@@ -9,7 +9,6 @@
 #include <gtk/gtk.h>
 
 typedef struct _WrappedLabelClass WrappedLabelClass;
-typedef struct _WrappedLabel WrappedLabel;
 
 struct _WrappedLabelClass {
 	GtkWidgetClass parent;

@@ -818,6 +818,8 @@ Radios *radios_new(void (*changed)(gpointer data), gpointer data)
 
 static void radios_free(GtkWidget *radio, Radios *radios)
 {
+	g_return_if_fail(radios != NULL);
+
 	g_list_free(radios->widgets);
 	g_free(radios);
 }
@@ -829,6 +831,9 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 	GSList *group = NULL;
 	gchar *s;
 	va_list args;
+
+	g_return_if_fail(radios != NULL);
+	g_return_if_fail(label != NULL);
 
 	va_start(args, label);
 	s = g_strdup_vprintf(label, args);
@@ -856,6 +861,8 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 
 static void radio_toggled(GtkToggleButton *button, Radios *radios)
 {
+	g_return_if_fail(radios != NULL);
+
 	if (radios->changed)
 		radios->changed(radios->changed_data);
 }
@@ -863,6 +870,8 @@ static void radio_toggled(GtkToggleButton *button, Radios *radios)
 void radios_pack(Radios *radios, GtkBox *box)
 {
 	GList *next;
+
+	g_return_if_fail(radios != NULL);
 
 	for (next = g_list_last(radios->widgets); next; next = next->prev)
 	{
@@ -878,6 +887,8 @@ void radios_pack(Radios *radios, GtkBox *box)
 void radios_set_value(Radios *radios, gint value)
 {
 	GList *next;
+
+	g_return_if_fail(radios != NULL);
 
 	for (next = radios->widgets; next; next = next->next)
 	{
@@ -900,6 +911,8 @@ void radios_set_value(Radios *radios, gint value)
 gint radios_get_value(Radios *radios)
 {
 	GList *next;
+
+	g_return_val_if_fail(radios != NULL, -1);
 
 	for (next = radios->widgets; next; next = next->next)
 	{

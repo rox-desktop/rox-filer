@@ -93,6 +93,11 @@ typedef struct _XMLwrapper XMLwrapper;
  */
 typedef struct _CollateKey CollateKey;
 
+/* Like a regular GtkLabel, except that the text can be wrapped to any
+ * width. Used for pinboard icons.
+ */
+typedef struct _WrappedLabel WrappedLabel;
+
 /* The minibuffer is a text field which appears at the bottom of
  * a filer window. It has four modes of operation:
  */

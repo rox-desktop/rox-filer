@@ -718,6 +718,31 @@ static GdkPixbuf* apply_mask(GdkPixbuf *pixbuf, GdkPixbuf *mask)
 	return with_alpha;
 }
 
+#define BORDER_X 16
+#define BORDER_Y 8
+/* Take the icon that the iconified window has given us and modify it to make
+ * it obvious what it is.
+ */
+static GdkPixbuf *apply_window_effect(GdkPixbuf *src)
+{
+	GdkPixbuf *new;
+	int w, h;
+
+	w = gdk_pixbuf_get_width(src);
+	h = gdk_pixbuf_get_height(src);
+
+	new = gdk_pixbuf_new(gdk_pixbuf_get_colorspace(src), TRUE,
+			8, w + BORDER_X * 2, h + BORDER_Y * 2);
+	gdk_pixbuf_fill(new, 0x88888888);
+
+	gdk_pixbuf_composite(src, new,
+			BORDER_X, BORDER_Y, w, h,
+			BORDER_X, BORDER_Y, 1, 1,
+			GDK_INTERP_NEAREST, 255);
+
+	return new;
+}
+
 /* Return a suitable icon for this window. unref the result.
  * Never returns NULL.
  */
@@ -781,7 +806,43 @@ static GdkPixbuf *get_image_for(IconWindow *win)
 		g_object_ref(retval);
 	}
 
+	/* Apply a special effect to make this look different from normal
+	 * pinboard icons.
+	 */
+	{
+		GdkPixbuf *old = retval;
+		retval = apply_window_effect(old);
+		g_object_unref(old);
+	}
+
 	return retval;
+}
+
+/* Stop the button from highlighting */
+static gint icon_expose(GtkWidget *widget, GdkEventExpose *event,
+			IconWindow *win)
+{
+	static GtkWidgetClass *parent_class = NULL;
+
+	g_return_val_if_fail(win != NULL, TRUE);
+	g_return_val_if_fail(win->label != NULL, TRUE);
+
+	if (!parent_class)
+	{
+		gpointer c = ((GTypeInstance *) widget)->g_class;
+		parent_class = (GtkWidgetClass *) g_type_class_peek_parent(c);
+	}
+
+	draw_label_shadow((WrappedLabel *) win->label, event->region);
+
+	gdk_gc_set_clip_region(win->label->style->fg_gc[win->label->state],
+				event->region);
+	(parent_class->expose_event)(widget, event);
+	gdk_gc_set_clip_region(win->label->style->fg_gc[win->label->state],
+				NULL);
+
+	/* Stop the button effect */
+	return TRUE;
 }
 
 /* A window has been iconified -- display it on the screen */
@@ -794,13 +855,17 @@ static void show_icon(IconWindow *win)
 	g_return_if_fail(win->label == NULL);
 
 	win->widget = gtk_button_new();
+	gtk_button_set_relief(GTK_BUTTON(win->widget), GTK_RELIEF_NONE);
+	g_signal_connect(win->widget, "expose-event",
+			G_CALLBACK(icon_expose), win);
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(win->widget), vbox);
 
 	pixbuf = get_image_for(win);
 
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_image_new_from_pixbuf(pixbuf),
-			   FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox),
+			  gtk_image_new_from_pixbuf(pixbuf),
+			  FALSE, TRUE, 0);
 	g_object_unref(pixbuf);
 
 	win->label = wrapped_label_new(win->text, 180);
@@ -866,8 +931,14 @@ static void update_style(gpointer key, gpointer data, gpointer user_data)
 {
 	IconWindow *win = (IconWindow *) data;
 
-	if (win->widget)
-		widget_modify_font(win->label, pinboard_font);
+	if (!win->widget)
+		return;
+
+	widget_modify_font(win->label, pinboard_font);
+	gtk_widget_modify_fg(win->label, GTK_STATE_NORMAL, &pin_text_fg_col);
+	gtk_widget_modify_bg(win->label, GTK_STATE_NORMAL, &pin_text_bg_col);
+	gtk_widget_modify_fg(win->label, GTK_STATE_PRELIGHT, &pin_text_fg_col);
+	gtk_widget_modify_bg(win->label, GTK_STATE_PRELIGHT, &pin_text_bg_col);
 }
 
 /* Find out what the new window manager can do... */

@@ -122,7 +122,7 @@ static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
 /* Used for the text colours (only) in the icons */
-static GdkColor pin_text_fg_col, pin_text_bg_col;
+GdkColor pin_text_fg_col, pin_text_bg_col;
 PangoFontDescription *pinboard_font = NULL; /* NULL => Gtk default */
 
 static GdkColor pin_text_shadow_col;
@@ -149,7 +149,6 @@ static Option o_pinboard_shadow_labels;
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
-static void draw_label_shadow(WrappedLabel *label);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
@@ -218,6 +217,7 @@ static void update_pinboard_font(void);
 static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
 static void clear_backdrop(GtkWidget *drop_box, gpointer data);
+static void radios_changed(gpointer data);
 
 
 /****************************************************************
@@ -588,7 +588,7 @@ void pinboard_set_backdrop(void)
 	hbox = gtk_hbox_new(TRUE, 2);
 	gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 4);
 
-	radios = radios_new(NULL, NULL);
+	radios = radios_new(radios_changed, dialog);
 	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
 	radios_add(radios, _("Centre the image without scaling it"),
@@ -602,12 +602,14 @@ void pinboard_set_backdrop(void)
 			BACKDROP_TILE, _("Tile"));
 
 	radios_set_value(radios, BACKDROP_TILE);
-	radios_pack(radios, GTK_BOX(hbox));
 	
 	/* The drop area... */
 	frame = drop_box_new(_("Drop an image here"));
 	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
+
+	radios_pack(radios, GTK_BOX(hbox));
 	gtk_box_pack_start(vbox, frame, TRUE, TRUE, 4);
+
 	drop_box_set_path(DROP_BOX(frame), current_pinboard->backdrop);
 
 	g_signal_connect(frame, "path_dropped",
@@ -620,6 +622,33 @@ void pinboard_set_backdrop(void)
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
 
 	gtk_widget_show_all(dialog);
+}
+
+/* Also used by tasklist.c */
+void draw_label_shadow(WrappedLabel *wl, GdkRegion *region)
+{
+	GtkWidget	*widget;
+	gint		x, y;
+
+	if (!o_pinboard_shadow_labels.int_value)
+		return;
+
+	gdk_gc_set_clip_region(current_pinboard->shadow_gc, region);
+
+	widget = GTK_WIDGET(wl);
+
+	y = widget->allocation.y - wl->y_off;
+	x = widget->allocation.x - wl->x_off -
+		((wl->text_width - widget->allocation.width) >> 1);
+
+	gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
+			x + 1, y + 1, wl->layout);
+
+	if (o_pinboard_shadow_labels.int_value > 1)
+		gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
+				x + 2, y + 2, wl->layout);
+
+	gdk_gc_set_clip_region(current_pinboard->shadow_gc, NULL);
 }
 
 /****************************************************************
@@ -825,12 +854,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 		gdk_gc_set_clip_region(gc, NULL);
 	}
 	else if (o_pinboard_shadow_labels.int_value)
-	{
-		gdk_gc_set_clip_region(current_pinboard->shadow_gc,
-					event->region);
-		draw_label_shadow((WrappedLabel *) pi->label);
-		gdk_gc_set_clip_region(current_pinboard->shadow_gc, NULL);
-	}
+		draw_label_shadow((WrappedLabel *) pi->label, event->region);
 
 	/* Draw children */
 	gdk_gc_set_clip_region(pi->label->style->fg_gc[GTK_STATE_NORMAL],
@@ -840,25 +864,6 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	/* Stop the button effect */
 	return TRUE;
-}
-
-static void draw_label_shadow(WrappedLabel *wl)
-{
-	GtkWidget	*widget;
-	gint		x, y;
-
-	widget = GTK_WIDGET(wl);
-
-	y = widget->allocation.y - wl->y_off;
-	x = widget->allocation.x - wl->x_off -
-		((wl->text_width - widget->allocation.width) >> 1);
-
-	gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
-			x + 1, y + 1, wl->layout);
-
-	if (o_pinboard_shadow_labels.int_value > 1)
-		gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
-				x + 2, y + 2, wl->layout);
 }
 
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
@@ -1462,11 +1467,16 @@ static gboolean bg_expose(GtkWidget *widget,
 {
 	GdkRectangle clipbox;
 	gpointer gclass = ((GTypeInstance *) widget)->g_class;
+	gboolean double_buffer;
 
 	gdk_gc_set_clip_region(widget->style->white_gc, event->region);
 	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
 
 	gdk_region_get_clipbox(event->region, &clipbox);
+
+	double_buffer = clipbox.width < 100 && clipbox.height < 100;
+	if (double_buffer)
+		gdk_window_begin_paint_region(widget->window, event->region);
 
 	/* Clear the area to the background image */
 	{
@@ -1527,6 +1537,9 @@ static gboolean bg_expose(GtkWidget *widget,
 	gdk_gc_set_clip_region(widget->style->black_gc, NULL);
 
 	((GtkWidgetClass *) gclass)->expose_event(widget, event);
+
+	if (double_buffer)
+		gdk_window_end_paint(widget->window);
 
 	return TRUE;
 }
@@ -1991,7 +2004,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 			scale = 1;
 
 		pixbuf = gdk_pixbuf_new(
-				gdk_pixbuf_get_colorspace(pixbuf), 0,
+				gdk_pixbuf_get_colorspace(pixbuf), FALSE,
 				8, screen_width, screen_height);
 		gdk_pixbuf_fill(pixbuf, 0);
 
@@ -2381,3 +2394,26 @@ static void update_pinboard_font(void)
 			: NULL;
 }
 
+static void radios_changed(gpointer data)
+{
+	GObject *dialog = G_OBJECT(data);
+	DropBox *drop_box;
+	const guchar *path;
+	Radios *radios;
+
+	g_return_if_fail(dialog != NULL);
+
+	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
+	drop_box = g_object_get_data(G_OBJECT(dialog), "rox-dropbox");
+
+	g_return_if_fail(radios != NULL);
+	g_return_if_fail(drop_box != NULL);
+	g_return_if_fail(current_pinboard != NULL);
+
+	if (current_pinboard->backdrop_style != BACKDROP_PROGRAM)
+	{
+		path = drop_box_get_path(drop_box);
+		if (path)
+			set_backdrop(path, radios_get_value(radios));
+	}
+}

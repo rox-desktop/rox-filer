@@ -11,6 +11,7 @@ extern Pinboard	*current_pinboard;
 extern Icon *pinboard_drag_in_progress;
 
 extern PangoFontDescription *pinboard_font;
+extern GdkColor pin_text_fg_col, pin_text_bg_col;
 
 typedef enum {
 	BACKDROP_NONE,
@@ -28,5 +29,6 @@ void pinboard_set_backdrop(void);
 void pinboard_set_backdrop_app(const gchar *app);
 GdkWindow *pinboard_get_window(void);
 void pinboard_add_widget(GtkWidget *widget);
+void draw_label_shadow(WrappedLabel *wl, GdkRegion *region);
 
 #endif /* _PINBOARD_H */
