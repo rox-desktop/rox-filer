@@ -57,3 +57,8 @@ typedef struct _Icon Icon;
  * like little pinboards, but with a more rigid layout.
  */
 typedef struct _Panel Panel;
+
+/* For very old versions of libxml... */
+#ifndef xmlChildrenNode
+#  define xmlChildrenNode childs
+#endif
