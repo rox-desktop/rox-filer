@@ -61,7 +61,6 @@ struct _Tool {
 Option o_toolbar, o_toolbar_info, o_toolbar_disable;
 Option o_toolbar_min_width;
 
-static GtkTooltips *tooltips = NULL;
 static FilerWindow *filer_window_being_counted;
 
 /* TRUE if the button presses (or released) should open a new window,
@@ -176,8 +175,6 @@ void toolbar_init(void)
 	option_add_int(&o_toolbar_min_width, "toolbar_min_width", 1);
 	option_add_notify(option_notify);
 	
-	tooltips = gtk_tooltips_new();
-
 	option_register_widget("tool-options", build_tool_options);
 }
 
