@@ -191,7 +191,7 @@ static gboolean idle_scan_dir(gpointer data)
 					filer_window->scan_min_width,
 					filer_window->collection->item_height);
 			collection_qsort(filer_window->collection,
-					sort_by_name);
+					filer_window->sort_fn);
 			if (filer_window->flags & FILER_NEEDS_RESCAN)
 				scan_dir(filer_window);
 
@@ -283,7 +283,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	item->mime_type = NULL;
 
 	if (base_type == TYPE_DIRECTORY &&
-			!(filer_window->flags & ITEM_FLAG_MOUNT_POINT))
+			!(item->flags & ITEM_FLAG_MOUNT_POINT))
 	{
 		/* Might be an application directory - better check... */
 		g_string_append(path, "/AppRun");
@@ -616,6 +616,38 @@ static int sort_by_name(const void *item1, const void *item2)
 		      (*((FileItem **)item2))->leafname);
 }
 
+static int sort_by_type(const void *item1, const void *item2)
+{
+	const FileItem *i1 = *((FileItem **) item1);
+	const FileItem *i2 = *((FileItem **) item2);
+	MIME_type *m1, *m2;
+
+	int	 diff = i1->base_type - i2->base_type;
+
+	if (!diff)
+		diff = (i1->flags & ITEM_FLAG_APPDIR)
+		     - (i2->flags & ITEM_FLAG_APPDIR);
+	if (diff)
+		return diff > 0 ? 1 : -1;
+
+	m1 = i1->mime_type;
+	m2 = i2->mime_type;
+	
+	if (m1 && m2)
+	{
+		diff = strcmp(m1->media_type, m2->media_type);
+		if (!diff)
+			diff = strcmp(m1->subtype, m2->subtype);
+	}
+	else
+		diff = m1 - m2;
+
+	if (diff)
+		return diff > 0 ? 1 : -1;
+	
+	return sort_by_name(item1, item2);
+}
+
 static gint clear_panel_hilight(gpointer data)
 {
 	collection_set_cursor_item(panel_with_timeout->collection, -1);
@@ -859,6 +891,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->panel = panel;
 	filer_window->panel_side = panel_side;
 	filer_window->temp_item_selected = FALSE;
+	filer_window->sort_fn = sort_by_type;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 

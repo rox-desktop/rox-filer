@@ -29,7 +29,7 @@ static GdkColor red = {0, 0xffff, 0, 0};
 
 typedef struct _GUIside GUIside;
 typedef void ActionChild(gpointer data);
-typedef void ForDirCB(char *path);
+typedef gboolean ForDirCB(char *path);
 
 struct _GUIside
 {
@@ -49,7 +49,7 @@ static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
 static GString  *message = NULL;
 static char     *action_dest = NULL;
-static void     (*action_do_func)(char *source, char *dest);
+static gboolean (*action_do_func)(char *source, char *dest);
 
 /* Static prototypes */
 static gboolean send();
@@ -153,9 +153,11 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 
 	while (next)
 	{
-		cb((char *) next->data);
-		g_string_sprintf(message, "+%s", dir);
-		send();
+		if (cb((char *) next->data))
+		{
+			g_string_sprintf(message, "+%s", dir);
+			send();
+		}
 
 		g_free(next->data);
 		next = next->next;
@@ -352,9 +354,11 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 
 /* 			ACTIONS ON ONE ITEM 			*/
 
-/* These may call themselves recursively, or ask questions, etc */
+/* These may call themselves recursively, or ask questions, etc.
+ * TRUE iff the directory needs to be rescanned.
+ */
 
-static void do_delete(char *path)
+static gboolean do_delete(char *path)
 {
 	struct 		stat info;
 	gboolean	write_prot;
@@ -363,10 +367,10 @@ static void do_delete(char *path)
 	if (lstat(path, &info))
 	{
 		send_error();
-		return;
+		return FALSE;
 	}
 
-	write_prot = access(path, W_OK) != 0;
+	write_prot = S_ISLNK(info.st_mode) ? FALSE : access(path, W_OK) != 0;
 	if (quiet == 0 || write_prot)
 	{
 		g_string_sprintf(message, "?Delete %s'%s'?\n",
@@ -377,7 +381,7 @@ static void do_delete(char *path)
 		if (rep == 'A')
 			quiet = TRUE;
 		else if (rep != 'Y')
-			return;
+			return FALSE;
 	}
 	if (S_ISDIR(info.st_mode))
 	{
@@ -390,7 +394,7 @@ static void do_delete(char *path)
 		{
 			g_free(safe_path);
 			send_error();
-			return;
+			return FALSE;
 		}
 		g_string_assign(message, "'Directory deleted\n");
 		send();
@@ -402,13 +406,19 @@ static void do_delete(char *path)
 		send();
 	}
 	else
+	{
 		send_error();
+		return FALSE;
+	}
+
+	return TRUE;
 }
 
-static void do_copy(char *path, char *dest)
+static gboolean do_copy(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
+	gboolean	retval = TRUE;
 
 	leaf = strrchr(path, '/');
 	if (!leaf)
@@ -429,7 +439,7 @@ static void do_copy(char *path, char *dest)
 		if (rep == 'A')
 			quiet = TRUE;
 		else if (rep != 'Y')
-			return;
+			return FALSE;
 	}
 
 	g_string_sprintf(message, "cp -a %s %s", path, dest_path);
@@ -437,15 +447,21 @@ static void do_copy(char *path, char *dest)
 		g_string_sprintf(message, "'Copied %s as %s\n",
 				path, dest_path);
 	else
+	{
 		g_string_sprintf(message, "!ERROR: Failed to copy %s as %s\n",
 				path, dest_path);
+		retval = FALSE;
+	}
 	send();
+
+	return retval;
 }
 
-static void do_move(char *path, char *dest)
+static gboolean do_move(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
+	gboolean	retval = TRUE;
 
 	leaf = strrchr(path, '/');
 	if (!leaf)
@@ -466,7 +482,7 @@ static void do_move(char *path, char *dest)
 		if (rep == 'A')
 			quiet = TRUE;
 		else if (rep != 'Y')
-			return;
+			return FALSE;
 	}
 
 	g_string_sprintf(message, "mv -f %s %s", path, dest_path);
@@ -479,12 +495,17 @@ static void do_move(char *path, char *dest)
 				path, dest_path);
 	}
 	else
+	{
 		g_string_sprintf(message, "!ERROR: Failed to move %s as %s\n",
 				path, dest_path);
+		retval = FALSE;
+	}
 	send();
+
+	return retval;
 }
 
-static void do_link(char *path, char *dest)
+static gboolean do_link(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
@@ -498,13 +519,18 @@ static void do_link(char *path, char *dest)
 	dest_path = make_path(dest, leaf)->str;
 
 	if (symlink(path, dest_path))
+	{
 		send_error();
+		return FALSE;
+	}
 	else
 	{
 		g_string_sprintf(message, "'Symlinked %s as %s\n",
 				path, dest_path);
 		send();
 	}
+
+	return TRUE;
 }
 
 /*			CHILD MAIN LOOPS			*/
@@ -525,9 +551,12 @@ static void delete_cb(gpointer data)
 		if (!collection->items[i].selected)
 			continue;
 		item = (FileItem *) collection->items[i].data;
-		do_delete(make_path(filer_window->path, item->leafname)->str);
-		g_string_sprintf(message, "+%s", filer_window->path);
-		send();
+		if (do_delete(make_path(filer_window->path,
+					item->leafname)->str))
+		{
+			g_string_sprintf(message, "+%s", filer_window->path);
+			send();
+		}
 		left--;
 	}
 	
@@ -541,9 +570,11 @@ static void list_cb(gpointer data)
 
 	while (paths)
 	{
-		action_do_func((char *) paths->data, action_dest);
-		g_string_sprintf(message, "+%s", action_dest);
-		send();
+		if (action_do_func((char *) paths->data, action_dest))
+		{
+			g_string_sprintf(message, "+%s", action_dest);
+			send();
+		}
 
 		paths = paths->next;
 	}

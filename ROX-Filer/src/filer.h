@@ -46,6 +46,7 @@ struct _FilerWindow
 	FilerFlags	flags;
 	Side		panel_side;
 	time_t		m_time;		/* m-time at last scan */
+	int 		(*sort_fn)(const void *a, const void *b);
 
 	/* Scanning */
 	DIR		*dir;
