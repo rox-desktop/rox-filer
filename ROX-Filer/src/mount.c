@@ -44,10 +44,10 @@
 # include <sys/mnttab.h>
 #endif
 #include <sys/time.h>
-#ifdef HAVE_STATFS
+#ifdef HAVE_SYS_VFS_H
 #include <sys/vfs.h>
 #endif
-#ifdef HAVE_STATVFS
+#ifdef HAVE_SYS_STATVFS_H
 #include <sys/statvfs.h>
 #endif
 
