@@ -807,8 +807,6 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	int		iwidth = image->width;
 	int		iheight = image->height;
 	int		x, y;
-	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
-					       : GTK_STATE_NORMAL;
 	
 	if (!parent_class)
 	{
@@ -855,17 +853,24 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	if (icon->selected)
 	{
-		gtk_paint_flat_box(pi->label->style, pi->label->window,
-				state,
-				GTK_SHADOW_NONE,
-				NULL, pi->label, "text",
+		GtkStyle *style = pi->label->style;
+		GdkGC *gc = style->bg_gc[GTK_STATE_SELECTED];
+
+		gdk_gc_set_clip_region(gc, event->region);
+		gdk_draw_rectangle(pi->label->window, gc, TRUE,
 				pi->label->allocation.x,
 				pi->label->allocation.y,
 				pi->label->allocation.width,
 				pi->label->allocation.height);
+		gdk_gc_set_clip_region(gc, NULL);
 	}
 	else if (o_pinboard_shadow_labels.int_value)
+	{
+		gdk_gc_set_clip_region(current_pinboard->shadow_gc,
+					event->region);
 		draw_label_shadow((GtkLabel *) pi->label);
+		gdk_gc_set_clip_region(current_pinboard->shadow_gc, NULL);
+	}
 
 	/* Draw children */
 	(parent_class->expose_event)(widget, event);
@@ -900,11 +905,6 @@ static void draw_label_shadow(GtkLabel *label)
 		   + ((widget->allocation.height
 		       - widget->requisition.height) * misc->yalign)
 		   + 0.5);
-
-	gdk_gc_set_clip_origin(current_pinboard->shadow_gc,
-			widget->allocation.x, widget->allocation.y);
-	gdk_gc_set_clip_rectangle(current_pinboard->shadow_gc,
-			&widget->allocation);
 
 	gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
 			x + 1, y + 1, layout);
@@ -1007,7 +1007,7 @@ static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d)
 /* Mark the area of the screen covered by the lasso box for redraw */
 static void draw_lasso(void)
 {
-	GdkRectangle area;
+	GdkRectangle area, edge;
 	
 	if (!lasso_in_progress)
 		return;
@@ -1017,8 +1017,27 @@ static void draw_lasso(void)
 	area.width = ABS(lasso_rect_x1 - lasso_rect_x2);
 	area.height = ABS(lasso_rect_y1 - lasso_rect_y2);
 
+	edge.x = area.x;
+	edge.y = area.y;
+	edge.width = area.width;
+	
+	edge.height = 2;		/* Top */
 	gdk_window_invalidate_rect(current_pinboard->window->window,
-				   &area, TRUE);
+				   &edge, TRUE);
+	
+	edge.y += area.height - 2;	/* Bottom */
+	gdk_window_invalidate_rect(current_pinboard->window->window,
+				   &edge, TRUE);
+	
+	edge.y = area.y;
+	edge.height = area.height;
+	edge.width = 2;			/* Left */
+	gdk_window_invalidate_rect(current_pinboard->window->window,
+				   &edge, TRUE);
+	
+	edge.x += area.width - 2;	/* Right */
+	gdk_window_invalidate_rect(current_pinboard->window->window,
+				   &edge, TRUE);
 }
 
 static void perform_action(PinIcon *pi, GdkEventButton *event)
@@ -1488,12 +1507,35 @@ static gint shadow_x, shadow_y;
 static gboolean bg_expose(GtkWidget *widget,
 			  GdkEventExpose *event, gpointer data)
 {
+	GdkRectangle clipbox;
 	gpointer gclass = ((GTypeInstance *) widget)->g_class;
 
-	/* TODO: Split large regions into smaller chunks... */
+	gdk_gc_set_clip_region(widget->style->white_gc, event->region);
+	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
 
-	gdk_window_begin_paint_region(widget->window, event->region);
-	
+	gdk_region_get_clipbox(event->region, &clipbox);
+
+	/* Clear the area to the background image */
+	{
+		GtkStyle *style = current_pinboard->window->style;
+		GdkGC *gc = style->base_gc[GTK_STATE_NORMAL];
+		
+		gdk_gc_set_clip_region(gc, event->region);
+		if (style->bg_pixmap[GTK_STATE_NORMAL])
+		{
+			gdk_gc_set_fill(gc, GDK_TILED);
+			gdk_gc_set_tile(gc, style->bg_pixmap[GTK_STATE_NORMAL]);
+		}
+
+		gdk_draw_rectangle(current_pinboard->window->window, gc, TRUE, 
+				   clipbox.x, clipbox.y,
+				   clipbox.width, clipbox.height);
+		if (style->bg_pixmap[GTK_STATE_NORMAL])
+			gdk_gc_set_fill(gc, GDK_SOLID);
+
+		gdk_gc_set_clip_region(gc, NULL);
+	}
+
 	if (pinboard_shadow)
 	{
 		gdk_draw_rectangle(widget->window,
@@ -1528,9 +1570,10 @@ static gboolean bg_expose(GtkWidget *widget,
 		}
 	}
 
-	((GtkWidgetClass *) gclass)->expose_event(widget, event);
+	gdk_gc_set_clip_region(widget->style->white_gc, NULL);
+	gdk_gc_set_clip_region(widget->style->black_gc, NULL);
 
-	gdk_window_end_paint(widget->window);
+	((GtkWidgetClass *) gclass)->expose_event(widget, event);
 
 	return TRUE;
 }
