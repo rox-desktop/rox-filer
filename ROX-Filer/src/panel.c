@@ -225,6 +225,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
+	gtk_widget_set_name(panel->window, "rox-panel");
 	gtk_widget_set_events(panel->window,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_POINTER_MOTION_MASK | GDK_LEAVE_NOTIFY_MASK);
