@@ -121,12 +121,12 @@ static void update_option_widgets(void);
 static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
 static void option_add(Option *option, guchar *key);
 
-static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_entry(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_radio_group(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_colour(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label);
+static GList *build_toggle(Option *option, xmlNode *node, guchar *label);
+static GList *build_slider(Option *option, xmlNode *node, guchar *label);
+static GList *build_entry(Option *option, xmlNode *node, guchar *label);
+static GList *build_radio_group(Option *option, xmlNode *node, guchar *label);
+static GList *build_colour(Option *option, xmlNode *node, guchar *label);
+static GList *build_menu(Option *option, xmlNode *node, guchar *label);
 
 
 /****************************************************************
@@ -265,9 +265,11 @@ static void option_add(Option *option, guchar *key)
 	g_return_if_fail(g_hash_table_lookup(option_hash, key) == NULL);
 	g_return_if_fail(option->value != NULL);
 	
-	option->save = TRUE;	/* Save by default */
-	option->ui = NULL;
 	option->has_changed = FALSE;
+
+	option->widget = NULL;
+	option->update_widget = NULL;
+	option->read_widget = NULL;
 
 	g_hash_table_insert(option_hash, key, option);
 
@@ -529,21 +531,10 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 	{
 		GList *widgets, *next;
 
-		if (option)
-		{
-			if (option->ui)
-				g_warning("UI for option already exists!");
-			else
-			{
-				option->ui = g_new(OptionUI, 1);
-				option->ui->update_widget = NULL;
-				option->ui->read_widget = NULL;
-			}
+		if (option && option->widget)
+			g_warning("Widget for option already exists!");
 
-			widgets = builder(option->ui, widget, label);
-		}
-		else
-			widgets = builder(NULL, widget, label);
+		widgets = builder(option, widget, label);
 
 		for (next = widgets; next; next = next->next)
 		{
@@ -624,14 +615,13 @@ static void build_options_window(void)
 	options_doc = NULL;
 }
 
-static void null_ui(gpointer key, gpointer value, gpointer data)
+static void null_widget(gpointer key, gpointer value, gpointer data)
 {
 	Option	*option = (Option *) value;
 
-	g_return_if_fail(option->ui != NULL);
+	g_return_if_fail(option->widget != NULL);
 
-	g_free(option->ui);
-	option->ui = NULL;
+	option->widget = NULL;
 }
 
 static void options_destroyed(GtkWidget *widget, gpointer data)
@@ -640,7 +630,7 @@ static void options_destroyed(GtkWidget *widget, gpointer data)
 	{
 		window = NULL;
 
-		g_hash_table_foreach(option_hash, null_ui, NULL);
+		g_hash_table_foreach(option_hash, null_widget, NULL);
 	}
 }
 
@@ -858,10 +848,10 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 	guchar		*new = NULL;
 
 	g_return_if_fail(option != NULL);
-	g_return_if_fail(option->ui != NULL);
+	g_return_if_fail(option->widget != NULL);
 
-	if (option->ui->read_widget)
-		new = option->ui->read_widget(option->ui);
+	if (option->read_widget)
+		new = option->read_widget(option);
 	else
 		return;
 
@@ -887,9 +877,6 @@ static void save_cb(gpointer key, gpointer value, gpointer data)
 	guchar	*name = (guchar *) key;
 	Option	*option = (Option *) value;
 	FILE	*stream = (FILE *) data;
-
-	if (!option->save)
-		return;
 
 	tmp = g_strdup_printf("%s = %s\n", name, option->value);
 	len = strlen(tmp);
@@ -951,10 +938,10 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 	Option *option = (Option *) value;
 
 	g_return_if_fail(option != NULL);
-	g_return_if_fail(option->ui != NULL);
+	g_return_if_fail(option->widget != NULL);
 
-	if (option->ui->update_widget)
-		option->ui->update_widget(option->ui, option->value);
+	if (option->update_widget)
+		option->update_widget(option, option->value);
 }
 
 /* Reflect the values in the Option structures by changing the widgets
@@ -969,75 +956,77 @@ static void update_option_widgets(void)
  * value of the option.
  */
 
-static void update_toggle(OptionUI *ui, guchar *value)
+static void update_toggle(Option *option, guchar *value)
 {
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(ui->widget),
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(option->widget),
 			atoi(value));
 }
 
-static void update_entry(OptionUI *ui, guchar *value)
+static void update_entry(Option *option, guchar *value)
 {
-	gtk_entry_set_text(GTK_ENTRY(ui->widget), value);
+	gtk_entry_set_text(GTK_ENTRY(option->widget), value);
 }
 
-static void update_radio_group(OptionUI *ui, guchar *value)
+static void update_radio_group(Option *option, guchar *value)
 {
-	radio_group_set_value(GTK_RADIO_BUTTON(ui->widget), value);
+	radio_group_set_value(GTK_RADIO_BUTTON(option->widget), value);
 }
 
-static void update_slider(OptionUI *ui, guchar *value)
+static void update_slider(Option *option, guchar *value)
 {
 	gtk_adjustment_set_value(
-		gtk_range_get_adjustment(GTK_RANGE(ui->widget)), atoi(value));
+			gtk_range_get_adjustment(GTK_RANGE(option->widget)),
+			atoi(value));
 }
 
-static void update_menu(OptionUI *ui, guchar *value)
+static void update_menu(Option *option, guchar *value)
 {
-	option_menu_set(GTK_OPTION_MENU(ui->widget), value);
+	option_menu_set(GTK_OPTION_MENU(option->widget), value);
 }
 
-static void update_colour(OptionUI *ui, guchar *value)
+static void update_colour(Option *option, guchar *value)
 {
 	GdkColor colour;
 
 	gdk_color_parse(value, &colour);
-	button_patch_set_colour(ui->widget, &colour);
+	button_patch_set_colour(option->widget, &colour);
 }
 
 /* Each of these read_* calls get the new (string) value of an option
  * from the widget.
  */
 
-static guchar *read_toggle(OptionUI *ui)
+static guchar *read_toggle(Option *option)
 {
-	return g_strdup_printf("%d",
-		gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(ui->widget)));
+	GtkToggleButton *toggle = GTK_TOGGLE_BUTTON(option->widget);
+
+	return g_strdup_printf("%d", gtk_toggle_button_get_active(toggle));
 }
 
-static guchar *read_entry(OptionUI *ui)
+static guchar *read_entry(Option *option)
 {
-	return gtk_editable_get_chars(GTK_EDITABLE(ui->widget), 0, -1);
+	return gtk_editable_get_chars(GTK_EDITABLE(option->widget), 0, -1);
 }
 
-static guchar *read_slider(OptionUI *ui)
+static guchar *read_slider(Option *option)
 {
 	return g_strdup_printf("%f",
-			gtk_range_get_adjustment(GTK_RANGE(ui->widget))->value);
+		gtk_range_get_adjustment(GTK_RANGE(option->widget))->value);
 }
 
-static guchar *read_radio_group(OptionUI *ui)
+static guchar *read_radio_group(Option *option)
 {
-	return radio_group_get_value(GTK_RADIO_BUTTON(ui->widget));
+	return radio_group_get_value(GTK_RADIO_BUTTON(option->widget));
 }
 
-static guchar *read_menu(OptionUI *ui)
+static guchar *read_menu(Option *option)
 {
-	return g_strdup(option_menu_get(GTK_OPTION_MENU(ui->widget)));
+	return g_strdup(option_menu_get(GTK_OPTION_MENU(option->widget)));
 }
 
-static guchar *read_colour(OptionUI *ui)
+static guchar *read_colour(Option *option)
 {
-	GtkStyle *style = GTK_BIN(ui->widget)->child->style;
+	GtkStyle *style = GTK_BIN(option->widget)->child->style;
 
 	return g_strdup_printf("#%04x%04x%04x",
 			style->bg[GTK_STATE_NORMAL].red,
@@ -1049,24 +1038,27 @@ static guchar *read_colour(OptionUI *ui)
  * callbacks.
  */
 
-static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_toggle(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*toggle;
 
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	toggle = gtk_check_button_new_with_label(_(label));
 
 	may_add_tip(toggle, node);
 
-	ui->update_widget = update_toggle;
-	ui->read_widget = read_toggle;
-	ui->widget = toggle;
+	option->update_widget = update_toggle;
+	option->read_widget = read_toggle;
+	option->widget = toggle;
+
+	//gtk_signal_connect_object(GTK_OBJECT(toggle), "toggled",
+			//GTK_SIGNAL_FUNC(check_widget), ui);
 
 	return g_list_append(NULL, toggle);
 }
 
-static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 {
 	GtkAdjustment *adj;
 	GtkWidget *hbox, *slide;
@@ -1074,7 +1066,7 @@ static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label)
 	int	fixed;
 	int	showvalue;
 
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	min = get_int(node, "min");
 	max = get_int(node, "max");
@@ -1108,19 +1100,19 @@ static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label)
 
 	gtk_box_pack_start(GTK_BOX(hbox), slide, !fixed, TRUE, 0);
 
-	ui->update_widget = update_slider;
-	ui->read_widget = read_slider;
-	ui->widget = slide;
+	option->update_widget = update_slider;
+	option->read_widget = read_slider;
+	option->widget = slide;
 
 	return g_list_append(NULL, hbox);
 }
 
-static GList *build_entry(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*hbox;
 	GtkWidget	*entry;
 
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 
@@ -1131,20 +1123,20 @@ static GList *build_entry(OptionUI *ui, xmlNode *node, guchar *label)
 	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
 	may_add_tip(entry, node);
 
-	ui->update_widget = update_entry;
-	ui->read_widget = read_entry;
-	ui->widget = entry;
+	option->update_widget = update_entry;
+	option->read_widget = read_entry;
+	option->widget = entry;
 
 	return g_list_append(NULL, hbox);
 }
 
-static GList *build_radio_group(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 {
 	GList		*list = NULL;
 	GtkWidget	*button = NULL;
 	xmlNode		*rn;
 
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	for (rn = node->xmlChildrenNode; rn; rn = rn->next)
 	{
@@ -1155,19 +1147,19 @@ static GList *build_radio_group(OptionUI *ui, xmlNode *node, guchar *label)
 		}
 	}
 
-	ui->update_widget = update_radio_group;
-	ui->read_widget = read_radio_group;
-	ui->widget = button;
+	option->update_widget = update_radio_group;
+	option->read_widget = read_radio_group;
+	option->widget = button;
 
 	return list;
 }
 
-static GList *build_colour(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_colour(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*hbox, *da, *button;
 	int		lpos;
 	
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	/* lpos gives the position for the label 
 	 * 0: label comes before the button
@@ -1196,14 +1188,14 @@ static GList *build_colour(OptionUI *ui, xmlNode *node, guchar *label)
 			gtk_label_new(_(label)),
 			FALSE, TRUE, 0);
 
-	ui->update_widget = update_colour;
-	ui->read_widget = read_colour;
-	ui->widget = button;
+	option->update_widget = update_colour;
+	option->read_widget = read_colour;
+	option->widget = button;
 
 	return g_list_append(NULL, hbox);
 }
 
-static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*hbox, *om, *option_menu;
 	xmlNode		*item;
@@ -1211,7 +1203,7 @@ static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label)
 	GList		*list, *kids;
 	int		min_w = 4, min_h = 4;
 
-	g_return_val_if_fail(ui != NULL, NULL);
+	g_return_val_if_fail(option != NULL, NULL);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 
@@ -1253,9 +1245,9 @@ static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label)
 			min_w + 50,	/* Else node doesn't work! */
 			min_h + 4);
 
-	ui->update_widget = update_menu;
-	ui->read_widget = read_menu;
-	ui->widget = option_menu;
+	option->update_widget = update_menu;
+	option->read_widget = read_menu;
+	option->widget = option_menu;
 
 	return g_list_append(NULL, hbox);
 }

@@ -92,8 +92,8 @@ char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
 static void reread_mime_files(guchar *unused);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
-static GList *build_type_reread(OptionUI *ui, xmlNode *node, guchar *label);
-static GList *build_type_edit(OptionUI *ui, xmlNode *node, guchar *label);
+static GList *build_type_reread(Option *none, xmlNode *node, guchar *label);
+static GList *build_type_edit(Option *none, xmlNode *node, guchar *label);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
  * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
@@ -1130,9 +1130,11 @@ static void reread_mime_files(guchar *unused)
 	type_reread();
 }
 
-static GList *build_type_reread(OptionUI *none, xmlNode *node, guchar *label)
+static GList *build_type_reread(Option *none, xmlNode *node, guchar *label)
 {
 	GtkWidget *button, *align;
+
+	g_return_val_if_fail(none == NULL, NULL);
 
 	align = gtk_alignment_new(0.1, 0, 0.1, 0);
 	button = gtk_button_new_with_label(_(label));
@@ -1144,9 +1146,11 @@ static GList *build_type_reread(OptionUI *none, xmlNode *node, guchar *label)
 	return g_list_append(NULL, align);
 }
 
-static GList *build_type_edit(OptionUI *none, xmlNode *node, guchar *label)
+static GList *build_type_edit(Option *none, xmlNode *node, guchar *label)
 {
 	GtkWidget *button, *align;
+
+	g_return_val_if_fail(none == NULL, NULL);
 
 	align = gtk_alignment_new(0.1, 0, 0.1, 0);
 	button = gtk_button_new_with_label(_(label));

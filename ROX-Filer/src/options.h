@@ -10,23 +10,17 @@
 
 #include <gtk/gtk.h>
 
-typedef void OptionChanged(guchar *new_value); /* (also connect_object cb) */
 typedef void OptionNotify(void);
-typedef struct _OptionUI OptionUI;
-typedef GList * (*OptionBuildFn)(OptionUI *ui, xmlNode *node, guchar *label);
+typedef GList * (*OptionBuildFn)(Option *option, xmlNode *node, guchar *label);
 
 struct _Option {
-	OptionUI	*ui;		/* NULL => No UI yet */
 	guchar		*value;
 	long		int_value;
-	gboolean	save;		/* Save to options file */
 	gboolean	has_changed;
-};
 
-struct _OptionUI {
-	GtkWidget	*widget;
-	void		(*update_widget)(OptionUI *ui, guchar *value);
-	guchar *	(*read_widget)(OptionUI *ui);
+	GtkWidget	*widget;		/* NULL => No UI yet */
+	void		(*update_widget)(Option *option, guchar *value);
+	guchar *	(*read_widget)(Option *option);
 };
 
 /* Prototypes */

@@ -102,7 +102,7 @@ static void coll_selection_changed(Collection *collection, guint time,
 static void recreate_toolbar(FilerWindow *filer_window);
 static void toggle_shaded(GtkWidget *widget);
 static void option_notify(void);
-static GList *build_tool_options(OptionUI *ui, xmlNode *node, guchar *label);
+static GList *build_tool_options(Option *option, xmlNode *node, guchar *label);
 
 static Tool all_tools[] = {
 	{N_("Close"), "close", N_("Close filer window"),
@@ -689,11 +689,11 @@ static void option_notify(void)
 	}
 }
 
-static void update_tools(OptionUI *ui, guchar *value)
+static void update_tools(Option *option, guchar *value)
 {
 	GList	*next, *kids;
 
-	kids = gtk_container_children(GTK_CONTAINER(ui->widget));
+	kids = gtk_container_children(GTK_CONTAINER(option->widget));
 
 	for (next = kids; next; next = next->next)
 	{
@@ -711,7 +711,7 @@ static void update_tools(OptionUI *ui, guchar *value)
 	g_list_free(kids);
 }
 
-static guchar *read_tools(OptionUI *ui)
+static guchar *read_tools(Option *option)
 {
 	GList	*next, *kids;
 	GString	*list;
@@ -719,7 +719,7 @@ static guchar *read_tools(OptionUI *ui)
 
 	list = g_string_new(NULL);
 
-	kids = gtk_container_children(GTK_CONTAINER(ui->widget));
+	kids = gtk_container_children(GTK_CONTAINER(option->widget));
 
 	for (next = kids; next; next = next->next)
 	{
@@ -744,19 +744,21 @@ static guchar *read_tools(OptionUI *ui)
 	return retval;
 }
 
-static GList *build_tool_options(OptionUI *ui, xmlNode *node, guchar *label)
+static GList *build_tool_options(Option *option, xmlNode *node, guchar *label)
 {
 	int		i = 0;
 	GtkWidget	*hbox, *tool;
+
+	g_return_val_if_fail(option != NULL, NULL);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 
 	while ((tool = toolbar_tool_option(i++)))
 		gtk_box_pack_start(GTK_BOX(hbox), tool, FALSE, TRUE, 0);
 
-	ui->update_widget = update_tools;
-	ui->read_widget = read_tools;
-	ui->widget = hbox;
+	option->update_widget = update_tools;
+	option->read_widget = read_tools;
+	option->widget = hbox;
 
 	return g_list_append(NULL, hbox);
 }
