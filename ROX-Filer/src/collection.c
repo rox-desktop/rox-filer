@@ -1172,7 +1172,11 @@ static void get_range(int from, int to, int step, short *pos, short *len)
 #endif
 {
 	if (from > to)
-		from ^= to ^= from ^= to;
+	{
+		int tmp = to;
+		to = from;
+		from = tmp;
+	}
 
 	from = (from + step / 4) / step;	/* First item */
 	to = (to + step - step / 4) / step;	/* Last item (inclusive) */
