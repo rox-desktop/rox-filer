@@ -139,20 +139,22 @@ void type_init(void)
 
 	icon_theme = gtk_icon_theme_new();
 	gtk_icon_theme_set_custom_theme(icon_theme, "ROX");
-	info = gtk_icon_theme_lookup_icon(icon_theme, "application:postscript", HUGE_WIDTH, 0);
+	info = gtk_icon_theme_lookup_icon(icon_theme, "application:postscript",
+					ICON_HEIGHT, 0);
 	if (info)
 		gtk_icon_info_free(info);
 	else
 	{
 		char *icon_home;
-		delayed_error("No icon theme found... installing ROX default icon theme...");
+		delayed_error(_("No icon theme found... installing ROX default "
+				"icon theme..."));
 
 		icon_home = g_build_filename(home_dir, ".icons", "ROX", NULL);
-		if (symlink(make_path(app_dir, "ROX"), icon_home)) {
-			delayed_error("Failed to create symlink '%s':\n%s", icon_home,
-					g_strerror(errno));
-		}
+		if (symlink(make_path(app_dir, "ROX"), icon_home))
+			delayed_error(_("Failed to create symlink '%s':\n%s"),
+					icon_home, g_strerror(errno));
 		g_free(icon_home);
+
 		gtk_icon_theme_rescan_if_needed(icon_theme);
 	}
 	
@@ -459,10 +461,13 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	}
 
 	type_name = g_strconcat(type->media_type, ":", type->subtype, NULL);
-	full = gtk_icon_theme_load_icon(icon_theme, type_name, HUGE_WIDTH, 0, NULL);
+	full = gtk_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
+						0, NULL);
 	g_free(type_name);
 	if (!full)
-		full = gtk_icon_theme_load_icon(icon_theme, type->media_type, HUGE_WIDTH, 0, NULL);
+		full = gtk_icon_theme_load_icon(icon_theme,
+						type->media_type,
+						ICON_HEIGHT, 0, NULL);
 	if (full)
 	{
 		type->image = masked_pixmap_new(full);

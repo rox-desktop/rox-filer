@@ -506,7 +506,6 @@ pixbuf_supports_svg ()
   return found_svg;
 }
 
-#define GTK_DATA_PREFIX "/usr/local/share/"
 static void
 gtk_icon_theme_init (GtkIconTheme *icon_theme)
 {
