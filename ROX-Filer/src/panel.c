@@ -1177,6 +1177,7 @@ static gboolean enter_icon(GtkWidget *widget,
 			   Icon *icon)
 {
 	icon_may_update(icon);
+	panel_icon_set_tip((PanelIcon *) icon);
 
 	return FALSE;
 }

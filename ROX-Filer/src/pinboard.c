@@ -903,6 +903,7 @@ static gboolean enter_notify(GtkWidget *widget,
 			     PinIcon *pi)
 {
 	icon_may_update((Icon *) pi);
+	pin_icon_set_tip(pi);
 	return TRUE;
 }
 
