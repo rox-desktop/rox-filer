@@ -493,6 +493,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	GtkWidget	*bar;
 	GtkWidget	*b;
 	int		i;
+	int		width;;
 
 	bar = gtk_toolbar_new();
 
@@ -506,17 +507,28 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	else
 		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
 
+	width=0;
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
 		Tool	*tool = &all_tools[i];
+		GtkRequisition req;
 
 		if (filer_window && !tool->enabled)
 			continue;
 
 		b = add_button(bar, tool, filer_window);
+		
+		gtk_widget_size_request(b, &req);
+		width+=req.width;
+		
 		if (filer_window && tool->drop_action != DROP_NONE)
 			handle_drops(filer_window, b, tool->drop_action);
 	}
+
+	/* Make the toolbar wide enough for all icons to be seen, plus
+	   a little for the (start of the) text label */
+	if (filer_window)
+		gtk_widget_set_size_request(bar, width+32, -1);
 
 	if (filer_window)
 	{
