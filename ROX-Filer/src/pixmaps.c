@@ -228,6 +228,126 @@ void pixmap_make_small(MaskedPixmap *mp)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+#ifdef GTK2
+/* Create a thumbnail file for this image.
+ * Spec says to use different permissions, but as we only use the global
+ * save dir anyway...
+ * XXX: Thumbnails should be deleted somewhere!
+ */
+static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
+{
+	struct stat info;
+	int original_width, original_height;
+	GString *to;
+	char *swidth, *sheight, *ssize, *smtime;
+	char *src;
+	char **bits, **bit;
+
+	original_width = gdk_pixbuf_get_width(full);
+	original_height = gdk_pixbuf_get_height(full);
+
+	if (mc_stat(path, &info) != 0)
+		return;
+
+	swidth = g_strdup_printf("%d", original_width);
+	sheight = g_strdup_printf("%d", original_height);
+	ssize = g_strdup_printf("%ld", info.st_size);
+	smtime = g_strdup_printf("%ld", info.st_mtime);
+
+	to = g_string_new(home_dir);
+	g_string_append(to, "/.thumbnails");
+	mkdir(to->str, 0700);
+	g_string_append(to, "/96x96");
+	mkdir(to->str, 0700);
+
+	src = pathdup(path);
+	g_return_if_fail(src[0] == '/');
+	bits = g_strsplit(src + 1, "/", 0);
+	g_free(src);
+
+	for (bit = bits; *bit && bit[1]; bit++)
+	{
+		g_string_append_c(to, '/');
+		g_string_append(to, *bit);
+		mkdir(to->str, 0700);
+	}
+
+	g_string_append_c(to, '/');
+	g_string_append(to, *bit);
+	g_string_append(to, ".png");
+
+	g_strfreev(bits);
+
+	g_print("[ save to '%s' ]\n", to->str);
+
+	gdk_pixbuf_save(image->huge_pixbuf,
+			to->str,
+			"png",
+			NULL,
+			"tEXt::OriginalWidth", swidth,
+			"tEXt::OriginalHeight", sheight,
+			"tEXt::OriginalSize", ssize,
+			"tEXt::OriginalMTime", smtime,
+			NULL);
+
+	g_string_free(to, TRUE);
+	g_free(swidth);
+	g_free(sheight);
+	g_free(ssize);
+	g_free(smtime);
+}
+
+/* Check if we have an up-to-date thumbnail for this image.
+ * If so, return it. Otherwise, returns NULL.
+ */
+static GdkPixbuf *get_thumbnail_for(char *path)
+{
+	GdkPixbuf *thumb;
+	char *thumb_path;
+	char *ssize, *smtime;
+	struct stat info;
+
+	path = pathdup(path);
+	
+	thumb_path = g_strdup_printf("%s/.thumbnails/96x96/%s.png",
+					home_dir, path);
+
+	g_print("[ looking for thumbnail in %s ]\n", thumb_path);
+
+	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
+	if (!thumb)
+		goto out;
+
+	/* Note that these don't need freeing... */
+	ssize = gdk_pixbuf_get_option(thumb, "tEXt::OriginalSize");
+	if (!ssize)
+		goto out;
+	smtime = gdk_pixbuf_get_option(thumb, "tEXt::OriginalMTime");
+	if (!smtime)
+		goto out;
+	if (mc_stat(path, &info) != 0)
+		goto out;
+
+	g_print("[ comparing... ]\n");
+
+	if (info.st_mtime != atol(smtime) || info.st_size != atol(ssize))
+	{
+		gdk_pixbuf_unref(thumb);
+		g_print("[ changed ]\n");
+		thumb = NULL;
+		goto out;
+	}
+
+	g_print("[ using thumb ]\n");
+out:
+	g_free(path);
+	g_free(thumb_path);
+
+	return thumb;
+}
+
+#endif
+
 /* Load the image 'path' and return a pointer to the resulting
  * MaskedPixmap. NULL on failure.
  */
@@ -238,7 +358,9 @@ static MaskedPixmap *image_from_file(char *path)
 #ifdef GTK2
 	GError		*error = NULL;
 	
-	pixbuf = gdk_pixbuf_new_from_file(path, &error);
+	pixbuf = get_thumbnail_for(path);
+	if (!pixbuf)
+		pixbuf = gdk_pixbuf_new_from_file(path, &error);
 	if (!pixbuf)
 	{
 		g_print("%s\n", error ? error->message : _("Unknown error"));
@@ -252,6 +374,14 @@ static MaskedPixmap *image_from_file(char *path)
 #endif
 
 	image = image_from_pixbuf(pixbuf);
+
+#ifdef GTK2
+	/* If the source image was very large, save a thumbnail */
+	if (gdk_pixbuf_get_width(pixbuf) * gdk_pixbuf_get_height(pixbuf) >
+	   (HUGE_WIDTH * HUGE_HEIGHT * 3))
+		save_thumbnail(path, pixbuf, image);
+#endif
+	
 	gdk_pixbuf_unref(pixbuf);
 
 	return image;
