@@ -55,6 +55,7 @@ void i18n_init(void)
 
 	option_add_string(&o_translation, "i18n_translation", "From LANG");
 	set_trans(o_translation.value);
+	o_translation.has_changed = FALSE; /* Prevent warning about saving */
 
 	option_add_notify(trans_changed);
 }
