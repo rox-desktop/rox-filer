@@ -315,7 +315,7 @@ void dir_rescan(Directory *dir, const guchar *pathname)
 	GPtrArray	*names;
 	DIR		*d;
 	struct dirent	*ent;
-	int		i;
+	guint		i;
 
 	g_return_if_fail(dir != NULL);
 	g_return_if_fail(pathname != NULL);
@@ -406,7 +406,7 @@ void dir_merge_new(Directory *dir)
 	GPtrArray *up = dir->up_items;
 	GPtrArray *gone = dir->gone_items;
 	GList	  *list;
-	int	  i;
+	guint	  i;
 
 	for (list = dir->users; list; list = list->next)
 	{
@@ -445,7 +445,7 @@ void dir_merge_new(Directory *dir)
 
 static void free_items_array(GPtrArray *array)
 {
-	int	i;
+	guint	i;
 
 	for (i = 0; i < array->len; i++)
 	{
@@ -502,7 +502,7 @@ static gboolean check_unused(gpointer key, gpointer value, gpointer data)
 static void remove_missing(Directory *dir, GPtrArray *keep)
 {
 	GPtrArray	*deleted;
-	int		i;
+	guint		i;
 
 	deleted = g_ptr_array_new();
 

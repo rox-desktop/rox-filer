@@ -466,7 +466,7 @@ static gboolean send(void)
 	fwrite(len_buffer, 1, 4, to_parent);
 	len = fwrite(message->str, 1, message->len, to_parent);
 	fflush(to_parent);
-	return len == message->len;
+	return len == (ssize_t) message->len;
 }
 
 /* Set the directory indicator at the top of the window */

@@ -26,6 +26,7 @@
 #include <gtk/gtk.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 #include "global.h"
 
