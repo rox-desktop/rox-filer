@@ -95,6 +95,7 @@ static xmlNodePtr rpc_FileType(GList *args);
 static xmlNodePtr rpc_Mount(GList *args);
 
 static xmlNodePtr rpc_PanelAdd(GList *args);
+static xmlNodePtr rpc_PanelRemove(GList *args);
 static xmlNodePtr rpc_PinboardAdd(GList *args);
 static xmlNodePtr rpc_SetBackdrop(GList *args);
 static xmlNodePtr rpc_SetBackdropApp(GList *args);
@@ -142,6 +143,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
+	soap_register("PanelRemove", rpc_PanelRemove, "Side,Path", NULL);
 
 	/* Look for a property on the root window giving the IPC window
 	 * of an already-running copy of this version of the filer, running
@@ -860,6 +862,25 @@ static xmlNodePtr rpc_PanelAdd(GList *args)
 	after = (tmp == -1) ? FALSE : tmp;
 
 	panel_add(side, path, label, after);
+
+	g_free(path);
+
+	return NULL;
+}
+
+static xmlNodePtr rpc_PanelRemove(GList *args)
+{
+	PanelSide side;
+	char *path, *side_name;
+
+	side_name = string_value(ARG(0));
+	side = panel_name_to_side(side_name);
+	g_free(side_name);
+	g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
+
+	path = string_value(ARG(1));
+
+	panel_remove_item(side, path);
 
 	g_free(path);
 

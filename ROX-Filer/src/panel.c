@@ -98,8 +98,8 @@ static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel);
 static void panel_destroyed(GtkWidget *widget, Panel *panel);
 static const char *pan_from_file(gchar *line);
 static gint icon_button_release(GtkWidget *widget,
-			        GdkEventButton *event,
-			        PanelIcon *pi);
+				GdkEventButton *event,
+				PanelIcon *pi);
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      PanelIcon *pi);
@@ -121,12 +121,12 @@ static void panel_post_resize(GtkWidget *box,
 			GtkRequisition *req, Panel *panel);
 static void drag_set_panel_dest(PanelIcon *pi);
 static void add_uri_list(GtkWidget          *widget,
-                         GdkDragContext     *context,
-                         gint               x,
-                         gint               y,
-                         GtkSelectionData   *selection_data,
-                         guint              info,
-                         guint32            time,
+			 GdkDragContext     *context,
+			 gint               x,
+			 gint               y,
+			 GtkSelectionData   *selection_data,
+			 guint              info,
+			 guint32            time,
 			 Panel		    *panel);
 static void panel_add_item(Panel *panel,
 			   const gchar *path,
@@ -135,29 +135,29 @@ static void panel_add_item(Panel *panel,
 			   const gchar *shortcut,
 			   const gchar *arg);
 static gboolean panel_drag_motion(GtkWidget	*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    Panel		*panel);
 static gboolean insert_drag_motion(GtkWidget	*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    Panel		*panel);
 static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    PanelIcon		*pi);
 static void panel_drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
+		       GdkDragContext	*context,
 		       guint32		time,
 		       Panel		*panel);
 static void drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
+		       GdkDragContext	*context,
 		       guint32		time,
 		       Icon	*icon);
 static GtkWidget *make_insert_frame(Panel *panel);
@@ -359,7 +359,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	g_object_set_data(G_OBJECT(frame), "after", "yes");
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
 
-        if (o_panel_is_dock.int_value)
+	if (o_panel_is_dock.int_value)
 		gtk_window_set_type_hint(GTK_WINDOW(panel->window),
 				GDK_WINDOW_TYPE_HINT_DOCK);	
 
@@ -415,8 +415,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	number_of_windows++;
 	gdk_window_lower(panel->window->window);
 	gtk_widget_show(panel->window);
-        /* This has no effect until after window is showing; GTK+ bug? */
-        keep_below(panel->window->window, TRUE);
+	/* This has no effect until after window is showing; GTK+ bug? */
+	keep_below(panel->window->window, TRUE);
 
 	{
 		GdkWindow *pinboard;
@@ -741,9 +741,66 @@ static void panel_add_item(Panel *panel,
 
 	if (!loading_panel)
 		panel_save(panel);
-		
+
 	panel_icon_set_tip(pi);
 	gtk_widget_show(widget);
+}
+
+static gboolean remove_item_from_side(GtkWidget *container, const gchar *path)
+{
+	GList *kids, *next;
+	gboolean found = FALSE;
+
+	kids = gtk_container_get_children(GTK_CONTAINER(container));
+
+	for (next = kids; next; next = next->next)
+	{
+		Icon    *icon;
+		icon = g_object_get_data(G_OBJECT(next->data), "icon");
+		if (!icon)
+			continue;
+
+		if (strcmp(path, icon->src_path) == 0)
+		{
+			icon_destroy(icon);
+			found = TRUE;
+			break;
+		}
+	}
+	
+	g_list_free(kids);
+
+	return found;
+}
+
+/* Remove an item with this path. If more than one item matches, only
+ * one is removed. Returns TRUE if an item was successfully removed.
+ */
+gboolean panel_remove_item(PanelSide side, const gchar *path)
+{
+	Panel *panel;
+
+	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
+	g_return_val_if_fail(path != NULL, FALSE);
+
+	panel = current_panel[side];
+	if (!panel)
+	{
+		g_warning("No panel on this side of the screen!");
+		return FALSE;
+	}
+
+	if (remove_item_from_side(panel->before, path) ||
+	    remove_item_from_side(panel->after, path))
+	{
+		panel_save(panel);
+		panel_update(panel);
+		return TRUE;
+	}
+
+
+	g_warning("Panel item '%s' not found", path);
+	return FALSE;
 }
 
 /* Called when Gtk+ wants to know how much space an icon needs.
@@ -962,8 +1019,8 @@ static gint panel_button_press(GtkWidget *widget,
 }
 
 static gint icon_button_release(GtkWidget *widget,
-			        GdkEventButton *event,
-			        PanelIcon *pi)
+				GdkEventButton *event,
+				PanelIcon *pi)
 {
 	if (pi->socket && event->button == 1)
 		return FALSE;	/* Restart button */
@@ -1168,10 +1225,10 @@ static void drag_set_panel_dest(PanelIcon *pi)
 }
 
 static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    PanelIcon		*pi)
 {
 	GdkDragAction	action = context->suggested_action;
@@ -1246,12 +1303,12 @@ out:
 
 
 static void add_uri_list(GtkWidget          *widget,
-                         GdkDragContext     *context,
-                         gint               x,
-                         gint               y,
-                         GtkSelectionData   *selection_data,
-                         guint              info,
-                         guint32            time,
+			 GdkDragContext     *context,
+			 gint               x,
+			 gint               y,
+			 GtkSelectionData   *selection_data,
+			 guint              info,
+			 guint32            time,
 			 Panel		    *panel)
 {
 	gboolean after = FALSE;
@@ -1294,7 +1351,7 @@ static void drag_end(GtkWidget *widget,
 }
 
 static void drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
+		       GdkDragContext	*context,
 		       guint32		time,
 		       Icon	*icon)
 {
@@ -1434,10 +1491,10 @@ static gint panel_leave_event(GtkWidget *widget,
 	if (event->mode != GDK_CROSSING_NORMAL)
 		return FALSE;	/* Grab for menu, DnD, etc */
 
-        keep_below(panel->window->window, TRUE);
+	keep_below(panel->window->window, TRUE);
 
-        /* Shouldn't need this as well as keep_below but some WMs don't
-         * automatically lower as soon as the hint is set */ 
+	/* Shouldn't need this as well as keep_below but some WMs don't
+	 * automatically lower as soon as the hint is set */ 
 	pinboard = pinboard_get_window();
 	window_put_just_above(panel->window->window, pinboard);
 
@@ -1459,13 +1516,13 @@ static void motion_may_raise(Panel *panel, int x, int y)
 		raise = x == panel->window->allocation.width - 1;
 
 	if (raise)
-        {
+	{
 		keep_below(panel->window->window, FALSE);
 
 		/* Shouldn't need this as well as keep_below but some WMs don't
 		 * automatically raise as soon as the hint is set */ 
 		gdk_window_raise(panel->window->window);
-        }
+	}
 }
 
 static gboolean may_autoscroll(Panel *panel)
@@ -2212,10 +2269,10 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 
 /* Note: also called from icon handler */
 static gboolean panel_drag_motion(GtkWidget	*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    Panel		*panel)
 {
 	int panel_x, panel_y;
@@ -2229,10 +2286,10 @@ static gboolean panel_drag_motion(GtkWidget	*widget,
 }
 
 static gboolean insert_drag_motion(GtkWidget	*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
+			    GdkDragContext	*context,
+			    gint		x,
+			    gint		y,
+			    guint		time,
 			    Panel		*panel)
 {
 	int panel_x, panel_y;
@@ -2245,7 +2302,7 @@ static gboolean insert_drag_motion(GtkWidget	*widget,
 
 /* Note: also called from icon handler */
 static void panel_drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
+		       GdkDragContext	*context,
 		       guint32		time,
 		       Panel		*panel)
 {
