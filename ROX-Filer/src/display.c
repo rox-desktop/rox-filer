@@ -70,39 +70,35 @@ static gboolean o_dirs_first = FALSE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
 
+typedef struct _Template Template;
+
+struct _Template {
+	GdkRectangle	icon;
+	GdkRectangle	leafname;
+
+	/* Note that details_string is either NULL or points to a
+	 * static buffer - don't free it!
+	 */
+	guchar		*details_string;
+	GdkRectangle	details;
+};
+
+#define SHOW_RECT(ite, template)	\
+	g_print("%s: %dx%d+%d+%d  %dx%d+%d+%d\n",	\
+		item->leafname,				\
+		(template)->leafname.width, (template)->leafname.height,\
+		(template)->leafname.x, (template)->leafname.y,		\
+		(template)->icon.width, (template)->icon.height,	\
+		(template)->icon.x, (template)->icon.y)
+
 /* Static prototypes */
-static void draw_item_large(GtkWidget *widget,
+static void fill_template(GdkRectangle *area, DirItem *item,
+			FilerWindow *filer_window, Template *template);
+static void draw_item(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area,
 			FilerWindow *filer_window);
-static void draw_item_small(GtkWidget *widget,
-			CollectionItem *item,
-			GdkRectangle *area,
-			FilerWindow *filer_window);
-static void draw_item_large_full(GtkWidget *widget,
-			CollectionItem *colitem,
-			GdkRectangle *area,
-			FilerWindow *filer_window);
-static void draw_item_small_full(GtkWidget *widget,
-			CollectionItem *colitem,
-			GdkRectangle *area,
-			FilerWindow *filer_window);
-static gboolean test_point_large(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *item,
-				int width, int height,
-				FilerWindow *filer_window);
-static gboolean test_point_small(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *item,
-				int width, int height,
-				FilerWindow *filer_window);
-static gboolean test_point_large_full(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *item,
-				int width, int height,
-				FilerWindow *filer_window);
-static gboolean test_point_small_full(Collection *collection,
+static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height,
@@ -162,6 +158,123 @@ static int details_width(FilerWindow *filer_window, DirItem *item)
 	return fixed_width * strlen(details(filer_window, item));
 }
 
+static void large_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	int	col_width = filer_window->collection->item_width;
+
+	MaskedPixmap	*image = item->image;
+	int		iwidth = MIN(image->width, MAX_ICON_WIDTH);
+	int		iheight = MIN(image->height + 6, MAX_ICON_HEIGHT);
+	int		image_x = area->x + ((col_width - iwidth) >> 1);
+	int		image_y;
+	
+	int	text_width = item->name_width;
+	int	font_height = item_font->ascent + item_font->descent;
+	int	text_x = area->x + ((col_width - text_width) >> 1);
+	int	text_y = area->y + area->height - font_height - 2;
+
+	text_x = MAX(text_x, area->x);
+
+	template->leafname.x = text_x;
+	template->leafname.y = text_y;
+	template->leafname.width = MIN(text_width, area->width);
+	template->leafname.height = font_height;
+
+	image_y = text_y - iheight;
+	image_y = MAX(area->y, image_y);
+	
+	template->icon.x = image_x;
+	template->icon.y = image_y;
+	template->icon.width = iwidth;
+	template->icon.height = MIN(MAX_ICON_HEIGHT, iheight);
+}
+
+static void small_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
+	int	font_height = item_font->ascent + item_font->descent;
+	int	low_text_y = area->y + area->height - font_height - 2;
+	int	max_text_width = area->width - SMALL_ICON_WIDTH - 4;
+
+	template->leafname.x = text_x;
+	template->leafname.y = low_text_y;
+	template->leafname.width = MIN(max_text_width, item->name_width);
+	template->leafname.height = font_height;
+	
+	template->icon.x = area->x;
+	template->icon.y = area->y;
+	template->icon.width = SMALL_ICON_WIDTH;
+	template->icon.height = SMALL_ICON_HEIGHT;
+}
+
+static void large_full_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	int	font_height = item_font->ascent + item_font->descent;
+	int	fixed_height = fixed_font->ascent + fixed_font->descent;
+	int	max_text_width = area->width - MAX_ICON_WIDTH - 4;
+
+	template->icon.x = area->x;
+	template->icon.y = area->y;
+	template->icon.width = MAX_ICON_WIDTH;
+	template->icon.height = MAX_ICON_HEIGHT;
+
+	template->leafname.x = area->x + MAX_ICON_WIDTH + 4;
+	template->leafname.width = MIN(max_text_width, item->name_width);
+	template->leafname.height = font_height;
+
+	template->details_string = details(filer_window, item);
+	
+	template->details.x = area->x + MAX_ICON_WIDTH + 4;
+	template->details.y = area->y + area->height - fixed_height;
+	template->details.width = fixed_width *
+					strlen(template->details_string);
+	template->details.height = fixed_height;
+
+	template->leafname.y = template->details.y - font_height;
+}
+
+static void small_full_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	int	col_width = filer_window->collection->item_width;
+	int	font_height = item_font->ascent + item_font->descent;
+
+	small_template(area, item, filer_window, template);
+
+	template->details_string = details(filer_window, item);
+	
+	template->details.width = fixed_width *
+					strlen(template->details_string);
+	template->details.x = area->x + col_width - template->details.width;
+	template->details.y = area->y + area->height - font_height;
+	template->details.height = font_height;
+}
+
+static void fill_template(GdkRectangle *area, DirItem *item,
+			FilerWindow *filer_window, Template *template)
+{
+	template->details_string = NULL;
+
+	switch (filer_window->display_style)
+	{
+		case LARGE_ICONS:
+			large_template(area, item, filer_window, template);
+			break;
+		case SMALL_FULL_INFO:
+			small_full_template(area, item, filer_window, template);
+			break;
+		case LARGE_FULL_INFO:
+			large_full_template(area, item, filer_window, template);
+			break;
+		default:
+			small_template(area, item, filer_window, template);
+			break;
+	}
+}
+
 int calc_width(FilerWindow *filer_window, DirItem *item)
 {
 	int		pix_width = item->image->width;
@@ -185,110 +298,36 @@ int calc_width(FilerWindow *filer_window, DirItem *item)
                         return MAX(pix_width, w) + 4;
         }
 }
-	
-/* Is a point inside an item? */
-static gboolean test_point_large(Collection *collection,
+
+#define INSIDE(px, py, area)	\
+	(px >= area.x && py >= area.y && \
+	 px < area.x + area.width && py < area.y + area.height)
+
+static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *colitem,
 				int width, int height,
 				FilerWindow *filer_window)
 {
-	DirItem		*item = (DirItem *) colitem->data;
-	int		text_height = item_font->ascent + item_font->descent;
-	MaskedPixmap	*image = item->image;
-	int		pic_area_height = height - text_height;
-	int		iheight = MIN(image->height, MAX_ICON_HEIGHT);
-	int		image_y = MAX(0, pic_area_height - iheight - 6);
-	int		image_width = (image->width >> 1) + 2;
-	int		text_width = (item->name_width >> 1) + 2;
-	int		x_limit;
+	Template	template;
+	GdkRectangle	area;
+	DirItem 	*item = (DirItem *) colitem->data;
 
-	if (point_y < image_y)
-		return FALSE;	/* Too high up (don't worry about too low) */
+	area.x = 0;
+	area.y = 0;
+	area.width = width;
+	area.height = height;
 
-	if (point_y <= image_y + image->height + 2)
-		x_limit = image_width;
-	else if (point_y > height - text_height - 2)
-		x_limit = text_width;
-	else
-		x_limit = MIN(image_width, text_width);
-	
-	return ABS(point_x - (width >> 1)) < x_limit;
+	fill_template(&area, item, filer_window, &template);
+
+	SHOW_RECT(item, &template);
+
+	return INSIDE(point_x, point_y, template.leafname) ||
+	       INSIDE(point_x, point_y, template.icon) ||
+	       (template.details_string &&
+			INSIDE(point_x, point_y, template.details));
 }
-
-static gboolean test_point_large_full(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *colitem,
-				int width, int height,
-				FilerWindow *filer_window)
-{
-	DirItem		*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
-	int		iheight = MIN(image->height, MAX_ICON_HEIGHT);
-	int		image_y = MAX(0, height - iheight - 6);
-	int		low_top = height
-				- fixed_font->descent - 2 - fixed_font->ascent;
-
-	if (point_x < image->width + 2)
-		return point_x > 2 && point_y > image_y;
 	
-	point_x -= MAX_ICON_WIDTH + 8;
-
-	if (point_y >= low_top)
-		return point_x < details_width(filer_window, item);
-	if (point_y >= low_top - item_font->ascent - item_font->descent)
-		return point_x < item->name_width;
-	return FALSE;
-}
-
-static gboolean test_point_small_full(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *colitem,
-				int width, int height,
-				FilerWindow *filer_window)
-{
-	DirItem		*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
-	int		image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
-	int		low_top = height
-				- fixed_font->descent - 2 - item_font->ascent;
-	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
-
-	if (point_x > width)
-		return FALSE;	/* (for the right-most column) */
-	
-	if (point_x < iwidth + 2)
-		return point_x > 2 && point_y > image_y;
-
-	if (point_y < low_top)
-		return FALSE;
-
-	return TRUE;
-}
-
-static gboolean test_point_small(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *colitem,
-				int width, int height,
-				FilerWindow *filer_window)
-{
-	DirItem		*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
-	int		image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
-	int		low_top = height
-				- fixed_font->descent - 2 - item_font->ascent;
-	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
-
-	if (point_x < iwidth + 2)
-		return point_x > 2 && point_y > image_y;
-	
-	point_x -= SMALL_ICON_WIDTH + 4;
-
-	if (point_y >= low_top)
-		return point_x < item->name_width;
-	return FALSE;
-}
-
 static void draw_small_icon(GtkWidget *widget,
 			    GdkRectangle *area,
 			    DirItem  *item,
@@ -475,21 +514,21 @@ void draw_string(GtkWidget *widget,
 
 /* Render the details somewhere */
 static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
-			 int width, gboolean selected, gboolean box)
+			 int width, gboolean selected, guchar *string)
 {
 	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
 	DetailsType	type = filer_window->details_type;
 	int		w;
 	
-	w = details_width(filer_window, item);
+	w = fixed_width * strlen(string);
 
 	draw_string(widget,
 			fixed_font,
-			details(filer_window, item),
+			string,
 			x, y,
 			w,
 			width,
-			selected, box);
+			selected, TRUE);
 
 	if (item->lstat_errno)
 		return;
@@ -584,146 +623,53 @@ char *details(FilerWindow *filer_window, DirItem *item)
 	return buf;
 }
 
-static void draw_item_large_full(GtkWidget *widget,
-			CollectionItem *colitem,
-			GdkRectangle *area,
-			FilerWindow *filer_window)
-{
-	DirItem	*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
-	int	text_x = area->x + MAX_ICON_WIDTH + 8;
-	int	low_text_y = area->y + area->height - fixed_font->descent - 2;
-	gboolean	selected = colitem->selected;
-	GdkRectangle	pic_area;
-	int		text_area_width = filer_window->collection->item_width -
-						(text_x - area->x);
-
-	pic_area.x = area->x;
-	pic_area.y = area->y;
-	pic_area.width = image->width + 8;
-	pic_area.height = area->height;
-
-	draw_large_icon(widget, &pic_area, item, selected);
-	
-	draw_string(widget,
-			item_font,
-			item->leafname, 
-			text_x,
-			low_text_y - item_font->descent - fixed_font->ascent,
-			item->name_width,
-			text_area_width,
-			selected, TRUE);
-
-	draw_details(filer_window, item, text_x, low_text_y,
-			text_area_width, selected, TRUE);
-}
-
-static void draw_item_small_full(GtkWidget *widget,
-			CollectionItem *colitem,
-			GdkRectangle *area,
-			FilerWindow *filer_window)
-{
-	DirItem	*item = (DirItem *) colitem->data;
-	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
-	int	bottom = area->y + area->height;
-	int	low_text_y = bottom - item_font->descent - 2;
-	gboolean	selected = colitem->selected;
-	GdkRectangle	pic_area;
-	int		text_height = item_font->ascent + item_font->descent;
-	int		fixed_height = fixed_font->ascent + fixed_font->descent;
-	int		box_height = MAX(text_height, fixed_height) + 2;
-	int		w;
-	int		width = filer_window->collection->item_width;
-
-	pic_area.x = area->x;
-	pic_area.y = area->y;
-	pic_area.width = SMALL_ICON_WIDTH;
-	pic_area.height = SMALL_ICON_HEIGHT;
-
-	draw_small_icon(widget, &pic_area, item, selected);
-	
-	if (selected)
-		gtk_paint_flat_box(widget->style, widget->window, 
-				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
-				NULL, widget, "text",
-				text_x, bottom - 1 - box_height,
-				width - (text_x - area->x) - 1,
-				box_height);
-	draw_string(widget,
-			item_font,
-			item->leafname, 
-			text_x,
-			low_text_y,
-			item->name_width,
-			width - (text_x - area->x),
-			selected, FALSE);
-
-	w = details_width(filer_window, item);
-	text_x = width - w - 4 + area->x;
-	draw_details(filer_window,
-			item, text_x, bottom - fixed_font->descent - 2,
-			w + 2, selected, FALSE);
-}
-
-static void draw_item_small(GtkWidget *widget,
-			CollectionItem *colitem,
-			GdkRectangle *area,
-			FilerWindow *filer_window)
-{
-	DirItem	*item = (DirItem *) colitem->data;
-	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
-	int	low_text_y = area->y + area->height - item_font->descent - 2;
-	gboolean	selected = colitem->selected;
-	GdkRectangle	pic_area;
-
-	pic_area.x = area->x;
-	pic_area.y = area->y;
-	pic_area.width = SMALL_ICON_WIDTH;
-	pic_area.height = SMALL_ICON_HEIGHT;
-
-	draw_small_icon(widget, &pic_area, item, selected);
-	
-	draw_string(widget,
-			item_font,
-			item->leafname, 
-			text_x,
-			low_text_y,
-			item->name_width,
-			area->width - (text_x - area->x),
-			selected, TRUE);
-}
-
-static void draw_item_large(GtkWidget *widget,
+static void draw_item(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area,
 			FilerWindow *filer_window)
 {
 	DirItem		*item = (DirItem *) colitem->data;
-	int		text_width = item->name_width;
-	int		width = filer_window->collection->item_width;
-	int	text_x = area->x + ((width - text_width) >> 1);
-	int	text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
-	GdkRectangle	pic_area;
+	Template	template;
 
-	pic_area.x = area->x;
-	pic_area.y = area->y;
-	pic_area.width = width;
-	pic_area.height = area->height -
-			(item_font->ascent + item_font->descent);
+	fill_template(area, item, filer_window, &template);
 
-	draw_large_icon(widget, &pic_area, item, selected);
+#if 0
+	gdk_draw_rectangle(widget->window, widget->style->black_gc,
+			selected, template.icon.x, template.icon.y,
+			template.icon.width, template.icon.height);
+	gdk_draw_rectangle(widget->window, widget->style->black_gc,
+			selected, template.leafname.x, template.leafname.y,
+			template.leafname.width, template.leafname.height);
+	if (!template.details_string)
+		return;
+	gdk_draw_rectangle(widget->window, widget->style->black_gc,
+			selected, template.details.x, template.details.y,
+			template.details.width, template.details.height);
+	return;
+#endif
+
+	if (item->image->width > template.icon.width ||
+	    item->image->height > template.icon.height)
+		draw_small_icon(widget, &template.icon, item, selected);
+	else
+		draw_large_icon(widget, &template.icon, item, selected);
 	
-	if (text_x < area->x)
-		text_x = area->x;
-
 	draw_string(widget,
 			item_font,
 			item->leafname, 
-			text_x, text_y,
+			template.leafname.x,
+			template.leafname.y + item_font->ascent,
 			item->name_width,
-			area->width,
+			template.leafname.width,
 			selected, TRUE);
+	
+	if (template.details_string)
+		draw_details(filer_window, item,
+				template.details.x,
+				template.details.y + fixed_font->ascent,
+				template.details.width,
+				selected, template.details_string);
 }
 
 #define IS_A_DIR(item) (item->base_type == TYPE_DIRECTORY && \
@@ -946,33 +892,10 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 
 	filer_window->display_style = style;
 
-	switch (style)
-	{
-		case SMALL_FULL_INFO:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_small_full,
-				(CollectionTestFunc) test_point_small_full,
-				filer_window);
-			break;
-		case SMALL_ICONS:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_small,
-				(CollectionTestFunc) test_point_small,
-				filer_window);
-			break;
-		case LARGE_FULL_INFO:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_large_full,
-				(CollectionTestFunc) test_point_large_full,
-				filer_window);
-			break;
-		default:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_large,
-				(CollectionTestFunc) test_point_large,
-				filer_window);
-			break;
-	}
+	collection_set_functions(filer_window->collection,
+			(CollectionDrawFunc) draw_item,
+			(CollectionTestFunc) test_point,
+			filer_window);
 
 	shrink_width(filer_window);
 }
