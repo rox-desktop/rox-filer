@@ -119,9 +119,13 @@ static void add_uri_list(GtkWidget          *widget,
                          guint              info,
                          guint32            time,
 			 Panel		    *panel);
-static void panel_add_item(Panel *panel, guchar *path, gboolean after);
+static void panel_add_item(Panel *panel,
+			   guchar *path,
+			   guchar *name,
+			   gboolean after);
 static void menu_closed(GtkWidget *widget);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
+static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void show_location(gpointer data, guint action, GtkWidget *widget);
 static void show_help(gpointer data, guint action, GtkWidget *widget);
 static gboolean drag_motion(GtkWidget		*widget,
@@ -168,6 +172,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
+{N_("Rename Item"),  		NULL,  	rename_item, 0, NULL},
 {N_("Show Location"),  		NULL,  	show_location, 0, NULL},
 {N_("Show Help"),    		NULL,  	show_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	remove_items, 0, NULL},
@@ -433,34 +438,47 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 /* Called for each line in the config file while loading a new panel */
 static char *pan_from_file(guchar *line)
 {
+	guchar	*sep, *leaf;
+	
 	g_return_val_if_fail(line != NULL, NULL);
 	g_return_val_if_fail(loading_panel != NULL, NULL);
-	
+
 	if (*line == '\0')
 		return NULL;
 
-	if (*line == '<')
-		panel_add_item(loading_panel, line + 1, FALSE);
-	else if (*line == '>')
-		panel_add_item(loading_panel, line + 1, TRUE);
-	else if (!isspace(*line))
-		return _("Lines in a panel file must start with < or >");
+	sep = strpbrk(line, "<>");
+	if (!sep)
+		return _("Missing < or > in panel config file");
+
+	if (sep != line)
+		leaf = g_strndup(line, sep - line);
+	else
+		leaf = NULL;
+	
+	panel_add_item(loading_panel,
+			sep + 1,
+			leaf,
+			sep[0] == '>');
+
+	g_free(leaf);
 
 	return NULL;
 }
 
 /* Add an icon with this path to the panel. If after is TRUE then the
  * icon is added to the right/bottom end of the panel.
+ *
+ * If name is NULL a suitable name is taken from path.
  */
-static void panel_add_item(Panel *panel, guchar *path, gboolean after)
+static void panel_add_item(Panel *panel,
+			   guchar *path,
+			   guchar *name,
+			   gboolean after)
 {
 	GtkWidget	*widget;
 	PanelIcon	*icon;
 	GdkFont		*font;
-	guchar		*slash;
 	GList		*list;
-
-	slash = strrchr(path, '/');
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,
@@ -490,9 +508,19 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 	icon->widget = widget;
 	icon->selected = FALSE;
 	dir_stat(path, &icon->item);
-	icon->item.leafname = g_strdup(slash && slash[1] ? slash + 1 : path);
-	icon->item.name_width = gdk_string_width(font,
-						 icon->item.leafname);
+
+	if (name)
+		icon->item.leafname = g_strdup(name);
+	else
+	{
+		guchar	*slash;
+
+		slash = strrchr(path, '/');
+		icon->item.leafname = g_strdup(slash && slash[1] ? slash + 1
+								 : path);
+	}
+	
+	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
 
 	gtk_signal_connect_after(GTK_OBJECT(widget), "enter-notify-event",
                            GTK_SIGNAL_FUNC(enter_icon), icon);
@@ -532,10 +560,12 @@ static void size_icon(PanelIcon *icon)
 {
 	int	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT - 4);
 	GdkFont	*font = icon->widget->style->font;
+	int	width, height;
 
-	gtk_widget_set_usize(icon->widget,
-		MAX(icon->item.image->width, icon->item.name_width) + 4,
-		font->ascent + font->descent + 2 + im_height);
+	width = MAX(icon->item.image->width, icon->item.name_width) + 4;
+	height = font->ascent + font->descent + 2 + im_height;
+
+	gtk_widget_set_usize(icon->widget, width, height);
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -938,6 +968,100 @@ static void popup_panel_menu(GdkEventButton *event,
 			(gpointer) pos, event->button, event->time);
 }
 
+typedef void (*RenameFn)(guchar *new, gpointer data);
+
+static void rename_activate(GtkWidget *dialog)
+{
+	GtkWidget *entry;
+	RenameFn callback;
+	gpointer data;
+	
+	entry = gtk_object_get_data(GTK_OBJECT(dialog), "new_name");
+	data = gtk_object_get_data(GTK_OBJECT(dialog), "callback_data");
+	callback = gtk_object_get_data(GTK_OBJECT(dialog), "callback_fn");
+
+	g_return_if_fail(callback != NULL && entry != NULL);
+
+	callback(gtk_entry_get_text(GTK_ENTRY(entry)), data);
+
+	gtk_widget_destroy(dialog);
+}
+
+/* Opens a box allowing the user to change the name of a pinned icon.
+ * If 'widget' is destroyed then the box will close.
+ * If the user chooses OK then the callback is called with the new name.
+ */
+static void show_rename_box(GtkWidget *widget,
+			    guchar *old_name,
+			    RenameFn callback,
+			    gpointer data)
+{
+	GtkWidget	*dialog, *vbox, *label, *entry;
+
+	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Rename Item"));
+	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
+
+	vbox = gtk_vbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(dialog), vbox);
+	
+	label = gtk_label_new(_("Change the name displayed next to "
+				"the pinned icon (the file itself is "
+				"NOT renamed).")),
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+
+	entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 2);
+	gtk_entry_set_text(GTK_ENTRY(entry), old_name);
+	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
+	gtk_widget_grab_focus(entry);
+	
+	gtk_signal_connect_object_while_alive(GTK_OBJECT(widget),
+			"destroy",
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(dialog));
+
+	gtk_object_set_data(GTK_OBJECT(dialog), "new_name", entry);
+	gtk_object_set_data(GTK_OBJECT(dialog), "callback_data", data);
+	gtk_object_set_data(GTK_OBJECT(dialog), "callback_fn", callback);
+	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
+			rename_activate, GTK_OBJECT(dialog));
+
+	gtk_widget_show_all(dialog);
+}
+
+static void rename_cb(guchar *new_name, PanelIcon *icon)
+{
+	GdkFont	*font = icon->widget->style->font;
+
+	g_free(icon->item.leafname);
+	icon->item.leafname = g_strdup(new_name);
+	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
+
+	size_icon(icon);
+	gtk_widget_queue_clear(icon->widget);
+	reposition_panel(icon->panel);
+
+	panel_save(icon->panel);
+}
+
+static void rename_item(gpointer data, guint action, GtkWidget *widget)
+{
+	PanelIcon	*icon;
+
+	if (panel_selection == NULL || panel_selection->next)
+	{
+		delayed_error(PROJECT,
+			_("First, select a single item to rename"));
+		return;
+	}
+
+	icon = (PanelIcon *) panel_selection->data;
+	show_rename_box(icon->widget, icon->item.leafname,
+			(RenameFn) rename_cb, icon);
+}
+
 static void show_location(gpointer data, guint action, GtkWidget *widget)
 {
 	PanelIcon	*icon;
@@ -1120,7 +1244,7 @@ static void add_uri_list(GtkWidget          *widget,
 		path = get_local_path((guchar *) next->data);
 
 		if (path)
-			panel_add_item(panel, path, after);
+			panel_add_item(panel, path, NULL, after);
 	}
 
 	g_slist_free(uris);
@@ -1183,7 +1307,9 @@ static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
 			continue;
 		}
 
-		g_string_sprintf(tmp, "%c%s\n", side, icon->path);
+		g_string_sprintf(tmp, "%s%c%s\n",
+				icon->item.leafname,
+				side, icon->path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 		{
 			g_list_free(widgets);

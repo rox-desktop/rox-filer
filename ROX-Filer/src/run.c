@@ -403,7 +403,7 @@ void open_to_show(guchar *path)
 	{
 		/* Item in the root (or root itself!) */
 		new = filer_opendir("/");
-		if (dir[1])
+		if (new && dir[1])
 			display_set_autoselect(new, dir + 1);
 		
 	}
@@ -411,7 +411,8 @@ void open_to_show(guchar *path)
 	{
 		*slash = '\0';
 		new = filer_opendir(dir);
-		display_set_autoselect(new, slash + 1);
+		if (new)
+			display_set_autoselect(new, slash + 1);
 	}
 
 	g_free(dir);

@@ -1088,8 +1088,11 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
  */
 void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 {
-	Collection	*col = filer_window->collection;
+	Collection	*col;
 	int		i;
+
+	g_return_if_fail(filer_window != NULL);
+	col = filer_window->collection;
 	
 	g_free(filer_window->auto_select);
 	filer_window->auto_select = NULL;
