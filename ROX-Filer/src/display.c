@@ -961,11 +961,22 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	int	max_text_width = area->width - ICON_WIDTH - 4;
 	ViewData *view = (ViewData *) colitem->view_data;
+	MaskedPixmap *image = view->image;
 
-	template->icon.x = area->x;
-	template->icon.y = area->y + (area->height - ICON_HEIGHT) / 2;
-	template->icon.width = ICON_WIDTH;
-	template->icon.height = ICON_HEIGHT;
+	if (image)
+	{
+		template->icon.width = image->width;
+		template->icon.height = image->height;
+	}
+	else
+	{
+		template->icon.width = ICON_WIDTH;
+		template->icon.height = ICON_HEIGHT;
+	}
+
+	template->icon.x = area->x + (ICON_WIDTH - template->icon.width) / 2;
+	template->icon.y = area->y + (area->height - template->icon.height) / 2;
+
 
 	template->leafname.x = area->x + ICON_WIDTH + 4;
 	template->leafname.y = area->y + area->height / 2
