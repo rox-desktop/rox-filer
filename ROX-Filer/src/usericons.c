@@ -280,6 +280,9 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 			radio[SET_MEDIA], FALSE, TRUE, 0);
 	g_free(tmp);
 	group = GTK_RADIO_BUTTON(radio[SET_MEDIA]);
+	gtk_tooltips_set_tip(tooltips, radio[SET_MEDIA],
+			_("Use a copy of the image as the default for all "
+			  "files of these MIME types."), NULL);
 
 	tmp = g_strdup_printf(_("Only for the type `%s/%s'"),
 			item->mime_type->media_type,
@@ -289,6 +292,9 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[SET_TYPE],
 			FALSE, TRUE, 0);
 	g_free(tmp);
+	gtk_tooltips_set_tip(tooltips, radio[SET_TYPE],
+			_("Use a copy of the image for all files of this MIME "
+			  "type."), NULL);
 
 	tmp = g_strdup_printf(_("Only for the file `%s'"), path);
 	radio[SET_PATH] = gtk_radio_button_new_with_label_from_widget(group,
