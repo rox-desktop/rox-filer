@@ -57,9 +57,6 @@ static gulong scrolled_signal = -1;
 static GtkObject *scrolled_adj = NULL;	/* The object watched */
 #endif
 
-/* Item we are about to display a tooltip for */
-static DirItem *tip_item = NULL;
-
 static gpointer parent_class = NULL;
 
 struct _ViewCollectionClass {
@@ -132,7 +129,6 @@ static void draw_huge_icon(GtkWidget *widget,
 			   MaskedPixmap *image,
 			   gboolean selected);
 static void view_collection_iface_init(gpointer giface, gpointer iface_data);
-static gboolean name_is_truncated(ViewCollection *view_collection, int i);
 static gint coll_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       ViewCollection *view_collection);
@@ -143,8 +139,6 @@ static gint coll_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      ViewCollection *view_collection);
 static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data);
-static void perform_action(ViewCollection *view_collection,
-			   GdkEventButton *event);
 static void style_set(Collection 	*collection,
 		      GtkStyle		*style,
 		      ViewCollection	*view_collection);
@@ -191,6 +185,8 @@ static int view_collection_count_selected(ViewIface *view);
 static void view_collection_show_cursor(ViewIface *view);
 static void view_collection_get_iter(ViewIface *view,
 				     ViewIter *iter, IterFlags flags);
+static void view_collection_get_iter_at_point(ViewIface *view, ViewIter *iter,
+					      int x, int y);
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter);
 static void view_collection_set_selected(ViewIface *view,
 					 ViewIter *iter,
@@ -202,7 +198,10 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter);
 static void view_collection_autosize(ViewIface *view);
 static gboolean view_collection_cursor_visible(ViewIface *view);
 static void view_collection_set_base(ViewIface *view, ViewIter *iter);
-static FilerWindow *view_collection_get_filer_window(ViewIface *view);
+static void view_collection_start_lasso_box(ViewIface *view,
+					     GdkEventButton *event);
+static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
+					GString *tip);
 
 static DirItem *iter_next(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
@@ -834,6 +833,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->count_selected = view_collection_count_selected;
 	iface->show_cursor = view_collection_show_cursor;
 	iface->get_iter = view_collection_get_iter;
+	iface->get_iter_at_point = view_collection_get_iter_at_point;
 	iface->cursor_to_iter = view_collection_cursor_to_iter;
 	iface->set_selected = view_collection_set_selected;
 	iface->get_selected = view_collection_get_selected;
@@ -843,73 +843,31 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->autosize = view_collection_autosize;
 	iface->cursor_visible = view_collection_cursor_visible;
 	iface->set_base = view_collection_set_base;
-	iface->get_filer_window = view_collection_get_filer_window;
+	iface->start_lasso_box = view_collection_start_lasso_box;
+	iface->extend_tip = view_collection_extend_tip;
 }
 
-/* It's time to make the tooltip appear. If we're not over the item any
- * more, or the item doesn't need a tooltip, do nothing.
- */
-static gboolean tooltip_activate(ViewCollection *view_collection)
+static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
+					GString *tip)
 {
-	Collection *collection;
-	gint 	x, y;
-	int	i;
-	GString	*tip = NULL;
-
-	g_return_val_if_fail(tip_item != NULL, 0);
-
-	if (!view_collection->filer_window)
-		return FALSE;	/* Window has been destroyed */
-
-	tooltip_show(NULL);
-
-	collection = view_collection->collection;
-	gdk_window_get_pointer(GTK_WIDGET(collection)->window, &x, &y, NULL);
-	i = collection_get_item(collection, x, y);
-	if (i == -1 || ((DirItem *) collection->items[i].data) != tip_item)
-		return FALSE;	/* Not still under the pointer */
-
-	/* OK, the filer window still exists and the pointer is still
-	 * over the same item. Do we need to show a tip?
-	 */
-
-	tip = g_string_new(NULL);
-
-	if (name_is_truncated(view_collection, i))
-	{
-		g_string_append(tip, tip_item->leafname);
-		g_string_append_c(tip, '\n');
-	}
-
-	filer_add_tip_details(view_collection->filer_window, tip, tip_item);
-
-	if (tip->len > 1)
-	{
-		g_string_truncate(tip, tip->len - 1);
-		
-		tooltip_show(tip->str);
-	}
-
-	g_string_free(tip, TRUE);
-
-	return FALSE;
-}
-
-static gboolean name_is_truncated(ViewCollection *view_collection, int i)
-{
-	Template template;
+	ViewCollection*view_collection = (ViewCollection *) view;
 	Collection *collection = view_collection->collection;
-	FilerWindow	*filer_window = view_collection->filer_window;
+	FilerWindow *filer_window = view_collection->filer_window;
+	Template template;
+	int i = iter->i;
 	CollectionItem	*colitem = &collection->items[i];
-	int	col = i % collection->columns;
-	int	row = i / collection->columns;
+	int col = i % collection->columns;
+	int row = i / collection->columns;
+	ViewData *view_data = (ViewData *) colitem->view_data;
 	GdkRectangle area;
-	ViewData	*view = (ViewData *) colitem->view_data;
+
+	g_return_if_fail(iter->view_collection == view_collection);
+	g_return_if_fail(i >= 0 && i < collection->number_of_items);
 
 	/* TODO: What if the window is narrower than 1 column? */
 	if (filer_window->display_style == LARGE_ICONS ||
 	    filer_window->display_style == HUGE_ICONS)
-		return FALSE;	/* These wrap rather than truncate */
+		return;		/* These wrap rather than truncate */
 
 	area.x = col * collection->item_width;
 	area.y = row * collection->item_height;
@@ -922,100 +880,20 @@ static gboolean name_is_truncated(ViewCollection *view_collection, int i)
 
 	fill_template(&area, colitem, view_collection, &template);
 
-	return template.leafname.width < view->name_width;
+	if (template.leafname.width < view_data->name_width)
+	{
+		DirItem *item = (DirItem *) collection->items[i].data;
+
+		g_string_append(tip, item->leafname);
+		g_string_append_c(tip, '\n');
+	}
 }
 
 static gint coll_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       ViewCollection *view_collection)
 {
-	Collection	*collection = view_collection->collection;
-	FilerWindow	*filer_window = view_collection->filer_window;
-	int		i;
-
-	i = collection_get_item(collection, event->x, event->y);
-
-	if (i == -1)
-	{
-		tooltip_show(NULL);
-		tip_item = NULL;
-	}
-	else
-	{
-		DirItem *item = (DirItem *) collection->items[i].data;
-
-		if (item != tip_item)
-		{
-			tooltip_show(NULL);
-
-			tip_item = item;
-			if (item)
-				tooltip_prime((GtkFunction) tooltip_activate,
-						G_OBJECT(view_collection));
-		}
-	}
-
-	if (motion_state != MOTION_READY_FOR_DND)
-		return FALSE;
-
-	if (!dnd_motion_moved(event))
-		return FALSE;
-
-	i = collection_get_item(collection,
-			event->x - (event->x_root - drag_start_x),
-			event->y - (event->y_root - drag_start_y));
-	if (i == -1)
-		return FALSE;
-
-	collection_wink_item(collection, -1);
-	
-	if (!collection->items[i].selected)
-	{
-		if (event->state & GDK_BUTTON1_MASK)
-		{
-			/* Select just this one */
-			filer_window->temp_item_selected = TRUE;
-			collection_clear_except(collection, i);
-		}
-		else
-		{
-			if (collection->number_selected == 0)
-				filer_window->temp_item_selected = TRUE;
-			collection_select_item(collection, i);
-		}
-	}
-
-	g_return_val_if_fail(collection->number_selected > 0, TRUE);
-
-	if (collection->number_selected == 1)
-	{
-		DirItem	 *item = (DirItem *) collection->items[i].data;
-		ViewData *view = (ViewData *) collection->items[i].view_data;
-
-		if (!item->image)
-			item = dir_update_item(filer_window->directory,
-						item->leafname);
-
-		if (!item)
-		{
-			report_error(_("Item no longer exists!"));
-			return FALSE;
-		}
-
-		drag_one_item(widget, event,
-			make_path(filer_window->sym_path, item->leafname),
-			item, view ? view->image : NULL);
-	}
-	else
-	{
-		guchar *uris;
-	
-		uris = view_create_uri_list((ViewIface *) view_collection);
-		drag_selection(widget, event, uris);
-		g_free(uris);
-	}
-
-	return FALSE;
+	return filer_motion_notify(view_collection->filer_window, event);
 }
 
 /* Viewport is to be resized, so calculate increments */
@@ -1042,7 +920,7 @@ static gint coll_button_release(GtkWidget *widget,
 		return FALSE;
 	}
 
-	perform_action(view_collection, event);
+	filer_perform_action(view_collection->filer_window, event);
 
 	return FALSE;
 }
@@ -1054,145 +932,9 @@ static gint coll_button_press(GtkWidget *widget,
 	collection_set_cursor_item(view_collection->collection, -1);
 
 	if (dnd_motion_press(widget, event))
-		perform_action(view_collection, event);
+		filer_perform_action(view_collection->filer_window, event);
 
 	return FALSE;
-}
-
-static void perform_action(ViewCollection *view_collection,
-			   GdkEventButton *event)
-{
-	Collection	*collection = view_collection->collection;
-	DirItem		*dir_item;
-	int		item;
-	gboolean	press = event->type == GDK_BUTTON_PRESS;
-	gboolean	selected = FALSE;
-	OpenFlags	flags = 0;
-	BindAction	action;
-	FilerWindow	*filer_window = view_collection->filer_window;
-
-	if (event->button > 3)
-		return;
-
-	item = collection_get_item(collection, event->x, event->y);
-
-	if (item != -1 && event->button == 1 &&
-		collection->items[item].selected &&
-		filer_window->selection_state == GTK_STATE_INSENSITIVE)
-	{
-		/* Possibly a really slow DnD operation? */
-		filer_window->temp_item_selected = FALSE;
-		
-		filer_selection_changed(filer_window, event->time);
-		return;
-	}
-
-	if (filer_window->target_cb)
-	{
-		dnd_motion_ungrab();
-		if (item != -1 && press && event->button == 1)
-		{
-			ViewIter iter;
-			make_item_iter(view_collection, &iter, item);
-			
-			filer_window->target_cb(filer_window, &iter,
-					filer_window->target_data);
-		}
-		filer_target_mode(filer_window, NULL, NULL, NULL);
-
-		return;
-	}
-
-	action = bind_lookup_bev(
-			item == -1 ? BIND_DIRECTORY : BIND_DIRECTORY_ICON,
-			event);
-
-	if (item != -1)
-	{
-		dir_item = (DirItem *) collection->items[item].data;
-		selected = collection->items[item].selected;
-	}
-	else
-		dir_item = NULL;
-
-	switch (action)
-	{
-		case ACT_CLEAR_SELECTION:
-			collection_clear_selection(collection);
-			break;
-		case ACT_TOGGLE_SELECTED:
-			collection_toggle_item(collection, item);
-			break;
-		case ACT_SELECT_EXCL:
-			collection_clear_except(collection, item);
-			break;
-		case ACT_EDIT_ITEM:
-			flags |= OPEN_SHIFT;
-			/* (no break) */
-		case ACT_OPEN_ITEM:
-		{
-			ViewIter iter;
-
-			make_item_iter(view_collection, &iter, item);
-			
-			if (event->button != 1 || event->state & GDK_MOD1_MASK)
-				flags |= OPEN_CLOSE_WINDOW;
-			else
-				flags |= OPEN_SAME_WINDOW;
-			if (o_new_button_1.int_value)
-				flags ^= OPEN_SAME_WINDOW;
-			if (event->type == GDK_2BUTTON_PRESS)
-				collection_unselect_item(collection, item);
-			dnd_motion_ungrab();
-
-			filer_openitem(filer_window, &iter, flags);
-			break;
-		}
-		case ACT_POPUP_MENU:
-		{
-			ViewIter iter;
-			
-			dnd_motion_ungrab();
-			tooltip_show(NULL);
-
-			make_item_iter(view_collection, &iter, item);
-			show_filer_menu(filer_window,
-					(GdkEvent *) event, &iter);
-			break;
-		}
-		case ACT_PRIME_AND_SELECT:
-			if (!selected)
-				collection_clear_except(collection, item);
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_AND_TOGGLE:
-			collection_toggle_item(collection, item);
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_FOR_DND:
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_IGNORE:
-			if (press && event->button < 4)
-			{
-				if (item)
-					collection_wink_item(collection, item);
-				dnd_motion_start(MOTION_NONE);
-			}
-			break;
-		case ACT_LASSO_CLEAR:
-			collection_clear_selection(collection);
-			/* (no break) */
-		case ACT_LASSO_MODIFY:
-			collection_lasso_box(collection, event->x, event->y);
-			break;
-		case ACT_RESIZE:
-			filer_window_autosize(filer_window);
-			break;
-		default:
-			g_warning("Unsupported action : %d\n", action);
-			break;
-	}
 }
 
 /* Nothing is selected anymore - give up primary */
@@ -1721,6 +1463,17 @@ static void view_collection_get_iter(ViewIface *view,
 	make_iter(view_collection, iter, flags);
 }
 
+static void view_collection_get_iter_at_point(ViewIface *view, ViewIter *iter,
+					      int x, int y)
+{
+	ViewCollection *view_collection = VIEW_COLLECTION(view);
+	Collection *collection = view_collection->collection;
+	int i;
+
+	i = collection_get_item(collection, x, y);
+	make_item_iter(view_collection, iter, i);
+}
+
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
@@ -1790,6 +1543,12 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
+
+	if (!iter)
+	{
+		collection_wink_item(collection, -1);
+		return;
+	}
 
 	g_return_if_fail(iter != NULL &&
 			 iter->view_collection == view_collection);
@@ -1904,11 +1663,13 @@ static void view_collection_set_base(ViewIface *view, ViewIter *iter)
 	view_collection->cursor_base = iter->i;
 }
 
-static FilerWindow *view_collection_get_filer_window(ViewIface *view)
+static void view_collection_start_lasso_box(ViewIface *view,
+					    GdkEventButton *event)
 {
-	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	ViewCollection	*view_collection = (ViewCollection *) view;
+	Collection	*collection = view_collection->collection;
 
-	return view_collection->filer_window;
+	collection_lasso_box(collection, event->x, event->y);
 }
 
 static void drag_end(GtkWidget *widget,

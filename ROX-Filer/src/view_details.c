@@ -57,9 +57,6 @@
 #define COL_BG_COLOUR 10
 #define N_COLUMNS 11
 
-/* Item we are about to display a tooltip for */
-static DirItem *tip_item = NULL;
-
 static gpointer parent_class = NULL;
 
 struct _ViewDetailsClass {
@@ -114,6 +111,8 @@ static int view_details_count_selected(ViewIface *view);
 static void view_details_show_cursor(ViewIface *view);
 static void view_details_get_iter(ViewIface *view,
 				     ViewIter *iter, IterFlags flags);
+static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
+					   int x, int y);
 static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter);
 static void view_details_set_selected(ViewIface *view,
 					 ViewIter *iter,
@@ -125,7 +124,11 @@ static void view_details_wink_item(ViewIface *view, ViewIter *iter);
 static void view_details_autosize(ViewIface *view);
 static gboolean view_details_cursor_visible(ViewIface *view);
 static void view_details_set_base(ViewIface *view, ViewIter *iter);
-static FilerWindow *view_details_get_filer_window(ViewIface *view);
+static void view_details_start_lasso_box(ViewIface *view,
+				     	 GdkEventButton *event);
+static void view_details_extend_tip(ViewIface *view,
+				    ViewIter *iter, GString *tip);
+
 static DirItem *iter_peek(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
 static DirItem *iter_next(ViewIter *iter);
@@ -590,134 +593,13 @@ static gboolean is_selected(ViewDetails *view_details, int i)
 	return view_details_get_selected((ViewIface *) view_details, &iter);
 }
 
-static void perform_action(ViewDetails *view_details, GdkEventButton *event)
-{
-	BindAction	action;
-	FilerWindow	*filer_window = view_details->filer_window;
-	ViewIface	*view = (ViewIface *) view_details;
-	DirItem		*item = NULL;
-	GtkTreeView	*tree = (GtkTreeView *) view_details;
-	GtkTreePath	*path = NULL;
-	GtkTreeIter	iter;
-	GtkTreeModel	*model;
-	gboolean	press = event->type == GDK_BUTTON_PRESS;
-	int		i = -1;
-	ViewIter	viter;
-	OpenFlags	flags = 0;
-
-	model = gtk_tree_view_get_model(tree);
-
-	if (gtk_tree_view_get_path_at_pos(tree, event->x, event->y,
-					&path, NULL, NULL, NULL))
-	{
-		g_return_if_fail(path != NULL);
-
-		i = gtk_tree_path_get_indices(path)[0];
-		gtk_tree_path_free(path);
-	}
-
-	if (i != -1)
-		item = ((ViewItem *) view_details->items->pdata[i])->item;
-	make_item_iter(view_details, &viter, i);
-	iter.user_data = GINT_TO_POINTER(i);
-
-	/* TODO: Cancel slow DnD */
-
-	if (filer_window->target_cb)
-	{
-		dnd_motion_ungrab();
-		if (item && press && event->button == 1)
-			filer_window->target_cb(filer_window, &viter,
-					filer_window->target_data);
-
-		filer_target_mode(filer_window, NULL, NULL, NULL);
-
-		return;
-	}
-
-	action = bind_lookup_bev(
-			item ? BIND_DIRECTORY_ICON : BIND_DIRECTORY,
-			event);
-
-	switch (action)
-	{
-		case ACT_CLEAR_SELECTION:
-			view_details_clear_selection(view);
-			break;
-		case ACT_TOGGLE_SELECTED:
-			set_selected(view_details, i,
-					!get_selected(view_details, i));
-			break;
-		case ACT_SELECT_EXCL:
-			view_details_select_only(view, &viter);
-			break;
-		case ACT_EDIT_ITEM:
-			flags |= OPEN_SHIFT;
-			/* (no break) */
-		case ACT_OPEN_ITEM:
-			if (event->button != 1 || event->state & GDK_MOD1_MASK)
-				flags |= OPEN_CLOSE_WINDOW;
-			else
-				flags |= OPEN_SAME_WINDOW;
-			if (o_new_button_1.int_value)
-				flags ^= OPEN_SAME_WINDOW;
-			if (event->type == GDK_2BUTTON_PRESS)
-				view_details_set_selected(view, &viter, FALSE);
-			dnd_motion_ungrab();
-
-			filer_openitem(filer_window, &viter, flags);
-			break;
-		case ACT_POPUP_MENU:
-			
-			dnd_motion_ungrab();
-			tooltip_show(NULL);
-
-			show_filer_menu(filer_window,
-					(GdkEvent *) event, &viter);
-			break;
-		case ACT_PRIME_AND_SELECT:
-			if (item && !is_selected(view_details, i))
-				view_details_select_only(view, &viter);
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_AND_TOGGLE:
-			set_selected(view_details, i,
-					!get_selected(view_details, i));
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_FOR_DND:
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_IGNORE:
-			if (press && event->button < 4)
-			{
-				if (item)
-					view_details_wink_item(view, &viter);
-				dnd_motion_start(MOTION_NONE);
-			}
-			break;
-		case ACT_LASSO_CLEAR:
-			view_details_clear_selection(view);
-			/* (no break) */
-		case ACT_LASSO_MODIFY:
-#if 0
-			collection_lasso_box(collection, event->x, event->y);
-#endif
-			break;
-		case ACT_RESIZE:
-			filer_window_autosize(filer_window);
-			break;
-		default:
-			g_warning("Unsupported action : %d\n", action);
-			break;
-	}
-}
-
 static gboolean view_details_button_press(GtkWidget *widget,
 					  GdkEventButton *bev)
 {
+	FilerWindow *filer_window = ((ViewDetails *) widget)->filer_window;
+
 	if (dnd_motion_press(widget, bev))
-		perform_action((ViewDetails *) widget, bev);
+		filer_perform_action(filer_window, bev);
 
 	return TRUE;
 }
@@ -725,8 +607,10 @@ static gboolean view_details_button_press(GtkWidget *widget,
 static gboolean view_details_button_release(GtkWidget *widget,
 					    GdkEventButton *bev)
 {
+	FilerWindow *filer_window = ((ViewDetails *) widget)->filer_window;
+
 	if (!dnd_motion_release(bev))
-		perform_action((ViewDetails *) widget, bev);
+		filer_perform_action(filer_window, bev);
 
 	return TRUE;
 }
@@ -747,121 +631,9 @@ static gint view_details_key_press_event(GtkWidget *widget, GdkEventKey *event)
 
 static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
 {
-	ViewDetails	*view_details = (ViewDetails *) widget;
-	ViewIface	*view = (ViewIface *) widget;
-	GtkTreeView	*tree = (GtkTreeView *) widget;
-	FilerWindow	*filer_window = view_details->filer_window;
-	GtkTreeModel	*model;
-	GtkTreePath	*path = NULL;
-	ViewIter	iter;
-	int		i = -1;
-	int		n_sel;
+	ViewDetails *view_details = (ViewDetails *) widget;
 
-	model = gtk_tree_view_get_model(tree);
-
-	if (gtk_tree_view_get_path_at_pos(tree, event->x, event->y,
-					&path, NULL, NULL, NULL))
-	{
-		g_return_val_if_fail(path != NULL, FALSE);
-
-		i = gtk_tree_path_get_indices(path)[0];
-		gtk_tree_path_free(path);
-	}
-
-	if (i == -1)
-	{
-		tooltip_show(NULL);
-		tip_item = NULL;
-	}
-	else
-	{
-		DirItem *item;
-
-		item = ((ViewItem *) view_details->items->pdata[i])->item;
-
-		if (item != tip_item)
-		{
-			tooltip_show(NULL);
-
-			tip_item = item;
-#if 0
-			tooltip_prime((GtkFunction) tooltip_activate,
-					G_OBJECT(view_details));
-#endif
-		}
-	}
-
-	if (motion_state != MOTION_READY_FOR_DND)
-		return FALSE;
-
-	if (!dnd_motion_moved(event))
-		return FALSE;
-
-	/* Find the item the drag started from... */
-	if (gtk_tree_view_get_path_at_pos(tree,
-				event->x - (event->x_root - drag_start_x),
-				event->y - (event->y_root - drag_start_y),
-				&path, NULL, NULL, NULL))
-	{
-		g_return_val_if_fail(path != NULL, FALSE);
-
-		i = gtk_tree_path_get_indices(path)[0];
-		gtk_tree_path_free(path);
-	}
-	else
-		return FALSE;
-
-	iter.i = i;
-	view_details_wink_item(view, NULL);
-	
-	if (!is_selected(view_details, i))
-	{
-		if (event->state & GDK_BUTTON1_MASK)
-		{
-			/* Select just this one */
-			filer_window->temp_item_selected = TRUE;
-			view_details_select_only(view, &iter);
-		}
-		else
-		{
-			if (view_details_count_selected(view) == 0)
-				filer_window->temp_item_selected = TRUE;
-			set_selected(view_details, i, TRUE);
-		}
-	}
-
-	n_sel = view_details_count_selected(view);
-	g_return_val_if_fail(n_sel > 0, TRUE);
-
-	if (n_sel == 1)
-	{
-		ViewItem *v_item = (ViewItem *) view_details->items->pdata[i];
-		DirItem	 *item = v_item->item;
-
-		if (!item->image)
-			item = dir_update_item(filer_window->directory,
-						item->leafname);
-
-		if (!item)
-		{
-			report_error(_("Item no longer exists!"));
-			return FALSE;
-		}
-
-		drag_one_item(widget, event,
-			make_path(filer_window->sym_path, item->leafname),
-			item, item->image);
-	}
-	else
-	{
-		guchar *uris;
-	
-		uris = view_create_uri_list(view);
-		drag_selection(widget, event, uris);
-		g_free(uris);
-	}
-
-	return FALSE;
+	return filer_motion_notify(view_details->filer_window, event);
 }
 
 static void view_details_destroy(GtkObject *view_details)
@@ -1018,6 +790,7 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 	iface->count_selected = view_details_count_selected;
 	iface->show_cursor = view_details_show_cursor;
 	iface->get_iter = view_details_get_iter;
+	iface->get_iter_at_point = view_details_get_iter_at_point;
 	iface->cursor_to_iter = view_details_cursor_to_iter;
 	iface->set_selected = view_details_set_selected;
 	iface->get_selected = view_details_get_selected;
@@ -1027,7 +800,8 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 	iface->autosize = view_details_autosize;
 	iface->cursor_visible = view_details_cursor_visible;
 	iface->set_base = view_details_set_base;
-	iface->get_filer_window = view_details_get_filer_window;
+	iface->start_lasso_box = view_details_start_lasso_box;
+	iface->extend_tip = view_details_extend_tip;
 }
 
 /* Implementations of the View interface. See view_iface.c for comments. */
@@ -1327,6 +1101,28 @@ static void view_details_get_iter(ViewIface *view,
 	make_iter((ViewDetails *) view, iter, flags);
 }
 
+static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
+					   int x, int y)
+{
+	ViewDetails *view_details = (ViewDetails *) view;
+	GtkTreeModel *model;
+	GtkTreeView *tree = (GtkTreeView *) view;
+	GtkTreePath *path = NULL;
+	int i = -1;
+
+	model = gtk_tree_view_get_model(tree);
+
+	if (gtk_tree_view_get_path_at_pos(tree, x, y, &path, NULL, NULL, NULL))
+	{
+		g_return_if_fail(path != NULL);
+
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_path_free(path);
+	}
+
+	make_item_iter(view_details, iter, i);
+}
+
 static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
 	GtkTreePath *path;
@@ -1430,11 +1226,14 @@ static void view_details_set_base(ViewIface *view, ViewIter *iter)
 	view_details->cursor_base = iter->i;
 }
 
-static FilerWindow *view_details_get_filer_window(ViewIface *view)
+static void view_details_start_lasso_box(ViewIface *view, GdkEventButton *event)
 {
-	ViewDetails	*view_details = (ViewDetails *) view;
+	g_print("TODO: lasso drag\n");
+}
 
-	return view_details->filer_window;
+static void view_details_extend_tip(ViewIface *view,
+				    ViewIter *iter, GString *tip)
+{
 }
 
 static DirItem *iter_init(ViewIter *iter)
@@ -1567,7 +1366,9 @@ static DirItem *iter_peek(ViewIter *iter)
 	return ((ViewItem *) view_details->items->pdata[i])->item;
 }
 
-/* Set the iterator to return 'i' on the next peek() */
+/* Set the iterator to return 'i' on the next peek().
+ * If i is -1, returns NULL on next peek().
+ */
 static void make_item_iter(ViewDetails *view_details, ViewIter *iter, int i)
 {
 	make_iter(view_details, iter, 0);

@@ -136,5 +136,7 @@ gboolean filer_window_delete(GtkWidget *window,
 			     FilerWindow *filer_window);
 void filer_set_view_type(FilerWindow *filer_window, ViewType type);
 void filer_window_toggle_cursor_item_selected(FilerWindow *filer_window);
+void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event);
+gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event);
 
 #endif /* _FILER_H */

@@ -355,50 +355,31 @@ void view_set_base(ViewIface *obj, ViewIter *iter)
 	VIEW_IFACE_GET_CLASS(obj)->set_base(obj, iter);
 }
 
-/* The the filer window for this view */
-FilerWindow *view_get_filer_window(ViewIface *obj)
-{
-	g_return_val_if_fail(VIEW_IS_IFACE(obj), NULL);
-
-	return VIEW_IFACE_GET_CLASS(obj)->get_filer_window(obj);
-}
-
-/* Return the selection as a text/uri-list.
- * g_free() the result.
+/* Returns an interator which yields just the item under the pointer.
+ * iter.peek() will return NULL if no item was under the pointer.
+ * x, y is relative to the window which generates events for the widget.
  */
-guchar *view_create_uri_list(ViewIface *obj)
+void view_get_iter_at_point(ViewIface *obj, ViewIter *iter, int x, int y)
 {
-	FilerWindow *filer_window;
-	GString	*string;
-	GString	*leader;
-	ViewIter iter;
-	DirItem	*item;
-	guchar	*retval;
+	g_return_if_fail(VIEW_IS_IFACE(obj));
 
-	g_return_val_if_fail(VIEW_IS_IFACE(obj), NULL);
-
-	filer_window = view_get_filer_window(obj);
-
-	string = g_string_new(NULL);
-
-	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name_for_dnd());
-	g_string_append(leader, filer_window->sym_path);
-	if (leader->str[leader->len - 1] != '/')
-		g_string_append_c(leader, '/');
-
-	view_get_iter(obj, &iter, VIEW_ITER_SELECTED);
-	while ((item = iter.next(&iter)))
-	{
-		g_string_append(string, leader->str);
-		g_string_append(string, item->leafname);
-		g_string_append(string, "\r\n");
-	}
-
-	g_string_free(leader, TRUE);
-	retval = string->str;
-	g_string_free(string, FALSE);
-
-	return retval;
+	VIEW_IFACE_GET_CLASS(obj)->get_iter_at_point(obj, iter, x, y);
 }
 
+/* Begin a drag to select a group of icons */
+void view_start_lasso_box(ViewIface *obj, GdkEventButton *event)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->start_lasso_box(obj, event);
+}
+
+/* Add anything useful to the tooltip string. Used to include the name of
+ * items where the name is shown truncated.
+ */
+void view_extend_tip(ViewIface *obj, ViewIter *iter, GString *tip)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->extend_tip(obj, iter, tip);
+}

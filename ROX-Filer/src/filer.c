@@ -66,6 +66,13 @@
 
 static XMLwrapper *groups = NULL;
 
+/* Item we are about to display a tooltip for */
+static DirItem *tip_item = NULL;
+/* The window which the motion event for the tooltip came from. Use this
+ * to get the correct widget for finding the item under the pointer.
+ */
+static GdkWindow *motion_window = NULL;
+
 /* This is rather badly named. It's actually the filer window which received
  * the last key press or Menu click event.
  */
@@ -1884,3 +1891,300 @@ void filer_add_tip_details(FilerWindow *filer_window,
 			_("This filename is not valid UTF-8. "
 			  "You should rename it.\n"));
 }
+
+/* Return the selection as a text/uri-list.
+ * g_free() the result.
+ */
+static guchar *filer_create_uri_list(FilerWindow *filer_window)
+{
+	GString	*string;
+	GString	*leader;
+	ViewIter iter;
+	DirItem	*item;
+	guchar	*retval;
+
+	g_return_val_if_fail(filer_window != NULL, NULL);
+
+	string = g_string_new(NULL);
+
+	leader = g_string_new("file://");
+	g_string_append(leader, our_host_name_for_dnd());
+	g_string_append(leader, filer_window->sym_path);
+	if (leader->str[leader->len - 1] != '/')
+		g_string_append_c(leader, '/');
+
+	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
+	while ((item = iter.next(&iter)))
+	{
+		g_string_append(string, leader->str);
+		g_string_append(string, item->leafname);
+		g_string_append(string, "\r\n");
+	}
+
+	g_string_free(leader, TRUE);
+	retval = string->str;
+	g_string_free(string, FALSE);
+
+	return retval;
+}
+
+void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event)
+{
+	BindAction	action;
+	ViewIface	*view = filer_window->view;
+	DirItem		*item = NULL;
+	gboolean	press = event->type == GDK_BUTTON_PRESS;
+	ViewIter	iter;
+	OpenFlags	flags = 0;
+
+	if (event->button > 3)
+		return;
+
+	view_get_iter_at_point(view, &iter, event->x, event->y);
+	item = iter.peek(&iter);
+
+	if (item && event->button == 1 &&
+		view_get_selected(view, &iter) &&
+		filer_window->selection_state == GTK_STATE_INSENSITIVE)
+	{
+		/* Possibly a really slow DnD operation? */
+		filer_window->temp_item_selected = FALSE;
+		
+		filer_selection_changed(filer_window, event->time);
+		return;
+	}
+
+	if (filer_window->target_cb)
+	{
+		dnd_motion_ungrab();
+		if (item && press && event->button == 1)
+			filer_window->target_cb(filer_window, &iter,
+					filer_window->target_data);
+
+		filer_target_mode(filer_window, NULL, NULL, NULL);
+
+		return;
+	}
+
+	action = bind_lookup_bev(
+			item ? BIND_DIRECTORY_ICON : BIND_DIRECTORY,
+			event);
+
+	switch (action)
+	{
+		case ACT_CLEAR_SELECTION:
+			view_clear_selection(view);
+			break;
+		case ACT_TOGGLE_SELECTED:
+			view_set_selected(view, &iter, 
+				!view_get_selected(view, &iter));
+			break;
+		case ACT_SELECT_EXCL:
+			view_select_only(view, &iter);
+			break;
+		case ACT_EDIT_ITEM:
+			flags |= OPEN_SHIFT;
+			/* (no break) */
+		case ACT_OPEN_ITEM:
+			if (event->button != 1 || event->state & GDK_MOD1_MASK)
+				flags |= OPEN_CLOSE_WINDOW;
+			else
+				flags |= OPEN_SAME_WINDOW;
+			if (o_new_button_1.int_value)
+				flags ^= OPEN_SAME_WINDOW;
+			if (event->type == GDK_2BUTTON_PRESS)
+				view_set_selected(view, &iter, FALSE);
+			dnd_motion_ungrab();
+
+			filer_openitem(filer_window, &iter, flags);
+			break;
+		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
+			tooltip_show(NULL);
+			show_filer_menu(filer_window,
+					(GdkEvent *) event, &iter);
+			break;
+		case ACT_PRIME_AND_SELECT:
+			if (item && !view_get_selected(view, &iter))
+				view_select_only(view, &iter);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_AND_TOGGLE:
+			view_set_selected(view, &iter, 
+				!view_get_selected(view, &iter));
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_FOR_DND:
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_IGNORE:
+			if (press && event->button < 4)
+			{
+				if (item)
+					view_wink_item(view, &iter);
+				dnd_motion_start(MOTION_NONE);
+			}
+			break;
+		case ACT_LASSO_CLEAR:
+			view_clear_selection(view);
+			/* (no break) */
+		case ACT_LASSO_MODIFY:
+			view_start_lasso_box(view, event);
+			break;
+		case ACT_RESIZE:
+			filer_window_autosize(filer_window);
+			break;
+		default:
+			g_warning("Unsupported action : %d\n", action);
+			break;
+	}
+}
+
+/* It's time to make the tooltip appear. If we're not over the item any
+ * more, or the item doesn't need a tooltip, do nothing.
+ */
+static gboolean tooltip_activate(GtkWidget *window)
+{
+	FilerWindow *filer_window;
+	ViewIface *view;
+	ViewIter iter;
+	gint 	x, y;
+	DirItem	*item = NULL;
+	GString	*tip = NULL;
+
+	g_return_val_if_fail(tip_item != NULL, 0);
+
+	filer_window = g_object_get_data(G_OBJECT(window), "filer_window");
+
+	if (!filer_window)
+	{
+		g_print("[ window destroyed ]\n");
+		return FALSE;	/* Window has been destroyed */
+	}
+
+	view = filer_window->view;
+
+	tooltip_show(NULL);
+
+	gdk_window_get_pointer(motion_window, &x, &y, NULL);
+	view_get_iter_at_point(view, &iter, x, y);
+
+	item = iter.peek(&iter);
+	if (item != tip_item)
+		return FALSE;	/* Not still under the pointer */
+
+	/* OK, the filer window still exists and the pointer is still
+	 * over the same item. Do we need to show a tip?
+	 */
+
+	tip = g_string_new(NULL);
+
+	view_extend_tip(filer_window->view, &iter, tip);
+
+	filer_add_tip_details(filer_window, tip, tip_item);
+
+	if (tip->len > 1)
+	{
+		g_string_truncate(tip, tip->len - 1);
+		
+		tooltip_show(tip->str);
+	}
+
+	g_string_free(tip, TRUE);
+
+	return FALSE;
+}
+
+/* Motion detected on the View widget */
+gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
+{
+	ViewIface	*view = filer_window->view;
+	ViewIter	iter;
+	DirItem		*item;
+
+	view_get_iter_at_point(view, &iter, event->x, event->y);
+	item = iter.peek(&iter);
+	
+	if (item)
+	{
+		if (item != tip_item)
+		{
+			tooltip_show(NULL);
+
+			tip_item = item;
+			motion_window = event->window;
+			tooltip_prime((GtkFunction) tooltip_activate,
+					G_OBJECT(filer_window->window));
+		}
+	}
+	else
+	{
+		tooltip_show(NULL);
+		tip_item = NULL;
+	}
+
+	if (motion_state != MOTION_READY_FOR_DND)
+		return FALSE;
+
+	if (!dnd_motion_moved(event))
+		return FALSE;
+
+	view_get_iter_at_point(view, &iter,
+			event->x - (event->x_root - drag_start_x),
+			event->y - (event->y_root - drag_start_y));
+	item = iter.peek(&iter);
+	if (!item)
+		return FALSE;
+
+	view_wink_item(view, NULL);
+	
+	if (!view_get_selected(view, &iter))
+	{
+		if (event->state & GDK_BUTTON1_MASK)
+		{
+			/* Select just this one */
+			filer_window->temp_item_selected = TRUE;
+			view_select_only(view, &iter);
+		}
+		else
+		{
+			if (view_count_selected(view) == 0)
+				filer_window->temp_item_selected = TRUE;
+			view_set_selected(view, &iter, TRUE);
+		}
+	}
+
+	g_return_val_if_fail(view_count_selected(view) > 0, TRUE);
+
+	if (view_count_selected(view) == 1)
+	{
+		if (!item->image)
+			item = dir_update_item(filer_window->directory,
+						item->leafname);
+
+		if (!item)
+		{
+			report_error(_("Item no longer exists!"));
+			return FALSE;
+		}
+
+		drag_one_item(GTK_WIDGET(view), event,
+			make_path(filer_window->sym_path, item->leafname),
+			item, item->image);
+#if 0
+		/* XXX: Use thumbnail */
+			item, view ? view->image : NULL);
+#endif
+	}
+	else
+	{
+		guchar *uris;
+	
+		uris = filer_create_uri_list(filer_window);
+		drag_selection(GTK_WIDGET(view), event, uris);
+		g_free(uris);
+	}
+
+	return FALSE;
+}
+

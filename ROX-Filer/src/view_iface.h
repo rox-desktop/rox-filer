@@ -10,6 +10,7 @@
 #define __VIEW_IFACE_H__
 
 #include <glib-object.h>
+#include <gdk/gdk.h>
 
 typedef enum {
 	/* iter->next moves to selected items only */
@@ -72,6 +73,7 @@ struct _ViewIfaceClass {
 	void (*show_cursor)(ViewIface *obj);
 
 	void (*get_iter)(ViewIface *obj, ViewIter *iter, IterFlags flags);
+	void (*get_iter_at_point)(ViewIface *obj, ViewIter *iter, int x, int y);
 	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
 
 	void (*set_selected)(ViewIface *obj, ViewIter *iter, gboolean selected);
@@ -82,7 +84,8 @@ struct _ViewIfaceClass {
 	void (*autosize)(ViewIface *obj);
 	gboolean (*cursor_visible)(ViewIface *obj);
 	void (*set_base)(ViewIface *obj, ViewIter *iter);
-	FilerWindow *(*get_filer_window)(ViewIface *obj);
+	void (*start_lasso_box)(ViewIface *obj, GdkEventButton *event);
+	void (*extend_tip)(ViewIface *obj, ViewIter *iter, GString *tip);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -119,6 +122,7 @@ int view_count_selected(ViewIface *obj);
 void view_show_cursor(ViewIface *obj);
 
 void view_get_iter(ViewIface *obj, ViewIter *iter, IterFlags flags);
+void view_get_iter_at_point(ViewIface *obj, ViewIter *iter, int x, int y);
 void view_get_cursor(ViewIface *obj, ViewIter *iter);
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
 
@@ -135,7 +139,7 @@ void view_wink_item(ViewIface *obj, ViewIter *iter);
 void view_autosize(ViewIface *obj);
 gboolean view_cursor_visible(ViewIface *obj);
 void view_set_base(ViewIface *obj, ViewIter *iter);
-guchar *view_create_uri_list(ViewIface *view);
-FilerWindow *view_get_filer_window(ViewIface *obj);
+void view_start_lasso_box(ViewIface *obj, GdkEventButton *event);
+void view_extend_tip(ViewIface *obj, ViewIter *iter, GString *tip);
 
 #endif /* __VIEW_IFACE_H__ */
