@@ -797,19 +797,6 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 			collection_move_cursor(collection, last - first + 1, 0);
 			break;
 		  }
-		case GDK_Escape:
-			collection_set_cursor_item(collection, -1);
-			collection_clear_selection(collection);
-			return FALSE;		/* Pass it on */
-		case ' ':
-			if (item >=0 && item < collection->number_of_items)
-			{
-				collection_toggle_item(collection, item);
-				if (item < collection->number_of_items - 1)
-					collection_set_cursor_item(collection,
-							item + 1);
-			}
-			break;
 		default:
 			return FALSE;
 	}

@@ -90,9 +90,6 @@ static guint xid_hash(XID *xid);
 static gboolean xid_equal(XID *a, XID *b);
 static void state_changed(IconWindow *win);
 static void show_icon(IconWindow *win);
-static gboolean draw_label_shadow(GtkWidget *widget,
-				  GdkEventExpose *event,
-				  gpointer data);
 static void icon_win_free(IconWindow *win);
 static void update_style(gpointer key, gpointer data, gpointer user_data);
 static void update_supported(void);
@@ -771,8 +768,6 @@ static void show_icon(IconWindow *win)
 			   FALSE, TRUE, 0);
 	g_object_unref(pixbuf);
 
-	gtk_button_set_relief(GTK_BUTTON(win->widget), GTK_RELIEF_NONE);
-		
 	win->label = wrapped_label_new(win->text, 180);
 
 	update_style(NULL, win, NULL);
@@ -786,45 +781,10 @@ static void show_icon(IconWindow *win)
 			G_CALLBACK(icon_motion_notify), win);
 	g_signal_connect(win->widget, "released",
 			G_CALLBACK(button_released), win);
-	g_signal_connect(win->label, "expose_event",
-			G_CALLBACK(draw_label_shadow), win);
 	
 	gtk_widget_show_all(vbox);	/* So the size comes out right */
 	pinboard_add_widget(win->widget);
 	gtk_widget_show(win->widget);
-}
-
-static gboolean draw_label_shadow(GtkWidget *widget, GdkEventExpose *event,
-				  gpointer data)
-{
-	WrappedLabel	*wrap = WRAPPED_LABEL(widget);
-	IconWindow	*win = (IconWindow *) data;
-	GdkGC		*gc;
-
-	/* Should we return silently? It seems that this can happen... */
-	g_return_val_if_fail(win->widget != NULL, FALSE);
-	
-	gc = pinboard_get_shadow_gc();
-
-	if (o_pinboard_shadow_labels.int_value && gc
-	    && GTK_WIDGET_STATE(win->widget) == GTK_STATE_NORMAL)
-	{
-		gint x = widget->allocation.x - wrap->x_off;
-		gint y = widget->allocation.y - wrap->y_off;
-
-		gdk_gc_set_clip_origin(gc,
-				widget->allocation.x, widget->allocation.y);
-		gdk_gc_set_clip_rectangle(gc, &widget->allocation);
-
-		gdk_draw_layout(widget->window, gc, x + 1, y + 1, wrap->layout);
-
-		if (o_pinboard_shadow_labels.int_value < 2)
-			return FALSE;
-
-		gdk_draw_layout(widget->window, gc, x + 2, y + 2, wrap->layout);
-	}
-
-	return FALSE;
 }
 
 /* A window has been destroyed/expanded -- remove its icon */
@@ -832,9 +792,9 @@ static void hide_icon(IconWindow *win)
 {
 	g_return_if_fail(win->widget != NULL);
 
+	gtk_widget_destroy(win->widget);
 	win->widget = NULL;
 	win->label = NULL;
-	gtk_widget_destroy(win->widget);
 }
 
 static void state_changed(IconWindow *win)
@@ -872,13 +832,7 @@ static void update_style(gpointer key, gpointer data, gpointer user_data)
 	IconWindow *win = (IconWindow *) data;
 
 	if (win->widget)
-	{
-		gtk_widget_modify_fg(win->label,
-					GTK_STATE_NORMAL, &pin_text_fg_col);
-		gtk_widget_modify_bg(win->label,
-					GTK_STATE_NORMAL, &pin_text_bg_col);
 		widget_modify_font(win->label, pinboard_font);
-	}
 }
 
 /* Find out what the new window manager can do... */

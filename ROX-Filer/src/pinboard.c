@@ -117,9 +117,9 @@ struct _PinIcon {
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
-/* Used for the text colours (only) in the icons (and tasklist windows) */
-GdkColor pin_text_fg_col, pin_text_bg_col;
-PangoFontDescription *pinboard_font = NULL;	/* NULL => Gtk default */
+/* Used for the text colours (only) in the icons */
+static GdkColor pin_text_fg_col, pin_text_bg_col;
+PangoFontDescription *pinboard_font = NULL; /* NULL => Gtk default */
 
 static GdkColor pin_text_shadow_col;
 
@@ -139,9 +139,7 @@ static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
 static Option o_iconify_start, o_iconify_dir;
 static Option o_label_font, o_pinboard_shadow_colour;
-
-/* tasklist.c needs it */
-Option o_pinboard_shadow_labels;
+static Option o_pinboard_shadow_labels;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -354,13 +352,6 @@ GdkWindow *pinboard_get_window(void)
 	if (current_pinboard)
 		return current_pinboard->window->window;
 	return NULL;
-}
-
-GdkGC *pinboard_get_shadow_gc(void)
-{
-	g_return_val_if_fail(current_pinboard != NULL, NULL);
-
-	return current_pinboard->shadow_gc;
 }
 
 const char *pinboard_get_name(void)

@@ -835,6 +835,24 @@ static gboolean popup_menu(GtkWidget *widget, FilerWindow *filer_window)
 	return TRUE;
 }
 
+void filer_window_toggle_cursor_item_selected(FilerWindow *filer_window)
+{
+	ViewIface *view = filer_window->view;
+	ViewIter iter;
+
+	view_get_iter(view, &iter, VIEW_ITER_FROM_CURSOR);
+	if (!iter.next(&iter))
+		return;	/* No cursor */
+
+	if (view_get_selected(view, &iter))
+		view_set_selected(view, &iter, FALSE);
+	else
+		view_set_selected(view, &iter, TRUE);
+
+	if (iter.next(&iter))
+		view_cursor_to_iter(view, &iter);
+}
+
 /* Handle keys that can't be bound with the menu */
 static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
@@ -863,6 +881,8 @@ static gint key_press_event(GtkWidget	*widget,
 	{
 		case GDK_Escape:
 			filer_target_mode(filer_window, NULL, NULL, NULL);
+			view_cursor_to_iter(filer_window->view, NULL);
+			view_clear_selection(filer_window->view);
 			return FALSE;
 		case GDK_Return:
 			return_pressed(filer_window, event);
@@ -887,6 +907,9 @@ static gint key_press_event(GtkWidget	*widget,
 					(GdkEvent *) event, &iter);
 			break;
 		}
+		case ' ':
+			filer_window_toggle_cursor_item_selected(filer_window);
+			break;
 		default:
 			if (key >= GDK_0 && key <= GDK_9)
 				group[0] = key - GDK_0 + '0';
