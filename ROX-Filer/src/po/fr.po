@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.1.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-08-03 15:17+0200\n"
-"PO-Revision-Date: 2004-08-03 15:35+0200\n"
+"POT-Creation-Date: 2004-08-09 19:56+0200\n"
+"PO-Revision-Date: 2004-08-09 19:56+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -819,55 +819,68 @@ msgstr ""
 "Désolé - j'ai besoin d'un type cible text/uri-list ou application/octet-"
 "stream."
 
-#: dnd.c:750
+#: dnd.c:684
+#, c-format
+msgid ""
+"Failed to add some items to the pinboard, because they are on a remote "
+"machine. For example:\n"
+"\n"
+"%s"
+msgstr ""
+"Impossible d'ajouter certains objets sur le punaiseur, parce qu'ils sont sur "
+"une machine distante. Par exemple :\n"
+"\n"
+"%s"
+
+#: dnd.c:759
 msgid "Unknown target"
 msgstr "Cible inconnue"
 
-#: dnd.c:783
+#: dnd.c:792
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr ""
 "L'application distante ne peut pas ou ne veut pas m'envoyer les données - "
 "désolé"
 
-#: dnd.c:796
+#: dnd.c:805
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "Erreur de protocole XDS : le code de retour devrait être 'S', 'F' ou 'E'\n"
 
-#: dnd.c:829
+#: dnd.c:838
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Désolé, impossible d'afficher un menu des actions pour un fichier distant / "
 "des données brutes."
 
-#: dnd.c:845
+#: dnd.c:854
 msgid "UntitledData"
 msgstr "UntitledData"
 
-#: dnd.c:872
+#: dnd.c:881
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Erreur lors de la sauvegarde du fichier : %s"
 
-#: dnd.c:945
+#: dnd.c:954
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Pas d'URI dans le text/uri-list (il n'y a rien à faire !)"
 
-#: dnd.c:977
+#: dnd.c:986
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Impossible d'obtenir les données de la machine distante (application/octet-"
 "stream non fourni)"
 
-#: dnd.c:1000
+#: dnd.c:1009
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Certains de ces fichiers sont sur une machine différente - ils seront "
 "ignorés - désolé"
 
-#: dnd.c:1007
+#: dnd.c:1016
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -875,11 +888,11 @@ msgstr ""
 "Aucun de ces fichiers n'est sur la machine locale - je ne peux pas traiter "
 "de multiples fichiers distants - désolé."
 
-#: dnd.c:1020
+#: dnd.c:1029
 msgid "Unknown action requested"
 msgstr "Action demandée inconnue"
 
-#: dnd.c:1028
+#: dnd.c:1037
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Erreur lors du chargement de la liste des fichiers : %s"
