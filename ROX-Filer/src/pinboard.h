@@ -28,7 +28,9 @@ const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop_box(void);
 void pinboard_set_backdrop_app(const gchar *app);
 GdkWindow *pinboard_get_window(void);
-void pinboard_add_widget(GtkWidget *widget);
+void pinboard_add_widget(GtkWidget *widget, const gchar *name);
+void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
+			   int x, int y);
 void pinboard_update_size(void);
 void draw_label_shadow(WrappedLabel *wl, GdkRegion *region);
 void pinboard_set_backdrop(const gchar *path, BackdropStyle style);

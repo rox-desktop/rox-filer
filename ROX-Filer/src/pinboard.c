@@ -138,6 +138,9 @@ static gboolean lasso_in_progress = FALSE;
 static int lasso_rect_x1, lasso_rect_x2;
 static int lasso_rect_y1, lasso_rect_y2;
 
+/* Tracking icon positions */
+static GHashTable *placed_icons=NULL;
+
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
@@ -219,7 +222,8 @@ static void drag_backdrop_dropped(GtkWidget	*drop_box,
 				  const guchar	*path,
 				  GtkWidget	*dialog);
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
-static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect);
+static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
+			   gboolean old);
 static void update_pinboard_font(void);
 static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
@@ -261,6 +265,8 @@ void pinboard_init(void)
 	gdk_color_parse(o_pinboard_bg_colour.value, &pin_text_bg_col);
 	gdk_color_parse(o_pinboard_shadow_colour.value, &pin_text_shadow_col);
 	update_pinboard_font();
+
+	placed_icons=g_hash_table_new(g_str_hash, g_str_equal);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -376,10 +382,11 @@ const char *pinboard_get_name(void)
 /* Add widget to the pinboard. Caller is responsible for coping with pinboard
  * being cleared.
  */
-void pinboard_add_widget(GtkWidget *widget)
+void pinboard_add_widget(GtkWidget *widget, const gchar *name)
 {
 	GtkRequisition req;
-	GdkRectangle rect;
+	GdkRectangle *rect=NULL;
+	gboolean found=FALSE;
 
 	g_return_if_fail(current_pinboard != NULL);
 
@@ -387,12 +394,50 @@ void pinboard_add_widget(GtkWidget *widget)
 
 	gtk_widget_size_request(widget, &req);
 
-	rect.width = req.width;
-	rect.height = req.height;
-	find_free_rect(current_pinboard, &rect);
+	if(name) {
+		rect=g_hash_table_lookup(placed_icons, name);
+		if(rect)
+			found=TRUE;
+	}
+	/*printf("%s at %p %d\n", name? name: "(nil)", rect, found);*/
+
+	if(rect) {
+		if(rect->width<req.width || rect->height<req.height) {
+			found=FALSE;
+		}
+	} else {
+		rect=g_new(GdkRectangle, 1);
+		rect->width = req.width;
+		rect->height = req.height;
+	}
+	/*printf("%s at %d,%d %d\n", name? name: "(nil)", rect->x,
+	  rect->y, found);*/
+	find_free_rect(current_pinboard, rect, found);
+	/*printf("%s at %d,%d %d\n", name? name: "(nil)", rect->x,
+	  rect->y, found);*/
 	
 	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed),
-			widget, rect.x, rect.y);
+			widget, rect->x, rect->y);
+
+	/* Store the new position (key and value are never freed) */
+	if(name)
+		g_hash_table_insert(placed_icons, g_strdup(name),
+				    rect);
+}
+
+void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
+			   int x, int y)
+{
+	GdkRectangle *rect;
+
+	if(!name)
+		return;
+	rect=g_hash_table_lookup(placed_icons, name);
+	if(!rect)
+		return;
+
+	rect->x=x;
+	rect->y=y;
 }
 
 /* Add a new icon to the background.
@@ -2388,10 +2433,13 @@ static void search_free(GdkRectangle *rect, GdkRegion *used,
 
 /* Finds a free area on the pinboard large enough for the width and height
  * of the given rectangle, by filling in the x and y fields of 'rect'.
+ * If 'old' is true, 'rect' has a previous position and we first check
+ * if it is viable.
  * The search order respects user preferences.
  * If no area is free, returns any old area.
  */
-static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
+static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
+			   gboolean old)
 {
 	GdkRegion *used;
 	GList *next;
@@ -2438,6 +2486,14 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 		used_rect.height = fix->widget->requisition.height;
 
 		gdk_region_union_with_rect(used, &used_rect);
+	}
+
+	/* Check the previous area */
+	if(old) {
+		if(gdk_region_rect_in(used, rect)==GDK_OVERLAP_RECTANGLE_OUT) {
+			gdk_region_destroy(used);
+			return;
+		}
 	}
 
 	/* Find the first free area (yes, this isn't exactly pretty, but

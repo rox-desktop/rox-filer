@@ -594,6 +594,10 @@ static gboolean icon_motion_notify(GtkWidget *widget,
 				win->widget,
 				event->x_root - drag_off_x,
 				event->y_root - drag_off_y);
+
+		pinboard_moved_widget(win->widget, win->text,
+				      event->x_root - drag_off_x,
+				      event->y_root - drag_off_y);
 	}
 
 	return FALSE;
@@ -882,7 +886,7 @@ static void show_icon(IconWindow *win)
 			G_CALLBACK(button_released), win);
 	
 	gtk_widget_show_all(vbox);	/* So the size comes out right */
-	pinboard_add_widget(win->widget);
+	pinboard_add_widget(win->widget, win->text);
 	gtk_widget_show(win->widget);
 }
 
