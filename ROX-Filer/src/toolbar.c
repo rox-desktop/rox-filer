@@ -360,9 +360,11 @@ static gint toolbar_adjust_pressed(GtkButton *button,
 		toolbar_other_button = event->button;
 		gtk_grab_add(GTK_WIDGET(button));
 		gtk_button_pressed(button);
+
+		return TRUE;
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 static gint toolbar_adjust_released(GtkButton *button,
@@ -374,9 +376,11 @@ static gint toolbar_adjust_released(GtkButton *button,
 		toolbar_other_button = 0;
 		gtk_grab_remove(GTK_WIDGET(button));
 		gtk_button_released(button);
+
+		return TRUE;
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 static gint menu_pressed(GtkWidget *button,

@@ -560,7 +560,7 @@ static gint collection_lose_selection(GtkWidget *widget,
 		collection_clear_selection(filer_window->collection);
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 /* Someone wants us to send them the selection */
@@ -824,7 +824,9 @@ static gint key_press_event(GtkWidget	*widget,
 			return FALSE;
 	}
 
+#ifndef GTK2
 	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
+#endif
 	return TRUE;
 }
 
@@ -1452,12 +1454,12 @@ static gint coll_button_release(GtkWidget *widget,
 			collection_end_lasso(filer_window->collection,
 				event->button == 1 ? GDK_SET : GDK_INVERT);
 		}
-		return TRUE;
+		return FALSE;
 	}
 
 	perform_action(filer_window, event);
 
-	return TRUE;
+	return FALSE;
 }
 
 static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
@@ -1573,7 +1575,7 @@ static gint coll_button_press(GtkWidget *widget,
 	if (dnd_motion_press(widget, event))
 		perform_action(filer_window, event);
 
-	return TRUE;
+	return FALSE;
 }
 
 static gint coll_motion_notify(GtkWidget *widget,
@@ -1591,16 +1593,16 @@ static gint coll_motion_notify(GtkWidget *widget,
 				(DirItem *) collection->items[i].data);
 
 	if (motion_state != MOTION_READY_FOR_DND)
-		return TRUE;
+		return FALSE;
 
 	if (!dnd_motion_moved(event))
-		return TRUE;
+		return FALSE;
 
 	i = collection_get_item(collection,
 			event->x - (event->x_root - drag_start_x),
 			event->y - (event->y_root - drag_start_y));
 	if (i == -1)
-		return TRUE;
+		return FALSE;
 
 	collection_wink_item(collection, -1);
 	
@@ -1640,7 +1642,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 		g_string_free(uris, TRUE);
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 /* Puts the filer window into target mode. When an item is chosen,

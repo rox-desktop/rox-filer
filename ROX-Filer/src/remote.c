@@ -80,6 +80,7 @@ gboolean remote_init(GString *to_open, gboolean new_copy)
 	{
 		gdk_property_change(existing_ipc_window, ipc_atom, XA_STRING, 8,
 			GDK_PROP_MODE_APPEND, to_open->str, to_open->len);
+		gdk_flush();
 		return TRUE;
 	}
 

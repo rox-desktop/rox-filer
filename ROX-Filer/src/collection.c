@@ -108,8 +108,10 @@ static void collection_get_arg(	GtkObject *object,
 				guint     arg_id);
 static void collection_adjustment(GtkAdjustment *adjustment,
 				  Collection    *collection);
+#ifndef GTK2
 static void collection_disconnect(GtkAdjustment *adjustment,
 				  Collection    *collection);
+#endif
 static void set_vadjustment(Collection *collection);
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
 static void scroll_by(Collection *collection, gint diff);
@@ -275,7 +277,7 @@ static void collection_class_init(CollectionClass *class)
 						     gain_selection),
 				     gtk_marshal_NONE__INT,
 				     GTK_TYPE_NONE, 1,
-				     GTK_TYPE_UINT);
+				     GTK_TYPE_INT);
 	collection_signals[LOSE_SELECTION] = gtk_signal_new("lose_selection",
 				     GTK_RUN_LAST,
 				     type,
@@ -283,7 +285,7 @@ static void collection_class_init(CollectionClass *class)
 						     lose_selection),
 				     gtk_marshal_NONE__INT,
 				     GTK_TYPE_NONE, 1,
-				     GTK_TYPE_UINT);
+				     GTK_TYPE_INT);
 	collection_signals[SELECTION_CHANGED] = gtk_signal_new(
 				     "selection_changed",
 				     GTK_RUN_LAST,
@@ -291,7 +293,8 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     selection_changed),
 				     gtk_marshal_NONE__INT,
-				     GTK_TYPE_NONE, 1);
+				     GTK_TYPE_NONE, 1,
+				     GTK_TYPE_INT);
 
 #ifndef GTK2
 	gtk_object_class_add_signals(object_class,
@@ -400,9 +403,6 @@ static void collection_destroy(GtkObject *object)
 		collection->auto_scroll = -1;
 	}
 
-	gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
-			collection);
-
 	if (collection->bg_gc)
 	{
 		gdk_gc_destroy(collection->bg_gc);
@@ -411,6 +411,8 @@ static void collection_destroy(GtkObject *object)
 
 	if (collection->vadj)
 	{
+		gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
+				collection);
 		gtk_object_unref(GTK_OBJECT(collection->vadj));
 		collection->vadj = NULL;
 	}
@@ -799,10 +801,13 @@ static void collection_set_adjustment(  Collection    *collection,
 				"value_changed",
 				(GtkSignalFunc) collection_adjustment,
 				collection);
+#ifndef GTK2
+		/* Is this used for anything? */
 		gtk_signal_connect(GTK_OBJECT(collection->vadj),
 				"disconnect",
 				(GtkSignalFunc) collection_disconnect,
 				collection);
+#endif
 		collection_adjustment(vadj, collection);
 	}
 }
@@ -855,6 +860,7 @@ static void collection_adjustment(GtkAdjustment *adjustment,
 	}
 }
 
+#ifndef GTK2
 static void collection_disconnect(GtkAdjustment *adjustment,
 				  Collection    *collection)
 {
@@ -865,6 +871,7 @@ static void collection_disconnect(GtkAdjustment *adjustment,
 
 	collection_set_adjustment(collection, NULL);
 }
+#endif
 
 static void set_vadjustment(Collection *collection)
 {	

@@ -79,7 +79,7 @@ AC_SUBST(XML_CONFIG)
 
 dnl See if we've got Gtk+ 2.0 (or 1.3 developement version)
 AC_MSG_CHECKING(for Gtk+-2.0)
-if $PKG_CONFIG --exists "gtk+-2.0-disabled"; then
+if $PKG_CONFIG --exists "gtk+-2.0"; then
   AC_MSG_RESULT(yes)
   AC_DEFINE(GTK2)
   GTK_CFLAGS="$PKG_CONFIG gtk+-2.0 --cflags"
