@@ -361,6 +361,14 @@ $ rox --bottom=</screen>
     between systems (which is why this isn't built in to the filer!).
 
    </para>
+   
+   <para>
+    Note: <command>gnomesu</command> can also be used to run the filer as root,
+    but you'll need to use <command>setsid</command> to run it in a new
+    session group, otherwise gnomesu kills it before it has a chance to open
+    a window. For example:
+    <screen>gnomesu -c 'setsid /usr/local/bin/rox /'</screen>
+   </para>
   </sect1>
 
  </chapter>
