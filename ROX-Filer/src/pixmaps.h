@@ -18,7 +18,6 @@ extern MaskedPixmap *im_symlink;
 
 extern MaskedPixmap *im_unmounted;
 extern MaskedPixmap *im_mounted;
-extern MaskedPixmap *im_multiple;
 extern MaskedPixmap *im_exec_file;
 extern MaskedPixmap *im_appdir;
 

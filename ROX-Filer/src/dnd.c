@@ -251,6 +251,7 @@ GList *uri_list_to_glist(const char *uri_list)
  */
 void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 {
+	GdkPixbuf	*pixbuf;
 	GdkDragContext 	*context;
 	GdkDragAction	actions;
 	GtkTargetList   *target_list;
@@ -281,7 +282,10 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 	g_dataset_set_data_full(context, "uri_list",
 				g_strdup(uri_list), g_free);
 
-	gtk_drag_set_icon_pixbuf(context, im_multiple->pixbuf, 0, 0);
+	pixbuf = gtk_widget_render_icon(widget, GTK_STOCK_DND_MULTIPLE,
+					GTK_ICON_SIZE_DIALOG, NULL);
+	gtk_drag_set_icon_pixbuf(context, pixbuf, 0, 0);
+	g_object_unref(pixbuf);
 }
 
 /* Copy/Load this item into another directory/application */

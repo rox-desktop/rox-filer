@@ -82,7 +82,6 @@ MaskedPixmap *im_symlink;
 
 MaskedPixmap *im_unmounted;
 MaskedPixmap *im_mounted;
-MaskedPixmap *im_multiple;
 MaskedPixmap *im_appdir;
 
 MaskedPixmap *im_dirs;
@@ -143,40 +142,30 @@ MaskedPixmap *load_pixmap(const char *name)
 	return retval;
 }
 
-/* Load all the standard pixmaps. Also sets the default window icon. */
-static void load_default_pixmaps(void)
+/* Create a MaskedPixmap from a GTK stock ID. Always returns
+ * a valid image.
+ */
+static MaskedPixmap *mp_from_stock(const char *stock_id)
 {
-	GdkPixbuf *pixbuf;
-	GError *error = NULL;
+	GtkIconSet *icon_set;
+	GdkPixbuf  *pixbuf;
+	MaskedPixmap *retval;
 
-	im_error = load_pixmap("error");
-	im_unknown = load_pixmap("unknown");
-	im_symlink = load_pixmap("symlink");
+	icon_set = gtk_icon_factory_lookup_default(stock_id);
+	if (!icon_set)
+		return get_bad_image();
+	
+	pixbuf = gtk_icon_set_render_icon(icon_set,
+                                     gtk_widget_get_default_style(), /* Gtk bug */
+                                     GTK_TEXT_DIR_LTR,
+                                     GTK_STATE_NORMAL,
+                                     GTK_ICON_SIZE_DIALOG,
+                                     NULL,
+                                     NULL);
+	retval = masked_pixmap_new(pixbuf);
+	gdk_pixbuf_unref(pixbuf);
 
-	im_unmounted = load_pixmap("mount");
-	im_mounted = load_pixmap("mounted");
-	im_multiple = load_pixmap("multiple");
-	im_appdir = load_pixmap("application");
-
-	im_dirs = load_pixmap("dirs");
-
-	pixbuf = gdk_pixbuf_new_from_file(
-			make_path(app_dir, ".DirIcon")->str, &error);
-	if (pixbuf)
-	{
-		GList *icon_list;
-
-		icon_list = g_list_append(NULL, pixbuf);
-		gtk_window_set_default_icon_list(icon_list);
-		g_list_free(icon_list);
-
-		g_object_unref(G_OBJECT(pixbuf));
-	}
-	else
-	{
-		g_print("%s\n", error ? error->message : _("Unknown error"));
-		g_error_free(error);
-	}
+	return retval;
 }
 
 void pixmap_make_huge(MaskedPixmap *mp)
@@ -782,3 +771,39 @@ static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src,
 
 	return dest;
 }
+
+/* Load all the standard pixmaps. Also sets the default window icon. */
+static void load_default_pixmaps(void)
+{
+	GdkPixbuf *pixbuf;
+	GError *error = NULL;
+
+	im_error = mp_from_stock(GTK_STOCK_DIALOG_WARNING);
+	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION);
+	im_symlink = load_pixmap("symlink");
+
+	im_unmounted = load_pixmap("mount");
+	im_mounted = load_pixmap("mounted");
+	im_appdir = load_pixmap("application");
+
+	im_dirs = load_pixmap("dirs");
+
+	pixbuf = gdk_pixbuf_new_from_file(
+			make_path(app_dir, ".DirIcon")->str, &error);
+	if (pixbuf)
+	{
+		GList *icon_list;
+
+		icon_list = g_list_append(NULL, pixbuf);
+		gtk_window_set_default_icon_list(icon_list);
+		g_list_free(icon_list);
+
+		g_object_unref(G_OBJECT(pixbuf));
+	}
+	else
+	{
+		g_print("%s\n", error ? error->message : _("Unknown error"));
+		g_error_free(error);
+	}
+}
+
