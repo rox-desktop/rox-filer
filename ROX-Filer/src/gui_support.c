@@ -201,8 +201,7 @@ int get_choice(char *title,
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
 
 #ifdef GTK2
-	/* (note: highlights button at the other end!) */
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), 0);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), i - 1);
 #else
 	gtk_window_set_focus(GTK_WINDOW(dialog), button);
 	gtk_window_set_default(GTK_WINDOW(dialog), button);
