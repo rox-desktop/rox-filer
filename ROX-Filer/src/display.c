@@ -853,7 +853,7 @@ static void options_changed(void)
 	o_small_truncate = option_get_int("display_small_width");
 	o_display_colour_types = option_get_int("display_colour_types");
 
-	/* TODO: Only alloc if needed? *?
+	/* TODO: Only alloc if needed? */
 	ch_colours = alloc_type_colours();
 	
 	while (next)
