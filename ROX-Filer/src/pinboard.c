@@ -821,11 +821,15 @@ static void perform_action(Icon *icon, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			pinboard_wink_item(icon, TRUE);
+			if (event->type == GDK_2BUTTON_PRESS)
+				icon_set_selected(icon, FALSE);
 			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
 			pinboard_wink_item(icon, TRUE);
+			if (event->type == GDK_2BUTTON_PRESS)
+				icon_set_selected(icon, FALSE);
 			run_diritem(icon->path, icon->item, NULL, NULL, TRUE);
 			break;
 		case ACT_POPUP_MENU:

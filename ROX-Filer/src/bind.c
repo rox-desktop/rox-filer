@@ -33,6 +33,7 @@
 gboolean o_new_window_on_1 = FALSE;
 static gboolean o_menu_button = 3;
 static gboolean o_single_click = TRUE;
+static gboolean o_single_pin = TRUE;
 
 /* Static prototypes */
 static void update_options(void);
@@ -46,6 +47,7 @@ void bind_init(void)
 	option_add_int("bind_new_button_1", o_new_window_on_1, NULL);
 	option_add_int("bind_menu_button_2", FALSE, NULL);
 	option_add_int("bind_single_click", o_single_click, NULL);
+	option_add_int("bind_single_pinboard", o_single_pin, NULL);
 
 	option_add_notify(update_options);
 }
@@ -71,7 +73,8 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 
 	gboolean dclick = event->type == GDK_2BUTTON_PRESS;
 	gboolean dclick_mode =
-		(context == BIND_DIRECTORY_ICON && !o_single_click);
+		(context == BIND_DIRECTORY_ICON && !o_single_click) ||
+		(context == BIND_PINBOARD_ICON && !o_single_pin);
 
 	if (b > 3)
 		return ACT_IGNORE;
@@ -124,5 +127,6 @@ static void update_options(void)
 	o_new_window_on_1 = option_get_int("bind_new_button_1");
 	o_menu_button = option_get_int("bind_menu_button_2") ? 2 : 3;
 	o_single_click = option_get_int("bind_single_click");
+	o_single_pin = option_get_int("bind_single_pinboard");
 }
 
