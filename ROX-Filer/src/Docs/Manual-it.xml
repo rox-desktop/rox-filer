@@ -112,6 +112,14 @@
         condiviso da tutti i desktop.
      </para></listitem></varlistentry>
 
+    <varlistentry><term>Tema delle icone</term>
+      <listitem><para>
+	Si possono installare (ad es. in <filename>~/.icons</filename>) varie raccolte
+	di icone, chiamate anche temi. Per cambiare tema, andare nella finestra 
+	«Opzioni». Non appena ci sarà il pieno supporto da parte degli altri desktop,
+	i temi saranno condivisi anche dagli altri.
+     </para></listitem></varlistentry>
+
      <varlistentry><term>Supporto a DNotify (solo per Linux)</term>
       <listitem><para>
         Se si usa un kernel Linux recente (2.4.x), il filer si accorge
@@ -600,9 +608,17 @@ $ rox --bottom=</screen>
        Mostra o nasconde i dettagli</entry><entry>
        La stessa cosa
        </entry></row><row><entry>
+       A..Z</entry><entry>
+       Passa al criterio di ordinamento successivo.</entry><entry>
+       Passa al criterio di ordinamento precedente.
+       </entry></row><row><entry>
        Occhio</entry><entry>
        Mostra o nasconde i file nascosti (il cui nome inizia con un punto)</entry><entry>
        La stessa cosa
+       </entry></row><row><entry>
+       Elenco con selezioni</entry><entry>
+       Seleziona tutto.</entry><entry>
+       Inverte la selezione.
        </entry></row><row><entry>
        Salvagente</entry><entry>
        Mostra i file di aiuto di <application>ROX-Filer</application></entry><entry>
@@ -729,13 +745,8 @@ $ rox --bottom=</screen>
 
        <row><entry><guimenuitem>Mostra miniature</guimenuitem></entry><entry>
        Se attivato, per ogni immagine il filer tenta di caricare come
-       icona l'immagine stessa del file. È utile nelle directory piene di foto.
-       Le miniature sono memorizzate in <filename>~/.thumbnails</filename> per
-       caricarle velocemente la volta successiva.
-       Durante il caricamento delle miniature, nella parte inferiore della finestra appare una barra di
-       avanzamento. Cliccando sul pulsante <guibutton>Annulla</guibutton> accanto alla barra,
-       si interrompe la scansione.
-       Se attivato, la barra del titolo mostra <guilabel>(Miniature)</guilabel>.
+       icona del file l'immagine stessa. È utile nelle directory piene di foto.
+       Per ulteriori dettagli, vedere la sezione <xref linkend="thumbnails"/>.
        </entry></row>
 
        <row><entry><guimenuitem>Aggiorna</guimenuitem></entry><entry>
@@ -843,7 +854,12 @@ $ rox --bottom=</screen>
     e con i tasti associati alle varie voci di menù. </para><para>
     Notare che le singole applicazioni possono aggiungere altri menù in cima ai
     sottomenù che si ottengono cliccando sopra di esse. Vedere
-    <xref linkend="AppDir"/> per ulteriori dettagli.
+    <xref linkend="AppDir"/> per ulteriori dettagli. In alto ci può essere un
+    numero qualsiasi di azioni definite dall'utente, che dipendono dal tipo di file
+    cliccato. Per aggiungere dei programmi, selezionare la voce 
+    <guimenuitem>Personalizza il menù...</guimenuitem>. Per esempio, è possibile far
+    apparire come menù <application>The Gimp</application> per le immagini e
+    <application>FreeFS</application> per i punti di mount.
 
     <informaltable><tgroup cols="2">
       <thead><row><entry>Voce</entry><entry>Azione</entry></row></thead>
@@ -869,12 +885,6 @@ $ rox --bottom=</screen>
          Rimuove dalla directory tutti gli oggetti selezionati. Se è una sottodirectory,
          viene prima eliminato il suo contenuto. Se è un collegamento simbolico,
          si elimina solo il collegamento, non l'oggetto a cui punta.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Aiuto</guimenuitem></entry><entry>
-         Spiega il tipo di oggetto selezionato. Se è un'applicazione, visualizza
-         i file di aiuto.
        </entry></row>
 
        <row><entry>
@@ -912,7 +922,9 @@ $ rox --bottom=</screen>
 
        <row><entry>
          <guimenuitem>Informazioni</guimenuitem></entry><entry>
-         Mostra ulteriori informazioni dell'oggetto selezionato.
+         Mostra ulteriori informazioni dell'oggetto selezionato. Qui è anche possibile 
+         cambiare i permessi (ma il menù <guimenuitem>Permessi</guimenuitem> che è più in 
+	 basso, permette di cambiarli a più file contemporaneamente).
        </entry></row>
 
        <row><entry>
@@ -924,7 +936,9 @@ $ rox --bottom=</screen>
 
        <row><entry>
          <guimenuitem>Permessi</guimenuitem></entry><entry>
-         Permette di cambiare i permessi ai file selezionati.
+         Permette di cambiare i permessi ai file selezionati. Se è selezionato solo un
+	 file, è meglio usare l'interfaccia più semplice del menù 
+	 <guimenuitem>Informazioni</guimenuitem>
        </entry></row>
 
        <row><entry>
@@ -1438,8 +1452,54 @@ $ rox --bottom=</screen>
    Normalmente ciò non serve, dal momento che queste directory sono generalmente vuote.
   </para>
  </chapter>
- 
- <chapter id="virtual">
+
+  <chapter>
+  <title><anchor id="thumbnails" xreflabel="Miniature"/>Miniature</title>
+  <para>
+    Se le miniature sono attive, il filer prova a caricare ogni file di
+    immagine e usa quella stessa immagine come icona del file. Sono utili nelle
+    directory piene di foto.  Per attivarle in una sola directory, selezionare 
+    <guimenuitem>Mostra miniature</guimenuitem> dal menù <guimenuitem>Visualizza</guimenuitem>.
+    Per averle sempre attive, andare nella finestra «Opzioni». In questo caso,
+    sulla barra del titolo della finestra compare la scritta <guilabel>(Miniature)</guilabel>.
+  </para>
+  <para>
+    Le miniature vengono memorizzate in <filename>~/.thumbnails</filename>, per caricarle
+    più velocemente la volta dopo. Durante il caricamento delle miniature, nella parte
+    bassa della finestra compare una barra di avanzamento. Cliccando il pulsante  
+    <guibutton>Annulla</guibutton> che è accanto alla barra, viene interrotta la scansione.
+    È anche possibile creare miniature di altri tipi di file, come dei video 
+    (per es. mostrando il primo frame). Basta usare un programma opportuno.
+  </para>
+  <sect1><title>Dettagli tecnici</title>
+  <para>
+   Se le miniature sono attive, <application>ROX-Filer</application> controlla
+   la directory <filename>~/.thumbs/normal</filename> per cercare una miniatura per ogni
+   file che scansiona. Se la miniatura esiste, la carica e continua con il file successivo.
+  </para><para>
+   Per generare la miniatura di un file di un certo tipo di «media/subtype», il filer
+   cerca un programma prima in <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>
+   e poi in <filename>&lt;Choices&gt;/MIME-thumb/media</filename> (come quando si visualizzano
+   applicazioni differenti per tipi di file differenti). Se non viene trovato 
+   niente e se il file è di tipo «image/*» allora vengono usate le routine interne. 
+   Se il file non è di tipo «image/*», non viene creata alcuna miniatura.
+  </para><para>
+   Se viene trovato il programma per generare le miniature, allora viene eseguito con i
+   parametri
+<screen>generatore_miniature /percorso/al/file /percorso/alla/miniatura dim_pixel</screen>
+  </para><para>
+   Non appena il processo figlio termina, si tenta di caricare
+   <filename>/percorso/alla/miniatura</filename>. In caso di fallimento, non viene mostrata
+   alcuna miniatura.
+  </para><para>
+   Notare che a causa dell'ordine di come avvengono le cose, ROX-Filer usa senza problemi
+   qualunque miniatura preesistente, anche senza sapere come è stata generata.
+  </para>
+  </sect1>
+
+ </chapter>
+
+<chapter id="virtual">
   <title>
    <anchor id="vfs" xreflabel="File system virtuale"/>File system virtuale
   </title>
@@ -3006,7 +3066,7 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>NomeFile</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>])
+     <parameter>Class</parameter>, <parameter>ID</parameter>])
      Apre una finestra mostrando la directory <parameter>NomeFile</parameter>.
      <parameter>Style</parameter> può essere <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      o <userinput>Automatic</userinput>.
@@ -3016,6 +3076,11 @@ EOF</screen>
      Se manca una di queste tre opzioni, viene usato il parametro predefinito.
      <parameter>Class</parameter> può essere usata per impostare la proprietà WM_CLASS sulla nuova finestra. 
      La si può usare per far sì che il proprio window manager tratti quella finestra in modo speciale.
+     <parameter>ID</parameter> è una stringa usata per identificare la finestra aperta. 
+     Se esiste già una finestra con questo ID, questa viene cambiata nella directory data,
+     altrimenti viene creata una nuova finestra con questo ID. Se usato da un programma,
+     assicurarsi che l'ID sia unico, per esempio includendo nell'ID il nome del processo,
+     il PID e il timestamp.
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
@@ -3065,6 +3130,13 @@ EOF</screen>
      NON usare questo metodo se si usa l'opzione <option>--backdrop</option> altrimenti
      va in loop all'infinito.
      Vedere <xref linkend="backdropapp"/> per ulteriori informazioni.
+   </para></listitem>
+
+   <listitem><para><function>SetBackdrop</function>(<parameter>NomeFile</parameter>,
+   <parameter>Style</parameter>)
+   Imposta un dato file come immagine di sfondo. Per riattivare l'immagine al
+   successivo accesso al sistema o per cambiarla automaticamente di volta in volta,
+   usare invece <function>SetBackdropApp</function>.
    </para></listitem>
 
    <listitem><para><function>Run</function>(<parameter>NomeFile</parameter>)
@@ -3184,7 +3256,7 @@ EOF</screen>
 
   <bibliomixed>
    <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
-    <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+    <ulink url="http://triq.net/~jens/thumbnail-spec/"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
@@ -3194,7 +3266,7 @@ EOF</screen>
 
   <bibliomixed>
    <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
-    <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
+    <ulink url="http://www.freedesktop.org/standards/shared-mime-info-spec/"/></citetitle>
   </bibliomixed>
 
  </bibliography>
