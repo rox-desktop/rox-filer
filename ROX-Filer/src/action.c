@@ -990,6 +990,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 			to_parent = fdopen(filedes[1], "wb");
 			from_parent = filedes[2];
 			func(data);
+			send_dir("");
 			_exit(0);
 	}
 
@@ -1493,7 +1494,7 @@ static gboolean do_copy(char *path, char *dest)
 	if (is_sub_dir(make_dest_path(path, dest), path))
 	{
 		g_string_sprintf(message,
-			_("!ERROR: Can't copy directory into itself\n"));
+			_("!ERROR: Can't copy object into itself\n"));
 		send();
 		return FALSE;
 	}
@@ -1515,7 +1516,7 @@ static gboolean do_move(char *path, char *dest)
 	if (is_sub_dir(dest, path))
 	{
 		g_string_sprintf(message,
-			_("!ERROR: Can't move directory into itself\n"));
+			_("!ERROR: Can't move object into itself\n"));
 		send();
 		return FALSE;
 	}

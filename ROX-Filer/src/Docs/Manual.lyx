@@ -1,4 +1,4 @@
-#This file was created by <tal197> Mon Apr 24 16:52:36 2000
+#This file was created by <tal197> Mon May  8 14:57:14 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -152,7 +152,7 @@ Unix or Linux (root access is not required),
 The X Window system (supplied as standard on all modern systems),
 \layout Itemize
 
-GTK+ 1.2.0 or later (libraries and headers) - get the latest version from
+GTK+ 1.2.0 or later (libraries and headers) --- get the latest version from
  
 \begin_inset LatexCommand \cite{GTK+}
 
@@ -165,8 +165,15 @@ A C compiler (standard on most systems).
 \layout Standard
 
 All of the above are standard on most modern Linux distributions.
- To check which version of GTK+ you have installed, run the gtk-config command,
- like this ($ is the shell prompt):
+ To check which version of GTK+ you have installed, run the 
+\family typewriter 
+gtk-config
+\family default 
+ command, like this (
+\family typewriter 
+$
+\family default 
+ is the shell prompt):
 \layout LyX-Code
 
 $ gtk-config --version
@@ -181,7 +188,11 @@ To compile:
 Change to the directory containing the ROX-Filer subdirectory.
 \layout Enumerate
 
-Run the AppRun script with the --compile option, like this:
+Run the AppRun script with the 
+\family typewriter 
+--compile
+\family default 
+ option, like this:
 \begin_deeper 
 \layout LyX-Code
 
@@ -254,8 +265,12 @@ The panel should be displayed in a window without a title bar.
 \end_inset 
 
 .
- You could also try using the -o option which bypasses the window manager
- entirely (also use this if the panel appears in the wrong place):
+ You could also try using the 
+\family typewriter 
+-o
+\family default 
+ option which bypasses the window manager entirely (also use this if the
+ panel appears in the wrong place):
 \layout LyX-Code
 
 $ ROX-Filer/AppRun -o -b ~/Panel &
@@ -752,7 +767,8 @@ If ROX-Filer was unable to find ImLib
 Permissions
 \layout Standard
 
-The permissions display is made up of four groups of three flags.
+The permissions display, shown in Full Info mode, is made up of four groups
+ of three flags.
  Each flag is displayed as a letter if it is on and a dash (-) if not.
  The first three characters show the permissions for the owner of the file,
  the second for other members of the file's group and the third for everyone
@@ -832,7 +848,7 @@ supplemental groups
  then the group permissions apply.
 \layout Itemize
 
-Otherwise, the 'other' permissions apply.
+Otherwise, the `other' permissions apply.
  The 
 \emph on 
 real user ID
@@ -1153,8 +1169,8 @@ libvfs.a
 LD_LIBRARY_PATH
 \family default 
 .
- In this case, you will be able to view the directory structure but not
- change it or access individual files.
+ In this case, you will be able to view the directory structure and copy
+ files out of it, but not change it.
  Support for this may be added later.
  Midnight Commander is part of the GNOME project.
 \layout Standard
@@ -1475,7 +1491,7 @@ Action windows are those boxes that appear while you're doing a Copy/Move/Link/e
 tc operation.
  The status line at the top of the window shows the current directory or
  object that the window is processing.
- The scrolling area below is the log area - it shows what has been done
+ The scrolling area below is the log area --- it shows what has been done
  and may display questions here.
 \layout Standard
 
@@ -2279,7 +2295,7 @@ po
 \family typewriter 
 src
 \family default 
- (not the other one!) as 
+ as 
 \begin_inset Formula \( \langle \hbox {name}\rangle \hbox {\tt .po} \)
 \end_inset 
 
