@@ -157,7 +157,7 @@ static GtkWidget *make_vbox(guchar *path)
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
 	item = diritem_new(NULL);
-	diritem_restat(path, item, FALSE);
+	diritem_restat(path, item);
 	item->leafname = strrchr(path, '/') + 1;
 
 	vbox = gtk_vbox_new(FALSE, 4);

@@ -40,7 +40,6 @@ struct _Directory
 	GList	*users;		/* Functions to call on update */
 	char	*error;		/* NULL => no error */
 
-	gboolean	do_thumbs;	/* Create thumbs while scanning */
 	gboolean	notify_active;	/* Notify timeout is running */
 	gint		idle_callback;	/* Idle callback ID */
 
@@ -68,12 +67,12 @@ void dir_init(void);
 void dir_attach(Directory *dir, DirCallback callback, gpointer data);
 void dir_detach(Directory *dir, DirCallback callback, gpointer data);
 void dir_update(Directory *dir, gchar *pathname);
-void dir_rescan_with_thumbs(Directory *dir, gchar *pathname);
 int dir_item_cmp(const void *a, const void *b);
 void refresh_dirs(char *path);
 void dir_check_this(guchar *path);
 DirItem *dir_update_item(Directory *dir, gchar *leafname);
 void dir_rescan(Directory *dir, guchar *pathname);
 void dir_merge_new(Directory *dir);
+void dir_force_update_path(gchar *path);
 
 #endif /* _DIR_H */

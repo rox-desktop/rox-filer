@@ -668,7 +668,7 @@ void drag_app_dropped(GtkWidget		*eb,
 	}
 
 	item = diritem_new(NULL);
-	diritem_restat(app, item, FALSE);
+	diritem_restat(app, item);
 	if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		guchar	*path;
@@ -1055,7 +1055,7 @@ int mode_to_base_type(int st_mode)
 	else if (S_ISSOCK(st_mode))
 		return TYPE_SOCKET;
 
-	return TYPE_UNKNOWN;
+	return TYPE_ERROR;
 }
 
 /* Returns TRUE is this is something that is run by looking up its type

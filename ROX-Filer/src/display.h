@@ -22,6 +22,7 @@ void display_set_layout(FilerWindow  *filer_window,
 			DisplayStyle style,
 			DetailsType  details);
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
+void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);
 int sort_by_date(const void *item1, const void *item2);
@@ -36,6 +37,7 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 void draw_large_icon(GtkWidget *widget,
 		     GdkRectangle *area,
 		     DirItem  *item,
+		     MaskedPixmap *image,
 		     gboolean selected);
 void draw_string(GtkWidget *widget,
 		GdkFont *font,

@@ -31,6 +31,13 @@ extern MaskedPixmap *im_appdir;
 extern MaskedPixmap *im_help;
 extern MaskedPixmap *im_dirs;
 
+/* When reading from the pixmap cache, the new image is normally loaded
+ * immediately.
+ * If this is set, the request is passed to the filer window to load in
+ * the background, and NULL is returned.
+ */
+extern FilerWindow *pixmap_cache_load_via;
+
 /* Note: don't change these two - thumbnails saving assumes 96x96 */
 #define HUGE_WIDTH 96
 #define HUGE_HEIGHT 96
@@ -75,5 +82,7 @@ void pixmap_unref(MaskedPixmap *mp);
 void pixmap_make_huge(MaskedPixmap *mp);
 void pixmap_make_small(MaskedPixmap *mp);
 MaskedPixmap *load_pixmap(char *name);
+MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size);
+void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data);
 
 #endif /* _PIXMAP_H */

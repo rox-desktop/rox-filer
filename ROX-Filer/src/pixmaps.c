@@ -33,9 +33,13 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
+#include <gdk-pixbuf/gdk-pixbuf-loader.h>
 
 #include "global.h"
 
@@ -44,8 +48,11 @@
 #include "gui_support.h"
 #include "pixmaps.h"
 #include "main.h"
+#include "filer.h"
+#include "dir.h"
 
 GFSCache *pixmap_cache = NULL;
+FilerWindow *pixmap_cache_load_via = NULL;
 
 static const char * bad_xpm[] = {
 "12 12 3 1",
@@ -87,9 +94,10 @@ static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
-static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf);
 static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
+static void got_thumb_data(GdkPixbufLoader *loader,
+				gint fd, GdkInputCondition cond);
 
 
 /****************************************************************
@@ -221,6 +229,35 @@ void pixmap_make_small(MaskedPixmap *mp)
 	mp->sm_mask = mp->mask;
 	mp->sm_width = mp->width;
 	mp->sm_height = mp->height;
+}
+
+/* Load image 'path' in the background and insert into pixmap_cache.
+ * Call callback(data, path) when done (PATH is NULL error).
+ */
+void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
+{
+	GdkPixbufLoader *loader;
+	int	fd, tag;
+
+	fd = mc_open(path, O_RDONLY | O_NONBLOCK);
+	if (fd == -1)
+	{
+		callback(data, NULL);
+		return;
+	}
+
+	loader = gdk_pixbuf_loader_new();
+
+	gtk_object_set_data_full(GTK_OBJECT(loader), "thumb-path",
+			g_strdup(path), g_free);
+	gtk_object_set_data(GTK_OBJECT(loader), "thumb-callback", callback);
+	gtk_object_set_data(GTK_OBJECT(loader), "thumb-callback-data", data);
+	
+	tag = gdk_input_add(fd, GDK_INPUT_READ,
+			    (GdkInputFunction) got_thumb_data, loader);
+
+	gtk_object_set_data(GTK_OBJECT(loader), "thumb-input-tag",
+			GINT_TO_POINTER(tag));
 }
 
 /****************************************************************
@@ -437,7 +474,7 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h)
 }
 
 /* Turn a full-size pixbuf into a MaskedPixmap */
-static MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
+MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
 {
 	MaskedPixmap	*mp;
 	GdkPixbuf	*huge_pixbuf, *normal_pixbuf;
@@ -502,6 +539,12 @@ static MaskedPixmap *get_bad_image(void)
 
 static MaskedPixmap *load(char *pathname, gpointer user_data)
 {
+	if (pixmap_cache_load_via)
+	{
+		filer_create_thumb(pixmap_cache_load_via, pathname);
+		return NULL;
+	}
+	
 	return image_from_file(pathname);
 }
 
@@ -554,4 +597,58 @@ static gint purge(gpointer data)
 	g_fscache_purge(pixmap_cache, PIXMAP_PURGE_TIME);
 
 	return TRUE;
+}
+
+static void got_thumb_data(GdkPixbufLoader *loader,
+				gint fd, GdkInputCondition cond)
+{
+	GFunc callback;
+	gchar *path;
+	gpointer cbdata;
+	char data[4096];
+	int  got, tag;
+
+	got = read(fd, data, sizeof(data));
+
+	if (got > 0 && gdk_pixbuf_loader_write(loader, data, got))
+		return;
+
+	/* Some kind of error, or end-of-file */
+
+	path = gtk_object_get_data(GTK_OBJECT(loader), "thumb-path");
+
+	tag = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(loader),
+							"thumb-input-tag"));
+	gdk_input_remove(tag);
+
+	gdk_pixbuf_loader_close(loader);
+
+	if (got == 0)
+	{
+		MaskedPixmap *image;
+		GdkPixbuf *pixbuf;
+
+		pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
+		if (pixbuf)
+		{
+			gdk_pixbuf_ref(pixbuf);
+			image = image_from_pixbuf(pixbuf);
+			gdk_pixbuf_unref(pixbuf);
+
+			g_fscache_insert(pixmap_cache, path, image);
+			pixmap_unref(image);
+			dir_force_update_path(path);
+		}
+		else
+			got = -1;
+	}
+
+	mc_close(fd);
+	
+	callback = gtk_object_get_data(GTK_OBJECT(loader), "thumb-callback");
+	cbdata = gtk_object_get_data(GTK_OBJECT(loader), "thumb-callback-data");
+
+	callback(cbdata, got != 0 ? NULL : path);
+
+	gtk_object_unref(GTK_OBJECT(loader));
 }

@@ -296,7 +296,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	}
 
 	icon->item = diritem_new(name);
-	diritem_restat(icon->path, icon->item, FALSE);
+	diritem_restat(icon->path, icon->item);
 
 	icon->win = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);

@@ -38,11 +38,11 @@
 #include "support.h"
 #include "gui_support.h"
 #include "mount.h"
-#include "pixmaps.h"
 #include "type.h"
 #include "usericons.h"
 #include "options.h"
 #include "fscache.h"
+#include "pixmaps.h"
 
 static gboolean o_ignore_exec = FALSE;
 
@@ -65,7 +65,7 @@ void diritem_init(void)
 /* Bring this item's structure uptodate.
  * Use diritem_stat() instead the first time to initialise the item.
  */
-void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
+void diritem_restat(guchar *path, DirItem *item)
 {
 	struct stat	info;
 
@@ -153,10 +153,7 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 						? special_exec
 						: text_plain;
 
-		if (make_thumb)
-			item->image = g_fscache_lookup(pixmap_cache, path);
-		else
-			check_globicon(path, item);
+		check_globicon(path, item);
 	}
 	else
 		check_globicon(path, item);

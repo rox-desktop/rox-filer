@@ -425,7 +425,7 @@ static void panel_add_item(Panel *panel,
 		icon->item = diritem_new(slash && slash[1] ? slash + 1
 								 : path);
 	}
-	diritem_restat(icon->path, icon->item, FALSE);
+	diritem_restat(icon->path, icon->item);
 	
 	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
@@ -510,12 +510,14 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 		area.y = height - text_height - area.height;
 		
-		draw_large_icon(widget, &area, icon->item, icon->selected);
+		draw_large_icon(widget, &area, icon->item,
+				icon->item->image, icon->selected);
 	}
 	else
 	{
 		area.y = (height - area.height) >> 1;
-		draw_large_icon(widget, &area, icon->item, icon->selected);
+		draw_large_icon(widget, &area, icon->item,
+				icon->item->image, icon->selected);
 	}
 
 	return FALSE;

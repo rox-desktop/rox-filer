@@ -143,10 +143,27 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	return g_fscache_lookup_full(cache, pathname, FSCACHE_LOOKUP_CREATE);
 }
 
-/* As g_fscache_lookup, but 'load' flags control what happens if the data
+/* Force this already-loaded item into the cache. The cache will
+ * ref the object if it wants to keep it.
+ */
+void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
+{
+	GFSCacheData	*data;
+
+	data = g_fscache_lookup_full(cache, pathname, FSCACHE_LOOKUP_INIT);
+
+	if (!data)
+		return;
+
+	if (data->data && cache->unref)
+		cache->unref(data->data, cache->user_data);
+	data->data = obj;
+	if (cache->ref)
+		cache->ref(data->data, cache->user_data);
+}
+
+/* As g_fscache_lookup, but 'lookup_type' controls what happens if the data
  * is out-of-date.
- * TRUE => Data is updated / reloaded
- * FALSE => Returns NULL
  */
 gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 				FSCacheLookup lookup_type)
@@ -170,7 +187,8 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 	{
 		/* We've cached this file already */
 
-		if (lookup_type == FSCACHE_LOOKUP_PEEK)
+		if (lookup_type == FSCACHE_LOOKUP_PEEK ||
+		    lookup_type == FSCACHE_LOOKUP_INIT)
 			goto out;	/* Never update on peeks */
 		
 		/* Is it up-to-date? */
@@ -195,7 +213,8 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 	{
 		GFSCacheKey *new_key;
 
-		if (lookup_type != FSCACHE_LOOKUP_CREATE)
+		if (lookup_type != FSCACHE_LOOKUP_CREATE &&
+		    lookup_type != FSCACHE_LOOKUP_INIT)
 			return NULL;
 		
 		new_key = g_memdup(&key, sizeof(key));
@@ -210,16 +229,19 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 	data->length = info.st_size;
 	data->mode = info.st_mode;
 
-	if (data->data == NULL)
+	if (data->data == NULL && lookup_type != FSCACHE_LOOKUP_INIT)
 	{
 		/* Create the object for the file (ie, not an update) */
 		if (cache->load)
 			data->data = cache->load(pathname, cache->user_data);
 	}
 out:
+	data->last_lookup = time(NULL);
+	if (lookup_type == FSCACHE_LOOKUP_INIT)
+		return data;
+
 	if (cache->ref)
 		cache->ref(data->data, cache->user_data);
-	data->last_lookup = time(NULL);
 	return data->data;
 }
 

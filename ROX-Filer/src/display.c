@@ -56,6 +56,7 @@
 #include "minibuffer.h"
 #include "dir.h"
 #include "diritem.h"
+#include "fscache.h"
 
 #define ROW_HEIGHT_SMALL 20
 #define ROW_HEIGHT_FULL_INFO 44
@@ -115,6 +116,8 @@ struct _ViewData
 	int	split_width, split_height;
 #endif
 	char	*details;
+
+	MaskedPixmap *image;		/* Image; possibly thumbnail */
 };
 
 #define SHOW_RECT(ite, template)	\
@@ -242,18 +245,17 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 	int		w;
 	int		fixed_height;
 	DisplayStyle	style = filer_window->display_style;
-	DirItem		*item = (DirItem *) colitem->data;
 	ViewData	*view = (ViewData *) colitem->view_data;
 
 	if (filer_window->details_type == DETAILS_NONE)
 	{
                 if (style == HUGE_ICONS)
 		{
-			if (item->image)
+			if (view->image)
 			{
-				if (!item->image->huge_pixmap)
-					pixmap_make_huge(item->image);
-				pix_width = item->image->huge_width;
+				if (!view->image->huge_pixmap)
+					pixmap_make_huge(view->image);
+				pix_width = view->image->huge_width;
 			}
 			else
 				pix_width = HUGE_WIDTH * 3 / 2;
@@ -273,8 +275,8 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		}
 		else
 		{
-			if (item->image)
-				pix_width = item->image->width;
+			if (view->image)
+				pix_width = view->image->width;
 			else
 				pix_width = HUGE_WIDTH * 3 / 2;
 #ifdef GTK2
@@ -319,9 +321,9 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 void draw_huge_icon(GtkWidget *widget,
 		    GdkRectangle *area,
 		    DirItem  *item,
+		    MaskedPixmap *image,
 		    gboolean selected)
 {
-	MaskedPixmap	*image = item->image;
 	int		width, height;
 	int		image_x;
 	int		image_y;
@@ -334,12 +336,12 @@ void draw_huge_icon(GtkWidget *widget,
 	height = image->huge_height;
 	image_x = area->x + ((area->width - width) >> 1);
 		
-	gdk_gc_set_clip_mask(gc, item->image->huge_mask);
+	gdk_gc_set_clip_mask(gc, image->huge_mask);
 
 	image_y = MAX(0, area->height - height - 6);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
-			item->image->huge_pixmap,
+			image->huge_pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
 			width, height);
@@ -387,9 +389,9 @@ void draw_huge_icon(GtkWidget *widget,
 void draw_large_icon(GtkWidget *widget,
 		     GdkRectangle *area,
 		     DirItem  *item,
+		     MaskedPixmap *image,
 		     gboolean selected)
 {
-	MaskedPixmap	*image = item->image;
 	int	width;
 	int	height;
 	int	image_x;
@@ -403,12 +405,12 @@ void draw_large_icon(GtkWidget *widget,
 	height = MIN(image->height, ICON_HEIGHT);
 	image_x = area->x + ((area->width - width) >> 1);
 
-	gdk_gc_set_clip_mask(gc, item->image->mask);
+	gdk_gc_set_clip_mask(gc, image->mask);
 
 	image_y = MAX(0, area->height - height - 6);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
-			item->image->pixmap,
+			image->pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
 			width, height);
@@ -642,6 +644,22 @@ void display_set_layout(FilerWindow  *filer_window,
 		filer_window_autosize(filer_window, TRUE);
 }
 
+/* Set the 'Show Thumbnails' flag for this window */
+void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
+{
+	if (filer_window->show_thumbs == thumbs)
+		return;
+
+	filer_window->show_thumbs = thumbs;
+
+	update_views(filer_window);
+
+#ifndef GTK2
+	filer_window->collection->paint_level = PAINT_CLEAR;
+#endif
+	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
+}
+
 /* Set the 'Show Hidden' flag for this window */
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 {
@@ -753,6 +771,7 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
 
 #endif
 	view->details = NULL;
+	view->image = NULL;
 
 	display_update_view(filer_window, item, view);
 
@@ -773,6 +792,9 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 		view->layout = NULL;
 	}
 #endif
+
+	if (view->image)
+		pixmap_unref(view->image);
 	
 	g_free(view);
 }
@@ -884,11 +906,10 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	col_width = filer_window->collection->item_width;
-	DirItem	*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
 	int		image_x, image_y;
 	int		text_x, text_y;
 	ViewData	*view = (ViewData *) colitem->view_data;
+	MaskedPixmap	*image = view->image;
 
 	if (image)
 	{
@@ -929,12 +950,11 @@ static void large_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	col_width = filer_window->collection->item_width;
-	DirItem		*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
 	int		iwidth, iheight;
 	int		image_x;
 	int		image_y;
 	ViewData	*view = (ViewData *) colitem->view_data;
+	MaskedPixmap	*image = view->image;
 	
 	int		text_x, text_y;
 	
@@ -996,11 +1016,10 @@ static void small_template(GdkRectangle *area, CollectionItem *colitem,
 static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
-	DirItem		*item = (DirItem *) colitem->data;
-	MaskedPixmap	*image = item->image;
 	int	max_text_width = area->width - HUGE_WIDTH - 4;
 	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	ViewData *view = (ViewData *) colitem->view_data;
+	MaskedPixmap	*image = view->image;
 
 	if (image)
 	{
@@ -1024,7 +1043,7 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
-	if (!item->image)
+	if (!image)
 		return;		/* Not scanned yet */
 
 	template->details.x = template->leafname.x;
@@ -1036,7 +1055,6 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	int	max_text_width = area->width - ICON_WIDTH - 4;
-	DirItem	*item = (DirItem *) colitem->data;
 	ViewData *view = (ViewData *) colitem->view_data;
 
 	template->icon.x = area->x;
@@ -1050,7 +1068,7 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
-	if (!item->image)
+	if (!view->image)
 		return;		/* Not scanned yet */
 
 	template->details.x = template->leafname.x;
@@ -1062,11 +1080,11 @@ static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	int	col_width = filer_window->collection->item_width;
 	int	fixed_height = fixed_font->ascent + fixed_font->descent;
-	DirItem	*item = (DirItem *) colitem->data;
+	ViewData *view = (ViewData *) colitem->view_data;
 
 	small_template(area, colitem, filer_window, template);
 
-	if (!item->image)
+	if (!view->image)
 		return;		/* Not scanned yet */
 
 	template->details.x = area->x + col_width - template->details.width;
@@ -1102,11 +1120,11 @@ static gboolean test_point(Collection *collection,
 static void draw_small_icon(GtkWidget *widget,
 			    GdkRectangle *area,
 			    DirItem  *item,
+			    MaskedPixmap *image,
 			    gboolean selected)
 {
 	GdkGC	*gc = selected ? widget->style->white_gc
 			       : widget->style->black_gc;
-	MaskedPixmap	*image = item->image;
 	int		width, height, image_x, image_y;
 	
 	if (!image)
@@ -1119,12 +1137,12 @@ static void draw_small_icon(GtkWidget *widget,
 	height = MIN(image->sm_height, SMALL_HEIGHT);
 	image_x = area->x + ((area->width - width) >> 1);
 		
-	gdk_gc_set_clip_mask(gc, item->image->sm_mask);
+	gdk_gc_set_clip_mask(gc, image->sm_mask);
 
 	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
-			item->image->sm_pixmap,
+			image->sm_pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
 			width, height);
@@ -1218,7 +1236,7 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 {
 	mode_t	m = item->mode;
 	guchar 	*buf = NULL;
-	gboolean scanned = item->image != NULL;
+	gboolean scanned = item->base_type != TYPE_UNKNOWN;
 
 	if (filer_window->details_type == DETAILS_NONE)
 		return NULL;
@@ -1336,12 +1354,21 @@ static void draw_item(GtkWidget *widget,
 
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)
-		draw_small_icon(widget, &template.icon, item, selected);
+	{
+		draw_small_icon(widget, &template.icon,
+				item, view->image, selected);
+	}
 	else if (template.icon.width <= ICON_WIDTH &&
 			template.icon.height <= ICON_HEIGHT)
-		draw_large_icon(widget, &template.icon, item, selected);
+	{
+		draw_large_icon(widget, &template.icon,
+				item, view->image, selected);
+	}
 	else
-		draw_huge_icon(widget, &template.icon, item, selected);
+	{
+		draw_huge_icon(widget, &template.icon,
+				item, view->image, selected);
+	}
 	
 #ifdef GTK2
 	if (selected)
@@ -1466,6 +1493,26 @@ void display_update_view(FilerWindow *filer_window,
 
 	g_free(view->details);
 	view->details = details(filer_window, item);
+
+	if (view->image)
+	{
+		pixmap_unref(view->image);
+		view->image = NULL;
+	}
+
+	if (filer_window->show_thumbs)
+	{
+		pixmap_cache_load_via = filer_window;
+		view->image = g_fscache_lookup(pixmap_cache,
+			make_path(filer_window->path, item->leafname)->str);
+		pixmap_cache_load_via = NULL;
+	}
+
+	if (!view->image)
+	{
+		view->image = item->image;
+		pixmap_ref(view->image);
+	}
 
 #ifdef GTK2
 	if (filer_window->details_type == DETAILS_NONE)

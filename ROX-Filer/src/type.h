@@ -23,7 +23,7 @@ enum
 {
 	/* Base types - this also determines the sort order */
 	TYPE_ERROR,
-	TYPE_UNKNOWN,
+	TYPE_UNKNOWN,		/* Not scanned yet */
 	TYPE_DIRECTORY,
 	TYPE_PIPE,
 	TYPE_SOCKET,

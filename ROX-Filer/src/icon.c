@@ -253,7 +253,7 @@ void icon_may_update(Icon *icon)
 
 	pixmap_ref(image);
 	mount_update(FALSE);
-	diritem_restat(icon->path, icon->item, FALSE);
+	diritem_restat(icon->path, icon->item);
 
 	if (icon->item->image != image || icon->item->flags != flags)
 	{
@@ -626,7 +626,7 @@ static void rename_activate(GtkWidget *dialog)
 #endif
 		/* XXX: Set name_width in size_and_shape? */
 
-		diritem_restat(icon->path, icon->item, FALSE);
+		diritem_restat(icon->path, icon->item);
 
 		callback(icon);
 		gtk_widget_destroy(dialog);

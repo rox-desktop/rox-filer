@@ -82,6 +82,7 @@ static DirItem *insert_item(Directory *dir, guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
 static void dir_recheck(Directory *dir, guchar *path, guchar *leafname);
 static GPtrArray *hash_to_array(GHashTable *hash);
+static void dir_force_update_item(Directory *dir, gchar *leaf);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -212,6 +213,33 @@ void dir_check_this(guchar *path)
 	g_free(real_path);
 }
 
+/* Tell watchers that this item has changed, but don't rescan.
+ * (used when thumbnail has been created for an item)
+ */
+void dir_force_update_path(gchar *path)
+{
+	guchar	*slash;
+	guchar	*real_path;
+
+	real_path = pathdup(path);
+
+	slash = strrchr(real_path, '/');
+
+	if (slash)
+	{
+		Directory *dir;
+
+		*slash = '\0';
+
+		dir = g_fscache_lookup_full(dir_cache, real_path,
+						FSCACHE_LOOKUP_PEEK);
+		if (dir)
+			dir_force_update_item(dir, slash + 1);
+	}
+	
+	g_free(real_path);
+}
+
 /* Ensure that 'leafname' is up-to-date. Returns the new/updated
  * DirItem, or NULL if the file no longer exists.
  */
@@ -223,15 +251,6 @@ DirItem *dir_update_item(Directory *dir, gchar *leafname)
 	dir_merge_new(dir);
 
 	return item;
-}
-
-void dir_rescan_with_thumbs(Directory *dir, gchar *pathname)
-{
-	g_return_if_fail(dir != NULL);
-	g_return_if_fail(pathname != NULL);
-
-	dir->do_thumbs = TRUE;
-	update(dir, pathname, NULL);
 }
 
 static int sort_names(const void *a, const void *b)
@@ -435,7 +454,6 @@ void dir_merge_new(Directory *dir)
 	g_ptr_array_set_size(up, 0);
 }
 
-
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -590,7 +608,7 @@ static DirItem *insert_item(Directory *dir, guchar *leafname)
 			pixmap_ref(old.image);
 			do_compare = TRUE;
 		}
-		diritem_restat(tmp->str, item, dir->do_thumbs);
+		diritem_restat(tmp->str, item);
 	}
 	else
 	{
@@ -599,7 +617,7 @@ static DirItem *insert_item(Directory *dir, guchar *leafname)
 		 * we get here.
 		 */
 		item = diritem_new(leafname);
-		diritem_restat(tmp->str, item, dir->do_thumbs);
+		diritem_restat(tmp->str, item);
 		g_ptr_array_add(dir->new_items, item);
 		dir_merge_new(dir);
 	}
@@ -658,7 +676,6 @@ static Directory *load(char *pathname, gpointer data)
 	dir->notify_active = FALSE;
 	dir->pathname = g_strdup(pathname);
 	dir->error = NULL;
-	dir->do_thumbs = FALSE;
 
 	dir->new_items = g_ptr_array_new();
 	dir->up_items = g_ptr_array_new();
@@ -743,6 +760,34 @@ static void set_idle_callback(Directory *dir)
 			dir->idle_callback = 0;
 		}
 	}
+}
+
+/* See dir_force_update_path() */
+static void dir_force_update_item(Directory *dir, gchar *leaf)
+{
+	GList *list = dir->users;
+	GPtrArray *items;
+	DirItem *item;
+
+	items = g_ptr_array_new();
+
+	item = g_hash_table_lookup(dir->known_items, leaf);
+	if (!item)
+		goto out;
+
+	g_ptr_array_add(items, item);
+
+	while (list)
+	{
+		DirUser *user = (DirUser *) list->data;
+
+		user->callback(dir, DIR_UPDATE, items, user->data);
+		
+		list = list->next;
+	}
+
+out:
+	g_ptr_array_free(items, TRUE);
 }
 
 static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)

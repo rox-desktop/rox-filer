@@ -60,6 +60,7 @@
 #include "bind.h"
 #include "appinfo.h"
 #include "mount.h"
+#include "thumb.h"
 
 #define PANEL_BORDER 2
 
@@ -119,6 +120,8 @@ static void group_free(int i);
 
 static void set_unique(guchar *unique);
 static void set_selection_state(FilerWindow *collection, gboolean normal);
+static void cancel_thumbnails(FilerWindow *filer_window);
+static void filer_next_thumb(FilerWindow *filer_window);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -544,6 +547,12 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	{
 		gtk_timeout_remove(filer_window->open_timeout);
 		filer_window->open_timeout = 0;
+	}
+
+	if (filer_window->thumb_queue)
+	{
+		g_list_foreach(filer_window->thumb_queue, (GFunc) g_free, NULL);
+		g_list_free(filer_window->thumb_queue);
 	}
 
 	g_free(filer_window->auto_select);
@@ -1051,6 +1060,8 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 
 	g_return_if_fail(filer_window != NULL);
 
+	cancel_thumbnails(filer_window);
+
 	filer_tooltip_prime(NULL, NULL);
 
 	real_path = pathdup(path);
@@ -1265,6 +1276,8 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	filer_window->flags = (FilerFlags) 0;
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
+	filer_window->thumb_queue = NULL;
+	filer_window->max_thumbs = 0;
 
 	if (src_win && option_get_int("display_inherit_options"))
 	{
@@ -1272,6 +1285,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 		dstyle = src_win->display_style;
 		dtype = src_win->details_type;
 		filer_window->show_hidden = src_win->show_hidden;
+		filer_window->show_thumbs = src_win->show_thumbs;
 	}
 	else
 	{
@@ -1285,6 +1299,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 		dtype = option_get_int("display_details");
 		filer_window->show_hidden =
 			option_get_int("display_show_hidden");
+		filer_window->show_thumbs = FALSE;
 	}
 
 	/* Add all the user-interface elements & realise */
@@ -1425,10 +1440,30 @@ static void filer_add_widgets(FilerWindow *filer_window)
 			gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 #endif
 
-	/* And the minibuffer (hidden unless differently selected in options) */
+	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
 	gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
 				FALSE, TRUE, 0);
+
+	/* And the thumbnail progress bar (also hidden) */
+	{
+		GtkWidget *cancel;
+
+		filer_window->thumb_bar = gtk_hbox_new(FALSE, 2);
+		gtk_box_pack_start(GTK_BOX(vbox), filer_window->thumb_bar,
+				FALSE, TRUE, 0);
+
+		filer_window->thumb_progress = gtk_progress_bar_new();
+		gtk_box_pack_start(GTK_BOX(filer_window->thumb_bar),
+				filer_window->thumb_progress, TRUE, TRUE, 0);
+
+		cancel = gtk_button_new_with_label(_("Cancel"));
+		gtk_box_pack_start(GTK_BOX(filer_window->thumb_bar),
+				cancel, FALSE, TRUE, 0);
+		gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked",
+				GTK_SIGNAL_FUNC(cancel_thumbnails),
+				(GtkObject *) filer_window);
+	}
 
 	/* Put the scrollbar on the left of everything else... */
 	gtk_box_pack_start(GTK_BOX(hbox),
@@ -2175,4 +2210,64 @@ static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 	if (old_state != filer_window->selection_state
 	    && filer_window->collection->number_selected)
 		gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
+}
+
+static void cancel_thumbnails(FilerWindow *filer_window)
+{
+	gtk_widget_hide(filer_window->thumb_bar);
+
+	g_list_foreach(filer_window->thumb_queue, (GFunc) g_free, NULL);
+	g_list_free(filer_window->thumb_queue);
+	filer_window->thumb_queue = NULL;
+	filer_window->max_thumbs = 0;
+}
+
+static gboolean filer_next_thumb_real(FilerWindow *filer_window)
+{
+	gchar	*path;
+	int	done, total;
+
+	if (!filer_window->thumb_queue)
+	{
+		cancel_thumbnails(filer_window);
+		return FALSE;
+	}
+
+	total = filer_window->max_thumbs;
+	done = total - g_list_length(filer_window->thumb_queue);
+
+	path = (gchar *) filer_window->thumb_queue->data;
+
+	pixmap_background_thumb(path,
+			(GFunc) filer_next_thumb,
+			filer_window);
+
+	filer_window->thumb_queue = g_list_remove(filer_window->thumb_queue,
+						  path);
+	g_free(path);
+
+	gtk_progress_set_percentage(GTK_PROGRESS(filer_window->thumb_progress),
+					done / (float) total);
+
+	return FALSE;
+}
+
+static void filer_next_thumb(FilerWindow *filer_window)
+{
+	gtk_idle_add((GtkFunction) filer_next_thumb_real, filer_window);
+}
+
+void filer_create_thumb(FilerWindow *filer_window, gchar *path)
+{
+	filer_window->max_thumbs++;
+
+	filer_window->thumb_queue = g_list_append(filer_window->thumb_queue,
+						  g_strdup(path));
+
+	if (!GTK_WIDGET_VISIBLE(filer_window->thumb_bar))
+	{
+		g_return_if_fail(filer_window->thumb_queue->next == NULL);
+		gtk_widget_show_all(filer_window->thumb_bar);
+		filer_next_thumb(filer_window);
+	}
 }

@@ -28,6 +28,7 @@ typedef enum
 {
 	FILER_NEEDS_RESCAN	= 0x01, /* Call may_rescan after scanning */
 	FILER_UPDATING		= 0x02, /* (scanning) items may already exist */
+	FILER_CREATE_THUMBS	= 0x04, /* Create thumbs when scan ends */
 } FilerFlags;
 
 typedef void (*TargetFunc)(FilerWindow *filer_window, int item, gpointer data);
@@ -72,6 +73,11 @@ struct _FilerWindow
 	gint		open_timeout;	/* Will resize and show window... */
 
 	GtkStateType	selection_state;	/* for drawing selection */
+	
+	gboolean	show_thumbs;
+	GList		*thumb_queue;		/* paths to thumbnail */
+	GtkWidget	*thumb_bar, *thumb_progress;
+	int		max_thumbs;		/* total for this batch */
 };
 
 extern FilerWindow 	*window_with_focus;
@@ -102,5 +108,6 @@ void filer_target_mode(FilerWindow	*filer_window,
 			char		*reason);
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink);
 GList *filer_selected_items(FilerWindow *filer_window);
+void filer_create_thumb(FilerWindow *filer_window, gchar *pathname);
 
 #endif /* _FILER_H */

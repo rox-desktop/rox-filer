@@ -49,6 +49,7 @@
 #include "menu.h"
 #include "filer.h"
 #include "action.h"
+#include "display.h"
 
 /* Store glob-to-icon mappings */
 typedef struct _GlobIcon {
@@ -626,7 +627,7 @@ static void open_icon_dir(GtkMenuItem *item, gpointer data)
 	gtk_label_get(GTK_LABEL(GTK_BIN(item)->child), &dir);
 	filer = filer_opendir(dir, NULL);
 	if (filer)
-		dir_rescan_with_thumbs(filer->directory, filer->path);
+		display_set_thumbs(filer, TRUE);
 }
 
 static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)

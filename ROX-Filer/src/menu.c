@@ -130,8 +130,8 @@ static void sort_size(gpointer data, guint action, GtkWidget *widget);
 static void sort_date(gpointer data, guint action, GtkWidget *widget);
 
 static void hidden(gpointer data, guint action, GtkWidget *widget);
+static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
-static void create_thumbs(gpointer data, guint action, GtkWidget *widget);
 
 static void file_op(gpointer data, FileOp action, GtkWidget *widget);
 
@@ -171,6 +171,7 @@ GtkWidget	*display_small_menu;	/* Display->Small With... */
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 #endif
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
+static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
 
@@ -213,8 +214,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Sort by Size"),	NULL, sort_size, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
+{">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
 {">" N_("Refresh"),		NULL, refresh, 0, NULL},
-{">" N_("Create Thumbs"),	NULL, create_thumbs, 0,	NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, NULL},
 {">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
@@ -303,6 +304,8 @@ void menu_init(void)
 	GET_SSMENU_ITEM(filer_vfs_menu, "filer", "File", "Open VFS");
 #endif
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
+	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
+							"Show Thumbnails");
 
 	GET_SSMENU_ITEM(display_large_menu, "filer",
 			"Display", "Large, With...");
@@ -549,7 +552,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 
 		fname = g_strconcat(dname, "/", ent->d_name, NULL);
 		ditem = diritem_new(NULL);
-		diritem_restat(fname, ditem, FALSE);
+		diritem_restat(fname, ditem);
 
 		if (ditem->image && style != MIS_NONE)
 		{
@@ -777,6 +780,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
 		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(filer_thumb_menu),
+				filer_window->show_thumbs);
+		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
 		buffer = g_string_new(NULL);
@@ -956,20 +962,22 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 	display_set_hidden(window_with_focus, !window_with_focus->show_hidden);
 }
 
+static void show_thumbs(gpointer data, guint action, GtkWidget *widget)
+{
+	if (updating_menu)
+		return;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	display_set_thumbs(window_with_focus, !window_with_focus->show_thumbs);
+}
+
 static void refresh(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
 	full_refresh();
 	filer_update_dir(window_with_focus, TRUE);
-}
-
-static void create_thumbs(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	dir_rescan_with_thumbs(window_with_focus->directory,
-				window_with_focus->path);
 }
 
 static void delete(FilerWindow *filer_window)

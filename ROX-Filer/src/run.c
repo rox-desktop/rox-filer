@@ -262,7 +262,7 @@ gboolean run_by_path(guchar *full_path)
 
 	/* XXX: Loads an image - wasteful */
 	item = diritem_new(NULL);
-	diritem_restat(full_path, item, FALSE);
+	diritem_restat(full_path, item);
 	retval = run_diritem(full_path, item, NULL, NULL, FALSE);
 	diritem_free(item);
 	
