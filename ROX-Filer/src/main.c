@@ -306,6 +306,8 @@ int main(int argc, char **argv)
 		{
 			case 'n':
 				new_copy = TRUE;
+				g_printerr("ROX-Filer: Running in debug mode "
+					   "(--new option used)\n");
 				break;
 			case 'o':
 				info_message(_("The -o argument is no longer "
