@@ -1359,11 +1359,6 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	gtk_box_pack_start_defaults(GTK_BOX(hbox), vbox);
 	filer_window->toplevel_vbox = GTK_BOX(vbox);
 
-	filer_set_view_type(filer_window, filer_window->view_type);
-	
-	/* If we want a toolbar, create it now */
-	toolbar_update_toolbar(filer_window);
-
 	/* If there's a message that should be displayed in each window (eg
 	 * 'Running as root'), add it here.
 	 */
@@ -1374,6 +1369,11 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 				   FALSE, TRUE, 0);
 		gtk_widget_show(filer_window->message);
 	}
+
+	filer_set_view_type(filer_window, filer_window->view_type);
+	
+	/* If we want a toolbar, create it now */
+	toolbar_update_toolbar(filer_window);
 
 	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
