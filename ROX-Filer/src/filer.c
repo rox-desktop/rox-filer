@@ -624,7 +624,7 @@ char *details(DirItem *item)
 				S_ISLNK(m) ? "Link" :
 				S_ISSOCK(m) ? "Sock" :
 				S_ISFIFO(m) ? "Pipe" : "File",
-			pretty_permissions(m),
+			pretty_permissions(item->uid, item->gid, m),
 			format_size(item->size));
 	return buf->str;
 }

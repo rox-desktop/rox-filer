@@ -137,16 +137,16 @@ static gint		screen_width, screen_height;
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",   	NULL,  	large, 0, "<RadioItem>"},
-{"/Display/Small Icons",   	NULL,  	small, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,  	full_info, 0, "/Display/Large Icons"},
+{"/Display/Large Icons",   	NULL,  	large, 0, NULL},
+{"/Display/Small Icons",   	NULL,  	small, 0, NULL},
+{"/Display/Full Info",		NULL,  	full_info, 0, NULL},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,  	sort_name, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,  	sort_type, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,  	sort_date, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,  	sort_size, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Name",	NULL,  	sort_name, 0, NULL},
+{"/Display/Sort by Type",	NULL,  	sort_type, 0, NULL},
+{"/Display/Sort by Date",	NULL,  	sort_date, 0, NULL},
+{"/Display/Sort by Size",	NULL,  	sort_size, 0, NULL},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
+{"/Display/Show Hidden",   	C_"H", 	hidden, 0, NULL},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	copy_item, 0, NULL},
@@ -179,16 +179,16 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",	NULL,   large, 0, "<RadioItem>"},
-{"/Display/Small Icons",	NULL,   small, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,   full_info, 0, "/Display/Large Icons"},
+{"/Display/Large Icons",	NULL,   large, 0, NULL},
+{"/Display/Small Icons",	NULL,   small, 0, NULL},
+{"/Display/Full Info",		NULL,   full_info, 0, NULL},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,   sort_name, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,   sort_type, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,   sort_date, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,   sort_size, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Name",	NULL,   sort_name, 0, NULL},
+{"/Display/Sort by Type",	NULL,   sort_type, 0, NULL},
+{"/Display/Sort by Date",	NULL,   sort_date, 0, NULL},
+{"/Display/Sort by Size",	NULL,   sort_size, 0, NULL},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
+{"/Display/Show Hidden",   	NULL, 	hidden, 0, NULL},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
 {"/File/Help",		    	NULL,  	help, 0, NULL},
@@ -415,19 +415,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		file_label = panel_file_item;
 		file_menu = panel_file_menu;
-
-		gtk_check_menu_item_set_active(
-				GTK_CHECK_MENU_ITEM(panel_hidden_menu),
-				filer_window->show_hidden);
 	}
 	else
 	{
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
-
-		gtk_check_menu_item_set_active(
-				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
-				filer_window->show_hidden);
 	}
 
 	buffer = g_string_new(NULL);
@@ -551,15 +543,9 @@ static void sort_size(gpointer data, guint action, GtkWidget *widget)
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)
 {
-	gboolean new;
-	GtkWidget	*item;
-	
 	g_return_if_fail(window_with_focus != NULL);
 
-	item = window_with_focus->panel ? panel_hidden_menu : filer_hidden_menu;
-	new = GTK_CHECK_MENU_ITEM(item)->active;
-
-	filer_set_hidden(window_with_focus, new);
+	filer_set_hidden(window_with_focus, !window_with_focus->show_hidden);
 }
 
 static void refresh(gpointer data, guint action, GtkWidget *widget)
@@ -918,7 +904,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
-	label = gtk_label_new(pretty_permissions(info.st_mode));
+	label = gtk_label_new(pretty_permissions(info.st_uid, info.st_gid,
+						 info.st_mode));
 	gtk_widget_set_style(label, fixed_style);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);

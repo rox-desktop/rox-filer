@@ -57,6 +57,8 @@ struct _DirItem
 	MIME_type	*mime_type;
 	int		name_width;
 	int		details_width;
+	uid_t		uid;
+	gid_t		gid;
 };
 
 struct _DirUser

@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <ctype.h>
 #include <sys/param.h>
 #include <unistd.h>
 #include <pwd.h>
@@ -233,28 +234,56 @@ int fork_exec_wait(char **argv)
 
 /* Converts a file's mode to a string. Result is a pointer
  * to a static buffer, valid until the next call.
+ * uid and gid are for the file - the permissions that affect the
+ * filer will be highlighted.
  */
-char *pretty_permissions(mode_t m)
+char *pretty_permissions(uid_t uid, gid_t gid, mode_t m)
 {
-	static char buffer[] = "rwx:rwx:rwx:UGT";
-	
-	sprintf(buffer, "%c%c%c:%c%c%c:%c%c%c:%c%c"
+	static char buffer[] = "(rwx),rwx,rwx/UGT";
+	int	high;
+
+	if (uid == euid)
+		high = 0;
+	else if (gid == egid)
+		high = 1;
+	else
+	{
+		int	i;
+
+		high = 2;
+		for (i = 0; i < ngroups; i++)
+		{
+			if (supplemental_groups[i] == gid)
+			{
+				high = 1;
+				break;
+			}
+		}
+	}
+
+	sprintf(buffer, "%s%c%c%c%s,%s%c%c%c%s,%s%c%c%c%s/%c%c"
 #ifdef S_ISVTX
 			"%c"
 #endif
 			,
 
+			high == 0 ? "(" : "",
 			m & S_IRUSR ? 'r' : '-',
 			m & S_IWUSR ? 'w' : '-',
 			m & S_IXUSR ? 'x' : '-',
+			high == 0 ? ")" : "",
 
+			high == 1 ? "(" : "",
 			m & S_IRGRP ? 'r' : '-',
 			m & S_IWGRP ? 'w' : '-',
 			m & S_IXGRP ? 'x' : '-',
+			high == 1 ? ")" : "",
 
+			high == 2 ? "(" : "",
 			m & S_IROTH ? 'r' : '-',
 			m & S_IWOTH ? 'w' : '-',
 			m & S_IXOTH ? 'x' : '-',
+			high == 2 ? ")" : "",
 
 			m & S_ISUID ? 'U' : '-',
 			m & S_ISGID ? 'G' : '-'
@@ -262,6 +291,7 @@ char *pretty_permissions(mode_t m)
 			, m & S_ISVTX ? 'T' : '-'
 #endif
 			);
+
 	return buffer;
 }
 

@@ -14,6 +14,11 @@ extern int number_of_windows;
 extern int to_error_log;	/* Send messages here to log them */
 extern gboolean override_redirect;
 
+extern uid_t euid;
+extern gid_t egid;
+extern int ngroups;			/* Number of supplemental groups */
+extern gid_t *supplemental_groups;
+
 /* Prototypes */
 int main(int argc, char **argv);
 

@@ -120,6 +120,8 @@ static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
 static DirItem 	*mount_item;
 
+static gboolean o_force = FALSE;
+
 /* Static prototypes */
 static gboolean send();
 static gboolean send_error();
@@ -453,15 +455,16 @@ static void process_flag(char flag)
 	{
 		case 'Q':
 			quiet = !quiet;
-			g_string_sprintf(message,
-					"'[ quiet mode %s ]\n", ON(quiet));
+			break;
+		case 'F':
+			o_force = !o_force;
 			break;
 		default:
 			g_string_sprintf(message,
 					"!ERROR: Bad message '%c'\n", flag);
+			send();
 			break;
 	}
-	send();
 }
 
 /* If the parent has sent any flag toggles, read them */
@@ -524,6 +527,11 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 		{
 			case 'Q':
 				quiet = !quiet;
+				if (ignore_quiet)
+				{
+					g_string_assign(message, "?");
+					send();
+				}
 				break;
 			case 'Y':
 				g_string_assign(message, "' Yes\n");
@@ -751,7 +759,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	g_string_sprintf(message, "?Delete %s'%s'?",
 			write_prot ? "WRITE-PROTECTED " : " ",
 			src_path);
-	if (!reply(from_parent, write_prot))
+	if (!reply(from_parent, write_prot && !o_force))
 		return FALSE;
 
 	if (S_ISDIR(info.st_mode))
@@ -789,7 +797,6 @@ static gboolean do_copy(char *path, char *dest)
 	char		*leaf;
 	struct stat 	info;
 	struct stat 	dest_info;
-	gboolean	do_overwrite = FALSE;
 	gboolean	retval = TRUE;
 
 	check_flags();
@@ -821,7 +828,6 @@ static gboolean do_copy(char *path, char *dest)
 		
 		if (!reply(from_parent, TRUE))
 			return FALSE;
-		do_overwrite = TRUE;
 
 		if (!merge)
 		{
@@ -958,6 +964,7 @@ static gboolean do_move(char *path, char *dest)
 	if (access(dest_path, F_OK) == 0)
 	{
 		struct stat	info;
+		int		err;
 
 		g_string_sprintf(message, "?'%s' already exists - overwrite?",
 				dest_path);
@@ -971,26 +978,18 @@ static gboolean do_move(char *path, char *dest)
 		}
 
 		if (S_ISDIR(info.st_mode))
-		{
-			char *safe_path, *safe_dest;
+			err = rmdir(dest_path);
+		else
+			err = unlink(dest_path);
 
-			safe_path = g_strdup(path);
-			safe_dest = g_strdup(dest_path);
-			for_dir_contents(do_move, safe_path, safe_dest);
-			g_free(safe_dest);
-			if (rmdir(safe_path))
-			{
-				g_free(safe_path);
-				send_error();
+		if (err)
+		{
+			send_error();
+			if (errno != ENOENT)
 				return FALSE;
-			}
-			g_string_assign(message, "'Directory deleted\n");
+			g_string_sprintf(message,
+					"'Trying move anyway...\n");
 			send();
-			g_free(safe_path);
-			g_string_sprintf(message, "+%s", path);
-			g_string_truncate(message, leaf - path);
-			send();
-			return TRUE;
 		}
 	}
 	else if (!quiet)
