@@ -477,10 +477,13 @@ In order for the filer to receive mouse clicks on the background (used for
  To see if your window manager supports this, try clicking the right mouse
  button on an unused area of the background.
  If you get the pinboard menu, all is well.
+\layout Subsubsection
+
+Sawfish / sawmill
 \layout Standard
 
-Note for sawfish users: sawfish trys to guess whether you are using GNOME
- at start-up and only provides support if so.
+Sawfish trys to guess whether you are using GNOME at start-up and only provides
+ support if so.
  You need to add the line `
 \family typewriter 
 (require 'gnome)
@@ -490,6 +493,87 @@ Note for sawfish users: sawfish trys to guess whether you are using GNOME
 .sawfishrc
 \family default 
  file (see the sawfish manual for more details).
+\layout Subsubsection
+
+IceWM
+\layout Standard
+
+Paste these configuration settings into `~/.icewm/preferences':
+\layout LyX-Code
+
+# Manage root window (EXPERIMENTAL - normally enabled!)
+\layout LyX-Code
+
+GrabRootWindow=1 # 0/1
+\layout LyX-Code
+
+# Bitmask of root window button click to use in window manager
+\layout LyX-Code
+
+UseRootButtons=3 # [0-255]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the menu
+\layout LyX-Code
+
+DesktopWinMenuButton=1 # [0-20]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the window list
+\layout LyX-Code
+
+DesktopWinListButton=2 # [0-5]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the window list menu
+\layout LyX-Code
+
+DesktopMenuButton=0 # [0-20] 
+\layout Standard
+
+Paste these into `~/.icewm/winoptions':
+\layout LyX-Code
+
+# ROX-Filer pinboard and panel
+\layout LyX-Code
+
+ROX-Filer.icon: folder
+\layout LyX-Code
+
+ROX-Panel.layer: Dock
+\layout LyX-Code
+
+ROX-Panel.doNotCover: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreWinList: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreTaskBar: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreQuickSwitch: 1
+\layout LyX-Code
+
+ROX-Pinboard.layer: Below
+\layout LyX-Code
+
+ROX-Pinboard.ignoreWinList: 1
+\layout LyX-Code
+
+ROX-Pinboard.ignoreTaskBar: 1
+\layout LyX-Code
+
+ROX-Pinboard.ignoreQuickSwitch: 1
+\layout LyX-Code
+
+ROX-Filer.layer: Normal
+\layout Standard
+
+Restart IceWM and the filer for the new settings to take effect.
+\layout Subsubsection
+
+Others
 \layout Standard
 
 If all else fails, try running rox with the `

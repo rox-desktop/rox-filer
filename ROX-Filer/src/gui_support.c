@@ -225,8 +225,11 @@ void make_panel_window(GdkWindow *window)
 	gdk_window_set_decorations(window, 0);
 	gdk_window_set_functions(window, 0);
 
+	/* Don't hide panel/pinboard windows initially (WIN_STATE_HIDDEN).
+	 * Needed for IceWM - Christopher Arndt <chris.arndt@web.de>
+	 */
 	set_cardinal_property(window, xa_state,
-			WIN_STATE_STICKY | WIN_STATE_HIDDEN |
+			WIN_STATE_STICKY |
 			WIN_STATE_FIXED_POSITION | WIN_STATE_ARRANGE_IGNORE);
 }
 
