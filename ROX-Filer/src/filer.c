@@ -165,11 +165,25 @@ static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 
 	if (GTK_WIDGET_VISIBLE(filer_window->window))
 	{
+		gint x, y;
 		GtkRequisition	*req = &filer_window->window->requisition;
 
-		gdk_window_resize(filer_window->window->window,
-					MAX(req->width, w),
-					MAX(req->height, h));
+		w = MAX(req->width, w);
+		h = MAX(req->height, h);
+		gdk_window_get_position(filer_window->window->window,
+					&x, &y);
+
+		if (x + w > screen_width || y + h > screen_height)
+		{
+			if (x + w > screen_width)
+				x = screen_width - w - 4;
+			if (y + h > screen_height)
+				y = screen_height - h - 4;
+			gdk_window_move_resize(filer_window->window->window,
+							x, y, w, h);
+		}
+		else
+			gdk_window_resize(filer_window->window->window, w, h);
 	}
 	else
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
