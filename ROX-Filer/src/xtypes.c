@@ -164,14 +164,11 @@ void xtype_init(void)
 
 int xtype_supported(const char *path)
 {
-#ifdef _PC_XATTR_EXISTS
+#ifdef _PC_XATTR_ENABLED
 	if(!path)
 		return TRUE;
 	
-	errno=0;
-	if(pathconf(path, _PC_XATTR_EXISTS)==-1 && errno)
-		return FALSE;
-	return TRUE;
+	return pathconf(path, _PC_XATTR_ENABLED);
 #else
 	return FALSE;
 #endif
