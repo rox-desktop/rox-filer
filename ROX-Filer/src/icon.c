@@ -509,11 +509,13 @@ void icon_destroyed(Icon *icon)
 	if (icon == menu_icon)
 		menu_icon = NULL;
 
+#ifdef GTK2
 	if (icon->layout)
 	{
 		g_object_unref(G_OBJECT(icon->layout));
 		icon->layout = NULL;
 	}
+#endif
 
 	icon_unhash_path(icon);
 

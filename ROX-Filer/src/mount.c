@@ -23,6 +23,7 @@
 
 #include <config.h>
 #include <stdio.h>
+#include <string.h>
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>
 #endif

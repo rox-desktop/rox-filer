@@ -417,7 +417,9 @@ static void panel_add_item(Panel *panel,
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 	icon->socket = NULL;
+#ifdef GTK2
 	icon->layout = NULL;
+#endif
 
 	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
 	
