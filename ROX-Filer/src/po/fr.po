@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.12-20020122\n"
-"POT-Creation-Date: 2002-01-23 17:09+0000\n"
+"POT-Creation-Date: 2002-01-30 11:42+0000\n"
 "PO-Revision-Date: 2002-01-22 18:28+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
@@ -201,7 +201,7 @@ msgstr "ERREUR de lecture"
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: action.c:808 action.c:995 main.c:557 main.c:564 main.c:575
+#: action.c:808 action.c:995 main.c:557 main.c:564 main.c:575 main.c:594
 msgid "Yes"
 msgstr "Oui"
 
@@ -594,7 +594,7 @@ msgstr ""
 " affectera des objets sur le punaiseur ou le panneau - voulez-vous vraiment "
 "les supprimer ?"
 
-#: action.c:2290 filer.c:1534 gtksavebox.c:247 icon.c:863 infobox.c:106
+#: action.c:2290 filer.c:1538 gtksavebox.c:244 icon.c:863 infobox.c:106
 #: menu.c:1573 options.c:742 panel.c:335 type.c:977 usericons.c:343
 msgid "Cancel"
 msgstr "Annuler"
@@ -727,11 +727,11 @@ msgid "You can't use multiple files with Set Icon!"
 msgstr ""
 "Vous ne pouvez pas utiliser plusieurs fichiers avec « Fixer l'icône » !"
 
-#: filer.c:578
+#: filer.c:582
 msgid "Directory missing/deleted"
 msgstr "Répertoire manquant/supprimé"
 
-#: filer.c:959
+#: filer.c:963
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -741,33 +741,33 @@ msgstr ""
 "<Ctrl>+%s pour le définir. Appuyez seulement sur %s pour resélectionner ces "
 "fichiers à l'avenir."
 
-#: filer.c:1135
+#: filer.c:1139
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Le répertoire '%s' n'est pas accessible"
 
-#: filer.c:1332
+#: filer.c:1337
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
-#: filer.c:1789
+#: filer.c:1793
 msgid "Scanning, "
 msgstr "Lecture, "
 
-#: filer.c:1790
+#: filer.c:1794
 msgid "All, "
 msgstr "Tous, "
 
-#: filer.c:1791
+#: filer.c:1795
 msgid "Thumbs, "
 msgstr "Imagettes, "
 
-#: filer.c:2040 menu.c:1829
+#: filer.c:2044 menu.c:1829
 msgid "Item no longer exists!"
 msgstr "L'objet n'existe plus !"
 
-#: filer.c:2162
+#: filer.c:2166
 msgid "Symbolic link to "
 msgstr "Lien symbolique vers "
 
@@ -967,16 +967,16 @@ msgstr "blocks"
 msgid "Save As:"
 msgstr "Sauver sous :"
 
-#: gtksavebox.c:236 gtksavebox.c:514 gui_support.c:257 icon.c:856 menu.c:1566
+#: gtksavebox.c:236 gtksavebox.c:512 gui_support.c:257 icon.c:856 menu.c:1566
 #: options.c:730 type.c:970 usericons.c:335
 msgid "OK"
 msgstr "OK"
 
-#: gtksavebox.c:339
+#: gtksavebox.c:337
 msgid "Unnamed"
 msgstr "SansNom"
 
-#: gtksavebox.c:409
+#: gtksavebox.c:407
 msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
@@ -984,7 +984,7 @@ msgstr ""
 "L'application distante veut utiliser « Direct Save », mais je ne peux pas "
 "lire la propriété XdndDirectSave0 (type text/plain).\n"
 
-#: gtksavebox.c:507
+#: gtksavebox.c:505
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
@@ -1338,10 +1338,6 @@ msgstr "Non (libpng ou Gtk+-2.0 est nécessaire)"
 #: main.c:589
 msgid "Character set translations"
 msgstr "Transcodage des caractères"
-
-#: main.c:594
-msgid "Yes (using libiconv)"
-msgstr "Oui (utilisation de libiconv)"
 
 #: main.c:596
 msgid "No (needs libiconv or Gtk+-2.0)"
@@ -3062,6 +3058,9 @@ msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
 "Utilisez la boîte de dialogue « Fixer l'icône... » pour fixer l'icône pour "
 "chaque type."
+
+#~ msgid "Yes (using libiconv)"
+#~ msgstr "Oui (utilisation de libiconv)"
 
 #~ msgid ""
 #~ "\n"
