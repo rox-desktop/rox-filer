@@ -494,7 +494,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 	draw_string(widget,
 			font,
-			icon->item.leafname, 
+			icon->item.leafname, -1,
 			MAX(0, text_x),
 			text_y,
 			icon->item.name_width,

@@ -73,6 +73,7 @@ typedef struct _Template Template;
 struct _Template {
 	GdkRectangle	icon;
 	GdkRectangle	leafname;
+	int		split;		/* 0 => No split */
 
 	/* Note that details_string is either NULL or points to a
 	 * static buffer - don't free it!
@@ -118,6 +119,7 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details);
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
+static void wrap_text(Template *template, DirItem *item, int width);
 
 enum {
 	SORT_BY_NAME = 0,
@@ -150,6 +152,7 @@ void display_init()
 static void fill_template(GdkRectangle *area, DirItem *item,
 			FilerWindow *filer_window, Template *template)
 {
+	template->split = 0;
 	template->details_string = NULL;
 
 	switch (filer_window->display_style)
@@ -183,6 +186,7 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 	int		w, h;
 	int		text_height = item_font->ascent + item_font->descent;
 	int		fixed_height;
+	Template	temp;
 
         switch (filer_window->display_style)
         {
@@ -221,10 +225,10 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 			break;
 		case LARGE_ICONS:
                 default:
-			w = MIN(item->name_width, o_large_truncate);
+			wrap_text(&temp, item, o_large_truncate);
 			pix_width = MIN(ICON_WIDTH, pix_width);
-                        *width = MAX(pix_width, w) + 4;
-			*height = text_height + ICON_HEIGHT + 2;
+                        *width = MAX(pix_width, temp.leafname.width) + 4;
+			*height = temp.leafname.height + ICON_HEIGHT + 2;
 			break;
         }
 }
@@ -362,6 +366,7 @@ void draw_large_icon(GtkWidget *widget,
 void draw_string(GtkWidget *widget,
 		GdkFont	*font,
 		char	*string,
+		int	len,		/* -1 for whole string */
 		int 	x,
 		int 	y,
 		int 	width,		/* Width of the full string */
@@ -393,11 +398,13 @@ void draw_string(GtkWidget *widget,
 		gdk_gc_set_clip_rectangle(gc, &clip);
 	}
 
+	if (len == -1)
+		len = strlen(string);
 	gdk_draw_text(widget->window,
 			font,
 			gc,
 			x, y,
-			string, strlen(string));
+			string, len);
 
 	if (width > area_width)
 	{
@@ -691,6 +698,33 @@ static void huge_template(GdkRectangle *area, DirItem *item,
 	template->icon.height = MIN(HUGE_HEIGHT, iheight);
 }
 
+/* Fill in the width, height and split of the leafname assuming a wrap
+ * width of 'width' pixels.
+ */
+static void wrap_text(Template *template, DirItem *item, int width)
+{
+	int	top_len, bot_len, sp;
+	int	font_height = item_font->ascent + item_font->descent;
+
+	if (item->name_width < width)
+	{
+		template->leafname.height = font_height;
+		template->leafname.width = item->name_width;
+		template->split = 0;
+		return;
+	}
+		
+	sp = strlen(item->leafname) / 2;
+	template->split = sp;
+
+	top_len = gdk_text_measure(item_font, item->leafname, sp);
+	bot_len = gdk_string_measure(item_font, item->leafname + sp);
+	bot_len = MIN(width, bot_len);
+
+	template->leafname.width = MAX(top_len, bot_len);
+	template->leafname.height = font_height * 2;
+}
+
 static void large_template(GdkRectangle *area, DirItem *item,
 			   FilerWindow *filer_window, Template *template)
 {
@@ -704,17 +738,15 @@ static void large_template(GdkRectangle *area, DirItem *item,
 	int		image_x = area->x + ((col_width - iwidth) >> 1);
 	int		image_y;
 	
-	int	text_width = item->name_width;
-	int	font_height = item_font->ascent + item_font->descent;
-	int	text_x = area->x + ((col_width - text_width) >> 1);
-	int	text_y = area->y + area->height - font_height - 2;
+	int	text_x;
+	int	text_y;
 
-	text_x = MAX(text_x, area->x);
+	wrap_text(template, item, o_large_truncate);
+	text_x = area->x + ((col_width - template->leafname.width) >> 1);
+	text_y = area->y + area->height - template->leafname.height - 2;
 
 	template->leafname.x = text_x;
 	template->leafname.y = text_y;
-	template->leafname.width = MIN(text_width, area->width);
-	template->leafname.height = font_height;
 
 	image_y = text_y - iheight;
 	image_y = MAX(area->y, image_y);
@@ -928,7 +960,7 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 
 	draw_string(widget,
 			fixed_font,
-			string,
+			string, -1,
 			x, y,
 			w,
 			width,
@@ -1063,14 +1095,40 @@ static void draw_item(GtkWidget *widget,
 	else
 		draw_huge_icon(widget, &template.icon, item, selected);
 	
-	draw_string(widget,
-			item_font,
-			item->leafname, 
-			template.leafname.x,
-			template.leafname.y + item_font->ascent,
-			item->name_width,
-			template.leafname.width,
-			selected, TRUE);
+	if (template.split)
+	{
+		guchar	*bot = item->leafname + template.split;
+		int	w;
+
+		w = gdk_string_measure(item_font, bot);
+
+		draw_string(widget,
+				item_font,
+				item->leafname, template.split,
+				template.leafname.x,
+				template.leafname.y + item_font->ascent,
+				template.leafname.width,
+				template.leafname.width,
+				selected, TRUE);
+		draw_string(widget,
+				item_font,
+				bot, -1,
+				template.leafname.x,
+				template.leafname.y + item_font->ascent * 2 +
+					item_font->descent,
+				MAX(w, template.leafname.width),
+				template.leafname.width,
+				selected, TRUE);
+	}
+	else
+		draw_string(widget,
+				item_font,
+				item->leafname, -1,
+				template.leafname.x,
+				template.leafname.y + item_font->ascent,
+				item->name_width,
+				template.leafname.width,
+				selected, TRUE);
 	
 	if (template.details_string)
 		draw_details(filer_window, item,
