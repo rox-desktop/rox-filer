@@ -47,7 +47,8 @@ struct _ViewIter {
 	DirItem	   *(*next)(ViewIter *iter);
 
 	/* private fields */
-	ViewCollection *view_collection;
+	ViewCollection *view_collection;	/* XXX (use ->view instead) */
+	ViewIface   *view;
 	int	   i, n_remaining;
 	int	   flags;
 };

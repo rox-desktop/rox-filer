@@ -79,6 +79,8 @@ struct _ViewDetails {
 	gint	    sort_column_id;
 	GtkSortType order;
 	int	    (*sort_fn)(const void *, const void *);
+
+	int	    cursor_base;	/* Cursor when minibuffer opened */
 };
 
 /* Static prototypes */
@@ -115,15 +117,12 @@ static void view_details_wink_item(ViewIface *view, ViewIter *iter);
 static void view_details_autosize(ViewIface *view);
 static gboolean view_details_cursor_visible(ViewIface *view);
 static void view_details_set_base(ViewIface *view, ViewIter *iter);
-#if 0
 static DirItem *iter_peek(ViewIter *iter);
+static DirItem *iter_prev(ViewIter *iter);
 static DirItem *iter_next(ViewIter *iter);
-#endif
 static void make_iter(ViewDetails *view_details, ViewIter *iter,
 		      IterFlags flags);
-static void make_item_iter(ViewDetails *view_details,
-			   ViewIter *v_iter,
-			   GtkTreeIter *t_iter);
+static void make_item_iter(ViewDetails *view_details, ViewIter *iter, int i);
 static void view_details_tree_model_init(GtkTreeModelIface *iface);
 static gboolean details_get_sort_column_id(GtkTreeSortable *sortable,
 					   gint            *sort_column_id,
@@ -564,6 +563,17 @@ static gboolean details_has_default_sort_func(GtkTreeSortable *sortable)
 
 /* End of model implementation */
 
+static gboolean is_selected(ViewDetails *view_details, int i)
+{
+	GtkTreeIter iter;
+	GtkTreeSelection *selection;
+
+	selection = gtk_tree_view_get_selection((GtkTreeView *) view_details);
+
+	iter.user_data = GINT_TO_POINTER(i);
+	return gtk_tree_selection_iter_is_selected(selection, &iter);
+}
+
 static void toggle_selected(GtkTreeSelection *selection, GtkTreeIter *iter)
 {
 	if (gtk_tree_selection_iter_is_selected(selection, iter))
@@ -582,6 +592,7 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 	GtkTreeIter	iter;
 	GtkTreeModel	*model;
 	GtkTreeSelection *selection;
+	int		i = -1;
 	/* OpenFlags	flags = 0; */
 
 	model = gtk_tree_view_get_model(tree);
@@ -592,10 +603,14 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 	{
 		g_return_if_fail(path != NULL);
 
-		gtk_tree_model_get_iter(model, &iter, path);
-
-		gtk_tree_model_get(model, &iter, COL_ITEM, &item, -1);
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_path_free(path);
 	}
+
+	if (i != -1)
+		item = ((ViewItem *) view_details->items->pdata[i])->item;
+
+	g_print("[ item %d clicked ]\n", i);
 
 	/* TODO: Cancel slow DnD */
 	/* TODO: Target callbacks */
@@ -647,7 +662,7 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 			dnd_motion_ungrab();
 			tooltip_show(NULL);
 
-			make_item_iter(view_details, &viter, &iter);
+			make_item_iter(view_details, &viter, i);
 			show_filer_menu(filer_window,
 					(GdkEvent *) event, &viter);
 			break;
@@ -745,6 +760,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	ViewDetails *view_details = (ViewDetails *) object;
 
 	view_details->items = g_ptr_array_new();
+	view_details->cursor_base = -1;
 
 	/* Sorting */
 	view_details->sort_column_id = -1;
@@ -1061,12 +1077,27 @@ static void view_details_clear_selection(ViewIface *view)
 
 static int view_details_count_items(ViewIface *view)
 {
-	return 0;
+	ViewDetails *view_details = (ViewDetails *) view;
+
+	return view_details->items->len;
+}
+
+static void inc(GtkTreeModel *model, GtkTreePath *path,
+	        GtkTreeIter *iter, gpointer data)
+{
+	(*((int *) data))++;
 }
 
 static int view_details_count_selected(ViewIface *view)
 {
-	return 0;
+	GtkTreeView *tree = (GtkTreeView *) view;
+	GtkTreeSelection *selection;
+	int count = 0;
+
+	selection = gtk_tree_view_get_selection(tree);
+
+	gtk_tree_selection_selected_foreach(selection, inc, &count);
+	return count;
 }
 
 static void view_details_show_cursor(ViewIface *view)
@@ -1081,12 +1112,32 @@ static void view_details_get_iter(ViewIface *view,
 
 static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
+	GtkTreePath *path;
+
+	path = gtk_tree_path_new();
+
+	/* XXX: How do we get rid of the cursor? */
+	if (iter)
+		gtk_tree_path_append_index(path, iter->i);
+	gtk_tree_view_set_cursor((GtkTreeView *) view, path, NULL, FALSE);
+	gtk_tree_path_free(path);
 }
 
 static void view_details_set_selected(ViewIface *view,
 					 ViewIter *iter,
 					 gboolean selected)
 {
+	GtkTreeView *tree = (GtkTreeView *) view;
+	GtkTreeSelection *selection;
+	GtkTreeIter t_iter;
+
+	selection = gtk_tree_view_get_selection(tree);
+
+	t_iter.user_data = GINT_TO_POINTER(iter->i);
+	if (selected)
+		gtk_tree_selection_select_iter(selection, &t_iter);
+	else
+		gtk_tree_selection_unselect_iter(selection, &t_iter);
 }
 
 static gboolean view_details_get_selected(ViewIface *view, ViewIter *iter)
@@ -1117,43 +1168,169 @@ static gboolean view_details_cursor_visible(ViewIface *view)
 
 static void view_details_set_base(ViewIface *view, ViewIter *iter)
 {
+	ViewDetails *view_details = (ViewDetails *) view;
+
+	view_details->cursor_base = iter->i;
 }
 
 static DirItem *iter_init(ViewIter *iter)
 {
-	return NULL;
+	ViewDetails *view_details = (ViewDetails *) iter->view;
+	int i = -1;
+	int n = view_details->items->len;
+	int flags = iter->flags;
+
+	iter->peek = iter_peek;
+
+	if (iter->n_remaining == 0)
+		return NULL;
+
+	if (flags & VIEW_ITER_FROM_CURSOR)
+	{
+		GtkTreePath *path;
+		gtk_tree_view_get_cursor((GtkTreeView *) view_details,
+					 &path, NULL);
+		if (!path)
+			return NULL;	/* No cursor */
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_path_free(path);
+	}
+	else if (flags & VIEW_ITER_FROM_BASE)
+		i = view_details->cursor_base;
+	
+	if (i < 0 || i >= n)
+	{
+		/* Either a normal iteration, or an iteration from an
+		 * invalid starting point.
+		 */
+		if (flags & VIEW_ITER_BACKWARDS)
+			i = n - 1;
+		else
+			i = 0;
+	}
+
+	if (i < 0 || i >= n)
+		return NULL;	/* No items at all! */
+
+	iter->next = flags & VIEW_ITER_BACKWARDS ? iter_prev : iter_next;
+	iter->n_remaining--;
+	iter->i = i;
+
+	if (flags & VIEW_ITER_SELECTED && !is_selected(view_details, i))
+		return iter->next(iter);
+	return iter->peek(iter);
 }
 
-#if 0
-static DirItem *iter_peek(ViewIter *iter)
+static DirItem *iter_prev(ViewIter *iter)
 {
+	ViewDetails *view_details = (ViewDetails *) iter->view;
+	int n = view_details->items->len;
+	int i = iter->i;
+
+	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
+
+	/* i is the last item returned (always valid) */
+
+	g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+	while (iter->n_remaining)
+	{
+		i--;
+		iter->n_remaining--;
+
+		if (i == -1)
+			i = n - 1;
+
+		g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+		if (iter->flags & VIEW_ITER_SELECTED &&
+		    !is_selected(view_details, i))
+			continue;
+
+		iter->i = i;
+		return ((ViewItem *) view_details->items->pdata[i])->item;
+	}
+	
+	iter->i = -1;
 	return NULL;
 }
 
 static DirItem *iter_next(ViewIter *iter)
 {
+	ViewDetails *view_details = (ViewDetails *) iter->view;
+	int n = view_details->items->len;
+	int i = iter->i;
+
+	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
+
+	/* i is the last item returned (always valid) */
+
+	g_return_val_if_fail(i >= 0 && i < n, NULL);
+	
+	while (iter->n_remaining)
+	{
+		i++;
+		iter->n_remaining--;
+
+		if (i == n)
+			i = 0;
+
+		g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+		if (iter->flags & VIEW_ITER_SELECTED &&
+		    !is_selected(view_details, i))
+			continue;
+
+		iter->i = i;
+		return ((ViewItem *) view_details->items->pdata[i])->item;
+	}
+	
+	iter->i = -1;
 	return NULL;
 }
-#endif
+
+static DirItem *iter_peek(ViewIter *iter)
+{
+	ViewDetails *view_details = (ViewDetails *) iter->view;
+	int n = view_details->items->len;
+	int i = iter->i;
+
+	if (i == -1)
+		return NULL;
+	
+	g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+	return ((ViewItem *) view_details->items->pdata[i])->item;
+}
 
 /* Set the iterator to return 'i' on the next peek() */
-static void make_item_iter(ViewDetails *view_details,
-			   ViewIter *iter,
-			   GtkTreeIter *t_iter)
+static void make_item_iter(ViewDetails *view_details, ViewIter *iter, int i)
 {
 	make_iter(view_details, iter, 0);
 
-	iter->next = iter_init;
-	iter->peek = iter_init;
+	g_return_if_fail(i >= -1 && i < (int) view_details->items->len);
+
+	iter->i = i;
+	iter->next = iter_next;
+	iter->peek = iter_peek;
 	iter->n_remaining = 0;
 }
 
 static void make_iter(ViewDetails *view_details, ViewIter *iter,
 		      IterFlags flags)
 {
-	/* iter->view_details = view_details; */
+	iter->view = (ViewIface *) view_details;
 	iter->next = iter_init;
 	iter->peek = NULL;
+	iter->i = -1;
 
 	iter->flags = flags;
+
+	if (flags & VIEW_ITER_ONE_ONLY)
+	{
+		iter->n_remaining = 1;
+		iter->next(iter);
+	}
+	else
+		iter->n_remaining = view_details->items->len;
 }

@@ -1595,7 +1595,7 @@ static DirItem *iter_init(ViewIter *iter)
 	
 	if (i < 0 || i >= n)
 	{
-		/* Either a normal iteraction, or an iteration from an
+		/* Either a normal iteration, or an iteration from an
 		 * invalid starting point.
 		 */
 		if (flags & VIEW_ITER_BACKWARDS)
