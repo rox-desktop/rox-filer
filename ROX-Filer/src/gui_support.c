@@ -360,6 +360,21 @@ void delayed_error(char *error, ...)
  */
 gboolean load_file(char *pathname, char **data_out, long *length_out)
 {
+#ifdef GTK2
+	gsize len;
+	GError *error;
+	
+	if (!g_file_get_contents(pathname, data_out, &len, &error))
+	{
+		delayed_error("%s", error ? error->message : pathname);
+		g_error_free(error);
+		return FALSE;
+	}
+		
+	if (length_out)
+		*length_out = len;
+	return TRUE;
+#else
 	FILE		*file;
 	long		length;
 	char		*buffer;
@@ -403,6 +418,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 	fclose(file);
 
 	return retval;
+#endif
 }
 
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
