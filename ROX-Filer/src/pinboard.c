@@ -303,7 +303,7 @@ void pinboard_activate(const gchar *name)
 				4 + ICON_HEIGHT / 2);
 	loading_pinboard--;
 
-	update_client_list();
+	tasklist_update(FALSE);
 }
 
 const char *pinboard_get_name(void)
@@ -1351,6 +1351,8 @@ static void pinboard_clear(void)
 
 	g_return_if_fail(current_pinboard != NULL);
 
+	tasklist_update(TRUE);
+
 	next = current_pinboard->icons;
 	while (next)
 	{
@@ -1863,7 +1865,7 @@ static GdkFilterReturn root_filter(GdkXEvent *xevent,
 		GdkAtom atom = gdk_x11_xatom_to_atom(xev->xproperty.atom);
 
 		if (atom == xa__NET_CLIENT_LIST)
-			update_client_list();
+			tasklist_update(FALSE);
 	}
 
 	return GDK_FILTER_CONTINUE;

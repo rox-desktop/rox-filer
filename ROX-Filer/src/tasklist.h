@@ -16,7 +16,7 @@ struct _IconWindow {
 	gboolean iconified;
 };
 
-void update_client_list(void);
+void tasklist_update(gboolean to_empty);
 void tasklist_uniconify(IconWindow *win);
 
 #endif /* _TASKLIST_H */

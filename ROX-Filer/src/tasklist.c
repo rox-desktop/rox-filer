@@ -247,8 +247,9 @@ static void remove_window(Window win)
 
 /* Make sure the window list is up-to-date. Call once to start, and then
  * everytime _NET_CLIENT_LIST changes.
+ * If 'to_empty' is set them pretend all windows have disappeared.
  */
-void update_client_list(void)
+void tasklist_update(gboolean to_empty)
 {
 	static GArray *old_mapping = NULL;
 	GArray *mapping = NULL;
@@ -264,8 +265,12 @@ void update_client_list(void)
 		gdk_window_add_filter(NULL, window_filter, NULL);
 	}
 
-	mapping = wnck_get_window_list(gdk_x11_get_default_root_xwindow(),
-			gdk_atom_intern("_NET_CLIENT_LIST", FALSE));
+	if (to_empty)
+		mapping = g_array_new(FALSE, FALSE, sizeof(Window));
+	else
+		mapping = wnck_get_window_list(
+				gdk_x11_get_default_root_xwindow(),
+				gdk_atom_intern("_NET_CLIENT_LIST", FALSE));
 
 	new_i = 0;
 	old_i = 0;
