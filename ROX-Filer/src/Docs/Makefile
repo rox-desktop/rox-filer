@@ -2,7 +2,8 @@ HELP=../../Help
 RES=../..
 MAN=../../..
 
-all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1
+all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1 \
+     Manual-fr.valid ${HELP}/Manual-fr.html
 
 %.valid: %.xml
 	nsgmls -s -wxml /usr/lib/sgml/declaration/xml.decl $<
