@@ -23,7 +23,7 @@ typedef enum
 struct _DirItem
 {
 	char		*leafname;
-	char		*leafname_collate; /* Preprocessed for sorting */
+	CollateKey	*leafname_collate; /* Preprocessed for sorting */
 	gboolean	may_delete;	/* Not yet found, this scan */
 	int		base_type;
 	int		flags;

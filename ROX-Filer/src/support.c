@@ -1120,33 +1120,102 @@ void null_g_free(gpointer p)
 	*(gpointer *)p = NULL;
 }
 
+struct _CollateKey {
+	guchar *text;	/* NULL => end of list */
+	long number;
+};
+
 /* Break 'name' (a UTF-8 string) down into a list of (text, number) pairs.
- * The text parts are run through strxfrm. This allows any two names to be
+ * The text parts processed for collating. This allows any two names to be
  * quickly compared later for intelligent sorting (comparing names is
  * speed-critical).
  */
-CollateKey *make_leafname_collate(const guchar *name)
+CollateKey *collate_key_new(const guchar *name)
 {
 	const guchar *i;
-	
+	guchar *to_free = NULL;
+	GArray *array;
+	CollateKey new;
+	CollateKey *retval;
+
 	g_return_val_if_fail(name != NULL, NULL);
 
-	/* XXX: validate */
+	array = g_array_new(FALSE, FALSE, sizeof(CollateKey));
+
+	/* Ensure valid UTF-8 */
+	if (!g_utf8_validate(name, -1, NULL))
+	{
+		to_free = to_utf8(name);
+		name = to_free;
+	}
+
 	for (i = name; *i; i = g_utf8_next_char(i))
 	{
-		/* We in a (possibly blank) text section starting at 'name'.
+		/* We're in a (possibly blank) text section starting at 'name'.
 		 * Find the end of it (the next digit, or end of string).
 		 */
 		if (g_unichar_isdigit(g_utf8_get_char(i)))
 		{
-			char *endp;
-			long num;
+			guchar *endp;
 			
 			/* i -> first digit character */
-			name_coll = g_utf8_collate_key(name, i - name);
-			num = strtol(i, &endp, 10);
+			new.text = g_utf8_collate_key(name, i - name);
+			new.number = strtol(i, (char **) &endp, 10);
+
+			g_array_append_val(array, new);
 
 			g_return_val_if_fail(endp > i, NULL);
+
+			name = endp;
+			i = name - 1;
 		}
+	}
+
+	new.text = g_utf8_collate_key(name, i - name);
+	new.number = -1;
+	g_array_append_val(array, new);
+
+	new.text = NULL;
+	g_array_append_val(array, new);
+
+	retval = (CollateKey *) array->data;
+	g_array_free(array, FALSE);
+
+	if (to_free)
+		g_free(to_free);
+
+	return retval;
+}
+
+void collate_key_free(CollateKey *key)
+{
+	CollateKey *part;
+
+	for (part = key; part->text; part++)
+		g_free(part->text);
+	g_free(key);
+}
+
+int collate_key_cmp(CollateKey *n1, CollateKey *n2)
+{
+	int r;
+
+	while (1)
+	{
+		if (!n1->text)
+			return n2->text ? -1 : 0;
+		if (!n2->text)
+			return 1;
+		r = strcmp(n1->text, n2->text);
+		if (r)
+			return r;
+
+		if (n1->number < n2->number)
+			return -1;
+		if (n1->number > n2->number)
+			return 1;
+
+		n1++;
+		n2++;
 	}
 }

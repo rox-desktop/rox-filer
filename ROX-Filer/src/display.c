@@ -182,61 +182,18 @@ int sort_by_name(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;
-	char *n1 = i1->leafname_collate;
-	char *n2 = i2->leafname_collate;
+	CollateKey *n1 = i1->leafname_collate;
+	CollateKey *n2 = i2->leafname_collate;
+	int retval;
 
 	SORT_DIRS;
-		
+
 	if (!o_intelligent_sort.int_value)
 		return strcmp(i1->leafname, i2->leafname);
 
-	/* The following code was copied from PicoGUI (was LGPL) */
+	retval = collate_key_cmp(n1, n2);
 
-	/* Sort the files, in a way that should make sense to users.
-	 * Case is ignored, punctuation is ignored. If the file contains
-	 * numbers, the numbers are sorted numerically.
-	 */
-	while (*n1 && *n2)
-	{
-		char c1 = *n1, c2 = *n2;
-
-		/* If they are both numbers, sort them numerically */
-		if (isdigit(c1) && isdigit(c2))
-		{
-			char *p;
-			unsigned long u1,u2;
-			u1 = strtoul(n1, &p, 10);
-			n1 = p;
-			u2 = strtoul(n2, &p, 10);
-			n2 = p;
-			if (u1 < u2)
-				return -1;
-			else if (u1 > u2)
-				return 1;
-			continue;
-		}
-
-		/* Do a case-insensitive asciibetical sort */
-		c1 = tolower(c1);
-		c2 = tolower(c2);
-		if (c1 < c2)
-			return -1;
-		else if (c1 > c2)
-			return 1;
-		n1++;
-		n2++;
-	}
-
-	/* Compare length */
-	if (*n1)
-		return 1;	/* First string is longer, so comes after */
-	if (*n2)
-		return -1;
-
-	/* If the strings are equal at the end of this, fallback to a straight
-	 * ASCII sort so at least it's deterministic.
-	 */
-	return strcmp(i1->leafname, i2->leafname);
+	return retval ? retval : strcmp(i1->leafname, i2->leafname);
 }
 
 int sort_by_type(const void *item1, const void *item2)

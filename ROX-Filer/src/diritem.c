@@ -148,9 +148,9 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
 			/* Note that the flag is set for ALL executable
-			 * files, but the mime_type is only application_executable
-			 * if the file doesn't have a known extension when
-			 * that option is in force.
+			 * files, but the mime_type is only
+			 * application_executable if the file doesn't have a
+			 * known extension when that option is in force.
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
@@ -187,8 +187,6 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 DirItem *diritem_new(const guchar *leafname)
 {
 	DirItem		*item;
-	const gchar	*i;
-	gboolean	all_alpha = TRUE;
 
 	item = g_new(DirItem, 1);
 	item->leafname = g_strdup(leafname);
@@ -197,58 +195,7 @@ DirItem *diritem_new(const guchar *leafname)
 	item->base_type = TYPE_UNKNOWN;
 	item->flags = 0;
 	item->mime_type = NULL;
-
-	for (i = leafname; *i; i++)
-	{
-		if (!isalnum(*i))
-		{
-			all_alpha = FALSE;
-			break;
-		}
-	}
-
-	if (all_alpha)
-		item->leafname_collate = item->leafname;
-	else
-	{
-		gchar	*o;
-		gboolean need_digit_spacer = FALSE;
-		gboolean may_need_digit_spacer = FALSE;
-
-		item->leafname_collate = g_malloc(strlen(item->leafname) + 1);
-		o = item->leafname_collate;
-
-		/* TODO: Fix for UTF-8 */
-
-		for (i = leafname; *i; i++)
-		{
-			if (isdigit(*i))
-			{
-				if (need_digit_spacer)
-				{
-					need_digit_spacer = FALSE;
-					*(o++) = '-';
-				}
-				may_need_digit_spacer = TRUE;
-				*(o++) = *i;
-			}
-			else if (isalpha(*i))
-			{
-				need_digit_spacer = FALSE;
-				may_need_digit_spacer = FALSE;
-				*(o++) = *i;
-			}
-			else if (may_need_digit_spacer)
-			{
-				/* We had a digit more recently than
-				 * an alpha. If this thing following this
-				 * punctuation is another digit, add a spacer.
-				 */
-				need_digit_spacer = TRUE;
-			}
-		}
-		*o = '\0';
-	}
+	item->leafname_collate = collate_key_new(leafname);
 
 	return item;
 }
@@ -260,8 +207,7 @@ void diritem_free(DirItem *item)
 	if (item->image)
 		g_object_unref(item->image);
 	item->image = NULL;
-	if (item->leafname_collate != item->leafname)
-		g_free(item->leafname_collate);
+	collate_key_free(item->leafname_collate);
 	null_g_free(&item->leafname);
 	g_free(item);
 }

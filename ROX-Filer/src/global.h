@@ -90,6 +90,11 @@ typedef struct _GFSCache GFSCache;
 /* Each cached XML file is represented by one of these */
 typedef struct _XMLwrapper XMLwrapper;
 
+/* This holds a pre-parsed version of a filename, which can be quickly
+ * compared with another CollateKey for intelligent sorting.
+ */
+typedef struct _CollateKey CollateKey;
+
 /* The minibuffer is a text field which appears at the bottom of
  * a filer window. It has four modes of operation:
  */

@@ -48,5 +48,8 @@ char *md5_hash(const char *message);
 gchar *expand_path(const gchar *path);
 void destroy_glist(GList **list);
 void null_g_free(gpointer p);
+CollateKey *collate_key_new(const guchar *name);
+void collate_key_free(CollateKey *key);
+int collate_key_cmp(CollateKey *n1, CollateKey *n2);
 
 #endif /* _SUPPORT_H */
