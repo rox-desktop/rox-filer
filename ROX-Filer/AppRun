@@ -30,7 +30,7 @@ case $1 in
 		fi
 		rm -f "$APP_DIR/src/config.cache"
 		cd "$APP_DIR/src" && ./configure --enable-rox	    \
-					--bindir="../$PLATFORM" \
+					--with-platform="$PLATFORM" \
 					"$@" \
 			&& make clean && make && echo Done >&2 && exit 0
 		echo Compile failed >&2
