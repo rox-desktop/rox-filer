@@ -60,7 +60,7 @@ g_utf8_get_charset_internal (const char **a)
     }
 
   /* Assume this for compatibility at present.  */
-  *a = "iso-8859-1";
+  *a = "ISO8859-1";
   
   return FALSE;
 }

@@ -153,7 +153,7 @@ void rox_add_translations(char *path)
 	if (!charset)
 	{
 		g_warning("Missing charset=... in translation!");
-		charset = g_strdup("iso-8859-1");
+		charset = g_strdup("ISO8859-1");
 	}
 #endif
 	
