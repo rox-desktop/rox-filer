@@ -67,8 +67,6 @@ static void add_ext(char *type_name, char *ext)
 	new->subtype = g_strdup(slash + 1);
 	new->image = NULL;
 
-	printf("Type = '%s', subtype = '%s', ext = '%s'\n",
-			new->media_type, new->subtype, ext);
 	g_hash_table_insert(extension_hash, g_strdup(ext), new);
 }
 
@@ -184,7 +182,12 @@ gboolean type_open(char *path, MIME_type *type)
 	open = choices_find_path_load_shared(type_name, "MIME-types");
 	g_free(type_name);
 	if (!open)
-		return FALSE;
+	{
+		open = choices_find_path_load_shared(type->media_type,
+				"MIME-types");
+		if (!open)
+			return FALSE;
+	}
 
 	argv[0] = g_strconcat(open, "/AppRun", NULL);
 
@@ -197,18 +200,36 @@ gboolean type_open(char *path, MIME_type *type)
 	return TRUE;
 }
 
+/* Tries to load image from <handler>/MIME-icons/<icon>.xpm */
+static MaskedPixmap *try_icon_path(GtkWidget *window, char *handler, char *icon)
+{
+	char		*path;
+	MaskedPixmap 	*image;
+
+	if (!handler)
+		return NULL;
+
+	path = g_strconcat(handler, "/MIME-icons/", icon, ".xpm", NULL);
+	image = load_pixmap_from(window, path);
+	g_free(path);
+
+	return image;
+}
+
 /* Return the image for this type, loading it if needed.
  * Places to check are: (eg type="text_plain", base="text")
  * 1. Choices/MIME-types/<type>/MIME-icons/<type>
  * 2. Choices/MIME-types/<type>/MIME-icons/<base>
- * 3. Choices/MIME-types/<base>/MIME-icons/<base> [ TODO ]
- * 4. $APP_DIR/MIME-icons/<base>
- * 5. Unknown type icon.
+ * 3. Choices/MIME-types/<base>/MIME-icons/<type>
+ * 4. Choices/MIME-types/<base>/MIME-icons/<base>
+ * 5. $APP_DIR/MIME-icons/<base>
+ * 6. Unknown type icon.
  */
 MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 {
-	char	*open, *path;
+	char	*open;
 	char	*type_name;
+	MaskedPixmap *i;
 
 	g_return_val_if_fail(type != NULL, default_pixmap + TYPE_UNKNOWN);
 
@@ -218,44 +239,22 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
 
-	/* 1 and 2 : Check for icon provided by specific handler */
 	open = choices_find_path_load_shared(type_name, "MIME-types");
-	if (open)
-	{
-		/* 1 : Exact type provided */
-		path = g_strconcat(open, "/MIME-icons/", type_name, ".xpm",
-				   NULL);
-		type->image = load_pixmap_from(window, path);
-		g_free(path);
+	if (((i = try_icon_path(window, open, type_name)))
+	 || ((i = try_icon_path(window, open, type->media_type))))
+		goto out;
 
-		if (!type->image)
-		{
-			/* 2 : Base type provided */
-			path = g_strconcat(open, "/MIME-icons/",
-					type->media_type, ".xpm", NULL);
-			type->image = load_pixmap_from(window, path);
-			g_free(path);
-		}
-	}
+	open = choices_find_path_load_shared(type->media_type, "MIME-types");
+	if (((i = try_icon_path(window, open, type_name)))
+	 || ((i = try_icon_path(window, open, type->media_type)))
+	 || ((i = try_icon_path(window, getenv("APP_DIR"), type->media_type))))
+		goto out;
+	
+	i = default_pixmap + TYPE_UNKNOWN;
 
+out:
 	g_free(type_name);
 
-	if (type->image)
-		return type->image;
-	
-	/* 4 : Load a default icon from our own application dir */
-	
-	path = g_strconcat(getenv("APP_DIR"), "/MIME-icons/", type->media_type,
-			   ".xpm", NULL);
-	type->image = load_pixmap_from(window, path);
-	g_free(path);
-
-	if (type->image)
-		return type->image;
-	
-	/* 5 : Use the unknown type icon */
-
-	type->image = default_pixmap + TYPE_UNKNOWN;
-		
-	return type->image;
+	type->image = i;
+	return i;
 }
