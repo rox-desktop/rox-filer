@@ -390,8 +390,6 @@ void pinboard_add_widget(GtkWidget *widget)
  * 'path' should be an absolute pathname.
  * 'x' and 'y' are the coordinates of the point in the middle of the text.
  * 'name' is the name to use. If NULL then the leafname of path is used.
- *
- * name and path are in UTF-8 for Gtk+-2.0 only.
  */
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut)
@@ -1750,6 +1748,7 @@ static void pin_icon_destroy(Icon *icon)
 
 	g_return_if_fail(pi->win != NULL);
 
+	gtk_widget_hide(pi->win);	/* Stops flicker - stupid GtkFixed! */
 	gtk_widget_destroy(pi->win);
 }
 

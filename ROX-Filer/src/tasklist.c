@@ -891,6 +891,7 @@ static void hide_icon(IconWindow *win)
 {
 	g_return_if_fail(win->widget != NULL);
 
+	gtk_widget_hide(win->widget);	/* Stops flicker - stupid GtkFixed! */
 	gtk_widget_destroy(win->widget);
 	win->widget = NULL;
 	win->label = NULL;
