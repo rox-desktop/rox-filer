@@ -828,9 +828,9 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 
 	find_condition_free(cond);
 
+	collection_unblock_selection_changed(collection, etime, TRUE);
 out:
 	minibuffer_hide(filer_window);
-	collection_unblock_selection_changed(collection, etime, TRUE);
 }
 
 
