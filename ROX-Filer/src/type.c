@@ -44,6 +44,7 @@
 
 /* Static prototypes */
 static char *import_extensions(guchar *line);
+static void import_for_dir(guchar *path);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
 static GHashTable *extension_hash = NULL;
@@ -54,20 +55,42 @@ MIME_type text_plain = {"text", "plain", NULL};
 
 void type_init()
 {
-	ChoicesList 	*paths, *next;
+	int		i;
+	GPtrArray	*list;
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-	paths = choices_find_load_all("guess", "MIME-types");
-	while (paths)
+	current_type = NULL;
+	parse_file(make_path(getenv("APP_DIR"), "MIME-types")->str,
+				import_extensions);
+
+	list = choices_list_dirs("MIME-info");
+	for (i = 0; i < list->len; i++)
+		import_for_dir((gchar *) g_ptr_array_index(list, i));
+	choices_free_list(list);
+}
+
+/* Parse every file in 'dir' */
+static void import_for_dir(guchar *path)
+{
+	DIR		*dir;
+	struct dirent	*item;
+
+	dir = opendir(path);
+	if (!dir)
+		return;
+
+	while ((item = readdir(dir)))
 	{
+		if (item->d_name[0] == '.')
+			continue;
+
 		current_type = NULL;
-		parse_file(paths->path, import_extensions);
-		next = paths->next;
-		g_free(paths->path);
-		g_free(paths);
-		paths = next;
+		parse_file(make_path(path, item->d_name)->str,
+				import_extensions);
 	}
+
+	closedir(dir);
 }
 
 /* Add one entry to the extension_hash table */
@@ -205,11 +228,11 @@ gboolean type_open(char *path, MIME_type *type)
 	argv[1] = path;
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
-	open = choices_find_path_load_shared(type_name, "MIME-types");
+	open = choices_find_path_load(type_name, "MIME-types");
 	g_free(type_name);
 	if (!open)
 	{
-		open = choices_find_path_load_shared(type->media_type,
+		open = choices_find_path_load(type->media_type,
 				"MIME-types");
 		if (!open)
 			return FALSE;
@@ -271,11 +294,11 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	type_name = g_strconcat(type->media_type, "_",
 				type->subtype, ".xpm", NULL);
-	path = choices_find_path_load_shared(type_name, "MIME-icons");
+	path = choices_find_path_load(type_name, "MIME-icons");
 	if (!path)
 	{
 		strcpy(type_name + strlen(type->media_type), ".xpm");
-		path = choices_find_path_load_shared(type_name, "MIME-icons");
+		path = choices_find_path_load(type_name, "MIME-icons");
 	}
 	
 	g_free(type_name);

@@ -22,253 +22,205 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/param.h>
 #include <fcntl.h>
 #include <unistd.h>
+#include <errno.h>
 
 #include "choices.h"
 
-static char *program_name = NULL;
-static char path_buffer[MAXPATHLEN];
+static gboolean saving_disabled = TRUE;
+static gchar **dir_list = NULL;
 
 /* Static prototypes */
-static char *my_strdup(char *str);
-static char *make_choices_path(char *path, char *leaf,
-		int create, char *shared_name);
-static char *default_user_choices();
-static int exists(char *path);
+static gboolean exists(char *path);
 
-/* Call this before using any of the other functions in this file -
- * it reads CHOICESPATH into an array for later use.
- * The program name you pass here will be used for the directory name.
+
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
+
+
+/* Reads in CHOICESPATH and constructs the directory list table.
+ * You must call this before using any other choices_* functions.
+ *
+ * If CHOICESPATH does not exist then a suitable default is used.
  */
-void choices_init(char *prog_name)
+void choices_init(void)
 {
-	program_name = my_strdup(prog_name);
+	char	*choices;
+
+	g_return_if_fail(dir_list == NULL);
+
+	choices = getenv("CHOICESPATH");
+	
+	if (choices)
+	{
+		if (*choices != ':' && *choices != '\0')
+			saving_disabled = FALSE;
+
+		while (*choices == ':')
+			choices++;
+
+		if (*choices == '\0')
+		{
+			dir_list = g_new(char *, 1);
+			dir_list[0] = NULL;
+		}
+		else
+			dir_list = g_strsplit(choices, ":", 0);
+	}
+	else
+	{
+		saving_disabled = FALSE;
+
+		dir_list = g_new(gchar *, 4);
+		dir_list[0] = g_strconcat(getenv("HOME"), "/Choices", NULL);
+		dir_list[1] = g_strdup("/usr/local/Choices");
+		dir_list[2] = g_strdup("/usr/Choices");
+		dir_list[3] = NULL;
+	}
+
+#if 0
+	{
+		gchar	**cdir = dir_list;
+
+		while (*cdir)
+		{
+			g_print("[ choices dir '%s' ]\n", *cdir);
+			cdir++;
+		}
+
+		g_print("[ saving is %s ]\n", saving_disabled ? "disabled"
+							      : "enabled");
+	}
+#endif
 }
 
+/* Returns an array of the directories in CHOICESPATH which contain
+ * a subdirectory called 'dir'.
+ *
+ * Lower-indexed results should override higher-indexed ones.
+ *
+ * Free the list using choices_free_list().
+ */
+GPtrArray *choices_list_dirs(char *dir)
+{
+	GPtrArray	*list;
+	gchar		**cdir = dir_list;
+
+	g_return_val_if_fail(dir_list != NULL, NULL);
+
+	list = g_ptr_array_new();
+
+	while (*cdir)
+	{
+		guchar	*path;
+
+		path = g_strconcat(*cdir, "/", dir, NULL);
+		if (exists(path))
+			g_ptr_array_add(list, path);
+		else
+			g_free(path);
+
+		cdir++;
+	}
+
+	return list;
+}
+
+void choices_free_list(GPtrArray *list)
+{
+	int	i;
+
+	g_return_if_fail(list != NULL);
+
+	for (i = 0; i < list->len; i++)
+		g_free(g_ptr_array_index(list, i));
+
+	g_ptr_array_free(list, TRUE);
+}
 
 /* Get the pathname of a choices file to load. Eg:
- * choices_find_path_load("menus") -> "/usr/local/Choices/ProgName/menus".
+ *
+ * choices_find_path_load("menus", "ROX-Filer")
+ *		 		-> "/usr/local/Choices/ROX-Filer/menus".
+ *
  * The return values may be NULL - use built-in defaults - otherwise
- * it points to a static buffer which is valid until the next call to
- * the choices system.
+ * g_free() the result.
  */
-char *choices_find_path_load(char *leaf)
+guchar *choices_find_path_load(char *leaf, char *dir)
 {
-	return choices_find_path_load_shared(leaf, program_name);
-}
-	
-/* Like choices_find_path_load(), but use shared_name instead of
- * prog_name (as passed to choices_init).
- */
-char *choices_find_path_load_shared(char *leaf, char *shared_name)
-{
-	char	*choices_path, *path;
-	
-	if (!shared_name)
-	{
-		fprintf(stderr, "choices_find_path_load_shared: "
-				"bad program name (or not initialised)\n");
-		return NULL;
-	}
+	gchar		**cdir = dir_list;
 
-	choices_path = getenv("CHOICESPATH");
-	if (!choices_path)
+	g_return_val_if_fail(dir_list != NULL, NULL);
+
+	while (*cdir)
 	{
-		path = make_choices_path(default_user_choices(),
-				leaf, 0, shared_name);
-		if (path && exists(path))
+		gchar	*path;
+
+		path = g_strconcat(*cdir, "/", dir, "/", leaf, NULL);
+		
+		if (exists(path))
 			return path;
-		choices_path = "/usr/local/Choices:/usr/Choices";
-	}
 
-	if (*choices_path == ':')
-		choices_path++;
+		g_free(path);
 
-	while (choices_path)
-	{
-		path = make_choices_path(choices_path, leaf, 0, shared_name);
-		if (path && exists(path))
-			return path;
-		choices_path = strchr(choices_path, ':');
-		if (choices_path)
-			choices_path++;
+		cdir++;
 	}
 
 	return NULL;
 }
 
-/* Return a linked list (possibly NULL) of matching files from all
- * directories in CHOICESPATH. The first item in the list is the right-most
- * entry in CHOICESPATH.
+/* Returns the pathname of a file to save to, or NULL if saving is
+ * disabled. If 'create' is TRUE then intermediate directories will
+ * be created (set this to FALSE if you just want to find out where
+ * a saved file would go without actually altering the filesystem).
  */
-ChoicesList *choices_find_load_all(char *leaf, char *dir_name)
+guchar *choices_find_path_save(char *leaf, char *dir, gboolean create)
 {
-	char		*choices_path, *path;
-	ChoicesList	*retval = NULL;
+	static gchar	*path = NULL;
 	
-	if (!dir_name)
+	g_return_val_if_fail(dir_list != NULL, NULL);
+
+	if (path)
 	{
-		fprintf(stderr, "choices_find_path_load_all: "
-				"bad Choices dir_name\n");
+		g_free(path);
+		path = NULL;
+	}
+	
+	if (saving_disabled)
 		return NULL;
-	}
 
-	choices_path = getenv("CHOICESPATH");
-	if (!choices_path)
+	if (create && !exists(dir_list[0]))
 	{
-		path = make_choices_path(default_user_choices(),
-				leaf, 0, dir_name);
-		if (path && exists(path) && (path = my_strdup(path)))
-		{
-			retval = malloc(sizeof(ChoicesList));
-			retval->next = NULL;
-			retval->path = path;
-		}
-
-		choices_path = "/usr/local/Choices:/usr/Choices";
+		if (mkdir(dir_list[0], 0777))
+			g_warning("mkdir(%s): %s\n", dir_list[0],
+					g_strerror(errno));
 	}
 
-	if (*choices_path == ':')
-		choices_path++;
-
-	while (choices_path)
+	path = g_strconcat(dir_list[0], "/", dir, NULL);
+	if (create && !exists(path))
 	{
-		path = make_choices_path(choices_path, leaf, 0, dir_name);
-		if (path && exists(path) && (path = my_strdup(path)))
-		{
-			ChoicesList *new;
-			
-			new = malloc(sizeof(ChoicesList));
-			new->next = retval;
-			new->path = path;
-			retval = new;
-		}
-
-		choices_path = strchr(choices_path, ':');
-		if (choices_path)
-			choices_path++;
+		if (mkdir(path, 0777))
+			g_warning("mkdir(%s): %s\n", path, g_strerror(errno));
 	}
 
-	return retval;
+	path = g_strconcat(path, "/", leaf, NULL);
+
+	return path;
 }
 
-/* Return a pathname to save to, or NULL if saving isn't possible.
- * Otherwise, it points to a static buffer which is valid until the next call
- * to the choices system.
- * If 'create' is true then missing directories are created automatically.
- */
-char *choices_find_path_save(char *leaf, int create)
-{
-	char *choices_path;
 
-	if (!program_name)
-	{
-		fprintf(stderr, "choices_find_path_save: not initialised\n");
-		return NULL;
-	}
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
 
-	choices_path = getenv("CHOICESPATH");
 
-	if (choices_path)
-		return make_choices_path(choices_path, leaf, create,
-				program_name);
-	else
-		return make_choices_path(default_user_choices(), leaf,
-				create, program_name);
-}
-
-/* Like strdup(), but also reports an error to stderr on failure */
-static char *my_strdup(char *str)
-{
-	char	*retval;
-
-	retval = strdup(str);
-
-	if (!retval)
-		fprintf(stderr, "choices.c: strdup() failed\n");
-
-	return retval;
-}
-
-/* Join these two strings together, with /ProgName/ between them, and return
- * the resulting pathname as a pointer to a static buffer, or NULL on
- * failure.
- * 'path' is \0 or : terminated and empty strings result in a NULL return.
- * If create is non-zero then the extra directories will be created if they
- * don't already exist.
- */
-static char *make_choices_path(char 	*path,
-			       char 	*leaf,
-			       int 	create,
-			       char 	*shared_name)
-{
-	char	*term;
-	size_t	path_len, prog_len;
-
-	term = path ? strchr(path, ':') : NULL;
-	if (term == path || *path == '\0')
-		return NULL;
-	 
-	if (term)
-		path_len = term - path;
-	else
-		path_len = strlen(path);
-
-	prog_len = strlen(shared_name);
-
-	/* path/progname/leaf0 */
-	if (path_len + prog_len + strlen(leaf) + 3 >= MAXPATHLEN)
-		return NULL;		/* Path is too long */
-
-	memcpy(path_buffer, path, path_len);
-	if (create)
-	{
-		path_buffer[path_len] = '\0';
-		mkdir(path_buffer, S_IRWXU | S_IRWXG | S_IRWXO);
-	}
-
-	path_buffer[path_len] = '/';
-	strcpy(path_buffer + path_len + 1, shared_name);
-	if (create)
-		mkdir(path_buffer, S_IRWXU | S_IRWXG | S_IRWXO);
-
-	path_buffer[path_len + 1 + prog_len] = '/';
-	strcpy(path_buffer + path_len + prog_len + 2, leaf);
-
-	return path_buffer;
-}
-
-/* Return ${HOME}/Choices (expanded), or NULL */
-static char *default_user_choices()
-{
-	static char 	*retval = NULL;
-	char		*home;
-
-	if (retval)
-		return retval;
-
-	home = getenv("HOME");
-
-	if (!home)
-		retval = NULL;
-	else if (strlen(home) + strlen("/Choices") >= MAXPATHLEN - 1)
-		retval = NULL;
-	else
-	{
-		sprintf(path_buffer, "%s/Choices", home);
-		retval = my_strdup(path_buffer);
-	}
-
-	return retval;
-}
-
-/* Returns 1 if the object exists, 0 if it doesn't */
-static int exists(char *path)
+/* Returns TRUE if the object exists, FALSE if it doesn't */
+static gboolean exists(char *path)
 {
 	struct stat info;
 

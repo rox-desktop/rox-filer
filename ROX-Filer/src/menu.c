@@ -272,7 +272,7 @@ void menu_init()
 	panel_hidden_menu = gtk_item_factory_get_widget(item_factory,
 			"<panel>/Display/Show Hidden");
 
-	menurc = choices_find_path_load("menus");
+	menurc = choices_find_path_load("menus", "ROX-Filer");
 	if (menurc)
 		gtk_item_factory_parse_rc(menurc);
 
@@ -349,7 +349,7 @@ static void save_options()
 {
 	char	*menurc;
 
-	menurc = choices_find_path_save("menus", TRUE);
+	menurc = choices_find_path_save("menus", "ROX-Filer", TRUE);
 	if (menurc)
 		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 

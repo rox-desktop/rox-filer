@@ -1,4 +1,4 @@
-#This file was created by <tal197> Sat Apr  8 19:52:01 2000
+#This file was created by <tal197> Sun Apr  9 12:48:48 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1903,37 +1903,53 @@ The `Xterm here' program is the one used when you choose `Xterm here' from
 Filetypes
 \layout Standard
 
-The filer needs some files in your choices directory to allow it to determine
- the MIME-types to give files and the images to display for them.
- These files are supplied as part of the ROX desktop
+ROX-Filer uses three sub-directories in your Choices directory for filetypes:
+\layout Description
+
+MIME-info contains files which specify what the MIME type for a file should
+ be, based on its extention.
+ All the files in all the MIME-info directories are scanned when the filer
+ loads.
+ In addition, ROX-Filer is now supplied with a file called `MIME-info' (inside
+ its application directory), which is also scanned --- this allows new users
+ to get started more easily.
+ Many applications now come with a file called `something.mime'; copy these
+ files into your MIME-info directory to make ROX-Filer automatically recognise
+ the new extensions.
+\layout Description
+
+MIME-types contains symlinks, one for each MIME type, which point to programs
+ that can handle files of that type.
+ For example, to make opening an HTML file load it into Netscape:
+\begin_deeper 
+\layout Enumerate
+
+Find the Netscape application and go to `Link...' on the menu.
+\layout Enumerate
+
+Enter `text_html' as the name for the link and drag the icon from the Link
+ box into the MIME-types directory.
+\layout Standard
+
+You can also put actual programs in here as well as links if you want to.
+\end_deeper 
+\layout Description
+
+MIME-icons contains the images used to display each type of file.
+ So the filer will try to display an HTML file using the icon `MIME-icons/text_h
+tml.xpm'.
+\layout Standard
+
+Many sample files are supplied as part of the ROX desktop
 \begin_inset LatexCommand \cite{ROX}
 
 \end_inset 
 
 .
- This should give you two directories in your Choices directory - `MIME-types'
- and `MIME-icons'.
 \layout Standard
 
-The file `MIME-types/guess' allows the filer to work out MIME-types from
- file extensions; the format is the same as the `gnome.mime' file from the
- GNOME desktop.
-\layout Standard
-
-The other items in the `MIME-types' directory are links to programs which
- are run when you double click on files.
- For example, to run Netscape when you double click on an HTML file there
- should be a file in this directory called `text_html' which is a symlink
- to the netscape binary or application directory.
-\layout Standard
-
-The `MIME-icons' directory contains images to use for the various types.
- For example, the filer will use the file `MIME-icons/text_html' for HTML
- files.
-\layout Standard
-
-In both directories you can also provide default actions/images for each
- media type.
+In both MIME-types and MIME-icons directories you can also provide default
+ actions/images for each media type.
  For example, if `text_html' isn't found then the filer will try simply
  using `text'.
 \layout Section

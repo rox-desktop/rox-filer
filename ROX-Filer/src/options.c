@@ -79,7 +79,7 @@ void options_init()
 	sections_vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(border), sections_vbox);
 	
-	save_path = choices_find_path_save("...", FALSE);
+	save_path = choices_find_path_save("...", "ROX-Filer", FALSE);
 	if (save_path)
 	{
 		string = g_strconcat("Choices will be saved as ",
@@ -144,7 +144,7 @@ void options_load(void)
 		need_init = FALSE;
 	}
 
-	path = choices_find_path_load("options");
+	path = choices_find_path_load("options", "ROX-Filer");
 	if (!path)
 		return;		/* Nothing to load */
 
@@ -258,7 +258,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 	{
 		char 		*path;
 		
-		path = choices_find_path_save("options", TRUE);
+		path = choices_find_path_save("options", "ROX-Filer", TRUE);
 		g_return_if_fail(path != NULL);
 
 		save_file = fopen(path, "wb");

@@ -218,7 +218,7 @@ int main(int argc, char **argv)
 		}
 	}
 
-	choices_init("ROX-Filer");
+	choices_init();
 
 	gui_support_init();
 	pixmaps_init();

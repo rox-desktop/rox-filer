@@ -7,18 +7,12 @@
 #ifndef _CHOICES_H
 #define _CHOICES_H
 
-typedef struct _ChoicesList ChoicesList;	/* Singly linked list */
+#include <glib.h>
 
-struct _ChoicesList
-{
-	char		*path;
-	ChoicesList	*next;
-};
-
-void choices_init(char *prog_name);
-ChoicesList *choices_find_load_all(char *leaf, char *dir_name);
-char *choices_find_path_load_shared(char *leaf, char *shared_name);
-char *choices_find_path_load(char *leaf);
-char *choices_find_path_save(char *leaf, int create);
+void 		choices_init	       (void);
+GPtrArray	*choices_list_dirs     (char *dir);
+void		choices_free_list      (GPtrArray *list);
+guchar 		*choices_find_path_load(char *leaf, char *dir);
+guchar	   	*choices_find_path_save(char *leaf, char *dir, gboolean create);
 
 #endif /* _CHOICES_H */
