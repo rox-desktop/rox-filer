@@ -348,12 +348,13 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 					 user_name(item->uid),
 					 group_name(item->gid)));
 
-	add_row_and_free(store, _("Size:"),
-			 item->size >= PRETTY_SIZE_LIMIT
-			 ? g_strdup_printf("%s (%" SIZE_FMT " %s)",
-					   format_size(item->size),
-					   item->size, _("bytes"))
-			 : g_strdup(format_size(item->size)));
+	if (item->base_type != TYPE_DIRECTORY)
+		add_row_and_free(store, _("Size:"),
+				 item->size >= PRETTY_SIZE_LIMIT
+				 ? g_strdup_printf("%s (%" SIZE_FMT " %s)",
+						   format_size(item->size),
+						   item->size, _("bytes"))
+				 : g_strdup(format_size(item->size)));
 
 	add_row_and_free(store, _("Change time:"), pretty_time(&item->ctime));
 	
