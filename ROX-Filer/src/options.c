@@ -402,7 +402,7 @@ static void show_notice(GtkObject *button)
 	text = gtk_object_get_data(button, "notice_text");
 	g_return_if_fail(text != NULL);
 
-	report_error("Notice", _(text));
+	report_error(_("Notice"), _(text));
 }
 
 static void build_widget(xmlNode *widget, GtkWidget *box)
