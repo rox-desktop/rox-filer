@@ -1563,6 +1563,7 @@ static void panel_icon_update(Icon *icon)
 
 	gtk_widget_queue_draw(pi->widget);
 	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
+	panel_icon_set_tip(pi);
 	panel_save(pi->panel);
 }
 
