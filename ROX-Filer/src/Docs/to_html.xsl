@@ -5,7 +5,12 @@
 
   <xsl:import href="/usr/share/sgml/docbook/xsl-stylesheets-1.29/html/docbook.xsl"/>
 
+  <!-- Try to stop Netscape mucking things up using media.
   <xsl:param name="html.stylesheet">../style.css</xsl:param>
+  -->
+  <xsl:template name="head.content">
+    <link rel="stylesheet" href="../style.css" type="text/css" media="all"/>
+  </xsl:template>
 
   <xsl:template match="guimenuitem">
     <span class="guimenuitem">
