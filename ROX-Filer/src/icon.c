@@ -256,7 +256,7 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 		menu_set_items_shaded(icon_menu, FALSE, 1, 3);
 		menu_set_items_shaded(icon_file_menu, FALSE, 0, 5);
 		if (!can_set_run_action(icon->item))
-			menu_set_items_shaded(icon_file_menu, TRUE, 3, 1);
+			menu_set_items_shaded(icon_file_menu, TRUE, 2, 1);
 
 		tmp = g_strdup_printf("%s '%s'",
 				basetype_name(icon->item),
