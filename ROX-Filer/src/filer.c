@@ -63,6 +63,7 @@
 #include "view_collection.h"
 #include "view_details.h"
 #include "action.h"
+#include "bookmarks.h"
 
 static XMLwrapper *groups = NULL;
 
@@ -334,6 +335,7 @@ static void attach(FilerWindow *filer_window)
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
 	filer_set_title(filer_window);
+	bookmarks_add_history(filer_window->sym_path);
 }
 
 static void detach(FilerWindow *filer_window)

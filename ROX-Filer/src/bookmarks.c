@@ -37,6 +37,11 @@
 #include "gui_support.h"
 #include "main.h"
 
+static GList *history = NULL;		/* Most recent first */
+static GList *history_tail = NULL;	/* Oldest item */
+static GHashTable *history_hash = NULL;	/* Path -> GList link */
+static gint history_free = 30;		/* Space left in history */
+
 static XMLwrapper *bookmarks = NULL;
 static GtkWidget *bookmarks_window = NULL;
 
@@ -189,6 +194,51 @@ void bookmarks_edit(void)
 	gtk_widget_show_all(bookmarks_window);
 }
 
+static void history_remove(const char *path)
+{
+	GList *old;
+
+	old = g_hash_table_lookup(history_hash, path);
+	if (old)
+	{
+		g_hash_table_remove(history_hash, path);
+
+		if (history_tail == old)
+			history_tail = old->prev;
+		g_free(old->data);
+		history = g_list_delete_link(history, old);
+
+		history_free++;
+	}
+}
+
+/* Add this path to the global history of visited directories. If it
+ * already exists there, make it the most recent.
+ */
+void bookmarks_add_history(const gchar *path)
+{
+	char *new;
+
+	new = g_strdup(path);
+	ensure_utf8(&new);
+	
+	if (!history_hash)
+		history_hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+	history_remove(new);
+
+	history = g_list_prepend(history, new);
+	if (!history_tail)
+		history_tail = history;
+	g_hash_table_insert(history_hash, new, history);
+
+	history_free--;
+	if (history_free == -1)
+	{
+		g_return_if_fail(history_tail != NULL);
+		history_remove((char *) history_tail->data);
+	}
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -478,6 +528,56 @@ static void activate_edit(GtkMenuShell *item, gpointer data)
 	bookmarks_edit();
 }
 
+static gint cmp_dirname(gconstpointer a, gconstpointer b)
+{
+	return g_utf8_collate(*(gchar **) a, *(gchar **) b);
+}
+
+static GtkWidget *build_history_menu(FilerWindow *filer_window)
+{
+	GtkWidget *menu;
+	GPtrArray *items;
+	GList	  *next;
+	int	  i;
+
+	menu = gtk_menu_new();
+
+	if (!history)
+		return menu;
+
+	g_return_val_if_fail(history_hash != NULL, menu);
+	g_return_val_if_fail(history_tail != NULL, menu);
+	
+	items = g_ptr_array_new();
+
+	for (next = history; next; next = next->next)
+		g_ptr_array_add(items, next->data);
+
+	g_ptr_array_sort(items, cmp_dirname);
+
+	for (i = 0; i < items->len; i++)
+	{
+		GtkWidget *item;
+		const char *path = (char *) items->pdata[i];
+
+		item = gtk_menu_item_new_with_label(path);
+
+		if (strcmp(path, filer_window->sym_path) == 0)
+			gtk_widget_set_sensitive(item, FALSE);
+		else
+			g_signal_connect(item, "activate",
+					G_CALLBACK(bookmarks_activate),
+					filer_window);
+
+		gtk_widget_show(item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	}
+
+	g_ptr_array_free(items, TRUE);
+
+	return menu;
+}
+
 /* Builds the bookmarks' menu. Done whenever the bookmarks icon has been
  * clicked.
  */
@@ -501,6 +601,12 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 	g_signal_connect(item, "activate", G_CALLBACK(activate_edit), NULL);
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+
+	item = gtk_menu_item_new_with_label(_("Recently Visited"));
+	gtk_widget_show(item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
+			build_history_menu(filer_window));
 
 	/* Now add all the bookmarks to the menu */
 
