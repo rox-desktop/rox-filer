@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.8\n"
-"POT-Creation-Date: 2001-12-29 15:10+0000\n"
+"Project-Id-Version: ROX-Filer 1.1.10\n"
+"POT-Creation-Date: 2001-12-30 02:15-0300\n"
 "PO-Revision-Date: 2001-11-05\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -220,7 +220,7 @@ msgstr "Anular"
 
 #: action.c:1019
 msgid "Don't confirm every operation"
-msgstr ""
+msgstr "No confirmar cada operación"
 
 #: action.c:1063
 #, c-format
@@ -311,6 +311,8 @@ msgid ""
 "!%s\n"
 "Failed to copy '%s'"
 msgstr ""
+"!%s\n"
+"Falló la copia de '%s'"
 
 #: action.c:1530
 #, c-format
@@ -332,11 +334,12 @@ msgid "'Moving %s as %s\n"
 msgstr "'Moviendo %s a %s\n"
 
 #: action.c:1577
-#, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Failed to move %s as %s\n"
-msgstr "!ERROR: Imposible mover %s a %s\n"
+msgstr ""
+"!%s\n"
+"Fallé en mover %s a %s\n"
 
 #: action.c:1614
 msgid "!ERROR: Can't copy object into itself\n"
@@ -378,18 +381,20 @@ msgid "?Unmount %s?\n"
 msgstr "?Desmontar %s?\n"
 
 #: action.c:1700
-#, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Mount failed\n"
-msgstr "!ERROR: No se pudo montar\n"
+msgstr ""
+"!%s\n"
+"Falló el montaje\n"
 
 #: action.c:1701
-#, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Unmount failed\n"
-msgstr "!ERROR: No se pude desmontar\n"
+msgstr ""
+"!%s\n"
+"Falló el desmontaje\n"
 
 #: action.c:1747
 #, c-format
@@ -487,7 +492,6 @@ msgid "Force"
 msgstr "Forzar"
 
 #: action.c:2076
-#, fuzzy
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "No confirmar la eliminación de elementos protegidos contra escritura."
 
@@ -496,9 +500,8 @@ msgid "Brief"
 msgstr "Breve"
 
 #: action.c:2079
-#, fuzzy
 msgid "Only log directories being deleted"
-msgstr "Breve - sólo mostrar los directorios que están siendo borrados"
+msgstr "Sólo mostrar los directorios que están siendo borrados"
 
 #: action.c:2095
 msgid "You need to select the items whose permissions you want to change"
@@ -525,16 +528,14 @@ msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Acceso público, sin escritura)"
 
 #: action.c:2122
-#, fuzzy
 msgid "Don't list processed files"
-msgstr "Breve - no listar los archivos procesados"
+msgstr "No listar los archivos procesados"
 
 #: action.c:2125 tips:102
 msgid "Recurse"
 msgstr "Recursivo"
 
 #: action.c:2125
-#, fuzzy
 msgid "Also change contents of subdirectories"
 msgstr "Modificar también el contenido de los subdirectorios."
 
@@ -635,11 +636,11 @@ msgstr "Error del protocolo XDS: el nombre del archivo no puede contener '/'\n"
 
 #: dnd.c:741
 msgid ""
-"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
-"plain) did not contain a leafname\n"
+"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type "
+"text/plain) did not contain a leafname\n"
 msgstr ""
-"Destino XdndDirectSave0 provisto, pero el átomo XdndDirectSave0 (tipo text/"
-"plain) no contiene un nombre de archivo\n"
+"Destino XdndDirectSave0 provisto, pero el átomo XdndDirectSave0 (tipo "
+"text/plain) no contiene un nombre de archivo\n"
 
 #: dnd.c:752
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
@@ -650,8 +651,8 @@ msgstr ""
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
-"Lo siento - Necesito un destino de tipo text/uri-list o application/octet-"
-"stream."
+"Lo siento - Necesito un destino de tipo text/uri-list o "
+"application/octet-stream."
 
 #: dnd.c:854
 msgid "Unknown target"
@@ -718,14 +719,13 @@ msgid "Directory missing/deleted"
 msgstr "Directorio ausente/borrado"
 
 #: filer.c:971
-#, fuzzy, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later."
 msgstr ""
-"El grupo %d no está definido. Selecciona algunos archivos y presiona Ctrl+%d "
-"para definir el grupo. Presiona %d para seleccionar de nuevo los archivos "
-"luego."
+"El grupo %s no está definido. Selecciona algunos archivos y presiona Ctrl+%s "
+"para definir el grupo. Presiona %s para seleccionar de nuevo los archivos "
+"después."
 
 #: filer.c:1143
 #, c-format
@@ -738,17 +738,16 @@ msgid "Directory '%s' not found."
 msgstr "El directorio '%s' no fue encontrado."
 
 #: filer.c:1793
-#, fuzzy
 msgid "Scanning, "
-msgstr " (Explorando)"
+msgstr "Explorando, "
 
 #: filer.c:1794
 msgid "All, "
-msgstr ""
+msgstr "Todo, "
 
 #: filer.c:1795
 msgid "Thumbs, "
-msgstr ""
+msgstr "Miniaturas, "
 
 #: filer.c:2044 menu.c:1820
 msgid "Item no longer exists!"
@@ -979,6 +978,8 @@ msgid ""
 "\n"
 "--- next error ---\n"
 msgstr ""
+"\n"
+"--- siguiente error ---\n"
 
 #: gui_support.c:430
 #, c-format
@@ -1000,8 +1001,8 @@ msgid ""
 msgstr ""
 "Error en el archivo '%s' en la línea %d: \n"
 "\"%s\"\n"
-"Esto puede deberse a una actualización a partir de una versión previa de ROX-"
-"Filer. Abre la ventana Opciones y pulsa en Guardar.\n"
+"Esto puede deberse a una actualización a partir de una versión previa de "
+"ROX-Filer. Abre la ventana Opciones y pulsa en Guardar.\n"
 "Los errores posteriores serán ignorados."
 
 #: i18n.c:154
@@ -1172,61 +1173,6 @@ msgstr "Aplicación de ROX"
 msgid "Mount point"
 msgstr "Punto de montaje"
 
-#: main.c:94
-msgid ""
-"Copyright (C) 2001 Thomas Leonard.\n"
-"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
-"to the extent permitted by law.\n"
-"You may redistribute copies of ROX-Filer\n"
-"under the terms of the GNU General Public License.\n"
-"For more information about these matters, see the file named COPYING.\n"
-msgstr ""
-
-#: main.c:103
-msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
-msgstr ""
-
-#: main.c:106
-msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
-msgstr ""
-
-#: main.c:108
-msgid ""
-"NOTE: Your system does not support long options - \n"
-"you must use the short versions instead.\n"
-"\n"
-msgstr ""
-
-#: main.c:112
-msgid ""
-"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
-"Open each directory or file listed, or the current working\n"
-"directory if no arguments are given.\n"
-"\n"
-"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
-"  -c, --client-id=ID\tused for session management\n"
-"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
-"  -D, --close=DIR\tclose DIR and its subdirectories\n"
-"  -h, --help\t\tdisplay this help and exit\n"
-"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
-"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
-"  -n, --new\t\tstart a new filer, even if already running\n"
-"  -o, --override\toverride window manager control of panels\n"
-"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
-"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
-"  -R, --RPC\t\tinvoke method call read from stdin\n"
-"  -s, --show=FILE\topen a directory showing FILE\n"
-"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
-"  -u, --user\t\tshow user name in each window \n"
-"  -v, --version\t\tdisplay the version information and exit\n"
-"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
-"\n"
-"The latest version can be found at:\n"
-"\thttp://rox.sourceforge.net\n"
-"\n"
-"Report bugs to <tal197@users.sourceforge.net>.\n"
-msgstr ""
-
 #: main.c:376
 #, c-format
 msgid "Running as user '%s'"
@@ -1237,13 +1183,12 @@ msgid "features set at compile time"
 msgstr "funcionalidades definidas en tiempo de compilación"
 
 #: main.c:543
-#, fuzzy
 msgid "Old VFS support"
-msgstr "Soporte VFS"
+msgstr "Soporte de VFS antiguo"
 
 #: main.c:548
 msgid "No (incompatible with Large File Support)"
-msgstr ""
+msgstr "No (incompatible con el Soporte para Archivos Grandes)"
 
 #: main.c:550
 msgid "No (couldn't find a valid libvfs)"
@@ -1322,9 +1267,8 @@ msgid "Show Hidden"
 msgstr "Mostrar Ocultos"
 
 #: menu.c:217
-#, fuzzy
 msgid "Show Thumbnails"
-msgstr "Mostrar archivos ocultos"
+msgstr "Mostrar Miniaturas"
 
 #: menu.c:220
 msgid "Copy..."
@@ -1762,7 +1706,7 @@ msgstr "Error desconocido"
 #: remote.c:767
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr ""
+msgstr "Intento de invocar un método SOAP desconocido '%s'"
 
 #: rox_gettext.c:93
 #, c-format
@@ -1773,8 +1717,8 @@ msgstr "Archivo de traducción .gmo no válido (demasiado corto): %s"
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr ""
-"Archivo de traducción .gmo no válido (no se encontró el número mágico GNU): %"
-"s"
+"Archivo de traducción .gmo no válido (no se encontró el número mágico GNU): "
+"%s"
 
 #: run.c:94 run.c:135
 #, c-format
@@ -1950,7 +1894,7 @@ msgstr "Tamaño"
 msgid "Change icon size"
 msgstr "Cambiar el tamaño del ícono"
 
-#: tips:30 toolbar.c:128
+#: tips:30 toolbar.c:128/
 msgid "Details"
 msgstr "Detalles"
 
@@ -2210,7 +2154,7 @@ msgstr "Traducción"
 
 #: tips:2
 msgid "Display messages in..."
-msgstr ""
+msgstr "Mostrar mensajes en..."
 
 #: tips:4
 msgid "Dutch"
@@ -2218,7 +2162,7 @@ msgstr "Alemán"
 
 #: tips:5
 msgid "English (no translation)"
-msgstr ""
+msgstr "Inglés (sin traducción)"
 
 #: tips:6
 msgid "French"
@@ -2250,7 +2194,7 @@ msgstr "Español"
 
 #: tips:13
 msgid "Use the LANG environment variable"
-msgstr ""
+msgstr "Utilizar la variable de entorno LANG"
 
 #: tips:15
 msgid "Ignore case when sorting"
@@ -2343,15 +2287,16 @@ msgstr ""
 "también son mostrados, sino son ocultados."
 
 #: tips:44
-#, fuzzy
 msgid "Show image thumbnails"
-msgstr "Mostrar detalles adicionales"
+msgstr "Mostrar miniaturas de las imágenes"
 
 #: tips:45 tips:46
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
 msgstr ""
+"Cargar cada imágen y mostrarla escalada en la ventana del filer "
+"en lugar del ícono normal."
 
 #: tips:47
 msgid "Pinboard"
@@ -2410,9 +2355,8 @@ msgid "Background"
 msgstr "Fondo"
 
 #: tips:60
-#, fuzzy
 msgid "Single-click to open"
-msgstr "Navegación con una sóla pulsación"
+msgstr "Una sóla pulsación para abrir"
 
 #: tips:61 tips:130
 msgid ""
@@ -2653,8 +2597,8 @@ msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
 msgstr ""
-"El mayor tamaño, como porcentaje del tamaño de la pantalla, al cual el auto-"
-"redimensionador redimensionará una ventana."
+"El mayor tamaño, como porcentaje del tamaño de la pantalla, al cual el "
+"auto-redimensionador redimensionará una ventana."
 
 #: tips:125
 msgid "Unique windows"
@@ -2683,9 +2627,8 @@ msgstr ""
 "con el botón 3 (del medio) reutilizará la ventana actual."
 
 #: tips:129
-#, fuzzy
 msgid "Single-click navigation in filer windows"
-msgstr "Navegación con una sóla pulsación"
+msgstr "Navegación con una sóla pulsación en las ventanas del filer"
 
 #: tips:131
 msgid "Beep if Tab-completion fails"
@@ -2926,7 +2869,6 @@ msgstr ""
 "existe o un archivo que el filer no tiene permiso de examinar."
 
 #: tips:183
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type\n"
 "for each regular file, and then chooses a suitable icon for that type.\n"
@@ -2934,7 +2876,9 @@ msgid ""
 "filer."
 msgstr ""
 "El filer utiliza un conjunto de reglas para averigüar el tipo MIME\n"
-"correcto para cada archivo, luego elige un ícono adecuado para ese tipo."
+"correcto para cada archivo regular, luego elige un ícono adecuado para ese tipo.\n"
+"Después de editar los archivos, pulsa el botón de actualización abajo, o reinicia "
+"el filer."
 
 #: tips:184
 msgid "Show name-to-type rules"
@@ -2949,89 +2893,4 @@ msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
 "Usa el diálogo 'Definir Icono...' para definir el ícono para cada tipo."
 
-#~ msgid "!ERROR: %s\n"
-#~ msgstr "!ERROR: %s\n"
 
-#~ msgid "Force - don't confirm deletion of non-writeable items"
-#~ msgstr ""
-#~ "Forzar - no confirmar el borrado de elementos protegidos contra escritura"
-
-#~ msgid "Recurse - also change contents of subdirectories"
-#~ msgstr "Recursivo - también modificar el contenido de los subdirectorios"
-
-#~ msgid "Copy failed"
-#~ msgstr "La copia falló"
-
-#~ msgid "From LANG"
-#~ msgstr "A partir de la variable LANG"
-
-#~ msgid "Mouse bindings"
-#~ msgstr "Comportamiento del ratón"
-
-#~ msgid ""
-#~ "After editing the files, click the reload button below, or\n"
-#~ "restart the filer."
-#~ msgstr ""
-#~ "Después de editar los archivos pulsa el botón releer que está más abajo, "
-#~ "o\n"
-#~ "reinicia el filer."
-
-#~ msgid "Create Thumbs"
-#~ msgstr "Crear Miniaturas"
-
-#, fuzzy
-#~ msgid "%s: You cannot do this to more than one item at a time"
-#~ msgstr "No puedes hacer ésto a más de un elemento a la vez"
-
-#~ msgid "You must select a single file to open as a Virtual File System"
-#~ msgstr ""
-#~ "Tienes que seleccionar un archivo para abrirlo como Virtual File System"
-
-#~ msgid "Failed to fork() child process"
-#~ msgstr "Falló el fork() al proceso hijo"
-
-#~ msgid "Failed to fork() child"
-#~ msgstr "Falló el fork() del hijo"
-
-#~ msgid "Notice"
-#~ msgstr "Aviso"
-
-#~ msgid ""
-#~ "Restart\n"
-#~ "Applet"
-#~ msgstr ""
-#~ "Reiniciar\n"
-#~ "Applet"
-
-#~ msgid "Device file"
-#~ msgstr "Archivo de dispositivo"
-
-#~ msgid "Named pipe"
-#~ msgstr "Tubería con nombre"
-
-#~ msgid "Application"
-#~ msgstr "Aplicación"
-
-#~ msgid "fork() failed"
-#~ msgstr "fork() falló"
-
-#~ msgid "ROX-Filer: file(1) says..."
-#~ msgstr "ROX-Filer: file(1) dice..."
-
-#~ msgid "Saving options"
-#~ msgstr "Guardando las opciones"
-
-#~ msgid "Error saving panel"
-#~ msgstr "Error guardando el panel"
-
-#~ msgid "Error saving pinboard"
-#~ msgstr "Error guardando el pinboard"
-
-#~ msgid "Error saving globicons"
-#~ msgstr "Error al guardar los globicons"
-
-#~ msgid "Path: "
-#~ msgstr "Ruta: "
-
-#~ msgid "Error (eg. orphan symlink)"
-#~ msgstr "Error (por ejemplo, enlace simbólico huérfano)"

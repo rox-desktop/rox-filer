@@ -39,6 +39,8 @@
 #define MINIMUM_ITEMS 16
 #define AUTOSCROLL_STEP 20
 
+#define MAX_WINKS 3		/* Should be an odd number */
+
 /* Macro to emit the "selection_changed" signal only if allowed */
 #define EMIT_SELECTION_CHANGED(collection, time) \
 	if (!collection->block_selection_changed) \
@@ -552,6 +554,17 @@ static void collection_size_request(GtkWidget *widget,
 #endif
 }
 
+static gboolean scroll_after_alloc(Collection *collection)
+{
+	if (collection->wink_item != -1)
+		scroll_to_show(collection, collection->wink_item);
+	else if (collection->cursor_item != -1)
+		scroll_to_show(collection, collection->cursor_item);
+	g_object_unref(G_OBJECT(collection));
+
+	return FALSE;
+}
+
 static void collection_size_allocate(GtkWidget *widget,
 				GtkAllocation *allocation)
 {
@@ -616,6 +629,12 @@ static void collection_size_allocate(GtkWidget *widget,
 	{
 		/* Need to go around again... */
 		gtk_widget_queue_resize(widget);
+	}
+	else if (collection->wink_item != -1 || collection->cursor_item != -1)
+	{
+		/* Viewport resets the adjustments after the alloc */
+		g_object_ref(G_OBJECT(collection));
+		g_idle_add((GSourceFunc) scroll_after_alloc, collection);
 	}
 #endif
 }
@@ -2141,7 +2160,7 @@ void collection_wink_item(Collection *collection, gint item)
 	}
 
 	collection->cursor_item_old = collection->wink_item = item;
-	collection->winks_left = 3;
+	collection->winks_left = MAX_WINKS;
 
 	collection->wink_timeout = gtk_timeout_add(70,
 					   (GtkFunction) wink_timeout,

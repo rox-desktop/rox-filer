@@ -594,9 +594,6 @@ void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 	g_return_if_fail(filer_window != NULL);
 	col = filer_window->collection;
 	
-	g_free(filer_window->auto_select);
-	filer_window->auto_select = NULL;
-
 	for (i = 0; i < col->number_of_items; i++)
 	{
 		DirItem *item = (DirItem *) col->items[i].data;
@@ -607,11 +604,16 @@ void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 				collection_set_cursor_item(col, i);
 			else
 				collection_wink_item(col, i);
-			return;
+			leaf = NULL;
+			goto out;
 		}
 	}
 	
-	filer_window->auto_select = g_strdup(leaf);
+out:
+	if (leaf)
+		leaf = g_strdup(leaf);
+	g_free(filer_window->auto_select);
+	filer_window->auto_select = leaf;
 }
 
 gboolean display_is_truncated(FilerWindow *filer_window, int i)

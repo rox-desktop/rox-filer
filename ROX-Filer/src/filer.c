@@ -403,42 +403,17 @@ static void update_display(Directory *dir,
 {
 	int	old_num;
 	int	i;
-	int	cursor = filer_window->collection->cursor_item;
-	char	*as;
 	Collection *collection = filer_window->collection;
 
 	switch (action)
 	{
 		case DIR_ADD:
-			as = filer_window->auto_select;
-
 			old_num = collection->number_of_items;
 			for (i = 0; i < items->len; i++)
 			{
 				DirItem *item = (DirItem *) items->pdata[i];
 
 				add_item(filer_window, item);
-
-				if (cursor != -1 || !as)
-					continue;
-
-				if (strcmp(as, item->leafname) != 0)
-					continue;
-
-				cursor = collection->number_of_items - 1;
-				if (filer_window->had_cursor)
-				{
-					collection_set_cursor_item(collection,
-							cursor);
-					filer_window->mini_cursor_base = cursor;
-					filer_window->had_cursor = FALSE;
-				}
-				else
-					collection_wink_item(collection,
-							cursor);
-
-				g_free(filer_window->auto_select);
-				filer_window->auto_select = NULL;
 			}
 
 			if (old_num != collection->number_of_items)
@@ -462,15 +437,21 @@ static void update_display(Directory *dir,
 				gdk_window_set_cursor(
 						filer_window->window->window,
 						NULL);
+			set_scanning_display(filer_window, FALSE);
+			toolbar_update_info(filer_window);
+			open_filer_window(filer_window);
+
 			if (filer_window->had_cursor &&
 					collection->cursor_item == -1)
 			{
 				collection_set_cursor_item(collection, 0);
 				filer_window->had_cursor = FALSE;
 			}
-			set_scanning_display(filer_window, FALSE);
-			toolbar_update_info(filer_window);
-			open_filer_window(filer_window);
+			if (filer_window->auto_select)
+				display_set_autoselect(filer_window,
+						filer_window->auto_select);
+			g_free(filer_window->auto_select);
+			filer_window->auto_select = NULL;
 
 			if (filer_window->thumb_queue)
 				start_thumb_scanning(filer_window);
@@ -1512,6 +1493,9 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_box_pack_start(GTK_BOX(vbox), viewport, TRUE, TRUE, 0);
 		filer_window->scrollbar = gtk_vscrollbar_new(adj);
 		gtk_widget_set_usize(viewport, 4, 4);
+
+		gtk_container_set_resize_mode(GTK_CONTAINER(viewport),
+						GTK_RESIZE_IMMEDIATE);
 	}
 #else
 	gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
