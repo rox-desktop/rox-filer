@@ -29,7 +29,7 @@
  *   is a name/value pair, and these are stored in the 'loading' hash table.
  *
  * - Each part of the filer then calls option_add_int(), or a related function,
- *   supplying the name for the option and a default value. Once an option is
+ *   supplying the name for each option and a default value. Once an option is
  *   registered, it is removed from the loading table.
  *
  * - If things need to happen when values change, modules register with
@@ -39,8 +39,8 @@
  *   before the Options box is displayed) to tell the system how to render a
  *   particular type of option.
  *
- * - All notify callbacks are called. Use the Option->has_changed field
- *   to work out what has changed from the defaults.
+ * - Finally, all notify callbacks are called. Use the Option->has_changed
+ *   field to work out what has changed from the defaults.
  *
  * When the user opens the Options box:
  *
@@ -51,17 +51,19 @@
  * - For each widget in the box, the current value of the option is used to
  *   set the widget's state.
  *
- * When the user clicks Save/OK:
+ * - All current values are saved for a possible Revert later.
  *
- * - The state of each widget is copied to the options values.
+ * When the user changes an option or clicks on Revert:
+ *
+ * - The option values are updated.
  *
  * - All notify callbacks are called. Use the Option->has_changed field
  *   to see what changed.
  *
- * - If Save or OK was clicked then the box is also closed.
+ * When Save is clicked:
  *
- * - If Save was clicked then the options are written to the filesystem and the
- *   saver_callbacks are called.
+ * - All the options are written to the filesystem and the saver_callbacks are
+ *   called.
  */
 
 #include "config.h"
