@@ -1,9 +1,5 @@
 #!/bin/sh
 
-if [ -n "$CHOICESPATH" ]; then
-	CHOICESPATH=${HOME}/Choices:/usr/local/share/Choices:/usr/share/Choices
-fi
-
 die() {
 	echo "$*" >&2
 	echo "Aborting..." >&2
@@ -28,17 +24,6 @@ confirm_or_die() {
 	done
 }
 
-# Installs a file in Choices if it isn't there already.
-install_if_missing() {
-	dest="$CHOICES/$1"
-	if [ -f "$CHOICES/$1" ]; then
-		echo "'$dest' already exists - skipping..."
-	else
-		echo "Installing '$dest'"
-		cp "Choices/$1" $dest
-	fi
-}
-
 cd `dirname $0`
 
 ./ROX-Filer/AppRun -v 2> /dev/null
@@ -60,76 +45,9 @@ umask 022
 
 cat << EOF
 
+**************************************************************************
 
-ROX-Filer comes with some icons and other defaults. These should be
-installed where it can find them. By default, it looks in
-	\${HOME}/Choices (${HOME}/Choices in your case)
-	/usr/local/share/Choices
-	/usr/share/Choices
-in that order. You can choose a different search path by setting
-the CHOICESPATH environment variable before running the filer.
-
-Which Choices directory would you like to use? Option (1) is recommended
-if you have root access; otherwise option (2) is best.
-
-1) /usr/local/share/Choices
-2) ${HOME}/Choices
-3) /usr/share/Choices
-
-Enter 1, 2, 3 or a path (starting with /):
-EOF
-printf ">>> "
-
-read REPLY
-echo
-
-case $REPLY in
-	1) CHOICES=/usr/local/share/Choices;;
-	2) CHOICES=${HOME}/Choices;;
-	3) CHOICES=/usr/share/Choices;;
-	/*) CHOICES="$REPLY"
-	    CHOICESPATH="${CHOICES}:${CHOICESPATH}"
-	    echo "*** NOTE that if you install into a non-standard Choices "
-	    echo "*** directory then you must ensure that CHOICESPATH is set "
-	    echo "*** correctly before running the filer!"
-	    echo
-	    export CHOICESPATH;;
-	*) die "Invalid choice!";;
-esac
-
-echo "Default icons and run actions will be installed into '$CHOICES'."
-
-endir "$CHOICES"
-
-if [ -d "$CHOICES/MIME-icons" ]; then
-	cat << EOF
-WARNING: You already have a $CHOICES/MIME-icons
-directory --- any icons you have modified will be overwritten!
-
-Continue?
-EOF
-	confirm_or_die
-fi
-
-endir "$CHOICES/MIME-icons"
-endir "$CHOICES/MIME-info"
-endir "$CHOICES/MIME-types"
-
-echo "Installing icons..."
-cp Choices/MIME-icons/* "$CHOICES/MIME-icons"
-
-echo
-echo "Installing handlers..."
-install_if_missing MIME-types/application_postscript
-install_if_missing MIME-types/text
-
-echo "Installing rules for guessing MIME types."
-cp Choices/MIME-info/Standard "$CHOICES/MIME-info"
-
-cat << EOF
-
-
-Where would you like to install the filer itself?
+Where would you like to install the filer?
 Normally, you should choose (1) if you have root access, or (2) if not.
 
 1) /usr/local/apps
@@ -169,10 +87,6 @@ else
 	echo "OK, I'll leave it where it is."
 	APPDIR=`pwd`
 fi
-
-echo Making ROX-Filer the default handler for directories...
-rm "$CHOICES/MIME-types/special_directory" 2> /dev/null
-ln -s "$APPDIR/ROX-Filer" "$CHOICES/MIME-types/special_directory"
 
 cat << EOF
 
@@ -222,12 +136,62 @@ else
 	cat << EOF
 OK, skipping installation of the 'rox' script.
 
-******  To run the filer in future, use:
-******  \$ $APPDIR/ROX-Filer/AppRun
+Note: To run the filer in future, you must use:
+
+	\$ $APPDIR/ROX-Filer/AppRun
 EOF
 fi
 
+if [ ! -n "$CHOICESPATH" ]; then
+	CHOICESPATH=${HOME}/Choices:/usr/local/share/Choices:/usr/share/Choices
+fi
+
 cat << EOF
+
+
+ROX-Filer requires some icons and other defaults. These should be
+installed where it can find them. By default, it looks in
+	\${HOME}/Choices (${HOME}/Choices in your case)
+	/usr/local/share/Choices
+	/usr/share/Choices
+in that order. You can choose a different search path by setting
+the CHOICESPATH environment variable before running the filer. These
+files are supplied in the 'rox-base' package. Make sure you have the
+latest version installed!
+
+EOF
+
+IFS=":"
+REPORT="I couldn't find the required files!"
+
+for DIR in $CHOICESPATH; do
+  if [ ! -n "$DIR" ]; then
+    continue
+  fi
+  
+  echo Looking for files in $DIR...
+
+  if [ -f "$DIR/MIME-icons/special_executable.xpm" ]; then
+    REPORT=""
+    echo "Found them!"
+    break
+  elif [ -d "$DIR/MIME-icons" ]; then
+    REPORT="I found an old installation in $DIR, but not the latest version."
+  fi
+done
+
+if [ -n "$REPORT" ]; then
+  echo
+  echo $REPORT
+  echo "Please download and install the latest version of the rox-base package"
+  echo "from http://rox.sourceforge.net before using the filer!"
+  echo
+  echo "Continue?"
+  confirm_or_die
+fi
+
+cat << EOF
+
 
 	****************************
 	*** Now read the manual! ***
@@ -236,5 +200,4 @@ cat << EOF
 Run ROX and click on the information icon on the toolbar:
 
 	\$ rox &
-
 EOF

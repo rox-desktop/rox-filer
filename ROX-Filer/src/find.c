@@ -812,7 +812,7 @@ static void free_constant(Eval *eval)
 /*	PARSING		*/
 
 /* Parse something that evaluates to a number.
- * This function tried to get a constant - if it fails then it tries
+ * This function tries to get a constant - if it fails then it tries
  * interpreting the next token as a variable.
  */
 static Eval *parse_eval(guchar **expression)
