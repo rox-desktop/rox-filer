@@ -163,10 +163,10 @@
   <procedure><title>To compile:</title>
 
    <step><para>
-     The filer needs some shared files to work &mdash; icons for the various
-     file types, rules for determining file types and default run actions.
-     These are installed by the `rox-base' package. Install rox-base (from
-     <ulink url="http://rox.sourceforge.net"/> now if you haven't done so already.
+     The filer now uses the Shared MIME Database<citation>SharedMIME</citation>
+     to work out the types of files. You need to install this before the
+     filer will work properly (ROX-Filer will warn you if it's not installed
+     when you run it).
    </para></step>
 
    <step><para>
@@ -197,7 +197,8 @@
    <step><para>
      Once the filer has compiled you will be asked where you want to install
      it. If you want to do a system-wide installation as root, you may
-     want to stop here, <command>su</command> to root and rerun the install script.
+     want to stop here, <command>su</command> to root and rerun the install
+     script.
 
      If you don't have the root password then don't worry &mdash; just follow
      the instructions for installing into your home directory.
@@ -205,9 +206,8 @@
   </procedure>
 
   <para>
-
-   You can now run the filer by running the <command>rox</command> script without
-   any options, like this:
+   You can now run the filer by running the <command>rox</command> script
+   without any options, like this:
 
    <screen>$ rox</screen>
 
