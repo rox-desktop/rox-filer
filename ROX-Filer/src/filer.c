@@ -227,6 +227,26 @@ static void filer_window_autosize_request(FilerWindow *filer_window, int t)
 				filer_window);
 }
 
+/* Return the number of items due to be merged into this directory. */
+static int filer_count_pending(FilerWindow *filer_window)
+{
+	GPtrArray *items = filer_window->directory->new_items;
+	int i, n = 0;
+
+	if (filer_window->show_hidden)
+		return items->len;
+	
+	for (i = 0; i < items->len; i++)
+	{
+		DirItem	*item = (DirItem *) items->pdata[i];
+
+		if (item->leafname[0] != '.')
+			n += 1;
+	}
+
+	return n;
+}
+
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 {
 	Collection	*collection = filer_window->collection;
@@ -246,7 +266,7 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 
 	/* Include items that are about to be added... */
 	if (filer_window->scanning)
-		n += filer_window->directory->new_items->len;
+		n += filer_count_pending(filer_window);
 
 	n = MAX(n, 2);
 
