@@ -468,10 +468,14 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
 			new = bigger ? HUGE_ICONS : SMALL_ICONS;
 			break;
 		case HUGE_ICONS:
-			new = bigger ? SMALL_ICONS : LARGE_ICONS;
+			if (bigger)
+				return;
+			new = LARGE_ICONS;
 			break;
 		default:
-			new = bigger ? LARGE_ICONS : HUGE_ICONS;
+			if (!bigger)
+				return;
+			new = LARGE_ICONS;
 			break;
 	}
 
