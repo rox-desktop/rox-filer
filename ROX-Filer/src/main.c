@@ -162,6 +162,7 @@ int main(int argc, char **argv)
 
 	home_dir = g_get_home_dir();
 
+	mc_vfs_init();
 	gtk_init(&argc, &argv);
 
 	while (1)

@@ -21,6 +21,8 @@
 
 /* options.c - code for handling user choices */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>

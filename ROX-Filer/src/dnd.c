@@ -21,6 +21,8 @@
 
 /* dnd.c - code for handling drag and drop */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>

@@ -21,6 +21,8 @@
 
 /* minibuffer.c - for handling the path entry box at the bottom */
 
+#include "config.h"
+
 #include <string.h>
 
 #include <gtk/gtk.h>
@@ -263,7 +265,7 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 	if (strcmp(real, filer_window->path) != 0)
 	{
 		struct stat info;
-		if (stat(real, &info) == 0 && S_ISDIR(info.st_mode))
+		if (mc_stat(real, &info) == 0 && S_ISDIR(info.st_mode))
 			filer_change_to(filer_window, real, slash + 1);
 		else
 			gdk_beep();

@@ -21,6 +21,8 @@
 
 /* type.c - code for dealing with filetypes */
 
+#include "config.h"
+
 #include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>

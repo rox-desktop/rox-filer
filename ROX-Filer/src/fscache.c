@@ -28,6 +28,8 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
+
 #include "fscache.h"
 
 #define UPTODATE(data, info)				\
@@ -143,7 +145,7 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	g_return_val_if_fail(cache != NULL, NULL);
 	g_return_val_if_fail(pathname != NULL, NULL);
 
-	if (stat(pathname, &info))
+	if (mc_stat(pathname, &info))
 		return NULL;
 
 	key.device = info.st_dev;
@@ -210,7 +212,7 @@ void g_fscache_may_update(GFSCache *cache, char *pathname)
 	g_return_if_fail(pathname != NULL);
 	g_return_if_fail(cache->update != NULL);
 
-	if (stat(pathname, &info))
+	if (mc_stat(pathname, &info))
 		return;
 
 	key.device = info.st_dev;
@@ -238,7 +240,7 @@ void g_fscache_update(GFSCache *cache, char *pathname)
 	g_return_if_fail(pathname != NULL);
 	g_return_if_fail(cache->update != NULL);
 
-	if (stat(pathname, &info))
+	if (mc_stat(pathname, &info))
 		return;
 
 	key.device = info.st_dev;

@@ -21,6 +21,8 @@
 
 /* savebox.c - code for handling those Newdir/Copy/Rename boxes */
 
+#include "config.h"
+
 #include <glib.h>
 #include <gtk/gtk.h>
 

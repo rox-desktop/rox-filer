@@ -1,15 +1,13 @@
 SHELL = @SHELL@
 srcdir = @srcdir@
 PLATFORM_DIR = @bindir@
-GTK_CFLAGS = @GTK_CFLAGS@
-GTK_CONFIG = @GTK_CONFIG@
-GTK_LIBS = @GTK_LIBS@
+LIBS = @LIBS@
 .SUFFIXES:
 .SUFFIXES: .c .o
 
 CC = @CC@
 CFLAGS = @CFLAGS@ `gtk-config --cflags` -I.
-LDFLAGS = @LDFLAGS@ `gtk-config --libs`
+LDFLAGS = @LDFLAGS@ `gtk-config --libs` ${LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs

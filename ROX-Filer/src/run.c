@@ -21,6 +21,8 @@
 
 /* run.c */
 
+#include "config.h"
+
 #include <sys/stat.h>
 #include <errno.h>
 

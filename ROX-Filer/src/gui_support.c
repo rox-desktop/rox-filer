@@ -21,6 +21,8 @@
 
 /* gui_support.c - general (GUI) support routines */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>

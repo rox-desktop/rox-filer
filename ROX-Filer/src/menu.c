@@ -66,7 +66,7 @@ static char *xterm_here_value;
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void menu_closed(GtkWidget *widget);
-static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
+static void items_sensitive(gboolean state);
 static char *load_xterm_here(char *data);
 
 /* Note that for these callbacks none of the arguments are used. */
@@ -94,6 +94,10 @@ static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
+
+static void open_vfs_rpm(gpointer data, guint action, GtkWidget *widget);
+static void open_vfs_utar(gpointer data, guint action, GtkWidget *widget);
+static void open_vfs_uzip(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -129,6 +133,7 @@ static OptionsSection options =
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
+static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
@@ -158,6 +163,10 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Shift Open",   		NULL,  	open_file, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			"I",  	show_file_info, 0, NULL},
+{"/File/Open VFS",		NULL,   NULL, 0, "<Branch>"},
+{"/File/Open VFS/Unzip",	NULL,   open_vfs_uzip, 0, NULL},
+{"/File/Open VFS/Untar",	NULL,   open_vfs_utar, 0, NULL},
+{"/File/Open VFS/RPM",		NULL,   open_vfs_rpm, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/File/Mount",	    		"M",  	mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
@@ -233,6 +242,8 @@ void menu_init()
 	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
 	filer_file_menu = gtk_item_factory_get_widget(item_factory,
 			"<filer>/File");
+	filer_vfs_menu = gtk_item_factory_get_widget(item_factory,
+			"<filer>/File/Open VFS");
 	filer_hidden_menu = gtk_item_factory_get_widget(item_factory,
 			"<filer>/Display/Show Hidden");
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
@@ -336,19 +347,25 @@ static void save_options()
 }
 
 
-static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
+static void items_sensitive(gboolean state)
 {
+	int	n = 7;
 	GList	*items, *item;
 
-	items = gtk_container_children(GTK_CONTAINER(menu));
-
-	item = g_list_nth(items, from);
+	items = item = gtk_container_children(GTK_CONTAINER(filer_file_menu));
 	while (item && n--)
 	{
 		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
 		item = item->next;
 	}
+	g_list_free(items);
 
+	items = item = gtk_container_children(GTK_CONTAINER(filer_vfs_menu));
+	while (item)
+	{
+		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
+		item = item->next;
+	}
 	g_list_free(items);
 }
 
@@ -437,17 +454,17 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		case 0:
 			g_string_assign(buffer, "Next Click");
-			items_sensitive(file_menu, 0, 6, TRUE);
+			items_sensitive(TRUE);
 			break;
 		case 1:
-			items_sensitive(file_menu, 0, 6, TRUE);
+			items_sensitive(TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
 					basetype_name(file_item),
 					file_item->leafname);
 			break;
 		default:
-			items_sensitive(file_menu, 0, 6, FALSE);
+			items_sensitive(FALSE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
 			break;
@@ -1023,7 +1040,7 @@ static void app_show_help(char *path)
 
 	help_dir = g_strconcat(path, "/Help", NULL);
 	
-	if (stat(help_dir, &info))
+	if (mc_stat(help_dir, &info))
 		delayed_error("Application",
 			"This is an application directory - you can "
 			"run it as a program, or open it (hold down "
@@ -1107,6 +1124,48 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 			break;
 	}
 }
+
+#define OPEN_VFS(fs)		\
+static void open_vfs_ ## fs (gpointer data, guint action, GtkWidget *widget) \
+{							\
+	Collection 	*collection;			\
+							\
+	g_return_if_fail(window_with_focus != NULL);	\
+							\
+	collection = window_with_focus->collection;	\
+	if (collection->number_selected < 1)			\
+		collection_target(collection, target_callback,	\
+						open_vfs_ ## fs);	\
+	else								\
+		real_vfs_open(#fs);			\
+}
+
+static void real_vfs_open(char *fs)
+{
+	gchar		*path;
+	DirItem		*item;
+
+	if (window_with_focus->collection->number_selected != 1)
+	{
+		report_error("ROX-Filer", "You must select a single file "
+				"to open as a Virtual File System");
+		return;
+	}
+
+	item = selected_item(window_with_focus->collection);
+
+	path = g_strconcat(window_with_focus->path,
+			"/",
+			item->leafname,
+			"#", fs, NULL);
+
+	filer_change_to(window_with_focus, path, NULL);
+	g_free(path);
+}
+
+OPEN_VFS(rpm)
+OPEN_VFS(utar)
+OPEN_VFS(uzip)
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)
 {

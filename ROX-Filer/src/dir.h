@@ -80,6 +80,7 @@ struct _Directory
 	gboolean	done_some_scanning;	/* Read any items this scan? */
 	gint		idle;		/* Idle callback ID */
 	DIR		*dir_handle;	/* NULL => not scanning */
+	off_t		dir_start;	/* For seekdir() to beginning */
 
 	GPtrArray 	*items;		/* What our users know about */
 	GPtrArray	*new_items;	/* New items to add in */

@@ -21,6 +21,8 @@
 
 /* filer.c - code for handling filer windows */
 
+#include "config.h"
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

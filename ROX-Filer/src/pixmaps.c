@@ -21,9 +21,12 @@
 
 /* pixmaps.c - code for handling pixmaps */
 
+#include "config.h"
+
 /* Remove pixmaps from the cache when they haven't been accessed for
  * this period of time (seconds).
  */
+
 #define PIXMAP_PURGE_TIME 1200
 
 #include <stdlib.h>

@@ -19,6 +19,8 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
+
 #include <gtk/gtk.h>
 #include <errno.h>
 
@@ -112,7 +114,7 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 			{
 				if (dir->dir_handle)
 				{
-					closedir(dir->dir_handle);
+					mc_closedir(dir->dir_handle);
 					dir->dir_handle = NULL;
 					gtk_idle_remove(dir->idle);
 					merge_new(dir);
@@ -276,7 +278,7 @@ static void start_scanning(Directory *dir, char *pathname)
 		dir->error = NULL;
 	}
 
-	dir->dir_handle = opendir(pathname);
+	dir->dir_handle = mc_opendir(pathname);
 
 	if (!dir->dir_handle)
 	{
@@ -284,6 +286,8 @@ static void start_scanning(Directory *dir, char *pathname)
 				g_strerror(errno));
 		return;		/* Report on attach */
 	}
+
+	dir->dir_start = telldir(dir->dir_handle);
 
 	init_for_scan(dir);
 
@@ -343,7 +347,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 
 	tmp = make_path(dir->pathname, ent->d_name);
 	
-	if (lstat(tmp->str, &info) == -1)
+	if (mc_lstat(tmp->str, &info) == -1)
 		new.base_type = TYPE_ERROR;
 	else
 	{
@@ -374,7 +378,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 			new.base_type = TYPE_SOCKET;
 		else if (S_ISLNK(info.st_mode))
 		{
-			if (stat(tmp->str, &info))
+			if (mc_stat(tmp->str, &info))
 				new.base_type = TYPE_ERROR;
 			else
 			{
@@ -409,7 +413,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 		 * (to stop people putting an AppRun in, eg, /tmp)
 		 */
 		g_string_append(tmp, "/AppRun");
-		if (!stat(tmp->str, &info) && info.st_uid == uid)
+		if (!mc_stat(tmp->str, &info) && info.st_uid == uid)
 		{
 			MaskedPixmap *app_icon;
 
@@ -509,7 +513,7 @@ static gint idle_callback(Directory *dir)
 	
 	do
 	{
-		ent = readdir(dir->dir_handle);
+		ent = mc_readdir(dir->dir_handle);
 
 		if (!ent)
 		{
@@ -518,12 +522,12 @@ static gint idle_callback(Directory *dir)
 
 			if (dir->needs_update)
 			{
-				rewinddir(dir->dir_handle);
+				mc_seekdir(dir->dir_handle, dir->dir_start);
 				init_for_scan(dir);
 				return TRUE;
 			}
 
-			closedir(dir->dir_handle);
+			mc_closedir(dir->dir_handle);
 			dir->dir_handle = NULL;
 
 			return FALSE;		/* Stop */
@@ -562,7 +566,7 @@ static void destroy(Directory *dir)
 	g_print("[ destroy %p ]\n", dir);
 	if (dir->dir_handle)
 	{
-		closedir(dir->dir_handle);
+		mc_closedir(dir->dir_handle);
 		gtk_idle_remove(dir->idle);
 	}
 	g_ptr_array_free(dir->up_items, TRUE);

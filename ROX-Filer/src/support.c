@@ -21,6 +21,8 @@
 
 /* support.c - (non-GUI) useful routines */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <errno.h>
