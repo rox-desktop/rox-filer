@@ -457,8 +457,10 @@ static void panel_add_item(Panel *panel,
 		gtk_signal_connect_after(GTK_OBJECT(widget),
 				"enter-notify-event",
 				GTK_SIGNAL_FUNC(enter_icon), icon);
+#ifndef GTK2
 		gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
 				GTK_SIGNAL_FUNC(draw_icon), icon);
+#endif
 		gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
 				GTK_SIGNAL_FUNC(expose_icon), icon);
 		gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
