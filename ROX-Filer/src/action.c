@@ -312,29 +312,21 @@ static void show_condition_help(gpointer data)
 
 		frame = gtk_frame_new("Quick Start");
 		text = gtk_label_new(
-	"Just put the name of the file you're looking for in single quotes:\n"
-	"'index.html'	(to find a file called 'index.html')");
+"Just put the name of the file you're looking for in single quotes:\n"
+"'index.html'	(to find a file called 'index.html')");
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
 		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
-		frame = gtk_frame_new("Expression Syntax");
+		frame = gtk_frame_new("Examples");
 		text = gtk_label_new(
-	"An expression is a series of cases which are checked from left \n"
-	"to right. As soon as one matches, the expression is TRUE. If none \n"
-	"match then the expression is FALSE.\n"
-	"\n"
-	"Cases are separated by commas:\n"
-	"'*.htm', '*.html'	(finds HTML files)\n"
-	"\n"
-	"Each case is a list of conditions which must all be met for the \n"
-	"case to succeed:\n"
-	"IsReg 'core'	(finds a regular file called 'core')\n"
-	"Preceeding a condition by ! inverts the result of the condition.\n"
-	"A condition can also be a bracketed expression:\n"
-	"!(IsDir,IsReg)	(finds something that is neither a directory nor a \n"
-	"regualr file)");
+"'*.htm', '*.html'      (finds HTML files)\n"
+"IsDir 'lib'            (finds directories called 'lib')\n"
+"IsReg 'core'           (finds a regular file called 'core')\n"
+"! (IsDir, IsReg)       (is neither a directory nor a regualr file)\n"
+"mtime after 1 day ago and size > 1Mb   (big, and recently modified)");
+		gtk_widget_set_style(text, fixed_style);
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
@@ -342,15 +334,25 @@ static void show_condition_help(gpointer data)
 
 		frame = gtk_frame_new("Simple Tests");
 		text = gtk_label_new(
-	"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket\n"
-	"	(to check what kind of thing this is)\n"
-	"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable\n"
-	"	(to check the permissions)\n"
-	"IsEmpty, IsMine\n"
-	"\n"
-	"A pattern in single quotes is a shell-style wildcard pattern to \n"
-	"match. If it contains a slash then the match is agaist the full \n"
-	"path; otherwise it is agaist the leafname only.");
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable (permissions)"
+"\n"
+"IsEmpty, IsMine\n"
+"\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
+"contains a slash then the match is agaist the full path; otherwise it is \n"
+"agaist the leafname only.");
+		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_container_add(GTK_CONTAINER(frame), text);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+
+		frame = gtk_frame_new("Comparisons");
+		text = gtk_label_new(
+"<, <=, =, !=, >, >=, After, Before (compare two values)\n"
+"5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
+"2 secs|mins|hours|days|weeks|years  ago|hence (times)\n"
+"atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)");
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);

@@ -32,15 +32,23 @@
 #include <fnmatch.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <stdlib.h>
+#include <time.h>
 
 #include "main.h"
 #include "find.h"
+
+typedef struct _Eval Eval;
 
 /* Static prototypes */
 static FindCondition *parse_expression(guchar **expression);
 static FindCondition *parse_case(guchar **expression);
 static FindCondition *parse_condition(guchar **expression);
 static FindCondition *parse_match(guchar **expression);
+static FindCondition *parse_comparison(guchar **expression);
+static FindCondition *parse_is(guchar **expression);
+static Eval *parse_eval(guchar **expression);
+static Eval *parse_variable(guchar **expression);
 
 typedef enum {
 	IS_DIR,
@@ -60,6 +68,44 @@ typedef enum {
 	IS_EMPTY,
 	IS_MINE,
 } IsTest;
+
+typedef enum {
+	COMP_LT,
+	COMP_LE,
+	COMP_EQ,
+	COMP_NE,
+	COMP_GE,
+	COMP_GT,
+} CompType;
+
+typedef enum {
+	V_ATIME,
+	V_CTIME,
+	V_MTIME,
+	V_SIZE,
+	V_INODE,
+	V_NLINKS,
+	V_UID,
+	V_GID,
+	V_BLOCKS,
+} VarType;
+
+enum
+{
+	FLAG_AGO 	= 1 << 0,
+	FLAG_HENCE 	= 1 << 1,
+};
+
+typedef long (*EvalCalc)(Eval *eval, FindInfo *info);
+typedef void (*EvalFree)(Eval *eval);
+
+struct _Eval
+{
+	EvalCalc	calc;
+	EvalFree	free;
+	gpointer	data1;
+	gpointer	data2;
+};
 
 
 #define EAT ((*expression)++)
@@ -115,7 +161,8 @@ gboolean find_test_condition(FindCondition *condition, guchar *path)
 	slash = strrchr(path, '/');
 	info.leaf = slash ? slash + 1 : path;
 	if (lstat(path, &info.stats))
-		return FALSE;	/* XXX: Log error */
+		return FALSE;	/* XXX: Log error? */
+	time(&info.now);	/* FIXME: Not for each check! */
 
 	return condition->test(condition, &info);
 }
@@ -170,7 +217,7 @@ static gboolean test_is(FindCondition *condition, FindInfo *info)
 {
 	mode_t	mode = info->stats.st_mode;
 
-	switch ((IsTest) condition->data1)
+	switch ((IsTest) condition->value)
 	{
 		case IS_DIR:
 			return S_ISDIR(mode);
@@ -211,6 +258,34 @@ static gboolean test_is(FindCondition *condition, FindInfo *info)
 	return FALSE;
 }
 
+static gboolean test_comp(FindCondition *condition, FindInfo *info)
+{
+	Eval	*first = (Eval *) condition->data1;
+	Eval	*second = (Eval *) condition->data2;
+	long	a, b;
+
+	a = first->calc(first, info);
+	b = second->calc(second, info);
+
+	switch ((CompType) condition->value)
+	{
+		case COMP_LT:
+			return a < b;
+		case COMP_LE:
+			return a <= b;
+		case COMP_EQ:
+			return a == b;
+		case COMP_NE:
+			return a != b;
+		case COMP_GE:
+			return a >= b;
+		case COMP_GT:
+			return a > b;
+	}
+
+	return FALSE;
+}
+
 /*				FREEING CODE				*/
 
 /* Frees the structure and g_free()s both data items (NULL is OK) */
@@ -228,6 +303,19 @@ static void free_branch(FindCondition *condition)
 {
 	FindCondition	*first = (FindCondition *) condition->data1;
 	FindCondition	*second = (FindCondition *) condition->data2;
+
+	if (first)
+		first->free(first);
+	if (second)
+		second->free(second);
+	g_free(condition);
+}
+
+/* Treats data1 and data2 as evals (or NULL) and frees recursively */
+static void free_comp(FindCondition *condition)
+{
+	Eval	*first = (Eval *) condition->data1;
+	Eval	*second = (Eval *) condition->data2;
 
 	if (first)
 		first->free(first);
@@ -289,6 +377,8 @@ static FindCondition *parse_case(guchar **expression)
 	if (NEXT == '\0' || NEXT == ',' || NEXT == ')')
 		return first;
 
+	(void) MATCH("And");
+
 	second = parse_case(expression);
 	if (!second)
 	{
@@ -308,11 +398,10 @@ static FindCondition *parse_case(guchar **expression)
 static FindCondition *parse_condition(guchar **expression)
 {
 	FindCondition	*cond = NULL;
-	IsTest		test;
 
 	SKIP;
 
-	if (NEXT == '!')
+	if (NEXT == '!' || MATCH("Not"))
 	{
 		FindCondition *operand;
 		
@@ -354,37 +443,125 @@ static FindCondition *parse_condition(guchar **expression)
 		EAT;
 		return parse_match(expression);
 	}
-	else if (MATCH("IsReg"))
+
+	if (g_strncasecmp(*expression, "Is", 2) == 0)
+	{
+		EAT;
+		EAT;
+		return parse_is(expression);
+	}
+
+	return parse_comparison(expression);
+}
+
+static FindCondition *parse_comparison(guchar **expression)
+{
+	FindCondition	*cond = NULL;
+	Eval		*first;
+	Eval		*second;
+	CompType	comp;
+
+	SKIP;
+
+	first = parse_eval(expression);
+	if (!first)
+		return NULL;
+	
+	SKIP;
+	if (NEXT == '=')
+	{
+		comp = COMP_EQ;
+		EAT;
+	}
+	else if (NEXT == '>')
+	{
+		EAT;
+		if (NEXT == '=')
+		{
+			EAT;
+			comp = COMP_GE;
+		}
+		else
+			comp = COMP_GT;
+	}
+	else if (NEXT == '<')
+	{
+		EAT;
+		if (NEXT == '=')
+		{
+			EAT;
+			comp = COMP_LE;
+		}
+		else
+			comp = COMP_LT;
+	}
+	else if (NEXT == '!' && (*expression)[1] == '=')
+	{
+		EAT;
+		EAT;
+		comp = COMP_NE;
+	}
+	else if (MATCH("After"))
+		comp = COMP_GT;
+	else if (MATCH("Before"))
+		comp = COMP_LT;
+	else
+		return NULL;
+
+	SKIP;
+	second = parse_eval(expression);
+	if (!second)
+	{
+		first->free(first);
+		return NULL;
+	}
+
+	cond = g_new(FindCondition, 1);
+	cond->test = &test_comp;
+	cond->free = (FindFree) &free_comp;
+	cond->data1 = first;
+	cond->data2 = second;
+	cond->value = comp;
+
+	return cond;
+}
+
+static FindCondition *parse_is(guchar **expression)
+{
+	FindCondition	*cond;
+	IsTest		test;
+
+	if (MATCH("Reg"))
 		test = IS_REG;
-	else if (MATCH("IsLink"))
+	else if (MATCH("Link"))
 		test = IS_LNK;
-	else if (MATCH("IsDir"))
+	else if (MATCH("Dir"))
 		test = IS_DIR;
-	else if (MATCH("IsChar"))
+	else if (MATCH("Char"))
 		test = IS_CHR;
-	else if (MATCH("IsBlock"))
+	else if (MATCH("Block"))
 		test = IS_BLK;
-	else if (MATCH("IsDev"))
+	else if (MATCH("Dev"))
 		test = IS_DEV;
-	else if (MATCH("IsPipe"))
+	else if (MATCH("Pipe"))
 		test = IS_FIFO;
-	else if (MATCH("IsSocket"))
+	else if (MATCH("Socket"))
 		test = IS_SOCK;
-	else if (MATCH("IsSUID"))
+	else if (MATCH("SUID"))
 		test = IS_SUID;
-	else if (MATCH("IsSGID"))
+	else if (MATCH("SGID"))
 		test = IS_SGID;
-	else if (MATCH("IsSticky"))
+	else if (MATCH("Sticky"))
 		test = IS_STICKY;
-	else if (MATCH("IsReadable"))
+	else if (MATCH("Readable"))
 		test = IS_READABLE;
-	else if (MATCH("IsWriteable"))
+	else if (MATCH("Writeable"))
 		test = IS_WRITEABLE;
-	else if (MATCH("IsExecutable"))
+	else if (MATCH("Executable"))
 		test = IS_EXEC;
-	else if (MATCH("IsEmpty"))
+	else if (MATCH("Empty"))
 		test = IS_EMPTY;
-	else if (MATCH("IsMine"))
+	else if (MATCH("Mine"))
 		test = IS_MINE;
 	else
 		return NULL;
@@ -392,8 +569,9 @@ static FindCondition *parse_condition(guchar **expression)
 	cond = g_new(FindCondition, 1);
 	cond->test = &test_is;
 	cond->free = (FindFree) &g_free;
-	cond->data1 = (gpointer) test;
+	cond->data1 = NULL;
 	cond->data2 = NULL;
+	cond->value = test;
 
 	return cond;
 }
@@ -437,4 +615,162 @@ out:
 	g_string_free(str, cond ? FALSE : TRUE);
 
 	return cond;
+}
+
+/*			NUMERIC EXPRESSIONS				*/
+
+/*	CALCULATIONS	*/
+
+static long get_constant(Eval *eval, FindInfo *info)
+{
+	long	value = *((long *) (eval->data1));
+	int	flags = (int) (eval->data2);
+
+	if (flags & FLAG_AGO)
+		value = info->now - value;
+	else if (flags & FLAG_HENCE)
+		value = info->now + value;
+	
+	return value;
+}
+
+static long get_var(Eval *eval, FindInfo *info)
+{
+	switch ((VarType) eval->data1)
+	{
+		case V_ATIME:
+			return info->stats.st_atime;
+		case V_CTIME:
+			return info->stats.st_ctime;
+		case V_MTIME:
+			return info->stats.st_mtime;
+		case V_SIZE:
+			return info->stats.st_size;
+		case V_INODE:
+			return info->stats.st_ino;
+		case V_NLINKS:
+			return info->stats.st_nlink;
+		case V_UID:
+			return info->stats.st_uid;
+		case V_GID:
+			return info->stats.st_gid;
+		case V_BLOCKS:
+			return info->stats.st_blocks;
+	}
+
+	return 0L;
+}
+
+/*	FREEING		*/
+
+static void free_constant(Eval *eval)
+{
+	g_free(eval->data1);
+	g_free(eval);
+}
+
+/*	PARSING		*/
+
+/* Parse something that evaluates to a number.
+ * This function tried to get a constant - if it fails then it tries
+ * interpreting the next token as a variable.
+ */
+static Eval *parse_eval(guchar **expression)
+{
+	char	*start, *end;
+	long	value;
+	Eval	*eval;
+	int	flags = 0;
+	
+	SKIP;
+	start = *expression;
+	value = strtol(start, &end, 0);
+
+	if (end == start)
+	{
+		if (MATCH("Now"))
+		{
+			value = 0;
+			flags |= FLAG_HENCE;
+		}
+		else
+			return parse_variable(expression);
+	}
+	else
+		*expression = end;
+
+	SKIP;
+
+	if (MATCH("Byte") || MATCH("Bytes"))
+		;
+	else if (MATCH("Kb"))
+		value <<= 10;
+	else if (MATCH("Mb"))
+		value <<= 20;
+	else if (MATCH("Gb"))
+		value <<= 30;
+	else if (MATCH("Sec") || MATCH("Secs"))
+		;
+	else if (MATCH("Min") || MATCH("Mins"))
+		value *= 60;
+	else if (MATCH("Hour") || MATCH("Hours"))
+		value *= 60 * 60;
+	else if (MATCH("Day") || MATCH("Days"))
+		value *= 60 * 60 * 24;
+	else if (MATCH("Week") || MATCH("Weeks"))
+		value *= 60 * 60 * 24 * 7;
+	else if (MATCH("Year") || MATCH("Years"))
+		value *= 60 * 60 * 24 * 7 * 365.25;
+
+	eval = g_new(Eval, 1);
+	eval->calc = &get_constant;
+	eval->free = &free_constant;
+	eval->data1 = g_memdup(&value, sizeof(value));
+
+	SKIP;
+	if (MATCH("Ago"))
+		flags |= FLAG_AGO;
+	else if (MATCH("Hence"))
+		flags |= FLAG_HENCE;
+
+	eval->data2 = (gpointer) flags;
+
+	return eval;
+}
+
+static Eval *parse_variable(guchar **expression)
+{
+	Eval	*eval;
+	VarType	var;
+
+	SKIP;
+
+	if (MATCH("atime"))
+		var = V_ATIME;
+	else if (MATCH("ctime"))
+		var = V_CTIME;
+	else if (MATCH("mtime"))
+		var = V_MTIME;
+	else if (MATCH("size"))
+		var = V_SIZE;
+	else if (MATCH("inode"))
+		var = V_INODE;
+	else if (MATCH("nlinks"))
+		var = V_NLINKS;
+	else if (MATCH("uid"))
+		var = V_UID;
+	else if (MATCH("gid"))
+		var = V_GID;
+	else if (MATCH("blocks"))
+		var = V_BLOCKS;
+	else
+		return NULL;
+
+	eval = g_new(Eval, 1);
+	eval->calc = &get_var;
+	eval->free = (EvalFree) &g_free;
+	eval->data1 = (gpointer) var;
+	eval->data2 = NULL;
+
+	return eval;
 }

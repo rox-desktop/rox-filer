@@ -17,8 +17,10 @@ struct _FindCondition
 {
 	FindTest	test;
 	FindFree	free;
+	/* These next three depend on the first two... */
 	gpointer	data1;
 	gpointer	data2;
+	gint		value;
 };
 
 struct _FindInfo
@@ -26,6 +28,7 @@ struct _FindInfo
 	guchar		*fullpath;
 	guchar		*leaf;
 	struct stat	stats;
+	time_t		now;
 };
 
 FindCondition *find_compile(guchar *string);
