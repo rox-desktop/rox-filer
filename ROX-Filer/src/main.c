@@ -51,7 +51,7 @@
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
 
-#define VERSION "ROX-Filer 0.1.6\n"					\
+#define VERSION "ROX-Filer 0.1.7\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
 		"to the extent permitted by law.\n"			\
