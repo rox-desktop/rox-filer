@@ -1069,6 +1069,9 @@ static void perform_action(ViewCollection *view_collection,
 		collection->items[item].selected &&
 		filer_window->selection_state == GTK_STATE_INSENSITIVE)
 	{
+		/* Possibly a really slow DnD operation? */
+		filer_window->temp_item_selected = FALSE;
+		
 		filer_selection_changed(filer_window, event->time);
 		return;
 	}
