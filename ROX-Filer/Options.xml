@@ -1,6 +1,18 @@
 <?xml version="1.0"?>
 <options>
 
+<section name="i18n" title="Translation options">
+
+<menu label="Translation" name="translation">
+<item value="None" label="None"/>
+<item value="From LANG" label="From LANG"/>
+<item value="nl" label="Dutch"/>
+<item value="fr" label="French"/>
+<item value="it" label="Italian"/>
+<item value="pl" label="Polish"/>
+</menu>
+
+</section>
 <section name="pinboard" title="Pinboard options">
 <radio-group name="text_bg">
 <radio label="No background" value="0">
@@ -65,6 +77,14 @@ Maximum width for the text under a Large Icon.
 Maximum width for the text beside a Small Icon.
 </slider>
 
+<toggle name="scale_icons" label="Scale icons">
+Scale down icons on the filer, pinboard and panel if they are larger than the size set by the 'Max icon dimension' option.
+</toggle>
+
+<slider name="max_icon_dim" label="Max icon dimension" min="10" max="48" showvalue="1">
+Maximum size of icons, if 'Scale icons' is enabled. Icons larger than this size will be scaled down.
+</slider>
+
 <label>Default settings for new windows</label>
 <hbox>
 <menu name="size" label="Icon size">
@@ -88,6 +108,7 @@ Maximum width for the text beside a Small Icon.
 <item value="2" label="Date"/>
 <item value="3" label="Size"/>
 </menu>
+
 </section>
 
 <section name="toolbar" title="Toolbar options">
@@ -159,19 +180,6 @@ Use button 2, the middle button (click both buttons at once on two button mice),
 <toggle name="single_click" label="Single-click navigation">
 Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.
 </toggle>
-
-</section>
-
-<section name="i18n" title="Translation options">
-
-<menu label="Translation" name="translation">
-<item value="None" label="None"/>
-<item value="From LANG" label="From LANG"/>
-<item value="nl" label="Dutch"/>
-<item value="fr" label="French"/>
-<item value="it" label="Italian"/>
-<item value="pl" label="Polish"/>
-</menu>
 
 </section>
 
