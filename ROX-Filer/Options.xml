@@ -18,65 +18,6 @@
     </frame>
     <label help='1'>Note that you must save your choices and restart the filer for the new language setting to take full effect.</label>
   </section>
-  <section title='Pinboard'>
-    <label help='1'>The pinboard is the desktop background.
-When the pinboard is turned on, you can drag files
-and applications onto it to create short-cuts to them.
-See the manual for information about using the pinboard.</label>
-    <frame label='Text style'>
-      <radio-group name='pinboard_text_bg'>
-        <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
-        <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
-        <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
-      </radio-group>
-      <hbox>
-        <colour name='pinboard_fg_colour' label='Foreground:'/>
-	<spacer/>
-        <colour name='pinboard_bg_colour' label='Background:'/>
-      </hbox>
-    </frame>
-    <frame label='Pinboard behaviour'>
-      <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-      <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
-      <hbox label='Icon grid step:'>
-        <radio-group name='pinboard_grid_step'>
-          <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
-          <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
-          <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
-        </radio-group>
-      </hbox>
-    </frame>
-  </section>
-
-  <section title='Panels'>
-    <label help='1'>Panels are bars of icons that run along the side of the screen.
-See the manual for information about using panels.</label>
-    <frame label='Panel style'>
-      <radio-group name='panel_style'>
-        <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
-        <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
-        <radio label='Image only' value='2'>Only the image is shown.</radio>
-      </radio-group>
-    </frame>
-  </section>
-  
-  <section title='Action windows'>
-    <label help='1'>Action windows appear when you start a background
-operation, such as copying or deleting some files.</label>
-    <frame label='Auto-start (Quiet) these actions'>
-      <toggle name='action_copy' label='Copy'>Copy files without confirming first.</toggle>
-      <toggle name='action_move' label='Move'>Move files without confirming first.</toggle>
-      <toggle name='action_link' label='Link'>Create links to files without confirming first.</toggle>
-      <toggle name='action_delete' label='Delete'>Delete files without confirming first.</toggle>
-      <toggle name='action_mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
-    </frame>
-    <frame label='Default settings'>
-      <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
-      <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
-      <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
-      <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
-    </frame>
-  </section>
   <section title='Filer windows'>
     <frame label='Auto-resize filer windows'>
       <radio-group name='filer_auto_resize'>
@@ -91,10 +32,6 @@ operation, such as copying or deleting some files.</label>
       <toggle name='filer_unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
       <toggle name='bind_new_button_1' label='New window on button 1 (RISC OS style)'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
       <toggle name='bind_single_click' label='Single-click navigation in filer windows'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-    </frame>
-    <frame label='Beeping'>
-      <toggle name='filer_beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
-      <toggle name='filer_beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
     </frame>
     <section title='Display'>
       <frame label='General'>
@@ -153,6 +90,72 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
   	</hbox>
       </frame>
     </section>
+    <section title='Minibuffers'>
+      <label help='1'>The minibuffers are text entry fields that appear along the bottom of a filer window. They are used to enter pathnames, search conditions and shell commands.</label>
+      <frame label='Beeping'>
+        <toggle name='filer_beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
+        <toggle name='filer_beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
+      </frame>
+    </section>
+  </section>
+  <section title='Pinboard'>
+    <label help='1'>The pinboard is the desktop background.
+When the pinboard is turned on, you can drag files
+and applications onto it to create short-cuts to them.
+See the manual for information about using the pinboard.</label>
+    <frame label='Text style'>
+      <radio-group name='pinboard_text_bg'>
+        <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
+        <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
+        <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
+      </radio-group>
+      <hbox>
+        <colour name='pinboard_fg_colour' label='Foreground:'/>
+	<spacer/>
+        <colour name='pinboard_bg_colour' label='Background:'/>
+      </hbox>
+    </frame>
+    <frame label='Pinboard behaviour'>
+      <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
+      <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
+      <hbox label='Icon grid step:'>
+        <radio-group name='pinboard_grid_step'>
+          <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
+          <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
+          <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
+        </radio-group>
+      </hbox>
+    </frame>
+  </section>
+
+  <section title='Panels'>
+    <label help='1'>Panels are bars of icons that run along the side of the screen.
+See the manual for information about using panels.</label>
+    <frame label='Panel style'>
+      <radio-group name='panel_style'>
+        <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
+        <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
+        <radio label='Image only' value='2'>Only the image is shown.</radio>
+      </radio-group>
+    </frame>
+  </section>
+  
+  <section title='Action windows'>
+    <label help='1'>Action windows appear when you start a background
+operation, such as copying or deleting some files.</label>
+    <frame label='Auto-start (Quiet) these actions'>
+      <toggle name='action_copy' label='Copy'>Copy files without confirming first.</toggle>
+      <toggle name='action_move' label='Move'>Move files without confirming first.</toggle>
+      <toggle name='action_link' label='Link'>Create links to files without confirming first.</toggle>
+      <toggle name='action_delete' label='Delete'>Delete files without confirming first.</toggle>
+      <toggle name='action_mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
+    </frame>
+    <frame label='Default settings'>
+      <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
+      <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
+      <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
+      <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
+    </frame>
   </section>
   <section title='Drag and Drop'>
     <frame label='General'>
