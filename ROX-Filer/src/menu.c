@@ -70,6 +70,11 @@ static void large(gpointer data, guint action, GtkWidget *widget);
 static void small(gpointer data, guint action, GtkWidget *widget);
 static void full_info(gpointer data, guint action, GtkWidget *widget);
 
+static void sort_name(gpointer data, guint action, GtkWidget *widget);
+static void sort_type(gpointer data, guint action, GtkWidget *widget);
+static void sort_size(gpointer data, guint action, GtkWidget *widget);
+static void sort_date(gpointer data, guint action, GtkWidget *widget);
+
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -127,12 +132,11 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Large Icons",   	NULL,  	large, 0, "<RadioItem>"},
 {"/Display/Small Icons",   	NULL,  	small, 0, "/Display/Large Icons"},
 {"/Display/Full Info",		NULL,  	full_info, 0, "/Display/Large Icons"},
-{"/Display/Separator",		NULL,  	not_yet, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,  	not_yet, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Owner",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
+{"/Display/Sort by Name",	NULL,  	sort_name, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,  	sort_type, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,  	sort_date, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,  	sort_size, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
@@ -163,15 +167,14 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",	NULL,   not_yet, 0, "<RadioItem>"},
-{"/Display/Small Icons",	NULL,   not_yet, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,   not_yet, 0, "/Display/Large Icons"},
+{"/Display/Large Icons",	NULL,   large, 0, "<RadioItem>"},
+{"/Display/Small Icons",	NULL,   small, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,   full_info, 0, "/Display/Large Icons"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,   not_yet, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,   not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,   not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,   not_yet, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Owner",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Name",	NULL,   sort_name, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,   sort_type, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,   sort_date, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,   sort_size, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
@@ -475,6 +478,34 @@ static void full_info(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_style_set(window_with_focus, FULL_INFO);
+}
+
+static void sort_name(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_set_sort_fn(window_with_focus, sort_by_name);
+}
+
+static void sort_type(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_set_sort_fn(window_with_focus, sort_by_type);
+}
+
+static void sort_date(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_set_sort_fn(window_with_focus, sort_by_date);
+}
+
+static void sort_size(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_set_sort_fn(window_with_focus, sort_by_size);
 }
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)

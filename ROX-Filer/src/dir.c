@@ -327,6 +327,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	new.image = NULL;
 	new.size = 0;
 	new.mode = 0;
+	new.mtime = 0;
 
 	tmp = make_path(dir->pathname, ent->d_name);
 	
@@ -336,6 +337,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	{
 		new.size = info.st_size;
 		new.mode = info.st_mode;
+		new.mtime = info.st_mtime;
 		if (S_ISREG(info.st_mode))
 			new.base_type = TYPE_FILE;
 		else if (S_ISDIR(info.st_mode))
@@ -457,6 +459,7 @@ update:
 	 && item->flags == new.flags
 	 && item->size == new.size
 	 && item->mode == new.mode
+	 && item->mtime == new.mtime
 	 && item->image == new.image
 	 && item->mime_type == new.mime_type
 	 && item->name_width == new.name_width
@@ -467,6 +470,7 @@ update:
 	item->flags = new.flags;
 	item->size = new.size;
 	item->mode = new.mode;
+	item->mtime = new.mtime;
 	item->image = new.image;
 	item->mime_type = new.mime_type;
 	item->name_width = new.name_width;

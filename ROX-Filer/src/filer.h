@@ -60,5 +60,11 @@ void change_to_parent(FilerWindow *filer_window);
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
 char *details(DirItem *item);
 void filer_set_hidden(FilerWindow *filer_window, gboolean hidden);
+int sort_by_name(const void *item1, const void *item2);
+int sort_by_type(const void *item1, const void *item2);
+int sort_by_date(const void *item1, const void *item2);
+int sort_by_size(const void *item1, const void *item2);
+void filer_set_sort_fn(FilerWindow *filer_window,
+			int (*fn)(const void *a, const void *b));
 
 #endif /* _FILER_H */

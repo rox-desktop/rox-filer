@@ -89,7 +89,6 @@ static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
-static int sort_by_name(const void *item1, const void *item2);
 static gint focus_in(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
@@ -796,13 +795,13 @@ static void gain_selection(Collection 	*collection,
 		collection_clear_selection(filer_window->collection);
 }
 
-static int sort_by_name(const void *item1, const void *item2)
+int sort_by_name(const void *item1, const void *item2)
 {
 	return strcmp((*((DirItem **)item1))->leafname,
 		      (*((DirItem **)item2))->leafname);
 }
 
-static int sort_by_type(const void *item1, const void *item2)
+int sort_by_type(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
 	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
@@ -834,6 +833,26 @@ static int sort_by_type(const void *item1, const void *item2)
 		return diff > 0 ? 1 : -1;
 	
 	return sort_by_name(item1, item2);
+}
+
+int sort_by_date(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
+	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
+
+	return i1->mtime > i2->mtime ? -1 :
+		i1->mtime < i2->mtime ? 1 :
+		sort_by_name(item1, item2);
+}
+
+int sort_by_size(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
+	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
+
+	return i1->size > i2->size ? -1 :
+		i1->size < i2->size ? 1 :
+		sort_by_name(item1, item2);
 }
 
 void open_item(Collection *collection,
@@ -1087,6 +1106,17 @@ static void shrink_width(FilerWindow *filer_window)
 		style == FULL_INFO ? 	MAX_ICON_HEIGHT + 4 :
 		style == SMALL_ICONS ? 	MAX(text_height, SMALL_ICON_HEIGHT) + 4
 				     :	text_height + MAX_ICON_HEIGHT + 8);
+}
+
+void filer_set_sort_fn(FilerWindow *filer_window,
+			int (*fn)(const void *a, const void *b))
+{
+	if (filer_window->sort_fn == fn)
+		return;
+
+	filer_window->sort_fn = fn;
+	collection_qsort(filer_window->collection,
+			filer_window->sort_fn);
 }
 
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style)

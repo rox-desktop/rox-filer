@@ -52,6 +52,7 @@ struct _DirItem
 	int		flags;
 	mode_t		mode;
 	off_t		size;
+	time_t		mtime;
 	MaskedPixmap	*image;
 	MIME_type	*mime_type;
 	int		name_width;
