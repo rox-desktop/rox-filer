@@ -684,6 +684,11 @@ $ rox --bottom=</screen>
        Change to home directory</entry><entry>
        Show home in a new window <xref linkend="newwin_fn"/>
        </entry></row><row><entry>
+       Jump to point</entry><entry>
+       Open the <xref linkend="bookmarks"/>
+       </entry><entry>
+       Edit the bookmarks
+       </entry></row><row><entry>
        Looping arrows</entry><entry>
        Reread the directory contents</entry><entry>
        Open a new window
@@ -702,7 +707,7 @@ $ rox --bottom=</screen>
        </entry></row><row><entry>
        Life-belt</entry><entry>
        Show <application>ROX-Filer</application>'s help files</entry><entry>
-       Show help files and close window
+       Open manual directly
      </entry></row>
   </tbody></tgroup></informaltable>
 
@@ -839,8 +844,7 @@ $ rox --bottom=</screen>
 
          <guimenuitem>Sort by Name</guimenuitem></entry><entry>
 	 Items are arranged by name. The default sort mode is case-insensitive
-	 and deals with numbers sensibly. There is an option to use straight
-	 ASCII sorting.
+	 and deals with numbers sensibly.
          </entry></row><row><entry>
 
          <guimenuitem>Sort by Type</guimenuitem></entry><entry>
@@ -1207,6 +1211,11 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
+         <guimenuitem>Show Bookmarks</guimenuitem></entry><entry>
+         Open the bookmarks menu (see <xref linkend="bookmarks"/>).
+       </entry></row>
+
+       <row><entry>
          <guimenuitem>Follow Symbolic Links</guimenuitem></entry><entry>
 	 Converts the path shown in the window's titlebar to its canonical form.
 	 For example, if <filename>/home/fred/link</filename> is a symlink
@@ -1324,6 +1333,19 @@ $ rox --bottom=</screen>
      <filename>.group</filename> directory is used instead.
     </para>
    </sect2>
+  </sect1>
+
+  <sect1>
+   <title><anchor id="bookmarks" xreflabel="Bookmarks menu"/>The bookmarks menu</title>
+   <para>
+    The bookmarks menu can be used to store a list of frequently used directories.
+    You can also open the menu from the main popup menu (in the <guimenuitem>Window</guimenuitem> submenu)
+    and you can use this to bind a shortcut key to it. From the bookmarks menu
+    you can add the currently shown directory to the list, jump to one of the
+    stored directories, or open a dialog letting you edit the list. In the dialog
+    box, you can remove entries, rearrange them (using the arrows or by
+    dragging) and edit the pathnames directly, if required.
+   </para>
   </sect1>
 
  </chapter>
@@ -2373,12 +2395,6 @@ $ rox --bottom=</screen>
     <para>
 
      <itemizedlist>
-      <listitem><para><guilabel>Intelligent sorting</guilabel>
-	treats upper and lower case letters as equivalent when sorting, ignores
-	punctuation, and sorts numbers numerically. If this is off then
-	<filename>Zoo</filename> comes before <filename>animal</filename>, for
-	example.
-      </para></listitem>
 
       <listitem><para><guilabel>Directories always come first</guilabel> means that
 	all directories are sorted and displayed at the top, then all the other items
@@ -2476,7 +2492,8 @@ $ rox --bottom=</screen>
 
      <listitem><para><guilabel>Colours</guilabel>
        sets the colours used for the text under the icons, and the background colour
-       (if no background image is set).
+       (if no background image is set). You can also choose to give the text a
+       shadow, which can help with some backgrounds.
      </para></listitem>
 
      <listitem><para><guilabel>Use custom font</guilabel> can be used to set a
@@ -2896,30 +2913,27 @@ when clicked and from doing other odd things.
   &lt;Summary xml:lang="en"&gt;A graphical file manager&lt;/Summary&gt;
   &lt;Summary xml:lang="de"&gt;Ein grafische Datei-Manager&lt;/Summary&gt;
   &lt;Summary xml:lang="nl"&gt;Een grafisch bestandsbeheerprogramma&lt;/Summary&gt;
-  &lt;Summary xml:lang="sp"&gt;Un manejador de archivos gr&#xE1;afico&lt;/Summary&gt;
+  &lt;Summary xml:lang="es"&gt;Un manejador de archivos gr&#xE1;afico&lt;/Summary&gt;
   &lt;About xml:lang="en"&gt;
     &lt;Purpose&gt;File manager&lt;/Purpose&gt;
-    &lt;Version&gt;1.3.3 (25-Jul-2002)&lt;/Version&gt;
+    &lt;Version&gt;1.3.5 PREVIEW&lt;/Version&gt;
     &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
     &lt;License&gt;GNU General Public License&lt;/License&gt;
     &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
   &lt;/About&gt;
+  &lt;About xml:lang="es"&gt;
+    &lt;Purpose&gt;Manejador de Archivos&lt;/Purpose&gt;
+    &lt;Authors&gt;Thomas Leonard y otros&lt;/Authors&gt;
+  &lt;/About&gt;
   &lt;AppMenu&gt;
     &lt;Item option="-p=Default"&gt;
       &lt;Label&gt;Enable pinboard&lt;/Label&gt;
-      &lt;Label xml:lang="hu"&gt;Pinboard engedélyezése&lt;/Label&gt;
-      &lt;Label xml:lang="sp"&gt;Habilitar el pinboard&lt;/Label&gt;
+      &lt;Label xml:lang="es"&gt;Habilitar el pinboard&lt;/Label&gt;
     &lt;/Item&gt;
     &lt;Item option="-p="&gt;
       &lt;Label&gt;Disable pinboard&lt;/Label&gt;
-      &lt;Label xml:lang="hu"&gt;Pinboard tiltása&lt;/Label&gt;
-      &lt;Label xml:lang="sp"&gt;Deshabilitar el pinboard&lt;/Label&gt;
+      &lt;Label xml:lang="es"&gt;Deshabilitar el pinboard&lt;/Label&gt;
     &lt;/Item&gt;
-    &lt;AppMenu&gt;
-      &lt;Label&gt;Submenu...&lt;/Label&gt;
-      &lt;Item option="..."&gt;
-      ...
-    &lt;/AppMenu&gt;
   &lt;/AppMenu&gt;
 &lt;/AppInfo&gt;
 </screen>
