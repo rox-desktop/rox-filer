@@ -1,23 +1,24 @@
 # Grab the tips from Options.xml
 
-from xmllib import *
+from xml.sax import *
+from xml.sax.handler import ContentHandler
 import string, os
 
 print "Extracting translatable bits from Options.xml..."
 
-class Parser(XMLParser):
+class Handler(ContentHandler):
 	data = ""
 
-	def unknown_starttag(self, tag, attrs):
+	def startElement(self, tag, attrs):
 		for x in ['title', 'label', 'end', 'unit']:
 			if attrs.has_key(x):
 				self.trans(attrs[x])
 		self.data = ""
 	
-	def handle_data(self, data):
+	def characters(self, data):
 		self.data = self.data + data
 	
-	def unknown_endtag(self, tag):
+	def endElement(self, tag):
 		data = string.strip(self.data)
 		if data:
 			self.trans(data)
@@ -31,10 +32,6 @@ try:
 except OSError:
 	pass
 	
-file = open('../../Options.xml', 'rb')
 out = open('../tips', 'wb')
-parser = Parser()
-parser.feed(file.read())
-file.close()
-parser.close()
+parse('../../Options.xml', Handler())
 out.close()
