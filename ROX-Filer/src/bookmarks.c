@@ -131,7 +131,7 @@ void bookmarks_edit(void)
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
 			swin, TRUE, TRUE, 0);
 
-	model = gtk_list_store_new(1, G_TYPE_STRING);
+	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 
 	list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 	
@@ -139,16 +139,26 @@ void bookmarks_edit(void)
 	g_signal_connect(G_OBJECT(cell), "edited",
 		    G_CALLBACK(cell_edited), model);
 	g_object_set(G_OBJECT(cell), "editable", TRUE, NULL);
+	g_object_set_data(G_OBJECT(cell), "column", GINT_TO_POINTER(0));
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(list), -1,
-		NULL, cell, "text", 0, NULL);
+		_("Path"), cell, "text", 0, NULL);
+	
+	cell = gtk_cell_renderer_text_new();
+	g_signal_connect(G_OBJECT(cell), "edited",
+		    G_CALLBACK(cell_edited), model);
+	g_object_set(G_OBJECT(cell), "editable", TRUE, NULL);
+	g_object_set_data(G_OBJECT(cell), "column", GINT_TO_POINTER(1));
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(list), -1,
+		_("Title"), cell, "text", 1, NULL);
+	
 	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(list), TRUE);
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(list), FALSE);
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(list), TRUE);
 
 	node = xmlDocGetRootElement(bookmarks->doc);
 	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
 		GtkTreeIter iter;
-		guchar *mark;
+		gchar *mark, *title;
 
 		if (node->type != XML_ELEMENT_NODE)
 			continue;
@@ -159,10 +169,16 @@ void bookmarks_edit(void)
 					    node->xmlChildrenNode, 1);
 		if (!mark)
 			continue;
+		
+		title=xmlGetProp(node, "title");
+		if(!title)
+			title=mark;
 
 		gtk_list_store_append(model, &iter);
-		gtk_list_store_set(model, &iter, 0, mark, -1);
-
+		gtk_list_store_set(model, &iter, 0, mark, 1, title, -1);
+		if(title!=mark)
+			xmlFree(title);
+		
 		xmlFree(mark);
 	}
 	
@@ -403,6 +419,7 @@ static void bookmarks_add_dir(const guchar *dir)
 
 	bookmark = xmlNewTextChild(xmlDocGetRootElement(bookmarks->doc),
 				NULL, "bookmark", dir);
+	xmlSetProp(bookmark, "title", dir);
 
 	bookmarks_save();
 
@@ -416,8 +433,11 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 	const gchar *mark;
 	GtkLabel *label;
 
-	label = GTK_LABEL(GTK_BIN(item)->child);
-	mark = gtk_label_get_text(label);
+	mark=g_object_get_data(G_OBJECT(item), "bookmark-path");
+	if(!mark) {
+		label = GTK_LABEL(GTK_BIN(item)->child);
+		mark = gtk_label_get_text(label);
+	}
 
 	if (strcmp(mark, filer_window->sym_path) != 0)
 		filer_change_to(filer_window, mark, NULL);
@@ -566,7 +586,8 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 			if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
 			{
 				gtk_list_store_append(model, &iter);
-				gtk_list_store_set(model, &iter, 0, path, -1);
+				gtk_list_store_set(model, &iter, 0, path,
+						   1, path, -1);
 			}
 			else
 				delayed_error(_("'%s' isn't a directory"),
@@ -592,17 +613,21 @@ static void commit_edits(GtkTreeModel *model)
 
 	if (gtk_tree_model_get_iter_first(model, &iter))
 	{
-		GValue value = {0};
+		GValue mark = {0}, title={0};
 		xmlNode *root = xmlDocGetRootElement(bookmarks->doc);
 
 		do
 		{
 			xmlNode *bookmark;
 
-			gtk_tree_model_get_value(model, &iter, 0, &value);
+			gtk_tree_model_get_value(model, &iter, 0, &mark);
 			bookmark = xmlNewTextChild(root, NULL, "bookmark",
-					g_value_get_string(&value));
-			g_value_unset(&value);
+					g_value_get_string(&mark));
+			g_value_unset(&mark);
+			gtk_tree_model_get_value(model, &iter, 1, &title);
+			xmlSetProp(bookmark, "title",
+				   g_value_get_string(&title));
+			g_value_unset(&title);
 		} while (gtk_tree_model_iter_next(model, &iter));
 	}
 
@@ -624,12 +649,14 @@ static void cell_edited(GtkCellRendererText *cell,
 	GtkTreeModel *model = (GtkTreeModel *) data;
 	GtkTreePath *path;
 	GtkTreeIter iter;
+	gint col;
 
 	path = gtk_tree_path_new_from_string(path_string);
 	gtk_tree_model_get_iter(model, &iter, path);
 	gtk_tree_path_free(path);
+	col=GPOINTER_TO_INT(g_object_get_data(G_OBJECT(cell), "column"));
 
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, new_text, -1);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, col, new_text, -1);
 }
 
 static void activate_edit(GtkMenuShell *item, gpointer data)
@@ -640,6 +667,12 @@ static void activate_edit(GtkMenuShell *item, gpointer data)
 static gint cmp_dirname(gconstpointer a, gconstpointer b)
 {
 	return g_utf8_collate(*(gchar **) a, *(gchar **) b);
+}
+
+static void free_path_for_item(GtkWidget *widget, gpointer udata)
+{
+	gchar *path=(gchar *) udata;
+	g_free(path);
 }
 
 static GtkWidget *build_history_menu(FilerWindow *filer_window)
@@ -668,8 +701,14 @@ static GtkWidget *build_history_menu(FilerWindow *filer_window)
 	{
 		GtkWidget *item;
 		const char *path = (char *) items->pdata[i];
+		gchar *copy;
 
 		item = gtk_menu_item_new_with_label(path);
+
+		copy=g_strdup(path);
+		g_object_set_data(G_OBJECT(item), "bookmark-path", copy);
+		g_signal_connect(item, "destroy",
+				 G_CALLBACK(free_path_for_item), copy);
 
 		if (strcmp(path, filer_window->sym_path) == 0)
 			gtk_widget_set_sensitive(item, FALSE);
@@ -725,7 +764,7 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 
 	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
-		gchar *mark;
+		gchar *mark, *title, *path;
 
 		if (node->type != XML_ELEMENT_NODE)
 			continue;
@@ -736,7 +775,20 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 					    node->xmlChildrenNode, 1);
 		if (!mark)
 			continue;
-		item = gtk_menu_item_new_with_label(mark);
+		path=g_strdup(mark);
+		
+		title=xmlGetProp(node, "title");
+		if(!title)
+			title=mark;
+		
+		item = gtk_menu_item_new_with_label(title);
+		
+		g_object_set_data(G_OBJECT(item), "bookmark-path", path);
+		g_signal_connect(item, "destroy",
+				 G_CALLBACK(free_path_for_item), path);
+
+		if(title!=mark)
+			xmlFree(title);
 		xmlFree(mark);
 
 		g_signal_connect(item, "activate",
