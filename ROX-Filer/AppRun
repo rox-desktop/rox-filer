@@ -7,23 +7,25 @@ APP_DIR=${0%/*}
 if [ "$APP_DIR" = "$0" ] ; then APP_DIR=. ; fi
 APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
+PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
+
 DEBUGGER=""
 case $1 in
 	--debug) shift ; DEBUGGER=gdb ;;
 	--compile)
-		if [ ! -e $APP_DIR/src/Makefile ] ; then
+		if [ ! -d $APP_DIR/src ] ; then
 			echo "ERROR from $0:" >&2
 			echo "Cannot compile - source code is missing!" >&2
 			exit 1
 		fi
 		echo "Compiling $APP_DIR... please wait..." >&2
-		cd $APP_DIR/src && make clean && make depend \
-					&& make && echo Done >&2 && exit 0
+		rm -f $APP_DIR/src/config.cache
+		cd $APP_DIR/src && ./configure --bindir=$APP_DIR/$PLATFORM \
+			&& make clean && make && echo Done >&2 && exit 0
 		echo Compile failed >&2
 		exit 1
 esac
 
-PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
 BIN=$APP_DIR/$PLATFORM/$PROG
 
 if [ -x $BIN ] ; then
