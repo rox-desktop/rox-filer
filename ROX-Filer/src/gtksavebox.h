@@ -60,6 +60,8 @@ struct _GtkSavebox
   GtkTargetList *targets;	/* Formats that we can save in */
   gboolean  using_xds;		/* Have we sent XDS reply 'S' or 'F' yet? */
   gboolean  data_sent;		/* Did we send any data at all this drag? */
+
+  GdkDragAction dnd_action;
 };
 
 struct _GtkSaveboxClass
@@ -78,6 +80,8 @@ void	   gtk_savebox_set_icon		(GtkSavebox *savebox,
 void	   gtk_savebox_set_pathname	(GtkSavebox *savebox,
 					 const gchar *pathname);
 void	   gtk_savebox_set_has_discard	(GtkSavebox *savebox, gboolean setting);
+void	   gtk_savebox_set_action	(GtkSavebox *savebox,
+					 GdkDragAction action);
 
 
 #ifdef __cplusplus

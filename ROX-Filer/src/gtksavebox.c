@@ -284,6 +284,17 @@ gtk_savebox_init (GtkSavebox *savebox)
   gtk_box_pack_end (GTK_BOX (dialog->vbox), savebox->discard_area,
 		      FALSE, TRUE, 0);
   gtk_box_reorder_child (GTK_BOX (dialog->vbox), savebox->discard_area, 0);
+
+  savebox->dnd_action = GDK_ACTION_COPY;
+}
+
+void
+gtk_savebox_set_action (GtkSavebox *savebox, GdkDragAction action)
+{
+  g_return_if_fail (savebox != NULL);
+  g_return_if_fail (GTK_IS_SAVEBOX (savebox));
+  
+  savebox->dnd_action = action;
 }
 
 GtkWidget*
@@ -375,7 +386,7 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
   savebox->using_xds = FALSE;
   savebox->data_sent = FALSE;
   context = gtk_drag_begin (GTK_WIDGET (savebox),
-			    savebox->targets, GDK_ACTION_COPY,
+			    savebox->targets, savebox->dnd_action,
 			    event->button, (GdkEvent *) event);
 
   uri = gtk_entry_get_text (GTK_ENTRY (savebox->entry));

@@ -108,7 +108,8 @@ static void save_menus(void);
 static void menu_closed(GtkWidget *widget);
 static void shade_file_menu_items(gboolean shaded);
 static void savebox_show(const gchar *action, const gchar *path,
-			 MaskedPixmap *image, SaveCb callback);
+			 MaskedPixmap *image, SaveCb callback,
+			 GdkDragAction dnd_action);
 static gint save_to_file(GObject *savebox,
 			 const gchar *pathname, gpointer data);
 static gboolean action_with_leaf(ActionFn action,
@@ -1002,7 +1003,8 @@ static void find(FilerWindow *filer_window)
  * NOTE: This function unrefs 'image'!
  */
 static void savebox_show(const gchar *action, const gchar *path,
-			 MaskedPixmap *image, SaveCb callback)
+			 MaskedPixmap *image, SaveCb callback,
+			 GdkDragAction dnd_action)
 {
 	GtkWidget	*savebox = NULL;	
 	GtkWidget	*check_relative = NULL;	
@@ -1010,6 +1012,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 	g_return_if_fail(image != NULL);
 	
 	savebox = gtk_savebox_new(action);
+	gtk_savebox_set_action(GTK_SAVEBOX(savebox), dnd_action);
 
 	if (callback == link_cb)
 	{
@@ -1118,10 +1121,11 @@ static gboolean action_with_leaf(ActionFn action,
  * Call 'callback' later to perform the operation.
  */
 static void src_dest_action_item(const gchar *path, MaskedPixmap *image,
-			 const gchar *action, SaveCb callback)
+			 const gchar *action, SaveCb callback,
+			 GdkDragAction dnd_action)
 {
 	g_object_ref(image);
-	savebox_show(action, path, image, callback);
+	savebox_show(action, path, image, callback, dnd_action);
 }
 
 static gboolean rename_cb(GObject *savebox,
@@ -1291,7 +1295,8 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 	savebox_show(_("Create"),
 		make_path(window_with_focus->sym_path, _("NewDir")),
-		type_to_icon(inode_directory), new_directory_cb);
+		type_to_icon(inode_directory), new_directory_cb,
+		GDK_ACTION_COPY);
 }
 
 static gboolean new_file_cb(GObject *savebox,
@@ -1332,7 +1337,7 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 	savebox_show(_("Create"),
 		make_path(window_with_focus->sym_path, _("NewFile")),
 		type_to_icon(text_plain),
-		new_file_cb);
+		new_file_cb, GDK_ACTION_COPY);
 }
 
 static gboolean new_file_type_cb(GObject *savebox,
@@ -1392,7 +1397,7 @@ static void new_file_type(gchar *templ)
 	savebox_show(_("Create"),
 		make_path(window_with_focus->sym_path, leaf),
 		type_to_icon(type),
-		new_file_type_cb);
+		new_file_type_cb, GDK_ACTION_COPY);
 }
 
 static void customise_send_to(gpointer data)
@@ -1836,15 +1841,18 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 	{
 		case FILE_COPY_ITEM:
 			src_dest_action_item(path, item->image,
-					_("Copy"), copy_cb);
+					_("Copy"), copy_cb,
+					GDK_ACTION_COPY);
 			break;
 		case FILE_RENAME_ITEM:
 			src_dest_action_item(path, item->image,
-					_("Rename"), rename_cb);
+					_("Rename"), rename_cb,
+					GDK_ACTION_MOVE);
 			break;
 		case FILE_LINK_ITEM:
 			src_dest_action_item(path, item->image,
-					_("Symlink"), link_cb);
+					_("Symlink"), link_cb,
+					GDK_ACTION_LINK);
 			break;
 		case FILE_OPEN_FILE:
 			filer_openitem(window_with_focus, &iter,
