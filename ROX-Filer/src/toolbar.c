@@ -710,7 +710,7 @@ static guchar *read_tools(Option *option)
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label)
 {
 	guint		num_tools = G_N_ELEMENTS(all_tools);
-	guint		rows = 2;
+	guint		rows = 3;
 	guint		cols = (num_tools + rows - 1) / rows;
 	int		i;
 	GtkWidget	*hbox, *tool, *table;

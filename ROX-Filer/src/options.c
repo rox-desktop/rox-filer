@@ -1326,7 +1326,7 @@ static GList *build_label(Option *option, xmlNode *node, guchar *label)
 
 	if (help)
 	{
-		GtkWidget *hbox, *image, *align;
+		GtkWidget *hbox, *image, *align, *spacer;
 
 		hbox = gtk_hbox_new(FALSE, 4);
 		image = gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO,
@@ -1337,7 +1337,10 @@ static GList *build_label(Option *option, xmlNode *node, guchar *label)
 		gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, TRUE, 0);
 		gtk_box_pack_start(GTK_BOX(hbox), widget, FALSE, TRUE, 0);
 
-		return g_list_append(NULL, hbox);
+		spacer = gtk_event_box_new();
+		gtk_widget_set_size_request(spacer, 6, 6);
+
+		return g_list_append(g_list_append(NULL, hbox), spacer);
 	}
 
 	return g_list_append(NULL, widget);
@@ -1358,16 +1361,29 @@ static GList *build_spacer(Option *option, xmlNode *node, guchar *label)
 
 static GList *build_frame(Option *option, xmlNode *node, guchar *label)
 {
-	GtkWidget *nbox, *frame;
+	GtkWidget *nbox, *frame, *label_widget;
 	xmlNode	  *hw;
+	PangoAttrList *list;
+	PangoAttribute *attr;
 
 	g_return_val_if_fail(option == NULL, NULL);
 	g_return_val_if_fail(label != NULL, NULL);
 
 	frame = gtk_frame_new(_(label));
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
+
+	/* Make the title bold */
+	label_widget = gtk_frame_get_label_widget(GTK_FRAME(frame));
+	attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+
+	attr->start_index = 0;
+	attr->end_index = -1;
+	list = pango_attr_list_new();
+	pango_attr_list_insert(list, attr);
+	gtk_label_set_attributes(GTK_LABEL(label_widget), list);
 
 	nbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(nbox), 4);
+	gtk_container_set_border_width(GTK_CONTAINER(nbox), 12);
 	gtk_container_add(GTK_CONTAINER(frame), nbox);
 
 	for (hw = node->xmlChildrenNode; hw; hw = hw->next)

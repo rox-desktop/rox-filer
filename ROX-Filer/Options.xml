@@ -19,8 +19,9 @@
         <radio label='Spanish' value='es'/>
         <radio label='Swedish' value='sv'/>
       </radio-group>
+      <spacer/>
+      <i18n-message/>
     </frame>
-    <i18n-message/>
   </section>
   <section title='Filer windows'>
     <frame label='Auto-resize filer windows'>
@@ -107,17 +108,20 @@
     <label help='1'>When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them.</label>
     <frame label='Appearance'>
       <hbox>
-        <colour name='pinboard_fg_colour' label='Foreground:'/>
-        <colour name='pinboard_bg_colour' label='Background:'/>
+        <vbox>
+	  <colour name='pinboard_fg_colour' label='Foreground:'/>
+	  <colour name='pinboard_shadow_colour' label='Text shadow:'/>
+	  <colour name='pinboard_bg_colour' label='Background:'/>
+        </vbox>
+	<hbox>
+          <radio-group name='pinboard_shadow_labels'>
+            <radio label='None' value='0'/>
+            <radio label='Thin' value='1'/>
+            <radio label='Thick' value='2'/>
+          </radio-group>
+	</hbox>
       </hbox>
-      <hbox label='Label shadow:'>
-        <colour name='pinboard_shadow_colour'/>
-        <radio-group name='pinboard_shadow_labels'>
-          <radio label='None' value='0'/>
-          <radio label='Thin' value='1'/>
-          <radio label='Thick' value='2'/>
-        </radio-group>
-      </hbox>
+      <spacer/>
       <font override='1' label='Use custom font:' name='label_font'>The font used for the text displayed under the icons</font>
     </frame>
     <frame label='Pinboard behaviour'>
@@ -131,21 +135,25 @@
         </radio-group>
       </hbox>
     </frame>
-    <frame label='Iconified windows'>
-     <toggle name='pinboard_tasklist' label='Show iconified windows'>Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows. If this option is on, the filer will show each iconified window as a small button on the screen. Requires a compatible window manager.</toggle>
-     <hbox>
-       <menu name='iconify_start' label='Iconify to the'>
-         <item label='top-left' value='0'/>
-         <item label='top-right' value='1'/>
-         <item label='bottom-left' value='2'/>
-         <item label='bottom-right' value='3'/>
-       </menu>
-       <menu name='iconify_dir' label=', going'>
-         <item label='horizontally' value='0'/>
-         <item label='vertically' value='1'/>
-       </menu>
-     </hbox>
-   </frame>
+    <section title='Iconified windows'>
+      <label help='1'>Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows.</label>
+      <frame label='Iconified windows'>
+       <toggle name='pinboard_tasklist' label='Show iconified windows'>If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use.</toggle>
+       <spacer/>
+       <hbox>
+         <menu name='iconify_start' label='Iconify to the'>
+           <item label='top-left' value='0'/>
+           <item label='top-right' value='1'/>
+           <item label='bottom-left' value='2'/>
+           <item label='bottom-right' value='3'/>
+         </menu>
+         <menu name='iconify_dir' label=', going'>
+           <item label='horizontally' value='0'/>
+           <item label='vertically' value='1'/>
+         </menu>
+       </hbox>
+     </frame>
+    </section>
   </section>
 
   <section title='Panels'>
@@ -179,7 +187,7 @@ operation, such as copying or deleting some files.</label>
     </frame>
   </section>
   <section title='Drag and Drop'>
-    <frame label='General'>
+    <frame label='Dragging to icons'>
       <toggle name='dnd_drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
       <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
       <numentry name='dnd_spring_delay' label='Spring delay:' unit='ms' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
@@ -192,8 +200,7 @@ operation, such as copying or deleting some files.</label>
     </frame>
   </section>
   <section title='Menus'>
-    <frame label='General'>
-      <toggle name='bind_menu_button_2' label='Menu on button 2 (RISC OS style)'>Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.</toggle>
+    <frame label='Appearance'>
       <hbox>
 	<menu name='menu_iconsize' label='Size of icons in menus:'>
 	  <item label='No Icons' value='0'/>
@@ -204,14 +211,16 @@ operation, such as copying or deleting some files.</label>
 	</menu>
       </hbox>
     </frame>
-    <frame label="`Xterm Here' program">
-      <entry name='menu_xterm'>The program to launch when you choose `Xterm Here' from the menu.</entry>
+    <frame label='Behaviour'>
+      <toggle name='bind_menu_button_2' label='Menu on button 2 (RISC OS style)'>Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.</toggle>
+      <entry name='menu_xterm' label="`Xterm Here' program">The program to launch when you choose `Xterm Here' from the menu.</entry>
     </frame>
-    <spacer/>
-    <menu-set-keys/>
+    <frame label='Keyboard shortcuts'>
+      <menu-set-keys/>
+    </frame>
   </section>
   <section title='Types'>
-    <frame label='General'>
+    <frame label='Executable files'>
       <toggle name='display_ignore_exec' label='Ignore eXecutable bit for known extensions'>If a file has a known extension (eg '.gif') then ignore the executable bit. This is useful if you have files on a Windows-type filesystem which are being shown as executable programs.</toggle>
     </frame>
     <frame label='MIME types'>
@@ -224,6 +233,7 @@ operation, such as copying or deleting some files.</label>
     <section title='Colours'>
       <frame label='File type colours'>
         <toggle name='display_colour_types' label='Colour files based on their types'>Filenames (and details) are coloured according to the file's type.</toggle>
+	<spacer/>
         <hbox>
           <vbox>
             <colour name='display_dir_colour'  label='Directory:'/>
