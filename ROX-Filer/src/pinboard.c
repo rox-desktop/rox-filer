@@ -1951,6 +1951,17 @@ static void reload_backdrop(Pinboard *pinboard,
 	g_object_unref(style);
 
 	gtk_widget_queue_draw(pinboard->window);
+
+	/* Also update root window property (for transparent xterms, etc) */
+	if (style->bg_pixmap[GTK_STATE_NORMAL])
+	{
+		XID xid = GDK_WINDOW_XWINDOW(style->bg_pixmap[GTK_STATE_NORMAL]);
+		gdk_property_change(gdk_get_default_root_window(),
+				gdk_atom_intern("_XROOTPMAP_ID", FALSE),
+				gdk_atom_intern("PIXMAP", FALSE),
+				32, GDK_PROP_MODE_REPLACE,
+				(guchar *) &xid, 1);
+	}
 }
 
 /* Set and save (path, style) as the new backdrop.
