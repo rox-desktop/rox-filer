@@ -1216,6 +1216,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	DetailsType     dtype;
 	SortType	s_type;
 	GtkSortType	s_order;
+	Settings	*dir_settings = NULL;
 
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -1309,20 +1310,60 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 		filer_window->view_type = o_filer_view_type.int_value;
 	}
 
+	dir_settings = (Settings *) g_hash_table_lookup(settings_table,
+					      filer_window->sym_path);
+	if (dir_settings)
+	{
+		/* Override the current defaults with the per-directory
+		 * user settings.
+		 */
+		if (dir_settings->flags & SET_HIDDEN)
+			filer_window->show_hidden = dir_settings->show_hidden;
+
+		if (dir_settings->flags & SET_STYLE)
+			filer_window->display_style =
+				dir_settings->display_style;
+
+		if (dir_settings->flags & SET_DETAILS)
+			filer_window->details_type = dir_settings->details_type;
+
+		if (dir_settings->flags & SET_SORT)
+		{
+			s_type = dir_settings->sort_type;
+			s_order = dir_settings->sort_order;
+		}
+
+		if (dir_settings->flags & SET_THUMBS)
+			filer_window->show_thumbs = dir_settings->show_thumbs;
+		
+		if (dir_settings->flags & SET_FILTER)
+			filer_set_filter(filer_window,
+					   dir_settings->filter_type,
+					   dir_settings->filter);
+	}
+
 	/* Add all the user-interface elements & realise */
 	filer_add_widgets(filer_window, wm_class);
 	if (src_win)
 		gtk_window_set_position(GTK_WINDOW(filer_window->window),
 					GTK_WIN_POS_MOUSE);
 
+	if (dir_settings)
+	{
+		if(dir_settings->flags & SET_POSITION) 
+			gtk_window_move(GTK_WINDOW(filer_window->window),
+					    dir_settings->x, dir_settings->y);
+		if(dir_settings->flags & SET_SIZE) 
+			filer_window_set_size(filer_window,
+					      dir_settings->width,
+					      dir_settings->height);
+	}
+
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
 	display_set_layout(filer_window, dstyle, dtype, TRUE);
 	display_set_sort_type(filer_window, s_type, s_order);
-
-	/* Do we have saved settings? */
-	check_settings(filer_window);
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to
@@ -2986,7 +3027,6 @@ static void check_settings(FilerWindow *filer_window)
 			if(set->flags & SET_DETAILS) {
 				details=set->details_type;
 
-				/* This next causes a warning */
 				filer_set_view_type(filer_window,
 						    set->view_type);
 			}

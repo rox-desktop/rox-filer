@@ -78,6 +78,9 @@ gboolean dnotify_wakeup_flag = FALSE;
 static int dnotify_last_fd = -1;
 #endif
 
+/* For debugging. Can't detach when this is non-zero. */
+static int in_callback = 0;
+
 GFSCache *dir_cache = NULL;
 
 /* Static prototypes */
@@ -196,6 +199,7 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 
 	g_return_if_fail(dir != NULL);
 	g_return_if_fail(callback != NULL);
+	g_return_if_fail(in_callback == 0);
 
 	for (list = dir->users; list; list = list->next)
 	{
@@ -332,6 +336,8 @@ static void dir_set_scanning(Directory *dir, gboolean scanning)
 	if (scanning == dir->scanning)
 		return;
 
+	in_callback++;
+
 	dir->scanning = scanning;
 
 	for (next = dir->users; next; next = next->next)
@@ -342,6 +348,8 @@ static void dir_set_scanning(Directory *dir, gboolean scanning)
 				scanning ? DIR_START_SCAN : DIR_END_SCAN,
 				NULL, user->data);
 	}
+
+	in_callback--;
 }
 
 /* Notify everyone that the error status of the directory has changed */
@@ -349,12 +357,16 @@ static void dir_error_changed(Directory *dir)
 {
 	GList	*next;
 
+	in_callback++;
+
 	for (next = dir->users; next; next = next->next)
 	{
 		DirUser *user = (DirUser *) next->data;
 
 		user->callback(dir, DIR_ERROR_CHANGED, NULL, user->data);
 	}
+
+	in_callback--;
 }
 
 /* This is called in the background when there are items on the
@@ -411,6 +423,8 @@ void dir_merge_new(Directory *dir)
 	GPtrArray *gone = dir->gone_items;
 	GList	  *list;
 	guint	  i;
+	
+	in_callback++;
 
 	for (list = dir->users; list; list = list->next)
 	{
@@ -423,6 +437,8 @@ void dir_merge_new(Directory *dir)
 		if (gone->len)
 			user->callback(dir, DIR_REMOVE, gone, user->data);
 	}
+
+	in_callback--;
 
 	for (i = 0; i < new->len; i++)
 	{
@@ -509,12 +525,16 @@ static void notify_deleted(Directory *dir, GPtrArray *deleted)
 	if (!deleted->len)
 		return;
 
+	in_callback++;
+
 	for (next = dir->users; next; next = next->next)
 	{
 		DirUser *user = (DirUser *) next->data;
 
 		user->callback(dir, DIR_REMOVE, deleted, user->data);
 	}
+
+	in_callback--;
 }
 
 static void mark_unused(gpointer key, gpointer value, gpointer data)
@@ -742,12 +762,16 @@ static void dir_force_update_item(Directory *dir, const gchar *leaf)
 
 	g_ptr_array_add(items, item);
 
+	in_callback++;
+
 	for (list = dir->users; list; list = list->next)
 	{
 		DirUser *user = (DirUser *) list->data;
 
 		user->callback(dir, DIR_UPDATE, items, user->data);
 	}
+
+	in_callback--;
 
 out:
 	g_ptr_array_free(items, TRUE);
