@@ -5,6 +5,9 @@
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  */
 
+#ifndef _PIXMAP_H
+#define _PIXMAP_H
+
 #include <gtk/gtk.h>
 
 enum
@@ -38,3 +41,5 @@ extern MaskedPixmap default_pixmap[LAST_DEFAULT_PIXMAP];
 
 void load_default_pixmaps(GdkWindow *window);
 void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image);
+
+#endif _PIXMAP_H

@@ -10,8 +10,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include <collection.h>
 
 #include "support.h"
@@ -45,19 +48,80 @@ static void scan_callback(char *leafname, gpointer data)
 {
 	FilerWindow 	*filer_window = (FilerWindow *) data;
 	FileItem	*item;
+	int		item_width;
+	struct stat	info;
+	int		base_type;
+	char		*path;
 
 	item = g_malloc(sizeof(FileItem));
 	item->leafname = g_strdup(leafname);
+	item->flags = 0;
 
-	collection_insert(filer_window->collection, item);
+	path = make_path(filer_window->dir->path, leafname)->str;
+	if (lstat(path, &info))
+		base_type = TYPE_ERROR;
+	else
+	{
+		if (S_ISREG(info.st_mode))
+			base_type = TYPE_FILE;
+		else if (S_ISDIR(info.st_mode))
+			base_type = TYPE_DIRECTORY;
+		else if (S_ISBLK(info.st_mode))
+			base_type = TYPE_BLOCK_DEVICE;
+		else if (S_ISCHR(info.st_mode))
+			base_type = TYPE_CHAR_DEVICE;
+		else if (S_ISFIFO(info.st_mode))
+			base_type = TYPE_PIPE;
+		else if (S_ISSOCK(info.st_mode))
+			base_type = TYPE_SOCKET;
+		else if (S_ISLNK(info.st_mode))
+		{
+			if (stat(path, &info))
+			{
+				base_type = TYPE_ERROR;
+			}
+			else
+			{
+				if (S_ISREG(info.st_mode))
+					base_type = TYPE_FILE;
+				else if (S_ISDIR(info.st_mode))
+					base_type = TYPE_DIRECTORY;
+				else if (S_ISBLK(info.st_mode))
+					base_type = TYPE_BLOCK_DEVICE;
+				else if (S_ISCHR(info.st_mode))
+					base_type = TYPE_CHAR_DEVICE;
+				else if (S_ISFIFO(info.st_mode))
+					base_type = TYPE_PIPE;
+				else if (S_ISSOCK(info.st_mode))
+					base_type = TYPE_SOCKET;
+				else
+					base_type = TYPE_UNKNOWN;
+			}
+
+			item->flags |= ITEM_FLAG_SYMLINK;
+		}
+		else
+			base_type = TYPE_UNKNOWN;
+	}
 
 	item->text_width = gdk_string_width(filer_window->window->style->font,
 			leafname);
+	item->image = default_pixmap + base_type;
+	
+	/* XXX: Must be a better way... */
+	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
 
-	if (item->text_width + 4 > filer_window->collection->item_width)
+	item_width = MAX(item->pix_width, item->text_width) + 4;
+
+	if (item_width > filer_window->collection->item_width)
 		collection_set_item_size(filer_window->collection,
-					 item->text_width + 4,
+					 item_width,
 					 filer_window->collection->item_height);
+
+	collection_insert(filer_window->collection, item);
+
+	/* XXX: Think about this */
+	g_main_iteration(FALSE);
 }
 
 static void draw_item(GtkWidget *widget,
@@ -66,12 +130,42 @@ static void draw_item(GtkWidget *widget,
 			GdkRectangle *area)
 {
 	FileItem	*item = (FileItem *) data;
+	GdkGC		*gc = selected ? widget->style->white_gc
+				       : widget->style->black_gc;
+	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
 
+	/*
 	gdk_draw_rectangle(widget->window,
 			widget->style->black_gc,
 			FALSE,
 			area->x, area->y,
 			area->width - 1, area->height - 1);
+	*/
+
+	if (item->image)
+	{
+		gdk_gc_set_clip_mask(gc, item->image->mask);
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_draw_pixmap(widget->window, gc,
+				item->image->pixmap,
+				0, 0,			/* Source x,y */
+				image_x, area->y + 8,	/* Dest x,y */
+				-1, -1);
+
+		if (item->flags & ITEM_FLAG_SYMLINK)
+		{
+			gdk_gc_set_clip_mask(gc,
+					default_pixmap[TYPE_SYMLINK].mask);
+			gdk_draw_pixmap(widget->window, gc,
+					default_pixmap[TYPE_SYMLINK].pixmap,
+					0, 0,			/* Source x,y */
+					image_x, area->y + 8,	/* Dest x,y */
+					-1, -1);
+		}
+		
+		gdk_gc_set_clip_mask(gc, NULL);
+		gdk_gc_set_clip_origin(gc, 0, 0);
+	}
 	
 	gdk_draw_text(widget->window,
 			widget->style->font,
@@ -118,6 +212,7 @@ void filer_opendir(char *path)
 
 	load_default_pixmaps(collection->window);
 
+	/* Note - scan may call g_main_iteration */
 	if (!directory_scan(filer_window->dir, scan_callback, filer_window))
 		report_error("Error opening directory", g_strerror(errno));
 }

@@ -8,9 +8,15 @@
 #include <gtk/gtk.h>
 #include <collection.h>
 #include "directory.h"
+#include "pixmaps.h"
 
 typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
+
+enum
+{
+	ITEM_FLAG_SYMLINK = 0x1,
+};
 
 struct _FilerWindow
 {
@@ -23,6 +29,9 @@ struct _FileItem
 {
 	char		*leafname;
 	int		text_width;
+	int		pix_width;
+	MaskedPixmap	*image;
+	int		flags;
 };
 
 void filer_opendir(char *path);
