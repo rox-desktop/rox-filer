@@ -449,7 +449,7 @@ $ rox --bottom=</screen>
      </entry></row>
 
      <row><entry><keycap>Backspace</keycap></entry><entry>
-       Va nella directory superiore.
+       Va nella directory genitore.
      </entry></row>
 
      <row><entry>Frecce</entry><entry>
@@ -580,8 +580,8 @@ $ rox --bottom=</screen>
        Apre una nuova finestra
        </entry></row><row><entry>
        Freccia su</entry><entry>
-       Va nella directory superiore</entry><entry>
-       Mostra la directory superiore in una nuova finestra <xref linkend="newwin_fn"/>
+       Va nella directory genitore</entry><entry>
+       Mostra la directory genitore in una nuova finestra <xref linkend="newwin_fn"/>
        </entry></row><row><entry>
        Casa</entry><entry>
        Va nella directory home</entry><entry>
@@ -960,7 +960,7 @@ $ rox --bottom=</screen>
    <formalpara><title>Nota sui collegamenti simbolici:</title>
     <para>
      un collegamento simbolico memorizza il <emphasis>percorso</emphasis>
-     di un'altro flle. Eliminando questo collegamento, non si influenza l'altro
+     di un altro flle. Eliminando questo collegamento, non si influenza l'altro
      file. Eliminando invece l'altro file, il collegamento simbolico viene interrotto. 
      Ci sono due tipi di collegamento simbolico: assoluto e relativo. Un collegamento
      simbolico assoluto memorizza il percorso partendo dalla radice («/» o «root»),
@@ -1068,12 +1068,12 @@ $ rox --bottom=</screen>
       <thead><row><entry>Voce</entry><entry>Azione</entry></row></thead>
       <tbody>
        <row><entry>
-         <guimenuitem>Directory superiore, nuova finestra</guimenuitem></entry><entry>
-         Visualizza la directory superiore in una nuova finestra.
+         <guimenuitem>Directory genitore, nuova finestra</guimenuitem></entry><entry>
+         Visualizza la directory genitore in una nuova finestra.
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Directory superiore, stessa finestra</guimenuitem></entry><entry>
+         <guimenuitem>Directory genitore, stessa finestra</guimenuitem></entry><entry>
          Come sopra, ma usa la stessa finestra.
        </entry></row>
 
@@ -3073,7 +3073,8 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>NomeFile</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>, <parameter>ID</parameter>])
+     <parameter>Class</parameter>, <parameter>ID</parameter>],
+     <parameter>Hidden</parameter>, <parameter>Filter</parameter>)
      Apre una finestra mostrando la directory <parameter>NomeFile</parameter>.
      <parameter>Style</parameter> può essere <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      o <userinput>Automatic</userinput>.
@@ -3088,6 +3089,10 @@ EOF</screen>
      altrimenti viene creata una nuova finestra con questo ID. Se usato da un programma,
      assicurarsi che l'ID sia unico, per esempio includendo nell'ID il nome del processo,
      il PID e il timestamp.
+     Se <parameter>Hidden</parameter> è <userinput>true</userinput>, vengono mostrati i file nascosti (quelli che iniziano 
+     con un punto), se è <userinput>false</userinput> non vengono mostrati.  Se è omesso, viene usata l'impostazione configurata.
+     <parameter>Filter</parameter> può essere usato per filtrare per nome i file visualizzati. Per esempio, usando il filtro 
+     <userinput>*.c</userinput> vengono mostrati solo i file che terminano per «.c».
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
