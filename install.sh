@@ -31,7 +31,7 @@ fi
 echo Testing...
 ./ROX-Filer/AppRun --version
 if [ $? -ne 0 ]; then
-	echo "Filer doesn't work! Giving up..."
+	die "Filer doesn't work! Giving up..."
 fi
 
 cat << EOF
