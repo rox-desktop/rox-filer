@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.12-20020122\n"
+"Project-Id-Version: ROX-Filer 1.3.0\n"
 "POT-Creation-Date: 2002-04-14 17:25+0100\n"
-"PO-Revision-Date: 2002-01-22 18:28+0100\n"
+"PO-Revision-Date: 2002-04-15 04:04+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -18,9 +18,8 @@ msgid "<dir>"
 msgstr "<rép>"
 
 #: abox.c:162
-#, fuzzy
 msgid "_Quiet"
-msgstr "Silencieux"
+msgstr "_Silencieux"
 
 #: abox.c:170
 msgid "Quiet"
@@ -391,14 +390,14 @@ msgid "'Unmounting %s\n"
 msgstr "'Démontage de %s\n"
 
 #: action.c:1435
-#, fuzzy, c-format
+#, c-format
 msgid "?Mount %s?"
-msgstr "?Monter %s ?\n"
+msgstr "?Monter %s ?"
 
 #: action.c:1436
-#, fuzzy, c-format
+#, c-format
 msgid "?Unmount %s?"
-msgstr "?Démonter %s ?\n"
+msgstr "?Démonter %s ?"
 
 #: action.c:1446
 #, c-format
@@ -560,13 +559,12 @@ msgid "Copy"
 msgstr "Copier"
 
 #: action.c:1880 action.c:1913 tips:160
-#, fuzzy
 msgid "Newer"
-msgstr "Nouveau"
+msgstr "Plus récent"
 
 #: action.c:1881 action.c:1914 tips:161 tips:162 tips:163 tips:164
 msgid "Only over-write if source is newer than destination."
-msgstr ""
+msgstr "Écraser seulement si la source est plus récente que la destination."
 
 #: action.c:1903 dnd.c:136 tips:144
 msgid "Move"
@@ -614,11 +612,11 @@ msgstr "<étiquette manquante>"
 
 #: collection.c:261
 msgid "Vertical Adjustment"
-msgstr ""
+msgstr "Ajustement vertical"
 
 #: collection.c:262
 msgid "The GtkAdjustment for the vertical position."
-msgstr ""
+msgstr "Le GtkAdjustment pour la position verticale."
 
 #: dir.c:131 dir.c:668
 #, c-format
@@ -630,9 +628,9 @@ msgstr ""
 "%s"
 
 #: dir.c:345
-#, fuzzy, c-format
+#, c-format
 msgid "Can't stat directory: %s"
-msgstr "Impossible d'ouvrir le répertoire : %s"
+msgstr "Impossible de faire un stat du répertoire : %s"
 
 #: dir.c:353
 #, c-format
@@ -775,15 +773,15 @@ msgstr "Répertoire '%s' non trouvé."
 
 #: filer.c:1769
 msgid "S"
-msgstr ""
+msgstr "L"
 
 #: filer.c:1770
 msgid "A"
-msgstr ""
+msgstr "T"
 
 #: filer.c:1771
 msgid "T"
-msgstr ""
+msgstr "I"
 
 #: filer.c:1777
 msgid "Scanning, "
@@ -808,6 +806,7 @@ msgstr "Lien symbolique vers "
 #: filer.c:2182
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
+"Ce nom de fichier n'est pas en UTF-8 valide. Vous devriez le renommer.\n"
 
 #: find.c:485
 msgid "And"
@@ -1003,11 +1002,11 @@ msgstr "blocks"
 
 #: gtksavebox.c:232
 msgid "Has Discard"
-msgstr ""
+msgstr "A Annuler"
 
 #: gtksavebox.c:233
 msgid "The dialog has a Discard button"
-msgstr ""
+msgstr "La boîte de dialogue a un bouton Annuler"
 
 #: gtksavebox.c:251
 msgid "Save As:"
@@ -1323,11 +1322,11 @@ msgstr "Support des fichiers longs"
 
 #: main.c:569
 msgid "GNOME-VFS library"
-msgstr ""
+msgstr "Bibliothèque GNOME-VFS"
 
 #: main.c:573
 msgid "No (gnome-vfs-config not found)"
-msgstr ""
+msgstr "Non (gnome-vfs-config non trouvé)"
 
 #: menu.c:173 tips:41
 msgid "Display"
@@ -1525,9 +1524,8 @@ msgid "Open As Text"
 msgstr "Ouvrir en texte"
 
 #: menu.c:992
-#, fuzzy
 msgid "_Relative link"
-msgstr "Lien relatif"
+msgstr "_Lien relatif"
 
 #: menu.c:998
 msgid ""
@@ -1546,9 +1544,8 @@ msgid "New pathname is not absolute"
 msgstr "Le nouveau chemin n'est pas absolu"
 
 #: menu.c:1220 menu.c:1261 menu.c:1321
-#, fuzzy
 msgid "Create"
-msgstr "Créer les imagettes"
+msgstr "Créer"
 
 #: menu.c:1221
 msgid "NewDir"
@@ -1766,40 +1763,39 @@ msgid "Invalid Find condition"
 msgstr "Condition de recherche invalide"
 
 #: options.c:267
-#, fuzzy
 msgid "ROX-Filer has converted your Options file to the new XML format"
-msgstr "Votre vieux fichier de panneau a été converti au nouveau format XML."
+msgstr "ROX-Filer a converti votre fichier Options au nouveau format XML"
 
 #: options.c:829
-#, fuzzy
 msgid "Options"
-msgstr "Options..."
+msgstr "Options"
 
 #: options.c:886
-#, fuzzy
 msgid "(saving disabled by CHOICESPATH)"
-msgstr "Le choix des icônes est désactivé par CHOICESPATH"
+msgstr "(sauvegarde désactivée par CHOICESPATH)"
 
 #: options.c:891
-#, fuzzy
 msgid "_Revert"
-msgstr "Enlever"
+msgstr "_Revenir"
 
 #: options.c:896
 msgid "Restore all choices to how they were when the Options box was opened."
 msgstr ""
+"Récupérer tous les choix tels qu'ils étaient lorsque la boîte Options a été "
+"ouverte."
 
 #: options.c:899
-#, fuzzy
 msgid "_OK"
-msgstr "OK"
+msgstr "_OK"
 
 #: options.c:912
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Choices will be saved as:\n"
 "%s"
-msgstr "Les choix seront sauvés sous %s"
+msgstr ""
+"Les choix seront sauvés sous :\n"
+"%s"
 
 #: options.c:1082
 #, c-format
@@ -1854,12 +1850,12 @@ msgid "Applet quit without ever creating a widget!"
 msgstr "L'appliquette a quitté sans avoir créé de widget !"
 
 #: panel.c:1408
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error running applet:\n"
 "%s"
 msgstr ""
-"Erreur lors de la lecture de '%s' :\n"
+"Erreur lors de l'exécution de l'appliquette :\n"
 "%s"
 
 #: pinboard.c:252
@@ -2321,9 +2317,8 @@ msgid "Enter the path of an icon file:"
 msgstr "Entrez le chemin d'un fichier d'icône :"
 
 #: usericons.c:413
-#, fuzzy
 msgid "_Remove"
-msgstr "Enlever"
+msgstr "_Enlever"
 
 #: usericons.c:607
 msgid ""
@@ -2358,9 +2353,8 @@ msgid "Translation"
 msgstr "Traduction"
 
 #: tips:2
-#, fuzzy
 msgid "Language"
-msgstr "Grande"
+msgstr "Langue"
 
 #: tips:3
 msgid "Use the LANG environment variable"
@@ -2375,9 +2369,8 @@ msgid "Chinese (simplified)"
 msgstr ""
 
 #: tips:6
-#, fuzzy
 msgid "Danish"
-msgstr "Espagnol"
+msgstr "Danois"
 
 #: tips:7
 msgid "Dutch"
@@ -2416,26 +2409,24 @@ msgid "Spanish"
 msgstr "Espagnol"
 
 #: tips:16 tips:17
-#, fuzzy
 msgid ""
 "Note that you must save your choices and restart the filer for the new "
 "language setting to take full effect."
 msgstr ""
-"Vous devez relancer le filer pour supporter entièrement le nouveau langage"
+"Noter que vous devez sauver vos choix et relancer le filer pour que la "
+"nouvelle langue soit entièrement supportée."
 
 #: tips:18
 msgid "Filer windows"
 msgstr "Fenêtres du filer"
 
 #: tips:19
-#, fuzzy
 msgid "Auto-resize filer windows"
-msgstr "Changement de taille automatique des fenêtres du filer..."
+msgstr "Changement de taille automatique des fenêtres du filer"
 
 #: tips:20
-#, fuzzy
 msgid "Never automatically resize"
-msgstr "Changement de taille automatique des fenêtres du filer..."
+msgstr "Ne jamais changer de taille automatiquement"
 
 #: tips:21
 msgid ""
@@ -2447,9 +2438,8 @@ msgstr ""
 "cliquant sur le fond de la fenêtre."
 
 #: tips:22
-#, fuzzy
 msgid "Resize when changing the display style"
-msgstr "...quand vous changez le style d'affichage"
+msgstr "Changer de taille quand vous changez le style d'affichage"
 
 #: tips:23
 msgid ""
@@ -2461,7 +2451,7 @@ msgstr ""
 
 #: tips:24
 msgid "Always resize"
-msgstr ""
+msgstr "Toujours changer la taille"
 
 #: tips:25 tips:26
 msgid ""
@@ -2472,9 +2462,8 @@ msgstr ""
 "utile (c'est-à-dire quand le répertoire ou le style d'affichage est changé)."
 
 #: tips:27
-#, fuzzy
 msgid "Largest window size:"
-msgstr "Changer la taille de l'icône"
+msgstr "Plus grande taille de fenêtre :"
 
 #: tips:28
 #, c-format
@@ -2491,17 +2480,19 @@ msgstr ""
 
 #: tips:31
 msgid "Window behaviour"
-msgstr ""
+msgstr "Comportement relatif aux fenêtres"
 
 #: tips:32
 msgid "Short titlebar flags"
-msgstr ""
+msgstr "Drapeaux de barre de titre courts"
 
 #: tips:33
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 msgstr ""
+"Utiliser des lettres simples au lieu de mots pour les indicateurs Lecture, "
+"Tous et Imagettes dans la barre de titre."
 
 #: tips:34
 msgid "Unique windows"
@@ -2549,9 +2540,8 @@ msgid "Sorting"
 msgstr "Rien"
 
 #: tips:43
-#, fuzzy
 msgid "Intelligent sorting"
-msgstr "Ignorer la casse lors d'un tri"
+msgstr "Tri intelligent"
 
 #: tips:44
 msgid ""
@@ -2559,6 +2549,9 @@ msgid ""
 "If on, ignores case and punctuation and handles numbers properly: file8, "
 "File9, File10"
 msgstr ""
+"Si désactivée, effectuer un tri ASCII: Fichier10, Fichier9, Fichier8.\n"
+"Si activée, ignorer la casse et la ponctuation et manipuler les nombres "
+"proprement: fichier8, Fichier9, Fichier10"
 
 #: tips:45
 msgid "Directories always come first"
@@ -2574,12 +2567,11 @@ msgstr ""
 
 #: tips:48
 msgid "Icon text width"
-msgstr ""
+msgstr "Largeur du texte de l'icône"
 
 #: tips:49
-#, fuzzy
 msgid "Large wrap width:"
-msgstr "Largeur du texte replié"
+msgstr "Largeur du texte replié :"
 
 #: tips:50 tips:53
 msgid "pixels"
@@ -2595,18 +2587,16 @@ msgstr ""
 "ligne quand il est 50% plus large que ce qui est fixé ici."
 
 #: tips:52
-#, fuzzy
 msgid "Max Small Icons width:"
-msgstr "Largeur max. des petites icônes"
+msgstr "Largeur max. des petites icônes :"
 
 #: tips:54 tips:55
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Largeur maximale du texte affiché à côté d'une petite icône."
 
 #: tips:56
-#, fuzzy
 msgid "Default settings for new windows"
-msgstr "Options par défaut pour les nouvelles fenêtres :"
+msgstr "Options par défaut pour les nouvelles fenêtres"
 
 #: tips:57
 msgid "Inherit options from source window"
@@ -2622,23 +2612,20 @@ msgstr ""
 "fixées aux valeurs par défaut données ci-dessous."
 
 #: tips:59
-#, fuzzy
 msgid "Icon size:"
-msgstr "Taille d'icône"
+msgstr "Taille d'icône :"
 
 #: tips:63
-#, fuzzy
 msgid "Details:"
-msgstr "Détails"
+msgstr "Détails :"
 
 #: tips:64
 msgid "No details"
 msgstr "Pas de détails"
 
 #: tips:70
-#, fuzzy
 msgid "Sort by:"
-msgstr "Trier par"
+msgstr "Trier par :"
 
 #: tips:73
 msgid "Date"
@@ -2673,24 +2660,20 @@ msgid "Toolbar"
 msgstr "Barre d'outils"
 
 #: tips:84
-#, fuzzy
 msgid "Toolbar buttons"
-msgstr "Options de la barre d'outils"
+msgstr "Boutons de la barre d'outils"
 
 #: tips:85
-#, fuzzy
 msgid "Unshade the tools you want."
-msgstr "Activez les outils que vous voulez :"
+msgstr "Activez les outils que vous voulez."
 
 #: tips:86
-#, fuzzy
 msgid "Toolbar appearance"
-msgstr "Type de barre d'outils"
+msgstr "Apparence de la barre d'outils"
 
 #: tips:87
-#, fuzzy
 msgid "Toolbar type:"
-msgstr "Type de barre d'outils"
+msgstr "Type de barre d'outils :"
 
 #: tips:88
 msgid "None"
@@ -2731,7 +2714,7 @@ msgstr ""
 
 #: tips:98
 msgid "Beeping"
-msgstr ""
+msgstr "Bip"
 
 #: tips:99
 msgid "Beep if Tab-completion fails"
@@ -2777,24 +2760,20 @@ msgstr ""
 "le manuel pour toute information sur l'utilisation du punaiseur."
 
 #: tips:108
-#, fuzzy
 msgid "Text style"
-msgstr "Style du texte :"
+msgstr "Style du texte"
 
 #: tips:109
-#, fuzzy
 msgid "Foreground:"
-msgstr "Encre"
+msgstr "Encre :"
 
 #: tips:110
-#, fuzzy
 msgid "Background:"
-msgstr "Fond"
+msgstr "Fond :"
 
 #: tips:111
-#, fuzzy
 msgid "Pinboard behaviour"
-msgstr "Punaiseur"
+msgstr "Comportement du punaiseur"
 
 #: tips:112
 msgid "Single-click to open"
@@ -2860,9 +2839,8 @@ msgstr ""
 "Voir le manuel pour toute information sur l'utilisation des panneaux."
 
 #: tips:129
-#, fuzzy
 msgid "Panel style"
-msgstr "Panneaux"
+msgstr "Style du panneau"
 
 #: tips:130
 msgid "Image and text"
@@ -2905,9 +2883,8 @@ msgstr ""
 "suppression de fichiers."
 
 #: tips:141
-#, fuzzy
 msgid "Auto-start (Quiet) these actions"
-msgstr "Commencer immédiatement (silencieusement) ces actions :"
+msgstr "Commencer immédiatement (silencieusement) ces actions"
 
 #: tips:143
 msgid "Copy files without confirming first."
@@ -2930,9 +2907,8 @@ msgid "Mount and unmount filesystems without confirming first."
 msgstr "Monter et démonter des systèmes de fichiers sans confirmation."
 
 #: tips:153
-#, fuzzy
 msgid "Default settings"
-msgstr "Options par défaut :"
+msgstr "Options par défaut"
 
 #: tips:155
 msgid "Don't confirm deletion of non-writeable items."
@@ -2951,9 +2927,8 @@ msgid "Drag and Drop"
 msgstr "Glisser-déposer"
 
 #: tips:166 tips:185 tips:198
-#, fuzzy
 msgid "General"
-msgstr "Allemand"
+msgstr "Général"
 
 #: tips:167
 msgid "Don't use hostnames"
@@ -3002,9 +2977,8 @@ msgstr ""
 "au-dessus pendant un instant."
 
 #: tips:173
-#, fuzzy
 msgid "Spring delay:"
-msgstr "Délai de surgissement"
+msgstr "Délai de surgissement :"
 
 #: tips:174
 msgid "ms"
@@ -3021,19 +2995,16 @@ msgstr ""
 "ci-dessus doit être active pour que ce réglage ait un effet."
 
 #: tips:177
-#, fuzzy
 msgid "Dragging files with the middle mouse button"
-msgstr "Glisser-déposer des fichiers avec le bouton du milieu..."
+msgstr "Glisser-déposer des fichiers avec le bouton du milieu"
 
 #: tips:178
-#, fuzzy
 msgid "Shows a menu of possible actions"
-msgstr "... fait apparaître un menu des actions possibles"
+msgstr "fait apparaître un menu des actions possibles"
 
 #: tips:179
-#, fuzzy
 msgid "Moves the files"
-msgstr "... provoque le déplacement des fichiers"
+msgstr "provoque le déplacement des fichiers"
 
 #: tips:180 tips:181 tips:182 tips:183
 msgid ""
@@ -3061,9 +3032,8 @@ msgstr ""
 "non choisie, utilisez le bouton 3 (à droite) à la place."
 
 #: tips:188
-#, fuzzy
 msgid "Size of icons in menus:"
-msgstr "Taille des icônes dans les menus"
+msgstr "Taille des icônes dans les menus :"
 
 #: tips:189
 msgid "No Icons"
@@ -3078,9 +3048,8 @@ msgid "Same as default"
 msgstr "Comme le choix par défaut"
 
 #: tips:194
-#, fuzzy
 msgid "`Xterm Here' program"
-msgstr "Programme pour « Xterm ici » :"
+msgstr "Programme pour « Xterm ici »"
 
 #: tips:195 tips:196
 msgid "The program to launch when you choose `Xterm Here' from the menu."
@@ -3108,18 +3077,16 @@ msgstr ""
 
 #: tips:202
 msgid "MIME types"
-msgstr ""
+msgstr "Types MIME"
 
 #: tips:203
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. After editing "
 "the files, click the re-read button below, or restart the filer."
 msgstr ""
-"Le filer utilise un ensemble de règles pour deviner le type MIME correct de\n"
-"chaque fichier ordinaire et choisit ensuite une icône adéquate pour ce "
-"type.\n"
+"Le filer utilise un ensemble de règles pour deviner le type MIME correct de "
+"chaque fichier ordinaire et choisit ensuite une icône adéquate pour ce type. "
 "Après avoir édité les fichiers, cliquez sur le bouton relecture ci-dessous "
 "ou relancez le filer."
 
@@ -3139,14 +3106,12 @@ msgstr ""
 "chaque type."
 
 #: tips:208
-#, fuzzy
 msgid "Colours"
-msgstr "Hours"
+msgstr "Couleurs"
 
 #: tips:209
-#, fuzzy
 msgid "File type colours"
-msgstr "Couleurs du texte :"
+msgstr "Couleurs des types de fichier"
 
 #: tips:210
 msgid "Colour files based on their types"
@@ -3159,24 +3124,20 @@ msgstr ""
 "du fichier."
 
 #: tips:212
-#, fuzzy
 msgid "Directory:"
-msgstr "Répertoire"
+msgstr "Répertoire :"
 
 #: tips:213
-#, fuzzy
 msgid "Regular file:"
-msgstr "Fichier ordinaire"
+msgstr "Fichier ordinaire :"
 
 #: tips:214
-#, fuzzy
 msgid "Pipe:"
-msgstr "Tube"
+msgstr "Tube :"
 
 #: tips:215
-#, fuzzy
 msgid "Socket:"
-msgstr "Socket"
+msgstr "Socket :"
 
 #: tips:217 tips:218
 msgid ""
@@ -3187,29 +3148,24 @@ msgstr ""
 "que le filer n'a pas la permission d'examiner."
 
 #: tips:219
-#, fuzzy
 msgid "Character device:"
-msgstr "Périphérique caractère"
+msgstr "Périphérique caractère :"
 
 #: tips:220
-#, fuzzy
 msgid "Block device:"
-msgstr "Périphérique bloc"
+msgstr "Périphérique bloc :"
 
 #: tips:221
-#, fuzzy
 msgid "Executable file:"
-msgstr "Fichier exécutable"
+msgstr "Fichier exécutable :"
 
 #: tips:222
-#, fuzzy
 msgid "Application directory:"
-msgstr "Répertoire application"
+msgstr "Répertoire application :"
 
 #: tips:223
-#, fuzzy
 msgid "Unknown type:"
-msgstr "Type inconnu"
+msgstr "Type inconnu :"
 
 #~ msgid "No background"
 #~ msgstr "Pas de fond"
