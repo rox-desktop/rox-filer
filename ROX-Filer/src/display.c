@@ -72,26 +72,6 @@ static gboolean o_sort_nocase = TRUE;
 static gboolean o_dirs_first = FALSE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
-static gboolean	o_display_colour_types = TRUE;
-
-/* Colours for file types (same order as base types) */
-static gchar *opt_type_colours[][2] = {
-	{"display_err_colour",  "#ff0000"},
-	{"display_unkn_colour", "#000000"},
-	{"display_dir_colour",  "#000080"},
-	{"display_pipe_colour", "#444444"},
-	{"display_sock_colour", "#ff00ff"},
-	{"display_file_colour", "#000000"},
-	{"display_cdev_colour", "#000000"},
-	{"display_bdev_colour", "#000000"},
-	{"display_exec_colour", "#006000"},
-	{"display_adir_colour", "#006000"}
-};
-#define NUM_TYPE_COLOURS\
-		(sizeof(opt_type_colours) / sizeof(opt_type_colours[0]))
-
-/* Parsed colours for file types */
-static GdkColor	type_colours[NUM_TYPE_COLOURS];
 
 /* GC for drawing colour filenames */
 static GdkGC	*type_gc = NULL;
@@ -113,7 +93,6 @@ struct _Template {
 		(template)->icon.x, (template)->icon.y)
 
 /* Static prototypes */
-static int alloc_type_colours(void);
 static void fill_template(GdkRectangle *area, CollectionItem *item,
 			FilerWindow *filer_window, Template *template);
 static void huge_template(GdkRectangle *area, CollectionItem *colitem,
@@ -169,18 +148,6 @@ enum {
 
 void display_init()
 {
-	int i;
-	
-	option_add_int("display_colour_types", o_display_colour_types, NULL);
-	
-	for (i = 0; i < NUM_TYPE_COLOURS; i++)
-		option_add_string(
-				opt_type_colours[i][0],
-				opt_type_colours[i][1],
-				NULL
-		);
-	alloc_type_colours();
-
 	option_add_int("display_sort_nocase", o_sort_nocase, NULL);
 	option_add_int("display_dirs_first", o_dirs_first, NULL);
 	option_add_int("display_size", LARGE_ICONS, NULL);
@@ -747,77 +714,20 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-/* Parse file type colours and allocate/free them as necessary.
- * Returns the number of colours changed (0 if 'allocated' is FALSE from last
- * call).
- */
-static int alloc_type_colours(void)
-{
-	gboolean	success[NUM_TYPE_COLOURS];
-	int		change_count = 0;	/* No. needing realloc */
-	int		i;
-	static gboolean	allocated = FALSE;
-
-	/* Parse colours */
-	for (i = 0; i < NUM_TYPE_COLOURS; i++) {
-		GdkColor *c = &type_colours[i];
-		gushort r = c->red;
-		gushort g = c->green;
-		gushort b = c->blue;
-
-		gdk_color_parse(
-			option_get_static_string(opt_type_colours[i][0]),
-			&type_colours[i]);
-
-		if (allocated
-		    && (c->red != r || c->green != g || c->blue != b))
-			change_count++;
-	}
-	
-	/* Free colours if they were previously allocated and
-	 * have changed or become unneeded.
-	 */
-	if (allocated && (change_count || !o_display_colour_types))
-	{
-		gdk_colormap_free_colors(gdk_rgb_get_cmap(),
-					 type_colours, NUM_TYPE_COLOURS);
-		allocated = FALSE;
-	}
-
-	/* Allocate colours, unless they are still allocated (=> they didn't
-	 * change) or we don't want them anymore.
-	 * XXX: what should be done if allocation fails?
-	 */
-	if (!allocated && o_display_colour_types)
-	{
-		gdk_colormap_alloc_colors(gdk_rgb_get_cmap(),
-				type_colours, NUM_TYPE_COLOURS,
-				FALSE, TRUE, success);
-		allocated = TRUE;
-	}
-
-	return change_count;
-}
-
 static void options_changed(void)
 {
 	gboolean	old_case = o_sort_nocase;
 	gboolean	old_dirs = o_dirs_first;
-	gboolean	old_colours = o_display_colour_types;
 #ifdef GTK2
 	gboolean	old_large_wrap = o_large_truncate;
 	gboolean	old_small_trunc = o_small_truncate;
 #endif
 	GList		*next = all_filer_windows;
-	int		ch_colours;
 
 	o_sort_nocase = option_get_int("display_sort_nocase");
 	o_dirs_first = option_get_int("display_dirs_first");
 	o_large_truncate = option_get_int("display_large_width");
 	o_small_truncate = option_get_int("display_small_width");
-	o_display_colour_types = option_get_int("display_colour_types");
-
-	ch_colours = alloc_type_colours();
 
 	while (next)
 	{
@@ -838,9 +748,7 @@ static void options_changed(void)
 					filer_window->sort_fn);
 		}
 		shrink_grid(filer_window);
-		if (old_colours != o_display_colour_types
-		    || (o_display_colour_types && ch_colours))
-			gtk_widget_queue_draw(filer_window->window);
+		gtk_widget_queue_draw(filer_window->window);
 
 		next = next->next;
 	}
@@ -1279,19 +1187,8 @@ static void draw_item(GtkWidget *widget,
 	if (!type_gc)
 		type_gc = gdk_gc_new(widget->window);
 
-	if (o_display_colour_types)
-	{
-		if (item->flags & ITEM_FLAG_EXEC_FILE)
-			gdk_gc_set_foreground(type_gc, &type_colours[8]);
-		else if (item->flags & ITEM_FLAG_APPDIR)
-			gdk_gc_set_foreground(type_gc, &type_colours[9]);
-		else
-			gdk_gc_set_foreground(type_gc,
-					&type_colours[item->base_type]);
-	}
-	else
-		gdk_gc_set_foreground(type_gc,
-				&widget->style->fg[GTK_STATE_NORMAL]);
+	gdk_gc_set_foreground(type_gc, type_get_colour(item,
+					&widget->style->fg[GTK_STATE_NORMAL]));
 
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)

@@ -64,7 +64,29 @@ typedef struct pattern {
 } Pattern;
 #endif
 
+static gboolean	o_display_colour_types = TRUE;
+
+/* Colours for file types (same order as base types) */
+static gchar *opt_type_colours[][2] = {
+	{"display_err_colour",  "#ff0000"},
+	{"display_unkn_colour", "#000000"},
+	{"display_dir_colour",  "#000080"},
+	{"display_pipe_colour", "#444444"},
+	{"display_sock_colour", "#ff00ff"},
+	{"display_file_colour", "#000000"},
+	{"display_cdev_colour", "#000000"},
+	{"display_bdev_colour", "#000000"},
+	{"display_exec_colour", "#006000"},
+	{"display_adir_colour", "#006000"}
+};
+#define NUM_TYPE_COLOURS\
+		(sizeof(opt_type_colours) / sizeof(opt_type_colours[0]))
+
+/* Parsed colours for file types */
+static GdkColor	type_colours[NUM_TYPE_COLOURS];
+
 /* Static prototypes */
+static void alloc_type_colours(void);
 static char *import_extensions(guchar *line);
 static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
@@ -100,7 +122,7 @@ MIME_type *special_char_dev;
 MIME_type *special_exec;
 MIME_type *special_unknown;
 
-void type_init()
+void type_init(void)
 {
 	int		i;
 	GPtrArray	*list;
@@ -126,6 +148,16 @@ void type_init()
 
 	option_register_widget("type-edit", build_type_edit);
 	option_register_widget("type-reread", build_type_reread);
+	
+	option_add_int("display_colour_types", o_display_colour_types, NULL);
+	
+	for (i = 0; i < NUM_TYPE_COLOURS; i++)
+		option_add_string(opt_type_colours[i][0],
+				  opt_type_colours[i][1],
+				  NULL);
+	alloc_type_colours();
+
+	option_add_notify(alloc_type_colours);
 }
 
 /* Returns the MIME_type structure for the given type name. It is looked
@@ -1127,4 +1159,69 @@ static GList *build_type_edit(OptionUI *none, xmlNode *node, guchar *label)
 			GTK_SIGNAL_FUNC(edit_mime_types), NULL);
 
 	return g_list_append(NULL, align);
+}
+
+/* Parse file type colours and allocate/free them as necessary */
+static void alloc_type_colours(void)
+{
+	gboolean	success[NUM_TYPE_COLOURS];
+	int		change_count = 0;	/* No. needing realloc */
+	int		i;
+	static gboolean	allocated = FALSE;
+
+	o_display_colour_types = option_get_int("display_colour_types");
+
+	/* Parse colours */
+	for (i = 0; i < NUM_TYPE_COLOURS; i++)
+	{
+		GdkColor *c = &type_colours[i];
+		gushort r = c->red;
+		gushort g = c->green;
+		gushort b = c->blue;
+
+		gdk_color_parse(
+			option_get_static_string(opt_type_colours[i][0]),
+			&type_colours[i]);
+
+		if (allocated && (c->red != r || c->green != g || c->blue != b))
+			change_count++;
+	}
+	
+	/* Free colours if they were previously allocated and
+	 * have changed or become unneeded.
+	 */
+	if (allocated && (change_count || !o_display_colour_types))
+	{
+		gdk_colormap_free_colors(gdk_rgb_get_cmap(),
+					 type_colours, NUM_TYPE_COLOURS);
+		allocated = FALSE;
+	}
+
+	/* Allocate colours, unless they are still allocated (=> they didn't
+	 * change) or we don't want them anymore.
+	 * XXX: what should be done if allocation fails?
+	 */
+	if (!allocated && o_display_colour_types)
+	{
+		gdk_colormap_alloc_colors(gdk_rgb_get_cmap(),
+				type_colours, NUM_TYPE_COLOURS,
+				FALSE, TRUE, success);
+		allocated = TRUE;
+	}
+}
+
+/* Return a pointer to a (static) colour for this item. If colouring is
+ * off, returns normal.
+ */
+GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
+{
+	if (!o_display_colour_types)
+		return normal;
+
+	if (item->flags & ITEM_FLAG_EXEC_FILE)
+		return &type_colours[8];
+	else if (item->flags & ITEM_FLAG_APPDIR)
+		return &type_colours[9];
+	else
+		return &type_colours[item->base_type];
 }

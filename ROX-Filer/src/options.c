@@ -367,7 +367,6 @@ static void open_coloursel(GtkWidget *ok, GtkWidget *button)
 }
 
 /* These are used during parsing... */
-static guchar *section_name = NULL;
 static xmlDocPtr options_doc = NULL;
 
 #define DATA(node) (xmlNodeListGetString(options_doc, node->xmlChildrenNode, 1))
@@ -538,20 +537,16 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 
 	if (oname)
 	{
-		guchar	*tmp;
-
-		tmp = g_strconcat(section_name, "_", oname, NULL);
-		g_free(oname);
-		option = g_hash_table_lookup(option_hash, tmp);
+		option = g_hash_table_lookup(option_hash, oname);
 
 		if (!option)
 		{
-			g_warning("No Option for '%s'!\n", tmp);
-			g_free(tmp);
+			g_warning("No Option for '%s'!\n", oname);
+			g_free(oname);
 			return;
 		}
 
-		g_free(tmp);
+		g_free(oname);
 	}
 	else
 		option = NULL;
@@ -606,7 +601,6 @@ static void build_sections(xmlNode *options, GtkWidget *sections_box)
 			continue;
 
 		title = xmlGetProp(section, "title");
-		section_name = xmlGetProp(section, "name");
 		page = gtk_vbox_new(FALSE, 0);
 		gtk_container_set_border_width(GTK_CONTAINER(page), 4);
 
@@ -631,8 +625,6 @@ static void build_sections(xmlNode *options, GtkWidget *sections_box)
 		}
 
 		g_free(title);
-		g_free(section_name);
-		section_name = NULL;
 	}
 }
 
@@ -893,6 +885,7 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 	guchar		*new = NULL;
 
 	g_return_if_fail(option != NULL);
+	g_return_if_fail(option->ui != NULL);
 
 	if (option->ui->read_widget)
 		new = option->ui->read_widget(option->ui);
@@ -984,6 +977,7 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 	Option *option = (Option *) value;
 
 	g_return_if_fail(option != NULL);
+	g_return_if_fail(option->ui != NULL);
 
 	if (option->ui->update_widget)
 		option->ui->update_widget(option->ui, option->value);
