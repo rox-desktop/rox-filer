@@ -640,7 +640,7 @@ static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
 	
 	item = gtk_menu_item_new_with_label(key);
 #ifdef GTK2
-	_gtk_widget_set_accel_path(item, NULL, NULL);
+	gtk_widget_set_accel_path(item, NULL, NULL);
 #else
 	gtk_widget_lock_accelerators(item);
 #endif

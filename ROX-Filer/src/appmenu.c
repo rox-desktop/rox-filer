@@ -185,7 +185,7 @@ static GtkWidget *create_menu_item(xmlNode *node)
 		label = g_strdup(_("<missing label>"));
 	item = gtk_menu_item_new_with_label(label);
 #ifdef GTK2
-	_gtk_widget_set_accel_path(item, NULL, NULL);
+	gtk_widget_set_accel_path(item, NULL, NULL);
 #else
 	gtk_widget_lock_accelerators(item);
 #endif

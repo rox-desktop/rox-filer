@@ -503,12 +503,10 @@ static void message_from_child(gpointer 	 data,
 			gtk_text_buffer_insert_with_tags_by_name(text_buffer,
 					&end, buffer + 1, message_len - 1,
 					*buffer == '!' ? "red" : NULL, NULL);
-			/* Causes a crash sometimes!
-			gtk_text_view_scroll_to_iter(
+			gtk_text_view_scroll_to_mark(
 				GTK_TEXT_VIEW(gui_side->log),
-				&end,
+				gtk_text_buffer_get_mark(text_buffer, "insert"),
 				0.0, FALSE, 0, 0);
-				*/
 #else
 			gtk_text_insert(GTK_TEXT(gui_side->log),
 					NULL,
