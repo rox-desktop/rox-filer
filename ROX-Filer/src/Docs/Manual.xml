@@ -1296,7 +1296,7 @@
     </para></step>
 
     <step><para>
-      Put an icon called <filename>.DirIcon.png</filename> inside it (so the directory
+      Put an icon called <filename>.DirIcon</filename> inside it (so the directory
       appears with an icon).
     </para></step>
 
@@ -2227,7 +2227,7 @@
   <sect1>
    <title>Toolbar options</title>
    <para>
-
+    The toolbar is described in the <xref linkend="Toolbar"/> section.
     <itemizedlist>
      <listitem><para> <guilabel>Unshade the tools you want:</guilabel> allows
        you to set which tools should appear on the toolbar. Click on the
@@ -2251,8 +2251,6 @@
      </para></listitem>
 
     </itemizedlist>
-
-    See the <xref linkend="Toolbar"/> section for details.
 
    </para>
   </sect1>
@@ -2628,7 +2626,7 @@
     </para></listitem>
 
     <listitem><para>
-      <filename>.DirIcon.png</filename>
+      <filename>.DirIcon</filename>
       is the image used to represent the directory (this works even if
       there is no <filename>AppRun</filename>).
     </para></listitem>
@@ -2646,7 +2644,7 @@
 
     <listitem><para>
       <filename>AppIcon.xpm</filename>
-      is used if <filename>.DirIcon.png</filename> is missing (for backwards
+      is used if <filename>.DirIcon</filename> is missing (for backwards
       compatibility).
     </para></listitem>
 
@@ -3167,7 +3165,7 @@
    <screen>
     $ rox --RPC &lt;&lt; EOF
     &lt;?xml version="1.0"?&gt;
-    &lt;env:Envelope xmlns:env="http://www.w3.org/2001/06/soap-envelope"&gt;
+    &lt;env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope"&gt;
     &lt;env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer"&gt;
     &lt;Panel&gt;
     &lt;Name&gt;Default&lt;/Name&gt;
@@ -3301,7 +3299,7 @@
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>SOAP</abbrev><citetitle>Simple Object Access Protocol (SOAP) 1.1
+   <abbrev>SOAP</abbrev><citetitle>Simple Object Access Protocol (SOAP) 1.2
     <ulink url="http://www.w3.org/TR/SOAP/"/></citetitle>
   </bibliomixed>
 

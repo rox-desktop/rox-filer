@@ -2028,7 +2028,8 @@ static gint coll_motion_notify(GtkWidget *widget,
 
 	if (collection->number_selected == 1)
 	{
-		DirItem	*item = (DirItem *) collection->items[i].data;
+		DirItem	 *item = (DirItem *) collection->items[i].data;
+		ViewData *view = (ViewData *) collection->items[i].view_data;
 
 		if (!item->image)
 			item = dir_update_item(filer_window->directory,
@@ -2042,7 +2043,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 
 		drag_one_item(widget, event,
 			make_path(filer_window->path, item->leafname)->str,
-			item);
+			item, view ? view->image : NULL);
 	}
 	else
 	{

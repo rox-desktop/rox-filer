@@ -1478,7 +1478,9 @@ static gboolean do_copy2(char *path, char *dest)
 
 		if (error)
 		{
-			g_string_sprintf(message, _("!ERROR: %s\n"), error);
+			g_string_sprintf(message, _("!%s\nFailed to copy '%s'"),
+					error, path);
+			g_free(error);
 			send();
 			retval = FALSE;
 		}
@@ -1495,6 +1497,7 @@ static gboolean do_move2(char *path, char *dest)
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
 	struct stat	info2;
 	gboolean	is_dir;
+	char            *err;
 
 	check_flags();
 
@@ -1551,7 +1554,17 @@ static gboolean do_move2(char *path, char *dest)
 	argv[2] = path;
 	argv[3] = dest_path;
 
-	if (fork_exec_wait(argv) == 0)
+	err = fork_exec_wait(argv);
+	if (err)
+	{
+		g_string_sprintf(message,
+				_("!%s\nFailed to move %s as %s\n"),
+				err, path, dest_path);
+		send();
+		retval = FALSE;
+		g_free(err);
+	}
+	else
 	{
 		char	*leaf;
 
@@ -1564,18 +1577,11 @@ static gboolean do_move2(char *path, char *dest)
 		g_string_sprintf(message, "+%s", path);
 		g_string_truncate(message, leaf - path + 1);
 		send();
-		if (is_dir) {
+		if (is_dir)
+		{
 			g_string_sprintf(message, "m%s", path);
 			send();
 		}
-	}
-	else
-	{
-		g_string_sprintf(message,
-				_("!ERROR: Failed to move %s as %s\n"),
-				path, dest_path);
-		send();
-		retval = FALSE;
 	}
 
 	return retval;
@@ -1646,6 +1652,7 @@ static gboolean do_link(char *path, char *dest)
 static void do_mount(guchar *path, gboolean mount)
 {
 	char		*argv[3] = {NULL, NULL, NULL};
+	char            *err;
 
 	check_flags();
 
@@ -1670,7 +1677,16 @@ static void do_mount(guchar *path, gboolean mount)
 			return;
 	}
 
-	if (fork_exec_wait(argv) == 0)
+	err = fork_exec_wait(argv);
+	if (err)
+	{
+		g_string_sprintf(message, mount ?
+			_("!%s\nMount failed\n") :
+			_("!%s\nUnmount failed\n"), err);
+		send();
+		g_free(err);
+	}
+	else
 	{
 		g_string_sprintf(message, "M%s", path);
 		send();
@@ -1679,13 +1695,6 @@ static void do_mount(guchar *path, gboolean mount)
 			g_string_sprintf(message, "o%s", path);
 			send();
 		}
-	}
-	else
-	{
-		g_string_sprintf(message, mount ?
-			_("!ERROR: Mount failed\n") :
-			_("!ERROR: Unmount failed\n"));
-		send();
 	}
 }
 

@@ -328,10 +328,10 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	/* TODO: Use gdk function when it supports this type */
 	{
-		gint32 desktop_type;
+		GdkAtom desktop_type;
 
-		desktop_type = gdk_x11_atom_to_xatom(
-			gdk_atom_intern("_NET_WM_WINDOW_TYPE_DESKTOP", FALSE));
+		desktop_type = gdk_atom_intern("_NET_WM_WINDOW_TYPE_DESKTOP",
+						FALSE);
 		gdk_property_change(icon->win->window,
 			gdk_atom_intern("_NET_WM_WINDOW_TYPE", FALSE),
 			gdk_atom_intern("ATOM", FALSE), 32,
@@ -937,7 +937,7 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	pinboard_drag_in_progress = icon;
 
 	if (icon_selection->next == NULL)
-		drag_one_item(widget, event, icon->path, icon->item);
+		drag_one_item(widget, event, icon->path, icon->item, NULL);
 	else
 	{
 		guchar	*uri_list;

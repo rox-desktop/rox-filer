@@ -226,11 +226,25 @@ char *our_host_name(void)
 }
 
 /* Create a child process. cd to dir first (if dir is non-NULL).
- * Returns the PID of the child, or 0 on failure.
+ * If from_stderr is set, create a pipe for stderr and return the readable
+ * side here.
+ * Returns the PID of the child, or 0 on failure (from_stderr is still valid).
  */
-pid_t spawn_full(char **argv, char *dir)
+pid_t spawn_full(char **argv, char *dir, int *from_stderr)
 {
 	int	child;
+	int	fd[2];
+
+	if (from_stderr)
+	{
+		if (pipe(fd) == 0)
+			*from_stderr = fd[0];
+		else
+		{
+			*from_stderr = -1;
+			from_stderr = NULL;
+		}
+	}
 
 	child = fork();
 
@@ -239,6 +253,17 @@ pid_t spawn_full(char **argv, char *dir)
 	else if (child == 0)
 	{
 		/* We are the child process */
+		if (from_stderr)
+		{
+			close(fd[0]);
+			if (fd[1] != STDERR_FILENO)
+			{
+				dup2(fd[1], STDERR_FILENO);
+				close(fd[1]);
+				close_on_exec(STDERR_FILENO, FALSE);
+			}
+		}
+
 		if (dir)
 			if (chdir(dir))
 				fprintf(stderr, "chdir() failed: %s\n",
@@ -249,6 +274,9 @@ pid_t spawn_full(char **argv, char *dir)
 				g_strerror(errno));
 		_exit(0);
 	}
+
+	if (from_stderr)
+		close(fd[1]);
 
 	/* We are the parent */
 	return child;
@@ -426,28 +454,101 @@ gchar *format_double_size(double size)
 	return buf;
 }
 
+/* Ensure that str ends with a newline (or is empty) */
+static void newline(GString *str)
+{
+	if (str->len && str->str[str->len - 1] != '\n')
+		g_string_append_c(str, '\n');
+}
+
 /* Fork and exec argv. Wait and return the child's exit status.
  * -1 if spawn fails.
+ * Returns the error string from the command if any, or NULL on success.
+ * If the process returns a non-zero exit status without producing a message,
+ * a suitable message is created.
+ * g_free() the result.
  */
-int fork_exec_wait(char **argv)
+char *fork_exec_wait(char **argv)
 {
 	pid_t	child;
 	int	status = -1;
+	GString *errors;
+	char	buffer[257];
+	int	from_stderr;
 
-	child = spawn_full(argv, NULL);
+	errors = g_string_new(NULL);
 
-	while (child)
+	child = spawn_full(argv, NULL, &from_stderr);
+
+	if (!child)
+	{
+		newline(errors);
+		g_string_append(errors, "fork: ");
+		g_string_append(errors, g_strerror(errno));
+		goto out;
+	}
+
+	while (from_stderr != -1)
+	{
+		int got;
+
+		got = read(from_stderr, buffer, sizeof(buffer) - 1);
+		if (got < 0)
+		{
+			newline(errors);
+			g_string_append(errors, "read: ");
+			g_string_append(errors, g_strerror(errno));
+		}
+		if (got <= 0)
+			break;
+		buffer[got] = '\0';
+		g_string_append(errors, buffer);
+	}
+
+	while (1)
 	{
 		if (waitpid(child, &status, 0) == -1)
 		{
 			if (errno != EINTR)
-				return -1;
+			{
+				newline(errors);
+				g_string_append(errors, "waitpid: ");
+				g_string_append(errors, g_strerror(errno));
+				break;
+			}
 		}
 		else
+		{
+			if (!WIFEXITED(status))
+			{
+				newline(errors);
+				g_string_append(errors, "(crashed?)");
+			}
+			else if (WEXITSTATUS(status))
+			{
+				newline(errors);
+				if (!errors->len)
+					g_string_append(errors, "ERROR");
+			}
 			break;
-	};
+		}
+	}
 
-	return status;
+out:
+	if (from_stderr != -1)
+		close(from_stderr);
+
+	if (errors->len && errors->str[errors->len - 1] == '\n')
+		g_string_truncate(errors, errors->len - 1);
+
+	if (errors->len)
+	{
+		char *retval = errors->str;
+		g_string_free(errors, FALSE);
+		return retval;
+	}
+
+	return NULL;
 }
 
 /* If a file has this UID and GID, which permissions apply to us?
@@ -626,7 +727,7 @@ static int copy_fd(int read_fd, int write_fd)
  * This spawns 'cp' to do the copy if lstat() succeeds, otherwise we
  * do the copy manually using vfs.
  *
- * Returns an error string, or NULL on success.
+ * Returns an error string, or NULL on success. g_free() the result.
  */
 guchar *copy_file(guchar *from, guchar *to)
 {
@@ -642,7 +743,7 @@ guchar *copy_file(guchar *from, guchar *to)
 		int	error = 0;
 
 		if (mc_lstat(from, &info))
-			return g_strerror(errno);
+			return g_strdup(g_strerror(errno));
 
 		/* Regular lstat() can't find it, but mc_lstat() can,
 		 * so try reading it with VFS.
@@ -665,7 +766,7 @@ guchar *copy_file(guchar *from, guchar *to)
 
 		/* (yes, the single | is right) */
 		if (mc_close(read_fd) | mc_close(write_fd))
-			return g_strerror(errno);
+			return g_strdup(g_strerror(errno));
 		return NULL;
 err:
 		error = errno;
@@ -673,16 +774,14 @@ err:
 			mc_close(read_fd);
 		if (write_fd != -1)
 			mc_close(write_fd);
-		return error ? g_strerror(error) : _("Copy error");
+		return g_strdup(error ? g_strerror(error) : _("Copy error"));
 	}
 #endif
 
 	argv[2] = from;
 	argv[3] = to;
 
-	if (fork_exec_wait(argv))
-		return _("Copy failed");
-	return NULL;
+	return fork_exec_wait(argv);
 }
 
 /* 'word' has all special characters escaped so that it may be inserted

@@ -42,7 +42,8 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list);
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
 		   guchar		*full_path,
-		   DirItem		*item);
+		   DirItem		*item,
+		   MaskedPixmap		*image);
 void drag_data_get(GtkWidget      	*widget,
 		   GdkDragContext     	*context,
 		   GtkSelectionData   	*selection_data,

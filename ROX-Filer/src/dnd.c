@@ -314,7 +314,8 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
 		   guchar		*full_path,
-		   DirItem		*item)
+		   DirItem		*item,
+		   MaskedPixmap		*image)
 {
 	guchar		*uri;
 	GdkDragContext 	*context;
@@ -328,6 +329,9 @@ void drag_one_item(GtkWidget		*widget,
 
 	g_return_if_fail(full_path != NULL);
 	g_return_if_fail(item != NULL);
+
+	if (!image)
+		image = item->image;
 
 	if (item->base_type == TYPE_FILE)
 	{
@@ -365,14 +369,11 @@ void drag_one_item(GtkWidget		*widget,
 			full_path, "\r\n", NULL);
 	g_dataset_set_data_full(context, "uri_list", uri, g_free);
 
-	g_return_if_fail(item->image != NULL);
+	g_return_if_fail(image != NULL);
 
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),
-			item->image->pixmap,
-			item->image->mask,
-			item->image->width / 2,
-			item->image->height / 2);
+			image->pixmap, image->mask, 0, 0);
 }
 
 static void drag_end(GtkWidget *widget,

@@ -267,7 +267,7 @@ void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
 	static GdkAtom	xa_state, xa_atom, xa_net_state, xa_hints;
-	static gint32	state_list[3];
+	static GdkAtom	state_list[3];
 	GdkWindow *window = widget->window;
 	gint32  values[2];
 	
@@ -288,12 +288,14 @@ void make_panel_window(GtkWidget *widget)
 		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
 		xa_hints = gdk_atom_intern("WM_HINTS", FALSE);
 
-		state_list[0] = gdk_x11_atom_to_xatom(gdk_atom_intern(
-					"_NET_WM_STATE_STICKY", FALSE));
-		state_list[1] = gdk_x11_atom_to_xatom(gdk_atom_intern(
-				"_NET_WM_STATE_SKIP_PAGER", FALSE));
-		state_list[2] = gdk_x11_atom_to_xatom(gdk_atom_intern(
-				"_NET_WM_STATE_SKIP_TASKBAR", FALSE));
+		/* Note: Starting with Gtk+-1.3.12, Gtk+ converts GdkAtoms
+		 * to X atoms automatically when the type is ATOM.
+		 */
+		state_list[0] = gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE);
+		state_list[1] = gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER",
+						FALSE);
+		state_list[2] = gdk_atom_intern("_NET_WM_STATE_SKIP_TASKBAR",
+						FALSE);
 		
 		need_init = FALSE;
 	}

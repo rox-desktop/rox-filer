@@ -1118,7 +1118,7 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	g_return_if_fail(icon_selection != NULL);
 
 	if (icon_selection->next == NULL)
-		drag_one_item(widget, event, icon->path, icon->item);
+		drag_one_item(widget, event, icon->path, icon->item, NULL);
 	else
 	{
 		guchar	*uri_list;
@@ -1233,7 +1233,7 @@ static void run_applet(Icon *icon)
 			GDK_WINDOW_XWINDOW(icon->socket->window));
 	argv[2] = NULL;
 
-	pid = spawn_full(argv, NULL);
+	pid = spawn_full(argv, NULL, NULL);
 	
 	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
 	

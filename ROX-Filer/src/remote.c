@@ -223,10 +223,16 @@ xmlDocPtr run_soap(xmlDocPtr soap)
 	number_of_windows++;
 
 	node = xmlDocGetRootElement(soap);
-	if (!node->ns || strcmp(node->ns->href, SOAP_ENV_NS) != 0)
+	if (!node->ns)
+		goto bad_soap;
+
+	if (strcmp(node->ns->href, SOAP_ENV_NS) != 0 &&
+	    strcmp(node->ns->href, SOAP_ENV_NS_OLD) != 0)
 		goto bad_soap;
 
 	body = get_subnode(node, SOAP_ENV_NS, "Body");
+	if (!body)
+		body = get_subnode(node, SOAP_ENV_NS_OLD, "Body");
 	if (!body)
 		goto bad_soap;
 
@@ -479,7 +485,7 @@ static xmlNodePtr rpc_Version(GList *args)
 	xmlNodePtr reply;
 
 	reply = xmlNewNode(NULL, "rox:VersionResponse");
-	xmlNewNs(reply, "http://www.w3.org/2001/09/soap-rpc", "soap");
+	xmlNewNs(reply, SOAP_RPC_NS, "soap");
 	xmlNewChild(reply, NULL, "soap:result", VERSION);
 
 	return reply;
@@ -661,7 +667,7 @@ static xmlNodePtr rpc_FileType(GList *args)
 	reply = xmlNewNode(NULL, "rox:FileTypeResponse");
 	tname = g_strconcat(type->media_type, "/", type->subtype, NULL);
 
-	xmlNewNs(reply, "http://www.w3.org/2001/09/soap-rpc", "soap");
+	xmlNewNs(reply, SOAP_RPC_NS, "soap");
 	xmlNewChild(reply, NULL, "soap:result", tname);
 	g_free(tname);
 
@@ -755,8 +761,19 @@ static xmlNodePtr soap_invoke(xmlNode *method)
 	call = g_hash_table_lookup(rpc_calls, method->name);
 	if (!call)
 	{
-		g_warning("Unknown method '%s'", method->name);
-		return NULL;
+		xmlNodePtr reply;
+		gchar *err;
+
+		err = g_strdup_printf(_("Attempt to invoke unknown SOAP "
+					"method '%s'"), method->name);
+		reply = xmlNewNode(NULL, "env:Fault");
+		xmlNewNs(reply, SOAP_RPC_NS, "rpc");
+		xmlNewNs(reply, SOAP_ENV_NS, "env");
+		xmlNewChild(reply, NULL, "faultcode",
+						"rpc:ProcedureNotPresent");
+		xmlNewChild(reply, NULL, "faultstring", err);
+		g_free(err);
+		return reply;
 	}
 
 	if (call->required_args)

@@ -109,11 +109,11 @@ typedef enum {		/* Values used in options, must start at 0 */
 	DETAILS_TIMES		= 5,
 } DetailsType;
 
-/* ROX-Filer's unique namespace (for use in SOAP messages) */
+/* The namespaces for the SOAP messages */
+#define SOAP_ENV_NS_OLD "http://www.w3.org/2001/06/soap-envelope"
+#define SOAP_ENV_NS "http://www.w3.org/2001/12/soap-envelope"
+#define SOAP_RPC_NS "http://www.w3.org/2001/12/soap-rpc"
 #define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
-
-/* The namespace for the SOAP envelope */
-#define SOAP_ENV_NS "http://www.w3.org/2001/06/soap-envelope"
 
 /* For debugging... */
 #define SHOW(var, fmt) (g_print("[ " #var " = '%" #fmt "' ]\n", var))

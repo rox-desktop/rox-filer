@@ -104,25 +104,6 @@ struct _Template {
 	GdkRectangle	details;
 };
 
-struct _ViewData
-{
-#ifdef GTK2
-	PangoLayout *layout;
-	PangoLayout *details;
-#endif
-	int	name_width;
-	int	name_height;
-	int	details_width;
-	int	details_height;
-#ifndef GTK2
-	int	split_pos;		/* 0 => No split */
-	int	split_width, split_height;
-	char	*details;
-#endif
-
-	MaskedPixmap *image;		/* Image; possibly thumbnail */
-};
-
 #define SHOW_RECT(ite, template)	\
 	g_print("%s: %dx%d+%d+%d  %dx%d+%d+%d\n",	\
 		item->leafname,				\
@@ -254,7 +235,7 @@ static void fill_template(GdkRectangle *area, CollectionItem *colitem,
 void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		int *width, int *height)
 {
-	int		pix_width;
+	int		pix_width, pix_height;
 	int		w;
 	DisplayStyle	style = filer_window->display_style;
 	ViewData	*view = (ViewData *) colitem->view_data;
@@ -268,15 +249,19 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 				if (!view->image->huge_pixmap)
 					pixmap_make_huge(view->image);
 				pix_width = view->image->huge_width;
+				pix_height = view->image->huge_height;
 			}
 			else
+			{
 				pix_width = HUGE_WIDTH * 3 / 2;
+				pix_height = HUGE_HEIGHT * 3 / 2;
+			}
 #ifdef GTK2
 			*width = MAX(pix_width, view->name_width) + 4;
-			*height = view->name_height + HUGE_HEIGHT + 4;
+			*height = view->name_height + pix_height + 4;
 #else
 			*width = MAX(pix_width, view->split_width) + 4;
-			*height = view->split_height + HUGE_HEIGHT + 4;
+			*height = view->split_height + pix_height + 4;
 #endif
 		}
 		else if (style == SMALL_ICONS)
@@ -865,7 +850,6 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	col_width = filer_window->collection->item_width;
-	int		image_x, image_y;
 	int		text_x, text_y;
 	ViewData	*view = (ViewData *) colitem->view_data;
 	MaskedPixmap	*image = view->image;
@@ -883,9 +867,6 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 		template->icon.height = HUGE_HEIGHT;
 	}
 
-	image_x = area->x + ((col_width - template->icon.width) >> 1);
-	image_y = area->y + (HUGE_HEIGHT - template->icon.height);
-
 #ifdef GTK2
 	template->leafname.width = view->name_width;
 	template->leafname.height = view->name_height;
@@ -894,15 +875,13 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 	template->leafname.height = view->split_height;
 #endif
 	text_x = area->x + ((col_width - template->leafname.width) >> 1);
-	text_y = image_y + template->icon.height + 2;
+	text_y = area->y + area->height - template->leafname.height;
 
 	template->leafname.x = text_x;
 	template->leafname.y = text_y;
 
-	template->icon.x = image_x;
-	template->icon.y = image_y;
-	template->icon.width = template->icon.width;
-	template->icon.height = template->icon.height;
+	template->icon.x = area->x + ((col_width - template->icon.width) >> 1);
+	template->icon.y = template->leafname.y - template->icon.height - 2;
 }
 
 static void large_template(GdkRectangle *area, CollectionItem *colitem,

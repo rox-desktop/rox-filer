@@ -132,7 +132,17 @@ void diritem_restat(guchar *path, DirItem *item)
 		 * because some mounts show everything as executable and we
 		 * still want to use the file name to set the mime type.
 		 */
-		item->mime_type = type_from_path(path);
+		if (item->flags & ITEM_FLAG_SYMLINK)
+		{
+			guchar *link_path;
+			link_path = readlink_dup(path);
+			item->mime_type = type_from_path(link_path
+								? link_path
+								: path);
+			g_free(link_path);
+		}
+		else
+			item->mime_type = type_from_path(path);
 
 		/* Note: for symlinks we need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
@@ -218,9 +228,11 @@ static void set_ignore_exec(guchar *new)
 static void examine_dir(guchar *path, DirItem *item)
 {
 	uid_t	uid = item->uid;
-	int	path_len;
-	guchar	*tmp;
 	struct stat info;
+	static GString *tmp = NULL;
+
+	if (!tmp)
+		tmp = g_string_new(NULL);
 
 	check_globicon(path, item);
 
@@ -229,40 +241,40 @@ static void examine_dir(guchar *path, DirItem *item)
 
 	/* Finding the icon:
 	 *
-	 * - If it contains a .DirIcon.png then that's the icon
+	 * - If it contains a .DirIcon then that's the icon
 	 * - If it contains an AppRun then it's an application
 	 * - If it contains an AppRun but no .DirIcon then try to
 	 *   use AppIcon.xpm as the icon.
 	 *
-	 * .DirIcon.png and AppRun must have the same owner as the
+	 * .DirIcon and AppRun must have the same owner as the
 	 * directory itself, to prevent abuse of /tmp, etc.
 	 * For symlinks, we want the symlink's owner.
 	 */
 
-	path_len = strlen(path);
-	tmp = g_strconcat(path, "/.DirIcon.png", NULL); /* MUST alloc this */
+	g_string_printf(tmp, "%s/.DirIcon", path);
 
 	if (item->image)
 		goto no_diricon;	/* Already got an icon */
 
-	if (mc_lstat(tmp, &info) != 0 || info.st_uid != uid)
+	if (mc_lstat(tmp->str, &info) != 0 || info.st_uid != uid)
 		goto no_diricon;	/* Missing, or wrong owner */
 
-	if (S_ISLNK(info.st_mode) && mc_stat(tmp, &info) != 0)
+	if (S_ISLNK(info.st_mode) && mc_stat(tmp->str, &info) != 0)
 		goto no_diricon;	/* Bad symlink */
 
 	if (info.st_size > MAX_ICON_SIZE || !S_ISREG(info.st_mode))
 		goto no_diricon;	/* Too big, or non-regular file */
 
 	/* Try to load image; may still get NULL... */
-	item->image = g_fscache_lookup(pixmap_cache, tmp);
+	item->image = g_fscache_lookup(pixmap_cache, tmp->str);
 
 no_diricon:
 
 	/* Try to find AppRun... */
-	strcpy(tmp + path_len + 1, "AppRun");
+	g_string_truncate(tmp, tmp->len - 8);
+	g_string_append(tmp, "AppRun");
 
-	if (mc_lstat(tmp, &info) != 0 || info.st_uid != uid)
+	if (mc_lstat(tmp->str, &info) != 0 || info.st_uid != uid)
 		goto out;	/* Missing, or wrong owner */
 		
 	if (!(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
@@ -275,20 +287,21 @@ no_diricon:
 	if (item->image)
 		goto out;	/* Already got an icon */
 
-	strcpy(tmp + path_len + 4, "Icon.xpm");
+	g_string_truncate(tmp, tmp->len - 3);
+	g_string_append(tmp, "Icon.xpm");
 
 	/* Note: since AppRun is valid we don't need to check AppIcon.xpm
 	 *	 so carefully.
 	 */
 
-	if (mc_stat(tmp, &info) != 0)
+	if (mc_stat(tmp->str, &info) != 0)
 		goto out;	/* Missing, or broken symlink */
 
 	if (info.st_size > MAX_ICON_SIZE || !S_ISREG(info.st_mode))
 		goto out;	/* Too big, or non-regular file */
 
 	/* Try to load image; may still get NULL... */
-	item->image = g_fscache_lookup(pixmap_cache, tmp);
+	item->image = g_fscache_lookup(pixmap_cache, tmp->str);
 
 out:
 
@@ -298,6 +311,4 @@ out:
 		item->image = im_appdir;
 		pixmap_ref(item->image);
 	}
-
-	g_free(tmp);
 }

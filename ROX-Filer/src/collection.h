@@ -113,7 +113,7 @@ struct _CollectionClass
 					gint		time);
 };
 
-guint   collection_get_type   		(void);
+GtkType collection_get_type   		(void);
 GtkWidget *collection_new		(void);
 void    collection_clear           	(Collection *collection);
 void	collection_clear_except		(Collection *collection, gint item);
