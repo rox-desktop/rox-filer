@@ -608,7 +608,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	image_x = (pi->width - iwidth) >> 1;
 
-	gdk_pixbuf_render_to_drawable_alpha(image->pixbuf,
+	gdk_pixbuf_render_to_drawable_alpha(
+			icon->selected ? image->pixbuf_lit : image->pixbuf,
 			widget->window,
 			0, 0, 				/* src */
 			image_x, WINK_FRAME,	/* dest */

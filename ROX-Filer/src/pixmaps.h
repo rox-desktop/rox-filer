@@ -61,13 +61,13 @@ struct _MaskedPixmap
 	GdkPixbuf	*huge_pixbuf_lit;
 	int		huge_width, huge_height;
 
-	GdkPixbuf	*pixbuf;
-	GdkPixmap	*pixmap;	/* Normal size image (always valid) */
-	GdkBitmap	*mask;
+	GdkPixbuf	*pixbuf;	/* Normal size image, always valid */
+	GdkPixbuf	*pixbuf_lit;
 	int		width, height;
 
 	/* If sm_pixbuf is NULL then call pixmap_make_small() */
 	GdkPixbuf	*sm_pixbuf;
+	GdkPixbuf	*sm_pixbuf_lit;
 	int		sm_width, sm_height;
 };
 

@@ -50,7 +50,7 @@
 #include "filer.h"
 #include "action.h"
 #include "display.h"
-#include "support.h"
+#include "xml.h"
 
 #define DELETE_ICON 1
 

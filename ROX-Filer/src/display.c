@@ -337,8 +337,7 @@ void draw_large_icon(GtkWidget *widget,
 	int	height;
 	int	image_x;
 	int	image_y;
-	GdkGC	*gc = selected ? widget->style->white_gc
-						: widget->style->black_gc;
+
 	if (!image)
 		return;
 
@@ -347,24 +346,14 @@ void draw_large_icon(GtkWidget *widget,
 	image_x = area->x + ((area->width - width) >> 1);
 	image_y = MAX(0, area->height - height - 6);
 
-	gdk_pixbuf_render_to_drawable_alpha(image->pixbuf, widget->window,
+	gdk_pixbuf_render_to_drawable_alpha(
+			selected ? image->pixbuf_lit : image->pixbuf,
+			widget->window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
-
-	if (selected)
-	{
-		gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-		gdk_gc_set_clip_mask(gc, image->mask);
-		gdk_gc_set_function(gc, GDK_INVERT);
-		gdk_draw_rectangle(widget->window,
-				gc,
-				TRUE, image_x, area->y + image_y,
-				width, height);
-		gdk_gc_set_function(gc, GDK_COPY);
-	}
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -1007,7 +996,9 @@ static void draw_small_icon(GtkWidget *widget,
 	image_x = area->x + ((area->width - width) >> 1);
 	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
 		
-	gdk_pixbuf_render_to_drawable_alpha(image->sm_pixbuf, widget->window,
+	gdk_pixbuf_render_to_drawable_alpha(
+			selected ? image->sm_pixbuf_lit : image->sm_pixbuf,
+			widget->window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,

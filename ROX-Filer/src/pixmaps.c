@@ -108,7 +108,8 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
 static void child_create_thumbnail(const gchar *path);
-static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src);
+static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
+					  guchar alpha);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -169,7 +170,8 @@ void pixmap_make_huge(MaskedPixmap *mp)
 		g_object_ref(mp->huge_pixbuf);
 	}
 
-	mp->huge_pixbuf_lit = create_spotlight_pixbuf(mp->huge_pixbuf);
+	mp->huge_pixbuf_lit = create_spotlight_pixbuf(mp->huge_pixbuf,
+						      0x000099, 128);
 	mp->huge_width = gdk_pixbuf_get_width(mp->huge_pixbuf);
 	mp->huge_height = gdk_pixbuf_get_height(mp->huge_pixbuf);
 }
@@ -188,6 +190,9 @@ void pixmap_make_small(MaskedPixmap *mp)
 		mp->sm_pixbuf = mp->src_pixbuf;
 		g_object_ref(mp->sm_pixbuf);
 	}
+
+	mp->sm_pixbuf_lit = create_spotlight_pixbuf(mp->sm_pixbuf,
+						      0x000099, 128);
 
 	mp->sm_width = gdk_pixbuf_get_width(mp->sm_pixbuf);
 	mp->sm_height = gdk_pixbuf_get_height(mp->sm_pixbuf);
@@ -588,11 +593,21 @@ static void masked_pixmap_finialize(GObject *object)
 		g_object_unref(mp->pixbuf);
 		mp->pixbuf = NULL;
 	}
+	if (mp->pixbuf_lit)
+	{
+		g_object_unref(mp->pixbuf_lit);
+		mp->pixbuf_lit = NULL;
+	}
 
 	if (mp->sm_pixbuf)
 	{
 		g_object_unref(mp->sm_pixbuf);
 		mp->sm_pixbuf = NULL;
+	}
+	if (mp->sm_pixbuf_lit)
+	{
+		g_object_unref(mp->sm_pixbuf_lit);
+		mp->sm_pixbuf_lit = NULL;
 	}
 
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -619,10 +634,12 @@ static void masked_pixmap_init(GTypeInstance *object, gpointer gclass)
 	mp->huge_height = -1;
 
 	mp->pixbuf = NULL;
+	mp->pixbuf_lit = NULL;
 	mp->width = -1;
 	mp->height = -1;
 
 	mp->sm_pixbuf = NULL;
+	mp->sm_pixbuf_lit = NULL;
 	mp->sm_width = -1;
 	mp->sm_height = -1;
 }
@@ -671,31 +688,27 @@ MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size)
 	mp->src_pixbuf = src_pixbuf;
 
 	mp->pixbuf = normal_pixbuf;
+	mp->pixbuf_lit = create_spotlight_pixbuf(normal_pixbuf, 0x000099, 128);
 	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
 	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
 
 	return mp;
 }
 
-static guchar lighten_component(guchar cur_value)
-{
-	int new_value = cur_value;
-
-	new_value += 48 + (new_value >> 3);
-	if (new_value > 255)
-		new_value = 255;
-	
-	return (guchar) new_value;
-}
-
-/* Stolen from eel */
-static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src)
+/* Stolen from eel...and modified to colourize the pixbuf.
+ * 'alpha' is the transparency of 'color' (0xRRGGBB):
+ * 0 = fully opaque, 255 = fully transparent.
+ */
+static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src,
+					  guint32 color,
+					  guchar alpha)
 {
 	GdkPixbuf *dest;
 	int i, j;
 	int width, height, has_alpha, src_row_stride, dst_row_stride;
 	guchar *target_pixels, *original_pixels;
 	guchar *pixsrc, *pixdest;
+	guchar r, g, b;
 	gint n_channels;
 
 	n_channels = gdk_pixbuf_get_n_channels(src);
@@ -718,15 +731,24 @@ static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src)
 	target_pixels = gdk_pixbuf_get_pixels(dest);
 	original_pixels = gdk_pixbuf_get_pixels(src);
 
+	r = (color & 0xff0000) >> 16;
+	g = (color & 0xff00) >> 8;
+	b = color & 0xff;
+
 	for (i = 0; i < height; i++)
 	{
+		gint tmp;
+
 		pixdest = target_pixels + i * dst_row_stride;
 		pixsrc = original_pixels + i * src_row_stride;
 		for (j = 0; j < width; j++)
 		{
-			*pixdest++ = (*pixsrc++);
-			*pixdest++ = (*pixsrc++);
-			*pixdest++ = lighten_component(*pixsrc++);
+			tmp = (*pixsrc++ * alpha + r * (255 - alpha)) / 255;
+			*pixdest++ = (guchar) MIN(255, tmp);
+			tmp = (*pixsrc++ * alpha + g * (255 - alpha)) / 255;
+			*pixdest++ = (guchar) MIN(255, tmp);
+			tmp = (*pixsrc++ * alpha + b * (255 - alpha)) / 255;
+			*pixdest++ = (guchar) MIN(255, tmp);
 			if (has_alpha)
 				*pixdest++ = *pixsrc++;
 		}
