@@ -20,8 +20,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.5\n"
-"POT-Creation-Date: 2003-01-04 15:09+0000\n"
+"Project-Id-Version: ROX-Filer 1.3.6\n"
+"POT-Creation-Date: 2003-01-04 10:04+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@easynet.be>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
@@ -66,7 +66,6 @@ msgid "Find expression reference"
 msgstr "Uitleg zoek-expressies"
 
 #: action.c:184
-#, fuzzy
 msgid ""
 "<u>Quick Start</u>\n"
 "Just put the name of the file you're looking for in single quotes:\n"
@@ -101,7 +100,7 @@ msgid ""
 "\n"
 "<u>Specials</u>\n"
 "<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
-"a % in 'command' is replaced with the path of the current file)\n"
+"a \\% in 'command' is replaced with the path of the current file)\n"
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
 "<u>Snel Start</u>\n"
@@ -319,13 +318,12 @@ msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!FOUT: Doel bestaat reeds, maar is geen map\n"
 
 #: action.c:1186
-#, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Failed to copy '%s'\n"
 msgstr ""
 "!%s\n"
-"Kopiëren '%s' mislukt"
+"Mislukt om '%s' te kopiëren\n"
 
 #: action.c:1226
 #, c-format
@@ -608,22 +606,20 @@ msgid "Edit bookmarks"
 msgstr "Pas bladwijzers aan"
 
 #: cell_icon.c:150
-#, fuzzy
 msgid "DirItem"
-msgstr "item"
+msgstr "DirItem"
 
 #: cell_icon.c:151
 msgid "The item to render."
-msgstr ""
+msgstr "Het weer te geven item."
 
 #: cell_icon.c:157
-#, fuzzy
 msgid "Background color"
-msgstr "Achtergrond:"
+msgstr "Achtergrond kleur"
 
 #: cell_icon.c:158
 msgid "Background color as a GdkColor"
-msgstr ""
+msgstr "Achtergrond kleur als een GdkColor"
 
 #: collection.c:273
 msgid "Vertical Adjustment"
@@ -1439,14 +1435,12 @@ msgid "Display"
 msgstr "Weergave"
 
 #: menu.c:183 tips:53
-#, fuzzy
 msgid "Icons View"
-msgstr "Iconen grootte:"
+msgstr "Iconen Weergave"
 
 #: menu.c:184
-#, fuzzy
 msgid "Icons, With..."
-msgstr "Groot, met..."
+msgstr "Iconen, Met..."
 
 #: menu.c:185 tips:73
 msgid "Sizes"
@@ -1462,21 +1456,19 @@ msgstr "Tijden"
 
 #: menu.c:189 tips:54
 msgid "List View"
-msgstr ""
+msgstr "Lijst weergave"
 
 #: menu.c:191
-#, fuzzy
 msgid "Bigger Icons"
-msgstr "Grote iconen"
+msgstr "Grotere iconen"
 
 #: menu.c:192
-#, fuzzy
 msgid "Smaller Icons"
-msgstr "Kleine iconen"
+msgstr "Kleinere iconen"
 
 #: menu.c:193 tips:70 toolbar.c:380
 msgid "Automatic"
-msgstr ""
+msgstr "Automatisch"
 
 #: menu.c:195
 msgid "Sort by Name"
@@ -1495,19 +1487,16 @@ msgid "Sort by Size"
 msgstr "Sorteer op grootte"
 
 #: menu.c:199
-#, fuzzy
 msgid "Sort by Owner"
-msgstr "Sorteer op grootte"
+msgstr "Sorteer op eigenaar"
 
 #: menu.c:200
-#, fuzzy
 msgid "Sort by Group"
-msgstr "Sorteer op type"
+msgstr "Sorteer op groep"
 
 #: menu.c:201
-#, fuzzy
 msgid "Reversed"
-msgstr "O_ngedaan maken"
+msgstr "Omgekeerd"
 
 #: menu.c:203
 msgid "Show Hidden"
@@ -1993,7 +1982,7 @@ msgid ""
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
-"De achtergrond bewerker moet een applicatie map zin. Sleep een applicatie "
+"De achtergrond bewerker moet een applicatie map zijn. Sleep een applicatie "
 "map naar het Zet Achtergrond dialoog venster, of (voor programmeurs) geef "
 "het door aan de SOAP SetBackdropApp methode."
 
@@ -2099,14 +2088,16 @@ msgid ""
 "Can't delete thumbnails in %s:\n"
 "%s"
 msgstr ""
+"Kan miniaturen in %s niet wissen:\n"
+"%s"
 
 #: pixmaps.c:894
 msgid "There are no thumbnails to delete"
-msgstr ""
+msgstr "Er zijn geen miniaturen om te wissen"
 
 #: pixmaps.c:907
 msgid "Purge thumbnails disk cache"
-msgstr ""
+msgstr "Ledig miniaturen disk cache"
 
 #: remote.c:987
 #, c-format
@@ -2360,17 +2351,15 @@ msgstr "%u geselecteerd (%s)"
 
 #: toolbar.c:379
 msgid "Huge"
-msgstr ""
+msgstr "Reusachtig"
 
 #: toolbar.c:379
-#, fuzzy
 msgid "Large"
-msgstr "Normale iconen"
+msgstr "Groot"
 
 #: toolbar.c:380
-#, fuzzy
 msgid "Small"
-msgstr "Kleine iconen"
+msgstr "Klein"
 
 #: type.c:197
 msgid "Sym link"
@@ -2690,40 +2679,36 @@ msgstr ""
 "%s"
 
 #: view_details.c:820
-#, fuzzy
 msgid "_Name"
-msgstr "Naam"
+msgstr "_Naam"
 
 #: view_details.c:823
-#, fuzzy
 msgid "_Type"
-msgstr "Type"
+msgstr "_Type"
 
 #: view_details.c:825
-#, fuzzy
 msgid "_Permissions"
-msgstr "Toegangsrechten"
+msgstr "Toegangs_rechten"
 
 #: view_details.c:826
 msgid "_Owner"
-msgstr ""
+msgstr "_Eigenaar"
 
 #: view_details.c:828
 msgid "_Group"
-msgstr ""
+msgstr "_Groep"
 
 #: view_details.c:830
-#, fuzzy
 msgid "_Size"
-msgstr "Grootte"
+msgstr "G_rootte"
 
 #: view_details.c:832
 msgid "Last _Modified"
-msgstr ""
+msgstr "Laatst _Aangepast"
 
 #: tips:1
 msgid "Translation"
-msgstr "Taal"
+msgstr "Vertaling"
 
 #: tips:2
 msgid "Language"
@@ -2880,9 +2865,8 @@ msgstr ""
 "dan zal deze optie ervoor zorgen dat dit andere venster gesloten wordt."
 
 #: tips:37
-#, fuzzy
 msgid "New window on button 1"
-msgstr "Nieuw venster op knop 1 (RISC OS stijl)"
+msgstr "Nieuw venster op knop 1"
 
 #: tips:38
 msgid ""
@@ -2895,9 +2879,8 @@ msgstr ""
 "huidige venster hergebruiken."
 
 #: tips:39
-#, fuzzy
 msgid "Single-click navigation"
-msgstr "Enkel klikken om te openen"
+msgstr "Enkel klik navigatie"
 
 #: tips:40 tips:41 tips:42 tips:43 tips:131
 msgid ""
@@ -2914,16 +2897,16 @@ msgid "Sorting"
 msgstr "Sorteren"
 
 #: tips:45
-#, fuzzy
 msgid "Directories come first (for sort by name)"
-msgstr "Mappen altijd eerst"
+msgstr "Mappen altijd eerst (voor sorteren op naam)"
 
 #: tips:46 tips:47
-#, fuzzy
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
-msgstr "Indien aan zullen mappen altijd vooraan komen ongeacht de sortering."
+msgstr ""
+"Indien aan zullen mappen altijd eerst getoond worden wanneer op "
+"naam gesorteerd wordt."
 
 #: tips:49
 msgid "Default settings for new windows"
@@ -2943,9 +2926,8 @@ msgstr ""
 "venster de standaardinstellingen."
 
 #: tips:52
-#, fuzzy
 msgid "View type:"
-msgstr "Onbekend type:"
+msgstr "Toon type:"
 
 #: tips:55
 msgid "Sort by:"
@@ -2968,31 +2950,28 @@ msgstr ""
 "afgebeeld, anders zijn ze verborgen."
 
 #: tips:65
-#, fuzzy
 msgid "Icon View"
-msgstr "Iconen grootte:"
+msgstr "Iconen Weergave"
 
 #: tips:66
-#, fuzzy
 msgid "Default size:"
-msgstr "Standaardinstellingen"
+msgstr "Standaard grootte:"
 
 #: tips:67
 msgid "Huge Icons"
-msgstr "Grote iconen"
+msgstr "Reusachtige iconen"
 
 #: tips:68 tips:217
 msgid "Large Icons"
-msgstr "Normale iconen"
+msgstr "Grote iconen"
 
 #: tips:69 tips:216
 msgid "Small Icons"
 msgstr "Kleine iconen"
 
 #: tips:71
-#, fuzzy
 msgid "Default details:"
-msgstr "Standaardinstellingen"
+msgstr "Standaard details:"
 
 #: tips:72
 msgid "No details"
@@ -3000,20 +2979,19 @@ msgstr "Geen details"
 
 #: tips:77
 msgid "Automatic small icons:"
-msgstr ""
+msgstr "Automatisch kleine iconen:"
 
 #: tips:78
-#, fuzzy
 msgid "Change at:"
-msgstr "Laatst status veranderd:"
+msgstr "Verander bij:"
 
 #: tips:80 tips:81 tips:82
-#, fuzzy
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
+"Wanneer automatische iconen weergave geselecteerd is: "
 "Als een map dit aantal items bevat dan zullen ze getoond worden d.m.v. "
 "Kleine Iconen, anders zullen Grote Iconen gebruikt worden."
 
@@ -3030,8 +3008,8 @@ msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
 msgstr ""
-"Tekst breder dan dit wordt gesplitst over meer regels in Normale iconen "
-"modus. In Grote iconen modus wordt tekst afgebroken als het 50% breder is "
+"Tekst breder dan dit wordt gesplitst over meer regels in Grote iconen "
+"modus. In Reusachtige iconen modus wordt tekst afgebroken als het 50% breder is "
 "dan dit."
 
 #: tips:86
@@ -3043,9 +3021,8 @@ msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maximale breedte van de tekst onder een klein icoon."
 
 #: tips:91
-#, fuzzy
 msgid "Tools/Minibuffer"
-msgstr "Minibuffers"
+msgstr "Gereedschap/Minibuffers"
 
 #: tips:92
 msgid "Toolbar"
@@ -3087,12 +3064,11 @@ msgstr ""
 
 #: tips:101
 msgid "Select the buttons you want on the bar:"
-msgstr ""
+msgstr "Selecteer de knoppen die op de knoppenbalk moet verschijnen:"
 
 #: tips:102
-#, fuzzy
 msgid "Minibuffer"
-msgstr "Minibuffers"
+msgstr "Minibuffer"
 
 #: tips:103
 msgid "Beep if Tab-completion fails"
@@ -3121,15 +3097,16 @@ msgstr ""
 "meer items overeenkomen zelfs als er wel letters toegevoegd worden."
 
 #: tips:109 tips:110
-#, fuzzy
 msgid "Thumbnails"
-msgstr "Toon miniaturen"
+msgstr "Miniaturen"
 
 #: tips:111
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
+"Wanneer miniaturen aanstaan zal elke afbeelding in een map geladen worden en "
+"een miniatuur ervan zal getoond worden."
 
 #: tips:112
 msgid "Show image thumbnails"
@@ -3140,11 +3117,12 @@ msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
 msgstr ""
+"Dit is de standaard instelling voor nieuwe vensters. Gebruik het Weergave menu "
+"om miniaturen aan of uit te schakelen voor individuele vensters."
 
 #: tips:115
-#, fuzzy
 msgid "Thumbnails cache"
-msgstr "Toon miniaturen"
+msgstr "Miniaturen cache"
 
 #: tips:116
 msgid ""
@@ -3152,6 +3130,10 @@ msgid ""
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
 "will be created again as needed."
 msgstr ""
+"Uit snelheids-overwegingen worden de aangemaakte miniaturen opgeslagen in "
+"een verborgen ~/.thumnails (miniatuur) map. Klik hier om all opgeslagen "
+"miniaturen te verwijderen. Ze zullen indien nodig terug aangemaakt "
+"worden."
 
 #: tips:117
 msgid "Pinboard"
@@ -3174,9 +3156,8 @@ msgid "Foreground:"
 msgstr "Voorgrond:"
 
 #: tips:121
-#, fuzzy
 msgid "Text shadow:"
-msgstr "Label shaduw:"
+msgstr "Tekst shaduw:"
 
 #: tips:122
 msgid "Background:"
@@ -3251,7 +3232,6 @@ msgid "Iconified windows"
 msgstr "Geminimaliseerde vensters"
 
 #: tips:145
-#, fuzzy
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -3259,9 +3239,7 @@ msgid ""
 msgstr ""
 "De meeste window managers hebben een manier om vensters te minimaliseren, en "
 "verschillende programma's, inclusief ROX-Filer, kunnen worden gebruikt om de "
-"geminimaliseerde vensters te tonen. Als deze optie ingeschakeld is, zal de "
-"filer elk geminimaliseerd venster als een klein icoon op het scherm "
-"afbeelden. Een compatibele window manager is vereist."
+"geminimaliseerde vensters te tonen."
 
 #: tips:147
 msgid "Show iconified windows"
@@ -3273,6 +3251,9 @@ msgid ""
 "button on the pinboard. Requires a compatible window manager, and the "
 "pinboard must be in use."
 msgstr ""
+"Als deze optie aan staat zal ROX elk geminimaliseerd venster tonen als een "
+"kleine knop op het prikbord. Dit vereist een compatibele window manager, en "
+"het prikbord moet in gebruik zijn."
 
 #: tips:149
 msgid "Iconify to the"
@@ -3409,7 +3390,7 @@ msgstr "Sleep en Drop"
 
 #: tips:196
 msgid "Dragging to icons"
-msgstr ""
+msgstr "Slepen naar iconen"
 
 #: tips:197
 msgid "Allow dragging to icons in filer windows"
@@ -3499,9 +3480,8 @@ msgid "Same as default"
 msgstr "Zelfde als standaard"
 
 #: tips:220
-#, fuzzy
 msgid "Behaviour"
-msgstr "Venster gedrag"
+msgstr "Gedrag"
 
 #: tips:221
 msgid "Menu on button 2 (RISC OS style)"
@@ -3525,18 +3505,16 @@ msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "Het programma dat moet starten als je `Xterm hier' kiest van het menu."
 
 #: tips:226
-#, fuzzy
 msgid "Keyboard shortcuts"
-msgstr "Toetsenbord sneltoetsen instellen"
+msgstr "Toetsenbord sneltoetsen"
 
 #: tips:227
 msgid "Types"
 msgstr "Types"
 
 #: tips:228
-#, fuzzy
 msgid "Executable files"
-msgstr "Uitvoerbaar bestand:"
+msgstr "Uitvoerbare bestanden:"
 
 #: tips:229
 msgid "Ignore eXecutable bit for known extensions"
@@ -3713,78 +3691,3 @@ msgstr ""
 "van een applicatie een + teken toont op de aanwijzer maar het droppen niet "
 "werkt."
 
-#~ msgid "Summary"
-#~ msgstr "Samenvatting"
-
-#~ msgid "Large, With..."
-#~ msgstr "Normaal, met..."
-
-#~ msgid "Small, With..."
-#~ msgstr "Klein, met..."
-
-#~ msgid "fork: %s"
-#~ msgstr "fork: %s"
-
-#~ msgid "New window, as user..."
-#~ msgstr "Nieuw venster, als gebruiker..."
-
-#~ msgid "Browse as which user?"
-#~ msgstr "Als welke gebruiker bladeren?"
-
-#~ msgid "User:"
-#~ msgstr "Gebruiker:"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Change from Large icons to Small automatically:"
-#~ msgstr "Schakel automatisch van Grote naar Kleine ikonen"
-
-#~ msgid ""
-#~ "If this is on then filer windows will change from Large icons to Small "
-#~ "when showing a new directory with lots of files."
-#~ msgstr ""
-#~ "Indien aan zullen de bestandsvensters omschakelen van Grote naar Kleine "
-#~ "ikonen wanneer een nieuwe map getoond wordt die zeer veel bestanden bevat."
-
-#~ msgid "Small Icons if at least:"
-#~ msgstr "Kleine Iconen als tenminste:"
-
-#~ msgid "Single-click navigation in filer windows"
-#~ msgstr "Enkel-klik navigatie in bestandsvensters"
-
-#~ msgid "Icon text width"
-#~ msgstr "Icoon tekst breedte"
-
-#~ msgid "Details:"
-#~ msgstr "Details:"
-
-#~ msgid ""
-#~ "Load every image file and display it, scaled-down, in the filer window "
-#~ "instead of the normal icon."
-#~ msgstr ""
-#~ "Toon elk afbeeldingsbestand verkleind inplaats van met een normaal icoon."
-
-#~ msgid "Toolbar buttons"
-#~ msgstr "Werkbalk knoppen"
-
-#~ msgid "Unshade the tools you want."
-#~ msgstr "Activeer de gewenste hulpmiddelen."
-
-#~ msgid "Toolbar appearance"
-#~ msgstr "Werkbalk uiterlijk"
-
-#~ msgid ""
-#~ "The minibuffers are text entry fields that appear along the bottom of a "
-#~ "filer window. They are used to enter pathnames, search conditions and "
-#~ "shell commands."
-#~ msgstr ""
-#~ "De minibuffers zijn kleine tekstvelden die onderaan een bestandsvenster "
-#~ "verschijnen. Ze worden gebruikt om paden, zoekacties en shell commando's "
-#~ "in te voeren."
-
-#~ msgid "Beeping"
-#~ msgstr "Geluid"
-
-#~ msgid "General"
-#~ msgstr "Algemeen"
