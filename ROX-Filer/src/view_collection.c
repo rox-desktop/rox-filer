@@ -853,7 +853,10 @@ static gint coll_motion_notify(GtkWidget *widget,
 	i = collection_get_item(collection, event->x, event->y);
 
 	if (i == -1)
+	{
 		tooltip_show(NULL);
+		tip_item = NULL;
+	}
 	else
 	{
 		DirItem *item = (DirItem *) collection->items[i].data;

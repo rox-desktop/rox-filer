@@ -1193,6 +1193,19 @@ static void import_for_dir(guchar *path, GHashTable *globs, gboolean *freedesk)
 		}
 		
 		import_file(make_path(path, item->d_name)->str, globs);
+#if 0
+		{
+			struct timeval start, end;
+			g_print("[ %s ]\n", item->d_name);
+			gettimeofday(&start, NULL);
+			import_file(make_path(path, item->d_name)->str, globs);
+			gettimeofday(&end, NULL);
+
+			g_print("Delay = %lf s\n", 
+						(end.tv_sec +   ((double) end.tv_usec)   / 1000000) - 
+						(start.tv_sec + ((double) start.tv_usec) / 1000000));
+		}
+#endif
 	}
 
 	closedir(dir);
