@@ -358,6 +358,9 @@ static void complete(FilerWindow *filer_window)
 				shortest_stem - current_stem);
 		gtk_entry_append_text(entry, extra);
 		g_free(extra);
+#ifdef GTK2
+		gtk_entry_set_position(entry, -1);
+#endif
 
 		if (option_get_int("filer_beep_multi"))
 			gdk_beep();
@@ -373,41 +376,45 @@ static void complete(FilerWindow *filer_window)
 			g_string_append_c(new, '/');
 
 		gtk_entry_set_text(entry, new->str);
+#ifdef GTK2
+		gtk_entry_set_position(entry, -1);
+#endif
 	}
 }
 
-static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
+/* This is an idle function because Gtk+ 2.0 changes text in a entry
+ * with two signals; one to blank it and one to put the new text in.
+ */
+static gboolean path_changed(gpointer data)
 {
-	char	*new, *slash;
+	FilerWindow *filer_window = (FilerWindow *) data;
+	GtkWidget *mini = filer_window->minibuffer;
+	char	*new, *leaf;
 	char	*path, *real;
 
 	new = gtk_entry_get_text(GTK_ENTRY(mini));
-	if (*new == '/')
-		new = g_strdup(new);
+
+	leaf = g_basename(new);
+	if (leaf == new)
+		path = g_strdup("/");
 	else
-		new = g_strdup_printf("/%s", new);
-
-	slash = strrchr(new, '/');
-	*slash = '\0';
-
-	if (*new == '\0')
-		path = "/";
-	else
-		path = new;
-
+		path = g_dirname(new);
 	real = pathdup(path);
+	g_free(path);
 
 	if (strcmp(real, filer_window->path) != 0)
 	{
+		/* The new path is in a different directory */
 		struct stat info;
+
 		if (mc_stat(real, &info) == 0 && S_ISDIR(info.st_mode))
-			filer_change_to(filer_window, real, slash + 1);
+			filer_change_to(filer_window, real, leaf);
 		else
 			gdk_beep();
 	}
 	else
 	{
-		if (slash[1] == '.')
+		if (*leaf == '.')
 		{
 			if (!filer_window->show_hidden)
 			{
@@ -421,13 +428,14 @@ static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 			filer_window->temp_show_hidden = FALSE;
 		}
 		
-		if (find_exact_match(filer_window, slash + 1) == FALSE &&
-		    find_next_match(filer_window, slash + 1, 0) == FALSE)
+		if (find_exact_match(filer_window, leaf) == FALSE &&
+		    find_next_match(filer_window, leaf, 0) == FALSE)
 			gdk_beep();
 	}
 		
 	g_free(real);
-	g_free(new);
+
+	return FALSE;
 }
 
 /* Look for an exact match, and move the cursor to it if found.
@@ -912,7 +920,9 @@ static gint key_press_event(GtkWidget	*widget,
 			break;
 	}
 
+#ifndef GTK2
 	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
+#endif
 	return TRUE;
 }
 
@@ -921,11 +931,12 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 	switch (filer_window->mini_type)
 	{
 		case MINI_PATH:
-			path_changed(mini, filer_window);
+			gtk_idle_add(path_changed, filer_window);
 			return;
 		case MINI_SELECT_IF:
 			set_find_string_colour(GTK_WIDGET(mini), 
-				gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer)));
+				gtk_entry_get_text(
+					GTK_ENTRY(filer_window->minibuffer)));
 			return;
 		default:
 			break;
