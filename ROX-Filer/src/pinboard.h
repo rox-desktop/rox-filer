@@ -26,5 +26,6 @@ const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop(DirItem *item, const gchar *path);
 void pinboard_set_backdrop_app(const gchar *app);
 GdkWindow *pinboard_get_window(void);
+void pinboard_add_widget(GtkWidget *widget, int x, int y);
 
 #endif /* _PINBOARD_H */

@@ -39,6 +39,7 @@
 #include "options.h"
 #include "gui_support.h"
 #include "main.h"
+#include "pinboard.h"
 
 /* There is one of these for each window controlled by the window
  * manager (all tasks) in the _NET_CLIENT_LIST property.
@@ -468,26 +469,6 @@ static void uniconify(IconWindow *win)
 	gdk_error_trap_pop();
 }
 
-/* If the user tries to close the icon window, attempt to uniconify the
- * window instead.
- */
-static gboolean widget_delete_event(GtkWidget *widget,
-		GdkEvent *event, IconWindow *win)
-{
-	uniconify(win);
-	return TRUE;
-}
-
-static void widget_destroyed(GtkWidget *widget, IconWindow *win)
-{
-	if (win->widget)
-	{
-		/* Window has been destroyed unexpectedly */
-		win->widget = NULL;
-		show_icon(win);
-	}
-}
-
 static gint drag_start_x = -1;
 static gint drag_start_y = -1;
 static gboolean drag_started = FALSE;
@@ -525,7 +506,8 @@ static gboolean icon_motion_notify(GtkWidget *widget,
 			drag_started = TRUE;
 		}
 
-		gdk_window_move(win->widget->window,
+		fixed_move_fast(GTK_FIXED(win->widget->parent),
+				win->widget,
 				event->x_root - drag_off_x,
 				event->y_root - drag_off_y);
 	}
@@ -542,76 +524,26 @@ static void button_released(GtkWidget *widget, IconWindow *win)
 /* A window has been iconified -- display it on the screen */
 static void show_icon(IconWindow *win)
 {
-	GtkWidget *button;
+	GtkRequisition req;
 
 	g_return_if_fail(win->widget == NULL);
 
-	win->widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	win->widget = gtk_button_new_with_label(win->text);
 
-	gtk_window_set_resizable(GTK_WINDOW(win->widget), FALSE);
-	g_signal_connect(win->widget, "delete-event",
-			G_CALLBACK(widget_delete_event), win);
-	g_signal_connect(win->widget, "destroy",
-			G_CALLBACK(widget_destroyed), win);
-	button = gtk_button_new_with_label(win->text);
-	gtk_container_add(GTK_CONTAINER(win->widget), button);
-
-	gtk_widget_add_events(button, GDK_BUTTON1_MOTION_MASK);
-	g_signal_connect(button, "button-press-event",
+	gtk_widget_add_events(win->widget, GDK_BUTTON1_MOTION_MASK);
+	g_signal_connect(win->widget, "button-press-event",
 			G_CALLBACK(icon_button_press), win);
-	g_signal_connect(button, "motion-notify-event",
+	g_signal_connect(win->widget, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), win);
-	g_signal_connect(button, "released", G_CALLBACK(button_released), win);
+	g_signal_connect(win->widget, "released",
+			G_CALLBACK(button_released), win);
 	
-	gtk_widget_realize(win->widget);
-	gtk_window_move(GTK_WINDOW(win->widget),
-			iconify_next_x, iconify_next_y);
-	make_panel_window(win->widget);
-
-	{
-		GdkAtom dock_type;
-
-		dock_type = gdk_atom_intern("_NET_WM_WINDOW_TYPE_DOCK",
-						FALSE);
-		gdk_property_change(win->widget->window,
-			gdk_atom_intern("_NET_WM_WINDOW_TYPE", FALSE),
-			gdk_atom_intern("ATOM", FALSE), 32,
-			GDK_PROP_MODE_REPLACE, (guchar *) &dock_type, 1);
-	}
-	
+	pinboard_add_widget(win->widget, iconify_next_x, iconify_next_y);
 	gtk_widget_show_all(win->widget);
+	gtk_widget_size_request(win->widget, &req);
 
-	/* This is just silly! Setting the type to DOCK in sawfish somehow
-	 * unsets STICKY, so we set it again here...
-	 */
-	{
-		XClientMessageEvent sev;
-
-		sev.type = ClientMessage;
-		sev.display = gdk_display;
-		sev.format = 32;
-		sev.window = GDK_WINDOW_XWINDOW(win->widget->window);
-		sev.message_type = gdk_x11_atom_to_xatom(
-				gdk_atom_intern("_NET_WM_STATE", FALSE));
-		sev.data.l[0] = 1;	/* Set property */
-		sev.data.l[1] = gdk_x11_atom_to_xatom(
-			gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE));
-		sev.data.l[2] =gdk_x11_atom_to_xatom(
-			gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER", FALSE));
-
-		gdk_error_trap_push();
-
-		XSendEvent(gdk_display, DefaultRootWindow(gdk_display), False,
-			SubstructureNotifyMask | SubstructureRedirectMask,
-			(XEvent *) &sev);
-
-		XSync (gdk_display, False);
-
-		gdk_error_trap_pop();
-	}
-
-	iconify_next_y += win->widget->requisition.height;
-	if (iconify_next_y + win->widget->requisition.height > screen_height)
+	iconify_next_y += req.height;
+	if (iconify_next_y + req.height > screen_height)
 		iconify_next_y = 0;
 }
 

@@ -319,6 +319,16 @@ const char *pinboard_get_name(void)
 	return current_pinboard->name;
 }
 
+/* Add widget to the pinboard. Caller is responsible for coping with pinboard
+ * being cleared.
+ */
+void pinboard_add_widget(GtkWidget *widget, int x, int y)
+{
+	g_return_if_fail(current_pinboard != NULL);
+
+	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), widget, x, y);
+}
+
 /* Add a new icon to the background.
  * 'path' should be an absolute pathname.
  * 'x' and 'y' are the coordinates of the point in the middle of the text.
@@ -469,8 +479,7 @@ void pinboard_reshape_icon(Icon *icon)
 
 	if (pi->win->allocation.x != x || pi->win->allocation.y != y)
 	{
-		/* Expensive - this redraws the whole pinboard! */
-		gtk_fixed_move(GTK_FIXED(current_pinboard->fixed),
+		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
 				pi->win, x, y);
 	}
 }
@@ -1246,7 +1255,7 @@ void pinboard_move_icons(void)
 	gdk_drawable_get_size(pi->win->window, &width, &height);
 	offset_from_centre(pi, &x, &y);
 
-	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
+	fixed_move_fast(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
 
 	pinboard_save();
 }
@@ -1509,6 +1518,7 @@ static void create_pinboard_window(Pinboard *pinboard)
 	g_return_if_fail(pinboard->window == NULL);
 
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_app_paintable(win, TRUE);
 	gtk_widget_set_name(win, "rox-pinboard");
 	pinboard->window = win;
 	pinboard->fixed = gtk_fixed_new();

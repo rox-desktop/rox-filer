@@ -783,3 +783,62 @@ void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 	}
 }
 
+/* Copied from Gtk */
+static GtkFixedChild* fixed_get_child(GtkFixed *fixed, GtkWidget *widget)
+{
+	GList *children;
+
+	children = fixed->children;
+	while (children)
+	{
+		GtkFixedChild *child;
+
+		child = children->data;
+		children = children->next;
+
+		if (child->widget == widget)
+			return child;
+	}
+
+	return NULL;
+}
+
+/* Like gtk_fixed_move(), except not insanely slow */
+void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y)
+{
+	GtkFixedChild *child;
+
+	child = fixed_get_child(fixed, widget);
+
+	g_assert(child);
+
+	gtk_widget_freeze_child_notify(widget);
+
+	child->x = x;
+	gtk_widget_child_notify(widget, "x");
+
+	child->y = y;
+	gtk_widget_child_notify(widget, "y");
+
+	gtk_widget_thaw_child_notify(widget);
+
+	if (GTK_WIDGET_VISIBLE(widget) && GTK_WIDGET_VISIBLE(fixed))
+	{
+		int border_width = GTK_CONTAINER(fixed)->border_width;
+		GtkAllocation child_allocation;
+		GtkRequisition child_requisition;
+
+		gtk_widget_get_child_requisition(child->widget,
+					&child_requisition);
+		child_allocation.x = child->x + border_width;
+		child_allocation.y = child->y + border_width;
+
+		child_allocation.x += GTK_WIDGET(fixed)->allocation.x;
+		child_allocation.y += GTK_WIDGET(fixed)->allocation.y;
+
+		child_allocation.width = child_requisition.width;
+		child_allocation.height = child_requisition.height;
+		gtk_widget_size_allocate(child->widget, &child_allocation);
+	}
+}
+

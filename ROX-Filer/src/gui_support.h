@@ -48,5 +48,6 @@ gboolean rox_spawn(const gchar *dir, const gchar **argv);
 GtkWidget *button_new_mixed(const char *stock, const char *message);
 void entry_set_error(GtkWidget *entry, gboolean error);
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower);
+void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y);
 
 #endif /* _GUI_SUPPORT_H */
