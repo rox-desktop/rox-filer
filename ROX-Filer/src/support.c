@@ -47,6 +47,10 @@
 #include "my_vfs.h"
 #include "fscache.h"
 
+#ifndef GTK2
+# include "gconvert.h"
+#endif
+
 static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 
@@ -1297,6 +1301,31 @@ gchar *icon_convert_path(gchar *path)
 	}
 
 	return retval;
+}
+
+/* Convert string 'src' from the current locale to UTF-8.
+ * If conversion fails, try again using iso-8859-1 -> UTF-8.
+ */
+gchar *to_utf8(gchar *src)
+{
+	gchar *retval;
+
+	if (!src)
+		return NULL;
+
+	retval = g_locale_to_utf8(src, -1, NULL, NULL, NULL);
+	if (retval)
+		return retval;
+
+	return g_convert(src, -1, "UTF-8", "iso-8859-1", NULL, NULL, NULL);
+}
+
+/* Convert string 'src' to the current locale from UTF-8.
+ * If conversion fails, try again using iso-8859-1 -> UTF-8.
+ */
+gchar *from_utf8(gchar *src)
+{
+	return src ? g_locale_from_utf8(src, -1, NULL, NULL, NULL) : NULL;
 }
 
 /****************************************************************

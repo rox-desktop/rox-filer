@@ -412,6 +412,7 @@ static void panel_load_from_xml(Panel *panel, xmlDocPtr doc)
 static char *pan_from_file(guchar *line)
 {
 	guchar	*sep, *leaf;
+	gchar	*u8_path, *u8_leaf;
 	
 	g_return_val_if_fail(line != NULL, NULL);
 	g_return_val_if_fail(loading_panel != NULL, NULL);
@@ -428,12 +429,14 @@ static char *pan_from_file(guchar *line)
 	else
 		leaf = NULL;
 	
-	panel_add_item(loading_panel,
-			sep + 1,
-			leaf,
-			sep[0] == '>');
-
+	u8_path = to_utf8(sep + 1);
+	u8_leaf = to_utf8(leaf);
 	g_free(leaf);
+
+	panel_add_item(loading_panel, u8_path, u8_leaf, sep[0] == '>');
+
+	g_free(u8_path);
+	g_free(u8_leaf);
 
 	return NULL;
 }
@@ -484,7 +487,17 @@ static void panel_add_item(Panel *panel,
 	icon->selected = FALSE;
 
 	if (name)
+	{
+#ifndef GTK2
+		gchar *loc_name;
+
+		loc_name = from_utf8(name);
+		icon->item = diritem_new(loc_name);
+		g_free(loc_name);
+#else
 		icon->item = diritem_new(name);
+#endif
+	}
 	else
 	{
 		guchar	*slash;
@@ -898,7 +911,16 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 
 		tree = xmlNewTextChild(side, NULL, "icon", icon->src_path);
 
+#ifndef GTK2
+		{
+			gchar *u8;
+			u8 = to_utf8(icon->item->leafname);
+			xmlSetProp(tree, "label", u8);
+			g_free(u8);
+		}
+#else
 		xmlSetProp(tree, "label", icon->item->leafname);
+#endif
 	}
 	
 	if (widgets)
