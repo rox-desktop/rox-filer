@@ -538,7 +538,7 @@ static void get_path_set_icon(GtkWidget *dialog)
 
 static void show_icon_help(gpointer data)
 {
-	report_error(
+	info_message(
 		_("Enter the full path of a file that contains a valid "
 		  "image to be used as the icon for this file or directory."));
 }

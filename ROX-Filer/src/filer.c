@@ -575,7 +575,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	if (!dir)
 	{
 		if (warning)
-			delayed_error(_("Directory missing/deleted"));
+			info_message(_("Directory missing/deleted"));
 		gtk_widget_destroy(filer_window->window);
 		return FALSE;
 	}

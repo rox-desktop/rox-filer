@@ -118,9 +118,9 @@ int get_choice(const char *title,
 	return retval;
 }
 
-/* Display a message in a window with "ROX-Filer" as title */
-void report_error(const char *message, ...)
+void info_message(const char *message, ...)
 {
+	GtkWidget *dialog;
         va_list args;
 	gchar *s;
 
@@ -130,19 +130,41 @@ void report_error(const char *message, ...)
 	s = g_strdup_vprintf(message, args);
 	va_end(args);
 
-	{
-		GtkWidget *dialog;
-		dialog = gtk_message_dialog_new(NULL,
-				GTK_DIALOG_MODAL,
-				GTK_MESSAGE_ERROR,
-				GTK_BUTTONS_OK,
-				"%s", s);
-		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-		gtk_dialog_set_default_response(GTK_DIALOG(dialog),
-						GTK_RESPONSE_OK);
-		gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
-	}
+	dialog = gtk_message_dialog_new(NULL,
+					GTK_DIALOG_MODAL,
+					GTK_MESSAGE_INFO,
+					GTK_BUTTONS_OK,
+					"%s", s);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+
+	g_free(s);
+}
+
+/* Display a message in a window with "ROX-Filer" as title */
+void report_error(const char *message, ...)
+{
+	GtkWidget *dialog;
+        va_list args;
+	gchar *s;
+
+	g_return_if_fail(message != NULL);
+
+	va_start(args, message);
+	s = g_strdup_vprintf(message, args);
+	va_end(args);
+
+	dialog = gtk_message_dialog_new(NULL,
+			GTK_DIALOG_MODAL,
+			GTK_MESSAGE_ERROR,
+			GTK_BUTTONS_OK,
+			"%s", s);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
 
 	g_free(s);
 }
@@ -726,4 +748,3 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 
 	gtk_widget_modify_text(entry, GTK_STATE_NORMAL, error ? &red : &normal);
 }
-

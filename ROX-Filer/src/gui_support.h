@@ -32,6 +32,7 @@ int get_choice(const char *title,
 	       const char *message,
 	       int number_of_buttons, ...);
 void report_error(const char *message, ...);
+void info_message(const char *message, ...);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
 void make_panel_window(GtkWidget *widget);
 void delayed_error(const char *error, ...);

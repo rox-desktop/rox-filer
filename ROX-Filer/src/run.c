@@ -276,19 +276,19 @@ void show_item_help(const guchar *path, DirItem *item)
 	{
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE)
-				delayed_error(
+				info_message(
 				      _("Executable file:\n"
 					"This is a file with an eXecute bit "
 					"set - it can be run as a program."));
 			else
-				delayed_error(
+				info_message(
 				      _("File:\n"
 					"This is a data file. Try using the "
 					"Info menu item to find out more..."));
 			break;
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_MOUNT_POINT)
-				delayed_error(
+				info_message(
 				_("Mount point:\n"
 				"A mount point is a directory which another "
 				"filing system can be mounted on. Everything "
@@ -299,26 +299,26 @@ void show_item_help(const guchar *path, DirItem *item)
 			break;
 		case TYPE_CHAR_DEVICE:
 		case TYPE_BLOCK_DEVICE:
-			delayed_error(
+			info_message(
 				_("Device file:\n"
 				"Device files allow you to read from or write "
 				"to a device driver as though it was an "
 				"ordinary file."));
 			break;
 		case TYPE_PIPE:
-			delayed_error(
+			info_message(
 				_("Named pipe:\n"
 				"Pipes allow different programs to "
 				"communicate. One program writes data to the "
 				"pipe while another one reads it out again."));
 			break;
 		case TYPE_SOCKET:
-			delayed_error(
+			info_message(
 				_("Socket:\n"
 				"Sockets allow processes to communicate."));
 			break;
 		default:
-			delayed_error(
+			info_message(
 				_("Unknown type:\n"
 				"I couldn't find out what kind of file this "
 				"is. Maybe it doesn't exist anymore or you "
@@ -406,8 +406,7 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond)
 		{
 			if (errno == EAGAIN)
 				return;
-			delayed_error(
-					_("Could not send data to program: %s"),
+			delayed_error(_("Could not send data to program: %s"),
 					g_strerror(errno));
 			goto finish;
 		}
@@ -525,14 +524,14 @@ static void dir_show_help(DirItem *item, const char *path)
 	if (mc_stat(help_dir, &info) == 0)
 		filer_opendir(help_dir, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
-		delayed_error(
+		info_message(
 			_("Application:\n"
 			"This is an application directory - you can "
 			"run it as a program, or open it (hold down "
 			"Shift while you open it). Most applications provide "
 			"their own help here, but this one doesn't."));
 	else
-		delayed_error(_("Directory:\n"
+		info_message(_("Directory:\n"
 				"This is a directory. It contains an index to "
 				"other items - open it to see the list."));
 }

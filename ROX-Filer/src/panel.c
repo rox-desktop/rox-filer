@@ -288,7 +288,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		else
 		{
 			parse_file(load_path, pan_from_file);
-			delayed_error(_("Your old panel file has been "
+			info_message(_("Your old panel file has been "
 					"converted to the new XML format."));
 			panel_save(panel);
 		}

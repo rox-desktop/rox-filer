@@ -626,7 +626,7 @@ GdkAtom type_to_atom(MIME_type *type)
 
 void show_shell_help(gpointer data)
 {
-	report_error(_("Enter a shell command which will load \"$1\" into "
+	info_message(_("Enter a shell command which will load \"$1\" into "
 			"a suitable program. Eg:\n\n"
 			"gimp \"$1\""));
 }

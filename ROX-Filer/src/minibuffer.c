@@ -237,30 +237,26 @@ void minibuffer_add(FilerWindow *filer_window, const gchar *leafname)
 
 static void show_help(FilerWindow *filer_window)
 {
-	const gchar	*message;
-
-	gtk_widget_grab_focus(filer_window->minibuffer);
-
 	switch (filer_window->mini_type)
 	{
 		case MINI_PATH:
-			message = _("Enter the name of a file and I'll display "
+			info_message(
+				_("Enter the name of a file and I'll display "
 				"it for you. Press Tab to fill in the longest "
-				"match. Escape to close the minibuffer.");
+				"match. Escape to close the minibuffer."));
 			break;
 		case MINI_SHELL:
-			message = _("Enter a shell command to execute. Click "
-				"on a file to add it to the buffer.");
+			info_message(
+				_("Enter a shell command to execute. Click "
+				"on a file to add it to the buffer."));
 			break;
 		case MINI_SELECT_IF:
 			show_condition_help(NULL);
-			return;
+			break;
 		default:
-			message = "?!?";
+			g_warning("Unknown minibuffer type!");
 			break;
 	}
-
-	delayed_error("%s", message);
 }
 
 

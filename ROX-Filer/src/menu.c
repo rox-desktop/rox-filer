@@ -1313,7 +1313,7 @@ static void customise_send_to(gpointer data)
 	if (save)
 		mkdir(save, 0777);
 
-	report_error(
+	info_message(
 		_("The `Send To' menu provides a quick way to send some files "
 		"to an application. The applications listed are those in "
 		"the following directories:\n\n%s\n%s\n"
@@ -1759,7 +1759,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 
 static void show_key_help(GtkWidget *button, gpointer data)
 {
-	report_error(_("To set a keyboard short-cut for a menu item:\n\n"
+	info_message(_("To set a keyboard short-cut for a menu item:\n\n"
 	"- Open the menu over a filer window,\n"
 	"- Move the pointer over the item you want to use,\n"
 	"- Press the key you want attached to it.\n\n"

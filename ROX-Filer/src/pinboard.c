@@ -259,7 +259,7 @@ void pinboard_activate(const gchar *name)
 		else
 		{
 			parse_file(path, pin_from_file);
-			delayed_error(_("Your old pinboard file has been "
+			info_message(_("Your old pinboard file has been "
 					"converted to the new XML format."));
 			pinboard_save();
 		}
