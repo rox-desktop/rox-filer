@@ -470,7 +470,7 @@ static void open_fontsel(GtkWidget *button, Option *option)
 				GTK_WIN_POS_MOUSE);
 
 	g_signal_connect(current_fontsel_box, "destroy",
-			G_CALLBACK(gtk_widget_destroy), &current_fontsel_box);
+			G_CALLBACK(gtk_widget_destroyed), &current_fontsel_box);
 
 	gtk_font_selection_dialog_set_font_name(current_fontsel_box,
 						option->value);
