@@ -30,7 +30,7 @@ system "cp ~/Apps/ROX-Filer/Help/Manual.ps ROX-Filer/Help";
 system "cp -r ~/Projects/roxfiler-template/* .";
 system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo ROX-Filer/Messages";
 chdir;
-system "tar czf roxfiler-$a.$b.$c.tgz roxfiler-$a-$b-$c";
+system "tar czf roxfiler-$a.$b.$c.tgz roxfiler-$a.$b.$c";
 system "rm -r roxfiler-$a.$b.$c";
 
 print "OK, done\n";

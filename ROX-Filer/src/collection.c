@@ -35,7 +35,7 @@
 #define MINIMUM_ITEMS 16
 
 int collection_menu_button = 3;
-gboolean collection_single_click = FALSE;
+gboolean collection_single_click = TRUE;
 
 enum
 {
