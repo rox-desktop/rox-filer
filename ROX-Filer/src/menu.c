@@ -547,7 +547,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 					shift_action = N_("Mount");
 			}
 			else if (file_item->flags & ITEM_FLAG_SYMLINK)
+			{
 				shift_action = N_("Show Target");
+				menus = appmenu_query(
+						make_path(filer_window->path,
+						   file_item->leafname)->str,
+						file_item);
+			}
 			else if (file_item->base_type == TYPE_DIRECTORY)
 			{
 				shift_action = N_("Look Inside");
