@@ -741,7 +741,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		path = get_local_path((gchar *) next->data);
 		if (path)
 		{
-			pinboard_pin(path, NULL, x, y);
+			pinboard_pin(path, NULL, x, y, TRUE);
 			x += 64;
 		}
 

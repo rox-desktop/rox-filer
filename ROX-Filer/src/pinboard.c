@@ -304,10 +304,12 @@ void pinboard_activate(guchar *name)
 
 /* Add a new icon to the background.
  * 'path' should be an absolute pathname.
- * 'x' and 'y' are the coordinates of the point in the middle of the text.
+ * 'x' and 'y' are the coordinates of the point in the middle of the text
+ * if 'corner' is FALSE, and as the top-left corner of where the icon
+ * image should be if it is TRUE.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  */
-void pinboard_pin(guchar *path, guchar *name, int x, int y)
+void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 {
 	Icon		*icon;
 	int		width, height;
@@ -321,7 +323,6 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 	icon->mask = NULL;
-	snap_to_grid(&x, &y);
 	icon->x = x;
 	icon->y = y;
 
@@ -353,6 +354,14 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	gtk_widget_realize(icon->widget);
 
 	set_size_and_shape(icon, &width, &height);
+	if (corner)
+	{
+		/* Convert from icon-corner coordinates to center coordinates */
+		MaskedPixmap	*image = icon->item.image;
+		x += (image->width >> 1);
+		y += height - (icon->widget->style->font->descent >> 1);
+	}
+	snap_to_grid(&x, &y);
 	offset_from_centre(icon, width, height, &x, &y);
 	gtk_widget_set_uposition(icon->win, x, y);
 	/* Set the correct position in the icon */
@@ -1142,7 +1151,7 @@ static char *pin_from_file(guchar *line)
 	if (sscanf(line, " %d , %d , %n", &x, &y, &n) < 2)
 		return NULL;		/* Ignore format errors */
 
-	pinboard_pin(line + n, leaf, x, y);
+	pinboard_pin(line + n, leaf, x, y, FALSE);
 
 	g_free(leaf);
 

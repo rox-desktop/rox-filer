@@ -10,7 +10,7 @@
 
 void pinboard_init(void);
 void pinboard_activate(guchar *name);
-void pinboard_pin(guchar *path, guchar *name, int x, int y);
+void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner);
 void pinboard_unpin(Icon *icon);
 void pinboard_unpin_selection(void);
 void pinboard_wink_item(Icon *icon, gboolean timeout);
