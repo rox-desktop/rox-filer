@@ -41,6 +41,7 @@
 #include "infobox.h"
 #include "appinfo.h"
 #include "dnd.h"	/* For xa_string */
+#include "run.h"	/* For show_item_help() */
 #include "xml.h"
 #include "mount.h"
 
@@ -58,7 +59,8 @@ struct _FileStatus
 /* Static prototypes */
 static void refresh_info(GObject *window);
 static GtkWidget *make_vbox(guchar *path);
-static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about);
+static GtkWidget *make_details(guchar *path, DirItem *item);
+static GtkWidget *make_about(guchar *path, xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
@@ -101,7 +103,7 @@ void infobox_new(const gchar *pathname)
 {
 	GtkWidget	*window, *details;
 	gchar		*path;
-	
+
 	g_return_if_fail(pathname != NULL);
 
 	path = g_strdup(pathname); /* Gets attached to window & freed later */
@@ -130,6 +132,16 @@ void infobox_new(const gchar *pathname)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void show_help_clicked(const gchar *path)
+{
+	DirItem *item;
+
+	item = diritem_new("");
+	diritem_restat(path, item, NULL);
+	show_item_help(path, item);
+	diritem_free(item);
+}
 
 static void got_response(GObject *window, gint response, gpointer data)
 {
@@ -161,13 +173,16 @@ static void refresh_info(GObject *window)
 	gtk_widget_show_all(details);
 }
 
-/* Create the VBox widget that contains the details */
+/* Create the VBox widget that contains the details.
+ * Note that 'path' must not be freed until the vbox is destroyed.
+ */
 static GtkWidget *make_vbox(guchar *path)
 {
 	DirItem		*item;
-	GtkWidget	*vbox, *list, *file, *frame;
+	GtkWidget	*vbox, *list, *frame;
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
+	gchar		*help_dir;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
@@ -182,15 +197,38 @@ static GtkWidget *make_vbox(guchar *path)
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	list = make_details(path, item, about);
+	list = make_details(path, item);
 	gtk_container_add(GTK_CONTAINER(frame), list);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
 
-	if (!about)
+	help_dir = g_strconcat(path, "/Help", NULL);
+	if (access(help_dir, F_OK) == 0)
 	{
-		file = make_file_says(path);
-		gtk_box_pack_start(GTK_BOX(vbox), file, TRUE, TRUE, 0);
+		GtkWidget *button, *align;
+
+		align = gtk_alignment_new(0.5, 0.5, 0, 0);
+		
+		button = button_new_mixed(GTK_STOCK_JUMP_TO,
+				_("Show _Help Files"));
+		gtk_box_pack_start(GTK_BOX(vbox), align, FALSE, TRUE, 0);
+		gtk_container_add(GTK_CONTAINER(align), button);
+		g_signal_connect_swapped(button, "clicked", 
+				G_CALLBACK(show_help_clicked),
+				path);
 	}
+	g_free(help_dir);
+
+	if (about)
+	{
+		frame = gtk_frame_new(NULL);
+		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+		list = make_about(path, about);
+		gtk_container_add(GTK_CONTAINER(frame), list);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+	}
+	else
+		gtk_box_pack_start(GTK_BOX(vbox), make_file_says(path), TRUE,
+				   TRUE, 0);
 
 	if (ai)
 		g_object_unref(ai);
@@ -236,16 +274,12 @@ static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
 	gtk_list_store_set(store, &iter, 0, label, 1, data, -1);
 }
 
-/* Create the TreeView widget with the file's details */
-static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
+/* Create an empty list view, ready to place some data in */
+static void make_list(GtkListStore **list_store, GtkWidget **list_view)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
 	GtkCellRenderer *cell_renderer;
-	GString		*gstring;
-	struct stat	info;
-	xmlNode 	*prop;
-	gchar		*tmp, *tmp2;
 
 	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -263,6 +297,21 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 
 	g_signal_connect(view, "cursor_changed",
 			G_CALLBACK(set_selection), NULL);
+
+	*list_store = store;
+	*list_view = view;
+}
+	
+/* Create the TreeView widget with the file's details */
+static GtkWidget *make_details(guchar *path, DirItem *item)
+{
+	GtkListStore	*store;
+	GtkWidget	*view;
+	GString		*gstring;
+	struct stat	info;
+	gchar		*tmp, *tmp2;
+
+	make_list(&store, &view);
 	
 	add_row(store, _("Name:"), item->leafname);
 
@@ -325,31 +374,43 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 		g_free(tmp);
 	}
 
-	if (about)
-	{
-		add_row(store, "", "");
-		//gtk_clist_set_selectable(table, table->rows - 1, FALSE);
-		for (prop = about->xmlChildrenNode; prop; prop = prop->next)
-		{
-			if (prop->type == XML_ELEMENT_NODE)
-			{
-				char *l;
+	return view;
+}
+	
+/* Create the TreeView widget with the application's details, or
+ * the file(1) summary (for non-apps).
+ */
+static GtkWidget *make_about(guchar *path, xmlNode *about)
+{
+	GtkListStore	*store;
+	GtkWidget	*view;
+	xmlNode 	*prop;
+	gchar		*tmp;
 
-				l = g_strconcat((char *) prop->name, ":", NULL);
-				tmp = xmlNodeListGetString(prop->doc,
-						prop->xmlChildrenNode, 1);
-				if (!tmp)
-					tmp = g_strdup("-");
-				add_row(store, l, tmp);
-				g_free(l);
-				g_free(tmp);
-			}
+	g_return_val_if_fail(about != NULL, NULL);
+
+	make_list(&store, &view);
+
+	for (prop = about->xmlChildrenNode; prop; prop = prop->next)
+	{
+		if (prop->type == XML_ELEMENT_NODE)
+		{
+			char *l;
+
+			l = g_strconcat((char *) prop->name, ":", NULL);
+			tmp = xmlNodeListGetString(prop->doc,
+					prop->xmlChildrenNode, 1);
+			if (!tmp)
+				tmp = g_strdup("-");
+			add_row(store, l, tmp);
+			g_free(l);
+			g_free(tmp);
 		}
 	}
 
 	return view;
 }
-	
+
 static GtkWidget *make_file_says(guchar *path)
 {
 	GtkWidget	*frame;

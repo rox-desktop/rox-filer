@@ -245,7 +245,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Xterm Here"),		NULL, xterm_here, FALSE, NULL},
 {">" N_("Switch to xterm"),	NULL, xterm_here, TRUE, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Show ROX-Filer Help"), "F1", menu_rox_help, 0, NULL},
+{">" N_("About ROX-Filer..."),	"F1", menu_rox_help, 0, NULL},
 };
 
 
@@ -1679,7 +1679,7 @@ static void mini_buffer(gpointer data, guint action, GtkWidget *widget)
 
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(app_dir, "Help")->str, NULL);
+	infobox_new(app_dir);
 }
 
 /* Set n items from position 'from' in 'menu' to the 'shaded' state */
