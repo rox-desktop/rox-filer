@@ -28,6 +28,8 @@
 #ifdef HAVE_LOCALE_H
 #  include <locale.h>
 #endif
+#include <sys/stat.h>
+#include <unistd.h>
 
 #include <gtk/gtk.h>
 
