@@ -569,14 +569,16 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	FilerWindow *fwin;
 
 	path = string_value(ARG(0));
-	style = string_value(ARG(1));
-	details = string_value(ARG(2));
-	sort = string_value(ARG(3));
 	class = string_value(ARG(4));
-
 	fwin = filer_opendir(path, NULL, class);
 	g_free(path);
 	g_free(class);
+	if (!fwin)
+		return NULL;
+
+	style = string_value(ARG(1));
+	details = string_value(ARG(2));
+	sort = string_value(ARG(3));
 
 	if (style)
 	{
