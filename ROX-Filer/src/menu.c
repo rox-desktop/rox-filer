@@ -950,7 +950,6 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	full_refresh();
-	filer_update_dir(window_with_focus, TRUE);
 }
 
 static void delete(FilerWindow *filer_window)

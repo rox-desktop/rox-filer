@@ -292,10 +292,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 		filer_opendir(filer_window->sym_path, filer_window, NULL);
 	}
 	else
-	{
 		full_refresh();
-		filer_update_dir(filer_window, TRUE);
-	}
 }
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)

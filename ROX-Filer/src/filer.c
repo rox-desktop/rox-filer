@@ -1543,7 +1543,7 @@ void filer_update_all(void)
 void full_refresh(void)
 {
 	mount_update(TRUE);
-	reread_mime_files();
+	reread_mime_files();	/* Refreshes all windows */
 }
 
 /* See whether a filer window with a given path already exists

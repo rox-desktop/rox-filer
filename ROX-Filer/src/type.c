@@ -163,7 +163,9 @@ void type_init(void)
 	option_add_notify(alloc_type_colours);
 }
 
-/* Read-load all the glob patterns */
+/* Read-load all the glob patterns.
+ * Note: calls filer_update_all.
+ */
 void reread_mime_files(void)
 {
 	load_mime_types();
@@ -1225,7 +1227,9 @@ static gint sort_by_strlen(gconstpointer a, gconstpointer b)
 	return 1;
 }
 
-/* Clear all currently stored information and re-read everything */
+/* Clear all currently stored information and re-read everything.
+ * Note: calls filer_update_all.
+ */
 static void load_mime_types(void)
 {
 	GHashTable *globs;
