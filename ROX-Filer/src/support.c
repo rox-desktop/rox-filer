@@ -745,88 +745,17 @@ char *pretty_time(time_t *time)
 #  define O_NOFOLLOW 0x0
 #endif
 
-#ifdef HAVE_LIBVFS
-/* Copy data from 'read_fd' FD to 'write_fd' FD until EOF or error.
- * Returns 0 on success, -1 on error (and sets errno).
- */
-static int copy_fd(int read_fd, int write_fd)
-{
-	char	buffer[4096];
-	int	got;
-	
-	while ((got = mc_read(read_fd, buffer, sizeof(buffer))) > 0)
-	{
-		int sent = 0;
-		
-		while (sent < got)
-		{
-			int	c;
-			
-			c = mc_write(write_fd, buffer + sent, got - sent);
-			if (c < 0)
-				return -1;
-			sent += c;
-		}
-	}
-
-	return got;
-}
-#endif
-
 /* 'from' and 'to' are complete pathnames of files (not dirs or symlinks).
  * This spawns 'cp' to do the copy if lstat() succeeds, otherwise we
  * do the copy manually using vfs.
  *
  * Returns an error string, or NULL on success. g_free() the result.
+ *
+ * XXX: This was only used for libvfs...
  */
 guchar *copy_file(const guchar *from, const guchar *to)
 {
 	const char *argv[] = {"cp", "-pRf", NULL, NULL, NULL};
-
-#ifdef HAVE_LIBVFS
-	struct	stat	info;
-
-	if (lstat(from, &info))
-	{
-		int	read_fd = -1;
-		int	write_fd = -1;
-		int	error = 0;
-
-		if (mc_lstat(from, &info))
-			return g_strdup(g_strerror(errno));
-
-		/* Regular lstat() can't find it, but mc_lstat() can,
-		 * so try reading it with VFS.
-		 */
-
-		if (!S_ISREG(info.st_mode))
-			goto err;
-
-		read_fd = mc_open(from, O_RDONLY);
-		if (read_fd == -1)
-			goto err;
-		write_fd = mc_open(to,
-				O_NOFOLLOW | O_WRONLY | O_CREAT | O_TRUNC,
-				info.st_mode & 0777);
-		if (write_fd == -1)
-			goto err;
-
-		if (copy_fd(read_fd, write_fd))
-			goto err;
-
-		/* (yes, the single | is right) */
-		if (mc_close(read_fd) | mc_close(write_fd))
-			return g_strdup(g_strerror(errno));
-		return NULL;
-err:
-		error = errno;
-		if (read_fd != -1)
-			mc_close(read_fd);
-		if (write_fd != -1)
-			mc_close(write_fd);
-		return g_strdup(error ? g_strerror(error) : _("Copy error"));
-	}
-#endif
 
 	argv[2] = from;
 	argv[3] = to;

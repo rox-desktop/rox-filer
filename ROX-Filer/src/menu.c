@@ -23,8 +23,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>
@@ -78,14 +76,7 @@ typedef enum {
 	FILE_USAGE,
 	FILE_CHMOD_ITEMS,
 	FILE_FIND,
-#ifdef HAVE_LIBVFS
-	FILE_OPEN_VFS_RPM,
-	FILE_OPEN_VFS_UTAR,
-	FILE_OPEN_VFS_UZIP,
-	FILE_OPEN_VFS_DEB,
-#else
 	FILE_OPEN_VFS_AVFS,
-#endif
 } FileOp;
 
 typedef enum menu_icon_style {
@@ -175,9 +166,6 @@ static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
 GtkWidget	*display_large_menu;	/* Display->Large With... */
 GtkWidget	*display_small_menu;	/* Display->Small With... */
-#ifdef HAVE_LIBVFS
-static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
-#endif
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
@@ -227,15 +215,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
 {">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, NULL},
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
-#ifdef HAVE_LIBVFS
-{">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
-{">>" N_("Unzip"),		NULL, file_op, FILE_OPEN_VFS_UZIP, NULL},
-{">>" N_("Untar"),		NULL, file_op, FILE_OPEN_VFS_UTAR, NULL},
-{">>" N_("Deb"),              	NULL, file_op, FILE_OPEN_VFS_DEB, NULL},
-{">>" N_("RPM"),		NULL, file_op, FILE_OPEN_VFS_RPM, NULL},
-#else
 {">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
-#endif
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
 {">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, NULL},
@@ -301,9 +281,6 @@ void menu_init(void)
 
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
-#ifdef HAVE_LIBVFS
-	GET_SSMENU_ITEM(filer_vfs_menu, "filer", "File", "Open VFS");
-#endif
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
 							"Show Thumbnails");
@@ -316,12 +293,12 @@ void menu_init(void)
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
 
 	/* File '' label... */
-	items = gtk_container_children(GTK_CONTAINER(filer_menu));
+	items = gtk_container_get_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
 
 	/* Shift Open... label */
-	items = gtk_container_children(GTK_CONTAINER(filer_file_menu));
+	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
 	file_shift_item = GTK_BIN(g_list_nth(items, 3)->data)->child;
 	g_list_free(items);
 
@@ -335,10 +312,10 @@ void menu_init(void)
 		g_free(menurc);
 	}
 
-	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
-	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	g_signal_connect(filer_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
+	g_signal_connect(filer_file_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
 
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
@@ -391,23 +368,15 @@ static void items_sensitive(gboolean state)
 	int	n = 9;
 	GList	*items, *item;
 
-	items = item = gtk_container_children(GTK_CONTAINER(filer_file_menu));
+	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
+	item = items;
+
 	while (item && n--)
 	{
 		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
 		item = item->next;
 	}
 	g_list_free(items);
-
-#ifdef HAVE_LIBVFS
-	items = item = gtk_container_children(GTK_CONTAINER(filer_vfs_menu));
-	while (item)
-	{
-		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
-		item = item->next;
-	}
-	g_list_free(items);
-#endif
 }
 
 /* 'data' is an array of three ints:
@@ -422,7 +391,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	int		y_shift = 0;
 	int		item = pos[2];
 
-	next = items = gtk_container_children(GTK_CONTAINER(menu));
+	next = items = gtk_container_get_children(GTK_CONTAINER(menu));
 
 	while (item >= 0 && next)
 	{
@@ -547,7 +516,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			hbox = gtk_hbox_new(FALSE, 2);
 			gtk_container_add(GTK_CONTAINER(item), hbox);
 
-			img = gtk_pixmap_new(icon, mask);
+			img = gtk_image_new_from_pixmap(icon, mask);
 			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
 
 			label = gtk_label_new(leaf);
@@ -561,11 +530,11 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 
 		g_free(leaf);
 
-		gtk_signal_connect_object(GTK_OBJECT(item), "activate",
-				GTK_SIGNAL_FUNC(func), (GtkObject *) fname);
+		g_signal_connect_swapped(item, "activate",
+				G_CALLBACK(func), fname);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
-				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
+		g_signal_connect_swapped(item, "destroy",
+				G_CALLBACK(g_free), fname);
 
 		widgets = g_list_append(widgets, item);
 	}
@@ -1012,8 +981,8 @@ static void savebox_show(const gchar *action, const gchar *path,
 		gtk_widget_show(check_relative);
 	}
 
-	gtk_signal_connect(GTK_OBJECT(savebox), "save_to_file",
-				GTK_SIGNAL_FUNC(save_to_file), NULL);
+	g_signal_connect(savebox, "save_to_file",
+				G_CALLBACK(save_to_file), NULL);
 
 	g_object_set_data_full(G_OBJECT(savebox), "current_path",
 				g_strdup(path), g_free);
@@ -1148,20 +1117,6 @@ void open_home(gpointer data, guint action, GtkWidget *widget)
 	filer_opendir(home_dir, NULL);
 }
 
-#ifdef HAVE_LIBVFS
-static void real_vfs_open(FilerWindow *filer_window, DirItem *item, char *fs)
-{
-	gchar		*path;
-
-	path = g_strconcat(filer_window->path,
-			"/",
-			item->leafname,
-			"#", fs, NULL);
-
-	filer_change_to(filer_window, path, NULL);
-	g_free(path);
-}
-#else
 static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
 {
 	gchar		*path;
@@ -1172,7 +1127,6 @@ static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
 	filer_change_to(filer_window, path, NULL);
 	g_free(path);
 }
-#endif
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)
 {
@@ -1411,8 +1365,8 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 	choices_free_list(path);
 
 	item = gtk_menu_item_new_with_label(_("Customise"));
-	gtk_signal_connect_object(GTK_OBJECT(item), "activate",
-				GTK_SIGNAL_FUNC(customise_send_to), NULL);
+	g_signal_connect_swapped(item, "activate",
+				G_CALLBACK(customise_send_to), NULL);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	if (send_to_paths)
@@ -1422,8 +1376,7 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 	}
 	send_to_paths = paths;
 
-	gtk_signal_connect(GTK_OBJECT(menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	g_signal_connect(menu, "unmap_event", G_CALLBACK(menu_closed), NULL);
 
 	popup_menu = menu;
 	show_popup_menu(menu, event, 0);
@@ -1609,7 +1562,7 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 {
 	GList	*items, *item;
 
-	items = gtk_container_children(GTK_CONTAINER(menu));
+	items = gtk_container_get_children(GTK_CONTAINER(menu));
 
 	item = g_list_nth(items, from);
 	while (item && n--)
@@ -1642,7 +1595,7 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 	GList	  *items, *nth;
 	GtkWidget *item = NULL;
 
-	items = gtk_container_children(GTK_CONTAINER(shell));
+	items = gtk_container_get_children(GTK_CONTAINER(shell));
 	nth = g_list_nth(items, n);
 
 	g_return_if_fail(nth != NULL);
@@ -1708,14 +1661,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			case FILE_FIND:
 				prompt = _("Search inside ... ?");
 				break;
-#ifdef HAVE_LIBVFS
-			case FILE_OPEN_VFS_RPM:
-			case FILE_OPEN_VFS_UTAR:
-			case FILE_OPEN_VFS_UZIP:
-			case FILE_OPEN_VFS_DEB:
-#else
 			case FILE_OPEN_VFS_AVFS:
-#endif
 				prompt = _("Look inside ... ?");
 				break;
 			default:
@@ -1802,24 +1748,9 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		case FILE_SET_ICON:
 			icon_set_handler_dialog(item, path);
 			break;
-#ifdef HAVE_LIBVFS
-		case FILE_OPEN_VFS_RPM:
-			real_vfs_open(window_with_focus, item, "rpm");
-			break;
-		case FILE_OPEN_VFS_UTAR:
-			real_vfs_open(window_with_focus, item, "utar");
-			break;
-		case FILE_OPEN_VFS_UZIP:
-			real_vfs_open(window_with_focus, item, "uzip");
-			break;
-		case FILE_OPEN_VFS_DEB:
-			real_vfs_open(window_with_focus, item, "deb");
-			break;
-#else
 		case FILE_OPEN_VFS_AVFS:
 			open_vfs_avfs(window_with_focus, item);
 			break;
-#endif
 		default:
 			g_warning("Unknown action!");
 			return;
@@ -1845,8 +1776,7 @@ static GList *set_keys_button(Option *option, xmlNode *node, guchar *label)
 	align = gtk_alignment_new(0.5, 0.5, 0, 0);
 	button = gtk_button_new_with_label(_("Set keyboard shortcuts"));
 	gtk_container_add(GTK_CONTAINER(align), button);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(show_key_help), NULL);
+	g_signal_connect(button, "clicked", G_CALLBACK(show_key_help), NULL);
 
 	return g_list_append(NULL, align);
 }

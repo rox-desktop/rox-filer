@@ -235,10 +235,6 @@ int main(int argc, char **argv)
 	 */
 	death_callbacks = g_hash_table_new(NULL, NULL);
 
-#ifdef HAVE_LIBVFS
-	mc_vfs_init();
-#endif
-
 	/* Find out some information about ourself */
 	euid = geteuid();
 	egid = getegid();
@@ -559,17 +555,6 @@ static void show_features(void)
 		_("Yes")
 #else
 		_("No")
-#endif
-		);
-	g_printerr("%s... %s\n", _("Old VFS support"),
-#ifdef HAVE_LIBVFS
-		_("Yes")
-#else
-# ifdef LARGE_FILE_SUPPORT
-		_("No (incompatible with Large File Support)")
-# else
-		_("No (couldn't find a valid libvfs)")
-# endif
 #endif
 		);
 	g_printerr("%s... %s\n", _("GNOME-VFS library"),
