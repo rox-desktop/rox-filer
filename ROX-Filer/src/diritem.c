@@ -95,6 +95,8 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 	}
 	else
 	{
+		guchar *target_path;
+
 		item->lstat_errno = 0;
 		item->size = info.st_size;
 		item->mode = info.st_mode;
@@ -115,21 +117,28 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 					mode_to_base_type(info.st_mode);
 
 			item->flags |= ITEM_FLAG_SYMLINK;
+
+			target_path = readlink_dup(path);
 		}
 		else
 		{
 			item->base_type = mode_to_base_type(info.st_mode);
-
-			if (item->base_type == TYPE_DIRECTORY)
-			{
-				if (mount_is_mounted(path, &info, parent))
-					item->flags |= ITEM_FLAG_MOUNT_POINT
-							| ITEM_FLAG_MOUNTED;
-				else if (g_hash_table_lookup(fstab_mounts,
-								path))
-					item->flags |= ITEM_FLAG_MOUNT_POINT;
-			}
+			target_path = (guchar *) path;
 		}
+
+		if (item->base_type == TYPE_DIRECTORY)
+		{
+			if (mount_is_mounted(target_path, &info,
+					target_path == path ? parent : NULL))
+				item->flags |= ITEM_FLAG_MOUNT_POINT
+						| ITEM_FLAG_MOUNTED;
+			else if (g_hash_table_lookup(fstab_mounts,
+							target_path))
+				item->flags |= ITEM_FLAG_MOUNT_POINT;
+		}
+
+		if (path != target_path)
+			g_free(target_path);
 	}
 
 	if (item->base_type == TYPE_DIRECTORY)

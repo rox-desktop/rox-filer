@@ -174,7 +174,7 @@ void icon_may_update(Icon *icon)
 	if (icon->item->image != image || icon->item->flags != flags)
 	{
 		/* Appearance changed; need to redraw */
-		g_signal_emit_by_name(icon, "redraw");
+		g_signal_emit_by_name(icon, "update");
 	}
 
 	if (image)

@@ -140,7 +140,7 @@ void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted
@@ -197,7 +197,7 @@ void draw_large_icon(GdkWindow *window,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted
@@ -248,7 +248,7 @@ void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted

@@ -2317,9 +2317,13 @@ static gboolean drag_motion(GtkWidget		*widget,
 	gboolean	retval = FALSE;
 	gboolean	same_window;
 
-	/* (GTK bug) */
-	if (!action && (context->actions & GDK_ACTION_ASK))
-		action = GDK_ACTION_ASK;
+	if ((context->actions & GDK_ACTION_ASK) && o_dnd_left_menu.int_value)
+	{
+		guint state;
+		gdk_window_get_pointer(NULL, NULL, NULL, &state);
+		if (state & GDK_BUTTON1_MASK)
+			action = GDK_ACTION_ASK;
+	}
 
 	same_window = gtk_drag_get_source_widget(context) == widget;
 

@@ -1471,16 +1471,26 @@ static void mount_cb(gpointer data)
 
 	for (; paths; paths = paths->next)
 	{
-		guchar	*path = (guchar *) paths->data;
+		guchar *path = (guchar *) paths->data;
+		guchar *target;
 
-		if (mount_is_mounted(path, NULL, NULL))
-			do_mount(path, FALSE);	/* Unmount */
-		else if (g_hash_table_lookup(fstab_mounts, path))
-			do_mount(path, TRUE);	/* Mount */
-		else
-			continue;
+		target = readlink_dup(path);
+		if (!target)
+			target = path;
 
-		mount_points = TRUE;
+		if (mount_is_mounted(target, NULL, NULL))
+		{
+			mount_points = TRUE;
+			do_mount(target, FALSE);	/* Unmount */
+		}
+		else if (g_hash_table_lookup(fstab_mounts, target))
+		{
+			mount_points = TRUE;
+			do_mount(target, TRUE);	/* Mount */
+		}
+
+		if (target != path)
+			g_free(target);
 	}
 
 	if (mount_points)

@@ -146,7 +146,8 @@ int spring_in_progress = 0;	/* Non-zero changes filer_opendir slightly */
 Option o_dnd_drag_to_icons;
 Option o_dnd_spring_open;
 static Option o_dnd_spring_delay;
-static Option o_dnd_middle_menu, o_dnd_left_menu;
+static Option o_dnd_middle_menu;
+Option o_dnd_left_menu;
 
 void dnd_init(void)
 {
@@ -264,13 +265,8 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 	};
 		
 	if (event->state & GDK_BUTTON1_MASK)
-	{
-		if (o_dnd_left_menu.int_value)
-			actions = GDK_ACTION_ASK;
-		else
-			actions = GDK_ACTION_COPY | GDK_ACTION_MOVE
-				| GDK_ACTION_LINK | GDK_ACTION_ASK;
-	}
+		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE
+			| GDK_ACTION_LINK | GDK_ACTION_ASK;
 	else
 	{
 		if (o_dnd_middle_menu.int_value)
@@ -333,13 +329,8 @@ void drag_one_item(GtkWidget		*widget,
 		target_list = gtk_target_list_new(target_table, 1);
 
 	if (event->state & GDK_BUTTON1_MASK)
-	{
-		if (o_dnd_left_menu.int_value)
-			actions = GDK_ACTION_ASK;
-		else
-			actions = GDK_ACTION_COPY | GDK_ACTION_ASK
-				| GDK_ACTION_MOVE | GDK_ACTION_LINK;
-	}
+		actions = GDK_ACTION_COPY | GDK_ACTION_ASK
+			| GDK_ACTION_MOVE | GDK_ACTION_LINK;
 	else
 	{
 		if (o_dnd_middle_menu.int_value)
