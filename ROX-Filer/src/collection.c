@@ -91,8 +91,8 @@ static void clear_area(Collection *collection, GdkRectangle *area);
 static void draw_one_item(Collection 	*collection,
 			  int 		item,
 			  GdkRectangle 	*area);
-static void collection_class_init(CollectionClass *class);
-static void collection_init(Collection *object);
+static void collection_class_init(gpointer gclass, gpointer data);
+static void collection_init(GTypeInstance *object, gpointer g_class);
 static void collection_destroy(GtkObject *object);
 static void collection_finalize(GtkObject *object);
 static void collection_realize(GtkWidget *widget);
@@ -169,26 +169,27 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 		draw_focus_at(collection, area);
 }
 
-GtkType collection_get_type(void)
+GType collection_get_type(void)
 {
-	static guint my_type = 0;
+	static GType my_type = 0;
 
 	if (!my_type)
 	{
-		static const GtkTypeInfo my_info =
+		static const GTypeInfo info =
 		{
-			"Collection",
-			sizeof(Collection),
 			sizeof(CollectionClass),
-			(GtkClassInitFunc) collection_class_init,
-			(GtkObjectInitFunc) collection_init,
-			NULL,			/* Reserved 1 */
-			NULL,			/* Reserved 2 */
-			(GtkClassInitFunc) NULL	/* base_class_init_func */
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			collection_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(Collection),
+			0,			/* n_preallocs */
+			collection_init
 		};
 
-		my_type = gtk_type_unique(gtk_widget_get_type(),
-				&my_info);
+		my_type = g_type_register_static(gtk_widget_get_type(),
+					"Collection", &info, 0);
 	}
 
 	return my_type;
@@ -196,14 +197,12 @@ GtkType collection_get_type(void)
 
 typedef void (*FinalizeFn)(GObject *object);
 
-static void collection_class_init(CollectionClass *class)
+static void collection_class_init(gpointer gclass, gpointer data)
 {
-	GtkObjectClass *object_class;
-	GtkWidgetClass *widget_class;
+	CollectionClass *collection_class = (CollectionClass *) gclass;
+	GtkObjectClass *object_class = (GtkObjectClass *) gclass;
+	GtkWidgetClass *widget_class = (GtkWidgetClass *) gclass;
 	GtkType	       type;
-
-	object_class = (GtkObjectClass*) class;
-	widget_class = (GtkWidgetClass*) class;
 
 	parent_class = gtk_type_class(gtk_widget_get_type());
 
@@ -235,11 +234,10 @@ static void collection_class_init(CollectionClass *class)
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
 
-	class->gain_selection = NULL;
-	class->lose_selection = NULL;
-	class->selection_changed = NULL;
+	collection_class->gain_selection = NULL;
+	collection_class->lose_selection = NULL;
+	collection_class->selection_changed = NULL;
 
-	/* XXX - do these do anything? */
 	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
 				     GTK_RUN_LAST,
 				     type,
@@ -267,8 +265,10 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_TYPE_INT);
 }
 
-static void collection_init(Collection *object)
+static void collection_init(GTypeInstance *instance, gpointer g_class)
 {
+	Collection *object = (Collection *) instance;
+
 	g_return_if_fail(object != NULL);
 	g_return_if_fail(IS_COLLECTION(object));
 

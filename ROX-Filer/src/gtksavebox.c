@@ -152,29 +152,30 @@ static void gtk_savebox_get_property (GObject	      *object,
 				      GValue          *value,
 				      GParamSpec      *pspec);
 
-GtkType
+GType
 gtk_savebox_get_type (void)
 {
-  static GtkType savebox_type = 0;
+  static GType my_type = 0;
 
-  if (!savebox_type)
+  if (!my_type)
     {
-      static const GtkTypeInfo savebox_info =
+      static const GTypeInfo info =
       {
-	"GtkSavebox",
-	sizeof (GtkSavebox),
 	sizeof (GtkSaveboxClass),
-	(GtkClassInitFunc) gtk_savebox_class_init,
-	(GtkObjectInitFunc) gtk_savebox_init,
-	/* reserved_1 */ NULL,
-        /* reserved_2 */ NULL,
-        (GtkClassInitFunc) NULL,
+	NULL,			/* base_init */
+	NULL,			/* base_finalise */
+	(GClassInitFunc) gtk_savebox_class_init,
+	NULL,			/* class_finalise */
+	NULL,			/* class_data */
+	sizeof(GtkSavebox),
+	0,			/* n_preallocs */
+	(GInstanceInitFunc) gtk_savebox_init
       };
 
-      savebox_type = gtk_type_unique (GTK_TYPE_DIALOG, &savebox_info);
+      my_type = g_type_register_static(GTK_TYPE_DIALOG, "GtkSavebox", &info, 0);
     }
 
-  return savebox_type;
+  return my_type;
 }
 
 static void
