@@ -1100,21 +1100,52 @@ static gboolean link_cb(GObject *savebox,
 			const gchar *initial, const gchar *path)
 {
 	GtkToggleButton *check_relative;
+	struct stat info;
 	int	err;
+	gchar	*link_path;
 
 	check_relative = g_object_get_data(savebox, "check_relative");
 
 	if (gtk_toggle_button_get_active(check_relative))
-	{
-		guchar *rpath;
-		
-		rpath = get_relative_path(path, initial);
-		err = symlink(rpath, path);
-		
-		g_free(rpath);
-	}
+		link_path = get_relative_path(path, initial);
 	else
-		err = symlink(initial, path);
+		link_path = g_strdup(initial);
+
+	if (mc_lstat(path, &info) == 0 && S_ISLNK(info.st_mode))
+	{
+		GtkWidget *box, *button;
+		gint ans;
+
+		box = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
+				GTK_BUTTONS_CANCEL,
+				_("Symlink from '%s' already exists. "
+				"Replace it with a link to '%s'?"),
+				path, link_path);
+
+		gtk_window_set_position(GTK_WINDOW(box), GTK_WIN_POS_MOUSE);
+		
+		button = button_new_mixed(GTK_STOCK_YES, _("_Replace"));
+		gtk_widget_show(button);
+		GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+		gtk_dialog_add_action_widget(GTK_DIALOG(box),
+					     button, GTK_RESPONSE_OK);
+		gtk_dialog_set_default_response(GTK_DIALOG(box),
+						GTK_RESPONSE_OK);
+
+		ans = gtk_dialog_run(GTK_DIALOG(box));
+		gtk_widget_destroy(box);
+		
+		if (ans != GTK_RESPONSE_OK)
+		{
+			g_free(link_path);
+			return FALSE;
+		}
+
+		unlink(path);
+	}
+
+	err = symlink(link_path, path);
+	g_free(link_path);
 			
 	if (err)
 	{
