@@ -474,10 +474,7 @@ void drag_set_dest(FilerWindow *filer_window)
 			G_CALLBACK(drag_end), filer_window);
 }
 
-/* Like drag_set_dest, but for a pinboard-type widget.
- * You must ensure that dnd events reach this widget (eg with
- * setup_xdnd_proxy() for the root window).
- */
+/* Like drag_set_dest, but for a pinboard-type widget */
 void drag_set_pinboard_dest(GtkWidget *widget)
 {
 	GtkTargetEntry 	target_table[] = {

@@ -276,9 +276,22 @@ int main(int argc, char **argv)
 		"  bg[INSENSITIVE] = \"#bfbfbf\"\n"
 		"  fg[INSENSITIVE] = \"#000000\"\n"
 		"}\n"
+		"style \"rox-default-pinboard-style\" {\n"
+		"  bg[NORMAL] = \"#444444\"\n"
+		"}\n"
+		"style \"rox-default-pinboard-icon-style\" {\n"
+		"  bg_pixmap[NORMAL] = \"<parent>\"\n"
+		"  fg[NORMAL] = \"#ffffff\"\n"
+		"}\n"
 		"\n"
-		"class \"Collection\" style : "
-		"gtk \"rox-default-collection-style\"\n");
+		"widget \"rox-pinboard\" style : gtk "
+		"\"rox-default-pinboard-style\"\n"
+		
+		"widget \"rox-pinboard.*\" style : gtk "
+		"\"rox-default-pinboard-icon-style\"\n"
+
+		"class \"Collection\" style : gtk "
+		"\"rox-default-collection-style\"\n");
 
 	/* Process each option in turn */
 	while (1)

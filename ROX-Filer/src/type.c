@@ -266,7 +266,7 @@ MIME_type *type_from_path(const char *path)
 	type = g_hash_table_lookup(literal_hash, leafname);
 	if (type)
 		return type;
-	lower = g_strdup(path);
+	lower = g_utf8_strdown(leafname, -1);
 	type = g_hash_table_lookup(literal_hash, lower);
 	if (type)
 		goto out;
