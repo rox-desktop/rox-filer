@@ -1590,9 +1590,15 @@ static void close_window(gpointer data, guint action, GtkWidget *widget)
 
 static void mini_buffer(gpointer data, guint action, GtkWidget *widget)
 {
+	MiniType type = (MiniType) action;
+
 	g_return_if_fail(window_with_focus != NULL);
 
-	minibuffer_show(window_with_focus, (MiniType) action);
+	/* Item needs to remain selected... */
+	if (type == MINI_SHELL)
+		window_with_focus->temp_item_selected = FALSE;
+
+	minibuffer_show(window_with_focus, type);
 }
 
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
