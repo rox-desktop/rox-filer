@@ -12,7 +12,6 @@
 
 extern GList *icon_selection;
 extern GtkWidget *icon_menu;		/* The popup icon menu */
-extern GtkWidget *icon_menu_remove_backdrop; /* 'Remove Backdrop' menu item */
 
 typedef struct _IconClass IconClass;
 
@@ -43,7 +42,7 @@ GType icon_get_type(void);
 gboolean icons_require(const gchar *path);
 void icon_may_update(Icon *icon);
 void icons_may_update(const gchar *path);
-void icon_prepare_menu(Icon *icon);
+void icon_prepare_menu(Icon *icon, gboolean pinboard);
 void icon_set_selected(Icon *icon, gboolean selected);
 void icon_select_only(Icon *select);
 void icon_set_path(Icon *icon, const char *pathname, const char *name);

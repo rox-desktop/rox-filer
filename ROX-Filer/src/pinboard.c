@@ -192,6 +192,15 @@ static void set_backdrop(const gchar *path, BackdropStyle style);
 void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static void abandon_backdrop_app(Pinboard *pinboard);
+static void drag_backdrop_dropped(GtkWidget	*frame,
+			      GdkDragContext    *context,
+			      gint              x,
+			      gint              y,
+			      GtkSelectionData  *selection_data,
+			      guint             drag_info,
+			      guint32           time,
+			      GtkWidget		*dialog);
+static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
 
 
 /****************************************************************
@@ -508,61 +517,159 @@ void pinboard_set_backdrop_app(const gchar *app)
 	if (can_set)
 		set_backdrop(app, BACKDROP_PROGRAM);
 	else
-		delayed_error(_("This program does not know how to "
-				"manage ROX-Filer's backdrop image."));
+		delayed_error(_("You can only set the backdrop to an image "
+				"or to a program which knows how to "
+				"manage ROX-Filer's backdrop."));
 }
 
-/* Use this icon / program as the backdrop for the current pinboard.
- * NULL removes the backdrop. If type is BACKDROP_NONE then will try
- * to work it out ourself.
- * If no pinboard is in use, activates 'Default'.
- */
-void pinboard_set_backdrop(DirItem *item, const gchar *path)
+/* Open a dialog box allowing the user to set the backdrop */
+void pinboard_set_backdrop(void)
 {
-	if (path == NULL || item == NULL)
-	{
-		/* Remove backdrop */
+	GtkWidget *dialog, *frame, *label, *radio, *hbox;
+	GtkBox *vbox;
+	GtkTargetEntry 	targets[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
 
-		if (current_pinboard && current_pinboard->backdrop)
-			set_backdrop(NULL, BACKDROP_NONE);
-		else
-			delayed_error(_("No backdrop image is currently "
-					"set. Use the 'Use for Backdrop' menu "
-					"item to set an image (or program) for "
-					"the backdrop."));
-		return;
-	}
+	dialog = gtk_dialog_new_with_buttons(_("Set backdrop"), NULL,
+			GTK_DIALOG_NO_SEPARATOR,
+			GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			NULL);
+	vbox = GTK_BOX(GTK_DIALOG(dialog)->vbox);
 
-	if (item->flags & ITEM_FLAG_APPDIR)
-	{
-		/* Use this program to set the backdrop */
-		pinboard_set_backdrop_app(path);
-	}
-	else if (item->base_type == TYPE_FILE)
-	{
-		int i;
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-		/* Use this file as the backdrop */
+	label = gtk_label_new("Display backdrop image:");
+	gtk_misc_set_padding(GTK_MISC(label), 4, 0);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+	gtk_box_pack_start(vbox, label, TRUE, TRUE, 4);
 
-		i = get_choice(_("Set backdrop"),
-			_("How should this image be displayed?"),
-			4, GTK_STOCK_CANCEL,
-			_("Centred"), _("_Scaled"), _("Tiled"));
+	/* The Centred, Scaled, Tiled radios... */
+	hbox = gtk_hbox_new(TRUE, 2);
+	gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 4);
+	
+	radio = gtk_radio_button_new_with_label(NULL, _("Centred"));
+	g_object_set_data(G_OBJECT(dialog), "radio_centred", radio);
+	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
 
-		if (i >= 0)
-			set_backdrop(path,
-				     i == 1 ? BACKDROP_CENTRE :
-				     i == 2 ? BACKDROP_SCALE :
-					      BACKDROP_TILE);
-	}
-	else
-		delayed_error(_("Only files and certain applications can be "
-				"used to set the background image."));
+	radio = gtk_radio_button_new_with_label(
+			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
+			_("Scaled"));
+	g_object_set_data(G_OBJECT(dialog), "radio_scaled", radio);
+	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+
+	radio = gtk_radio_button_new_with_label(
+			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
+			_("Tiled"));
+	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
+	
+	/* The drop area... */
+	frame = gtk_frame_new(NULL);
+	gtk_box_pack_start(vbox, frame, TRUE, TRUE, 4);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+
+	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
+			targets, sizeof(targets) / sizeof(*targets),
+			GDK_ACTION_COPY);
+	g_signal_connect(frame, "drag_data_received",
+			G_CALLBACK(drag_backdrop_dropped), dialog);
+
+	label = gtk_label_new(_("Drop an image here"));
+	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
+	gtk_container_add(GTK_CONTAINER(frame), label);
+
+	g_signal_connect(dialog, "response",
+			 G_CALLBACK(backdrop_response), NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+	gtk_widget_show_all(dialog);
 }
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void backdrop_response(GtkWidget *dialog, gint response, gpointer data)
+{
+	if (response == GTK_RESPONSE_NO)
+		set_backdrop(NULL, BACKDROP_NONE);
+			
+	gtk_widget_destroy(dialog);
+}
+
+static void drag_backdrop_dropped(GtkWidget	*frame,
+			      GdkDragContext    *context,
+			      gint              x,
+			      gint              y,
+			      GtkSelectionData  *selection_data,
+			      guint             drag_info,
+			      guint32           time,
+			      GtkWidget		*dialog)
+{
+	struct stat info;
+	const gchar *path = NULL;
+	GList *uris;
+
+	if (!selection_data->data)
+		return; 		/* Timeout? */
+
+	uris = uri_list_to_glist(selection_data->data);
+
+	if (g_list_length(uris) == 1)
+		path = get_local_path((guchar *) uris->data);
+	g_list_free(uris);
+
+	if (!path)
+	{
+		delayed_error(
+			_("You should drop a single (local) image file "
+			"onto the drop box - that image will be "
+			"used for the desktop background. You can also "
+			"drag certain applications onto this box."));
+		return;
+	}
+
+	if (mc_stat(path, &info))
+	{
+		delayed_error(
+			_("Can't access '%s':\n%s"), path,
+			g_strerror(errno));
+		return;
+	}
+
+	if (S_ISDIR(info.st_mode))
+	{
+		/* Use this program to set the backdrop */
+		pinboard_set_backdrop_app(path);
+	}
+	else if (S_ISREG(info.st_mode))
+	{
+		GtkWidget *radio;
+
+		radio = g_object_get_data(G_OBJECT(dialog), "radio_scaled");
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio)))
+		{
+			set_backdrop(path, BACKDROP_SCALE);
+			return;
+		}
+
+		radio = g_object_get_data(G_OBJECT(dialog), "radio_centred");
+		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio)))
+		{
+			set_backdrop(path, BACKDROP_CENTRE);
+			return;
+		}
+
+		set_backdrop(path, BACKDROP_TILE);
+	}
+	else
+		delayed_error(_("Only files (and certain applications) can be "
+				"used to set the background image."));
+}
 
 static void pinboard_check_options(void)
 {
@@ -1503,10 +1610,7 @@ static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 	pos[1] = event->y_root;
 	pos[2] = 1;
 
-	icon_prepare_menu((Icon *) pi);
-	gtk_widget_show(icon_menu_remove_backdrop);
-	gtk_widget_set_sensitive(GTK_BIN(icon_menu_remove_backdrop)->child,
-			current_pinboard->backdrop != NULL);
+	icon_prepare_menu((Icon *) pi, TRUE);
 
 	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
 			position_menu,

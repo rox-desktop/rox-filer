@@ -509,7 +509,7 @@ static void set_action_response(GtkWidget *dialog, gint response, gpointer data)
  * dialog. Make sure it's an application, and make that the default
  * handler.
  */
-void drag_app_dropped(GtkWidget		*eb,
+static void drag_app_dropped(GtkWidget		*eb,
 		      GdkDragContext    *context,
 		      gint              x,
 		      gint              y,

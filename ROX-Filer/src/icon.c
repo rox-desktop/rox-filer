@@ -57,7 +57,7 @@
 static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 
 GtkWidget		*icon_menu;		/* The popup icon menu */
-GtkWidget		*icon_menu_remove_backdrop;
+static GtkWidget	*icon_menu_set_backdrop;
 static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
@@ -84,7 +84,7 @@ static void selection_get(GtkClipboard *primary,
 		       guint      info,
 		       gpointer   data);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
-static void remove_backdrop(gpointer data, guint action, GtkWidget *widget);
+static void set_backdrop(gpointer data, guint action, GtkWidget *widget);
 static void file_op(gpointer data, guint action, GtkWidget *widget);
 static void show_rename_box(Icon *icon);
 static void icon_set_selected_int(Icon *icon, gboolean selected);
@@ -99,7 +99,6 @@ enum {
 	ACTION_INFO,
 	ACTION_RUN_ACTION,
 	ACTION_SET_ICON,
-	ACTION_BACKDROP,
 	ACTION_EDIT,
 	ACTION_LOCATION,
 };
@@ -117,11 +116,10 @@ static GtkItemFactoryEntry menu_def[] = {
 {">" N_("Info"),    		NULL, file_op, ACTION_INFO, NULL},
 {">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, NULL},
 {">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
-{">" N_("Use for Backdrop"),	NULL, file_op, ACTION_BACKDROP, NULL},
 {N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, NULL},
 {N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, NULL},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
-{N_("Remove Backdrop"),		NULL, remove_backdrop, 0, NULL},
+{N_("Backdrop..."),		NULL, set_backdrop, 0, NULL},
 };
 
 /****************************************************************
@@ -207,13 +205,16 @@ gboolean icons_require(const gchar *path)
  * add app menu stuff, etc).
  * You should show icon_menu after calling this...
  */
-void icon_prepare_menu(Icon *icon)
+void icon_prepare_menu(Icon *icon, gboolean pinboard)
 {
 	appmenu_remove();
 
 	menu_icon = icon;
 
-	gtk_widget_hide(icon_menu_remove_backdrop);
+	if (pinboard)
+		gtk_widget_show(icon_menu_set_backdrop);
+	else
+		gtk_widget_hide(icon_menu_set_backdrop);
 
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
@@ -507,9 +508,9 @@ static void selection_get(GtkClipboard	*primary,
 				8, text, strlen(text));
 }
 
-static void remove_backdrop(gpointer data, guint action, GtkWidget *widget)
+static void set_backdrop(gpointer data, guint action, GtkWidget *widget)
 {
-	pinboard_set_backdrop(NULL, NULL);
+	pinboard_set_backdrop();
 }
 
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
@@ -570,9 +571,6 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 		case ACTION_SET_ICON:
 			icon_set_handler_dialog(menu_icon->item,
 						menu_icon->path);
-			break;
-		case ACTION_BACKDROP:
-			pinboard_set_backdrop(menu_icon->item, menu_icon->path);
 			break;
 	}
 }
@@ -727,7 +725,7 @@ static void icon_class_init(gpointer gclass, gpointer data)
 	g_list_free(items);
 
 	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
-	icon_menu_remove_backdrop = g_list_nth(items, 5)->data;
+	icon_menu_set_backdrop = g_list_nth(items, 5)->data;
 	g_list_free(items);
 
 	g_signal_connect(icon_menu, "unmap_event",

@@ -1711,7 +1711,7 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 	pos[1] = event->y_root;
 	pos[2] = 1;
 
-	icon_prepare_menu((Icon *) pi);
+	icon_prepare_menu((Icon *) pi, FALSE);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
