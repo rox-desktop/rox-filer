@@ -2,7 +2,13 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
-24-Apr-2000
+28-Apr-2000
+~~~~~~~~~~~
+Removed a debugging message that had somehow got into the release version :-(
+Fixed a bug in the minibuffer code - pressing Return when the cursor was in
+an empty directory caused odd effects.
+
+24-Apr-2000 (Release 0.1.22)
 ~~~~~~~~~~~
 When starting, the filer will check to see if it is already running.
 If it is then the arguments are passed to that copy.

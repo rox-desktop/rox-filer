@@ -166,7 +166,8 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	else
 		pattern = path;
 
-	if (item == -1 || !matches(collection, item, pattern))
+	if (item == -1 || item >= collection->number_of_items ||
+			!matches(collection, item, pattern))
 	{
 		gdk_beep();
 		return;

@@ -633,8 +633,6 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	char		*dest_path;
 	char		*dest_type = NULL;
 	
-	g_print("[ filer_window = %s ]\n", filer_window->path);
-
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	dest_type = g_dataset_get_data(context, "drop_dest_type");
 
