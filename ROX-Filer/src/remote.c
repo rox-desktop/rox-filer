@@ -121,7 +121,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Version", rpc_Version, NULL, NULL);
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
-	soap_register("OpenDir", rpc_OpenDir, "Filename", "Style,Details,Sort,Class");
+	soap_register("OpenDir", rpc_OpenDir, "Filename",
+					      "Style,Details,Sort,Class");
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
@@ -160,11 +161,15 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	ipc_window = gtk_invisible_new();
 	gtk_widget_realize(ipc_window);
 
+	XGrabServer(GDK_DISPLAY());
+
 	existing_ipc_window = new_copy ? NULL : get_existing_ipc_window();
 	if (existing_ipc_window)
 	{
 		xmlChar *mem;
 		int	size;
+
+		XUngrabServer(GDK_DISPLAY());
 
 		xmlDocDumpMemory(rpc, &mem, &size);
 		g_return_val_if_fail(size > 0, FALSE);
@@ -206,6 +211,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
+
+	XUngrabServer(GDK_DISPLAY());
 
 	/* Also have a property without the version number, for programs
 	 * that are happy to talk to any version of the filer.
