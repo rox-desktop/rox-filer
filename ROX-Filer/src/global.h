@@ -108,7 +108,7 @@ typedef enum {
 	MINI_SELECT_IF,
 } MiniType;
 
-/* The next two correspond to the styles on the Display submenu: */
+/* The next three correspond to the styles on the Display submenu: */
 
 typedef enum {		/* Values used in options, must start at 0 */
 	LARGE_ICONS	= 0,

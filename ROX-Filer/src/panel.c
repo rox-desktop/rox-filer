@@ -1572,6 +1572,15 @@ static void run_applet(PanelIcon *pi)
 	gtk_widget_show_all(pi->socket);
 	gtk_widget_realize(pi->socket);
 
+	/* Always get button-2 events so we can drag */
+	XGrabButton(gdk_display, Button2, AnyModifier,
+			GDK_WINDOW_XWINDOW(pi->socket->window),
+			False,
+			ButtonPressMask | ButtonReleaseMask | Button2MotionMask,
+			GrabModeAsync,	/* Pointer */
+			GrabModeAsync,	/* Keyboard */
+			None, None);
+
 	{
 		gchar		*pos;
 		PanelSide	side = pi->panel->side;
