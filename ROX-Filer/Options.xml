@@ -107,6 +107,7 @@ See the manual for information about using panels.</label>
       <radio label='...when changing the display style' value='0'>Changing the size of the icons or which details are displayed will resize the window for you.</radio>
       <radio label='...always' value='1'>The filer will resize windows whenever it seems useful (that is, when changing directory or display style).</radio>
     </radio-group>
+    <slider name='size_limit' label='Window size limit' min='1' max='100' showvalue='1'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</slider>
     <spacer/>
     <toggle name='unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
     <toggle name='beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>

@@ -112,6 +112,7 @@ gboolean o_unique_filer_windows = FALSE;
 
 void filer_init(void)
 {
+	option_add_int("filer_size_limit", 75, NULL);
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
 			set_unique);
@@ -274,8 +275,11 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 	int 		max_x, max_rows;
 	const float	r = 2.5;
 	int		t = 0;
+	int		size_limit;
 
 	filer_window_autosize_request(filer_window, 0);
+
+	size_limit = option_get_int("filer_size_limit");
 
 	if (o_toolbar != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
@@ -286,8 +290,8 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 
 	n = MAX(n, 2);
 
-	max_x = (3 * screen_width) / 4;
-	max_rows = (3 * screen_height) / (h * 4);
+	max_x = (size_limit * screen_width) / 100;
+	max_rows = (size_limit * screen_height) / (h * 100);
 
 	/* Aim for a size where
 	 * 	   x = r(y + t + h),		(1)
