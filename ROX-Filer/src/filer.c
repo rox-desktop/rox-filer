@@ -769,7 +769,8 @@ void open_item(Collection *collection,
 	GdkEventButton 	*event;
 	char		*full_path;
 	GtkWidget	*widget;
-	gboolean	shift, adjust;
+	gboolean	shift;
+	gboolean	adjust;		/* do alternative action */
 
 	event = (GdkEventButton *) gtk_get_current_event();
 	full_path = make_path(filer_window->path, item->leafname)->str;
@@ -779,7 +780,7 @@ void open_item(Collection *collection,
 	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS)
 	{
 		shift = event->state & GDK_SHIFT_MASK;
-		adjust = (event->button != (o_ro_bindings ? 2 : 1))
+		adjust = (event->button != 1)
 				^ ((event->state & GDK_CONTROL_MASK) != 0);
 	}
 	else
@@ -801,7 +802,7 @@ void open_item(Collection *collection,
 					gtk_widget_destroy(widget);
 				break;
 			}
-			if (adjust || filer_window->panel)
+			if ((adjust ^ o_ro_bindings) || filer_window->panel)
 				filer_opendir(full_path, FALSE, BOTTOM);
 			else
 			{
