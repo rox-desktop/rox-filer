@@ -24,7 +24,7 @@ case $1 in
 		  DEBUGGER="gdb"
 		fi ;;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
-	--massif) shift ; DEBUGGER="valgrind --tool=massif";;
+	--massif) shift ; DEBUGGER="valgrind --tool=massif --alloc-fn=g_malloc --alloc-fn=g_realloc --alloc-fn=g_malloc0 --alloc-fn=g_try_malloc --alloc-fn=g_mem_chunk_alloc";;
 	--calltree) shift ; DEBUGGER="calltree";;
 	--leaks) shift ; DEBUGGER="valgrind --num-callers=8 --leak-check=yes";;
 	--compile)
