@@ -103,13 +103,16 @@ _xdg_mime_parent_list_lookup (XdgParentList *list,
   XdgMimeParents *entry;
   XdgMimeParents key;
 
-  key.mime = (char *)mime;
-  key.parents = NULL;
+  if (list->n_mimes > 0)
+    {
+      key.mime = (char *)mime;
+      key.parents = NULL;
 
-  entry = bsearch (&key, list->parents, list->n_mimes,
-		   sizeof (XdgMimeParents), &parent_entry_cmp);
-  if (entry)
-    return (const char **)entry->parents;
+      entry = bsearch (&key, list->parents, list->n_mimes,
+		       sizeof (XdgMimeParents), &parent_entry_cmp);
+      if (entry)
+        return (const char **)entry->parents;
+    }
 
   return NULL;
 }

@@ -98,13 +98,16 @@ _xdg_mime_alias_list_lookup (XdgAliasList *list,
   XdgAlias *entry;
   XdgAlias key;
 
-  key.alias = (char *)alias;
-  key.mime_type = 0;
+  if (list->n_mimes > 0)
+    {
+      key.alias = (char *)alias;
+      key.mime_type = 0;
 
-  entry = bsearch (&key, list->aliases, list->n_aliases,
-		   sizeof (XdgAlias), alias_entry_cmp);
-  if (entry)
-    return entry->mime_type;
+      entry = bsearch (&key, list->aliases, list->n_aliases,
+		       sizeof (XdgAlias), alias_entry_cmp);
+      if (entry)
+        return entry->mime_type;
+    }
 
   return NULL;
 }
