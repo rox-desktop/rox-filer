@@ -531,25 +531,201 @@ static void button_released(GtkWidget *widget, IconWindow *win)
 		uniconify(win);
 }
 
+static GdkColormap* get_cmap(GdkPixmap *pixmap)
+{
+	GdkColormap *cmap;
+
+	cmap = gdk_drawable_get_colormap(pixmap);
+	if (cmap)
+		g_object_ref(G_OBJECT(cmap));
+
+	if (cmap == NULL)
+	{
+		if (gdk_drawable_get_depth(pixmap) == 1)
+		{
+			/* Masks don't need colourmaps */
+			cmap = NULL;
+		}
+		else
+		{
+			/* Try system cmap */
+			cmap = gdk_colormap_get_system();
+			g_object_ref(G_OBJECT(cmap));
+		}
+	}
+
+	/* Be sure we aren't going to blow up due to visual mismatch */
+	if (cmap && (gdk_colormap_get_visual(cmap)->depth !=
+			 gdk_drawable_get_depth(pixmap)))
+		cmap = NULL;
+
+	return cmap;
+}
+
+/* Copy a pixmap from the server to a client-side pixbuf */
+static GdkPixbuf* pixbuf_from_pixmap(Pixmap xpixmap)
+{
+	GdkDrawable *drawable;
+	GdkPixbuf *retval;
+	GdkColormap *cmap;
+	int width, height;
+
+	retval = NULL;
+
+	drawable = gdk_xid_table_lookup(xpixmap);
+
+	if (drawable)
+		g_object_ref(G_OBJECT(drawable));
+	else
+		drawable = gdk_pixmap_foreign_new(xpixmap);
+
+	cmap = get_cmap(drawable);
+
+	/* GDK is supposed to do this but doesn't in GTK 2.0.2,
+	 * fixed in 2.0.3
+	 */
+	gdk_drawable_get_size(drawable, &width, &height);
+
+	retval = gdk_pixbuf_get_from_drawable(NULL, drawable, cmap,
+						0, 0, 0, 0, width, height);
+
+	if (cmap)
+		g_object_unref(G_OBJECT(cmap));
+	g_object_unref(G_OBJECT(drawable));
+
+	return retval;
+}
+
+/* Creates a new masked pixbuf from a non-masked pixbuf and a mask */
+static GdkPixbuf* apply_mask(GdkPixbuf *pixbuf, GdkPixbuf *mask)
+{
+	int w, h;
+	int i, j;
+	GdkPixbuf *with_alpha;
+	guchar *src;
+	guchar *dest;
+	int src_stride;
+	int dest_stride;
+
+	w = MIN(gdk_pixbuf_get_width(mask), gdk_pixbuf_get_width(pixbuf));
+	h = MIN(gdk_pixbuf_get_height(mask), gdk_pixbuf_get_height(pixbuf));
+
+	with_alpha = gdk_pixbuf_add_alpha(pixbuf, FALSE, 0, 0, 0);
+
+	dest = gdk_pixbuf_get_pixels(with_alpha);
+	src = gdk_pixbuf_get_pixels(mask);
+
+	dest_stride = gdk_pixbuf_get_rowstride(with_alpha);
+	src_stride = gdk_pixbuf_get_rowstride(mask);
+
+	i = 0;
+	while (i < h)
+	{
+		j = 0;
+		while (j < w)
+		{
+			guchar *s = src + i * src_stride + j * 3;
+			guchar *d = dest + i * dest_stride + j * 4;
+
+			/* s[0] == s[1] == s[2], they are 255 if the bit was
+			 * set, 0 otherwise
+			 */
+			if (s[0] == 0)
+				d[3] = 0;   /* transparent */
+			else
+				d[3] = 255; /* opaque */
+
+			++j;
+		}
+
+		++i;
+	}
+
+	return with_alpha;
+}
+
+/* Return a suitable icon for this window. unref the result.
+ * Never returns NULL.
+ */
+static GdkPixbuf *get_image_for(IconWindow *win)
+{
+	static MaskedPixmap *default_icon = NULL;
+	Pixmap pixmap = None;
+	Pixmap mask = None;
+	XWMHints *hints;
+	GdkPixbuf *retval = NULL;
+
+	/* Try the pixmap and mask in the old WMHints... */
+	gdk_error_trap_push();
+	hints = XGetWMHints(gdk_display, win->xwindow);
+
+	if (hints)
+	{
+		if (hints->flags & IconPixmapHint)
+			pixmap = hints->icon_pixmap;
+		if (hints->flags & IconMaskHint)
+			mask = hints->icon_mask;
+
+		XFree(hints);
+		hints = NULL;
+	}
+
+	if (pixmap != None)
+	{
+		GdkPixbuf *mask_pb = NULL;
+		
+		retval = pixbuf_from_pixmap(pixmap);
+
+		if (retval && mask != None)
+			mask_pb = pixbuf_from_pixmap(mask);
+
+		if (mask_pb)
+		{
+			GdkPixbuf *masked;
+
+			masked = apply_mask(retval, mask_pb);
+			g_object_unref(G_OBJECT(mask_pb));
+
+			if (masked)
+			{
+				g_object_unref(G_OBJECT(retval));
+				retval = masked;
+			}
+		}
+	}
+
+	gdk_error_trap_pop();
+	
+	if (!retval)
+	{
+		if (!default_icon)
+			default_icon = load_pixmap("images/iconified.png");
+
+		retval = default_icon->pixbuf;
+		g_object_ref(retval);
+	}
+
+	return retval;
+}
+
 /* A window has been iconified -- display it on the screen */
 static void show_icon(IconWindow *win)
 {
-	static MaskedPixmap *icon = NULL;
+	GdkPixbuf *pixbuf;
 	GtkWidget *vbox;
 
 	g_return_if_fail(win->widget == NULL);
 	g_return_if_fail(win->label == NULL);
 
-	if (!icon)
-		icon = load_pixmap("images/iconified.png");
-
 	win->widget = gtk_button_new();
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(win->widget), vbox);
 
-	gtk_box_pack_start(GTK_BOX(vbox),
-		gtk_image_new_from_pixbuf(icon->pixbuf),
-		FALSE, TRUE, 0);
+	pixbuf = get_image_for(win);
+
+	gtk_box_pack_start(GTK_BOX(vbox), gtk_image_new_from_pixbuf(pixbuf),
+			   FALSE, TRUE, 0);
+	g_object_unref(pixbuf);
 
 	gtk_button_set_relief(GTK_BUTTON(win->widget), GTK_RELIEF_NONE);
 		
