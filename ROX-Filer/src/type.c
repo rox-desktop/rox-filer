@@ -30,6 +30,10 @@
 #include <time.h>
 #include <sys/param.h>
 
+#ifdef HAVE_REGEX_H
+# include <regex.h>
+#endif
+
 #include "global.h"
 
 #include "string.h"
@@ -43,6 +47,21 @@
 #include "dir.h"
 #include "dnd.h"
 
+#if defined(HAVE_REGEX_H) && \
+		defined(HAVE_RE_COMPILE_PATTERN) && defined(HAVE_RE_SEARCH)
+# define USE_REGEX 1
+#else
+# undef USE_REGEX
+#endif
+
+#ifdef USE_REGEX
+/* A regexp rule, which maps matching filenames to a MIME-types */
+typedef struct pattern {
+  MIME_type *type;
+  struct re_pattern_buffer buffer;
+} Pattern;
+#endif
+
 /* Static prototypes */
 static char *import_extensions(guchar *line);
 static void import_for_dir(guchar *path);
@@ -55,6 +74,9 @@ char *get_action_save_path(GtkWidget *dialog);
  */
 static GHashTable *extension_hash = NULL;
 static char *current_type = NULL;	/* (used while reading file) */
+#ifdef USE_REGEX
+static GList *patterns = NULL;		/* [(regexp -> MIME type)] */
+#endif
 
 /* Most things on Unix are text files, so this is the default type */
 MIME_type text_plain 		= {"text", "plain", NULL};
@@ -72,6 +94,8 @@ void type_init()
 	int		i;
 	GPtrArray	*list;
 	
+	re_set_syntax(RE_SYNTAX_POSIX_EGREP);
+
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	current_type = NULL;
@@ -115,21 +139,50 @@ static void add_ext(char *type_name, char *ext)
 {
 	MIME_type *new;
 	char	  *slash;
-	int	  len;
 
 	slash = strchr(type_name, '/');
 	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
-	len = slash - type_name;
-
+			
 	new = g_new(MIME_type, 1);
-	new->media_type = g_malloc(sizeof(char) * (len + 1));
-	memcpy(new->media_type, type_name, len);
-	new->media_type[len] = '\0';
-
+	new->media_type = g_strndup(type_name, slash - type_name);
 	new->subtype = g_strdup(slash + 1);
 	new->image = NULL;
 
 	g_hash_table_insert(extension_hash, g_strdup(ext), new);
+}
+
+static void add_regex(char *type_name, char *reg)
+{
+#ifdef USE_REGEX
+	MIME_type *new;
+	char	  *slash;
+	Pattern	  *pattern;
+
+	slash = strchr(type_name, '/');
+	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
+
+	pattern = g_new(Pattern, 1);
+	pattern->buffer.buffer = NULL;
+	pattern->buffer.allocated = 0;
+	pattern->buffer.fastmap = NULL;
+	pattern->buffer.translate = NULL;
+
+	if (re_compile_pattern(reg, strlen(reg), &pattern->buffer))
+	{
+		regfree(&pattern->buffer);
+		g_free(pattern);
+		return;
+	}
+	
+	new = g_new(MIME_type, 1);
+	new->media_type = g_strndup(type_name, slash - type_name);
+	new->subtype = g_strdup(slash + 1);
+	new->image = NULL;
+
+	pattern->type = new;
+
+	patterns = g_list_prepend(patterns, pattern);
+#endif
 }
 
 /* Parse one line from the file and add entries to extension_hash */
@@ -164,6 +217,15 @@ static char *import_extensions(guchar *line)
 					*line++ = '\0';
 				add_ext(current_type, ext);
 			}
+		}
+		else if (strncmp(line, "regex:", 6) == 0)
+		{
+		        line += 6;
+
+			while (*line && isspace(*line))
+				line++;
+			if (*line)
+				add_regex(current_type, line);
 		}
 		/* else ignore */
 	}
@@ -249,13 +311,18 @@ MIME_type *type_get_type(guchar *path)
  */
 MIME_type *type_from_path(char *path)
 {
-	char	*ext, *dot, *lower;
+	char	*ext, *dot, *lower, *leafname;
+#ifdef USE_REGEX
+	GList *patt;
+	int len;
+#endif
 
-	ext = strrchr(path, '/');
-	if (!ext)
-		ext = path;
+	leafname = strrchr(path, '/');
+	if (!leafname)
+		leafname = path;
 	else
-		ext++;
+		leafname++;
+	ext = leafname;
 
 	while ((dot = strchr(ext, '.')))
 	{
@@ -276,6 +343,18 @@ MIME_type *type_from_path(char *path)
 		if (type)
 			return type;
 	}
+
+#ifdef USE_REGEX
+	len = strlen(leafname);
+
+	for (patt = patterns; patt; patt = patt->next)
+	{
+		Pattern *pattern = (Pattern *) patt->data;
+
+		if (re_match(&pattern->buffer, leafname, len, 0, NULL) >= 0)
+			return pattern->type;
+	}
+#endif
 
 	return NULL;
 }

@@ -21,7 +21,7 @@ Gtk+ 2.0:
 	- Panel menu appears, but menu item under cursor doesn't highlight
 	- Savebox doesn't highlight leafname
 	- Pinboard text background types none/outline don't work
-	- Can't set menu shortcuts to a single key (eg, 'L')
+	- Can't set menu shortcuts to a single key (eg, 'L') (GTK API bug)
 	- Wheel mice don't work anymore?
 
 Return for 'Do another search' toggles Quiet...
@@ -35,7 +35,12 @@ Panel sometimes won't accept drops (unrepeatable).
 
 FEATURES FOR 1.1
 
-Add (partial) support for thumbnails spec, when complete.
+Make Find expressions easier for beginners.
+
+Improve thumbnail handling:
+	- Lazy scanning?
+	- Recursive scanning?
+	- Add (partial) support for thumbnails spec, when complete.
 
 Click Refresh to reload MIME-info files.
 
@@ -48,8 +53,6 @@ Scanning:
 	- Clear window before resizing
 
 Add 'Just for this file / All files of type' to Set Icon dialog.
-
-Improve thumbnail handling.
 
 Don't beep for paths with a # in the leafname (for AVFS).
 
@@ -64,7 +67,7 @@ Set a property giving the panel side (for applet menus).
 
 Shift-click on symlink should open the file. Add a 'Follow link' submenu.
 
-Convert manual to HTML (smaller -- manual may get translated).
+Convert manual to HTML (smaller, searchable).
 
 Option to make menu-click over a file open the File submenu only?
 

@@ -203,6 +203,12 @@ void diritem_clear(DirItem *item)
 	g_free(item->leafname);
 }
 
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
+
+
 static void set_ignore_exec(guchar *new)
 {
 	o_ignore_exec = atoi(new);
