@@ -146,7 +146,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Copy...",		NULL,  	copy_item, 0, NULL},
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
 {"/File/Link...",		NULL,  	link_item, 0, NULL},
-{"/File/Open",	    		"O",  	open_file, 0, NULL},
+{"/File/Shift Open",   		NULL,  	open_file, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			"I",  	show_file_info, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
@@ -159,13 +159,13 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
 {"/Options...",			NULL,   show_options, 0, NULL},
-{"/New directory",		NULL,   new_directory, 0, NULL},
-{"/Xterm here",			NULL,  	xterm_here, 0, NULL},
+{"/New Directory...",		NULL,   new_directory, 0, NULL},
+{"/Xterm Here",			NULL,  	xterm_here, 0, NULL},
 {"/Window",			NULL,  	NULL, 0, "<Branch>"},
-{"/Window/Parent, new window",	NULL,   open_parent, 0, NULL},
-{"/Window/Parent, same window",	NULL,   open_parent_same, 0, NULL},
-{"/Window/New window",		NULL,   new_window, 0, NULL},
-{"/Window/Close window",	C_"Q",  close_window, 0, NULL},
+{"/Window/Parent, New Window",	NULL,   open_parent, 0, NULL},
+{"/Window/Parent, Same Window",	NULL,   open_parent_same, 0, NULL},
+{"/Window/New Window",		NULL,   new_window, 0, NULL},
+{"/Window/Close Window",	C_"Q",  close_window, 0, NULL},
 {"/Window/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Window/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
@@ -540,7 +540,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	action_mount(window_with_focus);
+	action_mount(window_with_focus, NULL);
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
@@ -693,21 +693,8 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 		report_error("ROX-Filer", "You must select a single "
 				"file or application to open");
 	else
-	{
-		DirItem *item = selected_item(collection);
-		char	*path;
-
-		path = make_path(window_with_focus->path, item->leafname)->str;
-
-		if (item->base_type == TYPE_APPDIR ||
-		    item->base_type == TYPE_DIRECTORY)
-			filer_opendir(path, FALSE, BOTTOM);
-		else
-			if (!type_open(path, &text_plain))
-				delayed_error("ROX-Filer",
-					"You haven't specified any action "
-					"for text/plain files.");
-	}
+		filer_openitem(window_with_focus, selected_item(collection),
+				TRUE, FALSE);
 }
 
 static void show_file_info(gpointer data, guint action, GtkWidget *widget)

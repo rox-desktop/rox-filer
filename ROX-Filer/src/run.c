@@ -43,3 +43,4 @@ void run_app(char *path)
 	
 	g_string_free(apprun, TRUE);
 }
+

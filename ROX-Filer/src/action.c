@@ -71,12 +71,14 @@ static GString  *message = NULL;
 static char     *action_dest = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
+static DirItem 	*mount_item;
 
 /* Static prototypes */
 static gboolean send();
 static gboolean send_error();
 static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
+static void do_mount(FilerWindow *filer_window, DirItem *item);
 
 static gboolean display_dir(gpointer data)
 {
@@ -115,6 +117,12 @@ static void message_from_child(gpointer 	 data,
 			else if (*buffer == '+')
 			{
 				refresh_dirs(buffer + 1);
+				g_free(buffer);
+				return;
+			}
+			else if (*buffer == 'm')
+			{
+				filer_check_mounted(buffer + 1);
 				g_free(buffer);
 				return;
 			}
@@ -714,6 +722,33 @@ static gboolean do_link(char *path, char *dest)
 	return TRUE;
 }
 
+/* Mount/umount this item */
+static void do_mount(FilerWindow *filer_window, DirItem *item)
+{
+	char		*command;
+	char		*path;
+
+	path = make_path(filer_window->path, item->leafname)->str;
+
+	command = g_strdup_printf("%smount %s",
+			item->flags & ITEM_FLAG_MOUNTED ? "u" : "", path);
+	g_string_sprintf(message, "'> %s\n", command);
+	send();
+	if (system(command) == 0)
+	{
+		g_string_sprintf(message, "+%s", filer_window->path);
+		send();
+		g_string_sprintf(message, "m%s", path);
+		send();
+	}
+	else
+	{
+		g_string_sprintf(message, "!Operation failed.\n");
+		send();
+	}
+	g_free(command);
+}
+
 /*			CHILD MAIN LOOPS			*/
 
 /* After forking, the child calls one of these functions */
@@ -759,42 +794,32 @@ static void mount_cb(gpointer data)
 	Collection	*collection = filer_window->collection;
 	DirItem   	*item;
 	int		i;
-	char		*command;
 	gboolean	mount_points = FALSE;
 
 	send_dir(filer_window->path);
 
-	for (i = 0; i < collection->number_of_items; i++)
+	if (mount_item)
+		do_mount(filer_window, mount_item);
+	else
 	{
-		if (!collection->items[i].selected)
-			continue;
-		item = (DirItem *) collection->items[i].data;
-		if (!(item->flags & ITEM_FLAG_MOUNT_POINT))
-			continue;
-		mount_points = TRUE;
+		for (i = 0; i < collection->number_of_items; i++)
+		{
+			if (!collection->items[i].selected)
+				continue;
+			item = (DirItem *) collection->items[i].data;
+			if (!(item->flags & ITEM_FLAG_MOUNT_POINT))
+				continue;
+			mount_points = TRUE;
 
-		command = g_strdup_printf("%smount %s",
-			item->flags & ITEM_FLAG_MOUNTED ? "u" : "",
-			make_path(filer_window->path, item->leafname)->str);
-		g_string_sprintf(message, "'> %s\n", command);
-		send();
-		if (system(command) == 0)
-		{
-			g_string_sprintf(message, "+%s", filer_window->path);
-			send();
+			do_mount(filer_window, item);
 		}
-		else
-		{
-			g_string_sprintf(message, "!Operation failed.\n");
-			send();
-		}
-		g_free(command);
-	}
 	
-	if (!mount_points)
-	{
-		g_string_sprintf(message, "!No mount points selected!\n");
-		send();
+		if (!mount_points)
+		{
+			g_string_sprintf(message,
+					"!No mount points selected!\n");
+			send();
+		}
 	}
 
 	g_string_sprintf(message, "'\nDone\n");
@@ -881,8 +906,8 @@ void action_usage(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
-/* Mount/unmount all selected mount points */
-void action_mount(FilerWindow *filer_window)
+/* Mount/unmount 'item', or all selected mount points if NULL. */
+void action_mount(FilerWindow *filer_window, DirItem *item)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
@@ -890,13 +915,14 @@ void action_mount(FilerWindow *filer_window)
 
 	collection = filer_window->collection;
 
-	if (collection->number_selected < 1)
+	if (item == NULL && collection->number_selected < 1)
 	{
 		report_error("ROX-Filer", "You need to select some items "
 				"to mount or unmount");
 		return;
 	}
 
+	mount_item = item;
 	gui_side = start_action(filer_window, mount_cb);
 	if (!gui_side)
 		return;

@@ -67,5 +67,8 @@ int sort_by_size(const void *item1, const void *item2);
 void filer_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void full_refresh(void);
+void filer_openitem(FilerWindow *filer_window, DirItem *item,
+		gboolean shift, gboolean adjust);
+void filer_check_mounted(char *path);
 
 #endif /* _FILER_H */

@@ -23,6 +23,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
@@ -45,6 +46,7 @@
 #include "mount.h"
 #include "type.h"
 #include "options.h"
+#include "action.h"
 
 #define ROW_HEIGHT_LARGE 64
 #define ROW_HEIGHT_SMALL 32
@@ -61,6 +63,7 @@ extern gboolean collection_single_click;
 
 FilerWindow 	*window_with_focus = NULL;
 GdkFont	   *fixed_font = NULL;
+GList	*all_filer_windows = NULL;
 
 static FilerWindow *window_with_selection = NULL;
 
@@ -148,6 +151,7 @@ static void update_display(Directory *dir,
 			FilerWindow *filer_window);
 void filer_change_to(FilerWindow *filer_window, char *path);
 static void shrink_width(FilerWindow *filer_window);
+static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 
 static GdkAtom xa_string;
 enum
@@ -268,6 +272,8 @@ static void detach(FilerWindow *filer_window)
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
+	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
+
 	if (window_with_selection == filer_window)
 		window_with_selection = NULL;
 	if (window_with_focus == filer_window)
@@ -681,7 +687,7 @@ void show_menu(Collection *collection, GdkEventButton *event,
 }
 
 /* Returns TRUE iff the directory still exits. */
-static gboolean may_rescan(FilerWindow *filer_window)
+static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 {
 	Directory *dir;
 	
@@ -693,7 +699,8 @@ static gboolean may_rescan(FilerWindow *filer_window)
 	dir = g_fscache_lookup(dir_cache, filer_window->path);
 	if (!dir)
 	{
-		delayed_error("ROX-Filer", "Directory missing/deleted");
+		if (warning)
+			delayed_error("ROX-Filer", "Directory missing/deleted");
 		gtk_widget_destroy(filer_window->window);
 		return FALSE;
 	}
@@ -892,17 +899,12 @@ void open_item(Collection *collection,
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
 	DirItem	*item = (DirItem *) item_data;
 	GdkEventButton 	*event;
-	char		*full_path;
-	GtkWidget	*widget;
 	gboolean	shift;
 	gboolean	adjust;		/* do alternative action */
 
-	event = (GdkEventButton *) gtk_get_current_event();
-	full_path = make_path(filer_window->path,
-			item->leafname)->str;
-
 	collection_wink_item(filer_window->collection, item_number);
 
+	event = (GdkEventButton *) gtk_get_current_event();
 	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS
 			|| event->type == GDK_BUTTON_RELEASE)
 	{
@@ -917,7 +919,18 @@ void open_item(Collection *collection,
 		adjust = FALSE;
 	}
 
+	filer_openitem(filer_window, item, shift, adjust);
+}
+
+void filer_openitem(FilerWindow *filer_window, DirItem *item,
+		gboolean shift, gboolean adjust)
+{
+	GtkWidget	*widget;
+	char		*full_path;
+
 	widget = filer_window->window;
+	full_path = make_path(filer_window->path,
+			item->leafname)->str;
 
 	switch (item->base_type)
 	{
@@ -930,6 +943,14 @@ void open_item(Collection *collection,
 					gtk_widget_destroy(widget);
 				break;
 			}
+
+			if (item->flags & ITEM_FLAG_MOUNT_POINT && shift)
+			{
+				action_mount(filer_window, item);
+				if (item->flags & ITEM_FLAG_MOUNTED)
+					break;
+			}
+
 			if ((adjust ^ o_ro_bindings) || filer_window->panel)
 				filer_opendir(full_path, FALSE, BOTTOM);
 			else
@@ -989,7 +1010,7 @@ static gint pointer_in(GtkWidget *widget,
 			GdkEventCrossing *event,
 			FilerWindow *filer_window)
 {
-	may_rescan(filer_window);
+	may_rescan(filer_window, TRUE);
 	return FALSE;
 }
 
@@ -1347,6 +1368,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	number_of_windows++;
 	gtk_widget_show_all(filer_window->window);
 	attach(filer_window);
+
+	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
@@ -1470,7 +1493,7 @@ static char *filer_toolbar(char *data)
 /* Note that filer_window may not exist after this call. */
 void update_dir(FilerWindow *filer_window)
 {
-	if (may_rescan(filer_window))
+	if (may_rescan(filer_window, TRUE))
 		dir_update(filer_window->directory, filer_window->path);
 }
 
@@ -1493,4 +1516,28 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 void full_refresh(void)
 {
 	mount_update(TRUE);
+}
+
+/* This path has been mounted/umounted - update all dirs */
+void filer_check_mounted(char *path)
+{
+	GList	*next = all_filer_windows;
+	int	len;
+
+	len = strlen(path);
+
+	while (next)
+	{
+		FilerWindow *filer_window = (FilerWindow *) next->data;
+
+		next = next->next;
+
+		if (strncmp(path, filer_window->path, len) == 0)
+		{
+			char	s = filer_window->path[len];
+
+			if (s == '/' || s == '\0')
+				may_rescan(filer_window, FALSE);
+		}
+	}
 }
