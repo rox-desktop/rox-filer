@@ -1516,10 +1516,10 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 			       gpointer		data)
 {
 	/* Dragging from the pinboard to the pinboard is not allowed */
-#if 0
-	if (pinboard_drag_in_progress)
+
+	if (!provides(context, text_uri_list))
 		return FALSE;
-#endif
+	
 	pinboard_set_shadow(TRUE);
 	
 	gdk_drag_status(context, context->suggested_action, time);
