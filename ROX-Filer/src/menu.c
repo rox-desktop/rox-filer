@@ -208,17 +208,19 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, NULL},
 {">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
 {">" N_("Link..."),		NULL, file_op, FILE_LINK_ITEM, NULL},
-{">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE, NULL},
+{">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Help"),		NULL, file_op, FILE_HELP, NULL},
-{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
+{">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE, NULL},
+{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
+{">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, NULL},
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
-{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
-{">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
-{">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, NULL},
-{">" N_("Disk Usage"),		NULL, file_op, FILE_USAGE, NULL},
+{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
+{">" N_("Count"),		NULL, file_op, FILE_USAGE, NULL},
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Find"),		NULL, file_op, FILE_FIND, NULL},
 {N_("Select"),	    		NULL, NULL, 0, "<Branch>"},
 {">" N_("Select All"),	    	NULL, select_all, 0, NULL},
@@ -300,7 +302,7 @@ void ensure_filer_menu(void)
 
 	/* Shift Open... label */
 	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
-	file_shift_item = GTK_BIN(g_list_nth(items, 3)->data)->child;
+	file_shift_item = GTK_BIN(g_list_nth(items, 6)->data)->child;
 	g_list_free(items);
 
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
@@ -369,10 +371,12 @@ static void menuitem_no_shortcuts(GtkWidget *item)
 #endif
 }
 
+/* Shade items that only work on single files */
 static void shade_file_menu_items(gboolean shaded)
 {
-	menu_set_items_shaded(filer_file_menu, shaded, 0, 5);
-	menu_set_items_shaded(filer_file_menu, shaded, 6, 3);
+	menu_set_items_shaded(filer_file_menu, shaded, 0, 3);
+	menu_set_items_shaded(filer_file_menu, shaded, 5, 3);
+	menu_set_items_shaded(filer_file_menu, shaded, 10, 2);
 }
 
 /* 'data' is an array of three ints:
