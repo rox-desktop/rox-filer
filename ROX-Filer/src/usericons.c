@@ -540,7 +540,7 @@ static void open_icon_dir(GtkMenuItem *item, gpointer data)
 {
 	char *dir;
 
-	dir = gtk_label_get_text(GTK_LABEL(GTK_BIN(item)->child));
+	gtk_label_get(GTK_LABEL(GTK_BIN(item)->child), &dir);
 	filer_opendir(dir, NULL);
 }
 
