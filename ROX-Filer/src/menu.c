@@ -873,7 +873,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Size:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	if (info.st_size >=2048)
+	if (info.st_size >= PRETTY_SIZE_LIMIT)
 	{
 		g_string_sprintf(gstring, "%s (%ld bytes)",
 				format_size((unsigned long) info.st_size),

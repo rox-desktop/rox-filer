@@ -52,6 +52,11 @@
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
 
+uid_t euid;
+gid_t egid;
+int ngroups;			/* Number of supplemental groups */
+gid_t *supplemental_groups = NULL;
+
 #define VERSION "ROX-Filer 0.1.14\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -217,7 +222,18 @@ int main(int argc, char **argv)
 	act.sa_flags = SA_NOCLDSTOP;
 	sigaction(SIGCHLD, &act, NULL);
 
-	if (geteuid() == 0)
+	euid = geteuid();
+	egid = getegid();
+	ngroups = getgroups(0, NULL);
+	if (ngroups < 0)
+		ngroups = 0;
+	else if (ngroups > 0)
+	{
+		supplemental_groups = g_malloc(sizeof(gid_t) * ngroups);
+		getgroups(ngroups, supplemental_groups);
+	}
+	
+	if (euid == 0)
 	{
 		if (get_choice("!!!DANGER!!!",
 			"Running ROX-Filer as root is VERY dangerous. If I "

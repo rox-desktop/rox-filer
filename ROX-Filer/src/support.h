@@ -11,6 +11,8 @@
 #include <glib.h>
 #include <sys/types.h>
 
+#define PRETTY_SIZE_LIMIT 4096
+
 typedef enum {NONE} SpawnFlags;
 
 char *pathdup(char *path);

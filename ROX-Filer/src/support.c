@@ -177,14 +177,17 @@ char *format_size(unsigned long size)
 	static	char *buffer = NULL;
 	char	*units;
 	
-	if (size >= 2048)
+	if (size >= PRETTY_SIZE_LIMIT)
 	{
+		size += 1023;
 		size >>= 10;
-		if (size >= 2048)
+		if (size >= PRETTY_SIZE_LIMIT)
 		{
+			size += 1023;
 			size >>= 10;
-			if (size >= 2048)
+			if (size >= PRETTY_SIZE_LIMIT)
 			{
+				size += 1023;
 				size >>= 10;
 				units = "Gb";
 			}
@@ -211,7 +214,7 @@ int fork_exec_wait(char **argv)
 {
 	pid_t	child;
 	int	status = -1;
-	
+
 	child = spawn_full(argv, NULL);
 
 	while (child)
