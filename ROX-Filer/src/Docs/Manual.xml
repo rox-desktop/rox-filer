@@ -129,8 +129,13 @@
     </para></listitem>
 
     <listitem><para>
-      GTK+ 1.2.0 or later (libraries and headers) &mdash; get the latest version
+      GTK+ 2.0.0 or later (libraries and headers) &mdash; get the latest version
       from <citation>GTK+</citation>,
+    </para></listitem>
+
+    <listitem><para>
+      LibXML 2.0.0 or later (libraries and headers) &mdash; get the latest
+      version from <citation>libxml</citation>,
     </para></listitem>
 
     <listitem><para>
@@ -141,13 +146,11 @@
 
    All of the above are standard on most modern Linux distributions.
    To check which version of GTK+ you have installed, run the
-   <command>gtk-config</command> command, like this
+   <command>pkg-config</command> command, like this
    (<prompt>$</prompt> is the shell prompt):
 
-   <screen>$ gtk-config --version
-    1.2.8</screen>
-   Due to bugs in earlier versions, GTK+ 1.2.8 is strongly
-   recommended.
+   <screen>$ pkg-config --modversion gtk+-2.0
+2.0.0</screen>
   </para>
 
   <procedure><title>To compile:</title>
@@ -176,12 +179,12 @@
      doesn't work then please e-mail me and complain! Tell me what kind of
      system you have and what errors were reported. If you manage to fix the
      problem yourself then please e-mail me the fix.
-
+    </para><para>
      The executable file is stored inside the ROX-Filer directory in a
      different subdirectory for each platform. Therefore, you can compile
      the same application on several different types of machine and then
-     run it from any of them using the AppRun script. This is particularly
-     useful in a network environment.
+     run it from any of them using the <filename>AppRun</filename> script.
+     This is particularly useful in a network environment.
    </para></step>
 
    <step><para>
@@ -214,17 +217,10 @@
     <manvolnum>1</manvolnum></citerefentry> shell):
 
    <screen>$ setenv PATH $HOME/bin:$PATH
-    $ rehash</screen>
+$ rehash</screen>
 
   </para>
 
-  <note><para>By default, ROX-Filer compiles using the stable Gtk+-1.2 release.
-  However, it is also possible to compile against the 2.0 release, although this has
-  not been fully tested since, at the time of writing, Gtk+-2.0 has not been
-  released. To compile with Gtk+-2.0, do:
-  <screen>$ ROX-Filer/AppRun --compile --with-gtk2</screen>
-  </para></note>
-  
  </chapter>
 
  <chapter id="invoking">
@@ -3328,6 +3324,11 @@
   <bibliomixed>
    <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
     <ulink url="http://www.gtk.org"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>libxml</abbrev><citetitle>The XML C library for Gnome
+    <ulink url="http://www.xmlsoft.org"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
