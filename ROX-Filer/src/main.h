@@ -20,7 +20,6 @@ struct _Callback
 };
 
 extern int number_of_windows;
-extern int to_error_log;	/* Send messages here to log them */
 extern gboolean override_redirect;
 
 extern uid_t euid;

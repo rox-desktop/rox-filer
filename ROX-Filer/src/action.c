@@ -945,11 +945,6 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 		case 0:
 			/* We are the child */
 
-			dup2(to_error_log, STDOUT_FILENO);
-			close_on_exec(STDOUT_FILENO, FALSE);
-			dup2(to_error_log, STDERR_FILENO);
-			close_on_exec(STDERR_FILENO, FALSE);
-
 			quiet = autoq;
 
 			/* Reset the SIGCHLD handler */

@@ -65,7 +65,7 @@
 #include "icon.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
-int to_error_log = -1;		/* Write here to log errors */
+static int to_wakeup_pipe = -1;	/* Write here to get noticed */
 
 uid_t euid;
 gid_t egid;
@@ -159,7 +159,7 @@ static gboolean child_died_flag = FALSE;
 static void child_died(int signum)
 {
 	child_died_flag = TRUE;
-	write(to_error_log, "\0", 1);	/* Wake up! */
+	write(to_wakeup_pipe, "\0", 1);	/* Wake up! */
 }
 
 static void child_died_callback(void)
@@ -192,51 +192,17 @@ static void child_died_callback(void)
 }
 
 #define BUFLEN 40
-void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
+/* When data is written to_wakeup_pipe, this gets called from the event
+ * loop some time later. Useful for getting out of signal handlers, etc.
+ */
+void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 {
 	char buf[BUFLEN];
-	static GtkWidget *log = NULL;
-	static GtkWidget *window = NULL;
-	ssize_t len;
 
-	if (!window)
-	{
-		GtkWidget	*hbox, *scrollbar;
-
-		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_title(GTK_WINDOW(window),
-						_("ROX-Filer message log"));
-		gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-		gtk_window_set_default_size(GTK_WINDOW(window), 600, 300);
-		gtk_signal_connect_object(GTK_OBJECT(window), "delete_event",
-				gtk_widget_hide, GTK_OBJECT(window));
-
-
-		hbox = gtk_hbox_new(FALSE, 0);
-		gtk_container_add(GTK_CONTAINER(window), hbox);
-		scrollbar = gtk_vscrollbar_new(NULL);
-		
-		log = gtk_text_new(NULL,
-				gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
-		gtk_box_pack_start(GTK_BOX(hbox), log, TRUE, TRUE, 0);
-		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
-	}
-
-	len = read(source, buf, BUFLEN);
+	read(source, buf, BUFLEN);
 	
 	if (child_died_flag)
-	{
 		child_died_callback();
-		if (len == 1 && !*buf)
-			return;
-	}
-	
-	if (len > 0)
-	{
-		if (!GTK_WIDGET_MAPPED(window))
-			gtk_widget_show_all(window);
-		gtk_text_insert(GTK_TEXT(log), NULL, NULL, NULL, buf, len);
-	}
 }
 
 /* The value that goes with an option */
@@ -244,7 +210,7 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 
 int main(int argc, char **argv)
 {
-	int		 stderr_pipe[2];
+	int		 wakeup_pipe[2];
 	int		 i;
 	struct sigaction act;
 	guchar		*tmp, *dir, *slash;
@@ -432,6 +398,15 @@ int main(int argc, char **argv)
 
 	options_load();
 
+	pipe(wakeup_pipe);
+	close_on_exec(wakeup_pipe[0], TRUE);
+	close_on_exec(wakeup_pipe[1], TRUE);
+	gdk_input_add(wakeup_pipe[0], GDK_INPUT_READ, wake_up_cb, NULL);
+	to_wakeup_pipe = wakeup_pipe[1];
+
+	/* If the pipe is full then we're going to get woken up anyway... */
+	set_blocking(to_wakeup_pipe, FALSE);
+
 	/* Let child processes die */
 	act.sa_handler = child_died;
 	sigemptyset(&act.sa_mask);
@@ -447,12 +422,6 @@ int main(int argc, char **argv)
 	run_list(to_open->str);
 	g_string_free(to_open, TRUE);
 	
-	pipe(stderr_pipe);
-	close_on_exec(stderr_pipe[0], TRUE);
-	close_on_exec(stderr_pipe[1], TRUE);
-	gdk_input_add(stderr_pipe[0], GDK_INPUT_READ, stderr_cb, NULL);
-	to_error_log = stderr_pipe[1];
-
 	if (number_of_windows > 0)
 		gtk_main();
 

@@ -685,10 +685,9 @@ static void shell_return_pressed(FilerWindow *filer_window)
 					"child process"));
 			break;
 		case 0:	/* Child */
-			dup2(to_error_log, STDOUT_FILENO);
+			/* Ensure output is noticed - send stdout to stderr */
+			dup2(STDERR_FILENO, STDOUT_FILENO);
 			close_on_exec(STDOUT_FILENO, FALSE);
-			dup2(to_error_log, STDERR_FILENO);
-			close_on_exec(STDERR_FILENO, FALSE);
 			if (chdir(filer_window->path))
 				g_printerr("chdir(%s) failed: %s\n",
 						filer_window->path,

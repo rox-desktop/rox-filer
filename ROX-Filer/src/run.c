@@ -159,8 +159,6 @@ void run_with_data(char *path, gpointer data, gulong length)
 		case 0:
 			/* We are the child */
 			chdir(home_dir);
-			dup2(to_error_log, STDERR_FILENO);
-			close_on_exec(STDERR_FILENO, FALSE);
 			if (dup2(fds[0], 0) == -1)
 				g_warning("dup2() failed: %s\n",
 						g_strerror(errno));

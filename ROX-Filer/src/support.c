@@ -136,8 +136,6 @@ pid_t spawn_full(char **argv, char *dir)
 			if (chdir(dir))
 				fprintf(stderr, "chdir() failed: %s\n",
 						g_strerror(errno));
-		dup2(to_error_log, STDERR_FILENO);
-		close_on_exec(STDERR_FILENO, FALSE);
 		execvp(argv[0], argv);
 		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
 				argv[0],
