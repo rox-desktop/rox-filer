@@ -88,6 +88,8 @@ if $PKG_CONFIG --exists "gtk+-2.0"; then
   AC_DEFINE(GTK2)
   GTK_CFLAGS="$PKG_CONFIG gtk+-2.0 --cflags"
   GTK_LIBS="$PKG_CONFIG gtk+-2.0 --libs"
+  GDK_PIXBUF_LIBS=`$PKG_CONFIG gdk-pixbuf-2.0 --libs`
+  GDK_PIXBUF_CFLAGS=`$PKG_CONFIG gdk-pixbuf-2.0 --cflags`
 else
   AC_MSG_RESULT(no)
 
@@ -98,30 +100,30 @@ else
   rox_CHECK_EXISTS([$GTK_CONFIG],
 		   [You need to install the gtk-devel package before compiling:
 		    http://www.gtk.org])
+
+  dnl Make sure we have gdk-pixbuf
+  AC_MSG_CHECKING(for gdk-pixbuf library)
+  if test -z "$GDK_PIXBUF_CONFIG"; then
+    GDK_PIXBUF_CONFIG=gdk-pixbuf-config
+  fi
+  GDK_PIXBUF_CFLAGS=`$GDK_PIXBUF_CONFIG --cflags`
+  GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
+  changequote(,)dnl
+  if [ -n "$GDK_PIXBUF_LIBS" ]; then
+    AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
+  else
+    AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - make sure it is in your PATH)
+  fi
+  changequote([,])dnl
 fi
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
+AC_SUBST(GDK_PIXBUF_CFLAGS)
+AC_SUBST(GDK_PIXBUF_LIBS)
 
 rox_CHECK_EXISTS([$XML_CONFIG],
 	   [You need to install the xml-devel package before compiling:
 	    http://xmlsoft.org/])
-
-dnl Make sure we have gdk-pixbuf
-AC_MSG_CHECKING(for gdk-pixbuf library)
-if test -z "$GDK_PIXBUF_CONFIG"; then
-  GDK_PIXBUF_CONFIG=gdk-pixbuf-config
-fi
-GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
-changequote(,)dnl
-if [ -n "$GDK_PIXBUF_LIBS" ]; then
-  AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
-else
-  AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - \
-make sure it is in your PATH)
-fi
-changequote([,])dnl
-AC_SUBST(GDK_PIXBUF_CONFIG)
-AC_SUBST(GDK_PIXBUF_LIBS)
 
 dnl Does file(1) support '-b' ?
 AC_MSG_CHECKING(whether file -b works)

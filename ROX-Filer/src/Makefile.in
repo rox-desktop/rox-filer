@@ -1,7 +1,7 @@
 GTK_CFLAGS = @GTK_CFLAGS@
 GTK_LIBS = @GTK_LIBS@
 XML_CONFIG = @XML_CONFIG@
-GDK_PIXBUF_CONFIG = @GDK_PIXBUF_CONFIG@
+GDK_PIXBUF_CFLAGS = @GDK_PIXBUF_CFLAGS@
 SHELL = @SHELL@
 srcdir = @srcdir@
 PLATFORM_DIR = @bindir@
@@ -64,4 +64,4 @@ messages.pot: ${SRCS} ../Options.xml
 ############ Special case
 
 pixmaps.o: pixmaps.c
-	${CC} ${CFLAGS} `${GDK_PIXBUF_CONFIG} --cflags` -c $< -o $@
+	${CC} ${CFLAGS} ${GDK_PIXBUF_CFLAGS} -c $< -o $@
