@@ -1,4 +1,4 @@
-/* vi: set cindent :
+/*
  * $Id$
  *
  * The collection widget provides an area for displaying a collection of

@@ -1,4 +1,4 @@
-/* vi: set cindent:
+/*
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project

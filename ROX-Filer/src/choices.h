@@ -1,4 +1,4 @@
-/* vi: set cindent:
+/*
  * $Id$
  *
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.

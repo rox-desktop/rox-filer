@@ -1,4 +1,4 @@
-/* vi: set cindent:
+/*
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
@@ -183,9 +183,10 @@ void parse_file(char *path, ParseFunc *parse_line)
 	}
 }
 
-/* Call this on init to register a handler for a key.
+/* Call this on init to register a handler for a key (thing before the = in
+ * the config file).
  * The function returns a pointer to an error messages (which will
- * NOT be free()d, or NULL on success.
+ * NOT be free()d), or NULL on success.
  */
 void option_register(char *key, OptionFunc *func)
 {

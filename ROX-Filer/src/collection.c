@@ -1,4 +1,4 @@
-/* vi: set cindent :
+/*
  * $Id$
  *
  * Collection - a GTK+ widget

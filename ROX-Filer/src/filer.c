@@ -1,4 +1,4 @@
-/* vi: set cindent:
+/*
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
@@ -44,6 +44,7 @@
 #include "apps.h"
 #include "mount.h"
 #include "type.h"
+#include "options.h"
 
 #define MAX_ICON_HEIGHT 42
 #define PANEL_BORDER 2
@@ -54,6 +55,24 @@ FilerWindow 	*window_with_focus = NULL;
 GHashTable	*path_to_window_list = NULL;
 
 static FilerWindow *window_with_selection = NULL;
+
+/* Options bits */
+static GtkWidget *create_options();
+static void update_options();
+static void set_options();
+static void save_options();
+static char *filer_ro_bindings(char *data);
+
+static OptionsSection options =
+{
+	"Filer window options",
+	create_options,
+	update_options,
+	set_options,
+	save_options
+};
+static gboolean o_ro_bindings = FALSE;
+static GtkWidget *toggle_ro_bindings;
 
 /* Static prototypes */
 static void filer_window_destroyed(GtkWidget    *widget,
@@ -94,6 +113,9 @@ void filer_init()
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
 	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
+
+	options_sections = g_slist_prepend(options_sections, &options);
+	option_register("filer_ro_bindings", filer_ro_bindings);
 }
 
 
@@ -757,7 +779,8 @@ void open_item(Collection *collection,
 	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS)
 	{
 		shift = event->state & GDK_SHIFT_MASK;
-		adjust = event->button != 1 || event->state & GDK_CONTROL_MASK;
+		adjust = (event->button != (o_ro_bindings ? 2 : 1))
+				^ ((event->state & GDK_CONTROL_MASK) != 0);
 	}
 	else
 	{
@@ -1070,3 +1093,46 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	add_view(filer_window);
 	scan_dir(filer_window);
 }
+
+/* Build up some option widgets to go in the options dialog, but don't
+ * fill them in yet.
+ */
+static GtkWidget *create_options()
+{
+	GtkWidget	*vbox;
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
+
+	toggle_ro_bindings =
+		gtk_check_button_new_with_label("Use RISC OS mouse bindings");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_ro_bindings, FALSE, TRUE, 0);
+
+	return vbox;
+}
+
+/* Reflect current state by changing the widgets in the options box */
+static void update_options()
+{
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_ro_bindings),
+			o_ro_bindings);
+}
+
+/* Set current values by reading the states of the widgets in the options box */
+static void set_options()
+{
+	o_ro_bindings = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_ro_bindings));
+}
+
+static void save_options()
+{
+	option_write("filer_ro_bindings", o_ro_bindings ? "1" : "0");
+}
+
+static char *filer_ro_bindings(char *data)
+{
+	o_ro_bindings = atoi(data) != 0;
+	return NULL;
+}
+
