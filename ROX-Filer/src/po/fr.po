@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.7-preview\n"
-"POT-Creation-Date: 2003-01-11 03:29+0100\n"
-"PO-Revision-Date: 2003-01-11 03:35+0100\n"
+"POT-Creation-Date: 2003-01-16 00:50+0100\n"
+"PO-Revision-Date: 2003-01-16 00:53+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -217,11 +217,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: action.c:633 main.c:573 main.c:581
+#: action.c:633 main.c:579 main.c:587
 msgid "Yes"
 msgstr "Oui"
 
-#: action.c:636 main.c:575
+#: action.c:636 main.c:581
 msgid "No"
 msgstr "Non"
 
@@ -595,11 +595,11 @@ msgid "This item is already at the end"
 msgstr "Cet objet est déjà à la fin"
 
 #: bookmarks.c:486
-msgid "Add new bookmark"
+msgid "Add New Bookmark"
 msgstr "Ajouter un nouveau signet"
 
 #: bookmarks.c:493
-msgid "Edit bookmarks"
+msgid "Edit Bookmarks"
 msgstr "Éditer les signets"
 
 #: cell_icon.c:151
@@ -796,44 +796,44 @@ msgstr "Le répertoire '%s' n'est pas accessible"
 msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
-#: filer.c:1405
+#: filer.c:1406
 msgid "Cancel"
 msgstr "Annuler"
 
-#: filer.c:1645
+#: filer.c:1646
 msgid "S"
 msgstr "L"
 
-#: filer.c:1646
+#: filer.c:1647
 msgid "A"
 msgstr "T"
 
-#: filer.c:1647
+#: filer.c:1648
 msgid "T"
 msgstr "I"
 
-#: filer.c:1653
+#: filer.c:1654
 msgid "Scanning, "
 msgstr "Lecture, "
 
-#: filer.c:1654
+#: filer.c:1655
 msgid "All, "
 msgstr "Tous, "
 
-#: filer.c:1655
+#: filer.c:1656
 msgid "Thumbs, "
 msgstr "Imagettes, "
 
-#: filer.c:1916
+#: filer.c:1917
 msgid "Symbolic link to "
 msgstr "Lien symbolique vers "
 
-#: filer.c:1947
+#: filer.c:1948
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 "Ce nom de fichier n'est pas en UTF-8 valide. Vous devriez le renommer.\n"
 
-#: filer.c:2220 menu.c:1829
+#: filer.c:2222 menu.c:1829
 msgid "Item no longer exists!"
 msgstr "L'objet n'existe plus !"
 
@@ -1418,19 +1418,29 @@ msgstr ""
 msgid "Running as user '%s'"
 msgstr "Exécution en tant qu'utilisateur '%s'"
 
-#: main.c:570
+#: main.c:571
+#, c-format
+msgid "Compiled with GTK version %s\n"
+msgstr "Compilé avec GTK version %s\n"
+
+#: main.c:572
+#, c-format
+msgid "Running with GTK version %d.%d.%d\n"
+msgstr "Tournant avec GTK version %d.%d.%d\n"
+
+#: main.c:576
 msgid "features set at compile time"
 msgstr "fonctionnalités fixées à la compilation"
 
-#: main.c:571
+#: main.c:577
 msgid "Large File Support"
 msgstr "Support des fichiers longs"
 
-#: main.c:579
+#: main.c:585
 msgid "GNOME-VFS library"
 msgstr "Bibliothèque GNOME-VFS"
 
-#: main.c:583
+#: main.c:589
 msgid "No (gnome-vfs-config not found)"
 msgstr "Non (gnome-vfs-config non trouvé)"
 
@@ -1450,9 +1460,9 @@ msgstr "Icônes, avec..."
 msgid "Sizes"
 msgstr "Tailles"
 
-#: menu.c:185 tips:57 tips:75
-msgid "Type"
-msgstr "Type"
+#: menu.c:185 tips:227
+msgid "Types"
+msgstr "Types"
 
 #: menu.c:186 tips:76
 msgid "Times"
@@ -2950,6 +2960,10 @@ msgstr "Type de vue :"
 msgid "Sort by:"
 msgstr "Trier par :"
 
+#: tips:57 tips:75
+msgid "Type"
+msgstr "Type"
+
 #: tips:58
 msgid "Date"
 msgstr "Date"
@@ -3536,10 +3550,6 @@ msgstr ""
 #: tips:226
 msgid "Keyboard shortcuts"
 msgstr "Raccourcis clavier"
-
-#: tips:227
-msgid "Types"
-msgstr "Types"
 
 #: tips:228
 msgid "Executable files"
