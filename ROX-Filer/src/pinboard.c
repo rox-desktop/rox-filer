@@ -950,8 +950,8 @@ static void forward_to_root(GdkEventButton *event)
 	xev.root =  xev.window;
 	xev.subwindow = None;
 	xev.time = event->time;
-	xev.x = event->x;
-	xev.y = event->y;
+	xev.x = event->x_root;	/* Needed for icewm */
+	xev.y = event->y_root;
 	xev.x_root = event->x_root;
 	xev.y_root = event->y_root;
 	xev.state = event->state;
