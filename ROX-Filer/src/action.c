@@ -171,7 +171,7 @@ static GtkWidget *create_options()
 	label = gtk_label_new(_("Auto-start (Quiet) these actions:"));
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
-	hbox = gtk_hbox_new(TRUE, 0);
+	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
 	w_auto_copy = gtk_check_button_new_with_label(_("Copy"));

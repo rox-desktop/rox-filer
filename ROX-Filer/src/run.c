@@ -535,7 +535,7 @@ static gboolean open_file(guchar *path, MIME_type *type)
 	message = g_string_new(NULL);
 	g_string_sprintf(message,
 		_("No run action specified for files of this type (%s/%s) - "
-		"you can set a run action using by choosing `Set Run Action' "
+		"you can set a run action by choosing `Set Run Action' "
 		"from the File menu, or you can just drag the file to an "
 		"application"),
 		type->media_type,

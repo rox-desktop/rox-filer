@@ -437,7 +437,7 @@ void drag_app_dropped(GtkWidget		*frame,
 	if (!app)
 	{
 		delayed_error(PROJECT,
-			_("You should drop a single (local) application"
+			_("You should drop a single (local) application "
 			"onto the drop box - that application will be "
 			"used to load files of this type in future"));
 		return;

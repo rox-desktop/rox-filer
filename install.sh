@@ -113,18 +113,25 @@ The application directory will be:
 The launcher script will be:
 	$BINDIR/rox
 
-The manual page will be:
-	$MANDIR/man1/rox.1
-
-OK?
 EOF
+if [ -n "$MANDIR" ]; then
+	echo "The manual page will be:"
+	echo "	$MANDIR/man1/rox.1"
+else
+	echo "The manual page will not be installed."
+fi
+
+echo
+echo "OK?"
 confirm_or_die
 echo
 
-echo "Installing manpage..."
-endir "$MANDIR"
-endir "$MANDIR/man1"
-cp rox.1 "$MANDIR/man1/rox.1" || die "Can't install manpage!"
+if [ -n "$MANDIR" ]; then
+	echo "Installing manpage..."
+	endir "$MANDIR"
+	endir "$MANDIR/man1"
+	cp rox.1 "$MANDIR/man1/rox.1" || die "Can't install manpage!"
+fi
 
 echo "Installing application..."
 endir "$APPDIR"
