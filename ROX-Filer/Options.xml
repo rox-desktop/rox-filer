@@ -334,5 +334,8 @@ http://rox.sourceforge.net/mime_editor.html</label>
     <frame label='Drag and drop'>
       <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
     </frame>
+    <frame label='Extended attributes'>
+      <toggle name='xattr_ignore' label="Don't use extended attributes">This disables the use of extended attributes available in newer operating systems and file systems.  With this option set the 'Set Type' menu entry is disabled, the MIME type of the file is only derived from the file name and the properties window does not report extended attributes.</toggle>
+    </frame>
   </section>
 </options>

@@ -39,8 +39,13 @@
 #include "global.h"
 #include "type.h"
 #include "xtypes.h"
+#include "options.h"
+
+static Option o_xattr_ignore;
 
 #define XTYPE_ATTR "user.mime_type"
+
+#define RETURN_IF_IGNORED(val) if(o_xattr_ignore.int_value) return (val)
 
 #if defined(HAVE_GETXATTR)
 /* Linux implementation */
@@ -65,12 +70,16 @@ void xtype_init(void)
 	dyn_setxattr = (void *) dlsym(libc, "setxattr");
 	dyn_getxattr = (void *) dlsym(libc, "getxattr");
 	dyn_listxattr = (void *) dlsym(libc, "listxattr");
+	
+	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
 int xtype_supported(const char *path)
 {
 	char buf[1];
 	ssize_t nent;
+	
+	RETURN_IF_IGNORED(FALSE);
 	
 	if (!dyn_getxattr)
 		return FALSE;
@@ -91,6 +100,8 @@ int xtype_have_attr(const char *path)
 	char buf[1];
 	ssize_t nent;
 	
+	RETURN_IF_IGNORED(FALSE);
+	
 	if (!dyn_listxattr)
 		return FALSE;
 
@@ -109,6 +120,8 @@ MIME_type *xtype_get(const char *path)
 	gchar *buf;
 	MIME_type *type = NULL;
 
+	RETURN_IF_IGNORED(type_from_path(path));
+	
 	if (!dyn_getxattr)
 		return type_from_path(path);	/* Old libc */
 
@@ -141,6 +154,12 @@ int xtype_set(const char *path, const MIME_type *type)
 	int res;
 	gchar *ttext;
 
+	if(o_xattr_ignore.int_value)
+	{
+		errno = ENOSYS;
+		return 1;
+	}
+
 	if (!dyn_setxattr)
 	{
 		errno = ENOSYS;
@@ -159,11 +178,13 @@ int xtype_set(const char *path, const MIME_type *type)
 /* Solaris 9 implementation */
 
 void xtype_init(void)
-{
+{	
+	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
 int xtype_supported(const char *path)
 {
+	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_ENABLED
 	if(!path)
 		return TRUE;
@@ -176,6 +197,7 @@ int xtype_supported(const char *path)
 
 int xtype_have_attr(const char *path)
 {
+	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_EXISTS
 	return pathconf(path, _PC_XATTR_EXISTS)>0;
 #else
@@ -189,6 +211,8 @@ MIME_type *xtype_get(const char *path)
 	char buf[1024];
 	int nb;
 	MIME_type *type=NULL;
+
+	RETURN_IF_IGNORED(type_from_path(path));
 
 #ifdef _PC_XATTR_EXISTS
 	if(!pathconf(path, _PC_XATTR_EXISTS))
@@ -218,6 +242,12 @@ int xtype_set(const char *path, const MIME_type *type)
 	int fd;
 	gchar *ttext;
 	int nb;
+
+	if(o_xattr_ignore.int_value)
+	{
+		errno = ENOSYS;
+		return 1;
+	}
 
 	fd=attropen(path, XTYPE_ATTR, O_WRONLY|O_CREAT, 0644);
 	if(fd>0) {

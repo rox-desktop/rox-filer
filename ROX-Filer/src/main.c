@@ -238,10 +238,10 @@ int main(int argc, char **argv)
 	/* Get internationalisation up and running. This requires the
 	 * choices system, to discover the user's preferred language.
 	 */
-	xtype_init();
 	choices_init();
 	options_init();
 	i18n_init();
+	xtype_init();
 
 #ifdef HAVE_GNOME_VFS
 	if (!gnome_vfs_init())
