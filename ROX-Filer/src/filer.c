@@ -839,9 +839,10 @@ static void group_restore(FilerWindow *filer_window, char *name)
 	if (!group)
 	{
 		report_error(_("Group %s is not set. Select some files "
-				"and press Ctrl+%s to set the group. Press %s "
-				"on its own to reselect the files later."),
-				name, name, name);
+			     "and press Ctrl+%s to set the group. Press %s "
+			     "on its own to reselect the files later.\n"
+			     "Make sure NumLock is on if you use the keypad."),
+			     name, name, name);
 		return;
 	}
 
