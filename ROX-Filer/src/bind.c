@@ -74,6 +74,9 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	if (b > 3)
 		return ACT_IGNORE;
 
+	if (context == BIND_PINBOARD_ICON || context == BIND_PINBOARD)
+		menu_button = 3;	/* Must work with window manager */
+
 	if (b == menu_button)
 		return press ? ACT_POPUP_MENU : ACT_IGNORE;
 
