@@ -383,6 +383,7 @@ static gint toolbar_adjust_released(GtkButton *button,
 	return FALSE;
 }
 
+#if 0
 static gint menu_pressed(GtkWidget *button,
 			 GdkEventButton *event,
 			 FilerWindow *filer_window)
@@ -399,6 +400,7 @@ static gint menu_pressed(GtkWidget *button,
 
 	return TRUE;
 }
+#endif
 
 static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 				FilerWindow *filer_window)
@@ -412,10 +414,13 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 
 	if (tool->menu)
 	{
+		g_warning("Not implemented");
+#if 0
 		gtk_object_set_data(GTK_OBJECT(button), "popup_menu",
 				*tool->menu);
 		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
 			GTK_SIGNAL_FUNC(menu_pressed), filer_window);
+#endif
 	}
 	else
 	{

@@ -375,10 +375,11 @@ void update_all_icons(void)
  */
 void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 {
-	int		pos[2];
+	int		pos[3];
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
+	pos[2] = 1;
 
 	appmenu_remove();
 

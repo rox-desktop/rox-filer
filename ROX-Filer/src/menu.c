@@ -67,6 +67,7 @@ GtkAccelGroup	*pinboard_keys;
 GtkWidget *popup_menu = NULL;		/* Currently open menu */
 
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
+static GList *send_to_paths = NULL;
 
 /* Static prototypes */
 
@@ -81,7 +82,8 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean link_cb(guchar *initial, guchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
 static void new_file_type(gchar *templ);
-static void send_file_to(char *send_to);
+static void do_send_to(gchar *templ);
+static void show_send_to_menu(GList *paths, GdkEvent *event);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -105,6 +107,7 @@ static void link_item(gpointer data, guint action, GtkWidget *widget);
 static void open_file(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
+static void send_to(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
@@ -151,7 +154,6 @@ static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
-static GtkWidget        *filer_sendto_menu;     /* The Send To submenu */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -213,7 +215,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Open AVFS"),		NULL, open_vfs_avfs, 0, NULL},
 #endif
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Send To"),		NULL, NULL, 0, "<Branch>"},
+{">" N_("Send To..."),		NULL, send_to, 0, NULL},
 {">" N_("Delete"),	    	NULL, delete, 0,	NULL},
 {">" N_("Disk Usage"),		NULL, usage, 0, NULL},
 {">" N_("Permissions"),		NULL, chmod_items, 0, NULL},
@@ -304,7 +306,6 @@ void menu_init(void)
 			"Display", "Small, With...");
 
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
-	GET_SSMENU_ITEM(filer_sendto_menu, "filer", "File", "Send To");
 
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
@@ -407,6 +408,9 @@ static void items_sensitive(gboolean state)
 #endif
 }
 
+/* 'data' is an array of three ints:
+ * [ pointer_x, pointer_y, item_under_pointer ]
+ */
 void position_menu(GtkMenu *menu, gint *x, gint *y,
 #ifdef GTK2
 		gboolean  *push_in,
@@ -415,11 +419,31 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
+	GList		*items, *next;
+	int		y_shift = 0;
+	int		item = pos[2];
+
+	next = items = gtk_container_children(GTK_CONTAINER(menu));
+
+	while (item >= 0)
+	{
+		int h = ((GtkWidget *) next->data)->requisition.height;
+
+		if (item > 0)
+			y_shift += h;
+		else
+			y_shift += h / 2;
+
+		next = next->next;
+		item--;
+	}
+	
+	g_list_free(items);
 
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
 	*x = pos[0] - (requisition.width * 7 / 8);
-	*y = pos[1] - (requisition.height * 3 / 18);
+	*y = pos[1] - y_shift;
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
@@ -429,15 +453,17 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 #endif
 }
 
+#if 0
 /* Used when you menu-click on the Large or Small toolbar tools */
 void show_style_menu(FilerWindow *filer_window,
 			GdkEventButton *event,
 			GtkWidget *menu)
 {
-	int		pos[2];
+	int		pos[3];
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
+	pos[2] = 0;
 
 	window_with_focus = filer_window;
 
@@ -446,6 +472,7 @@ void show_style_menu(FilerWindow *filer_window,
 	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
+#endif
 
 /* XXX: Is there any point to this? */
 typedef enum menu_icon_style {
@@ -584,79 +611,58 @@ static void update_new_files_menu(MenuIconStyle style)
 	gtk_widget_show_all(filer_new_menu);
 }
 
-/* Scan the templates dir and create entries for the Send to menu */
-static void update_send_to_menu(MenuIconStyle style)
+/* 'item' is the number of the item to appear under the pointer. */
+static void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
 {
-	static GList *widgets = NULL;
-
-	gchar	*sendto_dname = NULL;
-
-	if (widgets)
-	{
-		GList	*next;
-		
-		for (next = widgets; next; next = next->next)
-		{
-			GtkWidget *w = (GtkWidget *) next->data;
-
-			gtk_widget_destroy(w);
-		}
-
-		g_list_free(widgets);
-		widgets = NULL;
-	}
-
-	sendto_dname = choices_find_path_load("SendTo", "");
-	if (sendto_dname)
-	{
-		widgets = menu_from_dir(filer_sendto_menu, sendto_dname, 
-					style,
-					(CallbackFn) send_file_to,
-					FALSE, FALSE);
-		g_free(sendto_dname);
-	}
-
-	gtk_widget_show_all(filer_sendto_menu);
-}
-
-void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
-{
-	DirItem		*file_item = NULL;
-	int		pos[2];
+	int		pos[3];
 	int		button;
-	GdkModifierType	state = 0;
 	guint32		time = 0;
 
-	updating_menu++;
-
-	/* Remove previous AppMenu, if any */
-	appmenu_remove();
-
-
-	if (event->type == GDK_BUTTON_PRESS)
+	if (event->type == GDK_BUTTON_PRESS ||
+			event->type == GDK_BUTTON_RELEASE)
 	{
 		GdkEventButton *bev = (GdkEventButton *) event;
 
 		pos[0] = bev->x_root;
 		pos[1] = bev->y_root;
 		button = bev->button;
-		state = bev->state;
 		time = bev->time;
 	}
 	else
 	{
+		GdkEventKey *kev = (GdkEventKey *) event;
+
+		g_return_if_fail(event->type == GDK_KEY_PRESS);
+
 		get_pointer_xy(pos, pos + 1);
 		button = 0;
-		if (event->type == GDK_KEY_PRESS)
-		{
-			GdkEventKey *kev = (GdkEventKey *) event;
-
-			time = kev->time;
-			state = kev->state;
-		}
+		time = kev->time;
 	}
 
+	pos[2] = item;
+
+	gtk_widget_show_all(menu);
+	gtk_menu_popup(GTK_MENU(menu), NULL, NULL,
+			position_menu, (gpointer) pos, button, time);
+	select_nth_item(GTK_MENU_SHELL(menu), item);
+}
+
+void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
+{
+	DirItem		*file_item = NULL;
+	GdkModifierType	state = 0;
+
+	updating_menu++;
+
+	/* Remove previous AppMenu, if any */
+	appmenu_remove();
+
 	window_with_focus = filer_window;
+
+	if (event->type == GDK_BUTTON_PRESS)
+		state = ((GdkEventButton *) event)->state;
+	else if (event->type == GDK_KEY_PRESS)
+		state = ((GdkEventKey *) event)->state;
 
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
@@ -666,6 +672,20 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	else
 	{
 		filer_window->temp_item_selected = FALSE;
+	}
+
+	/* Short-cut to the Send To menu */
+	if (state & GDK_SHIFT_MASK)
+	{
+		GList *paths;
+
+		paths = filer_selected_items(filer_window);
+
+		updating_menu--;
+
+		show_send_to_menu(paths, event); /* (paths eaten) */
+
+		return;
 	}
 
 	{
@@ -714,7 +734,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	}
 
 	update_new_files_menu(MIS_SMALL);
-	update_send_to_menu(MIS_SMALL);
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
@@ -724,16 +743,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	updating_menu--;
 	
-	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
-			(gpointer) pos, button, time);
-
-	if (!button)
-	{
-		if (popup_menu == filer_file_menu)
-			select_nth_item(GTK_MENU_SHELL(popup_menu), 5);
-		else if (popup_menu == filer_menu)
-			select_nth_item(GTK_MENU_SHELL(popup_menu), 1);
-	}
+	show_popup_menu(popup_menu, event,
+			popup_menu == filer_file_menu ? 5 : 1);
 }
 
 static void menu_closed(GtkWidget *widget)
@@ -1448,6 +1459,13 @@ static gboolean new_file_type_cb(guchar *initial, guchar *path)
 	return TRUE;
 }
 
+static void do_send_to(gchar *templ)
+{
+	g_return_if_fail(send_to_paths != NULL);
+
+	run_with_files(templ, send_to_paths);
+}
+
 static void new_file_type(gchar *templ)
 {
 	gchar *leaf;
@@ -1464,39 +1482,67 @@ static void new_file_type(gchar *templ)
 			new_file_type_cb);
 }
 
-static void send_file_to(char *send_to)
+/* Scan the SendTo dir and create and show the Send To menu.
+ * The 'paths' list and every path in it is claimed, and will be
+ * freed later -- don't free it yourself!
+ */
+static void show_send_to_menu(GList *paths, GdkEvent *event)
+{
+	GtkWidget	*menu;
+	gchar		*sendto_dname = NULL;
+	GList		*widgets = NULL;
+
+	menu = gtk_menu_new();
+
+	sendto_dname = choices_find_path_load("SendTo", "");
+	if (sendto_dname)
+	{
+		widgets = menu_from_dir(menu, sendto_dname, 
+					MIS_SMALL,
+					(CallbackFn) do_send_to,
+					FALSE, FALSE);
+		g_free(sendto_dname);
+
+		g_list_free(widgets);	/* TODO: Get rid of this */
+	}
+
+	if (send_to_paths)
+	{
+		g_list_foreach(send_to_paths, (GFunc) g_free, NULL);
+		g_list_free(send_to_paths);
+	}
+	send_to_paths = paths;
+
+	gtk_signal_connect(GTK_OBJECT(menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
+
+	popup_menu = menu;
+	show_popup_menu(menu, event, 0);
+}
+
+static void send_to(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection *collection;
 	
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
+
 	if (collection->number_selected < 1)
-	{
-		/* XXX: How could this work? */
-#if 0
-		filer_target_mode(window_with_focus,
-				target_callback_signal,
-				send_file_to,
-				_("Send ... ?"));
-#endif
-	}
+		filer_target_mode(window_with_focus, target_callback,
+					send_to, _("Send ... to ... ?"));
 	else
 	{
-		GList		*paths, *tmp;
-		GList		*spaths = NULL;
+		GList		*paths;
+		GdkEvent	*event;
 
 		paths = filer_selected_items(window_with_focus);
+		event = gtk_get_current_event();
 
-		for(tmp = paths; tmp; tmp = g_list_next(tmp))
-			spaths = g_list_prepend(spaths, tmp->data);
+		/* Eats paths */
+		show_send_to_menu(paths, event);
 
-		g_list_free(paths);
-
-		run_with_files(send_to, spaths);
-
-		g_list_foreach(spaths, (GFunc) g_free, NULL);
-		g_list_free(spaths);
+		gdk_event_free(event);
 	}
 }
 

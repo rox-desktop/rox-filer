@@ -23,9 +23,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
 GtkItemFactory *menu_create(GtkItemFactoryEntry *def,
 			int n_entries, guchar *name);
 void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
-void show_style_menu(FilerWindow *filer_window,
-			GdkEventButton *event,
-			GtkWidget *menu);
 void position_menu(GtkMenu *menu, gint *x, gint *y,
 #ifdef GTK2
 		gboolean  *push_in,
