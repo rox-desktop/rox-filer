@@ -105,6 +105,9 @@ static gint icon_button_press(GtkWidget *widget,
 			      PanelIcon *pi);
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel);
+static gint expose_icon_background(GtkWidget *widget,
+			GdkEventExpose *event,
+			PanelIcon *pi);
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
 			PanelIcon *pi);
@@ -574,7 +577,8 @@ static gboolean icon_pointer_in(GtkWidget *widget,
 				GdkEventCrossing *event,
 				Icon *icon)
 {
-	gtk_widget_set_state(widget, GTK_STATE_PRELIGHT);
+	gtk_widget_set_state(widget,
+		icon->selected ? GTK_STATE_SELECTED : GTK_STATE_PRELIGHT);
 
 	return 0;
 }
@@ -583,7 +587,8 @@ static gboolean icon_pointer_out(GtkWidget *widget,
 				 GdkEventCrossing *event,
 				 Icon *icon)
 {
-	gtk_widget_set_state(widget, GTK_STATE_NORMAL);
+	gtk_widget_set_state(widget,
+		icon->selected ? GTK_STATE_SELECTED : GTK_STATE_NORMAL);
 
 	return 0;
 }
@@ -706,6 +711,8 @@ static void panel_add_item(Panel *panel,
 	{
 		g_signal_connect(widget, "enter-notify-event",
 				G_CALLBACK(enter_icon), pi);
+		g_signal_connect(widget, "expose_event",
+				G_CALLBACK(expose_icon_background), pi);
 		g_signal_connect_after(widget, "expose_event",
 				G_CALLBACK(expose_icon), pi);
 		g_signal_connect(widget, "drag_data_get",
@@ -779,6 +786,20 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 		req->height += PANEL_ICON_SPACING;
 }
 
+static gint expose_icon_background(GtkWidget *widget,
+			GdkEventExpose *event,
+			PanelIcon *pi)
+{
+	if (((Icon *) pi)->selected)
+		gtk_paint_flat_box(widget->style, widget->window,
+				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
+				&event->area, widget, NULL, 0, 0,
+				widget->allocation.width,
+				widget->allocation.height);
+	
+	return FALSE;
+}
+
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
 			PanelIcon *pi)
@@ -797,7 +818,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *pi)
 	int		text_height = 0;
 
 	gdk_drawable_get_size(widget->window, &area.width, &area.height);
-	
+
 	if (panel_want_show_text(pi))
 		text_height = pi->label->requisition.height;
 	
@@ -1995,6 +2016,9 @@ static void panel_remove_items(void)
 
 static void panel_icon_redraw(Icon *icon)
 {
+	gtk_widget_set_state(((PanelIcon *) icon)->widget,
+			icon->selected ? GTK_STATE_SELECTED
+				       : GTK_STATE_NORMAL);
 	gtk_widget_queue_draw(PANEL_ICON(icon)->widget);
 }
 

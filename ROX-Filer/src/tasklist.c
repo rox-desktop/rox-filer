@@ -358,6 +358,8 @@ static void window_check_status(IconWindow *win)
 	win->iconified = iconic;
 
 	state_changed(win);
+
+	gdk_flush();
 }
 
 /* Called for all events on all windows */
