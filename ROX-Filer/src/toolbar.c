@@ -54,7 +54,7 @@ struct _Tool {
 	void		(*clicked)(GtkWidget *w, FilerWindow *filer_window);
 	DropDest	drop_action;
 	gboolean	enabled;
-	GtkWidget	**menu;		/* Right-click menu widget addr */
+	gboolean	menu;		/* Activate on button-press */
 };
 
 Option o_toolbar, o_toolbar_info, o_toolbar_disable;
@@ -107,39 +107,39 @@ static void tally_items(gpointer key, gpointer value, gpointer data);
 static Tool all_tools[] = {
 	{N_("Close"), GTK_STOCK_CLOSE, N_("Close filer window"),
 	 toolbar_close_clicked, DROP_NONE, FALSE,
-	 NULL},
+	 FALSE},
 	 
 	{N_("Up"), GTK_STOCK_GO_UP, N_("Change to parent directory"),
 	 toolbar_up_clicked, DROP_TO_PARENT, TRUE,
-	 NULL},
+	 FALSE},
 	 
 	{N_("Home"), GTK_STOCK_HOME, N_("Change to home directory"),
 	 toolbar_home_clicked, DROP_TO_HOME, TRUE,
-	 NULL},
+	 FALSE},
 	
 	{N_("Bookmarks"), ROX_STOCK_BOOKMARKS, N_("Bookmarks menu"),
 	 toolbar_bookmarks_clicked, DROP_NONE, FALSE,
-	 NULL},
+	 TRUE},
 
 	{N_("Scan"), GTK_STOCK_REFRESH, N_("Rescan directory contents"),
 	 toolbar_refresh_clicked, DROP_NONE, TRUE,
-	 NULL},
+	 FALSE},
 	
 	{N_("Size"), GTK_STOCK_ZOOM_IN, N_("Change icon size"),
 	 toolbar_size_clicked, DROP_NONE, TRUE,
-	 NULL},
+	 FALSE},
 	
 	{N_("Details"), ROX_STOCK_SHOW_DETAILS, N_("Show extra details"),
 	 toolbar_details_clicked, DROP_NONE, TRUE,
-	 NULL},
+	 FALSE},
 	
 	{N_("Hidden"), ROX_STOCK_SHOW_HIDDEN, N_("Show/hide hidden files"),
 	 toolbar_hidden_clicked, DROP_NONE, TRUE,
-	 NULL},
+	 FALSE},
 	
 	{N_("Help"), GTK_STOCK_HELP, N_("Show ROX-Filer help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
-	 NULL},
+	 FALSE},
 };
 
 
@@ -354,7 +354,7 @@ static void toolbar_bookmarks_clicked(GtkWidget *widget,
 	g_return_if_fail(filer_window != NULL);
 
 	event = gtk_get_current_event();
-	if (event->type == GDK_BUTTON_RELEASE &&
+	if (event->type == GDK_BUTTON_PRESS &&
 			((GdkEventButton *) event)->button == 1)
 	{
 		bookmarks_show_menu(filer_window);
@@ -459,11 +459,21 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
  * normally ignores this).
  */
 static gint toolbar_other_button = 0;
-static gint toolbar_adjust_pressed(GtkButton *button,
+static gint toolbar_button_pressed(GtkButton *button,
 				GdkEventButton *event,
 				FilerWindow *filer_window)
 {
 	gint	b = event->button;
+	Tool	*tool;
+
+	tool = g_object_get_data(G_OBJECT(button), "rox-tool");
+	g_return_val_if_fail(tool != NULL, TRUE);
+
+	if (tool->menu && b == 1)
+	{
+		tool->clicked((GtkWidget *) button, filer_window);
+		return TRUE;
+	}
 
 	if ((b == 2 || b == 3) && toolbar_other_button == 0)
 	{
@@ -477,7 +487,7 @@ static gint toolbar_adjust_pressed(GtkButton *button,
 	return FALSE;
 }
 
-static gint toolbar_adjust_released(GtkButton *button,
+static gint toolbar_button_released(GtkButton *button,
 				GdkEventButton *event,
 				FilerWindow *filer_window)
 {
@@ -527,13 +537,14 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 		}
 	}
 
+	g_object_set_data(G_OBJECT(button), "rox-tool", tool);
+
 	g_signal_connect(button, "clicked",
 			G_CALLBACK(tool->clicked), filer_window);
-
 	g_signal_connect(button, "button_press_event",
-		G_CALLBACK(toolbar_adjust_pressed), filer_window);
+		G_CALLBACK(toolbar_button_pressed), filer_window);
 	g_signal_connect(button, "button_release_event",
-		G_CALLBACK(toolbar_adjust_released), filer_window);
+		G_CALLBACK(toolbar_button_released), filer_window);
 
 	return button;
 }
