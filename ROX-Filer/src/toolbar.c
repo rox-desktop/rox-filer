@@ -127,7 +127,7 @@ static Tool all_tools[] = {
 	
 	{N_("Size"), GTK_STOCK_ZOOM_IN, N_("Change icon size"),
 	 toolbar_size_clicked, DROP_NONE, TRUE,
-	 FALSE},
+	 TRUE},
 	
 	{N_("Details"), ROX_STOCK_SHOW_DETAILS, N_("Show extra details"),
 	 toolbar_details_clicked, DROP_NONE, TRUE,
@@ -395,14 +395,65 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 		change_to_parent(filer_window);
 }
 
+static void set_size(GtkMenuItem *item, gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
+	DisplayStyle size;
+
+	if (!gtk_check_menu_item_get_active(GTK_CHECK_MENU_ITEM(item)))
+		return;
+
+	size = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(item),
+						 "rox-icon-size"));
+
+	display_set_layout(filer_window, size, filer_window->details_type);
+}
+
 static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
+	GSList *grp = NULL;
 	GdkEventButton	*bev;
+	GtkWidget *menu;
+	int i, start = 0;
+	const gchar *names[] = {N_("Huge"), N_("Large"),
+				N_("Small"), N_("Automatic")};
+	const DisplayStyle sizes[] = {HUGE_ICONS, LARGE_ICONS,
+				      SMALL_ICONS, AUTO_SIZE_ICONS};
 
 	bev = (GdkEventButton *) gtk_get_current_event();
+	if (bev->type != GDK_BUTTON_PRESS)
+	{
+		if (bev->button != 1)
+			display_set_layout(filer_window, AUTO_SIZE_ICONS,
+					   filer_window->details_type);
+		return;
+	}
 
-	display_change_size(filer_window, 
-		bev->type == GDK_BUTTON_RELEASE && bev->button == 1);
+	menu = gtk_menu_new();
+
+	for (i = 0; i < G_N_ELEMENTS(names); i++)
+	{
+		DisplayStyle size = sizes[i];
+		GtkWidget *item;
+
+		item = gtk_radio_menu_item_new_with_label(grp, _(names[i]));
+		grp = gtk_radio_menu_item_get_group(GTK_RADIO_MENU_ITEM(item));
+
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		if (size == filer_window->display_style_wanted)
+		{
+			start = i;
+			gtk_check_menu_item_set_active(
+					GTK_CHECK_MENU_ITEM(item), TRUE);
+		}
+
+		g_signal_connect(item, "activate",
+				 G_CALLBACK(set_size), filer_window);
+		g_object_set_data(G_OBJECT(item), "rox-icon-size",
+				  GINT_TO_POINTER(size));
+	}
+
+	show_popup_menu(menu, (GdkEvent *) bev, start);
 }
 
 static void toolbar_details_clicked(GtkWidget *widget,

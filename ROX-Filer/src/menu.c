@@ -414,27 +414,6 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
-#if 0
-/* Used when you menu-click on the Large or Small toolbar tools */
-void show_style_menu(FilerWindow *filer_window,
-			GdkEventButton *event,
-			GtkWidget *menu)
-{
-	int		pos[3];
-
-	pos[0] = event->x_root;
-	pos[1] = event->y_root;
-	pos[2] = 0;
-
-	window_with_focus = filer_window;
-
-	popup_menu = menu;
-	
-	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
-			(gpointer) pos, event->button, event->time);
-}
-#endif
-
 static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 			    MenuIconStyle style, CallbackFn func,
 			    gboolean separator, gboolean strip_ext,

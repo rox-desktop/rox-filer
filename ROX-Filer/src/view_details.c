@@ -71,6 +71,7 @@ struct _ViewItem {
 	GdkPixbuf *image;
 	int	old_pos;	/* Used while sorting */
 	gboolean selected;
+	gchar   *utf8_name;	/* NULL => leafname is valid */
 };
 
 typedef struct _ViewDetails ViewDetails;
@@ -156,6 +157,7 @@ static gboolean details_has_default_sort_func(GtkTreeSortable *sortable);
 static void view_details_sortable_init(GtkTreeSortableIface *iface);
 static void set_selected(ViewDetails *view_details, int i, gboolean selected);
 static gboolean get_selected(ViewDetails *view_details, int i);
+static void free_view_item(ViewItem *view_item);
 
 
 /****************************************************************
@@ -302,7 +304,9 @@ static void details_get_value(GtkTreeModel *tree_model,
 	if (column == COL_LEAF)
 	{
 		g_value_init(value, G_TYPE_STRING);
-		g_value_set_string(value, item->leafname);
+		g_value_set_string(value,
+			view_item->utf8_name ? view_item->utf8_name
+					     : item->leafname);
 		return;
 	}
 	else if (column == COL_ITEM)
@@ -342,7 +346,17 @@ static void details_get_value(GtkTreeModel *tree_model,
 			break;
 		case COL_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
-			g_value_set_boxed(value, type_get_colour(item, NULL));
+			if (view_item->utf8_name)
+			{
+				GdkColor red;
+				red.red = 0xffff;
+				red.green = 0;
+				red.blue = 0;
+				g_value_set_boxed(value, &red);
+			}
+			else
+				g_value_set_boxed(value,
+						  type_get_colour(item, NULL));
 			break;
 		case COL_BG_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
@@ -714,6 +728,24 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->expose_event = view_details_expose;
 }
 
+static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
+			    ViewDetails *view_details)
+{
+	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
+	return FALSE;
+}
+
+#define ADD_TEXT_COLUMN(name, model_column) \
+	cell = gtk_cell_renderer_text_new();	\
+	column = gtk_tree_view_column_new_with_attributes(name, cell, \
+					    "text", model_column,	\
+					    "foreground-gdk", COL_COLOUR, \
+					    "background-gdk", COL_BG_COLOUR, \
+					    NULL);			\
+	gtk_tree_view_append_column(treeview, column);			\
+	g_signal_connect(column->button, "grab-focus",			\
+			G_CALLBACK(block_focus), view_details);
+
 static void view_details_init(GTypeInstance *object, gpointer gclass)
 {
 	GtkTreeView *treeview = (GtkTreeView *) object;
@@ -746,73 +778,18 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 					    NULL);
 	gtk_tree_view_append_column(treeview, column);
 
-	/* Name */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Name"), cell,
-					    "text", COL_LEAF,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("_Name"), COL_LEAF);
 	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
-
-	/* Type */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Type"), cell,
-					    "text", COL_TYPE,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("_Type"), COL_TYPE);
 	gtk_tree_view_column_set_sort_column_id(column, COL_TYPE);
-
-	/* Perm */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Permissions"),
-					cell, "text", COL_PERM,
-					"foreground-gdk", COL_COLOUR,
-					"background-gdk", COL_BG_COLOUR,
-					NULL);
-	gtk_tree_view_append_column(treeview, column);
-
-	/* Owner */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Owner"), cell,
-					    "text", COL_OWNER,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("_Permissions"), COL_PERM);
+	ADD_TEXT_COLUMN(_("_Owner"), COL_OWNER);
 	gtk_tree_view_column_set_sort_column_id(column, COL_OWNER);
-
-	/* Group */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Group"), cell,
-					    "text", COL_GROUP,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("_Group"), COL_GROUP);
 	gtk_tree_view_column_set_sort_column_id(column, COL_GROUP);
-
-	/* Size */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_Size"), cell,
-					    "text", COL_SIZE,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("_Size"), COL_SIZE);
 	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
-
-	/* MTime */
-	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("_M-Time"), cell,
-					    "text", COL_MTIME,
-					    "foreground-gdk", COL_COLOUR,
-					    "background-gdk", COL_BG_COLOUR,
-					    NULL);
-	gtk_tree_view_append_column(treeview, column);
+	ADD_TEXT_COLUMN(_("Last _Modified"), COL_MTIME);
 	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
 
 	gtk_widget_set_size_request(GTK_WIDGET(treeview), -1, 50);
@@ -947,6 +924,10 @@ static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
 		vitem->item = item;
 		vitem->image = NULL;
 		vitem->selected = FALSE;
+		if (!g_utf8_validate(leafname, -1, NULL))
+			vitem->utf8_name = to_utf8(leafname);
+		else
+			vitem->utf8_name = NULL;
 		
 		g_ptr_array_add(items, vitem);
 
@@ -1062,7 +1043,7 @@ static void view_details_delete_if(ViewIface *view,
 
 		if (test(item->item, data))
 		{
-			g_free(items->pdata[i]);
+			free_view_item(items->pdata[i]);
 			g_ptr_array_remove_index(items, i);
 			gtk_tree_model_row_deleted(model, path);
 		}
@@ -1473,4 +1454,10 @@ static void make_iter(ViewDetails *view_details, ViewIter *iter,
 	}
 	else
 		iter->n_remaining = view_details->items->len;
+}
+
+static void free_view_item(ViewItem *view_item)
+{
+	g_free(view_item->utf8_name);
+	g_free(view_item);
 }
