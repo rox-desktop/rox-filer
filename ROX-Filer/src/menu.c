@@ -816,7 +816,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 							item->leafname);
 				shade_file_menu_items(FALSE);
 				file_item = filer_selected_item(filer_window);
-				g_string_printf(buffer, "%s '%s'",
+				g_string_printf(buffer, _("%s '%s'"),
 					basetype_name(file_item),
 					g_utf8_validate(file_item->leafname,
 							-1, NULL)
