@@ -118,11 +118,6 @@ static void draw_string(GtkWidget *widget,
 		GtkStateType selection_state,
 		gboolean selected,
 		gboolean box);
-static void draw_small_icon(GtkWidget *widget,
-			    GdkRectangle *area,
-			    DirItem  *item,
-			    MaskedPixmap *image,
-			    gboolean selected);
 static void draw_huge_icon(GtkWidget *widget,
 			   GdkRectangle *area,
 			   DirItem  *item,
@@ -152,19 +147,6 @@ static void selection_changed(Collection *collection,
 			      gpointer user_data);
 static void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		int *width, int *height);
-static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
-			    ViewCollection	*view_collection);
-static void drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
-		       guint32		time,
-		       ViewCollection	*view_collection);
-static void drag_end(GtkWidget *widget,
-		     GdkDragContext *context,
-		     ViewCollection *view_collection);
 static void make_iter(ViewCollection *view_collection, ViewIter *iter,
 		      IterFlags flags);
 static void make_item_iter(ViewCollection *vc, ViewIter *iter, int i);
@@ -330,19 +312,6 @@ static void view_collection_init(GTypeInstance *object, gpointer gclass)
 			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-
-	/* Drag and drop events */
-	g_signal_connect(collection, "drag_data_get",
-			GTK_SIGNAL_FUNC(drag_data_get), NULL);
-
-	make_drop_target(collection, 0);
-
-	g_signal_connect(collection, "drag_motion",
-			G_CALLBACK(drag_motion), view_collection);
-	g_signal_connect(collection, "drag_leave",
-			G_CALLBACK(drag_leave), view_collection);
-	g_signal_connect(collection, "drag_end",
-			G_CALLBACK(drag_end), view_collection);
 }
 
 
@@ -372,7 +341,7 @@ static void draw_item(GtkWidget *widget,
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)
 	{
-		draw_small_icon(widget, &template.icon,
+		draw_small_icon(widget->window, &template.icon,
 				item, view->image, selected);
 	}
 	else if (template.icon.width <= ICON_WIDTH &&
@@ -698,60 +667,6 @@ static void draw_string(GtkWidget *widget,
 				area->x + area->width - 1, area->y,
 				1, area->height);
 		gdk_gc_set_clip_rectangle(gc, NULL);
-	}
-}
-
-static void draw_small_icon(GtkWidget *widget,
-			    GdkRectangle *area,
-			    DirItem  *item,
-			    MaskedPixmap *image,
-			    gboolean selected)
-{
-	int		width, height, image_x, image_y;
-	
-	if (!image)
-		return;
-
-	if (!image->sm_pixbuf)
-		pixmap_make_small(image);
-
-	width = MIN(image->sm_width, SMALL_WIDTH);
-	height = MIN(image->sm_height, SMALL_HEIGHT);
-	image_x = area->x + ((area->width - width) >> 1);
-	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
-		
-	gdk_pixbuf_render_to_drawable_alpha(
-			selected ? image->sm_pixbuf_lit : image->sm_pixbuf,
-			widget->window,
-			0, 0, 				/* src */
-			image_x, area->y + image_y,	/* dest */
-			width, height,
-			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-			GDK_RGB_DITHER_NORMAL, 0, 0);
-
-	if (item->flags & ITEM_FLAG_SYMLINK)
-	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x, area->y + 8,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
-	}
-	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-	{
-		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
-					? im_mounted
-					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x + 2, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 }
 
@@ -1670,140 +1585,4 @@ static void view_collection_start_lasso_box(ViewIface *view,
 	Collection	*collection = view_collection->collection;
 
 	collection_lasso_box(collection, event->x, event->y);
-}
-
-static void drag_end(GtkWidget *widget,
-		     GdkDragContext *context,
-		     ViewCollection *view_collection)
-{
-	if (view_collection->filer_window->temp_item_selected)
-	{
-		view_collection_clear_selection(VIEW(view_collection));
-		view_collection->filer_window->temp_item_selected = FALSE;
-	}
-}
-
-/* Remove highlights */
-static void drag_leave(GtkWidget	*widget,
-                       GdkDragContext	*context,
-		       guint32		time,
-		       ViewCollection	*view_collection)
-{
-	dnd_spring_abort();
-#if 0
-	if (scrolled_adj)
-	{
-		g_signal_handler_disconnect(scrolled_adj, scrolled_signal);
-		scrolled_adj = NULL;
-	}
-#endif
-}
-
-/* Called during the drag when the mouse is in a widget registered
- * as a drop target. Returns TRUE if we can accept the drop.
- */
-static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
-			    ViewCollection	*view_collection)
-{
-	DirItem		*item;
-	int		item_number;
-	GdkDragAction	action = context->suggested_action;
-	const guchar	*new_path = NULL;
-	const char	*type = NULL;
-	gboolean	retval = FALSE;
-	Collection	*collection = view_collection->collection;
-
-	if (o_dnd_drag_to_icons.int_value)
-		item_number = collection_get_item(collection, x, y);
-	else
-		item_number = -1;
-
-	item = item_number >= 0
-		? (DirItem *) collection->items[item_number].data
-		: NULL;
-
-	if (item && collection->items[item_number].selected)
-		type = NULL;
-	else
-		type = dnd_motion_item(context, &item);
-
-	if (!type)
-		item = NULL;
-
-	/* Don't allow drops to non-writeable directories. BUT, still
-	 * allow drops on non-writeable SUBdirectories so that we can
-	 * do the spring-open thing.
-	 */
-	if (item && type == drop_dest_dir &&
-			!(item->flags & ITEM_FLAG_APPDIR))
-	{
-#if 0
-		/* XXX: This is needed so that directories don't
-		 * spring open while we scroll. Should go in
-		 * view_collection.c, I think.
-		 */
-
-		/* XXX: Now it IS in view_collection, maybe we should
-		 * fix it?
-		 */
-		
-		GtkObject *vadj = GTK_OBJECT(collection->vadj);
-
-		/* Subdir: prepare for spring-open */
-		if (scrolled_adj != vadj)
-		{
-			if (scrolled_adj)
-				gtk_signal_disconnect(scrolled_adj,
-							scrolled_signal);
-			scrolled_adj = vadj;
-			scrolled_signal = gtk_signal_connect(
-						scrolled_adj,
-						"value_changed",
-						GTK_SIGNAL_FUNC(scrolled),
-						collection);
-		}
-#endif
-		dnd_spring_load(context, view_collection->filer_window);
-	}
-	else
-		dnd_spring_abort();
-
-	if (item)
-	{
-		collection_set_cursor_item(collection,
-				item_number);
-	}
-	else
-	{
-		collection_set_cursor_item(collection, -1);
-
-		/* Disallow background drops within a single window */
-		if (type && gtk_drag_get_source_widget(context) == widget)
-			type = NULL;
-	}
-
-	if (type)
-	{
-		if (item)
-			new_path = make_path(
-					view_collection->filer_window->sym_path,
-					item->leafname);
-		else
-			new_path = view_collection->filer_window->sym_path;
-	}
-
-	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
-	if (type)
-	{
-		gdk_drag_status(context, action, time);
-		g_dataset_set_data_full(context, "drop_dest_path",
-					g_strdup(new_path), g_free);
-		retval = TRUE;
-	}
-
-	return retval;
 }

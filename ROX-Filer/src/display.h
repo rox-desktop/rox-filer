@@ -65,5 +65,7 @@ void display_update_view(FilerWindow *filer_window,
 			 ViewData *view,
 			 gboolean update_name_layout);
 void display_update_views(FilerWindow *filer_window);
+void draw_small_icon(GdkWindow *window, GdkRectangle *area,
+		     DirItem  *item, MaskedPixmap *image, gboolean selected);
 
 #endif /* _DISPLAY_H */

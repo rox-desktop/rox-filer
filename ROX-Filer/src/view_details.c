@@ -42,6 +42,7 @@
 #include "gui_support.h"
 #include "menu.h"
 #include "options.h"
+#include "cell_icon.h"
 
 /* These are the column numbers in the ListStore */
 #define COL_LEAF 0
@@ -349,7 +350,7 @@ static void details_get_value(GtkTreeModel *tree_model,
 			g_value_init(value, GDK_TYPE_COLOR);
 			g_value_set_boxed(value, view_item->selected
 					? &style->base[GTK_STATE_SELECTED]
-					: &style->base[GTK_STATE_NORMAL]);
+					: NULL);
 			break;
 		case COL_OWNER:
 			g_value_init(value, G_TYPE_STRING);
@@ -692,9 +693,11 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(view_details));
 
 	/* Icon */
-	cell = gtk_cell_renderer_pixbuf_new();
+	cell = cell_icon_new();
 	column = gtk_tree_view_column_new_with_attributes(NULL, cell,
-					    "pixbuf", COL_ICON, NULL);
+					    "item", COL_ITEM,
+					    "background-gdk", COL_BG_COLOUR,
+					    NULL);
 	gtk_tree_view_append_column(treeview, column);
 
 	/* Name */

@@ -103,6 +103,18 @@ static void filer_next_thumb(GObject *window, const gchar *path);
 static void start_thumb_scanning(FilerWindow *filer_window);
 static void filer_options_changed(void);
 static void set_style_by_number_of_items(FilerWindow *filer_window);
+static void drag_end(GtkWidget *widget, GdkDragContext *context,
+		     FilerWindow *filer_window);
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       FilerWindow	*filer_window);
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    FilerWindow		*filer_window);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -1257,6 +1269,18 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 	gtk_box_pack_start(filer_window->toplevel_vbox, view, TRUE, TRUE, 0);
 	gtk_widget_show(view);
 
+	/* Drag and drop events */
+	make_drop_target(view, 0);
+	g_signal_connect(view, "drag_motion",
+			G_CALLBACK(drag_motion), filer_window);
+	g_signal_connect(view, "drag_leave",
+			G_CALLBACK(drag_leave), filer_window);
+	g_signal_connect(view, "drag_end",
+			G_CALLBACK(drag_end), filer_window);
+	/* Dragging from us... */
+	g_signal_connect(view, "drag_data_get",
+			GTK_SIGNAL_FUNC(drag_data_get), NULL);
+
 	if (dir)
 	{
 		/* Only when changing type. Otherwise, will attach later. */
@@ -2188,3 +2212,132 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 	return FALSE;
 }
 
+static void drag_end(GtkWidget *widget, GdkDragContext *context,
+		     FilerWindow *filer_window)
+{
+	if (filer_window->temp_item_selected)
+	{
+		view_clear_selection(filer_window->view);
+		filer_window->temp_item_selected = FALSE;
+	}
+}
+
+/* Remove highlights */
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       FilerWindow	*filer_window)
+{
+	dnd_spring_abort();
+#if 0
+	if (scrolled_adj)
+	{
+		g_signal_handler_disconnect(scrolled_adj, scrolled_signal);
+		scrolled_adj = NULL;
+	}
+#endif
+}
+
+/* Called during the drag when the mouse is in a widget registered
+ * as a drop target. Returns TRUE if we can accept the drop.
+ */
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    FilerWindow		*filer_window)
+{
+	DirItem		*item;
+	ViewIface	*view = filer_window->view;
+	ViewIter	iter;
+	GdkDragAction	action = context->suggested_action;
+	const guchar	*new_path = NULL;
+	const char	*type = NULL;
+	gboolean	retval = FALSE;
+
+	if (o_dnd_drag_to_icons.int_value)
+	{
+		view_get_iter_at_point(view, &iter, x, y);
+		item = iter.peek(&iter);
+	}
+	else
+		item = NULL;
+
+	if (item && view_get_selected(view, &iter))
+		type = NULL;
+	else
+		type = dnd_motion_item(context, &item);
+
+	if (!type)
+		item = NULL;
+
+	/* Don't allow drops to non-writeable directories. BUT, still
+	 * allow drops on non-writeable SUBdirectories so that we can
+	 * do the spring-open thing.
+	 */
+	if (item && type == drop_dest_dir &&
+			!(item->flags & ITEM_FLAG_APPDIR))
+	{
+#if 0
+		/* XXX: This is needed so that directories don't
+		 * spring open while we scroll. Should go in
+		 * view_collection.c, I think.
+		 */
+
+		/* XXX: Now it IS in view_collection, maybe we should
+		 * fix it?
+		 */
+		
+		GtkObject *vadj = GTK_OBJECT(collection->vadj);
+
+		/* Subdir: prepare for spring-open */
+		if (scrolled_adj != vadj)
+		{
+			if (scrolled_adj)
+				gtk_signal_disconnect(scrolled_adj,
+							scrolled_signal);
+			scrolled_adj = vadj;
+			scrolled_signal = gtk_signal_connect(
+						scrolled_adj,
+						"value_changed",
+						GTK_SIGNAL_FUNC(scrolled),
+						collection);
+		}
+#endif
+		dnd_spring_load(context, filer_window);
+	}
+	else
+		dnd_spring_abort();
+
+	if (item)
+		view_cursor_to_iter(view, &iter);
+	else
+	{
+		view_cursor_to_iter(view, NULL);
+
+		/* Disallow background drops within a single window */
+		if (type && gtk_drag_get_source_widget(context) == widget)
+			type = NULL;
+	}
+
+	if (type)
+	{
+		if (item)
+			new_path = make_path(filer_window->sym_path,
+					     item->leafname);
+		else
+			new_path = filer_window->sym_path;
+	}
+
+	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
+	if (type)
+	{
+		gdk_drag_status(context, action, time);
+		g_dataset_set_data_full(context, "drop_dest_path",
+					g_strdup(new_path), g_free);
+		retval = TRUE;
+	}
+
+	return retval;
+}

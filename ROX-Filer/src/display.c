@@ -161,6 +161,57 @@ void draw_large_icon(GtkWidget *widget,
 	}
 }
 
+void draw_small_icon(GdkWindow *window, GdkRectangle *area,
+		     DirItem  *item, MaskedPixmap *image, gboolean selected)
+{
+	int		width, height, image_x, image_y;
+	
+	if (!image)
+		return;
+
+	if (!image->sm_pixbuf)
+		pixmap_make_small(image);
+
+	width = MIN(image->sm_width, SMALL_WIDTH);
+	height = MIN(image->sm_height, SMALL_HEIGHT);
+	image_x = area->x + ((area->width - width) >> 1);
+	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
+		
+	gdk_pixbuf_render_to_drawable_alpha(
+			selected ? image->sm_pixbuf_lit : image->sm_pixbuf,
+			window,
+			0, 0, 				/* src */
+			image_x, area->y + image_y,	/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
+
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				window,
+				0, 0, 				/* src */
+				image_x, area->y + 8,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
+
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				window,
+				0, 0, 				/* src */
+				image_x + 2, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
+}
+
 /* The sort functions aren't called from outside, but they are
  * passed as arguments to display_set_sort_fn().
  */
