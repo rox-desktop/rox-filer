@@ -86,7 +86,6 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 {
 	AppInfo	*ai;
 	struct _xmlNode	*node;
-	guchar	*tmp;
 	GList	*next;
 	GtkWidget *sep;
 
@@ -104,7 +103,7 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 	 * (if there are any).
 	 */
 
-	node = appmenu_get_section(ai, "AppMenu");
+	node = appinfo_get_section(ai, "AppMenu");
 	if (!node)
 		return;
 

@@ -30,6 +30,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <math.h>
+#include <tree.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -54,6 +55,7 @@
 #include "icon.h"
 #include "toolbar.h"
 #include "bind.h"
+#include "appinfo.h"
 
 #define PANEL_BORDER 2
 
@@ -1676,6 +1678,9 @@ static void tip_destroyed(gpointer data)
 	time(&tip_time);
 }
 
+/* It's time to make the tooltip appear. If we're not over the item any
+ * more, or the item doesn't need a tooltip, do nothing.
+ */
 static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 {
 	GtkWidget *label;
@@ -1683,6 +1688,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	gint 	x, y, py;
 	int	w, h;
 	int	i;
+	GString	*tip = NULL;
 
 	g_return_val_if_fail(tip_item != NULL, 0);
 
@@ -1704,8 +1710,37 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	/* OK, the filer window still exists and the pointer is still
 	 * over the same item. Do we need to show a tip?
 	 */
-	if (!display_is_truncated(filer_window, i))
-		goto out;
+
+	tip = g_string_new(NULL);
+
+	if (display_is_truncated(filer_window, i))
+	{
+		g_string_append(tip, tip_item->leafname);
+		g_string_append_c(tip, '\n');
+	}
+	
+	if (tip_item->flags & ITEM_FLAG_APPDIR)
+	{
+		AppInfo *info;
+		struct _xmlNode *node;
+
+		info = appinfo_get(make_path(filer_window->path,
+					tip_item->leafname)->str, tip_item);
+		if (info && ((node = appinfo_get_section(info, "Summary"))))
+		{
+			guchar *str;
+			str = xmlNodeListGetString(node->doc,
+					node->xmlChildrenNode, 1);
+			g_string_append(tip, str);
+			g_string_append_c(tip, '\n');
+			g_free(str);
+		}
+	}
+
+	if (tip->len < 2)
+		goto out;	/* Nothing to display */
+
+	g_string_truncate(tip, tip->len - 1);
 	
 	/* Show the tip */
 	tip_widget = gtk_window_new(GTK_WINDOW_POPUP);
@@ -1719,7 +1754,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(filer_tooltip_draw),
 			(GtkObject *) tip_widget);
 
-	label = gtk_label_new(tip_item->leafname);
+	label = gtk_label_new(tip->str);
 	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
 	gtk_container_add(GTK_CONTAINER(tip_widget), label);
 	gtk_widget_show(label);
@@ -1746,6 +1781,8 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	time(&tip_time);
 
 out:
+	if (tip)
+		g_string_free(tip, TRUE);
 	tip_timeout = 0;
 	return FALSE;
 }

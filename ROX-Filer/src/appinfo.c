@@ -115,7 +115,7 @@ void appinfo_unref(AppInfo *info)
  *
  * Returns an _xmlNode or NULL if there isn't one.
  */
-struct _xmlNode *appmenu_get_section(AppInfo *ai, guchar *name)
+struct _xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
 {
 	struct _xmlNode *node;
 
