@@ -111,12 +111,19 @@ static void remove_lasso_box(Collection *collection);
 static void draw_lasso_box(Collection *collection);
 static int item_at_row_col(Collection *collection, int row, int col);
 static void collection_clear_except(Collection *collection, gint exception);
+static void cancel_wink(Collection *collection);
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 {
 	collection->draw_item((GtkWidget *) collection,
 			&collection->items[item],
 			area);
+	if (item == collection->wink_item)
+		gdk_draw_rectangle(((GtkWidget *) collection)->window,
+				   ((GtkWidget *) collection)->style->black_gc,
+				   FALSE,
+				   area->x + 1, area->y + 1,
+				   area->width - 3, area->height - 3);
 	if (item == collection->cursor_item)
 		gdk_draw_rectangle(((GtkWidget *) collection)->window,
 				   ((GtkWidget *) collection)->style->black_gc,
@@ -249,6 +256,7 @@ static void collection_init(Collection *object)
 
 	object->items = g_malloc(sizeof(CollectionItem) * MINIMUM_ITEMS);
 	object->cursor_item = -1;
+	object->wink_item = -1;
 	object->array_size = MINIMUM_ITEMS;
 	object->draw_item = default_draw_item;
 	object->test_point = default_test_point;
@@ -306,6 +314,12 @@ static void collection_destroy(GtkObject *object)
 	g_return_if_fail(IS_COLLECTION(object));
 
 	collection = COLLECTION(object);
+
+	if (collection->wink_item != -1)
+	{
+		collection->wink_item = -1;
+		gtk_timeout_remove(collection->wink_timeout);
+	}
 
 	gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
 			collection);
@@ -1266,6 +1280,40 @@ static void collection_clear_except(Collection *collection, gint exception)
 				current_event_time);
 }
 
+/* Cancel the current wink effect. */
+void cancel_wink(Collection *collection)
+{
+	gint	item;
+	
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(collection->wink_item != -1);
+
+	item = collection->wink_item;
+
+	collection->wink_item = -1;
+	gtk_timeout_remove(collection->wink_timeout);
+
+	collection_draw_item(collection, item, TRUE);
+}
+
+gboolean cancel_wink_timeout(Collection *collection)
+{
+	gint	item;
+	
+	g_return_val_if_fail(collection != NULL, FALSE);
+	g_return_val_if_fail(IS_COLLECTION(collection), FALSE);
+	g_return_val_if_fail(collection->wink_item != -1, FALSE);
+
+	item = collection->wink_item;
+
+	collection->wink_item = -1;
+
+	collection_draw_item(collection, item, TRUE);
+
+	return FALSE;
+}
+
 /* Functions for managing collections */
 
 /* Remove all objects from the collection */
@@ -1274,9 +1322,15 @@ void collection_clear(Collection *collection)
 	int	prev_selected;
 
 	g_return_if_fail(IS_COLLECTION(collection));
-	
+
 	if (collection->number_of_items == 0)
 		return;
+
+	if (collection->wink_item != -1)
+	{
+		collection->wink_item = -1;
+		gtk_timeout_remove(collection->wink_timeout);
+	}
 
 	collection_set_cursor_item(collection, -1);
 	prev_selected = collection->number_selected;
@@ -1488,7 +1542,7 @@ void collection_set_item_size(Collection *collection, int width, int height)
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(width > 0 && height > 0);
+	g_return_if_fail(width > 4 && height > 4);
 
 	widget = GTK_WIDGET(collection);
 
@@ -1515,6 +1569,12 @@ void collection_qsort(Collection *collection,
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(compar != NULL);
+
+	if (collection->wink_item != -1)
+	{
+		collection->wink_item = -1;
+		gtk_timeout_remove(collection->wink_timeout);
+	}
 	
 	qsort(collection->items, collection->number_of_items,
 			sizeof(collection->items[0]), compar); 
@@ -1524,9 +1584,8 @@ void collection_qsort(Collection *collection,
 	gtk_widget_queue_draw(GTK_WIDGET(collection));
 }
 
-/* Find an item in a sorted collection.
+/* Find an item in an unsorted collection.
  * Returns the item number, or -1 if not found.
- * XXX: Make this efficient!!!
  */
 int collection_find_item(Collection *collection, gpointer data,
 		         int (*compar)(const void *, const void *))
@@ -1626,6 +1685,31 @@ void collection_set_cursor_item(Collection *collection, gint item)
 		collection_draw_item(collection, item, TRUE);
 }
 
+/* Briefly highlight an item to draw the user's attention to it.
+ * -1 cancels the effect, as does deleting items, sorting the collection
+ * or starting a new wink effect.
+ * Otherwise, the effect will cancel itself after a short pause.
+ * */
+void collection_wink_item(Collection *collection, gint item)
+{
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(item >= -1 && item < collection->number_of_items);
+
+	if (collection->wink_item != -1)
+		cancel_wink(collection);
+	if (item == -1)
+		return;
+
+	collection->wink_item = item;
+	collection->wink_timeout = gtk_timeout_add(200,
+					   (GtkFunction) cancel_wink_timeout,
+					   collection);
+	collection_draw_item(collection, item, TRUE);
+
+	gdk_flush();
+}
+
 /* Call test(item, data) on each item in the collection.
  * Remove all items for which it returns TRUE. test() should
  * free the data before returning TRUE. The collection is in an
@@ -1661,6 +1745,12 @@ void collection_delete_if(Collection *collection,
 
 	if (in != out)
 	{
+		if (collection->wink_item != -1)
+		{
+			collection->wink_item = -1;
+			gtk_timeout_remove(collection->wink_timeout);
+		}
+		
 		collection->number_of_items = out;
 		collection->number_selected = selected;
 		resize_arrays(collection,

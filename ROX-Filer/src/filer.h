@@ -78,7 +78,6 @@ void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
 void update_dir(FilerWindow *filer_window);
 void scan_dir(FilerWindow *filer_window);
-void panel_set_timeout(FilerWindow *filer_window, gulong msec);
 FileItem *selected_item(Collection *collection);
 void refresh_dirs(char *path);
 

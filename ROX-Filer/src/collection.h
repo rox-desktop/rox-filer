@@ -74,7 +74,9 @@ struct _Collection
 	gboolean	may_drag;	/* Tried to drag since first press? */
 
 	CollectionItem	*items;
-	guint		cursor_item;	/* -1 if not shown */
+	gint		cursor_item;	/* -1 if not shown */
+	gint		wink_item;	/* -1 if not active */
+	gint		wink_timeout;
 	guint		columns;
 	guint		number_of_items;
 	guint		item_width, item_height;
@@ -131,6 +133,7 @@ void 	collection_set_panel		(Collection *collection,
 					 gboolean panel);
 int 	collection_get_item		(Collection *collection, int x, int y);
 void 	collection_set_cursor_item	(Collection *collection, gint item);
+void 	collection_wink_item		(Collection *collection, gint item);
 void 	collection_delete_if		(Collection *collection,
 			  		 gboolean (*test)(gpointer item,
 						          gpointer data),

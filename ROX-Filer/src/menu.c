@@ -332,10 +332,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	}
 
 	if (filer_window->panel)
-	{
-		collection_clear_selection(filer_window->collection);
-		panel_set_timeout(NULL, 0);
-	}
+		collection_clear_selection(filer_window->collection); /* ??? */
 
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{

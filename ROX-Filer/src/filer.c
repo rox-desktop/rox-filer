@@ -40,8 +40,6 @@ FilerWindow 	*window_with_focus = NULL;
 GHashTable	*path_to_window_list = NULL;
 
 static FilerWindow *window_with_selection = NULL;
-static FilerWindow *panel_with_timeout = NULL;
-static gint panel_timeout;
 
 /* Static prototypes */
 static void filer_window_destroyed(GtkWidget    *widget,
@@ -154,12 +152,6 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		window_with_selection = NULL;
 	if (window_with_focus == filer_window)
 		window_with_focus = NULL;
-	if (panel_with_timeout == filer_window)
-	{
-		/* Can this happen? */
-		panel_with_timeout = NULL;
-		gtk_timeout_remove(panel_timeout);
-	}
 
 	remove_view(filer_window);
 
@@ -359,19 +351,22 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 					 filer_window->collection->item_height);
 
 	old_item = collection_find_item(filer_window->collection, item,
-			filer_window->sort_fn);
+			sort_by_name);
 
 	if (old_item >= 0)
 	{
-		free_item((FileItem *)
-				filer_window->collection->items[old_item].data);
-		filer_window->collection->items[old_item].data = item;
+		CollectionItem *old =
+			&filer_window->collection->items[old_item];
+
+		free_item((FileItem *) old->data);
+		old->data = item;
 		collection_draw_item(filer_window->collection, old_item, TRUE);
 	}
 	else
 		collection_insert(filer_window->collection, item);
 }
 
+/* Is a point inside an item? */
 static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *colitem,
@@ -380,18 +375,22 @@ static gboolean test_point(Collection *collection,
 	FileItem	*item = (FileItem *) colitem->data;
 	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	int		text_height = font->ascent + font->descent;
-	int		x_off = ABS(point_x - (width >> 1));
 	int		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
-	
-	if (x_off <= (item->pix_width >> 1) + 2 &&
-		point_y >= image_y && point_y <= image_y + item->pix_height)
-		return TRUE;
-	
-	if (x_off <= (item->text_width >> 1) + 2 &&
-		point_y > height - text_height - 2)
-		return TRUE;
+	int		image_width = (item->pix_width >> 1) + 2;
+	int		text_width = (item->text_width >> 1) + 2;
+	int		x_limit;
 
-	return FALSE;
+	if (point_y < image_y)
+		return FALSE;	/* Too high up (don't worry about too low) */
+
+	if (point_y <= image_y + item->pix_height + 2)
+		x_limit = image_width;
+	else if (point_y > height - text_height - 2)
+		x_limit = text_width;
+	else
+		x_limit = MIN(image_width, text_width);
+	
+	return ABS(point_x - (width >> 1)) < x_limit;
 }
 
 static void draw_item(GtkWidget *widget,
@@ -539,12 +538,6 @@ void update_dir(FilerWindow *filer_window)
 	}
 	filer_window->flags &= ~FILER_NEEDS_RESCAN;
 	filer_window->flags |= FILER_UPDATING;
-
-	if (panel_with_timeout == filer_window)
-	{
-		panel_with_timeout = NULL;
-		gtk_timeout_remove(panel_timeout);
-	}
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
@@ -713,34 +706,6 @@ static int sort_by_type(const void *item1, const void *item2)
 	return sort_by_name(item1, item2);
 }
 
-static gint clear_panel_hilight(gpointer data)
-{
-	collection_set_cursor_item(panel_with_timeout->collection, -1);
-	panel_with_timeout = NULL;
-
-	return FALSE;
-}
-
-/* It is possible to highlight an item briefly on a panel by calling this
- * function.
- */
-void panel_set_timeout(FilerWindow *filer_window, gulong msec)
-{
-	if (panel_with_timeout)
-	{
-		/* Can't have two timeouts at once */
-		gtk_timeout_remove(panel_timeout);
-		clear_panel_hilight(NULL);
-	}
-
-	if (filer_window)
-	{
-		panel_with_timeout = filer_window;
-		panel_timeout = gtk_timeout_add(msec,
-					clear_panel_hilight, NULL);
-	}
-}
-
 void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data)
@@ -755,13 +720,7 @@ void open_item(Collection *collection,
 	event = (GdkEventButton *) gtk_get_current_event();
 	full_path = make_path(filer_window->path, item->leafname)->str;
 
-	if (filer_window->panel)
-	{
-		panel_set_timeout(NULL, 0);
-		collection_set_cursor_item(collection, item_number);
-		gdk_flush();
-		panel_set_timeout(filer_window, 200);
-	}
+	collection_wink_item(filer_window->collection, item_number);
 
 	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS)
 	{

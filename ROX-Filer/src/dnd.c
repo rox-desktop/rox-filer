@@ -509,8 +509,6 @@ static gboolean panel_drag_ok(FilerWindow 	*filer_window,
 	char	 	*new_path;
 	char		*type;
 
-	panel_set_timeout(NULL, 0);
-
 	if (item >= 0)
 		fileitem = (FileItem *)
 			filer_window->collection->items[item].data;
@@ -615,7 +613,6 @@ static void drag_leave(GtkWidget		*widget,
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
 
-	panel_set_timeout(NULL, 0);
 	collection_set_cursor_item(filer_window->collection, -1);
 }
 
