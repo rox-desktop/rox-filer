@@ -30,6 +30,8 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
+#include "global.h"
+
 #include "collection.h"
 
 #define MIN_WIDTH 80

@@ -30,8 +30,12 @@
 #include <unistd.h>
 #include <fnmatch.h>
 #include <parser.h>
+#include <time.h>
 
 #include "global.h"
+
+#include "fscache.h"
+#include "diritem.h"
 #include "dir.h"
 #include "gui_support.h"
 #include "choices.h"

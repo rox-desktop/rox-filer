@@ -36,11 +36,11 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
-#include "collection.h"
 
 #include "global.h"
 
 #include "main.h"
+#include "collection.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -54,6 +54,7 @@
 #include "action.h"
 #include "minibuffer.h"
 #include "dir.h"
+#include "diritem.h"
 
 #define ROW_HEIGHT_SMALL 20
 #define ROW_HEIGHT_FULL_INFO 44

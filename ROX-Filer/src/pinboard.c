@@ -42,7 +42,7 @@
 #include "support.h"
 #include "gui_support.h"
 #include "options.h"
-#include "dir.h"
+#include "diritem.h"
 #include "bind.h"
 #include "icon.h"
 #include "run.h"
@@ -278,8 +278,6 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 
 	icon_hash_path(icon);
 
-	diritem_stat(icon->path, &icon->item, FALSE);
-
 	if (!name)
 	{
 		name = strrchr(icon->path, '/');
@@ -289,7 +287,8 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 			name = icon->path;
 	}
 
-	icon->item.leafname = g_strdup(name);
+	icon->item = diritem_new(name);
+	diritem_restat(icon->path, icon->item, FALSE);
 
 	icon->win = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);
@@ -312,7 +311,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	if (corner)
 	{
 		/* Convert from icon-corner coordinates to center coordinates */
-		MaskedPixmap	*image = icon->item.image;
+		MaskedPixmap	*image = icon->item->image;
 
 		offset_to_centre(icon, image->width >> 1, height, &x, &y);
 	}
@@ -504,10 +503,10 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 {
 	int		width, height;
 	int		font_height;
-	MaskedPixmap	*image = icon->item.image;
+	MaskedPixmap	*image = icon->item->image;
 	int		iwidth = image->width;
 	int		iheight = image->height;
-	DirItem		*item = &icon->item;
+	DirItem		*item = icon->item;
 	int		text_x, text_y;
 #ifndef GTK2
 	GdkFont		*font;
@@ -530,7 +529,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 #else
 	{
 		PangoRectangle logical;
-		pango_layout_set_text(icon->layout, icon->item.leafname, -1);
+		pango_layout_set_text(icon->layout, icon->item->leafname, -1);
 		pango_layout_get_pixel_extents(icon->layout, NULL, &logical);
 
 		item->name_width = logical.width - logical.x;
@@ -641,7 +640,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	GdkFont		*font = icon->widget->style->font;
 #endif
 	int		text_x, text_y;
-	DirItem		*item = &icon->item;
+	DirItem		*item = icon->item;
 	MaskedPixmap	*image = item->image;
 	int		iwidth = image->width;
 	int		iheight = image->height;
@@ -809,12 +808,12 @@ static void perform_action(Icon *icon, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			pinboard_wink_item(icon, TRUE);
-			run_diritem(icon->path, &icon->item, NULL, NULL, FALSE);
+			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
 			pinboard_wink_item(icon, TRUE);
-			run_diritem(icon->path, &icon->item, NULL, NULL, TRUE);
+			run_diritem(icon->path, icon->item, NULL, NULL, TRUE);
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
@@ -921,7 +920,7 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	pinboard_drag_in_progress = TRUE;
 
 	if (icon_selection->next == NULL)
-		drag_one_item(widget, event, icon->path, &icon->item);
+		drag_one_item(widget, event, icon->path, icon->item);
 	else
 	{
 		guchar	*uri_list;
@@ -1126,7 +1125,7 @@ void pinboard_save(void)
 		Icon *icon = (Icon *) next->data;
 
 		g_string_sprintf(tmp, "<%s>, %d, %d, %s\n",
-			icon->item.leafname, icon->x, icon->y, icon->src_path);
+			icon->item->leafname, icon->x, icon->y, icon->src_path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 			goto err;
 	}
@@ -1276,7 +1275,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 {
 	GdkDragAction	action = context->suggested_action;
 	char		*type = NULL;
-	DirItem		*item = &icon->item;
+	DirItem		*item = icon->item;
 
 	if (gtk_drag_get_source_widget(context) == widget)
 		goto out;	/* Can't drag something to itself! */

@@ -36,7 +36,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk-pixbuf/gdk-pixbuf.h>
-#include "collection.h"
 
 #include "global.h"
 

@@ -40,7 +40,7 @@
 #include "main.h"
 #include "type.h"
 #include "gui_support.h"
-#include "dir.h"
+#include "diritem.h"
 #include "pixmaps.h"
 #include "display.h"
 #include "bind.h"
@@ -289,7 +289,7 @@ gboolean panel_want_show_text(Icon *icon)
 	if (panel_style == SHOW_ICON)
 		return FALSE;
 
-	if (icon->item.flags & ITEM_FLAG_APPDIR)
+	if (icon->item->flags & ITEM_FLAG_APPDIR)
 		return FALSE;
 
 	return TRUE;
@@ -299,7 +299,7 @@ void panel_icon_renamed(Icon *icon)
 {
 	GtkLabel *label = GTK_LABEL(icon->label);
 
-	gtk_label_set_text(label, icon->item.leafname);
+	gtk_label_set_text(label, icon->item->leafname);
 }
 
 
@@ -411,23 +411,23 @@ static void panel_add_item(Panel *panel,
 	icon->widget = widget;
 	gtk_widget_set_name(icon->widget, "panel-icon");
 	icon->selected = FALSE;
-	diritem_stat(icon->path, &icon->item, FALSE);
 
 	if (name)
-		icon->item.leafname = g_strdup(name);
+		icon->item = diritem_new(name);
 	else
 	{
 		guchar	*slash;
 
 		slash = strrchr(icon->path, '/');
-		icon->item.leafname = g_strdup(slash && slash[1] ? slash + 1
+		icon->item = diritem_new(slash && slash[1] ? slash + 1
 								 : path);
 	}
+	diritem_restat(icon->path, icon->item, FALSE);
 	
 	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
 
-	if (icon->item.base_type == TYPE_DIRECTORY)
+	if (icon->item->base_type == TYPE_DIRECTORY)
 		run_applet(icon);
 
 	gtk_signal_connect(GTK_OBJECT(widget), "button_release_event",
@@ -456,7 +456,7 @@ static void panel_add_item(Panel *panel,
 
 		drag_set_panel_dest(icon);
 
-		icon->label = gtk_label_new(icon->item.leafname);
+		icon->label = gtk_label_new(icon->item->leafname);
 		gtk_container_add(GTK_CONTAINER(icon->widget), icon->label);
 		gtk_misc_set_alignment(GTK_MISC(icon->label), 0.5, 1);
 		gtk_misc_set_padding(GTK_MISC(icon->label), 1, 2);
@@ -476,8 +476,8 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 {
 	int	im_width, im_height;
 
-	im_width = icon->item.image->width;
-	im_height = MIN(icon->item.image->height, ICON_HEIGHT);
+	im_width = icon->item->image->width;
+	im_height = MIN(icon->item->image->height, ICON_HEIGHT);
 
 	req->height += im_height;
 	req->width = MAX(req->width, im_width);
@@ -499,7 +499,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 	area.x = 0;
 	area.width = width;
-	area.height = icon->item.image->height;
+	area.height = icon->item->image->height;
 
 	if (panel_want_show_text(icon))
 	{
@@ -507,12 +507,12 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 		area.y = height - text_height - area.height;
 		
-		draw_large_icon(widget, &area, &icon->item, icon->selected);
+		draw_large_icon(widget, &area, icon->item, icon->selected);
 	}
 	else
 	{
 		area.y = (height - area.height) >> 1;
-		draw_large_icon(widget, &area, &icon->item, icon->selected);
+		draw_large_icon(widget, &area, icon->item, icon->selected);
 	}
 
 	return FALSE;
@@ -534,12 +534,12 @@ static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, NULL, FALSE);
+			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, NULL, TRUE);
+			run_diritem(icon->path, icon->item, NULL, NULL, TRUE);
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
@@ -698,7 +698,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 {
 	GdkDragAction	action = context->suggested_action;
 	char		*type = NULL;
-	DirItem		*item = &icon->item;
+	DirItem		*item = icon->item;
 
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */
@@ -831,7 +831,7 @@ static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
 		}
 
 		g_string_sprintf(tmp, "%s%c%s\n",
-				icon->item.leafname,
+				icon->item->leafname,
 				side, icon->src_path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 		{
@@ -1117,7 +1117,7 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	g_return_if_fail(icon_selection != NULL);
 
 	if (icon_selection->next == NULL)
-		drag_one_item(widget, event, icon->path, &icon->item);
+		drag_one_item(widget, event, icon->path, icon->item);
 	else
 	{
 		guchar	*uri_list;

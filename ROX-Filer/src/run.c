@@ -33,9 +33,11 @@
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
+#include "display.h"
 #include "main.h"
 #include "type.h"
 #include "dir.h"
+#include "diritem.h"
 #include "action.h"
 #include "icon.h"
 
@@ -256,12 +258,13 @@ gboolean run_diritem(guchar *full_path,
 gboolean run_by_path(guchar *full_path)
 {
 	gboolean retval;
-	DirItem	item;
+	DirItem	*item;
 
 	/* XXX: Loads an image - wasteful */
-	diritem_stat(full_path, &item, FALSE);
-	retval = run_diritem(full_path, &item, NULL, NULL, FALSE);
-	diritem_clear(&item);
+	item = diritem_new(NULL);
+	diritem_restat(full_path, item, FALSE);
+	retval = run_diritem(full_path, item, NULL, NULL, FALSE);
+	diritem_free(item);
 	
 	return retval;
 }

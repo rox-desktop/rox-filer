@@ -9,7 +9,6 @@
 #define _FILER_H
 
 #include <gtk/gtk.h>
-#include "collection.h"
 
 enum {
 	RESIZE_STYLE = 0,
@@ -30,10 +29,6 @@ typedef enum
 	FILER_NEEDS_RESCAN	= 0x01, /* Call may_rescan after scanning */
 	FILER_UPDATING		= 0x02, /* (scanning) items may already exist */
 } FilerFlags;
-
-#include "mount.h"
-#include "minibuffer.h"
-#include "display.h"
 
 typedef void (*TargetFunc)(FilerWindow *filer_window, int item, gpointer data);
 

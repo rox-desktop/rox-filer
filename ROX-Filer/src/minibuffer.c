@@ -41,9 +41,10 @@
 #include "support.h"
 #include "minibuffer.h"
 #include "filer.h"
+#include "display.h"
 #include "main.h"
 #include "action.h"
-#include "dir.h"
+#include "diritem.h"
 #include "type.h"
 
 static GList *shell_history = NULL;

@@ -37,6 +37,7 @@
 #include "global.h"
 
 #include "string.h"
+#include "fscache.h"
 #include "main.h"
 #include "pixmaps.h"
 #include "run.h"
@@ -44,7 +45,7 @@
 #include "choices.h"
 #include "type.h"
 #include "support.h"
-#include "dir.h"
+#include "diritem.h"
 #include "dnd.h"
 #include "options.h"
 #include "filer.h"
@@ -648,7 +649,7 @@ void drag_app_dropped(GtkWidget		*eb,
 {
 	GList	*uris;
 	guchar	*app = NULL;
-	DirItem	item;
+	DirItem	*item;
 
 	if (!selection_data->data)
 		return; 		/* Timeout? */
@@ -668,8 +669,9 @@ void drag_app_dropped(GtkWidget		*eb,
 		return;
 	}
 
-	diritem_stat(app, &item, FALSE);
-	if (item.flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	item = diritem_new(NULL);
+	diritem_restat(app, item, FALSE);
+	if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		guchar	*path;
 
@@ -691,7 +693,7 @@ void drag_app_dropped(GtkWidget		*eb,
 			_("This is not a program! Give me an application "
 			"instead!"));
 
-	diritem_clear(&item);
+	diritem_free(item);
 }
 
 /* Find the current command which is used to run files of this type.

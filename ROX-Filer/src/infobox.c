@@ -36,7 +36,7 @@
 #include "support.h"
 #include "main.h"
 #include "gui_support.h"
-#include "dir.h"
+#include "diritem.h"
 #include "type.h"
 #include "infobox.h"
 #include "appinfo.h"
@@ -149,23 +149,24 @@ static void refresh_info(GtkObject *window)
 /* Create the VBox widget that contains the details */
 static GtkWidget *make_vbox(guchar *path)
 {
-	DirItem		item;
+	DirItem		*item;
 	GtkWidget	*vbox, *list, *file;
 	AppInfo		*ai;
 	xmlNode 	*about = NULL;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
-	diritem_stat(path, &item, FALSE);
-	item.leafname = strrchr(path, '/') + 1;
+	item = diritem_new(NULL);
+	diritem_restat(path, item, FALSE);
+	item->leafname = strrchr(path, '/') + 1;
 
 	vbox = gtk_vbox_new(FALSE, 4);
 
-	ai = appinfo_get(path, &item);
+	ai = appinfo_get(path, item);
 	if (ai)
 		about = appinfo_get_section(ai, "About");
 
-	list = make_clist(path, &item, about);
+	list = make_clist(path, item, about);
 	gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
 
 	if (!about)
@@ -177,8 +178,8 @@ static GtkWidget *make_vbox(guchar *path)
 	if (ai)
 		appinfo_unref(ai);
 
-	item.leafname = NULL;
-	diritem_clear(&item);
+	item->leafname = NULL;
+	diritem_free(item);
 
 	return vbox;
 }

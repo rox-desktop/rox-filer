@@ -30,6 +30,8 @@
 
 #include "config.h"
 
+#include "global.h"
+
 #include "fscache.h"
 
 #define UPTODATE(data, info)				\

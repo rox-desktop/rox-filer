@@ -14,7 +14,6 @@
 #include <time.h>
 #include <glib.h>
 
-typedef struct _GFSCache GFSCache;
 typedef struct _GFSCacheKey GFSCacheKey;
 typedef struct _GFSCacheData GFSCacheData;
 typedef gpointer (*GFSLoadFunc)(char *pathname, gpointer user_data);

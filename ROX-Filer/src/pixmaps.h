@@ -9,7 +9,6 @@
 #define _PIXMAP_H
 
 #include <gtk/gtk.h>
-#include "fscache.h"
 
 #ifndef GTK2
 # ifndef PIXMAPS_C

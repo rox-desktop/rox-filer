@@ -37,7 +37,6 @@
 #endif
 
 #include <gtk/gtk.h>
-#include "collection.h"
 
 #include "global.h"
 
@@ -54,6 +53,7 @@
 #include "type.h"
 #include "pixmaps.h"
 #include "dir.h"
+#include "diritem.h"
 #include "action.h"
 #include "i18n.h"
 #include "remote.h"
@@ -65,6 +65,7 @@
 #include "appinfo.h"
 #include "panel.h"
 #include "session.h"
+#include "minibuffer.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 static int to_wakeup_pipe = -1;	/* Write here to get noticed */

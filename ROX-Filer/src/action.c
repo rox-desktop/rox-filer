@@ -44,12 +44,14 @@
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
+#include "display.h"
 #include "main.h"
 #include "options.h"
 #include "modechange.h"
 #include "find.h"
 #include "dir.h"
 #include "icon.h"
+#include "mount.h"
 
 /* Parent->Child messages are one character each:
  *
@@ -951,10 +953,8 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
  * TRUE iff the directory containing dest_path needs to be rescanned.
  */
 
-/* dest_path is the dir containing src_path.
- * Updates the global size_tally, file_counter and dir_counter.
- */
-static gboolean do_usage(char *src_path, char *dest_path)
+/* Updates the global size_tally, file_counter and dir_counter */
+static gboolean do_usage(char *src_path, char *unused)
 {
 	struct 		stat info;
 
@@ -1628,34 +1628,27 @@ static void do_mount(guchar *path, gboolean mount)
 /* We use a double for total size in order to count beyond 4Gb */
 static void usage_cb(gpointer data)
 {
-	FilerWindow *filer_window = (FilerWindow *) data;
-	Collection *collection = filer_window->collection;
-	DirItem   *item;
-	int	left = collection->number_selected;
-	int	i = -1;
+	GList *paths = (GList *) data;
 	double	total_size = 0;
 	gchar	*tmp;
 
-	dir_counter= file_counter= 0;
+	dir_counter = file_counter = 0;
 
-	send_dir(filer_window->path);
-
-	while (left > 0)
+	for (; paths; paths = paths->next)
 	{
-		i++;
-		if (!collection->items[i].selected)
-			continue;
-		item = (DirItem *) collection->items[i].data;
+		guchar	*path = (guchar *) paths->data;
+
+		send_dir(path);
+
 		size_tally = 0;
-		do_usage(make_path(filer_window->path,
-					item->leafname)->str,
-					filer_window->path);
+		
+		do_usage(path, NULL);
+
 		g_string_sprintf(message, "'%s: %s\n",
-				item->leafname,
+				g_basename(path),
 				format_double_size(size_tally));
 		send();
 		total_size += size_tally;
-		left--;
 	}
 
 	g_string_sprintf(message, _("'\nTotal: %s ("),
@@ -1753,29 +1746,18 @@ static void delete_cb(gpointer data)
 
 static void find_cb(gpointer data)
 {
-	FilerWindow *filer_window = (FilerWindow *) data;
-	Collection *collection = filer_window->collection;
-	DirItem   *item;
-	int	left;
-	int	i;
-
-	send_dir(filer_window->path);
+	GList *all_paths = (GList *) data;
+	GList *paths;
 
 	while (1)
 	{
-		left = collection->number_selected;
-		i = -1;
-
-		while (left > 0)
+		for (paths = all_paths; paths; paths = paths->next)
 		{
-			i++;
-			if (!collection->items[i].selected)
-				continue;
-			item = (DirItem *) collection->items[i].data;
-			do_find(make_path(filer_window->path,
-						item->leafname)->str,
-					NULL);
-			left--;
+			guchar	*path = (guchar *) paths->data;
+
+			send_dir(path);
+
+			do_find(path, NULL);
 		}
 
 		g_string_assign(message, _("?Another search?"));
@@ -1791,34 +1773,29 @@ static void find_cb(gpointer data)
 
 static void chmod_cb(gpointer data)
 {
-	FilerWindow *filer_window = (FilerWindow *) data;
-	Collection *collection = filer_window->collection;
-	DirItem   *item;
-	int	left = collection->number_selected;
-	int	i = -1;
+	GList *paths = (GList *) data;
 
-	send_dir(filer_window->path);
-
-	while (left > 0)
+	for (; paths; paths = paths->next)
 	{
-		i++;
-		if (!collection->items[i].selected)
-			continue;
-		item = (DirItem *) collection->items[i].data;
-		if (item->flags & ITEM_FLAG_SYMLINK)
+		guchar	*path = (guchar *) paths->data;
+		struct stat info;
+
+		send_dir(path);
+
+		if (mc_stat(path, &info) != 0)
+			send_error();
+		else if (S_ISLNK(info.st_mode))
 		{
 			g_string_sprintf(message,
 					_("!'%s' is a symbolic link\n"),
-					item->leafname);
+					g_basename(path));
 			send();
 		}
-		else if (do_chmod(make_path(filer_window->path,
-						item->leafname)->str, NULL))
+		else if (do_chmod(path, NULL))
 		{
-			g_string_sprintf(message, "+%s", filer_window->path);
+			g_string_sprintf(message, "+%s", path); /* XXX */
 			send();
 		}
-		left--;
 	}
 	
 	g_string_sprintf(message, _("'\nDone\n"));
@@ -1862,19 +1839,16 @@ static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
 
 /*			EXTERNAL INTERFACE			*/
 
-void action_find(FilerWindow *filer_window)
+void action_find(GList *paths)
 {
 	GUIside		*gui_side;
-	Collection 	*collection;
 	GtkWidget	*hbox, *label, *scroller;
 	gchar		*titles[2];
 	
 	titles[0] = _("Name");
 	titles[1] = _("Directory");
 
-	collection = filer_window->collection;
-
-	if (collection->number_selected < 1)
+	if (!paths)
 	{
 		report_error(_("You need to select some items "
 				"to search through"));
@@ -1885,7 +1859,7 @@ void action_find(FilerWindow *filer_window)
 		last_find_string = g_strdup("'core'");
 
 	new_entry_string = last_find_string;
-	gui_side = start_action(filer_window, find_cb, FALSE);
+	gui_side = start_action(paths, find_cb, FALSE);
 	if (!gui_side)
 		return;
 
@@ -1937,21 +1911,17 @@ void action_find(FilerWindow *filer_window)
 }
 
 /* Count disk space used by selected items */
-void action_usage(FilerWindow *filer_window)
+void action_usage(GList *paths)
 {
 	GUIside		*gui_side;
-	Collection 	*collection;
 
-	collection = filer_window->collection;
-
-	if (collection->number_selected < 1)
+	if (!paths)
 	{
-		report_error(
-			_("You need to select some items to count"));
+		report_error(_("You need to select some items to count"));
 		return;
 	}
 
-	gui_side = start_action(filer_window, usage_cb, TRUE);
+	gui_side = start_action(paths, usage_cb, TRUE);
 	if (!gui_side)
 		return;
 
@@ -1992,15 +1962,12 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 }
 
 /* Deletes all selected items in the window */
-void action_delete(FilerWindow *filer_window)
+void action_delete(GList *paths)
 {
 	GUIside		*gui_side;
-	GList		*paths;
-
-	paths = filer_selected_items(filer_window);
 
 	if (!remove_pinned_ok(paths))
-		goto out;
+		return;
 
 	gui_side = start_action(paths, delete_cb,
 					option_get_int("action_delete"));
@@ -2017,23 +1984,16 @@ void action_delete(FilerWindow *filer_window)
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
-
-out:
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
 }
 
 /* Change the permissions of the selected items */
-void action_chmod(FilerWindow *filer_window)
+void action_chmod(GList *paths)
 {
 	GUIside		*gui_side;
-	Collection 	*collection;
 	GtkWidget	*hbox, *label, *combo;
 	static GList	*presets = NULL;
 
-	collection = filer_window->collection;
-
-	if (collection->number_selected < 1)
+	if (!paths)
 	{
 		report_error(_("You need to select the items "
 				"whose permissions you want to change"));
@@ -2057,7 +2017,7 @@ void action_chmod(FilerWindow *filer_window)
 	if (!last_chmod_string)
 		last_chmod_string = g_strdup((guchar *) presets->data);
 	new_entry_string = last_chmod_string;
-	gui_side = start_action(filer_window, chmod_cb, FALSE);
+	gui_side = start_action(paths, chmod_cb, FALSE);
 	if (!gui_side)
 		return;
 

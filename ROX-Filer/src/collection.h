@@ -36,7 +36,6 @@ enum
 };
 
 
-typedef struct _Collection       Collection;
 typedef struct _CollectionClass  CollectionClass;
 typedef struct _CollectionItem   CollectionItem;
 typedef void (*CollectionDrawFunc)(GtkWidget *widget,

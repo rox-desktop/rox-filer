@@ -58,6 +58,7 @@
 #include "global.h"
 
 #include "dir.h"
+#include "diritem.h"
 #include "support.h"
 #include "gui_support.h"
 #include "dir.h"
@@ -432,8 +433,7 @@ static void free_items_array(GPtrArray *array)
 	{
 		DirItem	*item = (DirItem *) array->pdata[i];
 
-		diritem_clear(item);
-		g_free(item);
+		diritem_free(item);
 	}
 
 	g_ptr_array_free(array, TRUE);

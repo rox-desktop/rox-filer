@@ -6,7 +6,6 @@
 #define _APPINFO_H
 
 #include <parser.h>
-#include "fscache.h"
 
 /* Name of the XML file where the info is stored */
 #define APPINFO_FILENAME		"AppInfo.xml"

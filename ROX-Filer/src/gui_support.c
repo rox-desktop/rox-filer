@@ -34,7 +34,6 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdk.h>
-#include "collection.h"
 
 #include "global.h"
 

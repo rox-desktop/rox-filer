@@ -37,6 +37,7 @@
 #include "pinboard.h"
 #include "panel.h"
 #include "icon.h"
+#include "diritem.h"
 #include "menu.h"
 #include "appmenu.h"
 #include "dnd.h"
@@ -247,14 +248,14 @@ void icon_may_update(Icon *icon)
 
 	g_return_if_fail(icon != NULL);
 
-	image = icon->item.image;
-	flags = icon->item.flags;
+	image = icon->item->image;
+	flags = icon->item->flags;
 
 	pixmap_ref(image);
 	mount_update(FALSE);
-	diritem_restat(icon->path, &icon->item, FALSE);
+	diritem_restat(icon->path, icon->item, FALSE);
 
-	if (icon->item.image != image || icon->item.flags != flags)
+	if (icon->item->image != image || icon->item->flags != flags)
 	{
 		/* Appearance changed; need to redraw */
 		if (icon->panel)
@@ -317,7 +318,7 @@ void icon_set_tip(Icon *icon)
 	if (icon->panel && icon->socket)
 		ai = NULL;
 	else
-		ai = appinfo_get(icon->path, &icon->item);
+		ai = appinfo_get(icon->path, icon->item);
 
 	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
 	{
@@ -333,7 +334,7 @@ void icon_set_tip(Icon *icon)
 	else if (icon->panel && (!panel_want_show_text(icon)) && !icon->socket)
 	{
 		gtk_tooltips_set_tip(tooltips, widget,
-				icon->item.leafname, NULL);
+				icon->item->leafname, NULL);
 	}
 	else
 		gtk_tooltips_set_tip(tooltips, widget, NULL, NULL);
@@ -390,7 +391,7 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 		(icon_selection || menu_icon) ? FALSE : TRUE,
 		4, 1);
 
-	menu_show_shift_action(file_shift_item, icon ? &icon->item : NULL,
+	menu_show_shift_action(file_shift_item, icon ? icon->item : NULL,
 			FALSE);
 
 	/* Shade the File/Edit/Show items unless an item was clicked */
@@ -400,17 +401,17 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 
 		menu_set_items_shaded(icon_menu, FALSE, 1, 3);
 		menu_set_items_shaded(icon_file_menu, FALSE, 0, 5);
-		if (!can_set_run_action(&icon->item))
+		if (!can_set_run_action(icon->item))
 			menu_set_items_shaded(icon_file_menu, TRUE, 3, 1);
 
 		tmp = g_strdup_printf("%s '%s'",
-				basetype_name(&icon->item),
-				icon->item.leafname);
+				basetype_name(icon->item),
+				icon->item->leafname);
 		gtk_label_set_text(GTK_LABEL(icon_file_item), tmp);
 		g_free(tmp);
 
 		/* Check for app-specific menu */
-		appmenu_add(icon->path, &icon->item, icon_menu);
+		appmenu_add(icon->path, icon->item, icon_menu);
 	}
 	else
 	{
@@ -549,7 +550,7 @@ void icon_destroyed(Icon *icon)
 				g_list_remove(current_pinboard->icons, icon);
 	}
 	
-	diritem_clear(&icon->item);
+	diritem_free(icon->item);
 	g_free(icon->path);
 	g_free(icon->src_path);
 	g_free(icon);
@@ -609,7 +610,7 @@ static void rename_activate(GtkWidget *dialog)
 		GdkFont	*font = icon->widget->style->font;
 #endif
 		
-		g_free(icon->item.leafname);
+		g_free(icon->item->leafname);
 		g_free(icon->src_path);
 
 		icon->src_path = g_strdup(new_src);
@@ -619,13 +620,13 @@ static void rename_activate(GtkWidget *dialog)
 		icon->path = icon_convert_path(new_src);
 		icon_hash_path(icon);
 		
-		icon->item.leafname = g_strdup(new_name);
+		icon->item->leafname = g_strdup(new_name);
 #ifndef GTK2
-		icon->item.name_width = gdk_string_measure(font, new_name);
+		icon->item->name_width = gdk_string_measure(font, new_name);
 #endif
 		/* XXX: Set name_width in size_and_shape? */
 
-		diritem_restat(icon->path, &icon->item, FALSE);
+		diritem_restat(icon->path, icon->item, FALSE);
 
 		callback(icon);
 		gtk_widget_destroy(dialog);
@@ -793,7 +794,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 	switch (action)
 	{
 		case ACTION_SHIFT:
-			run_diritem(menu_icon->path, &menu_icon->item,
+			run_diritem(menu_icon->path, menu_icon->item,
 					NULL, NULL, TRUE);
 			break;
 		case ACTION_EDIT:
@@ -804,22 +805,22 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 			open_to_show(menu_icon->path);
 			break;
 		case ACTION_HELP:
-			show_item_help(menu_icon->path, &menu_icon->item);
+			show_item_help(menu_icon->path, menu_icon->item);
 			break;
 		case ACTION_INFO:
 			infobox_new(menu_icon->path);
 			break;
 		case ACTION_RUN_ACTION:
-			if (can_set_run_action(&menu_icon->item))
+			if (can_set_run_action(menu_icon->item))
 				type_set_handler_dialog(
-						menu_icon->item.mime_type);
+						menu_icon->item->mime_type);
 			else
 				report_error(
 				_("You can only set the run action for a "
 				"regular file"));
 			break;
 		case ACTION_SET_ICON:
-			icon_set_handler_dialog(&menu_icon->item,
+			icon_set_handler_dialog(menu_icon->item,
 						menu_icon->path);
 			break;
 	}
@@ -858,7 +859,7 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, FALSE, 2);
-	gtk_entry_set_text(GTK_ENTRY(entry), icon->item.leafname);
+	gtk_entry_set_text(GTK_ENTRY(entry), icon->item->leafname);
 	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
 	gtk_widget_grab_focus(entry);
 	gtk_object_set_data(GTK_OBJECT(dialog), "new_name", entry);

@@ -12,11 +12,11 @@
 
 void action_init(void);
 
-void action_usage(FilerWindow *filer_window);
+void action_usage(GList *paths);
 void action_mount(GList	*paths, gboolean open_dir, int quiet);
-void action_delete(FilerWindow *filer_window);
-void action_chmod(FilerWindow *filer_window);
-void action_find(FilerWindow *filer_window);
+void action_delete(GList *paths);
+void action_chmod(GList *paths);
+void action_find(GList *paths);
 void action_move(GList *paths, char *dest, char *leaf, int quiet);
 void action_copy(GList *paths, char *dest, char *leaf, int quiet);
 void action_link(GList *paths, char *dest, char *leaf);

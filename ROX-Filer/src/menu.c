@@ -52,9 +52,12 @@
 #include "main.h"
 #include "pinboard.h"
 #include "dir.h"
+#include "diritem.h"
 #include "appmenu.h"
 #include "usericons.h"
 #include "infobox.h"
+#include "collection.h"
+#include "display.h"
 
 #define C_ "<control>"
 
@@ -504,7 +507,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			    gboolean separator, gboolean strip_ext)
 {
 	GList *widgets = NULL;
-	DirItem ditem;
+	DirItem *ditem;
 	DIR	*dir;
 	struct dirent *ent;
 	GtkWidget *item;
@@ -542,28 +545,29 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			leaf = g_strdup(ent->d_name);
 
 		fname = g_strconcat(dname, "/", ent->d_name, NULL);
-		diritem_stat(fname, &ditem, FALSE);
+		ditem = diritem_new(NULL);
+		diritem_restat(fname, ditem, FALSE);
 
-		if (ditem.image && style != MIS_NONE)
+		if (ditem->image && style != MIS_NONE)
 		{
 			switch (style) {
 				case MIS_HUGE:
-					if (!ditem.image->huge_pixmap)
-						pixmap_make_huge(ditem.image);
-					icon = ditem.image->huge_pixmap;
-					mask = ditem.image->huge_mask;
+					if (!ditem->image->huge_pixmap)
+						pixmap_make_huge(ditem->image);
+					icon = ditem->image->huge_pixmap;
+					mask = ditem->image->huge_mask;
 					break;
 				case MIS_LARGE:
-					icon = ditem.image->pixmap;
-					mask = ditem.image->mask;
+					icon = ditem->image->pixmap;
+					mask = ditem->image->mask;
 					break;
 
 				case MIS_SMALL:
 				default:
-					if (!ditem.image->sm_pixmap)
-						pixmap_make_small(ditem.image);
-					icon = ditem.image->sm_pixmap;
-					mask = ditem.image->sm_mask;
+					if (!ditem->image->sm_pixmap)
+						pixmap_make_small(ditem->image);
+					icon = ditem->image->sm_pixmap;
+					mask = ditem->image->sm_mask;
 					break;
 			}
 
@@ -581,7 +585,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
 
-			diritem_clear(&ditem);
+			diritem_free(ditem);
 		}
 		else
 			item = gtk_menu_item_new_with_label(leaf);
@@ -963,7 +967,13 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 				target_callback, delete,
 				_("DELETE ... ?"));
 	else
-		action_delete(window_with_focus);
+	{
+		GList *paths;
+		paths = filer_selected_items(window_with_focus);
+		action_delete(paths);
+		g_list_foreach(paths, (GFunc) g_free, NULL);
+		g_list_free(paths);
+	}
 }
 
 static void usage(gpointer data, guint action, GtkWidget *widget)
@@ -975,7 +985,13 @@ static void usage(gpointer data, guint action, GtkWidget *widget)
 				target_callback, usage,
 				_("Count the size of ... ?"));
 	else
-		action_usage(window_with_focus);
+	{
+		GList *paths;
+		paths = filer_selected_items(window_with_focus);
+		action_usage(paths);
+		g_list_foreach(paths, (GFunc) g_free, NULL);
+		g_list_free(paths);
+	}
 }
 
 static void chmod_items(gpointer data, guint action, GtkWidget *widget)
@@ -987,7 +1003,13 @@ static void chmod_items(gpointer data, guint action, GtkWidget *widget)
 				target_callback, chmod_items,
 				_("Set permissions on ... ?"));
 	else
-		action_chmod(window_with_focus);
+	{
+		GList *paths;
+		paths = filer_selected_items(window_with_focus);
+		action_chmod(paths);
+		g_list_foreach(paths, (GFunc) g_free, NULL);
+		g_list_free(paths);
+	}
 }
 
 static void find(gpointer data, guint action, GtkWidget *widget)
@@ -999,7 +1021,13 @@ static void find(gpointer data, guint action, GtkWidget *widget)
 				target_callback, find,
 				_("Search inside ... ?"));
 	else
-		action_find(window_with_focus);
+	{
+		GList *paths;
+		paths = filer_selected_items(window_with_focus);
+		action_find(paths);
+		g_list_foreach(paths, (GFunc) g_free, NULL);
+		g_list_free(paths);
+	}
 }
 
 /* This pops up our savebox widget, cancelling any currently open one,

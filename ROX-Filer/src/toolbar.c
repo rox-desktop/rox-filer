@@ -27,6 +27,7 @@
 
 #include "global.h"
 
+#include "collection.h"
 #include "toolbar.h"
 #include "options.h"
 #include "support.h"
@@ -34,10 +35,12 @@
 #include "menu.h"
 #include "dnd.h"
 #include "filer.h"
+#include "display.h"
 #include "pixmaps.h"
 #include "bind.h"
 #include "type.h"
 #include "dir.h"
+#include "diritem.h"
 
 typedef struct _Tool Tool;
 

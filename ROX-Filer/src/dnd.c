@@ -34,10 +34,10 @@
 #include <X11/Xatom.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
-#include "collection.h"
 
 #include "global.h"
 
+#include "collection.h"
 #include "dnd.h"
 #include "type.h"
 #include "filer.h"
@@ -49,6 +49,7 @@
 #include "run.h"
 #include "pinboard.h"
 #include "dir.h"
+#include "diritem.h"
 #include "usericons.h"
 #include "menu.h"
 

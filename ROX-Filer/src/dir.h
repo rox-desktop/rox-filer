@@ -25,9 +25,6 @@ typedef void (*DirCallback)(Directory *dir,
 			GPtrArray *items,
 			gpointer data);
 
-#include "fscache.h"
-#include "diritem.h"
-
 extern GFSCache *dir_cache;
 
 struct _DirUser

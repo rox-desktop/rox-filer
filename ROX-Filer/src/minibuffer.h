@@ -8,13 +8,6 @@
 #ifndef _MINIBUFFER_H
 #define _MINIBUFFER_H
 
-typedef enum {
-	MINI_NONE,
-	MINI_PATH,
-	MINI_SHELL,
-	MINI_SELECT_IF,
-} MiniType;
-
 #include <gtk/gtk.h>
 
 void minibuffer_init(void);

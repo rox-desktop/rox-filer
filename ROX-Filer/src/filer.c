@@ -36,11 +36,13 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdkkeysyms.h>
-#include "collection.h"
 
 #include "global.h"
 
+#include "collection.h"
+#include "display.h"
 #include "main.h"
+#include "fscache.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -48,8 +50,8 @@
 #include "menu.h"
 #include "dnd.h"
 #include "dir.h"
+#include "diritem.h"
 #include "run.h"
-#include "mount.h"
 #include "type.h"
 #include "options.h"
 #include "minibuffer.h"
@@ -57,6 +59,7 @@
 #include "toolbar.h"
 #include "bind.h"
 #include "appinfo.h"
+#include "mount.h"
 
 #define PANEL_BORDER 2
 

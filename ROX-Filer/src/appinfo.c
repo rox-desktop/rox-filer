@@ -53,6 +53,7 @@
 #include "dir.h"
 #include "type.h"
 #include "support.h"
+#include "diritem.h"
 
 static GFSCache *appinfo_cache = NULL;
 

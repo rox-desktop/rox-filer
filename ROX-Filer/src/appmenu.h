@@ -8,7 +8,6 @@
 #define _APPMENU_H
 
 #include <gtk/gtk.h>
-#include "fscache.h"
 
 /* External interface */
 void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu);

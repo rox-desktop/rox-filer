@@ -42,6 +42,7 @@
 #include "type.h"
 #include "usericons.h"
 #include "options.h"
+#include "fscache.h"
 
 static gboolean o_ignore_exec = FALSE;
 
@@ -192,27 +193,15 @@ DirItem *diritem_new(guchar *leafname)
 	return item;
 }
 
-/* Fill in the item structure with the appropriate details.
- * 'leafname' field is set to NULL; text_width is unset.
- */
-void diritem_stat(guchar *path, DirItem *item, gboolean make_thumb)
-{
-	item->leafname = NULL;
-	item->may_delete = FALSE;
-	item->image = NULL;
-
-	diritem_restat(path, item, make_thumb);
-}
-
-/* Frees all fields in the icon, but does not free the icon structure
- * itself (because it might be part of a larger structure).
- */
-void diritem_clear(DirItem *item)
+void diritem_free(DirItem *item)
 {
 	g_return_if_fail(item != NULL);
 
 	pixmap_unref(item->image);
+	item->image = NULL;
 	g_free(item->leafname);
+	item->leafname = NULL;
+	g_free(item);
 }
 
 

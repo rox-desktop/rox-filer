@@ -14,9 +14,6 @@
 # include <pango/pango.h>
 #endif
 
-#include "dir.h"
-#include "diritem.h"
-
 extern GList *icon_selection;
 extern gboolean tmp_icon_selected;
 
@@ -26,7 +23,7 @@ struct _Icon {
 	gboolean	selected;
 	guchar		*src_path;	/* Eg: ~/Apps */
 	guchar		*path;		/* Eg: /home/fred/Apps */
-	DirItem		item;
+	DirItem		*item;
 
 	/* Only used on the pinboard... */
 	GtkWidget	*win;
