@@ -174,8 +174,8 @@ Option o_dnd_no_hostnames;
 static void show_features(void);
 static void soap_add(xmlNodePtr body,
 			   xmlChar *function,
-			   xmlChar *arg1_name, xmlChar *arg1_value,
-			   xmlChar *arg2_name, xmlChar *arg2_value);
+			   const xmlChar *arg1_name, const xmlChar *arg1_value,
+			   const xmlChar *arg2_name, const xmlChar *arg2_value);
 static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
@@ -197,7 +197,7 @@ int main(int argc, char **argv)
 	int		 wakeup_pipe[2];
 	int		 i;
 	struct sigaction act;
-	guchar		*tmp, *dir, *slash;
+	guchar		*tmp, *dir;
 	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
 	xmlDocPtr	rpc, soap_rpc = NULL, reply;
@@ -321,7 +321,10 @@ int main(int argc, char **argv)
 			case 'd':
 		        case 'x':
 				/* Argument is a path */
-				tmp = pathdup(VALUE);
+				if (c == 'd' && VALUE[0] == '/')
+					tmp = g_strdup(VALUE);
+				else
+					tmp = pathdup(VALUE);
 				soap_add(body,
 					c == 'D' ? "CloseDir" :
 					c == 'd' ? "OpenDir" :
@@ -331,23 +334,16 @@ int main(int argc, char **argv)
 				g_free(tmp);
 				break;
 			case 's':
-				tmp = g_strdup(VALUE);
-				slash = strrchr(tmp, '/');
-				if (slash)
-				{
-					*slash = '\0';
-					slash++;
-					dir = pathdup(tmp);
-				}
+				tmp = g_dirname(VALUE);
+				
+				if (tmp[0] == '/')
+					dir = NULL;
 				else
-				{
-					slash = tmp;
-					dir = pathdup(".");
-				}
+					dir = pathdup(tmp);
 
 				soap_add(body, "Show",
-					"Directory", dir,
-					"Leafname", slash);
+					"Directory", dir ? dir : tmp,
+					"Leafname", g_basename(VALUE));
 				g_free(tmp);
 				g_free(dir);
 				break;
@@ -583,8 +579,8 @@ static void show_features(void)
 
 static void soap_add(xmlNodePtr body,
 			   xmlChar *function,
-			   xmlChar *arg1_name, xmlChar *arg1_value,
-			   xmlChar *arg2_name, xmlChar *arg2_value)
+			   const xmlChar *arg1_name, const xmlChar *arg1_value,
+			   const xmlChar *arg2_name, const xmlChar *arg2_value)
 {
 	xmlNodePtr node;
 	xmlNs *rox;
