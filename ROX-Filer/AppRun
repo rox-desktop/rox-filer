@@ -13,9 +13,11 @@ esac
 PLATFORM=`uname -s`-$ARCH
 
 DEBUGGER=""
+
 case $1 in
 	--debug) shift ; DEBUGGER=gdb ;;
 	--compile)
+		shift
 		if [ ! -d $APP_DIR/src ] ; then
 			echo "ERROR from $0:" >&2
 			echo "Cannot compile - source code is missing!" >&2
@@ -28,6 +30,7 @@ case $1 in
 		fi
 		rm -f $APP_DIR/src/config.cache
 		cd $APP_DIR/src && ./configure --bindir=$APP_DIR/$PLATFORM \
+			"$@" \
 			&& make clean && make && echo Done >&2 && exit 0
 		echo Compile failed >&2
 		echo Press Return... >&2

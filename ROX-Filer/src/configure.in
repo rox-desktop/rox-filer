@@ -2,6 +2,27 @@ dnl Process this file with autoconf to produce a configure script.
 AC_INIT(main.c)
 AC_CONFIG_HEADER(config.h)
 
+dnl rox_ARG_WITH(PACKAGE, HELP-STRING, ACTION-IF-TRUE [, ACTION-IF-FALSE])
+dnl This macro does the same thing as AC_ARG_WITH, but it also defines
+dnl with_PACKAGE_arg and with_PACKAGE_sign to avoid complicated logic later.
+dnl Stolen from icewm's configure.in
+AC_DEFUN(rox_ARG_WITH, [
+AC_ARG_WITH([$1], [$2], [
+case "[${with_]patsubst([$1], -, _)}" in
+[no)]
+ [with_]patsubst([$1], -, _)_sign=no
+ ;;
+[yes)]
+ [with_]patsubst([$1], -, _)_sign=yes
+ ;;
+[*)] 
+ [with_]patsubst([$1], -, _)_arg="[${with_]patsubst([$1], -, _)}"
+ [with_]patsubst([$1], -, _)_sign=yes
+ ;;
+esac
+$3
+], [$4])])
+
 dnl Checks for programs.
 AC_PROG_CC
 
@@ -67,7 +88,10 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h)
-AC_CHECK_HEADERS(vfs.h locale.h)
+AC_CHECK_HEADERS(locale.h)
+
+rox_ARG_WITH(vfs,
+  [  --with-vfs[=prefix]     use libvfs for virtual file system [search it in prefix/include and prefix/lib]])
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -77,7 +101,30 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 
+AC_MSG_CHECKING(for vfs library)
+VFS_LIBS=""
+VFS_CFLAGS=""
+if test x"$with_vfs_sign" = xyes; then
+  if test x"$with_vfs_arg" != x; then
+    vfs_includes="-I${with_vfs_arg}/include"
+    vfs_libs="-L${with_vfs_arg}/lib -R${with_vfs_arg}/lib"
+    AC_MSG_RESULT(yes - use '$vfs_libs')
+  else
+    vfs_includes=""
+    vfs_libs=""
+    AC_MSG_RESULT(yes)
+  fi
+  CFLAGS="$CFLAGS $vfs_includes"
+  LDFLAGS="$LDFLAGS $vfs_libs"
+  VFS_CFLAGS=$vfs_includes
+  VFS_LIBS=$vfs_libs
+else
+  AC_MSG_RESULT(no)
+fi
+AC_SUBST(VFS_CFLAGS)
+AC_SUBST(VFS_LIBS)
+
 dnl Check for the Midnight Commander VFS library
-AC_CHECK_LIB(vfs, mc_stat, , , $GLIB_LIBS)
+AC_CHECK_LIB(vfs, mc_stat, , , `$GTK_CONFIG --libs`)
 
 AC_OUTPUT(Makefile)
