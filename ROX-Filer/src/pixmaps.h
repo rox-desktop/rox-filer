@@ -27,7 +27,7 @@ extern MaskedPixmap *im_dirs;
 #define HUGE_WIDTH 96
 #define HUGE_HEIGHT 96
 
-#define ICON_HEIGHT 48
+#define ICON_HEIGHT 52
 #define ICON_WIDTH 48
 
 #define SMALL_HEIGHT 18
