@@ -81,6 +81,8 @@ struct _Directory
 	 */
 	gboolean	needs_update;
 
+	gint		rescan_timeout;	/* See dir_rescan_soon() */
+
 #ifdef USE_DNOTIFY
 	int		dnotify_fd;	/* -1 if not watching */
 #endif

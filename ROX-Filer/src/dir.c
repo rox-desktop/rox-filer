@@ -70,8 +70,8 @@
 #include "main.h"
 
 #ifdef USE_DNOTIFY
-/* Newer Linux kernels can tell use when the directories we are watching
- * change using the dnotify system.
+/* Newer Linux kernels can tell us when the directories we are watching
+ * change, using the dnotify system.
  */
 static GHashTable *dnotify_fd_to_dir = NULL;
 gboolean dnotify_wakeup_flag = FALSE;
@@ -91,6 +91,7 @@ static GPtrArray *hash_to_array(GHashTable *hash);
 static void dir_force_update_item(Directory *dir, const gchar *leaf);
 static Directory *dir_new(const char *pathname);
 static void dir_rescan(Directory *dir);
+static void dir_rescan_soon(Directory *dir);
 #ifdef USE_DNOTIFY
 static void dnotify_handler(int sig, siginfo_t *si, void *data);
 #endif
@@ -453,19 +454,36 @@ void dnotify_wakeup(void)
 	dir = g_hash_table_lookup(dnotify_fd_to_dir,
 				  GINT_TO_POINTER(dnotify_last_fd));
 
-	if (!dir)
-		return;
-
-	if (dir->scanning)
-		dir->needs_update = TRUE;
-	else
-		dir_rescan(dir);
+	if (dir)
+		dir_rescan_soon(dir);
 }
 #endif
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static gint rescan_soon_timeout(gpointer data)
+{
+	Directory *dir = (Directory *) data;
+
+	dir->rescan_timeout = -1;
+	if (dir->scanning)
+		dir->needs_update = TRUE;
+	else
+		dir_rescan(dir);
+	return FALSE;
+}
+
+/* Wait a fraction of a second and then rescan. If already waiting,
+ * this function does nothing.
+ */
+static void dir_rescan_soon(Directory *dir)
+{
+	if (dir->rescan_timeout != -1)
+		return;
+	dir->rescan_timeout = gtk_timeout_add(500, rescan_soon_timeout, dir);
+}
 
 static void free_items_array(GPtrArray *array)
 {
@@ -780,6 +798,8 @@ static void dir_finialize(GObject *object)
 
 	free_recheck_list(dir);
 	set_idle_callback(dir);
+	if (dir->rescan_timeout != -1)
+		gtk_timeout_remove(dir->rescan_timeout);
 
 	dir_merge_new(dir);	/* Ensures new, up and gone are empty */
 
@@ -821,6 +841,7 @@ static void directory_init(GTypeInstance *object, gpointer gclass)
 	dir->notify_active = FALSE;
 	dir->pathname = NULL;
 	dir->error = NULL;
+	dir->rescan_timeout = -1;
 #ifdef USE_DNOTIFY
 	dir->dnotify_fd = -1;
 #endif
