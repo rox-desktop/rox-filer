@@ -44,6 +44,7 @@ static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
+static void stop_scanning(FilerWindow *filer_window);
 
 
 static void filer_window_destroyed(GtkWidget 	*widget,
@@ -53,15 +54,21 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		window_with_selection = NULL;
 
 	if (filer_window->dir)
-	{
-		closedir(filer_window->dir);
-		gtk_idle_remove(filer_window->idle_scan_id);
-	}
+		stop_scanning(filer_window);
 	g_free(filer_window->path);
 	g_free(filer_window);
 
 	if (--number_of_windows < 1)
 		gtk_main_quit();
+}
+
+static void stop_scanning(FilerWindow *filer_window)
+{
+	g_return_if_fail(filer_window->dir != NULL);
+
+	closedir(filer_window->dir);
+	gtk_idle_remove(filer_window->idle_scan_id);
+	filer_window->dir = NULL;
 }
 
 /* This is called while we are scanning the directory */
@@ -265,8 +272,14 @@ void show_menu(Collection *collection, GdkEventButton *event,
 
 static void scan_dir(FilerWindow *filer_window)
 {
-	g_return_if_fail(filer_window->dir == NULL);	/* XXX */
+	if (filer_window->dir)
+		stop_scanning(filer_window);
 	
+	collection_set_item_size(filer_window->collection, 64, 64);
+	collection_clear(filer_window->collection);
+	gtk_window_set_title(GTK_WINDOW(filer_window->window),
+			filer_window->path);
+
 	filer_window->dir = opendir(filer_window->path);
 	if (!filer_window->dir)
 	{
@@ -302,11 +315,14 @@ void open_item(Collection *collection,
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
 	FileItem	*item = (FileItem *) item_data;
 	GdkEventButton 	*event;
+	char		*full_path;
+
+	event = (GdkEventButton *) gtk_get_current_event();
+	full_path = make_path(filer_window->path, item->leafname)->str;
 
 	switch (item->base_type)
 	{
 		case TYPE_APPDIR:
-			event = (GdkEventButton *) gtk_get_current_event();
 			if (event->type != GDK_2BUTTON_PRESS ||
 					(event->state & GDK_SHIFT_MASK) == 0)
 			{
@@ -316,8 +332,14 @@ void open_item(Collection *collection,
 			}
 			/* FALLTHROUGH */
 		case TYPE_DIRECTORY:
-			filer_opendir(make_path(filer_window->path,
-						item->leafname)->str);
+			if (event->type != GDK_2BUTTON_PRESS ||
+					event->button == 1)
+			{
+				filer_window->path = pathdup(full_path);
+				scan_dir(filer_window);
+			}
+			else
+				filer_opendir(full_path);
 			break;
 		default:
 			report_error("open_item",
@@ -341,8 +363,6 @@ void filer_opendir(char *path)
 			draw_item, test_point);
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(filer_window->window),
-				filer_window->path);
 	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 				400, 200);
 
