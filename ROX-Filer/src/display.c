@@ -62,6 +62,8 @@
 #define MIN_TRUNCATE 0
 #define MAX_TRUNCATE 250
 
+#define HUGE_WRAP (1.5 * o_large_truncate)
+
 /* Options bits */
 static gboolean o_sort_nocase = TRUE;
 static gboolean o_dirs_first = FALSE;
@@ -183,7 +185,7 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 		int *width, int *height)
 {
 	int		pix_width = PIXMAP_WIDTH(item->image->pixmap);
-	int		w, h;
+	int		w;
 	int		text_height = item_font->ascent + item_font->descent;
 	int		fixed_height;
 	Template	temp;
@@ -193,13 +195,10 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
                 case HUGE_ICONS:
 			if (!item->image->huge_pixmap)
 				pixmap_make_huge(item->image);
-			w = MIN(item->name_width, 2 * o_large_truncate);
-			pix_width = MIN(HUGE_WIDTH,
-					PIXMAP_WIDTH(item->image->huge_pixmap));
-                        *width = MAX(pix_width, w) + 4;
-			h = text_height + 4 + 
-				PIXMAP_HEIGHT(item->image->huge_pixmap);
-			*height = MAX(h, ICON_HEIGHT * 1.5);
+			wrap_text(&temp, item, HUGE_WRAP);
+			pix_width = PIXMAP_WIDTH(item->image->huge_pixmap);
+			*width = MAX(pix_width, temp.leafname.width) + 4;
+			*height = temp.leafname.height + HUGE_HEIGHT + 4;
 			break;
                 case HUGE_FULL_INFO:
 			w = details_width(filer_window, item);
@@ -226,7 +225,6 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 		case LARGE_ICONS:
                 default:
 			wrap_text(&temp, item, o_large_truncate);
-			pix_width = MIN(ICON_WIDTH, pix_width);
                         *width = MAX(pix_width, temp.leafname.width) + 4;
 			*height = temp.leafname.height + ICON_HEIGHT + 2;
 			break;
@@ -662,44 +660,9 @@ static int details_width(FilerWindow *filer_window, DirItem *item)
 	return fixed_width * strlen(details(filer_window, item));
 }
 
-static void huge_template(GdkRectangle *area, DirItem *item,
-			   FilerWindow *filer_window, Template *template)
-{
-	int	col_width = filer_window->collection->item_width;
-
-	MaskedPixmap	*image = item->image;
-	int iwidth, iheight;
-	int image_x, image_y;
-	
-	int	text_width = item->name_width;
-	int	font_height = item_font->ascent + item_font->descent;
-	int	text_x = area->x + ((col_width - text_width) >> 1);
-	int	text_y = area->y + area->height - font_height - 2;
-
-	if (!image->huge_pixmap)
-		pixmap_make_huge(image);
-	iwidth = MIN(PIXMAP_WIDTH(image->huge_pixmap), HUGE_WIDTH);
-	iheight = MIN(PIXMAP_HEIGHT(image->huge_pixmap) + 6, HUGE_HEIGHT);
-	image_x = area->x + ((col_width - iwidth) >> 1);
-
-	text_x = MAX(text_x, area->x);
-
-	template->leafname.x = text_x;
-	template->leafname.y = text_y;
-	template->leafname.width = MIN(text_width, area->width);
-	template->leafname.height = font_height;
-
-	image_y = text_y - iheight;
-	image_y = MAX(area->y, image_y);
-	
-	template->icon.x = image_x;
-	template->icon.y = image_y + 1;
-	template->icon.width = iwidth;
-	template->icon.height = MIN(HUGE_HEIGHT, iheight);
-}
-
 /* Fill in the width, height and split of the leafname assuming a wrap
  * width of 'width' pixels.
+ * Note: result may still be wider than 'width'.
  */
 static void wrap_text(Template *template, DirItem *item, int width)
 {
@@ -719,10 +682,43 @@ static void wrap_text(Template *template, DirItem *item, int width)
 
 	top_len = gdk_text_measure(item_font, item->leafname, sp);
 	bot_len = gdk_string_measure(item_font, item->leafname + sp);
-	bot_len = MIN(width, bot_len);
 
 	template->leafname.width = MAX(top_len, bot_len);
 	template->leafname.height = font_height * 2;
+}
+
+static void huge_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	int	col_width = filer_window->collection->item_width;
+
+	MaskedPixmap	*image = item->image;
+	int iwidth, iheight;
+	int image_x, image_y;
+	
+	int	text_width = item->name_width;
+	int	font_height = item_font->ascent + item_font->descent;
+	int	text_x = area->x + ((col_width - text_width) >> 1);
+	int	text_y = area->y + area->height - font_height - 2;
+
+	if (!image->huge_pixmap)
+		pixmap_make_huge(image);
+	iwidth = PIXMAP_WIDTH(image->huge_pixmap);
+	iheight = PIXMAP_HEIGHT(image->huge_pixmap);
+	image_x = area->x + ((col_width - iwidth) >> 1);
+	image_y = area->y + (HUGE_HEIGHT - iheight);
+
+	wrap_text(template, item, HUGE_WRAP);
+	text_x = area->x + ((col_width - template->leafname.width) >> 1);
+	text_y = image_y + iheight + 2;
+
+	template->leafname.x = text_x;
+	template->leafname.y = text_y;
+
+	template->icon.x = image_x;
+	template->icon.y = image_y;
+	template->icon.width = iwidth;
+	template->icon.height = iheight;
 }
 
 static void large_template(GdkRectangle *area, DirItem *item,
@@ -738,12 +734,11 @@ static void large_template(GdkRectangle *area, DirItem *item,
 	int		image_x = area->x + ((col_width - iwidth) >> 1);
 	int		image_y;
 	
-	int	text_x;
-	int	text_y;
+	int		text_x, text_y;
 
 	wrap_text(template, item, o_large_truncate);
 	text_x = area->x + ((col_width - template->leafname.width) >> 1);
-	text_y = area->y + area->height - template->leafname.height - 2;
+	text_y = area->y + ICON_HEIGHT + 2;
 
 	template->leafname.x = text_x;
 	template->leafname.y = text_y;
