@@ -5,10 +5,12 @@ chdir "../../../rox";
 system "cvs rel .";
 
 open(VER, "ROX-Filer/AppRun --version 2>&1 |") or die "open(): $!";
-$line = <VER>;
+while (<VER>) {
+  last if /^ROX-Filer/;
+}
 close(VER);
 
-$line =~ /(\d+)\.(\d+)\.(\d+)$/;
+/(\d+)\.(\d+)\.(\d+)$/;
 
 ($a, $b, $c) = ($1, $2, $3);
 
