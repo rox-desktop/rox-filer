@@ -1538,7 +1538,6 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_PRIME_FOR_DND:
-			collection_wink_item(collection, item);
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_IGNORE:

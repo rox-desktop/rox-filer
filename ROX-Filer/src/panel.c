@@ -507,7 +507,6 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 /* icon may be NULL if the event is on the background */
 static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 {
-	GtkWidget	*widget = icon ? icon->widget : NULL;
 	BindAction	action;
 	
 	action = bind_lookup_bev(icon ? BIND_PANEL_ICON : BIND_PANEL, event);
@@ -545,7 +544,6 @@ static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_PRIME_FOR_DND:
-			wink_widget(widget);
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_TOGGLE_SELECTED:

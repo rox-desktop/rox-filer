@@ -823,7 +823,6 @@ static void perform_action(Icon *icon, GdkEventButton *event)
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_PRIME_FOR_DND:
-			pinboard_wink_item(icon, TRUE);
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_TOGGLE_SELECTED:
