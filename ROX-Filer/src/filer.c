@@ -262,7 +262,13 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			item->image = default_pixmap + TYPE_APPDIR;
 	}
 	else
-		item->image = default_pixmap + base_type;
+	{
+		if (base_type == TYPE_FILE &&
+				(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
+			item->image = default_pixmap + TYPE_EXEC_FILE;
+		else
+			item->image = default_pixmap + base_type;
+	}
 
 	item->text_width = gdk_string_width(filer_window->window->style->font,
 			leafname);

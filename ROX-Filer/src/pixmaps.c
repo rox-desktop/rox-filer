@@ -18,6 +18,24 @@
 #include "gui_support.h"
 #include "pixmaps.h"
 
+static char * bad_xpm[] = {
+"12 12 3 1",
+" 	c #000000000000",
+".	c #FFFF00000000",
+"X	c #FFFFFFFFFFFF",
+"            ",
+" ..XXXXXX.. ",
+" ...XXXX... ",
+" X...XX...X ",
+" XX......XX ",
+" XXX....XXX ",
+" XXX....XXX ",
+" XX......XX ",
+" X...XX...X ",
+" ...XXXX... ",
+" ..XXXXXX.. ",
+"            "};
+
 MaskedPixmap default_pixmap[LAST_DEFAULT_PIXMAP];
 
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
@@ -52,6 +70,12 @@ void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image)
 						   &image->mask,
 						   0,
 			   make_path(getenv("APP_DIR"), name)->str);
+
+	if (!image->pixmap)
+	{
+		image->pixmap= gdk_pixmap_create_from_xpm_d(window,
+				&image->mask, NULL, bad_xpm);
+	}
 }
 
 /* Load all the standard pixmaps */
@@ -87,6 +111,8 @@ void load_default_pixmaps(GdkWindow *window)
 			default_pixmap + TYPE_MOUNTED);
 	load_pixmap(window, "pixmaps/multiple.xpm",
 			default_pixmap + TYPE_MULTIPLE);
+	load_pixmap(window, "pixmaps/exec.xpm",
+			default_pixmap + TYPE_EXEC_FILE);
 	load_pixmap(window, "pixmaps/application.xpm",
 			default_pixmap + TYPE_APPDIR);
 
