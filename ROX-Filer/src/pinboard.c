@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -1236,7 +1236,7 @@ static void forward_root_clicks(void)
 static void pinboard_save(void)
 {
 	guchar	*save = NULL;
-	GString	*tmp;
+	GString	*tmp = NULL;
 	FILE	*file = NULL;
 	GList	*next;
 	guchar	*save_new = NULL;
@@ -1275,8 +1275,6 @@ static void pinboard_save(void)
 			goto err;
 	}
 
-	g_string_free(tmp, TRUE);
-
 	if (fclose(file))
 	{
 		file = NULL;
@@ -1294,6 +1292,9 @@ err:
 out:
 	if (file)
 		fclose(file);
+	if (tmp)
+		g_string_free(tmp, TRUE);
+
 	g_free(save_new);
 	g_free(save);
 }

@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -52,6 +52,7 @@
 #include "pinboard.h"
 #include "dir.h"
 #include "appmenu.h"
+#include "usericons.h"
 
 #define C_ "<control>"
 
@@ -120,6 +121,7 @@ static void close_window(gpointer data, guint action, GtkWidget *widget);
 static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void shell_command(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
+static void set_icon(gpointer data, guint action, GtkWidget *widget);
 static void select_if(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
@@ -175,6 +177,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Help"),		NULL, help, 0, NULL},
 {">" N_("Info"),		NULL, show_file_info, 0, NULL},
 {">" N_("Set Run Action..."),	NULL, run_action, 0, NULL},
+{">" N_("Set Icon..."),		NULL, set_icon, 0, NULL},
 {">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
 {">>" N_("Unzip"),		NULL, open_vfs_uzip, 0, NULL},
 {">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
@@ -343,7 +346,7 @@ GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
  
 static void items_sensitive(gboolean state)
 {
-	int	n = 7;
+	int	n = 8;
 	GList	*items, *item;
 
 	items = item = gtk_container_children(GTK_CONTAINER(filer_file_menu));
@@ -870,6 +873,37 @@ static void run_action(gpointer data, guint action, GtkWidget *widget)
 			report_error(PROJECT,
 				_("You can only set the run action for a "
 				"regular file"));
+	}
+}
+
+static void set_icon(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected > 1)
+	{
+		report_error(PROJECT, _("You cannot do this to more than "
+					"one item at a time"));
+		return;
+	}
+	else if (collection->number_selected != 1)
+		filer_target_mode(window_with_focus,
+				  target_callback, set_icon,
+				  _("Set icon for ... ?"));
+	else
+	{
+		DirItem *item;
+		guchar *path;
+
+		item = selected_item(collection);
+		g_return_if_fail(item != NULL);
+
+		path = make_path(window_with_focus->path, item->leafname)->str;
+
+		icon_set_handler_dialog(item, path);
 	}
 }
 

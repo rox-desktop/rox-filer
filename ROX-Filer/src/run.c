@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -46,7 +46,6 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond);
 static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
 static gboolean open_file(guchar *path, MIME_type *type);
 static void app_show_help(char *path);
-static void examine(guchar *path);
 
 typedef struct _PipedData PipedData;
 
@@ -429,6 +428,31 @@ void open_to_show(guchar *path)
 	g_free(dir);
 }
 
+/* Invoked using -x, this indicates that the filesystem has been modified
+ * and we should look at this item again.
+ */
+void examine(guchar *path)
+{
+	struct stat info;
+
+	if (mc_stat(path, &info) != 0)
+	{
+		/* Deleted? Do a paranoid update of everything... */
+		filer_check_mounted(path);
+	}
+	else
+	{
+		/* Update directory containing this item... */
+		dir_check_this(path);
+
+		/* If this is itself directory then rescan its contents... */
+		refresh_dirs(path);
+
+		/* If it's on the pinboard, update the icon... */
+		icons_may_update(path);
+	}
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -569,29 +593,4 @@ static void app_show_help(char *path)
 			"their own help here, but this one doesn't."));
 	else
 		filer_opendir(help_dir);
-}
-
-/* Invoked using -x, this indicates that the filesystem has been modified
- * and we should look at this item again.
- */
-static void examine(guchar *path)
-{
-	struct stat info;
-
-	if (mc_stat(path, &info) != 0)
-	{
-		/* Deleted? Do a paranoid update of everything... */
-		filer_check_mounted(path);
-	}
-	else
-	{
-		/* Update directory containing this item... */
-		dir_check_this(path);
-
-		/* If this is itself directory then rescan its contents... */
-		refresh_dirs(path);
-
-		/* If it's on the pinboard, update the icon... */
-		icons_may_update(path);
-	}
 }

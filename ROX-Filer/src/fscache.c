@@ -2,7 +2,7 @@
  * $Id$
  *
  * FSCache - a glib-style object for caching files
- * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * A cache object holds stat details about files in a hash table, along
  * with user-specified data. When you want to read in a file try to

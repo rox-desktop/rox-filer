@@ -21,5 +21,6 @@ gboolean run_diritem(guchar *full_path,
 void show_item_help(guchar *path, DirItem *item);
 void run_list(guchar *to_open);
 void open_to_show(guchar *path);
+void examine(guchar *path);
 
 #endif /* _RUN_H */

@@ -2,7 +2,7 @@
  * $Id$
  *
  * dir.c - Caches and updates directories
- * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -40,6 +40,7 @@
 #include "mount.h"
 #include "pixmaps.h"
 #include "type.h"
+#include "usericons.h"
 
 GFSCache *dir_cache = NULL;
 
@@ -55,7 +56,6 @@ static gint idle_callback(Directory *dir);
 static void init_for_scan(Directory *dir);
 static void merge_new(Directory *dir);
 
-
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -67,6 +67,7 @@ void dir_init(void)
 				(GFSRefFunc) unref,
 				(GFSGetRefFunc) getref,
 				(GFSUpdateFunc) update, NULL);
+	read_globicons();
 }
 
 /* Periodically calls callback to notify about changes to the contents
@@ -224,31 +225,59 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		uid_t	uid = info.st_uid;
 		int	path_len;
 		guchar	*tmp;
-		
-		/* Might be an application directory - better check...
-		 * AppRun must have the same owner as the directory
-		 * (to stop people putting an AppRun in, eg, /tmp)
-		 * If AppRun is a symlink, we want the symlink's owner.
+		struct stat	icon;
+
+		check_globicon(path, item);
+
+		/* It's a directory:
+		 *
+		 * - If it contains a .DirIcon.png then that's the icon
+		 * - If it contains an AppRun then it's an application
+		 * - If it contains an AppRun but no .DirIcon then try to
+		 *   use AppIcon.xpm as the icon.
+		 *
+		 * .DirIcon.png and AppRun must have the same owner as the
+		 * directory itself, to prevent abuse of /tmp, etc.
+		 * For symlinks, we want the symlink's owner.
 		 */
+
 		path_len = strlen(path);
 		/* (sizeof(string) includes \0) */
-		tmp = g_malloc(path_len + sizeof("/AppIcon.xpm"));
-		sprintf(tmp, "%s/%s", path, "AppRun");
+		tmp = g_malloc(path_len + sizeof("/.DirIcon.png"));
 
+		/* Try to find .DirIcon.png... */
+		sprintf(tmp, "%s/%s", path, ".DirIcon.png");
 		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid)
 		{
-			struct stat	icon;
-
+			if (info.st_size > MAX_ICON_SIZE ||
+						!S_ISREG(icon.st_mode))
+			{
+				/* Don't let nasty files cause us trouble */
+				/* (Note: slight race here) */
+				item->image = im_appdir;
+				pixmap_ref(item->image);
+			}
+			else
+				item->image = g_fscache_lookup(pixmap_cache,
+								tmp);
+		}
+			
+		/* Try to find AppRun... */
+		strcpy(tmp + path_len + 1, "AppRun");
+		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid)
 			item->flags |= ITEM_FLAG_APPDIR;
 			
+		/* Are we still missing an icon for this app? */
+		if (item->flags & ITEM_FLAG_APPDIR && !item->image)
+		{
 			strcpy(tmp + path_len + 4, "Icon.xpm");
 
-			if (mc_stat(tmp, &icon) == 0 &&
+			if (mc_lstat(tmp, &icon) == 0 &&
 					S_ISREG(icon.st_mode) &&
 					icon.st_size <= MAX_ICON_SIZE)
 			{
 				item->image = g_fscache_lookup(pixmap_cache,
-								tmp);
+								 tmp);
 			}
 			else
 			{
@@ -256,6 +285,7 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 				pixmap_ref(item->image);
 			}
 		}
+
 		g_free(tmp);
 	}
 	else if (item->base_type == TYPE_FILE)
@@ -286,7 +316,12 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		else
 			item->image = g_fscache_lookup_full(thumb_cache,
 								path, FALSE);
+		if (!item->image)
+			check_globicon(path, item);
 	}
+	else
+		check_globicon(path, item);
+
 
 	if (!item->mime_type)
 		item->mime_type = mime_type_from_base_type(item->base_type);
@@ -472,6 +507,8 @@ static void init_for_scan(Directory *dir)
 static void start_scanning(Directory *dir, char *pathname)
 {
 	GList	*next;
+
+	read_globicons();
 
 	if (dir->dir_handle)
 	{
