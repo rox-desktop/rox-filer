@@ -383,7 +383,7 @@ static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 			gchar *loc_path, *loc_label;
 
 			loc_path = from_utf8(path);
-			loc_label = from_utf8(leaf);
+			loc_label = from_utf8(label);
 			panel_add_item(panel, loc_path, loc_label, after);
 			g_free(loc_label);
 			g_free(loc_path);

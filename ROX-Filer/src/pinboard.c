@@ -1055,7 +1055,7 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 			gchar *loc_path, *loc_label;
 
 			loc_path = from_utf8(path);
-			loc_label = from_utf8(leaf);
+			loc_label = from_utf8(label);
 			pinboard_pin(loc_path, loc_label, x, y);
 			g_free(loc_label);
 			g_free(loc_path);
