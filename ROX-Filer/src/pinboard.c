@@ -1902,8 +1902,6 @@ static void create_pinboard_window(Pinboard *pinboard)
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_set_style(win, gtk_widget_get_default_style());
 
-	gtk_widget_modify_bg(win, GTK_STATE_NORMAL, &pin_text_bg_col);
-
 	gtk_widget_set_double_buffered(win, FALSE);
 	gtk_widget_set_app_paintable(win, TRUE);
 	gtk_widget_set_name(win, "rox-pinboard");
@@ -1951,6 +1949,8 @@ static void create_pinboard_window(Pinboard *pinboard)
 
 	pinboard->shadow_gc = gdk_gc_new(win->window);
 	gdk_gc_set_rgb_fg_color(pinboard->shadow_gc, &pin_text_shadow_col);
+
+	reload_backdrop(current_pinboard, NULL, BACKDROP_NONE);
 
 	gtk_widget_show_all(win);
 	gdk_window_lower(win->window);
