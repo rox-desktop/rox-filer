@@ -297,6 +297,7 @@ operation, such as copying or deleting some files.</label>
     <frame label='Window manager problems'>
       <toggle name='override_redirect' label='Override window manager control of the pinboard and panels'>Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists.</toggle>
       <toggle name='pinboard_forward_buttons_13' label='Pass all backdrop mouse clicks to window manager'>Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded.</toggle>
+      <toggle name='blackbox_hack' label='Blackbox root menus hack'>Blackbox, Fluxbox and similar window managers do not yet work well with the ROX-Filer pinboard. This option enables some workarounds. These window managers are expected to change their behaviour in new versions so that this isn't necessary.</toggle>
     </frame>
     <frame label='Drag and drop'>
       <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>

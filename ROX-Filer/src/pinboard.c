@@ -144,6 +144,7 @@ static Option o_pinboard_tasklist, o_forward_buttons_13;
 static Option o_iconify_start, o_iconify_dir;
 static Option o_label_font, o_pinboard_shadow_colour;
 static Option o_pinboard_shadow_labels;
+static Option o_blackbox_hack;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -162,6 +163,8 @@ static gint leave_notify(GtkWidget *widget,
 static gboolean button_press_event(GtkWidget *widget,
 			    GdkEventButton *event,
                             PinIcon *pi);
+static gboolean scroll_event(GtkWidget *widget, 
+                             GdkEventScroll *event);
 static gint icon_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       PinIcon *pi);
@@ -245,6 +248,8 @@ void pinboard_init(void)
 
 	option_add_int(&o_iconify_start, "iconify_start", CORNER_TOP_RIGHT);
 	option_add_int(&o_iconify_dir, "iconify_dir", DIR_VERT);
+
+	option_add_int(&o_blackbox_hack, "blackbox_hack", FALSE);
 
 	option_add_notify(pinboard_check_options);
 
@@ -1074,7 +1079,8 @@ static void forward_to_root(GdkEventButton *event)
 	if (event->type == GDK_BUTTON_PRESS)
 	{
 		xev.type = ButtonPress;
-		XUngrabPointer(gdk_display, event->time);
+		if (!o_blackbox_hack.int_value)
+			XUngrabPointer(gdk_display, event->time);
 	}
 	else
 		xev.type = ButtonRelease;
@@ -1132,6 +1138,38 @@ static gboolean button_press_event(GtkWidget *widget,
 		forward_to_root(event);
 	else if (dnd_motion_press(widget, event))
 		perform_action(pi, event);
+
+	return TRUE;
+}
+
+/* Forward mouse scroll events as buttons 4 and 5 to the window manager
+ * (for old window managers that don't catch the buttons themselves)
+ */
+static gboolean scroll_event(GtkWidget *widget, GdkEventScroll *event)
+{
+	XButtonEvent xev;
+
+	xev.type = ButtonPress;
+	xev.window = gdk_x11_get_default_root_xwindow();
+	xev.root =  xev.window;
+	xev.subwindow = None;
+	xev.time = event->time;
+	xev.x = event->x_root;	/* Needed for icewm */
+	xev.y = event->y_root;
+	xev.x_root = event->x_root;
+	xev.y_root = event->y_root;
+	xev.state = event->state;
+	xev.same_screen = True;
+
+	if (event->direction == GDK_SCROLL_UP)
+		xev.button = 4;
+	else if (event->direction == GDK_SCROLL_DOWN)
+		xev.button = 5;
+	else
+		return FALSE;
+
+	XSendEvent(gdk_display, xev.window, False,
+			ButtonPressMask, (XEvent *) &xev);
 
 	return TRUE;
 }
@@ -1946,6 +1984,12 @@ static void create_pinboard_window(Pinboard *pinboard)
 			G_CALLBACK(lasso_motion), NULL);
 	g_signal_connect(pinboard->fixed, "expose_event",
 			G_CALLBACK(bg_expose), NULL);
+
+	/* Some window managers use scroll events on the root to switch
+	 * desktops, but don't cope with our pinboard window, so we forward
+	 * them manually in that case.
+	 */
+	g_signal_connect(win, "scroll-event", G_CALLBACK(scroll_event), NULL);
 
 	/* Drag and drop handlers */
 	drag_set_pinboard_dest(win);
