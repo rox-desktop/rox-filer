@@ -201,7 +201,7 @@ static void set_trans(guchar *lang)
 	}
 	else if (strcmp(lang, "From LANG") == 0)
 	{
-		lang = getenv("From LANG");
+		lang = getenv("LANG");
 		if (!lang)
 			return;
 	}
