@@ -1926,6 +1926,9 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 {
 	Icon *icon = (Icon *) pi;
 
+	if (!icon->item->leafname[0])
+		return FALSE;
+
 	if (o_panel_style.int_value == SHOW_BOTH)
 		return TRUE;
 	if (o_panel_style.int_value == SHOW_ICON)
