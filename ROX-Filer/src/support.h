@@ -8,3 +8,4 @@
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
+int spawn(char **argv);

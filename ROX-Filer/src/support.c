@@ -7,7 +7,9 @@
 
 /* support.c - (non-GUI) useful routines */
 
+#include <stdio.h>
 #include <stdlib.h>
+#include <errno.h>
 #include <sys/param.h>
 #include <unistd.h>
 
@@ -69,3 +71,28 @@ char *our_host_name()
 
 	return name;
 }
+
+/* fork() and run a new program.
+ * Returns the new PID, or 0 on failure.
+ */
+int spawn(char **argv)
+{
+	int	child;
+	
+	child = fork();
+
+	if (child == -1)
+		return 0;	/* Failure */
+	else if (child == 0)
+	{
+		/* We are the child process */
+		execvp(argv[0], argv);
+		fprintf(stderr, "execvp() failed: %s\n",
+				g_strerror(errno));
+		_exit(0);
+	}
+
+	/* We are the parent */
+	return child;
+}
+

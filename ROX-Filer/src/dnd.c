@@ -36,6 +36,7 @@ enum
 
 GdkAtom XdndDirectSave0;
 GdkAtom text_plain;
+GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 
 /* Static prototypes */
@@ -66,11 +67,18 @@ static void got_data_raw(GtkWidget 		*widget,
 			GtkSelectionData 	*selection_data,
 			guint32             	time);
 static gboolean load_file(char *pathname, char **data_out, long *length_out);
+static GSList *uri_list_to_gslist(char *uri_list);
+static void got_uri_list(GtkWidget 		*widget,
+			 GdkDragContext 	*context,
+			 GtkSelectionData 	*selection_data,
+			 guint32             	time);
+char *get_local_path(char *uri);
 
 void dnd_init()
 {
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	text_plain = gdk_atom_intern("text/plain", FALSE);
+	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
 }
@@ -117,6 +125,93 @@ static gboolean provides(GdkDragContext *context, GdkAtom target)
 		targets = targets->next;
 
 	return targets != NULL;
+}
+
+/* Convert a URI to a local pathname (or NULL if it isn't local).
+ * The returned pointer points inside the input string.
+ * Possible formats:
+ *	/path
+ *	///path
+ *	//host/path
+ *	file://host/path
+ */
+char *get_local_path(char *uri)
+{
+	char	*host;
+
+	host = our_host_name();
+
+	if (*uri == '/')
+	{
+		char    *path;
+
+		if (uri[1] != '/')
+			return uri;	/* Just a local path - no host part */
+
+		path = strchr(uri + 2, '/');
+		if (!path)
+			return NULL;	    /* //something */
+
+		if (path - uri == 2)
+			return path;	/* ///path */
+		if (strlen(host) == path - uri - 2 &&
+			strncmp(uri + 2, host, path - uri - 2) == 0)
+			return path;	/* //myhost/path */
+
+		return NULL;	    /* From a different host */
+	}
+	else
+	{
+		if (strncasecmp(uri, "file:", 5))
+			return NULL;	    /* Don't know this format */
+
+		uri += 5;
+
+		if (*uri == '/')
+			return get_local_path(uri);
+
+		return NULL;
+	}
+}
+
+/* Convert a list of URIs into a list of strings.
+ * Lines beginning with # are skipped.
+ * The text block passed in is zero terminated (after the final CRLF)
+ */
+static GSList *uri_list_to_gslist(char *uri_list)
+{
+	GSList   *list = NULL;
+
+	while (*uri_list)
+	{
+		char	*linebreak;
+		char	*uri;
+		int	length;
+
+		linebreak = strchr(uri_list, 13);
+
+		if (!linebreak || linebreak[1] != 10)
+		{
+			report_error("uri_list_to_gslist",
+					"Incorrect or missing line break "
+					"in text/uri-list data");
+			return list;
+		}
+
+		length = linebreak - uri_list;
+
+		if (length && uri_list[0] != '#')
+		{
+			uri = g_malloc(sizeof(char) * (length + 1));
+			strncpy(uri, uri_list, length);
+			uri[length] = 0;
+			list = g_slist_append(list, uri);
+		}
+
+		uri_list = linebreak + 2;
+	}
+
+	return list;
 }
 
 /* Append all the URIs in the selection to the string */
@@ -305,7 +400,8 @@ static gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			report_error("Loading file for DND", g_strerror(errno));
+			report_error("Loading file for DND",
+						g_strerror(errno));
 			g_free(buffer);
 		}
 		else
@@ -411,10 +507,11 @@ static gboolean drag_drop(GtkWidget 	*widget,
 				"XdndDirectSave0 (type text/plain) did not "
 					"contain a leafname\n";
 	}
+	else if (provides(context, text_uri_list))
+		target = text_uri_list;
 	else
-	{
-		error = "Normal DND";
-	}
+		error = "Sorry - I require a target type of text/uri-list or "
+			"XdndDirectSave0.";
 
 	if (error)
 	{
@@ -456,8 +553,7 @@ static void drag_data_received(GtkWidget      		*widget,
 			got_data_raw(widget, context, selection_data, time);
 			break;
 		case TARGET_URI_LIST:
-			gtk_drag_finish(context, FALSE, FALSE, time);
-			report_error("drag_data_received", "got URI list");
+			got_uri_list(widget, context, selection_data, time);
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);
@@ -577,4 +673,121 @@ static void got_data_raw(GtkWidget 		*widget,
 	}
 	else
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
+}
+
+/* We've got a list of URIs from somewhere (probably another filer).
+ * If the files are on the local machine then try to copy them ourselves,
+ * otherwise, if there was only one file and application/octet-stream was
+ * provided, get the data via the X server.
+ */
+static void got_uri_list(GtkWidget 		*widget,
+			 GdkDragContext 	*context,
+			 GtkSelectionData 	*selection_data,
+			 guint32             	time)
+{
+	FilerWindow	*filer_window;
+	GSList		*uri_list;
+	char		*error = NULL;
+	char		**argv = NULL;	/* Command to exec, or NULL */
+	GSList		*next_uri;
+
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	g_return_if_fail(filer_window != NULL);
+
+	uri_list = uri_list_to_gslist(selection_data->data);
+
+	if (!uri_list)
+	{
+		/* No URIs in the list! */
+		error = "No URIs in the text/uri-list (nothing to do!)";
+	}
+	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
+	{
+		/* There is one URI in the list, and it's not on the local
+		 * machine. Get it via the X server if possible.
+		 */
+		error = "TODO: Fetch via X Server";
+	}
+	else
+	{
+		int		local_files = 0;
+		const char	*start_args[] = {"xterm", "-wf",
+					"-e", "cp", "-Riva"};
+		int		argc = sizeof(start_args) / sizeof(char *);
+		
+		next_uri = uri_list;
+
+		argv = g_malloc(sizeof(start_args) +
+			sizeof(char *) * (g_slist_length(uri_list) + 2));
+		memcpy(argv, start_args, sizeof(start_args));
+
+		/* Either one local URI, or a list. If anything in the list
+		 * isn't local then we are stuck.
+		 */
+
+		while (next_uri)
+		{
+			char	*path;
+
+			path = get_local_path((char *) next_uri->data);
+
+			if (path)
+			{
+				argv[argc++] = path;
+				local_files++;
+			}
+			else
+				error = "Some of these files are on a "
+					"different machine - they will be "
+					"ignored - sorry";
+
+			next_uri = next_uri->next;
+		}
+
+		if (local_files < 1)
+		{
+			error = "None of these files are on the local machine "
+				"- I can't operate on multiple remote files - "
+				"sorry.";
+			g_free(argv);
+			argv = NULL;
+		}
+		else
+		{
+			argv[argc++] = filer_window->path;
+			argv[argc++] = NULL;
+		}
+	}
+
+	if (error)
+	{
+		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
+		report_error("Error getting file list", error);
+	}
+	else
+	{
+		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
+	}
+
+	if (argv)
+	{
+		int	child;		/* Child process ID */
+		
+		child = spawn(argv);
+		if (child)
+			g_hash_table_insert(child_to_filer,
+					(gpointer) child, filer_window);
+		else
+			report_error("ROX-Filer", "Failed to fork() child "
+						"process");
+		g_free(argv);
+	}
+
+	next_uri = uri_list;
+	while (next_uri)
+	{
+		g_free(next_uri->data);
+		next_uri = next_uri->next;
+	}
+	g_slist_free(uri_list);
 }

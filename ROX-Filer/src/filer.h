@@ -46,9 +46,11 @@ struct _FileItem
 	MaskedPixmap	*image;
 };
 
-extern FilerWindow *window_with_focus;
+extern FilerWindow 	*window_with_focus;
+extern GHashTable	*child_to_filer;
 
 /* Prototype */
+void filer_init();
 void filer_opendir(char *path);
 void scan_dir(FilerWindow *filer_window);
 

@@ -26,7 +26,12 @@
 #include "dnd.h"
 #include "apps.h"
 
-FilerWindow *window_with_focus = NULL;
+FilerWindow 	*window_with_focus = NULL;
+
+/* When a child process that changes a directory dies we need to know
+ * which filer window to update. Use this table.
+ */
+GHashTable	*child_to_filer = NULL;
 
 static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
@@ -55,6 +60,19 @@ static gint focus_out(GtkWidget *widget,
 			FilerWindow *filer_window);
 
 
+void filer_init()
+{
+	child_to_filer = g_hash_table_new(NULL, NULL);
+}
+
+/* When a filer window is destroyed we call this for each entry in the
+ * child_to_filer hash table to remove old entries.
+ */
+static gboolean child_eq(gpointer key, gpointer data, gpointer filer_window)
+{
+	return data == filer_window;
+}
+
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
@@ -62,6 +80,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		window_with_selection = NULL;
 	if (window_with_focus == filer_window)
 		window_with_focus = NULL;
+
+	g_hash_table_foreach_remove(child_to_filer, child_eq, filer_window);
 
 	if (filer_window->dir)
 		stop_scanning(filer_window);
