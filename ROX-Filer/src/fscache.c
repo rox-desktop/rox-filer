@@ -169,11 +169,11 @@ void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 	if (!data)
 		return;
 
+	if (obj)
+		g_object_ref(obj);
 	if (data->data)
 		g_object_unref(data->data);
 	data->data = obj;
-	if (data->data)
-		g_object_ref(data->data);
 }
 
 /* As g_fscache_lookup, but 'lookup_type' controls what happens if the data
@@ -324,20 +324,17 @@ static gboolean purge_hash_entry(gpointer key, gpointer data,
 	struct PurgeInfo *info = (struct PurgeInfo *) user_data;
 	GFSCacheData *cache_data = (GFSCacheData *) data;
 
-	if (!cache_data->data)
-		goto remove;
-
 	/* It's wasteful to remove an entry if someone else is using it */
-	if (cache_data->data->ref_count > 1)
+	if (cache_data->data && cache_data->data->ref_count > 1)
 		return FALSE;
 
 	if (cache_data->last_lookup <= info->now
 		&& cache_data->last_lookup >= info->now - info->age)
 		return FALSE;
 
-	g_object_unref(cache_data->data);
+	if (cache_data->data)
+		g_object_unref(cache_data->data);
 
-remove:
 	g_free(key);
 	g_free(data);
 

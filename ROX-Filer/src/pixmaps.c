@@ -30,6 +30,13 @@
 
 #define PIXMAP_PURGE_TIME 1200
 
+/* Image files smaller than this are loaded in the main process.
+ * Larger images are sent to a sub-process.
+ * If this is too small, then looking inside ~/.thumbnails will
+ * cause nasty effects ;-)
+ */
+#define SMALL_IMAGE_THRESHOLD 50000
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -38,8 +45,6 @@
 #include <sys/stat.h>
 
 #include <gtk/gtk.h>
-#include <gdk-pixbuf/gdk-pixbuf.h>
-#include <gdk-pixbuf/gdk-pixbuf-loader.h>
 
 #include "global.h"
 
@@ -83,6 +88,15 @@ MaskedPixmap *im_appdir;
 MaskedPixmap *im_help;
 MaskedPixmap *im_dirs;
 
+typedef struct _ChildThumbnail ChildThumbnail;
+
+/* There is one of these for each active child process */
+struct _ChildThumbnail {
+	gchar	 *path;
+	GFunc	 callback;
+	gpointer data;
+};
+
 /* Static prototypes */
 
 static void load_default_pixmaps(void);
@@ -91,10 +105,9 @@ static MaskedPixmap *image_from_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
-static void got_thumb_data(GdkPixbufLoader *loader,
-				gint fd, GdkInputCondition cond);
 static GdkPixbuf *get_thumbnail_for(const char *path);
-
+static void thumbnail_child_done(ChildThumbnail *info);
+static void child_create_thumbnail(const gchar *path);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -208,12 +221,6 @@ void pixmap_make_small(MaskedPixmap *mp)
 	mp->sm_height = mp->height;
 }
 
-/* XXX: These don't need to be macros anymore */
-#define GET_LOADER(key) (g_object_get_data(G_OBJECT(loader), key))
-#define SET_LOADER(key, data) (g_object_set_data(G_OBJECT(loader), key, data))
-#define SET_LOADER_FULL(key, data, free) \
-		(g_object_set_data_full(G_OBJECT(loader), key, data, free))
-
 /* Load image 'path' in the background and insert into pixmap_cache.
  * Call callback(data, path) when done (path is NULL => error).
  * If the image is already uptodate, or being created already, calls the
@@ -221,11 +228,11 @@ void pixmap_make_small(MaskedPixmap *mp)
  */
 void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 {
-	GdkPixbufLoader *loader;
-	int		fd, tag;
 	gboolean	found;
 	MaskedPixmap	*image;
 	GdkPixbuf	*pixbuf;
+	pid_t		child;
+	ChildThumbnail	*info;
 
 	image = g_fscache_lookup_full(pixmap_cache, path,
 					FSCACHE_LOOKUP_ONLY_NEW, &found);
@@ -241,6 +248,31 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	g_return_if_fail(image == NULL);
 
 	pixbuf = get_thumbnail_for(path);
+	
+	if (!pixbuf)
+	{
+		struct stat finfo;
+
+		/* If the image is small, load it now */
+		if (mc_stat(path, &finfo) != 0)
+		{
+			callback(data, NULL);
+			return;
+		}
+
+		if (finfo.st_size < SMALL_IMAGE_THRESHOLD)
+		{
+			pixbuf = gdk_pixbuf_new_from_file(path, NULL);
+			if (!pixbuf)
+			{
+				g_fscache_insert(pixmap_cache,
+						 path, NULL, TRUE);
+				callback(data, NULL);
+				return;
+			}
+		}
+	}
+		
 	if (pixbuf)
 	{
 		MaskedPixmap *image;
@@ -257,24 +289,27 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	 */
 	g_fscache_insert(pixmap_cache, path, NULL, TRUE);
 
-	fd = mc_open(path, O_RDONLY | O_NONBLOCK);
-	if (fd == -1)
+	child = fork();
+
+	if (child == -1)
 	{
+		delayed_error("fork(): %s", g_strerror(errno));
 		callback(data, NULL);
 		return;
 	}
 
-	loader = gdk_pixbuf_loader_new();
+	if (child == 0)
+	{
+		/* We are the child process */
+		child_create_thumbnail(path);
+		_exit(0);
+	}
 
-	SET_LOADER_FULL("thumb-path", g_strdup(path), g_free);
-	SET_LOADER("thumb-callback", callback);
-	SET_LOADER("thumb-callback-data", data);
-	
-	tag = gtk_input_add_full(fd, GDK_INPUT_READ,
-			    (GdkInputFunction) got_thumb_data, NULL,
-			    loader, NULL);
-
-	SET_LOADER("thumb-input-tag", GINT_TO_POINTER(tag));
+	info = g_new(ChildThumbnail, 1);
+	info->path = g_strdup(path);
+	info->callback = callback;
+	info->data = data;
+	on_child_death(child, (CallbackFn) thumbnail_child_done, info);
 }
 
 /****************************************************************
@@ -284,24 +319,30 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 /* Create a thumbnail file for this image.
  * XXX: Thumbnails should be deleted somewhere!
  */
-static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
+static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 {
 	struct stat info;
+	gchar *path;
 	int original_width, original_height;
 	GString *to;
 	char *md5, *swidth, *sheight, *ssize, *smtime, *uri;
 	mode_t old_mask;
 	int name_len;
+	GdkPixbuf *thumb;
 
 	/* If the source image was very small, don't bother saving */
+#if 0
 	if (gdk_pixbuf_get_width(full) * gdk_pixbuf_get_height(full) <
 			   (HUGE_WIDTH * HUGE_HEIGHT * 3))
 		return;
+#endif /* XXX */
+
+	thumb = scale_pixbuf(full, HUGE_WIDTH, HUGE_HEIGHT);
 
 	original_width = gdk_pixbuf_get_width(full);
 	original_height = gdk_pixbuf_get_height(full);
 
-	if (mc_stat(path, &info) != 0)
+	if (mc_stat(pathname, &info) != 0)
 		return;
 
 	swidth = g_strdup_printf("%d", original_width);
@@ -309,7 +350,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	ssize = g_strdup_printf("%" SIZE_FMT, info.st_size);
 	smtime = g_strdup_printf("%ld", info.st_mtime);
 
-	path = pathdup(path);
+	path = pathdup(pathname);
 	uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 	g_free(path);
@@ -326,10 +367,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(md5);
 
 	old_mask = umask(0077);
-	gdk_pixbuf_save(image->huge_pixbuf,
-			to->str,
-			"png",
-			NULL,
+	gdk_pixbuf_save(thumb, to->str, "png", NULL,
 			"tEXt::Thumb::Image::Width", swidth,
 			"tEXt::Thumb::Image::Height", sheight,
 			"tEXt::Thumb::Size", ssize,
@@ -340,7 +378,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	umask(old_mask);
 
 	/* We create the file ###.png.ROX-Filer-PID and rename it to avoid
-	 * a race condition if two program create the same thumb at
+	 * a race condition if two programs create the same thumb at
 	 * once.
 	 */
 	{
@@ -359,6 +397,47 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(ssize);
 	g_free(smtime);
 	g_free(uri);
+}
+
+/* Called in a subprocess. Load path and create the thumbnail
+ * file. Parent will notice when we die.
+ */
+static void child_create_thumbnail(const gchar *path)
+{
+	GdkPixbuf *image;
+
+	image = gdk_pixbuf_new_from_file(path, NULL);
+
+	if (image)
+		save_thumbnail(path, image);
+
+	/* (no need to unref, as we're about to exit) */
+}
+
+/* Called when the child process exits */
+static void thumbnail_child_done(ChildThumbnail *info)
+{
+	GdkPixbuf *thumb;
+
+	thumb = get_thumbnail_for(info->path);
+
+	if (thumb)
+	{
+		MaskedPixmap *image;
+
+		image = masked_pixmap_new(thumb);
+		g_object_unref(thumb);
+
+		g_fscache_insert(pixmap_cache, info->path, image, FALSE);
+		g_object_unref(image);
+
+		info->callback(info->data, info->path);
+	}
+	else
+		info->callback(info->data, NULL);
+
+	g_free(info->path);
+	g_free(info);
 }
 
 /* Check if we have an up-to-date thumbnail for this image.
@@ -514,62 +593,6 @@ static gint purge(gpointer data)
 	g_fscache_purge(pixmap_cache, PIXMAP_PURGE_TIME);
 
 	return TRUE;
-}
-
-static void got_thumb_data(GdkPixbufLoader *loader,
-				gint fd, GdkInputCondition cond)
-{
-	GFunc callback;
-	gchar *path;
-	gpointer cbdata;
-	char data[4096];
-	int  got, tag;
-
-	got = read(fd, data, sizeof(data));
-
-	if (got > 0 && gdk_pixbuf_loader_write(loader, data, got, NULL))
-		return;
-
-	/* Some kind of error, or end-of-file */
-
-	path = GET_LOADER("thumb-path");
-
-	tag = GPOINTER_TO_INT(GET_LOADER("thumb-input-tag"));
-	g_source_remove(tag);
-
-	gdk_pixbuf_loader_close(loader, NULL);
-
-	if (got == 0)
-	{
-		MaskedPixmap *image;
-		GdkPixbuf *pixbuf;
-
-		pixbuf = gdk_pixbuf_loader_get_pixbuf(loader);
-		if (pixbuf)
-		{
-			gdk_pixbuf_ref(pixbuf);
-			image = masked_pixmap_new(pixbuf);
-
-			g_fscache_insert(pixmap_cache, path, image, FALSE);
-			if (image)
-			{
-				save_thumbnail(path, pixbuf, image);
-				g_object_unref(image);
-			}
-			gdk_pixbuf_unref(pixbuf);
-		}
-		else
-			got = -1;
-	}
-
-	mc_close(fd);
-	
-	callback = GET_LOADER("thumb-callback");
-	cbdata = GET_LOADER("thumb-callback-data");
-
-	callback(cbdata, got != 0 ? NULL : path);
-
-	g_object_unref(G_OBJECT(loader));
 }
 
 static gpointer parent_class;
