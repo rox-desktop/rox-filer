@@ -2,6 +2,16 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+21-Jul-2000
+~~~~~~~~~~~
+In the path entry minibuffer, an exact match is favoured over any other
+match. So, if you enter '.xsession' and press Return you'll get it, not
+'.xsession-errors' or whatever!
+
+The filer now clears APP_DIR from the environment so that child processes
+don't get it. Fixed a bug which caused problems when using a small version
+of the 'missing image' image.
+
 19-Jul-2000
 ~~~~~~~~~~~
 Creating a new directory now makes sure the display is updated.

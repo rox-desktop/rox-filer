@@ -64,7 +64,7 @@ uid_t euid;
 gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
-char *home_dir;
+char *home_dir, *app_dir;
 
 /* Static prototypes */
 static void show_features(void);
@@ -240,6 +240,16 @@ int main(int argc, char **argv)
 	i18n_init();
 
 	home_dir = g_get_home_dir();
+	app_dir = g_strdup(getenv("APP_DIR"));
+	if (app_dir)
+		unsetenv("APP_DIR");
+	else
+	{
+		g_warning("APP_DIR environment variable was unset!\n"
+			"Use the AppRun script to invoke ROX-Filer...\n");
+		app_dir = g_get_current_dir();
+	}
+
 	death_callbacks = g_hash_table_new(NULL, NULL);
 
 #ifdef HAVE_LIBVFS

@@ -614,7 +614,7 @@ static gint key_press_event(GtkWidget	*widget,
 
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, PANEL_NO);
+	filer_opendir(make_path(app_dir, "Help")->str, PANEL_NO);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,

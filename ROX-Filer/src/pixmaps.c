@@ -50,6 +50,7 @@
 #include "support.h"
 #include "gui_support.h"
 #include "pixmaps.h"
+#include "main.h"
 
 GFSCache *pixmap_cache = NULL;
 
@@ -127,12 +128,12 @@ void pixmaps_init(void)
 	load_default_pixmaps();
 }
 
-/* 'name' is relative to APP_DIR. Always returns with a valid image. */
+/* 'name' is relative to app_dir. Always returns with a valid image. */
 MaskedPixmap *load_pixmap(char *name)
 {
 	MaskedPixmap *retval;
 
-	retval = image_from_file(make_path(getenv("APP_DIR"), name)->str);
+	retval = image_from_file(make_path(app_dir, name)->str);
 	if (!retval)
 		retval = get_bad_image();
 	return retval;
@@ -283,6 +284,9 @@ static MaskedPixmap *get_bad_image(void)
 #ifdef HAVE_IMLIB
 		image->image = NULL;
 #endif
+
+		image->sm_pixmap = NULL;
+		image->sm_mask = NULL;
 	}
 
 	image->ref++;

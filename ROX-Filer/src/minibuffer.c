@@ -48,7 +48,10 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window);
 static void changed(GtkEditable *mini, FilerWindow *filer_window);
-static void find_next_match(FilerWindow *filer_window, char *pattern, int dir);
+static gboolean find_next_match(FilerWindow *filer_window,
+				char *pattern,
+				int dir);
+static gboolean find_exact_match(FilerWindow *filer_window, char *pattern);
 static gboolean matches(Collection *collection, int item, char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
 static guchar *mini_contents(FilerWindow *filer_window);
@@ -377,9 +380,6 @@ static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 	}
 	else
 	{
-		Collection 	*collection = filer_window->collection;
-		int 		item;
-
 		if (slash[1] == '.')
 		{
 			if (!filer_window->show_hidden)
@@ -394,9 +394,8 @@ static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 			filer_window->temp_show_hidden = FALSE;
 		}
 		
-		find_next_match(filer_window, slash + 1, 0);
-		item = collection->cursor_item;
-		if (item != -1 && !matches(collection, item, slash + 1))
+		if (find_exact_match(filer_window, slash + 1) == FALSE &&
+		    find_next_match(filer_window, slash + 1, 0) == FALSE)
 			gdk_beep();
 	}
 		
@@ -404,20 +403,47 @@ static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 	g_free(new);
 }
 
+/* Look for an exact match, and move the cursor to it if found.
+ * TRUE on success.
+ */
+static gboolean find_exact_match(FilerWindow *filer_window, char *pattern)
+{
+	Collection 	*collection = filer_window->collection;
+	int		i;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		DirItem *item = (DirItem *) collection->items[i].data;
+
+		if (strcmp(item->leafname, pattern) == 0)
+		{
+			collection_set_cursor_item(collection, i);
+			return TRUE;
+		}
+	}
+
+	return FALSE;
+}
+
 /* Find the next item in the collection that matches 'pattern'. Start from
  * mini_cursor_base and loop at either end. dir is 1 for a forward search,
  * -1 for backwards. 0 means forwards, but may stay the same.
  *
  * Does not automatically update mini_cursor_base.
+ *
+ * Returns TRUE if a match is found.
  */
-static void find_next_match(FilerWindow *filer_window, char *pattern, int dir)
+static gboolean find_next_match(FilerWindow *filer_window,
+				char *pattern,
+				int dir)
 {
 	Collection *collection = filer_window->collection;
 	int 	   base = filer_window->mini_cursor_base;
 	int 	   item = base;
+	gboolean   retval = TRUE;
 
 	if (collection->number_of_items < 1)
-		return;
+		return FALSE;
 
 	if (base < 0 || base>= collection->number_of_items)
 		filer_window->mini_cursor_base = base = 0;
@@ -435,12 +461,15 @@ static void find_next_match(FilerWindow *filer_window, char *pattern, int dir)
 		if (dir == 0)
 			dir = 1;
 		else if (item == base)
+		{
+			retval = FALSE;
 			break;		/* No (other) matches at all */
-
-
+		}
 	} while (!matches(collection, item, pattern));
 
 	collection_set_cursor_item(collection, item);
+
+	return retval;
 }
 
 static gboolean matches(Collection *collection, int item_number, char *pattern)

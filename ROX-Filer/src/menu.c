@@ -48,6 +48,7 @@
 #include "mount.h"
 #include "minibuffer.h"
 #include "i18n.h"
+#include "main.h"
 
 #define C_ "<control>"
 
@@ -1428,7 +1429,7 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 
 void rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, PANEL_NO);
+	filer_opendir(make_path(app_dir, "Help")->str, PANEL_NO);
 }
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget)

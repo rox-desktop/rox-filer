@@ -38,6 +38,7 @@
 #include "options.h"
 #include "i18n.h"
 #include "gui_support.h"
+#include "main.h"
 
 
 /****************************************************************
@@ -61,8 +62,7 @@ void i18n_init(void)
 		struct stat info;
 		guchar	*path;
 
-		path = g_strdup_printf("%s/Messages/%s.gmo",
-				getenv("APP_DIR"), lang);
+		path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, lang);
 		if (stat(path, &info) == 0)
 			rox_add_translations(path);
 		g_free(path);
