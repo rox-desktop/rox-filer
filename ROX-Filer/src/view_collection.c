@@ -43,10 +43,9 @@
 #include "bind.h"
 #include "options.h"
 
-#include "display.h"	/* XXX */
-#include "toolbar.h"	/* XXX */
-#include "filer.h"	/* XXX */
-#include "menu.h"	/* XXX */
+#include "toolbar.h"	/* for resizing */
+#include "display.h"
+#include "filer.h"
 
 #define MIN_ITEM_WIDTH 64
 
@@ -163,7 +162,7 @@ static void view_collection_show_cursor(ViewIface *view);
 static void view_collection_get_iter(ViewIface *view,
 				     ViewIter *iter, IterFlags flags);
 static void view_collection_get_iter_at_point(ViewIface *view, ViewIter *iter,
-					      int x, int y);
+					      GdkWindow *src, int x, int y);
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter);
 static void view_collection_set_selected(ViewIface *view,
 					 ViewIter *iter,
@@ -1344,11 +1343,17 @@ static void view_collection_get_iter(ViewIface *view,
 }
 
 static void view_collection_get_iter_at_point(ViewIface *view, ViewIter *iter,
-					      int x, int y)
+					      GdkWindow *src, int x, int y)
 {
 	ViewCollection *view_collection = VIEW_COLLECTION(view);
 	Collection *collection = view_collection->collection;
 	int i;
+
+	if (src == ((GtkWidget *) view)->window)
+	{
+		/* The event is on the Viewport, not the collection... */
+		y += collection->vadj->value;
+	}
 
 	i = collection_get_item(collection, x, y);
 	make_item_iter(view_collection, iter, i);

@@ -1997,7 +1997,7 @@ void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event)
 	if (event->button > 3)
 		return;
 
-	view_get_iter_at_point(view, &iter, event->x, event->y);
+	view_get_iter_at_point(view, &iter, event->window, event->x, event->y);
 	item = iter.peek(&iter);
 
 	if (item && event->button == 1 &&
@@ -2121,7 +2121,7 @@ static gboolean tooltip_activate(GtkWidget *window)
 	tooltip_show(NULL);
 
 	gdk_window_get_pointer(motion_window, &x, &y, NULL);
-	view_get_iter_at_point(view, &iter, x, y);
+	view_get_iter_at_point(view, &iter, motion_window, x, y);
 
 	item = iter.peek(&iter);
 	if (item != tip_item)
@@ -2156,7 +2156,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 	ViewIter	iter;
 	DirItem		*item;
 
-	view_get_iter_at_point(view, &iter, event->x, event->y);
+	view_get_iter_at_point(view, &iter, event->window, event->x, event->y);
 	item = iter.peek(&iter);
 	
 	if (item)
@@ -2184,6 +2184,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 		return FALSE;
 
 	view_get_iter_at_point(view, &iter,
+			event->window,
 			event->x - (event->x_root - drag_start_x),
 			event->y - (event->y_root - drag_start_y));
 	item = iter.peek(&iter);
@@ -2298,7 +2299,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 
 	if (o_dnd_drag_to_icons.int_value)
 	{
-		view_get_iter_at_point(view, &iter, x, y);
+		view_get_iter_at_point(view, &iter, widget->window, x, y);
 		item = iter.peek(&iter);
 	}
 	else

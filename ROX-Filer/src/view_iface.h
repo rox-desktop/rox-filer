@@ -73,7 +73,8 @@ struct _ViewIfaceClass {
 	void (*show_cursor)(ViewIface *obj);
 
 	void (*get_iter)(ViewIface *obj, ViewIter *iter, IterFlags flags);
-	void (*get_iter_at_point)(ViewIface *obj, ViewIter *iter, int x, int y);
+	void (*get_iter_at_point)(ViewIface *obj, ViewIter *iter,
+				  GdkWindow *src, int x, int y);
 	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
 
 	void (*set_selected)(ViewIface *obj, ViewIter *iter, gboolean selected);
@@ -122,7 +123,8 @@ int view_count_selected(ViewIface *obj);
 void view_show_cursor(ViewIface *obj);
 
 void view_get_iter(ViewIface *obj, ViewIter *iter, IterFlags flags);
-void view_get_iter_at_point(ViewIface *obj, ViewIter *iter, int x, int y);
+void view_get_iter_at_point(ViewIface *obj, ViewIter *iter,
+			    GdkWindow *src, int x, int y);
 void view_get_cursor(ViewIface *obj, ViewIter *iter);
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
 

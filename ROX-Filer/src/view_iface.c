@@ -355,13 +355,14 @@ void view_set_base(ViewIface *obj, ViewIter *iter)
 
 /* Returns an interator which yields just the item under the pointer.
  * iter.peek() will return NULL if no item was under the pointer.
- * x, y is relative to the window which generates events for the widget.
+ * x, y is relative to 'window'.
  */
-void view_get_iter_at_point(ViewIface *obj, ViewIter *iter, int x, int y)
+void view_get_iter_at_point(ViewIface *obj, ViewIter *iter,
+			    GdkWindow *window, int x, int y)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 
-	VIEW_IFACE_GET_CLASS(obj)->get_iter_at_point(obj, iter, x, y);
+	VIEW_IFACE_GET_CLASS(obj)->get_iter_at_point(obj, iter, window, x, y);
 }
 
 /* Begin a drag to select a group of icons */

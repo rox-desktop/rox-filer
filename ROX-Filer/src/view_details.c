@@ -89,7 +89,7 @@ static void view_details_show_cursor(ViewIface *view);
 static void view_details_get_iter(ViewIface *view,
 				     ViewIter *iter, IterFlags flags);
 static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
-					   int x, int y);
+					   GdkWindow *src, int x, int y);
 static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter);
 static void view_details_set_selected(ViewIface *view,
 					 ViewIter *iter,
@@ -1212,7 +1212,7 @@ static void view_details_get_iter(ViewIface *view,
 }
 
 static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
-					   int x, int y)
+					   GdkWindow *src, int x, int y)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 	GtkTreeModel *model;
