@@ -49,5 +49,6 @@ void wink_widget(GtkWidget *widget);
 void destroy_on_idle(GtkWidget *widget);
 gboolean rox_spawn(gchar *dir, gchar **argv);
 void add_default_styles(void);
+GtkWidget *button_new_mixed(char *stock, char *message);
 
 #endif /* _GUI_SUPPORT_H */

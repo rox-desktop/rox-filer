@@ -14,6 +14,7 @@
       <radio label='Spanish' value='sp'/>
       <radio label='Use the LANG environment variable' value='From LANG'/>
     </radio-group>
+    <label>Note that you must save your choices and restart the filer for the new language setting to take full effect.</label>
   </section>
   <section title='Display'>
     <toggle name='display_intelligent_sort' label='Intelligent sorting'>If off, does ASCII sort: File10, File9, file8.
@@ -147,13 +148,7 @@ operation, such as copying or deleting some files.</label>
   <section title='Menus'>
     <entry name='menu_xterm' label="`Xterm Here' program:">The program to launch when you choose `Xterm Here' from the menu.</entry>
     <spacer/>
-    <notice label='Set keyboard shortcuts'>To set a keyboard short-cut for a menu item:
-
-- Open the menu over a filer window,
-- Move the pointer over the item you want to use,
-- Press the key you want attached to it.
-
-The key will appear next to the menu item and you can just press that key without opening the menu in future.</notice>
+    <menu-set-keys/>
     <spacer/>
     <menu name='menu_iconsize' label='Size of icons in menus'>
       <item label='No Icons' value='0'/>
@@ -187,9 +182,7 @@ The key will appear next to the menu item and you can just press that key withou
       </vbox>
     </hbox>
     <spacer/>
-    <label>The filer uses a set of rules to work out the correct MIME type
-for each regular file, and then chooses a suitable icon for that type.
-After editing the files, click the re-read button below, or restart the filer.</label>
+    <label>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. After editing the files, click the re-read button below, or restart the filer.</label>
     <hbox>
       <type-edit label='Show name-to-type rules'/>
       <type-reread label='Re-read files'/>

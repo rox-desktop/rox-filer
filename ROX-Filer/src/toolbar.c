@@ -690,7 +690,7 @@ static void option_notify(void)
 	}
 }
 
-static void update_tools(Option *option, guchar *value)
+static void update_tools(Option *option)
 {
 	GList	*next, *kids;
 
@@ -706,7 +706,7 @@ static void update_tools(Option *option, guchar *value)
 		g_return_if_fail(name != NULL);
 		
 		gtk_widget_set_sensitive(GTK_BIN(kid)->child,
-					 !in_list(name, value));
+					 !in_list(name, option->value));
 	}
 
 	g_list_free(kids);

@@ -155,9 +155,6 @@ static void trans_changed(void)
 		return;
 
 	set_trans(o_translation.value);
-	delayed_error(
-		_("You must Save your choices and restart the filer for "
-		  "the new language setting to take full effect"));
 }
 
 /* Load the 'Messages/<name>.gmo' translation.

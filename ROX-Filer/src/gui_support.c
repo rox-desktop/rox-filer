@@ -906,3 +906,25 @@ void add_default_styles(void)
 	}
 }
 
+GtkWidget *button_new_mixed(char *stock, char *message)
+{
+	GtkWidget *button, *align, *image, *hbox, *label;
+	
+	button = gtk_button_new();
+	label = gtk_label_new_with_mnemonic(message);
+	gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
+
+	image = gtk_image_new_from_stock(stock, GTK_ICON_SIZE_BUTTON);
+	hbox = gtk_hbox_new(FALSE, 2);
+
+	align = gtk_alignment_new(0.5, 0.5, 0.0, 0.0);
+
+	gtk_box_pack_start(GTK_BOX(hbox), image, FALSE, FALSE, 0);
+	gtk_box_pack_end(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	gtk_container_add(GTK_CONTAINER(button), align);
+	gtk_container_add(GTK_CONTAINER(align), hbox);
+	gtk_widget_show_all(align);
+
+	return button;
+}

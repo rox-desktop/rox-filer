@@ -118,6 +118,7 @@ static void select_nth_item(GtkMenuShell *shell, int n);
 static void new_file_type(gchar *templ);
 static void do_send_to(gchar *templ);
 static void show_send_to_menu(GList *paths, GdkEvent *event);
+static GList *set_keys_button(Option *option, xmlNode *node, guchar *label);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -379,6 +380,8 @@ void menu_init(void)
 #else
 	atexit(save_menus);
 #endif
+
+	option_register_widget("menu-set-keys", set_keys_button);
 }
 
 /* Name is in the form "<panel>" */
@@ -1886,3 +1889,27 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 	}
 }
 
+static void show_key_help(GtkWidget *button, gpointer data)
+{
+	report_error(_("To set a keyboard short-cut for a menu item:\n\n"
+	"- Open the menu over a filer window,\n"
+	"- Move the pointer over the item you want to use,\n"
+	"- Press the key you want attached to it.\n\n"
+	"The key will appear next to the menu item and you can just press "
+	"that key without opening the menu in future."));
+}
+
+static GList *set_keys_button(Option *option, xmlNode *node, guchar *label)
+{
+	GtkWidget *button, *align;
+
+	g_return_val_if_fail(option == NULL, NULL);
+	
+	align = gtk_alignment_new(0.5, 0.5, 0, 0);
+	button = gtk_button_new_with_label(_("Set keyboard shortcuts"));
+	gtk_container_add(GTK_CONTAINER(align), button);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(show_key_help), NULL);
+
+	return g_list_append(NULL, align);
+}

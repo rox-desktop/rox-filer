@@ -21,7 +21,7 @@ struct _Option {
 	guchar		*backup;	/* Copy of value to Revert to */
 
 	GtkWidget	*widget;		/* NULL => No UI yet */
-	void		(*update_widget)(Option *option, guchar *value);
+	void		(*update_widget)(Option *option);
 	guchar *	(*read_widget)(Option *option);
 };
 
@@ -39,6 +39,6 @@ void options_notify(void);
 void option_add_notify(OptionNotify *callback);
 void option_add_saver(OptionNotify *callback);
 
-void options_show(void);
+GtkWidget *options_show(void);
 
 #endif /* _OPTIONS_H */
