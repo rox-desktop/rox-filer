@@ -186,6 +186,7 @@ void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
 	static GdkAtom xa_state, xa_atom, xa_net_state, xa_hints, xa_win_hints;
+	static GdkAtom xa_NET_WM_DESKTOP;
 	static GdkAtom state_list[3];
 	GdkWindow *window = widget->window;
 	gint32  wm_hints_values[] = {1, False, 0, 0, 0, 0, 0, 0};
@@ -206,6 +207,7 @@ void make_panel_window(GtkWidget *widget)
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
 		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
 		xa_hints = gdk_atom_intern("WM_HINTS", FALSE);
+		xa_NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
 
 		/* Note: Starting with Gtk+-1.3.12, Gtk+ converts GdkAtoms
 		 * to X atoms automatically when the type is ATOM.
@@ -237,6 +239,9 @@ void make_panel_window(GtkWidget *widget)
 	set_cardinal_property(window, xa_win_hints,
 			WIN_HINTS_SKIP_FOCUS | WIN_HINTS_SKIP_WINLIST |
 			WIN_HINTS_SKIP_TASKBAR);
+
+	/* Appear on all workspaces */
+	set_cardinal_property(window, xa_NET_WM_DESKTOP, 0xffffffff);
 
 	gdk_property_change(window, xa_net_state, xa_atom, 32,
 			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);
