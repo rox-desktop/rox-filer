@@ -1,0 +1,2504 @@
+# translation of rox-ja.po to Japanese
+# UTUMI Hirosi, 2003
+
+msgid ""
+msgstr ""
+"Project-Id-Version: rox-ja\n"
+"POT-Creation-Date: 2003-03-30 13:37+0100\n"
+"PO-Revision-Date: 2003-05-06 23:15--900\n"
+"Last-Translator: UTUMI Hirosi <*>\n"
+"Language-Team: Japanese <ja@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "\n"
+"---\n"
+msgstr "\n"
+"---\n"
+
+msgid "\n"
+"Asking child process to terminate...\n"
+msgstr "\n"
+"Asking child process to terminate...\n"
+
+msgid "\n"
+"Process terminated.\n"
+msgstr "\n"
+"プロセスが完了しました\n"
+
+msgid "\n"
+"Trying to KILL run-away process...\n"
+msgstr "\n"
+"Trying to KILL run-away process...\n"
+
+msgid " (%u hidden)"
+msgstr " (%u 個の隠し属性)"
+
+msgid " and "
+msgstr " and "
+
+msgid " will affect some items on the pinboard or panel - really delete it?"
+msgstr " will affect some items on the pinboard or panel - really delete it?"
+
+msgid " will affect some items on the pinboard or panel - really delete them?"
+msgstr " will affect some items on the pinboard or panel - really delete them?"
+
+msgid "!%s\n"
+"Failed to copy '%s'\n"
+msgstr "!%s\n"
+"Failed to copy '%s'\n"
+
+msgid "!%s\n"
+"Failed to move %s as %s\n"
+msgstr "!%s\n"
+"Failed to move %s as %s\n"
+
+msgid "!%s\n"
+"Mount failed\n"
+msgstr "!%s\n"
+"Mount failed\n"
+
+msgid "!%s\n"
+"Unmount failed\n"
+msgstr "!%s\n"
+"Unmount failed\n"
+
+msgid "!'%s' is a symbolic link\n"
+msgstr "!'%s' is a symbolic link\n"
+
+msgid "!ERROR: Can't copy object into itself\n"
+msgstr "!ERROR: Can't copy object into itself\n"
+
+msgid "!ERROR: Can't move/rename object into itself\n"
+msgstr "!ERROR: Can't move/rename object into itself\n"
+
+msgid "!ERROR: Destination already exists, but is not a directory\n"
+msgstr "!ERROR: Destination already exists, but is not a directory\n"
+
+msgid "!Invalid find condition - change it and try again\n"
+msgstr "!Invalid find condition - change it and try again\n"
+
+msgid "!Invalid mode command - change it and try again\n"
+msgstr "!Invalid mode command - change it and try again\n"
+
+msgid "!No mount points selected!\n"
+msgstr "!No mount points selected!\n"
+
+msgid "%"
+msgstr "%"
+
+msgid "%d items"
+msgstr "%d 個のアイテム"
+
+msgid "%u selected (%s)"
+msgstr "%u 個を選択(%s)"
+
+msgid "'\n"
+"Done\n"
+msgstr "'\n"
+"完了\n"
+
+msgid "'\n"
+"Total: %s ("
+msgstr "'\n"
+"全体: %s ("
+
+msgid "'%s' isn't a directory"
+msgstr "'%s'はディレクトリではありません"
+
+msgid "'(while checking '%s')\n"
+msgstr "'('%s'を検索中)\n"
+
+msgid "'Changing permissions of '%s'\n"
+msgstr "''%s'の権限を変更\n"
+
+msgid "'Copying %s as %s\n"
+msgstr "'Copying %s as %s\n"
+
+msgid "'Deleting '%s'\n"
+msgstr "''%s'を削除\n"
+
+msgid "'Directory '%s' deleted\n"
+msgstr "'ディレクトリ'%s'を削除しました\n"
+
+msgid "'Linking %s as %s\n"
+msgstr "'Linking %s as %s\n"
+
+msgid "'Mounting %s\n"
+msgstr "'%s をマウント\n"
+
+msgid "'Moving %s as %s\n"
+msgstr "'Moving %s as %s\n"
+
+msgid "'Trying copy anyway...\n"
+msgstr "'コピーしてみます..\n"
+
+msgid "'Trying move anyway...\n"
+msgstr "'移動してみます..\n"
+
+msgid "'Unmounting %s\n"
+msgstr "'%s をアンマウント\n"
+
+msgid "(Small Icons):"
+msgstr "(小さいアイコン):"
+
+msgid "(bad utf-8)"
+msgstr "(不正なutf-8)"
+
+msgid "(click to set)"
+msgstr "(クリックでセット)"
+
+msgid "(saving disabled by CHOICESPATH)"
+msgstr "(saving disabled by CHOICESPATH)"
+
+msgid "(thick)"
+msgstr "(広い)"
+
+msgid "(use default)"
+msgstr "(デフォルトを使用)"
+
+msgid ", going"
+msgstr ", 方向"
+
+msgid "<dir>"
+msgstr "<dir>"
+
+msgid "<missing label>"
+msgstr "<missing label>"
+
+msgid "<nothing yet>"
+msgstr "<nothing yet>"
+
+msgid "<nothing>"
+msgstr "<なし>"
+
+msgid ""
+"<u>Quick Start</u>\n"
+"Just put the name of the file you're looking for in single quotes:\n"
+"<b>'index.html'</b> (to find a file called 'index.html')\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>'*.htm', '*.html'</b> (finds HTML files)\n"
+"<b>IsDir 'lib'</b> (finds directories called 'lib')\n"
+"<b>IsReg 'core'</b> (finds a regular file called 'core')\n"
+"<b>! (IsDir, IsReg)</b> (is neither a directory nor a regular file)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (big, and recently modified)\n"
+"<b>'CVS' prune, isreg</b> (a regular file not in CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (contains the word 'fred')\n"
+"\n"
+"<u>Simple Tests</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</b> (types)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (permissions)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"<u>Comparisons</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (values)\n"
+"\n"
+"<u>Specials</u>\n"
+"<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
+"a % in 'command' is replaced with the path of the current file)\n"
+"<b>prune</b> (false, and prevents searching the contents of a directory)."
+msgstr ""
+"<u>概略</u>\n"
+"検索する文字を''でくくってください:\n"
+"<b>'index.html'</b> (''無しでindex.htmlとだけ入力するとエラーになる)\n"
+"\n"
+"<u>例</u>\n"
+"<b>'*.htm', '*.html'</b> (拡張子がhtmとhtmlのファイルを探す)\n"
+"<b>IsDir 'lib'</b> (libというディレクトリをリストアップ[ls=list])\n"
+"<b>IsReg 'core'</b> (coreという一般[regular]ファイルをリストアップ)\n"
+"<b>! (IsDir, IsReg)</b> (ディレクトリと一般ファイルを除外する)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (容量と変更日時を指定)\n"
+"<b>'CVS' prune, isreg</b> (CVS以外の一般ファイル)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (fredという文字を含む)\n"
+"\n"
+"<u>簡単なテスト</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</b> (types)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (permissions)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"<u>比較</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (values)\n"
+"\n"
+"<u>特殊</u>\n"
+"<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
+"a % in 'command' is replaced with the path of the current file)\n"
+"<b>prune</b> (false, and prevents searching the contents of a directory)."
+
+msgid "?'%s' already exists - %s?"
+msgstr "?'%s'は既に存在しています - %sしますか?"
+
+msgid "?'%s' already exists - overwrite?"
+msgstr "?'%s'は既に存在しています - 上書きしますか?"
+
+msgid "?Another search?"
+msgstr "?別の検索を行いますか?"
+
+msgid "?Change permissions of '%s'?"
+msgstr "?'%s'の権限を変更しますか?"
+
+msgid "?Check '%s'?"
+msgstr "?'%s'を調べますか?"
+
+msgid "?Copy %s as %s?"
+msgstr "?Copy %s as %s?"
+
+msgid "?Count contents of %s?"
+msgstr "?%sの容量を調べますか?"
+
+msgid "?Delete %s'%s'?"
+msgstr "?%s'%s'を削除しますか?"
+
+msgid "?Link %s as %s?"
+msgstr "?Link %s as %s?"
+
+msgid "?Mount %s?"
+msgstr "?%sをマウントしますか?"
+
+msgid "?Move %s as %s?"
+msgstr "?Move %s as %s?"
+
+msgid "?Unmount %s?"
+msgstr "?%sをアンマウントしますか?"
+
+msgid "A"
+msgstr "A"
+
+msgid "A run action already exists and is quite a big program - are you sure you want to delete it?"
+msgstr "A run action already exists and is quite a big program - are you sure you want to delete it?"
+
+msgid "About ROX-Filer..."
+msgstr "ROX-Filerについて.."
+
+msgid "Access time:"
+msgstr "アクセスした日時:"
+
+msgid "Action windows"
+msgstr "確認ウィンドウ"
+
+msgid "Action windows appear when you start a background\n"
+"operation, such as copying or deleting some files."
+msgstr "確認ウィンドウは、バックで操作(ファイルのコピーや削除など)を\n"
+"開始したときに表示されます。"
+
+msgid "Add New Bookmark"
+msgstr "新しいブックマークを追加"
+
+msgid "Add the file and image filenames to your personal list. The setting will be lost if the image or the file is moved."
+msgstr "ファイルと画像を個人用リストに追加してください。画像やファイルを移動すると設定は消えます。"
+
+msgid "After"
+msgstr "After"
+
+msgid "Ago"
+msgstr "Ago"
+
+msgid "All, "
+msgstr "全て, "
+
+msgid "Allow dragging to icons in filer windows"
+msgstr "同一ウィンドウ内でのアイコンの移動を許可する"
+
+msgid "Also change contents of subdirectories"
+msgstr "サブディレクトリの内容も変更する"
+
+msgid "Also change contents of subdirectories."
+msgstr "サブディレクトリの内容も変更する"
+
+msgid "Always resize"
+msgstr "常にリサイズする"
+
+msgid "And"
+msgstr "And"
+
+msgid "App dir"
+msgstr "アプリケーションのディレクトリ"
+
+msgid "Appearance"
+msgstr "外観"
+
+msgid "Applet quit without ever creating a widget!"
+msgstr "Applet quit without ever creating a widget!"
+
+msgid "Application directory:"
+msgstr "アプリケーションのディレクトリ:"
+
+msgid "Application:\n"
+"This is an application directory - you can run it as a program, or open it (hold down Shift while you open it). Most applications provide their own help here, but this one doesn't."
+msgstr "Application:\n"
+"This is an application directory - you can run it as a program, or open it (hold down Shift while you open it). Most applications provide their own help here, but this one doesn't."
+
+msgid "Applications have just an image, everything else has both an image and text."
+msgstr "Applications have just an image, everything else has both an image and text."
+
+msgid "Are you sure you want to open %d windows?"
+msgstr "Are you sure you want to open %d windows?"
+
+msgid "Attempt to invoke unknown SOAP method '%s'"
+msgstr "Attempt to invoke unknown SOAP method '%s'"
+
+msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
+msgstr "Attempt to read an XML file as a text file. File '%s' may be corrupted."
+
+msgid "Auto-resize filer windows"
+msgstr "ウィンドウのサイズを自動的に変更"
+
+msgid "Auto-start (Quiet) these actions"
+msgstr "以下を実行するときは確認を求めない:"
+
+msgid "Automatic"
+msgstr "自動"
+
+msgid "Automatic size mode"
+msgstr "ウィンドウのサイズを自動的に変更する"
+
+msgid "Automatic small icons:"
+msgstr "小さいアイコンに自動的に変更:"
+
+msgid "Backdrop..."
+msgstr "背景.."
+
+msgid "Background:"
+msgstr "背景の色:"
+
+msgid "Beep if Tab-completion fails"
+msgstr "タブによる入力補完に失敗したときは音を鳴らす"
+
+msgid "Beep if there are several matches"
+msgstr "補完候補が複数あるときは音を鳴らす"
+
+msgid "Before"
+msgstr "Before"
+
+msgid "Behaviour"
+msgstr "動作"
+
+msgid "Bigger Icons"
+msgstr "アイコン拡大"
+
+msgid "Blank file"
+msgstr "空のファイル"
+
+msgid "Block dev"
+msgstr "Block dev"
+
+msgid "Block device:"
+msgstr "ブロックデバイス:"
+
+msgid "Bookmarks"
+msgstr "ブックマーク"
+
+msgid "Bookmarks menu"
+msgstr "ブックマークメニュー"
+
+msgid "Brief"
+msgstr "簡易"
+
+msgid "Broken symlink (or you don't have permission to follow it): %s"
+msgstr "壊れたsymlink(もしくはsymlinkを追跡する権限がない): %s"
+
+msgid "Byte"
+msgstr "Byte"
+
+msgid "Bytes"
+msgstr "Bytes"
+
+msgid "Can't access '%s':\n"
+"%s"
+msgstr "'%s'にアクセスできません:\n"
+"%s"
+
+msgid "Can't bookmark non-local directories like '%s'"
+msgstr "'%s'はローカルディレクトリではないのでブックマークできません。"
+
+msgid "Can't bookmark non-local resource '%s'\n"
+msgstr "'%s'はローカルに存在しないのでブックマークできません。\n"
+
+msgid "Can't delete '%s':\n"
+"%s"
+msgstr "'%s'を削除できません:\n"
+"%s"
+
+msgid "Can't delete thumbnails in %s:\n"
+"%s"
+msgstr "%s のサムネールを削除できません:\n"
+"%s"
+
+msgid "Can't get data from remote machine (application/octet-stream not provided)"
+msgstr "リモートマシンからデータを取得できません(application/octet-stream not provided)"
+
+msgid "Can't open directory: %s"
+msgstr "ディレクトリを開けません: %s"
+
+msgid "Can't remove %s: %s"
+msgstr "%s を削除できません: %s"
+
+msgid "Can't stat directory: %s"
+msgstr "Can't stat directory: %s"
+
+msgid "Cancel"
+msgstr "キャンセル"
+
+msgid "Capitalised names first (for sort by name)"
+msgstr "大文字を先に表示(名前で並べ変える場合)"
+
+msgid "Centre"
+msgstr "中央"
+
+msgid "Centre the image without scaling it"
+msgstr "画像をスケーリングせず中央に表示"
+
+msgid "Change at:"
+msgstr "この数で変更:"
+
+msgid "Change icon size"
+msgstr "アイコンの大きさを変更"
+
+msgid "Change time:"
+msgstr "変更した日時:"
+
+msgid "Change to home directory"
+msgstr "ホームディレクトリに移動"
+
+msgid "Change to parent directory"
+msgstr "１つ上のディレクトリに移動"
+
+msgid "Changing the size of the icons or which details are displayed will resize the window for you."
+msgstr "Changing the size of the icons or which details are displayed will resize the window for you."
+
+msgid "Char dev"
+msgstr "Char dev"
+
+msgid "Character device:"
+msgstr "Character device:"
+
+msgid "Chinese (simplified)"
+msgstr "Chinese (simplified)"
+
+msgid "Chinese (traditional)"
+msgstr "Chinese (traditional)"
+
+msgid "Choices saving is disabled by CHOICESPATH variable"
+msgstr "Choices saving is disabled by CHOICESPATH variable"
+
+msgid "Choices will be saved as:\n"
+"%s"
+msgstr "設定を以下に保存します:\n"
+"%s"
+
+msgid "Choose a style and drag an image in:"
+msgstr "画像をドラッグして表示方法を選択:"
+
+msgid "Clear Selection"
+msgstr "選択をクリア"
+
+msgid "Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things."
+msgstr "Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things."
+
+msgid "Clicking the icon opens:"
+msgstr "アイコンをクリックしたら以下を開く:"
+
+msgid "Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window."
+msgstr "第１ボタン(たいてい左ボタン)をクリックすると、ディレクトリを新しいウィンドウで開く。第２ボタン(中ボタン)をクリックすると現在のウィンドウで開く。"
+
+msgid "Close"
+msgstr "閉じる"
+
+msgid "Close Window"
+msgstr "ウィンドウを閉じる"
+
+msgid "Close filer window"
+msgstr "フィルタウィンドウを閉じる"
+
+msgid "Coarse"
+msgstr "粗い"
+
+msgid "Colour files based on their types"
+msgstr "種類別にファイルを色分けする"
+
+msgid "Colours"
+msgstr "色"
+
+msgid "Command:"
+msgstr "コマンド:"
+
+msgid "Compatibility"
+msgstr "互換性"
+
+msgid "Compiled with GTK version %s\n"
+msgstr "Compiled with GTK version %s\n"
+
+msgid "Copy"
+msgstr "コピー"
+
+msgid "Copy ... ?"
+msgstr "コピーする"
+
+msgid "Copy files without confirming first."
+msgstr "ファイルをコピーするときは確認を求めない"
+
+msgid "Copy image into directory"
+msgstr "画像をディレクトリにコピー"
+
+msgid "Copy the files"
+msgstr "ファイルをコピー"
+
+msgid "Copy the image inside the directory, as a hidden file called '.DirIcon'. All users will then see the icon, and you can move the directory around safely. This is usually the best option if you can write to the directory."
+msgstr "Copy the image inside the directory, as a hidden file called '.DirIcon'. All users will then see the icon, and you can move the directory around safely. This is usually the best option if you can write to the directory."
+
+msgid "Copy..."
+msgstr "コピー.."
+
+msgid ""
+"Copyright (C) 2003 Thomas Leonard.\n"
+"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
+"to the extent permitted by law.\n"
+"You may redistribute copies of ROX-Filer\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+msgstr ""
+"Copyright (C) 2003 Thomas Leonard.\n"
+"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
+"to the extent permitted by law.\n"
+"You may redistribute copies of ROX-Filer\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+
+msgid "Could not read link: %s"
+msgstr "リンクを読めません: %s"
+
+msgid "Could not send data to program: %s"
+msgstr "データをプログラムに送れません: %s"
+
+msgid "Count"
+msgstr "容量"
+
+msgid "Count the size of ... ?"
+msgstr "容量を計算する"
+
+msgid "Create"
+msgstr "作成"
+
+msgid "Create links to files without confirming first."
+msgstr "リンクを張るときは確認を求めない"
+
+msgid "Customise"
+msgstr "カスタマイズ"
+
+msgid "DELETE ... ?"
+msgstr "削除する"
+
+msgid "Danish"
+msgstr "Danish"
+
+msgid "Date"
+msgstr "日時"
+
+msgid "Day"
+msgstr "日"
+
+msgid "Days"
+msgstr "日"
+
+msgid "Default details:"
+msgstr "デフォルトの説明:"
+
+msgid "Default settings"
+msgstr "デフォルトの設定"
+
+msgid "Default settings for new windows"
+msgstr "新しいウィンドウのデフォルト設定"
+
+msgid "Default size:"
+msgstr "デフォルトのサイズ:"
+
+msgid "Delete"
+msgstr "削除"
+
+msgid "Delete files without confirming first."
+msgstr "[危険]ファイルを削除するときは確認を求めない"
+
+msgid "Deleting items such as "
+msgstr "以下のアイテムを削除 "
+
+msgid "Deleting the item "
+msgstr "アイテムを削除 "
+
+msgid "Deleting the items "
+msgstr "このアイテムを削除 "
+
+msgid "Details"
+msgstr "詳細"
+
+msgid "Device file:\n"
+"Device files allow you to read from or write to a device driver as though it was an ordinary file."
+msgstr "Device file:\n"
+"Device files allow you to read from or write to a device driver as though it was an ordinary file."
+
+msgid "Dir"
+msgstr "Dir"
+
+msgid "Directories come first (for sort by name)"
+msgstr "ディレクトリを先に表示(名前で並べ変える場合)"
+
+msgid "Directories spring open"
+msgstr "ディレクトリの自動オープン"
+
+msgid "Directory"
+msgstr "ディレクトリ"
+
+msgid "Directory '%s' is not accessible"
+msgstr "ディレクトリ'%s'にアクセスできません"
+
+msgid "Directory '%s' not found."
+msgstr "ディレクトリ'%s'はありません"
+
+msgid "Directory missing/deleted"
+msgstr "ディレクトリがありません/削除されています"
+
+msgid "Directory:"
+msgstr "ディレクトリ:"
+
+msgid "Directory:\n"
+"This is a directory. It contains an index to other items - open it to see the list."
+msgstr "Directory:\n"
+"This is a directory. It contains an index to other items - open it to see the list."
+
+msgid "Disk Usage"
+msgstr "ディスクの使用量"
+
+msgid "Display"
+msgstr "表示"
+
+msgid "Dnotify support"
+msgstr "Dnotify support"
+
+msgid ""
+"Do you want to unmount this device?\n"
+"\n"
+"Unmounting a device makes it safe to remove the disk."
+msgstr ""
+"Do you want to unmount this device?\n"
+"\n"
+"Unmounting a device makes it safe to remove the disk."
+
+msgid "Don't confirm deletion of non-writeable items"
+msgstr "書き込み禁止アイテムを削除するときも確認を求めない"
+
+msgid "Don't confirm deletion of non-writeable items."
+msgstr "書き込み禁止アイテムを削除するときも確認を求めない"
+
+msgid "Don't confirm every operation"
+msgstr "操作ごとに確認を求めない"
+
+msgid "Don't display so much information in the message area."
+msgstr "あまり多くの情報を表示しない"
+
+msgid "Don't list processed files"
+msgstr "Don't list processed files"
+
+msgid "Don't use hostnames"
+msgstr "ホスト名を使わない"
+
+msgid "Door"
+msgstr "Door"
+
+msgid "Door files are a bit like sockets or pipes, and have only been seen on Solaris."
+msgstr "Door files are a bit like sockets or pipes, and have only been seen on Solaris."
+
+msgid "Door:"
+msgstr "Door:"
+
+msgid "Door:\n"
+"Doors are a little-used Solaris method for processes to communicate."
+msgstr "Door:\n"
+"Doors are a little-used Solaris method for processes to communicate."
+
+msgid "Drag a directory here to bookmark it."
+msgstr "ブックマークするにはディレクトリをここにドラッグ"
+
+msgid "Drag and Drop"
+msgstr "ドラッグ＆ドロップ"
+
+msgid "Drag and drop"
+msgstr "ドラッグ＆ドロップ"
+
+msgid "Drag the icon to a directory viewer\n"
+"(or enter a full pathname)"
+msgstr "Drag the icon to a directory viewer\n"
+"(or enter a full pathname)"
+
+msgid "Dragging to icons"
+msgstr "アイコンのドラッグ"
+
+msgid "Drop a suitable application here"
+msgstr "関連づけるアプリケーションをここにドロップ"
+
+msgid "Drop an icon file here"
+msgstr "アイコンファイルをここにドロップ"
+
+msgid "Drop an image here"
+msgstr "画像をここにドロップ"
+
+msgid "Dutch"
+msgstr "Dutch"
+
+msgid "ERROR"
+msgstr "エラー"
+
+msgid "ERROR reading"
+msgstr "ERROR reading"
+
+msgid "Edit Bookmarks"
+msgstr "ブックマークを編集"
+
+msgid "Edit Item"
+msgstr "アイテムを編集"
+
+msgid "English (no translation)"
+msgstr "English (no translation)"
+
+msgid "Enter Path..."
+msgstr "パスを入力.."
+
+msgid "Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr "Enter a shell command to execute. Click on a file to add it to the buffer."
+
+msgid ""
+"Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
+"\n"
+"gimp \"$@\""
+msgstr ""
+"Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
+"\n"
+"gimp \"$@\""
+
+msgid "Enter a shell command:"
+msgstr "シェルコマンドを入力してください:"
+
+msgid "Enter the name of a file and I'll display it for you. Press Tab to fill in the longest match. Escape to close the minibuffer."
+msgstr "Enter the name of a file and I'll display it for you. Press Tab to fill in the longest match. Escape to close the minibuffer."
+
+msgid "Error creating '%s': %s"
+msgstr "Error creating '%s': %s"
+
+msgid "Error creating file: could not find the template for %s"
+msgstr "Error creating file: could not find the template for %s"
+
+msgid "Error creating image '%s':\n"
+"%s"
+msgstr "Error creating image '%s':\n"
+"%s"
+
+msgid "Error getting file list: %s"
+msgstr "ファイルリストを取得中にエラー: %s"
+
+msgid ""
+"Error in '%s' file at line %d: \n"
+"\"%s\"\n"
+"This may be due to upgrading from a previous version of ROX-Filer. Open the Options window and click on Save.\n"
+"Further errors will be ignored."
+msgstr ""
+"Error in '%s' file at line %d: \n"
+"\"%s\"\n"
+"This may be due to upgrading from a previous version of ROX-Filer. Open the Options window and click on Save.\n"
+"Further errors will be ignored."
+
+msgid "Error in handler %s: %s"
+msgstr "Error in handler %s: %s"
+
+msgid "Error loading MIME database:\n"
+"%s"
+msgstr "Error loading MIME database:\n"
+"%s"
+
+msgid ""
+"Error loading backdrop image:\n"
+"%s\n"
+"Backdrop removed."
+msgstr ""
+"Error loading backdrop image:\n"
+"%s\n"
+"Backdrop removed."
+
+msgid "Error running applet:\n"
+"%s"
+msgstr "Error running applet:\n"
+"%s"
+
+msgid "Error saving %s: %s"
+msgstr "Error saving %s: %s"
+
+msgid "Error saving file: %s"
+msgstr "Error saving file: %s"
+
+msgid "Error saving panel %s: %s"
+msgstr "Error saving panel %s: %s"
+
+msgid "Error saving pinboard %s: %s"
+msgstr "Error saving pinboard %s: %s"
+
+msgid "Error scanning '%s':\n"
+"%s"
+msgstr "Error scanning '%s':\n"
+"%s"
+
+msgid "Error scanning '%s':\n"
+"%s\n"
+msgstr "Error scanning '%s':\n"
+"%s\n"
+
+msgid "Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine."
+msgstr "Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine."
+
+msgid "Error:"
+msgstr "エラー:"
+
+msgid "Every panel icon is shown with an image and some text."
+msgstr "Every panel icon is shown with an image and some text."
+
+msgid "Examine ... ?"
+msgstr "情報を調べる"
+
+msgid ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the permissions now (this problem may have been caused by a bug in earlier versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. Otherwise, you should check, or even just delete, all the existing run actions."
+msgstr ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the permissions now (this problem may have been caused by a bug in earlier versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. Otherwise, you should check, or even just delete, all the existing run actions."
+
+msgid "Executable file:"
+msgstr "実行ファイル:"
+
+msgid "Executable file:\n"
+"This is a file with an eXecute bit set - it can be run as a program."
+msgstr "Executable file:\n"
+"This is a file with an eXecute bit set - it can be run as a program."
+
+msgid "Executable files"
+msgstr "実行ファイル"
+
+msgid "Execute file"
+msgstr "ファイルを実行"
+
+msgid "Expression:"
+msgstr "表現:"
+
+msgid "Failed to get keyboard grab!"
+msgstr "Failed to get keyboard grab!"
+
+msgid "File"
+msgstr "ファイル"
+
+msgid "File '%s' corrupted!"
+msgstr "ファイル'%s'は競合しています"
+
+msgid "File doesn't exist, or I can't access it: %s"
+msgstr "ファイルが存在していないかアクセスできません: %s"
+
+msgid "File type colours"
+msgstr "ファイルの色分け"
+
+msgid "File:\n"
+"This is a data file. Try using the Info menu item to find out more..."
+msgstr "File:\n"
+"This is a data file. Try using the Info menu item to find out more..."
+
+msgid "Filenames (and details) are coloured according to the file's type."
+msgstr "Filenames (and details) are coloured according to the file's type."
+
+msgid "Filer windows"
+msgstr "ファイラのウィンドウ"
+
+msgid "Find"
+msgstr "検索"
+
+msgid "Find expression reference"
+msgstr "Find expression reference"
+
+msgid "Fine"
+msgstr "細かい"
+
+msgid "Follow Symbolic Links"
+msgstr "シンボリックリンクを追跡"
+
+msgid "Force"
+msgstr "強制"
+
+msgid "Foreground:"
+msgstr "文字の色:"
+
+msgid "French"
+msgstr "French"
+
+msgid "GNOME-VFS library"
+msgstr "GNOME-VFS library"
+
+msgid "German"
+msgstr "German"
+
+msgid "Goto:"
+msgstr "Goto:"
+
+msgid "Group %s is not set. Select some files and press Ctrl+%s to set the group. Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
+msgstr "Group %s is not set. Select some files and press Ctrl+%s to set the group. Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
+
+msgid "Help"
+msgstr "ヘルプ"
+
+msgid "Help about ... ?"
+msgstr "ヘルプを見る"
+
+msgid "Hence"
+msgstr "Hence"
+
+msgid "Hidden"
+msgstr "隠し"
+
+msgid "Home"
+msgstr "ホーム"
+
+msgid "Home Directory"
+msgstr "ホームディレクトリ"
+
+msgid "Hour"
+msgstr "Hour"
+
+msgid "Hours"
+msgstr "Hours"
+
+msgid "Huge Icons"
+msgstr "巨大なアイコン"
+
+msgid "Hungarian"
+msgstr "Hungarian"
+
+msgid "I can't show you the currently set item, because nothing is currently set. Drag something onto me!"
+msgstr "I can't show you the currently set item, because nothing is currently set. Drag something onto me!"
+
+msgid "I don't know how to open '%s'"
+msgstr "'%s'を開く方法が分かりません"
+
+msgid "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift drag) any applications you want into it."
+msgstr "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift drag) any applications you want into it."
+
+msgid "Icon View"
+msgstr "アイコン表示"
+
+msgid "Icon grid step:"
+msgstr "アイコンの移動幅:"
+
+msgid "Iconified windows"
+msgstr "アイコン化したウィンドウ"
+
+msgid "Iconify to the"
+msgstr "アイコン化する場所"
+
+msgid "Icons View"
+msgstr "アイコン表示"
+
+msgid "Icons only"
+msgstr "アイコンのみ"
+
+msgid "Icons, With..."
+msgstr "アイコンと以下を表示.."
+
+msgid "If a file has a known extension (eg '.gif') then ignore the executable bit. This is useful if you have files on a Windows-type filesystem which are being shown as executable programs."
+msgstr "既知の拡張子(例: .gif)を持つファイルが実行ファイルになっている場合、その実行属性を無視する。Windowsのファイルが実行ファイルのように表示されている場合に効果がある。"
+
+msgid "If a handler for the specific type isn't set up, use this as the default."
+msgstr "If a handler for the specific type isn't set up, use this as the default."
+
+msgid "If on, all filenames starting with a capital letter come before filenames starting with lowercase ones."
+msgstr "If on, all filenames starting with a capital letter come before filenames starting with lowercase ones."
+
+msgid "If on, the symlink will store the path from the symlink to the target file. Use this if the symlink and the target will be moved together.\n"
+"If off, the path from the root directory is stored - use this if the symlink may move but the target will stay put."
+msgstr "If on, the symlink will store the path from the symlink to the target file. Use this if the symlink and the target will be moved together.\n"
+"If off, the path from the root directory is stored - use this if the symlink may move but the target will stay put."
+
+msgid "If this is on then column headings will be shown in the list view."
+msgstr "リストの一番上に項目の説明を表示する"
+
+msgid "If this is on then directories will always appear before anything else when sorting by name."
+msgstr "If this is on then directories will always appear before anything else when sorting by name."
+
+msgid "If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below."
+msgstr "If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below."
+
+msgid "If this is on then files whose names start with a dot are shown too, otherwise they are hidden."
+msgstr "If this is on then files whose names start with a dot are shown too, otherwise they are hidden."
+
+msgid "If this is set, pinboard icons are always kept completely within screen limits, including the label."
+msgstr "If this is set, pinboard icons are always kept completely within screen limits, including the label."
+
+msgid "If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use."
+msgstr "If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use."
+
+msgid "If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed."
+msgstr "ディレクトリを開いたときに、既に別の窓がそのディレクトリを表示している場合は、その窓を自動的に閉じる"
+
+msgid "Ignore eXecutable bit for known extensions"
+msgstr "既知の拡張子については実行属性を無視する"
+
+msgid "Image and text"
+msgstr "アイコンと文字"
+
+msgid "Image only"
+msgstr "アイコンのみ"
+
+msgid "Image only for applications"
+msgstr "アプリケーションの場合はアイコンのみ"
+
+msgid "Incorrect or missing line break in text/uri-list data"
+msgstr "Incorrect or missing line break in text/uri-list data"
+
+msgid "Info"
+msgstr "情報"
+
+msgid "Inherit options from source window"
+msgstr "元のウィンドウのオプションを引き継ぐ"
+
+msgid "Internal error - bad info type"
+msgstr "内部エラー - bad info type"
+
+msgid "Internal error: %s unreadable"
+msgstr "内部エラー: %s は読めません"
+
+msgid "Invalid .gmo translation file (GNU magic number not found): %s"
+msgstr "不正な.gmo翻訳ファイル(GNU magic number not found): %s"
+
+msgid "Invalid .gmo translation file (too short): %s"
+msgstr "不正な.gmo翻訳ファイル(短すぎます): %s"
+
+msgid "Invalid Find condition"
+msgstr "不正な検索"
+
+msgid "Invalid application %s (bad AppRun)"
+msgstr "不正なアプリケーション %s(bad AppRun)"
+
+msgid "Invert Selection"
+msgstr "選択を反転"
+
+msgid "IsBlock"
+msgstr "IsBlock"
+
+msgid "IsChar"
+msgstr "IsChar"
+
+msgid "IsDev"
+msgstr "IsDev"
+
+msgid "IsDir"
+msgstr "IsDir"
+
+msgid "IsDoor"
+msgstr "IsDoor"
+
+msgid "IsEmpty"
+msgstr "IsEmpty"
+
+msgid "IsExecutable"
+msgstr "IsExecutable"
+
+msgid "IsLink"
+msgstr "IsLink"
+
+msgid "IsMine"
+msgstr "IsMine"
+
+msgid "IsPipe"
+msgstr "IsPipe"
+
+msgid "IsReadable"
+msgstr "IsReadable"
+
+msgid "IsReg"
+msgstr "IsReg"
+
+msgid "IsSGID"
+msgstr "IsSGID"
+
+msgid "IsSUID"
+msgstr "IsSUID"
+
+msgid "IsSocket"
+msgstr "IsSocket"
+
+msgid "IsSticky"
+msgstr "IsSticky"
+
+msgid "IsWriteable"
+msgstr "IsWriteable"
+
+msgid "Italian"
+msgstr "Italian"
+
+msgid "Item no longer exists!"
+msgstr "アイテムは存在しません"
+
+msgid "Keep icons within screen limits"
+msgstr "アイコンを画面内に収める"
+
+msgid "Keyboard shortcuts"
+msgstr "キーボードのショートカット"
+
+msgid "Language"
+msgstr "言語"
+
+msgid "Large File Support"
+msgstr "大きなファイルのサポート"
+
+msgid "Large Icons"
+msgstr "大きなアイコン"
+
+msgid "Largest window size:"
+msgstr "ウィンドウの最大サイズ:"
+
+msgid "Last _Modified"
+msgstr "最終変更日"
+
+msgid "Link"
+msgstr "リンク"
+
+msgid "Link..."
+msgstr "リンク.."
+
+msgid "List View"
+msgstr "リスト表示"
+
+msgid "Look Inside"
+msgstr "Look Inside"
+
+msgid "Look inside ... ?"
+msgstr "Look inside ... ?"
+
+msgid "MIME types"
+msgstr "MIME types"
+
+msgid "Manual"
+msgstr "マニュアル"
+
+msgid "Max width (Large icons):"
+msgstr "ファイル名の最大幅(大きなアイコン):"
+
+msgid "Maximum width for the text beside a Small Icon."
+msgstr "「小さいアイコン」の横に表示するファイル名の最大幅"
+
+msgid "Medium"
+msgstr "中間"
+
+msgid "Menu on button 2 (RISC OS style)"
+msgstr "第２ボタン(中ボタン)でメニューを表示(RISC OS style)"
+
+msgid "Menus"
+msgstr "メニュー"
+
+msgid "Min"
+msgstr "分"
+
+msgid "Minibuffer"
+msgstr "パス入力"
+
+msgid "Mins"
+msgstr "分"
+
+msgid "Missing ',' after icon label"
+msgstr "Missing ',' after icon label"
+
+msgid "Missing '='"
+msgstr "Missing '='"
+
+msgid "Missing '>' in icon label"
+msgstr "Missing '>' in icon label"
+
+msgid "Missing < or > in panel config file"
+msgstr "Missing < or > in panel config file"
+
+msgid "Modify time:"
+msgstr "修正した日時:"
+
+msgid "Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows."
+msgstr "多くのウィンドウマネージャにはウィンドウをアイコン化(最小化)する機能があります。ROX-Filerを含む多くのアプリケーションでこの機能を使うことができます。"
+
+msgid "Mount"
+msgstr "マウント"
+
+msgid "Mount / Unmount"
+msgstr "マウント/アンマウント"
+
+msgid "Mount and unmount filesystems without confirming first."
+msgstr "マウント/アンマウントするときは確認を求めない"
+
+msgid "Mount point"
+msgstr "マウントポイント"
+
+msgid "Mount point (%s)"
+msgstr "Point de montage (%s)"
+
+msgid "Mount point for %s (%s)"
+msgstr "%s (%s)のマウントポイント"
+
+msgid "Mount point:\n"
+"A mount point is a directory which another filing system can be mounted on. Everything on the mounted filesystem then appears to be inside the directory."
+msgstr "Mount point:\n"
+"A mount point is a directory which another filing system can be mounted on. Everything on the mounted filesystem then appears to be inside the directory."
+
+msgid "Move"
+msgstr "移動"
+
+msgid "Move files without confirming first."
+msgstr "ファイルを移動するときは確認を求めない"
+
+msgid "Move the files"
+msgstr "ファイルを移動"
+
+msgid ""
+"NOTE: Your system does not support long options - \n"
+"you must use the short versions instead.\n"
+"\n"
+msgstr ""
+"NOTE: Your system does not support long options - \n"
+"you must use the short versions instead.\n"
+"\n"
+
+msgid "Name"
+msgstr "名前"
+
+msgid "Named pipe:\n"
+"Pipes allow different programs to communicate. One program writes data to the pipe while another one reads it out again."
+msgstr "Named pipe:\n"
+"Pipes allow different programs to communicate. One program writes data to the pipe while another one reads it out again."
+
+msgid "Never automatically resize"
+msgstr "サイズを自動的に変更しない"
+
+msgid "New"
+msgstr "新規作成"
+
+msgid "New Window"
+msgstr "新しいウィンドウ"
+
+msgid "New pathname is not absolute"
+msgstr "New pathname is not absolute"
+
+msgid "New window on button 1"
+msgstr "第１ボタンで新しいウィンドウを開く"
+
+msgid "NewDir"
+msgstr "NewDir"
+
+msgid "NewFile"
+msgstr "NewFile"
+
+msgid "Newer"
+msgstr "新しいとき"
+
+msgid "Next Click"
+msgstr "何をしますか"
+
+msgid "No"
+msgstr "いいえ"
+
+msgid "No (gnome-vfs-config not found)"
+msgstr "No (gnome-vfs-config not found)"
+
+msgid "No Icons"
+msgstr "アイコンなし"
+
+msgid "No URIs in the text/uri-list (nothing to do!)"
+msgstr "No URIs in the text/uri-list (nothing to do!)"
+
+msgid "No description"
+msgstr "説明なし"
+
+msgid "No details"
+msgstr "説明なし"
+
+msgid "No items%s"
+msgstr "No items%s"
+
+msgid "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox -p=Default' to turn it on in future."
+msgstr "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox -p=Default' to turn it on in future."
+
+msgid "No run action defined"
+msgstr "関連づけを設定していません"
+
+msgid "No run action specified for files of this type (%s/%s) - you can set a run action by choosing `Set Run Action' from the File menu, or you can just drag the file to an application"
+msgstr "この種類(%s/%s)のファイルに対する関連づけを設定していません - アイコンを右クリックして「関連づけを設定」を選んでください。もしくはアイコンを直接アプリケーションにドラッグしてください"
+
+msgid "Non-executable %s"
+msgstr "Non-executable %s"
+
+msgid "None"
+msgstr "なし"
+
+msgid "None of these files are on the local machine - I can't operate on multiple remote files - sorry."
+msgstr "None of these files are on the local machine - I can't operate on multiple remote files - sorry."
+
+msgid "Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded."
+msgstr "デスクトップの背景で右クリックをすると、通常はROXのデスクトップメニューが現れる。しかしここにチェックを入れると、ウィンドウマネージャ本来の表示が現れる。"
+
+msgid ""
+"Normally, you can just select a command from the menu (click \n"
+"on the arrow beside the command box). Sometimes, you need more...\n"
+"\n"
+"The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
+"Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which determines whether to\n"
+"change the permissions for the User (owner), Group or Others.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly the permissions.\n"
+"<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
+"\n"
+"Bracketed text and spaces are ignored.\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>u+rw</b>: the file owner gains read and write permission\n"
+"<b>g=u</b>: the group permissions are set to be the same as the user's\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without write permission\n"
+"<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
+"<b>a+X</b>: directories become accessable by everyone; files which were\n"
+"executable by anyone become executable by everyone\n"
+"<b>u+rw, go+r</b>: two commands at once!\n"
+"<b>u+s</b>: set the SetUID bit - often has no effect on script files\n"
+"<b>755</b>: set the permissions directly\n"
+"\n"
+"See the chmod(1) man page for full details."
+msgstr ""
+"Normally, you can just select a command from the menu (click \n"
+"on the arrow beside the command box). Sometimes, you need more...\n"
+"\n"
+"The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
+"Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which determines whether to\n"
+"change the permissions for the User (owner), Group or Others.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly the permissions.\n"
+"<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
+"\n"
+"Bracketed text and spaces are ignored.\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>u+rw</b>: the file owner gains read and write permission\n"
+"<b>g=u</b>: the group permissions are set to be the same as the user's\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without write permission\n"
+"<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
+"<b>a+X</b>: directories become accessable by everyone; files which were\n"
+"executable by anyone become executable by everyone\n"
+"<b>u+rw, go+r</b>: two commands at once!\n"
+"<b>u+s</b>: set the SetUID bit - often has no effect on script files\n"
+"<b>755</b>: set the permissions directly\n"
+"\n"
+"See the chmod(1) man page for full details."
+
+msgid "Norwegian"
+msgstr "Norwegian"
+
+msgid "Not"
+msgstr "Not"
+
+msgid "Note that you can still get the menu to appear, by dragging with Alt held down."
+msgstr "Note that you can still get the menu to appear, by dragging with Alt held down."
+
+msgid "Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key."
+msgstr "Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key."
+
+msgid "Note that you must save your choices and restart the filer for the new language setting to take full effect."
+msgstr ""
+"注意: 新しい言語を有効にするには、選択を保存してファイラを再起動してください。\n"
+"\n"
+"日本語翻訳\n"
+"UTUMI Hirosi, 2003"
+
+msgid "Nothing"
+msgstr "なし"
+
+msgid "Now"
+msgstr "Now"
+
+msgid "OR"
+msgstr "もしくは"
+
+msgid "Only files (and certain applications) can be used to set the background image."
+msgstr "Only files (and certain applications) can be used to set the background image."
+
+msgid "Only for the file `%s'"
+msgstr "`%s'ファイルのみに適用する"
+
+msgid "Only for the type `%s' (%s/%s)"
+msgstr "`%s'(%s/%s)のみに適用する"
+
+msgid "Only log directories being deleted"
+msgstr "ログディレクトリだけを削除する"
+
+msgid "Only over-write if source is newer than destination."
+msgstr "対象より新しいときだけ上書きする"
+
+msgid "Only the image is shown."
+msgstr "Only the image is shown."
+
+msgid "Open AVFS"
+msgstr "AVFSを開く"
+
+msgid "Open As Text"
+msgstr "テキストとして開く"
+
+msgid "Open unmounted"
+msgstr "アンマウントしているものを開く"
+
+msgid "Options"
+msgstr "オプション"
+
+msgid "Options..."
+msgstr "オプション.."
+
+msgid "Override window manager control of the pinboard and panels"
+msgstr "ウィンドウマネージャによるデスクトップとパネルの制御を無視する"
+
+msgid "Owner, Group:"
+msgstr "所有者, グループ:"
+
+msgid "Panel style"
+msgstr "パネルの表示"
+
+msgid "Panel width (thin)"
+msgstr "パネルの幅(狭い)"
+
+msgid "Panels"
+msgstr "パネル"
+
+msgid "Panels are bars of icons that run along the side of the screen. See the manual for information about using panels."
+msgstr "画面の下にアイコンの連なったパネルが表示されます。詳しくはマニュアルをお読みください。"
+
+msgid "Parent, New Window"
+msgstr "１つ上を新しい窓で開く"
+
+msgid "Parent, Same Window"
+msgstr "１つ上を同じ窓で開く"
+
+msgid "Pass all backdrop mouse clicks to window manager"
+msgstr "デスクトップの背景でのマウスクリックはウィンドウマネージャに渡す"
+
+msgid "Permissions"
+msgstr "権限"
+
+msgid "Permissions:"
+msgstr "権限:"
+
+msgid "Pinboard"
+msgstr "デスクトップ"
+
+msgid "Pinboard behaviour"
+msgstr "デスクトップの動作"
+
+msgid "Pipe"
+msgstr "Pipe"
+
+msgid "Pipe:"
+msgstr "Pipe:"
+
+msgid "Polish"
+msgstr "Polish"
+
+msgid "Press the desired shortcut (eg, Control+F1)"
+msgstr "ショートカットを入力してください(例: Control+F1)"
+
+msgid "Program %s not found - deleted?"
+msgstr "プログラム %s がありません - 削除しましたか？"
+
+msgid "Purge thumbnails disk cache"
+msgstr "サムネールのキャッシュを削除"
+
+msgid "Put the cursor on an entry in the list to move it"
+msgstr "移動するにはリストの項目にカーソルを置いてください"
+
+msgid "Quiet"
+msgstr "全てはい"
+
+msgid "ROX application"
+msgstr "ROX application"
+
+msgid "ROX-Filer"
+msgstr "ROX-Filer"
+
+msgid "ROX-Filer does not yet support mount points on your system. Sorry."
+msgstr "ROX-Filer does not yet support mount points on your system. Sorry."
+
+msgid "ROX-Filer has converted your Options file to the new XML format"
+msgstr "ROX-Filer has converted your Options file to the new XML format"
+
+msgid "Real directory:"
+msgstr "Real directory:"
+
+msgid "Really delete icon '%s'?"
+msgstr "アイコン'%s'を削除しますか？"
+
+msgid "Recently Visited"
+msgstr "最近行った場所"
+
+msgid "Recurse"
+msgstr "再帰的"
+
+msgid "Refresh"
+msgstr "更新"
+
+msgid "Regular file:"
+msgstr "一般ファイル:"
+
+msgid "Remote app can't or won't send me the data - sorry"
+msgstr "Remote app can't or won't send me the data - sorry"
+
+msgid "Remote application wants to use Direct Save, but I can't read the XdndDirectSave0 (type text/plain) property.\n"
+msgstr "Remote application wants to use Direct Save, but I can't read the XdndDirectSave0 (type text/plain) property.\n"
+
+msgid "Remove Item(s)"
+msgstr "アイテムを削除"
+
+msgid "Rename"
+msgstr "リネーム"
+
+msgid "Rename ... ?"
+msgstr "リネームする"
+
+msgid "Rename..."
+msgstr "リネーム.."
+
+msgid "Rescan directory contents"
+msgstr "ディレクトリの内容を読み直す"
+
+msgid "Resize Window"
+msgstr "ウィンドウをリサイズ"
+
+msgid "Resize when changing the display style"
+msgstr "表示方法を変更したらリサイズする"
+
+msgid "Restore all choices to how they were when the Options box was opened."
+msgstr "Restore all choices to how they were when the Options box was opened."
+
+msgid "Reversed"
+msgstr "戻す"
+
+msgid "Run action:"
+msgstr "実行:"
+
+msgid "Running as user '%s'"
+msgstr "ユーザ'%s'で実行"
+
+msgid "Running with GTK version %d.%d.%d\n"
+msgstr "Running with GTK version %d.%d.%d\n"
+
+msgid "Russian"
+msgstr "Russian"
+
+msgid "S"
+msgstr "S"
+
+msgid "Same as current window"
+msgstr "現在のウィンドウのアイコンと同じ"
+
+msgid "Same as default"
+msgstr "デフォルトのアイコンと同じ"
+
+msgid "Save As:"
+msgstr "別名で保存:"
+
+msgid "Scale"
+msgstr "等倍"
+
+msgid "Scale the image to fit the backdrop area, without distorting it"
+msgstr "Scale the image to fit the backdrop area, without distorting it"
+
+msgid "Scan"
+msgstr "スキャン"
+
+msgid "Scanning, "
+msgstr "Scanning, "
+
+msgid "Search inside ... ?"
+msgstr "検索する"
+
+msgid "Sec"
+msgstr "秒"
+
+msgid "Secs"
+msgstr "秒"
+
+msgid "Select"
+msgstr "選択"
+
+msgid "Select All"
+msgstr "全て選択"
+
+msgid "Select If..."
+msgstr "条件つき選択.."
+
+msgid "Select If:"
+msgstr "Select If:"
+
+msgid "Select the buttons you want on the bar:"
+msgstr "バーのボタンを選んでください:"
+
+msgid "Send ... to ... ?"
+msgstr "送る"
+
+msgid "Send To..."
+msgstr "送る.."
+
+msgid "Set Icon..."
+msgstr "アイコンを設定.."
+
+msgid "Set Run Action..."
+msgstr "関連づけを設定.."
+
+msgid "Set backdrop"
+msgstr "背景を設定"
+
+msgid "Set default for all `%s/<anything>'"
+msgstr "全ての`%s/<anything>'に適用する"
+
+msgid "Set icon"
+msgstr "アイコンを設定"
+
+msgid "Set icon for ... ?"
+msgstr "アイコンを設定"
+
+msgid "Set icon for all `%s/<anything>'"
+msgstr "アイコンを全ての`%s/<anything>'に適用する"
+
+msgid "Set keyboard shortcuts"
+msgstr "キーボードのショートカットを設定"
+
+msgid "Set permissions on ... ?"
+msgstr "権限を設定"
+
+msgid "Set run action"
+msgstr "関連づけを設定"
+
+msgid "Set run action for ... ?"
+msgstr "関連づけを設定"
+
+msgid "Setting icon disabled by CHOICESPATH"
+msgstr "Setting icon disabled by CHOICESPATH"
+
+msgid "Shell Command..."
+msgstr "シェルコマンド.."
+
+msgid "Shell:"
+msgstr "シェル:"
+
+msgid "Shift Open"
+msgstr "開く"
+
+msgid "Shift Open ... ?"
+msgstr "開く"
+
+msgid "Short titlebar flags"
+msgstr "処理中のコマンドを略記する"
+
+msgid "Show"
+msgstr "表示"
+
+msgid "Show Bookmarks"
+msgstr "ブックマークを表示"
+
+msgid "Show Help Files"
+msgstr "ヘルプファイルを表示"
+
+msgid "Show Hidden"
+msgstr "隠し属性を表示"
+
+msgid "Show Info"
+msgstr "情報を表示"
+
+msgid "Show Location"
+msgstr "アイテムの場所を表示"
+
+msgid "Show ROX-Filer help"
+msgstr "ROX-Filerのヘルプを表示"
+
+msgid "Show Target"
+msgstr "リンク先を表示"
+
+msgid "Show Thumbnails"
+msgstr "サムネールを表示"
+
+msgid "Show _Help Files"
+msgstr "ヘルプファイルを表示"
+
+msgid "Show a menu of possible actions"
+msgstr "実行可能なメニューを表示"
+
+msgid "Show column headings"
+msgstr "項目の説明を表示"
+
+msgid "Show extra details"
+msgstr "詳細を表示"
+
+msgid "Show hidden files"
+msgstr "隠しファイルを表示"
+
+msgid "Show iconified windows"
+msgstr "アイコン化したウィンドウを表示"
+
+msgid "Show image thumbnails"
+msgstr "画像のサムネールを表示"
+
+msgid "Show name-to-type rules"
+msgstr "名前->種類 の順で表示"
+
+msgid "Show the current choice in a filer window"
+msgstr "フィルタウィンドウの現在の選択を表示"
+
+msgid "Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size."
+msgstr "Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size."
+
+msgid "Show totals of items"
+msgstr "アイテムの総数を表示"
+
+msgid "Show/hide hidden files"
+msgstr "隠しファイルを表示/隠す"
+
+msgid "Single-click navigation"
+msgstr "シングルクリックで操作する"
+
+msgid "Single-click to open"
+msgstr "シングルクリックで開く"
+
+msgid "Size"
+msgstr "サイズ"
+
+msgid "Size of icons in menus:"
+msgstr "メニューのアイコンの大きさ:"
+
+msgid "Size:"
+msgstr "サイズ:"
+
+msgid "Sizes"
+msgstr "サイズ"
+
+msgid "Small Icons"
+msgstr "小さいアイコン"
+
+msgid "Smaller Icons"
+msgstr "アイコン縮小"
+
+msgid "Socket"
+msgstr "Socket"
+
+msgid "Socket:"
+msgstr "Socket :"
+
+msgid "Socket:\n"
+"Sockets allow processes to communicate."
+msgstr "Socket:\n"
+"Sockets allow processes to communicate."
+
+msgid "Some of these files are on a different machine - they will be ignored - sorry"
+msgstr "Some of these files are on a different machine - they will be ignored - sorry"
+
+msgid "Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work."
+msgstr "Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work."
+
+msgid "Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists."
+msgstr "ウィンドウマネージャの中には新しい拡張ヒントシステムをサポートしないものがある。この場合デスクトップとパネルは普通のウィンドウのように扱われる。ここにチェックを入れるとデスクトップが前面に来るというような問題を修正することができる。ウィンドウ周りの装飾等についても同様。"
+
+msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
+msgstr "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
+
+msgid "Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgstr "Sorry - I require a target type of text/uri-list or application/octet-stream."
+
+msgid "Sorry, I can't use '%s' because it's not a local file."
+msgstr "Sorry, I can't use '%s' because it's not a local file."
+
+msgid "Sorry, can't display a menu of actions for a remote file / raw data."
+msgstr "Sorry, can't display a menu of actions for a remote file / raw data."
+
+msgid "Sorry, you need to drop exactly one file onto the drop area."
+msgstr "Sorry, you need to drop exactly one file onto the drop area."
+
+msgid "Sort by Date"
+msgstr "日付で並べ変え"
+
+msgid "Sort by Group"
+msgstr "グループで並べ変え"
+
+msgid "Sort by Name"
+msgstr "名前で並べ変え"
+
+msgid "Sort by Owner"
+msgstr "所有者で並べ変え"
+
+msgid "Sort by Size"
+msgstr "サイズで並べ変え"
+
+msgid "Sort by Type"
+msgstr "種類で並べ変え"
+
+msgid "Sort by:"
+msgstr "以下の順で並べ変え:"
+
+msgid "Sorting"
+msgstr "並べ変え"
+
+msgid "Spanish"
+msgstr "Spanish"
+
+msgid "Spring delay:"
+msgstr "開くまでの時間:"
+
+msgid "Stretch"
+msgstr "拡大"
+
+msgid "Stretch the image to fill the backdrop area"
+msgstr "Stretch the image to fill the backdrop area"
+
+msgid "Swedish"
+msgstr "Swedish"
+
+msgid "Switch to xterm"
+msgstr "xtermに切り替える"
+
+msgid "Sym link"
+msgstr "シンボリックリンク"
+
+msgid "Symbolic link"
+msgstr "シンボリックリンク"
+
+msgid "Symbolic link to "
+msgstr "以下へのシンボリックリンク "
+
+msgid "Symbolic link to %s"
+msgstr "%s にシンボリックリンクを張る"
+
+msgid "Symlink"
+msgstr "シンボリックリンク"
+
+msgid "Symlink ... ?"
+msgstr "Symlinkを張る"
+
+msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
+msgstr "Symlink from '%s' already exists. Replace it with a link to '%s'?"
+
+msgid "T"
+msgstr "I"
+
+msgid "Text beside icons"
+msgstr "アイコンの横に文字を表示"
+
+msgid "Text shadow:"
+msgstr "文字の影:"
+
+msgid "Text under icons"
+msgstr "アイコンの下に文字を表示"
+
+msgid "Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this."
+msgstr "この幅よりファイル名が長いときはファイル名を２行に分けて表示する(「大きなアイコン」モード)。「巨大なアイコン」モードのときは幅が50%広くなる。"
+
+msgid "The -o argument is no longer used. You can turn on override redirect from the Options box instead."
+msgstr "The -o argument is no longer used. You can turn on override redirect from the Options box instead."
+
+msgid ""
+"The `Send To' menu provides a quick way to send some files to an application. The applications listed are those in the following directories:\n"
+"\n"
+"%s\n"
+"%s\n"
+"The `Send To' menu may be opened by Shift+Menu clicking over a file.\n"
+"\n"
+"Advanced use:\n"
+"You can also create subdirectories called `.text_html', `.text', etc which will only be shown for files of that type. `.group' is shown only when multiple files are selected."
+msgstr ""
+"The `Send To' menu provides a quick way to send some files to an application. The applications listed are those in the following directories:\n"
+"\n"
+"%s\n"
+"%s\n"
+"The `Send To' menu may be opened by Shift+Menu clicking over a file.\n"
+"\n"
+"Advanced use:\n"
+"You can also create subdirectories called `.text_html', `.text', etc which will only be shown for files of that type. `.group' is shown only when multiple files are selected."
+
+msgid "The backdrop handler must be an application directory. Drag an application directory into the Set Backdrop dialog box, or (for programmers) pass it to the SOAP SetBackdropApp method."
+msgstr "The backdrop handler must be an application directory. Drag an application directory into the Set Backdrop dialog box, or (for programmers) pass it to the SOAP SetBackdropApp method."
+
+msgid "The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. After editing the files, you must run the 'update-mime-database' command. Use the Refresh toolbar button to reload the new types."
+msgstr "The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. After editing the files, you must run the 'update-mime-database' command. Use the Refresh toolbar button to reload the new types."
+
+msgid "The filer will resize windows whenever it seems useful (that is, when changing directory or display style)."
+msgstr "The filer will resize windows whenever it seems useful (that is, when changing directory or display style)."
+
+msgid "The font used for the text displayed under the icons"
+msgstr "The font used for the text displayed under the icons"
+
+msgid "The keyboard shortcut is:"
+msgstr "キーボードのショートカット:"
+
+msgid "The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to."
+msgstr "画面全体に対する最大のサイズ。自動的にサイズを変更する際に許可する最大のサイズ。"
+
+msgid "The location must contain at least one character!"
+msgstr "The location must contain at least one character!"
+
+msgid "The pathname you gave does not exist. The icon has not been changed."
+msgstr "The pathname you gave does not exist. The icon has not been changed."
+
+msgid "The program to launch when you choose `Xterm Here' from the menu."
+msgstr "メニューの`ここでxtermを開く'を選んだときに起動するプログラム"
+
+msgid "The size of the panels."
+msgstr "パネルのサイズ"
+
+msgid ""
+"The standard MIME type database (version 0.9 or later) was not found. The filer will probably not show the correct types for different files. You should download and install the 'shared-mime-info-0.9' package from here:\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html\n"
+"\n"
+"If you have already installed this package, check that the permissions allow the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/globs)."
+msgstr ""
+"The standard MIME type database (version 0.9 or later) was not found. The filer will probably not show the correct types for different files. You should download and install the 'shared-mime-info-0.9' package from here:\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html\n"
+"\n"
+"If you have already installed this package, check that the permissions allow the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/globs)."
+
+msgid "The text displayed under the icon is:"
+msgstr "アイコンの下に表示する文字:"
+
+msgid "There are no thumbnails to delete"
+msgstr "削除するサムネールはありません"
+
+msgid "There was one error.\n"
+msgstr "There was one error.\n"
+
+msgid "There were %d errors.\n"
+msgstr "There were %d errors.\n"
+
+msgid "Thick"
+msgstr "濃い"
+
+msgid "Thin"
+msgstr "薄い"
+
+msgid "This filename is not valid UTF-8. You should rename it.\n"
+msgstr "This filename is not valid UTF-8. You should rename it.\n"
+
+msgid "This is already the canonical name for this directory."
+msgstr "This is already the canonical name for this directory."
+
+msgid "This is not a program! Give me an application instead!"
+msgstr "This is not a program! Give me an application instead!"
+
+msgid "This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows."
+msgstr "This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows."
+
+msgid "This item is already at the end"
+msgstr "This item is already at the end"
+
+msgid "This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect."
+msgstr "ファイルをドラッグしてフォルダの上にかざしてからフォルダが自動的に開くまでの待ち時間をミリ秒(1000ms=1秒)で指定する。"
+
+msgid "This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while."
+msgstr "このオプションを使うには上のオプションを有効にしてください。ファイルをドラッグしてフォルダの上にかざすと、しばらくしてフォルダが自動的に開きます。"
+
+msgid "Thumbnails"
+msgstr "サムネール"
+
+msgid "Thumbnails cache"
+msgstr "サムネールのキャッシュ"
+
+msgid "Thumbs, "
+msgstr "サムネール, "
+
+msgid "Tile"
+msgstr "タイル"
+
+msgid "Tile the image over the backdrop area"
+msgstr "Tile the image over the backdrop area"
+
+msgid "Times"
+msgstr "日付"
+
+msgid ""
+"To set a keyboard short-cut for a menu item:\n"
+"\n"
+"- Open the menu over a filer window,\n"
+"- Move the pointer over the item you want to use,\n"
+"- Press the key you want attached to it.\n"
+"\n"
+"The key will appear next to the menu item and you can just press that key without opening the menu in future."
+msgstr ""
+"キーボードのショートカットを設定するには:\n"
+"\n"
+"- ショートカットを設定するアイテムをファイラで表示\n"
+"- アイテムのアイコンを右クリック\n"
+"- 「アイテムを編集」を選ぶ\n"
+"\n"
+"ダイアログが表示されるので指示に従ってください。"
+
+msgid "To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed."
+msgstr "To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed."
+
+msgid "Toolbar"
+msgstr "ツールバー"
+
+msgid "Toolbar type:"
+msgstr "ツールバーの種類:"
+
+msgid "Tools/Minibuffer"
+msgstr "ツールバー/パス入力"
+
+msgid "Translation"
+msgstr "翻訳"
+
+msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
+msgstr "詳しくは`ROX-Filer/AppRun --help'で確認してください\n"
+
+msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
+msgstr "詳しくは`ROX-Filer/AppRun -h'で確認してください\n"
+
+msgid "Type"
+msgstr "種類"
+
+msgid "Type:"
+msgstr "種類:"
+
+msgid "Types"
+msgstr "種類"
+
+msgid "Unable to load image file -- maybe it's not in a format I understand, or maybe the permissions are wrong?\n"
+"The icon has not been changed."
+msgstr "Unable to load image file -- maybe it's not in a format I understand, or maybe the permissions are wrong?\n"
+"The icon has not been changed."
+
+msgid "Unique windows"
+msgstr "重複した窓を閉じる"
+
+msgid "Unknown"
+msgstr "不明"
+
+msgid "Unknown action requested"
+msgstr "そのアクションは不明です"
+
+msgid "Unknown details type '%s'"
+msgstr "不明な詳細の種類'%s'"
+
+msgid "Unknown sorting type '%s'"
+msgstr "不明な並べ変え方法'%s'"
+
+msgid "Unknown style '%s'"
+msgstr "不明なスタイル'%s'"
+
+msgid "Unknown target"
+msgstr "不明な対象"
+
+msgid "Unknown type:"
+msgstr "不明な種類:"
+
+msgid "Unknown type:\n"
+"I couldn't find out what kind of file this is. Maybe it doesn't exist anymore or you don't have search permission on the directory it's in?"
+msgstr "Unknown type:\n"
+"I couldn't find out what kind of file this is. Maybe it doesn't exist anymore or you don't have search permission on the directory it's in?"
+
+msgid "Unmount"
+msgstr "アンマウント"
+
+msgid "Unnamed"
+msgstr "Unnamed"
+
+msgid "UntitledData"
+msgstr "UntitledData"
+
+msgid "Up"
+msgstr "上へ"
+
+msgid ""
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Open each directory or file listed, or the current working\n"
+"directory if no arguments are given.\n"
+"\n"
+"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
+"  -c, --client-id=ID\tused for session management\n"
+"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
+"  -D, --close=DIR\tclose DIR and its subdirectories\n"
+"  -h, --help\t\tdisplay this help and exit\n"
+"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
+"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
+"  -n, --new\t\tstart new copy; for debugging the filer\n"
+"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
+"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
+"  -R, --RPC\t\tinvoke method call read from stdin\n"
+"  -s, --show=FILE\topen a directory showing FILE\n"
+"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
+"  -u, --user\t\tshow user name in each window \n"
+"  -v, --version\t\tdisplay the version information and exit\n"
+"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
+"\n"
+"Report bugs to <tal197@users.sourceforge.net>.\n"
+"Home page (including updated versions): http://rox.sourceforge.net/\n"
+msgstr ""
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Open each directory or file listed, or the current working\n"
+"directory if no arguments are given.\n"
+"\n"
+"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
+"  -c, --client-id=ID\tused for session management\n"
+"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
+"  -D, --close=DIR\tclose DIR and its subdirectories\n"
+"  -h, --help\t\tdisplay this help and exit\n"
+"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
+"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
+"  -n, --new\t\tstart new copy; for debugging the filer\n"
+"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
+"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
+"  -R, --RPC\t\tinvoke method call read from stdin\n"
+"  -s, --show=FILE\topen a directory showing FILE\n"
+"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
+"  -u, --user\t\tshow user name in each window \n"
+"  -v, --version\t\tdisplay the version information and exit\n"
+"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
+"\n"
+"Report bugs to <tal197@users.sourceforge.net>.\n"
+"Home page (including updated versions): http://rox.sourceforge.net/\n"
+
+msgid "Use a 16-pixel grid for positioning icons on the desktop."
+msgstr "Use a 16-pixel grid for positioning icons on the desktop."
+
+msgid "Use a 2-pixel grid for positioning icons on the desktop."
+msgstr "Use a 2-pixel grid for positioning icons on the desktop."
+
+msgid "Use a 32-pixel grid for positioning icons on the desktop."
+msgstr "Use a 32-pixel grid for positioning icons on the desktop."
+
+msgid "Use a copy of the image as the default for all files of these MIME types."
+msgstr "Use a copy of the image as the default for all files of these MIME types."
+
+msgid "Use a copy of the image for all files of this MIME type."
+msgstr "Use a copy of the image for all files of this MIME type."
+
+msgid "Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead."
+msgstr "Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead."
+
+msgid "Use custom font:"
+msgstr "カスタムフォントを使う:"
+
+msgid "Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar."
+msgstr "タイトルバーに表示される Scanning(スキャン中), All(全て表示), Thumbs(サムネール作成中)の文字を略記する。Scanning なら '+S' となる。"
+
+msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
+msgstr "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
+
+msgid "Use the LANG environment variable"
+msgstr "LANG変数から読み取る"
+
+msgid "Use this application for all files with this MIME type."
+msgstr "Use this application for all files with this MIME type."
+
+msgid ""
+"User-definable shortcuts are disabled by default in Gtk2, and you have not enabled them. You can turn this feature on by:\n"
+"1) using an XSettings manager, such as ROX-Session\n"
+"or\n"
+"2) adding this line to ~/.gtkrc-2.0:\n"
+"\tgtk-can-change-accels = 1"
+msgstr ""
+"User-definable shortcuts are disabled by default in Gtk2, and you have not enabled them. You can turn this feature on by:\n"
+"1) using an XSettings manager, such as ROX-Session\n"
+"or\n"
+"2) adding this line to ~/.gtkrc-2.0:\n"
+"\tgtk-can-change-accels = 1"
+
+msgid "View type:"
+msgstr "表示方法:"
+
+msgid "WRITE-PROTECTED "
+msgstr "書き込み禁止 "
+
+msgid "Week"
+msgstr "週"
+
+msgid "Weeks"
+msgstr "週"
+
+msgid "When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used."
+msgstr "When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used."
+
+msgid "When dragging files with the left mouse button"
+msgstr "マウスの左ボタンでファイルをドラッグしたとき"
+
+msgid "When dragging files with the middle mouse button"
+msgstr "マウスの中ボタンでファイルをドラッグしたとき"
+
+msgid "When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program."
+msgstr "これを有効にすると、ファイルをドラッグして同一ウィンドウ内のサブディレクトリやプログラムにドロップできるようになる。"
+
+msgid "When thumbnails are turned on, each image file in a directory is loaded and a small thumbnail of it is shown."
+msgstr "When thumbnails are turned on, each image file in a directory is loaded and a small thumbnail of it is shown."
+
+msgid "When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them."
+msgstr "デスクトップにファイルをドラッグすると、デスクトップにショートカットを作ることができます。"
+
+msgid "When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies)."
+msgstr "メニューの`パスを入力..'でパスの入力欄を開き、文字を打つ。このときタブを押して何も補完することができないときは音を鳴らす。"
+
+msgid "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added."
+msgstr "メニューの`パスを入力..'でパスの入力欄を開き、文字を打つ。このときタブを押して複数の補完候補があるときは音を鳴らす。"
+
+msgid "Window"
+msgstr "ウィンドウ"
+
+msgid "Window behaviour"
+msgstr "ウィンドウの動作"
+
+msgid "Window manager problems"
+msgstr "ウィンドウマネージャとの問題"
+
+msgid "XDS protocol error: leafname may not contain '/'\n"
+msgstr "XDS protocol error: leafname may not contain '/'\n"
+
+msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
+msgstr "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
+
+msgid "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/plain) did not contain a leafname\n"
+msgstr "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/plain) did not contain a leafname\n"
+
+msgid "Xterm Here"
+msgstr "ここでxtermを開く"
+
+msgid "Year"
+msgstr "年"
+
+msgid "Years"
+msgstr "年"
+
+msgid "Yes"
+msgstr "はい"
+
+msgid ""
+"You can only set the backdrop to an image or to a program which knows how to manage ROX-Filer's backdrop.\n"
+"\n"
+"Programmers: the application's AppInfo.xml must contain the CanSetBackdrop element, as described in ROX-Filer's manual."
+msgstr ""
+"You can only set the backdrop to an image or to a program which knows how to manage ROX-Filer's backdrop.\n"
+"\n"
+"Programmers: the application's AppInfo.xml must contain the CanSetBackdrop element, as described in ROX-Filer's manual."
+
+msgid "You can only set the run action for a regular file"
+msgstr "You can only set the run action for a regular file"
+
+msgid "You can't open a second view onto this directory because the `Unique Windows' option is turned on in the Options window."
+msgstr "You can't open a second view onto this directory because the `Unique Windows' option is turned on in the Options window."
+
+msgid "You cannot do this to more than one item at a time"
+msgstr "You cannot do this to more than one item at a time"
+
+msgid "You have tried to close a panel via the window manager - I usually find that this is accidental... really close?"
+msgstr "You have tried to close a panel via the window manager - I usually find that this is accidental... really close?"
+
+msgid "You must first select some items to remove"
+msgstr "まず削除するアイテムを選んでください"
+
+msgid "You must open the menu over an item"
+msgstr "You must open the menu over an item"
+
+msgid "You need to select some items to count"
+msgstr "数えるアイテムを選んでください"
+
+msgid "You need to select some items to search through"
+msgstr "検索するアイテムを選んでください"
+
+msgid "You need to select the items whose permissions you want to change"
+msgstr "権限を変更するアイテムを選んでください"
+
+msgid "You should Shift+Menu click over a file to send it somewhere"
+msgstr "You should Shift+Menu click over a file to send it somewhere"
+
+msgid "You should first select some rows to delete"
+msgstr "まず削除する列を選んでください"
+
+msgid "You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background."
+msgstr "You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background."
+
+msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
+msgstr "Your CHOICESPATH variable setting prevents customisations - sorry."
+
+msgid "Your old panel file has been converted to the new XML format."
+msgstr "Your old panel file has been converted to the new XML format."
+
+msgid "Your old pinboard file has been converted to the new XML format."
+msgstr "Your old pinboard file has been converted to the new XML format."
+
+msgid "_Group"
+msgstr "_グループ"
+
+msgid "_Name"
+msgstr "_名前"
+
+msgid "_Owner"
+msgstr "_所有者"
+
+msgid "_Permissions"
+msgstr "権限(_P)"
+
+msgid "_Quiet"
+msgstr "全てはい(_Q)"
+
+msgid "_Relative link"
+msgstr "_相対リンク"
+
+msgid "_Replace"
+msgstr "_置き換え"
+
+msgid "_Revert"
+msgstr "_戻す"
+
+msgid "_Size"
+msgstr "_サイズ"
+
+msgid "_Type"
+msgstr "_種類"
+
+msgid "`Xterm Here' program"
+msgstr "ここでXtermを開く"
+
+msgid "a+x (Make executable/searchable)"
+msgstr "a+x (Make executable/searchable)"
+
+msgid "a-x (Make non-executable/non-searchable)"
+msgstr "a-x (Make non-executable/non-searchable)"
+
+msgid "atime"
+msgstr "atime"
+
+msgid "blocks"
+msgstr "blocks"
+
+msgid "bottom-left"
+msgstr "左下"
+
+msgid "bottom-right"
+msgstr "右下"
+
+msgid "byte"
+msgstr "byte"
+
+msgid "bytes"
+msgstr "bytes"
+
+msgid "ctime"
+msgstr "ctime"
+
+msgid "directories"
+msgstr "ディレクトリ"
+
+msgid "directory"
+msgstr "ディレクトリ"
+
+msgid "features set at compile time"
+msgstr "features set at compile time"
+
+msgid "file"
+msgstr "ファイル"
+
+msgid "file(1) says..."
+msgstr "file(1) says..."
+
+msgid "file(1) says... %s"
+msgstr "file(1) says... %s"
+
+msgid "files"
+msgstr "ファイル"
+
+msgid "gid"
+msgstr "gid"
+
+msgid "go-rwx (Private - owner access only)"
+msgstr "go-rwx (Private - owner access only)"
+
+msgid "go-w (Fix security problem)"
+msgstr "go-w (Fix security problem)"
+
+msgid "go=u-w (Public access, not write)"
+msgstr "go=u-w (Public access, not write)"
+
+msgid "horizontally"
+msgstr "水平に"
+
+msgid "inode"
+msgstr "inode"
+
+msgid "item"
+msgstr "アイテム"
+
+msgid "items"
+msgstr "アイテム"
+
+msgid "lstat(2) failed: %s"
+msgstr "lstat(2) failed: %s"
+
+msgid "merge contents"
+msgstr "merge contents"
+
+msgid "mounted"
+msgstr "mounted"
+
+msgid "ms"
+msgstr "ms"
+
+msgid "mtime"
+msgstr "mtime"
+
+msgid "nlinks"
+msgstr "nlinks"
+
+msgid "no directories)\n"
+msgstr "no directories)\n"
+
+msgid "overwrite"
+msgstr "上書き"
+
+msgid "pixels"
+msgstr "ピクセル"
+
+msgid "prune"
+msgstr "prune"
+
+msgid "size"
+msgstr "サイズ"
+
+msgid "system"
+msgstr "システム"
+
+msgid "top-left"
+msgstr "左上"
+
+msgid "top-right"
+msgstr "右上"
+
+msgid "u+rw (Give owner read+write)"
+msgstr "u+rw (Give owner read+write)"
+
+msgid "uid"
+msgstr "uid"
+
+msgid "unmounted"
+msgstr "unmounted"
+
+msgid "vertically"
+msgstr "垂直に"
+
