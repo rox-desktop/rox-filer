@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.5\n"
-"POT-Creation-Date: 2003-01-06 13:07+0000\n"
+"POT-Creation-Date: 2003-01-10 13:27+0000\n"
 "PO-Revision-Date: 2002-11-21\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -50,7 +50,6 @@ msgid "Find expression reference"
 msgstr "Información sobre la expresión de búsqueda"
 
 #: action.c:184
-#, fuzzy
 msgid ""
 "<u>Quick Start</u>\n"
 "Just put the name of the file you're looking for in single quotes:\n"
@@ -124,7 +123,7 @@ msgstr ""
 "<b>system(comando)</b> (verdadero si 'comando' termina con un estado de "
 "salida\n"
 "cero;\n"
-"un \\% en 'comando' es reemplazado con la ruta del archivo actual)\n"
+"un % en 'comando' es reemplazado con la ruta del archivo actual)\n"
 "<b>prune</b> (falso, e impide la búsqueda en los contenidos de un "
 "directorio)."
 
@@ -582,39 +581,39 @@ msgstr ""
 msgid "<missing label>"
 msgstr "<etiqueta ausente>"
 
-#: bookmarks.c:348
+#: bookmarks.c:349
 msgid "You should first select some rows to delete"
 msgstr "Tienes que seleccionar primero algunas filas a ser borradas"
 
-#: bookmarks.c:371
+#: bookmarks.c:372
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "Selecciona una entrada en la lista para moverla"
 
-#: bookmarks.c:391
+#: bookmarks.c:392
 msgid "This item is already at the end"
 msgstr "Este elemento ya es el último"
 
-#: bookmarks.c:485
+#: bookmarks.c:486
 msgid "Add new bookmark"
 msgstr "Agregar nuevo marcador"
 
-#: bookmarks.c:492
+#: bookmarks.c:493
 msgid "Edit bookmarks"
 msgstr "Editar marcadores"
 
-#: cell_icon.c:150
+#: cell_icon.c:151
 msgid "DirItem"
 msgstr "DirItem"
 
-#: cell_icon.c:151
+#: cell_icon.c:152
 msgid "The item to render."
 msgstr "El elemento a mostrar."
 
-#: cell_icon.c:157
+#: cell_icon.c:158
 msgid "Background color"
 msgstr "Color de fondo"
 
-#: cell_icon.c:158
+#: cell_icon.c:159
 msgid "Background color as a GdkColor"
 msgstr "Color de fondo como un Gdkcolor"
 
@@ -752,7 +751,7 @@ msgstr "Error obteniendo la lista de archivos: %s"
 msgid "You can't use multiple files with Set Icon!"
 msgstr "No puedes usar más de un archivo con Definir Icono"
 
-#: filer.c:360
+#: filer.c:361
 msgid ""
 "Do you want to unmount this device?\n"
 "\n"
@@ -762,15 +761,15 @@ msgstr ""
 "\n"
 "Al desmontar un dispositivo puedes remover el disco en forma segura."
 
-#: filer.c:365 menu.c:843
+#: filer.c:366 menu.c:843
 msgid "Unmount"
 msgstr "Desmontar"
 
-#: filer.c:434
+#: filer.c:435
 msgid "Directory missing/deleted"
 msgstr "Directorio ausente/borrado"
 
-#: filer.c:795
+#: filer.c:796
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -782,53 +781,53 @@ msgstr ""
 "después.\n"
 "Aségurate que NumLock está activado si utilizas el teclado numérico."
 
-#: filer.c:1024
+#: filer.c:1025
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "El directorio '%s' no es accesible"
 
-#: filer.c:1170
+#: filer.c:1172
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "El directorio '%s' no fue encontrado."
 
-#: filer.c:1396
+#: filer.c:1405
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: filer.c:1641
+#: filer.c:1645
 msgid "S"
 msgstr ""
 
-#: filer.c:1642
+#: filer.c:1646
 msgid "A"
 msgstr ""
 
-#: filer.c:1643
+#: filer.c:1647
 msgid "T"
 msgstr ""
 
-#: filer.c:1649
+#: filer.c:1653
 msgid "Scanning, "
 msgstr "Explorando, "
 
-#: filer.c:1650
+#: filer.c:1654
 msgid "All, "
 msgstr "Todo, "
 
-#: filer.c:1651
+#: filer.c:1655
 msgid "Thumbs, "
 msgstr "Miniaturas, "
 
-#: filer.c:1912
+#: filer.c:1916
 msgid "Symbolic link to "
 msgstr "Enlace simbólico a "
 
-#: filer.c:1943
+#: filer.c:1947
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Este nombre de archivo no es UTF-8 válido. Debes renombrarlo.\n"
 
-#: filer.c:2216 menu.c:1831
+#: filer.c:2220 menu.c:1831
 msgid "Item no longer exists!"
 msgstr "El elemento no existe más!"
 
@@ -1895,7 +1894,7 @@ msgstr "Condición de búsqueda inválida"
 msgid "ROX-Filer has converted your Options file to the new XML format"
 msgstr "ROX-Filer ha convertido tu archivos de Opciones al nuevo formato XML"
 
-#: options.c:484 options.c:1204
+#: options.c:484 options.c:1207
 msgid "(use default)"
 msgstr "(usar valor por defecto)"
 
@@ -1904,21 +1903,21 @@ msgstr "(usar valor por defecto)"
 msgid "Internal error: %s unreadable"
 msgstr "Error interno: %s ilegible"
 
-#: options.c:863
+#: options.c:866
 msgid "Options"
 msgstr "Opciones"
 
-#: options.c:908
+#: options.c:911
 msgid "_Revert"
 msgstr "_Deshacer"
 
-#: options.c:914
+#: options.c:917
 msgid "Restore all choices to how they were when the Options box was opened."
 msgstr ""
 "Restaurar todas las opciones a como estaban cuando la ventana de Opciones\n"
 "fue abierta."
 
-#: options.c:929
+#: options.c:932
 #, c-format
 msgid ""
 "Choices will be saved as:\n"
@@ -1927,16 +1926,16 @@ msgstr ""
 "Las opciones serán guardadas como:\n"
 "%s"
 
-#: options.c:937
+#: options.c:940
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "(El guardado está dehabilitado a causa de CHOICESPATH)"
 
-#: options.c:1110 usericons.c:449
+#: options.c:1113 usericons.c:449
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "Error guardando %s: %s"
 
-#: options.c:1772
+#: options.c:1775
 msgid "Missing '='"
 msgstr "Falta un '='"
 
