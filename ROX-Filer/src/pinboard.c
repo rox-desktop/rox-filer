@@ -2208,7 +2208,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 				MIN(screen_width, width * scale),
 				MIN(screen_height, height * scale),
 				x, y, scale, scale,
-				GDK_INTERP_NEAREST, 255);
+				GDK_INTERP_HYPER, 255);
 		g_object_unref(old);
 	}
 
