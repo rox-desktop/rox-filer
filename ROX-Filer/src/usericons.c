@@ -244,6 +244,7 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 	gtk_object_set_data(GTK_OBJECT(dialog),
 				 "mime_type", item->mime_type);
 
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio[0]), TRUE);
 
 	frame = gtk_frame_new(NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
@@ -366,8 +367,7 @@ static void write_globicon(gpointer key, gpointer value, gpointer data)
 /* Write globicons file */
 static void write_globicons(void)
 {
-	gchar *save = NULL;
-	gchar *save_new = NULL;
+	gchar *save = NULL, *save_new = NULL;
 	xmlDocPtr doc = NULL;
 
 	save = choices_find_path_save("globicons", PROJECT, TRUE);
@@ -384,32 +384,15 @@ static void write_globicons(void)
 	g_hash_table_foreach(glob_icons, write_globicon,
 			     xmlDocGetRootElement(doc));
 
-#if LIBXML_VERSION > 20400
-	if (xmlSaveFormatFileEnc(save_new, doc, NULL, 1) < 0)
-		goto err;
-#else
-	{
-		FILE *out;
-		
-		out = fopen(save_new, "w");
-		if (!out)
-			goto err;
-		xmlDocDump(out, doc);  /* Some versions return void */
-		if (fclose(out))
-			goto err;
-	}
-#endif
+	if (save_xml_file(doc, save_new) || rename(save_new, save))
+		delayed_rox_error(_("Error saving %s: %s"),
+				save, g_strerror(errno));
 
-	if (rename(save_new, save))
-		goto err;
-	goto out;
- err:
-	delayed_rox_error(_("Error saving globicons: %s"), g_strerror(errno));
- out:
-	if (doc)
-		xmlFreeDoc(doc);
 	g_free(save_new);
 	g_free(save);
+
+	if (doc)
+		xmlFreeDoc(doc);
 }
 
 /* Process a globicon line. Format:

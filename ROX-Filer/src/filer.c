@@ -60,8 +60,18 @@
 
 #define PANEL_BORDER 2
 
+struct _Group {
+	char *dir;
+	GList *files;	/* List of leafnames */
+};
+
+typedef struct _Group Group;
+
 FilerWindow 	*window_with_focus = NULL;
 GList		*all_filer_windows = NULL;
+
+#define N_GROUPS 10
+static Group groups[N_GROUPS];
 
 static FilerWindow *window_with_selection = NULL;
 
@@ -105,6 +115,7 @@ static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
 static void show_tooltip(guchar *text);
 static void filer_size_for(FilerWindow *filer_window,
 			   int w, int h, int n, gboolean allow_shrink);
+static void group_free(int i);
 
 static void set_unique(guchar *unique);
 
@@ -123,6 +134,7 @@ void filer_init(void)
 	gchar *ohost;
 	gchar *dpyhost, *dpy;
 	gchar *tmp;
+	int   i;
   
 	option_add_int("filer_size_limit", 75, NULL);
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
@@ -155,6 +167,10 @@ void filer_init(void)
 	}
 	
 	g_free(dpyhost);
+
+	/* Just in case... */
+	for (i = 0; i < N_GROUPS; i++)
+		group_free(i);
 }
 
 static void set_unique(guchar *unique)
@@ -845,6 +861,85 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	filer_openitem(filer_window, item, flags);
 }
 
+static void group_free(int i)
+{
+	g_free(groups[i].dir);
+
+	g_list_foreach(groups[i].files, (GFunc) g_free, NULL);
+
+	g_list_free(groups[i].files);
+
+	groups[i].dir = NULL;
+	groups[i].files = NULL;
+}
+
+static void group_save(FilerWindow *filer_window, int i)
+{
+	Collection *collection = filer_window->collection;
+	int	j;
+
+	group_free(i);
+
+	groups[i].dir = g_strdup(filer_window->path);
+
+	for (j = 0; j < collection->number_of_items; j++)
+	{
+		DirItem *item = (DirItem *) collection->items[j].data;
+		
+		if (collection->items[j].selected)
+			groups[i].files = g_list_prepend(groups[i].files,
+						g_strdup(item->leafname));
+	}
+}
+
+static void group_restore(FilerWindow *filer_window, int i)
+{
+	GHashTable *in_group;
+	GList	*next;
+	Collection *collection = filer_window->collection;
+	int	j, n;
+
+	if (!groups[i].dir)
+	{
+		report_rox_error(_("Group %d is not set. Select some files "
+				"and press Ctrl+%d to set the group. Press %d "
+				"on its own to reselect the files later."),
+				i, i, i);
+		return;
+	}
+
+	if (strcmp(groups[i].dir, filer_window->path) != 0)
+	{
+		filer_change_to(filer_window, groups[i].dir, NULL);
+		/* XXX: Need to wait until scanning is done! */
+	}
+
+	/* If an item at the start is selected then we could lose the
+	 * primary selection after checking that item and then need to
+	 * gain it again at the end. Therefore, if anything is selected
+	 * then select the last item until the end of the search.
+	 */
+	n = collection->number_of_items;
+	if (collection->number_selected)
+		collection_select_item(collection, n - 1);
+
+	in_group = g_hash_table_new(g_str_hash, g_str_equal);
+	for (next = groups[i].files; next; next = next->next)
+		g_hash_table_insert(in_group, next->data, filer_window);
+	
+	for (j = 0; j < n; j++)
+	{
+		DirItem *item = (DirItem *) collection->items[j].data;
+
+		if (g_hash_table_lookup(in_group, item->leafname))
+			collection_select_item(collection, j);
+		else
+			collection_unselect_item(collection, j);
+	}
+
+	g_hash_table_destroy(in_group);
+}
+
 /* Handle keys that can't be bound with the menu */
 static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
@@ -873,7 +968,14 @@ static gint key_press_event(GtkWidget	*widget,
 					filer_window->collection->cursor_item);
 			break;
 		default:
-			return FALSE;
+			if (event->keyval < GDK_0 || event->keyval > GDK_9)
+				return FALSE;
+
+			if (event->state & GDK_CONTROL_MASK)
+				group_save(filer_window, event->keyval - GDK_0);
+			else
+				group_restore(filer_window,
+					      event->keyval - GDK_0);
 	}
 
 #ifndef GTK2

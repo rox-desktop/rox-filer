@@ -39,5 +39,6 @@ guchar *get_relative_path(guchar *from, guchar *to);
 void add_default_styles(void);
 xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name);
 void set_to_null(gpointer *data);
+int save_xml_file(xmlDocPtr doc, gchar *filename);
 
 #endif /* _SUPPORT_H */

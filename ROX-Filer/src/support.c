@@ -837,3 +837,26 @@ void set_to_null(gpointer *data)
 {
 	*data = NULL;
 }
+
+/* Save doc as XML as filename, 0 on success or -1 on failure */
+int save_xml_file(xmlDocPtr doc, gchar *filename)
+{
+#if LIBXML_VERSION > 20400
+	if (xmlSaveFormatFileEnc(filename, doc, NULL, 1) < 0)
+		return 1;
+#else
+	FILE *out;
+	
+	out = fopen(filename, "w");
+	if (!out)
+		return 1;
+
+	xmlDocDump(out, doc);  /* Some versions return void */
+
+	if (fclose(out))
+		return 1;
+#endif
+
+	return 0;
+}
+
