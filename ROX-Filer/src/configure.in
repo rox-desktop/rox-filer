@@ -67,23 +67,48 @@ if test "x$GCC" = "xyes"; then
 fi
 changequote([,])dnl
 
-if test -z "$GTK_CONFIG"; then
-  GTK_CONFIG=gtk-config
+if test -z "$PGK_CONFIG"; then
+  PKG_CONFIG=pkg-config
 fi
-AC_SUBST(GTK_CONFIG)
+AC_SUBST(PKG_CONFIG)
 
 if test -z "$XML_CONFIG"; then
   AC_CHECK_PROG(XML_CONFIG, xml2-config, xml2-config, xml-config)
 fi
 AC_SUBST(XML_CONFIG)
 
-dnl Warn the user if stuff is missing...
-rox_CHECK_EXISTS([$GTK_CONFIG],
-		 [You need to install the gtk-devel package before compiling:
-		  http://www.gtk.org])
+dnl See if we've got Gtk+ 2.0 (or 1.3 developement version)
+AC_MSG_CHECKING(for Gtk+-2.0)
+if $PKG_CONFIG --exists "gtk+-2.0"; then
+  AC_MSG_RESULT(yes - but ignoring it for now)
+else
+  AC_MSG_RESULT(no)
+fi
+
+#if 1; then
+  #AC_MSG_RESULT(yes)
+  #GTK_CFLAGS="$PKG_CONFIG gtk+-2.0 --cflags"
+  #GTK_LIBS="$PKG_CONFIG gtk+-2.0 --libs"
+#else
+#  AC_MSG_RESULT(no)
+
+  if test -z "$GTK_CONFIG"; then
+    GTK_CONFIG=gtk-config
+  fi
+  GTK_CFLAGS="$GTK_CONFIG --cflags"
+  GTK_LIBS="$GTK_CONFIG --libs"
+
+  dnl Warn the user if stuff is missing...
+  rox_CHECK_EXISTS([$GTK_CONFIG],
+		   [You need to install the gtk-devel package before compiling:
+		    http://www.gtk.org])
+#fi
+AC_SUBST(GTK_CFLAGS)
+AC_SUBST(GTK_LIBS)
+
 rox_CHECK_EXISTS([$XML_CONFIG],
-		 [You need to install the xml-devel package before compiling:
-		  http://xmlsoft.org/])
+	   [You need to install the xml-devel package before compiling:
+	    http://xmlsoft.org/])
 
 dnl Make sure we have gdk-pixbuf
 AC_MSG_CHECKING(for gdk-pixbuf library)

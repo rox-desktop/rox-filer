@@ -1,4 +1,5 @@
-GTK_CONFIG = @GTK_CONFIG@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 XML_CONFIG = @XML_CONFIG@
 GDK_PIXBUF_CONFIG = @GDK_PIXBUF_CONFIG@
 SHELL = @SHELL@
@@ -10,8 +11,8 @@ LIBS = @LIBS@ @GDK_PIXBUF_LIBS@ `${XML_CONFIG} --libs`
 
 CC = @CC@
 
-CFLAGS = @CFLAGS@ `${GTK_CONFIG} --cflags` `${XML_CONFIG} --cflags` -I.
-LDFLAGS = @LDFLAGS@ `${GTK_CONFIG} --libs` ${LIBS}
+CFLAGS = @CFLAGS@ `${GTK_CFLAGS}` `${XML_CONFIG} --cflags` -I.
+LDFLAGS = @LDFLAGS@ `${GTK_LIBS}` ${LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
