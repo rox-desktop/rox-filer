@@ -419,12 +419,8 @@ void drag_data_get(GtkWidget          		*widget,
 						&to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
-				type = selection_data->type;
-				if (gdk_atom_name(type))
-					break;	/* OK */
-				delayed_error(PROJECT, _("Invalid type "
-					"requested (not a valid atom)"));
-				return;
+				type = selection_data->target;
+				break;
 			}
 			g_warning("drag_data_get: Can't find selected item\n");
 			return;
