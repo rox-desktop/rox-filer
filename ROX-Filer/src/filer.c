@@ -1631,6 +1631,8 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
+	gtk_widget_set_name(filer_window->window, "rox-filer");
+
 	if (wm_class)
 		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window),
 				       wm_class, PROJECT);
