@@ -247,7 +247,12 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 	if (!file)
 	{
-		delayed_error("Opening file for DND", g_strerror(errno));
+		guchar	*message;
+
+		message = g_strdup_printf("open(%s): %s",
+				pathname, g_strerror(errno));
+		delayed_error("ROX-Filer", message);
+		g_free(message);
 		return FALSE;
 	}
 
@@ -262,7 +267,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			delayed_error("Loading file for DND",
+			delayed_error("Error reading file",
 						g_strerror(errno));
 			g_free(buffer);
 		}
@@ -275,9 +280,9 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 		}
 	}
 	else
-		delayed_error("Loading file for DND",
+		delayed_error("ROX-Filer",
 				"Can't allocate memory for buffer to "
-				"transfer this file");
+				"load this file");
 
 	fclose(file);
 

@@ -61,7 +61,7 @@ void type_init()
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	current_type = NULL;
-	parse_file(make_path(getenv("APP_DIR"), "MIME-types")->str,
+	parse_file(make_path(getenv("APP_DIR"), "MIME-info")->str,
 				import_extensions);
 
 	list = choices_list_dirs("MIME-info");
