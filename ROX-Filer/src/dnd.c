@@ -1143,6 +1143,7 @@ void dnd_motion_start(MotionType motion)
 gboolean dnd_motion_release(GdkEventButton *event)
 {
 	MotionType	motion = motion_state;
+	gint		drag_threshold;
 	int		dx, dy;
 
 	if (motion_buttons_pressed == 0)
@@ -1166,7 +1167,11 @@ gboolean dnd_motion_release(GdkEventButton *event)
 	dx = event->x_root - drag_start_x;
 	dy = event->y_root - drag_start_y;
 
-	return ABS(dx) > 5 || ABS(dy) > 5;
+	g_object_get(gtk_settings_get_default(),
+		"gtk-dnd-drag-threshold", &drag_threshold,
+		NULL);
+
+	return ABS(dx) > drag_threshold || ABS(dy) > drag_threshold;
 }
 
 /* Use this to disable the motion system. The system will be reset once
@@ -1210,12 +1215,17 @@ void dnd_motion_ungrab(void)
  */
 gboolean dnd_motion_moved(GdkEventMotion *event)
 {
+	gint	drag_threshold;
 	int	dx, dy;
+
+	g_object_get(gtk_settings_get_default(),
+		"gtk-dnd-drag-threshold", &drag_threshold,
+		NULL);
 
 	dx = event->x_root - drag_start_x;
 	dy = event->y_root - drag_start_y;
 
-	if (ABS(dx) <= 5 && ABS(dy) <= 5)
+	if (ABS(dx) <= drag_threshold && ABS(dy) <= drag_threshold)
 		return FALSE;		/* Not far enough */
 
 	dnd_motion_ungrab();
