@@ -580,6 +580,48 @@ static gint focus_out(GtkWidget *widget,
 	return FALSE;
 }
 
+/* Move the cursor to the next selected item in direction 'dir'
+ * (+1 or -1).
+ */
+static void next_selected(FilerWindow *filer_window, int dir)
+{
+	Collection 	*collection = filer_window->collection;
+	int		to_check = collection->number_of_items;
+	int 	   	item = collection->cursor_item;
+
+	g_return_if_fail(dir == 1 || dir == -1);
+
+	if (to_check > 0 && item == -1)
+	{
+		/* Cursor not currently on */
+		if (dir == 1)
+			item = 0;
+		else
+			item = collection->number_of_items - 1;
+
+		if (collection->items[item].selected)
+			goto found;
+	}
+
+	while (--to_check > 0)
+	{
+		item += dir;
+
+		if (item >= collection->number_of_items)
+			item = 0;
+		else if (item < 0)
+			item = collection->number_of_items - 1;
+
+		if (collection->items[item].selected)
+			goto found;
+	}
+
+	gdk_beep();
+	return;
+found:
+	collection_set_cursor_item(collection, item);
+}
+
 /* Handle keys that can't be bound with the menu */
 static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
@@ -587,6 +629,12 @@ static gint key_press_event(GtkWidget	*widget,
 {
 	switch (event->keyval)
 	{
+		case GDK_ISO_Left_Tab:
+			next_selected(filer_window, -1);
+			break;
+		case GDK_Tab:
+			next_selected(filer_window, 1);
+			break;
 		case GDK_BackSpace:
 			change_to_parent(filer_window);
 			break;
@@ -594,6 +642,7 @@ static gint key_press_event(GtkWidget	*widget,
 			return FALSE;
 	}
 
+	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
 	return TRUE;
 }
 
@@ -801,7 +850,9 @@ static void start_drag_selection(Collection *collection,
 	}
 }
 
-/* Creates and realises a new filer window */
+/* Creates and shows a new filer window.
+ * panel_type should normally be PANEL_NO (for a normal window).
+ */
 FilerWindow *filer_opendir(char *path, PanelType panel_type)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
@@ -813,8 +864,12 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	};
 	char		*real_path;
 	
+	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
+	/* If the user doesn't want duplicate windows then check
+	 * for an existing one and close it if found.
+	 */
 	if (o_unique_filer_windows && panel_type == PANEL_NO)
 	{
 		FilerWindow *fw;
@@ -844,6 +899,10 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->auto_select = NULL;
 	filer_window->mini_type = MINI_NONE;
 
+	/* Finds the entry for this directory in the dir cache, creating
+	 * a new one if needed. This does not cause a scan to start,
+	 * so if a new entry is created then it will be empty.
+	 */
 	filer_window->directory = g_fscache_lookup(dir_cache,
 						   filer_window->path);
 	if (!filer_window->directory)
@@ -866,9 +925,11 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
 
+	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
 
+	/* The collection is the area that actually displays the files */
 	collection = collection_new(NULL);
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
@@ -908,6 +969,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	display_set_layout(filer_window, last_layout);
 	drag_set_dest(filer_window);
 
+	/* Add decorations appropriate to the window's type */
 	if (panel_type)
 	{
 		int		swidth, sheight, iwidth, iheight;
@@ -996,11 +1058,28 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 		gtk_widget_show(collection);
 	}
 
-	number_of_windows++;
-	gtk_widget_show(filer_window->window);
+	gtk_widget_realize(filer_window->window);
+
+	/* The collection is created empty and then attach() is called, which
+	 * links the filer window to the entry in the directory cache we
+	 * looked up / created above.
+	 *
+	 * The attach() function will immediately callback to the filer window
+	 * to deliver a list of all known entries in the directory (so,
+	 * collection->number_of_items may be valid after the call to
+	 * attach() returns).
+	 *
+	 * BUT, if the directory was not in the cache (because it hadn't been
+	 * opened it before) then the cached dir will be empty and nothing gets
+	 * added until a while later when some entries are actually available.
+	 */
+
 	attach(filer_window);
 
+	/* Make the window visible */
+	number_of_windows++;
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
+	gtk_widget_show(filer_window->window);
 
 	return filer_window;
 }
