@@ -29,7 +29,7 @@ static GdkColor red = {0, 0xffff, 0, 0};
 
 typedef struct _GUIside GUIside;
 typedef void ActionChild(gpointer data);
-typedef gboolean ForDirCB(char *path);
+typedef gboolean ForDirCB(char *path, char *dest_path);
 
 struct _GUIside
 {
@@ -123,13 +123,14 @@ static void message_from_child(gpointer 	 data,
 		gtk_widget_destroy(gui_side->window);
 }
 
-static void for_dir_contents(char *dir, ForDirCB *cb)
+/* Scans src_dir, updating dest_path whenever cb returns TRUE */
+static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 {
 	DIR	*d;
 	struct dirent *ent;
 	GSList  *list = NULL, *next;
 
-	d = opendir(dir);
+	d = opendir(src_dir);
 	if (!d)
 	{
 		send_error();
@@ -141,7 +142,7 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 		if (ent->d_name[0] == '.' && (ent->d_name[1] == '\0'
 			|| (ent->d_name[1] == '.' && ent->d_name[2] == '\0')))
 			continue;
-		list = g_slist_append(list, g_strdup(make_path(dir,
+		list = g_slist_append(list, g_strdup(make_path(src_dir,
 						       ent->d_name)->str));
 	}
 	closedir(d);
@@ -153,9 +154,9 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 
 	while (next)
 	{
-		if (cb((char *) next->data))
+		if (cb((char *) next->data, dest_path))
 		{
-			g_string_sprintf(message, "+%s", dir);
+			g_string_sprintf(message, "+%s", dest_path);
 			send();
 		}
 
@@ -355,27 +356,29 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 /* 			ACTIONS ON ONE ITEM 			*/
 
 /* These may call themselves recursively, or ask questions, etc.
- * TRUE iff the directory needs to be rescanned.
+ * TRUE iff the directory containing dest_path needs to be rescanned.
  */
 
-static gboolean do_delete(char *path)
+/* dest_path is the dir containing src_path */
+static gboolean do_delete(char *src_path, char *dest_path)
 {
 	struct 		stat info;
 	gboolean	write_prot;
 	char		rep;
 
-	if (lstat(path, &info))
+	if (lstat(src_path, &info))
 	{
 		send_error();
 		return FALSE;
 	}
 
-	write_prot = S_ISLNK(info.st_mode) ? FALSE : access(path, W_OK) != 0;
+	write_prot = S_ISLNK(info.st_mode) ? FALSE
+					   : access(src_path, W_OK) != 0;
 	if (quiet == 0 || write_prot)
 	{
 		g_string_sprintf(message, "?Delete %s'%s'?\n",
 				write_prot ? "WRITE-PROTECTED " : " ",
-				path);
+				src_path);
 		send();
 		rep = reply(from_parent);
 		if (rep == 'A')
@@ -386,10 +389,10 @@ static gboolean do_delete(char *path)
 	if (S_ISDIR(info.st_mode))
 	{
 		char *safe_path;
-		safe_path = g_strdup(path);
+		safe_path = g_strdup(src_path);
 		g_string_sprintf(message, "'Scanning in '%s'\n", safe_path);
 		send();
-		for_dir_contents(safe_path, do_delete);
+		for_dir_contents(do_delete, safe_path, safe_path);
 		if (rmdir(safe_path))
 		{
 			g_free(safe_path);
@@ -400,9 +403,9 @@ static gboolean do_delete(char *path)
 		send();
 		g_free(safe_path);
 	}
-	else if (unlink(path) == 0)
+	else if (unlink(src_path) == 0)
 	{
-		g_string_sprintf(message, "'Deleted '%s'\n", path);
+		g_string_sprintf(message, "'Deleted '%s'\n", src_path);
 		send();
 	}
 	else
@@ -418,6 +421,7 @@ static gboolean do_copy(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
+	struct stat 	info;
 	gboolean	retval = TRUE;
 
 	leaf = strrchr(path, '/');
@@ -427,6 +431,9 @@ static gboolean do_copy(char *path, char *dest)
 		leaf++;
 
 	dest_path = make_path(dest, leaf)->str;
+
+	g_string_sprintf(message, "'Copying %s as %s\n", path, dest_path);
+	send();
 
 	if (access(dest_path, F_OK) == 0)
 	{
@@ -442,17 +449,66 @@ static gboolean do_copy(char *path, char *dest)
 			return FALSE;
 	}
 
-	g_string_sprintf(message, "cp -a %s %s", path, dest_path);
-	if (system(message->str) == 0)
-		g_string_sprintf(message, "'Copied %s as %s\n",
-				path, dest_path);
+	if (lstat(path, &info))
+	{
+		send_error();
+		return FALSE;
+	}
+	
+	if (S_ISDIR(info.st_mode))
+	{
+		char *safe_path, *safe_dest;
+		struct stat 	dest_info;
+		gboolean	exists;
+
+		/* (we will do the update ourselves now, rather than
+		 * afterwards)
+		 */
+		retval = FALSE;
+		
+		safe_path = g_strdup(path);
+		safe_dest = g_strdup(dest_path);
+
+		exists = !lstat(dest_path, &dest_info);
+
+		if (exists && !S_ISDIR(dest_info.st_mode))
+		{
+			g_string_sprintf(message,
+					"!ERROR: Destination already exists, "
+					"but is not a directory\n");
+		}
+		else if (exists == FALSE && mkdir(dest_path, info.st_mode))
+			send_error();
+		else
+		{
+			if (!exists)
+			{
+				/* (just been created then) */
+				g_string_sprintf(message, "+%s", dest);
+				send();
+			}
+			
+			g_string_sprintf(message, "'Scanning in '%s'\n",
+					safe_path);
+			send();
+			for_dir_contents(do_copy, safe_path, safe_dest);
+			/* Note: dest_path now invalid... */
+		}
+
+		g_free(safe_path);
+		g_free(safe_dest);
+	}
 	else
 	{
-		g_string_sprintf(message, "!ERROR: Failed to copy %s as %s\n",
-				path, dest_path);
-		retval = FALSE;
+		g_string_sprintf(message, "cp -af %s %s", path, dest_path);
+		if (system(message->str))
+		{
+			g_string_sprintf(message, "!ERROR: %s\n",
+					"Copy failed\n");
+			send();
+			retval = FALSE;
+		}
 	}
-	send();
 
 	return retval;
 }
@@ -551,8 +607,8 @@ static void delete_cb(gpointer data)
 		if (!collection->items[i].selected)
 			continue;
 		item = (FileItem *) collection->items[i].data;
-		if (do_delete(make_path(filer_window->path,
-					item->leafname)->str))
+		if (do_delete(make_path(filer_window->path, item->leafname)
+					->str, filer_window->path))
 		{
 			g_string_sprintf(message, "+%s", filer_window->path);
 			send();
