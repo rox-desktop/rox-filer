@@ -91,8 +91,8 @@ static GPtrArray *hash_to_array(GHashTable *hash);
 static void dir_force_update_item(Directory *dir, const gchar *leaf);
 static Directory *dir_new(const char *pathname);
 static void dir_rescan(Directory *dir);
-static void dir_rescan_soon(Directory *dir);
 #ifdef USE_DNOTIFY
+static void dir_rescan_soon(Directory *dir);
 static void dnotify_handler(int sig, siginfo_t *si, void *data);
 #endif
 
@@ -463,6 +463,7 @@ void dnotify_wakeup(void)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+#ifdef USE_DNOTIFY
 static gint rescan_soon_timeout(gpointer data)
 {
 	Directory *dir = (Directory *) data;
@@ -484,6 +485,7 @@ static void dir_rescan_soon(Directory *dir)
 		return;
 	dir->rescan_timeout = gtk_timeout_add(500, rescan_soon_timeout, dir);
 }
+#endif
 
 static void free_items_array(GPtrArray *array)
 {
