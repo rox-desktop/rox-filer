@@ -371,7 +371,8 @@ void drag_one_item(GtkWidget		*widget,
 			gtk_widget_get_colormap(widget),
 			item->image->pixmap,
 			item->image->mask,
-			0, 0);
+			item->image->width / 2,
+			item->image->height / 2);
 }
 
 static void drag_end(GtkWidget *widget,
@@ -785,6 +786,12 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		return;
 	}
 
+	if (pinboard_drag_in_progress)
+	{
+		pinboard_move_icons();
+		return;
+	}
+	
 	gdk_window_get_position(widget->window, &dx, &dy);
 	x += dx;
 	y += dy;
@@ -798,7 +805,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		path = get_local_path((gchar *) next->data);
 		if (path)
 		{
-			pinboard_pin(path, NULL, x, y, TRUE);
+			pinboard_pin(path, NULL, x, y);
 			x += 64;
 		}
 

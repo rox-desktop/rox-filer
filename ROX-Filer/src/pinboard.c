@@ -85,7 +85,8 @@ static GtkWidget *proxy_invisible;
 static GdkWindow *click_proxy_gdk_window = NULL;
 static GdkAtom   win_button_proxy; /* _WIN_DESKTOP_BUTTON_PROXY */
 
-static gboolean pinboard_drag_in_progress = FALSE;
+/* The Icon that was used to start the current drag, if any */
+Icon *pinboard_drag_in_progress = NULL;
 
 /* Used when dragging icons around... */
 static gboolean pinboard_modified = FALSE;
@@ -155,6 +156,11 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
                                gint		y,
                                guint		time,
 			       gpointer		data);
+static gboolean bg_drag_leave(GtkWidget		*widget,
+			      GdkDragContext	*context,
+			      guint32		time,
+			      gpointer		data);
+static void bg_expose(GdkRectangle *area);
 static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
 			Icon *icon);
@@ -247,7 +253,9 @@ void pinboard_activate(guchar *name)
 		g_free(path);
 	}
 	else
-		pinboard_pin(home_dir, "Home", 4, 4, TRUE);
+		pinboard_pin(home_dir, "Home",
+				4 + ICON_WIDTH / 2,
+				4 + ICON_HEIGHT / 2);
 	loading_pinboard--;
 }
 
@@ -258,7 +266,7 @@ void pinboard_activate(guchar *name)
  * image should be if it is TRUE.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  */
-void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
+void pinboard_pin(guchar *path, guchar *name, int x, int y)
 {
 	Icon		*icon;
 	int		width, height;
@@ -308,13 +316,6 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	gtk_widget_realize(icon->widget);
 
 	set_size_and_shape(icon, &width, &height);
-	if (corner)
-	{
-		/* Convert from icon-corner coordinates to center coordinates */
-		MaskedPixmap	*image = icon->item->image;
-
-		offset_to_centre(icon, image->width >> 1, height, &x, &y);
-	}
 	snap_to_grid(&x, &y);
 	offset_from_centre(icon, width, height, &x, &y);
 	gtk_widget_set_uposition(icon->win, x, y);
@@ -929,7 +930,7 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	
 	g_return_if_fail(icon_selection != NULL);
 
-	pinboard_drag_in_progress = TRUE;
+	pinboard_drag_in_progress = icon;
 
 	if (icon_selection->next == NULL)
 		drag_one_item(widget, event, icon->path, icon->item);
@@ -949,8 +950,8 @@ static gint icon_motion_notify(GtkWidget *widget,
 			       Icon *icon)
 {
 	int	x, y;
-	int	width, height;
 	int	dx,dy;
+	int	width, height;
 
 	if (motion_state == MOTION_READY_FOR_DND)
 	{
@@ -1018,7 +1019,7 @@ static char *pin_from_file(guchar *line)
 	if (sscanf(line, " %d , %d , %n", &x, &y, &n) < 2)
 		return NULL;		/* Ignore format errors */
 
-	pinboard_pin(line + n, leaf, x, y, FALSE);
+	pinboard_pin(line + n, leaf, x, y);
 
 	g_free(leaf);
 
@@ -1055,6 +1056,9 @@ static gboolean add_root_handlers(void)
 		gtk_signal_connect(GTK_OBJECT(proxy_invisible), "drag_motion",
 				GTK_SIGNAL_FUNC(bg_drag_motion),
 				NULL);
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible), "drag_leave",
+				GTK_SIGNAL_FUNC(bg_drag_leave),
+				NULL);
 	}
 
 	root = gdk_window_lookup(GDK_ROOT_WINDOW());
@@ -1069,6 +1073,7 @@ static gboolean add_root_handlers(void)
 	gdk_window_set_user_data(GDK_ROOT_PARENT(), proxy_invisible);
 	gdk_window_set_events(GDK_ROOT_PARENT(),
 			gdk_window_get_events(GDK_ROOT_PARENT()) |
+				GDK_EXPOSURE_MASK |
 				GDK_PROPERTY_CHANGE_MASK);
 
 	forward_root_clicks();
@@ -1178,6 +1183,7 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 {
 	XEvent 		*xev;
 	GdkWindow	*proxy = proxy_invisible->window;
+	GdkRectangle	area;
 
 	xev = xevent;
 
@@ -1210,6 +1216,14 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 
 			return GDK_FILTER_TRANSLATE;
 
+		case Expose:
+			area.x = xev->xexpose.x;
+			area.y = xev->xexpose.y;
+			area.width = xev->xexpose.width;
+			area.height = xev->xexpose.height;
+			bg_expose(&area);
+			return GDK_FILTER_REMOVE;
+
 		case DestroyNotify:
 			/* XXX: I have no idea why this helps, but it does! */
 			/* The proxy window was destroyed (i.e. the window
@@ -1239,10 +1253,7 @@ static void offset_from_centre(Icon *icon,
 			       int *x, int *y)
 {
 	*x -= width >> 1;
-	*y -= height;
-#ifndef GTK2
-	*y += (icon->widget->style->font->descent >> 1);
-#endif
+	*y -= height >> 1;
 	*x = CLAMP(*x, 0, screen_width - (o_clamp_icons ? width : 0));
 	*y = CLAMP(*y, 0, screen_height - (o_clamp_icons ? height : 0));
 }
@@ -1253,11 +1264,7 @@ static void offset_to_centre(Icon *icon,
 			     int *x, int *y)
 {
   *x += width >> 1;
-  *y += height;
-  
-#ifndef GTK2
-  *y -= (icon->widget->style->font->descent >> 1);
-#endif
+  *y += height >> 1;
 }
 
 /* Same as drag_set_dest(), but for pinboard icons */
@@ -1328,6 +1335,130 @@ out:
 	return type != NULL;
 }
 
+static gboolean pinboard_shadow = FALSE;
+static gint shadow_x, shadow_y;
+static GdkGC *shadow_gc = NULL;
+#define SHADOW_SIZE (ICON_WIDTH)
+
+static void bg_expose(GdkRectangle *area)
+{
+	GdkWindow *root = GDK_ROOT_PARENT();
+
+	if (!pinboard_shadow)
+	{
+		/* XXX: Should just disable the events */
+		return;
+	}
+	
+	if (!shadow_gc)
+		shadow_gc = gdk_gc_new(root);
+
+	gdk_gc_set_clip_rectangle(shadow_gc, area);
+	gdk_draw_rectangle(root, shadow_gc, TRUE, shadow_x, shadow_y,
+			SHADOW_SIZE, SHADOW_SIZE);
+	gdk_gc_set_clip_rectangle(shadow_gc, NULL);
+}
+
+/* Draw a 'shadow' under an icon being dragged, showing where
+ * it will land.
+ */
+static void pinboard_set_shadow(gboolean on)
+{
+	GdkWindow *root = GDK_ROOT_PARENT();
+	int	  new_x, new_y;
+	int	  x1, y1, x2, y2;
+
+	if (on)
+	{
+		gdk_window_get_pointer(NULL, &new_x, &new_y, NULL);
+		snap_to_grid(&new_x, &new_y);
+		new_x -= SHADOW_SIZE / 2;
+		new_y -= SHADOW_SIZE / 2;
+	}
+
+	if (pinboard_shadow != on)
+	{
+		/* Turning the shadow on or off; redraw whole area */
+		if (on)
+		{
+			shadow_x = new_x;
+			shadow_y = new_y;
+		}
+		gdk_window_clear_area_e(root, shadow_x, shadow_y,
+					SHADOW_SIZE, SHADOW_SIZE);
+		pinboard_shadow = on;
+		return;
+	}
+
+	if (!on)
+		return;		/* Staying off */
+
+	/* Otherwise we're moving it. Only redraw the bits that have
+	 * changed (to avoid flicker).
+	 */
+
+	x1 = MIN(new_x, shadow_x);
+	x2 = MAX(new_x, shadow_x);
+
+	y1 = MIN(new_y, shadow_y);
+	y2 = MAX(new_y, shadow_y);
+	
+	if (x1 != x2)
+	{
+		gdk_window_clear_area_e(root,
+					x1, y1,
+					x2 - x1,
+					SHADOW_SIZE + (y2 - y1));
+		gdk_window_clear_area_e(root,
+					x1 + SHADOW_SIZE, y1,
+					x2 - x1,
+					SHADOW_SIZE + (y2 - y1));
+	}
+
+	if (new_y != shadow_y)
+	{
+		gdk_window_clear_area_e(root,
+					x1, y1,
+					SHADOW_SIZE + (x2 - x1),
+					y2 - y1);
+		gdk_window_clear_area_e(root,
+					x1, y1 + SHADOW_SIZE,
+					SHADOW_SIZE + (x2 - x1),
+					y2 - y1);
+	}
+
+	shadow_x = new_x;
+	shadow_y = new_y;
+
+	pinboard_shadow = TRUE;
+}
+
+/* Called when dragging some pinboard icons finishes */
+void pinboard_move_icons(void)
+{
+	int	x = shadow_x, y = shadow_y;
+	Icon	*icon = pinboard_drag_in_progress;
+	int	width, height;
+
+	g_return_if_fail(icon != NULL);
+
+	x += SHADOW_SIZE / 2;
+	y += SHADOW_SIZE / 2;
+	snap_to_grid(&x, &y);
+
+	if (icon->x == x && icon->y == y)
+		return;
+
+	icon->x = x;
+	icon->y = y;
+	gdk_window_get_size(icon->win->window, &width, &height);
+	offset_from_centre(icon, width, height, &x, &y);
+
+	gdk_window_move(icon->win->window, x, y);
+
+	pinboard_save();
+}
+
 static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
@@ -1337,6 +1468,16 @@ static void drag_leave(GtkWidget	*widget,
 	dnd_spring_abort();
 }
 
+static gboolean bg_drag_leave(GtkWidget		*widget,
+			      GdkDragContext	*context,
+			      guint32		time,
+			      gpointer		data)
+{
+	pinboard_set_shadow(FALSE);
+	return TRUE;
+}
+
+
 static gboolean bg_drag_motion(GtkWidget	*widget,
                                GdkDragContext	*context,
                                gint		x,
@@ -1345,8 +1486,11 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 			       gpointer		data)
 {
 	/* Dragging from the pinboard to the pinboard is not allowed */
+#if 0
 	if (pinboard_drag_in_progress)
 		return FALSE;
+#endif
+	pinboard_set_shadow(TRUE);
 	
 	gdk_drag_status(context, context->suggested_action, time);
 	return TRUE;
@@ -1356,7 +1500,7 @@ static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     Icon *icon)
 {
-	pinboard_drag_in_progress = FALSE;
+	pinboard_drag_in_progress = NULL;
 	if (tmp_icon_selected)
 	{
 		icon_select_only(NULL);
