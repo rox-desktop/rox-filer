@@ -1107,12 +1107,14 @@ static void add_uri_list(GtkWidget          *widget,
 
 	for (next = uris; next; next = next->next)
 	{
-		const guchar	*path;
+		guchar	*path;
 
 		path = get_local_path((guchar *) next->data);
 
-		if (path)
+		if (path) {
 			panel_add_item(panel, path, NULL, after, NULL);
+			g_free(path);
+		}
 	}
 
 	g_list_free(uris);

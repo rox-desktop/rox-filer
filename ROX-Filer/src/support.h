@@ -27,7 +27,7 @@ const gchar *format_double_size(double size);
 char *fork_exec_wait(const char **argv);
 const char *pretty_permissions(mode_t m);
 gint applicable(uid_t uid, gid_t gid);
-const char *get_local_path(const char *uri);
+char *get_local_path(const char *uri);  /* XXX Now need to g_free */
 void close_on_exec(int fd, gboolean close);
 void set_blocking(int fd, gboolean blocking);
 char *pretty_time(const time_t *time);

@@ -267,7 +267,7 @@ void bookmarks_add_history(const gchar *path)
 
 void bookmarks_add_uri(const gchar *uri)
 {
-	const char *path;
+	char *path;
 	struct stat info;
 
 	path = get_local_path(uri);
@@ -283,6 +283,7 @@ void bookmarks_add_uri(const gchar *uri)
 		bookmarks_add_dir(path);
 	else
 		delayed_error(_("'%s' isn't a directory"), path);
+	g_free(path);
 }
 
 /****************************************************************
@@ -553,7 +554,7 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 
 	for (next = uris; next; next = next->next)
 	{
-		const guchar *path;
+		guchar *path;
 
 		path = get_local_path((gchar *) next->data);
 
@@ -570,6 +571,8 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 			else
 				delayed_error(_("'%s' isn't a directory"),
 						path);
+
+			g_free(path);
 		}
 		else
 			delayed_error(_("Can't bookmark non-local directories "

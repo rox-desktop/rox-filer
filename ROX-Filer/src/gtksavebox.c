@@ -413,7 +413,7 @@ drag_data_get (GtkWidget	*widget,
   GtkSavebox  *savebox;
   guchar      to_send = 'E';
   gchar	      *uri;
-  const gchar *pathname;
+  gchar       *pathname;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (widget));
@@ -445,6 +445,7 @@ drag_data_get (GtkWidget	*widget,
       {
 	g_signal_emit (widget, savebox_signals[SAVE_TO_FILE], 0,
 		       pathname, &result);
+	g_free(pathname);
 
 	if (result == GTK_XDS_SAVED)
 	  {
@@ -516,12 +517,14 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 
       if (uri)
 	{
-	  const gchar  *path;
+	  gchar  *path;
 
 	  path = get_local_path (uri);
 	  
 	  g_signal_emit (widget, savebox_signals[SAVED_TO_URI], 0,
 			 path ? path : (const gchar *) uri);
+	  if(path)
+	    g_free(path);
 	  g_free(uri);
 
 	  gtk_widget_destroy (widget);
@@ -549,7 +552,8 @@ static void discard_clicked (GtkWidget *button, GtkWidget *savebox)
 static void do_save (GtkSavebox *savebox)
 {
   gint	result = GTK_XDS_NO_HANDLER;
-  const gchar  *pathname, *uri;
+  const gchar  *uri;
+  gchar        *pathname;
 
   g_return_if_fail (savebox != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));
@@ -585,6 +589,7 @@ static void do_save (GtkSavebox *savebox)
     }
   else if (result == GTK_XDS_NO_HANDLER)
     g_warning ("No handler for saving to a file.\n");
+  g_free(pathname);
 }
 
 static void

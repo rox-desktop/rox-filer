@@ -340,15 +340,17 @@ static gchar *uri_list_to_utf8(const char *uri_list)
 	for (next_uri = uris; next_uri; next_uri = next_uri->next)
 	{
 		char *uri = (char *) next_uri->data;
-		const char *local;
+		char *local;
 
-		local = get_local_path(uri);
+		local=get_local_path(uri);
 
 		if (new->len)
 			g_string_append_c(new, ' ');
 
-		if (local)
+		if (local) {
 			g_string_append(new, local);
+			g_free(local);
+		}
 		else
 			g_warning("Not local!\n");
 
@@ -646,7 +648,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 
 	for (next = uris; next; next = next->next)
 	{
-		const guchar	*path;
+		guchar	*path;
 
 		path = get_local_path((gchar *) next->data);
 		/*printf("%s -> %s\n", (char *) next->data,
@@ -655,6 +657,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		{
 			pinboard_pin(path, NULL, x, y, NULL);
 			x += 64;
+			g_free(path);
 		}
 
 		g_free(next->data);
@@ -842,6 +845,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
 	char		*type;
+	gchar           *lpath = NULL;
 	
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
@@ -865,7 +869,8 @@ static void got_uri_list(GtkWidget 		*widget,
 		error = _("No URIs in the text/uri-list (nothing to do!)");
 	else if (context->action != GDK_ACTION_ASK && type == drop_dest_prog)
 		run_with_files(dest_path, uri_list);
-	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
+	else if ((!uri_list->next) &&
+		 (!(lpath=get_local_path(uri_list->data))))
 	{
 		/* There is one URI in the list, and it's not on the local
 		 * machine. Get it via the X server if possible.
@@ -899,15 +904,15 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		for (next_uri = uri_list; next_uri; next_uri = next_uri->next)
 		{
-			const char *path;
+			char *path;
 
 			path = get_local_path((char *) next_uri->data);
 			/*printf("%s -> %s\n", (char *) next_uri->data,
 			  path? path: "NULL");*/
 
-			if (path)
+			if (path) 
 				local_paths = g_list_append(local_paths,
-								g_strdup(path));
+								path);
 			else
 				error = _("Some of these files are on a "
 					"different machine - they will be "
@@ -933,6 +938,8 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		destroy_glist(&local_paths);
 	}
+	if(lpath)
+		g_free(lpath);
 
 	if (error)
 	{

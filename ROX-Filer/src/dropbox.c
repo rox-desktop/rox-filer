@@ -253,7 +253,7 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
 			      guint32           time)
 {
 	GList *uris = NULL;
-	const guchar *path = NULL;
+	guchar *path = NULL;
 	gboolean success = FALSE;
 
 	if (!selection_data->data)
@@ -289,6 +289,9 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
 
 	success = TRUE;
 err:
+	if(path)
+		g_free(path);
+	
 	if (uris)
 		g_list_free(uris);
 	gtk_drag_finish(context, success, FALSE, time);	/* Failure */

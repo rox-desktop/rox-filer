@@ -88,7 +88,7 @@ void run_app(const char *path)
 void run_with_files(const char *path, GList *uri_list)
 {
 	const char	**argv;
-	int		argc = 0;
+	int		argc = 0, i;
 	struct stat 	info;
 
 	if (stat(path, &info))
@@ -107,19 +107,23 @@ void run_with_files(const char *path, GList *uri_list)
 	while (uri_list)
 	{
 		const char *uri = uri_list->data;
-		const char *local;
+		char *local;
 
 		local = get_local_path(uri);
-		if (local)
+		if (local) 
 			argv[argc++] = local;
 		else
-			argv[argc++] = uri;
+			argv[argc++] = g_strdup(uri);
 		uri_list = uri_list->next;
 	}
 	
 	argv[argc++] = NULL;
 
 	rox_spawn(home_dir, argv);
+
+	for(i=1; i<argc; i++)
+		g_free((gchar *) argv[i]);
+	g_free(argv);
 }
 
 /* Run the program as '<path> -', piping the data to it via stdin.
