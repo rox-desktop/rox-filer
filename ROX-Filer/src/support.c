@@ -1178,7 +1178,7 @@ CollateKey *collate_key_new(const guchar *name)
 		/* We're in a (possibly blank) text section starting at 'name'.
 		 * Find the end of it (the next digit, or end of string).
 		 */
-		if (g_unichar_isdigit(g_utf8_get_char(i)))
+		if (g_ascii_isdigit(g_utf8_get_char(i)))
 		{
 			char *endp;
 			
