@@ -7,6 +7,8 @@ when someone sends patches!).
 
 BUGS
 
+Use doubles in find.c to cope with large files.
+
 Implement locking (mv) for thumbnails.
 
 Trying to show a half-written thumbnail prevents updating it later.
@@ -32,29 +34,18 @@ Gtk+ 2.0:
 	- Spawning shell scripts sometimes gives Bad Address (glib bug)
 
 Rescanning sometimes causes the display to scroll (automounter problem).
-<<<<<<< TODO
-
-Panel sometimes won't accept drops (window frame problem?).
-
-Deleting / moving files should update the globicons.
-=======
 
 Panel sometimes won't accept drops:
 	- Create panel without a window manager running
 	- Start sawfish. Panel no longer accepts drops.
 	- Same thing happens with gnome-terminal => sawfish bug (WM_STATE)?
 
->>>>>>> 1.171
-
-<<<<<<< TODO
-=======
 FEATURES FOR 1.3
->>>>>>> 1.171
 
-<<<<<<< TODO
-FEATURES FOR 1.1
+Opening an AVFS directory with left-click should reuse the same window.
 
-=======
+Allow subdirectories inside SendTo, shown as submenus.
+
 Deleting / moving files should update the globicons?
 
 Pinboard icons can only be dragged one at a time.

@@ -32,7 +32,7 @@
 	<xsl:text>
 </xsl:text>
     </xsl:template>
-	    
+	
     <xsl:template match='refsynopsisdiv'>
 	<xsl:text>.SH SYNOPSIS
 </xsl:text>
@@ -52,7 +52,7 @@
 	    <xsl:if test='@choice="opt"'>]</xsl:if>
 	    <xsl:if test='@rep="repeat"'>...</xsl:if><xsl:text> </xsl:text>
     </xsl:template>
-    
+
     <xsl:template match='refsect1'>
 	    <xsl:text>.SH </xsl:text>
 	    <xsl:apply-templates/>
@@ -64,7 +64,7 @@
 </xsl:text>
 	    <xsl:apply-templates/><xsl:text>
 </xsl:text>
-    </xsl:template>    
+    </xsl:template>
 
     <xsl:template match='varlistentry'>
 	    <xsl:text>
@@ -78,13 +78,13 @@
 	    <xsl:apply-templates/>
 	    <xsl:if test='position()&lt;last()'><xsl:text>, </xsl:text></xsl:if>
     </xsl:template>
-    
+
     <xsl:template match='option'>
 	    <xsl:text>\fB</xsl:text><xsl:value-of select='.'/><xsl:text>\fP</xsl:text>
     </xsl:template>
 
     <xsl:template match='title'><xsl:apply-templates/></xsl:template>
-	    
+	
     <xsl:template match='*'>
 	    <xsl:text> </xsl:text><xsl:apply-templates/><xsl:text> </xsl:text>
     </xsl:template>
@@ -97,7 +97,7 @@
 	    <xsl:text>
 </xsl:text><xsl:value-of select='@url'/>
     </xsl:template>
-	    
+	
     <xsl:template match='email'>
 	    <xsl:text> &lt;</xsl:text><xsl:apply-templates/><xsl:text>&gt;</xsl:text>
     </xsl:template>
@@ -115,5 +115,5 @@
     <xsl:template match='simplelist'>
 	<xsl:apply-templates select='member'/>
     </xsl:template>
-	    
+	
 </xsl:stylesheet>

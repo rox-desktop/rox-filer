@@ -1328,12 +1328,7 @@ void display_update_view(FilerWindow *filer_window,
 	static PangoFontDescription *monospace = NULL;
 
 	if (!monospace)
-	{
-		/* XXX: Should just request 'monospace', but that doesn't
-		 * work for some reason (pango bug?).
-		 */
-		monospace = pango_font_description_from_string("Monotype.com");
-	}
+		monospace = pango_font_description_from_string("monospace");
 	
 	if (view->details)
 	{
