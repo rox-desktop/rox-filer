@@ -116,6 +116,7 @@ static void ungrab_key(Icon *icon);
 static void grab_key(Icon *icon);
 static void parseKeyString(MyKey *key, const char *str);
 static void icon_wink(Icon *icon);
+static void initModifiers(void);
 
 enum {
 	ACTION_SHIFT,
@@ -424,6 +425,8 @@ void icon_set_shortcut(Icon *icon, const gchar *shortcut)
 	if (icon->shortcut && shortcut && strcmp(icon->shortcut, shortcut) == 0)
 		return;
 
+	initModifiers();
+
 	ungrab_key(icon);
 
 	g_free(icon->shortcut);
@@ -642,6 +645,8 @@ static GdkFilterReturn filter_get_key(GdkXEvent *xevent,
 	if (kev->type != KeyRelease && kev->type != ButtonPressMask)
 		return GDK_FILTER_CONTINUE;
 
+	initModifiers();
+
 	if (kev->type == KeyRelease)
 	{
 		gchar *str;
@@ -656,7 +661,7 @@ static GdkFilterReturn filter_get_key(GdkXEvent *xevent,
 			m & ControlMask ? "Control+" : "",
 			m & ShiftMask ? "Shift+" : "",
 			m & AltMask ? "Alt+" : "",
-			m & MetaMask ? "Hyper+" : "",
+			m & MetaMask ? "Meta+" : "",
 			m & SuperMask ? "Super+" : "",
 			m & HyperMask ? "Hyper+" : "",
 			XKeysymToString(sym));
@@ -998,9 +1003,14 @@ static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n)
 /* Stolen from xfwm4 */
 static void initModifiers(void)
 {
+	static gboolean need_init = TRUE;
 	Display *dpy = GDK_DISPLAY();
 	XModifierKeymap *xmk = XGetModifierMapping(dpy);
 	int m, k;
+
+	if (!need_init)
+		return;
+	need_init = FALSE;
 
 	AltMask = MetaMask = NumLockMask = ScrollLockMask = CapsLockMask =
 		SuperMask = HyperMask = 0;
@@ -1092,7 +1102,7 @@ static void initModifiers(void)
 
 
 /* Fill in key from str. Sets keycode to zero if str is NULL.
- * Stolen from xfwm4 and modified.
+ * Stolen from xfwm4 and modified. Call initModifiers before this.
  */
 static void parseKeyString(MyKey *key, const char *str)
 {
@@ -1121,6 +1131,10 @@ static void parseKeyString(MyKey *key, const char *str)
 			key->modifier = key->modifier | AltMask;
 		if (strstr(tmp, "meta") || strstr(tmp, "mod2"))
 			key->modifier = key->modifier | MetaMask;
+		if (strstr(tmp, "hyper"))
+			key->modifier = key->modifier | HyperMask;
+		if (strstr(tmp, "super"))
+			key->modifier = key->modifier | SuperMask;
 
 		g_free(tmp);
 	}
@@ -1140,7 +1154,8 @@ static GdkFilterReturn filter_keys(GdkXEvent *xevent,
 	if (kev->type != KeyPress)
 		return GDK_FILTER_CONTINUE;
 
-	state = kev->state & (ShiftMask | ControlMask | AltMask | MetaMask);
+	state = kev->state & (ShiftMask | ControlMask | AltMask | MetaMask |
+			      HyperMask | SuperMask);
 
 	for (next = icon_shortcuts; next; next = next->next)
 	{
@@ -1178,7 +1193,7 @@ static gboolean mykey_cmp(gconstpointer a, gconstpointer b)
 }
 
 /* Stolen from xfwm4 and modified.
- * FALSE on error.
+ * FALSE on error. Call initModifiers before this.
  */
 static gboolean grabKey(MyKey *key)
 {
@@ -1189,8 +1204,6 @@ static gboolean grabKey(MyKey *key)
 	if (need_init)
 	{
 		need_init = FALSE;
-
-		initModifiers();
 		gdk_window_add_filter(gdk_get_default_root_window(),
 				filter_keys, NULL);
 	}
