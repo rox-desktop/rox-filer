@@ -283,10 +283,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 
 	item->base_type = base_type;
 
-	if (base_type == TYPE_FILE)
-		item->mime_type = type_from_path(path->str);
-	else
-		item->mime_type = NULL;
+	item->mime_type = type_from_path(path->str);
 
 	if (base_type == TYPE_DIRECTORY)
 	{
@@ -321,13 +318,13 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			item->image = default_pixmap + TYPE_EXEC_FILE;
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 		}
-		else
+		else if (base_type == TYPE_FILE)
 		{
 			item->image = type_to_icon(filer_window->window, 
 						   item->mime_type);
-			if (!item->image)
-				item->image = default_pixmap + base_type;
 		}
+		else
+			item->image = default_pixmap + base_type;
 	}
 
 	item->text_width = gdk_string_width(filer_window->window->style->font,
@@ -617,8 +614,9 @@ void open_item(Collection *collection,
 					message = g_string_new(NULL);
 					g_string_sprintf(message, "No open "
 						"action specified for files of "
-						"this type (%s)",
-						type ? type->name : "unknown");
+						"this type (%s/%s)",
+						type->media_type,
+						type->subtype);
 					report_error("ROX-Filer", message->str);
 					g_string_free(message, TRUE);
 				}

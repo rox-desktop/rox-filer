@@ -15,7 +15,8 @@ typedef struct _MIME_type MIME_type;
 
 struct _MIME_type
 {
-	char		*name;
+	char		*media_type;
+	char		*subtype;
 	MaskedPixmap 	*image;		/* NULL => not loaded yet */
 };
 

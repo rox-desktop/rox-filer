@@ -22,36 +22,20 @@
 #include "type.h"
 #include "support.h"
 
-/* Static prototypes */
-static GString *to_(char *mime_name);
+/* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
+static GHashTable *extension_hash = NULL;
 
 /* XXX: Just for testing... */
-static MIME_type text_plain = {"text/plain"};
-static MIME_type image_xpm = {"image/x-xpixmap"};
+static MIME_type text_plain = {"text", "plain"};
+static MIME_type image_xpm = {"image", "x-xpixmap"};
+static MIME_type image_png = {"image", "png"};
 
 void type_init()
 {
-}
+	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-/* Convert / to _, eg: text/plain to text_plain.
- * Returns a GString pointer (valid until next call).
- */
-static GString *to_(char *mime_name)
-{
-	static GString	*converted;
-	char		*slash;
-
-	if (!converted)
-		converted = g_string_new(mime_name);
-	else
-		g_string_assign(converted, mime_name);
-
-	slash = strchr(converted->str, '/');
-	if (slash)
-		*slash = '_';
-	else
-		g_print("Missing / in MIME type name");
-	return converted;
+	g_hash_table_insert(extension_hash, "png", &image_png);
+	g_hash_table_insert(extension_hash, "xpm", &image_xpm);
 }
 
 char *basetype_name(FileItem *item)
@@ -89,8 +73,17 @@ char *basetype_name(FileItem *item)
  */
 MIME_type *type_from_path(char *path)
 {
-	if (strstr(path, ".xpm"))
-		return &image_xpm;
+	char	*dot;
+
+	dot = strrchr(path, '.');
+	if (dot)
+	{
+		MIME_type *type;
+		type = g_hash_table_lookup(extension_hash, dot + 1);
+		if (type)
+			return type;
+	}
+
 	return &text_plain;
 }
 
@@ -98,11 +91,13 @@ MIME_type *type_from_path(char *path)
 
 gboolean type_open(char *path, MIME_type *type)
 {
-	char		*argv[] = {NULL, path, NULL};
-	char		*open;
+	char	*argv[] = {NULL, path, NULL};
+	char	*open;
+	char	*type_name;
 
-	open = choices_find_path_load_shared(to_(type->name)->str,
-					     "MIME-types");
+	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
+	open = choices_find_path_load_shared(type_name, "MIME-types");
+	g_free(type_name);
 	if (!open)
 		return FALSE;
 
@@ -117,31 +112,65 @@ gboolean type_open(char *path, MIME_type *type)
 	return TRUE;
 }
 
+/* Return the image for this type, loading it if needed.
+ * Places to check are: (eg type="text_plain", base="text")
+ * 1. Choices/MIME-types/<type>/MIME-icons/<type>
+ * 2. Choices/MIME-types/<type>/MIME-icons/<base>
+ * 3. Choices/MIME-types/<base>/MIME-icons/<base> [ TODO ]
+ * 4. $APP_DIR/MIME-icons/<base>
+ * 5. Unknown type icon.
+ */
 MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 {
-	if (!type)
-		return NULL;
+	char	*open, *path;
+	char	*type_name;
 
-	if (!type->image)
+	g_return_val_if_fail(type != NULL, default_pixmap + TYPE_UNKNOWN);
+
+	/* Already got an image? TODO: Is it out-of-date? */
+	if (type->image)
+		return type->image;
+
+	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
+
+	/* 1 and 2 : Check for icon provided by specific handler */
+	open = choices_find_path_load_shared(type_name, "MIME-types");
+	if (open)
 	{
-		char	*open, *path;
+		/* 1 : Exact type provided */
+		path = g_strconcat(open, "/MIME-icons/", type_name, ".xpm",
+				   NULL);
+		type->image = load_pixmap_from(window, path);
+		g_free(path);
 
-		open = choices_find_path_load_shared(to_(type->name)->str,
-						     "MIME-types");
-		if (open)
+		if (!type->image)
 		{
-			path = g_strconcat(open, "/MIME-types/",
-					   to_(type->name)->str, ".xpm",
-					   NULL);
+			/* 2 : Base type provided */
+			path = g_strconcat(open, "/MIME-icons/",
+					type->media_type, ".xpm", NULL);
 			type->image = load_pixmap_from(window, path);
-			if (!type->image)
-				g_print("Unable to load pixmap file '%s'\n",
-						path);
 			g_free(path);
 		}
-		if (!type->image)
-			type->image = default_pixmap + TYPE_UNKNOWN;
 	}
+
+	g_free(type_name);
+
+	if (type->image)
+		return type->image;
+	
+	/* 4 : Load a default icon from our own application dir */
+	
+	path = g_strconcat(getenv("APP_DIR"), "/MIME-icons/", type->media_type,
+			   ".xpm", NULL);
+	type->image = load_pixmap_from(window, path);
+	g_free(path);
+
+	if (type->image)
+		return type->image;
+	
+	/* 5 : Use the unknown type icon */
+
+	type->image = default_pixmap + TYPE_UNKNOWN;
 		
 	return type->image;
 }

@@ -16,7 +16,8 @@ if [ -x $BIN ] ; then
   esac
   exec $DEBUGGER $BIN $*
 else
-  echo "I cannot find an executable file for your host type ($PLATFORM)."
-  echo "Look inside this application directory for a 'src' directory - if"
-  echo "there is one then try running make inside it to create the executable."
+  echo "ERROR from $0:" >&2
+  echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
+  echo "Look inside this application directory for a 'src' directory - if" >&2
+  echo "there is one then try running make inside it to create the executable." >&2
 fi
