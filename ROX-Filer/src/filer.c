@@ -1248,11 +1248,22 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 {
 	GtkWidget *view = NULL;
 	Directory *dir = NULL;
+	GHashTable *selected = NULL;
 	
 	g_return_if_fail(filer_window != NULL);
 
 	if (filer_window->view)
 	{
+		/* Save the current selection */
+		ViewIter iter;
+		DirItem *item;
+
+		selected = g_hash_table_new(g_str_hash, g_str_equal);
+		view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
+		while ((item = iter.next(&iter)))
+			g_hash_table_insert(selected, item->leafname, "yes");
+
+		/* Destroy the old view */
 		gtk_widget_destroy(GTK_WIDGET(filer_window->view));
 		filer_window->view = NULL;
 
@@ -1298,6 +1309,21 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 		attach(filer_window);
 
 		view_autosize(filer_window->view);
+	}
+
+	if (selected)
+	{
+		ViewIter iter;
+		DirItem *item;
+
+		view_get_iter(filer_window->view, &iter, 0);
+		while ((item = iter.next(&iter)))
+		{
+			if (g_hash_table_lookup(selected, item->leafname))
+				view_set_selected(filer_window->view,
+						  &iter, TRUE);
+		}
+		g_hash_table_destroy(selected);
 	}
 }
 

@@ -149,7 +149,8 @@ GtkWidget *view_details_new(FilerWindow *filer_window)
 	gtk_range_set_adjustment(GTK_RANGE(filer_window->scrollbar),
 		gtk_tree_view_get_vadjustment(GTK_TREE_VIEW(view_details)));
 
-	view_details_sort((ViewIface *) view_details);
+	if (filer_window->sort_type != -1)
+		view_details_sort((ViewIface *) view_details);
 
 	return GTK_WIDGET(view_details);
 }
@@ -340,8 +341,11 @@ static void details_get_value(GtkTreeModel *tree_model,
 		case COL_BG_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
 			if (view_item->selected)
-				g_value_set_boxed(value,
-					&style->base[GTK_STATE_SELECTED]);
+			{
+				GtkStateType state = view_details->
+						filer_window->selection_state;
+				g_value_set_boxed(value, &style->base[state]);
+			}
 			else
 				g_value_set_boxed(value, NULL);
 			break;
@@ -524,7 +528,7 @@ static gboolean details_get_sort_column_id(GtkTreeSortable *sortable,
 		case SORT_OWNER: col = COL_OWNER; break;
 		case SORT_GROUP: col = COL_GROUP; break;
 		default:
-			g_assert_not_reached();
+			g_warning("details_get_sort_column_id(): error!");
 			return FALSE;
 	}
 	if (sort_column_id)
@@ -722,6 +726,13 @@ static void view_details_size_request(GtkWidget *widget,
 	requisition->width = 50;
 }
 
+static void view_details_drag_data_received(GtkWidget *widget,
+		GdkDragContext *drag_context,
+		gint x, gint y, GtkSelectionData *data, guint info, guint time)
+{
+	/* Just here to override annoying default handler */
+}
+
 static void view_details_destroy(GtkObject *view_details)
 {
 	VIEW_DETAILS(view_details)->filer_window = NULL;
@@ -753,6 +764,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->motion_notify_event = view_details_motion_notify;
 	widget->expose_event = view_details_expose;
 	widget->size_request = view_details_size_request;
+	widget->drag_data_received = view_details_drag_data_received;
 }
 
 static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
@@ -804,7 +816,6 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 					    "background-gdk", COL_BG_COLOUR,
 					    NULL);
 	gtk_tree_view_append_column(treeview, column);
-	gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
 
 	ADD_TEXT_COLUMN(_("_Name"), COL_LEAF);
 	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
@@ -880,6 +891,8 @@ static void view_details_style_changed(ViewIface *view, int flags)
 	}
 
 	gtk_tree_path_free(path);
+
+	gtk_tree_view_columns_autosize((GtkTreeView *) view);
 }
 
 static gint wrap_sort(gconstpointer a, gconstpointer b,
