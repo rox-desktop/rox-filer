@@ -153,7 +153,7 @@ _xdg_glob_hash_node_new (void)
   return glob_hash_node;
 }
 
-void
+static void
 _xdg_glob_hash_node_dump (XdgGlobHashNode *glob_hash_node,
 			  int depth)
 {
