@@ -1510,6 +1510,15 @@ static gboolean drag_motion(GtkWidget		*widget,
 
 	type = dnd_motion_item(context, &item);
 
+	if ((context->actions & GDK_ACTION_ASK) && o_dnd_left_menu.int_value
+		&& type != drop_dest_prog)
+	{
+		guint state;
+		gdk_window_get_pointer(NULL, NULL, NULL, &state);
+		if (state & GDK_BUTTON1_MASK)
+			action = GDK_ACTION_ASK;
+	}
+
 	if (!item)
 		type = NULL;
 out:

@@ -395,16 +395,27 @@ void display_set_layout(FilerWindow  *filer_window,
 			DetailsType  details,
 			gboolean     force_resize)
 {
+	gboolean style_changed = FALSE;
+
 	g_return_if_fail(filer_window != NULL);
 
+	if (filer_window->display_style_wanted != style 
+	    || filer_window->details_type != details)
+	{
+		style_changed = TRUE;
+	}
+	  
 	display_style_set(filer_window, style);
 	display_details_set(filer_window, details);
 
 	/* Recreate layouts because wrapping may have changed */
 	view_style_changed(filer_window->view, VIEW_UPDATE_NAME);
 
-	if (force_resize || o_filer_auto_resize.int_value != RESIZE_NEVER)
+	if (force_resize || o_filer_auto_resize.int_value == RESIZE_ALWAYS
+	    || (o_filer_auto_resize.int_value == RESIZE_STYLE && style_changed))
+	{
 		view_autosize(filer_window->view);
+	}
 }
 
 /* Set the 'Show Thumbnails' flag for this window */
