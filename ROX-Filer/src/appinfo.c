@@ -25,15 +25,26 @@
  * The format is:
  *
  * <?xml version="1.0"?>
- * <AppMenu>
- *   <Item label="..." option="..."/>
- *   ...
- * </AppMenu>
+ * <AppInfo>
+ *   <Summary>Tooltip text</Summary>
+ *   <About>
+ *     <Purpose>...</Purpose>
+ *     <Version>...</Version>
+ *     <Authors>...</Authors>
+ *     <License>...</License>
+ *     <Homepage>...</Homepage>
+ *     ...
+ *   </About>
+ *   <AppMenu>
+ *     <Item label="..." option="..."/>
+ *     ...
+ *   </AppMenu>
+ * </AppInfo>
  */
 
 #include "config.h"
+
 #include <string.h>
-#include <tree.h>
 
 #include "global.h"
 
@@ -41,6 +52,7 @@
 #include "fscache.h"
 #include "dir.h"
 #include "type.h"
+#include "support.h"
 
 static GFSCache *appinfo_cache = NULL;
 
@@ -127,13 +139,7 @@ xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
 	if (strcmp(node->name, name) == 0)
 		return node;
 
-	for (node = node->xmlChildrenNode; node; node = node->next)
-	{
-		if (strcmp(node->name, name) == 0)
-			return node;
-	}
-
-	return NULL;
+	return get_subnode(node, name);
 }
 
 /****************************************************************

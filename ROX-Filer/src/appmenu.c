@@ -30,7 +30,6 @@
 #include <ctype.h>
 
 #include <parser.h>
-#include <tree.h>
 
 #include "global.h"
 

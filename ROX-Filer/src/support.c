@@ -36,6 +36,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
+#include <parser.h>
 
 #include "global.h"
 
@@ -803,4 +804,19 @@ void add_default_styles(void)
 		gtk_rc_add_default_file(rc_file);
 		g_free(rc_file);
 	}
+}
+
+/* Return the (first) child of this node with the given name.
+ * NULL if not found.
+ */
+xmlNode *get_subnode(xmlNode *node, char *name)
+{
+	for (node = node->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type == XML_ELEMENT_NODE &&
+		    strcmp(node->name, name) == 0)
+			return node;
+	}
+
+	return NULL;
 }

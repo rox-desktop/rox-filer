@@ -28,6 +28,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <fnmatch.h>
+#include <parser.h>
 
 #include "global.h"
 #include "dir.h"
@@ -39,6 +40,18 @@
 #include "support.h"
 #include "usericons.h"
 
+#ifdef LIBXML_VERSION
+# if LIBXML_VERSION > 20000
+#  define XML2 1
+# endif
+#endif
+
+/* Store glob-to-icon mappings */
+typedef struct _GlobIcon {
+	guchar *pattern;
+	guchar *iconpath;
+} GlobIcon;
+
 static GList *glob_icons = NULL;
 
 /* Static prototypes */
@@ -47,6 +60,7 @@ static GlobIcon *get_globicon_struct(guchar *path);
 static void free_globicon(GlobIcon *gi, gpointer user_data);
 static void get_path_set_icon(GtkWidget *dialog);
 static void show_icon_help(gpointer data);
+static void write_globicons(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -58,6 +72,7 @@ void read_globicons()
 	static time_t last_read = (time_t) 0;
 	struct stat info;
 	guchar *path;
+	xmlDocPtr doc;
 	
 	path = choices_find_path_load("globicons", PROJECT);
 	if (!path)
@@ -76,7 +91,49 @@ void read_globicons()
 		glob_icons = NULL;
 	}
 
-	parse_file(path, process_globicons_line);
+	doc = xmlParseFile(path);
+	if (doc)
+	{
+		xmlNodePtr node, icon, root;
+		char	   *match;
+		GlobIcon   *gi;
+		
+		root = xmlDocGetRootElement(doc);
+		
+		/* Handle the new XML file format */
+		for (node = root->xmlChildrenNode; node; node = node->next)
+		{
+			if (node->type != XML_ELEMENT_NODE)
+				continue;
+			if (strcmp(node->name, "rule") != 0)
+				continue;
+			icon = get_subnode(node, "icon");
+			if (!icon)
+				continue;
+			match = xmlGetProp(node, "match");
+			if (!match)
+				continue;
+
+			gi = g_new(GlobIcon, 1);
+			gi->pattern = match;
+			gi->iconpath = xmlNodeGetContent(icon);
+
+			/* Prepend so that later patterns override earlier ones
+			 * when we loop through the list.
+			 */
+			glob_icons = g_list_prepend(glob_icons, gi);
+			
+		}
+
+		xmlFreeDoc(doc);
+	}
+	else
+	{
+		/* Handle the old non-XML format */
+		parse_file(path, process_globicons_line);
+		if (glob_icons)
+			write_globicons();	/* Upgrade to new format */
+	}
 
 	last_read = time(NULL);   /* Update time stamp */
 out:
@@ -114,39 +171,36 @@ static void free_globicon(GlobIcon *gi, gpointer user_data)
 static void write_globicons(void)
 {
 	guchar *save = NULL;
-	GString *tmp = NULL;
-	FILE *file = NULL;
 	GList *next;
 	guchar *save_new = NULL;
+	xmlDocPtr doc = NULL;
 
 	save = choices_find_path_save("globicons", "ROX-Filer", TRUE);
 
 	if (!save)
-		return;
+		return;		/* Saving is disabled */
 
 	save_new = g_strconcat(save, ".new", NULL);
-	file = fopen(save_new, "wb");
-	if (!file)
-		goto err;
 
-	tmp = g_string_new(NULL);
+	doc = xmlNewDoc("1.0");
+	doc->xmlChildrenNode = xmlNewDocNode(doc, NULL, "special-files", NULL);
+
 	for (next = g_list_last(glob_icons); next; next = next->prev)
 	{
 		GlobIcon *gi = (GlobIcon *) next->data;
-		
-		g_string_sprintf(tmp, "%s\t%s\n", gi->pattern, gi->iconpath);
+		xmlNodePtr tree;
 
-		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
-			goto err;
+		tree = xmlNewChild(doc->xmlChildrenNode, NULL, "rule", NULL);
+		xmlSetProp(tree, "match", gi->pattern);
+		xmlNewChild(tree, NULL, "icon", gi->iconpath);
 	}
 
-	if (fclose(file))
-	{
-		file = NULL;
+#ifdef XML2
+	if (xmlSaveFormatFileEnc(save_new, doc, NULL, 1) < 0)
+#else
+	if (xmlSaveFile(save_new, doc) < 0)
+#endif
 		goto err;
-	}
-
-	file = NULL;
 
 	if (rename(save_new, save))
 		goto err;
@@ -154,10 +208,8 @@ static void write_globicons(void)
  err:
 	delayed_error(_("Error saving globicons"), g_strerror(errno));
  out:
-	if (file)
-		fclose(file);
-	if (tmp)
-		g_string_free(tmp, TRUE);
+	if (doc)
+		xmlFreeDoc(doc);
 	g_free(save_new);
 	g_free(save);
 }

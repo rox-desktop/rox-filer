@@ -28,7 +28,6 @@
 #include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
 #include <parser.h>
-#include <tree.h>
 
 #include "global.h"
 

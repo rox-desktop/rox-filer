@@ -2,6 +2,13 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+10-Oct-2001
+~~~~~~~~~~~
+Bugfix: When setting an icon for a file with a space in the name, the
+	setting wasn't saved correctly (spotted by Arnaud Calvo and Jakub
+	Turski). The 'globicons' file should be converted automatically
+	when the filer is run.
+
 08-Oct-2001
 ~~~~~~~~~~~
 Added support for the regex field in MIME-info. This allows files to be

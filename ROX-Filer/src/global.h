@@ -58,6 +58,8 @@ typedef struct _Icon Icon;
  */
 typedef struct _Panel Panel;
 
+#include <tree.h>
+
 /* For very old versions of libxml... */
 #ifndef xmlChildrenNode
 #  define xmlChildrenNode childs

@@ -45,6 +45,7 @@
 #include "gtk/gtkdialog.h"
 #include "gtk/gtklabel.h"
 
+#include "global.h"
 #include "support.h"
 
 /* Signals:

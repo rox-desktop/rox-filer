@@ -31,7 +31,6 @@
 #include <ctype.h>
 #include <math.h>
 #include <netdb.h>
-#include <tree.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
