@@ -152,6 +152,9 @@ static gboolean idle_scan_dir(gpointer data)
 			closedir(filer_window->dir);
 			filer_window->dir = NULL;
 
+			collection_set_item_size(filer_window->collection,
+					filer_window->scan_min_width,
+					filer_window->collection->item_height);
 			collection_qsort(filer_window->collection,
 					sort_by_name);
 			return FALSE;		/* Finished */
@@ -283,6 +286,9 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 
 	item_width = MAX(item->pix_width, item->text_width) + 4;
 
+	if (item_width > filer_window->scan_min_width)
+		filer_window->scan_min_width = item_width;
+
 	if (item_width > filer_window->collection->item_width)
 		collection_set_item_size(filer_window->collection,
 					 item_width,
@@ -406,7 +412,6 @@ void scan_dir(FilerWindow *filer_window)
 
 	mount_update();
 	
-	collection_set_item_size(filer_window->collection, 64, 64);
 	free_temp_icons(filer_window);
 	collection_clear(filer_window->collection);
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
@@ -425,6 +430,8 @@ void scan_dir(FilerWindow *filer_window)
 		report_error("Error scanning directory", g_strerror(errno));
 		return;
 	}
+
+	filer_window->scan_min_width = 64;
 
 	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
 }
@@ -630,6 +637,22 @@ static gint key_press_event(GtkWidget	*widget,
 	return FALSE;
 }
 
+FileItem *selected_item(Collection *collection)
+{
+	int	i;
+	
+	g_return_val_if_fail(collection != NULL, NULL);
+	g_return_val_if_fail(IS_COLLECTION(collection), NULL);
+	g_return_val_if_fail(collection->number_selected == 1, NULL);
+
+	for (i = 0; i < collection->number_of_items; i++)
+		if (collection->items[i].selected)
+			return (FileItem *) collection->items[i].data;
+
+	g_warning("selected_item: number_selected is wrong\n");
+
+	return NULL;
+}
 
 void filer_opendir(char *path, gboolean panel, Side panel_side)
 {
@@ -649,6 +672,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
+	collection_set_item_size(filer_window->collection, 64, 64);
 	collection_set_functions(filer_window->collection,
 			draw_item, test_point);
 

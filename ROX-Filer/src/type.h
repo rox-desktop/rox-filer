@@ -17,6 +17,8 @@ struct _MIME_type
 
 /* Prototypes */
 void type_init();
+char *basetype_name(FileItem *item);
+
 MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);
 

@@ -44,7 +44,6 @@ static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context);
 static void create_uri_list(GString *string,
 				Collection *collection,
 				FilerWindow *filer_window);
-static FileItem *selected_item(Collection *collection);
 static gboolean drag_drop(GtkWidget 	*widget,
 			GdkDragContext  *context,
 			gint            x,
@@ -261,23 +260,6 @@ static void create_uri_list(GString *string,
 	}
 
 	g_string_free(leader, TRUE);
-}
-
-static FileItem *selected_item(Collection *collection)
-{
-	int	i;
-	
-	g_return_val_if_fail(collection != NULL, NULL);
-	g_return_val_if_fail(IS_COLLECTION(collection), NULL);
-	g_return_val_if_fail(collection->number_selected == 1, NULL);
-
-	for (i = 0; i < collection->number_of_items; i++)
-		if (collection->items[i].selected)
-			return (FileItem *) collection->items[i].data;
-
-	g_warning("selected_item: number_selected is wrong\n");
-
-	return NULL;
 }
 
 /*			DRAGGING FROM US			*/

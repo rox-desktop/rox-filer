@@ -12,6 +12,8 @@
 #include <unistd.h>
 #include <errno.h>
 
+#include "filer.h"
+#include "pixmaps.h"
 #include "apps.h"
 #include "gui_support.h"
 #include "choices.h"
@@ -25,6 +27,34 @@ static MIME_type text_plain = {"text/plain"};
 
 void type_init()
 {
+}
+
+char *basetype_name(FileItem *item)
+{
+	if (item->flags & ITEM_FLAG_SYMLINK)
+		return "Sym link";
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+		return "Mount point";
+	else if (item->flags & ITEM_FLAG_APPDIR)
+		return "App dir";
+
+	switch (item->base_type)
+	{
+		case TYPE_FILE:
+			return "File";
+		case TYPE_DIRECTORY:
+			return "Dir";
+		case TYPE_CHAR_DEVICE:
+			return "Char dev";
+		case TYPE_BLOCK_DEVICE:
+			return "Block dev";
+		case TYPE_PIPE:
+			return "Pipe";
+		case TYPE_SOCKET:
+			return "Socket";
+	}
+	
+	return "Unknown";
 }
 
 /*			MIME-type guessing 			*/

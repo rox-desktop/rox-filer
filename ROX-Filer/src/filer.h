@@ -41,6 +41,7 @@ struct _FilerWindow
 	/* Scanning */
 	DIR		*dir;
 	gint		idle_scan_id;	/* (only if dir != NULL) */
+	guint		scan_min_width;	/* Min width possible so far */
 };
 
 struct _FileItem
@@ -64,5 +65,6 @@ void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
 void scan_dir(FilerWindow *filer_window);
 void panel_set_timeout(FilerWindow *filer_window, gulong msec);
+FileItem *selected_item(Collection *collection);
 
 #endif /* _FILER_H */

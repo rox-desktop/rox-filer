@@ -13,6 +13,7 @@
 #include <gtk/gtk.h>
 
 #include "filer.h"
+#include "type.h"
 #include "support.h"
 #include "gui_support.h"
 #include "options.h"
@@ -33,6 +34,8 @@ static void menu_closed(GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
+static void select_all(gpointer data, guint action, GtkWidget *widget);
+static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void show_options(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
@@ -42,7 +45,9 @@ static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
+static GtkWidget	*filer_file_item;	/* The File '' menu */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
+static GtkWidget	*panel_file_item;	/* The File '' menu */
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
@@ -69,8 +74,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Permissions",		NULL,   NULL, 0, NULL},
 {"/File/Stamp",    		NULL,   NULL, 0, NULL},
 {"/File/Find",			NULL,   NULL, 0, NULL},
-{"/Select All",	    		C_"A",  NULL, 0, NULL},
-{"/Clear Selection",	    	C_"Z",  NULL, 0, NULL},
+{"/Select All",	    		C_"A",  select_all, 0, NULL},
+{"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
 {"/Options...",			NULL,   show_options, 0, NULL},
 {"/New directory",		NULL,   new_directory, 0, NULL},
 {"/Xterm here",			NULL,  	xterm_here, 0, NULL},
@@ -101,6 +106,7 @@ void menu_init()
 {
 	GtkItemFactory  	*item_factory;
 	char			*menurc;
+	GList			*items;
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
@@ -111,6 +117,9 @@ void menu_init()
 			filer_menu_def,
 			NULL);
 	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
+	items = gtk_container_children(GTK_CONTAINER(filer_menu));
+	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
 
 	panel_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
@@ -121,6 +130,9 @@ void menu_init()
 			panel_menu_def,
 			NULL);
 	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
+	items = gtk_container_children(GTK_CONTAINER(panel_menu));
+	panel_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
 
 	menurc = choices_find_path_load("menus");
 	if (menurc)
@@ -175,7 +187,9 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item)
 {
-	int	pos[] = {event->x_root, event->y_root};
+	GString		*buffer;
+	FileItem	*file_item;
+	int		pos[] = {event->x_root, event->y_root};
 
 	window_with_focus = filer_window;
 
@@ -190,12 +204,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		}
 	}
 
-	if (filer_window->panel)
-	{
-		collection_clear_selection(filer_window->collection);
-		panel_set_timeout(NULL, 0);
-	}
-
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
 		collection_select_item(filer_window->collection, item);
@@ -203,6 +211,35 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	}
 	else
 		filer_window->temp_item_selected = FALSE;
+
+	buffer = g_string_new(NULL);
+	switch (filer_window->collection->number_selected)
+	{
+		case 0:
+			g_string_assign(buffer, "<nothing>");
+			break;
+		case 1:
+			file_item = selected_item(filer_window->collection);
+			g_string_sprintf(buffer, "%s '%s'",
+					basetype_name(file_item),
+					file_item->leafname);
+			break;
+		default:
+			g_string_sprintf(buffer, "%d items",
+				filer_window->collection->number_selected);
+			break;
+	}
+
+	if (filer_window->panel)
+	{
+		collection_clear_selection(filer_window->collection);
+		panel_set_timeout(NULL, 0);
+		gtk_label_set_text(GTK_LABEL(panel_file_item), buffer->str);
+	}
+	else
+		gtk_label_set_text(GTK_LABEL(filer_file_item), buffer->str);
+
+	g_string_free(buffer, TRUE);
 
 	gtk_menu_popup(filer_window->panel ? GTK_MENU(panel_menu)
 				           : GTK_MENU(filer_menu),
@@ -314,6 +351,20 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 
 	if (error)
 		report_error("ROX-Filer", error);
+}
+
+static void select_all(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection_select_all(window_with_focus->collection);
+}
+
+static void clear_selection(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection_clear_selection(window_with_focus->collection);
 }
 
 static void show_options(gpointer data, guint action, GtkWidget *widget)
