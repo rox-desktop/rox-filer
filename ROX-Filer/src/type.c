@@ -42,7 +42,6 @@
 #include "choices.h"
 #include "type.h"
 #include "support.h"
-#include "options.h"
 
 /* Static prototypes */
 static char *import_extensions(guchar *line);

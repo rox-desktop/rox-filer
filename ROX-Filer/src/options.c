@@ -151,52 +151,6 @@ void options_load(void)
 	parse_file(path, process_option_line);
 }
 
-void parse_file(char *path, ParseFunc *parse_line)
-{
-	char		*data;
-	long		length;
-	gboolean	seen_error = FALSE;
-
-	if (load_file(path, &data, &length))
-	{
-		char *eol, *error;
-		char *line = data;
-		int  line_number = 1;
-
-		while (line && *line)
-		{
-			eol = strchr(line, '\n');
-			if (eol)
-				*eol = '\0';
-
-			error = parse_line(line);
-
-			if (error && !seen_error)
-			{
-				GString *message;
-
-				message = g_string_new(NULL);
-				g_string_sprintf(message,
-		_("Error in options file at line %d: "
-		"\n\"%s\"\n"
-		"This may be due to upgrading from a previous version of "
-		"ROX-Filer. Open the Options window and click on Save.\n"
-		"Further errors will be ignored."),
-					line_number,
-					error);
-				delayed_error(PROJECT, message->str);
-				g_string_free(message, TRUE);
-				seen_error = TRUE;
-			}
-
-			if (!eol)
-				break;
-			line = eol + 1;
-			line_number++;
-		}
-		g_free(data);
-	}
-}
 
 /* Call this on init to register a handler for a key (thing before the = in
  * the config file).

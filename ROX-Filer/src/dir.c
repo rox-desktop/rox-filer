@@ -23,6 +23,7 @@
 
 #include <gtk/gtk.h>
 #include <errno.h>
+#include <stdio.h>
 
 #include "support.h"
 #include "gui_support.h"
@@ -147,6 +148,131 @@ void refresh_dirs(char *path)
 	g_fscache_update(dir_cache, path);
 }
 
+/* Fill in the item structure with the appropriate details.
+ * 'leafname' field is set to NULL; text_width is unset.
+ */
+void dir_stat(guchar *path, DirItem *item)
+{
+	struct stat	info;
+
+	item->leafname = NULL;
+	item->may_delete = FALSE;
+	item->flags = 0;
+	item->mime_type = NULL;
+	item->image = NULL;
+
+	if (mc_lstat(path, &info) == -1)
+	{
+		item->lstat_errno = errno;
+		item->base_type = TYPE_ERROR;
+		item->size = 0;
+		item->mode = 0;
+		item->mtime = 0;
+		item->uid = (uid_t) -1;
+		item->gid = (gid_t) -1;
+	}
+	else
+	{
+		item->lstat_errno = 0;
+		item->size = info.st_size;
+		item->mode = info.st_mode;
+		item->mtime = info.st_mtime;
+		item->uid = info.st_uid;
+		item->gid = info.st_gid;
+
+		if (S_ISLNK(info.st_mode))
+		{
+			if (mc_stat(path, &info))
+				item->base_type = TYPE_ERROR;
+			else
+				item->base_type =
+					mode_to_base_type(info.st_mode);
+
+			item->flags |= ITEM_FLAG_SYMLINK;
+		}
+		else
+		{
+			item->base_type = mode_to_base_type(info.st_mode);
+
+			if (item->base_type == TYPE_DIRECTORY)
+			{
+				if (g_hash_table_lookup(mtab_mounts, path))
+					item->flags |= ITEM_FLAG_MOUNT_POINT
+							| ITEM_FLAG_MOUNTED;
+				else if (g_hash_table_lookup(fstab_mounts,
+								path))
+					item->flags |= ITEM_FLAG_MOUNT_POINT;
+			}
+		}
+	}
+
+	if (item->base_type == TYPE_DIRECTORY &&
+			!(item->flags & ITEM_FLAG_MOUNT_POINT))
+	{
+		uid_t	uid = info.st_uid;
+		int	path_len;
+		guchar	*tmp;
+		
+		/* Might be an application directory - better check...
+		 * AppRun must have the same owner as the directory
+		 * (to stop people putting an AppRun in, eg, /tmp)
+		 */
+		path_len = strlen(path);
+		/* (sizeof(string) includes \0) */
+		tmp = g_malloc(path_len + sizeof("/AppIcon.xpm"));
+		sprintf(tmp, "%s/%s", path, "AppRun");
+		if (!mc_stat(tmp, &info) && info.st_uid == uid)
+		{
+			MaskedPixmap *app_icon;
+
+			item->flags |= ITEM_FLAG_APPDIR;
+			
+			strcpy(tmp + path_len + 4, "Icon.xpm");
+			app_icon = g_fscache_lookup(pixmap_cache, tmp);
+			if (app_icon)
+			{
+				item->image = app_icon;
+				item->flags |= ITEM_FLAG_TEMP_ICON;
+			}
+			else
+				item->image = im_appdir;
+		}
+		g_free(tmp);
+	}
+	else if (item->base_type == TYPE_FILE)
+	{
+		/* Note: for symlinks we use need the mode of the target */
+		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+		{
+			item->image = im_exec_file;
+			item->flags |= ITEM_FLAG_EXEC_FILE;
+		}
+		else
+		{
+			item->mime_type = type_from_path(path);
+			item->flags |= ITEM_FLAG_TEMP_ICON;
+		}
+	}
+
+	if (!item->mime_type)
+		item->mime_type = mime_type_from_base_type(item->base_type);
+
+	if (!item->image)
+		item->image = type_to_icon(item->mime_type);
+}
+
+/* Frees all fields in the icon, but does not free the icon structure
+ * itself (because it might be part of a larger structure).
+ */
+void dir_item_clear(DirItem *item)
+{
+	g_return_if_fail(item != NULL);
+
+	if (item->flags & ITEM_FLAG_TEMP_ICON)
+		pixmap_unref(item->image);
+	g_free(item->leafname);
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -158,8 +284,8 @@ static void free_items_array(GPtrArray *array)
 	for (i = 0; i < array->len; i++)
 	{
 		DirItem	*item = (DirItem *) array->pdata[i];
-		
-		g_free(item->leafname);
+
+		dir_item_clear(item);
 		g_free(item);
 	}
 
@@ -335,109 +461,13 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	GPtrArray	*array = dir->items;
 	DirItem		*item;
 	int		i;
-	struct stat	info;
 	DirItem		new;
 	gboolean	is_new = FALSE;
 
-	new.flags = 0;
-	new.mime_type = NULL;
-	new.image = NULL;
-
 	tmp = make_path(dir->pathname, ent->d_name);
-	
-	if (mc_lstat(tmp->str, &info) == -1)
-	{
-		new.lstat_errno = errno;
-		new.base_type = TYPE_ERROR;
-		new.size = 0;
-		new.mode = 0;
-		new.mtime = 0;
-		new.uid = (uid_t) -1;
-		new.gid = (gid_t) -1;
-	}
-	else
-	{
-		new.lstat_errno = 0;
-		new.size = info.st_size;
-		new.mode = info.st_mode;
-		new.mtime = info.st_mtime;
-		new.uid = info.st_uid;
-		new.gid = info.st_gid;
+	dir_stat(tmp->str, &new);
 
-		if (S_ISLNK(info.st_mode))
-		{
-			if (mc_stat(tmp->str, &info))
-				new.base_type = TYPE_ERROR;
-			else
-				new.base_type = mode_to_base_type(info.st_mode);
-
-			new.flags |= ITEM_FLAG_SYMLINK;
-		}
-		else
-		{
-			new.base_type = mode_to_base_type(info.st_mode);
-
-			if (new.base_type == TYPE_DIRECTORY)
-			{
-				if (g_hash_table_lookup(mtab_mounts, tmp->str))
-					new.flags |= ITEM_FLAG_MOUNT_POINT
-							| ITEM_FLAG_MOUNTED;
-				else if (g_hash_table_lookup(fstab_mounts,
-								tmp->str))
-					new.flags |= ITEM_FLAG_MOUNT_POINT;
-			}
-		}
-	}
-
-	if (new.base_type == TYPE_DIRECTORY &&
-			!(new.flags & ITEM_FLAG_MOUNT_POINT))
-	{
-		uid_t	uid = info.st_uid;
-		
-		/* Might be an application directory - better check...
-		 * AppRun must have the same owner as the directory
-		 * (to stop people putting an AppRun in, eg, /tmp)
-		 */
-		g_string_append(tmp, "/AppRun");
-		if (!mc_stat(tmp->str, &info) && info.st_uid == uid)
-		{
-			MaskedPixmap *app_icon;
-
-			new.flags |= ITEM_FLAG_APPDIR;
-			
-			g_string_truncate(tmp, tmp->len - 3);
-			g_string_append(tmp, "Icon.xpm");
-			app_icon = g_fscache_lookup(pixmap_cache, tmp->str);
-			if (app_icon)
-			{
-				new.image = app_icon;
-				new.flags |= ITEM_FLAG_TEMP_ICON;
-			}
-			else
-				new.image = im_appdir;
-		}
-	}
-	else if (new.base_type == TYPE_FILE)
-	{
-		/* Note: for symlinks we use need the mode of the target */
-		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-		{
-			new.image = im_exec_file;
-			new.flags |= ITEM_FLAG_EXEC_FILE;
-		}
-		else
-		{
-			new.mime_type = type_from_path(tmp->str);
-			new.flags |= ITEM_FLAG_TEMP_ICON;
-		}
-	}
-
-	if (!new.mime_type)
-		new.mime_type = mime_type_from_base_type(new.base_type);
-
-	if (!new.image)
-		new.image = type_to_icon(new.mime_type);
-
+	/* Is an item with this name already listed? */
 	for (i = 0; i < array->len; i++)
 	{
 		item = (DirItem *) array->pdata[i];
@@ -593,3 +623,4 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 	if (dir->error)
 		delayed_error(PROJECT, dir->error);
 }
+

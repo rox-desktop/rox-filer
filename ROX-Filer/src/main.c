@@ -329,7 +329,7 @@ int main(int argc, char **argv)
 	}
 
 	if (pinboard)
-		pinboard_pin(home_dir, "Home", 32, 32);
+		pinboard_activate(pinboard);
 
 	if (optind == argc && (!panel_dirs) && !pinboard)
 		filer_opendir(home_dir, PANEL_NO);

@@ -23,6 +23,7 @@ void drag_data_get(GtkWidget          *widget,
 		   guint32             time,
 		   FilerWindow	      *filer_window);
 void drag_set_dest(FilerWindow *filer_window);
+void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init();
 GtkWidget *create_dnd_options();
 

@@ -27,8 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/param.h>
-#include <unistd.h>
 #include <time.h>
 #include <ctype.h>
 
@@ -48,7 +46,6 @@
 #include "mount.h"
 #include "type.h"
 #include "options.h"
-#include "action.h"
 #include "minibuffer.h"
 
 #define PANEL_BORDER 2
@@ -517,63 +514,19 @@ static void open_item(Collection *collection,
 	filer_openitem(filer_window, item_number, flags);
 }
 
-/* Return the full path to the directory containing object 'path'.
- * Relative paths are resolved from the filerwindow's path.
- */
-static void follow_symlink(FilerWindow *filer_window, char *path,
-				gboolean same_window)
-{
-	char	*real, *slash;
-	char	*new_dir;
-
-	if (path[0] != '/')
-		path = make_path(filer_window->path, path)->str;
-
-	real = pathdup(path);
-	slash = strrchr(real, '/');
-	if (!slash)
-	{
-		g_free(real);
-		delayed_error(PROJECT,
-			_("Broken symlink (or you don't have permission "
-			  "to follow it)."));
-		return;
-	}
-
-	*slash = '\0';
-
-	if (*real)
-		new_dir = real;
-	else
-		new_dir = "/";
-
-	if (filer_window->panel_type || !same_window)
-	{
-		FilerWindow *new;
-		
-		new = filer_opendir(new_dir, PANEL_NO);
-		display_set_autoselect(new, slash + 1);
-	}
-	else
-		filer_change_to(filer_window, new_dir, slash + 1);
-
-	g_free(real);
-}
-
 /* Open the item (or add it to the shell command minibuffer) */
 void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 {
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
-	gboolean	same_window = (flags & OPEN_SAME_WINDOW) != 0
-					&& !filer_window->panel_type;
 	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0
 					&& !filer_window->panel_type;
 	GtkWidget	*widget;
-	char		*full_path;
 	DirItem		*item = (DirItem *)
 			filer_window->collection->items[item_number].data;
-	gboolean	wink = TRUE, destroy = FALSE;
+	guchar		*full_path;
+	gboolean	wink = TRUE;
+	Directory	*old_dir;
 
 	widget = filer_window->window;
 	if (filer_window->mini_type == MINI_SHELL)
@@ -581,117 +534,36 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 		minibuffer_add(filer_window, item->leafname);
 		return;
 	}
-	
-	full_path = make_path(filer_window->path,
-			item->leafname)->str;
 
-	if (item->flags & ITEM_FLAG_SYMLINK && shift)
+	if (item->base_type == TYPE_DIRECTORY)
 	{
-		char	path[MAXPATHLEN + 1];
-		int	got;
+		/* Never close a filer window when opening a directory
+		 * (click on a dir or click on an app with shift).
+		 */
+		if (shift || !(item->flags & ITEM_FLAG_APPDIR))
+			close_window = FALSE;
+	}
 
-		got = readlink(make_path(filer_window->path,
-					item->leafname)->str,
-				path, MAXPATHLEN);
-		if (got < 0)
-			delayed_error(PROJECT, g_strerror(errno));
+	full_path = make_path(filer_window->path, item->leafname)->str;
+
+	old_dir = filer_window->directory;
+	if (run_diritem(full_path, item,
+			flags & OPEN_SAME_WINDOW ? filer_window : NULL,
+			shift))
+	{
+		if (old_dir != filer_window->directory)
+			return;
+
+		if (close_window)
+			gtk_widget_destroy(filer_window->window);
 		else
 		{
-			g_return_if_fail(got <= MAXPATHLEN);
-			path[got] = '\0';
-
-			follow_symlink(filer_window, path,
-					flags & OPEN_SAME_WINDOW);
-		}
-		return;
-	}
-
-	switch (item->base_type)
-	{
-		case TYPE_DIRECTORY:
-			if (item->flags & ITEM_FLAG_APPDIR && !shift)
-			{
-				run_app(make_path(filer_window->path,
-						item->leafname)->str);
-				if (close_window)
-					destroy = TRUE;
-				break;
-			}
-
-			if (item->flags & ITEM_FLAG_MOUNT_POINT && shift)
-			{
-				action_mount(filer_window, item);
-				if (item->flags & ITEM_FLAG_MOUNTED)
-					break;
-			}
-
-			if (same_window)
-			{
-				wink = FALSE;
-				filer_change_to(filer_window, full_path, NULL);
-				close_mini = FALSE;
-			}
-			else
-				filer_opendir(full_path, PANEL_NO);
-			break;
-		case TYPE_FILE:
-			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !shift)
-			{
-				char	*argv[] = {NULL, NULL};
-
-				argv[0] = full_path;
-
-				if (spawn_full(argv, filer_window->path))
-				{
-					if (close_window)
-						destroy = TRUE;
-				}
-				else
-					report_error(PROJECT,
-						_("Failed to fork() child"));
-			}
-			else
-			{
-				GString		*message;
-				MIME_type	*type = shift ? &text_plain
-							      : item->mime_type;
-
-				g_return_if_fail(type != NULL);
-
-				if (type_open(full_path, type))
-				{
-					if (close_window)
-						destroy = TRUE;
-				}
-				else
-				{
-					message = g_string_new(NULL);
-					g_string_sprintf(message,
-		_("No run action specified for files of this type (%s/%s) - "
-		"you can set a run action using by choosing `Set Run Action' "
-		"from the Window menu"),
-						type->media_type,
-						type->subtype);
-					report_error(PROJECT, message->str);
-					g_string_free(message, TRUE);
-				}
-			}
-			break;
-		default:
-			report_error("open_item",
-					"I don't know how to open that");
-			break;
-	}
-
-	if (destroy)
-		gtk_widget_destroy(filer_window->window);
-	else
-	{
-		if (wink)
-			collection_wink_item(filer_window->collection,
+			if (wink)
+				collection_wink_item(filer_window->collection,
 						item_number);
-		if (close_mini)
-			minibuffer_hide(filer_window);
+			if (close_mini)
+				minibuffer_hide(filer_window);
+		}
 	}
 }
 

@@ -33,6 +33,7 @@
 #include <glib.h>
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
+#include <gdk/gdkx.h>
 #include <gdk/gdk.h>
 
 #include "main.h"
@@ -45,7 +46,7 @@ GtkStyle   	*fixed_style = NULL;
 gint		fixed_width;
 GdkColor 	red = {0, 0xffff, 0, 0};
 GdkGC		*red_gc = NULL;	/* Not automatically initialised */
-
+gint		screen_width, screen_height;
 
 static GdkAtom xa_cardinal;
 
@@ -62,6 +63,11 @@ void gui_support_init()
 	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
 
 	gdk_color_alloc(gtk_widget_get_default_colormap(), &red);
+
+	/* This call starts returning strange values after a while, so get
+	 * the result here during init.
+	 */
+	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
 }
 
 static void choice_clicked(GtkWidget *widget, gpointer number)
@@ -308,5 +314,154 @@ GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
 	GTK_WIDGET_UNSET_FLAGS(b, GTK_CAN_FOCUS);
 
 	return b;
+}
+
+/* Read file into memory. Call parse_line(guchar *line) for each line
+ * in the file. Callback returns NULL on success, or an error message
+ * if something went wrong. Only the first error is displayed to the user.
+ */
+void parse_file(char *path, ParseFunc *parse_line)
+{
+	char		*data;
+	long		length;
+	gboolean	seen_error = FALSE;
+
+	if (load_file(path, &data, &length))
+	{
+		char *eol, *error;
+		char *line = data;
+		int  line_number = 1;
+
+		while (line && *line)
+		{
+			eol = strchr(line, '\n');
+			if (eol)
+				*eol = '\0';
+
+			error = parse_line(line);
+
+			if (error && !seen_error)
+			{
+				GString *message;
+
+				message = g_string_new(NULL);
+				g_string_sprintf(message,
+		_("Error in '%s' file at line %d: "
+		"\n\"%s\"\n"
+		"This may be due to upgrading from a previous version of "
+		"ROX-Filer. Open the Options window and click on Save.\n"
+		"Further errors will be ignored."),
+					path,
+					line_number,
+					error);
+				delayed_error(PROJECT, message->str);
+				g_string_free(message, TRUE);
+				seen_error = TRUE;
+			}
+
+			if (!eol)
+				break;
+			line = eol + 1;
+			line_number++;
+		}
+		g_free(data);
+	}
+}
+
+/* Sets up a proxy window for DnD on the specified X window.
+ * Courtesy of Owen Taylor (taken from gmc).
+ */
+gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
+{
+	GdkAtom	xdnd_proxy_atom;
+	Window	proxy_xid;
+	Atom	type;
+	int	format;
+	unsigned long nitems, after;
+	Window	*proxy_data;
+	Window	proxy;
+	guint32	old_warnings;
+
+	XGrabServer(GDK_DISPLAY());
+
+	xdnd_proxy_atom = gdk_atom_intern("XdndProxy", FALSE);
+	proxy_xid = GDK_WINDOW_XWINDOW(proxy_window);
+	type = None;
+	proxy = None;
+
+	old_warnings = gdk_error_warnings;
+
+	gdk_error_code = 0;
+	gdk_error_warnings = 0;
+
+	/* Check if somebody else already owns drops on the root window */
+
+	XGetWindowProperty(GDK_DISPLAY(), xid,
+			   xdnd_proxy_atom, 0,
+			   1, False, AnyPropertyType,
+			   &type, &format, &nitems, &after,
+			   (guchar **) &proxy_data);
+
+	if (type != None)
+	{
+		if (format == 32 && nitems == 1)
+			proxy = *proxy_data;
+
+		XFree(proxy_data);
+	}
+
+	/* The property was set, now check if the window it points to exists
+	 * and has a XdndProxy property pointing to itself.
+	 */
+	if (proxy)
+	{
+		XGetWindowProperty(GDK_DISPLAY(), proxy,
+				    xdnd_proxy_atom, 0,
+				    1, False, AnyPropertyType,
+				    &type, &format, &nitems, &after,
+				   (guchar **) &proxy_data);
+
+		if (!gdk_error_code && type != None)
+		{
+			if (format == 32 && nitems == 1)
+				if (*proxy_data != proxy)
+					proxy = GDK_NONE;
+
+			XFree(proxy_data);
+		}
+		else
+			proxy = GDK_NONE;
+	}
+
+	if (!proxy)
+	{
+		/* OK, we can set the property to point to us */
+
+		XChangeProperty(GDK_DISPLAY(), xid,
+				xdnd_proxy_atom,
+				gdk_atom_intern("WINDOW", FALSE),
+				32, PropModeReplace,
+				(guchar *) &proxy_xid, 1);
+	}
+
+	gdk_error_code = 0;
+	gdk_error_warnings = old_warnings;
+
+	XUngrabServer(GDK_DISPLAY());
+	gdk_flush();
+
+	if (!proxy)
+	{
+		/* Mark our window as a valid proxy window with a XdndProxy
+		 * property pointing recursively;
+		 */
+		XChangeProperty(GDK_DISPLAY(), proxy_xid,
+				xdnd_proxy_atom,
+				gdk_atom_intern("WINDOW", FALSE),
+				32, PropModeReplace,
+				(guchar *) &proxy_xid, 1);
+	}
+	
+	return !proxy;
 }
 

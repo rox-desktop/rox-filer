@@ -21,8 +21,10 @@ extern GtkStyle   	*fixed_style;
 extern gint		fixed_width;
 extern GdkColor 	red;
 extern GdkGC 		*red_gc;
+extern gint		screen_width, screen_height;
 
 typedef void (*HelpFunc)(gpointer data);
+typedef char *ParseFunc(guchar *line);
 
 void gui_support_init();
 int get_choice(char *title,
@@ -35,5 +37,7 @@ gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
 void delayed_error(char *title, char *error);
 gboolean load_file(char *pathname, char **data_out, long *length_out);
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data);
+void parse_file(char *path, ParseFunc *parse_line);
+gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window);
 
 #endif /* _GUI_SUPPORT_H */

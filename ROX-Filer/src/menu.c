@@ -33,7 +33,6 @@
 #include <errno.h>
 #include <string.h>
 
-#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
 #include "run.h"
@@ -155,8 +154,6 @@ static GtkWidget	*savebox = NULL;
 static guchar		*current_path = NULL;
 static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
-static gint		screen_width, screen_height;
-
 #undef N_
 #define N_(x) x
 
@@ -272,11 +269,6 @@ void menu_init()
 	GtkWidget		*item;
 	int			n_entries;
 	GtkItemFactoryEntry	*translated;
-
-	/* This call starts returning strange values after a while, so get
-	 * the result here during init.
-	 */
-	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,

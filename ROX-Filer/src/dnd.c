@@ -45,6 +45,7 @@
 #include "support.h"
 #include "options.h"
 #include "run.h"
+#include "pinboard.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
@@ -78,6 +79,14 @@ static void drag_data_received(GtkWidget      		*widget,
 				guint               	info,
 				guint32             	time,
 		       		FilerWindow		*filer_window);
+static void desktop_drag_data_received(GtkWidget      		*widget,
+				GdkDragContext  	*context,
+				gint            	x,
+				gint            	y,
+				GtkSelectionData 	*selection_data,
+				guint               	info,
+				guint32             	time,
+				FilerWindow		*filer_window);
 static void got_data_xds_reply(GtkWidget 		*widget,
 		  		GdkDragContext 		*context,
 				GtkSelectionData 	*selection_data,
@@ -530,6 +539,26 @@ void drag_set_dest(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(drag_end), filer_window);
 }
 
+/* Like drag_set_dest, but for a pinboard-type widget.
+ * You must ensure that dnd events reach this widget (eg with
+ * setup_xdnd_proxy() for the root window).
+ */
+void drag_set_pinboard_dest(GtkWidget *widget)
+{
+	GtkTargetEntry 	target_table[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
+
+	gtk_drag_dest_set(widget,
+			  GTK_DEST_DEFAULT_MOTION | GTK_DEST_DEFAULT_DROP,
+			  target_table,
+			  sizeof(target_table) / sizeof(*target_table),
+			  GDK_ACTION_LINK);
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
+			    (GtkSignalFunc) desktop_drag_data_received,
+			    NULL);
+}
+
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
  */
@@ -793,6 +822,49 @@ static void got_run_action(GtkWidget 		*widget,
 
 	if (symlink(dest_path, link))
 		delayed_error(PROJECT, g_strerror(errno));
+}
+
+/* Called when a text/uri-list arrives */
+static void desktop_drag_data_received(GtkWidget      	*widget,
+				       GdkDragContext  	*context,
+				       gint            	x,
+				       gint            	y,
+				       GtkSelectionData *selection_data,
+				       guint            info,
+				       guint32          time,
+				       FilerWindow	*filer_window)
+{
+	GSList	*uris, *next;
+	gint dx, dy;
+	
+	if (!selection_data->data)
+	{
+		/* Timeout? */
+		return;
+	}
+
+	gdk_window_get_position (widget->window, &dx, &dy);
+	x += dx;
+	y += dy;
+
+	uris = uri_list_to_gslist(selection_data->data);
+
+	for (next = uris; next; next = next->next)
+	{
+		guchar	*path;
+
+		path = get_local_path((gchar *) next->data);
+		if (path)
+		{
+			pinboard_pin(path, NULL, x, y);
+			x += 64;
+		}
+
+		g_free(next->data);
+	}
+
+	if (uris)	
+		g_slist_free(uris);
 }
 
 /* Called when some data arrives from the remote app (which we asked for

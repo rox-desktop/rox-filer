@@ -25,6 +25,8 @@
 
 #include <sys/stat.h>
 #include <errno.h>
+#include <string.h>
+#include <sys/param.h>
 
 #include "stdlib.h"
 #include "support.h"
@@ -32,9 +34,12 @@
 #include "filer.h"
 #include "menu.h"
 #include "main.h"
+#include "action.h"
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
+static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
+static gboolean open_file(guchar *path, MIME_type *type);
 
 typedef struct _PipedData PipedData;
 
@@ -176,6 +181,78 @@ void run_with_data(char *path, gpointer data, gulong length)
 	close(fds[0]);
 }
 
+/* Load a file, open a directory or run an application. Or, if 'edit' is set:
+ * edit a file, open an application, follow a symlink or mount a device.
+ *
+ * filer_window is the window to use for displaying a directory.
+ * NULL will always use a new directory when needed.
+ *
+ * Returns TRUE on success.
+ */
+gboolean run_diritem(guchar *full_path,
+		     DirItem *item,
+		     FilerWindow *filer_window,
+		     gboolean edit)
+{
+	if (filer_window && filer_window->panel_type)
+		filer_window = NULL;
+		
+	if (item->flags & ITEM_FLAG_SYMLINK && edit)
+		return follow_symlink(full_path, filer_window);
+
+	switch (item->base_type)
+	{
+		case TYPE_DIRECTORY:
+			if (item->flags & ITEM_FLAG_APPDIR && !edit)
+			{
+				run_app(full_path);
+				return TRUE;
+			}
+
+			if (item->flags & ITEM_FLAG_MOUNT_POINT && edit)
+			{
+				/* TODO: Remove this restriction! */
+				g_return_val_if_fail(filer_window != NULL,
+								FALSE);
+
+				action_mount(filer_window, item);
+				if (item->flags & ITEM_FLAG_MOUNTED)
+					return TRUE;
+			}
+
+			if (filer_window)
+				filer_change_to(filer_window, full_path, NULL);
+			else
+				filer_opendir(full_path, PANEL_NO);
+			return TRUE;
+		case TYPE_FILE:
+			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !edit)
+			{
+				char	*argv[] = {NULL, NULL};
+				guchar	*dir = filer_window ? filer_window->path
+							    : NULL;
+
+				argv[0] = full_path;
+
+				if (spawn_full(argv, dir))
+					return TRUE;
+				else
+				{
+					report_error(PROJECT,
+						_("Failed to fork() child"));
+					return FALSE;
+				}
+			}
+
+			return open_file(full_path, edit ? &text_plain
+						  : item->mime_type);
+		default:
+			report_error("open_item",
+					"I don't know how to open that");
+			return FALSE;
+	}
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -209,4 +286,93 @@ finish:
 	g_free(pd->data);
 	g_free(pd);
 	close(fd);
+}
+
+/* Follow the link 'full_path' and display it in filer_window, or a
+ * new window if that is NULL.
+ */
+static gboolean follow_symlink(char *full_path, FilerWindow *filer_window)
+{
+	char	*real, *slash;
+	char	*new_dir;
+	char	path[MAXPATHLEN + 1];
+	int	got;
+
+	got = readlink(full_path, path, MAXPATHLEN);
+	if (got < 0)
+	{
+		delayed_error(PROJECT, g_strerror(errno));
+		return FALSE;
+	}
+
+	g_return_val_if_fail(got <= MAXPATHLEN, FALSE);
+	path[got] = '\0';
+
+	/* Make a relative path absolute */
+	if (path[0] != '/')
+	{
+		guchar	*tmp;
+		slash = strrchr(full_path, '/');
+		g_return_val_if_fail(slash != NULL, FALSE);
+
+		tmp = g_strndup(full_path, slash - full_path);
+		real = pathdup(make_path(tmp, path)->str);
+		g_free(tmp);
+	}
+	else
+		real = pathdup(path);
+
+	slash = strrchr(real, '/');
+	if (!slash)
+	{
+		g_free(real);
+		delayed_error(PROJECT,
+			_("Broken symlink (or you don't have permission "
+			  "to follow it)."));
+		return FALSE;
+	}
+
+	*slash = '\0';
+
+	if (*real)
+		new_dir = real;
+	else
+		new_dir = "/";
+
+	if (filer_window)
+		filer_change_to(filer_window, new_dir, slash + 1);
+	else
+	{
+		FilerWindow *new;
+		
+		new = filer_opendir(new_dir, PANEL_NO);
+		display_set_autoselect(new, slash + 1);
+	}
+
+	g_free(real);
+
+	return TRUE;
+}
+
+/* Load this file into an appropriate editor */
+static gboolean open_file(guchar *path, MIME_type *type)
+{
+	GString		*message;
+
+	g_return_val_if_fail(type != NULL, FALSE);
+
+	if (type_open(path, type))
+		return TRUE;
+
+	message = g_string_new(NULL);
+	g_string_sprintf(message,
+		_("No run action specified for files of this type (%s/%s) - "
+		"you can set a run action using by choosing `Set Run Action' "
+		"from the Window menu"),
+		type->media_type,
+		type->subtype);
+	report_error(PROJECT, message->str);
+	g_string_free(message, TRUE);
+
+	return FALSE;
 }
