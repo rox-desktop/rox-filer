@@ -15,5 +15,6 @@ GString *make_path(char *dir, char *leaf);
 char *our_host_name();
 int spawn(char **argv);
 int spawn_in(char **argv, char *dir);
+void debug_free_string(void *data);
 
 #endif /* _SUPPORT_H */

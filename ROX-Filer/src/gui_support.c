@@ -61,8 +61,6 @@ int get_choice(char *title,
 	va_list	ap;
 	int		choice_return;
 
-	va_start(ap, number_of_buttons);
-
 	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
@@ -87,6 +85,8 @@ int get_choice(char *title,
 	gtk_box_pack_start(GTK_BOX(vbox),
 			text_container,
 			TRUE, TRUE, 0);
+
+	va_start(ap, number_of_buttons);
 
 	for (i = 0; i < number_of_buttons; i++)
 	{
@@ -158,4 +158,37 @@ void make_panel_window(GdkWindow *window)
 	set_cardinal_property(window, xa_state,
 			WIN_STATE_STICKY | WIN_STATE_HIDDEN |
 			WIN_STATE_FIXED_POSITION | WIN_STATE_ARRANGE_IGNORE);
+}
+
+gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window)
+{
+	gtk_widget_hide((GtkWidget *) window);
+
+	return TRUE;
+}
+
+static gboolean error_idle_cb(gpointer data)
+{
+	char	**error = (char **) data;
+	
+	report_error(error[0], error[1]);
+	g_free(error[0]);
+	g_free(error[1]);
+	error[0] = error[1] = NULL;
+
+	return FALSE;
+}
+
+/* Display an error next time we are idle */
+void delayed_error(char *title, char *error)
+{
+	static char *delayed_error_data[2] = {NULL, NULL};
+	
+	g_return_if_fail(error != NULL);
+	g_return_if_fail(delayed_error_data[1] == NULL);
+
+	delayed_error_data[0] = g_strdup(title);
+	delayed_error_data[1] = g_strdup(error);
+	
+	gtk_idle_add(error_idle_cb, delayed_error_data);
 }

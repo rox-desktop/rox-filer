@@ -40,6 +40,7 @@ GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 
 /* Static prototypes */
+static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context);
 static void create_uri_list(GString *string,
 				Collection *collection,
 				FilerWindow *filer_window);
@@ -51,6 +52,13 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			guint           time);
 static gboolean provides(GdkDragContext *context, GdkAtom target);
 static void set_xds_prop(GdkDragContext *context, char *text);
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time);
+static void drag_leave(GtkWidget		*widget,
+                           GdkDragContext	*context);
 static void drag_data_received(GtkWidget      		*widget,
 				GdkDragContext  	*context,
 				gint            	x,
@@ -81,6 +89,15 @@ void dnd_init()
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
+}
+
+static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context)
+{
+	char	*dest_path;
+
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
+
+	return dest_path ? dest_path : filer_window->path;
 }
 
 /* Set the XdndDirectSave0 property on the source window for this context */
@@ -192,7 +209,7 @@ static GSList *uri_list_to_gslist(char *uri_list)
 
 		if (!linebreak || linebreak[1] != 10)
 		{
-			report_error("uri_list_to_gslist",
+			delayed_error("uri_list_to_gslist",
 					"Incorrect or missing line break "
 					"in text/uri-list data");
 			return list;
@@ -300,7 +317,7 @@ void drag_selection(Collection 		*collection,
 
 	context = gtk_drag_begin(widget,
 			target_list,
-			GDK_ACTION_COPY,
+			GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK,
 			(event->state & GDK_BUTTON1_MASK) ? 1 : 2,
 			(GdkEvent *) event);
 	g_dataset_set_data(context, "filer_window", filer_window);
@@ -359,7 +376,7 @@ void drag_data_get(GtkWidget          		*widget,
 			g_string_free(string, FALSE);
 			break;
 		default:
-			report_error("drag_data_get",
+			delayed_error("drag_data_get",
 					"Internal error - bad info type\n");
 			break;
 	}
@@ -386,7 +403,7 @@ static gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 	if (!file)
 	{
-		report_error("Opening file for DND", g_strerror(errno));
+		delayed_error("Opening file for DND", g_strerror(errno));
 		return FALSE;
 	}
 
@@ -401,7 +418,7 @@ static gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			report_error("Loading file for DND",
+			delayed_error("Loading file for DND",
 						g_strerror(errno));
 			g_free(buffer);
 		}
@@ -413,7 +430,7 @@ static gboolean load_file(char *pathname, char **data_out, long *length_out)
 		}
 	}
 	else
-		report_error("Loading file for DND",
+		delayed_error("Loading file for DND",
 				"Can't allocate memory for buffer to "
 				"transfer this file");
 
@@ -437,16 +454,80 @@ void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
 	};
 
 	gtk_drag_dest_set(widget,
-			GTK_DEST_DEFAULT_MOTION,
+			0, /* GTK_DEST_DEFAULT_MOTION, */
 			target_table,
 			sizeof(target_table) / sizeof(*target_table),
 			GDK_ACTION_COPY | GDK_ACTION_MOVE
 			| GDK_ACTION_LINK | GDK_ACTION_PRIVATE);
 
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_motion",
+			GTK_SIGNAL_FUNC(drag_motion), filer_window);
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_leave",
+			GTK_SIGNAL_FUNC(drag_leave), filer_window);
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_drop",
 			GTK_SIGNAL_FUNC(drag_drop), filer_window);
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
 			GTK_SIGNAL_FUNC(drag_data_received), filer_window);
+}
+
+/* Called during the drag when the mouse is in a widget registered
+ * as a drop target. Returns TRUE if we can accept the drop.
+ */
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time)
+{
+	FilerWindow 	*filer_window;
+	int		item;
+
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	g_return_val_if_fail(filer_window != NULL, TRUE);
+
+	if (gtk_drag_get_source_widget(context) == widget)
+	{
+		/* Ignore drags within a single window */
+		return FALSE;
+	}
+
+	if (filer_window->panel == FALSE)
+	{
+		gdk_drag_status(context, context->suggested_action, time);
+		return TRUE;
+	}
+
+	item = collection_get_item(filer_window->collection, x, y);
+
+	if (item != filer_window->collection->cursor_item && item != -1)
+	{
+		FileItem *fileitem = (FileItem *)
+			filer_window->collection->items[item].data;
+			
+		panel_set_timeout(NULL, 0);
+
+		g_dataset_set_data_full(context, "drop_dest_path",
+				g_strdup(make_path(filer_window->path,
+						   fileitem->leafname)->str),
+				g_free);
+	}
+	collection_set_cursor_item(filer_window->collection, item);
+	
+	gdk_drag_status(context, context->suggested_action, time);
+	return TRUE;
+}
+
+/* Remove panel highlights */
+static void drag_leave(GtkWidget		*widget,
+                           GdkDragContext	*context)
+{
+	FilerWindow 	*filer_window;
+
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	g_return_if_fail(filer_window != NULL);
+
+	panel_set_timeout(NULL, 0);
+	collection_set_cursor_item(filer_window->collection, -1);
 }
 
 /* User has tried to drop some data on us. Decide what format we would
@@ -462,6 +543,7 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	char		*leafname = NULL;
 	FilerWindow	*filer_window;
 	GdkAtom		target;
+	char		*dest_path;
 	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_val_if_fail(filer_window != NULL, TRUE);
@@ -473,7 +555,14 @@ static gboolean drag_drop(GtkWidget 	*widget,
 		return TRUE;
 	}
 
-	if (provides(context, XdndDirectSave0))
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
+
+	if (((!dest_path) && filer_window->panel)
+		|| !((dest_path = filer_window->path)))
+	{
+		error = "Bad drop on panel";
+	}
+	else if (provides(context, XdndDirectSave0))
 	{
 		leafname = get_xds_prop(context);
 		if (leafname)
@@ -493,7 +582,7 @@ static gboolean drag_drop(GtkWidget 	*widget,
 				uri = g_string_new(NULL);
 				g_string_sprintf(uri, "file://%s%s",
 						our_host_name(),
-						make_path(filer_window->path,
+						make_path(dest_path,
 							  leafname)->str);
 				set_xds_prop(context, uri->str);
 				g_string_free(uri, TRUE);
@@ -518,7 +607,7 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		
-		report_error("ROX-Filer", error);
+		delayed_error("ROX-Filer", error);
 	}
 	else
 		gtk_drag_get_data(widget, context, target, time);
@@ -558,7 +647,7 @@ static void drag_data_received(GtkWidget      		*widget,
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);
-			report_error("drag_data_received", "Unknown target");
+			delayed_error("drag_data_received", "Unknown target");
 			break;
 	}
 }
@@ -620,7 +709,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 
 	if (error)
-		report_error("ROX-Filer", error);
+		delayed_error("ROX-Filer", error);
 }
 
 static void got_data_raw(GtkWidget 		*widget,
@@ -632,18 +721,21 @@ static void got_data_raw(GtkWidget 		*widget,
 	char		*leafname;
 	int		fd;
 	char		*error = NULL;
+	char		*dest_path;
 
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
 
 	leafname = g_dataset_get_data(context, "leafname");
-	
 	if (!leafname)
 		leafname = "UntitledData";
+	
+	dest_path = get_dest_path(filer_window, context);
 
-	fd = open(make_path(filer_window->path, leafname)->str,
+	fd = open(make_path(dest_path, leafname)->str,
 		O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY,
-		S_IRUSR | S_IRGRP | S_IROTH | S_IWUSR | S_IWGRP | S_IWOTH);
+			S_IRUSR | S_IRGRP | S_IROTH |
+			S_IWUSR | S_IWGRP | S_IWOTH);
 
 	if (fd == -1)
 		error = g_strerror(errno);
@@ -665,7 +757,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		if (provides(context, XdndDirectSave0))
 			set_xds_prop(context, "");
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		report_error("Error saving file", error);
+		delayed_error("Error saving file", error);
 	}
 	else
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
@@ -687,17 +779,17 @@ static void got_uri_list(GtkWidget 		*widget,
 	char		**argv = NULL;	/* Command to exec, or NULL */
 	GSList		*next_uri;
 	gboolean	send_reply = TRUE;
-
+	char		*dest_path;
+	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
+
+	dest_path = get_dest_path(filer_window, context);
 
 	uri_list = uri_list_to_gslist(selection_data->data);
 
 	if (!uri_list)
-	{
-		/* No URIs in the list! */
 		error = "No URIs in the text/uri-list (nothing to do!)";
-	}
 	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
 	{
 		/* There is one URI in the list, and it's not on the local
@@ -725,15 +817,30 @@ static void got_uri_list(GtkWidget 		*widget,
 	else
 	{
 		int		local_files = 0;
-		const char	*start_args[] = {"xterm", "-wf",
-					"-e", "cp", "-Riva"};
+		const char	*start_args[] = {"xterm", "-wf", "-e"};
 		int		argc = sizeof(start_args) / sizeof(char *);
 		
 		next_uri = uri_list;
 
 		argv = g_malloc(sizeof(start_args) +
-			sizeof(char *) * (g_slist_length(uri_list) + 2));
+			sizeof(char *) * (g_slist_length(uri_list) + 4));
 		memcpy(argv, start_args, sizeof(start_args));
+
+		if (context->action == GDK_ACTION_MOVE)
+		{
+			argv[argc++] = "mv";
+			argv[argc++] = "-iv";
+		}
+		else if (context->action == GDK_ACTION_LINK)
+		{
+			argv[argc++] = "ln";
+			argv[argc++] = "-vis";
+		}
+		else
+		{
+			argv[argc++] = "cp";
+			argv[argc++] = "-Riva";
+		}
 
 		/* Either one local URI, or a list. If anything in the list
 		 * isn't local then we are stuck.
@@ -768,7 +875,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		}
 		else
 		{
-			argv[argc++] = filer_window->path;
+			argv[argc++] = dest_path;
 			argv[argc++] = NULL;
 		}
 	}
@@ -776,23 +883,24 @@ static void got_uri_list(GtkWidget 		*widget,
 	if (error)
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		report_error("Error getting file list", error);
+		delayed_error("Error getting file list", error);
 	}
 	else if (send_reply)
-		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
-
-	if (argv)
 	{
-		int	child;		/* Child process ID */
-		
-		child = spawn(argv);
-		if (child)
-			g_hash_table_insert(child_to_filer,
-					(gpointer) child, filer_window);
-		else
-			report_error("ROX-Filer", "Failed to fork() child "
-						"process");
-		g_free(argv);
+		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
+		if (argv)
+		{
+			int	child;		/* Child process ID */
+			
+			child = spawn(argv);
+			if (child)
+				g_hash_table_insert(child_to_filer,
+						(gpointer) child, filer_window);
+			else
+				delayed_error("ROX-Filer",
+					"Failed to fork() child process");
+			g_free(argv);
+		}
 	}
 
 	next_uri = uri_list;

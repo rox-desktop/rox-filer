@@ -17,6 +17,7 @@
 #include "gui_support.h"
 #include "options.h"
 #include "choices.h"
+#include "newdir.h"
 
 #define C_ "<control>"
 
@@ -33,6 +34,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void show_options(gpointer data, guint action, GtkWidget *widget);
+static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 
@@ -70,7 +72,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Select All",	    		C_"A",  NULL, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  NULL, 0, NULL},
 {"/Options...",			NULL,   show_options, 0, NULL},
-{"/New directory",		NULL,   NULL, 0, NULL},
+{"/New directory",		NULL,   new_directory, 0, NULL},
 {"/Xterm here",			NULL,  	xterm_here, 0, NULL},
 {"/Open parent",		NULL,   open_parent, 0, NULL},
 };
@@ -86,8 +88,8 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Sort by Date",	NULL,   NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Size",	NULL,   NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
-{"/Display/Refresh",	    	C_"L", 	refresh, 0,	NULL},
+{"/Display/Show Hidden",   	NULL, 	NULL, 0, "<ToggleItem>"},
+{"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
 {"/File/Delete",		NULL,	NULL, 	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
@@ -318,7 +320,14 @@ static void show_options(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	options_edit(window_with_focus);
+	options_show(window_with_focus);
+}
+
+static void new_directory(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	newdir_show(window_with_focus);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)

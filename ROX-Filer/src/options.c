@@ -10,11 +10,10 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "gui_support.h"
 #include "options.h"
 
 static GtkWidget *window;
-
-static gint hide_options(GtkWidget *options, gpointer data);
 
 void options_init()
 {
@@ -25,7 +24,7 @@ void options_init()
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(window), "ROX-Filer options");
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
-			GTK_SIGNAL_FUNC(hide_options), NULL);
+			GTK_SIGNAL_FUNC(hide_dialog_event), window);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
@@ -60,16 +59,13 @@ void options_init()
 
 	button = gtk_button_new_with_label("Cancel");
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
 }
 
-static gint hide_options(GtkWidget *options, gpointer data)
+void options_show(FilerWindow *filer_window)
 {
-	gtk_widget_hide(window);
-
-	return TRUE;
-}
-
-void options_edit(FilerWindow *filer_window)
-{
+	if (GTK_WIDGET_MAPPED(window))
+		gtk_widget_hide(window);
 	gtk_widget_show_all(window);
 }

@@ -20,6 +20,7 @@
 #include "dnd.h"
 #include "options.h"
 #include "choices.h"
+#include "newdir.h"
 
 /* XXX: Maybe we shouldn't do so much work in a signal handler? */
 static void child_died(int signum)
@@ -61,6 +62,7 @@ int main(int argc, char **argv)
 	filer_init();
 	mount_init();
 	options_init();
+	newdir_init();
 
 	signal(SIGCHLD, child_died);
 

@@ -108,3 +108,8 @@ int spawn_in(char **argv, char *dir)
 	return child;
 }
 
+void debug_free_string(void *data)
+{
+	g_print("Freeing string '%s'\n", (char *) data);
+	g_free(data);
+}

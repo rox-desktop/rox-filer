@@ -13,6 +13,6 @@
 /* Prototypes */
 
 void options_init(void);
-void options_edit(FilerWindow *filer_window);
+void options_show(FilerWindow *filer_window);
 
 #endif /* _OPTIONS_H */

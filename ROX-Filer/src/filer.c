@@ -30,6 +30,7 @@
 #include "mount.h"
 
 #define MAX_ICON_HEIGHT 42
+#define PANEL_BORDER 2
 
 FilerWindow 	*window_with_focus = NULL;
 
@@ -282,20 +283,20 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 
 static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
-				CollectionItem *item,
+				CollectionItem *colitem,
 				int width, int height)
 {
-	FileItem	*fileitem = (FileItem *) item->data;
+	FileItem	*item = (FileItem *) colitem->data;
 	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	int		text_height = font->ascent + font->descent;
 	int		x_off = ABS(point_x - (width >> 1));
+	int		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
 	
-	if (x_off <= (fileitem->pix_width >> 1) + 2 &&
-		point_y < height - text_height - 2 &&
-		point_y > 6)
+	if (x_off <= (item->pix_width >> 1) + 2 &&
+		point_y >= image_y && point_y <= image_y + item->pix_height)
 		return TRUE;
 	
-	if (x_off <= (fileitem->text_width >> 1) + 2 &&
+	if (x_off <= (item->text_width >> 1) + 2 &&
 		point_y > height - text_height - 2)
 		return TRUE;
 
@@ -438,15 +439,14 @@ static int sort_by_name(const void *item1, const void *item2)
 
 static gint clear_panel_hilight(gpointer data)
 {
-	collection_clear_selection(panel_with_timeout->collection);
+	collection_set_cursor_item(panel_with_timeout->collection, -1);
 	panel_with_timeout = NULL;
 
 	return FALSE;
 }
 
 /* It is possible to highlight an item briefly on a panel by calling this
- * function. If anything happens to the selection state of the panel you
- * should call this with filer_window set to NULL to remove the timeout.
+ * function.
  */
 void panel_set_timeout(FilerWindow *filer_window, gulong msec)
 {
@@ -461,7 +461,7 @@ void panel_set_timeout(FilerWindow *filer_window, gulong msec)
 	{
 		panel_with_timeout = filer_window;
 		panel_timeout = gtk_timeout_add(msec,
-				clear_panel_hilight, NULL);
+					clear_panel_hilight, NULL);
 	}
 }
 
@@ -480,9 +480,9 @@ void open_item(Collection *collection,
 	if (filer_window->panel)
 	{
 		panel_set_timeout(NULL, 0);
-		collection_select_item(collection, item_number);
+		collection_set_cursor_item(collection, item_number);
 		gdk_flush();
-		panel_set_timeout(filer_window, 300);
+		panel_set_timeout(filer_window, 200);
 	}
 
 	switch (item->base_type)
@@ -649,16 +649,22 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		
 		if (panel_side == TOP || panel_side == BOTTOM)
 		{
-			int	y = panel_side == TOP ? 0 : sheight - iheight;
+			int	height = iheight + PANEL_BORDER;
+			int	y = panel_side == TOP 
+					? -PANEL_BORDER
+					: sheight - height - PANEL_BORDER;
 
-			gtk_widget_set_usize(collection, swidth, iheight);
+			gtk_widget_set_usize(collection, swidth, height);
 			gtk_widget_set_uposition(win, 0, y);
 		}
 		else
 		{
-			int	x = panel_side == LEFT ? 0 : swidth - iwidth;
+			int	width = iwidth + PANEL_BORDER;
+			int	x = panel_side == LEFT
+					? -PANEL_BORDER
+					: swidth - width - PANEL_BORDER;
 
-			gtk_widget_set_usize(collection, iwidth, sheight);
+			gtk_widget_set_usize(collection, width, sheight);
 			gtk_widget_set_uposition(win, x, 0);
 		}
 

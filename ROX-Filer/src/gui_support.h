@@ -22,5 +22,7 @@ int get_choice(char *title,
 void report_error(char *title, char *message);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
 void make_panel_window(GdkWindow *window);
+gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
+void delayed_error(char *title, char *error);
 
 #endif /* _GUI_SUPPORT_H */
