@@ -5,10 +5,7 @@
 This is a list of features that should/will be added when I have time (or
 when someone sends patches!).
 
-Note: Currently in the middle of upgrading the dir scanning code.
-	Check it carefully!! Ignore debugging output.
-	
-	- Only resize according to options & not on every rescan
+Scanning code:
 	- Optimise dir_check_this
 	- Think about needs_rescan, etc
 	- Remove debugging output
@@ -20,10 +17,12 @@ Escape in Enter Path minibuffer scrolls to cursor. Why?
 
 Quits if only an Info window is open.
 
+Deleting a symlink to a pinboard icon shows a warning
+
 Gtk+ 2.0:
-	- Deleting a symlink to a pinboard icon shows a warning
 	- Clicking on the scrollbar when you can't scroll blanks the window!
-	- Menu appears, but menu item under cursor isn't opened
+		(Gtk bug)
+	- Panel menu appears, but menu item under cursor doesn't highlight
 	- Savebox doesn't highlight leafname
 	- Pinboard text background types none/outline don't work
 	- Can't set menu shortcuts to a single key (eg, 'L')

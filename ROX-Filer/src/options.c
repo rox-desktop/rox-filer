@@ -35,7 +35,7 @@
  * When the user opens the Options box:
  * - The Options.xml file is read and used to create the Options dialog box.
  *   Each element in the file has a key corresponding to an option named
- *   above. This only happens the first time the box is opened.
+ *   above.
  * - For each widget in the box, the current value of the option is used to
  *   set the widget's state.
  *

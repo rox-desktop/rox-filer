@@ -350,6 +350,10 @@ static void filer_auto_size_names(FilerWindow *filer_window, GPtrArray *names)
 {
 	int	w, h, n;
 
+	if (GTK_WIDGET_VISIBLE(filer_window->window))
+		if (option_get_int("filer_auto_resize") != RESIZE_ALWAYS)
+			return;
+			
 	display_guess_size(filer_window, names, &w, &h, &n);
 	
 	filer_size_for(filer_window, w, h, n, TRUE);
@@ -910,7 +914,8 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	collection_set_cursor_item(filer_window->collection, -1);
 
 	attach(filer_window);
-	filer_window_autosize(filer_window, TRUE);
+	if (option_get_int("filer_auto_resize") == RESIZE_ALWAYS)
+		filer_window_autosize(filer_window, TRUE);
 
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
