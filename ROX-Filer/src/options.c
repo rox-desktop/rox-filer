@@ -43,7 +43,7 @@
  * to the options values and the update callbacks are called for those values
  * which have changed.
  *
-* All the notify_callbacks are called.
+ * All the notify_callbacks are called.
  *
  * If Save or OK was clicked then the box is also closed.
  *
@@ -637,10 +637,12 @@ static void endElement(void *user_data, const CHAR *name)
 	else if (old == PARSE_LABEL)
 	{
 		GtkWidget	*label;
+		guchar		*str;
 
-		label = gtk_label_new(context.data->str);
-		gtk_box_pack_start(GTK_BOX(box), label,
-				FALSE, TRUE, 0);
+		str = g_strstrip(g_strdup(context.data->str));
+		label = gtk_label_new(_(str));
+		g_free(str);
+		gtk_box_pack_start(GTK_BOX(box), label, FALSE, TRUE, 0);
 	}
 	else if (old == PARSE_HBOX)
 		context.hbox = NULL;
