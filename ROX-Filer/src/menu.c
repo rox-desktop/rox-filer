@@ -95,6 +95,9 @@ typedef void (*ActionFn)(GList *paths,
 			 const char *dest_dir, const char *leaf, int quiet);
 typedef void MenuCallback(GtkWidget *widget, gpointer data);
 
+typedef gboolean (*SaveCb)(GObject *savebox,
+			   const gchar *current, const gchar *new);
+
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*pinboard_keys;
 
@@ -110,13 +113,14 @@ static Option o_menu_iconsize, o_menu_xterm;
 static void save_menus(void);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
-static void savebox_show(const gchar *title, const gchar *path,
-		MaskedPixmap *image,
-		gboolean (*callback)(const gchar *current, const gchar *new));
-static gint save_to_file(GtkSavebox *savebox, const gchar *pathname);
+static void savebox_show(const gchar *action, const gchar *path,
+			 MaskedPixmap *image, SaveCb callback);
+static gint save_to_file(GObject *savebox,
+			 const gchar *pathname, gpointer data);
 static gboolean action_with_leaf(ActionFn action,
 				 const gchar *current, const gchar *new);
-static gboolean link_cb(const gchar *initial, const gchar *path);
+static gboolean link_cb(GObject *savebox,
+			const gchar *initial, const gchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
 static void new_file_type(gchar *templ);
 static void do_send_to(gchar *templ);
@@ -175,14 +179,6 @@ static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
-
-typedef gboolean (*SaveCb)(const gchar *current, const gchar *new);
-
-/* Used for Copy, etc */
-static GtkWidget	*savebox = NULL;	
-static GtkWidget	*check_relative = NULL;	
-static guchar		*current_path = NULL;
-static SaveCb		current_savebox_callback;
 
 #undef N_
 #define N_(x) x
@@ -293,7 +289,6 @@ void menu_init(void)
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
-	GtkTooltips		*tips;
 	GtkItemFactory  	*item_factory;
 
 	filer_keys = gtk_accel_group_new();
@@ -345,29 +340,6 @@ void menu_init(void)
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
 	option_add_saver(save_menus);
-
-	tips = gtk_tooltips_new();
-	check_relative = gtk_check_button_new_with_label(_("Relative link"));
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_relative), TRUE);
-	GTK_WIDGET_UNSET_FLAGS(check_relative, GTK_CAN_FOCUS);
-	gtk_tooltips_set_tip(tips, check_relative,
-			_("If on, the symlink will store the path from the "
-			"symlink to the target file. Use this if the symlink "
-			"and the target will be moved together.\n"
-			"If off, the path from the root directory is stored - "
-			"use this if the symlink may move but the target will "
-			"stay put."), NULL);
-			
-	savebox = gtk_savebox_new();
-	gtk_box_pack_start(GTK_BOX(GTK_SAVEBOX(savebox)->vbox),
-			   check_relative, FALSE, TRUE, 0);
-	gtk_widget_show(check_relative);
-
-	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_to_file",
-				GTK_SIGNAL_FUNC(save_to_file), NULL);
-	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_done",
-				GTK_SIGNAL_FUNC(gtk_widget_hide),
-				GTK_OBJECT(savebox));
 
 	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
 				  (GCallback) keys_changed, NULL, 0);
@@ -1001,48 +973,76 @@ static void find(FilerWindow *filer_window)
 	g_list_free(paths);
 }
 
-/* This pops up our savebox widget, cancelling any currently open one,
- * and allows the user to pick a new path for it.
+/* This creates a new savebox widget, and allows the user to pick a new path
+ * for the file.
  * Once the new path has been picked, the callback will be called with
  * both the current and new paths.
  * NOTE: This function unrefs 'image'!
  */
-static void savebox_show(const gchar *title, const gchar *path,
+static void savebox_show(const gchar *action, const gchar *path,
 			 MaskedPixmap *image, SaveCb callback)
 {
+	GtkWidget	*savebox = NULL;	
+	GtkWidget	*check_relative = NULL;	
+
 	g_return_if_fail(image != NULL);
 	
-	if (GTK_WIDGET_VISIBLE(savebox))
-		gtk_widget_hide(savebox);
+	savebox = gtk_savebox_new(action);
 
 	if (callback == link_cb)
+	{
+		check_relative = gtk_check_button_new_with_mnemonic(
+							_("_Relative link"));
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_relative),
+					     TRUE);
+
+		GTK_WIDGET_UNSET_FLAGS(check_relative, GTK_CAN_FOCUS);
+		gtk_tooltips_set_tip(tooltips, check_relative,
+			_("If on, the symlink will store the path from the "
+			"symlink to the target file. Use this if the symlink "
+			"and the target will be moved together.\n"
+			"If off, the path from the root directory is stored - "
+			"use this if the symlink may move but the target will "
+			"stay put."), NULL);
+		gtk_box_pack_start(GTK_BOX(GTK_DIALOG(savebox)->vbox),
+				check_relative, FALSE, TRUE, 0);
 		gtk_widget_show(check_relative);
-	else
-		gtk_widget_hide(check_relative);
+	}
 
-	if (current_path)
-		g_free(current_path);
-	current_path = g_strdup(path);
-	current_savebox_callback = callback;
+	gtk_signal_connect(GTK_OBJECT(savebox), "save_to_file",
+				GTK_SIGNAL_FUNC(save_to_file), NULL);
 
-	gtk_window_set_title(GTK_WINDOW(savebox), title);
-	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), current_path);
+	g_object_set_data_full(G_OBJECT(savebox), "current_path",
+				g_strdup(path), g_free);
+	g_object_set_data(G_OBJECT(savebox), "action_callback", callback);
+	g_object_set_data(G_OBJECT(savebox), "check_relative", check_relative);
+
+	gtk_window_set_title(GTK_WINDOW(savebox), action);
+	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
 	pixmap_unref(image);
 				
 	gtk_widget_show(savebox);
 }
 
-static gint save_to_file(GtkSavebox *savebox, const gchar *pathname)
+static gint save_to_file(GObject *savebox,
+			 const gchar *pathname, gpointer data)
 {
-	g_return_val_if_fail(current_savebox_callback != NULL,
-			GTK_XDS_SAVE_ERROR);
+	SaveCb		callback;
+	const gchar	*current_path;
+	
+	callback = g_object_get_data(savebox, "action_callback");
+	current_path = g_object_get_data(savebox, "current_path");
 
-	return current_savebox_callback(current_path, pathname)
+	g_return_val_if_fail(callback != NULL, GTK_XDS_SAVE_ERROR);
+	g_return_val_if_fail(current_path != NULL, GTK_XDS_SAVE_ERROR);
+
+	return callback(savebox, current_path, pathname)
 			? GTK_XDS_SAVED : GTK_XDS_SAVE_ERROR;
 }
 
-static gboolean copy_cb(const gchar *current, const gchar *new)
+static gboolean copy_cb(GObject *savebox,
+			const gchar *current, const gchar *new)
 {
 	return action_with_leaf(action_copy, current, new);
 }
@@ -1087,23 +1087,27 @@ static gboolean action_with_leaf(ActionFn action,
  * Call 'callback' later to perform the operation.
  */
 static void src_dest_action_item(const gchar *path, MaskedPixmap *image,
-			 const gchar *title,
-			 gboolean (*callback)(const gchar *, const gchar *))
+			 const gchar *action, SaveCb callback)
 {
 	pixmap_ref(image);
-	savebox_show(title, path, image, callback);
+	savebox_show(action, path, image, callback);
 }
 
-static gboolean rename_cb(const gchar *current, const gchar *new)
+static gboolean rename_cb(GObject *savebox,
+			  const gchar *current, const gchar *new)
 {
 	return action_with_leaf(action_move, current, new);
 }
 
-static gboolean link_cb(const gchar *initial, const gchar *path)
+static gboolean link_cb(GObject *savebox,
+			const gchar *initial, const gchar *path)
 {
+	GtkToggleButton *check_relative;
 	int	err;
 
-	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_relative)))
+	check_relative = g_object_get_data(savebox, "check_relative");
+
+	if (gtk_toggle_button_get_active(check_relative))
 	{
 		guchar *rpath;
 		
@@ -1196,7 +1200,8 @@ void menu_show_options(gpointer data, guint action, GtkWidget *widget)
 	options_show();
 }
 
-static gboolean new_directory_cb(const gchar *initial, const gchar *path)
+static gboolean new_directory_cb(GObject *savebox,
+				 const gchar *initial, const gchar *path)
 {
 	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
 	{
@@ -1221,13 +1226,14 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	savebox_show(_("New Directory"),
+	savebox_show(_("Create"),
 			make_path(window_with_focus->path, _("NewDir"))->str,
 			type_to_icon(special_directory),
 			new_directory_cb);
 }
 
-static gboolean new_file_cb(const gchar *initial, const gchar *path)
+static gboolean new_file_cb(GObject *savebox,
+			    const gchar *initial, const gchar *path)
 {
 	int fd;
 
@@ -1261,13 +1267,14 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 	
-	savebox_show(_("New File"),
+	savebox_show(_("Create"),
 			make_path(window_with_focus->path, _("NewFile"))->str,
 			type_to_icon(text_plain),
 			new_file_cb);
 }
 
-static gboolean new_file_type_cb(const gchar *initial, const gchar *path)
+static gboolean new_file_type_cb(GObject *savebox,
+			         const gchar *initial, const gchar *path)
 {
 	const gchar *oleaf, *leaf;
 	gchar *templ, *templ_dname, *dest;
@@ -1320,7 +1327,7 @@ static void new_file_type(gchar *templ)
 	leaf = g_basename(templ);
 	type = type_get_type(templ);
 
-	savebox_show(_("New File"),
+	savebox_show(_("Create"),
 			make_path(window_with_focus->path, leaf)->str,
 			type_to_icon(type),
 			new_file_type_cb);
@@ -1765,7 +1772,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 	{
 		case FILE_COPY_ITEM:
 			src_dest_action_item(path, item->image,
-						_("Copy"), copy_cb);
+					_("Copy"), copy_cb);
 			break;
 		case FILE_RENAME_ITEM:
 			src_dest_action_item(path, item->image,
