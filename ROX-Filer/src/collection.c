@@ -1293,6 +1293,8 @@ static void get_range(int from, int to, int step, gint *pos, gint *len)
 static void get_range(int from, int to, int step, short *pos, short *len)
 #endif
 {
+	int	margin = MIN(step / 4, 40);
+
 	if (from > to)
 	{
 		int tmp = to;
@@ -1300,8 +1302,8 @@ static void get_range(int from, int to, int step, short *pos, short *len)
 		from = tmp;
 	}
 
-	from = (from + step / 4) / step;	/* First item */
-	to = (to + step - step / 4) / step;	/* Last item (inclusive) */
+	from = (from + margin) / step;	/* First item */
+	to = (to + step - margin) / step;	/* Last item (inclusive) */
 
 	*pos = MAX(from, 0);
 	*len = to - *pos;
@@ -1342,7 +1344,7 @@ static void find_lasso_area(Collection *collection, GdkRectangle *area)
 	if (area->x >= cols)
 		area->width = 0;
 	else if (area->x + area->width > cols)
-			area->width = cols - area->x;
+		area->width = cols - area->x;
 
 	get_range(collection->drag_box_y[0] + scroll,
 		  collection->drag_box_y[1] + scroll,
