@@ -1,0 +1,36 @@
+#!/usr/bin/env perl
+
+chdir "..";
+
+system "cvs rel .";
+
+open(VER, "./AppRun --version 2>&1 |") or die "open(): $!";
+$line = <VER>;
+close(VER);
+
+$line =~ /(\d+)\.(\d+)\.(\d+)$/;
+
+($a, $b, $c) = ($1, $2, $3);
+
+print "Check the manual is up-to-date!\n";
+print "Version $a.$b.$c --- OK?\n";
+
+<STDIN> =~ /^[yY]/ or die "OK, fix the version number!\n";
+
+system "cvs tag Release-$a-$b-$c";
+
+chdir;
+
+mkdir "roxfiler-$a.$b.$c", 0777;
+chdir "roxfiler-$a.$b.$c";
+
+system "cvs export -r Release-$a-$b-$c ROX-Filer";
+system "cd ROX-Filer/src; autoconf";
+system "cp ~/Apps/ROX-Filer/Help/Manual.ps ROX-Filer/Help";
+system "cp -r ~/Projects/roxfiler-template/* .";
+system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo ROX-Filer/Messages";
+chdir;
+system "tar czf roxfiler-$a.$b.$c.tgz roxfiler-$a-$b-$c";
+system "rm -r roxfiler-$a.$b.$c";
+
+print "OK, done\n";
