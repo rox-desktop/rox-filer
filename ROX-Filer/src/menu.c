@@ -47,6 +47,7 @@
 #include "gtksavebox.h"
 #include "mount.h"
 #include "minibuffer.h"
+#include "i18n.h"
 
 #define C_ "<control>"
 
@@ -127,7 +128,7 @@ static void save_options();
 
 static OptionsSection options =
 {
-	"Menu options",
+	N_("Menu options"),
 	create_options,
 	update_options,
 	set_options,
@@ -152,68 +153,68 @@ static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 static gint		screen_width, screen_height;
 
 static GtkItemFactoryEntry filer_menu_def[] = {
-{"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",   	NULL,  	large, 0, NULL},
-{"/Display/Small Icons",   	NULL,  	small, 0, NULL},
-{"/Display/Full Info",		NULL,  	full_info, 0, NULL},
-{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,  	sort_name, 0, NULL},
-{"/Display/Sort by Type",	NULL,  	sort_type, 0, NULL},
-{"/Display/Sort by Date",	NULL,  	sort_date, 0, NULL},
-{"/Display/Sort by Size",	NULL,  	sort_size, 0, NULL},
-{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
-{"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
-{"/File",			NULL,  	NULL, 0, "<Branch>"},
-{"/File/Copy...",		NULL,  	copy_item, 0, NULL},
-{"/File/Rename...",		NULL,  	rename_item, 0, NULL},
-{"/File/Link...",		NULL,  	link_item, 0, NULL},
-{"/File/Shift Open",   		NULL,  	open_file, 0, NULL},
-{"/File/Help",		    	"F1",  	help, 0, NULL},
-{"/File/Info",			"I",  	show_file_info, 0, NULL},
-{"/File/Open VFS",		NULL,   NULL, 0, "<Branch>"},
-{"/File/Open VFS/Unzip",	NULL,   open_vfs_uzip, 0, NULL},
-{"/File/Open VFS/Untar",	NULL,   open_vfs_utar, 0, NULL},
-{"/File/Open VFS/RPM",		NULL,   open_vfs_rpm, 0, NULL},
-{"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/File/Mount",	    		"M",  	mount, 0,	NULL},
-{"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
-{"/File/Disk Usage",	    	"U", 	usage, 0, NULL},
-{"/File/Permissions",		NULL,   chmod_items, 0, NULL},
-{"/File/Find",			NULL,   find, 0, NULL},
-{"/Select All",	    		C_"A",  select_all, 0, NULL},
-{"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
-{"/Options...",			NULL,   show_options, 0, NULL},
-{"/New Directory...",		NULL,   new_directory, 0, NULL},
-{"/Xterm Here",			NULL,  	xterm_here, 0, NULL},
-{"/Window",			NULL,  	NULL, 0, "<Branch>"},
-{"/Window/Parent, New Window",	NULL,   open_parent, 0, NULL},
-{"/Window/Parent, Same Window",	NULL,   open_parent_same, 0, NULL},
-{"/Window/New Window",		NULL,   new_window, 0, NULL},
-{"/Window/Close Window",	C_"Q",  close_window, 0, NULL},
-{"/Window/Enter Path",		NULL,  	enter_path, 0, NULL},
-{"/Window/Shell Command",	NULL,  	shell_command, 0, NULL},
-{"/Window/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Window/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
+{N_("/Display"),		NULL,	NULL, 0, "<Branch>"},
+{N_("/Display/Large Icons"),   	NULL,  	large, 0, NULL},
+{N_("/Display/Small Icons"),   	NULL,  	small, 0, NULL},
+{N_("/Display/Full Info"),	NULL,  	full_info, 0, NULL},
+{N_("/Display/"),		NULL,  	NULL, 0, "<Separator>"},
+{N_("/Display/Sort by Name"),	NULL,  	sort_name, 0, NULL},
+{N_("/Display/Sort by Type"),	NULL,  	sort_type, 0, NULL},
+{N_("/Display/Sort by Date"),	NULL,  	sort_date, 0, NULL},
+{N_("/Display/Sort by Size"),	NULL,  	sort_size, 0, NULL},
+{N_("/Display/"),		NULL,  	NULL, 0, "<Separator>"},
+{N_("/Display/Show Hidden"),   	NULL, 	hidden, 0, "<ToggleItem>"},
+{N_("/Display/Refresh"),	NULL, 	refresh, 0,	NULL},
+{N_("/File"),			NULL,  	NULL, 0, "<Branch>"},
+{N_("/File/Copy..."),		NULL,  	copy_item, 0, NULL},
+{N_("/File/Rename..."),		NULL,  	rename_item, 0, NULL},
+{N_("/File/Link..."),		NULL,  	link_item, 0, NULL},
+{N_("/File/Shift Open"),   	NULL,  	open_file, 0, NULL},
+{N_("/File/Help"),		NULL,  	help, 0, NULL},
+{N_("/File/Info"),		NULL,  	show_file_info, 0, NULL},
+{N_("/File/Open VFS"),		NULL,   NULL, 0, "<Branch>"},
+{N_("/File/Open VFS/Unzip"),	NULL,   open_vfs_uzip, 0, NULL},
+{N_("/File/Open VFS/Untar"),	NULL,   open_vfs_utar, 0, NULL},
+{N_("/File/Open VFS/RPM"),	NULL,   open_vfs_rpm, 0, NULL},
+{N_("/File/"),			NULL,   NULL, 0, "<Separator>"},
+{N_("/File/Mount"),	    	NULL,  	mount, 0,	NULL},
+{N_("/File/Delete"),	    	NULL, 	delete, 0,	NULL},
+{N_("/File/Disk Usage"),	NULL, 	usage, 0, NULL},
+{N_("/File/Permissions"),	NULL,   chmod_items, 0, NULL},
+{N_("/File/Find"),		NULL,   find, 0, NULL},
+{N_("/Select All"),	    	NULL,  select_all, 0, NULL},
+{N_("/Clear Selection"),	NULL,  clear_selection, 0, NULL},
+{N_("/Options..."),		NULL,   show_options, 0, NULL},
+{N_("/New Directory..."),	NULL,   new_directory, 0, NULL},
+{N_("/Xterm Here"),		NULL,  	xterm_here, 0, NULL},
+{N_("/Window"),			NULL,  	NULL, 0, "<Branch>"},
+{N_("/Window/Parent, New Window"), NULL,   open_parent, 0, NULL},
+{N_("/Window/Parent, Same Window"), NULL,   open_parent_same, 0, NULL},
+{N_("/Window/New Window"),	NULL,   new_window, 0, NULL},
+{N_("/Window/Close Window"),	NULL,  close_window, 0, NULL},
+{N_("/Window/Enter Path"),	NULL,  	enter_path, 0, NULL},
+{N_("/Window/Shell Command"),	NULL,  	shell_command, 0, NULL},
+{N_("/Window/"),		NULL,  	NULL, 0, "<Separator>"},
+{N_("/Window/Show ROX-Filer help"), NULL,   rox_help, 0, NULL},
 };
 
 static GtkItemFactoryEntry panel_menu_def[] = {
-{"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Sort by Name",	NULL,   sort_name, 0, NULL},
-{"/Display/Sort by Type",	NULL,   sort_type, 0, NULL},
-{"/Display/Sort by Date",	NULL,   sort_date, 0, NULL},
-{"/Display/Sort by Size",	NULL,   sort_size, 0, NULL},
-{"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
-{"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
-{"/Open Panel as Directory",	NULL, 	open_as_dir, 0, NULL},
-{"/Close Panel",		NULL, 	close_panel, 0, NULL},
-{"/Separator",			NULL,	NULL, 0, "<Separator>"},
-{"/ROX-Filer Help",		NULL,   rox_help, 0, NULL},
-{"/ROX-Filer Options...",	NULL,   show_options, 0, NULL},
-{"/Separator",			NULL,	NULL, 0, "<Separator>"},
-{"/Show Help",    		NULL,  	help, 0, NULL},
-{"/Remove Item",		NULL,	remove_link, 0, NULL},
+{N_("/Display"),			NULL,	NULL, 0, "<Branch>"},
+{N_("/Display/Sort by Name"),	NULL,   sort_name, 0, NULL},
+{N_("/Display/Sort by Type"),	NULL,   sort_type, 0, NULL},
+{N_("/Display/Sort by Date"),	NULL,   sort_date, 0, NULL},
+{N_("/Display/Sort by Size"),	NULL,   sort_size, 0, NULL},
+{N_("/Display/"),	NULL,   NULL, 0, "<Separator>"},
+{N_("/Display/Show Hidden"),   	NULL, 	hidden, 0, "<ToggleItem>"},
+{N_("/Display/Refresh"),	NULL, 	refresh, 0,	NULL},
+{N_("/Open Panel as Directory"), NULL, 	open_as_dir, 0, NULL},
+{N_("/Close Panel"),		NULL, 	close_panel, 0, NULL},
+{"/",				NULL,	NULL, 0, "<Separator>"},
+{N_("/ROX-Filer Help"),		NULL,   rox_help, 0, NULL},
+{N_("/ROX-Filer Options..."),	NULL,   show_options, 0, NULL},
+{"/",				NULL,	NULL, 0, "<Separator>"},
+{N_("/Show Help"),    		NULL,  	help, 0, NULL},
+{N_("/Remove Item"),		NULL,	remove_link, 0, NULL},
 };
 
 typedef struct _FileStatus FileStatus;
@@ -227,11 +228,22 @@ struct _FileStatus
 	gboolean	start;	/* No output yet */
 };
 
+#define GET_MENU_ITEM(var, menu, path)	\
+	do {				\
+		tmp = g_strconcat("<" menu ">", _(path), NULL);	\
+		var = gtk_item_factory_get_widget(item_factory,	tmp); \
+		g_free(tmp);		\
+	} while (0)
+
 void menu_init()
 {
 	GtkItemFactory  	*item_factory;
 	char			*menurc;
 	GList			*items;
+	guchar			*tmp;
+	GtkWidget		*item;
+	int			n_entries;
+	GtkItemFactoryEntry	*translated;
 
 	/* This call starts returning strange values after a while, so get
 	 * the result here during init.
@@ -242,22 +254,24 @@ void menu_init()
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
 					    "<filer>",
 					    filer_keys);
-	gtk_item_factory_create_items(item_factory,
-			sizeof(filer_menu_def) / sizeof(*filer_menu_def),
-			filer_menu_def,
-			NULL);
-	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
-	filer_file_menu = gtk_item_factory_get_widget(item_factory,
-			"<filer>/File");
-	filer_vfs_menu = gtk_item_factory_get_widget(item_factory,
-			"<filer>/File/Open VFS");
-	filer_hidden_menu = gtk_item_factory_get_widget(item_factory,
-			"<filer>/Display/Show Hidden");
+
+	n_entries = sizeof(filer_menu_def) / sizeof(*filer_menu_def);
+	translated = translate_entries(filer_menu_def, n_entries);
+	gtk_item_factory_create_items (item_factory, n_entries,
+			translated, NULL);
+	free_translated_entries(translated, n_entries);
+
+	GET_MENU_ITEM(filer_menu, "filer", "");
+	GET_MENU_ITEM(filer_file_menu, "filer", "/File");
+	GET_MENU_ITEM(filer_vfs_menu, "filer", "/File/Open VFS");
+	GET_MENU_ITEM(filer_hidden_menu, "filer", "/Display/Show Hidden");
+
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
-	filer_new_window = GTK_BIN(gtk_item_factory_get_widget(item_factory,
-			"<filer>/Window/New Window"))->child;
+
+	GET_MENU_ITEM(item, "filer", "/Window/New Window");
+	filer_new_window = GTK_BIN(item)->child;
 
 	panel_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
@@ -267,11 +281,10 @@ void menu_init()
 			sizeof(panel_menu_def) / sizeof(*panel_menu_def),
 			panel_menu_def,
 			NULL);
-	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
-	panel_hidden_menu = gtk_item_factory_get_widget(item_factory,
-			"<panel>/Display/Show Hidden");
+	GET_MENU_ITEM(panel_menu, "panel", "");
+	GET_MENU_ITEM(panel_hidden_menu, "panel", "/Display/Show Hidden");
 
-	menurc = choices_find_path_load("menus", "ROX-Filer");
+	menurc = choices_find_path_load("menus", PROJECT);
 	if (menurc)
 		gtk_item_factory_parse_rc(menurc);
 

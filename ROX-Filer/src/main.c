@@ -51,6 +51,7 @@
 #include "pixmaps.h"
 #include "dir.h"
 #include "action.h"
+#include "i18n.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -207,6 +208,7 @@ int main(int argc, char **argv)
 	GList		*panel_dirs = NULL;
 	GList		*panel_sides = NULL;
 
+	choices_init();
 	i18n_init();
 
 	home_dir = g_get_home_dir();
@@ -256,8 +258,6 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 		}
 	}
-
-	choices_init();
 
 	gui_support_init();
 	pixmaps_init();

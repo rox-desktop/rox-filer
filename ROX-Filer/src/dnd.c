@@ -100,7 +100,7 @@ static char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
 
 static OptionsSection options =
 {
-	"Drag and Drop options",
+	N_("Drag and Drop options"),
 	create_options,
 	update_options,
 	set_options,
@@ -149,20 +149,20 @@ static GtkWidget *create_options()
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	label = gtk_label_new("Some older applications don't support XDND "
+	label = gtk_label_new(_("Some older applications don't support XDND "
 			"fully and may need to have this option turned on. "
 			"Use this if dragging files to an application shows "
-			"a + sign on the pointer but the drop doesn't work.");
+			"a + sign on the pointer but the drop doesn't work."));
 	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
 	toggle_no_hostnames =
-		gtk_check_button_new_with_label("Don't use hostnames");
+		gtk_check_button_new_with_label(_("Don't use hostnames"));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_no_hostnames, FALSE, TRUE, 0);
 
 	toggle_drag_to_icons =
-		gtk_check_button_new_with_label("Allow dragging to icons in "
-						"filer windows");
+		gtk_check_button_new_with_label(_("Allow dragging to icons in "
+						"filer windows"));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_drag_to_icons, FALSE, TRUE, 0);
 
 	return vbox;
@@ -267,8 +267,8 @@ static GSList *uri_list_to_gslist(char *uri_list)
 		if (!linebreak || linebreak[1] != 10)
 		{
 			delayed_error("uri_list_to_gslist",
-					"Incorrect or missing line break "
-					"in text/uri-list data");
+					_("Incorrect or missing line "
+					  "break in text/uri-list data"));
 			return list;
 		}
 
@@ -429,7 +429,7 @@ void drag_data_get(GtkWidget          		*widget,
 			break;
 		default:
 			delayed_error("drag_data_get",
-					"Internal error - bad info type\n");
+					_("Internal error - bad info type"));
 			break;
 	}
 
@@ -635,8 +635,8 @@ static gboolean drag_drop(GtkWidget 	*widget,
 		{
 			if (strchr(leafname, '/'))
 			{
-				error = "XDS protocol error: "
-					"leafname may not contain '/'\n";
+				error = _("XDS protocol error: "
+					"leafname may not contain '/'\n");
 				g_free(leafname);
 
 				leafname = NULL;
@@ -659,9 +659,10 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			}
 		}
 		else
-			error = "XdndDirectSave0 target provided, but the atom "
+			error = _(
+				"XdndDirectSave0 target provided, but the atom "
 				"XdndDirectSave0 (type text/plain) did not "
-					"contain a leafname\n";
+					"contain a leafname\n");
 	}
 	else if (provides(context, text_uri_list))
 		target = text_uri_list;
@@ -670,18 +671,18 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	else
 	{
 		if (dest_type == drop_dest_dir)
-			error = "Sorry - I require a target type of "
-				"text/uri-list or XdndDirectSave0.";
+			error = _("Sorry - I require a target type of "
+				"text/uri-list or XdndDirectSave0.");
 		else
-			error = "Sorry - I require a target type of "
-				"text/uri-list or application/octet-stream.";
+			error = _("Sorry - I require a target type of "
+				"text/uri-list or application/octet-stream.");
 	}
 
 	if (error)
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		
-		delayed_error("ROX-Filer", error);
+		delayed_error(PROJECT, error);
 	}
 	else
 		gtk_drag_get_data(widget, context, target, time);
@@ -721,7 +722,8 @@ static void drag_data_received(GtkWidget      		*widget,
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);
-			delayed_error("drag_data_received", "Unknown target");
+			delayed_error("drag_data_received",
+					_("Unknown target"));
 			break;
 	}
 }
@@ -754,8 +756,8 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 					application_octet_stream, time);
 		}
 		else
-			error = "Remote app can't or won't send me "
-					"the data - sorry";
+			error = _("Remote app can't or won't send me "
+					"the data - sorry");
 	}
 	else if (response == 'S')
 	{
@@ -773,8 +775,8 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 	else if (response != 'E')
 	{
-		error = "XDS protocol error: "
-			"return code should be 'S', 'F' or 'E'\n";
+		error = _("XDS protocol error: "
+			"return code should be 'S', 'F' or 'E'\n");
 	}
 	/* else: error has been reported by the sender */
 
@@ -786,7 +788,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 
 	if (error)
-		delayed_error("ROX-Filer", error);
+		delayed_error(PROJECT, error);
 }
 
 static void got_data_raw(GtkWidget 		*widget,
@@ -814,7 +816,7 @@ static void got_data_raw(GtkWidget 		*widget,
 
 	leafname = g_dataset_get_data(context, "leafname");
 	if (!leafname)
-		leafname = "UntitledData";
+		leafname = _("UntitledData");
 	
 	fd = open(make_path(dest_path, leafname)->str,
 		O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY,
@@ -841,7 +843,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		if (provides(context, XdndDirectSave0))
 			set_xds_prop(context, "");
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		delayed_error("Error saving file", error);
+		delayed_error(_("Error saving file"), error);
 	}
 	else
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
@@ -872,7 +874,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	uri_list = uri_list_to_gslist(selection_data->data);
 
 	if (!uri_list)
-		error = "No URIs in the text/uri-list (nothing to do!)";
+		error = _("No URIs in the text/uri-list (nothing to do!)");
 	else if (type == drop_dest_prog)
 		run_with_files(dest_path, uri_list);
 	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
@@ -896,8 +898,8 @@ static void got_uri_list(GtkWidget 		*widget,
 			send_reply = FALSE;
 		}
 		else
-			error = "Can't get data from remote machine "
-				"(application/octet-stream not provided)";
+			error = _("Can't get data from remote machine "
+				"(application/octet-stream not provided)");
 	}
 	else
 	{
@@ -918,16 +920,16 @@ static void got_uri_list(GtkWidget 		*widget,
 				local_paths = g_slist_append(local_paths,
 								g_strdup(path));
 			else
-				error = "Some of these files are on a "
+				error = _("Some of these files are on a "
 					"different machine - they will be "
-					"ignored - sorry";
+					"ignored - sorry");
 		}
 
 		if (!local_paths)
 		{
-			error = "None of these files are on the local machine "
-				"- I can't operate on multiple remote files - "
-				"sorry.";
+			error = _("None of these files are on the local "
+				"machine - I can't operate on multiple "
+				"remote files - sorry.");
 		}
 		else if (context->action == GDK_ACTION_MOVE)
 			action_move(local_paths, dest_path);
@@ -936,7 +938,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		else if (context->action == GDK_ACTION_LINK)
 			action_link(local_paths, dest_path);
 		else
-			error = "Unknown action requested";
+			error = _("Unknown action requested");
 
 		for (next = local_paths; next; next = next->next)
 			g_free(next->data);
@@ -946,7 +948,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	if (error)
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		delayed_error("Error getting file list", error);
+		delayed_error(_("Error getting file list"), error);
 	}
 	else if (send_reply)
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */

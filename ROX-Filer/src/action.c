@@ -91,8 +91,6 @@ static GdkColor red = {0, 0xffff, 0, 0};
 			gtk_widget_set_sensitive((gui_side)->entry, state);\
 	} while (0)
 
-#define ON(flag) ((flag) ? "on" : "off")
-
 typedef struct _GUIside GUIside;
 typedef void ActionChild(gpointer data);
 typedef gboolean ForDirCB(char *path, char *dest_path);

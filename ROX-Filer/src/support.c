@@ -537,13 +537,3 @@ guchar *shell_escape(guchar *word)
 	g_string_free(tmp, FALSE);
 	return retval;
 }
-
-/* Set things up for internationalisation */
-void i18n_init(void)
-{
-#ifdef HAVE_GETTEXT
-	setlocale(LC_ALL, "");
-	bindtextdomain("ROX-Filer", make_path(getenv("APP_DIR"), "po")->str);
-	textdomain("ROX-Filer");
-#endif
-}

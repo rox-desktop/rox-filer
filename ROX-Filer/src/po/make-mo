@@ -1,0 +1,20 @@
+#!/bin/sh
+
+if [ $# = 1 ]; then
+	DIR=../../po/$1
+	if [ ! -d $DIR ]; then
+		mkdir $DIR
+	fi
+	if [ ! -d $DIR/LC_MESSAGES ]; then
+		mkdir $DIR/LC_MESSAGES
+	fi
+	OUT=$DIR/LC_MESSAGES/ROX-Filer.mo
+	msgfmt $1.po -o $OUT && echo Created file $OUT OK
+	exit 0
+fi
+
+cat << HERE
+Usage: 'make-mo <LANG>'
+Eg:    'make-mo fr'
+	to compile the French translation, fr.po, ready for use.
+HERE

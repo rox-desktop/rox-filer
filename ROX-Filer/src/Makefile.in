@@ -18,11 +18,13 @@ PROG = ROX-Filer
 
 SRCS = main.c filer.c support.c gui_support.c pixmaps.c menu.c dnd.c \
        run.c mount.c options.c choices.c gtksavebox.c type.c action.c \
-       collection.c fscache.c dir.c minibuffer.c modechange.c find.c
+       collection.c fscache.c dir.c minibuffer.c modechange.c find.c \
+       i18n.c
 
 OBJECTS = main.o filer.o support.o gui_support.o pixmaps.o menu.o dnd.o \
 	  run.o mount.o options.o choices.o gtksavebox.o type.o action.o \
-	  collection.o fscache.o dir.o minibuffer.o modechange.o find.o
+	  collection.o fscache.o dir.o minibuffer.o modechange.o find.o \
+	  i18n.o
 
 ############ Things to keep the same
 
@@ -38,11 +40,11 @@ clean:
 depend:
 	makedepend -- $(CFLAGS) -- $(SRCS)
 
-ROX-Filer.po: ${SRCS}
+messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
 
 dist:
-	./update-trans
+	./po/update-po
 
 ############ Special case
 

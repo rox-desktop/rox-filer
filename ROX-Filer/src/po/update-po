@@ -1,0 +1,16 @@
+#!/bin/sh
+
+echo Extracting messages from source files...
+echo
+
+(cd ..; make messages.pot)
+
+echo
+echo Updating all .po files...
+echo
+
+for FILE in *.po; do
+	echo -n "Updating '$FILE' translation"
+	mv $FILE $FILE.old
+	msgmerge $FILE.old ../messages.pot > ${FILE};
+done

@@ -1,0 +1,79 @@
+			ROX-Filer
+			A RISC OS-like filer for X
+			by Thomas Leonard
+
+
+16-Apr-2000
+~~~~~~~~~~~
+Added GNU gettext support.
+Shell meta-characters in shell commands are escaped.
+
+15-Apr-2000
+~~~~~~~~~~~
+Tab in the shell commands minibuffer does shell-style completion.
+
+14-Apr-2000 (Release 0.1.20)
+~~~~~~~~~~~
+ImLib is used for rendering if possible. Small Icons super-samples the
+image down.
+
+13-Apr-2000
+~~~~~~~~~~~
+Copying from inside a VFS directory now works.
+
+09-Apr-2000
+~~~~~~~~~~~
+Added the Shell Command feature to the minibuffer.
+Fixed a bug which causes unnecessary flickering when a hidden file was
+detected.
+Removed 'Touch' from the menu; easy enough from the minibuffer now.
+Changed the type guessing system - scans all files in MIME-info directories
+now.
+
+02-Apr-2000
+~~~~~~~~~~~
+Added a nice list displaying the found files. Clicking opens a preview window
+onto the directory and winks the file.
+
+18-Mar-2000
+~~~~~~~~~~~
+Merged the MIME-Type and Special fields in the info window into a single
+Type field (since only one could be used at a time anyway).
+Made lots of changes to the panel menu. You can now remove things much more
+easily.
+Unstat()able files now display the error message in the Full Info display,
+instead of random values.
+Check for copying a directory onto itself, as well as into itself.
+
+Applied Bernard's patch:
+- Copy (menu entry) now works with action window.
+- Deleted/moved directory displays are automatically hidden.
+- Added option not to allow run/copy when object
+  dragged to filer (not panels) icons. Some people like
+  it the RISC OS way...
+- Full info alignment of App objects and owner/group
+  alignment corrected.
+- Info window: added special info for symlinks, apps
+  and mount points.
+
+17-Mar-2000
+~~~~~~~~~~~
+Added support for mc's Virtual File System.
+
+12-Mar-2000
+~~~~~~~~~~~
+New Window appears greyed out if Unique Windows is selected.
+Added 'Permissions' (chmod) feature.
+
+10-Mar-20000
+~~~~~~~~~~~~
+Added Bernard Jungen's patch:
+- Dates are displayed in a more RISC OS like format.
+- (Scanning) is shown in the titlebar during scans.
+- Option to only display one window per directory.
+- User and group names displayed in the Full Info view.
+- Open Parent in the root does nothing.
+- Errors in options are only reported once.
+- File does chdir() if -b isn't possible (prevents getting the full path
+  in the file(1) says... box).
+
