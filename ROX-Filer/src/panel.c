@@ -652,8 +652,9 @@ static void panel_icon_set_tip(PanelIcon *pi)
 	}
 	else if ((!panel_want_show_text(pi)) && !pi->socket)
 	{
-		gtk_tooltips_set_tip(tooltips, pi->widget,
-				icon->item->leafname, NULL);
+		if (icon->item->leafname && icon->item->leafname[0])
+			gtk_tooltips_set_tip(tooltips, pi->widget,
+					icon->item->leafname, NULL);
 	}
 	else
 		gtk_tooltips_set_tip(tooltips, pi->widget, NULL, NULL);
