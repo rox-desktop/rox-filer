@@ -260,63 +260,6 @@ const char *our_host_name(void)
 	return name;
 }
 
-/* Create a child process. cd to dir first (if dir is non-NULL).
- * If from_stderr is set, create a pipe for stderr and return the readable
- * side here.
- * Returns the PID of the child, or 0 on failure (from_stderr is still valid).
- */
-pid_t spawn_full(const char **argv, const char *dir, int *from_stderr)
-{
-	int	child;
-	int	fd[2];
-
-	if (from_stderr)
-	{
-		if (pipe(fd) == 0)
-			*from_stderr = fd[0];
-		else
-		{
-			*from_stderr = -1;
-			from_stderr = NULL;
-		}
-	}
-
-	child = fork();
-
-	if (child == -1)
-		return 0;	/* Failure */
-	else if (child == 0)
-	{
-		/* We are the child process */
-		if (from_stderr)
-		{
-			close(fd[0]);
-			if (fd[1] != STDERR_FILENO)
-			{
-				dup2(fd[1], STDERR_FILENO);
-				close(fd[1]);
-				close_on_exec(STDERR_FILENO, FALSE);
-			}
-		}
-
-		if (dir)
-			if (chdir(dir))
-				fprintf(stderr, "chdir() failed: %s\n",
-						g_strerror(errno));
-		execvp(argv[0], (char **) argv);
-		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
-				argv[0],
-				g_strerror(errno));
-		_exit(0);
-	}
-
-	if (from_stderr)
-		close(fd[1]);
-
-	/* We are the parent */
-	return child;
-}
-
 void debug_free_string(void *data)
 {
 	g_print("Freeing string '%s'\n", (char *) data);
@@ -491,13 +434,6 @@ gchar *format_double_size(double size)
 	return buf;
 }
 
-/* Ensure that str ends with a newline (or is empty) */
-static void newline(GString *str)
-{
-	if (str->len && str->str[str->len - 1] != '\n')
-		g_string_append_c(str, '\n');
-}
-
 /* Fork and exec argv. Wait and return the child's exit status.
  * -1 if spawn fails.
  * Returns the error string from the command if any, or NULL on success.
@@ -507,85 +443,43 @@ static void newline(GString *str)
  */
 char *fork_exec_wait(const char **argv)
 {
-	pid_t	child;
-	int	status = -1;
-	GString *errors;
-	char	buffer[257];
-	int	from_stderr;
+	int	status;
+	gchar	*errors = NULL;
+	GError	*error = NULL;
 
-	errors = g_string_new(NULL);
-
-	child = spawn_full(argv, NULL, &from_stderr);
-
-	if (!child)
+	if (!g_spawn_sync(NULL, (char **) argv, NULL,
+		     G_SPAWN_SEARCH_PATH | G_SPAWN_STDOUT_TO_DEV_NULL,
+		     NULL, NULL,
+		     NULL, &errors, &status, &error))
 	{
-		newline(errors);
-		g_string_append(errors, "fork: ");
-		g_string_append(errors, g_strerror(errno));
-		goto out;
+		char *msg;
+
+		msg = g_strdup(error->message);
+		g_error_free(error);
+		return msg;
 	}
 
-	while (from_stderr != -1)
+	if (errors && !*errors)
 	{
-		int got;
-
-		got = read(from_stderr, buffer, sizeof(buffer) - 1);
-		if (got < 0)
-		{
-			newline(errors);
-			g_string_append(errors, "read: ");
-			g_string_append(errors, g_strerror(errno));
-		}
-		if (got <= 0)
-			break;
-		buffer[got] = '\0';
-		g_string_append(errors, buffer);
+		g_free(errors);
+		errors = NULL;
 	}
 
-	while (1)
+	if (!WIFEXITED(status))
 	{
-		if (waitpid(child, &status, 0) == -1)
-		{
-			if (errno != EINTR)
-			{
-				newline(errors);
-				g_string_append(errors, "waitpid: ");
-				g_string_append(errors, g_strerror(errno));
-				break;
-			}
-		}
-		else
-		{
-			if (!WIFEXITED(status))
-			{
-				newline(errors);
-				g_string_append(errors, "(crashed?)");
-			}
-			else if (WEXITSTATUS(status))
-			{
-				newline(errors);
-				if (!errors->len)
-					g_string_append(errors, "ERROR");
-			}
-			break;
-		}
+		if (!errors)
+			errors = g_strdup("(Subprocess crashed?)");
+	}
+	else if (WEXITSTATUS(status))
+	{
+		if (!errors)
+			errors = g_strdup(_("ERROR"));
 	}
 
-out:
-	if (from_stderr != -1)
-		close(from_stderr);
+	if (errors)
+		g_strstrip(errors);
 
-	if (errors->len && errors->str[errors->len - 1] == '\n')
-		g_string_truncate(errors, errors->len - 1);
-
-	if (errors->len)
-	{
-		char *retval = errors->str;
-		g_string_free(errors, FALSE);
-		return retval;
-	}
-
-	return NULL;
+	return errors;
 }
 
 /* If a file has this UID and GID, which permissions apply to us?

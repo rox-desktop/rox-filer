@@ -1286,8 +1286,9 @@ static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
  */
 static void run_applet(Icon *icon)
 {
+	GError	*error = NULL;
 	char	*argv[3];
-	pid_t	pid;
+	gint	pid;
 
 	argv[0] = make_path(icon->path, "AppletRun")->str;
 	
@@ -1295,9 +1296,6 @@ static void run_applet(Icon *icon)
 		return;
 
 	icon->socket = gtk_socket_new();
-	/* Two refs held: one for child death, one for socket destroyed */
-	gtk_widget_ref(icon->socket);
-	gtk_widget_ref(icon->socket);
 	
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_widget_show_all(icon->socket);
@@ -1324,16 +1322,27 @@ static void run_applet(Icon *icon)
 	g_object_set_data(G_OBJECT(icon->widget), "icon", icon);
 	g_object_set_data(G_OBJECT(icon->socket), "panel", icon->panel);
 
-	g_signal_connect(icon->socket, "destroy",
-			G_CALLBACK(socket_destroyed), icon->widget);
-	
 	argv[1] = g_strdup_printf("%ld",
 			GDK_WINDOW_XWINDOW(icon->socket->window));
 	argv[2] = NULL;
 
-	pid = spawn_full((const char **) argv, NULL, NULL);
-	
-	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
+	if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_DO_NOT_REAP_CHILD,
+			NULL, NULL, &pid, &error))
+	{
+		delayed_error(_("Error running applet:\n%s"), error->message);
+		g_error_free(error);
+		gtk_widget_destroy(icon->socket);
+		icon->socket = NULL;
+	}
+	else
+	{
+		gtk_widget_ref(icon->socket);
+		on_child_death(pid, (CallbackFn) applet_died, icon->socket);
+
+		gtk_widget_ref(icon->socket);
+		g_signal_connect(icon->socket, "destroy",
+				G_CALLBACK(socket_destroyed), icon->widget);
+	}	
 	
 	g_free(argv[1]);
 }

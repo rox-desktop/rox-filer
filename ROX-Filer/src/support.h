@@ -21,7 +21,6 @@ char *pathdup(const char *path);
 GString *make_path(const char *dir, const char *leaf);
 const char *our_host_name();
 const char *our_host_name_for_dnd();
-pid_t spawn_full(const char **argv, const char *dir, int *to_stderr);
 void debug_free_string(void *data);
 const char *user_name(uid_t uid);
 const char *group_name(gid_t gid);

@@ -94,8 +94,6 @@ static void collection_destroy(GtkObject *object);
 static void collection_finalize(GObject *object);
 static void collection_realize(GtkWidget *widget);
 static void collection_map(GtkWidget *widget);
-static gint collection_paint(Collection 	*collection,
-			     GdkRectangle 	*area);
 static void collection_size_request(GtkWidget 		*widget,
 				    GtkRequisition 	*requisition);
 static void collection_size_allocate(GtkWidget 		*widget,
@@ -595,9 +593,9 @@ static void collection_get_item_area(Collection *collection,
 		area->width <<= 1;
 }
 
-static gint collection_paint(Collection 	*collection,
-			     GdkRectangle 	*area)
+static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 {
+	Collection	*collection;
 	GdkRectangle	item_area;
 	int		row, col;
 	int		item;
@@ -605,13 +603,21 @@ static gint collection_paint(Collection 	*collection,
 	int		start_col, last_col;
 	int		phys_last_col;
 
+	g_return_val_if_fail(widget != NULL, FALSE);
+	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
+	g_return_val_if_fail(event != NULL, FALSE);
+
+	collection = COLLECTION(widget);
+
 	/* Calculate the ranges to plot */
-	start_row = area->y / collection->item_height;
-	last_row = (area->y + area->height - 1) / collection->item_height;
+	start_row = event->area.y / collection->item_height;
+	last_row = (event->area.y + event->area.height - 1)
+		   / collection->item_height;
 	row = start_row;
 
-	start_col = area->x / collection->item_width;
-	phys_last_col = (area->x + area->width - 1) / collection->item_width;
+	start_col = event->area.x / collection->item_width;
+	phys_last_col = (event->area.x + event->area.width - 1)
+			/ collection->item_width;
 
 	/* The right-most column may be wider than the others.
 	 * Therefore, to redraw the area after the last 'real' column
@@ -754,21 +760,6 @@ static void diff_vpos(Collection *collection, int diff)
 	value = CLAMP(value, 0,
 			collection->vadj->upper - collection->vadj->page_size);
 	gtk_adjustment_set_value(collection->vadj, value);
-}
-
-static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
-{
-	Collection	*collection;
-	
-	g_return_val_if_fail(widget != NULL, FALSE);
-	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
-	g_return_val_if_fail(event != NULL, FALSE);
-
-	collection = COLLECTION(widget);
-
-	collection_paint(collection, &event->area);
-
-	return FALSE;
 }
 
 static void resize_arrays(Collection *collection, guint new_size)
