@@ -29,6 +29,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <dirent.h>
 
 #include <gtk/gtk.h>
 
@@ -78,6 +79,7 @@ static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean link_cb(guchar *initial, guchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
+static void new_file_type(GtkWidget *widget, gpointer data);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -146,6 +148,7 @@ static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 #endif
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
+static GtkWidget        *filer_new_file;        /* The New File item */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -215,7 +218,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Clear Selection"),		NULL, clear_selection, 0, NULL},
 {N_("Options..."),		NULL, menu_show_options, 0, NULL},
 {N_("New Directory..."),	NULL, new_directory, 0, NULL},
-{N_("New File..."),		NULL, new_file, 0, NULL},
+{N_("New File"),		NULL, NULL, 0, NULL},
 {N_("Xterm Here"),		NULL, xterm_here, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
@@ -294,6 +297,7 @@ void menu_init(void)
 			"Display", "Large, With...");
 	GET_SSMENU_ITEM(display_small_menu, "filer",
 			"Display", "Small, With...");
+	GET_SMENU_ITEM(filer_new_file, "filer", "New File");
 
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
@@ -428,6 +432,93 @@ void show_style_menu(FilerWindow *filer_window,
 			(gpointer) pos, event->button, event->time);
 }
 
+/* Scan the templates dir and return a menu of entries */
+static GtkWidget *get_new_files_menu(void)
+{
+	gchar	*templ_dname = NULL;
+	GtkWidget *menu;
+	GtkWidget *item;
+	DirItem ditem;
+	DIR	*dir;
+	struct dirent *ent;
+
+	menu = gtk_menu_new();
+
+	item = gtk_menu_item_new_with_label(_("Empty file"));
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			GTK_SIGNAL_FUNC(new_file), NULL);
+
+	gtk_menu_append(GTK_MENU(menu), item);
+
+	templ_dname = choices_find_path_load("Templates", "");
+	if (!templ_dname)
+		goto out;
+
+	dir = opendir(templ_dname);
+	if (!dir)
+		goto out;
+
+	item = gtk_menu_item_new();
+	gtk_menu_append(GTK_MENU(menu), item);
+
+	while ((ent = readdir(dir)))
+	{
+		char	*dot, *leaf;
+		GtkWidget *hbox;
+		GtkWidget *img;
+		GtkWidget *label;
+		gchar *fname;
+
+		/* Ignore hidden files */
+		if (ent->d_name[0] == '.')
+			continue;
+
+		/* Strip off extension, if any */
+		dot = strchr(ent->d_name, '.');
+		if (dot)
+			leaf = g_strndup(ent->d_name, dot - ent->d_name);
+		else
+			leaf = g_strdup(ent->d_name);
+		
+		fname = g_strconcat(templ_dname, "/", ent->d_name, NULL);
+		dir_stat(fname, &ditem, FALSE);
+		if (ditem.image)
+		{
+			if (!ditem.image->sm_pixmap)
+				pixmap_make_small(ditem.image);
+
+			item = gtk_menu_item_new();
+
+			hbox = gtk_hbox_new(FALSE, 2);
+			gtk_container_add(GTK_CONTAINER(item), hbox);
+
+			img = gtk_pixmap_new(ditem.image->sm_pixmap,
+						ditem.image->sm_mask);
+			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
+
+			label = gtk_label_new(leaf);
+			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
+		}
+		else
+			item = gtk_menu_item_new_with_label(leaf);
+
+		g_free(leaf);
+
+		gtk_signal_connect(GTK_OBJECT(item), "activate",
+				GTK_SIGNAL_FUNC(new_file_type), fname);
+		gtk_menu_append(GTK_MENU(menu), item);
+		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
+				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
+	}
+
+	closedir(dir);
+out:
+	g_free(templ_dname);
+	gtk_widget_show_all(menu);
+	return menu;
+}
+
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
@@ -521,6 +612,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 						file_item->leafname)->str,
 					file_item, filer_file_menu);
 	}
+
+	gtk_menu_item_set_submenu(GTK_MENU_ITEM(filer_new_file),
+				get_new_files_menu());
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
@@ -726,6 +820,7 @@ static void find(gpointer data, guint action, GtkWidget *widget)
  * and allows the user to pick a new path for it.
  * Once the new path has been picked, the callback will be called with
  * both the current and new paths.
+ * NOTE: This function unrefs 'image'!
  */
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new))
@@ -746,6 +841,7 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 	gtk_window_set_title(GTK_WINDOW(savebox), title);
 	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), current_path);
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
+	pixmap_unref(image);
 				
 	gtk_widget_grab_focus(GTK_SAVEBOX(savebox)->entry);
 	gtk_widget_show(savebox);
@@ -805,6 +901,7 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 	guchar	*path;	\
 	item = selected_item(collection);	\
 	path = make_path(window_with_focus->path, item->leafname)->str;	\
+	pixmap_ref(item->image);	\
 	savebox_show(title, path, item->image, callback);	\
 }
 
@@ -1210,6 +1307,62 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 			make_path(window_with_focus->path, _("NewFile"))->str,
 			type_to_icon(&text_plain),
 			new_file_cb);
+}
+
+static gboolean new_file_type_cb(guchar *initial, guchar *path)
+{
+	gchar *templ, *templ_dname, *oleaf, *dest, *leaf;
+	GSList *paths;
+
+	/* We can work out the template path from the initial name */
+	oleaf = g_basename(initial);
+	templ_dname = choices_find_path_load("Templates", "");
+	if (!templ_dname)
+	{
+		char *mess;
+
+		mess = g_strconcat(_("Could not find the template for "),
+					oleaf, NULL);
+		report_error(_("Error creating file"), mess);
+		g_free(mess);
+
+		return FALSE;
+	}
+
+	templ = g_strconcat(templ_dname, "/", oleaf, NULL);
+	g_free(templ_dname);
+
+	dest = g_dirname(path);
+	leaf = g_basename(path);
+	paths = g_slist_append(NULL, templ);
+
+	action_copy(paths, dest, leaf);
+
+	g_slist_free(paths);
+	g_free(dest);
+	g_free(templ);
+
+	if (filer_exists(window_with_focus))
+		display_set_autoselect(window_with_focus, leaf);
+
+	return TRUE;
+}
+
+static void new_file_type(GtkWidget *widget, gpointer data)
+{
+        gchar *templ = (char *) data;
+	gchar *leaf;
+	MIME_type *type;
+
+	g_return_if_fail(window_with_focus != NULL);
+	
+	leaf = g_basename(templ);
+	type = type_get_type(templ);
+
+	savebox_show(_("New File"),
+			make_path(window_with_focus->path, leaf)->str,
+			type_to_icon(type),
+			new_file_type_cb);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
