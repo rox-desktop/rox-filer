@@ -51,6 +51,7 @@
 #include "main.h"
 #include "pinboard.h"
 #include "dir.h"
+#include "appmenu.h"
 
 #define C_ "<control>"
 
@@ -295,6 +296,9 @@ void menu_init()
 	GET_SSMENU_ITEM(display_small_menu, "filer",
 			"Display", "Small, With...");
 
+	/* This is used for AppMenus */
+	gtk_object_set_data(GTK_OBJECT(filer_file_menu), "last_appmenu", NULL);
+
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
@@ -473,9 +477,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	DirItem		*file_item = NULL;
 	int		pos[2];
 	guchar		*shift_action;
+	AppMenus	*menus = NULL;
 
 	updating_menu++;
-	
+
+	/* Remove previous AppMenu, if any */
+	appmenu_remove(filer_file_menu);
+
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
 
@@ -531,6 +539,12 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		shift_action = NULL;
 		if (collection->number_selected == 1)
 		{
+			guchar *path;
+
+			/* Check for app-specific menu */
+			path = make_path(filer_window->path,
+					 file_item->leafname)->str;
+
 			if (file_item->flags & ITEM_FLAG_MOUNT_POINT)
 			{
 				if (file_item->flags & ITEM_FLAG_MOUNTED)
@@ -544,6 +558,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 				shift_action = N_("Look Inside");
 			else if (file_item->base_type == TYPE_FILE)
 				shift_action = N_("Open As Text");
+
+			menus = appmenu_query(path);
 		}
 		gtk_widget_set_sensitive(file_shift_item,
 					 shift_action != NULL ||
@@ -558,6 +574,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	popup_menu = (event->state & GDK_CONTROL_MASK)
 				? filer_file_menu
 				: filer_menu;
+
+	if (menus)
+		appmenu_add(menus, filer_file_menu);
 
 	updating_menu--;
 	

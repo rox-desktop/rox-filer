@@ -48,6 +48,7 @@
 #include "mount.h"
 #include "bind.h"
 #include "icon.h"
+#include "appmenu.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -239,6 +240,8 @@ void pinboard_init(void)
 				 "<pinboard>");
 	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	/* This is used for AppMenus */
+	gtk_object_set_data(GTK_OBJECT(pinboard_menu), "last_appmenu", NULL);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -1834,6 +1837,7 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 {
 	int		pos[2];
 	GList		*icons;
+	AppMenus	*menus = NULL;
 
 	if (icon)
 	{
@@ -1844,7 +1848,13 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 			pinboard_select_only(icon);
 			tmp_icon_selected = TRUE;
 		}
+		/* Check for icon-specific menu */
+		if (icon->path)
+			menus = appmenu_query(icon->path);
 	}
+
+	/* Remove the previous appmenu used on this menu */
+	appmenu_remove(pinboard_menu);
 
 	icons = pinboard_get_selected();
 
@@ -1860,6 +1870,10 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 	}
 	else
 		menu_set_items_shaded(pinboard_menu, TRUE, 4, 4);
+
+	/* Add the AppMenu items if necessary */
+	if (menus)
+		appmenu_add(menus, pinboard_menu);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);

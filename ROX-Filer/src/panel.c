@@ -48,6 +48,7 @@
 #include "mount.h"
 #include "filer.h"
 #include "icon.h"
+#include "appmenu.h"
 
 static Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
@@ -197,6 +198,8 @@ void panel_init(void)
 				 "<panel>");
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	/* This is used for AppMenus */
+	gtk_object_set_data(GTK_OBJECT(panel_menu), "last_appmenu", NULL);
 
 	selection_invisible = gtk_invisible_new();
 
@@ -874,6 +877,7 @@ static void popup_panel_menu(GdkEventButton *event,
 {
 	int		pos[2];
 	PanelSide	side = panel->side;
+	AppMenus	*menus = NULL;
 
 	if (icon != NULL)
 	{
@@ -891,7 +895,13 @@ static void popup_panel_menu(GdkEventButton *event,
 			/* Unselect when panel closes */
 			tmp_icon_selected = TRUE;
 		}
+		/* Check for icon-specific menu */
+		if (icon->path)
+			menus = appmenu_query(icon->path);
 	}
+
+	/* Remove the previous appmenu used on this menu */
+	appmenu_remove(panel_menu);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
@@ -918,6 +928,10 @@ static void popup_panel_menu(GdkEventButton *event,
 	menu_set_items_shaded(panel_menu,
 		panel_selection ? FALSE : TRUE,
 		7, 1);
+
+	/* Add the AppMenu items if necessary */
+	if (menus)
+		appmenu_add(menus, panel_menu);
 
 	gtk_menu_popup(GTK_MENU(panel_menu), NULL, NULL, panel_position_menu,
 			(gpointer) pos, event->button, event->time);
