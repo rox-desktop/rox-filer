@@ -140,6 +140,27 @@ static void get_visible_limits(Collection *collection, int *first, int *last);
 static void scroll_to_show(Collection *collection, int item);
 static gint focus_in(GtkWidget *widget, GdkEventFocus *event);
 static gint focus_out(GtkWidget *widget, GdkEventFocus *event);
+static void draw_focus(GtkWidget *widget);
+
+static void draw_focus_at(Collection *collection, GdkRectangle *area)
+{
+	GtkWidget    	*widget;
+	GdkGC		*gc;
+
+	widget = GTK_WIDGET(collection);
+
+	if (collection->target_cb)
+		gc = widget->style->white_gc;
+	else if (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS)
+		gc = widget->style->black_gc;
+	else
+		gc = widget->style->fg_gc[GTK_STATE_INSENSITIVE];
+
+	gdk_draw_rectangle(widget->window, gc, FALSE,
+				area->x + 1, area->y + 1,
+				area->width - 3,
+				area->height - 3);
+}
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 {
@@ -155,16 +176,24 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 				   area->x, area->y,
 				   area->width - 1, area->height - 1);
 	}
+	
 	if (item == collection->cursor_item)
-	{
-		gdk_draw_rectangle(((GtkWidget *) collection)->window,
-			collection->target_cb
-				? ((GtkWidget *) collection)->style->white_gc
-				: ((GtkWidget *) collection)->style->black_gc,
-			FALSE,
-			area->x + 1, area->y + 1,
-			area->width - 3, area->height - 3);
-	}
+		draw_focus_at(collection, area);
+}
+
+static void draw_focus(GtkWidget *widget)
+{
+	Collection    	*collection;
+
+	g_return_if_fail(widget != NULL);
+	g_return_if_fail(IS_COLLECTION(widget));
+
+	collection = COLLECTION(widget);
+
+	if (collection->cursor_item < 0 || !GTK_WIDGET_REALIZED(widget))
+		return;
+
+	collection_draw_item(collection, collection->cursor_item, FALSE);
 }
 		
 GtkType collection_get_type(void)
@@ -223,6 +252,7 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
+	widget_class->draw_focus = draw_focus;
 
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
