@@ -84,7 +84,7 @@ static void show_features(void);
 
 
 #define COPYING								\
-	     N_("Copyright (C) 2000 Thomas Leonard.\n"			\
+	     N_("Copyright (C) 2001 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
 		"to the extent permitted by law.\n"			\
 		"You may redistribute copies of ROX-Filer\n"		\
