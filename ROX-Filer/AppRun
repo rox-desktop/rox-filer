@@ -10,7 +10,7 @@ case $ARCH in
 	i?86) ARCH=ix86 ;;
 esac
 
-PLATFORM=`uname -s`-$ARCH
+PLATFORM=`uname -s`-$ARCH export PLATFORM
 
 DEBUGGER=""
 
