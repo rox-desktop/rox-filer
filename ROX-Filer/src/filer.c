@@ -28,7 +28,6 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
-#include <math.h>
 #include <netdb.h>
 #include <sys/param.h>
 
@@ -38,7 +37,6 @@
 
 #include "global.h"
 
-#include "collection.h"
 #include "display.h"
 #include "main.h"
 #include "fscache.h"
@@ -90,8 +88,6 @@ static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff);
 static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
-static void filer_size_for(FilerWindow *filer_window,
-			   int w, int h, int n, gboolean allow_shrink);
 
 static void set_selection_state(FilerWindow *filer_window, gboolean normal);
 static void filer_next_thumb(GObject *window, const gchar *path);
@@ -108,8 +104,9 @@ static GdkCursor *crosshair = NULL;
 static gboolean not_local = FALSE;
 
 static Option o_filer_change_size, o_filer_change_size_num;
-static Option o_filer_size_limit, o_short_flag_names;
+static Option o_short_flag_names;
 Option o_filer_auto_resize, o_unique_filer_windows;
+Option o_filer_size_limit;
 
 void filer_init(void)
 {
@@ -173,9 +170,7 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 }
 
 /* Resize the filer window to w x h pixels, plus border (not clamped) */
-static void filer_window_set_size(FilerWindow *filer_window,
-				  int w, int h,
-				  gboolean allow_shrink)
+void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 {
 	GtkWidget *window;
 
@@ -201,18 +196,6 @@ static void filer_window_set_size(FilerWindow *filer_window,
 		h = MAX(req->height, h);
 		gdk_window_get_position(gdk_window, &x, &y);
 
-		if (!allow_shrink)
-		{
-			gint	old_w, old_h;
-
-			gdk_drawable_get_size(gdk_window, &old_w, &old_h);
-			w = MAX(w, old_w);
-			h = MAX(h, old_h);
-
-			if (w == old_w && h == old_h)
-				return;
-		}
-
 		if (x + w > screen_width || y + h > screen_height)
 		{
 			if (x + w > screen_width)
@@ -229,109 +212,12 @@ static void filer_window_set_size(FilerWindow *filer_window,
 }
 
 /* Resize the window to fit the items currently in the Directory.
- * This should be used once the Directory has been fully scanned, otherwise
- * the window will appear too small. When opening a directory for the first
- * time, the names will be known but not the types and images. We can
- * still make a good estimate of the size.
+ * When opening a directory for the first time, the names will be known but not
+ * the types and images. We can still make a good estimate of the size.
  */
-void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
+void filer_window_autosize(FilerWindow *filer_window)
 {
-	Collection	*collection = filer_window->collection;
-	int 		n;
-
-	n = collection->number_of_items;
-	n = MAX(n, 2);
-
-	filer_size_for(filer_window,
-			collection->item_width,
-			collection->item_height,
-			n, allow_shrink);
-}
-
-/* Choose a good size for this window, assuming n items of size (w, h) */
-static void filer_size_for(FilerWindow *filer_window,
-			   int w, int h, int n, gboolean allow_shrink)
-{
-	int 		x;
-	int		rows, cols;
-	int 		max_x, max_rows;
-	const float	r = 2.5;
-	int		t = 0;
-	int		size_limit;
-	int		space = 0;
-
-	size_limit = o_filer_size_limit.int_value;
-
-	/* Get the extra height required for the toolbar and minibuffer,
-	 * if visible.
-	 */
-	if (o_toolbar.int_value != TOOLBAR_NONE)
-		t = filer_window->toolbar->allocation.height;
-	if (filer_window->message)
-		t += filer_window->message->allocation.height;
-	if (GTK_WIDGET_VISIBLE(filer_window->minibuffer_area))
-	{
-		GtkRequisition req;
-
-		gtk_widget_size_request(filer_window->minibuffer_area, &req);
-		space = req.height + 2;
-		t += space;
-	}
-
-	max_x = (size_limit * screen_width) / 100;
-	max_rows = (size_limit * screen_height) / (h * 100);
-
-	/* Aim for a size where
-	 * 	   x = r(y + t + h),		(1)
-	 * unless that's too wide.
-	 *
-	 * t = toolbar (and minibuffer) height
-	 * r = desired (width / height) ratio
-	 *
-	 * Want to display all items:
-	 * 	   (x/w)(y/h) = n
-	 * 	=> xy = nwh
-	 *	=> x(x/r - t - h) = nwh		(from 1)
-	 *	=> xx - x.rt - hr(1 - nw) = 0
-	 *	=> 2x = rt +/- sqrt(rt.rt + 4hr(nw - 1))
-	 * Now,
-	 * 	   4hr(nw - 1) > 0
-	 * so
-	 * 	   sqrt(rt.rt + ...) > rt
-	 *
-	 * So, the +/- must be +:
-	 * 	
-	 *	=> x = (rt + sqrt(rt.rt + 4hr(nw - 1))) / 2
-	 *
-	 * ( + w - 1 to round up)
-	 */
-	x = (r * t + sqrt(r*r*t*t + 4*h*r * (n*w - 1))) / 2 + w - 1;
-
-	/* Limit x */
-	if (x > max_x)
-		x = max_x;
-
-	cols = x / w;
-	cols = MAX(cols, 1);
-
-	/* Choose rows to display all items given our chosen x.
-	 * Don't make the window *too* big!
-	 */
-	rows = (n + cols - 1) / cols;
-	if (rows > max_rows)
-		rows = max_rows;
-
-	/* Leave some room for extra icons, but only in Small Icons mode
-	 * otherwise it takes up too much space.
-	 * Also, don't add space if the minibuffer is open.
-	 */
-	if (space == 0)
-		space = filer_window->display_style == SMALL_ICONS ? h : 2;
-
-	filer_window_set_size(filer_window,
-			w * MAX(cols, 1),
-			h * MAX(rows, 1) + space,
-			allow_shrink);
+	view_autosize(filer_window->view);
 }
 
 /* Called on a timeout while scanning or when scanning ends
@@ -350,7 +236,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
 		set_style_by_number_of_items(filer_window);
-		filer_window_autosize(filer_window, TRUE);
+		filer_window_autosize(filer_window);
 		gtk_widget_show(filer_window->window);
 	}
 
@@ -362,7 +248,6 @@ static void update_display(Directory *dir,
 			GPtrArray	*items,
 			FilerWindow *filer_window)
 {
-	Collection *collection = filer_window->collection;
 	ViewIface *view = (ViewIface *) filer_window->view;
 
 	switch (action)
@@ -389,9 +274,9 @@ static void update_display(Directory *dir,
 			open_filer_window(filer_window);
 
 			if (filer_window->had_cursor &&
-					collection->cursor_item == -1)
+					!view_cursor_visible(view))
 			{
-				collection_set_cursor_item(collection, 0);
+				view_show_cursor(view);
 				filer_window->had_cursor = FALSE;
 			}
 			if (filer_window->auto_select)
@@ -589,7 +474,7 @@ void filer_selection_changed(FilerWindow *filer_window, gint time)
 	if (window_with_primary == filer_window)
 		return;		/* Already got primary */
 
-	if (!filer_window->collection->number_selected)
+	if (!view_count_selected(filer_window->view))
 		return;		/* Nothing selected */
 
 	if (filer_window->temp_item_selected == FALSE &&
@@ -685,41 +570,22 @@ static gint pointer_out(GtkWidget *widget,
  */
 static void next_selected(FilerWindow *filer_window, int dir)
 {
-	Collection 	*collection = filer_window->collection;
-	int		to_check = collection->number_of_items;
-	int 	   	item = collection->cursor_item;
+	ViewIter	iter;
+	ViewIface	*view = filer_window->view;
 
 	g_return_if_fail(dir == 1 || dir == -1);
 
-	if (to_check > 0 && item == -1)
-	{
-		/* Cursor not currently on */
-		if (dir == 1)
-			item = 0;
-		else
-			item = collection->number_of_items - 1;
+	view_get_iter(view, &iter,
+			VIEW_ITER_SELECTED |
+			VIEW_ITER_FROM_CURSOR | 
+			(dir < 0 ? VIEW_ITER_BACKWARDS : 0));
 
-		if (collection->items[item].selected)
-			goto found;
-	}
+	if (iter.next(&iter))
+		view_cursor_to_iter(view, &iter);
+	else
+		gdk_beep();
 
-	while (--to_check > 0)
-	{
-		item += dir;
-
-		if (item >= collection->number_of_items)
-			item = 0;
-		else if (item < 0)
-			item = collection->number_of_items - 1;
-
-		if (collection->items[item].selected)
-			goto found;
-	}
-
-	gdk_beep();
 	return;
-found:
-	collection_set_cursor_item(collection, item);
 }
 
 static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
@@ -841,11 +707,17 @@ static void group_save(FilerWindow *filer_window, char *name)
 	}
 }
 
+static gboolean group_restore_cb(ViewIter *iter, gpointer data)
+{
+	GHashTable *in_group = (GHashTable *) data;
+
+	return g_hash_table_lookup(in_group,
+				   iter->peek(iter)->leafname) != NULL;
+}
+	
 static void group_restore(FilerWindow *filer_window, char *name)
 {
 	GHashTable *in_group;
-	Collection *collection = filer_window->collection;
-	int	j, n;
 	char	*path;
 	xmlNode	*group, *node;
 
@@ -870,15 +742,6 @@ static void group_restore(FilerWindow *filer_window, char *name)
 		filer_change_to(filer_window, path, NULL);
 	g_free(path);
 
-	/* If an item at the start is selected then we could lose the
-	 * primary selection after checking that item and then need to
-	 * gain it again at the end. Therefore, if anything is selected
-	 * then select the last item until the end of the search.
-	 */
-	n = collection->number_of_items;
-	if (collection->number_selected)
-		collection_select_item(collection, n - 1);
-
 	in_group = g_hash_table_new(g_str_hash, g_str_equal);
 	for (node = group->xmlChildrenNode; node; node = node->next)
 	{
@@ -895,17 +758,9 @@ static void group_restore(FilerWindow *filer_window, char *name)
 		else
 			g_hash_table_insert(in_group, leaf, filer_window);
 	}
+
+	view_select_if(filer_window->view, &group_restore_cb, in_group);
 	
-	for (j = 0; j < n; j++)
-	{
-		DirItem *item = (DirItem *) collection->items[j].data;
-
-		if (g_hash_table_lookup(in_group, item->leafname))
-			collection_select_item(collection, j);
-		else
-			collection_unselect_item(collection, j);
-	}
-
 	g_hash_table_foreach(in_group, (GHFunc) g_free, NULL);
 	g_hash_table_destroy(in_group);
 }
@@ -1083,22 +938,23 @@ void filer_change_to(FilerWindow *filer_window,
 	filer_window->directory = new_dir;
 
 	g_free(filer_window->auto_select);
-	filer_window->had_cursor = filer_window->collection->cursor_item != -1
-				   || filer_window->had_cursor;
 	filer_window->auto_select = from_dup;
+
+	filer_window->had_cursor = filer_window->had_cursor ||
+			view_cursor_visible(filer_window->view);
 
 	filer_set_title(filer_window);
 	if (filer_window->window->window)
 		gdk_window_set_role(filer_window->window->window,
 				    filer_window->sym_path);
-	collection_set_cursor_item(filer_window->collection, -1);
+	view_cursor_to_iter(filer_window->view, NULL);
 
 	attach(filer_window);
 	
 	set_style_by_number_of_items(filer_window);
 
 	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
-		filer_window_autosize(filer_window, TRUE);
+		filer_window_autosize(filer_window);
 
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
@@ -1125,16 +981,19 @@ GList *filer_selected_items(FilerWindow *filer_window)
 	return g_list_reverse(retval);
 }
 
+/* Return the single selected item. Error if nothing is selected. */
 DirItem *filer_selected_item(FilerWindow *filer_window)
 {
-	Collection *collection = filer_window->collection;
-	int	item;
+	ViewIter	iter;
+	DirItem		*item;
 
-	item = collection_selected_item_number(collection);
+	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
+		
+	item = iter.next(&iter);
+	g_return_val_if_fail(item != NULL, NULL);
+	g_return_val_if_fail(iter.next(&iter) == NULL, NULL);
 
-	if (item > -1)
-		return (DirItem *) collection->items[item].data;
-	return NULL;
+	return item;
 }
 
 /* Creates and shows a new filer window.
@@ -1249,14 +1108,13 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 					  (GtkFunction) open_filer_window,
 					  filer_window);
 
-	/* The collection is created empty and then attach() is called, which
+	/* The view is created empty and then attach() is called, which
 	 * links the filer window to the entry in the directory cache we
 	 * looked up / created above.
 	 *
 	 * The attach() function will immediately callback to the filer window
 	 * to deliver a list of all known entries in the directory (so,
-	 * collection->number_of_items may be valid after the call to
-	 * attach() returns).
+	 * the number of items will be known after attach() returns).
 	 *
 	 * If the directory was not in the cache (because it hadn't been
 	 * opened it before) then the types and icons for the entries are
@@ -1276,7 +1134,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
  */
 static void filer_add_widgets(FilerWindow *filer_window)
 {
-	GtkWidget *hbox, *vbox, *collection;
+	GtkWidget *hbox, *vbox;
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -1288,12 +1146,13 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	 */
 	g_object_set_data(G_OBJECT(filer_window->window),
 			"filer_window", filer_window);
+
+	/* Create this now to make the Adjustment before the View */
+	filer_window->scrollbar = gtk_vscrollbar_new(NULL);
 	
 	/* The view is the area that actually displays the files */
 	filer_window->view = VIEW(view_collection_new(filer_window));
 	gtk_widget_show(GTK_WIDGET(filer_window->view));
-	collection = GTK_WIDGET(filer_window->collection);	/* XXX */
-	g_object_set_data(G_OBJECT(collection), "filer_window", filer_window);
 
 	/* Scrollbar on the right, everything else on the left */
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -1317,13 +1176,9 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_widget_show(filer_window->message);
 	}
 
-	/* Now add the area for displaying the files.
-	 * The collection is one huge window that goes in a Viewport.
-	 */
+	/* Now add the area for displaying the files */
 	gtk_box_pack_start_defaults(GTK_BOX(vbox),
 				    GTK_WIDGET(filer_window->view));
-	filer_window->scrollbar =
-		gtk_vscrollbar_new(filer_window->collection->vadj);
 
 	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
@@ -1359,14 +1214,13 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_widget_show(hbox);
 	gtk_widget_show(vbox);
 	gtk_widget_show(filer_window->scrollbar);
-	gtk_widget_show(collection);
 
 	gtk_widget_realize(filer_window->window);
 	
 	gdk_window_set_role(filer_window->window->window,
 			    filer_window->sym_path);
 
-	filer_window_set_size(filer_window, 4, 4, TRUE);
+	filer_window_set_size(filer_window, 4, 4);
 }
 
 static void filer_add_signals(FilerWindow *filer_window)
@@ -1641,7 +1495,7 @@ void filer_target_mode(FilerWindow *filer_window,
 
 	if (fn != old_fn)
 		gdk_window_set_cursor(
-				GTK_WIDGET(filer_window->collection)->window,
+				GTK_WIDGET(filer_window->view)->window,
 				fn ? crosshair : NULL);
 
 	filer_window->target_cb = fn;
@@ -1670,8 +1524,8 @@ static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 			? GTK_STATE_SELECTED : GTK_STATE_INSENSITIVE;
 
 	if (old_state != filer_window->selection_state
-	    && filer_window->collection->number_selected)
-		gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
+	    && view_count_selected(filer_window->view))
+		gtk_widget_queue_draw(GTK_WIDGET(filer_window->view));
 }
 
 void filer_cancel_thumbnails(FilerWindow *filer_window)
@@ -1684,9 +1538,9 @@ void filer_cancel_thumbnails(FilerWindow *filer_window)
 	filer_window->max_thumbs = 0;
 }
 
-/* Generate the next thumb for this window. The collection object is
+/* Generate the next thumb for this window. The window object is
  * unref'd when there is nothing more to do.
- * If the collection no longer has a filer window, nothing is done.
+ * If the window no longer has a filer window, nothing is done.
  */
 static gboolean filer_next_thumb_real(GObject *window)
 {
@@ -1728,7 +1582,7 @@ static gboolean filer_next_thumb_real(GObject *window)
 }
 
 /* path is the thumb just loaded, if any.
- * collection is unref'd (eventually).
+ * window is unref'd (eventually).
  */
 static void filer_next_thumb(GObject *window, const gchar *path)
 {
@@ -1840,7 +1694,7 @@ static void set_style_by_number_of_items(FilerWindow *filer_window)
 	    filer_window->display_style != SMALL_ICONS)
 		return;		/* Only change between these two styles */
 
-	n = filer_window->collection->number_of_items;
+	n = view_count_items(filer_window->view);
 
 	if (n >= o_filer_change_size_num.int_value)
 		display_set_layout(filer_window, SMALL_ICONS,

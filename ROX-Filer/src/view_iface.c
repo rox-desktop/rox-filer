@@ -181,14 +181,12 @@ void view_show_cursor(ViewIface *obj)
  * The iterator does not need to be freed. It becomes invalid if the
  * view is changed in any way.
  */
-void view_get_iter(ViewIface *obj, ViewIter *iter, int flags)
+void view_get_iter(ViewIface *obj, ViewIter *iter, IterFlags flags)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 	g_return_if_fail(iter != NULL);
 
-	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter);
-
-	iter->flags = flags;
+	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter, flags);
 }
 
 /* Make an 'iter' whose next method will return the cursor item, if any */
@@ -197,7 +195,8 @@ void view_get_cursor(ViewIface *obj, ViewIter *iter)
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 	g_return_if_fail(iter != NULL);
 
-	VIEW_IFACE_GET_CLASS(obj)->get_cursor(obj, iter);
+	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter,
+				VIEW_ITER_FROM_CURSOR | VIEW_ITER_ONE_ONLY);
 }
 
 /* Position cursor on the last item returned by iter.next().
@@ -289,4 +288,26 @@ void view_thaw(ViewIface *obj)
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 
 	VIEW_IFACE_GET_CLASS(obj)->set_frozen(obj, FALSE);
+}
+
+/* Resize the filer window to a sensible size.
+ * v_border is the height of the toolbar + the minibuffer (if visible).
+ * space is
+ * If allow_shrink is 
+ */
+void view_autosize(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->autosize(obj);
+}
+
+/* Return TRUE if the cursor is shown. Note that the cursor may be visible
+ * even if their are no items (so get_cursor().peek() would return NULL).
+ */
+gboolean view_cursor_visible(ViewIface *obj)
+{
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), FALSE);
+
+	return VIEW_IFACE_GET_CLASS(obj)->cursor_visible(obj);
 }

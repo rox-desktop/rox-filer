@@ -92,6 +92,7 @@ extern FilerWindow 	*window_with_focus;
 extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
 extern Option		o_filer_auto_resize, o_unique_filer_windows;
+extern Option		o_filer_size_limit;
 
 /* Prototypes */
 void filer_init(void);
@@ -113,7 +114,7 @@ void filer_target_mode(FilerWindow	*filer_window,
 			TargetFunc	fn,
 			gpointer	data,
 			const char	*reason);
-void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink);
+void filer_window_autosize(FilerWindow *filer_window);
 GList *filer_selected_items(FilerWindow *filer_window);
 void filer_create_thumb(FilerWindow *filer_window, const gchar *pathname);
 void filer_cancel_thumbnails(FilerWindow *filer_window);
@@ -123,5 +124,6 @@ void filer_add_tip_details(FilerWindow *filer_window,
 			   GString *tip, DirItem *item);
 void filer_selection_changed(FilerWindow *filer_window, gint time);
 void filer_lost_selection(FilerWindow *filer_window, guint time);
+void filer_window_set_size(FilerWindow *filer_window, int w, int h);
 
 #endif /* _FILER_H */

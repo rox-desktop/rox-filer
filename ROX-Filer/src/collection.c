@@ -1642,23 +1642,6 @@ int collection_get_item(Collection *collection, int x, int y)
 	return -1;
 }
 
-int collection_selected_item_number(Collection *collection)
-{
-	int	i;
-	
-	g_return_val_if_fail(collection != NULL, -1);
-	g_return_val_if_fail(IS_COLLECTION(collection), -1);
-	g_return_val_if_fail(collection->number_selected == 1, -1);
-
-	for (i = 0; i < collection->number_of_items; i++)
-		if (collection->items[i].selected)
-			return i;
-
-	g_warning("collection_selected_item_number: number_selected is wrong");
-
-	return -1;
-}
-
 /* Set the cursor/highlight over the given item. Passing -1
  * hides the cursor. As a special case, you may set the cursor item
  * to zero when there are no items.
@@ -1817,6 +1800,13 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
+
+	if (!collection->number_of_items)
+	{
+		/* Show the cursor, even though there are no items */
+		collection_set_cursor_item(collection, 0);
+		return;
+	}
 
 	get_visible_limits(collection, &first, &last);
 

@@ -134,7 +134,6 @@ int 	collection_find_item		(Collection *collection,
 					 int (*compar)(const void *,
 						       const void *));
 int 	collection_get_item		(Collection *collection, int x, int y);
-int	collection_selected_item_number	(Collection *collection);
 void 	collection_set_cursor_item	(Collection *collection, gint item);
 void 	collection_wink_item		(Collection *collection, gint item);
 void 	collection_delete_if		(Collection *collection,

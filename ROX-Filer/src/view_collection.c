@@ -25,6 +25,7 @@
 
 #include <gtk/gtk.h>
 #include <time.h>
+#include <math.h>
 
 #include "global.h"
 
@@ -42,6 +43,7 @@
 #include "options.h"
 
 #include "display.h"	/* XXX */
+#include "toolbar.h"	/* XXX */
 #include "filer.h"	/* XXX */
 #include "menu.h"	/* XXX */
 
@@ -168,7 +170,8 @@ static void drag_leave(GtkWidget	*widget,
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     ViewCollection *view_collection);
-static void make_item_iter(ViewCollection *vc, ViewIter *iter, int i);
+static void make_item_iter(ViewCollection *vc, ViewIter *iter,
+			   int i, IterFlags flags);
 
 static void view_collection_sort(ViewIface *view);
 static void view_collection_style_changed(ViewIface *view, int flags);
@@ -184,8 +187,8 @@ static void view_collection_clear_selection(ViewIface *view);
 static int view_collection_count_items(ViewIface *view);
 static int view_collection_count_selected(ViewIface *view);
 static void view_collection_show_cursor(ViewIface *view);
-static void view_collection_get_iter(ViewIface *view, ViewIter *iter);
-static void view_collection_get_cursor(ViewIface *view, ViewIter *iter);
+static void view_collection_get_iter(ViewIface *view,
+				     ViewIter *iter, IterFlags flags);
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter);
 static void view_collection_set_selected(ViewIface *view,
 					 ViewIter *iter,
@@ -194,6 +197,8 @@ static gboolean view_collection_get_selected(ViewIface *view, ViewIter *iter);
 static void view_collection_select_only(ViewIface *view, ViewIter *iter);
 static void view_collection_set_frozen(ViewIface *view, gboolean frozen);
 static void view_collection_wink_item(ViewIface *view, ViewIter *iter);
+static void view_collection_autosize(ViewIface *view);
+static gboolean view_collection_cursor_visible(ViewIface *view);
 
 
 /****************************************************************
@@ -207,7 +212,10 @@ GtkWidget *view_collection_new(FilerWindow *filer_window)
 	view_collection = g_object_new(view_collection_get_type(), NULL);
 	view_collection->filer_window = filer_window;
 	filer_window->collection = view_collection->collection; /* XXX */
-	
+
+	gtk_range_set_adjustment(GTK_RANGE(filer_window->scrollbar),
+				 view_collection->collection->vadj);
+
 	return GTK_WIDGET(view_collection);
 }
 
@@ -810,13 +818,14 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->count_selected = view_collection_count_selected;
 	iface->show_cursor = view_collection_show_cursor;
 	iface->get_iter = view_collection_get_iter;
-	iface->get_cursor = view_collection_get_cursor;
 	iface->cursor_to_iter = view_collection_cursor_to_iter;
 	iface->set_selected = view_collection_set_selected;
 	iface->get_selected = view_collection_get_selected;
 	iface->set_frozen = view_collection_set_frozen;
 	iface->select_only = view_collection_select_only;
 	iface->wink_item = view_collection_wink_item;
+	iface->autosize = view_collection_autosize;
+	iface->cursor_visible = view_collection_cursor_visible;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -901,11 +910,8 @@ static gint coll_motion_notify(GtkWidget *widget,
 			       ViewCollection *view_collection)
 {
 	Collection	*collection = view_collection->collection;
-	FilerWindow	*filer_window;
+	FilerWindow	*filer_window = view_collection->filer_window;
 	int		i;
-
-	filer_window = g_object_get_data(G_OBJECT(collection), "filer_window");
-	g_return_val_if_fail(filer_window != NULL, FALSE);
 
 	i = collection_get_item(collection, event->x, event->y);
 
@@ -1099,7 +1105,8 @@ static void perform_action(ViewCollection *view_collection,
 		if (item != -1 && press && event->button == 1)
 		{
 			ViewIter iter;
-			make_item_iter(view_collection, &iter, item);
+			make_item_iter(view_collection, &iter, item,
+					VIEW_ITER_ONE_ONLY);
 			
 			filer_window->target_cb(filer_window, &iter,
 					filer_window->target_data);
@@ -1139,7 +1146,8 @@ static void perform_action(ViewCollection *view_collection,
 		{
 			ViewIter iter;
 
-			make_item_iter(view_collection, &iter, item);
+			make_item_iter(view_collection, &iter, item,
+					VIEW_ITER_ONE_ONLY);
 			
 			if (event->button != 1 || event->state & GDK_MOD1_MASK)
 				flags |= OPEN_CLOSE_WINDOW;
@@ -1161,7 +1169,8 @@ static void perform_action(ViewCollection *view_collection,
 			dnd_motion_ungrab();
 			tooltip_show(NULL);
 
-			make_item_iter(view_collection, &iter, item);
+			make_item_iter(view_collection, &iter, item,
+					VIEW_ITER_ONE_ONLY);
 			show_filer_menu(filer_window,
 					(GdkEvent *) event, &iter);
 			break;
@@ -1193,7 +1202,7 @@ static void perform_action(ViewCollection *view_collection,
 			collection_lasso_box(collection, event->x, event->y);
 			break;
 		case ACT_RESIZE:
-			filer_window_autosize(filer_window, TRUE);
+			filer_window_autosize(filer_window);
 			break;
 		default:
 			g_warning("Unsupported action : %d\n", action);
@@ -1598,6 +1607,41 @@ static DirItem *iter_next(ViewIter *iter)
 	return NULL;
 }
 
+/* Like iter_next, but in the other direction */
+static DirItem *iter_prev(ViewIter *iter)
+{
+	Collection *collection = iter->collection;
+	int n = collection->number_of_items;
+	int i = iter->i;
+
+	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
+
+	/* i is the last item returned (or -1 on the first call) */
+
+	g_return_val_if_fail(i >= -1 && i < n, NULL);
+
+	while (iter->n_remaining)
+	{
+		i--;
+		iter->n_remaining--;
+
+		if (i < 0)
+			i = collection->number_of_items - 1;
+
+		g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+		if (iter->flags & VIEW_ITER_SELECTED &&
+		    !collection->items[i].selected)
+			continue;
+
+		iter->i = i;
+		return collection->items[i].data;
+	}
+	
+	iter->i = -1;
+	return NULL;
+}
+
 static DirItem *iter_peek(ViewIter *iter)
 {
 	int i = iter->i;
@@ -1612,35 +1656,32 @@ static DirItem *iter_peek(ViewIter *iter)
 }
 
 /* Create an iterator on item 'i'. Calling next will return NULL. */
-static void make_item_iter(ViewCollection *vc, ViewIter *iter, int i)
+static void make_item_iter(ViewCollection *vc, ViewIter *iter,
+			   int i, IterFlags flags)
 {
 	iter->collection = vc->collection;
-	iter->next = iter_next;
+	iter->next = flags & VIEW_ITER_BACKWARDS ? iter_prev : iter_next;
 	iter->peek = iter_peek;
-	iter->flags = 0;
-	iter->n_remaining = 0;
 	iter->i = i;
-}
 
-static void view_collection_get_iter(ViewIface *view, ViewIter *iter)
-{
-	ViewCollection	*view_collection = VIEW_COLLECTION(view);
-	Collection	*collection = view_collection->collection;
+	iter->flags = flags;
 
-	make_item_iter(view_collection, iter, -1);
-	iter->n_remaining = collection->number_of_items;
-}
-
-static void view_collection_get_cursor(ViewIface *view, ViewIter *iter)
-{
-	ViewCollection	*view_collection = VIEW_COLLECTION(view);
-	Collection	*collection = view_collection->collection;
-	int		i = collection->cursor_item;
-
-	if (collection->number_of_items)
-		make_item_iter(view_collection, iter, i);
+	if (flags & VIEW_ITER_ONE_ONLY)
+		iter->n_remaining = 0;
 	else
-		make_item_iter(view_collection, iter, -1);
+		iter->n_remaining = iter->collection->number_of_items;
+}
+
+static void view_collection_get_iter(ViewIface *view,
+				     ViewIter *iter, IterFlags flags)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+
+	make_item_iter(view_collection, iter, -1, flags);
+
+	if (flags & VIEW_ITER_FROM_CURSOR && collection->number_of_items)
+		iter->i = collection->cursor_item;
 }
 
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
@@ -1714,6 +1755,103 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter)
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	collection_wink_item(collection, iter->i);
+}
+
+static void view_collection_autosize(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	FilerWindow	*filer_window = view_collection->filer_window;
+	Collection	*collection = view_collection->collection;
+	int 		n;
+	int		w = collection->item_width;
+	int		h = collection->item_height;
+	int 		x;
+	int		rows, cols;
+	int 		max_x, max_rows;
+	const float	r = 2.5;
+	int		t = 0;
+	int		space = 0;
+
+	/* Get the extra height required for the toolbar and minibuffer,
+	 * if visible.
+	 */
+	if (o_toolbar.int_value != TOOLBAR_NONE)
+		t = filer_window->toolbar->allocation.height;
+	if (filer_window->message)
+		t += filer_window->message->allocation.height;
+	if (GTK_WIDGET_VISIBLE(filer_window->minibuffer_area))
+	{
+		GtkRequisition req;
+
+		gtk_widget_size_request(filer_window->minibuffer_area, &req);
+		space = req.height + 2;
+		t += space;
+	}
+
+	n = collection->number_of_items;
+	n = MAX(n, 2);
+
+	max_x = (o_filer_size_limit.int_value * screen_width) / 100;
+	max_rows = (o_filer_size_limit.int_value * screen_height) / (h * 100);
+
+	/* Aim for a size where
+	 * 	   x = r(y + t + h),		(1)
+	 * unless that's too wide.
+	 *
+	 * t = toolbar (and minibuffer) height
+	 * r = desired (width / height) ratio
+	 *
+	 * Want to display all items:
+	 * 	   (x/w)(y/h) = n
+	 * 	=> xy = nwh
+	 *	=> x(x/r - t - h) = nwh		(from 1)
+	 *	=> xx - x.rt - hr(1 - nw) = 0
+	 *	=> 2x = rt +/- sqrt(rt.rt + 4hr(nw - 1))
+	 * Now,
+	 * 	   4hr(nw - 1) > 0
+	 * so
+	 * 	   sqrt(rt.rt + ...) > rt
+	 *
+	 * So, the +/- must be +:
+	 * 	
+	 *	=> x = (rt + sqrt(rt.rt + 4hr(nw - 1))) / 2
+	 *
+	 * ( + w - 1 to round up)
+	 */
+	x = (r * t + sqrt(r*r*t*t + 4*h*r * (n*w - 1))) / 2 + w - 1;
+
+	/* Limit x */
+	if (x > max_x)
+		x = max_x;
+
+	cols = x / w;
+	cols = MAX(cols, 1);
+
+	/* Choose rows to display all items given our chosen x.
+	 * Don't make the window *too* big!
+	 */
+	rows = (n + cols - 1) / cols;
+	if (rows > max_rows)
+		rows = max_rows;
+
+	/* Leave some room for extra icons, but only in Small Icons mode
+	 * otherwise it takes up too much space.
+	 * Also, don't add space if the minibuffer is open.
+	 */
+	if (space == 0)
+		space = filer_window->display_style == SMALL_ICONS ? h : 2;
+
+	filer_window_set_size(filer_window,
+			w * MAX(cols, 1),
+			h * MAX(rows, 1) + space);
+}
+
+static gboolean view_collection_cursor_visible(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+
+	return collection->cursor_item != -1;
 }
 
 static void drag_end(GtkWidget *widget,

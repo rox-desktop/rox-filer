@@ -562,7 +562,7 @@ static void delayed_notify(Directory *dir)
 	if (dir->notify_active)
 		return;
 	g_object_ref(dir);
-	gtk_timeout_add(500, notify_timeout, dir);
+	gtk_timeout_add(1500, notify_timeout, dir);
 	dir->notify_active = TRUE;
 }
 

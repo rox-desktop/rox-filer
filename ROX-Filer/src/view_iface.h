@@ -11,9 +11,22 @@
 
 #include <glib-object.h>
 
-enum {
-	VIEW_ITER_SELECTED = 1 << 0,
-};
+typedef enum {
+	/* iter->next moves to selected items only */
+	VIEW_ITER_SELECTED	= 1 << 0,
+
+	/* iteration starts from cursor (first call to next() returns
+	 * iter AFTER cursor). If there is no cursor, flag is ignored
+	 * (will iterate over everything).
+	 */
+	VIEW_ITER_FROM_CURSOR	= 1 << 1,
+
+	/* next() moves backwards */
+	VIEW_ITER_BACKWARDS	= 1 << 2,
+
+	/* next() always returns NULL and has no effect */
+	VIEW_ITER_ONE_ONLY	= 1 << 3,
+} IterFlags;
 
 typedef struct _ViewIfaceClass	ViewIfaceClass;
 
@@ -47,8 +60,7 @@ struct _ViewIfaceClass {
 	int (*count_selected)(ViewIface *obj);
 	void (*show_cursor)(ViewIface *obj);
 
-	void (*get_iter)(ViewIface *obj, ViewIter *iter);
-	void (*get_cursor)(ViewIface *obj, ViewIter *iter);
+	void (*get_iter)(ViewIface *obj, ViewIter *iter, IterFlags flags);
 	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
 
 	void (*set_selected)(ViewIface *obj, ViewIter *iter, gboolean selected);
@@ -56,6 +68,8 @@ struct _ViewIfaceClass {
 	void (*set_frozen)(ViewIface *obj, gboolean frozen);
 	void (*select_only)(ViewIface *obj, ViewIter *iter);
 	void (*wink_item)(ViewIface *obj, ViewIter *iter);
+	void (*autosize)(ViewIface *obj);
+	gboolean (*cursor_visible)(ViewIface *obj);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -91,7 +105,7 @@ int view_count_items(ViewIface *obj);
 int view_count_selected(ViewIface *obj);
 void view_show_cursor(ViewIface *obj);
 
-void view_get_iter(ViewIface *obj, ViewIter *iter, int flags);
+void view_get_iter(ViewIface *obj, ViewIter *iter, IterFlags flags);
 void view_get_cursor(ViewIface *obj, ViewIter *iter);
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
 
@@ -105,5 +119,7 @@ void view_select_if(ViewIface *obj,
 		    gpointer data);
 
 void view_wink_item(ViewIface *obj, ViewIter *iter);
+void view_autosize(ViewIface *obj);
+gboolean view_cursor_visible(ViewIface *obj);
 
 #endif /* __VIEW_IFACE_H__ */
