@@ -4,11 +4,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.2\n"
+"Project-Id-Version: ROX-Filer 1.1.3\n"
 "POT-Creation-Date: 2001-05-07 12:01+0100\n"
-"PO-Revision-Date: 2001-04-02 16:29+0200\n"
+"PO-Revision-Date: 2001-05-07 18:17+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
-"Language-Team: ROX Mailing List <rox@ecs.soton.ac.uk>\n"
+"Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
@@ -373,12 +373,11 @@ msgstr "?Démonter %s ?\n"
 
 #: action.c:1596
 msgid "!ERROR: Mount failed\n"
-msgstr "!ERREUR: le montage a échoué\n"
+msgstr "!ERREUR : le montage a échoué\n"
 
 #: action.c:1597
-#, fuzzy
 msgid "!ERROR: Unmount failed\n"
-msgstr "!ERREUR: le montage a échoué\n"
+msgstr "!ERREUR : le démontage a échoué\n"
 
 #: action.c:1635
 #, c-format
@@ -527,7 +526,7 @@ msgstr "La suppression des objets "
 
 #: action.c:2162
 msgid " and "
-msgstr ""
+msgstr " et "
 
 #: action.c:2171
 msgid " will affect some items on the pinboard or panel - really delete it?"
@@ -952,9 +951,8 @@ msgid "Name:"
 msgstr "Nom :"
 
 #: infobox.c:195
-#, fuzzy
 msgid "Error:"
-msgstr "Erreur"
+msgstr "Erreur :"
 
 #: infobox.c:205
 msgid "Owner, Group:"
@@ -1025,14 +1023,20 @@ msgid ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
+"Copyright (C) 2001 Thomas Leonard.\n"
+"ROX-Filer ne fournit ABSOLUMENT AUCUNE GARANTIE,\n"
+"jusqu'au niveau permis par la loi.\n"
+"Vous pouvez redistribuer des copies de ROX-Filer\n"
+"sous les termes de la GNU General Public License.\n"
+"Pour plus d'information à ce sujet, voir le fichier COPYING.\n"
 
 #: main.c:96
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
-msgstr ""
+msgstr "Essayer `ROX-Filer/AppRun --help' pour plus d'information.\n"
 
 #: main.c:99
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
-msgstr ""
+msgstr "Essayer `ROX-Filer/AppRun -h' pour plus d'information.\n"
 
 #: main.c:101
 msgid ""
@@ -1040,6 +1044,9 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
+"NOTE : votre système ne supporte pas les options longues - \n"
+"vous devez utiliser les versions courtes à la place.\n"
+"\n"
 
 #: main.c:105
 msgid ""
@@ -1067,6 +1074,29 @@ msgid ""
 "\n"
 "Report bugs to <tal197@users.sourceforge.net>.\n"
 msgstr ""
+"Usage : ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Ouvre chaque répertoire ou fichier listé, ou le répertoire de travail\n"
+"courant si aucun argument n'est donné.\n"
+"\n"
+"  -b, --bottom=PANNEAU\touvre PANNEAU en bas comme panneau\n"
+"  -d, --dir=RÉPERTOIRE\touvre RÉP comme répertoire (pas application)\n"
+"  -h, --help\t\taffiche l'aide et quitte\n"
+"  -l, --left=PANNEAU\touvre PANNEAU à gauche comme panneau\n"
+"  -m, --mime-type=FICH\taffiche le type MIME de FICHIER et quitte\n"
+"  -n, --new\t\tlance un nouveau filer, même s'il y en a déjà un\n"
+"  -o, --override\toutrepasse le contrôle des panneaux par le WM\n"
+"  -p, --pinboard=PUN\tutilise le punaiseur PUN comme punaiseur\n"
+"  -r, --right=PANNEAU\touvre PANNEAU à droite comme panneau\n"
+"  -s, --show=FICHIER\touvre un répertoire montrant FICHIER\n"
+"  -t, --top=PANNEAU\touvre PANNEAU en haut comme panneau\n"
+"  -u, --user\t\tmontre le nom de l'utilisateur dans chaque fenêtre\n"
+"  -v, --version\t\taffiche les info concernant cette version et quitte\n"
+"  -x, --examine=FICH\tFICHIER a changé - le ré-examiner\n"
+"\n"
+"La dernière version peut être trouvée sur :\n"
+"\thttp://rox.sourceforge.net\n"
+"\n"
+"Rapporter les bugs à <tal197@users.sourceforge.net>.\n"
 
 #: main.c:368
 #, c-format
@@ -1090,22 +1120,20 @@ msgid "Display"
 msgstr "Affichage"
 
 #: menu.c:156 tips:52
-#, fuzzy
 msgid "Huge Icons"
-msgstr "Grandes Icônes"
+msgstr "Énormes icônes"
 
 #: menu.c:157 tips:53
 msgid "Large Icons"
-msgstr "Grandes Icônes"
+msgstr "Grandes icônes"
 
 #: menu.c:158 tips:54
 msgid "Small Icons"
-msgstr "Petites Icônes"
+msgstr "Petites icônes"
 
 #: menu.c:159
-#, fuzzy
 msgid "Huge, With..."
-msgstr "Grand, avec..."
+msgstr "Énorme, avec..."
 
 #: menu.c:160 menu.c:166 menu.c:172 tips:57
 msgid "Summary"
@@ -1281,7 +1309,7 @@ msgstr "Voir l'aide de ROX-Filer"
 
 #: menu.c:317
 msgid "Relative link"
-msgstr ""
+msgstr "Lien relatif"
 
 #: menu.c:321
 msgid ""
@@ -1290,6 +1318,10 @@ msgid ""
 "If off, the path from the root directory is stored - use this if the symlink "
 "may move but the target will stay put."
 msgstr ""
+"Si activé, le chemin du lien symbolique sera stocké sur le fichier cible. "
+"Utiliser ceci si le lien et la cible peuvent être déplacés ensemble.\n"
+"Si désactivé, le chemin à partir de la racine sera stocké - utiliser ceci "
+"si le lien peut être déplacé sans que la cible bouge."
 
 #: menu.c:484
 msgid "Next Click"
@@ -1391,9 +1423,8 @@ msgid "Help about ... ?"
 msgstr "Aide sur ... ?"
 
 #: menu.c:1048
-#, fuzzy
 msgid "Look inside ... ?"
-msgstr "Chercher dans ... ?"
+msgstr "Regarder dans ... ?"
 
 #: menu.c:1060
 msgid "You must select a single file to open as a Virtual File System"
@@ -1873,12 +1904,12 @@ msgstr "Fixer l'action d'exécution"
 #: type.c:547
 #, c-format
 msgid "Set default for all `%s/<anything>'"
-msgstr ""
+msgstr "Mettre la valeur par défaut pour tout `%s/<quelconque>'"
 
 #: type.c:553
 #, c-format
 msgid "Only for the type `%s/%s'"
-msgstr ""
+msgstr "Seulement pour le type `%s/%s'"
 
 #: type.c:574
 msgid ""
@@ -1980,7 +2011,7 @@ msgstr "Français"
 
 #: tips:7
 msgid "Hungarian"
-msgstr ""
+msgstr "Hongrois"
 
 #: tips:8
 msgid "Italian"
@@ -1991,9 +2022,8 @@ msgid "Polish"
 msgstr "Polonais"
 
 #: tips:10
-#, fuzzy
 msgid "Russian"
-msgstr "Relire"
+msgstr "Russe"
 
 #: tips:11
 msgid "Pinboard options"
@@ -2098,12 +2128,11 @@ msgid "Ignore case when sorting"
 msgstr "Ignorer la casse lors d'un tri"
 
 #: tips:43
-#, fuzzy
 msgid ""
 "If off: Ben, animal, zoo.\n"
 "If on: animal, Ben, zoo."
 msgstr ""
-"Si désactivé : animal, zoo, Ben.\n"
+"Si désactivé : Ben, animal, zoo.\n"
 "Si activé : animal, Ben, zoo."
 
 #: tips:44
@@ -2151,9 +2180,8 @@ msgid "No details"
 msgstr "Pas de détails"
 
 #: tips:62
-#, fuzzy
 msgid "Sort by"
-msgstr "Trier par Nom"
+msgstr "Trier par"
 
 #: tips:65
 msgid "Date"
@@ -2181,12 +2209,14 @@ msgstr "Options des fenêtres du filer"
 
 #: tips:74
 msgid "Automatic resize"
-msgstr ""
+msgstr "Changement de taille automatique"
 
 #: tips:75
 msgid ""
 "Automatically resize the window when changing directory, if it's too small."
 msgstr ""
+"La fenêtre est automatiquement agrandie lors d'un changement de répertoire, "
+"si elle était trop petite."
 
 #: tips:76
 msgid "Unique windows"
@@ -2294,7 +2324,6 @@ msgid "Menu options"
 msgstr "Options de menu"
 
 #: tips:94
-#, fuzzy
 msgid ""
 "To set the keyboard short-cuts, simply open the\n"
 "menu over a filer window, move the pointer over\n"

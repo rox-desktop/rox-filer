@@ -2,16 +2,11 @@
 # Copyright (C) 2001 Free Software Foundation, Inc.
 # Andras Mohari <mayday@freemail.hu>, 2001.
 #
-# Ezúton kérlek, ha helyesírási hibát találtál a fordításban, ha valamire
-# jobb fordítást tudsz, vagy bármilyen építõ jellegû megjegyzésed illetve
-# javaslatod van a fordítással kapcsolatban, akkor azt írd meg nekem a
-# fenti címre. Javított hu.po fájlt is küldhetsz. (Sõt! ;-))
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.2\n"
-"POT-Creation-Date: 2001-05-07 12:01+0100\n"
-"PO-Revision-Date: 2001-04-08 19:35+0200\n"
+"Project-Id-Version: ROX-Filer 1.1.3\n"
+"POT-Creation-Date: 2001-05-07 08:00+0200\n"
+"PO-Revision-Date: 2001-05-08 07:02+0200\n"
 "Last-Translator: Andras Mohari <mayday@freemail.hu>\n"
 "Language-Team: Hungarian <out of team>\n"
 "MIME-Version: 1.0\n"
@@ -20,12 +15,11 @@ msgstr ""
 
 #: action.c:209
 msgid "Find expression reference"
-msgstr "Keresõ-kifejezések"
+msgstr "Keresési kifejezések"
 
-# Ide elkelne valami frappáns fordítás.
 #: action.c:214
 msgid "Quick Start"
-msgstr "Egyszerû keresés"
+msgstr "Gyors kezdés"
 
 #: action.c:216
 msgid ""
@@ -78,10 +72,9 @@ msgstr ""
 "(engedélyek)\n"
 "IsEmpty, IsMine\n"
 "\n"
-"Szimpla idézõjelek közé zárt metakarakterek a shellben megismert módon "
-"mûködnek.\n"
-"Ha a kifejezés perjelet tartalmaz, akkor teljes elérési útra illeszkedik, \n"
-"ellenkezõ esetben csak a fájl útvonal nélküli nevére."
+"A szimpla idézõjelek között a shellbõl ismert helyettesítõ karakterekkel\n"
+"megadott minta is lehet. Ha a mintában van perjel, akkor teljes elérési\n"
+"útra illeszkedik, ellenkezõ esetben csak a fájl útvonal nélküli nevére."
 
 #: action.c:253
 msgid "Comparisons"
@@ -110,12 +103,12 @@ msgid ""
 "prune (false, and prevents searching the contents of a directory)."
 msgstr ""
 "system(parancs) (értéke igaz, ha a 'parancs' visszatérési értéke nulla;\n"
-"a parancsban % használható az aktuális fájl neve helyett)\n"
+"a parancsban % használható az éppen vizsgált fájl neve helyett)\n"
 "prune (értéke hamis, megakadályozza egy könyvtár bejárását)."
 
 #: action.c:279
 msgid "See the ROX-Filer manual for full details."
-msgstr "Lásd a ROX-Filer felhasználói kézikönyvét további részletekért."
+msgstr "Lásd a ROX-Filer kézikönyvét teljes leírásért."
 
 #: action.c:281 action.c:347 toolbar.c:96
 msgid "Close"
@@ -252,7 +245,7 @@ msgstr "?Mehet '%s'?"
 
 #: action.c:1054
 msgid "!Invalid find condition - change it and try again\n"
-msgstr "!Érvénytelen keresõ-kifejezés - javítsd ki és próbáld újra\n"
+msgstr "!Érvénytelen keresési kifejezés - javítsd ki és próbáld újra\n"
 
 #: action.c:1065
 #, c-format
@@ -343,17 +336,16 @@ msgstr "!HIBA: Nem lehet önmagára másolni\n"
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!HIBA: Nem lehet önmagába mozgatni/átnevezni\n"
 
-# Ez így túl hosszú.
 #: action.c:1534
 #, c-format
 msgid "'Linking %s as %s\n"
-msgstr "'Link készítése %s fájlra/könyvtárra %s néven\n"
+msgstr "'%s linkelése %s néven\n"
 
-# Ez is túl hosszú.
+# Ez túl hosszú.
 #: action.c:1541
 #, c-format
 msgid "?Link %s as %s?"
-msgstr "?Linket készítesz a(z) %s fájlra/könyvtárra %s néven?"
+msgstr "?Linkeled a(z) %s fájlt/könyvtárat %s néven?"
 
 #: action.c:1568
 #, c-format
@@ -512,7 +504,7 @@ msgstr "Mozgatás"
 
 #: action.c:2090 tips:38
 msgid "Link"
-msgstr "Link készítés"
+msgstr "Linkelés"
 
 #: action.c:2137
 msgid "Deleting items such as "
@@ -533,12 +525,12 @@ msgstr " és "
 #: action.c:2171
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
-") a törlése hatással van a munkaasztal vagy panel ikonjaira. Tényleg törlöd?"
+") a törlése hatással van a munkaasztal vagy panel elemeire. Tényleg törlöd?"
 
 #: action.c:2178
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
-") a törlése hatással van a munkaasztal vagy panel ikonjaira. Tényleg törlöd "
+") a törlése hatással van a munkaasztal vagy panel elemeire. Tényleg törlöd "
 "õket?"
 
 #: action.c:2183 gtksavebox.c:226 gtksavebox.c:498 icon.c:112 menu.c:1290
@@ -605,7 +597,7 @@ msgstr "Ismeretlen cél"
 # A "remote app" mi legyen? És a "won't send"-et hogyan lehetne fordítani?
 #: dnd.c:822
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr "A program nem tud vagy nem akar adatot küldeni"
+msgstr "A távoli alkalmazás nem tud vagy nem akar adatot küldeni"
 
 #: dnd.c:835
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
@@ -885,7 +877,7 @@ msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
 msgstr ""
-"Dobd az ikont egy fájlkezelõ ablakba\n"
+"Dobd az ikont egy könyvtárablakba\n"
 "(vagy írj be egy teljes nevet)"
 
 #: gui_support.c:193
@@ -954,9 +946,8 @@ msgid "Name:"
 msgstr "Név:"
 
 #: infobox.c:195
-#, fuzzy
 msgid "Error:"
-msgstr "Hiba"
+msgstr "Hiba:"
 
 #: infobox.c:205
 msgid "Owner, Group:"
@@ -1020,6 +1011,7 @@ msgstr "ROX alkalmazás"
 msgid "Mount point"
 msgstr "Csatolási pont"
 
+# Jó ez így?
 #: main.c:87
 msgid ""
 "Copyright (C) 2001 Thomas Leonard.\n"
@@ -1029,14 +1021,20 @@ msgid ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
+"Copyright (C) 2001 Thomas Leonard.\n"
+"A ROX-Filerre nincs SEMMIFÉLE GARANCIA\n"
+"a törvény által megengedett mértékig.\n"
+"A ROX-Filer a GNU General Public License\n"
+"hatálya alatt terjeszthetõ.\n"
+"További információk a COPYING nevû fájlban találhatók.\n"
 
 #: main.c:96
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
-msgstr ""
+msgstr "Futtasd a \"ROX-Filer/AppRun --help\" parancsot segítségért.\n"
 
 #: main.c:99
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
-msgstr ""
+msgstr "Futtasd a \"ROX-Filer/AppRun -h\" parancsot segítségért.\n"
 
 #: main.c:101
 msgid ""
@@ -1044,6 +1042,8 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
+"MEGJ.: Ezen a rendszeren nem használhatók a hosszú opciók - \n"
+"használd helyettük a rövid változatukat.\n"
 
 #: main.c:105
 msgid ""
@@ -1071,6 +1071,29 @@ msgid ""
 "\n"
 "Report bugs to <tal197@users.sourceforge.net>.\n"
 msgstr ""
+"Használat: ROX-Filer/AppRun [OPCIÓK]... [FÁJL]...\n"
+"Megnyitja a felsorolt könyvtárakat vagy fájlokat, argumentumok\n"
+"hiányában pedig az aktuális könyvtárat.\n"
+"\n"
+"  -b, --bottom=PANEL\tmegjeleníti a PANEL-t a képernyõ alján\n"
+"  -d, --dir=KÖNYVTÁR\tmegnyitja a KÖNYVTÁR-at\n"
+"  -h, --help\t\tkiírja ezt a szöveget, és kilép\n"
+"  -l, --left=PANEL\tmegjeleníti a PANEL-t a képernyõ bal oldalán\n"
+"  -m, --mime-type=FÁJL\tkiírja a FÁJL MIME típusát, és kilép\n"
+"  -n, --new\t\túj fájlkezelõt indít akkor is, ha már fut\n"
+"  -o, --override\tfelülbírálja az ablakkezelõk panel- és ikon-kezelését\n"
+"  -p, --pinboard=PIN\tengedélyezi a PIN nevû munkaasztal használatát\n"
+"  -r, --right=PANEL\tmegjeleníti a PANEL-t a képernyõ jobb oldalán\n"
+"  -s, --show=FÁJL\tmegmutatja a FÁJL-t a könyvtárában\n"
+"  -t, --top=PANEL\tmegjeleníti a PANEL-t a képernyõ tetején\n"
+"  -u, --user\t\tminden ablakban kijelzi a felhasználónevet\n"
+"  -v, --version\t\tkiírja a program verzióját, és kilép\n"
+"  -x, --examine=FÁJL\ta FÁJL megváltozott - frissíti a fájlinformációt\n"
+"\n"
+"A legfrissebb verzió innen tölthetõ le:\n"
+"\thttp://rox.sourceforge.net\n"
+"\n"
+"A hibákat a <tal197@users.sourceforge.net> címen lehet jelenteni.\n"
 
 #: main.c:368
 #, c-format
@@ -1095,9 +1118,8 @@ msgid "Display"
 msgstr "Nézet"
 
 #: menu.c:156 tips:52
-#, fuzzy
 msgid "Huge Icons"
-msgstr "Nagy ikonok"
+msgstr "Óriás ikonok"
 
 #: menu.c:157 tips:53
 msgid "Large Icons"
@@ -1105,12 +1127,11 @@ msgstr "Nagy ikonok"
 
 #: menu.c:158 tips:54
 msgid "Small Icons"
-msgstr "Kicsi ikonok"
+msgstr "Kis ikonok"
 
 #: menu.c:159
-#, fuzzy
 msgid "Huge, With..."
-msgstr "Nagy ikonok és..."
+msgstr "Óriás ikonok és..."
 
 #: menu.c:160 menu.c:166 menu.c:172 tips:57
 msgid "Summary"
@@ -1134,7 +1155,7 @@ msgstr "Nagy ikonok és..."
 
 #: menu.c:171
 msgid "Small, With..."
-msgstr "Kicsi ikonok és..."
+msgstr "Kis ikonok és..."
 
 #: menu.c:178
 msgid "Sort by Name"
@@ -1174,13 +1195,12 @@ msgstr "Átnevezés..."
 
 #: menu.c:189
 msgid "Link..."
-msgstr "Link készítése..."
+msgstr "Linkelés..."
 
 #: menu.c:190 menu.c:541
 msgid "Shift Open"
 msgstr "Megnyitás (Shift)"
 
-# Segítség, Súgó vagy más?
 #: menu.c:191 toolbar.c:120
 msgid "Help"
 msgstr "Segítség"
@@ -1287,7 +1307,7 @@ msgstr "ROX-Filer dokumentáció"
 
 #: menu.c:317
 msgid "Relative link"
-msgstr ""
+msgstr "Relatív link"
 
 #: menu.c:321
 msgid ""
@@ -1296,6 +1316,11 @@ msgid ""
 "If off, the path from the root directory is stored - use this if the symlink "
 "may move but the target will stay put."
 msgstr ""
+"Bekapcsolt állapotban a szimlinkhez viszonyított útvonalat tárolja. "
+"Akkor hasznos, ha a szimlink és a cél egymáshoz viszonyított helyzete nem "
+"változik.\n"
+"Kikapcsolt állapotban a cél teljes útvonalát tárolja. "
+"Akkor hasznos, ha a szimlink bárhol lehet, de a cél a helyén marad."
 
 #: menu.c:484
 msgid "Next Click"
@@ -1395,14 +1420,16 @@ msgstr "Mirõl kérsz információt?"
 msgid "Help about ... ?"
 msgstr "Mihez kérsz segítséget?"
 
+# VFS megnyitásakor kérdezi, ha nincs kijelölve semmi.
 #: menu.c:1048
-#, fuzzy
 msgid "Look inside ... ?"
-msgstr "Hol akarsz keresni?"
+msgstr "Mit nyitsz meg VFS-ként?"
 
 #: menu.c:1060
 msgid "You must select a single file to open as a Virtual File System"
-msgstr "Jelöld ki a fájlt, amit virtuális fájlrendszerként szeretnél megnyitni"
+msgstr ""
+"Jelöld ki azt az egy fájlt, amit virtuális fájlrendszerként szeretnél "
+"megnyitni"
 
 #: menu.c:1127
 msgid "New Directory"
@@ -1466,15 +1493,15 @@ msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
 msgstr ""
-"Írd be a megjelenítendõ fájl nevét (Tab-bal lehet kiegészíteni a leghosszabb "
-"illeszkedõ névre). A beviteli sort az Escape billentyûvel lehet bezárni."
+"Írd be a megjelenítendõ fájl nevét (Tab-bal egészítheted ki a leghosszabb "
+"illeszkedõ névre). A beviteli sort az Escape billentyûvel tudod bezárni."
 
 #: minibuffer.c:237
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
-"Írd be a végrehajtandó shell parancsot. Egy fájlra kattintva a neve "
-"hozzáadodik a parancssorhoz."
+"Írd be a végrehajtandó shell parancsot. Egy fájlra történõ kattintás "
+"beszúrja a fájl nevét a parancssorba."
 
 #: minibuffer.c:717
 msgid "Failed to create child process"
@@ -1520,20 +1547,18 @@ msgstr "ROX-Filer beállításai..."
 msgid "Open Home Directory"
 msgstr "Home könyvtár megnyitása"
 
+# Nem valami jó...
 #: panel.c:175 pinboard.c:199
 msgid "Show Location"
-msgstr "Könyvtár megnyitása"
+msgstr "Hely megmutatása"
 
-# Ezzel a Helppel csak baj van... ;) 
 #: panel.c:176 pinboard.c:200
 msgid "Show Help"
 msgstr "Segítség"
 
-# Panelen és munkaasztalon csak ikonok lehetnek így
-# item(s) -> ikon(ok) rendben van.
 #: panel.c:177 pinboard.c:201
 msgid "Remove Item(s)"
-msgstr "Ikon(ok) törlése"
+msgstr "Elem(ek) törlése"
 
 #: panel.c:387
 msgid "Close panel?"
@@ -1547,8 +1572,6 @@ msgstr ""
 "Az ablakkezelõn keresztül próbáltad bezárni a panelt. Ez általában nem "
 "szándékosan történik... Tényleg bezárod?"
 
-# A panel bezárásakor kérdezi. (Lásd "Close panel?".) De akkor miért
-# nem "Close" van itt?
 #: panel.c:391
 msgid "Remove"
 msgstr "Eltávolít"
@@ -1559,23 +1582,23 @@ msgstr "Hiányzó < vagy > a panel konfigurációs fájlban"
 
 #: panel.c:971 pinboard.c:1751
 msgid "First, select a single item to edit"
-msgstr "Jelölj ki egyetlen szerkesztendõ elemet"
+msgstr "Elõbb jelölj ki egyetlen szerkesztendõ elemet."
 
 #: panel.c:986 pinboard.c:1728
 msgid ""
 "Select a single item, then use this to find out where it is in the "
 "filesystem."
 msgstr ""
-"Jelölj ki egyetlen elemet, majd használd ezt a parancsot a könyvtárának "
-"megnyitásához."
+"Jelölj ki egyetlen elemet, majd használd ezt a parancsot a fájlrendszeren "
+"elfoglalt helyének megmutatásához."
 
 #: panel.c:1003
 msgid "You must select a single item to get help on"
-msgstr "Jelölj ki egyetlen elemet, amihez segítséget kérsz"
+msgstr "Jelölj ki egyetlen elemet, amihez segítséget kérsz."
 
 #: panel.c:1019
 msgid "You must first select some icons to remove"
-msgstr "Elõbb jelöld ki a törlendõ ikonokat"
+msgstr "Elõbb jelöld ki a törlendõ ikonokat."
 
 #: panel.c:1271
 msgid "Error saving panel"
@@ -1623,11 +1646,11 @@ msgstr "Érvénytelen .gmo nyelvi fájl (túl rövid)"
 
 #: rox_gettext.c:101
 msgid "Invalid .gmo translation file (GNU magic number not found)\n"
-msgstr "Érvénytelen .gmo nyelvi fájl (nincs meg az azonosító)\n"
+msgstr "Érvénytelen .gmo nyelvi fájl (nincs meg a GNU azonosító)\n"
 
 #: run.c:93 run.c:135
 msgid "Program not found - deleted?"
-msgstr "A program nem található."
+msgstr "A program nem található - törölve lett?."
 
 #: run.c:244
 msgid "Failed to fork() child"
@@ -1732,8 +1755,6 @@ msgstr ""
 msgid "Application"
 msgstr "Alkalmazás"
 
-# Mi legyen: alkalmazási könyvtár, alkalmazói könyvtár, alkalmazás-könyvtár?
-# (Az utóbbit így kell írni?)
 #: run.c:593
 msgid ""
 "This is an application directory - you can run it as a program, or open it "
@@ -1744,13 +1765,14 @@ msgstr ""
 "megnyitáshoz tartsd nyomva a Shiftet). Az alkalmazások általában itt "
 "tárolják a dokumentációjukat is, de ezé az alkalmazásé nincs itt."
 
+# Lehetne jobb is.
 #: run.c:599
 msgid ""
 "This is a directory. It contains an index to other items - open it to see "
 "the list."
 msgstr ""
-"Ez egy könyvtár. A könyvtárak más elemek tartalomjegyzékét tárolják. A "
-"tartalomjegyzék a könyvtár megnyitásával tekinthetõ meg."
+"Ez egy könyvtár. A könyvtár más elemek tartalomjegyzékét tárolja - "
+"nyisd meg, ha meg akarod tekinteni."
 
 #: support.c:234
 msgid "byte"
@@ -1766,7 +1788,7 @@ msgstr "A másolás nem sikerült"
 
 #: toolbar.c:96
 msgid "Close filer window"
-msgstr "Bezárja a fájlkezelõ ablakot"
+msgstr "Bezárja a könyvtárablakot"
 
 #: toolbar.c:100
 msgid "Up"
@@ -1987,7 +2009,6 @@ msgstr "Holland"
 msgid "French"
 msgstr "Francia"
 
-# Added manually.
 #: tips:7
 msgid "Hungarian"
 msgstr "Magyar"
@@ -2002,7 +2023,7 @@ msgstr "Lengyel"
 
 #: tips:10
 msgid "Russian"
-msgstr ""
+msgstr "Orosz"
 
 #: tips:11
 msgid "Pinboard options"
@@ -2026,11 +2047,11 @@ msgstr "Az ikonok szövege körül vékony körvonal látszik."
 
 #: tips:16
 msgid "Rectangular background slab"
-msgstr "Téglalap háttér"
+msgstr "Tömör háttér"
 
 #: tips:17 tips:18
 msgid "The text is drawn on a solid rectangle."
-msgstr "Az ikonok szövege egy színes téglalapba kerül."
+msgstr "Az ikonok szövege egy tömör téglalapba kerül."
 
 #: tips:19
 msgid "Text colours:"
@@ -2130,11 +2151,11 @@ msgstr "A nagy ikonok alatti szöveg maximális szélessége."
 
 #: tips:48
 msgid "Max Small Icons width"
-msgstr "Kicsi ikonok max. szélessége"
+msgstr "Kis ikonok max. szélessége"
 
 #: tips:49
 msgid "Maximum width for the text beside a Small Icon."
-msgstr "A kicsi ikonok utáni szöveg maximális szélessége."
+msgstr "A kis ikonok utáni szöveg maximális szélessége."
 
 #: tips:50
 msgid "Default settings for new windows"
@@ -2178,16 +2199,17 @@ msgstr "Eszköztár"
 
 #: tips:73
 msgid "Filer window options"
-msgstr "Fájlkezelõ ablak beállításai"
+msgstr "Könyvtárablak beállításai"
 
 #: tips:74
 msgid "Automatic resize"
-msgstr ""
+msgstr "Automatikus átméretezés"
 
 #: tips:75
 msgid ""
 "Automatically resize the window when changing directory, if it's too small."
 msgstr ""
+"Könyvtárak váltásakor automatikusan átméretezi az ablakot, ha az túl kicsi."
 
 #: tips:76
 msgid "Unique windows"
@@ -2357,6 +2379,3 @@ msgstr ""
 "Egyetlen kattintás egy elemre megnyitja azt. Ilyenkor a kijelöléshez nyomva "
 "kell tartani a Control billentyût. Ha ez a beállítás nincs engedélyezve, "
 "akkor a megnyitáshoz duplán kell kattintani."
-
-#~ msgid "Force - make directories u+rx before entering them"
-#~ msgstr "Kényszerít - u+rx engedélyt ad a könyvtáraknak mielõtt beléjük lép"
