@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.7-preview\n"
-"POT-Creation-Date: 2003-01-16 00:50+0100\n"
-"PO-Revision-Date: 2003-01-16 00:53+0100\n"
+"POT-Creation-Date: 2003-01-19 00:36+0100\n"
+"PO-Revision-Date: 2003-01-19 00:38+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -213,15 +213,15 @@ msgstr ""
 "'\n"
 "Terminé\n"
 
-#: action.c:480 support.c:398
+#: action.c:480 support.c:397
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: action.c:633 main.c:579 main.c:587
+#: action.c:633 main.c:579 main.c:587 main.c:595
 msgid "Yes"
 msgstr "Oui"
 
-#: action.c:636 main.c:581
+#: action.c:636 main.c:581 main.c:597
 msgid "No"
 msgstr "Non"
 
@@ -626,7 +626,7 @@ msgstr "Ajustement vertical"
 msgid "The GtkAdjustment for the vertical position."
 msgstr "Le GtkAdjustment pour la position verticale."
 
-#: dir.c:131 dir.c:659
+#: dir.c:182 dir.c:649
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -635,12 +635,12 @@ msgstr ""
 "Erreur lors de la lecture de '%s' :\n"
 "%s"
 
-#: dir.c:334
+#: dir.c:865
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "Impossible de faire un stat du répertoire : %s"
 
-#: dir.c:342
+#: dir.c:873
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Impossible d'ouvrir le répertoire : %s"
@@ -1212,111 +1212,107 @@ msgstr "Le texte affiché au-dessous de l'icône est :"
 msgid "The keyboard shortcut is:"
 msgstr "Le raccourci clavier est :"
 
-#: infobox.c:90
+#: infobox.c:91
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr "Êtes-vous sûr de vouloir ouvrir %d fenêtres ?"
 
-#: infobox.c:91
+#: infobox.c:92
 msgid "Show Info"
 msgstr "Montrer"
 
-#: infobox.c:113 menu.c:757
+#: infobox.c:114 menu.c:757
 msgid "(bad utf-8)"
 msgstr "(utf-8 incorrect)"
 
-#: infobox.c:222
+#: infobox.c:265
 msgid "Show _Help Files"
 msgstr "Voir les fichiers d'_aide"
 
-#: infobox.c:331
-msgid "Name:"
-msgstr "Nom :"
-
-#: infobox.c:335 tips:245
+#: infobox.c:376 tips:245
 msgid "Error:"
 msgstr "Erreur :"
 
-#: infobox.c:342
+#: infobox.c:383
 msgid "Real directory:"
 msgstr "Vrai répertoire :"
 
-#: infobox.c:346
+#: infobox.c:387
 msgid "Owner, Group:"
 msgstr "Propriétaire, groupe :"
 
-#: infobox.c:352
+#: infobox.c:393
 msgid "Size:"
 msgstr "Taille :"
 
-#: infobox.c:356 support.c:275 support.c:352
+#: infobox.c:397 support.c:274 support.c:351
 msgid "bytes"
 msgstr "octets"
 
-#: infobox.c:359
+#: infobox.c:400
 msgid "Change time:"
 msgstr "Date de changement :"
 
-#: infobox.c:361
+#: infobox.c:402
 msgid "Modify time:"
 msgstr "Date de modification :"
 
-#: infobox.c:363
+#: infobox.c:404
 msgid "Access time:"
 msgstr "Date d'accès :"
 
-#: infobox.c:365
+#: infobox.c:406
 msgid "Permissions:"
 msgstr "Permissions :"
 
-#: infobox.c:367
+#: infobox.c:408
 msgid "Type:"
 msgstr "Type :"
 
-#: infobox.c:370
+#: infobox.c:411
 msgid "Run action:"
 msgstr "Exécuter l'action :"
 
-#: infobox.c:461
+#: infobox.c:502
 msgid "file(1) says..."
 msgstr "file(1) dit..."
 
-#: infobox.c:462
+#: infobox.c:503
 msgid "<nothing yet>"
 msgstr "<encore rien>"
 
-#: infobox.c:534
+#: infobox.c:575
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) dit... %s"
 
-#: infobox.c:578
+#: infobox.c:619
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Lien symbolique vers %s"
 
-#: infobox.c:584
+#: infobox.c:625
 msgid "Symbolic link"
 msgstr "Lien symbolique"
 
-#: infobox.c:588
+#: infobox.c:629
 msgid "ROX application"
 msgstr "Application ROX"
 
-#: infobox.c:596
+#: infobox.c:637
 msgid "mounted"
 msgstr "monté"
 
-#: infobox.c:596
+#: infobox.c:637
 msgid "unmounted"
 msgstr "démonté"
 
-#: infobox.c:600
+#: infobox.c:641
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Point de montage pour %s (%s)"
 
-#: infobox.c:603
+#: infobox.c:644
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Point de montage (%s)"
@@ -1443,6 +1439,10 @@ msgstr "Bibliothèque GNOME-VFS"
 #: main.c:589
 msgid "No (gnome-vfs-config not found)"
 msgstr "Non (gnome-vfs-config non trouvé)"
+
+#: main.c:593
+msgid "Dnotify support"
+msgstr "Support dnotify"
 
 #: menu.c:180 tips:48
 msgid "Display"
@@ -2278,7 +2278,7 @@ msgstr ""
 "C'est un répertoire. Il contient un index d'autres objets - ouvrez-le pour "
 "en voir la liste."
 
-#: support.c:273 support.c:354
+#: support.c:272 support.c:353
 msgid "byte"
 msgstr "octet"
 
@@ -3734,6 +3734,9 @@ msgstr ""
 "provoque bien l'apparition d'un signe '+' sur le pointeur mais que le "
 "« déposer » ne fonctionne pas."
 
+#~ msgid "Name:"
+#~ msgstr "Nom :"
+
 #~ msgid "Summary"
 #~ msgstr "Résumé"
 
@@ -4287,9 +4290,6 @@ msgstr ""
 
 #~ msgid "ROX-Filer message log"
 #~ msgstr "Log des messages de ROX-Filer"
-
-#~ msgid "ImLib support"
-#~ msgstr "Support ImLib"
 
 #~ msgid "No (the imlib-config command didn't work)"
 #~ msgstr "Non (la commande imlib-config n'a pas marché)"
