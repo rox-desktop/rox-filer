@@ -25,9 +25,6 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
-#ifdef HAVE_LOCALE_H
-#  include <locale.h>
-#endif
 
 #include "global.h"
 
@@ -53,9 +50,7 @@ void i18n_init(void)
 {
 	guchar		*trans;
 
-#ifdef HAVE_LOCALE_H
-	setlocale(LC_ALL, "");
-#endif
+	gtk_set_locale();
 	
 	trans = choices_find_path_load("Translation", PROJECT);
 
