@@ -16,8 +16,8 @@ Thank you.
 ])
 ])
 
-AC_ARG_WITH(gtk2,
-[  --with-gtk2		  Use Gtk+-2.0 API instead of Gtk+-1.2], gtk2=1, gtk2=0)
+#AC_ARG_WITH(gtk2,
+#[  --with-gtk2		  Use Gtk+-2.0 API instead of Gtk+-1.2], gtk2=1, gtk2=0)
 
 
 dnl rox_ARG_WITH(PACKAGE, HELP-STRING, ACTION-IF-TRUE [, ACTION-IF-FALSE])
@@ -87,12 +87,10 @@ if test -z "$GTK_CONFIG"; then
 fi
 
 dnl See if we've got Gtk+ 2.0 (or 1.3 developement version)
-dnl AC_MSG_CHECKING(for Gtk+-1.3.13 or later)
-dnl gtk2=0
-dnl if $PKG_CONFIG "--atleast-version=1.3.13" "gtk+-2.0"; then
-
-if test "$gtk2" = "1"; then
-  dnl AC_MSG_RESULT(yes)
+AC_MSG_CHECKING(for Gtk+-1.3.13 or later)
+gtk2=0
+if $PKG_CONFIG "--atleast-version=1.3.13" "gtk+-2.0"; then
+  AC_MSG_RESULT(yes)
   AC_MSG_WARN([Using EXPERIMENTAL Gtk+-2.0 API])
   AC_DEFINE(GTK2)
   gtk2=1
@@ -101,8 +99,7 @@ if test "$gtk2" = "1"; then
   GDK_PIXBUF_LIBS=`$PKG_CONFIG gdk-pixbuf-2.0 --libs`
   GDK_PIXBUF_CFLAGS=`$PKG_CONFIG gdk-pixbuf-2.0 --cflags`
 else
-  dnl AC_MSG_RESULT(no)
-
+  AC_MSG_RESULT(no)
   GTK_CFLAGS="$GTK_CONFIG --cflags"
   GTK_LIBS="$GTK_CONFIG --libs"
 
