@@ -57,6 +57,8 @@ GtkAccelGroup	*panel_keys;
 
 static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 
+static gint updating_menu = 0;		/* Non-zero => ignore activations */
+
 /* Options */
 static GtkWidget *xterm_here_entry;
 static char *xterm_here_value;
@@ -146,7 +148,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Sort by Date",	NULL,  	sort_date, 0, NULL},
 {"/Display/Sort by Size",	NULL,  	sort_size, 0, NULL},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	C_"H", 	hidden, 0, NULL},
+{"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	copy_item, 0, NULL},
@@ -188,7 +190,7 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Sort by Date",	NULL,   sort_date, 0, NULL},
 {"/Display/Sort by Size",	NULL,   sort_size, 0, NULL},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	NULL, 	hidden, 0, NULL},
+{"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
 {"/File/Help",		    	NULL,  	help, 0, NULL},
@@ -383,24 +385,27 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	GtkWidget	*file_label, *file_menu;
 	DirItem	*file_item;
 	int		pos[2];
+
+	updating_menu++;
 	
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
 
 	window_with_focus = filer_window;
 
-	if (filer_window->panel)
+	switch (filer_window->panel_type)
 	{
-		switch (filer_window->panel_side)
-		{
-			case TOP: 	pos[1] = -2; break;
-			case BOTTOM: 	pos[1] = -1; break;
-			case LEFT: 	pos[0] = -2; break;
-			case RIGHT: 	pos[0] = -1; break;
-		}
+		case PANEL_TOP:
+			pos[1] = -2;
+			break;
+		case PANEL_BOTTOM:
+			pos[1] = -1;
+			break;
+		default:
+			break;
 	}
 
-	if (filer_window->panel)
+	if (filer_window->panel_type)
 		collection_clear_selection(filer_window->collection); /* ??? */
 
 	if (filer_window->collection->number_selected == 0 && item >= 0)
@@ -411,15 +416,21 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	else
 		filer_window->temp_item_selected = FALSE;
 
-	if (filer_window->panel)
+	if (filer_window->panel_type)
 	{
 		file_label = panel_file_item;
 		file_menu = panel_file_menu;
+		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(panel_hidden_menu),
+				filer_window->show_hidden);
 	}
 	else
 	{
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
+		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
+				filer_window->show_hidden);
 	}
 
 	buffer = g_string_new(NULL);
@@ -447,13 +458,15 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	g_string_free(buffer, TRUE);
 
-	if (filer_window->panel)
+	if (filer_window->panel_type)
 		popup_menu = panel_menu;
 	else
 		popup_menu = (event->state & GDK_CONTROL_MASK)
 				? filer_file_menu
 				: filer_menu;
 
+	updating_menu--;
+	
 	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
@@ -543,6 +556,9 @@ static void sort_size(gpointer data, guint action, GtkWidget *widget)
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)
 {
+	if (updating_menu)
+		return;
+
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_set_hidden(window_with_focus, !window_with_focus->show_hidden);
@@ -1002,7 +1018,7 @@ static void app_show_help(char *path)
 			"Shift while you open it). Most applications provide "
 			"their own help here, but this one doesn't.");
 	else
-		filer_opendir(help_dir, FALSE, BOTTOM);
+		filer_opendir(help_dir, PANEL_NO);
 }
 
 static void help(gpointer data, guint action, GtkWidget *widget)
@@ -1140,7 +1156,7 @@ static void open_parent(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_opendir(make_path(window_with_focus->path, "/..")->str,
-			FALSE, BOTTOM);
+			PANEL_NO);
 }
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget)
@@ -1154,7 +1170,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_opendir(window_with_focus->path, FALSE, BOTTOM);
+	filer_opendir(window_with_focus->path, PANEL_NO);
 }
 
 static void close_window(gpointer data, guint action, GtkWidget *widget)
@@ -1175,14 +1191,14 @@ static void rox_help(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 	
-	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, FALSE, BOTTOM);
+	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, PANEL_NO);
 }
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 	
-	filer_opendir(window_with_focus->path, FALSE, BOTTOM);
+	filer_opendir(window_with_focus->path, PANEL_NO);
 }
 
 static void close_panel(gpointer data, guint action, GtkWidget *widget)

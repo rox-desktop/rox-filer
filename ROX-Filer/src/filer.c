@@ -980,11 +980,11 @@ static void follow_symlink(FilerWindow *filer_window, char *path,
 	else
 		new_dir = "/";
 
-	if (filer_window->panel || !same_window)
+	if (filer_window->panel_type || !same_window)
 	{
 		FilerWindow *new;
 		
-		new = filer_opendir(new_dir, FALSE, BOTTOM);
+		new = filer_opendir(new_dir, PANEL_NO);
 		set_autoselect(new, slash + 1);
 	}
 	else
@@ -998,9 +998,9 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
 	gboolean	same_window = (flags & OPEN_SAME_WINDOW) != 0
-					&& !filer_window->panel;
+					&& !filer_window->panel_type;
 	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0
-					&& !filer_window->panel;
+					&& !filer_window->panel_type;
 	GtkWidget	*widget;
 	char		*full_path;
 	DirItem		*item = (DirItem *)
@@ -1058,7 +1058,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				close_mini = FALSE;
 			}
 			else
-				filer_opendir(full_path, FALSE, BOTTOM);
+				filer_opendir(full_path, PANEL_NO);
 			break;
 		case TYPE_FILE:
 			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !shift)
@@ -1355,7 +1355,7 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 	shrink_width(filer_window);
 }
 
-FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
+FilerWindow *filer_opendir(char *path, PanelType panel_type)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
@@ -1386,8 +1386,7 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 	}
 
 	filer_window->show_hidden = FALSE;
-	filer_window->panel = panel;
-	filer_window->panel_side = panel_side;
+	filer_window->panel_type = panel_type;
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = sort_by_type;
 	filer_window->flags = (FilerFlags) 0;
@@ -1436,7 +1435,7 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_style_set(filer_window, LARGE_ICONS);
 	drag_set_dest(collection);
 
-	if (panel)
+	if (panel_type)
 	{
 		int		swidth, sheight, iwidth, iheight;
 		GtkWidget	*frame, *win = filer_window->window;
@@ -1453,25 +1452,14 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 		iwidth = filer_window->collection->item_width;
 		iheight = filer_window->collection->item_height;
 		
-		if (panel_side == TOP || panel_side == BOTTOM)
 		{
 			int	height = iheight + PANEL_BORDER;
-			int	y = panel_side == TOP 
+			int	y = panel_type == PANEL_TOP 
 					? -PANEL_BORDER
 					: sheight - height - PANEL_BORDER;
 
 			gtk_widget_set_usize(collection, swidth, height);
 			gtk_widget_set_uposition(win, 0, y);
-		}
-		else
-		{
-			int	width = iwidth + PANEL_BORDER;
-			int	x = panel_side == LEFT
-					? -PANEL_BORDER
-					: swidth - width - PANEL_BORDER;
-
-			gtk_widget_set_usize(collection, width, sheight);
-			gtk_widget_set_uposition(win, x, 0);
 		}
 
 		frame = gtk_frame_new(NULL);

@@ -476,6 +476,8 @@ void drag_data_get(GtkWidget          		*widget,
 
 	if (delete_once_sent)
 		g_free(to_send);
+
+	collection_clear_selection(filer_window->collection);
 }
 
 /*			DRAGGING TO US				*/
@@ -593,7 +595,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (gtk_drag_get_source_widget(context) == widget)
 		return FALSE;	/* Not within a single widget! */
 
-	if (filer_window->panel == FALSE)
+	if (filer_window->panel_type == PANEL_NO)
 	{
 		if (access(filer_window->path, W_OK))
 			return FALSE;	/* We can't write here */
@@ -649,7 +651,7 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	if (dest_path == NULL)
 	{
-		if (filer_window->panel)
+		if (filer_window->panel_type)
 			error = "Bad drop on panel";
 		else
 		{

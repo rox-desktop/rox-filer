@@ -77,6 +77,8 @@ gid_t *supplemental_groups = NULL;
 		"you must use the short versions instead.\n\n"
 #endif
 
+#define SHORT_OPS "t:b:ohv"
+
 #define HELP "Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"		\
        "Open filer windows showing each directory listed, or $HOME \n"	\
        "if no directories are given.\n\n"				\
@@ -84,8 +86,6 @@ gid_t *supplemental_groups = NULL;
        "  -v, --version		display the version information and exit\n"   \
        "  -t, --top [DIR]	open DIR as a top-edge panel\n"		\
        "  -b, --bottom [DIR]	open DIR as a bottom-edge panel\n"	\
-       "  -l, --left [DIR]	open DIR as a left-edge panel\n"	\
-       "  -r, --right [DIR]	open DIR as a right-edge panel\n"	\
        "  -o, --override	override window manager control of panels\n" \
        "\n"	SHORT_ONLY_WARNING					\
        "Report bugs to <tal197@ecs.soton.ac.uk>.\n"
@@ -95,8 +95,6 @@ static struct option long_opts[] =
 {
 	{"top", 1, NULL, 't'},
 	{"bottom", 1, NULL, 'b'},
-	{"left", 1, NULL, 'l'},
-	{"right", 1, NULL, 'r'},
 	{"override", 0, NULL, 'o'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
@@ -167,10 +165,10 @@ int main(int argc, char **argv)
 		int	c;
 #ifdef HAVE_GETOPT_LONG
 		int	long_index;
-		c = getopt_long(argc, argv, "t:b:l:r:ohv",
+		c = getopt_long(argc, argv, SHORT_OPS,
 				long_opts, &long_index);
 #else
-		c = getopt(argc, argv, "t:b:l:r:ohv");
+		c = getopt(argc, argv, SHORT_OPS);
 #endif
 
 		if (c == EOF)
@@ -189,8 +187,6 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 			case 't':
 			case 'b':
-			case 'l':
-			case 'r':
 				panel_sides = g_list_prepend(panel_sides,
 							(gpointer) c);
 				panel_dirs = g_list_prepend(panel_dirs,
@@ -247,7 +243,7 @@ int main(int argc, char **argv)
 	}
 
 	if (optind == argc && !panel_dirs)
-		filer_opendir(getenv("HOME"), FALSE, BOTTOM);
+		filer_opendir(getenv("HOME"), PANEL_NO);
 	else
 	{
 		int	 i = optind;
@@ -258,11 +254,8 @@ int main(int argc, char **argv)
 		{
 			int	c = (int) side->data;
 			
-			filer_opendir((char *) dir->data, TRUE,
-					c == 't' ? TOP :
-					c == 'b' ? BOTTOM :
-					c == 'l' ? LEFT :
-					RIGHT);
+			filer_opendir((char *) dir->data,
+					c == 't' ? PANEL_TOP : PANEL_BOTTOM);
 			dir = dir->next;
 			side = side->next;
 		}
@@ -271,7 +264,7 @@ int main(int argc, char **argv)
 		g_list_free(side);
 		
 		while (i < argc)
-			filer_opendir(argv[i++], FALSE, BOTTOM);
+			filer_opendir(argv[i++], PANEL_NO);
 	}
 
 	pipe(stderr_pipe);

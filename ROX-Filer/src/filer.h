@@ -17,7 +17,7 @@
 #include "dir.h"
 
 typedef struct _FilerWindow FilerWindow;
-typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
+typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
 typedef enum {UNKNOWN_STYLE, LARGE_ICONS, SMALL_ICONS, FULL_INFO} DisplayStyle;
 
 typedef enum
@@ -41,11 +41,10 @@ struct _FilerWindow
 	GtkWidget	*window;
 	char		*path;		/* pathname */
 	Collection	*collection;
-	gboolean	panel;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
-	Side		panel_side;
+	PanelType	panel_type;
 	time_t		m_time;		/* m-time at last scan */
 	int 		(*sort_fn)(const void *a, const void *b);
 	DisplayStyle	display_style;
@@ -64,7 +63,7 @@ extern GHashTable	*child_to_filer;
 
 /* Prototypes */
 void filer_init();
-FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side);
+FilerWindow *filer_opendir(char *path, PanelType panel_type);
 void update_dir(FilerWindow *filer_window, gboolean warning);
 void scan_dir(FilerWindow *filer_window);
 int selected_item_number(Collection *collection);
