@@ -84,14 +84,13 @@ void infobox_show_list(GList *paths)
 	if (n >= 10)
 	{
 		gchar *message;
-		int button;
+		gboolean ok;
 
 		message = g_strdup_printf(
 			_("Are you sure you want to open %d windows?"), n);
-		button = get_choice(_("File Information"),
-				message, 2, _("Cancel"), _("Show Info"));
+		ok = confirm(message, GTK_STOCK_YES, _("Show Info"));
 		g_free(message);
-		if (button != 1)
+		if (!ok)
 			return;
 	}
 

@@ -903,11 +903,10 @@ char *get_action_save_path(GtkWidget *dialog)
 		/* A binding already exists... */
 		if (S_ISREG(info.st_mode) && info.st_size > 256)
 		{
-			if (get_choice(PROJECT,
-				_("A run action already exists and is quite "
-				"a big program - are you sure you want to "
-				"delete it?"), 2,
-				_("Cancel"), _("Delete")) != 1)
+			if (!confirm(_("A run action already exists and is "
+				      "quite a big program - are you sure "
+				      "you want to delete it?"),
+				    GTK_STOCK_DELETE, NULL))
 			{
 				null_g_free(&path);
 				goto out;

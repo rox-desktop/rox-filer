@@ -75,6 +75,9 @@ void gui_support_init()
  *
  * If a dialog is already open, returns -1 without waiting AND
  * brings the current dialog to the front.
+ *
+ * Each button has two arguments, a GTK_STOCK icon and some text. If the
+ * text is NULL, the stock's text is used.
  */
 int get_choice(const char *title,
 	       const char *message,
@@ -102,8 +105,21 @@ int get_choice(const char *title,
 	va_start(ap, number_of_buttons);
 
 	for (i = 0; i < number_of_buttons; i++)
-		button = gtk_dialog_add_button(GTK_DIALOG(current_dialog),
-				va_arg(ap, char *), i);
+	{
+		const char *stock = va_arg(ap, char *);
+		const char *text = va_arg(ap, char *);
+
+		if (text)
+			button = button_new_mixed(stock, text);
+		else
+			button = gtk_button_new_from_stock(stock);
+
+		GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+		gtk_widget_show(button);
+
+		gtk_dialog_add_action_widget(GTK_DIALOG(current_dialog),
+						button, i);
+	}
 
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
@@ -758,29 +774,7 @@ void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc)
  */
 gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
 {
-	GtkWidget *box, *button;
-	gboolean resp;
-	
-	number_of_windows++;
-
-	box = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
-				     GTK_BUTTONS_CANCEL, message);
-	if (action)
-		button = button_new_mixed(stock, action);
-	else
-		button = gtk_button_new_from_stock(stock);
-
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_widget_show(button);
-
-	gtk_dialog_add_action_widget(GTK_DIALOG(box), button, GTK_RESPONSE_OK);
-	gtk_window_set_position(GTK_WINDOW(box), GTK_WIN_POS_CENTER);
-	gtk_window_set_title(GTK_WINDOW(box), _("Confirm:"));
-	gtk_dialog_set_default_response(GTK_DIALOG(box), GTK_RESPONSE_OK);
-
-	resp = gtk_dialog_run(GTK_DIALOG(box)) == GTK_RESPONSE_OK;
-	gtk_widget_destroy(box);
-
-	one_less_window();
-	return resp;
+	return get_choice(PROJECT, message, 2,
+			  GTK_STOCK_CANCEL, NULL,
+			  stock, action) == 1;
 }

@@ -342,10 +342,20 @@ static gboolean filer_window_delete(GtkWidget *window,
 {
 	if (mount_is_user_mounted(filer_window->real_path))
 	{
-		if (confirm(_("Do you want to unmount this device?\n\n"
-			      "Unmounting a device makes it safe to remove "
-			      "the disk."),
-			ROX_STOCK_MOUNT, _("Unmount")) == 1)
+		int action;
+
+		action = get_choice(PROJECT,
+			_("Do you want to unmount this device?\n\n"
+			"Unmounting a device makes it safe to remove "
+			"the disk."), 3,
+			GTK_STOCK_CANCEL, NULL,
+			GTK_STOCK_CLOSE, NULL,
+			ROX_STOCK_MOUNT, _("Unmount"));
+
+		if (action == 0)
+			return TRUE;	/* Cancel close operation */
+
+		if (action == 2)
 		{
 			GList *list; 
 

@@ -1909,8 +1909,7 @@ static gboolean remove_pinned_ok(GList *paths)
 					"or panel - really delete them?"));
 	}
 	
-	retval = get_choice(PROJECT, message->str,
-				2, _("Cancel"), _("Delete")) == 1;
+	retval = confirm(message->str, GTK_STOCK_DELETE, NULL);
 
 	g_string_free(message, TRUE);
 	
