@@ -29,8 +29,6 @@
 #include <pwd.h>
 #include "sc.h"
 
-#define DEBUG
-
 static SmPropValue *make_list_of_array_value(gchar *vals[], gint nvals)
 {
 	SmPropValue *values = g_new(SmPropValue, nvals);
@@ -403,4 +401,3 @@ gboolean sc_connect(SmClient *client)
 	return TRUE;
 }
 	
-#undef DEBUG

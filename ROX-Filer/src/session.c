@@ -89,14 +89,6 @@ gboolean save_yourself(SmClient *client)
 	return TRUE;
 }
 
-void shutdown_cancelled(SmClient *client)
-{
-}
-
-void save_complete(SmClient *client)
-{
-}
-
 void die(SmClient *client)
 {
 	gtk_main_quit();
@@ -131,7 +123,7 @@ void session_init(gchar *client_id)
 	sc_set_card_prop(client, SmRestartStyleHint, SmRestartIfRunning);
 	
 	client->save_yourself_fn = &save_yourself;
-	client->shutdown_cancelled_fn = &shutdown_cancelled;
-	client->save_complete_fn = &save_complete;
+	client->shutdown_cancelled_fn = NULL;
+	client->save_complete_fn = NULL;
 	client->die_fn = &die;
 }
