@@ -134,6 +134,7 @@ static void set_selected(ViewDetails *view_details, int i, gboolean selected);
 static gboolean get_selected(ViewDetails *view_details, int i);
 static void free_view_item(ViewItem *view_item);
 static void details_update_header_visibility(ViewDetails *view_details);
+static void set_lasso(ViewDetails *view_details, int x, int y);
 
 
 /****************************************************************
@@ -640,10 +641,81 @@ static gboolean view_details_button_press(GtkWidget *widget,
 	return TRUE;
 }
 
+static int get_lasso_index(ViewDetails *view_details, int y)
+{
+	GtkTreeViewColumn *column = NULL;
+	GtkTreePath *path = NULL;
+	GtkTreeView *tree = (GtkTreeView *) view_details;
+	gint cell_y;
+	int i;
+
+	if (gtk_tree_view_get_path_at_pos(tree, 4, y, &path,
+				&column, NULL, &cell_y))
+	{
+		GdkRectangle rect;
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_view_get_cell_area(tree, path, column, &rect);
+		gtk_tree_path_free(path);
+
+		if (2 * cell_y > rect.height)
+			i += 1;
+	}
+	else
+		i = view_details->items->len;
+
+	return i;
+}
+
+static gboolean select_lasso_cb(ViewIter *iter, gpointer data)
+{
+	int start = ((int *) data)[0];
+	int end = ((int *) data)[1];
+	GdkFunction fn = ((int *) data)[2];
+	ViewDetails *view_details = (ViewDetails *) iter->view;
+	GtkTreeIter  titer;
+
+	titer.user_data = GINT_TO_POINTER(iter->i);
+
+	if (iter->i < start || iter->i >= end)
+		return gtk_tree_selection_iter_is_selected(
+				view_details->selection, &titer);
+
+	if (fn == GDK_SET)
+		return TRUE;
+
+	return !gtk_tree_selection_iter_is_selected(view_details->selection,
+						    &titer);
+}
+
+static void select_lasso(ViewDetails *view_details, GdkFunction fn)
+{
+	GtkAdjustment	*adj;
+	int range[3];
+
+	adj = gtk_tree_view_get_vadjustment((GtkTreeView *) view_details);
+
+	range[0] = view_details->lasso_start_index;
+	range[1] = get_lasso_index(view_details,
+			      view_details->drag_box_y[1] - adj->value);
+	range[2] = fn;
+
+	if (range[0] == range[1])
+		return;
+	if (range[0] > range[1])
+	{
+		int tmp = range[0];
+		range[0] = range[1];
+		range[1] = tmp;
+	}
+
+	view_select_if((ViewIface *) view_details, select_lasso_cb, &range);
+}
+
 static gboolean view_details_button_release(GtkWidget *widget,
 					    GdkEventButton *bev)
 {
-	FilerWindow *filer_window = ((ViewDetails *) widget)->filer_window;
+	ViewDetails *view_details = (ViewDetails *) widget;
+	FilerWindow *filer_window = view_details->filer_window;
 	GtkTreeView *tree = (GtkTreeView *) widget;
 
 	if (bev->window != gtk_tree_view_get_bin_window(tree))
@@ -652,6 +724,17 @@ static gboolean view_details_button_release(GtkWidget *widget,
 
 	if (!dnd_motion_release(bev))
 		filer_perform_action(filer_window, bev);
+
+	if (motion_buttons_pressed == 0 && view_details->lasso_box)
+	{
+		select_lasso(view_details,
+				bev->button == 1 ? GDK_SET : GDK_INVERT);
+		filer_set_autoscroll(filer_window, FALSE);
+		set_lasso(view_details, 
+			  view_details->drag_box_x[0],
+			  view_details->drag_box_y[0]);
+		view_details->lasso_box = FALSE;
+	}
 
 	return TRUE;
 }
@@ -664,6 +747,14 @@ static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
 	if (event->window != gtk_tree_view_get_bin_window(tree))
 		return GTK_WIDGET_CLASS(parent_class)->motion_notify_event(
 								widget, event);
+
+	if (view_details->lasso_box)
+	{
+		GtkAdjustment	*adj;
+		adj = gtk_tree_view_get_vadjustment(tree);
+		set_lasso(view_details, event->x, event->y + adj->value);
+		return TRUE;
+	}
 
 	return filer_motion_notify(view_details->filer_window, event);
 }
@@ -688,6 +779,29 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 
 	if (event->window != gtk_tree_view_get_bin_window(tree))
 		return FALSE;	/* Not the main area */
+
+	if (view_details->lasso_box)
+	{
+		int x, y, width, height;
+		GtkAdjustment *adj;
+
+		adj = gtk_tree_view_get_vadjustment(tree);
+		x = MIN(view_details->drag_box_x[0],
+				view_details->drag_box_x[1]);
+		y = MIN(view_details->drag_box_y[0],
+				view_details->drag_box_y[1]);
+		width = abs(view_details->drag_box_x[1] -
+				view_details->drag_box_x[0]);
+		height = abs(view_details->drag_box_y[1] -
+				view_details->drag_box_y[0]);
+		y -= adj->value;
+
+		if (width && height)
+			gdk_draw_rectangle(event->window,
+				GTK_WIDGET(view_details)->style->
+					fg_gc[GTK_STATE_NORMAL],
+				FALSE, x, y, width - 1, height - 1);
+	}
 
 	gtk_tree_view_get_cursor(tree, &path, NULL);
 	if (!path)
@@ -788,6 +902,15 @@ static gboolean test_can_change_selection(GtkTreeSelection *sel,
 	return view_details->can_change_selection != 0;
 }
 
+static void selection_changed(GtkTreeSelection *selection,
+			      gpointer user_data)
+{
+	ViewDetails *view_details = VIEW_DETAILS(user_data);
+
+	filer_selection_changed(view_details->filer_window,
+			gtk_get_current_event_time());
+}
+
 #define ADD_TEXT_COLUMN(name, model_column) \
 	cell = gtk_cell_renderer_text_new();	\
 	column = gtk_tree_view_column_new_with_attributes(name, cell, \
@@ -812,12 +935,15 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	view_details->desired_size.width = -1;
 	view_details->desired_size.height = -1;
 	view_details->can_change_selection = 0;
+	view_details->lasso_box = FALSE;
 
 	view_details->selection = gtk_tree_view_get_selection(treeview);
 	gtk_tree_selection_set_mode(view_details->selection,
 				GTK_SELECTION_MULTIPLE);
 	gtk_tree_selection_set_select_function(view_details->selection,
 			test_can_change_selection, view_details, NULL);
+	g_signal_connect(view_details->selection, "changed",
+			G_CALLBACK(selection_changed), view_details);
 
 	/* Sorting */
 	view_details->sort_fn = NULL;
@@ -1238,14 +1364,17 @@ static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
 	GtkTreeView *tree = (GtkTreeView *) view;
 	GtkTreePath *path = NULL;
 	int i = -1;
+	gint cell_y;
 
 	model = gtk_tree_view_get_model(tree);
 
-	if (gtk_tree_view_get_path_at_pos(tree, x, y, &path, NULL, NULL, NULL))
+	if (gtk_tree_view_get_path_at_pos(tree, x, y + 4, &path, NULL,
+					  NULL, &cell_y))
 	{
 		g_return_if_fail(path != NULL);
 
-		i = gtk_tree_path_get_indices(path)[0];
+		if (cell_y > 8)
+			i = gtk_tree_path_get_indices(path)[0];
 		gtk_tree_path_free(path);
 	}
 
@@ -1317,6 +1446,7 @@ static void view_details_select_only(ViewIface *view, ViewIter *iter)
 	path = gtk_tree_path_new();
 	gtk_tree_path_append_index(path, iter->i);
 	view_details->can_change_selection++;
+	gtk_tree_selection_unselect_all(view_details->selection);
 	gtk_tree_selection_select_range(view_details->selection, path, path);
 	view_details->can_change_selection--;
 	gtk_tree_path_free(path);
@@ -1362,8 +1492,65 @@ static void view_details_set_base(ViewIface *view, ViewIter *iter)
 	view_details->cursor_base = iter->i;
 }
 
+/* Change the dynamic corner of the lasso box and trigger a redraw */
+static void set_lasso(ViewDetails *view_details, int x, int y)
+{
+	GdkWindow   *window;
+	GdkRectangle area;
+	int minx, miny, maxx, maxy;
+
+	if (x == view_details->drag_box_x[1] &&
+	    y == view_details->drag_box_y[1])
+		return;
+
+	/* Get old region */
+	minx = MIN(view_details->drag_box_x[0], view_details->drag_box_x[1]);
+	miny = MIN(view_details->drag_box_y[0], view_details->drag_box_y[1]);
+	maxx = MAX(view_details->drag_box_x[0], view_details->drag_box_x[1]);
+	maxy = MAX(view_details->drag_box_y[0], view_details->drag_box_y[1]);
+
+	/* Enlarge to cover new point */
+	minx = MIN(minx, x);
+	miny = MIN(miny, y);
+	maxx = MAX(maxx, x);
+	maxy = MAX(maxy, y);
+
+	area.x = minx;
+	area.y = miny;
+	area.width = maxx - minx;
+	area.height = maxy - miny;
+
+	view_details->drag_box_x[1] = x;
+	view_details->drag_box_y[1] = y;
+
+	window = gtk_tree_view_get_bin_window((GtkTreeView *) view_details);
+	if (area.width && area.height)
+	{
+		GtkAdjustment *adj;
+
+		adj = gtk_tree_view_get_vadjustment((GtkTreeView *)
+							view_details);
+		area.y -= adj->value;
+		gdk_window_invalidate_rect(window, &area, FALSE);
+	}
+}
+
 static void view_details_start_lasso_box(ViewIface *view, GdkEventButton *event)
 {
+	ViewDetails *view_details = (ViewDetails *) view;
+	GtkAdjustment *adj;
+
+	adj = gtk_tree_view_get_vadjustment((GtkTreeView *) view_details);
+
+	view_details->lasso_start_index = get_lasso_index(view_details,
+							  event->y);
+
+	filer_set_autoscroll(view_details->filer_window, TRUE);
+
+	view_details->drag_box_x[0] = view_details->drag_box_x[1] = event->x;
+	view_details->drag_box_y[0] = view_details->drag_box_y[1] = event->y +
+								adj->value;
+	view_details->lasso_box = TRUE;
 }
 
 static void view_details_extend_tip(ViewIface *view,

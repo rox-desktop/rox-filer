@@ -36,6 +36,11 @@ struct _ViewDetails {
 	int	    can_change_selection;
 
 	GtkRequisition desired_size;
+
+	gboolean	lasso_box;
+	int		lasso_start_index;
+	int		drag_box_x[2];	/* Index 0 is the fixed corner */
+	int		drag_box_y[2];
 };
 
 

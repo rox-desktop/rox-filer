@@ -240,7 +240,7 @@ const char *group_name(gid_t gid)
 	return retval;
 }
 
-/* Return a string in the form '23Mb' in a static buffer valid until
+/* Return a string in the form '23 M' in a static buffer valid until
  * the next call.
  */
 const char *format_size(off_t size)
@@ -268,10 +268,8 @@ const char *format_size(off_t size)
 		else
 			units = "K";
 	}
-	else if (size == 1)
-		units = _("byte");
 	else
-		units = _("bytes");
+		units = _("B");
 
 	g_free(buffer);
 	buffer = g_strdup_printf("%" SIZE_FMT " %s", size, units);
