@@ -128,6 +128,8 @@ void icon_init(void)
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"UTF8", 0, TARGET_STRING},
+		{"COMPOUND_TEXT", 0, TARGET_STRING},/* XXX: Treats as STRING */
 		{"STRING", 0, TARGET_STRING},
 	};
 

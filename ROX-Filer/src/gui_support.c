@@ -159,8 +159,8 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
-	static GdkAtom	xa_state, xa_atom, xa_net_state, xa_hints, xa_win_hints;
-	static GdkAtom	state_list[3];
+	static GdkAtom xa_state, xa_atom, xa_net_state, xa_hints, xa_win_hints;
+	static GdkAtom state_list[3];
 	GdkWindow *window = widget->window;
 	gint32  values[2];
 	
