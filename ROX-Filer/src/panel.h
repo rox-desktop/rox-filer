@@ -30,6 +30,7 @@ struct _Panel {
 	GtkWidget	*gap;		/* Event box between sides */
 };
 
+void panel_init(void);
 Panel *panel_new(guchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);
 void panel_size_icon(Icon *icon);

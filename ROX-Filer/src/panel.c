@@ -66,7 +66,7 @@ static gint icon_button_release(GtkWidget *widget,
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Icon *icon);
-static void reposition_panel(Panel *panel);
+static void reposition_panel(Panel *panel, gboolean force_resize);
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
 			Icon *icon);
@@ -126,6 +126,8 @@ static void perform_action(Panel *panel,
 			   Icon *icon,
 			   GdkEventButton *event);
 static void run_applet(Icon *icon);
+static void panel_set_style(guchar *new);
+static gboolean want_show_text(Icon *icon);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -133,10 +135,19 @@ static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
 /* When sliding the panel, records where the panel was before */
 static gint slide_from_value = 0;
 
+#define SHOW_BOTH 0
+#define SHOW_APPS_SMALL 1
+#define SHOW_ICON 2
+static int panel_style = SHOW_BOTH;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
+
+void panel_init(void)
+{
+	option_add_int("panel_style", SHOW_BOTH, panel_set_style);
+}
 
 /* 'name' may be NULL or "" to remove the panel */
 Panel *panel_new(guchar *name, PanelSide side)
@@ -292,8 +303,11 @@ void panel_icon_may_update(Icon *icon)
 void panel_size_icon(Icon *icon)
 {
 	int	im_height;
-	GdkFont	*font = icon->widget->style->font;
+	GdkFont	*font;
 	int	width, height;
+
+	g_return_if_fail(icon != NULL);
+	font = icon->widget->style->font;
 
 	if (icon->socket)
 		return;
@@ -302,8 +316,14 @@ void panel_size_icon(Icon *icon)
 					ICON_HEIGHT);
 
 	width = PIXMAP_WIDTH(icon->item.image->pixmap);
-	width = MAX(width, icon->item.name_width);
-	height = font->ascent + font->descent + 6 + im_height;
+
+	if (want_show_text(icon))
+	{
+		height = font->ascent + font->descent + 6 + im_height;
+		width = MAX(width, icon->item.name_width);
+	}
+	else
+		height = im_height;
 
 	gtk_widget_set_usize(icon->widget, width + 4, height);
 }
@@ -331,9 +351,9 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
 	{
 		if (current_panel[PANEL_RIGHT])
-			reposition_panel(current_panel[PANEL_RIGHT]);
+			reposition_panel(current_panel[PANEL_RIGHT], FALSE);
 		if (current_panel[PANEL_LEFT])
-			reposition_panel(current_panel[PANEL_LEFT]);
+			reposition_panel(current_panel[PANEL_LEFT], FALSE);
 	}
 
 	g_free(panel->name);
@@ -478,28 +498,38 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 	GdkRectangle	area;
 	int		width, height;
 	int		text_x, text_y;
+	int		text_height = font->ascent + font->descent;
 
 	gdk_window_get_size(widget->window, &width, &height);
 
 	area.x = 0;
 	area.width = width;
 	area.height = PIXMAP_HEIGHT(icon->item.image->pixmap);
-	area.y = height - font->ascent - font->descent - 6 - area.height;
-	
-	draw_large_icon(widget, &area, &icon->item, icon->selected);
 
-	text_x = (area.width - icon->item.name_width) >> 1;
+	if (want_show_text(icon))
+	{
+		area.y = height - text_height - 6 - area.height;
 
-	text_y = height - font->descent - 4;
+		draw_large_icon(widget, &area, &icon->item, icon->selected);
 
-	draw_string(widget,
-			font,
-			icon->item.leafname, -1,
-			MAX(0, text_x),
-			text_y,
-			icon->item.name_width,
-			area.width,
-			icon->selected, TRUE);
+		text_x = (area.width - icon->item.name_width) >> 1;
+		text_y = height - font->descent - 4;
+
+		draw_string(widget,
+				font,
+				icon->item.leafname, -1,
+				MAX(0, text_x),
+				text_y,
+				icon->item.name_width,
+				area.width,
+				icon->selected, TRUE);
+	}
+	else
+	{
+		area.y = (height - area.height) >> 1;
+
+		draw_large_icon(widget, &area, &icon->item, icon->selected);
+	}
 
 	return TRUE;
 }
@@ -618,7 +648,7 @@ static gint icon_button_press(GtkWidget *widget,
 /* Difference between height of an icon and height of panel (or width) */
 #define MARGIN 8
 
-static void reposition_panel(Panel *panel)
+static void reposition_panel(Panel *panel, gboolean force_resize)
 {
 	int	x = 0, y = 0;
 	int	w = 32, h = 32;
@@ -632,6 +662,9 @@ static void reposition_panel(Panel *panel)
 		GtkWidget	*widget = (GtkWidget *) next->data;
 		GtkRequisition	req;
 
+		if (force_resize)
+			panel_size_icon(gtk_object_get_data(
+						GTK_OBJECT(widget), "icon"));
 		gtk_widget_get_child_requisition(widget, &req);
 
 		if (req.width > w)
@@ -678,9 +711,9 @@ static void reposition_panel(Panel *panel)
 	if (side == PANEL_BOTTOM || side == PANEL_TOP)
 	{
 		if (current_panel[PANEL_RIGHT])
-			reposition_panel(current_panel[PANEL_RIGHT]);
+			reposition_panel(current_panel[PANEL_RIGHT], FALSE);
 		if (current_panel[PANEL_LEFT])
-			reposition_panel(current_panel[PANEL_LEFT]);
+			reposition_panel(current_panel[PANEL_LEFT], FALSE);
 	}
 }
 
@@ -1249,7 +1282,7 @@ static void run_applet(Icon *icon)
  */
 static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel)
 {
-	reposition_panel(panel);
+	reposition_panel(panel, FALSE);
 }
 
 static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
@@ -1272,5 +1305,35 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 		if (req->height < h)
 			req->height = h;
 	}
+}
+
+/* The style setting has been changed -- update all panels */
+static void panel_set_style(guchar *new)
+{
+	int	os = panel_style;
+	
+	panel_style = option_get_int("panel_style");
+
+	if (os != panel_style)
+	{
+		int	i;
+
+		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+			if (current_panel[i])
+				reposition_panel(current_panel[i], TRUE);
+	}
+}
+
+static gboolean want_show_text(Icon *icon)
+{
+	if (panel_style == SHOW_BOTH)
+		return TRUE;
+	if (panel_style == SHOW_ICON)
+		return FALSE;
+
+	if (icon->item.flags & ITEM_FLAG_APPDIR)
+		return FALSE;
+
+	return TRUE;
 }
 

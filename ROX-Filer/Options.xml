@@ -12,35 +12,6 @@
       <item label='Russian' value='ru'/>
     </menu>
   </section>
-  <section name='pinboard' title='Pinboard'>
-    <radio-group name='text_bg'>
-      <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
-      <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
-      <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
-    </radio-group>
-    <spacer/>
-    <hbox label='Text colours:'>
-      <colour name='fg_colour' label='Foreground'/>
-      <colour name='bg_colour' label='Background'/>
-    </hbox>
-    <spacer/>
-    <toggle name='clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
-    <hbox label='Icon grid step:'>
-      <radio-group name='grid_step'>
-        <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
-        <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
-        <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
-      </radio-group>
-    </hbox>
-  </section>
-  <section name='action' title='Action windows'>
-    <label>Auto-start (Quiet) these actions:</label>
-    <toggle name='copy' label='Copy'/>
-    <toggle name='move' label='Move'/>
-    <toggle name='link' label='Link'/>
-    <toggle name='delete' label='Delete'/>
-    <toggle name='mount' label='Mount'/>
-  </section>
   <section name='display' title='Display'>
     <toggle name='sort_nocase' label='Ignore case when sorting'>If off: Ben, animal, zoo.
 If on: animal, Ben, zoo.</toggle>
@@ -69,6 +40,44 @@ If on: animal, Ben, zoo.</toggle>
       <item label='Date' value='2'/>
       <item label='Size' value='3'/>
     </menu>
+  </section>
+  <section name='pinboard' title='Pinboard'>
+    <radio-group name='text_bg'>
+      <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
+      <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
+      <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
+    </radio-group>
+    <spacer/>
+    <hbox label='Text colours:'>
+      <colour name='fg_colour' label='Foreground'/>
+      <colour name='bg_colour' label='Background'/>
+    </hbox>
+    <spacer/>
+    <toggle name='clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
+    <hbox label='Icon grid step:'>
+      <radio-group name='grid_step'>
+        <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
+        <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
+        <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
+      </radio-group>
+    </hbox>
+  </section>
+
+  <section name='panel' title='Panels'>
+    <radio-group name='style'>
+      <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
+      <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
+      <radio label='Image only' value='2'>Only the image is shown.</radio>
+    </radio-group>
+  </section>
+  
+  <section name='action' title='Action windows'>
+    <label>Auto-start (Quiet) these actions:</label>
+    <toggle name='copy' label='Copy'/>
+    <toggle name='move' label='Move'/>
+    <toggle name='link' label='Link'/>
+    <toggle name='delete' label='Delete'/>
+    <toggle name='mount' label='Mount'/>
   </section>
   <section name='toolbar' title='Toolbar'>
     <label>Unshade the tools you want:</label>
