@@ -142,6 +142,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void invert_selection(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_file(gpointer data, guint action, GtkWidget *widget);
+static void customise_new(gpointer data);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
@@ -230,6 +231,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("New"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Directory"),		NULL, new_directory, 0, NULL},
 {">" N_("Blank file"),		NULL, new_file, 0, "<StockItem>", GTK_STOCK_NEW},
+{">" N_("Customise Menu..."),	NULL, customise_new, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, "<StockItem>", GTK_STOCK_GO_UP},
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
@@ -485,17 +487,18 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 	if (!names)
 		goto out;
 
-	if (separator)
-	{
-		item = gtk_menu_item_new();
-		widgets = g_list_append(widgets, item);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-	}
-
 	for (i = 0; i < names->len; i++)
 	{
 		char	*leaf = names->pdata[i];
 		gchar	*fname;
+
+		if (separator)
+		{
+			item = gtk_menu_item_new();
+			widgets = g_list_append(widgets, item);
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+			separator = FALSE;
+		}
 
 		fname = g_strconcat(dname, "/", leaf, NULL);
 
@@ -1491,6 +1494,46 @@ static void customise_send_to(gpointer data)
 		save ? _("I'll show you your SendTo directory now; you should "
 			"symlink (Ctrl+Shift drag) any applications you want "
 			"into it.")
+		     : _("Your CHOICESPATH variable setting prevents "
+			 "customisations - sorry."));
+
+	g_string_free(dirs, TRUE);
+	
+	if (save)
+		filer_opendir(save, NULL, NULL);
+}
+
+static void customise_new(gpointer data)
+{
+	GPtrArray	*path;
+	guchar		*save;
+	GString		*dirs;
+	int		i;
+
+	dirs = g_string_new(NULL);
+
+	path = choices_list_dirs("");
+	for (i = 0; i < path->len; i++)
+	{
+		guchar *old = (guchar *) path->pdata[i];
+
+		g_string_append(dirs, old);
+		g_string_append(dirs, "Templates\n");
+	}
+	choices_free_list(path);
+
+	save = choices_find_path_save("", "Templates", TRUE);
+	if (save)
+		mkdir(save, 0777);
+
+	info_message(
+		_("Any files placed in your Templates directories will "
+		"appear on the `New' menu. Choosing one of them will make "
+		"a copy of it as the new file.\n\n"
+		"The following directories contain templates:\n\n%s\n%s\n"),
+		dirs->str,
+		save ? _("I'll show you your Templates directory now; you "
+			 "should place any template files you want inside it.")
 		     : _("Your CHOICESPATH variable setting prevents "
 			 "customisations - sorry."));
 
