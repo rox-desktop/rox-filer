@@ -21,8 +21,9 @@ typedef enum
 	ITEM_FLAG_MAY_DELETE	= 0x40, /* Delete on finishing scan */
 	ITEM_FLAG_RECENT	= 0x80, /* [MC]-time is around now */
 
-	/* DirItems are created with this flag set. Accessing the item in
-	 * this state will add it to the directory's rescan list.
+	/* DirItems are created with this flag set. Restatting or queuing an
+	 * item in this state clears the flag. This is to prevent an item
+	 * being added to the queue more than once at a time.
 	 */
 	ITEM_FLAG_NEED_RESCAN_QUEUE = 0x100,
 } ItemFlags;
