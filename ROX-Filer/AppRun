@@ -24,6 +24,7 @@ case $1 in
 		  DEBUGGER="gdb"
 		fi ;;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
+	--calltree) shift ; DEBUGGER="calltree";;
 	--leaks) shift ; DEBUGGER="valgrind --num-callers=8 --leak-check=yes";;
 	--compile)
 		shift
@@ -37,10 +38,11 @@ case $1 in
 		  echo "No 'configure' script! Trying to run autoconf..."
 		  (cd "$APP_DIR/src"; autoconf)
 		fi
-		rm -f "$APP_DIR/src/config.cache"
-		[ ! -d "$HOME/build" ] && mkdir "$HOME/build"
-		[ ! -d "$HOME/build/$PROG" ] && mkdir "$HOME/build/$PROG"
-		cd "$HOME/build/$PROG" && "$APP_DIR/src/configure" --enable-rox    \
+		BUILDDIR="$APP_DIR/build"
+		[ ! -d "$BUILDDIR" ] && mkdir "$BUILDDIR"
+		rm -f "$BUILDDIR/config.cache"
+		rm -f "$APP_DIR/src/config.h"	# (for upgrading)
+		cd "$BUILDDIR" && "$APP_DIR/src/configure" --enable-rox    \
 					--with-platform="$PLATFORM" \
 					"$@" \
 			&& make clean && make && echo Done >&2 && exit 0

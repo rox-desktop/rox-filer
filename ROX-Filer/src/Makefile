@@ -2,8 +2,10 @@
 # goes in the build directory. We just call that from here.
 # Use AppRun --compile to create the build directory in the first place.
 
+BUILDDIR = ../build
+
 all:
-	cd $$HOME/build/ROX-Filer && make
+	cd ${BUILDDIR} && make
 
 clean:
-	cd $$HOME/build/ROX-Filer && make clean
+	cd ${BUILDDIR} && make clean
