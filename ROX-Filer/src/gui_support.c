@@ -159,7 +159,7 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
-	static GdkAtom	xa_state, xa_atom, xa_net_state, xa_hints;
+	static GdkAtom	xa_state, xa_atom, xa_net_state, xa_hints, xa_win_hints;
 	static GdkAtom	state_list[3];
 	GdkWindow *window = widget->window;
 	gint32  values[2];
@@ -176,6 +176,7 @@ void make_panel_window(GtkWidget *widget)
 
 	if (need_init)
 	{
+		xa_win_hints = gdk_atom_intern("_WIN_HINTS", FALSE);
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
 		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
@@ -206,6 +207,10 @@ void make_panel_window(GtkWidget *widget)
 	set_cardinal_property(window, xa_state,
 			WIN_STATE_STICKY |
 			WIN_STATE_FIXED_POSITION | WIN_STATE_ARRANGE_IGNORE);
+
+	set_cardinal_property(window, xa_win_hints,
+			WIN_HINTS_SKIP_FOCUS | WIN_HINTS_SKIP_WINLIST |
+			WIN_HINTS_SKIP_TASKBAR);
 
 	gdk_property_change(window, xa_net_state, xa_atom, 32,
 			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);

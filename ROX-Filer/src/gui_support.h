@@ -15,6 +15,10 @@
 #define WIN_STATE_FIXED_POSITION  (1<<8) /* Window is fixed in position even */
 #define WIN_STATE_ARRANGE_IGNORE  (1<<9) /* Ignore for auto arranging */
 
+#define WIN_HINTS_SKIP_FOCUS      (1<<0) /* Do not focus */
+#define WIN_HINTS_SKIP_WINLIST    (1<<1) /* Not in win list */
+#define WIN_HINTS_SKIP_TASKBAR    (1<<2) /* Not on taskbar */
+
 extern GdkFont	   	*fixed_font;
 extern GdkColor 	red;
 extern GdkGC 		*red_gc;
