@@ -610,7 +610,7 @@ static gboolean view_details_scroll(GtkWidget *widget, GdkEventScroll *event)
 	GtkTreeView *tree = (GtkTreeView *) widget;
 	GtkTreePath *path = NULL;
 
-	if (!gtk_tree_view_get_path_at_pos(tree, 0, 0, &path, NULL, NULL, NULL))
+	if (!gtk_tree_view_get_path_at_pos(tree, 0, 1, &path, NULL, NULL, NULL))
 		return TRUE;	/* Empty? */
 
 	if (event->direction == GDK_SCROLL_UP)
