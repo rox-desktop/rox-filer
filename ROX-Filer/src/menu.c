@@ -1011,7 +1011,6 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
 	pixmap_unref(image);
 				
-	gtk_widget_grab_focus(GTK_SAVEBOX(savebox)->entry);
 	gtk_widget_show(savebox);
 }
 
