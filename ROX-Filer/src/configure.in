@@ -20,27 +20,6 @@ Thank you.
 #[  --with-gtk2		  Use Gtk+-2.0 API instead of Gtk+-1.2], gtk2=1, gtk2=0)
 
 
-dnl rox_ARG_WITH(PACKAGE, HELP-STRING, ACTION-IF-TRUE [, ACTION-IF-FALSE])
-dnl This macro does the same thing as AC_ARG_WITH, but it also defines
-dnl with_PACKAGE_arg and with_PACKAGE_sign to avoid complicated logic later.
-dnl Stolen from icewm's configure.in
-AC_DEFUN(rox_ARG_WITH, [
-AC_ARG_WITH([$1], [$2], [
-case "[${with_]patsubst([$1], -, _)}" in
-[no)]
- [with_]patsubst([$1], -, _)_sign=no
- ;;
-[yes)]
- [with_]patsubst([$1], -, _)_sign=yes
- ;;
-[*)] 
- [with_]patsubst([$1], -, _)_arg="[${with_]patsubst([$1], -, _)}"
- [with_]patsubst([$1], -, _)_sign=yes
- ;;
-esac
-$3
-], [$4])])
-
 dnl rox_CHECK_EXISTS(PROGRAM, ERROR)
 dnl Ensure that PROGRAM --version works.
 dnl Stops and displays ERROR if it's missing.
@@ -122,6 +101,17 @@ else
   else
     AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - make sure it is in your PATH)
   fi
+
+  dnl Check for the Gnome VFS library
+  AC_MSG_CHECKING(for gnome-vfs-config)
+  if gnome-vfs-config --version > /dev/null 2>&1 ; then
+    AC_MSG_RESULT(yes)
+    CFLAGS="$CFLAGS `gnome-vfs-config --cflags`"
+    LIBS="$LIBS `gnome-vfs-config --libs`"
+    AC_DEFINE(WITH_GNOMEVFS)
+  else
+    AC_MSG_RESULT(no -- make sure libgnome-vfs-dev is installed)
+  fi
 fi
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)
@@ -148,14 +138,12 @@ if getconf LFS64_CFLAGS > /dev/null 2> /dev/null; then
   LFS_CFLAGS="`getconf LFS_CFLAGS`"
   LFS_LDFLAGS="`getconf LFS_LDFLAGS`"
   LFS_LIBS="`getconf LFS_LIBS`"
-  disable_vfs=yes
   AC_DEFINE(LARGE_FILE_SUPPORT)
 else
   AC_MSG_RESULT(no)
   LFS_CFLAGS=""
   LFS_LDFLAGS=""
   LFS_LIBS=""
-  disable_vfs=no
 fi
 AC_SUBST(LFS_CFLAGS)
 AC_SUBST(LFS_LDFLAGS)
@@ -169,9 +157,6 @@ AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h)
 AC_CHECK_HEADERS(regex.h iconv.h)
 
-rox_ARG_WITH(vfs,
-  [  --with-vfs[=prefix]     use libvfs for virtual file system [search it in prefix/include and prefix/lib]])
-
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
 AC_TYPE_UID_T
@@ -180,31 +165,6 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 
-VFS_LIBS=""
-VFS_CFLAGS=""
-if test "$disable_vfs" != "yes" ; then
-  AC_MSG_CHECKING(for vfs library)
-  if test x"$with_vfs_sign" = xyes; then
-    if test x"$with_vfs_arg" != x; then
-      vfs_includes="-I${with_vfs_arg}/include"
-      vfs_libs="-L${with_vfs_arg}/lib -R${with_vfs_arg}/lib"
-      AC_MSG_RESULT(yes - use '$vfs_libs')
-    else
-      vfs_includes=""
-      vfs_libs=""
-      AC_MSG_RESULT(yes)
-    fi
-    CFLAGS="$CFLAGS $vfs_includes"
-    LDFLAGS="$LDFLAGS $vfs_libs"
-    VFS_CFLAGS="$vfs_includes"
-    VFS_LIBS="$vfs_libs"
-  else
-    AC_MSG_RESULT(no)
-  fi
-fi
-AC_SUBST(VFS_CFLAGS)
-AC_SUBST(VFS_LIBS)
-
 dnl Extract version info from AppInfo.xml
 AC_MSG_CHECKING(extracting version information)
 [
@@ -212,11 +172,6 @@ VERSION=`sed -n 's/^.*<Version>\([.0-9]*\).*<\/Version>.*$/\1/p' ../AppInfo.xml`
 ]
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
-
-dnl Check for the Midnight Commander VFS library
-if test "$disable_vfs" != "yes" ; then
-  AC_CHECK_LIB(vfs, mc_stat, , , `$GTK_CONFIG --libs`)
-fi
 
 dnl Check for libpng
 LIBPNG=""

@@ -1311,9 +1311,16 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_menu;
 	option->widget = option_menu;
 
+#ifdef GTK2
 	gtk_signal_connect_object_after(GTK_OBJECT(option_menu), "changed",
 			GTK_SIGNAL_FUNC(option_check_widget),
 			(GtkObject *) option);
+#else
+	gtk_signal_connect_object_after(GTK_OBJECT(menu),
+			"selection-done",
+			GTK_SIGNAL_FUNC(option_check_widget),
+			(GtkObject *) option);
+#endif
 
 	return g_list_append(NULL, hbox);
 }

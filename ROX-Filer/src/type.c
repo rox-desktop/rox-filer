@@ -34,6 +34,13 @@
 # include <regex.h>
 #endif
 
+#ifdef WITH_GNOMEVFS
+# include <libgnomevfs/gnome-vfs.h>
+# include <libgnomevfs/gnome-vfs-mime.h>
+# include <libgnomevfs/gnome-vfs-mime-handlers.h>
+# include <libgnomevfs/gnome-vfs-application-registry.h>
+#endif
+
 #include "global.h"
 
 #include "string.h"
@@ -63,6 +70,8 @@ typedef struct pattern {
 	regex_t buffer;
 } Pattern;
 #endif
+
+static Option o_use_gnomevfs;
 
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
@@ -151,6 +160,7 @@ void type_init(void)
 	option_register_widget("type-reread", build_type_reread);
 	
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
+	option_add_int(&o_use_gnomevfs, "use_gnomevfs", TRUE);
 	
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
 		option_add_string(&o_type_colours[i],
@@ -432,6 +442,11 @@ MIME_type *type_from_path(char *path)
 #ifdef USE_REGEX
 	GList *patt;
 	int len;
+#endif
+
+#ifdef WITH_GNOMEVFS
+	if (o_use_gnomevfs.int_value)
+		return get_mime_type(gnome_vfs_mime_type_from_name(path), TRUE);
 #endif
 
 	leafname = strrchr(path, '/');
