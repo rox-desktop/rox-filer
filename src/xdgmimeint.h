@@ -67,8 +67,6 @@ extern const char *const _xdg_utf8_skip;
 
 xdg_unichar_t  _xdg_utf8_to_ucs4  (const char    *source);
 xdg_unichar_t  _xdg_ucs4_to_lower (xdg_unichar_t  source);
-
-
 int            _xdg_utf8_validate (const char    *source);
 const char    *_xdg_get_base_name (const char    *file_name);
 
