@@ -210,28 +210,33 @@ static void edit_delete(GtkButton *button, GtkTreeView *view)
 	GtkListStore *list;
 	GtkTreeSelection *selection;
 	GtkTreeIter iter;
-	gboolean more;
+	gboolean more, any = FALSE;
 
 	model = gtk_tree_view_get_model(view);
 	list = GTK_LIST_STORE(model);
 
 	selection = gtk_tree_view_get_selection(view);
 
-	if (!gtk_tree_model_get_iter_first(model, &iter))
-	{
-		report_error(_("You should first select some rows to delete"));
-		return;
-	}
+	more = gtk_tree_model_get_iter_first(model, &iter);
 
-	do
+	while (more)
 	{
 		GtkTreeIter old = iter;
 
 		more = gtk_tree_model_iter_next(model, &iter);
 
 		if (gtk_tree_selection_iter_is_selected(selection, &old))
+		{
+			any = TRUE;
 			gtk_list_store_remove(list, &old);
-	} while (more);
+		}
+	}
+
+	if (!any)
+	{
+		report_error(_("You should first select some rows to delete"));
+		return;
+	}
 }
 
 static void reorder(GtkTreeView *view, int dir)
