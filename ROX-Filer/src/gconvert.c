@@ -115,7 +115,7 @@ g_iconv (GIConv   converter,
 	 gsize   *outbytes_left)
 {
   iconv_t cd = (iconv_t)converter;
-  size_t in, out, retval;
+  size_t in = *inbytes_left, out = *outbytes_left, retval;
 
   retval = iconv (cd, inbuf, &in, outbuf, &out);
 
