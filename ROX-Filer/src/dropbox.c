@@ -25,6 +25,7 @@
 
 #include <gtk/gtk.h>
 #include <errno.h>
+#include <string.h>
 
 #include "global.h"
 
@@ -41,7 +42,6 @@ static gpointer parent_class = NULL;
 struct _DropBoxClass {
 	GtkFrameClass parent;
 
-	void (*open_dir)(GtkWidget *drop_box);
 	void (*path_dropped)(GtkWidget *drop_box, const guchar *path);
 	void (*clear)(GtkWidget *drop_box);
 };
@@ -49,7 +49,7 @@ struct _DropBoxClass {
 struct _DropBox {
 	GtkFrame frame;
 
-	GtkWidget *clear;
+	GtkWidget *buttons;
 	GtkWidget *label;
 	gchar *path;
 };
@@ -74,7 +74,7 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
 
 GtkWidget *drop_box_new(const char *message, const char *open_tip)
 {
-	GtkWidget *button, *label, *vbox, *icon, *buttons;
+	GtkWidget *button, *label, *vbox, *icon;
 	MaskedPixmap *mp;
 	DropBox *drop_box;
 	GtkTargetEntry 	targets[] = {
@@ -101,12 +101,12 @@ GtkWidget *drop_box_new(const char *message, const char *open_tip)
 	gtk_box_pack_start(GTK_BOX(vbox), drop_box->label, FALSE, TRUE, 0);
 	gtk_misc_set_padding(GTK_MISC(drop_box->label), 2, 2);
 
-	buttons = gtk_hbutton_box_new();
-	gtk_box_pack_start(GTK_BOX(vbox), buttons, FALSE, TRUE, 0);
+	drop_box->buttons = gtk_hbutton_box_new();
+	gtk_box_pack_start(GTK_BOX(vbox), drop_box->buttons, FALSE, TRUE, 0);
 
-	drop_box->clear = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
-	gtk_box_pack_start(GTK_BOX(buttons), drop_box->clear, FALSE, TRUE, 0);
-	g_signal_connect(drop_box->clear, "clicked",
+	button = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	gtk_box_pack_start(GTK_BOX(drop_box->buttons), button, FALSE, TRUE, 0);
+	g_signal_connect(button, "clicked",
 			G_CALLBACK(clear_clicked), drop_box);
 
 	mp = type_to_icon(inode_directory);
@@ -114,7 +114,7 @@ GtkWidget *drop_box_new(const char *message, const char *open_tip)
 	icon = gtk_image_new_from_pixbuf(mp->sm_pixbuf);
 	g_object_unref(mp);
 	button = button_new_image_text(icon, _("Show"));
-	gtk_box_pack_start(GTK_BOX(buttons), button, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(drop_box->buttons), button, FALSE, TRUE, 0);
 	g_signal_connect(button, "clicked",
 			G_CALLBACK(open_dir_clicked), drop_box);
 
@@ -168,16 +168,23 @@ void drop_box_set_path(DropBox *drop_box, const guchar *path)
 			copy = g_strdup_printf("...%s", path + l - 28);
 		else
 			copy = g_strdup(path);
-		gtk_widget_set_sensitive(drop_box->clear, TRUE);
+		gtk_widget_set_sensitive(drop_box->buttons, TRUE);
 	}
 	else
 	{
 		copy = g_strdup(_("<nothing>"));
-		gtk_widget_set_sensitive(drop_box->clear, FALSE);
+		gtk_widget_set_sensitive(drop_box->buttons, FALSE);
 	}
 
 	gtk_label_set_text(GTK_LABEL(drop_box->label), copy);
 	g_free(copy);
+}
+
+const gchar *drop_box_get_path(DropBox *drop_box)
+{
+	g_return_val_if_fail(drop_box != NULL, NULL);
+
+	return drop_box->path;
 }
 
 /****************************************************************
@@ -191,19 +198,9 @@ static void drop_box_class_init(gpointer gclass, gpointer data)
 
 	parent_class = g_type_class_peek_parent(gclass);
 
-	drop_box->open_dir = NULL;
 	drop_box->path_dropped = NULL;
-	drop_box->clear = NULL;
 	
 	widget->drag_data_received = drop_box_drag_data_received;
-
-	g_signal_new("open_dir",
-			G_TYPE_FROM_CLASS(gclass),
-			G_SIGNAL_RUN_LAST,
-			G_STRUCT_OFFSET(DropBoxClass, open_dir),
-			NULL, NULL,
-			g_cclosure_marshal_VOID__VOID,
-			G_TYPE_NONE, 0);
 
 	g_signal_new("path_dropped",
 			G_TYPE_FROM_CLASS(gclass),
@@ -228,6 +225,7 @@ static void drop_box_init(GTypeInstance *object, gpointer gclass)
 
 	drop_box->path = NULL;
 	drop_box->label = NULL;
+	drop_box->buttons = NULL;
 }
 
 static void clear_clicked(GtkWidget *button, DropBox *drop_box)

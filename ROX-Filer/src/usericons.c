@@ -64,7 +64,6 @@ static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 static const char *process_globicons_line(gchar *line);
 static gboolean free_globicon(gpointer key, gpointer value, gpointer data);
 static void write_globicons(void);
-static void show_current_dirs_menu(GtkWidget *drop_box, gpointer data);
 static void add_globicon(const gchar *path, const gchar *icon);
 static void drag_icon_dropped(GtkWidget	*drop_box,
 				  const guchar	*path,
@@ -210,23 +209,43 @@ static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
 
 static void clear_icon(DropBox *drop_box, GObject *dialog)
 {
-	const guchar *path;
-	const guchar *icon_path;
+	Radios *radios;
+	
+	radios = g_object_get_data(G_OBJECT(dialog), "radios");
+	g_return_if_fail(radios != NULL);
 
-	path = g_object_get_data(G_OBJECT(dialog), "pathname");
-	g_return_if_fail(path != NULL);
-
-	delete_globicon(path);
-
-	icon_path = make_path(path, ".DirIcon");
-	if (access(icon_path, F_OK) == 0)
+	if (radios_get_value(radios) == SET_PATH)
 	{
-		GList *list;
+		const guchar *path;
 
-		list = g_list_prepend(NULL, (char *) icon_path);
-		action_delete(list);
-		g_list_free(list);
+		path = g_object_get_data(G_OBJECT(dialog), "pathname");
+		g_return_if_fail(path != NULL);
+
+		delete_globicon(path);
 	}
+	else
+	{
+		const guchar *path;
+		guchar *tmp;
+		DropBox *drop_box;
+
+		drop_box = g_object_get_data(G_OBJECT(dialog), "rox-dropbox");
+		g_return_if_fail(drop_box != NULL);
+
+		path = drop_box_get_path(drop_box);
+		g_return_if_fail(path != NULL);
+
+		tmp = g_strdup_printf(_("Really delete icon '%s'?"), path);
+		if (confirm(tmp, GTK_STOCK_DELETE, NULL))
+		{
+			if (unlink(path))
+				delayed_error(_("Can't delete '%s':\n%s"),
+						path, g_strerror(errno));
+		}
+		g_free(tmp);
+	}
+
+	radios_changed(dialog);
 }
 
 /* Display a dialog box allowing the user to set the icon for
@@ -302,8 +321,6 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	g_signal_connect(frame, "path_dropped",
 			G_CALLBACK(drag_icon_dropped), dialog);
-	g_signal_connect(frame, "open_dir",
-			G_CALLBACK(show_current_dirs_menu), NULL);
 	g_signal_connect(frame, "clear",
 			G_CALLBACK(clear_icon), dialog);
 
@@ -579,67 +596,6 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 	filer_update_all();
 
 	return TRUE;
-}
-
-static void get_dir(gpointer key, gpointer value, gpointer data)
-{
-	GHashTable *names = (GHashTable *) data;
-	gchar *dir;
-	
-	dir = g_path_get_dirname(value);	/* Freed in add_dir_to_menu */
-	if (dir)
-	{
-		g_hash_table_insert(names, dir, NULL);
-	}
-}
-
-static void open_icon_dir(GtkMenuItem *item, gpointer data)
-{
-	FilerWindow *filer;
-	const char *dir;
-
-	dir = gtk_label_get_text(GTK_LABEL(GTK_BIN(item)->child));
-	filer = filer_opendir(dir, NULL, NULL);
-	if (filer)
-		display_set_thumbs(filer, TRUE);
-}
-
-static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
-{
-	GtkMenuShell *menu = (GtkMenuShell *) data;
-	GtkWidget *item;
-	
-	item = gtk_menu_item_new_with_label(key);
-	gtk_widget_set_accel_path(item, NULL, NULL);	/* XXX */
-	g_signal_connect(item, "activate",
-			G_CALLBACK(open_icon_dir), NULL);
-	g_free(key);
-	gtk_menu_shell_append(menu, item);
-}
-
-static void show_current_dirs_menu(GtkWidget *drop_box, gpointer data)
-{
-	GHashTable *names;
-	GtkWidget *menu;
-
-	names = g_hash_table_new(g_str_hash, g_str_equal);
-
-	g_hash_table_foreach(glob_icons, get_dir, names);
-	if (g_hash_table_size(glob_icons) == 0)
-	{
-		/* TODO: Include MIME-icons? */
-		delayed_error(_("You have not yet set any special icons; "
-			"therefore, I have no directories to show you"));
-		return;
-	}
-	
-	menu = gtk_menu_new();
-
-	g_hash_table_foreach(names, add_dir_to_menu, menu);
-
-	g_hash_table_destroy(names);
-
-	show_popup_menu(menu, gtk_get_current_event(), 0);
 }
 
 /* Load image 'src', and save it as an icon-sized image in png format.
