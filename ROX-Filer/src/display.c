@@ -512,6 +512,10 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 	filer_window->display_style = style;
 }
 
+/* Each displayed item has a ViewData structure with some cached information
+ * to help quickly draw the item (eg, the PangoLayout). This function updates
+ * this information.
+ */
 void display_update_view(FilerWindow *filer_window,
 			 DirItem *item,
 			 ViewData *view,
@@ -633,6 +637,9 @@ void display_update_view(FilerWindow *filer_window,
 			wrap_width = o_large_width.int_value * PANGO_SCALE;
 	}
 
+#ifdef PANGO_WRAP_WORD_CHAR
+	pango_layout_set_wrap(view->layout, PANGO_WRAP_WORD_CHAR);
+#endif
 	if (wrap_width != -1)
 		pango_layout_set_width(view->layout, wrap_width);
 
