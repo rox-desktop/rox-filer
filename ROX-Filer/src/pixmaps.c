@@ -323,21 +323,24 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
 	g_return_val_if_fail(normal_pixbuf != NULL, NULL);
 
 	gdk_pixbuf_render_pixmap_and_mask(normal_pixbuf, &pixmap, &mask, 128);
-	gdk_pixbuf_unref(normal_pixbuf);
 
 	if (!pixmap)
 	{
 		gdk_pixbuf_unref(huge_pixbuf);
+		gdk_pixbuf_unref(normal_pixbuf);
 		return NULL;
 	}
 
 	mp = g_new(MaskedPixmap, 1);
+	mp->huge_pixbuf = huge_pixbuf;
 	mp->ref = 1;
+
 	mp->pixmap = pixmap;
 	mp->mask = mask;
-	mp->huge_pixbuf = huge_pixbuf;
 	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
 	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
+
+	gdk_pixbuf_unref(normal_pixbuf);
 
 	mp->huge_pixmap = NULL;
 	mp->huge_mask = NULL;

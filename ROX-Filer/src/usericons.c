@@ -84,7 +84,7 @@ out:
 }
 
 /* Set an item's image field according to the globicons patterns if
- * it matches one of them and the file exists, if item is not NULL.
+ * it matches one of them and the file exists.
  */
 void check_globicon(guchar *path, DirItem *item)
 {
