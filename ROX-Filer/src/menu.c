@@ -111,6 +111,7 @@ static void open_vfs_deb(gpointer data, guint action, GtkWidget *widget);
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
+static void new_file(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
@@ -192,6 +193,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Clear Selection"),		NULL, clear_selection, 0, NULL},
 {N_("Options..."),		NULL, menu_show_options, 0, NULL},
 {N_("New Directory..."),	NULL, new_directory, 0, NULL},
+{N_("New File..."),		NULL, new_file, 0, NULL},
 {N_("Xterm Here"),		NULL, xterm_here, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
@@ -1277,6 +1279,36 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 			make_path(window_with_focus->path, _("NewDir"))->str,
 			type_to_icon(&special_directory),
 			new_directory_cb);
+}
+
+static gboolean new_file_cb(guchar *initial, guchar *path)
+{
+	int fd;
+
+	fd = open(path, O_CREAT | O_EXCL, 0666);
+
+	if (fd == -1)
+	{
+		report_error(_("Error creating file"), g_strerror(errno));
+		return FALSE;
+	}
+
+	if (close(fd))
+		report_error(_("Error creating file"), g_strerror(errno));
+
+	dir_check_this(path);
+
+	return TRUE;
+}
+
+static void new_file(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+	
+	savebox_show(_("New File"),
+			make_path(window_with_focus->path, _("NewFile"))->str,
+			type_to_icon(&text_plain),
+			new_file_cb);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
