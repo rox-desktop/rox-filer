@@ -105,7 +105,7 @@ void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 
 	build_app_menu(app_dir, app_item);
 
-	if (app_item->flags & ITEM_FLAG_MOUNTED)
+	if (app_item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		GtkWidget *item;
 		item = gtk_menu_item_new_with_label(_("Eject"));
