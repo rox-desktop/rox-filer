@@ -2417,6 +2417,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 			new_path = filer_window->sym_path;
 	}
 
+	/* Don't ask about dragging to an application! */
+	if (type == drop_dest_prog && action == GDK_ACTION_ASK)
+		action = GDK_ACTION_COPY;
+	
 	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
 	if (type)
 	{
