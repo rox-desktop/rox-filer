@@ -517,6 +517,12 @@ xdg_mime_shutdown (void)
       _xdg_mime_alias_list_free (alias_list);
       alias_list = NULL;
     }
+
+  if (parent_list)
+    {
+      _xdg_mime_parent_list_free (parent_list);
+      parent_list = NULL;
+    }
   
   for (list = callback_list; list; list = list->next)
     (list->callback) (list->data);
