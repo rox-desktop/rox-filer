@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.1\n"
-"POT-Creation-Date: 2002-07-25 14:30+0100\n"
+"Project-Id-Version: ROX-Filer 1.3.3\n"
+"POT-Creation-Date: 2002-07-26 09:56-0300\n"
 "PO-Revision-Date: 2001-11-05\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -89,7 +89,6 @@ msgid "Simple Tests"
 msgstr "Test simple"
 
 #: action.c:205
-#, fuzzy
 msgid ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
 "(types)\n"
@@ -102,13 +101,15 @@ msgid ""
 "contains a slash then the match is against the full path; otherwise it is \n"
 "against the leafname only."
 msgstr ""
-"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (tipos)\n"
-"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable (permisos)\n"
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+"(tipos)\n"
+"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
+"(permisos)\n"
 "IsEmpty, IsMine\n"
 "\n"
-"Un patrón entre comillas simples es un patrón comodín en estilo shell. Si "
-"contiene una barra entonces la correspondencia realizada considerando la \n"
-"ruta completa; en el otra caso se utiliza sólo el nombre del archivo."
+"Un patrón entre comillas simples es un patrón comodín en estilo shell. Si\n "
+"contiene una barra entonces la correspondencia es realizada considerando la \n"
+"ruta completa; sino se utiliza sólo el nombre del archivo."
 
 #: action.c:219
 msgid "Comparisons"
@@ -485,8 +486,7 @@ msgstr "Montar / Desmontar"
 
 #: action.c:1764
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr ""
-"ROX-Filer todavía no soporta puntos de montaje en tu sistema. Lo siento."
+msgstr "ROX-Filer todavía no soporta puntos de montaje en tu sistema. Lo siento."
 
 #: action.c:1778 action.c:2053 menu.c:211 tips:164 type.c:907
 msgid "Delete"
@@ -652,11 +652,11 @@ msgstr "Error del protocolo XDS: el nombre del archivo no puede contener '/'\n"
 
 #: dnd.c:716
 msgid ""
-"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
-"plain) did not contain a leafname\n"
+"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type "
+"text/plain) did not contain a leafname\n"
 msgstr ""
-"Destino XdndDirectSave0 provisto, pero el átomo XdndDirectSave0 (tipo text/"
-"plain) no contiene un nombre de archivo\n"
+"Destino XdndDirectSave0 provisto, pero el átomo XdndDirectSave0 (tipo "
+"text/plain) no contiene un nombre de archivo\n"
 
 #: dnd.c:727
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
@@ -667,8 +667,8 @@ msgstr ""
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
-"Lo siento - Necesito un destino de tipo text/uri-list o application/octet-"
-"stream."
+"Lo siento - Necesito un destino de tipo text/uri-list o "
+"application/octet-stream."
 
 #: dnd.c:829
 msgid "Unknown target"
@@ -741,7 +741,6 @@ msgid "Directory missing/deleted"
 msgstr "Directorio ausente/borrado"
 
 #: filer.c:845
-#, fuzzy, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later.\n"
@@ -749,7 +748,8 @@ msgid ""
 msgstr ""
 "El grupo %s no está definido. Selecciona algunos archivos y presiona Ctrl+%s "
 "para definir el grupo. Presiona %s para seleccionar de nuevo los archivos "
-"después."
+"después.\n"
+"Aségurate que NumLock está activado si utilizas el teclado numérico."
 
 #: filer.c:1030
 #, c-format
@@ -850,9 +850,8 @@ msgid "IsSocket"
 msgstr "EsSocket"
 
 #: find.c:764
-#, fuzzy
 msgid "IsDoor"
-msgstr "EsDir"
+msgstr "EsDoor"
 
 #: find.c:766
 msgid "IsSUID"
@@ -1048,16 +1047,9 @@ msgid ""
 msgstr ""
 "Error en el archivo '%s' en la línea %d: \n"
 "\"%s\"\n"
-"Esto puede deberse a una actualización a partir de una versión previa de ROX-"
-"Filer. Abre la ventana Opciones y haz click en Guardar.\n"
+"Esto puede deberse a una actualización a partir de una versión previa de "
+"ROX-Filer. Abre la ventana Opciones y haz click en Guardar.\n"
 "Los errores posteriores serán ignorados."
-
-#: i18n.c:38
-msgid ""
-"Note that you must save your choices and restart the filer for the new "
-"language setting to take full effect."
-msgstr ""
-"Tienes que reiniciar el filer para que el nuevo lenguaje tenga efecto total"
 
 #: icon.c:109
 msgid "ROX-Filer"
@@ -1065,12 +1057,11 @@ msgstr ""
 
 #: icon.c:110 menu.c:250
 msgid "About ROX-Filer..."
-msgstr ""
+msgstr "Sobre ROX-Filer..."
 
 #: icon.c:111 menu.c:251
-#, fuzzy
 msgid "Show Help Files"
-msgstr "Mostrar archivos ocultos"
+msgstr "Mostrar Archivos de Ayuda"
 
 #: icon.c:112 menu.c:252
 msgid "Manual"
@@ -1155,21 +1146,19 @@ msgstr "El texto mostrado bajo el ícono es:"
 #: infobox.c:90
 #, c-format
 msgid "Are you sure you want to open %d windows?"
-msgstr ""
+msgstr "¿Estás seguro que quieres abrir %d ventanas?"
 
 #: infobox.c:91
 msgid "File Information"
-msgstr ""
+msgstr "Información de Archivo"
 
 #: infobox.c:92
-#, fuzzy
 msgid "Show Info"
-msgstr "Información"
+msgstr "Mostrar Información"
 
 #: infobox.c:212
-#, fuzzy
 msgid "Show _Help Files"
-msgstr "Mostrar archivos ocultos"
+msgstr "Mostrar Arc_hivos de Ayuda"
 
 #: infobox.c:316
 msgid "Name:"
@@ -1180,9 +1169,8 @@ msgid "Error:"
 msgstr "Error:"
 
 #: infobox.c:327
-#, fuzzy
 msgid "Real directory:"
-msgstr "directorio"
+msgstr "Directorio real:"
 
 #: infobox.c:335
 msgid "Owner, Group:"
@@ -1247,79 +1235,20 @@ msgid "ROX application"
 msgstr "Aplicación de ROX"
 
 #: infobox.c:553
-#, fuzzy
 msgid "mounted"
-msgstr "Desmontar"
+msgstr "montado"
 
 #: infobox.c:553
-#, fuzzy
 msgid "unmounted"
-msgstr "Desmontar"
+msgstr "desmontado"
 
 #: infobox.c:557
-#, fuzzy, c-format
 msgid "Mount point for %s (%s)"
-msgstr "Punto de montaje"
+msgstr "Punto de montaje para %s (%s)"
 
 #: infobox.c:559
-#, fuzzy, c-format
 msgid "Mount point (%s)"
-msgstr "Punto de montaje"
-
-#: main.c:93
-msgid ""
-"Copyright (C) 2002 Thomas Leonard.\n"
-"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
-"to the extent permitted by law.\n"
-"You may redistribute copies of ROX-Filer\n"
-"under the terms of the GNU General Public License.\n"
-"For more information about these matters, see the file named COPYING.\n"
-msgstr ""
-
-#: main.c:102
-msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
-msgstr ""
-
-#: main.c:105
-msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
-msgstr ""
-
-#: main.c:107
-msgid ""
-"NOTE: Your system does not support long options - \n"
-"you must use the short versions instead.\n"
-"\n"
-msgstr ""
-
-#: main.c:111
-msgid ""
-"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
-"Open each directory or file listed, or the current working\n"
-"directory if no arguments are given.\n"
-"\n"
-"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
-"  -c, --client-id=ID\tused for session management\n"
-"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
-"  -D, --close=DIR\tclose DIR and its subdirectories\n"
-"  -h, --help\t\tdisplay this help and exit\n"
-"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
-"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
-"  -n, --new\t\tstart a new filer, even if already running\n"
-"  -o, --override\toverride window manager control of panels\n"
-"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
-"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
-"  -R, --RPC\t\tinvoke method call read from stdin\n"
-"  -s, --show=FILE\topen a directory showing FILE\n"
-"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
-"  -u, --user\t\tshow user name in each window \n"
-"  -v, --version\t\tdisplay the version information and exit\n"
-"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
-"\n"
-"The latest version can be found at:\n"
-"\thttp://rox.sourceforge.net\n"
-"\n"
-"Report bugs to <tal197@users.sourceforge.net>.\n"
-msgstr ""
+msgstr "Punto de montaje (%s)"
 
 #: main.c:395
 #, c-format
@@ -1435,9 +1364,8 @@ msgid "Send To..."
 msgstr "Enviar A..."
 
 #: menu.c:221
-#, fuzzy
 msgid "Count"
-msgstr "Montar"
+msgstr "Contar"
 
 #: menu.c:225
 msgid "Select"
@@ -1509,7 +1437,7 @@ msgstr "Xterm Aquí"
 
 #: menu.c:248
 msgid "Switch to xterm"
-msgstr ""
+msgstr "Cambiar a xterm"
 
 #: menu.c:719
 msgid "You should Shift+Menu click over a file to send it somewhere"
@@ -1626,14 +1554,14 @@ msgstr ""
 "Uso avanzado:\n"
 "También se pueden crear subdirectorios llamados `.text_html', `.text', etc "
 "los cuales serán mostrados sólo para archivos de ésos tipos. `.group' "
-"esmostrado sólo cuando son seleccionados muchos archivos."
+"es mostrado sólo cuando son seleccionados muchos archivos."
 
 #: menu.c:1404
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr ""
-"Te mostraré tu directorio EnviarA ahora; deberías enlazar simbólicamente "
+"Ahora te mostraré tu directorio EnviarA; deberías enlazar simbólicamente "
 "(Ctrl+Shift arrastrar) las aplicaciones que quieras que estén dentro de él."
 
 #: menu.c:1407
@@ -1914,9 +1842,11 @@ msgid ""
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
+"El manejador de fondo de pantalla debe ser un directorio de aplicación. Arrastra "
+"un directorio de aplicación adentro del diálogo Definir fondo de pantalla, o "
+"(para programadores) pásalo al método SOAP SetBackdropApp."
 
 #: pinboard.c:528
-#, fuzzy
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -1925,7 +1855,10 @@ msgid ""
 "element, as described in ROX-Filer's manual."
 msgstr ""
 "Sólo puedes definir el fondo de pantalla con una imágen o con un programa "
-"que sepa como manejar del fondo de pantalla de ROX-Filer."
+"que sepa como manejar el fondo de pantalla de ROX-Filer.\n"
+"\n"
+"Programadores: el AppInfo.xml de la aplicación debe contener el elemento "
+"CanSetBackdrop, como es descrito en el manual de ROX-Filer."
 
 #: pinboard.c:545
 msgid "Set backdrop"
@@ -2028,8 +1961,8 @@ msgstr "Archivo de traducción .gmo no válido (demasiado corto): %s"
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr ""
-"Archivo de traducción .gmo no válido (no se encontró el número mágico GNU): %"
-"s"
+"Archivo de traducción .gmo no válido (no se encontró el número mágico GNU): "
+"%s"
 
 #: run.c:94 run.c:135
 #, c-format
@@ -2108,6 +2041,9 @@ msgid ""
 "Door:\n"
 "Doors are a little-used Solaris method for processes to communicate."
 msgstr ""
+"Door:\n"
+"Los doors son un método poco utilizado de Solaris para la comunicación "
+"entre procesos."
 
 #: run.c:329
 msgid ""
@@ -2185,7 +2121,7 @@ msgstr "Arriba"
 
 #: toolbar.c:111
 msgid "Change to parent directory"
-msgstr "Cambiar al directorio padre"
+msgstr "Cambiar al directorio superior"
 
 #: toolbar.c:115
 msgid "Home"
@@ -2309,10 +2245,21 @@ msgid ""
 "Otherwise, you should check, or even just delete, all the existing run "
 "actions."
 msgstr ""
+"¡El ejecutable '%s' es modificable por todos! Me niego a ejecutar. Por "
+"favor modifica los permisos ahora (éste problema puede haber sido causado "
+"por un bug en versiones anteriores del filer).\n"
+"\n"
+"Tener accions de ejecución (no enlaces simbólicos) modificables por todos "
+"significa que otras personas que usen tu computadora pueden reemplazar tus "
+"acciones de ejecución con versiones maliciosas.\n"
+"\n"
+"Si confías en todos los que puedan escribir en ésos archivos, entonces no "
+"necesitas preocuparte. Sino, deberías verificar, o incluso sólo eliminar, "
+"todas las acciones de ejecución existentes."
 
 #: type.c:374
 msgid "go-w (Fix security problem)"
-msgstr ""
+msgstr "go-w (Resuelve problema de seguridad)"
 
 #: type.c:476
 msgid ""
@@ -2418,16 +2365,15 @@ msgid "File '%s' corrupted!"
 msgstr "¿El archivo '%s' está corrupto!"
 
 #: type.c:1254
-#, fuzzy
 msgid ""
 "The standard MIME type database (version 0.8 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
 "should download and install the 'shared-mime-info-0.8' package from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
-"La base de datos de tipos MIME no fue hallada. El filer probablemente no "
-"mostrará los tipos correctos para diferentes archivos. Deberás descarar e "
-"instalar el 'Paquete de tipo comunes' ('Common types package') de aquí:\n"
+"La base de datos de tipos MIME (versión 0.8 o posterior) no fue hallada. El "
+"filer probablemente no mostrará los tipos correctos para diferentes archivos. "
+"Deberás descargar e instalar el paquete 'shared-mime-info-0.8' desde aquí:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 
 #: usericons.c:191
@@ -2476,8 +2422,8 @@ msgid ""
 "users will then see the icon, and you can move the directory around safely. "
 "This is usually the best option if you can write to the directory."
 msgstr ""
-"Copia la imágen dentro del directorio, como un archivo oculto llamado '."
-"DirIcon'. Entonces todos los usuarios verán el ícono y podrás mover el "
+"Copia la imágen dentro del directorio, como un archivo oculto llamado "
+"'.DirIcon'. Entonces todos los usuarios verán el ícono y podrás mover el "
 "directorio con seguridad. Ésta es usualmente la mejor opción si puedes "
 "escribir en el directorio."
 
@@ -2636,7 +2582,7 @@ msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
 msgstr ""
-"El filer redimensionará las ventanas siempre que sea útil(esto es, cuando se "
+"El filer redimensionará las ventanas siempre que sea útil (esto es, cuando se "
 "cambie el directorio o el estilo de despliegue)."
 
 #: tips:25
@@ -2653,29 +2599,32 @@ msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
 msgstr ""
-"El mayor tamaño, como porcentaje del tamaño de la pantalla, al cual el auto-"
-"redimensionador redimensionará una ventana."
+"El mayor tamaño, como porcentaje del tamaño de la pantalla, al cual el "
+"auto-redimensionador redimensionará una ventana."
 
 #: tips:28
 msgid "Change from Large icons to Small automatically:"
-msgstr ""
+msgstr "Pasar de íconos Grandes a Pequeños automáticamente:"
 
 #: tips:29
 msgid ""
 "If this is on then filer windows will change from Large icons to Small when "
 "showing a new directory with lots of files."
 msgstr ""
+"Si ésto está activado entonces las ventanas del filer pasarán de íconos Grandes "
+"a Pequeños cuando se muestre un directorio nuevo con muchos archivos."
 
 #: tips:30
-#, fuzzy
 msgid "Small Icons if at least:"
-msgstr "Ancho máximo de los Iconos Pequeños:"
+msgstr "Iconos Pequeños si hay por lo menos:"
 
 #: tips:32 tips:33
 msgid ""
 "If the directory contains this many items then it will be shown using Small "
 "Icons, otherwise Large Icons will be used."
 msgstr ""
+"Si el directorio contiene ésta cantidad de elementos entonces será mostrado "
+"usando Iconos Pequeños, en otro caso serán usados Iconos Grandes."
 
 #: tips:34
 msgid "Window behaviour"
@@ -2717,7 +2666,7 @@ msgid ""
 msgstr ""
 "Al hacer click con el botón 1 del ratón (usualmente el botón izquierdo) se "
 "abrirá un directorio en una nueva ventana si está opción está activada. Al "
-"hacer click con el botón 3 (del medio) reutilizará la ventana actual."
+"hacer click con el botón 3 (del medio) se reutilizará la ventana actual."
 
 #: tips:41
 msgid "Single-click navigation in filer windows"
@@ -2806,7 +2755,7 @@ msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
 msgstr ""
-"Si está activada entonces las opciones de despliegue de una nueva ventana "
+"Si está activada entonces las opciones de despliegue de una ventana nueva "
 "son heredadas de la ventana origen si es posible, sino son definidas con sus "
 "valores por defecto a continuación."
 
@@ -2880,18 +2829,16 @@ msgid "None"
 msgstr "Ninguna"
 
 #: tips:92
-#, fuzzy
 msgid "Icons only"
-msgstr "Sólo imágen"
+msgstr "Sólo icónos"
 
 #: tips:93
-#, fuzzy
 msgid "Text under icons"
-msgstr "El texto mostrado bajo el ícono es:"
+msgstr "Texto bajo los íconos"
 
 #: tips:94
 msgid "Text beside icons"
-msgstr ""
+msgstr "Texto al lado de los íconos"
 
 #: tips:95
 msgid "Show totals of items"
@@ -3415,15 +3362,16 @@ msgid "Block device:"
 msgstr "Dispositivo de bloques:"
 
 #: tips:237
-#, fuzzy
 msgid "Door:"
-msgstr "Ir A:"
+msgstr "Door:"
 
 #: tips:238
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
+"Los archivos door son un poco como sockets o tuberías, y sólo han sido "
+"vistos en Solaris."
 
 #: tips:239
 msgid "Executable file:"
@@ -3436,21 +3384,3 @@ msgstr "Directorio de aplicaciones:"
 #: tips:241
 msgid "Unknown type:"
 msgstr "Tipo desconocido:"
-
-#~ msgid "Show ROX-Filer Help"
-#~ msgstr "Mostrar Ayuda de ROX-Filer"
-
-#~ msgid "Invalid type '%s' in '%s'"
-#~ msgstr "Tipo inválido '%s' en '%s'"
-
-#~ msgid "Failed to create child process"
-#~ msgstr "Falló la creación del proceso hijo"
-
-#~ msgid "Small"
-#~ msgstr "Pequeña"
-
-#~ msgid "Large"
-#~ msgstr "Grande"
-
-#~ msgid "The label must contain at least one character!"
-#~ msgstr "La etiqueta debe contener al menos un caracter!"
