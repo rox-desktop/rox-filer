@@ -65,7 +65,8 @@ static gint icon_button_release(GtkWidget *widget,
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Icon *icon);
-static void reposition_panel(Panel *panel, gboolean force_resize);
+static void reposition_panel(GtkWidget *window,
+				GtkAllocation *alloc, Panel *panel);
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
 			Icon *icon);
@@ -273,6 +274,8 @@ Panel *panel_new(guchar *name, PanelSide side)
 	gtk_widget_queue_resize(box);
 	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-request",
 		GTK_SIGNAL_FUNC(panel_post_resize), (GtkObject *) panel);
+	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-allocate",
+			GTK_SIGNAL_FUNC(reposition_panel), (GtkObject *) panel);
 	gtk_signal_connect_after(GTK_OBJECT(box), "size-allocate",
 			GTK_SIGNAL_FUNC(box_resized), (GtkObject *) panel);
 
@@ -325,9 +328,11 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
 	{
 		if (current_panel[PANEL_RIGHT])
-			reposition_panel(current_panel[PANEL_RIGHT], FALSE);
+			gtk_widget_queue_resize(
+					current_panel[PANEL_RIGHT]->window);
 		if (current_panel[PANEL_LEFT])
-			reposition_panel(current_panel[PANEL_LEFT], FALSE);
+			gtk_widget_queue_resize(
+					current_panel[PANEL_LEFT]->window);
 	}
 
 	g_free(panel->name);
@@ -638,39 +643,37 @@ static gint icon_button_press(GtkWidget *widget,
 /* Difference between height of an icon and height of panel (or width) */
 #define MARGIN 8
 
-static void reposition_panel(Panel *panel, gboolean force_resize)
+static void reposition_panel(GtkWidget *window,
+				GtkAllocation *alloc, Panel *panel)
 {
-	int	x = 0, y = 0;
-	int	w = 32, h = 32;
+	int		x = 0, y = 0;
 	PanelSide	side = panel->side;
-	GtkRequisition req;
-
-	gtk_widget_get_child_requisition(panel->window, &req);
-	w = req.width;
-	h = req.height;
 
 	if (side == PANEL_LEFT || side == PANEL_RIGHT)
 	{
 		if (side == PANEL_RIGHT)
-			x = screen_width - w;
+			x = screen_width - alloc->width;
 
 		if (current_panel[PANEL_TOP])
 			y += current_panel[PANEL_TOP]->height;
 	}
 
 	if (side == PANEL_BOTTOM)
-		y = screen_height - h;
+		y = screen_height - alloc->height;
 	
 	gtk_widget_set_uposition(panel->window, x, y);
-	panel->height = h;
-	gdk_window_move_resize(panel->window->window, x, y, w, h);
+	panel->height = alloc->height;
+	gdk_window_move_resize(panel->window->window, x, y,
+				alloc->width, alloc->height);
 
 	if (side == PANEL_BOTTOM || side == PANEL_TOP)
 	{
 		if (current_panel[PANEL_RIGHT])
-			reposition_panel(current_panel[PANEL_RIGHT], FALSE);
+			gtk_widget_queue_resize(
+					current_panel[PANEL_RIGHT]->window);
 		if (current_panel[PANEL_LEFT])
-			reposition_panel(current_panel[PANEL_LEFT], FALSE);
+			gtk_widget_queue_resize(
+					current_panel[PANEL_LEFT]->window);
 	}
 }
 
@@ -1245,16 +1248,13 @@ static void run_applet(Icon *icon)
  */
 static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel)
 {
-	reposition_panel(panel, FALSE);
+	gtk_widget_queue_resize(panel->window);
 }
 
 static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 {
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
-	{
-		if (req->width < screen_width)
-			req->width = screen_width;
-	}
+		req->width = screen_width;
 	else
 	{
 		int h = screen_height;
@@ -1265,8 +1265,7 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 		if (current_panel[PANEL_BOTTOM])
 			h -= current_panel[PANEL_BOTTOM]->height;
 
-		if (req->height < h)
-			req->height = h;
+		req->height = h;
 	}
 }
 
