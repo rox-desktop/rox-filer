@@ -1847,7 +1847,11 @@ void collection_qsort(Collection *collection,
 			if (collection->items[item].data == cursor_data)
 				collection_set_cursor_item(collection, item);
 			if (collection->items[item].data == wink_data)
+			{
+				collection->cursor_item_old = item;
 				collection->wink_item = item;
+				scroll_to_show(collection, item);
+			}
 		}
 	}
 	
