@@ -106,18 +106,6 @@ struct _CollectionClass
 					  gint		time);
 	void		(*selection_changed)(Collection	*collection,
 					     gint	time);
-
-	void		(*draw_item)(GtkWidget *widget, 
-				     CollectionItem *item,
-			  	     GdkRectangle *area);
-	
-	gboolean	(*test_point)(Collection *collection,
-				      int point_x, int point_y,
-				      CollectionItem *item,
-				      int width, int height);
-
-	void		(*free_item)(Collection *collection,
-				     CollectionItem *item);
 };
 
 GType	collection_get_type   		(void);

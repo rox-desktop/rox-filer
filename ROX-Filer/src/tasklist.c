@@ -355,7 +355,6 @@ static void add_window(Window win)
 
 		XSelectInput(gdk_display, win, attr.your_event_mask |
 			PropertyChangeMask);
-		gdk_flush();
 
 		gdk_flush();
 
