@@ -7,6 +7,8 @@
 
 #include <gtk/gtk.h>
 
+extern char *current_lang;
+
 void i18n_init(void);
 GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n);
 void free_translated_entries(GtkItemFactoryEntry *entries, gint n);

@@ -35,6 +35,8 @@
 #include "gui_support.h"
 #include "main.h"
 
+char *current_lang = NULL;	/* Two-char country code, or NULL */
+
 /* Used to stop the translation-changed message on startup */
 static gboolean doing_init;
 
@@ -165,10 +167,16 @@ static void set_trans(guchar *lang)
 {
 	struct stat info;
 	guchar	*path;
-	guchar	*lang2 = NULL;
+	gchar	*lang2 = NULL;
 
 	g_return_if_fail(lang != NULL);
 
+	if (current_lang)
+	{
+		g_free(current_lang);
+		current_lang = NULL;
+	}
+	
 	if (strcmp(lang, "None") == 0)
 	{
 		rox_clear_translation();
@@ -187,10 +195,10 @@ static void set_trans(guchar *lang)
 			lang2 = g_strndup((gchar *) lang, 2);
 	}
 
-	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir,
-			(lang2 != NULL) ? lang2 : lang);
+	current_lang = lang2 ? lang2 : g_strdup(lang);
+
+	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, current_lang);
 	if (stat(path, &info) == 0)
 		rox_add_translations(path);
 	g_free(path);
-	g_free(lang2);
 }
