@@ -1787,7 +1787,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 		box = gtk_hbutton_box_new();
 		gtk_button_box_set_child_size_default(16, 16);
-		gtk_hbutton_box_set_spacing_default(2);
+		gtk_hbutton_box_set_spacing_default(0);
 		gtk_button_box_set_layout(GTK_BUTTON_BOX(box),
 				GTK_BUTTONBOX_START);
 	}
@@ -1809,7 +1809,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	add_button(box, im_help,
 			GTK_SIGNAL_FUNC(toolbar_help_clicked),
 			filer_window,
-			_("Help"), _("Show ROX-Filer Help"));
+			_("Help"), _("Show ROX-Filer help"));
 
 	return frame;
 }
@@ -1870,6 +1870,7 @@ static void add_button(GtkWidget *box, MaskedPixmap *icon,
 	else
 	{
 		button = gtk_button_new();
+		gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
 		GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 
 		gtk_container_add(GTK_CONTAINER(button), icon_widget);

@@ -22,6 +22,8 @@ extern gint		fixed_width;
 extern GdkColor 	red;
 extern GdkGC 		*red_gc;
 
+typedef void (*HelpFunc)(gpointer data);
+
 void gui_support_init();
 int get_choice(char *title,
 	       char *message,
@@ -32,5 +34,6 @@ void make_panel_window(GdkWindow *window);
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
 void delayed_error(char *title, char *error);
 gboolean load_file(char *pathname, char **data_out, long *length_out);
+GtkWidget *new_help_button(HelpFunc show_help, gpointer data);
 
 #endif /* _GUI_SUPPORT_H */

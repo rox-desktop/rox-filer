@@ -331,7 +331,7 @@ static void entry_changed(GtkEntry *entry, GUIside *gui_side)
 	fflush(gui_side->to_child);
 }
 
-void show_condition_help(void)
+void show_condition_help(gpointer data)
 {
 	static GtkWidget *help = NULL;
 
@@ -1892,7 +1892,7 @@ void action_find(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
-	GtkWidget	*hbox, *label, *button, *scroller;
+	GtkWidget	*hbox, *label, *scroller;
 	gchar		*titles[2];
 	
 	titles[0] = _("Name");
@@ -1947,10 +1947,9 @@ void action_find(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
-	button = gtk_button_new_with_label(_("Show expression reference"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(show_condition_help), NULL);
+	gtk_box_pack_start(GTK_BOX(hbox),
+				new_help_button(show_condition_help, NULL),
+				FALSE, TRUE, 4);
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
@@ -2054,7 +2053,7 @@ void action_chmod(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
-	GtkWidget	*hbox, *label, *button;
+	GtkWidget	*hbox, *label;
 
 	collection = filer_window->collection;
 
@@ -2089,10 +2088,9 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
-	button = gtk_button_new_with_label(_("Show command reference"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			show_chmod_help, NULL);
+	gtk_box_pack_start(GTK_BOX(hbox),
+				new_help_button(show_chmod_help, NULL),
+				FALSE, TRUE, 4);
 	
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Permissions"));

@@ -37,6 +37,7 @@
 
 #include "main.h"
 #include "gui_support.h"
+#include "pixmaps.h"
 
 GdkFont	   	*item_font = NULL;
 GdkFont	   	*fixed_font = NULL;
@@ -293,3 +294,19 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 	return retval;
 }
+
+GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
+{
+	GtkWidget	*b, *icon;
+	
+	b = gtk_button_new();
+	gtk_button_set_relief(GTK_BUTTON(b), GTK_RELIEF_NONE);
+	icon = gtk_pixmap_new(im_help->pixmap, im_help->mask);
+	gtk_container_add(GTK_CONTAINER(b), icon);
+	gtk_signal_connect_object(GTK_OBJECT(b), "clicked", show_help, data);
+
+	GTK_WIDGET_UNSET_FLAGS(b, GTK_CAN_FOCUS);
+
+	return b;
+}
+

@@ -203,7 +203,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
 {">" N_("Select If..."),	NULL,  	select_if, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Show ROX-Filer help"), NULL,  rox_help, 0, NULL},
+{">" N_("Show ROX-Filer Help"), NULL,  rox_help, 0, NULL},
 };
 
 static GtkItemFactoryEntry panel_menu_def[] = {

@@ -65,16 +65,13 @@ static void show_help(FilerWindow *filer_window);
  */
 void create_minibuffer(FilerWindow *filer_window)
 {
-	GtkWidget *hbox, *label, *mini, *help, *icon;
+	GtkWidget *hbox, *label, *mini;
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	
-	icon = gtk_pixmap_new(im_help->pixmap, im_help->mask);
-	help = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(help), icon);
-	gtk_box_pack_start(GTK_BOX(hbox), help, FALSE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(help), "clicked",
-			GTK_SIGNAL_FUNC(show_help), (GtkObject *) filer_window);
+	gtk_box_pack_start(GTK_BOX(hbox),
+			new_help_button((HelpFunc) show_help, filer_window),
+			FALSE, TRUE, 0);
 
 	label = gtk_label_new(NULL);
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 2);
@@ -207,7 +204,7 @@ static void show_help(FilerWindow *filer_window)
 	  "where the name of the file should go (eg ` gimp \"$1\" ')");
 			break;
 		case MINI_SELECT_IF:
-			show_condition_help();
+			show_condition_help(NULL);
 			return;
 		default:
 			message = "?!?";
@@ -879,7 +876,7 @@ static gint key_press_event(GtkWidget	*widget,
 					shell_recall(filer_window, -1);
 					break;
 				case GDK_Tab:
-					return TRUE;
+					break;
 				case GDK_Return:
 					select_return_pressed(filer_window);
 					break;
