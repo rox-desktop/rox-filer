@@ -18,6 +18,7 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
+#include "apps.h"
 #include "filer.h"
 #include "type.h"
 #include "support.h"
@@ -41,6 +42,7 @@ static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
+static void help(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 
@@ -71,13 +73,14 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Sort by Type",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Date",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Size",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	NULL, 0, NULL},
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
-{"/File/Help",		    	"F1",  	NULL, 0, NULL},
+{"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/File/Mount",	    		C_"M",  mount, 0,	NULL},
@@ -104,10 +107,12 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Sort by Type",	NULL,   NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Date",	NULL,   NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Size",	NULL,   NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	NULL, 	NULL, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
+{"/File/Help",		    	NULL,  	help, 0, NULL},
 {"/File/Delete",		NULL,	delete,	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
@@ -195,6 +200,13 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 	GtkRequisition 	requisition;
 
 	gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
+	/* XXX: GDK sometimes seems to get the height wrong... */
+	if (sheight < 2)
+	{
+		g_print("ROX-Filer: Root window height reported as %d\n",
+				sheight);
+		sheight = 768;
+	}
 	
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
@@ -397,6 +409,78 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 				window_with_focus->path, item->leafname,
 				item->image, rename_cb);
 	}
+}
+
+static void help(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection 	*collection;
+	FileItem	*item;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected != 1)
+	{
+		report_error("ROX-Filer", "You must select a single "
+				"item to get help on");
+		return;
+	}
+	item = selected_item(collection);
+	switch (item->base_type)
+	{
+		case TYPE_FILE:
+			if (item->flags & ITEM_FLAG_EXEC_FILE)
+				report_error("Executable file",
+					"This is a file with an eXecute bit "
+					"set - it can be run as a program.");
+			else
+				report_error("File",
+				"This is a file. It contains stored data. Try "
+				"running file(1) on it to find out what kind "
+				"of data it contains.");
+			break;
+		case TYPE_DIRECTORY:
+			if (item->flags & ITEM_FLAG_APPDIR)
+				app_show_help(
+					make_path(window_with_focus->path,
+						  item->leafname)->str);
+			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+				report_error("Mount point",
+				"A mount point is a directory which another "
+				"filing system can be mounted on. Everything "
+				"on the mounted filesystem then appears to be "
+				"inside the directory.");
+			else
+				report_error("Directory",
+				"This is a directory. It contains an index to "
+				"other items - open it to see the list.");
+			break;
+		case TYPE_CHAR_DEVICE:
+		case TYPE_BLOCK_DEVICE:
+			report_error("Device file",
+				"Device files allow you to read from or write "
+				"to a device driver as though it was an "
+				"ordinary file.");
+			break;
+		case TYPE_PIPE:
+			report_error("Named pipe",
+				"Pipes allow different programs to "
+				"communicate. One program writes data to the "
+				"pipe while another one reads it out again.");
+			break;
+		case TYPE_SOCKET:
+			report_error("Socket",
+				"Sockets allow processes to communicate.");
+			break;
+		default:
+			report_error("Unknown type", 
+				"I couldn't find out what kind of file this "
+				"is. Maybe it doesn't exist anymore or you "
+				"don't have search permission on the directory "
+				"it's in?");
+			break;
+	}
+
 }
 
 static void mount(gpointer data, guint action, GtkWidget *widget)

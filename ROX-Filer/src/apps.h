@@ -6,3 +6,4 @@
  */
 
 void run_app(char *path);
+void app_show_help(char *path);
