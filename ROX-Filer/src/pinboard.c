@@ -568,7 +568,7 @@ void pinboard_set_backdrop(void)
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-	label = gtk_label_new("Display backdrop image:");
+	label = gtk_label_new(_("Display backdrop image:"));
 	gtk_misc_set_padding(GTK_MISC(label), 4, 0);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	gtk_box_pack_start(vbox, label, TRUE, TRUE, 4);
