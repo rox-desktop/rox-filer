@@ -457,8 +457,6 @@ static const char *pan_from_file(gchar *line)
  * icon is added to the right/bottom end of the panel.
  *
  * If name is NULL a suitable name is taken from path.
- *
- * name and path are in UTF-8 for Gtk+-2.0 only.
  */
 static void panel_add_item(Panel *panel,
 			   const guchar *path,
@@ -479,7 +477,7 @@ static void panel_add_item(Panel *panel,
 			GDK_BUTTON_RELEASE_MASK);
 	
 	gtk_box_pack_start(GTK_BOX(after ? panel->after : panel->before),
-			widget, FALSE, TRUE, 4);
+			widget, FALSE, TRUE, 0);
 	if (after)
 		gtk_box_reorder_child(GTK_BOX(panel->after), widget, 0);
 	
@@ -565,7 +563,7 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 	im_height = MIN(icon->item->image->height, ICON_HEIGHT);
 
 	req->height += im_height;
-	req->width = MAX(req->width, im_width);
+	req->width = MAX(req->width, im_width) + 8;
 }
 
 static gint expose_icon(GtkWidget *widget,
