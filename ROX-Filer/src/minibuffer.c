@@ -420,8 +420,11 @@ static void path_changed(FilerWindow *filer_window)
 		/* The new path is in a different directory */
 		struct stat info;
 
-		if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
+		if (stat_with_timeout(path, &info) == 0 &&
+				S_ISDIR(info.st_mode))
+		{
 			filer_change_to(filer_window, path, leaf);
+		}
 		else
 			error = TRUE;
 	}

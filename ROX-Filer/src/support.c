@@ -1370,3 +1370,33 @@ GPtrArray *list_dir(const guchar *path)
 
 	return names;
 }
+
+int stat_with_timeout(const char *path, struct stat *info)
+{
+	int status;
+	pid_t child;
+	gboolean retval;
+
+	child = fork();
+	if (child < 0)
+	{
+		g_warning("stat_with_timeout: fork(): %s", g_strerror(errno));
+		return -1;
+	}
+
+	if (child == 0)
+	{
+		/* Child */
+		alarm(3);
+		_exit(mc_stat(path, info) ? 1 : 0);
+	}
+
+	waitpid(child, &status, 0);
+
+	if (status == 0)
+		retval = mc_stat(path, info);
+	else
+		retval = -1;
+
+	return retval;
+}
