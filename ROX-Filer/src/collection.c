@@ -132,7 +132,7 @@ static void draw_focus_at(Collection *collection, GdkRectangle *area)
 	widget = GTK_WIDGET(collection);
 
 	if (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS)
-		gc = widget->style->black_gc;
+		gc = widget->style->fg_gc[GTK_STATE_ACTIVE];
 	else
 		gc = widget->style->fg_gc[GTK_STATE_INSENSITIVE];
 
@@ -394,7 +394,7 @@ static GdkGC *create_bg_gc(GtkWidget *widget)
 {
 	GdkGCValues values;
 
-	values.tile = widget->style->bg_pixmap[GTK_STATE_INSENSITIVE];
+	values.tile = widget->style->bg_pixmap[GTK_STATE_NORMAL];
 	values.fill = GDK_TILED;
 
 	return gdk_gc_new_with_values(widget->window, &values,
@@ -533,7 +533,7 @@ static void collection_set_style(GtkWidget *widget,
 			collection->bg_gc = NULL;
 		}
 
-		if (widget->style->bg_pixmap[GTK_STATE_INSENSITIVE])
+		if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
 			collection->bg_gc = create_bg_gc(widget);
 	}
 }
