@@ -48,6 +48,7 @@
 
 #include "gconvert.h"
 
+#ifdef HAVE_ICONV_H
 static gboolean
 g_utf8_get_charset_internal (const char **a)
 {
@@ -83,9 +84,12 @@ g_utf8_get_charset_internal (const char **a)
 static int utf8_locale_cache = -1;
 static const char *utf8_charset_cache = NULL;
 
+#endif
+
 gboolean
 g_get_charset (const char **charset) 
 {
+#ifdef HAVE_ICONV_H
   if (utf8_locale_cache != -1)
     {
       if (charset)
@@ -96,9 +100,11 @@ g_get_charset (const char **charset)
   if (charset) 
     *charset = utf8_charset_cache;
   return utf8_locale_cache;
+#else
+  *charset = "UTF-8";
+  return 1;
+#endif
 }
-
-/* unicode_strchr */
 
 #ifdef HAVE_ICONV_H
 size_t 
@@ -312,4 +318,4 @@ g_locale_from_utf8 (const gchar *utf8string,
 		      charset, "UTF-8", bytes_read, bytes_written, error);
 }
 
-#endif
+#endif /* GTK2 */
