@@ -282,11 +282,7 @@ static void add_regex(char *type_name, char *reg)
 	slash = strchr(type_name, '/');
 	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
 
-	pattern = g_new(Pattern, 1);
-	pattern->buffer.buffer = NULL;
-	pattern->buffer.allocated = 0;
-	pattern->buffer.fastmap = NULL;
-	pattern->buffer.translate = NULL;
+	pattern = g_new0(Pattern, 1);
 
         if (regcomp(&pattern->buffer, reg, REG_EXTENDED | REG_NOSUB))
 	{

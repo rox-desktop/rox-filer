@@ -365,11 +365,16 @@ gboolean sc_connect(SmClient *client)
 	gchar error_str[256];
 	gchar *client_id_ret = NULL;
 	SmcConn conn = NULL;
-	SmcCallbacks callbacks = { { &sc_save_yourself, (SmPointer)client },
-				   { &sc_die, (SmPointer)client },
-				   { &sc_save_complete, (SmPointer)client },
-				   { &sc_shutdown_cancelled, (SmPointer)client } };
+	SmcCallbacks callbacks;
 
+	callbacks.save_yourself.callback = &sc_save_yourself;
+	callbacks.save_yourself.client_data = (SmPointer)client;
+	callbacks.die.callback = &sc_die;
+	callbacks.die.client_data = (SmPointer)client;
+	callbacks.save_complete.callback = &sc_save_complete;
+	callbacks.save_complete.client_data = (SmPointer)client;
+	callbacks.shutdown_cancelled.callback = &sc_shutdown_cancelled;
+	callbacks.shutdown_cancelled.client_data = (SmPointer)client;
 	
 	if(IceAddConnectionWatch(&ice_watch_fn, client) == 0)
 	{
