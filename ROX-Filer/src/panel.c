@@ -502,15 +502,14 @@ static void panel_add_item(Panel *panel,
 			GTK_SIGNAL_FUNC(icon_button_release), icon);
 	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
 			GTK_SIGNAL_FUNC(icon_button_press), icon);
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
+			GTK_SIGNAL_FUNC(icon_motion_event), icon);
 
 	if (!icon->socket)
 	{
 		gtk_signal_connect_after(GTK_OBJECT(widget),
 				"enter-notify-event",
 				GTK_SIGNAL_FUNC(enter_icon), icon);
-		gtk_signal_connect(GTK_OBJECT(icon->widget),
-				"motion-notify-event",
-				GTK_SIGNAL_FUNC(icon_motion_event), icon);
 		gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
 				GTK_SIGNAL_FUNC(draw_icon), icon);
 		gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
@@ -1649,7 +1648,6 @@ static void run_applet(Icon *icon)
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_widget_show_all(icon->socket);
 	gtk_widget_realize(icon->socket);
-	gtk_widget_set_usize(icon->socket, 60, 30);
 
 	gtk_widget_ref(icon->widget);
 	gtk_object_set_data(GTK_OBJECT(icon->widget), "icon", icon);
