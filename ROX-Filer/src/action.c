@@ -282,7 +282,7 @@ static void select_row_callback(GtkWidget *widget,
                              GdkEventButton *event,
                              GUIside *gui_side)
 {
-	gchar		*leaf, *dir;
+	char		*leaf, *dir;
 
 	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 0, &leaf);
 	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 1, &dir);
@@ -1312,7 +1312,7 @@ static gboolean do_chmod(char *path, char *dummy)
 
 	if (o_recurse && S_ISDIR(info.st_mode))
 	{
-		char *safe_path;
+		guchar *safe_path;
 		safe_path = g_strdup(path);
 		for_dir_contents(do_chmod, safe_path, safe_path);
 		g_free(safe_path);

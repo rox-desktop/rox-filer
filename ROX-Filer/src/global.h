@@ -48,10 +48,10 @@ typedef struct _MIME_type MIME_type;
  */
 typedef struct _Pinboard Pinboard;
 
-/* Each icon on the pinboard has a PinIcon structure. It contains the
- * name, path and position of the icon, as well as its DirItem.
+/* Each icon on the pinboard or a panel has an Icon structure. It contains
+ * the name and path of the icon, as well as its DirItem.
  */
-typedef struct _PinIcon PinIcon;
+typedef struct _Icon Icon;
 
 /* There is one of these for each panel window open. Panels work rather
  * like little pinboards, but with a more rigid layout.

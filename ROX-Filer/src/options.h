@@ -32,9 +32,9 @@ extern GtkTooltips *option_tooltips;
 /* Prototypes */
 
 void options_init(void);
-void option_register(char *key, OptionFunc *func);
+void option_register(guchar *key, OptionFunc *func);
 void options_load(void);
 void options_show(void);
-void option_write(char *name, char *value);
+void option_write(guchar *name, guchar *value);
 
 #endif /* _OPTIONS_H */

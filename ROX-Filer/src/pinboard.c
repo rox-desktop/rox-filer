@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <ctype.h>
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
@@ -46,6 +47,7 @@
 #include "dir.h"
 #include "mount.h"
 #include "bind.h"
+#include "icon.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -61,15 +63,6 @@ GdkColor text_fg_col, text_bg_col;
 /* Style that all the icons should use. NULL => regenerate from text_fg/bg */
 GtkStyle *pinicon_style = NULL;
 
-struct _PinIcon {
-	GtkWidget	*win, *widget;
-	GdkBitmap	*mask;
-	guchar		*path;
-	DirItem		item;
-	int		x, y;
-	gboolean	selected;
-};
-
 struct _Pinboard {
 	guchar		*name;		/* Leaf name */
 	GList		*icons;
@@ -80,7 +73,7 @@ static gint	loading_pinboard = 0;		/* Non-zero => loading */
 static gboolean tmp_icon_selected = FALSE;
 
 
-static PinIcon	*current_wink_icon = NULL;
+static Icon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
 static gint	number_selected = 0;
@@ -124,13 +117,13 @@ typedef enum {TEXT_BG_SOLID, TEXT_BG_OUTLINE, TEXT_BG_NONE} TextBgType;
 TextBgType o_text_bg = TEXT_BG_SOLID;
 
 /* Static prototypes */
-static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight);
-static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon);
-static void mask_wink_border(PinIcon *icon, GdkColor *alpha);
+static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight);
+static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon);
+static void mask_wink_border(Icon *icon, GdkColor *alpha);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
-                            	     PinIcon *icon);
+                            	     Icon *icon);
 static gboolean root_property_event(GtkWidget *widget,
 			    	    GdkEventProperty *event,
                             	    gpointer data);
@@ -139,22 +132,22 @@ static gboolean root_button_press(GtkWidget *widget,
                             	  gpointer data);
 static gboolean enter_notify(GtkWidget *widget,
 			     GdkEventCrossing *event,
-			     PinIcon *icon);
+			     Icon *icon);
 static gboolean button_press_event(GtkWidget *widget,
 			    GdkEventButton *event,
-                            PinIcon *icon);
+                            Icon *icon);
 static gint icon_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
-			       PinIcon *icon);
+			       Icon *icon);
 static char *pin_from_file(guchar *line);
 static gboolean add_root_handlers(void);
 static void pinboard_save(void);
 static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 				    GdkEvent *event,
 				    gpointer data);
-static void icon_destroyed(GtkWidget *widget, PinIcon *icon);
+static void icon_destroyed(GtkWidget *widget, Icon *icon);
 static void snap_to_grid(int *x, int *y);
-static void offset_from_centre(PinIcon *icon,
+static void offset_from_centre(Icon *icon,
 			       int width, int height,
 			       int *x, int *y);
 static gboolean drag_motion(GtkWidget		*widget,
@@ -162,13 +155,13 @@ static gboolean drag_motion(GtkWidget		*widget,
                             gint		x,
                             gint		y,
                             guint		time,
-			    PinIcon		*icon);
-static void drag_set_pinicon_dest(PinIcon *icon);
+			    Icon		*icon);
+static void drag_set_pinicon_dest(Icon *icon);
 static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
-		       PinIcon		*icon);
-static void icon_may_update(PinIcon *icon);
+		       Icon		*icon);
+static void icon_may_update(Icon *icon);
 static void forward_root_clicks(void);
 static void change_number_selected(int delta);
 static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
@@ -185,14 +178,15 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 			       gpointer		data);
 static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
-			PinIcon *icon);
-static void reshape_icon(PinIcon *icon);
+			Icon *icon);
+static void reshape_icon(Icon *icon);
 static void reshape_all(void);
 static void menu_closed(GtkWidget *widget);
+static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void show_location(gpointer data, guint action, GtkWidget *widget);
 static void pin_help(gpointer data, guint action, GtkWidget *widget);
 static void pin_remove(gpointer data, guint action, GtkWidget *widget);
-static void show_pinboard_menu(GdkEventButton *event, PinIcon *icon);
+static void show_pinboard_menu(GdkEventButton *event, Icon *icon);
 
 
 static GtkItemFactoryEntry menu_def[] = {
@@ -200,6 +194,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
+{N_("Rename Item"),  		NULL,  	rename_item, 0, NULL},
 {N_("Show Location"),  		NULL,  	show_location, 0, NULL},
 {N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
@@ -307,20 +302,15 @@ void pinboard_activate(guchar *name)
  */
 void pinboard_pin(guchar *path, guchar *name, int x, int y)
 {
-	PinIcon		*icon;
-	int		path_len;
+	Icon		*icon;
 	int		width, height;
 
 	g_return_if_fail(path != NULL);
 	g_return_if_fail(current_pinboard != NULL);
 
-	path_len = strlen(path);
-	while (path_len > 1 && path[path_len - 1] == '/')
-		path_len--;
-
-	icon = g_new(PinIcon, 1);
+	icon = g_new(Icon, 1);
 	icon->selected = FALSE;
-	icon->path = g_strndup(path, path_len);
+	icon->path = icon_convert_path(path);
 	icon->mask = NULL;
 	snap_to_grid(&x, &y);
 	icon->x = x;
@@ -382,7 +372,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 }
 
 /* Remove an icon from the pinboard */
-void pinboard_unpin(PinIcon *icon)
+void pinboard_unpin(Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
 
@@ -408,7 +398,7 @@ void pinboard_unpin_selection(void)
 	next = current_pinboard->icons;
 	while (next)
 	{
-		PinIcon	*icon = (PinIcon *) next->data;
+		Icon	*icon = (Icon *) next->data;
 
 		next = next->next;
 
@@ -425,7 +415,7 @@ void pinboard_unpin_selection(void)
  * in which case you must call this function again (with NULL or another
  * icon) to remove the highlight.
  */
-void pinboard_wink_item(PinIcon *icon, gboolean timeout)
+void pinboard_wink_item(Icon *icon, gboolean timeout)
 {
 	if (current_wink_icon == icon)
 		return;
@@ -461,7 +451,7 @@ void pinboard_clear(void)
 	next = current_pinboard->icons;
 	while (next)
 	{
-		PinIcon	*icon = (PinIcon *) next->data;
+		Icon	*icon = (Icon *) next->data;
 
 		next = next->next;
 
@@ -487,7 +477,7 @@ void pinboard_may_update(guchar *path)
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*icon = (PinIcon *) next->data;
+		Icon	*icon = (Icon *) next->data;
 
 		if (strcmp(icon->path, path) == 0)
 			icon_may_update(icon);
@@ -495,16 +485,16 @@ void pinboard_may_update(guchar *path)
 }
 
 /* Return the single selected icon, or NULL */
-PinIcon *pinboard_selected_icon(void)
+Icon *pinboard_selected_icon(void)
 {
 	GList	*next;
-	PinIcon	*found = NULL;
+	Icon	*found = NULL;
 	
 	g_return_val_if_fail(current_pinboard != NULL, NULL);
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*icon = (PinIcon *) next->data;
+		Icon	*icon = (Icon *) next->data;
 
 		if (icon->selected)
 		{
@@ -524,7 +514,7 @@ void pinboard_clear_selection(void)
 }
 
 /* Set whether an icon is selected or not */
-void pinboard_set_selected(PinIcon *icon, gboolean selected)
+void pinboard_set_selected(Icon *icon, gboolean selected)
 {
 	g_return_if_fail(icon != NULL);
 
@@ -550,7 +540,7 @@ GList *pinboard_get_selected(void)
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*i = (PinIcon *) next->data;
+		Icon	*i = (Icon *) next->data;
 
 		if (i->selected)
 			selected = g_list_append(selected, i);
@@ -563,7 +553,7 @@ GList *pinboard_get_selected(void)
  * Doesn't release and claim the selection unnecessarily.
  * If icon is NULL, then just clears the selection.
  */
-void pinboard_select_only(PinIcon *icon)
+void pinboard_select_only(Icon *icon)
 {
 	GList	*next;
 	
@@ -574,7 +564,7 @@ void pinboard_select_only(PinIcon *icon)
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*i = (PinIcon *) next->data;
+		Icon	*i = (Icon *) next->data;
 
 		if (i->selected && i != icon)
 			pinboard_set_selected(i, FALSE);
@@ -593,7 +583,7 @@ gboolean pinboard_has(guchar *path)
 	
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*i = (PinIcon *) next->data;
+		Icon	*i = (Icon *) next->data;
 
 		if (is_sub_dir(i->path, path))
 			return TRUE;
@@ -608,7 +598,7 @@ gboolean pinboard_has(guchar *path)
  ****************************************************************/
 
 /* Icon's size, shape or appearance has changed - update the display */
-static void reshape_icon(PinIcon *icon)
+static void reshape_icon(Icon *icon)
 {
 	int	x = icon->x, y = icon->y;
 	int	width, height;
@@ -623,7 +613,7 @@ static void reshape_icon(PinIcon *icon)
 /* See if the file the icon points to has changed. Update the icon
  * if so.
  */
-static void icon_may_update(PinIcon *icon)
+static void icon_may_update(Icon *icon)
 {
 	MaskedPixmap	*image = icon->item.image;
 	int		flags = icon->item.flags;
@@ -645,7 +635,7 @@ static gint end_wink(gpointer data)
 }
 
 /* Make the wink border solid or transparent */
-static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
+static void mask_wink_border(Icon *icon, GdkColor *alpha)
 {
 	int	width, height;
 	
@@ -671,7 +661,7 @@ static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
  * Also sets the style to pinicon_style, generating it if needed.
  * Returns the new width and height.
  */
-static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
+static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 {
 	int		width, height;
 	GdkFont		*font;
@@ -786,7 +776,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	*rheight = height;
 }
 
-static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
+static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 {
 	GdkFont		*font = icon->widget->style->font;
 	int		font_height;
@@ -924,14 +914,14 @@ static gboolean root_button_press(GtkWidget *widget,
 
 static gboolean enter_notify(GtkWidget *widget,
 			     GdkEventCrossing *event,
-			     PinIcon *icon)
+			     Icon *icon)
 {
 	icon_may_update(icon);
 
 	return FALSE;
 }
 
-static void perform_action(PinIcon *icon, GdkEventButton *event)
+static void perform_action(Icon *icon, GdkEventButton *event)
 {
 	BindAction	action;
 	
@@ -985,7 +975,7 @@ static void perform_action(PinIcon *icon, GdkEventButton *event)
 
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
-                            	     PinIcon *icon)
+                            	     Icon *icon)
 {
 	if (pinboard_modified)
 		pinboard_save();
@@ -1000,7 +990,7 @@ static gboolean button_release_event(GtkWidget *widget,
 
 static gboolean button_press_event(GtkWidget *widget,
 			    	   GdkEventButton *event,
-                            	   PinIcon *icon)
+                            	   Icon *icon)
 {
 	if (dnd_motion_press(widget, event))
 		perform_action(icon, event);
@@ -1022,7 +1012,7 @@ static guchar *create_uri_list(GList *list)
 
 	for (; list; list = list->next)
 	{
-		PinIcon *icon = (PinIcon *) list->data;
+		Icon *icon = (Icon *) list->data;
 
 		g_string_append(tmp, leader);
 		g_string_append(tmp, icon->path);
@@ -1036,7 +1026,7 @@ static guchar *create_uri_list(GList *list)
 	return retval;
 }
 
-static void start_drag(PinIcon *icon, GdkEventMotion *event)
+static void start_drag(Icon *icon, GdkEventMotion *event)
 {
 	GtkWidget *widget = icon->widget;
 	GList	*selected;
@@ -1069,7 +1059,7 @@ static void start_drag(PinIcon *icon, GdkEventMotion *event)
 /* An icon is being dragged around... */
 static gint icon_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
-			       PinIcon *icon)
+			       Icon *icon)
 {
 	int	x, y;
 	int	width, height;
@@ -1105,12 +1095,34 @@ static gint icon_motion_notify(GtkWidget *widget,
 /* Called for each line in the pinboard file while loading a new board */
 static char *pin_from_file(guchar *line)
 {
+	guchar	*leaf = NULL;
 	int	x, y, n;
+
+	if (*line == '<')
+	{
+		guchar	*end;
+
+		end = strchr(line + 1, '>');
+		if (!end)
+			return _("Missing '>' in icon label");
+
+		leaf = g_strndup(line + 1, end - line - 1);
+
+		line = end + 1;
+
+		while (isspace(*line))
+			line++;
+		if (*line != ',')
+			return _("Missing ',' after icon label");
+		line++;
+	}
 
 	if (sscanf(line, " %d , %d , %n", &x, &y, &n) < 2)
 		return NULL;		/* Ignore format errors */
 
-	pinboard_pin(line + n, NULL, x, y);
+	pinboard_pin(line + n, leaf, x, y);
+
+	g_free(leaf);
 
 	return NULL;
 }
@@ -1245,10 +1257,10 @@ static void pinboard_save(void)
 	tmp = g_string_new(NULL);
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon *icon = (PinIcon *) next->data;
+		Icon *icon = (Icon *) next->data;
 
-		g_string_sprintf(tmp, "%d, %d, %s\n",
-				icon->x, icon->y, icon->path);
+		g_string_sprintf(tmp, "<%s>, %d, %d, %s\n",
+			icon->item.leafname, icon->x, icon->y, icon->path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 			goto err;
 	}
@@ -1334,7 +1346,7 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 }
 
 /* Does not save the new state */
-static void icon_destroyed(GtkWidget *widget, PinIcon *icon)
+static void icon_destroyed(GtkWidget *widget, Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
 
@@ -1360,7 +1372,7 @@ static void snap_to_grid(int *x, int *y)
 }
 
 /* Convert (x,y) from a centre point to a window position */
-static void offset_from_centre(PinIcon *icon,
+static void offset_from_centre(Icon *icon,
 			       int width, int height,
 			       int *x, int *y)
 {
@@ -1371,7 +1383,7 @@ static void offset_from_centre(PinIcon *icon,
 }
 
 /* Same as drag_set_dest(), but for pinboard icons */
-static void drag_set_pinicon_dest(PinIcon *icon)
+static void drag_set_pinicon_dest(Icon *icon)
 {
 	GtkObject	*obj = GTK_OBJECT(icon->widget);
 
@@ -1393,7 +1405,7 @@ static gboolean drag_motion(GtkWidget		*widget,
                             gint		x,
                             gint		y,
                             guint		time,
-			    PinIcon		*icon)
+			    Icon		*icon)
 {
 	GdkDragAction	action = context->suggested_action;
 	char		*type = NULL;
@@ -1441,7 +1453,7 @@ out:
 static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
-		       PinIcon		*icon)
+		       Icon		*icon)
 {
 	pinboard_wink_item(NULL, FALSE);
 	dnd_spring_abort();
@@ -1498,7 +1510,7 @@ static void selection_get(GtkWidget *widget,
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon	*icon = (PinIcon *) next->data;
+		Icon	*icon = (Icon *) next->data;
 
 		if (!icon->selected)
 			continue;
@@ -1548,7 +1560,7 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
-		     PinIcon *icon)
+		     Icon *icon)
 {
 	pinboard_drag_in_progress = FALSE;
 	if (tmp_icon_selected)
@@ -1727,7 +1739,7 @@ static void reshape_all(void)
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
-		PinIcon *icon = (PinIcon *) next->data;
+		Icon *icon = (Icon *) next->data;
 		reshape_icon(icon);
 	}
 }
@@ -1735,7 +1747,7 @@ static void reshape_all(void)
 /* Display the pinboard menu. Set icon to NULL if no particular icon
  * was clicked.
  */
-static void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
+static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 {
 	int		pos[2];
 	GList		*icons;
@@ -1772,7 +1784,7 @@ static void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
 
 static void pin_help(gpointer data, guint action, GtkWidget *widget)
 {
-	PinIcon	*icon;
+	Icon	*icon;
 
 	icon = pinboard_selected_icon();
 
@@ -1801,7 +1813,7 @@ static void menu_closed(GtkWidget *widget)
 /* Show where this item is stored */
 static void show_location(gpointer data, guint action, GtkWidget *widget)
 {
-	PinIcon	*icon;
+	Icon	*icon;
 
 	icon = pinboard_selected_icon();
 
@@ -1815,3 +1827,32 @@ static void show_location(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
+static void rename_cb(guchar *new_name, Icon *icon)
+{
+	GdkFont	*font = icon->widget->style->font;
+
+	g_free(icon->item.leafname);
+	icon->item.leafname = g_strdup(new_name);
+	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
+
+	reshape_icon(icon);
+
+	pinboard_save();
+}
+
+static void rename_item(gpointer data, guint action, GtkWidget *widget)
+{
+	Icon	*icon;
+
+	icon = pinboard_selected_icon();
+
+	if (icon)
+		show_rename_box(icon->widget, icon->item.leafname,
+				(RenameFn) rename_cb, icon);
+	else
+	{
+		delayed_error(PROJECT,
+			_("First, select a single item to rename"));
+		return;
+	}
+}

@@ -134,7 +134,7 @@ GPtrArray *choices_list_dirs(char *dir)
 
 void choices_free_list(GPtrArray *list)
 {
-	int	i;
+	guint	i;
 
 	g_return_if_fail(list != NULL);
 

@@ -163,7 +163,7 @@ void options_load(void)
  * The function returns a pointer to an error messages (which will
  * NOT be free()d), or NULL on success.
  */
-void option_register(char *key, OptionFunc *func)
+void option_register(guchar *key, OptionFunc *func)
 {
 	if (!option_hash)
 		option_hash = g_hash_table_new(g_str_hash, g_str_equal);
@@ -267,7 +267,7 @@ void options_show(void)
 	gtk_widget_show_all(window);
 }
 
-void option_write(char *name, char *value)
+void option_write(guchar *name, guchar *value)
 {
 	char    *string;
 	int	len;
