@@ -13,7 +13,9 @@
 #undef FILE_B_FLAG
 #undef HAVE_LIBVFS
 #undef HAVE_VFS_H
+
 #undef GTK2
+#undef LARGE_FILE_SUPPORT
 
 #undef HAVE_REGEX_H
 #undef HAVE_RE_COMPILE_PATTERN
@@ -36,4 +38,11 @@
 #else
 # define gdk_x11_xatom_to_atom(x) (x)
 # define gdk_x11_atom_to_xatom(x) (x)
+#endif
+
+/* printf format string to print file sizes */
+#ifdef LARGE_FILE_SUPPORT
+# define SIZE_FMT "lld"
+#else
+# define SIZE_FMT "ld"
 #endif

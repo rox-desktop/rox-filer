@@ -211,7 +211,7 @@ char *group_name(gid_t gid)
 /* Return a string in the form '23Mb' in a static buffer valid until
  * the next call.
  */
-char *format_size(unsigned long size)
+char *format_size(off_t size)
 {
 	static	char *buffer = NULL;
 	char	*units;
@@ -243,7 +243,7 @@ char *format_size(unsigned long size)
 
 	if (buffer)
 		g_free(buffer);
-	buffer = g_strdup_printf("%ld %s", size, units);
+	buffer = g_strdup_printf("%" SIZE_FMT " %s", size, units);
 
 	return buffer;
 }
@@ -251,7 +251,7 @@ char *format_size(unsigned long size)
 /* Return a string in the form '23Mb' in a static buffer valid until
  * the next call. Aligned to the right.
  */
-char *format_size_aligned(unsigned long size)
+char *format_size_aligned(off_t size)
 {
 	static	char *buffer = NULL;
 	char	units;
@@ -281,8 +281,9 @@ char *format_size_aligned(unsigned long size)
 
 	if (buffer)
 		g_free(buffer);
-	buffer = g_strdup_printf("%4ld%c", size, units);
 
+	buffer = g_strdup_printf("%4" SIZE_FMT "%c", size, units);
+	
 	return buffer;
 }
 

@@ -1652,7 +1652,7 @@ static void usage_cb(gpointer data)
 					filer_window->path);
 		g_string_sprintf(message, "'%s: %s\n",
 				item->leafname,
-				format_double_size((unsigned long) size_tally));
+				format_double_size(size_tally));
 		send();
 		total_size += size_tally;
 		left--;

@@ -254,14 +254,14 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 	
 	if (info.st_size >= PRETTY_SIZE_LIMIT)
 	{
-		g_string_sprintf(gstring, "%s (%ld %s)",
-				format_size((unsigned long) info.st_size),
-				(unsigned long) info.st_size, _("bytes"));
+		g_string_sprintf(gstring, "%s (%" SIZE_FMT " %s)",
+			format_size(info.st_size),
+			info.st_size, _("bytes"));
 	}
 	else
 	{
 		g_string_assign(gstring, 
-				format_size((unsigned long) info.st_size));
+				format_size(info.st_size));
 	}
 	data[0] = _("Size:");
 	data[1] = gstring->str;

@@ -136,6 +136,25 @@ else
   AC_MSG_RESULT(no)
 fi
 
+AC_MSG_CHECKING(for large file support)
+if getconf LFS64_CFLAGS > /dev/null 2> /dev/null; then
+  AC_MSG_RESULT(yes)
+  LFS_CFLAGS="`getconf LFS_CFLAGS`"
+  LFS_LDFLAGS="`getconf LFS_LDFLAGS`"
+  LFS_LIBS="`getconf LFS_LIBS`"
+  disable_vfs=yes
+  AC_DEFINE(LARGE_FILE_SUPPORT)
+else
+  AC_MSG_RESULT(no)
+  LFS_CFLAGS=""
+  LFS_LDFLAGS=""
+  LFS_LIBS=""
+  disable_vfs=no
+fi
+AC_SUBST(LFS_CFLAGS)
+AC_SUBST(LFS_LDFLAGS)
+AC_SUBST(LFS_LIBS)
+
 dnl Checks for header files.
 AC_PATH_X
 AC_HEADER_DIRENT
@@ -157,25 +176,27 @@ AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 AC_CHECK_LIB(regex, re_compile_pattern)
 AC_CHECK_FUNCS(re_compile_pattern re_search re_set_syntax)
 
-AC_MSG_CHECKING(for vfs library)
 VFS_LIBS=""
 VFS_CFLAGS=""
-if test x"$with_vfs_sign" = xyes; then
-  if test x"$with_vfs_arg" != x; then
-    vfs_includes="-I${with_vfs_arg}/include"
-    vfs_libs="-L${with_vfs_arg}/lib -R${with_vfs_arg}/lib"
-    AC_MSG_RESULT(yes - use '$vfs_libs')
+if test "$disable_vfs" != "yes" ; then
+  AC_MSG_CHECKING(for vfs library)
+  if test x"$with_vfs_sign" = xyes; then
+    if test x"$with_vfs_arg" != x; then
+      vfs_includes="-I${with_vfs_arg}/include"
+      vfs_libs="-L${with_vfs_arg}/lib -R${with_vfs_arg}/lib"
+      AC_MSG_RESULT(yes - use '$vfs_libs')
+    else
+      vfs_includes=""
+      vfs_libs=""
+      AC_MSG_RESULT(yes)
+    fi
+    CFLAGS="$CFLAGS $vfs_includes"
+    LDFLAGS="$LDFLAGS $vfs_libs"
+    VFS_CFLAGS="$vfs_includes"
+    VFS_LIBS="$vfs_libs"
   else
-    vfs_includes=""
-    vfs_libs=""
-    AC_MSG_RESULT(yes)
+    AC_MSG_RESULT(no)
   fi
-  CFLAGS="$CFLAGS $vfs_includes"
-  LDFLAGS="$LDFLAGS $vfs_libs"
-  VFS_CFLAGS=$vfs_includes
-  VFS_LIBS=$vfs_libs
-else
-  AC_MSG_RESULT(no)
 fi
 AC_SUBST(VFS_CFLAGS)
 AC_SUBST(VFS_LIBS)
@@ -189,6 +210,8 @@ AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
 
 dnl Check for the Midnight Commander VFS library
-AC_CHECK_LIB(vfs, mc_stat, , , `$GTK_CONFIG --libs`)
+if test "$disable_vfs" != "yes" ; then
+  AC_CHECK_LIB(vfs, mc_stat, , , `$GTK_CONFIG --libs`)
+fi
 
 AC_OUTPUT(Makefile)

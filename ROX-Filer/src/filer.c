@@ -138,6 +138,7 @@ void filer_init(void)
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
 			set_unique);
+	option_add_int("filer_default_minibuffer", MINI_NONE, NULL);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
@@ -316,12 +317,23 @@ static void filer_size_for(FilerWindow *filer_window,
 	const float	r = 2.5;
 	int		t = 0;
 	int		size_limit;
-	int		space;
+	int		space = 0;
 
 	size_limit = option_get_int("filer_size_limit");
 
+	/* Get the extra height required for the toolbar and minibuffer,
+	 * if visible.
+	 */
 	if (o_toolbar != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
+	if (GTK_WIDGET_VISIBLE(filer_window->minibuffer_area))
+	{
+		GtkRequisition req;
+
+		gtk_widget_size_request(filer_window->minibuffer_area, &req);
+		space = req.height + 2;
+		t += space;
+	}
 
 	max_x = (size_limit * screen_width) / 100;
 	max_rows = (size_limit * screen_height) / (h * 100);
@@ -330,7 +342,7 @@ static void filer_size_for(FilerWindow *filer_window,
 	 * 	   x = r(y + t + h),		(1)
 	 * unless that's too wide.
 	 *
-	 * t = toolbar height
+	 * t = toolbar (and minibuffer) height
 	 * r = desired (width / height) ratio
 	 *
 	 * Want to display all items:
@@ -368,8 +380,10 @@ static void filer_size_for(FilerWindow *filer_window,
 
 	/* Leave some room for extra icons, but only in Small Icons mode
 	 * otherwise it takes up too much space.
+	 * Also, don't add space if the minibuffer is open.
 	 */
-	space = filer_window->display_style == SMALL_ICONS ? h : 2;
+	if (space == 0)
+		space = filer_window->display_style == SMALL_ICONS ? h : 2;
 
 	filer_window_set_size(filer_window,
 			w * MAX(cols, 1),
@@ -1334,6 +1348,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 static void filer_add_widgets(FilerWindow *filer_window)
 {
 	GtkWidget *hbox, *vbox, *collection;
+	int def_minibuffer;
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -1389,7 +1404,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	/* Now add the area for displaying the files... */
 	gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
 
-	/* And the minibuffer (hidden by default)... */
+	/* And the minibuffer (hidden unless differently selected in options) */
 	create_minibuffer(filer_window);
 	gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
 				FALSE, TRUE, 0);
@@ -1418,6 +1433,11 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_widget_realize(filer_window->window);
 	
 	gdk_window_set_role(filer_window->window->window, filer_window->path);
+
+	/* Show the default minibuffer, if any */
+	def_minibuffer = option_get_int("filer_default_minibuffer");
+        if (def_minibuffer != MINI_NONE)
+		minibuffer_show(filer_window, (MiniType) def_minibuffer);
 
 	filer_window_set_size(filer_window, 4, 4, TRUE);
 }

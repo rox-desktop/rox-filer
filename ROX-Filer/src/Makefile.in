@@ -12,8 +12,8 @@ LIBS = @LIBS@ @GDK_PIXBUF_LIBS@ `${XML_CONFIG} --libs` -lICE -lSM
 
 CC = @CC@
 
-CFLAGS = @CFLAGS@ `${GTK_CFLAGS}` `${XML_CONFIG} --cflags`
-LDFLAGS = @LDFLAGS@ `${GTK_LIBS}` ${LIBS}
+CFLAGS = @CFLAGS@ @LFS_CFLAGS@ `${GTK_CFLAGS}` `${XML_CONFIG} --cflags`
+LDFLAGS = @LDFLAGS@ @LFS_LDFLAGS@ `${GTK_LIBS}` ${LIBS} @LFS_LIBS@
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
