@@ -59,6 +59,10 @@ struct _IconWindow {
 	gboolean iconified;
 };
 
+/* If TRUE, only iconfied windows with _NET_WM_STATE_HIDDEN are really icons */
+static gboolean wm_supports_hidden = FALSE;
+
+static GdkAtom xa__NET_SUPPORTED = GDK_NONE;
 static GdkAtom xa_WM_STATE = GDK_NONE;
 static GdkAtom xa_WM_NAME = GDK_NONE;
 static GdkAtom xa_WM_ICON_NAME = GDK_NONE;
@@ -68,6 +72,8 @@ static GdkAtom xa__NET_WM_VISIBLE_NAME = GDK_NONE;
 static GdkAtom xa__NET_WM_ICON_NAME = GDK_NONE;
 static GdkAtom xa__NET_CLIENT_LIST = GDK_NONE;
 static GdkAtom xa__NET_WM_ICON_GEOMETRY = GDK_NONE;
+static GdkAtom xa__NET_WM_STATE = GDK_NONE;
+static GdkAtom xa__NET_WM_STATE_HIDDEN = GDK_NONE;
 
 /* We have selected destroy and property events on every window in
  * this table.
@@ -89,6 +95,7 @@ static gboolean draw_label_shadow(GtkWidget *widget,
 				  gpointer data);
 static void icon_win_free(IconWindow *win);
 static void update_style(gpointer key, gpointer data, gpointer user_data);
+static void update_supported(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -109,6 +116,7 @@ void tasklist_set_active(gboolean active)
 
 		root = gdk_get_default_root_window();
 
+		xa__NET_SUPPORTED = gdk_atom_intern("_NET_SUPPORTED", FALSE);
 		xa_WM_STATE = gdk_atom_intern("WM_STATE", FALSE);
 		xa_WM_ICON_NAME = gdk_atom_intern("WM_ICON_NAME", FALSE);
 		xa_WM_NAME = gdk_atom_intern("WM_NAME", FALSE);
@@ -122,6 +130,9 @@ void tasklist_set_active(gboolean active)
 			gdk_atom_intern("_NET_WM_ICON_NAME", FALSE);
 		xa__NET_WM_ICON_GEOMETRY =
 			gdk_atom_intern("_NET_WM_ICON_GEOMETRY", FALSE);
+		xa__NET_WM_STATE = gdk_atom_intern("_NET_WM_STATE", FALSE);
+		xa__NET_WM_STATE_HIDDEN =
+			gdk_atom_intern("_NET_WM_STATE_HIDDEN", FALSE);
 		
 		known = g_hash_table_new_full((GHashFunc) xid_hash,
 					      (GEqualFunc) xid_equal,
@@ -133,7 +144,10 @@ void tasklist_set_active(gboolean active)
 	}
 	
 	if (active)
+	{
 		gdk_window_add_filter(NULL, window_filter, NULL);
+		update_supported();
+	}
 	else
 		gdk_window_remove_filter(NULL, window_filter, NULL);
 
@@ -278,7 +292,25 @@ static void window_check_status(IconWindow *win)
 	gint32 *data;
 	gboolean iconic;
 
-	if (XGetWindowProperty(gdk_display, win->xwindow,
+	if (wm_supports_hidden && XGetWindowProperty(gdk_display, win->xwindow,
+			gdk_x11_atom_to_xatom(xa__NET_WM_STATE),
+			0, 1, False,
+			XA_ATOM,
+			&type, &format, &nitems,
+			&bytes_after, (guchar **) &data) == Success && data)
+	{
+		GdkAtom state;
+			
+		if (nitems == 1)
+		{
+			state = gdk_x11_xatom_to_atom((Atom) data[0]);
+			iconic = state == xa__NET_WM_STATE_HIDDEN;
+		}
+		else
+			iconic = FALSE;
+		XFree(data);
+	}
+	else if (XGetWindowProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(xa_WM_STATE),
 			0, 1, False,
 			gdk_x11_atom_to_xatom(xa_WM_STATE),
@@ -312,7 +344,7 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 		GdkAtom atom = gdk_x11_xatom_to_atom(xev->xproperty.atom);
 		Window win = ((XPropertyEvent *) xev)->window;
 
-		if (atom == xa_WM_STATE)
+		if (atom == xa_WM_STATE || atom == xa__NET_WM_STATE)
 		{
 			w = g_hash_table_lookup(known, &win);
 			
@@ -324,9 +356,10 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 					g_hash_table_remove(known, &win);
 			}
 		}
-
-		if (atom == xa__NET_CLIENT_LIST)
+		else if (atom == xa__NET_CLIENT_LIST)
 			tasklist_update(FALSE);
+		else if (atom == xa__NET_SUPPORTED)
+			update_supported();
 	}
 
 	return GDK_FILTER_CONTINUE;
@@ -844,3 +877,47 @@ static void update_style(gpointer key, gpointer data, gpointer user_data)
 	}
 }
 
+/* Find out what the new window manager can do... */
+static void update_supported(void)
+{
+	Atom type;
+	int format;
+	gulong nitems;
+	gulong bytes_after;
+	Atom *data;
+	int err, result;
+	int i;
+	gboolean old_supports_hidden = wm_supports_hidden;
+
+	wm_supports_hidden = FALSE;
+
+	gdk_error_trap_push();
+	type = None;
+	result = XGetWindowProperty(gdk_display,
+			gdk_x11_get_default_root_xwindow(),
+			gdk_x11_atom_to_xatom(xa__NET_SUPPORTED),
+			0, G_MAXLONG,
+			False, XA_ATOM, &type, &format, &nitems,
+			&bytes_after, (guchar **)&data);  
+	err = gdk_error_trap_pop();
+
+	if (err != Success || result != Success)
+		goto out;
+
+	for (i = 0; i < nitems; i++)
+	{
+		GdkAtom atom = gdk_x11_xatom_to_atom(data[i]);
+
+		if (atom == xa__NET_WM_STATE_HIDDEN)
+			wm_supports_hidden = TRUE;
+	}
+
+	XFree(data);
+out:
+
+	if (wm_supports_hidden != old_supports_hidden)
+	{
+		tasklist_update(TRUE);
+		tasklist_update(FALSE);
+	}
+}
