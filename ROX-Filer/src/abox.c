@@ -493,20 +493,23 @@ static void shade(ABox *abox)
 	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_YES, on);
 	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_NO, on);
 	
+	if (on && !quiet)
+		gtk_dialog_set_response_sensitive(dialog, RESPONSE_QUIET, TRUE);
+	else
+		gtk_dialog_set_response_sensitive(dialog,
+						  RESPONSE_QUIET, FALSE);
+
+	/* Unsetting the focus means that set_default will put it in the
+	 * right place...
+	 */
+	gtk_window_set_focus(GTK_WINDOW(abox), NULL);
 	/* Note: Gtk+-2.0.0 will segfault on Return if an insensitive
 	 * widget is the default.
 	 */
-	if (on && !quiet)
-	{
-		gtk_dialog_set_response_sensitive(dialog, RESPONSE_QUIET, TRUE);
-		gtk_dialog_set_default_response(dialog, RESPONSE_QUIET);
-	}
-	else
-	{
-		gtk_dialog_set_response_sensitive(dialog,
-						  RESPONSE_QUIET, FALSE);
+	if (quiet)
 		gtk_dialog_set_default_response(dialog, GTK_RESPONSE_YES);
-	}
+	else
+		gtk_dialog_set_default_response(dialog, RESPONSE_QUIET);
 
 	if (abox->entry)
 	{
