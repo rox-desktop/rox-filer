@@ -12,6 +12,7 @@ Gtk+ 2.0:
 	- Menu appears, but item under cursor isn't opened
 	- Savebox doesn't highlight leafname
 	- Pinboard text background types none/outline don't work
+	- Can't set menu shortcuts to a single key (eg, 'L')
 
 Return for 'Do another search' toggles Quiet...
 
@@ -19,19 +20,14 @@ Return for 'Do another search' toggles Quiet...
 
 Key bindings in the New File menu don't work.
 
+Root click with sawfish 0.99 doesn't work.
+
 
 FEATURES FOR 1.1
 
 Send To menu to show the contents of '<Choices>/Send To'.
 
-Better positioning for main menu (ensure File submenu is initially selected).
-
 All leafnames to be truncated, even when details are displayed.
-
-On Shift-Menu-click, send the filename to a script and parse the results
-as a menu of commands to execute.
-
-Fully configurable toolbar.
 
 Use an environment variable to override the platform-name guessing in
 AppRun.
@@ -42,8 +38,6 @@ Improve MIME-type guessing:
 Provide a way to set the display style on a per-directory basis
 (shell glob patterns?)
 
-Some way to stop auto-resizing.
-
 Right-most icon in the last row should extend to the far right of the window,
 even if it isn't in the last column.
 
@@ -51,6 +45,8 @@ Allow find expression with Permissions command...
 
 
 OTHERS
+
+Fully configurable toolbar?
 
 Corner panels?
 
@@ -86,6 +82,9 @@ Options for 'Force' and 'Brief'?
 
 Items on the panel should be sensitive right up to the edge of the screen
 (GTK bug prevents this currently - should be fixed by 1.2.11).
+
+On Shift-Menu-click, send the filename to a script and parse the results
+as a menu of commands to execute?
 
 
 LONG TERM

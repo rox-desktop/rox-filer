@@ -507,6 +507,8 @@ static void update_new_files_menu(void)
 				pixmap_make_small(ditem.image);
 
 			item = gtk_menu_item_new();
+			/* TODO: Find a way to allow short-cuts */
+			gtk_widget_lock_accelerators(item);
 
 			hbox = gtk_hbox_new(FALSE, 2);
 			gtk_container_add(GTK_CONTAINER(item), hbox);
