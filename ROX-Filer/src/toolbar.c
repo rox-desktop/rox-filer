@@ -495,6 +495,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	int		i;
 
 	bar = gtk_toolbar_new();
+
 	if (filer_window)
 		gtk_widget_set_size_request(bar, 100, -1);
 
@@ -595,6 +596,7 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 			   icon_widget,
 			   NULL, NULL,	/* CB, userdata */
 			   GTK_TOOLBAR(bar)->num_children);
+	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 	
 	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
 	{
