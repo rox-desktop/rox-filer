@@ -6,7 +6,7 @@ all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1 \
      Manual-fr.valid ${HELP}/Manual-fr.html
 
 %.valid: %.xml
-	nsgmls -s -wxml /usr/lib/sgml/declaration/xml.decl $<
+	xmllint --noout --postvalid $<
 
 ${HELP}/%.html: %.xml to_html.xsl
 	xsltproc -o $@ to_html.xsl $<
