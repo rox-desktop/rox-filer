@@ -596,8 +596,8 @@ void pinboard_set_backdrop(void)
 	radios_add(radios, _("Scale the image to fit the backdrop area, "
 			     "without distorting it"),
 			BACKDROP_SCALE, _("Scale"));
-	radios_add(radios, _("Strech the image to fill the backdrop area"),
-			BACKDROP_STRETCH, _("Strech"));
+	radios_add(radios, _("Stretch the image to fill the backdrop area"),
+			BACKDROP_STRETCH, _("Stretch"));
 	radios_add(radios, _("Tile the image over the backdrop area"),
 			BACKDROP_TILE, _("Tile"));
 
@@ -1189,7 +1189,7 @@ static void backdrop_from_xml(xmlNode *node)
 		current_pinboard->backdrop_style =
 		  g_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
 		  g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
-		  g_strcasecmp(style, "Streched") == 0 ? BACKDROP_STRETCH :
+		  g_strcasecmp(style, "Stretched") == 0 ? BACKDROP_STRETCH :
 		  g_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
 		  g_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
 							     BACKDROP_NONE;
@@ -1326,7 +1326,7 @@ static void pinboard_save(void)
 			style == BACKDROP_TILE   ? "Tiled" :
 			style == BACKDROP_CENTRE ? "Centred" :
 			style == BACKDROP_SCALE  ? "Scaled" :
-			style == BACKDROP_STRETCH  ? "Streched" :
+			style == BACKDROP_STRETCH  ? "Stretched" :
 						   "Program");
 	}
 
