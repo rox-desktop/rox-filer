@@ -964,6 +964,14 @@ static gboolean do_chmod(char *path, char *dummy)
 
 	check_flags();
 
+	if (lstat(path, &info))
+	{
+		send_error();
+		return FALSE;
+	}
+	if (S_ISLNK(info.st_mode))
+		return FALSE;
+
 	if (!quiet)
 	{
 		g_string_sprintf(message, "?Change permissions of '%s'?", path);
@@ -992,6 +1000,8 @@ static gboolean do_chmod(char *path, char *dummy)
 		send_error();
 		return FALSE;
 	}
+	if (S_ISLNK(info.st_mode))
+		return FALSE;
 
 	new_mode = mode_adjust(info.st_mode, mode_change);
 	if (chmod(path, new_mode))
@@ -1469,7 +1479,13 @@ static void chmod_cb(gpointer data)
 		if (!collection->items[i].selected)
 			continue;
 		item = (DirItem *) collection->items[i].data;
-		if (do_chmod(make_path(filer_window->path,
+		if (item->flags & ITEM_FLAG_SYMLINK)
+		{
+			g_string_sprintf(message, "!'%s' is a symbolic link\n",
+					item->leafname);
+			send();
+		}
+		else if (do_chmod(make_path(filer_window->path,
 						item->leafname)->str, NULL))
 		{
 			g_string_sprintf(message, "+%s", filer_window->path);
