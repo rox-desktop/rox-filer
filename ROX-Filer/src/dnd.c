@@ -549,7 +549,7 @@ void drag_set_pinboard_dest(GtkWidget *widget)
 	};
 
 	gtk_drag_dest_set(widget,
-			  GTK_DEST_DEFAULT_MOTION | GTK_DEST_DEFAULT_DROP,
+			  GTK_DEST_DEFAULT_DROP,
 			  target_table,
 			  sizeof(target_table) / sizeof(*target_table),
 			  GDK_ACTION_LINK);
@@ -833,14 +833,14 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 {
 	GSList	*uris, *next;
 	gint dx, dy;
-	
+
 	if (!selection_data->data)
 	{
 		/* Timeout? */
 		return;
 	}
 
-	gdk_window_get_position (widget->window, &dx, &dy);
+	gdk_window_get_position(widget->window, &dx, &dy);
 	x += dx;
 	y += dy;
 

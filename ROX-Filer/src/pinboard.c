@@ -101,6 +101,11 @@ typedef enum {
 } PinDragType;
 static PinDragType pin_drag_type = DRAG_NONE;
 
+/* This is TRUE while the user is dragging from a pinned icon.
+ * We use it to prevent dragging from the pinboard to itself.
+ */
+static gboolean pinboard_drag_in_progress = FALSE;
+
 
 /* Static prototypes */
 static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight);
@@ -156,6 +161,15 @@ static void selection_get(GtkWidget *widget,
 		       guint      info,
 		       guint      time,
 		       gpointer   data);
+static gboolean bg_drag_motion(GtkWidget	*widget,
+                               GdkDragContext	*context,
+                               gint		x,
+                               gint		y,
+                               guint		time,
+			       gpointer		data);
+static void drag_end(GtkWidget *widget,
+			GdkDragContext *context,
+			FilerWindow *filer_window);
 
 
 
@@ -894,6 +908,8 @@ static void start_drag(PinIcon *icon, GdkEventMotion *event)
 	selected = pinboard_get_selected();
 	g_return_if_fail(selected != NULL);
 
+	pinboard_drag_in_progress = TRUE;
+
 	if (selected->next == NULL)
 		drag_one_item(widget, event, icon->path, &icon->item, FALSE);
 	else
@@ -987,7 +1003,12 @@ static gboolean add_root_handlers(void)
 		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
 				"button_press_event",
 				GTK_SIGNAL_FUNC(root_button_press), NULL);
+
+		/* Drag and drop handlers */
 		drag_set_pinboard_dest(proxy_invisible);
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible), "drag_motion",
+				GTK_SIGNAL_FUNC(bg_drag_motion),
+				NULL);
 
 		/* The proxy window is also used to hold the selection... */
 		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
@@ -1210,6 +1231,8 @@ static void drag_set_pinicon_dest(PinIcon *icon)
 			GTK_SIGNAL_FUNC(drag_motion), icon);
 	gtk_signal_connect(obj, "drag_leave",
 			GTK_SIGNAL_FUNC(drag_leave), icon);
+	gtk_signal_connect(obj, "drag_end",
+			GTK_SIGNAL_FUNC(drag_end), icon);
 
 	/*
 	gtk_signal_connect(obj, "drag_end",
@@ -1230,6 +1253,12 @@ static gboolean drag_motion(GtkWidget		*widget,
 	GdkDragAction	action = context->suggested_action;
 	char		*type = NULL;
 	DirItem		*item = &icon->item;
+
+	if (gtk_drag_get_source_widget(context) == widget)
+		goto out;	/* Can't drag something to itself! */
+
+	if (icon->selected)
+		goto out;	/* Can't drag a selection to itself */
 
 	if (provides(context, _rox_run_action))
 	{
@@ -1253,9 +1282,6 @@ static gboolean drag_motion(GtkWidget		*widget,
 			goto out;
 	}
 	
-	if (gtk_drag_get_source_widget(context) == widget)
-		goto out;	/* Can't drag something to itself! */
-
 	if (item->base_type == TYPE_DIRECTORY &&
 			!(item->flags & ITEM_FLAG_APPDIR))
 	{
@@ -1381,3 +1407,25 @@ static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
 	return TRUE;
 }
 
+static gboolean bg_drag_motion(GtkWidget	*widget,
+                               GdkDragContext	*context,
+                               gint		x,
+                               gint		y,
+                               guint		time,
+			       gpointer		data)
+{
+	/* Dragging from the pinboard to the pinboard is not allowed */
+	if (pinboard_drag_in_progress)
+		return FALSE;
+	
+	gdk_drag_status(context, context->suggested_action, time);
+	return TRUE;
+}
+
+static void drag_end(GtkWidget *widget,
+		     GdkDragContext *context,
+		     FilerWindow *filer_window)
+{
+	pinboard_drag_in_progress = FALSE;
+	pinboard_clear_selection();
+}
