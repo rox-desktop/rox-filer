@@ -1264,7 +1264,10 @@ static gint panel_leave_event(GtkWidget *widget,
 			      Panel *panel)
 {
 	GdkWindow *pinboard;
-	
+
+	if (event->mode != GDK_CROSSING_NORMAL)
+		return FALSE;	/* Grab for menu, DnD, etc */
+
 	pinboard = pinboard_get_window();
 	window_put_just_above(panel->window->window, pinboard);
 
