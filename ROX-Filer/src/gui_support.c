@@ -221,6 +221,7 @@ void make_panel_window(GtkWidget *widget)
 	
 	gdk_window_set_decorations(window, 0);
 	gdk_window_set_functions(window, 0);
+	gtk_window_set_resizable(GTK_WINDOW(widget), FALSE);
 
 	/* Note: DON'T do gtk_window_stick(). Setting the state via
 	 * gdk will override our other atoms (pager/taskbar).
