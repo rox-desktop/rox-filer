@@ -44,6 +44,7 @@
 #endif
 
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>		/* For rox_x_error */
 
 #include "global.h"
 
@@ -186,6 +187,31 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
 
 /* The value that goes with an option */
 #define VALUE (*optarg == '=' ? optarg + 1 : optarg)
+
+static int rox_x_error(Display *display, XErrorEvent *error)
+{
+	  gchar buf[64];
+          
+	  XGetErrorText(display, error->error_code, buf, 63);
+
+	  g_warning ("The program '%s' received an X Window System error.\n"
+                             "This probably reflects a bug in the program.\n"
+                             "The error was '%s'.\n"
+                             "  (Details: serial %ld error_code %d request_code %d minor_code %d)\n"
+                             "  (Note to programmers: normally, X errors are reported asynchronously;\n"
+                             "   that is, you will receive the error a while after causing it.\n"
+                             "   To debug your program, run it with the --sync command line\n"
+                             "   option to change this behavior. You can then get a meaningful\n"
+                             "   backtrace from your debugger.)",
+                             g_get_prgname (),
+                             buf,
+                             error->serial, 
+                             error->error_code, 
+                             error->request_code,
+                             error->minor_code);
+          
+	  abort();
+}
 
 /* Parses the command-line to work out what the user wants to do.
  * Tries to send the request to an already-running copy of the filer.
@@ -536,6 +562,9 @@ int main(int argc, char **argv)
 		save_xml_file(reply, "-");
 		xmlFreeDoc(reply);
 	}
+
+	/* Try to find out why we crash with GTK 2.4 */
+	XSetErrorHandler(rox_x_error);
 
 	/* Enter the main loop, processing events until all our windows
 	 * are closed.
