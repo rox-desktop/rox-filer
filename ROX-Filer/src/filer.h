@@ -165,5 +165,6 @@ gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename);
 void filer_set_filter(FilerWindow *filer_window, FilterType type, const gchar *filter_string);
 void filer_set_hidden(FilerWindow *fwin, gboolean hidden);
 void filer_next_selected(FilerWindow *filer_window, int dir);
+void filer_save_settings(FilerWindow *fwin);
 
 #endif /* _FILER_H */

@@ -130,6 +130,7 @@ static void reverse_sort(gpointer data, guint action, GtkWidget *widget);
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
+static void save_settings(gpointer data, guint action, GtkWidget *widget);
 
 static void file_op(gpointer data, FileOp action, GtkWidget *widget);
 
@@ -196,6 +197,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Filter files"),   	NULL, mini_buffer, MINI_FILTER, NULL},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
 {">" N_("Refresh"),		NULL, refresh, 0, "<StockItem>", GTK_STOCK_REFRESH},
+{">" N_("Save display settings"),	       NULL, save_settings, 0, NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, "<StockItem>", GTK_STOCK_COPY},
 {">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
@@ -966,6 +968,13 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_refresh(window_with_focus);
+}
+
+static void save_settings(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_save_settings(window_with_focus);
 }
 
 static void delete(FilerWindow *filer_window)

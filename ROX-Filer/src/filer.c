@@ -87,6 +87,39 @@ static GHashTable *window_with_id = NULL;
 
 static FilerWindow *window_with_primary = NULL;
 
+static GHashTable *settings_table=NULL;
+	
+typedef struct {
+	gchar *path;
+
+	guint flags;   /* Which parts are valid, see below */
+
+	gint x, y;
+	gint width, height;
+	gboolean show_hidden;
+	ViewType view_type;
+	SortType	sort_type;
+	GtkSortType	sort_order;
+	gboolean        show_thumbs;
+
+	DetailsType	details_type;
+	DisplayStyle	display_style;
+
+	FilterType filter_type;
+	char *filter;
+} Settings;
+
+enum settings_flags{
+	SET_POSITION=1,   /* x, y */
+	SET_SIZE=2,       /* width, height */
+	SET_HIDDEN=4,     /* show_hidden */
+	SET_STYLE=8,      /* display_style */
+	SET_SORT=16,      /* sort_type, sort_order */
+	SET_DETAILS=32,   /* view_type, details_type */
+	SET_THUMBS=64,    /* show_thumbs */
+	SET_FILTER=128,   /* filter_type, filter */
+};
+
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
@@ -119,6 +152,10 @@ static gboolean drag_motion(GtkWidget		*widget,
                             gint		y,
                             guint		time,
 			    FilerWindow		*filer_window);
+
+static void load_settings(void);
+static void save_settings(void);
+static void check_settings(FilerWindow *filer_window);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -180,6 +217,8 @@ void filer_init(void)
 	}
 	
 	g_free(dpyhost);
+
+	load_settings();
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -1100,6 +1139,8 @@ void filer_change_to(FilerWindow *filer_window,
 
 	attach(filer_window);
 	
+	check_settings(filer_window);
+
 	display_set_actual_size(filer_window, FALSE);
 
 	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
@@ -1263,6 +1304,9 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 
 	display_set_layout(filer_window, dstyle, dtype, TRUE);
 	display_set_sort_type(filer_window, s_type, s_order);
+
+	/* Do we have saved settings? */
+	check_settings(filer_window);
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to
@@ -2669,3 +2713,443 @@ void filer_set_filter(FilerWindow *filer_window, FilterType type,
 	}
 }
 
+/* Setting stuff */
+static Settings *settings_new(const char *path)
+{
+	Settings *set;
+
+	set=g_new(Settings, 1);
+	memset(set, 0, sizeof(Settings));
+	if(path)
+		set->path=g_strdup(path);
+
+	return set;
+}
+
+static void settings_free(Settings *set)
+{
+	g_free(set->path);
+	if(set->filter)
+		g_free(set->filter);
+	g_free(set);
+}
+
+static gboolean free_settings(gpointer key, gpointer value, gpointer data)
+{
+	if(!data || strcmp(data, key)==0)
+		settings_free(value);
+
+	return TRUE;
+}
+
+static void store_settings(Settings *set)
+{
+	Settings *old;
+
+	old=g_hash_table_lookup(settings_table, set->path);
+	if(old) {
+		g_hash_table_foreach_remove(settings_table, free_settings,
+					    set->path);
+	}
+
+	g_hash_table_insert(settings_table, set->path, set);
+}
+
+/* TODO: use symbolic names in the XML file where possible */
+static void load_from_node(Settings *set, xmlDocPtr doc, xmlNodePtr node)
+{
+	xmlChar *str=NULL;
+	
+	str=xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
+	
+	if(strcmp(node->name, "X") == 0) {
+		set->x=atoi(str);
+		set->flags|=SET_POSITION;		
+	} else if(strcmp(node->name, "Y") == 0) {
+		set->y=atoi(str);
+		set->flags|=SET_POSITION;		
+	} else if(strcmp(node->name, "Width") == 0) {
+		set->width=atoi(str);
+		set->flags|=SET_SIZE;		
+	} else if(strcmp(node->name, "Height") == 0) {
+		set->height=atoi(str);
+		set->flags|=SET_SIZE;		
+	} else if(strcmp(node->name, "ShowHidden") == 0) {
+		set->show_hidden=atoi(str);
+		set->flags|=SET_HIDDEN;		
+	} else if(strcmp(node->name, "ViewType") == 0) {
+		set->view_type=atoi(str);
+		set->flags|=SET_DETAILS;		
+	} else if(strcmp(node->name, "DetailsType") == 0) {
+		set->details_type=atoi(str);
+		set->flags|=SET_DETAILS;		
+	} else if(strcmp(node->name, "SortType") == 0) {
+		set->sort_type=atoi(str);
+		set->flags|=SET_SORT;		
+	} else if(strcmp(node->name, "SortOrder") == 0) {
+		set->sort_order=atoi(str);
+		set->flags|=SET_SORT;		
+	} else if(strcmp(node->name, "DisplayStyle") == 0) {
+		set->display_style=atoi(str);
+		set->flags|=SET_STYLE;		
+	} else if(strcmp(node->name, "ShowThumbs") == 0) {
+		set->show_thumbs=atoi(str);
+		set->flags|=SET_THUMBS;		
+	} else if(strcmp(node->name, "FilterType") == 0) {
+		set->filter_type=atoi(str);
+		set->flags|=SET_FILTER;		
+	} else if(strcmp(node->name, "Filter") == 0) {
+		set->filter=g_strdup(str);
+		set->flags|=SET_FILTER;		
+	}
+	
+	if(str)
+		xmlFree(str);
+}
+
+static void load_settings(void)
+{
+	gchar *path;
+	XMLwrapper *settings_doc=NULL;
+
+	path=choices_find_path_load("Settings.xml", "ROX-Filer");
+	if(path) {
+		settings_doc=xml_new(path);
+		g_free(path);
+	}
+
+	if(!settings_table)
+		settings_table=g_hash_table_new(g_str_hash, g_str_equal);
+
+	if(settings_doc) {
+		xmlNodePtr node, subnode;
+
+		node = xmlDocGetRootElement(settings_doc->doc);
+
+		for (node = node->xmlChildrenNode; node; node = node->next)
+		{
+			Settings *set;
+			xmlChar *path;
+			
+			if (node->type != XML_ELEMENT_NODE)
+				continue;
+			if (strcmp(node->name, "FilerWindow") != 0)
+				continue;
+
+			path=xmlGetProp(node, "path");
+			set=settings_new(path);
+			xmlFree(path);
+
+			for (subnode=node->xmlChildrenNode; subnode;
+			     subnode=subnode->next) {
+				
+				if (subnode->type != XML_ELEMENT_NODE)
+					continue;
+				load_from_node(set, settings_doc->doc,
+					       subnode);
+			}
+
+			store_settings(set);
+		}
+		g_object_unref(settings_doc);
+	}
+}
+
+static void add_nodes(gpointer key, gpointer value, gpointer data)
+{
+	xmlNodePtr node=(xmlNodePtr) data;
+	xmlNodePtr sub;
+	Settings *set=(Settings *) value;
+	char *tmp;
+
+	sub=xmlNewChild(node, NULL, "FilerWindow", NULL);
+
+	xmlSetProp(sub, "path", set->path);
+	
+	if(set->flags & SET_POSITION) {
+		tmp=g_strdup_printf("%d", set->x);
+		xmlNewChild(sub, NULL, "X", tmp);
+		g_free(tmp);
+		tmp=g_strdup_printf("%d", set->y);
+		xmlNewChild(sub, NULL, "Y", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_SIZE) {
+		tmp=g_strdup_printf("%d", set->width);
+		xmlNewChild(sub, NULL, "Width", tmp);
+		g_free(tmp);
+		tmp=g_strdup_printf("%d", set->height);
+		xmlNewChild(sub, NULL, "Height", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_HIDDEN) {
+		tmp=g_strdup_printf("%d", set->show_hidden);
+		xmlNewChild(sub, NULL, "ShowHidden", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_STYLE) {
+		tmp=g_strdup_printf("%d", set->display_style);
+		xmlNewChild(sub, NULL, "DisplayStyle", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_SORT) {
+		tmp=g_strdup_printf("%d", set->sort_type);
+		xmlNewChild(sub, NULL, "SortType", tmp);
+		g_free(tmp);
+		tmp=g_strdup_printf("%d", set->sort_order);
+		xmlNewChild(sub, NULL, "SortOrder", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_DETAILS) {
+		tmp=g_strdup_printf("%d", set->view_type);
+		xmlNewChild(sub, NULL, "ViewType", tmp);
+		g_free(tmp);
+		tmp=g_strdup_printf("%d", set->details_type);
+		xmlNewChild(sub, NULL, "DetailsType", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_STYLE) {
+		tmp=g_strdup_printf("%d", set->show_thumbs);
+		xmlNewChild(sub, NULL, "ShowThumbs", tmp);
+		g_free(tmp);
+	}
+	if(set->flags & SET_FILTER) {
+		tmp=g_strdup_printf("%d", set->filter_type);
+		xmlNewChild(sub, NULL, "FilterType", tmp);
+		g_free(tmp);
+		if(set->filter && set->filter[0])
+			xmlNewChild(sub, NULL, "Filter", set->filter);
+	}
+}
+
+static void save_settings(void)
+{
+	gchar *path;
+
+	path=choices_find_path_save("Settings.xml", "ROX-Filer", TRUE);
+	if(path) {
+		xmlDocPtr doc = xmlNewDoc("1.0");
+		xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL,
+							"Settings", NULL));
+		
+		g_hash_table_foreach(settings_table, add_nodes,
+					    xmlDocGetRootElement(doc));
+		
+		save_xml_file(doc, path);
+		
+		g_free(path);
+		xmlFreeDoc(doc);
+	}
+
+}
+
+static void check_settings(FilerWindow *filer_window)
+{
+	Settings *set;
+
+	set=(Settings *) g_hash_table_lookup(settings_table,
+					      filer_window->sym_path);
+
+	if(set) {
+		if(set->flags & SET_POSITION) 
+			gtk_window_move(GTK_WINDOW(filer_window->window),
+					    set->x, set->y);
+		if(set->flags & SET_SIZE) 
+			filer_window_set_size(filer_window, set->width,
+					      set->height);
+		if(set->flags & SET_HIDDEN)
+			filer_set_hidden(filer_window, set->show_hidden);
+
+		if(set->flags & (SET_STYLE|SET_DETAILS)) {
+			DisplayStyle style=filer_window->display_style;
+			DetailsType  details=filer_window->details_type;
+
+			if(set->flags & SET_STYLE)
+				style=set->display_style;
+
+			if(set->flags & SET_DETAILS) {
+				details=set->details_type;
+
+				/* This next causes a warning */
+				filer_set_view_type(filer_window,
+						    set->view_type);
+			}
+
+			display_set_layout(filer_window, style,
+					   details, FALSE);
+		}
+
+		if(set->flags & SET_SORT)
+			display_set_sort_type(filer_window,
+					      set->sort_type,
+					      set->sort_order);
+
+		if(set->flags & SET_THUMBS)
+			display_set_thumbs(filer_window,
+					   set->show_thumbs);
+		
+		if(set->flags & SET_FILTER)
+			display_set_filter(filer_window,
+					   set->filter_type,
+					   set->filter);
+	}
+
+}
+
+typedef struct settings_window {
+	GtkWidget *window;
+
+	GtkWidget *pos, *size, *hidden, *style, *sort, *details,
+		*thumbs, *filter;
+
+	Settings *set;
+} SettingsWindow;
+
+
+static void settings_response(GtkWidget *window, gint response,
+			      SettingsWindow *set_win)
+{
+	if(response==GTK_RESPONSE_OK) {
+		gint flags=0;
+
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->pos)))
+			flags|=SET_POSITION;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->size)))
+			flags|=SET_SIZE;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->hidden)))
+			flags|=SET_HIDDEN;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->style)))
+			flags|=SET_STYLE;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->sort)))
+			flags|=SET_SORT;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->details)))
+			flags|=SET_DETAILS;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->thumbs)))
+			flags|=SET_THUMBS;
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(set_win->filter)))
+			flags|=SET_FILTER;
+
+		set_win->set->flags=flags;
+		store_settings(set_win->set);
+		save_settings();
+	}
+	
+	gtk_widget_destroy(window);
+}
+
+void filer_save_settings(FilerWindow *fwin)
+{
+	SettingsWindow *set_win;
+	GtkWidget *vbox;
+	GtkWidget *path;
+	gint x, y;
+	
+	Settings *set=settings_new(fwin->sym_path);
+
+	gtk_window_get_position(GTK_WINDOW(fwin->window),&x, &y);
+	set->flags|=SET_POSITION;
+	set->x=x;
+	set->y=y;
+
+	gtk_window_get_size(GTK_WINDOW(fwin->window),&x, &y);
+	set->flags|=SET_SIZE;
+	set->width=x;
+	set->height=y;
+
+	set->flags|=SET_HIDDEN;
+	set->show_hidden=fwin->show_hidden;
+
+	set->flags|=SET_STYLE;
+	set->display_style=fwin->display_style;
+
+	set->flags|=SET_SORT;
+	set->sort_type=fwin->sort_type;
+	set->sort_order=fwin->sort_order;
+
+	set->flags|=SET_DETAILS;
+	set->view_type=fwin->view_type;
+	set->details_type=fwin->details_type;
+
+	set->flags|=SET_THUMBS;
+	set->show_thumbs=fwin->show_thumbs;
+
+	set->flags|=SET_FILTER;
+	set->filter_type=fwin->filter;
+	if(fwin->filter_string)
+		set->filter=g_strdup(fwin->filter_string);
+
+	/* Store other parameters
+	*/
+	set_win=g_new(SettingsWindow, 1);
+
+	set_win->window=gtk_dialog_new();
+	number_of_windows++;
+	
+	gtk_dialog_add_button(GTK_DIALOG(set_win->window),
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+	gtk_dialog_add_button(GTK_DIALOG(set_win->window),
+			GTK_STOCK_OK, GTK_RESPONSE_OK);
+
+	g_signal_connect(set_win->window, "destroy",
+			 G_CALLBACK(one_less_window), NULL);
+	g_signal_connect_swapped(set_win->window, "destroy",
+			 G_CALLBACK(g_free), set_win);
+
+	gtk_window_set_title(GTK_WINDOW(set_win->window),
+			     _("Select display properties to save"));
+
+	vbox=GTK_DIALOG(set_win->window)->vbox;
+
+	path=gtk_label_new(set->path);
+	gtk_box_pack_start(GTK_BOX(vbox), path, FALSE, FALSE, 2);
+
+	set_win->pos=gtk_check_button_new_with_label(_("Position"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->pos, FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->pos),
+				     set->flags & SET_POSITION);
+	
+	set_win->size=gtk_check_button_new_with_label(_("Size"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->size, FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->size),
+				     set->flags & SET_SIZE);
+	
+	set_win->hidden=gtk_check_button_new_with_label(_("Show hidden"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->hidden,
+			   FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->hidden),
+				     set->flags & SET_HIDDEN);
+
+	set_win->style=gtk_check_button_new_with_label(_("Display style"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->style,
+			   FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->style),
+				     set->flags & SET_STYLE);
+
+	set_win->sort=gtk_check_button_new_with_label(_("Sort type and order"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->sort, FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->sort),
+				     set->flags & SET_SORT);
+	
+	set_win->details=gtk_check_button_new_with_label(_("Details"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->details, FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->details),
+				     set->flags & SET_DETAILS);
+	
+	set_win->thumbs=gtk_check_button_new_with_label(_("Thumbnails"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->thumbs,
+			   FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->thumbs),
+				     set->flags & SET_THUMBS);
+
+	set_win->filter=gtk_check_button_new_with_label(_("Filter"));
+	gtk_box_pack_start(GTK_BOX(vbox), set_win->filter,
+			   FALSE, FALSE, 2);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(set_win->filter),
+				     set->flags & SET_FILTER);
+
+	set_win->set=set;
+	g_signal_connect(set_win->window, "response",
+			 G_CALLBACK(settings_response), set_win);
+
+	gtk_widget_show_all(set_win->window);
+}
