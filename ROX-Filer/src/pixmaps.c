@@ -231,6 +231,19 @@ void pixmap_make_small(MaskedPixmap *mp)
 	mp->sm_height = mp->height;
 }
 
+#ifdef GTK2
+# define GET_LOADER(key) (g_object_get_data(G_OBJECT(loader), key))
+# define SET_LOADER(key, data) (g_object_set_data(G_OBJECT(loader), key, data))
+# define SET_LOADER_FULL(key, data, free) \
+		(g_object_set_data_full(G_OBJECT(loader), key, data, free))
+#else
+# define GET_LOADER(key) (gtk_object_get_data(GTK_OBJECT(loader), key))
+# define SET_LOADER(key, data) \
+		(gtk_object_set_data(GTK_OBJECT(loader), key, data))
+# define SET_LOADER_FULL(key, data, free) \
+		(gtk_object_set_data_full(GTK_OBJECT(loader), key, data, free))
+#endif
+
 /* Load image 'path' in the background and insert into pixmap_cache.
  * Call callback(data, path) when done (PATH is NULL error).
  */
@@ -248,16 +261,14 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 
 	loader = gdk_pixbuf_loader_new();
 
-	gtk_object_set_data_full(GTK_OBJECT(loader), "thumb-path",
-			g_strdup(path), g_free);
-	gtk_object_set_data(GTK_OBJECT(loader), "thumb-callback", callback);
-	gtk_object_set_data(GTK_OBJECT(loader), "thumb-callback-data", data);
+	SET_LOADER_FULL("thumb-path", g_strdup(path), g_free);
+	SET_LOADER("thumb-callback", callback);
+	SET_LOADER("thumb-callback-data", data);
 	
 	tag = gdk_input_add(fd, GDK_INPUT_READ,
 			    (GdkInputFunction) got_thumb_data, loader);
 
-	gtk_object_set_data(GTK_OBJECT(loader), "thumb-input-tag",
-			GINT_TO_POINTER(tag));
+	SET_LOADER("thumb-input-tag", GINT_TO_POINTER(tag));
 }
 
 /****************************************************************
@@ -610,18 +621,26 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 
 	got = read(fd, data, sizeof(data));
 
+#ifdef GTK2
+	if (got > 0 && gdk_pixbuf_loader_write(loader, data, got, NULL))
+		return;
+#else
 	if (got > 0 && gdk_pixbuf_loader_write(loader, data, got))
 		return;
+#endif
 
 	/* Some kind of error, or end-of-file */
 
-	path = gtk_object_get_data(GTK_OBJECT(loader), "thumb-path");
+	path = GET_LOADER("thumb-path");
 
-	tag = GPOINTER_TO_INT(gtk_object_get_data(GTK_OBJECT(loader),
-							"thumb-input-tag"));
+	tag = GPOINTER_TO_INT(GET_LOADER("thumb-input-tag"));
 	gdk_input_remove(tag);
 
+#ifdef GTK2
+	gdk_pixbuf_loader_close(loader, NULL);
+#else
 	gdk_pixbuf_loader_close(loader);
+#endif
 
 	if (got == 0)
 	{
@@ -645,10 +664,14 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 
 	mc_close(fd);
 	
-	callback = gtk_object_get_data(GTK_OBJECT(loader), "thumb-callback");
-	cbdata = gtk_object_get_data(GTK_OBJECT(loader), "thumb-callback-data");
+	callback = GET_LOADER("thumb-callback");
+	cbdata = GET_LOADER("thumb-callback-data");
 
 	callback(cbdata, got != 0 ? NULL : path);
 
+#ifdef GTK2
+	g_object_unref(G_OBJECT(loader));
+#else
 	gtk_object_unref(GTK_OBJECT(loader));
+#endif
 }

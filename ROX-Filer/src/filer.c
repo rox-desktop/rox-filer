@@ -60,7 +60,6 @@
 #include "bind.h"
 #include "appinfo.h"
 #include "mount.h"
-#include "thumb.h"
 
 #define PANEL_BORDER 2
 
