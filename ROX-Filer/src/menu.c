@@ -136,8 +136,6 @@ static void select_if(gpointer data, guint action, GtkWidget *widget);
 static void pin_help(gpointer data, guint action, GtkWidget *widget);
 static void pin_remove(gpointer data, guint action, GtkWidget *widget);
 
-static void set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
-
 static GtkWidget *create_options();
 static void update_options();
 static void set_options();
@@ -480,13 +478,13 @@ void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
 
 	if (icons)
 	{
-		set_items_shaded(pinboard_menu,
+		menu_set_items_shaded(pinboard_menu,
 				icons->next ? TRUE : FALSE, 3, 1);
 
-		set_items_shaded(pinboard_menu, FALSE, 4, 1);
+		menu_set_items_shaded(pinboard_menu, FALSE, 4, 1);
 	}
 	else
-		set_items_shaded(pinboard_menu, TRUE, 3, 2);
+		menu_set_items_shaded(pinboard_menu, TRUE, 3, 2);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
@@ -1461,7 +1459,7 @@ static void pin_remove(gpointer data, guint action, GtkWidget *widget)
 }
 
 /* Set n items from position 'from' in 'menu' to the 'shaded' state */
-static void set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
+void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 {
 	GList	*items, *item;
 

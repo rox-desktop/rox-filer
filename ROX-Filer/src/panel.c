@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <ctype.h>
 
+#include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
 
 #include "global.h"
@@ -45,10 +46,15 @@
 #include "menu.h"
 #include "support.h"
 #include "mount.h"
+#include "filer.h"
 
 #define MAX_ICON_HEIGHT 42
 
 static Panel *current_panel[PANEL_NUMBER_OF_SIDES];
+
+/* Widget which holds the selection when we have it */
+static GtkWidget *selection_invisible = NULL;
+static guint losing_selection = 0;	/* > 0 => Don't send events */
 
 typedef struct _PanelIcon PanelIcon;
 
@@ -91,7 +97,7 @@ static gint draw_icon(GtkWidget *widget,
 static void popup_panel_menu(GdkEventButton *event,
 				Panel *panel,
 				PanelIcon *icon);
-static void xterm_here(gpointer data, guint action, GtkWidget *widget);
+static void open_home(gpointer data, guint action, GtkWidget *widget);
 static gint panel_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
@@ -109,6 +115,7 @@ static void add_uri_list(GtkWidget          *widget,
 static void panel_add_item(Panel *panel, guchar *path, gboolean after);
 static void menu_closed(GtkWidget *widget);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
+static void show_help(gpointer data, guint action, GtkWidget *widget);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -121,14 +128,24 @@ static void drag_leave(GtkWidget	*widget,
 		       PanelIcon	*icon);
 static void panel_save(Panel *panel);
 static GList *get_widget_list(Panel *panel);
+static GtkWidget *make_insert_frame(Panel *panel);
+static gboolean enter_icon(GtkWidget *widget,
+			   GdkEventCrossing *event,
+			   PanelIcon *icon);
+static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
+static void selection_get(GtkWidget *widget, 
+		       GtkSelectionData *selection_data,
+		       guint      info,
+		       guint      time,
+		       gpointer   data);
 
 
 static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
-{N_("Xterm in ~"),		NULL,	xterm_here, 0, NULL},
+{N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
-{N_("Show Help"),    		NULL,  	NULL, 0, NULL},
+{N_("Show Help"),    		NULL,  	show_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	remove_items, 0, NULL},
 };
 
@@ -152,12 +169,34 @@ static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
 
 void panel_init(void)
 {
+	GtkTargetEntry 	target_table[] =
+	{
+		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"STRING", 0, TARGET_STRING},
+	};
+
 	panel_menu = menu_create(menu_def,
 				 sizeof(menu_def) / sizeof(*menu_def),
 				 "<panel>");
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+	selection_invisible = gtk_invisible_new();
+
+	gtk_signal_connect(GTK_OBJECT(selection_invisible),
+			"selection_clear_event",
+			GTK_SIGNAL_FUNC(lose_selection),
+			NULL);
+
+	gtk_signal_connect(GTK_OBJECT(selection_invisible),
+			"selection_get",
+			GTK_SIGNAL_FUNC(selection_get), NULL);
+
+	gtk_selection_add_targets(selection_invisible,
+			GDK_SELECTION_PRIMARY,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table));
 }
 
 /* 'name' may be NULL or "" to remove the panel */
@@ -165,10 +204,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 {
 	guchar	*load_path;
 	Panel	*panel;
-	GtkWidget	*frame, *box;
-	GtkTargetEntry 	target_table[] = {
-		{"text/uri-list", 0, TARGET_URI_LIST},
-	};
+	GtkWidget	*vp, *frame, *box;
 
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, NULL);
 	g_return_val_if_fail(loading_panel == NULL, NULL);
@@ -218,40 +254,32 @@ Panel *panel_new(guchar *name, PanelSide side)
 		g_free(leaf);
 	}
 
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
-	gtk_container_add(GTK_CONTAINER(panel->window), frame);
+	vp = gtk_viewport_new(NULL, NULL);
+	gtk_viewport_set_shadow_type(GTK_VIEWPORT(vp), GTK_SHADOW_OUT);
+	gtk_container_add(GTK_CONTAINER(panel->window), vp);
 
 	if (side == PANEL_TOP || side == PANEL_BOTTOM)
 	{
 		box = gtk_hbox_new(FALSE, 0);
-		panel->before = gtk_hbox_new(FALSE, 4);
-		panel->after = gtk_hbox_new(FALSE, 4);
+		panel->before = gtk_hbox_new(FALSE, 0);
+		panel->after = gtk_hbox_new(FALSE, 0);
 	}
 	else
 	{
 		box = gtk_vbox_new(FALSE, 0);
-		panel->before = gtk_vbox_new(FALSE, 4);
-		panel->after = gtk_vbox_new(FALSE, 4);
+		panel->before = gtk_vbox_new(FALSE, 0);
+		panel->after = gtk_vbox_new(FALSE, 0);
 	}
 
-	gtk_container_add(GTK_CONTAINER(frame), box);
+	gtk_container_add(GTK_CONTAINER(vp), box);
 	gtk_box_pack_start(GTK_BOX(box), panel->before, FALSE, TRUE, 0);
 	gtk_box_pack_end(GTK_BOX(box), panel->after, FALSE, TRUE, 0);
 
-	frame = gtk_frame_new(NULL);
-	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_widget_set_usize(frame, 64, MAX_ICON_HEIGHT);
+	frame = make_insert_frame(panel);
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
-
-	gtk_signal_connect(GTK_OBJECT(frame), "drag-data-received",
-				GTK_SIGNAL_FUNC(add_uri_list), panel);
-	gtk_drag_dest_set(frame,
-			  GTK_DEST_DEFAULT_ALL,
-			  target_table,
-			  sizeof(target_table) / sizeof(*target_table),
-			  GDK_ACTION_COPY);
+	frame = make_insert_frame(panel);
+	gtk_object_set_data(GTK_OBJECT(frame), "after", "yes");
+	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
 
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window->window);
@@ -356,6 +384,8 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 	
 	gtk_box_pack_start(GTK_BOX(after ? panel->after : panel->before),
 			widget, FALSE, TRUE, 4);
+	if (after)
+		gtk_box_reorder_child(GTK_BOX(panel->after), widget, 0);
 	
 	gtk_widget_realize(widget);
 	font = widget->style->font;
@@ -377,6 +407,8 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 	icon->item.name_width = gdk_string_width(font,
 						 icon->item.leafname);
 
+	gtk_signal_connect_after(GTK_OBJECT(widget), "enter-notify-event",
+                           GTK_SIGNAL_FUNC(enter_icon), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
                            GTK_SIGNAL_FUNC(draw_icon), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
@@ -409,7 +441,7 @@ static void size_icon(PanelIcon *icon)
 
 	gtk_widget_set_usize(icon->widget,
 			MAX(icon->item.image->width, icon->item.name_width) + 4,
-			font->ascent + font->descent + 8 + MAX_ICON_HEIGHT);
+			font->ascent + font->descent + 4 + MAX_ICON_HEIGHT);
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -436,7 +468,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *icon)
 	draw_large_icon(widget, &area, &icon->item, icon->selected);
 
 	text_x = (area.width - icon->item.name_width) >> 1;
-	text_y = area.height - font->descent - 2;
+	text_y = area.height - font->ascent + 4;
 
 	draw_string(widget,
 			font,
@@ -465,42 +497,90 @@ static void icon_destroyed(PanelIcon *icon)
 		g_hash_table_insert(icons_hash,
 				((PanelIcon *) list->data)->path, list);
 
-	panel_selection = g_list_remove(panel_selection, icon);
+	if (g_list_find(panel_selection, icon))
+	{
+		panel_selection = g_list_remove(panel_selection, icon);
+
+		if (!panel_selection)
+			gtk_selection_owner_set(NULL,
+				GDK_SELECTION_PRIMARY,
+				gdk_event_get_time(gtk_get_current_event()));
+	}
 	
-	g_print("[ icon_destroyed(%s) ]\n", icon->item.leafname);
 	dir_item_clear(&icon->item);
 	g_free(icon->path);
 	g_free(icon);
 }
 
-static void panel_clear_selection(void)
+/* Clear everything, except 'select', which is selected.
+ * If select is NULL, unselects everything.
+ */
+static void panel_clear_selection(PanelIcon *select)
 {
-	while (panel_selection)
-		icon_set_selected((PanelIcon *) panel_selection->data, FALSE);
+	GList	*to_clear, *next;
+	
+	if (select)
+		icon_set_selected(select, TRUE);
+
+	to_clear = g_list_copy(panel_selection), select;
+
+	if (select)
+		to_clear = g_list_remove(g_list_copy(panel_selection), select);
+		
+	for (next = to_clear; next; next = next->next)
+		icon_set_selected((PanelIcon *) next->data, FALSE);
+
+	g_list_free(to_clear);
 }
 
 static void icon_set_selected(PanelIcon *icon, gboolean selected)
 {
+	gboolean clear = FALSE;
+
 	g_return_if_fail(icon != NULL);
 
 	if (icon->selected == selected)
 		return;
-
+	
+	/* When selecting an icon on another panel, we need to unselect
+	 * everything else afterwards.
+	 */
 	if (selected && panel_selection)
 	{
 		PanelIcon *current = (PanelIcon *) panel_selection->data;
 
 		if (icon->panel != current->panel)
-			panel_clear_selection();
+			clear = TRUE;
 	}
 
 	icon->selected = selected;
 	gtk_widget_queue_clear(icon->widget);
 
 	if (selected)
+	{
 		panel_selection = g_list_prepend(panel_selection, icon);
+		if (losing_selection == 0 && !panel_selection->next)
+		{
+			/* Grab selection */
+			gtk_selection_owner_set(selection_invisible,
+				GDK_SELECTION_PRIMARY,
+				gdk_event_get_time(gtk_get_current_event()));
+		}
+	}
 	else
+	{
 		panel_selection = g_list_remove(panel_selection, icon);
+		if (losing_selection == 0 && !panel_selection)
+		{
+			/* Release selection */
+			gtk_selection_owner_set(NULL,
+				GDK_SELECTION_PRIMARY,
+				gdk_event_get_time(gtk_get_current_event()));
+		}
+	}
+
+	if (clear)
+		panel_clear_selection(icon);
 }
 
 static gint panel_button_press(GtkWidget *widget,
@@ -514,7 +594,7 @@ static gint panel_button_press(GtkWidget *widget,
 	switch (action)
 	{
 		case ACT_CLEAR_SELECTION:
-			panel_clear_selection();
+			panel_clear_selection(NULL);
 			break;
 		case ACT_POPUP_MENU:
 			popup_panel_menu(event, panel, NULL);
@@ -653,7 +733,7 @@ static void popup_panel_menu(GdkEventButton *event,
 				: NULL;
 		
 		if (current && current->panel != panel)
-			panel_clear_selection();
+			panel_clear_selection(icon);
 
 		if (panel_selection == NULL)
 		{
@@ -678,10 +758,35 @@ static void popup_panel_menu(GdkEventButton *event,
 	else
 		pos[1] = event->y_root;
 
+	/* Shade the Help item unless exactly one item is selected */
+	menu_set_items_shaded(panel_menu,
+		panel_selection == NULL || panel_selection->next ? TRUE : FALSE,
+		4, 1);
+
+	/* Shade the Remove items unless there is a selection */
+	menu_set_items_shaded(panel_menu,
+		panel_selection ? FALSE : TRUE,
+		5, 1);
+
 	gtk_menu_popup(GTK_MENU(panel_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
 
+static void show_help(gpointer data, guint action, GtkWidget *widget)
+{
+	PanelIcon	*icon;
+
+	if (panel_selection == NULL || panel_selection->next)
+	{
+		delayed_error(PROJECT,
+			_("You must select a single item to get help on"));
+		return;
+	}
+
+	icon = (PanelIcon *) panel_selection->data;
+	show_item_help(icon->path, &icon->item);
+}
+	
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
 {
 	Panel	*panel;
@@ -708,14 +813,9 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	panel_save(panel);
 }
 
-static void xterm_here(gpointer data, guint action, GtkWidget *widget)
+static void open_home(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*argv[] = {NULL, NULL};
-
-	argv[0] = xterm_here_value;
-
-	if (!spawn_full(argv, home_dir))
-		report_error(PROJECT, _("Failed to fork() child process"));
+	filer_opendir(home_dir);
 }
 
 /* See if the file the icon points to has changed. Update the icon
@@ -820,12 +920,16 @@ static void add_uri_list(GtkWidget          *widget,
                          guint32            time,
 			 Panel		    *panel)
 {
+	gboolean after = FALSE;
 	GSList *uris, *next;
 	
 	if (!selection_data->data)
 		return;
 
 	g_return_if_fail(selection_data->data[selection_data->length] == '\0');
+
+	if (gtk_object_get_data(GTK_OBJECT(widget), "after"))
+		after = TRUE;
 
 	uris = uri_list_to_gslist(selection_data->data);
 
@@ -836,7 +940,7 @@ static void add_uri_list(GtkWidget          *widget,
 		path = get_local_path((guchar *) next->data);
 
 		if (path)
-			panel_add_item(panel, path, FALSE);
+			panel_add_item(panel, path, after);
 	}
 
 	g_slist_free(uris);
@@ -846,7 +950,7 @@ static void menu_closed(GtkWidget *widget)
 {
 	if (tmp_icon_selected)
 	{
-		panel_clear_selection();
+		panel_clear_selection(NULL);
 		tmp_icon_selected = FALSE;
 	}
 }
@@ -937,7 +1041,8 @@ static void panel_save(Panel *panel)
 		goto err;
 
 	if (!write_widgets(file,
-			gtk_container_children(GTK_CONTAINER(panel->after)),
+			g_list_reverse(gtk_container_children(
+					GTK_CONTAINER(panel->after))),
 			'>'))
 		goto err;
 
@@ -971,3 +1076,86 @@ static GList *get_widget_list(Panel *panel)
 
 	return list;
 }
+
+/* Create a frame widget which can be used to add icons to the panel */
+static GtkWidget *make_insert_frame(Panel *panel)
+{
+	GtkWidget *frame;
+	GtkTargetEntry 	target_table[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
+	gtk_widget_set_usize(frame, 16, 16);
+
+	gtk_signal_connect(GTK_OBJECT(frame), "drag-data-received",
+			GTK_SIGNAL_FUNC(add_uri_list), panel);
+	gtk_drag_dest_set(frame,
+			GTK_DEST_DEFAULT_ALL,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table),
+			GDK_ACTION_COPY);
+
+	return frame;
+}
+
+static gboolean enter_icon(GtkWidget *widget,
+			   GdkEventCrossing *event,
+			   PanelIcon *icon)
+{
+	icon_may_update(icon);
+
+	return FALSE;
+}
+
+/* Called when another application wants the contents of our selection */
+static void selection_get(GtkWidget *widget, 
+		       GtkSelectionData *selection_data,
+		       guint      info,
+		       guint      time,
+		       gpointer   data)
+{
+	GString	*str;
+	GList	*next;
+	guchar	*leader = NULL;
+
+	str = g_string_new(NULL);
+
+	if (info == TARGET_URI_LIST)
+		leader = g_strdup_printf("file://%s",
+				o_no_hostnames ? "" : our_host_name());
+
+	for (next = panel_selection; next; next = next->next)
+	{
+		PanelIcon	*icon = (PanelIcon *) next->data;
+
+		if (leader)
+			g_string_append(str, leader);
+		g_string_append(str, icon->path);
+		g_string_append_c(str, ' ');
+	}
+
+	g_free(leader);
+	
+	gtk_selection_data_set(selection_data,
+				gdk_atom_intern("STRING", FALSE),
+				8,
+				str->str,
+				str->len ? str->len - 1 : 0);
+
+	g_string_free(str, TRUE);
+}
+
+/* Called when another application takes the selection away from us */
+static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
+{
+	/* Don't send any events */
+
+	losing_selection++;
+	panel_clear_selection(NULL);
+	losing_selection--;
+
+	return TRUE;
+}
+
