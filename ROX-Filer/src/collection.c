@@ -33,6 +33,8 @@
 #define MIN_HEIGHT 60
 #define MINIMUM_ITEMS 16
 
+int collection_menu_button = 3;
+
 enum
 {
 	ARG_0,
@@ -48,7 +50,7 @@ enum
  * 	User has tried to drag the selection.
  * 
  * void show_menu(collection, button_event, item, user_data)
- * 	User has right-clicked on the collection. 'item' is the number
+ * 	User has menu-clicked on the collection. 'item' is the number
  * 	of the item clicked, or -1 if the click was over the background.
  *
  * void gain_selection(collection, time, user_data)
@@ -147,7 +149,6 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 				   area->width - 1, area->height - 1);
 }
 		
-
 GtkType collection_get_type(void)
 {
 	static guint my_type = 0;
@@ -381,7 +382,8 @@ static void collection_realize(GtkWidget *widget)
 	attributes.event_mask = gtk_widget_get_events(widget) | 
 		GDK_EXPOSURE_MASK |
 		GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-		GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK;
+		GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+		GDK_BUTTON3_MOTION_MASK;
 	attributes.visual = gtk_widget_get_visual(widget);
 	attributes.colormap = gtk_widget_get_colormap(widget);
 
@@ -889,7 +891,8 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	scroll = collection->vadj->value;
 
-	if (event->type == GDK_BUTTON_PRESS && event->button < 3)
+	if (event->type == GDK_BUTTON_PRESS &&
+			event->button != collection_menu_button)
 	{
 		if (collection->buttons_pressed++ == 0)
 			gtk_grab_add(widget);
@@ -934,7 +937,7 @@ static gint collection_button_press(GtkWidget      *widget,
 	stacked_time = current_event_time;
 	current_event_time = event->time;
 	
-	if (event->button == 3)
+	if (event->button == collection_menu_button)
 	{
 		gtk_signal_emit(GTK_OBJECT(collection),
 				collection_signals[SHOW_MENU],
@@ -963,7 +966,7 @@ static gint collection_button_press(GtkWidget      *widget,
 	}
 	else if (event->type == GDK_BUTTON_PRESS)
 	{
-		collection->may_drag = event->button < 3;
+		collection->may_drag = event->button < collection_menu_button;
 
 		if (item >= 0)
 		{
@@ -1008,7 +1011,7 @@ static gint collection_button_release(GtkWidget      *widget,
 	
 	scroll = collection->vadj->value;
 
-	if (event->button > 2)
+	if (event->button > 3 || event->button == collection_menu_button)
 		return FALSE;
 	if (collection->buttons_pressed == 0)
 		return FALSE;

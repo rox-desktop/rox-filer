@@ -528,6 +528,13 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	update_dir(window_with_focus);
 }
 
+static void mount(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	action_mount(window_with_focus);
+}
+
 static void delete(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
@@ -913,54 +920,6 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 				"it's in?");
 			break;
 	}
-}
-
-static void mount(gpointer data, guint action, GtkWidget *widget)
-{
-#ifdef DO_MOUNT_POINTS
-	DirItem	*item;
-	int		i;
-	Collection	*collection;
-	char		*error = NULL;
-	int		count = 0;
-	
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	
-	for (i = 0; i < collection->number_of_items; i++)
-		if (collection->items[i].selected)
-		{
-			item = (DirItem *) collection->items[i].data;
-			if (item->flags & ITEM_FLAG_MOUNT_POINT)
-			{
-				char	*argv[] = {"mount", NULL, NULL};
-				int	child;
-
-				count++;
-				if (item->flags & ITEM_FLAG_MOUNTED)
-					argv[0] = "umount";
-				argv[1] = make_path(window_with_focus->path,
-						item->leafname)->str;
-				child = spawn(argv);
-				if (child)
-					waitpid(child, NULL, 0);
-				else
-					error = "Failed to run mount/umount";
-			}
-		}
-	if (count)
-		update_dir(window_with_focus);
-	else if (!error)
-		error = "You must select some mount points first!";
-
-	if (error)
-		report_error("ROX-Filer", error);
-#else
-	report_error("ROX-Filer",
-			"ROX-Filer does not yet support mount points on your "
-			"system. Sorry.");
-#endif /* DO_MOUNT_POINTS */
 }
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)

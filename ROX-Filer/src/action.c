@@ -23,6 +23,8 @@
  * These routines generally fork() and talk to us via pipes.
  */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
@@ -712,6 +714,52 @@ static void usage_cb(gpointer data)
 	send();
 }
 
+static void mount_cb(gpointer data)
+{
+	FilerWindow 	*filer_window = (FilerWindow *) data;
+	Collection	*collection = filer_window->collection;
+	DirItem   	*item;
+	int		i;
+	char		*command;
+	gboolean	mount_points = FALSE;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		if (!collection->items[i].selected)
+			continue;
+		item = (DirItem *) collection->items[i].data;
+		if (!(item->flags & ITEM_FLAG_MOUNT_POINT))
+			continue;
+		mount_points = TRUE;
+
+		command = g_strdup_printf("%smount %s",
+			item->flags & ITEM_FLAG_MOUNTED ? "u" : "",
+			make_path(filer_window->path, item->leafname)->str);
+		g_string_sprintf(message, "'> %s\n", command);
+		send();
+		if (system(command) == 0)
+		{
+			g_string_sprintf(message, "+%s", filer_window->path);
+			send();
+		}
+		else
+		{
+			g_string_sprintf(message, "!Operation failed.\n");
+			send();
+		}
+		g_free(command);
+	}
+	
+	if (!mount_points)
+	{
+		g_string_sprintf(message, "!No mount points selected!\n");
+		send();
+	}
+
+	g_string_sprintf(message, "'\nDone\n");
+	send();
+}
+
 static void delete_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
@@ -767,7 +815,7 @@ void action_usage(FilerWindow *filer_window)
 	GUIside		*gui_side;
 	Collection 	*collection;
 
-	collection = window_with_focus->collection;
+	collection = filer_window->collection;
 
 	if (collection->number_selected < 1)
 	{
@@ -787,13 +835,43 @@ void action_usage(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
+/* Mount/unmount all selected mount points */
+void action_mount(FilerWindow *filer_window)
+{
+#ifdef DO_MOUNT_POINTS
+	GUIside		*gui_side;
+	Collection 	*collection;
+
+	collection = filer_window->collection;
+
+	if (collection->number_selected < 1)
+	{
+		report_error("ROX-Filer", "You need to select some items "
+				"to mount or unmount");
+		return;
+	}
+
+	gui_side = start_action(filer_window, mount_cb);
+	if (!gui_side)
+		return;
+
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Mount / Unmount");
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
+#else
+	report_error("ROX-Filer",
+			"ROX-Filer does not yet support mount points on your "
+			"system. Sorry.");
+#endif /* DO_MOUNT_POINTS */
+}
+
 /* Deletes all selected items in the window */
 void action_delete(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
 
-	collection = window_with_focus->collection;
+	collection = filer_window->collection;
 
 	if (collection->number_selected < 1)
 	{

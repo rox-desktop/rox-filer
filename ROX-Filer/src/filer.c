@@ -56,6 +56,8 @@
 #define PANEL_BORDER 2
 #define MIN_ITEM_WIDTH 64
 
+extern int collection_menu_button;
+
 FilerWindow 	*window_with_focus = NULL;
 GdkFont	   *fixed_font = NULL;
 
@@ -1385,6 +1387,7 @@ static void set_options()
 			GTK_TOGGLE_BUTTON(toggle_ro_bindings));
 	o_toolbar = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_toolbar));
+	collection_menu_button = o_ro_bindings ? 2 : 3;
 }
 
 static void save_options()
