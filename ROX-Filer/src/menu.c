@@ -244,8 +244,9 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Shell Command..."),	NULL, mini_buffer, MINI_SHELL, NULL},
 {">" N_("Xterm Here"),		NULL, xterm_here, FALSE, NULL},
 {">" N_("Switch to xterm"),	NULL, xterm_here, TRUE, NULL},
-{">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("About ROX-Filer..."),	"F1", menu_rox_help, 0, NULL},
+{N_("Help"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, NULL},
+{">" N_("Show Help Files"),	"F1", menu_rox_help, HELP_DIR, NULL},
 };
 
 
@@ -1679,7 +1680,12 @@ static void mini_buffer(gpointer data, guint action, GtkWidget *widget)
 
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	infobox_new(app_dir);
+	if (action == HELP_ABOUT)
+		infobox_new(app_dir);
+	else if (action == HELP_DIR)
+		filer_opendir(make_path(app_dir, "Help")->str, NULL);
+	else
+		g_warning("Unknown help action %d\n", action);
 }
 
 /* Set n items from position 'from' in 'menu' to the 'shaded' state */

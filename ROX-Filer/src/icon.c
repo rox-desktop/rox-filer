@@ -107,7 +107,8 @@ enum {
 #define N_(x) x
 static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer"),		NULL, NULL, 0, "<Branch>"},
-{">" N_("About..."),		NULL, menu_rox_help, 0, NULL},
+{">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, NULL},
+{">" N_("Show Help Files"),	"F1", menu_rox_help, HELP_DIR, NULL},
 {">" N_("Options..."),		NULL, menu_show_options, 0, NULL},
 {">" N_("Home Directory"),	NULL, open_home, 0, NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},

@@ -8,6 +8,9 @@
 #ifndef _MENU_H
 #define _MENU_H
 
+/* 'action's for menu_rox_help */
+enum {HELP_ABOUT, HELP_DIR};
+
 extern GtkAccelGroup	*filer_keys;
 
 void menu_init(void);
