@@ -90,12 +90,14 @@ void appmenu_remove(void)
  * This function modifies the menu stored in "menu".
  * 'app_dir' is the pathname of the application directory, and 'item'
  * is the corresponding DirItem.
+ * Returns number of entries added.
  * Call appmenu_remove() to undo the effect.
  */
-void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
+int appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 {
 	GList	*next;
 	GtkWidget *sep;
+	int nadded=0;
 
 	g_return_if_fail(menu != NULL);
 
@@ -122,11 +124,16 @@ void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 	}
 
 	for (next = current_items; next; next = next->next)
+	{
 		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu),
 					GTK_WIDGET(next->data));
+		nadded++;
+	}
 
 	current_menu = menu;
 	current_app_path = g_strdup(app_dir);
+
+	return nadded;
 }
 
 
