@@ -2525,7 +2525,7 @@ glob(7)
  manpage if you want to know more about shell wildcards.
 \layout Standard
 
-If the pattern you enter contains a slash ('/') character then the pattern
+If the pattern you enter contains a slash (`/') character then the pattern
  is matched against the file's full path, otherwise only the leafname is
  used.
  That is, 
@@ -2597,7 +2597,7 @@ IsSUID matches files which have the Set-UID bit set.
 IsSGID matches files which have the Set-GID bit set.
 \layout Description
 
-IsSticky matches files with the sticky bit set,
+IsSticky matches files with the sticky bit set.
 \layout Description
 
 IsReadable matches files which you can read from.
@@ -2886,27 +2886,18 @@ find(1)
 Examples:
 \layout LyX-Code
 
-'*.old' system(echo rm %)
+'*.old' system(rm %)
 \layout LyX-Code
 
 'src' prune, '*.c'
 \layout Standard
 
-The first displays a command to delete each file ending in 
+The first deletes each file ending in 
 \family typewriter 
 .old
 \family default 
-; you can either paste the results into an xterm to execute them or run
- the search again without the 
-\family typewriter 
-echo
-\family default 
 .
- It's always a good idea to use 
-\family typewriter 
-echo
-\family default 
- first with dangerous commands! The second looks for 
+ The second looks for 
 \family typewriter 
 .c
 \family default 
