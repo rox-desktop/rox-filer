@@ -197,6 +197,7 @@ static void panel_update(Panel *panel);
 static gboolean panel_check_xinerama(void);
 static GList *build_monitor_number(Option *option,
 					xmlNode *node, guchar *label);
+static gboolean may_autoscroll(Panel *panel);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -1066,6 +1067,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 	gdk_window_get_pointer(pi->panel->window->window,
 				&panel_x, &panel_y, NULL);
 	motion_may_raise(pi->panel, panel_x, panel_y);
+
+	/* Should we scroll the panel when dragging? */
+	if (motion_state != MOTION_REPOSITION)
+		if (pi->panel->autoscroll_speed == 0)
+			may_autoscroll(pi->panel);
 
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */
