@@ -99,6 +99,7 @@ static void delete(gpointer data, guint action, GtkWidget *widget);
 static void remove_link(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
+static void find(gpointer data, guint action, GtkWidget *widget);
 
 static void open_vfs_rpm(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_utar(gpointer data, guint action, GtkWidget *widget);
@@ -181,7 +182,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Disk Usage",	    	"U", 	usage, 0, NULL},
 {"/File/Permissions",		NULL,   chmod_items, 0, NULL},
 {"/File/Touch",    		NULL,   not_yet, 0, NULL},
-{"/File/Find",			NULL,   not_yet, 0, NULL},
+{"/File/Find",			NULL,   find, 0, NULL},
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
 {"/Options...",			NULL,   show_options, 0, NULL},
@@ -675,6 +676,17 @@ static void chmod_items(gpointer data, guint action, GtkWidget *widget)
 				target_callback, chmod_items);
 	else
 		action_chmod(window_with_focus);
+}
+
+static void find(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, find);
+	else
+		action_find(window_with_focus);
 }
 
 /* This pops up our savebox widget, cancelling any currently open one,

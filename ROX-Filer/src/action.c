@@ -45,6 +45,7 @@
 #include "main.h"
 #include "options.h"
 #include "modechange.h"
+#include "find.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -103,10 +104,12 @@ struct _GUIside
 	int 		input_tag;	/* gdk_input_add() */
 	GtkWidget 	*vbox, *log, *window, *dir;
 	GtkWidget	*quiet, *yes, *no;
-	GtkWidget	*entry;		/* May be NULL */
 	int		child;		/* Process ID */
 	int		errors;
 	gboolean	show_info;	/* For Disk Usage */
+
+	GtkWidget	*entry;		/* May be NULL */
+	guchar		**default_string; /* Changed when the entry changes */
 	
 	char		*next_dir;	/* NULL => no timer active */
 	gint		next_timer;
@@ -124,16 +127,24 @@ static char     *action_leaf = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
 static DirItem 	*mount_item;
+
 static struct mode_change *mode_change = NULL;	/* For Permissions */
+static FindCondition *find_condition = NULL;	/* For Find */
 
 static gboolean o_force = FALSE;
 static gboolean o_brief = FALSE;
 static gboolean o_recurse = FALSE;
 
-/* This is the last chmod command set, so that bringing up a new
- * chmod box defaults to the last used command.
+/* Whenever the text in these boxes is changed we store a copy of the new
+ * string to be used as the default next time.
  */
-static guchar	*chmod_command = NULL;
+static guchar	*last_chmod_string = NULL;
+static guchar	*last_find_string = NULL;
+
+/* Set to one of the above before forking. This may change over a call to
+ * reply(). It is reset to NULL once the text is parsed.
+ */
+static guchar	*new_entry_string = NULL;
 
 /* Static prototypes */
 static gboolean send();
@@ -260,21 +271,69 @@ static char *action_auto_quiet(char *data)
 
 /*			SUPPORT				*/
 
-/* This is called whenever the user edits the command - send the new command
- * to the child process.
+/* This is called whenever the user edits the entry box (if any) - send the
+ * new string.
  */
-static void chmod_command_changed(GtkEntry *entry, GUIside *gui_side)
+static void entry_changed(GtkEntry *entry, GUIside *gui_side)
 {
-	g_free(chmod_command);
-	chmod_command = g_strdup(gtk_entry_get_text(entry));
+	guchar	*text;
+
+	g_return_if_fail(gui_side->default_string != NULL);
+
+	text = gtk_entry_get_text(entry);
+
+	g_free(*(gui_side->default_string));
+	*(gui_side->default_string) = g_strdup(text);
 
 	if (!gui_side->to_child)
 		return;
 
-	fputc('P', gui_side->to_child);
-	fputs(chmod_command, gui_side->to_child);
+	fputc('E', gui_side->to_child);
+	fputs(text, gui_side->to_child);
 	fputc('\n', gui_side->to_child);
 	fflush(gui_side->to_child);
+}
+
+static void show_condition_help(gpointer data)
+{
+	static GtkWidget *help = NULL;
+
+	if (!help)
+	{
+		GtkWidget *text, *vbox, *button, *hbox, *sep;
+		
+		help = gtk_window_new(GTK_WINDOW_DIALOG);
+		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
+		gtk_window_set_title(GTK_WINDOW(help),
+				"Find condition reference");
+
+		vbox = gtk_vbox_new(FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(help), vbox);
+
+		text = gtk_label_new(
+	"The format of a condition is:\n"
+	"[ more help here ]\n"
+	"\nRead the ROX-Filer manual for full details.");
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
+
+		hbox = gtk_hbox_new(FALSE, 20);
+		gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+		sep = gtk_hseparator_new();
+		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
+		button = gtk_button_new_with_label("Close");
+		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+				gtk_widget_hide, GTK_OBJECT(help));
+
+		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
+				gtk_widget_hide, GTK_OBJECT(help));
+	}
+
+	if (GTK_WIDGET_VISIBLE(help))
+		gtk_widget_hide(help);
+	gtk_widget_show_all(help);
 }
 
 static void show_chmod_help(gpointer data)
@@ -625,7 +684,7 @@ static void check_flags(void)
 	}
 }
 
-static void read_new_chmod_command(void)
+static void read_new_entry_text(void)
 {
 	int	len;
 	char	c;
@@ -648,10 +707,11 @@ static void read_new_chmod_command(void)
 		g_string_append_c(new, c);
 	}
 
-	if (mode_change)
-		mode_free(mode_change);
-	mode_change = mode_compile(new->str, MODE_MASK_ALL);
-	g_string_free(new, TRUE);
+	g_free(new_entry_string);
+	new_entry_string = new->str;
+	g_string_free(new, FALSE);
+
+	g_print("[ new_entry_string = %s ]\n", new_entry_string);
 }
 
 /* Read until the user sends a reply. If ignore_quiet is TRUE then
@@ -698,8 +758,8 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 				g_string_assign(message, "' No\n");
 				send();
 				return FALSE;
-			case 'P':
-				read_new_chmod_command();
+			case 'E':
+				read_new_entry_text();
 				break;
 			default:
 				process_flag(retval);
@@ -802,6 +862,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gui_side->errors = 0;
 	gui_side->show_info = FALSE;
 	gui_side->entry = NULL;
+	gui_side->default_string = NULL;
 
 	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
@@ -958,9 +1019,70 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	return TRUE;
 }
 
-/* path is the item to change. If is is a directory then we may recurse
- * (depending on the recurse flag).
+/* path is the item to check. If is is a directory then we may recurse
+ * (unless prune is used).
  */
+static gboolean do_find(char *path, char *dummy)
+{
+	struct stat 	info;
+
+	check_flags();
+
+	if (!quiet)
+	{
+		g_string_sprintf(message, "?Check '%s'?", path);
+		if (!reply(from_parent, FALSE))
+			return FALSE;
+	}
+
+	for (;;)
+	{
+		if (new_entry_string)
+		{
+			g_print("[ find changed ]\n");
+			if (find_condition)
+				find_condition_free(find_condition);
+			find_condition = find_compile(new_entry_string);
+			g_free(new_entry_string);
+			new_entry_string = NULL;
+		}
+
+		if (find_condition)
+			break;
+
+		g_string_assign(message,
+			"!Invalid find condition - change it and try again\n");
+		send();
+		g_string_sprintf(message, "?Check '%s'?", path);
+		if (!reply(from_parent, TRUE))
+			return FALSE;
+	}
+
+	if (lstat(path, &info))
+	{
+		send_error();
+		g_string_sprintf(message, "'(while checking '%s')\n", path);
+		send();
+		return FALSE;
+	}
+
+	if (find_test_condition(find_condition, path))
+	{
+		g_string_sprintf(message, "'Found '%s'\n", path);
+		send();
+	}
+
+	if (S_ISDIR(info.st_mode))
+	{
+		char *safe_path;
+		safe_path = g_strdup(path);
+		for_dir_contents(do_find, safe_path, safe_path);
+		g_free(safe_path);
+	}
+
+	return FALSE;
+}
+
 static gboolean do_chmod(char *path, char *dummy)
 {
 	struct stat 	info;
@@ -989,8 +1111,22 @@ static gboolean do_chmod(char *path, char *dummy)
 		send();
 	}
 
-	while (!mode_change)
+	for (;;)
 	{
+		if (new_entry_string)
+		{
+			g_print("[ chmod changed ]\n");
+			if (mode_change)
+				mode_free(mode_change);
+			mode_change = mode_compile(new_entry_string,
+							MODE_MASK_ALL);
+			g_free(new_entry_string);
+			new_entry_string = NULL;
+		}
+
+		if (mode_change)
+			break;
+
 		g_string_assign(message,
 			"!Invalid mode command - change it and try again\n");
 		send();
@@ -1493,7 +1629,7 @@ static void delete_cb(gpointer data)
 	send();
 }
 
-static void chmod_cb(gpointer data)
+static void find_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
 	Collection *collection = filer_window->collection;
@@ -1503,7 +1639,31 @@ static void chmod_cb(gpointer data)
 
 	send_dir(filer_window->path);
 
-	mode_change = mode_compile(chmod_command, MODE_MASK_ALL);
+	while (left > 0)
+	{
+		i++;
+		if (!collection->items[i].selected)
+			continue;
+		item = (DirItem *) collection->items[i].data;
+		do_find(make_path(filer_window->path,
+					item->leafname)->str,
+				NULL);
+		left--;
+	}
+	
+	g_string_sprintf(message, "'\nDone\n");
+	send();
+}
+
+static void chmod_cb(gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
+	Collection *collection = filer_window->collection;
+	DirItem   *item;
+	int	left = collection->number_selected;
+	int	i = -1;
+
+	send_dir(filer_window->path);
 
 	while (left > 0)
 	{
@@ -1564,6 +1724,52 @@ static void add_toggle(GUIside *gui_side, guchar *label, guchar *code)
 
 
 /*			EXTERNAL INTERFACE			*/
+
+void action_find(FilerWindow *filer_window)
+{
+	GUIside		*gui_side;
+	Collection 	*collection;
+	GtkWidget	*hbox, *label, *button;
+
+	collection = filer_window->collection;
+
+	if (collection->number_selected < 1)
+	{
+		report_error("ROX-Filer", "You need to select some items "
+				"to search through");
+		return;
+	}
+
+	if (!last_find_string)
+		last_find_string = g_strdup("core");
+
+	new_entry_string = last_find_string;
+	gui_side = start_action(filer_window, find_cb, FALSE);
+	if (!gui_side)
+		return;
+
+	gui_side->show_info = TRUE;
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	label = gtk_label_new("Conditions:");
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	gui_side->default_string = &last_find_string;
+	gui_side->entry = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
+	gtk_widget_set_sensitive(gui_side->entry, FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
+	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
+			entry_changed, gui_side);
+	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
+	button = gtk_button_new_with_label("Show condition reference");
+	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			show_condition_help, NULL);
+
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Find");
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
+}
 
 /* Count disk space used by selected items */
 void action_usage(FilerWindow *filer_window)
@@ -1667,8 +1873,9 @@ void action_chmod(FilerWindow *filer_window)
 		return;
 	}
 
-	if (!chmod_command)
-		chmod_command = g_strdup("a+x");
+	if (!last_chmod_string)
+		last_chmod_string = g_strdup("a+x");
+	new_entry_string = last_chmod_string;
 	gui_side = start_action(filer_window, chmod_cb, FALSE);
 	if (!gui_side)
 		return;
@@ -1681,12 +1888,13 @@ void action_chmod(FilerWindow *filer_window)
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new("Command:");
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	gui_side->default_string = &last_chmod_string;
 	gui_side->entry = gtk_entry_new();
-	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), chmod_command);
+	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_chmod_string);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
-			chmod_command_changed, gui_side);
+			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
 	button = gtk_button_new_with_label("Show command reference");
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
