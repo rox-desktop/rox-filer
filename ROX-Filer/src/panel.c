@@ -350,7 +350,7 @@ void panel_icon_may_update(Icon *icon)
 
 	pixmap_ref(image);
 	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item);
+	dir_restat(icon->path, &icon->item, FALSE);
 
 	if (icon->item.image != image || icon->item.flags != flags)
 	{
@@ -470,7 +470,7 @@ static void panel_add_item(Panel *panel,
 	
 	icon->widget = widget;
 	icon->selected = FALSE;
-	dir_stat(icon->path, &icon->item);
+	dir_stat(icon->path, &icon->item, FALSE);
 
 	if (name)
 		icon->item.leafname = g_strdup(name);

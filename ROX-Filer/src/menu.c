@@ -95,6 +95,7 @@ static void sort_date(gpointer data, guint action, GtkWidget *widget);
 
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
+static void create_thumbs(gpointer data, guint action, GtkWidget *widget);
 
 static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
@@ -183,7 +184,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Sort by Size"),	NULL, sort_size, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
-{">" N_("Refresh"),		NULL, refresh, 0,	NULL},
+{">" N_("Refresh"),		NULL, refresh, 0, NULL},
+{">" N_("Create Thumbs"),	NULL, create_thumbs, 0,	NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Copy..."),		NULL, copy_item, 0, NULL},
 {">" N_("Rename..."),		NULL, rename_item, 0, NULL},
@@ -681,6 +683,14 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 
 	full_refresh();
 	filer_update_dir(window_with_focus, TRUE);
+}
+
+static void create_thumbs(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	dir_rescan_with_thumbs(window_with_focus->directory,
+				window_with_focus->path);
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)

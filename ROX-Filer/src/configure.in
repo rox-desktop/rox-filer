@@ -35,8 +35,21 @@ fi
 AC_SUBST(GTK_CONFIG)
 
 dnl Make sure we have gdk-pixbuf
-AC_CHECK_LIB(gdk_pixbuf, gdk_pixbuf_new_from_file, ,
-	AC_MSG_ERROR("ROX-Filer now requires the gdk-pixbuf library"))
+AC_MSG_CHECKING(for gdk-pixbuf library)
+if test -z "$GDK_PIXBUF_CONFIG"; then
+  GDK_PIXBUF_CONFIG=gdk-pixbuf-config
+fi
+GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
+changequote(,)dnl
+if [ -n "$GDK_PIXBUF_LIBS" ]; then
+  AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
+else
+  AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - \
+make sure it is in your PATH)
+fi
+changequote([,])dnl
+AC_SUBST(GDK_PIXBUF_CONFIG)
+AC_SUBST(GDK_PIXBUF_LIBS)
 
 dnl Does file(1) support '-b' ?
 AC_MSG_CHECKING(whether file -b works)

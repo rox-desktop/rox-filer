@@ -47,6 +47,7 @@
 #include "main.h"
 
 GFSCache *pixmap_cache = NULL;
+GFSCache *thumb_cache = NULL;
 
 static char * bad_xpm[] = {
 "12 12 3 1",
@@ -88,7 +89,8 @@ static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
-//static GdkPixbuf *make_half_size(GdkPixbuf *big);
+static MaskedPixmap *load_thumb(char *pathname, gpointer user_data);
+static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf);
 
 
 /****************************************************************
@@ -98,6 +100,13 @@ static MaskedPixmap *get_bad_image(void);
 void pixmaps_init(void)
 {
 	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
+					(GFSRefFunc) ref,
+					(GFSRefFunc) unref,
+					(GFSGetRefFunc) getref,
+					NULL,	/* Update func */
+					NULL);
+
+	thumb_cache = g_fscache_new((GFSLoadFunc) load_thumb,
 					(GFSRefFunc) ref,
 					(GFSRefFunc) unref,
 					(GFSGetRefFunc) getref,
@@ -138,12 +147,12 @@ static void load_default_pixmaps(void)
 
 void pixmap_ref(MaskedPixmap *mp)
 {
-	ref(mp, pixmap_cache->user_data);
+	ref(mp, NULL);
 }
 
 void pixmap_unref(MaskedPixmap *mp)
 {
-	unref(mp, pixmap_cache->user_data);
+	unref(mp, NULL);
 }
 
 void pixmap_make_small(MaskedPixmap *mp)
@@ -195,16 +204,22 @@ void pixmap_make_small(MaskedPixmap *mp)
  */
 static MaskedPixmap *image_from_file(char *path)
 {
-	MaskedPixmap	*mp;
-	GdkPixmap	*pixmap;
-	GdkBitmap	*mask;
-	int		width;
-	int		height;
 	GdkPixbuf	*pixbuf;
 	
 	pixbuf = gdk_pixbuf_new_from_file(path);
 	if (!pixbuf)
 		return NULL;
+
+	return image_from_pixbuf(pixbuf);
+}
+
+static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf)
+{
+	MaskedPixmap	*mp;
+	GdkPixmap	*pixmap;
+	GdkBitmap	*mask;
+	int		width;
+	int		height;
 
 	gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &mask, 128);
 
@@ -267,6 +282,40 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 	return retval ? retval : get_bad_image();
 }
 
+static MaskedPixmap *load_thumb(char *pathname, gpointer user_data)
+{
+	GdkPixbuf	*full_size, *thumb_pb;
+	int		w, h;
+
+	full_size = gdk_pixbuf_new_from_file(pathname);
+
+	if (!full_size)
+		return NULL;
+
+	w = gdk_pixbuf_get_width(full_size);
+	h = gdk_pixbuf_get_height(full_size);
+
+	if (w <= THUMB_WIDTH &&	h <= THUMB_HEIGHT)
+		thumb_pb = full_size;
+	else
+	{
+		float scale_x = ((float) w) / THUMB_WIDTH;
+		float scale_y = ((float) h) / THUMB_HEIGHT;
+		float scale = MAX(scale_x, scale_y);
+		
+		thumb_pb = gdk_pixbuf_scale_simple(full_size,
+						w / scale,
+						h / scale,
+						GDK_INTERP_BILINEAR);
+		gdk_pixbuf_unref(full_size);
+	}
+
+	if (!thumb_pb)
+		return get_bad_image();
+
+	return image_from_pixbuf(thumb_pb);
+}
+
 static void ref(MaskedPixmap *mp, gpointer data)
 {
 	/* printf("[ ref %p %d->%d ]\n", mp, mp->ref, mp->ref + 1); */
@@ -309,6 +358,7 @@ static int getref(MaskedPixmap *mp)
 static gint purge(gpointer data)
 {
 	g_fscache_purge(pixmap_cache, PIXMAP_PURGE_TIME);
+	g_fscache_purge(thumb_cache, PIXMAP_PURGE_TIME);
 
 	return TRUE;
 }

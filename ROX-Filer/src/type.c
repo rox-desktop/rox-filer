@@ -464,7 +464,7 @@ void drag_app_dropped(GtkWidget		*frame,
 		return;
 	}
 
-	dir_stat(app, &item);
+	dir_stat(app, &item, FALSE);
 	if (item.flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		guchar	*path;

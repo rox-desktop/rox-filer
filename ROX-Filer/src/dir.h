@@ -69,6 +69,7 @@ struct _Directory
 	GList	*users;		/* Functions to call on update */
 	char	*error;		/* NULL => no error */
 
+	gboolean	do_thumbs;	/* Create thumbs while scanning */
 	gboolean	needs_update;	/* When scan is finished, rescan */
 	gboolean	notify_active;	/* Notify timeout is running */
 	gboolean	done_some_scanning;	/* Read any items this scan? */
@@ -85,10 +86,11 @@ void dir_init(void);
 void dir_attach(Directory *dir, DirCallback callback, gpointer data);
 void dir_detach(Directory *dir, DirCallback callback, gpointer data);
 void dir_update(Directory *dir, gchar *pathname);
+void dir_rescan_with_thumbs(Directory *dir, gchar *pathname);
 int dir_item_cmp(const void *a, const void *b);
 void refresh_dirs(char *path);
-void dir_stat(guchar *path, DirItem *item);
-void dir_restat(guchar *path, DirItem *item);
+void dir_stat(guchar *path, DirItem *item, gboolean make_thumb);
+void dir_restat(guchar *path, DirItem *item, gboolean make_thumb);
 void dir_item_clear(DirItem *item);
 void dir_check_this(guchar *path);
 

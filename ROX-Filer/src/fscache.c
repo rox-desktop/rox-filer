@@ -199,6 +199,29 @@ out:
 	return data->data;
 }
 
+/* Like g_fscache_lookup(), but doesn't load or update the item.
+ * Returns NULL if the item isn't cached.
+ */
+gpointer g_fscache_lookup_cached(GFSCache *cache, char *pathname)
+{
+	GFSCacheKey	key;
+	GFSCacheData	*data;
+	struct stat 	info;
+
+	g_return_val_if_fail(cache != NULL, NULL);
+	g_return_val_if_fail(pathname != NULL, NULL);
+
+	if (mc_stat(pathname, &info))
+		return NULL;
+
+	key.device = info.st_dev;
+	key.inode = info.st_ino;
+
+	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+
+	return data ? data->data : NULL;
+}
+
 /* Call the update() function on this item if it's in the cache
  * AND it's out-of-date.
  */

@@ -319,7 +319,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	icon_hash_path(icon);
 
-	dir_stat(icon->path, &icon->item);
+	dir_stat(icon->path, &icon->item, FALSE);
 
 	if (!name)
 	{
@@ -607,7 +607,7 @@ void pinboard_icon_may_update(Icon *icon)
 
 	pixmap_ref(image);
 	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item);
+	dir_restat(icon->path, &icon->item, FALSE);
 
 	if (icon->item.image != image || icon->item.flags != flags)
 		reshape_icon(icon);

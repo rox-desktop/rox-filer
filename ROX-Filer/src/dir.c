@@ -159,7 +159,7 @@ void refresh_dirs(char *path)
 }
 
 /* Bring this item's structure uptodate */
-void dir_restat(guchar *path, DirItem *item)
+void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 {
 	struct stat	info;
 
@@ -268,6 +268,12 @@ void dir_restat(guchar *path, DirItem *item)
 		}
 		else
 			item->mime_type = type_from_path(path);
+
+		if (make_thumb)
+			item->image = g_fscache_lookup(thumb_cache, path);
+		else
+			item->image = g_fscache_lookup_cached(thumb_cache,
+								path);
 	}
 
 	if (!item->mime_type)
@@ -288,13 +294,13 @@ void dir_restat(guchar *path, DirItem *item)
 /* Fill in the item structure with the appropriate details.
  * 'leafname' field is set to NULL; text_width is unset.
  */
-void dir_stat(guchar *path, DirItem *item)
+void dir_stat(guchar *path, DirItem *item, gboolean make_thumb)
 {
 	item->leafname = NULL;
 	item->may_delete = FALSE;
 	item->image = NULL;
 
-	dir_restat(path, item);
+	dir_restat(path, item, make_thumb);
 }
 
 /* Frees all fields in the icon, but does not free the icon structure
@@ -328,6 +334,15 @@ void dir_check_this(guchar *path)
 	}
 	
 	g_free(real_path);
+}
+
+void dir_rescan_with_thumbs(Directory *dir, gchar *pathname)
+{
+	g_return_if_fail(dir != NULL);
+	g_return_if_fail(pathname != NULL);
+
+	dir->do_thumbs = TRUE;
+	update(dir, pathname, NULL);
 }
 
 /****************************************************************
@@ -536,7 +551,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	}
 
 	tmp = make_path(dir->pathname, ent->d_name);
-	dir_stat(tmp->str, &new);
+	dir_stat(tmp->str, &new, dir->do_thumbs);
 
 	/* Is an item with this name already listed? */
 	for (i = 0; i < array->len; i++)
@@ -651,6 +666,7 @@ static Directory *load(char *pathname, gpointer data)
 	dir->notify_active = FALSE;
 	dir->pathname = g_strdup(pathname);
 	dir->error = NULL;
+	dir->do_thumbs = FALSE;
 	
 	return dir;
 }

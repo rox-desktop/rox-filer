@@ -12,7 +12,10 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include "fscache.h"
 
-extern GFSCache *pixmap_cache;
+#define THUMB_WIDTH 48
+#define THUMB_HEIGHT 48
+
+extern GFSCache *pixmap_cache, *thumb_cache;
 
 extern MaskedPixmap *im_error;
 extern MaskedPixmap *im_unknown;
