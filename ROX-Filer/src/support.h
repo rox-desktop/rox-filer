@@ -48,6 +48,7 @@ guchar *get_relative_path(guchar *from, guchar *to);
 int text_to_boolean(const char *text, int defvalue);
 void set_to_null(gpointer *data);
 char *readlink_dup(char *path);
+gchar *icon_convert_path(gchar *path);
 
 #if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 char *md5_hash(char *message);

@@ -41,7 +41,6 @@ struct _Icon {
 };
 
 void icon_init(void);
-guchar *icon_convert_path(guchar *path);
 void icon_hash_path(Icon *icon);
 void icon_unhash_path(Icon *icon);
 gboolean icons_require(guchar *path);

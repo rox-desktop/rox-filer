@@ -117,6 +117,8 @@ void read_globicons()
 		/* Handle the new XML file format */
 		for (node = root->xmlChildrenNode; node; node = node->next)
 		{
+			gchar *path;
+
 			if (node->type != XML_ELEMENT_NODE)
 				continue;
 			if (strcmp(node->name, "rule") != 0)
@@ -128,7 +130,10 @@ void read_globicons()
 			if (!match)
 				continue;
 
-			g_hash_table_insert(glob_icons, match,
+			path = icon_convert_path(match);
+			g_free(match);
+
+			g_hash_table_insert(glob_icons, path,
 					xmlNodeGetContent(icon));
 		}
 

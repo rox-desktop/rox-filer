@@ -175,33 +175,6 @@ void icon_init(void)
 	tooltips = gtk_tooltips_new();
 }
 
-/* Removes trailing / chars and converts a leading '~/' (if any) to
- * the user's home dir. g_free() the result.
- */
-guchar *icon_convert_path(guchar *path)
-{
-	guchar		*retval;
-	int		path_len;
-
-	g_return_val_if_fail(path != NULL, NULL);
-
-	path_len = strlen(path);
-	while (path_len > 1 && path[path_len - 1] == '/')
-		path_len--;
-	
-	retval = g_strndup(path, path_len);
-
-	if (path[0] == '~' && (path[1] == '\0' || path[1] == '/'))
-	{
-		guchar *tmp = retval;
-
-		retval = g_strconcat(home_dir, retval + 1, NULL);
-		g_free(tmp);
-	}
-
-	return retval;
-}
-
 /* The icons_hash table allows us to convert from a path to a list
  * of icons that use that path.
  * Add this icon to the list for its path.

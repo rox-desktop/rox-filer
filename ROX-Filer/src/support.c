@@ -1272,6 +1272,33 @@ char *md5_hash(char *message)
 }
 #endif /* GTK2 or THUMBS_USE_LIBPNG */
 
+/* Removes trailing / chars and converts a leading '~/' (if any) to
+ * the user's home dir. g_free() the result.
+ */
+gchar *icon_convert_path(gchar *path)
+{
+	guchar		*retval;
+	int		path_len;
+
+	g_return_val_if_fail(path != NULL, NULL);
+
+	path_len = strlen(path);
+	while (path_len > 1 && path[path_len - 1] == '/')
+		path_len--;
+	
+	retval = g_strndup(path, path_len);
+
+	if (path[0] == '~' && (path[1] == '\0' || path[1] == '/'))
+	{
+		guchar *tmp = retval;
+
+		retval = g_strconcat(home_dir, retval + 1, NULL);
+		g_free(tmp);
+	}
+
+	return retval;
+}
+
 /****************************************************************
  *                      INTERNAL FUNCTIONS                      *
  ****************************************************************/
