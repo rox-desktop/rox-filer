@@ -42,6 +42,7 @@ static void destroy(Directory *dir);
 static void start_scanning(Directory *dir, char *pathname);
 static gint idle_callback(Directory *dir);
 static void init_for_scan(Directory *dir);
+static void merge_new(Directory *dir);
 
 
 /****************************************************************
@@ -78,11 +79,15 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 
 	ref(dir, NULL);
 
-	if (dir->error)
-		delayed_error("ROX-Filer", dir->error);
-
 	if (dir->items->len)
 		callback(dir, DIR_ADD, dir->items, data);
+
+	if (dir->needs_update)
+		start_scanning(dir, dir->pathname);
+
+	if (dir->error)
+		delayed_error("ROX-Filer", dir->error);
+	
 	if (!dir->dir_handle)
 		callback(dir, DIR_END_SCAN, NULL, data);
 }
@@ -104,6 +109,18 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 			g_free(user);
 			dir->users = g_list_remove(dir->users, user);
 			unref(dir, NULL);
+			if (!dir->users)
+			{
+				if (dir->dir_handle)
+				{
+					g_print("[ stop ]\n");
+					closedir(dir->dir_handle);
+					dir->dir_handle = NULL;
+					gtk_idle_remove(dir->idle);
+					merge_new(dir);
+					dir->needs_update = TRUE;
+				}
+			}
 			return;
 		}
 		list = list->next;
@@ -149,19 +166,16 @@ static void free_items_array(GPtrArray *array)
 	g_ptr_array_free(array, TRUE);
 }
 
-/* Scanning has finished. Remove all the old items that have gone
- * and add in the new ones.
- * Notify everyone who is watching us.
+/* Scanning has finished. Remove all the old items that have gone.
+ * Notify everyone who is watching us of the removed items and tell
+ * them that the scan is over.
  */
 static void sweep_deleted(Directory *dir)
 {
 	GPtrArray	*array = dir->items;
-	int		i;
 	int		items = array->len;
 	int		new_items = 0;
 	GPtrArray	*old;
-	GPtrArray	*new = dir->new_items;
-	GPtrArray	*up = dir->up_items;
 	DirItem	**from = (DirItem **) array->pdata;
 	DirItem	**to = (DirItem **) array->pdata;
 	GList *list = dir->users;
@@ -190,18 +204,39 @@ static void sweep_deleted(Directory *dir)
 	{
 		DirUser *user = (DirUser *) list->data;
 
-		if (up->len)
-			user->callback(dir, DIR_UPDATE, up, user->data);
 		if (old->len)
 			user->callback(dir, DIR_REMOVE, old, user->data);
-		if (new->len)
-			user->callback(dir, DIR_ADD, new, user->data);
 		user->callback(dir, DIR_END_SCAN, NULL, user->data);
 		
 		list = list->next;
 	}
 
 	free_items_array(old);
+}
+
+
+/* Add all the new items to the items array.
+ * Notify everyone who is watching us.
+ */
+static void merge_new(Directory *dir)
+{
+	GList *list = dir->users;
+	GPtrArray	*new = dir->new_items;
+	GPtrArray	*up = dir->up_items;
+	int	i;
+
+	while (list)
+	{
+		DirUser *user = (DirUser *) list->data;
+
+		if (new->len)
+			user->callback(dir, DIR_ADD, new, user->data);
+		if (up->len)
+			user->callback(dir, DIR_UPDATE, up, user->data);
+		
+		list = list->next;
+	}
+
 
 	for (i = 0; i < new->len; i++)
 		g_ptr_array_add(dir->items, new->pdata[i]);
@@ -426,6 +461,7 @@ static gint idle_callback(Directory *dir)
 
 		if (!ent)
 		{
+			merge_new(dir);
 			sweep_deleted(dir);
 
 			if (dir->needs_update)
@@ -459,11 +495,9 @@ static Directory *load(char *pathname, gpointer data)
 	dir->up_items = g_ptr_array_new();
 	dir->users = NULL;
 	dir->dir_handle = NULL;
-	dir->needs_update = FALSE;
+	dir->needs_update = TRUE;
 	dir->pathname = g_strdup(pathname);
 	dir->error = NULL;
-
-	start_scanning(dir, pathname);
 	
 	return dir;
 }
