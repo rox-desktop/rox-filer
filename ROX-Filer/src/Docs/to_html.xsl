@@ -65,5 +65,14 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
-  
+
+  <xsl:template match="citation">
+    <xsl:text>[</xsl:text>
+    <xsl:variable name="cited"><xsl:value-of select="."/></xsl:variable>
+    <a href="#{generate-id(/book/bibliography/bibliomixed[string(abbrev/.) = $cited])}">
+      <xsl:call-template name="inline.charseq"/>
+    </a>
+    <xsl:text>]</xsl:text>
+  </xsl:template>
+
 </xsl:stylesheet>
