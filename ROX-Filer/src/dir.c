@@ -80,6 +80,7 @@ static void set_idle_callback(Directory *dir);
 static void insert_item(Directory *dir, guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
 static void dir_recheck(Directory *dir, guchar *path, guchar *leafname);
+static GPtrArray *hash_to_array(GHashTable *hash);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -103,6 +104,7 @@ void dir_init(void)
 void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 {
 	DirUser	*user;
+	GPtrArray *items;
 
 	g_return_if_fail(dir != NULL);
 	g_return_if_fail(callback != NULL);
@@ -115,8 +117,10 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 
 	ref(dir, NULL);
 
-	if (dir->items->len)
-		callback(dir, DIR_ADD, dir->items, data);
+	items = hash_to_array(dir->known_items);
+	if (items->len)
+		callback(dir, DIR_ADD, items, data);
+	g_ptr_array_free(items, TRUE);
 
 	if (dir->needs_update)
 		dir_rescan(dir, dir->pathname);
@@ -361,10 +365,12 @@ void dir_rescan(Directory *dir, guchar *pathname)
 		}
 	}
 
-	/* Compare the (sorted) list with the current DirItems, removing
+	/* Sort, so the names are scanned in a sensible order */
+	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
+
+	/* Compare the list with the current DirItems, removing
 	 * any that are missing.
 	 */
-	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
 	remove_missing(dir, names);
 
 	free_recheck_list(dir);
@@ -405,9 +411,11 @@ void dir_merge_new(Directory *dir)
 
 
 	for (i = 0; i < new->len; i++)
-		g_ptr_array_add(dir->items, new->pdata[i]);
-	qsort(dir->items->pdata, dir->items->len, sizeof(DirItem *),
-			dir_item_cmp);
+	{
+		DirItem *item = (DirItem *) new->pdata[i];
+
+		g_hash_table_insert(dir->known_items, item->leafname, item);
+	}
 
 	g_ptr_array_set_size(new, 0);
 	g_ptr_array_set_size(up, 0);
@@ -449,60 +457,59 @@ static void notify_deleted(Directory *dir, GPtrArray *deleted)
 	}
 }
 
+static void mark_unused(gpointer key, gpointer value, gpointer data)
+{
+	DirItem	*item = (DirItem *) value;
+
+	item->may_delete = TRUE;
+}
+
+static void keep_deleted(gpointer key, gpointer value, gpointer data)
+{
+	DirItem	*item = (DirItem *) value;
+	GPtrArray *deleted = (GPtrArray *) data;
+
+	if (item->may_delete)
+		g_ptr_array_add(deleted, item);
+}
+
+static gboolean check_unused(gpointer key, gpointer value, gpointer data)
+{
+	DirItem	*item = (DirItem *) value;
+
+	return item->may_delete;
+}
+
 /* Remove all the old items that have gone.
  * Notify everyone who is watching us of the removed items.
  */
 static void remove_missing(Directory *dir, GPtrArray *keep)
 {
-	int		kept_items = 0;
 	GPtrArray	*deleted;
-	int		old, new;
+	int		i;
 
 	deleted = g_ptr_array_new();
 
-	old = 0;
-	new = 0;
+	/* Mark all current items as may_delete */
+	g_hash_table_foreach(dir->known_items, mark_unused, NULL);
 
-	while (old < dir->items->len && new < keep->len)
+	/* Unmark all items also in 'keep' */
+	for (i = 0; i < keep->len; i++)
 	{
-		DirItem	*old_item = (DirItem *) dir->items->pdata[old];
-		guchar	*new_name = (guchar *) keep->pdata[new];
-		int cmp;
+		guchar	*leaf = (guchar *) keep->pdata[i];
+		DirItem *item;
 
-		cmp = strcmp(old_item->leafname, new_name);
+		item = g_hash_table_lookup(dir->known_items, leaf);
 
-		if (cmp < 0)
-		{
-			/* old_item would have appeared before new_name
-			 * if it was still there - kill it!
-			 */
-			old++;
-			g_ptr_array_add(deleted, old_item);
-		}
-		else if (cmp == 0)
-		{
-			/* Item is in old and new lists */
-			old++;
-			new++;
-
-			dir->items->pdata[kept_items] = old_item;
-			kept_items++;
-		}
-		else
-		{
-			/* new_name wasn't here before. Skip it */
-			new++;
-		}
+		if (item)
+			item->may_delete = FALSE;
 	}
 
-	/* If we didn't get to the end of the old items, then we've
-	 * hit the end of the new items. Thus, we can just forget the
-	 * remaining old items.
-	 */
-	for (; old < dir->items->len; old++)
-		g_ptr_array_add(deleted, dir->items->pdata[old]);
-	
-	g_ptr_array_set_size(dir->items, kept_items);
+	/* Add each item still marked to 'deleted' */
+	g_hash_table_foreach(dir->known_items, keep_deleted, deleted);
+
+	/* Remove all items still marked */
+	g_hash_table_foreach_remove(dir->known_items, check_unused, NULL);
 
 	notify_deleted(dir, deleted);
 
@@ -533,17 +540,15 @@ static void delayed_notify(Directory *dir)
 	dir->notify_active = TRUE;
 }
 
-static void remove_item(Directory *dir, int i)
+static void remove_item(Directory *dir, DirItem *item)
 {
 	GPtrArray *gone;
 
-	g_return_if_fail(i >= 0 && i < dir->items->len);
+	g_hash_table_remove(dir->known_items, item->leafname);
 
 	/* Move deleted item from 'items' to 'gone' */
 	gone = g_ptr_array_new();
-	g_ptr_array_add(gone, dir->items->pdata[i]);
-	g_ptr_array_remove_index(dir->items, i);
-
+	g_ptr_array_add(gone, item);
 	notify_deleted(dir, gone);
 	free_items_array(gone);
 }
@@ -554,9 +559,7 @@ static void insert_item(Directory *dir, guchar *leafname)
 	static GString  *tmp = NULL;
 
 	GdkFont		*font;
-	GPtrArray	*array = dir->items;
 	DirItem		*item;
-	int		i;
 	DirItem		new;
 	gboolean	is_new = FALSE;
 	gboolean	deleted;
@@ -565,31 +568,18 @@ static void insert_item(Directory *dir, guchar *leafname)
 	diritem_stat(tmp->str, &new, dir->do_thumbs);
 	deleted = new.base_type == TYPE_ERROR && new.lstat_errno == ENOENT;
 
-	/* Is an item with this name already listed? */
-	/* XXX: Binary search this! */
-	for (i = 0; i < array->len; i++)
-	{
-		item = (DirItem *) array->pdata[i];
-
-		if (strcmp(item->leafname, leafname) == 0)
-		{
-			if (deleted)
-			{
-				diritem_clear(&new);
-				remove_item(dir, i);
-				return;
-			}
-
-			goto update;
-		}
-	}
+	item = g_hash_table_lookup(dir->known_items, leafname);
 
 	if (deleted)
 	{
-		/* Wasn't there before and isn't there now */
 		diritem_clear(&new);
+		if (item)
+			remove_item(dir, item);
 		return;
 	}
+
+	if (item)
+		goto update;
 
 	item = g_new(DirItem, 1);
 	item->leafname = g_strdup(leafname);
@@ -651,7 +641,7 @@ static Directory *load(char *pathname, gpointer data)
 
 	dir = g_new(Directory, 1);
 	dir->ref = 1;
-	dir->items = g_ptr_array_new();
+	dir->known_items = g_hash_table_new(g_str_hash, g_str_equal);
 	dir->recheck_list = NULL;
 	dir->idle_callback = 0;
 	dir->scanning = FALSE;
@@ -674,6 +664,8 @@ static Directory *load(char *pathname, gpointer data)
 /* Note: dir_cache is never purged, so this shouldn't get called */
 static void destroy(Directory *dir)
 {
+	GPtrArray *items;
+
 	g_return_if_fail(dir->users == NULL);
 
 	g_print("[ destroy %p ]\n", dir);
@@ -682,7 +674,11 @@ static void destroy(Directory *dir)
 	set_idle_callback(dir);
 
 	g_ptr_array_free(dir->up_items, TRUE);
-	free_items_array(dir->items);
+
+	items = hash_to_array(dir->known_items);
+	free_items_array(items);
+	g_hash_table_destroy(dir->known_items);
+	
 	free_items_array(dir->new_items);
 	g_free(dir->error);
 	g_free(dir->pathname);
@@ -750,4 +746,25 @@ static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
 
 	insert_item(dir, leafname);
 	dir_merge_new(dir);
+}
+
+static void to_array(gpointer key, gpointer value, gpointer data)
+{
+	GPtrArray *array = (GPtrArray *) data;
+
+	g_ptr_array_add(array, value);
+}
+
+/* Convert a hash table to an unsorted GPtrArray.
+ * g_ptr_array_free() the result.
+ */
+static GPtrArray *hash_to_array(GHashTable *hash)
+{
+	GPtrArray *array;
+
+	array = g_ptr_array_new();
+
+	g_hash_table_foreach(hash, to_array, array);
+
+	return array;
 }

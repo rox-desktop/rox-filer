@@ -48,7 +48,7 @@ struct _Directory
 	gboolean	notify_active;	/* Notify timeout is running */
 	gint		idle_callback;	/* Idle callback ID */
 
-	GPtrArray 	*items;		/* What our users know about */
+	GHashTable 	*known_items;	/* What our users know about */
 	GPtrArray	*new_items;	/* New items to add in */
 	GPtrArray	*up_items;	/* Items to redraw */
 

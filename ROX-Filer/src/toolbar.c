@@ -523,6 +523,15 @@ static void handle_drops(FilerWindow *filer_window,
 			(gpointer) dest);
 }
 
+static void tally_items(gpointer key, gpointer value, gpointer data)
+{
+	guchar *leafname = (guchar *) key;
+	int    *tally = (int *) data;
+
+	if (leafname[0] == '.')
+		(*tally)++;
+}
+
 static void coll_selection_changed(Collection *collection, guint time,
 					gpointer user_data)
 {
@@ -534,7 +543,6 @@ static void coll_selection_changed(Collection *collection, guint time,
 
 	if (collection->number_selected == 0)
 	{
-		guint num_hidden = 0;
 		gchar *s = NULL;
 
 		if (filer_window->scanning)
@@ -546,17 +554,15 @@ static void coll_selection_changed(Collection *collection, guint time,
 
 		if (!filer_window->show_hidden)
 		{
-			guint	i = filer_window->directory->items->len;
-			DirItem	**items = (DirItem **)
-				filer_window->directory->items->pdata;
+			GHashTable *hash = filer_window->directory->known_items;
+			int	   tally = 0;
 
-			while (i--)
-				if (items[i]->leafname[0] == '.')
-					num_hidden++;
-			if (num_hidden)
-				s = g_strdup_printf(_(" (%u hidden)"),
-						num_hidden);
+			g_hash_table_foreach(hash, tally_items, &tally);
+
+			if (tally)
+				s = g_strdup_printf(_(" (%u hidden)"), tally);
 		}
+
 		if (collection->number_of_items)
 			label = g_strdup_printf("%d %s%s",
 					collection->number_of_items,

@@ -13,7 +13,6 @@ Note: Currently in the middle of upgrading the dir scanning code.
 	- Think about needs_rescan, etc
 	- Remove debugging output
 	- Clear window before resizing
-	- Use a hash table for dir->items. Avoids duplicates problem?
 
 BUGS
 
@@ -46,8 +45,6 @@ Return for 'Do another search' toggles Quiet...
 
 'Edit Item' doesn't make much sense for applets...
 
-Root click with sawfish 0.99 doesn't work (bug in sawfish).
-
 Rescanning sometimes causes the display to scroll (unrepeatable).
 
 Panel sometimes won't accept drops (unrepeatable).
@@ -56,6 +53,7 @@ Panel sometimes won't accept drops (unrepeatable).
 FEATURES FOR 1.1
 
 Path Entry minibuffer -- add a drop down list for bookmarks.
+Way to reopen last closed directory.
 
 Details toolbar button should return to previous size, not default size.
 
@@ -63,17 +61,13 @@ Remove panel applets if they quit normally.
 
 Set a property giving the panel side (for applet menus).
 
-Way to reopen last closed directory.
-
 Shift-click on symlink should open the file. Add a 'Follow link' submenu.
 
 Convert manual to HTML (smaller -- manual may get translated).
 
 Option to make menu-click over a file open the File submenu only?
 
-Key bindings in the New File menu don't work.
-
-Send To menu to show the contents of '<Choices>/Send To'.
+Key bindings in the New File/Send To menus don't work.
 
 All leafnames to be truncated, even when details are displayed.
 
@@ -91,7 +85,7 @@ even if it isn't in the last column.
 
 Allow find expression with Permissions command...
 
-Use AA fonts in main window.
+Use AA fonts and word wrapping in main window with Gtk+ 2.0.
 
 
 OTHERS
