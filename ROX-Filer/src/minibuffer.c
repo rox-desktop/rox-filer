@@ -191,13 +191,12 @@ void minibuffer_hide(FilerWindow *filer_window)
 
 	if (filer_window->temp_show_hidden)
 	{
-		Collection *collection = filer_window->collection;
-		int i = collection->cursor_item;
-		DirItem *item = NULL;
+		DirItem *item;
+		ViewIter iter;
 
-		if (i >= 0 && i < collection->number_of_items)
-			item = (DirItem *) collection->items[i].data;
-		
+		view_get_cursor(filer_window->view, &iter);
+		item = iter.peek(&iter);
+
 		if (item == NULL || item->leafname[0] != '.')
 			display_set_hidden(filer_window, FALSE);
 		filer_window->temp_show_hidden = FALSE;
@@ -296,22 +295,22 @@ static void complete(FilerWindow *filer_window)
 {
 	GtkEntry	*entry;
 	Collection 	*collection = filer_window->collection;
-	int		cursor = collection->cursor_item;
-	DirItem 	*item;
+	DirItem 	*item, *other;
 	int		shortest_stem = -1;
 	int		current_stem;
-	int		other;
 	const gchar	*text, *leaf;
+	ViewIter	cursor, iter;
 
-	if (cursor < 0 || cursor >= collection->number_of_items)
+	view_get_cursor(filer_window->view, &cursor);
+	item = cursor.peek(&cursor);
+
+	if (!item)
 	{
 		gdk_beep();
 		return;
 	}
 
 	entry = GTK_ENTRY(filer_window->minibuffer);
-	
-	item = (DirItem *) collection->items[cursor].data;
 
 	text = gtk_entry_get_text(entry);
 	leaf = strrchr(text, '/');
@@ -322,7 +321,7 @@ static void complete(FilerWindow *filer_window)
 	}
 
 	leaf++;
-	if (!matches(collection, cursor, leaf))
+	if (!matches(collection, cursor.i, leaf)) /* XXX */
 	{
 		gdk_beep();
 		return;
@@ -333,17 +332,17 @@ static void complete(FilerWindow *filer_window)
 	/* Find the longest other match of this name. It it's longer than
 	 * the currently entered text then complete only up to that length.
 	 */
-	for (other = 0; other < collection->number_of_items; other++)
+	view_get_iter(filer_window->view, &iter, 0);
+	while ((other = iter.next(&iter)))
 	{
-		DirItem *other_item = (DirItem *) collection->items[other].data;
 		int	stem = 0;
 
-		if (other == cursor)
+		if (iter.i == cursor.i)	/* XXX */
 			continue;
 
-		while (other_item->leafname[stem] && item->leafname[stem])
+		while (other->leafname[stem] && item->leafname[stem])
 		{
-			if (other_item->leafname[stem] != item->leafname[stem])
+			if (other->leafname[stem] != item->leafname[stem])
 				break;
 			stem++;
 		}
@@ -707,11 +706,11 @@ static void run_child(gpointer unused)
 static void shell_return_pressed(FilerWindow *filer_window)
 {
 	GPtrArray	*argv;
-	int		i;
 	const gchar	*entry;
-	Collection	*collection = filer_window->collection;
 	GError		*error = NULL;
 	pid_t		child;
+	DirItem		*item;
+	ViewIter	iter;
 
 	entry = mini_contents(filer_window);
 
@@ -726,10 +725,10 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	g_ptr_array_add(argv, (gchar *) entry);
 	g_ptr_array_add(argv, "sh");
 
-	for (i = 0; i < collection->number_of_items; i++)
+	view_get_iter(filer_window->view, &iter, 0);
+	while ((item = iter.next(&iter)))
 	{
-		DirItem *item = (DirItem *) collection->items[i].data;
-		if (collection->items[i].selected)
+		if (view_get_selected(filer_window->view, &iter))
 			g_ptr_array_add(argv, item->leafname);
 	}
 	
