@@ -301,6 +301,7 @@ static void filer_size_for(FilerWindow *filer_window,
 	const float	r = 2.5;
 	int		t = 0;
 	int		size_limit;
+	int		space;
 
 	size_limit = option_get_int("filer_size_limit");
 
@@ -350,9 +351,14 @@ static void filer_size_for(FilerWindow *filer_window,
 	if (rows > max_rows)
 		rows = max_rows;
 
+	/* Leave some room for extra icons, but only in Small Icons mode
+	 * otherwise it takes up too much space.
+	 */
+	space = filer_window->display_style == SMALL_ICONS ? h : 2;
+
 	filer_window_set_size(filer_window,
 			w * MAX(cols, 1),
-			h * (MAX(rows, 1) + 1),
+			h * MAX(rows, 1) + space,
 			allow_shrink);
 }
 

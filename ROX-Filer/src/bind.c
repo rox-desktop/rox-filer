@@ -50,7 +50,7 @@ void bind_init(void)
 	option_add_notify(update_options);
 }
 
-/* Call this when a button event occurrs and you want to know what
+/* Call this when a button event occurs and you want to know what
  * to do.
  */
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)

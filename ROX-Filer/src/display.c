@@ -921,13 +921,9 @@ static void huge_template(GdkRectangle *area, DirItem *item,
 	int	col_width = filer_window->collection->item_width;
 
 	MaskedPixmap	*image = item->image;
-	int iwidth, iheight;
-	int image_x, image_y;
-	
-	int	text_width = item->name_width;
-	int	font_height = item_font->ascent + item_font->descent;
-	int	text_x = area->x + ((col_width - text_width) >> 1);
-	int	text_y = area->y + area->height - font_height - 2;
+	int		iwidth, iheight;
+	int		image_x, image_y;
+	int		text_x, text_y;
 
 	if (!image->huge_pixmap)
 		pixmap_make_huge(image);
@@ -983,7 +979,7 @@ static void small_template(GdkRectangle *area, DirItem *item,
 {
 	int	text_x = area->x + SMALL_WIDTH + 4;
 	int	font_height = item_font->ascent + item_font->descent;
-	int	low_text_y = area->y + area->height - font_height - 2;
+	int	low_text_y = area->y + area->height / 2 - font_height / 2;
 	int	max_text_width = area->width - SMALL_WIDTH - 4;
 
 	template->leafname.x = text_x;
@@ -1014,15 +1010,15 @@ static void huge_full_template(GdkRectangle *area, DirItem *item,
 	template->icon.y = area->y + (area->height - template->icon.height) / 2;
 
 	template->leafname.x = area->x + HUGE_WIDTH + 4;
-	template->leafname.y = area->y + area->height / 2 - font_height;
+	template->leafname.y = area->y + area->height / 2
+			     - (font_height + 2 + fixed_height) / 2;
 	template->leafname.width = MIN(max_text_width, item->name_width);
 	template->leafname.height = font_height;
 
 	template->details_string = details(filer_window, item);
 	
 	template->details.x = template->leafname.x;
-	template->details.y = template->leafname.y +
-				item_font->descent + fixed_font->ascent;
+	template->details.y = template->leafname.y + font_height + 2;
 	template->details.width = fixed_width *
 					strlen(template->details_string);
 	template->details.height = fixed_height;
@@ -1036,30 +1032,30 @@ static void large_full_template(GdkRectangle *area, DirItem *item,
 	int	max_text_width = area->width - ICON_WIDTH - 4;
 
 	template->icon.x = area->x;
-	template->icon.y = area->y;
+	template->icon.y = area->y + (area->height - ICON_HEIGHT) / 2;
 	template->icon.width = ICON_WIDTH;
 	template->icon.height = ICON_HEIGHT;
 
 	template->leafname.x = area->x + ICON_WIDTH + 4;
+	template->leafname.y = area->y + area->height / 2
+				- (font_height + 2 + fixed_height) / 2;
 	template->leafname.width = MIN(max_text_width, item->name_width);
 	template->leafname.height = font_height;
 
 	template->details_string = details(filer_window, item);
 	
-	template->details.x = area->x + ICON_WIDTH + 4;
-	template->details.y = area->y + area->height - fixed_height;
+	template->details.x = template->leafname.x;
+	template->details.y = template->leafname.y + font_height + 2;
 	template->details.width = fixed_width *
 					strlen(template->details_string);
 	template->details.height = fixed_height;
-
-	template->leafname.y = template->details.y - font_height;
 }
 
 static void small_full_template(GdkRectangle *area, DirItem *item,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	col_width = filer_window->collection->item_width;
-	int	font_height = item_font->ascent + item_font->descent;
+	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 
 	small_template(area, item, filer_window, template);
 
@@ -1068,8 +1064,8 @@ static void small_full_template(GdkRectangle *area, DirItem *item,
 	template->details.width = fixed_width *
 					strlen(template->details_string);
 	template->details.x = area->x + col_width - template->details.width;
-	template->details.y = area->y + area->height - font_height;
-	template->details.height = font_height;
+	template->details.y = area->y + area->height / 2 - fixed_height / 2;
+	template->details.height = fixed_height;
 }
 
 #define INSIDE(px, py, area)	\

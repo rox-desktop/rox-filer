@@ -15,20 +15,20 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-typedef enum {
-	LARGE_ICONS = 0,
-	SMALL_ICONS = 1,
-	HUGE_ICONS = 2,
-	UNKNOWN_STYLE,
+typedef enum {		/* Values used in options, must start at 0 */
+	LARGE_ICONS	= 0,
+	SMALL_ICONS	= 1,
+	HUGE_ICONS	= 2,
+	UNKNOWN_STYLE
 } DisplayStyle;
 
-typedef enum {
-	DETAILS_NONE,		/* Used in options */
-	DETAILS_SUMMARY,
-	DETAILS_SIZE,
-	DETAILS_PERMISSIONS,
-	DETAILS_TYPE,
-	DETAILS_TIMES,
+typedef enum {		/* Values used in options, must start at 0 */
+	DETAILS_NONE		= 0,
+	DETAILS_SUMMARY 	= 1,
+	DETAILS_SIZE		= 2,
+	DETAILS_PERMISSIONS	= 3,
+	DETAILS_TYPE		= 4,
+	DETAILS_TIMES		= 5,
 } DetailsType;
 
 /* Prototypes */
