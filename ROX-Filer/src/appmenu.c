@@ -272,7 +272,7 @@ static GtkWidget *appmenu_item_new(AppMenus *menu, char *text, char *entryid)
 
 	gtk_object_set_data_full(GTK_OBJECT(item), "entryid",
 					g_strconcat("--", entryid, NULL),
-					debug_free_string);
+					g_free);
 
 	gtk_signal_connect(GTK_OBJECT(item), "activate",
 			   GTK_SIGNAL_FUNC(apprun_menu),
