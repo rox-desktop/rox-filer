@@ -291,6 +291,23 @@ void pinboard_clear(void)
 	/* TODO: Remove handlers */
 }
 
+/* If path is on the pinboard then it may have changed... check! */
+void pinboard_may_update(guchar *path)
+{
+	GList	*next;
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon	*icon = (PinIcon *) next->data;
+
+		if (strcmp(icon->path, path) == 0)
+		{
+			dir_restat(icon->path, &icon->item);
+			gtk_widget_queue_draw(icon->win);
+		}
+	}
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -329,11 +346,12 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	int		font_height;
 	GdkBitmap	*mask;
 	MaskedPixmap	*image = icon->item.image;
+	DirItem		*item = &icon->item;
 	
 	font_height = font->ascent + font->descent;
-	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
+	item->name_width = gdk_string_width(font, item->leafname);
 
-	width = MAX(image->width, icon->item.name_width + 2) +
+	width = MAX(image->width, item->name_width + 2) +
 				2 * WINK_FRAME;
 	height = image->height + GAP + (font_height + 2) + 2 * WINK_FRAME;
 	gtk_widget_set_usize(icon->win, width, height);
@@ -347,6 +365,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	gdk_draw_rectangle(mask, mask_gc, TRUE, 0, 0, width, height);
 
 	gdk_gc_set_foreground(mask_gc, &mask_solid);
+	/* Make the icon area solid */
 	gdk_draw_pixmap(mask, mask_gc, image->mask,
 				0, 0,
 				(width - image->width) >> 1,
@@ -354,11 +373,31 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 				image->width,
 				image->height);
 
+	gdk_gc_set_function(mask_gc, GDK_OR);
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_draw_pixmap(mask, mask_gc, im_symlink->mask,
+				0, 0,		/* Source x,y */
+				(width - image->width) >> 1,	/* Dest x */
+				WINK_FRAME,			/* Dest y */
+				-1, -1);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		/* Note: Both mount state pixmaps must have the same mask */
+		gdk_draw_pixmap(mask, mask_gc, im_mounted->mask,
+				0, 0,		/* Source x,y */
+				(width - image->width) >> 1,	/* Dest x */
+				WINK_FRAME,			/* Dest y */
+				-1, -1);
+	}
+	gdk_gc_set_function(mask_gc, GDK_COPY);
+
 	/* Mask off an area for the text */
 	gdk_draw_rectangle(mask, mask_gc, TRUE,
-			(width - (icon->item.name_width + 2)) >> 1,
+			(width - (item->name_width + 2)) >> 1,
 			WINK_FRAME + image->height + GAP,
-			icon->item.name_width + 2, font_height + 2);
+			item->name_width + 2, font_height + 2);
 	
 	gtk_widget_shape_combine_mask(icon->win, mask, 0, 0);
 
@@ -376,24 +415,57 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 	int		font_height;
 	int		width, height;
 	int		text_x, text_y;
-	MaskedPixmap	*image = icon->item.image;
+	DirItem		*item = &icon->item;
+	MaskedPixmap	*image = item->image;
+	int		image_x;
+	GdkGC		*gc = widget->style->black_gc;
 
 	font_height = font->ascent + font->descent;
 
 	gdk_window_get_size(widget->window, &width, &height);
+	image_x = (width - image->width) >> 1;
 
 	/* TODO: If the shape extension is missing we might need to set
 	 * the clip mask here...
 	 */
-	gdk_draw_pixmap(widget->window, widget->style->black_gc,
+	gdk_draw_pixmap(widget->window, gc,
 			image->pixmap,
 			0, 0,
-			(width - image->width) >> 1,
+			image_x,
 			WINK_FRAME,
 			image->width,
 			image->height);
 
-	text_x = (width - icon->item.name_width) >> 1;
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
+		gdk_gc_set_clip_mask(gc, im_symlink->mask);
+		gdk_draw_pixmap(widget->window, gc,
+				im_symlink->pixmap,
+				0, 0,		/* Source x,y */
+				image_x, WINK_FRAME,	/* Dest x,y */
+				-1, -1);
+		gdk_gc_set_clip_mask(gc, NULL);
+		gdk_gc_set_clip_origin(gc, 0, 0);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
+					
+		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
+		gdk_gc_set_clip_mask(gc, mp->mask);
+		gdk_draw_pixmap(widget->window, gc,
+				mp->pixmap,
+				0, 0,		/* Source x,y */
+				image_x, WINK_FRAME,	/* Dest x,y */
+				-1, -1);
+		gdk_gc_set_clip_mask(gc, NULL);
+		gdk_gc_set_clip_origin(gc, 0, 0);
+	}
+
+	text_x = (width - item->name_width) >> 1;
 	text_y = WINK_FRAME + image->height + GAP + 1;
 
 	gtk_paint_flat_box(widget->style, widget->window,
@@ -401,7 +473,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 			NULL, widget, "text",
 			text_x - 1,
 			text_y - 1,
-			icon->item.name_width + 2,
+			item->name_width + 2,
 			font_height + 2);
 
 	gtk_paint_string(widget->style, widget->window,
@@ -409,7 +481,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 			NULL, widget, "text",
 			text_x,
 			text_y + font->ascent,
-			icon->item.leafname);
+			item->leafname);
 
 	if (current_wink_icon == icon)
 	{
@@ -449,6 +521,7 @@ static gboolean button_press_event(GtkWidget *widget,
                             	   PinIcon *icon)
 {
 	int	b = event->button;
+	DirItem	*item = &icon->item;
 
 	if (b == collection_menu_button)
 		pinboard_unpin(icon);
@@ -456,7 +529,7 @@ static gboolean button_press_event(GtkWidget *widget,
 	{
 		pinboard_wink_item(icon);
 
-		run_diritem(icon->path, &icon->item, NULL,
+		run_diritem(icon->path, item, NULL,
 				(event->state & GDK_SHIFT_MASK) != 0);
 	}
 	else if (b < 4)

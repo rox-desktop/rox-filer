@@ -148,18 +148,18 @@ void refresh_dirs(char *path)
 	g_fscache_update(dir_cache, path);
 }
 
-/* Fill in the item structure with the appropriate details.
- * 'leafname' field is set to NULL; text_width is unset.
- */
-void dir_stat(guchar *path, DirItem *item)
+/* Bring this item's structure uptodate */
+void dir_restat(guchar *path, DirItem *item)
 {
 	struct stat	info;
 
-	item->leafname = NULL;
-	item->may_delete = FALSE;
+	if (item->image && item->flags & ITEM_FLAG_TEMP_ICON)
+	{
+		pixmap_unref(item->image);
+		item->image = NULL;
+	}
 	item->flags = 0;
 	item->mime_type = NULL;
-	item->image = NULL;
 
 	if (mc_lstat(path, &info) == -1)
 	{
@@ -259,6 +259,18 @@ void dir_stat(guchar *path, DirItem *item)
 
 	if (!item->image)
 		item->image = type_to_icon(item->mime_type);
+}
+
+/* Fill in the item structure with the appropriate details.
+ * 'leafname' field is set to NULL; text_width is unset.
+ */
+void dir_stat(guchar *path, DirItem *item)
+{
+	item->leafname = NULL;
+	item->may_delete = FALSE;
+	item->image = NULL;
+
+	dir_restat(path, item);
 }
 
 /* Frees all fields in the icon, but does not free the icon structure

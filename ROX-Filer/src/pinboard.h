@@ -15,3 +15,4 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y);
 void pinboard_unpin(PinIcon *icon);
 void pinboard_wink_item(PinIcon *icon);
 void pinboard_clear(void);
+void pinboard_may_update(guchar *path);

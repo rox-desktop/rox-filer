@@ -13,7 +13,7 @@
 void action_init(void);
 
 void action_usage(FilerWindow *filer_window);
-void action_mount(FilerWindow *filer_window, DirItem *item);
+void action_mount(GList	*paths);
 void action_delete(FilerWindow *filer_window);
 void action_chmod(FilerWindow *filer_window);
 void action_find(FilerWindow *filer_window);

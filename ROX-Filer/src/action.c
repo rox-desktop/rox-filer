@@ -126,7 +126,6 @@ static char     *action_dest = NULL;
 static char     *action_leaf = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
-static DirItem 	*mount_item;
 
 static struct mode_change *mode_change = NULL;	/* For Permissions */
 static FindCondition *find_condition = NULL;	/* For Find */
@@ -151,7 +150,7 @@ static gboolean send();
 static gboolean send_error();
 static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
-static void do_mount(FilerWindow *filer_window, DirItem *item);
+static void do_mount(guchar *path, gboolean mount);
 static void add_toggle(GUIside *gui_side, guchar *label, guchar *code);
 static gboolean reply(int fd, gboolean ignore_quiet);
 
@@ -1640,23 +1639,22 @@ static gboolean do_link(char *path, char *dest)
 	return TRUE;
 }
 
-/* Mount/umount this item */
-static void do_mount(FilerWindow *filer_window, DirItem *item)
+/* Mount/umount this item (depending on 'mount') */
+static void do_mount(guchar *path, gboolean mount)
 {
 	char		*argv[3] = {NULL, NULL, NULL};
-	gboolean	mount = (item->flags & ITEM_FLAG_MOUNTED) == 0;
 
 	check_flags();
 
 	argv[0] = mount ? "mount" : "umount";
-	argv[1] = make_path(filer_window->path, item->leafname)->str;
+	argv[1] = path;
 
 	if (quiet)
 	{
 		g_string_sprintf(message,
 				mount ? _("'Mounting %s\n")
 				      : _("'Unmounting %s\n"),
-				argv[1]);
+				path);
 		send();
 	}
 	else
@@ -1664,16 +1662,14 @@ static void do_mount(FilerWindow *filer_window, DirItem *item)
 		g_string_sprintf(message,
 				mount ? _("?Mount %s?\n")
 				      : _("?Unmount %s?\n"),
-				argv[1]);
+				path);
 		if (!reply(from_parent, FALSE))
 			return;
 	}
 
 	if (fork_exec_wait(argv) == 0)
 	{
-		g_string_sprintf(message, "+%s", filer_window->path);
-		send();
-		g_string_sprintf(message, "m%s", argv[1]);
+		g_string_sprintf(message, "m%s", path);
 		send();
 	}
 	else
@@ -1724,39 +1720,26 @@ static void usage_cb(gpointer data)
 #ifdef DO_MOUNT_POINTS
 static void mount_cb(gpointer data)
 {
-	FilerWindow 	*filer_window = (FilerWindow *) data;
-	Collection	*collection = filer_window->collection;
-	DirItem   	*item;
-	int		i;
+	GList 		*paths = (GList *) data;
 	gboolean	mount_points = FALSE;
 
-	send_dir(filer_window->path);
-
-	if (mount_item)
-		do_mount(filer_window, mount_item);
-	else
+	for (; paths; paths = paths->next)
 	{
-		for (i = 0; i < collection->number_of_items; i++)
-		{
-			if (!collection->items[i].selected)
-				continue;
-			item = (DirItem *) collection->items[i].data;
-			if (!(item->flags & ITEM_FLAG_MOUNT_POINT))
-				continue;
-			mount_points = TRUE;
+		guchar	*path = (guchar *) paths->data;
 
-			do_mount(filer_window, item);
-		}
-	
-		if (!mount_points)
-		{
-			g_string_sprintf(message,
-					_("!No mount points selected!\n"));
-			send();
-		}
+		if (g_hash_table_lookup(mtab_mounts, path))
+			do_mount(path, FALSE);	/* Unmount */
+		else if (g_hash_table_lookup(fstab_mounts, path))
+			do_mount(path, TRUE);	/* Mount */
+		else
+			continue;
+
+		mount_points = TRUE;
 	}
 
-	g_string_sprintf(message, _("'\nDone\n"));
+	g_string_sprintf(message,
+			 mount_points ? _("'\nDone\n")
+			 	      : _("!No mount points selected!\n"));
 	send();
 }
 #endif
@@ -1985,24 +1968,15 @@ void action_usage(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
-/* Mount/unmount 'item', or all selected mount points if NULL. */
-void action_mount(FilerWindow *filer_window, DirItem *item)
+/* Mount/unmount listed items (paths).
+ * Free the list after this function returns.
+ */
+void action_mount(GList	*paths)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
-	Collection 	*collection;
 
-	collection = filer_window->collection;
-
-	if (item == NULL && collection->number_selected < 1)
-	{
-		report_error(PROJECT,
-			_("You need to select some items to mount or unmount"));
-		return;
-	}
-
-	mount_item = item;
-	gui_side = start_action(filer_window, mount_cb, o_auto_mount);
+	gui_side = start_action(paths, mount_cb, o_auto_mount);
 	if (!gui_side)
 		return;
 

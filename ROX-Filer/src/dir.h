@@ -94,6 +94,7 @@ void dir_update(Directory *dir, gchar *pathname);
 int dir_item_cmp(const void *a, const void *b);
 void refresh_dirs(char *path);
 void dir_stat(guchar *path, DirItem *item);
+void dir_restat(guchar *path, DirItem *item);
 void dir_item_clear(DirItem *item);
 
 #endif /* _DIR_H */

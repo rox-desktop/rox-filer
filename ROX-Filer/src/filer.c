@@ -47,6 +47,7 @@
 #include "type.h"
 #include "options.h"
 #include "minibuffer.h"
+#include "pinboard.h"
 
 #define PANEL_BORDER 2
 
@@ -1332,6 +1333,7 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 void filer_check_mounted(char *path)
 {
 	GList	*next = all_filer_windows;
+	char	*slash;
 	int	len;
 
 	len = strlen(path);
@@ -1350,6 +1352,20 @@ void filer_check_mounted(char *path)
 				filer_update_dir(filer_window, FALSE);
 		}
 	}
+
+	slash = strrchr(path, '/');
+	if (slash && slash != path)
+	{
+		guchar	*parent;
+
+		parent = g_strndup(path, slash - path);
+
+		refresh_dirs(parent);
+
+		g_free(parent);
+	}
+
+	pinboard_may_update(path);
 }
 
 /* Like minibuffer_show(), except that:

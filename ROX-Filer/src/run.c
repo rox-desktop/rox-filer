@@ -211,11 +211,11 @@ gboolean run_diritem(guchar *full_path,
 
 			if (item->flags & ITEM_FLAG_MOUNT_POINT && edit)
 			{
-				/* TODO: Remove this restriction! */
-				g_return_val_if_fail(filer_window != NULL,
-								FALSE);
+				GList	*paths;
 
-				action_mount(filer_window, item);
+				paths = g_list_prepend(NULL, full_path);
+				action_mount(paths);
+				g_list_free(paths);
 				if (item->flags & ITEM_FLAG_MOUNTED)
 					return TRUE;
 			}

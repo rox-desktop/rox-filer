@@ -72,6 +72,8 @@ static char *load_xterm_here(char *data);
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new));
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
+static GList *list_paths(FilerWindow *filer_window);
+static void free_paths(GList *paths);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
@@ -646,7 +648,13 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 		collection_target(window_with_focus->collection,
 				target_callback, mount);
 	else
-		action_mount(window_with_focus, NULL);
+	{
+		GList	*paths;
+
+		paths = list_paths(window_with_focus);
+		action_mount(paths);
+		free_paths(paths);
+	}
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
@@ -1435,4 +1443,41 @@ static void close_panel(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 	
 	gtk_widget_destroy(window_with_focus->window);
+}
+
+/* Return a list of full paths of all the selected items */
+static GList *list_paths(FilerWindow *filer_window)
+{
+	Collection	*collection = filer_window->collection;
+	GList		*paths = NULL;
+	int		i;
+	
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		CollectionItem	*colitem = &collection->items[i];
+		
+		if (colitem->selected)
+		{
+			DirItem	*item = (DirItem *) colitem->data;
+
+			paths = g_list_prepend(paths,
+				g_strdup(make_path(filer_window->path,
+						   item->leafname)->str));
+		}
+	}
+
+	return paths;
+}
+
+static void free_paths(GList *paths)
+{
+	GList	*next;
+
+	if (!paths)
+		return;
+
+	for (next = paths; next; next = next->next)
+		g_free(next->data);
+
+	g_list_free(paths);
 }
