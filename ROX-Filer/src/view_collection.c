@@ -1380,42 +1380,31 @@ static void view_collection_update_items(ViewIface *view, GPtrArray *items)
 	Collection	*collection = view_collection->collection;
 	FilerWindow	*filer_window = view_collection->filer_window;
 	int		i;
-	int		*is;
 
 	g_return_if_fail(items->len > 0);
 	
+	/* The item data has already been modified, so this gives the
+	 * final sort order...
+	 */
 	collection_qsort(collection, filer_window->sort_fn);
 
-	/* Find all the items first, then update since updating may
-	 * change the sort order...
-	 */
-
-	is = g_malloc(sizeof(int) * items->len);
 	for (i = 0; i < items->len; i++)
 	{
 		DirItem *item = (DirItem *) items->pdata[i];
 		const gchar *leafname = item->leafname;
+		int j;
 
 		if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
-			is[i] = -1;
-		else
-		{
-			is[i] = collection_find_item(collection, item,
+			continue;
+
+		j = collection_find_item(collection, item,
 						     filer_window->sort_fn);
 
-			if (is[i] < 0)
-				g_warning("Failed to find '%s'\n", leafname);
-		}
+		if (j < 0)
+			g_warning("Failed to find '%s'\n", leafname);
+		else
+			update_item(filer_window, j);
 	}
-
-	for (i = 0; i < items->len; i++)
-		if (is[i] >= 0)
-			update_item(filer_window, is[i]);
-	
-	g_free(is);
-
-	if (filer_window->sort_fn != sort_by_name)
-		collection_qsort(collection, filer_window->sort_fn);
 }
 
 static void view_collection_delete_if(ViewIface *view,
