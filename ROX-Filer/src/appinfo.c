@@ -86,7 +86,7 @@ XMLwrapper *appinfo_get(guchar *app_dir, DirItem *item)
  * It may be any direct child node, or the root node itself (this is for
  * backwards compat with AppMenu; it may go soon).
  *
- * Returns an _xmlNode or NULL if there isn't one.
+ * Returns an xmlNode or NULL if there isn't one.
  */
 xmlNode *appinfo_get_section(XMLwrapper *ai, guchar *name)
 {
