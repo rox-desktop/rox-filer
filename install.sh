@@ -61,8 +61,9 @@ Normally, you should choose (1) if you have root access, or (2) if not.
 2) Inside my home directory
 3) Inside /usr
 4) Specify paths manually
+5) Specify the prefix
 
-Enter 1, 2, 3 or 4:
+Enter 1, 2, 3, 4 or 5:
 EOF
 printf ">>> "
 
@@ -120,6 +121,15 @@ case $REPLY in
 	   get_dir "/usr/local/man"
 	   MANDIR="$DIR"
 	   ;;
+	5) echo "What prefix should I use?"
+           get_dir "/usr/local"
+           APPDIR="$DIR/apps"
+	   BINDIR="$DIR/bin"
+	   SHAREDIR="$DIR/share"
+	   CHOICESDIR=${SHAREDIR}/Choices
+	   MANDIR="$DIR/man"	# (not under share!)
+	   ;;
+
 	*) die "Invalid choice!";;
 esac
 
