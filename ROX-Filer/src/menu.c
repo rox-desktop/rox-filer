@@ -229,7 +229,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("New"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Directory"),		NULL, new_directory, 0, NULL},
 {">" N_("Blank file"),		NULL, new_file, 0, NULL},
-{N_("Xterm Here"),		NULL, xterm_here, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
@@ -243,6 +242,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Enter Path..."),	"slash", mini_buffer, MINI_PATH, NULL},
 {">" N_("Shell Command..."),	NULL, mini_buffer, MINI_SHELL, NULL},
+{">" N_("Xterm Here"),		NULL, xterm_here, FALSE, NULL},
+{">" N_("Switch to xterm"),	NULL, xterm_here, TRUE, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show ROX-Filer Help"), "F1", menu_rox_help, 0, NULL},
 };
@@ -1499,12 +1500,14 @@ static void send_to(FilerWindow *filer_window)
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
 	const char *argv[] = {"sh", "-c", NULL, NULL};
+	gboolean close = action;
 
 	argv[2] = o_menu_xterm.value;
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	rox_spawn(window_with_focus->sym_path, argv);
+	if (rox_spawn(window_with_focus->sym_path, argv) && close)
+		gtk_widget_destroy(window_with_focus->window);
 }
 
 static void home_directory(gpointer data, guint action, GtkWidget *widget)
