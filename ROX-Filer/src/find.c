@@ -49,6 +49,7 @@ static FindCondition *parse_system(guchar **expression);
 static FindCondition *parse_condition(guchar **expression);
 static FindCondition *parse_match(guchar **expression);
 static FindCondition *parse_comparison(guchar **expression);
+static FindCondition *parse_dash(guchar **expression);
 static FindCondition *parse_is(guchar **expression);
 static Eval *parse_eval(guchar **expression);
 static Eval *parse_variable(guchar **expression);
@@ -567,6 +568,10 @@ static FindCondition *parse_condition(guchar **expression)
 		return cond;
 	}
 
+	cond = parse_dash(expression);
+	if (cond)
+		return cond;
+
 	cond = parse_is(expression);
 	if (cond)
 		return cond;
@@ -665,15 +670,19 @@ static FindCondition *parse_comparison(guchar **expression)
 	return cond;
 }
 
-/* Returns NULL if expression is not an is-expression */
-static FindCondition *parse_is(guchar **expression)
+static FindCondition *parse_dash(guchar **expression)
 {
-	FindCondition	*cond;
-	IsTest		test;
+	guchar *exp = *expression;
+	FindCondition *cond, *retval = NULL;
+	IsTest	 test;
+	int i = 1;
 
-	if (NEXT == '-')
+	if (NEXT != '-')
+		return NULL;
+
+	while (exp[i] && !isspace(exp[i]))
 	{
-		switch ((*expression)[1])
+		switch (exp[i])
 		{
 			case 'f': test = IS_REG; break;;
 			case 'l': test = IS_LNK; break;;
@@ -691,12 +700,48 @@ static FindCondition *parse_is(guchar **expression)
 			case 'x': test = IS_EXEC; break;;
 			case 'o': test = IS_MINE; break;;
 			case 'z': test = IS_EMPTY; break;;
-			default: return NULL;
+			default:
+				  if (retval)
+					  find_condition_free(retval);
+				  return NULL;
 		}
-		EAT;
-		EAT;
+		i++;
+
+		cond = g_new(FindCondition, 1);
+		cond->test = &test_is;
+		cond->free = (FindFree) &g_free;
+		cond->data1 = NULL;
+		cond->data2 = NULL;
+		cond->value = test;
+
+		if (retval)
+		{
+			FindCondition *new;
+
+			new = g_new(FindCondition, 1);
+			new->test = &test_AND;
+			new->free = &free_branch;
+			new->data1 = retval;
+			new->data2 = cond;
+
+			retval = new;
+		}
+		else
+			retval = cond;
 	}
-	else if (MATCH(_("IsReg")))
+
+	(*expression) += i;
+
+	return retval;
+}
+
+/* Returns NULL if expression is not an is-expression */
+static FindCondition *parse_is(guchar **expression)
+{
+	FindCondition	*cond;
+	IsTest		test;
+
+	if (MATCH(_("IsReg")))
 		test = IS_REG;
 	else if (MATCH(_("IsLink")))
 		test = IS_LNK;

@@ -1635,7 +1635,7 @@ subdirectories, and so on.
 The Find feature looks through all the selected files and directories
 and any subdirectories (recursively) looking for items that match
 a particular expression.
-
+  </para><para>
 If you know the name of a file then just enter it in the `Expression:'
 box, enclosed in single quotes. For example, to find a file called
 <filename>log</filename> you would enter <userinput>'log'</userinput>.
@@ -1686,40 +1686,44 @@ As well as finding files by their names you can also find them by
 various other attributes. Note that <emphasis>file</emphasis> is used here to
 mean anything that can appear in the filesystem &mdash; including directories,
 devices and so on.
+  </para><para>
+You can also use a short form for each test; these are shown in brackets.
+You can combine multiple tests &mdash; `<userinput>-rw</userinput>' is
+the same as `<userinput>IsReadable and IsWriteable</userinput>'.
   </para>
 
 <itemizedlist><title>These look at the type of the item being checked:</title>
 
 <listitem><para>
-<userinput>IsReg</userinput> matches any regular (ie, normal) file.
+<userinput>IsReg (-f)</userinput> matches any regular (ie, normal) file.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsLink</userinput> matches symlinks.
+<userinput>IsLink (-l)</userinput> matches symlinks.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsDir</userinput> matches directories.
+<userinput>IsDir (-d)</userinput> matches directories.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsChar</userinput> matches character device files.
+<userinput>IsChar (-c)</userinput> matches character device files.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsBlock</userinput> matches block device files.
+		<userinput>IsBlock (-b)</userinput> matches block device files.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsDev</userinput> matches block or character device files.
+<userinput>IsDev (-D)</userinput> matches block or character device files.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsPipe</userinput> matches pipes.
+<userinput>IsPipe (-p)</userinput> matches pipes.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsSocket</userinput> matches sockets.
+<userinput>IsSocket (-S)</userinput> matches sockets.
 </para></listitem>
 
 </itemizedlist>
@@ -1728,27 +1732,27 @@ devices and so on.
 see the <xref linkend="Permissions"/> section.</title>
 
 <listitem><para>
-<userinput>IsSUID</userinput> matches files which have the Set-UID bit set.
+<userinput>IsSUID (-u)</userinput> matches files which have the Set-UID bit set.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsSGID</userinput> matches files which have the Set-GID bit set.
+<userinput>IsSGID (-g)</userinput> matches files which have the Set-GID bit set.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsSticky</userinput> matches files with the sticky bit set.
+<userinput>IsSticky (-k)</userinput> matches files with the sticky bit set.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsReadable</userinput> matches files which you can read from.
+<userinput>IsReadable (-r)</userinput> matches files which you can read from.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsWriteable</userinput> matches files which you can write to.
+<userinput>IsWriteable (-w)</userinput> matches files which you can write to.
 </para></listitem>
 
 <listitem><para>
-<userinput>IsExecutable</userinput> matches files which you can execute.
+<userinput>IsExecutable (-x)</userinput> matches files which you can execute.
 </para></listitem>
 
 </itemizedlist>
@@ -1756,11 +1760,11 @@ see the <xref linkend="Permissions"/> section.</title>
 <itemizedlist><title>And a couple of other useful ones:</title>
 
 <listitem><para>
-<userinput>IsEmpty</userinput> finds empty files (ie, those whose length is 0 bytes).
+<userinput>IsEmpty (-z)</userinput> finds empty files (ie, those whose length is 0 bytes).
 </para></listitem>
 
 <listitem><para>
-<userinput>IsMine</userinput> finds files which you own.
+<userinput>IsMine (-o)</userinput> finds files which you own.
 </para></listitem>
 
 </itemizedlist>
@@ -1777,14 +1781,14 @@ separated by commas. The filer will try to match each case in turn
 until one matches or there are no more cases left. For example, to
 search for files with several possible endings:
 
-<userinput>'*.gif', '*.htm', '*.html'</userinput>
+<screen>'*.gif', '*.htm', '*.html'</screen>
 
 Further, each of the cases is actually a list of conditions. The case
 only matches if all of its conditions are met. So, to find a directory
 called <filename>lib</filename> or a regular file ending in
 <filename>.so</filename>:
 
-<userinput>IsDir 'lib', IsReg '*.so'</userinput>
+<screen>IsDir 'lib', IsReg '*.so'</screen>
 
 You can negate a condition by putting a <userinput>!</userinput> in front of it
 and you can use a sub-expression as a condition by bracketing it, like this:
@@ -1795,8 +1799,10 @@ and you can use a sub-expression as a condition by bracketing it, like this:
 !IsDir !IsReg
 
 Not isdir and not isreg
+
+!-d !-f
 </screen>
-All three do the same thing.
+All four do the same thing.
   </para>
 </sect1>
 
@@ -3063,6 +3069,7 @@ ROX-Filer was created by Thomas Leonard, with help from:
 	<member>Christopher Arndt</member>
 	<member>Jens Askengren</member>
 	<member>Liav Asseraf</member>
+	<member>Francesco Bochicchio</member>
 	<member>Andrzej Borsuk</member>
 	<member>Richard Boulton</member>
 	<member>Simon Britnell</member>
@@ -3072,6 +3079,8 @@ ROX-Filer was created by Thomas Leonard, with help from:
 	<member>Dmitry Elfimov</member>
 	<member>Mattias Engdegard</member>
 	<member>Andrew Flegg</member>
+	<member>Olivier Fourdan</member>
+	<member>Thierry Godefroy</member>
 	<member>Alex Holden</member>
 	<member>Jasper Huijsmans</member>
 	<member>Bernard Jungen</member>
@@ -3086,6 +3095,7 @@ ROX-Filer was created by Thomas Leonard, with help from:
 	<member>Christiansen Merel</member>
 	<member>Jimmy Olgeni</member>
 	<member>Andy Piper</member>
+	<member>Marcelo Ramos</member>
 	<member>Michel Alexandre Salim</member>
 	<member>Chris Sawer</member>
 	<member>Taras</member>
