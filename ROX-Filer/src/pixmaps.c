@@ -99,6 +99,8 @@ struct _ChildThumbnail {
 static const char *stocks[] = {
 	ROX_STOCK_SHOW_DETAILS,
 	ROX_STOCK_SHOW_HIDDEN,
+	ROX_STOCK_MOUNT,
+	ROX_STOCK_MOUNTED,
 };
 
 /* Static prototypes */
@@ -130,8 +132,6 @@ void pixmaps_init(void)
 
 	gtk_timeout_add(10000, purge, NULL);
 
-	load_default_pixmaps();
-
 	factory = gtk_icon_factory_new();
 	for (i = 0; i < G_N_ELEMENTS(stocks); i++)
 	{
@@ -157,6 +157,8 @@ void pixmaps_init(void)
 		gtk_icon_set_unref(iset);
 	}
 	gtk_icon_factory_add_default(factory);
+
+	load_default_pixmaps();
 }
 
 /* Load image <appdir>/images/name.png.
@@ -817,8 +819,8 @@ static void load_default_pixmaps(void)
 	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION);
 	im_symlink = load_pixmap("symlink");
 
-	im_unmounted = load_pixmap("mount");
-	im_mounted = load_pixmap("mounted");
+	im_unmounted = load_pixmap(ROX_STOCK_MOUNT);
+	im_mounted = load_pixmap(ROX_STOCK_MOUNTED);
 	im_appdir = load_pixmap("application");
 
 	im_dirs = load_pixmap("dirs");

@@ -61,6 +61,7 @@
 #include "xml.h"
 #include "view_iface.h"
 #include "view_collection.h"
+#include "action.h"
 
 static XMLwrapper *groups = NULL;
 
@@ -335,8 +336,29 @@ static void detach(FilerWindow *filer_window)
 	filer_window->directory = NULL;
 }
 
-static void filer_window_destroyed(GtkWidget 	*widget,
-				   FilerWindow 	*filer_window)
+static gboolean filer_window_delete(GtkWidget *window,
+				    GdkEvent *event,
+				    FilerWindow *filer_window)
+{
+	if (mount_is_user_mounted(filer_window->real_path))
+	{
+		if (confirm(_("Do you want to unmount this device?\n\n"
+			      "Unmounting a device makes it safe to remove "
+			      "the disk."),
+			ROX_STOCK_MOUNT, _("Unmount")) == 1)
+		{
+			GList *list; 
+
+			list = g_list_prepend(NULL, filer_window->sym_path);
+			action_mount(list, FALSE, TRUE);
+			g_list_free(list);
+		}
+	}
+
+	return FALSE;
+}
+
+static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
 
@@ -1266,6 +1288,8 @@ static void filer_add_signals(FilerWindow *filer_window)
 			G_CALLBACK(pointer_out), filer_window);
 	g_signal_connect(filer_window->window, "destroy",
 			G_CALLBACK(filer_window_destroyed), filer_window);
+	g_signal_connect(filer_window->window, "delete-event",
+			G_CALLBACK(filer_window_delete), filer_window);
 
 	g_signal_connect(filer_window->window, "selection_clear_event",
 			G_CALLBACK(filer_lost_primary), filer_window);

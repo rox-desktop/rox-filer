@@ -49,5 +49,6 @@ void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y);
 void tooltip_show(guchar *text);
 void tooltip_prime(GtkFunction callback, GObject *object);
 void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc);
+gboolean confirm(const gchar *message, const gchar *stock, const gchar *action);
 
 #endif /* _GUI_SUPPORT_H */

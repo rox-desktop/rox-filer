@@ -752,3 +752,35 @@ void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc)
 
 	gtk_widget_modify_style(widget, rc_style);
 }
+
+/* Confirm the action with the user. If action is NULL, the text from stock
+ * is used.
+ */
+gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
+{
+	GtkWidget *box, *button;
+	gboolean resp;
+	
+	number_of_windows++;
+
+	box = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
+				     GTK_BUTTONS_CANCEL, message);
+	if (action)
+		button = button_new_mixed(stock, action);
+	else
+		button = gtk_button_new_from_stock(stock);
+
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_widget_show(button);
+
+	gtk_dialog_add_action_widget(GTK_DIALOG(box), button, GTK_RESPONSE_OK);
+	gtk_window_set_position(GTK_WINDOW(box), GTK_WIN_POS_CENTER);
+	gtk_window_set_title(GTK_WINDOW(box), _("Confirm:"));
+	gtk_dialog_set_default_response(GTK_DIALOG(box), GTK_RESPONSE_OK);
+
+	resp = gtk_dialog_run(GTK_DIALOG(box)) == GTK_RESPONSE_OK;
+	gtk_widget_destroy(box);
+
+	one_less_window();
+	return resp;
+}

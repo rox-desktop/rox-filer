@@ -289,7 +289,10 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 	{
 		/* Mount / major changes to this path */
 		if (*buffer == 'M')
+		{
 			mount_update(TRUE);
+			mount_user_mount(buffer + 1);
+		}
 		filer_check_mounted(buffer + 1);
 	}
 	else if (*buffer == '/')

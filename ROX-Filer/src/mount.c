@@ -50,10 +50,14 @@
 #include "global.h"
 
 #include "mount.h"
+#include "support.h"
 
 /* Map mount points to mntent structures */
 GHashTable *fstab_mounts = NULL;
 time_t fstab_time;
+
+/* Keys are mount points that the user mounted. Values are ignored. */
+static GHashTable *user_mounts = NULL;
 
 #ifdef HAVE_SYS_MNTENT_H
 #define THE_FSTAB VFSTAB
@@ -77,6 +81,8 @@ static gboolean free_mp(gpointer key, gpointer value, gpointer data);
 void mount_init(void)
 {
 	fstab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
+	user_mounts = g_hash_table_new_full(g_str_hash, g_str_equal,
+					    g_free, NULL);
 
 #ifdef DO_MOUNT_POINTS
 	fstab_time = read_time(THE_FSTAB);
@@ -97,6 +103,17 @@ void mount_update(gboolean force)
 		read_table();
 	}
 #endif /* DO_MOUNT_POINTS */
+}
+
+/* The user has just finished mounting/unmounting this path.
+ * Update the list of user-mounted filesystems.
+ */
+void mount_user_mount(const char *path)
+{
+	if (mount_is_mounted(path, NULL, NULL))
+		g_hash_table_insert(user_mounts, pathdup(path), "yes");
+	else
+		g_hash_table_remove(user_mounts, path);
 }
 
 /* TRUE iff this directory is a mount point. Uses python's method to
@@ -139,6 +156,28 @@ gboolean mount_is_mounted(const guchar *path, struct stat *info,
 		return TRUE;	/* Same device and inode */
 		
 	return FALSE;
+}
+
+/* TRUE if this mount point was mounted by the user, and still is */
+gboolean mount_is_user_mounted(const gchar *path)
+{
+	gboolean retval;
+	gchar *real;
+
+	real = pathdup(path);
+
+	retval = g_hash_table_lookup(user_mounts, path) != NULL;
+
+	if (retval)
+	{
+		/* Check the status is up-to-date */
+		mount_user_mount(real);
+		retval = g_hash_table_lookup(user_mounts, path) != NULL;
+	}
+
+	g_free(real);
+
+	return retval;
 }
 
 /****************************************************************
