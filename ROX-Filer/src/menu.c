@@ -56,6 +56,8 @@
 
 #define MENU_MARGIN 32
 
+typedef void (*ActionFn)(GSList *paths, char *dest_dir, char *leaf);
+
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*panel_keys;
 GtkAccelGroup	*pinboard_keys;
@@ -85,6 +87,7 @@ static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 static GList *list_paths(FilerWindow *filer_window);
 static void free_paths(GList *paths);
 static void mark_menus_unmodified(void);
+static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
@@ -859,6 +862,11 @@ static gint save_to_file(GtkSavebox *savebox, guchar *pathname)
 
 static gboolean copy_cb(guchar *current, guchar *new)
 {
+	return action_with_leaf(action_copy, current, new);
+}
+
+static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
+{
 	char	*new_dir, *leaf;
 	GSList	*local_paths;
 
@@ -883,7 +891,7 @@ static gboolean copy_cb(guchar *current, guchar *new)
 	}
 
 	local_paths = g_slist_append(NULL, current);
-	action_copy(local_paths, new_dir, leaf);
+	action(local_paths, new_dir, leaf);
 	g_slist_free(local_paths);
 
 	g_free(new_dir);
@@ -921,12 +929,7 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 
 static gboolean rename_cb(guchar *current, guchar *new)
 {
-	if (rename(current, new))
-	{
-		report_error("ROX-Filer: rename()", g_strerror(errno));
-		return FALSE;
-	}
-	return TRUE;
+	return action_with_leaf(action_move, current, new);
 }
 
 static void rename_item(gpointer data, guint action, GtkWidget *widget)

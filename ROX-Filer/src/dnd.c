@@ -1183,7 +1183,7 @@ static void got_uri_list(GtkWidget 		*widget,
 				"remote files - sorry.");
 		}
 		else if (context->action == GDK_ACTION_MOVE)
-			action_move(local_paths, dest_path);
+			action_move(local_paths, dest_path, NULL);
 		else if (context->action == GDK_ACTION_COPY)
 			action_copy(local_paths, dest_path, NULL);
 		else if (context->action == GDK_ACTION_LINK)

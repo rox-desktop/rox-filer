@@ -1334,8 +1334,7 @@ static char *make_dest_path(char *object, char *dir)
 	return make_path(dir, leaf)->str;
 }
 
-/* If action_leaf is not NULL it specifies the new leaf name
- */
+/* If action_leaf is not NULL it specifies the new leaf name */
 static gboolean do_copy2(char *path, char *dest)
 {
 	char		*dest_path;
@@ -1482,50 +1481,18 @@ static gboolean do_copy2(char *path, char *dest)
 	return retval;
 }
 
-/* Copy path to dest.
- * Check that path not copied into itself.
- */
-static gboolean do_copy(char *path, char *dest)
-{
-	if (is_sub_dir(make_dest_path(path, dest), path))
-	{
-		g_string_sprintf(message,
-			_("!ERROR: Can't copy object into itself\n"));
-		send();
-		return FALSE;
-	}
-	return do_copy2(path, dest);
-}
-
-/* Move path to dest.
- * Check that path not moved into itself.
- */
-static gboolean do_move(char *path, char *dest)
+/* If action_leaf is not NULL it specifies the new leaf name */
+static gboolean do_move2(char *path, char *dest)
 {
 	char		*dest_path;
-	char		*leaf;
 	gboolean	retval = TRUE;
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
 	struct stat	info2;
 	gboolean	is_dir;
 
-	if (is_sub_dir(dest, path))
-	{
-		g_string_sprintf(message,
-			_("!ERROR: Can't move object into itself\n"));
-		send();
-		return FALSE;
-	}
-
 	check_flags();
 
-	leaf = strrchr(path, '/');
-	if (!leaf)
-		leaf = path;		/* Error? */
-	else
-		leaf++;
-
-	dest_path = make_path(dest, leaf)->str;
+	dest_path = make_dest_path(path, dest);
 
 	is_dir = mc_lstat(path, &info2) == 0 && S_ISDIR(info2.st_mode);
 
@@ -1576,12 +1543,20 @@ static gboolean do_move(char *path, char *dest)
 	}
 
 	argv[2] = path;
-	argv[3] = dest;
+	argv[3] = dest_path;
 
 	if (fork_exec_wait(argv) == 0)
 	{
+		char	*leaf;
+
+		leaf = strrchr(dest_path, '/');
+		if (!leaf)
+			leaf = dest_path;		/* Error? */
+		else
+			leaf++;
+
 		g_string_sprintf(message, "+%s", path);
-		g_string_truncate(message, leaf - path);
+		g_string_truncate(message, leaf - dest_path);
 		send();
 		if (is_dir) {
 			g_string_sprintf(message, "m%s", path);
@@ -1598,6 +1573,36 @@ static gboolean do_move(char *path, char *dest)
 	}
 
 	return retval;
+}
+
+/* Copy path to dest.
+ * Check that path not copied into itself.
+ */
+static gboolean do_copy(char *path, char *dest)
+{
+	if (is_sub_dir(make_dest_path(path, dest), path))
+	{
+		g_string_sprintf(message,
+			_("!ERROR: Can't copy object into itself\n"));
+		send();
+		return FALSE;
+	}
+	return do_copy2(path, dest);
+}
+
+/* Move path to dest.
+ * Check that path not moved into itself.
+ */
+static gboolean do_move(char *path, char *dest)
+{
+	if (is_sub_dir(make_dest_path(path, dest), path))
+	{
+		g_string_sprintf(message,
+			_("!ERROR: Can't move/rename object into itself\n"));
+		send();
+		return FALSE;
+	}
+	return do_move2(path, dest);
 }
 
 static gboolean do_link(char *path, char *dest)
@@ -2074,6 +2079,7 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
+/* If leaf is NULL then the copy has the same name as the original */
 void action_copy(GSList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
@@ -2090,11 +2096,13 @@ void action_copy(GSList *paths, char *dest, char *leaf)
 	gtk_widget_show_all(gui_side->window);
 }
 
-void action_move(GSList *paths, char *dest)
+/* If leaf is NULL then the file is not renamed */
+void action_move(GSList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
 
 	action_dest = dest;
+	action_leaf = leaf;
 	action_do_func = do_move;
 	gui_side = start_action(paths, list_cb, o_auto_move);
 	if (!gui_side)
