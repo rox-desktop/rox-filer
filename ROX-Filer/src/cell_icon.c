@@ -349,9 +349,15 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 	switch (size)
 	{
 		case SMALL_ICONS:
-			draw_small_icon(window, cell_area, item,
+		{
+			GdkRectangle area = *cell_area;
+			area.width = MIN(area.width, SMALL_WIDTH);
+			area.x = cell_area->x + cell_area->width - area.width;
+			draw_small_icon(window, &area, item,
 					view_item->image, view_item->selected);
+
 			break;
+		}
 		case LARGE_ICONS:
 			draw_large_icon(window, cell_area, item,
 					view_item->image, view_item->selected);

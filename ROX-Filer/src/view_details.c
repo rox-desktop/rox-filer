@@ -601,6 +601,27 @@ static gboolean is_selected(ViewDetails *view_details, int i)
 	return view_details_get_selected((ViewIface *) view_details, &iter);
 }
 
+static gboolean view_details_scroll(GtkWidget *widget, GdkEventScroll *event)
+{
+	GtkTreeView *tree = (GtkTreeView *) widget;
+	GtkTreePath *path = NULL;
+
+	if (!gtk_tree_view_get_path_at_pos(tree, 0, 0, &path, NULL, NULL, NULL))
+		return TRUE;	/* Empty? */
+
+	if (event->direction == GDK_SCROLL_UP)
+		gtk_tree_path_prev(path);
+	else if (event->direction == GDK_SCROLL_DOWN)
+		gtk_tree_path_next(path);
+	else
+		goto out;
+
+	gtk_tree_view_scroll_to_cell(tree, path, NULL, TRUE, 0, 0);
+out:
+	gtk_tree_path_free(path);
+	return TRUE;
+}
+
 static gboolean view_details_button_press(GtkWidget *widget,
 					  GdkEventButton *bev)
 {
@@ -726,6 +747,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	object->finalize = view_details_finialize;
 	GTK_OBJECT_CLASS(object)->destroy = view_details_destroy;
 
+	widget->scroll_event = view_details_scroll;
 	widget->button_press_event = view_details_button_press;
 	widget->button_release_event = view_details_button_release;
 	widget->motion_notify_event = view_details_motion_notify;
