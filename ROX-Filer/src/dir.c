@@ -280,8 +280,17 @@ static gboolean recheck_callback(gpointer data)
 		return TRUE;	/* Call again */
 
 	dir_merge_new(dir);
+	
 	dir_set_scanning(dir, FALSE);
+	gtk_idle_remove(dir->idle_callback);
 	dir->idle_callback = 0;
+
+	if (dir->needs_update)
+	{
+		g_print("[ needs_update ]\n");
+		dir_rescan(dir, dir->pathname);
+	}
+
 	return FALSE;
 }
 
@@ -299,6 +308,8 @@ void dir_rescan(Directory *dir, guchar *pathname)
 
 	g_return_if_fail(dir != NULL);
 	g_return_if_fail(pathname != NULL);
+
+	dir->needs_update = FALSE;
 
 	names = g_ptr_array_new();
 
@@ -692,7 +703,10 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 	g_free(dir->pathname);
 	dir->pathname = pathdup(pathname);
 
-	dir_rescan(dir, pathname);
+	if (dir->scanning)
+		dir->needs_update = TRUE;
+	else
+		dir_rescan(dir, pathname);
 
 	if (dir->error)
 		delayed_error(PROJECT, dir->error);
