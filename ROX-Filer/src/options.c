@@ -163,11 +163,10 @@ void options_load(void)
 
 void options_show(void)
 {
-	if (!window)
-		build_options_window();
+	if (window)
+		gtk_widget_destroy(window);
 
-	if (GTK_WIDGET_MAPPED(window))
-		gtk_widget_hide(window);
+	build_options_window();
 
 	update_option_widgets();
 	
@@ -813,6 +812,12 @@ static void build_options_window(void)
 		NULL,	/* fatalError */
 	};
 
+	context.vbox = context.hbox = context.option_menu = NULL;
+	context.prev_radio = NULL;
+	context.adj = NULL;
+	context.radio_group = NULL;
+	context.option = NULL;
+	
 	window = build_frame(&context);
 
 	context.state = g_list_prepend(NULL, PARSE_TOPLEVEL);
@@ -832,6 +837,23 @@ static void build_options_window(void)
 	g_string_free(context.data, TRUE);
 }
 
+static void null_widget(gpointer key, gpointer value, gpointer data)
+{
+	Option	*option = (Option *) value;
+
+	option->widget = NULL;
+}
+
+static void options_destroyed(GtkWidget *widget, gpointer data)
+{
+	if (widget == window)
+	{
+		window = NULL;
+
+		g_hash_table_foreach(option_hash, null_widget, NULL);
+	}
+}
+
 /* Creates the window and adds the various buttons to it.
  * context->vbox becomes the box to add sections to.
  */
@@ -847,8 +869,8 @@ static GtkWidget *build_frame(ParseContext *context)
 
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	gtk_window_set_title(GTK_WINDOW(window), _("ROX-Filer options"));
-	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
-			GTK_SIGNAL_FUNC(hide_dialog_event), window);
+	gtk_signal_connect(GTK_OBJECT(window), "destroy",
+			GTK_SIGNAL_FUNC(options_destroyed), NULL);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_default_size(GTK_WINDOW(window), 400, 400);
 
@@ -914,7 +936,7 @@ static GtkWidget *build_frame(ParseContext *context)
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
+		GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(window));
 
 	return window;
 }
@@ -1183,7 +1205,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 	}
 
 	if (button != BUTTON_APPLY)
-		gtk_widget_hide(window);
+		gtk_widget_destroy(window);
 }
 
 /* Shade the listed tools; unshade the rest. */
