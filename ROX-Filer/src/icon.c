@@ -584,9 +584,7 @@ static void selection_get(GtkClipboard	*primary,
 		g_string_free(str, FALSE);
 	}
 
-	gtk_selection_data_set(selection_data,
-				gdk_atom_intern("STRING", FALSE),
-				8, text, strlen(text));
+	gtk_selection_data_set_text(selection_data, text, strlen(text));
 }
 
 static void set_backdrop(gpointer data, guint action, GtkWidget *widget)

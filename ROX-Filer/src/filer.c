@@ -734,12 +734,12 @@ static void selection_get(GtkWidget *widget,
 	}
 	
 	if (reply->len > 0)
-		gtk_selection_data_set(selection_data, xa_string,
-				8, reply->str + 1, reply->len - 1);
+		gtk_selection_data_set_text(selection_data,
+				reply->str + 1, reply->len - 1);
 	else
 	{
 		g_warning("Attempt to paste empty selection!");
-		gtk_selection_data_set(selection_data, xa_string, 8, "", 0);
+		gtk_selection_data_set_text(selection_data, "", 0);
 	}
 
 	g_string_free(reply, TRUE);
@@ -1717,9 +1717,9 @@ static void filer_add_signals(FilerWindow *filer_window)
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"UTF8_STRING", 0, TARGET_STRING},
 		{"STRING", 0, TARGET_STRING},
 		{"COMPOUND_TEXT", 0, TARGET_STRING},/* XXX: Treats as STRING */
-		{"UTF8_STRING", 0, TARGET_STRING},
 	};
 
 	/* Events on the top-level window */

@@ -4,11 +4,17 @@
 
 27-Nov-2004
 ~~~~~~~~~~~
+Bugfix: Use gtk_selection_data_set_text instead of gtk_selection_data_set when
+	pasting filenames so that other applications know the string is UTF-8
+	(Thomas Leonard; reported by Dennis).
+
+27-Nov-2004
+~~~~~~~~~~~
 Better extended attribute detection under Solaris (Stephen Watson).
 
 25-Nov-2004
 ~~~~~~~~~~~
-More extended attribute support.  The "Set Type..." menu item should be 
+More extended attribute support. The "Set Type..." menu item should be 
 disabled if not supported by the system or FS (Stephen Watson).
 
 24-Nov-2004
