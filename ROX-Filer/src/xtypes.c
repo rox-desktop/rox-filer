@@ -208,7 +208,7 @@ int xtype_have_attr(const char *path)
 MIME_type *xtype_get(const char *path)
 {
 	int fd;
-	char buf[1024];
+	char buf[1024], *nl;
 	int nb;
 	MIME_type *type=NULL;
 
@@ -225,6 +225,9 @@ MIME_type *xtype_get(const char *path)
 		nb=read(fd, buf, sizeof(buf));
 		if(nb>0) {
 			buf[nb]=0;
+			nl=strchr(buf, '\n');
+			if(nl)
+			        *nl=0;
 			type=mime_type_lookup(buf);
 		}
 		close(fd);
