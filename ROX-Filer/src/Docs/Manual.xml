@@ -503,8 +503,8 @@ $ rox --bottom=</screen>
      <row><entry>Left button click</entry><entry>
        Open the file or directory clicked on. Hold down <keycap>Control</keycap>
        to select things instead of opening them. Hold down <keycap>Shift</keycap>
-       to look inside applications, treat files as text, follow symlinks or
-       mount devices.
+       to look inside applications, treat files as text, follow symlinks, or
+       get more control over mount points (see <xref linkend="media"/>).
      </entry></row>
 
      <row><entry>Middle button click</entry><entry>
@@ -1013,11 +1013,12 @@ $ rox --bottom=</screen>
 
        <row><entry>
          <guimenuitem>Shift Open</guimenuitem></entry><entry>
-         Opens applications as directories, files as text/plain, mount points by
-         mounting or unmounting them and symlinks by opening the directory containing
-         the thing they point to. This is the same effect as clicking with
-	 <keycap>Shift</keycap> held down. The text of the menu entry changes
-	 to show which action will be performed.
+	 Opens applications as directories, files as text/plain, and
+	 symlinks by opening the directory containing the thing they point to.
+	 It also has interesting effects on mount points (see <xref linkend="media"/>).
+	 This is the same effect as clicking with <keycap>Shift</keycap> held
+	 down. The text of the menu entry changes to show which action will be
+	 performed.
        </entry></row>
 
        <row><entry>
@@ -1519,6 +1520,56 @@ $ rox --bottom=</screen>
   </sect1>
  </chapter>
 
+ <chapter>
+  <title>
+   <anchor id="media" xreflabel="Removable devices"/>Removable devices
+  </title>
+  <para>
+   Using removable devices, such as floppy disks and CDROMs under ROX-Filer is quite
+   simple. However, it is important to understand about <emphasis>mounting</emphasis> and
+   <emphasis>unmounting</emphasis> devices.
+  </para>
+  <para>
+   Mounting a device causes its contents to appear in the filesystem. On a typical setup,
+   the directory <filename>/floppy</filename> is an empty directory on the hard disk.
+   The floppy device is then mounted onto this directory, causing its contents to appear
+   inside. For example, a file called <filename>Letter</filename> on the floppy disk will
+   appear as <filename>/floppy/Letter</filename>.
+  </para>
+  <para>
+   Devices must be unmounted before the disk is removed. Unmounting causes the system to
+   write any buffered data to the disk. If you remove a disk without unmounting
+   it, it will probably be corrupted. CD and Zip drives often lock the tray while the
+   device is mounted so you can't remove it accidentally.
+  </para>
+  <para>
+   So that you don't have to specify which device should be mounted at which point in the
+   filesystem every time you want to use a disk, a preset list is usually found in the
+   file <filename>/etc/fstab</filename>. ROX-Filer shows mount points (such as
+   <filename>/floppy</filename>) which are listed here but not mounted with transparent
+   grey circles overlayed on their icons.
+  </para>
+  <para>
+   Clicking on one of these mount points will mount the device for you. The circle turns
+   green to indicate that the device is now mounted. Do <emphasis>not</emphasis> remove
+   the device while the circle is lit! You can unmount the device by clicking
+   while holding down <keycap>Shift</keycap> on the <filename>/floppy</filename>
+   directory icon.
+  </para>
+  <para>
+   You can also unmount a device by closing its directory window (eg, closing
+   the view of <filename>/floppy</filename>) and choosing Unmount when prompted. The
+   filer will only offer to unmount devices this way if they were mounted by
+   the filer in the first place.
+  </para>
+  <para>
+   If you want to open a directory without mounting anything (eg, if you want to
+   see the contents of <filename>/floppy</filename> on the hard disk), you can
+   click on the unmounted mount point with <keycap>Shift</keycap> held down.
+   This isn't usually useful, as these directories are typically empty.
+  </para>
+ </chapter>
+ 
  <chapter id="virtual">
   <title>
    <anchor id="vfs" xreflabel="Virtual file systems"/>Virtual file systems
