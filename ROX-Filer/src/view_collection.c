@@ -130,6 +130,7 @@ static gint coll_button_release(GtkWidget *widget,
 static gint coll_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      ViewCollection *view_collection);
+static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data);
 static void create_uri_list(FilerWindow *filer_window, GString *string);
 static void perform_action(ViewCollection *view_collection,
 			   GdkEventButton *event);
@@ -273,6 +274,8 @@ static void view_collection_init(GTypeInstance *object, gpointer gclass)
 			G_CALLBACK(coll_button_press), view_collection);
 	g_signal_connect(collection, "motion-notify-event",
 			G_CALLBACK(coll_motion_notify), view_collection);
+	g_signal_connect(viewport, "size-allocate",
+			G_CALLBACK(size_allocate), view_collection);
 }
 
 static void draw_item(GtkWidget *widget,
@@ -934,6 +937,15 @@ static gint coll_motion_notify(GtkWidget *widget,
 	}
 
 	return FALSE;
+}
+
+/* Viewport is to be resized, so calculate increments */
+static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data)
+{
+	Collection *col = ((ViewCollection *) data)->collection;
+
+	col->vadj->step_increment = col->item_height;
+	col->vadj->page_increment = col->vadj->page_size;
 }
 
 /* Append all the URIs in the selection to the string */

@@ -895,7 +895,7 @@ static xmlNodePtr rpc_Mount(GList *args)
  */
 static void soap_done(GtkWidget *widget, GdkEventProperty *event, gpointer data)
 {
-	static gboolean times_called = 0;
+	static int times_called = 0;
 	GdkAtom	prop = (GdkAtom) data;
 
 	if (prop != event->atom)

@@ -371,7 +371,7 @@ gboolean type_open(const char *path, MIME_type *type)
 			open);
 		choices_dir = g_dirname(open);
 		paths = g_list_append(NULL, choices_dir);
-		action_chmod(paths, TRUE, "go-w (Fix security problem)");
+		action_chmod(paths, TRUE, _("go-w (Fix security problem)"));
 		g_free(choices_dir);
 		g_list_free(paths);
 		g_free(open);

@@ -526,9 +526,9 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 		if (!scanned)
 		{
 			if (filer_window->display_style == SMALL_ICONS)
-				return g_strdup("12345M");
+				return g_strdup("1234M");
 			else
-				return g_strdup("12345 bytes");
+				return g_strdup("1234 bytes");
 		}
 
 		if (item->base_type != TYPE_DIRECTORY)
