@@ -283,13 +283,17 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	}
 	g_free(help_dir);
 
-	label = gtk_label_new(NULL);
-	gtk_label_set_markup(GTK_LABEL(label), _("<b>Permissions</b>"));
-	gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
-	gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
+	if (!(item->flags & ITEM_FLAG_SYMLINK))
+	{
+		label = gtk_label_new(NULL);
+		gtk_label_set_markup(GTK_LABEL(label),
+				     _("<b>Permissions</b>"));
+		gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
+		gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
 
-	gtk_box_pack_start(vbox, make_permissions(path, item),
-			FALSE, TRUE, 0);
+		gtk_box_pack_start(vbox, make_permissions(path, item),
+				   FALSE, TRUE, 0);
+	}
 
 	if (about)
 		add_frame(vbox, make_about(path, ai));

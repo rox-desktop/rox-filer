@@ -46,7 +46,7 @@ ${PROG}: ${OBJECTS}
 	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
 	[ -d "${PLATFORM_DIR}" ] || mkdir "${PLATFORM_DIR}"
 	mv "${PROG}" "${PLATFORM_DIR}"
-	(cd "${PLATFORM_DIR}" && \
+	-(cd "${PLATFORM_DIR}" && \
 	 objcopy --only-keep-debug ROX-Filer ROX-Filer.dbg; \
 	 strip ROX-Filer; \
 	 objcopy --add-gnu-debuglink=ROX-Filer.dbg ROX-Filer)
