@@ -26,6 +26,9 @@
 #include "global.h"
 
 #include "view_iface.h"
+#include "support.h"
+#include "filer.h"
+#include "diritem.h"
 
 /* A word about interfaces:
  *
@@ -351,3 +354,51 @@ void view_set_base(ViewIface *obj, ViewIter *iter)
 
 	VIEW_IFACE_GET_CLASS(obj)->set_base(obj, iter);
 }
+
+/* The the filer window for this view */
+FilerWindow *view_get_filer_window(ViewIface *obj)
+{
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), NULL);
+
+	return VIEW_IFACE_GET_CLASS(obj)->get_filer_window(obj);
+}
+
+/* Return the selection as a text/uri-list.
+ * g_free() the result.
+ */
+guchar *view_create_uri_list(ViewIface *obj)
+{
+	FilerWindow *filer_window;
+	GString	*string;
+	GString	*leader;
+	ViewIter iter;
+	DirItem	*item;
+	guchar	*retval;
+
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), NULL);
+
+	filer_window = view_get_filer_window(obj);
+
+	string = g_string_new(NULL);
+
+	leader = g_string_new("file://");
+	g_string_append(leader, our_host_name_for_dnd());
+	g_string_append(leader, filer_window->sym_path);
+	if (leader->str[leader->len - 1] != '/')
+		g_string_append_c(leader, '/');
+
+	view_get_iter(obj, &iter, VIEW_ITER_SELECTED);
+	while ((item = iter.next(&iter)))
+	{
+		g_string_append(string, leader->str);
+		g_string_append(string, item->leafname);
+		g_string_append(string, "\r\n");
+	}
+
+	g_string_free(leader, TRUE);
+	retval = string->str;
+	g_string_free(string, FALSE);
+
+	return retval;
+}
+

@@ -30,6 +30,7 @@
 
 #include "view_iface.h"
 #include "view_details.h"
+#include "dir.h"
 #include "diritem.h"
 #include "support.h"
 #include "type.h"
@@ -55,6 +56,9 @@
 #define COL_ICON 9
 #define COL_BG_COLOUR 10
 #define N_COLUMNS 11
+
+/* Item we are about to display a tooltip for */
+static DirItem *tip_item = NULL;
 
 static gpointer parent_class = NULL;
 
@@ -121,6 +125,7 @@ static void view_details_wink_item(ViewIface *view, ViewIter *iter);
 static void view_details_autosize(ViewIface *view);
 static gboolean view_details_cursor_visible(ViewIface *view);
 static void view_details_set_base(ViewIface *view, ViewIter *iter);
+static FilerWindow *view_details_get_filer_window(ViewIface *view);
 static DirItem *iter_peek(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
 static DirItem *iter_next(ViewIter *iter);
@@ -740,6 +745,125 @@ static gint view_details_key_press_event(GtkWidget *widget, GdkEventKey *event)
 	return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget, event);
 }
 
+static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
+{
+	ViewDetails	*view_details = (ViewDetails *) widget;
+	ViewIface	*view = (ViewIface *) widget;
+	GtkTreeView	*tree = (GtkTreeView *) widget;
+	FilerWindow	*filer_window = view_details->filer_window;
+	GtkTreeModel	*model;
+	GtkTreePath	*path = NULL;
+	ViewIter	iter;
+	int		i = -1;
+	int		n_sel;
+
+	model = gtk_tree_view_get_model(tree);
+
+	if (gtk_tree_view_get_path_at_pos(tree, event->x, event->y,
+					&path, NULL, NULL, NULL))
+	{
+		g_return_val_if_fail(path != NULL, FALSE);
+
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_path_free(path);
+	}
+
+	if (i == -1)
+	{
+		tooltip_show(NULL);
+		tip_item = NULL;
+	}
+	else
+	{
+		DirItem *item;
+
+		item = ((ViewItem *) view_details->items->pdata[i])->item;
+
+		if (item != tip_item)
+		{
+			tooltip_show(NULL);
+
+			tip_item = item;
+#if 0
+			tooltip_prime((GtkFunction) tooltip_activate,
+					G_OBJECT(view_details));
+#endif
+		}
+	}
+
+	if (motion_state != MOTION_READY_FOR_DND)
+		return FALSE;
+
+	if (!dnd_motion_moved(event))
+		return FALSE;
+
+	/* Find the item the drag started from... */
+	if (gtk_tree_view_get_path_at_pos(tree,
+				event->x - (event->x_root - drag_start_x),
+				event->y - (event->y_root - drag_start_y),
+				&path, NULL, NULL, NULL))
+	{
+		g_return_val_if_fail(path != NULL, FALSE);
+
+		i = gtk_tree_path_get_indices(path)[0];
+		gtk_tree_path_free(path);
+	}
+	else
+		return FALSE;
+
+	iter.i = i;
+	view_details_wink_item(view, NULL);
+	
+	if (!is_selected(view_details, i))
+	{
+		if (event->state & GDK_BUTTON1_MASK)
+		{
+			/* Select just this one */
+			filer_window->temp_item_selected = TRUE;
+			view_details_select_only(view, &iter);
+		}
+		else
+		{
+			if (view_details_count_selected(view) == 0)
+				filer_window->temp_item_selected = TRUE;
+			set_selected(view_details, i, TRUE);
+		}
+	}
+
+	n_sel = view_details_count_selected(view);
+	g_return_val_if_fail(n_sel > 0, TRUE);
+
+	if (n_sel == 1)
+	{
+		ViewItem *v_item = (ViewItem *) view_details->items->pdata[i];
+		DirItem	 *item = v_item->item;
+
+		if (!item->image)
+			item = dir_update_item(filer_window->directory,
+						item->leafname);
+
+		if (!item)
+		{
+			report_error(_("Item no longer exists!"));
+			return FALSE;
+		}
+
+		drag_one_item(widget, event,
+			make_path(filer_window->sym_path, item->leafname),
+			item, item->image);
+	}
+	else
+	{
+		guchar *uris;
+	
+		uris = view_create_uri_list(view);
+		drag_selection(widget, event, uris);
+		g_free(uris);
+	}
+
+	return FALSE;
+}
+
 static void view_details_destroy(GtkObject *view_details)
 {
 	VIEW_DETAILS(view_details)->filer_window = NULL;
@@ -768,6 +892,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->button_press_event = view_details_button_press;
 	widget->button_release_event = view_details_button_release;
 	widget->key_press_event = view_details_key_press_event;
+	widget->motion_notify_event = view_details_motion_notify;
 }
 
 static void view_details_init(GTypeInstance *object, gpointer gclass)
@@ -902,6 +1027,7 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 	iface->autosize = view_details_autosize;
 	iface->cursor_visible = view_details_cursor_visible;
 	iface->set_base = view_details_set_base;
+	iface->get_filer_window = view_details_get_filer_window;
 }
 
 /* Implementations of the View interface. See view_iface.c for comments. */
@@ -1302,6 +1428,13 @@ static void view_details_set_base(ViewIface *view, ViewIter *iter)
 	ViewDetails *view_details = (ViewDetails *) view;
 
 	view_details->cursor_base = iter->i;
+}
+
+static FilerWindow *view_details_get_filer_window(ViewIface *view)
+{
+	ViewDetails	*view_details = (ViewDetails *) view;
+
+	return view_details->filer_window;
 }
 
 static DirItem *iter_init(ViewIter *iter)

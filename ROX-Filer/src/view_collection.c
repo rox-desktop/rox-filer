@@ -143,7 +143,6 @@ static gint coll_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      ViewCollection *view_collection);
 static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data);
-static void create_uri_list(ViewCollection *view_collection, GString *string);
 static void perform_action(ViewCollection *view_collection,
 			   GdkEventButton *event);
 static void style_set(Collection 	*collection,
@@ -203,6 +202,7 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter);
 static void view_collection_autosize(ViewIface *view);
 static gboolean view_collection_cursor_visible(ViewIface *view);
 static void view_collection_set_base(ViewIface *view, ViewIter *iter);
+static FilerWindow *view_collection_get_filer_window(ViewIface *view);
 
 static DirItem *iter_next(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
@@ -843,6 +843,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->autosize = view_collection_autosize;
 	iface->cursor_visible = view_collection_cursor_visible;
 	iface->set_base = view_collection_set_base;
+	iface->get_filer_window = view_collection_get_filer_window;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -1007,12 +1008,11 @@ static gint coll_motion_notify(GtkWidget *widget,
 	}
 	else
 	{
-		GString *uris;
+		guchar *uris;
 	
-		uris = g_string_new(NULL);
-		create_uri_list(view_collection, uris);
-		drag_selection(widget, event, uris->str);
-		g_string_free(uris, TRUE);
+		uris = view_create_uri_list((ViewIface *) view_collection);
+		drag_selection(widget, event, uris);
+		g_free(uris);
 	}
 
 	return FALSE;
@@ -1025,30 +1025,6 @@ static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data)
 
 	col->vadj->step_increment = col->item_height;
 	col->vadj->page_increment = col->vadj->page_size;
-}
-
-/* Append all the URIs in the selection to the string */
-static void create_uri_list(ViewCollection *view_collection, GString *string)
-{
-	GString	*leader;
-	ViewIter iter;
-	DirItem	*item;
-
-	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name_for_dnd());
-	g_string_append(leader, view_collection->filer_window->sym_path);
-	if (leader->str[leader->len - 1] != '/')
-		g_string_append_c(leader, '/');
-
-	make_iter(view_collection, &iter, VIEW_ITER_SELECTED);
-	while ((item = iter.next(&iter)))
-	{
-		g_string_append(string, leader->str);
-		g_string_append(string, item->leafname);
-		g_string_append(string, "\r\n");
-	}
-
-	g_string_free(leader, TRUE);
 }
 
 static gint coll_button_release(GtkWidget *widget,
@@ -1926,6 +1902,13 @@ static void view_collection_set_base(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 
 	view_collection->cursor_base = iter->i;
+}
+
+static FilerWindow *view_collection_get_filer_window(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+
+	return view_collection->filer_window;
 }
 
 static void drag_end(GtkWidget *widget,

@@ -82,6 +82,7 @@ struct _ViewIfaceClass {
 	void (*autosize)(ViewIface *obj);
 	gboolean (*cursor_visible)(ViewIface *obj);
 	void (*set_base)(ViewIface *obj, ViewIter *iter);
+	FilerWindow *(*get_filer_window)(ViewIface *obj);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -134,5 +135,7 @@ void view_wink_item(ViewIface *obj, ViewIter *iter);
 void view_autosize(ViewIface *obj);
 gboolean view_cursor_visible(ViewIface *obj);
 void view_set_base(ViewIface *obj, ViewIter *iter);
+guchar *view_create_uri_list(ViewIface *view);
+FilerWindow *view_get_filer_window(ViewIface *obj);
 
 #endif /* __VIEW_IFACE_H__ */
