@@ -361,6 +361,11 @@ static void get_new_colour(GtkWidget *ok, Option *option)
 	option_check_widget(option);
 }
 
+static void set_to_null(gpointer *data)
+{
+	*data = NULL;
+}
+
 static void open_coloursel(GtkWidget *button, Option *option)
 {
 	GtkColorSelectionDialog	*csel;

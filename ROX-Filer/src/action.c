@@ -509,7 +509,9 @@ static void message_from_child(gpointer 	 data,
 			gtk_text_buffer_get_end_iter(text_buffer, &end);
 			gtk_text_buffer_insert_with_tags_by_name(text_buffer,
 					&end, buffer + 1, message_len - 1,
-					*buffer == '!' ? "red" : NULL, NULL);
+					*buffer == '!' ? "red" :
+					*buffer == '?' ? "question" :
+						         NULL, NULL);
 			gtk_text_view_scroll_to_mark(
 				GTK_TEXT_VIEW(gui_side->log),
 				gtk_text_buffer_get_mark(text_buffer, "insert"),
@@ -978,6 +980,10 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gtk_text_buffer_create_tag(
 			gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log)),
 			"red", "foreground", "red",
+			NULL);
+	gtk_text_buffer_create_tag(
+			gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log)),
+			"question", "weight", "bold",
 			NULL);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
 	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);

@@ -1061,11 +1061,6 @@ int text_to_boolean(const char *text, int defvalue)
 	return defvalue;
 }
 
-void set_to_null(gpointer *data)
-{
-	*data = NULL;
-}
-
 /* Return the pathname that this symlink points to.
  * NULL on error (not a symlink, path too long) and errno set.
  * g_free() the result.
