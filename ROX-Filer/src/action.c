@@ -2314,7 +2314,7 @@ static gboolean remove_pinned_ok(GList *paths)
 	}
 	
 	retval = get_choice(PROJECT, message->str,
-				2, _("Cancel"), _("OK")) == 1;
+				2, _("Cancel"), _("Delete")) == 1;
 
 	g_string_free(message, TRUE);
 	

@@ -187,7 +187,10 @@ int get_choice(char *title,
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
 
-#ifndef GTK2
+#ifdef GTK2
+	/* (note: highlights button at the other end!) */
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), 0);
+#else
 	gtk_window_set_focus(GTK_WINDOW(dialog), button);
 	gtk_window_set_default(GTK_WINDOW(dialog), button);
 	gtk_container_set_focus_child(GTK_CONTAINER(action_area), button);
@@ -245,6 +248,8 @@ void report_error(char *message, ...)
 				GTK_BUTTONS_OK,
 				"%s", s);
 		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+						GTK_RESPONSE_OK);
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 	}
