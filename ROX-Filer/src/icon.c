@@ -745,7 +745,8 @@ static void clear_shortcut(GtkButton *clear, GtkLabel *label)
 static void show_rename_box(Icon *icon)
 {
 	GtkDialog	*dialog;
-	GtkWidget	*label, *entry, *button, *button2, *hbox;
+	GtkWidget	*label, *entry, *button, *button2, *hbox, *spacer;
+	GtkBox		*vbox;
 
 	if (icon->dialog)
 	{
@@ -758,38 +759,47 @@ static void show_rename_box(Icon *icon)
 			G_CALLBACK(gtk_widget_destroyed), &icon->dialog);
 
 	dialog = GTK_DIALOG(icon->dialog);
-	gtk_dialog_set_has_separator(dialog, FALSE);
+	
+	vbox = GTK_BOX(gtk_vbox_new(FALSE, 1));
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), (GtkWidget *) vbox,
+			   TRUE, TRUE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 5);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
 	label = gtk_label_new(_("Clicking the icon opens:"));
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start(vbox, label, TRUE, TRUE, 0);
 
 	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
+	gtk_box_pack_start(vbox, entry, TRUE, FALSE, 2);
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->src_path);
 	g_object_set_data(G_OBJECT(dialog), "new_path", entry);
 	g_signal_connect_swapped(entry, "activate",
 			G_CALLBACK(rename_activate), dialog);
 
-	gtk_box_pack_start(GTK_BOX(dialog->vbox),
-			gtk_hseparator_new(), TRUE, TRUE, 2);
+	spacer = gtk_drawing_area_new();
+	gtk_widget_set_size_request(spacer, 4, 4);
+	gtk_box_pack_start(vbox, spacer, FALSE, FALSE, 0);
 
 	label = gtk_label_new(_("The text displayed under the icon is:"));
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start(vbox, label, TRUE, TRUE, 0);
 	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
+	gtk_box_pack_start(vbox, entry, TRUE, FALSE, 2);
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->item->leafname);
 	gtk_widget_grab_focus(entry);
 	g_object_set_data(G_OBJECT(dialog), "new_name", entry);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 	
+	spacer = gtk_drawing_area_new();
+	gtk_widget_set_size_request(spacer, 4, 4);
+	gtk_box_pack_start(vbox, spacer, FALSE, FALSE, 0);
+
 	label = gtk_label_new(_("The keyboard shortcut is:"));
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start(vbox, label, TRUE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 2);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, TRUE, FALSE, 0);
+	gtk_box_pack_start(vbox, hbox, TRUE, FALSE, 0);
 	button = gtk_button_new_with_label(icon->shortcut
 						? icon->shortcut
 						: CLICK_TO_SET);
