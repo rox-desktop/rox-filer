@@ -578,6 +578,7 @@ void display_update_view(FilerWindow *filer_window,
 	int	wrap_width = -1;
 	char	*str;
 	static PangoFontDescription *monospace = NULL;
+	PangoAttrList *list = NULL;
 
 	if (!monospace)
 		monospace = pango_font_description_from_string("monospace");
@@ -591,7 +592,7 @@ void display_update_view(FilerWindow *filer_window,
 	str = details(filer_window, item);
 	if (str)
 	{
-		PangoAttrList	*list;
+		PangoAttrList	*details_list;
 		int	perm_offset = -1;
 		
 		view->details = gtk_widget_create_pango_layout(
@@ -615,9 +616,10 @@ void display_update_view(FilerWindow *filer_window,
 			attr->start_index = perm_offset;
 			attr->end_index = perm_offset + 3;
 
-			list = pango_attr_list_new();
-			pango_attr_list_insert(list, attr);
-			pango_layout_set_attributes(view->details, list);
+			details_list = pango_attr_list_new();
+			pango_attr_list_insert(details_list, attr);
+			pango_layout_set_attributes(view->details,
+							details_list);
 		}
 	}
 
@@ -662,7 +664,6 @@ void display_update_view(FilerWindow *filer_window,
 	}
 	else
 	{
-		PangoAttrList	*list;
 		PangoAttribute	*attr;
 		gchar *utf8;
 
@@ -673,11 +674,26 @@ void display_update_view(FilerWindow *filer_window,
 
 		attr = pango_attr_foreground_new(0xffff, 0, 0);
 		attr->start_index = 0;
-		attr->end_index = 1000;
-		list = pango_attr_list_new();
+		attr->end_index = -1;
+		if (!list)
+			list = pango_attr_list_new();
 		pango_attr_list_insert(list, attr);
-		pango_layout_set_attributes(view->layout, list);
 	}
+
+	if (item->flags & ITEM_FLAG_RECENT)
+	{
+		PangoAttribute	*attr;
+
+		attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+		attr->start_index = 0;
+		attr->end_index = -1;
+		if (!list)
+			list = pango_attr_list_new();
+		pango_attr_list_insert(list, attr);
+	}
+
+	if (list)
+		pango_layout_set_attributes(view->layout, list);
 
 	if (filer_window->details_type == DETAILS_NONE)
 	{

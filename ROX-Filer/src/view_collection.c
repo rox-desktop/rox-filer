@@ -331,8 +331,6 @@ static void draw_item(GtkWidget *widget,
 
 	if (selected)
 		selection_state = filer_window->selection_state;
-	else if (item->flags & ITEM_FLAG_RECENT)
-		selection_state = GTK_STATE_PRELIGHT;
 	else
 		selection_state = GTK_STATE_NORMAL;
 	
@@ -634,8 +632,7 @@ static void draw_string(GtkWidget *widget,
 		GtkStateType selection_state,
 		gboolean box)
 {
-	GdkGC	*gc = (selection_state == GTK_STATE_NORMAL ||
-		       selection_state == GTK_STATE_PRELIGHT)
+	GdkGC	*gc = selection_state == GTK_STATE_NORMAL
 			? type_gc
 			: widget->style->fg_gc[selection_state];
 	

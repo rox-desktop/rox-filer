@@ -56,7 +56,8 @@
 #define COL_COLOUR 8
 #define COL_ICON 9
 #define COL_BG_COLOUR 10
-#define N_COLUMNS 11
+#define COL_WEIGHT 11
+#define N_COLUMNS 12
 
 static gpointer parent_class = NULL;
 
@@ -250,6 +251,8 @@ static GType details_get_column_type(GtkTreeModel *tree_model, gint index)
 		return G_TYPE_POINTER;
 	else if (index == COL_ICON)
 		return GDK_TYPE_PIXBUF;
+	else if (index == COL_WEIGHT)
+		return G_TYPE_INT;
 	return G_TYPE_STRING;
 }
 
@@ -327,6 +330,8 @@ static void details_get_value(GtkTreeModel *tree_model,
 			g_value_set_string(value, "");
 		else if (type == GDK_TYPE_COLOR)
 			g_value_set_boxed(value, NULL);
+		else if (type == G_TYPE_INT)
+			g_value_set_int(value, PANGO_WEIGHT_NORMAL);
 		else
 			g_value_set_object(value, NULL);
 			     
@@ -365,14 +370,6 @@ static void details_get_value(GtkTreeModel *tree_model,
 			if (view_item->selected)
 				g_value_set_boxed(value,
 					&style->base[GTK_STATE_SELECTED]);
-			else if (item->flags & ITEM_FLAG_RECENT)
-			{
-				GdkColor prelight;
-				prelight.red = 0xffff;
-				prelight.green = 0xcece;
-				prelight.blue = 0xcece;
-				g_value_set_boxed(value, &prelight);
-			}
 			else
 				g_value_set_boxed(value, NULL);
 			break;
@@ -415,6 +412,13 @@ static void details_get_value(GtkTreeModel *tree_model,
 				S_ISFIFO(m) ? "Pipe" :
 				S_ISDOOR(m) ? "Door" :
 				"File");
+			break;
+		case COL_WEIGHT:
+			g_value_init(value, G_TYPE_INT);
+			if (item->flags & ITEM_FLAG_RECENT)
+				g_value_set_int(value, PANGO_WEIGHT_BOLD);
+			else
+				g_value_set_int(value, PANGO_WEIGHT_NORMAL);
 			break;
 		default:
 			g_value_init(value, G_TYPE_STRING);
@@ -770,6 +774,7 @@ static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
 					    "text", model_column,	\
 					    "foreground-gdk", COL_COLOUR, \
 					    "background-gdk", COL_BG_COLOUR, \
+					    "weight", COL_WEIGHT, 	\
 					    NULL);			\
 	gtk_tree_view_append_column(treeview, column);			\
 	g_signal_connect(column->button, "grab-focus",			\
