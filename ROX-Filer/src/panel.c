@@ -308,6 +308,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window);
+	if (!(gtk_major_version == 2 && gtk_minor_version == 0))
+		gtk_window_stick(GTK_WINDOW(panel->window));
 
 	gtk_widget_show_all(align);
 	
@@ -384,7 +386,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		GdkWindow *pinboard;
 
 		pinboard = pinboard_get_window();
-
+		/* (if pinboard is NULL, will go right to the back) */
 		window_put_just_above(panel->window->window, pinboard);
 	}
 

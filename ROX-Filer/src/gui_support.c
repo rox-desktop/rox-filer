@@ -565,7 +565,9 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 	gtk_widget_modify_text(entry, GTK_STATE_NORMAL, error ? &red : &normal);
 }
 
-/* Change stacking position of higher to be just above lower */
+/* Change stacking position of higher to be just above lower.
+ * If lower is NULL, put higher at the bottom of the stack.
+ */
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 {
 	if (o_override_redirect.int_value && lower)
