@@ -62,6 +62,7 @@ MaskedPixmap 	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 /* Static prototypes */
 
+static void load_default_pixmaps(void);
 static MaskedPixmap *load(char *pathname, gpointer data);
 static void ref(MaskedPixmap *mp, gpointer data);
 static void unref(MaskedPixmap *mp, gpointer data);
@@ -80,6 +81,8 @@ void pixmaps_init(void)
 					NULL);
 
 	gtk_timeout_add(10000, purge, NULL);
+
+	load_default_pixmaps();
 }
 
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
@@ -97,16 +100,18 @@ MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
 	return masked_pixmap;
 }
 
-void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image)
+void load_pixmap(char *name, MaskedPixmap *image)
 {
-	image->pixmap = gdk_pixmap_create_from_xpm(window,
-						   &image->mask,
-						   0,
-			   make_path(getenv("APP_DIR"), name)->str);
+	image->pixmap = gdk_pixmap_colormap_create_from_xpm(NULL,
+				gtk_widget_get_default_colormap(),
+				&image->mask,
+				0,
+				make_path(getenv("APP_DIR"), name)->str);
 
 	if (!image->pixmap)
 	{
-		image->pixmap= gdk_pixmap_create_from_xpm_d(window,
+		image->pixmap= gdk_pixmap_colormap_create_from_xpm_d(NULL,
+				gtk_widget_get_default_colormap(),
 				&image->mask, NULL, bad_xpm);
 	}
 
@@ -114,44 +119,26 @@ void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image)
 }
 
 /* Load all the standard pixmaps */
-void load_default_pixmaps(GdkWindow *window)
+static void load_default_pixmaps(void)
 {
-	static gboolean	loaded = FALSE;
+	load_pixmap("pixmaps/error.xpm", default_pixmap + TYPE_ERROR);
+	load_pixmap("pixmaps/unknown.xpm", default_pixmap + TYPE_UNKNOWN);
+	load_pixmap("pixmaps/symlink.xpm", default_pixmap + TYPE_SYMLINK);
+	load_pixmap("pixmaps/file.xpm", default_pixmap + TYPE_FILE);
+	load_pixmap("pixmaps/directory.xpm", default_pixmap + TYPE_DIRECTORY);
+	load_pixmap("pixmaps/char.xpm", default_pixmap + TYPE_CHAR_DEVICE);
+	load_pixmap("pixmaps/block.xpm", default_pixmap + TYPE_BLOCK_DEVICE);
+	load_pixmap("pixmaps/pipe.xpm", default_pixmap + TYPE_PIPE);
+	load_pixmap("pixmaps/socket.xpm", default_pixmap + TYPE_SOCKET);
 
-	if (loaded)
-		return;
+	load_pixmap("pixmaps/mount.xpm", default_pixmap + TYPE_UNMOUNTED);
+	load_pixmap("pixmaps/mounted.xpm", default_pixmap + TYPE_MOUNTED);
+	load_pixmap("pixmaps/multiple.xpm", default_pixmap + TYPE_MULTIPLE);
+	load_pixmap("pixmaps/exec.xpm", default_pixmap + TYPE_EXEC_FILE);
+	load_pixmap("pixmaps/application.xpm", default_pixmap + TYPE_APPDIR);
 
-	load_pixmap(window, "pixmaps/error.xpm",
-			default_pixmap + TYPE_ERROR);
-	load_pixmap(window, "pixmaps/unknown.xpm",
-			default_pixmap + TYPE_UNKNOWN);
-	load_pixmap(window, "pixmaps/symlink.xpm",
-			default_pixmap + TYPE_SYMLINK);
-	load_pixmap(window, "pixmaps/file.xpm",
-			default_pixmap + TYPE_FILE);
-	load_pixmap(window, "pixmaps/directory.xpm",
-			default_pixmap + TYPE_DIRECTORY);
-	load_pixmap(window, "pixmaps/char.xpm",
-			default_pixmap + TYPE_CHAR_DEVICE);
-	load_pixmap(window, "pixmaps/block.xpm",
-			default_pixmap + TYPE_BLOCK_DEVICE);
-	load_pixmap(window, "pixmaps/pipe.xpm",
-			default_pixmap + TYPE_PIPE);
-	load_pixmap(window, "pixmaps/socket.xpm",
-			default_pixmap + TYPE_SOCKET);
-
-	load_pixmap(window, "pixmaps/mount.xpm",
-			default_pixmap + TYPE_UNMOUNTED);
-	load_pixmap(window, "pixmaps/mounted.xpm",
-			default_pixmap + TYPE_MOUNTED);
-	load_pixmap(window, "pixmaps/multiple.xpm",
-			default_pixmap + TYPE_MULTIPLE);
-	load_pixmap(window, "pixmaps/exec.xpm",
-			default_pixmap + TYPE_EXEC_FILE);
-	load_pixmap(window, "pixmaps/application.xpm",
-			default_pixmap + TYPE_APPDIR);
-
-	loaded = TRUE;
+	load_pixmap("pixmaps/up.xpm", default_pixmap + TOOLBAR_UP_ICON);
+	load_pixmap("pixmaps/home.xpm", default_pixmap + TOOLBAR_HOME_ICON);
 }
 
 void pixmap_ref(MaskedPixmap *mp)

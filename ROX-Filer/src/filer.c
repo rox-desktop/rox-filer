@@ -62,6 +62,7 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *filer_ro_bindings(char *data);
+static char *filer_toolbar(char *data);
 
 static OptionsSection options =
 {
@@ -71,6 +72,8 @@ static OptionsSection options =
 	set_options,
 	save_options
 };
+static gboolean o_toolbar = TRUE;
+static GtkWidget *toggle_toolbar;
 static gboolean o_ro_bindings = FALSE;
 static GtkWidget *toggle_ro_bindings;
 
@@ -100,6 +103,11 @@ static void add_view(FilerWindow *filer_window);
 static void remove_view(FilerWindow *filer_window);
 static void free_item(FileItem *item);
 static gboolean remove_deleted(gpointer item_data, gpointer data);
+static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void add_button(GtkContainer *box, int pixmap,
+			GtkSignalFunc cb, gpointer data);
+static GtkWidget *create_toolbar(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 enum
@@ -116,6 +124,7 @@ void filer_init()
 
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("filer_ro_bindings", filer_ro_bindings);
+	option_register("filer_toolbar", filer_toolbar);
 }
 
 
@@ -916,6 +925,19 @@ static gint key_press_event(GtkWidget	*widget,
 	return FALSE;
 }
 
+static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	remove_view(filer_window);
+	filer_window->path = pathdup(getenv("HOME"));
+	add_view(filer_window);
+	scan_dir(filer_window);
+}
+
+static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	change_to_parent(filer_window);
+}
+
 void change_to_parent(FilerWindow *filer_window)
 {
 	remove_view(filer_window);
@@ -1068,16 +1090,35 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	}
 	else
 	{
+		hbox = gtk_hbox_new(FALSE, 0);
+		
 		gtk_signal_connect(GTK_OBJECT(filer_window->window),
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-					400, 200);
+					400,
+					o_toolbar ? 220 : 200);
 
-		hbox = gtk_hbox_new(FALSE, 0);
-		gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
-		
-		gtk_box_pack_start(GTK_BOX(hbox), collection, TRUE, TRUE, 0);
+		gtk_container_add(GTK_CONTAINER(filer_window->window),
+					hbox);
+		if (o_toolbar)
+		{
+			GtkWidget *vbox, *toolbar;
+
+			
+			vbox = gtk_vbox_new(FALSE, 0);
+			gtk_box_pack_start(GTK_BOX(hbox), vbox,
+					TRUE, TRUE, 0);
+			toolbar = create_toolbar(filer_window);
+			gtk_box_pack_start(GTK_BOX(vbox), toolbar,
+					FALSE, TRUE, 0);
+
+			gtk_box_pack_start(GTK_BOX(vbox), collection,
+					TRUE, TRUE, 0);
+		}
+		else
+			gtk_box_pack_start(GTK_BOX(hbox), collection,
+					TRUE, TRUE, 0);
 
 		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
@@ -1088,10 +1129,45 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
 
-	load_default_pixmaps(collection->window);
-
 	add_view(filer_window);
 	scan_dir(filer_window);
+}
+
+static GtkWidget *create_toolbar(FilerWindow *filer_window)
+{
+	GtkWidget	*frame, *box;
+	
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
+
+	box = gtk_hbutton_box_new();
+	gtk_button_box_set_child_size_default(16, 16);
+	gtk_hbutton_box_set_spacing_default(2);
+	gtk_button_box_set_layout(GTK_BUTTON_BOX(box), GTK_BUTTONBOX_START);
+	gtk_container_add(GTK_CONTAINER(frame), box);
+	add_button(GTK_CONTAINER(box), TOOLBAR_UP_ICON,
+			GTK_SIGNAL_FUNC(toolbar_up_clicked),
+			filer_window);
+	add_button(GTK_CONTAINER(box), TOOLBAR_HOME_ICON,
+			GTK_SIGNAL_FUNC(toolbar_home_clicked),
+			filer_window);
+
+	return frame;
+}
+
+static void add_button(GtkContainer *box, int pixmap,
+			GtkSignalFunc cb, gpointer data)
+{
+	GtkWidget 	*button, *icon;
+
+	button = gtk_button_new();
+	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
+	gtk_container_add(box, button);
+
+	icon = gtk_pixmap_new(default_pixmap[pixmap].pixmap,
+				default_pixmap[pixmap].mask);
+	gtk_container_add(GTK_CONTAINER(button), icon);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, data);
 }
 
 /* Build up some option widgets to go in the options dialog, but don't
@@ -1108,6 +1184,10 @@ static GtkWidget *create_options()
 		gtk_check_button_new_with_label("Use RISC OS mouse bindings");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_ro_bindings, FALSE, TRUE, 0);
 
+	toggle_toolbar =
+		gtk_check_button_new_with_label("Show toolbar on new windows");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_toolbar, FALSE, TRUE, 0);
+
 	return vbox;
 }
 
@@ -1116,6 +1196,8 @@ static void update_options()
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_ro_bindings),
 			o_ro_bindings);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_toolbar),
+			o_toolbar);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
@@ -1123,11 +1205,14 @@ static void set_options()
 {
 	o_ro_bindings = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_ro_bindings));
+	o_toolbar = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_toolbar));
 }
 
 static void save_options()
 {
 	option_write("filer_ro_bindings", o_ro_bindings ? "1" : "0");
+	option_write("filer_toolbar", o_toolbar ? "1" : "0");
 }
 
 static char *filer_ro_bindings(char *data)
@@ -1136,3 +1221,9 @@ static char *filer_ro_bindings(char *data)
 	return NULL;
 }
 
+
+static char *filer_toolbar(char *data)
+{
+	o_toolbar = atoi(data) != 0;
+	return NULL;
+}

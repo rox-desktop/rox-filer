@@ -29,7 +29,13 @@ enum
 	TYPE_EXEC_FILE,
 	TYPE_MULTIPLE,
 	TYPE_APPDIR,
-	LAST_DEFAULT_PIXMAP,
+
+	/* Toolbar */
+	TOOLBAR_UP_ICON,
+	TOOLBAR_HOME_ICON,
+	
+	/* End of list */
+	LAST_DEFAULT_PIXMAP
 };
 
 
@@ -47,8 +53,7 @@ extern MaskedPixmap	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 
 void pixmaps_init(void);
-void load_default_pixmaps(GdkWindow *window);
-void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image);
+void load_pixmap(char *name, MaskedPixmap *image);
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);

@@ -110,9 +110,11 @@ static OptionsSection options =
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
+static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
 static GtkWidget	*panel_file_item;	/* The File '' label */
 static GtkWidget	*panel_file_menu;	/* The File '' menu */
+static GtkWidget	*panel_hidden_menu;	/* The Show Hidden item */
 
 static gint		screen_width, screen_height;
 
@@ -199,6 +201,8 @@ void menu_init()
 	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
 	filer_file_menu = gtk_item_factory_get_widget(item_factory,
 			"<filer>/File");
+	filer_hidden_menu = gtk_item_factory_get_widget(item_factory,
+			"<filer>/Display/Show Hidden");
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
@@ -214,6 +218,8 @@ void menu_init()
 	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
 	panel_file_menu = gtk_item_factory_get_widget(item_factory, 
 			"<panel>/File");
+	panel_hidden_menu = gtk_item_factory_get_widget(item_factory,
+			"<panel>/Display/Show Hidden");
 	items = gtk_container_children(GTK_CONTAINER(panel_menu));
 	panel_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
@@ -374,11 +380,19 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		file_label = panel_file_item;
 		file_menu = panel_file_menu;
+
+		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(panel_hidden_menu),
+				filer_window->show_hidden);
 	}
 	else
 	{
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
+
+		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
+				filer_window->show_hidden);
 	}
 
 	buffer = g_string_new(NULL);
@@ -440,9 +454,18 @@ static void not_yet(gpointer data, guint action, GtkWidget *widget)
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)
 {
+	gboolean new;
+	GtkWidget	*item;
+	
 	g_return_if_fail(window_with_focus != NULL);
 
-	window_with_focus->show_hidden = !window_with_focus->show_hidden;
+	item = window_with_focus->panel ? panel_hidden_menu : filer_hidden_menu;
+	new = GTK_CHECK_MENU_ITEM(item)->active;
+
+	if (window_with_focus->show_hidden == new)
+		return;
+
+	window_with_focus->show_hidden = new;
 	update_dir(window_with_focus);
 }
 
