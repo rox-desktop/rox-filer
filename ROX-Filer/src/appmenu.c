@@ -153,7 +153,7 @@ static GtkWidget *appmenu_add_submenu(xmlNode *subm_node)
 
 		item = create_menu_item(node);
 		if (item)
-			gtk_menu_append(GTK_MENU(sub_menu), item);
+			gtk_menu_shell_append(GTK_MENU_SHELL(sub_menu), item);
 	}
 
 	return sub_menu;
@@ -202,14 +202,13 @@ static GtkWidget *create_menu_item(xmlNode *node)
 
 		if (option)
 		{
-			gtk_object_set_data_full(GTK_OBJECT(item), "option",
+			g_object_set_data_full(G_OBJECT(item), "option",
 					g_strdup(option),
 					g_free);
 			g_free(option);
 		}
 
-		gtk_signal_connect(GTK_OBJECT(item), "activate",
-				GTK_SIGNAL_FUNC(apprun_menu),
+		g_signal_connect(item, "activate", G_CALLBACK(apprun_menu),
 				NULL);
 	}
 
@@ -226,7 +225,7 @@ static void apprun_menu(GtkWidget *item, gpointer data)
 
 	g_return_if_fail(current_app_path != NULL);
 
-	option = gtk_object_get_data(GTK_OBJECT(item), "option");
+	option = g_object_get_data(G_OBJECT(item), "option");
 	
 	argv[0] = g_strconcat(current_app_path, "/AppRun", NULL);
 	argv[1] = option;	/* (may be NULL) */

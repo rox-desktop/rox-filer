@@ -213,10 +213,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_type_hint(GTK_WINDOW(dialog),
 			GDK_WINDOW_TYPE_HINT_DIALOG);
-	gtk_object_set_data_full(GTK_OBJECT(dialog),
-				 "pathname",
-				 strdup(path),
-				 g_free);
+	g_object_set_data_full(G_OBJECT(dialog), "pathname",
+				 strdup(path), g_free);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
 	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
@@ -246,10 +244,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(vbox), radio[0], FALSE, TRUE, 0);
 	g_free(tmp);
 
-	gtk_object_set_data_full(GTK_OBJECT(dialog),
-				 "radios", radio, g_free);
-	gtk_object_set_data(GTK_OBJECT(dialog),
-				 "mime_type", item->mime_type);
+	g_object_set_data_full(G_OBJECT(dialog), "radios", radio, g_free);
+	g_object_set_data(G_OBJECT(dialog), "mime_type", item->mime_type);
 
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio[0]), TRUE);
 
@@ -261,8 +257,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
 			targets, sizeof(targets) / sizeof(*targets),
 			GDK_ACTION_COPY);
-	gtk_signal_connect(GTK_OBJECT(frame), "drag_data_received",
-			GTK_SIGNAL_FUNC(drag_icon_dropped), dialog);
+	g_signal_connect(frame, "drag_data_received",
+			G_CALLBACK(drag_icon_dropped), dialog);
 
 	vbox2 = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(frame), vbox2);
@@ -274,13 +270,13 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(vbox2), align, FALSE, TRUE, 0);
 	button = gtk_button_new();
 	gtk_container_add(GTK_CONTAINER(align), button);
-	icon = gtk_pixmap_new(im_dirs->pixmap, im_dirs->mask);
+	icon = gtk_image_new_from_pixmap(im_dirs->pixmap, im_dirs->mask);
 	gtk_container_add(GTK_CONTAINER(button), icon);
 	gtk_tooltips_set_tip(tooltips, button,
 			_("Menu of directories previously used for icons"),
 			NULL);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(show_current_dirs_menu), NULL);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(show_current_dirs_menu), NULL);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
@@ -306,10 +302,9 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
-	gtk_object_set_data(GTK_OBJECT(dialog), "icon_path", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(get_path_set_icon),
-			GTK_OBJECT(dialog));
+	g_object_set_data(G_OBJECT(dialog), "icon_path", entry);
+	g_signal_connect_swapped(entry, "activate",
+			G_CALLBACK(get_path_set_icon), dialog);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
@@ -323,9 +318,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	button = gtk_button_new_with_label(_("Remove custom icon"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-				  GTK_SIGNAL_FUNC(remove_icon),
-				  GTK_OBJECT(dialog));
+	g_signal_connect_swapped(button, "clicked",
+				  G_CALLBACK(remove_icon), dialog);
 
 	hbox = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
@@ -334,16 +328,14 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(get_path_set_icon),
-			GTK_OBJECT(dialog));
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(get_path_set_icon), dialog);
 	
 	button = gtk_button_new_with_label(_("Cancel"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(gtk_widget_destroy), dialog);
 
 	gtk_widget_show_all(dialog);
 }
@@ -468,10 +460,10 @@ static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 	guchar  *path = NULL;
 	GtkToggleButton **radio;
 
-	path = gtk_object_get_data(GTK_OBJECT(dialog), "pathname");
+	path = g_object_get_data(G_OBJECT(dialog), "pathname");
 	g_return_if_fail(path != NULL);
 
-	radio = gtk_object_get_data(GTK_OBJECT(dialog), "radios");
+	radio = g_object_get_data(G_OBJECT(dialog), "radios");
 	g_return_if_fail(radio != NULL);
 
 	if (gtk_toggle_button_get_active(radio[0]))
@@ -484,7 +476,7 @@ static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 		gboolean just_media;
 		MIME_type *type;
 		
-		type = gtk_object_get_data(GTK_OBJECT(dialog), "mime_type");
+		type = g_object_get_data(G_OBJECT(dialog), "mime_type");
 		just_media = gtk_toggle_button_get_active(radio[2]);
 
 		if (!set_icon_for_type(type, icon, just_media))
@@ -540,7 +532,7 @@ static void get_path_set_icon(GtkWidget *dialog)
 	GtkEntry *entry;
 	const gchar *icon;
 
-	entry = gtk_object_get_data(GTK_OBJECT(dialog), "icon_path");
+	entry = g_object_get_data(G_OBJECT(dialog), "icon_path");
 	g_return_if_fail(entry != NULL);
 
 	icon = gtk_entry_get_text(entry);
@@ -555,7 +547,7 @@ static void remove_icon(GtkWidget *dialog)
 
 	g_return_if_fail(dialog != NULL);
 
-	path = gtk_object_get_data(GTK_OBJECT(dialog), "pathname");
+	path = g_object_get_data(G_OBJECT(dialog), "pathname");
 	g_return_if_fail(path != NULL);
 
 	delete_globicon(path);
@@ -623,9 +615,9 @@ static void get_dir(gpointer key, gpointer value, gpointer data)
 static void open_icon_dir(GtkMenuItem *item, gpointer data)
 {
 	FilerWindow *filer;
-	char *dir;
+	const char *dir;
 
-	gtk_label_get(GTK_LABEL(GTK_BIN(item)->child), &dir);
+	dir = gtk_label_get_text(GTK_LABEL(GTK_BIN(item)->child));
 	filer = filer_opendir(dir, NULL);
 	if (filer)
 		display_set_thumbs(filer, TRUE);
@@ -638,8 +630,8 @@ static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
 	
 	item = gtk_menu_item_new_with_label(key);
 	gtk_widget_set_accel_path(item, NULL, NULL);	/* XXX */
-	gtk_signal_connect(GTK_OBJECT(item), "activate",
-			GTK_SIGNAL_FUNC(open_icon_dir), NULL);
+	g_signal_connect(item, "activate",
+			G_CALLBACK(open_icon_dir), NULL);
 	g_free(key);
 	gtk_menu_shell_append(menu, item);
 }

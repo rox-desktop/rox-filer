@@ -324,8 +324,8 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->widget);
 	drag_set_pinicon_dest(icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "drag_data_get",
-				GTK_SIGNAL_FUNC(drag_data_get), NULL);
+	g_signal_connect(icon->widget, "drag_data_get",
+				G_CALLBACK(drag_data_get), NULL);
 
 	gtk_widget_realize(icon->win);
 	gtk_widget_realize(icon->widget);
@@ -333,7 +333,7 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	set_size_and_shape(icon, &width, &height);
 	snap_to_grid(&x, &y);
 	offset_from_centre(icon, width, height, &x, &y);
-	gtk_widget_set_uposition(icon->win, x, y);
+	gtk_window_move(GTK_WINDOW(icon->win), x, y);
 	/* Set the correct position in the icon */
 	offset_to_centre(icon, width, height, &x, &y);
 	icon->x = x;
@@ -357,18 +357,18 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
 			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "enter-notify-event",
-			GTK_SIGNAL_FUNC(enter_notify), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "button-press-event",
-			GTK_SIGNAL_FUNC(button_press_event), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "button-release-event",
-			GTK_SIGNAL_FUNC(button_release_event), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
-			GTK_SIGNAL_FUNC(icon_motion_notify), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "expose-event",
-			GTK_SIGNAL_FUNC(draw_icon), icon);
-	gtk_signal_connect_object(GTK_OBJECT(icon->win), "destroy",
-			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
+	g_signal_connect(icon->widget, "enter-notify-event",
+			G_CALLBACK(enter_notify), icon);
+	g_signal_connect(icon->widget, "button-press-event",
+			G_CALLBACK(button_press_event), icon);
+	g_signal_connect(icon->widget, "button-release-event",
+			G_CALLBACK(button_release_event), icon);
+	g_signal_connect(icon->widget, "motion-notify-event",
+			G_CALLBACK(icon_motion_notify), icon);
+	g_signal_connect(icon->widget, "expose-event",
+			G_CALLBACK(draw_icon), icon);
+	g_signal_connect_swapped(icon->win, "destroy",
+			G_CALLBACK(icon_destroyed), icon);
 
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons,
 						 icon);
@@ -456,7 +456,7 @@ void pinboard_reshape_icon(Icon *icon)
 	set_size_and_shape(icon, &width, &height);
 	gdk_window_resize(icon->win->window, width, height);
 	offset_from_centre(icon, width, height, &x, &y);
-	gtk_widget_set_uposition(icon->win, x, y);
+	gtk_window_move(GTK_WINDOW(icon->win), x, y);
 	gtk_widget_queue_draw(icon->win);
 }
 
@@ -481,7 +481,7 @@ static void pinboard_check_options(void)
 
 		if (pinicon_style)
 		{
-			gtk_style_unref(pinicon_style);
+			g_object_unref(G_OBJECT(pinicon_style));
 			pinicon_style = NULL;
 		}
 
@@ -510,7 +510,8 @@ static void mask_wink_border(Icon *icon, GdkColor *alpha)
 
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
-	gtk_widget_draw(icon->widget, NULL);
+	gtk_widget_queue_draw(icon->widget);
+	gdk_window_process_updates(icon->widget->window, TRUE);
 }
 
 #define TEXT_AT(dx, dy)		\
@@ -553,7 +554,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 	width = MAX(iwidth, icon->name_width + 2) + 2 * WINK_FRAME;
 	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
-	gtk_widget_set_usize(icon->win, width, height);
+	gtk_widget_set_size_request(icon->win, width, height);
 	icon->width = width;
 	icon->height = height;
 
@@ -1052,21 +1053,17 @@ static gboolean add_root_handlers(void)
 					proxy_filter, NULL);
 					*/
 
-		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
-				"property_notify_event",
-				GTK_SIGNAL_FUNC(root_property_event), NULL);
-		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
-				"button_press_event",
-				GTK_SIGNAL_FUNC(root_button_press), NULL);
+		g_signal_connect(proxy_invisible, "property_notify_event",
+				G_CALLBACK(root_property_event), NULL);
+		g_signal_connect(proxy_invisible, "button_press_event",
+				G_CALLBACK(root_button_press), NULL);
 
 		/* Drag and drop handlers */
 		drag_set_pinboard_dest(proxy_invisible);
-		gtk_signal_connect(GTK_OBJECT(proxy_invisible), "drag_motion",
-				GTK_SIGNAL_FUNC(bg_drag_motion),
-				NULL);
-		gtk_signal_connect(GTK_OBJECT(proxy_invisible), "drag_leave",
-				GTK_SIGNAL_FUNC(bg_drag_leave),
-				NULL);
+		g_signal_connect(proxy_invisible, "drag_motion",
+				G_CALLBACK(bg_drag_motion), NULL);
+		g_signal_connect(proxy_invisible, "drag_leave",
+				G_CALLBACK(bg_drag_leave), NULL);
 	}
 
 	root = gdk_window_lookup(GDK_ROOT_WINDOW());
@@ -1279,12 +1276,9 @@ static void drag_set_pinicon_dest(Icon *icon)
 
 	make_drop_target(icon->widget, 0);
 
-	gtk_signal_connect(obj, "drag_motion",
-			GTK_SIGNAL_FUNC(drag_motion), icon);
-	gtk_signal_connect(obj, "drag_leave",
-			GTK_SIGNAL_FUNC(drag_leave), icon);
-	gtk_signal_connect(obj, "drag_end",
-			GTK_SIGNAL_FUNC(drag_end), icon);
+	g_signal_connect(obj, "drag_motion", G_CALLBACK(drag_motion), icon);
+	g_signal_connect(obj, "drag_leave", G_CALLBACK(drag_leave), icon);
+	g_signal_connect(obj, "drag_end", G_CALLBACK(drag_end), icon);
 }
 
 /* Called during the drag when the mouse is in a widget registered

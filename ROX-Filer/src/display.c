@@ -610,7 +610,7 @@ void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
 
 	update_views(filer_window);
 
-	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
+	gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 
 	if (!thumbs)
 		filer_cancel_thumbnails(filer_window);
@@ -1235,7 +1235,7 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details)
 	filer_window->details_type = details;
 	update_views(filer_window);
 
-	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
+	gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 }
 
 /* Note: Call shrink_grid after this */

@@ -68,6 +68,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -799,7 +801,7 @@ static GtkWidget *build_frame(void)
 		gtk_box_pack_start(GTK_BOX(hbox), actions, TRUE, TRUE, 0);
 	}
 	
-	button = button_new_mixed(GTK_STOCK_UNDO, "_Revert");
+	button = button_new_mixed(GTK_STOCK_UNDO, _("_Revert"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -808,7 +810,7 @@ static GtkWidget *build_frame(void)
 			_("Restore all choices to how they were when the "
 			  "Options box was opened."), NULL);
 
-	button = button_new_mixed(GTK_STOCK_APPLY, "_OK");
+	button = button_new_mixed(GTK_STOCK_APPLY, _("_OK"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",

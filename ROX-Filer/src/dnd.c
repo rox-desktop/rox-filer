@@ -143,7 +143,7 @@ static GtkWidget *dnd_menu = NULL;
 /* The handler of the signal handler for scroll events.
  * This is used to cancel spring loading when autoscrolling is used.
  */
-static gint scrolled_signal = -1;
+static gulong scrolled_signal = -1;
 static GtkObject *scrolled_adj = NULL;	/* The object watched */
 
 /* Possible values for drop_dest_type (can also be NULL).
@@ -465,10 +465,9 @@ void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults)
 			GDK_ACTION_COPY | GDK_ACTION_ASK | GDK_ACTION_MOVE
 			| GDK_ACTION_LINK | GDK_ACTION_PRIVATE);
 
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_drop",
-			GTK_SIGNAL_FUNC(drag_drop), NULL);
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
-			GTK_SIGNAL_FUNC(drag_data_received), NULL);
+	g_signal_connect(widget, "drag_drop", G_CALLBACK(drag_drop), NULL);
+	g_signal_connect(widget, "drag_data_received",
+			G_CALLBACK(drag_data_received), NULL);
 }
 
 /* Set up this filer window as a drop target. Called once, when the
@@ -480,12 +479,12 @@ void drag_set_dest(FilerWindow *filer_window)
 
 	make_drop_target(widget, 0);
 
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_motion",
-			GTK_SIGNAL_FUNC(drag_motion), filer_window);
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_leave",
-			GTK_SIGNAL_FUNC(drag_leave), filer_window);
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_end",
-			GTK_SIGNAL_FUNC(drag_end), filer_window);
+	g_signal_connect(widget, "drag_motion",
+			G_CALLBACK(drag_motion), filer_window);
+	g_signal_connect(widget, "drag_leave",
+			G_CALLBACK(drag_leave), filer_window);
+	g_signal_connect(widget, "drag_end",
+			G_CALLBACK(drag_end), filer_window);
 }
 
 /* Like drag_set_dest, but for a pinboard-type widget.
@@ -503,9 +502,8 @@ void drag_set_pinboard_dest(GtkWidget *widget)
 			  target_table,
 			  sizeof(target_table) / sizeof(*target_table),
 			  GDK_ACTION_LINK);
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
-			    (GtkSignalFunc) desktop_drag_data_received,
-			    NULL);
+	g_signal_connect(widget, "drag_data_received",
+			    G_CALLBACK(desktop_drag_data_received), NULL);
 }
 
 /* Called during the drag when the mouse is in a widget registered
@@ -674,8 +672,7 @@ static void drag_leave(GtkWidget		*widget,
 	dnd_spring_abort();
 	if (scrolled_adj)
 	{
-		gtk_signal_disconnect(scrolled_adj,
-					scrolled_signal);
+		g_signal_handler_disconnect(scrolled_adj, scrolled_signal);
 		scrolled_adj = NULL;
 	}
 }
@@ -1251,10 +1248,8 @@ static gboolean spring_now(gpointer data)
 		if (spring_window)
 		{
 			gtk_timeout_add(500, spring_check_idle, NULL);
-			gtk_signal_connect(GTK_OBJECT(spring_window->window),
-					"destroy",
-					GTK_SIGNAL_FUNC(spring_win_destroyed),
-					NULL);
+			g_signal_connect(spring_window->window, "destroy",
+					G_CALLBACK(spring_win_destroyed), NULL);
 			centre_window(spring_window->window->window, x, y);
 		}
 	}

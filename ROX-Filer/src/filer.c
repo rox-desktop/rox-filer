@@ -109,7 +109,7 @@ static void filer_size_for(FilerWindow *filer_window,
 			   int w, int h, int n, gboolean allow_shrink);
 
 static void set_selection_state(FilerWindow *collection, gboolean normal);
-static void filer_next_thumb(GtkObject *window, gchar *path);
+static void filer_next_thumb(GObject *window, const gchar *path);
 
 static void start_thumb_scanning(FilerWindow *filer_window);
 
@@ -495,7 +495,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
 
-	gtk_object_set_data(GTK_OBJECT(widget), "filer_window", NULL);
+	g_object_set_data(G_OBJECT(widget), "filer_window", NULL);
 
 	if (window_with_primary == filer_window)
 		window_with_primary = NULL;
@@ -617,7 +617,7 @@ static void selection_get(GtkWidget *widget,
 	int		i;
 	Collection	*collection;
 
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	filer_window = g_object_get_data(G_OBJECT(widget), "filer_window");
 
 	reply = g_string_new(NULL);
 	header = g_string_new(NULL);
@@ -1423,11 +1423,10 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	 * You can thus ref filer_window->window and use this to see
 	 * if the window no longer exists.
 	 */
-	gtk_object_set_data(GTK_OBJECT(filer_window->window),
+	g_object_set_data(G_OBJECT(filer_window->window),
 			"filer_window", filer_window);
 	
-	gtk_object_set_data(GTK_OBJECT(collection),
-			"filer_window", filer_window);
+	g_object_set_data(G_OBJECT(collection), "filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
 
 	filer_window->collection->free_item = display_free_colitem;
@@ -1486,7 +1485,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_widget_show_all(viewport);
 		gtk_box_pack_start(GTK_BOX(vbox), viewport, TRUE, TRUE, 0);
 		filer_window->scrollbar = gtk_vscrollbar_new(adj);
-		gtk_widget_set_usize(viewport, 4, 4);
+		gtk_widget_set_size_request(viewport, 4, 4);
 
 		gtk_container_set_resize_mode(GTK_CONTAINER(viewport),
 						GTK_RESIZE_IMMEDIATE);
@@ -1506,6 +1505,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 				FALSE, TRUE, 0);
 
 		filer_window->thumb_progress = gtk_progress_bar_new();
+		
 		gtk_box_pack_start(GTK_BOX(filer_window->thumb_bar),
 				filer_window->thumb_progress, TRUE, TRUE, 0);
 
@@ -1513,9 +1513,9 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		GTK_WIDGET_UNSET_FLAGS(cancel, GTK_CAN_FOCUS);
 		gtk_box_pack_start(GTK_BOX(filer_window->thumb_bar),
 				cancel, FALSE, TRUE, 0);
-		gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked",
-				GTK_SIGNAL_FUNC(filer_cancel_thumbnails),
-				(GtkObject *) filer_window);
+		g_signal_connect_swapped(cancel, "clicked",
+				G_CALLBACK(filer_cancel_thumbnails),
+				filer_window);
 	}
 
 	/* Put the scrollbar on the left of everything else... */
@@ -1548,14 +1548,12 @@ static void filer_add_signals(FilerWindow *filer_window)
 
 	/* Events on the top-level window */
 	gtk_widget_add_events(filer_window->window, GDK_ENTER_NOTIFY);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window),
-			"enter-notify-event",
-			GTK_SIGNAL_FUNC(pointer_in), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window),
-			"leave-notify-event",
-			GTK_SIGNAL_FUNC(pointer_out), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
-			GTK_SIGNAL_FUNC(filer_window_destroyed), filer_window);
+	g_signal_connect(filer_window->window, "enter-notify-event",
+			G_CALLBACK(pointer_in), filer_window);
+	g_signal_connect(filer_window->window, "leave-notify-event",
+			G_CALLBACK(pointer_out), filer_window);
+	g_signal_connect(filer_window->window, "destroy",
+			G_CALLBACK(filer_window_destroyed), filer_window);
 
 	/* Events on the collection widget */
 	gtk_widget_set_events(GTK_WIDGET(collection),
@@ -1563,29 +1561,29 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-	gtk_signal_connect(collection, "lose_selection",
-			GTK_SIGNAL_FUNC(lose_selection), filer_window);
-	gtk_signal_connect(collection, "selection_changed",
-			GTK_SIGNAL_FUNC(selection_changed), filer_window);
-	gtk_signal_connect(collection, "selection_clear_event",
-			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
-	gtk_signal_connect(collection, "selection_get",
-			GTK_SIGNAL_FUNC(selection_get), NULL);
+	g_signal_connect(collection, "lose_selection",
+			G_CALLBACK(lose_selection), filer_window);
+	g_signal_connect(collection, "selection_changed",
+			G_CALLBACK(selection_changed), filer_window);
+	g_signal_connect(collection, "selection_clear_event",
+			G_CALLBACK(collection_lose_selection), NULL);
+	g_signal_connect(collection, "selection_get",
+			G_CALLBACK(selection_get), NULL);
 	gtk_selection_add_targets(GTK_WIDGET(collection), GDK_SELECTION_PRIMARY,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	gtk_signal_connect(collection, "key_press_event",
-			GTK_SIGNAL_FUNC(key_press_event), filer_window);
-	gtk_signal_connect(collection, "button-release-event",
-			GTK_SIGNAL_FUNC(coll_button_release), filer_window);
-	gtk_signal_connect(collection, "button-press-event",
-			GTK_SIGNAL_FUNC(coll_button_press), filer_window);
-	gtk_signal_connect(collection, "motion-notify-event",
-			GTK_SIGNAL_FUNC(coll_motion_notify), filer_window);
+	g_signal_connect(collection, "key_press_event",
+			G_CALLBACK(key_press_event), filer_window);
+	g_signal_connect(collection, "button-release-event",
+			G_CALLBACK(coll_button_release), filer_window);
+	g_signal_connect(collection, "button-press-event",
+			G_CALLBACK(coll_button_press), filer_window);
+	g_signal_connect(collection, "motion-notify-event",
+			G_CALLBACK(coll_motion_notify), filer_window);
 
 	/* Drag and drop events */
-	gtk_signal_connect(collection, "drag_data_get",
+	g_signal_connect(collection, "drag_data_get",
 			GTK_SIGNAL_FUNC(drag_data_get), NULL);
 	drag_set_dest(filer_window);
 }
@@ -2198,9 +2196,8 @@ static void show_tooltip(guchar *text)
 	gtk_widget_set_app_paintable(tip_widget, TRUE);
 	gtk_widget_set_name(tip_widget, "gtk-tooltips");
 
-	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "expose_event",
-			GTK_SIGNAL_FUNC(filer_tooltip_draw),
-			(GtkObject *) tip_widget);
+	g_signal_connect_swapped(tip_widget, "expose_event",
+			G_CALLBACK(filer_tooltip_draw), tip_widget);
 
 	label = gtk_label_new(text);
 	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
@@ -2222,11 +2219,11 @@ static void show_tooltip(guchar *text)
 	/* And again test if pointer is over the tooltip window */
 	if (py >= y && py <= y + h)
 		y = py - h- 2;
-	gtk_widget_set_uposition(tip_widget, x, y);
+	gtk_window_move(GTK_WINDOW(tip_widget), x, y);
 	gtk_widget_show(tip_widget);
 
-	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "destroy",
-			GTK_SIGNAL_FUNC(tip_destroyed), NULL);
+	g_signal_connect_swapped(tip_widget, "destroy",
+			G_CALLBACK(tip_destroyed), NULL);
 	time(&tip_time);
 }
 
@@ -2292,24 +2289,24 @@ void filer_cancel_thumbnails(FilerWindow *filer_window)
  * unref'd when there is nothing more to do.
  * If the collection no longer has a filer window, nothing is done.
  */
-static gboolean filer_next_thumb_real(GtkObject *window)
+static gboolean filer_next_thumb_real(GObject *window)
 {
 	FilerWindow *filer_window;
 	gchar	*path;
 	int	done, total;
 
-	filer_window = gtk_object_get_data(window, "filer_window");
+	filer_window = g_object_get_data(window, "filer_window");
 
 	if (!filer_window)
 	{
-		gtk_object_unref(window);
+		g_object_unref(window);
 		return FALSE;
 	}
 		
 	if (!filer_window->thumb_queue)
 	{
 		filer_cancel_thumbnails(filer_window);
-		gtk_object_unref(window);
+		g_object_unref(window);
 		return FALSE;
 	}
 
@@ -2324,8 +2321,9 @@ static gboolean filer_next_thumb_real(GtkObject *window)
 						  path);
 	g_free(path);
 
-	gtk_progress_set_percentage(GTK_PROGRESS(filer_window->thumb_progress),
-					done / (float) total);
+	gtk_progress_bar_set_fraction(
+			GTK_PROGRESS_BAR(filer_window->thumb_progress),
+			done / (float) total);
 
 	return FALSE;
 }
@@ -2333,7 +2331,7 @@ static gboolean filer_next_thumb_real(GtkObject *window)
 /* path is the thumb just loaded, if any.
  * collection is unref'd (eventually).
  */
-static void filer_next_thumb(GtkObject *window, gchar *path)
+static void filer_next_thumb(GObject *window, const gchar *path)
 {
 	if (path)
 		dir_force_update_path(path);
@@ -2348,8 +2346,8 @@ static void start_thumb_scanning(FilerWindow *filer_window)
 
 	gtk_widget_show_all(filer_window->thumb_bar);
 
-	gtk_object_ref(GTK_OBJECT(filer_window->window));
-	filer_next_thumb(GTK_OBJECT(filer_window->window), NULL);
+	g_object_ref(G_OBJECT(filer_window->window));
+	filer_next_thumb(G_OBJECT(filer_window->window), NULL);
 }
 
 /* Set this image to be loaded some time in the future */

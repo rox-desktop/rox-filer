@@ -96,14 +96,13 @@ void create_minibuffer(FilerWindow *filer_window)
 	mini = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), mini, TRUE, TRUE, 0);
 	gtk_widget_set_name(mini, "fixed-style");
-	gtk_signal_connect(GTK_OBJECT(mini), "key_press_event",
-			GTK_SIGNAL_FUNC(key_press_event), filer_window);
-	gtk_signal_connect(GTK_OBJECT(mini), "changed",
-			GTK_SIGNAL_FUNC(changed), filer_window);
+	g_signal_connect(mini, "key_press_event",
+			G_CALLBACK(key_press_event), filer_window);
+	g_signal_connect(mini, "changed", G_CALLBACK(changed), filer_window);
 
 	/* Grabbing focus musn't select the text... */
-	gtk_signal_connect_object(GTK_OBJECT(mini), "grab-focus",
-		GTK_SIGNAL_FUNC(grab_focus), GTK_OBJECT(mini));
+	g_signal_connect_swapped(mini, "grab-focus",
+		G_CALLBACK(grab_focus), mini);
 
 	filer_window->minibuffer = mini;
 	filer_window->minibuffer_label = label;
@@ -173,7 +172,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	
 	filer_window->mini_type = mini_type;
 
-	gtk_entry_set_position(mini, pos);
+	gtk_editable_set_position(GTK_EDITABLE(mini), pos);
 
 	gtk_widget_show_all(filer_window->minibuffer_area);
 
@@ -368,12 +367,17 @@ static void complete(FilerWindow *filer_window)
 	else if (current_stem < shortest_stem)
 	{
 		guchar	*extra;
+		gint tmp_pos;
 
 		extra = g_strndup(item->leafname + current_stem,
 				shortest_stem - current_stem);
-		gtk_entry_append_text(entry, extra);
+
+		tmp_pos = entry->text_length;
+		gtk_editable_insert_text(GTK_EDITABLE(entry), extra, -1,
+					 &tmp_pos);
+		
 		g_free(extra);
-		gtk_entry_set_position(entry, -1);
+		gtk_editable_set_position(GTK_EDITABLE(entry), -1);
 
 		if (o_filer_beep_multi.int_value)
 			gdk_beep();
@@ -389,7 +393,7 @@ static void complete(FilerWindow *filer_window)
 			g_string_append_c(new, '/');
 
 		gtk_entry_set_text(entry, new->str);
-		gtk_entry_set_position(entry, -1);
+		gtk_editable_set_position(GTK_EDITABLE(entry), -1);
 	}
 }
 
@@ -984,7 +988,9 @@ static gboolean grab_focus(GtkWidget *minibuffer)
 
 	class->grab_focus(minibuffer);
 
-	gtk_signal_emit_stop_by_name(GTK_OBJECT(minibuffer), "grab_focus");
+	g_signal_stop_emission(minibuffer,
+		g_signal_lookup("grab_focus", G_OBJECT_TYPE(minibuffer)), 0);
+
 
 	return 1;
 }

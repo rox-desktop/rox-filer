@@ -22,6 +22,9 @@
 /* menu.c - code for handling the popup menu */
 
 #include "config.h"
+
+#undef GTK_DISABLE_DEPRECATED
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>

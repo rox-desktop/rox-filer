@@ -302,10 +302,9 @@ GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
 	
 	b = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(b), GTK_RELIEF_NONE);
-	icon = gtk_pixmap_new(im_help->pixmap, im_help->mask);
+	icon = gtk_image_new_from_pixmap(im_help->pixmap, im_help->mask);
 	gtk_container_add(GTK_CONTAINER(b), icon);
-	gtk_signal_connect_object(GTK_OBJECT(b), "clicked",
-			GTK_SIGNAL_FUNC(show_help), data);
+	g_signal_connect_swapped(b, "clicked", G_CALLBACK(show_help), data);
 
 	GTK_WIDGET_UNSET_FLAGS(b, GTK_CAN_FOCUS);
 
@@ -590,13 +589,13 @@ void centre_window(GdkWindow *window, int x, int y)
 
 static GtkWidget *current_wink_widget = NULL;
 static gint	wink_timeout = -1;	/* Called when it's time to stop */
-static gint	wink_destroy;		/* Called if the widget dies first */
+static gulong	wink_destroy;		/* Called if the widget dies first */
 
 static gboolean end_wink(gpointer data)
 {
 	gtk_drag_unhighlight(current_wink_widget);
 
-	gtk_signal_disconnect(GTK_OBJECT(current_wink_widget), wink_destroy);
+	g_signal_handler_disconnect(current_wink_widget, wink_destroy);
 
 	current_wink_widget = NULL;
 
@@ -630,8 +629,8 @@ void wink_widget(GtkWidget *widget)
 	
 	wink_timeout = gtk_timeout_add(300, (GtkFunction) end_wink, NULL);
 
-	wink_destroy = gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
-				GTK_SIGNAL_FUNC(wink_widget_died), NULL);
+	wink_destroy = g_signal_connect_swapped(widget, "destroy",
+				G_CALLBACK(wink_widget_died), NULL);
 }
 
 static gboolean idle_destroy_cb(GtkWidget *widget)

@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -192,23 +194,23 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->name = g_strdup(name);
 	panel->side = side;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_policy(GTK_WINDOW(panel->window), FALSE, FALSE, TRUE);
+	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_events(panel->window,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
 			GDK_BUTTON2_MOTION_MASK);
 
-	gtk_signal_connect(GTK_OBJECT(panel->window), "delete-event",
-			GTK_SIGNAL_FUNC(panel_delete), panel);
-	gtk_signal_connect(GTK_OBJECT(panel->window), "destroy",
-			GTK_SIGNAL_FUNC(panel_destroyed), panel);
-	gtk_signal_connect(GTK_OBJECT(panel->window), "button_press_event",
-			GTK_SIGNAL_FUNC(panel_button_press), panel);
-	gtk_signal_connect(GTK_OBJECT(panel->window), "button_release_event",
-			GTK_SIGNAL_FUNC(panel_button_release), panel);
-	gtk_signal_connect(GTK_OBJECT(panel->window), "motion-notify-event",
-			GTK_SIGNAL_FUNC(panel_motion_event), panel);
+	g_signal_connect(panel->window, "delete-event",
+			G_CALLBACK(panel_delete), panel);
+	g_signal_connect(panel->window, "destroy",
+			G_CALLBACK(panel_destroyed), panel);
+	g_signal_connect(panel->window, "button_press_event",
+			G_CALLBACK(panel_button_press), panel);
+	g_signal_connect(panel->window, "button_release_event",
+			G_CALLBACK(panel_button_release), panel);
+	g_signal_connect(panel->window, "motion-notify-event",
+			G_CALLBACK(panel_motion_event), panel);
 
 	if (strchr(name, '/'))
 		load_path = g_strdup(name);
@@ -267,7 +269,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_box_pack_start(GTK_BOX(box), panel->gap, FALSE, FALSE, 0);
 	
 	frame = make_insert_frame(panel);
-	gtk_object_set_data(GTK_OBJECT(frame), "after", "yes");
+	g_object_set_data(G_OBJECT(frame), "after", "yes");
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
 
 	gtk_widget_realize(panel->window);
@@ -313,10 +315,10 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	current_panel[side] = panel;
 
 	gtk_widget_queue_resize(box);
-	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-request",
-		GTK_SIGNAL_FUNC(panel_post_resize), (GtkObject *) panel);
-	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-allocate",
-			GTK_SIGNAL_FUNC(reposition_panel), (GtkObject *) panel);
+	g_signal_connect(panel->window, "size-request",
+			G_CALLBACK(panel_post_resize), panel);
+	g_signal_connect(panel->window, "size-allocate",
+			G_CALLBACK(reposition_panel), panel);
 
 	number_of_windows++;
 	gtk_widget_show(panel->window);
@@ -456,6 +458,24 @@ static const char *pan_from_file(gchar *line)
 	return NULL;
 }
 
+static gboolean icon_pointer_in(GtkWidget *widget,
+				GdkEventCrossing *event,
+				Icon *icon)
+{
+	gtk_widget_set_state(widget, GTK_STATE_PRELIGHT);
+
+	return 0;
+}
+
+static gboolean icon_pointer_out(GtkWidget *widget,
+				 GdkEventCrossing *event,
+				 Icon *icon)
+{
+	gtk_widget_set_state(widget, GTK_STATE_NORMAL);
+
+	return 0;
+}
+
 /* Add an icon with this path to the panel. If after is TRUE then the
  * icon is added to the right/bottom end of the panel.
  *
@@ -514,18 +534,22 @@ static void panel_add_item(Panel *panel,
 	}
 	diritem_restat(icon->path, icon->item);
 	
-	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
-			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
+	g_signal_connect_swapped(widget, "destroy",
+			  G_CALLBACK(icon_destroyed), icon);
 
 	if (icon->item->base_type == TYPE_DIRECTORY)
 		run_applet(icon);
 
-	gtk_signal_connect(GTK_OBJECT(widget), "button_release_event",
-			GTK_SIGNAL_FUNC(icon_button_release), icon);
-	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
-			GTK_SIGNAL_FUNC(icon_button_press), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
-			GTK_SIGNAL_FUNC(icon_motion_event), icon);
+	g_signal_connect(widget, "button_release_event",
+			G_CALLBACK(icon_button_release), icon);
+	g_signal_connect(widget, "button_press_event",
+			G_CALLBACK(icon_button_press), icon);
+	g_signal_connect(icon->widget, "motion-notify-event",
+			G_CALLBACK(icon_motion_event), icon);
+	g_signal_connect(icon->widget, "enter-notify-event",
+			G_CALLBACK(icon_pointer_in), icon);
+	g_signal_connect(icon->widget, "leave-notify-event",
+			G_CALLBACK(icon_pointer_out), icon);
 
 	if (!icon->socket)
 	{
@@ -749,7 +773,7 @@ static void reposition_panel(GtkWidget *window,
 	if (side == PANEL_BOTTOM)
 		y = screen_height - alloc->height;
 	
-	gtk_widget_set_uposition(panel->window, x, y);
+	gtk_window_move(GTK_WINDOW(panel->window), x, y);
 	gdk_window_move(panel->window->window, x, y);
 
 	if (side == PANEL_BOTTOM || side == PANEL_TOP)
@@ -853,7 +877,7 @@ static void add_uri_list(GtkWidget          *widget,
 
 	g_return_if_fail(selection_data->data[selection_data->length] == '\0');
 
-	if (gtk_object_get_data(GTK_OBJECT(widget), "after"))
+	if (g_object_get_data(G_OBJECT(widget), "after"))
 		after = TRUE;
 
 	uris = uri_list_to_glist(selection_data->data);
@@ -908,7 +932,7 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 		Icon	*icon;
 		xmlNodePtr tree;
 
-		icon = gtk_object_get_data(GTK_OBJECT(next->data), "icon");
+		icon = g_object_get_data(G_OBJECT(next->data), "icon");
 
 		if (!icon)
 		{

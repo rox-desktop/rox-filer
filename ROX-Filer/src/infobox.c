@@ -54,7 +54,7 @@ struct _FileStatus
 };
 
 /* Static prototypes */
-static void refresh_info(GtkObject *window);
+static void refresh_info(GObject *window);
 static GtkWidget *make_vbox(guchar *path);
 static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
@@ -62,7 +62,7 @@ static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static guchar *pretty_type(DirItem *file, guchar *path);
 static GtkWidget *make_vbox(guchar *path);
-static void got_response(GtkObject *window, gint response, gpointer data);
+static void got_response(GObject *window, gint response, gpointer data);
 static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 
 /****************************************************************
@@ -91,11 +91,10 @@ void infobox_new(const gchar *pathname)
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window)->vbox),
 			   details, TRUE, TRUE, 0);
 
-	gtk_object_set_data(GTK_OBJECT(window), "details", details);
-	gtk_object_set_data_full(GTK_OBJECT(window), "path", path, g_free);
+	g_object_set_data(G_OBJECT(window), "details", details);
+	g_object_set_data_full(G_OBJECT(window), "path", path, g_free);
 
-	gtk_signal_connect(GTK_OBJECT(window), "response",
-			GTK_SIGNAL_FUNC(got_response), NULL);
+	g_signal_connect(window, "response", G_CALLBACK(got_response), NULL);
 
 	number_of_windows++;
 	gtk_widget_show_all(window);
@@ -105,7 +104,7 @@ void infobox_new(const gchar *pathname)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void got_response(GtkObject *window, gint response, gpointer data)
+static void got_response(GObject *window, gint response, gpointer data)
 {
 	if (response == GTK_RESPONSE_APPLY)
 		refresh_info(window);
@@ -117,13 +116,13 @@ static void got_response(GtkObject *window, gint response, gpointer data)
 	}
 }
 
-static void refresh_info(GtkObject *window)
+static void refresh_info(GObject *window)
 {
 	GtkWidget	*details, *vbox;
 	guchar		*path;
 
-	path = gtk_object_get_data(window, "path");
-	details = gtk_object_get_data(window, "details");
+	path = g_object_get_data(window, "path");
+	details = g_object_get_data(window, "details");
 	g_return_if_fail(details != NULL);
 	g_return_if_fail(path != NULL);
 
@@ -131,7 +130,7 @@ static void refresh_info(GtkObject *window)
 	gtk_widget_destroy(details);
 
 	details = make_vbox(path);
-	gtk_object_set_data(window, "details", details);
+	g_object_set_data(window, "details", details);
 	gtk_box_pack_start(GTK_BOX(vbox), details, TRUE, TRUE, 0);
 	gtk_widget_show_all(details);
 }
@@ -238,8 +237,8 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),
 			1, NULL, cell_renderer, "text", 1, NULL);
 
-	gtk_signal_connect(GTK_OBJECT(view), "cursor_changed",
-			GTK_SIGNAL_FUNC(set_selection), NULL);
+	g_signal_connect(view, "cursor_changed",
+			G_CALLBACK(set_selection), NULL);
 	
 	add_row(store, _("Name:"), item->leafname);
 
@@ -372,8 +371,8 @@ static GtkWidget *make_file_says(guchar *path)
 			fs->text = g_strdup("");
 			fs->input = gdk_input_add(fs->fd, GDK_INPUT_READ,
 				(GdkInputFunction) add_file_output, fs);
-			gtk_signal_connect(GTK_OBJECT(frame), "destroy",
-				GTK_SIGNAL_FUNC(file_info_destroyed), fs);
+			g_signal_connect(frame, "destroy",
+				G_CALLBACK(file_info_destroyed), fs);
 			break;
 	}
 

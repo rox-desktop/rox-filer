@@ -641,8 +641,8 @@ static void set_shell_action(GtkWidget *dialog)
 	int	error = 0, len;
 	FILE	*file;
 
-	entry = gtk_object_get_data(GTK_OBJECT(dialog), "shell_command");
-	for_all = gtk_object_get_data(GTK_OBJECT(dialog), "set_for_all");
+	entry = g_object_get_data(G_OBJECT(dialog), "shell_command");
+	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
 	g_return_if_fail(entry != NULL);
 
 	command = gtk_entry_get_text(entry);
@@ -889,7 +889,7 @@ void type_set_handler_dialog(MIME_type *type)
 	gtk_dialog_set_has_separator(dialog, FALSE);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-	gtk_object_set_data(GTK_OBJECT(dialog), "mime_type", type);
+	g_object_set_data(G_OBJECT(dialog), "mime_type", type);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
 
@@ -897,13 +897,13 @@ void type_set_handler_dialog(MIME_type *type)
 				type->media_type);
 	radio = gtk_radio_button_new_with_label(NULL, tmp);
 	g_free(tmp);
-	gtk_object_set_data(GTK_OBJECT(dialog), "set_for_all", radio);
+	g_object_set_data(G_OBJECT(dialog), "set_for_all", radio);
 
 	tmp = g_strdup_printf(_("Only for the type `%s/%s'"), type->media_type,
 			type->subtype);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
 	radio = gtk_radio_button_new_with_label(
-			gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
+			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
 			tmp);
 	g_free(tmp);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
@@ -938,8 +938,8 @@ void type_set_handler_dialog(MIME_type *type)
 	gtk_drag_dest_set(eb, GTK_DEST_DEFAULT_ALL,
 			targets, sizeof(targets) / sizeof(*targets),
 			GDK_ACTION_COPY);
-	gtk_signal_connect(GTK_OBJECT(eb), "drag_data_received",
-			GTK_SIGNAL_FUNC(drag_app_dropped), dialog);
+	g_signal_connect(eb, "drag_data_received",
+			G_CALLBACK(drag_app_dropped), dialog);
 
 	label = gtk_label_new(_("Drop a suitable\napplication here"));
 	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
@@ -965,22 +965,22 @@ void type_set_handler_dialog(MIME_type *type)
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
-	gtk_object_set_data(GTK_OBJECT(dialog), "shell_command", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(set_shell_action), GTK_OBJECT(dialog));
+	g_object_set_data(G_OBJECT(dialog), "shell_command", entry);
+	g_signal_connect_swapped(GTK_OBJECT(entry), "activate",
+			G_CALLBACK(set_shell_action), GTK_OBJECT(dialog));
 
 	/* If possible, fill in the entry box with the current command */
 	tmp = get_current_command(type);
 	if (tmp)
 	{
 		gtk_entry_set_text(GTK_ENTRY(entry), tmp);
-		gtk_entry_set_position(GTK_ENTRY(entry), -1);
+		gtk_editable_set_position(GTK_EDITABLE(entry), -1);
 		g_free(tmp);
 	}
 	else
 	{
 		gtk_entry_set_text(GTK_ENTRY(entry), " \"$1\"");
-		gtk_entry_set_position(GTK_ENTRY(entry), 0);
+		gtk_editable_set_position(GTK_EDITABLE(entry), 0);
 	}
 
 	gtk_dialog_add_buttons(dialog,
@@ -993,8 +993,8 @@ void type_set_handler_dialog(MIME_type *type)
 
 	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
 	
-	gtk_signal_connect(GTK_OBJECT(dialog), "response",
-			GTK_SIGNAL_FUNC(set_action_response), NULL);
+	g_signal_connect(dialog, "response",
+			G_CALLBACK(set_action_response), NULL);
 
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
@@ -1012,8 +1012,8 @@ char *get_action_save_path(GtkWidget *dialog)
 	GtkToggleButton *for_all;
 
 	g_return_val_if_fail(dialog != NULL, NULL);
-	type = gtk_object_get_data(GTK_OBJECT(dialog), "mime_type");
-	for_all = gtk_object_get_data(GTK_OBJECT(dialog), "set_for_all");
+	type = g_object_get_data(G_OBJECT(dialog), "mime_type");
+	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
 	g_return_val_if_fail(for_all != NULL && type != NULL, NULL);
 
 	if (gtk_toggle_button_get_active(for_all))
@@ -1154,8 +1154,8 @@ static GList *build_type_reread(Option *none, xmlNode *node, guchar *label)
 	button = gtk_button_new_with_label(_(label));
 	gtk_container_add(GTK_CONTAINER(align), button);
 
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(reread_mime_files), NULL);
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(reread_mime_files), NULL);
 
 	return g_list_append(NULL, align);
 }
@@ -1170,8 +1170,8 @@ static GList *build_type_edit(Option *none, xmlNode *node, guchar *label)
 	button = gtk_button_new_with_label(_(label));
 	gtk_container_add(GTK_CONTAINER(align), button);
 
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(edit_mime_types), NULL);
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(edit_mime_types), NULL);
 
 	return g_list_append(NULL, align);
 }

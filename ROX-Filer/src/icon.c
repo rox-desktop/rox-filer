@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <string.h>
 
 #include <gtk/gtkinvisible.h>

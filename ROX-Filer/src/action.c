@@ -23,8 +23,6 @@
  * These routines generally fork() and talk to us via pipes.
  */
 
-#define GTK_DISABLE_DEPRECATED
-
 #include "config.h"
 
 #include <stdio.h>

@@ -28,6 +28,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>

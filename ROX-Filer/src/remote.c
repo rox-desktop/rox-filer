@@ -183,8 +183,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			(void *) &xwindow, 1);
 
 	/* Get notified when we get a message */
-	gtk_signal_connect(GTK_OBJECT(ipc_window), "client-event",
-			GTK_SIGNAL_FUNC(client_event), NULL);
+	g_signal_connect(ipc_window, "client-event",
+			G_CALLBACK(client_event), NULL);
 
 	/* Make the root window contain a pointer to the IPC window */
 	gdk_property_change(GDK_ROOT_PARENT(), filer_atom,
@@ -817,9 +817,8 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 	event.message_type = xsoap;
 	
 	gtk_widget_add_events(from, GDK_PROPERTY_CHANGE_MASK);
-	gtk_signal_connect(GTK_OBJECT(from), "property-notify-event",
-				GTK_SIGNAL_FUNC(soap_done),
-				GINT_TO_POINTER(prop));
+	g_signal_connect(from, "property-notify-event",
+			 G_CALLBACK(soap_done), GINT_TO_POINTER(prop));
 
 	gdk_event_send_client_message((GdkEvent *) &event,
 				      GDK_WINDOW_XWINDOW(dest));

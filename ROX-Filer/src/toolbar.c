@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <string.h>
 
 #include "global.h"
@@ -191,8 +193,8 @@ GtkWidget *toolbar_tool_option(int i)
 	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_pixmap_new(tool->icon->pixmap,
-				     tool->icon->mask);
+	icon_widget = gtk_image_new_from_pixmap(tool->icon->pixmap,
+						tool->icon->mask);
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
@@ -205,10 +207,10 @@ GtkWidget *toolbar_tool_option(int i)
 	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
 	gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
 
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-		GTK_SIGNAL_FUNC(toggle_shaded), GTK_OBJECT(vbox));
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(toggle_shaded), vbox);
 
-	gtk_object_set_data(GTK_OBJECT(button), "tool_name", tool->name);
+	g_object_set_data(G_OBJECT(button), "tool_name", tool->name);
 
 	return button;
 }
@@ -360,7 +362,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 	filer_window->toolbar_text = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text), 0, 0.5);
-	gtk_widget_set_usize(filer_window->toolbar_text, 8, -1);
+	gtk_widget_set_size_request(filer_window->toolbar_text, 8, -1);
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
 			TRUE, TRUE, 4);
 

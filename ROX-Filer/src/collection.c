@@ -26,6 +26,8 @@
 
 #include "config.h"
 
+#undef GTK_DISABLE_DEPRECATED
+
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
