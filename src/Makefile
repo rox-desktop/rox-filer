@@ -1,5 +1,5 @@
 
-CFLAGS=-Wall -g
+CFLAGS=-Wall -g -DXDG_PREFIX=xdg_test
 
 all: test-mime
 

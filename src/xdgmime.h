@@ -42,11 +42,15 @@ extern const char *xdg_mime_type_unknown;
 #define XDG_ENTRY(func) _XDG_ENTRY2(XDG_PREFIX,func)
 #define _XDG_ENTRY2(prefix,func) _XDG_ENTRY3(prefix,func)
 #define _XDG_ENTRY3(prefix,func) prefix##_##func
+#endif
 
+  
+#ifdef XDG_PREFIX
 #define xdg_mime_get_mime_type_for_data       XDG_ENTRY(get_mime_type_for_data)
 #define xdg_mime_get_mime_type_for_file       XDG_ENTRY(get_mime_type_for_file)
 #define xdg_mime_get_mime_type_from_file_name XDG_ENTRY(get_mime_type_from_file_name)
 #define xdg_mime_is_valid_mime_type           XDG_ENTRY(is_valid_mime_type)
+#define xdg_mime_type_unknown                 XDG_ENTRY(type_unknown)
 #endif
 
 const char *xdg_mime_get_mime_type_for_data       (const void *data,

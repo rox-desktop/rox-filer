@@ -121,8 +121,9 @@ xdg_mime_init (void)
 	    len = end_ptr - ptr;
 	  else
 	    len = end_ptr - ptr + 1;
-	  dir = malloc (len);
+	  dir = malloc (len + 1);
 	  strncpy (dir, ptr, len);
+	  dir[len] = '\0';
 	  _xdg_mime_init_from_directory (dir);
 	  free (dir);
 
