@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
+#include <parser.h>
 
 #include <gtk/gtk.h>
 
@@ -37,6 +38,7 @@
 #include "dir.h"
 #include "type.h"
 #include "infobox.h"
+#include "appinfo.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -50,12 +52,16 @@ struct _FileStatus
 };
 
 /* Static prototypes */
-static GtkWidget *make_clist(guchar *path);
+static void refresh_info(GtkObject *window);
+static GtkWidget *make_vbox(guchar *path);
+static GtkWidget *make_clist(guchar *path,
+		DirItem *item, struct _xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
 static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static guchar *pretty_type(DirItem *file, guchar *path);
+static GtkWidget *make_vbox(guchar *path);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -64,8 +70,8 @@ static guchar *pretty_type(DirItem *file, guchar *path);
 /* Create and display a new info box showing details about this item */
 void infobox_new(guchar *path)
 {
-	GtkWidget	*window, *vbox, *list, *file, *button;
-
+	GtkWidget	*window, *hbox, *vbox, *details, *button;
+	
 	g_return_if_fail(path != NULL);
 
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
@@ -75,20 +81,31 @@ void infobox_new(guchar *path)
 
 	vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(window), vbox);
+	
+	details = make_vbox(path);
+	gtk_box_pack_start(GTK_BOX(vbox), details, TRUE, TRUE, 0);
 
-	list = make_clist(path);
-	gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
+	hbox = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_end(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
-	file = make_file_says(path);
-	gtk_box_pack_start(GTK_BOX(vbox), file, TRUE, TRUE, 0);
+	button = gtk_button_new_with_label(_("Refresh"));
+	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(button), GTK_CAN_DEFAULT);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(refresh_info),
+			GTK_OBJECT(window));
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 
-	button = gtk_button_new_with_label(_("OK"));
+	button = gtk_button_new_with_label(_("Cancel"));
 	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(button), GTK_CAN_DEFAULT);
 	gtk_window_set_default(GTK_WINDOW(window), button);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(gtk_widget_destroy),
 			GTK_OBJECT(window));
-	gtk_box_pack_start(GTK_BOX(vbox), button, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+
+	gtk_object_set_data(GTK_OBJECT(window), "details", details);
+	gtk_object_set_data_full(GTK_OBJECT(window), "path", g_strdup(path),
+			g_free);
 
 	gtk_widget_show_all(window);
 }
@@ -97,17 +114,72 @@ void infobox_new(guchar *path)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+static void refresh_info(GtkObject *window)
+{
+	GtkWidget	*details, *vbox;
+	guchar		*path;
+
+	path = gtk_object_get_data(window, "path");
+	details = gtk_object_get_data(window, "details");
+	g_return_if_fail(details != NULL);
+	g_return_if_fail(path != NULL);
+
+	vbox = details->parent;
+	gtk_widget_destroy(details);
+
+	details = make_vbox(path);
+	gtk_object_set_data(window, "details", details);
+	gtk_box_pack_start(GTK_BOX(vbox), details, TRUE, TRUE, 0);
+	gtk_widget_show_all(details);
+}
+
+/* Create the VBox widget that contains the details */
+static GtkWidget *make_vbox(guchar *path)
+{
+	DirItem		item;
+	GtkWidget	*vbox, *list, *file;
+	AppInfo		*ai;
+	struct _xmlNode *about = NULL;
+
+	g_return_val_if_fail(path[0] == '/', NULL);
+	
+	dir_stat(path, &item, FALSE);
+	item.leafname = strrchr(path, '/') + 1;
+
+	vbox = gtk_vbox_new(FALSE, 4);
+
+	ai = appinfo_get(path, &item);
+	if (ai)
+		about = appinfo_get_section(ai, "About");
+
+	list = make_clist(path, &item, about);
+	gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
+
+	if (!about)
+	{
+		file = make_file_says(path);
+		gtk_box_pack_start(GTK_BOX(vbox), file, TRUE, TRUE, 0);
+	}
+
+	if (ai)
+		appinfo_unref(ai);
+
+	item.leafname = NULL;
+	dir_item_clear(&item);
+
+	return vbox;
+}
+
 /* Create the CList with the file's details */
-static GtkWidget *make_clist(guchar *path)
+static GtkWidget *make_clist(guchar *path,
+		DirItem *item, struct _xmlNode *about)
 {
 	GtkCList	*table;
 	GString		*gstring;
 	struct stat	info;
 	char		*data[] = {NULL, NULL, NULL};
-	DirItem		item;
+	struct _xmlNode *prop;
 
-	g_return_val_if_fail(path[0] == '/', NULL);
-	
 	table = GTK_CLIST(gtk_clist_new(2));
 	GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(table), GTK_CAN_FOCUS);
 	gtk_clist_set_column_auto_resize(table, 0, TRUE);
@@ -115,7 +187,7 @@ static GtkWidget *make_clist(guchar *path)
 	gtk_clist_set_column_justification(table, 0, GTK_JUSTIFY_RIGHT);
 	
 	data[0] = _("Name:");
-	data[1] = strrchr(path, '/') + 1;
+	data[1] = item->leafname;
 	gtk_clist_append(table, data);
 
 	if (lstat(path, &info))
@@ -167,12 +239,30 @@ static GtkWidget *make_clist(guchar *path)
 	data[1] = pretty_permissions(info.st_mode);
 	gtk_clist_append(table, data);
 	
-	dir_stat(path, &item, FALSE);
 	data[0] = _("Type:");
-	data[1] = pretty_type(&item, path);
+	data[1] = pretty_type(item, path);
 	gtk_clist_append(table, data);
 	g_free(data[1]);
-	dir_item_clear(&item);
+
+	if (about)
+	{
+		data[0] = data[1] = "";
+		gtk_clist_append(table, data);
+		gtk_clist_set_selectable(table, table->rows - 1, FALSE);
+		for (prop = about->xmlChildrenNode; prop; prop = prop->next)
+		{
+			if (prop->type == XML_ELEMENT_NODE)
+			{
+				data[0] = g_strconcat((char *) prop->name,
+						":", NULL);
+				data[1] = xmlNodeListGetString(prop->doc,
+						prop->xmlChildrenNode, 1);
+				gtk_clist_append(table, data);
+				g_free(data[0]);
+				g_free(data[1]);
+			}
+		}
+	}
 
 	return GTK_WIDGET(table);
 }
@@ -186,8 +276,6 @@ static GtkWidget *make_file_says(guchar *path)
 	FileStatus 	*fs = NULL;
 	guchar 		*tmp;
 
-	g_return_val_if_fail(path[0] == '/', NULL);
-	
 	frame = gtk_frame_new(_("file(1) says..."));
 	file_label = gtk_label_new(_("<nothing yet>"));
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
