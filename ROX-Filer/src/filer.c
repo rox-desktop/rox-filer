@@ -50,8 +50,7 @@
 #include "type.h"
 #include "options.h"
 #include "minibuffer.h"
-#include "pinboard.h"
-#include "panel.h"
+#include "icon.h"
 #include "toolbar.h"
 #include "bind.h"
 
@@ -1184,8 +1183,7 @@ void filer_check_mounted(char *path)
 		g_free(parent);
 	}
 
-	pinboard_may_update(path);
-	panel_may_update(path);
+	icons_may_update(path);
 }
 
 /* Like minibuffer_show(), except that:

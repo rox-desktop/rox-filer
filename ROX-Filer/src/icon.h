@@ -14,7 +14,11 @@
 
 typedef void (*RenameFn)(Icon *icon);
 
+typedef enum {ICON_PANEL, ICON_PINBOARD} IconType;
+
 struct _Icon {
+	IconType	type;
+
 	GtkWidget	*widget;	/* The drawing area for the icon */
 	gboolean	selected;
 	guchar		*src_path;	/* Eg: ~/Apps */
@@ -30,9 +34,14 @@ struct _Icon {
 	Panel		*panel;		/* Panel containing this icon */
 };
 
+void icon_init(void);
 void show_rename_box(GtkWidget	*widget,
 		     Icon	*icon,
 		     RenameFn	callback);
 guchar *icon_convert_path(guchar *path);
+void icon_hash_path(Icon *icon);
+void icon_unhash_path(Icon *icon);
+gboolean icons_require(guchar *path);
+void icons_may_update(guchar *path);
 
 #endif /* _ICON_H */

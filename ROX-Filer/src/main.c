@@ -62,6 +62,7 @@
 #include "run.h"
 #include "toolbar.h"
 #include "bind.h"
+#include "icon.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -156,7 +157,7 @@ static gboolean child_died_flag = FALSE;
 static void child_died(int signum)
 {
 	child_died_flag = TRUE;
-	write(to_error_log, '\0', 1);	/* Wake up! */
+	write(to_error_log, "\0", 1);	/* Wake up! */
 }
 
 static void child_died_callback(void)
@@ -416,6 +417,8 @@ int main(int argc, char **argv)
 	options_init();
 	type_init();
 	action_init();
+
+	icon_init();
 	pinboard_init();
 	panel_init();
 

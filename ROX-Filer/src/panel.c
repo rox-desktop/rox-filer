@@ -99,7 +99,6 @@ static gint panel_button_release(GtkWidget *widget,
 static gint panel_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
-static void icon_may_update(Icon *icon);
 static void size_icon(Icon *icon);
 static void drag_set_panel_dest(Icon *icon);
 static void add_uri_list(GtkWidget          *widget,
@@ -175,11 +174,6 @@ static gboolean tmp_icon_selected = FALSE;
 /* A list of selected Icons */
 static GList *panel_selection = NULL;
 
-/* Each entry is a GList of Icons which have the given pathname.
- * This allows us to update all necessary icons when something changes.
- */
-static GHashTable *icons_hash = NULL;
-
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
 
 /* When sliding the panel, records where the panel was before */
@@ -203,8 +197,6 @@ void panel_init(void)
 				 "<panel>");
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
-
-	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	selection_invisible = gtk_invisible_new();
 
@@ -341,54 +333,28 @@ Panel *panel_new(guchar *name, PanelSide side)
 	return panel;
 }
 
-/* If path is on a panel then it may have changed... check! */
-void panel_may_update(guchar *path)
-{
-	GList	*affected;
-
-	affected = g_hash_table_lookup(icons_hash, path);
-
-	while (affected)
-	{
-		Icon *icon = (Icon *) affected->data;
-
-		icon_may_update(icon);
-
-		affected = affected->next;
-	}
-}
-
-typedef struct _CheckData CheckData;
-struct _CheckData {
-	guchar	 *path;
-	gboolean found;
-};
-
-static void check_has(gpointer key, GList *icons, CheckData *check)
-{
-	Icon	*icon;
-	
-	g_return_if_fail(icons != NULL);
-	
-	icon = icons->data;
-
-	if (is_sub_dir(icon->path, check->path))
-		check->found = TRUE;
-}
-
-/* Returns TRUE if the pinboard contains this item (or any item inside
- * this item).
+/* See if the file the icon points to has changed. Update the icon
+ * if so.
  */
-gboolean panel_has(guchar *path)
+void panel_icon_may_update(Icon *icon)
 {
-	CheckData	check;
+	MaskedPixmap	*image = icon->item.image;
+	int		flags = icon->item.flags;
 
-	check.path = path;
-	check.found = FALSE;
-	g_hash_table_foreach(icons_hash, (GHFunc) check_has, &check);
+	pixmap_ref(image);
+	mount_update(FALSE);
+	dir_restat(icon->path, &icon->item);
 
-	return check.found;
+	if (icon->item.image != image || icon->item.flags != flags)
+	{
+		size_icon(icon);
+		gtk_widget_queue_clear(icon->widget);
+		reposition_panel(icon->panel);
+	}
+
+	pixmap_unref(image);
 }
+
 
 
 /****************************************************************
@@ -469,7 +435,6 @@ static void panel_add_item(Panel *panel,
 	GtkWidget	*widget;
 	Icon	*icon;
 	GdkFont		*font;
-	GList		*list;
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,
@@ -487,15 +452,14 @@ static void panel_add_item(Panel *panel,
 	font = widget->style->font;
 
 	icon = g_new(Icon, 1);
+	icon->type = ICON_PANEL;
 	icon->panel = panel;
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 
 	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
 	
-	list = g_hash_table_lookup(icons_hash, icon->path);
-	list = g_list_prepend(list, icon);
-	g_hash_table_insert(icons_hash, icon->path, list);
+	icon_hash_path(icon);
 	
 	icon->widget = widget;
 	icon->selected = FALSE;
@@ -603,18 +567,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 static void icon_destroyed(Icon *icon)
 {
-	GList		*list;
-
-	list = g_hash_table_lookup(icons_hash, icon->path);
-	g_return_if_fail(list != NULL);
-
-	list = g_list_remove(list, icon);
-
-	/* Remove it first; the hash key may have changed address */
-	g_hash_table_remove(icons_hash, icon->path);
-	if (list)
-		g_hash_table_insert(icons_hash,
-				((Icon *) list->data)->path, list);
+	icon_unhash_path(icon);
 
 	if (g_list_find(panel_selection, icon))
 	{
@@ -965,6 +918,8 @@ static void popup_panel_menu(GdkEventButton *event,
 
 static void rename_cb(Icon *icon)
 {
+
+	
 	size_icon(icon);
 	gtk_widget_queue_clear(icon->widget);
 	reposition_panel(icon->panel);
@@ -1043,28 +998,8 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	}
 
 	panel_save(panel);
-}
 
-/* See if the file the icon points to has changed. Update the icon
- * if so.
- */
-static void icon_may_update(Icon *icon)
-{
-	MaskedPixmap	*image = icon->item.image;
-	int		flags = icon->item.flags;
-
-	pixmap_ref(image);
-	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item);
-
-	if (icon->item.image != image || icon->item.flags != flags)
-	{
-		size_icon(icon);
-		gtk_widget_queue_clear(icon->widget);
-		reposition_panel(icon->panel);
-	}
-
-	pixmap_unref(image);
+	reposition_panel(panel);
 }
 
 /* Same as drag_set_dest(), but for panel icons */
@@ -1346,7 +1281,7 @@ static gboolean enter_icon(GtkWidget *widget,
 			   GdkEventCrossing *event,
 			   Icon *icon)
 {
-	icon_may_update(icon);
+	panel_icon_may_update(icon);
 
 	return FALSE;
 }

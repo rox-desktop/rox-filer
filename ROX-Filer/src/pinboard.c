@@ -161,7 +161,6 @@ static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
 		       Icon		*icon);
-static void icon_may_update(Icon *icon);
 static void forward_root_clicks(void);
 static void change_number_selected(int delta);
 static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
@@ -309,6 +308,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	g_return_if_fail(current_pinboard != NULL);
 
 	icon = g_new(Icon, 1);
+	icon->type = ICON_PINBOARD;
 	icon->selected = FALSE;
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
@@ -316,6 +316,8 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	snap_to_grid(&x, &y);
 	icon->x = x;
 	icon->y = y;
+
+	icon_hash_path(icon);
 
 	dir_stat(icon->path, &icon->item);
 
@@ -468,23 +470,6 @@ void pinboard_clear(void)
 	gdk_window_set_user_data(GDK_ROOT_PARENT(), NULL);
 }
 
-/* If path is on the pinboard then it may have changed... check! */
-void pinboard_may_update(guchar *path)
-{
-	GList	*next;
-
-	if (!current_pinboard)
-		return;
-
-	for (next = current_pinboard->icons; next; next = next->next)
-	{
-		Icon	*icon = (Icon *) next->data;
-
-		if (strcmp(icon->path, path) == 0)
-			icon_may_update(icon);
-	}
-}
-
 /* Return the single selected icon, or NULL */
 Icon *pinboard_selected_icon(void)
 {
@@ -614,7 +599,7 @@ static void reshape_icon(Icon *icon)
 /* See if the file the icon points to has changed. Update the icon
  * if so.
  */
-static void icon_may_update(Icon *icon)
+void pinboard_icon_may_update(Icon *icon)
 {
 	MaskedPixmap	*image = icon->item.image;
 	int		flags = icon->item.flags;
@@ -917,7 +902,7 @@ static gboolean enter_notify(GtkWidget *widget,
 			     GdkEventCrossing *event,
 			     Icon *icon)
 {
-	icon_may_update(icon);
+	pinboard_icon_may_update(icon);
 
 	return FALSE;
 }
@@ -1350,6 +1335,8 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 static void icon_destroyed(GtkWidget *widget, Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
+
+	icon_unhash_path(icon);
 
 	if (icon->selected)
 		change_number_selected(-1);

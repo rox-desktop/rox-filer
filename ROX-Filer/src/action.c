@@ -45,8 +45,7 @@
 #include "modechange.h"
 #include "find.h"
 #include "dir.h"
-#include "pinboard.h"
-#include "panel.h"
+#include "icon.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -2197,7 +2196,7 @@ static gboolean remove_pinned_ok(FilerWindow *filer_window)
 		item = (DirItem *) collection->items[i].data;
 		path = make_path(filer_window->path, item->leafname)->str;
 
-		if (pinboard_has(path) || panel_has(path))
+		if (icons_require(path))
 		{
 			if (++ask_n > MAX_ASK)
 				break;

@@ -33,7 +33,16 @@
 
 #include "main.h"
 #include "gui_support.h"
+#include "support.h"
+#include "pinboard.h"
+#include "panel.h"
 #include "icon.h"
+
+
+/* Each entry is a GList of Icons which have the given pathname.
+ * This allows us to update all necessary icons when something changes.
+ */
+static GHashTable *icons_hash = NULL;
 
 /* Static prototypes */
 static void rename_activate(GtkWidget *dialog);
@@ -41,6 +50,11 @@ static void rename_activate(GtkWidget *dialog);
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
+
+void icon_init(void)
+{
+	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
+}
 
 /* Opens a box allowing the user to change the name of a pinned icon.
  * If 'widget' is destroyed then the box will close.
@@ -139,6 +153,100 @@ guchar *icon_convert_path(guchar *path)
 	return retval;
 }
 
+/* The icons_hash table allows us to convert from a path to a list
+ * of icons that use that path.
+ * Add this icon to the list for its path.
+ */
+void icon_hash_path(Icon *icon)
+{
+	GList	*list;
+
+	g_return_if_fail(icon != NULL);
+
+	/* g_print("[ hashing '%s' ]\n", icon->path); */
+
+	list = g_hash_table_lookup(icons_hash, icon->path);
+	list = g_list_prepend(list, icon);
+	g_hash_table_insert(icons_hash, icon->path, list);
+}
+
+/* Remove this icon from the icons_hash table */
+void icon_unhash_path(Icon *icon)
+{
+	GList	*list;
+
+	g_return_if_fail(icon != NULL);
+
+	/* g_print("[ unhashing '%s' ]\n", icon->path); */
+	
+	list = g_hash_table_lookup(icons_hash, icon->path);
+	g_return_if_fail(list != NULL);
+
+	list = g_list_remove(list, icon);
+
+	/* Remove it first; the hash key may have changed address */
+	g_hash_table_remove(icons_hash, icon->path);
+	if (list)
+		g_hash_table_insert(icons_hash,
+				((Icon *) list->data)->path, list);
+}
+
+/* If path is on an icon then it may have changed... check!
+ */
+void icons_may_update(guchar *path)
+{
+	GList	*affected;
+
+	/* g_print("[ icons_may_update(%s) ]\n", path); */
+
+	affected = g_hash_table_lookup(icons_hash, path);
+
+	while (affected)
+	{
+		Icon *icon = (Icon *) affected->data;
+
+		if (icon->type == ICON_PANEL)
+			panel_icon_may_update(icon);
+		else
+			pinboard_icon_may_update(icon);
+
+		affected = affected->next;
+	}
+}
+
+typedef struct _CheckData CheckData;
+struct _CheckData {
+	guchar	 *path;
+	gboolean found;
+};
+
+static void check_has(gpointer key, GList *icons, CheckData *check)
+{
+	Icon	*icon;
+	
+	g_return_if_fail(icons != NULL);
+	
+	icon = icons->data;
+
+	if (is_sub_dir(icon->path, check->path))
+		check->found = TRUE;
+}
+
+/* Returns TRUE if any icon links to this item (or any item inside
+ * this item).
+ */
+gboolean icons_require(guchar *path)
+{
+	CheckData	check;
+
+	/* g_print("[ icons_require(%s)? ]\n", path); */
+
+	check.path = path;
+	check.found = FALSE;
+	g_hash_table_foreach(icons_hash, (GHFunc) check_has, &check);
+
+	return check.found;
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -176,12 +284,17 @@ static void rename_activate(GtkWidget *dialog)
 	else
 	{
 		GdkFont	*font = icon->widget->style->font;
-
+		
 		g_free(icon->item.leafname);
 		g_free(icon->src_path);
-		g_free(icon->path);
+
 		icon->src_path = g_strdup(new_src);
+
+		icon_unhash_path(icon);
+		g_free(icon->path);
 		icon->path = icon_convert_path(new_src);
+		icon_hash_path(icon);
+		
 		icon->item.leafname = g_strdup(new_name);
 		icon->item.name_width = gdk_string_width(font, new_name);
 		dir_restat(icon->path, &icon->item);

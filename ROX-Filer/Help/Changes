@@ -2,6 +2,18 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+23-Nov-2000
+~~~~~~~~~~~
+Bugfix: On many systems, the filer would fail to remove zombie processes
+	due to a typo (spotted by Philip Hazel and tracked down by Stephen
+	Watson).
+
+22-Nov-2000
+~~~~~~~~~~~
+Bugfix: Removing an item from the panel now resizes the panel (reported
+	by Wilbert Berendsen).
+Bugfix: Editing an icon's path failed to update its hash entry.
+
 20-Nov-2000
 ~~~~~~~~~~~
 If a case-sensitve match for an extension can't be found then try a
