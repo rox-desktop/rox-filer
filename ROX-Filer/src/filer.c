@@ -1247,7 +1247,7 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	filer_set_title(filer_window);
 	if (wm_class)
 		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window),
-					wm_class, PROJECT);
+				       wm_class, PROJECT);
 
 	/* This property is cleared when the window is destroyed.
 	 * You can thus ref filer_window->window and use this to see

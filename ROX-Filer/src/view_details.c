@@ -33,6 +33,7 @@
 #include "support.h"
 #include "type.h"
 #include "filer.h"
+#include "display.h"
 
 /* These are the column numbers in the ListStore */
 #define COL_LEAF 0
@@ -42,7 +43,8 @@
 #define COL_GROUP 4
 #define COL_SIZE 5
 #define COL_MTIME 6
-#define N_COLUMNS 7
+#define COL_ITEM 7
+#define N_COLUMNS 8
 
 static gpointer parent_class = NULL;
 
@@ -172,25 +174,40 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	GTK_OBJECT_CLASS(object)->destroy = view_details_destroy;
 }
 
+static gint list_sort_by_name(GtkTreeModel *list,
+			      GtkTreeIter *a,
+			      GtkTreeIter *b,
+			      gpointer user_data)
+{
+	DirItem *i_a, *i_b;
+
+	gtk_tree_model_get(list, a, COL_ITEM, &i_a, -1);
+	gtk_tree_model_get(list, b, COL_ITEM, &i_b, -1);
+
+	return sort_by_name(i_a, i_b);
+}
+
 static void view_details_init(GTypeInstance *object, gpointer gclass)
 {
 	GtkTreeView *treeview = (GtkTreeView *) object;
 	GtkTreeViewColumn *column;
 	GtkCellRenderer *cell;
 	GtkListStore *model;
+	GtkTreeSortable *sortable_list;
 
 	model = gtk_list_store_new(N_COLUMNS,
 				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
 				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				   G_TYPE_STRING);
+				   G_TYPE_STRING, G_TYPE_POINTER);
+
+	sortable_list = GTK_TREE_SORTABLE(model);
+	gtk_tree_sortable_set_sort_func(sortable_list, COL_LEAF,
+					list_sort_by_name,
+					NULL, NULL);
+	gtk_tree_sortable_set_sort_column_id(sortable_list, COL_LEAF,
+			GTK_SORT_ASCENDING);
 
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(model));
-
-#if 0
-	cell = gtk_cell_renderer_toggle_new();
-	gtk_tree_view_insert_column_with_attributes(treeview,
-			0, NULL, cell);
-#endif
 
 	cell = gtk_cell_renderer_text_new();
 
@@ -285,6 +302,48 @@ static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf)
 	return FALSE;
 }
 
+/* Some items have been added. Resort. */
+static void resort_list(GtkListStore *list)
+{
+	int old_id = list->sort_column_id;
+	
+	/* Huge hack. Is there really no proper way to do this?? */
+
+	list->sort_column_id = -100;
+	/* g_print("[ resorting ]\n"); */
+	gtk_tree_sortable_set_sort_column_id(GTK_TREE_SORTABLE(list),
+					  old_id, list->order);
+}
+
+static void update_item(GtkListStore *list, GtkTreeIter *iter, DirItem *item)
+{
+	char *time;
+	mode_t m = item->mode;
+	const char *type =
+		item->flags & ITEM_FLAG_APPDIR? "App" :
+		S_ISDIR(m) ? "Dir" :
+		S_ISCHR(m) ? "Char" :
+		S_ISBLK(m) ? "Blck" :
+		S_ISLNK(m) ? "Link" :
+		S_ISSOCK(m) ? "Sock" :
+		S_ISFIFO(m) ? "Pipe" :
+		S_ISDOOR(m) ? "Door" :
+		"File";
+
+	time = pretty_time(&item->mtime);
+
+	gtk_list_store_set(list, iter,
+			COL_LEAF, item->leafname,
+			COL_TYPE, type,
+			COL_SIZE, format_size(item->size),
+			COL_PERM, pretty_permissions(item->mode),
+			COL_OWNER, user_name(item->uid),
+			COL_GROUP, group_name(item->gid),
+			COL_MTIME, time,
+			COL_ITEM, item,
+			-1);
+	g_free(time);
+}
 static void view_details_add_items(ViewIface *view, GPtrArray *items)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
@@ -318,40 +377,64 @@ static void view_details_add_items(ViewIface *view, GPtrArray *items)
 		gtk_list_store_append(list, &iter);
 
 		if (item->base_type == TYPE_UNKNOWN)
-			gtk_list_store_set(list, &iter, COL_LEAF, leafname, -1);
-		else
-		{
-			char *time;
-			mode_t m = item->mode;
-			const char *type =
-				item->flags & ITEM_FLAG_APPDIR? "App" :
-			        S_ISDIR(m) ? "Dir" :
-				S_ISCHR(m) ? "Char" :
-				S_ISBLK(m) ? "Blck" :
-				S_ISLNK(m) ? "Link" :
-				S_ISSOCK(m) ? "Sock" :
-				S_ISFIFO(m) ? "Pipe" :
-				S_ISDOOR(m) ? "Door" :
-				"File";
-
-			time = pretty_time(&item->mtime);
-			
 			gtk_list_store_set(list, &iter,
-				COL_LEAF, leafname,
-				COL_TYPE, type,
-				COL_SIZE, format_size(item->size),
-				COL_PERM, pretty_permissions(item->mode),
-				COL_OWNER, user_name(item->uid),
-				COL_GROUP, group_name(item->gid),
-				COL_MTIME, time,
-		     		-1);
-			g_free(time);
-		}
+					COL_LEAF, leafname,
+					COL_ITEM, item, -1);
+		else
+			update_item(list, &iter, item);
 	}
+
+	resort_list(list);
 }
 
 static void view_details_update_items(ViewIface *view, GPtrArray *items)
 {
+	GtkTreeView *tree = (GtkTreeView *) view;
+	FilerWindow *filer_window = ((ViewDetails *) view)->filer_window;
+	GtkTreeModel *model;
+	GtkListStore *list;
+	GtkTreeIter iter;
+	GHashTable *changed;
+	gboolean show_hidden = filer_window->show_hidden;
+	int i;
+
+	model = gtk_tree_view_get_model(tree);
+	list = (GtkListStore *) model;
+	changed = g_hash_table_new(NULL, NULL);
+
+	for (i = 0; i < items->len; i++)
+	{
+		DirItem *item = (DirItem *) items->pdata[i];
+		
+		if (item->leafname[0] != '.' || show_hidden)
+			g_hash_table_insert(changed, item, "yes");
+	}
+
+	resort_list(list);
+
+	if (gtk_tree_model_get_iter_first(model, &iter))
+	{
+		do
+		{
+			DirItem *item;
+			gtk_tree_model_get(model, &iter, COL_ITEM, &item, -1);
+
+			if (g_hash_table_lookup(changed, item))
+			{
+				update_item(list, &iter, item);
+				g_hash_table_remove(changed, item);
+			}
+			else
+				g_warning("Item '%s' not found!\n",
+						item->leafname);
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+
+	if (g_hash_table_size(changed))
+		g_warning("%d items not updated!\n",
+				g_hash_table_size(changed));
+
+	g_hash_table_destroy(changed);
 }
 
 static void view_details_delete_if(ViewIface *view,

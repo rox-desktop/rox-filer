@@ -1469,18 +1469,8 @@ static void view_collection_add_items(ViewIface *view, GPtrArray *items)
 		DirItem *item = (DirItem *) items->pdata[i];
 		char	*leafname = item->leafname;
 
-		if (leafname[0] == '.')
-		{
-			if (!filer_window->show_hidden)
-				continue;
-
-			if (leafname[1] == '\0')
-				continue; /* Never show '.' */
-
-			if (leafname[1] == '.' &&
-					leafname[2] == '\0')
-				continue; /* Never show '..' */
-		}
+		if (leafname[0] == '.' && !filer_window->show_hidden)
+			continue;
 
 		add_item(view_collection, item);
 	}
