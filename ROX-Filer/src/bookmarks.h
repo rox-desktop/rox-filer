@@ -9,5 +9,6 @@
 #define _BOOKMARKS_H
 
 void bookmarks_show_menu(FilerWindow *filer_window);
+void bookmarks_edit(void);
 
 #endif /* _BOOKMARKS_H */

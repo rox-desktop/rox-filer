@@ -359,6 +359,11 @@ static void toolbar_bookmarks_clicked(GtkWidget *widget,
 	{
 		bookmarks_show_menu(filer_window);
 	}
+	else if (event->type == GDK_BUTTON_RELEASE &&
+			((GdkEventButton *) event)->button != 1)
+	{
+		bookmarks_edit();
+	}
 }
 
 static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
