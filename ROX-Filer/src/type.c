@@ -67,6 +67,7 @@ static gchar *opt_type_colours[][2] = {
 	{"display_file_colour", "#000000"},
 	{"display_cdev_colour", "#000000"},
 	{"display_bdev_colour", "#000000"},
+	{"display_door_colour", "#ff00ff"},
 	{"display_exec_colour", "#006000"},
 	{"display_adir_colour", "#006000"}
 };
@@ -122,6 +123,7 @@ MIME_type *inode_block_dev;
 MIME_type *inode_char_dev;
 MIME_type *application_executable;
 MIME_type *inode_unknown;
+MIME_type *inode_door;
 
 static Option o_display_colour_types;
 
@@ -140,6 +142,7 @@ void type_init(void)
 	inode_char_dev = get_mime_type("inode/chardevice", TRUE);
 	application_executable = get_mime_type("application/x-executable", TRUE);
 	inode_unknown = get_mime_type("inode/unknown", TRUE);
+	inode_door = get_mime_type("inode/door", TRUE);
 
 	load_mime_types();
 
@@ -208,6 +211,8 @@ const char *basetype_name(DirItem *item)
 			return _("Pipe");
 		case TYPE_SOCKET:
 			return _("Socket");
+		case TYPE_DOOR:
+			return _("Door");
 	}
 	
 	return _("Unknown");
@@ -938,6 +943,8 @@ MIME_type *mime_type_from_base_type(int base_type)
 			return inode_block_dev;
 		case TYPE_CHAR_DEVICE:
 			return inode_char_dev;
+	        case TYPE_DOOR:
+	                return inode_door;
 	}
 	return inode_unknown;
 }
@@ -959,6 +966,8 @@ int mode_to_base_type(int st_mode)
 		return TYPE_PIPE;
 	else if (S_ISSOCK(st_mode))
 		return TYPE_SOCKET;
+	else if (S_ISDOOR(st_mode))
+		return TYPE_DOOR;
 
 	return TYPE_ERROR;
 }
@@ -1081,15 +1090,19 @@ static void alloc_type_colours(void)
  */
 GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 {
+	int type = item->base_type;
+
 	if (!o_display_colour_types.int_value)
 		return normal;
 
 	if (item->flags & ITEM_FLAG_EXEC_FILE)
-		return &type_colours[8];
+		type = TYPE_EXEC;
 	else if (item->flags & ITEM_FLAG_APPDIR)
-		return &type_colours[9];
-	else
-		return &type_colours[item->base_type];
+		type = TYPE_APPDIR;
+
+	g_return_val_if_fail(type >= 0 && type < NUM_TYPE_COLOURS, normal);
+
+	return &type_colours[type];
 }
 
 /* Process the 'Patterns' value */

@@ -18,6 +18,7 @@ extern MIME_type *inode_block_dev;
 extern MIME_type *inode_char_dev;
 extern MIME_type *application_executable;
 extern MIME_type *inode_unknown;
+extern MIME_type *inode_door;
 
 enum
 {
@@ -30,6 +31,11 @@ enum
 	TYPE_FILE,
 	TYPE_CHAR_DEVICE,
 	TYPE_BLOCK_DEVICE,
+	TYPE_DOOR,
+
+	/* These are purely for colour allocation */
+	TYPE_EXEC,
+	TYPE_APPDIR,
 };
 
 struct _MIME_type

@@ -65,6 +65,7 @@ typedef enum {
 	IS_CHR,
 	IS_BLK,
 	IS_DEV,
+	IS_DOOR,
 	IS_SUID,
 	IS_SGID,
 	IS_STICKY,
@@ -341,6 +342,8 @@ static gboolean test_is(FindCondition *condition, FindInfo *info)
 		case IS_DEV:
 			return S_ISCHR(mode)
 			    || S_ISBLK(mode);
+		case IS_DOOR:
+			return S_ISDOOR(mode);
 		case IS_SUID:
 			return (mode & S_ISUID) != 0;
 		case IS_SGID:
@@ -684,22 +687,23 @@ static FindCondition *parse_dash(const gchar **expression)
 	{
 		switch (exp[i])
 		{
-			case 'f': test = IS_REG; break;;
-			case 'l': test = IS_LNK; break;;
-			case 'd': test = IS_DIR; break;;
-			case 'b': test = IS_BLK; break;;
-			case 'c': test = IS_CHR; break;;
-			case 'D': test = IS_DEV; break;;
-			case 'p': test = IS_FIFO; break;;
-			case 'S': test = IS_SOCK; break;;
-			case 'u': test = IS_SUID; break;;
-			case 'g': test = IS_SGID; break;;
-			case 'k': test = IS_STICKY; break;;
-			case 'r': test = IS_READABLE; break;;
-			case 'w': test = IS_WRITEABLE; break;;
-			case 'x': test = IS_EXEC; break;;
-			case 'o': test = IS_MINE; break;;
-			case 'z': test = IS_EMPTY; break;;
+			case 'f': test = IS_REG; break;
+			case 'l': test = IS_LNK; break;
+			case 'd': test = IS_DIR; break;
+			case 'b': test = IS_BLK; break;
+			case 'c': test = IS_CHR; break;
+			case 'D': test = IS_DEV; break;
+			case 'p': test = IS_FIFO; break;
+			case 'S': test = IS_SOCK; break;
+			case 'O': test = IS_DOOR; break;
+			case 'u': test = IS_SUID; break;
+			case 'g': test = IS_SGID; break;
+			case 'k': test = IS_STICKY; break;
+			case 'r': test = IS_READABLE; break;
+			case 'w': test = IS_WRITEABLE; break;
+			case 'x': test = IS_EXEC; break;
+			case 'o': test = IS_MINE; break;
+			case 'z': test = IS_EMPTY; break;
 			default:
 				  if (retval)
 					  find_condition_free(retval);
@@ -757,6 +761,8 @@ static FindCondition *parse_is(const gchar **expression)
 		test = IS_FIFO;
 	else if (MATCH(_("IsSocket")))
 		test = IS_SOCK;
+	else if (MATCH(_("IsDoor")))
+		test = IS_DOOR;
 	else if (MATCH(_("IsSUID")))
 		test = IS_SUID;
 	else if (MATCH(_("IsSGID")))

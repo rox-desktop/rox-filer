@@ -474,7 +474,9 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 				S_ISBLK(m) ? "Blck" :
 				S_ISLNK(m) ? "Link" :
 				S_ISSOCK(m) ? "Sock" :
-				S_ISFIFO(m) ? "Pipe" : "File",
+				S_ISFIFO(m) ? "Pipe" :
+				S_ISDOOR(m) ? "Door" :
+				"File",
 			pretty_permissions(m),
 			user_name(item->uid),
 			group_name(item->gid),

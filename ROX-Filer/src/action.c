@@ -202,7 +202,8 @@ _("'*.htm', '*.html'      (finds HTML files)\n"
 
 		frame = gtk_frame_new(_("Simple Tests"));
 		text = gtk_label_new(
-_("IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+_("IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+"(types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable (permissions)"
 "\n"
 "IsEmpty, IsMine\n"
