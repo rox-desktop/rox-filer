@@ -10,6 +10,10 @@
 
 #include <glib.h>
 
+#ifdef GTK2
+# include <pango/pango.h>
+#endif
+
 #include "dir.h"
 
 extern GList *icon_selection;
@@ -22,6 +26,9 @@ struct _Icon {
 	guchar		*src_path;	/* Eg: ~/Apps */
 	guchar		*path;		/* Eg: /home/fred/Apps */
 	DirItem		item;
+#ifdef GTK2
+	PangoLayout	*layout;	/* The label */
+#endif
 
 	/* Only used on the pinboard... */
 	GtkWidget	*win;

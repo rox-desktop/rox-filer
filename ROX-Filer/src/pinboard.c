@@ -299,6 +299,10 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);
 
 	icon->widget = gtk_drawing_area_new();
+#ifdef GTK2
+	icon->layout = gtk_widget_create_pango_layout(icon->widget, NULL);
+	pango_layout_set_width(icon->layout, 140 * PANGO_SCALE);
+#endif
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->widget);
 	drag_set_pinicon_dest(icon);
 	gtk_signal_connect(GTK_OBJECT(icon->widget), "drag_data_get",
@@ -499,14 +503,13 @@ static void mask_wink_border(Icon *icon, GdkColor *alpha)
 				text_x + dx, y + dy,		\
 				item->leafname);
 		
-/* Updates the name_width field and resizes and masks the window.
+/* Updates the name_width and layout fields, and resizes and masks the window.
  * Also sets the style to pinicon_style, generating it if needed.
  * Returns the new width and height.
  */
 static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 {
 	int		width, height;
-	GdkFont		*font;
 	int		font_height;
 	MaskedPixmap	*image = icon->item.image;
 	int		iwidth = PIXMAP_WIDTH(image->pixmap);
@@ -524,9 +527,23 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	}
 	gtk_widget_set_style(icon->widget, pinicon_style);
 
-	font = pinicon_style->font;
-	font_height = font->ascent + font->descent;
-	item->name_width = gdk_string_width(font, item->leafname);
+#ifdef GTK2
+	{
+		PangoRectangle logical;
+		pango_layout_set_text(icon->layout, icon->item.leafname, -1);
+		pango_layout_get_pixel_extents(icon->layout, NULL, &logical);
+
+		item->name_width = logical.width - logical.x;
+		font_height = logical.height - logical.y;
+	}
+#else
+	{
+		GdkFont		*font;
+		font = pinicon_style->font;
+		font_height = font->ascent + font->descent;
+		item->name_width = gdk_string_width(font, item->leafname);
+	}
+#endif
 
 	width = MAX(iwidth, item->name_width + 2) + 2 * WINK_FRAME;
 	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
@@ -596,6 +613,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	}
 	else
 	{
+#if 0
 		int	y = text_y + font->ascent;
 
 		TEXT_AT(0, 0);
@@ -611,6 +629,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 			TEXT_AT(0, -1);
 			TEXT_AT(1, -1);
 		}
+#endif
 	}
 	
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
@@ -694,12 +713,21 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 				font_height + 2);
 	}
 
+#ifdef GTK2
+	gtk_paint_layout(widget->style, widget->window,
+			state,
+			FALSE, NULL, widget, "text",
+			text_x,
+			text_y,
+			icon->layout);
+#else
 	gtk_paint_string(widget->style, widget->window,
 			state,
 			NULL, widget, "text",
 			text_x,
 			text_y + font->ascent,
 			item->leafname);
+#endif
 
 	if (current_wink_icon == icon)
 	{
@@ -1159,6 +1187,9 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 			event->button.y = xev->xbutton.y;
 			event->button.state = xev->xbutton.state;
 			event->button.button = xev->xbutton.button;
+#ifdef GTK2
+			event->button.axes = NULL;
+#endif
 
 			return GDK_FILTER_TRANSLATE;
 

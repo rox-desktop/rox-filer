@@ -501,12 +501,19 @@ void icon_select_only(Icon *select)
 	g_list_free(to_clear);
 }
 
+/* XXX: Under Gtk+ 2.0, can this get called twice? */
 void icon_destroyed(Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
 
 	if (icon == menu_icon)
 		menu_icon = NULL;
+
+	if (icon->layout)
+	{
+		g_object_unref(G_OBJECT(icon->layout));
+		icon->layout = NULL;
+	}
 
 	icon_unhash_path(icon);
 
