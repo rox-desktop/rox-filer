@@ -236,7 +236,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	struct stat info;
 	int original_width, original_height;
 	GString *to;
-	char *md5, *swidth, *sheight, *ssize, *smtime;
+	char *md5, *swidth, *sheight, *ssize, *smtime, *uri;
 	mode_t old_mask;
 
 	original_width = gdk_pixbuf_get_width(full);
@@ -251,7 +251,8 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	smtime = g_strdup_printf("%ld", info.st_mtime);
 
 	path = pathdup(path);
-	md5 = md5_hash(path);
+	uri = g_strconcat("file://", path, NULL);
+	md5 = md5_hash(uri);
 	g_free(path);
 		
 	to = g_string_new(home_dir);
@@ -269,10 +270,12 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 			to->str,
 			"png",
 			NULL,
-			"tEXt::Thumb::OriginalWidth", swidth,
-			"tEXt::Thumb::OriginalHeight", sheight,
-			"tEXt::Thumb::OriginalSize", ssize,
-			"tEXt::Thumb::OriginalMTime", smtime,
+			"tEXt::Thumb::Image::Width", swidth,
+			"tEXt::Thumb::Image::Height", sheight,
+			"tEXt::Thumb::Size", ssize,
+			"tEXt::Thumb::MTime", smtime,
+			"tEXt::Thumb::URI", uri,
+			"tEXt::Software", PROJECT,
 			NULL);
 	umask(old_mask);
 
@@ -281,6 +284,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(sheight);
 	g_free(ssize);
 	g_free(smtime);
+	g_free(uri);
 }
 
 /* Check if we have an up-to-date thumbnail for this image.
@@ -289,13 +293,15 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 static GdkPixbuf *get_thumbnail_for(char *path)
 {
 	GdkPixbuf *thumb;
-	char *thumb_path, *md5;
+	char *thumb_path, *md5, *uri;
 	char *ssize, *smtime;
 	struct stat info;
 
 	path = pathdup(path);
+	uri = g_strconcat("file://", path, NULL);
+	md5 = md5_hash(uri);
+	g_free(uri);
 	
-	md5 = md5_hash(path);
 	thumb_path = g_strdup_printf("%s/.thumbnails/96x96/%s.png",
 					home_dir, md5);
 	g_free(md5);
@@ -305,11 +311,11 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 		goto err;
 
 	/* Note that these don't need freeing... */
-	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::OriginalSize");
+	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::Size");
 	if (!ssize)
 		goto err;
 
-	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::OriginalMTime");
+	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::MTime");
 	if (!smtime)
 		goto err;
 	
