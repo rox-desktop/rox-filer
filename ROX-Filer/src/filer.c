@@ -1424,6 +1424,7 @@ static char *filer_toolbar(char *data)
 
 void update_dir(FilerWindow *filer_window)
 {
+	may_rescan(filer_window);
 	dir_update(filer_window->directory, filer_window->path);
 }
 
