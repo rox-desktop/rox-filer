@@ -227,7 +227,7 @@ to run it instead.
 	*** Now read the manual! ***
 	****************************
 
-Run ROX and click on the information icon on the toolbar:
+Run ROX and click on the help icon on the toolbar:
 
 	\$ rox
 EOF
