@@ -489,7 +489,7 @@ void abox_clear_results(ABox *abox)
 	gtk_list_store_clear(GTK_LIST_STORE(model));
 }
 
-void abox_add_combo(ABox *abox, GList *presets,
+void abox_add_combo(ABox *abox, const gchar* tlabel, GList *presets,
 		    const gchar *text, GtkWidget *help_button)
 {
 	GtkWidget *hbox, *label, *combo;
@@ -499,8 +499,10 @@ void abox_add_combo(ABox *abox, GList *presets,
 	g_return_if_fail(abox->entry == NULL);
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new(_("Command:"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	if(tlabel) {
+		label = gtk_label_new(tlabel);
+		gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	}
 	
 	combo = gtk_combo_new();
 	gtk_combo_disable_activate(GTK_COMBO(combo));

@@ -2025,7 +2025,7 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 		'R', recurse);
 
 	gui_side->default_string = &last_chmod_string;
-	abox_add_combo(ABOX(abox), presets, new_entry_string,
+	abox_add_combo(ABOX(abox), _("Command:"), presets, new_entry_string,
 				new_help_button(show_chmod_help, NULL));
 
 	g_signal_connect(ABOX(abox)->entry, "changed",
@@ -2089,7 +2089,7 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 		'R', recurse);
 
 	gui_side->default_string = &last_settype_string;
-	abox_add_combo(ABOX(abox), presets, new_entry_string,
+	abox_add_combo(ABOX(abox), _("Type:"), presets, new_entry_string,
 				new_help_button(show_settype_help, NULL));
 
 	g_signal_connect(ABOX(abox)->entry, "changed",

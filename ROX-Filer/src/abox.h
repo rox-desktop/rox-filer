@@ -69,6 +69,7 @@ void	abox_add_filename		(ABox *abox,
 					 const gchar *pathname);
 void	abox_clear_results		(ABox *abox);
 void	abox_add_combo			(ABox *abox,
+					 const gchar *tlabel, 
 					 GList *presets,
 					 const gchar *text,
 					 GtkWidget *help_button);
