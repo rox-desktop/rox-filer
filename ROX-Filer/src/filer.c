@@ -1336,7 +1336,10 @@ static gint coll_button_release(GtkWidget *widget,
 	{
 		if (motion_buttons_pressed == 0 &&
 					filer_window->collection->lasso_box)
-			collection_end_lasso(filer_window->collection, TRUE);
+		{
+			collection_end_lasso(filer_window->collection,
+				event->button == 1 ? GDK_SET : GDK_INVERT);
+		}
 		return TRUE;
 	}
 

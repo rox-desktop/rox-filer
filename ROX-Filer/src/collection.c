@@ -1153,6 +1153,8 @@ static void collection_process_area(Collection	 *collection,
 	guint32		stacked_time;
 	int		item;
 
+	g_return_if_fail(fn == GDK_SET || fn == GDK_INVERT);
+
 	stacked_time = current_event_time;
 	current_event_time = time;
 
@@ -1165,7 +1167,10 @@ static void collection_process_area(Collection	 *collection,
 			if (item >= collection->number_of_items)
 				goto out;
 
-			collection_select_item(collection, item);
+			if (fn == GDK_INVERT)
+				collection_toggle_item(collection, item);
+			else
+				collection_select_item(collection, item);
 
 			item++;
 		}
@@ -1402,6 +1407,39 @@ static gboolean as_timeout(Collection *collection)
 	return TRUE;
 }
 
+/* Change the selected state of an item */
+static void collection_item_set_selected(Collection *collection,
+                                         gint item,
+                                         gboolean selected)
+{
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(item >= 0 && item < collection->number_of_items);
+
+	if (collection->items[item].selected == selected)
+		return;
+
+	collection->items[item].selected = selected;
+	collection_draw_item(collection, item, TRUE);
+
+	if (selected)
+	{
+		collection->number_selected++;
+		if (collection->number_selected == 1)
+			gtk_signal_emit(GTK_OBJECT(collection),
+					collection_signals[GAIN_SELECTION],
+					current_event_time);
+	}
+	else
+	{
+		collection->number_selected--;
+		if (collection->number_selected == 0)
+			gtk_signal_emit(GTK_OBJECT(collection),
+					collection_signals[LOSE_SELECTION],
+					current_event_time);
+	}
+}
+
 /* Functions for managing collections */
 
 /* Remove all objects from the collection */
@@ -1468,68 +1506,20 @@ gint collection_insert(Collection *collection, gpointer data)
 	return item;
 }
 
-/* Unselect an item by number */
 void collection_unselect_item(Collection *collection, gint item)
 {
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(item >= 0 && item < collection->number_of_items);
-
-	if (collection->items[item].selected)
-	{
-		collection->items[item].selected = FALSE;
-		collection_draw_item(collection, item, TRUE);
-
-		if (--collection->number_selected == 0)
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[LOSE_SELECTION],
-					current_event_time);
-	}
+	collection_item_set_selected(collection, item, FALSE);
 }
 
-/* Select an item by number */
 void collection_select_item(Collection *collection, gint item)
 {
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(item >= 0 && item < collection->number_of_items);
-
-	if (collection->items[item].selected)
-		return;		/* Already selected */
-	
-	collection->items[item].selected = TRUE;
-	collection_draw_item(collection, item, TRUE);
-
-	if (collection->number_selected++ == 0)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[GAIN_SELECTION],
-				current_event_time);
+	collection_item_set_selected(collection, item, TRUE);
 }
 
-/* Toggle the selected state of an item (by number) */
 void collection_toggle_item(Collection *collection, gint item)
 {
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(item >= 0 && item < collection->number_of_items);
-
-	if (collection->items[item].selected)
-	{
-		collection->items[item].selected = FALSE;
-		if (--collection->number_selected == 0)
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[LOSE_SELECTION],
-					current_event_time);
-	}
-	else
-	{
-		collection->items[item].selected = TRUE;
-		if (collection->number_selected++ == 0)
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[GAIN_SELECTION],
-					current_event_time);
-	}
-	collection_draw_item(collection, item, TRUE);
+	collection_item_set_selected(collection, item,
+			!collection->items[item].selected);
 }
 
 /* Select all items in the collection */
