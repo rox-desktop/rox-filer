@@ -90,6 +90,7 @@ struct _GUIside
 /* These don't need to be in a structure because we fork() before
  * using them again.
  */
+static gboolean mount_open_dir = FALSE;
 static int 	from_parent = 0;
 static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
@@ -403,6 +404,7 @@ static void message_from_child(gpointer 	 data,
 			buffer[message_len] = '\0';
 			if (*buffer == '?')
 			{
+				/* Ask a question */
 				SENSITIVE_YESNO(gui_side, TRUE);
 				gtk_window_set_focus(
 					GTK_WINDOW(gui_side->window),
@@ -411,18 +413,21 @@ static void message_from_child(gpointer 	 data,
 			}
 			else if (*buffer == '+')
 			{
+				/* Update/rescan this item */
 				refresh_dirs(buffer + 1);
 				g_free(buffer);
 				return;
 			}
 			else if (*buffer == '=')
 			{
+				/* Add to search results */
 				add_to_results(gui_side, buffer + 1);
 				g_free(buffer);
 				return;
 			}
 			else if (*buffer == '#')
 			{
+				/* Clear search results area */
 				gtk_clist_clear(GTK_CLIST(gui_side->results));
 				g_free(buffer);
 				return;
@@ -430,6 +435,7 @@ static void message_from_child(gpointer 	 data,
 
 			else if (*buffer == 'm' || *buffer == 'M')
 			{
+				/* Mount / major changes to this path */
 				if (*buffer == 'M')
 					mount_update(TRUE);
 				filer_check_mounted(buffer + 1);
@@ -438,6 +444,7 @@ static void message_from_child(gpointer 	 data,
 			}
 			else if (*buffer == '/')
 			{
+				/* Update the current object display */
 				if (gui_side->next_dir)
 					g_free(gui_side->next_dir);
 				else
@@ -446,6 +453,13 @@ static void message_from_child(gpointer 	 data,
 								display_dir,
 								gui_side);
 				gui_side->next_dir = buffer;
+				return;
+			}
+			else if (*buffer == 'o')
+			{
+				/* Open a filer window */
+				filer_opendir(buffer + 1);
+				g_free(buffer);
 				return;
 			}
 			else if (*buffer == '!')
@@ -1545,6 +1559,11 @@ static void do_mount(guchar *path, gboolean mount)
 	{
 		g_string_sprintf(message, "M%s", path);
 		send();
+		if (mount && mount_open_dir)
+		{
+			g_string_sprintf(message, "o%s", path);
+			send();
+		}
 	}
 	else
 	{
@@ -1864,12 +1883,14 @@ void action_usage(FilerWindow *filer_window)
 
 /* Mount/unmount listed items (paths).
  * Free the list after this function returns.
+ * If open_dir is TRUE and the dir is successfully mounted, open it.
  */
-void action_mount(GList	*paths)
+void action_mount(GList	*paths, gboolean open_dir)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
 
+	mount_open_dir = open_dir;
 	gui_side = start_action(paths, mount_cb,
 					option_get_int("action_mount"));
 	if (!gui_side)

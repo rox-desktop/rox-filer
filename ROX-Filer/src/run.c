@@ -215,9 +215,10 @@ gboolean run_diritem(guchar *full_path,
 				GList	*paths;
 
 				paths = g_list_prepend(NULL, full_path);
-				action_mount(paths);
+				action_mount(paths, filer_window == NULL);
 				g_list_free(paths);
-				if (item->flags & ITEM_FLAG_MOUNTED)
+				if (item->flags & ITEM_FLAG_MOUNTED ||
+						!filer_window)
 					return TRUE;
 			}
 
