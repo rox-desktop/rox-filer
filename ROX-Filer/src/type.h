@@ -19,6 +19,7 @@ struct _MIME_type
 	char		*media_type;
 	char		*subtype;
 	MaskedPixmap 	*image;		/* NULL => not loaded yet */
+	time_t		image_time;	/* When we loaded the image */
 };
 
 /* Prototypes */

@@ -27,6 +27,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
+#include <time.h>
 
 #include "string.h"
 #include "filer.h"
@@ -77,7 +78,7 @@ static void add_ext(char *type_name, char *ext)
 	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
 	len = slash - type_name;
 
-	new = g_malloc(sizeof(MIME_type));
+	new = g_new(MIME_type, 1);
 	new->media_type = g_malloc(sizeof(char) * (len + 1));
 	memcpy(new->media_type, type_name, len);
 	new->media_type[len] = '\0';
@@ -245,14 +246,20 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 {
 	char	*path;
 	char	*type_name;
+	time_t	now;
 
 	g_return_val_if_fail(type != NULL, default_pixmap + TYPE_UNKNOWN);
 
-	/* Already got an image? TODO: Is it out-of-date? */
-	/*
+	now = time(NULL);
+	/* Already got an image? */
 	if (type->image)
-		return type->image;
-	*/
+	{
+		/* Yes - don't recheck too often */
+		if (abs(now - type->image_time) < 2)
+			return type->image;
+		pixmap_unref(type->image);
+		type->image = NULL;
+	}
 
 	type_name = g_strconcat(type->media_type, "_",
 				type->subtype, ".xpm", NULL);
@@ -270,6 +277,8 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 
 	if (!type->image)
 		type->image = default_pixmap + TYPE_UNKNOWN;
+
+	type->image_time = now;
 	
 	return type->image;
 }

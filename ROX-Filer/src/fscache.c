@@ -36,7 +36,16 @@
 static guint hash_key(gconstpointer key);
 static gint cmp_stats(gconstpointer a, gconstpointer b);
 static void destroy_hash_entry(gpointer key, gpointer data, gpointer user_data);
+static gboolean purge_hash_entry(gpointer key, gpointer data,
+				 gpointer user_data);
 
+
+struct PurgeInfo
+{
+	GFSCache *cache;
+	gint	 age;
+	time_t	 now;
+};
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -82,6 +91,7 @@ void g_fscache_destroy(GFSCache *cache)
 	g_free(cache);
 }
 
+/* Call the ref() user function for this object */
 void g_fscache_data_ref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
@@ -90,6 +100,7 @@ void g_fscache_data_ref(GFSCache *cache, gpointer data)
 		cache->ref(data, cache->user_data);
 }
 
+/* Call the unref() user function for this object */
 void g_fscache_data_unref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
@@ -130,11 +141,7 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 		if (data->m_time == info.st_mtime
 		 && data->length == info.st_size
 		 && data->mode == info.st_mode)
-		{
-			if (cache->ref)
-				cache->ref(data->data, cache->user_data);
-			return data->data;
-		}
+			goto out;
 
 		/* Out-of-date */
 		if (cache->unref)
@@ -162,10 +169,28 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	if (cache->load)
 		data->data = cache->load(pathname, cache->user_data);
 
+out:
 	if (cache->ref)
 		cache->ref(data->data, cache->user_data);
-
+	data->last_lookup = time(NULL);
 	return data->data;
+}
+
+/* Remove all cache entries last accessed more than 'age' seconds
+ * ago.
+ */
+void g_fscache_purge(GFSCache *cache, gint age)
+{
+	struct PurgeInfo info;
+	
+	g_return_if_fail(cache != NULL);
+
+	info.age = age;
+	info.cache = cache;
+	info.now = time(NULL);
+
+	g_hash_table_foreach_remove(cache->inode_to_stats, purge_hash_entry,
+			(gpointer) &info);
 }
 
 
@@ -201,4 +226,24 @@ static void destroy_hash_entry(gpointer key, gpointer data, gpointer user_data)
 
 	g_free(key);
 	g_free(data);
+}
+
+static gboolean purge_hash_entry(gpointer key, gpointer data,
+				 gpointer user_data)
+{
+	struct PurgeInfo *info = (struct PurgeInfo *) user_data;
+	GFSCacheData *cache_data = (GFSCacheData *) data;
+	GFSCache *cache = info->cache;
+
+	if (cache_data->last_lookup <= info->now
+		&& cache_data->last_lookup >= info->now - info->age)
+		return FALSE;
+
+	if (cache->unref)
+		cache->unref(cache_data->data, cache->user_data);
+
+	g_free(key);
+	g_free(data);
+
+	return TRUE;
 }

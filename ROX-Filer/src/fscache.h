@@ -11,6 +11,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
+#include <time.h>
 
 #include <glib.h>
 
@@ -39,6 +40,7 @@ struct _GFSCacheKey
 struct _GFSCacheData
 {
 	gpointer	data;		/* The object from the file */
+	time_t		last_lookup;
 
 	/* Details of the file last time we checked it */
 	time_t		m_time;
@@ -52,6 +54,8 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 			gpointer user_data);
 void g_fscache_destroy(GFSCache *cache);
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname);
+void g_fscache_purge(GFSCache *cache, gint age);
+
 void g_fscache_data_ref(GFSCache *cache, gpointer data);
 void g_fscache_data_unref(GFSCache *cache, gpointer data);
 

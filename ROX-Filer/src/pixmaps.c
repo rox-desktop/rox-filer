@@ -21,6 +21,11 @@
 
 /* pixmaps.c - code for handling pixmaps */
 
+/* Remove pixmaps from the cache when they haven't been accessed for
+ * this period of time (seconds).
+ */
+#define PIXMAP_PURGE_TIME 600
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -60,6 +65,7 @@ MaskedPixmap 	default_pixmap[LAST_DEFAULT_PIXMAP];
 static MaskedPixmap *load(char *pathname, gpointer data);
 static void ref(MaskedPixmap *mp, gpointer data);
 static void unref(MaskedPixmap *mp, gpointer data);
+static gint purge(gpointer data);
 
 
 /****************************************************************
@@ -72,11 +78,12 @@ void pixmaps_init(void)
 					(GFSFunc) ref,
 					(GFSFunc) unref,
 					NULL);
+
+	gtk_timeout_add(10000, purge, NULL);
 }
 
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
  * structure for it and return a pointer to the structure. NULL on failure.
- * XXX: Unref it when you're done.
  */
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
 {
@@ -164,7 +171,6 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 	GtkStyle	*style;
 	MaskedPixmap	*masked_pixmap;
 
-	g_print("Load '%s'\n", pathname);
 	style = gtk_widget_get_style(window);
 
 	pixmap = gdk_pixmap_create_from_xpm(window->window,
@@ -184,18 +190,24 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 
 static void ref(MaskedPixmap *mp, gpointer data)
 {
-	g_print("[ ref ]\n");
 	if (mp)
 		mp->ref++;
 }
 
 static void unref(MaskedPixmap *mp, gpointer data)
 {
-	g_print("[ unref ]\n");
 	if (mp && --mp->ref == 0)
 	{
 		gdk_pixmap_unref(mp->pixmap);
 		gdk_bitmap_unref(mp->mask);
 		g_free(mp);
 	}	
+}
+
+/* Called now and then to clear out old pixmaps */
+static gint purge(gpointer data)
+{
+	g_fscache_purge(pixmap_cache, PIXMAP_PURGE_TIME);
+
+	return TRUE;
 }
