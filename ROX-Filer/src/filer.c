@@ -2256,6 +2256,16 @@ static gboolean drag_motion(GtkWidget		*widget,
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
 
+	if (filer_window->view_type == VIEW_TYPE_DETAILS)
+	{
+		GdkWindow *bin;
+		int bin_y;
+		/* Correct for position of bin window */
+		bin = gtk_tree_view_get_bin_window(GTK_TREE_VIEW(view));
+		gdk_window_get_position(bin, NULL, &bin_y);
+		y -= bin_y;
+	}
+
 	if (o_dnd_drag_to_icons.int_value)
 	{
 		view_get_iter_at_point(view, &iter, x, y);
@@ -2283,10 +2293,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 		/* XXX: This is needed so that directories don't
 		 * spring open while we scroll. Should go in
 		 * view_collection.c, I think.
-		 */
-
-		/* XXX: Now it IS in view_collection, maybe we should
-		 * fix it?
+		 *
+		 * XXX: Now we ARE in view_collection, maybe fix it?
+		 *
+		 * XXX: Drat. Now we're in filer.c :-(
 		 */
 		
 		GtkObject *vadj = GTK_OBJECT(collection->vadj);

@@ -618,13 +618,17 @@ static gboolean view_details_button_release(GtkWidget *widget,
 
 static gint view_details_key_press_event(GtkWidget *widget, GdkEventKey *event)
 {
-	if (event->keyval == ' ')
-	{
-		ViewDetails *view_details = (ViewDetails *) widget;
-		FilerWindow *filer_window = view_details->filer_window;
+	ViewDetails *view_details = (ViewDetails *) widget;
+	FilerWindow *filer_window = view_details->filer_window;
 
-		filer_window_toggle_cursor_item_selected(filer_window);
-		return TRUE;
+	switch (event->keyval)
+	{
+		case ' ':
+			filer_window_toggle_cursor_item_selected(filer_window);
+			return TRUE;
+		case GDK_BackSpace:
+			change_to_parent(filer_window);
+			return TRUE;
 	}
 
 	return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget, event);
@@ -635,6 +639,49 @@ static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
 	ViewDetails *view_details = (ViewDetails *) widget;
 
 	return filer_motion_notify(view_details->filer_window, event);
+}
+
+static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
+{
+	GtkTreeView *tree = (GtkTreeView *) widget;
+	GtkTreePath *path = NULL;
+	GdkRectangle focus_rectangle;
+	gboolean     had_cursor;
+	
+	had_cursor = (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS) != 0;
+	
+	if (had_cursor)
+		GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
+	GTK_WIDGET_CLASS(parent_class)->expose_event(widget, event);
+	if (had_cursor)
+		GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS);
+
+	if (event->window != gtk_tree_view_get_bin_window(tree))
+		return FALSE;	/* Not the main area */
+
+	gtk_tree_view_get_cursor(tree, &path, NULL);
+	if (!path)
+		return FALSE;	/* No cursor */
+	gtk_tree_view_get_background_area(tree, path, NULL, &focus_rectangle);
+	gtk_tree_path_free(path);
+
+	if (!focus_rectangle.height)
+		return FALSE;	/* Off screen */
+
+	focus_rectangle.width = widget->allocation.width;
+
+	gtk_paint_focus(widget->style,
+			event->window,
+			GTK_STATE_NORMAL,
+			NULL,
+			widget,
+			"treeview",
+			focus_rectangle.x,
+			focus_rectangle.y,
+			focus_rectangle.width,
+			focus_rectangle.height);
+
+	return FALSE;
 }
 
 static void view_details_destroy(GtkObject *view_details)
@@ -666,6 +713,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->button_release_event = view_details_button_release;
 	widget->key_press_event = view_details_key_press_event;
 	widget->motion_notify_event = view_details_motion_notify;
+	widget->expose_event = view_details_expose;
 }
 
 static void view_details_init(GTypeInstance *object, gpointer gclass)
@@ -1129,17 +1177,20 @@ static void view_details_get_iter_at_point(ViewIface *view, ViewIter *iter,
 static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
 	GtkTreePath *path;
+	ViewDetails *view_details = (ViewDetails *) view;
 
-	if (!iter)
-	{
-		/* XXX: How do we get rid of the cursor? */
-		g_print("FIXME: Remove cursor\n");
-		return;
-	}
-		
 	path = gtk_tree_path_new();
 
-	gtk_tree_path_append_index(path, iter->i);
+	if (iter)
+		gtk_tree_path_append_index(path, iter->i);
+	else
+	{
+		/* Using depth zero or index -1 gives an error, but this
+		 * is OK!
+		 */
+		gtk_tree_path_append_index(path, view_details->items->len);
+	}
+
 	gtk_tree_view_set_cursor((GtkTreeView *) view, path, NULL, FALSE);
 	gtk_tree_path_free(path);
 }
