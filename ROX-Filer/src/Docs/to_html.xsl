@@ -12,6 +12,7 @@
   -->
   <xsl:template name="head.content">
     <link rel="stylesheet" href="../style.css" type="text/css" media="all"/>
+    <title><xsl:value-of select='/book/bookinfo/title'/></title>
   </xsl:template>
 
   <xsl:template match="guimenuitem">
