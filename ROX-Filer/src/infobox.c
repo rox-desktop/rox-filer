@@ -470,6 +470,7 @@ static gboolean read_du_output(GIOChannel *source, GIOCondition cond, DU *du)
 
 static void kill_du_output(GtkWidget *widget, DU *du)
 {
+        g_source_remove(du->watch);
 	g_io_channel_shutdown(du->chan, FALSE, NULL);
 	g_io_channel_unref(du->chan);
 	kill((pid_t) du->child, SIGTERM);
