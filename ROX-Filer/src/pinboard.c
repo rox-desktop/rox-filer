@@ -1927,7 +1927,7 @@ static void reload_backdrop(Pinboard *pinboard,
 	/* Also update root window property (for transparent xterms, etc) */
 	if (style->bg_pixmap[GTK_STATE_NORMAL])
 	{
-		XID id = GDK_WINDOW_XWINDOW(style->bg_pixmap[GTK_STATE_NORMAL]);
+		XID id = GDK_DRAWABLE_XID(style->bg_pixmap[GTK_STATE_NORMAL]);
 		gdk_property_change(gdk_get_default_root_window(),
 				gdk_atom_intern("_XROOTPMAP_ID", FALSE),
 				gdk_atom_intern("PIXMAP", FALSE),
