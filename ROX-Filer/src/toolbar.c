@@ -42,6 +42,7 @@
 #include "diritem.h"
 #include "view_iface.h"
 #include "bookmarks.h"
+#include "gui_support.h"
 
 typedef struct _Tool Tool;
 
@@ -83,6 +84,10 @@ static void toolbar_autosize_clicked(GtkWidget *widget, FilerWindow *filer_windo
 static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
 static void toolbar_hidden_clicked(GtkWidget *widget,
+				   FilerWindow *filer_window);
+static void toolbar_select_clicked(GtkWidget *widget,
+				   FilerWindow *filer_window);
+static void toolbar_sort_clicked(GtkWidget *widget,
 				   FilerWindow *filer_window);
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window);
@@ -138,10 +143,18 @@ static Tool all_tools[] = {
 	 toolbar_details_clicked, DROP_NONE, TRUE,
 	 FALSE},
 	
+	{N_("Sort"), GTK_STOCK_SORT_ASCENDING, N_("Change sort criteria"),
+	 toolbar_sort_clicked, DROP_NONE, FALSE,
+	 FALSE},
+	
 	{N_("Hidden"), ROX_STOCK_SHOW_HIDDEN, N_("Show/hide hidden files"),
 	 toolbar_hidden_clicked, DROP_NONE, TRUE,
 	 FALSE},
 	
+	{N_("Select"), GTK_STOCK_COPY, N_("Select all/invert selection"),
+	 toolbar_select_clicked, DROP_NONE, FALSE,
+	 FALSE},
+ 	
 	{N_("Help"), GTK_STOCK_HELP, N_("Show ROX-Filer help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
 	 FALSE},
@@ -380,6 +393,62 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	display_change_size(filer_window, bev->button == 1);
 }
 
+static void toolbar_sort_clicked(GtkWidget *widget,
+				    FilerWindow *filer_window)
+{
+	GdkEventButton	*bev;
+	int i, current, next;
+	gboolean adjust;
+	GtkSortType dir;
+	gchar *tip;
+
+	static const SortType sorts[]={
+		SORT_NAME, SORT_TYPE, SORT_DATE, SORT_SIZE,
+		SORT_OWNER, SORT_GROUP, 
+	};
+	static const int nsorts=sizeof(sorts)/sizeof(sorts[0]);
+	static const char *sort_names[]={
+		N_("Sort by name"), N_("Sort by type"), N_("Sort by date"), 
+		N_("Sort by size"), N_("Sort by owner"), N_("Sort by group"), 
+	};
+
+	bev = (GdkEventButton *) gtk_get_current_event();
+	adjust=(bev->button == 2) && bev->type == GDK_BUTTON_RELEASE;
+
+	current=-1;
+	dir=filer_window->sort_order;
+	for(i=0; i<nsorts; i++)
+		if(filer_window->sort_type==sorts[i]) {
+			current=i;
+			break;
+		}
+	if(current==-1) {
+		next=0;
+		dir=GTK_SORT_ASCENDING;
+	} else if(adjust) {
+		next=current-1;
+		if(next<0) {
+			next=nsorts-1;
+			dir=(dir==GTK_SORT_ASCENDING)?
+				GTK_SORT_DESCENDING: GTK_SORT_ASCENDING;
+		}
+	} else {
+		next=current+1;
+		if(next>=nsorts) {
+			next=0;
+			dir=(dir==GTK_SORT_ASCENDING)?
+				GTK_SORT_DESCENDING: GTK_SORT_ASCENDING;
+		}
+	}
+
+	display_set_sort_type(filer_window, sorts[next], dir);
+ 	tip=g_strconcat(_(sort_names[next]), ", ",
+			dir==GTK_SORT_ASCENDING? _("ascending"): _("descending"),
+			NULL);
+	tooltip_show(tip);
+	g_free(tip);
+}
+
 static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
@@ -393,6 +462,30 @@ static void toolbar_hidden_clicked(GtkWidget *widget,
 				   FilerWindow *filer_window)
 {
 	display_set_hidden(filer_window, !filer_window->show_hidden);
+}
+
+static gboolean invert_cb(ViewIter *iter, gpointer data)
+{
+	return !view_get_selected((ViewIface *) data, iter);
+}
+
+static void toolbar_select_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+ 	    ((GdkEventButton *) event)->button==2)
+	{
+		view_select_if(filer_window->view, invert_cb,
+			       filer_window->view);
+	}
+	else if (event->type == GDK_BUTTON_RELEASE &&
+		 ((GdkEventButton *) event)->button==1)
+	{
+		view_select_all(filer_window->view);
+	}
+	filer_window->temp_item_selected = FALSE;
 }
 
 /* If filer_window is NULL, the toolbar is for the options window */
