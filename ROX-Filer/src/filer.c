@@ -1751,6 +1751,13 @@ void filer_add_tip_details(FilerWindow *filer_window,
 		target = readlink_dup(fullpath);
 		if (target)
 		{
+			if (!g_utf8_validate(target, -1, NULL))
+			{
+				char *tmp = target;
+				target = to_utf8(target);
+				g_free(tmp);
+			}
+			
 			g_string_append(tip, _("Symbolic link to "));
 			g_string_append(tip, target);
 			g_string_append_c(tip, '\n');

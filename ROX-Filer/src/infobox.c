@@ -271,9 +271,15 @@ static void set_selection(GtkTreeView *view, gpointer data)
 static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
 {
 	GtkTreeIter	iter;
+	gchar		*u8 = NULL;
+
+	if (!g_utf8_validate(data, -1, NULL))
+		u8 = to_utf8(data);
 
 	gtk_list_store_append(store, &iter);
-	gtk_list_store_set(store, &iter, 0, label, 1, data, -1);
+	gtk_list_store_set(store, &iter, 0, label, 1, u8 ? u8 : data, -1);
+
+	g_free(u8);
 }
 
 /* Create an empty list view, ready to place some data in */
@@ -315,15 +321,7 @@ static GtkWidget *make_details(guchar *path, DirItem *item)
 
 	make_list(&store, &view);
 	
-	if (g_utf8_validate(path, -1, NULL))
-		add_row(store, _("Name:"), item->leafname);
-	else
-	{
-		gchar *u8;
-		u8 = to_utf8(path);
-		add_row(store, _("Name:"), u8);
-		g_free(u8);
-	}
+	add_row(store, _("Name:"), item->leafname);
 
 	if (lstat(path, &info))
 	{
@@ -512,7 +510,7 @@ static void add_file_output(FileStatus *fs,
 	g_free(fs->text);
 	fs->text = str;
 	
-	str = g_strdup(fs->text);
+	str = to_utf8(fs->text);
 	g_strstrip(str);
 	gtk_label_set_text(fs->label, str);
 	g_free(str);
@@ -541,6 +539,13 @@ static guchar *pretty_type(DirItem *file, guchar *path)
 		if (target)
 		{
 			char *retval;
+
+			if (!g_utf8_validate(target, -1, NULL))
+			{
+				char *tmp = target;
+				target = to_utf8(target);
+				g_free(tmp);
+			}
 
 			retval = g_strdup_printf(_("Symbolic link to %s"),
 						target);
