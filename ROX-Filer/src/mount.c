@@ -359,7 +359,7 @@ gchar *mount_get_fs_size(const gchar *dir)
     total=buf.f_frsize*(unsigned long long) buf.f_blocks;
     used=buf.f_frsize*(unsigned long long) (buf.f_blocks-buf.f_bfree);
     avail=buf.f_frsize*(unsigned long long) buf.f_bavail;
-#else
+#elif defined(HAVE_STATFS)
     total=buf.f_bsize*(unsigned long long) buf.f_blocks;
     used=buf.f_bsize*(unsigned long long) (buf.f_blocks-buf.f_bfree);
     avail=buf.f_bsize*(unsigned long long) buf.f_bavail;
