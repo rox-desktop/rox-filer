@@ -664,7 +664,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_string_append(to, "/96x96/");
 	mkdir(to->str, 0700);
 	g_string_append(to, md5);
-	g_string_append(to, ".png");
+	g_string_append(to, ".png.new");
 
 	g_free(md5);
 
@@ -693,6 +693,20 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 			NULL);
 #endif	
 	umask(old_mask);
+
+	/* We create the file ###.png.new and rename it to avoid
+	 * a race condition if two program create the same thumb at
+	 * once.
+	 */
+	{
+		gchar *final;
+
+		final = g_strndup(to->str, to->len - 4);
+		if (rename(to->str, final))
+			g_warning("Failed to rename '%s' to '%s': %s",
+				  to->str, final, g_strerror(errno));
+		g_free(final);
+	}
 
 	g_string_free(to, TRUE);
 	g_free(swidth);
