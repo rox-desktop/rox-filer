@@ -66,6 +66,9 @@ static char *load_xterm_here(char *data);
 
 static void not_yet(gpointer data, guint action, GtkWidget *widget);
 
+static void large(gpointer data, guint action, GtkWidget *widget);
+static void full_info(gpointer data, guint action, GtkWidget *widget);
+
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -120,9 +123,9 @@ static gint		screen_width, screen_height;
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",   	NULL,  	not_yet, 0, "<RadioItem>"},
+{"/Display/Large Icons",   	NULL,  	large, 0, "<RadioItem>"},
 {"/Display/Small Icons",   	NULL,  	not_yet, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,  	not_yet, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,  	full_info, 0, "/Display/Large Icons"},
 {"/Display/Separator",		NULL,  	not_yet, 0, "<Separator>"},
 {"/Display/Sort by Name",	NULL,  	not_yet, 0, "<RadioItem>"},
 {"/Display/Sort by Type",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
@@ -450,6 +453,20 @@ static void menu_closed(GtkWidget *widget)
 static void not_yet(gpointer data, guint action, GtkWidget *widget)
 {
 	delayed_error("ROX-Filer", "Sorry, that feature isn't implemented yet");
+}
+
+static void large(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_style_set(window_with_focus, LARGE);
+}
+
+static void full_info(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_style_set(window_with_focus, FULL_INFO);
 }
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)

@@ -17,6 +17,7 @@
 typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
+typedef enum {UNKNOWN_STYLE, LARGE, FULL_INFO} DisplayStyle;
 
 typedef enum
 {
@@ -49,6 +50,7 @@ struct _FilerWindow
 	Side		panel_side;
 	time_t		m_time;		/* m-time at last scan */
 	int 		(*sort_fn)(const void *a, const void *b);
+	DisplayStyle	display_style;
 
 	/* Scanning */
 	DIR		*dir;
@@ -59,6 +61,8 @@ struct _FilerWindow
 struct _FileItem
 {
 	char		*leafname;
+	mode_t		mode;
+	off_t		size;
 	
 	int		base_type;	/* (regular file, dir, pipe, etc) */
 	MIME_type	*mime_type;	/* NULL, except for non-exec files */
@@ -81,5 +85,6 @@ void scan_dir(FilerWindow *filer_window);
 FileItem *selected_item(Collection *collection);
 void refresh_dirs(char *path);
 void change_to_parent(FilerWindow *filer_window);
+void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
 
 #endif /* _FILER_H */

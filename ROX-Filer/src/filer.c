@@ -46,6 +46,8 @@
 #include "type.h"
 #include "options.h"
 
+#define ROW_HEIGHT_LARGE 64
+#define ROW_HEIGHT_FULL_INFO 44
 #define MAX_ICON_HEIGHT 42
 #define PANEL_BORDER 2
 
@@ -55,6 +57,7 @@ FilerWindow 	*window_with_focus = NULL;
 GHashTable	*path_to_window_list = NULL;
 
 static FilerWindow *window_with_selection = NULL;
+static GdkFont	   *fixed_font = NULL;
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -81,17 +84,10 @@ static GtkWidget *toggle_ro_bindings;
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
 static gboolean idle_scan_dir(gpointer data);
-static void draw_item(GtkWidget *widget,
-			CollectionItem *item,
-			GdkRectangle *area);
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
 static void add_item(FilerWindow *filer_window, char *leafname);
-static gboolean test_point(Collection *collection,
-				int point_x, int point_y,
-				CollectionItem *item,
-				int width, int height);
 static void stop_scanning(FilerWindow *filer_window);
 static gint focus_in(GtkWidget *widget,
 			GdkEventFocus *event,
@@ -110,6 +106,33 @@ static void add_button(GtkContainer *box, int pixmap,
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window);
+static void consider_width(FilerWindow *filer_window, FileItem *item);
+static void draw_large_icon(GtkWidget *widget,
+			    GdkRectangle *area,
+			    FileItem  *item,
+			    gboolean selected);
+static void draw_string(GtkWidget *widget,
+		GdkFont *font,
+		char	*string,
+		int 	x,
+		int 	y,
+		int 	width,
+		gboolean selected);
+static void draw_item_large(GtkWidget *widget,
+			CollectionItem *item,
+			GdkRectangle *area);
+static void draw_item_full_info(GtkWidget *widget,
+			CollectionItem *colitem,
+			GdkRectangle *area);
+static char *details(FileItem *item);
+static gboolean test_point_large(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height);
+static gboolean test_point_full_info(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height);
 
 static GdkAtom xa_string;
 enum
@@ -127,6 +150,8 @@ void filer_init()
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("filer_ro_bindings", filer_ro_bindings);
 	option_register("filer_toolbar", filer_toolbar);
+
+	fixed_font = gdk_font_load("fixed");
 }
 
 
@@ -259,12 +284,47 @@ static gboolean idle_scan_dir(gpointer data)
 	return TRUE;
 }
 	
+/* Make sure that the collection's width is big enough for this
+ * item. Updates scan_min_width.
+ */
+static void consider_width(FilerWindow *filer_window, FileItem *item)
+{
+	int		w1, w2;
+	int		item_width;
+	
+	/* XXX: Must be a better way... */
+	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
+	item->pix_height = ((GdkPixmapPrivate *) item->image->pixmap)->height;
+
+	switch (filer_window->display_style)
+	{
+		case FULL_INFO:
+			w1 = gdk_string_width(
+					filer_window->window->style->font,
+					item->leafname);
+			w2 = gdk_string_width(
+					fixed_font,
+					details(item));
+			item->text_width = MAX(w1, w2);
+			item_width = item->pix_width + item->text_width + 12;
+			break;
+		default:
+			item->text_width = gdk_string_width(
+					filer_window->window->style->font,
+					item->leafname);
+			item_width = MAX(item->pix_width, item->text_width) + 4;
+			break;
+	}
+
+	if (item_width > filer_window->scan_min_width)
+		filer_window->scan_min_width = item_width;
+}
+
 /* Add a single object to a directory display */
 static void add_item(FilerWindow *filer_window, char *leafname)
 {
 	FileItem	*item;
 	int		old_item;
-	int		item_width;
 	struct stat	info;
 	int		base_type;
 	GString		*path;
@@ -279,12 +339,16 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	item = g_malloc(sizeof(FileItem));
 	item->leafname = g_strdup(leafname);
 	item->flags = (ItemFlags) 0;
+	item->mode = 0;
+	item->size = 0;
 
 	path = make_path(filer_window->path, leafname);
 	if (lstat(path->str, &info))
 		base_type = TYPE_ERROR;
 	else
 	{
+		item->mode = info.st_mode;
+		item->size = info.st_size;
 		if (S_ISREG(info.st_mode))
 			base_type = TYPE_FILE;
 		else if (S_ISDIR(info.st_mode))
@@ -388,26 +452,15 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			item->image = default_pixmap + base_type;
 	}
 
-	item->text_width = gdk_string_width(filer_window->window->style->font,
-			leafname);
-	
 	if (!item->image)
 		item->image = default_pixmap + TYPE_UNKNOWN;
 	
-	/* XXX: Must be a better way... */
-	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
-	item->pix_height = ((GdkPixmapPrivate *) item->image->pixmap)->height;
+	consider_width(filer_window, item);
 
-	item_width = MAX(item->pix_width, item->text_width) + 4;
-
-	if (item_width > filer_window->scan_min_width)
-		filer_window->scan_min_width = item_width;
-
-	if (item_width > filer_window->collection->item_width)
+	if (filer_window->scan_min_width > filer_window->collection->item_width)
 		collection_set_item_size(filer_window->collection,
-					 item_width,
+					 filer_window->scan_min_width,
 					 filer_window->collection->item_height);
-
 	old_item = collection_find_item(filer_window->collection, item,
 			sort_by_name);
 
@@ -425,7 +478,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 }
 
 /* Is a point inside an item? */
-static gboolean test_point(Collection *collection,
+static gboolean test_point_large(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *colitem,
 				int width, int height)
@@ -451,77 +504,196 @@ static gboolean test_point(Collection *collection,
 	return ABS(point_x - (width >> 1)) < x_limit;
 }
 
-static void draw_item(GtkWidget *widget,
+static gboolean test_point_full_info(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *colitem,
+				int width, int height)
+{
+	FileItem	*item = (FileItem *) colitem->data;
+	GdkFont		*font = GTK_WIDGET(collection)->style->font;
+	int		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
+
+	if (point_x < item->pix_width + 2)
+		return point_x > 2 && point_y > image_y;
+	
+	return point_x > item->pix_width + 2 &&
+	point_y > (height >> 1) - font->ascent - font->descent &&
+	point_y < (height >> 1) + fixed_font->ascent + fixed_font->descent;
+}
+
+static void draw_large_icon(GtkWidget *widget,
+			    GdkRectangle *area,
+			    FileItem  *item,
+			    gboolean selected)
+{
+	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
+	int	image_y;
+	GdkGC	*gc = selected ? widget->style->white_gc
+						: widget->style->black_gc;
+	if (!item->image)
+		return;
+		
+	gdk_gc_set_clip_mask(gc, item->image->mask);
+
+	image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
+	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
+	gdk_draw_pixmap(widget->window, gc,
+			item->image->pixmap,
+			0, 0,			/* Source x,y */
+			image_x, area->y + image_y, /* Dest x,y */
+			-1, MIN(item->pix_height, MAX_ICON_HEIGHT));
+
+	if (selected)
+	{
+		gdk_gc_set_function(gc, GDK_INVERT);
+		gdk_draw_rectangle(widget->window,
+				gc,
+				TRUE, image_x, area->y + image_y,
+				item->pix_width, item->pix_height);
+		gdk_gc_set_function(gc, GDK_COPY);
+	}
+
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_mask(gc,
+				default_pixmap[TYPE_SYMLINK].mask);
+		gdk_draw_pixmap(widget->window, gc,
+				default_pixmap[TYPE_SYMLINK].pixmap,
+				0, 0,		/* Source x,y */
+				image_x, area->y + 8,	/* Dest x,y */
+				-1, -1);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		int	type = item->flags & ITEM_FLAG_MOUNTED
+				? TYPE_MOUNTED
+				: TYPE_UNMOUNTED;
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_mask(gc,
+				default_pixmap[type].mask);
+		gdk_draw_pixmap(widget->window, gc,
+				default_pixmap[type].pixmap,
+				0, 0,		/* Source x,y */
+				image_x, area->y + 8, /* Dest x,y */
+				-1, -1);
+	}
+	
+	gdk_gc_set_clip_mask(gc, NULL);
+	gdk_gc_set_clip_origin(gc, 0, 0);
+}
+
+static void draw_string(GtkWidget *widget,
+		GdkFont	*font,
+		char	*string,
+		int 	x,
+		int 	y,
+		int 	width,
+		gboolean selected)
+{
+	int	text_height = font->ascent + font->descent;
+
+	if (selected)
+		gtk_paint_flat_box(widget->style, widget->window, 
+				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				x, y - font->ascent,
+				width,
+				text_height);
+
+	gdk_draw_text(widget->window,
+			font,
+			selected ? widget->style->white_gc
+				 : widget->style->black_gc,
+			x, y,
+			string, strlen(string));
+}
+	
+/* Return a string (valid until next call) giving details
+ * of this item.
+ */
+static char *details(FileItem *item)
+{
+	mode_t	m = item->mode;
+	static GString *buf = NULL;
+
+	if (!buf)
+		buf = g_string_new(NULL);
+
+	g_string_sprintf(buf, "%s, %c%c%c:%c%c%c:%c%c%c, %s",
+			S_ISDIR(m) ? "Dir" :
+				S_ISCHR(m) ? "Char" :
+				S_ISBLK(m) ? "Blck" :
+				S_ISLNK(m) ? "Link" :
+				S_ISSOCK(m) ? "Sock" :
+				S_ISFIFO(m) ? "Pipe" : "File",
+
+			m & S_IRUSR ? 'r' : '-',
+			m & S_IWUSR ? 'w' : '-',
+			'-',
+
+			m & S_IRGRP ? 'r' : '-',
+			m & S_IWGRP ? 'w' : '-',
+			'-',
+
+			m & S_IROTH ? 'r' : '-',
+			m & S_IWOTH ? 'w' : '-',
+			'-',
+			
+			format_size(item->size));
+
+	return buf->str;
+}
+
+static void draw_item_full_info(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area)
 {
 	FileItem	*item = (FileItem *) colitem->data;
-	GdkGC		*gc = colitem->selected ? widget->style->white_gc
-				       		: widget->style->black_gc;
-	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
+	GdkFont	*font = widget->style->font;
+	int	text_x = area->x + item->pix_width + 8;
+	int	mid_y = area->y + (area->height >> 1);
+	gboolean	selected = colitem->selected;
+	GdkRectangle	pic_area;
+
+	pic_area.x = area->x;
+	pic_area.y = area->y;
+	pic_area.width = item->pix_width + 8;
+	pic_area.height = area->height;
+
+	draw_large_icon(widget, &pic_area, item, selected);
+	
+	draw_string(widget,
+			widget->style->font,
+			item->leafname, 
+			text_x, mid_y - font->descent,
+			item->text_width,
+			selected);
+	draw_string(widget,
+			fixed_font,
+			details(item),
+			text_x,	mid_y + font->ascent,
+			item->text_width,
+			selected);
+}
+
+static void draw_item_large(GtkWidget *widget,
+			CollectionItem *colitem,
+			GdkRectangle *area)
+{
+	FileItem	*item = (FileItem *) colitem->data;
 	GdkFont	*font = widget->style->font;
 	int	text_x = area->x + ((area->width - item->text_width) >> 1);
 	int	text_y = area->y + area->height - font->descent - 2;
-	int	text_height = font->ascent + font->descent;
+	gboolean	selected = colitem->selected;
 
-	if (item->image)
-	{
-		int	image_y;
-		
-		gdk_gc_set_clip_mask(gc, item->image->mask);
-
-		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
-		gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-		gdk_draw_pixmap(widget->window, gc,
-				item->image->pixmap,
-				0, 0,			/* Source x,y */
-				image_x, area->y + image_y, /* Dest x,y */
-				-1, MIN(item->pix_height, MAX_ICON_HEIGHT));
-
-		if (item->flags & ITEM_FLAG_SYMLINK)
-		{
-			gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-			gdk_gc_set_clip_mask(gc,
-					default_pixmap[TYPE_SYMLINK].mask);
-			gdk_draw_pixmap(widget->window, gc,
-					default_pixmap[TYPE_SYMLINK].pixmap,
-					0, 0,		/* Source x,y */
-					image_x, area->y + 8,	/* Dest x,y */
-					-1, -1);
-		}
-		else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-		{
-			int	type = item->flags & ITEM_FLAG_MOUNTED
-					? TYPE_MOUNTED
-					: TYPE_UNMOUNTED;
-			gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-			gdk_gc_set_clip_mask(gc,
-					default_pixmap[type].mask);
-			gdk_draw_pixmap(widget->window, gc,
-					default_pixmap[type].pixmap,
-					0, 0,		/* Source x,y */
-					image_x, area->y + 8, /* Dest x,y */
-					-1, -1);
-		}
-		
-		gdk_gc_set_clip_mask(gc, NULL);
-		gdk_gc_set_clip_origin(gc, 0, 0);
-	}
+	draw_large_icon(widget, area, item, selected);
 	
-	if (colitem->selected)
-		gtk_paint_flat_box(widget->style, widget->window, 
-				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
-				NULL, widget, "text",
-				text_x, text_y - font->ascent,
-				item->text_width,
-				text_height);
-
-	gdk_draw_text(widget->window,
+	draw_string(widget,
 			widget->style->font,
-			colitem->selected ? widget->style->white_gc
-					  : widget->style->black_gc,
-			text_x, text_y,
-			item->leafname, strlen(item->leafname));
+			item->leafname, 
+			text_x, text_y, item->text_width,
+			selected);
 }
 
 void show_menu(Collection *collection, GdkEventButton *event,
@@ -988,11 +1160,43 @@ void refresh_dirs(char *path)
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window)
 {
+	/* TODO: We can open lots of these - very irritating! */
 	return get_choice("Close panel?",
 			"You have tried to close a panel via the window "
 			"manager - I usually find that this is accidental... "
 			"really close?",
 			2, "Remove", "Cancel") != 0;
+}
+
+void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
+{
+	int		i;
+	Collection	*col = filer_window->collection;
+	
+	if (filer_window->display_style == style)
+		return;
+
+	filer_window->display_style = style;
+	switch (style)
+	{
+		case FULL_INFO:
+			collection_set_functions(filer_window->collection,
+				draw_item_full_info, test_point_full_info);
+			break;
+		default:
+			collection_set_functions(filer_window->collection,
+				draw_item_large, test_point_large);
+			break;
+	}
+
+	filer_window->scan_min_width = 64;
+	for (i = 0; i < col->number_of_items; i++)
+		consider_width(filer_window, (FileItem *) col->items[i].data);
+	
+	collection_set_item_size(filer_window->collection,
+			filer_window->scan_min_width,
+			style == FULL_INFO ? ROW_HEIGHT_FULL_INFO
+					   : ROW_HEIGHT_LARGE);
 }
 
 void filer_opendir(char *path, gboolean panel, Side panel_side)
@@ -1005,7 +1209,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		{"STRING", 0, TARGET_STRING},
 	};
 
-	filer_window = g_malloc(sizeof(FilerWindow));
+	filer_window = g_new(FilerWindow, 1);
 	filer_window->path = pathdup(path);
 	filer_window->dir = NULL;	/* Not scanning */
 	filer_window->show_hidden = FALSE;
@@ -1014,6 +1218,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = sort_by_type;
 	filer_window->flags = (FilerFlags) 0;
+	filer_window->display_style = UNKNOWN_STYLE;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
@@ -1021,9 +1226,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
-	collection_set_item_size(filer_window->collection, 64, 64);
-	collection_set_functions(filer_window->collection,
-			draw_item, test_point);
 
 	gtk_widget_add_events(filer_window->window, GDK_ENTER_NOTIFY);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window),
@@ -1056,6 +1258,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
+	filer_style_set(filer_window, LARGE);
 	drag_set_dest(collection);
 
 	if (panel)
@@ -1112,8 +1315,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-					400,
-					o_toolbar ? 220 : 200);
+			filer_window->display_style == LARGE ? 400 : 512,
+			o_toolbar ? 220 : 200);
 
 		gtk_container_add(GTK_CONTAINER(filer_window->window),
 					hbox);
