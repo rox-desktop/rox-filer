@@ -5,6 +5,9 @@
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  */
 
+#ifndef _FILER_H
+#define _FILER_H
+
 #include <gtk/gtk.h>
 #include <collection.h>
 #include "pixmaps.h"
@@ -42,4 +45,10 @@ struct _FileItem
 	MaskedPixmap	*image;
 };
 
+extern FilerWindow *window_with_focus;
+
+/* Prototype */
 void filer_opendir(char *path);
+void scan_dir(FilerWindow *filer_window);
+
+#endif /* _FILER_H */

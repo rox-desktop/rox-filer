@@ -15,6 +15,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkprivate.h> /* XXX - find another way to do this */
+#include <gdk/gdkkeysyms.h>
 #include <collection.h>
 
 #include "support.h"
@@ -24,6 +25,8 @@
 #include "menu.h"
 #include "dnd.h"
 #include "apps.h"
+
+FilerWindow *window_with_focus = NULL;
 
 static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
@@ -38,13 +41,18 @@ static void draw_item(GtkWidget *widget,
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
-static void scan_dir(FilerWindow *filer_window);
 static void add_item(FilerWindow *filer_window, char *leafname);
 static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
 static void stop_scanning(FilerWindow *filer_window);
+static gint focus_in(GtkWidget *widget,
+			GdkEventFocus *event,
+			FilerWindow *filer_window);
+static gint focus_out(GtkWidget *widget,
+			GdkEventFocus *event,
+			FilerWindow *filer_window);
 
 
 static void filer_window_destroyed(GtkWidget 	*widget,
@@ -52,6 +60,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 {
 	if (window_with_selection == filer_window)
 		window_with_selection = NULL;
+	if (window_with_focus == filer_window)
+		window_with_focus = NULL;
 
 	if (filer_window->dir)
 		stop_scanning(filer_window);
@@ -270,7 +280,7 @@ void show_menu(Collection *collection, GdkEventButton *event,
 	show_filer_menu((FilerWindow *) user_data, event);
 }
 
-static void scan_dir(FilerWindow *filer_window)
+void scan_dir(FilerWindow *filer_window)
 {
 	if (filer_window->dir)
 		stop_scanning(filer_window);
@@ -348,6 +358,58 @@ void open_item(Collection *collection,
 	}
 }
 
+static gint focus_in(GtkWidget *widget,
+			GdkEventFocus *event,
+			FilerWindow *filer_window)
+{
+	window_with_focus = filer_window;
+
+	return FALSE;
+}
+
+static gint focus_out(GtkWidget *widget,
+			GdkEventFocus *event,
+			FilerWindow *filer_window)
+{
+	/* TODO: Shade the cursor */
+
+	return FALSE;
+}
+
+/* Handle keys that can't be bound with the menu */
+static gint key_press_event(GtkWidget	*widget,
+			GdkEventKey	*event,
+			FilerWindow	*filer_window)
+{
+	switch (event->keyval)
+	{
+		/*
+		   case GDK_Left:
+		   move_cursor(-1, 0);
+		   break;
+		   case GDK_Right:
+		   move_cursor(1, 0);
+		   break;
+		   case GDK_Up:
+		   move_cursor(0, -1);
+		   break;
+		   case GDK_Down:
+		   move_cursor(0, 1);
+		   break;
+		   case GDK_Return:
+		 */
+		case GDK_BackSpace:
+			filer_window->path = pathdup(make_path(
+						filer_window->path,
+						"..")->str);
+			scan_dir(filer_window);
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+
 void filer_opendir(char *path)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
@@ -374,6 +436,12 @@ void filer_opendir(char *path)
 	scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 
+	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
+			GTK_SIGNAL_FUNC(focus_in), filer_window);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_out_event",
+			GTK_SIGNAL_FUNC(focus_out), filer_window);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window), "key_press_event",
+			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->collection), "open_item",
 			open_item, filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
@@ -386,11 +454,14 @@ void filer_opendir(char *path)
 			drag_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
 			drag_data_get, filer_window);
+	drag_set_dest(collection, filer_window);
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
 
 	load_default_pixmaps(collection->window);
+
+	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
 
 	scan_dir(filer_window);
 }

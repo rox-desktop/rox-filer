@@ -27,11 +27,19 @@ enum
 	TARGET_XDS,
 };
 
+GdkAtom XdndDirectSave0;
+
 /* Static prototypes */
 static void create_uri_list(GString *string,
 				Collection *collection,
 				FilerWindow *filer_window);
 static FileItem *selected_item(Collection *collection);
+static gboolean drag_drop(GtkWidget 	*widget,
+			GdkDragContext  *context,
+			gint            x,
+			gint            y,
+			guint           time);
+static gboolean provides(GdkDragContext *context, GdkAtom target);
 
 
 static FileItem *selected_item(Collection *collection)
@@ -176,4 +184,67 @@ static void create_uri_list(GString *string,
 	}
 
 	g_string_free(leader, TRUE);
+}
+
+void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
+{
+	GtkTargetEntry 	target_table[] =
+	{
+		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"XdndDirectSave0", 0, TARGET_XDS},
+		{"application/octet-stream", 0, TARGET_RAW},
+	};
+
+	gtk_drag_dest_set(widget,
+			GTK_DEST_DEFAULT_MOTION,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table),
+			GDK_ACTION_COPY);
+
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_drop",
+			GTK_SIGNAL_FUNC(drag_drop), filer_window);
+}
+
+static gboolean drag_drop(GtkWidget 	*widget,
+			GdkDragContext  *context,
+			gint            x,
+			gint            y,
+			guint           time)
+{
+	if (gtk_drag_get_source_widget(context) == widget)
+	{
+		gtk_drag_finish(context,
+				FALSE,	/* Success */
+				FALSE,  /* Delete */
+				time);
+		return TRUE;
+	}
+
+	if (provides(context, XdndDirectSave0))
+		report_error("drag_drop", "Use XDS");
+	else
+		report_error("drag_drop", "Normal DND");
+
+	gtk_drag_finish(context,
+			FALSE,	/* Success */
+			FALSE,  /* Delete */
+			time);
+
+	return TRUE;
+}
+
+/* Is the sended willing to supply this target type? */
+static gboolean provides(GdkDragContext *context, GdkAtom target)
+{
+	GList	    *targets = context->targets;
+
+	while (targets && ((GdkAtom) targets->data != target))
+		targets = targets->next;
+
+	return targets != NULL;
+}
+
+void dnd_init()
+{
+	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 }

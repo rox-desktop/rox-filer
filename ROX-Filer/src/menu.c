@@ -19,10 +19,10 @@ GtkAccelGroup	*filer_keys;
 
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
+static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
-static FilerWindow	*menu_owner;
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/_Display",		    NULL,	NULL, 0, "<Branch>"},
@@ -36,7 +36,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Sort by Si_ze",  NULL,   	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",	    NULL,   	NULL, 0, "<Separator>"},
 {"/Display/Show _Hidden",   C_"H", 	NULL, 0, "<ToggleItem>"},
-{"/Display/Refresh",	    C_"L", 	NULL, 0, NULL},
+{"/Display/Refresh",	    C_"L", 	refresh, 0, NULL},
 {"/File",		    NULL,   	NULL, 0, "<Branch>"},
 {"/File/_Copy",		    NULL,   	NULL, 0, NULL},
 {"/File/_Rename",	    NULL,   	NULL, 0, NULL},
@@ -87,13 +87,24 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 {
-	menu_owner = filer_window;
+	g_return_if_fail(window_with_focus == filer_window);
 	
 	gtk_menu_popup(GTK_MENU(filer_menu), NULL, NULL, position_menu,
 			NULL, event->button, event->time);
 }
 
+/* Actions */
+
+static void refresh(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	scan_dir(window_with_focus);
+}
+
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(menu_owner->path, "/..")->str);
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_opendir(make_path(window_with_focus->path, "/..")->str);
 }

@@ -12,12 +12,14 @@
 
 #include "filer.h"
 #include "menu.h"
+#include "dnd.h"
 
 int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
 
 	menu_init();
+	dnd_init();
 
 	if (argc < 2)
 		filer_opendir(getenv("HOME"));
