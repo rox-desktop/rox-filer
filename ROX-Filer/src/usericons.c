@@ -616,10 +616,12 @@ static void get_dir(gpointer key, gpointer value, gpointer data)
 
 static void open_icon_dir(GtkMenuItem *item, gpointer data)
 {
+	FilerWindow *filer;
 	char *dir;
 
 	gtk_label_get(GTK_LABEL(GTK_BIN(item)->child), &dir);
-	filer_opendir(dir, NULL);
+	filer = filer_opendir(dir, NULL);
+	dir_rescan_with_thumbs(filer->directory, filer->path);
 }
 
 static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)

@@ -232,7 +232,15 @@ void toolbar_update_info(FilerWindow *filer_window)
 
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_opendir(make_path(app_dir, "Help")->str, NULL);
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+			((GdkEventButton *) event)->button != 1)
+		filer_change_to(filer_window,
+				make_path(app_dir, "Help")->str, NULL);
+	else
+		filer_opendir(make_path(app_dir, "Help")->str, NULL);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,

@@ -86,9 +86,6 @@ static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-static gint focus_in(GtkWidget *widget,
-			GdkEventFocus *event,
-			FilerWindow *filer_window);
 static void add_item(FilerWindow *filer_window, DirItem *item);
 static void update_display(Directory *dir,
 			DirAction	action,
@@ -786,15 +783,6 @@ static gint pointer_out(GtkWidget *widget,
 	return FALSE;
 }
 
-static gint focus_in(GtkWidget *widget,
-			GdkEventFocus *event,
-			FilerWindow *filer_window)
-{
-	window_with_focus = filer_window;
-
-	return FALSE;
-}
-
 /* Move the cursor to the next selected item in direction 'dir'
  * (+1 or -1).
  */
@@ -945,6 +933,8 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window)
 {
+	window_with_focus = filer_window;
+
 	switch (event->keyval)
 	{
 		case GDK_Escape:
@@ -1412,8 +1402,6 @@ static void filer_add_signals(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(filer_window->window),
 			"leave-notify-event",
 			GTK_SIGNAL_FUNC(pointer_out), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
-			GTK_SIGNAL_FUNC(focus_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			GTK_SIGNAL_FUNC(filer_window_destroyed), filer_window);
 
