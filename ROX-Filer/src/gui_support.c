@@ -67,10 +67,6 @@ static void run_error_info_dialog(GtkMessageType type, const char *message,
 static GType simple_image_get_type(void);
 static void gui_get_monitor_adjacent(int monitor, MonitorAdjacent *adj);
 
-#if GTK_CHECK_VERSION(2, 2, 0)
-#define gdk_screen_get_monitor_at_point(s, x, y) 0
-#endif
-
 void gui_store_screen_geometry(GdkScreen *screen)
 {
 	gint mon;
@@ -81,7 +77,6 @@ void gui_store_screen_geometry(GdkScreen *screen)
 	if (monitor_adjacent)
 		g_free(monitor_adjacent);
 
-#if GTK_CHECK_VERSION(2, 2, 0)
 	monitor_width = monitor_height = G_MAXINT;
 	n_monitors = gdk_screen_get_n_monitors(screen);
 	if (monitor_geom)
@@ -106,7 +101,6 @@ void gui_store_screen_geometry(GdkScreen *screen)
 		}
 	}
 	else
-#endif /* GTK_CHECK_VERSION(2, 2, 0) */
 	{
 		n_monitors = 1;
 		monitor_geom[0].x = monitor_geom[0].y = 0;
@@ -1067,25 +1061,9 @@ static void simple_image_size_request(GtkWidget      *widget,
 void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		   int x, int y, int width, int height)
 {
-#if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION > 1
 	gdk_draw_pixbuf(target, gc, pixbuf, 0, 0, x, y, width, height,
 		        GDK_RGB_DITHER_NORMAL, 0, 0);
 
-#else
-	static gboolean warned = FALSE;
-	if (gtk_minor_version == 0)
-		GDK_DRAWABLE_GET_CLASS(target)->_draw_pixbuf(target, gc, pixbuf,
-				   0, 0, x, y, width, height,
-				   GDK_RGB_DITHER_NORMAL, 0, 0);
-	else if (!warned)
-	{
-		delayed_error(_("Pinboard icons cannot be drawn because "
-				"ROX-Filer was compiled against GTK+-2.0 "
-				"but is running with GTK+-2.2. Please "
-				"recompile it."));
-		warned = TRUE;
-	}
-#endif
 }
 
 static gint simple_image_expose(GtkWidget *widget, GdkEventExpose *event)

@@ -178,9 +178,7 @@ static void soap_add(xmlNodePtr body,
 static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
-#if GTK_CHECK_VERSION(2,2,0)
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
-#endif
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -290,10 +288,8 @@ int main(int argc, char **argv)
 		"class \"Collection\" style : gtk "
 		"\"rox-default-collection-style\"\n");
 
-#if GTK_CHECK_VERSION(2,2,0)
 	g_signal_connect(gdk_screen_get_default(), "size-changed",
 			 G_CALLBACK(xrandr_size_change), NULL);
-#endif
 
 	/* Process each option in turn */
 	while (1)
@@ -692,7 +688,6 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 #endif
 }
 
-#if GTK_CHECK_VERSION(2,2,0)
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 {
 	gui_store_screen_geometry(screen);
@@ -700,4 +695,3 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 	panel_update_size();
 	pinboard_update_size();
 }
-#endif
