@@ -1,0 +1,47 @@
+			ROX-Filer
+			A RISCOS-like filer for X
+			by Thomas Leonard
+
+			File types (technical)
+
+When the filer sees a file it chooses a MIME type for it. This type determines
+what icon is used to represent the file and what happens when you open it. Only
+regular, non-executable files have MIME types.
+
+To work out what type to give a file the Filer looks up its extension in a
+table, which it reads on start up from MIME-types/guess in your Choices
+directory. This file is in the same format as the gnome.mime file, although not
+all the information in this file is used at present.
+
+To decide what happens when you open the file, the Filer:
+
+- Replaces the / in the MIME type with _.
+- Looks for an item with this name in MIME-types in your choices directory.
+  If this is not found then it tries again with just the media type.
+- Runs the application it files there, passing the pathname of the file as
+  the only argument.
+
+So, double clicking on a file of type text/plain may try to run:
+  ~/Choices/MIME-types/text_plain/AppRun pathname
+If that's not found then it will try:
+  ~/Choices/MIME-types/text/AppRun pathname
+The idea is that you create symlinks in MIME-types to applications that you
+want to handle files of that type.
+
+To decide what icon to give a file the Filer tries to find an application which
+can handle files of that type, as above. It then tries to load an icon with the
+type name from the application's MIME-icons subdirectory. If this is missing
+then it tries again using just the media type.
+If both are missing then it tries again using the application for handling the
+base type. If that's missing too then it'll use a default icon for that media
+type from inside ROX-Filer itself.
+
+For example: when trying to display something of type 'image/gif' the following
+files may be tried:
+
+Choices/MIME-types/image_gif/MIME-icons/image_gif.xpm
+Choices/MIME-types/image_gif/MIME-icons/image.xpm
+Choices/MIME-types/image/MIME-icons/image_gif.xpm
+Choices/MIME-types/image/MIME-icons/image.xpm
+ROX-Filer/MIME-icons/image.xpm
+<built-in default icon>
