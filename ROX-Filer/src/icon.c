@@ -445,10 +445,7 @@ static void rename_activate(GtkWidget *dialog)
 	new_name = gtk_entry_get_text(GTK_ENTRY(entry));
 	new_src = gtk_entry_get_text(GTK_ENTRY(src));
 	
-	if (*new_name == '\0')
-		report_error(
-			_("The label must contain at least one character!"));
-	else if (*new_src == '\0')
+	if (*new_src == '\0')
 		report_error(
 			_("The location must contain at least one character!"));
 	else
