@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.1.2 - Manuel de l'utilisateur
+   ROX-Filer 2.1.3 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -35,7 +35,7 @@
   </authorgroup>
 
   <copyright>
-   <year>2003</year>
+   <year>2004</year>
    <holder>Thomas Leonard</holder>
   </copyright>
 
@@ -448,8 +448,16 @@ Redémarrez IceWM et le filer pour que les changements prennent effet.
 	  l'utilisateur root, par exemple, ne pourra lancer aucune commande qui utiliserait X).
 	  Une lecture des pages man pour <command>xauth</command> et <command>xhost</command> est
 	  donc conseillée, mais ce mécanisme varie selon les systèmes (c'est pourquoi ça n'est pas
-	  implémenté dans le filer !).
+	  imtégré dans le filer !).
 	 </para>
+	 <para>
+	  Note : La commande <command>gnomesu</command> peut aussi être utilisée pour exécuter 
+	  le filer en tant que root, mais vous devrez employer <command>setsid</command> pour 
+	  le démarrer dans une nouvelle session, sinon gnomesu le détruira avant qu'il n'ouvre 
+	  la moindre fenêtre.
+	  Exemple :
+	  <screen>gnomesu -c 'setsid /usr/local/bin/rox /'</screen>
+     </para>
 
 </sect1>
 </chapter>
@@ -2028,40 +2036,49 @@ pour passer d'un objet sélectionné à un autre, en boucle.
 <chapter id="actions">
   <title>Les fenêtres action</title>
   <para>
-
-Les fenêtres action sont ces fenêtres qui apparaissent quand vous êtes en train
-d'accomplir une opération de Copie/Déplacement/Lien/etc... La ligne de statut
-en haut de la fenêtre affiche le nom du dossier courant ou de l'objet en train
-d'être traité. L'espace qui se trouve en-dessous est là pour afficher les messages
-&mdash; ce qui a été fait, et éventuellement des questions.
-  </para><para>
+   Les fenêtres action sont ces fenêtres qui apparaissent quand vous êtes en train 
+   d'accomplir une opération de Copie/Déplacement/Lien/etc... La ligne de statut 
+   en haut de la fenêtre affiche le nom du dossier courant ou de l'objet en train 
+   d'être traité. L'espace qui se trouve en-dessous est là pour afficher les messages
+   &mdash; ce qui a été fait, et éventuellement des questions.
+  </para>
   
-En bas, il y a quatre boutons, et quelques options. Toutes les fenêtres ont une
-option <guilabel>Silencieux</guilabel>. Quand elle est active, le filer ne demandera
-que quelques confirmations (par exemple, la suppression d'un fichier protégé en
-écriture). Mais dans la majorité des cas, toutes les opérations seront automatiques.
-</para><para>
-
-Les boutons fonctionnent de cette manière :
+  <para>
+   En bas, il y a quatre boutons, et quelques options. Toutes les fenêtres ont une 
+   option <guilabel>Silencieux</guilabel>. Quand elle est active, le filer ne demandera 
+   que quelques confirmations (par exemple, la suppression d'un fichier protégé en 
+   écriture). Mais dans la majorité des cas, toutes les opérations seront automatiques.
+  </para>
+  
+  <para>
+   Les boutons fonctionnent de cette manière :
 
 <variablelist>
 
-<varlistentry><term><guibutton>Oui</guibutton></term><listitem><para>
-répond oui à la question affichée.
-</para></listitem></varlistentry>
+<varlistentry>
+ <term><guibutton>Oui</guibutton></term>
+ <listitem><para>répond oui à la question affichée.</para></listitem>
+</varlistentry>
 
-<varlistentry><term><guibutton>Non</guibutton></term><listitem><para>
-répond non à la question affichée.
-</para></listitem></varlistentry>
+<varlistentry>
+ <term><guibutton>Non</guibutton></term>
+ <listitem><para>répond non à la question affichée.</para></listitem>
+</varlistentry>
 
-<varlistentry><term><guibutton>Annuler</guibutton></term><listitem><para>
-Stoppe l'opération en cours et ferme la fenêtre action.
-</para></listitem></varlistentry>
+<varlistentry>
+ <term><guibutton>Annuler</guibutton></term>
+ <listitem><para>Stoppe l'opération en cours et ferme la fenêtre action.</para></listitem>
+</varlistentry>
 
-<varlistentry><term><guibutton>Silencieux</guibutton></term><listitem><para>
-est un raccourci pour activer l'option <guilabel>Silencieux</guilabel> puis
-cliquer sur <guibutton>Oui</guibutton>.
-</para></listitem></varlistentry>
+<varlistentry>
+ <term><guibutton>Silencieux</guibutton></term>
+ <listitem>
+  <para>
+   est un raccourci pour activer l'option <guilabel>Silencieux</guilabel> puis 
+   cliquer sur <guibutton>Oui</guibutton>.
+  </para>
+ </listitem>
+</varlistentry>
 
 </variablelist>
 
@@ -2073,25 +2090,28 @@ commande <guimenuitem>Options...</guimenuitem>.
 <sect1>
   <title>Options des fenêtres action</title>
   <para>
-
-Certaines actions ont des options, qui apparaissent sous forme de petites
-cases à cocher en bas de la fenêtre :
+   Certaines actions ont des options, qui apparaissent sous forme de petites 
+   cases à cocher en bas de la fenêtre :
 
 <itemizedlist>
 
-<listitem><para>
-<guilabel>Forcer</guilabel> signifie que le filer ne va pas traiter différemment
-les fichiers spécifiés 'protégés en écriture'. Normalement, la suppression est
-confirmée même si <guibutton>Silencieux</guibutton> est enclenché.
-Notez que vous ne pouvez pas supprimer des fichiers présents dans des dossiers
-protégés en écriture car dans ce cas vous n'en avez pas la permission.
-</para></listitem>
+<listitem>
+ <para>
+  <guilabel>Forcer</guilabel> signifie que le filer ne va pas traiter différemment 
+  les fichiers spécifiés 'protégés en écriture'. Normalement, la suppression est 
+  confirmée même si <guibutton>Silencieux</guibutton> est enclenché.
+  Notez que vous ne pouvez pas supprimer des fichiers présents dans des dossiers 
+  protégés en écriture car dans ce cas vous n'en avez pas la permission.
+ </para>
+</listitem>
 
-<listitem><para>
-<guilabel>Bref</guilabel> évite au filer d'afficher un message à chaque fois
-qu'il fait quelque chose. Utilisez cette option si vous voulez augmenter la vitesse
-d'exécution de l'opération, si beaucoup de messages sont affichés.
-</para></listitem>
+<listitem>
+ <para>
+  <guilabel>Bref</guilabel> évite au filer d'afficher un message à chaque fois 
+  qu'il fait quelque chose. Utilisez cette option si vous voulez augmenter la vitesse 
+  d'exécution de l'opération, si beaucoup de messages sont affichés.
+ </para>
+</listitem>
 
 <listitem>
  <para>
@@ -3313,7 +3333,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 	 
   <refsect1>
    <title>LICENCE</title>
-   <para>Copyright (C) 2003 Thomas Leonard.</para>
+   <para>Copyright (C) 2004 Thomas Leonard.</para>
    <para>
 	Vous pouvez redistribuer des copies de ROX-Filer si vous respectez les termes de la GNU General Public License.
    </para>
