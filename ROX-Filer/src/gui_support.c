@@ -749,3 +749,17 @@ void wink_widget(GtkWidget *widget)
 	wink_destroy = gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 				GTK_SIGNAL_FUNC(wink_widget_died), NULL);
 }
+
+static gboolean idle_destroy_cb(GtkWidget *widget)
+{
+	gtk_widget_unref(widget);
+	gtk_widget_destroy(widget);
+	return FALSE;
+}
+
+/* Destroy the widget in an idle callback */
+void destroy_on_idle(GtkWidget *widget)
+{
+	gtk_widget_ref(widget);
+	gtk_idle_add((GtkFunction) idle_destroy_cb, widget);
+}

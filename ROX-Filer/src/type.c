@@ -443,7 +443,7 @@ void drag_app_dropped(GtkWidget		*frame,
 				delayed_error("symlink failed",
 						g_strerror(errno));
 			else
-				gtk_widget_destroy(dialog);
+				destroy_on_idle(dialog);
 		}
 	}
 	else

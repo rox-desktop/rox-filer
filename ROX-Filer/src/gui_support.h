@@ -47,5 +47,6 @@ void make_colour_patch(GtkWidget *button);
 void button_patch_set_colour(GtkWidget *button, GdkColor *color);
 GdkColor *button_patch_get_colour(GtkWidget *button);
 void wink_widget(GtkWidget *widget);
+void destroy_on_idle(GtkWidget *widget);
 
 #endif /* _GUI_SUPPORT_H */
