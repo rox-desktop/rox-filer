@@ -210,6 +210,8 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 				0, 1, 0, 2,
 				GTK_SHRINK, GTK_EXPAND | GTK_FILL, 1, 2);
 
+	abox->progress=NULL;
+
 	abox->flag_box = gtk_hbox_new(FALSE, 16);
 	gtk_box_pack_end(GTK_BOX(dialog->vbox),
 				abox->flag_box, FALSE, TRUE, 2);
@@ -662,5 +664,19 @@ void abox_set_file(ABox *abox, int i, const gchar *path)
 	gtk_widget_show(abox->cmp_date[i]);
 
 	diritem_free(item);
+}
+
+void    abox_set_percentage(ABox *abox, int per)
+{
+	if(!abox->progress) {
+		GtkDialog *dialog = GTK_DIALOG(abox);
+		
+		abox->progress=gtk_progress_bar_new ();
+		gtk_box_pack_start(GTK_BOX(dialog->vbox),
+				abox->progress, FALSE, FALSE, 2);
+		gtk_widget_show(abox->progress);
+	}
+	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(abox->progress),
+				      per/100.);
 }
 

@@ -363,6 +363,10 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 		abox_set_file(abox, 1, buffer+1);
 		abox_show_compare(abox, TRUE);
 	}
+	else if (*buffer == '%')
+	{
+		abox_set_percentage(abox, atoi(buffer+1));
+	}
 	else
 		abox_log(abox, buffer + 1, NULL);
 }
@@ -905,12 +909,16 @@ static void do_delete(const char *src_path, const char *unused)
 					   : access(src_path, W_OK) != 0;
 	if (write_prot || !quiet)
 	{
+		int res;
+		
 		printf_send("<%s", src_path);
 		printf_send(">");
-		if (!printf_reply(from_parent, write_prot && !o_force,
+		res=printf_reply(from_parent, write_prot && !o_force,
 				  _("?Delete %s'%s'?"),
 				  write_prot ? _("WRITE-PROTECTED ") : "",
-				  src_path))
+				 src_path);
+		printf_send("<");
+		if (!res)
 			return;
 	}
 	else if (!o_brief)
@@ -956,11 +964,14 @@ static void do_eject(const char *path)
 
 	if (!quiet)
 	{
+		int res;
 		printf_send("<%s", path);
 		printf_send(">");
-		if (!printf_reply(from_parent, !o_force,
+		res=printf_reply(from_parent, !o_force,
 				  _("?Eject '%s'?"),
-				  path))
+				 path);
+		printf_send("<");
+		if (!res)
 			return;
 	}
 	else if (!o_brief)
@@ -1098,10 +1109,13 @@ static void do_chmod(const char *path, const char *unused)
 
 	if (!quiet)
 	{
+		int res;
 		printf_send("<%s", path);
 		printf_send(">");
-		if (!printf_reply(from_parent, FALSE,
-				  _("?Change permissions of '%s'?"), path))
+		res=printf_reply(from_parent, FALSE,
+				 _("?Change permissions of '%s'?"), path);
+		printf_send("<");
+		if (!res)
 			return;
 	}
 	else if (!o_brief)
@@ -1175,10 +1189,13 @@ static void do_settype(const char *path, const char *unused)
 
 	if (!quiet)
 	{
+		int res;
 		printf_send("<%s", path);
 		printf_send(">");
-		if (!printf_reply(from_parent, FALSE,
-				  _("?Change type of '%s'?"), path))
+		res=printf_reply(from_parent, FALSE,
+				 _("?Change type of '%s'?"), path);
+		printf_send("<");
+		if (!res)
 			return;
 	}
 
@@ -1625,10 +1642,12 @@ static void usage_cb(gpointer data)
 {
 	GList *paths = (GList *) data;
 	double	total_size = 0;
+	int n, i, per;
 
+	n=g_list_length(paths);
 	dir_counter = file_counter = 0;
 
-	for (; paths; paths = paths->next)
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 
@@ -1636,6 +1655,11 @@ static void usage_cb(gpointer data)
 
 		size_tally = 0;
 		
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		do_usage(path, NULL);
 
 		printf_send("'%s: %s\n",
@@ -1669,8 +1693,10 @@ static void mount_cb(gpointer data)
 {
 	GList 		*paths = (GList *) data;
 	gboolean	mount_points = FALSE;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar *path = (guchar *) paths->data;
 		guchar *target;
@@ -1679,6 +1705,11 @@ static void mount_cb(gpointer data)
 		if (!target)
 			target = path;
 
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		if (mount_is_mounted(target, NULL, NULL))
 		{
 			mount_points = TRUE;
@@ -1717,15 +1748,22 @@ static guchar *dirname(guchar *path)
 static void delete_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 		guchar	*dir;
-		
+
 		dir = dirname(path);
 		send_dir(dir);
 
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		do_delete(path, dir);
 
 		g_free(dir);
@@ -1737,11 +1775,19 @@ static void delete_cb(gpointer data)
 static void eject_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 		
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		send_dir(path);
 
 		do_eject(path);
@@ -1778,12 +1824,20 @@ static void find_cb(gpointer data)
 static void chmod_cb(gpointer data)
 {
 	GList *paths = (GList *) data;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 		struct stat info;
 
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		send_dir(path);
 
 		if (mc_stat(path, &info) != 0)
@@ -1801,12 +1855,20 @@ static void chmod_cb(gpointer data)
 static void settype_cb(gpointer data)
 {
 	GList *paths = (GList *) data;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+
+	for (i=0; paths; paths = paths->next, i++)
 	{
 		guchar	*path = (guchar *) paths->data;
 		struct stat info;
 
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		send_dir(path);
 
 		if (mc_stat(path, &info) != 0)
@@ -1824,9 +1886,17 @@ static void settype_cb(gpointer data)
 static void list_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
+	int n, i, per;
 
-	for (; paths; paths = paths->next)
+	n=g_list_length(paths);
+
+	for (i=0; paths; paths = paths->next, i++)
 	{
+		if(n>1 && i>0)
+		{
+			per=100*i/n;
+			printf_send("%%%d", per);
+		}
 		send_dir((char *) paths->data);
 
 		action_do_func((char *) paths->data, action_dest);
