@@ -431,8 +431,8 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 
 	path = pathdup(pathname);
 	uri = g_filename_to_uri(path, NULL, NULL);
-	if(!uri)
-	        uri=g_strconcat("file://", path, NULL);
+	if (!uri)
+	        uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 	g_free(path);
 		

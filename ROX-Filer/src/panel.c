@@ -408,6 +408,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	number_of_windows++;
 	gdk_window_lower(panel->window->window);
 	gtk_widget_show(panel->window);
+        /* This has no effect until after window is showing; GTK+ bug? */
+        keep_below(panel->window->window, TRUE);
 
 	{
 		GdkWindow *pinboard;
@@ -1417,6 +1419,10 @@ static gint panel_leave_event(GtkWidget *widget,
 	if (event->mode != GDK_CROSSING_NORMAL)
 		return FALSE;	/* Grab for menu, DnD, etc */
 
+        keep_below(panel->window->window, TRUE);
+
+        /* Shouldn't need this as well as keep_below but some WMs don't
+         * automatically lower as soon as the hint is set */ 
 	pinboard = pinboard_get_window();
 	window_put_just_above(panel->window->window, pinboard);
 
@@ -1438,7 +1444,13 @@ static void motion_may_raise(Panel *panel, int x, int y)
 		raise = x == panel->window->allocation.width - 1;
 
 	if (raise)
+        {
+		keep_below(panel->window->window, FALSE);
+
+		/* Shouldn't need this as well as keep_below but some WMs don't
+		 * automatically raise as soon as the hint is set */ 
 		gdk_window_raise(panel->window->window);
+        }
 }
 
 static gboolean may_autoscroll(Panel *panel)
@@ -2119,37 +2131,47 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
 	int		margin = pos[2];
+	int		mon = pos[3];
+	int		mon_right = monitor_geom[mon].x +
+				monitor_geom[mon].width;
+	int		mon_bottom = monitor_geom[mon].y +
+				monitor_geom[mon].height;
 
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
 	if (pos[0] == -1)
-		*x = screen_width - margin - requisition.width;
+		*x = mon_right - margin - requisition.width;
 	else if (pos[0] == -2)
-		*x = margin;
+		*x = monitor_geom[mon].x + margin;
 	else
 		*x = pos[0] - (requisition.width >> 2);
 		
 	if (pos[1] == -1)
-		*y = screen_height - margin - requisition.height;
+		*y = mon_bottom - margin - requisition.height;
 	else if (pos[1] == -2)
-		*y = margin;
+		*y = monitor_geom[mon].y + margin;
 	else
 		*y = pos[1] - (requisition.height >> 2);
 
-	*x = CLAMP(*x, 0, screen_width - requisition.width);
-	*y = CLAMP(*y, 0, screen_height - requisition.height);
+	*x = CLAMP(*x, 0, mon_right - requisition.width);
+	*y = CLAMP(*y, 0, mon_bottom - requisition.height);
 
 	*push_in = FALSE;
 }
 
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
-	PanelSide side = panel->side;
-	int pos[3];
+	PanelSide	side = panel->side;
+	int		pos[4];
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
 	pos[2] = MENU_MARGIN(side);
+	/* FIXME: Should we read screen from event's window rather than
+	 * using default? */
+	pos[3] = gdk_screen_get_monitor_at_point(
+				gdk_screen_get_default(),
+				event->x_root, event->y_root);
 
 	icon_prepare_menu((Icon *) pi, FALSE);
 
@@ -2215,6 +2237,10 @@ static void panel_drag_leave(GtkWidget	*widget,
 	gdk_window_get_pointer(window, &x, &y, NULL);
 	if (x < 0 || y < 0 || x > alloc->width || y > alloc->height)
 	{
+		keep_below(panel->window->window, TRUE);
+
+		/* Shouldn't need this as well as keep_below but some WMs don't
+		 * automatically lower as soon as the hint is set */ 
 		pinboard = pinboard_get_window();
 		window_put_just_above(panel->window->window, pinboard);
 	}

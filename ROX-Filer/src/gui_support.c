@@ -283,7 +283,8 @@ void make_panel_window(GtkWidget *widget)
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_protocols,
 			sizeof(wm_protocols) / sizeof(GdkAtom));
 
-	gdk_window_set_skip_taskbar_hint(window, TRUE);	
+	/* gdk_window_set_type_hint(window, GDK_WINDOW_TYPE_HINT_DOCK);	*/
+	gdk_window_set_skip_taskbar_hint(window, TRUE);
 	gdk_window_set_skip_pager_hint(window, TRUE);
 }
 
@@ -1173,5 +1174,67 @@ static void gui_get_monitor_adjacent(int monitor, MonitorAdjacent *adj)
 				adj->bottom = TRUE;
 			}
 		}
+	}
+}
+
+static void rox_wmspec_change_state(gboolean add, GdkWindow *window,
+				    GdkAtom state1, GdkAtom state2)
+{
+	GdkDisplay *display = gdk_drawable_get_display(GDK_DRAWABLE(window));
+	XEvent xev;
+	
+#define _NET_WM_STATE_REMOVE        0    /* remove/unset property */
+#define _NET_WM_STATE_ADD           1    /* add/set property */
+#define _NET_WM_STATE_TOGGLE        2    /* toggle property  */  
+
+	xev.xclient.type = ClientMessage;
+	xev.xclient.serial = 0;
+	xev.xclient.send_event = True;
+	xev.xclient.window = GDK_WINDOW_XID(window);
+	xev.xclient.message_type = gdk_x11_get_xatom_by_name_for_display(
+			display, "_NET_WM_STATE");
+	xev.xclient.format = 32;
+	xev.xclient.data.l[0] = add ? _NET_WM_STATE_ADD : _NET_WM_STATE_REMOVE;
+	xev.xclient.data.l[1] = gdk_x11_atom_to_xatom_for_display(display,
+			state1);
+	xev.xclient.data.l[2] = gdk_x11_atom_to_xatom_for_display(display,
+			state2);
+	xev.xclient.data.l[3] = 0;
+	xev.xclient.data.l[4] = 0;
+	
+	XSendEvent(GDK_DISPLAY_XDISPLAY(display),
+		   GDK_WINDOW_XID(
+			gdk_screen_get_root_window(
+				gdk_drawable_get_screen(GDK_DRAWABLE(window)))),
+		   False,
+		   SubstructureRedirectMask | SubstructureNotifyMask,
+		   &xev);
+}
+
+void keep_below(GdkWindow *window, gboolean setting)
+{
+	g_return_if_fail(GDK_IS_WINDOW(window));
+
+	if (GDK_WINDOW_DESTROYED(window))
+		return;
+
+	if (gdk_window_is_visible(window))
+	{
+		if (setting)
+		{
+			rox_wmspec_change_state(FALSE, window,
+				gdk_atom_intern("_NET_WM_STATE_ABOVE", FALSE),
+				GDK_NONE);
+		}
+		rox_wmspec_change_state(setting, window,
+				gdk_atom_intern("_NET_WM_STATE_BELOW", FALSE),
+				GDK_NONE);
+	}
+	else
+	{
+		gdk_synthesize_window_state(window,
+				setting ? GDK_WINDOW_STATE_ABOVE :
+					GDK_WINDOW_STATE_BELOW,
+				setting ? GDK_WINDOW_STATE_BELOW : 0);
 	}
 }

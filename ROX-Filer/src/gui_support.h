@@ -74,5 +74,9 @@ GList *uri_list_to_glist(const char *uri_list);
 GtkWidget *simple_image_new(GdkPixbuf *pixbuf);
 void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		   int x, int y, int width, int height);
+/* gdk_window_set_keep_below() only exists in GTK >= 2.4 and is broken until
+ * 2.4.6 */
+void keep_below(GdkWindow *window, gboolean setting);
+
 
 #endif /* _GUI_SUPPORT_H */
