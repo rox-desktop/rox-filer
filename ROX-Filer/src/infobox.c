@@ -267,9 +267,17 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 	}
 	add_row(store, _("Size:"), gstring->str);
 
-	add_row(store, _("Change time:"), pretty_time(&info.st_ctime));
-	add_row(store, _("Modify time:"), pretty_time(&info.st_mtime));
-	add_row(store, _("Access time:"), pretty_time(&info.st_atime));
+	tmp = pretty_time(&info.st_ctime);
+	add_row(store, _("Change time:"), tmp);
+	g_free(tmp);
+	
+	tmp = pretty_time(&info.st_mtime);
+	add_row(store, _("Modify time:"), tmp);
+	g_free(tmp);
+
+	tmp = pretty_time(&info.st_atime);
+	add_row(store, _("Access time:"), tmp);
+	g_free(tmp);
 
 	g_string_free(gstring, TRUE);
 

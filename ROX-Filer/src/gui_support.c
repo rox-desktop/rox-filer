@@ -224,13 +224,6 @@ void make_panel_window(GtkWidget *widget)
 			GDK_PROP_MODE_REPLACE, (guchar *) values, 2);
 }
 
-gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window)
-{
-	gtk_widget_hide((GtkWidget *) window);
-
-	return TRUE;
-}
-
 static gboolean error_idle_cb(gpointer data)
 {
 	char	**error = (char **) data;

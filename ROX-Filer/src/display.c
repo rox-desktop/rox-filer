@@ -1084,10 +1084,15 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 				g_strerror(item->lstat_errno));
 	else if (filer_window->details_type == DETAILS_SUMMARY)
 	{
+		gchar *time;
+
 		if (!scanned)
 			return g_strdup("XXXX ---,---,---/--- "
 					"12345678 12345678 "
 					"12345M 00:00:00 01 Mmm Yyyy");
+
+		time = pretty_time(&item->mtime);
+		
 		buf = g_strdup_printf("%s %s %-8.8s %-8.8s %s %s",
 				item->flags & ITEM_FLAG_APPDIR? "App " :
 			        S_ISDIR(m) ? "Dir " :
@@ -1100,7 +1105,8 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 			user_name(item->uid),
 			group_name(item->gid),
 			format_size_aligned(item->size),
-			pretty_time(&item->mtime));
+			time);
+		g_free(time);
 	}
 	else if (filer_window->details_type == DETAILS_TYPE)
 	{
@@ -1114,15 +1120,16 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	}
 	else if (filer_window->details_type == DETAILS_TIMES)
 	{
-		guchar	*ctime, *mtime;
+		guchar	*ctime, *mtime, *atime;
 		
-		ctime = g_strdup(pretty_time(&item->ctime));
-		mtime = g_strdup(pretty_time(&item->mtime));
+		ctime = pretty_time(&item->ctime);
+		mtime = pretty_time(&item->mtime);
+		atime = pretty_time(&item->atime);
 		
-		buf = g_strdup_printf("a[%s] c[%s] m[%s]",
-				pretty_time(&item->atime), ctime, mtime);
+		buf = g_strdup_printf("a[%s] c[%s] m[%s]", atime, ctime, mtime);
 		g_free(ctime);
 		g_free(mtime);
+		g_free(atime);
 	}
 	else if (filer_window->details_type == DETAILS_PERMISSIONS)
 	{

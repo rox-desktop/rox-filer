@@ -608,8 +608,8 @@ void set_blocking(int fd, gboolean blocking)
 		g_warning("fcntl() failed: %s\n", g_strerror(errno));
 }
 
-/* Format this time nicely. The result is a pointer to a static buffer,
- * valid until the next call.
+/* Format this time nicely.
+ * g_free() the result.
  */
 char *pretty_time(time_t *time)
 {
@@ -619,7 +619,7 @@ char *pretty_time(time_t *time)
 			TIME_FORMAT, localtime(time)) == 0)
 		time_buf[0]= 0;
 
-	return time_buf;
+	return to_utf8(time_buf);
 }
 
 #ifndef O_NOFOLLOW

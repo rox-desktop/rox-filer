@@ -34,7 +34,6 @@ int get_choice(const char *title,
 void report_error(const char *message, ...);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
 void make_panel_window(GtkWidget *widget);
-gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
 void delayed_error(const char *error, ...);
 gboolean load_file(const char *pathname, char **data_out, long *length_out);
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data);

@@ -2,12 +2,19 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+20-Mar-2002
+~~~~~~~~~~~
+Times weren't converted to UTF-8, causing errors in some locales (reported
+by Christopher Arndt and tracked down by Andras Mohari).
+
 18-Mar-2002
 ~~~~~~~~~~~
 Set _WIN_HINTS for pinboard and panel icons so that they don't appear on
 task-lists or get selected when Alt-Tabbing (Brendan McCarthy).
 Allow COMPOUND_TEXT target for pinboard and panels (allows pasting into
 gnome-terminal).
+The Path Entry minibuffer now highlights invalid paths in red, instead of
+beeping.
 
 17-Mar-2002
 ~~~~~~~~~~~
