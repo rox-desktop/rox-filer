@@ -41,6 +41,7 @@
 #include "dir.h"
 #include "diritem.h"
 #include "view_iface.h"
+#include "bookmarks.h"
 
 typedef struct _Tool Tool;
 
@@ -72,6 +73,8 @@ static GtkTooltips *tooltips = NULL;
 static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_bookmarks_clicked(GtkWidget *widget,
+				      FilerWindow *filer_window);
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
@@ -114,6 +117,10 @@ static Tool all_tools[] = {
 	 toolbar_home_clicked, DROP_TO_HOME, TRUE,
 	 NULL},
 	
+	{N_("Bookmarks"), ROX_STOCK_BOOKMARKS, N_("Bookmarks menu"),
+	 toolbar_bookmarks_clicked, DROP_NONE, FALSE,
+	 NULL},
+
 	{N_("Scan"), GTK_STOCK_REFRESH, N_("Rescan directory contents"),
 	 toolbar_refresh_clicked, DROP_NONE, TRUE,
 	 NULL},
@@ -337,6 +344,21 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	}
 	else
 		filer_change_to(filer_window, home_dir, NULL);
+}
+
+static void toolbar_bookmarks_clicked(GtkWidget *widget,
+				      FilerWindow *filer_window)
+{
+	GdkEvent	*event;
+
+	g_return_if_fail(filer_window != NULL);
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+			((GdkEventButton *) event)->button == 1)
+	{
+		bookmarks_show_menu(filer_window);
+	}
 }
 
 static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)

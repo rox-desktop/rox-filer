@@ -128,5 +128,6 @@ typedef enum {		/* Values used in options, must start at 0 */
 /* Stock icons */
 #define ROX_STOCK_SHOW_DETAILS "rox-show-details"
 #define ROX_STOCK_SHOW_HIDDEN  "rox-show-hidden"
+#define ROX_STOCK_BOOKMARKS GTK_STOCK_JUMP_TO
 
 #include <libxml/tree.h>
