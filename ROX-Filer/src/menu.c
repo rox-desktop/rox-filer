@@ -1793,6 +1793,24 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 
 static void show_key_help(GtkWidget *button, gpointer data)
 {
+	gboolean can_change_accels;
+	
+	g_object_get(G_OBJECT(gtk_settings_get_default()),
+		     "gtk-can-change-accels", &can_change_accels,
+		     NULL);
+
+	if (!can_change_accels)
+	{
+		info_message(_("User-definable shortcuts are disabled by "
+			"default in Gtk2, and you have not enabled "
+			"them. You can turn this feature on by:\n"
+			"1) using an XSettings manager, such as ROX-Session\n"
+			"or\n"
+			"2) adding this line to ~/.gtkrc-2.0:\n"
+			"\tgtk-can-change-accels = 1"));
+		return;
+	}
+
 	info_message(_("To set a keyboard short-cut for a menu item:\n\n"
 	"- Open the menu over a filer window,\n"
 	"- Move the pointer over the item you want to use,\n"
