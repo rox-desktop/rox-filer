@@ -52,6 +52,7 @@
 #include "appinfo.h"
 #include "menu.h"
 #include "xml.h"
+#include "tasklist.h"
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
@@ -125,6 +126,7 @@ typedef enum {
 
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
+static Option o_pinboard_tasklist;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -203,6 +205,8 @@ void pinboard_init(void)
 	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
 							GRID_STEP_COARSE);
+	option_add_int(&o_pinboard_tasklist, "pinboard_tasklist", TRUE);
+
 	option_add_notify(pinboard_check_options);
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &text_fg_col);
@@ -293,6 +297,9 @@ void pinboard_activate(const gchar *name)
 				4 + ICON_WIDTH / 2,
 				4 + ICON_HEIGHT / 2);
 	loading_pinboard--;
+
+	if (o_pinboard_tasklist.int_value)
+		tasklist_set_active(TRUE);
 }
 
 const char *pinboard_get_name(void)
@@ -557,6 +564,8 @@ static void pinboard_check_options(void)
 		if (current_pinboard)
 			reshape_all();
 	}
+
+	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
 }
 
 static gint end_wink(gpointer data)
@@ -1305,6 +1314,8 @@ static void pinboard_clear(void)
 	GList	*next;
 
 	g_return_if_fail(current_pinboard != NULL);
+
+	tasklist_set_active(FALSE);
 
 	next = current_pinboard->icons;
 	while (next)

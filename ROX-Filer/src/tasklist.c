@@ -60,13 +60,16 @@ static GdkAtom xa_TEXT = GDK_NONE;
 static GdkAtom xa__NET_WM_VISIBLE_NAME = GDK_NONE;
 static GdkAtom xa__NET_WM_ICON_NAME = GDK_NONE;
 static GdkAtom xa__NET_CLIENT_LIST = GDK_NONE;
+static GdkAtom xa__NET_WM_ICON_GEOMETRY = GDK_NONE;
 
 /* We have selected destroy and property events on every window in
  * this table.
  */
 static GHashTable *known = NULL;	/* XID -> IconWindow */
 
-static Option o_tasklist_active;
+/* Top-left corner of next icon to be created */
+static int iconify_next_x = 0;
+static int iconify_next_y = 0;
 
 /* Static prototypes */
 static void remove_window(Window win);
@@ -77,33 +80,15 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 static guint xid_hash(XID *xid);
 static gboolean xid_equal(XID *a, XID *b);
 static void state_changed(IconWindow *win);
-static void tasklist_check_options(void);
 static void show_icon(IconWindow *win);
+static void icon_win_free(IconWindow *win);
+static void set_iconify_pos(IconWindow *win);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-void tasklist_init(void)
-{
-	option_add_int(&o_tasklist_active, "tasklist_active", FALSE);
-	option_add_notify(tasklist_check_options);
-}
-
-/****************************************************************
- *			INTERNAL FUNCTIONS			*
- ****************************************************************/
-
-static void icon_win_free(IconWindow *win)
-{
-	g_return_if_fail(win->widget == NULL);
-
-	if (win->text)
-		g_free(win->text);
-	g_free(win);
-}
-
-static void tasklist_set_active(gboolean active)
+void tasklist_set_active(gboolean active)
 {
 	static gboolean need_init = TRUE;
 	static gboolean tasklist_active = FALSE;
@@ -129,6 +114,8 @@ static void tasklist_set_active(gboolean active)
 			gdk_atom_intern("_NET_WM_VISIBLE_NAME", FALSE);
 		xa__NET_WM_ICON_NAME =
 			gdk_atom_intern("_NET_WM_ICON_NAME", FALSE);
+		xa__NET_WM_ICON_GEOMETRY =
+			gdk_atom_intern("_NET_WM_ICON_GEOMETRY", FALSE);
 		
 		known = g_hash_table_new_full((GHashFunc) xid_hash,
 					      (GEqualFunc) xid_equal,
@@ -145,6 +132,20 @@ static void tasklist_set_active(gboolean active)
 		gdk_window_remove_filter(NULL, window_filter, NULL);
 
 	tasklist_update(!active);
+}
+
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
+
+static void icon_win_free(IconWindow *win)
+{
+	g_return_if_fail(win->widget == NULL);
+
+	if (win->text)
+		g_free(win->text);
+	g_free(win);
 }
 
 /* From gdk */
@@ -208,7 +209,8 @@ static GArray *get_window_list(Window xwindow, GdkAtom atom)
 		for (i = 0; i < nitems; i++)
 			g_array_append_val(array, data[i]);
 
-		g_array_sort(array, wincmp);
+		if (array->len)
+			g_array_sort(array, wincmp);
 	}
 
 	XFree(data);
@@ -357,6 +359,8 @@ static void add_window(Window win)
 	gdk_error_trap_push();
 
 	window_check_status(w);
+
+	set_iconify_pos(w);
 
 	if (gdk_error_trap_pop() != Success)
 		g_hash_table_remove(known, &win);
@@ -543,6 +547,8 @@ static void show_icon(IconWindow *win)
 	g_return_if_fail(win->widget == NULL);
 
 	win->widget = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	gtk_window_set_resizable(GTK_WINDOW(win->widget), FALSE);
 	g_signal_connect(win->widget, "delete-event",
 			G_CALLBACK(widget_delete_event), win);
 	g_signal_connect(win->widget, "destroy",
@@ -558,6 +564,8 @@ static void show_icon(IconWindow *win)
 	g_signal_connect(button, "released", G_CALLBACK(button_released), win);
 	
 	gtk_widget_realize(win->widget);
+	gtk_window_move(GTK_WINDOW(win->widget),
+			iconify_next_x, iconify_next_y);
 	make_panel_window(win->widget);
 
 	{
@@ -572,6 +580,39 @@ static void show_icon(IconWindow *win)
 	}
 	
 	gtk_widget_show_all(win->widget);
+
+	/* This is just silly! Setting the type to DOCK in sawfish somehow
+	 * unsets STICKY, so we set it again here...
+	 */
+	{
+		XClientMessageEvent sev;
+
+		sev.type = ClientMessage;
+		sev.display = gdk_display;
+		sev.format = 32;
+		sev.window = GDK_WINDOW_XWINDOW(win->widget->window);
+		sev.message_type = gdk_x11_atom_to_xatom(
+				gdk_atom_intern("_NET_WM_STATE", FALSE));
+		sev.data.l[0] = 1;	/* Set property */
+		sev.data.l[1] = gdk_x11_atom_to_xatom(
+			gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE));
+		sev.data.l[2] =gdk_x11_atom_to_xatom(
+			gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER", FALSE));
+
+		gdk_error_trap_push();
+
+		XSendEvent(gdk_display, DefaultRootWindow(gdk_display), False,
+			SubstructureNotifyMask | SubstructureRedirectMask,
+			(XEvent *) &sev);
+
+		XSync (gdk_display, False);
+
+		gdk_error_trap_pop();
+	}
+
+	iconify_next_y += win->widget->requisition.height;
+	if (iconify_next_y + win->widget->requisition.height > screen_height)
+		iconify_next_y = 0;
 }
 
 /* A window has been destroyed/expanded -- remove its icon */
@@ -596,8 +637,20 @@ static void state_changed(IconWindow *win)
 		hide_icon(win);
 }
 
-static void tasklist_check_options(void)
+/* Set the _NET_WM_ICON_GEOMETRY property, which indicates where this window
+ * will be iconified to. Should be inside a push/pop.
+ */
+static void set_iconify_pos(IconWindow *win)
 {
-	if (o_tasklist_active.has_changed)
-		tasklist_set_active(o_tasklist_active.int_value);
+	gint32 data[4];
+
+	data[0] = iconify_next_x;
+	data[1] = iconify_next_y;
+	data[2] = 100;
+	data[3] = 32;
+
+	XChangeProperty(gdk_display, win->xwindow,
+			gdk_x11_atom_to_xatom(xa__NET_WM_ICON_GEOMETRY),
+			XA_CARDINAL, 32, PropModeReplace, (guchar *) data, 4);
 }
+

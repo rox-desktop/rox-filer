@@ -8,6 +8,6 @@
 #ifndef _TASKLIST_H
 #define _TASKLIST_H
 
-void tasklist_init(void);
+void tasklist_set_active(gboolean active);
 
 #endif /* _TASKLIST_H */
