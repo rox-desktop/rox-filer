@@ -431,13 +431,13 @@ Panel *panel_new(const gchar *name, PanelSide side)
 
 /* Externally visible function to add an item to a panel */
 gboolean panel_add(PanelSide side,
-		   const gchar *path, const gchar *label, gboolean after)
+		   const gchar *path, const gchar *label, gboolean after, const gchar *shortcut, const gchar *args)
 {
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
 	
 	g_return_val_if_fail(current_panel[side] != NULL, FALSE);
 
-	panel_add_item(current_panel[side], path, label, after, NULL, NULL);
+	panel_add_item(current_panel[side], path, label, after, shortcut, args);
 
 	return TRUE;
 }

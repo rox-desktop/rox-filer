@@ -448,7 +448,7 @@ void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
  * 'x' and 'y' are the coordinates of the point in the middle of the text.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  */
-static void pinboard_pin_with_args(const gchar *path, const gchar *name,
+void pinboard_pin_with_args(const gchar *path, const gchar *name,
 				   int x, int y, const gchar *shortcut,
 				   const gchar *args)
 {

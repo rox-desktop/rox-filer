@@ -142,9 +142,9 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	soap_register("SetBackdrop", rpc_SetBackdrop, "Filename,Style", NULL);
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
-	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
+	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label,Shortcut,Args");
 	soap_register("PinboardRemove", rpc_PinboardRemove, "Path", "Label");
-	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
+	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After,Shortcut,Args");
 	soap_register("PanelRemove", rpc_PanelRemove, "Side,Path", "Label");
 
 	/* Look for a property on the root window giving the IPC window
@@ -793,15 +793,17 @@ static xmlNodePtr rpc_SetBackdropApp(GList *args)
 static xmlNodePtr rpc_PinboardAdd(GList *args)
 {
 	char *path = NULL;
-	gchar *name;
+	gchar *name, *shortcut, *xargs;
 	int x, y;
 
 	path = string_value(ARG(0));
 	x = int_value(ARG(1), 0);
 	y = int_value(ARG(2), 0);
 	name = string_value(ARG(3));
-	
-	pinboard_pin(path, name, x, y, NULL);
+	shortcut = string_value(ARG(4));
+	xargs = string_value(ARG(5));
+
+	pinboard_pin_with_args(path, name, x, y, shortcut, xargs);
 
 	g_free(path);
 	if(name)
@@ -868,7 +870,7 @@ static xmlNodePtr rpc_Panel(GList *args)
 static xmlNodePtr rpc_PanelAdd(GList *args)
 {
 	PanelSide side;
-	char *path, *side_name, *label;
+	char *path, *side_name, *label, *shortcut, *arg;
 	gboolean after = FALSE;
 	int tmp;
 
@@ -883,7 +885,10 @@ static xmlNodePtr rpc_PanelAdd(GList *args)
 	tmp = bool_value(ARG(3));
 	after = (tmp == -1) ? FALSE : tmp;
 
-	panel_add(side, path, label, after);
+	shortcut = string_value(ARG(4));
+	arg = string_value(ARG(5));
+
+	panel_add(side, path, label, after, shortcut, arg);
 
 	g_free(path);
 
