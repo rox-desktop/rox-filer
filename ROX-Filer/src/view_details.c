@@ -1208,11 +1208,28 @@ static int view_details_count_items(ViewIface *view)
 	return view_details->items->len;
 }
 
+#if GTK_MINOR_VERSION < 2
+static void view_details_count_inc(GtkTreeModel *model, GtkTreePath *path,
+				   GtkTreeIter *iter, gpointer data)
+{
+	int *count = (int *) data;
+	(*count) += 1;
+}
+#endif
+
 static int view_details_count_selected(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 
+#if GTK_MINOR_VERSION >= 2
 	return gtk_tree_selection_count_selected_rows(view_details->selection);
+#else
+	int count = 0;
+	
+	gtk_tree_selection_selected_foreach(view_details->selection,
+					    view_details_count_inc, &count);
+	return count;
+#endif
 }
 
 static void view_details_show_cursor(ViewIface *view)
