@@ -107,7 +107,7 @@ void read_globicons()
 				continue;
 			if (strcmp(node->name, "rule") != 0)
 				continue;
-			icon = get_subnode(node, "icon");
+			icon = get_subnode(node, NULL, "icon");
 			if (!icon)
 				continue;
 			match = xmlGetProp(node, "match");
@@ -183,14 +183,16 @@ static void write_globicons(void)
 	save_new = g_strconcat(save, ".new", NULL);
 
 	doc = xmlNewDoc("1.0");
-	doc->xmlChildrenNode = xmlNewDocNode(doc, NULL, "special-files", NULL);
+	xmlDocSetRootElement(doc,
+		             xmlNewDocNode(doc, NULL, "special-files", NULL));
 
 	for (next = g_list_last(glob_icons); next; next = next->prev)
 	{
 		GlobIcon *gi = (GlobIcon *) next->data;
 		xmlNodePtr tree;
 
-		tree = xmlNewChild(doc->xmlChildrenNode, NULL, "rule", NULL);
+		tree = xmlNewTextChild(xmlDocGetRootElement(doc),
+				   NULL, "rule", NULL);
 		xmlSetProp(tree, "match", gi->pattern);
 		xmlNewChild(tree, NULL, "icon", gi->iconpath);
 	}

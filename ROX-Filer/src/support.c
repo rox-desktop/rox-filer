@@ -809,12 +809,24 @@ void add_default_styles(void)
 /* Return the (first) child of this node with the given name.
  * NULL if not found.
  */
-xmlNode *get_subnode(xmlNode *node, char *name)
+xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name)
 {
 	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
-		if (node->type == XML_ELEMENT_NODE &&
-		    strcmp(node->name, name) == 0)
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+
+		if (strcmp(node->name, name))
+			continue;
+
+		if (node->ns == NULL || namespaceURI == NULL)
+		{
+			if (node->ns == NULL && namespaceURI == NULL)
+				return node;
+			continue;
+		}
+		
+		if (strcmp(node->ns->href, namespaceURI) == 0)
 			return node;
 	}
 

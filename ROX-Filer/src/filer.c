@@ -1463,7 +1463,7 @@ void filer_close_recursive(char *path)
 		{
 			char s = filer_window->path[len];
 
-			if (s == '/' || s == '\0')
+			if (len == 1 || s == '/' || s == '\0')
 				gtk_widget_destroy(filer_window->window);
 		}
 	}

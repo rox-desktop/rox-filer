@@ -37,6 +37,6 @@ gboolean in_list(guchar *item, guchar *list);
 GPtrArray *split_path(guchar *path);
 guchar *get_relative_path(guchar *from, guchar *to);
 void add_default_styles(void);
-xmlNode *get_subnode(xmlNode *node, char *name);
+xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name);
 
 #endif /* _SUPPORT_H */

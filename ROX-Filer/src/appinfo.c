@@ -139,7 +139,7 @@ xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
 	if (strcmp(node->name, name) == 0)
 		return node;
 
-	return get_subnode(node, name);
+	return get_subnode(node, NULL, name);
 }
 
 /****************************************************************

@@ -37,8 +37,6 @@
 #include "type.h"
 #include "dir.h"
 #include "action.h"
-#include "pinboard.h"
-#include "panel.h"
 #include "icon.h"
 
 /* Static prototypes */
@@ -327,86 +325,6 @@ void show_item_help(guchar *path, DirItem *item)
 				"it's in?"));
 			break;
 	}
-}
-
-/* Runs each item in the list. Items may be files, directories,
- * panels or pinboards.
- *
- * See main() for a description of 'to_open'.
- */
-void run_list(guchar *to_open)
-{
-	guchar	*next;
-
-	/* Make sure we don't quit before doing the whole list
-	 * (there's a command that closes windows)
-	 */
-	number_of_windows++;
-
-	/* TODO: Should escape < characters in case one really does
-	 * appear in a filename!
-	 */
-
-	while (*to_open)
-	{
-		guchar	code;
-		guchar	*value;
-
-		g_return_if_fail(to_open[0] == '<');
-		code = to_open[1];
-
-		next = strchr(to_open + 1, '<');
-		if (!next)
-			next = to_open + strlen(to_open);
-
-		g_return_if_fail(next - to_open > 2);
-		g_return_if_fail(to_open[2] == '>');
-
-		value = g_strndup(to_open + 3, next - to_open - 3);
-		to_open = next;
-
-		switch (code)
-		{
-			case 'f':
-				run_by_path(value);
-				break;
-			case 'p':
-				pinboard_activate(value);
-				break;
-			case 's':
-				open_to_show(value);
-				break;
-			case 'd':
-				filer_opendir(value, NULL);
-				break;
-		        case 'D':
-				filer_close_recursive(value);
-				break;
-			case 't':
-				panel_new(value, PANEL_TOP);
-				break;
-			case 'b':
-				panel_new(value, PANEL_BOTTOM);
-				break;
-			case 'l':
-				panel_new(value, PANEL_LEFT);
-				break;
-			case 'r':
-				panel_new(value, PANEL_RIGHT);
-				break;
-		        case 'x':
-				examine(value);
-				break;
-			default:
-				g_warning("Don't know how to handle '%s'",
-						value);
-				return;
-		}
-
-		g_free(value);
-	}
-
-	number_of_windows--;
 }
 
 /* Open a directory viewer showing this file, and wink it */

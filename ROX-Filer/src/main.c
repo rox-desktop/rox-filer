@@ -80,10 +80,6 @@ guchar *show_user_message = NULL;
 int home_dir_len;
 char *home_dir, *app_dir;
 
-/* Static prototypes */
-static void show_features(void);
-
-
 #define COPYING								\
 	     N_("Copyright (C) 2001 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -116,6 +112,7 @@ static void show_features(void);
        "  -o, --override	override window manager control of panels\n" \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
+       "  -R, --RPC		invoke method call read from stdin\n"	\
        "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
@@ -125,7 +122,7 @@ static void show_features(void);
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:D:"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:D:R"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -141,6 +138,7 @@ static struct option long_opts[] =
 	{"version", 0, NULL, 'v'},
 	{"user", 0, NULL, 'u'},
 	{"new", 0, NULL, 'n'},
+	{"RPC", 0, NULL, 'R'},
 	{"show", 1, NULL, 's'},
 	{"examine", 1, NULL, 'x'},
 	{"close", 1, NULL, 'D'},
@@ -160,57 +158,20 @@ gboolean new_copy = FALSE;
 static GHashTable *death_callbacks = NULL;
 static gboolean child_died_flag = FALSE;
 
-/* This is called as a signal handler; simply ensures that
- * child_died_callback() will get called later.
- */
-static void child_died(int signum)
-{
-	child_died_flag = TRUE;
-	write(to_wakeup_pipe, "\0", 1);	/* Wake up! */
-}
+/* Static prototypes */
+static void show_features(void);
+static xmlDocPtr soap_new(xmlNodePtr *ret_body);
+static void soap_add(xmlNodePtr body,
+			   xmlChar *function,
+			   xmlChar *arg1_name, xmlChar *arg1_value,
+			   xmlChar *arg2_name, xmlChar *arg2_value);
+static void child_died(int signum);
+static void child_died_callback(void);
+static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 
-static void child_died_callback(void)
-{
-	int	    	status;
-	gint	    	child;
-
-	child_died_flag = FALSE;
-
-	/* Find out which children exited and allow them to die */
-	do
-	{
-		Callback	*cb;
-
-		child = waitpid(-1, &status, WNOHANG);
-
-		if (child == 0 || child == -1)
-			return;
-
-		cb = g_hash_table_lookup(death_callbacks,
-				GINT_TO_POINTER(child));
-		if (cb)
-		{
-			cb->callback(cb->data);
-			g_hash_table_remove(death_callbacks,
-					GINT_TO_POINTER(child));
-		}
-
-	} while (1);
-}
-
-#define BUFLEN 40
-/* When data is written to_wakeup_pipe, this gets called from the event
- * loop some time later. Useful for getting out of signal handlers, etc.
- */
-void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
-{
-	char buf[BUFLEN];
-
-	read(source, buf, BUFLEN);
-	
-	if (child_died_flag)
-		child_died_callback();
-}
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
 
 /* The value that goes with an option */
 #define VALUE (*optarg == '=' ? optarg + 1 : optarg)
@@ -223,22 +184,8 @@ int main(int argc, char **argv)
 	guchar		*tmp, *dir, *slash;
 	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
-
-	/* This is a list of \0 separated strings. Each string starts with a
-	 * character indicating what kind of operation to perform:
-	 *
-	 * fFILE	open this file (or directory)
-	 * dDIR		open DIR as a directory (not as an application)
-	 * DDIR		close DIR and its subdirectories
-	 * eDIR		shift-open this file (edit)
-	 * pPIN		display this pinboard
-	 * [lrtb]PANEL	open PANEL as a {left, right, top, bottom} panel
-	 * sFILE	open a directory to show FILE
-	 * xFILE        eXamine FILE
-	 */
-	GString		*to_open;
-
-	to_open = g_string_new(NULL);
+	xmlDocPtr	rpc, soap_rpc = NULL;
+	xmlNodePtr	body;
 
 	home_dir = g_get_home_dir();
 	home_dir_len = strlen(home_dir);
@@ -278,6 +225,13 @@ int main(int argc, char **argv)
 		getgroups(ngroups, supplemental_groups);
 	}
 
+	/* The idea here is to convert the command-line arguments
+	 * into a SOAP RPC.
+	 * We attempt to invoke the call on an already-running copy of
+	 * the filer if possible, or execute it ourselves if not.
+	 */
+	rpc = soap_new(&body);
+
 	while (1)
 	{
 		int	c;
@@ -314,41 +268,50 @@ int main(int argc, char **argv)
 		        case 'x':
 				/* Argument is a path */
 				tmp = pathdup(VALUE);
-				g_string_append_c(to_open, '<');
-				g_string_append_c(to_open, c);
-				g_string_append_c(to_open, '>');
-				g_string_append(to_open, tmp);
+				soap_add(body,
+					c == 'D' ? "CloseDir" :
+					c == 'd' ? "OpenDir" :
+					c == 'x' ? "Examine" : "Unknown",
+					"Filename", tmp,
+					NULL, NULL);
 				g_free(tmp);
 				break;
 			case 's':
 				tmp = g_strdup(VALUE);
 				slash = strrchr(tmp, '/');
 				if (slash)
-					*slash = '\0';
-
-				dir = pathdup(tmp);
-				g_string_append(to_open, "<s>");
-				g_string_append(to_open, dir);
-				g_free(dir);
-				
-				if (slash)
 				{
-					*slash = '/';
-					g_string_append(to_open, slash);
+					*slash = '\0';
+					slash++;
+					dir = pathdup(tmp);
+				}
+				else
+				{
+					slash = tmp;
+					dir = pathdup(".");
 				}
 
+				soap_add(body, "Show",
+					"Directory", dir,
+					"Leafname", slash);
 				g_free(tmp);
+				g_free(dir);
 				break;
 			case 'l':
 			case 'r':
 			case 't':
 			case 'b':
-			case 'p':
 				/* Argument is a leaf (or starts with /) */
-				g_string_append_c(to_open, '<');
-				g_string_append_c(to_open, c);
-				g_string_append_c(to_open, '>');
-				g_string_append(to_open, VALUE);
+				soap_add(body, "Panel", "Name", VALUE,
+					 "Side", c == 'l' ? "Left" :
+						 c == 'r' ? "Right" :
+						 c == 't' ? "Top" :
+						 c == 'b' ? "Bottom" :
+						 "Unkown");
+				break;
+			case 'p':
+				soap_add(body, "Pinboard",
+						"Name", VALUE, NULL, NULL);
 				break;
 			case 'u':
 				show_user = TRUE;
@@ -364,6 +327,11 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 			case 'c':
 				client_id = g_strdup(VALUE);
+				break;
+			case 'R':
+				soap_rpc = xmlParseFile("-");
+				if (!soap_rpc)
+					g_error("Invalid XML in RPC");
 				break;
 			default:
 				printf(_(USAGE));
@@ -383,25 +351,32 @@ int main(int argc, char **argv)
 	{
 		tmp = pathdup(argv[i++]);
 
-		g_string_append(to_open, "<f>");
-		g_string_append(to_open, tmp);
+		soap_add(body, "Run", "Filename", tmp, NULL, NULL);
 
 		g_free(tmp);
 	}
 
-	if (to_open->len == 0)
+	if (soap_rpc)
+	{
+		if (body->xmlChildrenNode)
+			g_error("Can't use -R with other options - sorry!");
+		xmlFreeDoc(rpc);
+		body = NULL;
+		rpc = soap_rpc;
+	}
+	else if (!body->xmlChildrenNode)
 	{
 		guchar	*dir;
 
 		dir = g_get_current_dir();
-		g_string_sprintf(to_open, "<d>%s", dir);
+		soap_add(body, "OpenDir", "Filename", dir, NULL, NULL);
 		g_free(dir);
 	}
 
 	option_add_int("dnd_no_hostnames", 1, NULL);
 
 	gui_support_init();
-	if (remote_init(to_open, new_copy))
+	if (remote_init(rpc, new_copy))
 		return EXIT_SUCCESS;	/* Already running */
 
 	/* Put ourselves into the background (so 'rox' always works the
@@ -468,25 +443,13 @@ int main(int argc, char **argv)
 	session_init(client_id);
 	g_free(client_id);
 		
-	run_list(to_open->str);
-	g_string_free(to_open, TRUE);
+	run_soap(rpc);
+	xmlFreeDoc(rpc);
 
 	if (number_of_windows > 0)
 		gtk_main();
 
 	return EXIT_SUCCESS;
-}
-
-static void show_features(void)
-{
-	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
-	g_printerr("%s... %s\n", _("VFS support"),
-#ifdef HAVE_LIBVFS
-		_("Yes")
-#else
-		_("No (couldn't find a valid libvfs)")
-#endif
-		);
 }
 
 /* Register a function to be called when process number 'child' dies. */
@@ -502,4 +465,114 @@ void on_child_death(gint child, CallbackFn callback, gpointer data)
 	cb->data = data;
 
 	g_hash_table_insert(death_callbacks, GINT_TO_POINTER(child), cb);
+}
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
+
+static void show_features(void)
+{
+	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
+	g_printerr("%s... %s\n", _("VFS support"),
+#ifdef HAVE_LIBVFS
+		_("Yes")
+#else
+		_("No (couldn't find a valid libvfs)")
+#endif
+		);
+}
+
+/* Create a new SOAP message and return the document and the (empty)
+ * body node.
+ */
+static xmlDocPtr soap_new(xmlNodePtr *ret_body)
+{
+	xmlDocPtr  doc;
+	xmlNodePtr root;
+	xmlNs	   *env_ns;
+
+	doc = xmlNewDoc("1.0");
+	root = xmlNewDocNode(doc, NULL, "Envelope", NULL);
+	xmlDocSetRootElement(doc, root);
+	
+	env_ns = xmlNewNs(root, SOAP_ENV_NS, "env");
+	xmlSetNs(root, env_ns);
+
+	*ret_body = xmlNewTextChild(root, env_ns, "Body", NULL);
+	xmlNewNs(*ret_body, ROX_NS, "rox");
+
+	return doc;
+}
+
+static void soap_add(xmlNodePtr body,
+			   xmlChar *function,
+			   xmlChar *arg1_name, xmlChar *arg1_value,
+			   xmlChar *arg2_name, xmlChar *arg2_value)
+{
+	xmlNodePtr node;
+	xmlNs *rox;
+
+	rox = xmlSearchNsByHref(body->doc, body, ROX_NS);
+	
+	node = xmlNewChild(body, rox, function, NULL);
+
+	if (arg1_name)
+	{
+		xmlNewTextChild(node, rox, arg1_name, arg1_value);
+		if (arg2_name)
+			xmlNewTextChild(node, rox, arg2_name, arg2_value);
+	}
+}
+
+/* This is called as a signal handler; simply ensures that
+ * child_died_callback() will get called later.
+ */
+static void child_died(int signum)
+{
+	child_died_flag = TRUE;
+	write(to_wakeup_pipe, "\0", 1);	/* Wake up! */
+}
+
+static void child_died_callback(void)
+{
+	int	    	status;
+	gint	    	child;
+
+	child_died_flag = FALSE;
+
+	/* Find out which children exited and allow them to die */
+	do
+	{
+		Callback	*cb;
+
+		child = waitpid(-1, &status, WNOHANG);
+
+		if (child == 0 || child == -1)
+			return;
+
+		cb = g_hash_table_lookup(death_callbacks,
+				GINT_TO_POINTER(child));
+		if (cb)
+		{
+			cb->callback(cb->data);
+			g_hash_table_remove(death_callbacks,
+					GINT_TO_POINTER(child));
+		}
+
+	} while (1);
+}
+
+#define BUFLEN 40
+/* When data is written to_wakeup_pipe, this gets called from the event
+ * loop some time later. Useful for getting out of signal handlers, etc.
+ */
+static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
+{
+	char buf[BUFLEN];
+
+	read(source, buf, BUFLEN);
+	
+	if (child_died_flag)
+		child_died_callback();
 }

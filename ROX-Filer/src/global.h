@@ -12,6 +12,11 @@
 
 #include <glib.h>
 
+/* ROX-Filer's unique namespace (for use in SOAP messages) */
+#define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
+
+#define SOAP_ENV_NS "http://www.w3.org/2001/06/soap-envelope"
+
 /* We typedef various pointers here to avoid creating unnecessary
  * dependencies on the other header files.
  */
