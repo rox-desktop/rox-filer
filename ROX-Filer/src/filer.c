@@ -149,7 +149,7 @@ static gint focus_out(GtkWidget *widget,
 static void add_item(FilerWindow *filer_window, DirItem *item);
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
-static void add_button(GtkWidget *box, int pixmap,
+static void add_button(GtkWidget *box, MaskedPixmap *icon,
 			GtkSignalFunc cb, FilerWindow *filer_window,
 			char *label, char *tip);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
@@ -543,20 +543,17 @@ static void draw_small_icon(GtkWidget *widget,
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-		gdk_gc_set_clip_mask(gc,
-				default_pixmap[TYPE_SYMLINK]->mask);
-		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[TYPE_SYMLINK]->pixmap,
+		gdk_gc_set_clip_mask(gc, im_symlink->mask);
+		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
-		int	type = item->flags & ITEM_FLAG_MOUNTED
-				? TYPE_MOUNTED
-				: TYPE_UNMOUNTED;
-		MaskedPixmap	*mp = default_pixmap[type];
+		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
 
 		if (!mp->sm_pixmap)
 			pixmap_make_small(mp);
@@ -609,24 +606,21 @@ static void draw_large_icon(GtkWidget *widget,
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-		gdk_gc_set_clip_mask(gc,
-				default_pixmap[TYPE_SYMLINK]->mask);
-		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[TYPE_SYMLINK]->pixmap,
+		gdk_gc_set_clip_mask(gc, im_symlink->mask);
+		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
-		int	type = item->flags & ITEM_FLAG_MOUNTED
-				? TYPE_MOUNTED
-				: TYPE_UNMOUNTED;
+		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
+
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-		gdk_gc_set_clip_mask(gc,
-				default_pixmap[type]->mask);
-		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[type]->pixmap,
+		gdk_gc_set_clip_mask(gc, mp->mask);
+		gdk_draw_pixmap(widget->window, gc, mp->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8, /* Dest x,y */
 				-1, -1);
@@ -1283,6 +1277,11 @@ static gint key_press_event(GtkWidget	*widget,
 	return TRUE;
 }
 
+static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, PANEL_NO);
+}
+
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
@@ -1795,18 +1794,22 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
-	add_button(box, TOOLBAR_UP_ICON,
+	add_button(box, im_up_icon,
 			GTK_SIGNAL_FUNC(toolbar_up_clicked),
 			filer_window,
 			_("Up"), _("Change to parent directory"));
-	add_button(box, TOOLBAR_HOME_ICON,
+	add_button(box, im_home_icon,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
 			filer_window,
 			_("Home"), _("Change to home directory"));
-	add_button(box, TOOLBAR_REFRESH_ICON,
+	add_button(box, im_refresh_icon,
 			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
 			filer_window,
 			_("Rescan"), _("Rescan directory contents"));
+	add_button(box, im_help,
+			GTK_SIGNAL_FUNC(toolbar_help_clicked),
+			filer_window,
+			_("Help"), _("Show ROX-Filer Help"));
 
 	return frame;
 }
@@ -1846,14 +1849,13 @@ static gint toolbar_adjust_released(GtkButton *button,
 	return TRUE;
 }
 
-static void add_button(GtkWidget *box, int pixmap,
+static void add_button(GtkWidget *box, MaskedPixmap *icon,
 			GtkSignalFunc cb, FilerWindow *filer_window,
 			char *label, char *tip)
 {
-	GtkWidget 	*button, *icon;
+	GtkWidget 	*button, *icon_widget;
 
-	icon = gtk_pixmap_new(default_pixmap[pixmap]->pixmap,
-				default_pixmap[pixmap]->mask);
+	icon_widget = gtk_pixmap_new(icon->pixmap, icon->mask);
 
 	if (o_toolbar == TOOLBAR_GNOME)
 	{
@@ -1862,7 +1864,7 @@ static void add_button(GtkWidget *box, int pixmap,
 				NULL,
 				label,
 				tip, NULL,
-				icon,
+				icon_widget,
 				cb, filer_window);
 	}
 	else
@@ -1870,7 +1872,7 @@ static void add_button(GtkWidget *box, int pixmap,
 		button = gtk_button_new();
 		GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 
-		gtk_container_add(GTK_CONTAINER(button), icon);
+		gtk_container_add(GTK_CONTAINER(button), icon_widget);
 		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
 			GTK_SIGNAL_FUNC(toolbar_adjust_pressed), filer_window);
 		gtk_signal_connect(GTK_OBJECT(button), "button_release_event",

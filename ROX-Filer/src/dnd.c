@@ -404,7 +404,7 @@ void drag_selection(Collection 		*collection,
 			(event->state & GDK_BUTTON2_MASK) ? 2 : 3,
 			(GdkEvent *) event);
 
-	image = item ? item->image : default_pixmap[TYPE_MULTIPLE];
+	image = item ? item->image : im_multiple;
 	
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),

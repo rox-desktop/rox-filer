@@ -435,7 +435,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 				new.flags |= ITEM_FLAG_TEMP_ICON;
 			}
 			else
-				new.image = default_pixmap[TYPE_APPDIR];
+				new.image = im_appdir;
 		}
 	}
 	else if (new.base_type == TYPE_FILE)
@@ -443,7 +443,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 		/* Note: for symlinks we use need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
-			new.image = default_pixmap[TYPE_EXEC_FILE];
+			new.image = im_exec_file;
 			new.flags |= ITEM_FLAG_EXEC_FILE;
 		}
 		else

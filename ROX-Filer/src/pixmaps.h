@@ -32,17 +32,24 @@ enum
 	TYPE_EXEC_FILE,
 	TYPE_MULTIPLE,
 	TYPE_APPDIR,
-
-	/* Toolbar */
-	TOOLBAR_UP_ICON,
-	TOOLBAR_HOME_ICON,
-	TOOLBAR_REFRESH_ICON,
-	
-	/* End of list */
-	LAST_DEFAULT_PIXMAP
 };
 
 typedef struct _MaskedPixmap MaskedPixmap;
+
+extern MaskedPixmap *im_error;
+extern MaskedPixmap *im_unknown;
+extern MaskedPixmap *im_symlink;
+
+extern MaskedPixmap *im_unmounted;
+extern MaskedPixmap *im_mounted;
+extern MaskedPixmap *im_multiple;
+extern MaskedPixmap *im_exec_file;
+extern MaskedPixmap *im_appdir;
+
+extern MaskedPixmap *im_up_icon;
+extern MaskedPixmap *im_home_icon;
+extern MaskedPixmap *im_refresh_icon;
+extern MaskedPixmap *im_help;
 
 #ifdef HAVE_IMLIB
 #  ifdef PIXMAPS_C
@@ -69,8 +76,6 @@ struct _MaskedPixmap
 	int		sm_width;
 	int		sm_height;
 };
-
-extern MaskedPixmap *default_pixmap[LAST_DEFAULT_PIXMAP];
 
 void pixmaps_init(void);
 void pixmap_ref(MaskedPixmap *mp);

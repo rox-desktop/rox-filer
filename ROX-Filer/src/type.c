@@ -285,7 +285,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	char	*type_name;
 	time_t	now;
 
-	g_return_val_if_fail(type != NULL, default_pixmap[TYPE_UNKNOWN]);
+	g_return_val_if_fail(type != NULL, im_unknown);
 
 	now = time(NULL);
 	/* Already got an image? */
@@ -317,7 +317,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	if (!type->image)
 	{
-		type->image = default_pixmap[TYPE_UNKNOWN];
+		type->image = im_unknown;
 		pixmap_ref(type->image);
 	}
 

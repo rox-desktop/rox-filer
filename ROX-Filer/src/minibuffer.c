@@ -65,15 +65,11 @@ static void show_help(FilerWindow *filer_window);
  */
 void create_minibuffer(FilerWindow *filer_window)
 {
-	MaskedPixmap *mp;
 	GtkWidget *hbox, *label, *mini, *help, *icon;
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	
-	mp = g_fscache_lookup(pixmap_cache,
-		make_path(getenv("APP_DIR"), "pixmaps/help.xpm")->str);
-	icon = gtk_pixmap_new(mp->pixmap, mp->mask);
-	g_fscache_data_unref(pixmap_cache, mp);
+	icon = gtk_pixmap_new(im_help->pixmap, im_help->mask);
 	help = gtk_button_new();
 	gtk_container_add(GTK_CONTAINER(help), icon);
 	gtk_box_pack_start(GTK_BOX(hbox), help, FALSE, TRUE, 0);

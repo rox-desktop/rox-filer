@@ -71,7 +71,20 @@ static char * bad_xpm[] = {
 " ..XXXXXX.. ",
 "            "};
 
-MaskedPixmap 	*default_pixmap[LAST_DEFAULT_PIXMAP];
+MaskedPixmap *im_error;
+MaskedPixmap *im_unknown;
+MaskedPixmap *im_symlink;
+
+MaskedPixmap *im_unmounted;
+MaskedPixmap *im_mounted;
+MaskedPixmap *im_multiple;
+MaskedPixmap *im_exec_file;
+MaskedPixmap *im_appdir;
+
+MaskedPixmap *im_up_icon;
+MaskedPixmap *im_home_icon;
+MaskedPixmap *im_refresh_icon;
+MaskedPixmap *im_help;
 
 /* Static prototypes */
 
@@ -125,20 +138,20 @@ MaskedPixmap *load_pixmap(char *name)
 /* Load all the standard pixmaps */
 static void load_default_pixmaps(void)
 {
-	default_pixmap[TYPE_ERROR] = load_pixmap("pixmaps/error.xpm");
-	default_pixmap[TYPE_UNKNOWN] = load_pixmap("pixmaps/unknown.xpm");
-	default_pixmap[TYPE_SYMLINK] = load_pixmap("pixmaps/symlink.xpm");
+	im_error = load_pixmap("pixmaps/error.xpm");
+	im_unknown = load_pixmap("pixmaps/unknown.xpm");
+	im_symlink = load_pixmap("pixmaps/symlink.xpm");
 
-	default_pixmap[TYPE_UNMOUNTED] = load_pixmap("pixmaps/mount.xpm");
-	default_pixmap[TYPE_MOUNTED] = load_pixmap("pixmaps/mounted.xpm");
-	default_pixmap[TYPE_MULTIPLE] = load_pixmap("pixmaps/multiple.xpm");
-	default_pixmap[TYPE_EXEC_FILE] = load_pixmap("pixmaps/exec.xpm");
-	default_pixmap[TYPE_APPDIR] = load_pixmap("pixmaps/application.xpm");
+	im_unmounted = load_pixmap("pixmaps/mount.xpm");
+	im_mounted = load_pixmap("pixmaps/mounted.xpm");
+	im_multiple = load_pixmap("pixmaps/multiple.xpm");
+	im_exec_file = load_pixmap("pixmaps/exec.xpm");
+	im_appdir = load_pixmap("pixmaps/application.xpm");
 
-	default_pixmap[TOOLBAR_UP_ICON] = load_pixmap("pixmaps/up.xpm");
-	default_pixmap[TOOLBAR_HOME_ICON] = load_pixmap("pixmaps/home.xpm");
-	default_pixmap[TOOLBAR_REFRESH_ICON] =
-					load_pixmap("pixmaps/refresh.xpm");
+	im_up_icon = load_pixmap("pixmaps/up.xpm");
+	im_home_icon = load_pixmap("pixmaps/home.xpm");
+	im_refresh_icon = load_pixmap("pixmaps/refresh.xpm");
+	im_help = load_pixmap("pixmaps/help.xpm");
 }
 
 void pixmap_ref(MaskedPixmap *mp)
