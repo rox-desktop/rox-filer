@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2003, the ROX-Filer team.
+ * Copyright (C) 2005, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -71,7 +71,7 @@ static gchar *prompt_dest_path = NULL;
 gint motion_buttons_pressed = 0;
 
 /* Static prototypes */
-static void set_xds_prop(GdkDragContext *context, const char *uri);
+static void set_xds_prop(GdkDragContext *context, const char *text);
 static void desktop_drag_data_received(GtkWidget      		*widget,
 				GdkDragContext  	*context,
 				gint            	x,
@@ -173,10 +173,8 @@ void dnd_init(void)
 /*			SUPPORT FUNCTIONS			*/
 
 /* Set the XdndDirectSave0 property on the source window for this context */
-static void set_xds_prop(GdkDragContext *context, const char *uri)
+static void set_xds_prop(GdkDragContext *context, const char *text)
 {
-	const char *text = (char *) uri;
-
 	gdk_property_change(context->source_window,
 			XdndDirectSave0,
 			xa_text_plain, 8,
