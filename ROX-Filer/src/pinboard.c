@@ -1649,7 +1649,7 @@ static GtkWidget *create_options(void)
 			   FALSE, FALSE, 0);
 	tog2 = gtk_radio_button_new_with_label(NULL, _("Fine"));
 	radio_grid_fine = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 2-pixel grid for positioning icons"
+	OPTION_TIP(tog2, _("Use a 2-pixel grid for positioning icons "
 			   "on the desktop."));
 	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
 
@@ -1657,7 +1657,7 @@ static GtkWidget *create_options(void)
 			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
 			_("Medium"));
 	radio_grid_med = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 16-pixel grid for positioning icons"
+	OPTION_TIP(tog2, _("Use a 16-pixel grid for positioning icons "
 			   "on the desktop."));
 	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
 
@@ -1665,7 +1665,7 @@ static GtkWidget *create_options(void)
 			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
 			_("Coarse"));
 	radio_grid_coarse = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 32-pixel grid for positioning icons"
+	OPTION_TIP(tog2, _("Use a 32-pixel grid for positioning icons "
 			   "on the desktop."));
 	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
 
