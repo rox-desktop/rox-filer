@@ -529,7 +529,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 #ifndef GTK2
 	font = pinicon_style->font;
 	font_height = font->ascent + font->descent;
-	item->name_width = gdk_string_width(font, item->leafname);
+	item->name_width = gdk_string_measure(font, item->leafname);
 #else
 	{
 		PangoRectangle logical;

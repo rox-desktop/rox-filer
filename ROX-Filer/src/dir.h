@@ -12,6 +12,7 @@
 #include <dirent.h>
 
 typedef enum {
+	DIR_NAMES,	/* Got a list of names (used for resizing) */
 	DIR_START_SCAN,	/* Set 'scanning' indicator */
 	DIR_END_SCAN,	/* Clear 'scanning' indicator */
 	DIR_ADD,	/* Add the listed items to the display */
@@ -45,10 +46,15 @@ struct _Directory
 
 	gboolean	do_thumbs;	/* Create thumbs while scanning */
 	gboolean	notify_active;	/* Notify timeout is running */
-	gint		idle;		/* Idle callback ID */
+	gint		idle_callback;	/* Idle callback ID */
 
 	GPtrArray 	*items;		/* What our users know about */
+	GPtrArray	*new_items;	/* New items to add in */
+	GPtrArray	*up_items;	/* Items to redraw */
+
 	GList		*recheck_list;	/* Items to check on callback */
+
+	gboolean	scanning;	/* TRUE if we sent DIR_START_SCAN */
 
 	/* Old stuff.. */
 
@@ -56,9 +62,6 @@ struct _Directory
 	gboolean	done_some_scanning;	/* Read any items this scan? */
 	DIR		*dir_handle;	/* NULL => not scanning */
 	off_t		dir_start;	/* For seekdir() to beginning */
-
-	GPtrArray	*new_items;	/* New items to add in */
-	GPtrArray	*up_items;	/* Items to redraw */
 };
 
 void dir_init(void);
@@ -72,5 +75,7 @@ void dir_stat(guchar *path, DirItem *item, gboolean make_thumb);
 void dir_restat(guchar *path, DirItem *item, gboolean make_thumb);
 void dir_item_clear(DirItem *item);
 void dir_check_this(guchar *path);
+void dir_rescan(Directory *dir, guchar *pathname);
+void dir_merge_new(Directory *dir);
 
 #endif /* _DIR_H */

@@ -179,6 +179,61 @@ static void fill_template(GdkRectangle *area, DirItem *item,
 	}
 }
 
+/* Guess how big one item would be for this list of file names.
+ * Also returns the number of names. Doesn't count hidden files if hidden
+ * files are not being displayed.
+ */
+void display_guess_size(FilerWindow *filer_window,
+			GPtrArray *names,
+			int *ret_w, int *ret_h, int *ret_n)
+{
+	int		i = 0;
+	int		width = 16, height = 16;
+	DisplayStyle	style = filer_window->display_style;
+	int		text_height = item_font->ascent + item_font->descent;
+	int		w, h, n = 0;
+
+	/* TODO: Details display styles */
+
+	for (i = 0; i < names->len; i++)
+	{
+		guchar *name = (guchar *) names->pdata[i];
+
+		if (name[0] == '.' && !filer_window->show_hidden)
+			continue;
+
+		n++;
+		
+		w = gdk_string_measure(item_font, name);
+
+		if (style == SMALL_ICONS)
+		{
+			w = MIN(w, o_small_truncate);
+			w = SMALL_WIDTH + 12 + w;
+			h = MAX(text_height, SMALL_HEIGHT) + 4;
+		}
+		else if (style == LARGE_ICONS)
+		{
+			w = MAX(ICON_WIDTH, w) + 4;
+			h = text_height + ICON_HEIGHT + 2;
+		}
+		else
+		{
+			w = MAX(HUGE_WIDTH, w) + 4;
+			h = text_height + HUGE_HEIGHT + 4;
+		}
+
+		width = MAX(w, width);
+		height = MAX(h, height);
+	}
+
+	*ret_w = width;
+	*ret_h = height;
+	*ret_n = n;
+
+	g_print("[ guessed size = %d x %d ]\n", width, height);
+}
+
 /* Return the size needed for this item */
 void calc_size(FilerWindow *filer_window, DirItem *item,
 		int *width, int *height)
@@ -529,6 +584,8 @@ void shrink_grid(FilerWindow *filer_window)
 		if (h > height)
 			height = h;
 	}
+
+	g_print("[ actual size %d x %d ]\n", width, height);
 
 	collection_set_item_size(filer_window->collection, width, height);
 }

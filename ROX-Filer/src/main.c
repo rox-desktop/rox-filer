@@ -415,6 +415,7 @@ int main(int argc, char **argv)
 	dnd_init();
 	bind_init();
 	dir_init();
+	diritem_init();
 	menu_init();
 	minibuffer_init();
 	filer_init();

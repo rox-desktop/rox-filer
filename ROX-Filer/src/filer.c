@@ -102,6 +102,8 @@ static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
 static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
 static void show_tooltip(guchar *text);
+static void filer_size_for(FilerWindow *filer_window,
+			   int w, int h, int n, gboolean allow_shrink);
 
 static void set_unique(guchar *unique);
 
@@ -166,15 +168,12 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 		g_warning("Failed to find '%s'\n", item->leafname);
 }
 
-/* Resize the filer window to w x h icons (not clamped) */
+/* Resize the filer window to w x h pixels, plus border (not clamped) */
 static void filer_window_set_size(FilerWindow *filer_window,
 				  int w, int h,
 				  gboolean allow_shrink)
 {
 	g_return_if_fail(filer_window != NULL);
-
-	w = filer_window->collection->item_width * MAX(w, 1);
-	h = filer_window->collection->item_height * MAX(h, 1);
 
 	if (filer_window->scrollbar)
 		w += filer_window->scrollbar->allocation.width;
@@ -221,74 +220,42 @@ static void filer_window_set_size(FilerWindow *filer_window,
 						w, h);
 }
 
-static gboolean autosize_timeout_cb(FilerWindow *filer_window)
-{
-	filer_window_autosize(filer_window, FALSE);
-	return FALSE;
-}
-
-/* Add a gtk_timeout that calls the autosize routine after the period of time
- * passed with t, if t is equal to zero then remove the previously defined
- * timeout.
- */
-static void filer_window_autosize_request(FilerWindow *filer_window, int t)
-{
-	if (filer_window->autosize_timeout)
-	{
-		gtk_timeout_remove(filer_window->autosize_timeout);
-		filer_window->autosize_timeout = 0;
-	}
-	if (t > 0)
-		filer_window->autosize_timeout = gtk_timeout_add(t,
-				(GtkFunction) autosize_timeout_cb,
-				filer_window);
-}
-
-/* Return the number of items due to be merged into this directory. */
-static int filer_count_pending(FilerWindow *filer_window)
-{
-	GPtrArray *items = filer_window->directory->new_items;
-	int i, n = 0;
-
-	if (filer_window->show_hidden)
-		return items->len;
-	
-	for (i = 0; i < items->len; i++)
-	{
-		DirItem	*item = (DirItem *) items->pdata[i];
-
-		if (item->leafname[0] != '.')
-			n += 1;
-	}
-
-	return n;
-}
-
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 {
 	Collection	*collection = filer_window->collection;
-	int 		n = collection->number_of_items;
+	int 		n;
+
+	/* If any items are queued to be added, add them now */
+	dir_merge_new(filer_window->directory);
+
+	n = collection->number_of_items;
+	/* XXX: This counts duplicates => may overestimate */
+	n += g_list_length(filer_window->directory->recheck_list);
+	n = MAX(n, 2);
+	g_print("[ Guess n is %d (%d new) ]\n", n,
+			g_list_length(filer_window->directory->recheck_list));
+	
+	filer_size_for(filer_window,
+			collection->item_width,
+			collection->item_height,
+			n, allow_shrink);
+}
+
+/* Choose a good size for this window, assuming n items of size (w, h) */
+static void filer_size_for(FilerWindow *filer_window,
+			   int w, int h, int n, gboolean allow_shrink)
+{
 	int 		x;
 	int		rows, cols;
-	int		w = collection->item_width;
-	int		h = collection->item_height;
 	int 		max_x, max_rows;
 	const float	r = 2.5;
 	int		t = 0;
 	int		size_limit;
 
-	filer_window_autosize_request(filer_window, 0);
-
 	size_limit = option_get_int("filer_size_limit");
 
 	if (o_toolbar != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
-
-	/* Include items that are about to be added... */
-	if (filer_window->scanning)
-		n += filer_count_pending(filer_window);
-
-	n = MAX(n, 2);
 
 	max_x = (size_limit * screen_width) / 100;
 	max_rows = (size_limit * screen_height) / (h * 100);
@@ -333,10 +300,10 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 	if (rows > max_rows)
 		rows = max_rows;
 
-	filer_window_set_size(filer_window, cols, rows + 1, allow_shrink);
-
-	if (filer_window->scanning && rows < max_rows)
-		filer_window_autosize_request(filer_window, 100);
+	filer_window_set_size(filer_window,
+			w * MAX(cols, 1),
+			h * (MAX(rows, 1) + 1),
+			allow_shrink);
 }
 
 /* Called on a timeout while scanning or when scanning ends
@@ -355,10 +322,20 @@ static gint open_filer_window(FilerWindow *filer_window)
 		filer_window_autosize(filer_window, TRUE);
 		gtk_widget_show(filer_window->window);
 	}
-	else if (filer_window->autosize_timeout)
-		filer_window_autosize(filer_window, FALSE);
 
 	return FALSE;
+}
+
+/* The list of names in the directory is known, but the images for each
+ * one are not. Choose a sensible size.
+ */
+static void filer_auto_size_names(FilerWindow *filer_window, GPtrArray *names)
+{
+	int	w, h, n;
+
+	display_guess_size(filer_window, names, &w, &h, &n);
+	
+	filer_size_for(filer_window, w, h, n, TRUE);
 }
 
 static void update_display(Directory *dir,
@@ -442,6 +419,9 @@ static void update_display(Directory *dir,
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
 			break;
+		case DIR_NAMES:
+			filer_auto_size_names(filer_window, items);
+			break;
 	}
 }
 
@@ -488,7 +468,6 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		gtk_timeout_remove(filer_window->open_timeout);
 		filer_window->open_timeout = 0;
 	}
-	filer_window_autosize_request(filer_window, 0);
 
 	g_free(filer_window->auto_select);
 	g_free(filer_window->path);
@@ -917,8 +896,6 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
 				filer_window);
-	else if (option_get_int("filer_auto_resize") == RESIZE_ALWAYS)
-		filer_window_autosize_request(filer_window, 100);
 }
 
 void filer_open_parent(FilerWindow *filer_window)
@@ -1050,7 +1027,6 @@ FilerWindow *filer_opendir(char *path)
 	filer_window->toolbar_text = NULL;
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
-	filer_window->autosize_timeout = 0;
 
 	/* Finds the entry for this directory in the dir cache, creating
 	 * a new one if needed. This does not cause a scan to start,

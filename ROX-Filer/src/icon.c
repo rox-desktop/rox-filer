@@ -617,7 +617,7 @@ static void rename_activate(GtkWidget *dialog)
 		icon_hash_path(icon);
 		
 		icon->item.leafname = g_strdup(new_name);
-		icon->item.name_width = gdk_string_width(font, new_name);
+		icon->item.name_width = gdk_string_measure(font, new_name);
 		diritem_restat(icon->path, &icon->item, FALSE);
 
 		callback(icon);
