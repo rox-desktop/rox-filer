@@ -27,9 +27,11 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <unistd.h>
 
 #include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 
 #include "global.h"
 
@@ -37,6 +39,7 @@
 #include "options.h"
 #include "choices.h"
 #include "main.h"
+#include "type.h"
 #include "gui_support.h"
 #include "dir.h"
 #include "pixmaps.h"
@@ -157,6 +160,7 @@ static void drag_end(GtkWidget *widget,
 static void perform_action(Panel *panel,
 			   Icon *icon,
 			   GdkEventButton *event);
+static void run_applet(Icon *icon);
 
 
 static GtkItemFactoryEntry menu_def[] = {
@@ -465,6 +469,7 @@ static void panel_add_item(Panel *panel,
 	icon->panel = panel;
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
+	icon->socket = NULL;
 
 	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
 	
@@ -487,25 +492,34 @@ static void panel_add_item(Panel *panel,
 	
 	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
 
-	gtk_signal_connect_after(GTK_OBJECT(widget), "enter-notify-event",
-                           GTK_SIGNAL_FUNC(enter_icon), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
-			GTK_SIGNAL_FUNC(icon_motion_event), icon);
-	gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
-                           GTK_SIGNAL_FUNC(draw_icon), icon);
-	gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
-                           GTK_SIGNAL_FUNC(expose_icon), icon);
-	gtk_signal_connect(GTK_OBJECT(widget), "button_release_event",
-                           GTK_SIGNAL_FUNC(icon_button_release), icon);
-	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
-                           GTK_SIGNAL_FUNC(icon_button_press), icon);
-	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
-				drag_data_get, NULL);
-
 	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
 
-	drag_set_panel_dest(icon);
+	if (icon->item.base_type == TYPE_DIRECTORY)
+		run_applet(icon);
+
+	gtk_signal_connect(GTK_OBJECT(widget), "button_release_event",
+			GTK_SIGNAL_FUNC(icon_button_release), icon);
+	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
+			GTK_SIGNAL_FUNC(icon_button_press), icon);
+
+	if (!icon->socket)
+	{
+		gtk_signal_connect_after(GTK_OBJECT(widget),
+				"enter-notify-event",
+				GTK_SIGNAL_FUNC(enter_icon), icon);
+		gtk_signal_connect(GTK_OBJECT(icon->widget),
+				"motion-notify-event",
+				GTK_SIGNAL_FUNC(icon_motion_event), icon);
+		gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
+				GTK_SIGNAL_FUNC(draw_icon), icon);
+		gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
+				GTK_SIGNAL_FUNC(expose_icon), icon);
+		gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
+				drag_data_get, NULL);
+
+		drag_set_panel_dest(icon);
+	}
 
 	size_icon(icon);
 
@@ -523,14 +537,19 @@ static void panel_add_item(Panel *panel,
  */
 static void size_icon(Icon *icon)
 {
-	int	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT - 4);
+	int	im_height;
 	GdkFont	*font = icon->widget->style->font;
 	int	width, height;
 
-	width = MAX(icon->item.image->width, icon->item.name_width) + 4;
+	if (icon->socket)
+		return;
+
+	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT - 4);
+
+	width = MAX(icon->item.image->width, icon->item.name_width);
 	height = font->ascent + font->descent + 2 + im_height;
 
-	gtk_widget_set_usize(icon->widget, width, height);
+	gtk_widget_set_usize(icon->widget, width + 4, height);
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -1568,4 +1587,42 @@ static guchar *create_uri_list(GList *list)
 	g_string_free(tmp, FALSE);
 	
 	return retval;
+}
+
+static void applet_died(GtkWidget *socket)
+{
+	g_print("Applet died!\n");
+	if (GTK_OBJECT_DESTROYED(socket))
+		g_print("[ socket already gone ]\n");
+	else
+		g_print("[ socket still here ]\n");
+
+	gtk_widget_unref(socket);
+}
+
+/* Try to run this applet. Fills in icon->socket on success. */
+static void run_applet(Icon *icon)
+{
+	char	*argv[2];
+	pid_t	pid;
+
+	argv[0] = make_path(icon->path, "AppletRun")->str;
+	
+	if (access(argv[0], X_OK) != 0)
+		return;
+
+	icon->socket = gtk_socket_new();
+	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
+	gtk_widget_show_all(icon->socket);
+	gtk_widget_realize(icon->socket);
+	gtk_widget_set_usize(icon->socket, 30, 30);
+	
+	argv[1] = g_strdup_printf("%ld",
+			GDK_WINDOW_XWINDOW(icon->socket->window));
+
+	pid = spawn(argv);
+	gtk_widget_ref(icon->socket);
+	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
+	
+	g_free(argv[1]);
 }

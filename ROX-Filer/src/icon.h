@@ -32,6 +32,7 @@ struct _Icon {
 
 	/* Only used on the panel... */
 	Panel		*panel;		/* Panel containing this icon */
+	GtkWidget	*socket;	/* For applets */
 };
 
 void icon_init(void);

@@ -320,8 +320,6 @@ static gboolean test_point(Collection *collection,
 
 	fill_template(&area, item, filer_window, &template);
 
-	SHOW_RECT(item, &template);
-
 	return INSIDE(point_x, point_y, template.leafname) ||
 	       INSIDE(point_x, point_y, template.icon) ||
 	       (template.details_string &&

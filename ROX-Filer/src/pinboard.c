@@ -325,6 +325,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	icon->mask = NULL;
 	icon->x = x;
 	icon->y = y;
+	icon->socket = NULL;
 
 	icon_hash_path(icon);
 
