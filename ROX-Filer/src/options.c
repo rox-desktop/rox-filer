@@ -277,6 +277,7 @@ struct _ParseContext {
 	GtkAdjustment	*adj;
 	guchar		*section, *label, *radio_group, *value;
 	gboolean	fixed;
+	gboolean	showvalue;
 	Option		*option;
 };
 
@@ -429,6 +430,7 @@ static void startElement(void *user_data, const CHAR *name, const CHAR **attrs)
 		else if (strcmp(name, "slider") == 0)
 		{
 			guchar	*fixed;
+			guchar  *showvalue;
 
 			new = PARSE_SLIDER;
 			g_free(context.label);
@@ -440,6 +442,8 @@ static void startElement(void *user_data, const CHAR *name, const CHAR **attrs)
 
 			fixed = get_attr(attrs, "fixed");
 			context.fixed = fixed ? atoi(fixed) : 0;
+			showvalue = get_attr(attrs, "showvalue");
+			context.showvalue = showvalue ? atoi(showvalue) : 0;
 		}
 		else if (strcmp(name, "label") == 0)
 			new = PARSE_LABEL;
@@ -682,7 +686,14 @@ static void endElement(void *user_data, const CHAR *name)
 
 		if (context.fixed)
 			gtk_widget_set_usize(slide, context.adj->upper, 24);
-		gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
+		if (context.showvalue) {
+			gtk_scale_set_draw_value(GTK_SCALE(slide), TRUE);
+			gtk_scale_set_value_pos(GTK_SCALE(slide),
+						GTK_POS_LEFT);
+			gtk_scale_set_digits(GTK_SCALE(slide), 0);
+		}
+		else 
+			gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
 		GTK_WIDGET_UNSET_FLAGS(slide, GTK_CAN_FOCUS);
 
 		may_add_tip(slide, context.data->str);
