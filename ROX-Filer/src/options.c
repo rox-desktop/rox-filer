@@ -165,9 +165,13 @@ void options_init(void)
 }
 
 /* When parsing the XML file, process an element named 'name' by
- * calling 'builder(xml_node, label)'.
- * builder returns the new widget to add to the options box.
+ * calling 'builder(ui, xml_node, label)'.
+ * builder returns the new widgets to add to the options box.
  * 'name' should be a static string.
+ *
+ * Functions to set or get the widget's state can be stored in 'ui'.
+ * If the option doesn't have a name attribute in Options.xml then
+ * ui will be NULL on entry (this is used for buttons).
  */
 void option_register_widget(char *name, OptionBuildFn builder)
 {
@@ -263,17 +267,6 @@ void option_add_saver(OptionNotify *callback)
 	g_return_if_fail(callback != NULL);
 
 	saver_callbacks = g_list_append(saver_callbacks, callback);
-}
-
-/* Set whether this option should be saved in the options file */
-void option_set_save(guchar *key, gboolean save)
-{
-	Option	*option;
-
-	option = g_hash_table_lookup(option_hash, key);
-	g_return_if_fail(option != NULL);
-
-	option->save = save;
 }
 
 /****************************************************************
@@ -1004,6 +997,10 @@ static void update_option_widgets(void)
 	g_hash_table_foreach(option_hash, update_cb, NULL);
 }
 
+/* Each of the following update the widget to make it show the current
+ * value of the option.
+ */
+
 static void update_toggle(OptionUI *ui, guchar *value)
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(ui->widget),
@@ -1038,6 +1035,10 @@ static void update_colour(OptionUI *ui, guchar *value)
 	gdk_color_parse(value, &colour);
 	button_patch_set_colour(ui->widget, &colour);
 }
+
+/* Each of these read_* calls get the new (string) value of an option
+ * from the widget.
+ */
 
 static guchar *read_toggle(OptionUI *ui)
 {
@@ -1076,9 +1077,15 @@ static guchar *read_colour(OptionUI *ui)
 			style->bg[GTK_STATE_NORMAL].blue);
 }
 
+/* These create new widgets in the options window and set the appropriate
+ * callbacks.
+ */
+
 static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label)
 {
 	GtkWidget	*toggle;
+
+	g_return_val_if_fail(ui != NULL, NULL);
 
 	toggle = gtk_check_button_new_with_label(_(label));
 
@@ -1098,6 +1105,8 @@ static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label)
 	int	min, max;
 	int	fixed;
 	int	showvalue;
+
+	g_return_val_if_fail(ui != NULL, NULL);
 
 	min = get_int(node, "min");
 	max = get_int(node, "max");
@@ -1143,6 +1152,8 @@ static GList *build_entry(OptionUI *ui, xmlNode *node, guchar *label)
 	GtkWidget	*hbox;
 	GtkWidget	*entry;
 
+	g_return_val_if_fail(ui != NULL, NULL);
+
 	hbox = gtk_hbox_new(FALSE, 4);
 
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
@@ -1165,6 +1176,8 @@ static GList *build_radio_group(OptionUI *ui, xmlNode *node, guchar *label)
 	GtkWidget	*button = NULL;
 	xmlNode		*rn;
 
+	g_return_val_if_fail(ui != NULL, NULL);
+
 	for (rn = node->xmlChildrenNode; rn; rn = rn->next)
 	{
 		if (rn->type == XML_ELEMENT_NODE)
@@ -1186,6 +1199,8 @@ static GList *build_colour(OptionUI *ui, xmlNode *node, guchar *label)
 	GtkWidget	*hbox, *da, *button;
 	int		lpos;
 	
+	g_return_val_if_fail(ui != NULL, NULL);
+
 	/* lpos gives the position for the label 
 	 * 0: label comes before the button
 	 * non-zero: label comes after the button
@@ -1227,6 +1242,8 @@ static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label)
 	GtkWidget	*menu;
 	GList		*list, *kids;
 	int		min_w = 4, min_h = 4;
+
+	g_return_val_if_fail(ui != NULL, NULL);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 

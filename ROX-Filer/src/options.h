@@ -38,6 +38,4 @@ void option_add_saver(OptionNotify *callback);
 
 void options_show(void);
 
-void option_set_save(guchar *key, gboolean save);
-
 #endif /* _OPTIONS_H */

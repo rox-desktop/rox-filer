@@ -50,8 +50,7 @@
 #include "options.h"
 #include "filer.h"
 
-#if defined(HAVE_REGEX_H) && \
-		defined(HAVE_RE_COMPILE_PATTERN) && defined(HAVE_RE_SEARCH)
+#ifdef HAVE_REGEX_H
 # define USE_REGEX 1
 #else
 # undef USE_REGEX
@@ -60,8 +59,8 @@
 #ifdef USE_REGEX
 /* A regexp rule, which maps matching filenames to a MIME-types */
 typedef struct pattern {
-  MIME_type *type;
-  struct re_pattern_buffer buffer;
+	MIME_type *type;
+	regex_t buffer;
 } Pattern;
 #endif
 
@@ -106,10 +105,6 @@ void type_init()
 	int		i;
 	GPtrArray	*list;
 	
-#ifdef HAVE_RE_SET_SYNTAX
-	re_set_syntax(RE_SYNTAX_POSIX_EGREP);
-#endif
-
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
@@ -259,7 +254,7 @@ static void add_regex(char *type_name, char *reg)
 	pattern->buffer.fastmap = NULL;
 	pattern->buffer.translate = NULL;
 
-	if (re_compile_pattern(reg, strlen(reg), &pattern->buffer))
+        if (regcomp(&pattern->buffer, reg, REG_EXTENDED | REG_NOSUB))
 	{
 		regfree(&pattern->buffer);
 		g_free(pattern);
@@ -442,8 +437,7 @@ MIME_type *type_from_path(char *path)
 	{
 		Pattern *pattern = (Pattern *) patt->data;
 
-		if (re_search(&pattern->buffer,
-					leafname, len, 0, len, NULL) >= 0)
+                if (regexec(&pattern->buffer, leafname, 0, NULL, 0) == 0)
 			return pattern->type;
 	}
 #endif
