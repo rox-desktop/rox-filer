@@ -135,21 +135,26 @@ static void cancel_wink(Collection *collection);
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 {
-	collection->draw_item((GtkWidget *) collection,
-			&collection->items[item],
-			area);
-	if (item == collection->wink_item)
-		gdk_draw_rectangle(((GtkWidget *) collection)->window,
-				   ((GtkWidget *) collection)->style->black_gc,
-				   FALSE,
-				   area->x + 1, area->y + 1,
-				   area->width - 3, area->height - 3);
-	if (item == collection->cursor_item)
-		gdk_draw_rectangle(((GtkWidget *) collection)->window,
+	if (item < collection->number_of_items)
+	{
+		collection->draw_item((GtkWidget *) collection,
+				&collection->items[item],
+				area);
+		if (item == collection->wink_item)
+			gdk_draw_rectangle(((GtkWidget *) collection)->window,
 				   ((GtkWidget *) collection)->style->black_gc,
 				   FALSE,
 				   area->x, area->y,
 				   area->width - 1, area->height - 1);
+	}
+	if (item == collection->cursor_item)
+	{
+		gdk_draw_rectangle(((GtkWidget *) collection)->window,
+				((GtkWidget *) collection)->style->black_gc,
+				FALSE,
+				area->x + 1, area->y + 1,
+				area->width - 3, area->height - 3);
+	}
 }
 		
 GtkType collection_get_type(void)
@@ -541,7 +546,8 @@ static gint collection_paint(Collection 	*collection,
 		item_area.width = collection->item_width;
 		item_area.height = collection->item_height;
 
-		while (item < collection->number_of_items && row <= last_row)
+		while ((item == 0 || item < collection->number_of_items)
+				&& row <= last_row)
 		{
 			item_area.x = col * collection->item_width;
 			item_area.y = row * collection->item_height - scroll;
@@ -896,6 +902,9 @@ static gint collection_button_press(GtkWidget      *widget,
 		}
 		return FALSE;
 	}
+
+	if (collection->cursor_item != -1)
+		collection_set_cursor_item(collection, -1);
 
 	scroll = collection->vadj->value;
 
@@ -1403,7 +1412,8 @@ void collection_clear(Collection *collection)
 		gtk_timeout_remove(collection->wink_timeout);
 	}
 
-	collection_set_cursor_item(collection, -1);
+	collection_set_cursor_item(collection,
+			collection->cursor_item == -1 ? -1: 0);
 	prev_selected = collection->number_selected;
 	collection->number_of_items = collection->number_selected = 0;
 
@@ -1576,9 +1586,12 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(item >= 0 && item < collection->number_of_items);
+	g_return_if_fail(item >= 0 &&
+			(item == 0 || item < collection->number_of_items));
 
 	widget = GTK_WIDGET(collection);
+	if (!GTK_WIDGET_REALIZED(widget))
+		return;
 
 	col = item % collection->columns;
 	row = item / collection->columns;
@@ -1600,11 +1613,18 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 	area.y = area_y;
 	area.height = area_height;
 			
-	if (blank)
+	if (blank || collection->lasso_box)
 		gdk_window_clear_area(widget->window,
 				area.x, area.y, area.width, area.height);
 
 	draw_one_item(collection, item, &area);
+
+	if (collection->lasso_box)
+	{
+		gdk_gc_set_clip_rectangle(collection->xor_gc, &area);
+		draw_lasso_box(collection);
+		gdk_gc_set_clip_rectangle(collection->xor_gc, NULL);
+	}
 }
 
 void collection_set_item_size(Collection *collection, int width, int height)
@@ -1732,7 +1752,8 @@ int collection_get_item(Collection *collection, int x, int y)
 }
 
 /* Set the cursor/highlight over the given item. Passing -1
- * hides the cursor.
+ * hides the cursor. As a special case, you may set the cursor item
+ * to zero when there are no items.
  */
 void collection_set_cursor_item(Collection *collection, gint item)
 {
@@ -1741,7 +1762,7 @@ void collection_set_cursor_item(Collection *collection, gint item)
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(item >= -1 &&
-			item < (int) collection->number_of_items);
+		(item < (int) collection->number_of_items || item == 0));
 
 	old_item = collection->cursor_item;
 
@@ -1854,3 +1875,33 @@ void collection_target(Collection *collection,
 	gdk_window_set_cursor(GTK_WIDGET(collection)->window,
 			callback ? crosshair : NULL);
 }
+
+/* Move the cursor by the given row and column offsets. */
+void collection_move_cursor(Collection *collection, int drow, int dcol)
+{
+	int	row, col, item;
+
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+
+	item = collection->cursor_item;
+	if (item == -1)
+		row = col = 0;
+	else
+	{
+		row = item / collection->columns;
+		col = item % collection->columns;
+
+		row = MAX(row + drow, 0);
+		col = MAX(col + dcol, 0);
+	}
+
+	if (col >= collection->columns)
+		col = collection->columns - 1;
+	
+	item = col + row * collection->columns;
+
+	if (item >= 0 && item < collection->number_of_items)
+		collection_set_cursor_item(collection, item);
+}
+

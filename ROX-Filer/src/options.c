@@ -38,6 +38,8 @@ static GtkWidget *window, *sections_vbox;
 static FILE *save_file = NULL;
 static GHashTable *option_hash = NULL;
 
+enum {BUTTON_SAVE, BUTTON_OK, BUTTON_APPLY};
+
 /* Static prototypes */
 static void save_options(GtkWidget *widget, gpointer data);
 static char *process_option_line(guchar *line);
@@ -50,6 +52,7 @@ void options_init()
 	char		*string, *save_path;
 	
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	gtk_window_set_title(GTK_WINDOW(window), "ROX-Filer options");
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
 			GTK_SIGNAL_FUNC(hide_dialog_event), window);
@@ -96,12 +99,17 @@ void options_init()
 	if (!save_path)
 		gtk_widget_set_sensitive(button, FALSE);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), (gpointer) TRUE);
+			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_SAVE);
 
 	button = gtk_button_new_with_label("OK");
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), (gpointer) FALSE);
+			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_OK);
+
+	button = gtk_button_new_with_label("Apply");
+	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_APPLY);
 
 	button = gtk_button_new_with_label("Cancel");
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
@@ -220,14 +228,16 @@ static char *process_option_line(guchar *line)
 
 	func = (OptionFunc *) g_hash_table_lookup(option_hash, line);
 	if (!func)
-		return "Bad key (no such option name)";
+		return "Unknown option - this may be due to using a newer "
+			"or older version of ROX-Filer than that which saved "
+			"the file. Open the Options window and click Save.";
 
 	return func(c);
 }
 
 static void save_options(GtkWidget *widget, gpointer data)
 {
-	gboolean	save = (gboolean) data;
+	int		button = (int) data;
 	GSList		*next = options_sections;
 	
 	while (next)
@@ -237,7 +247,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 		next = next->next;
 	}
 	
-	if (save)
+	if (button == BUTTON_SAVE)
 	{
 		char 		*path;
 		
@@ -272,7 +282,8 @@ static void save_options(GtkWidget *widget, gpointer data)
 		}
 	}
 
-	gtk_widget_hide(window);
+	if (button != BUTTON_APPLY)
+		gtk_widget_hide(window);
 }
 
 void options_show(FilerWindow *filer_window)

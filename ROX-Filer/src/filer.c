@@ -26,6 +26,7 @@
 #include <string.h>
 #include <errno.h>
 #include <sys/stat.h>
+#include <sys/param.h>
 #include <unistd.h>
 #include <time.h>
 #include <ctype.h>
@@ -73,7 +74,8 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *filer_single_click(char *data);
-static char *filer_ro_bindings(char *data);
+static char *filer_menu_on_2(char *data);
+static char *filer_new_window_on_1(char *data);
 static char *filer_toolbar(char *data);
 
 static OptionsSection options =
@@ -88,8 +90,9 @@ static gboolean o_toolbar = TRUE;
 static GtkWidget *toggle_toolbar;
 static gboolean o_single_click = FALSE;
 static GtkWidget *toggle_single_click;
-static gboolean o_ro_bindings = FALSE;
-static GtkWidget *toggle_ro_bindings;
+static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
+static GtkWidget *toggle_new_window_on_1;
+static GtkWidget *toggle_menu_on_2;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -167,7 +170,8 @@ void filer_init()
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
 	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("filer_ro_bindings", filer_ro_bindings);
+	option_register("filer_new_window_on_1", filer_new_window_on_1);
+	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
 	option_register("filer_toolbar", filer_toolbar);
 
@@ -909,6 +913,30 @@ void open_item(Collection *collection,
 	filer_openitem(filer_window, item, shift, adjust);
 }
 
+/* Return the full path to the directory containing object 'path'.
+ * Relative paths are resolved from 'depart'.
+ * g_free() the result.
+ */
+static char *follow_symlink(char *depart, char *path)
+{
+	char	*real, *slash;
+
+	if (path[0] != '/')
+		path = make_path(depart, path)->str;
+
+	real = pathdup(path);
+	slash = strrchr(real, '/');
+	if (slash)
+	{
+		if (slash == real)
+			slash[1] = '\0';
+		else
+			slash[0] = '\0';
+	}
+
+	return real;
+}
+
 void filer_openitem(FilerWindow *filer_window, DirItem *item,
 		gboolean shift, gboolean adjust)
 {
@@ -918,6 +946,37 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 	widget = filer_window->window;
 	full_path = make_path(filer_window->path,
 			item->leafname)->str;
+
+	if (item->flags & ITEM_FLAG_SYMLINK && shift)
+	{
+		char	path[MAXPATHLEN + 1];
+		int	got;
+
+		got = readlink(make_path(filer_window->path,
+					item->leafname)->str,
+				path, MAXPATHLEN);
+		if (got < 0)
+			delayed_error("ROX-Filer", g_strerror(errno));
+		else
+		{
+			char	*real;
+
+			g_return_if_fail(got <= MAXPATHLEN);
+			path[got] = '\0';
+
+			real = follow_symlink(filer_window->path, path);
+
+			if (real)
+			{
+				if (filer_window->panel)
+					filer_opendir(real, FALSE, BOTTOM);
+				else
+					filer_change_to(filer_window, real);
+				g_free(real);
+			}
+		}
+		return;
+	}
 
 	switch (item->base_type)
 	{
@@ -938,7 +997,7 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 					break;
 			}
 
-			if ((adjust ^ o_ro_bindings) || filer_window->panel)
+			if ((adjust ^ o_new_window_on_1) || filer_window->panel)
 				filer_opendir(full_path, FALSE, BOTTOM);
 			else
 				filer_change_to(filer_window, full_path);
@@ -1024,23 +1083,34 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window)
 {
+	Collection	*collection = filer_window->collection;
+	int		item = collection->cursor_item;
+
 	switch (event->keyval)
 	{
-		/*
-		   case GDK_Left:
-		   move_cursor(-1, 0);
-		   break;
-		   case GDK_Right:
-		   move_cursor(1, 0);
-		   break;
-		   case GDK_Up:
-		   move_cursor(0, -1);
-		   break;
-		   case GDK_Down:
-		   move_cursor(0, 1);
-		   break;
-		   case GDK_Return:
-		 */
+		case GDK_Left:
+			collection_move_cursor(collection, 0, -1);
+			break;
+		case GDK_Right:
+			collection_move_cursor(collection, 0, 1);
+			break;
+		case GDK_Up:
+			collection_move_cursor(collection, -1, 0);
+			break;
+		case GDK_Down:
+			collection_move_cursor(collection, 1, 0);
+			break;
+		case GDK_Return:
+			/* XXX: This won't work properly if button-1 new
+			 * window is set.
+			 */
+			if (item < 0 || item >= collection->number_of_items)
+				break;
+			filer_openitem(filer_window,
+				(DirItem *) collection->items[item].data,
+				(event->state & GDK_SHIFT_MASK) != 0,
+				FALSE);
+			break;
 		case GDK_BackSpace:
 			change_to_parent(filer_window);
 			return TRUE;
@@ -1409,9 +1479,16 @@ static GtkWidget *create_options()
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	toggle_ro_bindings =
-		gtk_check_button_new_with_label("Use RISC OS mouse bindings");
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_ro_bindings, FALSE, TRUE, 0);
+	toggle_new_window_on_1 =
+		gtk_check_button_new_with_label("New window on button 1 "
+				"(RISC OS style)");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_new_window_on_1,
+			FALSE, TRUE, 0);
+
+	toggle_menu_on_2 =
+		gtk_check_button_new_with_label("Menu on button 2 "
+				"(RISC OS style)");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
 
 	toggle_single_click =
 		gtk_check_button_new_with_label("Single-click nagivation");
@@ -1427,8 +1504,10 @@ static GtkWidget *create_options()
 /* Reflect current state by changing the widgets in the options box */
 static void update_options()
 {
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_ro_bindings),
-			o_ro_bindings);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_new_window_on_1),
+			o_new_window_on_1);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_menu_on_2),
+			collection_menu_button == 2 ? 1 : 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
 			o_single_click);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_toolbar),
@@ -1438,8 +1517,11 @@ static void update_options()
 /* Set current values by reading the states of the widgets in the options box */
 static void set_options()
 {
-	o_ro_bindings = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_ro_bindings));
+	o_new_window_on_1 = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_new_window_on_1));
+
+	collection_menu_button = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_menu_on_2)) ? 2 : 3;
 
 	o_single_click = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_single_click));
@@ -1447,20 +1529,26 @@ static void set_options()
 	
 	o_toolbar = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_toolbar));
-	collection_menu_button = o_ro_bindings ? 2 : 3;
 }
 
 static void save_options()
 {
-	option_write("filer_ro_bindings", o_ro_bindings ? "1" : "0");
+	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
+	option_write("filer_menu_on_2",
+			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
 	option_write("filer_toolbar", o_toolbar ? "1" : "0");
 }
 
-static char *filer_ro_bindings(char *data)
+static char *filer_new_window_on_1(char *data)
 {
-	o_ro_bindings = atoi(data) != 0;
-	collection_menu_button = o_ro_bindings ? 2 : 3;
+	o_new_window_on_1 = atoi(data) != 0;
+	return NULL;
+}
+
+static char *filer_menu_on_2(char *data)
+{
+	collection_menu_button = atoi(data) != 0 ? 2 : 3;
 	return NULL;
 }
 

@@ -147,6 +147,8 @@ void 	collection_delete_if		(Collection *collection,
 void	collection_target		(Collection *collection,
 					 CollectionTargetFunc callback,
 					 gpointer user_data);
+void 	collection_move_cursor		(Collection *collection,
+					 int drow, int dcol);
 
 #ifdef __cplusplus
 }
