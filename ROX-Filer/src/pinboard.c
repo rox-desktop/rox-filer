@@ -80,11 +80,10 @@ struct _PinIconClass {
 struct _PinIcon {
 	Icon		icon;
 
-	int		x, y, width, height;
-	int		name_width;
-	PangoLayout	*layout;	/* The label */
+	int		x, y;
 	GtkWidget	*win;
-	GtkWidget	*widget;	/* The drawing area */
+	GtkWidget	*widget;	/* The drawing area for the icon */
+	GtkWidget	*label;
 };
 
 /* The number of pixels between the bottom of the image and the top
@@ -143,12 +142,7 @@ static gint icon_motion_notify(GtkWidget *widget,
 			       PinIcon *pi);
 static const char *pin_from_file(gchar *line);
 static void snap_to_grid(int *x, int *y);
-static void offset_from_centre(PinIcon *pi,
-			       int width, int height,
-			       int *x, int *y);
-static void offset_to_centre(PinIcon *pi,
-			     int width, int height,
-			     int *x, int *y);
+static void offset_from_centre(PinIcon *pi, int *x, int *y);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -170,7 +164,8 @@ static gboolean bg_drag_leave(GtkWidget		*widget,
 			      GdkDragContext	*context,
 			      guint32		time,
 			      gpointer		data);
-static void bg_expose(GtkWidget *window, GdkEventExpose *event, gpointer data);
+static gboolean bg_expose(GtkWidget *window,
+			  GdkEventExpose *event, gpointer data);
 static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
 			PinIcon *pi);
@@ -188,6 +183,8 @@ static void reload_backdrop(Pinboard *pinboard,
 			    const gchar *backdrop,
 			    BackdropStyle backdrop_style);
 static void set_backdrop(const gchar *path, BackdropStyle style);
+void pinboard_reshape_icon(Icon *icon);
+static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -299,15 +296,14 @@ const char *pinboard_get_name(void)
 
 /* Add a new icon to the background.
  * 'path' should be an absolute pathname.
- * 'x' and 'y' are the coordinates of the point in the middle of the text
- * if 'corner' is FALSE, and as the top-left corner of where the icon
- * image should be if it is TRUE.
+ * 'x' and 'y' are the coordinates of the point in the middle of the text.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  *
  * name and path are in UTF-8 for Gtk+-2.0 only.
  */
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 {
+	GtkWidget	*align;
 	PinIcon		*pi;
 	Icon		*icon;
 
@@ -320,30 +316,33 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	pi->y = y;
 
 	/* Box takes the initial ref of Icon */
-	pi->win = gtk_event_box_new();
+	pi->win = gtk_vbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(pi->win), WINK_FRAME);
 
+	g_signal_connect(pi->win, "expose-event", G_CALLBACK(draw_wink), pi);
+
+	align = gtk_alignment_new(0.5, 0.5, 0, 0);
 	pi->widget = gtk_drawing_area_new();
+	gtk_container_add(GTK_CONTAINER(align), pi->widget);
 	
-	pi->layout = gtk_widget_create_pango_layout(pi->widget, NULL);
-	pango_layout_set_width(pi->layout, 140 * PANGO_SCALE);
-
-	gtk_container_add(GTK_CONTAINER(pi->win), pi->widget);
+	gtk_box_pack_start(GTK_BOX(pi->win), align, FALSE, TRUE, 0);
 	drag_set_pinicon_dest(pi);
 	g_signal_connect(pi->widget, "drag_data_get",
 				G_CALLBACK(drag_data_get), NULL);
 
-	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
+	pi->label = gtk_label_new(icon->item->leafname);
+	gtk_label_set_line_wrap(GTK_LABEL(pi->label), TRUE);
+	gtk_box_pack_start(GTK_BOX(pi->win), pi->label, TRUE, TRUE, 0);
+
+	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), pi->win, 0, 0);
 	gtk_widget_realize(pi->win);
 	gtk_widget_realize(pi->widget);
 
-	set_size_and_style(pi);
 	snap_to_grid(&x, &y);
-	offset_from_centre(pi, pi->width, pi->height, &x, &y);
-	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
-	/* Set the correct position in the icon */
-	offset_to_centre(pi, pi->width, pi->height, &x, &y);
 	pi->x = x;
 	pi->y = y;
+	gtk_widget_show_all(pi->win);
+	pinboard_reshape_icon((Icon *) pi);
 	
 	gtk_widget_add_events(pi->widget,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
@@ -364,7 +363,6 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons, pi);
 	pin_icon_set_tip(pi);
-	gtk_widget_show_all(pi->win);
 
 	if (!loading_pinboard)
 		pinboard_save();
@@ -397,7 +395,7 @@ static void pinboard_wink_item(PinIcon *pi, gboolean timeout)
 
 	if (old)
 	{
-		gtk_widget_queue_draw(old->widget);
+		gtk_widget_queue_draw(old->win);
 		gdk_window_process_updates(old->widget->window, TRUE);
 
 		if (wink_timeout != -1)
@@ -406,7 +404,7 @@ static void pinboard_wink_item(PinIcon *pi, gboolean timeout)
 
 	if (pi)
 	{
-		gtk_widget_queue_draw(pi->widget);
+		gtk_widget_queue_draw(pi->win);
 		gdk_window_process_updates(pi->widget->window, TRUE);
 
 		if (timeout)
@@ -423,8 +421,7 @@ void pinboard_reshape_icon(Icon *icon)
 	int	x = pi->x, y = pi->y;
 
 	set_size_and_style(pi);
-	gdk_window_resize(pi->win->window, pi->width, pi->height);
-	offset_from_centre(pi, pi->width, pi->height, &x, &y);
+	offset_from_centre(pi, &x, &y);
 	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
 	gtk_widget_queue_draw(current_pinboard->fixed);
 }
@@ -546,13 +543,11 @@ static gint end_wink(gpointer data)
 	return FALSE;
 }
 
-/* Updates the width, height, name_width and layout fields, and resizes the
+/* Updates the width, height, name_width and label fields, and resizes the
  * window. Also sets the style to pinicon_style, generating it if needed.
  */
 static void set_size_and_style(PinIcon *pi)
 {
-	int		width, height;
-	int		font_height;
 	Icon		*icon = (Icon *) pi;
 	MaskedPixmap	*image = icon->item->image;
 	int		iwidth = image->width;
@@ -571,42 +566,26 @@ static void set_size_and_style(PinIcon *pi)
 	gtk_widget_set_style(pi->widget, pinicon_style);
 #endif
 
-	{
-		PangoRectangle logical;
-		pango_layout_set_text(pi->layout, icon->item->leafname, -1);
-		pango_layout_get_pixel_extents(pi->layout, NULL, &logical);
+	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
 
-		pi->name_width = logical.width - logical.x;
-		font_height = logical.height - logical.y;
-	}
-
-	width = MAX(iwidth, pi->name_width + 2) + 2 * WINK_FRAME;
-	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
-	gtk_widget_set_size_request(pi->win, width, height);
-	pi->width = width;
-	pi->height = height;
+	gtk_widget_set_size_request(pi->widget, iwidth, iheight);
 }
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 {
-	int		text_x, text_y;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 	MaskedPixmap	*image = item->image;
 	int		iwidth = image->width;
 	int		iheight = image->height;
-	int		image_x;
-	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
-					       : GTK_STATE_NORMAL;
-	PangoRectangle	logical;
-
-	image_x = (pi->width - iwidth) >> 1;
+	//GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
+	//				       : GTK_STATE_NORMAL;
 
 	gdk_pixbuf_render_to_drawable_alpha(
 			icon->selected ? image->pixbuf_lit : image->pixbuf,
 			widget->window,
 			0, 0, 				/* src */
-			image_x, WINK_FRAME,	/* dest */
+			0, 0,				/* dest */
 			iwidth, iheight,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
@@ -616,7 +595,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
 				widget->window,
 				0, 0, 				/* src */
-				image_x, WINK_FRAME,
+				0, 0,
 				-1, -1,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
@@ -630,12 +609,13 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
 				widget->window,
 				0, 0, 				/* src */
-				image_x, WINK_FRAME,
+				0, 0,
 				-1, -1,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 
+#if 0
 	text_x = (pi->width - pi->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
@@ -656,18 +636,30 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 			text_x,
 			text_y,
 			pi->layout);
+#endif
+	return FALSE;
+}
 
-	if (current_wink_icon == pi)
-	{
-		gdk_draw_rectangle(pi->widget->window,
-				pi->widget->style->white_gc,
-				FALSE,
-				0, 0, pi->width - 1, pi->height - 1);
-		gdk_draw_rectangle(pi->widget->window,
-				pi->widget->style->black_gc,
-				FALSE,
-				1, 1, pi->width - 3, pi->height - 3);
-	}
+static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
+{
+	gint x, y, width, height;
+
+	if (current_wink_icon != pi)
+		return FALSE;
+
+	x = widget->allocation.x;
+	y = widget->allocation.y;
+	width = widget->allocation.width;
+	height = widget->allocation.height;
+
+	gdk_draw_rectangle(widget->window,
+			pi->widget->style->white_gc,
+			FALSE,
+			x, y, width - 1, height - 1);
+	gdk_draw_rectangle(widget->window,
+			pi->widget->style->black_gc,
+			FALSE,
+			x + 1, y + 1, width - 3, height - 3);
 
 	return FALSE;
 }
@@ -1039,25 +1031,17 @@ static void snap_to_grid(int *x, int *y)
 }
 
 /* Convert (x,y) from a centre point to a window position */
-static void offset_from_centre(PinIcon *pi,
-			       int width, int height,
-			       int *x, int *y)
+static void offset_from_centre(PinIcon *pi, int *x, int *y)
 {
 	gboolean clamp = o_pinboard_clamp_icons.int_value;
+	GtkRequisition req;
 
-	*x -= width >> 1;
-	*y -= height >> 1;
-	*x = CLAMP(*x, 0, screen_width - (clamp ? width : 0));
-	*y = CLAMP(*y, 0, screen_height - (clamp ? height : 0));
-}
+	gtk_widget_size_request(pi->win, &req);
 
-/* Convert (x,y) from a window position to a centre point */
-static void offset_to_centre(PinIcon *pi,
-			     int width, int height,
-			     int *x, int *y)
-{
-  *x += width >> 1;
-  *y += height >> 1;
+	*x -= req.width >> 1;
+	*y -= req.height >> 1;
+	*x = CLAMP(*x, 0, screen_width - (clamp ? req.width : 0));
+	*y = CLAMP(*y, 0, screen_height - (clamp ? req.height : 0));
 }
 
 /* Same as drag_set_dest(), but for pinboard icons */
@@ -1133,43 +1117,22 @@ static gboolean pinboard_shadow = FALSE;
 static gint shadow_x, shadow_y;
 #define SHADOW_SIZE (ICON_WIDTH)
 
-static void bg_expose(GtkWidget *window, GdkEventExpose *event, gpointer data)
+static gboolean bg_expose(GtkWidget *widget,
+			  GdkEventExpose *event, gpointer data)
 {
-	GdkRectangle *area = &event->area;
-	static GdkGC *shadow_gc = NULL;
-	static GdkColor white, black;
-
 	if (!pinboard_shadow)
-	{
-		/* XXX: Should just disable the events */
-		return;
-	}
-	
-	if (!shadow_gc)
-	{
-		GdkColormap *cm;
-		gboolean success;
+		return FALSE;
 
-		white.red = white.green = white.blue = 0xffff;
-		black.red = black.green = black.blue = 0;
-		
-		cm = gtk_widget_get_colormap(window);
-		shadow_gc = gdk_gc_new(window->window);
-
-		gdk_colormap_alloc_colors(cm, &white, 1, FALSE, TRUE, &success);
-		gdk_colormap_alloc_colors(cm, &black, 1, FALSE, TRUE, &success);
-	}
-
-	gdk_gc_set_clip_rectangle(shadow_gc, area);
-	gdk_gc_set_foreground(shadow_gc, &white);
-	gdk_draw_rectangle(window->window, shadow_gc, FALSE,
+	gdk_draw_rectangle(widget->window,
+			widget->style->white_gc, FALSE,
 			shadow_x, shadow_y,
 			SHADOW_SIZE, SHADOW_SIZE);
-	gdk_gc_set_foreground(shadow_gc, &black);
-	gdk_draw_rectangle(window->window, shadow_gc, FALSE,
+	gdk_draw_rectangle(widget->window,
+			widget->style->black_gc, FALSE,
 			shadow_x + 1, shadow_y + 1,
 			SHADOW_SIZE - 2, SHADOW_SIZE - 2);
-	gdk_gc_set_clip_rectangle(shadow_gc, NULL);
+
+	return FALSE;
 }
 
 /* Draw a 'shadow' under an icon being dragged, showing where
@@ -1177,18 +1140,24 @@ static void bg_expose(GtkWidget *window, GdkEventExpose *event, gpointer data)
  */
 static void pinboard_set_shadow(gboolean on)
 {
+	GdkRectangle area;
+	
 	if (pinboard_shadow)
 	{
-		gdk_window_clear_area_e(current_pinboard->window->window,
-					shadow_x, shadow_y,
-					SHADOW_SIZE + 1, SHADOW_SIZE + 1);
+		area.x = shadow_x;
+		area.y = shadow_y;
+		area.width = SHADOW_SIZE + 1;
+		area.height = SHADOW_SIZE + 1;
+
+		gdk_window_invalidate_rect(current_pinboard->window->window,
+					&area, TRUE);
 	}
 
 	if (on)
 	{
 		int	old_x = shadow_x, old_y = shadow_y;
 
-		gdk_window_get_pointer(current_pinboard->window->window,
+		gdk_window_get_pointer(current_pinboard->fixed->window,
 					&shadow_x, &shadow_y, NULL);
 		snap_to_grid(&shadow_x, &shadow_y);
 		shadow_x -= SHADOW_SIZE / 2;
@@ -1198,9 +1167,13 @@ static void pinboard_set_shadow(gboolean on)
 		if (pinboard_shadow && shadow_x == old_x && shadow_y == old_y)
 			return;
 
-		gdk_window_clear_area_e(current_pinboard->window->window,
-					shadow_x, shadow_y,
-					SHADOW_SIZE + 1, SHADOW_SIZE + 1);
+		area.x = shadow_x;
+		area.y = shadow_y;
+		area.width = SHADOW_SIZE + 1;
+		area.height = SHADOW_SIZE + 1;
+
+		gdk_window_invalidate_rect(current_pinboard->window->window,
+					&area, TRUE);
 	}
 
 	pinboard_shadow = on;
@@ -1225,9 +1198,9 @@ void pinboard_move_icons(void)
 	pi->x = x;
 	pi->y = y;
 	gdk_drawable_get_size(pi->win->window, &width, &height);
-	offset_from_centre(pi, width, height, &x, &y);
+	offset_from_centre(pi, &x, &y);
 
-	gdk_window_move(pi->win->window, x, y);
+	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
 
 	pinboard_save();
 }
@@ -1339,19 +1312,6 @@ static void pin_icon_destroy(Icon *icon)
 	gtk_widget_destroy(pi->win);
 }
 
-static void pin_icon_finalize(GObject *icon)
-{
-	PinIcon *pi = (PinIcon *) icon;
-
-	if (pi->layout)
-	{
-		g_object_unref(G_OBJECT(pi->layout));
-		pi->layout = NULL;
-	}
-
-	((GObjectClass *) parent_class)->finalize(icon);
-}
-
 static void pinboard_remove_items(void)
 {
 	g_return_if_fail(icon_selection != NULL);
@@ -1379,8 +1339,6 @@ static void pin_icon_class_init(gpointer gclass, gpointer data)
 
 	parent_class = g_type_class_peek_parent(gclass);
 	
-	((GObjectClass *) icon)->finalize = pin_icon_finalize;
-	
 	icon->destroy = pin_icon_destroy;
 	icon->redraw = pinboard_reshape_icon;
 	icon->update = pin_icon_update;
@@ -1390,9 +1348,6 @@ static void pin_icon_class_init(gpointer gclass, gpointer data)
 
 static void pin_icon_init(GTypeInstance *object, gpointer gclass)
 {
-	PinIcon *pi = (PinIcon *) object;
-
-	pi->layout = NULL;
 }
 
 static GType pin_icon_get_type(void)
@@ -1507,12 +1462,12 @@ static void create_pinboard_window(Pinboard *pinboard)
 	g_return_if_fail(pinboard->window == NULL);
 
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_set_name(win, "rox-pinboard");
 	pinboard->window = win;
 	pinboard->fixed = gtk_fixed_new();
 	gtk_container_add(GTK_CONTAINER(win), pinboard->fixed);
 
 	gtk_window_set_wmclass(GTK_WINDOW(win), "ROX-Pinboard", PROJECT);
-	gtk_widget_set_name(win, "rox-pinboard");
 
 	gtk_widget_set_size_request(win, screen_width, screen_height);
 	gtk_widget_realize(win);
@@ -1538,7 +1493,8 @@ static void create_pinboard_window(Pinboard *pinboard)
 			G_CALLBACK(button_press_event), NULL);
 	g_signal_connect(win, "button-release-event",
 			G_CALLBACK(button_release_event), NULL);
-	g_signal_connect(win, "expose_event", G_CALLBACK(bg_expose), NULL);
+	g_signal_connect(pinboard->fixed, "expose_event",
+			G_CALLBACK(bg_expose), NULL);
 
 	/* Drag and drop handlers */
 	drag_set_pinboard_dest(win);

@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 		"  fg[INSENSITIVE] = \"#000000\"\n"
 		"}\n"
 		"style \"rox-default-pinboard-style\" {\n"
-		"  bg[NORMAL] = \"#444444\"\n"
+		"  bg[NORMAL] = \"#666666\"\n"
 		"}\n"
 		"style \"rox-default-pinboard-icon-style\" {\n"
 		"  bg_pixmap[NORMAL] = \"<parent>\"\n"
