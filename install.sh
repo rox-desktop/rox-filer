@@ -84,7 +84,11 @@ case $REPLY in
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
-	   MANDIR=""
+	   if [ ! -d ${HOME}/man ]; then
+		MANDIR=""
+	   else
+		MANDIR=${HOME}/man
+	   fi
 	   ;;
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
@@ -115,8 +119,9 @@ The launcher script will be:
 
 EOF
 if [ -n "$MANDIR" ]; then
-	echo "The manual page will be:"
+	echo "The manual pages will be:"
 	echo "	$MANDIR/man1/rox.1"
+	echo "	$MANDIR/man1/ROX-Filer.1"
 else
 	echo "The manual page will not be installed."
 fi
@@ -131,6 +136,8 @@ if [ -n "$MANDIR" ]; then
 	endir "$MANDIR"
 	endir "$MANDIR/man1"
 	cp rox.1 "$MANDIR/man1/rox.1" || die "Can't install manpage!"
+	rm -f "$MANDIR/man1/ROX-Filer.1" || die "Can't install manpage!"
+	ln -s "$MANDIR/man1/rox.1" "$MANDIR/man1/ROX-Filer.1" || die "Can't install manpage!"
 fi
 
 echo "Installing application..."

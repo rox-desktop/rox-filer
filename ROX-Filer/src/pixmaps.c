@@ -293,7 +293,11 @@ static MaskedPixmap *get_bad_image(void)
 
 static MaskedPixmap *load(char *pathname, gpointer user_data)
 {
-	return image_from_file(pathname);
+	MaskedPixmap	*retval;
+
+	retval = image_from_file(pathname);
+
+	return retval ? retval : get_bad_image();
 }
 
 static void ref(MaskedPixmap *mp, gpointer data)
@@ -332,7 +336,7 @@ static void unref(MaskedPixmap *mp, gpointer data)
 
 static int getref(MaskedPixmap *mp)
 {
-	return mp->ref;
+	return mp ? mp->ref : 0;
 }
 
 /* Called now and then to clear out old pixmaps */

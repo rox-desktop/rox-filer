@@ -519,6 +519,20 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	DirItem		new;
 	gboolean	is_new = FALSE;
 
+	if (ent->d_name[0] == '.')
+	{
+		/* Hidden file */
+		
+		if (ent->d_name[1] == '\0')
+			return;		/* Ignore '.' */
+		if (ent->d_name[1] == '.' && ent->d_name[2] == '\0')
+			return;		/* Ignore '..' */
+
+		/* Other hidden files are still cached, but the directory
+		 * viewers may filter them out on a per-display basis...
+		 */
+	}
+
 	tmp = make_path(dir->pathname, ent->d_name);
 	dir_stat(tmp->str, &new);
 

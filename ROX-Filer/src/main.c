@@ -285,7 +285,6 @@ int main(int argc, char **argv)
 #ifdef HAVE_LIBVFS
 	mc_vfs_init();
 #endif
-	gtk_init(&argc, &argv);
 
 	euid = geteuid();
 	egid = getegid();
@@ -372,6 +371,8 @@ int main(int argc, char **argv)
 				return EXIT_FAILURE;
 		}
 	}
+
+	gtk_init(&argc, &argv);
 
 	if (euid == 0 || show_user)
 		show_user_message = g_strdup_printf( _("Running as user '%s'"), 

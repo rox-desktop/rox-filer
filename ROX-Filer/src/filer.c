@@ -153,12 +153,8 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	int	i;
 	char	*leafname = item->leafname;
 
-	if (leafname[0] == '.')
-	{
-		if (filer_window->show_hidden == FALSE || leafname[1] == '\0'
-				|| (leafname[1] == '.' && leafname[2] == '\0'))
+	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
-	}
 
 	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
 
