@@ -739,6 +739,11 @@ void type_set_handler_dialog(MIME_type *type)
 		gtk_entry_set_position(GTK_ENTRY(entry), -1);
 		g_free(tmp);
 	}
+	else
+	{
+		gtk_entry_set_text(GTK_ENTRY(entry), " \"$1\"");
+		gtk_entry_set_position(GTK_ENTRY(entry), 0);
+	}
 
 	button = gtk_button_new_with_label(_("OK"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
