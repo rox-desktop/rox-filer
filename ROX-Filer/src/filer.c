@@ -326,6 +326,10 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
  */
 static gint open_filer_window(FilerWindow *filer_window)
 {
+	Settings	*dir_settings = (Settings *) g_hash_table_lookup(settings_table,
+					      filer_window->sym_path);
+	gboolean force_resize = !(o_filer_auto_resize.int_value == RESIZE_NEVER && dir_settings && dir_settings->flags & SET_POSITION);
+
 	view_style_changed(filer_window->view, 0);
 
 	if (filer_window->open_timeout)
@@ -336,7 +340,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
-		display_set_actual_size(filer_window, TRUE);
+		display_set_actual_size(filer_window, force_resize);
 		gtk_widget_show(filer_window->window);
 	}
 
@@ -1247,6 +1251,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	SortType	s_type;
 	GtkSortType	s_order;
 	Settings	*dir_settings = NULL;
+  gboolean force_resize = TRUE;
 
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -1351,11 +1356,13 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 			filer_window->show_hidden = dir_settings->show_hidden;
 
 		if (dir_settings->flags & SET_STYLE)
-			filer_window->display_style =
-				dir_settings->display_style;
+			dstyle = dir_settings->display_style;
 
 		if (dir_settings->flags & SET_DETAILS)
-			filer_window->details_type = dir_settings->details_type;
+		{
+			dtype = dir_settings->details_type;
+			filer_window->view_type = dir_settings->view_type;
+		}
 
 		if (dir_settings->flags & SET_SORT)
 		{
@@ -1383,16 +1390,18 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 		if(dir_settings->flags & SET_POSITION) 
 			gtk_window_move(GTK_WINDOW(filer_window->window),
 					    dir_settings->x, dir_settings->y);
-		if(dir_settings->flags & SET_SIZE) 
+		if(dir_settings->flags & SET_SIZE) {
 			filer_window_set_size(filer_window,
 					      dir_settings->width,
 					      dir_settings->height);
+			force_resize = o_filer_auto_resize.int_value != RESIZE_NEVER;
+		}
 	}
 
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
-	display_set_layout(filer_window, dstyle, dtype, TRUE);
+	display_set_layout(filer_window, dstyle, dtype, force_resize);
 	display_set_sort_type(filer_window, s_type, s_order);
 
 	/* Open the window after a timeout, or when scanning stops.
@@ -2736,7 +2745,6 @@ gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename)
 	   (!filer_window->temp_show_hidden && !filer_window->show_hidden))
 		return FALSE;
 
-	/*printf("%d %s\n", filer_window->filter, filename);*/
 	switch(filer_window->filter) {
 	case FILER_SHOW_GLOB:
 		return fnmatch(filer_window->filter_string,
