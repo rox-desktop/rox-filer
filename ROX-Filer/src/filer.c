@@ -2497,9 +2497,17 @@ void filer_refresh(FilerWindow *filer_window)
 	{
 		/* Try to run 0refresh */
 		gint pid;
-		const gchar *argv[] = {"0refresh",
-					filer_window->real_path, NULL};
-		pid = rox_spawn(filer_window->real_path, argv);
+		gchar *argv[] = {"0refresh", NULL, NULL};
+		const char *host = filer_window->real_path + sizeof(ZERO_MNT);
+		const char *slash;
+
+		slash = strchr(host, '/');
+		if (slash)
+			argv[1] = g_strndup(host, slash - host);
+		else
+			argv[1] = g_strdup(host);
+		pid = rox_spawn(filer_window->real_path, (const char **) argv);
+		g_free(argv[1]);
 		if (pid)
 			on_child_death(pid, (CallbackFn) refresh_done,
 					filer_window);
