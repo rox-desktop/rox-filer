@@ -619,9 +619,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 
 	if (error)
-	{
 		report_error("ROX-Filer", error);
-	}
 }
 
 static void got_data_raw(GtkWidget 		*widget,
@@ -633,7 +631,6 @@ static void got_data_raw(GtkWidget 		*widget,
 	char		*leafname;
 	int		fd;
 	char		*error = NULL;
-	gboolean	using_XDS = TRUE;
 
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
@@ -641,10 +638,7 @@ static void got_data_raw(GtkWidget 		*widget,
 	leafname = g_dataset_get_data(context, "leafname");
 	
 	if (!leafname)
-	{
-		using_XDS = FALSE;
-		leafname = "UntitledData";	/* TODO: Find a better name */
-	}
+		leafname = "UntitledData";
 
 	fd = open(make_path(filer_window->path, leafname)->str,
 		O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY,
@@ -656,10 +650,10 @@ static void got_data_raw(GtkWidget 		*widget,
 	{
 		if (write(fd,
 			selection_data->data,
-			selection_data->length) != -1)
+			selection_data->length) == -1)
 				error = g_strerror(errno);
 
-		if (close(fd) != -1 && !error)
+		if (close(fd) == -1 && !error)
 			error = g_strerror(errno);
 
 		scan_dir(filer_window);
@@ -667,7 +661,8 @@ static void got_data_raw(GtkWidget 		*widget,
 	
 	if (error)
 	{
-		set_xds_prop(context, "");
+		if (provides(context, XdndDirectSave0))
+			set_xds_prop(context, "");
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		report_error("Error saving file", error);
 	}
@@ -690,6 +685,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	char		*error = NULL;
 	char		**argv = NULL;	/* Command to exec, or NULL */
 	GSList		*next_uri;
+	gboolean	send_reply = TRUE;
 
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
@@ -706,7 +702,24 @@ static void got_uri_list(GtkWidget 		*widget,
 		/* There is one URI in the list, and it's not on the local
 		 * machine. Get it via the X server if possible.
 		 */
-		error = "TODO: Fetch via X Server";
+
+		if (provides(context, application_octet_stream))
+		{
+			char	*leaf;
+			leaf = strrchr(uri_list->data, '/');
+			if (leaf)
+				leaf++;
+			else
+				leaf = uri_list->data;
+			g_dataset_set_data_full(context, "leafname",
+					g_strdup(leaf), g_free);
+			gtk_drag_get_data(widget, context,
+					application_octet_stream, time);
+			send_reply = FALSE;
+		}
+		else
+			error = "Can't get data from remote machine "
+				"(application/octet-stream not provided)";
 	}
 	else
 	{
@@ -764,10 +777,8 @@ static void got_uri_list(GtkWidget 		*widget,
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		report_error("Error getting file list", error);
 	}
-	else
-	{
+	else if (send_reply)
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
-	}
 
 	if (argv)
 	{

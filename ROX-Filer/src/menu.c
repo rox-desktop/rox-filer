@@ -11,6 +11,7 @@
 
 #include "filer.h"
 #include "support.h"
+#include "gui_support.h"
 
 #define C_ "<control>"
 
@@ -20,6 +21,7 @@ GtkAccelGroup	*filer_keys;
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
+static void delete(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
@@ -43,7 +45,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/_Help",		    "F1",   	NULL, 0, NULL},
 {"/File/_Info",		    NULL,   	NULL, 0, NULL},
 {"/File/Separator",	    NULL,   	NULL, 0, "<Separator>"},
-{"/File/_Delete",	    C_"X", 	NULL, 0, NULL},
+{"/File/_Delete",	    C_"X", 	delete, 0, NULL},
 {"/File/Disk _Usage",	    C_"U", 	NULL, 0, NULL},
 {"/File/_Permissions",	    NULL,   	NULL, 0, NULL},
 {"/File/_Stamp",    	    NULL,   	NULL, 0, NULL},
@@ -100,6 +102,54 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	scan_dir(window_with_focus);
+}
+
+static void delete(gpointer data, guint action, GtkWidget *widget)
+{
+	const char	*start_args[] = {"xterm", "-wf",
+				"-e", "rm", "-vir"};
+	int		argc = sizeof(start_args) / sizeof(char *);
+	char		**argv;
+	Collection	*collection;
+	int		i;
+	FileItem	*item;
+	int		child;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+
+	if (collection->number_selected < 1)
+	{
+		report_error("ROX-Filer", "Nothing to delete!");
+		return;
+	}
+
+	argv = g_malloc(sizeof(start_args) +
+		sizeof(char *) * (collection->number_selected + 1));
+	memcpy(argv, start_args, sizeof(start_args));
+
+	for (i = 0; i < collection->number_of_items; i++)
+		if (collection->items[i].selected)
+		{
+			item = (FileItem *) collection->items[i].data;
+			argv[argc++] = g_strdup(make_path(
+						window_with_focus->path,
+						item->leafname)->str);
+		}
+	argv[argc] = NULL;
+
+	child = spawn(argv);
+	if (child)
+		g_hash_table_insert(child_to_filer,
+				(gpointer) child, window_with_focus);
+	else
+		report_error("ROX-Filer", "Failed to fork() child "
+					"process");
+
+	for (i = sizeof(start_args) / sizeof(char *); i < argc; i++)
+		g_free(argv[i]);
+	g_free(argv);
 }
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
