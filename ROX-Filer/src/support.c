@@ -548,8 +548,12 @@ gboolean is_sub_dir(char *sub, char *parent)
 	guchar		*real_sub, *real_parent;
 	gboolean	retval;
 
-	real_sub = pathdup(sub);
-	real_parent = pathdup(parent);
+	/* These were pathdup()s, but that follows symlinks!
+	 * I guess they were here for a reason - something is probably
+	 * broken now...
+	 */
+	real_sub = g_strdup(sub);
+	real_parent = g_strdup(parent);
 
 	parent_len = strlen(real_parent);
 	if (strncmp(real_parent, real_sub, parent_len))

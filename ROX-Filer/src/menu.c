@@ -1575,5 +1575,5 @@ static gboolean can_set_run_action(DirItem *item)
 	g_return_val_if_fail(item != NULL, FALSE);
 
 	return item->base_type == TYPE_FILE &&
-		!(item->flags & ITEM_FLAG_EXEC_FILE);
+		!(item->mime_type == &special_exec);
 }

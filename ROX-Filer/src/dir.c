@@ -260,14 +260,26 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 	}
 	else if (item->base_type == TYPE_FILE)
 	{
-		/* Note: for symlinks we use need the mode of the target */
+		/* Type determined from path before checking for executables
+		 * because some mounts show everything as executable and we
+		 * still want to use the file name to set the mime type.
+		 */
+		item->mime_type = type_from_path(path);
+
+		/* Note: for symlinks we need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
+			/* Note that the flag is set for ALL executable
+			 * files, but the mime_type is only special_exec
+			 * if the file doesn't have a known extension.
+			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
-			item->mime_type = &special_exec;
 		}
-		else
-			item->mime_type = type_from_path(path);
+
+		if (!item->mime_type)
+			item->mime_type = item->flags & ITEM_FLAG_EXEC_FILE
+						? &special_exec
+						: &text_plain;
 
 		if (make_thumb)
 			item->image = g_fscache_lookup(thumb_cache, path);

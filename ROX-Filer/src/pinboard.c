@@ -558,27 +558,6 @@ void pinboard_select_only(Icon *icon)
 	}
 }
 
-/* Returns TRUE if the pinboard contains this item (or any item inside
- * this item).
- */
-gboolean pinboard_has(guchar *path)
-{
-	GList	*next;
-
-	if (!current_pinboard)
-		return FALSE;
-	
-	for (next = current_pinboard->icons; next; next = next->next)
-	{
-		Icon	*i = (Icon *) next->data;
-
-		if (is_sub_dir(i->path, path))
-			return TRUE;
-	}
-		
-	return FALSE;
-}
-
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*

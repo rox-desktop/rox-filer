@@ -213,8 +213,8 @@ char *basetype_name(DirItem *item)
 
 /*			MIME-type guessing 			*/
 
-/* Returns a pointer to the MIME-type. Defaults to text/plain if we have
- * no opinion.
+/* Returns a pointer to the MIME-type.
+ * NULL if we can't think of anything.
  */
 MIME_type *type_from_path(char *path)
 {
@@ -246,7 +246,7 @@ MIME_type *type_from_path(char *path)
 			return type;
 	}
 
-	return &text_plain;
+	return NULL;
 }
 
 /*			Actions for types 			*/

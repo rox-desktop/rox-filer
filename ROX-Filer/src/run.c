@@ -230,7 +230,7 @@ gboolean run_diritem(guchar *full_path,
 				filer_opendir(full_path);
 			return TRUE;
 		case TYPE_FILE:
-			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !edit)
+			if ((item->mime_type == &special_exec) && !edit)
 			{
 				char	*argv[] = {NULL, NULL};
 				guchar	*dir = filer_window ? filer_window->path

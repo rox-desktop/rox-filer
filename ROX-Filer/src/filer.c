@@ -359,6 +359,12 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	if (filer_window->directory)
 		detach(filer_window);
 
+	if (filer_window->open_timeout)
+	{
+		gtk_timeout_remove(filer_window->open_timeout);
+		filer_window->open_timeout = 0;
+	}
+
 	g_free(filer_window->auto_select);
 	g_free(filer_window->path);
 	g_free(filer_window);
