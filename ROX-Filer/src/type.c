@@ -372,7 +372,7 @@ gboolean type_open(const char *path, MIME_type *type)
 			"then you needn't worry. Otherwise, you should check, "
 			"or even just delete, all the existing run actions."),
 			open);
-		choices_dir = g_dirname(open);
+		choices_dir = g_path_get_dirname(open);
 		paths = g_list_append(NULL, choices_dir);
 		action_chmod(paths, TRUE, _("go-w (Fix security problem)"));
 		g_free(choices_dir);
@@ -685,7 +685,7 @@ gchar *describe_current_command(MIME_type *type)
 		{
 			gchar *dir;
 
-			dir = g_dirname(handler);
+			dir = g_path_get_dirname(handler);
 			g_free(handler);
 			handler = g_strconcat(dir, "/", target, NULL);
 			g_free(target);

@@ -180,7 +180,7 @@ void dir_check_this(const guchar *path)
 	guchar	*dir_path;
 	Directory *dir;
 
-	dir_path = g_dirname(path);
+	dir_path = g_path_get_dirname(path);
 	real_path = pathdup(dir_path);
 	g_free(dir_path);
 
@@ -205,7 +205,7 @@ void dir_force_update_path(const gchar *path)
 
 	g_return_if_fail(path[0] == '/');
 
-	dir_path = g_dirname(path);
+	dir_path = g_path_get_dirname(path);
 
 	dir = g_fscache_lookup_full(dir_cache, dir_path, FSCACHE_LOOKUP_PEEK,
 			NULL);

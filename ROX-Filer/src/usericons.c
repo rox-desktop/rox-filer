@@ -646,7 +646,7 @@ static void get_dir(gpointer key, gpointer value, gpointer data)
 	GHashTable *names = (GHashTable *) data;
 	gchar *dir;
 	
-	dir = g_dirname(value);	/* Freed in add_dir_to_menu */
+	dir = g_path_get_dirname(value);	/* Freed in add_dir_to_menu */
 	if (dir)
 	{
 		g_hash_table_insert(names, dir, NULL);

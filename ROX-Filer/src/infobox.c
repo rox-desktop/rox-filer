@@ -64,7 +64,7 @@ static GtkWidget *make_about(guchar *path, xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
-static guchar *pretty_type(DirItem *file, guchar *path);
+static const gchar *pretty_type(DirItem *file, const guchar *path);
 static void got_response(GObject *window, gint response, gpointer data);
 static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 
@@ -103,6 +103,7 @@ void infobox_new(const gchar *pathname)
 {
 	GtkWidget	*window, *details;
 	gchar		*path;
+	GObject		*owindow;
 
 	g_return_if_fail(pathname != NULL);
 
@@ -119,11 +120,12 @@ void infobox_new(const gchar *pathname)
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 
 	details = make_vbox(path);
-	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window)->vbox),
-			   details, TRUE, TRUE, 0);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(window)->vbox),
+				    details);
 
-	g_object_set_data(G_OBJECT(window), "details", details);
-	g_object_set_data_full(G_OBJECT(window), "path", path, g_free);
+	owindow = G_OBJECT(window);
+	g_object_set_data(owindow, "details", details);
+	g_object_set_data_full(owindow, "path", path, g_free);
 
 	g_signal_connect(window, "response", G_CALLBACK(got_response), NULL);
 
@@ -171,8 +173,18 @@ static void refresh_info(GObject *window)
 
 	details = make_vbox(path);
 	g_object_set_data(window, "details", details);
-	gtk_box_pack_start(GTK_BOX(vbox), details, TRUE, TRUE, 0);
+	gtk_box_pack_start_defaults(GTK_BOX(vbox), details);
 	gtk_widget_show_all(details);
+}
+
+static void add_frame(GtkBox *vbox, GtkWidget *list)
+{
+	GtkWidget	*frame;
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_add(GTK_CONTAINER(frame), list);
+	gtk_box_pack_start_defaults(vbox, frame);
 }
 
 /* Create the VBox widget that contains the details.
@@ -181,7 +193,7 @@ static void refresh_info(GObject *window)
 static GtkWidget *make_vbox(guchar *path)
 {
 	DirItem		*item;
-	GtkWidget	*vbox, *list, *frame;
+	GtkBox		*vbox;
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
 	gchar		*help_dir;
@@ -191,19 +203,16 @@ static GtkWidget *make_vbox(guchar *path)
 	item = diritem_new(g_basename(path));
 	diritem_restat(path, item, NULL);
 
-	vbox = gtk_vbox_new(FALSE, 4);
-
 	ai = appinfo_get(path, item);
 	if (ai)
 		about = xml_get_section(ai, NULL, "About");
 
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	list = make_details(path, item);
-	gtk_container_add(GTK_CONTAINER(frame), list);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+	vbox = GTK_BOX(gtk_vbox_new(FALSE, 4));
+
+	add_frame(vbox, make_details(path, item));
 
 	help_dir = g_strconcat(path, "/Help", NULL);
+
 	if (access(help_dir, F_OK) == 0)
 	{
 		GtkWidget *button, *align;
@@ -212,7 +221,7 @@ static GtkWidget *make_vbox(guchar *path)
 		
 		button = button_new_mixed(GTK_STOCK_JUMP_TO,
 				_("Show _Help Files"));
-		gtk_box_pack_start(GTK_BOX(vbox), align, FALSE, TRUE, 0);
+		gtk_box_pack_start(vbox, align, FALSE, TRUE, 0);
 		gtk_container_add(GTK_CONTAINER(align), button);
 		g_signal_connect_swapped(button, "clicked", 
 				G_CALLBACK(show_help_clicked),
@@ -221,23 +230,16 @@ static GtkWidget *make_vbox(guchar *path)
 	g_free(help_dir);
 
 	if (about)
-	{
-		frame = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-		list = make_about(path, about);
-		gtk_container_add(GTK_CONTAINER(frame), list);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
-	}
+		add_frame(vbox, make_about(path, about));
 	else
-		gtk_box_pack_start(GTK_BOX(vbox), make_file_says(path), TRUE,
-				   TRUE, 0);
+		gtk_box_pack_start_defaults(vbox, make_file_says(path));
 
 	if (ai)
 		g_object_unref(ai);
 
 	diritem_free(item);
 
-	return vbox;
+	return (GtkWidget *) vbox;
 }
 
 /* The selection has changed - grab or release the primary selection */
@@ -282,32 +284,40 @@ static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
 	g_free(u8);
 }
 
+static void add_row_and_free(GtkListStore *store,
+			     const gchar *label, gchar *data)
+{
+	add_row(store, label, data);
+	g_free(data);
+}
+
 /* Create an empty list view, ready to place some data in */
 static void make_list(GtkListStore **list_store, GtkWidget **list_view)
 {
 	GtkListStore	*store;
-	GtkWidget	*view;
+	GtkTreeView	*view;
 	GtkCellRenderer *cell_renderer;
 
 	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	view = GTK_TREE_VIEW(
+			gtk_tree_view_new_with_model(GTK_TREE_MODEL(store)));
 	g_object_unref(G_OBJECT(store));
-	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
+	gtk_tree_view_set_headers_visible(view, FALSE);
 
 	cell_renderer = gtk_cell_renderer_text_new();
 	g_object_set(G_OBJECT(cell_renderer), "xalign", 1.0, NULL);
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),
+	gtk_tree_view_insert_column_with_attributes(view,
 			0, NULL, cell_renderer, "text", 0, NULL);
 
 	cell_renderer = gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),
+	gtk_tree_view_insert_column_with_attributes(view,
 			1, NULL, cell_renderer, "text", 1, NULL);
 
 	g_signal_connect(view, "cursor_changed",
 			G_CALLBACK(set_selection), NULL);
 
 	*list_store = store;
-	*list_view = view;
+	*list_view = (GtkWidget *) view;
 }
 	
 /* Create the TreeView widget with the file's details */
@@ -315,72 +325,50 @@ static GtkWidget *make_details(guchar *path, DirItem *item)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
-	GString		*gstring;
-	struct stat	info;
 	gchar		*tmp, *tmp2;
 
 	make_list(&store, &view);
 	
 	add_row(store, _("Name:"), item->leafname);
 
-	if (lstat(path, &info))
+	if (item->base_type == TYPE_ERROR)
 	{
-		add_row(store, _("Error:"), g_strerror(errno));
+		add_row(store, _("Error:"), g_strerror(item->lstat_errno));
 		return view;
 	}
 
-	tmp = g_dirname(path);
+	tmp = g_path_get_dirname(path);
 	tmp2 = pathdup(tmp);
 	if (strcmp(tmp, tmp2) != 0)
 		add_row(store, _("Real directory:"), tmp2);
 	g_free(tmp);
 	g_free(tmp2);
 
-	gstring = g_string_new(NULL);
+	add_row_and_free(store, _("Owner, Group:"),
+			 g_strdup_printf("%s, %s",
+					 user_name(item->uid),
+					 group_name(item->gid)));
 
-	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
-					    group_name(info.st_gid));
-	add_row(store, _("Owner, Group:"), gstring->str);
+	add_row_and_free(store, _("Size:"),
+			 item->size >= PRETTY_SIZE_LIMIT
+			 ? g_strdup_printf("%s (%" SIZE_FMT " %s)",
+					   format_size(item->size),
+					   item->size, _("bytes"))
+			 : g_strdup(format_size(item->size)));
+
+	add_row_and_free(store, _("Change time:"), pretty_time(&item->ctime));
 	
-	if (info.st_size >= PRETTY_SIZE_LIMIT)
-	{
-		g_string_sprintf(gstring, "%s (%" SIZE_FMT " %s)",
-			format_size(info.st_size),
-			info.st_size, _("bytes"));
-	}
-	else
-	{
-		g_string_assign(gstring, 
-				format_size(info.st_size));
-	}
-	add_row(store, _("Size:"), gstring->str);
+	add_row_and_free(store, _("Modify time:"), pretty_time(&item->mtime));
 
-	tmp = pretty_time(&info.st_ctime);
-	add_row(store, _("Change time:"), tmp);
-	g_free(tmp);
-	
-	tmp = pretty_time(&info.st_mtime);
-	add_row(store, _("Modify time:"), tmp);
-	g_free(tmp);
+	add_row_and_free(store, _("Access time:"), pretty_time(&item->atime));
 
-	tmp = pretty_time(&info.st_atime);
-	add_row(store, _("Access time:"), tmp);
-	g_free(tmp);
+	add_row(store, _("Permissions:"), pretty_permissions(item->mode));
 
-	g_string_free(gstring, TRUE);
-
-	add_row(store, _("Permissions:"), pretty_permissions(info.st_mode));
-
-	tmp = pretty_type(item, path);
-	add_row(store, _("Type:"), tmp);
-	g_free(tmp);
+	add_row(store, _("Type:"), pretty_type(item, path));
 
 	if (item->base_type != TYPE_DIRECTORY)
-	{
-		tmp = describe_current_command(item->mime_type);
-		add_row(store, _("Run action:"), tmp);
-		g_free(tmp);
-	}
+		add_row_and_free(store, _("Run action:"),
+				 describe_current_command(item->mime_type));
 
 	return view;
 }
@@ -410,9 +398,8 @@ static GtkWidget *make_about(guchar *path, xmlNode *about)
 					prop->xmlChildrenNode, 1);
 			if (!tmp)
 				tmp = g_strdup("-");
-			add_row(store, l, tmp);
+			add_row_and_free(store, l, tmp);
 			g_free(l);
-			g_free(tmp);
 		}
 	}
 
@@ -422,22 +409,24 @@ static GtkWidget *make_about(guchar *path, xmlNode *about)
 static GtkWidget *make_file_says(guchar *path)
 {
 	GtkWidget	*frame;
-	GtkWidget	*file_label;
+	GtkWidget	*w_file_label;
+	GtkLabel	*l_file_label;
 	int		file_data[2];
 	char 		*argv[] = {"file", "-b", NULL, NULL};
 	FileStatus 	*fs = NULL;
 	guchar 		*tmp;
 
 	frame = gtk_frame_new(_("file(1) says..."));
-	file_label = gtk_label_new(_("<nothing yet>"));
-	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
-	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
-	gtk_container_add(GTK_CONTAINER(frame), file_label);
+	w_file_label = gtk_label_new(_("<nothing yet>"));
+	l_file_label = GTK_LABEL(w_file_label);
+	gtk_misc_set_padding(GTK_MISC(w_file_label), 4, 4);
+	gtk_label_set_line_wrap(l_file_label, TRUE);
+	gtk_container_add(GTK_CONTAINER(frame), w_file_label);
 	
 	if (pipe(file_data))
 	{
 		tmp = g_strdup_printf("pipe(): %s", g_strerror(errno));
-		gtk_label_set_text(GTK_LABEL(file_label), tmp);
+		gtk_label_set_text(l_file_label, tmp);
 		g_free(tmp);
 		return frame;
 	}
@@ -446,7 +435,7 @@ static GtkWidget *make_file_says(guchar *path)
 	{
 		case -1:
 			tmp = g_strdup_printf("pipe(): %s", g_strerror(errno));
-			gtk_label_set_text(GTK_LABEL(file_label), tmp);
+			gtk_label_set_text(l_file_label, tmp);
 			g_free(tmp);
 			close(file_data[0]);
 			close(file_data[1]);
@@ -460,7 +449,7 @@ static GtkWidget *make_file_says(guchar *path)
 			argv[2] = path;
 #else
 			argv[1] = (char *) g_basename(path);
-			chdir(g_dirname(path));
+			chdir(g_path_get_dirname(path));
 #endif
 			if (execvp(argv[0], argv))
 				fprintf(stderr, "execvp() error: %s\n",
@@ -470,7 +459,7 @@ static GtkWidget *make_file_says(guchar *path)
 			/* We are the parent */
 			close(file_data[1]);
 			fs = g_new(FileStatus, 1);
-			fs->label = GTK_LABEL(file_label);
+			fs->label = l_file_label;
 			fs->fd = file_data[0];
 			fs->text = g_strdup("");
 			fs->input = gtk_input_add_full(fs->fd, GDK_INPUT_READ,
@@ -528,9 +517,13 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 	g_free(fs);
 }
 
-/* g_free() the result */
-static guchar *pretty_type(DirItem *file, guchar *path)
+/* Don't g_free() the result */
+static const gchar *pretty_type(DirItem *file, const guchar *path)
 {
+	static gchar *text = NULL;
+
+	null_g_free(&text);
+
 	if (file->flags & ITEM_FLAG_SYMLINK)
 	{
 		char	*target;
@@ -538,45 +531,43 @@ static guchar *pretty_type(DirItem *file, guchar *path)
 		target = readlink_dup(path);
 		if (target)
 		{
-			char *retval;
+			ensure_utf8(&target);
 
-			if (!g_utf8_validate(target, -1, NULL))
-			{
-				char *tmp = target;
-				target = to_utf8(target);
-				g_free(tmp);
-			}
-
-			retval = g_strdup_printf(_("Symbolic link to %s"),
-						target);
+			text = g_strdup_printf(_("Symbolic link to %s"),
+					       target);
 			g_free(target);
-			return retval;
+			return text;
 		}
 
-		return g_strdup(_("Symbolic link"));
+		return _("Symbolic link");
 	}
 
 	if (file->flags & ITEM_FLAG_APPDIR)
-		return g_strdup(_("ROX application"));
+		return _("ROX application");
 
 	if (file->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MountPoint *mp;
-		const char *mounted;
+		const gchar *mounted;
 
 		mounted = mount_is_mounted(path, NULL, NULL)
 			  ? _("mounted") : _("unmounted");
 
 		mp = g_hash_table_lookup(fstab_mounts, path);
 		if (mp)
-			return g_strdup_printf(_("Mount point for %s (%s)"),
-						mp->name, mounted);
-		return g_strdup_printf(_("Mount point (%s)"), mounted);
+			text = g_strdup_printf(_("Mount point for %s (%s)"),
+					       mp->name, mounted);
+		else
+			text = g_strdup_printf(_("Mount point (%s)"), mounted);
+		return text;
 	}
 
 	if (file->mime_type)
-		return g_strconcat(file->mime_type->media_type, "/",
-				file->mime_type->subtype, NULL);
+	{
+		text = g_strconcat(file->mime_type->media_type, "/",
+					  file->mime_type->subtype, NULL);
+		return text;
+	}
 
-	return g_strdup("-");
+	return "-";
 }

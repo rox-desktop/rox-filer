@@ -1079,11 +1079,9 @@ static void initModifiers(void)
 		AltMask = Mod1Mask;
 }
 
-#define PARSEKEY(s, k) strstr(g_ascii_strdown(s, strlen(s)), \
-			      g_ascii_strdown(k, strlen(k)))
 
 /* Fill in key from str. Sets keycode to zero if str is NULL.
- * Stolen from xfwm4.
+ * Stolen from xfwm4 and modified.
  */
 static void parseKeyString(MyKey *key, const char *str)
 {
@@ -1100,14 +1098,20 @@ static void parseKeyString(MyKey *key, const char *str)
 	key->keycode = XKeysymToKeycode(dpy, XStringToKeysym(k ? k + 1 : str));
 	if (k)
 	{
-		if (PARSEKEY(str, "Shift"))
+		gchar *tmp;
+
+		tmp = g_ascii_strdown(str, -1);
+
+		if (strstr(tmp, "shift"))
 			key->modifier = key->modifier | ShiftMask;
-		if (PARSEKEY(str, "Control"))
+		if (strstr(tmp, "control"))
 			key->modifier = key->modifier | ControlMask;
-		if (PARSEKEY(str, "Alt") || PARSEKEY(str, "Mod1"))
+		if (strstr(tmp, "alt") || strstr(tmp, "mod1"))
 			key->modifier = key->modifier | AltMask;
-		if (PARSEKEY(str, "Meta") || PARSEKEY(str, "Mod2"))
+		if (strstr(tmp, "meta") || strstr(tmp, "mod2"))
 			key->modifier = key->modifier | MetaMask;
+
+		g_free(tmp);
 	}
 
 	if (!key->keycode)
@@ -1169,7 +1173,7 @@ static gboolean grabKey(MyKey *key)
 {
 	Window root;
 	Display *dpy = GDK_DISPLAY();
-	gboolean need_init = TRUE;
+	static gboolean need_init = TRUE;
 
 	if (need_init)
 	{

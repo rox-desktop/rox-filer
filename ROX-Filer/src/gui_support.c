@@ -935,4 +935,3 @@ void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc)
 
 	gtk_widget_modify_style(widget, rc_style);
 }
-

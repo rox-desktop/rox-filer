@@ -542,7 +542,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 				   (gchar *) home_dir);
 	else
 		g_dataset_set_data_full(context, "drop_dest_path",
-				g_dirname(filer_window->sym_path), g_free);
+				g_path_get_dirname(filer_window->sym_path),
+				g_free);
 	
 	g_dataset_set_data(context, "drop_dest_type", (gpointer) drop_dest_dir);
 	gdk_drag_status(context, action, time);

@@ -339,7 +339,7 @@ int main(int argc, char **argv)
 				g_free(tmp);
 				break;
 			case 's':
-				tmp = g_dirname(VALUE);
+				tmp = g_path_get_dirname(VALUE);
 				
 				if (tmp[0] == '/')
 					dir = NULL;

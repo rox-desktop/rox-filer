@@ -348,7 +348,7 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	mkdir(to->str, 0700);
 	g_string_append(to, md5);
 	name_len = to->len + 4; /* Truncate to this length when renaming */
-	g_string_sprintfa(to, ".png.ROX-Filer-%ld", (long) getpid());
+	g_string_append_printf(to, ".png.ROX-Filer-%ld", (long) getpid());
 
 	g_free(md5);
 

@@ -758,7 +758,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 							item->leafname);
 				shade_file_menu_items(FALSE);
 				file_item = filer_selected_item(filer_window);
-				g_string_sprintf(buffer, "%s '%s'",
+				g_string_printf(buffer, "%s '%s'",
 					basetype_name(file_item),
 					g_utf8_validate(file_item->leafname,
 							-1, NULL)
@@ -770,7 +770,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 				break;
 			default:
 				shade_file_menu_items(TRUE);
-				g_string_sprintf(buffer, _("%d items"),
+				g_string_printf(buffer, _("%d items"),
 						 n_selected);
 				break;
 		}
@@ -1330,7 +1330,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 	templ = g_strconcat(templ_dname, "/", oleaf, NULL);
 	g_free(templ_dname);
 
-	dest = g_dirname(path);
+	dest = g_path_get_dirname(path);
 	leaf = g_basename(path);
 	paths = g_list_append(NULL, templ);
 

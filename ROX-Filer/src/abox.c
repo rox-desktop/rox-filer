@@ -424,7 +424,7 @@ void abox_add_filename(ABox *abox, const gchar *path)
 
 	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 
-	dir = g_dirname(path);
+	dir = g_path_get_dirname(path);
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
 			   0, g_basename(path),
 			   1, dir, -1);

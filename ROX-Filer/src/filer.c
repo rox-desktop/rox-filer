@@ -447,11 +447,11 @@ static void selection_get(GtkWidget *widget,
 	switch (info)
 	{
 		case TARGET_STRING:
-			g_string_sprintf(header, " %s",
+			g_string_printf(header, " %s",
 				make_path(filer_window->sym_path, "")->str);
 			break;
 		case TARGET_URI_LIST:
-			g_string_sprintf(header, " file://%s%s",
+			g_string_printf(header, " file://%s%s",
 				our_host_name_for_dnd(),
 				make_path(filer_window->sym_path, "")->str);
 			break;
@@ -877,7 +877,7 @@ void filer_open_parent(FilerWindow *filer_window)
 	if (current[0] == '/' && current[1] == '\0')
 		return;		/* Already in the root */
 	
-	dir = g_dirname(current);
+	dir = g_path_get_dirname(current);
 	filer_opendir(dir, filer_window, NULL);
 	g_free(dir);
 }
@@ -890,7 +890,7 @@ void change_to_parent(FilerWindow *filer_window)
 	if (current[0] == '/' && current[1] == '\0')
 		return;		/* Already in the root */
 	
-	dir = g_dirname(current);
+	dir = g_path_get_dirname(current);
 	filer_change_to(filer_window, dir, g_basename(current));
 	g_free(dir);
 }
@@ -1377,7 +1377,7 @@ void filer_check_mounted(const char *real_path)
 		}
 	}
 
-	parent = g_dirname(real_path);
+	parent = g_path_get_dirname(real_path);
 	refresh_dirs(parent);
 	g_free(parent);
 
@@ -1442,7 +1442,7 @@ gboolean filer_exists(FilerWindow *filer_window)
 /* Make sure the window title is up-to-date */
 void filer_set_title(FilerWindow *filer_window)
 {
-	guchar	*title = NULL;
+	gchar	*title = NULL;
 	guchar	*flags = "";
 
 	if (filer_window->scanning || filer_window->show_hidden ||
@@ -1486,12 +1486,7 @@ void filer_set_title(FilerWindow *filer_window)
 	if (!title)
 		title = g_strconcat(filer_window->sym_path, flags, NULL);
 
-	if (!g_utf8_validate(title, -1, NULL))
-	{
-		char *tmp = title;
-		title = to_utf8(tmp);
-		g_free(tmp);
-	}
+	ensure_utf8(&title);
 
 	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
 
@@ -1751,13 +1746,8 @@ void filer_add_tip_details(FilerWindow *filer_window,
 		target = readlink_dup(fullpath);
 		if (target)
 		{
-			if (!g_utf8_validate(target, -1, NULL))
-			{
-				char *tmp = target;
-				target = to_utf8(target);
-				g_free(tmp);
-			}
-			
+			ensure_utf8(&target);
+
 			g_string_append(tip, _("Symbolic link to "));
 			g_string_append(tip, target);
 			g_string_append_c(tip, '\n');

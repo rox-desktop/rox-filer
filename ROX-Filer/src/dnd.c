@@ -536,7 +536,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 				GString	*uri;
 
 				uri = g_string_new(NULL);
-				g_string_sprintf(uri, "file://%s%s",
+				g_string_printf(uri, "file://%s%s",
 						our_host_name_for_dnd(),
 						make_path(dest_path,
 							  leafname)->str);

@@ -413,7 +413,7 @@ static void path_changed(FilerWindow *filer_window)
 	if (leaf == new)
 		path = g_strdup("/");
 	else
-		path = g_dirname(new);
+		path = g_path_get_dirname(new);
 
 	if (strcmp(path, filer_window->sym_path) != 0)
 	{

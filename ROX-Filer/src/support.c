@@ -141,7 +141,7 @@ GString *make_path(const char *dir, const char *leaf)
 	g_return_val_if_fail(dir != NULL, buffer);
 	g_return_val_if_fail(leaf != NULL, buffer);
 
-	g_string_sprintf(buffer, "%s%s%s",
+	g_string_printf(buffer, "%s%s%s",
 			dir,
 			dir[0] == '/' && dir[1] == '\0' ? "" : "/",
 			leaf);
@@ -427,7 +427,11 @@ gint applicable(uid_t uid, gid_t gid)
  */
 char *pretty_permissions(mode_t m)
 {
-	static char buffer[] = "rwx,rwx,rwx/UGT";
+	static char buffer[] = "rwx,rwx,rwx/UG"
+#ifdef S_ISVTX
+	     "T"
+#endif
+	     ;
 
 	buffer[0]  = m & S_IRUSR ? 'r' : '-';
 	buffer[1]  = m & S_IWUSR ? 'w' : '-';
@@ -445,9 +449,6 @@ char *pretty_permissions(mode_t m)
 	buffer[13] = m & S_ISGID ? 'G' : '-';
 #ifdef S_ISVTX
         buffer[14] = m & S_ISVTX ? 'T' : '-';
-        buffer[15] = 0;
-#else
-        buffer[14] = 0;
 #endif
 
 	return buffer;
@@ -529,7 +530,7 @@ void set_blocking(int fd, gboolean blocking)
 /* Format this time nicely.
  * g_free() the result.
  */
-char *pretty_time(time_t *time)
+char *pretty_time(const time_t *time)
 {
         char time_buf[32];
 
@@ -772,15 +773,15 @@ guchar *get_relative_path(const guchar *from, const guchar *to)
  */
 int text_to_boolean(const char *text, int defvalue)
 {
-	if(g_strcasecmp(text, "true")==0)
+	if (g_strcasecmp(text, "true")==0)
 	        return TRUE;
-	else if(g_strcasecmp(text, "false")==0)
+	else if (g_strcasecmp(text, "false")==0)
 	        return FALSE;
-	else if(g_strcasecmp(text, "yes")==0)
+	else if (g_strcasecmp(text, "yes")==0)
 	        return TRUE;
-	else if(g_strcasecmp(text, "no")==0)
+	else if (g_strcasecmp(text, "no")==0)
 	        return FALSE;
-	else if(isdigit(text[0]))
+	else if (isdigit(text[0]))
 	        return !!atoi(text);
 
 	return defvalue;
@@ -1061,17 +1062,18 @@ gchar *to_utf8(const gchar *src)
 	return retval ? retval : g_strdup(src);
 }
 
-/* Convert string 'src' to the current locale from UTF-8 */
-gchar *from_utf8(const gchar *src)
+/* Ensure string at 'sp' is UTF-8. g_free() and replace by
+ * UTF-8 version if not.
+ */
+void ensure_utf8(gchar **sp)
 {
-	gchar *retval;
-	
-	if (!src)
-		return NULL;
+	gchar *s = *sp;
 
-	retval = g_locale_from_utf8(src, -1, NULL, NULL, NULL);
-
-	return retval ? retval : g_strdup(src);
+	if (!g_utf8_validate(s, -1, NULL))
+	{
+		*sp = to_utf8(s);
+		g_free(s);
+	}
 }
 
 /* Removes trailing / chars and converts a leading '~/' (if any) to
