@@ -105,6 +105,9 @@ static gint panel_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
 static void size_icon(Icon *icon);
+static void panel_post_resize(GtkWidget *box,
+			GtkRequisition *req, Panel *panel);
+static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel);
 static void drag_set_panel_dest(Icon *icon);
 static void add_uri_list(GtkWidget          *widget,
                          GdkDragContext     *context,
@@ -338,7 +341,11 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 	current_panel[side] = panel;
 
-	reposition_panel(panel);
+	gtk_widget_queue_resize(box);
+	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-request",
+		GTK_SIGNAL_FUNC(panel_post_resize), (GtkObject *) panel);
+	gtk_signal_connect_after(GTK_OBJECT(box), "size-allocate",
+			GTK_SIGNAL_FUNC(box_resized), (GtkObject *) panel);
 
 	number_of_windows++;
 	gtk_widget_show_all(panel->window);
@@ -362,7 +369,6 @@ void panel_icon_may_update(Icon *icon)
 	{
 		size_icon(icon);
 		gtk_widget_queue_clear(icon->widget);
-		reposition_panel(icon->panel);
 	}
 
 	pixmap_unref(image);
@@ -523,17 +529,12 @@ static void panel_add_item(Panel *panel,
 	size_icon(icon);
 
 	if (!loading_panel)
-	{
-		reposition_panel(panel);
 		panel_save(panel);
-	}
 		
 	gtk_widget_show(widget);
 }
 
-/* Set the size of the widget for this icon.
- * You should call reposition_panel() sometime after doing this...
- */
+/* Set the size of the widget for this icon */
 static void size_icon(Icon *icon)
 {
 	int	im_height;
@@ -543,10 +544,10 @@ static void size_icon(Icon *icon)
 	if (icon->socket)
 		return;
 
-	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT - 4);
+	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT);
 
 	width = MAX(icon->item.image->width, icon->item.name_width);
-	height = font->ascent + font->descent + 2 + im_height;
+	height = font->ascent + font->descent + 6 + im_height;
 
 	gtk_widget_set_usize(icon->widget, width + 4, height);
 }
@@ -568,17 +569,15 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 	gdk_window_get_size(widget->window, &width, &height);
 
 	area.x = 0;
-	area.y = 0;
 	area.width = width;
-	area.height = height - font->ascent - font->descent - 2;
+	area.height = icon->item.image->height;
+	area.y = height - font->ascent - font->descent - 6 - area.height;
 	
 	draw_large_icon(widget, &area, &icon->item, icon->selected);
 
 	text_x = (area.width - icon->item.name_width) >> 1;
 
-	text_y = height - font->descent;
-	if (icon->panel->side == PANEL_TOP || icon->panel->side == PANEL_BOTTOM)
-		text_y -= 4;
+	text_y = height - font->descent - 4;
 
 	draw_string(widget,
 			font,
@@ -801,7 +800,7 @@ static void reposition_panel(Panel *panel)
 	int	w = 32, h = 32;
 	GList	*next, *children;
 	PanelSide	side = panel->side;
-	
+
 	children = get_widget_list(panel);
 
 	for (next = children; next; next = next->next)
@@ -850,7 +849,6 @@ static void reposition_panel(Panel *panel)
 	
 	gtk_widget_set_uposition(panel->window, x, y);
 	panel->height = h;
-	gtk_widget_set_usize(panel->window, w, h);
 	gdk_window_move_resize(panel->window->window, x, y, w, h);
 
 	if (side == PANEL_BOTTOM || side == PANEL_TOP)
@@ -955,11 +953,8 @@ static void popup_panel_menu(GdkEventButton *event,
 
 static void rename_cb(Icon *icon)
 {
-
-	
 	size_icon(icon);
 	gtk_widget_queue_clear(icon->widget);
-	reposition_panel(icon->panel);
 
 	panel_save(icon->panel);
 }
@@ -1035,8 +1030,6 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	}
 
 	panel_save(panel);
-
-	reposition_panel(panel);
 }
 
 /* Same as drag_set_dest(), but for panel icons */
@@ -1663,4 +1656,35 @@ static void run_applet(Icon *icon)
 	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
 	
 	g_free(argv[1]);
+}
+
+/* When one of the panel icons resizes it will cause it's container box
+ * to resize. This will cause the packing box inside the viewport to resize -
+ * we get here right after that.
+ */
+static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel)
+{
+	reposition_panel(panel);
+}
+
+static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
+{
+	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
+	{
+		if (req->width < screen_width)
+			req->width = screen_width;
+	}
+	else
+	{
+		int h = screen_height;
+
+		if (current_panel[PANEL_TOP])
+			h -= current_panel[PANEL_TOP]->height;
+
+		if (current_panel[PANEL_BOTTOM])
+			h -= current_panel[PANEL_BOTTOM]->height;
+
+		if (req->height < h)
+			req->height = h;
+	}
 }

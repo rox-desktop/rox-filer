@@ -31,7 +31,6 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
-#include <libxml/xmlversion.h>
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -232,8 +231,6 @@ int main(int argc, char **argv)
 	 * xFILE        eXamine FILE
 	 */
 	GString		*to_open;
-
-	LIBXML_TEST_VERSION;
 
 	to_open = g_string_new(NULL);
 
