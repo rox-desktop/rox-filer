@@ -486,6 +486,14 @@ void parse_file(char *path, ParseFunc *parse_line)
 		char *line = data;
 		int  line_number = 1;
 
+		if (strncmp(data, "<?xml ", 6) == 0)
+		{
+			delayed_error(_("Attempt to read an XML file as "
+					"a text file. File '%s' may be "
+					"corrupted."), path);
+			return;
+		}
+
 		while (line && *line)
 		{
 			eol = strchr(line, '\n');
