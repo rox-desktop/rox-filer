@@ -11,10 +11,13 @@
 #include <collection.h>
 
 #include "filer.h"
+#include "menu.h"
 
 int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
+
+	menu_init();
 
 	if (argc < 2)
 		filer_opendir(getenv("HOME"));

@@ -22,6 +22,7 @@
 #include "gui_support.h"
 #include "filer.h"
 #include "pixmaps.h"
+#include "menu.h"
 
 static int number_of_windows = 0;
 
@@ -197,7 +198,7 @@ static void draw_item(GtkWidget *widget,
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data)
 {
-	printf("[ show menu ]\n");
+	show_filer_menu((FilerWindow *) user_data, event);
 }
 
 static int sort_by_name(const void *item1, const void *item2)
