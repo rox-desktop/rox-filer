@@ -920,11 +920,11 @@ static Eval *parse_eval(const gchar **expression)
 
 	if (MATCH(_("Byte")) || MATCH(_("Bytes")))
 		;
-	else if (MATCH("Kb"))
+	else if (MATCH("Kb") || MATCH("K"))
 		value *= 1<<10;
-	else if (MATCH("Mb"))
+	else if (MATCH("Mb") || MATCH("M"))
 		value *= 1<<20;
-	else if (MATCH("Gb"))
+	else if (MATCH("Gb") || MATCH("G"))
 		value *= 1<<30;
 	else if (MATCH(_("Sec")) || MATCH(_("Secs")))
 		;

@@ -257,10 +257,10 @@ char *format_size(off_t size)
 			{
 				size += 1023;
 				size >>= 10;
-				units = "Gb";
+				units = "G";
 			}
 			else
-				units = "Mb";
+				units = "M";
 		}
 		else
 			units = "K";
@@ -277,7 +277,7 @@ char *format_size(off_t size)
 	return buffer;
 }
 
-/* Return a string in the form '23Mb' in a static buffer valid until
+/* Return a string in the form '23M' in a static buffer valid until
  * the next call. Aligned to the right (5 chars).
  */
 char *format_size_aligned(off_t size)
@@ -338,10 +338,10 @@ gchar *format_double_size(double size)
 			{
 				size += 1023;
 				size /= 1024;
-				units = "Gb";
+				units = "G";
 			}
 			else
-				units = "Mb";
+				units = "M";
 		}
 		else
 			units = "K";
