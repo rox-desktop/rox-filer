@@ -139,7 +139,8 @@ void type_init(void)
 
 	icon_theme = gtk_icon_theme_new();
 	gtk_icon_theme_set_custom_theme(icon_theme, "ROX");
-	info = gtk_icon_theme_lookup_icon(icon_theme, "application:postscript",
+	info = gtk_icon_theme_lookup_icon(icon_theme,
+					"mime-application:postscript",
 					ICON_HEIGHT, 0);
 	if (info)
 		gtk_icon_info_free(info);
@@ -460,38 +461,24 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type->image = NULL;
 	}
 
-	type_name = g_strconcat(type->media_type, ":", type->subtype, NULL);
+	type_name = g_strconcat("mime-", type->media_type, ":",
+				type->subtype, NULL);
 	full = gtk_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
 						0, NULL);
 	g_free(type_name);
 	if (!full)
+	{
+		type_name = g_strconcat("mime-", type->media_type, NULL);
 		full = gtk_icon_theme_load_icon(icon_theme,
-						type->media_type,
+						type_name,
 						ICON_HEIGHT, 0, NULL);
+		g_free(type_name);
+	}
 	if (full)
 	{
 		type->image = masked_pixmap_new(full);
 		g_object_unref(full);
 	}
-
-#if 0
-	type_name = g_strconcat(type->media_type, "_",
-				type->subtype, ".png", NULL);
-	path = choices_find_path_load(type_name, "MIME-icons");
-	if (!path)
-	{
-		strcpy(type_name + strlen(type->media_type), ".png");
-		path = choices_find_path_load(type_name, "MIME-icons");
-	}
-	
-	g_free(type_name);
-
-	if (path)
-	{
-		type->image = g_fscache_lookup(pixmap_cache, path);
-		g_free(path);
-	}
-#endif
 
 	if (!type->image)
 	{
