@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer - Manuel de l'utilisateur
+   ROX-Filer 1.3.0 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -179,8 +179,15 @@
 
 	<listitem>
 	 <para>
-	  GTK+ 1.2.0 ou postérieure (librairies et en-têtes) &mdash; dernière
+	  GTK+ 2.0.0 ou postérieure (bibliothèques et en-têtes) &mdash; dernière
 	  version téléchargeable depuis <citation>GTK+</citation>,
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
+	  LibXML 2.0.0 ou postérieure (bibliothèques et en-têtes)  &mdash; dernière
+	  version téléchargeable depuis <citation>libxml</citation>,
 	 </para>
 	</listitem>
 
@@ -193,14 +200,11 @@
 
    Tout ceci est standard sur la plupart des distributions Linux modernes.
    Pour vérifier quelle version de GTK+ est installée, utilisez la commande
-   <command>gtk-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
+   <command>pkg-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
 
-   <screen>
-	$ gtk-config --version
-	1.2.8
-   </screen>
+   <screen>$ pkg-config --modversion gtk+-2.0
+2.0.0</screen>
 
-   À cause de bugs dans de précédentes versions, GTK+ 1.2.8 est hautement recommandé.
   </para>
 
   <procedure>
@@ -228,9 +232,7 @@
 	<para>
 	 Exécutez le script d'installation <command>install.sh</command>, comme ceci :
 
-	 <screen>
-	  $ ./install.sh
-	 </screen>
+	 <screen>$ ./install.sh</screen>
 
 	</para>
    </step>
@@ -243,10 +245,11 @@
 	 l'auteur de ce manuel, pas à moi ;-)
 	 Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés.
 	 Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
-
+	</para>
+	<para>
 	 Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans un sous-répertoire différent
 	 pour chaque plate-forme. Ainsi, vous pouvez compiler la même application sur plusieurs types de machines
-	 différents et l'exécuter depuis n'importe laquelle en utilisant le script 'AppRun'.
+	 différents et l'exécuter depuis n'importe laquelle en utilisant le script <filename>AppRun</filename>.
 	 C'est particulièrement utile dans un environnement réseau.
     </para>
    </step>
@@ -269,9 +272,7 @@
    Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command>
    sans aucune option, comme ceci :
 
-   <screen>
-	$ rox
-   </screen>
+   <screen>$ rox</screen>
 
    Une fenêtre devrait apparaître et afficher le contenu du dossier courant.
    Si vous avez installé le script dans votre home, vous devrez sûrement mettre
@@ -280,34 +281,15 @@
    Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename>
    dans votre home, tapez ceci :
 
-   <screen>
-	$ PATH=$HOME/bin:$PATH; export PATH
-   </screen>
+   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
 
    ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
    <manvolnum>1</manvolnum></citerefentry>) :
 
-   <screen>
-	$ setenv PATH $HOME/bin:$PATH
-	$ rehash
-   </screen>
+   <screen>$ setenv PATH $HOME/bin:$PATH
+$ rehash</screen>
 
   </para>
-
-  <note>
-   <para>
-	Par défaut, ROX-Filer est compilé en utilisant la verion stable Gtk+-1.2.
-	Cependant, vous pouvez le compiler avec la version 2.0. Mais sachez que cela
-	n'a pas été testé suffisamment, puisqu'au moment où ce manuel est écrit, Gtk+-2.0
-	n'est pas encore sorti.
-	Pour compiler avec Gtk+-2.0 :
-
-	<screen>
-	 $ ROX-Filer/AppRun --compile --with-gtk2
-	</screen>
-
-   </para>
-  </note>
 
  </chapter>
 
@@ -568,27 +550,26 @@ Redémarrez IceWM et le filer pour que les changements prennent effet.
 
 	  Normalement, vous devriez vous loguer en utilisateur ordinaire et vous changer
 	  en root que lorsque vous en avez besoin.
-	  Vous pouvez créer un simple script qui vous changera en root et exécutera le
-	  filer &mdash; quelque chose du genre :
+	  Si <command>sudo</command> est installé et proprement configuré sur votre système,
+	  vous pouvez exécutera le filer de cette façon :
 
-<programlisting>
-#!/bin/sh
+	  <screen>$ sudo rox</screen>
 
-su -m -c "rox $*"</programlisting>
+	  Attention, souvenez-vous que tout ce que vous ferez sur n'importe quel fichier (y 
+	  compris les applications que vous exécuterez depuis ces fenêtres) sera effectué 
+	  avec les droits de root ! Soyez très prudent !
 
-Vous pourrez donc ensuite avoir une fenêtre de filer 'root' simplement en exécutant
-ce script et en entrant son mot de passe. Attention, souvenez-vous que tout ce que
-vous ferez sur n'importe quel fichier (y compris les applications que vous exécuterez
-depuis ces fenêtres) sera effectué avec les droits de root ! Soyez très prudent !
+	 </para>
 
-Vous aurez peut-être un message du serveur X window qui vous dira que root (ou d'autres
-utilisateurs) ne peut pas se connecter (ndt : "se connecter à X", ce qui veut dire que
-l'utilisateur root, par exemple, ne pourra lancer aucune commande qui utiliserait X).
-Une lecture des pages man pour <command>xauth</command> et <command>xhost</command> est
-donc conseillée, mais ce mécanisme varie selon les systèmes (c'est pourquoi ça n'est pas
-implémenté dans le filer !).
+	 <para>
+	  Vous aurez peut-être un message du serveur X window qui vous dira que root (ou d'autres
+	  utilisateurs) ne peut pas se connecter (ndt : "se connecter à X", ce qui veut dire que
+	  l'utilisateur root, par exemple, ne pourra lancer aucune commande qui utiliserait X).
+	  Une lecture des pages man pour <command>xauth</command> et <command>xhost</command> est
+	  donc conseillée, mais ce mécanisme varie selon les systèmes (c'est pourquoi ça n'est pas
+	  implémenté dans le filer !).
+	 </para>
 
-  </para>
 </sect1>
 </chapter>
 
@@ -725,13 +706,16 @@ Affiche le premier/dernier objet du dossier.
 </tbody></tgroup></informaltable>
 
   <para>
-	  D'autres touches peuvent facilement être définies comme raccourcis-clavier en ouvrant le menu
-	  (ndt : le menu qui contient la commande qui doit être exécutée lorsque vous utiliserez le
-	  raccourci-clavier), en positionnant le pointeur de la souris au-dessus de la commande désirée,
-	  et en pressant la (les) touche(s) devant servir de raccourci.
-	  La (les) touche(s) apparaît(ssent) maintenant dans le menu et peuvent désormais être utilisées
-	  comme raccourci.
+	  Si vous avez activé la possibilité de définir les touches de raccourcis-clavier, alors 
+      celles-ci peuvent facilement être choisies en ouvrant le menu (ndt : le menu qui contient 
+	  la commande qui doit être exécutée lorsque vous utiliserez le raccourci-clavier), en 
+	  positionnant le pointeur de la souris au-dessus de la commande désirée, et en pressant la 
+	  (les) touche(s) devant servir de raccourci.
+	  La (les) touche(s) apparaît(ssent) maintenant dans le menu et peut(vent) désormais être utilisée(s)
+	  comme raccourci(s).
 	  Les touches de raccourcis sont automatiquement sauvées quand le filer est quitté.
+	  Vous pouvez utiliser un 'XSettings manager' tel que ROX-Session pour activer cette fonction pour
+	  toutes les applications Gtk+-2.0.
   </para>
 </chapter>
 
@@ -771,8 +755,8 @@ Vous pouvez alors les coller dans une autre fenêtre pour obtenir le chemin des o
 <sect1><title>Enregistrer et restaurer la sélection</title>
    <para>
    Il est parfois utile de sauvegarder la sélection courante pour une utilisation ultérieure.
-   Vous pouvez en enregistrer 10 en appuyant sur <keycap>Ctrl</keycap>+<keycap>&lt;chiffre&gt;</keycap> (NDT : ça ne fonctionne pas avec le pavé numérique).
-   Vous pouvez restaurer une sélection en appuyant seulement sur le chiffre utilisé (NDT : <keycap>Shift</keycap>+<keycap>&lt;chiffre&gt;</keycap>).
+   Vous pouvez en enregistrer 10 en appuyant sur <keycap>Ctrl</keycap>+<keycap>&lt;chiffre&gt;</keycap>.
+   Vous pouvez restaurer une sélection en appuyant seulement sur le chiffre utilisé.
    Vous pouvez aussi restaurer des sélections si un dossier différent est affiché, et même si vous utilisez une fenêtre différente.
    </para>
    <para>
@@ -984,52 +968,96 @@ Comme pour <guimenuitem>Grand, avec...</guimenuitem>, mais avec des icônes énorm
 
 	</itemizedlist>
 
-</entry></row><row><entry>
+	</entry></row>
+	
+	<row>
+	 <entry>
+	  <guimenuitem>Petit, avec...</guimenuitem>
+	 </entry>
+	 <entry>
+	  Comme ci-dessus, mais avec une petite icône et tout sur une seule ligne.
+	 </entry>
+	</row>
 
-<guimenuitem>Petit, avec...</guimenuitem></entry><entry>
-Comme ci-dessus, mais avec une petite icône et tout sur une seule ligne.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Trier par nom</guimenuitem>
+	 </entry>
+	 <entry>
+	  Les objets sont triés par nom. Le mode de tri par défaut ne respecte pas la casse mais 
+	  gère correctement les nombres. Il existe une option pour forcer le tri en ASCII.
+	 </entry>
+	</row>
 
-<guimenuitem>Trier par nom</guimenuitem></entry><entry>
-Les objets sont triés par nom. Il y a une option pour respecter la casse.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Trier par type</guimenuitem>
+	 </entry>
+	 <entry>
+	  Les objets sont triés par type, et ensuite par nom pour chaque type.
+	 </entry>
+	</row>
 
-<guimenuitem>Trier par type</guimenuitem></entry><entry>
-Les objets sont triés par type, et ensuite par nom pour chaque type.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Trier par date</guimenuitem>
+	 </entry>
+	 <entry>
+	  Les plus récemment modifiés au début.
+	 </entry>
+	</row>
 
-<guimenuitem>Trier par date</guimenuitem></entry><entry>
-Les plus récemment modifiés au début.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Trier par la taille</guimenuitem>
+	 </entry>
+	 <entry>
+	  Les plus gros fichiers au début.
+	 </entry>
+	</row>
 
-<guimenuitem>Trier par la taille</guimenuitem></entry><entry>
-Les plus gros fichiers au début.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Montrer les fichiers cachés</guimenuitem>
+	 </entry>
+	 <entry>
+	  Si cette option est activée, les objets commençant par un point sont affichés, 
+	  sinon, ils sont cachés. La barre de titres affiche <guilabel>(All)</guilabel> 
+	  quand cette option est activée.
+	 </entry>
+	</row>
 
-<guimenuitem>Montrer les fichiers cachés</guimenuitem></entry><entry>
-Si cette option est activée, les objets commençant par un point sont affichés,
-sinon, ils sont cachés. La barre de titres affiche <guilabel>(All)</guilabel>
-quand cette option est activée.
-</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Montrer les imagettes</guimenuitem>
+	 </entry>
+	 <entry>
+	  Activée, le filer essaiera de lire chaque fichier-image et d'utiliser cette 
+	  image comme icône pour ce fichier. Très utile quand vous avez un dossier 
+	  rempli de photos et que vous en cherchez une dont le nom vous échappe !
+	  Les imagettes sont enregistrées dans <filename>~/.thumbnails</filename> 
+	  pour un affichage ultérieur plus rapide. 
+	  Lors de l'affichage des imagettes, une barre de progression apparaîtra en bas 
+	  de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton 
+	  <guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression. 
+	  La barre de titres affiche <guilabel>(Thumbs)</guilabel> quand cette option est 
+	  activée.
+	 </entry>
+	</row>
 
-<guimenuitem>Montrer les imagettes</guimenuitem></entry><entry>
-Activée, le filer essaiera de lire chaque fichier-image et d'utiliser cette
-image comme icône pour ce fichier. Très utile quand vous avez un dossier
-rempli de photos et que vous en cherchez une dont le nom vous échappe !
-Si vous utilisez Gtk+-2.0 ou libpng, les imagettes sont enregistrées dans
-<filename>~/.thumbnails</filename> pour un affichage ultérieur plus rapide.
-Sinon, elles sont perdues quand vous quittez le filer.
-Lors de l'affichage des imagettes, une barre de progression apparaîtra en bas
-de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton
-<guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression.
-La barre de titres affiche <guilabel>(Thumbs)</guilabel> quand cette option est
-activée.</entry></row><row><entry>
+	<row>
+	 <entry>
+	  <guimenuitem>Rafraîchir</guimenuitem>
+	 </entry>
+	 <entry>
+	  Relit le contenu du dossier et les détails de tous les fichiers s'y trouvant. 
+	  Utilisez cette commande si l'affichage n'est plus à jour.
+	 </entry>
+	</row>
 
-<guimenuitem>Rafraîchir</guimenuitem></entry><entry>
-Relit le contenu du dossier et les détails de tous les fichiers s'y trouvant.
-Utilisez cette commande si l'affichage n'est plus à jour.
-</entry></row>
-</tbody></tgroup></informaltable>
+   </tbody>
+  </tgroup>
+ </informaltable>
 
   </para>
 
@@ -1176,7 +1204,7 @@ utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xref 
 </entry></row>
 
 <row><entry>
-<guimenuitem>Ouvrir (A)VFS</guimenuitem></entry><entry>
+<guimenuitem>Ouvrir AVFS</guimenuitem></entry><entry>
 Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
 </entry></row>
 
@@ -1299,7 +1327,7 @@ Copie un fichier depuis votre dossier Templates.
 
 
 Pour ajouter vos propres commandes, créez un nouveau dossier <filename>~/Choices/Templates</filename>
-(si la variable CHOICESPATH est celle par défaut) et enregistrez-y tous les fichiers
+(si la variable <envar>CHOICESPATH</envar> est celle par défaut) et enregistrez-y tous les fichiers
 que vous souhaitez. Chaque fichier de ce dossier apparaîtra dans le menu et la boîte qui s'ouvrira
 le copiera.
 Par exemple, vous pourriez créer une base pour un fichier HTML :
@@ -1389,20 +1417,24 @@ Ouvre un 'espace de saisie' pour exécuter une commande shell (voir section <xref
 </sect1>
 
 <sect1>
-  <title><anchor id="SendTo" xreflabel="Send To menu"/>Le menu 'Envoyer à...'</title>
-  <para>
-
-Le menu 'Envoyer à...' permet d'envoyer très facilement un (des) objet(s) à une application.
-Le filer cherche le dossier <filename>SendTo</filename> dans votre <envar>CHOICESPATH</envar> et liste son contenu dans ce menu.
-  </para><para>
-Pour changer les applications qui apparaissent ici, vous pouvez utiliser la commande <guimenuitem>Personnaliser</guimenuitem>
-qui se trouve en bas du menu ; elle créera si nécessaire le dossier 'SendTo' et l'ouvrira.
-Vous pouvez placer dans ce dossier des liens symboliques en glissant/déposant des applications
-avec les touches <keycap>Control</keycap> et <keycap>Shift</keycap> maintenues enfoncées.
-  </para><para>
-L'affichage du menu 'Envoyer à...' via le menu principal est plutôt lent ; vous devriez l'ouvrir
-en cliquant sur un fichier avec le bouton droit en maintenant la touche <keycap>Shift</keycap> enfoncée.
-  </para>
+ <title><anchor id="SendTo" xreflabel="Send To menu"/>Le menu 'Envoyer à...'</title>
+ <para>
+  Le menu 'Envoyer à...' permet d'envoyer très facilement un (des) objet(s) à une application. 
+  Le filer cherche le dossier <filename>SendTo</filename> dans votre <envar>CHOICESPATH</envar> 
+  et liste son contenu dans ce menu.
+ </para>
+ <para>
+  Pour changer les applications qui apparaissent ici, vous pouvez utiliser la commande 
+  <guimenuitem>Personnaliser</guimenuitem> qui se trouve en bas du menu ; elle créera si 
+  nécessaire le dossier <filename>SendTo</filename> et l'ouvrira. 
+  Vous pouvez placer dans ce dossier des liens symboliques en glissant/déposant des applications 
+  avec les touches <keycap>Control</keycap> et <keycap>Shift</keycap> maintenues enfoncées.
+ </para>
+ <para>
+  L'affichage du menu 'Envoyer à...' via le menu principal est plutôt lent ; vous devriez l'ouvrir 
+  en cliquant sur un fichier avec le bouton droit en maintenant la touche <keycap>Shift</keycap> 
+  enfoncée.
+ </para>
 </sect1>
 
 </chapter>
@@ -1481,14 +1513,21 @@ Supprime du punaiseur ou des panneaux les objets sélectionnés.
 
 </tbody></tgroup></informaltable>
 
-Si vous mettez en place les icônes par défaut pour plusieurs utilisateurs
-et que vous souhaitez créer une icône 'Home' qui pointe vers le dossier
-personnel de chaque utilisateur, créez une icône, choisissez <guimenuitem>Éditer l'icône</guimenuitem>
-et mettez <filename>~</filename> pour le chemin.
-  </para><para>
-Notez que des applications peuvent ajouter des commandes au début de ce
-menu quand vous cliquez dessus &mdash; voir la section <xref linkend="AppDir"/> pour plus de détails.
 </para>
+
+<para>
+ Si vous mettez en place les icônes par défaut pour plusieurs utilisateurs 
+ et que vous souhaitez créer une icône 'Home' qui pointe vers le dossier 
+ personnel de chaque utilisateur, créez une icône, choisissez 
+ <guimenuitem>Éditer l'icône</guimenuitem> et mettez <filename>~</filename> 
+ pour le chemin.
+</para>
+<para>
+ Notez que des applications peuvent ajouter des commandes au début de ce 
+ menu quand vous cliquez dessus &mdash; voir la section <xref linkend="AppDir"/> 
+ pour plus de détails.
+</para>
+
 </sect1>
 
 <sect1>
@@ -1507,21 +1546,29 @@ vous verrez l'appliquette démarrer.
 Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
     </para></step>
 
-    <step><para>
-Créez-y une icône appelée <filename>.DirIcon</filename> (le dossier apparaîtra avec une icône).
-    </para></step>
+	<step>
+	 <para>
+	  Utilisez la commande <guimenuitem>Fixer l'icône...</guimenuitem> pour créer 
+	  une icône appelée <filename>.DirIcon</filename> à l'intérieur de ce dossier 
+	  (celui-ci apparaîtra avec cette icône).
+	 </para>
+	</step>
 
-    <step><para>
-Créez-y un dossier <filename>Help</filename> pour le cas où les utilisateurs choisiront <guimenuitem>Aide</guimenuitem>
-dans le menu.
-    </para></step>
+	<step>
+	 <para>
+	  Créez-y un dossier <filename>Help</filename>, qui sera affiché quand les utilisateurs 
+	  choisiront <guimenuitem>Aide</guimenuitem> dans le menu.
+	 </para>
+	</step>
 
-    <step><para>
-Créez un exécutable appelé <filename>AppletRun</filename>.
-This will be passed the XID of the panel socket window when the directory is dragged
-onto the panel. You can use this to create a GtkPlug widget. An example applet
-(written in python) is available at <ulink url="http://rox.sourceforge.net/applets.php3"/>
-    </para></step>
+	<step>
+	 <para>
+	  Créez un exécutable appelé <filename>AppletRun</filename>. 
+	  This will be passed the XID of the panel socket window when the directory is dragged 
+	  onto the panel. You can use this to create a GtkPlug widget. An example applet 
+	  (written in python) is available at <ulink url="http://rox.sourceforge.net/applets.php3"/>
+     </para>
+	</step>
 
   </procedure>
 </sect1>
@@ -1532,48 +1579,17 @@ onto the panel. You can use this to create a GtkPlug widget. An example applet
     <anchor id="vfs" xreflabel="Virtual file systems"/>Systèmes de fichier virtuel (VFS)
   </title>
   <para>
-
-Certains types de fichier peuvent être représentés sous forme de dossier. Un exemple typique
-est le fichier zip, qui contient une structure complète et compressée d'un dossier.
-Il peut être très pratique d'ouvrir un tel fichier comme s'il s'agissait d'un vrai dossier ;
-c'est ce que vous permet de faire le système VFS.
-
-<itemizedlist><title>Pour utiliser cette fonctionnalité, vous devez disposer de (au choix ou les deux) :</title>
-
-<listitem><para>
-Un système du genre AVFS<citation>AVFS</citation> qui permet au noyau d'intégrer directement le support
-de différents systèmes de fichiers virtuels.
-C'est la meilleure des solutions, puisqu'elle autorise tous les programmes à accéder à cette fonctionnalité.
-Vous devrez probablement avoir le mot de passe root pour installer cette fonctionnalité. De plus, toutes
-les plates-formes ne sont pas supportées.
-</para></listitem>
-
-<listitem><para>
-Le support des librairies VFS de Midnight Commander, compilé dans <application>ROX-Filer</application>.
-C'est automatique quand vous compilez <application>ROX-Filer</application> et qu'il peut trouver les
-librairies VFS &mdash; il suffit d'avoir <filename>libvfs.so</filename> (ou <filename>libvfs.a</filename>)  dans un dossier de
-librairies du système ou dans le dossier défini par la variable d'environnement <envar>LD_LIBRARY_PATH</envar>.
-Dans ce cas, vous pourrez voir la structure interne du fichier sous forme de dossier et en extraire
-des fichiers, mais pas la modifier pour l'instant.
-</para>
-
-<para>
-Quand vous utilisez libvfs, la commande &mdash; <guimenuitem>Ouvrir AVFS</guimenuitem> est remplacée par un sous-menu <guisubmenu>Ouvrir VFS</guisubmenu>.
-C'est simplement un raccourci de l'utilisation de la commande <guimenuitem>Entrer un chemin...</guimenuitem> (explication ci-dessous),
-donc si vous voulez voir le contenu d'un fichier zip, par exemple, vous pouvez taper le chemin directement :
-<filename>/home/fred/archive.zip#uzip/</filename>.
-
-N'oubliez pas le slash final !
+   Certains types de fichier peuvent être représentés sous forme de dossier. 
+   Un exemple typique est le fichier zip, qui contient une structure complète 
+   et compressée d'un dossier. 
+   Il peut être très pratique d'ouvrir un tel fichier comme s'il s'agissait 
+   d'un vrai dossier ; c'est ce que vous permet de faire le système VFS.
   </para>
   <para>
-L'utilisation de libvfs est fortement déconseillée; utilisez plutôt AVFS.
-Les versions récentes de cette librairie ne se compilent pas proprement ; de plus,  elle ne peut pas être utilisée
-sur beaucoup de systèmes car elle crée un problème avec le support des gros fichiers.
+   Pour utiliser cette fonctionnalité, vous devez disposer d'un système comme 
+   AVFS <citation>AVFS</citation>, qui permet au noyau d'intégrer directement 
+   le support de différents Systèmes de Fichiers Virtuels.
   </para>
- </listitem>
-</itemizedlist>
-
-</para>
 </chapter>
 
 <chapter id="minibuffer">
@@ -1625,35 +1641,48 @@ est	temporairement activée pour que les fichiers puissent être affichés.
   </para>
 
   <para>
-La complétion essaie de trouver le maximum de caractères possibles.
-Par exemple, s'il y a deux fichiers dans un même dossier qui s'appellent <filename>save-mail-nov-1999</filename> et <filename>save-mail-dec-1999</filename>,
-alors le simple fait de taper 'save' et de presser la touche <keycap>Tabulation</keycap> développera 'save' en 'save-mail-' et bipera pour indiquer
-que la correspondance n'est pas complète.
-Si vous utilisez la complétion sur un dossier et qu'il est unique, le filer va automatiquement afficher celui-ci.
-Ce comportement doit rappeler quelque chose aux utilisateurs du shell.
+   La complétion essaie de trouver le maximum de caractères possibles. 
+   Par exemple, s'il y a deux fichiers dans un même dossier qui s'appellent 
+   <filename>save-mail-nov-1999</filename> et 
+   <filename>save-mail-dec-1999</filename>, alors le simple fait de taper 
+   <userinput>save</userinput> et de presser la touche <keycap>Tabulation</keycap> 
+   développera <userinput>save</userinput> en <userinput>save-mail-</userinput> 
+   et bipera pour indiquer que la correspondance n'est pas complète. 
+   Si vous utilisez la complétion sur un dossier et qu'il est unique, 
+   le filer va automatiquement afficher celui-ci. 
+   Ce comportement doit rappeler quelque chose aux utilisateurs du shell.
   </para>
 
-  <informalexample><para>
-Admettons que vous vouliez trouver la documentation de Wine dans le dossier <filename>/usr/doc</filename> (qui est habituellement très chargé).
-Voici comment vous pourriez faire :
+  <informalexample>
+   <para>
+	Admettons que vous vouliez trouver la documentation de Wine dans le 
+	dossier <filename>/usr/share/doc</filename> (qui est habituellement très chargé). 
+	Voici comment vous pourriez faire :
 
 <orderedlist>
 
-<listitem><para>
-Ouvrez le mini-buffer en choisissant la commande <guimenuitem>Entrer un chemin...</guimenuitem> du menu
-<guimenu>Fenêtre</guimenu>.
-J'utilise généralement le raccourci <keycap>/</keycap> pour cette commande.
+ <listitem>
+  <para>
+   Ouvrez le mini-buffer en choisissant la commande 
+   <guimenuitem>Entrer un chemin...</guimenuitem> du menu <guimenu>Fenêtre</guimenu>, ou, 
+   si vous n'avez pas modifié le raccourci-clavier par défaut, pressez <keycap>/</keycap>.
 </para></listitem>
 
-<listitem><para>
-Pressez <keycap>CTRL</keycap>+<keycap>U</keycap> pour effacer l'entrée par défaut &mdash; cela vous amène à la racine (/).
-</para></listitem>
+<listitem>
+ <para>
+  Pressez <keycap>CTRL</keycap>+<keycap>A</keycap> pour sélectionner l'entrée par défaut.
+ </para>
+</listitem>
 
-<listitem><para>
-Tapez <userinput>u&lt;Tab&gt;do&lt;Tab&gt;wi&lt;Tab&gt;</userinput>.
-Au fur et à mesure que vous tapez, les dossiers seront ouverts automatiquement.
-Si un bip retentit quand vous pressez la touche Tab vous devez taper une lettre de plus, car il y a plusieurs correspondances.
-</para></listitem>
+<listitem>
+ <para>
+  Tapez <userinput>u&lt;Tab&gt;sh&lt;Tab&gt;do&lt;Tab&gt;wi&lt;Tab&gt;</userinput>. 
+  Au fur et à mesure que vous tapez, les dossiers seront ouverts automatiquement. 
+  Si un bip retentit quand vous pressez la touche <keycap>Tab</keycap>, vous devez 
+  taper une lettre de plus (car il y a plusieurs correspondances), ou presser 
+  <keycap>Entrée</keycap>.
+ </para>
+</listitem>
 
 </orderedlist>
 
@@ -1663,18 +1692,21 @@ Si un bip retentit quand vous pressez la touche Tab vous devez taper une lettre 
 <sect1>
   <title>La commande shell</title>
   <para>
-
-Cette fonction vous permet d'entrer rapidement des commandes shell si vous ne voulez pas ouvrir d'xterm.
-Si vous ne savez pas ce que sont des "commandes shell", passez à la section suivante !
-  </para><para>
-  Tapez simplement la commande et pressez <keycap>Entrée</keycap> pour l'exécuter.
-Les touches <keycap>Haut</keycap> et <keycap>Bas</keycap> rappellent les commandes précédentes.
-<keycap>Tab</keycap> effectue toujours la complétion.
-Cliquer sur un objet insère son nom dans le mini-buffer.
-Si plusieurs objets sont sélectionnés, ils sont assignés aux paramètres <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
+   Cette fonction vous permet d'entrer rapidement des commandes shell 
+   si vous ne voulez pas ouvrir d'xterm. 
+   Si vous ne savez pas ce que sont des "commandes shell", passez à la section suivante !
   </para>
   <para>
-   Ouvrir le mini-buffer alors que des objets sont sélectionnés ajoute <computeroutput>$@</computeroutput>
+   Tapez simplement la commande et pressez <keycap>Entrée</keycap> pour 
+   l'exécuter. 
+   Les touches <keycap>Haut</keycap> et <keycap>Bas</keycap> rappellent 
+   les commandes précédentes. <keycap>Tab</keycap> effectue toujours la 
+   complétion. Cliquer sur un objet insère son nom dans le mini-buffer. 
+   Si plusieurs objets sont sélectionnés, ils sont assignés aux paramètres 
+   <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
+  </para>
+  <para>
+   Ouvrir le mini-buffer alors que des objets sont sélectionnés ajoute <computeroutput>"$@"</computeroutput>
    à la fin de la commande &mdash; ce qui remplace le nom des objets sélectionnés.
   </para>
 
@@ -1805,7 +1837,7 @@ répond oui à la question affichée.
 répond non à la question affichée.
 </para></listitem></varlistentry>
 
-<varlistentry><term><guibutton>Abandonner</guibutton></term><listitem><para>
+<varlistentry><term><guibutton>Annuler</guibutton></term><listitem><para>
 Stoppe l'opération en cours et ferme la fenêtre action.
 </para></listitem></varlistentry>
 
@@ -1844,15 +1876,28 @@ qu'il fait quelque chose. Utilisez cette option si vous voulez augmenter la vite
 d'exécution de l'opération, si beaucoup de messages sont affichés.
 </para></listitem>
 
-<listitem><para>
-<guilabel>Récursif</guilabel> signifie que l'action appliquée à un
-dossier sera aussi appliquée à tout son contenu, ainsi qu'au contenu
-de ses sous-dossiers, et ainsi de suite.
-</para></listitem>
+<listitem>
+ <para>
+  <guilabel>Récursif</guilabel> signifie que l'action appliquée à un 
+  dossier sera aussi appliquée à tout son contenu, ainsi qu'au contenu 
+  de ses sous-dossiers, et ainsi de suite.
+ </para>
+</listitem>
+
+<listitem>
+ <para>
+  <guilabel>Plus récent</guilabel> n'écrasera un fichier que si le fichier 
+  copié est plus récent que le fichier écrasé (date de modification).
+ </para>
+</listitem>
 
 </itemizedlist>
 
-  </para>
+</para>
+
+ <para>
+  Vous pouvez définir la valeur par défaut de ces options.
+ </para>
 </sect1>
 </chapter>
 
@@ -1869,13 +1914,16 @@ Si vous connaissez le nom d'un fichier, entrez-le simplement dans l'espace
 Par exemple, pour chercher un fichier nommé <filename>log</filename>, vous entrerez <userinput>'log'</userinput>.
 
 Souvenez-vous qu'il faut utiliser des apostrophes, et pas des guillemets (") ni des apostrophes inversées (`) !.
-  </para><para>
-Au fur et à mesure que le filer trouve des objets qui correspondent, ils sont ajoutés à la liste des résultats.
-Si vous cliquez sur un des résultats, une fenêtre s'ouvrira pour vous montrer le dossier dans lequel celui-ci est enregistré.
-Le filer utilisera la même fenêtre pour afficher les dossiers qui correspondent aux autres résultats
-(donc si vous voulez garder des fenêtres différentes pour chaque résultat, vous devrez explicitement créer une nouvelle fenêtre
-(menu <guimenu>Fenêtre</guimenu>).
-  </para>
+</para>
+<para>
+ Au fur et à mesure que le filer trouve des objets qui correspondent, ils sont ajoutés 
+ à la liste des résultats. 
+ Si vous double-cliquez sur un des résultats, une fenêtre s'ouvrira pour vous montrer 
+ le dossier dans lequel celui-ci est enregistré. 
+ Le filer utilisera la même fenêtre pour afficher les dossiers qui correspondent aux 
+ autres résultats (donc si vous voulez garder des fenêtres différentes pour chaque 
+ résultat, vous devrez explicitement créer une nouvelle fenêtre (menu <guimenu>Fenêtre</guimenu>).
+</para>
 
 <sect1>
   <title>Wildcards (les motifs génériques)</title>
@@ -2191,7 +2239,7 @@ pour que grep ne soit exécuté que pour les fichiers ayant pour extension <filena
 
 <listitem><para>
 <userinput>Prune</userinput> Ne réussit jamais !
-<footnote><para>Notez que c'est l'inverse de la commande<citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
+<footnote><para>Notez que c'est l'inverse de la commande <citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
 </citerefentry>.</para></footnote>
 
 Ce mot-clé peut empêcher la recherche à l'intérieur du dossier courant.
@@ -2226,34 +2274,39 @@ et dans ce cas, l'inclut dans les résultats.
 
 Vous pouvez configurer beaucoup de comportements de <application>ROX-Filer</application>.
 Choisissez pour cela <guimenuitem>Options...</guimenuitem> dans le menu d'une fenêtre du filer.
+La liste à gauche montre les différentes sections &mdash; cliquez sur celle de votre choix 
+pour voir les options dont elle dispose.
 
-Il y a quatre boutons en bas de la boîte de configuration :
+Il y a trois boutons en bas de la boîte de configuration :
 
 <itemizedlist>
 
-<listitem><para>
-<guibutton>Sauver</guibutton>
-applique vos choix et les sauve dans votre dossier Choices, pour que <application>ROX-Filer</application>
-les retrouve la prochaine fois qu'il sera exécuté. <application>ROX-Filer</application> ne sauvera jamais aucune
-des préférences à moins que vous ne cliquiez sur ce bouton <guibutton>Sauver</guibutton>.
-L'endroit exact où les choix sont sauvegardés est défini par la variable
-d'environnement <envar>CHOICESPATH</envar> &mdash; voir <citation>Choices</citation> pour plus de détails.
-</para></listitem>
+ <listitem>
+  <para>
+   <guibutton>Sauver</guibutton>
+   sauve vos choix dans votre dossier Choices, pour que <application>ROX-Filer</application> 
+   les retrouve la prochaine fois qu'il sera exécuté. 
+   L'endroit exact où les choix sont sauvegardés est défini par la variable 
+   d'environnement <envar>CHOICESPATH</envar> &mdash; voir <citation>Choices</citation> 
+   pour plus de détails.
+  </para>
+ </listitem>
 
-<listitem><para>
-<guibutton>OK</guibutton>
-applique vos choix, mais ne les sauve pas.
-</para></listitem>
+ <listitem>
+  <para>
+   <guibutton>OK</guibutton>
+   Puisque tous vos choix prennent effet immédiatement, ce bouton ne sert 
+   qu'à fermer la fenêtre.
+  </para>
+ </listitem>
 
-<listitem><para>
-<guibutton>Appliquer</guibutton>
-fonctionne comme <guibutton>OK</guibutton>, mais ne ferme pas la fenêtre Options.
-</para></listitem>
-
-<listitem><para>
-<guibutton>Annuler</guibutton>
-ferme la fenêtre Options et oublie toutes les modifications que vous avez effectuées.
-</para></listitem>
+ <listitem>
+  <para>
+   <guibutton>Revenir</guibutton>
+   Annule toutes les modifications effectuées depuis l'ouverture de la fenêtre Options. 
+   Cette fenêtre n'est pas fermée si vous utilisez ce bouton.
+  </para>
+ </listitem>
 
 </itemizedlist>
 
@@ -2272,124 +2325,171 @@ obtenir la langue désirée.
 </sect1>
 
 <sect1>
-  <title>Options d'affichage</title>
+  <title>Options des fenêtres du filer</title>
   <para>
 
-<itemizedlist>
-<listitem><para><guilabel>Ignorer la casse lors d'un tri</guilabel>
-permet de ne pas considérer une lettre comme différente d'une lettre
-minuscule lors d'un tri. Si cette option est désactivée, alors <filename>Zoo</filename>
-sera affiché avant <filename>animal</filename>, par exemple.
-</para></listitem>
+   <itemizedlist>
+	<listitem>
+	 <para>
+	  <guilabel>Changement de taille automatique des fenêtres du filer</guilabel> 
+	  peut être utilisée pour contrôler quand les fenêtres seront automatiquement 
+	  redimensionnées :
 
-<listitem><para><guilabel>Les répertoires viennent toujours en premier</guilabel> signifie que
-les répertoires sont triés et affichés au début, et ensuite seulement tous les autres objets
-sont triés et affichés. Si cette option est désactivée, les répertoires sont mélangés avec les
-fichiers.
-</para></listitem>
+	  <itemizedlist>
+	   <listitem>
+		<para>
+		 <guilabel>... jamais</guilabel>
+		 désactive l'auto-redimensionnement. Les fenêtres peuvent/doivent être 
+		 redimensionnées manuellement.
+		</para>
+	   </listitem>
 
-<listitem><para><guilabel>Largeur du texte replié</guilabel> permet de spécifier une longueur maximum pour
-l'affichage du nom de l'objet sur une seule ligne, dans le mode 'Grandes Icônes'.
-Au-delà de cette valeur, le nom sera affiché sur deux lignes.
-En mode 'Énormes Icônes', la coupure intervient à 50 % de cette valeur.
-</para></listitem>
+	   <listitem>
+		<para>
+		 <guilabel>... en changeant le style d'affichage</guilabel>
+		 redimensionnera la fenêtre lorsque vous changerez la taille des icônes 
+		 ou le type de détails à afficher.
+		</para>
+	   </listitem>
 
-<listitem><para><guilabel>Largeur max des petites icônes</guilabel> &mdash; en mode 'Petites Icônes',
-tout texte plus long que cette valeur sera tronqué à l'affichage (une petite barre rouge vous l'indique).
-Si vous maintenez la souris au-dessus d'un texte tronqué, une bulle apparaîtra et affichera le texte complet.
-</para></listitem>
-
-<listitem><para><guilabel>Hériter les options de la fenêtre source</guilabel> contrôle le comportement
-du filer quand vous ouvrez une nouvelle fenêtre depuis une fenêtre existante (par exemple en cliquant
-sur un dossier avec le bouton du milieu). Si cette option est activée, la nouvelle fenêtre respectera les
-mêmes options d'affichage que la fenêtre depuis laquelle vous l'avez ouverte (taille des icônes, critères
-de tri, etc). Sinon, la nouvelle fenêtre utilisera les options par défaut.</para></listitem>
-
-<listitem><para><guilabel>Options par défaut pour les nouvelles fenêtres</guilabel>.
-Les options restantes définissent l'affichage par défaut pour l'ouverture des nouvelles
-fenêtres &mdash; elles correspondent aux différents styles d'affichage que vous pouvez
-obtenir dans le menu <guimenuitem>Affichage</guimenuitem>.
-</para></listitem>
-
-</itemizedlist>
-
+	   <listitem>
+		<para>
+		 <guilabel>... toujours</guilabel>
+		 provoque l'auto-redimensionnement des fenêtres, chaque fois que 
+		 c'est nécessaire (c'est-à-dire quand vous changez de dossier ou 
+		 quand vous changez de style d'affichage).
+		</para>
+	   </listitem>
+	</itemizedlist>
   </para>
-</sect1>
+ </listitem>
 
-<sect1>
-  <title>Options du punaiseur</title>
+ <listitem>
   <para>
+   <guilabel>Taille maximum</guilabel> fixe -en pourcentage de la taille 
+   de l'écran- la taille maximum des fenêtres lorsque celles-ci sont 
+   automatiquement redimensionnées.
+  </para>
+ </listitem>
 
-Si vous utilisez la fonction punaiseur (voir section <xref linkend="run_pin"/>), vous pouvez choisir
-le style du texte qui est affiché sous chaque icône. Si vous avez un fond d'écran
-plutôt simple, vous pourriez choisir <guilabel>Pas de fond</guilabel>, ce qui affichera simplement le
-texte directement sur le fond d'écran. Mais les utilisateurs avec des fonds d'écran
-chargés peuvent avoir des difficultés à lire le texte ; pour cette raison, ils pourront choisir l'option
-<guilabel>Plaque rectangulaire de fond</guilabel>, qui affichera le texte sur un fond de couleur.
-Si vous utilisez Gtk+-2.0, cette option est sans effet.
+ <listitem>
+  <para>
+   <guilabel>Drapeaux de barre de titre courts</guilabel> substitue les 
+   indicateurs de la barre de titre 'Lecture', 'Tous' et 'Imagettes' par 
+   de simples lettres.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Fenêtres uniques</guilabel> évite que deux fenêtres puissent 
+   afficher le même dossier. 
+   Si vous ouvrez une deuxième fenêtre du même dossier, la première se 
+   fermera automatiquement.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Nouvelle fenêtre avec le bouton 1</guilabel> permute le rôle 
+   des deux boutons qui n'affichent pas de menu, quand un dossier est ouvert. 
+   Cette une option utile pour les personnes habituées à utiliser RISC OS.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Navigation en simple clic</guilabel> permet d'ouvrir un fichier ou 
+   un dossier avec un seul clic. Si cette option est désactivée, vous devrez 
+   double-cliquer pour ouvrir, car un simple clic ne fera que sélectionner l'objet.
+  </para>
+ </listitem>
+
+ </itemizedlist>
 </para>
-<para>
-Vous pouvez changer la couleur du texte et de ce fond en cliquant sur les pavés de couleur.
-</para>
 
-<itemizedlist>
-
-<listitem>
+<sect2>
+ <title>Options d'affichage</title>
  <para>
-  <guilabel>Navigation en simple clic</guilabel>
-  permet d'ouvrir un fichier ou un dossier avec un seul clic. Maintenez <keycap>Ctrl</keycap> enfoncé
-  pour sélectionner un(des) objet(s).
-  Si cette option est désactivée, vous devrez double-cliquer pour ouvrir, car un simple clic ne
-  fera que sélectionner l'objet.
- </para>
-</listitem>
 
-<listitem><para> <guilabel>Garder les icônes à l'intérieur des limites de l'écran</guilabel> évite que les icônes
-soient affichées à moitié en dehors de l'écran.
-</para></listitem>
+  <itemizedlist>
+   <listitem>
+	<para>
+	 <guilabel>Tri intelligent</guilabel>
+	 Effectuer un tri sans tenir compte de la casse (majuscules/minuscules), en 
+	 ignorant la ponctuation, et en triant correctement les nombres 
+	 (<filename>Fichier9</filename> apparaîtra bien avant <filename>Fichier10</filename>). 
+	 Si cette option est désactivée, alors <filename>Zoo</filename> sera affiché 
+	 avant <filename>animal</filename>, par exemple.
+  </para>
+ </listitem>
 
-<listitem><para> <guilabel>Pas de la grille pour les icônes</guilabel> contrôle la finesse du positionnement des icônes.
-</para></listitem>
+ <listitem>
+  <para>
+   <guilabel>Les répertoires viennent toujours en premier</guilabel> signifie que 
+   les répertoires sont triés et affichés au début, et ensuite seulement tous les 
+   autres objets sont triés et affichés. Si cette option est désactivée, les 
+   répertoires sont mélangés avec les fichiers.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Largeur du texte replié</guilabel> permet de spécifier une longueur 
+   maximum pour l'affichage du nom de l'objet sur une seule ligne, dans le mode 
+   'Grandes Icônes'. 
+   Au-delà de cette valeur, le nom sera affiché sur deux lignes. 
+   En mode 'Énormes Icônes', la coupure intervient à 50 % de cette valeur.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Largeur max des petites icônes</guilabel> &mdash; en mode 
+   'Petites Icônes', tout texte plus long que cette valeur sera tronqué 
+   à l'affichage (une petite barre rouge vous l'indique). 
+   Si vous maintenez la souris au-dessus d'un texte tronqué, une bulle 
+   apparaît et affiche le texte complet.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Options par défaut pour les nouvelles fenêtres</guilabel>. 
+   Ces options définissent l'affichage par défaut pour l'ouverture 
+   des nouvelles fenêtres. Elles correspondent aux différents styles 
+   d'affichage que vous pouvez obtenir dans le menu <guimenuitem>Affichage</guimenuitem>. 
+   <guilabel>Hériter les options de la fenêtre source</guilabel> contrôle 
+   le comportement du filer quand vous ouvrez une nouvelle fenêtre depuis 
+   une fenêtre existante (par exemple en cliquant sur un dossier avec 
+   le bouton du milieu). 
+   Si cette option est activée, la nouvelle fenêtre respectera les mêmes 
+   options d'affichage que la fenêtre depuis laquelle vous l'avez ouverte 
+   (taille des icônes, critères de tri, etc). 
+   Sinon, la nouvelle fenêtre utilisera les options par défaut.
+  </para>
+ </listitem>
 
 </itemizedlist>
 
-</sect1>
-
-<sect1>
-  <title>Options des panneaux</title>
-  <para>
-
-Si vous utilisez des panneaux (voir la section <xref linkend="run_pan"/>),
-vous pouvez choisir ici quelles icônes auront un texte affiché sous elles.
-Vous pouvez choisir d'afficher du texte sous toutes les icônes, sous aucune,
-ou sous toutes sauf les applications.
   </para>
-</sect1>
+ </sect2>
 
-<sect1>
-  <title>Options des fenêtres action</title>
-  <para>
-
-Vous pouvez choisir le démarrage automatique de certaines opérations, c'est-à-dire
-sans que vous ne deviez cliquer sur <guibutton>Silencieux</guibutton>.
-Sélectionnez les opérations que vous voulez voir démarrer automatiquement.
-  </para>
-</sect1>
-
-<sect1>
+ <sect2>
   <title>Options de la barre d'outils</title>
   <para>
 
    La barre d'outils est décrite à la section <xref linkend="Toolbar"/>.
+
    <itemizedlist>
 	<listitem>
 	 <para>
-	  <guilabel>Activez les outils que vous voulez</guilabel>
-	  vous permet d'activer/désactiver les outils que vous voulez voir
-	  apparaître/disparaître de la barre d'outils.
+	  <guilabel>Activez les outils que vous voulez</guilabel> vous permet 
+	  d'activer/désactiver les outils que vous voulez voir apparaître/disparaître 
+	  de la barre d'outils.
 	  Cliquez simplement dessus pour les activer/désactiver &mdash; les outils
-	  en grisé seront désactivés, et ne seront pas affichés sur la barre
-	  d'outils des fenêtres du filer.
+	  en grisé seront désactivés, et ne seront pas affichés sur la barre d'outils 
+	  des fenêtres du filer.
 	 </para>
 	</listitem>
 
@@ -2403,82 +2503,110 @@ Sélectionnez les opérations que vous voulez voir démarrer automatiquement.
 	 </para>
 	</listitem>
 
-<listitem><para> <guilabel>Afficher le nombre d'objets</guilabel> montre dans la barre d'outils le nombre d'objets
-affichés dans la fenêtre, ainsi que le nombre d'objets cachés (s'il y en a).
-Quand il y a une sélection, le nombre d'objets sélectionnés est affiché ainsi que la taille totale
-de la sélection (les dossiers ne sont pas pris en compte).
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Afficher le nombre d'objets</guilabel> montre dans la barre d'outils 
+	  le nombre d'objets affichés dans la fenêtre, ainsi que le nombre d'objets 
+	  cachés (s'il y en a). 
+	  Quand il y a une sélection, le nombre d'objets sélectionnés est affiché, ainsi 
+	  que la taille totale de la sélection (les dossiers ne sont pas pris en compte).
+	 </para>
+    </listitem>
+   </itemizedlist>
 
-</itemizedlist>
+ </para>
+</sect2>
+ 
+<sect2>
+ <title>Mini-buffers</title>
+ <para>
+  Les deux options suivantes contrôlent le bip lorsque vous pressez la touche 
+  <keycap>Tab</keycap> dans le mini-buffer :
 
+<itemizedlist>
+
+ <listitem>
+  <para>
+   <guilabel>Bip si la complétion par Tab échoue</guilabel> &mdash; bipe si 
+   Tab ne trouve pas de correspondance ou s'il y a plusieurs correspondances 
+   possibles.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Bip s'il y a plusieurs complétions</guilabel> &mdash; bipe 
+   s'il y a plusieurs correspondances possibles, même si des lettres ont 
+   été ajoutées.
+  </para>
+ </listitem>
+
+ </itemizedlist>
+</para>
+</sect2>
+</sect1>
+
+<sect1>
+  <title>Options du punaiseur</title>
+  <para>
+   Voir la section <xref linkend="run_pin"/> pour savoir comment activer le 
+   punaiseur.
+
+   <itemizedlist>
+	<listitem>
+	 <para>
+	  <guilabel>Style du texte</guilabel>
+	  Permet de choisir les couleurs à utiliser pour le texte des icônes.
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
+	  <guilabel>Navigation en simple clic</guilabel>
+	  permet d'ouvrir un fichier ou un dossier avec un seul clic. 
+	  Maintenez <keycap>Ctrl</keycap> enfoncé pour sélectionner un(des) objet(s). 
+	  Si cette option est désactivée, vous devrez double-cliquer pour ouvrir, 
+	  car un simple clic ne fera que sélectionner l'objet.
+	 </para>
+    </listitem>
+
+	<listitem>
+	 <para>
+	  <guilabel>Garder les icônes à l'intérieur des limites de l'écran</guilabel> 
+	  évite que les icônes soient affichées à moitié en dehors de l'écran.
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
+	  <guilabel>Pas de la grille pour les icônes</guilabel> contrôle la finesse 
+	  du positionnement des icônes.
+	 </para>
+	</listitem>
+
+   </itemizedlist>
+
+ </para>
+</sect1>
+
+<sect1>
+  <title>Options des panneaux</title>
+  <para>
+   Si vous utilisez des panneaux (voir la section <xref linkend="run_pan"/>), 
+   vous pouvez choisir ici quelles icônes auront un texte affiché sous elles. 
+   Vous pouvez choisir d'afficher du texte sous toutes les icônes, sous aucune, 
+   ou sous toutes sauf les applications.
   </para>
 </sect1>
 
 <sect1>
-  <title>Options des fenêtres du filer</title>
+  <title>Options des fenêtres action</title>
   <para>
-
-<itemizedlist>
-<listitem><para><guilabel>Changement de taille automatique des fenêtres du filer</guilabel> peut être utilisée
-pour contrôler quand les fenêtres seront automatiquement redimensionnées :
-
-	<itemizedlist>
-	<listitem><para><guilabel>... jamais</guilabel>
-	désactive l'auto-redimensionnement. Les fenêtres peuvent/doivent être redimensionnées manuellement.
-	</para></listitem>
-
-	<listitem><para><guilabel>... en changeant le style d'affichage</guilabel>
-	redimensionnera la fenêtre lorsque vous changerez la taille des icônes ou le type de détails à afficher.
-	</para></listitem>
-
-	<listitem><para><guilabel>... toujours</guilabel>
-	provoque l'auto-redimensionnement des fenêtres, chaque fois que c'est nécessaire (c'est-à-dire quand vous
-	changez de dossier ou quand vous changez de style d'affichage).
-	</para></listitem>
-	</itemizedlist>
-</para></listitem>
-
-<listitem><para> <guilabel>Taille maximum</guilabel> fixe -en pourcentage de la taille de l'écran- la taille
-maximum des fenêtres lorsque celles-ci sont redimensionnées automatiquement.
-</para></listitem>
-
-<listitem><para> <guilabel>Fenêtres uniques</guilabel> évite que deux fenêtres puissent afficher le même dossier.
-Si vous ouvrez une deuxième fenêtre du même dossier, la première se fermera automatiquement.
-</para></listitem>
-
-<listitem>
- <para>
-  <guilabel>Nouvelle fenêtre avec le bouton 1</guilabel>
-  permute le rôle des deux boutons qui n'affichent pas de menu quand un dossier est ouvert.
-  Cette une option utile pour les personnes habituées à utiliser RISC OS.
- </para>
-</listitem>
-
-<listitem>
- <para>
-  <guilabel>Navigation en simple clic</guilabel>
-  permet d'ouvrir un fichier ou un dossier avec un seul clic. Si cette option est désactivée,
-  vous devrez double-cliquer pour ouvrir, car un simple clic ne fera que sélectionner l'objet.
- </para>
-</listitem>
-
-</itemizedlist>
-
-Les deux options suivantes contrôlent le bip lorsque vous pressez la touche <keycap>Tab</keycap>
-dans le mini-buffer :
-
-<itemizedlist>
-
-<listitem><para> <guilabel>Bip si la complétion par Tab échoue</guilabel> &mdash; bipe si Tab ne trouve pas
-de correspondance ou s'il y a plusieurs correspondances possibles.
-</para></listitem>
-
-<listitem><para> <guilabel>Bip s'il y a plusieurs complétions</guilabel> &mdash;
-bipe s'il y a plusieurs correspondances possibles, même si des lettres ont été ajoutées.
-</para></listitem>
-
-</itemizedlist>
-
+   Vous pouvez choisir le démarrage automatique de certaines opérations, 
+   c'est-à-dire sans que vous ne deviez cliquer sur <guibutton>Silencieux</guibutton>. 
+   Sélectionnez les opérations que vous voulez voir démarrer automatiquement. 
+   Vous pouvez aussi définir les options par défaut pour chacune des options 
+   des fenêtres action.
   </para>
 </sect1>
 
@@ -2486,45 +2614,68 @@ bipe s'il y a plusieurs correspondances possibles, même si des lettres ont été a
   <title>Options du Drag-And-Drop (ie Glisser-Déposer)</title>
   <para>
 
-<itemizedlist>
-<listitem><para><application>ROX-Filer</application> utilise le protocole standard XDND pour le drag-and-drop.
-Ce protocole recommande : &lt;&lt; les URI doivent être accompagnées du nom de
-l'hôte de l'ordinateur où se trouve la ressource pour que le programme qui
-reçoit les données puisse déterminer s'il peut les recevoir directement ou
-s'il doit le faire via le serveur X &gt;&gt;.
-Cependant, beaucoup d'anciens programmes (particulièrement des applications
-GNOME) sont perturbés par le nom de l'hôte et ne réussissent pas à charger
-les données correctement. Si <guilabel>Ne pas utiliser le nom de machine</guilabel> est activée,
-celui-ci est donc omis et <application>ROX-Filer</application> fonctionnera avec ces applications MAIS
-vous ne pourrez pas glisser-déposer des données sur un programme tournant sur une autre machine.
-</para></listitem>
+   <itemizedlist>
+	<listitem>
+	 <para>
+	  <application>ROX-Filer</application> utilise le protocole standard XDND 
+	  pour le drag-and-drop. 
+	  Ce protocole recommande : &lt;&lt; les URI doivent être accompagnées 
+	  du nom de l'hôte de l'ordinateur où se trouve la ressource pour 
+	  que le programme qui reçoit les données puisse déterminer s'il peut 
+	  les recevoir directement ou s'il doit le faire via le serveur X &gt;&gt;. 
+	  Cependant, beaucoup d'anciens programmes (particulièrement des applications 
+	  GNOME) sont perturbés par le nom de l'hôte et ne réussissent pas à charger 
+	  les données correctement. Si <guilabel>Ne pas utiliser le nom de machine</guilabel> 
+	  est activée, celui-ci est donc omis et <application>ROX-Filer</application> 
+	  fonctionnera avec ces applications MAIS vous ne pourrez pas glisser-déposer 
+	  des données sur un programme tournant sur une autre machine.
+	 </para>
+	</listitem>
 
-<listitem><para><guilabel>Permettre de faire glisser vers des icônes dans les fenêtres du filer</guilabel> gère
-ce qui se passe quand vous déposez des fichiers sur des icônes dans une fenêtre du filer.
-Si cette option est activée, déposer sur un dossier sauvera les données à l'intérieur de celui-ci,
-et déposer sur un programme démarrera le programme, qui chargera les données.
-Si c'est désactivé, vous pouvez déposer n'importe où dans la fenêtre (au-dessus d'un dossier ou au-dessus du vide)
-&mdash; les données seront sauvées dans le dossier affiché.
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Permettre de faire glisser vers des icônes dans les fenêtres du 
+	   filer</guilabel> gère ce qui se passe quand vous déposez des fichiers sur 
+	  des icônes dans une fenêtre du filer. 
+	  Si cette option est activée, déposer sur un dossier sauvera les données à 
+	  l'intérieur de celui-ci, et déposer sur un programme démarrera le programme, 
+	  qui chargera les données. 
+	  Si c'est désactivé, vous pouvez déposer n'importe où dans la fenêtre 
+	  (au-dessus d'un dossier ou au-dessus du vide) &mdash; les données seront 
+	  sauvées dans le dossier affiché.
+	 </para>
+	</listitem>
 
-<listitem><para><guilabel>Les répertoires surgissent</guilabel> définit le comportement du filer
-quand vous glissez et maintenez un objet au-dessus d'un dossier.
-Active, l'option provoquera le surgissement du dossier après un délai fixé par l'option suivante,
-vous permettant ainsi de naviguer dans n'importe quel dossier pendant un glissé.
-Vous pouvez aussi maintenir le pointeur au-dessus des boutons 'Home' et 'Dossier père'
-de la barre d'outils pour obtenir un comportement similaire. L'option précédente doit être
-active pour que cela ait un effet sur les objets affichés dans un dossier.
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Les répertoires surgissent</guilabel> définit le comportement 
+	  du filer quand vous glissez et maintenez un objet au-dessus d'un dossier. 
+	  Active, l'option provoquera le surgissement du dossier après un délai 
+	  fixé par l'option suivante, vous permettant ainsi de naviguer dans n'importe 
+	  quel dossier pendant un glissé. 
+	  Vous pouvez aussi maintenir le pointeur au-dessus des boutons 'Home' et 
+	  'Dossier père' de la barre d'outils pour obtenir un comportement similaire. 
+	  L'option précédente doit être active pour que cela ait un effet sur les objets 
+	  affichés dans un dossier.
+	 </para>
+	</listitem>
 
-<listitem><para><guilabel>Délai de surgissement</guilabel> définit le temps, en millièmes de seconde,
-que le filer attendra avant d'ouvrir le dossier (comme décrit ci-dessus).
-Si l'option précédente est désactivée, celle-ci n'aura aucun effet.
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Délai de surgissement</guilabel> définit le temps, en millièmes 
+	  de seconde, que le filer attendra avant d'ouvrir le dossier (comme décrit 
+	  ci-dessus). Si l'option précédente est désactivée, celle-ci n'aura aucun effet.
+	 </para>
+	</listitem>
 
-<listitem><para><guilabel>Effectuer un drag-and-drop avec le bouton du milieu...</guilabel>
-vous permettra de choisir l'affichage d'un menu (le même qu'en appuyant sur <keycap>Alt</keycap> pendant un drag-and-drop) ou
-de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un drag-and-drop).
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Effectuer un drag-and-drop avec le bouton du milieu...</guilabel> 
+	  vous permettra de choisir l'affichage d'un menu (le même qu'en appuyant sur 
+	  <keycap>Alt</keycap> pendant un drag-and-drop) ou de déplacer les objets 
+	  (comme en appuyant sur <keycap>Shift</keycap> pendant un drag-and-drop).
+	 </para>
+	</listitem>
 
 </itemizedlist>
 
@@ -2535,37 +2686,40 @@ de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un 
   <title>Options du menu</title>
   <para>
 
-<itemizedlist>
- <listitem>
-  <para>
-	Le <guilabel>Programme pour Xterm ici</guilabel> est la commande utilisée quand vous choisissez
-	<guimenuitem>Xterm ici</guimenuitem>.
-	Vous pouvez la remplacer par la commande que vous voulez, comme <command>gnome-terminal</command>, <command>konsole</command>,
-	ou n'importe quoi d'autre.
-  </para>
- </listitem>
+   <itemizedlist>
+	<listitem>
+	 <para>
+	  <guilabel>Menu avec le bouton 2</guilabel> 
+	  permute le rôle des boutons 2 et 3 pour que le bouton du milieu affiche les menus. 
+	  Cette une option utile pour les personnes habituées à utiliser RISC OS.
+	 </para>
+	 <para>
+	  Il y a une autre façon d'affecter l'affichage du menu au bouton du milieu : 
+	  certaines personnes préfèrent utiliser la commande <command>xmodmap -e "pointer 
+	  = 1 3 2"</command>, ce qui intervertit le bouton du milieu et celui de droite 
+	  (TOUS les programmes sont affectés par cette manipulation, pas seulement 
+	  <application>ROX-Filer</application>).
+	 </para>
+	</listitem>
 
- <listitem>
-  <para>
-   <guilabel>Taille des icônes dans les menus</guilabel> vous permet de choisir la taille des icônes dans les menus
-   <guimenuitem>Envoyer à...</guimenuitem> et <guimenuitem>Nouveau</guimenuitem>.
-  </para>
- </listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Taille des icônes dans les menus</guilabel> vous permet de choisir 
+	  la taille des icônes dans les menus <guimenuitem>Envoyer à...</guimenuitem> 
+	  et <guimenuitem>Nouveau</guimenuitem>.
+	 </para>
+	</listitem>
 
- <listitem>
-  <para>
-   <guilabel>Menu avec le bouton 2</guilabel>
-   permute le rôle des boutons 2 et 3 pour que le bouton du milieu affiche les menus.
-   Cette une option utile pour les personnes habituées à utiliser RISC OS.
-  </para>
-  <para>
-   Il y a une autre façon d'affecter l'affichage du menu au bouton du milieu :
-   certaines personnes préfèrent utiliser la commande <command>xmodmap -e "pointer
-	= 1 3 2"</command>, ce qui intervertit le bouton du milieu et celui de droite
-   (TOUS les programmes sont affectés par cette manipulation, pas seulement
-   <application>ROX-Filer</application>).
-  </para>
- </listitem>
+	<listitem>
+	 <para>
+	  Le <guilabel>Programme pour Xterm ici</guilabel> est la commande utilisée 
+	  quand vous choisissez <guimenuitem>Xterm ici</guimenuitem>. 
+	  Vous pouvez la remplacer par la commande que vous voulez, comme 
+	  <command>gnome-terminal</command>, <command>konsole</command>, ou 
+	  n'importe quoi d'autre.
+	</para>
+   </listitem>
+
 </itemizedlist>
 
   </para>
@@ -2574,34 +2728,22 @@ de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un 
 <sect1>
  <title>Types</title>
  <para>
+  <guilabel>Ignorer le bit 'eXécutable' pour les extensions connues</guilabel> signifie que si 
+  un fichier a une extension connue (par exemple <filename>.gif</filename>), le 'bit exécutable' 
+  est ignoré. Un tel comportement est utile si vous avez des fichiers sur un système de fichiers 
+  de type Windows qui sont montrés comme des programmes exécutables. Par contre, cette option 
+  empêche un fichier du type <filename>script.sh</filename> d'être traité comme un programme.
+ </para>
+ <para>
+  Le système de types MIME utilisé par le filer est décrit plus en détails 
+  à la section <xref linkend="types"/>.
   <itemizedlist>
    <listitem>
 	<para>
-	 <guilabel>Ignorer le bit 'eXécutable' pour les extensions connues</guilabel> signifie que si
-	 un fichier a une extension connue (par exemple <filename>.gif</filename>), le 'bit exécutable'
-	 est ignoré. Un tel comportement est utile si vous avez des fichiers sur un système de fichiers
-	 de type Windows qui sont montrés comme des programmes exécutables. Par contre, cette option
-	 empêche un fichier du type <filename>script.sh</filename> d'être traité comme un programme.
-	</para>
-   </listitem>
-   <listitem>
-	<para>
-	 <guilabel>Mettre les fichiers en couleur en fonction de leur type</guilabel>.
-	 Si cette option est activée, les noms (et les détails) des fichiers sont mis en couleur en
-	 fonction de leur type (fichier normal, dossier, exécutable, etc). Vous pouvez choisir les
-	 couleurs dans la liste affichée en dessous.
-	</para>
-   </listitem>
-  </itemizedlist>
-
-  Le système de types MIME utilisé par le filer est décrit plus en détails à la section <xref linkend="types"/>.
-
-  <itemizedlist>
-   <listitem>
-	<para>
-	 <guibutton>Montrer les règles nom->type</guibutton>
-	 ouvre les dossiers contenant les fichiers précisant au filer quel type donner à quel fichier.
-	</para>
+	 <guibutton>Montrer les règles nom->type</guibutton> 
+	 ouvre les dossiers contenant les fichiers précisant au filer 
+	 quel type donner à quel fichier.
+    </para>
    </listitem>
    <listitem>
 	<para>
@@ -2611,8 +2753,17 @@ de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un 
    </listitem>
   </itemizedlist>
  </para>
-</sect1>
 
+ <sect2>
+  <title>Couleurs</title>
+  <para>
+   <guilabel>Mettre les fichiers en couleur en fonction de leur type</guilabel>. 
+   Si cette option est activée, les noms (et les détails) des fichiers sont mis en couleur en 
+   fonction de leur type (fichier normal, dossier, exécutable, etc). Vous pouvez choisir les 
+   couleurs dans la liste affichée en dessous.
+  </para>
+ </sect2>
+</sect1>
 </chapter>
 
 <chapter id="types">
@@ -2695,7 +2846,16 @@ de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un 
  <para>
   Elle fonctionne un peu de la même façon que la boîte 'Fixer l'action d'exécution' décrite
   ci-dessus, sauf que vous pouvez affecter une icône pour un fichier précis (par son nom),
-  ou pour tous les fichiers d'un type particulier.
+  ou pour tous les fichiers d'un type particulier. Si vous affectez une icône à un fichier 
+  précis, le filer enregistre les noms de ce fichier et de cette icône dans le dossier 
+  <filename>Choices</filename>. Si l'un ou l'autre est déplacé, l'icône ne sera plus affichée.
+ </para>
+ <para>
+  Quand vous affectez une icône à un répertoire, vous avez la possibilité de copier cette icône 
+  dans le dossier lui-même, en tant que fichier caché. 
+  Les autres utilisateurs verront aussi cette icône, vous pouvez donc supprimer l'image originale 
+  après sa copie (notez que la taille de l'image est ajustée si nécessaire et convertie 
+  au format PNG).
  </para>
  <para>
   L'icône de dossier affichée dans la zone <guilabel>Faites glisser ici un fichier d'icône
@@ -2825,11 +2985,13 @@ dans le menu Fichier.
 contient des informations complémentaires sur l'application (voir ci-dessous).
 </para></listitem>
 
-<listitem><para>
-<filename>AppIcon.xpm</filename>
-est utilisée si <filename>.DirIcon</filename> est manquant (dans un but de compatibilité
-avec les anciennes versions).
-</para></listitem>
+<listitem>
+ <para>
+  <filename>AppIcon.xpm</filename>
+  est utilisée si <filename>.DirIcon</filename> est manquant (dans un but de compatibilité 
+  avec les anciennes versions ; n'est normalement plus utilisée dorénavant).
+ </para>
+</listitem>
 
 </itemizedlist>
 
@@ -3284,7 +3446,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	ROX-Filer a été créé par Thomas Leonard, avec l'aide de :
    </para>
    <para>
-	<simplelist columns='4'>
+	<simplelist columns='3'>
 	 <member>Christopher Arndt</member>
 	 <member>Jens Askengren</member>
 	 <member>Liav Asseraf</member>
@@ -3298,6 +3460,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Fabien Coutant</member>
 	 <member>Couderc Damien</member>
 	 <member>Andreas Dehmel</member>
+	 <member>Micah Dowty</member>
 	 <member>Dmitry Elfimov</member>
 	 <member>Mattias Engdegard</member>
 	 <member>Andrew Flegg</member>
@@ -3316,6 +3479,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Anders Lundmark</member>
 	 <member>Jose Romildo Malaquias</member>
 	 <member>Denis Manente</member>
+	 <member>Brendan McCarthy</member>
 	 <member>Andras Mohari</member>
 	 <member>Christiansen Merel</member>
 	 <member>Jimmy Olgeni</member>
@@ -3323,11 +3487,13 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Marcelo Ramos</member>
 	 <member>Michel Alexandre Salim</member>
 	 <member>Chris Sawer</member>
+	 <member>Christian Storgaard</member>
 	 <member>Taras</member>
 	 <member>Simon Truss</member>
 	 <member>Jan Wagemakers</member>
 	 <member>Stephen Watson</member>
 	 <member>Andre Wyrwa</member>
+	 <member>Geoff Youngs</member>
 	 <member>Diego Zamboni</member>
 	</simplelist>
 	</para>
@@ -3408,11 +3574,32 @@ Les méthodes suivantes sont reconnues :</para>
 
  <listitem>
   <para>
+   <function>PanelAdd</function>(<parameter>Side</parameter>, 
+	<parameter>Path</parameter>, [<parameter>Label</parameter>, 
+	<parameter>After</parameter>])
+	Ajoute <parameter>Path</parameter> au panneau sur le côté <parameter>Side</parameter>, 
+	avec le libellé <parameter>Label</parameter>. 
+	Si <parameter>After</parameter> est fixé à <userinput>true</userinput>, l'icône sera alignée 
+	à droite (ou en bas) du panneau, sinon à gauche (ou en haut).
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
    <function>Pinboard</function>([<parameter>Name</parameter>])
    Affiche sur le bureau le punaiseur nommé <parameter>Name</parameter>.
    <parameter>Name</parameter> peut être un nom stocké dans <filename>Choices</filename>
    (par exemple <userinput>MonPunaiseur</userinput>), ou un chemin complet.. S'il est
    omis, la fonction punaiseur est désactivée.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <function>PinboardAdd</function>(<parameter>Path</parameter>, 
+	<parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
+	Ajoute <parameter>Path</parameter> au punaiseur à la position 
+	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter>.
   </para>
  </listitem>
 
@@ -3511,6 +3698,11 @@ Les méthodes suivantes sont reconnues :</para>
 <bibliomixed>
   <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
   <ulink url="http://www.gtk.org"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+ <abbrev>libxml</abbrev><citetitle>The XML C library for Gnome
+ <ulink url="http://www.xmlsoft.org"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
