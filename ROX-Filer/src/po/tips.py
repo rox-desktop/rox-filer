@@ -9,10 +9,9 @@ class Parser(XMLParser):
 	data = ""
 
 	def unknown_starttag(self, tag, attrs):
-		if attrs.has_key('title'):
-			self.trans(attrs['title'])
-		if attrs.has_key('label'):
-			self.trans(attrs['label'])
+		for x in ['title', 'label', 'end']:
+			if attrs.has_key(x):
+				self.trans(attrs[x])
 		self.data = ""
 	
 	def handle_data(self, data):
