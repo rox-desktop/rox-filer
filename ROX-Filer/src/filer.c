@@ -727,6 +727,9 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 		return;
 	}
 
+	if (!item->image)
+		dir_update_item(filer_window->directory, item->leafname);
+
 	if (item->base_type == TYPE_DIRECTORY)
 	{
 		/* Never close a filer window when opening a directory
