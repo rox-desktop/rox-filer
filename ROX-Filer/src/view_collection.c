@@ -139,7 +139,6 @@ static void make_item_iter(ViewCollection *vc, ViewIter *iter, int i);
 
 static void view_collection_sort(ViewIface *view);
 static void view_collection_style_changed(ViewIface *view, int flags);
-static gboolean view_collection_autoselect(ViewIface *view, const gchar *leaf);
 static void view_collection_add_items(ViewIface *view, GPtrArray *items);
 static void view_collection_update_items(ViewIface *view, GPtrArray *items);
 static void view_collection_delete_if(ViewIface *view,
@@ -672,7 +671,6 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	/* override stuff */
 	iface->sort = view_collection_sort;
 	iface->style_changed = view_collection_style_changed;
-	iface->autoselect = view_collection_autoselect;
 	iface->add_items = view_collection_add_items;
 	iface->update_items = view_collection_update_items;
 	iface->delete_if = view_collection_delete_if;
@@ -1023,29 +1021,6 @@ static void view_collection_sort(ViewIface *view)
 
 	collection_qsort(view_collection->collection, sort_fn(filer_window),
 			filer_window->sort_order);
-}
-
-static gboolean view_collection_autoselect(ViewIface *view, const gchar *leaf)
-{
-	ViewCollection *view_collection = VIEW_COLLECTION(view);
-	Collection	*col = view_collection->collection;
-	int		i;
-
-	for (i = 0; i < col->number_of_items; i++)
-	{
-		DirItem *item = (DirItem *) col->items[i].data;
-
-		if (strcmp(item->leafname, leaf) == 0)
-		{
-			if (col->cursor_item != -1)
-				collection_set_cursor_item(col, i, TRUE);
-			else
-				collection_wink_item(col, i);
-			return TRUE;
-		}
-	}
-
-	return FALSE;
 }
 
 static void view_collection_add_items(ViewIface *view, GPtrArray *items)

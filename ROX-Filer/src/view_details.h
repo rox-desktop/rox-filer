@@ -33,6 +33,10 @@ struct _ViewDetails {
 
 	int	    cursor_base;	/* Cursor when minibuffer opened */
 
+	int	    wink_item;		/* -1 => not winking */
+	gint	    wink_timeout;
+	int	    wink_step;
+
 	int	    can_change_selection;
 
 	GtkRequisition desired_size;

@@ -57,7 +57,6 @@ struct _ViewIfaceClass {
 
 	void (*sort)(ViewIface *obj);
 	void (*style_changed)(ViewIface *obj, int flags);
-	gboolean (*autoselect)(ViewIface *obj, const gchar *leaf);
 	void (*add_items)(ViewIface *obj, GPtrArray *items);
 	void (*update_items)(ViewIface *obj, GPtrArray *items);
 	void (*delete_if)(ViewIface *obj,

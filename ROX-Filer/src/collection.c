@@ -38,7 +38,7 @@
 #define MIN_HEIGHT 60
 #define MINIMUM_ITEMS 16
 
-#define MAX_WINKS 3		/* Should be an odd number */
+#define MAX_WINKS 5		/* Should be an odd number */
 
 /* Macro to emit the "selection_changed" signal only if allowed */
 #define EMIT_SELECTION_CHANGED(collection, time) \

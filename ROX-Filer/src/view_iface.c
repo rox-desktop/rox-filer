@@ -26,6 +26,7 @@
 #include "global.h"
 
 #include "view_iface.h"
+#include "diritem.h"
 
 /* A word about interfaces:
  *
@@ -122,10 +123,27 @@ void view_style_changed(ViewIface *obj, int flags)
  */
 gboolean view_autoselect(ViewIface *obj, const gchar *leaf)
 {
+	DirItem *item;
+	ViewIter iter;
+
 	g_return_val_if_fail(VIEW_IS_IFACE(obj), FALSE);
 	g_return_val_if_fail(leaf != NULL, FALSE);
 
-	return VIEW_IFACE_GET_CLASS(obj)->autoselect(obj, leaf);
+	view_get_iter(obj, &iter, 0);
+	while ((item = iter.next(&iter)))
+	{
+		if (strcmp(item->leafname, leaf) != 0)
+			continue;
+
+		if (view_cursor_visible(obj))
+			view_cursor_to_iter(obj, &iter);
+		else
+			view_wink_item(obj, &iter);
+
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 /* Scanning has turned up some new items... */

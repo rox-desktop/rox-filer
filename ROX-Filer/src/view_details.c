@@ -73,7 +73,6 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data);
 
 static void view_details_sort(ViewIface *view);
 static void view_details_style_changed(ViewIface *view, int flags);
-static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf);
 static void view_details_add_items(ViewIface *view, GPtrArray *items);
 static void view_details_update_items(ViewIface *view, GPtrArray *items);
 static void view_details_delete_if(ViewIface *view,
@@ -135,6 +134,7 @@ static gboolean get_selected(ViewDetails *view_details, int i);
 static void free_view_item(ViewItem *view_item);
 static void details_update_header_visibility(ViewDetails *view_details);
 static void set_lasso(ViewDetails *view_details, int x, int y);
+static void cancel_wink(ViewDetails *view_details);
 
 
 /****************************************************************
@@ -765,7 +765,7 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 	GtkTreePath *path = NULL;
 	GdkRectangle focus_rectangle;
 	ViewDetails *view_details = (ViewDetails *) widget;
-	gboolean     had_cursor;
+	gboolean    had_cursor;
 
 	had_cursor = (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS) != 0;
 	
@@ -798,9 +798,33 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 
 		if (width && height)
 			gdk_draw_rectangle(event->window,
-				GTK_WIDGET(view_details)->style->
-					fg_gc[GTK_STATE_NORMAL],
+				widget->style->fg_gc[GTK_STATE_NORMAL],
 				FALSE, x, y, width - 1, height - 1);
+	}
+
+	if (view_details->wink_item != -1 && view_details->wink_step & 1)
+	{
+		GtkTreePath *wink_path;
+		GdkRectangle wink_area;
+
+		wink_path = gtk_tree_path_new();
+		gtk_tree_path_append_index(wink_path, view_details->wink_item);
+		gtk_tree_view_get_background_area(tree, wink_path,
+					NULL, &wink_area);
+		gtk_tree_path_free(wink_path);
+
+		if (wink_area.height)
+		{
+			/* (visible) */
+			wink_area.width = widget->allocation.width;
+			gdk_draw_rectangle(event->window,
+				widget->style->fg_gc[GTK_STATE_NORMAL],
+					FALSE,
+					wink_area.x + 1,
+					wink_area.y + 1,
+					wink_area.width - 3,
+					wink_area.height - 3);
+		}
 	}
 
 	gtk_tree_view_get_cursor(tree, &path, NULL);
@@ -848,9 +872,12 @@ static void view_details_drag_data_received(GtkWidget *widget,
 	/* Just here to override annoying default handler */
 }
 
-static void view_details_destroy(GtkObject *view_details)
+static void view_details_destroy(GtkObject *obj)
 {
-	VIEW_DETAILS(view_details)->filer_window = NULL;
+	ViewDetails *view_details = VIEW_DETAILS(obj);
+
+	view_details->filer_window = NULL;
+	cancel_wink(view_details);
 }
 
 static void view_details_finialize(GObject *object)
@@ -932,6 +959,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	view_details->items = g_ptr_array_new();
 	view_details->cursor_base = -1;
+	view_details->wink_item = -1;
 	view_details->desired_size.width = -1;
 	view_details->desired_size.height = -1;
 	view_details->can_change_selection = 0;
@@ -984,7 +1012,6 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 	/* override stuff */
 	iface->sort = view_details_sort;
 	iface->style_changed = view_details_style_changed;
-	iface->autoselect = view_details_autoselect;
 	iface->add_items = view_details_add_items;
 	iface->update_items = view_details_update_items;
 	iface->delete_if = view_details_delete_if;
@@ -1065,6 +1092,7 @@ static void resort(ViewDetails *view_details)
 	gint i, len = view_details->items->len;
 	guint *new_order;
 	GtkTreePath *path;
+	int wink_item = view_details->wink_item;
 
 	if (!len)
 		return;
@@ -1090,7 +1118,13 @@ static void resort(ViewDetails *view_details)
 
 	new_order = g_new(guint, len);
 	for (i = len - 1; i >= 0; i--)
+	{
 		new_order[i] = items[i]->old_pos;
+		if (wink_item == items[i]->old_pos)
+			wink_item = i;
+	}
+
+	view_details->wink_item = wink_item;
 
 	path = gtk_tree_path_new();
 	gtk_tree_model_rows_reordered((GtkTreeModel *) view_details,
@@ -1103,11 +1137,6 @@ static void view_details_sort(ViewIface *view)
 {
 	resort((ViewDetails *) view);
 	gtk_tree_sortable_sort_column_changed((GtkTreeSortable *) view);
-}
-
-static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf)
-{
-	return FALSE;
 }
 
 static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
@@ -1456,9 +1485,66 @@ static void view_details_set_frozen(ViewIface *view, gboolean frozen)
 {
 }
 
+static void redraw_wink_area(ViewDetails *view_details)
+{
+	GtkTreePath *wink_path;
+	GdkRectangle wink_area;
+	GtkTreeView *tree = (GtkTreeView *) view_details;
+
+	g_return_if_fail(view_details->wink_item >= 0);
+
+	wink_path = gtk_tree_path_new();
+	gtk_tree_path_append_index(wink_path, view_details->wink_item);
+	gtk_tree_view_get_background_area(tree, wink_path, NULL, &wink_area);
+	gtk_tree_path_free(wink_path);
+
+	if (wink_area.height)
+	{
+		GdkWindow *window;
+		window = gtk_tree_view_get_bin_window(tree);
+
+		wink_area.width = GTK_WIDGET(tree)->allocation.width;
+		gdk_window_invalidate_rect(window, &wink_area, FALSE);
+	}
+}
+
+static void cancel_wink(ViewDetails *view_details)
+{
+	if (view_details->wink_item == -1)
+		return;
+
+	if (view_details->filer_window)
+		redraw_wink_area(view_details);
+
+	view_details->wink_item = -1;
+	g_source_remove(view_details->wink_timeout);
+}
+
+static gboolean wink_timeout(ViewDetails *view_details)
+{
+	view_details->wink_step--;
+	if (view_details->wink_step < 1)
+	{
+		cancel_wink(view_details);
+		return FALSE;
+	}
+
+	redraw_wink_area(view_details);
+
+	return TRUE;
+}
+
 static void view_details_wink_item(ViewIface *view, ViewIter *iter)
 {
-	/* TODO */
+	ViewDetails *view_details = (ViewDetails *) view;
+
+	cancel_wink(view_details);
+
+	view_details->wink_item = iter->i;
+	view_details->wink_timeout = g_timeout_add(70,
+			(GSourceFunc) wink_timeout, view_details);
+	view_details->wink_step = 7;
+	redraw_wink_area(view_details);
 }
 
 static void view_details_autosize(ViewIface *view)
