@@ -166,3 +166,38 @@ char *group_name(gid_t gid)
 	g_string_free(tmp, FALSE);
 	return retval;
 }
+
+/* Return a string in the form '23Mb' in a static buffer valid until
+ * the next call.
+ */
+char *format_size(unsigned long size)
+{
+	static	char *buffer = NULL;
+	char	*units;
+	
+	if (size >= 2048)
+	{
+		size >>= 10;
+		if (size >= 2048)
+		{
+			size >>= 10;
+			if (size >= 2048)
+			{
+				size >>= 10;
+				units = "Gb";
+			}
+			else
+				units = "Mb";
+		}
+		else
+			units = "K";
+	}
+	else
+		units = "bytes";
+
+	if (buffer)
+		g_free(buffer);
+	buffer = g_strdup_printf("%ld %s", size, units);
+
+	return buffer;
+}

@@ -53,6 +53,7 @@ struct _GUIside
 	GtkWidget 	*log, *window, *actions;
 	int		child;		/* Process ID */
 	int		errors;
+	gboolean	show_info;	/* For Disk Usage */
 };
 
 /* These don't need to be in a structure because we fork() before
@@ -64,6 +65,7 @@ static gboolean	quiet = FALSE;
 static GString  *message = NULL;
 static char     *action_dest = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
+static size_t	size_tally;	/* For Disk Usage */
 
 /* Static prototypes */
 static gboolean send();
@@ -133,7 +135,7 @@ static void message_from_child(gpointer 	 data,
 
 		g_string_free(report, TRUE);
 	}
-	else
+	else if (gui_side->show_info == FALSE)
 		gtk_widget_destroy(gui_side->window);
 }
 
@@ -270,7 +272,7 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
 	int		child;
-	GtkWidget	*vbox, *button, *control;
+	GtkWidget	*vbox, *button, *control, *hbox, *scrollbar;
 
 	if (pipe(filedes))
 	{
@@ -312,6 +314,7 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 	gui_side->log = NULL;
 	gui_side->child = child;
 	gui_side->errors = 0;
+	gui_side->show_info = FALSE;
 
 	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 500, 100);
@@ -321,8 +324,13 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 	vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
 
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+
 	gui_side->log = gtk_text_new(NULL, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), gui_side->log, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gui_side->log, TRUE, TRUE, 0);
+	scrollbar = gtk_vscrollbar_new(GTK_TEXT(gui_side->log)->vadj);
+	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 
 	gui_side->actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->actions, FALSE, TRUE, 0);
@@ -372,6 +380,36 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 /* These may call themselves recursively, or ask questions, etc.
  * TRUE iff the directory containing dest_path needs to be rescanned.
  */
+
+/* dest_path is the dir containing src_path.
+ * Updates the global size_tally.
+ */
+static gboolean do_usage(char *src_path, char *dest_path)
+{
+	struct 		stat info;
+
+	if (lstat(src_path, &info))
+	{
+		g_string_sprintf(message, "'%s:\n", src_path);
+		send();
+		send_error();
+		return FALSE;
+	}
+
+	if (S_ISREG(info.st_mode))
+		size_tally += info.st_size;
+	else if (S_ISDIR(info.st_mode))
+	{
+		char *safe_path;
+		safe_path = g_strdup(src_path);
+		g_string_sprintf(message, "'Scanning in '%s'\n", safe_path);
+		send();
+		for_dir_contents(do_usage, safe_path, safe_path);
+		g_free(safe_path);
+	}
+
+	return FALSE;
+}
 
 /* dest_path is the dir containing src_path */
 static gboolean do_delete(char *src_path, char *dest_path)
@@ -642,6 +680,37 @@ static gboolean do_link(char *path, char *dest)
 
 /* After forking, the child calls one of these functions */
 
+static void usage_cb(gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
+	Collection *collection = filer_window->collection;
+	FileItem   *item;
+	int	left = collection->number_selected;
+	int	i = -1;
+	off_t	total_size = 0;
+
+	while (left > 0)
+	{
+		i++;
+		if (!collection->items[i].selected)
+			continue;
+		item = (FileItem *) collection->items[i].data;
+		size_tally = 0;
+		do_usage(make_path(filer_window->path, item->leafname)->str,
+					filer_window->path);
+		g_string_sprintf(message, "'%s: %s\n",
+				item->leafname,
+				format_size((unsigned long) size_tally));
+		send();
+		total_size += size_tally;
+		left--;
+	}
+	
+	g_string_sprintf(message, "'\nTotal: %s\n",
+			format_size((unsigned long) total_size));
+	send();
+}
+
 static void delete_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
@@ -689,6 +758,32 @@ static void list_cb(gpointer data)
 }
 
 /*			EXTERNAL INTERFACE			*/
+
+/* Count disk space used by selected items */
+void action_usage(FilerWindow *filer_window)
+{
+	GUIside		*gui_side;
+	Collection 	*collection;
+
+	collection = window_with_focus->collection;
+
+	if (collection->number_selected < 1)
+	{
+		report_error("ROX-Filer", "You need to select some items "
+				"to count");
+		return;
+	}
+
+	gui_side = start_action(filer_window, usage_cb);
+	if (!gui_side)
+		return;
+
+	gui_side->show_info = TRUE;
+
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Disk Usage");
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
+}
 
 /* Deletes all selected items in the window */
 void action_delete(FilerWindow *filer_window)

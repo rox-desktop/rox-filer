@@ -21,5 +21,6 @@ int spawn_full(char **argv, char *dir, SpawnFlags flags);
 void debug_free_string(void *data);
 char *user_name(uid_t uid);
 char *group_name(gid_t gid);
+char *format_size(unsigned long size);
 
 #endif /* _SUPPORT_H */

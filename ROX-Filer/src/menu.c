@@ -76,6 +76,7 @@ static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
+static void usage(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -138,7 +139,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/File/Mount",	    		"M",  	mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
-{"/File/Disk Usage",	    	C_"U", 	not_yet, 0, NULL},
+{"/File/Disk Usage",	    	"U", 	usage, 0, NULL},
 {"/File/Permissions",		NULL,   not_yet, 0, NULL},
 {"/File/Touch",    		NULL,   not_yet, 0, NULL},
 {"/File/Find",			NULL,   not_yet, 0, NULL},
@@ -459,6 +460,13 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	action_delete(window_with_focus);
 }
 
+static void usage(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	action_usage(window_with_focus);
+}
+
 static gboolean copy_cb(char *initial, char *path)
 {
 	char	*new_dir, *slash;
@@ -638,7 +646,17 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Size:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	g_string_sprintf(gstring, "%ld", info.st_size);
+	if (info.st_size >=2048)
+	{
+		g_string_sprintf(gstring, "%s (%ld bytes)",
+				format_size((unsigned long) info.st_size),
+				(unsigned long) info.st_size);
+	}
+	else
+	{
+		g_string_sprintf(gstring, "%ld bytes",
+				(unsigned long) info.st_size);
+	}
 	label = gtk_label_new(gstring->str);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
