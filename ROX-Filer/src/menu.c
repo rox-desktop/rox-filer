@@ -788,7 +788,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 						: _("(bad utf-8)"));
 				if (!can_set_run_action(file_item))
 					menu_set_items_shaded(filer_file_menu,
-							TRUE, 6, 1);
+							TRUE, 9, 1);
 				break;
 			default:
 				shade_file_menu_items(TRUE);

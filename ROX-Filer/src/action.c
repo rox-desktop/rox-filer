@@ -923,15 +923,28 @@ static void do_eject(const char *path)
 	else if (!o_brief)
 		printf_send(_("'Eject '%s'\n"), path);
 
-	argv[0]="eject";
-	argv[1]=path;
-	argv[2]=NULL;
-	err=fork_exec_wait(argv);
+	/* Need to close all sub-directories now, or we
+	 * can't unmount if dnotify is used.
+	 */
+	{
+		char c = '?';
+		printf_send("X%s", path);
+		/* Wait until it's safe... */
+		read(from_parent, &c, 1);
+		g_return_if_fail(c == 'X');
+	}
+
+	argv[0] = "eject";
+	argv[1] = path;
+	argv[2] = NULL;
+	err = fork_exec_wait(argv);
 	if (err)
 	{
 		printf_send(_("!%s\neject failed\n"), err);
 		g_free(err);
 	}
+
+	printf_send("M%s", path);
 
 }
 
