@@ -80,5 +80,6 @@ void update_dir(FilerWindow *filer_window);
 void scan_dir(FilerWindow *filer_window);
 FileItem *selected_item(Collection *collection);
 void refresh_dirs(char *path);
+void change_to_parent(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

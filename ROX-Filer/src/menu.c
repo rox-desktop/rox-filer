@@ -2,7 +2,21 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 1999, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
 /* menu.c - code for handling the popup menu */
@@ -68,7 +82,11 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void show_options(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
+
+static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
+static void new_window(gpointer data, guint action, GtkWidget *widget);
+static void close_window(gpointer data, guint action, GtkWidget *widget);
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
@@ -129,7 +147,11 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Options...",			NULL,   show_options, 0, NULL},
 {"/New directory",		NULL,   new_directory, 0, NULL},
 {"/Xterm here",			NULL,  	xterm_here, 0, NULL},
-{"/Open parent",		NULL,   open_parent, 0, NULL},
+{"/Window",			NULL,  	NULL, 0, "<Branch>"},
+{"/Window/Parent, new window",	NULL,   open_parent, 0, NULL},
+{"/Window/Parent, same window",	NULL,   open_parent_same, 0, NULL},
+{"/Window/New window",		NULL,   new_window, 0, NULL},
+{"/Window/Close window",	C_"Q",  close_window, 0, NULL},
 };
 
 static GtkItemFactoryEntry panel_menu_def[] = {
@@ -651,7 +673,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
-	g_string_sprintf(gstring, "%o", info.st_mode);
+	g_string_sprintf(gstring, "%o", (unsigned int) info.st_mode);
 	label = gtk_label_new(gstring->str);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);
@@ -901,6 +923,27 @@ static void open_parent(gpointer data, guint action, GtkWidget *widget)
 
 	filer_opendir(make_path(window_with_focus->path, "/..")->str,
 			FALSE, BOTTOM);
+}
+
+static void open_parent_same(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	change_to_parent(window_with_focus);
+}
+
+static void new_window(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_opendir(window_with_focus->path, FALSE, BOTTOM);
+}
+
+static void close_window(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	gtk_widget_destroy(window_with_focus->window);
 }
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
