@@ -133,6 +133,12 @@ static gboolean panel_drag_motion(GtkWidget	*widget,
                             gint		y,
                             guint		time,
 			    Panel		*panel);
+static gboolean insert_drag_motion(GtkWidget	*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    Panel		*panel);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -180,6 +186,7 @@ static GType panel_icon_get_type(void);
 static gboolean panel_want_show_text(PanelIcon *pi);
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel);
 static void panel_style_changed(void);
+static void motion_may_raise(Panel *panel, int x, int y);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -946,8 +953,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 	const char	*type = NULL;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
+	int		panel_x, panel_y;
 
-	panel_drag_motion(widget, context, x, y, time, pi->panel);
+	gdk_window_get_pointer(pi->panel->window->window,
+				&panel_x, &panel_y, NULL);
+	motion_may_raise(pi->panel, panel_x, panel_y);
 
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */
@@ -1147,7 +1157,7 @@ static GtkWidget *make_insert_frame(Panel *panel)
 	gtk_widget_set_size_request(frame, 16, 16);
 
 	g_signal_connect(frame, "drag-motion",
-			G_CALLBACK(panel_drag_motion), panel);
+			G_CALLBACK(insert_drag_motion), panel);
 	g_signal_connect(frame, "drag-leave",
 			G_CALLBACK(panel_drag_leave), panel);
 
@@ -1835,7 +1845,23 @@ static gboolean panel_drag_motion(GtkWidget	*widget,
 
 	motion_may_raise(panel, panel_x, panel_y);
 	gdk_drag_status(context, 0, time);
+
 	return TRUE;
+}
+
+static gboolean insert_drag_motion(GtkWidget	*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    Panel		*panel)
+{
+	int panel_x, panel_y;
+
+	gdk_window_get_pointer(panel->window->window, &panel_x, &panel_y, NULL);
+	motion_may_raise(panel, panel_x, panel_y);
+
+	return FALSE;
 }
 
 /* Note: also called from icon handler */
