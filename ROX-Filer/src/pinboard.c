@@ -1479,7 +1479,7 @@ static gboolean bg_expose(GtkWidget *widget,
 
 	gdk_region_get_clipbox(event->region, &clipbox);
 
-	double_buffer = clipbox.width < 100 && clipbox.height < 100;
+	double_buffer = (clipbox.width * clipbox.height) < 20000;
 	if (double_buffer)
 		gdk_window_begin_paint_region(widget->window, event->region);
 

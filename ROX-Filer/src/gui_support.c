@@ -1019,11 +1019,15 @@ void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 static gint simple_image_expose(GtkWidget *widget, GdkEventExpose *event)
 {
 	SimpleImage *image = (SimpleImage *) widget;
+	int x;
 	
 	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
+
+	x = widget->allocation.x +
+		(widget->allocation.width - image->width) / 2;
 	
 	render_pixbuf(image->pixbuf, widget->window, widget->style->black_gc,
-			widget->allocation.x, widget->allocation.y,
+			x, widget->allocation.y,
 			image->width, image->height);
 			
 	gdk_gc_set_clip_region(widget->style->black_gc, NULL);
