@@ -53,10 +53,15 @@
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
+typedef enum {BACKDROP_CENTRE, BACKDROP_SCALE, BACKDROP_TILE} BackdropStyle;
+
 struct _Pinboard {
 	guchar		*name;		/* Leaf name */
 	GList		*icons;
 	GtkStyle	*style;
+
+	BackdropStyle	backdrop_style;
+	gchar		*backdrop;	/* Pathname */
 
 	GtkWidget	*window;	/* Screen-sized window */
 	GtkWidget	*fixed;
@@ -178,6 +183,7 @@ static void pin_icon_destroyed(PinIcon *pi);
 static void pin_icon_set_tip(PinIcon *pi);
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi);
 static void create_pinboard_window(Pinboard *pinboard);
+static void reload_backdrop(Pinboard *pinboard);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -245,6 +251,7 @@ void pinboard_activate(const gchar *name)
 	current_pinboard->name = g_strdup(name);
 	current_pinboard->icons = NULL;
 	current_pinboard->window = NULL;
+	current_pinboard->backdrop = NULL;
 
 	create_pinboard_window(current_pinboard);
 
@@ -257,6 +264,7 @@ void pinboard_activate(const gchar *name)
 		{
 			pinboard_load_from_xml(doc);
 			xmlFreeDoc(doc);
+			reload_backdrop(current_pinboard);
 		}
 		else
 		{
@@ -410,7 +418,43 @@ void pinboard_reshape_icon(Icon *icon)
 	gdk_window_resize(pi->win->window, pi->width, pi->height);
 	offset_from_centre(pi, pi->width, pi->height, &x, &y);
 	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
-	gtk_widget_queue_draw(pi->win);
+	gtk_widget_queue_draw(current_pinboard->fixed);
+}
+
+/* Use this icon / program as the backdrop for the current pinboard.
+ * If no pinboard is in use, activates 'Default'.
+ */
+void pinboard_set_backdrop(const gchar *path)
+{
+	int	type;
+
+	type = get_choice(_("Set backdrop"),
+		_("How should this image be displayed?"),
+		4,
+		GTK_STOCK_CANCEL, _("Centred"), _("_Scaled"), _("Tiled"));
+
+	if (type < 1)
+		return;
+	
+	if (!current_pinboard)
+	{
+		pinboard_activate("Default");
+		delayed_error(_("No pinboard was in use... the 'Default' "
+			"pinboard has been selected. Use 'rox -p=Default' to "
+			"turn it on in future."));
+	}
+
+	g_return_if_fail(current_pinboard != NULL);
+
+	g_free(current_pinboard->backdrop);
+	current_pinboard->backdrop = NULL;
+
+	current_pinboard->backdrop = g_strdup(path);
+	current_pinboard->backdrop_style = type == 1 ? BACKDROP_CENTRE :
+				 	   type == 2 ? BACKDROP_SCALE :
+						       BACKDROP_TILE;
+	reload_backdrop(current_pinboard);
+	pinboard_save();
 }
 
 
@@ -468,6 +512,7 @@ static void set_size_and_style(PinIcon *pi)
 		memcpy(&pinicon_style->bg[GTK_STATE_NORMAL],
 			&text_bg_col, sizeof(GdkColor));
 	}
+	/* XXX */
 #if 0
 	gtk_widget_set_style(pi->widget, pinicon_style);
 #endif
@@ -713,6 +758,27 @@ static gint icon_motion_notify(GtkWidget *widget,
 	return FALSE;
 }
 
+static void backdrop_from_xml(xmlNode *node)
+{
+	gchar *style;
+
+	g_free(current_pinboard->backdrop);
+	current_pinboard->backdrop = xmlNodeGetContent(node);
+
+	style = xmlGetProp(node, "style");
+
+	if (style)
+	{
+		current_pinboard->backdrop_style =
+			g_strcasecmp(style, "Tiled")  == 0 ? BACKDROP_TILE :
+			g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
+							     BACKDROP_CENTRE;
+		g_free(style);
+	}
+	else
+		current_pinboard->backdrop_style = BACKDROP_TILE;
+}
+
 /* Create one pinboard icon for each icon in the doc */
 static void pinboard_load_from_xml(xmlDocPtr doc)
 {
@@ -726,6 +792,11 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 	{
 		if (node->type != XML_ELEMENT_NODE)
 			continue;
+		if (strcmp(node->name, "backdrop") == 0)
+		{
+			backdrop_from_xml(node);
+			continue;
+		}
 		if (strcmp(node->name, "icon") != 0)
 			continue;
 
@@ -792,61 +863,6 @@ static const char *pin_from_file(gchar *line)
 	return NULL;
 }
 
-/* Make sure that clicks and drops on the root window come to us...
- * False if an error occurred (ie, someone else is using it).
- */
-#if 0
-static gboolean add_root_handlers(void)
-{
-	GdkWindow	*root;
-
-	if (!proxy_invisible)
-	{
-		win_button_proxy = gdk_atom_intern("_WIN_DESKTOP_BUTTON_PROXY",
-						   FALSE);
-		proxy_invisible = gtk_invisible_new();
-		gtk_widget_show(proxy_invisible);
-		/*
-		gdk_window_add_filter(proxy_invisible->window,
-					proxy_filter, NULL);
-					*/
-
-		g_signal_connect(proxy_invisible, "property_notify_event",
-				G_CALLBACK(root_property_event), NULL);
-		g_signal_connect(proxy_invisible, "button_press_event",
-				G_CALLBACK(root_button_press), NULL);
-
-		/* Drag and drop handlers */
-		drag_set_pinboard_dest(proxy_invisible);
-		g_signal_connect(proxy_invisible, "drag_motion",
-				G_CALLBACK(bg_drag_motion), NULL);
-		g_signal_connect(proxy_invisible, "drag_leave",
-				G_CALLBACK(bg_drag_leave), NULL);
-	}
-
-	root = gdk_window_lookup(GDK_ROOT_WINDOW());
-	if (!root)
-		root = gdk_window_foreign_new(GDK_ROOT_WINDOW());
-		
-	if (!setup_xdnd_proxy(GDK_ROOT_WINDOW(), proxy_invisible->window))
-		return FALSE;
-
-	/* Forward events from the root window to our proxy window */
-	gdk_window_add_filter(gdk_get_default_root_window(),
-			      proxy_filter, NULL);
-	gdk_window_set_user_data(gdk_get_default_root_window(),
-				 proxy_invisible);
-	gdk_window_set_events(gdk_get_default_root_window(),
-			gdk_window_get_events(gdk_get_default_root_window()) |
-				GDK_EXPOSURE_MASK |
-				GDK_PROPERTY_CHANGE_MASK);
-
-	forward_root_clicks();
-	
-	return TRUE;
-}
-#endif
-
 /* Write the current state of the pinboard to the current pinboard file */
 static void pinboard_save(void)
 {
@@ -876,6 +892,19 @@ static void pinboard_save(void)
 	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "pinboard", NULL));
 
 	root = xmlDocGetRootElement(doc);
+
+	if (current_pinboard->backdrop)
+	{
+		BackdropStyle style = current_pinboard->backdrop_style;
+		xmlNodePtr tree;
+
+		tree = xmlNewTextChild(root, NULL, "backdrop",
+				current_pinboard->backdrop);
+		xmlSetProp(tree, "style",
+			style == BACKDROP_TILE   ? "Tiled" :
+			style == BACKDROP_CENTRE ? "Centred" :
+						   "Scaled");
+	}
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
@@ -1405,28 +1434,92 @@ static void create_pinboard_window(Pinboard *pinboard)
 
 	gtk_widget_add_events(win,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
-			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK |
 			GDK_EXPOSURE_MASK);
 	g_signal_connect(win, "button-press-event",
 			G_CALLBACK(button_press_event), NULL);
 	g_signal_connect(win, "button-release-event",
 			G_CALLBACK(button_release_event), NULL);
-#if 0
-	g_signal_connect(pi->widget, "motion-notify-event",
-			G_CALLBACK(root_motion), pi);
-	g_signal_connect(pi->widget, "expose-event",
-			G_CALLBACK(draw_icon), pi);
-	g_signal_connect_swapped(pi->win, "destroy",
-			G_CALLBACK(pin_icon_destroyed), pi);
-#endif
+	g_signal_connect(win, "expose_event", G_CALLBACK(bg_expose), NULL);
 
 	/* Drag and drop handlers */
 	drag_set_pinboard_dest(win);
 	g_signal_connect(win, "drag_motion", G_CALLBACK(bg_drag_motion), NULL);
 	g_signal_connect(win, "drag_leave", G_CALLBACK(bg_drag_leave), NULL);
-	g_signal_connect(win, "expose_event", G_CALLBACK(bg_expose), NULL);
 
 	gtk_widget_show_all(win);
 	gdk_window_lower(win->window);
+}
+
+static void reload_backdrop(Pinboard *pinboard)
+{
+	GtkStyle *style;
+
+	style = gtk_style_copy(gtk_widget_get_style(pinboard->window));
+
+	if (style->bg_pixmap[GTK_STATE_NORMAL])
+	{
+		g_object_unref(style->bg_pixmap[GTK_STATE_NORMAL]);
+		style->bg_pixmap[GTK_STATE_NORMAL] = NULL;
+	}
+
+	if (pinboard->backdrop)
+	{
+		GdkPixbuf *pixbuf;
+		GError *error = NULL;
+		
+		pixbuf = gdk_pixbuf_new_from_file(pinboard->backdrop, &error);
+		if (error)
+		{
+			delayed_error(_("Error loading backdrop image:\n%s"),
+					error->message);
+			g_error_free(error);
+		}
+		else
+		{
+			GdkPixmap *pixmap;
+			
+			if (pinboard->backdrop_style == BACKDROP_SCALE)
+			{
+				GdkPixbuf *old = pixbuf;
+
+				pixbuf = gdk_pixbuf_scale_simple(old,
+						screen_width, screen_height,
+						GDK_INTERP_HYPER);
+				
+				g_object_unref(old);
+			}
+			else if (pinboard->backdrop_style == BACKDROP_CENTRE)
+			{
+				GdkPixbuf *old = pixbuf;
+				int	  x, y, width, height;
+
+				width = gdk_pixbuf_get_width(pixbuf);
+				height = gdk_pixbuf_get_height(pixbuf);
+
+				pixbuf = gdk_pixbuf_new(
+					gdk_pixbuf_get_colorspace(pixbuf), 0,
+					8, screen_width, screen_height);
+				gdk_pixbuf_fill(pixbuf, 0);
+
+				x = (screen_width - width) / 2;
+				y = (screen_height - height) / 2;
+
+				gdk_pixbuf_composite(old, pixbuf,
+					x, y, width, height,
+					x, y, 1, 1,
+					GDK_INTERP_NEAREST, 255);
+				g_object_unref(old);
+			}
+
+			gdk_pixbuf_render_pixmap_and_mask(pixbuf,
+				&pixmap, NULL, 0);
+			g_object_unref(pixbuf);
+
+			style->bg_pixmap[GTK_STATE_NORMAL] = pixmap;
+		}
+	}
+	
+	gtk_widget_set_style(pinboard->window, style);
+	g_object_unref(style);
+	gtk_widget_queue_draw(pinboard->window);
 }

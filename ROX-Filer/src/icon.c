@@ -52,6 +52,7 @@
 #include "mount.h"
 #include "type.h"
 #include "usericons.h"
+#include "pinboard.h"	/* For pinboard_set_backdrop */
 
 static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 
@@ -96,6 +97,7 @@ enum {
 	ACTION_INFO,
 	ACTION_RUN_ACTION,
 	ACTION_SET_ICON,
+	ACTION_BACKDROP,
 	ACTION_EDIT,
 	ACTION_LOCATION,
 };
@@ -113,6 +115,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {">" N_("Info"),    		NULL, file_op, ACTION_INFO, NULL},
 {">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, NULL},
 {">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
+{">" N_("Use for Backdrop"),	NULL, file_op, ACTION_BACKDROP, NULL},
 {N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, NULL},
 {N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, NULL},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
@@ -221,7 +224,7 @@ void icon_prepare_menu(Icon *icon)
 		guchar *tmp;
 
 		menu_set_items_shaded(icon_menu, FALSE, 1, 3);
-		menu_set_items_shaded(icon_file_menu, FALSE, 0, 5);
+		menu_set_items_shaded(icon_file_menu, FALSE, 0, 6);
 		if (!can_set_run_action(icon->item))
 			menu_set_items_shaded(icon_file_menu, TRUE, 3, 1);
 
@@ -237,7 +240,7 @@ void icon_prepare_menu(Icon *icon)
 	else
 	{
 		menu_set_items_shaded(icon_menu, TRUE, 1, 3);
-		menu_set_items_shaded(icon_file_menu, TRUE, 0, 5);
+		menu_set_items_shaded(icon_file_menu, TRUE, 0, 6);
 		gtk_label_set_text(GTK_LABEL(icon_file_item), _("Nothing"));
 	}
 }
@@ -557,6 +560,9 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 		case ACTION_SET_ICON:
 			icon_set_handler_dialog(menu_icon->item,
 						menu_icon->path);
+			break;
+		case ACTION_BACKDROP:
+			pinboard_set_backdrop(menu_icon->path);
 			break;
 	}
 }

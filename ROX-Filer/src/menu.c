@@ -69,6 +69,7 @@ typedef enum {
 	FILE_SHOW_FILE_INFO,
 	FILE_RUN_ACTION,
 	FILE_SET_ICON,
+	FILE_BACKDROP,
 	FILE_SEND_TO,
 	FILE_DELETE,
 	FILE_USAGE,
@@ -212,6 +213,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
 {">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, NULL},
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
+{">" N_("Use for Backdrop"),	NULL, file_op, FILE_BACKDROP, NULL},
 {">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
@@ -364,7 +366,7 @@ void menuitem_no_shortcuts(GtkWidget *item)
  
 static void items_sensitive(gboolean state)
 {
-	int	n = 9;
+	int	n = 10;
 	GList	*items, *item;
 
 	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
@@ -1711,6 +1713,9 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			case FILE_SET_ICON:
 				prompt = _("Set icon for ... ?");
 				break;
+			case FILE_BACKDROP:
+				prompt = _("Use ... for backdrop ?");
+				break;
 			case FILE_SEND_TO:
 				prompt = _("Send ... to ... ?");
 				break;
@@ -1812,6 +1817,9 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			break;
 		case FILE_SET_ICON:
 			icon_set_handler_dialog(item, path);
+			break;
+		case FILE_BACKDROP:
+			pinboard_set_backdrop(path);
 			break;
 		case FILE_OPEN_VFS_AVFS:
 			open_vfs_avfs(window_with_focus, item);

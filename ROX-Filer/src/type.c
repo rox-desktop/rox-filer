@@ -1280,7 +1280,8 @@ static void load_mime_types(void)
 	g_hash_table_foreach(globs, add_to_glob_patterns, NULL);
 	g_hash_table_destroy(globs);
 
-	g_ptr_array_sort(glob_patterns, sort_by_strlen);
+	if (glob_patterns->len)
+		g_ptr_array_sort(glob_patterns, sort_by_strlen);
 
 	if (!got_freedesk)
 	{
