@@ -8,6 +8,7 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
+#include <glib.h>
 #include <sys/types.h>
 
 extern int number_of_windows;

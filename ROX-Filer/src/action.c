@@ -300,7 +300,7 @@ static void show_condition_help(gpointer data)
 
 	if (!help)
 	{
-		GtkWidget *text, *vbox, *button, *hbox, *sep;
+		GtkWidget *text, *vbox, *button, *hbox, *frame;
 		
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
@@ -310,6 +310,16 @@ static void show_condition_help(gpointer data)
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(help), vbox);
 
+		frame = gtk_frame_new("Quick Start");
+		text = gtk_label_new(
+	"Just put the name of the file you're looking for in single quotes:\n"
+	"'index.html'	(to find a file called 'index.html')");
+		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_container_add(GTK_CONTAINER(frame), text);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+
+		frame = gtk_frame_new("Expression Syntax");
 		text = gtk_label_new(
 	"An expression is a series of cases which are checked from left \n"
 	"to right. As soon as one matches, the expression is TRUE. If none \n"
@@ -321,26 +331,37 @@ static void show_condition_help(gpointer data)
 	"Each case is a list of conditions which must all be met for the \n"
 	"case to succeed:\n"
 	"IsReg 'core'	(finds a regular file called 'core')\n"
-	"Preceeding a condition by ! inverts the result of the condition:\n"
-	"IsDev ! '/dev/*' (finds device files not in /dev)\n"
-	"\n"
-	"Simple tests are: IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev,\n"
-	"IsPipe, IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsEmpty\n"
-	"IsExecutable, IsMine\n"
+	"Preceeding a condition by ! inverts the result of the condition.\n"
+	"A condition can also be a bracketed expression:\n"
+	"!(IsDir,IsReg)	(finds something that is neither a directory nor a \n"
+	"regualr file)");
+		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_container_add(GTK_CONTAINER(frame), text);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+
+		frame = gtk_frame_new("Simple Tests");
+		text = gtk_label_new(
+	"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket\n"
+	"	(to check what kind of thing this is)\n"
+	"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable\n"
+	"	(to check the permissions)\n"
+	"IsEmpty, IsMine\n"
 	"\n"
 	"A pattern in single quotes is a shell-style wildcard pattern to \n"
 	"match. If it contains a slash then the match is agaist the full \n"
-	"path; otherwise it is agaist the leafname only.\n"
-	"\n"
-	"Read the ROX-Filer manual for full details.");
+	"path; otherwise it is agaist the leafname only.");
+		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
+		gtk_container_add(GTK_CONTAINER(frame), text);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
 		hbox = gtk_hbox_new(FALSE, 20);
-		gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
-		sep = gtk_hseparator_new();
-		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
+		text = gtk_label_new(
+			"See the ROX-Filer manual for full details.");
+		gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);
 		button = gtk_button_new_with_label("Close");
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
@@ -1772,6 +1793,7 @@ void action_find(FilerWindow *filer_window)
 	gui_side->entry = gtk_entry_new();
 	gtk_widget_set_style(gui_side->entry, fixed_style);
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
+	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
@@ -1783,6 +1805,7 @@ void action_find(FilerWindow *filer_window)
 			show_condition_help, NULL);
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Find");
+	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -1896,7 +1919,6 @@ void action_chmod(FilerWindow *filer_window)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Permissions");
 	add_toggle(gui_side,
 		"Brief - don't list processed files", "B");
 	add_toggle(gui_side,
@@ -1907,6 +1929,7 @@ void action_chmod(FilerWindow *filer_window)
 	gui_side->default_string = &last_chmod_string;
 	gui_side->entry = gtk_entry_new();
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_chmod_string);
+	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
@@ -1917,6 +1940,9 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			show_chmod_help, NULL);
 	
+	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Permissions");
+
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
