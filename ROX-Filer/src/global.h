@@ -87,12 +87,6 @@ typedef struct _GFSCache GFSCache;
 /* Each cached XML file is represented by one of these */
 typedef struct _XMLwrapper XMLwrapper;
 
-/* There is one of these for each window controlled by the window
- * manager (all tasks).
- * They are used for displaying iconified windows on the pinboard.
- */
-typedef struct _IconWindow IconWindow;
-
 /* The minibuffer is a text field which appears at the bottom of
  * a filer window. It has four modes of operation:
  */

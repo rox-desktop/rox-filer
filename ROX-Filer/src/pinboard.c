@@ -52,7 +52,6 @@
 #include "appinfo.h"
 #include "menu.h"
 #include "xml.h"
-#include "tasklist.h"
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
@@ -127,8 +126,6 @@ typedef enum {
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 
-static GdkAtom xa__NET_CLIENT_LIST = GDK_NONE;
-
 /* Static prototypes */
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
@@ -192,10 +189,6 @@ static void set_backdrop(const gchar *path, BackdropStyle style);
 void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static void abandon_backdrop_app(Pinboard *pinboard);
-static GdkFilterReturn root_filter(GdkXEvent *xevent,
-				   GdkEvent *event,
-				   gpointer data);
-static void uniconify(GtkWidget *widget, IconWindow *win);
 
 
 /****************************************************************
@@ -214,8 +207,6 @@ void pinboard_init(void)
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &text_fg_col);
 	gdk_color_parse(o_pinboard_bg_colour.value, &text_bg_col);
-
-	xa__NET_CLIENT_LIST = gdk_atom_intern("_NET_CLIENT_LIST", FALSE);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -302,8 +293,6 @@ void pinboard_activate(const gchar *name)
 				4 + ICON_WIDTH / 2,
 				4 + ICON_HEIGHT / 2);
 	loading_pinboard--;
-
-	tasklist_update(FALSE);
 }
 
 const char *pinboard_get_name(void)
@@ -540,40 +529,6 @@ void pinboard_set_backdrop(DirItem *item, const gchar *path)
 	else
 		delayed_error(_("Only files and certain applications can be "
 				"used to set the background image."));
-}
-
-/* A window has been iconified -- display it on the pinboard.
- * Only to be used by tasklist.c.
- */
-void pinboard_add_iconified_window(IconWindow *win)
-{
-	g_return_if_fail(win->widget == NULL);
-
-	if (!current_pinboard)
-		return;
-
-	win->widget = gtk_button_new_with_label("[ Window ]");
-
-	g_signal_connect(win->widget, "clicked",
-			G_CALLBACK(uniconify), win);
-	
-	gtk_widget_show(win->widget);
-
-	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), win->widget, 50, 50);
-}
-
-/* A window has been destroyed/expanded -- remove it from the pinboard.
- * Only to be used by tasklist.c.
- */
-void pinboard_remove_iconified_window(IconWindow *win)
-{
-	g_return_if_fail(win->widget != NULL);
-
-	if (!current_pinboard)
-		return;
-
-	gtk_widget_destroy(win->widget);
-	win->widget = NULL;
 }
 
 /****************************************************************
@@ -1351,8 +1306,6 @@ static void pinboard_clear(void)
 
 	g_return_if_fail(current_pinboard != NULL);
 
-	tasklist_update(TRUE);
-
 	next = current_pinboard->icons;
 	while (next)
 	{
@@ -1362,9 +1315,6 @@ static void pinboard_clear(void)
 
 		gtk_widget_destroy(pi->win);
 	}
-
-	gdk_window_remove_filter(gdk_get_default_root_window(),
-				 root_filter, NULL);
 
 	gtk_widget_destroy(current_pinboard->window);
 
@@ -1534,7 +1484,6 @@ static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 static void create_pinboard_window(Pinboard *pinboard)
 {
 	GtkWidget	*win;
-	GdkWindow	*root;
 
 	g_return_if_fail(pinboard->window == NULL);
 
@@ -1580,11 +1529,6 @@ static void create_pinboard_window(Pinboard *pinboard)
 
 	gtk_widget_show_all(win);
 	gdk_window_lower(win->window);
-
-	root = gdk_get_default_root_window();
-	gdk_window_add_filter(root, root_filter, NULL);
-	gdk_window_set_events(root, gdk_window_get_events(root) |
-				GDK_PROPERTY_CHANGE_MASK);
 }
 
 /* Load image 'path' and scale according to 'style' */
@@ -1852,26 +1796,4 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 			current_pinboard->backdrop_style);
 	
 	pinboard_save();
-}
-
-static GdkFilterReturn root_filter(GdkXEvent *xevent,
-				   GdkEvent *event,
-				   gpointer data)
-{
-	XEvent *xev = (XEvent *) xevent;
-
-	if (xev->type == PropertyNotify)
-	{
-		GdkAtom atom = gdk_x11_xatom_to_atom(xev->xproperty.atom);
-
-		if (atom == xa__NET_CLIENT_LIST)
-			tasklist_update(FALSE);
-	}
-
-	return GDK_FILTER_CONTINUE;
-}
-
-static void uniconify(GtkWidget *widget, IconWindow *win)
-{
-	tasklist_uniconify(win);
 }

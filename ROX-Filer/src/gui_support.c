@@ -188,7 +188,6 @@ void make_panel_window(GtkWidget *widget)
 
 	if (override_redirect)
 	{
-		gdk_window_lower(window);
 		gdk_window_set_override_redirect(window, TRUE);
 		return;
 	}
