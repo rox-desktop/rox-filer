@@ -1729,15 +1729,12 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	}
 }
 
-/* Cursor is positioned on item with the same data as before the sort.
- * Same for the wink item.
- */
+/* Cursor is positioned on item with the same data as before the sort */
 void collection_qsort(Collection *collection,
 			int (*compar)(const void *, const void *))
 {
-	int	cursor, wink, items;
+	int	cursor, items;
 	gpointer cursor_data = NULL;
-	gpointer wink_data = NULL;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1745,37 +1742,21 @@ void collection_qsort(Collection *collection,
 
 	items = collection->number_of_items;
 
-	wink = collection->wink_item;
-	if (wink >= 0 && wink < items)
-		wink_data = collection->items[wink].data;
-	else
-		wink = -1;
-
 	cursor = collection->cursor_item;
 	if (cursor >= 0 && cursor < items)
 		cursor_data = collection->items[cursor].data;
 	else
 		cursor = -1;
 
-	if (collection->wink_item != -1)
-	{
-		collection->wink_item = -1;
-		gtk_timeout_remove(collection->wink_timeout);
-	}
-	
 	qsort(collection->items, items, sizeof(collection->items[0]), compar); 
 
-	if (cursor > -1 || wink > -1)
+	if (cursor > -1)
 	{
 		int	item;
 
 		for (item = 0; item < items; item++)
-		{
 			if (collection->items[item].data == cursor_data)
 				collection_set_cursor_item(collection, item);
-			if (collection->items[item].data == wink_data)
-				collection_wink_item(collection, item);
-		}
 	}
 	
 	collection->paint_level = PAINT_CLEAR;
