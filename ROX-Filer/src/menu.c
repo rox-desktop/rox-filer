@@ -52,6 +52,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget);
 
 static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
+static void link_item(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
@@ -90,6 +91,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	copy_item, 0, NULL},
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
+{"/File/Link...",		NULL,  	link_item, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
@@ -341,13 +343,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		case 0:
 			g_string_assign(buffer, "<nothing selected>");
-			items_sensitive(file_menu, 0, 4, FALSE);
-			items_sensitive(file_menu, 5, -1, FALSE);
+			items_sensitive(file_menu, 0, 5, FALSE);
+			items_sensitive(file_menu, 6, -1, FALSE);
 			gtk_widget_set_sensitive(file_label, FALSE);
 			break;
 		case 1:
-			items_sensitive(file_menu, 0, 4, TRUE);
-			items_sensitive(file_menu, 5, -1, TRUE);
+			items_sensitive(file_menu, 0, 5, TRUE);
+			items_sensitive(file_menu, 6, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
@@ -355,8 +357,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 					file_item->leafname);
 			break;
 		default:
-			items_sensitive(file_menu, 0, 4, FALSE);
-			items_sensitive(file_menu, 5, -1, TRUE);
+			items_sensitive(file_menu, 0, 5, FALSE);
+			items_sensitive(file_menu, 6, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
@@ -407,46 +409,6 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	action_delete(window_with_focus);
-}
-
-void bin(gpointer data, guint action, GtkWidget *widget)
-{
-	const char	*start_args[] = {"xterm", "-wf",
-				"-e", "rm", "-vir"};
-	int		argc = sizeof(start_args) / sizeof(char *);
-	char		**argv;
-	Collection	*collection;
-	int		i;
-	FileItem	*item;
-	int		child;
-
-	g_return_if_fail(window_with_focus != NULL);
-
-	argv = g_malloc(sizeof(start_args) +
-		sizeof(char *) * (collection->number_selected + 1));
-	memcpy(argv, start_args, sizeof(start_args));
-
-	for (i = 0; i < collection->number_of_items; i++)
-		if (collection->items[i].selected)
-		{
-			item = (FileItem *) collection->items[i].data;
-			argv[argc++] = g_strdup(make_path(
-						window_with_focus->path,
-						item->leafname)->str);
-		}
-	argv[argc] = NULL;
-
-	child = spawn(argv);
-	if (child)
-		g_hash_table_insert(child_to_filer,
-				(gpointer) child, window_with_focus);
-	else
-		report_error("ROX-Filer", "Failed to fork() child "
-					"process");
-
-	for (i = sizeof(start_args) / sizeof(char *); i < argc; i++)
-		g_free(argv[i]);
-	g_free(argv);
 }
 
 static gboolean copy_cb(char *initial, char *path)
@@ -538,6 +500,36 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 		savebox_show(window_with_focus, "Rename",
 				window_with_focus->path, item->leafname,
 				item->image, rename_cb);
+	}
+}
+
+static gboolean link_cb(char *initial, char *path)
+{
+	if (symlink(initial, path))
+	{
+		report_error("ROX-Filer: symlink()", g_strerror(errno));
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static void link_item(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected != 1)
+		report_error("ROX-Filer", "You must select a single "
+				"item to link");
+	else
+	{
+		FileItem *item = selected_item(collection);
+
+		savebox_show(window_with_focus, "Symlink",
+				window_with_focus->path, item->leafname,
+				item->image, link_cb);
 	}
 }
 
