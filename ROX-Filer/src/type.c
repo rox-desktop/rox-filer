@@ -930,32 +930,24 @@ gboolean can_set_run_action(DirItem *item)
 		!(item->mime_type == special_exec);
 }
 
-#if 0
-/* Open all <Choices>/type directories and display a message */
-static void open_choices_dirs(gchar *type, gchar *what)
-{
-	guchar *dir;
-	GPtrArray *list;
-	int i;
-
-	dir = choices_find_path_save("", type, TRUE);
-	g_free(dir);
-	list = choices_list_dirs(type);
-
-	for (i = list->len - 1; i >= 0; i--)
-		filer_opendir(list->pdata[i], NULL);
-
-	choices_free_list(list);
-}
-#endif
-
 /* To edit the MIME types, open a filer window for <Choices>/MIME-info */
 static void edit_mime_types(guchar *unused)
 {
-	delayed_error("XXX: This feature is currently under repair");
-	/*
-	open_choices_dirs("MIME-info", "the files defining MIME types");
-	*/
+	const gchar *path;
+	struct stat info;
+
+	mkdir(make_path(home_dir, ".mime")->str, 0700);
+	path = make_path(home_dir, ".mime/mime-info")->str;
+	mkdir(path, 0700);
+	filer_opendir(path, NULL);
+
+	path = "/usr/local/share/mime/mime-info";
+	if (mc_stat(path, &info) == 0)
+		filer_opendir(path, NULL);
+
+	path = "/usr/share/mime/mime-info";
+	if (mc_stat(path, &info) == 0)
+		filer_opendir(path, NULL);
 }
 
 static void reread_mime_files(guchar *unused)
