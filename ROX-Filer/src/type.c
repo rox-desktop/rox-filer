@@ -72,6 +72,8 @@ char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
 static void reread_mime_files(guchar *unused);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
+static GList *build_type_reread(OptionUI *ui, xmlNode *node, guchar *label);
+static GList *build_type_edit(OptionUI *ui, xmlNode *node, guchar *label);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
  * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
@@ -127,8 +129,8 @@ void type_init()
 		import_for_dir((gchar *) g_ptr_array_index(list, i));
 	choices_free_list(list);
 
-	option_add_void("type_edit", edit_mime_types);
-	option_add_void("type_reread", reread_mime_files);
+	option_register_widget("type-edit", build_type_edit);
+	option_register_widget("type-reread", build_type_reread);
 }
 
 /* Returns the MIME_type structure for the given type name. It is looked
@@ -1099,3 +1101,30 @@ static void reread_mime_files(guchar *unused)
 	type_reread();
 }
 
+static GList *build_type_reread(OptionUI *none, xmlNode *node, guchar *label)
+{
+	GtkWidget *button, *align;
+
+	align = gtk_alignment_new(0.1, 0, 0.1, 0);
+	button = gtk_button_new_with_label(_(label));
+	gtk_container_add(GTK_CONTAINER(align), button);
+
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(reread_mime_files), NULL);
+
+	return g_list_append(NULL, align);
+}
+
+static GList *build_type_edit(OptionUI *none, xmlNode *node, guchar *label)
+{
+	GtkWidget *button, *align;
+
+	align = gtk_alignment_new(0.1, 0, 0.1, 0);
+	button = gtk_button_new_with_label(_(label));
+	gtk_container_add(GTK_CONTAINER(align), button);
+
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(edit_mime_types), NULL);
+
+	return g_list_append(NULL, align);
+}

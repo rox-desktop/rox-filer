@@ -102,6 +102,7 @@ static void coll_selection_changed(Collection *collection, guint time,
 static void recreate_toolbar(FilerWindow *filer_window);
 static void toggle_shaded(GtkWidget *widget);
 static void option_notify(void);
+static GList *build_tool_options(OptionUI *ui, xmlNode *node, guchar *label);
 
 static Tool all_tools[] = {
 	{N_("Close"), "close", N_("Close filer window"),
@@ -167,6 +168,8 @@ void toolbar_init(void)
 			g_free(path);
 		}
 	}
+
+	option_register_widget("tool-options", build_tool_options);
 }
 
 /* Returns a button which can be used to turn a tool on and off.
@@ -693,4 +696,76 @@ static void option_notify(void)
 			recreate_toolbar(filer_window);
 		}
 	}
+}
+
+static void update_tools(OptionUI *ui, guchar *value)
+{
+	GList	*next, *kids;
+
+	kids = gtk_container_children(GTK_CONTAINER(ui->widget));
+
+	for (next = kids; next; next = next->next)
+	{
+		GtkWidget	*kid = (GtkWidget *) next->data;
+		guchar		*name;
+
+		name = gtk_object_get_data(GTK_OBJECT(kid), "tool_name");
+
+		g_return_if_fail(name != NULL);
+		
+		gtk_widget_set_sensitive(GTK_BIN(kid)->child,
+					 !in_list(name, value));
+	}
+
+	g_list_free(kids);
+}
+
+static guchar *read_tools(OptionUI *ui)
+{
+	GList	*next, *kids;
+	GString	*list;
+	guchar	*retval;
+
+	list = g_string_new(NULL);
+
+	kids = gtk_container_children(GTK_CONTAINER(ui->widget));
+
+	for (next = kids; next; next = next->next)
+	{
+		GtkObject	*kid = (GtkObject *) next->data;
+		guchar		*name;
+
+		if (!GTK_WIDGET_SENSITIVE(GTK_BIN(kid)->child))
+		{
+			name = gtk_object_get_data(kid, "tool_name");
+			g_return_val_if_fail(name != NULL, list->str);
+
+			if (list->len)
+				g_string_append(list, ", ");
+			g_string_append(list, name);
+		}
+	}
+
+	g_list_free(kids);
+	retval = list->str;
+	g_string_free(list, FALSE);
+
+	return retval;
+}
+
+static GList *build_tool_options(OptionUI *ui, xmlNode *node, guchar *label)
+{
+	int		i = 0;
+	GtkWidget	*hbox, *tool;
+
+	hbox = gtk_hbox_new(FALSE, 0);
+
+	while ((tool = toolbar_tool_option(i++)))
+		gtk_box_pack_start(GTK_BOX(hbox), tool, FALSE, TRUE, 0);
+
+	ui->update_widget = update_tools;
+	ui->read_widget = read_tools;
+	ui->widget = hbox;
+
+	return g_list_append(NULL, hbox);
 }
