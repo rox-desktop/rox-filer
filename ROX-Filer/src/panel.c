@@ -1595,15 +1595,49 @@ static void applet_died(GtkWidget *socket)
 	if (GTK_OBJECT_DESTROYED(socket))
 		g_print("[ socket already gone ]\n");
 	else
-		g_print("[ socket still here ]\n");
+	{
+		g_print("[ socket still here - killing it ]\n");
+		gtk_widget_destroy(socket);
+	}
 
 	gtk_widget_unref(socket);
+}
+
+static void restart_applet(GtkWidget *button, Icon *icon)
+{
+	gtk_widget_destroy(button);
+	run_applet(icon);
+}
+
+static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
+{
+	Icon	*icon;
+	gboolean lost_widget;
+
+	lost_widget = GTK_OBJECT_DESTROYED(widget);
+	gtk_widget_unref(widget);
+
+	if (lost_widget)
+	{
+		g_print("[ removing socket ]\n");
+		return;		/* We're removing the icon... */
+	}
+		
+	icon = gtk_object_get_data(GTK_OBJECT(widget), "icon");
+	icon->socket = gtk_button_new_with_label(_("Restart\nApplet"));
+	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
+	gtk_container_set_border_width(GTK_CONTAINER(icon->socket), 4);
+	gtk_misc_set_padding(GTK_MISC(GTK_BIN(icon->socket)->child), 4, 4);
+	gtk_widget_show(icon->socket);
+
+	gtk_signal_connect(GTK_OBJECT(icon->socket), "clicked",
+			GTK_SIGNAL_FUNC(restart_applet), icon);
 }
 
 /* Try to run this applet. Fills in icon->socket on success. */
 static void run_applet(Icon *icon)
 {
-	char	*argv[2];
+	char	*argv[3];
 	pid_t	pid;
 
 	argv[0] = make_path(icon->path, "AppletRun")->str;
@@ -1615,10 +1649,16 @@ static void run_applet(Icon *icon)
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_widget_show_all(icon->socket);
 	gtk_widget_realize(icon->socket);
-	gtk_widget_set_usize(icon->socket, 30, 30);
+	gtk_widget_set_usize(icon->socket, 60, 30);
+
+	gtk_widget_ref(icon->widget);
+	gtk_object_set_data(GTK_OBJECT(icon->widget), "icon", icon);
+	gtk_signal_connect(GTK_OBJECT(icon->socket), "destroy",
+			GTK_SIGNAL_FUNC(socket_destroyed), icon->widget);
 	
 	argv[1] = g_strdup_printf("%ld",
 			GDK_WINDOW_XWINDOW(icon->socket->window));
+	argv[2] = NULL;
 
 	pid = spawn(argv);
 	gtk_widget_ref(icon->socket);
