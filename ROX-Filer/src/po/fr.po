@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.2\n"
-"POT-Creation-Date: 2002-07-25 14:05+0100\n"
-"PO-Revision-Date: 2002-06-22 00:57+0200\n"
+"Project-Id-Version: ROX-Filer 1.3.3\n"
+"POT-Creation-Date: 2002-07-25 14:30+0100\n"
+"PO-Revision-Date: 2002-07-25 23:28+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -89,7 +89,6 @@ msgid "Simple Tests"
 msgstr "Tests Simples"
 
 #: action.c:205
-#, fuzzy
 msgid ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
 "(types)\n"
@@ -102,7 +101,8 @@ msgid ""
 "contains a slash then the match is against the full path; otherwise it is \n"
 "against the leafname only."
 msgstr ""
-"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+"(types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
 "(permissions)\n"
 "IsEmpty, IsMine\n"
@@ -750,7 +750,7 @@ msgid "Directory missing/deleted"
 msgstr "Répertoire manquant/supprimé"
 
 #: filer.c:845
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later.\n"
@@ -758,7 +758,8 @@ msgid ""
 msgstr ""
 "Le groupe %s n'est pas défini. Sélectionnez des fichiers et appuyez sur "
 "<Ctrl>+%s pour le définir. Appuyez seulement sur %s pour resélectionner ces "
-"fichiers à l'avenir."
+"fichiers à l'avenir.\n"
+"Assurez-vous que NumLock est activé si vous utilisez le pavé numérique."
 
 #: filer.c:1030
 #, c-format
@@ -860,9 +861,8 @@ msgid "IsSocket"
 msgstr "IsSocket"
 
 #: find.c:764
-#, fuzzy
 msgid "IsDoor"
-msgstr "IsDir"
+msgstr "IsDoor"
 
 #: find.c:766
 msgid "IsSUID"
@@ -1075,18 +1075,16 @@ msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
 #: icon.c:110 menu.c:250
-#, fuzzy
 msgid "About ROX-Filer..."
-msgstr "ROX-Filer"
+msgstr "Au sujet de ROX-Filer..."
 
 #: icon.c:111 menu.c:251
-#, fuzzy
 msgid "Show Help Files"
-msgstr "Voir l'Aide"
+msgstr "Voir les fichiers d'aide"
 
 #: icon.c:112 menu.c:252
 msgid "Manual"
-msgstr ""
+msgstr "Manuel"
 
 #: icon.c:114 menu.c:230
 msgid "Options..."
@@ -1179,9 +1177,8 @@ msgid "Show Info"
 msgstr "Montrer"
 
 #: infobox.c:212
-#, fuzzy
 msgid "Show _Help Files"
-msgstr "Voir l'Aide"
+msgstr "Voir les fichiers d'_aide"
 
 #: infobox.c:316
 msgid "Name:"
@@ -1479,9 +1476,8 @@ msgid "Send To..."
 msgstr "Envoyer à..."
 
 #: menu.c:221
-#, fuzzy
 msgid "Count"
-msgstr "Monter"
+msgstr "Compter"
 
 #: menu.c:225
 msgid "Select"
@@ -2160,6 +2156,8 @@ msgid ""
 "Door:\n"
 "Doors are a little-used Solaris method for processes to communicate."
 msgstr ""
+"Porte:\n"
+"Les portes constituent une méthode de Solaris pour communiquer peu utilisée."
 
 #: run.c:329
 msgid ""
@@ -2264,7 +2262,7 @@ msgstr "Taille"
 
 #: toolbar.c:123
 msgid "Change icon size"
-msgstr "Changer la taille de l'icône"
+msgstr "Changer la taille des icônes"
 
 #: toolbar.c:127
 msgid "Details"
@@ -2286,25 +2284,25 @@ msgstr "Montrer/cacher les fichiers cachés"
 msgid "Show ROX-Filer help"
 msgstr "Montrer l'aide de ROX-Filer"
 
-#: toolbar.c:630
+#: toolbar.c:568
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u caché(s))"
 
-#: tips:31 toolbar.c:638
+#: tips:31 toolbar.c:576
 msgid "items"
 msgstr "objets"
 
-#: toolbar.c:638
+#: toolbar.c:576
 msgid "item"
 msgstr "objet"
 
-#: toolbar.c:641
+#: toolbar.c:579
 #, c-format
 msgid "No items%s"
 msgstr "Pas d'objet%s"
 
-#: toolbar.c:657
+#: toolbar.c:595
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u sélectionné(s) (%s)"
@@ -2343,7 +2341,7 @@ msgstr "Socket"
 
 #: type.c:215
 msgid "Door"
-msgstr ""
+msgstr "Porte"
 
 #: type.c:218
 msgid "Unknown"
@@ -2363,10 +2361,22 @@ msgid ""
 "Otherwise, you should check, or even just delete, all the existing run "
 "actions."
 msgstr ""
+"L'exécutable '%s' a un accès en écriture pour tout le monde ! Je refuse de "
+"le lancer. Veuillez changer les droits d'accès dès maintenant (ce problème a "
+"pu être causé par un bug dans d'anciennes versions du filer).\n"
+"\n"
+"Avoir des actions d'exécution (qui ne sont pas des liens symboliques) à "
+"accès en écriture pour tout le monde signifie que d'autres utilisateurs de "
+"votre ordinateur peuvent remplacer vos actions d'exécution par des versions "
+"malveillantes.\n"
+"\n"
+"Si vous faites confiance à tous ceux qui peuvent écrire dans ces fichiers, "
+"vous n'avez pas à vous inquiéter. Dans le cas contraire, vous devez "
+"vérifier, ou même juste supprimer, toutes les actions d'exécution existantes."
 
 #: type.c:374
 msgid "go-w (Fix security problem)"
-msgstr ""
+msgstr "go-w (corriger un problème de sécurité)"
 
 #: type.c:476
 msgid ""
@@ -2472,17 +2482,16 @@ msgid "File '%s' corrupted!"
 msgstr "Fichier '%s' altéré !"
 
 #: type.c:1254
-#, fuzzy
 msgid ""
 "The standard MIME type database (version 0.8 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
 "should download and install the 'shared-mime-info-0.8' package from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
-"La base de données des types MIME standard n'a pas été trouvée. Le filer ne "
-"pourra probablement pas montrer les types corrects pour les différents "
-"fichiers. Vous devriez télécharger et installer le paquet « Common types "
-"package » ici :\n"
+"La base de données des types MIME standard (version 0.8 ou ultérieure) n'a "
+"pas été trouvée. Le filer ne pourra probablement pas montrer les types "
+"corrects pour les différents fichiers. Vous devez télécharger et installer "
+"le paquet 'shared-mime-info-0.8' à partir de :\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 
 #: usericons.c:191
@@ -2730,7 +2739,6 @@ msgid "Small Icons if at least:"
 msgstr "Petites icônes si au moins :"
 
 #: tips:32 tips:33
-#, fuzzy
 msgid ""
 "If the directory contains this many items then it will be shown using Small "
 "Icons, otherwise Large Icons will be used."
@@ -3479,15 +3487,16 @@ msgid "Block device:"
 msgstr "Périphérique bloc :"
 
 #: tips:237
-#, fuzzy
 msgid "Door:"
-msgstr "Aller à :"
+msgstr "Porte :"
 
 #: tips:238
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
+"Les portes sont un peu comme les sockets ou les tubes, et n'ont été vues que "
+"sous Solaris."
 
 #: tips:239
 msgid "Executable file:"
