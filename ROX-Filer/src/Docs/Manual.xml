@@ -136,7 +136,7 @@
     </para></listitem>
 
     <listitem><para>
-      GTK+ 2.0.0 or later (libraries and headers) &mdash; get the latest version
+      GTK+ 2.0.1 or later (libraries and headers) &mdash; get the latest version
       from <citation>GTK+</citation>,
     </para></listitem>
 
@@ -157,7 +157,7 @@
    (<prompt>$</prompt> is the shell prompt):
 
    <screen>$ pkg-config --modversion gtk+-2.0
-2.0.0</screen>
+2.0.5</screen>
   </para>
 
   <procedure><title>To compile:</title>
@@ -766,10 +766,6 @@ $ rox --bottom=</screen>
         Create a new file or subdirectory inside this directory.
       </entry></row>
 
-      <row><entry><guimenuitem>Xterm Here</guimenuitem></entry><entry>
-        Open an xterm with its current directory set to this directory.
-      </entry></row>
-
       <row><entry><guimenuitem>Window</guimenuitem></entry><entry>
         Operations on the window as a whole.
       </entry></row>
@@ -1240,6 +1236,15 @@ $ rox --bottom=</screen>
          <guimenuitem>Shell Command...</guimenuitem></entry><entry>
          Open the shell command box (see the <xref linkend="mini"/> section).
        </entry></row>
+
+      <row><entry><guimenuitem>Xterm Here</guimenuitem></entry><entry>
+        Open an xterm with its current directory set to this directory.
+      </entry></row>
+
+      <row><entry><guimenuitem>Switch to xterm</guimenuitem></entry><entry>
+        Open an xterm with its current directory set to this directory, and close the
+	filer window at the same time.
+      </entry></row>
 
        <row><entry>
          <guimenuitem>Show ROX-Filer Help</guimenuitem></entry><entry>
@@ -2309,6 +2314,11 @@ while 1:
        to.
      </para></listitem>
 
+     <listitem><para> <guilabel>Change from Large icons to Small automatically</guilabel>
+       allows the filer to choose the size when changing directory. The
+       switching threshold is set using the number entry below.
+     </para></listitem>
+
      <listitem><para> <guilabel>Short titlebar flags</guilabel> abbreviates
      the All, Thumbs and Scanning titlebar indicators to single letters.
      </para></listitem>
@@ -2389,8 +2399,11 @@ while 1:
 	what kind of toolbars you want.
 	<guimenuitem>None</guimenuitem> means that windows will not have a
 	toolbar,
-	<guimenuitem>Normal</guimenuitem> provides a small bar of icons, and
-	<guimenuitem>Large</guimenuitem> displays larger buttons, with textual labels.
+	<guimenuitem>Icons only</guimenuitem> provides a small bar of icons,
+	<guimenuitem>Text under icons</guimenuitem> displays larger buttons,
+	with textual labels below, and
+	<guimenuitem>Text beside icons</guimenuitem> displays wider buttons,
+	with textual labels next to the icons.
       </para></listitem>
 
       <listitem><para> <guilabel>Show totals of items</guilabel> shows the
@@ -3259,6 +3272,7 @@ while 1:
      ROX-Filer was created by Thomas Leonard, with help from:
      </para><para>
      <simplelist columns='3'>
+      <member>Michael Adams</member>
       <member>Christopher Arndt</member>
       <member>Jens Askengren</member>
       <member>Liav Asseraf</member>
