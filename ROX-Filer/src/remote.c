@@ -590,7 +590,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		     !g_strcasecmp(style, "Automatic")  ? AUTO_SIZE_ICONS :
 		     				     UNKNOWN_STYLE;
 		if (ds == UNKNOWN_STYLE)
-			g_warning("Unknown style '%s'\n", style);
+			delayed_error(_("Unknown style '%s'"), style);
 		else
 			display_set_layout(fwin, ds, fwin->details_type, TRUE);
 
@@ -612,7 +612,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 						  DETAILS_UNKNOWN;
 
 		if (dt == DETAILS_UNKNOWN)
-			g_warning("Unknown details type '%s'\n", details);
+			delayed_error(_("Unknown details type '%s'"), details);
 		else
 			display_set_layout(fwin, fwin->display_style_wanted,
 					   dt, TRUE);
@@ -639,8 +639,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
  		       !g_strcasecmp(sort, "Owner") ? SORT_OWNER :
  		       !g_strcasecmp(sort, "Group") ? SORT_GROUP :
 						       -1;
-		if (type != -1)
-			g_warning("Unknown sorting criteria '%s'\n", sort);
+		if (type == -1)
+			delayed_error(_("Unknown sorting type '%s'"), sort);
 		else
 			display_set_sort_type(fwin, type, GTK_SORT_ASCENDING);
 
