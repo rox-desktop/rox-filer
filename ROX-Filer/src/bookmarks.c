@@ -35,6 +35,7 @@
 #include "xml.h"
 #include "support.h"
 #include "gui_support.h"
+#include "main.h"
 
 static XMLwrapper *bookmarks = NULL;
 static GtkWidget *bookmarks_window = NULL;
@@ -99,6 +100,7 @@ void bookmarks_edit(void)
 	update_bookmarks();
 
 	bookmarks_window = gtk_dialog_new();
+	number_of_windows++;
 
 	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
@@ -107,6 +109,8 @@ void bookmarks_edit(void)
 
 	g_signal_connect(bookmarks_window, "destroy",
 			 G_CALLBACK(gtk_widget_destroyed), &bookmarks_window);
+	g_signal_connect(bookmarks_window, "destroy",
+			 G_CALLBACK(one_less_window), NULL);
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
