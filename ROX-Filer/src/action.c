@@ -2049,21 +2049,11 @@ static gboolean remove_pinned_ok(GList *paths)
 
 void set_find_string_colour(GtkWidget *widget, const guchar *string)
 {
-	/* XXX */
-#if 0
-	static GtkStyle *error_style = NULL;
 	FindCondition *cond;
 
-	if (!error_style)
-	{
-		error_style = gtk_style_copy(fixed_style);
-		error_style->fg[GTK_STATE_NORMAL] = red;
-	}
-
 	cond = find_compile(string);
-	gtk_widget_set_style(widget, cond ? fixed_style : error_style);
+	entry_set_error(widget, !cond);
 
 	if (cond)
 		find_condition_free(cond);
-#endif
 }

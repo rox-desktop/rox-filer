@@ -119,6 +119,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	g_return_if_fail(filer_window->minibuffer != NULL);
 
 	mini = GTK_ENTRY(filer_window->minibuffer);
+	entry_set_error(filer_window->minibuffer, FALSE);
 
 	filer_window->mini_type = MINI_NONE;
 	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),
@@ -406,6 +407,7 @@ static gboolean path_changed(gpointer data)
 	GtkWidget *mini = filer_window->minibuffer;
 	const char	*new, *leaf;
 	char		*path, *real;
+	gboolean	error = FALSE;
 
 	new = gtk_entry_get_text(GTK_ENTRY(mini));
 
@@ -425,7 +427,7 @@ static gboolean path_changed(gpointer data)
 		if (mc_stat(real, &info) == 0 && S_ISDIR(info.st_mode))
 			filer_change_to(filer_window, real, leaf);
 		else
-			gdk_beep();
+			error = TRUE;
 	}
 	else
 	{
@@ -445,10 +447,12 @@ static gboolean path_changed(gpointer data)
 		
 		if (find_exact_match(filer_window, leaf) == FALSE &&
 		    find_next_match(filer_window, leaf, 0) == FALSE)
-			gdk_beep();
+			error = TRUE;
 	}
 		
 	g_free(real);
+
+	entry_set_error(mini, error);
 
 	return FALSE;
 }
