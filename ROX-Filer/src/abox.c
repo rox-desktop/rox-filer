@@ -332,7 +332,7 @@ static void abox_finalise(GObject *object)
 {
 	GObjectClass *parent_class;
 	ABox *abox = ABOX(object);
-	
+
 	if (abox->next_dir)
 	{
 		null_g_free(&abox->next_dir);
@@ -348,6 +348,8 @@ static void abox_finalise(GObject *object)
 static gboolean show_next_dir(gpointer data)
 {
 	ABox	*abox = (ABox *) data;
+
+	g_return_val_if_fail(IS_ABOX(abox), FALSE);
 
 	gtk_label_set_text(GTK_LABEL(abox->dir_label), abox->next_dir);
 	null_g_free(&abox->next_dir);
@@ -615,12 +617,12 @@ void abox_set_file(ABox *abox, int i, const gchar *path)
 {
 	DirItem *item;
 	gchar *base;
-	
+
 	g_return_if_fail(i >= 0 && i < 2);
+	g_return_if_fail(IS_ABOX(abox));
 
 	if (!path || !path[0])
 	{
-		/*printf("path=%s\n", path? path: "NULL");*/
 		gtk_widget_hide(abox->cmp_icon[i]);
 		gtk_widget_hide(abox->cmp_name[i]);
 		gtk_widget_hide(abox->cmp_size[i]);
