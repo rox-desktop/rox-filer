@@ -567,6 +567,12 @@ void one_less_window(void)
 
 static void show_features(void)
 {
+	g_print("\n");
+	g_print(_("Compiled with GTK version %s\n"), GTK_VERSION);
+	g_print(_("Running with GTK version %d.%d.%d\n"),
+				gtk_major_version,
+				gtk_minor_version,
+				gtk_micro_version);
 	g_print("\n-- %s --\n\n", _("features set at compile time"));
 	g_print("%s... %s\n", _("Large File Support"),
 #ifdef LARGE_FILE_SUPPORT

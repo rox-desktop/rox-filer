@@ -483,14 +483,14 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 
 	menu = gtk_menu_new();
 
-	item = gtk_menu_item_new_with_label(_("Add new bookmark"));
+	item = gtk_menu_item_new_with_label(_("Add New Bookmark"));
 	g_signal_connect(item, "activate",
 			 G_CALLBACK(bookmarks_add), filer_window);
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	gtk_menu_shell_select_item(GTK_MENU_SHELL(menu), item);
 
-	item = gtk_menu_item_new_with_label(_("Edit bookmarks"));
+	item = gtk_menu_item_new_with_label(_("Edit Bookmarks"));
 	g_signal_connect(item, "activate", G_CALLBACK(activate_edit), NULL);
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);

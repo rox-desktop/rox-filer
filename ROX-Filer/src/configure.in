@@ -54,6 +54,9 @@ ROX_REQUIRE(gtk+-2.0, 2.0.1)
 ROX_REQUIRE(glib-2.0, 2.0.3)
 ROX_REQUIRE(libxml-2.0, 2.0.0)
 
+GTK_VERSION=`"$PKG_CONFIG" --modversion gtk+-2.0`
+AC_DEFINE_UNQUOTED(GTK_VERSION, "$GTK_VERSION")
+
 AC_MSG_CHECKING(if pango (version >= 1.1.2) is installed)
 if "$PKG_CONFIG" --atleast-version=1.1.2 pango ; then
   AC_DEFINE(USE_PANGO_WRAP_WORD_CHAR)
