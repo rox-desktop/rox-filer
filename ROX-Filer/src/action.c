@@ -19,13 +19,16 @@
 #include <dirent.h>
 
 #include "action.h"
+#include "string.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
 #include "main.h"
 
+static GdkColor red = {0, 0xffff, 0, 0};
+
 typedef struct _GUIside GUIside;
-typedef void ActionChild(FilerWindow *filer_window);
+typedef void ActionChild(gpointer data);
 typedef void ForDirCB(char *path);
 
 struct _GUIside
@@ -35,19 +38,90 @@ struct _GUIside
 	int 		input_tag;	/* gdk_input_add() */
 	GtkWidget 	*log, *window, *actions;
 	int		child;		/* Process ID */
+	int		errors;
 };
 
 /* These don't need to be in a structure because we fork() before
- * using them.
+ * using them again.
  */
 static int 	from_parent = 0;
 static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
 static GString  *message = NULL;
+static char     *action_dest = NULL;
+static void     (*action_do_func)(char *source, char *dest);
 
 /* Static prototypes */
 static gboolean send();
 static gboolean send_error();
+static gboolean read_exact(int source, char *buffer, ssize_t len);
+
+/* Called when the child sends us a message */
+static void message_from_child(gpointer 	 data,
+			       gint     	 source, 
+			       GdkInputCondition condition)
+{
+	char buf[5];
+	GUIside	*gui_side = (GUIside *) data;
+	GtkWidget *log = gui_side->log;
+
+	if (read_exact(source, buf, 4))
+	{
+		ssize_t message_len;
+		char	*buffer;
+
+		buf[4] = '\0';
+		message_len = strtol(buf, NULL, 16);
+		buffer = g_malloc(message_len + 1);
+		if (message_len > 0 && read_exact(source, buffer, message_len))
+		{
+			buffer[message_len] = '\0';
+			if (*buffer == '?')
+				gtk_widget_set_sensitive(gui_side->actions,
+							TRUE);
+			else if (*buffer == '+')
+			{
+				refresh_dirs(buffer + 1);
+				g_free(buffer);
+				return;
+			}
+			else if (*buffer == '!')
+				gui_side->errors++;
+
+			gtk_text_insert(GTK_TEXT(log),
+					NULL,
+					*buffer == '!' ? &red : NULL,
+					NULL,
+					buffer + 1, message_len - 1);
+			g_free(buffer);
+			return;
+		}
+		g_print("Child died in the middle of a message.\n");
+	}
+
+	/* The child is dead */
+	gui_side->child = 0;
+
+	fclose(gui_side->to_child);
+	close(gui_side->from_child);
+	gdk_input_remove(gui_side->input_tag);
+
+	if (gui_side->errors)
+	{
+		GString *report;
+		report = g_string_new(NULL);
+		g_string_sprintf(report, "There %s %d error%s.\n",
+				gui_side->errors == 1 ? "was" : "were",
+				gui_side->errors,
+				gui_side->errors == 1 ? "" : "s");
+		gtk_text_insert(GTK_TEXT(log), NULL, &red, NULL,
+				report->str, report->len);
+
+		g_string_free(report, TRUE);
+	}
+	else
+		gtk_widget_destroy(gui_side->window);
+}
 
 static void for_dir_contents(char *dir, ForDirCB *cb)
 {
@@ -157,12 +231,13 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 {
 	GUIside	*gui_side = (GUIside *) data;
 
-	fclose(gui_side->to_child);
-	close(gui_side->from_child);
-	gdk_input_remove(gui_side->input_tag);
-	
 	if (gui_side->child)
+	{
 		kill(gui_side->child, SIGTERM);
+		fclose(gui_side->to_child);
+		close(gui_side->from_child);
+		gdk_input_remove(gui_side->input_tag);
+	}
 
 	g_free(data);
 	
@@ -173,7 +248,7 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 /* Create two pipes, fork() a child and return a pointer to a GUIside struct
  * (NULL on failure). The child calls func().
  */
-static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
+static GUIside *start_action(gpointer data, ActionChild *func)
 {
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
@@ -207,7 +282,7 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 			close(filedes[3]);
 			to_parent = fdopen(filedes[1], "wb");
 			from_parent = filedes[2];
-			func(filer_window);
+			func(data);
 			_exit(0);
 	}
 
@@ -219,9 +294,10 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 	gui_side->to_child = fdopen(filedes[3], "wb");
 	gui_side->log = NULL;
 	gui_side->child = child;
+	gui_side->errors = 0;
 
 	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 400, 100);
+	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 500, 100);
 	gtk_signal_connect(GTK_OBJECT(gui_side->window), "destroy",
 			GTK_SIGNAL_FUNC(destroy_action_window), gui_side);
 
@@ -233,6 +309,23 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 
 	gui_side->actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->actions, FALSE, TRUE, 0);
+
+	button = gtk_button_new_with_label("Always");
+	gtk_object_set_data(GTK_OBJECT(button), "send-code", "A");
+	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			button_reply, gui_side);
+	button = gtk_button_new_with_label("Yes");
+	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
+	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			button_reply, gui_side);
+	button = gtk_button_new_with_label("No");
+	gtk_object_set_data(GTK_OBJECT(button), "send-code", "N");
+	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			button_reply, gui_side);
+	gtk_widget_set_sensitive(gui_side->actions, FALSE);
 
 	control = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), control, FALSE, TRUE, 0);
@@ -249,12 +342,18 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(gui_side->window));
 
+	gui_side->input_tag = gdk_input_add(gui_side->from_child,
+						GDK_INPUT_READ,
+						message_from_child,
+						gui_side);
+
 	return gui_side;
 }
 
-/* And now, the individual actions... */
+/* 			ACTIONS ON ONE ITEM 			*/
 
-/* Delete one item - may need to recurse, or ask questions */
+/* These may call themselves recursively, or ask questions, etc */
+
 static void do_delete(char *path)
 {
 	struct 		stat info;
@@ -306,9 +405,115 @@ static void do_delete(char *path)
 		send_error();
 }
 
-/* The child executes this... */
-static void delete_cb(FilerWindow *filer_window)
+static void do_copy(char *path, char *dest)
 {
+	char		*dest_path;
+	char		*leaf;
+
+	leaf = strrchr(path, '/');
+	if (!leaf)
+		leaf = path;		/* Error? */
+	else
+		leaf++;
+
+	dest_path = make_path(dest, leaf)->str;
+
+	if (access(dest_path, F_OK) == 0)
+	{
+		char	rep;
+		g_string_sprintf(message, "?'%s' already exists - overwrite?\n",
+				dest_path);
+		send();
+		
+		rep = reply(from_parent);
+		if (rep == 'A')
+			quiet = TRUE;
+		else if (rep != 'Y')
+			return;
+	}
+
+	g_string_sprintf(message, "cp -a %s %s", path, dest_path);
+	if (system(message->str) == 0)
+		g_string_sprintf(message, "'Copied %s as %s\n",
+				path, dest_path);
+	else
+		g_string_sprintf(message, "!ERROR: Failed to copy %s as %s\n",
+				path, dest_path);
+	send();
+}
+
+static void do_move(char *path, char *dest)
+{
+	char		*dest_path;
+	char		*leaf;
+
+	leaf = strrchr(path, '/');
+	if (!leaf)
+		leaf = path;		/* Error? */
+	else
+		leaf++;
+
+	dest_path = make_path(dest, leaf)->str;
+
+	if (access(dest_path, F_OK) == 0)
+	{
+		char	rep;
+		g_string_sprintf(message, "?'%s' already exists - overwrite?\n",
+				dest_path);
+		send();
+		
+		rep = reply(from_parent);
+		if (rep == 'A')
+			quiet = TRUE;
+		else if (rep != 'Y')
+			return;
+	}
+
+	g_string_sprintf(message, "mv -f %s %s", path, dest_path);
+	if (system(message->str) == 0)
+	{
+		g_string_sprintf(message, "+%s", path);
+		g_string_truncate(message, leaf - path);
+		send();
+		g_string_sprintf(message, "'Moved %s as %s\n",
+				path, dest_path);
+	}
+	else
+		g_string_sprintf(message, "!ERROR: Failed to move %s as %s\n",
+				path, dest_path);
+	send();
+}
+
+static void do_link(char *path, char *dest)
+{
+	char		*dest_path;
+	char		*leaf;
+
+	leaf = strrchr(path, '/');
+	if (!leaf)
+		leaf = path;		/* Error? */
+	else
+		leaf++;
+
+	dest_path = make_path(dest, leaf)->str;
+
+	if (symlink(path, dest_path))
+		send_error();
+	else
+	{
+		g_string_sprintf(message, "'Symlinked %s as %s\n",
+				path, dest_path);
+		send();
+	}
+}
+
+/*			CHILD MAIN LOOPS			*/
+
+/* After forking, the child calls one of these functions */
+
+static void delete_cb(gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
 	Collection *collection = filer_window->collection;
 	FileItem   *item;
 	int	left = collection->number_selected;
@@ -328,53 +533,25 @@ static void delete_cb(FilerWindow *filer_window)
 	
 	g_string_sprintf(message, "'\nDone\n");
 	send();
-	g_string_sprintf(message, "+%s", filer_window->path);
-	send();
-	sleep(5);
+	sleep(1);
 }
 
-/* Called when the child sends us a message */
-static void got_delete_data(gpointer 		data,
-			    gint     		source, 
-			    GdkInputCondition 	condition)
+static void list_cb(gpointer data)
 {
-	char buf[5];
-	GUIside	*gui_side = (GUIside *) data;
-	GtkWidget *log = gui_side->log;
+	GSList	*paths = (GSList *) data;
 
-	if (read_exact(source, buf, 4))
+	while (paths)
 	{
-		ssize_t message_len;
-		char	*buffer;
+		action_do_func((char *) paths->data, action_dest);
+		g_string_sprintf(message, "+%s", action_dest);
+		send();
 
-		buf[4] = '\0';
-		message_len = strtol(buf, NULL, 16);
-		buffer = g_malloc(message_len + 1);
-		if (message_len > 0 && read_exact(source, buffer, message_len))
-		{
-			buffer[message_len] = '\0';
-			if (*buffer == '?')
-				gtk_widget_set_sensitive(gui_side->actions,
-							TRUE);
-			else if (*buffer == '+')
-			{
-				refresh_dirs(buffer + 1);
-				g_free(buffer);
-				return;
-			}
-			gtk_text_insert(GTK_TEXT(log),
-					NULL,
-					NULL, NULL,
-					buffer + 1, message_len - 1);
-			g_free(buffer);
-			return;
-		}
-		g_print("Child died in the middle of a message.\n");
+		paths = paths->next;
 	}
 
-	/* The child is dead */
-	gui_side->child = 0;
-	gtk_widget_destroy(gui_side->window);
+	g_string_sprintf(message, "'\nDone\n");
+	send();
+	sleep(1);
 }
 
 /*			EXTERNAL INTERFACE			*/
@@ -384,7 +561,6 @@ void action_delete(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
-	GtkWidget	*button;
 
 	collection = window_with_focus->collection;
 
@@ -399,44 +575,49 @@ void action_delete(FilerWindow *filer_window)
 	if (!gui_side)
 		return;
 
-	gui_side->input_tag = gdk_input_add(gui_side->from_child,
-						GDK_INPUT_READ,
-						got_delete_data, gui_side);
-
 	number_of_windows++;
-
-	button = gtk_button_new_with_label("Always");
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "A");
-	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
-	button = gtk_button_new_with_label("Yes");
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
-	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
-	button = gtk_button_new_with_label("No");
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "N");
-	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
-	gtk_widget_set_sensitive(gui_side->actions, FALSE);
-
 	gtk_widget_show_all(gui_side->window);
 }
 
 void action_copy(GSList *paths, char *dest)
 {
-	delayed_error("Copy", "Not implemented yet - sorry!");
+	GUIside		*gui_side;
+
+	action_dest = dest;
+	action_do_func = do_copy;
+	gui_side = start_action(paths, list_cb);
+	if (!gui_side)
+		return;
+
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
 }
 
 void action_move(GSList *paths, char *dest)
 {
-	delayed_error("Move", "Not implemented yet - sorry!");
+	GUIside		*gui_side;
+
+	action_dest = dest;
+	action_do_func = do_move;
+	gui_side = start_action(paths, list_cb);
+	if (!gui_side)
+		return;
+
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
 }
 
 void action_link(GSList *paths, char *dest)
 {
-	delayed_error("Link", "Not implemented yet - sorry!");
+	GUIside		*gui_side;
+
+	action_dest = dest;
+	action_do_func = do_link;
+	gui_side = start_action(paths, list_cb);
+	if (!gui_side)
+		return;
+
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
 }
 
