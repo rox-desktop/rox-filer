@@ -60,7 +60,7 @@ config.h: config.h.in
 	./config.status
 
 config.status: configure
-	$(srcdir)/configure --with-platform="${PLATFORM}" --enable-rox
+	APP_DIR="$(srcdir)/.." $(srcdir)/configure --with-platform="${PLATFORM}" --enable-rox
 
 configure: configure.in
 	cd $(srcdir) && autoconf
