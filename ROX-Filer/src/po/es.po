@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.5\n"
-"POT-Creation-Date: 2003-01-10 12:48-0300\n"
+"POT-Creation-Date: 2003-01-19 05:12-0300\n"
 "PO-Revision-Date: 2002-11-21\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -213,15 +213,15 @@ msgstr ""
 "'\n"
 "Hecho\n"
 
-#: action.c:480 support.c:398
+#: action.c:480 support.c:397
 msgid "ERROR"
 msgstr "ERROR"
 
-#: action.c:633 main.c:574 main.c:582
+#: action.c:633 main.c:579 main.c:587 main.c:595
 msgid "Yes"
 msgstr "Si"
 
-#: action.c:636 main.c:576
+#: action.c:636 main.c:581 main.c:597
 msgid "No"
 msgstr "No"
 
@@ -594,12 +594,12 @@ msgid "This item is already at the end"
 msgstr "Este elemento ya es el último"
 
 #: bookmarks.c:486
-msgid "Add new bookmark"
-msgstr "Agregar nuevo marcador"
+msgid "Add New Bookmark"
+msgstr "Agregar Nuevo Marcador"
 
 #: bookmarks.c:493
-msgid "Edit bookmarks"
-msgstr "Editar marcadores"
+msgid "Edit Bookmarks"
+msgstr "Editar Barcadores"
 
 #: cell_icon.c:151
 msgid "DirItem"
@@ -625,7 +625,7 @@ msgstr "Ajuste Vertical"
 msgid "The GtkAdjustment for the vertical position."
 msgstr "El Ajuste Gtk de la posición vertical"
 
-#: dir.c:131 dir.c:659
+#: dir.c:182 dir.c:649
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -634,12 +634,12 @@ msgstr ""
 "Error explorando '%s':\n"
 "%s"
 
-#: dir.c:334
+#: dir.c:865
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "No fue posible hallar estado del directorio: %s"
 
-#: dir.c:342
+#: dir.c:873
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "No fue posible abrir el directorio: %s"
@@ -791,43 +791,43 @@ msgstr "El directorio '%s' no es accesible"
 msgid "Directory '%s' not found."
 msgstr "El directorio '%s' no fue encontrado."
 
-#: filer.c:1405
+#: filer.c:1406
 msgid "Cancel"
 msgstr "Cancelar"
 
-#: filer.c:1645
+#: filer.c:1646
 msgid "S"
 msgstr ""
 
-#: filer.c:1646
+#: filer.c:1647
 msgid "A"
 msgstr ""
 
-#: filer.c:1647
+#: filer.c:1648
 msgid "T"
 msgstr ""
 
-#: filer.c:1653
+#: filer.c:1654
 msgid "Scanning, "
 msgstr "Explorando, "
 
-#: filer.c:1654
+#: filer.c:1655
 msgid "All, "
 msgstr "Todo, "
 
-#: filer.c:1655
+#: filer.c:1656
 msgid "Thumbs, "
 msgstr "Miniaturas, "
 
-#: filer.c:1916
+#: filer.c:1917
 msgid "Symbolic link to "
 msgstr "Enlace simbólico a "
 
-#: filer.c:1947
+#: filer.c:1948
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Este nombre de archivo no es UTF-8 válido. Debes renombrarlo.\n"
 
-#: filer.c:2220 menu.c:1829
+#: filer.c:2222 menu.c:1829
 msgid "Item no longer exists!"
 msgstr "El elemento no existe más!"
 
@@ -1205,111 +1205,107 @@ msgstr "El texto mostrado bajo el ícono es:"
 msgid "The keyboard shortcut is:"
 msgstr "El atajo de teclado es:"
 
-#: infobox.c:90
+#: infobox.c:91
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr "¿Estás seguro que quieres abrir %d ventanas?"
 
-#: infobox.c:91
+#: infobox.c:92
 msgid "Show Info"
 msgstr "Mostrar Información"
 
-#: infobox.c:113 menu.c:757
+#: infobox.c:114 menu.c:757
 msgid "(bad utf-8)"
 msgstr "(utf-8 erróneo)"
 
-#: infobox.c:222
+#: infobox.c:265
 msgid "Show _Help Files"
 msgstr "Mostrar Arc_hivos de Ayuda"
 
-#: infobox.c:331
-msgid "Name:"
-msgstr "Nombre:"
-
-#: infobox.c:335 tips:245
+#: infobox.c:376 tips:245
 msgid "Error:"
 msgstr "Error:"
 
-#: infobox.c:342
+#: infobox.c:383
 msgid "Real directory:"
 msgstr "Directorio real:"
 
-#: infobox.c:346
+#: infobox.c:387
 msgid "Owner, Group:"
 msgstr "Propietario, Grupo:"
 
-#: infobox.c:352
+#: infobox.c:393
 msgid "Size:"
 msgstr "Tamaño:"
 
-#: infobox.c:356 support.c:275 support.c:352
+#: infobox.c:397 support.c:274 support.c:351
 msgid "bytes"
 msgstr ""
 
-#: infobox.c:359
+#: infobox.c:400
 msgid "Change time:"
 msgstr "Tiempo de cambio:"
 
-#: infobox.c:361
+#: infobox.c:402
 msgid "Modify time:"
 msgstr "Tiempo de modificación:"
 
-#: infobox.c:363
+#: infobox.c:404
 msgid "Access time:"
 msgstr "Tiempo de acceso:"
 
-#: infobox.c:365
+#: infobox.c:406
 msgid "Permissions:"
 msgstr "Permisos:"
 
-#: infobox.c:367
+#: infobox.c:408
 msgid "Type:"
 msgstr "Tipo:"
 
-#: infobox.c:370
+#: infobox.c:411
 msgid "Run action:"
 msgstr "Acción asociada:"
 
-#: infobox.c:461
+#: infobox.c:502
 msgid "file(1) says..."
 msgstr "file(1) dice..."
 
-#: infobox.c:462
+#: infobox.c:503
 msgid "<nothing yet>"
 msgstr "<nada aún>"
 
-#: infobox.c:534
+#: infobox.c:575
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) dice... %s"
 
-#: infobox.c:578
+#: infobox.c:619
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Enlace simbólico a %s"
 
-#: infobox.c:584
+#: infobox.c:625
 msgid "Symbolic link"
 msgstr "Enlace simbólico"
 
-#: infobox.c:588
+#: infobox.c:629
 msgid "ROX application"
 msgstr "Aplicación de ROX"
 
-#: infobox.c:596
+#: infobox.c:637
 msgid "mounted"
 msgstr "montado"
 
-#: infobox.c:596
+#: infobox.c:637
 msgid "unmounted"
 msgstr "desmontado"
 
-#: infobox.c:600
+#: infobox.c:641
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Punto de montaje para %s (%s)"
 
-#: infobox.c:603
+#: infobox.c:644
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Punto de montaje (%s)"
@@ -1361,7 +1357,6 @@ msgid ""
 "  -l, --left=PANEL\topen PAN as a left-edge panel\n"
 "  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
 "  -n, --new\t\tstart new copy; for debugging the filer\n"
-"  -o, --override\toverride window manager control of panels\n"
 "  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
 "  -r, --right=PANEL\topen PAN as a right-edge panel\n"
 "  -R, --RPC\t\tinvoke method call read from stdin\n"
@@ -1386,8 +1381,6 @@ msgstr ""
 "  -l, --left=PANEL\tabre PAN como un panel en el borde izquierdo\n"
 "  -m, --mime-type=ARCHIVO\tmuestra el tipo MIME de ARCHIVO y termina\n"
 "  -n, --new\t\tinicia una nueva instancia; para depurar el filer\n"
-"  -o, --override\tpasa por alto el control del manejador de ventanas sobre "
-"los paneles\n"
 "  -p, --pinboard=PIN\tusa el escritorio PIN como el escritorio\n"
 "  -r, --right=PANEL\tabre PAN como un panel en el borde derecho\n"
 "  -R, --RPC\t\tinvoca llamada de método leído desde stdin\n"
@@ -1400,7 +1393,7 @@ msgstr ""
 "Informa los fallos a <tal197@users.sourceforge.net>.\n"
 "Página web (incluyendo versiones actualizadas): http://rox.sourceforge.net/\n"
 
-#: main.c:310
+#: main.c:309
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
@@ -1408,26 +1401,40 @@ msgstr ""
 "El argumento -o no se utiliza más. Puedes activar el pasar por alto la "
 "redirección en la ventana de Opciones en su lugar."
 
-#: main.c:399
+#: main.c:398
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Corriendo como el usuario '%s'"
 
 #: main.c:571
+#, c-format
+msgid "Compiled with GTK version %s\n"
+msgstr "Compilado con GTK versión %s\n"
+
+#: main.c:572
+#, c-format
+msgid "Running with GTK version %d.%d.%d\n"
+msgstr "Ejecutándose con GTK versión %d.%d.%d\n"
+
+#: main.c:576
 msgid "features set at compile time"
 msgstr "funcionalidades definidas en tiempo de compilación"
 
-#: main.c:572
+#: main.c:577
 msgid "Large File Support"
 msgstr "Soporte para Archivos Grandes"
 
-#: main.c:580
+#: main.c:585
 msgid "GNOME-VFS library"
 msgstr "Biblioteca GNOME-VFS"
 
-#: main.c:584
+#: main.c:589
 msgid "No (gnome-vfs-config not found)"
 msgstr "No (gnome-vfs-config no encontrado)"
+
+#: main.c:593
+msgid "Dnotify support"
+msgstr "Soporte para Dnotify (Notificación de cambio de directorio)"
 
 #: menu.c:180 tips:48
 msgid "Display"
@@ -1445,9 +1452,9 @@ msgstr "Iconos, Con..."
 msgid "Sizes"
 msgstr "Tamaños"
 
-#: menu.c:185 tips:57 tips:75
-msgid "Type"
-msgstr "Tipo"
+#: menu.c:185 tips:227
+msgid "Types"
+msgstr "Tipos"
 
 #: menu.c:186 tips:76
 msgid "Times"
@@ -2258,7 +2265,7 @@ msgstr ""
 "Esto es un directorio. Contiene un índice a otros elementos - ábrelo para "
 "ver la lista."
 
-#: support.c:273 support.c:354
+#: support.c:272 support.c:353
 msgid "byte"
 msgstr ""
 
@@ -2939,6 +2946,10 @@ msgstr "Tipo de vista:"
 msgid "Sort by:"
 msgstr "Ordenar por:"
 
+#: tips:57 tips:75
+msgid "Type"
+msgstr "Tipo"
+
 #: tips:58
 msgid "Date"
 msgstr "Fecha"
@@ -3113,8 +3124,8 @@ msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
-"Cuando las miniaturas están activadas cada imágen en un directorio es cargada " 
-"y una miniatura pequeña de ella es mostrada."
+"Cuando las miniaturas están activadas cada imágen en un directorio es "
+"cargada y una miniatura pequeña de ella es mostrada."
 
 #: tips:112
 msgid "Show image thumbnails"
@@ -3521,10 +3532,6 @@ msgstr "El programa a lanzar cuando elijas `Xterm Aquí' desde el menú."
 msgid "Keyboard shortcuts"
 msgstr "Atajos de teclado"
 
-#: tips:227
-msgid "Types"
-msgstr "Tipos"
-
 #: tips:228
 msgid "Executable files"
 msgstr "Archivos ejecutables"
@@ -3706,3 +3713,6 @@ msgstr ""
 "Algunas aplicaciones antiguas no soportan XDND totalmente y pueden necesitar "
 "que está opción esté activada. Usala si al arrastrar archivos a una "
 "aplicación aparece un signo + en el puntero pero al soltar no funciona."
+
+#~ msgid "Name:"
+#~ msgstr "Nombre:"
