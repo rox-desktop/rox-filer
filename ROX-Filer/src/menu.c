@@ -176,8 +176,6 @@ static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
 #undef N_
 #define N_(x) x
 
-#define SORT_PATH "/Display/Sort by Name"
-
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Icons View"),   	NULL, view_type, VIEW_TYPE_COLLECTION, NULL},

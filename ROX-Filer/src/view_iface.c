@@ -26,9 +26,6 @@
 #include "global.h"
 
 #include "view_iface.h"
-#include "support.h"
-#include "filer.h"
-#include "diritem.h"
 
 /* A word about interfaces:
  *

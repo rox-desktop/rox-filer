@@ -1321,6 +1321,7 @@ static void view_details_set_frozen(ViewIface *view, gboolean frozen)
 
 static void view_details_wink_item(ViewIface *view, ViewIter *iter)
 {
+	/* TODO */
 }
 
 static void view_details_autosize(ViewIface *view)
