@@ -1528,7 +1528,7 @@ static void mark_modified(gpointer hash_key,
 {
 	GtkItemFactoryItem *item = (GtkItemFactoryItem *) value;
 
-	item->modified = (gboolean) user_data;
+	item->modified = (gboolean) GPOINTER_TO_INT(user_data);
 }
 
 /* Set or clear the 'modified' flag in all menu items. Messy... */
@@ -1538,7 +1538,8 @@ static void mark_menus_modified(gboolean mod)
 
 	class = gtk_type_class(GTK_TYPE_ITEM_FACTORY);
 
-	g_hash_table_foreach(class->item_ht, mark_modified, (gpointer) mod);
+	g_hash_table_foreach(class->item_ht, mark_modified,
+			GINT_TO_POINTER(mod));
 }
 
 

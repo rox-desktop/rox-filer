@@ -152,7 +152,7 @@ char *user_name(uid_t uid)
 	if (!uid_hash)
 		uid_hash = g_hash_table_new(NULL, NULL);
 
-	retval = g_hash_table_lookup(uid_hash, (gpointer) uid);
+	retval = g_hash_table_lookup(uid_hash, GINT_TO_POINTER(uid));
 
 	if (!retval)
 	{
@@ -161,7 +161,7 @@ char *user_name(uid_t uid)
 		passwd = getpwuid(uid);
 		retval = passwd ? g_strdup(passwd->pw_name)
 			       : g_strdup_printf("[%d]", (int) uid);
-		g_hash_table_insert(uid_hash, (gpointer) uid, retval);
+		g_hash_table_insert(uid_hash, GINT_TO_POINTER(uid), retval);
 	}
 
 	return retval;
@@ -174,7 +174,7 @@ char *group_name(gid_t gid)
 	if (!gid_hash)
 		gid_hash = g_hash_table_new(NULL, NULL);
 
-	retval = g_hash_table_lookup(gid_hash, (gpointer) gid);
+	retval = g_hash_table_lookup(gid_hash, GINT_TO_POINTER(gid));
 
 	if (!retval)
 	{
@@ -183,7 +183,7 @@ char *group_name(gid_t gid)
 		group = getgrgid(gid);
 		retval = group ? g_strdup(group->gr_name)
 			       : g_strdup_printf("[%d]", (int) gid);
-		g_hash_table_insert(gid_hash, (gpointer) gid, retval);
+		g_hash_table_insert(gid_hash, GINT_TO_POINTER(gid), retval);
 	}
 
 	return retval;

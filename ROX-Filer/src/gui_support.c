@@ -81,7 +81,7 @@ static void choice_clicked(GtkWidget *widget, gpointer number)
 			"choice_return");
 
 	if (choice_return)
-		*choice_return = (int) number;
+		*choice_return = GPOINTER_TO_INT(number);
 }
 
 /* Open a modal dialog box showing a message.
@@ -150,7 +150,7 @@ int get_choice(char *title,
 				&choice_return);
 		gtk_box_pack_start(GTK_BOX(action_area), button, TRUE, TRUE, 0);
 		gtk_signal_connect(GTK_OBJECT(button), "clicked",
-					choice_clicked, (gpointer) i);
+					choice_clicked, GINT_TO_POINTER(i));
 		if (!default_button)
 			default_button = button;
 	}
