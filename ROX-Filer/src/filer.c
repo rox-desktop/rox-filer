@@ -1927,7 +1927,7 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 			if (o_new_window_on_1)
 				flags ^= OPEN_SAME_WINDOW;
 			if (event->type == GDK_2BUTTON_PRESS)
-				collection_unselect_item(collection, item);
+				collection_clear_selection(collection);
 			dnd_motion_ungrab();
 			filer_openitem(filer_window, item, flags);
 			break;

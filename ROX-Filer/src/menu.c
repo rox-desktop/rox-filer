@@ -1880,10 +1880,10 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		case FILE_OPEN_VFS_AVFS:
 			open_vfs_avfs(window_with_focus, item);
 			break;
+#endif
 		default:
 			g_warning("Unknown action!");
 			return;
-#endif
 	}
 }
 
