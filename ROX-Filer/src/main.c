@@ -7,6 +7,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <sys/types.h>
 #include <signal.h>
 #include <sys/wait.h>
 #include <unistd.h>
@@ -108,6 +109,16 @@ int main(int argc, char **argv)
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	sigaction(SIGCHLD, &act, NULL);
+
+	if (geteuid() == 0)
+	{
+		if (get_choice("!!!DANGER!!!",
+			"Running ROX-Filer as root is VERY dangerous. If it "
+			"had a warranty (it doesn't) then doing this would "
+			"void it.", 2,
+			"Don't click here", "Quit") != 0)
+			exit(EXIT_SUCCESS);
+	}
 
 	if (argc < 2)
 		filer_opendir(getenv("HOME"), FALSE, BOTTOM);

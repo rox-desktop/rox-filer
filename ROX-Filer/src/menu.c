@@ -8,12 +8,14 @@
 /* menu.c - code for handling the popup menu */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
+#include <string.h>
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -48,6 +50,7 @@ static char *load_xterm_here(char *data);
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
+static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
@@ -85,7 +88,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
-{"/File/Copy...",		NULL,  	NULL, 0, NULL},
+{"/File/Copy...",		NULL,  	copy_item, 0, NULL},
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
@@ -444,6 +447,68 @@ void bin(gpointer data, guint action, GtkWidget *widget)
 	for (i = sizeof(start_args) / sizeof(char *); i < argc; i++)
 		g_free(argv[i]);
 	g_free(argv);
+}
+
+static gboolean copy_cb(char *initial, char *path)
+{
+	char	*new_dir, *slash;
+	int	len;
+	GString	*command;
+	gboolean retval = TRUE;
+
+	slash = strrchr(path, '/');
+	if (!slash)
+	{
+		report_error("ROX-Filer", "Missing '/' in new pathname");
+		return FALSE;
+	}
+
+	if (access(path, F_OK) == 0)
+	{
+		report_error("ROX-Filer",
+				"An item with this name already exists");
+		return FALSE;
+	}
+
+	len = slash - path;
+	new_dir = g_malloc(len + 1);
+	memcpy(new_dir, path, len);
+	new_dir[len] = '\0';
+
+	command = g_string_new(NULL);
+	g_string_sprintf(command, "cp -a %s %s", initial, path);
+
+	if (system(command->str))
+	{
+		g_string_append(command, " failed!");
+		report_error("ROX-Filer", command->str);
+		retval = FALSE;
+	}
+
+	g_string_free(command, TRUE);
+
+	refresh_dirs(new_dir);
+	return retval;
+}
+
+static void copy_item(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected != 1)
+		report_error("ROX-Filer", "You must select a single "
+				"item to copy");
+	else
+	{
+		FileItem *item = selected_item(collection);
+
+		savebox_show(window_with_focus, "Copy",
+				window_with_focus->path, item->leafname,
+				item->image, copy_cb);
+	}
 }
 
 static gboolean rename_cb(char *initial, char *path)
