@@ -261,6 +261,9 @@ void pinboard_activate(const gchar *name)
 	{
 		if (number_of_windows < 1 && gtk_main_level() > 0)
 			gtk_main_quit();
+
+		gdk_property_delete(gdk_get_default_root_window(),
+				gdk_atom_intern("_XROOTPMAP_ID", FALSE));
 		return;
 	}
 
@@ -1961,6 +1964,11 @@ static void reload_backdrop(Pinboard *pinboard,
 				gdk_atom_intern("PIXMAP", FALSE),
 				32, GDK_PROP_MODE_REPLACE,
 				(guchar *) &xid, 1);
+	}
+	else
+	{
+		gdk_property_delete(gdk_get_default_root_window(),
+				gdk_atom_intern("_XROOTPMAP_ID", FALSE));
 	}
 }
 
