@@ -113,7 +113,7 @@ void type_init()
 	current_type = NULL;
 
 	list = choices_list_dirs("MIME-info");
-	for (i = 0; i < list->len; i++)
+	for (i = list->len - 1; i >= 0; i--)
 		import_for_dir((gchar *) g_ptr_array_index(list, i));
 	choices_free_list(list);
 
@@ -184,7 +184,7 @@ void type_reread(void)
 	current_type = NULL;
 
 	list = choices_list_dirs("MIME-info");
-	for (i = 0; i < list->len; i++)
+	for (i = list->len - 1; i >= 0; i--)
 		import_for_dir((gchar *) g_ptr_array_index(list, i));
 	choices_free_list(list);
 
