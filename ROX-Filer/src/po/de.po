@@ -6,8 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.6\n"
-"POT-Creation-Date: 2003-05-22 14:04+0100\n"
-"PO-Revision-Date: 2003-01-05 18:24--100\n"
+"POT-Creation-Date: 2003-05-23 06:26+0200\n"
+"PO-Revision-Date: 2003-04-30 00:52--100\n"
 "Last-Translator: Guido Schimmels <guido.schimmels@freenet.de>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -195,6 +195,8 @@ msgid ""
 "\n"
 "Process terminated.\n"
 msgstr ""
+"\n"
+"Prozess beendet..\n"
 
 #: action.c:367
 msgid "There was one error.\n"
@@ -234,12 +236,16 @@ msgid ""
 "\n"
 "Asking child process to terminate...\n"
 msgstr ""
+"\n"
+"Fordere Kindprozess auf, sich zu beenden...\n"
 
 #: action.c:673
 msgid ""
 "\n"
 "Trying to KILL run-away process...\n"
 msgstr ""
+"\n"
+"Versuche KILL auf Wildläuferprozess ...\n"
 
 #: action.c:826
 #, c-format
@@ -473,7 +479,7 @@ msgstr "Bitte wählen Sie erst einige zu zählende Einträge aus"
 
 #: action.c:1654
 msgid "Disk Usage"
-msgstr "Speicherbedarf"
+msgstr "Speicherverbrauch"
 
 #: action.c:1687
 msgid "Mount / Unmount"
@@ -598,12 +604,12 @@ msgstr "<Bezeichnung fehlt>"
 #: bookmarks.c:277
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
-msgstr ""
+msgstr "Lesezeichen für Netzwerkresource '%s' nicht anlegbar\n"
 
 #: bookmarks.c:285 bookmarks.c:571
-#, fuzzy, c-format
+#, c-format
 msgid "'%s' isn't a directory"
-msgstr "Kann Verzeichnis %s nicht auswerten "
+msgstr "'%s' ist kein Verzeichnis"
 
 #: bookmarks.c:464
 msgid "You should first select some rows to delete"
@@ -620,21 +626,19 @@ msgstr "Das Ende der Liste ist schon erreicht"
 #: bookmarks.c:575
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
-msgstr ""
+msgstr "Lesezeichen für Netzwerkverzeichnisse wie '%s' nicht anlegbar"
 
 #: bookmarks.c:699
-#, fuzzy
 msgid "Add New Bookmark"
-msgstr "Neues Lesezeichen"
+msgstr "Lesezeichen anlegen"
 
 #: bookmarks.c:706
-#, fuzzy
 msgid "Edit Bookmarks"
 msgstr "Lesezeichen bearbeiten"
 
 #: bookmarks.c:711
 msgid "Recently Visited"
-msgstr ""
+msgstr "Zuletzt besucht"
 
 #: dir.c:924
 #, c-format
@@ -657,7 +661,7 @@ msgstr "Interner Fehler - Fehlerhafter Info-Typ"
 
 #: dnd.c:549
 msgid "Drag a directory here to bookmark it."
-msgstr ""
+msgstr "Verzeichnis hier hinein ziehen, um Lesezeichen anzulegen."
 
 #: dnd.c:564
 msgid "XDS protocol error: leafname may not contain '/'\n"
@@ -748,34 +752,31 @@ msgid "Error getting file list: %s"
 msgstr "Fehler beim Holen der Dateiliste: %s"
 
 #: dropbox.c:116
-#, fuzzy
 msgid "Show"
-msgstr "Zeige Info"
+msgstr "Zeige"
 
 #: dropbox.c:122
-#, fuzzy
 msgid "Show the current choice in a filer window"
-msgstr "Ziehen auf Icons in Verzeichnisfenster erlauben"
+msgstr "Zeige aktuelle Einstellung in Dateifenster"
 
 #: dropbox.c:176
-#, fuzzy
 msgid "<nothing>"
-msgstr "<nichts bisher>"
+msgstr "<nichts>"
 
 #: dropbox.c:242
 msgid ""
 "I can't show you the currently set item, because nothing is currently set. "
 "Drag something onto me!"
-msgstr ""
+msgstr "Es gibt nichts zu zeigen. Ziehe etwas auf mich!"
 
 #: dropbox.c:266
 msgid "Sorry, you need to drop exactly one file onto the drop area."
-msgstr ""
+msgstr "Nur immer genau eine Datei auf diese Zone bewegen."
 
 #: dropbox.c:276
 #, c-format
 msgid "Sorry, I can't use '%s' because it's not a local file."
-msgstr ""
+msgstr "Kann '%s' nicht verwenden, da es keine lokale Datei ist."
 
 #: dropbox.c:283 pinboard.c:690
 #, c-format
@@ -787,13 +788,13 @@ msgstr ""
 "%s"
 
 #: filer.c:346
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error scanning '%s':\n"
 "%s\n"
 msgstr ""
 "Fehler beim Durchsuchen von '%s':\n"
-"%s"
+"%s\n"
 
 #: filer.c:350
 #, c-format
@@ -1143,6 +1144,8 @@ msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
 msgstr ""
+"Pinwand-Icons können nicht dargestellt werden, da ROX-Filer gegen GTK+-2.0 "
+"kompiliert wurde und jetzt mit GTK+-2.2 läuft. Bitte rekompilieren."
 
 #: i18n.c:38
 msgid ""
@@ -1366,7 +1369,6 @@ msgid "Mount point (%s)"
 msgstr "Mount-Punkt (%s) "
 
 #: main.c:93
-#, fuzzy
 msgid ""
 "Copyright (C) 2003 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1375,7 +1377,7 @@ msgid ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
-"Copyright (C) 2002 Thomas Leonard.\n"
+"Copyright (C) 2003 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
@@ -1401,7 +1403,6 @@ msgstr ""
 "\n"
 
 #: main.c:111
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1433,12 +1434,13 @@ msgstr ""
 "sofern keine Argumente angegeben wurden.\n"
 "\n"
 "  -b, --bottom=PANEL\töffnet PANEL am unteren Bildschirmrand\n"
+"  -c, --client-id=ID\tfür die Sitzungsverwaltung\n"
 "  -d, --dir=DIR\t\töffnet DIR als Verzeichnis (nicht als Anwendung)\n"
+"  -D, --close=DIR\tschließe DIR samt Unterverzeichnissen\n"
 "  -h, --help\t\tzeigt diese Hilfe und beendet ROX-Filer\n"
 "  -l, --left=PANEL\töffnet PANEL am linken Bildschirmrand\n"
 "  -m, --mime-type=FILE\tzeigt den MIME-Typ von FILE und beendet ROX-Filer\n"
 "  -n, --new\t\tstartet neuen Filer, auch wenn bereits einer läuft\n"
-"  -o, --override\tFenster-Manager-Control-Panel ignorieren\n"
 "  -p, --pinboard=PIN\tPIN als Pinwand benutzen\n"
 "  -r, --right=PANEL\töffnet PANEL am rechten Bildschirmrand\n"
 "  -s, --show=FILE\töffnet das Verzeichnis, in dem sich FILE befindet\n"
@@ -1447,10 +1449,8 @@ msgstr ""
 "  -v, --version\t\tzeigt Versionsinformation und beendet ROX-Filer\n"
 "  -x, --examine=FILE\tFILE ist geändert - neu prüfen\n"
 "\n"
-"Die aktuelle Version kann gefunden werden unter:\n"
-"\thttp://rox.sourceforge.net\n"
-"\n"
 "Bug-Reports bitte an <tal197@users.sourceforge.net>.\n"
+"Homepage (auch Updates): thttp://rox.sourceforge.net\n"
 
 #: main.c:309
 msgid ""
@@ -1468,12 +1468,12 @@ msgstr "Starte als Benutzter '%s'"
 #: main.c:571
 #, c-format
 msgid "Compiled with GTK version %s\n"
-msgstr ""
+msgstr "Kompiliert mit GTK Version %s\n"
 
 #: main.c:572
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
-msgstr ""
+msgstr "Läuft mit GTK Version %d.%d.%d\n"
 
 #: main.c:576
 msgid "features set at compile time"
@@ -1493,7 +1493,7 @@ msgstr "Nein (gnome-vfs-config nicht gefunden)"
 
 #: main.c:593
 msgid "Dnotify support"
-msgstr ""
+msgstr "Dnotify-Ünterstützung"
 
 #: menu.c:181 tips:51
 msgid "Display"
@@ -2065,44 +2065,39 @@ msgstr "Hintergrund ändern"
 
 #: pinboard.c:590
 msgid "Choose a style and drag an image in:"
-msgstr ""
+msgstr "Stil wählen und Bild hineinziehen:"
 
 #: pinboard.c:603
-#, fuzzy
 msgid "Centre the image without scaling it"
-msgstr "Vor dem Löschen nicht nachfragen."
+msgstr "Bild unskaliert zentrieren"
 
 #: pinboard.c:604
-#, fuzzy
 msgid "Centre"
-msgstr "Zentriert"
+msgstr "Zentrieren"
 
 #: pinboard.c:605
 msgid "Scale the image to fit the backdrop area, without distorting it"
-msgstr ""
+msgstr "Bild auf Hintergrundgröße skalieren, ohne es zu verzerren"
 
 #: pinboard.c:607
-#, fuzzy
 msgid "Scale"
-msgstr "Skaliert"
+msgstr "Skalieren"
 
 #: pinboard.c:608
 msgid "Stretch the image to fill the backdrop area"
-msgstr ""
+msgstr "Bild strecken, um den Hintergrund auszufüllen"
 
 #: pinboard.c:609
-#, fuzzy
 msgid "Stretch"
-msgstr "Französisch"
+msgstr "Strecken"
 
 #: pinboard.c:610
 msgid "Tile the image over the backdrop area"
-msgstr ""
+msgstr "Fliese Hintergrund mit dem Bild"
 
 #: pinboard.c:611
-#, fuzzy
 msgid "Tile"
-msgstr "Gekachelt"
+msgstr "Fliesen"
 
 #: pinboard.c:616
 msgid "Drop an image here"
@@ -2166,19 +2161,19 @@ msgid "Purge thumbnails disk cache"
 msgstr "Zwischenspeicher für Miniaturen leeren"
 
 #: remote.c:593
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown style '%s'"
-msgstr "Unbekannter Typ:"
+msgstr "Unbekannter Stil '%s'"
 
 #: remote.c:615
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown details type '%s'"
-msgstr "Unbekannter Typ:"
+msgstr "Unbekannter Detailtyp '%s'"
 
 #: remote.c:643
-#, fuzzy, c-format
+#, c-format
 msgid "Unknown sorting type '%s'"
-msgstr "Unbekannter Typ:"
+msgstr "Unbekannter Sortiertyp '%s'"
 
 #: remote.c:989
 #, c-format
@@ -2339,7 +2334,7 @@ msgstr ""
 
 #: support.c:272
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: support.c:351
 msgid "byte"
@@ -2394,9 +2389,8 @@ msgid "Change icon size"
 msgstr "Wechseln der Icongröße"
 
 #: toolbar.c:133
-#, fuzzy
 msgid "Automatic size mode"
-msgstr "Automatisch"
+msgstr "Automatische Größenanpassung"
 
 #: toolbar.c:137
 msgid "Details"
@@ -2556,7 +2550,7 @@ msgstr "Startaktion festlegen"
 #: type.c:816
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
-msgstr ""
+msgstr "Voreinstellung, falls dem Typ noch keine Applikation zugeordnet wurde."
 
 #: type.c:818
 #, c-format
@@ -2564,21 +2558,17 @@ msgid "Set default for all `%s/<anything>'"
 msgstr "Standard für alle '%s/<irgendwas>' festlegen"
 
 #: type.c:822
-#, fuzzy
 msgid "Use this application for all files with this MIME type."
-msgstr "Eine Kopie des Bildes für diesen MIME-Typ verwenden."
+msgstr "Diese Applikation verwenden für alle Dateien von diesem MIME-Typ."
 
 #: type.c:824 usericons.c:285
-#, fuzzy, c-format
+#, c-format
 msgid "Only for the type `%s' (%s/%s)"
-msgstr "Nur für den Typ '%s/%s'"
+msgstr "Nur für den Typ `%s' (%s/%s)"
 
 #: type.c:830
-#, fuzzy
 msgid "Drop a suitable application here"
-msgstr ""
-"Ziehen Sie eine passende\n"
-"Applikation hierher"
+msgstr "Ziehen Sie eine passende Applikation hierher"
 
 #: type.c:845
 msgid "OR"
@@ -2625,6 +2615,9 @@ msgid ""
 "should move it there (and make a symlink from ~/.mime to it for older "
 "applications)."
 msgstr ""
+"Das ~/.mime Verzeichnis  wurde in ~/.local/share/mime umbenannt. Bitte "
+"verschieben Sie es dahin (eine Verknüpfung zum alten Platz bewahrt "
+"Kompatibilität mit alten Programmen).   "
 
 #: type.c:1286
 msgid ""
@@ -2649,7 +2642,7 @@ msgstr ""
 
 #: type.c:1360
 msgid "No description"
-msgstr ""
+msgstr "Keine Beschreibung vorhanden"
 
 #: usericons.c:181
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -2670,15 +2663,15 @@ msgstr ""
 #: usericons.c:238
 #, c-format
 msgid "Really delete icon '%s'?"
-msgstr ""
+msgstr "Icon '%s' wirklich entfernen?"
 
 #: usericons.c:242
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Can't delete '%s':\n"
 "%s"
 msgstr ""
-"Kein Zugriff möglich auf '%s':\n"
+"Kann nicht entfernen '%s':\n"
 "%s"
 
 #: usericons.c:269
@@ -2979,15 +2972,16 @@ msgstr ""
 "erstes angezeigt."
 
 #: tips:48
-#, fuzzy
 msgid "Capitalised names first (for sort by name)"
-msgstr "Verzeichnisse immer zuerst (für Sortieren nach Name)"
+msgstr "Großgeschriebene Namen zuerst (für Sortieren nach Name)"
 
 #: tips:49 tips:50
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
 msgstr ""
+"Wenn Haken gesetzt, werden Dateien mit großem Anfangsbuchstaben zuerst "
+"gelistet."
 
 #: tips:52
 msgid "Default settings for new windows"
@@ -3081,7 +3075,7 @@ msgstr ""
 
 #: tips:86
 msgid "Max width (Large icons):"
-msgstr ""
+msgstr "Max. Breite (Große Icons):"
 
 #: tips:87 tips:90
 msgid "pixels"
@@ -3097,22 +3091,20 @@ msgstr ""
 "umgebrochen, wenn er 50% breiter als dieser Wert ist."
 
 #: tips:89
-#, fuzzy
 msgid "(Small Icons):"
-msgstr "Kleine Icons"
+msgstr "(Kleine Icons):"
 
 #: tips:91 tips:92 tips:93
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maximale Breite für den Text neben Kleinen Icons."
 
 #: tips:95
-#, fuzzy
 msgid "Show column headings"
-msgstr "Miniaturen zeigen"
+msgstr "Zeige Spaltenüberschriften"
 
 #: tips:96 tips:97 tips:98
 msgid "If this is on then column headings will be shown in the list view."
-msgstr ""
+msgstr "Haken setzen für Spaltenüberschriften in der Listenansicht."
 
 #: tips:99
 msgid "Tools/Minibuffer"
@@ -3432,17 +3424,15 @@ msgstr "Nur das Bild wird angezeigt."
 
 #: tips:175
 msgid "Panel width (thin)"
-msgstr ""
+msgstr "Panelbreite (schmal)"
 
 #: tips:176
-#, fuzzy
 msgid "(thick)"
-msgstr "Dick"
+msgstr "(breit)"
 
 #: tips:177 tips:178 tips:179
-#, fuzzy
 msgid "The size of the panels."
-msgstr "Darzustellendes Element."
+msgstr "Die Größe der Panels."
 
 #: tips:180
 msgid "Action windows"
@@ -3556,47 +3546,39 @@ msgstr ""
 "die vorherige Option, um eine Wirkung zu haben."
 
 #: tips:216
-#, fuzzy
 msgid "When dragging files with the left mouse button"
-msgstr "Ziehen von Dateien mit der mittleren Maustaste"
+msgstr "Beim Ziehen von Dateien mit der mittleren Maustaste"
 
 #: tips:217 tips:223
-#, fuzzy
 msgid "Show a menu of possible actions"
-msgstr "Zeigt ein Menü der möglichen Aktionen"
+msgstr "Zeige ein Menü der möglichen Aktionen"
 
 #: tips:218
-#, fuzzy
 msgid "Copy the files"
-msgstr "Verschiebt Dateien"
+msgstr "Kopiere die Dateien"
 
 #: tips:219 tips:220 tips:221
-#, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
 msgstr ""
-"Beachten Sie, daß Sie das Menü immernoch durch Ziehen mit der linken Taste "
-"und Gedrückthalten der Alt-Taste aufrufen können"
+"Das Menü ist weiterhin erreichbar durch Ziehen bei gedrückter Alt-Taste."
 
 #: tips:222
-#, fuzzy
 msgid "When dragging files with the middle mouse button"
-msgstr "Ziehen von Dateien mit der mittleren Maustaste"
+msgstr "Beim Ziehen von Dateien mit der mittleren Maustaste"
 
 #: tips:224
-#, fuzzy
 msgid "Move the files"
-msgstr "Verschiebt Dateien"
+msgstr "Verschiebe die Dateien"
 
 #: tips:225 tips:226 tips:227 tips:228
-#, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
 msgstr ""
-"Beachten Sie, daß Sie das Menü immernoch durch Ziehen mit der linken Taste "
-"und Gedrückthalten der Alt-Taste aufrufen können"
+"Das Menü ist weiterhin erreichbar, durch Ziehen mit der linken Maustaste bei "
+"gedrückter Alt-Taste."
 
 #: tips:229
 msgid "Menus"
@@ -3672,7 +3654,6 @@ msgid "MIME types"
 msgstr "MIME-Typen"
 
 #: tips:250
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. Use the MIME-"
@@ -3682,9 +3663,10 @@ msgid ""
 msgstr ""
 "Der Filer benutzt einen Satz von Regeln, um den richtigen MIME-Typ für jede "
 "reguläre Datei herauszufinden, um dann nach einem passenden Icon für diesen "
-"Typ zu suchen.Nachdem Sie die Dateien geändert haben, müssen Sie 'update-"
-"mime-database' auf der Befehlszeile eingeben. Betätigen Sie den "
-"'Aktualisieren' Knopf der Werkzeugleiste, um die neuen Typen anzuzeigen."
+"Typ zu suchen. Benutzen Sie das Programm MIME-Editor, um die Datei-zu-Typ "
+"Zuordnungsregeln zu bearbeiten:\n"
+"\n"
+"http://rox.sourceforge.net/mime_editor.html"
 
 #: tips:251 tips:252
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
@@ -3807,7 +3789,7 @@ msgstr ""
 
 #: tips:277
 msgid "Blackbox root menus hack"
-msgstr ""
+msgstr "Hack für das Blackbox Hintergrundmenü"
 
 #: tips:278 tips:279
 msgid ""
@@ -3816,6 +3798,10 @@ msgid ""
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
 msgstr ""
+"Blackbox, Fluxbox und ähnliche Windowmanager vertragen sich noch nicht gut "
+"mit der Pinwand. Diese Option aktiviert Notlösungen für das Problem. Mit "
+"zukünftigen Versionen dieser Windowmanager dürfte sich dieses Problem "
+"erledigen. "
 
 #: tips:280
 msgid "Drag and drop"
@@ -3836,104 +3822,3 @@ msgstr ""
 "Ziehen einer Datei über eine Applikation ein + auf dem Mauszeiger erscheint, "
 "aber nichts passiert."
 
-#~ msgid "Show name-to-type rules"
-#~ msgstr "Zeige Name-zu-Typ-Regeln"
-
-#~ msgid "DirItem"
-#~ msgstr "DirItem"
-
-#~ msgid "Background color"
-#~ msgstr "Hintergrundfarbe"
-
-#~ msgid "Background color as a GdkColor"
-#~ msgstr "Hintergrundfarbe als GdkColor"
-
-#~ msgid "Vertical Adjustment"
-#~ msgstr "Vertikal ausrichten"
-
-#~ msgid "The GtkAdjustment for the vertical position."
-#~ msgstr "GtkAdjustment für die vertikale Position."
-
-#~ msgid "Has Discard"
-#~ msgstr "Hat Abbrechen"
-
-#~ msgid "The dialog has a Discard button"
-#~ msgstr "Der Dialog hat einen Abbrechen Knopf"
-
-#~ msgid "Set Icon"
-#~ msgstr "Icon ändern"
-
-#~ msgid "You can't use multiple files with Set Icon!"
-#~ msgstr "Sie können immer nur für eine Datei das Icon ändern!"
-
-#~ msgid "Name:"
-#~ msgstr "Name:"
-
-#~ msgid "Display backdrop image:"
-#~ msgstr "Hintergrundbild anzeigen:"
-
-#~ msgid ""
-#~ "You should drop a single (local) image file onto the drop box - that "
-#~ "image will be used for the desktop background. You can also drag certain "
-#~ "applications onto this box."
-#~ msgstr ""
-#~ "Ziehen Sie ein einziges (lokales) Icon in diesen Rahmen - dieses Bild "
-#~ "wird als Hintergrund verwendet. Sie können auch spezielle Programme in "
-#~ "diesen Rahmen ziehen."
-
-#~ msgid "Huge"
-#~ msgstr "Riesig"
-
-#~ msgid "Large"
-#~ msgstr "Groß"
-
-#~ msgid "Small"
-#~ msgstr "Klein"
-
-#~ msgid ""
-#~ "You should drop a single (local) application onto the drop box - that "
-#~ "application will be used to load files of this type in future"
-#~ msgstr ""
-#~ "Ziehen Sie eine einzelne lokale Applikation in diesen Auffangkasten - "
-#~ "diese Applikation wird dann in Zukunft benutzt, um Dateien dieses Typs zu "
-#~ "laden"
-
-#~ msgid "Currently %s"
-#~ msgstr "Momentan %s"
-
-#~ msgid "Menu of directories previously used for icons"
-#~ msgstr "Menü von Verzeichnissen wurde vorher für Icons benutzt"
-
-#~ msgid "Enter the path of an icon file:"
-#~ msgstr "Geben Sie den Pfad eines Icons ein:"
-
-#~ msgid "_Remove"
-#~ msgstr "_Entfernen"
-
-#~ msgid ""
-#~ "You should drop a single local icon file onto the drop box - that icon "
-#~ "will be used for this file from now on."
-#~ msgstr ""
-#~ "Ziehen Sie ein einziges lokales Icon in diesen Auffangkasten - dieses "
-#~ "Icon wird dann von jetzt an für diese Datei benutzt."
-
-#~ msgid ""
-#~ "Enter the full path of a file that contains a valid image to be used as "
-#~ "the icon for this file or directory."
-#~ msgstr ""
-#~ "Geben Sie den vollständigen Pfad einer Datei an, die ein verwendbares "
-#~ "Bild enthält, das als Icon für diese Datei oder dieses Verzeichnis "
-#~ "benutzt werden soll."
-
-#~ msgid ""
-#~ "You have not yet set any special icons; therefore, I have no directories "
-#~ "to show you"
-#~ msgstr ""
-#~ "Sie haben keine speziellen Icons definiert; deshalb kann ich Ihnen keine "
-#~ "Verzeichnisse zeigen"
-
-#~ msgid "Large wrap width:"
-#~ msgstr "Umbruch bei Großen Icons:"
-
-#~ msgid "Max Small Icons width:"
-#~ msgstr "Max. Textbreite bei Kleinen Icons:"
