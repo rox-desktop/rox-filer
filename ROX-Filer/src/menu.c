@@ -185,10 +185,10 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">>" N_("Permissions"),	NULL, set_with, DETAILS_PERMISSIONS, NULL},
 {">>" N_("Types"),		NULL, set_with, DETAILS_TYPE, NULL},
 {">>" N_("Times"),		NULL, set_with, DETAILS_TIMES, NULL},
-{">" N_("List View"),   	NULL, view_type, VIEW_TYPE_DETAILS, NULL},
+{">" N_("List View"),   	NULL, view_type, VIEW_TYPE_DETAILS, "<StockItem>", ROX_STOCK_SHOW_DETAILS},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Bigger Icons"),   	NULL, change_size, 1, NULL},
-{">" N_("Smaller Icons"),   	NULL, change_size, -1, NULL},
+{">" N_("Bigger Icons"),   	NULL, change_size, 1, "<StockItem>", GTK_STOCK_ZOOM_IN},
+{">" N_("Smaller Icons"),   	NULL, change_size, -1, "<StockItem>", GTK_STOCK_ZOOM_OUT},
 {">" N_("Automatic"),   	NULL, change_size_auto, 0, "<ToggleItem>"},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL, set_sort, SORT_NAME, NULL},
@@ -201,45 +201,45 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
-{">" N_("Refresh"),		NULL, refresh, 0, NULL},
+{">" N_("Refresh"),		NULL, refresh, 0, "<StockItem>", GTK_STOCK_REFRESH},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, NULL},
+{">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, "<StockItem>", GTK_STOCK_COPY},
 {">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
 {">" N_("Link..."),		NULL, file_op, FILE_LINK_ITEM, NULL},
-{">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, NULL},
+{">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, "<StockItem>", GTK_STOCK_DELETE},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Help"),		NULL, file_op, FILE_HELP, NULL},
-{">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE, NULL},
-{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
+{">" N_("Help"),		NULL, file_op, FILE_HELP, "<StockItem>", GTK_STOCK_HELP},
+{">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE},
+{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, "<StockItem>", GTK_STOCK_OPEN},
 {">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, NULL},
+{">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
-{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
+{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, "<StockItem>", GTK_STOCK_DIALOG_INFO},
 {">" N_("Count"),		NULL, file_op, FILE_USAGE, NULL},
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Find"),		NULL, file_op, FILE_FIND, NULL},
+{">" N_("Find"),		NULL, file_op, FILE_FIND, "<StockItem>", GTK_STOCK_FIND},
 {N_("Select"),	    		NULL, NULL, 0, "<Branch>"},
 {">" N_("Select All"),	    	NULL, select_all, 0, NULL},
 {">" N_("Clear Selection"),	NULL, clear_selection, 0, NULL},
 {">" N_("Invert Selection"),	NULL, invert_selection, 0, NULL},
 {">" N_("Select If..."),	NULL, mini_buffer, MINI_SELECT_IF, NULL},
-{N_("Options..."),		NULL, menu_show_options, 0, NULL},
+{N_("Options..."),		NULL, menu_show_options, 0, "<StockItem>", GTK_STOCK_PREFERENCES},
 {N_("New"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Directory"),		NULL, new_directory, 0, NULL},
-{">" N_("Blank file"),		NULL, new_file, 0, NULL},
+{">" N_("Blank file"),		NULL, new_file, 0, "<StockItem>", GTK_STOCK_NEW},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
+{">" N_("Parent, New Window"), 	NULL, open_parent, 0, "<StockItem>", GTK_STOCK_GO_UP},
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
-{">" N_("Home Directory"),	NULL, home_directory, 0, NULL},
-{">" N_("Show Bookmarks"),	"<Ctrl>B", show_bookmarks, 0, NULL},
+{">" N_("Home Directory"),	NULL, home_directory, 0, "<StockItem>", GTK_STOCK_HOME},
+{">" N_("Show Bookmarks"),	"<Ctrl>B", show_bookmarks, 0, "<StockItem>", ROX_STOCK_BOOKMARKS},
 {">" N_("Follow Symbolic Links"),	NULL, follow_symlinks, 0, NULL},
 {">" N_("Resize Window"),	NULL, resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
 
-{">" N_("Close Window"),	NULL, close_window, 0, NULL},
+{">" N_("Close Window"),	NULL, close_window, 0, "<StockItem>", GTK_STOCK_CLOSE},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Enter Path..."),	"slash", mini_buffer, MINI_PATH, NULL},
 {">" N_("Shell Command..."),	NULL, mini_buffer, MINI_SHELL, NULL},
@@ -247,7 +247,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Switch to xterm"),	NULL, xterm_here, TRUE, NULL},
 {N_("Help"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, NULL},
-{">" N_("Show Help Files"),	"F1", menu_rox_help, HELP_DIR, NULL},
+{">" N_("Show Help Files"),	"F1", menu_rox_help, HELP_DIR, "<StockItem>", GTK_STOCK_HELP},
 {">" N_("Manual"),		NULL, menu_rox_help, HELP_MANUAL, NULL},
 };
 
@@ -452,9 +452,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 	while ((ent = readdir(dir)))
 	{
 		char	*dot, *leaf;
-		GtkWidget *hbox;
-		GtkWidget *img;
-		GtkWidget *label;
 		gchar *fname;
 
 		/* Ignore hidden files */
@@ -488,20 +485,12 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 					break;
 			}
 
-			item = gtk_menu_item_new();
+			item = gtk_image_menu_item_new_with_label(leaf);
 			/* TODO: Find a way to allow short-cuts */
 			menuitem_no_shortcuts(item);
 
-			hbox = gtk_hbox_new(FALSE, 2);
-			gtk_container_add(GTK_CONTAINER(item), hbox);
-
-			img = gtk_image_new_from_pixbuf(pixbuf);
-
-			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
-
-			label = gtk_label_new(leaf);
-			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
+			gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
+					gtk_image_new_from_pixbuf(pixbuf));
 		}
 		else
 			item = gtk_menu_item_new_with_label(leaf);

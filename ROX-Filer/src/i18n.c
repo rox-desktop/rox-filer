@@ -135,6 +135,7 @@ GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n)
 		ret[i].callback = entries[i].callback;
 		ret[i].callback_action = entries[i].callback_action;
 		ret[i].item_type = entries[i].item_type;
+		ret[i].extra_data = entries[i].extra_data;
 	}
 	
 	g_free(first);
