@@ -18,12 +18,9 @@ struct _Directory
 	int		number_of_files;
 };
 
-struct _FileInfo
-{
-	char	*name;
-};
-
-gboolean directory_scan(Directory *directory);
+gboolean directory_scan(Directory *directory,
+			void (*callback)(char *name, gpointer user_data),
+			gpointer data);
 Directory *directory_new(char *path);
 void directory_destroy(Directory *dir);
 

@@ -17,61 +17,41 @@
 #include "support.h"
 #include "directory.h"
 
-/* Creates and fills in the files list for a directory.
- * Returns TRUE on success, else FALSE and errno gives error.
+/* Calls the callback function for each object in the directory.
+ * '.' and '..' are ignored.
+ * Returns FALSE on error (errno is set).
  */
-gboolean directory_scan(Directory *directory)
+gboolean directory_scan(Directory *directory,
+			void (*callback)(char *name, gpointer user_data),
+			gpointer user_data)
 {
-	FileInfo	*files;
-	int		files_size, n_files;
 	DIR		*dir;
 	struct dirent   *next;
-	gboolean	retval;
 	
 	g_return_val_if_fail(directory != NULL, FALSE);
-	g_return_val_if_fail(directory->files == NULL, FALSE);
-
-	files = g_malloc(sizeof(FileInfo) * 8);
-	files_size = 8;
-	n_files = 0;
 
 	dir = opendir(directory->path);
-	if (dir)
+	if (!dir)
+		return FALSE;
+
+	while ((next = readdir(dir)))
 	{
-		while ((next = readdir(dir)))
-		{
-			char	*name = next->d_name;
+		char	*name = next->d_name;
 
-			/* Ignore '.' and '..' */
-			if (*name == '.' && (name[1] == '\0'
+		/* Ignore '.' and '..' */
+		if (*name == '.' && (name[1] == '\0'
 					|| (name[1] == '.' && name[2] == '\0')))
-				continue;
+			continue;
 
-			if (n_files >= files_size)
-			{
-				files_size += files_size / 2;
-				files = g_realloc(files,
-						sizeof(FileInfo) * files_size);
-				printf("[ resized to %d items ]\n", files_size);
-			}
-			files[n_files++].name = g_strdup(name);
-		}
-
-		/* An error here should be ignored - NFS seems to generate
-		 * unnecessary errors.
-		 */
-
-		closedir(dir);
-
-		retval = TRUE;
+		callback(name, user_data);
 	}
-	else
-		retval = FALSE;
 
-	directory->files = files;
-	directory->number_of_files = n_files;
+	/* An error here should be ignored - NFS seems to generate
+	 * unnecessary errors.
+	 */
+	closedir(dir);
 
-	return retval;
+	return TRUE;
 }
 
 /* Public methods */

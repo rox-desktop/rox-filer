@@ -10,12 +10,19 @@
 #include "directory.h"
 
 typedef struct _FilerWindow FilerWindow;
+typedef struct _FileItem FileItem;
 
 struct _FilerWindow
 {
 	GtkWidget	*window;
 	Collection	*collection;
 	Directory	*dir;
+};
+
+struct _FileItem
+{
+	char		*leafname;
+	int		text_width;
 };
 
 void filer_opendir(char *path);
