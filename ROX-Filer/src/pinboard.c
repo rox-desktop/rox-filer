@@ -295,6 +295,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);
 
 	icon->widget = gtk_drawing_area_new();
+	gtk_widget_set_name(icon->widget, "pinboard-icon");
 #ifdef GTK2
 	icon->layout = gtk_widget_create_pango_layout(icon->widget, NULL);
 	pango_layout_set_width(icon->layout, 140 * PANGO_SCALE);

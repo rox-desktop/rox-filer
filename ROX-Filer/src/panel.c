@@ -408,6 +408,7 @@ static void panel_add_item(Panel *panel,
 	icon_hash_path(icon);
 	
 	icon->widget = widget;
+	gtk_widget_set_name(icon->widget, "panel-icon");
 	icon->selected = FALSE;
 	diritem_stat(icon->path, &icon->item, FALSE);
 
