@@ -11,11 +11,7 @@
 #include <gtk/gtk.h>
 #include "fscache.h"
 
-#ifdef GTK2
-#else
-# include <gdk/gdkprivate.h> /* XXX - find another way to do this */
-# define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
-# define PIXMAP_HEIGHT(p) (((GdkPixmapPrivate *) (p))->height)
+#ifndef GTK2
 # ifndef PIXMAPS_C
   typedef struct _GdkPixbuf GdkPixbuf;
 # endif
