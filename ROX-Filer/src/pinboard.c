@@ -560,8 +560,9 @@ void pinboard_set_backdrop_app(const gchar *app)
 /* Open a dialog box allowing the user to set the backdrop */
 void pinboard_set_backdrop(void)
 {
-	GtkWidget *dialog, *frame, *label, *radio, *hbox;
+	GtkWidget *dialog, *frame, *label, *hbox;
 	GtkBox *vbox;
+	Radios *radios;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
@@ -575,7 +576,7 @@ void pinboard_set_backdrop(void)
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-	label = gtk_label_new(_("Display backdrop image:"));
+	label = gtk_label_new(_("Choose a style, then drag an image in:"));
 	gtk_misc_set_padding(GTK_MISC(label), 4, 0);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	gtk_box_pack_start(vbox, label, TRUE, TRUE, 4);
@@ -583,23 +584,22 @@ void pinboard_set_backdrop(void)
 	/* The Centred, Scaled, Tiled radios... */
 	hbox = gtk_hbox_new(TRUE, 2);
 	gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 4);
-	
-	radio = gtk_radio_button_new_with_label(NULL, _("Centred"));
-	g_object_set_data(G_OBJECT(dialog), "radio_centred", radio);
-	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
 
-	radio = gtk_radio_button_new_with_label(
-			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
-			_("Scaled"));
-	g_object_set_data(G_OBJECT(dialog), "radio_scaled", radio);
-	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+	radios = radios_new();
+	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
-	radio = gtk_radio_button_new_with_label(
-			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
-			_("Tiled"));
-	gtk_box_pack_start(GTK_BOX(hbox), radio, FALSE, TRUE, 0);
+	radios_add(radios, _("Centre the image without scaling it"),
+			BACKDROP_CENTRE, _("Centre"));
+	radios_add(radios, _("Scale the image to fit the backdrop area, "
+			     "without distorting it"),
+			BACKDROP_SCALE, _("Scale"));
+	radios_add(radios, _("Strech the image to fill the backdrop area"),
+			BACKDROP_STRETCH, _("Strech"));
+	radios_add(radios, _("Tile the image over the backdrop area"),
+			BACKDROP_TILE, _("Tile"));
 
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
+	radios_set_value(radios, BACKDROP_TILE);
+	radios_pack(radios, GTK_BOX(hbox));
 	
 	/* The drop area... */
 	frame = gtk_frame_new(NULL);
@@ -648,9 +648,13 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 	struct stat info;
 	const gchar *path = NULL;
 	GList *uris;
+	Radios *radios;
 
 	if (!selection_data->data)
 		return; 		/* Timeout? */
+
+	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
+	g_return_if_fail(radios != NULL);
 
 	uris = uri_list_to_glist(selection_data->data);
 
@@ -682,25 +686,7 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 		pinboard_set_backdrop_app(path);
 	}
 	else if (S_ISREG(info.st_mode))
-	{
-		GtkWidget *radio;
-
-		radio = g_object_get_data(G_OBJECT(dialog), "radio_scaled");
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio)))
-		{
-			set_backdrop(path, BACKDROP_SCALE);
-			return;
-		}
-
-		radio = g_object_get_data(G_OBJECT(dialog), "radio_centred");
-		if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(radio)))
-		{
-			set_backdrop(path, BACKDROP_CENTRE);
-			return;
-		}
-
-		set_backdrop(path, BACKDROP_TILE);
-	}
+		set_backdrop(path, radios_get_value(radios));
 	else
 		delayed_error(_("Only files (and certain applications) can be "
 				"used to set the background image."));
@@ -1222,10 +1208,11 @@ static void backdrop_from_xml(xmlNode *node)
 	if (style)
 	{
 		current_pinboard->backdrop_style =
-			g_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
-			g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
-			g_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
-			g_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
+		  g_strcasecmp(style, "Tiled") == 0 ? BACKDROP_TILE :
+		  g_strcasecmp(style, "Scaled") == 0 ? BACKDROP_SCALE :
+		  g_strcasecmp(style, "Streched") == 0 ? BACKDROP_STRETCH :
+		  g_strcasecmp(style, "Centred") == 0 ? BACKDROP_CENTRE :
+		  g_strcasecmp(style, "Program") == 0 ? BACKDROP_PROGRAM :
 							     BACKDROP_NONE;
 		g_free(style);
 	}
@@ -1360,6 +1347,7 @@ static void pinboard_save(void)
 			style == BACKDROP_TILE   ? "Tiled" :
 			style == BACKDROP_CENTRE ? "Centred" :
 			style == BACKDROP_SCALE  ? "Scaled" :
+			style == BACKDROP_STRETCH  ? "Streched" :
 						   "Program");
 	}
 
@@ -1999,7 +1987,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 		return NULL;
 	}
 
-	if (style == BACKDROP_SCALE)
+	if (style == BACKDROP_STRETCH)
 	{
 		GdkPixbuf *old = pixbuf;
 
@@ -2009,29 +1997,40 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 
 		g_object_unref(old);
 	}
-	else if (style == BACKDROP_CENTRE)
+	else if (style == BACKDROP_CENTRE || style == BACKDROP_SCALE)
 	{
 		GdkPixbuf *old = pixbuf;
 		int	  x, y, width, height;
+		float	  scale;
 
 		width = gdk_pixbuf_get_width(pixbuf);
 		height = gdk_pixbuf_get_height(pixbuf);
+
+		if (style == BACKDROP_SCALE)
+		{
+			float	  scale_x, scale_y;
+			scale_x = screen_width / ((float) width);
+			scale_y = screen_height / ((float) height);
+			scale = MIN(scale_x, scale_y);
+		}
+		else
+			scale = 1;
 
 		pixbuf = gdk_pixbuf_new(
 				gdk_pixbuf_get_colorspace(pixbuf), 0,
 				8, screen_width, screen_height);
 		gdk_pixbuf_fill(pixbuf, 0);
 
-		x = (screen_width - width) / 2;
-		y = (screen_height - height) / 2;
+		x = (screen_width - width * scale) / 2;
+		y = (screen_height - height * scale) / 2;
 		x = MAX(x, 0);
 		y = MAX(y, 0);
 
 		gdk_pixbuf_composite(old, pixbuf,
 				x, y,
-				MIN(screen_width, width),
-				MIN(screen_height, height),
-				x, y, 1, 1,
+				MIN(screen_width, width * scale),
+				MIN(screen_height, height * scale),
+				x, y, scale, scale,
 				GDK_INTERP_NEAREST, 255);
 		g_object_unref(old);
 	}
@@ -2082,6 +2081,11 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 	{
 		style = BACKDROP_SCALE;
 		command += 6;
+	}
+	else if (strncmp(command, "stretch ", 8) == 0)
+	{
+		style = BACKDROP_STRETCH;
+		command += 8;
 	}
 	else if (strncmp(command, "centre ", 7) == 0)
 	{

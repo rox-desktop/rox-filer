@@ -17,7 +17,7 @@ extern PangoFontDescription *pinboard_font;
 typedef enum {
 	BACKDROP_NONE,
 	BACKDROP_PROGRAM,
-	BACKDROP_CENTRE, BACKDROP_SCALE, BACKDROP_TILE
+	BACKDROP_CENTRE, BACKDROP_SCALE, BACKDROP_STRETCH, BACKDROP_TILE
 } BackdropStyle;
 
 void pinboard_init(void);
