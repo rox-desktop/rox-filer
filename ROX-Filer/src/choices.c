@@ -163,7 +163,7 @@ guchar *choices_find_path_load(char *leaf, char *dir)
 		gchar	*path;
 
 		path = g_strconcat(*cdir, "/", dir, "/", leaf, NULL);
-		
+
 		if (exists(path))
 			return path;
 

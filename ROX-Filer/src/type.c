@@ -24,6 +24,7 @@
 #include "config.h"
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <errno.h>
 #include <ctype.h>
 #include <time.h>
@@ -40,10 +41,12 @@
 #include "type.h"
 #include "support.h"
 #include "dir.h"
+#include "dnd.h"
 
 /* Static prototypes */
 static char *import_extensions(guchar *line);
 static void import_for_dir(guchar *path);
+char *get_action_save_path(GtkWidget *dialog);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
 static GHashTable *extension_hash = NULL;
@@ -340,46 +343,246 @@ GdkAtom type_to_atom(MIME_type *type)
 	return retval;
 }
 
+void show_shell_help(gpointer data)
+{
+	report_error(PROJECT,
+		_("Enter a shell command which will load \"$1\" into "
+		"a suitable program. Eg:\n\n"
+		"gimp \"$1\""));
+}
+
+/* Called if the user clicks on the OK button */
+static void set_shell_action(GtkWidget *dialog)
+{
+	GtkEntry *entry;
+	GtkToggleButton *for_all;
+	guchar	*command, *path, *tmp;
+	int	error = 0, len;
+	FILE	*file;
+
+	entry = gtk_object_get_data(GTK_OBJECT(dialog), "shell_command");
+	for_all = gtk_object_get_data(GTK_OBJECT(dialog), "set_for_all");
+	g_return_if_fail(entry != NULL);
+
+	command = gtk_entry_get_text(entry);
+	
+	if (!strchr(command, '$'))
+	{
+		show_shell_help(NULL);
+		return;
+	}
+
+	path = get_action_save_path(dialog);
+	if (!path)
+		return;
+		
+	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
+	len = strlen(tmp);
+	
+	file = fopen(path, "wb");
+	if (fwrite(tmp, 1, len, file) < len)
+		error = errno;
+	if (fclose(file) && error == 0)
+		error = errno;
+	if (chmod(path, 0777))
+		error = errno;
+
+	if (error)
+		report_error(PROJECT, g_strerror(errno));
+
+	g_free(tmp);
+
+	gtk_widget_destroy(dialog);
+}
+
+/* Called when a URI list is dropped onto the box in the Set Run Action
+ * dialog. Make sure it's an application, and make that the default
+ * handler.
+ */
+void drag_app_dropped(GtkWidget		*frame,
+		      GdkDragContext    *context,
+		      gint              x,
+		      gint              y,
+		      GtkSelectionData  *selection_data,
+		      guint             info,
+		      guint32           time,
+		      GtkWidget		*dialog)
+{
+	GSList	*uris;
+	guchar	*app = NULL;
+	DirItem	item;
+
+	if (!selection_data->data)
+		return; 		/* Timeout? */
+
+	uris = uri_list_to_gslist(selection_data->data);
+
+	if (g_slist_length(uris) == 1)
+		app = get_local_path((guchar *) uris->data);
+	g_slist_free(uris);
+
+	if (!app)
+	{
+		delayed_error(PROJECT,
+			_("You should drop a single (local) application"
+			"onto the drop box - that application will be "
+			"used to load files of this type in future"));
+		return;
+	}
+
+	dir_stat(app, &item);
+	if (item.flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	{
+		guchar	*path;
+
+		path = get_action_save_path(dialog);
+
+		if (path)
+		{
+			if (symlink(app, path))
+				delayed_error("symlink failed",
+						g_strerror(errno));
+			else
+				gtk_widget_destroy(dialog);
+		}
+	}
+	else
+		delayed_error(PROJECT,
+			_("This is not a program! Give me an application "
+			"instead!"));
+
+	dir_item_clear(&item);
+}
+
+/* Display a dialog box allowing the user to set the default run action
+ * for this type.
+ */
+void type_set_handler_dialog(MIME_type *type)
+{
+	guchar		*tmp;
+	GtkWidget	*dialog, *vbox, *frame, *hbox, *entry, *label, *button;
+	GtkWidget	*radio;
+	GtkTargetEntry 	targets[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
+
+	g_return_if_fail(type != NULL);
+
+	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_object_set_data(GTK_OBJECT(dialog), "mime_type", type);
+
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
+	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
+
+	vbox = gtk_vbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(dialog), vbox);
+
+	tmp = g_strconcat("Set default for all `", type->media_type,
+				"/<anything>'", NULL);
+	radio = gtk_radio_button_new_with_label(NULL, tmp);
+	g_free(tmp);
+	gtk_object_set_data(GTK_OBJECT(dialog), "set_for_all", radio);
+
+	tmp = g_strconcat("Only for the type `", type->media_type, "/",
+			type->subtype, "'", NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, TRUE, 0);
+	radio = gtk_radio_button_new_with_label(
+			gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
+			tmp);
+	g_free(tmp);
+	gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, TRUE, 0);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
+
+	frame = gtk_frame_new(NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+
+	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
+			targets, sizeof(targets) / sizeof(*targets),
+			GDK_ACTION_COPY);
+	gtk_signal_connect(GTK_OBJECT(frame), "drag_data_received",
+			GTK_SIGNAL_FUNC(drag_app_dropped), dialog);
+
+	label = gtk_label_new(_("Drop a suitable\napplication here"));
+	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
+	gtk_container_add(GTK_CONTAINER(frame), label);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
+						FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	label = gtk_label_new(_("Enter a shell command:")),
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 4);
+
+	gtk_box_pack_start(GTK_BOX(hbox),
+			new_help_button(show_shell_help, NULL), FALSE, TRUE, 0);
+
+	entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
+	gtk_widget_grab_focus(entry);
+	gtk_object_set_data(GTK_OBJECT(dialog), "shell_command", entry);
+	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
+			GTK_SIGNAL_FUNC(set_shell_action), GTK_OBJECT(dialog));
+
+	hbox = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	button = gtk_button_new_with_label(_("OK"));
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_window_set_default(GTK_WINDOW(dialog), button);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(set_shell_action), GTK_OBJECT(dialog));
+	
+	button = gtk_button_new_with_label(_("Cancel"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(dialog));
+
+	gtk_widget_show_all(dialog);
+}
+
 /* The user wants to set a new default action for files of this type.
- * Ask the user if they want to set eg 'text/plain' or just 'text'.
  * Removes the current binding if possible and returns the path to
  * save the new one to. NULL means cancel.
  */
-char *type_ask_which_action(guchar *media_type, guchar *subtype)
+char *get_action_save_path(GtkWidget *dialog)
 {
-	int		r;
-	guchar		*tmp, *type_name, *path;
+	guchar		*tmp, *path = NULL;
 	struct stat 	info;
+	guchar 		*type_name = NULL;
+	MIME_type	*type;
+	GtkToggleButton *for_all;
 
-	g_return_val_if_fail(media_type != NULL, NULL);
-	g_return_val_if_fail(subtype != NULL, NULL);
+	g_return_val_if_fail(dialog != NULL, NULL);
+	type = gtk_object_get_data(GTK_OBJECT(dialog), "mime_type");
+	for_all = gtk_object_get_data(GTK_OBJECT(dialog), "set_for_all");
+	g_return_val_if_fail(for_all != NULL && type != NULL, NULL);
+
+	if (gtk_toggle_button_get_active(for_all))
+		type_name = g_strdup(type->media_type);
+	else
+		type_name = g_strconcat(type->media_type, "_",
+				type->subtype, NULL);
 
 	if (!choices_find_path_save("", PROJECT, FALSE))
 	{
 		report_error(PROJECT,
 		_("Choices saving is disabled by CHOICESPATH variable"));
-		return NULL;
+		goto out;
 	}
 
-	type_name = g_strconcat(media_type, "/", subtype, NULL);
-	tmp = g_strdup_printf(
-		_("You can choose to set the action for just '%s' files, or "
-		  "the default action for all '%s' files which don't already "
-		  "have a run action:"), type_name, media_type);
-	r = get_choice(PROJECT, tmp, 3, type_name, media_type, "Cancel");
-	g_free(tmp);
-	g_free(type_name);
-
-	if (r == 0)
-	{
-		type_name = g_strconcat(media_type, "_", subtype, NULL);
-		path = choices_find_path_save(type_name, "MIME-types", TRUE);
-		g_free(type_name);
-	}
-	else if (r == 1)
-		path = choices_find_path_save(media_type, "MIME-types", TRUE);
-	else
-		return NULL;
+	path = choices_find_path_save(type_name, "MIME-types", TRUE);
 
 	if (lstat(path, &info) == 0)
 	{
@@ -390,7 +593,10 @@ char *type_ask_which_action(guchar *media_type, guchar *subtype)
 				_("A run action already exists and is quite "
 				"a big program - are you sure you want to "
 				"delete it?"), 2, "Delete", "Cancel") != 0)
-				return NULL;
+			{
+				path = NULL;
+				goto out;
+			}
 		}
 		
 		if (unlink(path))
@@ -399,10 +605,13 @@ char *type_ask_which_action(guchar *media_type, guchar *subtype)
 				path, g_strerror(errno));
 			report_error(PROJECT, tmp);
 			g_free(tmp);
-			return NULL;
+			path = NULL;
+			goto out;
 		}
 	}
 
+out:
+	g_free(type_name);
 	return path;
 }
 

@@ -4,9 +4,20 @@
 
 06-Sep-2000
 ~~~~~~~~~~~
-Added a much improved icon for executables (Victor Liu See-le).
+Moved 'Set Run Action' to the file menu (suggested by Ewan Mac Mahon), and
+make using it bring up a dialog rather than a minibuffer. Hopefully it is now
+easier to use!
+
+Added much improved icons for executables and for applications without icons
+of their own (Victor Liu See-le).
+
 Allow '/' on the pinboard and panel (text wasn't displayed - spotted by
 Tim Rowledge).
+
+Bugfix: auto-scrolling didn't always stop when a drag ended.
+Bugfix: creating a panel with the same name as a file in the current
+	directory caused an error due to a throwback from when panels were
+	directories (spotted by Ewan Mac Mahon).
 
 30-Aug-2000 (Release 0.1.27)
 ~~~~~~~~~~~

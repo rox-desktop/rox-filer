@@ -313,9 +313,7 @@ int main(int argc, char **argv)
 				g_string_append_c(to_open, '<');
 				g_string_append_c(to_open, c);
 				g_string_append_c(to_open, '>');
-				tmp = pathdup(VALUE);
-				g_string_append(to_open, tmp);
-				g_free(tmp);
+				g_string_append(to_open, VALUE);
 				break;
 			case 'p':
 				g_string_append(to_open, "<p>");

@@ -45,8 +45,8 @@ MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);
 MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);
-char *type_ask_which_action(guchar *media_type, guchar *subtype);
 MIME_type *mime_type_from_base_type(int base_type);
 int mode_to_base_type(int st_mode);
+void type_set_handler_dialog(MIME_type *type);
 
 #endif /* _TYPE_H */

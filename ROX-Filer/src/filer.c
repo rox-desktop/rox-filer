@@ -1380,7 +1380,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 
 		drag_one_item(widget, event,
 			make_path(filer_window->path, item->leafname)->str,
-			item, FALSE);
+			item);
 	}
 	else
 	{

@@ -1012,7 +1012,7 @@ static void start_drag(PinIcon *icon, GdkEventMotion *event)
 	pinboard_drag_in_progress = TRUE;
 
 	if (selected->next == NULL)
-		drag_one_item(widget, event, icon->path, &icon->item, FALSE);
+		drag_one_item(widget, event, icon->path, &icon->item);
 	else
 	{
 		guchar	*uri_list;

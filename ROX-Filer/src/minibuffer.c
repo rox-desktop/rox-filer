@@ -110,7 +110,6 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),
 			mini_type == MINI_PATH ? _("Goto:") :
 			mini_type == MINI_SHELL ? _("Shell:") :
-			mini_type == MINI_RUN_ACTION ? _("Run Action:") :
 			mini_type == MINI_SELECT_IF ? _("Select If:") :
 			"?");
 
@@ -130,7 +129,6 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			}
 			break;
 		case MINI_SHELL:
-		case MINI_RUN_ACTION:
 		case MINI_SELECT_IF:
 			filer_window->mini_cursor_base = -1;	/* History */
 			gtk_entry_set_text(mini, "");
@@ -166,7 +164,7 @@ void minibuffer_hide(FilerWindow *filer_window)
 }
 
 /* Insert this leafname at the cursor (replacing the selection, if any).
- * Must be in SHELL or RUN_ACTION mode.
+ * Must be in SHELL mode.
  */
 void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 {
@@ -175,8 +173,7 @@ void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 	GtkEntry 	*entry = GTK_ENTRY(edit);
 	int		pos;
 
-	g_return_if_fail(filer_window->mini_type == MINI_SHELL ||
-			 filer_window->mini_type == MINI_RUN_ACTION);
+	g_return_if_fail(filer_window->mini_type == MINI_SHELL);
 
 	esc = shell_escape(leafname);
 
@@ -213,13 +210,6 @@ static void show_help(FilerWindow *filer_window)
 		case MINI_SHELL:
 			message = _("Enter a shell command to execute. Click "
 				"on a file to add it to the buffer.");
-			break;
-		case MINI_RUN_ACTION:
-			message =
-	_("To set the run action for a file, either:\n"
-	  "- Drag a file to an application directory (eg drag an image to the "
-	  "Gimp), or\n" "- Enter a shell command which contains a \"$1\""
-	  "where the name of the file should go (eg ` gimp \"$1\" ')");
 			break;
 		case MINI_SELECT_IF:
 			show_condition_help(NULL);
@@ -655,57 +645,6 @@ static void shell_tab(FilerWindow *filer_window)
 	g_string_free(leaf, TRUE);
 }
 
-/* This is called from shell_return_pressed() so that the command is already
- * in the history. Returns TRUE if the buffer should be closed.
- */
-gboolean set_run_action(FilerWindow *filer_window, guchar *command)
-{
-	Collection	*collection = filer_window->collection;
-	int		n = collection->cursor_item;
-	DirItem		*item;
-	guchar		*path, *tmp;
-	FILE		*file;
-	int		error = 0, len;
-
-	if (!strchr(command, '$'))
-	{
-		show_help(filer_window);
-		return FALSE;
-	}
-
-	if (n < 0 || n >= collection->number_of_items)
-	{
-		delayed_error(PROJECT,
-		_("You must have the cursor on the item to use for '$1'."));
-		return FALSE;
-	}
-
-	item = (DirItem *) collection->items[n].data;
-	path = type_ask_which_action(item->mime_type->media_type,
-					item->mime_type->subtype);
-
-	if (!path)
-		return TRUE;
-
-	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
-	len = strlen(tmp);
-	
-	file = fopen(path, "wb");
-	if (fwrite(tmp, 1, len, file) < len)
-		error = errno;
-	if (fclose(file) && error == 0)
-		error = errno;
-	if (chmod(path, 0777))
-		error = errno;
-
-	if (error)
-		report_error(PROJECT, g_strerror(errno));
-
-	g_free(tmp);
-
-	return TRUE;
-}
-
 /* Either execute the command or make it the default run action */
 static void shell_return_pressed(FilerWindow *filer_window)
 {
@@ -722,14 +661,6 @@ static void shell_return_pressed(FilerWindow *filer_window)
 
 	add_to_history(entry);
 
-	if (filer_window->mini_type == MINI_RUN_ACTION)
-	{
-		if (set_run_action(filer_window, entry))
-			goto out;
-		else
-			return;
-	}
-	
 	argv = g_ptr_array_new();
 	g_ptr_array_add(argv, "sh");
 	g_ptr_array_add(argv, "-c");
@@ -905,7 +836,6 @@ static gint key_press_event(GtkWidget	*widget,
 			break;
 
 		case MINI_SHELL:
-		case MINI_RUN_ACTION:
 			switch (event->keyval)
 			{
 				case GDK_Up:

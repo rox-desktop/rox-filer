@@ -12,7 +12,6 @@ typedef enum {
 	MINI_NONE,
 	MINI_PATH,
 	MINI_SHELL,
-	MINI_RUN_ACTION,
 	MINI_SELECT_IF,
 } MiniType;
 

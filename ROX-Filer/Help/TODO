@@ -20,6 +20,9 @@ MISSING FEATURES
 Close button for the toolbar. Also, Large and Small icons buttons.
 Sort type?
 
+Allow renaming of panel and pinboard icons. Also allow '~' (for
+system-wide configuration).
+
 Size limit on AppIcon files.
 
 User-definable icons for the different mount points.
@@ -84,3 +87,12 @@ Recursive 'a-x' acts on the directory first and so can't then change the
 permissions on the contents. chmod(1) has the same problem.
 
 Set Run Action should be on the 'File' menu, not in the minibuffer.
+
+
+LONG TERM
+
+Use a separate process to access the filesystem. Prevents hanging when you
+try to access a dead filesystem.
+
+Allow user to change permissions to another user on the fly, by entering a
+password.

@@ -14,7 +14,6 @@ enum
 {
 	TARGET_RAW,
 	TARGET_URI_LIST,
-	TARGET_RUN_ACTION,
 	TARGET_XDS,
 	TARGET_STRING,
 };
@@ -42,8 +41,7 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list);
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
 		   guchar		*full_path,
-		   DirItem		*item,
-		   gboolean		set_run_action);
+		   DirItem		*item);
 void drag_data_get(GtkWidget      	*widget,
 		   GdkDragContext     	*context,
 		   GtkSelectionData   	*selection_data,

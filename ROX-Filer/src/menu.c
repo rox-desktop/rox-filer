@@ -85,6 +85,7 @@ static GList *list_paths(FilerWindow *filer_window);
 static void free_paths(GList *paths);
 static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
+static gboolean can_set_run_action(DirItem *item);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
@@ -193,6 +194,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Shift Open"),   	NULL,  	open_file, 0, NULL},
 {">" N_("Help"),		NULL,  	help, 0, NULL},
 {">" N_("Info"),		NULL,  	show_file_info, 0, NULL},
+{">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
 {">" N_("Open VFS"),	NULL,   NULL, 0, "<Branch>"},
 {">>" N_("Unzip"),	NULL,   open_vfs_uzip, 0, NULL},
 {">>" N_("Untar"),	NULL,   open_vfs_utar, 0, NULL},
@@ -216,7 +218,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Enter Path..."),	NULL,  	enter_path, 0, NULL},
 {">" N_("Shell Command..."),	NULL,  	shell_command, 0, NULL},
-{">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
 {">" N_("Select If..."),	NULL,  	select_if, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Show ROX-Filer Help"), NULL,  menu_rox_help, 0, NULL},
@@ -535,6 +536,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 				g_string_sprintf(buffer, "%s '%s'",
 						basetype_name(file_item),
 						file_item->leafname);
+				if (!can_set_run_action(file_item))
+					menu_set_items_shaded(filer_file_menu,
+							TRUE, 6, 1);
 				break;
 			default:
 				items_sensitive(FALSE);
@@ -545,7 +549,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 		g_string_free(buffer, TRUE);
 	}
-
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
@@ -931,6 +934,39 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 		filer_openitem(window_with_focus,
 				selected_item_number(collection),
 				OPEN_SAME_WINDOW | OPEN_SHIFT);
+}
+
+static void run_action(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected > 1)
+	{
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
+		return;
+	}
+	else if (collection->number_selected != 1)
+		filer_target_mode(window_with_focus,
+				target_callback, run_action,
+				_("Set run action for ... ?"));
+	else
+	{
+		DirItem	*item;
+
+		item = selected_item(collection);
+		g_return_if_fail(item != NULL);
+
+		if (can_set_run_action(item))
+			type_set_handler_dialog(item->mime_type);
+		else
+			report_error(PROJECT,
+				_("You can only set the run action for a "
+				"regular file"));
+	}
 }
 
 /* Got some data from file(1) - stick it in the window. */
@@ -1374,13 +1410,6 @@ static void shell_command(gpointer data, guint action, GtkWidget *widget)
 	minibuffer_show(window_with_focus, MINI_SHELL);
 }
 
-static void run_action(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	minibuffer_show(window_with_focus, MINI_RUN_ACTION);
-}
-
 static void select_if(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
@@ -1514,4 +1543,16 @@ static void mark_menus_modified(gboolean mod)
 	class = gtk_type_class(GTK_TYPE_ITEM_FACTORY);
 
 	g_hash_table_foreach(class->item_ht, mark_modified, (gpointer) mod);
+}
+
+
+/* Returns TRUE is this is something that is run by looking up its type
+ * in MIME-types and, hence, can have its run action set.
+ */
+static gboolean can_set_run_action(DirItem *item)
+{
+	g_return_val_if_fail(item != NULL, FALSE);
+
+	return item->base_type == TYPE_FILE &&
+		!(item->flags & ITEM_FLAG_EXEC_FILE);
 }

@@ -1475,7 +1475,7 @@ static void start_drag(PanelIcon *icon, GdkEventMotion *event)
 	g_return_if_fail(panel_selection != NULL);
 
 	if (panel_selection->next == NULL)
-		drag_one_item(widget, event, icon->path, &icon->item, FALSE);
+		drag_one_item(widget, event, icon->path, &icon->item);
 	else
 	{
 		guchar	*uri_list;
