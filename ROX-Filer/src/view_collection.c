@@ -884,7 +884,8 @@ static void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 				pix_height = HUGE_HEIGHT * 3 / 2;
 			}
 			*width = MAX(pix_width, view->name_width) + 4;
-			*height = view->name_height + pix_height + 4;
+			*height = MAX(view->name_height + pix_height + 4,
+					HUGE_HEIGHT * 3 / 4);
 		}
 		else if (style == SMALL_ICONS)
 		{
