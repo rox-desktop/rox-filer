@@ -81,7 +81,7 @@ static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
 static void toolbar_hidden_clicked(GtkWidget *widget,
 				   FilerWindow *filer_window);
-static GtkWidget *add_button(GtkWidget *box, Tool *tool,
+static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static gboolean drag_motion(GtkWidget		*widget,
@@ -99,7 +99,6 @@ static void handle_drops(FilerWindow *filer_window,
 			 DropDest dest);
 static void coll_selection_changed(Collection *collection, guint time,
 					gpointer user_data);
-static void recreate_toolbar(FilerWindow *filer_window);
 static void toggle_shaded(GtkWidget *widget);
 static void option_notify(void);
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label);
@@ -204,17 +203,6 @@ GtkWidget *toolbar_tool_option(int i)
 	return button;
 }
 
-/* Create a new toolbar widget, suitable for adding to a filer window,
- * and return it.
- */
-GtkWidget *toolbar_new(FilerWindow *filer_window)
-{
-	g_return_val_if_fail(filer_window != NULL, NULL);
-	g_return_val_if_fail(o_toolbar.int_value != TOOLBAR_NONE, NULL);
-
-	return create_toolbar(filer_window);
-}
-
 void toolbar_update_info(FilerWindow *filer_window)
 {
 	if (o_toolbar.int_value != TOOLBAR_NONE && o_toolbar_info.int_value)
@@ -222,6 +210,33 @@ void toolbar_update_info(FilerWindow *filer_window)
 				GDK_CURRENT_TIME, NULL);
 }
 
+/* Create, destroy or recreate toolbar for this window so that it
+ * matches the option setting.
+ */
+void toolbar_update_toolbar(FilerWindow *filer_window)
+{
+	g_return_if_fail(filer_window != NULL);
+
+	if (filer_window->toolbar)
+	{
+		gtk_widget_destroy(filer_window->toolbar);
+		filer_window->toolbar = NULL;
+		filer_window->toolbar_text = NULL;
+	}
+
+	if (o_toolbar.int_value != TOOLBAR_NONE)
+	{
+		filer_window->toolbar = create_toolbar(filer_window);
+		gtk_box_pack_start(filer_window->toplevel_vbox,
+				filer_window->toolbar, FALSE, TRUE, 0);
+		gtk_box_reorder_child(filer_window->toplevel_vbox,
+				filer_window->toolbar, 0);
+		gtk_widget_show_all(filer_window->toolbar);
+	}
+
+	filer_target_mode(filer_window, NULL, NULL, NULL);
+	toolbar_update_info(filer_window);
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -331,11 +346,12 @@ static void toolbar_hidden_clicked(GtkWidget *widget,
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
-	GtkWidget	*box;
+	GtkWidget	*bar;
 	GtkWidget	*b;
 	int		i;
 
-	box = gtk_hbox_new(FALSE, 0);
+	bar = gtk_toolbar_new();
+	gtk_widget_set_size_request(bar, 100, -1);
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
@@ -344,23 +360,22 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 		if (!tool->enabled)
 			continue;
 
-		b = add_button(box, tool, filer_window);
+		b = add_button(bar, tool, filer_window);
 		if (tool->drop_action != DROP_NONE)
 			handle_drops(filer_window, b, tool->drop_action);
 	}
 
 	filer_window->toolbar_text = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text), 0, 0.5);
-	gtk_widget_set_size_request(filer_window->toolbar_text, 8, -1);
-	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
-			TRUE, TRUE, 4);
+	gtk_toolbar_append_widget(GTK_TOOLBAR(bar),
+				  filer_window->toolbar_text, NULL, NULL);
 
 	if (o_toolbar_info.int_value)
 		g_signal_connect_object(filer_window->collection,
 				"selection_changed",
-				G_CALLBACK(coll_selection_changed), box, 0);
+				G_CALLBACK(coll_selection_changed), bar, 0);
 
-	return box;
+	return bar;
 }
 
 /* This is used to simulate a click when button 3 is used (GtkButton
@@ -420,7 +435,7 @@ static gint menu_pressed(GtkWidget *button,
 }
 #endif
 
-static GtkWidget *add_button(GtkWidget *box, Tool *tool,
+static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window)
 {
 	GtkWidget 	*button, *icon_widget;
@@ -472,7 +487,8 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
 	gtk_misc_set_padding(GTK_MISC(icon_widget),
 			o_toolbar.int_value == TOOLBAR_LARGE ? 16 : 8, 1);
-	gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 0);
+
+	gtk_toolbar_append_widget(GTK_TOOLBAR(bar), button, NULL, NULL);
 
 	return button;
 }
@@ -612,32 +628,6 @@ static void coll_selection_changed(Collection *collection, guint time,
 	g_free(label);
 }
 
-static void recreate_toolbar(FilerWindow *filer_window)
-{
-	GtkWidget	*frame = filer_window->toolbar_frame;
-	
-	if (GTK_BIN(frame)->child)
-	{
-		filer_window->toolbar_text = NULL;
-		gtk_widget_destroy(((GtkBin *) frame)->child);
-	}
-	
-	if (o_toolbar.int_value == TOOLBAR_NONE)
-		gtk_widget_hide(frame);
-	else
-	{
-		GtkWidget	*toolbar;
-
-		toolbar = toolbar_new(filer_window);
-		gtk_container_add(GTK_CONTAINER(filer_window->toolbar_frame),
-				toolbar);
-		gtk_widget_show_all(frame);
-	}
-
-	filer_target_mode(filer_window, NULL, NULL, NULL);
-	toolbar_update_info(filer_window);
-}
-
 static void option_notify(void)
 {
 	int		i;
@@ -663,7 +653,7 @@ static void option_notify(void)
 		{
 			FilerWindow *filer_window = (FilerWindow *) next->data;
 			
-			recreate_toolbar(filer_window);
+			toolbar_update_toolbar(filer_window);
 		}
 	}
 }

@@ -230,7 +230,7 @@ static void filer_window_set_size(FilerWindow *filer_window,
 		w += filer_window->scrollbar->allocation.width;
 	
 	if (o_toolbar.int_value != TOOLBAR_NONE)
-		h += filer_window->toolbar_frame->allocation.height;
+		h += filer_window->toolbar->allocation.height;
 	if (filer_window->message)
 		h += filer_window->message->allocation.height;
 
@@ -311,7 +311,7 @@ static void filer_size_for(FilerWindow *filer_window,
 	 * if visible.
 	 */
 	if (o_toolbar.int_value != TOOLBAR_NONE)
-		t = filer_window->toolbar_frame->allocation.height;
+		t = filer_window->toolbar->allocation.height;
 	if (filer_window->message)
 		t += filer_window->message->allocation.height;
 	if (GTK_WIDGET_VISIBLE(filer_window->minibuffer_area))
@@ -1323,6 +1323,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
 	filer_window->selection_state = GTK_STATE_INSENSITIVE;
+	filer_window->toolbar = NULL;
+	filer_window->toplevel_vbox = NULL;
 
 	tidy_sympath(filer_window->sym_path);
 
@@ -1444,27 +1446,10 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+	filer_window->toplevel_vbox = GTK_BOX(vbox);
 	
-	/* Create a frame for the toolbar, but don't show it unless we actually
-	 * have a toolbar.
-	 * (allows us to change the toolbar later)
-	 */
-	filer_window->toolbar_frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(filer_window->toolbar_frame),
-			GTK_SHADOW_OUT);
-	gtk_box_pack_start(GTK_BOX(vbox),
-			filer_window->toolbar_frame, FALSE, TRUE, 0);
-
-	/* If we want a toolbar, create it and put it in the frame */
-	if (o_toolbar.int_value != TOOLBAR_NONE)
-	{
-		GtkWidget *toolbar;
-		
-		toolbar = toolbar_new(filer_window);
-		gtk_container_add(GTK_CONTAINER(filer_window->toolbar_frame),
-				toolbar);
-		gtk_widget_show_all(filer_window->toolbar_frame);
-	}
+	/* If we want a toolbar, create it now */
+	toolbar_update_toolbar(filer_window);
 
 	/* If there's a message that should be displayed in each window (eg
 	 * 'Running as root'), add it here.

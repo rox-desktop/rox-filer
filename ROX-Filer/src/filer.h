@@ -36,6 +36,7 @@ typedef void (*TargetFunc)(FilerWindow *filer_window, int item, gpointer data);
 struct _FilerWindow
 {
 	GtkWidget	*window;
+	GtkBox		*toplevel_vbox;
 	gboolean	scanning;	/* State of the 'scanning' indicator */
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
@@ -69,7 +70,7 @@ struct _FilerWindow
 	TargetFunc	target_cb;
 	gpointer	target_data;
 
-	GtkWidget	*toolbar_frame;
+	GtkWidget	*toolbar;
 	GtkWidget	*toolbar_text;
 	GtkWidget	*scrollbar;
 
