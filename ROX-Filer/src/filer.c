@@ -1977,9 +1977,12 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 			guchar *str;
 			str = xmlNodeListGetString(node->doc,
 					node->xmlChildrenNode, 1);
-			g_string_append(tip, str);
-			g_string_append_c(tip, '\n');
-			g_free(str);
+			if (str)
+			{
+				g_string_append(tip, str);
+				g_string_append_c(tip, '\n');
+				g_free(str);
+			}
 		}
 	}
 
