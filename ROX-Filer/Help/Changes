@@ -2,6 +2,20 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+08-Jan-2005
+~~~~~~~~~~~
+Allow renaming multiple files at once. This opens the Bulk Rename window,
+which allows manual editing of the names, as well as regular-expression
+based transformations (Thomas Leonard).
+
+Rename buttons in Set Run Action box so that they make sense (Thomas Leonard;
+reported by Jonatan Liljedahl).
+
+Bugfix: Filer would crash when the screen was resized if there was no
+	pinboard (Thomas Leonard).
+Bugfix: Xinerama support had broken panel repositioning in response to
+	XRANDR screen resizing events (Thomas Leonard).
+
 03-Jan-2005
 ~~~~~~~~~~~
 Set the name for filer windows to 'rox-filer'. This allows theming the fonts

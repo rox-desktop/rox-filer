@@ -117,9 +117,6 @@ void gui_support_init()
 	
 	xa_cardinal = gdk_atom_intern("CARDINAL", FALSE);
 
-	/* This call starts returning strange values after a while, so get
-	 * the result here during init.
-	 */
 	gui_store_screen_geometry(gdk_screen_get_default());
 
 	/* Work around the scrollbar placement bug */

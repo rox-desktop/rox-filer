@@ -803,6 +803,9 @@ void pinboard_update_size(void)
 {
 	int width, height;
 
+	if (!current_pinboard)
+		return;
+
 	gtk_window_get_size(GTK_WINDOW(current_pinboard->window),
 			&width, &height);
 	

@@ -138,7 +138,6 @@ void filer_target_mode(FilerWindow	*filer_window,
 			TargetFunc	fn,
 			gpointer	data,
 			const char	*reason);
-void filer_window_autosize(FilerWindow *filer_window);
 GList *filer_selected_items(FilerWindow *filer_window);
 void filer_create_thumb(FilerWindow *filer_window, const gchar *pathname);
 void filer_cancel_thumbnails(FilerWindow *filer_window);

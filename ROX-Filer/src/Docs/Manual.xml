@@ -892,6 +892,8 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Rename...</guimenuitem></entry><entry>
          Change the name used for this object, or move it between directories.
+	 If multiple files are selected, this opens
+	 <xref linkend='bulkrename' />.
        </entry></row>
 
        <row><entry>
@@ -1769,6 +1771,41 @@ generated.
 
    </para>
   </sect1>
+ </chapter>
+
+ <chapter>
+  <title>
+   <anchor id="bulkrename" xreflabel="The Bulk Rename window"/>Renaming files in bulk
+  </title>
+  <para>
+   If you have a large number of files to rename, it is tedious to rename them one
+   by one. Instead, select all the files and choose <guimenuitem>Rename...</guimenuitem>
+   from the menu to open the bulk rename window.
+  </para>
+
+  <para>
+   The window shows a table with two columns. The <guilabel>Before</guilabel> column
+   shows the current name of each selected file, and the <guilabel>After</guilabel>
+   column shows the new name, which is initially the same.
+  </para>
+
+  <para>
+   There are two ways to change the new names. You can edit the names in the table
+   directly, or you can use the search and replace feature at the top of the window.
+   This takes a regular expression to search for, and some text to replace matches
+   with. For example, if you had a lot of files with names ending in
+   <filename>.htm</filename> and you wanted to change them to use
+   <filename>.html</filename>, you would enter <userinput>\.htm$</userinput> in
+   the <guilabel>Replace:</guilabel> field and <userinput>.html</userinput> in the
+   <guilabel>With:</guilabel> field. When you click <guibutton>Apply</guibutton>, the
+   table is updated to show the proposed new names (but no actual renaming it done
+   yet).
+  </para>
+
+  <para>
+   Having checked that the new names look OK, click on the <guibutton>Rename</guibutton>
+   button to actually perform the rename operation.
+  </para>
  </chapter>
 
  <chapter id="actions">

@@ -61,6 +61,7 @@
 #include "display.h"
 #include "bookmarks.h"
 #include "panel.h"
+#include "bulk_rename.h"
 #include "xtypes.h"
 
 typedef enum {
@@ -382,7 +383,8 @@ static void menuitem_no_shortcuts(GtkWidget *item)
 /* Shade items that only work on single files */
 static void shade_file_menu_items(gboolean shaded)
 {
-	menu_set_items_shaded(filer_file_menu, shaded, 0, 3);
+	menu_set_items_shaded(filer_file_menu, shaded, 0, 1);
+	menu_set_items_shaded(filer_file_menu, shaded, 2, 1);
 	menu_set_items_shaded(filer_file_menu, shaded, 5, 2);
 	menu_set_items_shaded(filer_file_menu, shaded, 9, 2);
 }
@@ -1024,7 +1026,11 @@ static void set_type_items(FilerWindow *filer_window)
 			nfail++;
 	}
 	if(npass==0) 
-		report_error(_("Setting type not supported for this file or files"));
+		report_error(_("Extended attributes, used to store types, are not supported for this "
+				"file or files.\n"
+				"This may be due to lack of support from the filesystem or the C library, "
+				"or it may simply be that the filesystem needs to be mounted with "
+				"the right mount option ('user_xattr' on Linux)."));
 	else if(nfail>0)
 		report_error(_("Setting type not supported for some of these files"));
 	if(npass>0)
@@ -1896,6 +1902,22 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			destroy_glist(&items);
 			return;
 		}
+		case FILE_RENAME_ITEM:
+			if (n_selected > 1)
+			{
+				GList *items = NULL;
+				ViewIter iter;
+
+				view_get_iter(window_with_focus->view, &iter, VIEW_ITER_SELECTED);
+				while ((item = iter.next(&iter)))
+					items = g_list_prepend(items, item->leafname);
+				items = g_list_reverse(items);
+
+				bulk_rename(window_with_focus->sym_path, items);
+				g_list_free(items);
+				return;
+			}
+			break;	/* Not a bulk rename... see below */
 		default:
 			break;
 	}

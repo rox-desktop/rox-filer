@@ -469,10 +469,17 @@ void panel_update_size(void)
 {
 	int i;
 
+	panel_check_xinerama();
+
 	for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 	{
 		if (current_panel[i])
-			panel_update(current_panel[i]);
+		{
+			reposition_panel(current_panel[i]->window,
+					&current_panel[i]->window->allocation,
+					current_panel[i]);
+			gtk_widget_queue_resize(current_panel[i]->window);
+		}
 	}
 }
 
