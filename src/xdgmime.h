@@ -50,6 +50,7 @@ extern const char *xdg_mime_type_unknown;
 #define xdg_mime_get_mime_type_for_file       XDG_ENTRY(get_mime_type_for_file)
 #define xdg_mime_get_mime_type_from_file_name XDG_ENTRY(get_mime_type_from_file_name)
 #define xdg_mime_is_valid_mime_type           XDG_ENTRY(is_valid_mime_type)
+#define xdg_mime_get_max_buffer_extents       XDG_ENTRY(get_max_buffer_extents)
 #define xdg_mime_type_unknown                 XDG_ENTRY(type_unknown)
 #endif
 
@@ -58,6 +59,7 @@ const char *xdg_mime_get_mime_type_for_data       (const void *data,
 const char *xdg_mime_get_mime_type_for_file       (const char *file_name);
 const char *xdg_mime_get_mime_type_from_file_name (const char *file_name);
 int         xdg_mime_is_valid_mime_type           (const char *mime_type);
+int         xdg_mime_get_max_buffer_extents       (void);
 void        xdg_mime_shutdown                     (void);
 
 #ifdef __cplusplus
