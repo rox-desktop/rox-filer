@@ -254,7 +254,8 @@ static void history_remove(const char *path)
 }
 
 /* Add this path to the global history of visited directories. If it
- * already exists there, make it the most recent.
+ * already exists there, make it the most recent. If its parent exists
+ * already, remove the parent.
  */
 void bookmarks_add_history(const gchar *path)
 {
@@ -267,6 +268,13 @@ void bookmarks_add_history(const gchar *path)
 		history_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	history_remove(new);
+
+	{
+		char *parent;
+		parent = g_dirname(path);
+		history_remove(parent);
+		g_free(parent);
+	}
 
 	history = g_list_prepend(history, new);
 	if (!history_tail)
