@@ -511,72 +511,6 @@ void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(drag_data_received), filer_window);
 }
 
-/* Decide if panel drag is OK, setting drop_dest_type and drop_dest_path
- * on the context as needed.
- */
-static gboolean panel_drag_ok(FilerWindow 	*filer_window,
-			      GdkDragContext 	*context,
-			      int	     	item)
-{
-	DirItem 	*fileitem = NULL;
-	char	 	*old_path;
-	char	 	*new_path;
-	char		*type = NULL;	/* Quiet gcc */
-
-	if (item >= 0)
-		fileitem = (DirItem *)
-			filer_window->collection->items[item].data;
-
-	if (item == -1)
-		new_path = NULL;   /* Drag to panel background - disallow */
-	else if (fileitem->flags &
-			(ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
-	{
-		if (provides(context, text_uri_list))
-		{
-			type = drop_dest_prog;
-			new_path = make_path(filer_window->path,
-					fileitem->leafname)->str;
-		}
-		else
-			new_path = NULL;
-	}
-	else if (fileitem->base_type == TYPE_DIRECTORY)
-	{
-		type = drop_dest_dir;
-		new_path = make_path(filer_window->path,
-				fileitem->leafname)->str;
-	}
-	else
-		new_path = NULL;
-	
-	if (new_path && access(new_path, W_OK))
-		new_path = NULL;
-
-	old_path = g_dataset_get_data(context, "drop_dest_path");
-	if (old_path == new_path ||
-		(old_path && new_path && strcmp(old_path, new_path) == 0))
-	{
-		return new_path != NULL;	/* Same as before */
-	}
-
-	if (new_path)
-	{
-		g_dataset_set_data(context, "drop_dest_type", type);
-		g_dataset_set_data_full(context, "drop_dest_path",
-					g_strdup(new_path), g_free);
-	}
-	else
-	{
-		item = -1;
-		g_dataset_set_data(context, "drop_dest_path", NULL);
-	}
-
-	collection_set_cursor_item(filer_window->collection, item);
-
-	return new_path != NULL;
-}
-
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
  */
@@ -587,34 +521,77 @@ static gboolean drag_motion(GtkWidget		*widget,
                             guint		time)
 {
 	FilerWindow 	*filer_window;
-	int		item;
+	DirItem		*item;
+	int		item_number;
+	GdkDragAction	action = context->suggested_action;
+	char	 	*new_path = NULL;
+	char		*type = NULL;
 
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_val_if_fail(filer_window != NULL, TRUE);
 
-	if (gtk_drag_get_source_widget(context) == widget)
-		return FALSE;	/* Not within a single widget! */
+	item_number = collection_get_item(filer_window->collection, x, y);
 
-	if (filer_window->panel_type == PANEL_NO)
-	{
-		if (access(filer_window->path, W_OK))
-			return FALSE;	/* We can't write here */
-		gdk_drag_status(context, context->suggested_action, time);
-		return TRUE;
-	}
+	item = item_number >= 0
+		? (DirItem *) filer_window->collection->items[item_number].data
+		: NULL;
 
-	/* OK, this is a drag to a panel.
-	 * Allow drags to directories, applications and X bit files only.
-	 */
-	item = collection_get_item(filer_window->collection, x, y);
-
-	if (panel_drag_ok(filer_window, context, item))
-	{
-		gdk_drag_status(context, context->suggested_action, time);
-		return TRUE;
-	}
+	if (item && !(item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE)))
+		item = NULL;	/* Drop onto non-executable == no item */
 	
-	return FALSE;
+	if (!item)
+	{
+		/* Drop onto the window background */
+		collection_set_cursor_item(filer_window->collection,
+				-1);
+
+	    	if (gtk_drag_get_source_widget(context) == widget)
+			goto out;
+
+		if (access(filer_window->path, W_OK) != 0)
+			goto out;	/* No write permission */
+
+		if (filer_window->panel_type != PANEL_NO)
+		{
+			if (context->actions & GDK_ACTION_LINK)
+			{
+				action = GDK_ACTION_LINK;
+				type = drop_dest_dir;
+			}
+		}
+		else
+			type = drop_dest_dir;
+
+		if (type)
+			new_path = g_strdup(filer_window->path);
+	}
+	else
+	{
+		/* Drop onto a program of some sort */
+		if (provides(context, text_uri_list)
+			|| provides(context, application_octet_stream))
+		{
+			/* Actually, we should probably allow any data type */
+			type = drop_dest_prog;
+			new_path = make_path(filer_window->path,
+					item->leafname)->str;
+		}
+		collection_set_cursor_item(filer_window->collection,
+				item_number);
+	}
+
+out:
+	g_dataset_set_data(context, "drop_dest_type", type);
+	if (type)
+	{
+		gdk_drag_status(context, action, time);
+		g_dataset_set_data_full(context, "drop_dest_path",
+					g_strdup(new_path), g_free);
+	}
+	else
+		g_free(new_path);
+
+	return type != NULL;
 }
 
 /* Remove panel highlights */
@@ -649,27 +626,11 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	g_return_val_if_fail(filer_window != NULL, TRUE);
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
-	if (dest_path == NULL)
-	{
-		if (filer_window->panel_type)
-			error = "Bad drop on panel";
-		else
-		{
-			dest_path = filer_window->path;
-			dest_type = drop_dest_dir;
-		}
-	}
-	else
-	{
-		dest_type = g_dataset_get_data(context, "drop_dest_type");
-	}
+	dest_type = g_dataset_get_data(context, "drop_dest_type");
 
-	if (error)
-	{
-		/* Do nothing */
-	}
-	else if (dest_type == drop_dest_dir
-			&& provides(context, XdndDirectSave0))
+	g_return_val_if_fail(dest_path != NULL, TRUE);
+
+	if (dest_type == drop_dest_dir && provides(context, XdndDirectSave0))
 	{
 		leafname = get_xds_prop(context);
 		if (leafname)
@@ -706,6 +667,8 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	}
 	else if (provides(context, text_uri_list))
 		target = text_uri_list;
+	else if (provides(context, application_octet_stream))
+		target = application_octet_stream;
 	else
 	{
 		if (dest_type == drop_dest_dir)
@@ -713,7 +676,7 @@ static gboolean drag_drop(GtkWidget 	*widget,
 				"text/uri-list or XdndDirectSave0.";
 		else
 			error = "Sorry - I require a target type of "
-				"text/uri-list.";
+				"text/uri-list or application/octet-stream.";
 	}
 
 	if (error)
@@ -836,6 +799,13 @@ static void got_data_raw(GtkWidget 		*widget,
 	char		*error = NULL;
 	char		*dest_path;
 
+	if (g_dataset_get_data(context, "drop_dest_type") == drop_dest_prog)
+	{
+		/* The data needs to be sent to an application */
+		g_warning("[ not implemented ]\n");
+		return;
+	}
+	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
 

@@ -121,6 +121,7 @@ static size_t	size_tally;	/* For Disk Usage */
 static DirItem 	*mount_item;
 
 static gboolean o_force = FALSE;
+static gboolean o_brief = FALSE;
 
 /* Static prototypes */
 static gboolean send();
@@ -490,6 +491,9 @@ static void process_flag(char flag)
 		case 'F':
 			o_force = !o_force;
 			break;
+		case 'B':
+			o_brief = !o_brief;
+			break;
 		default:
 			g_string_sprintf(message,
 					"!ERROR: Bad message '%c'\n", flag);
@@ -679,7 +683,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gtk_signal_connect(GTK_OBJECT(gui_side->window), "destroy",
 			GTK_SIGNAL_FUNC(destroy_action_window), gui_side);
 
-	gui_side->vbox = vbox = gtk_vbox_new(FALSE, 4);
+	gui_side->vbox = vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
 
 	gui_side->dir = gtk_label_new("<dir>");
@@ -688,7 +692,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 4);
 
 	gui_side->log = gtk_text_new(NULL, NULL);
 	gtk_widget_set_usize(gui_side->log, 400, 100);
@@ -795,7 +799,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 		if (!reply(from_parent, write_prot && !o_force))
 			return FALSE;
 	}
-	else
+	else if (!o_brief)
 	{
 		g_string_sprintf(message, "'Removing '%s'\n", src_path);
 		send();
@@ -812,7 +816,8 @@ static gboolean do_delete(char *src_path, char *dest_path)
 			send_error();
 			return FALSE;
 		}
-		g_string_assign(message, "'Directory deleted\n");
+		g_string_sprintf(message, "'Directory '%s' deleted\n",
+				safe_path);
 		send();
 		g_free(safe_path);
 	}
@@ -1378,7 +1383,9 @@ void action_delete(FilerWindow *filer_window)
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Delete");
 	add_toggle(gui_side,
-		"Don't confirm deletion of non-writeable items", "F");
+		"Force - don't confirm deletion of non-writeable items", "F");
+	add_toggle(gui_side,
+		"Brief - only log directories being deleted", "B");
 	
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
