@@ -16,6 +16,7 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
+#include <time.h>
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -595,7 +596,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	table = gtk_table_new(4, 2, FALSE);
+	table = gtk_table_new(9, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
@@ -607,18 +608,55 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
 					    group_name(info.st_gid));
 	label = gtk_label_new(gstring->str);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
+	
+	label = gtk_label_new("Size:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
+	g_string_sprintf(gstring, "%ld", info.st_size);
+	label = gtk_label_new(gstring->str);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
+	
+	label = gtk_label_new("Change time:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
+	g_string_sprintf(gstring, "%s", ctime(&info.st_ctime));
+	g_string_truncate(gstring, gstring->len - 1);
+	label = gtk_label_new(gstring->str);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
+	
+	label = gtk_label_new("Modify time:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
+	g_string_sprintf(gstring, "%s", ctime(&info.st_mtime));
+	g_string_truncate(gstring, gstring->len - 1);
+	label = gtk_label_new(gstring->str);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 3, 4);
+	
+	label = gtk_label_new("Access time:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 4, 5);
+	g_string_sprintf(gstring, "%s", ctime(&info.st_atime));
+	g_string_truncate(gstring, gstring->len - 1);
+	label = gtk_label_new(gstring->str);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 4, 5);
 	
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
 	g_string_sprintf(gstring, "%o", info.st_mode);
 	label = gtk_label_new(gstring->str);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);
 	
 	label = gtk_label_new("MIME type:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 6, 7);
 	if (file->mime_type)
 	{
 		string = g_strconcat(file->mime_type->media_type, "/",
@@ -628,17 +666,18 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	}
 	else
 		label = gtk_label_new("-");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 6, 7);
 
 	frame = gtk_frame_new("file(1) says...");
-	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 3, 4);
+	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 7, 8);
 	file_label = gtk_label_new("<nothing yet>");
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
 	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
 	gtk_container_add(GTK_CONTAINER(frame), file_label);
 	
 	button = gtk_button_new_with_label("OK");
-	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 4, 5,
+	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 8, 9,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(window));
