@@ -371,18 +371,10 @@ gboolean filer_window_delete(GtkWidget *window,
 		if (action == 2)
 		{
 			GList *list; 
-			char *path;
 
-			/* Destroy the window now so that any dnotify we have
-			 * set up will be lost.
-			 */
-			path = g_strdup(filer_window->sym_path);
-			gtk_widget_destroy(window);
-
-			list = g_list_prepend(NULL, path);
+			list = g_list_prepend(NULL, filer_window->sym_path);
 			action_mount(list, FALSE, TRUE);
 			g_list_free(list);
-			g_free(path);
 
 			return TRUE;
 		}

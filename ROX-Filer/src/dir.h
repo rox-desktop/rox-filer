@@ -96,5 +96,6 @@ DirItem *dir_update_item(Directory *dir, const gchar *leafname);
 void dir_merge_new(Directory *dir);
 void dir_force_update_path(const gchar *path);
 void dnotify_wakeup(void);
+void dir_drop_all_dnotifies(void);
 
 #endif /* _DIR_H */

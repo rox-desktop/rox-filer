@@ -285,6 +285,13 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 		abox_add_filename(abox, buffer + 1);
 	else if (*buffer == '#')
 		abox_clear_results(abox);
+	else if (*buffer == 'X')
+	{
+		filer_close_recursive(buffer + 1);
+		/* Let child know it's safe to continue... */
+		fputc('X', gui_side->to_child);
+		fflush(gui_side->to_child);
+	}
 	else if (*buffer == 'm' || *buffer == 'M')
 	{
 		/* Mount / major changes to this path */
@@ -706,6 +713,8 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 			/* We are the child */
 
 			quiet = autoq;
+
+			dir_drop_all_dnotifies();
 
 			/* Reset the SIGCHLD handler */
 			act.sa_handler = SIG_DFL;
@@ -1339,6 +1348,18 @@ static void do_mount(const guchar *path, gboolean mount)
 				     : _("?Unmount %s?"),
 			       path))
 		return;
+
+	if (!mount)
+	{
+		char c = '?';
+		/* Need to close all sub-directories now, or we
+		 * can't unmount if dnotify is used.
+		 */
+		printf_send("X%s", path);
+		/* Wait until it's safe... */
+		read(from_parent, &c, 1);
+		g_return_if_fail(c == 'X');
+	}
 
 	err = fork_exec_wait(argv);
 	if (err)

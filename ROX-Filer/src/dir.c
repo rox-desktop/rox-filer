@@ -263,6 +263,23 @@ void dir_check_this(const guchar *path)
 	g_free(real_path);
 }
 
+#ifdef USE_DNOTIFY
+static void drop_dnotify(gpointer key, gpointer value, gpointer data)
+{
+	close(GPOINTER_TO_INT(key));
+}
+#endif
+
+/* Used when we fork an action child, otherwise we can't delete or unmount
+ * any directory which we're watching!
+ */
+void dir_drop_all_dnotifies(void)
+{
+#ifdef USE_DNOTIFY
+	g_hash_table_foreach(dnotify_fd_to_dir, drop_dnotify, NULL);
+#endif
+}
+
 /* Tell watchers that this item has changed, but don't rescan.
  * (used when thumbnail has been created for an item)
  */
