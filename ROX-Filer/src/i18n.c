@@ -191,6 +191,7 @@ static void set_trans(guchar *lang)
 {
 	struct stat info;
 	guchar	*path;
+	guchar	*lang2 = NULL;
 
 	g_return_if_fail(lang != NULL);
 
@@ -204,12 +205,20 @@ static void set_trans(guchar *lang)
 		lang = getenv("LANG");
 		if (!lang)
 			return;
+		/* Extract the language code from the locale name.
+		 * language[_territory][.codeset][@modifier]
+		 */
+		if (lang[0] != '\0' && lang[1] != '\0'
+		    && (lang[2] == '_' || lang[2] == '.' || lang[2] == '@'))
+			lang2 = g_strndup((gchar *) lang, 2);
 	}
 
-	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, lang);
+	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir,
+			(lang2 != NULL) ? lang2 : lang);
 	if (stat(path, &info) == 0)
 		rox_add_translations(path);
 	g_free(path);
+	g_free(lang2);
 }
 
 static void save(void)
