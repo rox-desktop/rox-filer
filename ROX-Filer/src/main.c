@@ -47,7 +47,6 @@
 #include "dnd.h"
 #include "options.h"
 #include "choices.h"
-#include "savebox.h"
 #include "type.h"
 #include "pixmaps.h"
 #include "dir.h"
@@ -218,7 +217,6 @@ int main(int argc, char **argv)
 	filer_init();
 	mount_init();
 	options_init();
-	savebox_init();
 	type_init();
 	action_init();
 

@@ -44,7 +44,7 @@
 #include "gui_support.h"
 #include "options.h"
 #include "choices.h"
-#include "savebox.h"
+#include "gtksavebox.h"
 #include "mount.h"
 #include "minibuffer.h"
 
@@ -69,6 +69,9 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
 static char *load_xterm_here(char *data);
+static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
+		gboolean (*callback)(guchar *current, guchar *new));
+static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 
 /* Note that for these callbacks none of the arguments are used. */
 static void not_yet(gpointer data, guint action, GtkWidget *widget);
@@ -140,6 +143,11 @@ static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
 static GtkWidget	*panel_hidden_menu;	/* The Show Hidden item */
+
+/* Used for Copy, etc */
+static GtkWidget	*savebox = NULL;	
+static guchar		*current_path = NULL;
+static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
 static gint		screen_width, screen_height;
 
@@ -279,6 +287,13 @@ void menu_init()
 	options_sections = g_slist_prepend(options_sections, &options);
 	xterm_here_value = g_strdup("xterm");
 	option_register("xterm_here", load_xterm_here);
+
+	savebox = gtk_savebox_new();
+	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_to_file",
+				GTK_SIGNAL_FUNC(save_to_file), NULL);
+	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_done",
+				GTK_SIGNAL_FUNC(gtk_widget_hide),
+				GTK_OBJECT(savebox));
 }
  
 /* Build up some option widgets to go in the options dialog, but don't
@@ -662,38 +677,80 @@ static void chmod_items(gpointer data, guint action, GtkWidget *widget)
 		action_chmod(window_with_focus);
 }
 
-static gboolean copy_cb(char *initial, char *path)
+/* This pops up our savebox widget, cancelling any currently open one,
+ * and allows the user to pick a new path for it.
+ * Once the new path has been picked, the callback will be called with
+ * both the current and new paths.
+ */
+static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
+		gboolean (*callback)(guchar *current, guchar *new))
+{
+	if (GTK_WIDGET_VISIBLE(savebox))
+		gtk_widget_hide(savebox);
+
+	if (current_path)
+		g_free(current_path);
+	current_path = g_strdup(path);
+	current_savebox_callback = callback;
+
+	gtk_window_set_title(GTK_WINDOW(savebox), title);
+	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), current_path);
+	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
+				
+	gtk_widget_grab_focus(GTK_SAVEBOX(savebox)->entry);
+	gtk_widget_show(savebox);
+}
+
+static gint save_to_file(GtkSavebox *savebox, guchar *pathname)
+{
+	g_return_val_if_fail(current_savebox_callback != NULL,
+			GTK_XDS_SAVE_ERROR);
+
+	return current_savebox_callback(current_path, pathname)
+			? GTK_XDS_SAVED : GTK_XDS_SAVE_ERROR;
+}
+
+static gboolean copy_cb(guchar *current, guchar *new)
 {
 	char	*new_dir, *leaf;
 	GSList	*local_paths;
 
-	if (path[0] != '/')
+	if (new[0] != '/')
 	{
 		report_error("ROX-Filer", "New pathname is not absolute");
 		return FALSE;
 	}
 
-	if (path[strlen(path) - 1] == '/')
+	if (new[strlen(new) - 1] == '/')
 	{
-		new_dir = g_strdup(path);
+		new_dir = g_strdup(new);
 		leaf = NULL;
 	}
 	else
 	{
-		char *slash;
+		guchar *slash;
 		
-		slash = strrchr(path, '/');
-		new_dir = g_strndup(path, slash - path);
+		slash = strrchr(new, '/');
+		new_dir = g_strndup(new, slash - new);
 		leaf = slash + 1;
 	}
 
-	local_paths = g_slist_append(NULL, initial);
+	local_paths = g_slist_append(NULL, current);
 	action_copy(local_paths, new_dir, leaf);
 	g_slist_free(local_paths);
 
 	g_free(new_dir);
 
 	return TRUE;
+}
+
+#define SHOW_SAVEBOX(title, callback)	\
+{	\
+	DirItem	*item;	\
+	guchar	*path;	\
+	item = selected_item(collection);	\
+	path = make_path(window_with_focus->path, item->leafname)->str;	\
+	savebox_show(title, path, item->image, callback);	\
 }
 
 static void copy_item(gpointer data, guint action, GtkWidget *widget)
@@ -712,19 +769,12 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, copy_item);
 	else
-	{
-		DirItem *item = selected_item(collection);
-
-		savebox_show(window_with_focus, "Copy",
-				window_with_focus->path,
-				item->leafname,
-				item->image, copy_cb);
-	}
+		SHOW_SAVEBOX("Copy", copy_cb);
 }
 
-static gboolean rename_cb(char *initial, char *path)
+static gboolean rename_cb(guchar *current, guchar *new)
 {
-	if (rename(initial, path))
+	if (rename(current, new))
 	{
 		report_error("ROX-Filer: rename()", g_strerror(errno));
 		return FALSE;
@@ -748,17 +798,10 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, rename_item);
 	else
-	{
-		DirItem *item = selected_item(collection);
-
-		savebox_show(window_with_focus, "Rename",
-				window_with_focus->path,
-				item->leafname,
-				item->image, rename_cb);
-	}
+		SHOW_SAVEBOX("Rename", rename_cb);
 }
 
-static gboolean link_cb(char *initial, char *path)
+static gboolean link_cb(guchar *initial, guchar *path)
 {
 	if (symlink(initial, path))
 	{
@@ -784,14 +827,7 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, link_item);
 	else
-	{
-		DirItem *item = selected_item(collection);
-
-		savebox_show(window_with_focus, "Symlink",
-				window_with_focus->path,
-				item->leafname,
-				item->image, link_cb);
-	}
+		SHOW_SAVEBOX("Symlink", link_cb);
 }
 
 static void open_file(gpointer data, guint action, GtkWidget *widget)
@@ -1236,7 +1272,7 @@ static void show_options(gpointer data, guint action, GtkWidget *widget)
 	options_show(window_with_focus);
 }
 
-static gboolean new_directory_cb(char *initial, char *path)
+static gboolean new_directory_cb(guchar *initial, guchar *path)
 {
 	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
 	{
@@ -1250,9 +1286,10 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	savebox_show(window_with_focus, "Create directory",
-			window_with_focus->path, "NewDir",
-			default_pixmap + TYPE_DIRECTORY, new_directory_cb);
+	savebox_show("New Directory",
+			make_path(window_with_focus->path, "NewDir")->str,
+			default_pixmap + TYPE_DIRECTORY,
+			new_directory_cb);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
