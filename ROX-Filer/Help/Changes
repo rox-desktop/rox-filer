@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+26-Oct-2003
+~~~~~~~~~~~
+Use apsymbols.h (from autopackage.org) if possible for binary compatibility
+with older glibc versions. Use g_ascii_* functions instead of the ctypes ones
+for the same reason.
+
 25-Oct-2003
 ~~~~~~~~~~~
 Updated Dutch translation (Jan Wagemakers).

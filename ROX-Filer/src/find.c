@@ -682,7 +682,7 @@ static FindCondition *parse_dash(const gchar **expression)
 	if (NEXT != '-')
 		return NULL;
 
-	while (exp[i] && !isspace(exp[i]))
+	while (exp[i] && !g_ascii_isspace(exp[i]))
 	{
 		switch (exp[i])
 		{
@@ -998,7 +998,7 @@ static gboolean match(const gchar **expression, const gchar *word)
 	if (g_strncasecmp(*expression, word, len))
 		return FALSE;
 
-	if (isalpha(*(*expression + len)))
+	if (g_ascii_isalpha(*(*expression + len)))
 		return FALSE;
 
 	(*expression) += len;

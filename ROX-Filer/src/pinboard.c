@@ -1359,7 +1359,7 @@ static const char *pin_from_file(gchar *line)
 
 		line = end + 1;
 
-		while (isspace(*line))
+		while (g_ascii_isspace(*line))
 			line++;
 		if (*line != ',')
 			return _("Missing ',' after icon label");

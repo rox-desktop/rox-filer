@@ -952,7 +952,7 @@ static const gchar *mini_contents(FilerWindow *filer_window)
 	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 
 	for (c = entry; *c; c++)
-		if (!isspace(*c))
+		if (!g_ascii_isspace(*c))
 			return entry;
 
 	return NULL;

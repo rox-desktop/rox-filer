@@ -14,6 +14,7 @@
 #undef FILE_B_FLAG
 #undef WITH_GNOMEVFS
 #undef USE_PANGO_WRAP_WORD_CHAR
+#undef HAVE_APSYMBOLS_H
 
 #undef LARGE_FILE_SUPPORT
 
@@ -22,6 +23,10 @@
 /* Enable extensions - used for dnotify support */
 #ifndef _GNU_SOURCE
 # define _GNU_SOURCE
+#endif
+
+#ifdef HAVE_APSYMBOLS_H
+# include <apsymbols.h>
 #endif
 
 #include "my_vfs.h"

@@ -655,12 +655,13 @@ gboolean in_list(const guchar *item, const guchar *list)
 	
 	while (*list)
 	{
-		if (strncmp(item, list, len) == 0 && !isalpha(list[len]))
+		if (strncmp(item, list, len) == 0 &&
+		    !g_ascii_isalpha(list[len]))
 			return TRUE;
 		list = strchr(list, ',');
 		if (!list)
 			return FALSE;
-		while (isspace(*++list))
+		while (g_ascii_isspace(*++list))
 			;
 	}
 
@@ -782,7 +783,7 @@ int text_to_boolean(const char *text, int defvalue)
 	        return TRUE;
 	else if (g_strcasecmp(text, "no")==0)
 	        return FALSE;
-	else if (isdigit(text[0]))
+	else if (g_ascii_isdigit(text[0]))
 	        return !!atoi(text);
 
 	return defvalue;

@@ -597,6 +597,13 @@ static void show_features(void)
 		_("No")
 #endif
 	       );
+	g_print("%s... %s\n", _("Binary compatibility"),
+#ifdef HAVE_APSYMBOLS_H
+		_("Yes (can run with older glibc versions)")
+#else
+		_("No (apsymbols.h not found)")
+#endif
+	       );
 }
 
 static void soap_add(xmlNodePtr body,
