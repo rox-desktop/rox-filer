@@ -1076,7 +1076,7 @@ static gboolean spring_now(gpointer data)
 	}
 	else
 	{
-		spring_window = filer_opendir(dest_path, spring_src_window);
+		spring_window = filer_opendir(dest_path, spring_src_window, NULL);
 		if (spring_window)
 		{
 			gtk_timeout_add(500, spring_check_idle, NULL);

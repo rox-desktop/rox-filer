@@ -995,15 +995,15 @@ static void edit_mime_types(guchar *unused)
 	mkdir(make_path(home_dir, ".mime")->str, 0700);
 	path = make_path(home_dir, ".mime/packages")->str;
 	mkdir(path, 0700);
-	filer_opendir(path, NULL);
+	filer_opendir(path, NULL, NULL);
 
 	path = "/usr/local/share/mime/packages";
 	if (mc_stat(path, &info) == 0)
-		filer_opendir(path, NULL);
+		filer_opendir(path, NULL, NULL);
 
 	path = "/usr/share/mime/packages";
 	if (mc_stat(path, &info) == 0)
-		filer_opendir(path, NULL);
+		filer_opendir(path, NULL, NULL);
 }
 
 static GList *build_type_edit(Option *none, xmlNode *node, guchar *label)

@@ -228,7 +228,7 @@ gboolean run_diritem(const guchar *full_path,
 			if (filer_window)
 				filer_change_to(filer_window, full_path, NULL);
 			else
-				filer_opendir(full_path, src_window);
+				filer_opendir(full_path, src_window, NULL);
 			return TRUE;
 		case TYPE_FILE:
 			if ((item->mime_type == application_executable) && !edit)
@@ -348,14 +348,14 @@ void open_to_show(const guchar *path)
 	if (slash == dir || !slash)
 	{
 		/* Item in the root (or root itself!) */
-		new = filer_opendir("/", NULL);
+		new = filer_opendir("/", NULL, NULL);
 		if (new && dir[1])
 			display_set_autoselect(new, dir + 1);
 	}
 	else
 	{
 		*slash = '\0';
-		new = filer_opendir(dir, NULL);
+		new = filer_opendir(dir, NULL, NULL);
 		if (new)
 		{
 			if (slash[1] == '.')
@@ -488,7 +488,7 @@ static gboolean follow_symlink(const char *full_path,
 	{
 		FilerWindow *new;
 		
-		new = filer_opendir(new_dir, src_window);
+		new = filer_opendir(new_dir, src_window, NULL);
 		if (new)
 			display_set_autoselect(new, slash + 1);
 	}
@@ -528,7 +528,7 @@ static void dir_show_help(DirItem *item, const char *path)
 	help_dir = g_strconcat(path, "/Help", NULL);
 
 	if (mc_stat(help_dir, &info) == 0)
-		filer_opendir(help_dir, NULL);
+		filer_opendir(help_dir, NULL, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		info_message(
 			_("Application:\n"

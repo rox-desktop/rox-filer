@@ -1180,7 +1180,7 @@ static void run_action(DirItem *item)
 
 void open_home(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(home_dir, NULL);
+	filer_opendir(home_dir, NULL, NULL);
 }
 
 static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
@@ -1415,7 +1415,7 @@ static void customise_send_to(gpointer data)
 	g_string_free(dirs, TRUE);
 	
 	if (save)
-		filer_opendir(save, NULL);
+		filer_opendir(save, NULL, NULL);
 }
 
 /* Add everything in the directory <Choices>/SendTo/[.type[_subtype]] 
@@ -1582,7 +1582,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 			"is turned on in the Options window."));
 	}
 	else
-		filer_opendir(window_with_focus->sym_path, window_with_focus);
+		filer_opendir(window_with_focus->sym_path, window_with_focus, NULL);
 }
 
 #if 0
@@ -1693,7 +1693,7 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 	if (action == HELP_ABOUT)
 		infobox_new(app_dir);
 	else if (action == HELP_DIR)
-		filer_opendir(make_path(app_dir, "Help")->str, NULL);
+		filer_opendir(make_path(app_dir, "Help")->str, NULL, NULL);
 	else if (action == HELP_MANUAL)
 	{
 		gchar *manual = NULL;

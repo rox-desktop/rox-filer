@@ -346,7 +346,7 @@ static void select_row_callback(GtkTreeView *treeview,
 		goto out;
 	}
 
-	abox->preview = filer_opendir(dir, NULL);
+	abox->preview = filer_opendir(dir, NULL, NULL);
 	if (abox->preview)
 	{
 		display_set_autoselect(abox->preview, leaf);

@@ -95,7 +95,7 @@ extern Option		o_filer_size_limit;
 
 /* Prototypes */
 void filer_init(void);
-FilerWindow *filer_opendir(const char *path, FilerWindow *src_win);
+FilerWindow *filer_opendir(const char *path, FilerWindow *src_win, const gchar *wm_class);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 void filer_update_all(void);
 DirItem *filer_selected_item(FilerWindow *filer_window);

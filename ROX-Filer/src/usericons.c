@@ -661,7 +661,7 @@ static void open_icon_dir(GtkMenuItem *item, gpointer data)
 	const char *dir;
 
 	dir = gtk_label_get_text(GTK_LABEL(GTK_BIN(item)->child));
-	filer = filer_opendir(dir, NULL);
+	filer = filer_opendir(dir, NULL, NULL);
 	if (filer)
 		display_set_thumbs(filer, TRUE);
 }

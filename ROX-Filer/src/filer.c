@@ -86,7 +86,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff);
-static void filer_add_widgets(FilerWindow *filer_window);
+static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class);
 static void filer_add_signals(FilerWindow *filer_window);
 
 static void set_selection_state(FilerWindow *filer_window, gboolean normal);
@@ -877,7 +877,7 @@ void filer_open_parent(FilerWindow *filer_window)
 		return;		/* Already in the root */
 	
 	dir = g_dirname(current);
-	filer_opendir(dir, filer_window);
+	filer_opendir(dir, filer_window, NULL);
 	g_free(dir);
 }
 
@@ -1024,7 +1024,7 @@ DirItem *filer_selected_item(FilerWindow *filer_window)
  * Returns the new filer window, or NULL on error.
  * Note: if unique windows is in use, may return an existing window.
  */
-FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
+FilerWindow *filer_opendir(const char *path, FilerWindow *src_win, const gchar *wm_class)
 {
 	FilerWindow	*filer_window;
 	char		*real_path;
@@ -1113,7 +1113,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	}
 
 	/* Add all the user-interface elements & realise */
-	filer_add_widgets(filer_window);
+	filer_add_widgets(filer_window, wm_class);
 	if (src_win)
 		gtk_window_set_position(GTK_WINDOW(filer_window->window),
 					GTK_WIN_POS_MOUSE);
@@ -1155,13 +1155,15 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 /* This adds all the widgets to a new filer window. It is in a separate
  * function because filer_opendir() was getting too long...
  */
-static void filer_add_widgets(FilerWindow *filer_window)
+static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 {
 	GtkWidget *hbox, *vbox;
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
+	if (wm_class)
+		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window), wm_class, PROJECT);
 
 	/* This property is cleared when the window is destroyed.
 	 * You can thus ref filer_window->window and use this to see

@@ -306,7 +306,7 @@ static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 		filer_change_to(filer_window,
 				make_path(app_dir, "Help")->str, NULL);
 	else
-		filer_opendir(make_path(app_dir, "Help")->str, NULL);
+		filer_opendir(make_path(app_dir, "Help")->str, NULL, NULL);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,
@@ -318,7 +318,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->sym_path, filer_window);
+		filer_opendir(filer_window->sym_path, filer_window, NULL);
 	}
 	else
 	{
@@ -334,7 +334,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
-		filer_opendir(home_dir, filer_window);
+		filer_opendir(home_dir, filer_window, NULL);
 	}
 	else
 		filer_change_to(filer_window, home_dir, NULL);
@@ -350,7 +350,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->sym_path, filer_window);
+		filer_opendir(filer_window->sym_path, filer_window, NULL);
 	}
 	else
 		gtk_widget_destroy(filer_window->window);
