@@ -20,10 +20,11 @@ typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 
 enum
 {
-	ITEM_FLAG_SYMLINK 	= 0x1,	/* Is a symlink */
-	ITEM_FLAG_APPDIR  	= 0x2,	/* Contains /AppInfo */
-	ITEM_FLAG_MOUNT_POINT  	= 0x4,	/* Is in mtab or fstab */
-	ITEM_FLAG_MOUNTED  	= 0x8,	/* Is in /etc/mtab */
+	ITEM_FLAG_SYMLINK 	= 0x01,	/* Is a symlink */
+	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains /AppInfo */
+	ITEM_FLAG_MOUNT_POINT  	= 0x04,	/* Is in mtab or fstab */
+	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is in /etc/mtab */
+	ITEM_FLAG_TEMP_ICON  	= 0x10,	/* Free icon after use */
 };
 
 struct _FilerWindow

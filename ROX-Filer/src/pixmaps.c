@@ -20,6 +20,32 @@
 
 MaskedPixmap default_pixmap[LAST_DEFAULT_PIXMAP];
 
+/* Try to load the pixmap from the given path, allocate a MaskedPixmap
+ * structure for it and return a pointer to the structure. NULL on failure.
+ */
+MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
+{
+	GdkPixmap	*pixmap;
+	GdkBitmap	*mask;
+	GtkStyle	*style;
+	MaskedPixmap	*masked_pixmap;
+
+	style = gtk_widget_get_style(window);
+
+	pixmap = gdk_pixmap_create_from_xpm(window->window,
+			&mask,
+			&style->bg[GTK_STATE_NORMAL],
+			path);
+	if (!pixmap)
+		return NULL;
+
+	masked_pixmap = g_malloc(sizeof(MaskedPixmap));
+	masked_pixmap->pixmap = pixmap;
+	masked_pixmap->mask = mask;
+
+	return masked_pixmap;
+}
+
 void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image)
 {
 	image->pixmap = gdk_pixmap_create_from_xpm(window,

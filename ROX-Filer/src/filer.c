@@ -75,6 +75,28 @@ static gboolean child_eq(gpointer key, gpointer data, gpointer filer_window)
 	return data == filer_window;
 }
 
+/* Go though all the FileItems in a collection, freeing all the temp
+ * icons.
+ * TODO: Maybe we should cache icons?
+ */
+static void free_temp_icons(FilerWindow *filer_window)
+{
+	int		i;
+	Collection	*collection = filer_window->collection;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		FileItem	*item = (FileItem *) collection->items[i].data;
+		if (item->flags & ITEM_FLAG_TEMP_ICON)
+		{
+			gdk_pixmap_unref(item->image->pixmap);
+			gdk_pixmap_unref(item->image->mask);
+			g_free(item->image);
+			item->image = default_pixmap + TYPE_ERROR;
+		}
+	}
+}
+
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
@@ -85,6 +107,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 
 	g_hash_table_foreach_remove(child_to_filer, child_eq, filer_window);
 
+	free_temp_icons(filer_window);
 	if (filer_window->dir)
 		stop_scanning(filer_window);
 	g_free(filer_window->path);
@@ -205,13 +228,28 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	if (base_type == TYPE_DIRECTORY)
 	{
 		/* Might be an application directory - better check... */
-		path = g_string_append(path, "/AppRun");
+		g_string_append(path, "/AppRun");
 		if (!stat(path->str, &info))
+		{
 			item->flags |= ITEM_FLAG_APPDIR;
+		}
 	}
 
-	if (item->flags & ITEM_FLAG_APPDIR)
-		item->image = default_pixmap + TYPE_APPDIR;
+	if (item->flags & ITEM_FLAG_APPDIR)	/* path still ends /AppRun */
+	{
+		MaskedPixmap *app_icon;
+		
+		g_string_truncate(path, path->len - 3);
+		g_string_append(path, "Icon.xpm");
+		app_icon = load_pixmap_from(filer_window->window, path->str);
+		if (app_icon)
+		{
+			item->image = app_icon;
+			item->flags |= ITEM_FLAG_TEMP_ICON;
+		}
+		else
+			item->image = default_pixmap + TYPE_APPDIR;
+	}
 	else
 		item->image = default_pixmap + base_type;
 
@@ -334,6 +372,7 @@ void scan_dir(FilerWindow *filer_window)
 	mount_update();
 	
 	collection_set_item_size(filer_window->collection, 64, 64);
+	free_temp_icons(filer_window);
 	collection_clear(filer_window->collection);
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
 			filer_window->path);
