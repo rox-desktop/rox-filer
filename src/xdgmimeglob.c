@@ -470,6 +470,7 @@ _xdg_mime_glob_read_from_file (XdgGlobHash *glob_hash,
       *(colon++) = '\000';
       colon[strlen (colon) -1] = '\000';
       _xdg_glob_hash_append_glob (glob_hash, colon, line);
+      free (line);
     }
 
   fclose (glob_file);

@@ -1,5 +1,12 @@
 2004-12-08  Marco Pesenti Gritti  <marco@gnome.org>
 
+	* src/xdgmimeglob.c: (_xdg_mime_glob_read_from_file):
+
+	Patch from Matthias Clasen <mclasen@redhat.com> to fix
+	a mem leak. Bug #1048
+
+2004-12-08  Marco Pesenti Gritti  <marco@gnome.org>
+
 	* src/xdgmimeglob.h:
 
 	Patch from Michael.Wilson@bull.net to fix compile error on AIX
