@@ -1119,3 +1119,34 @@ void null_g_free(gpointer p)
 	g_free(*(gpointer *)p);
 	*(gpointer *)p = NULL;
 }
+
+/* Break 'name' (a UTF-8 string) down into a list of (text, number) pairs.
+ * The text parts are run through strxfrm. This allows any two names to be
+ * quickly compared later for intelligent sorting (comparing names is
+ * speed-critical).
+ */
+CollateKey *make_leafname_collate(const guchar *name)
+{
+	const guchar *i;
+	
+	g_return_val_if_fail(name != NULL, NULL);
+
+	/* XXX: validate */
+	for (i = name; *i; i = g_utf8_next_char(i))
+	{
+		/* We in a (possibly blank) text section starting at 'name'.
+		 * Find the end of it (the next digit, or end of string).
+		 */
+		if (g_unichar_isdigit(g_utf8_get_char(i)))
+		{
+			char *endp;
+			long num;
+			
+			/* i -> first digit character */
+			name_coll = g_utf8_collate_key(name, i - name);
+			num = strtol(i, &endp, 10);
+
+			g_return_val_if_fail(endp > i, NULL);
+		}
+	}
+}
