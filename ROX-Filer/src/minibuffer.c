@@ -46,6 +46,7 @@
 #include "action.h"
 #include "diritem.h"
 #include "type.h"
+#include "view_iface.h"
 
 static GList *shell_history = NULL;
 
@@ -132,7 +133,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	switch (mini_type)
 	{
 		case MINI_PATH:
-			collection_move_cursor(collection, 0, 0);
+			view_show_cursor(VIEW(filer_window->view));
 			filer_window->mini_cursor_base =
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,
@@ -150,7 +151,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 		case MINI_SHELL:
 			pos = 0;
 			i = collection->cursor_item;
-			if (collection->number_selected)
+			if (view_count_selected(VIEW(filer_window->view)) > 0)
 				gtk_entry_set_text(mini, " \"$@\"");
 			else if (i > -1 && i < collection->number_of_items)
 			{
@@ -456,16 +457,17 @@ static void path_changed(FilerWindow *filer_window)
 static gboolean find_exact_match(FilerWindow *filer_window,
 				 const gchar *pattern)
 {
-	Collection 	*collection = filer_window->collection;
-	int		i;
+	DirItem		*item;
+	ViewIter	iter;
+	ViewIface	*view = VIEW(filer_window->view);
 
-	for (i = 0; i < collection->number_of_items; i++)
+	view_get_iter(view, &iter, VIEW_FOREACH_ALL);
+
+	while ((item = iter.next(&iter)))
 	{
-		DirItem *item = (DirItem *) collection->items[i].data;
-
 		if (strcmp(item->leafname, pattern) == 0)
 		{
-			collection_set_cursor_item(collection, i);
+			view_cursor_to_iter(view, &iter);
 			return TRUE;
 		}
 	}
@@ -692,6 +694,13 @@ static void shell_tab(FilerWindow *filer_window)
 	g_string_free(leaf, TRUE);
 }
 
+static void run_child(gpointer unused)
+{
+	/* Ensure output is noticed - send stdout to stderr */
+	dup2(STDERR_FILENO, STDOUT_FILENO);
+	close_on_exec(STDOUT_FILENO, FALSE);
+}
+
 /* Either execute the command or make it the default run action */
 static void shell_return_pressed(FilerWindow *filer_window)
 {
@@ -699,6 +708,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	int		i;
 	const gchar	*entry;
 	Collection	*collection = filer_window->collection;
+	GError		*error = NULL;
 	pid_t		child;
 
 	entry = mini_contents(filer_window);
@@ -723,34 +733,19 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	
 	g_ptr_array_add(argv, NULL);
 
-	/* XXX: Use spawn */
-
-	child = fork();
-
-	switch (child)
+	if (!g_spawn_async_with_pipes(NULL, (gchar **) argv->pdata, NULL,
+			G_SPAWN_DO_NOT_REAP_CHILD |
+			G_SPAWN_SEARCH_PATH,
+			run_child, NULL,	/* Child setup fn */
+			&child,			/* Child PID */
+			NULL, NULL, NULL,	/* Standard pipes */
+			&error))
 	{
-		case -1:
-			delayed_error(_("Failed to create child process"));
-			break;
-		case 0:	/* Child */
-			/* Ensure output is noticed - send stdout to stderr */
-			dup2(STDERR_FILENO, STDOUT_FILENO);
-			close_on_exec(STDOUT_FILENO, FALSE);
-			if (chdir(filer_window->sym_path))
-				g_printerr("chdir(%s) failed: %s\n",
-						filer_window->sym_path,
-						g_strerror(errno));
-			execvp((char *) argv->pdata[0],
-				(char **) argv->pdata);
-			g_printerr("execvp(%s, ...) failed: %s\n",
-					(char *) argv->pdata[0],
-					g_strerror(errno));
-			_exit(0);
-		default:
-			on_child_death(child,
-					(CallbackFn) shell_done, filer_window);
-			break;
+		delayed_error("%s", error ? error->message : "(null)");
+		g_error_free(error);
 	}
+	else
+		on_child_death(child, (CallbackFn) shell_done, filer_window);
 
 	g_ptr_array_free(argv, TRUE);
 

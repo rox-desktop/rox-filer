@@ -159,7 +159,12 @@ static void view_collection_delete_if(ViewIface *view,
 			  gpointer data);
 static void view_collection_clear(ViewIface *view);
 static void view_collection_clear_selection(ViewIface *view);
+static int view_collection_count_items(ViewIface *view);
 static int view_collection_count_selected(ViewIface *view);
+static void view_collection_show_cursor(ViewIface *view);
+static void view_collection_get_iter(ViewIface *view, ViewIter *iter,
+				    ViewForeach type);
+static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter);
 
 
 /****************************************************************
@@ -750,7 +755,11 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->delete_if = view_collection_delete_if;
 	iface->clear = view_collection_clear;
 	iface->clear_selection = view_collection_clear_selection;
+	iface->count_items = view_collection_count_items;
 	iface->count_selected = view_collection_count_selected;
+	iface->show_cursor = view_collection_show_cursor;
+	iface->get_iter = view_collection_get_iter;
+	iface->cursor_to_iter = view_collection_cursor_to_iter;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -1437,10 +1446,74 @@ static void view_collection_clear_selection(ViewIface *view)
 	collection_clear_selection(collection);
 }
 
+static int view_collection_count_items(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+	
+	return collection->number_of_items;
+}
+
 static int view_collection_count_selected(ViewIface *view)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 	
 	return collection->number_selected;
+}
+
+static void view_collection_show_cursor(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+
+	collection_move_cursor(collection, 0, 0);
+}
+
+static DirItem *iter_next(ViewIter *iter)
+{
+	Collection *collection = iter->collection;
+	int n = collection->number_of_items;
+	int i = iter->i;
+
+	g_return_val_if_fail(i >= 0 || i <= n, NULL);
+	
+	/* iter->i is the first item to consider returning */
+	i = iter->i;
+
+	if (iter->type == VIEW_FOREACH_SELECTED)
+	{
+		/* As long as i is an unselected item, move on */
+		while (i < n && !collection->items[i].selected)
+			i++;
+	}
+	
+	iter->i = i + 1;
+
+	if (i < n)
+		return collection->items[i].data;
+
+	return NULL;
+}
+
+static void view_collection_get_iter(ViewIface *view, ViewIter *iter,
+				    ViewForeach type)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+
+	iter->i = 0;
+	iter->collection = collection;
+	iter->next = iter_next;
+	iter->type = type;
+}
+
+static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+	
+	g_return_if_fail(iter->collection == collection);
+
+	collection_set_cursor_item(collection, iter->i - 1);
 }

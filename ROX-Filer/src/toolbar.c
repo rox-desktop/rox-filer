@@ -41,6 +41,7 @@
 #include "type.h"
 #include "dir.h"
 #include "diritem.h"
+#include "view_iface.h"
 
 typedef struct _Tool Tool;
 
@@ -565,17 +566,23 @@ static void coll_selection_changed(Collection *collection, guint time,
 {
 	FilerWindow	*filer_window;
 	gchar		*label;
+	ViewIface	*view;
+	int		n_selected;
 
 	filer_window = g_object_get_data(G_OBJECT(collection), "filer_window");
-
 	g_return_if_fail(filer_window != NULL);
+
+	view = VIEW(filer_window->view);
 
 	if (filer_window->target_cb)
 		return;
 
-	if (collection->number_selected == 0)
+	n_selected = view_count_selected(view);
+
+	if (n_selected == 0)
 	{
 		gchar *s = NULL;
+		int   n_items;
 
 		if (filer_window->scanning)
 		{
@@ -595,12 +602,13 @@ static void coll_selection_changed(Collection *collection, guint time,
 				s = g_strdup_printf(_(" (%u hidden)"), tally);
 		}
 
-		if (collection->number_of_items)
+		n_items = view_count_items(view);
+
+		if (n_items)
 			label = g_strdup_printf("%d %s%s",
-					collection->number_of_items,
-					collection->number_of_items != 1
-						? _("items") : _("item"),
-						s ? s : "");
+					n_items,
+					n_items != 1 ? _("items") : _("item"),
+					s ? s : "");
 		else /* (French plurals work differently for zero) */
 			label = g_strdup_printf(_("No items%s"),
 					s ? s : "");
@@ -608,20 +616,19 @@ static void coll_selection_changed(Collection *collection, guint time,
 	}
 	else
 	{
-		gint	i = collection->number_of_items;
 		double	size = 0;
+		ViewIter iter;
+		DirItem *item;
 
-		while (i--)
-		{
-			DirItem *item = (DirItem *) collection->items[i].data;
-			
-			if (collection->items[i].selected 
-			    && item->base_type != TYPE_DIRECTORY)
-					size += (double) item->size;
-		}
+		view_get_iter(VIEW(filer_window->view), &iter,
+				VIEW_FOREACH_SELECTED);
+
+		while ((item = iter.next(&iter)))
+			if (item->base_type != TYPE_DIRECTORY)
+				size += (double) item->size;
+
 		label = g_strdup_printf(_("%u selected (%s)"),
-				collection->number_selected,
-				format_double_size(size));
+				n_selected, format_double_size(size));
 	}
 
 	gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), label);

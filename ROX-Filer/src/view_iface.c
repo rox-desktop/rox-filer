@@ -143,10 +143,47 @@ void view_clear_selection(ViewIface *obj)
 	VIEW_IFACE_GET_CLASS(obj)->clear_selection(obj);
 }
 
+/* Return the total number of items */
+int view_count_items(ViewIface *obj)
+{
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), 0);
+
+	return VIEW_IFACE_GET_CLASS(obj)->count_items(obj);
+}
+
 /* Return the number of selected items */
 int view_count_selected(ViewIface *obj)
 {
 	g_return_val_if_fail(VIEW_IS_IFACE(obj), 0);
 
 	return VIEW_IFACE_GET_CLASS(obj)->count_selected(obj);
+}
+
+void view_show_cursor(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->show_cursor(obj);
+}
+
+/* Create an iterator which will return each element selected by 'type'
+ * from successive calls to iter.next(&iter). NULL indicates the end
+ * of the sequence.
+ *
+ * The iterator does not need to be freed. It becomes invalid if the
+ * view is changed in any way.
+ */
+void view_get_iter(ViewIface *obj, ViewIter *iter, ViewForeach type)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter, type);
+}
+
+/* Position cursor on the last item returned by iter.next() */
+void view_cursor_to_iter(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->cursor_to_iter(obj, iter);
 }

@@ -11,23 +11,43 @@
 
 #include <glib-object.h>
 
-typedef struct _ViewIface      ViewIface;
-typedef struct _ViewIfaceClass ViewIfaceClass;
-struct _ViewIfaceClass
-{
-  GTypeInterface base_iface;
+typedef enum {
+	VIEW_FOREACH_ALL,	/* Start to finish */
+	VIEW_FOREACH_SELECTED	/* Start to finish, selected items only */
+} ViewForeach;
 
-  void (*sort)(ViewIface *obj);
-  void (*style_changed)(ViewIface *obj, int flags);
-  gboolean (*autoselect)(ViewIface *obj, const gchar *leaf);
-  void (*add_items)(ViewIface *obj, GPtrArray *items);
-  void (*update_items)(ViewIface *obj, GPtrArray *items);
-  void (*delete_if)(ViewIface *obj,
-		    gboolean (*test)(gpointer item, gpointer data),
-		    gpointer data);
-  void (*clear)(ViewIface *obj);
-  void (*clear_selection)(ViewIface *obj);
-  int (*count_selected)(ViewIface *obj);
+typedef struct _ViewIface	ViewIface;
+typedef struct _ViewIfaceClass	ViewIfaceClass;
+typedef struct _ViewIter	ViewIter;
+
+struct _ViewIter {
+	DirItem	   *(*next)(ViewIter *iter);
+
+	/* private fields */
+	Collection *collection;
+	int	   i;
+	ViewForeach type;
+};
+
+struct _ViewIfaceClass {
+	GTypeInterface base_iface;
+
+	void (*sort)(ViewIface *obj);
+	void (*style_changed)(ViewIface *obj, int flags);
+	gboolean (*autoselect)(ViewIface *obj, const gchar *leaf);
+	void (*add_items)(ViewIface *obj, GPtrArray *items);
+	void (*update_items)(ViewIface *obj, GPtrArray *items);
+	void (*delete_if)(ViewIface *obj,
+			gboolean (*test)(gpointer item, gpointer data),
+			gpointer data);
+	void (*clear)(ViewIface *obj);
+	void (*clear_selection)(ViewIface *obj);
+	int (*count_items)(ViewIface *obj);
+	int (*count_selected)(ViewIface *obj);
+	void (*show_cursor)(ViewIface *obj);
+
+	void (*get_iter)(ViewIface *obj, ViewIter *iter, ViewForeach type);
+	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -58,6 +78,11 @@ void view_delete_if(ViewIface *obj,
 		    gpointer data);
 void view_clear(ViewIface *obj);
 void view_clear_selection(ViewIface *obj);
+int view_count_items(ViewIface *obj);
 int view_count_selected(ViewIface *obj);
+void view_show_cursor(ViewIface *obj);
+
+void view_get_iter(ViewIface *obj, ViewIter *iter, ViewForeach type);
+void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
 
 #endif /* __VIEW_IFACE_H__ */

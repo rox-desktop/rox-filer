@@ -529,8 +529,8 @@ static void selection_get(GtkWidget *widget,
 {
 	GString	*reply, *header;
 	FilerWindow 	*filer_window;
-	int		i;
-	Collection	*collection;
+	ViewIter	iter;
+	DirItem		*item;
 
 	filer_window = g_object_get_data(G_OBJECT(widget), "filer_window");
 
@@ -550,20 +550,13 @@ static void selection_get(GtkWidget *widget,
 			break;
 	}
 
-	collection = filer_window->collection;
-	for (i = 0; i < collection->number_of_items; i++)
+	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
+
+	while ((item = iter.next(&iter)))
 	{
-		if (collection->items[i].selected)
-		{
-			DirItem *item =
-				(DirItem *) collection->items[i].data;
-			
-			g_string_append(reply, header->str);
-			g_string_append(reply, item->leafname);
-		}
+		g_string_append(reply, header->str);
+		g_string_append(reply, item->leafname);
 	}
-	/* This works, but I don't think I like it... */
-	/* g_string_append_c(reply, ' '); */
 	
 	if (reply->len > 0)
 		gtk_selection_data_set(selection_data, xa_string,
@@ -799,10 +792,10 @@ static xmlNode *group_find(char *name)
 
 static void group_save(FilerWindow *filer_window, char *name)
 {
-	Collection *collection = filer_window->collection;
 	xmlNode	*group;
 	guchar	*save_path;
-	int	i;
+	DirItem *item;
+	ViewIter iter;
 
 	group = group_find(name);
 	if (group)
@@ -816,16 +809,10 @@ static void group_save(FilerWindow *filer_window, char *name)
 
 	xmlNewChild(group, NULL, "directory", filer_window->sym_path);
 
-	for (i = 0; i < collection->number_of_items; i++)
-	{
-		DirItem *item = (DirItem *) collection->items[i].data;
-		gchar	*u8_leaf = item->leafname;
-		
-		if (!collection->items[i].selected)
-			continue;
+	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
 
-		xmlNewChild(group, NULL, "item", u8_leaf);
-	}
+	while ((item = iter.next(&iter)))
+		xmlNewChild(group, NULL, "item", item->leafname);
 
 	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
 	if (save_path)
@@ -1086,20 +1073,16 @@ void filer_change_to(FilerWindow *filer_window,
  */
 GList *filer_selected_items(FilerWindow *filer_window)
 {
-	Collection	*collection = filer_window->collection;
-	GList		*retval = NULL;
-	guchar		*dir = filer_window->sym_path;
-	int		i;
+	GList	*retval = NULL;
+	guchar	*dir = filer_window->sym_path;
+	ViewIter iter;
+	DirItem *item;
 
-	for (i = 0; i < collection->number_of_items; i++)
+	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
+	while ((item = iter.next(&iter)))
 	{
-		if (collection->items[i].selected)
-		{
-			DirItem	*item = (DirItem *) collection->items[i].data;
-
-			retval = g_list_prepend(retval,
+		retval = g_list_prepend(retval,
 				g_strdup(make_path(dir, item->leafname)->str));
-		}
 	}
 
 	return g_list_reverse(retval);
@@ -1754,16 +1737,17 @@ void filer_create_thumb(FilerWindow *filer_window, const gchar *path)
  */
 void filer_create_thumbs(FilerWindow *filer_window)
 {
-	Collection *collection = filer_window->collection;
-	int i;
+	DirItem *item;
+	ViewIter iter;
 
 	if (!filer_window->show_thumbs)
 		return;
 
-	for (i = 0; i < collection->number_of_items; i++)
+	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_ALL);
+
+	while ((item = iter.next(&iter)))
 	{
 		MaskedPixmap *pixmap;
-		DirItem	 *item = (DirItem *) collection->items[i].data;
 		gchar    *path;
 		gboolean found;
 
