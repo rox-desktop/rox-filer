@@ -29,10 +29,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <sys/param.h>
-
-#ifdef HAVE_REGEX_H
-# include <regex.h>
-#endif
+#include <fnmatch.h>
 
 #ifdef WITH_GNOMEVFS
 # include <libgnomevfs/gnome-vfs.h>
@@ -57,20 +54,6 @@
 #include "options.h"
 #include "filer.h"
 
-#ifdef HAVE_REGEX_H
-# define USE_REGEX 1
-#else
-# undef USE_REGEX
-#endif
-
-#ifdef USE_REGEX
-/* A regexp rule, which maps matching filenames to a MIME-types */
-typedef struct pattern {
-	MIME_type *type;
-	regex_t buffer;
-} Pattern;
-#endif
-
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
 	{"display_err_colour",  "#ff0000"},
@@ -92,9 +75,8 @@ static Option o_type_colours[NUM_TYPE_COLOURS];
 static GdkColor	type_colours[NUM_TYPE_COLOURS];
 
 /* Static prototypes */
+static void load_mime_types(void);
 static void alloc_type_colours(void);
-static const char *import_extensions(gchar *line);
-static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
 static void reread_mime_files(guchar *unused);
@@ -102,16 +84,26 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static GList *build_type_reread(Option *none, xmlNode *node, guchar *label);
 static GList *build_type_edit(Option *none, xmlNode *node, guchar *label);
 
+/* When working out the type for a file, this hash table is checked
+ * first...
+ */
+static GHashTable *literal_hash = NULL;	/* name -> MIME-type */
+
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
  * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
  * The hash table is consulted from each dot in the string in turn
  * (First .ps.gz, then try .gz)
  */
 static GHashTable *extension_hash = NULL;
-static char *current_type = NULL;	/* (used while reading file) */
-#ifdef USE_REGEX
-static GList *patterns = NULL;		/* [(regexp -> MIME type)] */
-#endif
+
+/* The first pattern in the list which matches is used */
+typedef struct pattern {
+	gint len;		/* Used for sorting */
+	gchar *glob;
+	MIME_type *type;
+} Pattern;
+static GPtrArray *glob_patterns = NULL;	/* [Pattern] */
+
 /* Hash of all allocated MIME types, indexed by "media/subtype".
  * MIME_type structs are never freed; this table prevents memory leaks
  * when rereading the config files.
@@ -119,6 +111,7 @@ static GList *patterns = NULL;		/* [(regexp -> MIME type)] */
 static GHashTable *type_hash = NULL;
 
 /* Most things on Unix are text files, so this is the default type */
+/* XXX: special -> inode! */
 MIME_type *text_plain;
 MIME_type *special_directory;
 MIME_type *special_pipe;
@@ -133,7 +126,6 @@ static Option o_display_colour_types;
 void type_init(void)
 {
 	int		i;
-	GPtrArray	*list;
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
@@ -147,12 +139,7 @@ void type_init(void)
 	special_exec = get_mime_type("special/executable", TRUE);
 	special_unknown = get_mime_type("special/unknown", TRUE);
 
-	current_type = NULL;
-
-	list = choices_list_dirs("MIME-info");
-	for (i = list->len - 1; i >= 0; i--)
-		import_for_dir((gchar *) g_ptr_array_index(list, i));
-	choices_free_list(list);
+	load_mime_types();
 
 	option_register_widget("type-edit", build_type_edit);
 	option_register_widget("type-reread", build_type_reread);
@@ -194,178 +181,6 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
 	return mtype;
-}
-
-#ifdef USE_REGEX
-static void pattern_delete(gpointer patt, gpointer udata)
-{
-	Pattern *pattern = (Pattern *) patt;
-
-	regfree(&pattern->buffer);
-
-	g_free(pattern);
-}
-#endif
-
-static gboolean extension_delete(gpointer key, gpointer value, gpointer udata)
-{
-	/* key is a g_strdup'ed string */
-	g_free(key);
-
-	/* value is also preserved in type_hash, so don't delete */
-
-	return TRUE; /* Removes this entry */
-}
-
-/* XXX: Dup code */
-void type_reread(void)
-{
-	GPtrArray	*list;
-	int i;
-
-	g_hash_table_foreach_remove(extension_hash, extension_delete, NULL);
-#ifdef USE_REGEX
-	g_list_foreach(patterns, pattern_delete, NULL);
-	g_list_free(patterns);
-	patterns = NULL;
-#endif
-
-	current_type = NULL;
-
-	list = choices_list_dirs("MIME-info");
-	for (i = list->len - 1; i >= 0; i--)
-		import_for_dir((gchar *) g_ptr_array_index(list, i));
-	choices_free_list(list);
-
-	filer_update_all();
-}
-
-/* Parse every file in 'dir' */
-static void import_for_dir(guchar *path)
-{
-	DIR		*dir;
-	struct dirent	*item;
-
-	dir = opendir(path);
-	if (!dir)
-		return;
-
-	while ((item = readdir(dir)))
-	{
-		guchar	*file;
-		struct stat info;
-		
-		if (item->d_name[0] == '.')
-			continue;
-
-		current_type = NULL;
-		file = make_path(path, item->d_name)->str;
-
-		if (stat(file, &info) == 0 && S_ISREG(info.st_mode))
-			parse_file(file, import_extensions);
-	}
-
-	closedir(dir);
-}
-
-/* Add one entry to the extension_hash table */
-static void add_ext(const char *type_name, const char *ext)
-{
-	MIME_type *new;
-
-	new = get_mime_type(type_name, TRUE);
-	
-	g_return_if_fail(new != NULL);
-			
-	g_hash_table_insert(extension_hash, g_strdup(ext), new);
-}
-
-static void add_regex(char *type_name, char *reg)
-{
-#ifdef USE_REGEX
-	MIME_type *new;
-	char	  *slash;
-	Pattern	  *pattern;
-
-	slash = strchr(type_name, '/');
-	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
-
-	pattern = g_new0(Pattern, 1);
-
-        if (regcomp(&pattern->buffer, reg, REG_EXTENDED | REG_NOSUB))
-	{
-		regfree(&pattern->buffer);
-		g_free(pattern);
-		return;
-	}
-	
-	new = get_mime_type(type_name, TRUE);
-	
-	g_return_if_fail(new != NULL);
-
-	pattern->type = new;
-
-	patterns = g_list_prepend(patterns, pattern);
-#endif
-}
-
-/* Parse one line from the file and add entries to extension_hash */
-static const char *import_extensions(gchar *line)
-{
-	if (*line == '\0' || *line == '#')
-		return NULL;		/* Comment */
-
-	if (isspace(*line))
-	{
-		if (!current_type)
-			return _("Missing MIME-type");
-		while (*line && isspace(*line))
-			line++;
-
-		if (strncmp(line, "ext:", 4) == 0)
-		{
-			char *ext;
-			line += 4;
-
-			for (;;)
-			{
-				while (*line && isspace(*line))
-					line++;
-				if (*line == '\0')
-					break;
-				ext = line;
-				while (*line && !isspace(*line))
-					line++;
-				if (*line)
-					*line++ = '\0';
-				add_ext(current_type, ext);
-			}
-		}
-		else if (strncmp(line, "regex:", 6) == 0)
-		{
-		        line += 6;
-
-			while (*line && isspace(*line))
-				line++;
-			if (*line)
-				add_regex(current_type, line);
-		}
-		/* else ignore */
-	}
-	else
-	{
-		char		*type = line;
-		while (*line && *line != ':' && !isspace(*line))
-			line++;
-		if (*line)
-			*line++ = '\0';
-		while (*line && isspace(*line))
-			line++;
-		if (*line)
-			return _("Trailing chars after MIME-type");
-		current_type = g_strdup(type);
-	}
-	return NULL;
 }
 
 const char *basetype_name(DirItem *item)
@@ -436,52 +251,65 @@ MIME_type *type_from_path(const char *path)
 {
 	const char *ext, *dot, *leafname;
 	char *lower;
-#ifdef USE_REGEX
-	GList *patt;
-	int len;
-#endif
+	MIME_type *type = NULL;
+	int	i;
 
-#ifdef WITH_GNOMEVFS
+#if 0
+# ifdef WITH_GNOMEVFS
 	if (o_use_gnomevfs.int_value)
 		return get_mime_type(gnome_vfs_mime_type_from_name(path), TRUE);
+# endif
 #endif
 
 	leafname = g_basename(path);
+
+	type = g_hash_table_lookup(literal_hash, leafname);
+	if (type)
+		return type;
+	lower = g_strdup(path);
+	type = g_hash_table_lookup(literal_hash, lower);
+	if (type)
+		goto out;
+
 	ext = leafname;
 
 	while ((dot = strchr(ext, '.')))
 	{
-		MIME_type *type;
-
 		ext = dot + 1;
 
 		type = g_hash_table_lookup(extension_hash, ext);
 
 		if (type)
-			return type;
+			goto out;
 
-		lower = g_strdup(ext);
-		g_strdown(lower);
-		type = g_hash_table_lookup(extension_hash, lower);
-		g_free(lower);
-
+		type = g_hash_table_lookup(extension_hash,
+					lower + (ext - leafname));
 		if (type)
-			return type;
+			goto out;
 	}
 
-#ifdef USE_REGEX
-	len = strlen(leafname);
-
-	for (patt = patterns; patt; patt = patt->next)
+	for (i = 0; i < glob_patterns->len; i++)
 	{
-		Pattern *pattern = (Pattern *) patt->data;
+		Pattern *p = glob_patterns->pdata[i];
 
-                if (regexec(&pattern->buffer, leafname, 0, NULL, 0) == 0)
-			return pattern->type;
+		if (fnmatch(p->glob, leafname, 0) == 0)
+		{
+			type = p->type;
+			goto out;
+		}
+
+		if (fnmatch(p->glob, lower, 0) == 0)
+		{
+			type = p->type;
+			goto out;
+		}
+
 	}
-#endif
 
-	return NULL;
+out:
+	g_free(lower);
+
+	return type;
 }
 
 /* Returns the file/dir in Choices for handling this type.
@@ -1108,6 +936,7 @@ gboolean can_set_run_action(DirItem *item)
 		!(item->mime_type == special_exec);
 }
 
+#if 0
 /* Open all <Choices>/type directories and display a message */
 static void open_choices_dirs(gchar *type, gchar *what)
 {
@@ -1124,16 +953,20 @@ static void open_choices_dirs(gchar *type, gchar *what)
 
 	choices_free_list(list);
 }
+#endif
 
 /* To edit the MIME types, open a filer window for <Choices>/MIME-info */
 static void edit_mime_types(guchar *unused)
 {
+	delayed_error("XXX: This feature is currently under repair");
+	/*
 	open_choices_dirs("MIME-info", "the files defining MIME types");
+	*/
 }
 
 static void reread_mime_files(guchar *unused)
 {
-	type_reread();
+	load_mime_types();
 }
 
 static GList *build_type_reread(Option *none, xmlNode *node, guchar *label)
@@ -1227,4 +1060,236 @@ GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 		return &type_colours[9];
 	else
 		return &type_colours[item->base_type];
+}
+
+/* Process the 'Patterns' value */
+static void add_patterns(MIME_type *type, gchar *patterns, GHashTable *globs)
+{
+	while (1)
+	{
+		char *semi;
+
+		semi = strchr(patterns, ';');
+		if (semi)
+			*semi = '\0';
+		g_strstrip(patterns);
+		if (patterns[0] == '*' && patterns[1] == '.' &&
+				strpbrk(patterns + 2, "*?[") == NULL)
+		{
+			g_hash_table_insert(extension_hash,
+					g_strdup(patterns + 2), type);
+		}
+		else if (strpbrk(patterns, "*?[") == NULL)
+			g_hash_table_insert(literal_hash,
+					g_strdup(patterns), type);
+		else
+			g_hash_table_insert(globs, g_strdup(patterns), type);
+		if (!semi)
+			return;
+		patterns = semi + 1;
+	}
+}
+
+/* Load and parse this file. literal_hash and extension_hash are updated
+ * directly. Other patterns are added to 'globs'.
+ */
+static void import_file(const gchar *file, GHashTable *globs)
+{
+	MIME_type *type = NULL;
+	GError *error = NULL;
+	gchar  *data, *line;
+	
+	if (!g_file_get_contents(file, &data, NULL, &error))
+	{
+		delayed_error("Error loading MIME-Info database:\n%s",
+				error->message);
+		g_error_free(error);
+		return;
+	}
+
+	line = data;
+
+	while (line && *line)
+	{
+		char *nl;
+
+		nl = strchr(line, '\n');
+		if (!nl)
+			break;
+		*nl = '\0';
+
+		if (*line == '[')
+		{
+			const gchar *end;
+
+			type = NULL;
+
+			end = strchr(line, ']');
+			if (!end)
+			{
+				delayed_error(_("File '%s' corrupted!"), file);
+				break;
+			}
+
+			if (strncmp(line + 1, "MIME-Info ", 10) == 0)
+			{
+				gchar *name;
+
+				line += 11;
+				while (*line == ' ' || *line == '\t')
+					line++;
+				name = g_strndup(line, end - line);
+				g_strstrip(name);
+
+				type = get_mime_type(name, TRUE);
+				if (!type)
+				{
+					delayed_error(
+						_("Invalid type '%s' in '%s'"),
+						name, file);
+					break;
+				}
+				g_free(name);
+			}
+		}
+		else if (type)
+		{
+			char *eq;
+			eq = strchr(line, '=');
+			if (eq)
+			{
+				char *tmp = eq;
+
+				while (tmp > line &&
+					(tmp[-1] == ' ' || tmp[-1] == '\t'))
+					tmp--;
+				*tmp = '\0';
+
+				eq++;
+				while (*eq == ' ' || *eq == '\t')
+					eq++;
+
+				if (strcmp(line, "Patterns") == 0)
+					add_patterns(type, eq, globs);
+			}
+		}
+
+		line = nl + 1;
+	}
+
+	g_free(data);
+}
+
+/* Parse every .mimeinfo file in 'dir' */
+static void import_for_dir(guchar *path, GHashTable *globs, gboolean *freedesk)
+{
+	DIR		*dir;
+	struct dirent	*item;
+
+	dir = opendir(path);
+	if (!dir)
+		return;
+
+	while ((item = readdir(dir)))
+	{
+		gchar   *dot;
+
+		dot = strrchr(item->d_name, '.');
+		if (!dot)
+			continue;
+		if (strcmp(dot + 1, "mimeinfo") != 0)
+			continue;
+
+		if (*freedesk == FALSE &&
+			!strcmp(item->d_name, "freedesktop-shared.mimeinfo"))
+		{
+			*freedesk = TRUE;
+		}
+		
+		import_file(make_path(path, item->d_name)->str, globs);
+	}
+
+	closedir(dir);
+}
+
+static void add_to_glob_patterns(gpointer key, gpointer value, gpointer unused)
+{
+	Pattern *pattern;
+
+	pattern = g_new(Pattern, 1);
+	pattern->glob = g_strdup((gchar *) key);
+	pattern->type = (MIME_type *) value;
+	pattern->len = strlen(pattern->glob);
+
+	g_ptr_array_add(glob_patterns, pattern);
+}
+
+static gint sort_by_strlen(gconstpointer a, gconstpointer b)
+{
+	const Pattern *pa = *(const Pattern **) a;
+	const Pattern *pb = *(const Pattern **) b;
+
+	if (pa->len > pb->len)
+		return -1;
+	else if (pa->len == pb->len)
+		return 0;
+	return 1;
+}
+
+/* Clear all currently stored information and re-read everything */
+static void load_mime_types(void)
+{
+	gboolean got_freedesk = FALSE;
+	GHashTable *globs;
+	gchar *tmp;
+
+	if (!glob_patterns)
+		glob_patterns = g_ptr_array_new();
+	else
+	{
+		int i;
+
+		for (i = glob_patterns->len - 1; i >= 0; i--)
+		{
+			Pattern *p = glob_patterns->pdata[i];
+			g_free(p->glob);
+			g_free(p);
+		}
+		g_ptr_array_set_size(glob_patterns, 0);
+	}
+
+	if (literal_hash)
+		g_hash_table_destroy(literal_hash);
+	if (extension_hash)
+		g_hash_table_destroy(extension_hash);
+	literal_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+						g_free, NULL);
+	extension_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
+						g_free, NULL);
+	globs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
+
+	import_for_dir("/usr/share/mime/mime-info", globs, &got_freedesk);
+
+	import_for_dir("/usr/local/share/mime/mime-info", globs, &got_freedesk);
+
+	tmp = g_strconcat(home_dir, "/.mime/mime-info", NULL);
+	import_for_dir(tmp, globs, &got_freedesk);
+	g_free(tmp);
+
+	/* Turn the globs hash into a pointer array */
+	g_hash_table_foreach(globs, add_to_glob_patterns, NULL);
+	g_hash_table_destroy(globs);
+
+	g_ptr_array_sort(glob_patterns, sort_by_strlen);
+
+	if (!got_freedesk)
+	{
+		delayed_error(_("The standard MIME type database was not "
+			"found. The filer will probably not show the correct "
+			"types for different files. You should download and "
+			"install the 'Common types package' from here:\n"
+		"http://www.freedesktop.org/standards/shared-mime-info.html"));
+	}
+
+	filer_update_all();
 }

@@ -304,7 +304,7 @@ void delayed_error(const char *error, ...)
 gboolean load_file(const char *pathname, char **data_out, long *length_out)
 {
 	gsize len;
-	GError *error;
+	GError *error = NULL;
 	
 	if (!g_file_get_contents(pathname, data_out, &len, &error))
 	{

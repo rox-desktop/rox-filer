@@ -2,10 +2,17 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+26-Apr-2002
+~~~~~~~~~~~
+MIME information is now read from the freedesktop.org shared database rather
+than the old Choices/MIME-info directories.
+
 25-Apr-2002
 ~~~~~~~~~~~
-Don't convert to `real' path when following symlinks (Up returns to the
-directory containing the symlink, not the thing it linked to).
+Don't convert to `real' path when following symlinks, so that Up now returns
+to the directory containing the symlink, not the thing it linked to
+(requested by Gregory Spath).
+Don't quit while Options window is open.
 
 21-Apr-2002
 ~~~~~~~~~~~
