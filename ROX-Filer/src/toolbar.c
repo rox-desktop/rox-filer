@@ -456,10 +456,10 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 	}
 	else
 	{
-		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
-			GTK_SIGNAL_FUNC(toolbar_adjust_pressed), filer_window);
-		gtk_signal_connect(GTK_OBJECT(button), "button_release_event",
-			GTK_SIGNAL_FUNC(toolbar_adjust_released), filer_window);
+		g_signal_connect(button, "button_press_event",
+			G_CALLBACK(toolbar_adjust_pressed), filer_window);
+		g_signal_connect(button, "button_release_event",
+			G_CALLBACK(toolbar_adjust_released), filer_window);
 	}
 
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
@@ -467,7 +467,8 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_pixmap_new(tool->icon->pixmap, tool->icon->mask);
+	icon_widget = gtk_image_new_from_pixmap(tool->icon->pixmap,
+						tool->icon->mask);
 
 	if (o_toolbar.int_value == TOOLBAR_LARGE)
 	{
@@ -511,8 +512,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	GdkDragAction	action = context->suggested_action;
 	DropDest	dest;
 
-	dest = (DropDest) gtk_object_get_data(GTK_OBJECT(widget),
-							"toolbar_dest");
+	dest = (DropDest) g_object_get_data(G_OBJECT(widget), "toolbar_dest");
 
 	if (dest == DROP_TO_HOME)
 		g_dataset_set_data(context, "drop_dest_path",
@@ -558,8 +558,7 @@ static void handle_drops(FilerWindow *filer_window,
 			GTK_SIGNAL_FUNC(drag_motion), filer_window);
 	gtk_signal_connect(GTK_OBJECT(button), "drag_leave",
 			GTK_SIGNAL_FUNC(drag_leave), filer_window);
-	gtk_object_set_data(GTK_OBJECT(button), "toolbar_dest",
-			(gpointer) dest);
+	g_object_set_data(G_OBJECT(button), "toolbar_dest", (gpointer) dest);
 }
 
 static void tally_items(gpointer key, gpointer value, gpointer data)
@@ -704,7 +703,7 @@ static void update_tools(Option *option)
 		GtkWidget	*kid = (GtkWidget *) next->data;
 		guchar		*name;
 
-		name = gtk_object_get_data(GTK_OBJECT(kid), "tool_name");
+		name = g_object_get_data(G_OBJECT(kid), "tool_name");
 
 		g_return_if_fail(name != NULL);
 		
@@ -732,7 +731,7 @@ static guchar *read_tools(Option *option)
 
 		if (!GTK_WIDGET_SENSITIVE(GTK_BIN(kid)->child))
 		{
-			name = gtk_object_get_data(kid, "tool_name");
+			name = g_object_get_data(G_OBJECT(kid), "tool_name");
 			g_return_val_if_fail(name != NULL, list->str);
 
 			if (list->len)

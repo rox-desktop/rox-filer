@@ -68,8 +68,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -377,35 +375,25 @@ static GtkFontSelectionDialog *current_fontsel_box = NULL;
 static void get_new_colour(GtkWidget *ok, Option *option)
 {
 	GtkWidget	*csel;
-	gdouble		c[4];
-	GdkColor	colour;
+	GdkColor	c;
 
 	g_return_if_fail(current_csel_box != NULL);
 
 	csel = current_csel_box->colorsel;
 
-	gtk_color_selection_get_color(GTK_COLOR_SELECTION(csel), c);
-	colour.red = c[0] * 0xffff;
-	colour.green = c[1] * 0xffff;
-	colour.blue = c[2] * 0xffff;
+	gtk_color_selection_get_current_color(GTK_COLOR_SELECTION(csel), &c);
 
-	button_patch_set_colour(option->widget, &colour);
+	button_patch_set_colour(option->widget, &c);
 	
 	gtk_widget_destroy(GTK_WIDGET(current_csel_box));
 
 	option_check_widget(option);
 }
 
-static void set_to_null(gpointer *data)
-{
-	*data = NULL;
-}
-
 static void open_coloursel(GtkWidget *button, Option *option)
 {
 	GtkColorSelectionDialog	*csel;
 	GtkWidget		*dialog, *patch;
-	gdouble			c[4];
 
 	if (current_csel_box)
 		gtk_widget_destroy(GTK_WIDGET(current_csel_box));
@@ -415,22 +403,19 @@ static void open_coloursel(GtkWidget *button, Option *option)
 	current_csel_box = csel;
 	gtk_window_set_position(GTK_WINDOW(csel), GTK_WIN_POS_MOUSE);
 
-	gtk_signal_connect_object(GTK_OBJECT(dialog), "destroy",
-			GTK_SIGNAL_FUNC(set_to_null),
-			(GtkObject *) &current_csel_box);
+	g_signal_connect(dialog, "destroy",
+			G_CALLBACK(gtk_widget_destroyed), &current_csel_box);
 	gtk_widget_hide(csel->help_button);
-	gtk_signal_connect_object(GTK_OBJECT(csel->cancel_button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
-	gtk_signal_connect(GTK_OBJECT(csel->ok_button), "clicked",
-			GTK_SIGNAL_FUNC(get_new_colour), option);
+	g_signal_connect_swapped(csel->cancel_button, "clicked",
+			G_CALLBACK(gtk_widget_destroy), dialog);
+	g_signal_connect(csel->ok_button, "clicked",
+			G_CALLBACK(get_new_colour), option);
 
 	patch = GTK_BIN(button)->child;
 
-	c[0] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].red) / 0xffff;
-	c[1] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].green) / 0xffff;
-	c[2] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].blue) / 0xffff;
-	gtk_color_selection_set_color(GTK_COLOR_SELECTION(csel->colorsel), c);
+	gtk_color_selection_set_current_color(
+			GTK_COLOR_SELECTION(csel->colorsel),
+			&patch->style->bg[GTK_STATE_NORMAL]);
 
 	gtk_widget_show(dialog);
 }
@@ -467,15 +452,14 @@ static void open_fontsel(GtkWidget *button, Option *option)
 	gtk_window_set_position(GTK_WINDOW(current_fontsel_box),
 				GTK_WIN_POS_MOUSE);
 
-	gtk_signal_connect_object(GTK_OBJECT(current_fontsel_box), "destroy",
-			GTK_SIGNAL_FUNC(set_to_null),
-			(GtkObject *) &current_fontsel_box);
+	g_signal_connect(current_fontsel_box, "destroy",
+			G_CALLBACK(gtk_widget_destroy), &current_fontsel_box);
 
 	gtk_font_selection_dialog_set_font_name(current_fontsel_box,
 						option->value);
 
-	gtk_signal_connect(GTK_OBJECT(current_fontsel_box), "response",
-			GTK_SIGNAL_FUNC(font_chosen), option);
+	g_signal_connect(current_fontsel_box, "response",
+			G_CALLBACK(font_chosen), option);
 
 	gtk_widget_show(GTK_WIDGET(current_fontsel_box));
 }
@@ -524,15 +508,15 @@ static GtkWidget *build_radio(xmlNode *radio, GtkWidget *prev)
 	label = xmlGetProp(radio, "label");
 
 	button = gtk_radio_button_new_with_label(
-			prev_button ? gtk_radio_button_group(prev_button)
+			prev_button ? gtk_radio_button_get_group(prev_button)
 				    : NULL,
 			_(label));
 	g_free(label);
 
 	may_add_tip(button, radio);
 
-	gtk_object_set_data(GTK_OBJECT(button), "value",
-			xmlGetProp(radio, "value"));
+	g_object_set_data(G_OBJECT(button), "value",
+			  xmlGetProp(radio, "value"));
 
 	return button;
 }
@@ -552,8 +536,7 @@ static void build_menu_item(xmlNode *node, GtkWidget *option_menu)
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	gtk_widget_show_all(menu);
 
-	gtk_object_set_data(GTK_OBJECT(item),
-				"value", xmlGetProp(node, "value"));
+	g_object_set_data(G_OBJECT(item), "value", xmlGetProp(node, "value"));
 }
 
 static void build_widget(xmlNode *widget, GtkWidget *box)
@@ -584,7 +567,7 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 		GtkWidget *eb;
 
 		eb = gtk_event_box_new();
-		gtk_widget_set_usize(eb, 12, 12);
+		gtk_widget_set_size_request(eb, 12, 12);
 		gtk_box_pack_start(GTK_BOX(box), eb, FALSE, TRUE, 0);
 		return;
 	}
@@ -768,8 +751,8 @@ static GtkWidget *build_frame(void)
 
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 	gtk_window_set_title(GTK_WINDOW(window), _("Options"));
-	gtk_signal_connect(GTK_OBJECT(window), "destroy",
-			GTK_SIGNAL_FUNC(options_destroyed), NULL);
+	g_signal_connect(window, "destroy",
+			G_CALLBACK(options_destroyed), NULL);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_default_size(GTK_WINDOW(window), -1, 400);
 
@@ -784,7 +767,7 @@ static GtkWidget *build_frame(void)
 	actions = gtk_hbutton_box_new();
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(actions),
 				  GTK_BUTTONBOX_END);
-	gtk_button_box_set_spacing(GTK_BUTTON_BOX(actions), 10);
+	gtk_box_set_spacing(GTK_BOX(actions), 10);
 
 	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
@@ -804,8 +787,7 @@ static GtkWidget *build_frame(void)
 	button = button_new_mixed(GTK_STOCK_UNDO, _("_Revert"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(revert_options), NULL);
+	g_signal_connect(button, "clicked", G_CALLBACK(revert_options), NULL);
 	gtk_tooltips_set_tip(option_tooltips, button,
 			_("Restore all choices to how they were when the "
 			  "Options box was opened."), NULL);
@@ -813,15 +795,15 @@ static GtkWidget *build_frame(void)
 	button = button_new_mixed(GTK_STOCK_APPLY, _("_OK"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-		GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(window));
+	g_signal_connect_swapped(button, "clicked",
+				G_CALLBACK(gtk_widget_destroy), window);
 
 	if (save_path)
 	{
 		button = gtk_button_new_from_stock(GTK_STOCK_SAVE);
 		gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), NULL);
+		g_signal_connect_swapped(button, "clicked",
+					 G_CALLBACK(save_options), NULL);
 
 		string = g_strdup_printf(_("Choices will be saved as:\n%s"),
 					save_path);
@@ -843,13 +825,13 @@ static void radio_group_set_value(GtkRadioButton *last, guchar *value)
 {	
 	GSList	*next;
 
-	next = gtk_radio_button_group(last);
+	next = gtk_radio_button_get_group(last);
 	while (next)
 	{
 		GtkToggleButton *button = (GtkToggleButton *) next->data;
 		guchar	*val;
 
-		val = gtk_object_get_data(GTK_OBJECT(button), "value");
+		val = g_object_get_data(G_OBJECT(button), "value");
 		g_return_if_fail(val != NULL);
 
 		if (strcmp(val, value) == 0)
@@ -871,7 +853,7 @@ static guchar *radio_group_get_value(GtkRadioButton *last)
 {
 	GSList	*next;
 
-	next = gtk_radio_button_group(last);
+	next = gtk_radio_button_get_group(last);
 	while (next)
 	{
 		GtkToggleButton *button = (GtkToggleButton *) next->data;
@@ -880,7 +862,7 @@ static guchar *radio_group_get_value(GtkRadioButton *last)
 		{
 			guchar	*val;
 
-			val = gtk_object_get_data(GTK_OBJECT(button), "value");
+			val = g_object_get_data(G_OBJECT(button), "value");
 			g_return_val_if_fail(val != NULL, NULL);
 
 			return g_strdup(val);
@@ -900,14 +882,14 @@ static void option_menu_set(GtkOptionMenu *om, guchar *value)
 	int	  i = 0;
 
 	menu = gtk_option_menu_get_menu(om);
-	list = gtk_container_children(GTK_CONTAINER(menu));
+	list = gtk_container_get_children(GTK_CONTAINER(menu));
 
 	for (next = list; next; next = next->next)
 	{
-		GtkObject	*item = (GtkObject *) next->data;
-		guchar		*data;
+		GObject	*item = (GObject *) next->data;
+		guchar	*data;
 
-		data = gtk_object_get_data(item, "value");
+		data = g_object_get_data(item, "value");
 		g_return_if_fail(data != NULL);
 
 		if (strcmp(data, value) == 0)
@@ -930,7 +912,7 @@ static guchar *option_menu_get(GtkOptionMenu *om)
 	menu = gtk_option_menu_get_menu(om);
 	item = gtk_menu_get_active(GTK_MENU(menu));
 
-	return gtk_object_get_data(GTK_OBJECT(item), "value");
+	return g_object_get_data(G_OBJECT(item), "value");
 }
 
 static void restore_backup(gpointer key, gpointer value, gpointer data)
@@ -1168,9 +1150,8 @@ static GList *build_toggle(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_toggle;
 	option->widget = toggle;
 
-	gtk_signal_connect_object(GTK_OBJECT(toggle), "toggled",
-			GTK_SIGNAL_FUNC(option_check_widget),
-			(GtkObject *) option);
+	g_signal_connect_swapped(toggle, "toggled",
+			G_CALLBACK(option_check_widget), option);
 
 	return g_list_append(NULL, toggle);
 }
@@ -1210,7 +1191,7 @@ static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 	slide = gtk_hscale_new(adj);
 
 	if (fixed)
-		gtk_widget_set_usize(slide, adj->upper, 24);
+		gtk_widget_set_size_request(slide, adj->upper, 24);
 	if (showvalue)
 	{
 		gtk_scale_set_draw_value(GTK_SCALE(slide), TRUE);
@@ -1230,9 +1211,8 @@ static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_slider;
 	option->widget = slide;
 
-	gtk_signal_connect_object(GTK_OBJECT(adj), "value-changed",
-			GTK_SIGNAL_FUNC(option_check_widget),
-			(GtkObject *) option);
+	g_signal_connect_swapped(adj, "value-changed",
+			G_CALLBACK(option_check_widget), option);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1257,9 +1237,9 @@ static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_entry;
 	option->widget = entry;
 
-	gtk_signal_connect_object_after(GTK_OBJECT(entry), "changed",
-			GTK_SIGNAL_FUNC(option_check_widget),
-			(GtkObject *) option);
+	g_signal_connect_data(entry, "changed",
+			G_CALLBACK(option_check_widget), option,
+			NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1277,9 +1257,8 @@ static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 		if (rn->type == XML_ELEMENT_NODE)
 		{
 			button = build_radio(rn, button);
-			gtk_signal_connect_object(GTK_OBJECT(button), "toggled",
-				GTK_SIGNAL_FUNC(option_check_widget),
-				(GtkObject *) option);
+			g_signal_connect_swapped(button, "toggled",
+				G_CALLBACK(option_check_widget), option);
 			list = g_list_append(list, button);
 		}
 	}
@@ -1312,10 +1291,9 @@ static GList *build_colour(Option *option, xmlNode *node, guchar *label)
 
 	button = gtk_button_new();
 	da = gtk_drawing_area_new();
-	gtk_drawing_area_size(GTK_DRAWING_AREA(da), 64, 12);
+	gtk_widget_set_size_request(da, 64, 12);
 	gtk_container_add(GTK_CONTAINER(button), da);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(open_coloursel), option);
+	g_signal_connect(button, "clicked", G_CALLBACK(open_coloursel), option);
 
 	may_add_tip(button, node);
 	
@@ -1336,9 +1314,6 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*hbox, *om, *option_menu;
 	xmlNode		*item;
-	GtkWidget	*menu;
-	GList		*list, *kids;
-	int		min_w = 4, min_h = 4;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
@@ -1359,36 +1334,13 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 			build_menu_item(item, option_menu);
 	}
 
-	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
-	list = kids = gtk_container_children(GTK_CONTAINER(menu));
-
-	while (kids)
-	{
-		GtkWidget	*item = (GtkWidget *) kids->data;
-		GtkRequisition	req;
-
-		gtk_widget_size_request(item, &req);
-		if (req.width > min_w)
-			min_w = req.width;
-		if (req.height > min_h)
-			min_h = req.height;
-		
-		kids = kids->next;
-	}
-
-	g_list_free(list);
-
-	gtk_widget_set_usize(option_menu,
-			min_w + 50,	/* Else node doesn't work! */
-			min_h + 4);
-
 	option->update_widget = update_menu;
 	option->read_widget = read_menu;
 	option->widget = option_menu;
 
-	gtk_signal_connect_object_after(GTK_OBJECT(option_menu), "changed",
-			GTK_SIGNAL_FUNC(option_check_widget),
-			(GtkObject *) option);
+	g_signal_connect_data(option_menu, "changed",
+			G_CALLBACK(option_check_widget), option,
+			NULL, G_CONNECT_AFTER | G_CONNECT_SWAPPED);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1412,8 +1364,7 @@ static GList *build_font(Option *option, xmlNode *node, guchar *label)
 	option->widget = GTK_BIN(button)->child;
 	may_add_tip(button, node);
 
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(open_fontsel), (GtkObject *) option);
+	g_signal_connect(button, "clicked", G_CALLBACK(open_fontsel), option);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1430,7 +1381,7 @@ static void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
 	style->bg[GTK_STATE_NORMAL].green = colour->green;
 	style->bg[GTK_STATE_NORMAL].blue = colour->blue;
 	gtk_widget_set_style(patch, style);
-	gtk_style_unref(style);
+	g_object_unref(G_OBJECT(style));
 
 	if (GTK_WIDGET_REALIZED(patch))
 		gdk_window_clear(patch->window);
