@@ -377,7 +377,7 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 		{
 			w = details_width(filer_window, item);
                         *width = ICON_WIDTH + 12 + MAX(w, item->name_width);
-			*height = ICON_HEIGHT - 4;
+			*height = ICON_HEIGHT;
 		}
         }
 }
