@@ -2190,6 +2190,12 @@ static void start_thumb_scanning(FilerWindow *filer_window)
 /* Set this image to be loaded some time in the future */
 void filer_create_thumb(FilerWindow *filer_window, const gchar *path)
 {
+	if (g_list_find_custom(filer_window->thumb_queue, path,
+			       (GCompareFunc) strcmp))
+		return;
+
+	if (!filer_window->thumb_queue)
+		filer_window->max_thumbs=0;
 	filer_window->max_thumbs++;
 
 	filer_window->thumb_queue = g_list_append(filer_window->thumb_queue,
