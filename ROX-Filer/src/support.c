@@ -79,11 +79,11 @@ char *our_host_name()
  */
 int spawn(char **argv)
 {
-	return spawn_in(argv, NULL);
+	return spawn_full(argv, NULL, 0);
 }
 
 /* As spawn(), but cd to dir first (if dir is non-NULL) */
-int spawn_in(char **argv, char *dir)
+int spawn_full(char **argv, char *dir, SpawnFlags flags)
 {
 	int	child;
 	

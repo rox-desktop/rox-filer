@@ -7,12 +7,6 @@
 
 /* savebox.c - code for handling those Newdir/Copy/Rename boxes */
 
-#include <sys/stat.h>
-#include <sys/types.h>
-#include <fcntl.h>
-#include <unistd.h>
-#include <errno.h>
-
 #include <glib.h>
 #include <gtk/gtk.h>
 
@@ -22,15 +16,20 @@
 #include "filer.h"
 
 static GtkWidget *window, *pathname_entry;
+static GtkWidget *icon = NULL;
 static FilerWindow *filer_window;
+static SaveBoxCallback *callback;
+static GtkWidget *icon_frame;
+static char *initial = NULL;
 
 /* Static prototypes */
-static void create_dir(GtkWidget *widget, gpointer data);
+static void do_callback(GtkWidget *widget, gpointer data);
 
 void savebox_init()
 {
-	GtkWidget	*table, *label, *sep;
+	GtkWidget	*sep;
 	GtkWidget	*button;
+	GtkWidget	*table;
 	
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_default_size(GTK_WINDOW(window), 300, 0);
@@ -39,25 +38,28 @@ void savebox_init()
 			GTK_SIGNAL_FUNC(hide_dialog_event), window);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 8);
 
-	table = gtk_table_new(4, 2, TRUE);
+	table = gtk_table_new(4, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 
-	label = gtk_label_new("Enter pathname:");
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
+	icon_frame = gtk_frame_new(NULL);
+	gtk_container_set_border_width(GTK_CONTAINER(icon_frame), 8);
+	gtk_frame_set_shadow_type(GTK_FRAME(icon_frame), GTK_SHADOW_NONE);
+	gtk_table_attach_defaults(GTK_TABLE(table), icon_frame, 0, 2, 0, 1);
 
 	pathname_entry = gtk_entry_new();
 	gtk_table_attach_defaults(GTK_TABLE(table),
 			pathname_entry, 0, 2, 1, 2);
 	gtk_signal_connect(GTK_OBJECT(pathname_entry), "activate",
-			   GTK_SIGNAL_FUNC(create_dir), NULL);
+			   GTK_SIGNAL_FUNC(do_callback), NULL);
 
 	sep = gtk_hseparator_new();
-	gtk_table_attach_defaults(GTK_TABLE(table), sep, 0, 2, 2, 3);
+	gtk_table_attach(GTK_TABLE(table), sep, 0, 2, 2, 3,
+			GTK_EXPAND | GTK_FILL, GTK_FILL, 0, 4);
 
 	button = gtk_button_new_with_label("OK");
 	gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 1, 3, 4);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			   GTK_SIGNAL_FUNC(create_dir), NULL);
+			   GTK_SIGNAL_FUNC(do_callback), NULL);
 
 	button = gtk_button_new_with_label("Cancel");
 	gtk_table_attach_defaults(GTK_TABLE(table), button, 1, 2, 3, 4);
@@ -65,16 +67,30 @@ void savebox_init()
 			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
 }
 
-void savebox_show(FilerWindow *fw, char *title, char *path, char *leaf)
+void savebox_show(FilerWindow *fw, char *title, char *path, char *leaf,
+		  MaskedPixmap *image, SaveBoxCallback *cb)
 {
 	GString	*tmp;
 	filer_window = fw;
 
 	tmp = make_path(path, leaf);
+	if (initial)
+		g_free(initial);
+	initial = g_strdup(tmp->str);
 
 	if (GTK_WIDGET_MAPPED(window))
 		gtk_widget_hide(window);
 	gtk_window_set_title(GTK_WINDOW(window), title);
+
+	if (icon)
+		gtk_pixmap_set(GTK_PIXMAP(icon), image->pixmap, image->mask);
+	else
+	{
+		icon = gtk_pixmap_new(image->pixmap, image->mask);
+		gtk_container_add(GTK_CONTAINER(icon_frame), icon);
+	}
+
+	callback = cb;
 
 	gtk_entry_set_text(GTK_ENTRY(pathname_entry), tmp->str);
 	gtk_entry_select_region(GTK_ENTRY(pathname_entry),
@@ -84,15 +100,16 @@ void savebox_show(FilerWindow *fw, char *title, char *path, char *leaf)
 	gtk_widget_show_all(window);
 }
 
-static void create_dir(GtkWidget *widget, gpointer data)
+static void do_callback(GtkWidget *widget, gpointer data)
 {
 	char *path;
 	
+	g_return_if_fail(callback != NULL);
+	g_return_if_fail(initial != NULL);
+
 	path = gtk_entry_get_text(GTK_ENTRY(pathname_entry));
 
-	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
-		report_error("mkdir", g_strerror(errno));
-	else
+	if (callback(initial, path))
 	{
 		gtk_widget_hide(window);
 		scan_dir(filer_window);

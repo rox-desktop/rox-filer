@@ -7,7 +7,13 @@
 
 /* menu.c - code for handling the popup menu */
 
+#include <stdio.h>
+#include <sys/stat.h>
+#include <sys/types.h>
 #include <sys/wait.h>
+#include <fcntl.h>
+#include <unistd.h>
+#include <errno.h>
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -34,7 +40,7 @@ static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
-static void rename(gpointer data, guint action, GtkWidget *widget);
+static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 
@@ -70,7 +76,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	NULL, 0, NULL},
-{"/File/Rename...",		NULL,  	rename, 0, NULL},
+{"/File/Rename...",		NULL,  	rename_item, 0, NULL},
 {"/File/Help",		    	"F1",  	NULL, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
@@ -78,7 +84,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
 {"/File/Disk Usage",	    	C_"U", 	NULL, 0, NULL},
 {"/File/Permissions",		NULL,   NULL, 0, NULL},
-{"/File/Stamp",    		NULL,   NULL, 0, NULL},
+{"/File/Touch",    		NULL,   NULL, 0, NULL},
 {"/File/Find",			NULL,   NULL, 0, NULL},
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
@@ -363,7 +369,17 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	g_free(argv);
 }
 
-static void rename(gpointer data, guint action, GtkWidget *widget)
+static gboolean rename_cb(char *initial, char *path)
+{
+	if (rename(initial, path))
+	{
+		report_error("ROX-Filer: rename()", g_strerror(errno));
+		return FALSE;
+	}
+	return TRUE;
+}
+
+static void rename_item(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection *collection;
 	
@@ -378,7 +394,8 @@ static void rename(gpointer data, guint action, GtkWidget *widget)
 		FileItem *item = selected_item(collection);
 
 		savebox_show(window_with_focus, "Rename",
-				window_with_focus->path, item->leafname);
+				window_with_focus->path, item->leafname,
+				item->image, rename_cb);
 	}
 }
 
@@ -440,12 +457,23 @@ static void show_options(gpointer data, guint action, GtkWidget *widget)
 	options_show(window_with_focus);
 }
 
+static gboolean new_directory_cb(char *initial, char *path)
+{
+	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
+	{
+		report_error("mkdir", g_strerror(errno));
+		return FALSE;
+	}
+	return TRUE;
+}
+
 static void new_directory(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
 	savebox_show(window_with_focus, "Create directory",
-			window_with_focus->path, "NewDir");
+			window_with_focus->path, "NewDir",
+			default_pixmap + TYPE_DIRECTORY, new_directory_cb);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
@@ -454,7 +482,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	if (!spawn_in(argv, window_with_focus->path))
+	if (!spawn_full(argv, window_with_focus->path, 0))
 		report_error("ROX-Filer", "Failed to fork() child "
 					"process");
 }

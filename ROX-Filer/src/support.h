@@ -10,11 +10,13 @@
 
 #include <glib.h>
 
+typedef enum {NONE} SpawnFlags;
+
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
 int spawn(char **argv);
-int spawn_in(char **argv, char *dir);
+int spawn_full(char **argv, char *dir, SpawnFlags flags);
 void debug_free_string(void *data);
 
 #endif /* _SUPPORT_H */

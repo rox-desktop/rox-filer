@@ -10,8 +10,10 @@
 #include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <stdlib.h>
 #include <errno.h>
 
+#include "string.h"
 #include "filer.h"
 #include "pixmaps.h"
 #include "apps.h"
@@ -21,6 +23,7 @@
 #include "support.h"
 
 /* Static prototypes */
+static GString *to_(char *mime_name);
 
 /* XXX: Just for testing... */
 static MIME_type text_plain = {"text/plain"};
@@ -28,6 +31,27 @@ static MIME_type image_xpm = {"image/x-xpixmap"};
 
 void type_init()
 {
+}
+
+/* Convert / to _, eg: text/plain to text_plain.
+ * Returns a GString pointer (valid until next call).
+ */
+static GString *to_(char *mime_name)
+{
+	static GString	*converted;
+	char		*slash;
+
+	if (!converted)
+		converted = g_string_new(mime_name);
+	else
+		g_string_assign(converted, mime_name);
+
+	slash = strchr(converted->str, '/');
+	if (slash)
+		*slash = '_';
+	else
+		g_print("Missing / in MIME type name");
+	return converted;
 }
 
 char *basetype_name(FileItem *item)
@@ -76,33 +100,19 @@ gboolean type_open(char *path, MIME_type *type)
 {
 	char		*argv[] = {NULL, path, NULL};
 	char		*open;
-	struct stat 	info;
-	gboolean	needs_free = FALSE;
 
-	open = choices_find_path_load_shared(type->name, "MIME-open");
+	open = choices_find_path_load_shared(to_(type->name)->str,
+					     "MIME-types");
 	if (!open)
 		return FALSE;
 
-	if (stat(open, &info))
-	{
-		report_error("ROX-Filer", g_strerror(errno));
-		return FALSE;
-	}
-	
-	if (S_ISDIR(info.st_mode))
-	{
-		argv[0] = g_strconcat(open, "/AppRun");
-		needs_free = TRUE;
-	}
-	else
-		argv[0] = open;
+	argv[0] = g_strconcat(open, "/AppRun", NULL);
 
-	if (!spawn(argv))
+	if (!spawn_full(argv, getenv("HOME"), 0))
 		report_error("ROX-Filer",
 				"Failed to fork() child process");
 
-	if (needs_free)
-		g_free(argv[0]);
+	g_free(argv[0]);
 	
 	return TRUE;
 }
@@ -116,10 +126,19 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 	{
 		char	*open, *path;
 
-		path = g_strconcat(type->name, ".xpm", NULL);
-		open = choices_find_path_load_shared(path, "MIME-icons");
-		g_free(path);
-		type->image = load_pixmap_from(window, open);
+		open = choices_find_path_load_shared(to_(type->name)->str,
+						     "MIME-types");
+		if (open)
+		{
+			path = g_strconcat(open, "/MIME-types/",
+					   to_(type->name)->str, ".xpm",
+					   NULL);
+			type->image = load_pixmap_from(window, path);
+			if (!type->image)
+				g_print("Unable to load pixmap file '%s'\n",
+						path);
+			g_free(path);
+		}
 		if (!type->image)
 			type->image = default_pixmap + TYPE_UNKNOWN;
 	}

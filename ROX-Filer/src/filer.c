@@ -538,7 +538,7 @@ void open_item(Collection *collection,
 			{
 				char	*argv[] = {full_path, NULL};
 
-				if (!spawn(argv))
+				if (!spawn_full(argv, getenv("HOME"), 0))
 					report_error("ROX-Filer",
 						"Failed to fork() child");
 			}
