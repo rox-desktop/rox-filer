@@ -1232,10 +1232,10 @@ static void load_mime_types(void)
 	if (g_hash_table_size(extension_hash) == 0)
 	{
 		delayed_error(_("The standard MIME type database "
-			"(version 0.8 or later) was not found. "
+			"(version 0.9 or later) was not found. "
 			"The filer will probably not show the correct "
 			"types for different files. You should download and "
-			"install the 'shared-mime-info-0.8' package from "
+			"install the 'shared-mime-info-0.9' package from "
 			"here:\n"
 		"http://www.freedesktop.org/standards/shared-mime-info.html"));
 	}
