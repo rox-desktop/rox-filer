@@ -875,6 +875,7 @@ static void view_details_style_changed(ViewIface *view, int flags)
 	ViewDetails *view_details = (ViewDetails *) view;
 	GtkTreeModel *model = (GtkTreeModel *) view;
 	GtkTreePath *path;
+	ViewItem    **items = (ViewItem **) view_details->items->pdata;
 	int i;
 	int n = view_details->items->len;
 
@@ -884,8 +885,14 @@ static void view_details_style_changed(ViewIface *view, int flags)
 	for (i = 0; i < n; i++)
 	{
 		GtkTreeIter iter;
+		ViewItem    *item = items[i];
 
 		iter.user_data = GINT_TO_POINTER(i);
+		if (item->image)
+		{
+			g_object_unref(G_OBJECT(item->image));
+			item->image = NULL;
+		}
 		gtk_tree_model_row_changed(model, path, &iter);
 		gtk_tree_path_next(path);
 	}
@@ -910,8 +917,8 @@ static gint wrap_sort(gconstpointer a, gconstpointer b,
 static void resort(ViewDetails *view_details)
 {
 	ViewItem **items = (ViewItem **) view_details->items->pdata;
-	GArray *new_order;
 	gint i, len = view_details->items->len;
+	guint *new_order;
 	GtkTreePath *path;
 
 	if (!len)
@@ -936,24 +943,21 @@ static void resort(ViewDetails *view_details)
 				   (GCompareDataFunc) wrap_sort,
 				   view_details);
 
-	new_order = g_array_sized_new(FALSE, FALSE, sizeof(gint), len);
-	g_array_set_size(new_order, len);
-
+	new_order = g_new(guint, len);
 	for (i = len - 1; i >= 0; i--)
-		g_array_insert_val(new_order, items[i]->old_pos, i);
+		new_order[i] = items[i]->old_pos;
 
 	path = gtk_tree_path_new();
 	gtk_tree_model_rows_reordered((GtkTreeModel *) view_details,
-					path, NULL,
-					(gint *) new_order->data);
+					path, NULL, new_order);
 	gtk_tree_path_free(path);
-	g_array_free(new_order, TRUE);
+	g_free(new_order);
 }
 
 static void view_details_sort(ViewIface *view)
 {
-	gtk_tree_sortable_sort_column_changed((GtkTreeSortable *) view);
 	resort((ViewDetails *) view);
+	gtk_tree_sortable_sort_column_changed((GtkTreeSortable *) view);
 }
 
 static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf)

@@ -65,7 +65,6 @@
             </menu>
           </vbox><vbox>
             <toggle name='display_show_hidden' label='Show hidden files'>If this is on then files whose names start with a dot are shown too, otherwise they are hidden.</toggle>
-            <toggle name='display_show_thumbs' label='Show image thumbnails'>Load every image file and display it, scaled-down, in the filer window instead of the normal icon.</toggle>
           </vbox>
         </hbox>
       </frame>
@@ -119,7 +118,10 @@
       </frame>
     </section>
     <section title='Thumbnails'>
-      <label help='1'>When thumbnails are turned on (see the Display section), each image file in a directory is loaded and a small thumbnail of it is shown.</label>
+      <frame label='Thumbnails'>
+        <label help='1'>When thumbnails are turned on, each image file in a directory is loaded and a small thumbnail of it is shown.</label>
+         <toggle name='display_show_thumbs' label='Show image thumbnails'>This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows.</toggle>
+      </frame>
       <frame label='Thumbnails cache'>
 	<label help='1'>To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed.</label>
         <thumbs-purge-cache/>
