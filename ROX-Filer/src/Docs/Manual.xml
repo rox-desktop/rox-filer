@@ -1644,7 +1644,7 @@ of the window. They are:
 <itemizedlist>
 
 <listitem><para>
-<guibutton>Force</guibutton> means that the filer won't treat non-writeable
+<guilabel>Force</guilabel> means that the filer won't treat non-writeable
 files as special.  Normally, it confirms the deletion even if
 <guibutton>Quiet</guibutton> is pressed.
 Note that you still can't remove files from non-writeable directories because
@@ -1652,13 +1652,13 @@ in that case you really don't have permission.
 </para></listitem>
 
 <listitem><para>
-<guibutton>Brief</guibutton> prevents the filer logging a message every time it
+<guilabel>Brief</guilabel> prevents the filer logging a message every time it
 does something.  Use this to speed things up if large numbers of messages are
 being logged.
 </para></listitem>
 
 <listitem><para>
-<guibutton>Recurse</guibutton> means that doing something to a directory will
+<guilabel>Recurse</guilabel> means that doing something to a directory will
 also do the same thing to all its contents, and the contents of any
 subdirectories, and so on.
 </para></listitem>
@@ -2520,46 +2520,70 @@ will try simply using <filename>text</filename>.
     Application directories
   </title>
   <para>
-
 An application directory is a directory which can be run as an application.
 It contains all the resources of an application &mdash; source code, binaries,
 documentation and so on. Keeping everything in one place make installation
 and uninstallation much easier for users. You can also keep multiple
 versions of a program by simply having several application directories.
 You may move and rename them as you please. Application directories
-are easier to use and install and are more secure too%
-\footnote{Because you can compile an application as a user and then simply copy
-it as root rather than having to run an install script you are free
-from the danger of running untrusted code as root. All you have to
-watch out for is setuid binaries.
-}.
+make programs easier to use and install.
+  </para><para>
+  <!-- Note to translaters: Changed the wording here a bit from 1.1.7 -->
+They're more secure too, because you can compile an application as a user and
+then simply copy it as root. Since you don't have to run an install script
+you are free from the danger of running untrusted code as root. All you have
+to watch out for is setuid binaries.
+  </para><para>
 
-The following files are treated as special by <application>ROX-Filer</application>:
+The following files are treated as special by
+<application>ROX-Filer</application>:
 
-\begin{description}
-\item [AppRun]is executed when you click on the directory &mdash; make sure
+<itemizedlist>
+
+<listitem><para>
+<filename>AppRun</filename>
+is executed when you click on the directory &mdash; make sure
 it is executable (use the Permissions box)!
-\item [.DirIcon.png]is the image used to represent the directory (this works
-even if there is no AppRun).
-\item [Help]is the directory to be opened when you choose `Help' from the
-File menu.
-\item [AppInfo.xml]contains extra information about an application (see
-below).
-\item [AppIcon.xpm]is used if \texttt{.DirIcon.png} is missing (for backwards
-compatibility).
-\end{description}
-Have a look at the <filename>ROX-Filer</filename> application directory for a full example.
+</para></listitem>
 
-Note: For security reasons, an application directory must have the
-same owner as the AppRun file inside.
+<listitem><para>
+<filename>.DirIcon.png</filename>
+is the image used to represent the directory (this works even if
+there is no <filename>AppRun</filename>).
+</para></listitem>
+
+<listitem><para>
+<filename>Help</filename>
+is the directory to be opened when you choose <guimenuitem>Help</guimenuitem>
+from the File menu.
+</para></listitem>
+
+<listitem><para>
+<filename>AppInfo.xml</filename>
+contains extra information about an application (see below).
+</para></listitem>
+
+<listitem><para>
+<filename>AppIcon.xpm</filename>
+is used if <filename>.DirIcon.png</filename> is missing (for backwards
+compatibility).
+</para></listitem>
+
+</itemizedlist>
+
+Have a look at the <filename>ROX-Filer</filename> application directory for a
+full example.
 
   </para>
+
+<note><para>For security reasons, an application directory must have the
+same owner as the <filename>AppRun</filename> file inside.</para></note>
 
 <sect1>
   <title>The AppInfo file</title>
   <para>
 
-`\texttt{AppInfo.xml}' is an XML file with the following structure
+<filename>AppInfo.xml</filename> is an XML file with the following structure
 (any elements may be omitted, and the file itself is optional):
 
 <screen>
@@ -2579,16 +2603,29 @@ same owner as the AppRun file inside.
   &lt;/AppMenu&gt;
 &lt;/AppInfo&gt;
 </screen>
-\begin{description}
-\item [Summary]is displayed in a tooltip when the mouse is held over the
-application.
-\item [About]contains a list of fields which are shown in the `File Info'
+
+<itemizedlist>
+
+<listitem><para>
+<userinput>Summary</userinput>
+is displayed in a tooltip when the mouse is held over the application.
+</para></listitem>
+
+<listitem><para>
+<userinput>About</userinput>
+contains a list of fields which are shown in the `File Info'
 box for the application (any element names may be used, but the above
 are suggested).
-\item [AppMenu]is a list of extra menu items to display for the application.
-When one is chosen, \texttt{AppRun} is called with <emphasis>option</emphasis> as
-its only argument.
-\end{description}
+</para></listitem>
+
+<listitem><para>
+<userinput>AppMenu</userinput>
+is a list of extra menu items to display for the application.
+When one is chosen, <filename>AppRun</filename> is called with
+<userinput>option</userinput> as its only argument.
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2601,18 +2638,21 @@ its only argument.
   </para>
 
 <sect1>
-  <title><anchor id="LANG" xreflabel="Translations"/>Selecting a translation</title>
+  <title><anchor id="LANG" xreflabel="Translations"/>
+    Selecting a translation
+  </title>
   <para>
 
-<application>ROX-Filer</application> is able to translate many of its messages, provided suitable
-translation files are provided: 
+<application>ROX-Filer</application> is able to translate many of its messages,
+provided suitable translation files are provided: 
 
-\begin{enumerate}
-\item Open the Options box from the menu, 
-\item Select a language from the menu at the top,
-\item Click on Save and restart the filer for the new setting to take full
-effect.
-\end{enumerate}
+<orderedlist>
+<listitem><para>Open the Options box from the menu,</para></listitem>
+<listitem><para>Select a language from the menu at the top,</para></listitem>
+<listitem><para>Click on <guibutton>Save</guibutton> and restart the filer
+for the new setting to take full effect.</para></listitem>
+</orderedlist>
+
   </para>
 </sect1>
 
@@ -2620,39 +2660,53 @@ effect.
   <title>Creating a new translation</title>
   <para>
 
-\begin{enumerate}
-\item Go into the \texttt{src} directory and create the file `\texttt{messages.pot}':
+<orderedlist>
+<listitem><para>Go into the <filename>src</filename> directory and create
+the file <filename>messages.pot</filename>:
 
 <screen>
 $ cd ROX-Filer/src
 $ make messages.pot
 </screen>
 
-\item Copy the file into the `\texttt{po}' subdirectory under \texttt{src}
-as \( \langle \hbox {name}\rangle \hbox {\tt .po} \). Eg, if your
+</para></listitem>
+
+<listitem><para>Copy the file into the <filename>po</filename>
+subdirectory under <filename>src</filename> as
+<filename>&lt;name&gt;.po</filename>. Eg, if your
 language is referred to as `ml' (`my language'):
 
 <screen>$ cp messages.pot po/ml.po</screen>
+</para></listitem>
 
-\item Load the copy into a text editor.
-\item Fill in the translations, which are all blank to start with.
-\item Run the `\texttt{make-mo}' script to create the binary file which
-<application>ROX-Filer</application> can use. You will need the GNU gettext package for this.
-If you don't have it then just send me the \texttt{.po} file and I'll
-convert it for you.
+<listitem><para>Load the copy into a text editor.</para></listitem>
+
+<listitem><para>Fill in the translations, which are all blank to start with.
+</para></listitem>
+
+<listitem><para>Run the <filename>make-mo</filename> script to create the
+binary file which <application>ROX-Filer</application> can use.
+You will need the GNU gettext package for this.
+If you don't have it then just send me the <filename>.po</filename> file
+and I'll convert it for you.
 
 <screen>
 $ cd ROX-Filer/src/po
 $ ./make-mo ml
 Created file ../../Messages/ml.gmo OK
 </screen>
+</para></listitem>
 
-\item Edit `\texttt{ROX-Filer/Options.xml}' so that your language is listed,
-restart the filer and select it from the Options box (see section
-\ref{sec: LANG}).
-\item Submit the \texttt{.po} file to me so that I can include it in future
-releases of the filer.
-\end{enumerate}
+<listitem><para>Edit <filename>ROX-Filer/Options.xml</filename> so that
+your language is listed, restart the filer and select it from the Options box
+(see the <xref linkend="LANG"/> section).
+</para></listitem>
+
+<listitem><para>Submit the <filename>.po</filename> file to me so that I
+can include it in future releases of the filer.
+</para></listitem>
+
+</orderedlist>
   </para>
 </sect1>
 
@@ -2660,24 +2714,33 @@ releases of the filer.
   <title>Updating an existing translation</title>
   <para>
 
-\begin{enumerate}
-\item Go into the directory containing the \texttt{.po} files and run the
-\texttt{update-po} script. This checks the source code for new and
-changed strings and updates all the translation files.
+<orderedlist>
+<listitem><para>Go into the directory containing the <filename>.po</filename>
+files and run the <filename>update-po</filename> script.
+This checks the source code for new and changed strings and updates all
+the translation files.
 
 <screen>
 $ cd ROX-Filer/src/po
 $ ./update-po
 </screen>
-\item Edit the file by hand as before, filling in the new blanks and updating
-out-of-date translations. Look out for `fuzzy' entries where \texttt{update-po}
-has made a guess; check it's correct and remove the `fuzzy' line.
-\item Run \texttt{make-mo} as before.
-\item Submit the updated file to me.
-\end{enumerate}
-See the \texttt{gettext} info page for more instructions on creating
-a translation.
+</para></listitem>
 
+<listitem><para>Edit the file by hand as before, filling in the new blanks
+and updating out-of-date translations.
+Look out for <computeroutput>fuzzy</computeroutput> entries where
+<command>update-po</command> has made a guess; check it's correct and
+remove the <computeroutput>fuzzy</computeroutput> line.
+</para></listitem>
+
+<listitem><para>Run <command>make-mo</command> as before.</para></listitem>
+
+<listitem><para>Submit the updated file to me.</para></listitem>
+
+</orderedlist>
+
+See the <command>gettext</command> info page for more instructions on creating
+a translation.
 
   </para>
 </sect1>
@@ -2686,33 +2749,31 @@ a translation.
 <chapter>
   <title>Hacking</title>
   <para>
-
 This is a quick start guide for people who want to modify the source
 code. If you make useful changes or fix bugs, please send patches
 to me or to the mailing list. Tell me which version you're using!
-
   </para>
 
 <sect1>
   <title>Compiling</title>
   <para>
-
-The first time you compile the program you need to do `\texttt{AppRun
---compile}', but in future you only need to run `\texttt{make}'
-in the `\texttt{src}' directory when you change the \texttt{.c} and
-\texttt{.h} files. You might want to run `\texttt{make depend}' too.
-
+The first time you compile the program you need to do <command>AppRun
+--compile</command>, but in future you only need to run <command>make</command>
+in the <filename>src</filename> directory when you change the
+<filename>.c</filename> and <filename>.h</filename> files.
+You might want to run <command>make depend</command> too.
   </para>
 </sect1>
 
 <sect1>
   <title>Creating and applying patches</title>
   <para>
-
 When people make small modifications to the sources they will often
-distribute them as <emphasis>patch files</emphasis> &mdash; usually on the mailing list.
-To apply a patch, go into the 'src' directory and run patch with the
-patch file. Then recompile, like this:
+distribute them as <emphasis>patch files</emphasis> &mdash; usually on the
+mailing list.
+
+To apply a patch, go into the <filename>src</filename> directory and run
+<command>patch</command> with the patch file. Then recompile, like this:
 
 <screen>
 $ cd ROX-Filer/src
@@ -2721,30 +2782,37 @@ $ ../AppRun --compile
 </screen>
 
 You can remove the patch by simply repeating the above sequence &mdash;
-patch will detect that the patch is already applied and offer to remove
-it.
-
+<command>patch</command> will detect that the patch is already applied
+and offer to remove it.
+  </para><para>
 To create a patch you should first get the latest version of the filer
 from CVS (instructions on using CVS can be found on the web-site).
-Modify the program as you please. Create the patch using `\texttt{cvs
-diff}' from the appropriate directory:
+Modify the program as you please. Create the patch using
+<command>cvs diff</command> from the appropriate directory:
 
 <screen>
 $ cvs diff -c &gt; my_patch
 </screen>
 
-This creates a human- and machine-readable patch file. Submit this
+This creates a human&ndash; and machine-readable patch file. Submit this
 to the mailing list. The are many reasons for posting patches rather
 that the modified files:
 
-\begin{itemize}
-\item They are smaller, and hence shouldn't bounce. They are also quicker
-to download for people with slow connections.
-\item People can see what they're getting into before applying them!
-\item Patches can (usually) be applied to slightly modified versions of
-the sources. This means that people can apply several patches without
-each new one overwriting the others.
-\end{itemize}
+<itemizedlist>
+<listitem><para>They are smaller, and hence shouldn't bounce.
+They are also quicker to download for people with slow connections.
+</para></listitem>
+
+<listitem><para>People can see what they're getting into before applying them!
+</para></listitem>
+
+<listitem><para>Patches can (usually) be applied to slightly modified
+versions of the sources. This means that people can apply several patches
+without each new one overwriting the others.
+</para></listitem>
+
+</itemizedlist>
+
   </para>
 </sect1>
 
@@ -2787,19 +2855,30 @@ filer and the relationships between them.
   </para>
 
   <para>
-To summarise, each window has its own <classname>FilerWindow</classname> structure.
-This structure has pointers to a <classname>Collection</classname> (which is the
-widget which actually displays the files) and to a <classname>Directory</classname>,
-which is used to cache the directory contents. Both <classname>Collection</classname>
-and <classname>Directory</classname> have pointers to (the same) <classname>DirItem</classname>s,
-each of which corresponds to one filesystem object. Several <classname>FilerWindow</classname>s
-may share the same <classname>Directory</classname>. While scanning is in progress
-the <classname>Directory</classname> keeps a list of the new items it has found
+To summarise, each window has its own <classname>FilerWindow</classname>
+structure.
+  </para><para>
+This structure has pointers to a <classname>Collection</classname>
+(which is the widget which actually displays the files) and to a
+<classname>Directory</classname>, which is used to cache the directory
+contents.
+  </para><para>
+Both <classname>Collection</classname> and
+<classname>Directory</classname> have pointers to (the same)
+<classname>DirItem</classname>s, each of which corresponds to one filesystem
+object.
+  </para><para>
+Several <classname>FilerWindow</classname>s may share the same
+<classname>Directory</classname>.
+  </para><para>
+While scanning is in progress the <classname>Directory</classname>
+keeps a list of the new items it has found
 (<emphasis>new_items</emphasis>) and the items which have changed in some way
-(<emphasis>up_items</emphasis>).
-It periodically notifies the filer window of the changes-so-far by
-calling all the functions in the <emphasis>users</emphasis> list (use <function>attach()</function>
-and <function>detach()</function> to add and remove functions to or from the list).
+(<emphasis>up_items</emphasis>). It periodically notifies the filer window of
+the changes-so-far by calling all the functions in the
+<emphasis>users</emphasis> list (use <function>attach()</function>
+and <function>detach()</function> to add and remove functions to or from
+the list).
   </para>
 </sect1>
 </chapter>
