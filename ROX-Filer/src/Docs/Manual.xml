@@ -548,7 +548,7 @@ and unselected.
 Resize the window to a sensible size.
 </entry></row>
 
-<row><entry>Backspace</entry><entry>
+<row><entry><keycap>Backspace</keycap></entry><entry>
 Change to viewing the parent directory.
 </entry></row>
 
@@ -557,25 +557,25 @@ Move the cursor around.
 </entry></row>
 
 <row><entry>
-Page Up, Page Down</entry><entry>
+<keycap>Page Up</keycap>, <keycap>Page Down</keycap></entry><entry>
 Move up and down in steps of ten rows at a time.
 </entry></row>
 
-<row><entry>Home, End</entry><entry>
+<row><entry><keycap>Home</keycap>, <keycap>End</keycap></entry><entry>
 Move to the first/last entry in the directory.
 </entry></row>
 
-<row><entry>Return</entry><entry>
+<row><entry><keycap>Return</keycap></entry><entry>
 Acts like clicking on the file. You may hold down Shift for other
 effects, as with clicking.
 </entry></row>
 
-<row><entry>Spacebar</entry><entry>
+<row><entry><keycap>Spacebar</keycap></entry><entry>
 Toggles the item under the cursor between being selected and unselected,
 and moves to the next item.
 </entry></row>
 
-<row><entry>Tab, Shift+Tab</entry><entry>
+<row><entry><keycap>Tab</keycap>, <keycap>Shift+Tab</keycap></entry><entry>
 Moves the cursor to the next/previous selected item.
 </entry></row>
 
@@ -703,23 +703,28 @@ of each menu item:
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 
 <tbody>
-<row><entry> 
-Select All</entry><entry>
+<row><entry><guimenuitem>Select All</guimenuitem></entry><entry>
 Select every item in this window.
-</entry></row><row><entry>
-Clear Selection</entry><entry>
+</entry></row>
+
+<row><entry><guimenuitem>Clear Selection</guimenuitem></entry><entry>
 Unselect every item in this window.
-</entry></row><row><entry>
-Options...</entry><entry>
+</entry></row>
+
+<row><entry><guimenuitem>Options...</guimenuitem></entry><entry>
 Configure <application>ROX-Filer</application>.
-</entry></row><row><entry>
-New</entry><entry>
+</entry></row>
+
+<row><entry><guimenuitem>New</guimenuitem></entry><entry>
 Create a new file or subdirectory inside this directory.
-</entry></row><row><entry>
-Xterm Here</entry><entry>
+</entry></row>
+
+<row><entry><guimenuitem>Xterm Here</guimenuitem></entry><entry>
 Open an xterm with its current directory set to this directory.
 </entry></row>
+
 </tbody></tgroup></informaltable>
+
   </para>
 
 <sect1>
@@ -731,25 +736,25 @@ Open an xterm with its current directory set to this directory.
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 
 <tbody>
-<row><entry>Huge Icons</entry><entry>
+<row><entry><guimenuitem>Huge Icons</guimenuitem></entry><entry>
 Extra large icons (mainly useful with thumbnails, see below).
 </entry></row><row><entry> 
 
-Large Icons</entry><entry>
+<guimenuitem>Large Icons</guimenuitem></entry><entry>
 Each object in the directory is shown as a large icon with its name
 below.
 </entry></row><row><entry>
 
-Small Icons</entry><entry>
+<guimenuitem>Small Icons</guimenuitem></entry><entry>
 Items are drawn smaller than usual, allowing you to see more files
 at once.
 </entry></row><row><entry>
 
-Huge, With...</entry><entry>
-As for `Large, With...', but with extra large icons.
+<guimenuitem>Huge, With...</guimenuitem></entry><entry>
+As for <guimenuitem>Large, With...</guimenuitem>, but with extra large icons.
 </entry></row><row><entry>
 
-Large, With...</entry><entry>
+<guimenuitem>Large, With...</guimenuitem></entry><entry>
 	<para>Entries are displayed along with some extra details:</para>
 	<itemizedlist>
 
@@ -782,37 +787,37 @@ Large, With...</entry><entry>
 
 </entry></row><row><entry>
 
-Small, With...</entry><entry>
+<guimenuitem>Small, With...</guimenuitem></entry><entry>
 As above, but with a smaller icon and all on one line.
 </entry></row><row><entry>
 
-Sort by Name</entry><entry>
+<guimenuitem>Sort by Name</guimenuitem></entry><entry>
 Items are arranged by name. There is an option to make this case-sensitive.
 </entry></row><row><entry>
 
-Sort by Type</entry><entry>
+<guimenuitem>Sort by Type</guimenuitem></entry><entry>
 Items are grouped by their types and then sorted by name within the
 groups.
 </entry></row><row><entry>
 
-Sort by Date</entry><entry>
+<guimenuitem>Sort by Date</guimenuitem></entry><entry>
 Most recently modified first.
 </entry></row><row><entry>
 
-Sort by Size</entry><entry>
+<guimenuitem>Sort by Size</guimenuitem></entry><entry>
 Largest first.
 </entry></row><row><entry>
 
-Show Hidden</entry><entry>
+<guimenuitem>Show Hidden</guimenuitem></entry><entry>
 If on, files beginning with a dot are shown, otherwise they are hidden.
 </entry></row><row><entry>
 
-Refresh </entry><entry>
+<guimenuitem>Refresh</guimenuitem></entry><entry>
 Rereads the contents of the directory and details of all the files
 in it.Use this if the display becomes out-of-date.
 </entry></row><row><entry>
 
-Create Thumbs </entry><entry>
+<guimenuitem>Create Thumbs</guimenuitem></entry><entry>
 Tries to load every file as an image and use that image as the file's
 icon. Usefulif you have a directory full of photos and can't remember
 which is which!
@@ -918,74 +923,107 @@ for details.
 <informaltable><tgroup cols="2">
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 <tbody>
+
 <row><entry> 
-Copy...</entry><entry>
+<guimenuitem>Copy...</guimenuitem></entry><entry>
 Make a copy of this object.
-</entry></row><row><entry>
-Rename...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Rename...</guimenuitem></entry><entry>
 Change the name used for this object, or move it between directories.
-</entry></row><row><entry>
-Link...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Link...</guimenuitem></entry><entry>
 Create a symbolic link to this name.
-</entry></row><row><entry>
-Shift Open    </entry><entry>
-Opens applications as directories, files as text/plain, mount pointsby
-mounting or unmounting them and symlinks by opening the directorycontaining
-the thing they point to.This is the same effect as clicking with Shift
-held down. The text of the menuentry changes to show which action
+</entry></row>
+
+<row><entry>
+<guimenuitem>Shift Open</guimenuitem></entry><entry>
+Opens applications as directories, files as text/plain, mount points by
+mounting or unmounting them and symlinks by opening the directory containing
+the thing they point to. This is the same effect as clicking with Shift
+held down. The text of the menu entry changes to show which action
 will be performed.
-</entry></row><row><entry>
-Help</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Help</guimenuitem></entry><entry>
 Explain what kind of thing is selected. For applications, display
 the help files.
-</entry></row><row><entry>
-Info</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Info</guimenuitem></entry><entry>
 Display extra information about this object.
-</entry></row><row><entry>
-Set Run Action... </entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Set Run Action...</guimenuitem></entry><entry>
 Allows you to set the default program to use when opening files of
-this type.See section \ref{sec: RunAction} for details.
-Set Icon...
+this type. See section \ref{sec: RunAction} for details.
+</entry></row>
+
+<row><entry>
+<guimenuitem>Set Icon...</guimenuitem></entry><entry>
 You can give each file or directory its own special icon using this
-feature &mdash; simplydrag a suitable image onto the Set Icon dialog box.
-</entry></row><row><entry>
-Open (A)VFS</entry><entry>
+feature &mdash; simply drag a suitable image onto the Set Icon dialog box.
+</entry></row>
+
+<row><entry>
+<guimenuitem>Open (A)VFS</guimenuitem></entry><entry>
 Open the file as if it was a directory &mdash; see section \ref{sec: vfs}.
-</entry></row><row><entry>
-Send To...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Send To...</guimenuitem></entry><entry>
 Opens the `Send To' menu, allowing you to send the selected files
 to one of a list of applications. See section \ref{SendTo}.
-</entry></row><row><entry>
-Delete  </entry><entry>
-Remove all the selected entries from the directory.Subdirectories
-will have their contents deleted first.Deleting symlinks only removes
+</entry></row>
+
+<row><entry>
+<guimenuitem>Delete</guimenuitem></entry><entry>
+Remove all the selected entries from the directory. Subdirectories
+will have their contents deleted first. Deleting symlinks only removes
 the link, not the thing it points to.
-</entry></row><row><entry>
-Disk Usage </entry><entry>
-Count the sizes of all the selected items. Directories also have theircontents
+</entry></row>
+
+<row><entry>
+<guimenuitem>Disk Usage</guimenuitem></entry><entry>
+Count the sizes of all the selected items. Directories also have their contents
 counted. Symlinks count themselves, not the things they point to.
-</entry></row><row><entry>
-Permissions</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Permissions</guimenuitem></entry><entry>
 Allows you to change the permissions for the selected files.
-</entry></row><row><entry>
-Find</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Find</guimenuitem></entry><entry>
 Search for files by specifying various conditions &mdash; see section
 \ref{sec: Searching}.
 </entry></row>
+
 </tbody></tgroup></informaltable>
   </para>
 
   <formalpara><title>Note about symlinks:</title>
+    <para>
 A symbolic link stores the <emphasis>location</emphasis>
 of another file. Deleting the symlink doesn't affect the other file.
 Deleting the other file means that the symlink won't work. There are
 two types of symbolic link &mdash; Relative and Absolute. An absolute
 link stores the path from the root directory to the target file (eg
-`/home/fred/MyFile'). A relative path stores the path from the symlink
-to the target (eg `../fred/MyFile'). If the target file is never going
-to move then you want an absolute link, but if the target may move
-(and the symlink will be moved with it) then you want a relative link.
+<filename>/home/fred/MyFile</filename>).
 
+A relative path stores the path from the symlink
+to the target (eg <filename>../fred/MyFile</filename>).
+If the target file is never going to move then you want an absolute link, but
+if the target may move (and the symlink will be moved with it) then you want a
+relative link.
+    </para>
   </formalpara>
 </sect1>
 
@@ -1052,37 +1090,56 @@ entries at present.
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 <tbody>
 <row><entry> 
-Parent, New Window</entry><entry>
+<guimenuitem>Parent, New Window</guimenuitem></entry><entry>
 Open a new window displaying this window's parent.
-</entry></row><row><entry>
-Parent, Same Window</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Parent, Same Window</guimenuitem></entry><entry>
 As above, but reuse this window.
-</entry></row><row><entry>
-New Window</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>New Window</guimenuitem></entry><entry>
 Open another window onto this directory.
-</entry></row><row><entry>
-Home Directory</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Home Directory</guimenuitem></entry><entry>
 Change to your home directory.
-</entry></row><row><entry>
-Resize Window</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Resize Window</guimenuitem></entry><entry>
 Set the window to a sensible size for its contents.
-</entry></row><row><entry>
-Close Window</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Close Window</guimenuitem></entry><entry>
 Close this window.
-</entry></row><row><entry>
-Enter Path...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Enter Path...</guimenuitem></entry><entry>
 Open the path-entry box (see section \ref{sec: mini}).
-</entry></row><row><entry>
-Shell Command...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Shell Command...</guimenuitem></entry><entry>
 Open the shell command box (see section \ref{sec: mini}).
-</entry></row><row><entry>
-Select If...</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Select If...</guimenuitem></entry><entry>
 Select just those files that match the given pattern &mdash; see section
 \ref{sec: SelectIf}.
-</entry></row><row><entry>
-Show ROX-Filer Help</entry><entry>
+</entry></row>
+
+<row><entry>
+<guimenuitem>Show ROX-Filer Help</guimenuitem></entry><entry>
 Same as selecting ROX-Filer and choosing `Help' from the menu.
 </entry></row>
+
 </tbody></tgroup></informaltable>
 
 
@@ -1094,16 +1151,18 @@ Same as selecting ROX-Filer and choosing `Help' from the menu.
   <para>
 
 The `Send To' menu provides a quick way to send some files to an application.
-The filer scans all the `SendTo' directories in your CHOICESPATH and
-lists the contents on this menu. To change which applications appear
-here you should choose the `Customise' item from the bottom of the
-menu to create and open your own SendTo directory. Applications can
-be symlinked into this directory by dragging them in with Control
-and Shift held down.
-
+The filer scans all the <filename>SendTo</filename> directories in your
+<envar>CHOICESPATH</envar> and lists the contents on this menu.
+  </para><para>
+To change which applications appear here you should choose the
+<guimenuitem>Customise</guimenuitem> item from the bottom
+of the menu to create and open your own SendTo directory. Applications can be
+symlinked into this directory by dragging them in with <keycap>Control</keycap>
+and <keycap>Shift</keycap> held down.
+  </para><para>
 Opening the Send To menu via the main menu is rather slow, so it is
 normally opened by clicking the Menu mouse button over a file while
-holding the Shift key down.
+holding the <keycap>Shift</keycap> key down.
 
   </para>
 </sect1>
@@ -1120,16 +1179,16 @@ onto the them to pin them up. Clicking on a pinned item acts just
 like clicking on it in a filer window. You can drag pinned icons just
 like normal icons and you can right-click on one to see the popup
 menu.
-
+  </para><para>
 Drag pinned icons with the middle mouse button to move them around
 (they snap to a grid on the pinboard). Changes to the pinboard and
 panel are automatically saved. Clicking on pinned icons with Control
 held down selects and unselects them. Click on the background to unselect
 them all.
-
+  </para><para>
 If the panel has so many icons that they can't all be shown at once
 then you can scroll it by dragging the blank area in the middle.
-
+  </para><para>
 \textbf{IMPORTANT:} Pinning a file does \textbf{not} copy it, it merely
 creates a shortcut to the original file. If you delete the file, then
 you've lost it! Removing a pinned file from its pinboard or panel
@@ -1146,31 +1205,40 @@ These menus are both the same, and very simple:
 <informaltable><tgroup cols="2">
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 <tbody>
+
 <row><entry> 
-ROX-Filer</entry><entry>
+<guimenuitem>ROX-Filer</guimenuitem></entry><entry>
 Show the filer's help, edit the options or open your home directory.
-</entry></row><row><entry> 
-File `file'</entry><entry>
+</entry></row>
+
+<row><entry> 
+<guimenuitem>File `file'</guimenuitem></entry><entry>
 Offers a smaller version of the filer's submenu of the same name.
-</entry></row><row><entry> 
-Edit Item</entry><entry>
+</entry></row>
+
+<row><entry> 
+<guimenuitem>Edit Item</guimenuitem></entry><entry>
 Change the name displayed under the icon, or the pathname the item
 points to.
-</entry></row><row><entry> 
-Show Location</entry><entry>
+</entry></row>
+
+<row><entry> 
+<guimenuitem>Show Location</guimenuitem></entry><entry>
 Open a directory viewer showing where the file is stored.
-</entry></row><row><entry> 
-Remove Item(s)</entry><entry>
+</entry></row>
+
+<row><entry> 
+<guimenuitem>Remove Item(s)</guimenuitem></entry><entry>
 Remove the selected items from the pinboard or panel.
 </entry></row>
-</tbody></tgroup></informaltable>
 
+</tbody></tgroup></informaltable>
 
 \noindent If you are setting up the defaults for multiple users and
 you wish to create a `Home' icon that leads to each user's home directory
 then you should first create a new icon and then use `Edit Icon' to
 change the location to `~' and the name to `Home'.
-
+  </para><para>
 Note that individual applications may add extra menu items to the
 top of this menu when you click over them &mdash; see <xref linkend="AppDir"/>
 for details.
@@ -1251,9 +1319,7 @@ When using libvfs, the menu structure is slightly different &mdash; <guimenuitem
 AVFS</guimenuitem> is replaced by the <guisubmenu>Open VFS</guisubmenu> submenu.
 This is simply a short-cut for using the path-entry box (explained below), so
 if you want to use a VFS not listed on the menu you can type in the path
-directly, eg:
-
-<screen><filename>/home/fred/archive.zip#uzip/</filename></screen>
+directly, eg: <filename>/home/fred/archive.zip#uzip/</filename>.
 
 Don't forget the final slash!
 
@@ -1343,14 +1409,19 @@ else and pasting it directly into the path-entry box.
 <informaltable><tgroup cols="2">
 <thead><row><entry>Key</entry><entry>Action</entry></row></thead>
 <tbody>
+
 <row><entry> 
-Return</entry><entry>
+<keycap>Return</keycap></entry><entry>
 Open the currently selected item.
-</entry></row><row><entry>
-Tab</entry><entry>
+</entry></row>
+
+<row><entry>
+<keycap>Tab</keycap></entry><entry>
 Shell-style tab completion.
-</entry></row><row><entry>
-Up, Down</entry><entry>
+</entry></row>
+
+<row><entry>
+<keycap>Up</keycap>, <keycap>Down</keycap></entry><entry>
 Select the previous/next matching entry.
 </entry></row>
 </tbody></tgroup></informaltable>
@@ -1372,7 +1443,7 @@ unique then the filer will automatically change into the directory.
 This behavior should be familiar to shell users.
   </para>
 
-  <informalexample>
+  <informalexample><para>
 Let's say you want to locate the documentation for Wine in the directory
 <filename>/usr/doc</filename> (which is usually very large).
 Here's how you could do it:
@@ -1380,14 +1451,14 @@ Here's how you could do it:
 <orderedlist>
 
 <listitem><para>
-Open the minibuffer by choosing <guimenuitem>Enter Path</guimenuitem> from the
+Open the minibuffer by choosing <guimenuitem>Enter Path...</guimenuitem> from the
 <guimenu>Window</guimenu> menu.
 I usually bind this function to the slash (<keycap>/</keycap>) key.
 </para></listitem>
 
 <listitem><para>
-Press <accel>CTRL-U</accel> to delete the existing contents &mdash; this
-moves you to the root directory.
+Press <keycap>CTRL</keycap>+<keycap>U</keycap> to delete the existing contents
+&mdash; this moves you to the root directory.
 </para></listitem>
 
 <listitem><para>
@@ -1398,7 +1469,7 @@ If it beeps when you press Tab then you need to supply more letters.
 
 </orderedlist>
 
-  </informalexample>
+  </para></informalexample>
 </sect1>
 
 <sect1>
@@ -1423,12 +1494,12 @@ If there is no selection, but a file is under the cursor, the name
 of that file is inserted.
   </para>
 
-  <informalexample>Examples:
+  <informalexample><para>Examples:
 
 <orderedlist><title>To untar a <filename>.tgz</filename> archive:</title>
 
 <listitem><para>
-Open the minibuffer by choosing <guimenuitem>Shell Command</guimenuitem> from
+Open the minibuffer by choosing <guimenuitem>Shell Command...</guimenuitem> from
 the <guimenu>Window</guimenu> menu.
 I usually bind this to the bang (<keycap>!</keycap>) key.
 </para></listitem>
@@ -1457,7 +1528,7 @@ Type <userinput>lpr</userinput> at the beginning of the line and press
 
 </orderedlist>
 
-</informalexample>
+</para></informalexample>
 
 <itemizedlist><title>Notes</title>
 
@@ -1739,14 +1810,14 @@ separated by commas. The filer will try to match each case in turn
 until one matches or there are no more cases left. For example, to
 search for files with several possible endings:
 
-<informalexample><command>'*.gif', '*.htm', '*.html'</command></informalexample>
+<userinput>'*.gif', '*.htm', '*.html'</userinput>
 
 Further, each of the cases is actually a list of conditions. The case
 only matches if all of its conditions are met. So, to find a directory
 called <filename>lib</filename> or a regular file ending in
 <filename>.so</filename>:
 
-<informalexample><command>IsDir 'lib', IsReg '*.so'</command></informalexample>
+<userinput>IsDir 'lib', IsReg '*.so'</userinput>
 
 You can negate a condition by putting a <userinput>!</userinput> in front of it
 and you can use a sub-expression as a condition by bracketing it, like this:
@@ -2570,23 +2641,27 @@ each new one overwriting the others.
 <sect1>
   <title>Autoconf</title>
   <para>
-
 Here's a quick explanation of the autoconf system in case you haven't
-used it before. See `info autoconf' for full details.
-
-There's a file called `configure.in' which contains various tests
-(`info autoconf'). You run `autoconf' and it reads through the file
-and generates a shell script to perform the tests, saving it as `configure'.
-`configure' is normally distributed with the program because not everyone
-has autoconf.
-
-You then run `configure' (in fact, let the `AppRun' script do it because
+used it before. See <command>info autoconf</command> for full details.
+  </para><para>
+There's a file called <filename>configure.in</filename> which contains
+various tests (<command>info autoconf</command>).
+You run <command>autoconf</command> and it reads through the file
+and generates a shell script to perform the tests, saving it as
+<filename>configure</filename>.
+<filename>configure</filename> is normally distributed with the program because
+not everyone has autoconf.
+  </para><para>
+You then run <filename>configure</filename> (in fact, let the
+<filename>AppRun</filename> script do it because
 it passes it some arguments), which performs all the tests. It reads
-in `Makefile.in' and `config.h.in' and fills in the missing values
-with the test results to produce `Makefile' and `config.h'.
-
-You run `make', which creates .o files from the .c files and links
-to produce <application>ROX-Filer</application>.
+in <filename>Makefile.in</filename> and <filename>config.h.in</filename>
+and fills in the missing values with the test results to produce
+<filename>Makefile</filename> and <filename>config.h</filename>.
+  </para><para>
+You run <command>make</command>, which creates <filename>.o</filename>
+files from the <filename>.c</filename> files and links to produce
+<filename>ROX-Filer</filename>.
   </para>
 </sect1>
 
@@ -2597,8 +2672,9 @@ The diagram below shows some of the major structures found in the
 filer and the relationships between them.
   </para>
 
-
+  <para>
 {\centering \resizebox*{1\textwidth}{!}{\includegraphics{Structs.eps}} \par}
+  </para>
 
   <para>
 To summarise, each window has its own <classname>FilerWindow</classname> structure.

@@ -68,8 +68,8 @@ pre.screen {
 }
 
 span.guimenuitem {
-  border: 1px solid #888;
-  padding: 1px;
+  background: #ccc;
+  white-space: nowrap;
 }
 
 div.chapter {
@@ -83,7 +83,7 @@ tt.filename {
 span.keycap {
   background-color: #ddd;
   border: 1px solid #888;
-  padding: 1px;
+  white-space: nowrap;
 }
 
     ]]></STYLE>
@@ -96,7 +96,7 @@ span.keycap {
   </xsl:template>
 
   <xsl:template match="filename">
-    '<tt class="filename"><xsl:apply-templates/></tt>'
+    `<tt class="filename"><xsl:apply-templates/></tt>'
   </xsl:template>
 
   <xsl:template match="keycap">
