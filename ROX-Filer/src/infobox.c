@@ -44,6 +44,7 @@
 #include "run.h"	/* For show_item_help() */
 #include "xml.h"
 #include "mount.h"
+#include "pixmaps.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -196,6 +197,7 @@ static GtkWidget *make_vbox(const guchar *path)
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
 	gchar		*help_dir;
+	GtkWidget	*hbox, *name;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
@@ -208,6 +210,46 @@ static GtkWidget *make_vbox(const guchar *path)
 
 	vbox = GTK_BOX(gtk_vbox_new(FALSE, 4));
 
+	/* Heading, with icon and name */
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(vbox), hbox);
+	gtk_box_pack_start(GTK_BOX(hbox),
+			   gtk_image_new_from_pixbuf(item->image->pixbuf),
+			   FALSE, FALSE, 4);
+
+	if (g_utf8_validate(item->leafname, -1, NULL))
+		name = gtk_label_new(item->leafname);
+	else
+	{
+		guchar *u8;
+
+		u8 = to_utf8(item->leafname);
+		name = gtk_label_new(u8);
+		g_free(u8);
+	}
+	gtk_box_pack_start(GTK_BOX(hbox), name, FALSE, TRUE, 4);
+	
+	/* Make the name bolder and larger */
+	{
+		PangoAttribute *attr;
+		PangoAttrList *list;
+
+		list = pango_attr_list_new();
+
+		attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+		attr->start_index = 0;
+		attr->end_index = -1;
+		pango_attr_list_insert(list, attr);
+
+		attr = pango_attr_scale_new(PANGO_SCALE_X_LARGE);
+		attr->start_index = 0;
+		attr->end_index = -1;
+		pango_attr_list_insert(list, attr);
+		
+		gtk_label_set_attributes(GTK_LABEL(name), list);
+	}
+
+	/* List of file attributes */
 	add_frame(vbox, make_details(path, item));
 
 	help_dir = g_strconcat(path, "/Help", NULL);
@@ -327,8 +369,6 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 	gchar		*tmp, *tmp2;
 
 	make_list(&store, &view);
-	
-	add_row(store, _("Name:"), item->leafname);
 
 	if (item->base_type == TYPE_ERROR)
 	{
