@@ -166,7 +166,7 @@ void bookmarks_edit(void)
 		xmlFree(mark);
 	}
 	
-	gtk_widget_set_size_request(list, 300, 100);
+	gtk_widget_set_size_request(list, 300, 300);
 	gtk_container_add(GTK_CONTAINER(swin), list);
 
 	hbox = gtk_hbutton_box_new();
