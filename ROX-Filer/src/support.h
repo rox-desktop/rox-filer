@@ -15,7 +15,6 @@
 
 XMLwrapper *xml_cache_load(const gchar *pathname);
 int save_xml_file(xmlDocPtr doc, const gchar *filename);
-xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
 xmlDocPtr soap_new(xmlNodePtr *ret_body);
 char *pathdup(const char *path);
 GString *make_path(const char *dir, const char *leaf);

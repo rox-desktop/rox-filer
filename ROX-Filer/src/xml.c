@@ -27,9 +27,127 @@
 
 #include "global.h"
 
+#include "i18n.h"
 #include "xml.h"
 
 static gpointer parent_class = NULL;
+
+/* Static prototypes */
+static xmlNode *best_lang(xmlNode *first);
+static void xml_wrapper_finialize(GObject *object);
+static void xml_wrapper_class_init(gpointer gclass, gpointer data);
+static void xml_wrapper_init(GTypeInstance *object, gpointer gclass);
+static GType xml_wrapper_get_type(void);
+
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
+
+XMLwrapper *xml_new(const char *pathname)
+{
+	xmlDocPtr doc = NULL;
+	XMLwrapper *xml_data;
+
+	if (pathname)
+	{
+		doc = xmlParseFile(pathname);
+		if (!doc)
+			return NULL;	/* Bad XML */
+	}
+
+	xml_data = g_object_new(xml_wrapper_get_type(), NULL);
+	xml_data->doc = doc;
+
+	return xml_data;
+}
+
+/* Return the first child of the root node with this name */
+xmlNode *xml_get_section(XMLwrapper *xml, const gchar *ns, const gchar *name)
+{
+	g_return_val_if_fail(xml != NULL, NULL);
+	g_return_val_if_fail(xml->doc != NULL, NULL);
+
+	return get_subnode(xmlDocGetRootElement(xml->doc), ns, name);
+}
+
+/* Return the (first) child of this node with the given name.
+ * NULL if not found.
+ * If there are several consecutive nodes with the same name but different
+ * xml:lang attributes, then the one matching the current locale is used,
+ * or the first one if none match.
+ */
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
+{
+	for (node = node->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+
+		if (strcmp(node->name, name))
+			continue;
+
+		if (node->ns == NULL || namespaceURI == NULL)
+		{
+			if (node->ns == NULL && namespaceURI == NULL)
+				return best_lang(node);
+			continue;
+		}
+		
+		if (strcmp(node->ns->href, namespaceURI) == 0)
+			return best_lang(node);
+	}
+
+	return NULL;
+}
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
+
+/* Taking this node and each directly following node with the same name,
+ * return the one which matches the current LANG.
+ * Return the node itself if nothing matches.
+ */
+static xmlNode *best_lang(xmlNode *first)
+{
+	xmlNode *node = first;
+	const char *target_lang = current_lang ? current_lang : "en";
+	
+	g_return_val_if_fail(first != NULL, NULL);
+
+	for (node = first->next; node; node = node->next)
+	{
+		char *lang;
+
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+
+		/* Check names match... */
+		if (strcmp(node->name, first->name))
+			return first;
+
+		/* Check namespaces match... */
+		if ((node->ns == NULL) != (first->ns == NULL))
+			return first;
+
+		if (node->ns && first->ns)
+			if (strcmp(node->ns->href, first->ns->href))
+				return first;
+
+		lang = xmlNodeGetLang(node);
+		
+		if (!lang)
+			continue;
+		if (strcmp(lang, target_lang) == 0)
+		{
+			g_free(lang);
+			return node;
+		}
+		g_free(lang);
+	}
+
+	return first;
+}
 
 static void xml_wrapper_finialize(GObject *object)
 {
@@ -86,20 +204,3 @@ static GType xml_wrapper_get_type(void)
 	return type;
 }
 
-XMLwrapper *xml_new(const char *pathname)
-{
-	xmlDocPtr doc = NULL;
-	XMLwrapper *xml_data;
-
-	if (pathname)
-	{
-		doc = xmlParseFile(pathname);
-		if (!doc)
-			return NULL;	/* Bad XML */
-	}
-
-	xml_data = g_object_new(xml_wrapper_get_type(), NULL);
-	xml_data->doc = doc;
-
-	return xml_data;
-}

@@ -25,7 +25,7 @@
  * The format is:
  *
  * <?xml version="1.0"?>
- * <XMLwrapper>
+ * <AppInfo>
  *   <Summary>Tooltip text</Summary>
  *   <About>
  *     <Purpose>...</Purpose>
@@ -39,7 +39,8 @@
  *     <Item label="..." option="..."/>
  *     ...
  *   </AppMenu>
- * </XMLwrapper>
+ *   <ROX:CanSetBackdrop/>
+ * </AppInfo>
  */
 
 #include "config.h"
@@ -81,26 +82,4 @@ XMLwrapper *appinfo_get(const gchar *app_dir, DirItem *item)
 	g_free(tmp);
 
 	return ai;
-}
-
-/* Look for this section in the XMLwrapper document.
- * It may be any direct child node, or the root node itself (this is for
- * backwards compat with AppMenu; it may go soon).
- *
- * Returns an xmlNode or NULL if there isn't one.
- */
-xmlNode *appinfo_get_section(XMLwrapper *ai, const gchar *name)
-{
-	xmlNode *node;
-
-	g_return_val_if_fail(ai != NULL, NULL);
-	g_return_val_if_fail(name != NULL, NULL);
-
-	node = xmlDocGetRootElement(ai->doc);
-	g_return_val_if_fail(node != NULL, NULL);
-
-	if (strcmp(node->name, name) == 0)
-		return node;
-
-	return get_subnode(node, NULL, name);
 }

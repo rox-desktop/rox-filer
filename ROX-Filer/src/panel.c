@@ -51,6 +51,7 @@
 #include "icon.h"
 #include "run.h"
 #include "appinfo.h"
+#include "xml.h"
 
 /* The width of the separator at the inner edge of the panel */
 #define EDGE_WIDTH 2
@@ -542,7 +543,7 @@ static void panel_icon_set_tip(PanelIcon *pi)
 	else
 		ai = appinfo_get(icon->path, icon->item);
 
-	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
+	if (ai && ((node = xml_get_section(ai, NULL, "Summary"))))
 	{
 		guchar *str;
 		str = xmlNodeListGetString(node->doc,

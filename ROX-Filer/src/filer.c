@@ -2150,7 +2150,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 		xmlNode *node;
 
 		info = appinfo_get(fullpath, tip_item);
-		if (info && ((node = appinfo_get_section(info, "Summary"))))
+		if (info && ((node = xml_get_section(info, NULL, "Summary"))))
 		{
 			guchar *str;
 			str = xmlNodeListGetString(node->doc,

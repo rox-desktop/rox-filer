@@ -12,6 +12,7 @@
 
 extern GList *icon_selection;
 extern GtkWidget *icon_menu;		/* The popup icon menu */
+extern GtkWidget *icon_menu_remove_backdrop; /* 'Remove Backdrop' menu item */
 
 typedef struct _IconClass IconClass;
 

@@ -23,5 +23,7 @@ struct _XMLwrapper {
 };
 
 XMLwrapper *xml_new(const char *pathname);
+xmlNode *xml_get_section(XMLwrapper *xml, const gchar *ns, const gchar *name);
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
 
 #endif /* __XML_H__ */

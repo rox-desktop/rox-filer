@@ -3238,6 +3238,32 @@ $ rox --bottom=</screen>
      <parameter>Label</parameter>.
    </para></listitem>
 
+   <listitem><para><function>SetBackdrop</function>(<parameter>App</parameter>,
+     <parameter>Path</parameter>, [<parameter>Style</parameter>])
+     Make <parameter>App</parameter> (an application directory) the new handler
+     for the current pinboard's backdrop. <parameter>Path</parameter> is the
+     image to use, and <parameter>Style</parameter> is
+     <userinput>Tiled</userinput>, <userinput>Scaled</userinput> or
+     <userinput>Centred</userinput>.
+     The <filename>AppInfo.xml</filename> file inside <parameter>App</parameter>
+     must contain the CanSetBackdrop element, eg:
+     <programlisting>
+&lt;?xml version="1.0"?&gt;
+&lt;AppInfo&gt;
+      &lt;ROX:CanSetBackdrop xmlns:ROX="http://rox.sourceforge.net/SOAP/ROX-Filer"/>
+&lt;/AppInfo&gt;</programlisting>
+     The application will be run with the <option>--backdrop</option> option
+     as it's only argument when the pinboard is next activated... it should
+     respond by sending this SOAP message to choose the particular image.
+     The application is responsible for deleting the image afterwards, if
+     required.
+     </para><para>
+     An application can become the default handler either by being run normally,
+     and using this call, or using the filer's
+     <guimenuitem>Use for Backdrop</guimenuitem> menu item.
+     
+   </para></listitem>
+
    <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
      Run <parameter>Filename</parameter> as if it was clicked on in the filer.
    </para></listitem>

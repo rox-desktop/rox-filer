@@ -41,6 +41,7 @@
 #include "infobox.h"
 #include "appinfo.h"
 #include "dnd.h"	/* For xa_string */
+#include "xml.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -152,7 +153,7 @@ static GtkWidget *make_vbox(guchar *path)
 
 	ai = appinfo_get(path, item);
 	if (ai)
-		about = appinfo_get_section(ai, "About");
+		about = xml_get_section(ai, NULL, "About");
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);

@@ -1819,7 +1819,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			icon_set_handler_dialog(item, path);
 			break;
 		case FILE_BACKDROP:
-			pinboard_set_backdrop(path);
+			pinboard_set_backdrop(item, path);
 			break;
 		case FILE_OPEN_VFS_AVFS:
 			open_vfs_avfs(window_with_focus, item);

@@ -42,6 +42,7 @@
 #include "dir.h"
 #include "type.h"
 #include "appinfo.h"
+#include "xml.h"
 
 /* Static prototypes */
 static void apprun_menu(GtkWidget *item, gpointer data);
@@ -104,7 +105,7 @@ void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 	 * (if there are any).
 	 */
 
-	node = appinfo_get_section(ai, "AppMenu");
+	node = xml_get_section(ai, NULL, "AppMenu");
 	if (!node)
 		goto out;
 
