@@ -903,8 +903,9 @@ static void select_lasso(void)
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
 		PinIcon *pi = (PinIcon *) next->data;
-		int cx = pi->x;
-		int cy = pi->y;
+		GtkAllocation *alloc = &pi->win->allocation;
+		int cx = alloc->x + alloc->width / 2;
+		int cy = alloc->y + alloc->height / 2;
 
 		if (cx > minx && cx < maxx && cy > miny && cy < maxy)
 			icon_set_selected((Icon *) pi, TRUE);
