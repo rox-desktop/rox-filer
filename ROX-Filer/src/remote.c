@@ -602,7 +602,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	style = string_value(ARG(1));
 	details = string_value(ARG(2));
 	sort = string_value(ARG(3));
-	hidden = boolean_value(ARG(6));
+	hidden = bool_value(ARG(6));
 	filter_string = string_value(ARG(7));
 
 	if (style)
