@@ -141,6 +141,8 @@ GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
+int spring_in_progress = 0;	/* Non-zero changes filer_opendir slightly */
+
 Option o_dnd_drag_to_icons;
 Option o_dnd_spring_open;
 static Option o_dnd_spring_delay;
@@ -1032,11 +1034,11 @@ static gboolean spring_check_idle(gpointer data)
 
 static gboolean spring_now(gpointer data)
 {
-	gboolean	old_unique = o_unique_filer_windows.int_value;
 	guchar		*dest_path;
 	gint		x, y;
 	
 	g_return_val_if_fail(spring_context != NULL, FALSE);
+	g_return_val_if_fail(!spring_in_progress, FALSE);
 
 	dest_path = g_dataset_get_data(spring_context, "drop_dest_path");
 	g_return_val_if_fail(dest_path != NULL, FALSE);
@@ -1054,7 +1056,7 @@ static gboolean spring_now(gpointer data)
 
 	get_pointer_xy(&x, &y);
 	
-	o_unique_filer_windows.int_value = FALSE;	/* XXX: yuck! */
+	spring_in_progress++;
 	if (spring_window)
 	{
 		view_cursor_to_iter(spring_window->view, NULL);
@@ -1075,7 +1077,7 @@ static gboolean spring_now(gpointer data)
 			centre_window(spring_window->window->window, x, y);
 		}
 	}
-	o_unique_filer_windows.int_value = old_unique;
+	spring_in_progress--;
 
 	dnd_spring_abort();
 

@@ -64,11 +64,13 @@ void wrapped_label_set_text(WrappedLabel *wl, const char *text)
 
 	if (!wl->layout)
 	{
-	      wl->layout = gtk_widget_create_pango_layout(widget, text);
-	      pango_layout_set_width(wl->layout, wl->width * PANGO_SCALE);
-	      pango_layout_set_wrap(wl->layout, PANGO_WRAP_WORD);
-	      pango_layout_set_alignment(wl->layout, PANGO_ALIGN_CENTER);
+		wl->layout = gtk_widget_create_pango_layout(widget, text);
+		pango_layout_set_width(wl->layout, wl->width * PANGO_SCALE);
+		pango_layout_set_wrap(wl->layout, PANGO_WRAP_WORD);
+		pango_layout_set_alignment(wl->layout, PANGO_ALIGN_CENTER);
 	}
+	else
+		pango_layout_set_text(wl->layout, text, -1);
 
 	gtk_widget_queue_resize(widget);
 }

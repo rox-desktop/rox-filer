@@ -57,6 +57,7 @@ struct _IconWindow {
 	gchar *text;
 	Window xwindow;
 	gboolean iconified;
+	gint timeout_update;	/* Non-zero => timeout callback in use */
 };
 
 /* If TRUE, only iconfied windows with _NET_WM_STATE_HIDDEN are really icons */
@@ -93,6 +94,7 @@ static void show_icon(IconWindow *win);
 static void icon_win_free(IconWindow *win);
 static void update_style(gpointer key, gpointer data, gpointer user_data);
 static void update_supported(void);
+static gboolean update_title(gpointer data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -166,6 +168,9 @@ static void icon_win_free(IconWindow *win)
 {
 	g_return_if_fail(win->widget == NULL);
 	g_return_if_fail(win->label == NULL);
+
+	if (win->timeout_update)
+		gtk_timeout_remove(win->timeout_update);
 
 	g_free(win->text);
 	g_free(win);
@@ -268,6 +273,8 @@ static void get_icon_name(IconWindow *win)
 {
 	null_g_free(&win->text);
 
+	/* Keep this list in sync with window_filter */
+
 	win->text = get_str(win, xa__NET_WM_ICON_NAME);
 	if (!win->text)
 		win->text = get_str(win, xa__NET_WM_VISIBLE_NAME);
@@ -277,6 +284,21 @@ static void get_icon_name(IconWindow *win)
 		win->text = get_str(win, xa_WM_NAME);
 	if (!win->text)
 		win->text = g_strdup(_("Window"));
+}
+
+static gboolean update_title(gpointer data)
+{
+	IconWindow *win = (IconWindow *) data;
+
+	if (!win->widget)
+		return FALSE;		/* No longer an icon */
+
+	get_icon_name(win);
+	wrapped_label_set_text(WRAPPED_LABEL(win->label), win->text);
+
+	win->timeout_update = 0;
+
+	return FALSE;
 }
 
 /* Call from within error_push/pop */
@@ -356,6 +378,18 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 					g_hash_table_remove(known, &win);
 			}
 		}
+		else if (atom == xa__NET_WM_ICON_NAME ||
+			 atom == xa__NET_WM_VISIBLE_NAME ||
+			 atom == xa_WM_ICON_NAME ||
+			 atom == xa_WM_NAME)
+		{
+			/* Keep this list in sync with get_icon_name */
+			w = g_hash_table_lookup(known, &win);
+
+			if (w && w->widget && !w->timeout_update)
+				w->timeout_update = gtk_timeout_add(100,
+							update_title, w);
+		}
 		else if (atom == xa__NET_CLIENT_LIST)
 			tasklist_update(FALSE);
 		else if (atom == xa__NET_SUPPORTED)
@@ -400,6 +434,7 @@ static void add_window(Window win)
 		w->text = NULL;
 		w->xwindow = win;
 		w->iconified = FALSE;
+		w->timeout_update = 0;
 
 		g_hash_table_insert(known, &w->xwindow, w);
 	}

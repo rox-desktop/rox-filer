@@ -29,6 +29,7 @@ extern gint drag_start_x, drag_start_y;
 extern gint motion_buttons_pressed;
 
 extern gboolean o_no_hostnames;
+extern int spring_in_progress;
 extern Option o_dnd_spring_open, o_dnd_drag_to_icons;
 extern const char *drop_dest_prog;
 extern const char *drop_dest_dir;

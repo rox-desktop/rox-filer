@@ -341,9 +341,16 @@ static void attach(FilerWindow *filer_window)
 	bookmarks_add_history(filer_window->sym_path);
 
 	if (filer_window->directory->error)
-		delayed_error(_("Error scanning '%s':\n%s"),
+	{
+		if (spring_in_progress)
+			g_printerr(_("Error scanning '%s':\n%s\n"),
 				filer_window->sym_path,
 				filer_window->directory->error);
+		else
+			delayed_error(_("Error scanning '%s':\n%s"),
+					filer_window->sym_path,
+					filer_window->directory->error);
+	}
 }
 
 static void detach(FilerWindow *filer_window)
@@ -1047,7 +1054,7 @@ void filer_change_to(FilerWindow *filer_window,
 		return;
 	}
 	
-	if (o_unique_filer_windows.int_value)
+	if (o_unique_filer_windows.int_value && !spring_in_progress)
 	{
 		FilerWindow *fw;
 		
@@ -1144,7 +1151,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
-	if (o_unique_filer_windows.int_value)
+	if (o_unique_filer_windows.int_value && !spring_in_progress)
 	{
 		FilerWindow	*same_dir_window;
 		
@@ -2315,6 +2322,9 @@ static gboolean drag_motion(GtkWidget		*widget,
 	const guchar	*new_path = NULL;
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
+	gboolean	same_window;
+
+	same_window = gtk_drag_get_source_widget(context) == widget;
 
 	filer_set_autoscroll(filer_window, TRUE);
 
@@ -2336,7 +2346,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	else
 		item = NULL;
 
-	if (item && view_get_selected(view, &iter))
+	if (item && same_window && view_get_selected(view, &iter))
 		type = NULL;
 	else
 		type = dnd_motion_item(context, &item);
@@ -2351,32 +2361,6 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (item && type == drop_dest_dir &&
 			!(item->flags & ITEM_FLAG_APPDIR))
 	{
-#if 0
-		/* XXX: This is needed so that directories don't
-		 * spring open while we scroll. Should go in
-		 * view_collection.c, I think.
-		 *
-		 * XXX: Now we ARE in view_collection, maybe fix it?
-		 *
-		 * XXX: Drat. Now we're in filer.c :-(
-		 */
-		
-		GtkObject *vadj = GTK_OBJECT(collection->vadj);
-
-		/* Subdir: prepare for spring-open */
-		if (scrolled_adj != vadj)
-		{
-			if (scrolled_adj)
-				gtk_signal_disconnect(scrolled_adj,
-							scrolled_signal);
-			scrolled_adj = vadj;
-			scrolled_signal = gtk_signal_connect(
-						scrolled_adj,
-						"value_changed",
-						GTK_SIGNAL_FUNC(scrolled),
-						collection);
-		}
-#endif
 		dnd_spring_load(context, filer_window);
 	}
 	else
@@ -2389,7 +2373,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 		view_cursor_to_iter(view, NULL);
 
 		/* Disallow background drops within a single window */
-		if (type && gtk_drag_get_source_widget(context) == widget)
+		if (type && same_window)
 			type = NULL;
 	}
 
