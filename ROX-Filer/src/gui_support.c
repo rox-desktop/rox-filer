@@ -283,9 +283,19 @@ void make_panel_window(GtkWidget *widget)
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_protocols,
 			sizeof(wm_protocols) / sizeof(GdkAtom));
 
-	/* gdk_window_set_type_hint(window, GDK_WINDOW_TYPE_HINT_DOCK);	*/
 	gdk_window_set_skip_taskbar_hint(window, TRUE);
 	gdk_window_set_skip_pager_hint(window, TRUE);
+
+	if (g_object_class_find_property(G_OBJECT_GET_CLASS(widget),
+					"accept_focus"))
+	{
+		GValue vfalse = { 0, };
+		g_value_init(&vfalse, G_TYPE_BOOLEAN);
+		g_value_set_boolean(&vfalse, FALSE);
+		g_object_set_property(G_OBJECT(widget),
+					"accept_focus", &vfalse);
+		g_value_unset(&vfalse);
+	}
 }
 
 static gboolean error_idle_cb(gpointer data)
