@@ -303,6 +303,8 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 						":", NULL);
 				data[1] = xmlNodeListGetString(prop->doc,
 						prop->xmlChildrenNode, 1);
+				if (!data[1])
+					data[1] = g_strdup("-");
 				gtk_clist_append(table, data);
 				g_free(data[0]);
 				g_free(data[1]);

@@ -324,8 +324,11 @@ void icon_set_tip(Icon *icon)
 		guchar *str;
 		str = xmlNodeListGetString(node->doc,
 				node->xmlChildrenNode, 1);
-		gtk_tooltips_set_tip(tooltips, widget, str, NULL);
-		g_free(str);
+		if (str)
+		{
+			gtk_tooltips_set_tip(tooltips, widget, str, NULL);
+			g_free(str);
+		}
 	}
 	else if (icon->panel && (!panel_want_show_text(icon)) && !icon->socket)
 	{
