@@ -248,21 +248,6 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window);
-	{
-		gchar *pos;
-		/* Set a hint to let applets position their menus correctly */
-		pos = g_strdup_printf("%s,%d",
-				panel->side == PANEL_TOP ? "Top" :
-				panel->side == PANEL_BOTTOM ? "Bottom" :
-				panel->side == PANEL_LEFT ? "Left" :
-				"Right", MENU_MARGIN);
-		gdk_property_change(panel->window->window,
-				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
-				gdk_atom_intern("STRING", FALSE),
-				8, GDK_PROP_MODE_REPLACE,
-				pos, strlen(pos));
-		g_free(pos);
-	}
 
 	gtk_widget_show_all(vp);
 	
@@ -1286,6 +1271,24 @@ static void run_applet(Icon *icon)
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_widget_show_all(icon->socket);
 	gtk_widget_realize(icon->socket);
+
+	{
+		gchar		*pos;
+		PanelSide	side = icon->panel->side;
+
+		/* Set a hint to let applets position their menus correctly */
+		pos = g_strdup_printf("%s,%d",
+				side == PANEL_TOP ? "Top" :
+				side == PANEL_BOTTOM ? "Bottom" :
+				side == PANEL_LEFT ? "Left" :
+				"Right", MENU_MARGIN);
+		gdk_property_change(icon->socket->window,
+				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
+				gdk_atom_intern("STRING", FALSE),
+				8, GDK_PROP_MODE_REPLACE,
+				pos, strlen(pos));
+		g_free(pos);
+	}
 
 	gtk_object_set_data(GTK_OBJECT(icon->widget), "icon", icon);
 	gtk_object_set_data(GTK_OBJECT(icon->socket), "panel", icon->panel);
