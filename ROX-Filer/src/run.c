@@ -521,7 +521,7 @@ static void dir_show_help(DirItem *item, const char *path)
 
 	help_dir = g_strconcat(path, "/Help", NULL);
 
-	if (file_exists(help_dir) == 0)
+	if (file_exists(help_dir))
 		filer_opendir(help_dir, NULL, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		info_message(
