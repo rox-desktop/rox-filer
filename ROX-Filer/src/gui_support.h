@@ -41,5 +41,7 @@ void parse_file(char *path, ParseFunc *parse_line);
 gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window);
 void release_xdnd_proxy(guint32 xid);
 GdkWindow *find_click_proxy_window(void);
+gboolean get_pointer_xy(int *x, int *y);
+void centre_window(GdkWindow *window, int x, int y);
 
 #endif /* _GUI_SUPPORT_H */

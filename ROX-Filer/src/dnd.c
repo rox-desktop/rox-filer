@@ -105,6 +105,8 @@ static void drag_data_received(GtkWidget      		*widget,
 			guint               	info,
 			guint32             	time,
 			gpointer		user_data);
+static gboolean spring_now(gpointer data);
+static void spring_win_destroyed(GtkWidget *widget, gpointer data);
 
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
@@ -668,9 +670,18 @@ static gboolean drag_motion(GtkWidget		*widget,
 	}
 
 out:
-	/* Don't allow drops to non-writeable directories */
-	if (type == drop_dest_dir && access(new_path, W_OK) != 0)
-		type = NULL;
+	/* Don't allow drops to non-writeable directories. BUT, still
+	 * allow drops on non-writeable SUBdirectories so that we can
+	 * do the spring-open thing.
+	 */
+	if (type == drop_dest_dir && item)
+	{
+		/* Subdir: prepare for spring-open */
+		dnd_spring_load(context);
+	}
+	else
+		dnd_spring_abort();
+
 	if (type && item)
 		collection_set_cursor_item(filer_window->collection,
 				item_number);
@@ -686,13 +697,14 @@ out:
 	return type != NULL;
 }
 
-/* Remove panel highlights */
+/* Remove highlights */
 static void drag_leave(GtkWidget		*widget,
                            GdkDragContext	*context,
 			   guint32		time,
 			   FilerWindow		*filer_window)
 {
 	collection_set_cursor_item(filer_window->collection, -1);
+	dnd_spring_abort();
 }
 
 /* User has tried to drop some data on us. Decide what format we would
@@ -1132,4 +1144,119 @@ static void got_uri_list(GtkWidget 		*widget,
 		next_uri = next_uri->next;
 	}
 	g_slist_free(uri_list);
+}
+
+
+/*			SPRING-LOADING 				*/
+
+/* This is the code that makes directories pop open if you hold a
+ * file over them...
+ *
+ * First, call dnd_spring_load(context) to arm the system.
+ * After a timeout (1/2 a second) the dest_path directory will be
+ * opened in a new window, unless dnd_spring_abort is called first.
+ */
+
+static gint spring_timeout = -1;
+static GdkDragContext *spring_context = NULL;
+static FilerWindow *spring_window = NULL;
+
+void dnd_spring_load(GdkDragContext *context)
+{
+	g_return_if_fail(context != NULL);
+
+	if (spring_context)
+		dnd_spring_abort();
+	
+	spring_context = context;
+	gdk_drag_context_ref(spring_context);
+	spring_timeout = gtk_timeout_add(500, spring_now, NULL);
+}
+
+void dnd_spring_abort(void)
+{
+	if (!spring_context)
+		return;
+
+	gdk_drag_context_unref(spring_context);
+	spring_context = NULL;
+	gtk_timeout_remove(spring_timeout);
+}
+
+/* If all mod keys are released, no buttons are pressed, and the
+ * mouse is outside the spring window, then close it.
+ */
+static gboolean spring_check_idle(gpointer data)
+{
+	int	p_x, p_y;
+
+	if (!spring_window)
+		return FALSE;
+
+	if (!get_pointer_xy(&p_x, &p_y))
+	{
+		GdkWindow	*win = spring_window->window->window;
+		int		x, y;
+		int		w, h;
+
+		gdk_window_get_position(win, &x, &y);
+		gdk_window_get_size(win, &w, &h);
+
+		if (p_x < x || p_x > x + w || p_y < y || p_y > y + h)
+		{
+			gtk_widget_destroy(spring_window->window);
+			return FALSE;		/* Got it! */
+		}
+	}
+
+	return TRUE;	/* Try again later */
+}
+
+static gboolean spring_now(gpointer data)
+{
+	guchar		*dest_path;
+	gint		x, y;
+	
+	g_return_val_if_fail(spring_context != NULL, FALSE);
+
+	dest_path = g_dataset_get_data(spring_context, "drop_dest_path");
+	g_return_val_if_fail(dest_path != NULL, FALSE);
+
+	/*
+	 * XXX: Due to a bug in gtk, if a window disappears during
+	 * a drag and the pointer moves over where the window was,
+	 * the sender crashes! Therefore, do not close any windows
+	 * while dragging! (fixed in later versions)
+	 */
+	/*
+	if (spring_window)
+		gtk_widget_destroy(spring_window->window);
+		*/
+
+	get_pointer_xy(&x, &y);
+	
+	if (spring_window)
+	{
+		collection_set_cursor_item(spring_window->collection, -1);
+		filer_change_to(spring_window, dest_path, NULL);
+	}
+	else
+	{
+		spring_window = filer_opendir(dest_path, PANEL_NO);
+		gtk_timeout_add(500, spring_check_idle, NULL);
+		gtk_signal_connect(GTK_OBJECT(spring_window->window), "destroy",
+				GTK_SIGNAL_FUNC(spring_win_destroyed), NULL);
+	}
+	
+	if (spring_window)
+		centre_window(spring_window->window->window, x, y);
+
+	dnd_spring_abort();
+
+	return FALSE;
+}
+
+static void spring_win_destroyed(GtkWidget *widget, gpointer data)
+{
+	spring_window = NULL;
 }

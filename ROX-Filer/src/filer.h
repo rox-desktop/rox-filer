@@ -73,9 +73,11 @@ extern FilerWindow 	*window_with_focus;
 extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
 extern gboolean 	o_unique_filer_windows;
+extern gboolean		o_single_click;
+extern gboolean 	o_new_window_on_1;
 
 /* Prototypes */
-void filer_init();
+void filer_init(void);
 FilerWindow *filer_opendir(char *path, PanelType panel_type);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 int selected_item_number(Collection *collection);

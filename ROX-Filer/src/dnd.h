@@ -39,4 +39,7 @@ void dnd_init();
 GtkWidget *create_dnd_options();
 gboolean provides(GdkDragContext *context, GdkAtom target);
 
+void dnd_spring_load(GdkDragContext *context);
+void dnd_spring_abort(void);
+
 #endif /* _DND_H */

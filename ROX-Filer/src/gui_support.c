@@ -561,3 +561,36 @@ GdkWindow *find_click_proxy_window(void)
 	return proxy_gdk_window;
 }
 
+/* Returns the position of the pointer.
+ * TRUE if any modifier keys or mouse buttons are pressed.
+ */
+gboolean get_pointer_xy(int *x, int *y)
+{
+	Window	root, child;
+	int	win_x, win_y;
+	unsigned int mask;
+	
+	XQueryPointer(GDK_DISPLAY(), GDK_ROOT_WINDOW(),
+			&root, &child, x, y, &win_x, &win_y, &mask);
+
+	return mask != 0;
+}
+
+#define DECOR_BORDER 32
+
+/* Centre the window at these coords */
+void centre_window(GdkWindow *window, int x, int y)
+{
+	int	w, h;
+
+	g_return_if_fail(window != NULL);
+
+	gdk_window_get_size(window, &w, &h);
+	
+	x -= w / 2;
+	y -= h / 2;
+
+	gdk_window_move(window,
+		CLAMP(x, DECOR_BORDER, screen_width - w - DECOR_BORDER),
+		CLAMP(y, DECOR_BORDER, screen_height - h - DECOR_BORDER));
+}

@@ -56,6 +56,7 @@
 #include "remote.h"
 #include "pinboard.h"
 #include "run.h"
+#include "toolbar.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -334,6 +335,7 @@ int main(int argc, char **argv)
 	menu_init();
 	dnd_init();
 	filer_init();
+	toolbar_init();
 	display_init();
 	mount_init();
 	options_init();

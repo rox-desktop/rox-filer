@@ -1297,12 +1297,17 @@ static gboolean drag_motion(GtkWidget		*widget,
 	}
 
 out:
+
+#if 0
+	/* We actually must pretend to accept the drop, even if the
+	 * directory isn't writeable, so that the spring-opening
+	 * thing works.
+	 */
+
 	/* Don't allow drops to non-writeable directories */
 	if (type == drop_dest_dir && access(icon->path, W_OK) != 0)
 		type = NULL;
-
-	if (type)
-		pinboard_wink_item(icon, FALSE);
+#endif
 
 	g_dataset_set_data(context, "drop_dest_type", type);
 	if (type)
@@ -1310,6 +1315,10 @@ out:
 		gdk_drag_status(context, action, time);
 		g_dataset_set_data_full(context, "drop_dest_path",
 				g_strdup(icon->path), g_free);
+		if (type == drop_dest_dir)
+			dnd_spring_load(context);
+
+		pinboard_wink_item(icon, FALSE);
 	}
 
 	return type != NULL;
@@ -1321,6 +1330,7 @@ static void drag_leave(GtkWidget	*widget,
 		       PinIcon		*icon)
 {
 	pinboard_wink_item(NULL, FALSE);
+	dnd_spring_abort();
 }
 
 /* When changing the 'selected' attribute of an icon, call this
