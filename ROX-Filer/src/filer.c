@@ -1791,9 +1791,11 @@ static void show_tooltip(guchar *text)
 	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "expose_event",
 			GTK_SIGNAL_FUNC(filer_tooltip_draw),
 			(GtkObject *) tip_widget);
+#ifndef GTK2
 	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "draw",
 			GTK_SIGNAL_FUNC(filer_tooltip_draw),
 			(GtkObject *) tip_widget);
+#endif
 
 	label = gtk_label_new(text);
 	gtk_misc_set_padding(GTK_MISC(label), 4, 2);

@@ -623,6 +623,9 @@ static gint icon_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        Icon *icon)
 {
+	if (icon->socket && event->button == 1)
+		return FALSE;	/* Restart button */
+
 	if (dnd_motion_release(event))
 		return TRUE;
 
@@ -635,6 +638,9 @@ static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Icon *icon)
 {
+	if (icon->socket && event->button == 1)
+		return FALSE;	/* Restart button */
+
 	if (dnd_motion_press(widget, event))
 		perform_action(icon->panel, icon, event);
 
@@ -1231,6 +1237,12 @@ static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
 		
 	icon = gtk_object_get_data(GTK_OBJECT(widget), "icon");
 	icon->socket = gtk_button_new_with_label(_("Restart\nApplet"));
+	
+	gtk_signal_connect(GTK_OBJECT(icon->socket), "button_release_event",
+			GTK_SIGNAL_FUNC(icon_button_release), icon);
+	gtk_signal_connect(GTK_OBJECT(icon->socket), "button_press_event",
+			GTK_SIGNAL_FUNC(icon_button_press), icon);
+
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_container_set_border_width(GTK_CONTAINER(icon->socket), 4);
 	gtk_misc_set_padding(GTK_MISC(GTK_BIN(icon->socket)->child), 4, 4);
