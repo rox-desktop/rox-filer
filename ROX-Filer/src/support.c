@@ -99,7 +99,8 @@ int spawn_in(char **argv, char *dir)
 				fprintf(stderr, "chdir() failed: %s\n",
 						g_strerror(errno));
 		execvp(argv[0], argv);
-		fprintf(stderr, "execvp() failed: %s\n",
+		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
+				argv[0],
 				g_strerror(errno));
 		_exit(0);
 	}

@@ -18,6 +18,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdk.h>
 
+#include "main.h"
 #include "gui_support.h"
 
 static GdkAtom xa_win_state;
@@ -176,6 +177,9 @@ static gboolean error_idle_cb(gpointer data)
 	g_free(error[1]);
 	error[0] = error[1] = NULL;
 
+	if (--number_of_windows == 0)
+		gtk_main_quit();
+
 	return FALSE;
 }
 
@@ -191,4 +195,6 @@ void delayed_error(char *title, char *error)
 	delayed_error_data[1] = g_strdup(error);
 	
 	gtk_idle_add(error_idle_cb, delayed_error_data);
+
+	number_of_windows++;
 }

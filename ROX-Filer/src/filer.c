@@ -20,6 +20,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <collection.h>
 
+#include "main.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -28,6 +29,7 @@
 #include "dnd.h"
 #include "apps.h"
 #include "mount.h"
+#include "type.h"
 
 #define MAX_ICON_HEIGHT 42
 #define PANEL_BORDER 2
@@ -39,7 +41,6 @@ FilerWindow 	*window_with_focus = NULL;
  */
 GHashTable	*child_to_filer = NULL;
 
-static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
 static FilerWindow *panel_with_timeout = NULL;
 static gint panel_timeout;
@@ -265,7 +266,10 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	{
 		if (base_type == TYPE_FILE &&
 				(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
+		{
 			item->image = default_pixmap + TYPE_EXEC_FILE;
+			item->flags |= ITEM_FLAG_EXEC_FILE;
+		}
 		else
 			item->image = default_pixmap + base_type;
 	}
@@ -512,6 +516,34 @@ void open_item(Collection *collection,
 			else
 				filer_opendir(full_path, FALSE, BOTTOM);
 			break;
+		case TYPE_FILE:
+			if (item->flags & ITEM_FLAG_EXEC_FILE)
+			{
+				char	*argv[] = {full_path, NULL};
+
+				if (!spawn(argv))
+					report_error("ROX-Filer",
+						"Failed to fork() child");
+			}
+			else
+			{
+				GString		*message;
+				MIME_type	*type;
+
+				type = type_from_path(full_path);
+
+				if ((!type) || !type_open(full_path, type))
+				{
+					message = g_string_new(NULL);
+					g_string_sprintf(message, "No open "
+						"action specified for files of "
+						"this type (%s)",
+						type ? type->name : "unknown");
+					report_error("ROX-Filer", message->str);
+					g_string_free(message, TRUE);
+				}
+			}
+			break;
 		default:
 			report_error("open_item",
 					"I don't know how to open that");
@@ -536,7 +568,10 @@ static gint pointer_in(GtkWidget *widget,
 		last_stat_filer = filer_window;
 
 		if (stat(filer_window->path, &info))
+		{
+			delayed_error("ROX-Filer", "Directory deleted");
 			gtk_widget_destroy(filer_window->window);
+		}
 		else if (info.st_mtime > filer_window->m_time)
 			scan_dir(filer_window);
 	}

@@ -13,6 +13,7 @@
 #include <gtk/gtk.h>
 #include <collection.h>
 
+#include "main.h"
 #include "gui_support.h"
 #include "filer.h"
 #include "mount.h"
@@ -21,6 +22,9 @@
 #include "options.h"
 #include "choices.h"
 #include "newdir.h"
+#include "type.h"
+
+int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 
 /* XXX: Maybe we shouldn't do so much work in a signal handler? */
 static void child_died(int signum)
@@ -63,6 +67,7 @@ int main(int argc, char **argv)
 	mount_init();
 	options_init();
 	newdir_init();
+	type_init();
 
 	signal(SIGCHLD, child_died);
 

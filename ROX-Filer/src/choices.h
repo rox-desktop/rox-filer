@@ -8,6 +8,7 @@
 #define _CHOICES_H
 
 void choices_init(char *prog_name);
+char *choices_find_path_load_shared(char *leaf, char *shared_name);
 char *choices_find_path_load(char *leaf);
 char *choices_find_path_save(char *leaf);
 
