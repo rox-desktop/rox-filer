@@ -398,13 +398,16 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 
 	if (pathname)
 	{
-		icon->src_path = g_strdup(pathname);
-		icon->path = expand_path(pathname);
+		if (g_utf8_validate(pathname, -1, NULL))
+			icon->src_path = g_strdup(pathname);
+		else
+			icon->src_path = to_utf8(pathname);
+		icon->path = expand_path(icon->src_path);
 
 		icon_hash_path(icon);
 
 		if (!name)
-			name = g_basename(pathname);
+			name = g_basename(icon->src_path);
 
 		icon->item = diritem_new(name);
 		diritem_restat(icon->path, icon->item, NULL);
