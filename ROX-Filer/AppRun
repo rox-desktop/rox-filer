@@ -24,6 +24,7 @@ case $1 in
 		  DEBUGGER="gdb"
 		fi ;;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
+	--massif) shift ; DEBUGGER="valgrind --tool=massif";;
 	--calltree) shift ; DEBUGGER="calltree";;
 	--leaks) shift ; DEBUGGER="valgrind --num-callers=8 --leak-check=yes";;
 	--compile)
