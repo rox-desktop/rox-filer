@@ -55,8 +55,10 @@
 
 /* Parent->Child messages are one character each:
  *
- * Q/Y/N 	Quiet/Yes/No button clicked
+ * Y/N 		Yes/No button clicked
  * F		Force deletion of non-writeable items
+ * Q		Quiet toggled
+ * E		Entry text changed
  */
 
 #define SENSITIVE_YESNO(gui_side, state)	\
@@ -77,7 +79,7 @@ struct _GUIside
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
 	GtkWidget 	*vbox, *log, *window, *dir, *log_hbox;
-	GtkWidget	*quiet, *yes, *no;
+	GtkWidget	*quiet, *yes, *no, *quiet_flag;
 	int		child;		/* Process ID */
 	int		errors;
 	gboolean	show_info;	/* For Disk Usage */
@@ -134,7 +136,7 @@ static gboolean send_error();
 static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
-static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
+static GtkWidget *add_toggle(GUIside *gui_side, guchar *label, guchar *code,
 			gboolean active);
 static gboolean reply(int fd, gboolean ignore_quiet);
 static gboolean remove_pinned_ok(GList *paths);
@@ -611,6 +613,35 @@ static gboolean send_error(void)
 	return send();
 }
 
+static void quiet_clicked(GtkWidget *button, GUIside *gui_side)
+{
+	GtkToggleButton *quiet_flag = GTK_TOGGLE_BUTTON(gui_side->quiet_flag);
+
+	if (!gui_side->to_child)
+		return;
+
+	gtk_widget_set_sensitive(gui_side->quiet, FALSE);
+
+	if (gtk_toggle_button_get_active(quiet_flag))
+		return;		/* (shouldn't happen) */
+
+	gtk_toggle_button_set_active(quiet_flag, TRUE);
+
+	if (GTK_WIDGET_SENSITIVE(gui_side->yes))
+		gtk_button_clicked(GTK_BUTTON(gui_side->yes));
+}
+
+/* Send 'Quiet' if possible, 'Yes' otherwise */
+static void find_return_pressed(GtkWidget *button, GUIside *gui_side)
+{
+	if (GTK_WIDGET_SENSITIVE(gui_side->quiet))
+		gtk_button_clicked(GTK_BUTTON(gui_side->quiet));
+	else if (GTK_WIDGET_SENSITIVE(gui_side->yes))
+		gtk_button_clicked(GTK_BUTTON(gui_side->yes));
+	else
+		gdk_beep();
+}
+
 static void button_reply(GtkWidget *button, GUIside *gui_side)
 {
 	char *text;
@@ -623,8 +654,42 @@ static void button_reply(GtkWidget *button, GUIside *gui_side)
 	fputc(*text, gui_side->to_child);
 	fflush(gui_side->to_child);
 
-	if (*text == 'Y' || *text == 'N' || *text == 'Q')
+	if (*text == 'Y' || *text == 'N')
 		SENSITIVE_YESNO(gui_side, FALSE);
+	if (*text == 'Q')
+	{
+		gtk_widget_set_sensitive(gui_side->quiet,
+			!gtk_toggle_button_get_active(
+				GTK_TOGGLE_BUTTON(gui_side->quiet_flag)));
+	}
+}
+
+static void read_new_entry_text(void)
+{
+	int	len;
+	char	c;
+	GString	*new;
+
+	new = g_string_new(NULL);
+
+	for (;;)
+	{
+		len = read(from_parent, &c, 1);
+		if (len != 1)
+		{
+			fprintf(stderr, "read() error: %s\n",
+					g_strerror(errno));
+			_exit(1);	/* Parent died? */
+		}
+
+		if (c == '\n')
+			break;
+		g_string_append_c(new, c);
+	}
+
+	g_free(new_entry_string);
+	new_entry_string = new->str;
+	g_string_free(new, FALSE);
 }
 
 static void process_flag(char flag)
@@ -642,6 +707,9 @@ static void process_flag(char flag)
 			break;
 		case 'B':
 			o_brief = !o_brief;
+			break;
+		case 'E':
+			read_new_entry_text();
 			break;
 		default:
 			g_string_sprintf(message,
@@ -681,34 +749,6 @@ static void check_flags(void)
 	}
 }
 
-static void read_new_entry_text(void)
-{
-	int	len;
-	char	c;
-	GString	*new;
-
-	new = g_string_new(NULL);
-
-	for (;;)
-	{
-		len = read(from_parent, &c, 1);
-		if (len != 1)
-		{
-			fprintf(stderr, "read() error: %s\n",
-					g_strerror(errno));
-			_exit(1);	/* Parent died? */
-		}
-
-		if (c == '\n')
-			break;
-		g_string_append_c(new, c);
-	}
-
-	g_free(new_entry_string);
-	new_entry_string = new->str;
-	g_string_free(new, FALSE);
-}
-
 /* Read until the user sends a reply. If ignore_quiet is TRUE then
  * the user MUST click Yes or No, else treat quiet on as Yes.
  * If the user needs prompting then does send().
@@ -717,16 +757,14 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 {
 	ssize_t len;
 	char retval;
-	gboolean asked = FALSE;
 
-	while (ignore_quiet || !quiet)
+	if (quiet && !ignore_quiet)
+		return TRUE;
+
+	send();
+
+	while (1)
 	{
-		if (!asked)
-		{
-			send();
-			asked = TRUE;
-		}
-
 		len = read(fd, &retval, 1);
 		if (len != 1)
 		{
@@ -737,14 +775,6 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 
 		switch (retval)
 		{
-			case 'Q':
-				quiet = !quiet;
-				if (ignore_quiet)
-				{
-					g_string_assign(message, "?");
-					send();
-				}
-				break;
 			case 'Y':
 				g_string_sprintf(message, "' %s\n", _("Yes"));
 				send();
@@ -753,21 +783,11 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 				g_string_sprintf(message, "' %s\n", _("No"));
 				send();
 				return FALSE;
-			case 'E':
-				read_new_entry_text();
-				break;
 			default:
 				process_flag(retval);
 				break;
 		}
 	}
-
-	if (asked)
-	{
-		g_string_sprintf(message, "' %s\n", _("Quiet"));
-		send();
-	}
-	return TRUE;
 }
 
 static void destroy_action_window(GtkWidget *widget, gpointer data)
@@ -907,12 +927,10 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), actions, FALSE, TRUE, 0);
 
-	gui_side->quiet = button = gtk_toggle_button_new_with_label(_("Quiet"));
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), autoq);
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Q");
+	gui_side->quiet = button = gtk_button_new_with_label(_("Quiet"));
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(button_reply), gui_side);
+			GTK_SIGNAL_FUNC(quiet_clicked), gui_side);
 	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
@@ -935,6 +953,10 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 						GDK_INPUT_READ,
 						message_from_child,
 						gui_side);
+	gui_side->quiet_flag = add_toggle(gui_side,
+				_("Quiet - don't confirm every operation"),
+				"Q", autoq);
+	gtk_widget_set_sensitive(gui_side->quiet, !autoq);
 
 	return gui_side;
 }
@@ -1823,8 +1845,8 @@ static void list_cb(gpointer data)
 	send();
 }
 
-static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
-			gboolean active)
+static GtkWidget *add_toggle(GUIside *gui_side, guchar *label, guchar *code,
+			     gboolean active)
 {
 	GtkWidget	*check;
 
@@ -1834,6 +1856,8 @@ static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
 	gtk_signal_connect(GTK_OBJECT(check), "clicked",
 			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), check, FALSE, TRUE, 0);
+
+	return check;
 }
 
 
@@ -1903,9 +1927,8 @@ void action_find(GList *paths)
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
-	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
-			GTK_SIGNAL_FUNC(gtk_button_clicked),
-			GTK_OBJECT(gui_side->quiet));
+	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "activate",
+			GTK_SIGNAL_FUNC(find_return_pressed), gui_side);
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
