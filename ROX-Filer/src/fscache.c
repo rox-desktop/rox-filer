@@ -47,6 +47,8 @@ static gint cmp_stats(gconstpointer a, gconstpointer b);
 static void destroy_hash_entry(gpointer key, gpointer data, gpointer user_data);
 static gboolean purge_hash_entry(gpointer key, gpointer data,
 				 gpointer user_data);
+static GFSCacheData *lookup_internal(GFSCache *cache, char *pathname,
+					FSCacheLookup lookup_type);
 
 
 struct PurgeInfo
@@ -151,13 +153,12 @@ void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
 {
 	GFSCacheData	*data;
 
-	data = g_fscache_lookup_full(cache, pathname,
-					FSCACHE_LOOKUP_INIT, NULL);
+	data = lookup_internal(cache, pathname, FSCACHE_LOOKUP_INIT);
 
 	if (!data)
 		return;
 
-	if (data->data && cache->unref)
+	if (cache->unref)
 		cache->unref(data->data, cache->user_data);
 	data->data = obj;
 	if (cache->ref)
@@ -174,89 +175,26 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 				FSCacheLookup lookup_type,
 				gboolean *found)
 {
-	struct stat 	info;
-	GFSCacheKey	key;
-	GFSCacheData	*data;
+	GFSCacheData *data;
+	
+	data = lookup_internal(cache, pathname, lookup_type);
 
-	g_return_val_if_fail(cache != NULL, NULL);
-	g_return_val_if_fail(pathname != NULL, NULL);
-
-	if (found)
-		*found = FALSE;
-
-	if (mc_stat(pathname, &info))
-		return NULL;
-
-	key.device = info.st_dev;
-	key.inode = info.st_ino;
-
-	data = g_hash_table_lookup(cache->inode_to_stats, &key);
-
-	if (data)
-	{
-		/* We've cached this file already */
-
-		if (lookup_type == FSCACHE_LOOKUP_PEEK)
-			goto out;	/* Never update on peeks */
-
-		if (lookup_type == FSCACHE_LOOKUP_INIT)
-			goto init;
-		
-		/* Is it up-to-date? */
-
-		if (UPTODATE(data, info))
-			goto out;
-		
-		if (lookup_type == FSCACHE_LOOKUP_ONLY_NEW)
-			return NULL;
-
-		/* Out-of-date */
-		if (cache->update)
-			cache->update(data->data, pathname, cache->user_data);
-		else
-		{
-			if (cache->unref)
-				cache->unref(data->data, cache->user_data);
-			data->data = NULL;
-		}
-	}
-	else
-	{
-		GFSCacheKey *new_key;
-
-		if (lookup_type != FSCACHE_LOOKUP_CREATE &&
-		    lookup_type != FSCACHE_LOOKUP_INIT)
-			return NULL;
-		
-		new_key = g_memdup(&key, sizeof(key));
-
-		data = g_new(GFSCacheData, 1);
-		data->data = NULL;
-
-		g_hash_table_insert(cache->inode_to_stats, new_key, data);
-	}
-
-init:
-	data->m_time = info.st_mtime;
-	data->length = info.st_size;
-	data->mode = info.st_mode;
-
-	if (data->data == NULL && lookup_type != FSCACHE_LOOKUP_INIT)
-	{
-		/* Create the object for the file (ie, not an update) */
-		if (cache->load)
-			data->data = cache->load(pathname, cache->user_data);
-	}
-out:
-	if (found)
-		*found = TRUE;
-
-	data->last_lookup = time(NULL);
 	if (lookup_type == FSCACHE_LOOKUP_INIT)
 		return data;
 
+	if (!data)
+	{
+		if (found)
+			*found = FALSE;
+		return NULL;
+	}
+
+	if (found)
+		*found = TRUE;
+
 	if (cache->ref)
 		cache->ref(data->data, cache->user_data);
+
 	return data->data;
 }
 
@@ -394,3 +332,86 @@ static gboolean purge_hash_entry(gpointer key, gpointer data,
 
 	return TRUE;
 }
+
+/* As for g_fscache_lookup_full, but return the GFSCacheData rather than
+ * the data it contains. Doesn't increment the refcount.
+ */
+static GFSCacheData *lookup_internal(GFSCache *cache, char *pathname,
+					FSCacheLookup lookup_type)
+{
+	struct stat 	info;
+	GFSCacheKey	key;
+	GFSCacheData	*data;
+
+	g_return_val_if_fail(cache != NULL, NULL);
+	g_return_val_if_fail(pathname != NULL, NULL);
+
+	if (mc_stat(pathname, &info))
+		return NULL;
+
+	key.device = info.st_dev;
+	key.inode = info.st_ino;
+
+	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+
+	if (data)
+	{
+		/* We've cached this file already */
+
+		if (lookup_type == FSCACHE_LOOKUP_PEEK)
+			goto out;	/* Never update on peeks */
+
+		if (lookup_type == FSCACHE_LOOKUP_INIT)
+			goto init;
+
+		/* Is it up-to-date? */
+
+		if (UPTODATE(data, info))
+			goto out;
+		
+		if (lookup_type == FSCACHE_LOOKUP_ONLY_NEW)
+			return NULL;
+
+		/* Out-of-date */
+		if (cache->update)
+			cache->update(data->data, pathname, cache->user_data);
+		else
+		{
+			if (cache->unref)
+				cache->unref(data->data, cache->user_data);
+			data->data = NULL;
+		}
+	}
+	else
+	{
+		GFSCacheKey *new_key;
+
+		if (lookup_type != FSCACHE_LOOKUP_CREATE &&
+		    lookup_type != FSCACHE_LOOKUP_INIT)
+			return NULL;
+		
+		new_key = g_memdup(&key, sizeof(key));
+
+		data = g_new(GFSCacheData, 1);
+		data->data = NULL;
+
+		g_hash_table_insert(cache->inode_to_stats, new_key, data);
+	}
+
+init:
+	data->m_time = info.st_mtime;
+	data->length = info.st_size;
+	data->mode = info.st_mode;
+
+	if (data->data == NULL && lookup_type != FSCACHE_LOOKUP_INIT)
+	{
+		/* Create the object for the file (ie, not an update) */
+		if (cache->load)
+			data->data = cache->load(pathname, cache->user_data);
+	}
+out:
+	data->last_lookup = time(NULL);
+
+	return data;
+}
+
