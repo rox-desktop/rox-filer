@@ -311,7 +311,10 @@ void icon_set_tip(Icon *icon)
 
 	widget = icon->panel ? icon->widget : icon->win;
 
-	ai = appinfo_get(icon->path, &icon->item);
+	if (icon->panel && icon->socket)
+		ai = NULL;
+	else
+		ai = appinfo_get(icon->path, &icon->item);
 
 	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
 	{
@@ -321,7 +324,7 @@ void icon_set_tip(Icon *icon)
 		gtk_tooltips_set_tip(tooltips, widget, str, NULL);
 		g_free(str);
 	}
-	else if (icon->panel && !panel_want_show_text(icon))
+	else if (icon->panel && (!panel_want_show_text(icon)) && !icon->socket)
 	{
 		gtk_tooltips_set_tip(tooltips, widget,
 				icon->item.leafname, NULL);
