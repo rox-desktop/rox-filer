@@ -300,7 +300,7 @@ static void check_has(gpointer key, GList *icons, CheckData *check)
 void icon_set_tip(Icon *icon)
 {
 	GtkWidget	*widget;
-	AppInfo		*ai;
+	XMLwrapper	*ai;
 	xmlNode 	*node;
 
 	g_return_if_fail(icon != NULL);
@@ -340,7 +340,7 @@ void icon_set_tip(Icon *icon)
 		gtk_tooltips_set_tip(tooltips, widget, NULL, NULL);
 
 	if (ai)
-		appinfo_unref(ai);
+		xml_cache_unref(ai);
 }
 
 /* Returns TRUE if any icon links to this item (or any item inside

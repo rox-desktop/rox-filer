@@ -45,6 +45,7 @@
 #include "options.h"
 #include "support.h"
 #include "my_vfs.h"
+#include "fscache.h"
 
 static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
@@ -54,6 +55,104 @@ static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 static void MD5Transform(guint32 buf[4], guint32 const in[16]);
 #endif
 
+/* Static prototypes */
+static XMLwrapper *xml_load(char *pathname, gpointer data);
+static void xml_ref(XMLwrapper *dir, gpointer data);
+static void xml_unref(XMLwrapper *dir, gpointer data);
+static int xml_getref(XMLwrapper *dir, gpointer data);
+
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
+
+XMLwrapper *xml_cache_load(gchar *pathname)
+{
+	static GFSCache *xml_cache = NULL;
+
+	if (!xml_cache)
+		xml_cache = g_fscache_new((GFSLoadFunc) xml_load,
+					  (GFSRefFunc) xml_ref,
+					  (GFSRefFunc) xml_unref,
+					  (GFSGetRefFunc) xml_getref,
+					  NULL, NULL);
+	return g_fscache_lookup(xml_cache, pathname);
+}
+
+void xml_cache_unref(XMLwrapper *wrapper)
+{
+	xml_unref(wrapper, NULL);
+}
+
+/* Return the (first) child of this node with the given name.
+ * NULL if not found.
+ */
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
+{
+	for (node = node->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+
+		if (strcmp(node->name, name))
+			continue;
+
+		if (node->ns == NULL || namespaceURI == NULL)
+		{
+			if (node->ns == NULL && namespaceURI == NULL)
+				return node;
+			continue;
+		}
+		
+		if (strcmp(node->ns->href, namespaceURI) == 0)
+			return node;
+	}
+
+	return NULL;
+}
+
+/* Save doc as XML as filename, 0 on success or -1 on failure */
+int save_xml_file(xmlDocPtr doc, gchar *filename)
+{
+#if LIBXML_VERSION > 20400
+	if (xmlSaveFormatFileEnc(filename, doc, NULL, 1) < 0)
+		return 1;
+#else
+	FILE *out;
+	
+	out = fopen(filename, "w");
+	if (!out)
+		return 1;
+
+	xmlDocDump(out, doc);  /* Some versions return void */
+
+	if (fclose(out))
+		return 1;
+#endif
+
+	return 0;
+}
+
+/* Create a new SOAP message and return the document and the (empty)
+ * body node.
+ */
+xmlDocPtr soap_new(xmlNodePtr *ret_body)
+{
+	xmlDocPtr  doc;
+	xmlNodePtr root;
+	xmlNs	   *env_ns;
+
+	doc = xmlNewDoc("1.0");
+	root = xmlNewDocNode(doc, NULL, "Envelope", NULL);
+	xmlDocSetRootElement(doc, root);
+	
+	env_ns = xmlNewNs(root, SOAP_ENV_NS, "env");
+	xmlSetNs(root, env_ns);
+
+	*ret_body = xmlNewTextChild(root, env_ns, "Body", NULL);
+	xmlNewNs(*ret_body, ROX_NS, "rox");
+
+	return doc;
+}
 
 /* Like g_strdup, but does realpath() too (if possible) */
 char *pathdup(char *path)
@@ -785,52 +884,6 @@ guchar *get_relative_path(guchar *from, guchar *to)
 	return retval;
 }
 
-/* Called before gtk_init(). Override default styles with our defaults,
- * and override them with user choices, if any.
- */
-void add_default_styles(void)
-{
-	gchar	*rc_file;
-	
-	rc_file = g_strconcat(app_dir, "/Styles", NULL);
-	gtk_rc_add_default_file(rc_file);
-	g_free(rc_file);
-
-	rc_file = choices_find_path_load("Styles", PROJECT);
-	if (rc_file)
-	{
-		gtk_rc_add_default_file(rc_file);
-		g_free(rc_file);
-	}
-}
-
-/* Return the (first) child of this node with the given name.
- * NULL if not found.
- */
-xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
-{
-	for (node = node->xmlChildrenNode; node; node = node->next)
-	{
-		if (node->type != XML_ELEMENT_NODE)
-			continue;
-
-		if (strcmp(node->name, name))
-			continue;
-
-		if (node->ns == NULL || namespaceURI == NULL)
-		{
-			if (node->ns == NULL && namespaceURI == NULL)
-				return node;
-			continue;
-		}
-		
-		if (strcmp(node->ns->href, namespaceURI) == 0)
-			return node;
-	}
-
-	return NULL;
-}
-
 /*
  * Interperet text as a boolean value.  Return defvalue if we don't
  * recognise it
@@ -854,50 +907,6 @@ int text_to_boolean(const char *text, int defvalue)
 void set_to_null(gpointer *data)
 {
 	*data = NULL;
-}
-
-/* Save doc as XML as filename, 0 on success or -1 on failure */
-int save_xml_file(xmlDocPtr doc, gchar *filename)
-{
-#if LIBXML_VERSION > 20400
-	if (xmlSaveFormatFileEnc(filename, doc, NULL, 1) < 0)
-		return 1;
-#else
-	FILE *out;
-	
-	out = fopen(filename, "w");
-	if (!out)
-		return 1;
-
-	xmlDocDump(out, doc);  /* Some versions return void */
-
-	if (fclose(out))
-		return 1;
-#endif
-
-	return 0;
-}
-
-/* Create a new SOAP message and return the document and the (empty)
- * body node.
- */
-xmlDocPtr soap_new(xmlNodePtr *ret_body)
-{
-	xmlDocPtr  doc;
-	xmlNodePtr root;
-	xmlNs	   *env_ns;
-
-	doc = xmlNewDoc("1.0");
-	root = xmlNewDocNode(doc, NULL, "Envelope", NULL);
-	xmlDocSetRootElement(doc, root);
-	
-	env_ns = xmlNewNs(root, SOAP_ENV_NS, "env");
-	xmlSetNs(root, env_ns);
-
-	*ret_body = xmlNewTextChild(root, env_ns, "Body", NULL);
-	xmlNewNs(*ret_body, ROX_NS, "rox");
-
-	return doc;
 }
 
 /* Return the pathname that this symlink points to.
@@ -1163,3 +1172,43 @@ char *md5_hash(char *message)
 	return MD5Final(&ctx);
 }
 #endif /* GTK2 */
+
+/****************************************************************
+ *                      INTERNAL FUNCTIONS                      *
+ ****************************************************************/
+
+static XMLwrapper *xml_load(char *pathname, gpointer data)
+{
+	xmlDocPtr doc;
+	XMLwrapper *xml_data = NULL;
+
+	doc = xmlParseFile(pathname);
+	if (!doc)
+		return NULL;	/* Bad XML */
+
+	xml_data = g_new(XMLwrapper, 1);
+	xml_data->ref = 1;
+	xml_data->doc = doc;
+
+	return xml_data;
+}
+
+static void xml_ref(XMLwrapper *doc, gpointer data)
+{
+	if (doc)
+		doc->ref++;
+}
+
+static void xml_unref(XMLwrapper *doc, gpointer data)
+{
+	if (doc && --doc->ref == 0)
+	{
+		xmlFreeDoc(doc->doc);
+		g_free(doc);
+	}
+}
+
+static int xml_getref(XMLwrapper *doc, gpointer data)
+{
+	return doc ? doc->ref : 0;
+}

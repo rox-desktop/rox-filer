@@ -51,5 +51,6 @@ GdkColor *button_patch_get_colour(GtkWidget *button);
 void wink_widget(GtkWidget *widget);
 void destroy_on_idle(GtkWidget *widget);
 gboolean rox_spawn(gchar *dir, gchar **argv);
+void add_default_styles(void);
 
 #endif /* _GUI_SUPPORT_H */

@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
+#include <parser.h>
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -68,7 +69,6 @@
 #include "toolbar.h"
 #include "bind.h"
 #include "icon.h"
-#include "appinfo.h"
 #include "panel.h"
 #include "session.h"
 #include "minibuffer.h"
@@ -462,7 +462,6 @@ int main(int argc, char **argv)
 	mount_init();
 	type_init();
 	action_init();
-	appinfo_init();
 
 	icon_init();
 	pinboard_init();

@@ -8,9 +8,19 @@
 #ifndef _SUPPORT_H
 #define _SUPPORT_H
 
+struct _XMLwrapper {
+	int	ref;
+	xmlDocPtr doc;
+};
+
 #define PRETTY_SIZE_LIMIT 10000
 #define TIME_FORMAT "%T %d %b %Y"
 
+XMLwrapper *xml_cache_load(gchar *pathname);
+void xml_cache_unref(XMLwrapper *wrapper);
+int save_xml_file(xmlDocPtr doc, gchar *filename);
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
+xmlDocPtr soap_new(xmlNodePtr *ret_body);
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
@@ -35,13 +45,9 @@ gboolean is_sub_dir(char *sub, char *parent);
 gboolean in_list(guchar *item, guchar *list);
 GPtrArray *split_path(guchar *path);
 guchar *get_relative_path(guchar *from, guchar *to);
-void add_default_styles(void);
-xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
 int text_to_boolean(const char *text, int defvalue);
 void set_to_null(gpointer *data);
-int save_xml_file(xmlDocPtr doc, gchar *filename);
 char *readlink_dup(char *path);
-xmlDocPtr soap_new(xmlNodePtr *ret_body);
 
 #ifdef GTK2
 char *md5_hash(char *message);

@@ -19,7 +19,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* appmenu.c - handles application-specific menus read from AppInfo.xml */
+/* appmenu.c - handles application-specific menus read from XMLwrapper.xml */
 
 #include "config.h"
 
@@ -85,7 +85,7 @@ void appmenu_remove(void)
  */
 void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 {
-	AppInfo	*ai;
+	XMLwrapper	*ai;
 	xmlNode	*node;
 	GList	*next;
 	GtkWidget *sep;

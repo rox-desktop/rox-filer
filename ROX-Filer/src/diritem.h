@@ -13,7 +13,7 @@
 typedef enum
 {
 	ITEM_FLAG_SYMLINK 	= 0x01,	/* Is a symlink */
-	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains /AppInfo */
+	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains an AppRun */
 	ITEM_FLAG_MOUNT_POINT  	= 0x04,	/* Is in mtab or fstab */
 	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is in /etc/mtab */
 	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */

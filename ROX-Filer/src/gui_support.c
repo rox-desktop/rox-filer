@@ -41,6 +41,7 @@
 #include "gui_support.h"
 #include "support.h"
 #include "pixmaps.h"
+#include "choices.h"
 
 #ifndef GTK2
 GdkFont	   	*item_font = NULL;
@@ -952,3 +953,23 @@ gboolean rox_spawn(gchar *dir, gchar **argv)
 #endif
 	return TRUE;
 }
+
+/* Called before gtk_init(). Override default styles with our defaults,
+ * and override them with user choices, if any.
+ */
+void add_default_styles(void)
+{
+	gchar	*rc_file;
+	
+	rc_file = g_strconcat(app_dir, "/Styles", NULL);
+	gtk_rc_add_default_file(rc_file);
+	g_free(rc_file);
+
+	rc_file = choices_find_path_load("Styles", PROJECT);
+	if (rc_file)
+	{
+		gtk_rc_add_default_file(rc_file);
+		g_free(rc_file);
+	}
+}
+

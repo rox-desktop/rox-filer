@@ -155,7 +155,7 @@ static GtkWidget *make_vbox(guchar *path)
 {
 	DirItem		*item;
 	GtkWidget	*vbox, *list, *file;
-	AppInfo		*ai;
+	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
@@ -180,7 +180,7 @@ static GtkWidget *make_vbox(guchar *path)
 	}
 
 	if (ai)
-		appinfo_unref(ai);
+		xml_cache_unref(ai);
 
 	item->leafname = NULL;
 	diritem_free(item);

@@ -19,13 +19,13 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* appinfo.c - loading, caching and querying the AppInfo.xml files */
+/* appinfo.c - querying the XMLwrapper.xml files */
 
-/* Any valid application directory may contain a file called AppInfo.xml.
+/* Any valid application directory may contain a file called XMLwrapper.xml.
  * The format is:
  *
  * <?xml version="1.0"?>
- * <AppInfo>
+ * <XMLwrapper>
  *   <Summary>Tooltip text</Summary>
  *   <About>
  *     <Purpose>...</Purpose>
@@ -39,7 +39,7 @@
  *     <Item label="..." option="..."/>
  *     ...
  *   </AppMenu>
- * </AppInfo>
+ * </XMLwrapper>
  */
 
 #include "config.h"
@@ -50,48 +50,24 @@
 
 #include "appinfo.h"
 #include "fscache.h"
-#include "dir.h"
 #include "type.h"
-#include "support.h"
 #include "diritem.h"
-
-static GFSCache *appinfo_cache = NULL;
-
-/* Static prototypes */
-static AppInfo *load(char *pathname, gpointer data);
-static void ref(AppInfo *dir, gpointer data);
-static void unref(AppInfo *dir, gpointer data);
-static int getref(AppInfo *dir, gpointer data);
-
-/* Stores the tree for one application's AppInfo file */
-struct _AppInfo {
-	int	ref;
-	xmlDocPtr doc;		/* Parsed AppInfo file */
-};
+#include "support.h"
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-void appinfo_init(void)
-{
-	appinfo_cache = g_fscache_new((GFSLoadFunc) load,
-				      (GFSRefFunc) ref,
-				      (GFSRefFunc) unref,
-				      (GFSGetRefFunc) getref,
-				      NULL, NULL);
-}
-
-/* Load the AppInfo file for this application.
+/* Load the XMLwrapper file for this application.
  *
- * Returns a pointer to the AppInfo structure, or NULL if this isn't
- * an application with a valid AppInfo file.
+ * Returns a pointer to the XMLwrapper structure, or NULL if this isn't
+ * an application with a valid XMLwrapper file.
  *
  * appinfo_unref() the result.
  */
-AppInfo *appinfo_get(guchar *app_dir, DirItem *item)
+XMLwrapper *appinfo_get(guchar *app_dir, DirItem *item)
 {
-	AppInfo	*ai;
+	XMLwrapper	*ai;
 	guchar	*tmp;
 
 	/* Is it even an application directory? */
@@ -100,34 +76,19 @@ AppInfo *appinfo_get(guchar *app_dir, DirItem *item)
 		return NULL;	/* Not an application */
 
 	tmp = g_strconcat(app_dir, "/" APPINFO_FILENAME, NULL);
-	ai = g_fscache_lookup(appinfo_cache, tmp);
+	ai = xml_cache_load(tmp);
 	g_free(tmp);
 
-	if (!ai)
-	{
-		/* Temp: look for the old AppMenu file */
-		tmp = g_strconcat(app_dir, "/AppMenu", NULL);
-		ai = g_fscache_lookup(appinfo_cache, tmp);
-		g_free(tmp);
-	}
-	
 	return ai;
 }
 
-void appinfo_unref(AppInfo *info)
-{
-	g_return_if_fail(info != NULL);
-
-	g_fscache_data_unref(appinfo_cache, info);
-}
-
-/* Look for this section in the AppInfo document.
+/* Look for this section in the XMLwrapper document.
  * It may be any direct child node, or the root node itself (this is for
  * backwards compat with AppMenu; it may go soon).
  *
  * Returns an _xmlNode or NULL if there isn't one.
  */
-xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
+xmlNode *appinfo_get_section(XMLwrapper *ai, guchar *name)
 {
 	xmlNode *node;
 
@@ -141,47 +102,4 @@ xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
 		return node;
 
 	return get_subnode(node, NULL, name);
-}
-
-/****************************************************************
- *                      INTERNAL FUNCTIONS                      *
- ****************************************************************/
-
-/* The pathname is the full path of the AppInfo file.
- * If we get here, assume that this really is an application.
- */
-static AppInfo *load(char *pathname, gpointer data)
-{
-	xmlDocPtr doc;
-	AppInfo *appinfo = NULL;
-
-	doc = xmlParseFile(pathname);
-	if (!doc)
-		return NULL;	/* Bad XML */
-
-	appinfo = g_new(AppInfo, 1);
-	appinfo->ref = 1;
-	appinfo->doc = doc;
-
-	return appinfo;
-}
-
-static void ref(AppInfo *ai, gpointer data)
-{
-	if (ai)
-		ai->ref++;
-}
-
-static void unref(AppInfo *ai, gpointer data)
-{
-	if (ai && --ai->ref == 0)
-	{
-		xmlFreeDoc(ai->doc);
-		g_free(ai);
-	}
-}
-
-static int getref(AppInfo *ai, gpointer data)
-{
-	return ai ? ai->ref : 0;
 }

@@ -78,6 +78,9 @@ typedef struct _Panel Panel;
  */
 typedef struct _GFSCache GFSCache;
 
+/* Each cached XML file is represented by one of these */
+typedef struct _XMLwrapper XMLwrapper;
+
 /* The minibuffer is a text field which appears at the bottom of
  * a filer window. It has four modes of operation:
  */

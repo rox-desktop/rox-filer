@@ -46,6 +46,7 @@
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
+#include "choices.h"
 #include "pixmaps.h"
 #include "menu.h"
 #include "dnd.h"
@@ -63,18 +64,10 @@
 
 #define PANEL_BORDER 2
 
-struct _Group {
-	char *dir;
-	GList *files;	/* List of leafnames */
-};
-
-typedef struct _Group Group;
+static XMLwrapper *groups = NULL;
 
 FilerWindow 	*window_with_focus = NULL;
 GList		*all_filer_windows = NULL;
-
-#define N_GROUPS 10
-static Group groups[N_GROUPS];
 
 static FilerWindow *window_with_primary = NULL;
 
@@ -114,7 +107,6 @@ static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
 static void show_tooltip(guchar *text);
 static void filer_size_for(FilerWindow *filer_window,
 			   int w, int h, int n, gboolean allow_shrink);
-static void group_free(int i);
 
 static void set_unique(guchar *unique);
 static void set_selection_state(FilerWindow *collection, gboolean normal);
@@ -137,7 +129,6 @@ void filer_init(void)
 	gchar *ohost;
 	gchar *dpyhost, *dpy;
 	gchar *tmp;
-	int   i;
   
 	option_add_int("filer_size_limit", 75, NULL);
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
@@ -170,10 +161,6 @@ void filer_init(void)
 	}
 	
 	g_free(dpyhost);
-
-	/* Just in case... */
-	for (i = 0; i < N_GROUPS; i++)
-		group_free(i);
 }
 
 static void set_unique(guchar *unique)
@@ -878,58 +865,128 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	filer_openitem(filer_window, item, flags);
 }
 
-static void group_free(int i)
+/* Makes sure that 'groups' is up-to-date, reloading from file if it has
+ * changed. If no groups were loaded and there is no file then initialised
+ * groups to an empty document.
+ * Return the node for the 'name' group.
+ */
+static xmlNode *group_find(char *name)
 {
-	g_free(groups[i].dir);
+	xmlNode *node;
+	gchar *path;
 
-	g_list_foreach(groups[i].files, (GFunc) g_free, NULL);
+	/* Update the groups, if possible */
+	path = choices_find_path_load("Groups.xml", PROJECT);
+	if (path)
+	{
+		XMLwrapper *wrapper;
+		wrapper = xml_cache_load(path);
+		if (wrapper)
+		{
+			if (groups)
+				xml_cache_unref(groups);
+			groups = wrapper;
+		}
 
-	g_list_free(groups[i].files);
+		g_free(path);
+	}
 
-	groups[i].dir = NULL;
-	groups[i].files = NULL;
+	if (!groups)
+	{
+		groups = g_new(XMLwrapper, 1);
+		groups->doc = xmlNewDoc("1.0");
+		groups->ref = 1;
+		xmlDocSetRootElement(groups->doc,
+			xmlNewDocNode(groups->doc, NULL, "groups", NULL));
+		return NULL;
+	}
+
+	node = xmlDocGetRootElement(groups->doc);
+
+	for (node = node->xmlChildrenNode; node; node = node->next)
+	{
+		guchar	*gid;
+
+		gid = xmlGetProp(node, "name");
+
+		if (!gid)
+			continue;
+
+		if (strcmp(name, gid) != 0)
+			continue;
+
+		g_free(gid);
+
+		return node;
+	}
+
+	return NULL;
 }
 
-static void group_save(FilerWindow *filer_window, int i)
+static void group_save(FilerWindow *filer_window, char *name)
 {
 	Collection *collection = filer_window->collection;
-	int	j;
+	xmlNode	*group;
+	guchar	*save_path;
+	int	i;
 
-	group_free(i);
-
-	groups[i].dir = g_strdup(filer_window->path);
-
-	for (j = 0; j < collection->number_of_items; j++)
+	group = group_find(name);
+	if (group)
 	{
-		DirItem *item = (DirItem *) collection->items[j].data;
+		xmlUnlinkNode(group);
+		xmlFreeNode(group);
+	}
+	group = xmlNewChild(xmlDocGetRootElement(groups->doc),
+			NULL, "group", NULL);
+	xmlSetProp(group, "name", name);
+
+	xmlNewChild(group, NULL, "directory", filer_window->path);
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		DirItem *item = (DirItem *) collection->items[i].data;
 		
-		if (collection->items[j].selected)
-			groups[i].files = g_list_prepend(groups[i].files,
-						g_strdup(item->leafname));
+		if (!collection->items[i].selected)
+			continue;
+
+		xmlNewChild(group, NULL, "item", item->leafname);
+	}
+
+	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
+	if (save_path)
+	{
+		save_xml_file(groups->doc, save_path);
+		g_free(save_path);
 	}
 }
 
-static void group_restore(FilerWindow *filer_window, int i)
+static void group_restore(FilerWindow *filer_window, char *name)
 {
 	GHashTable *in_group;
-	GList	*next;
 	Collection *collection = filer_window->collection;
 	int	j, n;
+	char	*path;
+	xmlNode	*group, *node;
 
-	if (!groups[i].dir)
+	group = group_find(name);
+
+	if (!group)
 	{
-		report_error(_("Group %d is not set. Select some files "
-				"and press Ctrl+%d to set the group. Press %d "
+		report_error(_("Group %s is not set. Select some files "
+				"and press Ctrl+%s to set the group. Press %s "
 				"on its own to reselect the files later."),
-				i, i, i);
+				name, name, name);
 		return;
 	}
 
-	if (strcmp(groups[i].dir, filer_window->path) != 0)
-	{
-		filer_change_to(filer_window, groups[i].dir, NULL);
-		/* XXX: Need to wait until scanning is done! */
-	}
+	node = get_subnode(group, NULL, "directory");
+	g_return_if_fail(node != NULL);
+	path = xmlNodeListGetString(groups->doc, node->xmlChildrenNode, 1);
+	g_return_if_fail(path != NULL);
+
+	if (strcmp(path, filer_window->path) != 0)
+		filer_change_to(filer_window, path, NULL);
+	g_free(path);
 
 	/* If an item at the start is selected then we could lose the
 	 * primary selection after checking that item and then need to
@@ -941,8 +998,21 @@ static void group_restore(FilerWindow *filer_window, int i)
 		collection_select_item(collection, n - 1);
 
 	in_group = g_hash_table_new(g_str_hash, g_str_equal);
-	for (next = groups[i].files; next; next = next->next)
-		g_hash_table_insert(in_group, next->data, filer_window);
+	for (node = group->xmlChildrenNode; node; node = node->next)
+	{
+		gchar *leaf;
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+		if (strcmp(node->name, "item") != 0)
+			continue;
+
+		leaf = xmlNodeListGetString(groups->doc,
+						node->xmlChildrenNode, 1);
+		if (!leaf)
+			g_warning("Missing leafname!\n");
+		else
+			g_hash_table_insert(in_group, leaf, filer_window);
+	}
 	
 	for (j = 0; j < n; j++)
 	{
@@ -954,6 +1024,7 @@ static void group_restore(FilerWindow *filer_window, int i)
 			collection_unselect_item(collection, j);
 	}
 
+	g_hash_table_foreach(in_group, (GHFunc) g_free, NULL);
 	g_hash_table_destroy(in_group);
 }
 
@@ -963,6 +1034,7 @@ static gint key_press_event(GtkWidget	*widget,
 			FilerWindow	*filer_window)
 {
 	gboolean handled;
+	char group[2] = "1";
 
 	window_with_focus = filer_window;
 
@@ -1012,11 +1084,12 @@ static gint key_press_event(GtkWidget	*widget,
 			if (event->keyval < GDK_0 || event->keyval > GDK_9)
 				return FALSE;
 
+			group[0] = event->keyval - GDK_0 + '0';
+
 			if (event->state & GDK_CONTROL_MASK)
-				group_save(filer_window, event->keyval - GDK_0);
+				group_save(filer_window, group);
 			else
-				group_restore(filer_window,
-					      event->keyval - GDK_0);
+				group_restore(filer_window, group);
 	}
 
 #ifndef GTK2
@@ -2094,7 +2167,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	
 	if (tip_item->flags & ITEM_FLAG_APPDIR)
 	{
-		AppInfo *info;
+		XMLwrapper *info;
 		xmlNode *node;
 
 		info = appinfo_get(fullpath, tip_item);
