@@ -30,6 +30,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <stdlib.h>
+#include <math.h>
 #include <libxml/parser.h>
 #include <signal.h>
 
@@ -70,6 +71,7 @@ struct _Pinboard {
 
 	GtkWidget	*window;	/* Screen-sized window */
 	GtkWidget	*fixed;
+	GdkGC		*shadow_gc;
 };
 
 #define IS_PIN_ICON(obj) G_TYPE_CHECK_INSTANCE_TYPE((obj), pin_icon_get_type())
@@ -119,6 +121,8 @@ static gint	wink_timeout;
 GdkColor pin_text_fg_col, pin_text_bg_col;
 PangoFontDescription *pinboard_font = NULL;	/* NULL => Gtk default */
 
+static GdkColor pin_text_shadow_col;
+
 Pinboard	*current_pinboard = NULL;
 static gint	loading_pinboard = 0;		/* Non-zero => loading */
 
@@ -134,12 +138,16 @@ static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
 static Option o_iconify_start, o_iconify_dir;
-static Option o_label_font;
+static Option o_label_font, o_pinboard_shadow_colour;
+
+/* tasklist.c needs it */
+Option o_pinboard_shadow_labels;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
+static void draw_label_shadow(GtkLabel *label);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
@@ -222,7 +230,10 @@ void pinboard_init(void)
 {
 	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#fff");
 	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#888");
+	option_add_string(&o_pinboard_shadow_colour, "pinboard_shadow_colour",
+			"#000");
 	option_add_string(&o_label_font, "label_font", "");
+	option_add_int(&o_pinboard_shadow_labels, "pinboard_shadow_labels", 1);
 
 	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
@@ -238,6 +249,7 @@ void pinboard_init(void)
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &pin_text_fg_col);
 	gdk_color_parse(o_pinboard_bg_colour.value, &pin_text_bg_col);
+	gdk_color_parse(o_pinboard_shadow_colour.value, &pin_text_shadow_col);
 	update_pinboard_font();
 }
 
@@ -342,6 +354,13 @@ GdkWindow *pinboard_get_window(void)
 	if (current_pinboard)
 		return current_pinboard->window->window;
 	return NULL;
+}
+
+GdkGC *pinboard_get_shadow_gc(void)
+{
+	g_return_val_if_fail(current_pinboard != NULL, NULL);
+
+	return current_pinboard->shadow_gc;
 }
 
 const char *pinboard_get_name(void)
@@ -709,10 +728,11 @@ static gboolean recreate_pinboard(gchar *name)
 
 static void pinboard_check_options(void)
 {
-	GdkColor	n_fg, n_bg;
+	GdkColor	n_fg, n_bg, n_shadow;
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &n_fg);
 	gdk_color_parse(o_pinboard_bg_colour.value, &n_bg);
+	gdk_color_parse(o_pinboard_shadow_colour.value, &n_shadow);
 
 	if (o_override_redirect.has_changed && current_pinboard)
 	{
@@ -726,10 +746,13 @@ static void pinboard_check_options(void)
 
 	if (gdk_color_equal(&n_fg, &pin_text_fg_col) == 0 ||
 		gdk_color_equal(&n_bg, &pin_text_bg_col) == 0 ||
+		gdk_color_equal(&n_shadow, &pin_text_shadow_col) == 0 ||
+		o_pinboard_shadow_labels.has_changed ||
 		o_label_font.has_changed)
 	{
 		pin_text_fg_col = n_fg;
 		pin_text_bg_col = n_bg;
+		pin_text_shadow_col = n_shadow;
 		update_pinboard_font();
 
 		if (current_pinboard)
@@ -741,6 +764,9 @@ static void pinboard_check_options(void)
 
 			gdk_colormap_alloc_color(cm, &n_bg, FALSE, TRUE);
 			gtk_widget_modify_bg(w, GTK_STATE_NORMAL, &n_bg);
+
+			gdk_gc_set_rgb_fg_color(current_pinboard->shadow_gc,
+					&n_shadow);
 
 			/* Only redraw the background if there is no image */
 			if (!current_pinboard->backdrop)
@@ -847,12 +873,54 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 				pi->label->allocation.width,
 				pi->label->allocation.height);
 	}
+	else if (o_pinboard_shadow_labels.int_value)
+		draw_label_shadow(GTK_LABEL(pi->label));
 
 	/* Draw children */
 	(parent_class->expose_event)(widget, event);
 
 	/* Stop the button effect */
 	return TRUE;
+}
+
+static void draw_label_shadow(GtkLabel *label)
+{
+	PangoLayout	*layout;
+	GtkMisc		*misc;
+	GtkWidget	*widget;
+	gfloat		xalign;
+	gint		x, y;
+
+	misc = GTK_MISC (label);
+	widget = GTK_WIDGET (label);
+	layout = gtk_label_get_layout (label);
+
+	/* Taken from gtklabel.c ... */
+	if (gtk_widget_get_direction(widget) == GTK_TEXT_DIR_LTR)
+		xalign = misc->xalign;
+	else
+		xalign = 1.0 - misc->xalign;
+
+	x = floor (widget->allocation.x + (gint)misc->xpad
+		   + ((widget->allocation.width
+		       - widget->requisition.width) * xalign)
+		   + 0.5);
+	y = floor (widget->allocation.y + (gint)misc->ypad
+		   + ((widget->allocation.height
+		       - widget->requisition.height) * misc->yalign)
+		   + 0.5);
+
+	gdk_gc_set_clip_origin(current_pinboard->shadow_gc,
+			widget->allocation.x, widget->allocation.y);
+	gdk_gc_set_clip_rectangle(current_pinboard->shadow_gc,
+			&widget->allocation);
+
+	gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
+			x + 1, y + 1, layout);
+
+	if (o_pinboard_shadow_labels.int_value > 1)
+		gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
+				x + 2, y + 2, layout);
 }
 
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
@@ -1659,6 +1727,9 @@ static void pinboard_clear(void)
 
 	abandon_backdrop_app(current_pinboard);
 	
+	g_object_unref(current_pinboard->shadow_gc);
+	current_pinboard->shadow_gc = NULL;
+
 	g_free(current_pinboard->name);
 	null_g_free(&current_pinboard);
 
@@ -1877,6 +1948,9 @@ static void create_pinboard_window(Pinboard *pinboard)
 	drag_set_pinboard_dest(win);
 	g_signal_connect(win, "drag_motion", G_CALLBACK(bg_drag_motion), NULL);
 	g_signal_connect(win, "drag_leave", G_CALLBACK(bg_drag_leave), NULL);
+
+	pinboard->shadow_gc = gdk_gc_new(win->window);
+	gdk_gc_set_rgb_fg_color(pinboard->shadow_gc, &pin_text_shadow_col);
 
 	gtk_widget_show_all(win);
 	gdk_window_lower(win->window);

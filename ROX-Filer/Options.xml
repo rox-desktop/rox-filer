@@ -111,6 +111,14 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
       <hbox>
         <colour name='pinboard_fg_colour' label='Foreground:'/>
         <colour name='pinboard_bg_colour' label='Background:'/>
+        <colour name='pinboard_shadow_colour' label='Shadow:'/>
+      </hbox>
+      <hbox label='Label shadow:'>
+        <radio-group name='pinboard_shadow_labels'>
+          <radio label='None' value='0'/>
+          <radio label='Thin' value='1'/>
+          <radio label='Thick' value='2'/>
+        </radio-group>
       </hbox>
       <font override='1' label='Use custom font:' name='label_font'>The font used for the text displayed under the icons</font>
     </frame>

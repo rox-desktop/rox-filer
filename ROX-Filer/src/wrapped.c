@@ -35,7 +35,6 @@ static gpointer parent_class = NULL;
 static void wrapped_label_finialize(GObject *object);
 static void wrapped_label_class_init(gpointer gclass, gpointer data);
 static void wrapped_label_init(GTypeInstance *object, gpointer gclass);
-static GType wrapped_label_get_type(void);
 static void wrapped_label_size_request(GtkWidget *widget,
 				       GtkRequisition *requisition);
 static gint wrapped_label_expose(GtkWidget *widget, GdkEventExpose *event);
@@ -116,7 +115,7 @@ static void wrapped_label_init(GTypeInstance *object, gpointer gclass)
 	wl->width = -1;
 }
 
-static GType wrapped_label_get_type(void)
+GType wrapped_label_get_type(void)
 {
 	static GType type = 0;
 

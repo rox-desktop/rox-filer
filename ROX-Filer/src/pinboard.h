@@ -14,6 +14,7 @@ extern Icon *pinboard_drag_in_progress;
 
 extern GdkColor pin_text_fg_col, pin_text_bg_col;
 extern PangoFontDescription *pinboard_font;
+extern Option o_pinboard_shadow_labels;
 
 typedef enum {
 	BACKDROP_NONE,
@@ -30,6 +31,7 @@ const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop(void);
 void pinboard_set_backdrop_app(const gchar *app);
 GdkWindow *pinboard_get_window(void);
+GdkGC *pinboard_get_shadow_gc(void);
 void pinboard_add_widget(GtkWidget *widget);
 
 #endif /* _PINBOARD_H */
