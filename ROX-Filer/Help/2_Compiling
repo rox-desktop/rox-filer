@@ -1,0 +1,36 @@
+			ROX-Filer
+			A RISCOS-like filer for X
+			by Thomas Leonard
+
+			Compiling
+
+To find out if you need to compile the filer, first try running it. From a
+directory containing the ROX-Filer sub-directory:
+
+	$ ./ROX-Filer/AppRun
+	I cannot find an executable file for your host type (Linux-i386).
+	Look inside this application directory for a 'src' directory - if
+	there is one then try running make inside it to create the executable.
+
+If the above is displayed then you need to recompile. Firstly, ensure
+that you have GTK+ installed (version 1.2.0 or later):
+
+	$ gtk-config --version
+	1.2.3
+
+If you get an error instead, or you have and out-of-date version, go to
+the GTK+ web page and get the latest copy:
+	<http://www.gtk.org>
+
+To compile the application:
+
+	$ cd ROX-Filer/src
+	$ make depend
+	$ make
+
+If that fails, email me and I'll try to fix it. Otherwise, test it as before:
+
+	$ cd ../..
+	$ ./ROX-Filer/AppRun
+
+Hopefully it will work this time!
