@@ -613,17 +613,11 @@ GtkWidget *button_new_mixed(const char *stock, const char *message)
 /* Highlight entry in red if 'error' is TRUE */
 void entry_set_error(GtkWidget *entry, gboolean error)
 {
-	GdkColor red = {0, 0xffff, 0, 0};
-	static gboolean need_init = TRUE;
-	static GdkColor normal;
+	const GdkColor red = {0, 0xffff, 0, 0};
+	const GdkColor white = {0, 0xffff, 0xffff, 0xffff};
 
-	if (need_init)
-	{
-		normal = entry->style->text[GTK_STATE_NORMAL];
-		need_init = FALSE;
-	}
-
-	gtk_widget_modify_text(entry, GTK_STATE_NORMAL, error ? &red : &normal);
+	gtk_widget_modify_text(entry, GTK_STATE_NORMAL, error ? &red : NULL);
+	gtk_widget_modify_base(entry, GTK_STATE_NORMAL, error ? &white : NULL);
 }
 
 /* Change stacking position of higher to be just above lower.

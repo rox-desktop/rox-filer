@@ -552,7 +552,7 @@ static gboolean matches(ViewIter *iter, const char *pattern)
 	
 	item = iter->peek(iter);
 	
-	return strncmp(item->leafname, pattern, strlen(pattern)) == 0;
+	return strncasecmp(item->leafname, pattern, strlen(pattern)) == 0;
 }
 
 /* Find next match and set base for future matches. */
