@@ -1979,7 +1979,7 @@ void action_eject(GList *paths)
 	GUIside		*gui_side;
 	GtkWidget	*abox;
 
-	abox = abox_new(_("Eject"), 0);
+	abox = abox_new(_("Eject"), TRUE);
 	gui_side = start_action(abox, eject_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
