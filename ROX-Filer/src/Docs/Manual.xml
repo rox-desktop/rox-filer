@@ -1,0 +1,2315 @@
+<?xml version="1.0" standalone="no"?>
+<?xml-stylesheet href="/usr/share/sgml/docbook/xsl-stylesheets-1.29/html/docbook.xsl" type="text/xml"?>
+
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
+		      "/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd">
+
+<book>
+<bookinfo>
+  <title>
+    ROX-Filer User Manual
+    <ulink url="http://rox.sourceforge.net"/>
+  </title>
+  <author>
+    <firstname>Thomas</firstname><surname>Leonard</surname>
+    <affiliation>
+      <address><email>tal197@users.sourceforge.net</email></address>
+    </affiliation>
+  </author>
+  <copyright><year>2001</year><holder>Thomas Leonard</holder></copyright>
+  <legalnotice>
+    <title>Conditions</title>
+    <para>
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published
+by the Free Software Foundation; either version 2 of the License,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful, but
+WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License
+for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software Foundation,
+Inc., 59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
+    </para>
+  </legalnotice>
+
+  <abstract>
+    <para>
+ROX-Filer is a graphical file manger for the X Window System. Its user
+interface is based on the RISC OS filer and it supports similar features such
+as application directories and drag-and-drop loading and saving of files. The
+filer can also act as a pinboard, allowing you to pin frequently used files
+onto the desktop background.
+    </para>
+  </abstract>
+</bookinfo>
+
+<chapter>
+  <title>Introduction</title>
+  <para>
+ROX-Filer is a simple and easy to use graphical file manager for X11 --- the
+windowing system used on Unix and Unix-like operating systems.  It is also the
+core component of the ROX Desktop<citation>ROX</citation>. Many of the filer's
+features were inspired by RISC OS<citation>RISC OS</citation>. `ROX' stands for
+`RISC OS--On--X'.
+  </para>
+
+<section>
+  <title>Features</title>
+    <para>
+
+<variablelist>
+
+<varlistentry><term>XDND</term>
+<listitem><para>
+A common drag-and-drop protocol used, for example, by the GNOME
+desktop<citation>GNOME</citation>. This allows data to be loaded into an
+application by dragging it from a filer window to a program. The full
+specification is given in <citation>DND</citation>.
+</para></listitem></varlistentry>
+
+<varlistentry><term>XDS</term>
+<listitem><para>
+An extension to XDND that allows applications to save data by
+dragging an icon back to a filer window. The full specification is given in
+<citation>XDS</citation>.
+</para></listitem></varlistentry>
+
+<varlistentry><term>Choices</term>
+<listitem><para>
+A simple, but flexible, system for managing user choices.  See
+<citation>Choices</citation> for details.
+</para></listitem></varlistentry>
+
+<varlistentry><term>Application directories</term>
+<listitem><para>
+Self contained relocatable applications, where installation is as simple as
+copying it to where you want it and uninstalling it is just a matter of
+deleting a directory. Described later in this documentation.
+</para></listitem></varlistentry>
+
+<varlistentry><term>Thumbnails</term>
+<listitem><para>
+The filer can be made to display image files by using the image itself for the
+icon, instead of a generic `this-is-an-image' icon. Very useful for organising
+a directory full of photos!
+</para></listitem></varlistentry>
+
+</variablelist>
+
+  </para>
+</section>
+
+</chapter>
+
+<chapter>
+  <title>Compiling</title>
+  <para>
+
+If you've just got hold of the filer by downloading the source archive
+then you'll need to compile it before you can use it. If you downloaded
+and installed a binary package, or if ROX-Filer was included with
+your system, then you can skip this section. If you got here by clicking
+on the `i' symbol in a filer window, or if typing <command>rox</command> at a
+shell prompt works, then you don't need to compile.
+
+  <itemizedlist><title>To compile, you will need the following:</title>
+
+    <listitem><para>
+Unix or Linux (root access is not required),
+    </para></listitem>
+
+    <listitem><para>
+The X Window system (supplied as standard on all modern systems),
+    </para></listitem>
+
+    <listitem><para>
+GTK+ 1.2.0 or later (libraries and headers) --- get the latest version
+from <citation>GTK+</citation>,
+    </para></listitem>
+
+    <listitem><para>
+A C compiler, such as `gcc' (standard on most systems).
+    </para></listitem>
+
+  </itemizedlist>
+
+All of the above are standard on most modern Linux distributions.
+To check which version of GTK+ you have installed, run the
+<command>gtk-config</command> command, like this 
+(<prompt>$</prompt> is the shell prompt):
+
+  <screen>$ gtk-config --version
+1.2.8</screen>
+Due to bugs in earlier versions, GTK+ 1.2.8 is strongly
+recommended.
+  </para>
+
+  <procedure><title>To compile:</title>
+
+    <step><para>
+The filer needs some shared files to work --- icons for the various
+file types, rules for determining file types and default run actions.
+These are installed by the `rox-base' package. Install rox-base (from
+<ulink url="http://rox.sourceforge.net"/> now if you haven't done so already.
+    </para></step>
+
+    <step><para>
+Change to the directory containing the ROX-Filer subdirectory.
+    </para></step>
+
+    <step><para>
+Run the <command>install.sh</command> script, like this:
+
+      <screen>$ ./install.sh</screen>
+
+    </para></step>
+
+    <step><para>
+ROX-Filer will perform various checks to find out what kind of system
+it is being run on and will then compile. If it doesn't work then
+please e-mail me and complain! Tell me what kind of system you have
+and what errors were reported. If you manage to fix the problem yourself
+then please e-mail me the fix.
+
+The executable file is stored inside the ROX-Filer directory in a
+different subdirectory for each platform. Therefore, you can compile
+the same application on several different types of machine and then
+run it from any of them using the AppRun script. This is particularly
+useful in a network environment.
+    </para></step>
+
+    <step><para>
+Once the filer has compiled you will be asked where you want to install
+it. If you want to do a system-wide installation as root, you may
+want to stop here, <command>su</command> to root and rerun the install script.
+
+If you don't have the root password then don't worry --- just follow
+the instructions for installing into your home directory. 
+    </para></step>
+  </procedure>
+
+  <para>
+
+You can now run the filer by running the <command>rox</command> script without
+any options, like this:
+
+  <screen>$ rox</screen>
+
+A window should appear and display the contents of the current directory.
+
+If you installed the script into your home directory then you may
+need to set your <envar>PATH</envar> environment variable so that the shell can
+find it. For example, if you installed it into a directory called
+<filename>bin</filename> in your home directory, use this:
+
+  <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
+
+or (if you are using the <citerefentry><refentrytitle>csh</refentrytitle>
+<manvolnum>1</manvolnum></citerefentry> shell):
+
+  <screen>$ setenv PATH $HOME/bin:$PATH
+$ rehash</screen>
+
+  </para>
+</chapter>
+
+<chapter>
+  <title>Invoking</title>
+  <para>
+
+By default, ROX-Filer will start by displaying the current directory.
+You can get it to display other directories instead by listing them
+after the command:
+
+<screen>$ rox /home /usr /usr/local</screen>
+
+You can also use it to open files, like this:
+
+<screen>$ rox README</screen>
+
+The filer supports various options; use `\texttt{-h}' for a list.
+All options have long and short forms (eg `\texttt{-h}' and `\texttt{-{}-help}')
+--- although on some systems you can only use the short versions.
+
+Note that if the same version of the filer is already running on this
+machine then, by default, it will be used to open the directories
+and the new copy will exit immediately. You can override this (perhaps
+because the old copy has stopped responding for some reason) using
+the `\texttt{-{}-new}' option.
+  </para>
+
+<section>
+  <title><anchor id="run_pin"/>Pinboard support</title>
+  <para>
+
+If you want the filer to manage your desktop background then you use
+the \texttt{-{}-pinboard} option and supply a name for the pinboard,
+eg:
+
+<screen>$ rox --pinboard=MyPinboard</screen>
+
+The pinboard configuration is saved in `\emph{&lt;Choices&gt;/ROX-Filer/pb\_MyPinboard}'
+as soon as you change it in some way (for example, by dropping a file
+onto the background). You can have as many pinboards as you like and
+switch between them by running rox again, eg:
+
+<screen>$ rox --pinboard=MyOtherPinboard</screen>
+
+To turn off the pinboard again, set the name to an empty string:
+
+<screen>$ rox --pinboard=</screen>
+
+See section \ref{winman} if you have trouble getting the icons to
+display correctly. The pinboard may also be turned on and off by locating
+`ROX-Filer' in a filer window and choosing `Enable pinboard' or `Disable
+pinboard' from the menu.
+
+  </para>
+</section>
+
+<section>
+  <title><anchor id="run_pan"/>Panels</title>
+  <para>
+
+Panels work just like the pinboard. You can create a panel on any
+side of the screen by using the options \texttt{-{}-left}, \texttt{-{}-right,}
+\texttt{-{}-top} and \texttt{-{}-bottom}, depending on which side
+of the screen the panel should appear on. On some systems, the short
+(one letter) form of the options must be used. For example, to create
+a panel along the bottom edge of the screen:
+
+<screen>$ rox -b=MyPanel</screen>
+
+The panel should be displayed in a window without a title bar. If
+this does not work then see section \ref{winman} for some ideas.
+You can drag files onto either side of the panel to add them. Icons
+can be repositioned by dragging them with the middle mouse button.
+Changes to the panel are automatically saved to '\emph{&lt;Choices&gt;/ROX-Filer/pan\_MyPanel}'.
+As with the pinboard, you can switch between panel configurations
+simply by running rox again with a different panel name. Specify a
+blank name to remove the panel.
+
+<screen>$ rox --bottom=MyOtherPanel
+$ rox --bottom=</screen>
+
+  </para>
+</section>
+
+<section>
+  <title><anchor id="winman"/>Window manager notes</title>
+  <para>
+
+You may have to play around with your window manager a bit to get
+the pinboard icons and panels to display correctly (eg, without borders
+and underneath all other windows). In particular, try setting the
+stacking level / depth to low (or a negative value). Make sure any
+'Keep transients above other windows' type options are turned off!
+
+In order for the filer to receive mouse clicks on the background (used
+for the pinboard support) you need a GNOME-compliant window manager.
+To see if your window manager supports this, try clicking the right
+mouse button on an unused area of the background. If you get the pinboard
+menu, all is well.
+
+
+\subsubsection{Sawfish / sawmill}
+
+Sawfish trys to guess whether you are using GNOME at start-up and
+only provides support if so. You need to add the line `\texttt{(require
+'gnome)}' to your \texttt{.sawfishrc} file (see the sawfish manual
+for more details).
+
+
+\subsubsection{IceWM}
+
+Paste these configuration settings into `\textasciitilde{}/.icewm/preferences':
+
+<programlisting>
+# Manage root window (EXPERIMENTAL - normally enabled!)
+GrabRootWindow=1 # 0/1
+# Bitmask of root window button click to use in window manager
+UseRootButtons=3 # [0-255]
+# Desktop mouse-button click to show the menu
+DesktopWinMenuButton=1 # [0-20]
+# Desktop mouse-button click to show the window list
+DesktopWinListButton=2 # [0-5]
+# Desktop mouse-button click to show the window list menu
+DesktopMenuButton=0 # [0-20] 
+</programlisting>
+Paste these into `\textasciitilde{}/.icewm/winoptions':
+
+<programlisting>
+# ROX-Filer pinboard and panel
+ROX-Filer.icon: folder
+ROX-Panel.layer: Dock
+ROX-Panel.doNotCover: 1
+ROX-Panel.ignoreWinList: 1
+ROX-Panel.ignoreTaskBar: 1
+ROX-Panel.ignoreQuickSwitch: 1
+ROX-Pinboard.layer: Below
+ROX-Pinboard.ignoreWinList: 1
+ROX-Pinboard.ignoreTaskBar: 1
+ROX-Pinboard.ignoreQuickSwitch: 1
+ROX-Filer.layer: Normal
+</programlisting>
+Restart IceWM and the filer for the new settings to take effect.
+
+
+\subsubsection{Others}
+
+If all else fails, try running rox with the `\texttt{-n}' and `\texttt{-o}'
+options; this overrides window manager control of the icons altogether
+(\texttt{-n} forces the filer to start a new copy).
+
+  </para>
+</section>
+
+<section>
+  <title>Running as root</title>
+  <para>
+
+If you run the filer as the `root' user then the filer will display
+a message at the top of each window to remind you. The root user has
+permission to access or change any file in the system, so be very
+careful when using the filer like this.
+
+Normally, you should log in as an ordinary user and only change to
+root when you need to. You can create a simple script which runs the
+filer as root --- something like this:
+
+<programlisting>
+#!/bin/sh
+
+su -m -c "rox $*"</programlisting>
+
+Then, you can get a root filer window by simply running the script
+and entering the root password. Remember, any file operations you
+perform and any programs you run from these windows will run as root
+too! Be careful!
+
+You may find that the X server won't allow root (or other users) to
+connect. Reading the manual pages for `\texttt{xauth}' and `\texttt{xhost}'
+may give you some hints, but it varies between systems (which is why
+this isn't built in to the filer!).
+
+  </para>
+</section>
+
+<section>
+  <title>Full list of command-line options</title>
+  <para>
+
+The full list of options is:
+
+\begin{description}
+\item [-b, --bottom=PANEL]open PANEL as a bottom-edge panel
+\item [-d, --dir=DIR]open DIR as directory (not as an application, even
+if it looks like one)
+\item [-h, --help]display help about the various options
+\item [-l, --left=PANEL]open PANEL as a left-edge panel
+\item [-m, --mime-type=FILE]print MIME type of FILE and exit
+\item [-n, --new]start a new filer, even if one already seems to be running
+\item [-o, --override]override window manager control of panels
+\item [-p, --pinboard=PIN]use pinboard PIN as the pinboard
+\item [-r, --right=PANEL]open PANEL as a right-edge panel
+\item [-s, --show=FILE]open a directory showing FILE
+\item [-t, --top=PANEL]open PANEL as a top-edge panel
+\item [-u, --user]show user name in each window
+\item [-x, --examine=FILE]FILE has changed --- re-examine it
+\item [-v, --version]display the version information and exit
+\end{description}
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Mouse button and key bindings</title>
+  <para>
+
+Quick start:
+
+\begin{itemize}
+\item Click the left%
+\footnote{This documentation assumes that button--1 is the left button, button--2
+is the middle button and button--3 is the right button. This is not
+always the case --- for example, in a left-handed setup.
+} mouse button to open files and directories.
+\item Click the right button to get a menu. Click over a file to perform
+an action on that file.
+\item Drag files between windows to copy (left button) or move (middle button)
+them.
+\end{itemize}
+\noindent By default, the mouse button bindings are designed to fit
+in with X conventions. However, the behaviour is highly configurable
+--- have a play in the Options window if you don't like the normal
+settings. The normal settings behave as follows:
+
+\medskip
+
+\begin{tabular}{|p{3.8cm}|p{9.5cm}|}
+\hline 
+Key or mouse button&amp;
+Action\\
+\hline
+\hline 
+Left button click  &amp;
+Open the file or directory clicked on.Hold down Ctrl to select things
+instead of opening them.Hold down Shift to look inside applications,
+treat files as text, follow symlinks or mount devices.\\
+\hline
+Middle button click&amp;
+Same as left click, but open a directory in a new window or close
+the viewer when opening a file.\\
+\hline
+Right button click&amp;
+Open the main menu. Hold down Ctrl while clicking to go directly to
+the Selection submenu.\\
+\hline
+Drag an item  (left mouse button)&amp;
+Copy the file(s) to the destination (an application or another filer
+window).Hold down Shift to move the file, or Ctrl+Shift to create
+a symbolic link.\\
+\hline
+Drag an item (middle mouse button)&amp;
+As above, but always moves rather than copying or symlinking.\\
+\hline
+Drag (not over an item)  &amp;
+Select a group of items by dragging a box around them. With the left
+mouse button, only the filesin the box will be selected. If you hold
+down Ctrl then the boxed items are added to the selection.If you use
+the middle button then the boxed items switch between being selected
+and unselected.\\
+\hline
+Double-click background&amp;
+Resize the window to a sensible size.\\
+\hline
+Backspace&amp;
+Change to viewing the parent directory.\\
+\hline
+Cursor keys&amp;
+Move the cursor around.\\
+\hline
+Page Up, Page Down&amp;
+Move up and down in steps of ten rows at a time.\\
+\hline
+Home, End&amp;
+Move to the first/last entry in the directory.\\
+\hline
+Return&amp;
+Acts like clicking on the file. You may hold down Shift for other
+effects, as with clicking.\\
+\hline
+Spacebar&amp;
+Toggles the item under the cursor between being selected and unselected,
+and moves to the next item.\\
+\hline
+Tab, Shift+Tab&amp;
+Moves the cursor to the next/previous selected item.\\
+\hline
+\end{tabular}
+
+\medskip\noindent Other keys can easily be defined by opening the
+menu, moving the pointer over the item you want to use and pressing
+a key. The key will appear in the menu and can be used from then on.
+Key bindings are automatically saved when the filer quits.
+
+
+  </para>
+</chapter>
+
+<chapter>
+  <title>The selection</title>
+  <para>
+
+While items are selected in a ROX-Filer window the filer has the global
+selection. You can then paste into another window to get the pathnames
+of the selected files. For example, if you want to load a file into
+an application that doesn't support drag-and-drop:
+
+\begin{enumerate}
+\item Open the application's `Open' dialog box.
+\item Ctrl-click on the file in ROX-Filer to select it.
+\item Click the middle button in the filename box in the application to
+paste the name in.
+\end{enumerate}
+
+  </para>
+</chapter>
+
+<chapter>
+  <title><anchor id="Toolbar"/>The toolbar</title>
+  <para>
+
+By default, each window has a toolbar along the top. You can disable
+this (or make it larger) from the Options window, as well as set which
+tools appear on the toolbar. Normally, you should click with the left
+mouse button (1). However, many tools can perform a related function
+if clicked on with buttons 2 or 3 (middle or right).
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{4.5cm}|p{5.5cm}|}
+\hline 
+Icon&amp;
+Mouse button 1&amp;
+Other button\\
+\hline
+\hline 
+Cross&amp;
+Close the window&amp;
+Open a new window\\
+\hline 
+Up arrow&amp;
+Change to parent directory&amp;
+Show parent in a new window\dag\\
+\hline
+House&amp;
+Change to home directory&amp;
+Show home in a new window\dag\\
+\hline
+Looping arrows&amp;
+Reread the directory contents&amp;
+Open a new window\\
+\hline
+Magnifying glass&amp;
+Make icons bigger&amp;
+Make icons smaller\\
+\hline
+List&amp;
+Hide or show extra details&amp;
+Same\\
+\hline
+Information&amp;
+Show ROX-Filer's help files&amp;
+Same\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+\noindent\dag{}If the 'New window on button 1' option is turned on
+then the default is to open a new window --- clicking with the other
+button reuses the same window instead.
+
+Dragging files to the Up or Home icons acts just like dragging them
+into the directory which the button leads to.
+
+The toolbar can also show the number of files in the directory, and
+information about the selection. This can be turned on or off in the
+Options box.
+
+
+  </para>
+</chapter>
+
+<chapter>
+  <title>The menus</title>
+  <para>
+
+You can open a menu by right clicking%
+\footnote{If the Use `RISC OS mouse bindings' option is on then use the middle
+button instead.
+} over a pinboard, panel or filer window. In filer windows, you may
+also press `\textbackslash{}' to open the menu. As a shortcut, you
+can open the File submenu directly by holding down the \texttt{Control}
+key when opening the menu. Here is a full description of each menu
+item:
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{10cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+Select All&amp;
+Select every item in this window.\\
+\hline
+Clear Selection&amp;
+Unselect every item in this window.\\
+\hline
+Options...&amp;
+Configure ROX-Filer.\\
+\hline
+New&amp;
+Create a new file or subdirectory inside this directory.\\
+\hline
+Xterm Here&amp;
+Open an xterm with its current directory set to this directory.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+  
+  </para>
+
+<section>
+  <title>The display menu</title>
+  <para>
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{10cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+Huge Icons&amp;
+Extra large icons (mainly useful with thumbnails, see below).\\
+\hline 
+Large Icons&amp;
+Each object in the directory is shown as a large icon with its name
+below.\\
+\hline
+Small Icons&amp;
+Items are drawn smaller than usual, allowing you to see more files
+at once.\\
+\hline
+Huge, With...&amp;
+As for `Large, With...', but with extra large icons.\\
+\hline
+Large, With...     &amp;
+Entries are displayed along with some extra details:\textbf{Summary}
+shows the file permissions, owner, group, size and modification time.\textbf{Sizes}
+shows just the size of each file (not directories).\textbf{Permissions}
+shows just the permissions and owner.\textbf{Type} shows the MIME
+type of each file.\textbf{Times} shows the times the file was last
+accessed, modifed and changed.\dag\\
+\hline
+Small, With...&amp;
+As above, but with a smaller icon and all on one line.\\
+\hline
+Sort by Name&amp;
+Items are arranged by name. There is an option to make this case-sensitive.\\
+\hline
+Sort by Type&amp;
+Items are grouped by their types and then sorted by name within the
+groups.\\
+\hline
+Sort by Date&amp;
+Most recently modified first.\\
+\hline
+Sort by Size&amp;
+Largest first.\\
+\hline
+Show Hidden&amp;
+If on, files beginning with a dot are shown, otherwise they are hidden.\\
+\hline
+Refresh &amp;
+Rereads the contents of the directory and details of all the files
+in it.Use this if the display becomes out-of-date.\\
+\hline
+Create Thumbs &amp;
+Tries to load every file as an image and use that image as the file's
+icon. Usefulif you have a directory full of photos and can't remember
+which is which!\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+\noindent\dag\thinspace{} Reading a file's contents or listing a directory
+updates the \emph{access time}; modifying the contents of a file or
+the list of files in a directory updates the \emph{modification time};
+changing a file's owner or permissions updates the \emph{change time}.
+
+
+\subsubsection{<anchor id="Permissions"/>Permissions}
+
+The permissions field, when shown, is made up of four groups of three
+flags. Each flag is displayed as a letter if it is on and a dash (--)
+if not. The first three characters show the permissions for the owner
+of the file, the second for other members of the file's group and
+the third for everyone else. Whichever group applies to the ROX-Filer
+process itself is shown underlined. The fourth group shows any special
+flags.
+
+The meanings of the characters are:
+
+\begin{description}
+\item [r]Permission to read the contents of a file, or the names of files
+in a directory.
+\item [w]Permission to alter the contents of a file, or change which names
+appear in a directory.
+\item [x]Permission to run the file as a program, or refer to the files
+listed within the directory.
+\item [U]This program executes with the \emph{effective user ID} of its
+owner rather than the person who ran it.
+\item [G]This program executes with the \emph{effective group ID} of its
+group, regardless of who ran it.
+\item [T]Entries in this directory can only be altered or removed by the
+people who own the files even if they have write permission on the
+directory itself.
+\end{description}
+For example, `\texttt{\underbar{rwx}}\texttt{,rwx,r-x/-{}-{}-}' means
+that the owner of the file is the same as the effective user of ROX-Filer
+(basically, you own the file), you and members of the file's group
+have read, write and execute permission and other people have only
+read and execute permission. There are no special flags set.
+
+The rules which determine which permissions apply may vary slightly
+between operating systems, but a rough guide is:
+
+\begin{itemize}
+\item If the \emph{effective user ID} of the process is equal to the file's
+owner, then the owner permissions apply.
+\item Otherwise, if the \emph{effective group ID} of the process is equal
+to the file's group OR the file's group is one of the process's \emph{supplemental
+groups} then the group permissions apply.
+\item Otherwise, the `other' permissions apply. The \emph{real user ID}
+and \emph{real group ID} have no effect (except that a process may
+set its real IDs to its effective IDs).
+\end{itemize}
+
+  </para>
+</section>
+
+<section>
+  <title>The selection menu</title>
+  <para>
+
+All of these work in the same way --- if you open the menu with some
+items selected then the operation applies to those items. If you open
+then menu over an item while there is no selection then that item
+is temporarily selected. If you choose one of these while there is
+no selection at all then the window goes into `target mode'; the operation
+happens to the next item you click on. Click on the window background,
+press Escape, or click with the right mouse button to cancel target
+mode. Target mode is mainly useful with the `Single click navigation'
+option and keys bound to the various menu entries.
+
+Note that individual applications may add extra menu items to the
+top of this submenu when you click over them --- see section \ref{AppDir}
+for details.
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{10cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+Copy...&amp;
+Make a copy of this object.\\
+\hline
+Rename...&amp;
+Change the name used for this object, or move it between directories.\\
+\hline
+Link...&amp;
+Create a symbolic link to this name. \dag\\
+\hline
+Shift Open    &amp;
+Opens applications as directories, files as text/plain, mount pointsby
+mounting or unmounting them and symlinks by opening the directorycontaining
+the thing they point to.This is the same effect as clicking with Shift
+held down. The text of the menuentry changes to show which action
+will be performed.\\
+\hline
+Help&amp;
+Explain what kind of thing is selected. For applications, display
+the help files.\\
+\hline
+Info&amp;
+Display extra information about this object.\\
+\hline
+Set Run Action... &amp;
+Allows you to set the default program to use when opening files of
+this type.See section \ref{sec: RunAction} for details.\\
+Set Icon... &amp;
+You can give each file or directory its own special icon using this
+feature --- simplydrag a suitable image onto the Set Icon dialog box.\\
+\hline
+Open (A)VFS&amp;
+Open the file as if it was a directory --- see section \ref{sec: vfs}.\\
+\hline
+Send To...&amp;
+Opens the `Send To' menu, allowing you to send the selected files
+to one of a list of applications. See section \ref{SendTo}.\\
+\hline
+Delete  &amp;
+Remove all the selected entries from the directory.Subdirectories
+will have their contents deleted first.Deleting symlinks only removes
+the link, not the thing it points to.\\
+\hline
+Disk Usage &amp;
+Count the sizes of all the selected items. Directories also have theircontents
+counted. Symlinks count themselves, not the things they point to.\\
+\hline
+Permissions&amp;
+Allows you to change the permissions for the selected files.\\
+\hline
+Find&amp;
+Search for files by specifying various conditions --- see section
+\ref{sec: Searching}.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+\noindent\dag\thinspace{}A symbolic link stores the \emph{location}
+of another file. Deleting the symlink doesn't affect the other file.
+Deleting the other file means that the symlink won't work. There are
+two types of symbolic link --- Relative and Absolute. An absolute
+link stores the path from the root directory to the target file (eg
+`/home/fred/MyFile'). A relative path stores the path from the symlink
+to the target (eg `../fred/MyFile'). If the target file is never going
+to move then you want an absolute link, but if the target may move
+(and the symlink will be moved with it) then you want a relative link.
+
+  </para>
+</section>
+
+<section>
+  <title>The new menu</title>
+  <para>
+
+Each entry in this submenu opens a savebox for creating a new file
+or directory. There are two standard entries; the others are the contents
+of your `\texttt{&lt;Choices&gt;/Templates}' directory, if it exists.
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{9cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+Directory&amp;
+Create a new directory.\\
+\hline
+File&amp;
+Create a blank file.\\
+\hline
+&lt;user entries&gt;&amp;
+Copy a file from your Templates directory.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+To add your own entries, create a new directory called `\texttt{\textasciitilde{}/Choices/Templates}'
+(if you have the default CHOICESPATH) and put any files you want in
+there. Each file in the directory will appear on the menu and the
+box that appears will copy it. For example, you could create a blank
+HTML file:
+
+<programlisting>
+&lt;html&gt;
+  &lt;head&gt;
+    &lt;title&gt;My Page&lt;/title&gt;
+  &lt;/head&gt;
+  &lt;body&gt;
+    The contents.
+  &lt;/body&gt;
+&lt;/html&gt;
+</programlisting>
+
+Save this as `\texttt{index.html}' inside the \texttt{Templates} directory
+and you can easily create new HTML files. You can also save blank
+documents from various applications into here (eg, a blank spreadsheet,
+a blank letter, etc).
+
+Note that you cannot set keyboard shortcuts for these user-defined
+entries at present.
+
+  </para>
+</section>
+
+<section>
+  <title>The window menu</title>
+  <para>
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{9cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+Parent, New Window&amp;
+Open a new window displaying this window's parent.\\
+\hline
+Parent, Same Window&amp;
+As above, but reuse this window.\\
+\hline
+New Window&amp;
+Open another window onto this directory.\\
+\hline
+Home Directory&amp;
+Change to your home directory.\\
+\hline
+Resize Window&amp;
+Set the window to a sensible size for its contents.\\
+\hline
+Close Window&amp;
+Close this window.\\
+\hline
+Enter Path...&amp;
+Open the path-entry box (see section \ref{sec: mini}).\\
+\hline
+Shell Command...&amp;
+Open the shell command box (see section \ref{sec: mini}).\\
+\hline
+Select If...&amp;
+Select just those files that match the given pattern --- see section
+\ref{sec: SelectIf}.\\
+\hline
+Show ROX-Filer Help&amp;
+Same as selecting ROX-Filer and choosing `Help' from the menu.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+  </para>
+</section>
+
+<section>
+  <title><anchor id="SendTo"/>The send to menu</title>
+  <para>
+
+The `Send To' menu provides a quick way to send some files to an application.
+The filer scans all the `SendTo' directories in your CHOICESPATH and
+lists the contents on this menu. To change which applications appear
+here you should choose the `Customise' item from the bottom of the
+menu to create and open your own SendTo directory. Applications can
+be symlinked into this directory by dragging them in with Control
+and Shift held down.
+
+Opening the Send To menu via the main menu is rather slow, so it is
+normally opened by clicking the Menu mouse button over a file while
+holding the Shift key down.
+
+  </para>
+</section>
+
+</chapter>
+
+<chapter>
+  <title>The pinboard and panels</title>
+  <para>
+
+Sections \ref{run_pin} and \ref{run_pan} explain how to turn the
+pinboard and panels on. Once on, you may drop items from filer windows
+onto the them to pin them up. Clicking on a pinned item acts just
+like clicking on it in a filer window. You can drag pinned icons just
+like normal icons and you can right-click on one to see the popup
+menu.
+
+Drag pinned icons with the middle mouse button to move them around
+(they snap to a grid on the pinboard). Changes to the pinboard and
+panel are automatically saved. Clicking on pinned icons with Control
+held down selects and unselects them. Click on the background to unselect
+them all.
+
+If the panel has so many icons that they can't all be shown at once
+then you can scroll it by dragging the blank area in the middle.
+
+\textbf{IMPORTANT:} Pinning a file does \textbf{not} copy it, it merely
+creates a shortcut to the original file. If you delete the file, then
+you've lost it! Removing a pinned file from its pinboard or panel
+only removes the link. This is different to most other filers...
+  </para>
+
+<section>
+  <title>The pinboard and panel menus</title>
+  <para>
+
+These menus are both the same, and very simple:
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{10cm}|}
+\hline 
+Entry&amp;
+Action\\
+\hline
+\hline 
+ROX-Filer&amp;
+Show the filer's help, edit the options or open your home directory.\\
+\hline 
+File `file'&amp;
+Offers a smaller version of the filer's submenu of the same name.\\
+\hline 
+Edit Item&amp;
+Change the name displayed under the icon, or the pathname the item
+points to.\\
+\hline 
+Show Location&amp;
+Open a directory viewer showing where the file is stored.\\
+\hline 
+Remove Item(s)&amp;
+Remove the selected items from the pinboard or panel.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+\noindent If you are setting up the defaults for multiple users and
+you wish to create a `Home' icon that leads to each user's home directory
+then you should first create a new icon and then use `Edit Icon' to
+change the location to `\textasciitilde{}' and the name to `Home'.
+
+Note that individual applications may add extra menu items to the
+top of this menu when you click over them --- see section \ref{AppDir}
+for details.
+</para>
+</section>
+
+<section>
+  <title>Panel applets</title>
+  <para>
+
+ROX-Filer allows you to run small programs inside the panel --- such
+programs are called \emph{applets}. To run an applet, drag it onto
+the panel from a filer window and instead of the applet's icon being
+shown, the applet will run.
+  </para>
+
+  <procedure><title>To create your own applets (programmers only!):</title>
+
+    <step><para>
+Create a directory for the applet (eg `\texttt{MyApplet}').
+    </para></step>
+
+    <step><para>
+Put an icon called `\texttt{.DirIcon.png}' inside it (so the directory
+appears with an icon).
+    </para></step>
+
+    <step><para>
+Make a `\texttt{Help}' directory inside it for when the user chooses
+`Help' from the menu.
+    </para></step>
+
+    <step><para>
+Create an executable file called `\texttt{AppletRun}'. This will be
+passed the XID of the panel socket window when the directory is dragged
+onto the panel. You can use this to create a GtkSocket widget. An
+example applet (written in python) is available at 
+<ulink url="http://rox.sourceforge.net/applets.php3"/>
+    </para></step>
+
+  </procedure>
+</section>
+</chapter>
+
+<chapter>
+  <title><anchor id="vfs"/>Virtual file systems</title>
+  <para>
+
+Some types of file can be represented as a directory. A typical example
+is a zip file, which contains an entire directory structure in compressed
+form. It is often useful to be able to open up such a file as if it
+was a real directory, and the VFS system allows you to do this.
+
+To use this feature you must have one or both of the following:
+
+\begin{itemize}
+\item A system such as AVFS<citation>AVFS</citation> which causes the kernel to support
+various Virtual File Systems directly. This is the best option since
+all programs will be able to access the contents of the VFS. You may
+require root access to install such a system, however, and it is not
+available on all platforms.
+\item Support for the Midnight Commander VFS library compiled into ROX-Filer.
+This happens automatically when you compile ROX-Filer if it can find
+the VFS library --- this means having \texttt{libvfs.so} (or \texttt{libvfs.a})
+in a system library directory or in the directory in the environment
+variable \texttt{LD\_LIBRARY\_PATH}. In this case, you will be able
+to view the directory structure and copy files out of it, but not
+change it. Support for this may be added later. Midnight Commander
+is part of the GNOME project.
+
+
+When using libvfs, the menu structure is slightly different --- `Open
+AVFS' is replaced by the `Open VFS' submenu. This is simply a short-cut
+for using the path-entry box (explained below), so if you want to
+use a VFS not listed on the menu you can type in the path directly,
+eg:
+
+\texttt{/home/fred/archive.zip\#uzip/}
+
+\noindent Don't forget the final slash!
+
+\end{itemize}
+</para>
+
+<section>
+  <title>Step by step example of adding VFS support</title>
+  <para>
+
+This assumes that you have the Midnight Commander source in a directory
+called `mc'. You might need to replace \texttt{libvfs.so} with \texttt{libvfs.a}.
+
+<screen>
+$ cd mc
+$ ./configure
+$ cd vfs
+$ make libvfs.so
+</screen>
+
+\begin{itemize}
+\item If you have the root password then install the library in a system
+library directory as normal.
+\item If not,
+
+<screen>
+$ mkdir ~/lib
+$ cp libvfs.so ~/lib
+$ cd ~/Apps/ROX-Filer
+</screen>
+Edit the \texttt{AppRun} file to include this as the \emph{second}
+line:
+
+<command>LD_LIBRARY_PATH=$HOME/lib; export LD_LIBRARY_PATH</command>
+
+This will ensure that ROX-Filer will look for the library in the new
+\texttt{\textasciitilde{}/lib} directory. Finally, recompile:
+
+<screen>
+$ ./AppRun --compile
+
+...
+
+checking for mc_stat in -lvfs... yes
+</screen>
+
+If you saw that line then it's worked! Well done!
+
+\end{itemize}
+
+  </para>
+  </section>
+</chapter>
+
+<chapter>
+  <title><anchor id="mini"/>The mini-buffer</title>
+  <para>
+
+The mini-buffer is a white bar that appears along the bottom of the
+window and allows you to enter some text. Press Escape to get rid
+of it again. It behaves in different ways depending on how you invoked
+it:
+  </para>
+
+<section>
+  <title>The path-entry box</title>
+  <para>
+
+This allows you to type in a path directly. As you type the display
+is updated to show the item entered visually. The main use is to find
+a file in a large directory quickly, but you can also use it for navigating
+between directories, or for selecting a full pathname from somewhere
+else and pasting it directly into the path-entry box.
+
+\vspace{0.3cm}
+{\centering \begin{tabular}{|c|p{8cm}|}
+\hline 
+Key&amp;
+Action\\
+\hline
+Return&amp;
+Open the currently selected item.\\
+\hline
+Tab&amp;
+Shell-style tab completion.\\
+\hline
+Up, Down&amp;
+Select the previous/next matching entry.\\
+\hline
+\end{tabular}\par}
+\vspace{0.3cm}
+
+If you start entering a name beginning with a `.' then the `Show Hidden'
+feature is temporarily turned on so that the file can be shown.
+
+Tab completion tries to fill in as many characters for you as it can.
+For example, if there are two files in a directory called `save-mail-nov-1999'
+and `save-mail-dec-1999' then typing 'save' and pressing Tab will
+expand `save' to `save-mail-' and beep to indicate that the match
+is not complete. If you use tab completion on a directory and it is
+unique then the filer will automatically change into the directory.
+This behavior should be familiar to shell users.
+
+
+\subsubsection*{Example}
+
+Let's say you want to locate the documentation for Wine in the directory
+/usr/doc (which is usually very large). Here's how you could do it:
+
+\begin{enumerate}
+\item Open the minibuffer by choosing `Enter Path' from the Window menu.
+I usually bind this function to the slash (`/') key.
+\item Press CTRL-U to delete the existing contents --- this moves you to
+the root directory.
+\item Type `u\Tab{}do\Tab{}wi\Tab{}'. As you type, the cursor will move
+to the correct subdirectory. If it beeps when you press Tab then you
+need to supply more letters.
+\end{enumerate}
+</para>
+</section>
+
+<section>
+  <title>The shell command box</title>
+  <para>
+
+This provides a quick way of entering shell commands if you don't
+want to open an xterm. If you don't know what shell commands are,
+skip this section!
+
+Just type in the command and press Return to execute it. Up and Down
+arrows move through previously entered commands. Tab does shell-style
+completion. Clicking on an item inserts its name into the minibuffer.
+If some items are selected then they are assigned to the positional
+parameters \texttt{\$1}, \texttt{\$2}, etc.
+
+Opening the minibuffer with a selection adds \texttt{{}``\$@''}
+to the end of the command --- this expands to all the selected files.
+If there is no selection, but a file is under the cursor, the name
+of that file is inserted.
+
+
+\subsubsection*{Examples}
+
+To untar a \texttt{.tgz} archive:
+
+\begin{enumerate}
+\item Open the minibuffer by choosing `Shell Command' from the Window menu.
+I usually bind this to the bang (`!') key.
+\item Type `\texttt{tar xzf}' and click on the file. The leading space is
+automatically inserted.
+\item Press Return to execute it.
+\end{enumerate}
+To print all the selected files:
+
+\begin{enumerate}
+\item Open the shell command minibuffer.
+\item Type \texttt{`lpr}' at the beginning of the line and press Return.
+\end{enumerate}
+
+\subsubsection*{Notes}
+
+\begin{itemize}
+\item Be careful; you will not be asked to confirm! If in doubt, start the
+command with `\texttt{echo}' so that it will be displayed rather than
+executed.
+\item `sh' is always used as the name of the shell to run (mainly because
+bash and csh treat positional parameters differently). However, PATH
+is searched to find it so you can still use another shell if you want
+by naming it sh and putting it in your path.
+\item Commands execute in the background, so you can say:
+
+<command>sleep 240; xmessage Time to go!</command>
+\end{itemize}
+</para>
+</section>
+
+<section>
+  <title><anchor id="SelectIf"/>The conditional selection box</title>
+  <para>
+
+Use this if you want to automatically select all files in the directory
+which match a condition. The syntax for the conditions is given in
+section \ref{sec: Searching}. For example, to select all files larger
+than 5Mb:
+
+\begin{enumerate}
+\item Open the Select If minibuffer.
+\item Type `\texttt{Size &gt; 5Mb}' and press Return.
+\end{enumerate}
+Just those files over 5 Mb in size will be selected. The expressions
+you can enter are in the same form as described in section \ref{sec: Searching},
+except that `\texttt{prune}' has no effect since the contents of directories
+are never checked anyway.
+
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Action windows</title>
+  <para>
+
+Action windows are those boxes that appear while you're doing a Copy/Move/Link/etc
+operation. The status line at the top of the window shows the current
+directory or object that the window is processing. The scrolling area
+below is the log area --- it shows what has been done and may display
+questions here.
+
+At the bottom are four buttons and, sometimes, some options. The buttons
+work as follows:
+
+\begin{description}
+\item [Quiet]will do simple operations without asking you to confirm each
+one. By turning this on and off during an operation you can use it
+like a pause button.
+\item [Yes]answers yes to the question displayed in the log area.
+\item [No]answers no to the question displayed in the log area.
+\item [Abort]kills the current operation (if any) and closes the action
+window.
+\end{description}
+You can control which actions get started automatically (without you
+having to click on Quiet at the start) from the Options window.
+  </para>
+
+<section>
+  <title>Action window options</title>
+  <para>
+
+Some actions have options, which appear as option boxes at the bottom
+of the window. They are:
+
+\begin{itemize}
+\item `Force' means that the filer won't treat non-writeable files as special.
+Normally, it confirms the deletion even if Quiet is pressed. Note
+that you still can't remove files from non-writeable directories because
+in that case you really don't have permission.
+\item `Brief' prevents the filer logging a message every time it does something.
+Use this to speed things up if large numbers of messages are being
+logged.
+\item `Recurse' means that doing something to a directory will also do the
+same thing to all its contents, and the contents of any subdirectories,
+and so on.
+\end{itemize}
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title><anchor id="Searching"/>Searching</title>
+  <para>
+
+The Find feature looks through all the selected files and directories
+and any subdirectories (recursively) looking for items that match
+a particular expression.
+
+If you know the name of a file then just enter it in the `Expression:'
+box, enclosed in single quotes. For example, to find a file called
+`log' you would enter:
+
+<command>'log'</command>
+
+Remember to use normal quotes, not double quotes (\texttt{{}``})
+or back-quotes (\texttt{`})!
+
+As the filer finds matching files they are added to the results list.
+Clicking on an entry in the list opens a viewer showing the file you
+clicked on. The filer will use the same window to view other results
+(so, if you want the results shown in separate windows you must explicitly
+create a new window from the Window menu).
+  </para>
+
+<section>
+  <title>Wildcards</title>
+  <para>
+
+You can also put shell-style wildcard characters inside the quotes,
+for example:
+
+  <simplelist>
+
+    <member><command>'*.html'</command></member>
+    <member><command>'Report.*'</command></member>
+    <member><command>'Draft[1-5]'</command></member>
+    <member><command>'main.[ch]'</command></member>
+
+  </simplelist>
+
+Look at the \texttt{glob(7)} manpage if you want to know more about
+shell wildcards.
+
+If the pattern you enter contains a slash (`/') character then the
+pattern is matched against the file's full path, otherwise only the
+leafname is used. That is, \texttt{'{*}tmp{*}'} will find `tmp' and
+`tmpfile' but not `/tmp/file' --- \texttt{'/{*}tmp{*}'} will find
+all three.
+  </para>
+</section>
+
+<section>
+  <title>Simple tests</title>
+  <para>
+
+As well as finding files by their names you can also find them by
+various other attributes. Note that `file' is used here to mean anything
+that can appear in the filesystem --- including directories, devices
+and so on.
+
+\smallskip\noindent These look at the type of the item being checked:
+
+\begin{description}
+\item [IsReg]matches any regular (ie, normal) file.
+\item [IsLink]matches symlinks.
+\item [IsDir]matches directories.
+\item [IsChar]matches character device files.
+\item [IsBlock]matches block device files.
+\item [IsDev]matches block or character device files.
+\item [IsPipe]matches pipes.
+\item [IsSocket]matches sockets.
+\end{description}
+These look at the permissions set on the file --- see section \ref{sec: Permissions}.
+
+\begin{description}
+\item [IsSUID]matches files which have the Set-UID bit set.
+\item [IsSGID]matches files which have the Set-GID bit set.
+\item [IsSticky]matches files with the sticky bit set.
+\item [IsReadable]matches files which you can read from.
+\item [IsWriteable]matches files which you can write to.
+\item [IsExecutable]matches files which you can execute.
+\end{description}
+And a couple of other useful ones:
+
+\begin{description}
+\item [IsEmpty]finds empty files (ie, those whose length is 0 bytes).
+\item [IsMine]finds files which you own.
+\end{description}
+  </para>
+</section>
+
+<section>
+  <title>Logic operators</title>
+  <para>
+
+You can combine the above tests in various ways to perform more advanced
+searches. An expression is actually made up of a list of \emph{cases},
+separated by commas. The filer will try to match each case in turn
+until one matches or there are no more cases left. For example, to
+search for files with several possible endings:
+
+<command>'*.gif', '*.htm', '*.html'</command>
+
+Further, each of the cases is actually a list of conditions. The case
+only matches if all of its conditions are met. So, to find a directory
+called \texttt{lib} or a regular file ending in \texttt{.so}:
+
+<command>IsDir 'lib', IsReg '*.so'</command>
+
+You can negate a condition by putting a \texttt{!} in front of it
+and you can use a sub-expression as a condition by bracketing it,
+like this:
+
+<screen>
+!(IsDir, IsReg)
+
+!IsDir !IsReg
+
+Not isdir and not isreg
+</screen>
+All three do the same thing.
+  </para>
+</section>
+
+<section>
+  <title>Comparisons</title>
+  <para>
+
+You can also compare various values using the operators \texttt{&lt;,
+&lt;=, =, !=, &gt;, &gt;=} (for less-than, less-than-or-equal-to, equal-to,
+not-equal-to, greater-than and greater-than-or-equal-to). When comparing
+times, you may find it helpful to use \texttt{after} and \texttt{before}
+instead of \texttt{&gt;} and \texttt{&lt;} to make things clearer.
+
+The following are read from the file being checked and may be used
+for the values being compared:
+
+\begin{description}
+\item [atime]The time that the file was last accessed.
+\item [ctime]The time that the file's status was last changed.
+\item [mtime]The time that the file's contents were last modified.
+\item [size]The size of the file.
+\item [inode]The file's inode (index) number.
+\item [nlinks]The number of links to this file. That is, the number of directory
+entries which refer to this file. Note that symlinks don't count as
+references.
+\item [uid]The User ID of the file.
+\item [gid]The Group ID of the file.
+\item [blocks]The number of disk blocks being used by the file.
+\end{description}
+Times are measured as seconds since the Unix Epoch (00:00:00 UTC,
+January 1, 1970). Sizes are in bytes. When specifying constants to
+compare these values with you may use various keywords to scale the
+value:
+
+\begin{description}
+\item [Byte(s)]has no effect, but looks better.
+\item [Kb]multiplies by 1024, so 2Kb is the same as 2048.
+\item [Mb]multiplies by \( 1024^{2} \), ie 1024 Kb.
+\item [Sec(s)]has no effect, but looks nice.
+\item [Min(s)]multiplies by 60 to get minutes.
+\item [Hour(s), Day(s), Week(s), Year(s)]likewise convert to the relevant
+unit.
+\item [Ago]makes the time in the past relative to when the check is done.
+\item [Hence]makes the time in the future.
+\item [Now]is short for `\texttt{0 Secs Hence}'.
+\end{description}
+Some examples should make this all a bit clearer!
+
+<screen>
+mtime after 1 day ago
+
+size &gt; 10 Mb
+
+IsReg and nlinks &gt; 1
+</screen>
+The first finds files modified within the last 24 hours. You could
+use \texttt{&gt;} instead of \texttt{after,}but it's not so clear what
+is meant. The second finds files larger than 10 Mb and the last finds
+regular files with more than one directory entry.
+
+Be careful though --- the filer doesn't check the context of the modifiers,
+so \texttt{size &gt; 1 day ago} is allowed, although it doesn't make
+much sense! Also, forgetting to use \texttt{ago} or \texttt{hence}
+will cause odd effects (the time will be measured relative to the
+Epoch rather than the current time). Finally, don't use = with times
+--- \texttt{atime = 1 day ago} looks for a file accessed \emph{exactly}
+86400 seconds ago$\ldots$
+
+  </para>
+</section>
+
+<section>
+  <title>Specials</title>
+  <para>
+
+\begin{description}
+\item [System(Command)]executes `Command' on the file. The test succeeds
+if the command returns an exit status of zero. A `\%' character in
+`Command' is replaced by the full path of the file being checked.
+System is a very slow test to perform, so do it last if possible.
+For example, if you're looking for a .c file containing the word `main',
+do
+
+<screen>
+'{*}.c' system(grep -q main "\thinspace{}\%\thinspace{}")
+</screen>
+so that the grep is only performed for files ending in .c (as opposed
+to only checking that the file ends in .c if it contains the word
+`main').
+
+\item [Prune]Always fails!%
+\footnote{Note that this is the opposite of the \noun{find(1)} command.
+} However, if it gets evaluated at all then it prevents the filer from
+checking inside the current directory. Remember the order in which
+the filer checks the expression!
+\end{description}
+Examples:
+
+<screen>
+'{*}.old' system(rm \%)
+
+'src' prune, '{*}.c'
+</screen>
+The first deletes each file ending in \texttt{.old}. The second looks
+for \texttt{.c} files, but does not bother checking inside directories
+called \texttt{src}. The expression is evaluated like this:
+
+\vspace{0.3cm}
+{\centering \resizebox*{!}{2.5in}{\includegraphics{Prune.eps}} \par}
+\vspace{0.3cm}
+
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Options</title>
+  <para>
+
+You can configure various aspects of ROX-Filer from the Options box.
+Choose `Options...' from a filer window menu to open it. 
+
+At the bottom of the window are four buttons:
+
+\begin{description}
+\item [Save]puts all your choices into effect, and also saves them into
+your Choices directory for next time ROX-Filer is loaded. ROX-Filer
+will never save any preferences to disk unless you click on the `Save'
+button in the options window. Exactly where choices are loaded from
+and saved to is controlled by the \texttt{CHOICESPATH} environment
+variable --- see <citation>Choices</citation> for details.
+\item [OK]puts your choices into effect without writing anything to disk.
+\item [Apply]works like OK, but without closing the Options window.
+\item [Cancel]closes the options box and forgets any changes you made.
+\end{description}
+Many of the options in the Options window have tooltips --- hold the
+mouse pointer over the option to find out what it does.
+
+  </para>
+
+<section>
+  <title>Translation options</title>
+  <para>
+
+You can choose which language the filer will display messages in from
+here. There are also two special choices:
+
+\begin{description}
+\item [None]causes the untranslated English messages to be used;
+\item [From LANG]will use the value of the LANG environment variable as
+the name of the file to load from ROX-Filer/Messages.
+\end{description}
+
+  </para>
+</section>
+
+<section>
+  <title>Display options</title>
+  <para>
+
+\begin{itemize}
+\item `Ignore case when sorting' treats upper and lower case letters as
+equivalent when sorting. If this is off then `Zoo' comes before `animal',
+for example.
+\item `Ignore eXecutable bit for known extensions' means that when a file
+has a known extension (eg `.gif') the executable bit is ignored. This
+is useful if you have files on a Windows-type filesystem which are
+being shown as executable programs. However, it prevents a file such
+as `script.sh' from being treated as a program.
+\item `Directories always come first' means that all directories are sorted
+and displayed at the top, then all the other items are sorted and
+displayed below. With this option off, directories are mixed in with
+the other files.
+\item `Large wrap width' sets the maximum width for a file's name in `Large
+Icons' display mode before the text will wrap onto two lines. In Huge
+Icons mode, the wrap width is 50\% larger than this value.
+\item `Max Small Icons width' --- as above, but applies when the display
+is in `Small Icons' display mode.
+\end{itemize}
+The remaining options provide the default settings for newly opened
+windows --- they correspond to choosing styles from the Display menu.
+Icon size is also used when switching off the details display from
+the toolbar.
+
+  </para>
+</section>
+
+<section>
+  <title>Pinboard options</title>
+  <para>
+
+If you are using the pinboard features (see section \ref{run_pin})
+then you can choose how the text under each icon is displayed. If
+you have a fairly uniform background then you may like to choose `No
+background', which simply draws the text directly over the desktop
+background. However, users with more `noisy' backdrops may find such
+text hard to read; selecting `Rectangular background slab' will draw
+a solid rectangle behind the text to make it easier to read.
+
+You may also change the foreground and background colours used for
+the text by clicking on the colour slabs in the Options window.
+
+\begin{itemize}
+\item `Keep icons within screen limits' prevents icons from going partly
+off the side of the screen.
+\item `Icon grid step' controls how finely the icons may be positioned.
+\end{itemize}
+
+  </para>
+</section>
+
+<section>
+  <title>Panel options</title>
+  <para>
+
+If you are using panels (see section \ref{run_pan}) then this section
+lets you choose which icons will have textual labels underneath them.
+You can have labels on all icons, on no icons, or on all icons except
+applications.
+
+  </para>
+</section>
+
+<section>
+  <title>Action window options</title>
+  <para>
+
+You can choose to start some operations automatically, without waiting
+for you to click on Quiet. Select each operation that you want to
+auto-start here. You can also set the default state for each of the
+options that appear inside action windows.
+
+  </para>
+</section>
+
+<section>
+  <title>Toolbar options</title>
+  <para>
+
+\begin{itemize}
+\item `Unshade the tools you want:' allows you to set which tools should
+appear on the toolbar. Click on the buttons below to shade and unshade
+them --- shaded tools will not be shown on filer window toolbars.
+\item `Toolbar type' allows you to choose what kind of toolbars you want.
+\textbf{None} means that windows will not have a toolbar, \textbf{Normal}
+provides a small bar of icons, and \textbf{Large} displays larger
+buttons, with textual labels.
+\item `Show totals of items' shows the number of items displayed in a filer
+window, as well as the number of hidden items (if any) on the toolbar.
+When there's a selection, it shows the number of selected items and
+their combined size (excluding directories).
+\end{itemize}
+See section \ref{sec: Toolbar} for details.
+
+  </para>
+</section>
+
+<section>
+  <title>Filer window options</title>
+  <para>
+
+\begin{itemize}
+\item `Automatically resize filer windows' can be used to control when windows
+are automatically resized:
+
+\begin{itemize}
+\item `...never' turns off auto-resizing. Windows must be resized manually.
+\item `...when changing the display style' will resize the window automatically
+when you change the icon size or the type of details to be displayed.
+\item `...always' causes the window to resize whenever it seems useful (that
+is, when changing to a different directory or when switching between
+display styles).
+\end{itemize}
+\item `Window size limit' sets the largest size (as a percentage of the
+screen size) that the auto-resizer will resize windows to.
+\item `Unique windows' prevents you from having two windows showing the
+same directory. Opening a second view onto a directory closes the
+first.
+\end{itemize}
+The next two options control what happens when you press tab in the
+path entry minibuffer:
+
+\begin{itemize}
+\item `Beep if Tab-completion fails' --- beep if there is no match, or there
+are several possible completions, each starting differently.
+\item `Beep if there are several matches' --- beep if there are several
+matches, even though some letters were added.
+\end{itemize}
+
+  </para>
+</section>
+
+<section>
+  <title>Drag-And-Drop options</title>
+  <para>
+
+\begin{itemize}
+\item ROX-Filer uses the standard XDND protocol for drag-and-drop. This
+protocol recommends that URIs should contain the hostname of the computer
+that the resource is on so that the program receiving the data can
+determine whether it can get the data directly or whether it must
+go via the X-server. However, many older programs (particularly GNOME
+applications) get confused by the hostname and fail to load the data
+correctly. If `Don't use hostnames' is on then the hostname part is
+omitted and ROX-Filer will work with these applications BUT you can't
+drag data to a program running on a different machine.
+\item `Allow dragging to icons in filer windows' controls what happens when
+you drop files onto icons in filer windows. If on then drops onto
+directories will save the data inside the directory, while dropping
+onto programs will invoke the program on that data. If off then drops
+anywhere inside a filer window act like drops onto the window background
+--- that is, the data will be saved into the directory being displayed.
+\item `Directories spring open' controls what happens when you hold a file
+over a directory while dragging it. If on, the directory will `spring
+open' after a short pause, allowing you to navigate to any directory
+during a drag. You can also hold the pointer over the Home and Up
+buttons on the toolbar for a similar effect. You need to have the
+previous option enabled for this to have any effect on files displayed
+in a directory.
+\item `Spring delay' sets how long, in thousanths of a second, the filer
+will wait before spring opening a directory as described above. If
+the above option is turned off, then this has no effect.
+\end{itemize}
+
+  </para>
+</section>
+
+<section>
+  <title>Menu options</title>
+  <para>
+
+The `Xterm here' program is the command used when you choose `Xterm
+here' from the menu. You can replace it with another command such
+as `gnome-terminal', `konsole', or anything else.
+
+  </para>
+</section>
+
+<section>
+  <title>Mouse bindings</title>
+  <para>
+
+\begin{itemize}
+\item `New window on button 1' swaps the actions of the two non-menu buttons
+when opening directories. This is provided for people who are used
+to the RISC OS mouse bindings.
+\item `Menu on button 2' swaps the actions of buttons 2 and 3 so that the
+middle button brings up the menus. This is provided for people who
+are used to the RISC OS mouse bindings.
+\item `Single-click navigation' means that clicking on a file or directory
+will open it. If off, clicking on files selects them instead --- you
+must double click on a file to open it.
+\end{itemize}
+As an alternative to using the options window to put menu on button-2,
+some people prefer to use the command `\texttt{xmodmap -e \char`\"{}pointer
+= 1 3 2\char`\"{}}', which makes the right mouse button button-2 and
+the middle one button-3 (this affects all programs, not just ROX-Filer).
+
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Filetypes</title>
+  <para>
+
+All files have a MIME type in the form `\texttt{text/plain}'. Here,
+`\texttt{text}' is the \emph{media type} and `\texttt{plain}' is the
+\emph{sub-type}. ROX-Filer uses a file's name to decide what its MIME
+type is, and then uses the MIME type to decide what icon to give it
+and what program to use when you open the file.
+
+  </para>
+
+<section>
+  <title><anchor id="RunAction"/>The run action box</title>
+  <para>
+
+This box appears when you choose `Set Run Action...' from the File
+menu, and is used to set which application is loaded when you click
+on a file.
+
+For example, let's say you want to set things up so that opening a
+`.gif' file loads it into the Gimp. First, right-click over a gif
+image to open the menu and choose `Set Run Action...' from the File
+submenu. Then, you have a choice of two methods to set the run action:
+
+
+\subsubsection*{Setting the run action by drag-and-drop}
+
+Drag the Gimp (from a filer window, a panel or the pinboard) onto
+the area marked `Drop a suitable application here'. From now on, clicking
+on a GIF file will load it into the Gimp.
+
+
+\subsubsection*{Setting the run action by entering a shell command}
+
+Type:
+
+<screen>
+gimp {}``\$1''
+</screen>
+into the box labelled `Enter a shell command' and press Return. `\texttt{\$1}'
+will be replaced by the name of the file you click on when this command
+is used. As before, clicking on any GIF image will now load it into
+the Gimp.
+
+
+\subsubsection{Setting the default media-type handlers}
+
+Whichever method you use to set the action you have the choice of
+setting the run action just for that type, or setting the default
+for all files with that media-type which don't already have a specific
+action. Since the Gimp can load many types of image, it makes sense
+to select the `Set default for all `image/&lt;anything&gt;'' option so you
+don't have to do it again for image/jpeg files and so on. However,
+this only affects types that don't already have a specific action
+(ie, those that would have brought up an error box if you tried to
+open them).
+
+  </para>
+</section>
+
+<section>
+  <title>How filetypes are stored</title>
+  <para>
+
+ROX-Filer uses three sub-directories in your Choices directory for
+filetypes:
+
+\begin{description}
+\item [MIME-info]contains files which specify what the MIME types for files
+should be, based on their extentions. All the files in all the MIME-info
+directories are scanned when the filer loads. ROX-Filer comes with
+a file containing many such rules --- this is installed into the MIME-info
+directory by the rox-base package.
+
+
+Many applications now come with a file called `something.mime'; copy
+these files into your MIME-info directory to make ROX-Filer automatically
+recognise the new extensions.
+
+\item [MIME-types]contains symlinks, one for each MIME type, which point
+to programs that can handle files of that type. To set what program
+is run when you click on the file you should normally use the `Set
+Run Action' feature (see section \ref{sec: RunAction}). However,
+you can also set the actions manually --- for example, to make opening
+an HTML file load it into Netscape:
+
+\begin{enumerate}
+\item Find the Netscape application and go to `Link...' on the menu.
+\item Enter `text\_html' as the name for the link and drag the icon from
+the Link box into the MIME-types directory.
+\end{enumerate}
+You can also put actual programs in here as well as links if you want
+to.
+
+\item [MIME-icons]contains the images used to display each type of file.
+So the filer will try to display an HTML file using the icon `MIME-icons/text\_html.xpm'.
+\end{description}
+In both MIME-types and MIME-icons directories you can also provide
+default actions/images for each media type. For example, if `text\_html'
+isn't found then the filer will try simply using `text'.
+
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title><anchor id="AppDir"/>Application directories</title>
+  <para>
+
+An application directory is a directory which can be run as an application.
+It contains all the resources of an application --- source code, binaries,
+documentation and so on. Keeping everything in one place make installation
+and uninstallation much easier for users. You can also keep multiple
+versions of a program by simply having several application directories.
+You may move and rename them as you please. Application directories
+are easier to use and install and are more secure too%
+\footnote{Because you can compile an application as a user and then simply copy
+it as root rather than having to run an install script you are free
+from the danger of running untrusted code as root. All you have to
+watch out for is setuid binaries.
+}.
+
+The following files are treated as special by ROX-Filer:
+
+\begin{description}
+\item [AppRun]is executed when you click on the directory --- make sure
+it is executable (use the Permissions box)!
+\item [.DirIcon.png]is the image used to represent the directory (this works
+even if there is no AppRun).
+\item [Help]is the directory to be opened when you choose `Help' from the
+File menu.
+\item [AppInfo.xml]contains extra information about an application (see
+below).
+\item [AppIcon.xpm]is used if \texttt{.DirIcon.png} is missing (for backwards
+compatibility).
+\end{description}
+Have a look at the ROX-Filer application directory for a full example.
+
+Note: For security reasons, an application directory must have the
+same owner as the AppRun file inside.
+
+  </para>
+
+<section>
+  <title>The AppInfo file</title>
+  <para>
+
+`\texttt{AppInfo.xml}' is an XML file with the following structure
+(any elements may be omitted, and the file itself is optional):
+
+<screen>
+&lt;?xml version=\char`\"{}1.0\char`\"{}?&gt;
+
+&lt;AppInfo&gt;
+
+  &lt;Summary&gt;A graphical file manager&lt;/Summary&gt;
+
+  &lt;About&gt;
+
+    &lt;Purpose&gt;File manager&lt;/Purpose&gt;
+
+    &lt;Version&gt;1.1.3 (07-May-2001)&lt;/Version&gt;
+
+    &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
+
+    &lt;License&gt;GNU General Public License&lt;/License&gt;
+
+    &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
+
+  &lt;/About&gt;
+
+  &lt;AppMenu&gt;
+
+    &lt;Item label=\char`\"{}Enable pinboard\char`\"{} option=\char`\"{}-p=Default\char`\"{}/&gt;
+
+    &lt;Item label=\char`\"{}Disable pinboard\char`\"{} option=\char`\"{}-p=\char`\"{}/&gt;
+
+  &lt;/AppMenu&gt;
+
+&lt;/AppInfo&gt;
+</screen>
+\begin{description}
+\item [Summary]is displayed in a tooltip when the mouse is held over the
+application.
+\item [About]contains a list of fields which are shown in the `File Info'
+box for the application (any element names may be used, but the above
+are suggested).
+\item [AppMenu]is a list of extra menu items to display for the application.
+When one is chosen, \texttt{AppRun} is called with \emph{option} as
+its only argument.
+\end{description}
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Internationalisation</title>
+  <para>
+
+  </para>
+
+<section>
+  <title><anchor id="LANG"/>Selecting a translation</title>
+  <para>
+
+ROX-Filer is able to translate many of its messages, provided suitable
+translation files are provided: 
+
+\begin{enumerate}
+\item Open the Options box from the menu, 
+\item Select a language from the menu at the top,
+\item Click on Save and restart the filer for the new setting to take full
+effect.
+\end{enumerate}
+  </para>
+</section>
+
+<section>
+  <title>Creating a new translation</title>
+  <para>
+
+\begin{enumerate}
+\item Go into the \texttt{src} directory and create the file `\texttt{messages.pot}':
+
+<screen>
+$ cd ROX-Filer/src
+$ make messages.pot
+</screen>
+
+\item Copy the file into the `\texttt{po}' subdirectory under \texttt{src}
+as \( \langle \hbox {name}\rangle \hbox {\tt .po} \). Eg, if your
+language is referred to as `ml' (`my language'):
+
+<screen>$ cp messages.pot po/ml.po</screen>
+
+\item Load the copy into a text editor.
+\item Fill in the translations, which are all blank to start with.
+\item Run the `\texttt{make-mo}' script to create the binary file which
+ROX-Filer can use. You will need the GNU gettext package for this.
+If you don't have it then just send me the \texttt{.po} file and I'll
+convert it for you.
+
+<screen>
+$ cd ROX-Filer/src/po
+
+$ ./make-mo ml
+
+Created file ../../Messages/ml.gmo OK
+</screen>
+
+\item Edit `\texttt{ROX-Filer/Options.xml}' so that your language is listed,
+restart the filer and select it from the Options box (see section
+\ref{sec: LANG}).
+\item Submit the \texttt{.po} file to me so that I can include it in future
+releases of the filer.
+\end{enumerate}
+  </para>
+</section>
+
+<section>
+  <title>Updating an existing translation</title>
+  <para>
+
+\begin{enumerate}
+\item Go into the directory containing the \texttt{.po} files and run the
+\texttt{update-po} script. This checks the source code for new and
+changed strings and updates all the translation files.
+
+<screen>
+$ cd ROX-Filer/src/po
+
+$ ./update-po
+</screen>
+\item Edit the file by hand as before, filling in the new blanks and updating
+out-of-date translations. Look out for `fuzzy' entries where \texttt{update-po}
+has made a guess; check it's correct and remove the `fuzzy' line.
+\item Run \texttt{make-mo} as before.
+\item Submit the updated file to me.
+\end{enumerate}
+See the \texttt{gettext} info page for more instructions on creating
+a translation.
+
+
+  </para>
+</section>
+</chapter>
+
+<chapter>
+  <title>Hacking</title>
+  <para>
+
+This is a quick start guide for people who want to modify the source
+code. If you make useful changes or fix bugs, please send patches
+to me or to the mailing list. Tell me which version you're using!
+
+  </para>
+
+<section>
+  <title>Compiling</title>
+  <para>
+
+The first time you compile the program you need to do `\texttt{AppRun
+-{}-compile}', but in future you only need to run `\texttt{make}'
+in the `\texttt{src}' directory when you change the \texttt{.c} and
+\texttt{.h} files. You might want to run `\texttt{make depend}' too.
+
+  </para>
+</section>
+
+<section>
+  <title>Creating and applying patches</title>
+  <para>
+
+When people make small modifications to the sources they will often
+distribute them as \emph{patch files} --- usually on the mailing list.
+To apply a patch, go into the 'src' directory and run patch with the
+patch file. Then recompile, like this:
+
+<screen>
+$ cd ROX-Filer/src
+$ patch &lt; patchfile
+$ ../AppRun -{}-compile
+</screen>
+
+You can remove the patch by simply repeating the above sequence ---
+patch will detect that the patch is already applied and offer to remove
+it.
+
+To create a patch you should first get the latest version of the filer
+from CVS (instructions on using CVS can be found on the web-site).
+Modify the program as you please. Create the patch using `\texttt{cvs
+diff}' from the appropriate directory:
+
+<screen>
+$ cvs diff -c &gt; my_patch
+</screen>
+
+This creates a human- and machine-readable patch file. Submit this
+to the mailing list. The are many reasons for posting patches rather
+that the modified files:
+
+\begin{itemize}
+\item They are smaller, and hence shouldn't bounce. They are also quicker
+to download for people with slow connections.
+\item People can see what they're getting into before applying them!
+\item Patches can (usually) be applied to slightly modified versions of
+the sources. This means that people can apply several patches without
+each new one overwriting the others.
+\end{itemize}
+  </para>
+</section>
+
+<section>
+  <title>Autoconf</title>
+  <para>
+
+Here's a quick explanation of the autoconf system in case you haven't
+used it before. See `info autoconf' for full details.
+
+There's a file called `configure.in' which contains various tests
+(`info autoconf'). You run `autoconf' and it reads through the file
+and generates a shell script to perform the tests, saving it as `configure'.
+`configure' is normally distributed with the program because not everyone
+has autoconf.
+
+You then run `configure' (in fact, let the `AppRun' script do it because
+it passes it some arguments), which performs all the tests. It reads
+in `Makefile.in' and `config.h.in' and fills in the missing values
+with the test results to produce `Makefile' and `config.h'.
+
+You run `make', which creates .o files from the .c files and links
+to produce ROX-Filer.
+  </para>
+</section>
+
+<section><title>Data-structures</title>
+  <para>
+
+The diagram below shows some of the major structures found in the
+filer and the relationships between them.
+
+\vspace{0.3cm}
+{\centering \resizebox*{1\textwidth}{!}{\includegraphics{Structs.eps}} \par}
+\vspace{0.3cm}
+
+To summarise, each window has its own \textbf{FilerWindow} structure.
+This structure has pointers to a \textbf{Collection} (which is the
+widget which actually displays the files) and to a \textbf{Directory},
+which is used to cache the directory contents. Both \textbf{Collection}
+and \textbf{Directory} have pointers to (the same) \textbf{DirItem}s,
+each of which corresponds to one filesystem object. Several \textbf{FilerWindow}s
+may share the same \textbf{Directory}. While scanning is in progress
+the \textbf{Directory} keeps a list of the new items it has found
+(\emph{new\_items}) and the items which have changed in some way (\emph{up\_items}).
+It periodically notifies the filer window of the changes-so-far by
+calling all the functions in the \emph{users} list (use \emph{attach()}
+and \emph{detach()} to add and remove functions to or from the list).
+  </para>
+</section>
+</chapter>
+
+<bibliography>
+  <title>References</title>
+
+<bibliomixed>
+  <abbrev>ROX</abbrev><citetitle>The ROX desktop,
+  <ulink url="http://rox.sourceforge.net"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>RISC OS</abbrev><citetitle>RISC OS,
+  <ulink url="http://www.riscos.com"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>GTK+</abbrev><citetitle>GTK+ Toolkit,
+  <ulink url="http://www.gtk.org"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>GNOME</abbrev><citetitle>The GNOME desktop,
+  <ulink url="http://www.gnome.org"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>DND</abbrev><citetitle>The Drag and Drop protocol,
+  <ulink url="http://www.newplanetsoftware.com/xdnd/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>XDS</abbrev><citetitle>The X Direct Save protocol,
+  <ulink url="http://www.newplanetsoftware.com/xds/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>Choices</abbrev><citetitle>The ROX Choices system,
+  <ulink url="http://rox.sourceforge.net/choices.php3"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>enlightenment</abbrev><citetitle>Enlightenment,
+  <ulink url="http://www.enlightenment.org"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>AVFS</abbrev><citetitle>AVFS - A Virtual File System,
+  <ulink url="http://sourceforge.net/projects/avf/"/></citetitle>
+</bibliomixed>
+
+</bibliography>
+
+</book>
