@@ -90,7 +90,7 @@ static void got_data_raw(GtkWidget 		*widget,
 			guint32             	time);
 static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
-			 GtkSelectionData 	*selection_data,
+			 const char	 	*selection_data,
 			 guint32             	time);
 static gboolean drag_drop(GtkWidget 	  *widget,
 			  GdkDragContext  *context,
@@ -137,6 +137,7 @@ const char *drop_dest_bookmark = "drop_dest_bookmark";	/* Add to bookmarks */
 GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
+GdkAtom text_x_moz_url;
 GdkAtom application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
@@ -153,6 +154,7 @@ void dnd_init(void)
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
+	text_x_moz_url = gdk_atom_intern("text/x-moz-url", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
 	xa_string = gdk_atom_intern("STRING", FALSE);
@@ -437,6 +439,7 @@ void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults)
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"text/x-moz-url", 0, TARGET_MOZ_URL},
 		{"XdndDirectSave0", 0, TARGET_XDS},
 		{"application/octet-stream", 0, TARGET_RAW},
 	};
@@ -508,12 +511,14 @@ const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 	{
 		/* A normal directory */
 		if (provides(context, text_uri_list) ||
+				provides(context, text_x_moz_url) ||
 				provides(context, XdndDirectSave0))
 			return drop_dest_dir;
 	}
 	else
 	{
 		if (provides(context, text_uri_list) ||
+				provides(context, text_x_moz_url) ||
 				provides(context, application_octet_stream))
 			return drop_dest_prog;
 	}
@@ -591,6 +596,8 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 	}
 	else if (provides(context, text_uri_list))
 		target = text_uri_list;
+	else if (provides(context, text_x_moz_url))
+		target = text_x_moz_url;
 	else if (provides(context, application_octet_stream))
 		target = application_octet_stream;
 	else
@@ -667,6 +674,36 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		g_list_free(uris);
 }
 
+/* Convert Mozilla's text/x-moz-uri into a text/uri-list */
+static void got_moz_uri(GtkWidget 		*widget,
+			GdkDragContext 		*context,
+			GtkSelectionData	*selection_data,
+			guint32        		time)
+{
+	gchar *utf8, *uri_list, *eol;
+
+	utf8 = g_utf16_to_utf8((gunichar2 *) selection_data->data,
+			(glong) selection_data->length,
+			NULL, NULL, NULL);
+
+	eol = utf8 ? strchr(utf8, '\n') : NULL;
+	if (!eol)
+	{
+		delayed_error("Invalid UTF16 from text/x-moz-url target");
+		g_free(utf8);
+		gtk_drag_finish(context, FALSE, FALSE, time);
+		return;
+	}
+
+	*eol = '\0';
+	uri_list = g_strconcat(utf8, "\r\n", NULL);
+	g_free(utf8);
+
+	got_uri_list(widget, context, uri_list, time);
+
+	g_free(uri_list);
+}
+
 /* Called when some data arrives from the remote app (which we asked for
  * in drag_drop).
  */
@@ -696,7 +733,11 @@ static void drag_data_received(GtkWidget      	*widget,
 			got_data_raw(widget, context, selection_data, time);
 			break;
 		case TARGET_URI_LIST:
-			got_uri_list(widget, context, selection_data, time);
+			got_uri_list(widget, context, selection_data->data,
+					time);
+			break;
+		case TARGET_MOZ_URL:
+			got_moz_uri(widget, context, selection_data, time);
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);
@@ -836,7 +877,7 @@ static void got_data_raw(GtkWidget 		*widget,
  */
 static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
-			 GtkSelectionData 	*selection_data,
+			 const char 		*selection_data,
 			 guint32             	time)
 {
 	GList		*uri_list;
@@ -850,8 +891,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
 
-	/*printf("got_uri_list\n");*/
-	uri_list = uri_list_to_glist(selection_data->data);
+	uri_list = uri_list_to_glist(selection_data);
 
 	if (type == drop_dest_bookmark)
 	{

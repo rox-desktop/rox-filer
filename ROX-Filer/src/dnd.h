@@ -15,6 +15,7 @@ enum
 	TARGET_UTF8,
 	TARGET_XDS,
 	TARGET_STRING,
+	TARGET_MOZ_URL,
 };
 
 typedef enum {
