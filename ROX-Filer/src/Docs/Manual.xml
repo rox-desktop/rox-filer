@@ -770,7 +770,12 @@ Large, With...</entry><entry>
 	</para></listitem>
 
 	<listitem><para><guimenuitem>Times</guimenuitem>
-	shows the times the file was last accessed, modifed and changed.\dag
+	shows the times the file was last accessed, modifed and changed.
+	Reading a file's contents or listing a directory updates the
+	<emphasis>access time</emphasis>; modifying the contents of a file or
+	the list of files in a directory updates the <emphasis>modification
+	time</emphasis>; changing a file's owner or permissions updates the
+	<emphasis>change time</emphasis>.
 	</para></listitem>
 
 	</itemizedlist>
@@ -814,10 +819,6 @@ which is which!
 </entry></row>
 </tbody></tgroup></informaltable>
 
-\noindent\dag\thinspace{} Reading a file's contents or listing a directory
-updates the <emphasis>access time</emphasis>; modifying the contents of a file or
-the list of files in a directory updates the <emphasis>modification time</emphasis>;
-changing a file's owner or permissions updates the <emphasis>change time</emphasis>.
   </para>
 
 <sect2><title><anchor id="Permissions"/>Permissions</title>
@@ -861,26 +862,33 @@ people who own the files even if they have write permission on the
 directory itself.</para></listitem></varlistentry>
 
 </variablelist>
+<!-- XXX: Make this appear underlined! -->
+For example, <computeroutput>_r_w_x_,rwx,r-x/---</computeroutput> means
+that the owner of the file is the same as the effective user of
+<application>ROX-Filer</application> (basically, you own the file), you and
+members of the file's group have read, write and execute permission and other
+people have only read and execute permission. There are no special flags set.
 
-For example, `\texttt{\underbar{rwx}}\texttt{,rwx,r-x/---}' means
-that the owner of the file is the same as the effective user of <application>ROX-Filer</application>
-(basically, you own the file), you and members of the file's group
-have read, write and execute permission and other people have only
-read and execute permission. There are no special flags set.
+The rules which determine which permissions apply may vary slightly between
+operating systems, but a rough guide is:
 
-The rules which determine which permissions apply may vary slightly
-between operating systems, but a rough guide is:
+<itemizedlist>
 
-\begin{itemize}
-\item If the <emphasis>effective user ID</emphasis> of the process is equal to the file's
+<listitem><para>If the <emphasis>effective user ID</emphasis> of the process is equal to the file's
 owner, then the owner permissions apply.
-\item Otherwise, if the <emphasis>effective group ID</emphasis> of the process is equal
+</para></listitem>
+
+<listitem><para>Otherwise, if the <emphasis>effective group ID</emphasis> of the process is equal
 to the file's group OR the file's group is one of the process's <emphasis>supplemental
 groups</emphasis> then the group permissions apply.
-\item Otherwise, the `other' permissions apply. The <emphasis>real user ID</emphasis>
+</para></listitem>
+
+<listitem><para>Otherwise, the `other' permissions apply. The <emphasis>real user ID</emphasis>
 and <emphasis>real group ID</emphasis> have no effect (except that a process may
 set its real IDs to its effective IDs).
-\end{itemize}
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect2>
@@ -901,7 +909,7 @@ mode. Target mode is mainly useful with the `Single click navigation'
 option and keys bound to the various menu entries.
 
 Note that individual applications may add extra menu items to the
-top of this submenu when you click over them --- see section \ref{AppDir}
+top of this submenu when you click over them --- see <xref linkend="AppDir"/>
 for details.
 
 
@@ -917,7 +925,7 @@ Rename...</entry><entry>
 Change the name used for this object, or move it between directories.
 </entry></row><row><entry>
 Link...</entry><entry>
-Create a symbolic link to this name. \dag
+Create a symbolic link to this name.
 </entry></row><row><entry>
 Shift Open    </entry><entry>
 Opens applications as directories, files as text/plain, mount pointsby
@@ -964,9 +972,10 @@ Search for files by specifying various conditions --- see section
 \ref{sec: Searching}.
 </entry></row>
 </tbody></tgroup></informaltable>
+  </para>
 
-
-\noindent\dag\thinspace{}A symbolic link stores the <emphasis>location</emphasis>
+  <formalpara><title>Note about symlinks:</title>
+A symbolic link stores the <emphasis>location</emphasis>
 of another file. Deleting the symlink doesn't affect the other file.
 Deleting the other file means that the symlink won't work. There are
 two types of symbolic link --- Relative and Absolute. An absolute
@@ -976,7 +985,7 @@ to the target (eg `../fred/MyFile'). If the target file is never going
 to move then you want an absolute link, but if the target may move
 (and the symlink will be moved with it) then you want a relative link.
 
-  </para>
+  </formalpara>
 </sect1>
 
 <sect1>
@@ -1165,7 +1174,7 @@ then you should first create a new icon and then use `Edit Icon' to
 change the location to `~' and the name to `Home'.
 
 Note that individual applications may add extra menu items to the
-top of this menu when you click over them --- see section \ref{AppDir}
+top of this menu when you click over them --- see <xref linkend="AppDir"/>
 for details.
 </para>
 </sect1>
@@ -1349,10 +1358,14 @@ Select the previous/next matching entry.
 </entry></row>
 </tbody></tgroup></informaltable>
 
+  </para>
 
+  <para>
 If you start entering a name beginning with a `.' then the `Show Hidden'
 feature is temporarily turned on so that the file can be shown.
+  </para>
 
+  <para>
 Tab completion tries to fill in as many characters for you as it can.
 For example, if there are two files in a directory called `save-mail-nov-1999'
 and `save-mail-dec-1999' then typing 'save' and pressing Tab will
@@ -1360,23 +1373,35 @@ expand `save' to `save-mail-' and beep to indicate that the match
 is not complete. If you use tab completion on a directory and it is
 unique then the filer will automatically change into the directory.
 This behavior should be familiar to shell users.
+  </para>
 
-
-\subsubsection*{Example}
-
+  <informalexample>
 Let's say you want to locate the documentation for Wine in the directory
-/usr/doc (which is usually very large). Here's how you could do it:
+<filename>/usr/doc</filename> (which is usually very large).
+Here's how you could do it:
 
-\begin{enumerate}
-\item Open the minibuffer by choosing `Enter Path' from the Window menu.
-I usually bind this function to the slash (`/') key.
-\item Press CTRL-U to delete the existing contents --- this moves you to
-the root directory.
-\item Type `u\Tab{}do\Tab{}wi\Tab{}'. As you type, the cursor will move
-to the correct subdirectory. If it beeps when you press Tab then you
-need to supply more letters.
-\end{enumerate}
-</para>
+<orderedlist>
+
+<listitem><para>
+Open the minibuffer by choosing <guimenuitem>Enter Path</guimenuitem> from the
+<guimenu>Window</guimenu> menu.
+I usually bind this function to the slash (<keycap>/</keycap>) key.
+</para></listitem>
+
+<listitem><para>
+Press <accel>CTRL-U</accel> to delete the existing contents --- this
+moves you to the root directory.
+</para></listitem>
+
+<listitem><para>
+Type <userinput>u&lt;Tab&gt;do&lt;Tab&gt;wi&lt;Tab&gt;</userinput>.
+As you type, the cursor will move to the correct subdirectory.
+If it beeps when you press Tab then you need to supply more letters.
+</para></listitem>
+
+</orderedlist>
+
+  </informalexample>
 </sect1>
 
 <sect1>
@@ -1386,52 +1411,80 @@ need to supply more letters.
 This provides a quick way of entering shell commands if you don't
 want to open an xterm. If you don't know what shell commands are,
 skip this section!
-
-Just type in the command and press Return to execute it. Up and Down
-arrows move through previously entered commands. Tab does shell-style
-completion. Clicking on an item inserts its name into the minibuffer.
+  </para><para>
+Just type in the command and press <keycap>Return</keycap> to execute it.
+<keycap>Up</keycap> and <keycap>Down</keycap> arrows move through previously
+entered commands.
+<keycap>Tab</keycap> does shell-style completion.
+Clicking on an item inserts its name into the minibuffer.
 If some items are selected then they are assigned to the positional
-parameters \texttt{\$1}, \texttt{\$2}, etc.
-
-Opening the minibuffer with a selection adds \texttt{{}``\$@''}
+parameters <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
+  </para><para>
+Opening the minibuffer with a selection adds <computeroutput>$@</computeroutput>
 to the end of the command --- this expands to all the selected files.
 If there is no selection, but a file is under the cursor, the name
 of that file is inserted.
+  </para>
 
+  <informalexample>Examples:
 
-\subsubsection*{Examples}
+<orderedlist><title>To untar a <filename>.tgz</filename> archive:</title>
 
-To untar a \texttt{.tgz} archive:
+<listitem><para>
+Open the minibuffer by choosing <guimenuitem>Shell Command</guimenuitem> from
+the <guimenu>Window</guimenu> menu.
+I usually bind this to the bang (<keycap>!</keycap>) key.
+</para></listitem>
 
-\begin{enumerate}
-\item Open the minibuffer by choosing `Shell Command' from the Window menu.
-I usually bind this to the bang (`!') key.
-\item Type `\texttt{tar xzf}' and click on the file. The leading space is
-automatically inserted.
-\item Press Return to execute it.
-\end{enumerate}
-To print all the selected files:
+<listitem><para>
+Type <userinput>tar xzf</userinput> and click on the file.
+The leading space is automatically inserted.
+</para></listitem>
 
-\begin{enumerate}
-\item Open the shell command minibuffer.
-\item Type \texttt{`lpr}' at the beginning of the line and press Return.
-\end{enumerate}
+<listitem><para>
+Press <keycap>Return</keycap> to execute it.
+</para></listitem>
 
-\subsubsection*{Notes}
+</orderedlist>
 
-\begin{itemize}
-\item Be careful; you will not be asked to confirm! If in doubt, start the
-command with `\texttt{echo}' so that it will be displayed rather than
-executed.
-\item `sh' is always used as the name of the shell to run (mainly because
-bash and csh treat positional parameters differently). However, PATH
-is searched to find it so you can still use another shell if you want
-by naming it sh and putting it in your path.
-\item Commands execute in the background, so you can say:
+<orderedlist><title>To print all the selected files:</title>
+
+<listitem><para>
+Open the shell command minibuffer.
+</para></listitem>
+
+<listitem><para>
+Type <userinput>lpr</userinput> at the beginning of the line and press
+<keycap>Return</keycap>.
+</para></listitem>
+
+</orderedlist>
+
+</informalexample>
+
+<itemizedlist><title>Notes</title>
+
+<listitem><para>
+Be careful; you will not be asked to confirm! If in doubt, start the
+command with <userinput>echo</userinput> so that it will be displayed
+rather than executed.
+</para></listitem>
+
+<listitem><para>
+<refentrytitle>sh</refentrytitle> is always used as the name of the shell
+to run (mainly because <refentrytitle>bash</refentrytitle> and
+<refentrytitle>csh</refentrytitle> treat positional parameters differently).
+However, <envar>PATH</envar> is searched to find it so you can still use
+another shell if you want by naming it sh and putting it in your path.
+</para></listitem>
+
+<listitem><para>
+Commands execute in the background, so you can say:
 
 <command>sleep 240; xmessage Time to go!</command>
-\end{itemize}
-</para>
+</para></listitem>
+
+</itemizedlist>
 </sect1>
 
 <sect1>
@@ -1439,19 +1492,25 @@ by naming it sh and putting it in your path.
   <para>
 
 Use this if you want to automatically select all files in the directory
-which match a condition. The syntax for the conditions is given in
-section \ref{sec: Searching}. For example, to select all files larger
-than 5Mb:
+which match a condition.
 
-\begin{enumerate}
-\item Open the Select If minibuffer.
-\item Type `\texttt{Size &gt; 5Mb}' and press Return.
-\end{enumerate}
+<orderedlist><title>For example, to select all files larger than 5Mb:</title>
+
+<listitem><para>
+Open the Select If minibuffer.
+</para></listitem>
+
+<listitem><para>
+Type <userinput>Size &gt; 5Mb</userinput> and press <keycap>Return</keycap>.
+</para></listitem>
+
+</orderedlist>
+
 Just those files over 5 Mb in size will be selected. The expressions
-you can enter are in the same form as described in section \ref{sec: Searching},
-except that `\texttt{prune}' has no effect since the contents of directories
-are never checked anyway.
-
+you can enter are in the same form as described in the
+<xref linkend="Searching"/> section, except that
+<userinput>prune</userinput> has no effect since the contents of
+directories are never checked anyway.
 
   </para>
 </sect1>
@@ -1461,24 +1520,39 @@ are never checked anyway.
   <title>Action windows</title>
   <para>
 
-Action windows are those boxes that appear while you're doing a Copy/Move/Link/etc
+Action windows are those boxes that appear while you're doing a
+Copy/Move/Link/etc
 operation. The status line at the top of the window shows the current
 directory or object that the window is processing. The scrolling area
 below is the log area --- it shows what has been done and may display
 questions here.
-
+  </para><para>
 At the bottom are four buttons and, sometimes, some options. The buttons
 work as follows:
 
-\begin{description}
-\item [Quiet]will do simple operations without asking you to confirm each
+<variablelist>
+
+<varlistentry><term>Quiet</term><listitem><para>
+will do simple operations without asking you to confirm each
 one. By turning this on and off during an operation you can use it
 like a pause button.
-\item [Yes]answers yes to the question displayed in the log area.
-\item [No]answers no to the question displayed in the log area.
-\item [Abort]kills the current operation (if any) and closes the action
+</para></listitem></varlistentry>
+
+<varlistentry><term>Yes</term><listitem><para>
+answers yes to the question displayed in the log area.
+</para></listitem></varlistentry>
+
+<varlistentry><term>No</term><listitem><para>
+answers no to the question displayed in the log area.
+</para></listitem></varlistentry>
+
+<varlistentry><term>Abort</term><listitem><para>
+kills the current operation (if any) and closes the action
 window.
-\end{description}
+</para></listitem></varlistentry>
+
+</variablelist>
+
 You can control which actions get started automatically (without you
 having to click on Quiet at the start) from the Options window.
   </para>
@@ -1490,25 +1564,35 @@ having to click on Quiet at the start) from the Options window.
 Some actions have options, which appear as option boxes at the bottom
 of the window. They are:
 
-\begin{itemize}
-\item `Force' means that the filer won't treat non-writeable files as special.
+<itemizedlist>
+
+<listitem><para>
+`Force' means that the filer won't treat non-writeable files as special.
 Normally, it confirms the deletion even if Quiet is pressed. Note
 that you still can't remove files from non-writeable directories because
 in that case you really don't have permission.
-\item `Brief' prevents the filer logging a message every time it does something.
+</para></listitem>
+
+<listitem><para>
+`Brief' prevents the filer logging a message every time it does something.
 Use this to speed things up if large numbers of messages are being
 logged.
-\item `Recurse' means that doing something to a directory will also do the
+</para></listitem>
+
+<listitem><para>
+`Recurse' means that doing something to a directory will also do the
 same thing to all its contents, and the contents of any subdirectories,
 and so on.
-\end{itemize}
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
 </chapter>
 
 <chapter>
-  <title><anchor id="Searching"/>Searching</title>
+  <title><anchor id="Searching" xreflabel="Searching"/>Searching</title>
   <para>
 
 The Find feature looks through all the selected files and directories
@@ -2100,7 +2184,9 @@ isn't found then the filer will try simply using `text'.
 </chapter>
 
 <chapter>
-  <title><anchor id="AppDir"/>Application directories</title>
+  <title><anchor id="AppDir" xreflabel="Application directories"/>
+    Application directories
+  </title>
   <para>
 
 An application directory is a directory which can be run as an application.
