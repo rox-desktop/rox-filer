@@ -440,8 +440,8 @@ static void collection_realize(GtkWidget *widget)
 	gdk_window_set_user_data(widget->window, widget);
 
 	gdk_window_set_background(widget->window,
-			&widget->style->base[GTK_STATE_INSENSITIVE]);
-	if (widget->style->bg_pixmap[GTK_STATE_INSENSITIVE])
+			&widget->style->bg[GTK_STATE_NORMAL]);
+	if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
 		collection->bg_gc = create_bg_gc(widget);
 
 	/* Try to stop everything flickering horribly */
@@ -449,7 +449,7 @@ static void collection_realize(GtkWidget *widget)
 
 	set_vadjustment(collection);
 
-	bg = &widget->style->base[GTK_STATE_INSENSITIVE];
+	bg = &widget->style->bg[GTK_STATE_NORMAL];
 	fg = &widget->style->fg[GTK_STATE_NORMAL];
 	xor_values.function = GDK_XOR;
 	xor_values.foreground.pixel = fg->pixel ^ bg->pixel;
@@ -525,7 +525,7 @@ static void collection_set_style(GtkWidget *widget,
 	if (GTK_WIDGET_REALIZED(widget))
 	{
 		gdk_window_set_background(widget->window,
-				&widget->style->base[GTK_STATE_INSENSITIVE]);
+				&widget->style->bg[GTK_STATE_NORMAL]);
 
 		if (collection->bg_gc)
 		{
