@@ -19,6 +19,6 @@ void choices_init(char *prog_name);
 ChoicesList *choices_find_load_all(char *leaf, char *dir_name);
 char *choices_find_path_load_shared(char *leaf, char *shared_name);
 char *choices_find_path_load(char *leaf);
-char *choices_find_path_save(char *leaf);
+char *choices_find_path_save(char *leaf, int create);
 
 #endif /* _CHOICES_H */

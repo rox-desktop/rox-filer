@@ -160,9 +160,9 @@ ChoicesList *choices_find_load_all(char *leaf, char *dir_name)
 /* Return a pathname to save to, or NULL if saving isn't possible.
  * Otherwise, it points to a static buffer which is valid until the next call
  * to the choices system.
- * Missing directories are created automatically.
+ * If 'create' is true then missing directories are created automatically.
  */
-char *choices_find_path_save(char *leaf)
+char *choices_find_path_save(char *leaf, int create)
 {
 	char *choices_path;
 
@@ -175,10 +175,11 @@ char *choices_find_path_save(char *leaf)
 	choices_path = getenv("CHOICESPATH");
 
 	if (choices_path)
-		return make_choices_path(choices_path, leaf, 1, program_name);
+		return make_choices_path(choices_path, leaf, create,
+				program_name);
 	else
 		return make_choices_path(default_user_choices(), leaf,
-				1, program_name);
+				create, program_name);
 }
 
 /* Like strdup(), but also reports an error to stderr on failure */

@@ -299,7 +299,7 @@ static void save_options()
 {
 	char	*menurc;
 
-	menurc = choices_find_path_save("menus");
+	menurc = choices_find_path_save("menus", TRUE);
 	if (menurc)
 		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 
