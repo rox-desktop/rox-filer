@@ -587,7 +587,7 @@ static gint key_press_event(GtkWidget	*widget,
 	{
 		case GDK_Escape:
 			filer_target_mode(filer_window, NULL, NULL, NULL);
-			break;
+			return FALSE;
 		case GDK_Return:
 			return_pressed(filer_window, event);
 			break;

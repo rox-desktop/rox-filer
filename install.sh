@@ -28,6 +28,17 @@ function confirm_or_die () {
 	done
 }
 
+# Installs an executable file in Choices if it isn't there already.
+function install_if_missing () {
+	dest="$CHOICES/$1"
+	if [ -e "$CHOICES/$1" ]; then
+		echo "'$dest' already exists - skipping..."
+	else
+		echo "Installing '$dest'"
+		install -m 755 "Choices/$1" $dest
+	fi
+}
+
 cd `dirname $0`
 
 ./ROX-Filer/AppRun -v 2> /dev/null
@@ -95,14 +106,9 @@ if [ -d "$CHOICES/MIME-icons" ]; then
 WARNING: You already have a $CHOICES/MIME-icons
 directory --- any icons you have modified will be overwritten!
 
-Continue? [y/n]
+Continue?
 EOF
-	echo -n ">>> "
-	read REPLY
-	case $REPLY in
-		[yY]*) ;;
-		*) die "OK, back up the ones you want and try again...";;
-	esac
+	confirm_or_die
 fi
 
 endir "$CHOICES/MIME-icons"
@@ -112,13 +118,13 @@ endir "$CHOICES/MIME-types"
 echo "Installing icons..."
 cp Choices/MIME-icons/* "$CHOICES/MIME-icons"
 
-echo "Installing other files. If you haven't modified these since the "
-echo "last installation then answer 'yes' to any questions about overwriting "
-echo "files. Otherwise, you'll have to decide what to do!"
-cp -i Choices/MIME-types/* "$CHOICES/MIME-types"
-cp -i Choices/MIME-info/* "$CHOICES/MIME-info"
 echo
-echo "OK, done that. Next step..."
+echo "Installing handlers..."
+install_if_missing MIME-types/application_postscript
+install_if_missing MIME-types/text
+
+echo "Installing rules for guessing MIME types."
+install -m 644 Choices/MIME-info/Standard "$CHOICES/MIME-info"
 
 cat << EOF
 
@@ -215,13 +221,12 @@ EOF
 else
 	cat << EOF
 OK, skipping installation of the 'rox' script.
-To run the filer in future, use:
 
-	\$ $APPDIR/ROX-Filer/AppRun.
+******  To run the filer in future, use:
+******  \$ $APPDIR/ROX-Filer/AppRun
 EOF
 fi
 
-sleep 3
 cat << EOF
 
 	****************************

@@ -2,6 +2,14 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+27-Aug-2000
+~~~~~~~~~~~
+Fixed a slight bug with lasso boxes, which could cause them to be drawn in
+the wrong place. Install script no longer overwrites the default run
+actions; if the user has changed them leave them alone!
+(Martin Ward noted that symlinking to an executable would cause the
+executable to be destroyed on upgrade!)
+
 24-Aug-2000
 ~~~~~~~~~~~
 More improvements to the event handling. Seems to be working again at

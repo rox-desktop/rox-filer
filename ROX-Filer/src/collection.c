@@ -1149,6 +1149,7 @@ static gint collection_motion_notify(GtkWidget *widget,
 				     GdkEventMotion *event)
 {
 	Collection    	*collection;
+	int		x, y;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -1156,16 +1157,22 @@ static gint collection_motion_notify(GtkWidget *widget,
 
 	collection = COLLECTION(widget);
 
-	if (collection->lasso_box)
+	if (!collection->lasso_box)
+		return FALSE;
+
+	if (event->window != widget->window)
+		gdk_window_get_pointer(widget->window, &x, &y, NULL);
+	else
 	{
-		remove_lasso_box(collection);
-		collection->drag_box_x[1] = event->x;
-		collection->drag_box_y[1] = event->y;
-		add_lasso_box(collection);
-		return TRUE;
+		x = event->x;
+		y = event->y;
 	}
-	
-	return FALSE;
+
+	remove_lasso_box(collection);
+	collection->drag_box_x[1] = x;
+	collection->drag_box_y[1] = y;
+	add_lasso_box(collection);
+	return TRUE;
 }
 
 static void add_lasso_box(Collection *collection)
