@@ -890,6 +890,8 @@ static void set_vadjustment(Collection *collection)
 
 	collection->vadj->lower = 0.0;
 	collection->vadj->upper = collection->item_height * rows;
+	if (!collection->vadj->upper)
+		collection->vadj->upper = 1;
 
 	collection->vadj->step_increment =
 		MIN(collection->vadj->upper, collection->item_height / 4);
