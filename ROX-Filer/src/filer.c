@@ -33,6 +33,8 @@ static void draw_item(GtkWidget *widget,
 			gpointer data,
 			gboolean selected,
 			GdkRectangle *area);
+void show_menu(Collection *collection, GdkEventButton *event,
+		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
 
 static void filer_window_destroyed(GtkWidget 	*widget,
@@ -138,6 +140,10 @@ static void draw_item(GtkWidget *widget,
 	GdkGC		*gc = selected ? widget->style->white_gc
 				       : widget->style->black_gc;
 	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
+	GdkFont	*font = widget->style->font;
+	int	text_x = area->x + ((area->width - item->text_width) >> 1);
+	int	text_y = area->y + area->height - font->descent - 2;
+	int	text_height = font->ascent + font->descent;
 
 	/*
 	gdk_draw_rectangle(widget->window,
@@ -172,14 +178,26 @@ static void draw_item(GtkWidget *widget,
 		gdk_gc_set_clip_origin(gc, 0, 0);
 	}
 	
+	if (selected)
+		gtk_paint_flat_box(widget->style, widget->window, 
+				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				text_x, text_y - font->ascent,
+				item->text_width,
+				text_height);
+
 	gdk_draw_text(widget->window,
 			widget->style->font,
 			selected ? widget->style->white_gc
 				 : widget->style->black_gc,
-			area->x + ((area->width - item->text_width) >> 1),
-			area->y + area->height -
-				widget->style->font->descent - 2,
-		 	item->leafname, strlen(item->leafname));
+			text_x, text_y,
+			item->leafname, strlen(item->leafname));
+}
+
+void show_menu(Collection *collection, GdkEventButton *event,
+		int number_selected, gpointer user_data)
+{
+	printf("[ show menu ]\n");
 }
 
 static int sort_by_name(const void *item1, const void *item2)
@@ -229,6 +247,8 @@ void filer_opendir(char *path)
 			open_item, filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			filer_window_destroyed, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "show_menu",
+			show_menu, filer_window);
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
