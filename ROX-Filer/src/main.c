@@ -17,6 +17,7 @@
 #include "menu.h"
 #include "dnd.h"
 
+/* XXX: Maybe we shouldn't do so much work in a signal handler? */
 static void child_died(int signum)
 {
 	int	    	status;

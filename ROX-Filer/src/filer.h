@@ -21,7 +21,8 @@ enum
 {
 	ITEM_FLAG_SYMLINK 	= 0x1,	/* Is a symlink */
 	ITEM_FLAG_APPDIR  	= 0x2,	/* Contains /AppInfo */
-	ITEM_FLAG_MOUNT_POINT  	= 0x4,	/* Is in /etc/fstab */
+	ITEM_FLAG_MOUNT_POINT  	= 0x4,	/* Is in mtab or fstab */
+	ITEM_FLAG_MOUNTED  	= 0x8,	/* Is in /etc/mtab */
 };
 
 struct _FilerWindow

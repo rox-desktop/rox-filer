@@ -7,6 +7,8 @@
 
 /* menu.c - code for handling the popup menu */
 
+#include <sys/wait.h>
+
 #include <gtk/gtk.h>
 
 #include "filer.h"
@@ -21,6 +23,7 @@ GtkAccelGroup	*filer_keys;
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
+static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 
@@ -44,6 +47,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/_Rename",	    NULL,   	NULL, 0, NULL},
 {"/File/_Help",		    "F1",   	NULL, 0, NULL},
 {"/File/_Info",		    NULL,   	NULL, 0, NULL},
+{"/File/_Mount",	    C_"M",   	mount, 0, NULL},
 {"/File/Separator",	    NULL,   	NULL, 0, "<Separator>"},
 {"/File/_Delete",	    C_"X", 	delete, 0, NULL},
 {"/File/Disk _Usage",	    C_"U", 	NULL, 0, NULL},
@@ -150,6 +154,43 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	for (i = sizeof(start_args) / sizeof(char *); i < argc; i++)
 		g_free(argv[i]);
 	g_free(argv);
+}
+
+static void mount(gpointer data, guint action, GtkWidget *widget)
+{
+	FileItem	*item;
+	int		i;
+	Collection	*collection;
+	char		*error = NULL;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	
+	for (i = 0; i < collection->number_of_items; i++)
+		if (collection->items[i].selected)
+		{
+			item = (FileItem *) collection->items[i].data;
+			if (item->flags & ITEM_FLAG_MOUNT_POINT)
+			{
+				char	*argv[] = {"mount", NULL, NULL};
+				int	child;
+
+				if (item->flags & ITEM_FLAG_MOUNTED)
+					argv[0] = "umount";
+				argv[1] = make_path(window_with_focus->path,
+							item->leafname)->str;
+				child = spawn(argv);
+				if (child)
+					waitpid(child, NULL, 0);
+				else
+					error = "Failed to run mount/umount";
+			}
+		}
+	scan_dir(window_with_focus);
+
+	if (error)
+		report_error("ROX-Filer", error);
 }
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)

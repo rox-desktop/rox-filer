@@ -153,12 +153,12 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			base_type = TYPE_FILE;
 		else if (S_ISDIR(info.st_mode))
 		{
-			struct mntent *ent;
-
 			base_type = TYPE_DIRECTORY;
 
-			ent = g_hash_table_lookup(mount_points, path->str);
-			if (ent)
+			if (g_hash_table_lookup(mtab_mounts, path->str))
+				item->flags |= ITEM_FLAG_MOUNT_POINT
+						| ITEM_FLAG_MOUNTED;
+			else if (g_hash_table_lookup(fstab_mounts, path->str))
 				item->flags |= ITEM_FLAG_MOUNT_POINT;
 		}
 		else if (S_ISBLK(info.st_mode))
@@ -287,12 +287,15 @@ static void draw_item(GtkWidget *widget,
 		}
 		else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 		{
+			int	type = item->flags & ITEM_FLAG_MOUNTED
+					? TYPE_MOUNTED
+					: TYPE_UNMOUNTED;
 			gdk_gc_set_clip_mask(gc,
-					default_pixmap[TYPE_MOUNT].mask);
+					default_pixmap[type].mask);
 			gdk_draw_pixmap(widget->window, gc,
-					default_pixmap[TYPE_MOUNT].pixmap,
+					default_pixmap[type].pixmap,
 					0, 0,		/* Source x,y */
-					image_x, area->y + 8,	/* Dest x,y */
+					image_x, area->y + 8, /* Dest x,y */
 					-1, -1);
 		}
 		
@@ -326,6 +329,8 @@ void scan_dir(FilerWindow *filer_window)
 {
 	if (filer_window->dir)
 		stop_scanning(filer_window);
+
+	mount_update();
 	
 	collection_set_item_size(filer_window->collection, 64, 64);
 	collection_clear(filer_window->collection);

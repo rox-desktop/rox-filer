@@ -8,7 +8,8 @@
 #ifndef _MOUNT_H
 #define _MOUNT_H
 
-extern GHashTable *mount_points;
+extern GHashTable *fstab_mounts;
+extern GHashTable *mtab_mounts;
 
 typedef struct _MountPoint MountPoint;
 
@@ -20,5 +21,6 @@ struct _MountPoint
 
 /* Prototypes */
 void mount_init();
+void mount_update();
 
 #endif /* _MOUNT_H */
