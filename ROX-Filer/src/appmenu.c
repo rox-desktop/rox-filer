@@ -97,13 +97,13 @@ int appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 {
 	GList	*next;
 	GtkWidget *sep;
-	int nadded=0;
+	int nadded = 0;
 
-	g_return_if_fail(menu != NULL);
+	g_return_val_if_fail(menu != NULL, 0);
 
 	/* Should have called appmenu_remove() already... */
-	g_return_if_fail(current_menu == NULL);
-	g_return_if_fail(current_items == NULL);
+	g_return_val_if_fail(current_menu == NULL, 0);
+	g_return_val_if_fail(current_items == NULL, 0);
 
 	build_app_menu(app_dir, app_item);
 

@@ -1,4 +1,4 @@
-/* GtkIconTheme - a loader for icon themes
+/* RoxIconTheme - a loader for icon themes
  * gtk-icon-theme.c Copyright (C) 2002, 2003 Red Hat, Inc.
  *
  * This was LGPL; it's now GPL, as allowed by the LGPL. It's also very
@@ -35,7 +35,7 @@
 
 #define DEFAULT_THEME_NAME "hicolor"
 
-static GdkPixbuf *gtk_icon_info_load_icon(GtkIconInfo *icon_info,
+static GdkPixbuf *rox_icon_info_load_icon(RoxIconInfo *icon_info,
 							GError **error);
 
 typedef struct _GtkIconData GtkIconData;
@@ -57,7 +57,7 @@ typedef enum
   ICON_SUFFIX_PNG = 1 << 2,  
 } IconSuffix;
 
-struct _GtkIconThemePrivate
+struct _RoxIconThemePrivate
 {
   guint custom_theme : 1;
   guint pixbuf_supports_svg : 1;
@@ -83,7 +83,7 @@ struct _GtkIconThemePrivate
   GList *dir_mtimes;
 };
 
-struct _GtkIconInfo
+struct _RoxIconInfo
 {
   guint ref_count;
 
@@ -170,29 +170,29 @@ typedef struct
   time_t mtime; /* 0 == not existing or not a dir */
 } IconThemeDirMtime;
 
-static void  rox_icon_theme_class_init (GtkIconThemeClass    *klass);
-static void  rox_icon_theme_init       (GtkIconTheme         *icon_theme);
+static void  rox_icon_theme_class_init (RoxIconThemeClass    *klass);
+static void  rox_icon_theme_init       (RoxIconTheme         *icon_theme);
 static void  rox_icon_theme_finalize   (GObject              *object);
 static void  theme_dir_destroy         (IconThemeDir         *dir);
 
 static void         theme_destroy     (IconTheme        *theme);
-static GtkIconInfo *theme_lookup_icon (IconTheme        *theme,
+static RoxIconInfo *theme_lookup_icon (IconTheme        *theme,
 				       const char       *icon_name,
 				       int               size,
 				       gboolean          allow_svg,
 				       gboolean          use_default_icons);
-static void         theme_subdir_load (GtkIconTheme     *icon_theme,
+static void         theme_subdir_load (RoxIconTheme     *icon_theme,
 				       IconTheme        *theme,
 				       GtkIconThemeFile *theme_file,
 				       char             *subdir);
-static void         do_theme_change   (GtkIconTheme     *icon_theme);
+static void         do_theme_change   (RoxIconTheme     *icon_theme);
 
-static void  blow_themes               (GtkIconTheme    *icon_themes);
+static void  blow_themes               (RoxIconTheme    *icon_themes);
 
 static void  icon_data_free            (GtkIconData          *icon_data);
 
-static GtkIconInfo *icon_info_new             (void);
-static GtkIconInfo *icon_info_new_builtin     (BuiltinIcon *icon);
+static RoxIconInfo *icon_info_new             (void);
+static RoxIconInfo *icon_info_new_builtin     (BuiltinIcon *icon);
 
 static IconSuffix suffix_from_name (const char *name);
 
@@ -214,38 +214,38 @@ rox_icon_theme_get_type (void)
     {
       static const GTypeInfo info =
 	{
-	  sizeof (GtkIconThemeClass),
+	  sizeof (RoxIconThemeClass),
 	  NULL,           /* base_init */
 	  NULL,           /* base_finalize */
 	  (GClassInitFunc) rox_icon_theme_class_init,
 	  NULL,           /* class_finalize */
 	  NULL,           /* class_data */
-	  sizeof (GtkIconTheme),
+	  sizeof (RoxIconTheme),
 	  0,              /* n_preallocs */
 	  (GInstanceInitFunc) rox_icon_theme_init,
 	};
 
-      type = g_type_register_static (G_TYPE_OBJECT, "GtkIconTheme", &info, 0);
+      type = g_type_register_static (G_TYPE_OBJECT, "RoxIconTheme", &info, 0);
     }
 
   return type;
 }
 
-GtkIconTheme *
+RoxIconTheme *
 rox_icon_theme_new (void)
 {
-  return g_object_new (GTK_TYPE_ICON_THEME, NULL);
+  return g_object_new (ROX_TYPE_ICON_THEME, NULL);
 }
 
 static void
-rox_icon_theme_class_init (GtkIconThemeClass *klass)
+rox_icon_theme_class_init (RoxIconThemeClass *klass)
 {
   GObjectClass *gobject_class = G_OBJECT_CLASS (klass);
 
   gobject_class->finalize = rox_icon_theme_finalize;
 
 /**
- * GtkIconTheme::changed
+ * RoxIconTheme::changed
  * @icon_theme: the icon theme
  * 
  * Emitted when the current icon theme is switched or GTK+ detects
@@ -255,18 +255,18 @@ rox_icon_theme_class_init (GtkIconThemeClass *klass)
   signal_changed = g_signal_new ("changed",
 				 G_TYPE_FROM_CLASS (klass),
 				 G_SIGNAL_RUN_LAST,
-				 G_STRUCT_OFFSET (GtkIconThemeClass, changed),
+				 G_STRUCT_OFFSET (RoxIconThemeClass, changed),
 				 NULL, NULL,
 				 g_cclosure_marshal_VOID__VOID,
 				 G_TYPE_NONE, 0);
 
-  /* g_type_class_add_private (klass, sizeof (GtkIconThemePrivate)); */
+  /* g_type_class_add_private (klass, sizeof (RoxIconThemePrivate)); */
 }
 
 static void
-update_current_theme (GtkIconTheme *icon_theme)
+update_current_theme (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv = icon_theme->priv;
+  RoxIconThemePrivate *priv = icon_theme->priv;
 
   if (!priv->custom_theme)
     {
@@ -314,11 +314,11 @@ pixbuf_supports_svg ()
 }
 
 static void
-rox_icon_theme_init (GtkIconTheme *icon_theme)
+rox_icon_theme_init (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
 
-  priv = g_new0(GtkIconThemePrivate, 1);
+  priv = g_new0(RoxIconThemePrivate, 1);
   icon_theme->priv = priv;
 
   priv->custom_theme = FALSE;
@@ -348,16 +348,16 @@ free_dir_mtime (IconThemeDirMtime *dir_mtime)
 }
 
 static void
-do_theme_change (GtkIconTheme *icon_theme)
+do_theme_change (RoxIconTheme *icon_theme)
 {
   blow_themes (icon_theme);
   g_signal_emit (G_OBJECT (icon_theme), signal_changed, 0);
 }
 
 static void
-blow_themes (GtkIconTheme *icon_theme)
+blow_themes (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv = icon_theme->priv;
+  RoxIconThemePrivate *priv = icon_theme->priv;
   
   if (priv->themes_valid)
     {
@@ -378,11 +378,11 @@ blow_themes (GtkIconTheme *icon_theme)
 static void
 rox_icon_theme_finalize (GObject *object)
 {
-  GtkIconTheme *icon_theme;
-  GtkIconThemePrivate *priv;
+  RoxIconTheme *icon_theme;
+  RoxIconThemePrivate *priv;
   int i;
 
-  icon_theme = GTK_ICON_THEME (object);
+  icon_theme = ROX_ICON_THEME (object);
   priv = icon_theme->priv;
 
   g_free (priv->current_theme);
@@ -398,14 +398,14 @@ rox_icon_theme_finalize (GObject *object)
 }
 
 void
-rox_icon_theme_get_search_path (GtkIconTheme      *icon_theme,
+rox_icon_theme_get_search_path (RoxIconTheme      *icon_theme,
 				gchar            **path[],
 				gint              *n_elements)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
   int i;
 
-  g_return_if_fail (GTK_IS_ICON_THEME (icon_theme));
+  g_return_if_fail (ROX_IS_ICON_THEME (icon_theme));
 
   priv = icon_theme->priv;
 
@@ -422,12 +422,12 @@ rox_icon_theme_get_search_path (GtkIconTheme      *icon_theme,
 }
 
 void
-rox_icon_theme_set_custom_theme (GtkIconTheme *icon_theme,
+rox_icon_theme_set_custom_theme (RoxIconTheme *icon_theme,
 				 const gchar  *theme_name)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
 
-  g_return_if_fail (GTK_IS_ICON_THEME (icon_theme));
+  g_return_if_fail (ROX_IS_ICON_THEME (icon_theme));
 
   priv = icon_theme->priv;
 
@@ -451,13 +451,13 @@ rox_icon_theme_set_custom_theme (GtkIconTheme *icon_theme,
 }
 
 static void
-insert_theme (GtkIconTheme *icon_theme, const char *theme_name)
+insert_theme (RoxIconTheme *icon_theme, const char *theme_name)
 {
   int i;
   GList *l;
   char **dirs;
   char **themes;
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
   IconTheme *theme;
   char *path;
   char *contents;
@@ -590,9 +590,9 @@ free_unthemed_icon (UnthemedIcon *unthemed_icon)
 }
 
 static void
-load_themes (GtkIconTheme *icon_theme)
+load_themes (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
   GDir *gdir;
   int base;
   char *dir, *base_name, *dot;
@@ -693,9 +693,9 @@ load_themes (GtkIconTheme *icon_theme)
 }
 
 static void
-ensure_valid_themes (GtkIconTheme *icon_theme)
+ensure_valid_themes (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv = icon_theme->priv;
+  RoxIconThemePrivate *priv = icon_theme->priv;
   GTimeVal tv;
   
   if (priv->themes_valid)
@@ -710,35 +710,35 @@ ensure_valid_themes (GtkIconTheme *icon_theme)
     load_themes (icon_theme);
 }
 
-GtkIconInfo *
-rox_icon_theme_lookup_icon (GtkIconTheme       *icon_theme,
+RoxIconInfo *
+rox_icon_theme_lookup_icon (RoxIconTheme       *icon_theme,
 			    const gchar        *icon_name,
 			    gint                size,
-			    GtkIconLookupFlags  flags)
+			    RoxIconLookupFlags  flags)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
   GList *l;
-  GtkIconInfo *icon_info = NULL;
+  RoxIconInfo *icon_info = NULL;
   UnthemedIcon *unthemed_icon;
   gboolean allow_svg;
   gboolean use_builtin;
   gboolean found_default;
 
-  g_return_val_if_fail (GTK_IS_ICON_THEME (icon_theme), NULL);
+  g_return_val_if_fail (ROX_IS_ICON_THEME (icon_theme), NULL);
   g_return_val_if_fail (icon_name != NULL, NULL);
-  g_return_val_if_fail ((flags & GTK_ICON_LOOKUP_NO_SVG) == 0 ||
-			(flags & GTK_ICON_LOOKUP_FORCE_SVG) == 0, NULL);
+  g_return_val_if_fail ((flags & ROX_ICON_LOOKUP_NO_SVG) == 0 ||
+			(flags & ROX_ICON_LOOKUP_FORCE_SVG) == 0, NULL);
   
   priv = icon_theme->priv;
 
-  if (flags & GTK_ICON_LOOKUP_NO_SVG)
+  if (flags & ROX_ICON_LOOKUP_NO_SVG)
     allow_svg = FALSE;
-  else if (flags & GTK_ICON_LOOKUP_FORCE_SVG)
+  else if (flags & ROX_ICON_LOOKUP_FORCE_SVG)
     allow_svg = TRUE;
   else
     allow_svg = priv->pixbuf_supports_svg;
 
-  use_builtin = (flags & GTK_ICON_LOOKUP_USE_BUILTIN);
+  use_builtin = (flags & ROX_ICON_LOOKUP_USE_BUILTIN);
 
   ensure_valid_themes (icon_theme);
 
@@ -806,47 +806,47 @@ rox_icon_theme_error_quark (void)
 }
 
 GdkPixbuf *
-rox_icon_theme_load_icon (GtkIconTheme         *icon_theme,
+rox_icon_theme_load_icon (RoxIconTheme         *icon_theme,
 			  const gchar          *icon_name,
 			  gint                  size,
-			  GtkIconLookupFlags    flags,
+			  RoxIconLookupFlags    flags,
 			  GError              **error)
 {
-  GtkIconInfo *icon_info;
+  RoxIconInfo *icon_info;
   GdkPixbuf *pixbuf = NULL;
   
-  g_return_val_if_fail (GTK_IS_ICON_THEME (icon_theme), NULL);
+  g_return_val_if_fail (ROX_IS_ICON_THEME (icon_theme), NULL);
   g_return_val_if_fail (icon_name != NULL, NULL);
-  g_return_val_if_fail ((flags & GTK_ICON_LOOKUP_NO_SVG) == 0 ||
-			(flags & GTK_ICON_LOOKUP_FORCE_SVG) == 0, NULL);
+  g_return_val_if_fail ((flags & ROX_ICON_LOOKUP_NO_SVG) == 0 ||
+			(flags & ROX_ICON_LOOKUP_FORCE_SVG) == 0, NULL);
   g_return_val_if_fail (error == NULL || *error == NULL, NULL);
   
   icon_info  = rox_icon_theme_lookup_icon (icon_theme, icon_name, size,
-					   flags | GTK_ICON_LOOKUP_USE_BUILTIN);
+					   flags | ROX_ICON_LOOKUP_USE_BUILTIN);
   if (!icon_info)
     {
-      g_set_error (error, GTK_ICON_THEME_ERROR,  GTK_ICON_THEME_NOT_FOUND,
+      g_set_error (error, ROX_ICON_THEME_ERROR,  ROX_ICON_THEME_NOT_FOUND,
 		   _("Icon '%s' not present in theme"), icon_name);
       return NULL;
     }
 
-  pixbuf = gtk_icon_info_load_icon (icon_info, error);
-  gtk_icon_info_free (icon_info);
+  pixbuf = rox_icon_info_load_icon (icon_info, error);
+  rox_icon_info_free (icon_info);
 
   return pixbuf;
 }
 
 gboolean
-rox_icon_theme_rescan_if_needed (GtkIconTheme *icon_theme)
+rox_icon_theme_rescan_if_needed (RoxIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv;
+  RoxIconThemePrivate *priv;
   IconThemeDirMtime *dir_mtime;
   GList *d;
   int stat_res;
   struct stat stat_buf;
   GTimeVal tv;
 
-  g_return_val_if_fail (GTK_IS_ICON_THEME (icon_theme), FALSE);
+  g_return_val_if_fail (ROX_IS_ICON_THEME (icon_theme), FALSE);
 
   priv = icon_theme->priv;
   
@@ -983,7 +983,7 @@ best_suffix (IconSuffix suffix,
     return ICON_SUFFIX_NONE;
 }
 
-static GtkIconInfo *
+static RoxIconInfo *
 theme_lookup_icon (IconTheme          *theme,
 		   const char         *icon_name,
 		   int                 size,
@@ -1063,7 +1063,7 @@ theme_lookup_icon (IconTheme          *theme,
   
   if (min_dir)
     {
-      GtkIconInfo *icon_info = icon_info_new ();
+      RoxIconInfo *icon_info = icon_info_new ();
       
       suffix = GPOINTER_TO_UINT (g_hash_table_lookup (min_dir->icons, icon_name));
       suffix = best_suffix (suffix, allow_svg);
@@ -1180,7 +1180,7 @@ load_icon_data (IconThemeDir *dir, const char *path, const char *name)
 }
 
 static void
-scan_directory (GtkIconThemePrivate *icon_theme,
+scan_directory (RoxIconThemePrivate *icon_theme,
 		IconThemeDir *dir, char *full_dir)
 {
   GDir *gdir;
@@ -1231,7 +1231,7 @@ scan_directory (GtkIconThemePrivate *icon_theme,
 }
 
 static void
-theme_subdir_load (GtkIconTheme *icon_theme,
+theme_subdir_load (RoxIconTheme *icon_theme,
 		   IconTheme *theme,
 		   GtkIconThemeFile *theme_file,
 		   char *subdir)
@@ -1331,25 +1331,25 @@ icon_data_free (GtkIconData *icon_data)
 }
 
 /*
- * GtkIconInfo
+ * RoxIconInfo
  */
 GType
-gtk_icon_info_get_type (void)
+rox_icon_info_get_type (void)
 {
   static GType our_type = 0;
   
   if (our_type == 0)
-    our_type = g_boxed_type_register_static ("GtkIconInfo",
-					     (GBoxedCopyFunc) gtk_icon_info_copy,
-					     (GBoxedFreeFunc) gtk_icon_info_free);
+    our_type = g_boxed_type_register_static ("RoxIconInfo",
+					     (GBoxedCopyFunc) rox_icon_info_copy,
+					     (GBoxedFreeFunc) rox_icon_info_free);
 
   return our_type;
 }
 
-static GtkIconInfo *
+static RoxIconInfo *
 icon_info_new (void)
 {
-  GtkIconInfo *icon_info = g_new0 (GtkIconInfo, 1);
+  RoxIconInfo *icon_info = g_new0 (RoxIconInfo, 1);
 
   icon_info->ref_count = 1;
   icon_info->scale = -1.;
@@ -1357,10 +1357,10 @@ icon_info_new (void)
   return icon_info;
 }
 
-static GtkIconInfo *
+static RoxIconInfo *
 icon_info_new_builtin (BuiltinIcon *icon)
 {
-  GtkIconInfo *icon_info = icon_info_new ();
+  RoxIconInfo *icon_info = icon_info_new ();
 
   icon_info->builtin_pixbuf = g_object_ref (icon->pixbuf);
   icon_info->dir_type = ICON_THEME_DIR_THRESHOLD;
@@ -1370,14 +1370,14 @@ icon_info_new_builtin (BuiltinIcon *icon)
   return icon_info;
 }
 
-GtkIconInfo *
-gtk_icon_info_copy (GtkIconInfo *icon_info)
+RoxIconInfo *
+rox_icon_info_copy (RoxIconInfo *icon_info)
 {
-  GtkIconInfo *copy;
+  RoxIconInfo *copy;
   
   g_return_val_if_fail (icon_info != NULL, NULL);
 
-  copy = g_memdup (icon_info, sizeof (GtkIconInfo));
+  copy = g_memdup (icon_info, sizeof (RoxIconInfo));
   if (copy->builtin_pixbuf)
     g_object_ref (copy->builtin_pixbuf);
   if (copy->pixbuf)
@@ -1391,7 +1391,7 @@ gtk_icon_info_copy (GtkIconInfo *icon_info)
 }
 
 void
-gtk_icon_info_free (GtkIconInfo *icon_info)
+rox_icon_info_free (RoxIconInfo *icon_info)
 {
   g_return_if_fail (icon_info != NULL);
 
@@ -1445,7 +1445,7 @@ load_svg_at_size (const gchar *filename,
  * that size.
  */
 static gboolean
-icon_info_ensure_scale_and_pixbuf (GtkIconInfo *icon_info,
+icon_info_ensure_scale_and_pixbuf (RoxIconInfo *icon_info,
 				   gboolean     scale_only)
 {
   int image_width, image_height;
@@ -1557,7 +1557,7 @@ icon_info_ensure_scale_and_pixbuf (GtkIconInfo *icon_info,
 }
 
 static GdkPixbuf *
-gtk_icon_info_load_icon (GtkIconInfo *icon_info,
+rox_icon_info_load_icon (RoxIconInfo *icon_info,
 			 GError     **error)
 {
   g_return_val_if_fail (icon_info != NULL, NULL);

@@ -135,7 +135,7 @@ MIME_type *inode_door;
 static Option o_display_colour_types;
 static Option o_icon_theme;
 
-static GtkIconTheme *icon_theme = NULL;
+static RoxIconTheme *icon_theme = NULL;
 
 void type_init(void)
 {
@@ -1447,7 +1447,7 @@ const char *mime_type_comment(MIME_type *type)
 
 static void set_icon_theme(void)
 {
-	GtkIconInfo *info;
+	RoxIconInfo *info;
 	char *icon_home;
 	const char *theme_name = o_icon_theme.value;
 
@@ -1468,7 +1468,7 @@ static void set_icon_theme(void)
 		}
 		if (info)
 		{
-			gtk_icon_info_free(info);
+			rox_icon_info_free(info);
 			return;
 		}
 

@@ -766,9 +766,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 		menu_show_shift_action(file_shift_item, file_item,
 					n_selected == 0);
 		if (file_item)
-			n_added=appmenu_add(make_path(filer_window->sym_path,
-						file_item->leafname),
-					file_item, filer_file_menu);
+			n_added = appmenu_add(make_path(filer_window->sym_path,
+							file_item->leafname),
+						file_item, filer_file_menu);
 	}
 
 	update_new_files_menu(get_menu_icon_style());
@@ -785,7 +785,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	updating_menu--;
 	
 	show_popup_menu(popup_menu, event,
-			popup_menu == filer_file_menu ? (n_added+7) : 1);
+			popup_menu == filer_file_menu ? (n_added + 7) : 1);
 }
 
 static void menu_closed(GtkWidget *widget)
