@@ -1357,18 +1357,20 @@ static void cancel_wink(Collection *collection)
 /* Draw/undraw a box around collection->wink_item */
 static void invert_wink(Collection *collection)
 {
-	gint	w = collection->item_width;
-	gint	h = collection->item_height;
+	GdkRectangle area;
 	gint	row, col;
 
 	g_return_if_fail(collection->wink_item >= 0);
-	
+
 	col = collection->wink_item % collection->columns;
 	row = collection->wink_item / collection->columns;
+	collection_get_item_area(collection, row, col, &area);
 
 	gdk_draw_rectangle(((GtkWidget *) collection)->window,
 			collection->xor_gc, FALSE,
-			col * w, row * h, w - 1, h - 1);
+			area.x, area.y,
+			collection->item_width - 1,
+			area.height - 1);
 }
 
 static gboolean wink_timeout(Collection *collection)
