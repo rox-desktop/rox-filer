@@ -25,8 +25,6 @@ struct _WrappedLabel {
 	int x_off, y_off;
 };
 
-#define WRAPPED_LABEL(obj) (GTK_CHECK_CAST((obj), WRAPPED_LABEL, WrappedLabel))
-
 GtkWidget *wrapped_label_new(const char *text, gint width);
 void wrapped_label_set_text(WrappedLabel *wl, const char *text);
 
