@@ -10,18 +10,8 @@
   <xsl:template name="head.content">
     <STYLE type="text/css"><![CDATA[
 
-html {
-  background-color: #dddddd;
-}
-
 body {
-  background-color: white;
-  margin: 1em;
-  padding: 0em 2em 1em 2em;
-  max-width: 40em;
-  border-colour: red;
-  border-width: 2px;
-  border-style: solid;
+  background-color: #dddddd;
 }
 
 table.simplelist {
@@ -87,7 +77,14 @@ span.guilabel {
 }
 
 div.chapter {
-  padding-top: 3em;
+  margin-top: 3em;
+  background-color: white;
+  margin: 1em;
+  padding: 0em 2em 1em 2em;
+  max-width: 40em;
+  border-colour: red;
+  border-width: 2px;
+  border-style: solid;
 }
 
 tt.filename {
@@ -125,6 +122,22 @@ span.keycap {
 
   <xsl:template match="keycap">
     <span class="keycap"><xsl:apply-templates/></span>
+  </xsl:template>
+
+  <xsl:template match="book">
+    <xsl:variable name="id">
+      <xsl:call-template name="object.id"/>
+    </xsl:variable>
+    <div class="{name(.)}" id="{$id}">
+      <div class="chapter">
+        <xsl:call-template name="book.titlepage"/>
+        <xsl:apply-templates select="dedication" mode="dedication"/>
+        <xsl:if test="$generate.book.toc != '0'">
+          <xsl:call-template name="division.toc"/>
+        </xsl:if>
+      </div>
+      <xsl:apply-templates/>
+    </div>
   </xsl:template>
   
 </xsl:stylesheet>
