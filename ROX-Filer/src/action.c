@@ -32,6 +32,7 @@
 #include <errno.h>
 #include <signal.h>
 #include <sys/time.h>
+#include <utime.h>
 
 #include "global.h"
 
@@ -1327,12 +1328,20 @@ static gboolean do_copy2(char *path, char *dest)
 
 			if (!exists)
 			{
+				struct utimbuf utb;
+
 				/* We may have created the directory with
 				 * more permissions than the source so that
 				 * we could write to it... change it back now.
 				 */
 				if (chmod(safe_dest, mode))
 					send_error();
+
+				/* Also, try to preserve the timestamps */
+				utb.actime = info.st_atime;
+				utb.modtime = info.st_mtime;
+
+				utime(safe_dest, &utb);
 			}
 		}
 

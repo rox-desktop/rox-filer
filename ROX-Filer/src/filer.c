@@ -1276,6 +1276,9 @@ static gboolean minibuffer_show_cb(FilerWindow *filer_window)
 	return FALSE;
 }
 
+/* TRUE iff filer_window points to an existing FilerWindow
+ * structure.
+ */
 gboolean filer_exists(FilerWindow *filer_window)
 {
 	GList	*next;
