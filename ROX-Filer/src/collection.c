@@ -1051,7 +1051,12 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 
 	collection = COLLECTION(widget);
 
-#ifndef GTK2
+#ifdef GTK2
+	gtk_paint_flat_box(widget->style, widget->window,
+			   widget->state, GTK_SHADOW_NONE,
+			   &event->area, widget, "collection",
+			   0, 0, -1, -1);
+#else	
 	clear_area(collection, &event->area);
 #endif
 
