@@ -35,13 +35,20 @@
 #include "gui_support.h"
 #include "main.h"
 
+#define MESSAGE _("Note that you must save your choices "		\
+		  "and restart the filer for the new language "		\
+		  "setting to take full effect.")
+
 char *current_lang = NULL;	/* Two-char country code, or NULL */
 
 static Option o_translation;
 
+static GtkWidget *i18n_message = NULL;
+
 /* Static Prototypes */
 static void set_trans(guchar *lang);
 static void trans_changed(void);
+static GList *build_i18n_message(Option *option, xmlNode *node, guchar *label);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -58,6 +65,8 @@ void i18n_init(void)
 	o_translation.has_changed = FALSE; /* Prevent warning about saving */
 
 	option_add_notify(trans_changed);
+
+	option_register_widget("i18n-message", build_i18n_message);
 }
 
 /* These two stolen from dia :-).
@@ -155,6 +164,9 @@ static void trans_changed(void)
 		return;
 
 	set_trans(o_translation.value);
+
+	if (i18n_message)
+		gtk_label_set_text(GTK_LABEL(i18n_message), MESSAGE);
 }
 
 /* Load the 'Messages/<name>.gmo' translation.
@@ -168,6 +180,8 @@ static void set_trans(guchar *lang)
 
 	g_return_if_fail(lang != NULL);
 
+	rox_clear_translation();
+
 	if (current_lang)
 	{
 		g_free(current_lang);
@@ -175,10 +189,7 @@ static void set_trans(guchar *lang)
 	}
 	
 	if (strcmp(lang, "None") == 0)
-	{
-		rox_clear_translation();
 		return;
-	}
 	else if (strcmp(lang, "From LANG") == 0)
 	{
 		lang = getenv("LANG");
@@ -198,4 +209,32 @@ static void set_trans(guchar *lang)
 	if (stat(path, &info) == 0)
 		rox_add_translations(path);
 	g_free(path);
+}
+
+static GList *build_i18n_message(Option *option, xmlNode *node, guchar *label)
+{
+	GtkWidget *hbox, *image, *align;
+
+	g_return_val_if_fail(option == NULL, NULL);
+	g_return_val_if_fail(label == NULL, NULL);
+	g_return_val_if_fail(i18n_message == NULL, NULL);
+
+	i18n_message = gtk_label_new(MESSAGE);
+	g_signal_connect(i18n_message, "destroy",
+			G_CALLBACK(gtk_widget_destroyed), &i18n_message);
+
+	gtk_misc_set_alignment(GTK_MISC(i18n_message), 0, 0.5);
+	gtk_label_set_justify(GTK_LABEL(i18n_message), GTK_JUSTIFY_LEFT);
+	gtk_label_set_line_wrap(GTK_LABEL(i18n_message), TRUE);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	image = gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO,
+			GTK_ICON_SIZE_BUTTON);
+	align = gtk_alignment_new(0, 0, 0, 0);
+
+	gtk_container_add(GTK_CONTAINER(align), image);
+	gtk_box_pack_start(GTK_BOX(hbox), align, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), i18n_message, FALSE, TRUE, 0);
+
+	return g_list_append(NULL, hbox);
 }
