@@ -26,6 +26,7 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <getopt.h>
 
 #include <gtk/gtk.h>
 #include "collection.h"
@@ -42,6 +43,46 @@
 #include "type.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
+int to_error_log = -1;		/* Write here to log errors */
+
+#define USAGE   "Try `ROX-Filer/AppRun --help' for more information.\n"
+
+#define VERSION "ROX-Filer 0.1.4\n"					\
+		"Copyright (C) 1999 Thomas Leonard.\n"			\
+		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
+		"to the extent permitted by law.\n"			\
+		"You may redistribute copies of ROX-Filer\n"		\
+		"under the terms of the GNU General Public License.\n"	\
+		"For more information about these matters, "		\
+		"see the file named COPYING.\n"
+
+#define HELP "Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"		\
+       "Open filer windows showing each directory listed, or $HOME \n"	\
+       "if no directories are given.\n\n"				\
+       "  -h, --help		display this help and exit\n"		      \
+       "  -v, --version		display the version information and exit\n"   \
+       "  -t, --top [DIR]	open DIR as a top-edge panel\n"		\
+       "  -b, --bottom [DIR]	open DIR as a bottom-edge panel\n"	\
+       "  -l, --left [DIR]	open DIR as a left-edge panel\n"	\
+       "  -r, --right [DIR]	open DIR as a right-edge panel\n"	\
+       "  -o, --override	override window manager control of panels\n" \
+       "\n"								\
+       "Report bugs to <tal197@ecs.soton.ac.uk>.\n"
+
+static struct option long_opts[] =
+{
+	{"top", 1, NULL, 't'},
+	{"bottom", 1, NULL, 'b'},
+	{"left", 1, NULL, 'l'},
+	{"right", 1, NULL, 'r'},
+	{"override", 0, NULL, 'o'},
+	{"help", 0, NULL, 'h'},
+	{"version", 0, NULL, 'v'},
+	{NULL, 0, NULL, 0},
+};
+
+/* Take control of panels away from WM? */
+gboolean override_redirect = FALSE;
 
 static void child_died(int signum)
 {
@@ -93,8 +134,49 @@ int main(int argc, char **argv)
 {
 	int		 stderr_pipe[2];
 	struct sigaction act;
+	GList		*panel_dirs = NULL;
+	GList		*panel_sides = NULL;
 
 	gtk_init(&argc, &argv);
+
+	while (1)
+	{
+		int	long_index;
+		int	c;
+		
+		c = getopt_long(argc, argv, "t:b:l:r:ohv",
+				long_opts, &long_index);
+
+		if (c == EOF)
+			break;		/* No more options */
+		
+		switch (c)
+		{
+			case 'o':
+				override_redirect = TRUE;
+				break;
+			case 'v':
+				printf(VERSION);
+				return EXIT_SUCCESS;
+			case 'h':
+				printf(HELP);
+				return EXIT_SUCCESS;
+			case 't':
+			case 'b':
+			case 'l':
+			case 'r':
+				panel_sides = g_list_prepend(panel_sides,
+							(gpointer) c);
+				panel_dirs = g_list_prepend(panel_dirs,
+						*optarg == '=' ? optarg + 1
+							: optarg);
+				break;
+			default:
+				printf(USAGE);
+				return EXIT_FAILURE;
+		}
+	}
+
 	choices_init("ROX-Filer");
 
 	gui_support_init();
@@ -124,45 +206,37 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 	}
 
-	if (argc < 2)
+	if (optind == argc && !panel_dirs)
 		filer_opendir(getenv("HOME"), FALSE, BOTTOM);
 	else
 	{
-		int	 i = 1;
-		gboolean panel = FALSE;
-		Side	 side = BOTTOM;
+		int	 i = optind;
+		GList	 *dir = panel_dirs;
+		GList	 *side = panel_sides;
 
-		while (i < argc)
+		while (dir)
 		{
-			if (argv[i][0] == '-')
-			{
-				switch (argv[i][1] + (argv[i][2] << 8))
-				{
-					case 't': side = TOP; break;
-					case 'b': side = BOTTOM; break;
-					case 'l': side = LEFT; break;
-					case 'r': side = RIGHT; break;
-					default:
-						fprintf(stderr,
-							"Bad option.\n");
-						return EXIT_FAILURE;
-				}
-				panel = TRUE;
-			}
-			else
-			{
-				filer_opendir(argv[i], panel, side);
-				panel = FALSE;
-				side = BOTTOM;
-			}
-			i++;
+			int	c = (int) side->data;
+			
+			filer_opendir((char *) dir->data, TRUE,
+					c == 't' ? TOP :
+					c == 'b' ? BOTTOM :
+					c == 'l' ? LEFT :
+					RIGHT);
+			dir = dir->next;
+			side = side->next;
 		}
+
+		g_list_free(dir);
+		g_list_free(side);
+		
+		while (i < argc)
+			filer_opendir(argv[i++], FALSE, BOTTOM);
 	}
 
 	pipe(stderr_pipe);
-	dup2(stderr_pipe[1], STDERR_FILENO);
 	gdk_input_add(stderr_pipe[0], GDK_INPUT_READ, stderr_cb, NULL);
-	fcntl(STDERR_FILENO, F_SETFD, 0);
+	to_error_log = stderr_pipe[1];
 
 	gtk_main();
 

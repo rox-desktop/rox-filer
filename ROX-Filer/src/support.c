@@ -28,9 +28,11 @@
 #include <unistd.h>
 #include <pwd.h>
 #include <grp.h>
+#include <fcntl.h>
 
 #include <glib.h>
 
+#include "main.h"
 #include "support.h"
 
 /* Static prototypes */
@@ -114,6 +116,8 @@ int spawn_full(char **argv, char *dir, SpawnFlags flags)
 			if (chdir(dir))
 				fprintf(stderr, "chdir() failed: %s\n",
 						g_strerror(errno));
+		dup2(to_error_log, STDERR_FILENO);
+		fcntl(STDERR_FILENO, F_SETFD, 0);
 		execvp(argv[0], argv);
 		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
 				argv[0],

@@ -1039,6 +1039,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		gtk_container_add(GTK_CONTAINER(win), frame);
 
 		gtk_widget_realize(win);
+		if (override_redirect)
+			gdk_window_set_override_redirect(win->window, TRUE);
 		make_panel_window(win->window);
 	}
 	else
