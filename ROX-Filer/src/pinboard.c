@@ -883,7 +883,9 @@ static gboolean button_press_event(GtkWidget *widget,
 	return TRUE;
 }
 
-/* Return a text/uri-list of all the icons in the list */
+/* Return a text/uri-list of all the icons in the list.
+ * TODO: Use code in icon.c instead.
+ */
 static guchar *create_uri_list(GList *list)
 {
 	GString	*tmp;

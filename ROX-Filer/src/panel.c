@@ -126,6 +126,7 @@ static void perform_action(Panel *panel,
 			   GdkEventButton *event);
 static void run_applet(Icon *icon);
 static void panel_set_style(guchar *new);
+static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -241,6 +242,8 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window->window);
+
+	gtk_widget_show_all(vp);
 	
 	loading_panel = panel;
 	if (load_path && access(load_path, F_OK) == 0)
@@ -271,38 +274,9 @@ Panel *panel_new(guchar *name, PanelSide side)
 			GTK_SIGNAL_FUNC(box_resized), (GtkObject *) panel);
 
 	number_of_windows++;
-	gtk_widget_show_all(panel->window);
+	gtk_widget_show(panel->window);
 	
 	return panel;
-}
-
-/* Set the size of the widget for this icon */
-void panel_size_icon(Icon *icon)
-{
-	int	im_height;
-	GdkFont	*font;
-	int	width, height;
-
-	g_return_if_fail(icon != NULL);
-	font = icon->widget->style->font;
-
-	if (icon->socket)
-		return;
-
-	im_height = MIN(PIXMAP_HEIGHT(icon->item.image->pixmap),
-					ICON_HEIGHT);
-
-	width = PIXMAP_WIDTH(icon->item.image->pixmap);
-
-	if (panel_want_show_text(icon))
-	{
-		height = font->ascent + font->descent + 6 + im_height;
-		width = MAX(width, icon->item.name_width);
-	}
-	else
-		height = im_height;
-
-	gtk_widget_set_usize(icon->widget, width + 4, height);
 }
 
 gboolean panel_want_show_text(Icon *icon)
@@ -394,7 +368,7 @@ static void panel_add_item(Panel *panel,
 			   gboolean after)
 {
 	GtkWidget	*widget;
-	Icon	*icon;
+	Icon		*icon;
 	GdkFont		*font;
 
 	widget = gtk_event_box_new();
@@ -417,6 +391,7 @@ static void panel_add_item(Panel *panel,
 	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 	icon->socket = NULL;
+	icon->label = NULL;
 #ifdef GTK2
 	icon->layout = NULL;
 #endif
@@ -469,16 +444,36 @@ static void panel_add_item(Panel *panel,
 		gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
 				GTK_SIGNAL_FUNC(drag_data_get), NULL);
 
-		drag_set_panel_dest(icon);
-	}
+		gtk_signal_connect(GTK_OBJECT(widget), "size_request",
+				GTK_SIGNAL_FUNC(size_request), icon);
 
-	panel_size_icon(icon);
+		drag_set_panel_dest(icon);
+
+		icon->label = gtk_label_new(icon->item.leafname);
+		gtk_container_add(GTK_CONTAINER(icon->widget), icon->label);
+		gtk_misc_set_alignment(GTK_MISC(icon->label), 0.5, 1);
+		gtk_misc_set_padding(GTK_MISC(icon->label), 1, 2);
+	}
 
 	if (!loading_panel)
 		panel_save(panel);
 		
 	icon_set_tip(icon);
 	gtk_widget_show(widget);
+}
+
+/* Called when Gtk+ wants to know how much space an icon needs.
+ * 'req' is already big enough for the label, if shown.
+ */
+static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
+{
+	int	im_width, im_height;
+
+	im_width = PIXMAP_WIDTH(icon->item.image->pixmap);
+	im_height = MIN(PIXMAP_HEIGHT(icon->item.image->pixmap), ICON_HEIGHT);
+
+	req->height += im_height;
+	req->width = MAX(req->width, im_width);
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -490,11 +485,8 @@ static gint expose_icon(GtkWidget *widget,
 
 static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 {
-	GdkFont		*font = widget->style->font;
 	GdkRectangle	area;
 	int		width, height;
-	int		text_x, text_y;
-	int		text_height = font->ascent + font->descent;
 
 	gdk_window_get_size(widget->window, &width, &height);
 
@@ -504,30 +496,19 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 	if (panel_want_show_text(icon))
 	{
-		area.y = height - text_height - 6 - area.height;
+		int	text_height = icon->label->requisition.height;
 
+		area.y = height - text_height - area.height;
+		
 		draw_large_icon(widget, &area, &icon->item, icon->selected);
-
-		text_x = (area.width - icon->item.name_width) >> 1;
-		text_y = height - font->descent - 4;
-
-		draw_string(widget,
-				font,
-				icon->item.leafname, -1,
-				MAX(0, text_x),
-				text_y,
-				icon->item.name_width,
-				area.width,
-				icon->selected, TRUE);
 	}
 	else
 	{
 		area.y = (height - area.height) >> 1;
-
 		draw_large_icon(widget, &area, &icon->item, icon->selected);
 	}
 
-	return TRUE;
+	return FALSE;
 }
 
 /* icon may be NULL if the event is on the background */
@@ -664,9 +645,6 @@ static void reposition_panel(Panel *panel, gboolean force_resize)
 		GtkWidget	*widget = (GtkWidget *) next->data;
 		GtkRequisition	req;
 
-		if (force_resize)
-			panel_size_icon(gtk_object_get_data(
-						GTK_OBJECT(widget), "icon"));
 		gtk_widget_get_child_requisition(widget, &req);
 
 		if (req.width > w)
@@ -1326,11 +1304,17 @@ static void panel_set_style(guchar *new)
 	{
 		int	i;
 
-		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
-			if (current_panel[i])
-				reposition_panel(current_panel[i], TRUE);
-
 		icons_update_tip();
+
+		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+		{
+			Panel	*panel = current_panel[i];
+			
+			if (!panel)
+				continue;
+
+			gtk_widget_queue_resize(panel->window);
+		}
 	}
 }
 

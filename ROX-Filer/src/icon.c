@@ -261,10 +261,7 @@ void icon_may_update(Icon *icon)
 	{
 		/* Appearance changed; need to redraw */
 		if (icon->panel)
-		{
-			panel_size_icon(icon);
 			gtk_widget_queue_clear(icon->widget);
-		}
 		else
 			pinboard_reshape_icon(icon);
 	}
@@ -301,6 +298,7 @@ static void check_has(gpointer key, GList *icons, CheckData *check)
 		check->found = TRUE;
 }
 
+/* Set the tooltip AND hide/show the label for panel icons */
 void icon_set_tip(Icon *icon)
 {
 	GtkWidget	*widget;
@@ -310,6 +308,14 @@ void icon_set_tip(Icon *icon)
 	g_return_if_fail(icon != NULL);
 
 	widget = icon->panel ? icon->widget : icon->win;
+
+	if (icon->panel && icon->label)
+	{
+		if (panel_want_show_text(icon))
+			gtk_widget_show(icon->label);
+		else
+			gtk_widget_hide(icon->label);
+	}
 
 	if (icon->panel && icon->socket)
 		ai = NULL;
@@ -711,7 +717,6 @@ static void rename_cb(Icon *icon)
 {
 	if (icon->panel)
 	{
-		panel_size_icon(icon);
 		gtk_widget_queue_clear(icon->widget);
 		panel_save(icon->panel);
 	}

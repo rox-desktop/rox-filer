@@ -26,16 +26,17 @@ struct _Icon {
 	guchar		*src_path;	/* Eg: ~/Apps */
 	guchar		*path;		/* Eg: /home/fred/Apps */
 	DirItem		item;
-#ifdef GTK2
-	PangoLayout	*layout;	/* The label */
-#endif
 
 	/* Only used on the pinboard... */
 	GtkWidget	*win;
 	GdkBitmap	*mask;
 	int		x, y;
+#ifdef GTK2
+	PangoLayout	*layout;	/* The label */
+#endif
 
 	/* Only used on the panel... */
+	GtkWidget	*label;
 	GtkWidget	*socket;	/* For applets */
 };
 
