@@ -3162,75 +3162,95 @@
 
   <itemizedlist>
 
-   <listitem><para><function>Version()</function>
+   <listitem><para><function>Version</function>()
      Returns the filer's version.
    </para></listitem>
 
-   <listitem><para><function>CloseDir(Filename)</function>
-     Close directory Filename and all its subdirectories.
+   <listitem><para><function>CloseDir</function>(<parameter>Filename</parameter>)
+     Close directory <parameter>Filename</parameter> and all its subdirectories.
    </para></listitem>
 
-   <listitem><para><function>Examine(Filename)</function>
-     Filename may have changed &mdash; check it and update the display.
+   <listitem><para><function>Examine</function>(<parameter>Filename</parameter>)
+     <parameter>Filename</parameter> may have changed &mdash; check it and
+     update the display.
    </para></listitem>
 
-   <listitem><para><function>OpenDir(Filename)</function>
-     Open a window showing directory Filename.
+   <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>)
+     Open a window showing directory <parameter>Filename</parameter>.
    </para></listitem>
 
-   <listitem><para><function>Panel(Name, Side)</function>
-     Open the panel named Name on screen side Side (Top|Bottom|Left|Right).
-     Name can be a name in Choices (eg, `MyPanel') or a full pathname.
+   <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
+     [<parameter>Name</parameter>])
+     Open the panel named <parameter>Name</parameter> on screen side
+     <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>).
+     <parameter>Name</parameter> can be a name in Choices (eg,
+     <userinput>MyPanel</userinput>) or a full pathname.
+     If not given, the panel on that side is turned off.
    </para></listitem>
 
-   <listitem><para><function>Pinboard(Name)</function>
-     Display pinboard Name on the desktop background.
-     Name can be a name in Choices (eg, `MyPinboard') or a full pathname.
+   <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
+     Display pinboard <parameter>Name</parameter> on the desktop background.
+     <parameter>Name</parameter> can be a name in Choices (eg,
+     <userinput>MyPinboard</userinput>) or a full pathname.
+     If not given, the pinboard is turned off.
    </para></listitem>
 
-   <listitem><para><function>Run(Filename)</function>
-     Run Filename as if it was clicked on in the filer.
+   <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
+     Run <parameter>Filename</parameter> as if it was clicked on in the filer.
    </para></listitem>
 
-   <listitem><para><function>Show(Directory, Leafname)</function>
-     Open Directory and flash the file Leafname inside it.
+   <listitem><para><function>Show</function>(<parameter>Directory</parameter>,
+     <parameter>Leafname</parameter>)
+     Open <parameter>Directory</parameter> and flash the file
+     <parameter>Leafname</parameter> inside it.
    </para></listitem>
 
-   <listitem><para><function>FileType(Filename)</function>
-     Returns the MIME-type of Filename (by writing the SOAP response
-     to standard output).
+   <listitem><para><function>FileType</function>(<parameter>Filename</parameter>)
+     Returns the MIME-type of <parameter>Filename</parameter> (by writing the
+     SOAP response to standard output).
    </para></listitem>
   </itemizedlist>
 
   <para>
    The following calls can be used to start new file actions.
-   Quiet can be "true" if the operation should start immediately, instead
-   of waiting for the user to confirm. If "false", the user must always
-   confirm. If not given, the default setting is used.
+   <parameter>Quiet</parameter> can be <userinput>true</userinput> if the
+   operation should start immediately, instead of waiting for the user to
+   confirm. If <userinput>false</userinput>, the user must always confirm. If
+   not given, the default setting is used.
   </para>
 
   <itemizedlist>
-   <listitem><para><function>Copy(From, To, [Leafname, Quiet])</function>
-     Copy each file in the array From to the directory To. If Leafname
-     is given then From should contain a single entry only; Leafname
-     gives the new leafname.
+   <listitem><para><function>Copy</function>(<parameter>From</parameter>,
+     <parameter>To</parameter>, [<parameter>Leafname</parameter>,
+     <parameter>Quiet</parameter>])
+     Copy each file in the array <parameter>From</parameter> to the directory
+     <parameter>To</parameter>. If <parameter>Leafname</parameter> is given
+     then <parameter>From</parameter> should contain a single entry only;
+     <parameter>Leafname </parameter> gives the new leafname.
    </para></listitem>
 
-   <listitem><para><function>Move(From, To, [Leafname, Quiet])</function>
-     Move each file in the array From to the directory To. If Leafname
-     is given then From should contain a single entry only; Leafname
-     gives the new leafname.
+   <listitem><para><function>Move</function>(<parameter>From</parameter>,
+     <parameter>To</parameter>, [<parameter>Leafname</parameter>,
+     <parameter>Quiet</parameter>])
+     Move each file in the array <parameter>From</parameter> to the directory
+     <parameter>To</parameter>. If <parameter>Leafname</parameter> is given
+     then <parameter>From</parameter> should contain a single entry only;
+     <parameter>Leafname</parameter> gives the new leafname.
    </para></listitem>
 
-   <listitem><para><function>Link(From, To, [Leafname])</function>
-     Symlink each file in the array From to the directory To. If Leafname
-     is given then From should contain a single entry only; Leafname
-     gives the new leafname.
+   <listitem><para><function>Link</function>(<parameter>From</parameter>,
+     <parameter>To</parameter>, [<parameter>Leafname</parameter>])
+     Symlink each file in the array <parameter>From</parameter> to the
+     directory <parameter>To</parameter>. If <parameter>Leafname</parameter> is
+     given then <parameter>From</parameter> should contain a single entry only;
+     <parameter>Leafname</parameter> gives the new leafname.
    </para></listitem>
 
-   <listitem><para><function>Mount(MountPoints, [OpenDir, Quiet])</function>
-     Mount each directory in the list MountPoints. If "true", OpenDir
-     causes each directory to be opened once it is mounted.
+   <listitem><para><function>Mount</function>(<parameter>MountPoints</parameter>,
+     [<parameter>OpenDir</parameter>, <parameter>Quiet</parameter>])
+     Mount each directory in the list <parameter>MountPoints</parameter>. If
+     <userinput>true</userinput>, <parameter>OpenDir</parameter> causes each
+     directory to be opened once it is mounted.
    </para></listitem>
 
   </itemizedlist>

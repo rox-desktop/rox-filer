@@ -7,6 +7,11 @@ when someone sends patches!).
 
 BUGS
 
+When files are converted to XML they are labelled as UTF-8, even though
+they aren't. Label as iso-8859 instead (just when doing the conversion).
+
+Dragging to the Home icon in a deleted directory causes odd effects!
+
 Use doubles in find.c to cope with large files.
 
 Implement locking (mv) for thumbnails.
