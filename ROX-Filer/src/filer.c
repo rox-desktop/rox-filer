@@ -108,6 +108,8 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void add_button(GtkContainer *box, int pixmap,
 			GtkSignalFunc cb, gpointer data);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
+static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
+				FilerWindow *window);
 
 static GdkAtom xa_string;
 enum
@@ -983,6 +985,16 @@ void refresh_dirs(char *path)
 	}
 }
 
+static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
+				FilerWindow *window)
+{
+	return get_choice("Close panel?",
+			"You have tried to close a panel via the window "
+			"manager - I usually find that this is accidental... "
+			"really close?",
+			2, "Remove", "Cancel") != 0;
+}
+
 void filer_opendir(char *path, gboolean panel, Side panel_side)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
@@ -1052,6 +1064,10 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		GtkWidget	*frame, *win = filer_window->window;
 
 		collection_set_panel(filer_window->collection, TRUE);
+		gtk_signal_connect(GTK_OBJECT(filer_window->window),
+				"delete_event",
+				GTK_SIGNAL_FUNC(filer_confirm_close),
+				filer_window);
 
 		gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
 		iwidth = filer_window->collection->item_width;
