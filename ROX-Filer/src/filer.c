@@ -274,7 +274,6 @@ static void update_display(Directory *dir,
 			break;
 		case DIR_REMOVE:
 			view_delete_if(view, if_deleted, items);
-			/* XXX: Slow? */
 			toolbar_update_info(filer_window);
 			break;
 		case DIR_START_SCAN:

@@ -74,4 +74,14 @@
     <xsl:text>]</xsl:text>
   </xsl:template>
 
+  <xsl:template match="bibliomixed">
+    <div xmlns="http://www.w3.org/1999/xhtml" class="{name(.)}" id="{generate-id(.)}">
+      <xsl:call-template name="anchor"/>
+      <p class="{name(.)}">
+        <xsl:call-template name="biblioentry.label"/>
+        <xsl:apply-templates mode="bibliomixed.mode"/>
+      </p>
+    </div>
+  </xsl:template>
+
 </xsl:stylesheet>
