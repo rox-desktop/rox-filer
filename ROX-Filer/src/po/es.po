@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.5\n"
-"POT-Creation-Date: 2003-02-27 18:08+0000\n"
+"POT-Creation-Date: 2003-03-05 21:53-0300\n"
 "PO-Revision-Date: 2002-11-21\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -553,7 +553,7 @@ msgstr "Recursivo"
 msgid "Also change contents of subdirectories"
 msgstr "Modificar también el contenido de los subdirectorios."
 
-#: action.c:1822 dnd.c:123 menu.c:1844 tips:179
+#: action.c:1822 dnd.c:123 menu.c:1833 tips:179
 msgid "Copy"
 msgstr "Copiar"
 
@@ -808,7 +808,7 @@ msgstr ""
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Lo siento, no puedo usar '%s' porque no es un archivo local."
 
-#: dropbox.c:283 pinboard.c:693
+#: dropbox.c:283 pinboard.c:697
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -845,7 +845,7 @@ msgstr ""
 "\n"
 "Al desmontar un dispositivo puedes remover el disco en forma segura."
 
-#: filer.c:383 menu.c:842
+#: filer.c:383 menu.c:831
 msgid "Unmount"
 msgstr "Desmontar"
 
@@ -911,7 +911,7 @@ msgstr "Enlace simbólico a "
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Este nombre de archivo no es UTF-8 válido. Debes renombrarlo.\n"
 
-#: filer.c:2286 menu.c:1834
+#: filer.c:2286 menu.c:1823
 msgid "Item no longer exists!"
 msgstr "El elemento no existe más!"
 
@@ -1217,7 +1217,7 @@ msgstr "Abrir el directorio Home"
 msgid "File"
 msgstr "Archivo"
 
-#: icon.c:142 menu.c:212 menu.c:855
+#: icon.c:142 menu.c:212 menu.c:844
 msgid "Shift Open"
 msgstr "Shift Abrir"
 
@@ -1269,7 +1269,7 @@ msgstr "Tiens que seleccionar primero algunos elementos a ser borrados"
 msgid "You must open the menu over an item"
 msgstr "Tienes que abrir el menu sobre un elemento"
 
-#: icon.c:619 menu.c:1205
+#: icon.c:619 menu.c:1194
 msgid "You can only set the run action for a regular file"
 msgstr "Sólo puedes definir la acción para un archivo normal"
 
@@ -1302,7 +1302,7 @@ msgstr "¿Estás seguro que quieres abrir %d ventanas?"
 msgid "Show Info"
 msgstr "Mostrar Información"
 
-#: infobox.c:114 menu.c:758
+#: infobox.c:114 menu.c:747
 msgid "(bad utf-8)"
 msgstr "(utf-8 erróneo)"
 
@@ -1704,42 +1704,42 @@ msgstr "Xterm Aquí"
 msgid "Switch to xterm"
 msgstr "Cambiar a xterm"
 
-#: menu.c:707
+#: menu.c:696
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr ""
 "Tienes que hacer click apretando Shift y elegir del menú sobre un archivo "
 "para enviarlo a alguna parte"
 
-#: menu.c:743
+#: menu.c:732
 msgid "Next Click"
 msgstr "Siguiente Click"
 
-#: menu.c:765
+#: menu.c:754
 #, c-format
 msgid "%d items"
 msgstr "%d elementos"
 
-#: menu.c:844
+#: menu.c:833
 msgid "Open unmounted"
 msgstr "Abrir desmontado"
 
-#: menu.c:847
+#: menu.c:836
 msgid "Show Target"
 msgstr "Mostrar Destino"
 
-#: menu.c:849
+#: menu.c:838
 msgid "Look Inside"
 msgstr "Mirar Adentro"
 
-#: menu.c:851
+#: menu.c:840
 msgid "Open As Text"
 msgstr "Abrir Como Texto"
 
-#: menu.c:1020
+#: menu.c:1009
 msgid "_Relative link"
 msgstr "_Enlace relativo"
 
-#: menu.c:1026
+#: menu.c:1015
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1751,43 +1751,43 @@ msgstr ""
 "Si está desactivado, la ruta desde el directorio raíz es guardada - usalo si "
 "el enlace puede moverse pero el destino permanecerá en el mismo lugar."
 
-#: menu.c:1093
+#: menu.c:1082
 msgid "New pathname is not absolute"
 msgstr "La nueva ruta no es absoluta"
 
-#: menu.c:1159
+#: menu.c:1148
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr ""
 "Ya existe un enlace simbólico desde '%s'. ¿Reemplazar con un enlace a '%s'?"
 
-#: menu.c:1165
+#: menu.c:1154
 msgid "_Replace"
 msgstr "_Reemplazar"
 
-#: menu.c:1296 menu.c:1337 menu.c:1397
+#: menu.c:1285 menu.c:1326 menu.c:1386
 msgid "Create"
 msgstr "Crear"
 
-#: menu.c:1297
+#: menu.c:1286
 msgid "NewDir"
 msgstr "NuevoDir"
 
-#: menu.c:1311 menu.c:1317
+#: menu.c:1300 menu.c:1306
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Error creando archivo '%s': %s"
 
-#: menu.c:1338
+#: menu.c:1327
 msgid "NewFile"
 msgstr "NuevoArchivo"
 
-#: menu.c:1356
+#: menu.c:1345
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "Error creando el archivo: no pude encontrar el template para %s"
 
-#: menu.c:1427
+#: menu.c:1416
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1817,7 +1817,7 @@ msgstr ""
 "los cuales serán mostrados sólo para archivos de ésos tipos. `.group' es "
 "mostrado sólo cuando son seleccionados muchos archivos."
 
-#: menu.c:1438
+#: menu.c:1427
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -1825,20 +1825,20 @@ msgstr ""
 "Ahora te mostraré tu directorio EnviarA; deberías enlazar simbólicamente "
 "(Ctrl+Shift arrastrar) las aplicaciones que quieras que estén dentro de él."
 
-#: menu.c:1441
+#: menu.c:1430
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr ""
 "El valor de tu variable CHOICESPATH impide personalizaciones - lo siento."
 
-#: menu.c:1518
+#: menu.c:1507
 msgid "Customise"
 msgstr "Personalizar"
 
-#: menu.c:1583
+#: menu.c:1572
 msgid "This is already the canonical name for this directory."
 msgstr "Éste es ya el nombre canónico de éste directorio."
 
-#: menu.c:1614
+#: menu.c:1603
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1846,75 +1846,75 @@ msgstr ""
 "No puedes abrir una segunda vista de éste directorio porque la opción "
 "`Ventanas Unicas' está activada en la ventana Opciones."
 
-#: menu.c:1733
+#: menu.c:1722
 msgid "Copy ... ?"
 msgstr "Copiar ... ?"
 
-#: menu.c:1736
+#: menu.c:1725
 msgid "Rename ... ?"
 msgstr "Renombrar ... ?"
 
-#: menu.c:1739
+#: menu.c:1728
 msgid "Symlink ... ?"
 msgstr "Enlazar ... ?"
 
-#: menu.c:1742
+#: menu.c:1731
 msgid "Shift Open ... ?"
 msgstr "Shift Abrir ... ?"
 
-#: menu.c:1745
+#: menu.c:1734
 msgid "Help about ... ?"
 msgstr "Ayuda acerca de ... ?"
 
-#: menu.c:1748
+#: menu.c:1737
 msgid "Examine ... ?"
 msgstr "Examinar ... ?"
 
-#: menu.c:1751
+#: menu.c:1740
 msgid "Set run action for ... ?"
 msgstr "Definir acción para ... ?"
 
-#: menu.c:1754
+#: menu.c:1743
 msgid "Set icon for ... ?"
 msgstr "Definir ícono para ... ?"
 
-#: menu.c:1757
+#: menu.c:1746
 msgid "Send ... to ... ?"
 msgstr "Enviar ... a ... ?"
 
-#: menu.c:1760
+#: menu.c:1749
 msgid "DELETE ... ?"
 msgstr "BORRAR ... ?"
 
-#: menu.c:1763
+#: menu.c:1752
 msgid "Count the size of ... ?"
 msgstr "Calcular el tamaño de ... ?"
 
-#: menu.c:1766
+#: menu.c:1755
 msgid "Set permissions on ... ?"
 msgstr "Definir los permisos de ... ?"
 
-#: menu.c:1769
+#: menu.c:1758
 msgid "Search inside ... ?"
 msgstr "Buscar adentro de ... ?"
 
-#: menu.c:1772
+#: menu.c:1761
 msgid "Look inside ... ?"
 msgstr "Mirar adentro ... ?"
 
-#: menu.c:1817
+#: menu.c:1806
 msgid "You cannot do this to more than one item at a time"
 msgstr "No puedes hacer ésto a más de un elemento a la vez"
 
-#: menu.c:1849
+#: menu.c:1838
 msgid "Rename"
 msgstr "Renombrar"
 
-#: menu.c:1854
+#: menu.c:1843
 msgid "Symlink"
 msgstr "Enlace"
 
-#: menu.c:1889
+#: menu.c:1878
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1930,7 +1930,7 @@ msgstr ""
 "2) agregando ésta línea en ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1899
+#: menu.c:1888
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1950,7 +1950,7 @@ msgstr ""
 "La tecla aparecerá próxima al elemento del menú y bastará con presionar ésa "
 "tecla sin abrir el menú en el futuro."
 
-#: menu.c:1914
+#: menu.c:1903
 msgid "Set keyboard shortcuts"
 msgstr "Definir atajos de teclado"
 
@@ -2068,12 +2068,12 @@ msgstr ""
 "Error ejecutando el applet:\n"
 "%s"
 
-#: pinboard.c:330
+#: pinboard.c:332
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr ""
 "Tu antiguo archivo de escritorio ha sido convertido al nuevo formato XML."
 
-#: pinboard.c:532
+#: pinboard.c:536
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
@@ -2083,7 +2083,7 @@ msgstr ""
 "Arrastra un directorio de aplicación adentro del diálogo Definir fondo de "
 "pantalla, o (para programadores) pásalo al método SOAP SetBackdropApp."
 
-#: pinboard.c:551
+#: pinboard.c:555
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2097,51 +2097,51 @@ msgstr ""
 "Programadores: el AppInfo.xml de la aplicación debe contener el elemento "
 "CanSetBackdrop, como es descrito en el manual de ROX-Filer."
 
-#: pinboard.c:571
+#: pinboard.c:575
 msgid "Set backdrop"
 msgstr "Definir fondo de pantalla"
 
-#: pinboard.c:582
+#: pinboard.c:586
 msgid "Choose a style, then drag an image in:"
 msgstr "Elije un estilo, luego arrastra una imágen:"
 
-#: pinboard.c:594
+#: pinboard.c:598
 msgid "Centre the image without scaling it"
 msgstr "Centrar la imágen sin cambiar su escala"
 
-#: pinboard.c:595
+#: pinboard.c:599
 msgid "Centre"
 msgstr "Centrada"
 
-#: pinboard.c:596
+#: pinboard.c:600
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "Agrandar la imágen para que ajuste en el fondo, sin distorcionarla"
 
-#: pinboard.c:598
+#: pinboard.c:602
 msgid "Scale"
 msgstr "Escalada"
 
-#: pinboard.c:599
+#: pinboard.c:603
 msgid "Stretch the image to fill the backdrop area"
 msgstr "Estirar la imágen para que ocupe todo el fondo de pantalla"
 
-#: pinboard.c:600
+#: pinboard.c:604
 msgid "Stretch"
 msgstr "Estirada"
 
-#: pinboard.c:601
+#: pinboard.c:605
 msgid "Tile the image over the backdrop area"
 msgstr "Hacer un mosaico con imágen sobre el fondo"
 
-#: pinboard.c:602
+#: pinboard.c:606
 msgid "Tile"
 msgstr "Mosaico"
 
-#: pinboard.c:619
+#: pinboard.c:623
 msgid "Drop an image here"
 msgstr "Suelta una imágen aquí"
 
-#: pinboard.c:706
+#: pinboard.c:710
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
@@ -2149,20 +2149,20 @@ msgstr ""
 "Sólo archivos (y ciertas aplicaciones) pueden utilizarse para definir la "
 "imágen del fondo de pantalla."
 
-#: pinboard.c:1269
+#: pinboard.c:1279
 msgid "Missing '>' in icon label"
 msgstr "Falta un '>' en la etiqueta del ícono"
 
-#: pinboard.c:1278
+#: pinboard.c:1288
 msgid "Missing ',' after icon label"
 msgstr "Falta una ',' después de la etiqueta del ícono"
 
-#: pinboard.c:1361
+#: pinboard.c:1371
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Error guardando el escritorio %s: %s"
 
-#: pinboard.c:1973
+#: pinboard.c:1984
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2173,7 +2173,7 @@ msgstr ""
 "%s\n"
 "Fondo de pantalla eliminado."
 
-#: pinboard.c:2249
+#: pinboard.c:2260
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2199,31 +2199,28 @@ msgid "Purge thumbnails disk cache"
 msgstr "Eliminar el caché de miniaturas en el disco"
 
 #: remote.c:593
-#, fuzzy, c-format
 msgid "Unknown style '%s'"
-msgstr "Tipo desconocido:"
+msgstr "Estilo desconocido '%s'"
 
 #: remote.c:615
-#, fuzzy, c-format
 msgid "Unknown details type '%s'"
-msgstr "Tipo desconocido:"
+msgstr "Tipo de detalles desconocido '%s'"
 
 #: remote.c:643
-#, fuzzy, c-format
 msgid "Unknown sorting type '%s'"
-msgstr "Tipo desconocido:"
+msgstr "Tipo de ordenación desconocido '%s'"
 
 #: remote.c:989
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "Intento de invocar un método SOAP desconocido '%s'"
 
-#: rox_gettext.c:90
+#: rox_gettext.c:95
 #, c-format
 msgid "Invalid .gmo translation file (too short): %s"
 msgstr "Archivo de traducción .gmo no válido (demasiado corto): %s"
 
-#: rox_gettext.c:103
+#: rox_gettext.c:108
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr ""
@@ -2422,9 +2419,8 @@ msgid "Change icon size"
 msgstr "Cambiar el tamaño del ícono"
 
 #: toolbar.c:133
-#, fuzzy
 msgid "Automatic size mode"
-msgstr "Automático"
+msgstr "Modo de tamaño automático"
 
 # tips:30 toolbar.c:128/
 #: toolbar.c:137
