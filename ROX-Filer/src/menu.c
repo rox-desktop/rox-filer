@@ -435,7 +435,7 @@ void show_style_menu(FilerWindow *filer_window,
 }
 #endif
 
-static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
+static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 			    MenuIconStyle style, CallbackFn func,
 			    gboolean separator, gboolean strip_ext,
 			    gboolean recurse)
@@ -445,6 +445,9 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 	DIR	*dir;
 	struct dirent *ent;
 	GtkWidget *item;
+	char *dname = NULL;
+
+	dname = pathdup(dir_name);
 
 	dir = opendir(dname);
 	if (!dir)
@@ -545,6 +548,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 
 	closedir(dir);
 out:
+	g_free(dname);
 
 	return widgets;
 }
