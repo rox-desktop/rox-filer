@@ -533,6 +533,53 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
+static void show_file_info(FilerWindow *filer_window, FileItem *file)
+{
+	GtkWidget	*window, *table, *label, *button;
+	char		*string;
+
+	window = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
+	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
+	gtk_window_set_title(GTK_WINDOW(window),
+		     make_path(filer_window->path, file->leafname)->str);
+
+	table = gtk_table_new(3, 2, FALSE);
+	gtk_container_add(GTK_CONTAINER(window), table);
+	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
+	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
+	
+	label = gtk_label_new("Owner, group:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
+	label = gtk_label_new("bob, bob");
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
+	
+	label = gtk_label_new("Permissions:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
+	label = gtk_label_new("drwxrwxrwx");
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
+	
+	label = gtk_label_new("MIME type:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
+	string = g_strconcat(file->mime_type->media_type, "/",
+			     file->mime_type->subtype, NULL);
+	label = gtk_label_new(string);
+	g_free(string);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
+	
+	button = gtk_button_new_with_label("OK");
+	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 3, 4,
+			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			gtk_widget_destroy, GTK_OBJECT(window));
+
+	gtk_widget_show_all(window);
+}
+
 static void help(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection 	*collection;
@@ -556,10 +603,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 					"This is a file with an eXecute bit "
 					"set - it can be run as a program.");
 			else
-				report_error("File",
-				"This is a file. It contains stored data. Try "
-				"running file(1) on it to find out what kind "
-				"of data it contains.");
+				show_file_info(window_with_focus, item);
 			break;
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_APPDIR)

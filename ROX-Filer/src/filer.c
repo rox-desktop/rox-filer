@@ -73,8 +73,17 @@ static gint focus_out(GtkWidget *widget,
 static void add_view(FilerWindow *filer_window);
 static void remove_view(FilerWindow *filer_window);
 
+static GdkAtom xa_string;
+enum
+{
+	TARGET_STRING,
+	TARGET_URI_LIST,
+};
+
 void filer_init()
 {
+	xa_string = gdk_atom_intern("STRING", FALSE);
+
 	child_to_filer = g_hash_table_new(NULL, NULL);
 	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
 }
@@ -506,16 +515,101 @@ void scan_dir(FilerWindow *filer_window)
 	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
 }
 
-static void gain_selection(Collection 	*collection,
-			   gint		number_selected,
+/* Another app has grabbed the selection */
+static gint collection_lose_selection(GtkWidget *widget,
+				      GdkEventSelection *event)
+{
+	if (window_with_selection &&
+			window_with_selection->collection == COLLECTION(widget))
+	{
+		FilerWindow *filer_window = window_with_selection;
+		window_with_selection = NULL;
+		collection_clear_selection(filer_window->collection);
+	}
+
+	return TRUE;
+}
+
+/* Someone wants us to send them the selection */
+static void selection_get(GtkWidget *widget, 
+		       GtkSelectionData *selection_data,
+		       guint      info,
+		       guint      time,
+		       gpointer   data)
+{
+	GString	*reply, *header;
+	FilerWindow 	*filer_window;
+	int		i;
+	Collection	*collection;
+
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+
+	reply = g_string_new(NULL);
+	header = g_string_new(NULL);
+
+	switch (info)
+	{
+		case TARGET_STRING:
+			g_string_sprintf(header, " %s",
+					make_path(filer_window->path, "")->str);
+			break;
+		case TARGET_URI_LIST:
+			g_string_sprintf(header, " file://%s%s",
+					our_host_name(),
+					make_path(filer_window->path, "")->str);
+			break;
+	}
+
+	collection = filer_window->collection;
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		if (collection->items[i].selected)
+		{
+			FileItem *item =
+				(FileItem *) collection->items[i].data;
+			
+			g_string_append(reply, header->str);
+			g_string_append(reply, item->leafname);
+		}
+	}
+	g_string_append_c(reply, ' ');
+	
+	gtk_selection_data_set(selection_data, xa_string,
+			8, reply->str + 1, reply->len - 1);
+	g_string_free(reply, TRUE);
+	g_string_free(header, TRUE);
+}
+
+/* No items are now selected. This might be because another app claimed
+ * the selection or because the user unselected all the items.
+ */
+static void lose_selection(Collection 	*collection,
+			   guint	time,
 			   gpointer 	user_data)
 {
 	FilerWindow *filer_window = (FilerWindow *) user_data;
 
-	if (window_with_selection && window_with_selection != filer_window)
-		collection_clear_selection(window_with_selection->collection);
-	
-	window_with_selection = filer_window;
+	if (window_with_selection == filer_window)
+	{
+		window_with_selection = NULL;
+		gtk_selection_owner_set(NULL,
+				GDK_SELECTION_PRIMARY,
+				time);
+	}
+}
+
+static void gain_selection(Collection 	*collection,
+			   guint	time,
+			   gpointer 	user_data)
+{
+	FilerWindow *filer_window = (FilerWindow *) user_data;
+
+	if (gtk_selection_owner_set(GTK_WIDGET(collection),
+				GDK_SELECTION_PRIMARY,
+				time))
+	{
+		window_with_selection = filer_window;
+	}
 }
 
 static int sort_by_name(const void *item1, const void *item2)
@@ -729,6 +823,11 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
+	GtkTargetEntry 	target_table[] =
+	{
+		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"STRING", 0, TARGET_STRING},
+	};
 
 	filer_window = g_malloc(sizeof(FilerWindow));
 	filer_window->path = pathdup(path);
@@ -767,10 +866,20 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			show_menu, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
 			gain_selection, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "lose_selection",
+			lose_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_selection",
 			drag_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
 			drag_data_get, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "selection_clear_event",
+			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
+	gtk_signal_connect (GTK_OBJECT(collection), "selection_get",
+			GTK_SIGNAL_FUNC(selection_get), NULL);
+	gtk_selection_add_targets(collection, GDK_SELECTION_PRIMARY,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table));
+
 	drag_set_dest(collection);
 
 	if (panel)
