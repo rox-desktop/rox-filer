@@ -282,10 +282,10 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 			to->str,
 			"png",
 			NULL,
-			"tEXt::OriginalWidth", swidth,
-			"tEXt::OriginalHeight", sheight,
-			"tEXt::OriginalSize", ssize,
-			"tEXt::OriginalMTime", smtime,
+			"tEXt::Thumb::OriginalWidth", swidth,
+			"tEXt::Thumb::OriginalHeight", sheight,
+			"tEXt::Thumb::OriginalSize", ssize,
+			"tEXt::Thumb::OriginalMTime", smtime,
 			NULL);
 
 	g_string_free(to, TRUE);
@@ -312,24 +312,28 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
 	if (!thumb)
-		goto out;
+		goto err;
 
 	/* Note that these don't need freeing... */
-	ssize = gdk_pixbuf_get_option(thumb, "tEXt::OriginalSize");
+	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::OriginalSize");
 	if (!ssize)
-		goto out;
-	smtime = gdk_pixbuf_get_option(thumb, "tEXt::OriginalMTime");
-	if (!smtime)
-		goto out;
-	if (mc_stat(path, &info) != 0)
-		goto out;
+		goto err;
 
+	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::OriginalMTime");
+	if (!smtime)
+		goto err;
+	
+	if (mc_stat(path, &info) != 0)
+		goto err;
+	
 	if (info.st_mtime != atol(smtime) || info.st_size != atol(ssize))
-	{
+		goto err;
+
+	goto out;
+err:
+	if (thumb)
 		gdk_pixbuf_unref(thumb);
-		thumb = NULL;
-		goto out;
-	}
+	thumb = NULL;
 out:
 	g_free(path);
 	g_free(thumb_path);
