@@ -60,6 +60,7 @@ MIME_type special_pipe 		= {"special", "pipe", NULL};
 MIME_type special_socket 	= {"special", "socket", NULL};
 MIME_type special_block_dev 	= {"special", "block-device", NULL};
 MIME_type special_char_dev 	= {"special", "char-device", NULL};
+MIME_type special_exec 		= {"special", "executable", NULL};
 MIME_type special_unknown 	= {"special", "unknown", NULL};
 
 void type_init()
@@ -619,6 +620,8 @@ MIME_type *mime_type_from_base_type(int base_type)
 {
 	switch (base_type)
 	{
+		case TYPE_FILE:
+			return &text_plain;
 		case TYPE_DIRECTORY:
 			return &special_directory;
 		case TYPE_PIPE:

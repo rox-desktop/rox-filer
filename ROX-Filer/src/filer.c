@@ -112,6 +112,8 @@ static gint coll_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       FilerWindow *filer_window);
 static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
+static void filer_add_widgets(FilerWindow *filer_window);
+static void filer_add_signals(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 
@@ -775,16 +777,12 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 	g_string_free(leader, TRUE);
 }
 
-/* Creates and shows a new filer window */
+/* Creates and shows a new filer window.
+ * Returns the new filer window, or NULL on error.
+ */
 FilerWindow *filer_opendir(char *path)
 {
-	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
-	GtkTargetEntry 	target_table[] =
-	{
-		{"text/uri-list", 0, TARGET_URI_LIST},
-		{"STRING", 0, TARGET_STRING},
-	};
 	char		*real_path;
 	
 	/* Get the real pathname of the directory and copy it */
@@ -798,10 +796,7 @@ FilerWindow *filer_opendir(char *path)
 		FilerWindow *fw;
 		
 		fw = find_filer_window(real_path, NULL);
-		
-		/* Destroy and recreate to make sure it becomes
-		 * visible.
-		 */
+
 		if (fw)
 			gtk_widget_destroy(fw->window);
 	}
@@ -844,113 +839,13 @@ FilerWindow *filer_opendir(char *path)
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
 
-	/* Create the top-level window widget */
-	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	filer_set_title(filer_window);
+	/* Add all the user-interface elements */
+	filer_add_widgets(filer_window);
 
-	/* The collection is the area that actually displays the files */
-	collection = collection_new(NULL);
-	gtk_widget_set_events(collection,
-			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
-			GDK_BUTTON3_MOTION_MASK |
-			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-
-	gtk_object_set_data(GTK_OBJECT(collection),
-			"filer_window", filer_window);
-	filer_window->collection = COLLECTION(collection);
-
-	gtk_widget_add_events(filer_window->window, GDK_ENTER_NOTIFY);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window),
-			"enter-notify-event",
-			GTK_SIGNAL_FUNC(pointer_in), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
-			GTK_SIGNAL_FUNC(focus_in), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
-			filer_window_destroyed, filer_window);
-
-	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
-			gain_selection, filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "lose_selection",
-			lose_selection, filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
-			drag_data_get, NULL);
-	gtk_signal_connect(GTK_OBJECT(collection), "selection_clear_event",
-			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
-	gtk_signal_connect(GTK_OBJECT(collection), "selection_get",
-			GTK_SIGNAL_FUNC(selection_get), NULL);
-	gtk_selection_add_targets(collection, GDK_SELECTION_PRIMARY,
-			target_table,
-			sizeof(target_table) / sizeof(*target_table));
-
-	gtk_signal_connect(GTK_OBJECT(collection), "button-release-event",
-			GTK_SIGNAL_FUNC(coll_button_release), filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "button-press-event",
-			GTK_SIGNAL_FUNC(coll_button_press), filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "motion-notify-event",
-			GTK_SIGNAL_FUNC(coll_motion_notify), filer_window);
+	/* Connect to all the signal handlers */
+	filer_add_signals(filer_window);
 
 	display_set_layout(filer_window, last_layout);
-	drag_set_dest(filer_window);
-
-	{
-		GtkWidget	*vbox;
-		int		col_height = ROW_HEIGHT_LARGE *
-							o_initial_window_height;
-
-		gtk_signal_connect(GTK_OBJECT(collection),
-				"key_press_event",
-				GTK_SIGNAL_FUNC(key_press_event), filer_window);
-		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-			filer_window->display_style == LARGE_ICONS ? 400 : 512,
-			o_toolbar == TOOLBAR_NONE ? col_height:
-			o_toolbar == TOOLBAR_NORMAL ? col_height + 24 :
-			col_height + 38);
-
-		hbox = gtk_hbox_new(FALSE, 0);
-		gtk_container_add(GTK_CONTAINER(filer_window->window),
-					hbox);
-
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
-		
-		if (show_user_message)
-		{
-			GtkWidget *label;
-
-			label = gtk_label_new(show_user_message);
-			gtk_box_pack_start(GTK_BOX(vbox), label,
-					FALSE, TRUE, 0);
-			gtk_widget_show(label);
-		}
-
-		if (o_toolbar != TOOLBAR_NONE)
-		{
-			GtkWidget *toolbar;
-			
-			toolbar = toolbar_new(filer_window);
-			gtk_box_pack_start(GTK_BOX(vbox), toolbar,
-					FALSE, TRUE, 0);
-			gtk_widget_show_all(toolbar);
-		}
-
-		gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
-
-		create_minibuffer(filer_window);
-		gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
-					FALSE, TRUE, 0);
-
-		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
-		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
-		gtk_accel_group_attach(filer_keys,
-				GTK_OBJECT(filer_window->window));
-		gtk_window_set_focus(GTK_WINDOW(filer_window->window),
-				collection);
-
-		gtk_widget_show(hbox);
-		gtk_widget_show(vbox);
-		gtk_widget_show(scrollbar);
-		gtk_widget_show(collection);
-	}
 
 	gtk_widget_realize(filer_window->window);
 
@@ -976,6 +871,145 @@ FilerWindow *filer_opendir(char *path)
 	gtk_widget_show(filer_window->window);
 
 	return filer_window;
+}
+
+/* This adds all the widgets to a new filer window. It is in a separate
+ * function because filer_opendir() was getting too long...
+ */
+static void filer_add_widgets(FilerWindow *filer_window)
+{
+	GtkWidget *hbox, *vbox, *scrollbar, *collection;
+	int	  col_height = ROW_HEIGHT_LARGE * o_initial_window_height;
+
+	/* Create the top-level window widget */
+	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	filer_set_title(filer_window);
+
+	/* The collection is the area that actually displays the files */
+	collection = collection_new(NULL);
+
+	gtk_object_set_data(GTK_OBJECT(collection),
+			"filer_window", filer_window);
+	filer_window->collection = COLLECTION(collection);
+
+	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
+		filer_window->display_style == LARGE_ICONS ? 400 : 512,
+		o_toolbar == TOOLBAR_NONE ? col_height:
+		o_toolbar == TOOLBAR_NORMAL ? col_height + 24 :
+		col_height + 38);
+
+	/* Scrollbar on the right, everything else on the left */
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+	
+	/* If there's a message that should go at the top of every
+	 * window (eg 'Running as root'), add it here.
+	 */
+	if (show_user_message)
+	{
+		GtkWidget *label;
+
+		label = gtk_label_new(show_user_message);
+		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+		gtk_widget_show(label);
+	}
+
+	/* Create a frame for the toolbar, but don't show it unless we actually
+	 * have a toolbar.
+	 * (allows us to change the toolbar later)
+	 */
+	filer_window->toolbar_frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(filer_window->toolbar_frame),
+			GTK_SHADOW_OUT);
+	gtk_box_pack_start(GTK_BOX(vbox),
+			filer_window->toolbar_frame, FALSE, TRUE, 0);
+
+	/* If we want a toolbar, create it and put it in the frame */
+	if (o_toolbar != TOOLBAR_NONE)
+	{
+		GtkWidget *toolbar;
+		
+		toolbar = toolbar_new(filer_window);
+		gtk_container_add(GTK_CONTAINER(filer_window->toolbar_frame),
+				toolbar);
+		gtk_widget_show_all(filer_window->toolbar_frame);
+	}
+
+	/* Now add the area for displaying the files... */
+	gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
+
+	/* And the minibuffer (hidden by default)... */
+	create_minibuffer(filer_window);
+	gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
+				FALSE, TRUE, 0);
+
+	/* Put the scrollbar on the left of everything else... */
+	scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
+	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
+
+	/* Connect the menu's accelerator group to the window */
+	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
+
+	gtk_window_set_focus(GTK_WINDOW(filer_window->window), collection);
+
+	gtk_widget_show(hbox);
+	gtk_widget_show(vbox);
+	gtk_widget_show(scrollbar);
+	gtk_widget_show(collection);
+}
+
+static void filer_add_signals(FilerWindow *filer_window)
+{
+	GtkObject	*collection = GTK_OBJECT(filer_window->collection);
+	GtkTargetEntry 	target_table[] =
+	{
+		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"STRING", 0, TARGET_STRING},
+	};
+
+	/* Events on the top-level window */
+	gtk_widget_add_events(filer_window->window, GDK_ENTER_NOTIFY);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window),
+			"enter-notify-event",
+			GTK_SIGNAL_FUNC(pointer_in), filer_window);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
+			GTK_SIGNAL_FUNC(focus_in), filer_window);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
+			filer_window_destroyed, filer_window);
+
+	/* Events on the collection widget */
+	gtk_widget_set_events(GTK_WIDGET(collection),
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+			GDK_BUTTON3_MOTION_MASK |
+			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+
+	gtk_signal_connect(collection, "gain_selection",
+			gain_selection, filer_window);
+	gtk_signal_connect(collection, "lose_selection",
+			lose_selection, filer_window);
+	gtk_signal_connect(collection, "selection_clear_event",
+			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
+	gtk_signal_connect(collection, "selection_get",
+			GTK_SIGNAL_FUNC(selection_get), NULL);
+	gtk_selection_add_targets(GTK_WIDGET(collection), GDK_SELECTION_PRIMARY,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table));
+
+	gtk_signal_connect(collection, "key_press_event",
+			GTK_SIGNAL_FUNC(key_press_event), filer_window);
+	gtk_signal_connect(collection, "button-release-event",
+			GTK_SIGNAL_FUNC(coll_button_release), filer_window);
+	gtk_signal_connect(collection, "button-press-event",
+			GTK_SIGNAL_FUNC(coll_button_press), filer_window);
+	gtk_signal_connect(collection, "motion-notify-event",
+			GTK_SIGNAL_FUNC(coll_motion_notify), filer_window);
+
+	/* Drag and drop events */
+	gtk_signal_connect(collection, "drag_data_get", drag_data_get, NULL);
+	drag_set_dest(filer_window);
 }
 
 static gint clear_scanning_display(FilerWindow *filer_window)

@@ -64,6 +64,7 @@ struct _FilerWindow
 	TargetFunc	target_cb;
 	gpointer	target_data;
 
+	GtkWidget	*toolbar_frame;
 	GtkWidget	*toolbar_text;
 };
 

@@ -163,10 +163,6 @@ static int details_width(FilerWindow *filer_window, DirItem *item)
 {
 	int	bar = 0;
 
-	if (filer_window->details_type == DETAILS_SIZE_BARS &&
-			item->base_type != TYPE_DIRECTORY)
-		return 6 * fixed_width + MAX_BAR_SIZE + 16;
-
 	return bar + fixed_width * strlen(details(filer_window, item));
 }
 
@@ -203,7 +199,9 @@ static gboolean test_point_large(Collection *collection,
 	DirItem		*item = (DirItem *) colitem->data;
 	int		text_height = item_font->ascent + item_font->descent;
 	MaskedPixmap	*image = item->image;
-	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
+	int		pic_area_height = height - text_height;
+	int		iheight = MIN(image->height, MAX_ICON_HEIGHT);
+	int		image_y = MAX(0, pic_area_height - iheight - 6);
 	int		image_width = (image->width >> 1) + 2;
 	int		text_width = (item->name_width >> 1) + 2;
 	int		x_limit;
@@ -229,7 +227,8 @@ static gboolean test_point_large_full(Collection *collection,
 {
 	DirItem		*item = (DirItem *) colitem->data;
 	MaskedPixmap	*image = item->image;
-	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
+	int		iheight = MIN(image->height, MAX_ICON_HEIGHT);
+	int		image_y = MAX(0, height - iheight - 6);
 	int		low_top = height
 				- fixed_font->descent - 2 - fixed_font->ascent;
 
@@ -264,19 +263,6 @@ static gboolean test_point_small_full(Collection *collection,
 	if (point_y < low_top)
 		return FALSE;
 
-	if (filer_window->details_type == DETAILS_SIZE_BARS)
-	{
-		int	bar_x = width - MAX_BAR_SIZE - 4;
-		int	bar_size;
-
-		if (item->base_type == TYPE_DIRECTORY)
-			bar_size = 0;
-		else
-			bar_size = BAR_SIZE(item->size);
-
-		return point_x < bar_x + bar_size;
-	}
-	
 	return TRUE;
 }
 
@@ -492,6 +478,7 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 			 int width, gboolean selected, gboolean box)
 {
 	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
+	DetailsType	type = filer_window->details_type;
 	int		w;
 	
 	w = details_width(filer_window, item);
@@ -507,43 +494,19 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 	if (item->lstat_errno)
 		return;
 
-	if (filer_window->details_type == DETAILS_SIZE_BARS)
+	if (type == DETAILS_SUMMARY || type == DETAILS_PERMISSIONS)
 	{
-		int	bar;
-		int	bar_x = x + width - MAX_BAR_SIZE - 4;
-
-		if (item->base_type == TYPE_DIRECTORY)
-			return;
+		int	perm_offset = type == DETAILS_SUMMARY ? 5 : 0;
 		
-		bar = BAR_SIZE(item->size);
+		perm_offset += 4 * applicable(item->uid, item->gid);
 
-		gdk_draw_rectangle(widget->window,
-				widget->style->black_gc,
-				TRUE,
-				bar_x, y - fixed_font->ascent,
-				bar + 4,
-				fixed_font->ascent + fixed_font->descent);
-		gdk_draw_rectangle(widget->window,
-				widget->style->white_gc,
-				TRUE,
-				bar_x + 2,
-				y - fixed_font->ascent + 2,
-				bar,
-				fixed_font->ascent + fixed_font->descent - 4);
-				
-		return;
-	}
-
-	if (filer_window->details_type == DETAILS_SUMMARY)
-	{
 		/* Underline the effective permissions */
 		gdk_draw_rectangle(widget->window,
 				widget->style->fg_gc[selected
 							? GTK_STATE_SELECTED
 							: GTK_STATE_NORMAL],
 				TRUE,
-				x - 1 + fixed_width *
-				(5 + 4 * applicable(item->uid, item->gid)),
+				x - 1 + fixed_width * perm_offset,
 				y + fixed_font->descent - 1,
 				fixed_width * 3 + 1, 1);
 	}
@@ -578,6 +541,32 @@ char *details(FilerWindow *filer_window, DirItem *item)
 			group_name(item->gid),
 			format_size_aligned(item->size),
 			pretty_time(&item->mtime));
+	}
+	else if (filer_window->details_type == DETAILS_TYPE)
+	{
+		MIME_type	*type = item->mime_type;
+
+		buf = g_strdup_printf("(%s/%s)",
+				type->media_type, type->subtype);
+	}
+	else if (filer_window->details_type == DETAILS_TIMES)
+	{
+		guchar	*ctime, *mtime;
+		
+		ctime = g_strdup(pretty_time(&item->ctime));
+		mtime = g_strdup(pretty_time(&item->mtime));
+		
+		buf = g_strdup_printf("a[%s] c[%s] m[%s]",
+				pretty_time(&item->atime), ctime, mtime);
+		g_free(ctime);
+		g_free(mtime);
+	}
+	else if (filer_window->details_type == DETAILS_PERMISSIONS)
+	{
+		buf = g_strdup_printf("%s %-8.8s %-8.8s",
+				pretty_permissions(m),
+				user_name(item->uid),
+				group_name(item->gid));
 	}
 	else
 	{
@@ -891,8 +880,12 @@ gboolean display_set_layout(FilerWindow *filer_window, guchar *layout)
 			details = DETAILS_SUMMARY;
 		else if (g_strcasecmp(layout + 5, "+Sizes") == 0)
 			details = DETAILS_SIZE;
-		else if (g_strcasecmp(layout + 5, "+SizeBars") == 0)
-			details = DETAILS_SIZE_BARS;
+		else if (g_strcasecmp(layout + 5, "+Times") == 0)
+			details = DETAILS_TIMES;
+		else if (g_strcasecmp(layout + 5, "+Type") == 0)
+			details = DETAILS_TYPE;
+		else if (g_strcasecmp(layout + 5, "+Permissions") == 0)
+			details = DETAILS_PERMISSIONS;
 		else
 			return FALSE;
 	}

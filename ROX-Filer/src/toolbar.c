@@ -107,6 +107,7 @@ static void drag_leave(GtkWidget	*widget,
 static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
+static void recreate_toolbar(FilerWindow *filer_window);
 
 static Tool all_tools[] = {
 	{N_("Close"), "close", N_("Close filer window"),
@@ -264,16 +265,11 @@ static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
-	GtkWidget	*frame, *box;
+	GtkWidget	*box;
 	GtkWidget	*b;
 	int		i;
 
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
-
 	box = gtk_hbox_new(FALSE, 0);
-
-	gtk_container_add(GTK_CONTAINER(frame), box);
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
@@ -291,7 +287,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
 			TRUE, TRUE, 4);
 
-	return frame;
+	return box;
 }
 
 /* This is used to simulate a click when button 3 is used (GtkButton
@@ -458,7 +454,7 @@ static GtkWidget *create_options(void)
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
 	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new(_("Toolbar type for new windows")),
+			gtk_label_new(_("Toolbar type")),
 			FALSE, TRUE, 0);
 	menu_toolbar = gtk_option_menu_new();
 	menu = gtk_menu_new();
@@ -496,6 +492,8 @@ static void set_options()
 	GtkWidget 	*item, *menu;
 	GList		*list;
 	int		i;
+	gboolean	changed = FALSE;
+	ToolbarType	old_type = o_toolbar;
 	
 	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(menu_toolbar));
 	item = gtk_menu_get_active(GTK_MENU(menu));
@@ -506,9 +504,24 @@ static void set_options()
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
 		Tool		*tool = &all_tools[i];
-
+		gboolean	old = tool->enabled;
+		
 		tool->enabled = GTK_WIDGET_SENSITIVE(
 					GTK_BIN(tool->option_button)->child);
+		if (tool->enabled != old)
+			changed = TRUE;
+	}
+
+	if (changed || old_type != o_toolbar)
+	{
+		GList	*next;
+
+		for (next = all_filer_windows; next; next = next->next)
+		{
+			FilerWindow *filer_window = (FilerWindow *) next->data;
+
+			recreate_toolbar(filer_window);
+		}
 	}
 }
 
@@ -661,4 +674,29 @@ static void handle_drops(FilerWindow *filer_window,
 			GTK_SIGNAL_FUNC(drag_leave), filer_window);
 	gtk_object_set_data(GTK_OBJECT(button), "toolbar_dest",
 			(gpointer) dest);
+}
+
+static void recreate_toolbar(FilerWindow *filer_window)
+{
+	GtkWidget	*frame = filer_window->toolbar_frame;
+	
+	if (GTK_BIN(frame)->child)
+	{
+		filer_window->toolbar_text = NULL;
+		gtk_widget_destroy(((GtkBin *) frame)->child);
+	}
+	
+	if (o_toolbar == TOOLBAR_NONE)
+		gtk_widget_hide(frame);
+	else
+	{
+		GtkWidget	*toolbar;
+
+		toolbar = toolbar_new(filer_window);
+		gtk_container_add(GTK_CONTAINER(filer_window->toolbar_frame),
+				toolbar);
+		gtk_widget_show_all(frame);
+	}
+
+	filer_target_mode(filer_window, NULL, NULL, NULL);
 }

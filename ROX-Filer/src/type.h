@@ -14,6 +14,7 @@ extern MIME_type special_pipe;
 extern MIME_type special_socket;
 extern MIME_type special_block_dev;
 extern MIME_type special_char_dev;
+extern MIME_type special_exec;
 extern MIME_type special_unknown;
 
 enum

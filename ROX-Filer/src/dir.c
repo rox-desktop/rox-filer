@@ -176,7 +176,7 @@ void dir_restat(guchar *path, DirItem *item)
 		item->base_type = TYPE_ERROR;
 		item->size = 0;
 		item->mode = 0;
-		item->mtime = 0;
+		item->mtime = item->ctime = item->atime = 0;
 		item->uid = (uid_t) -1;
 		item->gid = (gid_t) -1;
 	}
@@ -185,6 +185,8 @@ void dir_restat(guchar *path, DirItem *item)
 		item->lstat_errno = 0;
 		item->size = info.st_size;
 		item->mode = info.st_mode;
+		item->atime = info.st_atime;
+		item->ctime = info.st_ctime;
 		item->mtime = info.st_mtime;
 		item->uid = info.st_uid;
 		item->gid = info.st_gid;
@@ -257,9 +259,8 @@ void dir_restat(guchar *path, DirItem *item)
 		/* Note: for symlinks we use need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
-			item->image = im_exec_file;
-			pixmap_ref(im_exec_file);
 			item->flags |= ITEM_FLAG_EXEC_FILE;
+			item->mime_type = &special_exec;
 		}
 		else
 			item->mime_type = type_from_path(path);
@@ -547,6 +548,8 @@ update:
 		 && item->flags == new.flags
 		 && item->size == new.size
 		 && item->mode == new.mode
+		 && item->atime == new.atime
+		 && item->ctime == new.ctime
 		 && item->mtime == new.mtime
 		 && item->uid == new.uid
 		 && item->gid == new.gid
@@ -567,6 +570,8 @@ update:
 	item->mode = new.mode;
 	item->uid = new.uid;
 	item->gid = new.gid;
+	item->atime = new.atime;
+	item->ctime = new.ctime;
 	item->mtime = new.mtime;
 	item->mime_type = new.mime_type;
 	item->name_width = new.name_width;

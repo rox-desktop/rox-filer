@@ -28,7 +28,9 @@ typedef enum {
 typedef enum {
 	DETAILS_SUMMARY,
 	DETAILS_SIZE,
-	DETAILS_SIZE_BARS,
+	DETAILS_PERMISSIONS,
+	DETAILS_TYPE,
+	DETAILS_TIMES,
 } DetailsType;
 
 extern guchar *last_layout;

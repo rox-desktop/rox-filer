@@ -166,11 +166,15 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
 {">>" N_("Summary"),		NULL, large_with, DETAILS_SUMMARY, NULL},
 {">>" N_("Sizes"),		NULL, large_with, DETAILS_SIZE, NULL},
-{">>" N_("Size Bars"),		NULL, large_with, DETAILS_SIZE_BARS, NULL},
+{">>" N_("Permissions"),	NULL, large_with, DETAILS_PERMISSIONS, NULL},
+{">>" N_("Type"),		NULL, large_with, DETAILS_TYPE, NULL},
+{">>" N_("Times"),		NULL, large_with, DETAILS_TIMES, NULL},
 {">" N_("Small, With..."),	NULL, NULL, 0, "<Branch>"},
 {">>" N_("Summary"),		NULL, small_with, DETAILS_SUMMARY, NULL},
 {">>" N_("Sizes"),		NULL, small_with, DETAILS_SIZE, NULL},
-{">>" N_("Size Bars"),		NULL, small_with, DETAILS_SIZE_BARS, NULL},
+{">>" N_("Permissions"),	NULL, small_with, DETAILS_PERMISSIONS, NULL},
+{">>" N_("Type"),		NULL, small_with, DETAILS_TYPE, NULL},
+{">>" N_("Times"),		NULL, small_with, DETAILS_TIMES, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL, sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL, sort_type, 0, NULL},
@@ -611,7 +615,9 @@ static void set_layout(gboolean large, DetailsType details)
 	style = g_strdup_printf("%s+%s",
 		large ? "Large" : "Small",
 		details == DETAILS_SUMMARY ? "Summary" :
-		details == DETAILS_SIZE_BARS ? "SizeBars" :
+		details == DETAILS_TIMES ? "Times" :
+		details == DETAILS_PERMISSIONS ? "Permissions" :
+		details == DETAILS_TYPE ? "Type" :
 		"Sizes");
 
 	display_set_layout(window_with_focus, style);
@@ -999,9 +1005,6 @@ guchar *pretty_type(DirItem *file, guchar *path)
 
 		return g_strdup(_("Symbolic link"));
 	}
-
-	if (file->flags & ITEM_FLAG_EXEC_FILE)
-		return g_strdup(_("Executable file"));
 
 	if (file->flags & ITEM_FLAG_APPDIR)
 		return g_strdup(_("ROX application"));

@@ -973,11 +973,13 @@ The display menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-15 2 0 0 -1 -1 -1 -1
+17 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
 0 1 0 0
+0 1 1 0
+0 1 1 0
 0 1 1 0
 0 1 1 0
 0 1 1 0
@@ -997,6 +999,10 @@ multicol5
 0 2 1 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1064,10 +1070,31 @@ Sizes
 \newline 
 
 \series bold 
-Size Bars
+Permissions
 \series default 
- displays a bar indicating the size of each file.
- This is on a log scale.
+ shows just the permissions and owner.
+\newline 
+
+\newline 
+
+\series bold 
+Type
+\series default 
+ shows the MIME type of each file.
+\newline 
+
+\newline 
+
+\series bold 
+Times
+\series default 
+ shows the times the file was last accessed, modifed and changed.
+\latex latex 
+
+\backslash 
+ddag
+\latex default 
+
 \newline 
 Small, With...
 \newline 
@@ -1120,6 +1147,32 @@ If ROX-Filer was unable to find ImLib
 
  when it was compiled then the icons are shown cropped rather than scaled.
  Get ImLib and recompile if you want it to look nice.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+ddag
+\backslash 
+thinspace{} 
+\latex default 
+Reading a file's contents or listing a directory updates the 
+\emph on 
+access time
+\emph default 
+; modifying the contents of a file or the list of files in a directory updates
+ the 
+\emph on 
+modification time
+\emph default 
+; changing a files owner or permissions updates the 
+\emph on 
+change time
+\emph default 
+.
 \layout Subsubsection
 
 
@@ -1557,19 +1610,22 @@ These menus are both the same, and very simple:
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-6 2 0 0 -1 -1 -1 -1
+7 2 0 0 -1 -1 -1 -1
 1 1 0 0
+1 0 0 0
 1 0 0 0
 1 0 0 0
 1 0 0 0
 1 0 0 0
 1 1 0 0
 8 1 0 "" ""
-2 1 1 "8cm" ""
+2 1 1 "10cm" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 2 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 2 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
@@ -1594,6 +1650,10 @@ Show the configuration options for ROX-Filer.
 Open Home Directory
 \newline 
 Show your home directory.
+\newline 
+Show Location
+\newline 
+Open a directory viewer showing where the file is stored.
 \newline 
 Show Help
 \newline 
@@ -2638,14 +2698,12 @@ Toolbar options
  not be shown on filer window toolbars.
 \layout Itemize
 
-`Toolbar type for new windows' allows you to choose what kind of toolbar
- will be used for future filer windows (the currently open windows are not
- affected).
+`Toolbar type' allows you to choose what kind of toolbars you want.
  
 \series bold 
 None
 \series default 
- means that new windows will not have a toolbar, 
+ means that windows will not have a toolbar, 
 \series bold 
 Normal
 \series default 
@@ -2653,7 +2711,7 @@ Normal
 \series bold 
 Large
 \series default 
- displays larger icons with textual labels.
+ displays larger buttons, with textual labels.
 \layout Standard
 
 See section 
