@@ -479,7 +479,7 @@ static void set_shell_action(GtkWidget *dialog)
 		error = errno;
 	if (fclose(file) && error == 0)
 		error = errno;
-	if (chmod(path, 0777))
+	if (chmod(path, 0755))
 		error = errno;
 
 	if (error)
@@ -1084,7 +1084,7 @@ static void import_file(const gchar *file, GHashTable *globs)
 	MIME_type *type = NULL;
 	GError *error = NULL;
 	gchar  *data, *line;
-	
+
 	if (!g_file_get_contents(file, &data, NULL, &error))
 	{
 		delayed_error("Error loading MIME-Info database:\n%s",
@@ -1092,7 +1092,7 @@ static void import_file(const gchar *file, GHashTable *globs)
 		g_error_free(error);
 		return;
 	}
-
+	
 	line = data;
 
 	while (line && *line)
