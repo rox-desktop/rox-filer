@@ -69,7 +69,6 @@ struct _GtkSaveboxClass
 
   gint (*save_to_file)	(GtkSavebox *savebox, guchar *pathname);
   void (*saved_to_uri)	(GtkSavebox *savebox, guchar *uri);
-  void (*save_done)	(GtkSavebox *savebox);
 };
 
 

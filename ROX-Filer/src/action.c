@@ -37,6 +37,7 @@
 #include "global.h"
 
 #include "action.h"
+#include "abox.h"
 #include "string.h"
 #include "support.h"
 #include "gui_support.h"
@@ -59,41 +60,24 @@
  * W		neWer toggled
  */
 
-#define SENSITIVE_YESNO(gui_side, state)	\
-	do {				\
-		gtk_widget_set_sensitive((gui_side)->yes, state);	\
-		gtk_widget_set_sensitive((gui_side)->no, state);	\
-		if ((gui_side)->entry)					\
-			gtk_widget_set_sensitive((gui_side)->entry, state);\
-	} while (0)
-
 typedef struct _GUIside GUIside;
 typedef void ActionChild(gpointer data);
 typedef void ForDirCB(const char *path, const char *dest_path);
 
 struct _GUIside
 {
+	ABox		*abox;		/* The action window widget */
+
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-	GtkWidget 	*log;
-	GtkWidget 	*vbox, *window, *dir, *log_hbox, *flag_box;
-	GtkWidget	*quiet, *yes, *no, *quiet_flag;
 	int		child;		/* Process ID */
-	int		errors;
+	int		errors;		/* Number of errors so far */
 	gboolean	show_info;	/* For Disk Usage */
 
-	GtkWidget	*entry;		/* May be NULL */
 	guchar		**default_string; /* Changed when the entry changes */
 	void		(*entry_string_func)(GtkWidget *widget,
 					     const guchar *string);
-	
-	char		*next_dir;	/* NULL => no timer active */
-	gint		next_timer;
-
-	/* Used by Find */
-	FilerWindow	*preview;
-	GtkWidget	*results;
 };
 
 /* These don't need to be in a structure because we fork() before
@@ -142,51 +126,10 @@ static gboolean send_error();
 static gboolean send_dir(const char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
-static GtkWidget *add_toggle(GUIside *gui_side,
-			     const gchar *label,
-			     const gchar *tip,
-			     const gchar *code,
-			     gboolean active);
 static gboolean reply(int fd, gboolean ignore_quiet);
 static gboolean remove_pinned_ok(GList *paths);
 
 /*			SUPPORT				*/
-
-static void select_row_callback(GtkTreeView *treeview,
-				GtkTreePath *path,
-				GtkTreeViewColumn *col,
-				GUIside	    *gui_side)
-{
-	GtkTreeModel	*model;
-	GtkTreeIter	iter;
-	char		*leaf, *dir;
-
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(gui_side->results));
-	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_model_get(model, &iter, 0, &leaf, 1, &dir, -1);
-
-	if (gui_side->preview)
-	{
-		if (strcmp(gui_side->preview->path, dir) == 0)
-			display_set_autoselect(gui_side->preview, leaf);
-		else
-			filer_change_to(gui_side->preview, dir, leaf);
-		goto out;
-	}
-
-	gui_side->preview = filer_opendir(dir, NULL);
-	if (gui_side->preview)
-	{
-		display_set_autoselect(gui_side->preview, leaf);
-		g_signal_connect(gui_side->preview->window, "destroy",
-				G_CALLBACK(gtk_widget_destroyed),
-				&gui_side->preview);
-	}
-
-out:
-	g_free(dir);
-	g_free(leaf);
-}
 
 
 /* This is called whenever the user edits the entry box (if any) - send the
@@ -201,7 +144,7 @@ static void entry_changed(GtkEditable *entry, GUIside *gui_side)
 	text = gtk_editable_get_chars(entry, 0, -1);
 
 	if (gui_side->entry_string_func)
-		gui_side->entry_string_func(GTK_WIDGET(gui_side->entry), text);
+		gui_side->entry_string_func(GTK_WIDGET(entry), text);
 
 	g_free(*(gui_side->default_string));
 	*(gui_side->default_string) = text;	/* Gets text's ref */
@@ -382,46 +325,49 @@ static void show_chmod_help(gpointer data)
 	gtk_widget_show_all(help);
 }
 
-static gboolean display_dir(gpointer data)
+static void process_message(GUIside *gui_side, const gchar *buffer)
 {
-	GUIside	*gui_side = (GUIside *) data;
+	ABox *abox = gui_side->abox;
 
-	gtk_label_set_text(GTK_LABEL(gui_side->dir), gui_side->next_dir + 1);
-	g_free(gui_side->next_dir);
-	gui_side->next_dir = NULL;
-	
-	return FALSE;
-}
-
-static void add_to_results(GUIside *gui_side, gchar *path)
-{
-	GtkTreeModel *model;
-	GtkTreeIter iter;
-	gchar	*dir;
-
-	model = gtk_tree_view_get_model(GTK_TREE_VIEW(gui_side->results));
-
-	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
-
-	dir = g_dirname(path);
-	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
-			   0, g_basename(path),
-			   1, dir, -1);
-
-	g_free(dir);
+	if (*buffer == '?')
+		abox_ask(abox, buffer + 1);
+	else if (*buffer == 's')
+		dir_check_this(buffer + 1);	/* Update this item */
+	else if (*buffer == '=')
+		abox_add_filename(abox, buffer + 1);
+	else if (*buffer == '#')
+		abox_clear_results(abox);
+	else if (*buffer == 'm' || *buffer == 'M')
+	{
+		/* Mount / major changes to this path */
+		if (*buffer == 'M')
+			mount_update(TRUE);
+		filer_check_mounted(buffer + 1);
+	}
+	else if (*buffer == '/')
+		abox_set_current_object(abox, buffer + 1);
+	else if (*buffer == 'o')
+		filer_opendir(buffer + 1, NULL);
+	else if (*buffer == '!')
+	{
+		gui_side->errors++;
+		abox_log(abox, buffer + 1, "error");
+	}
+	else
+		abox_log(abox, buffer + 1, NULL);
 }
 
 /* Called when the child sends us a message */
-static void message_from_child(gpointer 	 data,
-			       gint     	 source, 
-			       GdkInputCondition condition)
+static void message_from_child(gpointer 	  data,
+			        gint     	  source, 
+			        GdkInputCondition condition)
 {
 	char buf[5];
 	GUIside	*gui_side = (GUIside *) data;
+	ABox	*abox = gui_side->abox;
 	GtkTextBuffer *text_buffer;
-	GtkTextIter end;
 
-	text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log));
+	text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(abox->log));
 
 	if (read_exact(source, buf, 4))
 	{
@@ -434,84 +380,7 @@ static void message_from_child(gpointer 	 data,
 		if (message_len > 0 && read_exact(source, buffer, message_len))
 		{
 			buffer[message_len] = '\0';
-			if (*buffer == '?')
-			{
-				/* Ask a question */
-				SENSITIVE_YESNO(gui_side, TRUE);
-				gtk_window_set_focus(
-					GTK_WINDOW(gui_side->window),
-					gui_side->entry ? gui_side->entry
-							: gui_side->yes);
-			}
-			else if (*buffer == 's')
-			{
-				/* Update this item */
-				/* refresh_dirs(buffer + 1); */
-				dir_check_this(buffer + 1);
-				g_free(buffer);
-				return;
-			}
-			else if (*buffer == '=')
-			{
-				/* Add to search results */
-				add_to_results(gui_side, buffer + 1);
-				g_free(buffer);
-				return;
-			}
-			else if (*buffer == '#')
-			{
-				/* Clear search results area */
-				GtkTreeModel *model;
-				
-				model = gtk_tree_view_get_model(
-					GTK_TREE_VIEW(gui_side->results));
-				gtk_list_store_clear(GTK_LIST_STORE(model));
-				g_free(buffer);
-				return;
-			}
-
-			else if (*buffer == 'm' || *buffer == 'M')
-			{
-				/* Mount / major changes to this path */
-				if (*buffer == 'M')
-					mount_update(TRUE);
-				filer_check_mounted(buffer + 1);
-				g_free(buffer);
-				return;
-			}
-			else if (*buffer == '/')
-			{
-				/* Update the current object display */
-				if (gui_side->next_dir)
-					g_free(gui_side->next_dir);
-				else
-					gui_side->next_timer =
-						gtk_timeout_add(500,
-								display_dir,
-								gui_side);
-				gui_side->next_dir = buffer;
-				return;
-			}
-			else if (*buffer == 'o')
-			{
-				/* Open a filer window */
-				filer_opendir(buffer + 1, NULL);
-				g_free(buffer);
-				return;
-			}
-			else if (*buffer == '!')
-				gui_side->errors++;
-
-			gtk_text_buffer_get_end_iter(text_buffer, &end);
-			gtk_text_buffer_insert_with_tags_by_name(text_buffer,
-					&end, buffer + 1, message_len - 1,
-					*buffer == '!' ? "red" :
-					*buffer == '?' ? "question" :
-						         NULL, NULL);
-			gtk_text_view_scroll_to_mark(
-				GTK_TEXT_VIEW(gui_side->log),
-				gtk_text_buffer_get_mark(text_buffer, "insert"),
-				0.0, FALSE, 0, 0);
+			process_message(gui_side, buffer);
 			g_free(buffer);
 			return;
 		}
@@ -525,7 +394,7 @@ static void message_from_child(gpointer 	 data,
 	gui_side->to_child = NULL;
 	close(gui_side->from_child);
 	gdk_input_remove(gui_side->input_tag);
-	gtk_widget_set_sensitive(gui_side->quiet, FALSE);
+	/* XXX: gtk_widget_set_sensitive(gui_side->quiet, FALSE); */
 
 	if (gui_side->errors)
 	{
@@ -542,7 +411,7 @@ static void message_from_child(gpointer 	 data,
 		g_free(report);
 	}
 	else if (gui_side->show_info == FALSE)
-		gtk_widget_destroy(gui_side->window);
+		gtk_widget_destroy(GTK_WIDGET(gui_side->abox));
 }
 
 /* Scans src_dir, calling cb(item, dest_path) for each item */
@@ -635,25 +504,8 @@ static gboolean send_error(void)
 	return send();
 }
 
-static void quiet_clicked(GtkWidget *button, GUIside *gui_side)
-{
-	GtkToggleButton *quiet_flag = GTK_TOGGLE_BUTTON(gui_side->quiet_flag);
-
-	if (!gui_side->to_child)
-		return;
-
-	gtk_widget_set_sensitive(gui_side->quiet, FALSE);
-
-	if (gtk_toggle_button_get_active(quiet_flag))
-		return;		/* (shouldn't happen) */
-
-	gtk_toggle_button_set_active(quiet_flag, TRUE);
-
-	if (GTK_WIDGET_SENSITIVE(gui_side->yes))
-		gtk_button_clicked(GTK_BUTTON(gui_side->yes));
-}
-
 /* Send 'Quiet' if possible, 'Yes' otherwise */
+#if 0
 static void find_return_pressed(GtkWidget *button, GUIside *gui_side)
 {
 	if (GTK_WIDGET_SENSITIVE(gui_side->quiet))
@@ -663,27 +515,33 @@ static void find_return_pressed(GtkWidget *button, GUIside *gui_side)
 	else
 		gdk_beep();
 }
+#endif
 
-static void button_reply(GtkWidget *button, GUIside *gui_side)
+static void response(GtkDialog *dialog, gint response, GUIside *gui_side)
 {
-	char *text;
+	gchar code;
 
 	if (!gui_side->to_child)
 		return;
 
-	text = g_object_get_data(G_OBJECT(button), "send-code");
-	g_return_if_fail(text != NULL);
-	fputc(*text, gui_side->to_child);
-	fflush(gui_side->to_child);
+	if (response == GTK_RESPONSE_YES)
+		code = 'Y';
+	else if (response == GTK_RESPONSE_NO)
+		code = 'N';
+	else
+		return;
 
-	if (*text == 'Y' || *text == 'N')
-		SENSITIVE_YESNO(gui_side, FALSE);
-	if (*text == 'Q')
-	{
-		gtk_widget_set_sensitive(gui_side->quiet,
-			!gtk_toggle_button_get_active(
-				GTK_TOGGLE_BUTTON(gui_side->quiet_flag)));
-	}
+	fputc(code, gui_side->to_child);
+	fflush(gui_side->to_child);
+}
+
+static void flag_toggled(ABox *abox, gint flag, GUIside *gui_side)
+{
+	if (!gui_side->to_child)
+		return;
+
+	fputc(flag, gui_side->to_child);
+	fflush(gui_side->to_child);
 }
 
 static void read_new_entry_text(void)
@@ -827,20 +685,6 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 		gdk_input_remove(gui_side->input_tag);
 	}
 
-	if (gui_side->next_dir)
-	{
-		gtk_timeout_remove(gui_side->next_timer);
-		g_free(gui_side->next_dir);
-	}
-
-	if (gui_side->preview)
-	{
-		g_signal_handlers_disconnect_matched(gui_side->preview->window,
-				G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL,
-				gui_side);
-		gui_side->preview = NULL;
-	}
-	
 	g_free(gui_side);
 	
 	if (--number_of_windows < 1)
@@ -849,24 +693,20 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 
 /* Create two pipes, fork() a child and return a pointer to a GUIside struct
  * (NULL on failure). The child calls func().
- *
- * If autoq then automatically selects 'Quiet'.
  */
-static GUIside *start_action_with_options(gpointer data, ActionChild *func,
-					  gboolean autoq,
-					  int force, int brief, int recurse,
-					  int newer)
+static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
+			      int force, int brief, int recurse, int newer)
 {
+	gboolean	autoq;
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
 	int		child;
-	GtkWidget	*vbox, *button, *scrollbar, *actions, *text;
 	struct sigaction act;
-	GtkWidget	*frame;
 
 	if (pipe(filedes))
 	{
 		report_error("pipe: %s", g_strerror(errno));
+		gtk_widget_destroy(abox);
 		return NULL;
 	}
 
@@ -875,8 +715,12 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 		close(filedes[0]);
 		close(filedes[1]);
 		report_error("pipe: %s", g_strerror(errno));
+		gtk_widget_destroy(abox);
 		return NULL;
 	}
+
+	autoq = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(ABOX(abox)->quiet));
 
 	o_force = force;
 	o_brief = brief;
@@ -888,6 +732,7 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	{
 		case -1:
 			report_error("fork: %s", g_strerror(errno));
+			gtk_widget_destroy(abox);
 			return NULL;
 		case 0:
 			/* We are the child */
@@ -916,112 +761,28 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gui_side = g_malloc(sizeof(GUIside));
 	gui_side->from_child = filedes[0];
 	gui_side->to_child = fdopen(filedes[3], "wb");
-	gui_side->log = NULL;
 	gui_side->child = child;
 	gui_side->errors = 0;
 	gui_side->show_info = FALSE;
-	gui_side->preview = NULL;
-	gui_side->results = NULL;
-	gui_side->entry = NULL;
 	gui_side->default_string = NULL;
 	gui_side->entry_string_func = NULL;
 
-	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_type_hint(GTK_WINDOW(gui_side->window),
-				    GDK_WINDOW_TYPE_HINT_DIALOG);
-	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
-	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 450, 200);
-	g_signal_connect(gui_side->window, "destroy",
+	gui_side->abox = ABOX(abox);
+	g_signal_connect(abox, "destroy",
 			G_CALLBACK(destroy_action_window), gui_side);
 
-	gui_side->vbox = vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
+	g_signal_connect(abox, "response", G_CALLBACK(response), gui_side);
+	g_signal_connect(abox, "flag_toggled",
+			 G_CALLBACK(flag_toggled), gui_side);
 
-	gui_side->dir = gtk_label_new(_("<dir>"));
-	gtk_widget_set_size_request(gui_side->dir, 8, -1);
-	gui_side->next_dir = NULL;
-	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
-	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
-
-	gui_side->log_hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), gui_side->log_hbox, TRUE, TRUE, 4);
-
-	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox), frame, TRUE, TRUE, 0);
-	
-	text = gtk_text_view_new();
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_container_add(GTK_CONTAINER(frame), text);
-
-	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
-	gui_side->log = text;
-	scrollbar = gtk_vscrollbar_new(NULL);
-	gtk_widget_set_scroll_adjustments(text, NULL,
-			gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
-	gtk_text_buffer_create_tag(
-			gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log)),
-			"red", "foreground", "red",
-			NULL);
-	gtk_text_buffer_create_tag(
-			gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log)),
-			"question", "weight", "bold",
-			NULL);
-	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
-	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);
-	gtk_widget_set_size_request(text, 400, 100);
-
-	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
-				scrollbar, FALSE, TRUE, 0);
-
-	actions = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), actions, FALSE, TRUE, 0);
-	gui_side->flag_box = gtk_hbox_new(FALSE, 16);
-	gtk_box_pack_start(GTK_BOX(vbox), gui_side->flag_box, FALSE, TRUE, 2);
-
-	gui_side->quiet = button = gtk_button_new_with_label(_("Quiet"));
-	gtk_misc_set_padding(GTK_MISC(GTK_BIN(button)->child), 12, 0);
-	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), button, FALSE, TRUE, 0);
-	g_signal_connect(button, "clicked",
-			G_CALLBACK(quiet_clicked), gui_side);
-
-	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
-	g_object_set_data(G_OBJECT(button), "send-code", "Y");
-	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	g_signal_connect(button, "clicked",
-			G_CALLBACK(button_reply), gui_side);
-	gui_side->no = button = gtk_button_new_with_label(_("No"));
-	g_object_set_data(G_OBJECT(button), "send-code", "N");
-	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	g_signal_connect(button, "clicked",
-			G_CALLBACK(button_reply), gui_side);
-	SENSITIVE_YESNO(gui_side, FALSE);
-
-	button = gtk_button_new_with_label(_("Abort"));
-	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(gtk_widget_destroy),
-			gui_side->window);
+	//SENSITIVE_YESNO(gui_side, FALSE);
 
 	gui_side->input_tag = gdk_input_add(gui_side->from_child,
 						GDK_INPUT_READ,
 						message_from_child,
 						gui_side);
 
-	gui_side->quiet_flag = add_toggle(gui_side,
-				_("Quiet"), _("Don't confirm every operation"),
-				"Q", autoq);
-	gtk_widget_set_sensitive(gui_side->quiet, !autoq);
-
 	return gui_side;
-}
-
-static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
-{
-	return start_action_with_options(data, func, autoq,
-					 o_action_force.int_value,
-					 o_action_brief.int_value,
-					 o_action_recurse.int_value,
-					 o_action_newer.int_value);
 }
 
 /* 			ACTIONS ON ONE ITEM 			*/
@@ -1680,8 +1441,8 @@ static void do_mount(guchar *path, gboolean mount)
 	else
 	{
 		g_string_sprintf(message,
-				mount ? _("?Mount %s?\n")
-				      : _("?Unmount %s?\n"),
+				mount ? _("?Mount %s?")
+				      : _("?Unmount %s?"),
 				path);
 		if (!reply(from_parent, FALSE))
 			return;
@@ -1900,35 +1661,12 @@ static void list_cb(gpointer data)
 	send();
 }
 
-static GtkWidget *add_toggle(GUIside *gui_side,
-			     const gchar *label,
-			     const gchar *tip,
-			     const gchar *code,
-			     gboolean active)
-{
-	GtkWidget	*check;
-
-	check = gtk_check_button_new_with_label(label);
-	gtk_tooltips_set_tip(tooltips, check, tip, NULL);
-	g_object_set_data(G_OBJECT(check), "send-code", (gchar *) code);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), active);
-	g_signal_connect(check, "clicked",
-			G_CALLBACK(button_reply), gui_side);
-	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), check, FALSE, TRUE, 0);
-
-	return check;
-}
-
-
 /*			EXTERNAL INTERFACE			*/
 
 void action_find(GList *paths)
 {
 	GUIside		*gui_side;
-	GtkWidget	*hbox, *label, *scroller, *frame;
-	GtkListStore	*model;
-	GtkCellRenderer	*cell_renderer;
-	GtkTreeViewColumn	*column;
+	GtkWidget	*abox;
 
 	if (!paths)
 	{
@@ -1941,74 +1679,37 @@ void action_find(GList *paths)
 		last_find_string = g_strdup("'core'");
 
 	new_entry_string = last_find_string;
-	gui_side = start_action(paths, find_cb, FALSE);
+
+	abox = abox_new(_("Find"), FALSE);
+	gui_side = start_action(abox, find_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
+
+	abox_add_results(ABOX(abox));
+
+	gui_side->default_string = &last_find_string;
+	abox_add_entry(ABOX(abox), last_find_string,
+				new_help_button(show_condition_help, NULL));
+	g_signal_connect(ABOX(abox)->entry, "changed",
+			G_CALLBACK(entry_changed), gui_side);
+	set_find_string_colour(ABOX(abox)->entry, last_find_string);
 
 	gui_side->show_info = TRUE;
 	gui_side->entry_string_func = set_find_string_colour;
 
-	scroller = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
-			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), frame, TRUE, TRUE, 4);
-
-	gtk_container_add(GTK_CONTAINER(frame), scroller);
-
-	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
-	gui_side->results = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
-	g_object_unref(G_OBJECT(model));
-	cell_renderer = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(
-				_("Name"), cell_renderer, "text", 0, NULL);
-	gtk_tree_view_column_set_resizable(column, TRUE);
-	gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
-	gtk_tree_view_append_column(GTK_TREE_VIEW(gui_side->results), column);
-	gtk_tree_view_insert_column_with_attributes(
-			GTK_TREE_VIEW(gui_side->results),
-			1, (gchar *) _("Directory"), cell_renderer,
-			"text", 1, NULL);
-
-	gtk_widget_set_size_request(gui_side->results, 100, 100);
-	gtk_container_add(GTK_CONTAINER(scroller), gui_side->results);
-	gtk_box_set_child_packing(GTK_BOX(gui_side->vbox),
-			  gui_side->log_hbox, FALSE, TRUE, 4, GTK_PACK_START);
-	g_signal_connect(gui_side->results, "row-activated",
-			G_CALLBACK(select_row_callback), gui_side);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new(_("Expression:"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
-	gui_side->default_string = &last_find_string;
-	gui_side->entry = gtk_entry_new();
-	gtk_widget_set_name(gui_side->entry, "fixed-style");
-	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
-	set_find_string_colour(gui_side->entry, last_find_string);
-	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
-	gtk_widget_set_sensitive(gui_side->entry, FALSE);
-	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
-	g_signal_connect(gui_side->entry, "changed",
-			G_CALLBACK(entry_changed), gui_side);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox),
-				new_help_button(show_condition_help, NULL),
-				FALSE, TRUE, 4);
-
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
-	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
-	g_signal_connect(gui_side->entry, "activate",
-			G_CALLBACK(find_return_pressed), gui_side);
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show_all(abox);
 }
 
 /* Count disk space used by selected items */
 void action_usage(GList *paths)
 {
-	GUIside		*gui_side;
+	GUIside *gui_side;
+	GtkWidget *abox;
 
 	if (!paths)
 	{
@@ -2016,15 +1717,21 @@ void action_usage(GList *paths)
 		return;
 	}
 
-	gui_side = start_action(paths, usage_cb, TRUE);
+	abox = abox_new(_("Disk Usage"), TRUE);
+	
+	gui_side = start_action(abox, usage_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
 	gui_side->show_info = TRUE;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Disk Usage"));
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+
+	gtk_widget_show(abox);
 }
 
 /* Mount/unmount listed items (paths).
@@ -2036,19 +1743,24 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
+	GtkWidget	*abox;
 
 	if (quiet == -1)
 	 	quiet = o_action_mount.int_value;
 
 	mount_open_dir = open_dir;
-	gui_side = start_action(paths, mount_cb, quiet);
+
+	abox = abox_new(_("Mount / Unmount"), quiet);
+	gui_side = start_action(abox, mount_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window),
-					_("Mount / Unmount"));
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 #else
 	report_error(
 		_("ROX-Filer does not yet support mount points on your "
@@ -2060,31 +1772,36 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 void action_delete(GList *paths)
 {
 	GUIside		*gui_side;
+	GtkWidget	*abox;
 
 	if (!remove_pinned_ok(paths))
 		return;
 
-	gui_side = start_action(paths, delete_cb, o_action_delete.int_value);
+	abox = abox_new(_("Delete"), o_action_delete.int_value);
+	gui_side = start_action(abox, delete_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Delete"));
-	add_toggle(gui_side,
+	abox_add_flag(ABOX(abox),
 		_("Force"), _("Don't confirm deletion of non-writeable items"),
-		"F", o_action_force.int_value);
-	add_toggle(gui_side,
+		'F', o_action_force.int_value);
+	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Only log directories being deleted"),
-		"B", o_action_brief.int_value);
+		'B', o_action_brief.int_value);
 
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 }
 
 /* Change the permissions of the selected items */
 void action_chmod(GList *paths)
 {
+	GtkWidget	*abox;
 	GUIside		*gui_side;
-	GtkWidget	*hbox, *label, *combo;
 	static GList	*presets = NULL;
 
 	if (!paths)
@@ -2111,47 +1828,37 @@ void action_chmod(GList *paths)
 	if (!last_chmod_string)
 		last_chmod_string = g_strdup((guchar *) presets->data);
 	new_entry_string = last_chmod_string;
-	gui_side = start_action(paths, chmod_cb, FALSE);
+
+	abox = abox_new(_("Permissions"), FALSE);
+	gui_side = start_action(abox, chmod_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	add_toggle(gui_side,
+	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Don't list processed files"),
-		"B", o_action_brief.int_value);
-	add_toggle(gui_side,
+		'B', o_action_brief.int_value);
+	abox_add_flag(ABOX(abox),
 		_("Recurse"), _("Also change contents of subdirectories"),
-		"R", o_action_recurse.int_value);
+		'R', o_action_recurse.int_value);
 
-	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new(_("Command:"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_chmod_string;
-	
-	combo = gtk_combo_new();
-	gtk_combo_disable_activate(GTK_COMBO(combo));
-	gtk_combo_set_use_arrows_always(GTK_COMBO(combo), TRUE);
-	gtk_combo_set_popdown_strings(GTK_COMBO(combo), presets);
-	
-	gui_side->entry = GTK_COMBO(combo)->entry;
-	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_chmod_string);
-	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
-	gtk_widget_set_sensitive(gui_side->entry, FALSE);
-	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
-	g_signal_connect(gui_side->entry, "changed",
+	abox_add_combo(ABOX(abox), presets, last_chmod_string,
+				new_help_button(show_chmod_help, NULL));
+
+	g_signal_connect(ABOX(abox)->entry, "changed",
 			G_CALLBACK(entry_changed), gui_side);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox),
-				new_help_button(show_chmod_help, NULL),
-				FALSE, TRUE, 4);
-	
-	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Permissions"));
+#if 0
 	g_signal_connect_swapped(gui_side->entry, "activate",
 			G_CALLBACK(gtk_button_clicked),
 			gui_side->yes);
+#endif
 
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 }
 
 /* If leaf is NULL then the copy has the same name as the original.
@@ -2160,6 +1867,7 @@ void action_chmod(GList *paths)
 void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 {
 	GUIside		*gui_side;
+	GtkWidget	*abox;
 
 	if (quiet == -1)
 		quiet = o_action_copy.int_value;
@@ -2167,17 +1875,23 @@ void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_copy;
-	gui_side = start_action(paths, list_cb, quiet);
+
+	abox = abox_new(_("Copy"), quiet);
+	gui_side = start_action(abox, list_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Copy"));
-	add_toggle(gui_side,
+	abox_add_flag(ABOX(abox),
 		   _("Newer"),
 		   _("Only over-write if source is newer than destination."),
-		   "W", o_action_newer.int_value);
+		   'W', o_action_newer.int_value);
+
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 }
 
 /* If leaf is NULL then the file is not renamed.
@@ -2186,6 +1900,7 @@ void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 {
 	GUIside		*gui_side;
+	GtkWidget	*abox;
 
 	if (quiet == -1)
 		quiet = o_action_move.int_value;
@@ -2193,35 +1908,46 @@ void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_move;
-	gui_side = start_action(paths, list_cb, quiet);
+
+	abox = abox_new(_("Move"), quiet);
+	gui_side = start_action(abox, list_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Move"));
-	add_toggle(gui_side,
+	abox_add_flag(ABOX(abox),
 		   _("Newer"),
 		   _("Only over-write if source is newer than destination."),
-		   "W", o_action_newer.int_value);
+		   'W', o_action_newer.int_value);
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 }
 
 /* If leaf is NULL then the link will have the same name */
 /* XXX: No quiet option here? */
 void action_link(GList *paths, const char *dest, const char *leaf)
 {
+	GtkWidget	*abox;
 	GUIside		*gui_side;
 
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_link;
-	gui_side = start_action(paths, list_cb, o_action_link.int_value);
+
+	abox = abox_new(_("Link"), o_action_link.int_value);
+	gui_side = start_action(abox, list_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Link"));
 	number_of_windows++;
-	gtk_widget_show_all(gui_side->window);
+	gtk_widget_show(abox);
 }
 
 void action_init(void)

@@ -1,0 +1,514 @@
+/*
+ * $Id$
+ *
+ * ROX-Filer, filer for the ROX desktop project
+ * Copyright (C) 2002, the ROX-Filer team.
+ *
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
+ *
+ * This program is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for
+ * more details.
+ *
+ * You should have received a copy of the GNU General Public License along with
+ * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
+ * Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
+/* abox.c - the dialog box widget used for filer operations.
+ *
+ * The actual code for specific operations is in action.c.
+ */
+
+#include "config.h"
+
+#include "global.h"
+
+#include "main.h"
+#include "abox.h"
+#include "gui_support.h"
+#include "filer.h"
+#include "display.h"
+
+#define RESPONSE_QUIET 1
+
+/* Static prototypes */
+static void abox_class_init(GObjectClass *gclass, gpointer data);
+static void abox_init(GTypeInstance *object, gpointer gclass);
+static void response(GtkDialog *dialog, gint response_id);
+static void abox_finalise(GObject *object);
+static void shade(ABox *abox);
+
+GType abox_get_type(void)
+{
+	static GType type = 0;
+
+	if (!type)
+	{
+		static const GTypeInfo info =
+		{
+			sizeof (ABoxClass),
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			(GClassInitFunc) abox_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(ABox),
+			0,			/* n_preallocs */
+			(GInstanceInitFunc) abox_init
+		};
+
+		type = g_type_register_static(GTK_TYPE_DIALOG,
+						"ABox", &info, 0);
+	}
+
+	return type;
+}
+
+GtkWidget* abox_new(const gchar *title, gboolean quiet)
+{
+	GtkWidget *widget;
+	ABox	  *abox;
+	
+	widget = GTK_WIDGET(gtk_widget_new(abox_get_type(), NULL));
+	abox = (ABox *) widget;
+
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(abox->quiet), quiet);
+
+	gtk_window_set_title(GTK_WINDOW(widget), title);
+	gtk_dialog_set_has_separator(GTK_DIALOG(widget), FALSE);
+
+	return widget;
+}
+
+static void abox_class_init(GObjectClass *gclass, gpointer data)
+{
+	GtkDialogClass *dialog = (GtkDialogClass *) gclass;
+
+	dialog->response = response;
+
+	g_signal_new("flag_toggled", G_TYPE_FROM_CLASS(gclass),
+		G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET(ABoxClass, flag_toggled),
+		NULL, NULL, g_cclosure_marshal_VOID__INT,
+		G_TYPE_NONE, 1, G_TYPE_INT);
+
+	gclass->finalize = abox_finalise;
+}
+
+static void abox_init(GTypeInstance *object, gpointer gclass)
+{
+	GtkWidget *frame, *text, *scrollbar, *button;
+	ABox *abox = ABOX(object);
+	GtkDialog *dialog = GTK_DIALOG(object);
+
+	abox->dir_label = gtk_label_new(_("<dir>"));
+	gtk_widget_set_size_request(abox->dir_label, 8, -1);
+	abox->results = NULL;
+	abox->entry = NULL;
+	abox->next_dir = NULL;
+	abox->next_timer = 0;
+	abox->question = FALSE;
+	gtk_misc_set_alignment(GTK_MISC(abox->dir_label), 0.5, 0.5);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox),
+				abox->dir_label, FALSE, TRUE, 0);
+
+	abox->log_hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox),
+				abox->log_hbox, TRUE, TRUE, 4);
+
+	frame = gtk_frame_new(NULL);
+	gtk_box_pack_start(GTK_BOX(abox->log_hbox), frame, TRUE, TRUE, 0);
+	
+	text = gtk_text_view_new();
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_add(GTK_CONTAINER(frame), text);
+
+	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+	abox->log = text;
+
+	scrollbar = gtk_vscrollbar_new(NULL);
+	gtk_widget_set_scroll_adjustments(text, NULL,
+			gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
+	gtk_text_buffer_create_tag(
+			gtk_text_view_get_buffer(GTK_TEXT_VIEW(abox->log)),
+			"error", "foreground", "red",
+			NULL);
+	gtk_text_buffer_create_tag(
+			gtk_text_view_get_buffer(GTK_TEXT_VIEW(abox->log)),
+			"question", "weight", "bold",
+			NULL);
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
+	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);
+	gtk_widget_set_size_request(text, 400, 100);
+
+	gtk_box_pack_start(GTK_BOX(abox->log_hbox), scrollbar, FALSE, TRUE, 0);
+
+	gtk_dialog_add_buttons(dialog,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_NO, GTK_RESPONSE_NO,
+			GTK_STOCK_YES, GTK_RESPONSE_YES,
+			NULL);
+
+	abox->flag_box = gtk_hbox_new(FALSE, 16);
+	gtk_box_pack_end(GTK_BOX(dialog->vbox),
+				abox->flag_box, FALSE, TRUE, 2);
+
+	button = button_new_mixed(GTK_STOCK_GOTO_LAST, _("_Quiet"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_dialog_add_action_widget(dialog, button, RESPONSE_QUIET);
+	gtk_dialog_set_default_response(dialog, RESPONSE_QUIET);
+
+	gtk_widget_show_all(dialog->vbox);
+
+	abox->quiet = abox_add_flag(abox,
+			_("Quiet"), _("Don't confirm every operation"),
+			'Q', FALSE);
+
+	shade(abox);
+}
+
+static void flag_toggled(GtkToggleButton *toggle, ABox *abox)
+{
+	gint	code;
+
+	code = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(toggle),
+						 "abox-response"));
+	if (code == 'Q')
+		shade(abox);
+	
+	g_signal_emit_by_name(abox, "flag_toggled", code);
+			
+}
+
+GtkWidget *abox_add_flag(ABox *abox, const gchar *label, const gchar *tip,
+		   	 gint response, gboolean default_value)
+{
+	GtkWidget	*check;
+
+	check = gtk_check_button_new_with_label(label);
+	gtk_tooltips_set_tip(tooltips, check, tip, NULL);
+	g_object_set_data(G_OBJECT(check), "abox-response",
+			  GINT_TO_POINTER(response));
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), default_value);
+	g_signal_connect(check, "toggled", G_CALLBACK(flag_toggled), abox);
+	gtk_box_pack_end(GTK_BOX(abox->flag_box), check, FALSE, TRUE, 0);
+	gtk_widget_show(check);
+
+	return check;
+}
+
+static void response(GtkDialog *dialog, gint response_id)
+{
+	ABox *abox = ABOX(dialog);
+
+	if (response_id == GTK_RESPONSE_CANCEL)
+		gtk_widget_destroy(GTK_WIDGET(dialog));
+	else if (response_id == RESPONSE_QUIET)
+	{
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(abox->quiet),
+					     TRUE);
+		gtk_dialog_response(dialog, GTK_RESPONSE_YES);
+	}
+	else if (response_id == GTK_RESPONSE_YES ||
+					response_id == GTK_RESPONSE_NO)
+	{
+		abox->question = FALSE;
+		shade(ABOX(abox));
+	}
+}
+
+/* Display the question. Unshade the Yes and No boxes (XXX and any entry).
+ * Will send a response signal when the user makes a choice.
+ */
+void abox_ask(ABox *abox, const gchar *question)
+{
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(question != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+
+	abox_log(abox, question, "question");
+
+	abox->question = TRUE;
+	shade(abox);
+
+#if 0
+		gtk_window_set_focus(
+				GTK_WINDOW(gui_side->window),
+				gui_side->entry ? gui_side->entry
+				: gui_side->yes);
+#endif
+}
+
+void abox_log(ABox *abox, const gchar *message, const gchar *style)
+{
+	GtkTextIter end;
+	GtkTextBuffer *text_buffer;
+
+	text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(abox->log));
+
+	gtk_text_buffer_get_end_iter(text_buffer, &end);
+	gtk_text_buffer_insert_with_tags_by_name(text_buffer,
+			&end, message, -1, style, NULL);
+	gtk_text_view_scroll_to_mark(
+			GTK_TEXT_VIEW(abox->log),
+			gtk_text_buffer_get_mark(text_buffer, "insert"),
+			0.0, FALSE, 0, 0);
+}
+
+static void abox_finalise(GObject *object)
+{
+	GObjectClass *parent_class;
+	ABox *abox = ABOX(object);
+	
+	if (abox->next_dir)
+	{
+		g_free(abox->next_dir);
+		abox->next_dir = NULL;
+		gtk_timeout_remove(abox->next_timer);
+	}
+
+	parent_class = gtk_type_class(GTK_TYPE_DIALOG);
+
+	if (G_OBJECT_CLASS(parent_class)->finalize)
+		(*G_OBJECT_CLASS(parent_class)->finalize)(object);
+}
+
+static gboolean show_next_dir(gpointer data)
+{
+	ABox	*abox = (ABox *) data;
+
+	gtk_label_set_text(GTK_LABEL(abox->dir_label), abox->next_dir);
+	g_free(abox->next_dir);
+	abox->next_dir = NULL;
+	
+	return FALSE;
+}
+
+/* Display this message in the current-object area.
+ * The display won't update too fast, even if you call this very often.
+ */
+void abox_set_current_object(ABox *abox, const gchar *message)
+{
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(message != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+
+	/* If a string is already set then replace it, but assume the
+	 * timer is already running...
+	 */
+
+	if (abox->next_dir)
+		g_free(abox->next_dir);
+	else
+	{
+		gtk_label_set_text(GTK_LABEL(abox->dir_label), message);
+		abox->next_timer = gtk_timeout_add(500, show_next_dir, abox);
+	}
+
+	abox->next_dir = g_strdup(message);
+}
+
+static void lost_preview(GtkWidget *window, ABox *abox)
+{
+	abox->preview = NULL;
+}
+
+static void select_row_callback(GtkTreeView *treeview,
+				GtkTreePath *path,
+				GtkTreeViewColumn *col,
+				ABox	    *abox)
+{
+	GtkTreeModel	*model;
+	GtkTreeIter	iter;
+	char		*leaf, *dir;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(abox->results));
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, 0, &leaf, 1, &dir, -1);
+
+	if (abox->preview)
+	{
+		if (strcmp(abox->preview->path, dir) == 0)
+			display_set_autoselect(abox->preview, leaf);
+		else
+			filer_change_to(abox->preview, dir, leaf);
+		goto out;
+	}
+
+	abox->preview = filer_opendir(dir, NULL);
+	if (abox->preview)
+	{
+		display_set_autoselect(abox->preview, leaf);
+		g_signal_connect_object(abox->preview->window, "destroy",
+				G_CALLBACK(lost_preview), abox, 0);
+	}
+
+out:
+	g_free(dir);
+	g_free(leaf);
+}
+
+/* Add a list-of-results area. You must use this before adding files
+ * with abox_add_filename().
+ */
+void abox_add_results(ABox *abox)
+{
+	GtkTreeViewColumn	*column;
+	GtkWidget	*scroller, *frame;
+	GtkListStore	*model;
+	GtkCellRenderer	*cell_renderer;
+
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+	g_return_if_fail(abox->results == NULL);
+
+	scroller = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
+			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(abox)->vbox),
+				frame, TRUE, TRUE, 4);
+
+	gtk_container_add(GTK_CONTAINER(frame), scroller);
+
+	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	abox->results = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	g_object_unref(G_OBJECT(model));
+
+	cell_renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(
+				_("Name"), cell_renderer, "text", 0, NULL);
+	gtk_tree_view_column_set_resizable(column, TRUE);
+	gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(abox->results), column);
+	gtk_tree_view_insert_column_with_attributes(
+			GTK_TREE_VIEW(abox->results),
+			1, (gchar *) _("Directory"), cell_renderer,
+			"text", 1, NULL);
+
+	gtk_container_add(GTK_CONTAINER(scroller), abox->results);
+
+	gtk_widget_set_size_request(abox->results, 100, 100);
+	gtk_box_set_child_packing(GTK_BOX(GTK_DIALOG(abox)->vbox),
+			  abox->log_hbox, FALSE, TRUE, 4, GTK_PACK_START);
+
+	g_signal_connect(abox->results, "row-activated",
+			G_CALLBACK(select_row_callback), abox);
+}
+
+void abox_add_filename(ABox *abox, const gchar *path)
+{	
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	gchar	*dir;
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(abox->results));
+
+	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
+
+	dir = g_dirname(path);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+			   0, g_basename(path),
+			   1, dir, -1);
+	g_free(dir);
+}
+
+/* Clear search results area */
+void abox_clear_results(ABox *abox)
+{
+	GtkTreeModel *model;
+	
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(abox->results));
+
+	gtk_list_store_clear(GTK_LIST_STORE(model));
+}
+
+void abox_add_combo(ABox *abox, GList *presets,
+		    const gchar *text, GtkWidget *help_button)
+{
+	GtkWidget *hbox, *label, *combo;
+
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+	g_return_if_fail(abox->entry == NULL);
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	label = gtk_label_new(_("Command:"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	
+	combo = gtk_combo_new();
+	gtk_combo_disable_activate(GTK_COMBO(combo));
+	gtk_combo_set_use_arrows_always(GTK_COMBO(combo), TRUE);
+	gtk_combo_set_popdown_strings(GTK_COMBO(combo), presets);
+	abox->entry = GTK_COMBO(combo)->entry;
+
+	gtk_entry_set_text(GTK_ENTRY(abox->entry), text);
+	//gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
+	//gtk_widget_set_sensitive(abox->entry, FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
+
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(abox)->vbox), hbox,
+				FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), help_button, FALSE, TRUE, 4);
+	
+	gtk_widget_grab_focus(abox->entry);
+
+	gtk_widget_show_all(hbox);
+}
+
+void abox_add_entry(ABox *abox, const gchar *text, GtkWidget *help_button)
+{
+	GtkWidget *hbox, *label;
+
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+	g_return_if_fail(abox->entry == NULL);
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	label = gtk_label_new(_("Expression:"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	abox->entry = gtk_entry_new();
+	gtk_widget_set_name(abox->entry, "fixed-style");
+	gtk_entry_set_text(GTK_ENTRY(abox->entry), text);
+	//gtk_editable_select_region(GTK_EDITABLE(abox->entry), 0, -1);
+	//gtk_widget_set_sensitive(abox->entry, FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), abox->entry, TRUE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(abox)->vbox),
+				hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox), help_button,
+				FALSE, TRUE, 4);
+
+	gtk_window_set_focus(GTK_WINDOW(abox), abox->entry);
+#if 0
+	g_signal_connect(abox->entry, "activate",
+			G_CALLBACK(find_return_pressed), gui_side);
+#endif
+
+	gtk_widget_show_all(hbox);
+}
+
+static void shade(ABox *abox)
+{
+	GtkDialog *dialog = (GtkDialog *) abox;
+	gboolean quiet, on = abox->question;
+
+	quiet = gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(abox->quiet));
+
+	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_YES, on);
+	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_NO, on);
+	
+	gtk_dialog_set_response_sensitive(dialog, RESPONSE_QUIET,
+					  quiet ? FALSE : on);
+
+	if (abox->entry)
+		gtk_widget_set_sensitive(abox->entry, on);
+}
