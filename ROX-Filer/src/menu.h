@@ -24,8 +24,7 @@ void menu_update_options(void);
 void menu_set_options(void);
 void menu_save_options(void);
 
-void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
-		     int item);
+void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
 GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name);
 void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
 void show_style_menu(FilerWindow *filer_window,

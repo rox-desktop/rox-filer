@@ -78,6 +78,7 @@ static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean can_set_run_action(DirItem *item);
 static gboolean link_cb(guchar *initial, guchar *path);
+static void select_nth_item(GtkMenuShell *shell, int n);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -410,20 +411,43 @@ void show_style_menu(FilerWindow *filer_window,
 			(gpointer) pos, event->button, event->time);
 }
 
-void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
-		     int item)
+void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
 	int		pos[2];
 	guchar		*shift_action;
+	int		button;
+	GdkModifierType	state = 0;
+	guint32		time = 0;
 
 	updating_menu++;
 
 	/* Remove previous AppMenu, if any */
 	appmenu_remove();
 
-	pos[0] = event->x_root;
-	pos[1] = event->y_root;
+
+	if (event->type == GDK_BUTTON_PRESS)
+	{
+		GdkEventButton *bev = (GdkEventButton *) event;
+
+		pos[0] = bev->x_root;
+		pos[1] = bev->y_root;
+		button = bev->button;
+		state = bev->state;
+		time = bev->time;
+	}
+	else
+	{
+		get_pointer_xy(pos, pos + 1);
+		button = 0;
+		if (event->type == GDK_KEY_PRESS)
+		{
+			GdkEventKey *kev = (GdkEventKey *) event;
+
+			time = kev->time;
+			state = kev->state;
+		}
+	}
 
 	window_with_focus = filer_window;
 
@@ -513,14 +537,22 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
-	popup_menu = (event->state & GDK_CONTROL_MASK)
+	popup_menu = (state & GDK_CONTROL_MASK)
 				? filer_file_menu
 				: filer_menu;
 
 	updating_menu--;
 	
 	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
-			(gpointer) pos, event->button, event->time);
+			(gpointer) pos, button, time);
+
+	if (!button)
+	{
+		if (popup_menu == filer_file_menu)
+			select_nth_item(GTK_MENU_SHELL(popup_menu), 5);
+		else if (popup_menu == filer_menu)
+			select_nth_item(GTK_MENU_SHELL(popup_menu), 1);
+	}
 }
 
 static void menu_closed(GtkWidget *widget)
@@ -1383,4 +1415,15 @@ static gboolean can_set_run_action(DirItem *item)
 
 	return item->base_type == TYPE_FILE &&
 		!(item->mime_type == &special_exec);
+}
+
+static void select_nth_item(GtkMenuShell *shell, int n)
+{
+	GList	  *items;
+	GtkWidget *item;
+
+	items = gtk_container_children(GTK_CONTAINER(shell));
+	item = (GtkWidget *) (g_list_nth(items, n)->data);
+	g_list_free(items);
+	gtk_menu_shell_select_item(shell, item);
 }
