@@ -4,25 +4,30 @@
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 "/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd">
 
-<book>
+<book lang="fr">
 <bookinfo>
   <title>
 	  ROX-Filer - Manuel de l'utilisateur
     <ulink url="http://rox.sourceforge.net"/>
   </title>
-  <author>
+
+  <authorgroup>
+   <author>
     <firstname>Thomas</firstname><surname>Leonard</surname>
     <affiliation>
       <address><email>tal197@users.sourceforge.net</email></address>
     </affiliation>
    </author>
+
    <othercredit role="translator">
-	 <firstname>Arnaud</firstname><surname>Calvo</surname>
-	 <contrib>Traduction française</contrib>
-	 <affiliation>
-	   <address><email>arnaud@calvo-france.com</email></address>
-	 </affiliation>
-   </othercredit>
+    <firstname>Arnaud</firstname><surname>Calvo</surname>
+    <contrib>Traduction française</contrib>
+    <affiliation>
+     <address><email>arnaud@calvo-france.com</email></address>
+    </affiliation>
+    </othercredit>
+   </authorgroup>
+   
   <copyright><year>2001</year><holder>Thomas Leonard</holder></copyright>
   <legalnotice>
     <title>Conditions</title>
@@ -239,7 +244,7 @@ $ rehash</screen>
 
 	  Par défaut, <application>ROX-Filer</application> démarre en affichant le répertoire courant.
 	  Vous pouvez lui spécifier d'ouvrir d'autres dossiers à la place en les passant en arguments :
-	  
+	
 <screen>$ rox /home /usr /usr/local</screen>
 
 Vous pouvez aussi l'utiliser pour ouvrir des fichiers, comme ceci :
@@ -359,7 +364,7 @@ DesktopWinMenuButton=1 # [0-20]
 # Desktop mouse-button click to show the window list
 DesktopWinListButton=2 # [0-5]
 # Desktop mouse-button click to show the window list menu
-DesktopMenuButton=0 # [0-20] 
+DesktopMenuButton=0 # [0-20]
 </programlisting>
 
 Et collez ceux-ci dans <filename>~/.icewm/winoptions</filename> :
@@ -511,7 +516,7 @@ implémenté dans le filer !).
 
 <itemizedlist><title>Premier aperçu succinct :</title>
 
-  <listitem><para>Faites un clic gauche 
+  <listitem><para>Faites un clic gauche
   <footnote><para>Cette documentation suppose que le bouton&ndash;1 est le bouton gauche, le bouton&ndash;2
 est le bouton du milieu et le bouton&ndash;3 est le bouton droit. Ce n'est pas
 toujours le cas &mdash; par exemple, dans une configuration pour gaucher.</para></footnote>
@@ -662,7 +667,7 @@ sont sollicités avec le bouton du milieu ou le bouton droit.
 <informaltable><tgroup cols="3">
 
 <thead>
-<row><entry> 
+<row><entry>
 Icône</entry><entry>
 Bouton gauche (1)</entry><entry>
 Autre bouton
@@ -675,7 +680,7 @@ Autre bouton
 Croix</entry><entry>
 Fermer la fenêtre</entry><entry>
 Ouvrir une nouvelle fenêtre
-</entry></row><row><entry> 
+</entry></row><row><entry>
 Flêche vers le haut</entry><entry>
 Affiche le dossier père</entry><entry>
 ... dans une nouvelle fenêtre<xref linkend="newwin_fn"/>
@@ -770,7 +775,7 @@ Ouvre un xterm avec ce dossier comme dossier courant.
 <row><entry><guimenuitem>Enormes icônes</guimenuitem></entry><entry>
 Vous voyez quelle taille ont les grandes icônes ? Celles-ci sont plus grandes !
 (cf. imagettes, ci-dessous).
-</entry></row><row><entry> 
+</entry></row><row><entry>
 
 <guimenuitem>Grandes icônes</guimenuitem></entry><entry>
 Chaque objet est affiché avec une grande icône et son nom en-dessous.
@@ -945,7 +950,7 @@ ajoutées au début de ce sous-menu quand vous cliquez sur ceux-ci &mdash; voir la
 		<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
 
-<row><entry> 
+<row><entry>
 <guimenuitem>Copier...</guimenuitem></entry><entry>
 Copie cet objet.
 </entry></row>
@@ -1059,7 +1064,7 @@ dossier <filename>&lt;Choices&gt;/Templates</filename>, s'il existe.
 <informaltable><tgroup cols="2">
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
-<row><entry> 
+<row><entry>
 Répertoire</entry><entry>
 Crée un nouveau répertoire.
 </entry></row><row><entry>
@@ -1106,7 +1111,7 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ce
 <informaltable><tgroup cols="2">
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
-<row><entry> 
+<row><entry>
 <guimenuitem>Père, nouvelle fenêtre</guimenuitem></entry><entry>
 Ouvre une nouvelle fenêtre pour afficher le contenu du dossier père.
 </entry></row>
@@ -1221,28 +1226,28 @@ Ces menus sont les mêmes. Ils sont très simples :
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
 
-<row><entry> 
+<row><entry>
 <guimenuitem>ROX-Filer</guimenuitem></entry><entry>
 Affiche l'aide, la boîte des options, ou votre dossier personnel.
 </entry></row>
 
-<row><entry> 
+<row><entry>
 		<guimenuitem>Fichier 'fichier'</guimenuitem></entry><entry>
 Ouvre le même menu que le menu 'Fichier' du filer, mais en simplifié.
 </entry></row>
 
-<row><entry> 
+<row><entry>
 <guimenuitem>Editer l'objet</guimenuitem></entry><entry>
 Modifier le nom qui est affiché sous l'icône, ou le chemin de l'objet vers lequel
 pointe l'icône.
 </entry></row>
 
-<row><entry> 
+<row><entry>
 <guimenuitem>Voir l'emplacement</guimenuitem></entry><entry>
 Ouvre une fenêtre montrant le dossier où est enregistré l'objet original.
 </entry></row>
 
-<row><entry> 
+<row><entry>
 <guimenuitem>Enlever le(s) objet(s)</guimenuitem></entry><entry>
 Supprime du punaiseur ou des panneaux les objets sélectionnés.
 </entry></row>
@@ -1416,7 +1421,7 @@ depuis une autre fenêtre.
 <thead><row><entry>Touche</entry><entry>Action</entry></row></thead>
 <tbody>
 
-<row><entry> 
+<row><entry>
 <keycap>Entrée</keycap></entry><entry>
 Ouvre l'objet sélectionné.
 </entry></row>
@@ -2013,7 +2018,7 @@ L'expression est évaluée comme suit :
   <para>
 
 Vous pouvez configurer beaucoup de comportements de <application>ROX-Filer</application>.
-Choisissez pour cela <guimenuitem>Options...</guimenuitem> dans le menu d'une fenêtre du filer. 
+Choisissez pour cela <guimenuitem>Options...</guimenuitem> dans le menu d'une fenêtre du filer.
 
 Il y a quatre boutons en bas de la boîte de configuration :
 
@@ -2112,7 +2117,7 @@ du filer quand vous ouvrez une nouvelle fenêtre depuis une fenêtre existante (pa
 sur un objet avec le bouton du milieu). Si cette option est activée, la nouvelle fenêtre respectera les
 mêmes options d'affichage que la fenêtre depuis laquelle vous l'avez ouverte (taille des icônes, critères
 de tri, etc). Sinon, la nouvelle fenêtre utilisera les options par défaut.</para></listitem>
-  
+
 <listitem><para><guilabel>Options par défaut pour les nouvelles fenêtres</guilabel>. Celles-ci correspondent aux
 différents styles d'affichage que vous pouvez obtenir dans le menu <guimenuitem>Affichage</guimenuitem>.
 </para></listitem>
@@ -2469,7 +2474,7 @@ Vous pouvez aussi déposer dans ce dossier les programmes eux-mêmes, plutôt que d
 
 <varlistentry><term><filename>MIME-icons</filename></term><listitem><para>
 contient les images utilisées pour afficher chaque type de fichier.
-Donc le filer essaiera d'afficher un fichier HTML en utilisant l'icône nommée 
+Donc le filer essaiera d'afficher un fichier HTML en utilisant l'icône nommée
 <filename>MIME-icons/text_html.xpm</filename>.
 </para></listitem></varlistentry>
 

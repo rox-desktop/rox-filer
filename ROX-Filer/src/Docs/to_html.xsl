@@ -55,6 +55,12 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="othercredit" mode="titlepage.mode">
+    <h3 class="{name(.)}"><xsl:call-template name="person.name"/></h3>
+    <xsl:apply-templates mode="titlepage.mode" select="./contrib"/>
+    <xsl:apply-templates mode="titlepage.mode" select="./affiliation"/>
+  </xsl:template>
+
   <xsl:template match="emphasis">
     <xsl:choose>
       <xsl:when test="@role='underline'">
