@@ -60,7 +60,7 @@ msgstr ""
 "IsReg 'core'           (een normaal bestand met de naam 'core')\n"
 "! (IsDir, IsReg)       (noch een map noch een gewoon bestand)\n"
 "mtime na 1 dag geleden en grootte > 1Mb   (groot, en recent aangepast)\n"
-"'CVS' afkappen, isreg                     (een normaal bestand niet in CVS)\n"
+"'CVS' negeren, isreg                     (een normaal bestand niet in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (bevat het woord 'fred')"
 
 #: action.c:256
@@ -116,7 +116,7 @@ msgid ""
 msgstr ""
 "system(commando) (waar als 'commando' terugkeert met een nul status; een % \n"
 "in een 'commando' word vervangen met het pad van het huidige bestand)\n"
-"prune (onwaar, en voorkomt het doorzoeken van de map-inhoud)."
+"negeren (onwaar, en voorkomt het doorzoeken van de map-inhoud)."
 
 #: action.c:297
 msgid "See the ROX-Filer manual for full details."
@@ -779,7 +779,7 @@ msgstr ""
 
 #: find.c:560
 msgid "prune"
-msgstr ""
+msgstr "negeren"
 
 #: find.c:648
 msgid "After"
