@@ -730,3 +730,56 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 
 	gtk_widget_modify_text(entry, GTK_STATE_NORMAL, error ? &red : &normal);
 }
+
+/* Change stacking position of higher to be just above lower */
+void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
+{
+	if (!lower)
+		gdk_window_lower(higher);	/* To bottom of stack */
+	else
+	{
+		XWindowChanges restack;
+		Window root, parent, w;
+		Window *children;
+		int nchildren;
+
+		gdk_error_trap_push();
+		
+		restack.stack_mode = Above;
+
+		/* From gdk */
+		parent = GDK_WINDOW_XWINDOW(lower);
+		do 
+		{
+			w = parent;
+
+			XQueryTree(gdk_display, w,
+					&root, &parent, &children, &nchildren);
+			if (children)
+				XFree(children);
+		} 
+		while (parent != root);
+		
+		restack.sibling = w;
+
+		parent = GDK_WINDOW_XWINDOW(higher);
+		do 
+		{
+			w = parent;
+
+			XQueryTree(gdk_display, w,
+					&root, &parent, &children, &nchildren);
+			if (children)
+				XFree(children);
+		} 
+		while (parent != root);
+
+		XConfigureWindow(gdk_display, w,
+				CWSibling | CWStackMode, &restack);
+
+		gdk_flush();
+		if (gdk_error_trap_pop())
+			g_warning("window_put_just_above()\n");
+	}
+}
+

@@ -52,6 +52,7 @@
 #include "run.h"
 #include "appinfo.h"
 #include "xml.h"
+#include "pinboard.h"		/* For pinboard_get_window() */
 
 /* The width of the separator at the inner edge of the panel */
 #define EDGE_WIDTH 2
@@ -377,7 +378,14 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	number_of_windows++;
 	gdk_window_lower(panel->window->window);
 	gtk_widget_show(panel->window);
-	gdk_window_lower(panel->window->window);
+
+	{
+		GdkWindow *pinboard;
+
+		pinboard = pinboard_get_window();
+
+		window_put_just_above(panel->window->window, pinboard);
+	}
 
 	return panel;
 }
@@ -1104,9 +1112,12 @@ static gint panel_leave_event(GtkWidget *widget,
 			      GdkEventCrossing *event,
 			      Panel *panel)
 {
-	gdk_window_lower(panel->window->window);
+	GdkWindow *pinboard;
+	
+	pinboard = pinboard_get_window();
+	window_put_just_above(panel->window->window, pinboard);
 
-	return 0;
+	return FALSE;
 }
 
 static gint panel_motion_event(GtkWidget *widget,

@@ -25,5 +25,6 @@ void pinboard_move_icons(void);
 const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop(DirItem *item, const gchar *path);
 void pinboard_set_backdrop_app(const gchar *app);
+GdkWindow *pinboard_get_window(void);
 
 #endif /* _PINBOARD_H */

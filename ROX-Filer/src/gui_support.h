@@ -47,5 +47,6 @@ void destroy_on_idle(GtkWidget *widget);
 gboolean rox_spawn(const gchar *dir, const gchar **argv);
 GtkWidget *button_new_mixed(const char *stock, const char *message);
 void entry_set_error(GtkWidget *entry, gboolean error);
+void window_put_just_above(GdkWindow *higher, GdkWindow *lower);
 
 #endif /* _GUI_SUPPORT_H */

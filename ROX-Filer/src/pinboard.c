@@ -302,6 +302,16 @@ void pinboard_activate(const gchar *name)
 		tasklist_set_active(TRUE);
 }
 
+/* Return the window of the current pinboard, or NULL.
+ * Used to make sure lowering the panels doesn't lose them...
+ */
+GdkWindow *pinboard_get_window(void)
+{
+	if (current_pinboard)
+		return current_pinboard->window->window;
+	return NULL;
+}
+
 const char *pinboard_get_name(void)
 {
 	g_return_val_if_fail(current_pinboard != NULL, NULL);
