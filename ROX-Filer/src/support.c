@@ -208,6 +208,44 @@ char *format_size(unsigned long size)
 	return buffer;
 }
 
+/* Return a string in the form '23Mb' in a static buffer valid until
+ * the next call. Aligned to the right.
+ */
+char *format_size_aligned(unsigned long size)
+{
+	static	char *buffer = NULL;
+	char	units;
+	
+	if (size >= PRETTY_SIZE_LIMIT)
+	{
+		size += 1023;
+		size >>= 10;
+		if (size >= PRETTY_SIZE_LIMIT)
+		{
+			size += 1023;
+			size >>= 10;
+			if (size >= PRETTY_SIZE_LIMIT)
+			{
+				size += 1023;
+				size >>= 10;
+				units = 'G';
+			}
+			else
+				units = 'M';
+		}
+		else
+			units = 'K';
+	}
+	else
+		units = ' ';
+
+	if (buffer)
+		g_free(buffer);
+	buffer = g_strdup_printf("%4ld%c", size, units);
+
+	return buffer;
+}
+
 /* Fork and exec argv. Wait and return the child's exit status.
  * -1 if spawn fails.
  */
@@ -239,58 +277,49 @@ int fork_exec_wait(char **argv)
  */
 char *pretty_permissions(uid_t uid, gid_t gid, mode_t m)
 {
-	static char buffer[] = "(rwx),rwx,rwx/UGT";
-	int	high;
+	static char buffer[sizeof("rwx,rwx,rwx/UGT")];
+	int	high1 = ~0, high2 = ~0, high3 = ~0;
 
 	if (uid == euid)
-		high = 0;
+		high1 = ~32;
 	else if (gid == egid)
-		high = 1;
+		high2 = ~32;
 	else
 	{
 		int	i;
 
-		high = 2;
+		high3 = ~32;
 		for (i = 0; i < ngroups; i++)
 		{
 			if (supplemental_groups[i] == gid)
 			{
-				high = 1;
+				high2 = ~32;
+				high3 = ~0;
 				break;
 			}
 		}
 	}
 
-	sprintf(buffer, "%s%c%c%c%s,%s%c%c%c%s,%s%c%c%c%s/%c%c"
+	buffer[0]  = m & S_IRUSR ? 'r'&high1 : '-';
+	buffer[1]  = m & S_IWUSR ? 'w'&high1 : '-';
+	buffer[2]  = m & S_IXUSR ? 'x'&high1 : '-';
+	buffer[3]  = ',';
+	buffer[4]  = m & S_IRGRP ? 'r'&high2 : '-';
+	buffer[5]  = m & S_IWGRP ? 'w'&high2 : '-';
+	buffer[6]  = m & S_IXGRP ? 'x'&high2 : '-';
+	buffer[7]  = ',';
+	buffer[8]  = m & S_IROTH ? 'r'&high3 : '-';
+	buffer[9]  = m & S_IWOTH ? 'w'&high3 : '-';
+	buffer[10] = m & S_IXOTH ? 'x'&high3 : '-';
+	buffer[11] = '/';
+	buffer[12] = m & S_ISUID ? 'U' : '-';
+	buffer[13] = m & S_ISGID ? 'G' : '-';
 #ifdef S_ISVTX
-			"%c"
+        buffer[14] = m & S_ISVTX ? 'T' : '-';
+        buffer[15] = 0;
+#else
+        buffer[14] = 0;
 #endif
-			,
-
-			high == 0 ? "(" : "",
-			m & S_IRUSR ? 'r' : '-',
-			m & S_IWUSR ? 'w' : '-',
-			m & S_IXUSR ? 'x' : '-',
-			high == 0 ? ")" : "",
-
-			high == 1 ? "(" : "",
-			m & S_IRGRP ? 'r' : '-',
-			m & S_IWGRP ? 'w' : '-',
-			m & S_IXGRP ? 'x' : '-',
-			high == 1 ? ")" : "",
-
-			high == 2 ? "(" : "",
-			m & S_IROTH ? 'r' : '-',
-			m & S_IWOTH ? 'w' : '-',
-			m & S_IXOTH ? 'x' : '-',
-			high == 2 ? ")" : "",
-
-			m & S_ISUID ? 'U' : '-',
-			m & S_ISGID ? 'G' : '-'
-#ifdef S_ISVTX
-			, m & S_ISVTX ? 'T' : '-'
-#endif
-			);
 
 	return buffer;
 }

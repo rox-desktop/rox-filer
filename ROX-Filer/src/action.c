@@ -247,6 +247,22 @@ static char *action_auto_quiet(char *data)
 
 /*			SUPPORT				*/
 
+/* TRUE iff `sub' is (or would be) an object inside the directory `parent' */
+static gboolean is_sub_dir(char *sub, char *parent)
+{
+	int parent_len;
+
+	parent_len = strlen(parent);
+	if (strncmp(parent, sub, parent_len))
+		return FALSE;
+
+	/* sub is at least as long as parent and all characters upto
+	 * parent's length match.
+	 */
+
+	return sub[parent_len] == 0 || sub[parent_len] == '/';
+}
+
 static gboolean display_dir(gpointer data)
 {
 	GUIside	*gui_side = (GUIside *) data;
@@ -794,7 +810,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	return TRUE;
 }
 
-static gboolean do_copy(char *path, char *dest)
+static gboolean do_copy2(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
@@ -896,7 +912,7 @@ static gboolean do_copy(char *path, char *dest)
 				send();
 			}
 			
-			for_dir_contents(do_copy, safe_path, safe_dest);
+			for_dir_contents(do_copy2, safe_path, safe_dest);
 			/* Note: dest_path now invalid... */
 		}
 
@@ -937,8 +953,7 @@ static gboolean do_copy(char *path, char *dest)
 
 		if (fork_exec_wait(argv))
 		{
-			g_string_sprintf(message, "!ERROR: %s\n",
-					"Copy failed\n");
+			g_string_sprintf(message, "!ERROR: Copy failed\n");
 			send();
 			retval = FALSE;
 		}
@@ -947,12 +962,40 @@ static gboolean do_copy(char *path, char *dest)
 	return retval;
 }
 
+/* Copy path to dest.
+ * Check that path not copied into itself.
+ * path and dest are real paths (coming from the filer)
+ */
+static gboolean do_copy(char *path, char *dest)
+{
+	if (is_sub_dir(dest, path))
+	{
+		g_string_sprintf(message,
+				"!ERROR: Can't copy directory into itself\n");
+		send();
+		return FALSE;
+	}
+	return do_copy2(path, dest);
+}
+
+/* Move path to dest.
+ * Check that path not moved into itself.
+ * path and dest are real paths (coming from the filer)
+ */
 static gboolean do_move(char *path, char *dest)
 {
 	char		*dest_path;
 	char		*leaf;
 	gboolean	retval = TRUE;
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
+
+	if (is_sub_dir(dest, path))
+	{
+		g_string_sprintf(message,
+				"!ERROR: Can't move directory into itself\n");
+		send();
+		return FALSE;
+	}
 
 	check_flags();
 

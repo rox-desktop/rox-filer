@@ -24,6 +24,7 @@ void debug_free_string(void *data);
 char *user_name(uid_t uid);
 char *group_name(gid_t gid);
 char *format_size(unsigned long size);
+char *format_size_aligned(unsigned long size);
 int fork_exec_wait(char **argv);
 char *pretty_permissions(uid_t uid, gid_t gid, mode_t m);
 

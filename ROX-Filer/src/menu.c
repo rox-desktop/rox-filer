@@ -181,10 +181,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",	NULL,   large, 0, NULL},
-{"/Display/Small Icons",	NULL,   small, 0, NULL},
-{"/Display/Full Info",		NULL,   full_info, 0, NULL},
-{"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/Display/Sort by Name",	NULL,   sort_name, 0, NULL},
 {"/Display/Sort by Type",	NULL,   sort_type, 0, NULL},
 {"/Display/Sort by Date",	NULL,   sort_date, 0, NULL},

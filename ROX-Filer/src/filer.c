@@ -65,9 +65,17 @@ extern gboolean collection_single_click;
 FilerWindow 	*window_with_focus = NULL;
 GList		*all_filer_windows = NULL;
 
+static DisplayStyle last_display_style = LARGE_ICONS;
+static gboolean last_show_hidden = FALSE;
+static int (*last_sort_fn)(const void *a, const void *b) = sort_by_type;
+
 static FilerWindow *window_with_selection = NULL;
 
 /* Options bits */
+static guchar *style_to_name(void);
+static guchar *sort_fn_to_name(void);
+static void update_options_label(void);
+	
 static GtkWidget *create_options();
 static void update_options();
 static void set_options();
@@ -76,6 +84,8 @@ static char *filer_single_click(char *data);
 static char *filer_menu_on_2(char *data);
 static char *filer_new_window_on_1(char *data);
 static char *filer_toolbar(char *data);
+static char *filer_display_style(char *data);
+static char *filer_sort_by(char *data);
 
 static OptionsSection options =
 {
@@ -94,6 +104,8 @@ typedef enum {
 } ToolbarType;
 static ToolbarType o_toolbar = TOOLBAR_NORMAL;
 static GtkWidget *menu_toolbar;
+
+static GtkWidget *display_label;
 
 static gboolean o_single_click = FALSE;
 static GtkWidget *toggle_single_click;
@@ -187,6 +199,8 @@ void filer_init()
 	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
 	option_register("filer_toolbar", filer_toolbar);
+	option_register("filer_display_style", filer_display_style);
+	option_register("filer_sort_by", filer_sort_by);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 
@@ -613,19 +627,25 @@ char *details(DirItem *item)
 {
 	mode_t	m = item->mode;
 	static GString *buf = NULL;
-
+        static char time_buf[32];
 	if (!buf)
 		buf = g_string_new(NULL);
 
-	g_string_sprintf(buf, "%s, %s, %s",
-			S_ISDIR(m) ? "Dir" :
-				S_ISCHR(m) ? "Char" :
-				S_ISBLK(m) ? "Blck" :
-				S_ISLNK(m) ? "Link" :
-				S_ISSOCK(m) ? "Sock" :
-				S_ISFIFO(m) ? "Pipe" : "File",
+        if (strftime(time_buf, sizeof(time_buf),
+			"%d-%b-%Y %T", localtime(&item->mtime)) == 0)
+		time_buf[0]= 0;
+
+	g_string_sprintf(buf, "%s%s %s %s",
+				item->flags & ITEM_FLAG_APPDIR? "App  " :
+			        S_ISDIR(m) ? "Dir  " :
+				S_ISCHR(m) ? "Char " :
+				S_ISBLK(m) ? "Blck " :
+				S_ISLNK(m) ? "Link " :
+				S_ISSOCK(m) ? "Sock " :
+				S_ISFIFO(m) ? "Pipe " : "File ",
 			pretty_permissions(item->uid, item->gid, m),
-			format_size(item->size));
+			format_size_aligned(item->size),
+			time_buf);
 	return buf->str;
 }
 
@@ -1067,7 +1087,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 
 				argv[0] = full_path;
 
-				if (spawn_full(argv, getenv("HOME")))
+				if (spawn_full(argv, filer_window->path))
 				{
 					if (close_window)
 						destroy = TRUE;
@@ -1326,8 +1346,12 @@ void filer_set_sort_fn(FilerWindow *filer_window,
 		return;
 
 	filer_window->sort_fn = fn;
+	last_sort_fn = fn;
+
 	collection_qsort(filer_window->collection,
 			filer_window->sort_fn);
+
+	update_options_label();
 }
 
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
@@ -1335,7 +1359,13 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 	if (filer_window->display_style == style)
 		return;
 
+	if (filer_window->panel_type)
+		style = LARGE_ICONS;
+	else
+		last_display_style = style;
+
 	filer_window->display_style = style;
+
 	switch (style)
 	{
 		case SMALL_ICONS:
@@ -1353,6 +1383,8 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 	}
 
 	shrink_width(filer_window);
+
+	update_options_label();
 }
 
 FilerWindow *filer_opendir(char *path, PanelType panel_type)
@@ -1385,10 +1417,10 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 		return NULL;
 	}
 
-	filer_window->show_hidden = FALSE;
+	filer_window->show_hidden = last_show_hidden;
 	filer_window->panel_type = panel_type;
 	filer_window->temp_item_selected = FALSE;
-	filer_window->sort_fn = sort_by_type;
+	filer_window->sort_fn = last_sort_fn;
 	filer_window->flags = (FilerFlags) 0;
 	filer_window->display_style = UNKNOWN_STYLE;
 
@@ -1432,7 +1464,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	filer_style_set(filer_window, LARGE_ICONS);
+	filer_style_set(filer_window, last_display_style);
 	drag_set_dest(collection);
 
 	if (panel_type)
@@ -1621,6 +1653,10 @@ static GtkWidget *create_options()
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
+	display_label = gtk_label_new("<>");
+	gtk_label_set_line_wrap(GTK_LABEL(display_label), TRUE);
+	gtk_box_pack_start(GTK_BOX(vbox), display_label, FALSE, TRUE, 0);
+
 	toggle_new_window_on_1 =
 		gtk_check_button_new_with_label("New window on button 1 "
 				"(RISC OS style)");
@@ -1653,6 +1689,17 @@ static GtkWidget *create_options()
 	return vbox;
 }
 
+static void update_options_label(void)
+{
+	guchar	*str;
+	
+	str = g_strdup_printf("The last used display style (%s) and sort "
+			"function (Sort By %s) will be saved if you click on "
+			"Save.", style_to_name(), sort_fn_to_name());
+	gtk_label_set_text(GTK_LABEL(display_label), str);
+	g_free(str);
+}
+
 /* Reflect current state by changing the widgets in the options box */
 static void update_options()
 {
@@ -1663,6 +1710,8 @@ static void update_options()
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
 			o_single_click);
 	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
+
+	update_options_label();
 }
 
 /* Set current values by reading the states of the widgets in the options box */
@@ -1689,12 +1738,29 @@ static void set_options()
 	
 }
 
+static guchar *style_to_name(void)
+{
+	return last_display_style == LARGE_ICONS ? "Large Icons" :
+		last_display_style == SMALL_ICONS ? "Small Icons" :
+		"Full Info";
+}
+
+static guchar *sort_fn_to_name(void)
+{
+	return last_sort_fn == sort_by_name ? "Name" :
+		last_sort_fn == sort_by_type ? "Type" :
+		last_sort_fn == sort_by_date ? "Date" :
+		"Size";
+}
+
 static void save_options()
 {
 	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
+	option_write("filer_display_style", style_to_name());
+	option_write("filer_sort_by", sort_fn_to_name());
 	option_write("filer_toolbar", o_toolbar == TOOLBAR_NONE ? "None" :
 				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
 				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
@@ -1717,6 +1783,36 @@ static char *filer_single_click(char *data)
 {
 	o_single_click = atoi(data) != 0;
 	collection_single_click = o_single_click ? TRUE : FALSE;
+	return NULL;
+}
+
+static char *filer_display_style(char *data)
+{
+	if (g_strcasecmp(data, "Large Icons") == 0)
+		last_display_style = LARGE_ICONS;
+	else if (g_strcasecmp(data, "Small Icons") == 0)
+		last_display_style = SMALL_ICONS;
+	else if (g_strcasecmp(data, "Full Info") == 0)
+		last_display_style = FULL_INFO;
+	else
+		return "Unknown display style";
+
+	return NULL;
+}
+
+static char *filer_sort_by(char *data)
+{
+	if (g_strcasecmp(data, "Name") == 0)
+		last_sort_fn = sort_by_name;
+	else if (g_strcasecmp(data, "Type") == 0)
+		last_sort_fn = sort_by_type;
+	else if (g_strcasecmp(data, "Date") == 0)
+		last_sort_fn = sort_by_date;
+	else if (g_strcasecmp(data, "Size") == 0)
+		last_sort_fn = sort_by_size;
+	else
+		return "Unknown sort type";
+
 	return NULL;
 }
 
@@ -1749,6 +1845,7 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 		return;
 
 	filer_window->show_hidden = hidden;
+	last_show_hidden = hidden;
 
 	g_fscache_data_ref(dir_cache, dir);
 	detach(filer_window);
