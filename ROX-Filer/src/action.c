@@ -234,7 +234,7 @@ static void show_chmod_help(gpointer data)
 	GtkWidget *text;
 
 	help = gtk_dialog_new_with_buttons(
-			_("Find expression reference"),
+			_("Change permissions reference"),
 			NULL, 0,
 			GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL,
 			NULL);
