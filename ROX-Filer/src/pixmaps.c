@@ -444,12 +444,6 @@ static MaskedPixmap *image_from_file(char *path)
 		return NULL;
 	}
 #else
-	if (pixmap_cache_load_via)
-	{
-		filer_create_thumb(pixmap_cache_load_via, path);
-		return NULL;
-	}
-	
 	pixbuf = gdk_pixbuf_new_from_file(path);
 	if (!pixbuf)
 		return NULL;

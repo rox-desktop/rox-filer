@@ -251,7 +251,7 @@ static void examine_dir(guchar *path, DirItem *item)
 	 * For symlinks, we want the symlink's owner.
 	 */
 
-	g_string_printf(tmp, "%s/.DirIcon", path);
+	g_string_sprintf(tmp, "%s/.DirIcon", path);
 
 	if (item->image)
 		goto no_diricon;	/* Already got an icon */

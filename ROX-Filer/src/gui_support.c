@@ -946,7 +946,7 @@ gboolean rox_spawn(gchar *dir, gchar **argv)
 		return FALSE;
 	}
 #else
-	if (spawn_full(argv, dir) == 0)
+	if (spawn_full(argv, dir, NULL) == 0)
 	{
 		report_error("Failed to start child process:\n%s",
 				g_strerror(errno));
