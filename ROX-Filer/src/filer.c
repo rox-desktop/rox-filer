@@ -280,8 +280,13 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 
 	if (window_with_selection == filer_window)
 		window_with_selection = NULL;
+	
 	if (window_with_focus == filer_window)
+	{
+		if (popup_menu)
+			gtk_menu_popdown(GTK_MENU(popup_menu));
 		window_with_focus = NULL;
+	}
 
 	if (filer_window->directory)
 		detach(filer_window);
@@ -1033,20 +1038,37 @@ static GtkWidget *create_options(void)
 	toggle_new_window_on_1 =
 		gtk_check_button_new_with_label(
 			_("New window on button 1 (RISC OS style)"));
+	OPTION_TIP(toggle_new_window_on_1,
+			"Clicking with mouse button 1 (usually the "
+			"left button) opens a directory in a new window "
+			"with this turned on. Clicking with the button-2 "
+			"(middle) will reuse the current window.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_new_window_on_1,
 			FALSE, TRUE, 0);
 
 	toggle_menu_on_2 =
 		gtk_check_button_new_with_label(
 			_("Menu on button 2 (RISC OS style)"));
+	OPTION_TIP(toggle_menu_on_2,
+			"Use button 2, the middle button (click both buttons "
+			"at once on two button mice), to pop up the menu. "
+			"If off, use button 3 (right) instead.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
 
 	toggle_single_click =
 		gtk_check_button_new_with_label(_("Single-click nagivation"));
+	OPTION_TIP(toggle_single_click,
+			"Clicking on an item opens it with this on. Hold down "
+			"Control to select the item instead. If off, clicking "
+			"once selects an item; double click to open things.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
 	toggle_unique_filer_windows =
 		gtk_check_button_new_with_label(_("Unique windows"));
+	OPTION_TIP(toggle_unique_filer_windows,
+			"If you open a directory and that directory is "
+			"already displayed in another window, then this "
+			"option causes the other window to be closed.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
 			FALSE, TRUE, 0);
 

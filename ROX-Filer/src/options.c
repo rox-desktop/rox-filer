@@ -36,6 +36,9 @@
 /* Add OptionsSection structs to this list in your _init() functions */
 GSList *options_sections = NULL;
 
+/* Add all option tooltips to this group */
+GtkTooltips *option_tooltips = NULL;
+
 static GtkWidget *window, *sections_vbox;
 static FILE *save_file = NULL;
 static GHashTable *option_hash = NULL;
@@ -52,6 +55,8 @@ void options_init()
 	GtkWidget	*border, *label;
 	GtkWidget	*actions, *button;
 	char		*string, *save_path;
+
+	option_tooltips = gtk_tooltips_new();
 	
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);

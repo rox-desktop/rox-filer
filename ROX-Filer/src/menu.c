@@ -58,7 +58,7 @@ GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*panel_keys;
 GtkAccelGroup	*pinboard_keys;
 
-static GtkWidget *popup_menu = NULL;	/* Currently open menu */
+GtkWidget *popup_menu = NULL;		/* Currently open menu */
 
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 
@@ -610,6 +610,8 @@ static void menu_closed(GtkWidget *widget)
 {
 	if (window_with_focus == NULL || widget != popup_menu)
 		return;			/* Close panel item chosen? */
+
+	popup_menu = NULL;
 
 	if (window_with_focus->temp_item_selected)
 	{

@@ -8,6 +8,11 @@
 #ifndef _OPTIONS_H
 #define _OPTIONS_H
 
+#include <gtk/gtk.h>
+
+#define OPTION_TIP(widget, tip)	\
+	gtk_tooltips_set_tip(option_tooltips, widget, _(tip), NULL)
+
 typedef char *OptionFunc(char *value);
 
 typedef struct _OptionsSection OptionsSection;
@@ -22,6 +27,7 @@ struct _OptionsSection
 };
 
 extern GSList *options_sections;
+extern GtkTooltips *option_tooltips;
 
 /* Prototypes */
 

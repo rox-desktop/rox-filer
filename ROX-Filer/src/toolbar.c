@@ -51,7 +51,12 @@ ToolbarType o_toolbar = TOOLBAR_NORMAL;
 static GtkWidget *menu_toolbar;
 static GtkTooltips *tooltips = NULL;
 
-#define NEW_WIN_BUTTON() (o_new_window_on_1 ? 1 : 5 - collection_menu_button)
+/* TRUE if the button presses (or released) should open a new window,
+ * rather than reusing the existing one.
+ */
+#define NEW_WIN_BUTTON(button_event)	\
+  (o_new_window_on_1 ? ((GdkEventButton *) button_event)->button == 1	\
+		     : ((GdkEventButton *) button_event)->button != 1)
 
 /* Static prototypes */
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
@@ -119,8 +124,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	GdkEvent	*event;
 
 	event = gtk_get_current_event();
-	if (event->type == GDK_BUTTON_RELEASE &&
-			((GdkEventButton *) event)->button == NEW_WIN_BUTTON())
+	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
 		filer_opendir(home_dir, PANEL_NO);
 	}
@@ -133,8 +137,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	GdkEvent	*event;
 
 	event = gtk_get_current_event();
-	if (event->type == GDK_BUTTON_RELEASE &&
-			((GdkEventButton *) event)->button == NEW_WIN_BUTTON())
+	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
 		filer_open_parent(filer_window);
 	}

@@ -88,6 +88,7 @@ static void set_options();
 static void save_options();
 static char *load_no_hostnames(char *data);
 static char *drag_to_icons(char *data);
+static char *spring_open(char *data);
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     FilerWindow *filer_window);
@@ -149,40 +150,55 @@ void dnd_init()
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("dnd_no_hostnames", load_no_hostnames);
 	option_register("dnd_drag_to_icons", drag_to_icons);
+	option_register("dnd_spring_open", spring_open);
 }
 
 /*				OPTIONS				*/
 
 gboolean o_no_hostnames = FALSE;
 static gboolean o_drag_to_icons = TRUE;
+static gboolean o_spring_open = TRUE;
+
 static GtkWidget *toggle_no_hostnames;
 static GtkWidget *toggle_drag_to_icons;
+static GtkWidget *toggle_spring_open;
 
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
  */
 static GtkWidget *create_options()
 {
-	GtkWidget	*vbox, *label;
+	GtkWidget	*vbox;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	label = gtk_label_new(_("Some older applications don't support XDND "
-			"fully and may need to have this option turned on. "
-			"Use this if dragging files to an application shows "
-			"a + sign on the pointer but the drop doesn't work."));
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-
 	toggle_no_hostnames =
 		gtk_check_button_new_with_label(_("Don't use hostnames"));
+	OPTION_TIP(toggle_no_hostnames, 
+		"Some older applications don't support XDND "
+		"fully and may need to have this option turned on. "
+		"Use this if dragging files to an application shows "
+		"a + sign on the pointer but the drop doesn't work.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_no_hostnames, FALSE, TRUE, 0);
 
 	toggle_drag_to_icons =
 		gtk_check_button_new_with_label(_("Allow dragging to icons in "
 						"filer windows"));
+	OPTION_TIP(toggle_drag_to_icons, 
+		"When this is on you can drag a file over a sub-directory "
+		"or program in a filer window. The item will highlight when "
+		"you do this and dropping the file will put it into that "
+		"directory, or load it into the program.");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_drag_to_icons, FALSE, TRUE, 0);
+
+	toggle_spring_open =
+		gtk_check_button_new_with_label(_("Directories spring open"));
+	OPTION_TIP(toggle_spring_open, 
+		"This option, which requires the above option to be turned "
+		"on too, causes the highlighted directory to 'spring open' "
+		"after the file is held over it for a short while.");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_spring_open, FALSE, TRUE, 0);
 
 	return vbox;
 }
@@ -193,6 +209,8 @@ static void update_options()
 			o_no_hostnames);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_drag_to_icons),
 			o_drag_to_icons);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_spring_open),
+			o_spring_open);
 }
 
 static void set_options()
@@ -201,12 +219,15 @@ static void set_options()
 			GTK_TOGGLE_BUTTON(toggle_no_hostnames));
 	o_drag_to_icons = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_drag_to_icons));
+	o_spring_open = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_spring_open));
 }
 
 static void save_options()
 {
 	option_write("dnd_no_hostnames", o_no_hostnames ? "1" : "0");
 	option_write("dnd_drag_to_icons", o_drag_to_icons ? "1" : "0");
+	option_write("dnd_spring_open", o_spring_open ? "1" : "0");
 }
 
 static char *load_no_hostnames(char *data)
@@ -218,6 +239,12 @@ static char *load_no_hostnames(char *data)
 static char *drag_to_icons(char *data)
 {
 	o_drag_to_icons = atoi(data) != 0;
+	return NULL;
+}
+
+static char *spring_open(char *data)
+{
+	o_spring_open = atoi(data) != 0;
 	return NULL;
 }
 
@@ -1165,6 +1192,9 @@ void dnd_spring_load(GdkDragContext *context)
 {
 	g_return_if_fail(context != NULL);
 
+	if (!o_spring_open)
+		return;
+
 	if (spring_context)
 		dnd_spring_abort();
 	
@@ -1195,6 +1225,7 @@ static gboolean spring_check_idle(gpointer data)
 
 	if (!get_pointer_xy(&p_x, &p_y))
 	{
+		/*
 		GdkWindow	*win = spring_window->window->window;
 		int		x, y;
 		int		w, h;
@@ -1204,9 +1235,10 @@ static gboolean spring_check_idle(gpointer data)
 
 		if (p_x < x || p_x > x + w || p_y < y || p_y > y + h)
 		{
-			gtk_widget_destroy(spring_window->window);
-			return FALSE;		/* Got it! */
-		}
+		*/
+
+		gtk_widget_destroy(spring_window->window);
+		return FALSE;		/* Got it! */
 	}
 
 	return TRUE;	/* Try again later */

@@ -12,6 +12,7 @@
 #include "pinboard.h"
 
 extern GtkAccelGroup	*filer_keys;
+extern GtkWidget 	*popup_menu;
 
 void menu_init(void);
 
