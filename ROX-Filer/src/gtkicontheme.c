@@ -27,6 +27,7 @@
 #endif
 #endif /* G_OS_WIN32 */
 
+#include "gui_support.h"
 #include "gtkicontheme.h"
 #include "gtkiconthemeparser.h"
 /* #include "gtkintl.h" */
@@ -1405,43 +1406,6 @@ rox_icon_info_free (RoxIconInfo *icon_info)
   g_free (icon_info);
 }
 
-static GdkPixbuf *
-load_svg_at_size (const gchar *filename,
-		  gint         size,
-		  GError      **error)
-{
-  GdkPixbuf *pixbuf = NULL;
-  GdkPixbufLoader *loader = NULL;
-  gchar *contents=NULL;
-  gsize length;
-  
-  if (!g_file_get_contents (filename,
-			    &contents, &length, error))
-    goto bail;
-  
-  loader = gdk_pixbuf_loader_new ();
-  gdk_pixbuf_loader_set_size (loader, size, size);
-  
-  if (!gdk_pixbuf_loader_write (loader, contents, length, error))
-    {
-      gdk_pixbuf_loader_close (loader, NULL);
-      goto bail;
-    }
-  
-  if (!gdk_pixbuf_loader_close (loader, error))
-    goto bail;
-  
-  pixbuf = g_object_ref (gdk_pixbuf_loader_get_pixbuf (loader));
-  
- bail:
-  if(contents)
-    g_free(contents);
-  if (loader)
-    g_object_unref (loader);
-  
-  return pixbuf;
-}
-
 /* This function contains the complicatd logic for deciding
  * on the size at which to load the icon and loading it at
  * that size.
@@ -1475,8 +1439,10 @@ icon_info_ensure_scale_and_pixbuf (RoxIconInfo *icon_info,
       if (scale_only)
 	return TRUE;
       
-      icon_info->pixbuf = load_svg_at_size (icon_info->filename,
+      icon_info->pixbuf = rox_pixbuf_new_from_file_at_scale(icon_info->filename,
 					    icon_info->desired_size,
+					    icon_info->desired_size,
+					    TRUE,
 					    &icon_info->load_error);
 
       return icon_info->pixbuf != NULL;

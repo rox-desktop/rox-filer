@@ -77,6 +77,11 @@ void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 /* gdk_window_set_keep_below() only exists in GTK >= 2.4 and is broken until
  * 2.4.6 */
 void keep_below(GdkWindow *window, gboolean setting);
+GdkPixbuf * rox_pixbuf_new_from_file_at_scale (const char *filename,
+					       int       width, 
+					       int       height,
+					       gboolean  preserve_aspect_ratio,
+					       GError    **error);
 
 
 #endif /* _GUI_SUPPORT_H */

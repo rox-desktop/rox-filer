@@ -315,7 +315,8 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 			    info1.st_dev == info2.st_dev &&
 			    info1.st_ino == info2.st_ino)
 		{
-			pixbuf = gdk_pixbuf_new_from_file(path, NULL);
+			pixbuf = rox_pixbuf_new_from_file_at_scale(path,
+					PIXMAP_THUMB_SIZE, PIXMAP_THUMB_SIZE, TRUE, NULL);
 			if (!pixbuf)
 			{
 				g_fscache_insert(pixmap_cache,
@@ -540,7 +541,8 @@ static void child_create_thumbnail(const gchar *path)
 {
 	GdkPixbuf *image;
 
-	image = gdk_pixbuf_new_from_file(path, NULL);
+	image = rox_pixbuf_new_from_file_at_scale(path,
+			PIXMAP_THUMB_SIZE, PIXMAP_THUMB_SIZE, TRUE, NULL);
 
 	if (image)
 		save_thumbnail(path, image);

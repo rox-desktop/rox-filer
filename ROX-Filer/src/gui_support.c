@@ -1252,3 +1252,142 @@ void keep_below(GdkWindow *window, gboolean setting)
 	}
 #endif
 }
+
+static void
+size_prepared_cb (GdkPixbufLoader *loader, 
+		  int              width,
+		  int              height,
+		  gpointer         data)
+{
+	struct {
+		gint width;
+		gint height;
+		gboolean preserve_aspect_ratio;
+	} *info = data;
+
+	g_return_if_fail (width > 0 && height > 0);
+
+	if(info->preserve_aspect_ratio) {
+		if ((double)height * (double)info->width >
+		    (double)width * (double)info->height) {
+			width = 0.5 + (double)width * (double)info->height / (double)height;
+			height = info->height;
+		} else {
+			height = 0.5 + (double)height * (double)info->width / (double)width;
+			width = info->width;
+		}
+	} else {
+		width = info->width;
+		height = info->height;
+	}
+	
+	gdk_pixbuf_loader_set_size (loader, width, height);
+}
+
+/**
+ * rox_pixbuf_new_from_file_at_scale:
+ * @filename: Name of file to load.
+ * @width: The width the image should have
+ * @height: The height the image should have
+ * @preserve_aspect_ratio: %TRUE to preserve the image's aspect ratio
+ * @error: Return location for an error
+ *
+ * Creates a new pixbuf by loading an image from a file.  The file format is
+ * detected automatically. If %NULL is returned, then @error will be set.
+ * Possible errors are in the #GDK_PIXBUF_ERROR and #G_FILE_ERROR domains.
+ * The image will be scaled to fit in the requested size, optionally preserving
+ * the image's aspect ratio.
+ *
+ * Return value: A newly-created pixbuf with a reference count of 1, or %NULL 
+ * if any of several error conditions occurred:  the file could not be opened,
+ * there was no loader for the file's format, there was not enough memory to
+ * allocate the image buffer, or the image file contained invalid data.
+ *
+ * Taken from GTK 2.6.
+ **/
+GdkPixbuf *
+rox_pixbuf_new_from_file_at_scale (const char *filename,
+				   int         width, 
+				   int         height,
+				   gboolean    preserve_aspect_ratio,
+				   GError    **error)
+{
+
+	GdkPixbufLoader *loader;
+	GdkPixbuf       *pixbuf;
+
+	guchar buffer [4096];
+	int length;
+	FILE *f;
+	struct {
+		gint width;
+		gint height;
+		gboolean preserve_aspect_ratio;
+	} info;
+
+	g_return_val_if_fail (filename != NULL, NULL);
+        g_return_val_if_fail (width > 0 && height > 0, NULL);
+
+	f = fopen (filename, "rb");
+	if (!f) {
+                gchar *utf8_filename = g_filename_to_utf8 (filename, -1,
+                                                           NULL, NULL, NULL);
+                g_set_error (error,
+                             G_FILE_ERROR,
+                             g_file_error_from_errno (errno),
+                             _("Failed to open file '%s': %s"),
+                             utf8_filename ? utf8_filename : "???",
+                             g_strerror (errno));
+                g_free (utf8_filename);
+		return NULL;
+        }
+
+	loader = gdk_pixbuf_loader_new ();
+
+	info.width = width;
+	info.height = height;
+        info.preserve_aspect_ratio = preserve_aspect_ratio;
+
+	g_signal_connect (loader, "size-prepared", G_CALLBACK (size_prepared_cb), &info);
+
+	while (!feof (f) && !ferror (f)) {
+		length = fread (buffer, 1, sizeof (buffer), f);
+		if (length > 0)
+			if (!gdk_pixbuf_loader_write (loader, buffer, length, error)) {
+				gdk_pixbuf_loader_close (loader, NULL);
+				fclose (f);
+				g_object_unref (loader);
+				return NULL;
+			}
+	}
+
+	fclose (f);
+
+	if (!gdk_pixbuf_loader_close (loader, error)) {
+		g_object_unref (loader);
+		return NULL;
+	}
+
+	pixbuf = gdk_pixbuf_loader_get_pixbuf (loader);
+
+	if (!pixbuf) {
+                gchar *utf8_filename = g_filename_to_utf8 (filename, -1,
+                                                           NULL, NULL, NULL);
+
+		g_object_unref (loader);
+
+                g_set_error (error,
+                             GDK_PIXBUF_ERROR,
+                             GDK_PIXBUF_ERROR_FAILED,
+                             _("Failed to load image '%s': reason not known, probably a corrupt image file"),
+                             utf8_filename ? utf8_filename : "???");
+                g_free (utf8_filename);
+		return NULL;
+	}
+
+	g_object_ref (pixbuf);
+
+	g_object_unref (loader);
+
+	return pixbuf;
+}
