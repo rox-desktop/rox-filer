@@ -302,7 +302,7 @@ gboolean ensure_filer_menu(void)
 
 	/* Shift Open... label */
 	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
-	file_shift_item = GTK_BIN(g_list_nth(items, 6)->data)->child;
+	file_shift_item = GTK_BIN(g_list_nth(items, 5)->data)->child;
 	g_list_free(items);
 
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
@@ -378,8 +378,8 @@ static void menuitem_no_shortcuts(GtkWidget *item)
 static void shade_file_menu_items(gboolean shaded)
 {
 	menu_set_items_shaded(filer_file_menu, shaded, 0, 3);
-	menu_set_items_shaded(filer_file_menu, shaded, 5, 3);
-	menu_set_items_shaded(filer_file_menu, shaded, 10, 2);
+	menu_set_items_shaded(filer_file_menu, shaded, 5, 2);
+	menu_set_items_shaded(filer_file_menu, shaded, 9, 2);
 }
 
 /* 'data' is an array of three ints:
