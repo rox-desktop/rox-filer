@@ -16,7 +16,7 @@ class Parser(XMLParser):
 		self.data = ""
 	
 	def handle_data(self, data):
-		self.data += data
+		self.data = self.data + data
 	
 	def unknown_endtag(self, tag):
 		data = string.strip(self.data)
