@@ -34,6 +34,7 @@
 #define MINIMUM_ITEMS 16
 
 int collection_menu_button = 3;
+gboolean collection_single_click = FALSE;
 
 enum
 {
@@ -849,6 +850,8 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	collection = COLLECTION(widget);
 
+	collection->item_clicked = -1;
+
 	if (event->button > 3)
 	{
 		int	diff;
@@ -900,7 +903,7 @@ static gint collection_button_press(GtkWidget      *widget,
 			return FALSE;	/* Ignore extra presses */
 	}
 	
-	if (event->state & GDK_CONTROL_MASK)
+	if (event->state & GDK_CONTROL_MASK && !collection_single_click)
 		action = 2;
 	else
 		action = event->button;
@@ -933,6 +936,7 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	collection->drag_box_x[0] = event->x;
 	collection->drag_box_y[0] = event->y;
+	collection->item_clicked = item;
 	
 	stacked_time = current_event_time;
 	current_event_time = event->time;
@@ -948,7 +952,8 @@ static gint collection_button_press(GtkWidget      *widget,
 	{
 		/* Do nothing */
 	}
-	else if (event->type == GDK_2BUTTON_PRESS || collection->panel)
+	else if ((event->type == GDK_2BUTTON_PRESS && !collection_single_click)
+		|| collection->panel)
 	{
 		if (item >= 0)
 		{
@@ -1002,12 +1007,14 @@ static gint collection_button_release(GtkWidget      *widget,
 	int		scroll;
 	int		item;
 	guint		stacked_time;
+	int		button;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
 	g_return_val_if_fail(event != NULL, FALSE);
 
 	collection = COLLECTION(widget);
+	button = event->button;
 	
 	scroll = collection->vadj->value;
 
@@ -1021,7 +1028,28 @@ static gint collection_button_release(GtkWidget      *widget,
 		return FALSE;		/* Wait until ALL buttons are up */
 	
 	if (!collection->lasso_box)
+	{
+		int	item = collection->item_clicked;
+			
+		if (collection_single_click && item > -1
+			&& item < collection->number_of_items
+			&& (event->state & GDK_CONTROL_MASK) == 0)
+		{
+			int	dx = event->x - collection->drag_box_x[0];
+			int	dy = event->y - collection->drag_box_y[0];
+
+			if (ABS(dx) + ABS(dy) > 9)
+				return FALSE;
+
+			collection_unselect_item(collection, item);
+			gtk_signal_emit(GTK_OBJECT(collection), 
+					collection_signals[OPEN_ITEM],
+					collection->items[item].data,
+					item);
+		}
+
 		return FALSE;
+	}
 			
 	remove_lasso_box(collection);
 
@@ -1073,7 +1101,11 @@ static gint collection_button_release(GtkWidget      *widget,
 				current_event_time = stacked_time;
 				return FALSE;
 			}
-			collection_select_item(collection, item);
+
+			if (button == 1)
+				collection_select_item(collection, item);
+			else
+				collection_toggle_item(collection, item);
 			col++;
 			item++;
 		}

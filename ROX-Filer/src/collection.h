@@ -25,7 +25,6 @@ extern "C" {
 					collection_get_type(), CollectionClass)
 #define IS_COLLECTION(obj) GTK_CHECK_TYPE((obj), collection_get_type())
 
-
 /* If the display gets mucked up then remember to fix it next time we get the
  * chance.
  */
@@ -82,6 +81,7 @@ struct _Collection
 	guint		item_width, item_height;
 
 	guint		number_selected;
+	int		item_clicked;	/* For collection_single_click */
 
 	guint		array_size;
 };

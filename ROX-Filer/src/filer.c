@@ -41,7 +41,7 @@
 #include "pixmaps.h"
 #include "menu.h"
 #include "dnd.h"
-#include "apps.h"
+#include "run.h"
 #include "mount.h"
 #include "type.h"
 #include "options.h"
@@ -57,6 +57,7 @@
 #define MIN_ITEM_WIDTH 64
 
 extern int collection_menu_button;
+extern gboolean collection_single_click;
 
 FilerWindow 	*window_with_focus = NULL;
 GdkFont	   *fixed_font = NULL;
@@ -68,6 +69,7 @@ static GtkWidget *create_options();
 static void update_options();
 static void set_options();
 static void save_options();
+static char *filer_single_click(char *data);
 static char *filer_ro_bindings(char *data);
 static char *filer_toolbar(char *data);
 
@@ -81,6 +83,8 @@ static OptionsSection options =
 };
 static gboolean o_toolbar = TRUE;
 static GtkWidget *toggle_toolbar;
+static gboolean o_single_click = FALSE;
+static GtkWidget *toggle_single_click;
 static gboolean o_ro_bindings = FALSE;
 static GtkWidget *toggle_ro_bindings;
 
@@ -158,6 +162,7 @@ void filer_init()
 
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("filer_ro_bindings", filer_ro_bindings);
+	option_register("filer_single_click", filer_single_click);
 	option_register("filer_toolbar", filer_toolbar);
 
 	fixed_font = gdk_font_load("fixed");
@@ -898,11 +903,13 @@ void open_item(Collection *collection,
 
 	collection_wink_item(filer_window->collection, item_number);
 
-	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS)
+	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS
+			|| event->type == GDK_BUTTON_RELEASE)
 	{
 		shift = event->state & GDK_SHIFT_MASK;
 		adjust = (event->button != 1)
-				^ ((event->state & GDK_CONTROL_MASK) != 0);
+			^ ((event->state & GDK_CONTROL_MASK) != 0
+					&& o_single_click == 0);
 	}
 	else
 	{
@@ -1396,6 +1403,10 @@ static GtkWidget *create_options()
 		gtk_check_button_new_with_label("Use RISC OS mouse bindings");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_ro_bindings, FALSE, TRUE, 0);
 
+	toggle_single_click =
+		gtk_check_button_new_with_label("Single-click nagivation");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
+
 	toggle_toolbar =
 		gtk_check_button_new_with_label("Show toolbar on new windows");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_toolbar, FALSE, TRUE, 0);
@@ -1408,6 +1419,8 @@ static void update_options()
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_ro_bindings),
 			o_ro_bindings);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
+			o_single_click);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_toolbar),
 			o_toolbar);
 }
@@ -1417,6 +1430,11 @@ static void set_options()
 {
 	o_ro_bindings = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_ro_bindings));
+
+	o_single_click = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_single_click));
+	collection_single_click = o_single_click ? TRUE : FALSE;
+	
 	o_toolbar = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_toolbar));
 	collection_menu_button = o_ro_bindings ? 2 : 3;
@@ -1425,6 +1443,7 @@ static void set_options()
 static void save_options()
 {
 	option_write("filer_ro_bindings", o_ro_bindings ? "1" : "0");
+	option_write("filer_single_click", o_single_click ? "1" : "0");
 	option_write("filer_toolbar", o_toolbar ? "1" : "0");
 }
 
@@ -1432,6 +1451,13 @@ static char *filer_ro_bindings(char *data)
 {
 	o_ro_bindings = atoi(data) != 0;
 	collection_menu_button = o_ro_bindings ? 2 : 3;
+	return NULL;
+}
+
+static char *filer_single_click(char *data)
+{
+	o_single_click = atoi(data) != 0;
+	collection_single_click = o_single_click ? TRUE : FALSE;
 	return NULL;
 }
 

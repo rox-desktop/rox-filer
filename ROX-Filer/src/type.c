@@ -32,7 +32,7 @@
 #include "string.h"
 #include "filer.h"
 #include "pixmaps.h"
-#include "apps.h"
+#include "run.h"
 #include "gui_support.h"
 #include "choices.h"
 #include "type.h"
