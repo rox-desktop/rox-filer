@@ -66,6 +66,7 @@
 
 /* Options bits */
 static gboolean o_sort_nocase = TRUE;
+static gboolean o_dirs_first = FALSE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
 
@@ -120,6 +121,7 @@ enum {
 void display_init()
 {
 	option_add_int("display_sort_nocase", o_sort_nocase, NULL);
+	option_add_int("display_dirs_first", o_dirs_first, NULL);
 	option_add_int("display_size", LARGE_ICONS, NULL);
 	option_add_int("display_details", DETAILS_NONE, NULL);
 	option_add_int("display_sort_by", SORT_BY_TYPE, NULL);
@@ -132,9 +134,11 @@ void display_init()
 static void options_changed(void)
 {
 	gboolean	old_case = o_sort_nocase;
+	gboolean	old_dirs = o_dirs_first;
 	GList		*next = all_filer_windows;
 
 	o_sort_nocase = option_get_int("display_sort_nocase");
+	o_dirs_first = option_get_int("display_dirs_first");
 	o_large_truncate = option_get_int("display_large_width");
 	o_small_truncate = option_get_int("display_small_width");
 
@@ -142,7 +146,7 @@ static void options_changed(void)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
-		if (o_sort_nocase != old_case)
+		if (o_sort_nocase != old_case || o_dirs_first != old_dirs)
 		{
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
@@ -722,13 +726,28 @@ static void draw_item_large(GtkWidget *widget,
 			selected, TRUE);
 }
 
+#define IS_A_DIR(item) (item->base_type == TYPE_DIRECTORY && \
+			!(item->flags & ITEM_FLAG_APPDIR))
+
+#define SORT_DIRS	\
+	if (o_dirs_first) {	\
+		gboolean id1 = IS_A_DIR(i1);	\
+		gboolean id2 = IS_A_DIR(i2);	\
+		g_print("%s:%d - %s:%d\n", i1->leafname, id1, i2->leafname, id2);\
+		if (id1 && !id2) return -1;				\
+		if (id2 && !id1) return 1;				\
+	}
+
 int sort_by_name(const void *item1, const void *item2)
 {
+	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
+	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
+
+	SORT_DIRS;
+		
 	if (o_sort_nocase)
-		return g_strcasecmp((*((DirItem **)item1))->leafname,
-			      	    (*((DirItem **)item2))->leafname);
-	return strcmp((*((DirItem **)item1))->leafname,
-		      (*((DirItem **)item2))->leafname);
+		return g_strcasecmp(i1->leafname, i2->leafname);
+	return strcmp(i1->leafname, i2->leafname);
 }
 
 int sort_by_type(const void *item1, const void *item2)
@@ -770,6 +789,8 @@ int sort_by_date(const void *item1, const void *item2)
 	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
 	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
 
+	SORT_DIRS;
+
 	return i1->mtime > i2->mtime ? -1 :
 		i1->mtime < i2->mtime ? 1 :
 		sort_by_name(item1, item2);
@@ -779,6 +800,8 @@ int sort_by_size(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
 	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
+
+	SORT_DIRS;
 
 	return i1->size > i2->size ? -1 :
 		i1->size < i2->size ? 1 :
