@@ -29,8 +29,20 @@
 
 #include "view_iface.h"
 #include "view_details.h"
-
+#include "diritem.h"
+#include "support.h"
+#include "type.h"
 #include "filer.h"
+
+/* These are the column numbers in the ListStore */
+#define COL_LEAF 0
+#define COL_TYPE 1
+#define COL_PERM 2
+#define COL_OWNER 3
+#define COL_GROUP 4
+#define COL_SIZE 5
+#define COL_MTIME 6
+#define N_COLUMNS 7
 
 static gpointer parent_class = NULL;
 
@@ -167,20 +179,63 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	GtkCellRenderer *cell;
 	GtkListStore *model;
 
-	model = gtk_list_store_new(1, G_TYPE_STRING);
+	model = gtk_list_store_new(N_COLUMNS,
+				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
+				   G_TYPE_STRING);
 
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(model));
-	column = gtk_tree_view_column_new();
-	
-	gtk_tree_view_append_column(treeview, column);
 
+#if 0
 	cell = gtk_cell_renderer_toggle_new();
 	gtk_tree_view_insert_column_with_attributes(treeview,
 			0, NULL, cell);
+#endif
 
 	cell = gtk_cell_renderer_text_new();
-	gtk_tree_view_insert_column_with_attributes(treeview,
-			1, _("Name"), cell, "text", 0);
+
+	/* Name */
+	column = gtk_tree_view_column_new_with_attributes(_("Name"), cell,
+					    "text", COL_LEAF, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
+
+	/* Type */
+	column = gtk_tree_view_column_new_with_attributes(_("Type"), cell,
+					    "text", COL_TYPE, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_TYPE);
+
+	/* Perm */
+	column = gtk_tree_view_column_new_with_attributes(_("Permissions"),
+			cell, "text", COL_PERM, NULL);
+	gtk_tree_view_append_column(treeview, column);
+
+	/* Owner */
+	column = gtk_tree_view_column_new_with_attributes(_("Owner"), cell,
+					    "text", COL_OWNER, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_OWNER);
+
+	/* Group */
+	column = gtk_tree_view_column_new_with_attributes(_("Group"), cell,
+					    "text", COL_GROUP, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_GROUP);
+
+	/* Size */
+	column = gtk_tree_view_column_new_with_attributes(_("Size"), cell,
+					    "text", COL_SIZE, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
+
+	/* MTime */
+	column = gtk_tree_view_column_new_with_attributes(_("M-Time"), cell,
+					    "text", COL_MTIME, NULL);
+	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
+
+	gtk_widget_set_size_request(GTK_WIDGET(treeview), -1, 50);
 }
 
 /* Create the handers for the View interface */
@@ -232,6 +287,67 @@ static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf)
 
 static void view_details_add_items(ViewIface *view, GPtrArray *items)
 {
+	ViewDetails *view_details = (ViewDetails *) view;
+	FilerWindow *filer_window = view_details->filer_window;
+	GtkTreeView *tree = GTK_TREE_VIEW(view);
+	GtkListStore *list;
+	gboolean show_hidden = filer_window->show_hidden;
+	int i;
+	
+	list = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
+
+	for (i = 0; i < items->len; i++)
+	{
+		DirItem *item = (DirItem *) items->pdata[i];
+		char	*leafname = item->leafname;
+		GtkTreeIter iter;
+	
+		if (leafname[0] == '.')
+		{
+			if (!show_hidden)
+				continue;
+
+			if (leafname[1] == '\0')
+				continue; /* Never show '.' */
+
+			if (leafname[1] == '.' &&
+					leafname[2] == '\0')
+				continue; /* Never show '..' */
+		}
+		
+		gtk_list_store_append(list, &iter);
+
+		if (item->base_type == TYPE_UNKNOWN)
+			gtk_list_store_set(list, &iter, COL_LEAF, leafname, -1);
+		else
+		{
+			char *time;
+			mode_t m = item->mode;
+			const char *type =
+				item->flags & ITEM_FLAG_APPDIR? "App" :
+			        S_ISDIR(m) ? "Dir" :
+				S_ISCHR(m) ? "Char" :
+				S_ISBLK(m) ? "Blck" :
+				S_ISLNK(m) ? "Link" :
+				S_ISSOCK(m) ? "Sock" :
+				S_ISFIFO(m) ? "Pipe" :
+				S_ISDOOR(m) ? "Door" :
+				"File";
+
+			time = pretty_time(&item->mtime);
+			
+			gtk_list_store_set(list, &iter,
+				COL_LEAF, leafname,
+				COL_TYPE, type,
+				COL_SIZE, format_size(item->size),
+				COL_PERM, pretty_permissions(item->mode),
+				COL_OWNER, user_name(item->uid),
+				COL_GROUP, group_name(item->gid),
+				COL_MTIME, time,
+		     		-1);
+			g_free(time);
+		}
+	}
 }
 
 static void view_details_update_items(ViewIface *view, GPtrArray *items)
@@ -246,6 +362,12 @@ static void view_details_delete_if(ViewIface *view,
 
 static void view_details_clear(ViewIface *view)
 {
+	GtkTreeView *tree = GTK_TREE_VIEW(view);
+	GtkListStore *list;
+
+	list = GTK_LIST_STORE(gtk_tree_view_get_model(tree));
+
+	gtk_list_store_clear(list);
 }
 
 static void view_details_select_all(ViewIface *view)

@@ -1466,7 +1466,7 @@ static void view_collection_add_items(ViewIface *view, GPtrArray *items)
 	for (i = 0; i < items->len; i++)
 	{
 		DirItem *item = (DirItem *) items->pdata[i];
-		char		*leafname = item->leafname;
+		char	*leafname = item->leafname;
 
 		if (leafname[0] == '.')
 		{
