@@ -146,6 +146,8 @@ static Option o_label_font, o_pinboard_shadow_colour;
 static Option o_pinboard_shadow_labels;
 static Option o_blackbox_hack;
 
+static Option o_top_margin, o_bottom_margin;
+
 /* Static prototypes */
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
@@ -249,6 +251,9 @@ void pinboard_init(void)
 	option_add_int(&o_iconify_dir, "iconify_dir", DIR_VERT);
 
 	option_add_int(&o_blackbox_hack, "blackbox_hack", FALSE);
+
+	option_add_int(&o_top_margin, "pinboard_top_margin", 0);
+	option_add_int(&o_bottom_margin, "pinboard_bottom_margin", 0);
 
 	option_add_notify(pinboard_check_options);
 
@@ -2377,6 +2382,26 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 	used = gdk_region_new();
 
 	panel_mark_used(used);
+
+	/* Subtract the no-go areas... */
+
+	if(o_top_margin.int_value>0)
+	{
+		used_rect.x=0;
+		used_rect.y=0;
+		used_rect.width=gdk_screen_width();
+		used_rect.height=o_top_margin.int_value;
+		gdk_region_union_with_rect(used, &used_rect);
+	}
+
+	if(o_bottom_margin.int_value>0)
+	{
+		used_rect.x=0;
+		used_rect.y=gdk_screen_height()-o_bottom_margin.int_value;
+		used_rect.width=gdk_screen_width();
+		used_rect.height=gdk_screen_height();
+		gdk_region_union_with_rect(used, &used_rect);
+	}
 
 	/* Subtract the used areas... */
 

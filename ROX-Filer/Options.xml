@@ -184,6 +184,13 @@
            <item label='vertically' value='1'/>
          </menu>
        </hbox>
+       <spacer/>
+       <label help='1'>Sometimes the filer doesn't know about your desktop furniture and puts iconified windows under (for example) the Gnome panel.  You can define a top or bottom margin to avoid placing the icons there.  The filer already knows about its own panel.</label>
+       <spacer/>
+       <vbox>
+         <slider name='pinboard_top_margin' label='Top margin' min='0' max='96' showvalue='1'>Height of no-go area at top of screen.</slider>
+         <slider name='pinboard_bottom_margin' label='Bottom margin' min='0' max='96' showvalue='1'>Height of no-go area at bottom of screen.</slider>
+       </vbox>
      </frame>
     </section>
   </section>
