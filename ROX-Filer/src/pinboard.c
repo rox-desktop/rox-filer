@@ -31,6 +31,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtkinvisible.h>
+#include <stdlib.h>
 
 #include "global.h"
 
