@@ -19,6 +19,7 @@
 #include <gtk/gtk.h>
 
 #include "apps.h"
+#include "action.h"
 #include "filer.h"
 #include "type.h"
 #include "support.h"
@@ -400,6 +401,13 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
 {
+	g_return_if_fail(window_with_focus != NULL);
+
+	action_delete(window_with_focus);
+}
+
+void bin(gpointer data, guint action, GtkWidget *widget)
+{
 	const char	*start_args[] = {"xterm", "-wf",
 				"-e", "rm", "-vir"};
 	int		argc = sizeof(start_args) / sizeof(char *);
@@ -410,15 +418,6 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	int		child;
 
 	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-
-	if (collection->number_selected < 1)
-	{
-		report_error("ROX-Filer", "You need to select some items "
-				"first");
-		return;
-	}
 
 	argv = g_malloc(sizeof(start_args) +
 		sizeof(char *) * (collection->number_selected + 1));
@@ -555,6 +554,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 	int		i;
 	Collection	*collection;
 	char		*error = NULL;
+	int		count = 0;
 	
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -569,6 +569,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 				char	*argv[] = {"mount", NULL, NULL};
 				int	child;
 
+				count++;
 				if (item->flags & ITEM_FLAG_MOUNTED)
 					argv[0] = "umount";
 				argv[1] = make_path(window_with_focus->path,
@@ -580,7 +581,10 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 					error = "Failed to run mount/umount";
 			}
 		}
-	scan_dir(window_with_focus);
+	if (count)
+		scan_dir(window_with_focus);
+	else if (!error)
+		error = "You must select some mount points first!";
 
 	if (error)
 		report_error("ROX-Filer", error);
