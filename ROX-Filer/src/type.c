@@ -148,7 +148,7 @@ void type_init(void)
 
 	text_plain = get_mime_type("text/plain", TRUE);
 	inode_directory = get_mime_type("inode/directory", TRUE);
-	inode_mountpoint = get_mime_type("inode/mountpoint", TRUE);
+	inode_mountpoint = get_mime_type("inode/mount-point", TRUE);
 	inode_pipe = get_mime_type("inode/fifo", TRUE);
 	inode_socket = get_mime_type("inode/socket", TRUE);
 	inode_block_dev = get_mime_type("inode/blockdevice", TRUE);
