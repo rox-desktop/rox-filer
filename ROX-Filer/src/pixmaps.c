@@ -126,14 +126,21 @@ void pixmaps_init(void)
 	load_default_pixmaps();
 }
 
-/* 'name' is relative to app_dir. Always returns with a valid image. */
+/* Load image <appdir>/images/name.png.
+ * Always returns with a valid image.
+ */
 MaskedPixmap *load_pixmap(const char *name)
 {
+	guchar *path;
 	MaskedPixmap *retval;
+	
+	path = g_strconcat(app_dir, "/images/", name, ".png", NULL);
+	retval = image_from_file(path);
+	g_free(path);
 
-	retval = image_from_file(make_path(app_dir, name)->str);
 	if (!retval)
 		retval = get_bad_image();
+
 	return retval;
 }
 
@@ -143,17 +150,17 @@ static void load_default_pixmaps(void)
 	GdkPixbuf *pixbuf;
 	GError *error = NULL;
 
-	im_error = load_pixmap("images/error.png");
-	im_unknown = load_pixmap("images/unknown.png");
-	im_symlink = load_pixmap("images/symlink.png");
+	im_error = load_pixmap("error");
+	im_unknown = load_pixmap("unknown");
+	im_symlink = load_pixmap("symlink");
 
-	im_unmounted = load_pixmap("images/mount.png");
-	im_mounted = load_pixmap("images/mounted.png");
-	im_multiple = load_pixmap("images/multiple.png");
-	im_appdir = load_pixmap("images/application.png");
+	im_unmounted = load_pixmap("mount");
+	im_mounted = load_pixmap("mounted");
+	im_multiple = load_pixmap("multiple");
+	im_appdir = load_pixmap("application");
 
-	im_help = load_pixmap("images/help.png");
-	im_dirs = load_pixmap("images/dirs.png");
+	im_help = load_pixmap("help");
+	im_dirs = load_pixmap("dirs");
 
 	pixbuf = gdk_pixbuf_new_from_file(
 			make_path(app_dir, ".DirIcon")->str, &error);

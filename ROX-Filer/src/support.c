@@ -538,7 +538,7 @@ void set_blocking(int fd, gboolean blocking)
  */
 char *pretty_time(time_t *time)
 {
-        static char time_buf[32];
+        char time_buf[32];
 
         if (strftime(time_buf, sizeof(time_buf),
 			TIME_FORMAT, localtime(time)) == 0)

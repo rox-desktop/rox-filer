@@ -181,11 +181,22 @@ static void read_table(void)
 	FILE		*tab;
 	struct mntent	*ent;
 	MountPoint	*mp;
+#  ifdef HAVE_FCNTL_H
+	struct flock	lb;
+#  endif
 
 	clear_table();
 
 	tab = setmntent(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
+
+#  ifdef HAVE_FCNTL_H
+	lb.l_type = F_RDLCK;
+	lb.l_whence = 0;
+	lb.l_start = 0;
+	lb.l_len = 0;
+	fcntl(fileno(tab), F_SETLKW, &lb);
+#  endif
 
 	while ((ent = getmntent(tab)))
 	{
@@ -212,9 +223,10 @@ static void read_table(void)
 	struct flock	lb;
 #  endif
 
+	clear_table();
+
 	tab = fopen(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
-	clear_table();
 
 #  ifdef HAVE_FCNTL_H
 	lb.l_type = F_RDLCK;

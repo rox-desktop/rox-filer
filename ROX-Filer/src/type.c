@@ -292,18 +292,12 @@ MIME_type *type_from_path(const char *path)
 	{
 		Pattern *p = glob_patterns->pdata[i];
 
-		if (fnmatch(p->glob, leafname, 0) == 0)
+		if (fnmatch(p->glob, leafname, 0) == 0 ||
+		    fnmatch(p->glob, lower, 0) == 0)
 		{
 			type = p->type;
 			goto out;
 		}
-
-		if (fnmatch(p->glob, lower, 0) == 0)
-		{
-			type = p->type;
-			goto out;
-		}
-
 	}
 
 out:

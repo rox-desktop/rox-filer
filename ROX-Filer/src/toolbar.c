@@ -159,14 +159,7 @@ void toolbar_init(void)
 		Tool	*tool = &all_tools[i];
 
 		if (!tool->icon)
-		{
-			guchar	*path;
-
-			path = g_strconcat("images/",
-					tool->name, ".png", NULL);
-			tool->icon = load_pixmap(path);
-			g_free(path);
-		}
+			tool->icon = load_pixmap(tool->name);
 	}
 
 	option_register_widget("tool-options", build_tool_options);
@@ -647,11 +640,9 @@ static void recreate_toolbar(FilerWindow *filer_window)
 
 static void option_notify(void)
 {
-	guchar		*list;
 	int		i;
 	gboolean	changed = FALSE;
-
-	list = o_toolbar_disable.value;
+	guchar		*list = o_toolbar_disable.value;
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{

@@ -136,12 +136,12 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 {
 	DirUser	*user;
-	GList	*list = dir->users;
+	GList	*list;
 
 	g_return_if_fail(dir != NULL);
 	g_return_if_fail(callback != NULL);
 
-	while (list)
+	for (list = dir->users; list; list = list->next)
 	{
 		user = (DirUser *) list->data;
 		if (user->callback == callback && user->data == data)
@@ -155,7 +155,6 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 
 			return;
 		}
-		list = list->next;
 	}
 
 	g_warning("dir_detach: Callback/data pair not attached!\n");
@@ -413,13 +412,13 @@ void dir_rescan(Directory *dir, const guchar *pathname)
  */
 void dir_merge_new(Directory *dir)
 {
-	GList *list = dir->users;
-	GPtrArray	*new = dir->new_items;
-	GPtrArray	*up = dir->up_items;
-	GPtrArray	*gone = dir->gone_items;
-	int	i;
+	GPtrArray *new = dir->new_items;
+	GPtrArray *up = dir->up_items;
+	GPtrArray *gone = dir->gone_items;
+	GList	  *list;
+	int	  i;
 
-	while (list)
+	for (list = dir->users; list; list = list->next)
 	{
 		DirUser *user = (DirUser *) list->data;
 
@@ -429,8 +428,6 @@ void dir_merge_new(Directory *dir)
 			user->callback(dir, DIR_UPDATE, up, user->data);
 		if (gone->len)
 			user->callback(dir, DIR_REMOVE, gone, user->data);
-		
-		list = list->next;
 	}
 
 	for (i = 0; i < new->len; i++)
@@ -575,13 +572,12 @@ static void delayed_notify(Directory *dir)
  */
 static DirItem *insert_item(Directory *dir, const guchar *leafname)
 {
-	static GString  *tmp = NULL;
-
+	const gchar  	*full_path;
 	DirItem		*item;
 	DirItem		old;
 	gboolean	do_compare = FALSE;	/* (old is filled in) */
 
-	tmp = make_path(dir->pathname, leafname);
+	full_path = make_path(dir->pathname, leafname)->str;
 	item = g_hash_table_lookup(dir->known_items, leafname);
 
 	if (item)
@@ -594,7 +590,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 				g_object_ref(old.image);
 			do_compare = TRUE;
 		}
-		diritem_restat(tmp->str, item, &dir->stat_info);
+		diritem_restat(full_path, item, &dir->stat_info);
 	}
 	else
 	{
@@ -603,7 +599,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		 * we get here.
 		 */
 		item = diritem_new(leafname);
-		diritem_restat(tmp->str, item, &dir->stat_info);
+		diritem_restat(full_path, item, &dir->stat_info);
 		if (item->base_type == TYPE_ERROR &&
 				item->lstat_errno == ENOENT)
 		{
@@ -696,7 +692,7 @@ static void set_idle_callback(Directory *dir)
 /* See dir_force_update_path() */
 static void dir_force_update_item(Directory *dir, const gchar *leaf)
 {
-	GList *list = dir->users;
+	GList *list;
 	GPtrArray *items;
 	DirItem *item;
 
@@ -708,13 +704,11 @@ static void dir_force_update_item(Directory *dir, const gchar *leaf)
 
 	g_ptr_array_add(items, item);
 
-	while (list)
+	for (list = dir->users; list; list = list->next)
 	{
 		DirUser *user = (DirUser *) list->data;
 
 		user->callback(dir, DIR_UPDATE, items, user->data);
-		
-		list = list->next;
 	}
 
 out:

@@ -183,26 +183,25 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 
 static void update_item(FilerWindow *filer_window, DirItem *item)
 {
-	int	i;
 	char	*leafname = item->leafname;
-	int	old_w = filer_window->collection->item_width;
-	int	old_h = filer_window->collection->item_height;
-	int	w, h;
+	Collection *collection = filer_window->collection;
+	int	old_w = collection->item_width;
+	int	old_h = collection->item_height;
+	int	w, h, i;
 	CollectionItem *colitem;
 	
 	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
 
-	i = collection_find_item(filer_window->collection, item,
-				 filer_window->sort_fn);
+	i = collection_find_item(collection, item, filer_window->sort_fn);
 
 	if (i < 0)
 	{
-		g_warning("Failed to find '%s'\n", item->leafname);
+		g_warning("Failed to find '%s'\n", leafname);
 		return;
 	}
 	
-	colitem = &filer_window->collection->items[i];
+	colitem = &collection->items[i];
 
 	display_update_view(filer_window,
 			(DirItem *) colitem->data,
@@ -211,11 +210,11 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	
 	calc_size(filer_window, colitem, &w, &h); 
 	if (w > old_w || h > old_h)
-		collection_set_item_size(filer_window->collection,
+		collection_set_item_size(collection,
 					 MAX(old_w, w),
 					 MAX(old_h, h));
 
-	collection_draw_item(filer_window->collection, i, TRUE);
+	collection_draw_item(collection, i, TRUE);
 }
 
 /* Resize the filer window to w x h pixels, plus border (not clamped) */
@@ -223,6 +222,8 @@ static void filer_window_set_size(FilerWindow *filer_window,
 				  int w, int h,
 				  gboolean allow_shrink)
 {
+	GtkWidget *window;
+
 	g_return_if_fail(filer_window != NULL);
 
 	if (filer_window->scrollbar)
@@ -233,21 +234,23 @@ static void filer_window_set_size(FilerWindow *filer_window,
 	if (filer_window->message)
 		h += filer_window->message->allocation.height;
 
-	if (GTK_WIDGET_VISIBLE(filer_window->window))
+	window = filer_window->window;
+
+	if (GTK_WIDGET_VISIBLE(window))
 	{
 		gint x, y;
-		GtkRequisition	*req = &filer_window->window->requisition;
+		GtkRequisition	*req = &window->requisition;
+		GdkWindow *gdk_window = window->window;
 
 		w = MAX(req->width, w);
 		h = MAX(req->height, h);
-		gdk_window_get_position(filer_window->window->window,
-					&x, &y);
+		gdk_window_get_position(gdk_window, &x, &y);
+
 		if (!allow_shrink)
 		{
 			gint	old_w, old_h;
 
-			gdk_drawable_get_size(filer_window->window->window,
-						&old_w, &old_h);
+			gdk_drawable_get_size(gdk_window, &old_w, &old_h);
 			w = MAX(w, old_w);
 			h = MAX(h, old_h);
 
@@ -261,15 +264,13 @@ static void filer_window_set_size(FilerWindow *filer_window,
 				x = screen_width - w - 4;
 			if (y + h > screen_height)
 				y = screen_height - h - 4;
-			gdk_window_move_resize(filer_window->window->window,
-							x, y, w, h);
+			gdk_window_move_resize(gdk_window, x, y, w, h);
 		}
 		else
-			gdk_window_resize(filer_window->window->window, w, h);
+			gdk_window_resize(gdk_window, w, h);
 	}
 	else
-		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-						w, h);
+		gtk_window_set_default_size(GTK_WINDOW(window), w, h);
 }
 
 /* Resize the window to fit the items currently in the Directory.
@@ -421,16 +422,14 @@ static void update_display(Directory *dir,
 			}
 
 			if (old_num != collection->number_of_items)
-				collection_qsort(filer_window->collection,
-						filer_window->sort_fn);
+				collection_qsort(collection,
+						 filer_window->sort_fn);
 
 			/* Open and resize if currently hidden */
 			open_filer_window(filer_window);
 			break;
 		case DIR_REMOVE:
-			collection_delete_if(filer_window->collection,
-					if_deleted,
-					items);
+			collection_delete_if(collection, if_deleted, items);
 			break;
 		case DIR_START_SCAN:
 			set_scanning_display(filer_window, TRUE);
@@ -463,8 +462,8 @@ static void update_display(Directory *dir,
 				start_thumb_scanning(filer_window);
 			break;
 		case DIR_UPDATE:
-			collection_qsort(filer_window->collection,
-					filer_window->sort_fn);
+			collection_qsort(collection, filer_window->sort_fn);
+
 			for (i = 0; i < items->len; i++)
 			{
 				DirItem *item = (DirItem *) items->pdata[i];
@@ -541,26 +540,30 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 static void add_item(FilerWindow *filer_window, DirItem *item)
 {
 	char		*leafname = item->leafname;
-	int		old_w = filer_window->collection->item_width;
-	int		old_h = filer_window->collection->item_height;
-	int		w, h;
-	int		i;
+	Collection	*collection = filer_window->collection;
+	int		old_w = collection->item_width;
+	int		old_h = collection->item_height;
+	int		w, h, i;
 
 	if (leafname[0] == '.')
 	{
-		if (filer_window->show_hidden == FALSE || leafname[1] == '\0'
-				|| (leafname[1] == '.' && leafname[2] == '\0'))
-		return;
+		if (!filer_window->show_hidden)
+			return;
+
+		if (leafname[1] == '\0')
+			return;		/* Never show '.' */
+
+		if (leafname[1] == '.' && leafname[2] == '\0')
+			return;		/* Never show '..' */
 	}
 
-	i = collection_insert(filer_window->collection,
-			item,
-			display_create_viewdata(filer_window, item));
+	i = collection_insert(collection, item,
+				display_create_viewdata(filer_window, item));
 
-	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
+	calc_size(filer_window, &collection->items[i], &w, &h); 
 
 	if (w > old_w || h > old_h)
-		collection_set_item_size(filer_window->collection,
+		collection_set_item_size(collection,
 					 MAX(old_w, w),
 					 MAX(old_h, h));
 }
@@ -719,14 +722,12 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
 	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0;
-	GtkWidget	*widget;
 	DirItem		*item = (DirItem *)
 			filer_window->collection->items[item_number].data;
 	guchar		*full_path;
 	gboolean	wink = TRUE;
 	Directory	*old_dir;
 
-	widget = filer_window->window;
 	if (filer_window->mini_type == MINI_SHELL)
 	{
 		minibuffer_add(filer_window, item->leafname);
@@ -1617,7 +1618,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
 				filer_window);
 }
 
-/* Note that filer_window may not exist after this call. */
+/* Note that filer_window may not exist after this call */
 void filer_update_dir(FilerWindow *filer_window, gboolean warning)
 {
 	if (may_rescan(filer_window, warning))
@@ -1632,6 +1633,9 @@ void filer_update_all(void)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
+		/* Updating directory may remove it from list -- stop sending
+		 * patches to move this line!
+		 */
 		next = next->next;
 
 		filer_update_dir(filer_window, TRUE);
@@ -1649,19 +1653,15 @@ void full_refresh(void)
  */
 static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff)
 {
-	GList	*next = all_filer_windows;
+	GList	*next;
 
-	while (next)
+	for (next = all_filer_windows; next; next = next->next)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
 		if (filer_window != diff &&
 		    	strcmp(sym_path, filer_window->sym_path) == 0)
-		{
 			return filer_window;
-		}
-
-		next = next->next;
 	}
 	
 	return NULL;
@@ -1671,7 +1671,7 @@ static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff)
 void filer_check_mounted(const char *real_path)
 {
 	GList	*next = all_filer_windows;
-	char	*slash;
+	gchar	*parent;
 	int	len;
 
 	len = strlen(real_path);
@@ -1691,19 +1691,9 @@ void filer_check_mounted(const char *real_path)
 		}
 	}
 
-	slash = strrchr(real_path, '/');
-	if (slash && slash != real_path)
-	{
-		guchar	*parent;
-
-		parent = g_strndup(real_path, slash - real_path);
-
-		refresh_dirs(parent);
-
-		g_free(parent);
-	}
-	else
-		refresh_dirs("/");
+	parent = g_dirname(real_path);
+	refresh_dirs(parent);
+	g_free(parent);
 
 	icons_may_update(real_path);
 }
@@ -1818,7 +1808,7 @@ void filer_set_title(FilerWindow *filer_window)
 }
 
 /* Reconnect to the same directory (used when the Show Hidden option is
- * toggled).
+ * toggled). This has the side-effect of updating the window title.
  */
 void filer_detach_rescan(FilerWindow *filer_window)
 {
@@ -1869,8 +1859,7 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 		collection->items[item].selected &&
 		filer_window->selection_state == GTK_STATE_INSENSITIVE)
 	{
-		selection_changed(filer_window->collection,
-				event->time, filer_window);
+		selection_changed(collection, event->time, filer_window);
 		return;
 	}
 
@@ -2088,7 +2077,6 @@ void filer_target_mode(FilerWindow *filer_window,
 	}
 	else
 		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), "");
-
 }
 
 /* Draw the black border */
@@ -2130,7 +2118,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 
 	collection = filer_window->collection;
 	gdk_window_get_pointer(GTK_WIDGET(collection)->window, &x, &y, NULL);
-	i = collection_get_item(filer_window->collection, x, y);
+	i = collection_get_item(collection, x, y);
 	if (i == -1 || ((DirItem *) collection->items[i].data) != tip_item)
 		return FALSE;	/* Not still under the pointer */
 
@@ -2291,9 +2279,8 @@ static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item)
 
 static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 {
-	GtkStateType old_state;
+	GtkStateType old_state = filer_window->selection_state;
 
-	old_state = filer_window->selection_state;
 	filer_window->selection_state = normal
 			? GTK_STATE_SELECTED : GTK_STATE_INSENSITIVE;
 

@@ -592,9 +592,7 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 
 	filer_window->show_hidden = hidden;
 
-	filer_detach_rescan(filer_window);
-
-	filer_set_title(filer_window);
+	filer_detach_rescan(filer_window);	/* (updates titlebar) */
 }
 
 /* Highlight (wink or cursor) this item in the filer window. If the item
@@ -742,9 +740,9 @@ void display_update_views(FilerWindow *filer_window)
 
 static void options_changed(void)
 {
-	GList		*next = all_filer_windows;
+	GList		*next;
 
-	while (next)
+	for (next = all_filer_windows; next; next = next->next)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
@@ -762,8 +760,6 @@ static void options_changed(void)
 		}
 		shrink_grid(filer_window);
 		gtk_widget_queue_draw(filer_window->window);
-
-		next = next->next;
 	}
 }
 
@@ -1052,9 +1048,12 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 		gchar *time;
 
 		if (!scanned)
-			return g_strdup("XXXX ---,---,---/--- "
-					"12345678 12345678 "
-					"12345M 00:00:00 01 Mmm Yyyy");
+			return g_strdup("XXXX ---,---,---/--"
+#ifdef S_ISVTX
+					"-"
+#endif
+					" 12345678 12345678 "
+					"1234M 00:00:00 01 Mmm Yyyy");
 
 		time = pretty_time(&item->mtime);
 		
@@ -1099,7 +1098,11 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	else if (filer_window->details_type == DETAILS_PERMISSIONS)
 	{
 		if (!scanned)
-			return g_strdup("---,---,---/--- 12345678 12345678");
+			return g_strdup("---,---,---/--"
+#ifdef S_ISVTX
+					"-"
+#endif
+					" 12345678 12345678");
 
 		buf = g_strdup_printf("%s %-8.8s %-8.8s",
 				pretty_permissions(m),
