@@ -1879,11 +1879,12 @@ static void show_key_help(GtkWidget *button, gpointer data)
 	{
 		info_message(_("User-definable shortcuts are disabled by "
 			"default in Gtk2, and you have not enabled "
-			"them. You can turn this feature on by:\n"
-			"1) using an XSettings manager, such as ROX-Session\n"
-			"or\n"
+			"them. You can turn this feature on by:\n\n"
+			"1) using an XSettings manager, such as ROX-Session "
+			"or gnome-settings-daemon, or\n\n"
 			"2) adding this line to ~/.gtkrc-2.0:\n"
-			"\tgtk-can-change-accels = 1"));
+			"\tgtk-can-change-accels = 1\n"
+			"\t(this only works if NOT using XSETTINGS)"));
 		return;
 	}
 
