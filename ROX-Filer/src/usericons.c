@@ -171,6 +171,7 @@ void check_globicon(const guchar *path, DirItem *item)
 gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 {
 	MaskedPixmap *pic;
+	gchar	*icon_path;
 
 	pic = g_fscache_lookup(pixmap_cache, iconpath);
 	if (!pic)
@@ -183,12 +184,14 @@ gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 		return FALSE;
 	}
 
-	gdk_pixbuf_save(pic->huge_pixbuf,
-			make_path(filepath, ".DirIcon")->str,
+	icon_path = make_path(filepath, ".DirIcon")->str;
+	gdk_pixbuf_save(pic->huge_pixbuf, icon_path,
 			"png", NULL,
 			"tEXt::Software", PROJECT,
 			NULL);
 	g_object_unref(pic);
+
+	dir_check_this(filepath);
 
 	return TRUE;
 }

@@ -876,6 +876,14 @@ static void do_delete(const char *src_path, const char *unused)
 	{
 		g_string_sprintf(message, "s%s", safe_path);
 		send();
+		if (strcmp(g_basename(safe_path), ".DirIcon") == 0)
+		{
+			gchar *dir;
+			dir = g_dirname(safe_path);
+			g_string_sprintf(message, "s%s", dir);
+			g_free(dir);
+			send();
+		}
 	}
 
 	g_free(safe_path);
