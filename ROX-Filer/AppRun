@@ -1,0 +1,43 @@
+#!/bin/bash
+
+# This is the Run file.
+# It can be run either from a shell or by double-clicking
+# on an application directory in the Filer.
+
+# First of all we need to work out what directory we are
+# living in. This probably won't work if someone has created
+# a link to this file.
+# TODO: Deref symlinks?
+
+# If our path was of the form <path>/<file> then set APP_DIR to <path>.
+# If that didn't work then APP_DIR will be equal to our full path, which
+# means that we are running from the current directory, so use '.'.
+
+APP_DIR=${0%/*}
+if [ "$APP_DIR" = "$0" ] ; then APP_DIR=. ; fi
+
+# Now we need to know what kind of system we are running on. We
+# want this in the form 'OS-Hardware'. bash sets some variables up
+# for us BUT if they are already defined to something else (eg by running
+# tcsh) then they'll be wrong, so:
+# Unset them and get the values from a sub-shell :-)
+PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
+
+# Set environment variable for platform specific resources:
+
+PLATFORM_DIR=$APP_DIR/$PLATFORM ; export PLATFORM_DIR
+
+if [ -x $PLATFORM_DIR/runimage ] ; then
+  # A runimage for this platform exists - run it!
+  export APP_DIR
+  DEBUGGER=""
+  case $1 in
+  	-d) shift; DEBUGGER=gdb;
+  esac
+  exec $DEBUGGER $PLATFORM_DIR/runimage $*
+else
+  echo "I cannot find an executable file for your host type ($PLATFORM)."
+  echo "Look inside this application directory for a 'src' directory - if"
+  echo "there is one then try running make inside it to create the executable."
+fi
+

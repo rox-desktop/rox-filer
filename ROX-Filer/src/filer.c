@@ -205,7 +205,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	if (base_type == TYPE_DIRECTORY)
 	{
 		/* Might be an application directory - better check... */
-		path = g_string_append(path, "/AppInfo");
+		path = g_string_append(path, "/AppRun");
 		if (!stat(path->str, &info))
 			item->flags |= ITEM_FLAG_APPDIR;
 	}

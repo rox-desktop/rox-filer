@@ -9,6 +9,7 @@
 
 #include <sys/wait.h>
 
+#include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
 #include "filer.h"
@@ -16,6 +17,8 @@
 #include "gui_support.h"
 
 #define C_ "<control>"
+
+#define MENU_MARGIN 32
 
 GtkAccelGroup	*filer_keys;
 
@@ -68,34 +71,68 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 void menu_init()
 {
-    GtkItemFactory  	*item_factory;
+	GtkItemFactory  	*item_factory;
 
-    filer_keys = gtk_accel_group_new();
-    item_factory = gtk_item_factory_new(GTK_TYPE_MENU, "<popup>", filer_keys);
+	filer_keys = gtk_accel_group_new();
+	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
+					    "<popup>",
+					    filer_keys);
 
-    gtk_item_factory_create_items(item_factory,
+	gtk_item_factory_create_items(item_factory,
 			sizeof(filer_menu_def) / sizeof(*filer_menu_def),
 			filer_menu_def,
 			NULL);
 
-    filer_menu = gtk_item_factory_get_widget(item_factory, "<popup>");
+	filer_menu = gtk_item_factory_get_widget(item_factory, "<popup>");
 }
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 {
-    GtkRequisition requisition;
+	int		*pos = (int *) data;
+	int		swidth, sheight;
+	GtkRequisition 	requisition;
 
-    gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
+	gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
+	
+	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
-    *x -= requisition.width >> 2;
-    *y -= requisition.height >> 2;
+	if (pos[0] == -1)
+		*x = swidth - MENU_MARGIN - requisition.width;
+	else if (pos[0] == -2)
+		*x = MENU_MARGIN;
+	else
+		*x = pos[0] - (requisition.width >> 2);
+		
+	if (pos[1] == -1)
+		*y = sheight - MENU_MARGIN - requisition.height;
+	else if (pos[1] == -2)
+		*y = MENU_MARGIN;
+	else
+		*y = pos[1] - (requisition.height >> 2);
+
+	*x = CLAMP(*x, 0, swidth - requisition.width);
+	*y = CLAMP(*y, 0, sheight - requisition.height);
 }
 
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 {
+	int	pos[] = {event->x_root, event->y_root};
+
 	window_with_focus = filer_window;
+
+	if (filer_window->panel)
+	{
+		switch (filer_window->panel_side)
+		{
+			case TOP: 	pos[1] = -2; break;
+			case BOTTOM: 	pos[1] = -1; break;
+			case LEFT: 	pos[0] = -2; break;
+			case RIGHT: 	pos[0] = -1; break;
+		}
+	}
+
 	gtk_menu_popup(GTK_MENU(filer_menu), NULL, NULL, position_menu,
-			NULL, event->button, event->time);
+			(gpointer) pos, event->button, event->time);
 }
 
 /* Actions */
