@@ -17,7 +17,11 @@
  * You should have received a copy of the GNU General Public License along with
  * this program; if not, write to the Free Software Foundation, Inc., 59 Temple
  * Place, Suite 330, Boston, MA  02111-1307  USA
+ *
+ * The getopt stuff is from glibc.
  */
+
+#include "config.h"
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -26,7 +30,10 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
-#include <getopt.h>
+
+#ifdef HAVE_GETOPT_LONG
+#  include <getopt.h>
+#endif
 
 #include <gtk/gtk.h>
 #include "collection.h"
@@ -45,8 +52,6 @@
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
 
-#define USAGE   "Try `ROX-Filer/AppRun --help' for more information.\n"
-
 #define VERSION "ROX-Filer 0.1.4\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -55,6 +60,15 @@ int to_error_log = -1;		/* Write here to log errors */
 		"under the terms of the GNU General Public License.\n"	\
 		"For more information about these matters, "		\
 		"see the file named COPYING.\n"
+
+#ifdef HAVE_GETOPT_LONG
+#  define USAGE   "Try `ROX-Filer/AppRun --help' for more information.\n"
+#  define SHORT_ONLY_WARNING ""
+#else
+#  define USAGE   "Try `ROX-Filer/AppRun -h' for more information.\n"
+#  define SHORT_ONLY_WARNING "NOTE: Your system does not support long options - \n" \
+				"you must use the short versions instead.\n\n"
+#endif									\
 
 #define HELP "Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"		\
        "Open filer windows showing each directory listed, or $HOME \n"	\
@@ -66,9 +80,10 @@ int to_error_log = -1;		/* Write here to log errors */
        "  -l, --left [DIR]	open DIR as a left-edge panel\n"	\
        "  -r, --right [DIR]	open DIR as a right-edge panel\n"	\
        "  -o, --override	override window manager control of panels\n" \
-       "\n"								\
+       "\n"	SHORT_ONLY_WARNING					\
        "Report bugs to <tal197@ecs.soton.ac.uk>.\n"
 
+#ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
 {
 	{"top", 1, NULL, 't'},
@@ -80,6 +95,7 @@ static struct option long_opts[] =
 	{"version", 0, NULL, 'v'},
 	{NULL, 0, NULL, 0},
 };
+#endif
 
 /* Take control of panels away from WM? */
 gboolean override_redirect = FALSE;
@@ -141,11 +157,14 @@ int main(int argc, char **argv)
 
 	while (1)
 	{
-		int	long_index;
 		int	c;
-		
+#ifdef HAVE_GETOPT_LONG
+		int	long_index;
 		c = getopt_long(argc, argv, "t:b:l:r:ohv",
 				long_opts, &long_index);
+#else
+		c = getopt(argc, argv, "t:b:l:r:ohv");
+#endif
 
 		if (c == EOF)
 			break;		/* No more options */
