@@ -256,6 +256,7 @@ static void update_display(Directory *dir,
 			GPtrArray	*items,
 			FilerWindow *filer_window)
 {
+	int	old_num;
 	int	i;
 	int	cursor = filer_window->collection->cursor_item;
 	char	*as;
@@ -266,6 +267,7 @@ static void update_display(Directory *dir,
 		case DIR_ADD:
 			as = filer_window->auto_select;
 
+			old_num = collection->number_of_items;
 			for (i = 0; i < items->len; i++)
 			{
 				DirItem *item = (DirItem *) items->pdata[i];
@@ -290,8 +292,9 @@ static void update_display(Directory *dir,
 							cursor);
 			}
 
-			collection_qsort(filer_window->collection,
-					filer_window->sort_fn);
+			if (old_num != collection->number_of_items)
+				collection_qsort(filer_window->collection,
+						filer_window->sort_fn);
 			break;
 		case DIR_REMOVE:
 			collection_delete_if(filer_window->collection,

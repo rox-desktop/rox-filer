@@ -74,8 +74,6 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 
 /* Note that for these callbacks none of the arguments are used. */
-static void not_yet(gpointer data, guint action, GtkWidget *widget);
-
 static void large(gpointer data, guint action, GtkWidget *widget);
 static void small(gpointer data, guint action, GtkWidget *widget);
 static void full_info(gpointer data, guint action, GtkWidget *widget);
@@ -182,7 +180,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
 {"/File/Disk Usage",	    	"U", 	usage, 0, NULL},
 {"/File/Permissions",		NULL,   chmod_items, 0, NULL},
-{"/File/Touch",    		NULL,   not_yet, 0, NULL},
 {"/File/Find",			NULL,   find, 0, NULL},
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
@@ -527,12 +524,6 @@ void target_callback(Collection *collection, gint item, gpointer real_fn)
 }
 
 /* Actions */
-
-/* Fake action to warn when a menu item does nothing */
-static void not_yet(gpointer data, guint action, GtkWidget *widget)
-{
-	delayed_error("ROX-Filer", "Sorry, that feature isn't implemented yet");
-}
 
 static void large(gpointer data, guint action, GtkWidget *widget)
 {
