@@ -72,9 +72,13 @@ case $REPLY in
 	1) APPDIR=/usr/local/apps
 	   BINDIR=/usr/local/bin
 	   MANDIR=/usr/local/man
+	   CHOICESDIR=/usr/local/share/Choices
+	   MIMEDIR=/usr/local/share/mime/mime-info
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
+	   CHOICESDIR=${HOME}/Choices
+	   MIMEDIR=${HOME}/.mime/mime-info
 	   if [ ! -d ${HOME}/man ]; then
 		MANDIR=""
 	   else
@@ -84,6 +88,8 @@ case $REPLY in
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
 	   MANDIR=/usr/man
+	   CHOICESDIR=/usr/share/Choices
+	   MIMEDIR=/usr/local/mime/mime-info
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
 	   get_dir "/usr/local/apps"
@@ -96,17 +102,32 @@ case $REPLY in
 	   echo "Where should the manual page go?"
 	   get_dir "/usr/local/man"
 	   MANDIR="$DIR"
+	   echo
+	   echo "Where should the default icons and run actions go?"
+	   get_dir "/usr/local/share/Choices"
+	   CHOICESDIR="$DIR"
+	   echo
+	   echo "Where should the MIME info file go?"
+	   get_dir "/usr/local/share/mime/mime-info"
+	   MIMEDIR="$DIR"
 	   ;;
 	*) die "Invalid choice!";;
 esac
 
-cat << EOF
+MIMEINFO="${MIMEDIR}/rox.mimeinfo"
 
+cat << EOF
 The application directory will be:
 	$APPDIR/ROX-Filer
 
 The launcher script will be:
 	$BINDIR/rox
+
+Icons and run actions will be in:
+	$CHOICESDIR
+
+MIME-info rules will be:
+	$MIMEINFO
 
 EOF
 if [ -n "$MANDIR" ]; then
@@ -130,6 +151,26 @@ if [ -n "$MANDIR" ]; then
 	rm -f "$MANDIR/man1/ROX-Filer.1" || die "Can't install manpage!"
 	ln -s "$MANDIR/man1/rox.1" "$MANDIR/man1/ROX-Filer.1" || die "Can't install manpage!"
 fi
+
+echo "Installing icons (existing icons will not be replaced)..."
+endir "$CHOICESDIR/MIME-icons"
+endir "$CHOICESDIR/MIME-types"
+cd Choices || die "Choices missing"
+for file in MIME-*/*; do
+  if [ -f "$file" ]; then
+    dest="$CHOICESDIR/$file"
+    if [ ! -f "$dest" ]; then
+      if [ ! -d "$dest" ]; then
+        echo Install $file as $dest
+        cp "$file" "$dest"
+      fi
+    fi
+  fi
+done
+cd ..
+
+endir "$MIMEDIR"
+cp rox.mimeinfo "$MIMEINFO" || die "Failed to create $MIMEINFO"
 
 echo "Installing application..."
 endir "$APPDIR"
@@ -155,63 +196,12 @@ EOF
 chmod a+x "$BINDIR/rox"
 
 cat << EOF
+
 Script installed. You can run the filer by simply typing 'rox'
 Make sure that $BINDIR is in your PATH though - if it isn't then
 you must use
 	\$ $BINDIR/rox
 to run it instead.
-EOF
-
-if [ ! -n "$CHOICESPATH" ]; then
-	CHOICESPATH=${HOME}/Choices:/usr/local/share/Choices:/usr/share/Choices
-fi
-
-cat << EOF
-
-
-ROX-Filer requires some icons and other defaults. These should be
-installed where it can find them. By default, it looks in
-	\${HOME}/Choices (${HOME}/Choices in your case)
-	/usr/local/share/Choices
-	/usr/share/Choices
-in that order. You can choose a different search path by setting
-the CHOICESPATH environment variable before running the filer. These
-files are supplied in the 'rox-base' package. Make sure you have the
-latest version installed!
-
-EOF
-
-IFS=":"
-REPORT="I couldn't find the required files!"
-
-for DIR in $CHOICESPATH; do
-  if [ ! -n "$DIR" ]; then
-    continue
-  fi
-  
-  echo Looking for files in $DIR...
-
-  if [ -f "$DIR/MIME-icons/application_x-executable.png" ]; then
-    REPORT=""
-    echo "Found them!"
-    break
-  elif [ -d "$DIR/MIME-icons" ]; then
-    REPORT="I found an old installation in $DIR, but not the latest version."
-  fi
-done
-
-if [ -n "$REPORT" ]; then
-  echo
-  echo $REPORT
-  echo "Please download and install the latest version of the rox-base package"
-  echo "from http://rox.sourceforge.net before using the filer!"
-  echo
-  echo "Continue?"
-  confirm_or_die
-fi
-
-cat << EOF
-
 
 	****************************
 	*** Now read the manual! ***
