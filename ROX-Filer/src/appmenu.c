@@ -46,6 +46,7 @@
 #include "run.h"
 #include "diritem.h"
 #include "action.h"
+#include "options.h"
 
 /* Static prototypes */
 static void apprun_menu(GtkWidget *item, gpointer data);
@@ -60,10 +61,16 @@ static guchar *current_app_path = NULL;	/* The path of the application */
 static GList *current_items = NULL;	/* The GtkMenuItems we added directly
 					 * to it --- not submenu items.
 					 */
+static Option o_mount_free;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
+
+void appmenu_init(void)
+{
+	option_add_string(&o_mount_free, "mount_free", "");
+}
 
 /* Removes all appmenu menu items */
 void appmenu_remove(void)
@@ -251,6 +258,68 @@ static void mnt_eject(GtkWidget *item, gpointer data)
 	g_list_free(dirs);
 }
 
+static void mnt_free(GtkWidget *item, gpointer data)
+{
+	char *argv[4]={"sh", "-c", NULL, NULL};
+	char *fmt;
+	gchar *tmp=NULL;
+	
+	g_return_if_fail(current_app_path != NULL);
+	
+	/*printf("do df for %s (%s)\n", current_app_path,
+	  o_mount_free.value);*/
+
+	if(o_mount_free.value[0]) {
+		fmt=o_mount_free.value;
+		if(fmt[0]!='/') {
+			/* We do our own searching so we can handle AppDir's */
+			const gchar *path=g_getenv("PATH");
+			gchar **dirs=g_strsplit(path, ":", 100);
+			int i;
+			gchar **words=g_strsplit(fmt, " ", 2);
+
+			for(i=0; dirs[i]; i++) {
+				gchar *target=g_build_filename(dirs[i],
+							       words[0], NULL);
+
+				if(file_exists(target)) {
+					DirItem *di;
+					di=diritem_new(words[0]);
+					diritem_restat(target, di, NULL);
+
+					if(di->flags & ITEM_FLAG_APPDIR) {
+						tmp=g_strconcat(target,
+								"/AppRun ",
+								words[1],
+								NULL);
+						fmt=tmp;
+								
+						diritem_free(di);
+						g_free(target);
+						break;
+					}
+
+					diritem_free(di);
+				}
+				g_free(target);
+			}
+
+			g_strfreev(dirs);
+			g_strfreev(words);
+		}
+	} else {
+		fmt="xterm -hold -e df -k %s";
+	}
+
+	argv[2]=g_strdup_printf(fmt, current_app_path);
+	/*printf("Command is %s\n", argv[2]);*/
+	rox_spawn(current_app_path, argv);
+	g_free(argv[2]);
+
+	if(tmp)
+		g_free(tmp);
+}
+
 static void build_mount_menu(const char *mnt_dir, DirItem *app_item)
 {
 	GtkWidget *item;
@@ -267,6 +336,7 @@ static void build_mount_menu(const char *mnt_dir, DirItem *app_item)
 	item = gtk_menu_item_new_with_label(_("Free Space"));
 	gtk_widget_show(item);
 	current_items = g_list_prepend(current_items, item);
+	g_signal_connect(item, "activate", G_CALLBACK(mnt_free), NULL);
 }
 
 /* Adds to current_items */

@@ -475,6 +475,7 @@ int main(int argc, char **argv)
 	dir_init();
 	diritem_init();
 	menu_init();
+	appmenu_init();
 	minibuffer_init();
 	filer_init();
 	toolbar_init();
