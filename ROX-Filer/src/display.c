@@ -67,13 +67,13 @@
 #define MIN_TRUNCATE 0
 #define MAX_TRUNCATE 250
 
-DetailsType last_details_type = DETAILS_SUMMARY;
-DisplayStyle last_display_style = LARGE_ICONS;
+/* This is a string so the saving code doesn't get out of sync (again ;-) */
+guchar *last_layout = NULL;
+
 gboolean last_show_hidden = FALSE;
 int (*last_sort_fn)(const void *a, const void *b) = sort_by_type;
 
 /* Options bits */
-static guchar *style_to_name(void);
 static guchar *sort_fn_to_name(void);
 static void update_options_label(void);
 
@@ -82,7 +82,7 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *display_sort_nocase(char *data);
-static char *display_display_style(char *data);
+static char *display_layout(char *data);
 static char *display_sort_by(char *data);
 static char *display_truncate(char *data);
 
@@ -154,12 +154,16 @@ static gboolean test_point_small_full(Collection *collection,
 				CollectionItem *item,
 				int width, int height,
 				FilerWindow *filer_window);
+static void display_details_set(FilerWindow *filer_window, DetailsType details);
+static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 
 void display_init()
 {
+	last_layout = g_strdup("Large");
+
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("display_sort_nocase", display_sort_nocase);
-	option_register("display_display_style", display_display_style);
+	option_register("display_layout", display_layout);
 	option_register("display_sort_by", display_sort_by);
 	option_register("display_truncate", display_truncate);
 }
@@ -855,58 +859,60 @@ void display_set_sort_fn(FilerWindow *filer_window,
 	update_options_label();
 }
 
-void display_details_set(FilerWindow *filer_window, DetailsType details)
+/* Make 'layout' the default display layout.
+ * If filer_window is not NULL then set the style for that window too.
+ * FALSE if layout is invalid.
+ */
+gboolean display_set_layout(FilerWindow *filer_window, guchar *layout)
 {
-	if (filer_window->details_type == details)
-		return;
-	filer_window->details_type = details;
-	shrink_width(filer_window);
-	update_options_label();
-}
+	DisplayStyle	style = LARGE_ICONS;
+	DetailsType	details = DETAILS_SUMMARY;
 
-void display_style_set(FilerWindow *filer_window, DisplayStyle style)
-{
-	if (filer_window->display_style == style)
-		return;
-
-	if (filer_window->panel_type)
-		style = LARGE_ICONS;
-	else
-		last_display_style = style;
-
-	filer_window->display_style = style;
-
-	switch (style)
+	g_return_val_if_fail(layout != NULL, FALSE);
+			
+	if (g_strncasecmp(layout, "Large", 5) == 0)
 	{
-		case SMALL_FULL_INFO:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_small_full,
-				(CollectionTestFunc) test_point_small_full,
-				filer_window);
-			break;
-		case SMALL_ICONS:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_small,
-				(CollectionTestFunc) test_point_small,
-				filer_window);
-			break;
-		case LARGE_FULL_INFO:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_large_full,
-				(CollectionTestFunc) test_point_large_full,
-				filer_window);
-			break;
-		default:
-			collection_set_functions(filer_window->collection,
-				(CollectionDrawFunc) draw_item_large,
-				(CollectionTestFunc) test_point_large,
-				filer_window);
-			break;
+		if (layout[5])
+			style = LARGE_FULL_INFO;
+		else
+			style = LARGE_ICONS;
+	}
+	else if (g_strncasecmp(layout, "Small", 5) == 0)
+	{
+		if (layout[5])
+			style = SMALL_FULL_INFO;
+		else
+			style = SMALL_ICONS;
+	}
+	else
+		return FALSE;
+
+	if (layout[5])
+	{
+		if (g_strcasecmp(layout + 5, "+Summary") == 0)
+			details = DETAILS_SUMMARY;
+		else if (g_strcasecmp(layout + 5, "+Sizes") == 0)
+			details = DETAILS_SIZE;
+		else if (g_strcasecmp(layout + 5, "+SizeBars") == 0)
+			details = DETAILS_SIZE_BARS;
+		else
+			return FALSE;
 	}
 
-	shrink_width(filer_window);
+	if (last_layout != layout)
+	{
+		g_free(last_layout);
+		last_layout = g_strdup(layout);
+	}
+	
+	if (filer_window)
+	{
+		display_style_set(filer_window, style);
+		if (layout[5])
+			display_details_set(filer_window, details);
+	}
 
-	update_options_label();
+	return TRUE;
 }
 
 /* Build up some option widgets to go in the options dialog, but don't
@@ -960,7 +966,7 @@ static void update_options_label(void)
 	
 	str = g_strdup_printf(_("The last used display style (%s) and sort "
 			"function (Sort By %s) will be saved if you click on "
-			"Save."), style_to_name(), sort_fn_to_name());
+			"Save."), last_layout, sort_fn_to_name());
 	gtk_label_set_text(GTK_LABEL(display_label), str);
 	g_free(str);
 }
@@ -1004,13 +1010,6 @@ static void set_options()
 	}
 }
 
-static guchar *style_to_name(void)
-{
-	return last_display_style == LARGE_ICONS ? _("Large Icons") :
-		last_display_style == SMALL_ICONS ? _("Small Icons") :
-		_("Full Info");
-}
-
 static guchar *sort_fn_to_name(void)
 {
 	return last_sort_fn == sort_by_name ? _("Name") :
@@ -1024,11 +1023,7 @@ static void save_options()
 	guchar	*tmp;
 
 	option_write("display_sort_nocase", o_sort_nocase ? "1" : "0");
-	option_write("display_display_style",
-		last_display_style == LARGE_ICONS ? "Large Icons" :
-		last_display_style == SMALL_ICONS ? "Small Icons" :
-		last_display_style == SMALL_FULL_INFO ? "Small, Full Info" :
-			"Large, Full Info");
+	option_write("display_layout", last_layout);
 	option_write("display_sort_by",
 		last_sort_fn == sort_by_name ? "Name" :
 		last_sort_fn == sort_by_type ? "Type" :
@@ -1046,20 +1041,12 @@ static char *display_sort_nocase(char *data)
 	return NULL;
 }
 
-static char *display_display_style(char *data)
+static char *display_layout(char *data)
 {
-	if (g_strcasecmp(data, "Large Icons") == 0)
-		last_display_style = LARGE_ICONS;
-	else if (g_strcasecmp(data, "Small Icons") == 0)
-		last_display_style = SMALL_ICONS;
-	else if (g_strcasecmp(data, "Large, Full Info") == 0)
-		last_display_style = LARGE_FULL_INFO;
-	else if (g_strcasecmp(data, "Small, Full Info") == 0)
-		last_display_style = SMALL_FULL_INFO;
-	else
-		return _("Unknown display style");
+	if (display_set_layout(NULL, data))
+		return NULL;
 
-	return NULL;
+	return _("Unknown display style");
 }
 
 static char *display_sort_by(char *data)
@@ -1131,4 +1118,56 @@ void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 	}
 	
 	filer_window->auto_select = g_strdup(leaf);
+}
+
+static void display_details_set(FilerWindow *filer_window, DetailsType details)
+{
+	if (filer_window->details_type == details)
+		return;
+	filer_window->details_type = details;
+	shrink_width(filer_window);
+	update_options_label();
+}
+
+static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
+{
+	if (filer_window->display_style == style)
+		return;
+
+	if (filer_window->panel_type)
+		style = LARGE_ICONS;
+
+	filer_window->display_style = style;
+
+	switch (style)
+	{
+		case SMALL_FULL_INFO:
+			collection_set_functions(filer_window->collection,
+				(CollectionDrawFunc) draw_item_small_full,
+				(CollectionTestFunc) test_point_small_full,
+				filer_window);
+			break;
+		case SMALL_ICONS:
+			collection_set_functions(filer_window->collection,
+				(CollectionDrawFunc) draw_item_small,
+				(CollectionTestFunc) test_point_small,
+				filer_window);
+			break;
+		case LARGE_FULL_INFO:
+			collection_set_functions(filer_window->collection,
+				(CollectionDrawFunc) draw_item_large_full,
+				(CollectionTestFunc) test_point_large_full,
+				filer_window);
+			break;
+		default:
+			collection_set_functions(filer_window->collection,
+				(CollectionDrawFunc) draw_item_large,
+				(CollectionTestFunc) test_point_large,
+				filer_window);
+			break;
+	}
+
+	shrink_width(filer_window);
+
+	update_options_label();
 }

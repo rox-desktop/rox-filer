@@ -39,6 +39,7 @@
 #include "gui_support.h"
 #include "run.h"
 #include "menu.h"
+#include "options.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -106,6 +107,24 @@ static PinDragType pin_drag_type = DRAG_NONE;
  */
 static gboolean pinboard_drag_in_progress = FALSE;
 
+/* Options bits */
+static GtkWidget *create_options();
+static void update_options();
+static void set_options();
+static void save_options();
+static char *text_bg(char *data);
+
+static OptionsSection options =
+{
+	N_("Pinboard options"),
+	create_options,
+	update_options,
+	set_options,
+	save_options
+};
+
+typedef enum {TEXT_BG_SOLID, TEXT_BG_OUTLINE, TEXT_BG_NONE} TextBgType;
+TextBgType o_text_bg = TEXT_BG_SOLID;
 
 /* Static prototypes */
 static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight);
@@ -177,6 +196,12 @@ static void drag_end(GtkWidget *widget,
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
+void pinboard_init(void)
+{
+	options_sections = g_slist_prepend(options_sections, &options);
+	option_register("pinboard_text_bg", text_bg);
+}
+
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
  * and make it the current pinboard.
  * Any existing pinned items are removed. You must call this
@@ -200,7 +225,7 @@ void pinboard_activate(guchar *name)
 
 	if (!name)
 	{
-		if (number_of_windows < 1)
+		if (number_of_windows < 1 && gtk_main_level() > 0)
 			gtk_main_quit();
 		return;
 	}
@@ -594,6 +619,11 @@ static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
 	gtk_widget_draw(icon->paper, NULL);
 }
 
+#define TEXT_AT(dx, dy)		\
+		gdk_draw_string(icon->mask, font, mask_gc,	\
+				text_x + dx, y + dy,		\
+				item->leafname);
+		
 /* Updates the name_width field and resizes and masks the window.
  * Returns the new width and height.
  */
@@ -604,6 +634,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	int		font_height;
 	MaskedPixmap	*image = icon->item.image;
 	DirItem		*item = &icon->item;
+	int		text_x, text_y;
 	
 	font_height = font->ascent + font->descent;
 	item->name_width = gdk_string_width(font, item->leafname);
@@ -663,11 +694,36 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	}
 	gdk_gc_set_function(mask_gc, GDK_COPY);
 
-	/* Mask off an area for the text */
-	gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
-			(width - (item->name_width + 2)) >> 1,
-			WINK_FRAME + image->height + GAP,
-			item->name_width + 2, font_height + 2);
+	/* Mask off an area for the text (from o_text_bg) */
+
+	text_x = (width - item->name_width) >> 1;
+	text_y = WINK_FRAME + image->height + GAP + 1;
+
+	if (o_text_bg == TEXT_BG_SOLID)
+	{
+		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
+				(width - (item->name_width + 2)) >> 1,
+				WINK_FRAME + image->height + GAP,
+				item->name_width + 2, font_height + 2);
+	}
+	else
+	{
+		int	y = text_y + font->ascent;
+
+		TEXT_AT(0, 0);
+
+		if (o_text_bg == TEXT_BG_OUTLINE)
+		{
+			TEXT_AT(1, 0);
+			TEXT_AT(1, 1);
+			TEXT_AT(0, 1);
+			TEXT_AT(-1, 1);
+			TEXT_AT(-1, 0);
+			TEXT_AT(-1, -1);
+			TEXT_AT(0, -1);
+			TEXT_AT(1, -1);
+		}
+	}
 	
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
@@ -736,14 +792,17 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 	text_x = (width - item->name_width) >> 1;
 	text_y = WINK_FRAME + image->height + GAP + 1;
 
-	gtk_paint_flat_box(widget->style, widget->window,
-			state,
-			GTK_SHADOW_NONE,
-			NULL, widget, "text",
-			text_x - 1,
-			text_y - 1,
-			item->name_width + 2,
-			font_height + 2);
+	if (o_text_bg != TEXT_BG_NONE)
+	{
+		gtk_paint_flat_box(widget->style, widget->window,
+				state,
+				GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				text_x - 1,
+				text_y - 1,
+				item->name_width + 2,
+				font_height + 2);
+	}
 
 	gtk_paint_string(widget->style, widget->window,
 			state,
@@ -1438,4 +1497,98 @@ static void drag_end(GtkWidget *widget,
 {
 	pinboard_drag_in_progress = FALSE;
 	pinboard_clear_selection();
+}
+
+/*			OPTIONS BITS				*/
+
+static GtkToggleButton *radio_bg_none;
+static GtkToggleButton *radio_bg_outline;
+static GtkToggleButton *radio_bg_solid;
+
+/* Build up some option widgets to go in the options dialog, but don't
+ * fill them in yet.
+ */
+static GtkWidget *create_options(void)
+{
+	GtkWidget	*vbox, *tog;
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
+
+	tog = gtk_radio_button_new_with_label( NULL, _("No background"));
+	radio_bg_none = GTK_TOGGLE_BUTTON(tog);
+	OPTION_TIP(tog, "The text is drawn directly on the desktop "
+			"background.");
+	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
+
+	tog = gtk_radio_button_new_with_label(
+			gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
+			_("Outlined text"));
+	radio_bg_outline = GTK_TOGGLE_BUTTON(tog);
+	OPTION_TIP(tog, "The text has a thin outline around each letter.");
+	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
+
+	tog = gtk_radio_button_new_with_label(
+		gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
+		_("Rectangular background slab"));
+	radio_bg_solid = GTK_TOGGLE_BUTTON(tog);
+	OPTION_TIP(tog, "The text is drawn on a solid rectangle.");
+	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
+
+	return vbox;
+}
+
+/* Reflect current state by changing the widgets in the options box */
+static void update_options()
+{
+	if (o_text_bg == TEXT_BG_SOLID)
+		gtk_toggle_button_set_active(radio_bg_solid, TRUE);
+	else if (o_text_bg == TEXT_BG_OUTLINE)
+		gtk_toggle_button_set_active(radio_bg_outline, TRUE);
+	else
+		gtk_toggle_button_set_active(radio_bg_none, TRUE);
+}
+
+/* Set current values by reading the states of the widgets in the options box */
+static void set_options()
+{
+	TextBgType	old = o_text_bg;
+	
+	if (gtk_toggle_button_get_active(radio_bg_none))
+		o_text_bg = TEXT_BG_NONE;
+	else if (gtk_toggle_button_get_active(radio_bg_outline))
+		o_text_bg = TEXT_BG_OUTLINE;
+	else
+		o_text_bg = TEXT_BG_SOLID;
+
+	if (o_text_bg != old && current_pinboard)
+	{
+		guchar	*name;
+			
+		name = g_strdup(current_pinboard->name);
+		pinboard_activate(name);
+		g_free(name);
+	}
+}
+
+static void save_options()
+{
+	option_write("pinboard_text_bg",
+			o_text_bg == TEXT_BG_NONE ? "None" :
+			o_text_bg == TEXT_BG_OUTLINE ? "Outline" :
+			"Solid");
+}
+
+static char *text_bg(char *data)
+{
+	if (g_strcasecmp(data, "None") == 0)
+		o_text_bg = TEXT_BG_NONE;
+	else if (g_strcasecmp(data, "Outline") == 0)
+		o_text_bg = TEXT_BG_OUTLINE;
+	else if (g_strcasecmp(data, "Solid") == 0)
+		o_text_bg = TEXT_BG_SOLID;
+	else
+		return _("Unknown pinboard text background type");
+
+	return NULL;
 }

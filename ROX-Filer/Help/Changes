@@ -1,12 +1,31 @@
 			ROX-Filer
 			A RISC OS-like filer for X
 			by Thomas Leonard
+25-Jul-2000
+~~~~~~~~~~~
+The new display styles can now be saved as the defaults (bug spotted by
+Vladimir Klebanov).
+
+When autoscrolling is used, prevent the last-highlighted directory
+from springing open. 'spring open' now defaults to off.
+
+The toolbar Up and Home buttons can act as drop targets (and spring open
+too!).
+
+Options to set the pinboard text background style.
 
 23-Jul-2000
 ~~~~~~~~~~~
 Added an option to control the spring-loading feature. Added tooltips
 to some of the options. Improved the rule for deciding whether to open
 a new window when you click on the toolbar buttons.
+
+Stopped the spring-open window moving while it's open (prevents a bug
+in GTK+ from causing problems). Please use GTK+ 1.2.8 or later now!
+
+Dragging near the edge of a window scrolls. Improved the lasso box drag
+to use the same system (so it scrolls without you having to move the
+mouse).
 
 22-Jul-2000
 ~~~~~~~~~~~
@@ -27,7 +46,7 @@ of the 'missing image' image.
 ~~~~~~~~~~~
 Creating a new directory now makes sure the display is updated.
 
-18-Jul-2000
+18-Jul-2000 (Release 0.1.25)
 ~~~~~~~~~~~
 Prevent dragging from a pinboard selection to itself, or onto the desktop
 background.

@@ -95,6 +95,8 @@ struct _Collection
 
 	CollectionTargetFunc target_cb;
 	gpointer	target_data;
+
+	gint		auto_scroll;	/* Timer */
 };
 
 struct _CollectionClass
@@ -155,6 +157,8 @@ void	collection_target		(Collection *collection,
 					 gpointer user_data);
 void 	collection_move_cursor		(Collection *collection,
 					 int drow, int dcol);
+void	collection_set_autoscroll	(Collection *collection,
+					 gboolean auto_scroll);
 
 #ifdef __cplusplus
 }

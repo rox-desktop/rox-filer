@@ -13,6 +13,7 @@
 typedef struct _Pinboard Pinboard;
 typedef struct _PinIcon PinIcon;
 
+void pinboard_init(void);
 void pinboard_activate(guchar *name);
 void pinboard_pin(guchar *path, guchar *name, int x, int y);
 void pinboard_unpin(PinIcon *icon);

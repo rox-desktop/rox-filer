@@ -41,7 +41,7 @@ struct _FilerWindow
 {
 	GtkWidget	*window;
 	gboolean	scanning;	/* State of the 'scanning' indicator */
-	char		*path;		/* pathname */
+	guchar		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;

@@ -109,6 +109,12 @@ static void drag_data_received(GtkWidget      		*widget,
 static gboolean spring_now(gpointer data);
 static void spring_win_destroyed(GtkWidget *widget, gpointer data);
 
+/* The handler of the signal handler for scroll events.
+ * This is used to cancel spring loading when autoscrolling is used.
+ */
+static gint scrolled_signal = -1;
+static GtkObject *scrolled_adj = NULL;	/* The object watched */
+
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
  */
@@ -157,7 +163,7 @@ void dnd_init()
 
 gboolean o_no_hostnames = FALSE;
 static gboolean o_drag_to_icons = TRUE;
-static gboolean o_spring_open = TRUE;
+static gboolean o_spring_open = FALSE;
 
 static GtkWidget *toggle_no_hostnames;
 static GtkWidget *toggle_drag_to_icons;
@@ -525,7 +531,7 @@ void drag_data_get(GtkWidget          		*widget,
 /*			DRAGGING TO US				*/
 
 /* Set up this widget as a drop-target.
- * Does not attach any handlers.
+ * Does not attach any motion handlers.
  */
 void make_drop_target(GtkWidget *widget)
 {
@@ -538,7 +544,7 @@ void make_drop_target(GtkWidget *widget)
 	};
 
 	gtk_drag_dest_set(widget,
-			0, /* GTK_DEST_DEFAULT_MOTION, */
+			0,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table),
 			GDK_ACTION_COPY | GDK_ACTION_MOVE
@@ -587,6 +593,12 @@ void drag_set_pinboard_dest(GtkWidget *widget)
 			    NULL);
 }
 
+static void scrolled(GtkAdjustment *adj, Collection *collection)
+{
+	collection_set_cursor_item(collection, -1);
+	dnd_spring_abort();
+}
+
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
  */
@@ -602,6 +614,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 	GdkDragAction	action = context->suggested_action;
 	char	 	*new_path = NULL;
 	char		*type = NULL;
+	gboolean	retval = FALSE;
+
+	if (filer_window->collection->auto_scroll == -1)
+		collection_set_autoscroll(filer_window->collection, TRUE);
 
 	if (o_drag_to_icons || filer_window->panel_type != PANEL_NO)
 		item_number = collection_get_item(filer_window->collection,
@@ -703,7 +719,21 @@ out:
 	 */
 	if (type == drop_dest_dir && item)
 	{
+		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
+
 		/* Subdir: prepare for spring-open */
+		if (scrolled_adj != vadj)
+		{
+			if (scrolled_adj)
+				gtk_signal_disconnect(scrolled_adj,
+							scrolled_signal);
+			scrolled_adj = vadj;
+			scrolled_signal = gtk_signal_connect(
+						scrolled_adj,
+						"value_changed",
+						GTK_SIGNAL_FUNC(scrolled),
+						filer_window->collection);
+		}
 		dnd_spring_load(context);
 	}
 	else
@@ -719,9 +749,10 @@ out:
 		gdk_drag_status(context, action, time);
 		g_dataset_set_data_full(context, "drop_dest_path",
 					g_strdup(new_path), g_free);
+		retval = TRUE;
 	}
 
-	return type != NULL;
+	return retval;
 }
 
 /* Remove highlights */
@@ -730,8 +761,15 @@ static void drag_leave(GtkWidget		*widget,
 			   guint32		time,
 			   FilerWindow		*filer_window)
 {
+	collection_set_autoscroll(filer_window->collection, FALSE);
 	collection_set_cursor_item(filer_window->collection, -1);
 	dnd_spring_abort();
+	if (scrolled_adj)
+	{
+		gtk_signal_disconnect(scrolled_adj,
+					scrolled_signal);
+		scrolled_adj = NULL;
+	}
 }
 
 /* User has tried to drop some data on us. Decide what format we would
@@ -1271,6 +1309,9 @@ static gboolean spring_now(gpointer data)
 	{
 		collection_set_cursor_item(spring_window->collection, -1);
 		filer_change_to(spring_window, dest_path, NULL);
+		/* DON'T move the window. Gtk+ sometimes doesn't
+		 * notice :-(
+		 */
 	}
 	else
 	{
@@ -1278,10 +1319,9 @@ static gboolean spring_now(gpointer data)
 		gtk_timeout_add(500, spring_check_idle, NULL);
 		gtk_signal_connect(GTK_OBJECT(spring_window->window), "destroy",
 				GTK_SIGNAL_FUNC(spring_win_destroyed), NULL);
+		if (spring_window)
+			centre_window(spring_window->window->window, x, y);
 	}
-	
-	if (spring_window)
-		centre_window(spring_window->window->window, x, y);
 
 	dnd_spring_abort();
 

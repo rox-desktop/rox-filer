@@ -23,10 +23,13 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "toolbar.h"
 #include "options.h"
 #include "support.h"
 #include "main.h"
+#include "dnd.h"
 
 extern int collection_menu_button;
 
@@ -58,13 +61,28 @@ static GtkTooltips *tooltips = NULL;
   (o_new_window_on_1 ? ((GdkEventButton *) button_event)->button == 1	\
 		     : ((GdkEventButton *) button_event)->button != 1)
 
+typedef enum {DROP_TO_PARENT, DROP_TO_HOME} DropDest;
+
 /* Static prototypes */
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
-static void add_button(GtkWidget *box, MaskedPixmap *icon,
+static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
 			GtkSignalFunc cb, FilerWindow *filer_window,
 			char *label, char *tip);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    FilerWindow		*filer_window);
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       FilerWindow	*filer_window);
+static void handle_drops(FilerWindow *filer_window,
+			 GtkWidget *button,
+			 DropDest dest);
 
 
 /****************************************************************
@@ -148,6 +166,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*frame, *box;
+	GtkWidget	*b;
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
@@ -159,14 +178,18 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
-	add_button(box, im_up_icon,
+	b = add_button(box, im_up_icon,
 			GTK_SIGNAL_FUNC(toolbar_up_clicked),
 			filer_window,
 			_("Up"), _("Change to parent directory"));
-	add_button(box, im_home_icon,
+	handle_drops(filer_window, b, DROP_TO_PARENT);
+
+	b = add_button(box, im_home_icon,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
 			filer_window,
 			_("Home"), _("Change to home directory"));
+	handle_drops(filer_window, b, DROP_TO_HOME);
+
 	add_button(box, im_refresh_icon,
 			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
 			filer_window,
@@ -214,7 +237,7 @@ static gint toolbar_adjust_released(GtkButton *button,
 	return TRUE;
 }
 
-static void add_button(GtkWidget *box, MaskedPixmap *icon,
+static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
 			GtkSignalFunc cb, FilerWindow *filer_window,
 			char *label, char *tip)
 {
@@ -251,6 +274,8 @@ static void add_button(GtkWidget *box, MaskedPixmap *icon,
 		gtk_container_add(GTK_CONTAINER(button), icon_widget);
 
 	gtk_container_add(GTK_CONTAINER(box), button);
+
+	return button;
 }
 
 /* Build up some option widgets to go in the options dialog, but don't
@@ -324,3 +349,65 @@ static char *toolbar_type(char *data)
 	return NULL;
 }
 
+/* Called during the drag when the mouse is in a widget registered
+ * as a drop target. Returns TRUE if we can accept the drop.
+ */
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    FilerWindow		*filer_window)
+{
+	GdkDragAction	action = context->suggested_action;
+	DropDest	dest;
+
+	dest = (DropDest) gtk_object_get_data(GTK_OBJECT(widget),
+							"toolbar_dest");
+
+	if (dest == DROP_TO_HOME)
+		g_dataset_set_data(context, "drop_dest_path", home_dir);
+	else
+	{
+		guchar	*slash, *path;
+
+		slash = strrchr(filer_window->path, '/');
+		if (slash == NULL || slash == filer_window->path)
+			path = g_strdup("/");
+		else
+			path = g_strndup(filer_window->path,
+					slash - filer_window->path);
+		g_dataset_set_data_full(context, "drop_dest_path",
+						path, g_free);
+	}
+	
+	g_dataset_set_data(context, "drop_dest_type", drop_dest_dir);
+	gdk_drag_status(context, action, time);
+	
+	dnd_spring_load(context);
+	gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NORMAL);
+
+	return TRUE;
+}
+
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       FilerWindow	*filer_window)
+{
+	gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NONE);
+	dnd_spring_abort();
+}
+
+static void handle_drops(FilerWindow *filer_window,
+			 GtkWidget *button,
+			 DropDest dest)
+{
+	make_drop_target(button);
+	gtk_signal_connect(GTK_OBJECT(button), "drag_motion",
+			GTK_SIGNAL_FUNC(drag_motion), filer_window);
+	gtk_signal_connect(GTK_OBJECT(button), "drag_leave",
+			GTK_SIGNAL_FUNC(drag_leave), filer_window);
+	gtk_object_set_data(GTK_OBJECT(button), "toolbar_dest",
+			(gpointer) dest);
+}

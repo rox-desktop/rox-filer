@@ -863,7 +863,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = last_sort_fn;
 	filer_window->flags = (FilerFlags) 0;
-	filer_window->details_type = last_details_type;
+	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -905,7 +905,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	display_style_set(filer_window, last_display_style);
+	display_set_layout(filer_window, last_layout);
 	drag_set_dest(filer_window);
 
 	if (panel_type)

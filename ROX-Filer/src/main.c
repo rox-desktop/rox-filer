@@ -341,6 +341,7 @@ int main(int argc, char **argv)
 	options_init();
 	type_init();
 	action_init();
+	pinboard_init();
 
 	options_load();
 

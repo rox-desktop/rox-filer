@@ -640,30 +640,40 @@ static void large(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	display_style_set(window_with_focus, LARGE_ICONS);
+	display_set_layout(window_with_focus, "Large");
 }
 
 static void small(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	display_style_set(window_with_focus, SMALL_ICONS);
+	display_set_layout(window_with_focus, "Small");
+}
+
+static void set_layout(gboolean large, DetailsType details)
+{
+	guchar	*style;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	style = g_strdup_printf("%s+%s",
+		large ? "Large" : "Small",
+		details == DETAILS_SUMMARY ? "Summary" :
+		details == DETAILS_SIZE_BARS ? "SizeBars" :
+		"Sizes");
+
+	display_set_layout(window_with_focus, style);
+	g_free(style);
 }
 
 static void large_with(gpointer data, guint action, GtkWidget *widget)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_style_set(window_with_focus, LARGE_FULL_INFO);
-	display_details_set(window_with_focus, (DetailsType) action);
+	set_layout(TRUE, (DetailsType) action);
 }
 
 static void small_with(gpointer data, guint action, GtkWidget *widget)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_style_set(window_with_focus, SMALL_FULL_INFO);
-	display_details_set(window_with_focus, (DetailsType) action);
+	set_layout(FALSE, (DetailsType) action);
 }
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)

@@ -30,8 +30,7 @@ typedef enum {
 	DETAILS_SIZE_BARS,
 } DetailsType;
 
-extern DetailsType last_details_type;
-extern DisplayStyle last_display_style;
+extern guchar *last_layout;
 extern gboolean last_show_hidden;
 extern int (*last_sort_fn)(const void *a, const void *b);
 
@@ -39,9 +38,8 @@ extern int (*last_sort_fn)(const void *a, const void *b);
 
 /* Prototypes */
 void display_init();
-void display_details_set(FilerWindow *filer_window, DetailsType details);
-void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 char *details(FilerWindow *filer_window, DirItem *item);
+gboolean display_set_layout(FilerWindow *filer_window, guchar *layout);
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);

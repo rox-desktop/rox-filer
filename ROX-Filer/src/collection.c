@@ -132,6 +132,7 @@ static gboolean	default_test_point(Collection *collection,
 static gint collection_motion_notify(GtkWidget *widget,
 				     GdkEventMotion *event);
 static void add_lasso_box(Collection *collection);
+static void abort_lasso(Collection *collection);
 static void remove_lasso_box(Collection *collection);
 static void draw_lasso_box(Collection *collection);
 static int item_at_row_col(Collection *collection, int row, int col);
@@ -345,6 +346,8 @@ static void collection_init(Collection *object)
 
 	object->buttons_pressed = 0;
 	object->may_drag = FALSE;
+
+	object->auto_scroll = -1;
 	
 	return;
 }
@@ -403,6 +406,12 @@ static void collection_destroy(GtkObject *object)
 	{
 		collection->wink_item = -1;
 		gtk_timeout_remove(collection->wink_timeout);
+	}
+
+	if (collection->auto_scroll != -1)
+	{
+		gtk_timeout_remove(collection->auto_scroll);
+		collection->auto_scroll = -1;
 	}
 
 	gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
@@ -828,7 +837,15 @@ static void collection_adjustment(GtkAdjustment *adjustment,
 	{
 		collection->last_scroll = adjustment->value;
 
-		scroll_by(collection, diff);
+		if (collection->lasso_box)
+		{
+			remove_lasso_box(collection);
+			collection->drag_box_y[0] -= diff;
+			scroll_by(collection, diff);
+			add_lasso_box(collection);
+		}
+		else
+			scroll_by(collection, diff);
 	}
 }
 
@@ -876,6 +893,16 @@ static void set_vadjustment(Collection *collection)
 	collection->vadj->value = MAX(collection->vadj->value, 0.0);
 
 	gtk_signal_emit_by_name(GTK_OBJECT(collection->vadj), "changed");
+}
+
+/* Change the adjustment by this amount. Bounded. */
+static void diff_vpos(Collection *collection, int diff)
+{
+	int	value = collection->vadj->value + diff;
+
+	value = CLAMP(value, 0,
+			collection->vadj->upper - collection->vadj->page_size);
+	gtk_adjustment_set_value(collection->vadj, value);
 }
 
 static void collection_draw(GtkWidget *widget, GdkRectangle *area)
@@ -927,7 +954,7 @@ static void scroll_by(Collection *collection, gint diff)
 	widget = GTK_WIDGET(collection);
 	
 	if (collection->lasso_box)
-		remove_lasso_box(collection);
+		abort_lasso(collection);
 
 	gdk_window_get_size(widget->window, &width, &height);
 	new_area.x = 0;
@@ -1307,7 +1334,7 @@ static gint collection_button_release(GtkWidget      *widget,
 		return FALSE;
 	}
 			
-	remove_lasso_box(collection);
+	abort_lasso(collection);
 
 	w = collection->item_width;
 	h = collection->item_height;
@@ -1402,41 +1429,9 @@ static gint collection_motion_notify(GtkWidget *widget,
 
 	if (collection->lasso_box)
 	{
-		int	new_value = 0, diff;
-		int	height;
-
-		gdk_window_get_size(widget->window, NULL, &height);
-		
-		if (y < 0)
-		{
-			int	old_value = collection->vadj->value;
-
-			new_value = MAX(old_value + y / 10, 0.0);
-			diff = new_value - old_value;
-		}
-		else if (y > height)
-		{
-			int	old_value = collection->vadj->value;
-
-			new_value = MIN(old_value + (y - height) / 10,
-					collection->vadj->upper
-						- collection->vadj->page_size);
-			diff = new_value - old_value;
-		}
-		else
-			diff = 0;
-			
 		remove_lasso_box(collection);
 		collection->drag_box_x[1] = x;
 		collection->drag_box_y[1] = y;
-
-		if (diff)
-		{
-			collection->drag_box_y[0] -= diff;
-			collection->vadj->value = new_value;
-			gtk_signal_emit_by_name(GTK_OBJECT(collection->vadj),
-					"changed");
-		}
 		add_lasso_box(collection);
 	}
 	else if (collection->may_drag)
@@ -1480,6 +1475,7 @@ static gint collection_motion_notify(GtkWidget *widget,
 			{
 				collection->drag_box_x[1] = x;
 				collection->drag_box_y[1] = y;
+				collection_set_autoscroll(collection, TRUE);
 				add_lasso_box(collection);
 			}
 		}
@@ -1513,6 +1509,15 @@ static void draw_lasso_box(Collection *collection)
 
 	gdk_draw_rectangle(widget->window, collection->xor_gc, FALSE,
 			x, y, width, height);
+}
+
+static void abort_lasso(Collection *collection)
+{
+	if (collection->lasso_box)
+	{
+		remove_lasso_box(collection);
+		collection_set_autoscroll(collection, FALSE);
+	}
 }
 
 static void remove_lasso_box(Collection *collection)
@@ -1702,6 +1707,37 @@ static gint focus_out(GtkWidget *widget, GdkEventFocus *event)
 	gtk_widget_draw_focus(widget);
 
 	return FALSE;
+}
+
+/* This is called frequently while auto_scroll is on.
+ * Checks the pointer position and scrolls the window if it's
+ * near the top or bottom.
+ */
+static gboolean as_timeout(Collection *collection)
+{
+	GdkWindow	*window = GTK_WIDGET(collection)->window;
+	gint		x, y, w, h;
+	GdkModifierType	mask;
+	int		diff = 0;
+
+	gdk_window_get_pointer(window, &x, &y, &mask);
+	gdk_window_get_size(window, &w, &h);
+
+	if ((x < 0 || x > w || y < 0 || y > h) && !collection->lasso_box)
+	{
+		collection->auto_scroll = -1;
+		return FALSE;		/* Out of window - stop */
+	}
+
+	if (y < 20)
+		diff = y - 20;
+	else if (y > h - 20)
+		diff = 20 + y - h;
+
+	if (diff)
+		diff_vpos(collection, diff);
+
+	return TRUE;
 }
 
 /* Functions for managing collections */
@@ -2058,8 +2094,7 @@ void collection_set_panel(Collection *collection, gboolean panel)
 	if (collection->panel)
 	{
 		collection_clear_selection(collection);
-		if (collection->lasso_box)
-			remove_lasso_box(collection);
+		abort_lasso(collection);
 	}
 }
 
@@ -2126,7 +2161,8 @@ void collection_set_cursor_item(Collection *collection, gint item)
 	if (item != -1)
 	{
 		collection_draw_item(collection, item, TRUE);
-		scroll_to_show(collection, item);
+		if (collection->auto_scroll == -1)
+			scroll_to_show(collection, item);
 	}
 	else if (old_item != -1)
 		collection->cursor_item_old = old_item;
@@ -2302,4 +2338,34 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 
 	if (item >= 0 && item < collection->number_of_items)
 		collection_set_cursor_item(collection, item);
+}
+
+/* When autoscroll is on, a timer keeps track of the pointer position.
+ * While it's near the top or bottom of the window, the window scrolls.
+ *
+ * If the mouse buttons are released, or the pointer leaves the window,
+ * auto_scroll is turned off.
+ */
+void collection_set_autoscroll(Collection *collection, gboolean auto_scroll)
+{
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+
+	if (auto_scroll)
+	{
+		if (collection->auto_scroll != -1)
+			return;		/* Already on! */
+
+		collection->auto_scroll = gtk_timeout_add(50,
+						(GtkFunction) as_timeout,
+						collection);
+	}
+	else
+	{
+		if (collection->auto_scroll == -1)
+			return;		/* Already off! */
+
+		gtk_timeout_remove(collection->auto_scroll);
+		collection->auto_scroll = -1;
+	}
 }
