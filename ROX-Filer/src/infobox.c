@@ -64,12 +64,22 @@ typedef struct du {
 	GIOChannel   *chan;
 } DU;
 
+typedef struct _Permissions Permissions;
+
+struct _Permissions
+{
+	gchar *path;
+	DirItem *item;
+	GtkWidget *bits[12];
+};
+
 /* Static prototypes */
 static void refresh_info(GObject *window);
 static GtkWidget *make_vbox(const guchar *path);
 static GtkWidget *make_details(const guchar *path, DirItem *item);
 static GtkWidget *make_about(const guchar *path, XMLwrapper *ai);
 static GtkWidget *make_file_says(const guchar *path);
+static GtkWidget *make_permissions(const gchar *path, DirItem *item);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static const gchar *pretty_type(DirItem *file, const guchar *path);
@@ -277,6 +287,8 @@ static GtkWidget *make_vbox(const guchar *path)
 				(gpointer) path);
 	}
 	g_free(help_dir);
+
+	add_frame(vbox, make_permissions(path, item));
 
 	if (about)
 		add_frame(vbox, make_about(path, ai));
@@ -511,8 +523,11 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 
 	add_row_and_free(store, _("Access time:"), pretty_time(&item->atime));
 
+	/* Disable because we use the tick boxes */
+	/*
 	add_row(store, _("Permissions:"), pretty_permissions(item->mode));
-
+	*/
+	
 	add_row(store, _("Type:"), pretty_type(item, path));
 
 	if (item->mime_type)
@@ -709,6 +724,114 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 
 	g_free(fs->text);
 	g_free(fs);
+}
+
+static void permissions_destroyed(GtkWidget *widget, Permissions *perm)
+{
+	g_free(perm->path);
+	g_free(perm->item);
+	
+	g_free(perm);
+}
+
+static void permissions_apply(GtkWidget *widget, Permissions *perm)
+{
+	mode_t nmode;
+	int i;
+
+	nmode=0;
+	
+	for(i=0; i<9; i++) {
+		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[i])))
+			nmode|=(1<<i);
+	}
+	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[9])))
+		nmode|=S_ISUID;
+	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[10])))
+		nmode|=S_ISGID;
+	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[11])))
+		nmode|=S_ISVTX;
+	
+	if(chmod(perm->path, nmode)) {
+		report_error(_("Could not change permissions: %s"),
+			     strerror(errno));
+	}
+}
+
+static GtkWidget *make_permissions(const gchar *path, DirItem *item)
+{
+	Permissions *perm;
+	GtkWidget *frame;
+	GtkWidget *table;
+	GtkWidget *but, *tick, *label;
+	int i, x, y;
+
+	perm=g_new(Permissions, 1);
+
+	perm->path=g_strdup(path);
+	perm->item=diritem_new(path);
+
+	frame=gtk_frame_new(_("Permissions"));
+
+	table=gtk_table_new(4, 5, TRUE);
+	gtk_container_add(GTK_CONTAINER(frame), table);
+
+	label=gtk_label_new(_("Owner"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
+	label=gtk_label_new(_("Group"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
+	label=gtk_label_new(_("World"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
+
+	label=gtk_label_new(_("Read"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
+	label=gtk_label_new(_("Write"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 2, 3, 0, 1);
+	label=gtk_label_new(_("Exec"));
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 3, 4, 0, 1);
+
+	for(i=0; i<9; i++) {
+		x=1+2-i%3;
+		y=1+2-i/3;
+		perm->bits[i]=tick=gtk_check_button_new();
+		gtk_table_attach_defaults(GTK_TABLE(table), tick,
+					  x, x+1, y, y+1);
+		if(item->mode & (1<<i))
+			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick),
+						     TRUE);
+		g_signal_connect(tick, "toggled",
+				G_CALLBACK(permissions_apply ), perm);
+	}
+
+	tick=gtk_check_button_new_with_label(_("SUID"));
+	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 1, 2);
+	if(item->mode & S_ISUID)
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
+	g_signal_connect(tick, "toggled",
+				G_CALLBACK(permissions_apply ), perm);
+	perm->bits[9]=tick;
+
+	tick=gtk_check_button_new_with_label(_("SGID"));
+	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 2, 3);
+	if(item->mode & S_ISGID)
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
+	g_signal_connect(tick, "toggled",
+				G_CALLBACK(permissions_apply ), perm);
+	perm->bits[10]=tick;
+
+	tick=gtk_check_button_new_with_label(_("Sticky"));
+	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 3, 4);
+	if(item->mode & S_ISVTX)
+		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
+	g_signal_connect(tick, "toggled",
+				G_CALLBACK(permissions_apply ), perm);
+	perm->bits[11]=tick;
+
+	g_signal_connect(frame, "destroy",
+				G_CALLBACK(permissions_destroyed), perm);
+			
+	gtk_widget_show_all(frame);
+	return frame;
 }
 
 /* Don't g_free() the result */
