@@ -608,7 +608,7 @@ static void show_features(void)
 #endif
 	       );
 	g_print("%s... %s\n", _("Binary compatibility"),
-#ifdef HAVE_APSYMBOLS_H
+#if defined(HAVE_APSYMBOLS_H) || defined(HAVE_APBUILD_APSYMBOLS_H)
 		_("Yes (can run with older glibc versions)")
 #else
 		_("No (apsymbols.h not found)")

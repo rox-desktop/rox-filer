@@ -1536,7 +1536,45 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 		diritem_free(item);
 	}
 	else
+	{
+		GList *rover;
+		gboolean same=TRUE, same_media=TRUE;
+		MIME_type *type=NULL;
+		DirItem	*item;
+		
+		item = diritem_new("");
+		for(rover=paths; rover; rover=g_list_next(rover))
+		{
+			diritem_restat(rover->data, item, NULL);
+			if(!type)
+				type=item->mime_type;
+			else
+			{
+				if(type!=item->mime_type)
+				{
+					same=FALSE;
+					if(strcmp(type->media_type,
+						  item->mime_type->media_type)!=0)
+					{
+						same_media=FALSE;
+						break;
+					}
+				}
+			}
+		}
+		diritem_free(item);
+
+		if(type)
+		{
+			if(same)
+				add_sendto(menu, type->media_type,
+					   type->subtype);
+			if(same_media)
+				add_sendto(menu, type->media_type, NULL);
+		}
+		
 		add_sendto(menu, "group", NULL);
+	}
 	
 	add_sendto(menu, NULL, NULL);
 

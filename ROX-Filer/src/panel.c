@@ -1443,7 +1443,7 @@ static gint icon_motion_event(GtkWidget *widget,
 		x += w;
 		y += h;
 
-		if (val >= (horz ? x : y))
+		if (val >= (horz ? x : y)-1)
 		{
 			if (next == panel->gap)
 				dir = +2;
