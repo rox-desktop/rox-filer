@@ -221,7 +221,7 @@ gtk_savebox_init (GtkSavebox *savebox)
   gtk_box_pack_start (GTK_BOX (savebox->vbox), savebox->entry, FALSE, TRUE, 4);
   
   hbox = gtk_hbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (savebox->vbox), hbox, FALSE, TRUE, 0);
+  gtk_box_pack_end (GTK_BOX (savebox->vbox), hbox, FALSE, TRUE, 0);
 
   button = gtk_button_new_with_label (_("OK"));
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
