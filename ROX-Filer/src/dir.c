@@ -24,6 +24,7 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "support.h"
 #include "gui_support.h"
@@ -283,6 +284,28 @@ void dir_item_clear(DirItem *item)
 	if (item->flags & ITEM_FLAG_TEMP_ICON)
 		pixmap_unref(item->image);
 	g_free(item->leafname);
+}
+
+/* When something has happened to a particular object, call this
+ * and all appropriate changes will be made.
+ * Currently, we just extract the dirname and rescan...
+ */
+void dir_check_this(guchar *path)
+{
+	guchar	*slash;
+	guchar	*real_path;
+
+	real_path = pathdup(path);
+
+	slash = strrchr(real_path, '/');
+
+	if (slash)
+	{
+		*slash = '\0';
+		refresh_dirs(real_path);
+	}
+	
+	g_free(real_path);
 }
 
 /****************************************************************

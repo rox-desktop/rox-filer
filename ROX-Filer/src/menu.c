@@ -1337,6 +1337,8 @@ static gboolean new_directory_cb(guchar *initial, guchar *path)
 		report_error("mkdir", g_strerror(errno));
 		return FALSE;
 	}
+
+	dir_check_this(path);
 	return TRUE;
 }
 

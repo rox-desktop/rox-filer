@@ -1,10 +1,10 @@
 #!/usr/bin/env perl
 
-chdir "..";
+chdir "../..";
 
 system "cvs rel .";
 
-open(VER, "./AppRun --version 2>&1 |") or die "open(): $!";
+open(VER, "ROX-Filer/AppRun --version 2>&1 |") or die "open(): $!";
 $line = <VER>;
 close(VER);
 
@@ -21,16 +21,14 @@ system "cvs tag -F Release-$a-$b-$c";
 
 chdir;
 
-mkdir "roxfiler-$a.$b.$c", 0777;
-chdir "roxfiler-$a.$b.$c";
+mkdir "rox-$a.$b.$c", 0777;
+chdir "rox-$a.$b.$c";
 
-system "cvs export -r Release-$a-$b-$c ROX-Filer";
-system "cd ROX-Filer/src; autoconf";
-system "cp ~/Apps/ROX-Filer/Help/Manual.ps ROX-Filer/Help";
-system "cp -r ~/Projects/roxfiler-template/* .";
-system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo ROX-Filer/Messages";
-chdir;
-system "tar czf roxfiler-$a.$b.$c.tgz roxfiler-$a.$b.$c";
-system "rm -r roxfiler-$a.$b.$c";
+system "cvs export -r Release-$a-$b-$c rox";
+system "cd rox/ROX-Filer/src; autoconf";
+system "cp ~/Apps/ROX-Filer/Help/Manual.ps rox/ROX-Filer/Help";
+system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
+system "tar czf rox-$a.$b.$c.tgz rox-$a.$b.$c";
+system "rm -r rox-$a.$b.$c";
 
 print "OK, done\n";
