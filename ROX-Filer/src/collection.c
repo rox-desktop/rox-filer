@@ -154,10 +154,12 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 	if (item == collection->cursor_item)
 	{
 		gdk_draw_rectangle(((GtkWidget *) collection)->window,
-				((GtkWidget *) collection)->style->black_gc,
-				FALSE,
-				area->x + 1, area->y + 1,
-				area->width - 3, area->height - 3);
+			collection->target_cb
+				? ((GtkWidget *) collection)->style->white_gc
+				: ((GtkWidget *) collection)->style->black_gc,
+			FALSE,
+			area->x + 1, area->y + 1,
+			area->width - 3, area->height - 3);
 	}
 }
 		
@@ -861,15 +863,36 @@ static void resize_arrays(Collection *collection, guint new_size)
 	collection->array_size = new_size;
 }
 
+static void return_pressed(Collection *collection)
+{
+	int			item = collection->cursor_item;
+	CollectionTargetFunc 	cb = collection->target_cb;
+	gpointer		data = collection->target_data;
+
+	collection_target(collection, NULL, NULL);
+	if (item < 0 || item >= collection->number_of_items)
+		return;
+
+	if (cb)
+		return cb(collection, item, data);
+
+	gtk_signal_emit(GTK_OBJECT(collection), 
+			collection_signals[OPEN_ITEM],
+			collection->items[item].data,
+			item);
+}
+
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 {
 	Collection *collection;
+	int	   item;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
 	g_return_val_if_fail(event != NULL, FALSE);
 
 	collection = (Collection *) widget;
+	item = collection->cursor_item;
 	
 	switch (event->keyval)
 	{
@@ -884,6 +907,29 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 			break;
 		case GDK_Down:
 			collection_move_cursor(collection, 1, 0);
+			break;
+		case GDK_Home:
+			collection_set_cursor_item(collection, 0);
+			break;
+		case GDK_End:
+			collection_set_cursor_item(collection,
+				MAX((gint) collection->number_of_items - 1, 0));
+			break;
+		case GDK_Page_Up:
+			collection_move_cursor(collection, -10, 0);
+			break;
+		case GDK_Page_Down:
+			collection_move_cursor(collection, 10, 0);
+			break;
+		case GDK_Return:
+			return_pressed(collection);
+			break;
+		case GDK_Escape:
+			collection_target(collection, NULL, NULL);
+			break;
+		case ' ':
+			if (item >=0 && item < collection->number_of_items)
+				collection_toggle_item(collection, item);
 			break;
 		default:
 			return FALSE;
@@ -1006,7 +1052,7 @@ static gint collection_button_press(GtkWidget      *widget,
 			gtk_grab_remove(widget);
 			collection->buttons_pressed = 0;
 		}
-		if (item > -1)
+		if (item > -1 && event->button != collection_menu_button)
 			cb(collection, item, data);
 		return TRUE;
 	}
@@ -2023,18 +2069,23 @@ void collection_target(Collection *collection,
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 
+	if (callback != collection->target_cb)
+		gdk_window_set_cursor(GTK_WIDGET(collection)->window,
+				callback ? crosshair : NULL);
+
 	collection->target_cb = callback;
 	collection->target_data = user_data;
 
-	gdk_window_set_cursor(GTK_WIDGET(collection)->window,
-			callback ? crosshair : NULL);
+	if (collection->cursor_item != -1)
+		collection_draw_item(collection, collection->cursor_item,
+				FALSE);
 }
 
 /* Move the cursor by the given row and column offsets. */
 void collection_move_cursor(Collection *collection, int drow, int dcol)
 {
 	int	row, col, item;
-	int	first, last;
+	int	first, last, total_rows;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -2064,7 +2115,20 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 
 	if (col >= collection->columns)
 		col = collection->columns - 1;
-	
+
+	total_rows = (collection->number_of_items + collection->columns - 1)
+				/ collection->columns;
+
+	if (row >= total_rows - 1)
+	{
+		row = total_rows - 1;
+		item = col + row * collection->columns;
+		if (item >= collection->number_of_items)
+			row--;
+	}
+	if (row < 0)
+		row = 0;
+
 	item = col + row * collection->columns;
 
 	if (item >= 0 && item < collection->number_of_items)

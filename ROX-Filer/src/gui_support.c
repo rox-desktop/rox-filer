@@ -108,6 +108,8 @@ int get_choice(char *title,
 				TRUE, TRUE, 16);
 		gtk_signal_connect(GTK_OBJECT(button), "clicked",
 				choice_clicked, (gpointer) i);
+		if (i == 0)
+			gtk_window_set_focus(GTK_WINDOW(dialog), button);
 	}
 	if (!i)
 		gtk_widget_grab_focus(button);

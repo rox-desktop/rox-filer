@@ -484,7 +484,8 @@ void target_callback(Collection *collection, gint item, gpointer real_fn)
 	collection_clear_selection(collection);
 	collection_select_item(collection, item);
 	((CollectionTargetFunc)real_fn)(NULL, 0, collection);
-	collection_unselect_item(collection, item);
+	if (item < collection->number_of_items)
+		collection_unselect_item(collection, item);
 }
 
 /* Actions */
@@ -940,6 +941,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_container_add(GTK_CONTAINER(frame), file_label);
 	
 	button = gtk_button_new_with_label("OK");
+	gtk_window_set_focus(GTK_WINDOW(window), button);
 	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 8, 9,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
@@ -1002,7 +1004,7 @@ static void app_show_help(char *path)
 	help_dir = g_strconcat(path, "/Help", NULL);
 	
 	if (stat(help_dir, &info))
-		report_error("Application",
+		delayed_error("Application",
 			"This is an application directory - you can "
 			"run it as a program, or open it (hold down "
 			"Shift while you open it). Most applications provide "
@@ -1035,11 +1037,11 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	{
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE)
-				report_error("Executable file",
+				delayed_error("Executable file",
 					"This is a file with an eXecute bit "
 					"set - it can be run as a program.");
 			else
-				report_error("File",
+				delayed_error("File",
 					"This is a data file. Try using the "
 					"Info menu item to find out more...");
 			break;
@@ -1049,35 +1051,35 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 					make_path(window_with_focus->path,
 					  item->leafname)->str);
 			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-				report_error("Mount point",
+				delayed_error("Mount point",
 				"A mount point is a directory which another "
 				"filing system can be mounted on. Everything "
 				"on the mounted filesystem then appears to be "
 				"inside the directory.");
 			else
-				report_error("Directory",
+				delayed_error("Directory",
 				"This is a directory. It contains an index to "
 				"other items - open it to see the list.");
 			break;
 		case TYPE_CHAR_DEVICE:
 		case TYPE_BLOCK_DEVICE:
-			report_error("Device file",
+			delayed_error("Device file",
 				"Device files allow you to read from or write "
 				"to a device driver as though it was an "
 				"ordinary file.");
 			break;
 		case TYPE_PIPE:
-			report_error("Named pipe",
+			delayed_error("Named pipe",
 				"Pipes allow different programs to "
 				"communicate. One program writes data to the "
 				"pipe while another one reads it out again.");
 			break;
 		case TYPE_SOCKET:
-			report_error("Socket",
+			delayed_error("Socket",
 				"Sockets allow processes to communicate.");
 			break;
 		default:
-			report_error("Unknown type", 
+			delayed_error("Unknown type", 
 				"I couldn't find out what kind of file this "
 				"is. Maybe it doesn't exist anymore or you "
 				"don't have search permission on the directory "

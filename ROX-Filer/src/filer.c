@@ -267,7 +267,10 @@ static void update_display(Directory *dir,
 			shrink_width(filer_window);
 			if (filer_window->had_cursor &&
 					collection->cursor_item == -1)
+			{
 				collection_set_cursor_item(collection, 0);
+				filer_window->had_cursor = FALSE;
+			}
 			break;
 		case DIR_UPDATE:
 			for (i = 0; i < items->len; i++)
@@ -911,23 +914,35 @@ void open_item(Collection *collection,
 		gpointer user_data)
 {
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
-	GdkEventButton 	*event;
+	GdkEvent 	*event;
+	GdkEventButton 	*bevent;
+	GdkEventKey 	*kevent;
 	gboolean	shift;
 	gboolean	adjust;		/* do alternative action */
 
-	event = (GdkEventButton *) gtk_get_current_event();
-	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS
-			|| event->type == GDK_BUTTON_RELEASE)
+	event = (GdkEvent *) gtk_get_current_event();
+
+	bevent = (GdkEventButton *) event;
+	kevent = (GdkEventKey *) event;
+
+	switch (event->type)
 	{
-		shift = event->state & GDK_SHIFT_MASK;
-		adjust = (event->button != 1)
-			^ ((event->state & GDK_CONTROL_MASK) != 0
-					&& o_single_click == 0);
-	}
-	else
-	{
-		shift = FALSE;
-		adjust = FALSE;
+		case GDK_2BUTTON_PRESS:
+		case GDK_BUTTON_PRESS:
+		case GDK_BUTTON_RELEASE:
+			shift = bevent->state & GDK_SHIFT_MASK;
+			adjust = (bevent->button != 1)
+				^ ((bevent->state & GDK_CONTROL_MASK) != 0
+						&& o_single_click == 0);
+			break;
+		case GDK_KEY_PRESS:
+			shift = kevent->state & GDK_SHIFT_MASK;
+			adjust = FALSE;
+			break;
+		default:
+			shift = FALSE;
+			adjust = FALSE;
+			break;
 	}
 
 	filer_openitem(filer_window, item_number, shift, adjust);
@@ -1120,28 +1135,16 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window)
 {
-	Collection	*collection = filer_window->collection;
-	int		item = collection->cursor_item;
-
 	switch (event->keyval)
 	{
-		case GDK_Return:
-			/* XXX: This won't work properly if button-1 new
-			 * window is set.
-			 */
-			if (item < 0 || item >= collection->number_of_items)
-				break;
-			filer_openitem(filer_window,
-					item,
-				(event->state & GDK_SHIFT_MASK) != 0,
-				FALSE);
-			break;
 		case GDK_BackSpace:
 			change_to_parent(filer_window);
-			return TRUE;
+			break;
+		default:
+			return FALSE;
 	}
 
-	return FALSE;
+	return TRUE;
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,
@@ -1163,14 +1166,27 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 void change_to_parent(FilerWindow *filer_window)
 {
-	char	*from;
+	char	*copy;
+	char	*slash;
 
-	from = strrchr(filer_window->path, '/');
-	if (from)
-		from++;
+	if (filer_window->path[0] == '/' && filer_window->path[1] == '\0')
+		return;		/* Already in the root */
+	
+	copy = g_strdup(filer_window->path);
+	slash = strrchr(copy, '/');
 
-	filer_change_to(filer_window, make_path(filer_window->path, "..")->str,
-			from);
+	if (slash)
+	{
+		*slash = '\0';
+		filer_change_to(filer_window,
+				*copy ? copy : "/",
+				slash + 1);
+	}
+	else
+		g_warning("No / in directory path!\n");
+
+	g_free(copy);
+
 }
 
 /* Make filer_window display path. When finished, highlight item 'from', or
@@ -1193,7 +1209,8 @@ static void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	{
 		g_free(filer_window->auto_select);
 		filer_window->had_cursor =
-			filer_window->collection->cursor_item != -1;
+			filer_window->collection->cursor_item != -1
+			|| filer_window->had_cursor;
 		filer_window->auto_select = from_dup;
 
 		gtk_window_set_title(GTK_WINDOW(filer_window->window),
