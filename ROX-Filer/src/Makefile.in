@@ -43,6 +43,10 @@ depend:
 messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
 
+dist:
+	(cd po; ./dist)
+	echo "Don't forget the manual and version number!"
+
 ############ Special case
 
 pixmaps.o: pixmaps.c
