@@ -1111,6 +1111,21 @@ void change_to_parent(FilerWindow *filer_window)
 	g_free(dir);
 }
 
+/* Removes trailing /s from path (modified in place) */
+static void tidy_sympath(gchar *path)
+{
+	int l;
+	
+	g_return_if_fail(path != NULL);
+
+	l = strlen(path);
+	while (l > 1 && path[l - 1] == '/')
+	{
+		l--;
+		path[l] = '\0';
+	}
+}
+
 /* Make filer_window display path. When finished, highlight item 'from', or
  * the first item if from is NULL. If there is currently no cursor then
  * simply wink 'from' (if not NULL).
@@ -1157,6 +1172,7 @@ void filer_change_to(FilerWindow *filer_window,
 	g_free(filer_window->sym_path);
 	filer_window->real_path = real_path;
 	filer_window->sym_path = sym_path;
+	tidy_sympath(filer_window->sym_path);
 
 	filer_window->directory = new_dir;
 
@@ -1306,6 +1322,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
 	filer_window->selection_state = GTK_STATE_INSENSITIVE;
+
+	tidy_sympath(filer_window->sym_path);
 
 	/* Finds the entry for this directory in the dir cache, creating
 	 * a new one if needed. This does not cause a scan to start,

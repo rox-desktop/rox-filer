@@ -1385,7 +1385,12 @@ static void customise_send_to(gpointer data)
 		"to an application. The applications listed are those in "
 		"the following directories:\n\n%s\n%s\n"
 		"The `Send To' menu may be opened by Shift+Menu clicking "
-		"over a file."),
+		"over a file.\n\n"
+		"Advanced use:\n"
+		"You can also create subdirectories called "
+		"`.text_html', `.text', etc which will only be "
+		"shown for files of that type. `.group' is shown "
+		"only when multiple files are selected."),
 		dirs->str,
 		save ? _("I'll show you your SendTo directory now; you should "
 			"symlink (Ctrl+Shift drag) any applications you want "
@@ -1399,28 +1404,33 @@ static void customise_send_to(gpointer data)
 		filer_opendir(save, NULL);
 }
 
-/* Scan the SendTo dir and create and show the Send To menu.
- * The 'paths' list and every path in it is claimed, and will be
- * freed later -- don't free it yourself!
+/* Add everything in the directory <Choices>/SendTo/[.type[_subtype]] 
+ * to the menu.
  */
-static void show_send_to_menu(GList *paths, GdkEvent *event)
+static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 {
-	GtkWidget	*menu, *item;
-	GPtrArray	*path;
-	int		i;
+	gchar *searchdir;
+	GPtrArray *paths;
+	int i;
 
-	menu = gtk_menu_new();
+	if (subtype)
+		searchdir = g_strdup_printf("SendTo/.%s_%s", type, subtype);
+	else if (type)
+		searchdir = g_strdup_printf("SendTo/.%s", type);
+	else
+		searchdir = g_strdup("SendTo");
 
-	path = choices_list_dirs("SendTo");
+	paths = choices_list_dirs(searchdir);
+	g_free(searchdir);	
 
-	for (i = 0; i < path->len; i++)
+	for (i = 0; i < paths->len; i++)
 	{
 		GList	*widgets = NULL;
-		guchar	*dir = (guchar *) path->pdata[i];
+		guchar	*dir = (guchar *) paths->pdata[i];
 
 		widgets = menu_from_dir(menu, dir, get_menu_icon_style(),
-					(CallbackFn) do_send_to,
-					FALSE, FALSE, TRUE);
+				(CallbackFn) do_send_to,
+				FALSE, FALSE, TRUE);
 
 		if (widgets)
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
@@ -1429,7 +1439,38 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 		g_list_free(widgets);	/* TODO: Get rid of this */
 	}
 
-	choices_free_list(path);
+	choices_free_list(paths);
+}
+
+/* Scan the SendTo dir and create and show the Send To menu.
+ * The 'paths' list and every path in it is claimed, and will be
+ * freed later -- don't free it yourself!
+ */
+static void show_send_to_menu(GList *paths, GdkEvent *event)
+{
+	GtkWidget	*menu, *item;
+
+	menu = gtk_menu_new();
+	
+	if (g_list_length(paths) == 1)
+	{
+		DirItem	*item;
+		
+		item = diritem_new("");
+		diritem_restat(paths->data, item, NULL);
+
+		add_sendto(menu,
+			   item->mime_type->media_type,
+			   item->mime_type->subtype);
+
+		add_sendto(menu, item->mime_type->media_type, NULL);
+		
+		diritem_free(item);
+	}
+	else
+		add_sendto(menu, "group", NULL);
+	
+	add_sendto(menu, NULL, NULL);
 
 	item = gtk_menu_item_new_with_label(_("Customise"));
 	g_signal_connect_swapped(item, "activate",
