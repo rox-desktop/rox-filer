@@ -965,15 +965,13 @@ static void open_choices_dirs(gchar *type, gchar *what)
 	int i;
 
 	dir = choices_find_path_save("", type, TRUE);
+	g_free(dir);
 	list = choices_list_dirs(type);
-
-	report_rox_error(_("These %s directories contain %s."), type, what);
 
 	for (i = list->len - 1; i >= 0; i--)
 		filer_opendir(list->pdata[i], NULL);
 
 	choices_free_list(list);
-	g_free(dir);
 }
 
 /* To edit the MIME types, open a filer window for <Choices>/MIME-info */

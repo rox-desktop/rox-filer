@@ -1143,6 +1143,9 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 
 	/* Add all the user-interface elements & realise */
 	filer_add_widgets(filer_window);
+	if (src_win)
+		gtk_window_set_position(GTK_WINDOW(filer_window->window),
+					GTK_WIN_POS_MOUSE);
 
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
@@ -1204,8 +1207,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_position(GTK_WINDOW(filer_window->window),
-				GTK_WIN_POS_MOUSE);
 	filer_set_title(filer_window);
 
 	/* The collection is the area that actually displays the files */
