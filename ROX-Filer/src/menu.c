@@ -852,7 +852,7 @@ void menu_show_shift_action(GtkWidget *menu_item, DirItem *item, gboolean next)
 			if (item->flags & ITEM_FLAG_MOUNTED)
 				shift_action = N_("Unmount");
 			else
-				shift_action = N_("Mount");
+				shift_action = N_("Open unmounted");
 		}
 		else if (item->flags & ITEM_FLAG_SYMLINK)
 			shift_action = N_("Show Target");

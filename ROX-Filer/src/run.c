@@ -226,7 +226,7 @@ gboolean run_diritem(const guchar *full_path,
 				filer_opendir(full_path, src_window, NULL);
 			return TRUE;
 		case TYPE_FILE:
-			if ((item->mime_type == application_executable) && !edit)
+			if (item->mime_type == application_executable && !edit)
 			{
 				const char *argv[] = {NULL, NULL};
 				guchar	*dir = filer_window
@@ -542,20 +542,23 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
 			    FilerWindow *filer_window, FilerWindow *src_window,
 			    gboolean edit)
 {
-	GList	*paths;
+	gboolean mounted = (item->flags & ITEM_FLAG_MOUNTED) != 0;
 
-	if (edit)
+	if (mounted == edit)
 	{
+		GList	*paths;
+
 		paths = g_list_prepend(NULL, (gpointer) full_path);
 		action_mount(paths, filer_window == NULL, -1);
 		g_list_free(paths);
-		if (item->flags & ITEM_FLAG_MOUNTED ||
-				!filer_window)
-			return;
+		if (filer_window && !mounted)
+			filer_change_to(filer_window, full_path, NULL);
 	}
-
-	if (filer_window)
-		filer_change_to(filer_window, full_path, NULL);
 	else
-		filer_opendir(full_path, src_window, NULL);
+	{
+		if (filer_window)
+			filer_change_to(filer_window, full_path, NULL);
+		else
+			filer_opendir(full_path, src_window, NULL);
+	}
 }
