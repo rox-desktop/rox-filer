@@ -367,14 +367,14 @@ int main(int argc, char **argv)
 				show_user = TRUE;
 				break;
 		        case 'm':
-				{
-					MIME_type *type;
-					type_init();
-					type = type_get_type(VALUE);
-					printf("%s/%s\n", type->media_type,
-							  type->subtype);
-				}
+			{
+				MIME_type *type;
+				type_init();
+				type = type_get_type(VALUE);
+				printf("%s/%s\n", type->media_type,
+						type->subtype);
 				return EXIT_SUCCESS;
+			}
 			case 'c':
 				client_id = g_strdup(VALUE);
 				break;
@@ -392,8 +392,8 @@ int main(int argc, char **argv)
 	tooltips = gtk_tooltips_new();
 
 	if (euid == 0 || show_user)
-		show_user_message = g_strdup_printf( _("Running as user '%s'"), 
-				user_name(euid));
+		show_user_message = g_strdup_printf(_("Running as user '%s'"), 
+						    user_name(euid));
 	
 	/* Add each remaining (non-option) argument to the list of files
 	 * to run.

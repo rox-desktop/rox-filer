@@ -1295,12 +1295,16 @@ static void view_collection_style_changed(ViewIface *view, int flags)
 	Collection	*col = view_collection->collection;
 	int		width = MIN_ITEM_WIDTH;
 	int		height = SMALL_HEIGHT;
+	int		n = col->number_of_items;
+
+	if (n == 0 && filer_window->display_style != SMALL_ICONS)
+		height = ICON_HEIGHT;
 
 	/* Recalculate all the ViewData structs for this window
 	 * (needed if the text or image has changed in any way) and
 	 * get the size of each item.
 	 */
-	for (i = 0; i < col->number_of_items; i++)
+	for (i = 0; i < n; i++)
 	{
 		CollectionItem *ci = &col->items[i];
 		int	w, h;
@@ -1319,7 +1323,7 @@ static void view_collection_style_changed(ViewIface *view, int flags)
 	}
 
 	collection_set_item_size(col, width, height);
-
+	
 	gtk_widget_queue_draw(GTK_WIDGET(view_collection));
 }
 

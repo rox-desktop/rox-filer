@@ -51,7 +51,9 @@ typedef struct _Collection Collection;
  */
 typedef struct _CollectionItem   CollectionItem;
 
-/* A viewport containing a Collection which also handles redraw */
+/* A viewport containing a Collection which also handles redraw.
+ * This is the Collection-based implementation of the View interface.
+ */
 typedef struct _ViewCollection ViewCollection;
 
 /* This contains the pixbufs for an image, in various sizes */
