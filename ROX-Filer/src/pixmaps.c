@@ -112,11 +112,12 @@ static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
-static void child_create_thumbnail(const gchar *path, MIME_type *type);
+static void child_create_thumbnail(const gchar *path);
 static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
 					  guchar alpha);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
 static gchar *thumbnail_path(const gchar *path);
+static gchar *thumbnail_program(MIME_type *type);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -270,6 +271,8 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	pid_t		child;
 	ChildThumbnail	*info;
 	MIME_type       *type;
+	gchar		*thumb_prog;
+
 
 	image = g_fscache_lookup_full(pixmap_cache, path,
 					FSCACHE_LOOKUP_ONLY_NEW, &found);
@@ -332,9 +335,10 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		return;
 	}
 
-	type=type_from_path(path);
-	if(!type /*|| strcmp(type->media_type, "image")!=0*/) {
-		callback(data, (gchar *) path);
+	type = type_from_path(path);
+	if (!type)
+	{
+		callback(data, NULL);
 		return;  /* Can't create thumbnail */
 	}
 
@@ -343,10 +347,20 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	 */
 	g_fscache_insert(pixmap_cache, path, NULL, TRUE);
 
+	thumb_prog = thumbnail_program(type);
+
+	/* Only attempt to load 'images' types ourselves */
+	if (thumb_prog == NULL && strcmp(type->media_type, "image") != 0)
+	{
+		callback(data, NULL);
+		return;		/* Don't know how to handle this type */
+	}
+
 	child = fork();
 
 	if (child == -1)
 	{
+		g_free(thumb_prog);
 		delayed_error("fork(): %s", g_strerror(errno));
 		callback(data, NULL);
 		return;
@@ -355,9 +369,18 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (child == 0)
 	{
 		/* We are the child process */
-		child_create_thumbnail(path, type);
+		if (thumb_prog) {
+			execl(thumb_prog, thumb_prog, path,
+				thumbnail_path(path),
+				g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
+			_exit(1);
+		}
+
+		child_create_thumbnail(path);
 		_exit(0);
 	}
+
+	g_free(thumb_prog);
 
 	info = g_new(ChildThumbnail, 1);
 	info->path = g_strdup(path);
@@ -496,20 +519,10 @@ static gchar *thumbnail_program(MIME_type *type)
 
 /* Called in a subprocess. Load path and create the thumbnail
  * file. Parent will notice when we die.
- * Type is for future expansion: we could run an external command, selected
- * by MIME type, to generate the thumbnail
  */
-static void child_create_thumbnail(const gchar *path, MIME_type *type)
+static void child_create_thumbnail(const gchar *path)
 {
 	GdkPixbuf *image;
-	gchar	  *thumb_prog;
-
-	thumb_prog = thumbnail_program(type);
-        if (thumb_prog) {
-		execl(thumb_prog, thumb_prog, path, thumbnail_path(path),
-		      g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
-		_exit(1);
-	}
 
 	image = gdk_pixbuf_new_from_file(path, NULL);
 
