@@ -54,6 +54,12 @@
 /* The size of the border around the icon which is used when winking */
 #define WINK_FRAME 2
 
+/* Used for the text colours (only) in the icons */
+GdkColor text_fg_col, text_bg_col;
+
+/* Style that all the icons should use. NULL => regenerate from text_fg/bg */
+GtkStyle *pinicon_style = NULL;
+
 enum
 {
 	TARGET_STRING,
@@ -118,6 +124,7 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *text_bg(char *data);
+static char *text_colours(char *data);
 
 static OptionsSection options =
 {
@@ -194,6 +201,8 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
 			FilerWindow *filer_window);
+static void reshape_icon(PinIcon *icon);
+static void reshape_all(void);
 
 
 
@@ -203,8 +212,16 @@ static void drag_end(GtkWidget *widget,
 
 void pinboard_init(void)
 {
+	GtkStyle	*style;
+	
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("pinboard_text_bg", text_bg);
+	option_register("pinboard_text_colours", text_colours);
+
+	style = gtk_widget_get_default_style();
+
+	memcpy(&text_fg_col, &style->fg[GTK_STATE_NORMAL], sizeof(GdkColor));
+	memcpy(&text_bg_col, &style->bg[GTK_STATE_NORMAL], sizeof(GdkColor));
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -318,6 +335,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 				drag_data_get, NULL);
 
 	gtk_widget_realize(icon->win);
+	gtk_widget_realize(icon->paper);
 	if (override_redirect)
 	{
 		gdk_window_lower(icon->win->window);
@@ -575,6 +593,19 @@ void pinboard_select_only(PinIcon *icon)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+/* Icon's size, shape or appearance has changed - update the display */
+static void reshape_icon(PinIcon *icon)
+{
+	int	x = icon->x, y = icon->y;
+	int	width, height;
+
+	set_size_and_shape(icon, &width, &height);
+	gdk_window_resize(icon->win->window, width, height);
+	offset_from_centre(icon, width, height, &x, &y);
+	gtk_widget_set_uposition(icon->win, x, y);
+	gtk_widget_queue_draw(icon->win);
+}
+
 /* See if the file the icon points to has changed. Update the icon
  * if so.
  */
@@ -588,16 +619,7 @@ static void icon_may_update(PinIcon *icon)
 	dir_restat(icon->path, &icon->item);
 
 	if (icon->item.image != image || icon->item.flags != flags)
-	{
-		int	x = icon->x, y = icon->y;
-		int	width, height;
-
-		set_size_and_shape(icon, &width, &height);
-		gdk_window_resize(icon->win->window, width, height);
-		offset_from_centre(icon, width, height, &x, &y);
-		gtk_widget_set_uposition(icon->win, x, y);
-		gtk_widget_queue_draw(icon->win);
-	}
+		reshape_icon(icon);
 
 	pixmap_unref(image);
 }
@@ -632,17 +654,29 @@ static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
 				item->leafname);
 		
 /* Updates the name_width field and resizes and masks the window.
+ * Also sets the style to pinicon_style, generating it if needed.
  * Returns the new width and height.
  */
 static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 {
 	int		width, height;
-	GdkFont		*font = icon->win->style->font;
+	GdkFont		*font;
 	int		font_height;
 	MaskedPixmap	*image = icon->item.image;
 	DirItem		*item = &icon->item;
 	int		text_x, text_y;
-	
+
+	if (!pinicon_style)
+	{
+		pinicon_style = gtk_style_copy(icon->paper->style);
+		memcpy(&pinicon_style->fg[GTK_STATE_NORMAL],
+			&text_fg_col, sizeof(GdkColor));
+		memcpy(&pinicon_style->bg[GTK_STATE_NORMAL],
+			&text_bg_col, sizeof(GdkColor));
+	}
+	gtk_widget_set_style(icon->paper, pinicon_style);
+
+	font = pinicon_style->font;
 	font_height = font->ascent + font->descent;
 	item->name_width = gdk_string_width(font, item->leafname);
 
@@ -740,7 +774,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 {
-	GdkFont		*font = icon->win->style->font;
+	GdkFont		*font = icon->paper->style->font;
 	int		font_height;
 	int		width, height;
 	int		text_x, text_y;
@@ -1511,21 +1545,22 @@ static void drag_end(GtkWidget *widget,
 static GtkToggleButton *radio_bg_none;
 static GtkToggleButton *radio_bg_outline;
 static GtkToggleButton *radio_bg_solid;
+static GtkWidget *fg_colour_square, *bg_colour_square;
 
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
  */
 static GtkWidget *create_options(void)
 {
-	GtkWidget	*vbox, *tog;
+	GtkWidget	*vbox, *tog, *hbox, *label;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
 	tog = gtk_radio_button_new_with_label( NULL, _("No background"));
 	radio_bg_none = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, "The text is drawn directly on the desktop "
-			"background.");
+	OPTION_TIP(tog, _("The text is drawn directly on the desktop "
+			  "background."));
 	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
 
 	tog = gtk_radio_button_new_with_label(
@@ -1539,8 +1574,26 @@ static GtkWidget *create_options(void)
 		gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
 		_("Rectangular background slab"));
 	radio_bg_solid = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, "The text is drawn on a solid rectangle.");
+	OPTION_TIP(tog, _("The text is drawn on a solid rectangle."));
 	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	label = gtk_label_new(_("Text colours: "));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
+
+	label = gtk_label_new(_("Foreground"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
+	fg_colour_square = gtk_button_new();
+	make_colour_patch(fg_colour_square);
+	gtk_box_pack_start(GTK_BOX(hbox), fg_colour_square, FALSE, FALSE, 0);
+
+	label = gtk_label_new(_("Background"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
+	bg_colour_square = gtk_button_new();
+	make_colour_patch(bg_colour_square);
+	gtk_box_pack_start(GTK_BOX(hbox), bg_colour_square, FALSE, FALSE, 0);
 
 	return vbox;
 }
@@ -1554,12 +1607,17 @@ static void update_options()
 		gtk_toggle_button_set_active(radio_bg_outline, TRUE);
 	else
 		gtk_toggle_button_set_active(radio_bg_none, TRUE);
+
+	button_patch_set_colour(fg_colour_square, &text_fg_col);
+	button_patch_set_colour(bg_colour_square, &text_bg_col);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
 static void set_options()
 {
+	GdkColor	*fg, *bg;
 	TextBgType	old = o_text_bg;
+	gboolean	colours_changed = FALSE;
 	
 	if (gtk_toggle_button_get_active(radio_bg_none))
 		o_text_bg = TEXT_BG_NONE;
@@ -1568,22 +1626,64 @@ static void set_options()
 	else
 		o_text_bg = TEXT_BG_SOLID;
 
-	if (o_text_bg != old && current_pinboard)
+	fg = button_patch_get_colour(fg_colour_square);
+	bg = button_patch_get_colour(bg_colour_square);
+
+	if (gdk_color_equal(fg, &text_fg_col) == FALSE ||
+	    gdk_color_equal(bg, &text_bg_col) == FALSE)
 	{
-		guchar	*name;
-			
-		name = g_strdup(current_pinboard->name);
-		pinboard_activate(name);
-		g_free(name);
+		colours_changed = TRUE;
+
+		text_fg_col.red = fg->red;
+		text_fg_col.green = fg->green;
+		text_fg_col.blue = fg->blue;
+
+		text_bg_col.red = bg->red;
+		text_bg_col.green = bg->green;
+		text_bg_col.blue = bg->blue;
+
+		if (pinicon_style)
+		{
+			gtk_style_unref(pinicon_style);
+			pinicon_style = NULL;
+		}
 	}
+
+	if ((colours_changed || o_text_bg != old) && current_pinboard)
+		reshape_all();
 }
 
 static void save_options()
 {
+	guchar	*str;
+
 	option_write("pinboard_text_bg",
 			o_text_bg == TEXT_BG_NONE ? "None" :
 			o_text_bg == TEXT_BG_OUTLINE ? "Outline" :
 			"Solid");
+
+	str = g_strdup_printf("%hx,%hx,%hx : %hx,%hx,%hx",
+			text_fg_col.red,
+			text_fg_col.green,
+			text_fg_col.blue,
+			text_bg_col.red,
+			text_bg_col.green,
+			text_bg_col.blue);
+	option_write("pinboard_text_colours", str);
+	g_free(str);
+}
+
+static char *text_colours(char *data)
+{
+	if (sscanf(data, " %hx , %hx , %hx : %hx , %hx , %hx ",
+			&text_fg_col.red,
+			&text_fg_col.green,
+			&text_fg_col.blue,
+			&text_bg_col.red,
+			&text_bg_col.green,
+			&text_bg_col.blue) != 6)
+		return _("Bad colour format");
+	return NULL;
 }
 
 static char *text_bg(char *data)
@@ -1598,4 +1698,18 @@ static char *text_bg(char *data)
 		return _("Unknown pinboard text background type");
 
 	return NULL;
+}
+
+/* Something which affects all the icons has changed - reshape
+ * and redraw all of them.
+ */
+static void reshape_all(void)
+{
+	GList	*next;
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon *icon = (PinIcon *) next->data;
+		reshape_icon(icon);
+	}
 }

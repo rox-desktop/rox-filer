@@ -67,6 +67,8 @@ uid_t euid;
 gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
+
+int home_dir_len;
 char *home_dir, *app_dir;
 
 /* Static prototypes */
@@ -240,6 +242,7 @@ int main(int argc, char **argv)
 	to_open = g_string_new(NULL);
 
 	home_dir = g_get_home_dir();
+	home_dir_len = strlen(home_dir);
 	app_dir = g_strdup(getenv("APP_DIR"));
 
 	choices_init();

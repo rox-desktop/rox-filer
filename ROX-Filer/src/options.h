@@ -11,7 +11,7 @@
 #include <gtk/gtk.h>
 
 #define OPTION_TIP(widget, tip)	\
-	gtk_tooltips_set_tip(option_tooltips, widget, _(tip), NULL)
+	gtk_tooltips_set_tip(option_tooltips, widget, tip, NULL)
 
 typedef char *OptionFunc(char *value);
 

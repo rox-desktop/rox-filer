@@ -184,28 +184,28 @@ static GtkWidget *create_options()
 	toggle_no_hostnames =
 		gtk_check_button_new_with_label(_("Don't use hostnames"));
 	OPTION_TIP(toggle_no_hostnames, 
-		"Some older applications don't support XDND "
+		_("Some older applications don't support XDND "
 		"fully and may need to have this option turned on. "
 		"Use this if dragging files to an application shows "
-		"a + sign on the pointer but the drop doesn't work.");
+		"a + sign on the pointer but the drop doesn't work."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_no_hostnames, FALSE, TRUE, 0);
 
 	toggle_drag_to_icons =
 		gtk_check_button_new_with_label(_("Allow dragging to icons in "
 						"filer windows"));
 	OPTION_TIP(toggle_drag_to_icons, 
-		"When this is on you can drag a file over a sub-directory "
+		_("When this is on you can drag a file over a sub-directory "
 		"or program in a filer window. The item will highlight when "
 		"you do this and dropping the file will put it into that "
-		"directory, or load it into the program.");
+		"directory, or load it into the program."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_drag_to_icons, FALSE, TRUE, 0);
 
 	toggle_spring_open =
 		gtk_check_button_new_with_label(_("Directories spring open"));
 	OPTION_TIP(toggle_spring_open, 
-		"This option, which requires the above option to be turned "
+		_("This option, which requires the above option to be turned "
 		"on too, causes the highlighted directory to 'spring open' "
-		"after the file is held over it for a short while.");
+		"after the file is held over it for a short while."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_spring_open, FALSE, TRUE, 0);
 
 	return vbox;

@@ -595,3 +595,104 @@ void centre_window(GdkWindow *window, int x, int y)
 		CLAMP(x, DECOR_BORDER, screen_width - w - DECOR_BORDER),
 		CLAMP(y, DECOR_BORDER, screen_height - h - DECOR_BORDER));
 }
+
+static void set_to_null(gpointer *data)
+{
+	*data = NULL;
+}
+
+/* Non-NULL => selector window is open */
+static GtkColorSelectionDialog *current_csel_box = NULL;
+
+static void get_new_colour(GtkWidget *ok, GtkWidget *button)
+{
+	GtkWidget	*csel;
+	gdouble		c[4];
+	GdkColor	colour;
+
+	g_return_if_fail(current_csel_box != NULL);
+
+	csel = current_csel_box->colorsel;
+
+	gtk_color_selection_get_color(GTK_COLOR_SELECTION(csel), c);
+	colour.red = c[0] * 0xffff;
+	colour.green = c[1] * 0xffff;
+	colour.blue = c[2] * 0xffff;
+
+	button_patch_set_colour(button, &colour);
+	
+	gtk_widget_destroy(GTK_WIDGET(current_csel_box));
+}
+
+static void open_coloursel(GtkWidget *ok, GtkWidget *button)
+{
+	GtkColorSelectionDialog	*csel;
+	GtkWidget		*dialog, *patch;
+	gdouble			c[4];
+
+	if (current_csel_box)
+		gtk_widget_destroy(GTK_WIDGET(current_csel_box));
+
+	dialog = gtk_color_selection_dialog_new(NULL);
+	csel = GTK_COLOR_SELECTION_DIALOG(dialog);
+	current_csel_box = csel;
+
+	gtk_signal_connect_object(GTK_OBJECT(dialog), "destroy",
+			GTK_SIGNAL_FUNC(set_to_null),
+			(GtkObject *) &current_csel_box);
+	gtk_widget_hide(csel->help_button);
+	gtk_signal_connect_object(GTK_OBJECT(csel->cancel_button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(dialog));
+	gtk_signal_connect(GTK_OBJECT(csel->ok_button), "clicked",
+			GTK_SIGNAL_FUNC(get_new_colour), button);
+
+	patch = GTK_BIN(button)->child;
+
+	c[0] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].red) / 0xffff;
+	c[1] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].green) / 0xffff;
+	c[2] = ((gdouble) patch->style->bg[GTK_STATE_NORMAL].blue) / 0xffff;
+	gtk_color_selection_set_color(GTK_COLOR_SELECTION(csel->colorsel), c);
+
+	gtk_widget_show(dialog);
+}
+
+/* Turns a button (with no child) into a colour patch button.
+ * When clicked, the button will open the colour selector window
+ * and let the user pick a colour. Afterwards, the buttons changes
+ * colour to the one chosen.
+ */
+void make_colour_patch(GtkWidget *button)
+{
+	GtkWidget	*da;
+
+	da = gtk_drawing_area_new();
+	gtk_drawing_area_size(GTK_DRAWING_AREA(da), 64, 12);
+	gtk_container_add(GTK_CONTAINER(button), da);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(open_coloursel), button);
+}
+
+/* Returns a pointer to the style's background colour */
+GdkColor *button_patch_get_colour(GtkWidget *button)
+{
+	return &(GTK_BIN(button)->child)->style->bg[GTK_STATE_NORMAL];
+}
+
+void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
+{
+	GtkStyle   	*style;
+	GtkWidget	*patch;
+
+	patch = GTK_BIN(button)->child;
+
+	style = gtk_style_copy(GTK_WIDGET(patch)->style);
+	style->bg[GTK_STATE_NORMAL].red = colour->red;
+	style->bg[GTK_STATE_NORMAL].green = colour->green;
+	style->bg[GTK_STATE_NORMAL].blue = colour->blue;
+	gtk_widget_set_style(patch, style);
+	gtk_style_unref(style);
+
+	if (GTK_WIDGET_REALIZED(patch))
+		gdk_window_clear(patch->window);
+}

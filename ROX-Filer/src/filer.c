@@ -1127,10 +1127,10 @@ static GtkWidget *create_options(void)
 		gtk_check_button_new_with_label(
 			_("New window on button 1 (RISC OS style)"));
 	OPTION_TIP(toggle_new_window_on_1,
-			"Clicking with mouse button 1 (usually the "
+			_("Clicking with mouse button 1 (usually the "
 			"left button) opens a directory in a new window "
 			"with this turned on. Clicking with the button-2 "
-			"(middle) will reuse the current window.");
+			"(middle) will reuse the current window."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_new_window_on_1,
 			FALSE, TRUE, 0);
 
@@ -1138,25 +1138,25 @@ static GtkWidget *create_options(void)
 		gtk_check_button_new_with_label(
 			_("Menu on button 2 (RISC OS style)"));
 	OPTION_TIP(toggle_menu_on_2,
-			"Use button 2, the middle button (click both buttons "
+			_("Use button 2, the middle button (click both buttons "
 			"at once on two button mice), to pop up the menu. "
-			"If off, use button 3 (right) instead.");
+			"If off, use button 3 (right) instead."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
 
 	toggle_single_click =
 		gtk_check_button_new_with_label(_("Single-click nagivation"));
 	OPTION_TIP(toggle_single_click,
-			"Clicking on an item opens it with this on. Hold down "
+			_("Clicking on an item opens it with this on. Hold down "
 			"Control to select the item instead. If off, clicking "
-			"once selects an item; double click to open things.");
+			"once selects an item; double click to open things."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
 	toggle_unique_filer_windows =
 		gtk_check_button_new_with_label(_("Unique windows"));
 	OPTION_TIP(toggle_unique_filer_windows,
-			"If you open a directory and that directory is "
+			_("If you open a directory and that directory is "
 			"already displayed in another window, then this "
-			"option causes the other window to be closed.");
+			"option causes the other window to be closed."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
 			FALSE, TRUE, 0);
 
@@ -1334,18 +1334,25 @@ gboolean filer_exists(FilerWindow *filer_window)
 
 static void filer_set_title(FilerWindow *filer_window)
 {
-	if (filer_window->scanning)
-	{
-		guchar	*title;
+	guchar	*title = NULL;
+	guchar	*scanning = filer_window->scanning ? _(" (Scanning)") : "";
 
-		title = g_strdup_printf(_("%s (Scanning)"), filer_window->path);
-		gtk_window_set_title(GTK_WINDOW(filer_window->window),
-				title);
-		g_free(title);
+	if (strncmp(filer_window->path, home_dir, home_dir_len) == 0)
+	{
+		guchar 	sep = filer_window->path[home_dir_len];
+
+		if (sep == '\0' || sep == '/')
+			title = g_strconcat("~",
+					filer_window->path + home_dir_len,
+					scanning,
+					NULL);
 	}
-	else
-		gtk_window_set_title(GTK_WINDOW(filer_window->window),
-				filer_window->path);
+	
+	if (!title)
+		title = g_strconcat(filer_window->path, scanning, NULL);
+
+	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
+	g_free(title);
 }
 
 /* Reconnect to the same directory (used when the Show Hidden option is
