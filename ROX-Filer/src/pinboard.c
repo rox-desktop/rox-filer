@@ -104,6 +104,15 @@ struct _PinIcon {
 #define GRID_STEP_MED    16
 #define GRID_STEP_COARSE 32
 
+/* Used in options */
+#define CORNER_TOP_LEFT 0
+#define CORNER_TOP_RIGHT 1
+#define CORNER_BOTTOM_LEFT 2
+#define CORNER_BOTTOM_RIGHT 3
+
+#define DIR_HORZ 0
+#define DIR_VERT 1
+
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
@@ -128,6 +137,7 @@ typedef enum {
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_button_3;
+static Option o_iconify_start, o_iconify_dir;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -219,6 +229,9 @@ void pinboard_init(void)
 							GRID_STEP_COARSE);
 	option_add_int(&o_pinboard_tasklist, "pinboard_tasklist", TRUE);
 	option_add_int(&o_forward_button_3, "pinboard_forward_button_3", FALSE);
+
+	option_add_int(&o_iconify_start, "iconify_start", CORNER_TOP_RIGHT);
+	option_add_int(&o_iconify_dir, "iconify_dir", DIR_VERT);
 
 	option_add_notify(pinboard_check_options);
 
@@ -1968,6 +1981,31 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 	pinboard_save();
 }
 
+#define SEARCH_STEP 32
+
+static void search_free(GdkRectangle *rect, GdkRegion *used,
+			int *outer, int od, int omax,
+			int *inner, int id, int imax)
+{
+	*outer = od > 0 ? 0 : omax;
+	while (*outer >= 0 && *outer <= omax)
+	{
+		*inner = id > 0 ? 0 : imax;
+		while (*inner >= 0 && *inner <= imax)
+		{
+			if (gdk_region_rect_in(used, rect) ==
+					GDK_OVERLAP_RECTANGLE_OUT)
+				return;
+			*inner += id;
+		}
+
+		*outer += od;
+	}
+
+	rect->x = -1;
+	rect->y = -1;
+}
+
 /* Finds a free area on the pinboard large enough for the width and height
  * of the given rectangle, by filling in the x and y fields of 'rect'.
  * The search order respects user preferences.
@@ -1977,6 +2015,8 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 {
 	GdkRegion *used;
 	GList *next;
+	GdkRectangle used_rect;
+	int dx = SEARCH_STEP, dy = SEARCH_STEP;
 	
 	used = gdk_region_new();
 
@@ -1988,7 +2028,6 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 	for (; next; next = next->next)
 	{
 		GtkFixedChild *fix = (GtkFixedChild *) next->data;
-		GdkRectangle used_rect;
 
 		if (!GTK_WIDGET_VISIBLE(fix->widget))
 			continue;
@@ -2005,18 +2044,34 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 	 * it works). If you know a better (fast!) algorithm, let me know!
 	 */
 
-	for (rect->y = 0; rect->y < screen_height; rect->y += 32)
-	{
-		for (rect->x = 0; rect->x < screen_width; rect->x += 32)
-		{
-			if (gdk_region_rect_in(used, rect) ==
-					GDK_OVERLAP_RECTANGLE_OUT)
-				goto out;
-		}
-	}
 
-	rect->x = 0;
-	rect->y = 0;
-out:
+	if (o_iconify_start.int_value == CORNER_TOP_RIGHT ||
+	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
+		dx = -SEARCH_STEP;
+
+	if (o_iconify_start.int_value == CORNER_BOTTOM_LEFT ||
+	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
+		dy = -SEARCH_STEP;
+
+	if (o_iconify_dir.int_value == DIR_VERT)
+	{
+		search_free(rect, used,
+			    &rect->x, dx, screen_width - rect->width,
+			    &rect->y, dy, screen_height - rect->height);
+	}
+	else
+	{
+		search_free(rect, used,
+			    &rect->y, dy, screen_height - rect->height,
+			    &rect->x, dx, screen_width - rect->width);
+	}
+	
 	gdk_region_destroy(used);
+
+	if (rect->x == -1)
+	{
+		rect->x = 0;
+		rect->y = 0;
+	}
 }
+

@@ -101,10 +101,7 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
     </section>
   </section>
   <section title='Pinboard'>
-    <label help='1'>The pinboard is the desktop background.
-When the pinboard is turned on, you can drag files
-and applications onto it to create short-cuts to them.
-See the manual for information about using the pinboard.</label>
+    <label help='1'>When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them.</label>
     <frame label='Colours'>
       <hbox>
         <colour name='pinboard_fg_colour' label='Foreground:'/>
@@ -125,6 +122,18 @@ See the manual for information about using the pinboard.</label>
     </frame>
     <frame label='Iconfied windows'>
      <toggle name='pinboard_tasklist' label='Show iconified windows'>Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows. If this option is on, the filer will show each iconified window as a small button on the screen. Requires a compatible window manager.</toggle>
+     <hbox>
+       <menu name='iconify_start' label='Iconify to the'>
+         <item label='top-left' value='0'/>
+         <item label='top-right' value='1'/>
+         <item label='bottom-left' value='2'/>
+         <item label='bottom-right' value='3'/>
+       </menu>
+       <menu name='iconify_dir' label=', going'>
+         <item label='horizontally' value='0'/>
+         <item label='vertically' value='1'/>
+       </menu>
+     </hbox>
    </frame>
   </section>
 
