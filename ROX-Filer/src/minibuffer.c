@@ -274,7 +274,7 @@ static void show_help(FilerWindow *filer_window)
 				"* means zero or more characters\n"
 				"[aA] means 'a' or 'A'\n"
 				"[a-z] means any character from a to z (lowercase)\n"
-				"*.png means any name ending in '.png')"));
+				"*.png means any name ending in '.png'"));
 			break;
 		case MINI_SELECT_IF:
 			show_condition_help(NULL);
