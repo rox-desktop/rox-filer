@@ -512,6 +512,10 @@ static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 	
 	action = bind_lookup_bev(icon ? BIND_PANEL_ICON : BIND_PANEL, event);
 
+	if (icon && icon->socket)
+		if (action != ACT_POPUP_MENU && action != ACT_MOVE_ICON)
+			return;
+
 	switch (action)
 	{
 		case ACT_OPEN_ITEM:
@@ -1175,14 +1179,8 @@ static guchar *create_uri_list(GList *list)
 
 static void applet_died(GtkWidget *socket)
 {
-	g_print("Applet died!\n");
-	if (GTK_OBJECT_DESTROYED(socket))
-		g_print("[ socket already gone ]\n");
-	else
-	{
-		g_print("[ socket still here - killing it ]\n");
+	if (!GTK_OBJECT_DESTROYED(socket))
 		gtk_widget_destroy(socket);
-	}
 
 	gtk_widget_unref(socket);
 }
@@ -1202,10 +1200,7 @@ static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
 	gtk_widget_unref(widget);
 
 	if (lost_widget)
-	{
-		g_print("[ removing socket ]\n");
 		return;		/* We're removing the icon... */
-	}
 		
 	icon = gtk_object_get_data(GTK_OBJECT(widget), "icon");
 	icon->socket = gtk_button_new_with_label(_("Restart\nApplet"));
