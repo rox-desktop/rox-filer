@@ -707,7 +707,7 @@ static MenuIconStyle get_menu_icon_style(void)
    (only eject implemented at present) */
 static void set_mount_point_items(gboolean ismp, gboolean ismounted)
 {
-	gtk_widget_set_sensitive(filer_file_eject, ismp && !ismounted);
+	gtk_widget_set_sensitive(filer_file_eject, ismp);
 	gtk_widget_set_sensitive(filer_file_format, ismp && !ismounted);
 	gtk_widget_set_sensitive(filer_file_free, ismp && ismounted);
 
@@ -1943,14 +1943,14 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			open_vfs_avfs(window_with_focus, item);
 			break;
 	        case FILE_EJECT:
-			{
-				GList *items;
+		{
+			GList *items;
 
-				items=filer_selected_items(window_with_focus);
-				action_eject(items);
-				destroy_glist(&items);
-			}
+			items=filer_selected_items(window_with_focus);
+			action_eject(items);
+			destroy_glist(&items);
 			break;
+		}
 		default:
 			g_warning("Unknown action!");
 			return;
