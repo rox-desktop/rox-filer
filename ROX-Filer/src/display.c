@@ -162,7 +162,7 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
 #ifndef GTK2
-static void wrap_text(Template *template, CollectionItem *colitem, int width);
+static void wrap_text(CollectionItem *colitem, int width);
 #endif
 
 enum {
@@ -212,9 +212,6 @@ static void fill_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	DisplayStyle	style = filer_window->display_style;
 
-#ifndef GTK2
-	template->split = 0;
-#endif
 	template->details_string = NULL;
 
 	if (filer_window->details_type == DETAILS_NONE)
@@ -276,9 +273,12 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		view->name_width = w / PANGO_SCALE;
 		view->name_height = h / PANGO_SCALE;
 #else
-		view->name_width =
-				gdk_string_measure(item_font, item->leafname);
-		view->name_height = item_font->ascent + item_font->descent;
+		w = gdk_string_measure(item_font, item->leafname);
+		h = item_font->ascent + item_font->descent;
+				
+		view->name_width = w;
+		view->name_height = h;
+		view->split_pos = 0;
 		if (filer_window->details_type == DETAILS_NONE)
 		{
 			if (style == HUGE_ICONS)
@@ -788,6 +788,9 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
 void display_free_colitem(Collection *collection, CollectionItem *colitem)
 {
 	ViewData	*view = (ViewData *) colitem->view_data;
+
+	if (!view)
+		return;
 
 #ifdef GTK2
 	if (view->layout)
@@ -1377,16 +1380,16 @@ static void draw_item(GtkWidget *widget,
 			template.leafname.y,
 			view->layout);
 #else
-	if (template.split)
+	if (view->split_pos)
 	{
-		guchar	*bot = item->leafname + template.split;
+		guchar	*bot = item->leafname + view->split_pos;
 		int	w;
 
 		w = gdk_string_measure(item_font, bot);
 
 		draw_string(widget,
 				item_font,
-				item->leafname, template.split,
+				item->leafname, view->split_pos,
 				template.leafname.x,
 				template.leafname.y + item_font->ascent,
 				template.leafname.width,
@@ -1410,7 +1413,7 @@ static void draw_item(GtkWidget *widget,
 				item->leafname, -1,
 				template.leafname.x,
 				template.leafname.y + item_font->ascent,
-				name_width,
+				view->name_width,
 				template.leafname.width,
 				filer_window->selection_state,
 				selected, TRUE);

@@ -565,8 +565,9 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 
 	/* The ViewData field is created in calc_size() */
 	i = collection_insert(filer_window->collection, item, NULL);
-
 	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
+	collection_draw_item(filer_window->collection, i, FALSE);
+
 	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,
 					 MAX(old_w, w),

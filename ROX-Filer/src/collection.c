@@ -1695,6 +1695,8 @@ void collection_clear(Collection *collection)
 
 /* Inserts a new item at the end. The new item is unselected, and its
  * number is returned.
+ * The new item is *not* drawn; use collection_draw_item(). This is to
+ * allow you to fill in the view_data field.
  */
 gint collection_insert(Collection *collection, gpointer data, gpointer view)
 {
@@ -1713,18 +1715,11 @@ gint collection_insert(Collection *collection, gpointer data, gpointer view)
 
 	collection->number_of_items++;
 
-	if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
-	{
-#ifndef GTK2
-		set_vadjustment(collection);
-#endif
-		collection_draw_item(collection,
-				collection->number_of_items - 1,
-				FALSE);
-	}
-
 #ifdef GTK2
 	gtk_widget_queue_resize(GTK_WIDGET(collection));
+#else
+	if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
+		set_vadjustment(collection);
 #endif
 
 	return item;
@@ -1892,8 +1887,7 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 	collection_get_item_area(collection, row, col, &area);
 
 #ifdef GTK2
-	if (GTK_WIDGET_REALIZED(widget))
-		gdk_window_invalidate_rect(widget->window, &area, FALSE);
+	gdk_window_invalidate_rect(widget->window, &area, FALSE);
 #else
 	if (area.y + area.height < 0)
 		return;

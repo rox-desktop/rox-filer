@@ -622,7 +622,7 @@ static void rename_activate(GtkWidget *dialog)
 		
 		icon->item->leafname = g_strdup(new_name);
 #ifndef GTK2
-		icon->item->name_width = gdk_string_measure(font, new_name);
+		icon->name_width = gdk_string_measure(font, new_name);
 #endif
 		/* XXX: Set name_width in size_and_shape? */
 

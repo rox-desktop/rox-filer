@@ -108,8 +108,14 @@ void rox_add_translations(char *path)
 		g_warning("rox_add_translations: expected format revision 0");
 
 	if (!translate)
+	{
+#ifdef GTK2
 		translate = g_hash_table_new_full(g_str_hash, g_str_equal,
 						  g_free, g_free);
+#else
+		translate = g_hash_table_new(g_str_hash, g_str_equal);
+#endif
+	}
 
 	n_total = WORD(data + 8);
 	from_base = data + WORD(data + 12);
@@ -119,22 +125,27 @@ void rox_add_translations(char *path)
 	{
 		char	*from = data + WORD(from_base + (n << 3) + 4);
 		char	*to_raw   = data + WORD(to_base + (n << 3) + 4);
-		char	*to;
 #ifdef GTK2
+		char	*to;
+
 		to = g_convert_with_fallback(to_raw, -1,
 					"UTF-8",
 					"iso-8859-1", /* XXX: Don't guess */
 					"#",
 					NULL, NULL, NULL);
 		if (!to)
-#endif
 			to = g_strdup(to_raw);
 
 		g_hash_table_insert(translate, g_strdup(from), to);
+#else
+		g_hash_table_insert(translate, from, to_raw);
+#endif
 	}
 
 out:
+#ifdef GTK2
 	g_free(data);
+#endif
 }
 
 /****************************************************************
