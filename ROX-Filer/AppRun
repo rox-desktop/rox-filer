@@ -5,13 +5,12 @@ PROG=ROX-Filer
 APP_DIR=`dirname $0`
 APP_DIR=`cd "$APP_DIR";pwd`; export APP_DIR
 
-# On MacOS X uname -m returns Power Macintosh, remove the space
-ARCH=`uname -m | sed "s/ //g"`
-case $ARCH in
+ARCH=`uname -m`
+case "$ARCH" in
 	i?86) ARCH=ix86 ;;
 esac
 
-PLATFORM=`uname -s`-$ARCH
+PLATFORM=`uname -s`-"$ARCH"
 
 DEBUGGER=""
 

@@ -41,11 +41,10 @@ OBJECTS = abox.o action.o appinfo.o appmenu.o bind.o bookmarks.o	\
 
 ############ Things to keep the same
 
-${EXEC}: ${PLATFORM_DIR} ${OBJECTS}
-	${CC} -o ${EXEC} ${OBJECTS} ${LDFLAGS}
-
-${PLATFORM_DIR}:
-	mkdir ${PLATFORM_DIR}
+${PROG}: ${OBJECTS}
+	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
+	[ -d "${PLATFORM_DIR}" ] || mkdir "${PLATFORM_DIR}"
+	mv "${PROG}" "${PLATFORM_DIR}"
 
 clean:
 	rm -f *.o Makefile.bak
