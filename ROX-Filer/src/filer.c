@@ -63,8 +63,6 @@
 #include "mount.h"
 #include "xml.h"
 
-#define PANEL_BORDER 2
-
 static XMLwrapper *groups = NULL;
 
 FilerWindow 	*window_with_focus = NULL;
@@ -507,8 +505,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	
 	if (window_with_focus == filer_window)
 	{
-		if (popup_menu)
-			gtk_menu_popdown(GTK_MENU(popup_menu));
+		menu_popdown();
 		window_with_focus = NULL;
 	}
 
@@ -1031,6 +1028,8 @@ static gint key_press_event(GtkWidget	*widget,
 	/* Note: Not convinced this is the way Gtk's key system is supposed
 	 * to be used...
 	 */
+	if (!filer_keys)
+		ensure_filer_menu();	/* Gets the keys working... */
 	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
 						filer_keys);
 	handled = gtk_accel_groups_activate(G_OBJECT(filer_window->window),
@@ -1398,15 +1397,9 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 
 	attach(filer_window);
 
-	/* Update number_of_windows BEFORE destroying the old window! */
 	number_of_windows++;
-
-	/* If the user doesn't want duplicate windows then check
-	 * for an existing one and close it if found.
-	 */
-
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
-	
+
 	return filer_window;
 }
 

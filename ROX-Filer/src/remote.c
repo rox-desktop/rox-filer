@@ -838,6 +838,8 @@ static xmlNodePtr soap_invoke(xmlNode *method)
 	SOAP_call *call;
 	gchar **arg;
 	xmlNodePtr retval = NULL;
+	GHashTable *name_to_node;
+	xmlNode	*node;
 
 	call = g_hash_table_lookup(rpc_calls, method->name);
 	if (!call)
@@ -857,13 +859,23 @@ static xmlNodePtr soap_invoke(xmlNode *method)
 		return reply;
 	}
 
+	name_to_node = g_hash_table_new(g_str_hash, g_str_equal);
+	for (node = method->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+
+		if (node->ns == NULL || strcmp(node->ns->href, ROX_NS) != 0)
+			continue;
+
+		g_hash_table_insert(name_to_node, (gchar *) node->name, node);
+	}
+
 	if (call->required_args)
 	{
 		for (arg = call->required_args; *arg; arg++)
 		{
-			xmlNode *node;
-
-			node = get_subnode(method, ROX_NS, *arg);
+			node = g_hash_table_lookup(name_to_node, *arg);
 			if (!node)
 			{
 				g_warning("Missing required argument '%s' "
@@ -879,17 +891,14 @@ static xmlNodePtr soap_invoke(xmlNode *method)
 	if (call->optional_args)
 	{
 		for (arg = call->optional_args; *arg; arg++)
-		{
-			xmlNode *node;
-
-			node = get_subnode(method, ROX_NS, *arg);
-
-			args = g_list_append(args, node);
-		}
+			args = g_list_append(args,
+				g_hash_table_lookup(name_to_node, *arg));
 	}
 
 	retval = call->func(args);
+
 out:
+	g_hash_table_destroy(name_to_node);
 	g_list_free(args);
 
 	return retval;

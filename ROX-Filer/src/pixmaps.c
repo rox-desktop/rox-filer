@@ -138,17 +138,17 @@ MaskedPixmap *load_pixmap(const char *name)
 /* Load all the standard pixmaps */
 static void load_default_pixmaps(void)
 {
-	im_error = load_pixmap("pixmaps/error.xpm");
-	im_unknown = load_pixmap("pixmaps/unknown.xpm");
-	im_symlink = load_pixmap("pixmaps/symlink.xpm");
+	im_error = load_pixmap("images/error.png");
+	im_unknown = load_pixmap("images/unknown.png");
+	im_symlink = load_pixmap("images/symlink.png");
 
-	im_unmounted = load_pixmap("pixmaps/mount.xpm");
-	im_mounted = load_pixmap("pixmaps/mounted.xpm");
-	im_multiple = load_pixmap("pixmaps/multiple.xpm");
-	im_appdir = load_pixmap("pixmaps/application.xpm");
+	im_unmounted = load_pixmap("images/mount.png");
+	im_mounted = load_pixmap("images/mounted.png");
+	im_multiple = load_pixmap("images/multiple.png");
+	im_appdir = load_pixmap("images/application.png");
 
-	im_help = load_pixmap("pixmaps/help.xpm");
-	im_dirs = load_pixmap("pixmaps/dirs.xpm");
+	im_help = load_pixmap("images/help.png");
+	im_dirs = load_pixmap("images/dirs.png");
 }
 
 void pixmap_make_huge(MaskedPixmap *mp)

@@ -54,8 +54,8 @@ typedef struct _MaskedPixmap MaskedPixmap;
  */
 typedef struct _MIME_type MIME_type;
 
-/* Each icon on the pinboard or a panel has an Icon structure. It contains
- * the name and path of the icon, as well as its DirItem.
+/* Icon is an abstract base class for pinboard and panel icons.
+ * It contains the name and path of the icon, as well as its DirItem.
  */
 typedef struct _Icon Icon;
 
@@ -80,7 +80,7 @@ typedef struct _Option Option;
  * registered to it. Requesting an object from the cache will load
  * or update it as needed, or return the cached copy if the current
  * version of the file is already cached.
- * Caches are used to access directories, images and AppInfo.xml files.
+ * Caches are used to access directories, images and XML files.
  */
 typedef struct _GFSCache GFSCache;
 
@@ -121,13 +121,4 @@ typedef enum {		/* Values used in options, must start at 0 */
 #define SOAP_RPC_NS "http://www.w3.org/2001/12/soap-rpc"
 #define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
 
-/* For debugging... */
-#define SHOW(var, fmt) (g_print("[ " #var " = '%" #fmt "' ]\n", var))
-
-
 #include <libxml/tree.h>
-
-/* For very old versions of libxml... */
-#ifndef xmlChildrenNode
-#  define xmlChildrenNode childs
-#endif

@@ -19,7 +19,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* menu.c - code for handling the popup menu */
+/* menu.c - code for handling the popup menus */
 
 #include "config.h"
 
@@ -60,8 +60,6 @@
 #include "collection.h"
 #include "display.h"
 
-#define C_ "<control>"
-
 typedef enum {
 	FILE_COPY_ITEM,
 	FILE_RENAME_ITEM,
@@ -92,10 +90,9 @@ typedef void MenuCallback(GtkWidget *widget, gpointer data);
 typedef gboolean (*SaveCb)(GObject *savebox,
 			   const gchar *current, const gchar *new);
 
-GtkAccelGroup	*filer_keys;
-GtkAccelGroup	*pinboard_keys;
+GtkAccelGroup	*filer_keys = NULL;
 
-GtkWidget *popup_menu = NULL;		/* Currently open menu */
+static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
@@ -164,8 +161,6 @@ static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
-GtkWidget	*display_large_menu;	/* Display->Large With... */
-GtkWidget	*display_small_menu;	/* Display->Small With... */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
@@ -266,13 +261,15 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 		g_free(tmp);		\
 	} while (0)
 
-void menu_init(void)
+void ensure_filer_menu(void)
 {
-	char			*menurc;
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
 	GtkItemFactory  	*item_factory;
+
+	if (filer_keys)
+		return;
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = menu_create(filer_menu_def,
@@ -284,11 +281,6 @@ void menu_init(void)
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
 							"Show Thumbnails");
-
-	GET_SSMENU_ITEM(display_large_menu, "filer",
-			"Display", "Large, With...");
-	GET_SSMENU_ITEM(display_small_menu, "filer",
-			"Display", "Small, With...");
 
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
 
@@ -305,6 +297,19 @@ void menu_init(void)
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
 	filer_new_window = GTK_BIN(item)->child;
 
+	g_signal_connect(filer_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
+	g_signal_connect(filer_file_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
+
+	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
+				  (GCallback) keys_changed, NULL, 0);
+}
+
+void menu_init(void)
+{
+	char			*menurc;
+
 	menurc = choices_find_path_load(MENUS_NAME, PROJECT);
 	if (menurc)
 	{
@@ -312,17 +317,9 @@ void menu_init(void)
 		g_free(menurc);
 	}
 
-	g_signal_connect(filer_menu, "unmap_event",
-			G_CALLBACK(menu_closed), NULL);
-	g_signal_connect(filer_file_menu, "unmap_event",
-			G_CALLBACK(menu_closed), NULL);
-
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
 	option_add_saver(save_menus);
-
-	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
-				  (GCallback) keys_changed, NULL, 0);
 
 	option_register_widget("menu-set-keys", set_keys_button);
 }
@@ -608,6 +605,13 @@ void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
 	select_nth_item(GTK_MENU_SHELL(menu), item);
 }
 
+/* Hide the popup menu, if any */
+void menu_popdown(void)
+{
+	if (popup_menu)
+		gtk_menu_popdown(GTK_MENU(popup_menu));
+}
+
 static MenuIconStyle get_menu_icon_style(void)
 {
 	MenuIconStyle mis;
@@ -658,6 +662,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
 	GdkModifierType	state = 0;
+
+	ensure_filer_menu();
 
 	updating_menu++;
 

@@ -165,8 +165,6 @@ static Option o_dnd_middle_menu;
 
 void dnd_init()
 {
-	GtkItemFactory	*item_factory;
-
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
@@ -178,11 +176,6 @@ void dnd_init()
 	option_add_int(&o_dnd_spring_open, "dnd_spring_open", 0);
 	option_add_int(&o_dnd_spring_delay, "dnd_spring_delay", 400);
 	option_add_int(&o_dnd_middle_menu, "dnd_middle_menu", TRUE);
-
-	item_factory = menu_create(menu_def,
-				sizeof(menu_def) / sizeof(*menu_def),
-				 "<dnd>", NULL);
-	dnd_menu = gtk_item_factory_get_widget(item_factory, "<dnd>");
 }
 
 /*			SUPPORT FUNCTIONS			*/
@@ -1128,6 +1121,16 @@ static void prompt_action(GList *paths, gchar *dest)
 		prompt_local_paths = g_list_append(prompt_local_paths,
 						g_strdup((gchar *) next->data));
 	prompt_dest_path = g_strdup(dest);
+
+	if (!dnd_menu)
+	{
+		GtkItemFactory	*item_factory;
+
+		item_factory = menu_create(menu_def,
+				sizeof(menu_def) / sizeof(*menu_def),
+				"<dnd>", NULL);
+		dnd_menu = gtk_item_factory_get_widget(item_factory, "<dnd>");
+	}
 
 	/* Shade 'Set Icon' if there are multiple files */
 	menu_set_items_shaded(dnd_menu, g_list_length(paths) != 1, 4, 1);

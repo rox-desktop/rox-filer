@@ -68,7 +68,6 @@
 #include "run.h"
 #include "toolbar.h"
 #include "bind.h"
-#include "icon.h"
 #include "panel.h"
 #include "session.h"
 #include "minibuffer.h"
@@ -457,7 +456,7 @@ int main(int argc, char **argv)
 	}
 	
 	/* Initialize the rest of the filer... */
-	
+
 	pixmaps_init();
 
 	dnd_init();
@@ -508,7 +507,7 @@ int main(int argc, char **argv)
 	/* Set up session managament if available */
 	session_init(client_id);
 	g_free(client_id);
-		
+
 	/* Finally, execute the request */
 	reply = run_soap(rpc);
 	xmlFreeDoc(rpc);

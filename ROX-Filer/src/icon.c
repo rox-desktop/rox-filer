@@ -153,10 +153,13 @@ void icons_may_update(const gchar *path)
 {
 	GList	*affected;
 
-	affected = g_hash_table_lookup(icons_hash, path);
+	if (icons_hash)
+	{
+		affected = g_hash_table_lookup(icons_hash, path);
 
-	for (; affected; affected = affected->next)
-		icon_may_update((Icon *) affected->data);
+		for (; affected; affected = affected->next)
+			icon_may_update((Icon *) affected->data);
+	}
 }
 
 typedef struct _CheckData CheckData;
@@ -183,6 +186,9 @@ static void check_has(gpointer key, GList *icons, CheckData *check)
 gboolean icons_require(const gchar *path)
 {
 	CheckData	check;
+
+	if (!icons_hash)
+		return FALSE;
 
 	check.path = path;
 	check.found = FALSE;
