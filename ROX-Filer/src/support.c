@@ -827,7 +827,7 @@ struct _MD5Context {
 };
 
 #if G_BYTE_ORDER == G_BIG_ENDIAN
-void byteSwap(guint32 *buf, unsigned words)
+static void byteSwap(guint32 *buf, unsigned words)
 {
 	md5byte *p = (md5byte *)buf;
 
