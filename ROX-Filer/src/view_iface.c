@@ -182,7 +182,9 @@ void view_get_iter(ViewIface *obj, ViewIter *iter, int flags)
 	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter);
 }
 
-/* Position cursor on the last item returned by iter.next() */
+/* Position cursor on the last item returned by iter.next().
+ * If iter is NULL, remove the cursor.
+ */
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));

@@ -1563,9 +1563,9 @@ static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 	
-	g_return_if_fail(iter->collection == collection);
+	g_return_if_fail(iter == NULL || iter->collection == collection);
 
-	collection_set_cursor_item(collection, iter->i);
+	collection_set_cursor_item(collection, iter ? iter->i : -1);
 }
 
 static void drag_end(GtkWidget *widget,

@@ -38,7 +38,6 @@
 #include "global.h"
 
 #include "view_iface.h"
-#include "collection.h"
 #include "dnd.h"
 #include "type.h"
 #include "filer.h"
@@ -1065,7 +1064,7 @@ static gboolean spring_now(gpointer data)
 	o_unique_filer_windows.int_value = FALSE;	/* XXX: yuck! */
 	if (spring_window)
 	{
-		collection_set_cursor_item(spring_window->collection, -1);
+		view_cursor_to_iter(spring_window->view, NULL);
 		filer_change_to(spring_window, dest_path, NULL);
 		/* DON'T move the window. Gtk+ sometimes doesn't
 		 * notice :-(
