@@ -224,69 +224,52 @@ void show_condition_help(gpointer data)
 
 static void show_chmod_help(gpointer data)
 {
-	static GtkWidget *help = NULL;
+	GtkWidget *help;
+	GtkWidget *text;
 
-	if (!help)
-	{
-		GtkWidget *text, *vbox, *button, *hbox, *sep;
-		
-		help = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_type_hint(GTK_WINDOW(help),
-				    GDK_WINDOW_TYPE_HINT_DIALOG);
-		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
-		gtk_window_set_title(GTK_WINDOW(help),
-				_("Permissions command reference"));
+	help = gtk_dialog_new_with_buttons(
+			_("Find expression reference"),
+			NULL, 0,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL,
+			NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(help), GTK_RESPONSE_CANCEL);
 
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_container_add(GTK_CONTAINER(help), vbox);
+	text = gtk_label_new(NULL);
+	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(help)->vbox), text);
+	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
+	gtk_label_set_markup(GTK_LABEL(text), _(
+"Normally, you can just select a command from the menu (click \n"
+"on the arrow beside the command box). Sometimes, you need more...\n"
+"\n"
+"The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
+"Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which "
+"determines whether to\n"
+"change the permissions for the User (owner), Group or Others.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set "
+"exactly the permissions.\n"
+"<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
+"\n"
+"Bracketed text and spaces are ignored.\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>u+rw</b>: the file owner gains read and write permission\n"
+"<b>g=u</b>: the group permissions are set to be the same as the user's\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without "
+"write permission\n"
+"<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
+"<b>a+X</b>: directories become accessable by everyone; files which were\n"
+"executable by anyone become executable by everyone\n"
+"<b>u+rw, go+r</b>: two commands at once!\n"
+"<b>u+s</b>: set the SetUID bit - often has no effect on script files\n"
+"<b>755</b>: set the permissions directly\n"
+"\n"
+"See the chmod(1) man page for full details."));
 
-		text = gtk_label_new(
-	_("Normally, you can just select a command from the menu (click \n"
-	"on the arrow beside the command box). Sometimes, you need more...\n"
-	"\n"
-	"The format of a command is:\n"
-	"CHANGE, CHANGE, ...\n"
-	"Each CHANGE is:\n"
-	"WHO HOW PERMISSIONS\n"
-	"WHO is some combination of u, g and o which determines whether to\n"
-	"change the permissions for the User (owner), Group or Others.\n"
-	"HOW is +, - or = to add, remove or set exactly the permissions.\n"
-	"PERMISSIONS is some combination of the letters 'rwxXstugo'\n\n"
+	g_signal_connect(help, "response",
+			G_CALLBACK(gtk_widget_destroy), NULL);
 
-	"Bracketed text and spaces are ignored.\n\n"
-
-	"Examples:\n"
-	"u+rw 	(the file owner gains read and write permission)\n"
-	"g=u	(the group permissions are set to be the same as the user's)\n"
-	"o=u-w	(others get the same permissions as the owner, but without "
-	"write permission)\n"
-	"a+x	(everyone gets execute/access permission - same as 'ugo+x')\n"
-	"a+X	(directories become accessable by everyone; files which were\n"
-	"executable by anyone become executable by everyone)\n"
-	"u+rw, go+r	(two commands at once!)\n"
-	"u+s	(set the SetUID bit - often has no effect on script files)\n"
-	"755	(set the permissions directly)\n"
-	
-	"\nSee the chmod(1) man page for full details."));
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
-
-		hbox = gtk_hbox_new(FALSE, 20);
-		gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-		sep = gtk_hseparator_new();
-		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
-		button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
-		g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(gtk_widget_hide), help);
-
-		g_signal_connect_swapped(help, "delete_event",
-			G_CALLBACK(gtk_widget_hide), help);
-	}
-
-	if (GTK_WIDGET_VISIBLE(help))
-		gtk_widget_hide(help);
 	gtk_widget_show_all(help);
 }
 
