@@ -3985,6 +3985,14 @@ Display options
  If this is off then `Zoo' comes before `animal', for example.
 \layout Itemize
 
+`Ignore eXecutable bit for known extensions' means that when a file has
+ a known extension (eg `.gif') the executable bit is ignored.
+ This is useful if you have files on a Windows-type filesystem which are
+ being shown as executable programs.
+ However, it prevents a file such as `script.sh' from being treated as a
+ program.
+\layout Itemize
+
 `Directories always come first' means that all directories are sorted and
  displayed at the top, then all the other items are sorted and displayed
  below.

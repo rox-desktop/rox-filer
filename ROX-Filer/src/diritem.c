@@ -41,6 +41,13 @@
 #include "pixmaps.h"
 #include "type.h"
 #include "usericons.h"
+#include "options.h"
+
+static gboolean o_ignore_exec = FALSE;
+
+/* Static prototypes */
+static void set_ignore_exec(guchar *new);
+
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -48,6 +55,8 @@
 
 void diritem_init(void)
 {
+	option_add_int("display_ignore_exec", o_ignore_exec, set_ignore_exec);
+
 	read_globicons();
 }
 
@@ -196,9 +205,13 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		{
 			/* Note that the flag is set for ALL executable
 			 * files, but the mime_type is only special_exec
-			 * if the file doesn't have a known extension.
+			 * if the file doesn't have a known extension when
+			 * that option is in force.
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
+
+			if (!o_ignore_exec)
+				item->mime_type = &special_exec;
 		}
 
 		if (!item->mime_type)
@@ -257,3 +270,7 @@ void diritem_clear(DirItem *item)
 	g_free(item->leafname);
 }
 
+static void set_ignore_exec(guchar *new)
+{
+	o_ignore_exec = atoi(new);
+}
