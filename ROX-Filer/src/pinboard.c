@@ -57,6 +57,11 @@
 /* The size of the border around the icon which is used when winking */
 #define WINK_FRAME 2
 
+/* Grid sizes */
+#define GRID_STEP_FINE   2
+#define GRID_STEP_MED    16
+#define GRID_STEP_COARSE 32
+
 /* Used for the text colours (only) in the icons */
 GdkColor text_fg_col, text_bg_col;
 
@@ -103,6 +108,8 @@ static void set_options();
 static void save_options();
 static char *text_bg(char *data);
 static char *text_colours(char *data);
+static char *clamp_icons(char *data);
+static char *grid_step(char *data);
 
 static OptionsSection options =
 {
@@ -115,6 +122,8 @@ static OptionsSection options =
 
 typedef enum {TEXT_BG_SOLID, TEXT_BG_OUTLINE, TEXT_BG_NONE} TextBgType;
 TextBgType o_text_bg = TEXT_BG_SOLID;
+gboolean o_clamp_icons = TRUE;
+static int o_grid_step = GRID_STEP_COARSE;
 
 /* Static prototypes */
 static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight);
@@ -150,6 +159,9 @@ static void snap_to_grid(int *x, int *y);
 static void offset_from_centre(Icon *icon,
 			       int width, int height,
 			       int *x, int *y);
+static void offset_to_centre(Icon *icon,
+			     int width, int height,
+			     int *x, int *y);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -214,6 +226,8 @@ void pinboard_init(void)
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("pinboard_text_bg", text_bg);
 	option_register("pinboard_text_colours", text_colours);
+	option_register("pinboard_clamp_icons", clamp_icons);
+	option_register("pinboard_grid_step", grid_step);
 
 	style = gtk_widget_get_default_style();
 
@@ -347,6 +361,11 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 	gtk_widget_set_uposition(icon->win, x, y);
+	/* Set the correct position in the icon */
+	offset_to_centre(icon, width, height, &x, &y);
+	icon->x = x;
+	icon->y = y;
+	
 	make_panel_window(icon->win->window);
 
 	gtk_widget_add_events(icon->widget,
@@ -1053,6 +1072,11 @@ static gint icon_motion_notify(GtkWidget *widget,
 
 	gdk_window_move(icon->win->window, x, y);
 
+	/* Store the fixed position for the center of the icon */
+	offset_to_centre(icon, width, height, &x, &y);
+	icon->x = x;
+	icon->y = y;
+
 	pinboard_modified = TRUE;
 
 	return TRUE;
@@ -1336,12 +1360,10 @@ static void icon_destroyed(GtkWidget *widget, Icon *icon)
 			g_list_remove(current_pinboard->icons, icon);
 }
 
-#define GRID_STEP 32
-
 static void snap_to_grid(int *x, int *y)
 {
-	*x = ((*x + GRID_STEP / 2) / GRID_STEP) * GRID_STEP;
-	*y = ((*y + GRID_STEP / 2) / GRID_STEP) * GRID_STEP;
+	*x = ((*x + o_grid_step / 2) / o_grid_step) * o_grid_step;
+	*y = ((*y + o_grid_step / 2) / o_grid_step) * o_grid_step;
 }
 
 /* Convert (x,y) from a centre point to a window position */
@@ -1351,8 +1373,17 @@ static void offset_from_centre(Icon *icon,
 {
 	*x -= width >> 1;
 	*y -= height - (icon->widget->style->font->descent >> 1);
-	*x = CLAMP(*x, 0, screen_width - width);
-	*y = CLAMP(*y, 0, screen_height - height);
+	*x = CLAMP(*x, 0, screen_width - (o_clamp_icons ? width : 0));
+	*y = CLAMP(*y, 0, screen_height - (o_clamp_icons ? height : 0));
+}
+
+/* Convert (x,y) from a window position to a centre point */
+static void offset_to_centre(Icon *icon,
+			     int width, int height,
+			     int *x, int *y)
+{
+  *x += width >> 1;
+  *y += height - (icon->widget->style->font->descent >> 1);
 }
 
 /* Same as drag_set_dest(), but for pinboard icons */
@@ -1548,14 +1579,18 @@ static void drag_end(GtkWidget *widget,
 static GtkToggleButton *radio_bg_none;
 static GtkToggleButton *radio_bg_outline;
 static GtkToggleButton *radio_bg_solid;
+static GtkToggleButton *radio_grid_fine;
+static GtkToggleButton *radio_grid_med;
+static GtkToggleButton *radio_grid_coarse;
 static GtkWidget *fg_colour_square, *bg_colour_square;
+static GtkWidget	*toggle_clamp_icons;
 
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
  */
 static GtkWidget *create_options(void)
 {
-	GtkWidget	*vbox, *tog, *hbox, *label;
+	GtkWidget	*vbox, *tog, *hbox, *label, *tog2;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -1598,6 +1633,42 @@ static GtkWidget *create_options(void)
 	make_colour_patch(bg_colour_square);
 	gtk_box_pack_start(GTK_BOX(hbox), bg_colour_square, FALSE, FALSE, 0);
 
+	toggle_clamp_icons =
+	  gtk_check_button_new_with_label(
+	     _("Keep icons within screen limits"));
+	OPTION_TIP(toggle_clamp_icons,
+		   _("If this is set, pinboard icons are always kept "
+		     "completely within screen limits, including the label."));
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_clamp_icons, FALSE, TRUE, 0);
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	gtk_box_pack_start(GTK_BOX(hbox),
+			   gtk_label_new(_("Icon grid step: ")),
+			   FALSE, FALSE, 0);
+	tog2 = gtk_radio_button_new_with_label(NULL, _("Fine"));
+	radio_grid_fine = GTK_TOGGLE_BUTTON(tog2);
+	OPTION_TIP(tog2, _("Use a 2-pixel grid for positioning icons"
+			   "on the desktop."));
+	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
+
+	tog2 = gtk_radio_button_new_with_label(
+			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
+			_("Medium"));
+	radio_grid_med = GTK_TOGGLE_BUTTON(tog2);
+	OPTION_TIP(tog2, _("Use a 16-pixel grid for positioning icons"
+			   "on the desktop."));
+	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
+
+	tog2 = gtk_radio_button_new_with_label(
+			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
+			_("Coarse"));
+	radio_grid_coarse = GTK_TOGGLE_BUTTON(tog2);
+	OPTION_TIP(tog2, _("Use a 32-pixel grid for positioning icons"
+			   "on the desktop."));
+	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
+
 	return vbox;
 }
 
@@ -1611,8 +1682,18 @@ static void update_options()
 	else
 		gtk_toggle_button_set_active(radio_bg_none, TRUE);
 
+	if (o_grid_step == GRID_STEP_FINE)
+	    gtk_toggle_button_set_active(radio_grid_fine, TRUE);
+	else if (o_grid_step == GRID_STEP_MED)
+	    gtk_toggle_button_set_active(radio_grid_med, TRUE);
+	else
+	    gtk_toggle_button_set_active(radio_grid_coarse, TRUE);
+	    
 	button_patch_set_colour(fg_colour_square, &text_fg_col);
 	button_patch_set_colour(bg_colour_square, &text_bg_col);
+
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_clamp_icons),
+				     o_clamp_icons);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
@@ -1628,6 +1709,13 @@ static void set_options()
 		o_text_bg = TEXT_BG_OUTLINE;
 	else
 		o_text_bg = TEXT_BG_SOLID;
+
+	if (gtk_toggle_button_get_active(radio_grid_fine))
+	    o_grid_step = GRID_STEP_FINE;
+	else if (gtk_toggle_button_get_active(radio_grid_med))
+	    o_grid_step = GRID_STEP_MED;
+	else
+	    o_grid_step = GRID_STEP_COARSE;
 
 	fg = button_patch_get_colour(fg_colour_square);
 	bg = button_patch_get_colour(bg_colour_square);
@@ -1654,6 +1742,9 @@ static void set_options()
 
 	if ((colours_changed || o_text_bg != old) && current_pinboard)
 		reshape_all();
+
+	o_clamp_icons = gtk_toggle_button_get_active(
+			  GTK_TOGGLE_BUTTON(toggle_clamp_icons));
 }
 
 static void save_options()
@@ -1673,6 +1764,11 @@ static void save_options()
 			text_bg_col.green,
 			text_bg_col.blue);
 	option_write("pinboard_text_colours", str);
+	option_write("pinboard_clamp_icons", o_clamp_icons ? "1" : "0");
+	option_write("pinboard_grid_step",
+		     o_grid_step == GRID_STEP_FINE ? "Fine" :
+		     o_grid_step == GRID_STEP_MED  ? "Medium" :
+		     "Coarse");
 	g_free(str);
 }
 
@@ -1699,6 +1795,20 @@ static char *text_bg(char *data)
 		o_text_bg = TEXT_BG_SOLID;
 	else
 		return _("Unknown pinboard text background type");
+
+	return NULL;
+}
+
+static char *grid_step(char *data)
+{
+	if (g_strcasecmp(data, "Fine") == 0)
+		o_grid_step = GRID_STEP_FINE;
+	else if (g_strcasecmp(data, "Medium") == 0)
+		o_grid_step = GRID_STEP_MED;
+	else if (g_strcasecmp(data, "Coarse") == 0)
+		o_grid_step = GRID_STEP_COARSE;
+	else
+		return _("Unknown grid step size");
 
 	return NULL;
 }
@@ -1821,4 +1931,10 @@ static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 			_("First, select a single item to edit"));
 		return;
 	}
+}
+
+static char *clamp_icons(char *data)
+{
+  o_clamp_icons = atoi(data) != 0;
+  return NULL;
 }
