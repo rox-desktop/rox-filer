@@ -278,8 +278,6 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 
 	g_strfreev(bits);
 
-	g_print("[ save to '%s' ]\n", to->str);
-
 	gdk_pixbuf_save(image->huge_pixbuf,
 			to->str,
 			"png",
@@ -312,8 +310,6 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 	thumb_path = g_strdup_printf("%s/.thumbnails/96x96/%s.png",
 					home_dir, path);
 
-	g_print("[ looking for thumbnail in %s ]\n", thumb_path);
-
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
 	if (!thumb)
 		goto out;
@@ -328,17 +324,12 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 	if (mc_stat(path, &info) != 0)
 		goto out;
 
-	g_print("[ comparing... ]\n");
-
 	if (info.st_mtime != atol(smtime) || info.st_size != atol(ssize))
 	{
 		gdk_pixbuf_unref(thumb);
-		g_print("[ changed ]\n");
 		thumb = NULL;
 		goto out;
 	}
-
-	g_print("[ using thumb ]\n");
 out:
 	g_free(path);
 	g_free(thumb_path);
