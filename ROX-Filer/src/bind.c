@@ -167,7 +167,7 @@ static GtkWidget *create_options(void)
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
 
 	toggle_single_click =
-		gtk_check_button_new_with_label(_("Single-click nagivation"));
+		gtk_check_button_new_with_label(_("Single-click navigation"));
 	OPTION_TIP(toggle_single_click,
 			_("Clicking on an item opens it with this on. Hold "
 			"down Control to select the item instead. If off, "

@@ -218,18 +218,32 @@ char *basetype_name(DirItem *item)
  */
 MIME_type *type_from_path(char *path)
 {
-	char	*dot;
+	char	*ext, *dot, *lower;
 
-	while ((dot = strchr(path, '.')))
+	ext = strrchr(path, '/');
+	if (!ext)
+		ext = path;
+	else
+		ext++;
+
+	while ((dot = strchr(ext, '.')))
 	{
 		MIME_type *type;
 
-		type = g_hash_table_lookup(extension_hash, dot + 1);
+		ext = dot + 1;
+
+		type = g_hash_table_lookup(extension_hash, ext);
 
 		if (type)
 			return type;
 
-		path = dot + 1;
+		lower = g_strdup(ext);
+		g_strdown(lower);
+		type = g_hash_table_lookup(extension_hash, lower);
+		g_free(lower);
+
+		if (type)
+			return type;
 	}
 
 	return &text_plain;

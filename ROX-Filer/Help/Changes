@@ -2,6 +2,16 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+20-Nov-2000
+~~~~~~~~~~~
+If a case-sensitve match for an extension can't be found then try a
+case-insensitive match - so .BMP and similar work (Denis Manente).
+
+17-Nov-2000
+~~~~~~~~~~~
+A few changes to remove some compiler warnings (reported by Vincent Lefevre).
+Added a VFS menu entry for .deb files (Vincent Ledda).
+
 11-Nov-2000
 ~~~~~~~~~~~
 Mounting or unmounting a directory forces mtab to be reread, even if the

@@ -110,6 +110,7 @@ static void find(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_rpm(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_utar(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_uzip(gpointer data, guint action, GtkWidget *widget);
+static void open_vfs_deb(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -194,6 +195,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
 {">>" N_("Unzip"),		NULL, open_vfs_uzip, 0, NULL},
 {">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
+{">>" N_("Deb"),              	NULL, open_vfs_deb, 0, NULL},
 {">>" N_("RPM"),		NULL, open_vfs_rpm, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Delete"),	    	NULL, delete, 0,	NULL},
@@ -1278,6 +1280,7 @@ static void real_vfs_open(char *fs)
 OPEN_VFS(rpm)
 OPEN_VFS(utar)
 OPEN_VFS(uzip)
+OPEN_VFS(deb)
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)
 {

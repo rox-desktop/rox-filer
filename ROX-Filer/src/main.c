@@ -162,7 +162,7 @@ static void child_died(int signum)
 static void child_died_callback(void)
 {
 	int	    	status;
-	int	    	child;
+	gint	    	child;
 
 	child_died_flag = FALSE;
 
@@ -176,11 +176,13 @@ static void child_died_callback(void)
 		if (child == 0 || child == -1)
 			return;
 
-		cb = g_hash_table_lookup(death_callbacks, (gpointer) child);
+		cb = g_hash_table_lookup(death_callbacks,
+				GINT_TO_POINTER(child));
 		if (cb)
 		{
 			cb->callback(cb->data);
-			g_hash_table_remove(death_callbacks, (gpointer) child);
+			g_hash_table_remove(death_callbacks,
+					GINT_TO_POINTER(child));
 		}
 
 	} while (1);
@@ -466,7 +468,7 @@ static void show_features(void)
 }
 
 /* Register a function to be called when process number 'child' dies. */
-void on_child_death(int child, CallbackFn callback, gpointer data)
+void on_child_death(gint child, CallbackFn callback, gpointer data)
 {
 	Callback	*cb;
 
@@ -477,5 +479,5 @@ void on_child_death(int child, CallbackFn callback, gpointer data)
 	cb->callback = callback;
 	cb->data = data;
 
-	g_hash_table_insert(death_callbacks, (gpointer) child, cb);
+	g_hash_table_insert(death_callbacks, GINT_TO_POINTER(child), cb);
 }

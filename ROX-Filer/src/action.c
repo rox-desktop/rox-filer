@@ -240,7 +240,7 @@ static char *action_auto_quiet(char *data)
 {
 	while (*data)
 	{
-		char	c = *data++;
+		guchar	c = *data++;
 		gboolean state;
 
 		state = isupper(c);

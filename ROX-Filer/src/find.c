@@ -764,7 +764,7 @@ out:
 static long get_constant(Eval *eval, FindInfo *info)
 {
 	long	value = *((long *) (eval->data1));
-	int	flags = (int) (eval->data2);
+	gint	flags = GPOINTER_TO_INT(eval->data2);
 
 	if (flags & FLAG_AGO)
 		value = info->now - value;
@@ -820,7 +820,7 @@ static Eval *parse_eval(guchar **expression)
 	char	*start, *end;
 	long	value;
 	Eval	*eval;
-	int	flags = 0;
+	gint	flags = 0;
 	
 	SKIP;
 	start = *expression;
@@ -873,7 +873,7 @@ static Eval *parse_eval(guchar **expression)
 	else if (MATCH(_("Hence")))
 		flags |= FLAG_HENCE;
 
-	eval->data2 = (gpointer) flags;
+	eval->data2 = GINT_TO_POINTER(flags);
 
 	return eval;
 }

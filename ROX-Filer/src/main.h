@@ -33,6 +33,6 @@ extern char *home_dir, *app_dir;
 
 /* Prototypes */
 int main(int argc, char **argv);
-void on_child_death(int child, CallbackFn callback, gpointer data);
+void on_child_death(gint child, CallbackFn callback, gpointer data);
 
 #endif /* _MAIN_H */
