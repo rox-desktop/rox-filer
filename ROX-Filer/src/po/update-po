@@ -4,7 +4,7 @@ echo Extracting messages from source files...
 echo
 
 (cd ..; python po/tips.py;
- xgettext --keyword=_ --keyword=N_ --output=$@ *.c tips)
+ xgettext --keyword=_ --keyword=N_ --output=messages.pot *.c tips)
 
 echo
 echo Updating all .po files...
