@@ -267,9 +267,9 @@ gboolean run_by_path(guchar *full_path)
 	DirItem	item;
 
 	/* XXX: Loads an image - wasteful */
-	dir_stat(full_path, &item, FALSE);
+	diritem_stat(full_path, &item, FALSE);
 	retval = run_diritem(full_path, &item, NULL, FALSE);
-	dir_item_clear(&item);
+	diritem_clear(&item);
 	
 	return retval;
 }

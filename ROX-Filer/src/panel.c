@@ -402,7 +402,7 @@ static void panel_add_item(Panel *panel,
 	
 	icon->widget = widget;
 	icon->selected = FALSE;
-	dir_stat(icon->path, &icon->item, FALSE);
+	diritem_stat(icon->path, &icon->item, FALSE);
 
 	if (name)
 		icon->item.leafname = g_strdup(name);

@@ -255,7 +255,7 @@ void icon_may_update(Icon *icon)
 
 	pixmap_ref(image);
 	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item, FALSE);
+	diritem_restat(icon->path, &icon->item, FALSE);
 
 	if (icon->item.image != image || icon->item.flags != flags)
 	{
@@ -548,7 +548,7 @@ void icon_destroyed(Icon *icon)
 				g_list_remove(current_pinboard->icons, icon);
 	}
 	
-	dir_item_clear(&icon->item);
+	diritem_clear(&icon->item);
 	g_free(icon->path);
 	g_free(icon->src_path);
 	g_free(icon);
@@ -618,7 +618,7 @@ static void rename_activate(GtkWidget *dialog)
 		
 		icon->item.leafname = g_strdup(new_name);
 		icon->item.name_width = gdk_string_width(font, new_name);
-		dir_restat(icon->path, &icon->item, FALSE);
+		diritem_restat(icon->path, &icon->item, FALSE);
 
 		callback(icon);
 		gtk_widget_destroy(dialog);

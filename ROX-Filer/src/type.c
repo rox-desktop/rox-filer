@@ -505,7 +505,7 @@ void drag_app_dropped(GtkWidget		*frame,
 		return;
 	}
 
-	dir_stat(app, &item, FALSE);
+	diritem_stat(app, &item, FALSE);
 	if (item.flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		guchar	*path;
@@ -528,7 +528,7 @@ void drag_app_dropped(GtkWidget		*frame,
 			_("This is not a program! Give me an application "
 			"instead!"));
 
-	dir_item_clear(&item);
+	diritem_clear(&item);
 }
 
 /* Find the current command which is used to run files of this type.

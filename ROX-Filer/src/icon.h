@@ -15,6 +15,7 @@
 #endif
 
 #include "dir.h"
+#include "diritem.h"
 
 extern GList *icon_selection;
 extern gboolean tmp_icon_selected;

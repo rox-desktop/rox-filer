@@ -144,7 +144,7 @@ static GtkWidget *make_vbox(guchar *path)
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
-	dir_stat(path, &item, FALSE);
+	diritem_stat(path, &item, FALSE);
 	item.leafname = strrchr(path, '/') + 1;
 
 	vbox = gtk_vbox_new(FALSE, 4);
@@ -166,7 +166,7 @@ static GtkWidget *make_vbox(guchar *path)
 		appinfo_unref(ai);
 
 	item.leafname = NULL;
-	dir_item_clear(&item);
+	diritem_clear(&item);
 
 	return vbox;
 }

@@ -278,7 +278,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 
 	icon_hash_path(icon);
 
-	dir_stat(icon->path, &icon->item, FALSE);
+	diritem_stat(icon->path, &icon->item, FALSE);
 
 	if (!name)
 	{
