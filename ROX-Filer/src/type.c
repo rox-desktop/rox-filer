@@ -195,6 +195,8 @@ gboolean type_open(char *path, MIME_type *type)
 	char	*argv[] = {NULL, NULL, NULL};
 	char	*open;
 	char	*type_name;
+	gboolean	retval = TRUE;
+	struct stat	info;
 
 	argv[1] = path;
 
@@ -209,15 +211,28 @@ gboolean type_open(char *path, MIME_type *type)
 			return FALSE;
 	}
 
-	argv[0] = g_strconcat(open, "/AppRun", NULL);
+	if (stat(open, &info))
+	{
+		report_error("ROX-Filer", g_strerror(errno));
+		return FALSE;
+	}
+
+	if (S_ISDIR(info.st_mode))
+		argv[0] = g_strconcat(open, "/AppRun", NULL);
+	else
+		argv[0] = open;
 
 	if (!spawn_full(argv, getenv("HOME"), 0))
+	{
 		report_error("ROX-Filer",
 				"Failed to fork() child process");
+		retval = FALSE;
+	}
 
-	g_free(argv[0]);
+	if (argv[0] != open)
+		g_free(argv[0]);
 	
-	return TRUE;
+	return retval;
 }
 
 /* Return the image for this type, loading it if needed.
