@@ -505,7 +505,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 /* No items are now selected. This might be because another app claimed
  * the selection or because the user unselected all the items.
  */
-void filer_lost_selection(FilerWindow *filer_window, gint time)
+void filer_lost_selection(FilerWindow *filer_window, guint time)
 {
 	if (window_with_primary == filer_window)
 	{
@@ -515,8 +515,12 @@ void filer_lost_selection(FilerWindow *filer_window, gint time)
 }
 
 /* Another app has claimed the primary selection */
-void filer_lost_primary(FilerWindow *filer_window)
+static void filer_lost_primary(GtkWidget *window,
+		        GdkEventSelection *event,
+		        gpointer user_data)
 {
+	FilerWindow *filer_window = (FilerWindow *) user_data;
+	
 	if (window_with_primary && window_with_primary == filer_window)
 	{
 		window_with_primary = NULL;
@@ -532,11 +536,9 @@ static void selection_get(GtkWidget *widget,
 		       gpointer   data)
 {
 	GString	*reply, *header;
-	FilerWindow 	*filer_window;
+	FilerWindow 	*filer_window = (FilerWindow *) data;
 	ViewIter	iter;
 	DirItem		*item;
-
-	filer_window = g_object_get_data(G_OBJECT(widget), "filer_window");
 
 	reply = g_string_new(NULL);
 	header = g_string_new(NULL);
@@ -575,11 +577,12 @@ static void selection_get(GtkWidget *widget,
 	g_string_free(header, TRUE);
 }
 
+/* Selection has been changed -- try to grab the primary selection
+ * if we don't have it. Also called when clicking on an insensitive selection
+ * to regain primary.
+ */
 void filer_selection_changed(FilerWindow *filer_window, gint time)
 {
-	/* Selection has been changed -- try to grab the primary selection
-	 * if we don't have it.
-	 */
 	if (window_with_primary == filer_window)
 		return;		/* Already got it */
 
@@ -587,7 +590,7 @@ void filer_selection_changed(FilerWindow *filer_window, gint time)
 		return;		/* Nothing selected */
 
 	if (filer_window->temp_item_selected == FALSE &&
-		gtk_selection_owner_set(GTK_WIDGET(filer_window->collection),
+		gtk_selection_owner_set(GTK_WIDGET(filer_window->window),
 				GDK_SELECTION_PRIMARY,
 				time))
 	{
@@ -1362,15 +1365,19 @@ static void filer_add_signals(FilerWindow *filer_window)
 	g_signal_connect(filer_window->window, "destroy",
 			G_CALLBACK(filer_window_destroyed), filer_window);
 
+	g_signal_connect(filer_window->window, "selection_clear_event",
+			G_CALLBACK(filer_lost_primary), filer_window);
+
 	/* Events on the collection widget */
 	gtk_widget_set_events(GTK_WIDGET(collection),
 			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-	g_signal_connect(collection, "selection_get",
-			G_CALLBACK(selection_get), NULL);
-	gtk_selection_add_targets(GTK_WIDGET(collection), GDK_SELECTION_PRIMARY,
+	g_signal_connect(filer_window->window, "selection_get",
+			G_CALLBACK(selection_get), filer_window);
+	gtk_selection_add_targets(GTK_WIDGET(filer_window->window),
+			GDK_SELECTION_PRIMARY,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 

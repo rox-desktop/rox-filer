@@ -134,20 +134,17 @@ static void size_allocate(GtkWidget *w, GtkAllocation *a, gpointer data);
 static void create_uri_list(FilerWindow *filer_window, GString *string);
 static void perform_action(ViewCollection *view_collection,
 			   GdkEventButton *event);
-static gint collection_lost_primary(GtkWidget *widget,
-				      GdkEventSelection *event,
-				      gpointer user_data);
 static void style_set(Collection 	*collection,
 		      GtkStyle		*style,
 		      ViewCollection	*view_collection);
-static void lost_selection(Collection 	*collection,
-			   guint	time,
-			   gpointer 	user_data);
+static void display_free_colitem(Collection *collection,
+				 CollectionItem *colitem);
+static void lost_selection(Collection  *collection,
+			   guint        time,
+			   gpointer     user_data);
 static void selection_changed(Collection *collection,
 			      gint time,
 			      gpointer user_data);
-static void display_free_colitem(Collection *collection,
-				 CollectionItem *colitem);
 static void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		int *width, int *height);
 
@@ -262,12 +259,12 @@ static void view_collection_init(GTypeInstance *object, gpointer gclass)
 	g_signal_connect(collection, "style_set",
 			G_CALLBACK(style_set),
 			view_collection);
+
 	g_signal_connect(collection, "lose_selection",
 			G_CALLBACK(lost_selection), view_collection);
 	g_signal_connect(collection, "selection_changed",
 			G_CALLBACK(selection_changed), view_collection);
-	g_signal_connect(collection, "selection_clear_event",
-			G_CALLBACK(collection_lost_primary), view_collection);
+
 	g_signal_connect(collection, "button-release-event",
 			G_CALLBACK(coll_button_release), view_collection);
 	g_signal_connect(collection, "button-press-event",
@@ -1125,22 +1122,10 @@ static void perform_action(ViewCollection *view_collection,
 	}
 }
 
-/* Another app took the selection - shade everything */
-static gint collection_lost_primary(GtkWidget *widget,
-				      GdkEventSelection *event,
-				      gpointer user_data)
-{
-	ViewCollection *view_collection = VIEW_COLLECTION(user_data);
-
-	filer_lost_primary(view_collection->filer_window);
-
-	return FALSE;
-}
-
 /* Nothing is selected anymore - give up primary */
-static void lost_selection(Collection 	*collection,
-			   guint	time,
-			   gpointer 	user_data)
+static void lost_selection(Collection  *collection,
+			   guint        time,
+			   gpointer     user_data)
 {
 	ViewCollection *view_collection = VIEW_COLLECTION(user_data);
 
