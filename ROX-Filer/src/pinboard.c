@@ -1841,8 +1841,7 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 		sent = write(pinboard->to_backdrop_app, ok, strlen(ok));
 		if (sent <= 0)
 		{
-			g_warning("command_from_backdrop_app: %s\n",
-					g_strerror(errno));
+			/* Remote app quit? Not an error. */
 			abandon_backdrop_app(pinboard);
 			return;
 		}

@@ -737,42 +737,14 @@ void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 	if (override_redirect && lower)
 	{
 		XWindowChanges restack;
-		Window root, parent, w;
-		Window *children;
-		int nchildren;
 
 		gdk_error_trap_push();
 		
 		restack.stack_mode = Above;
 
-		/* From gdk */
-		parent = GDK_WINDOW_XWINDOW(lower);
-		do 
-		{
-			w = parent;
+		restack.sibling = GDK_WINDOW_XWINDOW(lower);
 
-			XQueryTree(gdk_display, w,
-					&root, &parent, &children, &nchildren);
-			if (children)
-				XFree(children);
-		} 
-		while (parent != root);
-		
-		restack.sibling = w;
-
-		parent = GDK_WINDOW_XWINDOW(higher);
-		do 
-		{
-			w = parent;
-
-			XQueryTree(gdk_display, w,
-					&root, &parent, &children, &nchildren);
-			if (children)
-				XFree(children);
-		} 
-		while (parent != root);
-
-		XConfigureWindow(gdk_display, w,
+		XConfigureWindow(gdk_display, GDK_WINDOW_XWINDOW(higher),
 				CWSibling | CWStackMode, &restack);
 
 		gdk_flush();
