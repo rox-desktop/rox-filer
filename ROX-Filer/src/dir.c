@@ -466,6 +466,9 @@ static void remove_missing(Directory *dir, GPtrArray *keep)
 	 * hit the end of the new items. Thus, we can just forget the
 	 * remaining old items.
 	 */
+	for (; old < dir->items->len; old++)
+		g_ptr_array_add(deleted, dir->items->pdata[old]);
+	
 	g_ptr_array_set_size(dir->items, kept_items);
 
 	/* Tell everyone about the removals */
