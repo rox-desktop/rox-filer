@@ -3,7 +3,7 @@
 # Use AppRun --compile to create the build directory in the first place.
 
 all:
-	cd ~/build/ROX-Filer && make
+	cd $$HOME/build/ROX-Filer && make
 
 clean:
-	cd ~/build/ROX-Filer && make clean
+	cd $$HOME/build/ROX-Filer && make clean
