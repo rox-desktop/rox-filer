@@ -156,20 +156,15 @@ You should have received a copy of the GNU General Public License along
  59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
 \layout Section
 
-Instructions
+Compiling
 \layout Standard
 
 If you've just got hold of the filer by downloading the source archive then
  you'll need to compile it before you can use it.
  If you downloaded and installed a binary package, or if ROX-Filer was included
- with your system, then you should skip the `Compiling' section.
-\layout Subsection
-
-Compiling
-\layout Standard
-
-ROX-Filer is usually supplied in source-only form.
- To compile and run it, you will require:
+ with your system, then you can skip this section.
+ If you got here by clicking on the `i' symbol in a filer window, or if
+ typing `rox' at a shell prompt works, then you don't need to compile.
 \layout Itemize
 
 Unix or Linux (root access is not required),
@@ -307,7 +302,7 @@ $ setenv PATH ${HOME}/bin:${PATH}
 \layout LyX-Code
 
 $ rehash
-\layout Subsection
+\layout Section
 
 Invoking
 \layout Standard
@@ -351,7 +346,7 @@ Note that if the same version of the filer is already running on this machine
 --new
 \family default 
 ' option.
-\layout Subsubsection
+\layout Subsection
 
 
 \begin_inset LatexCommand \label{run_pin}
@@ -397,7 +392,10 @@ See section
 \end_inset 
 
  if you have trouble getting the icons to display correctly.
-\layout Subsubsection
+ The pinboard may also be turned on and off by locating `ROX-Filer' in a
+ filer window and choosing `Enable pinboard' or `Disable pinboard' from
+ the menu.
+\layout Subsection
 
 
 \begin_inset LatexCommand \label{run_pan}
@@ -455,7 +453,7 @@ $ rox --bottom=MyOtherPanel
 \layout LyX-Code
 
 $ rox --bottom=
-\layout Subsubsection
+\layout Subsection
 
 
 \begin_inset LatexCommand \label{winman}
@@ -499,7 +497,7 @@ If all else fails, try running rox with the `
 -no
 \family default 
 ' options; this overrides window manager control of the icons altogether.
-\layout Subsubsection
+\layout Subsection
 
 Running as root
 \layout Standard
@@ -539,7 +537,7 @@ xhost
 \family default 
 ' may give you some hints, but it varies between systems (which is why this
  isn't built in to the filer!).
-\layout Subsubsection
+\layout Subsection
 
 Full list of command-line options
 \layout Standard
@@ -562,6 +560,10 @@ The full list of options is:
 
 -l,\SpecialChar ~
 --left=PANEL open PANEL as a left-edge panel
+\layout Description
+
+-m,\SpecialChar ~
+--mime-type=FILE print MIME type of FILE and exit
 \layout Description
 
 -n,\SpecialChar ~
@@ -598,7 +600,7 @@ The full list of options is:
 
 -v,\SpecialChar ~
 --version display the version information and exit
-\layout Subsection
+\layout Section
 
 Mouse button and key bindings
 \layout Standard
@@ -645,7 +647,7 @@ medskip
 \layout Standard
 \LyXTable
 multicol5
-19 2 0 0 -1 -1 -1 -1
+20 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 1 0
@@ -657,6 +659,7 @@ multicol5
 0 1 0 0
 0 1 1 0
 0 1 0 0
+0 1 1 0
 0 1 1 0
 0 1 0 0
 0 1 0 0
@@ -687,6 +690,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -757,8 +762,12 @@ Select a group of items by dragging a box around them.
 
 \newline 
 in the box will be selected.
- If you hold down Ctrl or use the middle button then the boxed items are
- added to the selection.
+ If you hold down Ctrl then the boxed items are added to the selection.
+\newline 
+
+\newline 
+If you use the middle button then the boxed items switch between being selected
+ and unselected.
 \newline 
 Backspace
 \newline 
@@ -783,7 +792,8 @@ Acts like clicking on the file.
 \newline 
 Spacebar
 \newline 
-Toggles the item under the cursor between being selected and unselected.
+Toggles the item under the cursor between being selected and unselected,
+ and moves to the next item.
 \newline 
 Tab, Shift+Tab
 \newline 
@@ -802,7 +812,7 @@ Other keys can easily be defined by opening the menu, moving the pointer
  over the item you want to use and pressing a key.
  The key will appear in the menu and can be used from then on.
  Key bindings are automatically saved when the filer quits.
-\layout Subsection
+\layout Section
 
 The selection
 \layout Standard
@@ -823,7 +833,7 @@ Ctrl-click on the file in ROX-Filer to select it.
 
 Click the middle button in the filename box in the application to paste
  the name in.
-\layout Subsection
+\layout Section
 
 
 \begin_inset LatexCommand \label{sec: Toolbar}
@@ -958,7 +968,7 @@ If the 'New window on button 1' option is turned on then the default is
 
 Dragging files to the Up or Home icons acts just like dragging them into
  the directory which the button leads to.
-\layout Subsection
+\layout Section
 
 The menus
 \layout Standard
@@ -975,9 +985,10 @@ If the Use `RISC OS mouse bindings' option is on then use the middle button
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-6 2 0 0 -1 -1 -1 -1
+7 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -992,6 +1003,8 @@ multicol5
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1017,10 +1030,14 @@ New Directory...
 \newline 
 Create a new directory in this one.
 \newline 
+New File...
+\newline 
+Create an empty file.
+\newline 
 Xterm Here
 \newline 
 Open an xterm with its current directory set to this directory.
-\layout Subsubsection
+\layout Subsection
 
 The display menu
 \layout Standard
@@ -1323,7 +1340,7 @@ real group ID
 \emph toggle 
  have no effect (except that a process may set its real IDs to its effective
  IDs).
-\layout Subsubsection
+\layout Subsection
 
 The selection menu
 \layout Standard
@@ -1339,6 +1356,15 @@ All of these work in the same way --- if you open the menu with some items
  button to cancel target mode.
  Target mode is mainly useful with the `Single click navigation' option
  and keys bound to the various menu entries.
+\layout Standard
+
+Note that individual applications may add extra menu items to the top of
+ this submenu when you click over them --- see section 
+\begin_inset LatexCommand \ref{AppDir}
+
+\end_inset 
+
+ for details.
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
@@ -1527,15 +1553,16 @@ Search for files by specifying various conditions --- see section
 \end_inset 
 
 .
-\layout Subsubsection
+\layout Subsection
 
 The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-10 2 0 0 -1 -1 -1 -1
+11 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -1550,6 +1577,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1582,6 +1611,10 @@ As above, but reuse this window.
 New Window
 \newline 
 Open another window onto this directory.
+\newline 
+Home Directory
+\newline 
+Change to your home directory.
 \newline 
 Resize Window
 \newline 
@@ -1625,7 +1658,7 @@ Select just those files that match the given pattern
 Show ROX-Filer Help
 \newline 
 Same as selecting ROX-Filer and choosing `Help' from the menu.
-\layout Subsection
+\layout Section
 
 The pinboard and panels
 \layout Standard
@@ -1671,9 +1704,9 @@ not
  If you delete the file, then you've lost it! Removing a pinned file from
  its pinboard or panel only removes the link.
  This is different to most other filers...
-\layout Subsubsection
+\layout Subsection
 
-The panel and pinboard menus
+The pinboard and panel menus
 \layout Standard
 
 These menus are both the same, and very simple:
@@ -1752,7 +1785,69 @@ If you are setting up the defaults for multiple users and you wish to create
  a `Home' icon that leads to each user's home directory then you should
  first create a new icon and then use `Edit Icon' to change the location
  to `~' and the name to `Home'.
+\layout Standard
+
+Note that individual applications may add extra menu items to the top of
+ this submenu when you click over them --- see section 
+\begin_inset LatexCommand \ref{AppDir}
+
+\end_inset 
+
+ for details.
 \layout Subsection
+
+Panel applets
+\layout Standard
+
+ROX-Filer allows you to run small programs inside the panel --- such programs
+ are called 
+\emph on 
+applets
+\emph default 
+.
+ To run an applet, drag it onto the panel from a filer window and instead
+ of the applet's icon being shown, the applet will run.
+\layout Standard
+
+To create your own applets (programmers only!):
+\layout Enumerate
+
+Create a directory for the applet (eg `
+\family typewriter 
+MyApplet
+\family default 
+').
+\layout Enumerate
+
+Put an icon called `
+\family typewriter 
+.DirIcon.png
+\family default 
+' inside it (so the directory appears with an icon).
+\layout Enumerate
+
+Make a `
+\family typewriter 
+Help
+\family default 
+' directory inside it for when the user chooses `Help' from the menu.
+\layout Enumerate
+
+Create an executable file called `
+\family typewriter 
+AppletRun
+\family default 
+'.
+ This will be passed the XID of the panel socket window when the directory
+ is dragged onto the panel.
+ You can use this to create a GtkSocket widget.
+ An example applet (written in python) is available at:
+\begin_deeper 
+\layout LyX-Code
+
+http://rox.sourceforge.net/applets.php3
+\end_deeper 
+\layout Section
 
 
 \begin_inset LatexCommand \label{sec: vfs}
@@ -1823,7 +1918,7 @@ Note that using the `Open VFS' menu is simply a short-cut for using the
 noindent 
 \latex default 
 Don't forget the final slash!
-\layout Subsubsection
+\layout Subsection
 
 Step by step example of adding VFS support
 \layout Standard
@@ -1904,7 +1999,7 @@ checking for mc_stat in -lvfs...
 
 If you saw that line then it's worked! Well done!
 \end_deeper 
-\layout Subsection
+\layout Section
 
 
 \begin_inset LatexCommand \label{sec: mini}
@@ -1918,7 +2013,7 @@ The mini-buffer is a white bar that appears along the bottom of the window
  and allows you to enter some text.
  Press Escape to get rid of it again.
  It behaves in different ways depending on how you invoked it:
-\layout Subsubsection
+\layout Subsection
 
 The path-entry box
 \layout Standard
@@ -2015,7 +2110,7 @@ Tab{}
 '.
  As you type, the cursor will move to the correct subdirectory.
  If it beeps when you press Tab then you need to supply more letters.
-\layout Subsubsection
+\layout Subsection
 
 The shell command box
 \layout Standard
@@ -2117,7 +2212,7 @@ Commands execute in the background, so you can say:
 
 sleep 240; xmessage Time to go!
 \end_deeper 
-\layout Subsubsection
+\layout Subsection
 
 
 \begin_inset LatexCommand \label{sec: SelectIf}
@@ -2160,7 +2255,7 @@ Just those files over 5 Mb in size will be selected.
 prune
 \family default 
 ' has no effect since the contents of directories are never checked anyway.
-\layout Subsection
+\layout Section
 
 Action windows
 \layout Standard
@@ -2193,7 +2288,7 @@ Abort kills the current operation (if any) and closes the action window.
 
 You can control which actions get started automatically (without you having
  to click on Quiet at the start) from the Options window.
-\layout Subsubsection
+\layout Subsection
 
 Action window options
 \layout Standard
@@ -2216,7 +2311,7 @@ Some actions have options, which appear as option boxes at the bottom of
 `Recurse' means that doing something to a directory will also do the same
  thing to all its contents, and the contents of any subdirectories, and
  so on.
-\layout Subsection
+\layout Section
 
 
 \begin_inset LatexCommand \label{sec: Searching}
@@ -2260,7 +2355,7 @@ As the filer finds matching files they are added to the results list.
  The filer will use the same window to view other results (so, if you want
  the results shown in separate windows you must explicitly create a new
  window from the Window menu).
-\layout Subsubsection
+\layout Subsection
 
 Wildcards
 \layout Standard
@@ -2300,7 +2395,7 @@ If the pattern you enter contains a slash ('/') character then the pattern
 '/*tmp*'
 \family default 
  will find all three.
-\layout Subsubsection
+\layout Subsection
 
 Simple tests
 \layout Standard
@@ -2379,7 +2474,7 @@ IsEmpty finds empty files (ie, those whose length is 0 bytes).
 \layout Description
 
 IsMine finds files which you own.
-\layout Subsubsection
+\layout Subsection
 
 Logic operators
 \layout Standard
@@ -2433,7 +2528,7 @@ Not isdir and not isreg
 \layout Standard
 
 All three do the same thing.
-\layout Subsubsection
+\layout Subsection
 
 Comparisons
 \layout Standard
@@ -2596,7 +2691,7 @@ exactly
 $
 \backslash 
 ldots$
-\layout Subsubsection
+\layout Subsection
 
 Specials
 \layout Description
@@ -2690,7 +2785,7 @@ flags 9
 \end_inset 
 
 
-\layout Subsection
+\layout Section
 
 Options
 \layout Standard
@@ -2731,7 +2826,7 @@ Cancel closes the options box and forgets any changes you made.
 
 Many of the options in the Options window have tooltips --- hold the mouse
  pointer over the option to find out what it does.
-\layout Subsubsection
+\layout Subsection
 
 Translation options
 \layout Standard
@@ -2746,7 +2841,7 @@ None causes the untranslated English messages to be used;
 From\SpecialChar ~
 LANG will use the value of the LANG environment variable as the name
  of the file to load from ROX-Filer/Messages.
-\layout Subsubsection
+\layout Subsection
 
 Pinboard options
 \layout Standard
@@ -2773,7 +2868,7 @@ You may also change the foreground and background colours used for the text
 \layout Itemize
 
 `Icon grid step' controls how finely the icons may be positioned.
-\layout Subsubsection
+\layout Subsection
 
 Action window options
 \layout Standard
@@ -2781,7 +2876,7 @@ Action window options
 You can choose to start some operations automatically, without waiting for
  you to click on Quiet.
  Select each operation that you want to auto-start here.
-\layout Subsubsection
+\layout Subsection
 
 Display options
 \layout Itemize
@@ -2789,6 +2884,12 @@ Display options
 `Ignore case when sorting' treats upper and lower case letters as equivalent
  when sorting.
  If this is off then `Zoo' comes before `animal', for example.
+\layout Itemize
+
+`Directories always come first' means that all directories are sorted and
+ displayed at the top, then all the other items are sorted and displayed
+ below.
+ With this option off, directories are mixed in with the other files.
 \layout Itemize
 
 `Max Large Icons width' sets the maximum width for a file's name in `Large
@@ -2803,7 +2904,7 @@ Display options
 
 The remaining options provide the default settings for newly opened windows
  --- they correspond to choosing styles from the Display menu.
-\layout Subsubsection
+\layout Subsection
 
 Toolbar options
 \layout Itemize
@@ -2836,14 +2937,26 @@ See section
 \end_inset 
 
  for details.
-\layout Subsubsection
+\layout Subsection
 
 Filer window options
 \layout Itemize
 
 `Unique windows' prevents you from having two windows showing the same directory.
  Opening a second view onto a directory closes the first.
-\layout Subsubsection
+\layout Standard
+
+The next two options control what happens when you press tab in the path
+ entry minibuffer:
+\layout Itemize
+
+`Beep if Tab-completion fails' --- beep if there is no match, or there are
+ several possible completions, each starting differently.
+\layout Itemize
+
+`Beep if there are several matches' --- beep if there are several matches,
+ even though some letters were added.
+\layout Subsection
 
 Drag-And-Drop options
 \layout Itemize
@@ -2881,7 +2994,7 @@ ROX-Filer uses the standard XDND protocol for drag-and-drop.
 `Spring delay' sets how long, in thousanths of a second, the filer will
  wait before spring opening a directory as described above.
  If the above option is turned off, then this has no effect.
-\layout Subsubsection
+\layout Subsection
 
 Menu options
 \layout Standard
@@ -2892,7 +3005,7 @@ The `Xterm here' program is the one used when you choose `Xterm here' from
  if you like.
  In fact, any program will do, but note that you cannot pass any options
  to the program at present.
-\layout Subsubsection
+\layout Subsection
 
 Mouse bindings
 \layout Itemize
@@ -3079,6 +3192,11 @@ In both MIME-types and MIME-icons directories you can also provide default
  using `text'.
 \layout Section
 
+
+\begin_inset LatexCommand \label{AppDir}
+
+\end_inset 
+
 Application directories
 \layout Standard
 
@@ -3118,11 +3236,38 @@ Help is the directory to be opened when you choose `Help' from the File
  menu.
 \layout Description
 
-AppMenu lists additional menu items to display in the popup menu (this is
- new and the format is likely to change soon).
+AppMenu lists additional menu items to display in the popup menu.
+ The file should be an XML document with `
+\family typewriter 
+AppMenu
+\family default 
+' as the document element, containing any number of `
+\family typewriter 
+Item
+\family default 
+' elements (each of which appears as one entry on the menu).
+ Item elements can have two attributes: `option' is passed as the argument
+ to 
+\family typewriter 
+AppRun
+\family default 
+ when the menu item is chosen; `
+\family typewriter 
+label
+\family default 
+' is the text used in the menu.
+ See the `
+\family typewriter 
+ROX-Filer/AppMenu
+\family default 
+' file for an example.
 \layout Description
 
-AppIcon.xpm is used if .DirIcon.png is missing (for backwards compatibility).
+AppIcon.xpm is used if 
+\family typewriter 
+.DirIcon.png
+\family default 
+ is missing (for backwards compatibility).
 \layout Standard
 
 Have a look at the ROX-Filer application directory for a full example.
