@@ -1675,7 +1675,7 @@ static void mount_cb(gpointer data)
 		guchar *path = (guchar *) paths->data;
 		guchar *target;
 
-		target = readlink_dup(path);
+		target = pathdup(path);
 		if (!target)
 			target = path;
 

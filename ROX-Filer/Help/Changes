@@ -5,6 +5,9 @@
 06-Oct-2004
 ~~~~~~~~~~~
 Added PanelRemove() SOAP call (m0n5t3r).
+Bugfix: Mounting a directory that was accessed through a symlinked directory
+	used the symbolic path, confusing the mount command (Thomas Leonard;
+	reported by Anthony DiSante).
 
 29-Sep-2004
 ~~~~~~~~~~~
