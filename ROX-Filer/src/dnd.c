@@ -571,7 +571,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 			{
 				gchar	*uri;
 
-				uri=encode_path_as_uri(make_path(dest_path,
+				uri = encode_path_as_uri(make_path(dest_path,
 							  leafname));
 				set_xds_prop(context, uri);
 				g_free(uri);

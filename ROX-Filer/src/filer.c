@@ -2012,8 +2012,8 @@ static guchar *filer_create_uri_list(FilerWindow *filer_window)
 	{
 		gchar *uri, *path;
 		
-		path=g_strconcat(leader->str, item->leafname, NULL);
-		uri=encode_path_as_uri(path);
+		path = g_strconcat(leader->str, item->leafname, NULL);
+		uri = encode_path_as_uri(path);
 		g_string_append(string, uri);
 		g_string_append(string, "\r\n");
 		g_free(path);

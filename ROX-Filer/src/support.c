@@ -1308,41 +1308,36 @@ gchar *escape_uri(const char *uri)
 /* Escape path for future use in URI */
 gchar *escape_uri_path(const char *path)
 {
-	const char *safe="-_./"; /* Plus isalnum() */
-	int l;
-	const gchar *s;
+	const char *safe = "-_./"; /* Plus isalnum() */
+	const guchar *s;
 	gchar *ans;
 	GString *str;
 
-	/* Worst case is expansion by 3 */
-	l=strlen(path);
-	str=g_string_sized_new(l*3);
+	str = g_string_sized_new(strlen(path));
 
-	for(s=path; *s; s++) {
-		if(!g_ascii_isalnum(*s) && strchr(safe, *s)==0) {
-			guchar c=*s;
-			/*printf("%d (%c %02x)\n", c, c, c);*/
-			g_string_append_printf(str, "%%%02x", c);
-		} else {
-			str=g_string_append_c(str, *s);
-		}
+	for (s = path; *s; s++)
+	{
+		if (!g_ascii_isalnum(*s) && !strchr(safe, *s))
+			g_string_append_printf(str, "%%%02x", *s);
+		else
+			str = g_string_append_c(str, *s);
 	}
 
-	ans=g_strdup(str->str);
-	g_string_free(str, TRUE);
+	ans = str->str;
+	g_string_free(str, FALSE);
 	
 	return ans;
 }
 
 gchar *encode_path_as_uri(const guchar *path)
 {
-  gchar *tpath=escape_uri_path(path);
-  gchar *uri;
+	gchar *tpath = escape_uri_path(path);
+	gchar *uri;
 
-  uri=g_strconcat("file://", our_host_name_for_dnd(), tpath, NULL);
-  g_free(tpath);
+	uri = g_strconcat("file://", our_host_name_for_dnd(), tpath, NULL);
+	g_free(tpath);
 
-  return uri;
+	return uri;
 }
 
 gchar *unescape_uri(const char *uri)
@@ -1351,10 +1346,11 @@ gchar *unescape_uri(const char *uri)
 	gchar *d;
 	gchar *tmp;
 	
-	tmp=g_strdup(uri);
-	for(s=uri, d=tmp; *s; s++, d++) {
+	tmp = g_strdup(uri);
+	for (s = uri, d=tmp; *s; s++, d++)
+	{
 		/*printf("%s\n", s);*/
-		if(*s=='%' && g_ascii_isxdigit(s[1]) &&
+		if (*s=='%' && g_ascii_isxdigit(s[1]) &&
 		   g_ascii_isxdigit(s[2])) {
 			int c;
 			char buf[3];
@@ -1372,5 +1368,3 @@ gchar *unescape_uri(const char *uri)
 
 	return tmp;
 }
-
-    
