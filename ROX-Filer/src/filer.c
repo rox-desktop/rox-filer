@@ -245,6 +245,7 @@ static void attach(FilerWindow *filer_window)
 {
 	gdk_window_set_cursor(filer_window->window->window,
 			gdk_cursor_new(GDK_WATCH));
+	collection_clear(filer_window->collection);
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
 }
@@ -676,9 +677,23 @@ void show_menu(Collection *collection, GdkEventButton *event,
 
 static void may_rescan(FilerWindow *filer_window)
 {
+	Directory *dir;
+	
 	g_return_if_fail(filer_window != NULL);
 
-	g_fscache_may_update(dir_cache, filer_window->path);
+	/* We do a fresh lookup (rather than update) because the inode may
+	 * have changed.
+	 */
+	dir = g_fscache_lookup(dir_cache, filer_window->path);
+	if (dir == filer_window->directory)
+	{
+		g_fscache_data_unref(dir_cache, dir);
+		return;
+	}
+	
+	detach(filer_window);
+	filer_window->directory = dir;
+	attach(filer_window);
 }
 
 /* Callback to collection_delete_if() */
@@ -1036,7 +1051,6 @@ void filer_change_to(FilerWindow *filer_window, char *path)
 					filer_window->path);
 	if (filer_window->directory)
 	{
-		collection_clear(filer_window->collection);
 		gtk_window_set_title(GTK_WINDOW(filer_window->window),
 				filer_window->path);
 		attach(filer_window);
@@ -1425,6 +1439,5 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	g_fscache_data_ref(dir_cache, dir);
 	detach(filer_window);
 	filer_window->directory = dir;
-	collection_clear(filer_window->collection);
 	attach(filer_window);
 }
