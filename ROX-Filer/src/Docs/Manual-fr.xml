@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.1.4 - Manuel de l'utilisateur
+   ROX-Filer 2.2.0 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -1070,100 +1070,153 @@ le groupe du fichier est le même qu'un des groupes auxquels l'utilisateur appar
 		<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
 
-<row><entry>
-<guimenuitem>Copier...</guimenuitem></entry><entry>
-Copie cet objet.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Renommer...</guimenuitem></entry><entry>
-Change le nom de cet objet, ou le déplace vers un autre dossier.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Lier...</guimenuitem></entry><entry>
-Crée un lien symbolique vers cet objet.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Supprimer</guimenuitem></entry><entry>
-Supprime tous les objets sélectionnés du dossier courant. Le contenu des sous-dossiers
-sera supprimé en premier. Supprimer un lien symbolique ne supprime que le lien, pas la
-cible de ce lien.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Shift Ouvrir</guimenuitem></entry><entry>
-Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers, 
-ouvre les fichiers comme s'il s'agissait de simple texte brut, ou ouvre le 
-dossier contenant la cible du lien symbolique sur lequel vous "shift-cliquez". 
-Sur des points de montage, on peut noter des effets intéressants (voir <xref linkend="media"/>). 
-C'est la même chose que de cliquer en maintenant <keycap>Shift</keycap> enfoncé. 
-La commande du menu sélection prend alors le nom de la commande a effectuer.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Ouvrir AVFS</guimenuitem></entry><entry>
-Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Envoyer à...</guimenuitem></entry><entry>
-Ouvre le menu 'Envoyer à...', ce qui permet d'envoyer les objets à une application.
-Voir la section <xref linkend="SendTo"/>.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Fixer l'action d'exécution...</guimenuitem></entry><entry>
-Cette commande vous permet de choisir l'application qui sera utilisée pour
-ouvrir les fichiers de ce type. Lire la section <xref linkend="RunAction"/>
-pour plus de détails.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Fixer l'icône...</guimenuitem></entry><entry>
-Vous pouvez affecter une icône différente pour chaque fichier/dossier en
-utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xref linkend="SetIcon"/>.
-</entry></row>
-
 <row>
- <entry><guimenuitem>Propriétés</guimenuitem></entry>
  <entry>
- Affiche plus de détails sur l'objet.
- Vous pouvez aussi modifier les permissions d'accès à partir de cette boîte (la commande  <guimenuitem>Permissions</guimenuitem> vous permet quant à elle d'appliquer des 
-modifications sur plusieurs fichiers simultanément), ainsi que la cible d'un lien symbolique.
+  <guimenuitem>Copier...</guimenuitem>
  </entry>
-</row>
-
-<row><entry>
-<guimenuitem>Compter</guimenuitem></entry><entry>
-Fait le total de l'espace occupé par les objets sélectionnés. Le contenu des dossiers
-sélectionnés est aussi compté. Les liens symboliques sont comptés, mais pas leur cible.
-</entry></row>
-
-<row>
- <entry><guimenuitem>Fixer le type...</guimenuitem></entry>
  <entry>
- Cette commande vous permet de changer le type MIME d'un fichier, seulement sur les sytèmes 
- de fichiers qui bénéficient des "attributs étendus".
- Si vous utilisez un système de fichiers plus ancien, vous devrez renommer le fichier (ndt : son 
- extension) pour changer son type MIME.
+  Copie cet objet.
  </entry>
 </row>
 
 <row>
- <entry><guimenuitem>Permissions</guimenuitem></entry>
  <entry>
- Cette commande vous permet de changer les permissions des objets sélectionnés.
- Si vous ne devez changer les permissions que pour un fichier, vous pouvez utiliser
- la commande <guimenuitem>Propriétés</guimenuitem>, qui est plus simple.
+  <guimenuitem>Renommer...</guimenuitem>
+ </entry>
+ <entry>
+  Change le nom de cet objet, ou le déplace vers un autre dossier.
+  Si plusieurs fichiers sont sélectionnés, la boîte <xref linkend='bulkrename' /> est affichée.
  </entry>
 </row>
 
-<row><entry>
-<guimenuitem>Chercher</guimenuitem></entry><entry>
-Cherche des fichiers en spécifiant différentes conditions &mdash; voir la section <xref linkend="Searching"/>.
-</entry></row>
+<row>
+ <entry>
+  <guimenuitem>Lier...</guimenuitem>
+ </entry>
+ <entry>
+  Crée un lien symbolique vers cet objet.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Supprimer</guimenuitem>
+ </entry>
+ <entry>
+  Supprime tous les objets sélectionnés du dossier courant. Le contenu des sous-dossiers
+  sera supprimé en premier. Supprimer un lien symbolique ne supprime que le lien, pas la
+  cible de ce lien.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Shift Ouvrir</guimenuitem>
+ </entry>
+ <entry>
+  Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers, 
+  ouvre les fichiers comme s'il s'agissait de simple texte brut, ou ouvre le 
+  dossier contenant la cible du lien symbolique sur lequel vous "shift-cliquez". 
+  Sur des points de montage, on peut noter des effets intéressants (voir <xref linkend="media"/>). 
+  C'est la même chose que de cliquer en maintenant <keycap>Shift</keycap> enfoncé. 
+  La commande du menu sélection prend alors le nom de la commande a effectuer.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Ouvrir AVFS</guimenuitem>
+ </entry>
+ <entry>
+  Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Envoyer à...</guimenuitem>
+ </entry>
+ <entry>
+  Ouvre le menu 'Envoyer à...', ce qui permet d'envoyer les objets à une application.
+  Voir la section <xref linkend="SendTo"/>.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Fixer l'action d'exécution...</guimenuitem>
+ </entry>
+ <entry>
+  Cette commande vous permet de choisir l'application qui sera utilisée pour
+  ouvrir les fichiers de ce type. Lire la section <xref linkend="RunAction"/>
+  pour plus de détails.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Fixer l'icône...</guimenuitem>
+ </entry>
+ <entry>
+  Vous pouvez affecter une icône différente pour chaque fichier/dossier en
+  utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xref linkend="SetIcon"/>.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Propriétés</guimenuitem>
+ </entry>
+ <entry>
+  Affiche plus de détails sur l'objet.
+  Vous pouvez aussi modifier les permissions d'accès à partir de cette boîte (la commande 
+  <guimenuitem>Permissions</guimenuitem> vous permet quant à elle d'appliquer des 
+  modifications sur plusieurs fichiers simultanément), ainsi que la cible d'un lien symbolique.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Compter</guimenuitem>
+ </entry>
+ <entry>
+  Fait le total de l'espace occupé par les objets sélectionnés. Le contenu des dossiers
+  sélectionnés est aussi compté. Les liens symboliques sont comptés, mais pas leur cible.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Fixer le type...</guimenuitem>
+ </entry>
+ <entry>
+  Cette commande vous permet de changer le type MIME d'un fichier, seulement sur les sytèmes 
+  de fichiers qui bénéficient des "attributs étendus".
+  Si vous utilisez un système de fichiers plus ancien, vous devrez renommer le fichier (ndt : son 
+  extension) pour changer son type MIME.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Permissions</guimenuitem>
+ </entry>
+ <entry>
+  Cette commande vous permet de changer les permissions des objets sélectionnés.
+  Si vous ne devez changer les permissions que pour un fichier, vous pouvez utiliser
+  la commande <guimenuitem>Propriétés</guimenuitem>, qui est plus simple.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Chercher</guimenuitem>
+ </entry>
+ <entry>
+  Cherche des fichiers en spécifiant différentes conditions &mdash; voir la section 
+  <xref linkend="Searching"/>.
+ </entry>
+</row>
 
 </tbody></tgroup></informaltable>
   </para>
@@ -2032,6 +2085,46 @@ pour passer d'un objet sélectionné à un autre, en boucle.
 
   </para>
 </sect1>
+</chapter>
+
+<chapter>
+ <title>
+  <anchor id="bulkrename" xreflabel="The Bulk Rename window"/>Renommer des fichiers en masse
+  </title>
+  <para>
+   Si vous devez renommer un nombre important de fichiers, vous vous apercevrez vite
+   qu'il est fastidieux de les renommer un par un. Solution : sélectionnez-les tous
+   et choisissez <guimenuitem>Renommer...</guimenuitem> dans le menu, ce qui fera
+   apparaître la fenêtre de renommage en masse.
+  </para>
+
+  <para>
+   Cette fenêtre vous montre deux colonnes. La colonne <guilabel>Avant</guilabel> 
+   affiche le nom actuel de tous les fichiers sélectionnés, et la colonne 
+   <guilabel>Après</guilabel> affiche le nouveau nom, qui est le même au début de 
+   la procédure de renommage en masse.
+  </para>
+
+  <para>
+   Vous pouvez changer les nouveaux noms de deux façons différentes. Vous pouvez 
+   cliquer directement sur le nom du fichier à modifier, ou utiliser la fonction 
+   de recherche et de remplacement en haut de la fenêtre. 
+   Vous devez utiliser une expression régulière dans le champ de recherche, 
+   et du texte dans le champ de remplacement, qui remplacera ce qui aura été trouvé 
+   par l'expression régulière. 
+   Par exemple, vous voulez renommer tous vos fichiers qui ont une extension 
+   <filename>.htm</filename> avec une extension <filename>.html</filename> : 
+   utilisez <userinput>\.htm$</userinput> dans le champ <guilabel>Remplacer :</guilabel> 
+   et <userinput>.html</userinput> dans le champ <guilabel>par :</guilabel>. 
+   Quand vous cliquez sur <guibutton>Appliquer</guibutton>, la colonne "Après" est 
+   mise à jour pour afficher les nouveaux noms proposés (mais aucun fichier 
+   n'est encore renommé).
+  </para>
+
+  <para>
+   Après avoir vérifié que les nouveaux noms vous paraissent corrects, cliquez sur 
+   <guibutton>Renommer</guibutton> pour effectuer le renommage en masse.
+ </para>
 </chapter>
 
 <chapter id="actions">
@@ -3534,8 +3627,10 @@ pour n'afficher que les fichiers se terminant par .c.
 
  <listitem>
   <para>
-   <function>PanelRemove</function>(<parameter>Side</parameter>,<parameter>Path</parameter>)
+   <function>PanelRemove</function>(<parameter>Side</parameter>,<parameter>Path</parameter>, 
+                                    [<parameter>Label</parameter>])
    Retire <parameter>Path</parameter> du panneau sur le côté <parameter>Side</parameter>. 
+   Si <parameter>Label</parameter> est précisé, il doit correspondre au label de l'objet. 
    Si plusieurs objets correspondent, un seul est retiré.
   </para>
  </listitem>
@@ -3556,6 +3651,16 @@ pour n'afficher que les fichiers se terminant par .c.
 	<parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
 	Ajoute <parameter>Path</parameter> au punaiseur à la position 
 	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter>.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <function>PinboardRemove</function>(<parameter>Path</parameter>, 
+                                       [<parameter>Label</parameter>])
+   Retire <parameter>Path</parameter> du punaiseur.
+   Si <parameter>Label</parameter> est précisé, il doit correspondre au label de l'objet. 
+   Si plusieurs objets correspondent, un seul est retiré.
   </para>
  </listitem>
 
