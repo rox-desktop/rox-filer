@@ -127,12 +127,22 @@ static void panel_add_item(Panel *panel,
 			   const gchar *name,
 			   gboolean after,
 			   const gchar *shortcut);
+static gboolean panel_drag_motion(GtkWidget	*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    Panel		*panel);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
                             gint		y,
                             guint		time,
 			    PanelIcon		*pi);
+static void panel_drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       Panel		*panel);
 static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
@@ -232,6 +242,13 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_widget_set_events(panel->window,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_POINTER_MOTION_MASK | GDK_LEAVE_NOTIFY_MASK);
+
+	/* We make the panel a drop target only so that we can auto-raise! */
+	gtk_drag_dest_set(panel->window, 0, NULL, 0, GDK_ACTION_PRIVATE);
+	g_signal_connect(panel->window, "drag_leave",
+			G_CALLBACK(panel_drag_leave), panel);
+	g_signal_connect(panel->window, "drag_motion",
+			G_CALLBACK(panel_drag_motion), panel);
 
 	g_signal_connect(panel->window, "delete-event",
 			G_CALLBACK(panel_delete), panel);
@@ -930,6 +947,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 
+	panel_drag_motion(widget, context, x, y, time, pi->panel);
+
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */
 
@@ -1028,6 +1047,8 @@ static void drag_leave(GtkWidget	*widget,
 		       guint32		time,
 		       Icon	*icon)
 {
+	panel_drag_leave(widget, context, time, ((PanelIcon *) icon)->panel);
+
 	if (dnd_highlight && dnd_highlight == widget)
 	{
 		gtk_drag_unhighlight(dnd_highlight);
@@ -1125,6 +1146,11 @@ static GtkWidget *make_insert_frame(Panel *panel)
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
 	gtk_widget_set_size_request(frame, 16, 16);
 
+	g_signal_connect(frame, "drag-motion",
+			G_CALLBACK(panel_drag_motion), panel);
+	g_signal_connect(frame, "drag-leave",
+			G_CALLBACK(panel_drag_leave), panel);
+
 	g_signal_connect(frame, "drag-data-received",
 			G_CALLBACK(add_uri_list), panel);
 	gtk_drag_dest_set(frame,
@@ -1157,25 +1183,32 @@ static gint panel_leave_event(GtkWidget *widget,
 	return FALSE;
 }
 
+/* If (x, y) is at the edge of the panel then raise */
+static void motion_may_raise(Panel *panel, int x, int y)
+{
+	gboolean raise;
+
+	if (panel->side == PANEL_TOP)
+		raise = y == 0;
+	else if (panel->side == PANEL_BOTTOM)
+		raise = y == panel->window->allocation.height - 1;
+	else if (panel->side == PANEL_LEFT)
+		raise = x == 0;
+	else
+		raise = x == panel->window->allocation.width - 1;
+
+	if (raise)
+		gdk_window_raise(panel->window->window);
+}
+
 static gint panel_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      Panel *panel)
 {
 	gint	delta, new;
-	gboolean raise;
 	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
 
-	if (panel->side == PANEL_TOP)
-		raise = event->y == 0;
-	else if (panel->side == PANEL_BOTTOM)
-		raise = event->y == panel->window->allocation.height - 1;
-	else if (panel->side == PANEL_LEFT)
-		raise = event->x == 0;
-	else
-		raise = event->x == panel->window->allocation.width - 1;
-
-	if (raise)
-		gdk_window_raise(panel->window->window);
+	motion_may_raise(panel, event->x, event->y);
 
 	if (motion_state != MOTION_REPOSITION)
 		return FALSE;
@@ -1786,4 +1819,40 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
 			panel_position_menu,
 			(gpointer) pos, event->button, event->time);
+}
+
+/* Note: also called from icon handler */
+static gboolean panel_drag_motion(GtkWidget	*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    Panel		*panel)
+{
+	int panel_x, panel_y;
+
+	gdk_window_get_pointer(panel->window->window, &panel_x, &panel_y, NULL);
+
+	motion_may_raise(panel, panel_x, panel_y);
+	gdk_drag_status(context, 0, time);
+	return TRUE;
+}
+
+/* Note: also called from icon handler */
+static void panel_drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       Panel		*panel)
+{
+	GdkWindow *pinboard, *window;
+	GtkAllocation *alloc = &panel->window->allocation;
+	int x, y;
+	
+	window = panel->window->window;
+	gdk_window_get_pointer(window, &x, &y, NULL);
+	if (x < 0 || y < 0 || x > alloc->width || y > alloc->height)
+	{
+		pinboard = pinboard_get_window();
+		window_put_just_above(panel->window->window, pinboard);
+	}
 }
