@@ -52,6 +52,8 @@
 #include "display.h"
 #include "icon.h"
 
+#define DELETE_ICON 1
+
 static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 
 /* Static prototypes */
@@ -70,9 +72,9 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      guint             info,
 		       	      guint32           time,
 		       	      GtkWidget	 	*dialog);
-static void remove_icon(GtkWidget *dialog);
 static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
+static void delete_globicon(const gchar *path);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -192,13 +194,33 @@ gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 	return TRUE;
 }
 
+static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
+{
+	if (response == GTK_RESPONSE_OK)
+		get_path_set_icon(dialog);
+	else if (response == GTK_RESPONSE_CANCEL)
+		gtk_widget_destroy(dialog);
+	else if (response == DELETE_ICON)
+	{
+		const gchar *path;
+
+		path = g_object_get_data(G_OBJECT(dialog), "pathname");
+		g_return_if_fail(path != NULL);
+
+		delete_globicon(path);
+
+		gtk_widget_destroy(dialog);
+	}
+}
+
 /* Display a dialog box allowing the user to set the icon for
  * a file or directory.
  */
 void icon_set_handler_dialog(DirItem *item, const guchar *path)
 {
 	guchar		*tmp;
-	GtkWidget	*dialog, *vbox, *frame, *hbox, *vbox2;
+	GtkDialog	*dialog;
+	GtkWidget	*frame, *hbox, *vbox2;
 	GtkWidget	*entry, *label, *button, *align, *icon;
 	GtkWidget	**radio;
 	GtkTargetEntry 	targets[] = {
@@ -210,24 +232,20 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	gi = g_hash_table_lookup(glob_icons, path);
 
-	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_type_hint(GTK_WINDOW(dialog),
-			GDK_WINDOW_TYPE_HINT_DIALOG);
+	dialog = GTK_DIALOG(gtk_dialog_new());
+	gtk_dialog_set_has_separator(dialog, FALSE);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 	g_object_set_data_full(G_OBJECT(dialog), "pathname",
 				 strdup(path), g_free);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
-
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
 
 	radio = g_new(GtkWidget *, 3);
 
 	tmp = g_strdup_printf(_("Set icon for all `%s/<anything>'"),
 			item->mime_type->media_type);
 	radio[2] = gtk_radio_button_new_with_label(NULL, tmp);
-	gtk_box_pack_start(GTK_BOX(vbox), radio[2], FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[2], FALSE, TRUE, 0);
 	g_free(tmp);
 
 	tmp = g_strdup_printf(_("Only for the type `%s/%s'"),
@@ -235,13 +253,13 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 			item->mime_type->subtype);
 	radio[1] = gtk_radio_button_new_with_label_from_widget(
 					GTK_RADIO_BUTTON(radio[2]), tmp);
-	gtk_box_pack_start(GTK_BOX(vbox), radio[1], FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[1], FALSE, TRUE, 0);
 	g_free(tmp);
 
 	tmp = g_strdup_printf(_("Only for the file `%s'"), path);
 	radio[0] = gtk_radio_button_new_with_label_from_widget(
 					GTK_RADIO_BUTTON(radio[2]), tmp);
-	gtk_box_pack_start(GTK_BOX(vbox), radio[0], FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[0], FALSE, TRUE, 0);
 	g_free(tmp);
 
 	g_object_set_data_full(G_OBJECT(dialog), "radios", radio, g_free);
@@ -250,7 +268,7 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio[0]), TRUE);
 
 	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
 	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
 
@@ -279,14 +297,14 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 			G_CALLBACK(show_current_dirs_menu), NULL);
 
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
 						FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
 
 	label = gtk_label_new(_("Enter the path of an icon file:")),
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
@@ -300,29 +318,25 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	if (gi)
 		gtk_entry_set_text(GTK_ENTRY(entry), gi);
 
-	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
 	g_object_set_data(G_OBJECT(dialog), "icon_path", entry);
 	g_signal_connect_swapped(entry, "activate",
 			G_CALLBACK(get_path_set_icon), dialog);
 
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
-						FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+	button = button_new_mixed(GTK_STOCK_DELETE, _("_Remove"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_dialog_add_action_widget(dialog, button, DELETE_ICON);
+	gtk_dialog_add_buttons(dialog,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			NULL);
+	g_signal_connect(dialog, "response", G_CALLBACK(dialog_response), NULL);
+	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
 
+#if 0
 	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("Remove custom icon"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	g_signal_connect_swapped(button, "clicked",
-				  G_CALLBACK(remove_icon), dialog);
-
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
 
 	button = gtk_button_new_with_label(_("OK"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
@@ -336,8 +350,9 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 	g_signal_connect_swapped(button, "clicked",
 			G_CALLBACK(gtk_widget_destroy), dialog);
+#endif
 
-	gtk_widget_show_all(dialog);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
 
 
@@ -438,7 +453,7 @@ static void add_globicon(const gchar *path, const gchar *icon)
 }
 
 /* Remove the globicon for a certain path */
-static void delete_globicon(guchar *path)
+static void delete_globicon(const gchar *path)
 {
 	gpointer key, value;
 
@@ -538,21 +553,6 @@ static void get_path_set_icon(GtkWidget *dialog)
 	icon = gtk_entry_get_text(entry);
 
 	do_set_icon(dialog, icon);
-}
-
-/* Called if the user clicks on the "Remove custom icon" button */
-static void remove_icon(GtkWidget *dialog)
-{
-	guchar *path;
-
-	g_return_if_fail(dialog != NULL);
-
-	path = g_object_get_data(G_OBJECT(dialog), "pathname");
-	g_return_if_fail(path != NULL);
-
-	delete_globicon(path);
-
-	destroy_on_idle(dialog);
 }
 
 static void show_icon_help(gpointer data)
