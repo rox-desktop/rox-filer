@@ -1375,10 +1375,20 @@ static void draw_item(GtkWidget *widget,
 		draw_huge_icon(widget, &template.icon, item, selected);
 	
 #ifdef GTK2
-	gdk_draw_layout(widget->window, type_gc,
-			template.leafname.x,
-			template.leafname.y,
-			view->layout);
+	if (selected)
+		gtk_paint_flat_box(widget->style, widget->window, 
+				filer_window->selection_state, GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				template.leafname.x,
+				template.leafname.y,
+				template.leafname.width,
+				template.leafname.height);
+	gdk_draw_layout(widget->window,
+		selected ? widget->style->fg_gc[filer_window->selection_state]
+			 : type_gc,
+		template.leafname.x,
+		template.leafname.y,
+		view->layout);
 #else
 	if (view->split_pos)
 	{
