@@ -155,7 +155,7 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 AC_CHECK_LIB(regex, re_compile_pattern)
-AC_CHECK_FUNCS(re_compile_pattern re_search)
+AC_CHECK_FUNCS(re_compile_pattern re_search re_set_syntax)
 
 AC_MSG_CHECKING(for vfs library)
 VFS_LIBS=""

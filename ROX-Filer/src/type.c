@@ -94,7 +94,9 @@ void type_init()
 	int		i;
 	GPtrArray	*list;
 	
+#ifdef HAVE_RE_SET_SYNTAX
 	re_set_syntax(RE_SYNTAX_POSIX_EGREP);
+#endif
 
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
