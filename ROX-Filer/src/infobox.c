@@ -397,8 +397,10 @@ static void make_list(GtkListStore **list_store, GtkWidget **list_view,
 	gtk_tree_view_insert_column_with_attributes(view,
 			1, NULL, cell_renderer, "text", 1, "editable", 2, NULL);
 
-	g_signal_connect(G_OBJECT(cell_renderer), "edited",
-		    G_CALLBACK(cell_edited), store);
+	if (cell_edited) {
+		g_signal_connect(G_OBJECT(cell_renderer), "edited",
+				G_CALLBACK(cell_edited), store);
+	}
 
 	g_signal_connect(view, "cursor_changed",
 			G_CALLBACK(set_selection), NULL);
