@@ -64,7 +64,6 @@ typedef enum
 struct _GtkIconThemePrivate
 {
   guint custom_theme : 1;
-  guint is_screen_singleton : 1;
   guint pixbuf_supports_svg : 1;
   
   char *current_theme;
@@ -83,10 +82,6 @@ struct _GtkIconThemePrivate
    */
   GHashTable *all_icons;
 
-  /* GdkScreen for the icon theme (may be NULL)
-   */
-  GdkScreen *screen;
-  
   /* time when we last stat:ed for theme changes */
   long last_stat_time;
   GList *dir_mtimes;
@@ -209,8 +204,6 @@ static BuiltinIcon *find_builtin_icon (const gchar *icon_name,
 				       gint         size,
 				       gint        *min_difference_p,
 				       gboolean    *has_larger_p);
-static void gtk_icon_theme_set_screen (GtkIconTheme *icon_theme,
-					GdkScreen    *screen);
 
 static guint signal_changed = 0;
 
@@ -285,34 +278,6 @@ gtk_icon_theme_class_init (GtkIconThemeClass *klass)
   /* g_type_class_add_private (klass, sizeof (GtkIconThemePrivate)); */
 }
 
-
-/* Callback when the display that the icon theme is attached to
- * is closed; unset the screen, and if it's the unique theme
- * for the screen, drop the reference
- */
-static void
-display_closed (GdkDisplay   *display,
-		gboolean      is_error,
-		GtkIconTheme *icon_theme)
-{
-  GtkIconThemePrivate *priv = icon_theme->priv;
-  GdkScreen *screen = priv->screen;
-  gboolean was_screen_singleton = priv->is_screen_singleton;
-
-  if (was_screen_singleton)
-    {
-      g_object_set_data (G_OBJECT (screen), "gtk-icon-theme", NULL);
-      priv->is_screen_singleton = FALSE;
-    }
-
-  gtk_icon_theme_set_screen (icon_theme, NULL);
-
-  if (was_screen_singleton)
-    {
-      g_object_unref (icon_theme);
-    }
-}
-
 static void
 update_current_theme (GtkIconTheme *icon_theme)
 {
@@ -321,12 +286,6 @@ update_current_theme (GtkIconTheme *icon_theme)
   if (!priv->custom_theme)
     {
       gchar *theme = NULL;
-
-      if (0 && priv->screen)
-	{
-	  GtkSettings *settings = gtk_settings_get_for_screen (priv->screen);
-	  g_object_get (settings, "gtk-icon-theme-name", &theme, NULL);
-	}
 
       if (!theme)
 	theme = g_strdup (DEFAULT_THEME_NAME);
@@ -341,79 +300,6 @@ update_current_theme (GtkIconTheme *icon_theme)
       else
 	g_free (theme);
     }
-}
-
-/* Callback when the icon theme GtkSetting changes
- */
-static void
-theme_changed (GtkSettings  *settings,
-	       GParamSpec   *pspec,
-	       GtkIconTheme *icon_theme)
-{
-  update_current_theme (icon_theme);
-}
-
-static void
-unset_screen (GtkIconTheme *icon_theme)
-{
-  GtkIconThemePrivate *priv = icon_theme->priv;
-  GtkSettings *settings;
-  GdkDisplay *display;
-  
-  if (priv->screen)
-    {
-      settings = gtk_settings_get_for_screen (priv->screen);
-      display = gdk_screen_get_display (priv->screen);
-      
-      g_signal_handlers_disconnect_by_func (display,
-					    (gpointer) display_closed,
-					    icon_theme);
-      g_signal_handlers_disconnect_by_func (settings,
-					    (gpointer) theme_changed,
-					    icon_theme);
-
-      priv->screen = NULL;
-    }
-}
-
-/**
- * gtk_icon_theme_set_screen:
- * @icon_theme: a #GtkIconTheme
- * @screen: a #GdkScreen
- * 
- * Sets the screen for an icon theme; the screen is used
- * to track the user's currently configured icon theme,
- * which might be different for different screens.
- **/
-static void
-gtk_icon_theme_set_screen (GtkIconTheme *icon_theme,
-			   GdkScreen    *screen)
-{
-  GtkIconThemePrivate *priv;
-  GtkSettings *settings;
-  GdkDisplay *display;
-
-  g_return_if_fail (GTK_ICON_THEME (icon_theme));
-  g_return_if_fail (screen == NULL || GDK_IS_SCREEN (screen));
-
-  priv = icon_theme->priv;
-
-  unset_screen (icon_theme);
-  
-  if (screen)
-    {
-      display = gdk_screen_get_display (screen);
-      settings = gtk_settings_get_for_screen (screen);
-      
-      priv->screen = screen;
-      
-      g_signal_connect (display, "closed",
-			G_CALLBACK (display_closed), icon_theme);
-      g_signal_connect (settings, "notify::gtk-icon-theme-name",
-			G_CALLBACK (theme_changed), icon_theme);
-    }
-
-  update_current_theme (icon_theme);
 }
 
 /* Checks whether a loader for SVG files has been registered
@@ -482,16 +368,8 @@ free_dir_mtime (IconThemeDirMtime *dir_mtime)
 static void
 do_theme_change (GtkIconTheme *icon_theme)
 {
-  GtkIconThemePrivate *priv = icon_theme->priv;
-  
   blow_themes (icon_theme);
   g_signal_emit (G_OBJECT (icon_theme), signal_changed, 0);
-  
-  if (priv->screen && priv->is_screen_singleton)
-    {
-      GtkSettings *settings = gtk_settings_get_for_screen (priv->screen);
-      _gtk_rc_reset_styles (settings);
-    }
 }
 
 static void
@@ -524,8 +402,6 @@ gtk_icon_theme_finalize (GObject *object)
 
   icon_theme = GTK_ICON_THEME (object);
   priv = icon_theme->priv;
-
-  unset_screen (icon_theme);
 
   g_free (priv->current_theme);
   priv->current_theme = NULL;
@@ -593,8 +469,6 @@ gtk_icon_theme_set_custom_theme (GtkIconTheme *icon_theme,
 
   priv = icon_theme->priv;
 
-  g_return_if_fail (!priv->is_screen_singleton);
-  
   if (theme_name != NULL)
     {
       priv->custom_theme = TRUE;
