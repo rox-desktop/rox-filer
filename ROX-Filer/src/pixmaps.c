@@ -29,6 +29,7 @@
  */
 
 #define PIXMAP_PURGE_TIME 1200
+#define PIXMAP_THUMB_SIZE  128
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -49,6 +50,7 @@
 #include "main.h"
 #include "filer.h"
 #include "dir.h"
+#include "choices.h"
 #include "options.h"
 #include "action.h"
 #include "type.h"
@@ -114,6 +116,7 @@ static void child_create_thumbnail(const gchar *path, MIME_type *type);
 static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
 					  guchar alpha);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
+static gchar *thumbnail_path(const gchar *path);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -329,7 +332,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	}
 
 	type=type_from_path(path);
-	if(!type || strcmp(type->media_type, "image")!=0) {
+	if(!type /*|| strcmp(type->media_type, "image")!=0*/) {
 		callback(data, (gchar *) path);
 		return;  /* Can't create thumbnail */
 	}
@@ -378,7 +381,7 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	int name_len;
 	GdkPixbuf *thumb;
 
-	thumb = scale_pixbuf(full, 128, 128);
+	thumb = scale_pixbuf(full, PIXMAP_THUMB_SIZE, PIXMAP_THUMB_SIZE);
 
 	original_width = gdk_pixbuf_get_width(full);
 	original_height = gdk_pixbuf_get_height(full);
@@ -440,6 +443,51 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	g_free(uri);
 }
 
+static gchar *thumbnail_path(const char *path)
+{
+	gchar *uri, *md5;
+	GString *to;
+	gchar *ans;
+	
+	uri = g_strconcat("file://", path, NULL);
+	md5 = md5_hash(uri);
+		
+	to = g_string_new(home_dir);
+	g_string_append(to, "/.thumbnails");
+	mkdir(to->str, 0700);
+	g_string_append(to, "/normal/");
+	mkdir(to->str, 0700);
+	g_string_append(to, md5);
+	g_string_append(to, ".png");
+
+	g_free(md5);
+	g_free(uri);
+
+	ans=to->str;
+	g_string_free(to, FALSE);
+
+	return ans;
+}
+
+static gchar *thumbnail_program(MIME_type *type)
+{
+	gchar     *leaf;
+	gchar *path;
+
+	if(!type)
+		return NULL;
+
+	leaf=g_strconcat(type->media_type, "_", type->subtype, NULL);
+	path=choices_find_path_load(leaf, "MIME-thumb");
+	if(path) {
+		g_free(leaf);
+		return path;
+	}
+
+	path=choices_find_path_load(type->media_type, "MIME-thumb");
+
+	return path;
+}
 /* Called in a subprocess. Load path and create the thumbnail
  * file. Parent will notice when we die.
  * Type is for future expansion: we could run an external command, selected
@@ -448,6 +496,23 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 static void child_create_thumbnail(const gchar *path, MIME_type *type)
 {
 	GdkPixbuf *image;
+	gchar    *thumb_prog;
+
+	thumb_prog=thumbnail_program(type);
+        if(thumb_prog) {
+		char     *args[5];
+	
+		args[0]=thumb_prog;
+		args[1]=(char *) path;
+		args[2]=thumbnail_path(path);
+		args[3]=g_strdup_printf("%d", PIXMAP_THUMB_SIZE);
+		args[4]=0;
+
+		execl(thumb_prog, thumb_prog, path, thumbnail_path(path),
+		      g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
+
+		_exit(1);
+	}
 
 	image = gdk_pixbuf_new_from_file(path, NULL);
 
