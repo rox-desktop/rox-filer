@@ -1010,9 +1010,19 @@ void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		        GDK_RGB_DITHER_NORMAL, 0, 0);
 
 #else
-	GDK_DRAWABLE_GET_CLASS(target)->_draw_pixbuf(target, gc, pixbuf,
+	static gboolean warned = FALSE;
+	if (gtk_minor_version == 0)
+		GDK_DRAWABLE_GET_CLASS(target)->_draw_pixbuf(target, gc, pixbuf,
 				   0, 0, x, y, width, height,
 				   GDK_RGB_DITHER_NORMAL, 0, 0);
+	else if (!warned)
+	{
+		delayed_error(_("Pinboard icons cannot be drawn because "
+				"ROX-Filer was compiled against GTK+-2.0 "
+				"but is running with GTK+-2.2. Please "
+				"recompile it."));
+		warned = TRUE;
+	}
 #endif
 }
 
