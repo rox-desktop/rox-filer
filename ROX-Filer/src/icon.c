@@ -74,6 +74,8 @@ GList *icon_selection = NULL;
  */
 GList *icon_shortcuts = NULL;
 
+#define CLICK_TO_SET _("(click to set)")
+
 static unsigned int AltMask;
 static unsigned int MetaMask;
 static unsigned int NumLockMask;
@@ -415,6 +417,8 @@ void icon_set_shortcut(Icon *icon, const gchar *shortcut)
 {
 	g_return_if_fail(icon != NULL);
 
+	if (shortcut && !*shortcut)
+		shortcut = NULL;
 	if (icon->shortcut == shortcut)
 		return;
 	if (icon->shortcut && shortcut && strcmp(icon->shortcut, shortcut) == 0)
@@ -489,7 +493,9 @@ static void rename_activate(GtkWidget *dialog)
 
 	new_name = gtk_entry_get_text(GTK_ENTRY(entry));
 	new_src = gtk_entry_get_text(GTK_ENTRY(src));
-	new_shortcut = gtk_entry_get_text(GTK_ENTRY(shortcut));
+	new_shortcut = gtk_label_get_text(GTK_LABEL(shortcut));
+	if (strcmp(new_shortcut, CLICK_TO_SET) == 0)
+		new_shortcut = NULL;
 	
 	if (*new_src == '\0')
 		report_error(
@@ -625,6 +631,111 @@ static void edit_response(GtkWidget *dialog, gint response, gpointer data)
 		gtk_widget_destroy(dialog);
 }
 
+static GdkFilterReturn filter_get_key(GdkXEvent *xevent,
+				      GdkEvent *event,
+				      gpointer data)
+{
+	XKeyEvent *kev = (XKeyEvent *) xevent;
+	GtkWidget *popup = (GtkWidget *) data;
+	Display *dpy = GDK_DISPLAY();
+
+	if (kev->type != KeyRelease && kev->type != ButtonPressMask)
+		return GDK_FILTER_CONTINUE;
+
+	if (kev->type == KeyRelease)
+	{
+		gchar *str;
+		KeySym sym;
+		unsigned int m = kev->state;
+
+		sym = XKeycodeToKeysym(dpy, kev->keycode, 0);
+		if (!sym)
+			return GDK_FILTER_CONTINUE;
+
+		str = g_strdup_printf("%s%s%s%s%s%s%s",
+			m & ControlMask ? "Control+" : "",
+			m & ShiftMask ? "Shift+" : "",
+			m & AltMask ? "Alt+" : "",
+			m & MetaMask ? "Hyper+" : "",
+			m & SuperMask ? "Super+" : "",
+			m & HyperMask ? "Hyper+" : "",
+			XKeysymToString(sym));
+			
+		g_object_set_data(G_OBJECT(popup), "chosen-key", str);
+	}
+
+	gdk_window_remove_filter(popup->window, filter_get_key, data);
+	gtk_widget_destroy(popup);
+
+	return GDK_FILTER_REMOVE;
+}
+
+static void may_set_shortcut(GtkWidget *popup, GtkWidget *label)
+{
+	gchar *str;
+
+	str = g_object_get_data(G_OBJECT(popup), "chosen-key");
+	if (str)
+	{
+		gtk_label_set_text(GTK_LABEL(label), str);
+		g_free(str);
+		g_object_set_data(G_OBJECT(popup), "chosen-key", NULL);
+	}
+}
+
+static void get_shortcut(GtkWidget *button, GtkWidget *label)
+{
+	GtkWidget *popup, *frame, *msg;
+	Window    xid;
+	Display	  *dpy = GDK_DISPLAY();
+
+	popup = gtk_window_new(GTK_WINDOW_POPUP);
+
+	gtk_window_set_position(GTK_WINDOW(popup), GTK_WIN_POS_CENTER);
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_add(GTK_CONTAINER(popup), frame);
+
+	msg = gtk_label_new(_("Press the desired shortcut (eg, Control+F1)"));
+
+	gtk_misc_set_padding(GTK_MISC(msg), 20, 20);
+	gtk_container_add(GTK_CONTAINER(frame), msg);
+
+	gtk_window_set_modal(GTK_WINDOW(popup), TRUE);
+
+	gtk_widget_add_events(popup,
+			GDK_KEY_RELEASE_MASK | GDK_BUTTON_PRESS_MASK);
+
+	g_signal_connect(popup, "destroy",
+			G_CALLBACK(may_set_shortcut), label);
+
+	gtk_widget_show_all(popup);
+
+	gdk_window_add_filter(popup->window, filter_get_key, popup);
+
+	xid = gdk_x11_drawable_get_xid(popup->window);
+
+	if (XGrabKeyboard(dpy, xid, False, GrabModeAsync, GrabModeAsync,
+			gtk_get_current_event_time()) != Success)
+	{
+		delayed_error(_("Failed to get keyboard grab!"));
+		gtk_widget_destroy(popup);
+	}
+
+	if (XGrabPointer(dpy, xid, False, ButtonPressMask, GrabModeAsync,
+				GrabModeAsync, xid, None,
+				gtk_get_current_event_time()) != Success)
+	{
+		g_warning("Failed to get mouse grab");
+	}
+}
+
+static void clear_shortcut(GtkButton *clear, GtkLabel *label)
+{
+	gtk_label_set_text(GTK_LABEL(label), CLICK_TO_SET);
+}
+
 /* Opens a box allowing the user to change the name of a pinned icon.
  * If the icon is destroyed then the box will close.
  * If the user chooses OK then the callback is called once the icon's
@@ -634,7 +745,7 @@ static void edit_response(GtkWidget *dialog, gint response, gpointer data)
 static void show_rename_box(Icon *icon)
 {
 	GtkDialog	*dialog;
-	GtkWidget	*label, *entry;
+	GtkWidget	*label, *entry, *button, *button2, *hbox;
 
 	if (icon->dialog)
 	{
@@ -675,12 +786,23 @@ static void show_rename_box(Icon *icon)
 	
 	label = gtk_label_new(_("The keyboard shortcut is:"));
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
-	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
-	gtk_entry_set_text(GTK_ENTRY(entry),
-			icon->shortcut ? icon->shortcut : "");
-	g_object_set_data(G_OBJECT(dialog), "new_shortcut", entry);
-	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+
+	hbox = gtk_hbox_new(FALSE, 2);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, TRUE, FALSE, 0);
+	button = gtk_button_new_with_label(icon->shortcut
+						? icon->shortcut
+						: CLICK_TO_SET);
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	g_object_set_data(G_OBJECT(dialog), "new_shortcut",
+				GTK_BIN(button)->child);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(get_shortcut),
+			GTK_BIN(button)->child);
+	button2 = gtk_button_new_from_stock(GTK_STOCK_CLEAR);
+	gtk_box_pack_start(GTK_BOX(hbox), button2, FALSE, FALSE, 0);
+	g_signal_connect(button2, "clicked",
+			G_CALLBACK(clear_shortcut),
+			GTK_BIN(button)->child);
 
 	g_object_set_data(G_OBJECT(dialog), "callback_icon", icon);
 
@@ -975,9 +1097,9 @@ static void parseKeyString(MyKey *key, const char *str)
 		return;
 
 	k = strrchr(str, '+');
+	key->keycode = XKeysymToKeycode(dpy, XStringToKeysym(k ? k + 1 : str));
 	if (k)
 	{
-		key->keycode = XKeysymToKeycode(dpy, XStringToKeysym(k + 1));
 		if (PARSEKEY(str, "Shift"))
 			key->modifier = key->modifier | ShiftMask;
 		if (PARSEKEY(str, "Control"))
@@ -987,6 +1109,9 @@ static void parseKeyString(MyKey *key, const char *str)
 		if (PARSEKEY(str, "Meta") || PARSEKEY(str, "Mod2"))
 			key->modifier = key->modifier | MetaMask;
 	}
+
+	if (!key->keycode)
+		g_warning("Can't parse key '%s'\n", str);
 }
 
 static GdkFilterReturn filter_keys(GdkXEvent *xevent,
