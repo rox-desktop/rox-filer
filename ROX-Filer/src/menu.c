@@ -15,75 +15,122 @@
 #include "filer.h"
 #include "support.h"
 #include "gui_support.h"
+#include "options.h"
+#include "choices.h"
 
 #define C_ "<control>"
 
 #define MENU_MARGIN 32
 
 GtkAccelGroup	*filer_keys;
-
+GtkAccelGroup	*panel_keys;
 
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
+static void show_options(gpointer data, guint action, GtkWidget *widget);
+static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 
+static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
+static void close_panel(gpointer data, guint action, GtkWidget *widget);
+
 static GtkWidget	*filer_menu;		/* The popup filer menu */
+static GtkWidget	*panel_menu;		/* The popup panel menu */
 
 static GtkItemFactoryEntry filer_menu_def[] = {
-{"/_Display",		    NULL,	NULL, 0, "<Branch>"},
-{"/Display/_Large Icons",   NULL,   	NULL, 0, "<RadioItem>"},
-{"/Display/_Small Icons",   NULL,   	NULL, 0, "/Display/Large Icons"},
-{"/Display/_Full Info",	    NULL,   	NULL, 0, "/Display/Large Icons"},
-{"/Display/Separator",	    NULL,   	NULL, 0, "<Separator>"},
-{"/Display/Sort by _Name",  NULL,   	NULL, 0, "<RadioItem>"},
-{"/Display/Sort by _Type",  NULL,   	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by _Date",  NULL,   	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Si_ze",  NULL,   	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Separator",	    NULL,   	NULL, 0, "<Separator>"},
-{"/Display/Show _Hidden",   C_"H", 	NULL, 0, "<ToggleItem>"},
-{"/Display/Refresh",	    C_"L", 	refresh, 0, NULL},
-{"/File",		    NULL,   	NULL, 0, "<Branch>"},
-{"/File/_Copy",		    NULL,   	NULL, 0, NULL},
-{"/File/_Rename",	    NULL,   	NULL, 0, NULL},
-{"/File/_Help",		    "F1",   	NULL, 0, NULL},
-{"/File/_Info",		    NULL,   	NULL, 0, NULL},
-{"/File/_Mount",	    C_"M",   	mount, 0, NULL},
-{"/File/Separator",	    NULL,   	NULL, 0, "<Separator>"},
-{"/File/_Delete",	    C_"X", 	delete, 0, NULL},
-{"/File/Disk _Usage",	    C_"U", 	NULL, 0, NULL},
-{"/File/_Permissions",	    NULL,   	NULL, 0, NULL},
-{"/File/_Stamp",    	    NULL,   	NULL, 0, NULL},
-{"/File/_Find",		    NULL,   	NULL, 0, NULL},
-{"/_Select All",	    C_"A",   	NULL, 0, NULL},
-{"/_Clear Selection",	    C_"Z",   	NULL, 0, NULL},
-{"/_Options",		    NULL,   	NULL, 0, "<Branch>"},
-{"/Options/_Confirm",	    NULL,   	NULL, 0, "<ToggleItem>"},
-{"/Options/_Verbose",	    NULL,   	NULL, 0, "<ToggleItem>"},
-{"/Options/_Force",	    NULL,   	NULL, 0, "<ToggleItem>"},
-{"/Options/_Newer",	    NULL,   	NULL, 0, "<ToggleItem>"},
-{"/_New directory",	    NULL,   	NULL, 0, NULL},
-{"/_Open parent",	    NULL,   	open_parent, 0, NULL},
+{"/Display",			NULL,	NULL, 0, "<Branch>"},
+{"/Display/Large Icons",   	NULL,  	NULL, 0, "<RadioItem>"},
+{"/Display/Small Icons",   	NULL,  	NULL, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,  	NULL, 0, "/Display/Large Icons"},
+{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
+{"/Display/Sort by Name",	NULL,  	NULL, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
+{"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
+{"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
+{"/File",			NULL,  	NULL, 0, "<Branch>"},
+{"/File/Copy",			NULL,  	NULL, 0, NULL},
+{"/File/Rename",		NULL,  	NULL, 0, NULL},
+{"/File/Help",		    	"F1",  	NULL, 0, NULL},
+{"/File/Info",			NULL,  	NULL, 0, NULL},
+{"/File/Mount",	    		C_"M",  mount, 0,	NULL},
+{"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
+{"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
+{"/File/Disk Usage",	    	C_"U", 	NULL, 0, NULL},
+{"/File/Permissions",		NULL,   NULL, 0, NULL},
+{"/File/Stamp",    		NULL,   NULL, 0, NULL},
+{"/File/Find",			NULL,   NULL, 0, NULL},
+{"/Select All",	    		C_"A",  NULL, 0, NULL},
+{"/Clear Selection",	    	C_"Z",  NULL, 0, NULL},
+{"/Options...",			NULL,   show_options, 0, NULL},
+{"/New directory",		NULL,   NULL, 0, NULL},
+{"/Xterm here",			NULL,  	xterm_here, 0, NULL},
+{"/Open parent",		NULL,   open_parent, 0, NULL},
+};
+
+static GtkItemFactoryEntry panel_menu_def[] = {
+{"/Display",			NULL,	NULL, 0, "<Branch>"},
+{"/Display/Large Icons",	NULL,   NULL, 0, "<RadioItem>"},
+{"/Display/Small Icons",	NULL,   NULL, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,   NULL, 0, "/Display/Large Icons"},
+{"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
+{"/Display/Sort by Name",	NULL,   NULL, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,   NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,   NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,   NULL, 0, "/Display/Sort by Name"},
+{"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
+{"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
+{"/Display/Refresh",	    	C_"L", 	refresh, 0,	NULL},
+{"/File",			NULL,	NULL, 	0, "<Branch>"},
+{"/File/Delete",		NULL,	NULL, 	0, NULL},
+{"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
+{"/Close panel",		NULL, 	close_panel, 0, NULL},
 };
 
 
 void menu_init()
 {
 	GtkItemFactory  	*item_factory;
+	char			*menurc;
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
 					    "<popup>",
 					    filer_keys);
-
 	gtk_item_factory_create_items(item_factory,
 			sizeof(filer_menu_def) / sizeof(*filer_menu_def),
 			filer_menu_def,
 			NULL);
-
 	filer_menu = gtk_item_factory_get_widget(item_factory, "<popup>");
+
+	panel_keys = gtk_accel_group_new();
+	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
+					    "<popup2>",
+					    panel_keys);
+	gtk_item_factory_create_items(item_factory,
+			sizeof(panel_menu_def) / sizeof(*panel_menu_def),
+			panel_menu_def,
+			NULL);
+	panel_menu = gtk_item_factory_get_widget(item_factory, "<popup2>");
+
+	menurc = choices_find_path_load("menus");
+	if (menurc)
+		gtk_item_factory_parse_rc(menurc);
+}
+ 
+/* Save the keybindings... */
+void menu_finish()
+{
+	char	*menurc;
+
+	menurc = choices_find_path_save("menus");
+	if (menurc)
+		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 }
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
@@ -131,7 +178,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 		}
 	}
 
-	gtk_menu_popup(GTK_MENU(filer_menu), NULL, NULL, position_menu,
+	gtk_menu_popup(filer_window->panel ? GTK_MENU(panel_menu)
+				           : GTK_MENU(filer_menu),
+			NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
 
@@ -229,10 +278,42 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 		report_error("ROX-Filer", error);
 }
 
+static void show_options(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	options_edit(window_with_focus);
+}
+
+static void xterm_here(gpointer data, guint action, GtkWidget *widget)
+{
+	char	*argv[] = {"gnome-terminal", NULL};	/* XXX: Bad default */
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (!spawn_in(argv, window_with_focus->path))
+		report_error("ROX-Filer", "Failed to fork() child "
+					"process");
+}
+
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_opendir(make_path(window_with_focus->path, "/..")->str,
 			FALSE, BOTTOM);
+}
+
+static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+	
+	filer_opendir(window_with_focus->path, FALSE, BOTTOM);
+}
+
+static void close_panel(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+	
+	gtk_widget_destroy(window_with_focus->window);
 }

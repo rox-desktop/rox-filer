@@ -321,7 +321,7 @@ static void draw_item(GtkWidget *widget,
 }
 
 void show_menu(Collection *collection, GdkEventButton *event,
-		int number_selected, gpointer user_data)
+		int item, gpointer user_data)
 {
 	show_filer_menu((FilerWindow *) user_data, event);
 }
@@ -502,6 +502,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	{
 		int		swidth, sheight, iwidth, iheight;
 		GtkWidget	*frame, *win = filer_window->window;
+
+		collection_set_panel(filer_window->collection, TRUE);
 
 		gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
 		iwidth = filer_window->collection->item_width;

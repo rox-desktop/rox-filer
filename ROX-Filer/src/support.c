@@ -15,6 +15,8 @@
 
 #include <glib.h>
 
+#include "support.h"
+
 /* Static prototypes */
 
 
@@ -77,6 +79,12 @@ char *our_host_name()
  */
 int spawn(char **argv)
 {
+	return spawn_in(argv, NULL);
+}
+
+/* As spawn(), but cd to dir first (if dir is non-NULL) */
+int spawn_in(char **argv, char *dir)
+{
 	int	child;
 	
 	child = fork();
@@ -86,6 +94,10 @@ int spawn(char **argv)
 	else if (child == 0)
 	{
 		/* We are the child process */
+		if (dir)
+			if (chdir(dir))
+				fprintf(stderr, "chdir() failed: %s\n",
+						g_strerror(errno));
 		execvp(argv[0], argv);
 		fprintf(stderr, "execvp() failed: %s\n",
 				g_strerror(errno));

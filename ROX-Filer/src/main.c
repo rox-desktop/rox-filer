@@ -18,6 +18,8 @@
 #include "mount.h"
 #include "menu.h"
 #include "dnd.h"
+#include "options.h"
+#include "choices.h"
 
 /* XXX: Maybe we shouldn't do so much work in a signal handler? */
 static void child_died(int signum)
@@ -51,12 +53,14 @@ static void child_died(int signum)
 int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
+	choices_init("ROX-Filer");
 
 	gui_support_init();
 	menu_init();
 	dnd_init();
 	filer_init();
 	mount_init();
+	options_init();
 
 	signal(SIGCHLD, child_died);
 
@@ -96,6 +100,8 @@ int main(int argc, char **argv)
 	}
 
 	gtk_main();
+
+	menu_finish();
 
 	return EXIT_SUCCESS;
 }
