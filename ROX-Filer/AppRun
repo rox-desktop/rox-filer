@@ -7,12 +7,12 @@ APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
 PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
 
-BIN=$APP_DIR/bin/$PLATFORM
+BIN=$APP_DIR/$PLATFORM/ROX-Filer
 
 if [ -x $BIN ] ; then
   DEBUGGER=""
   case $1 in
-  	-d) shift; DEBUGGER=gdb;
+  	--debug) shift; DEBUGGER=gdb;
   esac
   exec $DEBUGGER $BIN $*
 else
