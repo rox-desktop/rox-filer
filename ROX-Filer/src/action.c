@@ -1325,7 +1325,7 @@ static void do_copy2(const char *path, const char *dest)
 				  _("?Copy %s as %s?"), path, dest_path))
 			return;
 	}
-	else
+	else if (!o_brief)
 		printf_send(_("'Copying %s as %s\n"), path, dest_path);
 
 	if (S_ISDIR(info.st_mode))
@@ -1483,7 +1483,7 @@ static void do_move2(const char *path, const char *dest)
 				  _("?Move %s as %s?"), path, dest_path))
 			return;
 	}
-	else
+	else if (!o_brief)
 		printf_send(_("'Moving %s as %s\n"), path, dest_path);
 
 	argv[2] = path;
