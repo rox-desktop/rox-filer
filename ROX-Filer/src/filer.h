@@ -19,7 +19,8 @@ typedef struct _FileItem FileItem;
 
 enum
 {
-	ITEM_FLAG_SYMLINK = 0x1,
+	ITEM_FLAG_SYMLINK = 0x1,	/* Is a symlink */
+	ITEM_FLAG_APPDIR  = 0x2,	/* Contains /AppInfo */
 };
 
 struct _FilerWindow

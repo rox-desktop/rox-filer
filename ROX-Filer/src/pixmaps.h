@@ -12,6 +12,7 @@
 
 enum
 {
+	/* Base types */
 	TYPE_ERROR,
 	TYPE_UNKNOWN,
 	TYPE_SYMLINK,
@@ -21,6 +22,8 @@ enum
 	TYPE_BLOCK_DEVICE,
 	TYPE_PIPE,
 	TYPE_SOCKET,
+
+	/* Extended types */
 	TYPE_MULTIPLE,
 	TYPE_APPDIR,
 	LAST_DEFAULT_PIXMAP

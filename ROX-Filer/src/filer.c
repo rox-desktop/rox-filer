@@ -170,20 +170,23 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			base_type = TYPE_UNKNOWN;
 	}
 
+	item->base_type = base_type;
+
 	if (base_type == TYPE_DIRECTORY)
 	{
 		/* Might be an application directory - better check... */
 		path = g_string_append(path, "/AppInfo");
 		if (!stat(path->str, &info))
-		{
-			base_type = TYPE_APPDIR;
-		}
+			item->flags |= ITEM_FLAG_APPDIR;
 	}
-	item->base_type = base_type;
+
+	if (item->flags & ITEM_FLAG_APPDIR)
+		item->image = default_pixmap + TYPE_APPDIR;
+	else
+		item->image = default_pixmap + base_type;
 
 	item->text_width = gdk_string_width(filer_window->window->style->font,
 			leafname);
-	item->image = default_pixmap + base_type;
 	
 	/* XXX: Must be a better way... */
 	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
@@ -332,16 +335,15 @@ void open_item(Collection *collection,
 
 	switch (item->base_type)
 	{
-		case TYPE_APPDIR:
-			if (event->type != GDK_2BUTTON_PRESS ||
-					(event->state & GDK_SHIFT_MASK) == 0)
+		case TYPE_DIRECTORY:
+			if (item->flags & ITEM_FLAG_APPDIR &&
+					(event->type != GDK_2BUTTON_PRESS ||
+					(event->state & GDK_SHIFT_MASK) == 0))
 			{
 				run_app(make_path(filer_window->path,
 							item->leafname)->str);
 				break;
 			}
-			/* FALLTHROUGH */
-		case TYPE_DIRECTORY:
 			if (event->type != GDK_2BUTTON_PRESS ||
 					event->button == 1)
 			{
