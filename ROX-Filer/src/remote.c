@@ -97,6 +97,7 @@ static xmlNodePtr rpc_Mount(GList *args);
 static xmlNodePtr rpc_PanelAdd(GList *args);
 static xmlNodePtr rpc_PanelRemove(GList *args);
 static xmlNodePtr rpc_PinboardAdd(GList *args);
+static xmlNodePtr rpc_PinboardRemove(GList *args);
 static xmlNodePtr rpc_SetBackdrop(GList *args);
 static xmlNodePtr rpc_SetBackdropApp(GList *args);
 
@@ -142,8 +143,9 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("SetBackdrop", rpc_SetBackdrop, "Filename,Style", NULL);
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
+	soap_register("PinboardRemove", rpc_PinboardRemove, "Path", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
-	soap_register("PanelRemove", rpc_PanelRemove, "Side,Path", NULL);
+	soap_register("PanelRemove", rpc_PanelRemove, "Side,Path", "Label");
 
 	/* Look for a property on the root window giving the IPC window
 	 * of an already-running copy of this version of the filer, running
@@ -802,6 +804,26 @@ static xmlNodePtr rpc_PinboardAdd(GList *args)
 	pinboard_pin(path, name, x, y, NULL);
 
 	g_free(path);
+	if(name)
+	        g_free(name);
+
+	return NULL;
+}
+
+/* args = Path, [Label] */
+static xmlNodePtr rpc_PinboardRemove(GList *args)
+{
+	char *path = NULL;
+	gchar *name;
+
+	path = string_value(ARG(0));
+	name = string_value(ARG(1));
+	
+	pinboard_remove(path, name);
+
+	g_free(path);
+	if(name)
+	        g_free(name);
 
 	return NULL;
 }
@@ -871,7 +893,7 @@ static xmlNodePtr rpc_PanelAdd(GList *args)
 static xmlNodePtr rpc_PanelRemove(GList *args)
 {
 	PanelSide side;
-	char *path, *side_name;
+	char *path, *side_name, *label;
 
 	side_name = string_value(ARG(0));
 	side = panel_name_to_side(side_name);
@@ -879,10 +901,12 @@ static xmlNodePtr rpc_PanelRemove(GList *args)
 	g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
 
 	path = string_value(ARG(1));
+	label = string_value(ARG(2));
 
-	panel_remove_item(side, path);
+	panel_remove_item(side, path, label);
 
 	g_free(path);
+	g_free(label);
 
 	return NULL;
 }

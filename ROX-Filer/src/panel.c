@@ -746,7 +746,8 @@ static void panel_add_item(Panel *panel,
 	gtk_widget_show(widget);
 }
 
-static gboolean remove_item_from_side(GtkWidget *container, const gchar *path)
+static gboolean remove_item_from_side(GtkWidget *container, const gchar *path,
+				      const gchar *label)
 {
 	GList *kids, *next;
 	gboolean found = FALSE;
@@ -760,7 +761,8 @@ static gboolean remove_item_from_side(GtkWidget *container, const gchar *path)
 		if (!icon)
 			continue;
 
-		if (strcmp(path, icon->src_path) == 0)
+		if (strcmp(path, icon->src_path) == 0 &&
+		    (!label || strcmp(label, icon->item->leafname)==0))
 		{
 			icon_destroy(icon);
 			found = TRUE;
@@ -774,9 +776,11 @@ static gboolean remove_item_from_side(GtkWidget *container, const gchar *path)
 }
 
 /* Remove an item with this path. If more than one item matches, only
- * one is removed. Returns TRUE if an item was successfully removed.
+ * one is removed. If label is not NULL then it must also match the item.
+ * Returns TRUE if an item was successfully removed.
  */
-gboolean panel_remove_item(PanelSide side, const gchar *path)
+gboolean panel_remove_item(PanelSide side, const gchar *path,
+			   const gchar *label)
 {
 	Panel *panel;
 
@@ -790,8 +794,8 @@ gboolean panel_remove_item(PanelSide side, const gchar *path)
 		return FALSE;
 	}
 
-	if (remove_item_from_side(panel->before, path) ||
-	    remove_item_from_side(panel->after, path))
+	if (remove_item_from_side(panel->before, path, label) ||
+	    remove_item_from_side(panel->after, path, label))
 	{
 		panel_save(panel);
 		panel_update(panel);

@@ -3184,8 +3184,10 @@ means that only files ending in .c are shown.
    </para></listitem>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
-     <parameter>Path</parameter>)
-     Remove <parameter>Path</parameter> from the panel on side <parameter>Side</parameter>. If more than one item matches, only one is removed.
+     <parameter>Path</parameter>, [<parameter>Label</parameter>])
+     Remove <parameter>Path</parameter> from the panel on side
+<parameter>Side</parameter>. If <parameter>Label</parameter> is given
+then this must match the label of the item.  If more than one item matches, only one is removed.
    </para></listitem>
 
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
@@ -3200,6 +3202,11 @@ means that only files ending in .c are shown.
      Add <parameter>Path</parameter> to the pinboard at position
      (<parameter>X</parameter>, <parameter>Y</parameter>), giving it the label
      <parameter>Label</parameter>.
+   </para></listitem>
+
+   <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
+     Remove <parameter>Path</parameter> from the pinboard. If <parameter>Label</parameter> is given
+then this must match the label of the item.  If more than one item matches, only one is removed.
    </para></listitem>
 
    <listitem><para><function>SetBackdropApp</function>(<parameter>App</parameter>)

@@ -545,6 +545,38 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 	pinboard_pin_with_args(path, name, x, y, shortcut, NULL);
 }
 
+/*
+ * Remove an icon from the background.  The first icon with a matching
+ * path is removed.  If name is not NULL then that also must match
+ */
+gboolean pinboard_remove(const gchar *path, const gchar *name)
+{
+	GList *item;
+	PinIcon		*pi;
+	Icon		*icon;
+
+	g_return_if_fail(current_pinboard != NULL);
+
+	for(item=current_pinboard->icons; item; item=g_list_next(item)) {
+		pi=(PinIcon *) item->data;
+		icon=(Icon *) pi;
+
+		if(strcmp(icon->path, path)!=0)
+			continue;
+
+		if(name && strcmp(name, icon->item->leafname)!=0)
+			continue;
+
+		icon_destroy(icon);
+	
+		pinboard_save();
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
 /* Put a border around the icon, briefly.
  * If icon is NULL then cancel any existing wink.
  * The icon will automatically unhighlight unless timeout is FALSE,
