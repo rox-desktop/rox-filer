@@ -1446,6 +1446,7 @@ static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 	GtkWidget	*hbox;
 	GtkWidget	*spin;
 	GtkWidget	*label_wid;
+	guchar		*unit;
 	int		min, max, step, width;
 
 	g_return_val_if_fail(option != NULL, NULL);
@@ -1454,6 +1455,7 @@ static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 	max = get_int(node, "max");
 	step = get_int(node, "step");
 	width = get_int(node, "width");
+	unit = xmlGetProp(node, "unit");
 	
 	hbox = gtk_hbox_new(FALSE, 4);
 
@@ -1469,6 +1471,13 @@ static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 	gtk_entry_set_width_chars(GTK_ENTRY(spin), width > 1 ? width + 1 : -1);
 	gtk_box_pack_start(GTK_BOX(hbox), spin, FALSE, TRUE, 0);
 	may_add_tip(spin, node);
+
+	if (unit)
+	{
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(unit)),
+				FALSE, TRUE, 0);
+		g_free(unit);
+	}
 
 	option->update_widget = update_numentry;
 	option->read_widget = read_numentry;

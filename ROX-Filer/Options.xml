@@ -84,7 +84,7 @@ operation, such as copying or deleting some files.</label>
         <radio label='Resize when changing the display style' value='0'>Changing the size of the icons or which details are displayed will resize the window for you.</radio>
         <radio label='Always resize' value='1'>The filer will resize windows whenever it seems useful (that is, when changing directory or display style).</radio>
       </radio-group>
-      <numentry name='filer_size_limit' label='Largest window size:' min='1' max='100' width='3'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</numentry>
+      <numentry name='filer_size_limit' label='Largest window size:' unit='%' min='1' max='100' width='3'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</numentry>
     </frame>
     <frame label='Window behaviour'>
       <toggle name='filer_short_flag_names' label='Short titlebar flags'>Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar.</toggle>
@@ -103,8 +103,8 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
         <toggle name='display_dirs_first' label='Directories always come first'>If this is on then directories will always appear before anything else, regardless of the sort type.</toggle>
       </frame>
       <frame label='Icon text width'>
-        <numentry name='display_large_width' label='Large wrap width:' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
-        <numentry name='display_small_width' label='Max Small Icons width:' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
+        <numentry name='display_large_width' label='Large wrap width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
+        <numentry name='display_small_width' label='Max Small Icons width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
       </frame>
       <frame label='Default settings for new windows'>
         <toggle name='display_inherit_options' label='Inherit options from source window'>If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below.</toggle>
@@ -159,7 +159,7 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
       <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
       <toggle name='dnd_drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
       <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
-      <numentry name='dnd_spring_delay' label='Spring delay:' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
+      <numentry name='dnd_spring_delay' label='Spring delay:' unit='ms' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
     </frame>
     <frame label='Dragging files with the middle mouse button'>
       <radio-group name='dnd_middle_menu'>
@@ -211,8 +211,9 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
             <colour name='display_file_colour' label='Regular file:'/>
             <colour name='display_pipe_colour' label='Pipe:'/>
             <colour name='display_sock_colour' label='Socket:'/>
-            <colour name='display_err_colour'   label='Error:'>Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine.</colour>
+            <colour name='display_err_colour'  label='Error:'>Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine.</colour>
           </vbox>
+	  <spacer/>
           <vbox>
             <colour name='display_cdev_colour' label='Character device:'/>
             <colour name='display_bdev_colour' label='Block device:'/>

@@ -188,7 +188,6 @@ GtkWidget *toolbar_tool_option(int i)
 		return NULL;
 
 	button = gtk_button_new();
-	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
 	icon_widget = gtk_image_new_from_pixmap(tool->icon->pixmap,
@@ -747,29 +746,31 @@ static guchar *read_tools(Option *option)
 
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label)
 {
-	int		i = 0;
-	GtkWidget	*hbox, *tool, *sw, *box;
+	guint		num_tools = G_N_ELEMENTS(all_tools);
+	guint		rows = 2;
+	guint		cols = (num_tools + rows - 1) / rows;
+	int		i;
+	GtkWidget	*hbox, *tool, *table;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
-	box = gtk_hbox_new(FALSE, 0);
 	hbox = gtk_hbox_new(FALSE, 0);
-	
-	sw = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw),
-			GTK_SHADOW_NONE);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-			GTK_POLICY_ALWAYS, GTK_POLICY_NEVER);
+	table = gtk_table_new(rows, cols, TRUE);
 
-	while ((tool = toolbar_tool_option(i++)))
-		gtk_box_pack_start(GTK_BOX(hbox), tool, FALSE, TRUE, 0);
+	for (i = 0; (tool = toolbar_tool_option(i)) != NULL; i++)
+	{
+		guint left = i % cols;
+		guint top = i / cols;
+	
+		gtk_table_attach_defaults(GTK_TABLE(table), tool,
+				left, left + 1, top, top + 1);
+	}
+
+	gtk_box_pack_start(GTK_BOX(hbox), table, FALSE, FALSE, 0);
 
 	option->update_widget = update_tools;
 	option->read_widget = read_tools;
-	option->widget = hbox;
+	option->widget = table;
 
-	gtk_box_pack_start(GTK_BOX(box), sw, TRUE, TRUE, 0);
-	gtk_scrolled_window_add_with_viewport(GTK_SCROLLED_WINDOW(sw), hbox);
-
-	return g_list_append(NULL, box);
+	return g_list_append(NULL, hbox);
 }
