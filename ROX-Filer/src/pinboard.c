@@ -182,7 +182,7 @@ static void drag_end(GtkWidget *widget,
 static void reshape_icon(Icon *icon);
 static void reshape_all(void);
 static void menu_closed(GtkWidget *widget);
-static void rename_item(gpointer data, guint action, GtkWidget *widget);
+static void edit_icon(gpointer data, guint action, GtkWidget *widget);
 static void show_location(gpointer data, guint action, GtkWidget *widget);
 static void pin_help(gpointer data, guint action, GtkWidget *widget);
 static void pin_remove(gpointer data, guint action, GtkWidget *widget);
@@ -194,7 +194,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
-{N_("Rename Item"),  		NULL,  	rename_item, 0, NULL},
+{N_("Edit Icon"),  		NULL,  	edit_icon, 0, NULL},
 {N_("Show Location"),  		NULL,  	show_location, 0, NULL},
 {N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
@@ -310,6 +310,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	icon = g_new(Icon, 1);
 	icon->selected = FALSE;
+	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 	icon->mask = NULL;
 	snap_to_grid(&x, &y);
@@ -1260,7 +1261,7 @@ static void pinboard_save(void)
 		Icon *icon = (Icon *) next->data;
 
 		g_string_sprintf(tmp, "<%s>, %d, %d, %s\n",
-			icon->item.leafname, icon->x, icon->y, icon->path);
+			icon->item.leafname, icon->x, icon->y, icon->src_path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 			goto err;
 	}
@@ -1355,6 +1356,7 @@ static void icon_destroyed(GtkWidget *widget, Icon *icon)
 
 	gdk_pixmap_unref(icon->mask);
 	dir_item_clear(&icon->item);
+	g_free(icon->src_path);
 	g_free(icon->path);
 	g_free(icon);
 
@@ -1827,32 +1829,25 @@ static void show_location(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-static void rename_cb(guchar *new_name, Icon *icon)
+static void rename_cb(Icon *icon)
 {
-	GdkFont	*font = icon->widget->style->font;
-
-	g_free(icon->item.leafname);
-	icon->item.leafname = g_strdup(new_name);
-	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
-
 	reshape_icon(icon);
 
 	pinboard_save();
 }
 
-static void rename_item(gpointer data, guint action, GtkWidget *widget)
+static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 {
 	Icon	*icon;
 
 	icon = pinboard_selected_icon();
 
 	if (icon)
-		show_rename_box(icon->widget, icon->item.leafname,
-				(RenameFn) rename_cb, icon);
+		show_rename_box(icon->widget, icon, rename_cb);
 	else
 	{
 		delayed_error(PROJECT,
-			_("First, select a single item to rename"));
+			_("First, select a single item to edit"));
 		return;
 	}
 }

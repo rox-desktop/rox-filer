@@ -116,7 +116,7 @@ static void panel_add_item(Panel *panel,
 			   gboolean after);
 static void menu_closed(GtkWidget *widget);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
-static void rename_item(gpointer data, guint action, GtkWidget *widget);
+static void edit_icon(gpointer data, guint action, GtkWidget *widget);
 static void show_location(gpointer data, guint action, GtkWidget *widget);
 static void show_help(gpointer data, guint action, GtkWidget *widget);
 static gboolean drag_motion(GtkWidget		*widget,
@@ -163,7 +163,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
-{N_("Rename Item"),  		NULL,  	rename_item, 0, NULL},
+{N_("Edit Icon"),  		NULL,  	edit_icon, 0, NULL},
 {N_("Show Location"),  		NULL,  	show_location, 0, NULL},
 {N_("Show Help"),    		NULL,  	show_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	remove_items, 0, NULL},
@@ -488,6 +488,7 @@ static void panel_add_item(Panel *panel,
 
 	icon = g_new(Icon, 1);
 	icon->panel = panel;
+	icon->src_path = g_strdup(path);
 	icon->path = icon_convert_path(path);
 
 	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
@@ -627,6 +628,7 @@ static void icon_destroyed(Icon *icon)
 	
 	dir_item_clear(&icon->item);
 	g_free(icon->path);
+	g_free(icon->src_path);
 	g_free(icon);
 }
 
@@ -961,14 +963,8 @@ static void popup_panel_menu(GdkEventButton *event,
 			(gpointer) pos, event->button, event->time);
 }
 
-static void rename_cb(guchar *new_name, Icon *icon)
+static void rename_cb(Icon *icon)
 {
-	GdkFont	*font = icon->widget->style->font;
-
-	g_free(icon->item.leafname);
-	icon->item.leafname = g_strdup(new_name);
-	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
-
 	size_icon(icon);
 	gtk_widget_queue_clear(icon->widget);
 	reposition_panel(icon->panel);
@@ -976,20 +972,19 @@ static void rename_cb(guchar *new_name, Icon *icon)
 	panel_save(icon->panel);
 }
 
-static void rename_item(gpointer data, guint action, GtkWidget *widget)
+static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 {
 	Icon	*icon;
 
 	if (panel_selection == NULL || panel_selection->next)
 	{
 		delayed_error(PROJECT,
-			_("First, select a single item to rename"));
+			_("First, select a single item to edit"));
 		return;
 	}
 
 	icon = (Icon *) panel_selection->data;
-	show_rename_box(icon->widget, icon->item.leafname,
-			(RenameFn) rename_cb, icon);
+	show_rename_box(icon->widget, icon, rename_cb);
 }
 
 static void show_location(gpointer data, guint action, GtkWidget *widget)
@@ -1239,7 +1234,7 @@ static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
 
 		g_string_sprintf(tmp, "%s%c%s\n",
 				icon->item.leafname,
-				side, icon->path);
+				side, icon->src_path);
 		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
 		{
 			g_list_free(widgets);

@@ -12,12 +12,13 @@
 
 #include "dir.h"
 
-typedef void (*RenameFn)(guchar *new, gpointer data);
+typedef void (*RenameFn)(Icon *icon);
 
 struct _Icon {
 	GtkWidget	*widget;	/* The drawing area for the icon */
 	gboolean	selected;
-	guchar		*path;
+	guchar		*src_path;	/* Eg: ~/Apps */
+	guchar		*path;		/* Eg: /home/fred/Apps */
 	DirItem		item;
 
 	/* Only used on the pinboard... */
@@ -29,10 +30,9 @@ struct _Icon {
 	Panel		*panel;		/* Panel containing this icon */
 };
 
-void show_rename_box(GtkWidget *widget,
-		     guchar *old_name,
-		     RenameFn callback,
-		     gpointer data);
+void show_rename_box(GtkWidget	*widget,
+		     Icon	*icon,
+		     RenameFn	callback);
 guchar *icon_convert_path(guchar *path);
 
 #endif /* _ICON_H */

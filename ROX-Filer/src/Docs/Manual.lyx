@@ -1571,16 +1571,16 @@ Sections
 \end_inset 
 
  explain how to turn the pinboard and panels on.
- Once on, you may drop icons from filer windows onto the them to pin them
+ Once on, you may drop items from filer windows onto the them to pin them
  up.
- Clicking on a pinned file acts just like clicking on it in a filer window.
+ Clicking on a pinned item acts just like clicking on it in a filer window.
  You can drag pinned icons just like normal icons and you can right-click
  on one to see the popup menu.
 \layout Standard
 
 Drag pinned icons with the middle mouse button to move them around (they
  snap to a grid on the pinboard).
- Changes to the pinboard and panel layouts are automatically saved.
+ Changes to the pinboard and panel are automatically saved.
  Clicking on pinned icons with Control held down selects and unselects them.
  Click on the background to unselect them all.
 \layout Standard
@@ -1654,10 +1654,10 @@ Open Home Directory
 \newline 
 Show your home directory.
 \newline 
-Rename Item
+Edit Icon
 \newline 
-Change the name displayed under the icon.
- The actual file's name is not changed.
+Change the name displayed under the icon, or the pathname the icon points
+ to.
 \newline 
 Show Location
 \newline 
@@ -1670,6 +1670,18 @@ Show the documentation for the selected application.
 Remove Item(s)
 \newline 
 Remove the selected items from the panel.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
+If you are setting up the defaults for multiple users and you wish to create
+ a `Home' icon that leads to each user's home directory then you should
+ first create a new icon and then use `Edit Icon' to change the location
+ to `~' and the name to `Home'.
 \layout Subsection
 
 
