@@ -130,6 +130,7 @@ static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
+static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
 static GtkWidget	*panel_file_item;	/* The File '' label */
 static GtkWidget	*panel_file_menu;	/* The File '' menu */
@@ -237,6 +238,8 @@ void menu_init()
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
+	filer_new_window = GTK_BIN(gtk_item_factory_get_widget(item_factory,
+			"<filer>/Window/New Window"))->child;
 
 	panel_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
@@ -449,6 +452,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 				filer_window->collection->number_selected);
 			break;
 	}
+
+	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
 	gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 
@@ -1194,7 +1199,12 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_opendir(window_with_focus->path, PANEL_NO);
+	if (o_unique_filer_windows)
+		report_error("ROX-Filer", "You can't open a second view onto "
+			"this directory because the `Unique Windows' option "
+			"is turned on in the Options window.");
+	else
+		filer_opendir(window_with_focus->path, PANEL_NO);
 }
 
 static void close_window(gpointer data, guint action, GtkWidget *widget)

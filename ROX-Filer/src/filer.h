@@ -60,6 +60,7 @@ struct _FilerWindow
 
 extern FilerWindow 	*window_with_focus;
 extern GHashTable	*child_to_filer;
+extern gboolean 	o_unique_filer_windows;
 
 /* Prototypes */
 void filer_init();

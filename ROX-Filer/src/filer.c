@@ -114,7 +114,7 @@ static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 static GtkWidget *toggle_new_window_on_1;
 static GtkWidget *toggle_menu_on_2;
 static GtkWidget *toggle_unique_filer_windows;
-static gboolean o_unique_filer_windows = FALSE;
+gboolean o_unique_filer_windows = FALSE;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
