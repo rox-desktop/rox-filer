@@ -430,7 +430,9 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	smtime = g_strdup_printf("%ld", (long) info.st_mtime);
 
 	path = pathdup(pathname);
-	uri = g_strconcat("file://", path, NULL);
+	uri = g_filename_to_uri(path, NULL, NULL);
+	if(!uri)
+	        uri=g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 	g_free(path);
 		
@@ -484,7 +486,9 @@ static gchar *thumbnail_path(const char *path)
 	GString *to;
 	gchar *ans;
 	
-	uri = g_strconcat("file://", path, NULL);
+	uri = g_filename_to_uri(path, NULL, NULL);
+	if(!uri)
+	       uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 		
 	to = g_string_new(home_dir);
@@ -581,7 +585,9 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 	struct stat info;
 
 	path = pathdup(pathname);
-	uri = g_strconcat("file://", path, NULL);
+	uri = g_filename_to_uri(path, NULL, NULL);
+	if(!uri)
+	        uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 	g_free(uri);
 	

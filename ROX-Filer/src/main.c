@@ -110,6 +110,8 @@ GtkTooltips *tooltips = NULL;
 		"you must use the short versions instead.\n\n")
 #endif
 
+#define BUGS_TO "<rox-devel@lists.sourceforge.net>"
+
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
@@ -129,7 +131,7 @@ GtkTooltips *tooltips = NULL;
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
-       "\nReport bugs to <tal197@users.sourceforge.net>.\n"		\
+       "\nReport bugs to " BUGS_TO ".\n"		\
        "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
 #define SHORT_OPS "c:d:t:b:l:r:op:s:hvnux:m:D:R"
