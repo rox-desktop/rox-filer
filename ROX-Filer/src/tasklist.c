@@ -290,24 +290,27 @@ static void window_check_status(IconWindow *win)
 	gulong nitems;
 	gulong bytes_after;
 	gint32 *data;
-	gboolean iconic;
+	gboolean iconic = FALSE;
 
 	if (wm_supports_hidden && XGetWindowProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(xa__NET_WM_STATE),
-			0, 1, False,
+			0, G_MAXLONG, False,
 			XA_ATOM,
 			&type, &format, &nitems,
 			&bytes_after, (guchar **) &data) == Success && data)
 	{
 		GdkAtom state;
+		int i;
 			
-		if (nitems == 1)
+		for (i = 0; i < nitems; i++)
 		{
-			state = gdk_x11_xatom_to_atom((Atom) data[0]);
-			iconic = state == xa__NET_WM_STATE_HIDDEN;
+			state = gdk_x11_xatom_to_atom((Atom) data[i]);
+			if (state == xa__NET_WM_STATE_HIDDEN)
+			{
+				iconic = TRUE;
+				break;
+			}
 		}
-		else
-			iconic = FALSE;
 		XFree(data);
 	}
 	else if (XGetWindowProperty(gdk_display, win->xwindow,
