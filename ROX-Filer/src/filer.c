@@ -911,6 +911,9 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	filer_window->auto_select = from_dup;
 
 	filer_set_title(filer_window);
+	if (filer_window->window->window)
+		gdk_window_set_role(filer_window->window->window,
+				    filer_window->path);
 	collection_set_cursor_item(filer_window->collection, -1);
 
 	attach(filer_window);

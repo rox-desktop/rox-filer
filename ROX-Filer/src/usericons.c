@@ -46,7 +46,6 @@ static char *process_globicons_line(guchar *line);
 static GlobIcon *get_globicon_struct(guchar *path);
 static void free_globicon(GlobIcon *gi, gpointer user_data);
 static void get_path_set_icon(GtkWidget *dialog);
-static gboolean set_icon_path(guchar *path, guchar *icon);
 static void show_icon_help(gpointer data);
 
 /****************************************************************
@@ -354,9 +353,10 @@ static void remove_icon(GtkWidget *dialog)
 }
 
 /* Add a globicon mapping for the given file to the given icon path */
-static gboolean set_icon_path(guchar *filepath, guchar *iconpath)
+gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 {
 	struct stat icon;
+	MaskedPixmap *pic;
 
 	/* Check if file exists */
 	if (!mc_stat(iconpath, &icon) == 0) {
@@ -366,11 +366,18 @@ static gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 		return FALSE;
 	}
 
-	/* Check if we can load the image */
-	/* We can't check for bad image files without some modifications to the
-	 * public interface of pixmap.c. Is it worth it? If it's not a valid
-	 * image we get the bad_image icon anyway. - Diego Zamboni
-	 */
+	/* Check if we can load the image, warn the user if not. */
+	pic = g_fscache_lookup(pixmap_cache, iconpath);
+	if (!pic)
+	{
+		delayed_error(PROJECT,
+			_("Unable to load image file -- maybe it's not in a "
+			  "format I understand, or maybe the permissions are "
+			  "wrong?\n"
+			  "The icon has not been changed."));
+		return FALSE;
+	}
+	g_fscache_data_unref(pixmap_cache, pic);
 
 	/* Add the globicon mapping and update visible icons */
 	add_globicon(filepath, iconpath);

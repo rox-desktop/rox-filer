@@ -612,14 +612,14 @@ static void update_new_files_menu(MenuIconStyle style)
 }
 
 /* 'item' is the number of the item to appear under the pointer. */
-static void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
+void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
 {
 	int		pos[3];
-	int		button;
+	int		button = 0;
 	guint32		time = 0;
 
-	if (event->type == GDK_BUTTON_PRESS ||
-			event->type == GDK_BUTTON_RELEASE)
+	if (event && (event->type == GDK_BUTTON_PRESS ||
+			event->type == GDK_BUTTON_RELEASE))
 	{
 		GdkEventButton *bev = (GdkEventButton *) event;
 
@@ -628,16 +628,15 @@ static void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
 		button = bev->button;
 		time = bev->time;
 	}
-	else
+	else if (event && event->type == GDK_KEY_PRESS)
 	{
 		GdkEventKey *kev = (GdkEventKey *) event;
 
-		g_return_if_fail(event->type == GDK_KEY_PRESS);
-
 		get_pointer_xy(pos, pos + 1);
-		button = 0;
 		time = kev->time;
 	}
+	else
+		get_pointer_xy(pos, pos + 1);
 
 	pos[2] = item;
 

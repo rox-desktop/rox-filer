@@ -28,6 +28,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 		gboolean  *push_in,
 #endif
 		gpointer data);
+void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item);
 
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);

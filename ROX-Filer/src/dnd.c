@@ -48,11 +48,16 @@
 #include "run.h"
 #include "pinboard.h"
 #include "dir.h"
+#include "usericons.h"
+#include "menu.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
 gint drag_start_x, drag_start_y;
 MotionType motion_state = MOTION_NONE;
+
+static GList *prompt_local_paths = NULL;
+static gchar *prompt_dest_path = NULL;
 
 /* This keeps track of how many mouse buttons are currently down.
  * We add a grab when it does 0->1 and release it on 1<-0.
@@ -113,6 +118,25 @@ static void drag_data_received(GtkWidget      		*widget,
 			gpointer		user_data);
 static gboolean spring_now(gpointer data);
 static void spring_win_destroyed(GtkWidget *widget, gpointer data);
+static void menuitem_response(gpointer data, guint action, GtkWidget *widget);
+static void prompt_action(GList *paths, gchar *dest);
+
+typedef enum {
+	MENU_COPY,
+	MENU_MOVE,
+	MENU_LINK,
+	MENU_SET_ICON,
+} MenuActionType;
+#undef N_
+#define N_(x) x
+static GtkItemFactoryEntry menu_def[] = {
+{N_("Copy"),		NULL, menuitem_response, MENU_COPY, 	NULL},
+{N_("Move"),		NULL, menuitem_response, MENU_MOVE, 	NULL},
+{N_("Link"),		NULL, menuitem_response, MENU_LINK, 	NULL},
+{"",	    		NULL, NULL, 		 0,		"<Separator>"},
+{N_("Set Icon"),	NULL, menuitem_response, MENU_SET_ICON, NULL},
+};
+static GtkWidget *dnd_menu = NULL;
 
 /* The handler of the signal handler for scroll events.
  * This is used to cancel spring loading when autoscrolling is used.
@@ -134,6 +158,8 @@ GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
 void dnd_init()
 {
+	GtkItemFactory	*item_factory;
+
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
@@ -144,6 +170,11 @@ void dnd_init()
 	option_add_int("dnd_drag_to_icons", 1, NULL);
 	option_add_int("dnd_spring_open", 0, NULL);
 	option_add_int("dnd_spring_delay", 400, NULL);
+
+	item_factory = menu_create(menu_def,
+				sizeof(menu_def) / sizeof(*menu_def),
+				 "<dnd>");
+	dnd_menu = gtk_item_factory_get_widget(item_factory, "<dnd>");
 }
 
 /*			SUPPORT FUNCTIONS			*/
@@ -247,9 +278,10 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 	};
 		
 	if (event->state & GDK_BUTTON1_MASK)
-		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK;
+		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE
+			| GDK_ACTION_LINK | GDK_ACTION_ASK;
 	else
-		actions = GDK_ACTION_MOVE;
+		actions = GDK_ACTION_ASK;	/* TODO: Option for move */
 	
 	target_list = gtk_target_list_new(target_table, 1);
 
@@ -302,9 +334,10 @@ void drag_one_item(GtkWidget		*widget,
 		target_list = gtk_target_list_new(target_table, 1);
 
 	if (event->state & GDK_BUTTON1_MASK)
-		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK;
+		actions = GDK_ACTION_COPY | GDK_ACTION_ASK
+			| GDK_ACTION_MOVE | GDK_ACTION_LINK;
 	else
-		actions = GDK_ACTION_MOVE;
+		actions = GDK_ACTION_ASK;	/* TODO: Option for move */
 	
 	context = gtk_drag_begin(widget,
 			target_list,
@@ -407,7 +440,7 @@ void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults)
 			defaults,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table),
-			GDK_ACTION_COPY | GDK_ACTION_MOVE
+			GDK_ACTION_COPY | GDK_ACTION_ASK | GDK_ACTION_MOVE
 			| GDK_ACTION_LINK | GDK_ACTION_PRIVATE);
 
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_drop",
@@ -935,12 +968,13 @@ static void got_uri_list(GtkWidget 		*widget,
 	if (!uri_list)
 		error = _("No URIs in the text/uri-list (nothing to do!)");
 	else if (type == drop_dest_prog)
-		run_with_files(dest_path, uri_list);
+		run_with_files(dest_path, uri_list); /* XXX: Action ask? */
 	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
 	{
 		/* There is one URI in the list, and it's not on the local
 		 * machine. Get it via the X server if possible.
 		 */
+		 /* XXX: Action ask? */
 
 		if (provides(context, application_octet_stream))
 		{
@@ -990,6 +1024,8 @@ static void got_uri_list(GtkWidget 		*widget,
 				"machine - I can't operate on multiple "
 				"remote files - sorry.");
 		}
+		else if (context->action == GDK_ACTION_ASK)
+			prompt_action(local_paths, dest_path);
 		else if (context->action == GDK_ACTION_MOVE)
 			action_move(local_paths, dest_path, NULL);
 		else if (context->action == GDK_ACTION_COPY)
@@ -1019,6 +1055,55 @@ static void got_uri_list(GtkWidget 		*widget,
 		next_uri = next_uri->next;
 	}
 	g_list_free(uri_list);
+}
+
+/* Called when an item from the ACTION_ASK menu is chosen */
+static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
+{
+	if (action == MENU_MOVE)
+		action_move(prompt_local_paths, prompt_dest_path, NULL);
+	else if (action == MENU_COPY)
+		action_copy(prompt_local_paths, prompt_dest_path, NULL);
+	else if (action == MENU_LINK)
+		action_link(prompt_local_paths, prompt_dest_path);
+	else if (action == MENU_SET_ICON)
+	{
+		if (g_list_length(prompt_local_paths) == 1)
+			set_icon_path(prompt_dest_path,
+				(char*) prompt_local_paths->data);
+		else
+			delayed_error(PROJECT,
+			_("You can't use multiple files with Set Icon!"));
+	}
+} 
+
+/* When some local files are dropped somewhere with ACTION_ASK, this
+ * function is called to display the menu.
+ */
+static void prompt_action(GList *paths, gchar *dest)
+{
+	GList		*next;
+
+	if (prompt_local_paths)
+	{
+		g_list_foreach(prompt_local_paths, (GFunc) g_free, NULL);
+		g_list_free(prompt_local_paths);
+		g_free(prompt_dest_path);
+
+		prompt_dest_path = NULL;
+		prompt_local_paths = NULL;
+	}
+	
+	/* Make a copy of the arguments */
+	for (next = paths; next; next = next->next)
+		prompt_local_paths = g_list_append(prompt_local_paths,
+						g_strdup((gchar *) next->data));
+	prompt_dest_path = g_strdup(dest);
+
+	/* Shade 'Set Icon' if there are multiple files */
+	menu_set_items_shaded(dnd_menu, g_list_length(paths) != 1, 4, 1);
+
+	show_popup_menu(dnd_menu, gtk_get_current_event(), 1);
 }
 
 
