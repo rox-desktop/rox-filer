@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.5\n"
-"POT-Creation-Date: 2003-03-05 21:53-0300\n"
+"POT-Creation-Date: 2003-03-09 16:27-0300\n"
 "PO-Revision-Date: 2002-11-21\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -644,30 +644,6 @@ msgstr "Editar Marcadores"
 msgid "Recently Visited"
 msgstr "Visitado Recientemente"
 
-#: cell_icon.c:151
-msgid "DirItem"
-msgstr "DirItem"
-
-#: cell_icon.c:152
-msgid "The item to render."
-msgstr "El elemento a mostrar."
-
-#: cell_icon.c:158
-msgid "Background color"
-msgstr "Color de fondo"
-
-#: cell_icon.c:159
-msgid "Background color as a GdkColor"
-msgstr "Color de fondo como un Gdkcolor"
-
-#: collection.c:264
-msgid "Vertical Adjustment"
-msgstr "Ajuste Vertical"
-
-#: collection.c:265
-msgid "The GtkAdjustment for the vertical position."
-msgstr "El Ajuste Gtk de la posición vertical"
-
 #: dir.c:903
 #, c-format
 msgid "Can't stat directory: %s"
@@ -808,7 +784,7 @@ msgstr ""
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Lo siento, no puedo usar '%s' porque no es un archivo local."
 
-#: dropbox.c:283 pinboard.c:697
+#: dropbox.c:283 pinboard.c:687
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1085,7 +1061,7 @@ msgstr "cambio"
 
 #: find.c:967
 msgid "mtime"
-msgstr "modifiación"
+msgstr "modificación"
 
 #: find.c:969
 msgid "size"
@@ -1110,14 +1086,6 @@ msgstr ""
 #: find.c:979
 msgid "blocks"
 msgstr "bloques"
-
-#: gtksavebox.c:231
-msgid "Has Discard"
-msgstr "Tiene Descarte"
-
-#: gtksavebox.c:232
-msgid "The dialog has a Discard button"
-msgstr "El diálogo tiene un botón Descartar"
 
 #: gtksavebox.c:250
 msgid "Save As:"
@@ -2055,11 +2023,11 @@ msgstr "Falta un < o un > en el archivo de configuración del panel"
 msgid "Error saving panel %s: %s"
 msgstr "Error guardando el panel %s: %s"
 
-#: panel.c:1407
+#: panel.c:1408
 msgid "Applet quit without ever creating a widget!"
 msgstr "El applet terminó sin siquiera crear un widget!"
 
-#: panel.c:1492
+#: panel.c:1493
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2068,12 +2036,12 @@ msgstr ""
 "Error ejecutando el applet:\n"
 "%s"
 
-#: pinboard.c:332
+#: pinboard.c:333
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr ""
 "Tu antiguo archivo de escritorio ha sido convertido al nuevo formato XML."
 
-#: pinboard.c:536
+#: pinboard.c:537
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
@@ -2083,7 +2051,7 @@ msgstr ""
 "Arrastra un directorio de aplicación adentro del diálogo Definir fondo de "
 "pantalla, o (para programadores) pásalo al método SOAP SetBackdropApp."
 
-#: pinboard.c:555
+#: pinboard.c:556
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2097,51 +2065,51 @@ msgstr ""
 "Programadores: el AppInfo.xml de la aplicación debe contener el elemento "
 "CanSetBackdrop, como es descrito en el manual de ROX-Filer."
 
-#: pinboard.c:575
+#: pinboard.c:576
 msgid "Set backdrop"
 msgstr "Definir fondo de pantalla"
 
-#: pinboard.c:586
-msgid "Choose a style, then drag an image in:"
-msgstr "Elije un estilo, luego arrastra una imágen:"
+#: pinboard.c:587
+msgid "Choose a style and drag an image in:"
+msgstr "Elije un estilo y arrastra una imágen:"
 
-#: pinboard.c:598
+#: pinboard.c:600
 msgid "Centre the image without scaling it"
 msgstr "Centrar la imágen sin cambiar su escala"
 
-#: pinboard.c:599
+#: pinboard.c:601
 msgid "Centre"
 msgstr "Centrada"
 
-#: pinboard.c:600
+#: pinboard.c:602
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "Agrandar la imágen para que ajuste en el fondo, sin distorcionarla"
 
-#: pinboard.c:602
+#: pinboard.c:604
 msgid "Scale"
 msgstr "Escalada"
 
-#: pinboard.c:603
+#: pinboard.c:605
 msgid "Stretch the image to fill the backdrop area"
 msgstr "Estirar la imágen para que ocupe todo el fondo de pantalla"
 
-#: pinboard.c:604
+#: pinboard.c:606
 msgid "Stretch"
 msgstr "Estirada"
 
-#: pinboard.c:605
+#: pinboard.c:607
 msgid "Tile the image over the backdrop area"
 msgstr "Hacer un mosaico con imágen sobre el fondo"
 
-#: pinboard.c:606
+#: pinboard.c:608
 msgid "Tile"
 msgstr "Mosaico"
 
-#: pinboard.c:623
+#: pinboard.c:613
 msgid "Drop an image here"
 msgstr "Suelta una imágen aquí"
 
-#: pinboard.c:710
+#: pinboard.c:700
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
@@ -2149,20 +2117,20 @@ msgstr ""
 "Sólo archivos (y ciertas aplicaciones) pueden utilizarse para definir la "
 "imágen del fondo de pantalla."
 
-#: pinboard.c:1279
+#: pinboard.c:1270
 msgid "Missing '>' in icon label"
 msgstr "Falta un '>' en la etiqueta del ícono"
 
-#: pinboard.c:1288
+#: pinboard.c:1279
 msgid "Missing ',' after icon label"
 msgstr "Falta una ',' después de la etiqueta del ícono"
 
-#: pinboard.c:1371
+#: pinboard.c:1362
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Error guardando el escritorio %s: %s"
 
-#: pinboard.c:1984
+#: pinboard.c:1975
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2173,7 +2141,7 @@ msgstr ""
 "%s\n"
 "Fondo de pantalla eliminado."
 
-#: pinboard.c:2260
+#: pinboard.c:2253
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2199,14 +2167,17 @@ msgid "Purge thumbnails disk cache"
 msgstr "Eliminar el caché de miniaturas en el disco"
 
 #: remote.c:593
+#, c-format
 msgid "Unknown style '%s'"
 msgstr "Estilo desconocido '%s'"
 
 #: remote.c:615
+#, c-format
 msgid "Unknown details type '%s'"
 msgstr "Tipo de detalles desconocido '%s'"
 
 #: remote.c:643
+#, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "Tipo de ordenación desconocido '%s'"
 
@@ -3821,6 +3792,30 @@ msgstr ""
 "Algunas aplicaciones antiguas no soportan XDND totalmente y pueden necesitar "
 "que está opción esté activada. Usala si al arrastrar archivos a una "
 "aplicación aparece un signo + en el puntero pero al soltar no funciona."
+
+#~ msgid "DirItem"
+#~ msgstr "DirItem"
+
+#~ msgid "The item to render."
+#~ msgstr "El elemento a mostrar."
+
+#~ msgid "Background color"
+#~ msgstr "Color de fondo"
+
+#~ msgid "Background color as a GdkColor"
+#~ msgstr "Color de fondo como un Gdkcolor"
+
+#~ msgid "Vertical Adjustment"
+#~ msgstr "Ajuste Vertical"
+
+#~ msgid "The GtkAdjustment for the vertical position."
+#~ msgstr "El Ajuste Gtk de la posición vertical"
+
+#~ msgid "Has Discard"
+#~ msgstr "Tiene Descarte"
+
+#~ msgid "The dialog has a Discard button"
+#~ msgstr "El diálogo tiene un botón Descartar"
 
 #~ msgid "Huge"
 #~ msgstr "Enormes"
