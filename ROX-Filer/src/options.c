@@ -297,7 +297,7 @@ GtkWidget *options_show(void)
 
 	if (g_hash_table_size(loading) != 0)
 	{
-		g_printerr(PROJECT ": Some options loaded but not used:\n");
+		g_print(PROJECT ": Some options loaded but not used:\n");
 		g_hash_table_foreach(loading, (GHFunc) puts, NULL);
 	}
 

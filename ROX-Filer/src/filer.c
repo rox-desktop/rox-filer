@@ -1155,6 +1155,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->selection_state = GTK_STATE_INSENSITIVE;
 	filer_window->toolbar = NULL;
 	filer_window->toplevel_vbox = NULL;
+	filer_window->view_hbox = NULL;
 	filer_window->view = NULL;
 	filer_window->scrollbar = NULL;
 
@@ -1287,7 +1288,7 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 	filer_window->view = VIEW(view);
 	filer_window->view_type = type;
 
-	gtk_box_pack_start(filer_window->toplevel_vbox, view, TRUE, TRUE, 0);
+	gtk_box_pack_start(filer_window->view_hbox, view, TRUE, TRUE, 0);
 	gtk_widget_show(view);
 
 	/* Drag and drop events */
@@ -1350,13 +1351,10 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 
 	/* Create this now to make the Adjustment before the View */
 	filer_window->scrollbar = gtk_vscrollbar_new(NULL);
-	
-	/* Scrollbar on the right, everything else on the left */
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
 
 	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_box_pack_start_defaults(GTK_BOX(hbox), vbox);
+	gtk_container_add(GTK_CONTAINER(filer_window->window), vbox);
+	
 	filer_window->toplevel_vbox = GTK_BOX(vbox);
 
 	/* If there's a message that should be displayed in each window (eg
@@ -1370,7 +1368,15 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 		gtk_widget_show(filer_window->message);
 	}
 
+	hbox = gtk_hbox_new(FALSE, 0);
+	filer_window->view_hbox = GTK_BOX(hbox);
+	gtk_box_pack_start_defaults(GTK_BOX(vbox), hbox);
+	/* Add the main View widget */
 	filer_set_view_type(filer_window, filer_window->view_type);
+	/* Put the scrollbar next to the View */
+	gtk_box_pack_start(GTK_BOX(hbox),
+			filer_window->scrollbar, FALSE, TRUE, 0);
+	gtk_widget_show(hbox);
 	
 	/* If we want a toolbar, create it now */
 	toolbar_update_toolbar(filer_window);
@@ -1402,11 +1408,6 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 				filer_window);
 	}
 
-	/* Put the scrollbar on the left of everything else... */
-	gtk_box_pack_start(GTK_BOX(hbox),
-			filer_window->scrollbar, FALSE, TRUE, 0);
-
-	gtk_widget_show(hbox);
 	gtk_widget_show(vbox);
 	gtk_widget_show(filer_window->scrollbar);
 

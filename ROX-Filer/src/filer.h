@@ -46,7 +46,7 @@ typedef void (*TargetFunc)(FilerWindow *filer_window,
 struct _FilerWindow
 {
 	GtkWidget	*window;
-	GtkBox		*toplevel_vbox;
+	GtkBox		*toplevel_vbox, *view_hbox;
 	gboolean	scanning;	/* State of the 'scanning' indicator */
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
