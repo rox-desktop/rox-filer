@@ -1155,7 +1155,7 @@ static void do_copy2(const char *path, const char *dest)
 
 	if (S_ISDIR(info.st_mode))
 	{
-		mode_t	mode = info.st_mode;
+		mode_t	mode = info.st_mode & 0777;
 		char *safe_path, *safe_dest;
 		struct stat 	dest_info;
 		gboolean	exists;
