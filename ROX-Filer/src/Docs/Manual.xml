@@ -1,5 +1,5 @@
 <?xml version="1.0" standalone="no"?>
-<?xml-stylesheet href="/usr/share/sgml/docbook/xsl-stylesheets-1.29/html/docbook.xsl" type="text/xml"?>
+<?xml-stylesheet href="to_html.xsl" type="text/xml"?>
 
 <!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.1.2//EN"
 		      "/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd">
@@ -50,11 +50,11 @@ onto the desktop background.
 <chapter>
   <title>Introduction</title>
   <para>
-<application>ROX-Filer</application> is a simple and easy to use graphical file manager for X11 --- the
+<application>ROX-Filer</application> is a simple and easy to use graphical file manager for X11 &mdash; the
 windowing system used on Unix and Unix-like operating systems.  It is also the
 core component of the ROX Desktop <citation>ROX</citation>. Many of the filer's
 features were inspired by RISC OS <citation>RISC OS</citation>. `ROX' stands for
-`RISC OS--On--X'.
+`RISC OS&ndash;On&ndash;X'.
   </para>
 
 <sect1>
@@ -127,7 +127,7 @@ The X Window system (supplied as standard on all modern systems),
     </para></listitem>
 
     <listitem><para>
-GTK+ 1.2.0 or later (libraries and headers) --- get the latest version
+GTK+ 1.2.0 or later (libraries and headers) &mdash; get the latest version
 from <citation>GTK+</citation>,
     </para></listitem>
 
@@ -151,7 +151,7 @@ recommended.
   <procedure><title>To compile:</title>
 
     <step><para>
-The filer needs some shared files to work --- icons for the various
+The filer needs some shared files to work &mdash; icons for the various
 file types, rules for determining file types and default run actions.
 These are installed by the `rox-base' package. Install rox-base (from
 <ulink url="http://rox.sourceforge.net"/> now if you haven't done so already.
@@ -187,7 +187,7 @@ Once the filer has compiled you will be asked where you want to install
 it. If you want to do a system-wide installation as root, you may
 want to stop here, <command>su</command> to root and rerun the install script.
 
-If you don't have the root password then don't worry --- just follow
+If you don't have the root password then don't worry &mdash; just follow
 the instructions for installing into your home directory. 
     </para></step>
   </procedure>
@@ -233,7 +233,7 @@ You can also use it to open files, like this:
 
 The filer supports various options; use <option>-h</option> for a list.
 All options have long and short forms (eg <option>-h</option> and
-<option>--help</option>) --- although on some systems you can only use the
+<option>--help</option>) &mdash; although on some systems you can only use the
 short versions.
 
 Note that if the same version of the filer is already running on this
@@ -389,7 +389,7 @@ careful when using the filer like this.
 
 Normally, you should log in as an ordinary user and only change to
 root when you need to. You can create a simple script which runs the
-filer as root --- something like this:
+filer as root &mdash; something like this:
 
 <programlisting>
 #!/bin/sh
@@ -464,7 +464,7 @@ like one).
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-x</option></term><term><option>--examine=FILE</option></term>
-<listitem><para>FILE has changed --- re-examine it.
+<listitem><para>FILE has changed &mdash; re-examine it.
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-v</option></term><term><option>--version</option></term>
@@ -482,9 +482,9 @@ like one).
 <itemizedlist><title>Quick start:</title>
 
   <listitem><para>Click the left
-  <footnote><para>This documentation assumes that button--1 is the left button, button--2
-is the middle button and button--3 is the right button. This is not
-always the case --- for example, in a left-handed setup.</para></footnote>
+  <footnote><para>This documentation assumes that button&ndash;1 is the left button, button&ndash;2
+is the middle button and button&ndash;3 is the right button. This is not
+always the case &mdash; for example, in a left-handed setup.</para></footnote>
 mouse button to open files and directories.</para></listitem>
 
   <listitem><para>
@@ -499,7 +499,7 @@ Drag files between windows to copy (left button) or move (middle button) them.
 
   <para>
 By default, the mouse button bindings are designed to fit in with X
-conventions. However, the behaviour is highly configurable --- have a play in
+conventions. However, the behaviour is highly configurable &mdash; have a play in
 the Options window if you don't like the normal settings. The normal settings
 behave as follows:
   </para>
@@ -672,7 +672,7 @@ Same
 <para>
 <anchor id="newwin_fn" xreflabel="[1]"/>[1]
 If the 'New window on button 1' option is turned on
-then the default is to open a new window --- clicking with the other
+then the default is to open a new window &mdash; clicking with the other
 button reuses the same window instead.
 </para>
 
@@ -827,7 +827,7 @@ which is which!
   <para>
 
 The permissions field, when shown, is made up of four groups of three
-flags. Each flag is displayed as a letter if it is on and a dash (--)
+flags. Each flag is displayed as a letter if it is on and a dash (&ndash;)
 if not. The first three characters show the permissions for the owner
 of the file, the second for other members of the file's group and
 the third for everyone else. Whichever group applies to the <application>ROX-Filer</application>
@@ -865,7 +865,7 @@ directory itself.</para></listitem></varlistentry>
 
 </variablelist>
 <!-- XXX: Make this appear underlined! -->
-For example, <computeroutput>_r_w_x_,rwx,r-x/---</computeroutput> means
+For example, <computeroutput>_r_w_x_,rwx,r-x/&mdash;</computeroutput> means
 that the owner of the file is the same as the effective user of
 <application>ROX-Filer</application> (basically, you own the file), you and
 members of the file's group have read, write and execute permission and other
@@ -900,7 +900,7 @@ set its real IDs to its effective IDs).
   <title>The selection menu</title>
   <para>
 
-All of these work in the same way --- if you open the menu with some
+All of these work in the same way &mdash; if you open the menu with some
 items selected then the operation applies to those items. If you open
 then menu over an item while there is no selection then that item
 is temporarily selected. If you choose one of these while there is
@@ -911,7 +911,7 @@ mode. Target mode is mainly useful with the `Single click navigation'
 option and keys bound to the various menu entries.
 
 Note that individual applications may add extra menu items to the
-top of this submenu when you click over them --- see <xref linkend="AppDir"/>
+top of this submenu when you click over them &mdash; see <xref linkend="AppDir"/>
 for details.
 
 
@@ -948,10 +948,10 @@ Allows you to set the default program to use when opening files of
 this type.See section \ref{sec: RunAction} for details.
 Set Icon...
 You can give each file or directory its own special icon using this
-feature --- simplydrag a suitable image onto the Set Icon dialog box.
+feature &mdash; simplydrag a suitable image onto the Set Icon dialog box.
 </entry></row><row><entry>
 Open (A)VFS</entry><entry>
-Open the file as if it was a directory --- see section \ref{sec: vfs}.
+Open the file as if it was a directory &mdash; see section \ref{sec: vfs}.
 </entry></row><row><entry>
 Send To...</entry><entry>
 Opens the `Send To' menu, allowing you to send the selected files
@@ -970,7 +970,7 @@ Permissions</entry><entry>
 Allows you to change the permissions for the selected files.
 </entry></row><row><entry>
 Find</entry><entry>
-Search for files by specifying various conditions --- see section
+Search for files by specifying various conditions &mdash; see section
 \ref{sec: Searching}.
 </entry></row>
 </tbody></tgroup></informaltable>
@@ -980,7 +980,7 @@ Search for files by specifying various conditions --- see section
 A symbolic link stores the <emphasis>location</emphasis>
 of another file. Deleting the symlink doesn't affect the other file.
 Deleting the other file means that the symlink won't work. There are
-two types of symbolic link --- Relative and Absolute. An absolute
+two types of symbolic link &mdash; Relative and Absolute. An absolute
 link stores the path from the root directory to the target file (eg
 `/home/fred/MyFile'). A relative path stores the path from the symlink
 to the target (eg `../fred/MyFile'). If the target file is never going
@@ -1080,7 +1080,7 @@ Shell Command...</entry><entry>
 Open the shell command box (see section \ref{sec: mini}).
 </entry></row><row><entry>
 Select If...</entry><entry>
-Select just those files that match the given pattern --- see section
+Select just those files that match the given pattern &mdash; see section
 \ref{sec: SelectIf}.
 </entry></row><row><entry>
 Show ROX-Filer Help</entry><entry>
@@ -1176,7 +1176,7 @@ then you should first create a new icon and then use `Edit Icon' to
 change the location to `~' and the name to `Home'.
 
 Note that individual applications may add extra menu items to the
-top of this menu when you click over them --- see <xref linkend="AppDir"/>
+top of this menu when you click over them &mdash; see <xref linkend="AppDir"/>
 for details.
 </para>
 </sect1>
@@ -1185,7 +1185,7 @@ for details.
   <title>Panel applets</title>
   <para>
 
-<application>ROX-Filer</application> allows you to run small programs inside the panel --- such
+<application>ROX-Filer</application> allows you to run small programs inside the panel &mdash; such
 programs are called <emphasis>applets</emphasis>. To run an applet, drag it onto
 the panel from a filer window and instead of the applet's icon being
 shown, the applet will run.
@@ -1242,7 +1242,7 @@ available on all platforms.
 Support for the Midnight Commander VFS library compiled into
 <application>ROX-Filer</application>. This happens automatically when you
 compile <application>ROX-Filer</application> if it can find
-the VFS library --- this means having <filename>libvfs.so</filename>
+the VFS library &mdash; this means having <filename>libvfs.so</filename>
 (or <filename>libvfs.a</filename>) in a system library directory or in the
 directory in the environment variable <envar>LD_LIBRARY_PATH</envar>. In this case,
 you will be able to view the directory structure and copy files out of it, but
@@ -1251,7 +1251,7 @@ not change it. Support for this may be added later.
 </para>
 
 <para>
-When using libvfs, the menu structure is slightly different --- <guimenuitem>Open
+When using libvfs, the menu structure is slightly different &mdash; <guimenuitem>Open
 AVFS</guimenuitem> is replaced by the <guisubmenu>Open VFS</guisubmenu> submenu.
 This is simply a short-cut for using the path-entry box (explained below), so
 if you want to use a VFS not listed on the menu you can type in the path
@@ -1391,7 +1391,7 @@ I usually bind this function to the slash (<keycap>/</keycap>) key.
 </para></listitem>
 
 <listitem><para>
-Press <accel>CTRL-U</accel> to delete the existing contents --- this
+Press <accel>CTRL-U</accel> to delete the existing contents &mdash; this
 moves you to the root directory.
 </para></listitem>
 
@@ -1423,7 +1423,7 @@ If some items are selected then they are assigned to the positional
 parameters <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
   </para><para>
 Opening the minibuffer with a selection adds <computeroutput>$@</computeroutput>
-to the end of the command --- this expands to all the selected files.
+to the end of the command &mdash; this expands to all the selected files.
 If there is no selection, but a file is under the cursor, the name
 of that file is inserted.
   </para>
@@ -1528,7 +1528,7 @@ Action windows are those boxes that appear while you're doing a
 Copy/Move/Link/etc
 operation. The status line at the top of the window shows the current
 directory or object that the window is processing. The scrolling area
-below is the log area --- it shows what has been done and may display
+below is the log area &mdash; it shows what has been done and may display
 questions here.
   </para><para>
 At the bottom are four buttons and, sometimes, some options. The buttons
@@ -1641,7 +1641,7 @@ If the pattern you enter contains a slash (`/') character then the
 pattern is matched against the file's full path, otherwise only the
 leafname is used. That is, <userinput>'*tmp*'</userinput> will find
 <filename>tmp</filename> and <filename>tmpfile</filename> but not
-<filename>/tmp/file</filename> --- <userinput>'/*tmp*'</userinput> will find
+<filename>/tmp/file</filename> &mdash; <userinput>'/*tmp*'</userinput> will find
 all three.
   </para>
 </sect1>
@@ -1651,7 +1651,7 @@ all three.
   <para>
 As well as finding files by their names you can also find them by
 various other attributes. Note that <emphasis>file</emphasis> is used here to
-mean anything that can appear in the filesystem --- including directories,
+mean anything that can appear in the filesystem &mdash; including directories,
 devices and so on.
   </para>
 
@@ -1691,7 +1691,7 @@ devices and so on.
 
 </itemizedlist>
 
-<itemizedlist><title>These look at the permissions set on the file ---
+<itemizedlist><title>These look at the permissions set on the file &mdash;
 see the <xref linkend="Permissions"/> section.</title>
 
 <listitem><para>
@@ -1895,14 +1895,14 @@ but it's not so clear what is meant.
 The second finds files larger than 10 Mb and the last finds
 regular files with more than one directory entry.
 </para><para>
-Be careful though --- the filer doesn't check the context of the modifiers,
+Be careful though &mdash; the filer doesn't check the context of the modifiers,
 so <userinput>size &gt; 1 day ago</userinput> is allowed, although it
 doesn't make much sense!
 
 Also, forgetting to use <userinput>ago</userinput> or
 <userinput>hence</userinput> will cause odd effects (the time will be
 measured relative to the Epoch rather than the current time).
-Finally, don't use <userinput>=</userinput> with times ---
+Finally, don't use <userinput>=</userinput> with times &mdash;
 <userinput>atime = 1 day ago</userinput> looks for a file accessed
 <emphasis>exactly</emphasis> 86400 seconds ago...
 
@@ -1913,42 +1913,50 @@ Finally, don't use <userinput>=</userinput> with times ---
   <title>Specials</title>
   <para>
 
-\begin{description}
-\item [System(Command)]executes `Command' on the file. The test succeeds
-if the command returns an exit status of zero. A `\%' character in
+<itemizedlist>
+
+<listitem><para>
+<userinput>System(Command)</userinput> executes `Command' on the file. The test
+succeeds if the command returns an exit status of zero. A `%' character in
 `Command' is replaced by the full path of the file being checked.
-System is a very slow test to perform, so do it last if possible.
-For example, if you're looking for a .c file containing the word `main',
-do
+<userinput>System</userinput> is a very slow test to perform, so do it last if
+possible.  For example, if you're looking for a <filename>.c</filename> file
+containing the word `main', do:
 
 <screen>
-'{*}.c' system(grep -q main "\thinspace{}\%\thinspace{}")
+'*.c' system(grep -q main "%")
 </screen>
-so that the grep is only performed for files ending in .c (as opposed
-to only checking that the file ends in .c if it contains the word
-`main').
+so that the grep is only performed for files ending in <filename>.c</filename>
+(as opposed to only checking that the file ends in <filename>.c</filename> if
+it contains the word `main').
+</para></listitem>
 
-\item [Prune]Always fails!%
-\footnote{Note that this is the opposite of the \noun{find(1)} command.
-} However, if it gets evaluated at all then it prevents the filer from
-checking inside the current directory. Remember the order in which
+<listitem><para>
+<userinput>Prune</userinput> Always fails!
+<footnote><para>Note that this is the opposite of the
+<citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
+</citerefentry> command.</para></footnote>
+
+However, if it gets evaluated at all then it prevents the filer
+from checking inside the current directory. Remember the order in which
 the filer checks the expression!
-\end{description}
+</para></listitem>
+
+</itemizedlist>
+
 Examples:
 
 <screen>
-'{*}.old' system(rm \%)
+'*.old' system(rm '%')
 
-'src' prune, '{*}.c'
+'src' prune, '*.c'
 </screen>
-The first deletes each file ending in \texttt{.old}. The second looks
-for \texttt{.c} files, but does not bother checking inside directories
-called \texttt{src}. The expression is evaluated like this:
-
+The first deletes each file ending in <filename>.old</filename>.
+The second looks for <filename>.c</filename> files, but does not bother
+checking inside directories called <filename>src</filename>.
+The expression is evaluated like this:
 
 {\centering \resizebox*{!}{2.5in}{\includegraphics{Prune.eps}} \par}
-
-
 
   </para>
 </sect1>
@@ -1958,23 +1966,44 @@ called \texttt{src}. The expression is evaluated like this:
   <title>Options</title>
   <para>
 
-You can configure various aspects of <application>ROX-Filer</application> from the Options box.
-Choose `Options...' from a filer window menu to open it. 
+You can configure various aspects of <application>ROX-Filer</application> from
+the Options box.
+Choose <guimenuitem>Options...</guimenuitem> from a filer window menu to open
+it. 
 
 At the bottom of the window are four buttons:
 
-\begin{description}
-\item [Save]puts all your choices into effect, and also saves them into
-your Choices directory for next time <application>ROX-Filer</application> is loaded. <application>ROX-Filer</application>
-will never save any preferences to disk unless you click on the `Save'
-button in the options window. Exactly where choices are loaded from
-and saved to is controlled by the \texttt{CHOICESPATH} environment
-variable --- see <citation>Choices</citation> for details.
-\item [OK]puts your choices into effect without writing anything to disk.
-\item [Apply]works like OK, but without closing the Options window.
-\item [Cancel]closes the options box and forgets any changes you made.
-\end{description}
-Many of the options in the Options window have tooltips --- hold the
+<itemizedlist>
+
+<listitem><para>
+<guibutton>Save</guibutton>
+puts all your choices into effect, and also saves them into
+your Choices directory for next time <application>ROX-Filer</application> is
+loaded. <application>ROX-Filer</application> will never save any preferences to
+disk unless you click on the <guibutton>Save</guibutton> button in the options
+window. Exactly where choices are loaded from and saved to is controlled by
+the <envar>CHOICESPATH</envar> environment variable &mdash; see
+<citation>Choices</citation> for details.
+</para></listitem>
+
+<listitem><para>
+<guibutton>OK</guibutton>
+puts your choices into effect without writing anything to disk.
+</para></listitem>
+
+<listitem><para>
+<guibutton>Apply</guibutton>
+works like <guibutton>OK</guibutton>, but without closing the Options window.
+</para></listitem>
+
+<listitem><para>
+<guibutton>Cancel</guibutton>
+closes the options box and forgets any changes you made.
+</para></listitem>
+
+</itemizedlist>
+
+Many of the options in the Options window have tooltips &mdash; hold the
 mouse pointer over the option to find out what it does.
 
   </para>
@@ -2015,11 +2044,11 @@ the other files.
 \item `Large wrap width' sets the maximum width for a file's name in `Large
 Icons' display mode before the text will wrap onto two lines. In Huge
 Icons mode, the wrap width is 50\% larger than this value.
-\item `Max Small Icons width' --- as above, but applies when the display
+\item `Max Small Icons width' &mdash; as above, but applies when the display
 is in `Small Icons' display mode.
 \end{itemize}
 The remaining options provide the default settings for newly opened
-windows --- they correspond to choosing styles from the Display menu.
+windows &mdash; they correspond to choosing styles from the Display menu.
 Icon size is also used when switching off the details display from
 the toolbar.
 
@@ -2081,7 +2110,7 @@ options that appear inside action windows.
 \begin{itemize}
 \item `Unshade the tools you want:' allows you to set which tools should
 appear on the toolbar. Click on the buttons below to shade and unshade
-them --- shaded tools will not be shown on filer window toolbars.
+them &mdash; shaded tools will not be shown on filer window toolbars.
 \item `Toolbar type' allows you to choose what kind of toolbars you want.
 \textbf{None} means that windows will not have a toolbar, \textbf{Normal}
 provides a small bar of icons, and \textbf{Large} displays larger
@@ -2122,9 +2151,9 @@ The next two options control what happens when you press tab in the
 path entry minibuffer:
 
 \begin{itemize}
-\item `Beep if Tab-completion fails' --- beep if there is no match, or there
+\item `Beep if Tab-completion fails' &mdash; beep if there is no match, or there
 are several possible completions, each starting differently.
-\item `Beep if there are several matches' --- beep if there are several
+\item `Beep if there are several matches' &mdash; beep if there are several
 matches, even though some letters were added.
 \end{itemize}
 
@@ -2150,7 +2179,7 @@ you drop files onto icons in filer windows. If on then drops onto
 directories will save the data inside the directory, while dropping
 onto programs will invoke the program on that data. If off then drops
 anywhere inside a filer window act like drops onto the window background
---- that is, the data will be saved into the directory being displayed.
+&mdash; that is, the data will be saved into the directory being displayed.
 \item `Directories spring open' controls what happens when you hold a file
 over a directory while dragging it. If on, the directory will `spring
 open' after a short pause, allowing you to navigate to any directory
@@ -2189,7 +2218,7 @@ to the RISC OS mouse bindings.
 middle button brings up the menus. This is provided for people who
 are used to the RISC OS mouse bindings.
 \item `Single-click navigation' means that clicking on a file or directory
-will open it. If off, clicking on files selects them instead --- you
+will open it. If off, clicking on files selects them instead &mdash; you
 must double click on a file to open it.
 \end{itemize}
 As an alternative to using the options window to put menu on button-2,
@@ -2276,7 +2305,7 @@ filetypes:
 \item [MIME-info]contains files which specify what the MIME types for files
 should be, based on their extentions. All the files in all the MIME-info
 directories are scanned when the filer loads. <application>ROX-Filer</application> comes with
-a file containing many such rules --- this is installed into the MIME-info
+a file containing many such rules &mdash; this is installed into the MIME-info
 directory by the rox-base package.
 
 
@@ -2288,7 +2317,7 @@ recognise the new extensions.
 to programs that can handle files of that type. To set what program
 is run when you click on the file you should normally use the `Set
 Run Action' feature (see section \ref{sec: RunAction}). However,
-you can also set the actions manually --- for example, to make opening
+you can also set the actions manually &mdash; for example, to make opening
 an HTML file load it into Netscape:
 
 \begin{enumerate}
@@ -2318,7 +2347,7 @@ isn't found then the filer will try simply using `text'.
   <para>
 
 An application directory is a directory which can be run as an application.
-It contains all the resources of an application --- source code, binaries,
+It contains all the resources of an application &mdash; source code, binaries,
 documentation and so on. Keeping everything in one place make installation
 and uninstallation much easier for users. You can also keep multiple
 versions of a program by simply having several application directories.
@@ -2333,7 +2362,7 @@ watch out for is setuid binaries.
 The following files are treated as special by <application>ROX-Filer</application>:
 
 \begin{description}
-\item [AppRun]is executed when you click on the directory --- make sure
+\item [AppRun]is executed when you click on the directory &mdash; make sure
 it is executable (use the Permissions box)!
 \item [.DirIcon.png]is the image used to represent the directory (this works
 even if there is no AppRun).
@@ -2506,7 +2535,7 @@ in the `\texttt{src}' directory when you change the \texttt{.c} and
   <para>
 
 When people make small modifications to the sources they will often
-distribute them as <emphasis>patch files</emphasis> --- usually on the mailing list.
+distribute them as <emphasis>patch files</emphasis> &mdash; usually on the mailing list.
 To apply a patch, go into the 'src' directory and run patch with the
 patch file. Then recompile, like this:
 
@@ -2516,7 +2545,7 @@ $ patch &lt; patchfile
 $ ../AppRun --compile
 </screen>
 
-You can remove the patch by simply repeating the above sequence ---
+You can remove the patch by simply repeating the above sequence &mdash;
 patch will detect that the patch is already applied and offer to remove
 it.
 
