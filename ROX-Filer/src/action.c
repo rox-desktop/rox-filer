@@ -563,6 +563,13 @@ static void message_from_child(gpointer 	 data,
 				g_free(buffer);
 				return;
 			}
+			else if (*buffer == '#')
+			{
+				gtk_clist_clear(GTK_CLIST(gui_side->results));
+				g_free(buffer);
+				return;
+			}
+
 			else if (*buffer == 'm' || *buffer == 'M')
 			{
 				if (*buffer == 'M')
@@ -1788,21 +1795,33 @@ static void find_cb(gpointer data)
 	FilerWindow *filer_window = (FilerWindow *) data;
 	Collection *collection = filer_window->collection;
 	DirItem   *item;
-	int	left = collection->number_selected;
-	int	i = -1;
+	int	left;
+	int	i;
 
 	send_dir(filer_window->path);
 
-	while (left > 0)
+	while (1)
 	{
-		i++;
-		if (!collection->items[i].selected)
-			continue;
-		item = (DirItem *) collection->items[i].data;
-		do_find(make_path(filer_window->path,
-					item->leafname)->str,
-				NULL);
-		left--;
+		left = collection->number_selected;
+		i = -1;
+
+		while (left > 0)
+		{
+			i++;
+			if (!collection->items[i].selected)
+				continue;
+			item = (DirItem *) collection->items[i].data;
+			do_find(make_path(filer_window->path,
+						item->leafname)->str,
+					NULL);
+			left--;
+		}
+
+		g_string_assign(message, _("?Another search?"));
+		if (!reply(from_parent, TRUE))
+			break;
+		g_string_assign(message, "#");
+		send();
 	}
 	
 	g_string_sprintf(message, _("'\nDone\n"));
