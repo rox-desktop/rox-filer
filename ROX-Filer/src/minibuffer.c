@@ -159,7 +159,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 		case MINI_FILTER:
 			if(filer_window->filter!=FILER_SHOW_GLOB ||
 			   !filer_window->filter_string)
-				gtk_entry_set_text(mini, "");
+				gtk_entry_set_text(mini, "*");
 			else
 				gtk_entry_set_text(mini,
 						  filer_window->filter_string);
@@ -865,7 +865,7 @@ static void filter_return_pressed(FilerWindow *filer_window, guint etime)
 
 	entry = mini_contents(filer_window);
 
-	if (entry && *entry) {
+	if (entry && *entry && strcmp(entry, "*")!=0) {
 		display_set_filter(filer_window, FILER_SHOW_GLOB,
 				   entry);
 	} else {
