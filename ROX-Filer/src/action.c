@@ -215,6 +215,10 @@ void show_condition_help(gpointer data)
 		GtkWidget *text, *vbox, *button, *hbox, *frame;
 		
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
+#ifdef GTK2
+		gtk_window_set_type_hint(GTK_WINDOW(help),
+				    GDK_WINDOW_TYPE_HINT_DIALOG);
+#endif
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
 		gtk_window_set_title(GTK_WINDOW(help),
 				_("Find expression reference"));
@@ -312,6 +316,10 @@ static void show_chmod_help(gpointer data)
 		GtkWidget *text, *vbox, *button, *hbox, *sep;
 		
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
+#ifdef GTK2
+		gtk_window_set_type_hint(GTK_WINDOW(help),
+				    GDK_WINDOW_TYPE_HINT_DIALOG);
+#endif
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
 		gtk_window_set_title(GTK_WINDOW(help),
 				_("Permissions command reference"));

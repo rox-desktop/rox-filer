@@ -39,17 +39,6 @@ void draw_large_icon(GtkWidget *widget,
 		     DirItem  *item,
 		     MaskedPixmap *image,
 		     gboolean selected);
-void draw_string(GtkWidget *widget,
-		GdkFont *font,
-		char	*string,
-		int	len,
-		int 	x,
-		int 	y,
-		int 	width,
-		int	area_width,
-		GtkStateType selection_state,
-		gboolean selected,
-		gboolean box);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);
 void display_change_size(FilerWindow *filer_window, gboolean bigger);
 

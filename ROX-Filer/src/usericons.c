@@ -212,6 +212,10 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 	gi = g_hash_table_lookup(glob_icons, path);
 
 	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
+#ifdef GTK2
+	gtk_window_set_type_hint(GTK_WINDOW(dialog),
+			GDK_WINDOW_TYPE_HINT_DIALOG);
+#endif
 	gtk_object_set_data_full(GTK_OBJECT(dialog),
 				 "pathname",
 				 strdup(path),

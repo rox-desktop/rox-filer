@@ -198,7 +198,11 @@ gtk_savebox_init (GtkSavebox *savebox)
 					  sizeof (targets) / sizeof (*targets));
   savebox->icon = NULL;
 
+#ifdef GTK2
+  gtk_window_set_type_hint (GTK_WINDOW (savebox), GDK_WINDOW_TYPE_HINT_DIALOG);
+#else
   GTK_WINDOW (savebox)->type = GTK_WINDOW_DIALOG;
+#endif
   gtk_window_set_title (GTK_WINDOW (savebox), _("Save As:"));
   gtk_window_set_position (GTK_WINDOW (savebox), GTK_WIN_POS_MOUSE);
   gtk_window_set_wmclass (GTK_WINDOW (savebox), "savebox", "Savebox");

@@ -79,6 +79,10 @@ void infobox_new(guchar *path)
 	path = g_strdup(path);	/* Gets attached to window & freed later */
 
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
+#ifdef GTK2
+	gtk_window_set_type_hint(GTK_WINDOW(window),
+			GDK_WINDOW_TYPE_HINT_DIALOG);
+#endif
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_title(GTK_WINDOW(window), path);

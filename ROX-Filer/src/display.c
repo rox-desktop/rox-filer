@@ -108,14 +108,17 @@ struct _ViewData
 {
 #ifdef GTK2
 	PangoLayout *layout;
+	PangoLayout *details;
 #endif
 	int	name_width;
 	int	name_height;
+	int	details_width;
+	int	details_height;
 #ifndef GTK2
 	int	split_pos;		/* 0 => No split */
 	int	split_width, split_height;
-#endif
 	char	*details;
+#endif
 
 	MaskedPixmap *image;		/* Image; possibly thumbnail */
 };
@@ -144,7 +147,6 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template);
 static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template);
-static int details_width(ViewData *view);
 static void draw_item(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area,
@@ -159,6 +161,19 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
 static void update_views(FilerWindow *filer_window);
+static void draw_string(GtkWidget *widget,
+#ifdef GTK2
+		PangoLayout *layout,
+#else
+		GdkFont	*font,
+		char	*string,
+		int	len,		/* -1 for whole string */
+#endif
+		GdkRectangle *area,	/* Area available on screen */
+		int 	width,		/* Width of the full string */
+		GtkStateType selection_state,
+		gboolean selected,
+		gboolean box);
 
 enum {
 	SORT_BY_NAME = 0,
@@ -210,11 +225,16 @@ static void fill_template(GdkRectangle *area, CollectionItem *colitem,
 
 	if (view->details)
 	{
+#ifdef GTK2
+		template->details.width = view->details_width;
+		template->details.height = view->details_height;
+#else
 		int	fixed_height = fixed_font->ascent + fixed_font->descent;
 
 		template->details.width = fixed_width *
 					strlen(view->details);
 		template->details.height = fixed_height;
+#endif
 
 		if (style == SMALL_ICONS)
 			small_full_template(area, colitem,
@@ -290,9 +310,9 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 	}
 	else
 	{
+		w = view->details_width;
 		if (style == HUGE_ICONS)
 		{
-			w = details_width(view);
 			*width = HUGE_WIDTH + 12 + MAX(w, view->name_width);
 			*height = HUGE_HEIGHT - 4;
 		}
@@ -300,7 +320,6 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		{
 			int	text_height;
 
-			w = details_width(view);
 			*width = SMALL_WIDTH + view->name_width + 12 + w;
 			fixed_height = fixed_font->ascent + fixed_font->descent;
 			text_height = MAX(view->name_height, fixed_height);
@@ -308,7 +327,6 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		}
 		else
 		{
-			w = details_width(view);
                         *width = ICON_WIDTH + 12 + MAX(w, view->name_width);
 			*height = ICON_HEIGHT;
 		}
@@ -450,64 +468,6 @@ void draw_large_icon(GtkWidget *widget,
 	
 	gdk_gc_set_clip_mask(gc, NULL);
 	gdk_gc_set_clip_origin(gc, 0, 0);
-}
-
-/* 'box' renders a background box if the string is also selected */
-void draw_string(GtkWidget *widget,
-		GdkFont	*font,
-		char	*string,
-		int	len,		/* -1 for whole string */
-		int 	x,
-		int 	y,
-		int 	width,		/* Width of the full string */
-		int	area_width,	/* Width available for drawing in */
-		GtkStateType selection_state,
-		gboolean selected,
-		gboolean box)
-{
-	int		text_height = font->ascent + font->descent;
-	GdkRectangle	clip;
-	GdkGC		*gc = selected
-			? widget->style->fg_gc[selection_state]
-			: type_gc;
-	
-	if (selected && box)
-		gtk_paint_flat_box(widget->style, widget->window, 
-				selection_state, GTK_SHADOW_NONE,
-				NULL, widget, "text",
-				x, y - font->ascent,
-				MIN(width, area_width),
-				text_height);
-
-	if (width > area_width)
-	{
-		clip.x = x;
-		clip.y = y - font->ascent;
-		clip.width = area_width;
-		clip.height = text_height;
-		gdk_gc_set_clip_origin(gc, 0, 0);
-		gdk_gc_set_clip_rectangle(gc, &clip);
-	}
-
-	if (len == -1)
-		len = strlen(string);
-	gdk_draw_text(widget->window,
-			font,
-			gc,
-			x, y,
-			string, len);
-
-	if (width > area_width)
-	{
-		if (!red_gc)
-		{
-			red_gc = gdk_gc_new(widget->window);
-			gdk_gc_set_foreground(red_gc, &red);
-		}
-		gdk_draw_rectangle(widget->window, red_gc, TRUE,
-				x + area_width - 1, clip.y, 1, text_height);
-		gdk_gc_set_clip_rectangle(gc, NULL);
-	}
 }
 
 /* The sort functions aren't called from outside, but they are
@@ -766,9 +726,7 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
 	view = g_new(ViewData, 1);
 
 #ifdef GTK2
-	view->layout = gtk_widget_create_pango_layout(
-				filer_window->window, item->leafname);
-
+	view->layout = NULL;
 #endif
 	view->details = NULL;
 	view->image = NULL;
@@ -791,6 +749,8 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 		g_object_unref(G_OBJECT(view->layout));
 		view->layout = NULL;
 	}
+	if (view->details)
+		g_object_unref(G_OBJECT(view->details));
 #endif
 
 	if (view->image)
@@ -861,7 +821,8 @@ static void options_changed(void)
 	gboolean	old_dirs = o_dirs_first;
 	gboolean	old_colours = o_display_colour_types;
 #ifdef GTK2
-	gboolean	old_wrap = o_large_truncate;
+	gboolean	old_large_wrap = o_large_truncate;
+	gboolean	old_small_trunc = o_small_truncate;
 #endif
 	GList		*next = all_filer_windows;
 	int		ch_colours;
@@ -879,8 +840,12 @@ static void options_changed(void)
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
 #ifdef GTK2
-		if (old_wrap != o_large_truncate)
+		if (old_large_wrap != o_large_truncate ||
+			old_small_trunc != o_small_truncate)
+		{
+			/* Recreate PangoLayout */
 			update_views(filer_window);
+		}
 #endif
 
 		if (o_sort_nocase != old_case || o_dirs_first != old_dirs)
@@ -895,11 +860,6 @@ static void options_changed(void)
 
 		next = next->next;
 	}
-}
-
-static int details_width(ViewData *view)
-{
-	return fixed_width * strlen(view->details);
 }
 
 static void huge_template(GdkRectangle *area, CollectionItem *colitem,
@@ -1187,26 +1147,30 @@ static void draw_small_icon(GtkWidget *widget,
 	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
+#ifndef GTK2
 /* Render the details somewhere */
-static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
-			 int width, gboolean selected, guchar *string)
+static void draw_details(FilerWindow *filer_window, DirItem *item,
+			 GdkRectangle *area, int width,
+			 gboolean selected, guchar *string)
 {
 	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
 	DetailsType	type = filer_window->details_type;
 	int		w;
+
+	if (item->base_type == TYPE_UNKNOWN)
+		return;
 	
 	w = fixed_width * strlen(string);
 
 	draw_string(widget,
 			fixed_font,
 			string, -1,
-			x, y,
-			w,
+			area,
 			width,
 			filer_window->selection_state,
 			selected, TRUE);
 
-	if (item->lstat_errno || item->base_type == TYPE_UNKNOWN)
+	if (item->lstat_errno)
 		return;
 
 	if (type == DETAILS_SUMMARY || type == DETAILS_PERMISSIONS)
@@ -1222,11 +1186,12 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 					filer_window->selection_state]
 				: type_gc,
 				TRUE,
-				x - 1 + fixed_width * perm_offset,
-				y + fixed_font->descent - 1,
+				area->x - 1 + fixed_width * perm_offset,
+				area->y + area->height - 1,
 				fixed_width * 3 + 1, 1);
 	}
 }
+#endif
 
 /* Return a new string giving details of this item, or NULL if details
  * are not being displayed. If details are not yet available, return
@@ -1371,45 +1336,44 @@ static void draw_item(GtkWidget *widget,
 	}
 	
 #ifdef GTK2
-	if (selected)
-		gtk_paint_flat_box(widget->style, widget->window, 
-				filer_window->selection_state, GTK_SHADOW_NONE,
-				NULL, widget, "text",
-				template.leafname.x,
-				template.leafname.y,
-				template.leafname.width,
-				template.leafname.height);
-	gdk_draw_layout(widget->window,
-		selected ? widget->style->fg_gc[filer_window->selection_state]
-			 : type_gc,
-		template.leafname.x,
-		template.leafname.y,
-		view->layout);
+	draw_string(widget, view->layout,
+			&template.leafname,
+			view->name_width,
+			filer_window->selection_state,
+			selected, TRUE);
+	if (view->details)
+		draw_string(widget, view->details,
+				&template.details,
+				template.details.width,
+				filer_window->selection_state,
+				selected, TRUE);
 #else
 	if (view->split_pos)
 	{
+		GdkRectangle rec;
 		guchar	*bot = item->leafname + view->split_pos;
 		int	w;
 
 		w = gdk_string_measure(item_font, bot);
 
+		rec.x = template.leafname.x;
+		rec.y = template.leafname.y;
+		rec.width = template.leafname.width;
+		rec.height = item_font->ascent + item_font->descent;
+
 		draw_string(widget,
 				item_font,
 				item->leafname, view->split_pos,
-				template.leafname.x,
-				template.leafname.y + item_font->ascent,
-				template.leafname.width,
+				&rec,
 				template.leafname.width,
 				filer_window->selection_state,
 				selected, TRUE);
+		rec.y += rec.height;
 		draw_string(widget,
 				item_font,
 				bot, -1,
-				template.leafname.x,
-				template.leafname.y + item_font->ascent * 2 +
-					item_font->descent,
+				&rec,
 				MAX(w, template.leafname.width),
-				template.leafname.width,
 				filer_window->selection_state,
 				selected, TRUE);
 	}
@@ -1417,20 +1381,17 @@ static void draw_item(GtkWidget *widget,
 		draw_string(widget,
 				item_font,
 				item->leafname, -1,
-				template.leafname.x,
-				template.leafname.y + item_font->ascent,
+				&template.leafname,
 				view->name_width,
-				template.leafname.width,
 				filer_window->selection_state,
 				selected, TRUE);
-#endif
 	
 	if (view->details)
 		draw_details(filer_window, item,
-				template.details.x,
-				template.details.y + fixed_font->ascent,
+				&template.details,
 				template.details.width,
 				selected, view->details);
+#endif
 }
 
 /* Recalculate all the ViewData structs for this window.
@@ -1487,12 +1448,39 @@ void display_update_view(FilerWindow *filer_window,
 	DisplayStyle	style = filer_window->display_style;
 	int	w, h;
 	int	wrap_width = -1;
-#ifndef GTK2
-	int	font_height = item_font->ascent + item_font->descent;
+#ifdef GTK2
+	char	*str;
+	static PangoFontDescription *monospace = NULL;
+
+	if (!monospace)
+		monospace = pango_font_description_from_string("Monospace");
+	
+	if (view->details)
+	{
+		g_object_unref(G_OBJECT(view->details));
+		view->details = NULL;
+	}
+
+	str = details(filer_window, item);
+	if (str)
+	{
+		view->details = gtk_widget_create_pango_layout(
+					filer_window->window, str);
+		g_free(str);
+
+#if 0
+		pango_layout_set_font_description(view->details, monospace);
 #endif
+		pango_layout_get_size(view->details, &w, &h);
+		view->details_width = w / PANGO_SCALE;
+		view->details_height = h / PANGO_SCALE;
+	}
+#else
+	int	font_height = item_font->ascent + item_font->descent;
 
 	g_free(view->details);
 	view->details = details(filer_window, item);
+#endif
 
 	if (view->image)
 	{
@@ -1516,6 +1504,11 @@ void display_update_view(FilerWindow *filer_window,
 	}
 
 #ifdef GTK2
+	if (view->layout)
+		g_object_unref(G_OBJECT(view->layout));
+	view->layout = gtk_widget_create_pango_layout(
+				filer_window->window, item->leafname);
+
 	if (filer_window->details_type == DETAILS_NONE)
 	{
 		if (style == HUGE_ICONS)
@@ -1524,7 +1517,8 @@ void display_update_view(FilerWindow *filer_window,
 			wrap_width = o_large_truncate * PANGO_SCALE;
 	}
 
-	pango_layout_set_width(view->layout, wrap_width);
+	if (wrap_width != -1)
+		pango_layout_set_width(view->layout, wrap_width);
 
 	pango_layout_get_size(view->layout, &w, &h);
 	view->name_width = w / PANGO_SCALE;
@@ -1565,5 +1559,64 @@ void display_update_view(FilerWindow *filer_window,
 		view->split_height = font_height * 2;
 	}
 #endif
+}
+
+/* 'box' renders a background box if the string is also selected */
+static void draw_string(GtkWidget *widget,
+#ifdef GTK2
+		PangoLayout *layout,
+#else
+		GdkFont	*font,
+		char	*string,
+		int	len,		/* -1 for whole string */
+#endif
+		GdkRectangle *area,	/* Area available on screen */
+		int 	width,		/* Width of the full string */
+		GtkStateType selection_state,
+		gboolean selected,
+		gboolean box)
+{
+	GdkGC		*gc = selected
+			? widget->style->fg_gc[selection_state]
+			: type_gc;
+	
+	if (selected && box)
+		gtk_paint_flat_box(widget->style, widget->window, 
+				selection_state, GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				area->x, area->y,
+				MIN(width, area->width),
+				area->height);
+
+	if (width > area->width)
+	{
+		gdk_gc_set_clip_origin(gc, 0, 0);
+		gdk_gc_set_clip_rectangle(gc, area);
+	}
+
+#ifdef GTK2
+	gdk_draw_layout(widget->window, gc, area->x, area->y, layout);
+#else
+	if (len == -1)
+		len = strlen(string);
+	gdk_draw_text(widget->window,
+			font,
+			gc,
+			area->x, area->y + font->ascent,
+			string, len);
+#endif
+
+	if (width > area->width)
+	{
+		if (!red_gc)
+		{
+			red_gc = gdk_gc_new(widget->window);
+			gdk_gc_set_foreground(red_gc, &red);
+		}
+		gdk_draw_rectangle(widget->window, red_gc, TRUE,
+				area->x + area->width - 1, area->y,
+				1, area->height);
+		gdk_gc_set_clip_rectangle(gc, NULL);
+	}
 }
 
