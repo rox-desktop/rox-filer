@@ -172,7 +172,7 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 			GTK_STOCK_YES, GTK_RESPONSE_YES,
 			NULL);
 
-	abox->cmp_area = gtk_table_new(2, 4, FALSE);
+	abox->cmp_area = gtk_table_new(2, 6, FALSE);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox),
 				abox->cmp_area, FALSE, FALSE, 2);
 	gtk_table_set_row_spacings(GTK_TABLE(abox->cmp_area), 2);
@@ -180,27 +180,35 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 
 	for (i = 0; i < 2; i++)
 	{
+	
 		abox->cmp_icon[i] = gtk_image_new();
 		gtk_table_attach(GTK_TABLE(abox->cmp_area),
 				abox->cmp_icon[i],
-				0, 1, i, i + 1,
-				GTK_SHRINK, GTK_SHRINK, 1, 1);
+				1, 2, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 4, 1);
 		abox->cmp_name[i] = gtk_label_new("");
+		gtk_misc_set_alignment(GTK_MISC(abox->cmp_name[i]), 0., 0.5);
 		gtk_table_attach(GTK_TABLE(abox->cmp_area),
 				abox->cmp_name[i],
-				1, 2, i, i + 1,
-				GTK_EXPAND | GTK_FILL, GTK_SHRINK, 1, 1);
+				2, 3, i, i + 1,
+				 GTK_EXPAND | GTK_FILL, GTK_SHRINK, 4, 1);
 		abox->cmp_size[i] = gtk_label_new("");
 		gtk_table_attach(GTK_TABLE(abox->cmp_area),
 				abox->cmp_size[i],
-				2, 3, i, i + 1,
-				GTK_SHRINK, GTK_SHRINK, 1, 1);
+				3, 4, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 4, 1);
 		abox->cmp_date[i] = gtk_label_new("");
 		gtk_table_attach(GTK_TABLE(abox->cmp_area),
 				abox->cmp_date[i],
-				3, 4, i, i + 1,
-				GTK_SHRINK, GTK_SHRINK, 1, 1);
+				4, 5, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 4, 1);
 	}
+	abox->cmp_arrow=gtk_arrow_new(GTK_ARROW_DOWN, GTK_SHADOW_IN);
+	gtk_widget_set_size_request(abox->cmp_arrow, 32, 64);
+	gtk_table_attach(GTK_TABLE(abox->cmp_area),
+				abox->cmp_arrow,
+				0, 1, 0, 2,
+				GTK_SHRINK, GTK_EXPAND | GTK_FILL, 1, 2);
 
 	abox->flag_box = gtk_hbox_new(FALSE, 16);
 	gtk_box_pack_end(GTK_BOX(dialog->vbox),
@@ -615,6 +623,7 @@ void abox_set_file(ABox *abox, int i, const gchar *path)
 		gtk_widget_hide(abox->cmp_name[i]);
 		gtk_widget_hide(abox->cmp_size[i]);
 		gtk_widget_hide(abox->cmp_date[i]);
+		gtk_widget_hide(abox->cmp_arrow);
 		return;
 	}
 
@@ -629,6 +638,7 @@ void abox_set_file(ABox *abox, int i, const gchar *path)
 
 	gtk_label_set_text(GTK_LABEL(abox->cmp_name[i]), item->leafname);
 	gtk_widget_show(abox->cmp_name[i]);
+	gtk_widget_show(abox->cmp_arrow);
 	
 	if (item->lstat_errno)
 	{

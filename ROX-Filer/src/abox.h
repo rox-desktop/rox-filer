@@ -34,6 +34,7 @@ struct _ABox
 	GtkWidget       *cmp_name[2];
 	GtkWidget       *cmp_size[2];
 	GtkWidget       *cmp_date[2];
+	GtkWidget       *cmp_arrow;
 
 	gchar		*next_dir;	/* NULL => no timer active */
 	gint		next_timer;
