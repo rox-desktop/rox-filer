@@ -265,7 +265,7 @@ To turn off the pinboard again, set the name to an empty string:
 
 <screen>$ rox --pinboard=</screen>
 
-See section \ref{winman} if you have trouble getting the icons to
+See the <xref linkend="winman"/> if you have trouble getting the icons to
 display correctly. The pinboard may also be turned on and off by locating
 <filename>ROX-Filer</filename> in a filer window and choosing `Enable pinboard' or `Disable pinboard' from the menu.
 
@@ -286,7 +286,7 @@ a panel along the bottom edge of the screen:
 <screen>$ rox -b=MyPanel</screen>
 
 The panel should be displayed in a window without a title bar. If
-this does not work then see section \ref{winman} for some ideas.
+this does not work then see the <xref linkend="winman"/> for some ideas.
 You can drag files onto either side of the panel to add them. Icons
 can be repositioned by dragging them with the middle mouse button.
 Changes to the panel are automatically saved to
@@ -302,7 +302,7 @@ $ rox --bottom=</screen>
 </sect1>
 
 <sect1>
-  <title><anchor id="winman"/>Window manager notes</title>
+  <title id="winman" xreflabel="window manager notes">Window manager notes</title>
   <para>
 
 You may have to play around with your window manager a bit to get
@@ -321,8 +321,9 @@ menu, all is well.
 <sect2><title>Sawfish / sawmill</title>
   <para>
 Sawfish trys to guess whether you are using GNOME at start-up and
-only provides support if so. You need to add the line `\texttt{(require
-'gnome)}' to your \texttt{.sawfishrc} file (see the sawfish manual
+only provides support if so. You need to add the line
+<programlisting>(require 'gnome)</programlisting>
+to your <filename>.sawfishrc</filename> file (see the sawfish manual
 for more details).
   </para>
 </sect2>
@@ -345,7 +346,7 @@ DesktopWinListButton=2 # [0-5]
 # Desktop mouse-button click to show the window list menu
 DesktopMenuButton=0 # [0-20] 
 </programlisting>
-Paste these into `~/.icewm/winoptions':
+Paste these into <filename>~/.icewm/winoptions</filename>:
 
 <programlisting>
 # ROX-Filer pinboard and panel
@@ -369,9 +370,9 @@ Restart IceWM and the filer for the new settings to take effect.
 <sect2><title>Others</title>
   <para>
 
-If all else fails, try running rox with the `\texttt{-n}' and `\texttt{-o}'
+If all else fails, try running rox with the <option>-n</option> and <option>-o</option>
 options; this overrides window manager control of the icons altogether
-(\texttt{-n} forces the filer to start a new copy).
+(<option>-n</option> forces the filer to start a new copy).
 
   </para>
 </sect2>
@@ -401,9 +402,9 @@ perform and any programs you run from these windows will run as root
 too! Be careful!
 
 You may find that the X server won't allow root (or other users) to
-connect. Reading the manual pages for `\texttt{xauth}' and `\texttt{xhost}'
-may give you some hints, but it varies between systems (which is why
-this isn't built in to the filer!).
+connect. Reading the manual pages for <command>xauth</command> and
+<command>xhost</command> may give you some hints, but it varies
+between systems (which is why this isn't built in to the filer!).
 
   </para>
 </sect1>
@@ -748,13 +749,32 @@ Huge, With...</entry><entry>
 As for `Large, With...', but with extra large icons.
 </entry></row><row><entry>
 
-Large, With...     </entry><entry>
-Entries are displayed along with some extra details:\textbf{Summary}
-shows the file permissions, owner, group, size and modification time.\textbf{Sizes}
-shows just the size of each file (not directories).\textbf{Permissions}
-shows just the permissions and owner.\textbf{Type} shows the MIME
-type of each file.\textbf{Times} shows the times the file was last
-accessed, modifed and changed.\dag
+Large, With...</entry><entry>
+	<para>Entries are displayed along with some extra details:</para>
+	<itemizedlist>
+
+	<listitem><para><guimenuitem>Summary</guimenuitem>
+	shows the file permissions, owner, group, size and modification time.
+	</para></listitem>
+
+	<listitem><para><guimenuitem>Sizes</guimenuitem>
+	shows just the size of each file (not directories).
+	</para></listitem>
+
+	<listitem><para><guimenuitem>Permissions</guimenuitem>
+	shows just the permissions and owner.
+	</para></listitem>
+
+	<listitem><para><guimenuitem>Type</guimenuitem>
+	shows the MIME type of each file.
+	</para></listitem>
+
+	<listitem><para><guimenuitem>Times</guimenuitem>
+	shows the times the file was last accessed, modifed and changed.\dag
+	</para></listitem>
+
+	</itemizedlist>
+
 </entry></row><row><entry>
 
 Small, With...</entry><entry>
@@ -795,9 +815,9 @@ which is which!
 </tbody></tgroup></informaltable>
 
 \noindent\dag\thinspace{} Reading a file's contents or listing a directory
-updates the \emph{access time}; modifying the contents of a file or
-the list of files in a directory updates the \emph{modification time};
-changing a file's owner or permissions updates the \emph{change time}.
+updates the <emphasis>access time</emphasis>; modifying the contents of a file or
+the list of files in a directory updates the <emphasis>modification time</emphasis>;
+changing a file's owner or permissions updates the <emphasis>change time</emphasis>.
   </para>
 
 <sect2><title><anchor id="Permissions"/>Permissions</title>
@@ -811,23 +831,37 @@ the third for everyone else. Whichever group applies to the <application>ROX-Fil
 process itself is shown underlined. The fourth group shows any special
 flags.
 
-The meanings of the characters are:
 
-\begin{description}
-\item [r]Permission to read the contents of a file, or the names of files
-in a directory.
-\item [w]Permission to alter the contents of a file, or change which names
-appear in a directory.
-\item [x]Permission to run the file as a program, or refer to the files
-listed within the directory.
-\item [U]This program executes with the \emph{effective user ID} of its
-owner rather than the person who ran it.
-\item [G]This program executes with the \emph{effective group ID} of its
-group, regardless of who ran it.
-\item [T]Entries in this directory can only be altered or removed by the
+
+<variablelist><title>The meanings of the characters are:</title>
+
+<varlistentry><term>r</term><listitem><para>
+Permission to read the contents of a file, or the names of files
+in a directory.</para></listitem></varlistentry>
+
+<varlistentry><term>w</term><listitem><para>
+Permission to alter the contents of a file, or change which names
+appear in a directory.</para></listitem></varlistentry>
+
+<varlistentry><term>x</term><listitem><para>
+Permission to run the file as a program, or refer to the files
+listed within the directory.</para></listitem></varlistentry>
+
+<varlistentry><term>U</term><listitem><para>
+This program executes with the <emphasis>effective user ID</emphasis> of its
+owner rather than the person who ran it.</para></listitem></varlistentry>
+
+<varlistentry><term>G</term><listitem><para>
+This program executes with the <emphasis>effective group ID</emphasis> of its
+group, regardless of who ran it.</para></listitem></varlistentry>
+
+<varlistentry><term>T</term><listitem><para>
+Entries in this directory can only be altered or removed by the
 people who own the files even if they have write permission on the
-directory itself.
-\end{description}
+directory itself.</para></listitem></varlistentry>
+
+</variablelist>
+
 For example, `\texttt{\underbar{rwx}}\texttt{,rwx,r-x/---}' means
 that the owner of the file is the same as the effective user of <application>ROX-Filer</application>
 (basically, you own the file), you and members of the file's group
@@ -838,13 +872,13 @@ The rules which determine which permissions apply may vary slightly
 between operating systems, but a rough guide is:
 
 \begin{itemize}
-\item If the \emph{effective user ID} of the process is equal to the file's
+\item If the <emphasis>effective user ID</emphasis> of the process is equal to the file's
 owner, then the owner permissions apply.
-\item Otherwise, if the \emph{effective group ID} of the process is equal
-to the file's group OR the file's group is one of the process's \emph{supplemental
-groups} then the group permissions apply.
-\item Otherwise, the `other' permissions apply. The \emph{real user ID}
-and \emph{real group ID} have no effect (except that a process may
+\item Otherwise, if the <emphasis>effective group ID</emphasis> of the process is equal
+to the file's group OR the file's group is one of the process's <emphasis>supplemental
+groups</emphasis> then the group permissions apply.
+\item Otherwise, the `other' permissions apply. The <emphasis>real user ID</emphasis>
+and <emphasis>real group ID</emphasis> have no effect (except that a process may
 set its real IDs to its effective IDs).
 \end{itemize}
 
@@ -932,7 +966,7 @@ Search for files by specifying various conditions --- see section
 </tbody></tgroup></informaltable>
 
 
-\noindent\dag\thinspace{}A symbolic link stores the \emph{location}
+\noindent\dag\thinspace{}A symbolic link stores the <emphasis>location</emphasis>
 of another file. Deleting the symlink doesn't affect the other file.
 Deleting the other file means that the symlink won't work. There are
 two types of symbolic link --- Relative and Absolute. An absolute
@@ -1141,7 +1175,7 @@ for details.
   <para>
 
 <application>ROX-Filer</application> allows you to run small programs inside the panel --- such
-programs are called \emph{applets}. To run an applet, drag it onto
+programs are called <emphasis>applets</emphasis>. To run an applet, drag it onto
 the panel from a filer window and instead of the applet's icon being
 shown, the applet will run.
   </para>
@@ -1569,7 +1603,7 @@ And a couple of other useful ones:
   <para>
 
 You can combine the above tests in various ways to perform more advanced
-searches. An expression is actually made up of a list of \emph{cases},
+searches. An expression is actually made up of a list of <emphasis>cases</emphasis>,
 separated by commas. The filer will try to match each case in turn
 until one matches or there are no more cases left. For example, to
 search for files with several possible endings:
@@ -1659,7 +1693,7 @@ so \texttt{size &gt; 1 day ago} is allowed, although it doesn't make
 much sense! Also, forgetting to use \texttt{ago} or \texttt{hence}
 will cause odd effects (the time will be measured relative to the
 Epoch rather than the current time). Finally, don't use = with times
---- \texttt{atime = 1 day ago} looks for a file accessed \emph{exactly}
+--- \texttt{atime = 1 day ago} looks for a file accessed <emphasis>exactly</emphasis>
 86400 seconds ago$\ldots$
 
   </para>
@@ -1963,8 +1997,8 @@ the middle one button-3 (this affects all programs, not just <application>ROX-Fi
   <para>
 
 All files have a MIME type in the form `\texttt{text/plain}'. Here,
-`\texttt{text}' is the \emph{media type} and `\texttt{plain}' is the
-\emph{sub-type}. <application>ROX-Filer</application> uses a file's name to decide what its MIME
+`\texttt{text}' is the <emphasis>media type</emphasis> and `\texttt{plain}' is the
+<emphasis>sub-type</emphasis>. <application>ROX-Filer</application> uses a file's name to decide what its MIME
 type is, and then uses the MIME type to decide what icon to give it
 and what program to use when you open the file.
 
@@ -2047,17 +2081,17 @@ an HTML file load it into Netscape:
 
 \begin{enumerate}
 \item Find the Netscape application and go to `Link...' on the menu.
-\item Enter `text\_html' as the name for the link and drag the icon from
+\item Enter `text_html' as the name for the link and drag the icon from
 the Link box into the MIME-types directory.
 \end{enumerate}
 You can also put actual programs in here as well as links if you want
 to.
 
 \item [MIME-icons]contains the images used to display each type of file.
-So the filer will try to display an HTML file using the icon `MIME-icons/text\_html.xpm'.
+So the filer will try to display an HTML file using the icon `MIME-icons/text_html.xpm'.
 \end{description}
 In both MIME-types and MIME-icons directories you can also provide
-default actions/images for each media type. For example, if `text\_html'
+default actions/images for each media type. For example, if `text_html'
 isn't found then the filer will try simply using `text'.
 
 
@@ -2134,7 +2168,7 @@ application.
 box for the application (any element names may be used, but the above
 are suggested).
 \item [AppMenu]is a list of extra menu items to display for the application.
-When one is chosen, \texttt{AppRun} is called with \emph{option} as
+When one is chosen, \texttt{AppRun} is called with <emphasis>option</emphasis> as
 its only argument.
 \end{description}
 
@@ -2258,7 +2292,7 @@ in the `\texttt{src}' directory when you change the \texttt{.c} and
   <para>
 
 When people make small modifications to the sources they will often
-distribute them as \emph{patch files} --- usually on the mailing list.
+distribute them as <emphasis>patch files</emphasis> --- usually on the mailing list.
 To apply a patch, go into the 'src' directory and run patch with the
 patch file. Then recompile, like this:
 
@@ -2324,23 +2358,25 @@ to produce <application>ROX-Filer</application>.
 
 The diagram below shows some of the major structures found in the
 filer and the relationships between them.
+  </para>
 
 
 {\centering \resizebox*{1\textwidth}{!}{\includegraphics{Structs.eps}} \par}
 
-
-To summarise, each window has its own \textbf{FilerWindow} structure.
-This structure has pointers to a \textbf{Collection} (which is the
-widget which actually displays the files) and to a \textbf{Directory},
-which is used to cache the directory contents. Both \textbf{Collection}
-and \textbf{Directory} have pointers to (the same) \textbf{DirItem}s,
-each of which corresponds to one filesystem object. Several \textbf{FilerWindow}s
-may share the same \textbf{Directory}. While scanning is in progress
-the \textbf{Directory} keeps a list of the new items it has found
-(\emph{new\_items}) and the items which have changed in some way (\emph{up\_items}).
+  <para>
+To summarise, each window has its own <classname>FilerWindow</classname> structure.
+This structure has pointers to a <classname>Collection</classname> (which is the
+widget which actually displays the files) and to a <classname>Directory</classname>,
+which is used to cache the directory contents. Both <classname>Collection</classname>
+and <classname>Directory</classname> have pointers to (the same) <classname>DirItem</classname>s,
+each of which corresponds to one filesystem object. Several <classname>FilerWindow</classname>s
+may share the same <classname>Directory</classname>. While scanning is in progress
+the <classname>Directory</classname> keeps a list of the new items it has found
+(<emphasis>new_items</emphasis>) and the items which have changed in some way
+(<emphasis>up_items</emphasis>).
 It periodically notifies the filer window of the changes-so-far by
-calling all the functions in the \emph{users} list (use \emph{attach()}
-and \emph{detach()} to add and remove functions to or from the list).
+calling all the functions in the <emphasis>users</emphasis> list (use <function>attach()</function>
+and <function>detach()</function> to add and remove functions to or from the list).
   </para>
 </sect1>
 </chapter>
