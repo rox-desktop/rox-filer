@@ -228,8 +228,8 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 
   g_object_class_install_property(object_class, PROP_HAS_DISCARD,
                                   g_param_spec_boolean("has_discard",
-					 _("Has Discard"),
-					 _("The dialog has a Discard button"),
+					 "Has Discard",
+					 "The dialog has a Discard button",
 					 TRUE,
 					 G_PARAM_READWRITE));
 }

@@ -148,15 +148,15 @@ static void cell_icon_class_init(CellIconClass *class)
 	g_object_class_install_property(object_class,
 			PROP_ITEM,
 			g_param_spec_pointer("item",
-				_("DirItem"),
-				_("The item to render."),
+				"DirItem",
+				"The item to render.",
 				G_PARAM_WRITABLE));
 
 	g_object_class_install_property(object_class,
 			PROP_BACKGROUND_GDK,
 			g_param_spec_boxed("background_gdk",
-				_("Background color"),
-				_("Background color as a GdkColor"),
+				"Background color",
+				"Background color as a GdkColor",
 				GDK_TYPE_COLOR,
 				G_PARAM_WRITABLE));  
 }

@@ -261,8 +261,8 @@ static void collection_class_init(GObjectClass *gclass, gpointer data)
 	g_object_class_install_property(gclass,
 		PROP_VADJUSTMENT,
 		g_param_spec_object("vadjustment",
-			_("Vertical Adjustment"),
-			_("The GtkAdjustment for the vertical position."),
+			"Vertical Adjustment",
+			"The GtkAdjustment for the vertical position.",
 			GTK_TYPE_ADJUSTMENT,
 			G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 }
