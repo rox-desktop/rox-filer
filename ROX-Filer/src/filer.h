@@ -67,7 +67,7 @@ extern gboolean 	o_unique_filer_windows;
 /* Prototypes */
 void filer_init();
 FilerWindow *filer_opendir(char *path, PanelType panel_type);
-void update_dir(FilerWindow *filer_window, gboolean warning);
+void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
@@ -86,5 +86,6 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 void filer_check_mounted(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf);
+gboolean filer_exists(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

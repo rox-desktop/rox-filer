@@ -52,11 +52,11 @@
 #include "minibuffer.h"
 
 #define ROW_HEIGHT_LARGE 64
-#define ROW_HEIGHT_SMALL 28
+#define ROW_HEIGHT_SMALL 20
 #define ROW_HEIGHT_FULL_INFO 44
 #define SMALL_ICON_HEIGHT 20
 #ifdef HAVE_IMLIB
-#  define SMALL_ICON_WIDTH 32
+#  define SMALL_ICON_WIDTH 24
 #else
 #  define SMALL_ICON_WIDTH 48
 #endif
@@ -190,7 +190,6 @@ static void open_item(Collection *collection,
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
 static void filer_set_title(FilerWindow *filer_window);
-static gboolean exists(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 enum
@@ -1233,7 +1232,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
 	full_refresh();
-	update_dir(filer_window, TRUE);
+	filer_update_dir(filer_window, TRUE);
 }
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -1641,7 +1640,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 
 static gint clear_scanning_display(FilerWindow *filer_window)
 {
-	if (exists(filer_window))
+	if (filer_exists(filer_window))
 		filer_set_title(filer_window);
 	return FALSE;
 }
@@ -1943,7 +1942,7 @@ static char *filer_toolbar(char *data)
 }
 
 /* Note that filer_window may not exist after this call. */
-void update_dir(FilerWindow *filer_window, gboolean warning)
+void filer_update_dir(FilerWindow *filer_window, gboolean warning)
 {
 	if (may_rescan(filer_window, warning))
 		dir_update(filer_window->directory, filer_window->path);
@@ -2014,7 +2013,7 @@ void filer_check_mounted(char *path)
 			char	s = filer_window->path[len];
 
 			if (s == '/' || s == '\0')
-				update_dir(filer_window, FALSE);
+				filer_update_dir(filer_window, FALSE);
 		}
 	}
 }
@@ -2025,12 +2024,12 @@ void filer_check_mounted(char *path)
  */
 static gboolean minibuffer_show_cb(FilerWindow *filer_window)
 {
-	if (exists(filer_window))
+	if (filer_exists(filer_window))
 		minibuffer_show(filer_window, MINI_PATH);
 	return FALSE;
 }
 
-static gboolean exists(FilerWindow *filer_window)
+gboolean filer_exists(FilerWindow *filer_window)
 {
 	GList	*next;
 

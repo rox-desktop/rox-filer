@@ -112,20 +112,42 @@ static struct option long_opts[] =
 /* Take control of panels away from WM? */
 gboolean override_redirect = FALSE;
 
+/* Maps child PIDs to Callback pointers */
+static GHashTable *death_callbacks = NULL;
+static gboolean child_died_flag = FALSE;
+
+/* This is called as a signal handler; simply ensures that
+ * child_died_callback() will get called later.
+ */
 static void child_died(int signum)
+{
+	child_died_flag = TRUE;
+	write(to_error_log, '\0', 1);	/* Wake up! */
+}
+
+static void child_died_callback(void)
 {
 	int	    	status;
 	int	    	child;
 
+	child_died_flag = FALSE;
+
 	/* Find out which children exited and allow them to die */
 	do
 	{
+		Callback	*cb;
+
 		child = waitpid(-1, &status, WNOHANG);
 
 		if (child == 0 || child == -1)
 			return;
 
-		/* fprintf(stderr, "Child %d exited\n", child); */
+		cb = g_hash_table_lookup(death_callbacks, (gpointer) child);
+		if (cb)
+		{
+			cb->callback(cb->data);
+			g_hash_table_remove(death_callbacks, (gpointer) child);
+		}
 
 	} while (1);
 }
@@ -161,12 +183,21 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 	}
 
-	if (!GTK_WIDGET_MAPPED(window))
-		gtk_widget_show_all(window);
-	
 	len = read(source, buf, BUFLEN);
+	
+	if (child_died_flag)
+	{
+		child_died_callback();
+		if (len == 1 && !*buf)
+			return;
+	}
+	
 	if (len > 0)
+	{
+		if (!GTK_WIDGET_MAPPED(window))
+			gtk_widget_show_all(window);
 		gtk_text_insert(GTK_TEXT(log), NULL, NULL, NULL, buf, len);
+	}
 }
 
 int main(int argc, char **argv)
@@ -177,6 +208,7 @@ int main(int argc, char **argv)
 	GList		*panel_sides = NULL;
 
 	home_dir = g_get_home_dir();
+	death_callbacks = g_hash_table_new(NULL, NULL);
 
 #ifdef HAVE_LIBVFS
 	mc_vfs_init();
@@ -324,4 +356,17 @@ static void show_features(void)
 		"No (the imlib-config command didn't work)"
 #endif
 		"\n");
+}
+
+/* Register a function to be called when process number 'child' dies. */
+void on_child_death(int child, CallbackFn callback, gpointer data)
+{
+	Callback	*cb;
+
+	cb = g_new(Callback, 1);
+
+	cb->callback = callback;
+	cb->data = data;
+
+	g_hash_table_insert(death_callbacks, (gpointer) child, cb);
 }

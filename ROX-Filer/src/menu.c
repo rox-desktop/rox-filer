@@ -589,7 +589,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	full_refresh();
-	update_dir(window_with_focus, TRUE);
+	filer_update_dir(window_with_focus, TRUE);
 }
 
 static void mount(gpointer data, guint action, GtkWidget *widget)
@@ -645,7 +645,7 @@ static void remove_link(gpointer data, guint action, GtkWidget *widget)
 		else if (unlink(path))
 			report_error("ROX-Filer", g_strerror(errno));
 		else
-			update_dir(window_with_focus, TRUE);
+			filer_update_dir(window_with_focus, TRUE);
 	}
 }
 

@@ -26,6 +26,7 @@
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
+#include <glob.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
@@ -47,6 +48,7 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window);
 static void find_next_match(FilerWindow *filer_window, char *pattern, int dir);
 static gboolean matches(Collection *collection, int item, char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
+static guchar *mini_contents(FilerWindow *filer_window);
 
 
 /****************************************************************
@@ -374,17 +376,9 @@ static void search_in_dir(FilerWindow *filer_window, int dir)
 
 /*			SHELL COMMANDS			*/
 
-static void add_to_history(FilerWindow *filer_window)
+static void add_to_history(guchar *line)
 {
-	guchar 	*line, *last, *c;
-	
-	line = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	
-	for (c = line; *c && isspace(*c); c++)
-		;
-
-	if (!*c)
-		return;
+	guchar 	*last;
 	
 	last = shell_history ? (guchar *) shell_history->data : NULL;
 
@@ -394,16 +388,160 @@ static void add_to_history(FilerWindow *filer_window)
 	shell_history = g_list_prepend(shell_history, g_strdup(line));
 }
 
+static void shell_done(FilerWindow *filer_window)
+{
+	if (filer_exists(filer_window))
+		filer_update_dir(filer_window, TRUE);
+}
+
+/* Given a list of matches, return the longest stem. g_free() the result.
+ * Spaces are escaped.
+ */
+static guchar *best_match(FilerWindow *filer_window, glob_t *matches)
+{
+	gchar	*first = matches->gl_pathv[0];
+	int	i;
+	int	longest, path_len;
+	guchar	*path;
+
+	longest = strlen(first);
+
+	for (i = 1; i < matches->gl_pathc; i++)
+	{
+		int	j;
+		guchar	*m = matches->gl_pathv[i];
+
+		for (j = 0; j < longest; j++)
+			if (m[j] != first[j])
+				longest = j;
+	}
+
+	path_len = strlen(filer_window->path);
+	if (strncmp(filer_window->path, first, path_len) == 0 &&
+			first[path_len] == '/' && first[path_len + 1])
+	{
+		path = g_strndup(first + path_len + 1, longest - path_len - 1);
+	}
+	else
+		path = g_strndup(first, longest);
+
+	if (strchr(path, ' '))
+	{
+		gchar	**bits;
+
+		bits = g_strsplit(path, " ", 0);
+		g_free(path);
+		path = g_strjoinv("\\ ", bits);
+		g_strfreev(bits);
+	}
+
+	return path;
+}
+
+static void shell_tab(FilerWindow *filer_window)
+{
+	int	i;
+	guchar	*entry;
+	guchar	quote;
+	int	pos;
+	GString	*leaf;
+	glob_t	matches;
+	int	leaf_start;
+	
+	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
+	pos = gtk_editable_get_position(GTK_EDITABLE(filer_window->minibuffer));
+	leaf = g_string_new(NULL);
+
+	quote = '\0';
+	for (i = 0; i < pos; i++)
+	{
+		guchar	c = entry[i];
+		
+		if (leaf->len == 0)
+			leaf_start = i;
+
+		if (c == ' ')
+		{
+			g_string_truncate(leaf, 0);
+			continue;
+		}
+		else if (c == '\\' && i + 1 < pos)
+			c = entry[++i];
+		else if (c == '"' || c == '\'')
+		{
+			guchar	cc;
+
+			for (++i; i < pos; i++)
+			{
+				cc = entry[i];
+
+				if (cc == '\\' && i + 1 < pos)
+					cc = entry[++i];
+				else if (entry[i] == c)
+					break;
+				g_string_append_c(leaf, entry[i]);
+			}
+			continue;
+		}
+		
+		g_string_append_c(leaf, c);
+	}
+
+	if (leaf->len == 0)
+		leaf_start = pos;
+
+	if (leaf->str[0] != '/')
+	{
+		g_string_prepend_c(leaf, '/');
+		g_string_prepend(leaf, filer_window->path);
+	}
+
+	g_string_append_c(leaf, '*');
+
+	if (glob(leaf->str,
+#ifdef GLOB_TILDE
+			GLOB_TILDE |
+#endif
+			GLOB_MARK, NULL, &matches) == 0)
+	{
+		if (matches.gl_pathc > 0)
+		{
+			guchar		*best;
+			GtkEditable 	*edit =
+				GTK_EDITABLE(filer_window->minibuffer);
+
+			best = best_match(filer_window, &matches);
+
+			gtk_editable_delete_text(edit, leaf_start, pos);
+			gtk_editable_insert_text(edit, best, strlen(best),
+						&leaf_start);
+			gtk_editable_set_position(edit, leaf_start);
+
+			g_free(best);
+		}
+		if (matches.gl_pathc != 1)
+			gdk_beep();
+
+		globfree(&matches);
+	}
+
+	g_string_free(leaf, TRUE);
+}
+
 static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	GPtrArray	*argv;
 	int		i;
 	guchar		*entry;
 	Collection	*collection = filer_window->collection;
+	int		child;
 
-	add_to_history(filer_window);
+	entry = mini_contents(filer_window);
 
-	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
+	if (!entry)
+		goto out;
+
+	add_to_history(entry);
 	
 	argv = g_ptr_array_new();
 	g_ptr_array_add(argv, "sh");
@@ -420,12 +558,14 @@ static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	
 	g_ptr_array_add(argv, NULL);
 
-	switch (fork())
+	child = fork();
+
+	switch (child)
 	{
 		case -1:
 			delayed_error("ROX-Filer", "Failed to create "
 					"child process");
-			return;
+			break;
 		case 0:	/* Child */
 			dup2(to_error_log, STDOUT_FILENO);
 			close_on_exec(STDOUT_FILENO, FALSE);
@@ -441,10 +581,15 @@ static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 					(char *) argv->pdata[0],
 					g_strerror(errno));
 			_exit(0);
+		default:
+			on_child_death(child,
+					(CallbackFn) shell_done, filer_window);
+			break;
 	}
 
 	g_ptr_array_free(argv, TRUE);
 
+out:
 	minibuffer_hide(filer_window);
 }
 
@@ -480,7 +625,14 @@ static gint key_press_event(GtkWidget	*widget,
 	if (event->keyval == GDK_Escape)
 	{
 		if (filer_window->mini_type == MINI_SHELL)
-			add_to_history(filer_window);
+		{
+			guchar	*line;
+			
+			line = mini_contents(filer_window);
+			if (line)
+				add_to_history(line);
+		}
+
 		minibuffer_hide(filer_window);
 		return TRUE;
 	}
@@ -518,6 +670,7 @@ static gint key_press_event(GtkWidget	*widget,
 					shell_recall(filer_window, -1);
 					break;
 				case GDK_Tab:
+					shell_tab(filer_window);
 					break;
 				case GDK_Return:
 					shell_return_pressed(filer_window,
@@ -547,3 +700,20 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 			break;
 	}
 }
+
+/* Returns a string (which must NOT be freed), or NULL if the buffer
+ * is blank (whitespace only).
+ */
+static guchar *mini_contents(FilerWindow *filer_window)
+{
+	guchar	*entry, *c;
+
+	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
+
+	for (c = entry; *c; c++)
+		if (!isspace(*c))
+			return entry;
+
+	return NULL;
+}
+
