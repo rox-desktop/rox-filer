@@ -544,9 +544,11 @@ static void size_icon(Icon *icon)
 	if (icon->socket)
 		return;
 
-	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT);
+	im_height = MIN(PIXMAP_HEIGHT(icon->item.image->pixmap),
+					MAX_ICON_HEIGHT);
 
-	width = MAX(icon->item.image->width, icon->item.name_width);
+	width = PIXMAP_WIDTH(icon->item.image->pixmap);
+	width = MAX(width, icon->item.name_width);
 	height = font->ascent + font->descent + 6 + im_height;
 
 	gtk_widget_set_usize(icon->widget, width + 4, height);
@@ -570,7 +572,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 	area.x = 0;
 	area.width = width;
-	area.height = icon->item.image->height;
+	area.height = PIXMAP_HEIGHT(icon->item.image->pixmap);
 	area.y = height - font->ascent - font->descent - 6 - area.height;
 	
 	draw_large_icon(widget, &area, &icon->item, icon->selected);

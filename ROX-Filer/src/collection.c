@@ -1794,6 +1794,7 @@ int collection_get_item(Collection *collection, int x, int y)
 {
 	int		scroll;
 	int		row, col;
+	int		width;
 	int		item;
 
 	g_return_val_if_fail(collection != NULL, -1);
@@ -1808,6 +1809,11 @@ int collection_get_item(Collection *collection, int x, int y)
 	if (col < 0 || row < 0)
 		return -1;
 
+	if (col == collection->columns - 1)
+		width = collection->item_width << 1;
+	else
+		width = collection->item_width;
+
 	item = col + row * collection->columns;
 	if (item >= collection->number_of_items
 			|| 
@@ -1816,7 +1822,7 @@ int collection_get_item(Collection *collection, int x, int y)
 			y - row * collection->item_height
 				+ scroll,
 			&collection->items[item],
-			collection->item_width,
+			width,
 			collection->item_height,
 			collection->cb_user_data))
 	{

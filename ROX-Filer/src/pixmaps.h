@@ -11,6 +11,10 @@
 #include <gtk/gtk.h>
 #include "fscache.h"
 
+#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
+#define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
+#define PIXMAP_HEIGHT(p) (((GdkPixmapPrivate *) (p))->height)
+
 #define THUMB_WIDTH 48
 #define THUMB_HEIGHT 48
 
@@ -39,14 +43,10 @@ struct _MaskedPixmap
 
 	GdkPixmap	*pixmap;	/* Full size image */
 	GdkBitmap	*mask;
-	int		width;
-	int		height;
 
 	/* If sm_pixmap is NULL then call pixmap_make_small() */
 	GdkPixmap	*sm_pixmap;	/* Half-size (hopefully!) image */
 	GdkBitmap	*sm_mask;
-	int		sm_width;
-	int		sm_height;
 };
 
 void pixmaps_init(void);

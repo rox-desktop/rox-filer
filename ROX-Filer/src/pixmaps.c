@@ -35,7 +35,6 @@
 #include <errno.h>
 
 #include <gtk/gtk.h>
-#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include "collection.h"
 
@@ -167,15 +166,16 @@ void pixmap_make_small(MaskedPixmap *mp)
 
 	if (mp->pixbuf)
 	{
+		int		sm_width, sm_height;
 		GdkPixbuf	*small;
 
-		mp->sm_width = mp->width / 2;
-		mp->sm_height = mp->height / 2;
+		sm_width = PIXMAP_WIDTH(mp->pixmap) / 2;
+		sm_height = PIXMAP_HEIGHT(mp->pixmap) / 2;
 			
 		small = gdk_pixbuf_scale_simple(
 				mp->pixbuf,
-				mp->sm_width,
-				mp->sm_height,
+				sm_width,
+				sm_height,
 				GDK_INTERP_BILINEAR);
 
 		if (small)
@@ -196,8 +196,6 @@ void pixmap_make_small(MaskedPixmap *mp)
 		gdk_bitmap_ref(mp->mask);
 	mp->sm_pixmap = mp->pixmap;
 	mp->sm_mask = mp->mask;
-	mp->sm_width = mp->width;
-	mp->sm_height = mp->height;
 }
 
 /****************************************************************
@@ -223,8 +221,6 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf)
 	MaskedPixmap	*mp;
 	GdkPixmap	*pixmap;
 	GdkBitmap	*mask;
-	int		width;
-	int		height;
 
 	gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &mask, 128);
 
@@ -234,15 +230,10 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf)
 		return NULL;
 	}
 
-	width = gdk_pixbuf_get_width(pixbuf);
-	height = gdk_pixbuf_get_height(pixbuf);
-
 	mp = g_new(MaskedPixmap, 1);
 	mp->ref = 1;
 	mp->pixmap = pixmap;
 	mp->mask = mask;
-	mp->width = width;
-	mp->height = height;
 	mp->pixbuf = pixbuf;
 	mp->sm_pixmap = NULL;
 	mp->sm_mask = NULL;
@@ -272,8 +263,6 @@ static MaskedPixmap *get_bad_image(void)
 	}
 
 	image->ref++;
-	image->width = ((GdkPixmapPrivate *) image->pixmap)->width;
-	image->height = ((GdkPixmapPrivate *) image->pixmap)->height;
 
 	return image;
 }

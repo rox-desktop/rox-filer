@@ -359,7 +359,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	{
 		/* Convert from icon-corner coordinates to center coordinates */
 		MaskedPixmap	*image = icon->item.image;
-		x += (image->width >> 1);
+		x += (PIXMAP_WIDTH(image->pixmap) >> 1);
 		y += height - (icon->widget->style->font->descent >> 1);
 	}
 	snap_to_grid(&x, &y);
@@ -686,6 +686,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	GdkFont		*font;
 	int		font_height;
 	MaskedPixmap	*image = icon->item.image;
+	int		iwidth = PIXMAP_WIDTH(image->pixmap);
+	int		iheight = PIXMAP_HEIGHT(image->pixmap);
 	DirItem		*item = &icon->item;
 	int		text_x, text_y;
 
@@ -703,9 +705,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	font_height = font->ascent + font->descent;
 	item->name_width = gdk_string_width(font, item->leafname);
 
-	width = MAX(image->width, item->name_width + 2) +
-				2 * WINK_FRAME;
-	height = image->height + GAP + (font_height + 2) + 2 * WINK_FRAME;
+	width = MAX(iwidth, item->name_width + 2) + 2 * WINK_FRAME;
+	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
 	gtk_widget_set_usize(icon->win, width, height);
 
 	if (icon->mask)
@@ -724,18 +725,18 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	{
 		gdk_draw_pixmap(icon->mask, mask_gc, image->mask,
 				0, 0,
-				(width - image->width) >> 1,
+				(width - iwidth) >> 1,
 				WINK_FRAME,
-				image->width,
-				image->height);
+				PIXMAP_WIDTH(image->pixmap),
+				PIXMAP_HEIGHT(image->pixmap));
 	}
 	else
 	{
 		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
-				(width - image->width) >> 1,
+				(width - iwidth) >> 1,
 				WINK_FRAME,
-				image->width,
-				image->height);
+				iwidth,
+				iheight);
 	}
 
 	gdk_gc_set_function(mask_gc, GDK_OR);
@@ -743,7 +744,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	{
 		gdk_draw_pixmap(icon->mask, mask_gc, im_symlink->mask,
 				0, 0,		/* Source x,y */
-				(width - image->width) >> 1,	/* Dest x */
+				(width - iwidth) >> 1,		/* Dest x */
 				WINK_FRAME,			/* Dest y */
 				-1, -1);
 	}
@@ -752,7 +753,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 		/* Note: Both mount state pixmaps must have the same mask */
 		gdk_draw_pixmap(icon->mask, mask_gc, im_mounted->mask,
 				0, 0,		/* Source x,y */
-				(width - image->width) >> 1,	/* Dest x */
+				(width - iwidth) >> 1,		/* Dest x */
 				WINK_FRAME,			/* Dest y */
 				-1, -1);
 	}
@@ -761,13 +762,13 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	/* Mask off an area for the text (from o_text_bg) */
 
 	text_x = (width - item->name_width) >> 1;
-	text_y = WINK_FRAME + image->height + GAP + 1;
+	text_y = WINK_FRAME + iheight + GAP + 1;
 
 	if (o_text_bg == TEXT_BG_SOLID)
 	{
 		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
 				(width - (item->name_width + 2)) >> 1,
-				WINK_FRAME + image->height + GAP,
+				WINK_FRAME + iheight + GAP,
 				item->name_width + 2, font_height + 2);
 	}
 	else
@@ -803,6 +804,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	int		text_x, text_y;
 	DirItem		*item = &icon->item;
 	MaskedPixmap	*image = item->image;
+	int		iwidth = PIXMAP_WIDTH(image->pixmap);
+	int		iheight = PIXMAP_HEIGHT(image->pixmap);
 	int		image_x;
 	GdkGC		*gc = widget->style->black_gc;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
@@ -811,7 +814,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	font_height = font->ascent + font->descent;
 
 	gdk_window_get_size(widget->window, &width, &height);
-	image_x = (width - image->width) >> 1;
+	image_x = (width - iwidth) >> 1;
 
 	/* TODO: If the shape extension is missing we might need to set
 	 * the clip mask here...
@@ -821,8 +824,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 			0, 0,
 			image_x,
 			WINK_FRAME,
-			image->width,
-			image->height);
+			iwidth,
+			iheight);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -854,7 +857,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	}
 
 	text_x = (width - item->name_width) >> 1;
-	text_y = WINK_FRAME + image->height + GAP + 1;
+	text_y = WINK_FRAME + iheight + GAP + 1;
 
 	if (o_text_bg != TEXT_BG_NONE)
 	{

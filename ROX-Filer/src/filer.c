@@ -62,6 +62,12 @@ GList		*all_filer_windows = NULL;
 
 static FilerWindow *window_with_selection = NULL;
 
+/* Item we are about to display a tooltip for */
+static DirItem *tip_item = NULL;
+static GtkWidget *tip_widget = NULL;
+static gint tip_timeout = 0;
+static time_t tip_time = 0; 	/* Time tip widget last closed */
+
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
@@ -92,6 +98,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
 static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
+static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
 
 static void set_unique(guchar *unique);
 
@@ -688,6 +695,14 @@ static gint pointer_in(GtkWidget *widget,
 	return FALSE;
 }
 
+static gint pointer_out(GtkWidget *widget,
+			GdkEventCrossing *event,
+			FilerWindow *filer_window)
+{
+	filer_tooltip_prime(NULL, NULL);
+	return FALSE;
+}
+
 static gint focus_in(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window)
@@ -829,6 +844,8 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	Directory *new_dir;
 
 	g_return_if_fail(filer_window != NULL);
+
+	filer_tooltip_prime(NULL, NULL);
 
 	real_path = pathdup(path);
 	new_dir  = g_fscache_lookup(dir_cache, real_path);
@@ -1199,6 +1216,9 @@ static void filer_add_signals(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(filer_window->window),
 			"enter-notify-event",
 			GTK_SIGNAL_FUNC(pointer_in), filer_window);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window),
+			"leave-notify-event",
+			GTK_SIGNAL_FUNC(pointer_out), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
@@ -1207,7 +1227,7 @@ static void filer_add_signals(FilerWindow *filer_window)
 	/* Events on the collection widget */
 	gtk_widget_set_events(GTK_WIDGET(collection),
 			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
-			GDK_BUTTON3_MOTION_MASK |
+			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	gtk_signal_connect(collection, "gain_selection",
@@ -1539,6 +1559,13 @@ static gint coll_motion_notify(GtkWidget *widget,
 	Collection	*collection = filer_window->collection;
 	int		i;
 
+	i = collection_get_item(collection, event->x, event->y);
+	if (i == -1)
+		filer_tooltip_prime(NULL, NULL);
+	else
+		filer_tooltip_prime(filer_window,
+				(DirItem *) collection->items[i].data);
+
 	if (motion_state != MOTION_READY_FOR_DND)
 		return TRUE;
 
@@ -1614,4 +1641,130 @@ void filer_target_mode(FilerWindow *filer_window,
 	if (filer_window->toolbar_text)
 		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text),
 				fn ? reason : "");
+}
+
+/* Draw the black border */
+static gint filer_tooltip_draw(GtkWidget *w)
+{
+	gdk_draw_rectangle(w->window, w->style->fg_gc[w->state], FALSE, 0, 0,
+			w->allocation.width - 1, w->allocation.height - 1);
+
+	return FALSE;
+}
+
+/* When the tips window closed, record the time. If we try to open another
+ * tip soon, it will appear more quickly.
+ */
+static void tip_destroyed(gpointer data)
+{
+	time(&tip_time);
+}
+
+static gboolean filer_tooltip_activate(FilerWindow *filer_window)
+{
+	GtkWidget *label;
+	Collection *collection;
+	gint 	x, y, py;
+	int	w, h;
+	int	i;
+
+	g_return_val_if_fail(tip_item != NULL, 0);
+
+	if (tip_widget)
+	{
+		gtk_widget_destroy(tip_widget);
+		tip_widget = NULL;
+	}
+
+	if (!filer_exists(filer_window))
+		goto out;
+
+	collection = filer_window->collection;
+	gdk_window_get_pointer(GTK_WIDGET(collection)->window, &x, &y, NULL);
+	i = collection_get_item(filer_window->collection, x, y);
+	if (i == -1 || ((DirItem *) collection->items[i].data) != tip_item)
+		goto out;	/* Not still under the pointer */
+
+	/* OK, the filer window still exists and the pointer is still
+	 * over the same item. Do we need to show a tip?
+	 */
+	if (!display_is_truncated(filer_window, i))
+		goto out;
+	
+	/* Show the tip */
+	tip_widget = gtk_window_new(GTK_WINDOW_POPUP);
+	gtk_widget_set_app_paintable(tip_widget, TRUE);
+	gtk_widget_set_name(tip_widget, "gtk-tooltips");
+
+	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "expose_event",
+			GTK_SIGNAL_FUNC(filer_tooltip_draw),
+			(GtkObject *) tip_widget);
+	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "draw",
+			GTK_SIGNAL_FUNC(filer_tooltip_draw),
+			(GtkObject *) tip_widget);
+
+	label = gtk_label_new(tip_item->leafname);
+	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
+	gtk_container_add(GTK_CONTAINER(tip_widget), label);
+	gtk_widget_show(label);
+	gtk_widget_realize(tip_widget);
+
+	w = tip_widget->allocation.width;
+	h = tip_widget->allocation.height;
+	gdk_window_get_pointer(NULL, &x, &py, NULL);
+
+	x -= w / 2;
+	y = py + 12; /* I don't know the pointer height so I use a constant */
+
+	/* Now check for screen boundaries */
+	x = CLAMP(x, 0, screen_width - w);
+	y = CLAMP(y, 0, screen_height - h);
+
+	/* And again test if pointer is over the tooltip window */
+	if (py >= y && py <= y + h)
+		y = py - h- 2;
+	gtk_widget_popup(tip_widget, x, y);
+
+	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "destroy",
+			GTK_SIGNAL_FUNC(tip_destroyed), NULL);
+	time(&tip_time);
+
+out:
+	tip_timeout = 0;
+	return FALSE;
+}
+
+/* Display a tooltip for 'item' after a while (if item is not NULL).
+ * Cancel any previous tooltip.
+ */
+static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item)
+{
+	time_t  now;
+
+	time(&now);
+		
+	if (item == tip_item)
+		return;
+
+	if (tip_timeout)
+	{
+		gtk_timeout_remove(tip_timeout);
+		tip_timeout = 0;
+		tip_item = NULL;
+	}
+	if (tip_widget)
+	{
+		gtk_widget_destroy(tip_widget);
+		tip_widget = NULL;
+	}
+
+	tip_item = item;
+	if (filer_window && item)
+	{
+		int	delay = now - tip_time > 2 ? 1000 : 200;
+
+		tip_timeout = gtk_timeout_add(delay,
+					(GtkFunction) filer_tooltip_activate,
+					filer_window);
+	}
 }

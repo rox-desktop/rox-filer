@@ -40,7 +40,6 @@ extern int (*last_sort_fn)(const void *a, const void *b);
 
 /* Prototypes */
 void display_init();
-char *details(FilerWindow *filer_window, DirItem *item);
 void display_set_layout(FilerWindow  *filer_window,
 			DisplayStyle style,
 			DetailsType  details);
@@ -68,5 +67,6 @@ void draw_string(GtkWidget *widget,
 		int	area_width,
 		gboolean selected,
 		gboolean box);
+gboolean display_is_truncated(FilerWindow *filer_window, int i);
 
 #endif /* _DISPLAY_H */
