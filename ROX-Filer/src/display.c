@@ -706,8 +706,8 @@ void display_update_view(FilerWindow *filer_window,
 		view->image = NULL;
 	}
 
-	if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
-		strcmp(item->mime_type->media_type, "image") == 0)
+	if (filer_window->show_thumbs && item->base_type == TYPE_FILE /*&&
+									strcmp(item->mime_type->media_type, "image") == 0*/)
 	{
 		const guchar    *path;
 

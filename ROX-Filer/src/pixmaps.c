@@ -50,6 +50,7 @@
 #include "dir.h"
 #include "options.h"
 #include "action.h"
+#include "type.h"
 
 GFSCache *pixmap_cache = NULL;
 
@@ -108,7 +109,7 @@ static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
-static void child_create_thumbnail(const gchar *path);
+static void child_create_thumbnail(const gchar *path, MIME_type *type);
 static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
 					  guchar alpha);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
@@ -264,6 +265,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	GdkPixbuf	*pixbuf;
 	pid_t		child;
 	ChildThumbnail	*info;
+	MIME_type       *type;
 
 	image = g_fscache_lookup_full(pixmap_cache, path,
 					FSCACHE_LOOKUP_ONLY_NEW, &found);
@@ -325,6 +327,12 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		return;
 	}
 
+	type=type_from_path(path);
+	if(!type || strcmp(type->media_type, "image")!=0) {
+		callback(data, (gchar *) path);
+		return;  /* Can't create thumbnail */
+	}
+
 	/* Add an entry, set to NULL, so no-one else tries to load this
 	 * image.
 	 */
@@ -342,7 +350,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (child == 0)
 	{
 		/* We are the child process */
-		child_create_thumbnail(path);
+		child_create_thumbnail(path, type);
 		_exit(0);
 	}
 
@@ -433,8 +441,10 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 
 /* Called in a subprocess. Load path and create the thumbnail
  * file. Parent will notice when we die.
+ * Type is for future expansion: we could run an external command, selected
+ * by MIME type, to generate the thumbnail
  */
-static void child_create_thumbnail(const gchar *path)
+static void child_create_thumbnail(const gchar *path, MIME_type *type)
 {
 	GdkPixbuf *image;
 
@@ -506,7 +516,7 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 	
 	if (mc_stat(path, &info) != 0)
 		goto err;
-	
+
 	if (info.st_mtime != atol(smtime) || info.st_size != atol(ssize))
 		goto err;
 

@@ -1898,8 +1898,8 @@ void filer_create_thumbs(FilerWindow *filer_window)
 		 if (item->base_type != TYPE_FILE)
 			 continue;
 
-		 if (strcmp(item->mime_type->media_type, "image") != 0)
-			 continue;
+		 /*if (strcmp(item->mime_type->media_type, "image") != 0)
+		   continue;*/
 
 		path = make_path(filer_window->real_path, item->leafname);
 
