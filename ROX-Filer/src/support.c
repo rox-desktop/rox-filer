@@ -577,7 +577,7 @@ gboolean is_sub_dir(char *sub, char *parent)
 
 	while (1)
 	{
-		guchar	    *slash;
+		char	    *slash;
 		struct stat info;
 		
 		if (mc_stat(sub, &info) == 0)
@@ -589,13 +589,19 @@ gboolean is_sub_dir(char *sub, char *parent)
 				return TRUE;
 			}
 		}
-		else
-			g_print("[ %s doesn't exist ]\n", sub);
 		
 		slash = strrchr(sub, '/');
 		if (!slash)
 			break;
-		*slash = '\0';
+		if (slash == sub)
+		{
+			if (sub[1])
+				sub[1] = '\0';
+			else
+				break;
+		}
+		else
+			*slash = '\0';
 	}
 
 	g_free(sub);
