@@ -95,18 +95,27 @@ else
 fi
 
 AC_MSG_CHECKING(for large file support)
-if getconf LFS64_CFLAGS > /dev/null 2> /dev/null; then
+case "$with_platform" in
+OpenBSD*)
   AC_MSG_RESULT(yes)
-  LFS_CFLAGS="`getconf LFS_CFLAGS`"
-  LFS_LDFLAGS="`getconf LFS_LDFLAGS`"
-  LFS_LIBS="`getconf LFS_LIBS`"
   AC_DEFINE(LARGE_FILE_SUPPORT)
-else
-  AC_MSG_RESULT(no)
-  LFS_CFLAGS=""
-  LFS_LDFLAGS=""
-  LFS_LIBS=""
-fi
+  ;;
+*)
+  if getconf LFS64_CFLAGS > /dev/null 2> /dev/null; then
+    AC_MSG_RESULT(yes)
+    LFS_CFLAGS="`getconf LFS_CFLAGS`"
+    LFS_LDFLAGS="`getconf LFS_LDFLAGS`"
+    LFS_LIBS="`getconf LFS_LIBS`"
+    AC_DEFINE(LARGE_FILE_SUPPORT)
+  else
+    AC_MSG_RESULT(no)
+    LFS_CFLAGS=""
+    LFS_LDFLAGS=""
+    LFS_LIBS=""
+  fi
+  ;;
+esac
+
 AC_SUBST(LFS_CFLAGS)
 AC_SUBST(LFS_LDFLAGS)
 AC_SUBST(LFS_LIBS)
