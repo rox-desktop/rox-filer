@@ -15,7 +15,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: rox\n"
-"POT-Creation-Date: 2003-01-05 14:59+0100\n"
+"POT-Creation-Date: 2003-01-06 13:07+0000\n"
 "PO-Revision-Date: 2003-01-05 16:40+0100\n"
 "Last-Translator: Marcin Juszkiewicz <marcin@amiga.pl>\n"
 "Language-Team: GNOME PL Team <translators@gnome.pl>\n"
@@ -185,11 +185,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "B£¡D"
 
-#: action.c:633 main.c:561 main.c:569
+#: action.c:633 main.c:574 main.c:582
 msgid "Yes"
 msgstr "Tak"
 
-#: action.c:636 main.c:563
+#: action.c:636 main.c:576
 msgid "No"
 msgstr "Nie"
 
@@ -611,7 +611,7 @@ msgid "Can't open directory: %s"
 msgstr "Nie mo¿na otworzyæ katalogu: %s"
 
 # ##, c-format
-#: display.c:545
+#: display.c:549
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "b³±d lstat(2): %s"
@@ -638,15 +638,16 @@ msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
-"Okre¶lono cel XdndDirectSave0, lecz atom XdndDirectSave0 (typ text/plain) nie "
-"zawiera nazwy li¶cia\n"
+"Okre¶lono cel XdndDirectSave0, lecz atom XdndDirectSave0 (typ text/plain) "
+"nie zawiera nazwy li¶cia\n"
 
 #: dnd.c:564
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Wymagany jest docelowy typ text/uri-list lub XdndDirectSave0."
 
 #: dnd.c:567
-msgid "Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgid ""
+"Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr "Wymagany jest typ text/uri-list lub application/octet-stream."
 
 #: dnd.c:666
@@ -664,7 +665,8 @@ msgstr "B³±d protoko³u XDS: kod powrotu powinien byæ \"S\", \"F\" lub \"E\"\n"
 
 #: dnd.c:745
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
-msgstr "Nie mo¿na wy¶wietliæ menu czynno¶ci dla zdalnych plików / surowych danych."
+msgstr ""
+"Nie mo¿na wy¶wietliæ menu czynno¶ci dla zdalnych plików / surowych danych."
 
 #: dnd.c:761
 msgid "UntitledData"
@@ -681,13 +683,15 @@ msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Nie podano URI w text/uri-list (nic do zrobienia!)"
 
 #: dnd.c:843
-msgid "Can't get data from remote machine (application/octet-stream not provided)"
+msgid ""
+"Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Nie mo¿na otrzymaæ danych ze zdalnego komputera (nie podano application/"
 "octet-stream)"
 
 #: dnd.c:864
-msgid "Some of these files are on a different machine - they will be ignored - sorry"
+msgid ""
+"Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Niektóre z tych plików znajduj± siê na innym komputerze - zostan± one "
 "zignorowane"
@@ -1172,107 +1176,111 @@ msgstr "Tekst wy¶wietlany pod ikon±:"
 msgid "The keyboard shortcut is:"
 msgstr "Kombinacja klawiszy:"
 
-#: infobox.c:91
+#: infobox.c:90
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr "Czy na pewno chcesz otworzyæ %d okien?"
 
-#: infobox.c:92
+#: infobox.c:91
 msgid "Show Info"
 msgstr "Informacja"
 
-#: infobox.c:114 menu.c:759
+#: infobox.c:113 menu.c:759
 msgid "(bad utf-8)"
 msgstr "(z³y UTF-8)"
 
-#: infobox.c:251
+#: infobox.c:222
 msgid "Show _Help Files"
 msgstr "Poka¿ pliki z dokumentacj±"
 
-#: infobox.c:362 tips:245
+#: infobox.c:331
+msgid "Name:"
+msgstr "nazwa:"
+
+#: infobox.c:335 tips:245
 msgid "Error:"
 msgstr "B³±d:"
 
-#: infobox.c:369
+#: infobox.c:342
 msgid "Real directory:"
 msgstr "Katalog:"
 
-#: infobox.c:373
+#: infobox.c:346
 msgid "Owner, Group:"
 msgstr "W³a¶ciciel, Grupa:"
 
-#: infobox.c:379
+#: infobox.c:352
 msgid "Size:"
 msgstr "Rozmiar:"
 
-#: infobox.c:383 support.c:275 support.c:352
+#: infobox.c:356 support.c:275 support.c:352
 msgid "bytes"
 msgstr "bajty"
 
-#: infobox.c:386
+#: infobox.c:359
 msgid "Change time:"
 msgstr ":"
 
-#: infobox.c:388
+#: infobox.c:361
 msgid "Modify time:"
 msgstr "Data modyfikacji:"
 
-#: infobox.c:390
+#: infobox.c:363
 msgid "Access time:"
 msgstr "Data dostêpu:"
 
-#: infobox.c:392
+#: infobox.c:365
 msgid "Permissions:"
 msgstr "Uprawnienia:"
 
-#: infobox.c:394
+#: infobox.c:367
 msgid "Type:"
 msgstr "Typ:"
 
-#: infobox.c:397
+#: infobox.c:370
 msgid "Run action:"
 msgstr "Akcja:"
 
-#: infobox.c:488
+#: infobox.c:461
 msgid "file(1) says..."
 msgstr "Informacja z file(1)..."
 
-#: infobox.c:489
+#: infobox.c:462
 msgid "<nothing yet>"
 msgstr "<jeszcze nic>"
 
-#: infobox.c:561
+#: infobox.c:534
 #, c-format
 msgid "file(1) says... %s"
 msgstr "Informacja z file(1)... %s"
 
-#: infobox.c:605
+#: infobox.c:578
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Dowi±zanie symboliczne do %s"
 
-#: infobox.c:611
+#: infobox.c:584
 msgid "Symbolic link"
 msgstr "Dowi±zanie symboliczne"
 
-#: infobox.c:615
+#: infobox.c:588
 msgid "ROX application"
 msgstr "Aplikacja ROX-a"
 
-#: infobox.c:623
+#: infobox.c:596
 msgid "mounted"
 msgstr "zamontowany"
 
-#: infobox.c:623
+#: infobox.c:596
 msgid "unmounted"
 msgstr "odmontowany"
 
-#: infobox.c:627
+#: infobox.c:600
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Punkt zamontowania dla %s (%s)"
 
-#: infobox.c:630
+#: infobox.c:603
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Punkt zamontowania (%s)"
@@ -1295,11 +1303,13 @@ msgstr ""
 "W celu uzyskania bli¿szych informacji, przeczytaj plik COPYING.\n"
 
 #: main.c:102
-msgid "Try `rox --help' for more information.\n"
+#, fuzzy
+msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr "Wpisz \"rox --help\" by uzyskaæ wiêcej informacji.\n"
 
 #: main.c:105
-msgid "Try `rox -h' for more information.\n"
+#, fuzzy
+msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr "Wpisz \"rox -h\" by uzyskaæ wiêcej informacji.\n"
 
 #: main.c:107
@@ -1313,8 +1323,9 @@ msgstr ""
 "\n"
 
 #: main.c:111
+#, fuzzy
 msgid ""
-"Usage: rox [OPTION]... [FILE]...\n"
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
 "directory if no arguments are given.\n"
 "\n"
@@ -1368,30 +1379,31 @@ msgstr ""
 "jêzyku angielskim).\n"
 " \n"
 
-#: main.c:297
+#: main.c:310
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
-msgstr "Parametr \"-o\" nie jest ju¿ u¿ywany. Opcja zosta³a przeniesiona do ustawieñ."
+msgstr ""
+"Parametr \"-o\" nie jest ju¿ u¿ywany. Opcja zosta³a przeniesiona do ustawieñ."
 
-#: main.c:386
+#: main.c:399
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Uruchomiony na prawach u¿ytkownika \"%s\""
 
-#: main.c:558
+#: main.c:571
 msgid "features set at compile time"
 msgstr "w³a¶ciwo¶ci ustawione podczas kompilacji"
 
-#: main.c:559
+#: main.c:572
 msgid "Large File Support"
 msgstr "Obs³uga wielkich plików"
 
-#: main.c:567
+#: main.c:580
 msgid "GNOME-VFS library"
 msgstr "Biblioteka GNOME-VFS"
 
-#: main.c:571
+#: main.c:584
 msgid "No (gnome-vfs-config not found)"
 msgstr "Brak (nie znaleziono gnome-vfs-config)"
 
@@ -1696,7 +1708,8 @@ msgstr ""
 
 #: menu.c:1438
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
-msgstr "Ustawienie zmiennej CHOICESPATH wy³±cza mo¿liwo¶æ dostosowywania ustawieñ."
+msgstr ""
+"Ustawienie zmiennej CHOICESPATH wy³±cza mo¿liwo¶æ dostosowywania ustawieñ."
 
 #: menu.c:1515
 msgid "Customise"
@@ -1845,7 +1858,8 @@ msgstr ""
 "zgadzaj±cej siê nazwy. \"Escape\" zamyka minibufor."
 
 #: minibuffer.c:250
-msgid "Enter a shell command to execute. Click on a file to add it to the buffer."
+msgid ""
+"Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
 "Wprowad¼ polecenie do wykonania. Kliknij na plik, aby dodaæ jego nazwê do "
 "bufora."
@@ -1856,7 +1870,8 @@ msgstr "Nieprawid³owe wyra¿enie"
 
 #: options.c:272
 msgid "ROX-Filer has converted your Options file to the new XML format"
-msgstr "Stary plik z konfiguracj± zosta³ przekonwertowany na nowy w formacie XML."
+msgstr ""
+"Stary plik z konfiguracj± zosta³ przekonwertowany na nowy w formacie XML."
 
 #: options.c:484 options.c:1204
 msgid "(use default)"
@@ -1877,7 +1892,8 @@ msgstr "_Przywróæ"
 
 #: options.c:914
 msgid "Restore all choices to how they were when the Options box was opened."
-msgstr "Przywraca ustawienia do takich jakie by³y przed otwarciem okna \"Opcje\""
+msgstr ""
+"Przywraca ustawienia do takich jakie by³y przed otwarciem okna \"Opcje\""
 
 #: options.c:929
 #, c-format
@@ -2009,7 +2025,8 @@ msgstr ""
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
-msgstr "Tylko pliki (i odpowiednie aplikacje) mog± byæ u¿yte do ustawienia t³a biurka"
+msgstr ""
+"Tylko pliki (i odpowiednie aplikacje) mog± byæ u¿yte do ustawienia t³a biurka"
 
 #: pinboard.c:1293
 msgid "Missing '>' in icon label"
@@ -2043,7 +2060,7 @@ msgstr ""
 "Nie by³ u¿yty ¿aden pulpit... zosta³ wybrany 'Default'. U¿yj \"rox -p=Default"
 "\" by w³±czyæ go w przysz³o¶ci."
 
-#: pixmaps.c:871
+#: pixmaps.c:873
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2052,11 +2069,11 @@ msgstr ""
 "Nie mo¿na usun±æ miniaturek w %s:\n"
 "%s"
 
-#: pixmaps.c:892
+#: pixmaps.c:894
 msgid "There are no thumbnails to delete"
 msgstr "Nie ma ¿adnych miniaturek do skasowania."
 
-#: pixmaps.c:905
+#: pixmaps.c:907
 msgid "Purge thumbnails disk cache"
 msgstr "Wyczyszczenie bufora miniaturek"
 
@@ -2082,17 +2099,17 @@ msgstr "Niew³a¶ciwy (brak magicznego numeru GNU) plik z t³umaczeniem: %s"
 msgid "Program %s not found - deleted?"
 msgstr "Nie znaleziono programu %s - skasowany?"
 
-#: run.c:238
+#: run.c:244
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
 msgstr "Plik nie istnieje lub nie mo¿na go otworzyæ: %s"
 
-#: run.c:243
+#: run.c:249
 #, c-format
 msgid "I don't know how to open '%s'"
 msgstr "Nie wiadomo jak otworzyæ \"%s\""
 
-#: run.c:270
+#: run.c:276
 msgid ""
 "Executable file:\n"
 "This is a file with an eXecute bit set - it can be run as a program."
@@ -2101,7 +2118,7 @@ msgstr ""
 "To jest plik z ustawionym atrybutem X (wykonywalny) - mo¿e zostaæ "
 "uruchomiony jako program."
 
-#: run.c:275
+#: run.c:281
 msgid ""
 "File:\n"
 "This is a data file. Try using the Info menu item to find out more..."
@@ -2110,7 +2127,7 @@ msgstr ""
 "To jest plik danych. Spróbuj skorzystaæ z polecenia \"Informacja\" z menu, "
 "aby uzyskaæ wiêcej informacji."
 
-#: run.c:282
+#: run.c:288
 msgid ""
 "Mount point:\n"
 "A mount point is a directory which another filing system can be mounted on. "
@@ -2121,7 +2138,7 @@ msgstr ""
 "system plików. Wszystkie pliki znajduj±ce siê w tym systemie plików pojawi± "
 "siê wewn±trz tego katalogu."
 
-#: run.c:293
+#: run.c:299
 msgid ""
 "Device file:\n"
 "Device files allow you to read from or write to a device driver as though it "
@@ -2131,7 +2148,7 @@ msgstr ""
 "Pliki urz±dzeñ pozwalaj± na odczyt lub zapis do sterownika urz±dzenia tak, "
 "jakby by³ zwyk³y plik."
 
-#: run.c:300
+#: run.c:306
 msgid ""
 "Named pipe:\n"
 "Pipes allow different programs to communicate. One program writes data to "
@@ -2141,7 +2158,7 @@ msgstr ""
 "Potoki pozwalaj± na wzajemn± komunikacjê ró¿nych programów. Jeden program "
 "zapisuje dane do potoku, podczas gdy drugi odczytuje je z niego."
 
-#: run.c:307
+#: run.c:313
 msgid ""
 "Socket:\n"
 "Sockets allow processes to communicate."
@@ -2149,13 +2166,13 @@ msgstr ""
 "Gniazda:\n"
 "Gniazda pozwalaj± procesom na komunikacjê"
 
-#: run.c:312
+#: run.c:318
 msgid ""
 "Door:\n"
 "Doors are a little-used Solaris method for processes to communicate."
 msgstr ""
 
-#: run.c:318
+#: run.c:324
 msgid ""
 "Unknown type:\n"
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
@@ -2165,23 +2182,23 @@ msgstr ""
 "Nie mo¿na ustaliæ typu tego pliku. Byæ mo¿e plik zosta³ ju¿ skasowany lub "
 "nie masz uprawnieñ do przegl±dania tego katalogu."
 
-#: run.c:404
+#: run.c:410
 #, c-format
 msgid "Could not send data to program: %s"
 msgstr "Nie mo¿na wys³aæ danych do programu: %s"
 
-#: run.c:434
+#: run.c:440
 #, c-format
 msgid "Could not read link: %s"
 msgstr "Nie mo¿na odczytaæ dowi±zania: %s"
 
 # ##, c-format
-#: run.c:462
+#: run.c:468
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "Zerwane dowi±zanie (lub nie masz prawa nim pod±¿aæ): %s"
 
-#: run.c:499
+#: run.c:505
 #, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
@@ -2192,7 +2209,7 @@ msgstr ""
 "domy¶ln± akcjê wybieraj±c polecenie \"Okre¶l akcjê\" z menu, lub przeci±gn±æ "
 "ikonê tego pliku na odpowiedni program"
 
-#: run.c:522
+#: run.c:528
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2204,7 +2221,7 @@ msgstr ""
 "katalog (przytrzymuj±c Shift). Wiêkszo¶æ aplikacji udostêpnia w³asn± pomoc, "
 "ale nie ten."
 
-#: run.c:528
+#: run.c:534
 msgid ""
 "Directory:\n"
 "This is a directory. It contains an index to other items - open it to see "
@@ -2389,7 +2406,7 @@ msgstr ""
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Naprawia problem z bezpieczeñstwem)"
 
-#: type.c:476
+#: type.c:479
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -2399,7 +2416,7 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:579
+#: type.c:582
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2407,53 +2424,53 @@ msgstr ""
 "Aplikacja przeniesiona do skrzynki (drop box) bêdzie u¿ywana do za³adowania "
 "plików tego typu w przysz³o¶ci"
 
-#: type.c:606
+#: type.c:609
 msgid "This is not a program! Give me an application instead!"
 msgstr "To nie jest program."
 
-#: type.c:664
+#: type.c:667
 msgid "Execute file"
 msgstr "Uruchom plik"
 
-#: type.c:669
+#: type.c:672
 msgid "No run action defined"
 msgstr "Brak okre¶lonej akcji"
 
-#: type.c:695
+#: type.c:698
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "B³±d w obs³udze %s: %s"
 
-#: type.c:710
+#: type.c:713
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Niew³a¶ciwa aplikacja %s (niew³a¶ciwy AppRun)"
 
-#: type.c:721
+#: type.c:724
 #, c-format
 msgid "Non-executable %s"
 msgstr "Niewykonywalny %s"
 
-#: type.c:757
+#: type.c:760
 msgid "Set run action"
 msgstr "Okre¶l akcjê"
 
-#: type.c:759
+#: type.c:762
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Ustaw domy¶lnie dla wszystkich \"%s/<cokolwiek>\""
 
-#: type.c:765 usericons.c:286
+#: type.c:768 usericons.c:286
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Tylko dla typu \"%s/%s\""
 
-#: type.c:793
+#: type.c:796
 #, c-format
 msgid "Currently %s"
 msgstr "Aktualnie %s"
 
-#: type.c:807
+#: type.c:810
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2461,19 +2478,19 @@ msgstr ""
 "Upu¶æ tutaj w³a¶ciw±\n"
 "aplikacjê"
 
-#: type.c:814 usericons.c:368
+#: type.c:817 usericons.c:368
 msgid "OR"
 msgstr "LUB"
 
-#: type.c:821
+#: type.c:824
 msgid "Enter a shell command:"
 msgstr "Wprowad¼ polecenie:"
 
-#: type.c:891
+#: type.c:894
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Zapis opcji wy³±czony przez zmienn± CHOICESPATH"
 
-#: type.c:903
+#: type.c:906
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2481,12 +2498,12 @@ msgstr ""
 "Akcja ju¿ istnieje i jest do¶æ sporym programem - czy na pewno chcesz j± "
 "skasowaæ?"
 
-#: type.c:915
+#: type.c:918
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Nie mogê usun±æ %s: %s"
 
-#: type.c:1113
+#: type.c:1116
 #, c-format
 msgid ""
 "Error loading MIME database:\n"
@@ -2495,12 +2512,12 @@ msgstr ""
 "B³±d przy ³adowaniu bazy MIME:\n"
 "%s"
 
-#: type.c:1138
+#: type.c:1141
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr "Plik \"%s\" jest uszkodzony."
 
-#: type.c:1229
+#: type.c:1232
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -2540,7 +2557,8 @@ msgid "Set icon for all `%s/<anything>'"
 msgstr "Ustaw ikonê dla wszystkich \"%s/<cokolwiek>\""
 
 #: usericons.c:283
-msgid "Use a copy of the image as the default for all files of these MIME types."
+msgid ""
+"Use a copy of the image as the default for all files of these MIME types."
 msgstr "U¿yj kopii obrazka jako domy¶lnego dla wszystkich plików tych typów."
 
 #: usericons.c:295
@@ -2616,7 +2634,8 @@ msgstr "Ustawianie ikon wy³±czone przez zmienn± CHOICESPATH"
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
-msgstr "Nie ustawia³e¶ jeszcze ¿adnych ikon wiêc nie mam katalogów do pokazania"
+msgstr ""
+"Nie ustawia³e¶ jeszcze ¿adnych ikon wiêc nie mam katalogów do pokazania"
 
 #: usericons.c:737
 #, c-format
@@ -2939,8 +2958,9 @@ msgid ""
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
-"Po wybraniu automatycznego skalowania ikon: je¶li katalog zawiera tyle elementów to bêdzie pokazany przy u¿yciu Ma³ych "
-"ikon. W przeciwnym wypadku u¿yte bêd± Du¿e ikony."
+"Po wybraniu automatycznego skalowania ikon: je¶li katalog zawiera tyle "
+"elementów to bêdzie pokazany przy u¿yciu Ma³ych ikon. W przeciwnym wypadku "
+"u¿yte bêd± Du¿e ikony."
 
 #: tips:83
 #, fuzzy
@@ -3054,8 +3074,8 @@ msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
-"Gdy miniaturki s± w³±czone ka¿dy obrazek w katalogu jest wczytywany "
-"i pokazywana jest jego miniaturka."
+"Gdy miniaturki s± w³±czone ka¿dy obrazek w katalogu jest wczytywany i "
+"pokazywana jest jego miniaturka."
 
 #: tips:112
 msgid "Show image thumbnails"
@@ -3079,9 +3099,9 @@ msgid ""
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
 "will be created again as needed."
 msgstr ""
-"By przy¶pieszyæ pracê programu miniaturki s± przechowywane w ukrytym katalogu "
-"~/.thumbnails. Naci¶nij tutaj by usun±æ wszystkie miniaturki. Zostan± one "
-"ponownie utworzone w razie potrzeby."
+"By przy¶pieszyæ pracê programu miniaturki s± przechowywane w ukrytym "
+"katalogu ~/.thumbnails. Naci¶nij tutaj by usun±æ wszystkie miniaturki. "
+"Zostan± one ponownie utworzone w razie potrzeby."
 
 #: tips:117
 msgid "Pinboard"
@@ -3263,7 +3283,8 @@ msgid "Image only for applications"
 msgstr "Ikony tylko przy aplikacjach"
 
 #: tips:163
-msgid "Applications have just an image, everything else has both an image and text."
+msgid ""
+"Applications have just an image, everything else has both an image and text."
 msgstr ""
 "Aplikacje s± przedstawione tylko za pomoc± ikon, wszystko inne jako ikona i "
 "podpis."
@@ -3634,9 +3655,6 @@ msgstr ""
 "wska¼niku myszy pokazuje znak '+' lecz funkcja \"przenie¶ i upu¶æ\" nie "
 "dzia³a poprawnie."
 
-#~ msgid "Name:"
-#~ msgstr "nazwa:"
-
 #, fuzzy
 #~ msgid ""
 #~ "<u>Quick Start</u>\n"
@@ -3884,4 +3902,3 @@ msgstr ""
 #, fuzzy
 #~ msgid "Text style"
 #~ msgstr "Styl panelu"
-

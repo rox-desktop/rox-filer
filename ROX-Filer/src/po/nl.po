@@ -21,7 +21,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.6\n"
-"POT-Creation-Date: 2003-01-04 10:04+0100\n"
+"POT-Creation-Date: 2003-01-06 13:07+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@easynet.be>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
@@ -66,6 +66,7 @@ msgid "Find expression reference"
 msgstr "Uitleg zoek-expressies"
 
 #: action.c:184
+#, fuzzy
 msgid ""
 "<u>Quick Start</u>\n"
 "Just put the name of the file you're looking for in single quotes:\n"
@@ -100,7 +101,7 @@ msgid ""
 "\n"
 "<u>Specials</u>\n"
 "<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
-"a \\% in 'command' is replaced with the path of the current file)\n"
+"a % in 'command' is replaced with the path of the current file)\n"
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
 "<u>Snel Start</u>\n"
@@ -318,6 +319,7 @@ msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!FOUT: Doel bestaat reeds, maar is geen map\n"
 
 #: action.c:1186
+#, c-format
 msgid ""
 "!%s\n"
 "Failed to copy '%s'\n"
@@ -648,7 +650,7 @@ msgstr "Kan map status niet verkrijgen: %s"
 msgid "Can't open directory: %s"
 msgstr "Kan map niet openen: %s"
 
-#: display.c:545
+#: display.c:549
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) mislukt: %s"
@@ -1466,7 +1468,7 @@ msgstr "Grotere iconen"
 msgid "Smaller Icons"
 msgstr "Kleinere iconen"
 
-#: menu.c:193 tips:70 toolbar.c:380
+#: menu.c:193 toolbar.c:380 tips:70
 msgid "Automatic"
 msgstr "Automatisch"
 
@@ -2298,7 +2300,7 @@ msgstr "Scan"
 msgid "Rescan directory contents"
 msgstr "Map inhoud verversen"
 
-#: tips:59 toolbar.c:128
+#: toolbar.c:128 tips:59
 msgid "Size"
 msgstr "Grootte"
 
@@ -2331,7 +2333,7 @@ msgstr "Toon ROX-Filer help"
 msgid " (%u hidden)"
 msgstr " (%u verborgen)"
 
-#: tips:79 toolbar.c:207
+#: toolbar.c:207 tips:79
 msgid "items"
 msgstr "items"
 
@@ -2824,7 +2826,6 @@ msgid "Largest window size:"
 msgstr "Maximale venstergrootte:"
 
 #: tips:28
-#, c-format
 msgid "%"
 msgstr "%"
 
@@ -2905,8 +2906,8 @@ msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
 msgstr ""
-"Indien aan zullen mappen altijd eerst getoond worden wanneer op "
-"naam gesorteerd wordt."
+"Indien aan zullen mappen altijd eerst getoond worden wanneer op naam "
+"gesorteerd wordt."
 
 #: tips:49
 msgid "Default settings for new windows"
@@ -2991,9 +2992,9 @@ msgid ""
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
-"Wanneer automatische iconen weergave geselecteerd is: "
-"Als een map dit aantal items bevat dan zullen ze getoond worden d.m.v. "
-"Kleine Iconen, anders zullen Grote Iconen gebruikt worden."
+"Wanneer automatische iconen weergave geselecteerd is: Als een map dit aantal "
+"items bevat dan zullen ze getoond worden d.m.v. Kleine Iconen, anders zullen "
+"Grote Iconen gebruikt worden."
 
 #: tips:83
 msgid "Large wrap width:"
@@ -3008,9 +3009,9 @@ msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
 msgstr ""
-"Tekst breder dan dit wordt gesplitst over meer regels in Grote iconen "
-"modus. In Reusachtige iconen modus wordt tekst afgebroken als het 50% breder is "
-"dan dit."
+"Tekst breder dan dit wordt gesplitst over meer regels in Grote iconen modus. "
+"In Reusachtige iconen modus wordt tekst afgebroken als het 50% breder is dan "
+"dit."
 
 #: tips:86
 msgid "Max Small Icons width:"
@@ -3117,8 +3118,8 @@ msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
 msgstr ""
-"Dit is de standaard instelling voor nieuwe vensters. Gebruik het Weergave menu "
-"om miniaturen aan of uit te schakelen voor individuele vensters."
+"Dit is de standaard instelling voor nieuwe vensters. Gebruik het Weergave "
+"menu om miniaturen aan of uit te schakelen voor individuele vensters."
 
 #: tips:115
 msgid "Thumbnails cache"
@@ -3132,8 +3133,7 @@ msgid ""
 msgstr ""
 "Uit snelheids-overwegingen worden de aangemaakte miniaturen opgeslagen in "
 "een verborgen ~/.thumnails (miniatuur) map. Klik hier om all opgeslagen "
-"miniaturen te verwijderen. Ze zullen indien nodig terug aangemaakt "
-"worden."
+"miniaturen te verwijderen. Ze zullen indien nodig terug aangemaakt worden."
 
 #: tips:117
 msgid "Pinboard"
@@ -3690,4 +3690,3 @@ msgstr ""
 "nodig kunnen hebben dat deze optie aanstaat. Gebruik dit wanneer het slepen "
 "van een applicatie een + teken toont op de aanwijzer maar het droppen niet "
 "werkt."
-
