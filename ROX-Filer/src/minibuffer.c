@@ -193,7 +193,15 @@ void minibuffer_hide(FilerWindow *filer_window)
 
 	if (filer_window->temp_show_hidden)
 	{
-		display_set_hidden(filer_window, FALSE);
+		Collection *collection = filer_window->collection;
+		int i = collection->cursor_item;
+		DirItem *item = NULL;
+
+		if (i >= 0 && i < collection->number_of_items)
+			item = (DirItem *) collection->items[i].data;
+		
+		if (item == NULL || item->leafname[0] != '.')
+			display_set_hidden(filer_window, FALSE);
 		filer_window->temp_show_hidden = FALSE;
 	}
 }

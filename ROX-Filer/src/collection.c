@@ -516,12 +516,23 @@ static void collection_size_allocate(GtkWidget *widget,
 {
 	Collection 	*collection;
 	int		old_columns;
+	gboolean	cursor_visible = FALSE;
 
 	g_return_if_fail(widget != NULL);
 	g_return_if_fail(IS_COLLECTION(widget));
 	g_return_if_fail(allocation != NULL);
 
 	collection = COLLECTION(widget);
+
+	if (collection->cursor_item != -1)
+	{
+		int	first, last;
+		int	crow = collection->cursor_item / collection->columns;
+
+		get_visible_limits(collection, &first, &last);
+
+		cursor_visible = crow >= first && crow <= last;
+	}
 
 	old_columns = collection->columns;
 	if (widget->allocation.x != allocation->x
@@ -551,7 +562,7 @@ static void collection_size_allocate(GtkWidget *widget,
 
 		set_vadjustment(collection);
 
-		if (collection->cursor_item != -1)
+		if (cursor_visible)
 			scroll_to_show(collection, collection->cursor_item);
 	}
 }

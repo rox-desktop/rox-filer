@@ -2,6 +2,14 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+05-Dec-2001
+~~~~~~~~~~~
+When resizing the collection, only ensure the cursor is still visible if
+it was in the displayed area before.
+
+When closing the Enter Path minibuffer, keep Show Hidden on if the cursor is
+on a hidden item.
+
 04-Dec-2001
 ~~~~~~~~~~~
 Support for new thumbnails spec; thumbnails are saved inside ~/.thumbnails
