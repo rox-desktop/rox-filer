@@ -38,13 +38,11 @@ $3
 ], [$4])])
 
 dnl rox_CHECK_EXISTS(PROGRAM, ERROR)
-dnl Ensure that PROGRAM is in PATH.
+dnl Ensure that PROGRAM --version works.
 dnl Stops and displays ERROR if it's missing.
 AC_DEFUN(rox_CHECK_EXISTS, [
-AC_MSG_CHECKING(for $1)
-[
-if [ -x "`which \"$1\" 2> /dev/null`" ]; then
-]
+AC_MSG_CHECKING(that $1 runs)
+if "$1" --version > /dev/null 2>&1 ; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
