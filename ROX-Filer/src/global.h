@@ -102,6 +102,11 @@ typedef struct _CollateKey CollateKey;
  */
 typedef struct _WrappedLabel WrappedLabel;
 
+/* A filename where " " has been replaced by "%20", etc.
+ * This is really just a string, but we try to catch type errors.
+ */
+typedef struct _EscapedPath EscapedPath;
+
 /* The minibuffer is a text field which appears at the bottom of
  * a filer window. It has various modes of operation:
  */

@@ -343,10 +343,10 @@ gchar *icon_create_uri_list(void)
 	for (next = icon_selection; next; next = next->next)
 	{
 		Icon *icon = (Icon *) next->data;
-		gchar *uri;
+		EscapedPath *uri;
 
 		uri = encode_path_as_uri(icon->path);
-		g_string_append(tmp, uri);
+		g_string_append(tmp, (char *) uri);
 		g_free(uri);
 		g_string_append(tmp, "\r\n");
 	}

@@ -474,28 +474,34 @@ static gboolean is_local_address(char *address)
  *	//host/path
  *	file://host/path
  */
-char *get_local_path(const char *uri)
+char *get_local_path(const EscapedPath *escaped_uri)
 {
+	const char *uri = (char *) escaped_uri;
+
 	if (*uri == '/')
 	{
 		char    *path, *uri_host;
 
 		/* Just a local path - no host part */
 		if (uri[1] != '/')
-			return unescape_uri(uri);
+			return unescape_uri((EscapedPath *) uri);
 		                    
 		path = strchr(uri + 2, '/');
 		if (!path)
 			return NULL;	    /* //something */
 
 		if (path - uri == 2)
-			return unescape_uri(path);	/* ///path */
+		{
+			/* ///path */
+			return unescape_uri((EscapedPath *) path);
+		}
 		
 		uri_host = g_strndup(uri + 2, path - uri - 2);
 		if (is_local_address(uri_host))
 		{
 			g_free(uri_host);
-			return unescape_uri(path);	/* //myhost/path */
+			/* //myhost/path */
+			return unescape_uri((EscapedPath *) path);
 		}
 		g_free(uri_host);
 
@@ -509,7 +515,7 @@ char *get_local_path(const char *uri)
 		uri += 5;
 
 		if (*uri == '/')
-			return get_local_path(uri);
+			return get_local_path((EscapedPath *) uri);
 
 		return NULL;
 	}
@@ -1265,9 +1271,9 @@ gboolean file_exists(const char *path)
 }
 
 /* Escape path for future use in URI */
-gchar *escape_uri_path(const char *path)
+EscapedPath *escape_uri_path(const char *path)
 {
-	const char *safe = "-_./"; /* Plus isalnum() */
+	const char *safe = ":-_./"; /* Plus isalnum() */
 	const guchar *s;
 	gchar *ans;
 	GString *str;
@@ -1285,28 +1291,29 @@ gchar *escape_uri_path(const char *path)
 	ans = str->str;
 	g_string_free(str, FALSE);
 
-	return ans;
+	return (EscapedPath *) ans;
 }
 
-gchar *encode_path_as_uri(const guchar *path)
+EscapedPath *encode_path_as_uri(const guchar *path)
 {
-	gchar *tpath = escape_uri_path(path);
+	gchar *tpath = (gchar *) escape_uri_path(path);
 	gchar *uri;
 
 	uri = g_strconcat("file://", our_host_name_for_dnd(), tpath, NULL);
 	g_free(tpath);
 
-	return uri;
+	return (EscapedPath *) uri;
 }
 
-gchar *unescape_uri(const char *uri)
+gchar *unescape_uri(const EscapedPath *uri)
 {
+	const char *uri_string = (char *) uri;
 	const gchar *s;
 	gchar *d;
 	gchar *tmp;
 	
-	tmp = g_malloc(strlen(uri) + 1);
-	for (s = uri, d = tmp; *s; s++, d++)
+	tmp = g_malloc(strlen(uri_string) + 1);
+	for (s = uri_string, d = tmp; *s; s++, d++)
 	{
 		/*printf("%s\n", s);*/
 		if (*s == '%' && g_ascii_isxdigit(s[1]) &&

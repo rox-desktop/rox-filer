@@ -289,7 +289,7 @@ void bookmarks_add_history(const gchar *path)
 	}
 }
 
-void bookmarks_add_uri(const gchar *uri)
+void bookmarks_add_uri(const EscapedPath *uri)
 {
 	char *path;
 	struct stat info;
@@ -588,7 +588,7 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 	{
 		guchar *path;
 
-		path = get_local_path((gchar *) next->data);
+		path = get_local_path((EscapedPath *) next->data);
 
 		if (path)
 		{

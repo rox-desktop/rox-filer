@@ -981,7 +981,7 @@ gint radios_get_value(Radios *radios)
 	return -1;
 }
 
-/* Convert a list of URIs as a string into a GList of URIs.
+/* Convert a list of URIs as a string into a GList of EscapedPath URIs.
  * No unescaping is done.
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)

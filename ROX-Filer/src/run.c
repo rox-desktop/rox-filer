@@ -106,14 +106,14 @@ void run_with_files(const char *path, GList *uri_list)
 	
 	while (uri_list)
 	{
-		const char *uri = uri_list->data;
+		const EscapedPath *uri = uri_list->data;
 		char *local;
 
 		local = get_local_path(uri);
 		if (local) 
 			argv[argc++] = local;
 		else
-			argv[argc++] = g_strdup(uri);
+			argv[argc++] = unescape_uri(uri);
 		uri_list = uri_list->next;
 	}
 	

@@ -265,7 +265,7 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
 		goto err;
 	}
 		
-	path = get_local_path((guchar *) uris->data);
+	path = get_local_path((EscapedPath *) uris->data);
 
 	if (!path)
 	{

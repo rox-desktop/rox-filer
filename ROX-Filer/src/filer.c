@@ -2336,11 +2336,12 @@ static guchar *filer_create_uri_list(FilerWindow *filer_window)
 	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 	while ((item = iter.next(&iter)))
 	{
-		gchar *uri, *path;
+		EscapedPath *uri;
+		char *path;
 		
 		path = g_strconcat(leader->str, item->leafname, NULL);
 		uri = encode_path_as_uri(path);
-		g_string_append(string, uri);
+		g_string_append(string, (char *) uri);
 		g_string_append(string, "\r\n");
 		g_free(path);
 		g_free(uri);

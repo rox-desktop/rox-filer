@@ -27,7 +27,7 @@ const gchar *format_double_size(double size);
 char *fork_exec_wait(const char **argv);
 const char *pretty_permissions(mode_t m);
 gint applicable(uid_t uid, gid_t gid);
-char *get_local_path(const char *uri);
+char *get_local_path(const EscapedPath *escaped_uri);
 void close_on_exec(int fd, gboolean close);
 void set_blocking(int fd, gboolean blocking);
 char *pretty_time(const time_t *time);
@@ -55,8 +55,8 @@ GPtrArray *list_dir(const guchar *path);
 gint strcmp2(gconstpointer a, gconstpointer b);
 int stat_with_timeout(const char *path, struct stat *info);
 
-extern gchar *escape_uri_path(const char *path);
-extern gchar *encode_path_as_uri(const guchar *path);
-extern gchar *unescape_uri(const char *uri);
+EscapedPath *escape_uri_path(const char *path);
+EscapedPath *encode_path_as_uri(const guchar *path);
+gchar *unescape_uri(const EscapedPath *uri);
 
 #endif /* _SUPPORT_H */

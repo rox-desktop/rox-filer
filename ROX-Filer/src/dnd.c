@@ -71,7 +71,7 @@ static gchar *prompt_dest_path = NULL;
 gint motion_buttons_pressed = 0;
 
 /* Static prototypes */
-static void set_xds_prop(GdkDragContext *context, const char *text);
+static void set_xds_prop(GdkDragContext *context, const char *uri);
 static void desktop_drag_data_received(GtkWidget      		*widget,
 				GdkDragContext  	*context,
 				gint            	x,
@@ -173,8 +173,10 @@ void dnd_init(void)
 /*			SUPPORT FUNCTIONS			*/
 
 /* Set the XdndDirectSave0 property on the source window for this context */
-static void set_xds_prop(GdkDragContext *context, const char *text)
+static void set_xds_prop(GdkDragContext *context, const char *uri)
 {
+	const char *text = (char *) uri;
+
 	gdk_property_change(context->source_window,
 			XdndDirectSave0,
 			xa_text_plain, 8,
@@ -199,6 +201,7 @@ static char *get_xds_prop(GdkDragContext *context)
 		/* Terminate the string */
 		prop_text = g_realloc(prop_text, length + 1);
 		prop_text[length] = '\0';
+		/* Note: assuming UTF-8 (should convert here) */
 		return prop_text;
 	}
 
@@ -319,7 +322,7 @@ void drag_one_item(GtkWidget		*widget,
 
 	g_dataset_set_data_full(context, "full_path",
 			g_strdup(full_path), g_free);
-	tmp = encode_path_as_uri(full_path);
+	tmp = (char *) encode_path_as_uri(full_path);
 	uri = g_strconcat(tmp, "\r\n", NULL);
 	/*printf("%s\n", tmp);*/
 	g_free(tmp);
@@ -345,7 +348,7 @@ static gchar *uri_list_to_utf8(const char *uri_list)
 
 	for (next_uri = uris; next_uri; next_uri = next_uri->next)
 	{
-		char *uri = (char *) next_uri->data;
+		EscapedPath *uri = next_uri->data;
 		char *local;
 
 		local = get_local_path(uri);
@@ -581,12 +584,17 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 			}
 			else
 			{
-				gchar	*uri;
+				char *dest_uri;
 
-				uri = encode_path_as_uri(make_path(dest_path,
-							  leafname));
-				set_xds_prop(context, uri);
-				g_free(uri);
+				/* Not escaped. */
+				dest_uri = g_strconcat("file://",
+						our_host_name_for_dnd(),
+						dest_path, NULL);
+
+				set_xds_prop(context,
+					make_path(dest_uri, leafname));
+
+				g_free(dest_uri);
 
 				target = XdndDirectSave0;
 				g_dataset_set_data_full(context, "leafname",
@@ -663,7 +671,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 	{
 		guchar	*path;
 
-		path = get_local_path((gchar *) next->data);
+		path = get_local_path((EscapedPath *) next->data);
 		if (path)
 		{
 			pinboard_pin(path, NULL, x, y, NULL);
@@ -884,7 +892,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 }
 
-static gboolean uri_is_local(const char *uri)
+static gboolean uri_is_local(const EscapedPath *uri)
 {
 	char *path;
 	path = get_local_path(uri);
@@ -942,7 +950,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	{
 		GList *next;
 		for (next = uri_list; next; next = next->next)
-			bookmarks_add_uri((guchar *) next->data);
+			bookmarks_add_uri((EscapedPath *) next->data);
 		destroy_glist(&uri_list);
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 		return;
@@ -969,7 +977,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			else
 				leaf = uri_list->data;
 			g_dataset_set_data_full(context, "leafname",
-					unescape_uri(leaf), g_free);
+				unescape_uri((EscapedPath *) leaf), g_free);
 			gtk_drag_get_data(widget, context,
 					application_octet_stream, time);
 			send_reply = FALSE;
@@ -980,7 +988,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		{
 			run_with_argument(dest_path,
 					o_dnd_uri_handler.value,
-					uri_list->data);
+					(char *) uri_list->data);
                 }
                 else
 			error = _("Can't get data from remote machine "
@@ -998,7 +1006,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		{
 			char *path;
 
-			path = get_local_path((char *) next_uri->data);
+			path = get_local_path((EscapedPath *) next_uri->data);
 			/*printf("%s -> %s\n", (char *) next_uri->data,
 			  path? path: "NULL");*/
 

@@ -1339,7 +1339,7 @@ static void add_uri_list(GtkWidget          *widget,
 	{
 		guchar	*path;
 
-		path = get_local_path((guchar *) next->data);
+		path = get_local_path((EscapedPath *) next->data);
 
 		if (path) {
 			panel_add_item(panel, path, NULL, after, NULL, NULL);

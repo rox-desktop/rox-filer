@@ -94,6 +94,7 @@
  * void saved_to_uri (GtkSavebox *savebox, const gchar *uri)
  *	The data is saved. If 'uri' is non-NULL, mark the file as unmodified
  *	and update the pathname/uri for the file to the one given.
+ *	The URI is UTF-8 (not escaped).
  */
 
 enum {
@@ -437,8 +438,17 @@ drag_data_get (GtkWidget	*widget,
   if (uri)
   {
     gint result = GTK_XDS_NO_HANDLER;
-
-    pathname = get_local_path (uri);
+    EscapedPath *escaped_uri;
+    
+    /* Escape and then unescape. A little inefficient. */
+    escaped_uri = escape_uri_path (uri);
+    pathname = get_local_path (escaped_uri);
+#if 0
+    g_print("[ asked to save as '%s' (%s escaped) ]\n",
+		    pathname, (char *) escaped_uri);
+#endif
+    g_free (escaped_uri);
+    
     if (!pathname)
       to_send = 'F';    /* Not on the local machine */
     else
@@ -469,6 +479,7 @@ drag_data_get (GtkWidget	*widget,
   gtk_selection_data_set (selection_data, xa_string, 8, &to_send, 1);
 }
 
+/* Result is a UTF-8 encoded path. Not escaped. g_free() the result. */
 static guchar *
 read_xds_property (GdkDragContext *context, gboolean delete)
 {
@@ -488,12 +499,18 @@ read_xds_property (GdkDragContext *context, gboolean delete)
     retval[length] = '\0';
   }
 
+  /* Should really do a character set conversation here, but assume UTF-8 */
+
   return retval;
 }
 
 static void
 write_xds_property (GdkDragContext *context, const guchar *value)
 {
+  /* XXX: Should set character set to UTF-8 here. Spec says default is
+   * ISO-8859-1!
+   */
+
   if (value)
     {
       gdk_property_change (context->source_window, XdndDirectSave,
@@ -518,8 +535,11 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
       if (uri)
 	{
 	  gchar  *path;
+	  EscapedPath *escaped_uri;
 
-	  path = get_local_path (uri);
+	  escaped_uri = escape_uri_path (uri);
+	  path = get_local_path (escaped_uri);
+	  g_free(escaped_uri);
 	  
 	  g_signal_emit (widget, savebox_signals[SAVED_TO_URI], 0,
 			 path ? path : (const gchar *) uri);
@@ -559,7 +579,14 @@ static void do_save (GtkSavebox *savebox)
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));
 
   uri = gtk_entry_get_text (GTK_ENTRY (savebox->entry));
-  pathname = get_local_path (uri);
+
+  /* This is a bit inefficient... */ {
+	  EscapedPath *escaped_uri;
+
+	  escaped_uri = escape_uri_path (uri);
+	  pathname = get_local_path (escaped_uri);
+	  g_free(escaped_uri);
+  }
 
   if (!pathname)
     {
