@@ -52,6 +52,7 @@
 #include "dir.h"
 #include "action.h"
 #include "i18n.h"
+#include "remote.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -66,7 +67,6 @@ char *home_dir;
 static void show_features(void);
 
 
-#define VERSION "ROX-Filer 0.1.21\n"
 #define COPYING								\
 	     N_("Copyright (C) 2000 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -86,16 +86,17 @@ static void show_features(void);
 		"you must use the short versions instead.\n\n")
 #endif
 
-#define SHORT_OPS "t:b:ohv"
+#define SHORT_OPS "t:b:ohvn"
 
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"	\
        "Open filer windows showing each directory listed, or $HOME \n"	\
        "if no directories are given.\n\n"				\
+       "  -b, --bottom=DIR	open DIR as a bottom-edge panel\n"	\
        "  -h, --help		display this help and exit\n"		      \
-       "  -v, --version		display the version information and exit\n"   \
-       "  -t, --top [DIR]	open DIR as a top-edge panel\n"		\
-       "  -b, --bottom [DIR]	open DIR as a bottom-edge panel\n"	\
+       "  -n, --new		start a new filer, even if already running\n"  \
        "  -o, --override	override window manager control of panels\n" \
+       "  -t, --top=DIR		open DIR as a top-edge panel\n"		\
+       "  -v, --version		display the version information and exit\n"   \
        "\nReport bugs to <tal197@ecs.soton.ac.uk>.\n")
 
 #ifdef HAVE_GETOPT_LONG
@@ -106,12 +107,16 @@ static struct option long_opts[] =
 	{"override", 0, NULL, 'o'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
+	{"new", 0, NULL, 'n'},
 	{NULL, 0, NULL, 0},
 };
 #endif
 
 /* Take control of panels away from WM? */
 gboolean override_redirect = FALSE;
+
+/* Always start a new filer, even if one seems to be already running */
+gboolean new_copy = FALSE;
 
 /* Maps child PIDs to Callback pointers */
 static GHashTable *death_callbacks = NULL;
@@ -235,11 +240,14 @@ int main(int argc, char **argv)
 		
 		switch (c)
 		{
+			case 'n':
+				new_copy = TRUE;
+				break;
 			case 'o':
 				override_redirect = TRUE;
 				break;
 			case 'v':
-				printf(VERSION);
+				printf("ROX-Filer %s\n", VERSION);
 				printf(_(COPYING));
 				show_features();
 				return EXIT_SUCCESS;
@@ -262,6 +270,8 @@ int main(int argc, char **argv)
 	}
 
 	gui_support_init();
+	if (remote_init(argc - optind, argv + optind, new_copy))
+		return EXIT_SUCCESS;	/* Already running */
 	pixmaps_init();
 	dir_init();
 	menu_init();

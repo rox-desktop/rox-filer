@@ -2,6 +2,18 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+24-Apr-2000
+~~~~~~~~~~~
+When starting, the filer will check to see if it is already running.
+If it is then the arguments are passed to that copy.
+
+23-Apr-2000
+~~~~~~~~~~~
+Bug fix: Attempting to open a Find preview window could cause a crash
+if the directory containing the item could not be opened.
+Button-3 clicking on the toolbar icons opens a new window.
+
+
 21-Apr-2000
 ~~~~~~~~~~~
 Added Vincent Lefevre's French translation. Changed to using my own
