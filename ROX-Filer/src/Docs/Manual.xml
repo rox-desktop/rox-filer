@@ -106,6 +106,14 @@
 	unifies these into a single system shared by all desktops.
      </para></listitem></varlistentry>
 
+     <varlistentry><term>Icon Themes</term>
+      <listitem><para>
+	Collections of file icons, called themes, can be installed (eg, to
+	<filename>~/.icons</filename>). You can switch between themes in
+	the Options box. Once other desktops support this fully, themes
+	will be sharable between desktops.
+     </para></listitem></varlistentry>
+
      <varlistentry><term>DNotify support (Linux only)</term>
       <listitem><para>
         If used with a recent Linux kernel (2.4.x series), the filer will notice changes
@@ -600,9 +608,17 @@ $ rox --bottom=</screen>
        Hide or show extra details</entry><entry>
        Same
        </entry></row><row><entry>
+       A..Z</entry><entry>
+       Step forward through the different sort types.</entry><entry>
+       Step backward through the sort types.
+       </entry></row><row><entry>
        Eye</entry><entry>
        Toggle the display of hidden files (those with names starting with a dot)</entry><entry>
        Same
+       </entry></row><row><entry>
+       List with selections</entry><entry>
+       Select All.</entry><entry>
+       Invert Selection.
        </entry></row><row><entry>
        Life-belt</entry><entry>
        Show <application>ROX-Filer</application>'s help files</entry><entry>
@@ -732,12 +748,7 @@ $ rox --bottom=</screen>
        When on, the filer tries to load every image file and use that
        image as the file's icon. Useful if you have a directory full of
        photos and can't remember which is which!
-       The thumbnails are saved in <filename>~/.thumbnails</filename> for
-       quick loading next time.
-       While loading thumbnails, a progress bar appears at the bottom of
-       the window. Clicking on the <guibutton>Cancel</guibutton> button
-       beside the bar stops the scan.
-       The titlebar shows <guilabel>(Thumbs)</guilabel> when this is on.
+       See the <xref linkend="thumbnails"/> section for details.
        </entry></row>
 
        <row><entry><guimenuitem>Refresh</guimenuitem></entry><entry>
@@ -842,7 +853,12 @@ $ rox --bottom=</screen>
     and keys bound to the various menu entries. </para><para>
     Note that individual applications may add extra menu items to the
     top of this submenu when you click over them &mdash; see
-    <xref linkend="AppDir"/> for details.
+    <xref linkend="AppDir"/> for details. There may also be any number of
+    user-defined actions at the top, which depend on the type of file
+    clicked on. You can add programs here by choosing the
+    <guimenuitem>Customise Menu</guimenuitem> item. For example, you could
+    make <application>The Gimp</application> appear on the menu for images, and
+    <application>FreeFS</application> appear for mount points.
 
     <informaltable><tgroup cols="2">
       <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
@@ -868,12 +884,6 @@ $ rox --bottom=</screen>
          Remove all the selected entries from the directory. Subdirectories
          will have their contents deleted first. Deleting symlinks only removes
          the link, not the thing it points to.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Help</guimenuitem></entry><entry>
-         Explain what kind of thing is selected. For applications, display
-         the help files.
        </entry></row>
 
        <row><entry>
@@ -913,7 +923,9 @@ $ rox --bottom=</screen>
 
        <row><entry>
          <guimenuitem>Info</guimenuitem></entry><entry>
-         Display extra information about this object.
+         Display extra information about this object. You can also change
+	 the access permissions from here (<guimenuitem>Permissions</guimenuitem>
+	 below allows you to change many files at once).
        </entry></row>
 
        <row><entry>
@@ -926,6 +938,8 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Permissions</guimenuitem></entry><entry>
          Allows you to change the permissions for the selected files.
+	 If only one file is to be changed, you can use
+	 <guimenuitem>Info</guimenuitem> instead for a simpler interface.
        </entry></row>
 
        <row><entry>
@@ -1448,7 +1462,57 @@ $ rox --bottom=</screen>
    This isn't usually useful, as these directories are typically empty.
   </para>
  </chapter>
- 
+
+ <chapter>
+  <title><anchor id="thumbnails" xreflabel="Thumbnails"/>File thumbnails</title>
+  <para>
+    When thumbnailing is turned on, the filer tries to load every image file
+    and use that image as the file's icon. Useful if you have a directory full
+    of photos and can't remember which is which! You can turn it on for
+    a single directory by choosing <guimenuitem>Show Thumbnails</guimenuitem>
+    from the <guimenu>Display</guimenu> menu. You can set it as the default
+    from the Options box.
+    The titlebar shows <guilabel>(Thumbs)</guilabel> when thumbnailing is on.
+  </para>
+  <para>
+    The thumbnails are saved in <filename>~/.thumbnails</filename> for
+    quick loading next time.
+    While loading thumbnails, a progress bar appears at the bottom of
+    the window. Clicking on the <guibutton>Cancel</guibutton> button
+    beside the bar stops the scan.
+    It is also possible to thumbnail other types of file, such as videos
+    (eg, by showing the first frame), with a suitable helper program.
+  </para>
+  <sect1><title>Technical details</title>
+  <para>
+When in thumbnail mode <application>ROX-Filer</application> checks the
+thumbnail directory (<filename>~/.thumbs/normal</filename>) for a
+thumbnail for each file it scans. If a thumbnail exists it loads it and
+continues on to the next file.
+  </para><para>
+To generate a thumbnail for a given file of type media/subtype the filer looks
+for a program <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>,
+falling back to <filename>&lt;Choices&gt;/MIME-thumb/media</filename> if one
+cannot be found (this duplicates how run actions for files are looked up). If
+neither file can be found and the file is of type image/* then the internal
+routines are used. If the file is not of type image/* then no thumbnail is
+generated.
+  </para><para>
+If the generator program is found, is executed with the parameters
+<screen>thumbnailer /path/to/source/file /path/to/thumbnail pixel_size</screen>
+  </para><para>
+Once the child program exits, it attempts to load
+<filename>/path/to/thumbnail</filename>. If that fails no thumbnail is
+displayed.
+  </para><para>
+Note that because of the order it does things ROX-Filer will happily
+use any pre-existing thumbnail even if it has no idea how it was
+generated.
+  </para>
+  </sect1>
+
+ </chapter>
+
  <chapter id="virtual">
   <title>
    <anchor id="vfs" xreflabel="Virtual file systems"/>Virtual file systems
@@ -3108,6 +3172,13 @@ by including your process name, PID and a timestamp in the ID.
      reloaded. DO NOT use this method if invoked with <option>--backdrop</option> or
      you will get stuck in an infinite loop!
      See <xref linkend="backdropapp"/> for a guide to writing backdrop applications.
+   </para></listitem>
+
+   <listitem><para><function>SetBackdrop</function>(<parameter>Filename</parameter>,
+   <parameter>Style</parameter>)
+   Set the backdrop image to a given file. If you want to regenerate the image next
+   time the user logs in, or you want to change it automatically from time to time,
+   use <function>SetBackdropApp</function> above instead.
    </para></listitem>
 
    <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
