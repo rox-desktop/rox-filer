@@ -24,7 +24,7 @@
 /* Remove pixmaps from the cache when they haven't been accessed for
  * this period of time (seconds).
  */
-#define PIXMAP_PURGE_TIME 600
+#define PIXMAP_PURGE_TIME 1200
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -191,7 +191,11 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 static void ref(MaskedPixmap *mp, gpointer data)
 {
 	if (mp)
+	{
+		gdk_pixmap_ref(mp->pixmap);
+		gdk_bitmap_ref(mp->mask);
 		mp->ref++;
+	}
 }
 
 static void unref(MaskedPixmap *mp, gpointer data)
