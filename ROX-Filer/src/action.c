@@ -300,9 +300,13 @@ static void select_row_callback(GtkWidget *widget,
 	}
 
 	gui_side->preview = filer_opendir(dir, PANEL_NO);
-	filer_set_autoselect(gui_side->preview, leaf);
-	gtk_signal_connect(GTK_OBJECT(gui_side->preview->window), "destroy",
-			GTK_SIGNAL_FUNC(preview_closed), gui_side);
+	if (gui_side->preview)
+	{
+		filer_set_autoselect(gui_side->preview, leaf);
+		gtk_signal_connect(GTK_OBJECT(gui_side->preview->window),
+				"destroy",
+				GTK_SIGNAL_FUNC(preview_closed), gui_side);
+	}
 }
 
 
