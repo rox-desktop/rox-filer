@@ -273,6 +273,7 @@ int main(int argc, char **argv)
 	if (remote_init(argc - optind, argv + optind, new_copy))
 		return EXIT_SUCCESS;	/* Already running */
 	pixmaps_init();
+
 	dir_init();
 	menu_init();
 	dnd_init();

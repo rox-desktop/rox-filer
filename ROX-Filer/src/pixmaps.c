@@ -110,6 +110,9 @@ void pixmaps_init(void)
 {
 #ifdef HAVE_IMLIB
 	gdk_imlib_init();
+
+	gtk_widget_push_visual(gdk_imlib_get_visual());
+	gtk_widget_push_colormap(gdk_imlib_get_colormap());
 #endif
 	
 	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
