@@ -53,6 +53,16 @@ fi
 ROX_REQUIRE(gtk+-2.0, 2.2.0)
 ROX_REQUIRE(libxml-2.0, 2.0.0)
 
+AC_MSG_CHECKING(for GNOME VFS 2.8 or later)
+if "$PKG_CONFIG" --atleast-version=2.8.0 "gnome-vfs-2.0" ; then
+  LIBS="$LIBS `$PKG_CONFIG --libs gnome-vfs-2.0`"
+  CFLAGS="$CFLAGS `$PKG_CONFIG --cflags gnome-vfs-2.0`"
+  AC_DEFINE(HAVE_GNOME_VFS)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
 GTK_VERSION=`"$PKG_CONFIG" --modversion gtk+-2.0`
 AC_DEFINE_UNQUOTED(GTK_VERSION, "$GTK_VERSION")
 

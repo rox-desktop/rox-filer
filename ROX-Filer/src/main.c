@@ -243,6 +243,11 @@ int main(int argc, char **argv)
 	options_init();
 	i18n_init();
 
+#ifdef HAVE_GNOME_VFS
+	if (!gnome_vfs_init())
+		g_warning("Failed to init gnomevfs!");
+#endif
+
 	if (!app_dir)
 	{
 		g_warning("APP_DIR environment variable was unset!\n"
@@ -618,15 +623,13 @@ static void show_features(void)
 		_("No")
 #endif
 		);
-#if 0
 	g_print("%s... %s\n", _("GNOME-VFS library"),
-# ifdef WITH_GNOMEVFS
+# ifdef HAVE_GNOME_VFS
 			_("Yes")
 # else
-			_("No (gnome-vfs-config not found)")
+			_("No (need 2.8.0 or later)")
 # endif
 		  );
-#endif
 	g_print("%s... %s\n", _("Dnotify support"),
 #ifdef USE_DNOTIFY
 		_("Yes")

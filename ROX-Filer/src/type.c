@@ -212,6 +212,14 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	return mtype;
 }
 
+/* NULL if we don't know / don't support contents checking */
+MIME_type *mime_type_from_contents(const char *path)
+{
+#ifdef HAVE_GNOME_VFS
+	return get_mime_type(gnome_vfs_get_mime_type(path), TRUE);
+#endif
+}
+
 const char *basetype_name(DirItem *item)
 {
 	if (item->flags & ITEM_FLAG_SYMLINK)
@@ -298,13 +306,6 @@ MIME_type *type_from_path(const char *path)
 	char *lower;
 	MIME_type *type = NULL;
 	int	i;
-
-#if 0
-# ifdef WITH_GNOMEVFS
-	if (o_use_gnomevfs.int_value)
-		return get_mime_type(gnome_vfs_mime_type_from_name(path), TRUE);
-# endif
-#endif
 
 	leafname = g_basename(path);
 

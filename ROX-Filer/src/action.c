@@ -132,7 +132,7 @@ static void send_done(void);
 static void send_check_path(const gchar *path);
 static void send_mount_path(const gchar *path);
 static gboolean printf_send(const char *msg, ...);
-static gboolean send(void);
+static gboolean send_msg(void);
 static gboolean send_error(void);
 static gboolean send_dir(const char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
@@ -513,11 +513,11 @@ static gboolean printf_send(const char *msg, ...)
 	g_string_assign(message, tmp);
 	g_free(tmp);
 
-	return send();
+	return send_msg();
 }
 
 /* Send 'message' to our parent process. TRUE on success. */
-static gboolean send(void)
+static gboolean send_msg(void)
 {
 	char len_buffer[5];
 	ssize_t len;
@@ -658,7 +658,7 @@ static void check_flags(void)
 
 /* Read until the user sends a reply. If ignore_quiet is TRUE then
  * the user MUST click Yes or No, else treat quiet on as Yes.
- * If the user needs prompting then does send().
+ * If the user needs prompting then does send_msg().
  */
 static gboolean printf_reply(int fd, gboolean ignore_quiet,
 			     const char *msg, ...)
@@ -678,7 +678,7 @@ static gboolean printf_reply(int fd, gboolean ignore_quiet,
 	g_string_assign(message, tmp);
 	g_free(tmp);
 
-	send();
+	send_msg();
 
 	while (1)
 	{
@@ -1661,7 +1661,7 @@ static void usage_cb(gpointer data)
 				dir_counter == 1 ? _("directory")
 						 : _("directories"));
 	
-	send();
+	send_msg();
 }
 
 #ifdef DO_MOUNT_POINTS

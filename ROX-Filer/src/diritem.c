@@ -185,6 +185,14 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		}
 
 		if (!item->mime_type)
+		{
+			if (item->size == 0)
+				item->mime_type = text_plain;
+			else
+				item->mime_type = mime_type_from_contents(path);
+		}
+
+		if (!item->mime_type)
 			item->mime_type = item->flags & ITEM_FLAG_EXEC_FILE
 						? application_executable
 						: text_plain;
@@ -193,7 +201,6 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 	}
 	else
 		check_globicon(path, item);
-
 
 	if (!item->mime_type)
 		item->mime_type = mime_type_from_base_type(item->base_type);

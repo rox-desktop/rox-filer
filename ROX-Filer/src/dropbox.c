@@ -37,8 +37,6 @@
 #include "gui_support.h"
 #include "run.h"
 
-static gpointer parent_class = NULL;
-
 struct _DropBoxClass {
 	GtkFrameClass parent;
 
@@ -197,9 +195,8 @@ static void drop_box_class_init(gpointer gclass, gpointer data)
 	GtkWidgetClass *widget = (GtkWidgetClass *) gclass;
 	DropBoxClass *drop_box = (DropBoxClass *) gclass;
 
-	parent_class = g_type_class_peek_parent(gclass);
-
 	drop_box->path_dropped = NULL;
+	drop_box->clear = NULL;
 	
 	widget->drag_data_received = drop_box_drag_data_received;
 

@@ -290,8 +290,8 @@ gboolean run_diritem(const guchar *full_path,
 		     FilerWindow *src_window,
 		     gboolean edit)
 {
-	run_diritem_with_arg(full_path, item, NULL, filer_window,
-			     src_window, edit);
+	return run_diritem_with_arg(full_path, item, NULL, filer_window,
+				     src_window, edit);
 }
 
 /* Attempt to open this item */

@@ -10,6 +10,10 @@
 
 #include <glib.h>
 
+#ifdef HAVE_GNOME_VFS
+# include <libgnomevfs/gnome-vfs.h>
+#endif
+
 /* We put all the global typedefs here to avoid creating dependencies
  * between header files.
  */
