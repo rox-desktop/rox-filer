@@ -446,7 +446,7 @@ static void for_dir_contents(ForDirCB *cb,
 		if (ent->d_name[0] == '.' && (ent->d_name[1] == '\0'
 			|| (ent->d_name[1] == '.' && ent->d_name[2] == '\0')))
 			continue;
-		list = g_list_append(list, g_strdup(make_path(src_dir,
+		list = g_list_prepend(list, g_strdup(make_path(src_dir,
 						       ent->d_name)->str));
 	}
 	mc_closedir(d);
