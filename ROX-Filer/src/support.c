@@ -1141,6 +1141,7 @@ CollateKey *collate_key_new(const guchar *name)
 	GArray *array;
 	CollateKey new;
 	CollateKey *retval;
+	char *tmp;
 
 	g_return_val_if_fail(name != NULL, NULL);
 
@@ -1163,7 +1164,9 @@ CollateKey *collate_key_new(const guchar *name)
 			guchar *endp;
 			
 			/* i -> first digit character */
-			new.text = g_utf8_collate_key(name, i - name);
+			tmp = g_utf8_strdown(name, i - name);
+			new.text = g_utf8_collate_key(tmp, -1);
+			g_free(tmp);
 			new.number = strtol(i, (char **) &endp, 10);
 
 			g_array_append_val(array, new);
@@ -1175,7 +1178,9 @@ CollateKey *collate_key_new(const guchar *name)
 		}
 	}
 
-	new.text = g_utf8_collate_key(name, i - name);
+	tmp = g_utf8_strdown(name, i - name);
+	new.text = g_utf8_collate_key(tmp, -1);
+	g_free(tmp);
 	new.number = -1;
 	g_array_append_val(array, new);
 

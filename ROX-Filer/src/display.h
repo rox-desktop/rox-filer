@@ -45,6 +45,8 @@ int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);
 int sort_by_date(const void *item1, const void *item2);
 int sort_by_size(const void *item1, const void *item2);
+int sort_by_owner(const void *item1, const void *item2);
+int sort_by_group(const void *item1, const void *item2);
 void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf);

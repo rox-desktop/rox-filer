@@ -225,6 +225,26 @@ int sort_by_type(const void *item1, const void *item2)
 	return sort_by_name(item1, item2);
 }
 
+int sort_by_owner(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) item1;
+	const DirItem *i2 = (DirItem *) item2;
+
+	return i1->uid < i2->uid ? -1 :
+		i1->uid > i2->uid ? 1 :
+		sort_by_name(item1, item2);
+}
+
+int sort_by_group(const void *item1, const void *item2)
+{
+	const DirItem *i1 = (DirItem *) item1;
+	const DirItem *i2 = (DirItem *) item2;
+
+	return i1->gid < i2->gid ? -1 :
+		i1->gid > i2->gid ? 1 :
+		sort_by_name(item1, item2);
+}
+
 int sort_by_date(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
