@@ -787,6 +787,7 @@ out:
 
 /* Load the image 'path' and return a pointer to the resulting
  * MaskedPixmap. NULL on failure.
+ * Doesn't check for thumbnails (this is for small icons).
  */
 static MaskedPixmap *image_from_file(char *path)
 {
@@ -795,18 +796,12 @@ static MaskedPixmap *image_from_file(char *path)
 #ifdef GTK2
 	GError		*error = NULL;
 	
-	pixbuf = get_thumbnail_for(path);
-	if (!pixbuf)
-		pixbuf = gdk_pixbuf_new_from_file(path, &error);
+	pixbuf = gdk_pixbuf_new_from_file(path, &error);
 	if (!pixbuf)
 	{
 		g_print("%s\n", error ? error->message : _("Unknown error"));
 		g_error_free(error);
 	}
-#elif defined(THUMBS_USE_LIBPNG)
-	pixbuf = get_thumbnail_for(path);
-	if (!pixbuf)
-		pixbuf = gdk_pixbuf_new_from_file(path);
 #else
 	pixbuf = gdk_pixbuf_new_from_file(path);
 #endif
