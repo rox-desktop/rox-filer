@@ -61,6 +61,30 @@
 
 #define C_ "<control>"
 
+typedef enum {
+	FILE_COPY_ITEM,
+	FILE_RENAME_ITEM,
+	FILE_LINK_ITEM,
+	FILE_OPEN_FILE,
+	FILE_HELP,
+	FILE_SHOW_FILE_INFO,
+	FILE_RUN_ACTION,
+	FILE_SET_ICON,
+	FILE_SEND_TO,
+	FILE_DELETE,
+	FILE_USAGE,
+	FILE_CHMOD_ITEMS,
+	FILE_FIND,
+#ifdef HAVE_LIBVFS
+	FILE_OPEN_VFS_RPM,
+	FILE_OPEN_VFS_UTAR,
+	FILE_OPEN_VFS_UZIP,
+	FILE_OPEN_VFS_DEB,
+#else
+	FILE_OPEN_VFS_AVFS,
+#endif
+} FileOp;
+
 typedef enum menu_icon_style {
   MIS_NONE, MIS_SMALL, MIS_LARGE, MIS_HUGE,
   MIS_CURRENT, /* As per current filer window */
@@ -109,26 +133,7 @@ static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void create_thumbs(gpointer data, guint action, GtkWidget *widget);
 
-static void copy_item(gpointer data, guint action, GtkWidget *widget);
-static void rename_item(gpointer data, guint action, GtkWidget *widget);
-static void link_item(gpointer data, guint action, GtkWidget *widget);
-static void open_file(gpointer data, guint action, GtkWidget *widget);
-static void help(gpointer data, guint action, GtkWidget *widget);
-static void show_file_info(gpointer data, guint action, GtkWidget *widget);
-static void send_to(gpointer data, guint action, GtkWidget *widget);
-static void delete(gpointer data, guint action, GtkWidget *widget);
-static void usage(gpointer data, guint action, GtkWidget *widget);
-static void chmod_items(gpointer data, guint action, GtkWidget *widget);
-static void find(gpointer data, guint action, GtkWidget *widget);
-
-#ifdef HAVE_LIBVFS
-static void open_vfs_rpm(gpointer data, guint action, GtkWidget *widget);
-static void open_vfs_utar(gpointer data, guint action, GtkWidget *widget);
-static void open_vfs_uzip(gpointer data, guint action, GtkWidget *widget);
-static void open_vfs_deb(gpointer data, guint action, GtkWidget *widget);
-#else
-static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget);
-#endif
+static void file_op(gpointer data, FileOp action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -146,8 +151,6 @@ static void close_window(gpointer data, guint action, GtkWidget *widget);
 
 /* (action used in this - MiniType) */
 static void mini_buffer(gpointer data, guint action, GtkWidget *widget);
-static void run_action(gpointer data, guint action, GtkWidget *widget);
-static void set_icon(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
 #ifdef GTK2
@@ -213,29 +216,29 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Refresh"),		NULL, refresh, 0, NULL},
 {">" N_("Create Thumbs"),	NULL, create_thumbs, 0,	NULL},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Copy..."),		NULL, copy_item, 0, NULL},
-{">" N_("Rename..."),		NULL, rename_item, 0, NULL},
-{">" N_("Link..."),		NULL, link_item, 0, NULL},
-{">" N_("Shift Open"),   	NULL, open_file, 0, NULL},
-{">" N_("Help"),		NULL, help, 0, NULL},
-{">" N_("Info"),		NULL, show_file_info, 0, NULL},
-{">" N_("Set Run Action..."),	NULL, run_action, 0, NULL},
-{">" N_("Set Icon..."),		NULL, set_icon, 0, NULL},
+{">" N_("Copy..."),		NULL, file_op, FILE_COPY_ITEM, NULL},
+{">" N_("Rename..."),		NULL, file_op, FILE_RENAME_ITEM, NULL},
+{">" N_("Link..."),		NULL, file_op, FILE_LINK_ITEM, NULL},
+{">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE, NULL},
+{">" N_("Help"),		NULL, file_op, FILE_HELP, NULL},
+{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, NULL},
+{">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, NULL},
+{">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
 #ifdef HAVE_LIBVFS
 {">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
-{">>" N_("Unzip"),		NULL, open_vfs_uzip, 0, NULL},
-{">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
-{">>" N_("Deb"),              	NULL, open_vfs_deb, 0, NULL},
-{">>" N_("RPM"),		NULL, open_vfs_rpm, 0, NULL},
+{">>" N_("Unzip"),		NULL, file_op, FILE_OPEN_VFS_UZIP, NULL},
+{">>" N_("Untar"),		NULL, file_op, FILE_OPEN_VFS_UTAR, NULL},
+{">>" N_("Deb"),              	NULL, file_op, FILE_OPEN_VFS_DEB, NULL},
+{">>" N_("RPM"),		NULL, file_op, FILE_OPEN_VFS_RPM, NULL},
 #else
-{">" N_("Open AVFS"),		NULL, open_vfs_avfs, 0, NULL},
+{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, NULL},
 #endif
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Send To..."),		NULL, send_to, 0, NULL},
-{">" N_("Delete"),	    	NULL, delete, 0,	NULL},
-{">" N_("Disk Usage"),		NULL, usage, 0, NULL},
-{">" N_("Permissions"),		NULL, chmod_items, 0, NULL},
-{">" N_("Find"),		NULL, find, 0, NULL},
+{">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
+{">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, NULL},
+{">" N_("Disk Usage"),		NULL, file_op, FILE_USAGE, NULL},
+{">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
+{">" N_("Find"),		NULL, file_op, FILE_FIND, NULL},
 {N_("Select"),	    		NULL, NULL, 0, "<Branch>"},
 {">" N_("Select All"),	    	NULL, select_all, 0, NULL},
 {">" N_("Clear Selection"),	NULL, clear_selection, 0, NULL},
@@ -840,18 +843,17 @@ static void menu_closed(GtkWidget *widget)
 
 void target_callback(FilerWindow *filer_window,
 			gint item,
-			gpointer real_fn)
+			gpointer action)
 {
 	Collection	*collection = filer_window->collection;
 
 	g_return_if_fail(window_with_focus != NULL);
 	g_return_if_fail(window_with_focus == filer_window);
-	g_return_if_fail(real_fn != NULL);
 	
 	collection_wink_item(collection, item);
 	collection_clear_selection(collection);
 	collection_select_item(collection, item);
-	((GtkItemFactoryCallback1) real_fn)(NULL, 0, GTK_WIDGET(collection));
+	file_op(NULL, GPOINTER_TO_INT(action), GTK_WIDGET(collection));
 
 	/* TODO: Opening a Savebox grabs the selection; don't lose it again! */
 	if (item < collection->number_of_items)
@@ -958,76 +960,40 @@ static void create_thumbs(gpointer data, guint action, GtkWidget *widget)
 				window_with_focus->path);
 }
 
-static void delete(gpointer data, guint action, GtkWidget *widget)
+static void delete(FilerWindow *filer_window)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected == 0)
-		filer_target_mode(window_with_focus,
-				target_callback, delete,
-				_("DELETE ... ?"));
-	else
-	{
-		GList *paths;
-		paths = filer_selected_items(window_with_focus);
-		action_delete(paths);
-		g_list_foreach(paths, (GFunc) g_free, NULL);
-		g_list_free(paths);
-	}
+	GList *paths;
+	paths = filer_selected_items(filer_window);
+	action_delete(paths);
+	g_list_foreach(paths, (GFunc) g_free, NULL);
+	g_list_free(paths);
 }
 
-static void usage(gpointer data, guint action, GtkWidget *widget)
+static void usage(FilerWindow *filer_window)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected == 0)
-		filer_target_mode(window_with_focus,
-				target_callback, usage,
-				_("Count the size of ... ?"));
-	else
-	{
-		GList *paths;
-		paths = filer_selected_items(window_with_focus);
-		action_usage(paths);
-		g_list_foreach(paths, (GFunc) g_free, NULL);
-		g_list_free(paths);
-	}
+	GList *paths;
+	paths = filer_selected_items(filer_window);
+	action_usage(paths);
+	g_list_foreach(paths, (GFunc) g_free, NULL);
+	g_list_free(paths);
 }
 
-static void chmod_items(gpointer data, guint action, GtkWidget *widget)
+static void chmod_items(FilerWindow *filer_window)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected == 0)
-		filer_target_mode(window_with_focus,
-				target_callback, chmod_items,
-				_("Set permissions on ... ?"));
-	else
-	{
-		GList *paths;
-		paths = filer_selected_items(window_with_focus);
-		action_chmod(paths);
-		g_list_foreach(paths, (GFunc) g_free, NULL);
-		g_list_free(paths);
-	}
+	GList *paths;
+	paths = filer_selected_items(filer_window);
+	action_chmod(paths);
+	g_list_foreach(paths, (GFunc) g_free, NULL);
+	g_list_free(paths);
 }
 
-static void find(gpointer data, guint action, GtkWidget *widget)
+static void find(FilerWindow *filer_window)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected == 0)
-		filer_target_mode(window_with_focus,
-				target_callback, find,
-				_("Search inside ... ?"));
-	else
-	{
-		GList *paths;
-		paths = filer_selected_items(window_with_focus);
-		action_find(paths);
-		g_list_foreach(paths, (GFunc) g_free, NULL);
-		g_list_free(paths);
-	}
+	GList *paths;
+	paths = filer_selected_items(filer_window);
+	action_find(paths);
+	g_list_foreach(paths, (GFunc) g_free, NULL);
+	g_list_free(paths);
 }
 
 /* This pops up our savebox widget, cancelling any currently open one,
@@ -1110,59 +1076,30 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 	return TRUE;
 }
 
-/* Open a savebox to act on the selected file. Error if multiple files
- * are selected. If no files are selected, get one and call 'again'.
- * Otherwise, call 'callback' later to perform the operation.
+/* Open a savebox to act on the selected file.
+ * Call 'callback' later to perform the operation.
  */
-static void src_dest_action_item(guchar *prompt,
-				 guchar *title,
-				 void (*again)(gpointer, guint, GtkWidget *),
+static void src_dest_action_item(FilerWindow *filer_window, guchar *title,
 				 gboolean (*callback)(guchar *, guchar *))
 {
 	Collection *collection;
+	DirItem	*item;
+	guchar	*path;
 	
-	g_return_if_fail(window_with_focus != NULL);
+	collection = filer_window->collection;
 
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("%s: You cannot do this to more than "
-						"one item at a time"), title);
-	}
-	else if (collection->number_selected != 1)
-	{
-		filer_target_mode(window_with_focus,
-				target_callback, again, prompt);
-	}
-	else
-	{
-	        DirItem	*item;
-		guchar	*path;
+	item = selected_item(collection);
 
-		item = selected_item(collection);
+	g_return_if_fail(item->image != NULL);	/* XXX */
 
-		g_return_if_fail(item->image != NULL);	/* XXX */
-
-		path = make_path(window_with_focus->path, item->leafname)->str;
-		pixmap_ref(item->image);
-		savebox_show(title, path, item->image, callback);
-	}
-}
-
-static void copy_item(gpointer data, guint action, GtkWidget *widget)
-{
-	src_dest_action_item(_("Copy ... ?"), _("Copy"), copy_item, copy_cb);
+	path = make_path(filer_window->path, item->leafname)->str;
+	pixmap_ref(item->image);
+	savebox_show(title, path, item->image, callback);
 }
 
 static gboolean rename_cb(guchar *current, guchar *new)
 {
 	return action_with_leaf(action_move, current, new);
-}
-
-static void rename_item(gpointer data, guint action, GtkWidget *widget)
-{
-	src_dest_action_item(_("Rename ... ?"), _("Rename"),
-				rename_item, rename_cb);
 }
 
 static gboolean link_cb(guchar *initial, guchar *path)
@@ -1189,124 +1126,56 @@ static gboolean link_cb(guchar *initial, guchar *path)
 	return TRUE;
 }
 
-static void link_item(gpointer data, guint action, GtkWidget *widget)
+static void open_file(FilerWindow *filer_window)
 {
-	src_dest_action_item(_("Symlink ... ?"), _("Symlink"),
-				link_item, link_cb);
-
+	filer_openitem(filer_window,
+			selected_item_number(filer_window->collection),
+			OPEN_SAME_WINDOW | OPEN_SHIFT);
 }
 
-static void open_file(gpointer data, guint action, GtkWidget *widget)
+static void run_action(FilerWindow *filer_window)
 {
 	Collection *collection;
+	DirItem	*item;
 	
-	g_return_if_fail(window_with_focus != NULL);
+	collection = filer_window->collection;
 
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-		filer_target_mode(window_with_focus,
-				target_callback, open_file,
-				_("Shift Open ... ?"));
+	item = selected_item(collection);
+	g_return_if_fail(item != NULL);
+
+	if (can_set_run_action(item))
+		type_set_handler_dialog(item->mime_type);
 	else
-		filer_openitem(window_with_focus,
-				selected_item_number(collection),
-				OPEN_SAME_WINDOW | OPEN_SHIFT);
+		report_error(
+			_("You can only set the run action for a "
+			"regular file"));
 }
 
-static void run_action(gpointer data, guint action, GtkWidget *widget)
+static void set_icon(FilerWindow *filer_window)
 {
 	Collection *collection;
-	
-	g_return_if_fail(window_with_focus != NULL);
+	DirItem *item;
+	guchar *path;
 
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-		filer_target_mode(window_with_focus,
-				target_callback, run_action,
-				_("Set run action for ... ?"));
-	else
-	{
-		DirItem	*item;
+	collection = filer_window->collection;
 
-		item = selected_item(collection);
-		g_return_if_fail(item != NULL);
+	item = selected_item(collection);
+	g_return_if_fail(item != NULL);
 
-		if (can_set_run_action(item))
-			type_set_handler_dialog(item->mime_type);
-		else
-			report_error(
-				_("You can only set the run action for a "
-				"regular file"));
-	}
+	path = make_path(filer_window->path, item->leafname)->str;
+
+	icon_set_handler_dialog(item, path);
 }
 
-static void set_icon(gpointer data, guint action, GtkWidget *widget)
-{
-	Collection *collection;
-
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("You cannot do this to more than "
-					"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-		filer_target_mode(window_with_focus,
-				  target_callback, set_icon,
-				  _("Set icon for ... ?"));
-	else
-	{
-		DirItem *item;
-		guchar *path;
-
-		item = selected_item(collection);
-		g_return_if_fail(item != NULL);
-
-		path = make_path(window_with_focus->path, item->leafname)->str;
-
-		icon_set_handler_dialog(item, path);
-	}
-}
-
-static void show_file_info(gpointer unused, guint action, GtkWidget *widget)
+static void show_file_info(FilerWindow *filer_window)
 {
 	DirItem		*file;
 	Collection 	*collection;
 
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-	{
-		filer_target_mode(window_with_focus,
-				target_callback, show_file_info,
-				_("Examine ... ?"));
-		return;
-	}
+	collection = filer_window->collection;
 
 	file = selected_item(collection);
-	infobox_new(make_path(window_with_focus->path, file->leafname)->str);
+	infobox_new(make_path(filer_window->path, file->leafname)->str);
 }
 	
 void open_home(gpointer data, guint action, GtkWidget *widget)
@@ -1314,106 +1183,49 @@ void open_home(gpointer data, guint action, GtkWidget *widget)
 	filer_opendir(home_dir, NULL);
 }
 
-static void help(gpointer data, guint action, GtkWidget *widget)
+static void help(FilerWindow *filer_window)
 {
 	Collection 	*collection;
 	DirItem	*item;
 	
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-	{
-		filer_target_mode(window_with_focus, target_callback, help,
-				_("Help about ... ?"));
-		return;
-	}
+	collection = filer_window->collection;
 	item = selected_item(collection);
 
-	show_item_help(make_path(window_with_focus->path, item->leafname)->str,
+	show_item_help(make_path(filer_window->path, item->leafname)->str,
 			item);
 }
 
 #ifdef HAVE_LIBVFS
-#define OPEN_VFS(fs)		\
-static void open_vfs_ ## fs (gpointer data, guint action, GtkWidget *widget) \
-{							\
-	Collection 	*collection;			\
-							\
-	g_return_if_fail(window_with_focus != NULL);	\
-							\
-	collection = window_with_focus->collection;	\
-	if (collection->number_selected < 1)			\
-		filer_target_mode(window_with_focus, target_callback,	\
-					open_vfs_ ## fs,		\
-					_("Look inside ... ?"));	\
-	else								\
-		real_vfs_open(#fs);			\
-}
-
-static void real_vfs_open(char *fs)
+static void real_vfs_open(FilerWindow *filer_window, char *fs)
 {
 	gchar		*path;
 	DirItem		*item;
 
-	if (window_with_focus->collection->number_selected != 1)
-	{
-		report_error(_("You must select a single file "
-				"to open as a Virtual File System"));
-		return;
-	}
+	item = selected_item(filer_window->collection);
 
-	item = selected_item(window_with_focus->collection);
-
-	path = g_strconcat(window_with_focus->path,
+	path = g_strconcat(filer_window->path,
 			"/",
 			item->leafname,
 			"#", fs, NULL);
 
-	filer_change_to(window_with_focus, path, NULL);
+	filer_change_to(filer_window, path, NULL);
 	g_free(path);
 }
-
-OPEN_VFS(rpm)
-OPEN_VFS(utar)
-OPEN_VFS(uzip)
-OPEN_VFS(deb)
 #else
-static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget)
+static void open_vfs_avfs(FilerWindow *filer_window)
 {
 	gchar		*path;
 	DirItem		*item;
 	Collection 	*collection;
 
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	if (collection->number_selected < 1)	
-	{
-		filer_target_mode(window_with_focus, target_callback,
-					open_vfs_avfs,
-					_("Look inside ... ?"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-	{
-		report_error(_("You must select a single file "
-				"to open as a Virtual File System"));
-		return;
-	}
+	collection = filer_window->collection;
 
 	item = selected_item(collection);
 
-	path = g_strconcat(window_with_focus->path,
+	path = g_strconcat(filer_window->path,
 			"/", item->leafname, "#", NULL);
 
-	filer_change_to(window_with_focus, path, NULL);
+	filer_change_to(filer_window, path, NULL);
 	g_free(path);
 }
 #endif
@@ -1669,30 +1481,18 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 	show_popup_menu(menu, event, 0);
 }
 
-static void send_to(gpointer data, guint action, GtkWidget *widget)
+static void send_to(FilerWindow *filer_window)
 {
-	Collection *collection;
-	
-	g_return_if_fail(window_with_focus != NULL);
+	GList		*paths;
+	GdkEvent	*event;
 
-	collection = window_with_focus->collection;
+	paths = filer_selected_items(filer_window);
+	event = gtk_get_current_event();
 
-	if (collection->number_selected < 1)
-		filer_target_mode(window_with_focus, target_callback,
-					send_to, _("Send ... to ... ?"));
-	else
-	{
-		GList		*paths;
-		GdkEvent	*event;
+	/* Eats paths */
+	show_send_to_menu(paths, event);
 
-		paths = filer_selected_items(window_with_focus);
-		event = gtk_get_current_event();
-
-		/* Eats paths */
-		show_send_to_menu(paths, event);
-
-		gdk_event_free(event);
-	}
+	gdk_event_free(event);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
@@ -1957,3 +1757,159 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 
 	gtk_menu_shell_select_item(shell, item);
 }
+
+static void file_op(gpointer data, FileOp action, GtkWidget *widget)
+{
+	Collection *collection;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+
+	if (collection->number_selected < 1)
+	{
+		char *prompt;
+
+		switch (action)
+		{
+			case FILE_COPY_ITEM:
+				prompt = _("Copy ... ?");
+				break;
+			case FILE_RENAME_ITEM:
+				prompt = _("Rename ... ?");
+				break;
+			case FILE_LINK_ITEM:
+				prompt = _("Symlink ... ?");
+				break;
+			case FILE_OPEN_FILE:
+				prompt = _("Shift Open ... ?");
+				break;
+			case FILE_HELP:
+				prompt = _("Help about ... ?");
+				break;
+			case FILE_SHOW_FILE_INFO:
+				prompt = _("Examine ... ?");
+				break;
+			case FILE_RUN_ACTION:
+				prompt = _("Set run action for ... ?");
+				break;
+			case FILE_SET_ICON:
+				prompt = _("Set icon for ... ?");
+				break;
+			case FILE_SEND_TO:
+				prompt = _("Send ... to ... ?");
+				break;
+			case FILE_DELETE:
+				prompt = _("DELETE ... ?");
+				break;
+			case FILE_USAGE:
+				prompt = _("Count the size of ... ?");
+				break;
+			case FILE_CHMOD_ITEMS:
+				prompt = _("Set permissions on ... ?");
+				break;
+			case FILE_FIND:
+				prompt = _("Search inside ... ?");
+				break;
+#ifdef HAVE_LIBVFS
+			case FILE_OPEN_VFS_RPM:
+			case FILE_OPEN_VFS_UTAR:
+			case FILE_OPEN_VFS_UZIP:
+			case FILE_OPEN_VFS_DEB:
+#else
+			case FILE_OPEN_VFS_AVFS:
+#endif
+				prompt = _("Look inside ... ?");
+				break;
+			default:
+				g_warning("Unknown action!");
+				return;
+		}
+		filer_target_mode(window_with_focus, target_callback,
+					GINT_TO_POINTER(action), prompt);
+		return;
+	}
+
+	switch (action)
+	{
+		case FILE_SEND_TO:
+			send_to(window_with_focus);
+			return;
+		case FILE_DELETE:
+			delete(window_with_focus);
+			return;
+		case FILE_USAGE:
+			usage(window_with_focus);
+			return;
+		case FILE_CHMOD_ITEMS:
+			chmod_items(window_with_focus);
+			return;
+		case FILE_FIND:
+			find(window_with_focus);
+			return;
+		default:
+			break;
+	}
+
+	/* All the following actions require exactly one file selected */
+
+	if (collection->number_selected > 1)
+	{
+		report_error(_("You cannot do this to more than "
+				"one item at a time"));
+		return;
+	}
+
+	switch (action)
+	{
+		case FILE_COPY_ITEM:
+			src_dest_action_item(window_with_focus, _("Copy"),
+					copy_cb);
+			break;
+		case FILE_RENAME_ITEM:
+			src_dest_action_item(window_with_focus, _("Rename"),
+					rename_cb);
+			break;
+		case FILE_LINK_ITEM:
+			src_dest_action_item(window_with_focus, _("Symlink"),
+					link_cb);
+			break;
+		case FILE_OPEN_FILE:
+			open_file(window_with_focus);
+			break;
+		case FILE_HELP:
+			help(window_with_focus);
+			break;
+		case FILE_SHOW_FILE_INFO:
+			show_file_info(window_with_focus);
+			break;
+		case FILE_RUN_ACTION:
+			run_action(window_with_focus);
+			break;
+		case FILE_SET_ICON:
+			set_icon(window_with_focus);
+			break;
+#ifdef HAVE_LIBVFS
+		case FILE_OPEN_VFS_RPM:
+			real_vfs_open(window_with_focus, "rpm");
+			break;
+		case FILE_OPEN_VFS_UTAR:
+			real_vfs_open(window_with_focus, "utar");
+			break;
+		case FILE_OPEN_VFS_UZIP:
+			real_vfs_open(window_with_focus, "uzip");
+			break;
+		case FILE_OPEN_VFS_DEB:
+			real_vfs_open(window_with_focus, "deb");
+			break;
+#else
+		case FILE_OPEN_VFS_AVFS:
+			open_vfs_avfs(window_with_focus);
+			break;
+		default:
+			g_warning("Unknown action!");
+			return;
+#endif
+	}
+}
+
