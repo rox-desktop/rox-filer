@@ -1077,15 +1077,15 @@ l'être aussi...), alors optez pour un lien relatif.
 	 </row>
 	 <row>
 	  <entry>
-           <guimenuitem>Inverser la sélection</guimenuitem>
-          </entry>
-          <entry>
-           Dé-sélectionne tous les objets sélectionnés, et sélectionne tous 
-           les objets non sélectionnés.
-          </entry>
-         </row>
-         <row>
-          <entry>
+	   <guimenuitem>Inverser la sélection</guimenuitem>
+	  </entry>
+	  <entry>
+	   Dé-sélectionne tous les objets sélectionnés, et sélectionne tous 
+	   les objets non sélectionnés.
+	  </entry>
+	 </row>
+	 <row>
+	  <entry>
 	   <guimenuitem>Sélectionner si...</guimenuitem>
 	  </entry>
 	  <entry>
@@ -3211,9 +3211,13 @@ Les méthodes suivantes sont reconnues :</para>
 </itemizedlist>
 
 <para>
- Les appels suivants peuvent être utilisés pour commencer de nouvelles actions sur objets.
- Quiet (NDT : "Silencieux") peut prendre la valeur "true" si l'opération doit commencer immédiatement, plutôt
- que d'attendre la confirmation de l'utilisateur. S'il a la valeur "false", l'utilisateur doit toujours confirmer.
+ Les appels suivants peuvent être utilisés pour commencer de nouvelles actions
+ sur objets.
+ Quiet (NDT : "Silencieux") est un booléen et peut prendre la valeur "vrai"
+ (via "yes", "true" ou 1) si l'opération doit commencer immédiatement plutôt
+ que d'attendre la confirmation de l'utilisateur.
+ S'il prend la valeur "faux" (via "no", "false" ou 0), l'utilisateur doit
+ toujours confirmer.
  S'il est omis, la valeur par défaut est utilisée.
 </para>
 
