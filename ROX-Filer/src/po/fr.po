@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.7\n"
+"Project-Id-Version: ROX-Filer 1.1.8\n"
 "POT-Creation-Date: 2001-10-31 14:08+0000\n"
-"PO-Revision-Date: 2001-09-03 13:28+0200\n"
+"PO-Revision-Date: 2001-10-31 19:56+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -46,10 +46,10 @@ msgid ""
 msgstr ""
 "'*.htm', '*.html'      (trouve les fichiers HTML)\n"
 "IsDir 'lib'            (trouve les répertoires nommés 'lib')\n"
-"IsReg 'core'           (trouve un fichier régulier nommé 'core')\n"
-"! (IsDir, IsReg)       (n'est ni un répertoire, ni un fichier régulier)\n"
+"IsReg 'core'           (trouve un fichier ordinaire nommé 'core')\n"
+"! (IsDir, IsReg)       (n'est ni un répertoire, ni un fichier ordinaire)\n"
 "mtime after 1 day ago and size > 1Mb   (gros, et récemment modifié)\n"
-"'CVS' prune, isreg                     (un fichier régulier pas dans CVS)\n"
+"'CVS' prune, isreg                     (un fichier ordinaire pas dans CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contient le mot 'fred')"
 
 #: action.c:245
@@ -380,38 +380,33 @@ msgid "!ERROR: Unmount failed\n"
 msgstr "!ERREUR : le démontage a échoué\n"
 
 #: action.c:1655
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "'\n"
 "Total: %s ("
 msgstr ""
 "'\n"
-"Total: %s\n"
+"Total : %s ("
 
 #: action.c:1662
-#, fuzzy
 msgid "file"
-msgstr "Fichier"
+msgstr "fichier"
 
 #: action.c:1662
-#, fuzzy
 msgid "files"
-msgstr "Fichier"
+msgstr "fichiers"
 
 #: action.c:1669
-#, fuzzy
 msgid "no directories)\n"
-msgstr "Répertoire home"
+msgstr "pas de répertoires)\n"
 
 #: action.c:1674
-#, fuzzy
 msgid "directory"
-msgstr "Répertoire"
+msgstr "répertoire"
 
 #: action.c:1675
-#, fuzzy
 msgid "directories"
-msgstr "Répertoire"
+msgstr "répertoires"
 
 #: action.c:1704 action.c:1744 action.c:1782 action.c:1818 action.c:1839
 msgid ""
@@ -576,9 +571,8 @@ msgid "Cancel"
 msgstr "Annuler"
 
 #: appmenu.c:185
-#, fuzzy
 msgid "<missing label>"
-msgstr "'>' manquant dans l'étiquette de l'icône"
+msgstr "<étiquette manquante>"
 
 #: appmenu.c:234 menu.c:1740
 msgid "fork() failed"
@@ -595,7 +589,6 @@ msgid "lstat(2) failed: %s"
 msgstr "lstat(2) a échoué : %s"
 
 #: dnd.c:138
-#, fuzzy
 msgid "Set Icon"
 msgstr "Fixer l'icône"
 
@@ -688,7 +681,7 @@ msgstr "Erreur en obtenant la liste des fichiers"
 
 #: dnd.c:1090
 msgid "You can't use multiple files with Set Icon!"
-msgstr ""
+msgstr "Vous ne pouvez pas utiliser plusieurs fichiers avec Fixer l'icône !"
 
 #: filer.c:578
 msgid "Directory missing/deleted"
@@ -1149,7 +1142,6 @@ msgstr ""
 "\n"
 
 #: main.c:102
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1183,7 +1175,9 @@ msgstr ""
 "courant si aucun argument n'est donné.\n"
 "\n"
 "  -b, --bottom=PANNEAU\touvre PANNEAU en bas comme panneau\n"
-"  -d, --dir=RÉPERTOIRE\touvre RÉP comme répertoire (pas application)\n"
+"  -c, --client-id=ID\tutilisé pour la gestion de sessions\n"
+"  -d, --dir=RÉPERTOIRE\touvre RÉPERTOIRE comme répertoire (pas application)\n"
+"  -D, --close=RÉP\tferme RÉPERTOIRE et ses sous-répertoires\n"
 "  -h, --help\t\taffiche l'aide et quitte\n"
 "  -l, --left=PANNEAU\touvre PANNEAU à gauche comme panneau\n"
 "  -m, --mime-type=FICH\taffiche le type MIME de FICHIER et quitte\n"
@@ -1191,6 +1185,7 @@ msgstr ""
 "  -o, --override\toutrepasse le contrôle des panneaux par le WM\n"
 "  -p, --pinboard=PUN\tutilise le punaiseur PUN comme punaiseur\n"
 "  -r, --right=PANNEAU\touvre PANNEAU à droite comme panneau\n"
+"  -R, --RPC\t\tinvoque la méthode d'appel lue sur stdin\n"
 "  -s, --show=FICHIER\touvre un répertoire montrant FICHIER\n"
 "  -t, --top=PANNEAU\touvre PANNEAU en haut comme panneau\n"
 "  -u, --user\t\tmontre le nom de l'utilisateur dans chaque fenêtre\n"
@@ -1634,9 +1629,8 @@ msgid "Failed to create child process"
 msgstr "Impossible de créer un processus fils"
 
 #: options.c:405
-#, fuzzy
 msgid "Notice"
-msgstr "Not"
+msgstr "Remarque"
 
 #: options.c:810
 msgid "ROX-Filer options"
@@ -2058,6 +2052,9 @@ msgid ""
 "maybe the permissions are wrong?\n"
 "The icon has not been changed."
 msgstr ""
+"Impossible de charger l'image -- peut-être est-ce un format que je ne "
+"comprends pas, ou peut-être que les permissions sont incorrectes ?\n"
+"L'icône n'a pas été changée."
 
 #: usericons.c:467
 msgid "Set icon"
@@ -2141,7 +2138,7 @@ msgstr ""
 
 #: tips:15
 msgid "Ignore eXecutable bit for known extensions"
-msgstr ""
+msgstr "Ignorer le bit eXécutable pour les extensions connues"
 
 #: tips:16
 msgid ""
@@ -2185,13 +2182,16 @@ msgstr "Largeur maximale du texte à côté d'une Petite icône."
 
 #: tips:23
 msgid "Inherit options from source window"
-msgstr ""
+msgstr "Hériter les options de la fenêtre source"
 
 #: tips:24
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
 msgstr ""
+"Si cette option est choisie, alors les options d'affichage pour une "
+"nouvelle fenêtre sont héritées de la fenêtre source si possible, sinon elles "
+"sont fixées aux valeurs par défaut ci-dessous."
 
 #: tips:25
 msgid "Default settings for new windows:"
@@ -2214,7 +2214,6 @@ msgid "Date"
 msgstr "Date"
 
 #: tips:42
-#, fuzzy
 msgid "Show hidden files"
 msgstr "Montrer les fichiers cachés"
 
@@ -2223,38 +2222,38 @@ msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
 msgstr ""
+"Si cette option est choisie, alors les fichiers dont le nom commence par un "
+"point sont aussi montrés, sinon ils sont cachés."
 
 #: tips:44
 msgid "Colour files based on their types"
-msgstr ""
+msgstr "Mettre les fichiers en couleur d'après leurs types"
 
 #: tips:45
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr ""
+"Les noms de fichier (et les détails) sont mis en couleur d'après le type du "
+"fichier."
 
 #: tips:47
-#, fuzzy
 msgid "Regular file"
-msgstr "Fichier vide"
+msgstr "Fichier ordinaire"
 
 #: tips:50
-#, fuzzy
 msgid "Character device"
-msgstr "Char dev"
+msgstr "Character device"
 
 #: tips:51
-#, fuzzy
 msgid "Block device"
-msgstr "Block dev"
+msgstr "Block device"
 
 #: tips:53
-#, fuzzy
 msgid "Application directory"
-msgstr "Application"
+msgstr "Répertoire application"
 
 #: tips:55
 msgid "Error (eg. orphan symlink)"
-msgstr ""
+msgstr "Erreur (eg. lien symbolique orphelin)"
 
 #: tips:56
 msgid "Pinboard"
@@ -2627,15 +2626,15 @@ msgstr ""
 
 #: tips:144
 msgid "Dragging files with the middle mouse button..."
-msgstr ""
+msgstr "Faire glisser des fichiers avec le bouton du milieu..."
 
 #: tips:145
 msgid "... shows a menu of possible actions"
-msgstr ""
+msgstr "... montre un menu des actions possibles"
 
 #: tips:146
 msgid "... moves the file"
-msgstr ""
+msgstr "... déplace le fichier"
 
 #: tips:147
 msgid "Directories spring open"
@@ -2703,21 +2702,19 @@ msgstr ""
 
 #: tips:157
 msgid "Size of icons in menus"
-msgstr ""
+msgstr "Taille des icônes dans les menus"
 
 #: tips:158
-#, fuzzy
 msgid "No Icons"
-msgstr "Énormes icônes"
+msgstr "Pas d'icônes"
 
 #: tips:161
-#, fuzzy
 msgid "Same as current window"
-msgstr "Père, nouvelle fenêtre"
+msgstr "Comme la fenêtre courante"
 
 #: tips:162
 msgid "Same as default"
-msgstr ""
+msgstr "Comme le choix par défaut"
 
 #: tips:163
 msgid "Mouse bindings"
