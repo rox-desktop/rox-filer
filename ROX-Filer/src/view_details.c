@@ -105,6 +105,7 @@ static void view_details_start_lasso_box(ViewIface *view,
 				     	 GdkEventButton *event);
 static void view_details_extend_tip(ViewIface *view,
 				    ViewIter *iter, GString *tip);
+static gboolean view_details_auto_scroll_callback(ViewIface *view);
 
 static DirItem *iter_peek(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
@@ -866,6 +867,7 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 	iface->set_base = view_details_set_base;
 	iface->start_lasso_box = view_details_start_lasso_box;
 	iface->extend_tip = view_details_extend_tip;
+	iface->auto_scroll_callback = view_details_auto_scroll_callback;
 }
 
 /* Implementations of the View interface. See view_iface.c for comments. */
@@ -1534,4 +1536,47 @@ static void free_view_item(ViewItem *view_item)
 		g_object_unref(G_OBJECT(view_item->image));
 	g_free(view_item->utf8_name);
 	g_free(view_item);
+}
+
+static gboolean view_details_auto_scroll_callback(ViewIface *view)
+{
+	GtkTreeView	*tree = (GtkTreeView *) view;
+	ViewDetails	*view_details = (ViewDetails *) view;
+	FilerWindow	*filer_window = view_details->filer_window;
+	GtkRange	*scrollbar = (GtkRange *) filer_window->scrollbar;
+	GtkAdjustment	*adj;
+	GdkWindow	*window;
+	gint		x, y, w, h;
+	GdkModifierType	mask;
+	int		diff = 0;
+
+	window = gtk_tree_view_get_bin_window(tree);
+
+	gdk_window_get_pointer(window, &x, &y, &mask);
+	gdk_drawable_get_size(window, &w, NULL);
+
+	adj = gtk_range_get_adjustment(scrollbar);
+	h = adj->page_size;
+
+	if ((x < 0 || x > w || y < 0 || y > h)) /* && !view->lasso_box) */
+		return FALSE;		/* Out of window - stop */
+
+	if (y < AUTOSCROLL_STEP)
+		diff = y - AUTOSCROLL_STEP;
+	else if (y > h - AUTOSCROLL_STEP)
+		diff = AUTOSCROLL_STEP + y - h;
+
+	if (diff)
+	{
+		int	old = adj->value;
+		int	value = old + diff;
+
+		value = CLAMP(value, 0, adj->upper - adj->page_size);
+		gtk_adjustment_set_value(adj, value);
+
+		if (adj->value != old)
+			dnd_spring_abort();
+	}
+
+	return TRUE;
 }

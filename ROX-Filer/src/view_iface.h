@@ -9,6 +9,8 @@
 #ifndef __VIEW_IFACE_H__
 #define __VIEW_IFACE_H__
 
+#define AUTOSCROLL_STEP 20
+
 #include <glib-object.h>
 #include <gdk/gdk.h>
 
@@ -48,7 +50,6 @@ struct _ViewIter {
 	DirItem	   *(*next)(ViewIter *iter);
 
 	/* private fields */
-	ViewCollection *view_collection;	/* XXX (use ->view instead) */
 	ViewIface   *view;
 	int	   i, n_remaining;
 	int	   flags;
@@ -87,6 +88,7 @@ struct _ViewIfaceClass {
 	void (*set_base)(ViewIface *obj, ViewIter *iter);
 	void (*start_lasso_box)(ViewIface *obj, GdkEventButton *event);
 	void (*extend_tip)(ViewIface *obj, ViewIter *iter, GString *tip);
+	gboolean (*auto_scroll_callback)(ViewIface *obj);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -143,5 +145,6 @@ gboolean view_cursor_visible(ViewIface *obj);
 void view_set_base(ViewIface *obj, ViewIter *iter);
 void view_start_lasso_box(ViewIface *obj, GdkEventButton *event);
 void view_extend_tip(ViewIface *obj, ViewIter *iter, GString *tip);
+gboolean view_auto_scroll_callback(ViewIface *obj);
 
 #endif /* __VIEW_IFACE_H__ */

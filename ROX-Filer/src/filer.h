@@ -95,6 +95,8 @@ struct _FilerWindow
 	GList		*thumb_queue;		/* paths to thumbnail */
 	GtkWidget	*thumb_bar, *thumb_progress;
 	int		max_thumbs;		/* total for this batch */
+
+	gint		auto_scroll;		/* Timer */
 };
 
 extern FilerWindow 	*window_with_focus;
@@ -143,5 +145,6 @@ void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event);
 gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event);
 gint filer_key_press_event(GtkWidget *widget, GdkEventKey *event,
 			   FilerWindow *filer_window);
+void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
 
 #endif /* _FILER_H */

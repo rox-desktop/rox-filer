@@ -49,14 +49,6 @@
 
 #define MIN_ITEM_WIDTH 64
 
-#if 0
-/* The handler of the signal handler for scroll events.
- * This is used to cancel spring loading when autoscrolling is used.
- */
-static gulong scrolled_signal = -1;
-static GtkObject *scrolled_adj = NULL;	/* The object watched */
-#endif
-
 static gpointer parent_class = NULL;
 
 struct _ViewCollectionClass {
@@ -178,6 +170,7 @@ static void view_collection_start_lasso_box(ViewIface *view,
 					     GdkEventButton *event);
 static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
 					GString *tip);
+static gboolean view_collection_auto_scroll_callback(ViewIface *view);
 
 static DirItem *iter_next(ViewIter *iter);
 static DirItem *iter_prev(ViewIter *iter);
@@ -702,6 +695,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->set_base = view_collection_set_base;
 	iface->start_lasso_box = view_collection_start_lasso_box;
 	iface->extend_tip = view_collection_extend_tip;
+	iface->auto_scroll_callback = view_collection_auto_scroll_callback;
 }
 
 static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
@@ -718,7 +712,7 @@ static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
 	ViewData *view_data = (ViewData *) colitem->view_data;
 	GdkRectangle area;
 
-	g_return_if_fail(iter->view_collection == view_collection);
+	g_return_if_fail(iter->view == (ViewIface *) view_collection);
 	g_return_if_fail(i >= 0 && i < collection->number_of_items);
 
 	/* TODO: What if the window is narrower than 1 column? */
@@ -771,6 +765,8 @@ static gint coll_button_release(GtkWidget *widget,
 		if (motion_buttons_pressed == 0 &&
 					view_collection->collection->lasso_box)
 		{
+			filer_set_autoscroll(view_collection->filer_window,
+					     FALSE);
 			collection_end_lasso(view_collection->collection,
 				event->button == 1 ? GDK_SET : GDK_INVERT);
 		}
@@ -786,7 +782,7 @@ static gint coll_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      ViewCollection *view_collection)
 {
-	collection_set_cursor_item(view_collection->collection, -1);
+	collection_set_cursor_item(view_collection->collection, -1, TRUE);
 
 	if (dnd_motion_press(widget, event))
 		filer_perform_action(view_collection->filer_window, event);
@@ -1041,7 +1037,7 @@ static gboolean view_collection_autoselect(ViewIface *view, const gchar *leaf)
 		if (strcmp(item->leafname, leaf) == 0)
 		{
 			if (col->cursor_item != -1)
-				collection_set_cursor_item(col, i);
+				collection_set_cursor_item(col, i, TRUE);
 			else
 				collection_wink_item(col, i);
 			return TRUE;
@@ -1170,7 +1166,7 @@ static void view_collection_show_cursor(ViewIface *view)
 /* The first time the next() method is used, this is called */
 static DirItem *iter_init(ViewIter *iter)
 {
-	ViewCollection *view_collection = iter->view_collection;
+	ViewCollection *view_collection = (ViewCollection *) iter->view;
 	Collection *collection = view_collection->collection;
 	int i = -1;
 	int n = collection->number_of_items;
@@ -1217,7 +1213,7 @@ static DirItem *iter_init(ViewIter *iter)
  */
 static DirItem *iter_next(ViewIter *iter)
 {
-	Collection *collection = iter->view_collection->collection;
+	Collection *collection = ((ViewCollection *) iter->view)->collection;
 	int n = collection->number_of_items;
 	int i = iter->i;
 
@@ -1252,7 +1248,7 @@ static DirItem *iter_next(ViewIter *iter)
 /* Like iter_next, but in the other direction */
 static DirItem *iter_prev(ViewIter *iter)
 {
-	Collection *collection = iter->view_collection->collection;
+	Collection *collection = ((ViewCollection *) iter->view)->collection;
 	int n = collection->number_of_items;
 	int i = iter->i;
 
@@ -1286,7 +1282,7 @@ static DirItem *iter_prev(ViewIter *iter)
 
 static DirItem *iter_peek(ViewIter *iter)
 {
-	Collection *collection = iter->view_collection->collection;
+	Collection *collection = ((ViewCollection *) iter->view)->collection;
 	int i = iter->i;
 
 	if (i == -1)
@@ -1302,7 +1298,7 @@ static void make_iter(ViewCollection *view_collection, ViewIter *iter,
 {
 	Collection *collection = view_collection->collection;
 
-	iter->view_collection = view_collection;
+	iter->view = (ViewIface *) view_collection;
 	iter->next = iter_init;
 	iter->peek = NULL;
 	iter->i = -1;
@@ -1363,11 +1359,13 @@ static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
+	FilerWindow	*filer_window = view_collection->filer_window;
 	
 	g_return_if_fail(iter == NULL ||
-			 iter->view_collection == view_collection);
+			 iter->view == (ViewIface *) view_collection);
 
-	collection_set_cursor_item(collection, iter ? iter->i : -1);
+	collection_set_cursor_item(collection, iter ? iter->i : -1,
+			filer_window->auto_scroll == -1);
 }
 
 static void view_collection_set_selected(ViewIface *view,
@@ -1378,7 +1376,7 @@ static void view_collection_set_selected(ViewIface *view,
 	Collection	*collection = view_collection->collection;
 	
 	g_return_if_fail(iter != NULL &&
-			 iter->view_collection == view_collection);
+			 iter->view == (ViewIface *) view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	if (selected)
@@ -1393,7 +1391,7 @@ static gboolean view_collection_get_selected(ViewIface *view, ViewIter *iter)
 	Collection	*collection = view_collection->collection;
 
 	g_return_val_if_fail(iter != NULL &&
-			iter->view_collection == view_collection, FALSE);
+			iter->view == (ViewIface *) view_collection, FALSE);
 	g_return_val_if_fail(iter->i >= 0 &&
 				iter->i < collection->number_of_items, FALSE);
 	
@@ -1406,7 +1404,7 @@ static void view_collection_select_only(ViewIface *view, ViewIter *iter)
 	Collection	*collection = view_collection->collection;
 
 	g_return_if_fail(iter != NULL &&
-			 iter->view_collection == view_collection);
+			 iter->view == (ViewIface *) view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	collection_clear_except(collection, iter->i);
@@ -1436,7 +1434,7 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter)
 	}
 
 	g_return_if_fail(iter != NULL &&
-			 iter->view_collection == view_collection);
+			 iter->view == (ViewIface *) view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	collection_wink_item(collection, iter->i);
@@ -1554,5 +1552,50 @@ static void view_collection_start_lasso_box(ViewIface *view,
 	ViewCollection	*view_collection = (ViewCollection *) view;
 	Collection	*collection = view_collection->collection;
 
+	filer_set_autoscroll(view_collection->filer_window, TRUE);
 	collection_lasso_box(collection, event->x, event->y);
+}
+
+
+/* Change the adjustment by this amount. Bounded. */
+static void diff_vpos(Collection *collection, int diff)
+{
+	int	old = collection->vadj->value;
+	int	value = old + diff;
+
+	value = CLAMP(value, 0,
+			collection->vadj->upper - collection->vadj->page_size);
+	gtk_adjustment_set_value(collection->vadj, value);
+
+	if (collection->vadj->value != old)
+		dnd_spring_abort();
+}
+
+static gboolean view_collection_auto_scroll_callback(ViewIface *view)
+{
+	ViewCollection	*view_collection = (ViewCollection *) view;
+	Collection	*collection = view_collection->collection;
+	GdkWindow	*window = ((GtkWidget *) collection)->window;
+	gint		x, y, w, h;
+	GdkModifierType	mask;
+	int		diff = 0;
+
+	gdk_window_get_pointer(window, &x, &y, &mask);
+	gdk_drawable_get_size(window, &w, NULL);
+
+	h = collection->vadj->page_size;
+	y -= collection->vadj->value;
+
+	if ((x < 0 || x > w || y < 0 || y > h) && !collection->lasso_box)
+		return FALSE;		/* Out of window - stop */
+
+	if (y < AUTOSCROLL_STEP)
+		diff = y - AUTOSCROLL_STEP;
+	else if (y > h - AUTOSCROLL_STEP)
+		diff = AUTOSCROLL_STEP + y - h;
+
+	if (diff)
+		diff_vpos(collection, diff);
+
+	return TRUE;
 }

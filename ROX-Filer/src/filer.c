@@ -409,6 +409,12 @@ static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 		filer_window->open_timeout = 0;
 	}
 
+	if (filer_window->auto_scroll != -1)
+	{
+		gtk_timeout_remove(filer_window->auto_scroll);
+		filer_window->auto_scroll = -1;
+	}
+
 	if (filer_window->thumb_queue)
 		destroy_glist(&filer_window->thumb_queue);
 
@@ -1163,6 +1169,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->view_hbox = NULL;
 	filer_window->view = NULL;
 	filer_window->scrollbar = NULL;
+	filer_window->auto_scroll = -1;
 
 	tidy_sympath(filer_window->sym_path);
 
@@ -2250,6 +2257,8 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 static void drag_end(GtkWidget *widget, GdkDragContext *context,
 		     FilerWindow *filer_window)
 {
+	filer_set_autoscroll(filer_window, FALSE);
+
 	if (filer_window->temp_item_selected)
 	{
 		view_clear_selection(filer_window->view);
@@ -2290,6 +2299,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 	const guchar	*new_path = NULL;
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
+
+	filer_set_autoscroll(filer_window, TRUE);
 
 	if (filer_window->view_type == VIEW_TYPE_DETAILS)
 	{
@@ -2385,4 +2396,45 @@ static gboolean drag_motion(GtkWidget		*widget,
 	}
 
 	return retval;
+}
+
+static gboolean as_timeout(FilerWindow *filer_window)
+{
+	gboolean retval;
+
+	retval = view_auto_scroll_callback(filer_window->view);
+
+	if (!retval)
+		filer_window->auto_scroll = -1;
+
+	return retval;
+}
+
+/* When autoscroll is on, a timer keeps track of the pointer position.
+ * While it's near the top or bottom of the window, the window scrolls.
+ *
+ * If the mouse buttons are released, the pointer leaves the window, or
+ * a drag-and-drop operation finishes, auto_scroll is turned off.
+ */
+void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll)
+{
+	g_return_if_fail(filer_window != NULL);
+
+	if (auto_scroll)
+	{
+		if (filer_window->auto_scroll != -1)
+			return;		/* Already on! */
+
+		filer_window->auto_scroll = gtk_timeout_add(50,
+					(GtkFunction) as_timeout,
+					filer_window);
+	}
+	else
+	{
+		if (filer_window->auto_scroll == -1)
+			return;		/* Already off! */
+
+		gtk_timeout_remove(filer_window->auto_scroll);
+		filer_window->auto_scroll = -1;
+	}
 }

@@ -382,3 +382,15 @@ void view_extend_tip(ViewIface *obj, ViewIter *iter, GString *tip)
 
 	VIEW_IFACE_GET_CLASS(obj)->extend_tip(obj, iter, tip);
 }
+
+/* This is called frequently while auto_scroll is on.
+ * Checks the pointer position and scrolls the window if it's
+ * near the top or bottom.
+ */
+gboolean view_auto_scroll_callback(ViewIface *obj)
+{
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), FALSE);
+
+	return VIEW_IFACE_GET_CLASS(obj)->auto_scroll_callback(obj);
+}
+

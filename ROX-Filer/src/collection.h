@@ -97,8 +97,6 @@ struct _Collection
 
 	guint		array_size;
 
-	gint		auto_scroll;	/* Timer */
-
 	gint		block_selection_changed;
 };
 
@@ -142,7 +140,8 @@ int 	collection_find_item		(Collection *collection,
 						       const void *),
 					 GtkSortType order);
 int 	collection_get_item		(Collection *collection, int x, int y);
-void 	collection_set_cursor_item	(Collection *collection, gint item);
+void 	collection_set_cursor_item	(Collection *collection, gint item,
+					 gboolean may_scroll);
 void 	collection_wink_item		(Collection *collection, gint item);
 void 	collection_delete_if		(Collection *collection,
 			  		 gboolean (*test)(gpointer item,
@@ -150,8 +149,6 @@ void 	collection_delete_if		(Collection *collection,
 			  		 gpointer data);
 void 	collection_move_cursor		(Collection *collection,
 					 int drow, int dcol);
-void	collection_set_autoscroll	(Collection *collection,
-					 gboolean auto_scroll);
 void	collection_lasso_box		(Collection *collection, int x, int y);
 void	collection_end_lasso		(Collection *collection,
 					 GdkFunction fn);
