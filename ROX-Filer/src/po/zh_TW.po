@@ -6,7 +6,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
-"POT-Creation-Date: 2003-05-29 12:05+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-05 15:20+0100\n"
 "PO-Revision-Date: 2002-11-10 21:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai_cheung@hotmail.com>\n"
 "Language-Team: none\n"
@@ -14,35 +15,35 @@ msgstr ""
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: abox.c:124
+#: abox.c:127
 msgid "<dir>"
 msgstr "<目錄>"
 
-#: abox.c:176
+#: abox.c:209
 msgid "_Quiet"
 msgstr "離開(_Q)"
 
-#: abox.c:184
+#: abox.c:218
 msgid "Quiet"
 msgstr "離開"
 
-#: abox.c:184
+#: abox.c:218
 msgid "Don't confirm every operation"
 msgstr "不可確認操作"
 
-#: abox.c:409 tips:59
+#: abox.c:443 tips:60
 msgid "Name"
 msgstr "名稱"
 
-#: abox.c:415 menu.c:230
+#: abox.c:449 menu.c:228
 msgid "Directory"
 msgstr "目錄"
 
-#: abox.c:468
+#: abox.c:502
 msgid "Command:"
 msgstr "指令:"
 
-#: abox.c:499
+#: abox.c:533
 msgid "Expression:"
 msgstr "表達"
 
@@ -120,26 +121,26 @@ msgid ""
 "See the chmod(1) man page for full details."
 msgstr ""
 
-#: action.c:351
+#: action.c:358
 msgid ""
 "\n"
 "Process terminated.\n"
 msgstr ""
 
-#: action.c:367
+#: action.c:374
 msgid "There was one error.\n"
 msgstr "發現錯誤.\n"
 
-#: action.c:369
+#: action.c:376
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "發現 %d 錯誤\n"
 
-#: action.c:393
+#: action.c:400
 msgid "ERROR reading"
 msgstr "錯誤讀取"
 
-#: action.c:436
+#: action.c:443
 msgid ""
 "'\n"
 "Done\n"
@@ -147,114 +148,133 @@ msgstr ""
 "'\n"
 "完成\n"
 
-#: action.c:492 support.c:395
+#: action.c:499 support.c:395
 msgid "ERROR"
 msgstr "錯誤"
 
-#: action.c:645 main.c:579 main.c:587 main.c:595
+#: action.c:653 main.c:577 main.c:585 main.c:593
 msgid "Yes"
 msgstr "是"
 
-#: action.c:648 main.c:581 main.c:597
+#: action.c:656 main.c:579 main.c:595
 msgid "No"
 msgstr "否"
 
-#: action.c:666
+#: action.c:674
 msgid ""
 "\n"
 "Asking child process to terminate...\n"
 msgstr ""
 
-#: action.c:673
+#: action.c:681
 msgid ""
 "\n"
 "Trying to KILL run-away process...\n"
 msgstr ""
 
-#: action.c:826
+#: action.c:834
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?計算內容從 %s?"
 
-#: action.c:858
+#: action.c:868
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?刪除 %s'%s'?"
 
-#: action.c:859
+#: action.c:869
 msgid "WRITE-PROTECTED "
 msgstr "防寫入的"
 
-#: action.c:864
+#: action.c:874
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'正在刪除 '%s'\n"
 
-#: action.c:877
+#: action.c:887
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'目錄 '%s' 已刪除\n"
 
-#: action.c:908 action.c:927
+#: action.c:919
+#, fuzzy, c-format
+msgid "?Eject '%s'?"
+msgstr "?檢查 '%s'?"
+
+#: action.c:924
+#, fuzzy, c-format
+msgid "'Eject '%s'\n"
+msgstr "'正在刪除 '%s'\n"
+
+#: action.c:932
+#, fuzzy, c-format
+msgid ""
+"!%s\n"
+"eject failed\n"
+msgstr ""
+"!%s\n"
+"掛載失敗\n"
+
+#: action.c:949 action.c:968
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?檢查 '%s'?"
 
-#: action.c:924
+#: action.c:965
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!非法的找尋設定-請更改後再嘗試\n"
 
-#: action.c:934
+#: action.c:975
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(正當檢查 '%s')\n"
 
-#: action.c:1005 action.c:1028
+#: action.c:1048 action.c:1071
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?改變 '%s' 的權限?"
 
-#: action.c:1009
+#: action.c:1052
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'正在改變 '%s' 的權限\n"
 
-#: action.c:1026
+#: action.c:1069
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!非法指令模式-請更改後再試\n"
 
-#: action.c:1116
+#: action.c:1161
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' 經已存在 - %s?"
 
-#: action.c:1118
+#: action.c:1163
 msgid "merge contents"
 msgstr "合拼內容"
 
-#: action.c:1119
+#: action.c:1164
 msgid "overwrite"
 msgstr "覆蓋"
 
-#: action.c:1135
+#: action.c:1180
 msgid "'Trying copy anyway...\n"
 msgstr "'嘗試硬複製..\n"
 
-#: action.c:1142
+#: action.c:1189
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?複製%s 為 %s?"
 
-#: action.c:1146
+#: action.c:1193
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'正在複製 %s 為 %s\n"
 
-#: action.c:1161
+#: action.c:1208
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!錯誤: 目標已存在，但不是一個目錄\n"
 
-#: action.c:1233
+#: action.c:1280
 #, fuzzy, c-format
 msgid ""
 "!%s\n"
@@ -263,26 +283,26 @@ msgstr ""
 "!%s\n"
 "複製 '%s' 失敗"
 
-#: action.c:1273
+#: action.c:1323
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' 檔案已存在-覆蓋?"
 
-#: action.c:1287
+#: action.c:1338
 msgid "'Trying move anyway...\n"
 msgstr "'嘗試硬移動...\n"
 
-#: action.c:1293
+#: action.c:1346
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?移動 %s 為 %s?"
 
-#: action.c:1297
+#: action.c:1350
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'正在移動 %s 為 %s\n"
 
-#: action.c:1305
+#: action.c:1358
 #, c-format
 msgid ""
 "!%s\n"
@@ -291,45 +311,45 @@ msgstr ""
 "!%s\n"
 "移動 %s 到 %s 失敗\n"
 
-#: action.c:1326
+#: action.c:1379
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!錯誤: 不能複製物件到本身內\n"
 
-#: action.c:1341
+#: action.c:1394
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!錯誤: 不能移動/改名物件到本身內\n"
 
-#: action.c:1358
+#: action.c:1411
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'連結 %s 為 %s\n"
 
-#: action.c:1360
+#: action.c:1416
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?連結 %s 為 %s?"
 
-#: action.c:1381
+#: action.c:1438
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'掛載 %s\n"
 
-#: action.c:1382
+#: action.c:1439
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'解除掛載 %s\n"
 
-#: action.c:1385
+#: action.c:1442
 #, c-format
 msgid "?Mount %s?"
 msgstr "?掛載 %s?"
 
-#: action.c:1386
+#: action.c:1443
 #, c-format
 msgid "?Unmount %s?"
 msgstr "?解除掛載 %s?"
 
-#: action.c:1406
+#: action.c:1463
 #, c-format
 msgid ""
 "!%s\n"
@@ -338,7 +358,7 @@ msgstr ""
 "!%s\n"
 "掛載失敗\n"
 
-#: action.c:1407
+#: action.c:1464
 #, c-format
 msgid ""
 "!%s\n"
@@ -347,7 +367,11 @@ msgstr ""
 "!%s\n"
 "解除掛載失敗\n"
 
-#: action.c:1446
+#: action.c:1472
+msgid "'(seems to be mounted now anyway)\n"
+msgstr ""
+
+#: action.c:1510
 #, c-format
 msgid ""
 "'\n"
@@ -356,170 +380,186 @@ msgstr ""
 "'\n"
 "總數: %s("
 
-#: action.c:1452
+#: action.c:1516
 msgid "file"
 msgstr "檔案"
 
-#: action.c:1452
+#: action.c:1516
 msgid "files"
 msgstr "檔案"
 
-#: action.c:1456
+#: action.c:1520
 msgid "no directories)\n"
 msgstr "沒有目錄)\n"
 
-#: action.c:1460
+#: action.c:1524
 msgid "directory"
 msgstr "目錄"
 
-#: action.c:1461
+#: action.c:1525
 msgid "directories"
 msgstr "目錄"
 
-#: action.c:1499
+#: action.c:1563
 msgid "!No mount points selected!\n"
 msgstr "!沒有掛載點被標記!\n"
 
-#: action.c:1553
+#: action.c:1633
 msgid "?Another search?"
 msgstr "?其他的搜尋?"
 
-#: action.c:1575
+#: action.c:1655
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' 是一符號連結\n"
 
-#: action.c:1607
+#: action.c:1687
 msgid "You need to select some items to search through"
 msgstr "你需要一些選項來幫助搜尋"
 
-#: action.c:1617 menu.c:222
+#: action.c:1697 menu.c:220
 msgid "Find"
 msgstr "找尋"
 
-#: action.c:1650
+#: action.c:1730
 msgid "You need to select some items to count"
 msgstr "你需要一些選項來幫助計算"
 
-#: action.c:1654
+#: action.c:1734
 msgid "Disk Usage"
 msgstr "磁碟用量"
 
-#: action.c:1687
+#: action.c:1767
 msgid "Mount / Unmount"
 msgstr "掛載 / 解除掛載"
 
-#: action.c:1700
+#: action.c:1780
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer 對系統上的掛載點尚未支援"
 
-#: action.c:1714 menu.c:209 tips:189
+#: action.c:1794 menu.c:208 tips:190
 msgid "Delete"
 msgstr "刪除"
 
-#: action.c:1724 tips:195
+#: action.c:1804 tips:196
 msgid "Force"
 msgstr "強制"
 
-#: action.c:1724
+#: action.c:1804
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "不可確認刪除唯讀的項目"
 
-#: action.c:1727 action.c:1782 tips:197
+#: action.c:1807 action.c:1862 tips:198
 msgid "Brief"
 msgstr "簡潔"
 
-#: action.c:1727
+#: action.c:1807
 msgid "Only log directories being deleted"
 msgstr "祗記錄已刪除的目錄"
 
-#: action.c:1744
+#: action.c:1824
 msgid "You need to select the items whose permissions you want to change"
 msgstr "你需選擇更改權限的選項"
 
-#: action.c:1752
+#: action.c:1832
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (使之可執行/可被搜尋)"
 
-#: action.c:1754
+#: action.c:1834
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (使之不可執行/不可被搜尋)"
 
-#: action.c:1756
+#: action.c:1836
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (給擁有者寫讀的權限)"
 
-#: action.c:1758
+#: action.c:1838
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (私有化 - 只擁有者可訪問)"
 
-#: action.c:1760
+#: action.c:1840
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u_w (共享訪問，不可寫入)"
 
-#: action.c:1771 menu.c:185 menu.c:220 tips:77
+#: action.c:1851 menu.c:184 menu.c:218 tips:78
 msgid "Permissions"
 msgstr "權限"
 
-#: action.c:1782
+#: action.c:1862
 msgid "Don't list processed files"
 msgstr "不列出已處理的檔案"
 
-#: action.c:1785 tips:199
+#: action.c:1865 tips:200
 msgid "Recurse"
 msgstr "包含"
 
-#: action.c:1785
+#: action.c:1865
 msgid "Also change contents of subdirectories"
 msgstr "同時改變子目錄的內容"
 
-#: action.c:1822 dnd.c:123 menu.c:1832 tips:183
+#: action.c:1902 dnd.c:123 menu.c:1877 tips:184
 msgid "Copy"
 msgstr "複製"
 
-#: action.c:1832 action.c:1865 tips:201
+#: action.c:1912 action.c:1945 tips:202
 msgid "Newer"
 msgstr "更新"
 
-#: action.c:1833 action.c:1866 tips:202 tips:203 tips:204 tips:205
+#: action.c:1913 action.c:1946 tips:203 tips:204 tips:205 tips:206
 msgid "Only over-write if source is newer than destination."
 msgstr "只覆蓋舊版本的檔案"
 
-#: action.c:1855 dnd.c:124 tips:185
+#: action.c:1935 dnd.c:124 tips:186
 msgid "Move"
 msgstr "移動"
 
-#: action.c:1883 dnd.c:125 tips:187
+#: action.c:1963 dnd.c:125 tips:188
 msgid "Link"
 msgstr "連結"
 
-#: action.c:1940
+#: action.c:1982 appmenu.c:258
+msgid "Eject"
+msgstr ""
+
+#: action.c:2039
 msgid "Deleting items such as "
 msgstr "刪除項目為"
 
-#: action.c:1944
+#: action.c:2043
 msgid "Deleting the item "
 msgstr "刪除中"
 
-#: action.c:1946
+#: action.c:2045
 msgid "Deleting the items "
 msgstr "刪除中"
 
-#: action.c:1965
+#: action.c:2064
 msgid " and "
 msgstr " 及 "
 
-#: action.c:1974
+#: action.c:2073
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr "將影嚮面板上某些項目 - 真的刪除?"
 
-#: action.c:1981
+#: action.c:2080
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr "將影嚮面板上某些項目 - 真的刪除?"
 
-#: appmenu.c:198
+#: appmenu.c:182
 msgid "<missing label>"
 msgstr "<失去標簽>"
+
+#: appmenu.c:263
+msgid "Format"
+msgstr ""
+
+#: appmenu.c:267
+msgid "Free Space"
+msgstr ""
+
+#: appmenu.c:307 menu.c:246 toolbar.c:158
+msgid "Help"
+msgstr "說明"
 
 #: bookmarks.c:277
 #, c-format
@@ -561,98 +601,98 @@ msgstr ""
 msgid "Recently Visited"
 msgstr ""
 
-#: dir.c:924
+#: dir.c:926
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "不能打開目錄: %s"
 
-#: dir.c:933
+#: dir.c:935
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "不能打開目錄: %s"
 
-#: display.c:557
+#: display.c:568
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr ""
 
-#: dnd.c:412
+#: dnd.c:414
 msgid "Internal error - bad info type"
 msgstr "內部錯誤 - 信息已損壞"
 
-#: dnd.c:549
+#: dnd.c:551
 msgid "Drag a directory here to bookmark it."
 msgstr ""
 
-#: dnd.c:564
+#: dnd.c:566
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "XDS 協定錯誤: 名稱不存在'/'\n"
 
-#: dnd.c:587
+#: dnd.c:586
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
 
-#: dnd.c:598
+#: dnd.c:597
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
 
-#: dnd.c:601
+#: dnd.c:600
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 
-#: dnd.c:700
+#: dnd.c:701
 msgid "Unknown target"
 msgstr "不明目標"
 
-#: dnd.c:733
+#: dnd.c:734
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr ""
 
-#: dnd.c:746
+#: dnd.c:747
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr "XDS錯誤,回傳碼必須為'S','F'或'E'\n"
 
-#: dnd.c:779
+#: dnd.c:780
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 
-#: dnd.c:795
+#: dnd.c:796
 msgid "UntitledData"
 msgstr "未命名資料"
 
-#: dnd.c:822
+#: dnd.c:823
 #, c-format
 msgid "Error saving file: %s"
 msgstr "儲存: %s 時發生錯誤"
 
-#: dnd.c:863
+#: dnd.c:865
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr ""
 
-#: dnd.c:887
+#: dnd.c:889
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 
-#: dnd.c:908
+#: dnd.c:912
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 
-#: dnd.c:915
+#: dnd.c:919
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
 msgstr ""
 
-#: dnd.c:928
+#: dnd.c:932
 msgid "Unknown action requested"
 msgstr "不明的執行要求"
 
-#: dnd.c:936
+#: dnd.c:940
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "錯誤的檔案列表: %s"
@@ -687,7 +727,7 @@ msgstr ""
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr ""
 
-#: dropbox.c:283 pinboard.c:690
+#: dropbox.c:283 pinboard.c:735
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -721,7 +761,7 @@ msgid ""
 "Unmounting a device makes it safe to remove the disk."
 msgstr ""
 
-#: filer.c:383 menu.c:831
+#: filer.c:383 menu.c:874
 msgid "Unmount"
 msgstr "解除掛載"
 
@@ -749,43 +789,43 @@ msgstr "'目錄 '%s' 不接受被訪問"
 msgid "Directory '%s' not found."
 msgstr "'找不到目錄 '%s' "
 
-#: filer.c:1431
+#: filer.c:1432
 msgid "Cancel"
 msgstr "取消"
 
-#: filer.c:1672
+#: filer.c:1678
 msgid "S"
 msgstr ""
 
-#: filer.c:1673
+#: filer.c:1679
 msgid "A"
 msgstr ""
 
-#: filer.c:1674
+#: filer.c:1680
 msgid "T"
 msgstr ""
 
-#: filer.c:1680
+#: filer.c:1686
 msgid "Scanning, "
 msgstr "從新檢視中, "
 
-#: filer.c:1681
+#: filer.c:1687
 msgid "All, "
 msgstr "全部, "
 
-#: filer.c:1682
+#: filer.c:1688
 msgid "Thumbs, "
 msgstr "縮圖啟動, "
 
-#: filer.c:1951
+#: filer.c:1957
 msgid "Symbolic link to "
 msgstr "符號連結予"
 
-#: filer.c:1982
+#: filer.c:1988
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "不是正確的 UTF-8 名稱，請重新命名.\n"
 
-#: filer.c:2286 menu.c:1822
+#: filer.c:2295 menu.c:1867
 msgid "Item no longer exists!"
 msgstr "項目已不存在!"
 
@@ -1007,18 +1047,18 @@ msgstr ""
 "拖放該圖示至一個目錄檢視器內\n"
 "(或輸入一個完整路徑)"
 
-#: gui_support.c:292
+#: gui_support.c:290
 msgid ""
 "\n"
 "---\n"
 msgstr ""
 
-#: gui_support.c:361
+#: gui_support.c:359
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr "嘗試以文字檔開啟XML文件。發現文件 '%s' 已損壞."
 
-#: gui_support.c:378
+#: gui_support.c:376
 #, c-format
 msgid ""
 "Error in '%s' file at line %d: \n"
@@ -1028,11 +1068,11 @@ msgid ""
 "Further errors will be ignored."
 msgstr ""
 
-#: gui_support.c:951
+#: gui_support.c:950
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "開啟 文字/連結 檔時發生錯誤"
 
-#: gui_support.c:1020
+#: gui_support.c:1022
 msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
@@ -1048,211 +1088,264 @@ msgstr "請重新啟動ROX-Filer,新的語言設定才會完全生效"
 msgid "(click to set)"
 msgstr "(點擊以設定)"
 
-#: icon.c:134
+#: icon.c:133
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:135 menu.c:249
+#: icon.c:134 menu.c:247
 msgid "About ROX-Filer..."
 msgstr "關於 ROX-Filer..."
 
-#: icon.c:136 menu.c:250
+#: icon.c:135 menu.c:248
 msgid "Show Help Files"
 msgstr "顯示說明檔"
 
-#: icon.c:137 menu.c:251
+#: icon.c:136 menu.c:249
 msgid "Manual"
 msgstr "指南"
 
-#: icon.c:139 menu.c:228
+#: icon.c:138 menu.c:226
 msgid "Options..."
 msgstr "選項..."
 
-#: icon.c:140 menu.c:236
+#: icon.c:139 menu.c:234
 msgid "Home Directory"
 msgstr "家目錄"
 
-#: icon.c:141 icon.c:903 menu.c:205 type.c:211
+#: icon.c:140 icon.c:897 menu.c:204 type.c:211
 msgid "File"
 msgstr "檔案"
 
-#: icon.c:142 menu.c:212 menu.c:844
+#: icon.c:141 menu.c:210 menu.c:887
 msgid "Shift Open"
 msgstr "以新窗口開啟"
 
-#: icon.c:143 menu.c:211 menu.c:248 toolbar.c:145
-msgid "Help"
-msgstr "說明"
-
-#: icon.c:144 menu.c:218
+#: icon.c:142 menu.c:216
 msgid "Info"
 msgstr "信息"
 
-#: icon.c:145 menu.c:216
+#: icon.c:143 menu.c:214
 msgid "Set Run Action..."
 msgstr "設定執行檔"
 
-#: icon.c:146 menu.c:217
+#: icon.c:144 menu.c:215
 msgid "Set Icon..."
 msgstr "設定圖示"
 
-#: icon.c:147 icon.c:773
+#: icon.c:145 icon.c:767
 msgid "Edit Item"
 msgstr "編輯項目"
 
-#: icon.c:148
+#: icon.c:146
 msgid "Show Location"
 msgstr "顯示位址"
 
-#: icon.c:149
+#: icon.c:147
 msgid "Remove Item(s)"
 msgstr "移除項目"
 
-#: icon.c:151
+#: icon.c:149
 msgid "Backdrop..."
 msgstr "背景"
 
-#: icon.c:276
+#: icon.c:274
 msgid "Nothing"
 msgstr "空的"
 
-#: icon.c:505
+#: icon.c:502
 msgid "The location must contain at least one character!"
 msgstr "位址名稱最少要包含一個字元"
 
-#: icon.c:577
+#: icon.c:574
 msgid "You must first select some items to remove"
 msgstr "請先選擇項目以刪除"
 
-#: icon.c:591
+#: icon.c:588
 msgid "You must open the menu over an item"
 msgstr "請在項目上開啟選單"
 
-#: icon.c:619 menu.c:1193
+#: icon.c:613 menu.c:1239
 msgid "You can only set the run action for a regular file"
 msgstr "只可對常規檔案設定開啟的程式"
 
-#: icon.c:705
+#: icon.c:699
 msgid "Press the desired shortcut (eg, Control+F1)"
 msgstr "按下所要求的熱鍵 (如 Control+F1)"
 
-#: icon.c:727
+#: icon.c:721
 msgid "Failed to get keyboard grab!"
 msgstr "按鍵找取錯誤"
 
-#: icon.c:776
+#: icon.c:770
 msgid "Clicking the icon opens:"
 msgstr "點擊圖示以開啟:"
 
-#: icon.c:790
+#: icon.c:784
 msgid "The text displayed under the icon is:"
 msgstr "圖示下的信息為:"
 
-#: icon.c:803
+#: icon.c:797
 msgid "The keyboard shortcut is:"
 msgstr "設定熱鍵為:"
 
-#: infobox.c:91
+#: infobox.c:108
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr "您想開啟 %d 窗口"
 
-#: infobox.c:92
+#: infobox.c:109
 msgid "Show Info"
 msgstr "顯示信息"
 
-#: infobox.c:114 menu.c:747
+#: infobox.c:131 menu.c:788
 msgid "(bad utf-8)"
 msgstr "(不正確的 utf-8)"
 
-#: infobox.c:265
+#: infobox.c:273
 msgid "Show _Help Files"
 msgstr "顯示說明檔"
 
-#: infobox.c:376 tips:261
-msgid "Error:"
-msgstr "錯誤"
+#: infobox.c:283
+#, fuzzy
+msgid "<b>Permissions</b>"
+msgstr "權限"
 
-#: infobox.c:383
-msgid "Real directory:"
-msgstr "正確目錄:"
+#: infobox.c:296
+msgid "<b>Contents indicate...</b>"
+msgstr ""
 
-#: infobox.c:386
-msgid "Owner, Group:"
-msgstr "擁有者，組別:"
-
-#: infobox.c:392
-msgid "Size:"
-msgstr "大小"
-
-#: infobox.c:396 support.c:349
+#: infobox.c:424 infobox.c:497 support.c:349
 msgid "bytes"
 msgstr ""
 
-#: infobox.c:399
+#: infobox.c:477 tips:260
+msgid "Error:"
+msgstr "錯誤"
+
+#: infobox.c:484
+msgid "Real directory:"
+msgstr "正確目錄:"
+
+#: infobox.c:487
+msgid "Owner, Group:"
+msgstr "擁有者，組別:"
+
+#: infobox.c:493 infobox.c:505
+msgid "Size:"
+msgstr "大小"
+
+#: infobox.c:505
+#, fuzzy
+msgid "Scanning"
+msgstr "從新檢視中, "
+
+#: infobox.c:519
+msgid "Failed to scan"
+msgstr ""
+
+#: infobox.c:525
 msgid "Change time:"
 msgstr "改變時間"
 
-#: infobox.c:401
+#: infobox.c:527
 msgid "Modify time:"
 msgstr "被更改時間"
 
-#: infobox.c:403
+#: infobox.c:529
 msgid "Access time:"
 msgstr "被訪問時間"
 
-#: infobox.c:405
-msgid "Permissions:"
-msgstr "權限"
-
-#: infobox.c:407
+#: infobox.c:531
 msgid "Type:"
 msgstr "類型"
 
-#: infobox.c:413
+#: infobox.c:537
 msgid "Run action:"
 msgstr "執行程序"
 
-#: infobox.c:504
-msgid "file(1) says..."
-msgstr "檔案(1) 顯示..."
-
-#: infobox.c:505
+#: infobox.c:627
 msgid "<nothing yet>"
 msgstr "<還是空的>"
 
-#: infobox.c:577
+#: infobox.c:697
 #, c-format
 msgid "file(1) says... %s"
 msgstr "檔案(1) 顯示...%s"
 
-#: infobox.c:621
+#: infobox.c:752
+#, fuzzy, c-format
+msgid "Could not change permissions: %s"
+msgstr "?改變 '%s' 的權限?"
+
+#: infobox.c:771
+#, fuzzy
+msgid "Owner"
+msgstr "更新"
+
+#: infobox.c:773
+msgid "Group"
+msgstr ""
+
+#: infobox.c:775
+msgid "World"
+msgstr ""
+
+#: infobox.c:778
+#, fuzzy
+msgid "Read"
+msgstr "改名"
+
+#: infobox.c:780
+#, fuzzy
+msgid "Write"
+msgstr "項目"
+
+#: infobox.c:782
+msgid "Exec"
+msgstr ""
+
+#: infobox.c:798
+#, fuzzy
+msgid "SUID"
+msgstr "列出SUID"
+
+#: infobox.c:806
+#, fuzzy
+msgid "SGID"
+msgstr "列出SGID"
+
+#: infobox.c:814
+#, fuzzy
+msgid "Sticky"
+msgstr "列出Sticky"
+
+#: infobox.c:845
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "符號連結 %s"
 
-#: infobox.c:627
+#: infobox.c:851
 msgid "Symbolic link"
 msgstr "是一符號連結"
 
-#: infobox.c:631
+#: infobox.c:855
 msgid "ROX application"
 msgstr "ROX 程式"
 
-#: infobox.c:639
+#: infobox.c:863
 msgid "mounted"
 msgstr "已掛載"
 
-#: infobox.c:639
+#: infobox.c:863
 msgid "unmounted"
 msgstr "已解除掛載"
 
-#: infobox.c:643
+#: infobox.c:867
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "掛載點為 %s (%s)"
 
-#: infobox.c:646
+#: infobox.c:870
 #, c-format
 msgid "Mount point (%s)"
 msgstr "掛載點 (%s)"
@@ -1323,258 +1416,263 @@ msgstr ""
 msgid "Running as user '%s'"
 msgstr "執行身份為 '%s'"
 
-#: main.c:571
+#: main.c:569
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr ""
 
-#: main.c:572
+#: main.c:570
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr ""
 
-#: main.c:576
+#: main.c:574
 msgid "features set at compile time"
 msgstr "在安裝時要設定之功能"
 
-#: main.c:577
+#: main.c:575
 msgid "Large File Support"
 msgstr "大型檔案支援"
 
-#: main.c:585
+#: main.c:583
 msgid "GNOME-VFS library"
 msgstr ""
 
-#: main.c:589
+#: main.c:587
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
-#: main.c:593
+#: main.c:591
 msgid "Dnotify support"
 msgstr ""
 
-#: menu.c:181 tips:51
+#: menu.c:180 tips:52
 msgid "Display"
 msgstr "顯示"
 
-#: menu.c:182 tips:56
+#: menu.c:181 tips:57
 #, fuzzy
 msgid "Icons View"
 msgstr "圖示大小"
 
-#: menu.c:183
+#: menu.c:182
 #, fuzzy
 msgid "Icons, With..."
 msgstr "巨圖示，並顯示..."
 
-#: menu.c:184 tips:76
+#: menu.c:183 tips:77
 msgid "Sizes"
 msgstr "大小"
 
-#: menu.c:186 tips:244
+#: menu.c:185 tips:243
 msgid "Types"
 msgstr "類型"
 
-#: menu.c:187 tips:79
+#: menu.c:186 tips:80
 msgid "Times"
 msgstr "次數"
 
-#: menu.c:188 tips:57 tips:94
+#: menu.c:187 tips:58 tips:95
 msgid "List View"
 msgstr ""
 
-#: menu.c:190
+#: menu.c:189
 #, fuzzy
 msgid "Bigger Icons"
 msgstr "巨圖示"
 
-#: menu.c:191
+#: menu.c:190
 #, fuzzy
 msgid "Smaller Icons"
 msgstr "小圖示"
 
-#: menu.c:192 tips:73
+#: menu.c:191 tips:74
 msgid "Automatic"
 msgstr ""
 
-#: menu.c:194
+#: menu.c:193
 msgid "Sort by Name"
 msgstr "以名稱排序"
 
-#: menu.c:195
+#: menu.c:194
 msgid "Sort by Type"
 msgstr "以類型排序"
 
-#: menu.c:196
+#: menu.c:195
 msgid "Sort by Date"
 msgstr "以日期排序"
 
-#: menu.c:197
+#: menu.c:196
 msgid "Sort by Size"
 msgstr "以大小排序"
 
-#: menu.c:198
+#: menu.c:197
 #, fuzzy
 msgid "Sort by Owner"
 msgstr "以大小排序"
 
-#: menu.c:199
+#: menu.c:198
 #, fuzzy
 msgid "Sort by Group"
 msgstr "以類型排序"
 
-#: menu.c:200
+#: menu.c:199
 #, fuzzy
 msgid "Reversed"
 msgstr "移除(_R)"
 
-#: menu.c:202
+#: menu.c:201
 msgid "Show Hidden"
 msgstr "顯示隱藏檔"
 
-#: menu.c:203
+#: menu.c:202
 msgid "Show Thumbnails"
 msgstr "顯示縮圖"
 
-#: menu.c:204
+#: menu.c:203
 msgid "Refresh"
 msgstr "更新"
 
-#: menu.c:206
+#: menu.c:205
 msgid "Copy..."
 msgstr "複製..."
 
-#: menu.c:207
+#: menu.c:206
 msgid "Rename..."
 msgstr "改名..."
 
-#: menu.c:208
+#: menu.c:207
 msgid "Link..."
 msgstr "連結..."
 
-#: menu.c:213
+#: menu.c:211
 msgid "Open AVFS"
 msgstr "開啟AVFS"
 
-#: menu.c:214
+#: menu.c:212
 msgid "Send To..."
 msgstr "傳送至..."
 
-#: menu.c:219
+#: menu.c:217
 msgid "Count"
 msgstr "計算"
 
-#: menu.c:223
+#: menu.c:221 toolbar.c:154
 msgid "Select"
 msgstr "選擇"
 
-#: menu.c:224
+#: menu.c:222
 msgid "Select All"
 msgstr "全選"
 
-#: menu.c:225
+#: menu.c:223
 msgid "Clear Selection"
 msgstr "取消選擇"
 
-#: menu.c:226
+#: menu.c:224
 msgid "Invert Selection"
 msgstr "反向選擇"
 
-#: menu.c:227
+#: menu.c:225
 msgid "Select If..."
 msgstr "挑選"
 
-#: menu.c:229
+#: menu.c:227
 msgid "New"
 msgstr "新增"
 
-#: menu.c:231
+#: menu.c:229
 msgid "Blank file"
 msgstr "空檔案"
 
-#: menu.c:232 tasklist.c:286
+#: menu.c:230 tasklist.c:286
 msgid "Window"
 msgstr "窗口"
 
-#: menu.c:233
+#: menu.c:231
 msgid "Parent, New Window"
 msgstr "上層，新窗口"
 
-#: menu.c:234
+#: menu.c:232
 msgid "Parent, Same Window"
 msgstr "上層，窗口"
 
-#: menu.c:235
+#: menu.c:233
 msgid "New Window"
 msgstr "新窗口"
 
-#: menu.c:237
+#: menu.c:235
 msgid "Show Bookmarks"
 msgstr ""
 
-#: menu.c:238
+#: menu.c:236
 msgid "Follow Symbolic Links"
 msgstr "跟隨符號連結"
 
-#: menu.c:239
+#: menu.c:237
 msgid "Resize Window"
 msgstr "調整窗口大小"
 
-#: menu.c:242
+#: menu.c:240
 msgid "Close Window"
 msgstr "關閉窗口"
 
-#: menu.c:244
+#: menu.c:242
 msgid "Enter Path..."
 msgstr "輸入路徑"
 
-#: menu.c:245
+#: menu.c:243
 msgid "Shell Command..."
 msgstr "命令環境"
 
-#: menu.c:246
+#: menu.c:244
 msgid "Xterm Here"
 msgstr "終端機"
 
-#: menu.c:247
+#: menu.c:245
 msgid "Switch to xterm"
 msgstr "切換至終端機"
 
-#: menu.c:696
+#: menu.c:737
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "你可用滑鼠在檔案上點擊選單,並同時按下Shift鍵.開啟`傳送至'功能"
 
-#: menu.c:732
+#: menu.c:773
 msgid "Next Click"
 msgstr "進階"
 
-#: menu.c:754
+#: menu.c:783
+#, c-format
+msgid "%s '%s'"
+msgstr ""
+
+#: menu.c:795
 #, c-format
 msgid "%d items"
 msgstr "%d 項目"
 
-#: menu.c:833
+#: menu.c:876
 #, fuzzy
 msgid "Open unmounted"
 msgstr "已解除掛載"
 
-#: menu.c:836
+#: menu.c:879
 msgid "Show Target"
 msgstr "顯示目標"
 
-#: menu.c:838
+#: menu.c:881
 msgid "Look Inside"
 msgstr "察看內部"
 
-#: menu.c:840
+#: menu.c:883
 msgid "Open As Text"
 msgstr "以文字模式開啟"
 
-#: menu.c:1008
+#: menu.c:1051
 msgid "_Relative link"
 msgstr "相關連結(_R)"
 
-#: menu.c:1014
+#: menu.c:1057
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1582,42 +1680,42 @@ msgid ""
 "may move but the target will stay put."
 msgstr ""
 
-#: menu.c:1081
+#: menu.c:1127
 msgid "New pathname is not absolute"
 msgstr "新的路徑名稱屬不絕對"
 
-#: menu.c:1147
+#: menu.c:1193
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr " '%' 的連結檔已存在，是否要替換？"
 
-#: menu.c:1153
+#: menu.c:1199
 msgid "_Replace"
 msgstr "替換(_R)"
 
-#: menu.c:1284 menu.c:1325 menu.c:1385
+#: menu.c:1330 menu.c:1371 menu.c:1431
 msgid "Create"
 msgstr "創建"
 
-#: menu.c:1285
+#: menu.c:1331
 msgid "NewDir"
 msgstr "新目錄"
 
-#: menu.c:1299 menu.c:1305
+#: menu.c:1345 menu.c:1351
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "錯誤創建 '%s': %s"
 
-#: menu.c:1326
+#: menu.c:1372
 msgid "NewFile"
 msgstr "新檔案"
 
-#: menu.c:1344
+#: menu.c:1390
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "錯誤創建檔案: 找不到樣板予 %s"
 
-#: menu.c:1415
+#: menu.c:1461
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1640,25 +1738,25 @@ msgstr ""
 "%s\n"
 "這'傳送至'功能,可用滑鼠和Shift+Menu來快速開啟."
 
-#: menu.c:1426
+#: menu.c:1472
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr "請將適用的程式以符號連結 (Ctrl+Shift並 拖放)到'傳送至'的目錄內."
 
-#: menu.c:1429
+#: menu.c:1475
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "不容許自定路徑"
 
-#: menu.c:1506
+#: menu.c:1552
 msgid "Customise"
 msgstr "自定"
 
-#: menu.c:1571
+#: menu.c:1617
 msgid "This is already the canonical name for this directory."
 msgstr "此目錄已有預設名稱"
 
-#: menu.c:1602
+#: menu.c:1648
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1666,75 +1764,71 @@ msgstr ""
 "你不能對此目錄開啟第二個窗口,因為你已在選項->Filer窗口內選了「唯一的窗口」的"
 "功能."
 
-#: menu.c:1721
+#: menu.c:1769
 msgid "Copy ... ?"
 msgstr "複製...?"
 
-#: menu.c:1724
+#: menu.c:1772
 msgid "Rename ... ?"
 msgstr "改名為...?"
 
-#: menu.c:1727
+#: menu.c:1775
 msgid "Symlink ... ?"
 msgstr "符號連...?"
 
-#: menu.c:1730
+#: menu.c:1778
 msgid "Shift Open ... ?"
 msgstr "新窗口開啟...?"
 
-#: menu.c:1733
-msgid "Help about ... ?"
-msgstr "說明關於...?"
-
-#: menu.c:1736
+#: menu.c:1781
 msgid "Examine ... ?"
 msgstr "檢查...?"
 
-#: menu.c:1739
+#: menu.c:1784
 msgid "Set run action for ... ?"
 msgstr "設定執行程式予... ?"
 
-#: menu.c:1742
+#: menu.c:1787
 msgid "Set icon for ... ?"
 msgstr "設定圖示予...?"
 
-#: menu.c:1745
+#: menu.c:1790
 msgid "Send ... to ... ?"
 msgstr "傳送...至...?"
 
-#: menu.c:1748
+#: menu.c:1793
 msgid "DELETE ... ?"
 msgstr "移除...?"
 
-#: menu.c:1751
+#: menu.c:1796
 msgid "Count the size of ... ?"
 msgstr "計算容量從 ...?"
 
-#: menu.c:1754
+#: menu.c:1799
 msgid "Set permissions on ... ?"
 msgstr "改變權限予...?"
 
-#: menu.c:1757
+#: menu.c:1802
 msgid "Search inside ... ?"
 msgstr "搜索內部...?"
 
-#: menu.c:1760
+#: menu.c:1805
 msgid "Look inside ... ?"
 msgstr "察看內部...?"
 
-#: menu.c:1805
+#: menu.c:1850
 msgid "You cannot do this to more than one item at a time"
 msgstr "不可同時以此方式處理多個項目"
 
-#: menu.c:1837
+#: menu.c:1882
 msgid "Rename"
 msgstr "改名"
 
-#: menu.c:1842
+#: menu.c:1887
 msgid "Symlink"
 msgstr "符號連結"
 
-#: menu.c:1877
+#: menu.c:1919
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1749,7 +1843,7 @@ msgstr ""
 "二) 在 ~/.gtkrc-2.0 內加入這行:\n"
 "\tgtk-can-chang-accels = 1"
 
-#: menu.c:1887
+#: menu.c:1929
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1769,7 +1863,7 @@ msgstr ""
 "對應的熱鍵會出現在選單的某個項目上，而日後你想開啟這項目． 祗須按下熱鍵而不需"
 "先開啟選單."
 
-#: menu.c:1902
+#: menu.c:1944
 msgid "Set keyboard shortcuts"
 msgstr "設定熱鍵"
 
@@ -1861,16 +1955,16 @@ msgstr "你要從Window Manger中關閉面板確定要關閉?"
 msgid "Missing < or > in panel config file"
 msgstr "沒有 < 或 > 於面板的設定檔"
 
-#: panel.c:1206
+#: panel.c:1215
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "錯誤儲存面板 %s: %s"
 
-#: panel.c:1509
+#: panel.c:1518
 msgid "Applet quit without ever creating a widget!"
 msgstr ""
 
-#: panel.c:1594
+#: panel.c:1612
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -1879,18 +1973,18 @@ msgstr ""
 "錯誤檢視 '%s' :\n"
 "%s"
 
-#: pinboard.c:338
+#: pinboard.c:337
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "你的舊桌板資信檔已轉為新的XML格式."
 
-#: pinboard.c:540
+#: pinboard.c:539
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
 
-#: pinboard.c:559
+#: pinboard.c:558
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -1899,75 +1993,81 @@ msgid ""
 "element, as described in ROX-Filer's manual."
 msgstr ""
 
-#: pinboard.c:579
+#: pinboard.c:578
 msgid "Set backdrop"
 msgstr "設定背景"
 
-#: pinboard.c:590
+#: pinboard.c:589
 msgid "Choose a style and drag an image in:"
 msgstr ""
 
-#: pinboard.c:603
+#: pinboard.c:602
 #, fuzzy
 msgid "Centre the image without scaling it"
 msgstr "刪除檔案而無須先被確認"
 
-#: pinboard.c:604
+#: pinboard.c:603
 #, fuzzy
 msgid "Centre"
 msgstr "置中"
 
-#: pinboard.c:605
+#: pinboard.c:604
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr ""
 
-#: pinboard.c:607
+#: pinboard.c:606
 #, fuzzy
 msgid "Scale"
 msgstr "紳延"
 
-#: pinboard.c:608
+#: pinboard.c:607
 msgid "Stretch the image to fill the backdrop area"
 msgstr ""
 
-#: pinboard.c:609
+#: pinboard.c:608
 #, fuzzy
 msgid "Stretch"
 msgstr "法文"
 
-#: pinboard.c:610
+#: pinboard.c:609
 msgid "Tile the image over the backdrop area"
 msgstr ""
 
-#: pinboard.c:611
+#: pinboard.c:610
 #, fuzzy
 msgid "Tile"
 msgstr "平鋪"
 
-#: pinboard.c:616
+#: pinboard.c:615
 msgid "Drop an image here"
 msgstr "拖放圖像到此處"
 
-#: pinboard.c:703
+#: pinboard.c:676
+msgid ""
+"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
+"-p=Default' to turn it on in future."
+msgstr ""
+
+#: pinboard.c:748
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 
-#: pinboard.c:1306
+#: pinboard.c:1351
 msgid "Missing '>' in icon label"
 msgstr "沒有 '>' 在圖示標簽內"
 
-#: pinboard.c:1315
+#: pinboard.c:1360
 msgid "Missing ',' after icon label"
 msgstr "沒有 ',' 在圖示標簽後"
 
-#: pinboard.c:1398
+#: pinboard.c:1443
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "錯誤儲存桌板 %s: %s"
 
-#: pinboard.c:2018
+#: pinboard.c:2072
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -1975,43 +2075,37 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:2296
-msgid ""
-"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
-"-p=Default' to turn it on in future."
-msgstr ""
-
-#: pixmaps.c:874
+#: pixmaps.c:960
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
 "%s"
 msgstr ""
 
-#: pixmaps.c:895
+#: pixmaps.c:981
 msgid "There are no thumbnails to delete"
 msgstr ""
 
-#: pixmaps.c:908
+#: pixmaps.c:994
 msgid "Purge thumbnails disk cache"
 msgstr ""
 
-#: remote.c:593
+#: remote.c:600
 #, fuzzy, c-format
 msgid "Unknown style '%s'"
 msgstr "不明類型"
 
-#: remote.c:615
+#: remote.c:622
 #, fuzzy, c-format
 msgid "Unknown details type '%s'"
 msgstr "不明類型"
 
-#: remote.c:643
+#: remote.c:650
 #, fuzzy, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "不明類型"
 
-#: remote.c:995
+#: remote.c:1029
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "嘗試呼叫不明的 SOAP 方式 '%s'"
@@ -2026,113 +2120,22 @@ msgstr "非法的 .gmo 翻譯檔 (過短): %s"
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr "非法的 .gmo 翻譯檔 (GNU magic number 找不到): %s"
 
-#: run.c:97 run.c:138
+#: run.c:96 run.c:137
 #, c-format
 msgid "Program %s not found - deleted?"
 msgstr "程序 %s 找不到 - 已被刪除?"
 
-#: run.c:244
+#: run.c:243
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
 msgstr "檔案不存在,或不能被你訪問: %s"
 
-#: run.c:249
+#: run.c:248
 #, c-format
 msgid "I don't know how to open '%s'"
 msgstr "不能開啟不明的檔案 '%s'"
 
-#: run.c:276
-msgid ""
-"Executable file:\n"
-"This is a file with an eXecute bit set - it can be run as a program."
-msgstr ""
-"可執行檔:\n"
-"此檔案包含了可執行特性"
-
-#: run.c:281
-msgid ""
-"File:\n"
-"This is a data file. Try using the Info menu item to find out more..."
-msgstr ""
-":\n"
-"這是一個資料文件.請以選單的`信息'來查閱..."
-
-#: run.c:288
-msgid ""
-"Mount point:\n"
-"A mount point is a directory which another filing system can be mounted on. "
-"Everything on the mounted filesystem then appears to be inside the directory."
-msgstr ""
-"掛載點:\n"
-"掛載點為一個目錄,它用作掛入其他檔案系統的檔案."
-
-#: run.c:299
-msgid ""
-"Device file:\n"
-"Device files allow you to read from or write to a device driver as though it "
-"was an ordinary file."
-msgstr ""
-"裝置檔:\n"
-"裝置檔允許你透過驅動程式,寫入或讀取內部的檔案."
-
-#: run.c:306
-msgid ""
-"Named pipe:\n"
-"Pipes allow different programs to communicate. One program writes data to "
-"the pipe while another one reads it out again."
-msgstr ""
-"名稱 pipe(管道):\n"
-"Pipes(管道)允許不同的程式互通.程式將數據寫進管道並傳出至其他程式."
-
-#: run.c:313
-msgid ""
-"Socket:\n"
-"Sockets allow processes to communicate."
-msgstr ""
-"Socket(套節):\n"
-"Sockets(套節)允許程序相互通訊."
-
-#: run.c:318
-msgid ""
-"Door:\n"
-"Doors are a little-used Solaris method for processes to communicate."
-msgstr ""
-
-#: run.c:324
-msgid ""
-"Unknown type:\n"
-"I couldn't find out what kind of file this is. Maybe it doesn't exist "
-"anymore or you don't have search permission on the directory it's in?"
-msgstr ""
-"不明的類型:\n"
-"檔案的類型不明或檔案已不存在.亦可能是權限設定問題."
-
-#: run.c:410
-#, c-format
-msgid "Could not send data to program: %s"
-msgstr "不能傳送資料到: %s"
-
-#: run.c:440
-#, c-format
-msgid "Could not read link: %s"
-msgstr "不能讀取連結檔: %s"
-
-#: run.c:468
-#, c-format
-msgid "Broken symlink (or you don't have permission to follow it): %s"
-msgstr "無效的連結檔 (或權限問題): %s"
-
-#: run.c:505
-#, c-format
-msgid ""
-"No run action specified for files of this type (%s/%s) - you can set a run "
-"action by choosing `Set Run Action' from the File menu, or you can just drag "
-"the file to an application"
-msgstr ""
-"沒有標記的執行動作對應此檔案 (%s/%s) - 你可在選單中的 `設定執行檔' 設入程式,"
-"或將此檔案拖放到指定的程式上."
-
-#: run.c:528
+#: run.c:279
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2143,14 +2146,30 @@ msgstr ""
 "這是一個執行程式的目錄 - 你可執行或開啟它(開啟時按下Shift鍵).但此程式並沒有說"
 "明檔."
 
-#: run.c:534
+#: run.c:363
+#, c-format
+msgid "Could not send data to program: %s"
+msgstr "不能傳送資料到: %s"
+
+#: run.c:393
+#, c-format
+msgid "Could not read link: %s"
+msgstr "不能讀取連結檔: %s"
+
+#: run.c:421
+#, c-format
+msgid "Broken symlink (or you don't have permission to follow it): %s"
+msgstr "無效的連結檔 (或權限問題): %s"
+
+#: run.c:458
+#, c-format
 msgid ""
-"Directory:\n"
-"This is a directory. It contains an index to other items - open it to see "
-"the list."
+"No run action specified for files of this type (%s/%s) - you can set a run "
+"action by choosing `Set Run Action' from the File menu, or you can just drag "
+"the file to an application"
 msgstr ""
-"目錄:\n"
-"這是一個目錄.它包含一個管理內部項目的索引."
+"沒有標記的執行動作對應此檔案 (%s/%s) - 你可在選單中的 `設定執行檔' 設入程式,"
+"或將此檔案拖放到指定的程式上."
 
 #: support.c:272
 msgid "B"
@@ -2160,100 +2179,153 @@ msgstr ""
 msgid "byte"
 msgstr "byte"
 
-#: toolbar.c:109
+#: toolbar.c:114
 msgid "Close"
 msgstr "關閉"
 
-#: toolbar.c:109
+#: toolbar.c:114
 msgid "Close filer window"
 msgstr "關閉窗口"
 
-#: toolbar.c:113
+#: toolbar.c:118
 msgid "Up"
 msgstr "往上"
 
-#: toolbar.c:113
+#: toolbar.c:118
 msgid "Change to parent directory"
 msgstr "到根目錄"
 
-#: toolbar.c:117
+#: toolbar.c:122
 msgid "Home"
 msgstr "家目錄"
 
-#: toolbar.c:117
+#: toolbar.c:122
 msgid "Change to home directory"
 msgstr "移至家目錄"
 
-#: toolbar.c:121
+#: toolbar.c:126
 msgid "Bookmarks"
 msgstr ""
 
-#: toolbar.c:121
+#: toolbar.c:126
 msgid "Bookmarks menu"
 msgstr ""
 
-#: toolbar.c:125
+#: toolbar.c:130
 msgid "Scan"
 msgstr "檢視"
 
-#: toolbar.c:125
+#: toolbar.c:130
 msgid "Rescan directory contents"
 msgstr "重新檢視內容"
 
-#: toolbar.c:129 toolbar.c:133 tips:62
+#: toolbar.c:134 toolbar.c:138 tips:63
 msgid "Size"
 msgstr "大小"
 
-#: toolbar.c:129
+#: toolbar.c:134
 msgid "Change icon size"
 msgstr "改變圖示大小"
 
-#: toolbar.c:133
+#: toolbar.c:138
 msgid "Automatic size mode"
 msgstr ""
 
-#: toolbar.c:137
+#: toolbar.c:142
 msgid "Details"
 msgstr "詳述"
 
-#: toolbar.c:137
+#: toolbar.c:142
 msgid "Show extra details"
 msgstr "更詳述"
 
-#: toolbar.c:141
+#: toolbar.c:146
+#, fuzzy
+msgid "Sort"
+msgstr "排序"
+
+#: toolbar.c:146
+#, fuzzy
+msgid "Change sort criteria"
+msgstr "改變時間"
+
+#: toolbar.c:150
 msgid "Hidden"
 msgstr "隱藏"
 
-#: toolbar.c:141
+#: toolbar.c:150
 msgid "Show/hide hidden files"
 msgstr "顯示/或隱藏隱藏檔"
 
-#: toolbar.c:145
+#: toolbar.c:154
+#, fuzzy
+msgid "Select all/invert selection"
+msgstr "反向選擇"
+
+#: toolbar.c:158
 msgid "Show ROX-Filer help"
 msgstr "顯示ROX-Filer說明"
 
-#: toolbar.c:204
+#: toolbar.c:217
 #, c-format
 msgid " (%u hidden)"
 msgstr "(%u 隱藏)"
 
-#: toolbar.c:212 tips:82
+#: toolbar.c:225 tips:83
 msgid "items"
 msgstr "項目"
 
-#: toolbar.c:212
+#: toolbar.c:225
 msgid "item"
 msgstr "項目"
 
-#: toolbar.c:215
+#: toolbar.c:228
 #, c-format
 msgid "No items%s"
 msgstr "沒有項目%s"
 
-#: toolbar.c:231
+#: toolbar.c:244
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u 已選擇 (%s)"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by name"
+msgstr "以名稱排序"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by type"
+msgstr "以類型排序"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by date"
+msgstr "以日期排序"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by size"
+msgstr "以大小排序"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by owner"
+msgstr "以大小排序"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by group"
+msgstr "以類型排序"
+
+#: toolbar.c:446
+msgid "ascending"
+msgstr ""
+
+#: toolbar.c:446
+msgid "descending"
+msgstr ""
 
 #: type.c:202
 msgid "Sym link"
@@ -2437,7 +2509,7 @@ msgid ""
 "globs)."
 msgstr ""
 
-#: type.c:1360
+#: type.c:1353
 msgid "No description"
 msgstr ""
 
@@ -2576,128 +2648,132 @@ msgid "Chinese (simplified)"
 msgstr "中文(簡體)"
 
 #: tips:6
+msgid "Czech"
+msgstr ""
+
+#: tips:7
 msgid "Danish"
 msgstr "西班牙文"
 
-#: tips:7
+#: tips:8
 msgid "Dutch"
 msgstr "荷蘭文"
 
-#: tips:8
+#: tips:9
 msgid "English (no translation)"
 msgstr "英文 (不被翻譯)"
 
-#: tips:9
+#: tips:10
 msgid "French"
 msgstr "法文"
 
-#: tips:10
+#: tips:11
 msgid "German"
 msgstr "德文"
 
-#: tips:11
+#: tips:12
 msgid "Hungarian"
 msgstr "匈牙利文"
 
-#: tips:12
+#: tips:13
 msgid "Japanese"
 msgstr ""
 
-#: tips:13
+#: tips:14
 msgid "Norwegian"
 msgstr ""
 
-#: tips:14
+#: tips:15
 msgid "Italian"
 msgstr "意大利文"
 
-#: tips:15
+#: tips:16
 msgid "Polish"
 msgstr "波蘭文"
 
-#: tips:16
+#: tips:17
 msgid "Russian"
 msgstr "俄羅斯文"
 
-#: tips:17
+#: tips:18
 msgid "Spanish"
 msgstr "西班牙文"
 
-#: tips:18
+#: tips:19
 msgid "Swedish"
 msgstr "瑞典"
 
-#: tips:19
+#: tips:20
 msgid "Filer windows"
 msgstr "Filer 窗口"
 
-#: tips:20
+#: tips:21
 msgid "Auto-resize filer windows"
 msgstr "自動改變窗口大小..."
 
-#: tips:21
+#: tips:22
 msgid "Never automatically resize"
 msgstr "永不自動改變窗口大小..."
 
-#: tips:22
+#: tips:23
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
 msgstr "你將需要手動更改窗口大小或在選單的`調整窗口大小`及雙擊窗口背景改變它"
 
-#: tips:23
+#: tips:24
 msgid "Resize when changing the display style"
 msgstr "在變更顯示風格時改變大小"
 
-#: tips:24
+#: tips:25
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
 msgstr "當改變圖示大小時或敘述時.窗口大小會自行調整"
 
-#: tips:25
+#: tips:26
 msgid "Always resize"
 msgstr "永遠改變大小"
 
-#: tips:26 tips:27
+#: tips:27 tips:28
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
 msgstr "當改變圖示大小時或敘述時,及轉變到其他目錄時.窗口大小會自行調整."
 
-#: tips:28
+#: tips:29
 msgid "Largest window size:"
 msgstr "窗口的最大值"
 
-#: tips:29
+#: tips:30
 msgid "%"
 msgstr ""
 
-#: tips:30 tips:31
+#: tips:31 tips:32
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
 msgstr "窗口大小自行調整時,會跟據該百份比來限制窗口最大的值"
 
-#: tips:32
+#: tips:33
 msgid "Window behaviour"
 msgstr "窗口行為"
 
-#: tips:33
+#: tips:34
 msgid "Short titlebar flags"
 msgstr "簡化名稱"
 
-#: tips:34
+#: tips:35
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 msgstr "以單字母代替檔案全名"
 
-#: tips:35
+#: tips:36
 msgid "Unique windows"
 msgstr "唯一的窗口"
 
-#: tips:36 tips:37
+#: tips:37 tips:38
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -2705,12 +2781,12 @@ msgstr ""
 "如你要開啟一個目錄而此目錄已經存在於另一窗口內 , 開啟此選項後你已經存在的窗口"
 "便會被關閉."
 
-#: tips:38
+#: tips:39
 #, fuzzy
 msgid "New window on button 1"
 msgstr "按滑鼠1(左)鍵以開啟新窗口 (RISC OS 風格)"
 
-#: tips:39
+#: tips:40
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -2718,142 +2794,142 @@ msgid ""
 msgstr ""
 "單擊滑鼠1(左)鍵以開啟目錄於新窗口內 單擊滑鼠2(中)鍵會開啟目錄於 原有的窗口內."
 
-#: tips:40
+#: tips:41
 #, fuzzy
 msgid "Single-click navigation"
 msgstr "單擊予開啟"
 
-#: tips:41 tips:42 tips:43 tips:44 tips:139
+#: tips:42 tips:43 tips:44 tips:45 tips:140
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
 "things."
 msgstr "單擊項目以開啟及瀏覽,反之則單擊以選擇,雙擊以開啟."
 
-#: tips:45
+#: tips:46
 msgid "Sorting"
 msgstr "排序"
 
-#: tips:46
+#: tips:47
 #, fuzzy
 msgid "Directories come first (for sort by name)"
 msgstr "目錄先行"
 
-#: tips:47
+#: tips:48
 #, fuzzy
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
 msgstr "如開啟此功能,則永遠以目錄先排序,並忽略其他排序方式."
 
-#: tips:48
+#: tips:49
 #, fuzzy
 msgid "Capitalised names first (for sort by name)"
 msgstr "目錄先行"
 
-#: tips:49 tips:50
+#: tips:50 tips:51
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
 msgstr ""
 
-#: tips:52
+#: tips:53
 msgid "Default settings for new windows"
 msgstr "預設新窗口的設定"
 
-#: tips:53
+#: tips:54
 msgid "Inherit options from source window"
 msgstr "從源窗口中繼承選項"
 
-#: tips:54
+#: tips:55
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
 msgstr "如開啟此功能,則新窗口會從源窗口之風格相同.反之,則以預設值開啟."
 
-#: tips:55
+#: tips:56
 #, fuzzy
 msgid "View type:"
 msgstr "不明類型"
 
-#: tips:58
+#: tips:59
 msgid "Sort by:"
 msgstr "排序以"
 
-#: tips:60 tips:78
+#: tips:61 tips:79
 msgid "Type"
 msgstr "類型"
 
-#: tips:61
+#: tips:62
 msgid "Date"
 msgstr "日期"
 
-#: tips:63
+#: tips:64
 msgid "Show hidden files"
 msgstr "顯示隱藏檔"
 
-#: tips:64 tips:65 tips:66 tips:67
+#: tips:65 tips:66 tips:67 tips:68
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
 msgstr "如啟動此功能，會顥示所有點檔案,否之，點檔案會被隱藏."
 
-#: tips:68
+#: tips:69
 #, fuzzy
 msgid "Icon View"
 msgstr "圖示大小"
 
-#: tips:69
+#: tips:70
 #, fuzzy
 msgid "Default size:"
 msgstr "默認設定"
 
-#: tips:70
+#: tips:71
 msgid "Huge Icons"
 msgstr "巨圖示"
 
-#: tips:71 tips:234
+#: tips:72 tips:235
 msgid "Large Icons"
 msgstr "大圖示"
 
-#: tips:72 tips:233
+#: tips:73 tips:234
 msgid "Small Icons"
 msgstr "小圖示"
 
-#: tips:74
+#: tips:75
 #, fuzzy
 msgid "Default details:"
 msgstr "默認設定"
 
-#: tips:75
+#: tips:76
 msgid "No details"
 msgstr "不須詳述"
 
-#: tips:80
+#: tips:81
 msgid "Automatic small icons:"
 msgstr ""
 
-#: tips:81
+#: tips:82
 #, fuzzy
 msgid "Change at:"
 msgstr "改變時間"
 
-#: tips:83 tips:84 tips:85
+#: tips:84 tips:85 tips:86
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
 
-#: tips:86
+#: tips:87
 msgid "Max width (Large icons):"
 msgstr ""
 
-#: tips:87 tips:90
+#: tips:88 tips:91
 msgid "pixels"
 msgstr "像素"
 
-#: tips:88
+#: tips:89
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -2861,57 +2937,57 @@ msgstr ""
 "在大圖示模式下,信息文字如比此寬度為長,則自動換行.在巨圖示模式下,則會比寬度多"
 "長百份之五十."
 
-#: tips:89
+#: tips:90
 #, fuzzy
 msgid "(Small Icons):"
 msgstr "小圖示"
 
-#: tips:91 tips:92 tips:93
+#: tips:92 tips:93 tips:94
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "小圖示最大的信息寬度"
 
-#: tips:95
+#: tips:96
 #, fuzzy
 msgid "Show column headings"
 msgstr "顯示縮圖"
 
-#: tips:96 tips:97 tips:98
+#: tips:97 tips:98 tips:99
 msgid "If this is on then column headings will be shown in the list view."
 msgstr ""
 
-#: tips:99
+#: tips:100
 msgid "Tools/Minibuffer"
 msgstr ""
 
-#: tips:100
+#: tips:101
 msgid "Toolbar"
 msgstr "工具欄"
 
-#: tips:101
+#: tips:102
 msgid "Toolbar type:"
 msgstr "工具欄類別"
 
-#: tips:102 tips:131
+#: tips:103 tips:132
 msgid "None"
 msgstr "沒有"
 
-#: tips:103
+#: tips:104
 msgid "Icons only"
 msgstr "只顯示圖示"
 
-#: tips:104
+#: tips:105
 msgid "Text under icons"
 msgstr "圖示信息在下:"
 
-#: tips:105
+#: tips:106
 msgid "Text beside icons"
 msgstr "圖示信息在側"
 
-#: tips:106
+#: tips:107
 msgid "Show totals of items"
 msgstr "顯示項目總數"
 
-#: tips:107 tips:108
+#: tips:108 tips:109
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -2920,215 +2996,215 @@ msgstr ""
 "在窗口的工具欄顯示項目總數,並會顯示隱藏檔數目,當以右鍵選檔案時,還會顯示其大"
 "小."
 
-#: tips:109
+#: tips:110
 msgid "Select the buttons you want on the bar:"
 msgstr ""
 
-#: tips:110
+#: tips:111
 msgid "Minibuffer"
 msgstr ""
 
-#: tips:111
+#: tips:112
 msgid "Beep if Tab-completion fails"
 msgstr ""
 
-#: tips:112
+#: tips:113
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
 "letter varies)."
 msgstr ""
 
-#: tips:113
+#: tips:114
 msgid "Beep if there are several matches"
 msgstr ""
 
-#: tips:114 tips:115 tips:116
+#: tips:115 tips:116 tips:117
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
 msgstr ""
 
-#: tips:117 tips:118
+#: tips:118 tips:119
 #, fuzzy
 msgid "Thumbnails"
 msgstr "顯示縮圖"
 
-#: tips:119
+#: tips:120
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
 
-#: tips:120
+#: tips:121
 msgid "Show image thumbnails"
 msgstr "顯示影像檔的縮圖"
 
-#: tips:121 tips:122
+#: tips:122 tips:123
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
 msgstr ""
 
-#: tips:123
+#: tips:124
 #, fuzzy
 msgid "Thumbnails cache"
 msgstr "顯示縮圖"
 
-#: tips:124
+#: tips:125
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
 "will be created again as needed."
 msgstr ""
 
-#: tips:125
+#: tips:126
 msgid "Pinboard"
 msgstr "桌板"
 
-#: tips:126
+#: tips:127
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
 msgstr ""
 
-#: tips:127 tips:230
+#: tips:128 tips:231
 msgid "Appearance"
 msgstr "外表"
 
-#: tips:128
+#: tips:129
 msgid "Foreground:"
 msgstr "前景"
 
-#: tips:129
+#: tips:130
 msgid "Text shadow:"
 msgstr ""
 
-#: tips:130
+#: tips:131
 msgid "Background:"
 msgstr "背景"
 
-#: tips:132
+#: tips:133
 msgid "Thin"
 msgstr ""
 
-#: tips:133
+#: tips:134
 msgid "Thick"
 msgstr ""
 
-#: tips:134
+#: tips:135
 msgid "Use custom font:"
 msgstr "自定字型"
 
-#: tips:135 tips:136
+#: tips:136 tips:137
 msgid "The font used for the text displayed under the icons"
 msgstr "圖示信息在底部"
 
-#: tips:137
+#: tips:138
 msgid "Pinboard behaviour"
 msgstr "桌板風格"
 
-#: tips:138
+#: tips:139
 msgid "Single-click to open"
 msgstr "單擊予開啟"
 
-#: tips:140
+#: tips:141
 msgid "Keep icons within screen limits"
 msgstr "限制圖示在可見屏幕上"
 
-#: tips:141
+#: tips:142
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
 msgstr "桌板內的圖示和標簽全顯示在屏幕中"
 
-#: tips:142
+#: tips:143
 msgid "Icon grid step:"
 msgstr "圖示格式程序:"
 
-#: tips:143
+#: tips:144
 msgid "Fine"
 msgstr "高質素"
 
-#: tips:144
+#: tips:145
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "以2像素圖示在桌面顯示"
 
-#: tips:145
+#: tips:146
 msgid "Medium"
 msgstr "中等"
 
-#: tips:146
+#: tips:147
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "以16像素圖示在桌面顯示"
 
-#: tips:147
+#: tips:148
 msgid "Coarse"
 msgstr "粗糙的"
 
-#: tips:148 tips:149 tips:150 tips:151
+#: tips:149 tips:150 tips:151 tips:152
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "以32像素圖示在桌面顯示"
 
-#: tips:152 tips:154
+#: tips:153 tips:155
 msgid "Iconified windows"
 msgstr "圖示化"
 
-#: tips:153
+#: tips:154
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
 "windows."
 msgstr ""
 
-#: tips:155
+#: tips:156
 msgid "Show iconified windows"
 msgstr "圖示化窗口"
 
-#: tips:156
+#: tips:157
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
 "pinboard must be in use."
 msgstr ""
 
-#: tips:157
+#: tips:158
 msgid "Iconify to the"
 msgstr "圖示化"
 
-#: tips:158
+#: tips:159
 msgid "top-left"
 msgstr "左上"
 
-#: tips:159
+#: tips:160
 msgid "top-right"
 msgstr "右上"
 
-#: tips:160
+#: tips:161
 msgid "bottom-left"
 msgstr "左下"
 
-#: tips:161
+#: tips:162
 msgid "bottom-right"
 msgstr "右下"
 
-#: tips:162
+#: tips:163
 msgid ", going"
 msgstr ""
 
-#: tips:163
+#: tips:164
 msgid "horizontally"
 msgstr "平面"
 
-#: tips:164
+#: tips:165
 msgid "vertically"
 msgstr "垂直地"
 
-#: tips:165
+#: tips:166
 msgid "Panels"
 msgstr "面板"
 
-#: tips:166
+#: tips:167
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
@@ -3136,114 +3212,114 @@ msgstr ""
 "面板是以多圖示連成的工具欄.\n"
 "詳情請參閱說明."
 
-#: tips:167
+#: tips:168
 msgid "Panel style"
 msgstr "面板風格"
 
-#: tips:168
+#: tips:169
 msgid "Image and text"
 msgstr "圖像及文字"
 
-#: tips:169
+#: tips:170
 msgid "Every panel icon is shown with an image and some text."
 msgstr "面板上顯示圖示及文字"
 
-#: tips:170
+#: tips:171
 msgid "Image only for applications"
 msgstr "程式檔只顯示圖像"
 
-#: tips:171
+#: tips:172
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr "程式檔只以圖示表達,其他的檔案則有圖示及文字敘述."
 
-#: tips:172
+#: tips:173
 msgid "Image only"
 msgstr "只顯示圖像"
 
-#: tips:173 tips:174
+#: tips:174 tips:175
 msgid "Only the image is shown."
 msgstr "只顯示該圖像"
 
-#: tips:175
+#: tips:176
 msgid "Panel width (thin)"
 msgstr ""
 
-#: tips:176
+#: tips:177
 msgid "(thick)"
 msgstr ""
 
-#: tips:177 tips:178 tips:179
+#: tips:178 tips:179 tips:180
 msgid "The size of the panels."
 msgstr ""
 
-#: tips:180
+#: tips:181
 msgid "Action windows"
 msgstr "程序診斷窗口"
 
-#: tips:181
+#: tips:182
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
 msgstr "程序診斷窗口會在你執行一些程序,如複製或刪除檔案時,自動出現."
 
-#: tips:182
+#: tips:183
 msgid "Auto-start (Quiet) these actions"
 msgstr "自動啟用 (離開) 這些程序:"
 
-#: tips:184
+#: tips:185
 msgid "Copy files without confirming first."
 msgstr "複製檔案而無須先被確認"
 
-#: tips:186
+#: tips:187
 msgid "Move files without confirming first."
 msgstr "移動檔案而無須先被確認"
 
-#: tips:188
+#: tips:189
 msgid "Create links to files without confirming first."
 msgstr "連結檔案而無須先被確認"
 
-#: tips:190
+#: tips:191
 msgid "Delete files without confirming first."
 msgstr "刪除檔案而無須先被確認"
 
-#: tips:191
+#: tips:192
 msgid "Mount"
 msgstr "掛載"
 
-#: tips:192 tips:193
+#: tips:193 tips:194
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "掛載檔案而無須先被確認"
 
-#: tips:194
+#: tips:195
 msgid "Default settings"
 msgstr "默認設定"
 
-#: tips:196
+#: tips:197
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "不可確認刪除唯讀項目"
 
-#: tips:198
+#: tips:199
 msgid "Don't display so much information in the message area."
 msgstr "不可在信息框內顯示太多資料"
 
-#: tips:200
+#: tips:201
 msgid "Also change contents of subdirectories."
 msgstr "同樣改變子目錄內容"
 
-#: tips:206
+#: tips:207
 msgid "Drag and Drop"
 msgstr "滑鼠拖放"
 
-#: tips:207
+#: tips:208
 msgid "Dragging to icons"
 msgstr ""
 
-#: tips:208
+#: tips:209
 msgid "Allow dragging to icons in filer windows"
 msgstr "容許在窗口間拖放圖示"
 
-#: tips:209
+#: tips:210
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -3252,11 +3328,11 @@ msgstr ""
 "選項開啟後你可將檔案在子目錄或程式上拖放.該項目會被加亮並拖放進你指定的目錄"
 "內 或在你拖進的程式內執行."
 
-#: tips:210
+#: tips:211
 msgid "Directories spring open"
 msgstr "目錄彈出並開啟"
 
-#: tips:211
+#: tips:212
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -3265,15 +3341,15 @@ msgstr ""
 "此選項必須連帶上一個選項同時開啟,在指向加亮的目錄時,使它在按著滑鼠一段短時間"
 "內自動開啟."
 
-#: tips:212
+#: tips:213
 msgid "Spring delay:"
 msgstr "延遲彈出"
 
-#: tips:213
+#: tips:214
 msgid "ms"
 msgstr "微秒"
 
-#: tips:214 tips:215
+#: tips:215 tips:216
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -3282,105 +3358,93 @@ msgstr ""
 "此選項是用作是設定:你在加亮的目錄上按著滑鼠而引發該目錄被自動開啟的延遲時間,"
 "並會以 ms 微秒來計算"
 
-#: tips:216
+#: tips:217
 #, fuzzy
 msgid "When dragging files with the left mouse button"
 msgstr "以滑鼠中鍵拖放"
 
-#: tips:217 tips:223
+#: tips:218 tips:224
 #, fuzzy
 msgid "Show a menu of possible actions"
 msgstr "顯示一個可用的動作選單"
 
-#: tips:218
+#: tips:219
 #, fuzzy
 msgid "Copy the files"
 msgstr ".移動檔案"
 
-#: tips:219 tips:220 tips:221
+#: tips:220 tips:221 tips:222
 #, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
 msgstr "注意，如想選單再出現，可按著左鍵並 同時按下鍵盤上的 Alt 鍵"
 
-#: tips:222
+#: tips:223
 #, fuzzy
 msgid "When dragging files with the middle mouse button"
 msgstr "以滑鼠中鍵拖放"
 
-#: tips:224
+#: tips:225
 #, fuzzy
 msgid "Move the files"
 msgstr ".移動檔案"
 
-#: tips:225 tips:226 tips:227 tips:228
+#: tips:226 tips:227 tips:228 tips:229
 #, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
 msgstr "注意，如想選單再出現，可按著左鍵並 同時按下鍵盤上的 Alt 鍵"
 
-#: tips:229
+#: tips:230
 msgid "Menus"
 msgstr "選單"
 
-#: tips:231
+#: tips:232
 msgid "Size of icons in menus:"
 msgstr "選單上的圖示大小"
 
-#: tips:232
+#: tips:233
 msgid "No Icons"
 msgstr "沒有圖示"
 
-#: tips:235
+#: tips:236
 msgid "Same as current window"
 msgstr "跟現行窗口相同"
 
-#: tips:236
+#: tips:237
 msgid "Same as default"
 msgstr "跟預設值相同"
 
-#: tips:237
+#: tips:238
 #, fuzzy
 msgid "Behaviour"
 msgstr "窗口行為"
 
-#: tips:238
-msgid "Menu on button 2 (RISC OS style)"
-msgstr "以滑鼠2(中)鍵啟動選單 (RISC OS 風格)"
-
 #: tips:239
-msgid ""
-"Use button 2, the middle button (click both buttons at once on two button "
-"mice), to pop up the menu. If off, use button 3 (right) instead."
-msgstr ""
-"以滑鼠第2鍵，即中鍵 (或對雙鍵滑鼠兩鍵同時按下)來開啟選單，否則，會用第3鍵(右"
-"鍵)代替."
-
-#: tips:240
 msgid "`Xterm Here' program"
 msgstr "預設的終端機程式:"
 
-#: tips:241 tips:242
+#: tips:240 tips:241
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "當你從選單選擇“終端機”這程式將被啟動"
 
-#: tips:243
+#: tips:242
 #, fuzzy
 msgid "Keyboard shortcuts"
 msgstr "設定熱鍵"
 
-#: tips:245
+#: tips:244
 #, fuzzy
 msgid "Executable files"
 msgstr "可執行檔"
 
-#: tips:246
+#: tips:245
 msgid "Ignore eXecutable bit for known extensions"
 msgstr "忽略已知紳延檔的執行性"
 
-#: tips:247 tips:248
+#: tips:246 tips:247
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -3390,11 +3454,11 @@ msgstr ""
 "你正在瀏覽一些MS-Windows的系統時，遇到某些在你的系統上沒法執行但 被標記為可執"
 "行的檔案，你便有需要忽略其可執行性."
 
-#: tips:249
+#: tips:248
 msgid "MIME types"
 msgstr ""
 
-#: tips:250
+#: tips:249
 #, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
@@ -3407,91 +3471,91 @@ msgstr ""
 "於每一常規的檔案，並會為每一檔案的類型配置一個合適的圖示.\n"
 "請在每次編輯檔案後，單擊“重新讀取”的按鈕，或重新啟動 ROX-Filer."
 
-#: tips:251 tips:252
+#: tips:250 tips:251
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
 msgstr "請以“設定圖示...”對話框來設定圖示的類型"
 
-#: tips:253
+#: tips:252
 msgid "Colours"
 msgstr "顏色"
 
-#: tips:254
+#: tips:253
 msgid "File type colours"
 msgstr "檔案類型顏色"
 
-#: tips:255
+#: tips:254
 msgid "Colour files based on their types"
 msgstr "基於檔案類型配色"
 
-#: tips:256
+#: tips:255
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr "檔案名稱(及詳述)會根據它的類型而配色"
 
-#: tips:257
+#: tips:256
 msgid "Directory:"
 msgstr "目錄"
 
-#: tips:258
+#: tips:257
 msgid "Regular file:"
 msgstr "常規檔"
 
-#: tips:259
+#: tips:258
 msgid "Pipe:"
 msgstr "管道"
 
-#: tips:260
+#: tips:259
 msgid "Socket:"
 msgstr "套節"
 
-#: tips:262 tips:263
+#: tips:261 tips:262
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr "錯誤，此連結所指向的是一個不存在或 你的權限不足以檢察的檔案."
 
-#: tips:264
+#: tips:263
 msgid "Character device:"
 msgstr "字符設備"
 
-#: tips:265
+#: tips:264
 msgid "Block device:"
 msgstr "區塊設備"
 
-#: tips:266
+#: tips:265
 msgid "Door:"
 msgstr "入口:"
 
-#: tips:267
+#: tips:266
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
 
-#: tips:268
+#: tips:267
 msgid "Executable file:"
 msgstr "可執行檔"
 
-#: tips:269
+#: tips:268
 msgid "Application directory:"
 msgstr "應用程式目錄"
 
-#: tips:270
+#: tips:269
 msgid "Unknown type:"
 msgstr "不明類型"
 
-#: tips:271
+#: tips:270
 msgid "Compatibility"
 msgstr "相容性"
 
-#: tips:272
+#: tips:271
 msgid "Window manager problems"
 msgstr ""
 
-#: tips:273
+#: tips:272
 msgid "Override window manager control of the pinboard and panels"
 msgstr ""
 
-#: tips:274
+#: tips:273
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -3500,22 +3564,22 @@ msgid ""
 "them appear in window-select lists."
 msgstr ""
 
-#: tips:275
+#: tips:274
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr ""
 
-#: tips:276
+#: tips:275
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
 "events to your window manager instead. Clicks on icons will not be forwarded."
 msgstr ""
 
-#: tips:277
+#: tips:276
 msgid "Blackbox root menus hack"
 msgstr ""
 
-#: tips:278 tips:279
+#: tips:277 tips:278
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -3523,15 +3587,15 @@ msgid ""
 "isn't necessary."
 msgstr ""
 
-#: tips:280
+#: tips:279
 msgid "Drag and drop"
 msgstr "滑鼠拖放"
 
-#: tips:281
+#: tips:280
 msgid "Don't use hostnames"
 msgstr "不用主機名稱"
 
-#: tips:282 tips:283 tips:284 tips:285
+#: tips:281 tips:282 tips:283 tips:284
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -3539,6 +3603,87 @@ msgid ""
 msgstr ""
 "某些舊的應用程式不完全支援拖放來執行的功能 此選項便須要開啟，以達致將檔案拖到"
 "當鼠標出現 a + 符號的應用程式上."
+
+#~ msgid "Permissions:"
+#~ msgstr "權限"
+
+#~ msgid "file(1) says..."
+#~ msgstr "檔案(1) 顯示..."
+
+#~ msgid "Help about ... ?"
+#~ msgstr "說明關於...?"
+
+#~ msgid ""
+#~ "Executable file:\n"
+#~ "This is a file with an eXecute bit set - it can be run as a program."
+#~ msgstr ""
+#~ "可執行檔:\n"
+#~ "此檔案包含了可執行特性"
+
+#~ msgid ""
+#~ "File:\n"
+#~ "This is a data file. Try using the Info menu item to find out more..."
+#~ msgstr ""
+#~ ":\n"
+#~ "這是一個資料文件.請以選單的`信息'來查閱..."
+
+#~ msgid ""
+#~ "Mount point:\n"
+#~ "A mount point is a directory which another filing system can be mounted "
+#~ "on. Everything on the mounted filesystem then appears to be inside the "
+#~ "directory."
+#~ msgstr ""
+#~ "掛載點:\n"
+#~ "掛載點為一個目錄,它用作掛入其他檔案系統的檔案."
+
+#~ msgid ""
+#~ "Device file:\n"
+#~ "Device files allow you to read from or write to a device driver as though "
+#~ "it was an ordinary file."
+#~ msgstr ""
+#~ "裝置檔:\n"
+#~ "裝置檔允許你透過驅動程式,寫入或讀取內部的檔案."
+
+#~ msgid ""
+#~ "Named pipe:\n"
+#~ "Pipes allow different programs to communicate. One program writes data to "
+#~ "the pipe while another one reads it out again."
+#~ msgstr ""
+#~ "名稱 pipe(管道):\n"
+#~ "Pipes(管道)允許不同的程式互通.程式將數據寫進管道並傳出至其他程式."
+
+#~ msgid ""
+#~ "Socket:\n"
+#~ "Sockets allow processes to communicate."
+#~ msgstr ""
+#~ "Socket(套節):\n"
+#~ "Sockets(套節)允許程序相互通訊."
+
+#~ msgid ""
+#~ "Unknown type:\n"
+#~ "I couldn't find out what kind of file this is. Maybe it doesn't exist "
+#~ "anymore or you don't have search permission on the directory it's in?"
+#~ msgstr ""
+#~ "不明的類型:\n"
+#~ "檔案的類型不明或檔案已不存在.亦可能是權限設定問題."
+
+#~ msgid ""
+#~ "Directory:\n"
+#~ "This is a directory. It contains an index to other items - open it to see "
+#~ "the list."
+#~ msgstr ""
+#~ "目錄:\n"
+#~ "這是一個目錄.它包含一個管理內部項目的索引."
+
+#~ msgid "Menu on button 2 (RISC OS style)"
+#~ msgstr "以滑鼠2(中)鍵啟動選單 (RISC OS 風格)"
+
+#~ msgid ""
+#~ "Use button 2, the middle button (click both buttons at once on two button "
+#~ "mice), to pop up the menu. If off, use button 3 (right) instead."
+#~ msgstr ""
+#~ "以滑鼠第2鍵，即中鍵 (或對雙鍵滑鼠兩鍵同時按下)來開啟選單，否則，會用第3鍵"
+#~ "(右鍵)代替."
 
 #~ msgid "Show name-to-type rules"
 #~ msgstr "顯示名稱類型的規則"

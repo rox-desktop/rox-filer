@@ -5,7 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.1\n"
-"POT-Creation-Date: 2003-05-29 12:05+0100\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2003-09-05 15:20+0100\n"
 "PO-Revision-Date: 2002-05-27 14:24+0200\n"
 "Last-Translator: Andras Mohari <mayday@freemail.hu>\n"
 "Language-Team: Hungarian <out of team>\n"
@@ -13,35 +14,35 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: abox.c:124
+#: abox.c:127
 msgid "<dir>"
 msgstr "<könyvtár>"
 
-#: abox.c:176
+#: abox.c:209
 msgid "_Quiet"
 msgstr "_Csendben"
 
-#: abox.c:184
+#: abox.c:218
 msgid "Quiet"
 msgstr "Csendben"
 
-#: abox.c:184
+#: abox.c:218
 msgid "Don't confirm every operation"
 msgstr "Nem kér megerõsítést minden mûvelethez"
 
-#: abox.c:409 tips:59
+#: abox.c:443 tips:60
 msgid "Name"
 msgstr "Név"
 
-#: abox.c:415 menu.c:230
+#: abox.c:449 menu.c:228
 msgid "Directory"
 msgstr "Könyvtár"
 
-#: abox.c:468
+#: abox.c:502
 msgid "Command:"
 msgstr "Parancs:"
 
-#: abox.c:499
+#: abox.c:533
 msgid "Expression:"
 msgstr "Kifejezés:"
 
@@ -149,26 +150,26 @@ msgstr ""
 "\n"
 "Lásd a chmod(1) parancs kézikönyvét további részletekért."
 
-#: action.c:351
+#: action.c:358
 msgid ""
 "\n"
 "Process terminated.\n"
 msgstr ""
 
-#: action.c:367
+#: action.c:374
 msgid "There was one error.\n"
 msgstr "Egyetlen hiba volt.\n"
 
-#: action.c:369
+#: action.c:376
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "%d hiba volt.\n"
 
-#: action.c:393
+#: action.c:400
 msgid "ERROR reading"
 msgstr "Olvasási HIBA:"
 
-#: action.c:436
+#: action.c:443
 msgid ""
 "'\n"
 "Done\n"
@@ -176,115 +177,134 @@ msgstr ""
 "'\n"
 "Kész\n"
 
-#: action.c:492 support.c:395
+#: action.c:499 support.c:395
 msgid "ERROR"
 msgstr "HIBA"
 
-#: action.c:645 main.c:579 main.c:587 main.c:595
+#: action.c:653 main.c:577 main.c:585 main.c:593
 msgid "Yes"
 msgstr "Igen"
 
-#: action.c:648 main.c:581 main.c:597
+#: action.c:656 main.c:579 main.c:595
 msgid "No"
 msgstr "Nem"
 
-#: action.c:666
+#: action.c:674
 msgid ""
 "\n"
 "Asking child process to terminate...\n"
 msgstr ""
 
-#: action.c:673
+#: action.c:681
 msgid ""
 "\n"
 "Trying to KILL run-away process...\n"
 msgstr ""
 
-#: action.c:826
+#: action.c:834
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?Megméred %s tartalmát?"
 
-#: action.c:858
+#: action.c:868
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?Törlöd?%s-> \"%s\""
 
-#: action.c:859
+#: action.c:869
 msgid "WRITE-PROTECTED "
 msgstr " (ÍRÁSVÉDETT) "
 
-#: action.c:864
+#: action.c:874
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'\"%s\" törlése\n"
 
-#: action.c:877
+#: action.c:887
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'Könyvtár törölve: \"%s\"\n"
 
-#: action.c:908 action.c:927
+#: action.c:919
+#, fuzzy, c-format
+msgid "?Eject '%s'?"
+msgstr "?Mehet \"%s\"?"
+
+#: action.c:924
+#, fuzzy, c-format
+msgid "'Eject '%s'\n"
+msgstr "'\"%s\" törlése\n"
+
+#: action.c:932
+#, fuzzy, c-format
+msgid ""
+"!%s\n"
+"eject failed\n"
+msgstr ""
+"!%s\n"
+"Sikertelen csatolás\n"
+
+#: action.c:949 action.c:968
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?Mehet \"%s\"?"
 
-#: action.c:924
+#: action.c:965
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!Érvénytelen keresési kifejezés - javítsd ki és próbáld újra\n"
 
-#: action.c:934
+#: action.c:975
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(\"%s\" feldolgozásakor)\n"
 
-#: action.c:1005 action.c:1028
+#: action.c:1048 action.c:1071
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?Módosítod \"%s\" engedélyeit?"
 
-#: action.c:1009
+#: action.c:1052
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'\"%s\" engedélyeinek módosítása\n"
 
-#: action.c:1026
+#: action.c:1069
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Érvénytelen módosítási parancs - javítsd ki és próbáld újra\n"
 
-#: action.c:1116
+#: action.c:1161
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?\"%s\" már létezik - %s?"
 
-#: action.c:1118
+#: action.c:1163
 msgid "merge contents"
 msgstr "összefésülöd a tartalmukat"
 
-#: action.c:1119
+#: action.c:1164
 msgid "overwrite"
 msgstr "felülírod"
 
-#: action.c:1135
+#: action.c:1180
 msgid "'Trying copy anyway...\n"
 msgstr "'Megpróbálom másolni...\n"
 
 # Ez nehéz ügy...
-#: action.c:1142
+#: action.c:1189
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?Másolod? %s -> %s"
 
-#: action.c:1146
+#: action.c:1193
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'%s másolása %s néven\n"
 
-#: action.c:1161
+#: action.c:1208
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!HIBA: A cél már létezik, de nem könyvtár\n"
 
-#: action.c:1233
+#: action.c:1280
 #, fuzzy, c-format
 msgid ""
 "!%s\n"
@@ -293,27 +313,27 @@ msgstr ""
 "!%s\n"
 "Nem sikerült \"%s\" másolása"
 
-#: action.c:1273
+#: action.c:1323
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?\"%s\" már létezik - felülírod?"
 
-#: action.c:1287
+#: action.c:1338
 msgid "'Trying move anyway...\n"
 msgstr "'Megpróbálom mozgatni...\n"
 
 # Ez is nehéz ügy...
-#: action.c:1293
+#: action.c:1346
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?Mozgatod? %s -> %s"
 
-#: action.c:1297
+#: action.c:1350
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'%s mozgatása %s néven\n"
 
-#: action.c:1305
+#: action.c:1358
 #, c-format
 msgid ""
 "!%s\n"
@@ -322,46 +342,46 @@ msgstr ""
 "!%s\n"
 "Nem sikerült %s mozgatása %s néven\n"
 
-#: action.c:1326
+#: action.c:1379
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!HIBA: Nem lehet önmagába másolni\n"
 
-#: action.c:1341
+#: action.c:1394
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!HIBA: Nem lehet önmagába mozgatni/átnevezni\n"
 
-#: action.c:1358
+#: action.c:1411
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'%s linkelése %s néven\n"
 
 # Ez túl hosszú.
-#: action.c:1360
+#: action.c:1416
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?Linkeled a(z) %s fájlt/könyvtárat %s néven?"
 
-#: action.c:1381
+#: action.c:1438
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'%s csatolása\n"
 
-#: action.c:1382
+#: action.c:1439
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'%s lecsatolása\n"
 
-#: action.c:1385
+#: action.c:1442
 #, c-format
 msgid "?Mount %s?"
 msgstr "?Csatolod? -> %s"
 
-#: action.c:1386
+#: action.c:1443
 #, c-format
 msgid "?Unmount %s?"
 msgstr "?Lecsatolod? -> %s"
 
-#: action.c:1406
+#: action.c:1463
 #, c-format
 msgid ""
 "!%s\n"
@@ -370,7 +390,7 @@ msgstr ""
 "!%s\n"
 "Sikertelen csatolás\n"
 
-#: action.c:1407
+#: action.c:1464
 #, c-format
 msgid ""
 "!%s\n"
@@ -379,7 +399,11 @@ msgstr ""
 "!%s\n"
 "Sikertelen lecsatolás\n"
 
-#: action.c:1446
+#: action.c:1472
+msgid "'(seems to be mounted now anyway)\n"
+msgstr ""
+
+#: action.c:1510
 #, c-format
 msgid ""
 "'\n"
@@ -388,175 +412,191 @@ msgstr ""
 "'\n"
 "Összesen: %s ("
 
-#: action.c:1452
+#: action.c:1516
 msgid "file"
 msgstr "fájl"
 
 # XXX: többes szám miatt baj lehet, de ez jelenleg így jó.
-#: action.c:1452
+#: action.c:1516
 msgid "files"
 msgstr "fájl"
 
-#: action.c:1456
+#: action.c:1520
 msgid "no directories)\n"
 msgstr "nincsenek könyvtárak)\n"
 
-#: action.c:1460
+#: action.c:1524
 msgid "directory"
 msgstr "könyvtár"
 
 # XXX: többes szám miatt baj lehet, de ez jelenleg így jó.
-#: action.c:1461
+#: action.c:1525
 msgid "directories"
 msgstr "könyvtár"
 
-#: action.c:1499
+#: action.c:1563
 msgid "!No mount points selected!\n"
 msgstr "!Nincs kijelölve csatolási pont!\n"
 
-#: action.c:1553
+#: action.c:1633
 msgid "?Another search?"
 msgstr "?Újabb keresés?"
 
-#: action.c:1575
+#: action.c:1655
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!\"%s\" egy szimbolikus link\n"
 
-#: action.c:1607
+#: action.c:1687
 msgid "You need to select some items to search through"
 msgstr "Ki kell jelölni néhány elemet a kereséshez"
 
-#: action.c:1617 menu.c:222
+#: action.c:1697 menu.c:220
 msgid "Find"
 msgstr "Keresés"
 
-#: action.c:1650
+#: action.c:1730
 msgid "You need to select some items to count"
 msgstr "Ki kell jelölnöd az elemeket a méretük megállapításához"
 
-#: action.c:1654
+#: action.c:1734
 msgid "Disk Usage"
 msgstr "Felhasznált lemezterület"
 
-#: action.c:1687
+#: action.c:1767
 msgid "Mount / Unmount"
 msgstr "Csatolás / Lecsatolás"
 
-#: action.c:1700
+#: action.c:1780
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr ""
 "Sajnos a ROX-Filer még nem támogatja csatolási pontokat ezen a rendszeren."
 
-#: action.c:1714 menu.c:209 tips:189
+#: action.c:1794 menu.c:208 tips:190
 msgid "Delete"
 msgstr "Törlés"
 
-#: action.c:1724 tips:195
+#: action.c:1804 tips:196
 msgid "Force"
 msgstr "Kényszerít"
 
-#: action.c:1724
+#: action.c:1804
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Nem kér megerõsítést a nem írható elemek törléséhez"
 
-#: action.c:1727 action.c:1782 tips:197
+#: action.c:1807 action.c:1862 tips:198
 msgid "Brief"
 msgstr "Tömör"
 
-#: action.c:1727
+#: action.c:1807
 msgid "Only log directories being deleted"
 msgstr "Csak a könyvtárak törlését listázza"
 
-#: action.c:1744
+#: action.c:1824
 msgid "You need to select the items whose permissions you want to change"
 msgstr "Ki kell jelölnöd az elemeket, amiknek az engedélyeit módosítani akarod"
 
-#: action.c:1752
+#: action.c:1832
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (Engedélyezi a végrehajást/elérést)"
 
-#: action.c:1754
+#: action.c:1834
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (Tiltja a végrehajtást/elérést)"
 
-#: action.c:1756
+#: action.c:1836
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (Olvasási+írási engedély a tulajdonosnak)"
 
-#: action.c:1758
+#: action.c:1838
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (Privát elérés)"
 
-#: action.c:1760
+#: action.c:1840
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Nyilvános elérés, írás tiltva)"
 
-#: action.c:1771 menu.c:185 menu.c:220 tips:77
+#: action.c:1851 menu.c:184 menu.c:218 tips:78
 msgid "Permissions"
 msgstr "Engedélyek"
 
-#: action.c:1782
+#: action.c:1862
 msgid "Don't list processed files"
 msgstr "Ne listázza a feldolgozott fájlokat"
 
-#: action.c:1785 tips:199
+#: action.c:1865 tips:200
 msgid "Recurse"
 msgstr "Rekurzív"
 
-#: action.c:1785
+#: action.c:1865
 msgid "Also change contents of subdirectories"
 msgstr "Az alkönyvtárak tartalmát is feldolgozza"
 
-#: action.c:1822 dnd.c:123 menu.c:1832 tips:183
+#: action.c:1902 dnd.c:123 menu.c:1877 tips:184
 msgid "Copy"
 msgstr "Másolás"
 
-#: action.c:1832 action.c:1865 tips:201
+#: action.c:1912 action.c:1945 tips:202
 msgid "Newer"
 msgstr "Újabb"
 
-#: action.c:1833 action.c:1866 tips:202 tips:203 tips:204 tips:205
+#: action.c:1913 action.c:1946 tips:203 tips:204 tips:205 tips:206
 msgid "Only over-write if source is newer than destination."
 msgstr "Csak akkor írja felül a célt, ha a forrás újabb nála."
 
-#: action.c:1855 dnd.c:124 tips:185
+#: action.c:1935 dnd.c:124 tips:186
 msgid "Move"
 msgstr "Mozgatás"
 
-#: action.c:1883 dnd.c:125 tips:187
+#: action.c:1963 dnd.c:125 tips:188
 msgid "Link"
 msgstr "Linkelés"
 
-#: action.c:1940
+#: action.c:1982 appmenu.c:258
+msgid "Eject"
+msgstr ""
+
+#: action.c:2039
 msgid "Deleting items such as "
 msgstr "Az ehhez hasonló elemeknek ("
 
-#: action.c:1944
+#: action.c:2043
 msgid "Deleting the item "
 msgstr "Ennek az elemnek ("
 
-#: action.c:1946
+#: action.c:2045
 msgid "Deleting the items "
 msgstr "Ezeknek az elemeknek ("
 
-#: action.c:1965
+#: action.c:2064
 msgid " and "
 msgstr " és "
 
-#: action.c:1974
+#: action.c:2073
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
 ") a törlése hatással van a pinboard vagy panel elemeire. Tényleg törlöd?"
 
-#: action.c:1981
+#: action.c:2080
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 ") a törlése hatással van a pinboard vagy panel elemeire. Tényleg törlöd õket?"
 
-#: appmenu.c:198
+#: appmenu.c:182
 msgid "<missing label>"
 msgstr "<hiányzó címke>"
+
+#: appmenu.c:263
+msgid "Format"
+msgstr ""
+
+#: appmenu.c:267
+msgid "Free Space"
+msgstr ""
+
+#: appmenu.c:307 menu.c:246 toolbar.c:158
+msgid "Help"
+msgstr "Segítség"
 
 #: bookmarks.c:277
 #, c-format
@@ -600,36 +640,36 @@ msgid "Recently Visited"
 msgstr ""
 
 # FIXME (mondjuk az angol szöveg is lehetne jobb...)
-#: dir.c:924
+#: dir.c:926
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "stat() hiba a könyvtáron: %s"
 
-#: dir.c:933
+#: dir.c:935
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Nem sikerült megnyitni a könyvtárat: %s"
 
-#: display.c:557
+#: display.c:568
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) hiba: %s"
 
-#: dnd.c:412
+#: dnd.c:414
 msgid "Internal error - bad info type"
 msgstr "Belsõ hiba - rossz infó típus"
 
-#: dnd.c:549
+#: dnd.c:551
 msgid "Drag a directory here to bookmark it."
 msgstr ""
 
 # leafname = ???
-#: dnd.c:564
+#: dnd.c:566
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "XDS protokoll hiba: a fájlnévben nem lehet '/'\n"
 
 # leafname = ???
-#: dnd.c:587
+#: dnd.c:586
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
@@ -637,65 +677,65 @@ msgstr ""
 "Az XdndDirectSave0 cél meg van adva, de a text/plain típusú XdndDirectSave0 "
 "atom nem tartalmazott fájlnevet\n"
 
-#: dnd.c:598
+#: dnd.c:597
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Sajnálom, csak text/uri-list vagy XdndDirectSave0 típusú célt fogadok."
 
-#: dnd.c:601
+#: dnd.c:600
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 "Sajnálom, csak text/uri-list vagy application/octet-stream típusú célt "
 "fogadok."
 
-#: dnd.c:700
+#: dnd.c:701
 msgid "Unknown target"
 msgstr "Ismeretlen cél"
 
 # FIXME: a "won't" -> "nem akar" nem igazán jó...
-#: dnd.c:733
+#: dnd.c:734
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "Sajnos a távoli alkalmazás nem tud vagy nem akar adatot küldeni"
 
-#: dnd.c:746
+#: dnd.c:747
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "XDS protokoll hiba: a visszatérési érték csak 'S', 'F' vagy 'E' lehet\n"
 
-#: dnd.c:779
+#: dnd.c:780
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Sajnálom, távoli fájloknál / nyers adatoknál nem jeleníthetõ meg a mûveleti "
 "menü."
 
-#: dnd.c:795
+#: dnd.c:796
 msgid "UntitledData"
 msgstr "NevtelenAdat"
 
-#: dnd.c:822
+#: dnd.c:823
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Hiba a fájl mentésekor: %s"
 
 # XXX: "nothing to do" -> gondolom "nincs mit tenni" URI hiányában.
 # A "nincs mit tenni" nem a legjobb...
-#: dnd.c:863
+#: dnd.c:865
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Nem tartalmaz URI-t a text/uri-list (nincs mit tenni!)"
 
-#: dnd.c:887
+#: dnd.c:889
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Nem lehet adatokat fogadni a távoli géprõl (application/octet-stream nincs "
 "megadva)"
 
-#: dnd.c:908
+#: dnd.c:912
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr "A fájlok közül néhány egy másik gépen van - ezek sajnos kimaradnak"
 
-#: dnd.c:915
+#: dnd.c:919
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -703,11 +743,11 @@ msgstr ""
 "Egyik fájl sincs a helyi gépen. Sajnos nem tudok egyszerre több távoli "
 "fájllal dolgozni."
 
-#: dnd.c:928
+#: dnd.c:932
 msgid "Unknown action requested"
 msgstr "Ismeretlen mûvelet-kérés"
 
-#: dnd.c:936
+#: dnd.c:940
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Hiba a fájl-lista lekérdezésekor: %s"
@@ -742,7 +782,7 @@ msgstr ""
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr ""
 
-#: dropbox.c:283 pinboard.c:690
+#: dropbox.c:283 pinboard.c:735
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -776,7 +816,7 @@ msgid ""
 "Unmounting a device makes it safe to remove the disk."
 msgstr ""
 
-#: filer.c:383 menu.c:831
+#: filer.c:383 menu.c:874
 msgid "Unmount"
 msgstr "Lecsatolás"
 
@@ -805,43 +845,43 @@ msgstr "Nem érhetõ el a könyvtár: \"%s\""
 msgid "Directory '%s' not found."
 msgstr "Nem található a könyvtár: \"%s\""
 
-#: filer.c:1431
+#: filer.c:1432
 msgid "Cancel"
 msgstr "Mégsem"
 
-#: filer.c:1672
+#: filer.c:1678
 msgid "S"
 msgstr "O"
 
-#: filer.c:1673
+#: filer.c:1679
 msgid "A"
 msgstr "M"
 
-#: filer.c:1674
+#: filer.c:1680
 msgid "T"
 msgstr "I"
 
-#: filer.c:1680
+#: filer.c:1686
 msgid "Scanning, "
 msgstr "Olvasás, "
 
-#: filer.c:1681
+#: filer.c:1687
 msgid "All, "
 msgstr "Mind, "
 
-#: filer.c:1682
+#: filer.c:1688
 msgid "Thumbs, "
 msgstr "Index, "
 
-#: filer.c:1951
+#: filer.c:1957
 msgid "Symbolic link to "
 msgstr "Szimbolikus link -> "
 
-#: filer.c:1982
+#: filer.c:1988
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Ez a fájlnév nem UTF-8 kódolású. Ha lehet, nevezd át.\n"
 
-#: filer.c:2286 menu.c:1822
+#: filer.c:2295 menu.c:1867
 msgid "Item no longer exists!"
 msgstr "Az elem már nem létezik!"
 
@@ -1068,7 +1108,7 @@ msgstr ""
 "Dobd az ikont egy könyvtárablakba\n"
 "(vagy írj be egy teljes nevet)"
 
-#: gui_support.c:292
+#: gui_support.c:290
 msgid ""
 "\n"
 "---\n"
@@ -1076,13 +1116,13 @@ msgstr ""
 "\n"
 "---\n"
 
-#: gui_support.c:361
+#: gui_support.c:359
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr ""
 "A beolvasandó szöveges fájl egy XML dokumentum. A fájl (%s) sérült lehet."
 
-#: gui_support.c:378
+#: gui_support.c:376
 #, c-format
 msgid ""
 "Error in '%s' file at line %d: \n"
@@ -1097,11 +1137,11 @@ msgstr ""
 "Nyisd meg a Beállítások ablakot és kattints a Mentés gombra.\n"
 "A további hibákat figyelmen kívül hagyom."
 
-#: gui_support.c:951
+#: gui_support.c:950
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "Helytelen vagy hiányzik a sortörés a text/uri-list adatokban"
 
-#: gui_support.c:1020
+#: gui_support.c:1022
 msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
@@ -1119,222 +1159,276 @@ msgstr ""
 msgid "(click to set)"
 msgstr ""
 
-#: icon.c:134
+#: icon.c:133
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:135 menu.c:249
+#: icon.c:134 menu.c:247
 #, fuzzy
 msgid "About ROX-Filer..."
 msgstr "ROX-Filer"
 
-#: icon.c:136 menu.c:250
+#: icon.c:135 menu.c:248
 #, fuzzy
 msgid "Show Help Files"
 msgstr "Segítség"
 
-#: icon.c:137 menu.c:251
+#: icon.c:136 menu.c:249
 msgid "Manual"
 msgstr ""
 
-#: icon.c:139 menu.c:228
+#: icon.c:138 menu.c:226
 msgid "Options..."
 msgstr "Beállítások..."
 
-#: icon.c:140 menu.c:236
+#: icon.c:139 menu.c:234
 msgid "Home Directory"
 msgstr "Home könyvtár"
 
-#: icon.c:141 icon.c:903 menu.c:205 type.c:211
+#: icon.c:140 icon.c:897 menu.c:204 type.c:211
 msgid "File"
 msgstr "Fájl"
 
-#: icon.c:142 menu.c:212 menu.c:844
+#: icon.c:141 menu.c:210 menu.c:887
 msgid "Shift Open"
 msgstr "Megnyitás (Shift)"
 
-#: icon.c:143 menu.c:211 menu.c:248 toolbar.c:145
-msgid "Help"
-msgstr "Segítség"
-
-#: icon.c:144 menu.c:218
+#: icon.c:142 menu.c:216
 msgid "Info"
 msgstr "Infó"
 
-#: icon.c:145 menu.c:216
+#: icon.c:143 menu.c:214
 msgid "Set Run Action..."
 msgstr "Program hozzárendelése..."
 
-#: icon.c:146 menu.c:217
+#: icon.c:144 menu.c:215
 msgid "Set Icon..."
 msgstr "Ikon hozzárendelése..."
 
-#: icon.c:147 icon.c:773
+#: icon.c:145 icon.c:767
 msgid "Edit Item"
 msgstr "Elem szerkesztése"
 
 # Nem valami jó...
-#: icon.c:148
+#: icon.c:146
 msgid "Show Location"
 msgstr "Hely megmutatása"
 
-#: icon.c:149
+#: icon.c:147
 msgid "Remove Item(s)"
 msgstr "Elem(ek) törlése"
 
-#: icon.c:151
+#: icon.c:149
 msgid "Backdrop..."
 msgstr "Háttér..."
 
-#: icon.c:276
+#: icon.c:274
 msgid "Nothing"
 msgstr "Semmi"
 
-#: icon.c:505
+#: icon.c:502
 msgid "The location must contain at least one character!"
 msgstr "Az elérési út nem maradhat üresen!"
 
-#: icon.c:577
+#: icon.c:574
 msgid "You must first select some items to remove"
 msgstr "Elõbb jelöld ki a törlendõ elemeket"
 
-#: icon.c:591
+#: icon.c:588
 msgid "You must open the menu over an item"
 msgstr "A menüt elem felett kell megnyitni"
 
-#: icon.c:619 menu.c:1193
+#: icon.c:613 menu.c:1239
 msgid "You can only set the run action for a regular file"
 msgstr "Programot csak közönséges fájlhoz lehet hozzárendelni"
 
-#: icon.c:705
+#: icon.c:699
 msgid "Press the desired shortcut (eg, Control+F1)"
 msgstr ""
 
-#: icon.c:727
+#: icon.c:721
 msgid "Failed to get keyboard grab!"
 msgstr ""
 
-#: icon.c:776
+#: icon.c:770
 msgid "Clicking the icon opens:"
 msgstr "Az ikonhoz rendelt útvonal:"
 
-#: icon.c:790
+#: icon.c:784
 msgid "The text displayed under the icon is:"
 msgstr "Az ikon alatt megjelenõ szöveg:"
 
-#: icon.c:803
+#: icon.c:797
 #, fuzzy
 msgid "The keyboard shortcut is:"
 msgstr "Billentyûk hozzárendelése"
 
-#: infobox.c:91
+#: infobox.c:108
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr ""
 
-#: infobox.c:92
+#: infobox.c:109
 #, fuzzy
 msgid "Show Info"
 msgstr "Infó"
 
-#: infobox.c:114 menu.c:747
+#: infobox.c:131 menu.c:788
 msgid "(bad utf-8)"
 msgstr ""
 
-#: infobox.c:265
+#: infobox.c:273
 #, fuzzy
 msgid "Show _Help Files"
 msgstr "Segítség"
 
-#: infobox.c:376 tips:261
+#: infobox.c:283
+#, fuzzy
+msgid "<b>Permissions</b>"
+msgstr "Engedélyek"
+
+#: infobox.c:296
+msgid "<b>Contents indicate...</b>"
+msgstr ""
+
+#: infobox.c:424 infobox.c:497 support.c:349
+msgid "bytes"
+msgstr "byte"
+
+#: infobox.c:477 tips:260
 msgid "Error:"
 msgstr "Hiba:"
 
-#: infobox.c:383
+#: infobox.c:484
 #, fuzzy
 msgid "Real directory:"
 msgstr "könyvtár"
 
-#: infobox.c:386
+#: infobox.c:487
 msgid "Owner, Group:"
 msgstr "Tulaj., Csoport:"
 
-#: infobox.c:392
+#: infobox.c:493 infobox.c:505
 msgid "Size:"
 msgstr "Méret:"
 
-#: infobox.c:396 support.c:349
-msgid "bytes"
-msgstr "byte"
+#: infobox.c:505
+#, fuzzy
+msgid "Scanning"
+msgstr "Olvasás, "
+
+#: infobox.c:519
+#, fuzzy
+msgid "Failed to scan"
+msgstr "Nem sikerült gyerek processzt létrehozni"
 
 # Khm, egyáltalán van erre _jó_ magyar fordítás? A Midnight Commanderben
 # használt "Létrehozási idõ" sem a legjobb, ráadásul megtévesztõ.
-#: infobox.c:399
+#: infobox.c:525
 msgid "Change time:"
 msgstr "Változtatási idõ:"
 
-#: infobox.c:401
+#: infobox.c:527
 msgid "Modify time:"
 msgstr "Módosítási idõ:"
 
-#: infobox.c:403
+#: infobox.c:529
 msgid "Access time:"
 msgstr "Hozzáférési idõ:"
 
-#: infobox.c:405
-msgid "Permissions:"
-msgstr "Engedélyek:"
-
-#: infobox.c:407
+#: infobox.c:531
 msgid "Type:"
 msgstr "Típus:"
 
-#: infobox.c:413
+#: infobox.c:537
 msgid "Run action:"
 msgstr "Hozzárendelt program:"
 
-#: infobox.c:504
-msgid "file(1) says..."
-msgstr "A file(1) szerint..."
-
-#: infobox.c:505
+#: infobox.c:627
 msgid "<nothing yet>"
 msgstr "<még nincs kész>"
 
-#: infobox.c:577
+#: infobox.c:697
 #, c-format
 msgid "file(1) says... %s"
 msgstr "A file(1) szerint... %s"
 
-#: infobox.c:621
+#: infobox.c:752
+#, fuzzy, c-format
+msgid "Could not change permissions: %s"
+msgstr "Nem sikerült menteni a beállításokat: %s"
+
+#: infobox.c:771
+#, fuzzy
+msgid "Owner"
+msgstr "Újabb"
+
+#: infobox.c:773
+msgid "Group"
+msgstr ""
+
+#: infobox.c:775
+msgid "World"
+msgstr ""
+
+#: infobox.c:778
+#, fuzzy
+msgid "Read"
+msgstr "Átnevezés"
+
+#: infobox.c:780
+#, fuzzy
+msgid "Write"
+msgstr "elem"
+
+#: infobox.c:782
+msgid "Exec"
+msgstr ""
+
+#: infobox.c:798
+#, fuzzy
+msgid "SUID"
+msgstr "IsSUID"
+
+#: infobox.c:806
+#, fuzzy
+msgid "SGID"
+msgstr "IsSGID"
+
+#: infobox.c:814
+#, fuzzy
+msgid "Sticky"
+msgstr "IsSticky"
+
+#: infobox.c:845
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Szimbolikus link -> %s"
 
-#: infobox.c:627
+#: infobox.c:851
 msgid "Symbolic link"
 msgstr "Szimbolikus link"
 
-#: infobox.c:631
+#: infobox.c:855
 msgid "ROX application"
 msgstr "ROX alkalmazás"
 
-#: infobox.c:639
+#: infobox.c:863
 #, fuzzy
 msgid "mounted"
 msgstr "Lecsatolás"
 
-#: infobox.c:639
+#: infobox.c:863
 #, fuzzy
 msgid "unmounted"
 msgstr "Lecsatolás"
 
-#: infobox.c:643
+#: infobox.c:867
 #, fuzzy, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Csatolási pont"
 
-#: infobox.c:646
+#: infobox.c:870
 #, fuzzy, c-format
 msgid "Mount point (%s)"
 msgstr "Csatolási pont"
@@ -1440,262 +1534,267 @@ msgstr ""
 msgid "Running as user '%s'"
 msgstr "Felhasználó: \"%s\""
 
-#: main.c:571
+#: main.c:569
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr ""
 
-#: main.c:572
+#: main.c:570
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr ""
 
-#: main.c:576
+#: main.c:574
 msgid "features set at compile time"
 msgstr "fordításkor beállított támogatások"
 
 # XXX: van jó fordítás az LFS-re?
-#: main.c:577
+#: main.c:575
 msgid "Large File Support"
 msgstr "Nagy fájlok támogatása"
 
-#: main.c:585
+#: main.c:583
 msgid "GNOME-VFS library"
 msgstr "GNOME-VFS könyvtár"
 
-#: main.c:589
+#: main.c:587
 msgid "No (gnome-vfs-config not found)"
 msgstr "Nem (hiányzott a gnome-vfs-config)"
 
-#: main.c:593
+#: main.c:591
 msgid "Dnotify support"
 msgstr ""
 
-#: menu.c:181 tips:51
+#: menu.c:180 tips:52
 msgid "Display"
 msgstr "Nézet"
 
-#: menu.c:182 tips:56
+#: menu.c:181 tips:57
 #, fuzzy
 msgid "Icons View"
 msgstr "Ikonméret:"
 
-#: menu.c:183
+#: menu.c:182
 #, fuzzy
 msgid "Icons, With..."
 msgstr "Óriás ikonok és..."
 
-#: menu.c:184 tips:76
+#: menu.c:183 tips:77
 msgid "Sizes"
 msgstr "Méretek"
 
-#: menu.c:186 tips:244
+#: menu.c:185 tips:243
 msgid "Types"
 msgstr "Típusok"
 
-#: menu.c:187 tips:79
+#: menu.c:186 tips:80
 msgid "Times"
 msgstr "Dátumok"
 
-#: menu.c:188 tips:57 tips:94
+#: menu.c:187 tips:58 tips:95
 msgid "List View"
 msgstr ""
 
-#: menu.c:190
+#: menu.c:189
 #, fuzzy
 msgid "Bigger Icons"
 msgstr "Óriás ikonok"
 
-#: menu.c:191
+#: menu.c:190
 #, fuzzy
 msgid "Smaller Icons"
 msgstr "Kis ikonok"
 
-#: menu.c:192 tips:73
+#: menu.c:191 tips:74
 msgid "Automatic"
 msgstr ""
 
-#: menu.c:194
+#: menu.c:193
 msgid "Sort by Name"
 msgstr "Rendezés név szerint"
 
-#: menu.c:195
+#: menu.c:194
 msgid "Sort by Type"
 msgstr "Rendezés típus szerint"
 
-#: menu.c:196
+#: menu.c:195
 msgid "Sort by Date"
 msgstr "Rendezés dátum szerint"
 
-#: menu.c:197
+#: menu.c:196
 msgid "Sort by Size"
 msgstr "Rendezés méret szerint"
 
-#: menu.c:198
+#: menu.c:197
 #, fuzzy
 msgid "Sort by Owner"
 msgstr "Rendezés méret szerint"
 
-#: menu.c:199
+#: menu.c:198
 #, fuzzy
 msgid "Sort by Group"
 msgstr "Rendezés típus szerint"
 
-#: menu.c:200
+#: menu.c:199
 #, fuzzy
 msgid "Reversed"
 msgstr "_Visszavon"
 
-#: menu.c:202
+#: menu.c:201
 msgid "Show Hidden"
 msgstr "Rejtett fájlok mutatása"
 
-#: menu.c:203
+#: menu.c:202
 msgid "Show Thumbnails"
 msgstr "Indexképek mutatása"
 
-#: menu.c:204
+#: menu.c:203
 msgid "Refresh"
 msgstr "Frissítés"
 
-#: menu.c:206
+#: menu.c:205
 msgid "Copy..."
 msgstr "Másolás..."
 
-#: menu.c:207
+#: menu.c:206
 msgid "Rename..."
 msgstr "Átnevezés..."
 
-#: menu.c:208
+#: menu.c:207
 msgid "Link..."
 msgstr "Linkelés..."
 
-#: menu.c:213
+#: menu.c:211
 msgid "Open AVFS"
 msgstr "AVFS megnyitása"
 
-#: menu.c:214
+#: menu.c:212
 msgid "Send To..."
 msgstr "Küldés..."
 
-#: menu.c:219
+#: menu.c:217
 #, fuzzy
 msgid "Count"
 msgstr "Csatolás"
 
-#: menu.c:223
+#: menu.c:221 toolbar.c:154
 msgid "Select"
 msgstr "Kijelölés"
 
-#: menu.c:224
+#: menu.c:222
 msgid "Select All"
 msgstr "Mindent kijelöl"
 
-#: menu.c:225
+#: menu.c:223
 msgid "Clear Selection"
 msgstr "Kijelölést megszüntet"
 
-#: menu.c:226
+#: menu.c:224
 msgid "Invert Selection"
 msgstr "Kijelölést megfordít"
 
-#: menu.c:227
+#: menu.c:225
 msgid "Select If..."
 msgstr "Feltételes kijelölés..."
 
-#: menu.c:229
+#: menu.c:227
 msgid "New"
 msgstr "Új"
 
-#: menu.c:231
+#: menu.c:229
 msgid "Blank file"
 msgstr "Üres fájl"
 
-#: menu.c:232 tasklist.c:286
+#: menu.c:230 tasklist.c:286
 msgid "Window"
 msgstr "Ablak"
 
-#: menu.c:233
+#: menu.c:231
 msgid "Parent, New Window"
 msgstr "Szülõ, új ablakba"
 
-#: menu.c:234
+#: menu.c:232
 msgid "Parent, Same Window"
 msgstr "Szülõ, ebbe az ablakba"
 
-#: menu.c:235
+#: menu.c:233
 msgid "New Window"
 msgstr "Új ablak"
 
-#: menu.c:237
+#: menu.c:235
 msgid "Show Bookmarks"
 msgstr ""
 
-#: menu.c:238
+#: menu.c:236
 msgid "Follow Symbolic Links"
 msgstr "Szimlinkek követése"
 
-#: menu.c:239
+#: menu.c:237
 msgid "Resize Window"
 msgstr "Ablak átméretezése"
 
-#: menu.c:242
+#: menu.c:240
 msgid "Close Window"
 msgstr "Ablak bezárása"
 
-#: menu.c:244
+#: menu.c:242
 msgid "Enter Path..."
 msgstr "Útvonal megadása..."
 
-#: menu.c:245
+#: menu.c:243
 msgid "Shell Command..."
 msgstr "Shell parancs..."
 
-#: menu.c:246
+#: menu.c:244
 msgid "Xterm Here"
 msgstr "Terminál"
 
-#: menu.c:247
+#: menu.c:245
 msgid "Switch to xterm"
 msgstr ""
 
-#: menu.c:696
+#: menu.c:737
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr ""
 "Ha fájlokat akarsz küldeni egy alkalmazásnak, akkor a Shift+menü kattintást "
 "fájlok felett használd."
 
-#: menu.c:732
+#: menu.c:773
 msgid "Next Click"
 msgstr "Következõ kattintás"
 
-#: menu.c:754
+#: menu.c:783
+#, c-format
+msgid "%s '%s'"
+msgstr ""
+
+#: menu.c:795
 #, c-format
 msgid "%d items"
 msgstr "%d elem"
 
-#: menu.c:833
+#: menu.c:876
 #, fuzzy
 msgid "Open unmounted"
 msgstr "Lecsatolás"
 
-#: menu.c:836
+#: menu.c:879
 msgid "Show Target"
 msgstr "Cél mutatása"
 
-#: menu.c:838
+#: menu.c:881
 msgid "Look Inside"
 msgstr "Könyvtár megnyitása"
 
-#: menu.c:840
+#: menu.c:883
 msgid "Open As Text"
 msgstr "Megnyitás szövegfájlként"
 
-#: menu.c:1008
+#: menu.c:1051
 msgid "_Relative link"
 msgstr "_Relatív link"
 
-#: menu.c:1014
+#: menu.c:1057
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1708,42 +1807,42 @@ msgstr ""
 "Kikapcsolt állapotban a cél teljes útvonalát tárolja. Akkor hasznos, ha a "
 "szimlink bárhol lehet, de a cél a helyén marad."
 
-#: menu.c:1081
+#: menu.c:1127
 msgid "New pathname is not absolute"
 msgstr "Az új elérési út nem abszolút útvonal"
 
-#: menu.c:1147
+#: menu.c:1193
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr "A szimlink (%s) már létezik. Kicseréled a célját az új célra (%s)?"
 
-#: menu.c:1153
+#: menu.c:1199
 msgid "_Replace"
 msgstr "C_sere"
 
-#: menu.c:1284 menu.c:1325 menu.c:1385
+#: menu.c:1330 menu.c:1371 menu.c:1431
 msgid "Create"
 msgstr "Létrehozás"
 
-#: menu.c:1285
+#: menu.c:1331
 msgid "NewDir"
 msgstr "UjKonyvtar"
 
-#: menu.c:1299 menu.c:1305
+#: menu.c:1345 menu.c:1351
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Hiba \"%s\" létrehozásakor: %s"
 
-#: menu.c:1326
+#: menu.c:1372
 msgid "NewFile"
 msgstr "UjFajl"
 
-#: menu.c:1344
+#: menu.c:1390
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "Hiba a fájl létrehozásakor: nincs meg hozzá a sablon (%s)"
 
-#: menu.c:1415
+#: menu.c:1461
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1772,7 +1871,7 @@ msgstr ""
 "megfelelõ fájltípusnál jelennek meg. A \".group\" csak több kijelölt fájl "
 "esetén jelenik meg."
 
-#: menu.c:1426
+#: menu.c:1472
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -1780,20 +1879,20 @@ msgstr ""
 "Most meg lesz nyitva a saját \"Küldés\" (SendTo) könyvtárad, amiben "
 "létrehozhatsz szimlinkeket a kívánt alkalmazásokra (Ctrl+Shift-tel húzással)."
 
-#: menu.c:1429
+#: menu.c:1475
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "Sajnos a CHOICESPATH változó tiltja a beállítások mentését."
 
-#: menu.c:1506
+#: menu.c:1552
 msgid "Customise"
 msgstr "Szerkesztés"
 
 # FIXME linkmentes
-#: menu.c:1571
+#: menu.c:1617
 msgid "This is already the canonical name for this directory."
 msgstr "Ez már a könyvtár \"linkmentes\" neve."
 
-#: menu.c:1602
+#: menu.c:1648
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1801,76 +1900,72 @@ msgstr ""
 "Nem lehet másik ablakban is megnyitni ezt a könyvtárat, mert az \"Egyedi "
 "ablakok\" beállítás engedélyezve van."
 
-#: menu.c:1721
+#: menu.c:1769
 msgid "Copy ... ?"
 msgstr "Mit másolsz?"
 
-#: menu.c:1724
+#: menu.c:1772
 msgid "Rename ... ?"
 msgstr "Mit nevezel át?"
 
-#: menu.c:1727
+#: menu.c:1775
 msgid "Symlink ... ?"
 msgstr "Mit linkelsz?"
 
-#: menu.c:1730
+#: menu.c:1778
 msgid "Shift Open ... ?"
 msgstr "Mit nyitsz meg (Shift)?"
 
-#: menu.c:1733
-msgid "Help about ... ?"
-msgstr "Mihez kérsz segítséget?"
-
-#: menu.c:1736
+#: menu.c:1781
 msgid "Examine ... ?"
 msgstr "Mirõl kérsz információt?"
 
-#: menu.c:1739
+#: menu.c:1784
 msgid "Set run action for ... ?"
 msgstr "Mihez rendelsz programot?"
 
-#: menu.c:1742
+#: menu.c:1787
 msgid "Set icon for ... ?"
 msgstr "Mihez rendelsz ikont?"
 
-#: menu.c:1745
+#: menu.c:1790
 msgid "Send ... to ... ?"
 msgstr "Mit küldesz?"
 
-#: menu.c:1748
+#: menu.c:1793
 msgid "DELETE ... ?"
 msgstr "Mit TÖRÖLSZ?"
 
-#: menu.c:1751
+#: menu.c:1796
 msgid "Count the size of ... ?"
 msgstr "Minek a méretét akarod tudni?"
 
-#: menu.c:1754
+#: menu.c:1799
 msgid "Set permissions on ... ?"
 msgstr "Minek az engedélyeit módosítod?"
 
-#: menu.c:1757
+#: menu.c:1802
 msgid "Search inside ... ?"
 msgstr "Hol akarsz keresni?"
 
 # VFS megnyitásakor kérdezi, ha nincs kijelölve semmi.
-#: menu.c:1760
+#: menu.c:1805
 msgid "Look inside ... ?"
 msgstr "Mit nyitsz meg VFS-ként?"
 
-#: menu.c:1805
+#: menu.c:1850
 msgid "You cannot do this to more than one item at a time"
 msgstr "Ezt egyszerre csak egy elemmel lehet megtenni"
 
-#: menu.c:1837
+#: menu.c:1882
 msgid "Rename"
 msgstr "Átnevezés"
 
-#: menu.c:1842
+#: menu.c:1887
 msgid "Symlink"
 msgstr "Szimlink"
 
-#: menu.c:1877
+#: menu.c:1919
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1886,7 +1981,7 @@ msgstr ""
 "2) add ezt a sort a ~/.gtkrc-2.0 fájlhoz:\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1887
+#: menu.c:1929
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1907,7 +2002,7 @@ msgstr ""
 "késõbbiekben a menü megnyitása nélkül is elérhetõ lesz a billentyû "
 "segítségével."
 
-#: menu.c:1902
+#: menu.c:1944
 msgid "Set keyboard shortcuts"
 msgstr "Billentyûk hozzárendelése"
 
@@ -2006,16 +2101,16 @@ msgstr ""
 msgid "Missing < or > in panel config file"
 msgstr "Hiányzó < vagy > a panel konfigurációs fájlban"
 
-#: panel.c:1206
+#: panel.c:1215
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "Hiba a panel (%s) mentésekor: %s"
 
-#: panel.c:1509
+#: panel.c:1518
 msgid "Applet quit without ever creating a widget!"
 msgstr "Az applet kilépett mielõtt megjelent volna!"
 
-#: panel.c:1594
+#: panel.c:1612
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2024,18 +2119,18 @@ msgstr ""
 "Hiba az applet futtatásakor:\n"
 "%s"
 
-#: pinboard.c:338
+#: pinboard.c:337
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "A régi pinboard fájl az új XML formátumba lett alakítva."
 
-#: pinboard.c:540
+#: pinboard.c:539
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
 
-#: pinboard.c:559
+#: pinboard.c:558
 #, fuzzy
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
@@ -2047,76 +2142,84 @@ msgstr ""
 "Háttérnek csak kép, vagy pedig a ROX-Filer hátterét kezelni képes program "
 "adható meg."
 
-#: pinboard.c:579
+#: pinboard.c:578
 msgid "Set backdrop"
 msgstr "Háttér beállítása"
 
-#: pinboard.c:590
+#: pinboard.c:589
 msgid "Choose a style and drag an image in:"
 msgstr ""
 
-#: pinboard.c:603
+#: pinboard.c:602
 #, fuzzy
 msgid "Centre the image without scaling it"
 msgstr "Megerõsítõ kérdés nélkül kezdi a fájlok törlését."
 
-#: pinboard.c:604
+#: pinboard.c:603
 #, fuzzy
 msgid "Centre"
 msgstr "Középen"
 
-#: pinboard.c:605
+#: pinboard.c:604
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr ""
 
 # FIXME: ki tud jobbat?
-#: pinboard.c:607
+#: pinboard.c:606
 #, fuzzy
 msgid "Scale"
 msgstr "Átméretezve"
 
-#: pinboard.c:608
+#: pinboard.c:607
 msgid "Stretch the image to fill the backdrop area"
 msgstr ""
 
-#: pinboard.c:609
+#: pinboard.c:608
 #, fuzzy
 msgid "Stretch"
 msgstr "Francia"
 
-#: pinboard.c:610
+#: pinboard.c:609
 msgid "Tile the image over the backdrop area"
 msgstr ""
 
-#: pinboard.c:611
+#: pinboard.c:610
 #, fuzzy
 msgid "Tile"
 msgstr "Tapétaként"
 
-#: pinboard.c:616
+#: pinboard.c:615
 msgid "Drop an image here"
 msgstr "Dobj ide egy képet"
 
-#: pinboard.c:703
+#: pinboard.c:676
+msgid ""
+"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
+"-p=Default' to turn it on in future."
+msgstr ""
+"Nem volt használatban pinboard... kijelöltem a \"Default\" nevû pinboardot. "
+"Ezt a késõbbiekben a \"rox -p=Default\" paranccsal használhatod."
+
+#: pinboard.c:748
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr "Csak fájlok (és bizonyos alkalmazások) adhatók meg háttérképnek."
 
-#: pinboard.c:1306
+#: pinboard.c:1351
 msgid "Missing '>' in icon label"
 msgstr "Hiányzó \">\" az ikon címkéjében"
 
-#: pinboard.c:1315
+#: pinboard.c:1360
 msgid "Missing ',' after icon label"
 msgstr "Hiányzik a \",\" az ikon címkéje után"
 
-#: pinboard.c:1398
+#: pinboard.c:1443
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Hiba a pinboard (%s) mentésekor: %s"
 
-#: pinboard.c:2018
+#: pinboard.c:2072
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2127,45 +2230,37 @@ msgstr ""
 "%s\n"
 "Háttér eltávolítva."
 
-#: pinboard.c:2296
-msgid ""
-"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
-"-p=Default' to turn it on in future."
-msgstr ""
-"Nem volt használatban pinboard... kijelöltem a \"Default\" nevû pinboardot. "
-"Ezt a késõbbiekben a \"rox -p=Default\" paranccsal használhatod."
-
-#: pixmaps.c:874
+#: pixmaps.c:960
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
 "%s"
 msgstr ""
 
-#: pixmaps.c:895
+#: pixmaps.c:981
 msgid "There are no thumbnails to delete"
 msgstr ""
 
-#: pixmaps.c:908
+#: pixmaps.c:994
 msgid "Purge thumbnails disk cache"
 msgstr ""
 
-#: remote.c:593
+#: remote.c:600
 #, fuzzy, c-format
 msgid "Unknown style '%s'"
 msgstr "Ismeretlen típus:"
 
-#: remote.c:615
+#: remote.c:622
 #, fuzzy, c-format
 msgid "Unknown details type '%s'"
 msgstr "Ismeretlen típus:"
 
-#: remote.c:643
+#: remote.c:650
 #, fuzzy, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "Ismeretlen típus:"
 
-#: remote.c:995
+#: remote.c:1029
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "Kísérlet ismeretlen SOAP metódus hívására: \"%s\""
@@ -2180,119 +2275,22 @@ msgstr "Érvénytelen .gmo nyelvi fájl (túl rövid): %s"
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr "Érvénytelen .gmo nyelvi fájl (nincs meg a GNU azonosító): %s"
 
-#: run.c:97 run.c:138
+#: run.c:96 run.c:137
 #, c-format
 msgid "Program %s not found - deleted?"
 msgstr "A program (%s) nem található - törölve lett?"
 
-#: run.c:244
+#: run.c:243
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
 msgstr "A fájl nem létezik vagy nem elérhetõ: %s"
 
-#: run.c:249
+#: run.c:248
 #, c-format
 msgid "I don't know how to open '%s'"
 msgstr "Nem tudom, hogyan nyissam meg: \"%s\""
 
-#: run.c:276
-msgid ""
-"Executable file:\n"
-"This is a file with an eXecute bit set - it can be run as a program."
-msgstr ""
-"Végrehajtható fájl:\n"
-"Ennek a fájlnak be van állítva a végrehajtható bitje. Ez egy futtatható "
-"program."
-
-#: run.c:281
-msgid ""
-"File:\n"
-"This is a data file. Try using the Info menu item to find out more..."
-msgstr ""
-"Fájl:\n"
-"Ez egy adatfájl. Használd az Információ menüpontot bõvebb információért..."
-
-#: run.c:288
-msgid ""
-"Mount point:\n"
-"A mount point is a directory which another filing system can be mounted on. "
-"Everything on the mounted filesystem then appears to be inside the directory."
-msgstr ""
-"Csatolási pont:\n"
-"A csatolási pont egy olyan könyvtár, ahová egy másik fájlrendszer "
-"csatolható. A csatolt fájlrendszer teljes tartalma elérhetõ a könyvtár alatt."
-
-#: run.c:299
-msgid ""
-"Device file:\n"
-"Device files allow you to read from or write to a device driver as though it "
-"was an ordinary file."
-msgstr ""
-"Eszközfájl:\n"
-"Az eszközfájlokon keresztül úgy olvasható illetve írható egy eszköz, mintha "
-"az egy közönséges fájl lenne."
-
-#: run.c:306
-msgid ""
-"Named pipe:\n"
-"Pipes allow different programs to communicate. One program writes data to "
-"the pipe while another one reads it out again."
-msgstr ""
-"Named pipe:\n"
-"A pipe-ok lehetõvé teszik a programok kommunikációját. Egyik program "
-"adatokat ír a pipe-ba, miközben egy másik program kiolvassa azokat."
-
-#: run.c:313
-msgid ""
-"Socket:\n"
-"Sockets allow processes to communicate."
-msgstr ""
-"Socket:\n"
-"A socket lehetõvé teszi a processzek közötti kommunikációt."
-
-#: run.c:318
-msgid ""
-"Door:\n"
-"Doors are a little-used Solaris method for processes to communicate."
-msgstr ""
-
-#: run.c:324
-msgid ""
-"Unknown type:\n"
-"I couldn't find out what kind of file this is. Maybe it doesn't exist "
-"anymore or you don't have search permission on the directory it's in?"
-msgstr ""
-"Ismeretlen típus:\n"
-"Nem tudom megállapítani a fájl típusát. A fájl talán már nem létezik, vagy "
-"pedig nincs hozzáférési jogod a könyvtárához."
-
-#: run.c:410
-#, c-format
-msgid "Could not send data to program: %s"
-msgstr "Nem sikerült adatot küldeni a programnak: %s"
-
-#: run.c:440
-#, c-format
-msgid "Could not read link: %s"
-msgstr "Nem sikerült a link olvasása: %s"
-
-#: run.c:468
-#, c-format
-msgid "Broken symlink (or you don't have permission to follow it): %s"
-msgstr "Rossz szimlink (vagy nincs engedélyed a követésére): %s"
-
-#: run.c:505
-#, c-format
-msgid ""
-"No run action specified for files of this type (%s/%s) - you can set a run "
-"action by choosing `Set Run Action' from the File menu, or you can just drag "
-"the file to an application"
-msgstr ""
-"Nincs hozzárendelve program ehhez a fájltípushoz (%s/%s). Rendelj hozzá egy "
-"programot a Fájl menü \"Program hozzárendelése\" parancsával, vagy pedig "
-"egyszerûen húzd rá a fájlt egy programra."
-
-#: run.c:528
+#: run.c:279
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2304,16 +2302,31 @@ msgstr ""
 "megnyitáshoz tartsd nyomva a Shiftet). Az alkalmazások általában itt "
 "tárolják a dokumentációjukat is, de ezé az alkalmazásé nincs itt."
 
-# Lehetne jobb is.
-#: run.c:534
+#: run.c:363
+#, c-format
+msgid "Could not send data to program: %s"
+msgstr "Nem sikerült adatot küldeni a programnak: %s"
+
+#: run.c:393
+#, c-format
+msgid "Could not read link: %s"
+msgstr "Nem sikerült a link olvasása: %s"
+
+#: run.c:421
+#, c-format
+msgid "Broken symlink (or you don't have permission to follow it): %s"
+msgstr "Rossz szimlink (vagy nincs engedélyed a követésére): %s"
+
+#: run.c:458
+#, c-format
 msgid ""
-"Directory:\n"
-"This is a directory. It contains an index to other items - open it to see "
-"the list."
+"No run action specified for files of this type (%s/%s) - you can set a run "
+"action by choosing `Set Run Action' from the File menu, or you can just drag "
+"the file to an application"
 msgstr ""
-"Könyvtár:\n"
-"Ez egy könyvtár. A könyvtár más elemek tartalomjegyzékét tárolja - nyisd "
-"meg, ha meg akarod tekinteni."
+"Nincs hozzárendelve program ehhez a fájltípushoz (%s/%s). Rendelj hozzá egy "
+"programot a Fájl menü \"Program hozzárendelése\" parancsával, vagy pedig "
+"egyszerûen húzd rá a fájlt egy programra."
 
 #: support.c:272
 msgid "B"
@@ -2323,101 +2336,157 @@ msgstr ""
 msgid "byte"
 msgstr "byte"
 
-#: toolbar.c:109
+#: toolbar.c:114
 msgid "Close"
 msgstr "Bezár"
 
-#: toolbar.c:109
+#: toolbar.c:114
 msgid "Close filer window"
 msgstr "Bezárja a könyvtárablakot"
 
-#: toolbar.c:113
+#: toolbar.c:118
 msgid "Up"
 msgstr "Fel"
 
-#: toolbar.c:113
+#: toolbar.c:118
 msgid "Change to parent directory"
 msgstr "A szülõ könyvtárba vált"
 
-#: toolbar.c:117
+#: toolbar.c:122
 msgid "Home"
 msgstr "Home"
 
-#: toolbar.c:117
+#: toolbar.c:122
 msgid "Change to home directory"
 msgstr "A home könyvtárba vált"
 
-#: toolbar.c:121
+#: toolbar.c:126
 msgid "Bookmarks"
 msgstr ""
 
-#: toolbar.c:121
+#: toolbar.c:126
 msgid "Bookmarks menu"
 msgstr ""
 
-#: toolbar.c:125
+#: toolbar.c:130
 msgid "Scan"
 msgstr "Frissítés"
 
-#: toolbar.c:125
+#: toolbar.c:130
 msgid "Rescan directory contents"
 msgstr "Újraolvassa a könyvtár tartalmát"
 
-#: toolbar.c:129 toolbar.c:133 tips:62
+#: toolbar.c:134 toolbar.c:138 tips:63
 msgid "Size"
 msgstr "Méret"
 
-#: toolbar.c:129
+#: toolbar.c:134
 msgid "Change icon size"
 msgstr "Ikonméret megváltoztatása"
 
-#: toolbar.c:133
+#: toolbar.c:138
 msgid "Automatic size mode"
 msgstr ""
 
-#: toolbar.c:137
+#: toolbar.c:142
 msgid "Details"
 msgstr "Részletek"
 
-#: toolbar.c:137
+#: toolbar.c:142
 msgid "Show extra details"
 msgstr "Részletes nézet"
 
-#: toolbar.c:141
+#: toolbar.c:146
+#, fuzzy
+msgid "Sort"
+msgstr "Rendezés"
+
+# Khm, egyáltalán van erre _jó_ magyar fordítás? A Midnight Commanderben
+# használt "Létrehozási idõ" sem a legjobb, ráadásul megtévesztõ.
+#: toolbar.c:146
+#, fuzzy
+msgid "Change sort criteria"
+msgstr "Változtatási idõ:"
+
+#: toolbar.c:150
 msgid "Hidden"
 msgstr "Rejtett"
 
-#: toolbar.c:141
+#: toolbar.c:150
 msgid "Show/hide hidden files"
 msgstr "Engedélyezi/tiltja a rejtett fájlok mutatását"
 
-#: toolbar.c:145
+#: toolbar.c:154
+#, fuzzy
+msgid "Select all/invert selection"
+msgstr "Kijelölést megfordít"
+
+#: toolbar.c:158
 msgid "Show ROX-Filer help"
 msgstr "ROX-Filer dokumentáció"
 
-#: toolbar.c:204
+#: toolbar.c:217
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u rejtett)"
 
-#: toolbar.c:212 tips:82
+#: toolbar.c:225 tips:83
 msgid "items"
 msgstr "elem"
 
-#: toolbar.c:212
+#: toolbar.c:225
 msgid "item"
 msgstr "elem"
 
 # Ez jobb, mint a "Nincsenek elemek%s"
-#: toolbar.c:215
+#: toolbar.c:228
 #, c-format
 msgid "No items%s"
 msgstr "0 elem%s"
 
-#: toolbar.c:231
+#: toolbar.c:244
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u kijelölve (%s)"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by name"
+msgstr "Rendezés név szerint"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by type"
+msgstr "Rendezés típus szerint"
+
+#: toolbar.c:411
+#, fuzzy
+msgid "Sort by date"
+msgstr "Rendezés dátum szerint"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by size"
+msgstr "Rendezés méret szerint"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by owner"
+msgstr "Rendezés méret szerint"
+
+#: toolbar.c:412
+#, fuzzy
+msgid "Sort by group"
+msgstr "Rendezés típus szerint"
+
+#: toolbar.c:446
+#, fuzzy
+msgid "ascending"
+msgstr "Egér beállításai"
+
+#: toolbar.c:446
+msgid "descending"
+msgstr ""
 
 #: type.c:202
 msgid "Sym link"
@@ -2613,7 +2682,7 @@ msgstr ""
 "\"Common types package\"-nél található csomagot:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 
-#: type.c:1360
+#: type.c:1353
 msgid "No description"
 msgstr ""
 
@@ -2760,70 +2829,74 @@ msgid "Chinese (simplified)"
 msgstr "Kínai (egyszerûsített)"
 
 #: tips:6
+msgid "Czech"
+msgstr ""
+
+#: tips:7
 msgid "Danish"
 msgstr "Dán"
 
-#: tips:7
+#: tips:8
 msgid "Dutch"
 msgstr "Holland"
 
-#: tips:8
+#: tips:9
 msgid "English (no translation)"
 msgstr "Angol (nincs fordítás)"
 
-#: tips:9
+#: tips:10
 msgid "French"
 msgstr "Francia"
 
-#: tips:10
+#: tips:11
 msgid "German"
 msgstr "Német"
 
-#: tips:11
+#: tips:12
 msgid "Hungarian"
 msgstr "Magyar"
 
-#: tips:12
+#: tips:13
 msgid "Japanese"
 msgstr ""
 
-#: tips:13
+#: tips:14
 msgid "Norwegian"
 msgstr ""
 
-#: tips:14
+#: tips:15
 msgid "Italian"
 msgstr "Olasz"
 
-#: tips:15
+#: tips:16
 msgid "Polish"
 msgstr "Lengyel"
 
-#: tips:16
+#: tips:17
 msgid "Russian"
 msgstr "Orosz"
 
-#: tips:17
+#: tips:18
 msgid "Spanish"
 msgstr "Spanyol"
 
-#: tips:18
+#: tips:19
 msgid "Swedish"
 msgstr ""
 
-#: tips:19
+#: tips:20
 msgid "Filer windows"
 msgstr "Könyvtárablakok"
 
-#: tips:20
+#: tips:21
 msgid "Auto-resize filer windows"
 msgstr "Könyvtárablakok automatikus átméretezése"
 
-#: tips:21
+#: tips:22
 msgid "Never automatically resize"
 msgstr "Nincs automatikus átméretezés"
 
-#: tips:22
+#: tips:23
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
@@ -2832,11 +2905,11 @@ msgstr ""
 "vagy az \"Ablak átméretezése\" menüpont használatával, vagy pedig dupla "
 "kattintással az ablak hátterére."
 
-#: tips:23
+#: tips:24
 msgid "Resize when changing the display style"
 msgstr "Átméretezés a nézet megváltoztatásakor"
 
-#: tips:24
+#: tips:25
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
@@ -2844,11 +2917,11 @@ msgstr ""
 "Az ikonméret megváltoztatása vagy a részletes nézet kapcsolgatása átméretezi "
 "az ablakot."
 
-#: tips:25
+#: tips:26
 msgid "Always resize"
 msgstr "Mindig legyen átméretezés"
 
-#: tips:26 tips:27
+#: tips:27 tips:28
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
@@ -2856,15 +2929,15 @@ msgstr ""
 "Az ablak minden szükséges esetben át lesz méretezve (könyvtárváltáskor, "
 "illetve a nézet megváltoztatásakor)."
 
-#: tips:28
+#: tips:29
 msgid "Largest window size:"
 msgstr "Legnagyobb ablakméret:"
 
-#: tips:29
+#: tips:30
 msgid "%"
 msgstr "%"
 
-#: tips:30 tips:31
+#: tips:31 tips:32
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
@@ -2872,25 +2945,25 @@ msgstr ""
 "A legnagyobb méret, amit egy ablak az automatikus átméretezés során "
 "felvehet. (A képernyõ méretének százalékában értendõ.)"
 
-#: tips:32
+#: tips:33
 msgid "Window behaviour"
 msgstr "Ablakok viselkedése"
 
-#: tips:33
+#: tips:34
 msgid "Short titlebar flags"
 msgstr "Rövid jelzõk a címsorban"
 
-#: tips:34
+#: tips:35
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 msgstr "A címsorban betûket használ az Olvasás, Mind és Index szavak helyett."
 
-#: tips:35
+#: tips:36
 msgid "Unique windows"
 msgstr "Egyedi ablakok"
 
-#: tips:36 tips:37
+#: tips:37 tips:38
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -2898,12 +2971,12 @@ msgstr ""
 "Ha megnyitsz egy olyan könyvtárat, ami egy másik ablakban már meg van "
 "nyitva, akkor ennek a beállításnak a hatására a másik ablak bezáródik."
 
-#: tips:38
+#: tips:39
 #, fuzzy
 msgid "New window on button 1"
 msgstr "Új ablak az 1-es gombra (RISC OS módra)"
 
-#: tips:39
+#: tips:40
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -2913,12 +2986,12 @@ msgstr ""
 "ablakban jelenik meg. A 2-es (középsõ) gombbal kattintva a könyvtár tartalma "
 "az aktuális ablakban jelenik meg."
 
-#: tips:40
+#: tips:41
 #, fuzzy
 msgid "Single-click navigation"
 msgstr "Megnyitás egy kattintásra"
 
-#: tips:41 tips:42 tips:43 tips:44 tips:139
+#: tips:42 tips:43 tips:44 tips:45 tips:140
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -2928,16 +3001,16 @@ msgstr ""
 "kell tartani a Control billentyût. Ha ez a beállítás nincs engedélyezve, "
 "akkor a megnyitáshoz duplán kell kattintani."
 
-#: tips:45
+#: tips:46
 msgid "Sorting"
 msgstr "Rendezés"
 
-#: tips:46
+#: tips:47
 #, fuzzy
 msgid "Directories come first (for sort by name)"
 msgstr "Mindig elöl legyenek a könyvtárak"
 
-#: tips:47
+#: tips:48
 #, fuzzy
 msgid ""
 "If this is on then directories will always appear before anything else when "
@@ -2946,26 +3019,26 @@ msgstr ""
 "Ha engedélyezve van, akkor a könyvtárak mindig a fájlok elé kerülnek "
 "(függetlenül az éppen érvényes rendezési módtól)."
 
-#: tips:48
+#: tips:49
 #, fuzzy
 msgid "Capitalised names first (for sort by name)"
 msgstr "Mindig elöl legyenek a könyvtárak"
 
-#: tips:49 tips:50
+#: tips:50 tips:51
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
 msgstr ""
 
-#: tips:52
+#: tips:53
 msgid "Default settings for new windows"
 msgstr "Alapértelmezések az új ablakok számára"
 
-#: tips:53
+#: tips:54
 msgid "Inherit options from source window"
 msgstr "Beállítások öröklése az elõzõ ablaktól"
 
-#: tips:54
+#: tips:55
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
@@ -2974,28 +3047,28 @@ msgstr ""
 "szerint elõzõ ablaktól öröklõdnek, máskülönben pedig megegyeznek az "
 "alapbeállítással."
 
-#: tips:55
+#: tips:56
 #, fuzzy
 msgid "View type:"
 msgstr "Ismeretlen típus:"
 
-#: tips:58
+#: tips:59
 msgid "Sort by:"
 msgstr "Rendezés:"
 
-#: tips:60 tips:78
+#: tips:61 tips:79
 msgid "Type"
 msgstr "Típus"
 
-#: tips:61
+#: tips:62
 msgid "Date"
 msgstr "Dátum"
 
-#: tips:63
+#: tips:64
 msgid "Show hidden files"
 msgstr "Rejtett fájlok mutatása"
 
-#: tips:64 tips:65 tips:66 tips:67
+#: tips:65 tips:66 tips:67 tips:68
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
@@ -3003,64 +3076,64 @@ msgstr ""
 "Ha engedélyezve van, akkor azok a fájlok is látszanak, amiknek neve ponttal "
 "kezdõdik, egyébként rejtve maradnak."
 
-#: tips:68
+#: tips:69
 #, fuzzy
 msgid "Icon View"
 msgstr "Ikonméret:"
 
-#: tips:69
+#: tips:70
 #, fuzzy
 msgid "Default size:"
 msgstr "Alapértelmezett beállítások"
 
-#: tips:70
+#: tips:71
 msgid "Huge Icons"
 msgstr "Óriás ikonok"
 
-#: tips:71 tips:234
+#: tips:72 tips:235
 msgid "Large Icons"
 msgstr "Nagy ikonok"
 
-#: tips:72 tips:233
+#: tips:73 tips:234
 msgid "Small Icons"
 msgstr "Kis ikonok"
 
-#: tips:74
+#: tips:75
 #, fuzzy
 msgid "Default details:"
 msgstr "Alapértelmezett beállítások"
 
-#: tips:75
+#: tips:76
 msgid "No details"
 msgstr "Nincsenek részletek"
 
-#: tips:80
+#: tips:81
 msgid "Automatic small icons:"
 msgstr ""
 
 # Khm, egyáltalán van erre _jó_ magyar fordítás? A Midnight Commanderben
 # használt "Létrehozási idõ" sem a legjobb, ráadásul megtévesztõ.
-#: tips:81
+#: tips:82
 #, fuzzy
 msgid "Change at:"
 msgstr "Változtatási idõ:"
 
-#: tips:83 tips:84 tips:85
+#: tips:84 tips:85 tips:86
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
 "used."
 msgstr ""
 
-#: tips:86
+#: tips:87
 msgid "Max width (Large icons):"
 msgstr ""
 
-#: tips:87 tips:90
+#: tips:88 tips:91
 msgid "pixels"
 msgstr "pixel"
 
-#: tips:88
+#: tips:89
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -3068,60 +3141,60 @@ msgstr ""
 "Az ennél hosszabb szöveg két sorban jelenik meg a nagy ikonok alatt. Óriás "
 "ikonok esetén az ennél 50%-kal szélesebb szöveg lesz két sorba törve."
 
-#: tips:89
+#: tips:90
 #, fuzzy
 msgid "(Small Icons):"
 msgstr "Kis ikonok"
 
-#: tips:91 tips:92 tips:93
+#: tips:92 tips:93 tips:94
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "A kis ikonok utáni szöveg maximális szélessége."
 
-#: tips:95
+#: tips:96
 #, fuzzy
 msgid "Show column headings"
 msgstr "Indexképek mutatása"
 
-#: tips:96 tips:97 tips:98
+#: tips:97 tips:98 tips:99
 msgid "If this is on then column headings will be shown in the list view."
 msgstr ""
 
-#: tips:99
+#: tips:100
 #, fuzzy
 msgid "Tools/Minibuffer"
 msgstr "Minipufferek"
 
-#: tips:100
+#: tips:101
 msgid "Toolbar"
 msgstr "Eszköztár"
 
-#: tips:101
+#: tips:102
 msgid "Toolbar type:"
 msgstr "Eszköztár fajtája:"
 
-#: tips:102 tips:131
+#: tips:103 tips:132
 msgid "None"
 msgstr "Nincs"
 
-#: tips:103
+#: tips:104
 #, fuzzy
 msgid "Icons only"
 msgstr "Csak kép"
 
-#: tips:104
+#: tips:105
 #, fuzzy
 msgid "Text under icons"
 msgstr "Az ikon alatt megjelenõ szöveg:"
 
-#: tips:105
+#: tips:106
 msgid "Text beside icons"
 msgstr ""
 
-#: tips:106
+#: tips:107
 msgid "Show totals of items"
 msgstr "Elemek számának megjelenítése"
 
-#: tips:107 tips:108
+#: tips:108 tips:109
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -3131,20 +3204,20 @@ msgstr ""
 "elemek számát. Kijelölés esetén a kijelölt elemek számát és összegzett "
 "méretét mutatja."
 
-#: tips:109
+#: tips:110
 msgid "Select the buttons you want on the bar:"
 msgstr ""
 
-#: tips:110
+#: tips:111
 #, fuzzy
 msgid "Minibuffer"
 msgstr "Minipufferek"
 
-#: tips:111
+#: tips:112
 msgid "Beep if Tab-completion fails"
 msgstr "Hangjelzés sikertelen fájlnév-kiegészítéskor"
 
-#: tips:112
+#: tips:113
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
@@ -3154,11 +3227,11 @@ msgstr ""
 "leütésére semmi sem történik (például mert több lehetséges kiegészítés is "
 "van, és a következõ betûjük eltérõ)."
 
-#: tips:113
+#: tips:114
 msgid "Beep if there are several matches"
 msgstr "Hangjelzés több fájlnév esetén"
 
-#: tips:114 tips:115 tips:116
+#: tips:115 tips:116 tips:117
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
@@ -3167,44 +3240,44 @@ msgstr ""
 "leütésére még akkor is több fájlnév jöhet szóba kiegészítésként, ha megadtál "
 "pár betût."
 
-#: tips:117 tips:118
+#: tips:118 tips:119
 #, fuzzy
 msgid "Thumbnails"
 msgstr "Indexképek mutatása"
 
-#: tips:119
+#: tips:120
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
 
-#: tips:120
+#: tips:121
 msgid "Show image thumbnails"
 msgstr "Indexképek mutatása"
 
-#: tips:121 tips:122
+#: tips:122 tips:123
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
 msgstr ""
 
-#: tips:123
+#: tips:124
 #, fuzzy
 msgid "Thumbnails cache"
 msgstr "Indexképek mutatása"
 
-#: tips:124
+#: tips:125
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
 "will be created again as needed."
 msgstr ""
 
-#: tips:125
+#: tips:126
 msgid "Pinboard"
 msgstr "Pinboard"
 
-#: tips:126
+#: tips:127
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
@@ -3212,54 +3285,54 @@ msgstr ""
 "A pinboard használatakor fájlokra és alkalmazásokra mutató ikonokat "
 "helyezhetsz a munkaasztal hátterére."
 
-#: tips:127 tips:230
+#: tips:128 tips:231
 #, fuzzy
 msgid "Appearance"
 msgstr "Eszköztár megjelenése"
 
-#: tips:128
+#: tips:129
 msgid "Foreground:"
 msgstr "Elõtér:"
 
-#: tips:129
+#: tips:130
 msgid "Text shadow:"
 msgstr ""
 
-#: tips:130
+#: tips:131
 msgid "Background:"
 msgstr "Háttér:"
 
-#: tips:132
+#: tips:133
 msgid "Thin"
 msgstr ""
 
-#: tips:133
+#: tips:134
 msgid "Thick"
 msgstr ""
 
-#: tips:134
+#: tips:135
 #, fuzzy
 msgid "Use custom font:"
 msgstr "Töröld a hozzárendelt ikont"
 
-#: tips:135 tips:136
+#: tips:136 tips:137
 #, fuzzy
 msgid "The font used for the text displayed under the icons"
 msgstr "Az ikon alatt megjelenõ szöveg:"
 
-#: tips:137
+#: tips:138
 msgid "Pinboard behaviour"
 msgstr "Pinboard viselkedése"
 
-#: tips:138
+#: tips:139
 msgid "Single-click to open"
 msgstr "Megnyitás egy kattintásra"
 
-#: tips:140
+#: tips:141
 msgid "Keep icons within screen limits"
 msgstr "Ikonok képernyõn tartása"
 
-#: tips:141
+#: tips:142
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -3267,40 +3340,40 @@ msgstr ""
 "Ha engedélyezve van, akkor a pinboard ikonjai nem \"lógnak ki\" a "
 "képernyõrõl."
 
-#: tips:142
+#: tips:143
 msgid "Icon grid step:"
 msgstr "Ikonrács felosztása:"
 
-#: tips:143
+#: tips:144
 msgid "Fine"
 msgstr "Finom"
 
-#: tips:144
+#: tips:145
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "2 pixel méretû rács mentén vannak igazítva az ikonok."
 
-#: tips:145
+#: tips:146
 msgid "Medium"
 msgstr "Közepes"
 
-#: tips:146
+#: tips:147
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "16 pixel méretû rács mentén vannak igazítva az ikonok."
 
-#: tips:147
+#: tips:148
 msgid "Coarse"
 msgstr "Durva"
 
-#: tips:148 tips:149 tips:150 tips:151
+#: tips:149 tips:150 tips:151 tips:152
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "32 pixel méretû rács mentén vannak igazítva az ikonok."
 
-#: tips:152 tips:154
+#: tips:153 tips:155
 #, fuzzy
 msgid "Iconified windows"
 msgstr "Ikonizált ablakok"
 
-#: tips:153
+#: tips:154
 #, fuzzy
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
@@ -3313,55 +3386,55 @@ msgstr ""
 "ikonizált ablakok kis gombokként jelennek meg a képernyõn. Csak megfelelõ "
 "ablakkezelõvel mûködik."
 
-#: tips:155
+#: tips:156
 msgid "Show iconified windows"
 msgstr "Ikonizált ablakok mutatása"
 
-#: tips:156
+#: tips:157
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
 "pinboard must be in use."
 msgstr ""
 
-#: tips:157
+#: tips:158
 msgid "Iconify to the"
 msgstr "Ikonizálás a"
 
-#: tips:158
+#: tips:159
 msgid "top-left"
 msgstr "bal felsõ"
 
-#: tips:159
+#: tips:160
 msgid "top-right"
 msgstr "jobb felsõ"
 
-#: tips:160
+#: tips:161
 msgid "bottom-left"
 msgstr "bal alsó"
 
-#: tips:161
+#: tips:162
 msgid "bottom-right"
 msgstr "jobb alsó"
 
-#: tips:162
+#: tips:163
 msgid ", going"
 msgstr " sarokba, elhelyezés:"
 
-#: tips:163
+#: tips:164
 msgid "horizontally"
 msgstr "vízszintesen"
 
-#: tips:164
+#: tips:165
 msgid "vertically"
 msgstr "függõlegesen"
 
-#: tips:165
+#: tips:166
 msgid "Panels"
 msgstr "Panelek"
 
 # FIXME sávok...
-#: tips:166
+#: tips:167
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
@@ -3369,53 +3442,53 @@ msgstr ""
 "A panelek a képernyõ oldalai mentén végigfutó, ikonokat tartalmazó sávok. "
 "Használatukkal kapcsolatban lásd a kézikönyvet."
 
-#: tips:167
+#: tips:168
 msgid "Panel style"
 msgstr "Panel stílusa"
 
-#: tips:168
+#: tips:169
 msgid "Image and text"
 msgstr "Kép és szöveg"
 
-#: tips:169
+#: tips:170
 msgid "Every panel icon is shown with an image and some text."
 msgstr "A panel minden ikonja képpel és szöveggel jelenik meg."
 
-#: tips:170
+#: tips:171
 msgid "Image only for applications"
 msgstr "Az alkalmazásoknál csak kép"
 
-#: tips:171
+#: tips:172
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr ""
 "Az alkalmazásoknál csak kép jelenik meg, minden másnál kép és szöveg is."
 
-#: tips:172
+#: tips:173
 msgid "Image only"
 msgstr "Csak kép"
 
-#: tips:173 tips:174
+#: tips:174 tips:175
 msgid "Only the image is shown."
 msgstr "Csak a kép jelenik meg."
 
-#: tips:175
+#: tips:176
 msgid "Panel width (thin)"
 msgstr ""
 
-#: tips:176
+#: tips:177
 msgid "(thick)"
 msgstr ""
 
-#: tips:177 tips:178 tips:179
+#: tips:178 tips:179 tips:180
 msgid "The size of the panels."
 msgstr ""
 
-#: tips:180
+#: tips:181
 msgid "Action windows"
 msgstr "Mûveleti ablakok"
 
-#: tips:181
+#: tips:182
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -3423,64 +3496,64 @@ msgstr ""
 "A mûveleti ablakok a háttérben futó mûveletek indításakor\n"
 "jelennek meg (például fájlok másolásakor vagy törlésekor)."
 
-#: tips:182
+#: tips:183
 msgid "Auto-start (Quiet) these actions"
 msgstr "Automatikusan (Csendben) kezdi a következõ mûveleteket"
 
-#: tips:184
+#: tips:185
 msgid "Copy files without confirming first."
 msgstr "Megerõsítõ kérdés nélkül kezdi a fájlok másolását."
 
-#: tips:186
+#: tips:187
 msgid "Move files without confirming first."
 msgstr "Megerõsítõ kérdés nélkül kezdi a fájlok mozgatását."
 
-#: tips:188
+#: tips:189
 msgid "Create links to files without confirming first."
 msgstr "Megerõsítõ kérdés nélkül kezdi a linkek készítését."
 
-#: tips:190
+#: tips:191
 msgid "Delete files without confirming first."
 msgstr "Megerõsítõ kérdés nélkül kezdi a fájlok törlését."
 
-#: tips:191
+#: tips:192
 msgid "Mount"
 msgstr "Csatolás"
 
-#: tips:192 tips:193
+#: tips:193 tips:194
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "Megerõsítõ kérdés nélkül kezdi a fájlrendszerek (le)csatolását."
 
-#: tips:194
+#: tips:195
 msgid "Default settings"
 msgstr "Alapértelmezett beállítások"
 
-#: tips:196
+#: tips:197
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "Nem kér megerõsítést a nem írható elemek törléséhez."
 
-#: tips:198
+#: tips:199
 msgid "Don't display so much information in the message area."
 msgstr "Kevesebb üzenetet ad mûveletvégzés közben."
 
-#: tips:200
+#: tips:201
 msgid "Also change contents of subdirectories."
 msgstr "Az alkönyvtárak tartalmát is feldolgozza."
 
-#: tips:206
+#: tips:207
 msgid "Drag and Drop"
 msgstr "\"Fogd és vidd\""
 
-#: tips:207
+#: tips:208
 #, fuzzy
 msgid "Dragging to icons"
 msgstr "Beállítások mentése"
 
-#: tips:208
+#: tips:209
 msgid "Allow dragging to icons in filer windows"
 msgstr "Könyvtárablakok ikonjaira húzás"
 
-#: tips:209
+#: tips:210
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -3491,11 +3564,11 @@ msgstr ""
 "az alatta levõ könyvtárba kerül. Ha program felett engeded el, akkor "
 "betöltõdik a programba."
 
-#: tips:210
+#: tips:211
 msgid "Directories spring open"
 msgstr "Könyvtárak megnyitása"
 
-#: tips:211
+#: tips:212
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -3504,15 +3577,15 @@ msgstr ""
 "Ha a fenti beállítás is engedélyezve van, akkor a könyvtárak bizonyos idõ "
 "után automatikusan megnyílnak, ha fájlt húzol föléjük."
 
-#: tips:212
+#: tips:213
 msgid "Spring delay:"
 msgstr "Megnyitás késleltetése:"
 
-#: tips:213
+#: tips:214
 msgid "ms"
 msgstr "ms"
 
-#: tips:214 tips:215
+#: tips:215 tips:216
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -3522,22 +3595,22 @@ msgstr ""
 "kell egy fájlt a könyvtár felett tartani a könyvtár automatikus "
 "megnyitásához. A fenti beállítást is engedélyezni kell a használatához."
 
-#: tips:216
+#: tips:217
 #, fuzzy
 msgid "When dragging files with the left mouse button"
 msgstr "Fájlok középsõ egérgombbal húzása"
 
-#: tips:217 tips:223
+#: tips:218 tips:224
 #, fuzzy
 msgid "Show a menu of possible actions"
 msgstr "Megjelenít egy menüt a lehetséges mûveletekkel"
 
-#: tips:218
+#: tips:219
 #, fuzzy
 msgid "Copy the files"
 msgstr "Mozgatja a fájlokat"
 
-#: tips:219 tips:220 tips:221
+#: tips:220 tips:221 tips:222
 #, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
@@ -3546,17 +3619,17 @@ msgstr ""
 "Megjegyzés: ha bal gombbal húzod a fájlokat az Alt nyomva tartása közben, "
 "akkor a menü mindenképpen megjelenik."
 
-#: tips:222
+#: tips:223
 #, fuzzy
 msgid "When dragging files with the middle mouse button"
 msgstr "Fájlok középsõ egérgombbal húzása"
 
-#: tips:224
+#: tips:225
 #, fuzzy
 msgid "Move the files"
 msgstr "Mozgatja a fájlokat"
 
-#: tips:225 tips:226 tips:227 tips:228
+#: tips:226 tips:227 tips:228 tips:229
 #, fuzzy
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
@@ -3565,67 +3638,54 @@ msgstr ""
 "Megjegyzés: ha bal gombbal húzod a fájlokat az Alt nyomva tartása közben, "
 "akkor a menü mindenképpen megjelenik."
 
-#: tips:229
+#: tips:230
 msgid "Menus"
 msgstr "Menük"
 
-#: tips:231
+#: tips:232
 msgid "Size of icons in menus:"
 msgstr "Ikonok mérete a menükben:"
 
-#: tips:232
+#: tips:233
 msgid "No Icons"
 msgstr "Nincsenek ikonok"
 
-#: tips:235
+#: tips:236
 msgid "Same as current window"
 msgstr "Mint az aktuális ablakban"
 
-#: tips:236
+#: tips:237
 msgid "Same as default"
 msgstr "Alapértelmezés szerinti"
 
-#: tips:237
+#: tips:238
 #, fuzzy
 msgid "Behaviour"
 msgstr "Ablakok viselkedése"
 
-#: tips:238
-msgid "Menu on button 2 (RISC OS style)"
-msgstr "Menü a 2-es gombra (RISC OS módra)"
-
 #: tips:239
-msgid ""
-"Use button 2, the middle button (click both buttons at once on two button "
-"mice), to pop up the menu. If off, use button 3 (right) instead."
-msgstr ""
-"A 2-es, azaz a középsõ gomb (kétgombos egereken mindkét gomb egyidejû) "
-"lenyomására jelenik meg a menü. Ha nincs engedélyzve, akkor a 3-mas (jobb) "
-"gombbal jeleníthetõ meg."
-
-#: tips:240
 msgid "`Xterm Here' program"
 msgstr "Terminál program"
 
-#: tips:241 tips:242
+#: tips:240 tips:241
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "A menü \"Terminál\" parancsára futtatandó program."
 
-#: tips:243
+#: tips:242
 #, fuzzy
 msgid "Keyboard shortcuts"
 msgstr "Billentyûk hozzárendelése"
 
-#: tips:245
+#: tips:244
 #, fuzzy
 msgid "Executable files"
 msgstr "Végrehajtható fájl:"
 
-#: tips:246
+#: tips:245
 msgid "Ignore eXecutable bit for known extensions"
 msgstr "A végrehajtható bit nem számít ismert kiterjesztések esetén"
 
-#: tips:247 tips:248
+#: tips:246 tips:247
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -3635,11 +3695,11 @@ msgstr ""
 "hagyja hogy végrehajtható. Ez akkor lehet hasznos, ha például egy windowsos "
 "fájlrendszeren minden fájl végrehajthatóként jelenik meg."
 
-#: tips:249
+#: tips:248
 msgid "MIME types"
 msgstr "MIME típusok"
 
-#: tips:250
+#: tips:249
 #, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
@@ -3653,46 +3713,46 @@ msgstr ""
 "tartalmazó fájlok szerkesztése után kattints az újraolvasás gombra, vagy "
 "indítsd újra a fájlkezelõt."
 
-#: tips:251 tips:252
+#: tips:250 tips:251
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
 msgstr ""
 "Használd az \"Ikon hozzárendelése...\" párbeszédablakot az egyes típusokhoz "
 "tartozó ikonok beállítására."
 
-#: tips:253
+#: tips:252
 msgid "Colours"
 msgstr "Színek"
 
-#: tips:254
+#: tips:253
 msgid "File type colours"
 msgstr "Fájltípusok színei"
 
-#: tips:255
+#: tips:254
 msgid "Colour files based on their types"
 msgstr "Fájlok színezése a típusuk alapján"
 
-#: tips:256
+#: tips:255
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr ""
 "A fájlnevek (és a részletek) a fájltípusnak megfelelõ színnel jelennek meg."
 
-#: tips:257
+#: tips:256
 msgid "Directory:"
 msgstr "Könyvtár:"
 
-#: tips:258
+#: tips:257
 msgid "Regular file:"
 msgstr "Közönséges fájl:"
 
-#: tips:259
+#: tips:258
 msgid "Pipe:"
 msgstr "Pipe:"
 
-#: tips:260
+#: tips:259
 msgid "Socket:"
 msgstr "Socket:"
 
-#: tips:262 tips:263
+#: tips:261 tips:262
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
@@ -3700,50 +3760,50 @@ msgstr ""
 "Hiba: például nem létezõ fájlra mutató szimlink, vagy olyan fájl, aminek nem "
 "lehet lekérdezni a tulajdonságait elegendõ jogosultság hiányában."
 
-#: tips:264
+#: tips:263
 msgid "Character device:"
 msgstr "Karakteres eszköz:"
 
-#: tips:265
+#: tips:264
 msgid "Block device:"
 msgstr "Blokkos eszköz:"
 
-#: tips:266
+#: tips:265
 #, fuzzy
 msgid "Door:"
 msgstr "Ugrás:"
 
-#: tips:267
+#: tips:266
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
 
-#: tips:268
+#: tips:267
 msgid "Executable file:"
 msgstr "Végrehajtható fájl:"
 
-#: tips:269
+#: tips:268
 msgid "Application directory:"
 msgstr "Alkalmazási könyvtár:"
 
-#: tips:270
+#: tips:269
 msgid "Unknown type:"
 msgstr "Ismeretlen típus:"
 
-#: tips:271
+#: tips:270
 msgid "Compatibility"
 msgstr ""
 
-#: tips:272
+#: tips:271
 msgid "Window manager problems"
 msgstr ""
 
-#: tips:273
+#: tips:272
 msgid "Override window manager control of the pinboard and panels"
 msgstr ""
 
-#: tips:274
+#: tips:273
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -3752,12 +3812,12 @@ msgid ""
 "them appear in window-select lists."
 msgstr ""
 
-#: tips:275
+#: tips:274
 #, fuzzy
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "3-mas gombbal kattintás átadása az ablakkezelõnek"
 
-#: tips:276
+#: tips:275
 #, fuzzy
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
@@ -3768,11 +3828,11 @@ msgstr ""
 "meg. Ha a beállítás engedélyezve van, akkor a kattintást az ablakkezelõ "
 "kapja meg. Az ikonokra kattintás nem lesz továbbítva."
 
-#: tips:277
+#: tips:276
 msgid "Blackbox root menus hack"
 msgstr ""
 
-#: tips:278 tips:279
+#: tips:277 tips:278
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -3780,16 +3840,16 @@ msgid ""
 "isn't necessary."
 msgstr ""
 
-#: tips:280
+#: tips:279
 #, fuzzy
 msgid "Drag and drop"
 msgstr "\"Fogd és vidd\""
 
-#: tips:281
+#: tips:280
 msgid "Don't use hostnames"
 msgstr "Hosztnevek tiltása"
 
-#: tips:282 tips:283 tips:284 tips:285
+#: tips:281 tips:282 tips:283 tips:284
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -3798,6 +3858,96 @@ msgstr ""
 "Néhány régebbi (az XDND protokollt csak részben támogató) program esetén "
 "lehet szükséges ez a beállítás. Kapcsold be, ha egy fájlt egy programra "
 "húzva megjelenik a + jel az egérmutatóban, de a \"rádobás\" mégsem mûködik."
+
+#~ msgid "Permissions:"
+#~ msgstr "Engedélyek:"
+
+#~ msgid "file(1) says..."
+#~ msgstr "A file(1) szerint..."
+
+#~ msgid "Help about ... ?"
+#~ msgstr "Mihez kérsz segítséget?"
+
+#~ msgid ""
+#~ "Executable file:\n"
+#~ "This is a file with an eXecute bit set - it can be run as a program."
+#~ msgstr ""
+#~ "Végrehajtható fájl:\n"
+#~ "Ennek a fájlnak be van állítva a végrehajtható bitje. Ez egy futtatható "
+#~ "program."
+
+#~ msgid ""
+#~ "File:\n"
+#~ "This is a data file. Try using the Info menu item to find out more..."
+#~ msgstr ""
+#~ "Fájl:\n"
+#~ "Ez egy adatfájl. Használd az Információ menüpontot bõvebb információért..."
+
+#~ msgid ""
+#~ "Mount point:\n"
+#~ "A mount point is a directory which another filing system can be mounted "
+#~ "on. Everything on the mounted filesystem then appears to be inside the "
+#~ "directory."
+#~ msgstr ""
+#~ "Csatolási pont:\n"
+#~ "A csatolási pont egy olyan könyvtár, ahová egy másik fájlrendszer "
+#~ "csatolható. A csatolt fájlrendszer teljes tartalma elérhetõ a könyvtár "
+#~ "alatt."
+
+#~ msgid ""
+#~ "Device file:\n"
+#~ "Device files allow you to read from or write to a device driver as though "
+#~ "it was an ordinary file."
+#~ msgstr ""
+#~ "Eszközfájl:\n"
+#~ "Az eszközfájlokon keresztül úgy olvasható illetve írható egy eszköz, "
+#~ "mintha az egy közönséges fájl lenne."
+
+#~ msgid ""
+#~ "Named pipe:\n"
+#~ "Pipes allow different programs to communicate. One program writes data to "
+#~ "the pipe while another one reads it out again."
+#~ msgstr ""
+#~ "Named pipe:\n"
+#~ "A pipe-ok lehetõvé teszik a programok kommunikációját. Egyik program "
+#~ "adatokat ír a pipe-ba, miközben egy másik program kiolvassa azokat."
+
+#~ msgid ""
+#~ "Socket:\n"
+#~ "Sockets allow processes to communicate."
+#~ msgstr ""
+#~ "Socket:\n"
+#~ "A socket lehetõvé teszi a processzek közötti kommunikációt."
+
+#~ msgid ""
+#~ "Unknown type:\n"
+#~ "I couldn't find out what kind of file this is. Maybe it doesn't exist "
+#~ "anymore or you don't have search permission on the directory it's in?"
+#~ msgstr ""
+#~ "Ismeretlen típus:\n"
+#~ "Nem tudom megállapítani a fájl típusát. A fájl talán már nem létezik, "
+#~ "vagy pedig nincs hozzáférési jogod a könyvtárához."
+
+# Lehetne jobb is.
+#~ msgid ""
+#~ "Directory:\n"
+#~ "This is a directory. It contains an index to other items - open it to see "
+#~ "the list."
+#~ msgstr ""
+#~ "Könyvtár:\n"
+#~ "Ez egy könyvtár. A könyvtár más elemek tartalomjegyzékét tárolja - nyisd "
+#~ "meg, ha meg akarod tekinteni."
+
+#~ msgid "Menu on button 2 (RISC OS style)"
+#~ msgstr "Menü a 2-es gombra (RISC OS módra)"
+
+#~ msgid ""
+#~ "Use button 2, the middle button (click both buttons at once on two button "
+#~ "mice), to pop up the menu. If off, use button 3 (right) instead."
+#~ msgstr ""
+#~ "A 2-es, azaz a középsõ gomb (kétgombos egereken mindkét gomb egyidejû) "
+#~ "lenyomására jelenik meg a menü. Ha nincs engedélyzve, akkor a 3-mas "
+#~ "(jobb) gombbal jeleníthetõ meg."
 
 #~ msgid "Show name-to-type rules"
 #~ msgstr "Mutasd a név-típus szabályokat"
@@ -4103,9 +4253,6 @@ msgstr ""
 #~ msgid "_OK"
 #~ msgstr "OK"
 
-#~ msgid "Could not save options: %s"
-#~ msgstr "Nem sikerült menteni a beállításokat: %s"
-
 #~ msgid "Another application is already managing the pinboard!"
 #~ msgstr "Egy másik alkalmazás már használja a pinboardot!"
 
@@ -4271,9 +4418,6 @@ msgstr ""
 #~ msgid "From LANG"
 #~ msgstr "LANG alapján"
 
-#~ msgid "Mouse bindings"
-#~ msgstr "Egér beállításai"
-
 #~ msgid ""
 #~ "After editing the files, click the reload button below, or\n"
 #~ "restart the filer."
@@ -4300,9 +4444,6 @@ msgstr ""
 
 #~ msgid "Failed to fork() child process"
 #~ msgstr "Nem sikerült gyerek processzt futtatni"
-
-#~ msgid "Failed to fork() child"
-#~ msgstr "Nem sikerült gyerek processzt létrehozni"
 
 # Khm...
 #~ msgid "Notice"
