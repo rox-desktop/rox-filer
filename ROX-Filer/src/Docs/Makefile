@@ -4,6 +4,7 @@ all: Manual/index.html
 	dia -e $@ $<
 
 Manual/index.html: Manual.tex Prune.eps Structs.eps
+	latex Manual.tex
 	latex2html -split +1 -antialias -local_icon -show_section_numbers \
 	-up_url='http://rox.sourceforge.net' Manual.tex -up_title='ROX website'
 

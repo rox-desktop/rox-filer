@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.0\n"
-"POT-Creation-Date: 2001-06-05 12:40+0100\n"
-"PO-Revision-Date: 2001-04-05 20:46+0300\n"
+"POT-Creation-Date: 2001-06-07 12:06+0100\n"
+"PO-Revision-Date: 2001-06-05 20:46+0300\n"
 "Last-Translator: Dmitry Elfimov <die@parma.ru>\n"
 "Language-Team: not in team \n"
 "MIME-Version: 1.0\n"
@@ -185,7 +185,7 @@ msgstr "Произошла одна ошибка.\n"
 #: action.c:500
 #, c-format
 msgid "There were %d errors.\n"
-msgstr "Колчество произошедших ошибок: %d\n"
+msgstr "Количество произошедших ошибок: %d\n"
 
 #: action.c:524
 msgid "ERROR reading"
@@ -209,7 +209,7 @@ msgstr "Все"
 
 #: action.c:875
 msgid "<dir>"
-msgstr "<дир>"
+msgstr "<каталог>"
 
 #: action.c:912
 msgid "Abort"
@@ -419,7 +419,7 @@ msgstr "Вам нужно выбрать несколько обьектов для поиска"
 msgid "Expression:"
 msgstr "Выражение:"
 
-#: action.c:1879 menu.c:203
+#: action.c:1879 menu.c:213
 msgid "Find"
 msgstr "Найти"
 
@@ -427,7 +427,7 @@ msgstr "Найти"
 msgid "You need to select some items to count"
 msgstr "Вам надо выбрать несколько обьектов для подсчета"
 
-#: action.c:1908 menu.c:201
+#: action.c:1908 menu.c:211
 msgid "Disk Usage"
 msgstr "Использование диска"
 
@@ -440,7 +440,7 @@ msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr ""
 "ROX-Filer не поддерживает точки подсоединения на вашей системе. Извините. "
 
-#: action.c:1955 menu.c:200 tips:76
+#: action.c:1955 menu.c:210 tips:76
 msgid "Delete"
 msgstr "Удалить"
 
@@ -488,11 +488,11 @@ msgstr "Рекурсивно - также меняет содержимое подкаталогов"
 msgid "Command:"
 msgstr "Команда:"
 
-#: action.c:2038 menu.c:161 menu.c:167 menu.c:173 menu.c:202 tips:29
+#: action.c:2038 menu.c:167 menu.c:173 menu.c:179 menu.c:212 tips:29
 msgid "Permissions"
 msgstr "Права доступа"
 
-#: action.c:2058 menu.c:815 tips:73
+#: action.c:2058 menu.c:829 tips:73
 msgid "Copy"
 msgstr "Копировать"
 
@@ -532,17 +532,17 @@ msgstr ""
 "Это затронет некоторые обьекты на рабочем столе или на панели - "
 "действительно удалить?"
 
-#: action.c:2183 gtksavebox.c:226 gtksavebox.c:498 icon.c:842 menu.c:1286
+#: action.c:2183 gtksavebox.c:226 gtksavebox.c:498 icon.c:845 menu.c:1334
 #: options.c:802 type.c:605 usericons.c:476
 msgid "OK"
 msgstr "OK"
 
-#: action.c:2183 gtksavebox.c:233 icon.c:849 infobox.c:99 menu.c:1293
+#: action.c:2183 gtksavebox.c:233 icon.c:852 infobox.c:99 menu.c:1341
 #: options.c:814 panel.c:333 type.c:612 usericons.c:484
 msgid "Cancel"
 msgstr "Отменить"
 
-#: appmenu.c:184 menu.c:1242
+#: appmenu.c:184 menu.c:1290
 msgid "fork() failed"
 msgstr "не удалось сделать fork()"
 
@@ -613,7 +613,7 @@ msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Невозможно получить данные от удаленной машины (application/octet-stream не "
-"передано)"
+"передан)"
 
 #: dnd.c:982
 msgid ""
@@ -654,7 +654,7 @@ msgstr "Каталог '%s' не найден"
 
 #: filer.c:1407
 msgid " (Scanning)"
-msgstr "(Сканирование)"
+msgstr " (Сканирование)"
 
 #: find.c:484
 msgid "And"
@@ -905,44 +905,42 @@ msgid ""
 msgstr "Вы должны перезапустить программу для использования выбранного языка"
 
 #: icon.c:103
-#, fuzzy
 msgid "ROX-Filer"
 msgstr "Помощь (документация)"
 
-#: icon.c:104 icon.c:109 menu.c:190 toolbar.c:126
+#: icon.c:104 icon.c:109 menu.c:196 toolbar.c:126
 msgid "Help"
 msgstr "Помощь"
 
-#: icon.c:105 menu.c:206
+#: icon.c:105 menu.c:216
 msgid "Options..."
 msgstr "Настройки"
 
-#: icon.c:106 menu.c:214
+#: icon.c:106 menu.c:224
 msgid "Home Directory"
 msgstr "Домашний каталог"
 
-#: icon.c:107 menu.c:185 run.c:287 type.c:198
+#: icon.c:107 icon.c:139 menu.c:191 run.c:287 type.c:198
 msgid "File"
 msgstr "Файл"
 
-#: icon.c:108 menu.c:189 menu.c:588
+#: icon.c:108 menu.c:195 menu.c:602
 msgid "Shift Open"
 msgstr "Открыть (принудительно)"
 
-#: icon.c:110 menu.c:191
+#: icon.c:110 menu.c:197
 msgid "Info"
 msgstr "Информация"
 
-#: icon.c:111 menu.c:192
+#: icon.c:111 menu.c:198
 msgid "Set Run Action..."
 msgstr "Установить действие"
 
-#: icon.c:112 menu.c:193
+#: icon.c:112 menu.c:199
 msgid "Set Icon..."
 msgstr "Установить пиктограмму"
 
-#: icon.c:113 icon.c:800
-#, fuzzy
+#: icon.c:113 icon.c:803
 msgid "Edit Item"
 msgstr "Редактировать"
 
@@ -954,45 +952,43 @@ msgstr "Показать путь"
 msgid "Remove Item(s)"
 msgstr "Удалить обьект(ы)"
 
-#: icon.c:402
-#, fuzzy
+#: icon.c:405
 msgid "Nothing"
 msgstr "<ничего>"
 
-#: icon.c:573
+#: icon.c:576
 msgid "The label must contain at least one character!"
 msgstr "Метка должна содержать хотя бы один символ!"
 
-#: icon.c:576
+#: icon.c:579
 msgid "The location must contain at least one character!"
 msgstr "Место расположения должно содержать хотя бы один символ!"
 
-#: icon.c:579
+#: icon.c:582
 msgid "Sorry, but the name must not contain < or >"
 msgstr "Имя не должно содержать `<` или `>`"
 
-#: icon.c:711
-#, fuzzy
+#: icon.c:714
 msgid "You must first select some items to remove"
 msgstr "Сначала вы должны выбрать несколько значков для удаления"
 
-#: icon.c:750
+#: icon.c:753
 msgid "You must open the menu over an item"
-msgstr ""
+msgstr "Вы должны открыть меню над объектом"
 
-#: icon.c:779 menu.c:940
+#: icon.c:782 menu.c:954
 msgid "You can only set the run action for a regular file"
 msgstr "Вы можете устанавливать ассоциации только для обычных файлов"
 
-#: icon.c:806
+#: icon.c:809
 msgid "Clicking the icon opens:"
 msgstr "Щелчок по пиктограмме открывает:"
 
-#: icon.c:818
+#: icon.c:821
 msgid "The text displayed under the icon is:"
 msgstr "Текст изображаемый под пиктограммой:"
 
-#: infobox.c:92 menu.c:183
+#: infobox.c:92 menu.c:189
 msgid "Refresh"
 msgstr "Обновить"
 
@@ -1133,171 +1129,176 @@ msgstr "Поддержка VFS"
 msgid "No (couldn't find a valid libvfs)"
 msgstr "Нет (не могу найти пригодную libvfs)"
 
-#: menu.c:154 tips:11
+#: menu.c:160 tips:11
 msgid "Display"
 msgstr "Показать"
 
-#: menu.c:155 tips:22
+#: menu.c:161 tips:22
 msgid "Huge Icons"
 msgstr "Огромные значки"
 
-#: menu.c:156 tips:23
+#: menu.c:162 tips:23
 msgid "Large Icons"
 msgstr "Большие значки"
 
-#: menu.c:157 tips:24
+#: menu.c:163 tips:24
 msgid "Small Icons"
 msgstr "Маленькие значки"
 
-#: menu.c:158
+#: menu.c:164
 msgid "Huge, With..."
 msgstr "Огромные..."
 
-#: menu.c:159 menu.c:165 menu.c:171 tips:27
+#: menu.c:165 menu.c:171 menu.c:177 tips:27
 msgid "Summary"
 msgstr "Детали"
 
-#: menu.c:160 menu.c:166 menu.c:172 tips:28
+#: menu.c:166 menu.c:172 menu.c:178 tips:28
 msgid "Sizes"
 msgstr "Размер"
 
-#: menu.c:162 menu.c:168 menu.c:174 tips:30 tips:34
+#: menu.c:168 menu.c:174 menu.c:180 tips:30 tips:34
 msgid "Type"
 msgstr "Тип"
 
-#: menu.c:163 menu.c:169 menu.c:175 tips:31
+#: menu.c:169 menu.c:175 menu.c:181 tips:31
 msgid "Times"
 msgstr "Время"
 
-#: menu.c:164
+#: menu.c:170
 msgid "Large, With..."
 msgstr "Большие..."
 
-#: menu.c:170
+#: menu.c:176
 msgid "Small, With..."
 msgstr "Маленькие..."
 
-#: menu.c:177
+#: menu.c:183
 msgid "Sort by Name"
 msgstr "Сортировка по имени"
 
-#: menu.c:178
+#: menu.c:184
 msgid "Sort by Type"
 msgstr "Сортировка по типу"
 
-#: menu.c:179
+#: menu.c:185
 msgid "Sort by Date"
 msgstr "Сортировка по дате"
 
-#: menu.c:180
+#: menu.c:186
 msgid "Sort by Size"
 msgstr "Сортировка по размеру"
 
-#: menu.c:182
+#: menu.c:188
 msgid "Show Hidden"
 msgstr "Показать спрятанные"
 
-#: menu.c:184
+#: menu.c:190
 msgid "Create Thumbs"
 msgstr "Предпросмотр"
 
-#: menu.c:186
+#: menu.c:192
 msgid "Copy..."
 msgstr "Копировать"
 
-#: menu.c:187
+#: menu.c:193
 msgid "Rename..."
 msgstr "Переименовать"
 
-#: menu.c:188
+#: menu.c:194
 msgid "Link..."
 msgstr "Ссылка"
 
-#: menu.c:194
+#: menu.c:201
 msgid "Open VFS"
 msgstr "Открыть VFS"
 
-#: menu.c:195
+#: menu.c:202
 msgid "Unzip"
 msgstr ""
 
-#: menu.c:196
+#: menu.c:203
 msgid "Untar"
 msgstr ""
 
-#: menu.c:197
+#: menu.c:204
 msgid "Deb"
 msgstr ""
 
-#: menu.c:198
+#: menu.c:205
 msgid "RPM"
 msgstr ""
 
-#: menu.c:204
+#: menu.c:207
+#, fuzzy
+msgid "Open AVFS"
+msgstr "Открыть VFS"
+
+#: menu.c:214
 msgid "Select All"
 msgstr "Выбрать все"
 
-#: menu.c:205
+#: menu.c:215
 msgid "Clear Selection"
 msgstr "Снять выбор"
 
-#: menu.c:207
+#: menu.c:217
 msgid "New Directory..."
 msgstr "Новый каталог"
 
-#: menu.c:208
+#: menu.c:218
 msgid "New File..."
 msgstr "Новый файл"
 
-#: menu.c:209
+#: menu.c:219
 msgid "Xterm Here"
 msgstr "Терминал"
 
-#: menu.c:210
+#: menu.c:220
 msgid "Window"
 msgstr "Окно"
 
-#: menu.c:211
+#: menu.c:221
 msgid "Parent, New Window"
 msgstr "На уровень выше, новое окно"
 
-#: menu.c:212
+#: menu.c:222
 msgid "Parent, Same Window"
 msgstr "На уровень выше, то же окно"
 
-#: menu.c:213
+#: menu.c:223
 msgid "New Window"
 msgstr "Новое окно"
 
-#: menu.c:215
+#: menu.c:225
 msgid "Resize Window"
 msgstr "Размер окна"
 
-#: menu.c:218
+#: menu.c:228
 msgid "Close Window"
 msgstr "Закрыть oкно"
 
-#: menu.c:220
+#: menu.c:230
 msgid "Enter Path..."
 msgstr "Ввести путь..."
 
-#: menu.c:221
+#: menu.c:231
 msgid "Shell Command..."
 msgstr "Команда..."
 
-#: menu.c:222
+#: menu.c:232
 msgid "Select If..."
 msgstr "Выбрать..."
 
-#: menu.c:224
+#: menu.c:234
 msgid "Show ROX-Filer Help"
 msgstr "Помощь ROX-Filer'a"
 
-#: menu.c:316
+#: menu.c:328
 msgid "Relative link"
 msgstr "Относительная ссылка"
 
-#: menu.c:320
+#: menu.c:332
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1310,134 +1311,134 @@ msgstr ""
 "Если выключено, то будет сохранен путь от корневого каталога - используйте "
 "если ссылка будет перемещена, а целевой файл останется на прежнем месте."
 
-#: menu.c:480
+#: menu.c:494
 msgid "Next Click"
 msgstr "Действие"
 
-#: menu.c:496
+#: menu.c:510
 #, c-format
 msgid "%d items"
 msgstr "%d обьектов"
 
-#: menu.c:575
+#: menu.c:589
 msgid "Unmount"
 msgstr "Отсоединить"
 
-#: menu.c:577 tips:77
+#: menu.c:591 tips:77
 msgid "Mount"
 msgstr "Присоединить"
 
-#: menu.c:580
+#: menu.c:594
 msgid "Show Target"
 msgstr "Показать цель"
 
-#: menu.c:582
+#: menu.c:596
 msgid "Look Inside"
 msgstr "Посмотреть внутрь"
 
-#: menu.c:584
+#: menu.c:598
 msgid "Open As Text"
 msgstr "Открыть как текст"
 
-#: menu.c:670
+#: menu.c:684
 msgid "DELETE ... ?"
 msgstr "Удалить что?"
 
-#: menu.c:682
+#: menu.c:696
 msgid "Count the size of ... ?"
 msgstr "Подсчитать размер чего?"
 
-#: menu.c:694
+#: menu.c:708
 msgid "Set permissions on ... ?"
 msgstr "Установить права для чего?"
 
-#: menu.c:706
+#: menu.c:720
 msgid "Search inside ... ?"
 msgstr "Искать внутри чего?"
 
-#: menu.c:761
+#: menu.c:775
 msgid "New pathname is not absolute"
 msgstr "Новый путь не абсолютный"
 
-#: menu.c:806 menu.c:832 menu.c:877 menu.c:898 menu.c:921 menu.c:954
-#: menu.c:986 menu.c:1017
+#: menu.c:820 menu.c:846 menu.c:891 menu.c:912 menu.c:935 menu.c:968
+#: menu.c:1000 menu.c:1031
 msgid "You cannot do this to more than one item at a time"
 msgstr "Вы не можете делать это более чем с одним обьектом сразу"
 
-#: menu.c:813
+#: menu.c:827
 msgid "Copy ... ?"
 msgstr "Копировать что?"
 
-#: menu.c:839
+#: menu.c:853
 msgid "Rename ... ?"
 msgstr "Переименовать что?"
 
-#: menu.c:841
+#: menu.c:855
 msgid "Rename"
 msgstr "Переименовать что?"
 
-#: menu.c:884
+#: menu.c:898
 msgid "Symlink ... ?"
 msgstr "Сделать ссылку чего?"
 
-#: menu.c:886
+#: menu.c:900
 msgid "Symlink"
 msgstr "Создать ссылку"
 
-#: menu.c:905
+#: menu.c:919
 msgid "Shift Open ... ?"
 msgstr "Принудительно открыть что?"
 
-#: menu.c:928
+#: menu.c:942
 msgid "Set run action for ... ?"
 msgstr "Устанивить ассоциацию для чего?"
 
-#: menu.c:961
+#: menu.c:975
 msgid "Set icon for ... ?"
 msgstr "Выбрать пиктограмму для чего?"
 
-#: menu.c:994
+#: menu.c:1008
 msgid "Examine ... ?"
 msgstr "Проверить что?"
 
-#: menu.c:1024
+#: menu.c:1038
 msgid "Help about ... ?"
 msgstr "Помощь о чем?"
 
 #
-#: menu.c:1044
+#: menu.c:1059 menu.c:1105
 msgid "Look inside ... ?"
 msgstr "Искать внутри ... ?"
 
-#: menu.c:1056
+#: menu.c:1071 menu.c:1110
 msgid "You must select a single file to open as a Virtual File System"
 msgstr "Вы должны выбрать только один файл для открытия в VFS"
 
-#: menu.c:1123
+#: menu.c:1171
 msgid "New Directory"
 msgstr "Новый каталог"
 
-#: menu.c:1124
+#: menu.c:1172
 msgid "NewDir"
 msgstr "Новый каталог"
 
-#: menu.c:1137 menu.c:1142
+#: menu.c:1185 menu.c:1190
 msgid "Error creating file"
 msgstr "Ошибка создания файла"
 
-#: menu.c:1161
+#: menu.c:1209
 msgid "New File"
 msgstr "Новый файл"
 
-#: menu.c:1162
+#: menu.c:1210
 msgid "NewFile"
 msgstr "Новый файл"
 
-#: menu.c:1176 run.c:120 type.c:321
+#: menu.c:1224 run.c:120 type.c:321
 msgid "Failed to fork() child process"
 msgstr "Невозможно сделать fork() для потомка"
 
-#: menu.c:1213
+#: menu.c:1261
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1445,15 +1446,15 @@ msgstr ""
 "Вы не можете открыть второе окно просмотра этого каталога, так как включена "
 "опция `Уникальные окна`."
 
-#: menu.c:1257
+#: menu.c:1305
 msgid "New window, as user..."
 msgstr "Открыть как пользователь..."
 
-#: menu.c:1265
+#: menu.c:1313
 msgid "Browse as which user?"
 msgstr "Открыть как какой пользователь?"
 
-#: menu.c:1272
+#: menu.c:1320
 msgid "User:"
 msgstr "Пользователь:"
 
@@ -1561,7 +1562,7 @@ msgstr "Отсутствует ',' после метки"
 
 #: pinboard.c:1113
 msgid "Error saving pinboard"
-msgstr "Ошибка при записи pinboard"
+msgstr "Ошибка при записи рабочего стола"
 
 #: rox_gettext.c:88
 msgid "Invalid .gmo translation file (too short)"
@@ -1574,7 +1575,7 @@ msgstr ""
 
 #: run.c:93 run.c:135
 msgid "Program not found - deleted?"
-msgstr "Программа не найдена. (была удалена?)"
+msgstr "Программа не найдена. (Была удалена?)"
 
 #: run.c:244
 msgid "Failed to fork() child"
@@ -1741,18 +1742,16 @@ msgid "Size"
 msgstr "Размер"
 
 #: toolbar.c:118
-#, fuzzy
 msgid "Change icon size"
-msgstr "Изменить время:"
+msgstr "Изменить размер пиктограммы"
 
 #: tips:25 toolbar.c:122
 msgid "Details"
 msgstr "Детали"
 
 #: toolbar.c:122
-#, fuzzy
 msgid "Show extra details"
-msgstr "Без деталей"
+msgstr "Показать дополнительные детали"
 
 #: toolbar.c:126
 msgid "Show ROX-Filer help"
@@ -1761,22 +1760,20 @@ msgstr "Показать помощь ROX-Filer'a"
 #: toolbar.c:553
 #, c-format
 msgid " (%u hidden)"
-msgstr ""
+msgstr " (%u скрыто)"
 
 #: toolbar.c:559
-#, fuzzy
 msgid "items"
-msgstr "%d обьектов"
+msgstr "обьектов"
 
 #: toolbar.c:559
-#, fuzzy
 msgid "item"
-msgstr "%d обьектов"
+msgstr "обьект"
 
 #: toolbar.c:576
 #, c-format
 msgid "%u selected (%s)"
-msgstr ""
+msgstr "%u выбрано (%s)"
 
 #: type.c:145
 msgid "Missing MIME-type"
@@ -1984,7 +1981,6 @@ msgstr ""
 "от типа сортировки."
 
 #: tips:16
-#, fuzzy
 msgid "Large wrap width"
 msgstr "Максимальная ширина больших значков"
 
@@ -1993,6 +1989,9 @@ msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
 msgstr ""
+"Текст шире указанного значение будет разбит на две линии в режиме показа "
+"больших пиктограмм.В режиме огромных пиктограмм текст переносится когда на "
+"50% шире этого значения."
 
 #: tips:18
 msgid "Max Small Icons width"
@@ -2003,7 +2002,6 @@ msgid "Maximum width for the text beside a Small Icon."
 msgstr "Максимальный размер текстового поля под маленькими значками."
 
 #: tips:20
-#, fuzzy
 msgid "Default settings for new windows:"
 msgstr "Установки по умолчанию для нового окна"
 
@@ -2024,9 +2022,8 @@ msgid "Date"
 msgstr "Дата"
 
 #: tips:37
-#, fuzzy
 msgid "Pinboard"
-msgstr "Настройка десктопа"
+msgstr "Настройка рабочего стола"
 
 #: tips:38
 msgid ""
@@ -2035,6 +2032,10 @@ msgid ""
 "and applications onto it to create short-cuts to them.\n"
 "See the manual for information about using the pinboard."
 msgstr ""
+"Когда рабочий стол включен, вы можете перетаскивать\n"
+"файлы и приложения на него для создания ссылок на них.\n"
+"Смотрите документацию для подробной информации об использовании\n"
+"рабочего стола"
 
 #: tips:39
 msgid "No background"
@@ -2081,8 +2082,8 @@ msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
 msgstr ""
-"Если эта опция включена, пиктограммы pinboard всегда будут внутри экрана, "
-"включая метку."
+"Если эта опция включена, пиктограммы рабочего стола всегда будут внутри "
+"экрана, включая метку."
 
 #: tips:51
 msgid "Icon grid step:"
@@ -2116,52 +2117,52 @@ msgstr ""
 "Используется 32-х пиксельная сетка для позиционирования на рабочем столе."
 
 #: tips:61
-#, fuzzy
 msgid "Panels"
-msgstr "Отменить"
+msgstr "Панели"
 
 #: tips:62
 msgid ""
 "Panels are bars of icons that run along the side of the screen.\n"
 "See the manual for information about using panels."
 msgstr ""
+"Панели пиктограмм, распологающиеся вдоль границы экрана.\n"
+"Смотрите документацию для подробной информации об использовании\n"
+"панелей."
 
 #: tips:63
 msgid "Image and text"
-msgstr ""
+msgstr "Картинка и текст"
 
 #: tips:64
 msgid "Every panel icon is shown with an image and some text."
-msgstr ""
+msgstr "Каждая пиктограмм на панели отображается картинкой и текстом."
 
 #: tips:65
 msgid "Image only for applications"
-msgstr ""
+msgstr "Картинки только для приложений"
 
 #: tips:66
 msgid ""
 "Applications have just an image, everything else has both an image and text."
-msgstr ""
+msgstr "С картинкой только приложения, остальное и с картинкой и с текстом."
 
 #: tips:67
 msgid "Image only"
-msgstr ""
+msgstr "Только картинки"
 
 #: tips:68 tips:69 tips:70
 msgid "Only the image is shown."
-msgstr ""
+msgstr "Показываются только картинки"
 
 #: tips:71
-#, fuzzy
 msgid "Action windows"
-msgstr "Запрос подтверждения"
+msgstr "Окна действий"
 
 #: tips:72
 msgid "Auto-start (Quiet) these actions:"
 msgstr "Выполнять без подтверждения следующие действия:"
 
 #: tips:78
-#, fuzzy
 msgid "Toolbar"
 msgstr "Тип панели инструментов"
 
@@ -2183,7 +2184,7 @@ msgstr "Большие"
 
 #: tips:84
 msgid "Show totals of items"
-msgstr ""
+msgstr "Показывать статистику объектов"
 
 #: tips:85 tips:86
 msgid ""
@@ -2191,9 +2192,11 @@ msgid ""
 "of hidden items (if any). When there's a selection, show the number of "
 "selected items and their combined size."
 msgstr ""
+"Показывать количество объектов отображаемых в окне менеджера, так же как и "
+"количество скрытых объектов (если они есть). Когда что-либо выбрано, "
+"показывает количество выбранных объектов и их общий размер."
 
 #: tips:87
-#, fuzzy
 msgid "Filer windows"
 msgstr "Парамтеры окна файлменеджера"
 
@@ -2246,7 +2249,6 @@ msgstr ""
 "несколько символов было добавлено."
 
 #: tips:97
-#, fuzzy
 msgid "Drag and Drop"
 msgstr "Параметры drag'n'drop"
 
@@ -2307,12 +2309,10 @@ msgstr ""
 "автоматического открытия каталога. Предыдущая опция должна быть включена."
 
 #: tips:107
-#, fuzzy
 msgid "Menus"
-msgstr "Mins"
+msgstr "Меню"
 
 #: tips:108
-#, fuzzy
 msgid ""
 "To set the keyboard short-cuts, simply\n"
 "open the menu over a filer window, move the pointer\n"
@@ -2378,6 +2378,27 @@ msgstr ""
 "обьектов. Если выключено, один щелчок выбирает обьект; двойной щелчок "
 "открывает его."
 
+#~ msgid "Translation options"
+#~ msgstr "Выбор языка сообщений"
+
+#~ msgid "Pinboard options"
+#~ msgstr "Настройки панели инструментов"
+
+#~ msgid "Display options"
+#~ msgstr "Установки отображения"
+
+#~ msgid "Max Large Icons width"
+#~ msgstr "Максимальный размер малых значков"
+
+#~ msgid "Maximum width for the text under a Large Icon."
+#~ msgstr "Максимальный размер текстового поля под большими значками."
+
+#~ msgid "Toolbar options"
+#~ msgstr "Настройки панели инструментов"
+
+#~ msgid "Menu options"
+#~ msgstr "Параметры контекстного меню"
+
 #~ msgid "ROX-Filer Options..."
 #~ msgstr "Настройки"
 
@@ -2413,18 +2434,3 @@ msgstr ""
 
 #~ msgid "Display using small icons"
 #~ msgstr "Отобразить используя маленькие значки"
-
-#~ msgid "Translation options"
-#~ msgstr "Выбор языка сообщений"
-
-#~ msgid "Display options"
-#~ msgstr "Установки отображения"
-
-#~ msgid "Maximum width for the text under a Large Icon."
-#~ msgstr "Максимальный размер текстового поля под большими значками."
-
-#~ msgid "Toolbar options"
-#~ msgstr "Настройки панели инструментов"
-
-#~ msgid "Menu options"
-#~ msgstr "Параметры контекстного меню"

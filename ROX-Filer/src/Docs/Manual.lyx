@@ -1633,7 +1633,7 @@ You can give each file or directory its own special icon using this feature
 \newline 
 drag a suitable image onto the Set Icon dialog box.
 \newline 
-Open VFS
+Open (A)VFS
 \newline 
 Open the file as if it was a directory --- see section 
 \begin_inset LatexCommand \ref{sec: vfs}
@@ -2003,16 +2003,16 @@ Some types of file can be represented as a directory.
 To use this feature you must have one or both of the following:
 \layout Itemize
 
-A system (such as PODFUK
-\begin_inset LatexCommand \cite{PODFUK}
+A system such as AVFS
+\begin_inset LatexCommand \cite{AVFS}
 
 \end_inset 
 
-) which causes the kernel to support various Virtual File Systems directly.
+ which causes the kernel to support various Virtual File Systems directly.
  This is the best option since all programs will be able to access the contents
  of the VFS.
- You will require root access to install such a system, however, and it
- is not available on all platforms.
+ You may require root access to install such a system, however, and it is
+ not available on all platforms.
 \layout Itemize
 
 Support for the Midnight Commander VFS library compiled into ROX-Filer.
@@ -2035,11 +2035,14 @@ LD_LIBRARY_PATH
  files out of it, but not change it.
  Support for this may be added later.
  Midnight Commander is part of the GNOME project.
+\begin_deeper 
 \layout Standard
 
-Note that using the `Open VFS' menu is simply a short-cut for using the
- path-entry box (explained below), so if you want to use a VFS not listed
- on the menu you can type in the path directly, eg:
+When using libvfs, the menu structure is slightly different --- `Open AVFS'
+ is replaced by the `Open VFS' submenu.
+ This is simply a short-cut for using the path-entry box (explained below),
+ so if you want to use a VFS not listed on the menu you can type in the
+ path directly, eg:
 \layout Standard
 
 
@@ -2054,6 +2057,7 @@ Note that using the `Open VFS' menu is simply a short-cut for using the
 noindent 
 \latex default 
 Don't forget the final slash!
+\end_deeper 
 \layout Subsection
 
 Step by step example of adding VFS support
@@ -3927,11 +3931,11 @@ Enlightenment,
 \emph toggle 
  <http://www.enlightenment.org>
 \layout Bibliography
-\bibitem {PODFUK}
+\bibitem {AVFS}
 
 
 \emph on 
-POrtable Dodgy Filesystems in Userland (hacK), 
-\emph toggle 
-<http://atrey.karlin.mff.cuni.cz/~pavel/podfuk/podfuk.html>
+AVFS - A Virtual File System, <
+\emph default 
+http://www.inf.bme.hu/~mszeredi/avfs/>
 \the_end
