@@ -430,7 +430,10 @@ static void build_widget(Node *widget, GtkWidget *box)
 		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
 
 		for (hw = widget->xmlChildrenNode; hw; hw = hw->next)
-			build_widget(hw, hbox);
+		{
+			if (hw->type == XML_ELEMENT_NODE)
+				build_widget(hw, hbox);
+		}
 
 		g_free(label);
 		return;
@@ -536,7 +539,10 @@ static void build_widget(Node *widget, GtkWidget *box)
 		Node		*rn;
 
 		for (rn = widget->xmlChildrenNode; rn; rn = rn->next)
-			button = build_radio(rn, box, button);
+		{
+			if (rn->type == XML_ELEMENT_NODE)
+				button = build_radio(rn, box, button);
+		}
 
 		option->widget_type = OPTION_RADIO_GROUP;
 		option->widget = button;
@@ -586,7 +592,10 @@ static void build_widget(Node *widget, GtkWidget *box)
 		gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), om);
 
 		for (item = widget->xmlChildrenNode; item; item = item->next)
-			build_menu_item(item, option_menu);
+		{
+			if (item->type == XML_ELEMENT_NODE)
+				build_menu_item(item, option_menu);
+		}
 
 		menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
 		list = kids = gtk_container_children(GTK_CONTAINER(menu));
@@ -647,6 +656,9 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
 		GtkWidget	*hbox;
 		Node		*widget;
 
+		if (section->type != XML_ELEMENT_NODE)
+			continue;
+
 		title = xmlGetProp(section, "title");
 		section_name = xmlGetProp(section, "name");
 
@@ -665,7 +677,10 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
 
 		widget = section->xmlChildrenNode;
 		for (; widget; widget = widget->next)
-			build_widget(widget, sections_vbox);
+		{
+			if (widget->type == XML_ELEMENT_NODE)
+				build_widget(widget, sections_vbox);
+		}
 
 		g_free(title);
 		g_free(section_name);
