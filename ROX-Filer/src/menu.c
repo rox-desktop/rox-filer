@@ -738,8 +738,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
-		collection_select_item(filer_window->collection, item);
 		filer_window->temp_item_selected = TRUE;
+		collection_select_item(filer_window->collection, item);
 	}
 	else
 	{
@@ -850,14 +850,16 @@ void target_callback(FilerWindow *filer_window,
 	g_return_if_fail(window_with_focus != NULL);
 	g_return_if_fail(window_with_focus == filer_window);
 	
+	/* Don't grab the primary selection */
+	filer_window->temp_item_selected = TRUE;
+	
 	collection_wink_item(collection, item);
-	collection_clear_selection(collection);
-	collection_select_item(collection, item);
+	collection_clear_except(collection, item);
 	file_op(NULL, GPOINTER_TO_INT(action), GTK_WIDGET(collection));
 
-	/* TODO: Opening a Savebox grabs the selection; don't lose it again! */
 	if (item < collection->number_of_items)
 		collection_unselect_item(collection, item);
+	filer_window->temp_item_selected = FALSE;
 }
 
 /* Set the text of the 'Shift Open...' menu item.
@@ -1234,24 +1236,24 @@ static void select_all(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	collection_select_all(window_with_focus->collection);
 	window_with_focus->temp_item_selected = FALSE;
+	collection_select_all(window_with_focus->collection);
 }
 
 static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	collection_clear_selection(window_with_focus->collection);
 	window_with_focus->temp_item_selected = FALSE;
+	collection_clear_selection(window_with_focus->collection);
 }
 
 static void invert_selection(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	collection_invert_selection(window_with_focus->collection);
 	window_with_focus->temp_item_selected = FALSE;
+	collection_invert_selection(window_with_focus->collection);
 }
 
 void menu_show_options(gpointer data, guint action, GtkWidget *widget)

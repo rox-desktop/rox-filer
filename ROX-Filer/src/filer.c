@@ -701,7 +701,8 @@ static void selection_changed(Collection *collection,
 	if (!collection->number_selected)
 		return;		/* Nothing selected */
 
-	if (gtk_selection_owner_set(GTK_WIDGET(collection),
+	if (filer_window->temp_item_selected == FALSE &&
+		gtk_selection_owner_set(GTK_WIDGET(collection),
 				GDK_SELECTION_PRIMARY,
 				time))
 	{
@@ -1863,8 +1864,8 @@ static gint coll_motion_notify(GtkWidget *widget,
 		if (event->state & GDK_BUTTON1_MASK)
 		{
 			/* Select just this one */
-			collection_clear_except(collection, i);
 			filer_window->temp_item_selected = TRUE;
+			collection_clear_except(collection, i);
 		}
 		else
 		{
