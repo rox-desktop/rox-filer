@@ -7,7 +7,7 @@ all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1 \
      Manual-it.valid ${HELP}/Manual-it.html 
 
 %.valid: %.xml
-	xmllint --noout --postvalid $<
+	xmllint --valid --noout --postvalid $<
 
 ${HELP}/%.html: %.xml to_html.xsl
 	xsltproc -o $@ to_html.xsl $<
