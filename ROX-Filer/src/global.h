@@ -45,7 +45,7 @@ typedef struct _Collection Collection;
  */
 typedef struct _CollectionItem   CollectionItem;
 
-/* This contains pixmaps and masks for an image, in various sizes */
+/* This contains the pixbufs for an image, in various sizes */
 typedef struct _MaskedPixmap MaskedPixmap;
 
 /* Each MIME type (eg 'text/plain') has one of these. It contains
