@@ -85,7 +85,6 @@ MaskedPixmap *im_mounted;
 MaskedPixmap *im_multiple;
 MaskedPixmap *im_appdir;
 
-MaskedPixmap *im_help;
 MaskedPixmap *im_dirs;
 
 typedef struct _ChildThumbnail ChildThumbnail;
@@ -159,7 +158,6 @@ static void load_default_pixmaps(void)
 	im_multiple = load_pixmap("multiple");
 	im_appdir = load_pixmap("application");
 
-	im_help = load_pixmap("help");
 	im_dirs = load_pixmap("dirs");
 
 	pixbuf = gdk_pixbuf_new_from_file(

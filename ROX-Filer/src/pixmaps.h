@@ -22,7 +22,6 @@ extern MaskedPixmap *im_multiple;
 extern MaskedPixmap *im_exec_file;
 extern MaskedPixmap *im_appdir;
 
-extern MaskedPixmap *im_help;
 extern MaskedPixmap *im_dirs;
 
 /* Note: don't change these two - thumbnails saving assumes 96x96 */
