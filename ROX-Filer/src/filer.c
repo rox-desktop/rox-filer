@@ -1283,6 +1283,8 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 				flags |= OPEN_CLOSE_WINDOW;
 			else
 				flags |= OPEN_SAME_WINDOW;
+			if (o_new_window_on_1)
+				flags ^= OPEN_SAME_WINDOW;
 			if (event->type == GDK_2BUTTON_PRESS)
 				collection_unselect_item(collection, item);
 			dnd_motion_ungrab();
