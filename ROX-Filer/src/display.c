@@ -334,20 +334,32 @@ int sort_by_owner(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;
+	const gchar *name1;
+	const gchar *name2;
 
-	return i1->uid < i2->uid ? -1 :
-		i1->uid > i2->uid ? 1 :
-		sort_by_name(item1, item2);
+	if(i1->uid==i2->uid)
+		return sort_by_name(item1, item2);
+
+	name1=user_name(i1->uid);
+	name2=user_name(i2->uid);
+
+	return strcmp(name1, name2);
 }
 
 int sort_by_group(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;
+	const gchar *name1;
+	const gchar *name2;
 
-	return i1->gid < i2->gid ? -1 :
-		i1->gid > i2->gid ? 1 :
-		sort_by_name(item1, item2);
+	if(i1->gid==i2->gid)
+		return sort_by_name(item1, item2);
+
+	name1=group_name(i1->gid);
+	name2=group_name(i2->gid);
+
+	return strcmp(name1, name2);
 }
 
 int sort_by_date(const void *item1, const void *item2)
