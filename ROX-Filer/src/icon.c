@@ -35,6 +35,8 @@
 
 #include <string.h>
 #include <gtk/gtk.h>
+#include <X11/keysym.h>
+#include <gdk/gdkx.h>
 
 #include "global.h"
 
@@ -67,6 +69,22 @@ static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
  */
 GList *icon_selection = NULL;
 
+/* A list of Icons which have grabs in effect. The same combo may be
+ * listed more than once, but has only one X grab.
+ */
+GList *icon_shortcuts = NULL;
+
+static unsigned int AltMask;
+static unsigned int MetaMask;
+static unsigned int NumLockMask;
+static unsigned int ScrollLockMask;
+static unsigned int CapsLockMask;
+static unsigned int SuperMask;
+static unsigned int HyperMask;
+
+/* {MyKey -> Number of grabs} */
+static GHashTable *grab_counter = NULL;
+
 /* Each entry is a GList of Icons which have the given pathname.
  * This allows us to update all necessary icons when something changes.
  */
@@ -92,6 +110,10 @@ static void icon_init(GTypeInstance *object, gpointer gclass);
 static void icon_hash_path(Icon *icon);
 static void icon_unhash_path(Icon *icon);
 static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n);
+static void ungrab_key(Icon *icon);
+static void grab_key(Icon *icon);
+static void parseKeyString(MyKey *key, const char *str);
+static void icon_wink(Icon *icon);
 
 enum {
 	ACTION_SHIFT,
@@ -389,6 +411,24 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 	}
 }
 
+void icon_set_shortcut(Icon *icon, const gchar *shortcut)
+{
+	g_return_if_fail(icon != NULL);
+
+	if (icon->shortcut == shortcut)
+		return;
+	if (icon->shortcut && shortcut && strcmp(icon->shortcut, shortcut) == 0)
+		return;
+
+	ungrab_key(icon);
+
+	g_free(icon->shortcut);
+	icon->shortcut = g_strdup(shortcut);
+	parseKeyString(&icon->shortcut_key, shortcut);
+
+	grab_key(icon);
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -433,20 +473,23 @@ static void icon_unhash_path(Icon *icon)
 
 static void rename_activate(GtkWidget *dialog)
 {
-	GtkWidget *entry, *src;
+	GtkWidget *entry, *src, *shortcut;
 	Icon	*icon;
-	const guchar	*new_name, *new_src;
+	const guchar	*new_name, *new_src, *new_shortcut;
 	
 	entry = g_object_get_data(G_OBJECT(dialog), "new_name");
 	icon = g_object_get_data(G_OBJECT(dialog), "callback_icon");
 	src = g_object_get_data(G_OBJECT(dialog), "new_path");
+	shortcut = g_object_get_data(G_OBJECT(dialog), "new_shortcut");
 
 	g_return_if_fail(entry != NULL &&
 			 src != NULL &&
-			 icon != NULL);
+			 icon != NULL &&
+			 shortcut != NULL);
 
 	new_name = gtk_entry_get_text(GTK_ENTRY(entry));
 	new_src = gtk_entry_get_text(GTK_ENTRY(src));
+	new_shortcut = gtk_entry_get_text(GTK_ENTRY(shortcut));
 	
 	if (*new_src == '\0')
 		report_error(
@@ -454,6 +497,7 @@ static void rename_activate(GtkWidget *dialog)
 	else
 	{
 		icon_set_path(icon, new_src, new_name);
+		icon_set_shortcut(icon, new_shortcut);
 		g_signal_emit_by_name(icon, "update");
 		gtk_widget_destroy(dialog);
 	}
@@ -629,6 +673,15 @@ static void show_rename_box(Icon *icon)
 	g_object_set_data(G_OBJECT(dialog), "new_name", entry);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 	
+	label = gtk_label_new(_("The keyboard shortcut is:"));
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
+	entry = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
+	gtk_entry_set_text(GTK_ENTRY(entry),
+			icon->shortcut ? icon->shortcut : "");
+	g_object_set_data(G_OBJECT(dialog), "new_shortcut", entry);
+	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
+
 	g_object_set_data(G_OBJECT(dialog), "callback_icon", icon);
 
 	gtk_dialog_add_buttons(dialog,
@@ -657,6 +710,7 @@ static void icon_finialize(GObject *object)
 		menu_icon = NULL;
 
 	icon_set_path(icon, NULL, NULL);
+	icon_set_shortcut(icon, NULL);
 
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -676,6 +730,7 @@ static void icon_class_init(gpointer gclass, gpointer data)
 	icon->redraw = NULL;
 	icon->update = NULL;
 	icon->same_group = NULL;
+	icon->wink = NULL;
 
 	g_signal_new("update",
 			G_TYPE_FROM_CLASS(gclass),
@@ -735,6 +790,9 @@ static void icon_init(GTypeInstance *object, gpointer gclass)
 	icon->path = NULL;
 	icon->item = NULL;
 	icon->dialog = NULL;
+	icon->shortcut = NULL;
+	icon->shortcut_key.keycode = 0;
+	icon->shortcut_key.modifier = 0;
 }
 
 /* As icon_set_selected(), but doesn't automatically unselect incompatible
@@ -802,4 +860,319 @@ static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n)
 		item = item->next;
 	}
 	g_list_free(items);
+}
+
+/* Stolen from xfwm4 */
+static void initModifiers(void)
+{
+	Display *dpy = GDK_DISPLAY();
+	XModifierKeymap *xmk = XGetModifierMapping(dpy);
+	int m, k;
+
+	AltMask = MetaMask = NumLockMask = ScrollLockMask = CapsLockMask =
+		SuperMask = HyperMask = 0;
+
+	/* Work out which mask to use for each modifier group */
+	if (xmk)
+	{
+		KeyCode *c = xmk->modifiermap;
+		KeyCode numLockKeyCode;
+		KeyCode scrollLockKeyCode;
+		KeyCode capsLockKeyCode;
+		KeyCode altKeyCode;
+		KeyCode metaKeyCode;
+		KeyCode superKeyCode;
+		KeyCode hyperKeyCode;
+
+		/* Find the codes to search for... */
+		numLockKeyCode = XKeysymToKeycode(dpy, XK_Num_Lock);
+		scrollLockKeyCode = XKeysymToKeycode(dpy, XK_Scroll_Lock);
+		capsLockKeyCode = XKeysymToKeycode(dpy, XK_Caps_Lock);
+		altKeyCode = XKeysymToKeycode(dpy, XK_Alt_L);
+		metaKeyCode = XKeysymToKeycode(dpy, XK_Meta_L);
+		superKeyCode = XKeysymToKeycode(dpy, XK_Super_L);
+		hyperKeyCode = XKeysymToKeycode(dpy, XK_Hyper_L);
+
+		/* If some are missing, try alternatives... */
+		if (!altKeyCode)
+			altKeyCode = XKeysymToKeycode(dpy, XK_Alt_R);
+		if (!metaKeyCode)
+			metaKeyCode = XKeysymToKeycode(dpy, XK_Meta_R);
+		if (!superKeyCode)
+			superKeyCode = XKeysymToKeycode(dpy, XK_Super_R);
+		if (!hyperKeyCode)
+			hyperKeyCode = XKeysymToKeycode(dpy, XK_Hyper_R);
+
+		/* Check each of the eight modifier lists.
+		 * The idea (I think) is that we name the modifier group which
+		 * includes the Alt key as the 'Alt group', and so on for
+		 * the other modifiers.
+		 */
+		for (m = 0; m < 8; m++)
+		{
+			for (k = 0; k < xmk->max_keypermod; k++, c++)
+			{
+				if (*c == NoSymbol)
+					continue;
+				if (*c == numLockKeyCode)
+					NumLockMask = (1 << m);
+				if (*c == scrollLockKeyCode)
+					ScrollLockMask = (1 << m);
+				if (*c == capsLockKeyCode)
+					CapsLockMask = (1 << m);
+				if (*c == altKeyCode)
+					AltMask = (1 << m);
+				if (*c == metaKeyCode)
+					MetaMask = (1 << m);
+				if (*c == superKeyCode)
+					SuperMask = (1 << m);
+				if (*c == hyperKeyCode)
+					HyperMask = (1 << m);
+			}
+		}
+		XFreeModifiermap(xmk);
+	}
+
+	if(MetaMask == AltMask)
+		MetaMask = 0;
+	
+	if (AltMask != 0 && MetaMask == Mod1Mask)
+	{
+		MetaMask = AltMask;
+		AltMask = Mod1Mask;
+	}
+
+	if (AltMask == 0 && MetaMask != 0)
+	{
+		if (MetaMask != Mod1Mask)
+			AltMask = Mod1Mask;
+		else
+		{
+			AltMask = MetaMask;
+			MetaMask = 0;
+		}
+	}
+
+	if (AltMask == 0)
+		AltMask = Mod1Mask;
+}
+
+#define PARSEKEY(s, k) strstr(g_ascii_strdown(s, strlen(s)), \
+			      g_ascii_strdown(k, strlen(k)))
+
+/* Fill in key from str. Sets keycode to zero if str is NULL.
+ * Stolen from xfwm4.
+ */
+static void parseKeyString(MyKey *key, const char *str)
+{
+	char *k;
+	Display *dpy = GDK_DISPLAY();
+
+	key->keycode = 0;
+	key->modifier = 0;
+
+	if (!str)
+		return;
+
+	k = strrchr(str, '+');
+	if (k)
+	{
+		key->keycode = XKeysymToKeycode(dpy, XStringToKeysym(k + 1));
+		if (PARSEKEY(str, "Shift"))
+			key->modifier = key->modifier | ShiftMask;
+		if (PARSEKEY(str, "Control"))
+			key->modifier = key->modifier | ControlMask;
+		if (PARSEKEY(str, "Alt") || PARSEKEY(str, "Mod1"))
+			key->modifier = key->modifier | AltMask;
+		if (PARSEKEY(str, "Meta") || PARSEKEY(str, "Mod2"))
+			key->modifier = key->modifier | MetaMask;
+	}
+}
+
+static GdkFilterReturn filter_keys(GdkXEvent *xevent,
+				   GdkEvent *event,
+				   gpointer  data)
+{
+	GList *next;
+	XKeyEvent *kev = (XKeyEvent *) xevent;
+	guint state;
+	
+	if (kev->type != KeyPress)
+		return GDK_FILTER_CONTINUE;
+
+	state = kev->state & (ShiftMask | ControlMask | AltMask | MetaMask);
+
+	for (next = icon_shortcuts; next; next = next->next)
+	{
+		Icon  *icon = (Icon *) next->data;
+
+		if (icon->shortcut_key.keycode == kev->keycode &&
+		    icon->shortcut_key.modifier == state)
+		{
+			icon_wink(icon);
+			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
+		}
+	}
+	
+	return GDK_FILTER_CONTINUE;
+}
+
+#define GRAB(key, mods) XGrabKey(dpy, key->keycode, key->modifier | mods, \
+				 root, False, GrabModeAsync, GrabModeAsync)
+#define UNGRAB(key, mods) XUngrabKey(dpy, key->keycode, key->modifier | mods, \
+				 root)
+
+static guint mykey_hash(gconstpointer key)
+{
+	MyKey *k = (MyKey *) key;
+	
+	return (k->keycode << 8) + k->modifier;
+}
+
+static gboolean mykey_cmp(gconstpointer a, gconstpointer b)
+{
+	MyKey *ka = (MyKey *) a;
+	MyKey *kb = (MyKey *) b;
+
+	return ka->keycode == kb->keycode && kb->modifier == kb->modifier;
+}
+
+/* Stolen from xfwm4 and modified.
+ * FALSE on error.
+ */
+static gboolean grabKey(MyKey *key)
+{
+	Window root;
+	Display *dpy = GDK_DISPLAY();
+	gboolean need_init = TRUE;
+
+	if (need_init)
+	{
+		need_init = FALSE;
+
+		initModifiers();
+		gdk_window_add_filter(gdk_get_default_root_window(),
+				filter_keys, NULL);
+	}
+
+	gdk_error_trap_push();
+
+	root = GDK_ROOT_WINDOW();
+
+	GRAB(key, 0);
+
+	if (key->modifier != AnyModifier && key->modifier != 0)
+	{
+		/* Here we grab all combinations of well known
+		 * modifiers.
+		 */
+		GRAB(key, ScrollLockMask);
+		GRAB(key, NumLockMask);
+		GRAB(key, CapsLockMask);
+		GRAB(key, ScrollLockMask | NumLockMask);
+		GRAB(key, ScrollLockMask | CapsLockMask);
+		GRAB(key, CapsLockMask | NumLockMask);
+		GRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
+	}
+
+	gdk_flush();
+	return gdk_error_trap_pop() == Success;
+}
+
+static gboolean ungrabKey(MyKey *key)
+{
+	Window root = GDK_ROOT_WINDOW();
+	Display *dpy = GDK_DISPLAY();
+
+	gdk_error_trap_push();
+
+	UNGRAB(key, 0);
+
+	if (key->modifier != AnyModifier && key->modifier != 0)
+	{
+		UNGRAB(key, ScrollLockMask);
+		UNGRAB(key, NumLockMask);
+		UNGRAB(key, CapsLockMask);
+		UNGRAB(key, ScrollLockMask | NumLockMask);
+		UNGRAB(key, ScrollLockMask | CapsLockMask);
+		UNGRAB(key, CapsLockMask | NumLockMask);
+		UNGRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
+	}
+
+	gdk_flush();
+	return gdk_error_trap_pop() == Success;
+}
+
+static void ungrab_key(Icon *icon)
+{
+	int *count;
+	
+	g_return_if_fail(icon != NULL);
+
+	if (!icon->shortcut_key.keycode)
+		return;
+
+	icon_shortcuts = g_list_remove(icon_shortcuts, icon);
+
+	count = g_hash_table_lookup(grab_counter, &icon->shortcut_key);
+	g_return_if_fail(count != NULL);
+
+	(*count)--;
+
+	if (*count > 0)
+		return;
+	
+	g_hash_table_remove(grab_counter, &icon->shortcut_key);
+
+	if (!ungrabKey(&icon->shortcut_key))
+		g_warning("Failed to ungrab shortcut '%s' for '%s' icon.",
+			   icon->shortcut, icon->item->leafname);
+}
+
+static void grab_key(Icon *icon)
+{
+	MyKey *hash_key;
+	int   *count;
+		
+	g_return_if_fail(icon != NULL);
+
+	g_return_if_fail(g_list_find(icon_shortcuts, icon) == NULL);
+
+	if (!icon->shortcut_key.keycode)
+		return;
+
+	icon_shortcuts = g_list_prepend(icon_shortcuts, icon);
+
+	if (!grab_counter)
+		grab_counter = g_hash_table_new_full(mykey_hash, mykey_cmp,
+						     g_free, NULL);
+
+	count = g_hash_table_lookup(grab_counter, &icon->shortcut_key);
+	if (count)
+	{
+		(*count)++;
+		return;	/* Already grabbed */
+	}
+
+	hash_key = g_new(MyKey, 1);
+	*hash_key = icon->shortcut_key;
+	count = g_new(int, 1);
+	*count = 1;
+	g_hash_table_insert(grab_counter, hash_key, count);
+
+	if (!grabKey(&icon->shortcut_key))
+		g_warning("Failed to grab shortcut '%s' for '%s' icon.\n"
+			  "Some other application may be already using it!\n",
+			  icon->shortcut, icon->item->leafname);
+	
+}
+
+static void icon_wink(Icon *icon)
+{
+	IconClass	*iclass;
+
+	iclass = (IconClass *) G_OBJECT_GET_CLASS(icon);
+	g_return_if_fail(iclass->wink != NULL);
+
+	iclass->wink(icon);
 }

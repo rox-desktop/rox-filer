@@ -714,7 +714,7 @@ static xmlNodePtr rpc_PinboardAdd(GList *args)
 	y = int_value(ARG(2), 0);
 	name = string_value(ARG(3));
 	
-	pinboard_pin(path, name, x, y);
+	pinboard_pin(path, name, x, y, NULL);
 
 	g_free(path);
 

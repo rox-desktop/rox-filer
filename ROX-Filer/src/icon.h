@@ -9,11 +9,17 @@
 #define _ICON_H
 
 #include <glib.h>
+#include <X11/Xlib.h>
 
 extern GList *icon_selection;
 extern GtkWidget *icon_menu;		/* The popup icon menu */
 
 typedef struct _IconClass IconClass;
+
+typedef struct {
+	KeyCode keycode;
+	int modifier;
+} MyKey;
 
 struct _IconClass {
 	GObjectClass parent;
@@ -22,6 +28,7 @@ struct _IconClass {
 	void (*destroy)(Icon *icon);
 	void (*redraw)(Icon *icon);
 	void (*update)(Icon *icon);
+	void (*wink)(Icon *icon);
 
 	/* Acts on selected items */
 	void (*remove_items)(void);
@@ -34,6 +41,8 @@ struct _Icon {
 	guchar		*src_path;	/* Eg: ~/Apps */
 	guchar		*path;		/* Eg: /home/fred/Apps */
 	DirItem		*item;
+	gchar		*shortcut;	/* Eg: Control + x */
+	MyKey		shortcut_key;	/* Parsed version of shortcut */
 
 	GtkWidget	*dialog;	/* Current rename box, if any */
 };
@@ -48,5 +57,6 @@ void icon_select_only(Icon *select);
 void icon_set_path(Icon *icon, const char *pathname, const char *name);
 gchar *icon_create_uri_list(void);
 void icon_destroy(Icon *icon);
+void icon_set_shortcut(Icon *icon, const gchar *shortcut);
 
 #endif /* _ICON_H */

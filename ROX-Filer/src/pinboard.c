@@ -319,7 +319,8 @@ void pinboard_activate(const gchar *name)
 	else
 		pinboard_pin(home_dir, "Home",
 				4 + ICON_WIDTH / 2,
-				4 + ICON_HEIGHT / 2);
+				4 + ICON_HEIGHT / 2,
+				NULL);
 	loading_pinboard--;
 
 	if (o_pinboard_tasklist.int_value)
@@ -372,7 +373,8 @@ void pinboard_add_widget(GtkWidget *widget)
  *
  * name and path are in UTF-8 for Gtk+-2.0 only.
  */
-void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
+void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
+		  const gchar *shortcut)
 {
 	GtkWidget	*align, *vbox;
 	GdkWindow	*events;
@@ -455,6 +457,8 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons, pi);
 	pin_icon_set_tip(pi);
+
+	icon_set_shortcut(icon, shortcut);
 
 	if (!loading_pinboard)
 		pinboard_save();
@@ -1074,7 +1078,7 @@ static void backdrop_from_xml(xmlNode *node)
 static void pinboard_load_from_xml(xmlDocPtr doc)
 {
 	xmlNodePtr node, root;
-	char	   *tmp, *label, *path;
+	char	   *tmp, *label, *path, *shortcut;
 	int	   x, y;
 
 	root = xmlDocGetRootElement(doc);
@@ -1109,11 +1113,13 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 		path = xmlNodeGetContent(node);
 		if (!path)
 			path = g_strdup("<missing path>");
+		shortcut = xmlGetProp(node, "shortcut");
 
-		pinboard_pin(path, label, x, y);
+		pinboard_pin(path, label, x, y, shortcut);
 
 		g_free(path);
 		g_free(label);
+		g_free(shortcut);
 	}
 }
 
@@ -1147,7 +1153,7 @@ static const char *pin_from_file(gchar *line)
 	if (sscanf(line, " %d , %d , %n", &x, &y, &n) < 2)
 		return NULL;		/* Ignore format errors */
 
-	pinboard_pin(line + n, leaf, x, y);
+	pinboard_pin(line + n, leaf, x, y, NULL);
 
 	g_free(leaf);
 
@@ -1216,6 +1222,8 @@ static void pinboard_save(void)
 		g_free(tmp);
 
 		xmlSetProp(tree, "label", icon->item->leafname);
+		if (icon->shortcut)
+			xmlSetProp(tree, "shortcut", icon->shortcut);
 	}
 
 	save_new = g_strconcat(save, ".new", NULL);
@@ -1551,6 +1559,11 @@ static gboolean pin_icon_same_group(Icon *icon, Icon *other)
 	return IS_PIN_ICON(other);
 }
 
+static void pin_wink_icon(Icon *icon)
+{
+	pinboard_wink_item((PinIcon *) icon, TRUE);
+}
+
 static void pin_icon_class_init(gpointer gclass, gpointer data)
 {
 	IconClass *icon = (IconClass *) gclass;
@@ -1560,6 +1573,7 @@ static void pin_icon_class_init(gpointer gclass, gpointer data)
 	icon->destroy = pin_icon_destroy;
 	icon->redraw = pinboard_reshape_icon;
 	icon->update = pin_icon_update;
+	icon->wink = pin_wink_icon;
 	icon->remove_items = pinboard_remove_items;
 	icon->same_group = pin_icon_same_group;
 }
