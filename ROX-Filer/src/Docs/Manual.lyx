@@ -188,10 +188,19 @@ $
 $ gtk-config --version
 \layout LyX-Code
 
-1.2.3
+1.2.8
 \layout Standard
 
-To compile:
+Due to bugs in earlier versions, GTK+ 1.2.8 is strongly recommended.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\latex default 
+ To compile:
 \layout Enumerate
 
 Change to the directory containing the ROX-Filer subdirectory.
@@ -505,7 +514,7 @@ medskip
 \layout Standard
 \LyXTable
 multicol5
-19 2 0 0 -1 -1 -1 -1
+20 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 1 0
@@ -519,6 +528,7 @@ multicol5
 0 1 0 0
 0 1 1 0
 0 1 1 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -551,6 +561,8 @@ multicol5
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -648,6 +660,10 @@ Open the item under the cursor.
 Spacebar
 \newline 
 Toggles the item under the cursor between being selected and unselected.
+\newline 
+Tab, Shift+Tab
+\newline 
+Moves the cursor to the next/previous selected item.
 \layout Standard
 
 
@@ -767,10 +783,13 @@ Same
 \backslash 
 noindent 
 \latex default 
-If the toolbar is in Normal mode (ie, not GNOME mode) then you may also
- use either of the other buttons to perform the `Other action'.
+You may also use either of the other buttons to perform the `Other action'.
  If the 'New window on button 1' option is turned on then the `Action' and
  `Other action' of the first two are swapped.
+\layout Standard
+
+Dragging files to the Up or Home icons acts just like dragging them into
+ the directory which the button leads to.
 \layout Subsection
 
 The menus
@@ -2464,6 +2483,26 @@ Apply works like OK, but without closing the Options window.
 \layout Description
 
 Cancel closes the options box and forgets any changes you made.
+\layout Standard
+
+Many of the options in the Options window have tooltips --- hold the mouse
+ pointer over the option to find out what it does.
+\layout Subsubsection
+
+Pinboard options
+\layout Standard
+
+If you are using the pinboard features (see section 
+\begin_inset LatexCommand \ref{run_pin}
+
+\end_inset 
+
+) then you can choose how the text under each icon is displayed.
+ If you have a fairly uniform background then you may like to choose `No
+ background', which simply draws the text directly over the desktop background.
+ However, users with more `noisy' backdrops may find such text hard to read;
+ selecting `Rectangular background slab' will draw a solid rectangle behind
+ the text to make it easier to read.
 \layout Subsubsection
 
 Action window options
@@ -2474,12 +2513,56 @@ You can choose to start some operations automatically, without waiting for
  Select each operation that you want to auto-start here.
 \layout Subsubsection
 
-Filer window options
+Display options
 \layout Itemize
 
 `Ignore case when sorting' treats upper and lower case letters as equivalent
  when sorting.
  If this is off then `Zoo' comes before `animal', for example.
+\layout Itemize
+
+`Max Large Icons width' sets the maximum width for a file's name in `Large
+ Icons' display mode.
+ Text wider than this will be truncated (a small red vertical bar indicates
+ when text has been truncated).
+\layout Itemize
+
+`Max Small Icons width' --- as above, but applies when the display is in
+ `Small Icons' display mode.
+\layout Standard
+
+The last display style and sort type you chose will also be saved as the
+ defaults for next time if you click on Save.
+\layout Subsubsection
+
+Toolbar options
+\layout Standard
+
+`Toolbar type for new windows' allows you to choose what kind of toolbar
+ will be used for future filer windows (the currently open windows are not
+ affected).
+ 
+\series bold 
+None
+\series default 
+ means that new windows will not have a toolbar, 
+\series bold 
+Normal
+\series default 
+ provides a small bar of icons, and 
+\series bold 
+Large
+\series default 
+ displays larger icons with textual labels.
+ See section 
+\begin_inset LatexCommand \ref{sec: Toolbar}
+
+\end_inset 
+
+ for details.
+\layout Subsubsection
+
+Filer window options
 \layout Itemize
 
 `New window on button 1' swaps the actions of the two non-menu buttons when
@@ -2505,28 +2588,10 @@ without
 
 `Unique windows' prevents you from having two windows showing the same directory.
  Opening a second view onto a directory closes the first.
-\layout Itemize
-
-`Toolbar type for new windows' allows you to choose what kind of toolbar
- will be used for future filer windows (the currently open windows are not
- affected).
- None means that new windows will not have a toolbar, Normal provides a
- small bar of icons, and GNOME displays larger icons with textual labels
- and allows the bar to be detached from the window by dragging it.
- See section 
-\begin_inset LatexCommand \ref{sec: Toolbar}
-
-\end_inset 
-
- for details.
-\layout Standard
-
-The last display style and sort type you chose will also be saved as the
- defaults for next time.
 \layout Subsubsection
 
 Drag-And-Drop options
-\layout Standard
+\layout Itemize
 
 ROX-Filer uses the standard XDND protocol for drag-and-drop.
  This protocol recommends that URIs should contain the hostname of the computer
@@ -2537,15 +2602,25 @@ ROX-Filer uses the standard XDND protocol for drag-and-drop.
  If `Don't use hostnames' is on then the hostname part is omitted and ROX-Filer
  will work with these applications BUT you can't drag data to a program
  running on a different machine.
-\layout Standard
+\layout Itemize
 
 `Allow dragging to icons in filer windows' controls what happens when you
  drop files onto icons in filer windows.
- If on then drops onto directories will save the data inside the directory
+ If on then drops onto directories will save the data inside the directory,
  while dropping onto programs will invoke the program on that data.
  If off then drops anywhere inside a filer window act like drops onto the
  window background --- that is, the data will be saved into the directory
  being displayed.
+\layout Itemize
+
+`Directories spring open' controls what happens when you hold a file over
+ a directory in a filer window or on the pinboard.
+ If on, the directory will `spring open' after a short pause, allowing you
+ to navigate to any directory during a drag.
+ You can also hold the pointer over the Home and Up buttons on the toolbar
+ for a similar effect.
+ You need to have the previous option enabled for this to have any effect
+ on files displayed in a directory.
 \layout Subsubsection
 
 Menu options

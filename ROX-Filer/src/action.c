@@ -2092,7 +2092,7 @@ void action_chmod(FilerWindow *filer_window)
 		presets = g_list_append(presets,
 				_("go-rwx (Private - owner access only)"));
 		presets = g_list_append(presets,
-				_("go=u-w (Public read, not write)"));
+				_("go=u-w (Public access, not write)"));
 	}
 
 	if (!last_chmod_string)
