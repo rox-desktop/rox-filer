@@ -784,7 +784,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	updating_menu--;
 	
 	show_popup_menu(popup_menu, event,
-			popup_menu == filer_file_menu ? 5 : 1);
+			popup_menu == filer_file_menu ? 9 : 1);
 }
 
 static void menu_closed(GtkWidget *widget)
