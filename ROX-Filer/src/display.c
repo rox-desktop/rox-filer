@@ -795,17 +795,18 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-/* Allocate colours for file types.
- * Returns the number of colours changed (0 if first_time is TRUE).
+/* Parse file type colours and allocate/free them as necessary.
+ * Returns the number of colours changed (0 if 'allocated' is FALSE from last
+ * call).
  */
 static int alloc_type_colours(void)
 {
 	gboolean	success[NUM_TYPE_COLOURS];
-	int		change_count = 0;
+	int		change_count = 0;	/* No. needing realloc */
 	int		i;
-	static gboolean	first_time = TRUE;
+	static gboolean	allocated = FALSE;
 
-	/* Parse colours. */
+	/* Parse colours */
 	for (i = 0; i < NUM_TYPE_COLOURS; i++) {
 		GdkColor *c = &type_colours[i];
 		gushort r = c->red;
@@ -814,27 +815,34 @@ static int alloc_type_colours(void)
 
 		gdk_color_parse(
 			option_get_static_string(opt_type_colours[i][0]),
-			&type_colours[i]
-		);
-		if (!first_time
+			&type_colours[i]);
+
+		if (allocated
 		    && (c->red != r || c->green != g || c->blue != b))
 			change_count++;
 	}
 	
-	/* Free colours. */
-	if (!first_time && change_count)
-		gdk_colormap_free_colors(gtk_widget_get_default_colormap(),
-				type_colours, NUM_TYPE_COLOURS);
+	/* Free colours if they were previously allocated and
+	 * have changed or become unneeded.
+	 */
+	if (allocated && (change_count || !o_display_colour_types))
+	{
+		gdk_colormap_free_colors(gdk_rgb_get_cmap(),
+					 type_colours, NUM_TYPE_COLOURS);
+		allocated = FALSE;
+	}
 
-	/* Allocate colours.
+	/* Allocate colours, unless they are still allocated (=> they didn't
+	 * change) or we don't want them anymore.
 	 * XXX: what should be done if allocation fails?
 	 */
-	if (first_time || change_count)
-		gdk_colormap_alloc_colors(gtk_widget_get_default_colormap(),
+	if (!allocated && o_display_colour_types)
+	{
+		gdk_colormap_alloc_colors(gdk_rgb_get_cmap(),
 				type_colours, NUM_TYPE_COLOURS,
 				FALSE, TRUE, success);
-
-	first_time = FALSE;
+		allocated = TRUE;
+	}
 
 	return change_count;
 }
@@ -853,7 +861,6 @@ static void options_changed(void)
 	o_small_truncate = option_get_int("display_small_width");
 	o_display_colour_types = option_get_int("display_colour_types");
 
-	/* TODO: Only alloc if needed? */
 	ch_colours = alloc_type_colours();
 	
 	while (next)
