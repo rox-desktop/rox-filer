@@ -167,9 +167,9 @@ static void draw_focus_at(Collection *collection, GdkRectangle *area)
 		gc = widget->style->fg_gc[GTK_STATE_INSENSITIVE];
 
 	gdk_draw_rectangle(widget->window, gc, FALSE,
-				area->x + 1, area->y + 1,
-				collection->item_width - 3,
-				area->height - 3);
+				area->x, area->y,
+				collection->item_width - 1,
+				area->height - 1);
 }
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
@@ -1001,7 +1001,7 @@ static void set_vadjustment(Collection *collection)
 		collection->vadj->upper = 1;
 
 	collection->vadj->step_increment =
-		MIN(collection->vadj->upper, collection->item_height / 4);
+		MIN(collection->vadj->upper, collection->item_height);
 	
 	collection->vadj->page_increment =
 		MIN(collection->vadj->upper,
