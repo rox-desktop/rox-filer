@@ -36,15 +36,19 @@ static MIME_type text_plain = {"text", "plain"};
 
 void type_init()
 {
-	char	*path;
+	ChoicesList 	*paths, *next;
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-	path = choices_find_path_load_shared("guess", "MIME-types");
-	if (path)
+	paths = choices_find_load_all("guess", "MIME-types");
+	while (paths)
 	{
 		current_type = NULL;
-		parse_file(path, import_extensions);
+		parse_file(paths->path, import_extensions);
+		next = paths->next;
+		g_free(paths->path);
+		g_free(paths);
+		paths = next;
 	}
 }
 

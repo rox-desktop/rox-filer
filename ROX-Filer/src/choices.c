@@ -88,6 +88,61 @@ char *choices_find_path_load_shared(char *leaf, char *shared_name)
 	return NULL;
 }
 
+/* Return a linked list (possibly NULL) of matching files from all
+ * directories in CHOICESPATH. The first item in the list is the right-most
+ * entry in CHOICESPATH.
+ */
+ChoicesList *choices_find_load_all(char *leaf, char *dir_name)
+{
+	char		*choices_path, *path;
+	ChoicesList	*retval = NULL;
+	
+	if (!dir_name)
+	{
+		fprintf(stderr, "choices_find_path_load_all: "
+				"bad Choices dir_name\n");
+		return NULL;
+	}
+
+	choices_path = getenv("CHOICESPATH");
+	if (!choices_path)
+	{
+		path = make_choices_path(default_user_choices(),
+				leaf, 0, dir_name);
+		if (path && exists(path) && (path = my_strdup(path)))
+		{
+			retval = malloc(sizeof(ChoicesList));
+			retval->next = NULL;
+			retval->path = path;
+		}
+
+		choices_path = "/usr/local/Choices:/usr/Choices";
+	}
+
+	if (*choices_path == ':')
+		choices_path++;
+
+	while (choices_path)
+	{
+		path = make_choices_path(choices_path, leaf, 0, dir_name);
+		if (path && exists(path) && (path = my_strdup(path)))
+		{
+			ChoicesList *new;
+			
+			new = malloc(sizeof(ChoicesList));
+			new->next = retval;
+			new->path = path;
+			retval = new;
+		}
+
+		choices_path = strchr(choices_path, ':');
+		if (choices_path)
+			choices_path++;
+	}
+
+	return retval;
+}
+
 /* Return a pathname to save to, or NULL if saving isn't possible.
  * Otherwise, it points to a static buffer which is valid until the next call
  * to the choices system.
