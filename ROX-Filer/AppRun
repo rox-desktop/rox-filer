@@ -38,7 +38,9 @@ case $1 in
 		  (cd "$APP_DIR/src"; autoconf)
 		fi
 		rm -f "$APP_DIR/src/config.cache"
-		cd "$APP_DIR/src" && ./configure --enable-rox	    \
+		[ ! -d ~/build ] && mkdir ~/build
+		[ ! -d ~/build/"$PROG" ] && mkdir ~/build/"$PROG"
+		cd ~/build/"$PROG" && "$APP_DIR/src/configure" --enable-rox    \
 					--with-platform="$PLATFORM" \
 					"$@" \
 			&& make clean && make && echo Done >&2 && exit 0

@@ -2,6 +2,11 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+22-May-2004
+~~~~~~~~~~~
+Build object files in ~/build/ROX-Filer, in case source directory is read-only.
+This also reduces the risk of distributing the object files by accident.
+
 14-May-2004
 ~~~~~~~~~~~
 Don't allow toolbar buttons to focus (needed for GTK 2.4).
@@ -9,7 +14,7 @@ Don't allow toolbar buttons to focus (needed for GTK 2.4).
 08-May-2004
 ~~~~~~~~~~~
 Fix loss of bookmark name when re-ordering (Rahsheen Porter).
-Removed installation of thumbnail handlers via the Set Icon dialog.  It was
+Removed installation of thumbnail handlers via the Set Icon dialog. It was
 never documented and all the thumbnailers use the mime_handler installation
 anyway (Stephen Watson).
 
@@ -228,7 +233,7 @@ Added optional top and bottom margines for iconized window placement
 16-Oct-2003
 ~~~~~~~~~~~
 Don't lower the panel due when the pointer 'leaves' due to a grab (eg, clicking
-or opening a menu).
+or opening a menu). This also prevents a flickering problem with Openbox 3.
 
 15-Oct-2003
 ~~~~~~~~~~~

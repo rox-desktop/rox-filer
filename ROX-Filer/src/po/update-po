@@ -3,7 +3,8 @@
 echo Extracting messages from source files...
 echo
 
-(cd ..; make messages.pot)
+(cd ..; python po/tips.py;
+ xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS} tips)
 
 echo
 echo Updating all .po files...

@@ -1,7 +1,8 @@
 SHELL = @SHELL@
 srcdir = @srcdir@
+VPATH = @srcdir@
 PLATFORM = @with_platform@
-PLATFORM_DIR = ../${PLATFORM}
+PLATFORM_DIR = $(srcdir)/../${PLATFORM}
 CC = @CC@
 .SUFFIXES:
 .SUFFIXES: .c .o
@@ -63,7 +64,3 @@ config.status: configure
 
 configure: configure.in
 	autoconf
-
-messages.pot: ${SRCS} ../Options.xml
-	python po/tips.py
-	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS} tips

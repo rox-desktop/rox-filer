@@ -57,13 +57,14 @@ struct _GFSCacheData
 	time_t		last_lookup;
 
 	/* Details of the file last time we checked it */
-	time_t		m_time;
+	time_t		m_time, c_time;
 	off_t		length;
 	mode_t		mode;
 };
 
 #define UPTODATE(data, info)				\
 		(data->m_time == info.st_mtime		\
+		 && data->c_time == info.st_ctime	\
 		 && data->length == info.st_size	\
 		 && data->mode == info.st_mode)		\
 
@@ -234,6 +235,7 @@ void g_fscache_may_update(GFSCache *cache, const char *pathname)
 	{
 		cache->update(data->data, pathname, cache->user_data);
 		data->m_time = info.st_mtime;
+		data->c_time = info.st_ctime;
 		data->length = info.st_size;
 		data->mode = info.st_mode;
 	}
@@ -262,6 +264,7 @@ void g_fscache_update(GFSCache *cache, const char *pathname)
 	{
 		cache->update(data->data, pathname, cache->user_data);
 		data->m_time = info.st_mtime;
+		data->c_time = info.st_ctime;
 		data->length = info.st_size;
 		data->mode = info.st_mode;
 	}
@@ -409,6 +412,7 @@ static GFSCacheData *lookup_internal(GFSCache *cache, const char *pathname,
 
 init:
 	data->m_time = info.st_mtime;
+	data->c_time = info.st_ctime;
 	data->length = info.st_size;
 	data->mode = info.st_mode;
 
