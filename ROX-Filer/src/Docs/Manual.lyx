@@ -115,7 +115,6 @@ XDS An extension to XDND that allows applications to save data by dragging
 .
 \layout Description
 
-ROX\SpecialChar ~
 Choices A simple, but flexible, system for managing user choices.
  See 
 \begin_inset LatexCommand \cite{Choices}
@@ -165,7 +164,7 @@ Compiling
 \layout Standard
 
 ROX-Filer is usually supplied in source-only form.
- To compile and run it, you will require
+ To compile and run it, you will require:
 \layout Itemize
 
 Unix or Linux (root access is not required),
@@ -216,18 +215,28 @@ noindent
  To compile:
 \layout Enumerate
 
+The filer needs some shared files to work --- icons for the various file
+ types, rules for determining file types and default run actions.
+ These are installed by the `rox-base' package.
+ Install rox-base (from 
+\family typewriter 
+http://rox.sourceforge.net
+\family default 
+) now if you haven't done so already.
+\layout Enumerate
+
 Change to the directory containing the ROX-Filer subdirectory.
 \layout Enumerate
 
-Run the AppRun script with the 
+Run the `
 \family typewriter 
---compile
+install.sh
 \family default 
- option, like this:
+' script, like this:
 \begin_deeper 
 \layout LyX-Code
 
-$ ROX-Filer/AppRun --compile
+$ ./install.sh
 \end_deeper 
 \layout Enumerate
 
@@ -247,47 +256,27 @@ The executables files are stored inside the ROX-Filer directory in a different
 \end_deeper 
 \layout Enumerate
 
-The filer needs some shared files to work --- icons for the various file
- types, rules for determining file types and default run actions.
- These are installed, along with the filer itself, by the '
-\family typewriter 
-install.sh
-\family default 
-' script supplied with the filer.
- Run it like this:
+Once the filer has compiled you will be asked where you want to install
+ it.
+ If you want to do a system-wide installation as root, you may want to stop
+ here, su to root and rerun the install script.
 \begin_deeper 
-\layout LyX-Code
-
-$ su
-\layout LyX-Code
-
-[ enter root password ]
-\layout LyX-Code
-
-$ ./install.sh
 \layout Standard
 
-If you don't have the root password then don't worry --- skip the '
-\family typewriter 
-su
-\family default 
-' step and follow the instructions for installing into your home directory.
+If you don't have the root password then don't worry --- just follow the
+ instructions for installing into your home directory.
  
 \end_deeper 
 \layout Standard
 
-You can now run the filer by running the AppRun script without any options,
+You can now run the filer by running the `rox' script without any options,
  like this:
 \layout LyX-Code
 
-$ ROX-Filer/AppRun
+$ rox
 \layout Standard
 
 A window should appear and display the contents of the current directory.
- If you opted to install the `rox' script then you can simply do this instead:
-\layout LyX-Code
-
-$ rox
 \layout Standard
 
 If you installed the script into your home directory then you may need to
@@ -592,7 +581,7 @@ medskip
 \layout Standard
 \LyXTable
 multicol5
-20 2 0 0 -1 -1 -1 -1
+19 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 1 0
@@ -604,7 +593,6 @@ multicol5
 0 1 0 0
 0 1 1 0
 0 1 0 0
-0 1 1 0
 0 1 1 0
 0 1 0 0
 0 1 0 0
@@ -635,8 +623,6 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -707,12 +693,8 @@ Select a group of items by dragging a box around them.
 
 \newline 
 in the box will be selected.
- If you hold down Ctrl then the boxed items are added to the selection.
-\newline 
-
-\newline 
-If the other mouse button is used then the boxed items are toggled between
- selected and unselected.
+ If you hold down Ctrl or use the middle button then the boxed items are
+ added to the selection.
 \newline 
 Backspace
 \newline 
@@ -1558,7 +1540,7 @@ Select just those files that match the given pattern
 
 .
 \newline 
-Show ROX-Filer help
+Show ROX-Filer Help
 \newline 
 Same as selecting ROX-Filer and choosing `Help' from the menu.
 \layout Subsection
@@ -2952,7 +2934,7 @@ MIME-info contains files which specify what the MIME type for a file should
  All the files in all the MIME-info directories are scanned when the filer
  loads.
  ROX-Filer comes with many such rules --- these are installed into the MIME-info
- directory by the install script.
+ directory by the rox-base package.
 \begin_deeper 
 \layout Standard
 
