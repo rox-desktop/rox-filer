@@ -244,7 +244,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
 
 	gtk_widget_realize(panel->window);
-	make_panel_window(panel->window->window);
+	make_panel_window(panel->window);
 
 	gtk_widget_show_all(vp);
 	

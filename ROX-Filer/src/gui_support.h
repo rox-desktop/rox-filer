@@ -32,7 +32,7 @@ int get_choice(char *title,
 	       int number_of_buttons, ...);
 void report_error(char *message, ...);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
-void make_panel_window(GdkWindow *window);
+void make_panel_window(GtkWidget *widget);
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
 void delayed_error(char *error, ...);
 gboolean load_file(char *pathname, char **data_out, long *length_out);

@@ -267,11 +267,14 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 /* NB: Also used for pinned icons.
  * TODO: Set the level here too.
  */
-void make_panel_window(GdkWindow *window)
+void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
 	static GdkAtom	xa_state, xa_atom, xa_net_state;
-	static GdkAtom	state_list[3];
+	static gint32	state_list[3];
+	GdkWindow *window = widget->window;
+
+	g_return_if_fail(window != NULL);
 
 	if (override_redirect)
 	{
@@ -286,17 +289,22 @@ void make_panel_window(GdkWindow *window)
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
 		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
 
-		state_list[0] = gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE);
-		state_list[1] = gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER",
-							FALSE);
-		state_list[2] = gdk_atom_intern("_NET_WM_STATE_SKIP_TASKBAR",
-							FALSE);
+		state_list[0] = gdk_x11_atom_to_xatom(gdk_atom_intern(
+					"_NET_WM_STATE_STICKY", FALSE));
+		state_list[1] = gdk_x11_atom_to_xatom(gdk_atom_intern(
+				"_NET_WM_STATE_SKIP_PAGER", FALSE));
+		state_list[2] = gdk_x11_atom_to_xatom(gdk_atom_intern(
+				"_NET_WM_STATE_SKIP_TASKBAR", FALSE));
 		
 		need_init = FALSE;
 	}
 	
 	gdk_window_set_decorations(window, 0);
 	gdk_window_set_functions(window, 0);
+
+	/* Note: DON'T do gtk_window_stick(). Setting the state via
+	 * gdk will override our other atoms (pager/taskbar).
+	 */
 
 	/* Don't hide panel/pinboard windows initially (WIN_STATE_HIDDEN).
 	 * Needed for IceWM - Christopher Arndt <chris.arndt@web.de>

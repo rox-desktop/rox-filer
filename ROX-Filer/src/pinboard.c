@@ -324,7 +324,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	icon->x = x;
 	icon->y = y;
 	
-	make_panel_window(icon->win->window);
+	make_panel_window(icon->win);
 
 	gtk_widget_add_events(icon->widget,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
