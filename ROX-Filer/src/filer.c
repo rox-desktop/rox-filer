@@ -260,21 +260,34 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 
 	if (GTK_WIDGET_VISIBLE(window))
 	{
-		gint x, y;
+		gint x, y, m;
 		GtkRequisition	*req = &window->requisition;
 		GdkWindow *gdk_window = window->window;
 
 		w = MAX(req->width, w);
 		h = MAX(req->height, h);
+		gdk_window_get_pointer(NULL, &x, &y, NULL);
+		m = gdk_screen_get_monitor_at_point(gdk_screen_get_default(),
+				x, y);
 		gdk_window_get_position(gdk_window, &x, &y);
 
-		if (x + w + DECOR_BORDER > monitor_width ||
-				y + h > monitor_height + DECOR_BORDER)
+		if (x + w + DECOR_BORDER >
+				monitor_geom[m].x + monitor_geom[m].width ||
+				y + h + DECOR_BORDER >
+				monitor_geom[m].y + monitor_geom[m].height)
 		{
-			if (x + w + DECOR_BORDER > monitor_width)
-				x = monitor_width - w - 4 - DECOR_BORDER;
-			if (y + h + DECOR_BORDER > monitor_height)
-				y = monitor_height - h - 4 - DECOR_BORDER;
+			if (x + w + DECOR_BORDER >
+				monitor_geom[m].x + monitor_geom[m].width)
+			{
+				x = monitor_geom[m].x + monitor_geom[m].width -
+					w - 4 - DECOR_BORDER;
+			}
+			if (y + h + DECOR_BORDER >
+				monitor_geom[m].y + monitor_geom[m].height)
+			{
+				y = monitor_geom[m].y + monitor_geom[m].height -
+					h - 4 - DECOR_BORDER;
+			}
 			gdk_window_move_resize(gdk_window, x, y, w, h);
 		}
 		else
