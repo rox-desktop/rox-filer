@@ -96,7 +96,7 @@ case $REPLY in
 	   BINDIR=/usr/bin
 	   MANDIR=/usr/man
 	   CHOICESDIR=/usr/share/Choices
-	   MIMEDIR=/usr/local/mime
+	   MIMEDIR=/usr/share/mime
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
 	   get_dir "/usr/local/apps"
