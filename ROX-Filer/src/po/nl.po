@@ -15,13 +15,13 @@
 # Bijgewerkt Jan 2002 en Mei 2002
 # Copyright (C) 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
 # 
-# Bijgewerkt Dec 2002 en Maa 2003
+# Bijgewerkt Dec 2002, Maa 2003 en Mei 2003
 # Copyright (C) 2002 Jan Wagemakers <janw@easynet.be>
 #  - Dank aan Jan Verhoeven (wisclub) voor zijn tips!
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.8\n"
-"POT-Creation-Date: 2003-05-22 14:04+0100\n"
+"Project-Id-Version: ROX-Filer 1.3.9\n"
+"POT-Creation-Date: 2003-05-24 09:57+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@easynet.be>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
@@ -1150,6 +1150,8 @@ msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
 msgstr ""
+"ROX-Filer kan geen prikbord iconen tonen daar het gecompileerd was met "
+"GTK+-2.0 maar draait met GTK+-2.2. Gelieve ROX-Filer te hercompileren."
 
 #: i18n.c:38
 msgid ""
@@ -2624,6 +2626,9 @@ msgid ""
 "should move it there (and make a symlink from ~/.mime to it for older "
 "applications)."
 msgstr ""
+"De map ~/.mime is verplaatst. Deze zou nu ~/.local.share/mime moeten zijn. "
+"Verplaats het naar daar (en maak er een symbolische koppeling van ~/.mime "
+"naar toe voor oudere toepassingen)."
 
 #: type.c:1286
 msgid ""
@@ -2817,7 +2822,7 @@ msgstr "Hongaars"
 
 #: tips:12
 msgid "Japanese"
-msgstr ""
+msgstr "Japans"
 
 #: tips:13
 msgid "Norwegian"
@@ -3081,7 +3086,7 @@ msgstr ""
 
 #: tips:86
 msgid "Max width (Large icons):"
-msgstr "Max afmeting (Grote ikonen):"
+msgstr "Max afmeting (Grote iconen):"
 
 #: tips:87 tips:90
 msgid "pixels"
@@ -3651,7 +3656,6 @@ msgid "MIME types"
 msgstr "MIME types"
 
 #: tips:250
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. Use the MIME-"
@@ -3660,9 +3664,10 @@ msgid ""
 "http://rox.sourceforge.net/mime_editor.html"
 msgstr ""
 "ROX gebruikt een set van regels om het juiste MIME-type te bepalen voor elk "
-"gewoon bestand, en kiest dan een passend icoon. Na de regel-bestanden te "
-"hebben bewerkt, klik dan op de knop Verversen hieronder, of herstart ROX-"
-"Filer."
+"gewoon bestand, en kiest dan een passend icoon. Gebruik de MIME-Editor om "
+"deze bestand-naar-type regels aan te passen:\n"
+"\n"
+"http://rox.sourceforge.net/mime_editor.html"
 
 #: tips:251 tips:252
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
@@ -3796,6 +3801,10 @@ msgid ""
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
 msgstr ""
+"Blackbox, Fluxbox en gelijkaardige window managers werken nog niet goed "
+"samen met het ROX-Filer prikbord. Met deze optie wordt er rond dit probleem gewerkt."
+"Er van uit gaande dat deze window managers hun gedrag in een nieuwere versie "
+"zullen aanpassen kan het zijn dat dit niet meer nodig is."
 
 #: tips:280
 msgid "Drag and drop"
@@ -3816,5 +3825,3 @@ msgstr ""
 "van een applicatie een + teken toont op de aanwijzer maar het droppen niet "
 "werkt."
 
-#~ msgid "Show name-to-type rules"
-#~ msgstr "Toon naam-naar-type regels"
