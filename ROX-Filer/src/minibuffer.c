@@ -23,6 +23,7 @@
 
 #include "config.h"
 
+#include <fnmatch.h>
 #include <string.h>
 #include <errno.h>
 #include <ctype.h>
@@ -64,6 +65,7 @@ static void search_in_dir(FilerWindow *filer_window, int dir);
 static const gchar *mini_contents(FilerWindow *filer_window);
 static void show_help(FilerWindow *filer_window);
 static gboolean grab_focus(GtkWidget *minibuffer);
+static gboolean select_if_glob(ViewIter *iter, gpointer data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -126,6 +128,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			mini_type == MINI_PATH ? _("Goto:") :
 			mini_type == MINI_SHELL ? _("Shell:") :
 			mini_type == MINI_SELECT_IF ? _("Select If:") :
+			mini_type == MINI_SELECT_BY_NAME ? _("Select Named:") :
 			mini_type == MINI_FILTER ? _("Pattern:") :
 			"?");
 
@@ -147,6 +150,11 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 		case MINI_SELECT_IF:
 			gtk_entry_set_text(mini, "");
 			filer_window->mini_cursor_base = -1;	/* History */
+			break;
+		case MINI_SELECT_BY_NAME:
+			gtk_entry_set_text(mini, "*.");
+			filer_window->mini_cursor_base = -1;	/* History */
+			view_select_if(filer_window->view, select_if_glob, "*.");
 			break;
 		case MINI_FILTER:
 			if(filer_window->filter!=FILER_SHOW_GLOB ||
@@ -258,6 +266,15 @@ static void show_help(FilerWindow *filer_window)
 			info_message(
 				_("Enter a shell command to execute. Click "
 				"on a file to add it to the buffer."));
+			break;
+		case MINI_SELECT_BY_NAME:
+			info_message(
+				_("Enter a file name pattern to select all matching files:\n\n"
+				"? means any character\n"
+				"* means zero or more characters\n"
+				"[aA] means 'a' or 'A'\n"
+				"[a-z] means any character from a to z (lowercase)\n"
+				"*.png means any name ending in '.png')"));
 			break;
 		case MINI_SELECT_IF:
 			show_condition_help(NULL);
@@ -943,6 +960,25 @@ static gint key_press_event(GtkWidget	*widget,
 					return FALSE;
 			}
 			break;
+		case MINI_SELECT_BY_NAME:
+			switch (event->keyval)
+			{
+				case GDK_Up:
+					filer_next_selected(filer_window, -1);
+					break;
+				case GDK_Down:
+					filer_next_selected(filer_window, 1);
+					break;
+				case GDK_Tab:
+					break;
+				case GDK_Return:
+				case GDK_KP_Enter:
+					minibuffer_hide(filer_window);
+					break;
+				default:
+					return FALSE;
+			}
+			break;
 
 	        case MINI_FILTER:
 			switch (event->keyval)
@@ -963,6 +999,17 @@ static gint key_press_event(GtkWidget	*widget,
 	return TRUE;
 }
 
+static gboolean select_if_glob(ViewIter *iter, gpointer data)
+{
+	DirItem *item;
+	const char *pattern = (char *) data;
+
+	item = iter->peek(iter);
+	g_return_val_if_fail(item != NULL, FALSE);
+
+	return fnmatch(pattern, item->leafname, 0) == 0;
+}
+
 static void changed(GtkEditable *mini, FilerWindow *filer_window)
 {
 	switch (filer_window->mini_type)
@@ -974,6 +1021,12 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 			set_find_string_colour(GTK_WIDGET(mini), 
 				gtk_entry_get_text(
 					GTK_ENTRY(filer_window->minibuffer)));
+			return;
+		case MINI_SELECT_BY_NAME:
+			view_select_if(filer_window->view,
+					select_if_glob,
+					(gpointer) gtk_entry_get_text(
+					      GTK_ENTRY(filer_window->minibuffer)));
 			return;
 		default:
 			break;

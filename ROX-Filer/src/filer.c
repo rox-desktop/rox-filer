@@ -667,7 +667,7 @@ static gint pointer_out(GtkWidget *widget,
 /* Move the cursor to the next selected item in direction 'dir'
  * (+1 or -1).
  */
-static void next_selected(FilerWindow *filer_window, int dir)
+void filer_next_selected(FilerWindow *filer_window, int dir)
 {
 	ViewIter	iter, cursor;
 	gboolean	have_cursor;
@@ -948,10 +948,10 @@ gint filer_key_press_event(GtkWidget	*widget,
 			return_pressed(filer_window, event);
 			break;
 		case GDK_ISO_Left_Tab:
-			next_selected(filer_window, -1);
+			filer_next_selected(filer_window, -1);
 			break;
 		case GDK_Tab:
-			next_selected(filer_window, 1);
+			filer_next_selected(filer_window, 1);
 			break;
 		case GDK_BackSpace:
 			change_to_parent(filer_window);

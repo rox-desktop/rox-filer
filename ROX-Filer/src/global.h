@@ -107,6 +107,7 @@ typedef enum {
 	MINI_SHELL,
 	MINI_SELECT_IF,
 	MINI_FILTER,
+	MINI_SELECT_BY_NAME,
 } MiniType;
 
 /* The next three correspond to the styles on the Display submenu: */
