@@ -93,9 +93,9 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 
 	filer_window->mini_type = MINI_NONE;
 	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),
-			mini_type == MINI_PATH ? "Goto:" :
-			mini_type == MINI_SHELL ? "Shell:" :
-			mini_type == MINI_RUN_ACTION ? "Run Action:" :
+			mini_type == MINI_PATH ? _("Goto:") :
+			mini_type == MINI_SHELL ? _("Shell:") :
+			mini_type == MINI_RUN_ACTION ? _("Run Action:") :
 			"?");
 
 	collection = filer_window->collection;
