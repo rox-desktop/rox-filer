@@ -812,8 +812,9 @@ void target_callback(FilerWindow *filer_window,
 {
 	Collection	*collection = filer_window->collection;
 
-	g_return_if_fail(window_with_focus != NULL);
-	g_return_if_fail(window_with_focus == filer_window);
+	g_return_if_fail(filer_window != NULL);
+
+	window_with_focus = filer_window;
 	
 	/* Don't grab the primary selection */
 	filer_window->temp_item_selected = TRUE;

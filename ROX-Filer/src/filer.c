@@ -66,7 +66,11 @@
 
 static XMLwrapper *groups = NULL;
 
+/* This is rather badly named. It's actually the filer window which received
+ * the last key press or Menu click event.
+ */
 FilerWindow 	*window_with_focus = NULL;
+
 GList		*all_filer_windows = NULL;
 
 static FilerWindow *window_with_primary = NULL;
