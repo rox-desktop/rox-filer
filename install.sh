@@ -41,16 +41,7 @@ confirm_or_die() {
 
 cd `dirname $0`
 
-./ROX-Filer/AppRun -v 2> /dev/null
-
-if [ $? -ne 0 ]; then
-	echo "Filer didn't run... attempting to compile..."
-	./ROX-Filer/AppRun --compile
-else
-	echo "Filer is already compiled - good"
-fi
-
-echo Testing...
+echo Testing the filer...
 ./ROX-Filer/AppRun -v
 if [ $? -ne 0 ]; then
 	die "Filer doesn't work! Giving up..."
