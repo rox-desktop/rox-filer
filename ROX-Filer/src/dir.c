@@ -22,6 +22,7 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 
+#include "support.h"
 #include "gui_support.h"
 #include "dir.h"
 #include "fscache.h"
@@ -269,10 +270,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	new.size = 0;
 	new.mode = 0;
 
-	if (!tmp)
-		tmp = g_string_new(NULL);
-
-	g_string_sprintf(tmp, "%s/%s", dir->pathname, ent->d_name);
+	tmp = make_path(dir->pathname, ent->d_name);
 	
 	if (lstat(tmp->str, &info) == -1)
 		new.base_type = TYPE_ERROR;

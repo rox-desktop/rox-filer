@@ -20,7 +20,7 @@ extern GdkFont	   *fixed_font;
 
 typedef struct _FilerWindow FilerWindow;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
-typedef enum {UNKNOWN_STYLE, LARGE, FULL_INFO} DisplayStyle;
+typedef enum {UNKNOWN_STYLE, LARGE_ICONS, SMALL_ICONS, FULL_INFO} DisplayStyle;
 
 typedef enum
 {
@@ -59,5 +59,6 @@ DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
 char *details(DirItem *item);
+void filer_set_hidden(FilerWindow *filer_window, gboolean hidden);
 
 #endif /* _FILER_H */

@@ -47,7 +47,10 @@
 #include "options.h"
 
 #define ROW_HEIGHT_LARGE 64
+#define ROW_HEIGHT_SMALL 32
 #define ROW_HEIGHT_FULL_INFO 44
+#define SMALL_ICON_HEIGHT 20
+#define SMALL_ICON_WIDTH 48
 #define MAX_ICON_HEIGHT 42
 #define MAX_ICON_WIDTH 48
 #define PANEL_BORDER 2
@@ -115,10 +118,17 @@ static void draw_string(GtkWidget *widget,
 static void draw_item_large(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area);
+static void draw_item_small(GtkWidget *widget,
+			CollectionItem *item,
+			GdkRectangle *area);
 static void draw_item_full_info(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area);
 static gboolean test_point_large(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height);
+static gboolean test_point_small(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
@@ -171,7 +181,11 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	int	i;
 
 	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
-	collection_draw_item(filer_window->collection, i, TRUE);
+
+	if (i >= 0)
+		collection_draw_item(filer_window->collection, i, TRUE);
+	else
+		g_warning("Failed to find '%s'\n", item->leafname);
 }
 
 static void update_display(Directory *dir,
@@ -254,10 +268,10 @@ static int calc_width(FilerWindow *filer_window, DirItem *item)
                 case FULL_INFO:
                         return MAX_ICON_WIDTH + 12 + 
 				MAX(item->details_width, item->name_width);
-                        break;
+		case SMALL_ICONS:
+			return SMALL_ICON_WIDTH + 12 + item->name_width;
                 default:
                         return MAX(pix_width, item->name_width) + 4;
-			break;
         }
 }
 	
@@ -334,18 +348,106 @@ static gboolean test_point_full_info(Collection *collection,
 	return FALSE;
 }
 
+static gboolean test_point_small(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *colitem,
+				int width, int height)
+{
+	DirItem		*item = (DirItem *) colitem->data;
+	MaskedPixmap	*image = item->image;
+	int		image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
+	GdkFont		*font = GTK_WIDGET(collection)->style->font;
+	int		low_top = height
+				- fixed_font->descent - 2 - font->ascent;
+	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
+
+	if (point_x < iwidth + 2)
+		return point_x > 2 && point_y > image_y;
+	
+	point_x -= iwidth + 8;
+
+	if (point_y >= low_top)
+		return point_x < item->name_width;
+	return FALSE;
+}
+
+static void draw_small_icon(GtkWidget *widget,
+			    GdkRectangle *area,
+			    DirItem  *item,
+			    gboolean selected)
+{
+	MaskedPixmap	*image = item->image;
+	int	width = MIN(image->width, SMALL_ICON_WIDTH);
+	int	height = MIN(image->height, SMALL_ICON_HEIGHT);
+	int	image_x = area->x + ((area->width - width) >> 1);
+	int	image_y;
+	GdkGC	*gc = selected ? widget->style->white_gc
+						: widget->style->black_gc;
+	if (!item->image)
+		return;
+		
+	gdk_gc_set_clip_mask(gc, item->image->mask);
+
+	image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
+	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
+	gdk_draw_pixmap(widget->window, gc,
+			item->image->pixmap,
+			0, 0,			/* Source x,y */
+			image_x, area->y + image_y, /* Dest x,y */
+			width, height);
+
+	if (selected)
+	{
+		gdk_gc_set_function(gc, GDK_INVERT);
+		gdk_draw_rectangle(widget->window,
+				gc,
+				TRUE, image_x, area->y + image_y,
+				width, height);
+		gdk_gc_set_function(gc, GDK_COPY);
+	}
+
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_mask(gc,
+				default_pixmap[TYPE_SYMLINK].mask);
+		gdk_draw_pixmap(widget->window, gc,
+				default_pixmap[TYPE_SYMLINK].pixmap,
+				0, 0,		/* Source x,y */
+				image_x, area->y + 8,	/* Dest x,y */
+				-1, -1);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		int	type = item->flags & ITEM_FLAG_MOUNTED
+				? TYPE_MOUNTED
+				: TYPE_UNMOUNTED;
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_mask(gc,
+				default_pixmap[type].mask);
+		gdk_draw_pixmap(widget->window, gc,
+				default_pixmap[type].pixmap,
+				0, 0,		/* Source x,y */
+				image_x, area->y + 8, /* Dest x,y */
+				-1, -1);
+	}
+	
+	gdk_gc_set_clip_mask(gc, NULL);
+	gdk_gc_set_clip_origin(gc, 0, 0);
+}
+
 static void draw_large_icon(GtkWidget *widget,
 			    GdkRectangle *area,
 			    DirItem  *item,
 			    gboolean selected)
 {
 	MaskedPixmap	*image = item->image;
-	int	image_x = area->x + ((area->width - image->width) >> 1);
+	int	width = MIN(image->width, MAX_ICON_WIDTH);
+	int	height = MIN(image->height, MAX_ICON_WIDTH);
+	int	image_x = area->x + ((area->width - width) >> 1);
 	int	image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
 						: widget->style->black_gc;
-	if (!item->image)
-		return;
 		
 	gdk_gc_set_clip_mask(gc, item->image->mask);
 
@@ -355,8 +457,7 @@ static void draw_large_icon(GtkWidget *widget,
 			item->image->pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
-			MIN(image->width, MAX_ICON_WIDTH),
-			MIN(image->height, MAX_ICON_HEIGHT));
+			width, height);
 
 	if (selected)
 	{
@@ -364,7 +465,7 @@ static void draw_large_icon(GtkWidget *widget,
 		gdk_draw_rectangle(widget->window,
 				gc,
 				TRUE, image_x, area->y + image_y,
-				image->width, image->height);
+				width, height);
 		gdk_gc_set_function(gc, GDK_COPY);
 	}
 
@@ -500,6 +601,33 @@ static void draw_item_full_info(GtkWidget *widget,
 			details(item),
 			text_x, low_text_y,
 			item->details_width,
+			selected);
+}
+
+static void draw_item_small(GtkWidget *widget,
+			CollectionItem *colitem,
+			GdkRectangle *area)
+{
+	DirItem	*item = (DirItem *) colitem->data;
+	GdkFont	*font = widget->style->font;
+	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
+	int	low_text_y = area->y + area->height - font->descent - 2;
+	gboolean	selected = colitem->selected;
+	GdkRectangle	pic_area;
+
+	pic_area.x = area->x;
+	pic_area.y = area->y;
+	pic_area.width = SMALL_ICON_WIDTH;
+	pic_area.height = SMALL_ICON_HEIGHT;
+
+	draw_small_icon(widget, &pic_area, item, selected);
+	
+	draw_string(widget,
+			widget->style->font,
+			item->leafname, 
+			text_x,
+			low_text_y,
+			item->name_width,
 			selected);
 }
 
@@ -926,6 +1054,12 @@ static void shrink_width(FilerWindow *filer_window)
 	Collection	*col = filer_window->collection;
 	int		width = MIN_ITEM_WIDTH;
 	int		this_width;
+	DisplayStyle	style = filer_window->display_style;
+	GdkFont		*font;
+	int		text_height;
+
+	font = gtk_widget_get_default_style()->font;
+	text_height = font->ascent + font->descent;
 	
 	for (i = 0; i < col->number_of_items; i++)
 	{
@@ -937,8 +1071,9 @@ static void shrink_width(FilerWindow *filer_window)
 	
 	collection_set_item_size(filer_window->collection,
 		width,
-		filer_window->display_style == FULL_INFO ? ROW_HEIGHT_FULL_INFO
-						         : ROW_HEIGHT_LARGE);
+		style == FULL_INFO ? 	MAX_ICON_HEIGHT + 4 :
+		style == SMALL_ICONS ? 	MAX(text_height, SMALL_ICON_HEIGHT) + 4
+				     :	text_height + MAX_ICON_HEIGHT + 8);
 }
 
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
@@ -949,6 +1084,10 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 	filer_window->display_style = style;
 	switch (style)
 	{
+		case SMALL_ICONS:
+			collection_set_functions(filer_window->collection,
+				draw_item_small, test_point_small);
+			break;
 		case FULL_INFO:
 			collection_set_functions(filer_window->collection,
 				draw_item_full_info, test_point_full_info);
@@ -1036,7 +1175,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	filer_style_set(filer_window, LARGE);
+	filer_style_set(filer_window, LARGE_ICONS);
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
 	drag_set_dest(collection);
@@ -1095,7 +1234,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-			filer_window->display_style == LARGE ? 400 : 512,
+			filer_window->display_style == LARGE_ICONS ? 400 : 512,
 			o_toolbar ? 220 : 200);
 
 		gtk_container_add(GTK_CONTAINER(filer_window->window),
@@ -1226,4 +1365,21 @@ static char *filer_toolbar(char *data)
 void update_dir(FilerWindow *filer_window)
 {
 	dir_update(filer_window->directory, filer_window->path);
+}
+
+void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
+{
+	Directory *dir = filer_window->directory;
+	
+	if (filer_window->show_hidden == hidden)
+		return;
+
+	filer_window->show_hidden = hidden;
+
+	g_fscache_data_ref(dir_cache, dir);
+	detach(filer_window);
+	filer_window->directory = dir;
+	collection_clear(filer_window->collection);
+	dir_attach(filer_window->directory, (DirCallback) update_display,
+			filer_window);
 }
