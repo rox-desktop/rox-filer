@@ -335,17 +335,18 @@ static GtkWidget *create_options()
 	table = gtk_table_new(2, 2, FALSE);
 	gtk_container_set_border_width(GTK_CONTAINER(table), 4);
 
-	label = gtk_label_new("To set the keyboard short-cuts you simply open "
+	label = gtk_label_new(
+			_("To set the keyboard short-cuts you simply open "
 			"the menu over a filer window, move the pointer over "
 			"the item you want to use and press a key. The key "
 			"will appear next to the menu item and you can just "
 			"press that key without opening the menu in future. "
 			"To save the current menu short-cuts for next time, "
-			"click the Save button at the bottom of this window.");
+			"click the Save button at the bottom of this window."));
 	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
 
-	label = gtk_label_new("'Xterm here' program:");
+	label = gtk_label_new(_("'Xterm here' program:"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
 	xterm_here_entry = gtk_entry_new();
 	gtk_table_attach_defaults(GTK_TABLE(table), xterm_here_entry,
@@ -377,7 +378,7 @@ static void save_options()
 {
 	char	*menurc;
 
-	menurc = choices_find_path_save("menus", "ROX-Filer", TRUE);
+	menurc = choices_find_path_save("menus", PROJECT, TRUE);
 	if (menurc)
 		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 
@@ -489,7 +490,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		switch (collection->number_selected)
 		{
 			case 0:
-				g_string_assign(buffer, "Next Click");
+				g_string_assign(buffer, _("Next Click"));
 				items_sensitive(TRUE);
 				break;
 			case 1:
@@ -502,7 +503,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 				break;
 			default:
 				items_sensitive(FALSE);
-				g_string_sprintf(buffer, "%d items",
+				g_string_sprintf(buffer, _("%d items"),
 						collection->number_selected);
 				break;
 		}
@@ -649,8 +650,8 @@ static void remove_link(gpointer data, guint action, GtkWidget *widget)
 
 	if (window_with_focus->collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You can only remove one link "
-				"at a time");
+		report_error(PROJECT,
+				_("You can only remove one link at a time"));
 		return;
 	}
 	else if (window_with_focus->collection->number_selected == 0)
@@ -666,13 +667,13 @@ static void remove_link(gpointer data, guint action, GtkWidget *widget)
 
 		path = make_path(window_with_focus->path, item->leafname)->str;
 		if (lstat(path, &info))
-			report_error("ROX-Filer", g_strerror(errno));
+			report_error(PROJECT, g_strerror(errno));
 		else if (!S_ISLNK(info.st_mode))
-			report_error("ROX-Filer",
-				"You can only remove symbolic links this way - "
-				"try the 'Open Panel as Directory' item.");
+			report_error(PROJECT,
+			      _("You can only remove symbolic links this way - "
+				"try the 'Open Panel as Directory' item."));
 		else if (unlink(path))
-			report_error("ROX-Filer", g_strerror(errno));
+			report_error(PROJECT, g_strerror(errno));
 		else
 			filer_update_dir(window_with_focus, TRUE);
 	}
@@ -751,7 +752,7 @@ static gboolean copy_cb(guchar *current, guchar *new)
 
 	if (new[0] != '/')
 	{
-		report_error("ROX-Filer", "New pathname is not absolute");
+		report_error(PROJECT, _("New pathname is not absolute"));
 		return FALSE;
 	}
 
@@ -796,14 +797,14 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+						"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, copy_item);
 	else
-		SHOW_SAVEBOX("Copy", copy_cb);
+		SHOW_SAVEBOX(_("Copy"), copy_cb);
 }
 
 static gboolean rename_cb(guchar *current, guchar *new)
@@ -825,14 +826,14 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, rename_item);
 	else
-		SHOW_SAVEBOX("Rename", rename_cb);
+		SHOW_SAVEBOX(_("Rename"), rename_cb);
 }
 
 static gboolean link_cb(guchar *initial, guchar *path)
@@ -854,14 +855,14 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, link_item);
 	else
-		SHOW_SAVEBOX("Symlink", link_cb);
+		SHOW_SAVEBOX(_("Symlink"), link_cb);
 }
 
 static void open_file(gpointer data, guint action, GtkWidget *widget)
@@ -873,8 +874,8 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
@@ -901,7 +902,7 @@ static void add_file_output(FileStatus *fs,
 		close(source);
 		fs->fd = -1;
 		if (got < 0)
-			delayed_error("ROX-Filer: file(1) says...",
+			delayed_error(_("ROX-Filer: file(1) says..."),
 					g_strerror(err));
 		return;
 	}
@@ -939,7 +940,7 @@ guchar *pretty_type(DirItem *file, guchar *path)
 				file->mime_type->subtype, NULL);
 
 	if (file->flags & ITEM_FLAG_APPDIR)
-		return g_strdup("ROX application");
+		return g_strdup(_("ROX application"));
 
 	if (file->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -949,10 +950,10 @@ guchar *pretty_type(DirItem *file, guchar *path)
 		if (got > 0 && got <= MAXPATHLEN)
 		{
 			p[got] = '\0';
-			return g_strconcat("Symbolic link to ", p, NULL);
+			return g_strconcat(_("Symbolic link to "), p, NULL);
 		}
 
-		return g_strdup("Symbolic link");
+		return g_strdup(_("Symbolic link"));
 	}
 
 	if (file->flags & ITEM_FLAG_MOUNT_POINT)
@@ -960,16 +961,17 @@ guchar *pretty_type(DirItem *file, guchar *path)
 		MountPoint *mp;
 		if ((file->flags & ITEM_FLAG_MOUNTED) &&
 			(mp = g_hash_table_lookup(mtab_mounts, path)))
-			return g_strconcat("Mount point for ", mp->name, NULL);
+			return g_strconcat(_("Mount point for "),
+					mp->name, NULL);
 
-		return g_strdup("Mount point");
+		return g_strdup(_("Mount point"));
 	}
 
 	return g_strdup("-");
 }
 
 #define LABEL(text, row)						\
-	label = gtk_label_new(text ":");				\
+	label = gtk_label_new(text);				\
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);			\
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);	\
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
@@ -997,8 +999,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
@@ -1011,7 +1013,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 			file->leafname)->str;
 	if (lstat(path, &info))
 	{
-		delayed_error("ROX-Filer", g_strerror(errno));
+		delayed_error(PROJECT, g_strerror(errno));
 		return;
 	}
 	
@@ -1028,41 +1030,40 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
 	
 	value = gtk_label_new(file->leafname);
-	LABEL("Name", 0);
+	LABEL(_("Name:"), 0);
 	VALUE(value, 0);
 
 	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
 					    group_name(info.st_gid));
 	value = gtk_label_new(gstring->str);
-	LABEL("Owner, Group", 1);
+	LABEL(_("Owner, Group:"), 1);
 	VALUE(value, 1);
 	
 	if (info.st_size >= PRETTY_SIZE_LIMIT)
 	{
-		g_string_sprintf(gstring, "%s (%ld bytes)",
+		g_string_sprintf(gstring, "%s (%ld %s)",
 				format_size((unsigned long) info.st_size),
-				(unsigned long) info.st_size);
+				(unsigned long) info.st_size, _("bytes"));
 	}
 	else
 	{
-		g_string_sprintf(gstring, "%ld byte%s",
-				(unsigned long) info.st_size,
-				info.st_size == 1 ? "" : "s");
+		g_string_assign(gstring, 
+				format_size((unsigned long) info.st_size));
 	}
 	value = gtk_label_new(gstring->str);
-	LABEL("Size", 2);
+	LABEL(_("Size:"), 2);
 	VALUE(value, 2);
 	
 	value = gtk_label_new(pretty_time(&info.st_ctime));
-	LABEL("Change time", 3);
+	LABEL(_("Change time:"), 3);
 	VALUE(value, 3);
 	
 	value = gtk_label_new(pretty_time(&info.st_mtime));
-	LABEL("Modify time", 4);
+	LABEL(_("Modify time:"), 4);
 	VALUE(value, 4);
 	
 	value = gtk_label_new(pretty_time(&info.st_atime));
-	LABEL("Access time", 5);
+	LABEL(_("Access time:"), 5);
 	VALUE(value, 5);
 	
 	value = gtk_label_new(pretty_permissions(info.st_mode));
@@ -1072,23 +1073,23 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 			perm == 1 ? "    ___    " :
 				    "        ___");
 	gtk_widget_set_style(value, fixed_style);
-	LABEL("Permissions", 6);
+	LABEL(_("Permissions:"), 6);
 	VALUE(value, 6);
 	
 	tmp = pretty_type(file, path);
 	value = gtk_label_new(tmp);
 	g_free(tmp);
-	LABEL("Type", 7);
+	LABEL(_("Type:"), 7);
 	VALUE(value, 7);
 
-	frame = gtk_frame_new("file(1) says...");
+	frame = gtk_frame_new(_("file(1) says..."));
 	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 8, 9);
-	file_label = gtk_label_new("<nothing yet>");
+	file_label = gtk_label_new(_("<nothing yet>"));
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
 	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
 	gtk_container_add(GTK_CONTAINER(frame), file_label);
 	
-	button = gtk_button_new_with_label("OK");
+	button = gtk_button_new_with_label(_("OK"));
 	gtk_window_set_focus(GTK_WINDOW(window), button);
 	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 10, 11,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
@@ -1153,11 +1154,11 @@ static void app_show_help(char *path)
 	help_dir = g_strconcat(path, "/Help", NULL);
 	
 	if (mc_stat(help_dir, &info))
-		delayed_error("Application",
-			"This is an application directory - you can "
+		delayed_error(_("Application"),
+			_("This is an application directory - you can "
 			"run it as a program, or open it (hold down "
 			"Shift while you open it). Most applications provide "
-			"their own help here, but this one doesn't.");
+			"their own help here, but this one doesn't."));
 	else
 		filer_opendir(help_dir, PANEL_NO);
 }
@@ -1172,8 +1173,8 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You cannot do this to more than "
-				"one item at a time");
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
 		return;
 	}
 	else if (collection->number_selected != 1)
@@ -1186,13 +1187,13 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	{
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE)
-				delayed_error("Executable file",
-					"This is a file with an eXecute bit "
-					"set - it can be run as a program.");
+				delayed_error(_("Executable file"),
+				      _("This is a file with an eXecute bit "
+					"set - it can be run as a program."));
 			else
-				delayed_error("File",
+				delayed_error(_("File"), _(
 					"This is a data file. Try using the "
-					"Info menu item to find out more...");
+					"Info menu item to find out more..."));
 			break;
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_APPDIR)
@@ -1200,39 +1201,39 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 					make_path(window_with_focus->path,
 					  item->leafname)->str);
 			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-				delayed_error("Mount point",
+				delayed_error(_("Mount point"), _(
 				"A mount point is a directory which another "
 				"filing system can be mounted on. Everything "
 				"on the mounted filesystem then appears to be "
-				"inside the directory.");
+				"inside the directory."));
 			else
-				delayed_error("Directory",
+				delayed_error(_("Directory"), _(
 				"This is a directory. It contains an index to "
-				"other items - open it to see the list.");
+				"other items - open it to see the list."));
 			break;
 		case TYPE_CHAR_DEVICE:
 		case TYPE_BLOCK_DEVICE:
-			delayed_error("Device file",
+			delayed_error(_("Device file"), _(
 				"Device files allow you to read from or write "
 				"to a device driver as though it was an "
-				"ordinary file.");
+				"ordinary file."));
 			break;
 		case TYPE_PIPE:
-			delayed_error("Named pipe",
+			delayed_error(_("Named pipe"), _(
 				"Pipes allow different programs to "
 				"communicate. One program writes data to the "
-				"pipe while another one reads it out again.");
+				"pipe while another one reads it out again."));
 			break;
 		case TYPE_SOCKET:
-			delayed_error("Socket",
-				"Sockets allow processes to communicate.");
+			delayed_error(_("Socket"), _(
+				"Sockets allow processes to communicate."));
 			break;
 		default:
-			delayed_error("Unknown type", 
+			delayed_error(_("Unknown type"),  _(
 				"I couldn't find out what kind of file this "
 				"is. Maybe it doesn't exist anymore or you "
 				"don't have search permission on the directory "
-				"it's in?");
+				"it's in?"));
 			break;
 	}
 }
@@ -1259,8 +1260,8 @@ static void real_vfs_open(char *fs)
 
 	if (window_with_focus->collection->number_selected != 1)
 	{
-		report_error("ROX-Filer", "You must select a single file "
-				"to open as a Virtual File System");
+		report_error(PROJECT, _("You must select a single file "
+				"to open as a Virtual File System"));
 		return;
 	}
 
@@ -1316,8 +1317,8 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	savebox_show("New Directory",
-			make_path(window_with_focus->path, "NewDir")->str,
+	savebox_show(_("New Directory"),
+			make_path(window_with_focus->path, _("NewDir"))->str,
 			default_pixmap[TYPE_DIRECTORY],
 			new_directory_cb);
 }
@@ -1331,7 +1332,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (!spawn_full(argv, window_with_focus->path))
-		report_error("ROX-Filer", "Failed to fork() child "
+		report_error(PROJECT, "Failed to fork() child "
 					"process");
 }
 
@@ -1372,9 +1373,9 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (o_unique_filer_windows)
-		report_error("ROX-Filer", "You can't open a second view onto "
+		report_error(PROJECT, _("You can't open a second view onto "
 			"this directory because the `Unique Windows' option "
-			"is turned on in the Options window.");
+			"is turned on in the Options window."));
 	else
 		filer_opendir(window_with_focus->path, PANEL_NO);
 }

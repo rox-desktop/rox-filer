@@ -66,28 +66,29 @@ char *home_dir;
 static void show_features(void);
 
 
-#define VERSION "ROX-Filer 0.1.20\n"					\
-		"Copyright (C) 2000 Thomas Leonard.\n"			\
+#define VERSION "ROX-Filer 0.1.20\n"
+#define COPYING								\
+	     N_("Copyright (C) 2000 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
 		"to the extent permitted by law.\n"			\
 		"You may redistribute copies of ROX-Filer\n"		\
 		"under the terms of the GNU General Public License.\n"	\
 		"For more information about these matters, "		\
-		"see the file named COPYING.\n"
+		"see the file named COPYING.\n")
 
 #ifdef HAVE_GETOPT_LONG
-#  define USAGE   "Try `ROX-Filer/AppRun --help' for more information.\n"
+#  define USAGE   N_("Try `ROX-Filer/AppRun --help' for more information.\n")
 #  define SHORT_ONLY_WARNING ""
 #else
-#  define USAGE   "Try `ROX-Filer/AppRun -h' for more information.\n"
+#  define USAGE   N_("Try `ROX-Filer/AppRun -h' for more information.\n")
 #  define SHORT_ONLY_WARNING	\
-		"NOTE: Your system does not support long options - \n" \
-		"you must use the short versions instead.\n\n"
+		_("NOTE: Your system does not support long options - \n" \
+		"you must use the short versions instead.\n\n")
 #endif
 
 #define SHORT_OPS "t:b:ohv"
 
-#define HELP "Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"		\
+#define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"	\
        "Open filer windows showing each directory listed, or $HOME \n"	\
        "if no directories are given.\n\n"				\
        "  -h, --help		display this help and exit\n"		      \
@@ -95,8 +96,7 @@ static void show_features(void);
        "  -t, --top [DIR]	open DIR as a top-edge panel\n"		\
        "  -b, --bottom [DIR]	open DIR as a bottom-edge panel\n"	\
        "  -o, --override	override window manager control of panels\n" \
-       "\n"	SHORT_ONLY_WARNING					\
-       "Report bugs to <tal197@ecs.soton.ac.uk>.\n"
+       "\nReport bugs to <tal197@ecs.soton.ac.uk>.\n")
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -167,7 +167,7 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 		gtk_window_set_title(GTK_WINDOW(window),
-						"ROX-Filer message log");
+						_("ROX-Filer message log"));
 		gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 		gtk_window_set_default_size(GTK_WINDOW(window), 600, 300);
 		gtk_signal_connect_object(GTK_OBJECT(window), "delete_event",
@@ -240,10 +240,12 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				printf(VERSION);
+				printf(_(COPYING));
 				show_features();
 				return EXIT_SUCCESS;
 			case 'h':
-				printf(HELP);
+				printf(_(HELP));
+				printf(_(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
 			case 't':
 			case 'b':
@@ -254,7 +256,7 @@ int main(int argc, char **argv)
 							: optarg);
 				break;
 			default:
-				printf(USAGE);
+				printf(_(USAGE));
 				return EXIT_FAILURE;
 		}
 	}
@@ -297,11 +299,11 @@ int main(int argc, char **argv)
 	
 	if (euid == 0)
 	{
-		if (get_choice("!!!DANGER!!!",
-			"Running ROX-Filer as root is VERY dangerous. If I "
+		if (get_choice(_("!!!DANGER!!!"),
+			_("Running ROX-Filer as root is VERY dangerous. If I "
 			"had a warranty (I don't) then doing this would "
-			"void it", 2,
-			"Don't click here", "Quit") != 0)
+			"void it"), 2,
+			_("Don't click here"), _("Quit")) != 0)
 			exit(EXIT_SUCCESS);
 	}
 

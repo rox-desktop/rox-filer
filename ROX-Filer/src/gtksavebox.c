@@ -316,7 +316,7 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
 	leafname = uri;
     }
   else
-    leafname = "Unnamed";
+    leafname = _("Unnamed");
   
   write_xds_property (context, leafname);
 
@@ -386,8 +386,8 @@ drag_data_get (GtkWidget	*widget,
   }
   else
   {
-    g_warning ("Remote application wants to use Direct Save, but I can't "
-	       "read the XdndDirectSave0 (type text/plain) property.\n");
+    g_warning (_("Remote application wants to use Direct Save, but I can't "
+	       "read the XdndDirectSave0 (type text/plain) property.\n"));
   }
 
   if (to_send != 'E')
@@ -555,8 +555,8 @@ static void do_save (GtkWidget *widget, GtkSavebox *savebox)
       dialog = gtk_dialog_new ();
       GTK_WINDOW (dialog)->type = GTK_WINDOW_DIALOG;
 
-      label = gtk_label_new ("Drag the icon to a directory viewer\n"
-				  "(or enter a full pathname)");
+      label = gtk_label_new (_("Drag the icon to a directory viewer\n"
+				  "(or enter a full pathname)"));
       gtk_misc_set_padding (GTK_MISC (label), 8, 32);
 
       gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),

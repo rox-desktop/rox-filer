@@ -157,7 +157,7 @@ void report_error(char *title, char *message)
 	g_return_if_fail(message != NULL);
 
 	if (!title)
-		title = "Error";
+		title = _("Error");
 
 	get_choice(title, message, 1, "OK");
 }
@@ -251,7 +251,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		message = g_strdup_printf("open(%s): %s",
 				pathname, g_strerror(errno));
-		delayed_error("ROX-Filer", message);
+		delayed_error(PROJECT, message);
 		g_free(message);
 		return FALSE;
 	}
@@ -267,7 +267,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			delayed_error("Error reading file",
+			delayed_error(_("Error reading file"),
 						g_strerror(errno));
 			g_free(buffer);
 		}
@@ -280,9 +280,9 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 		}
 	}
 	else
-		delayed_error("ROX-Filer",
-				"Can't allocate memory for buffer to "
-				"load this file");
+		delayed_error(PROJECT,
+			_("Can't allocate memory for buffer to "
+				"load this file"));
 
 	fclose(file);
 

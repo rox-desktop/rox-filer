@@ -470,7 +470,7 @@ static FindCondition *parse_case(guchar **expression)
 	if (NEXT == '\0' || NEXT == ',' || NEXT == ')')
 		return first;
 
-	(void) MATCH("And");
+	(void) MATCH(_("And"));
 
 	second = parse_case(expression);
 	if (!second)
@@ -494,7 +494,7 @@ static FindCondition *parse_condition(guchar **expression)
 
 	SKIP;
 
-	if (NEXT == '!' || MATCH("Not"))
+	if (NEXT == '!' || MATCH(_("Not")))
 	{
 		FindCondition *operand;
 		
@@ -537,7 +537,7 @@ static FindCondition *parse_condition(guchar **expression)
 		return parse_match(expression);
 	}
 
-	if (MATCH("system"))
+	if (MATCH(_("system")))
 	{
 		SKIP;
 		if (NEXT != '(')
@@ -545,7 +545,7 @@ static FindCondition *parse_condition(guchar **expression)
 		EAT;
 		return parse_system(expression);
 	}
-	else if (MATCH("prune"))
+	else if (MATCH(_("prune")))
 	{
 		cond = g_new(FindCondition, 1);
 		cond->test = test_prune;
@@ -555,12 +555,10 @@ static FindCondition *parse_condition(guchar **expression)
 
 		return cond;
 	}
-	else if (g_strncasecmp(*expression, "Is", 2) == 0)
-	{
-		EAT;
-		EAT;
-		return parse_is(expression);
-	}
+
+	cond = parse_is(expression);
+	if (cond)
+		return cond;
 
 	return parse_comparison(expression);
 }
@@ -631,9 +629,9 @@ static FindCondition *parse_comparison(guchar **expression)
 		EAT;
 		comp = COMP_NE;
 	}
-	else if (MATCH("After"))
+	else if (MATCH(_("After")))
 		comp = COMP_GT;
-	else if (MATCH("Before"))
+	else if (MATCH(_("Before")))
 		comp = COMP_LT;
 	else
 		return NULL;
@@ -656,42 +654,43 @@ static FindCondition *parse_comparison(guchar **expression)
 	return cond;
 }
 
+/* Returns NULL if expression is not an is-expression */
 static FindCondition *parse_is(guchar **expression)
 {
 	FindCondition	*cond;
 	IsTest		test;
 
-	if (MATCH("Reg"))
+	if (MATCH(_("IsReg")))
 		test = IS_REG;
-	else if (MATCH("Link"))
+	else if (MATCH(_("IsLink")))
 		test = IS_LNK;
-	else if (MATCH("Dir"))
+	else if (MATCH(_("IsDir")))
 		test = IS_DIR;
-	else if (MATCH("Char"))
+	else if (MATCH(_("IsChar")))
 		test = IS_CHR;
-	else if (MATCH("Block"))
+	else if (MATCH(_("IsBlock")))
 		test = IS_BLK;
-	else if (MATCH("Dev"))
+	else if (MATCH(_("IsDev")))
 		test = IS_DEV;
-	else if (MATCH("Pipe"))
+	else if (MATCH(_("IsPipe")))
 		test = IS_FIFO;
-	else if (MATCH("Socket"))
+	else if (MATCH(_("IsSocket")))
 		test = IS_SOCK;
-	else if (MATCH("SUID"))
+	else if (MATCH(_("IsSUID")))
 		test = IS_SUID;
-	else if (MATCH("SGID"))
+	else if (MATCH(_("IsSGID")))
 		test = IS_SGID;
-	else if (MATCH("Sticky"))
+	else if (MATCH(_("IsSticky")))
 		test = IS_STICKY;
-	else if (MATCH("Readable"))
+	else if (MATCH(_("IsReadable")))
 		test = IS_READABLE;
-	else if (MATCH("Writeable"))
+	else if (MATCH(_("IsWriteable")))
 		test = IS_WRITEABLE;
-	else if (MATCH("Executable"))
+	else if (MATCH(_("IsExecutable")))
 		test = IS_EXEC;
-	else if (MATCH("Empty"))
+	else if (MATCH(_("IsEmpty")))
 		test = IS_EMPTY;
-	else if (MATCH("Mine"))
+	else if (MATCH(_("IsMine")))
 		test = IS_MINE;
 	else
 		return NULL;
@@ -818,7 +817,7 @@ static Eval *parse_eval(guchar **expression)
 
 	if (end == start)
 	{
-		if (MATCH("Now"))
+		if (MATCH(_("Now")))
 		{
 			value = 0;
 			flags |= FLAG_HENCE;
@@ -831,7 +830,7 @@ static Eval *parse_eval(guchar **expression)
 
 	SKIP;
 
-	if (MATCH("Byte") || MATCH("Bytes"))
+	if (MATCH(_("Byte")) || MATCH(_("Bytes")))
 		;
 	else if (MATCH("Kb"))
 		value <<= 10;
@@ -839,17 +838,17 @@ static Eval *parse_eval(guchar **expression)
 		value <<= 20;
 	else if (MATCH("Gb"))
 		value <<= 30;
-	else if (MATCH("Sec") || MATCH("Secs"))
+	else if (MATCH(_("Sec")) || MATCH(_("Secs")))
 		;
-	else if (MATCH("Min") || MATCH("Mins"))
+	else if (MATCH(_("Min")) || MATCH(_("Mins")))
 		value *= 60;
-	else if (MATCH("Hour") || MATCH("Hours"))
+	else if (MATCH(_("Hour")) || MATCH(_("Hours")))
 		value *= 60 * 60;
-	else if (MATCH("Day") || MATCH("Days"))
+	else if (MATCH(_("Day")) || MATCH(_("Days")))
 		value *= 60 * 60 * 24;
-	else if (MATCH("Week") || MATCH("Weeks"))
+	else if (MATCH(_("Week")) || MATCH(_("Weeks")))
 		value *= 60 * 60 * 24 * 7;
-	else if (MATCH("Year") || MATCH("Years"))
+	else if (MATCH(_("Year")) || MATCH(_("Years")))
 		value *= 60 * 60 * 24 * 7 * 365.25;
 
 	eval = g_new(Eval, 1);
@@ -858,9 +857,9 @@ static Eval *parse_eval(guchar **expression)
 	eval->data1 = g_memdup(&value, sizeof(value));
 
 	SKIP;
-	if (MATCH("Ago"))
+	if (MATCH(_("Ago")))
 		flags |= FLAG_AGO;
-	else if (MATCH("Hence"))
+	else if (MATCH(_("Hence")))
 		flags |= FLAG_HENCE;
 
 	eval->data2 = (gpointer) flags;
@@ -875,23 +874,23 @@ static Eval *parse_variable(guchar **expression)
 
 	SKIP;
 
-	if (MATCH("atime"))
+	if (MATCH(_("atime")))
 		var = V_ATIME;
-	else if (MATCH("ctime"))
+	else if (MATCH(_("ctime")))
 		var = V_CTIME;
-	else if (MATCH("mtime"))
+	else if (MATCH(_("mtime")))
 		var = V_MTIME;
-	else if (MATCH("size"))
+	else if (MATCH(_("size")))
 		var = V_SIZE;
-	else if (MATCH("inode"))
+	else if (MATCH(_("inode")))
 		var = V_INODE;
-	else if (MATCH("nlinks"))
+	else if (MATCH(_("nlinks")))
 		var = V_NLINKS;
-	else if (MATCH("uid"))
+	else if (MATCH(_("uid")))
 		var = V_UID;
-	else if (MATCH("gid"))
+	else if (MATCH(_("gid")))
 		var = V_GID;
-	else if (MATCH("blocks"))
+	else if (MATCH(_("blocks")))
 		var = V_BLOCKS;
 	else
 		return NULL;

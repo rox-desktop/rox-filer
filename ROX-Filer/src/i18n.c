@@ -45,8 +45,9 @@ void i18n_init(void)
 {
 #ifdef HAVE_GETTEXT
 	setlocale(LC_ALL, "");
-	bindtextdomain("ROX-Filer", make_path(getenv("APP_DIR"), "po")->str);
-	textdomain("ROX-Filer");
+	bindtextdomain(PROJECT,
+			make_path(getenv("APP_DIR"), "locale")->str);
+	textdomain(PROJECT);
 #endif
 }
 

@@ -169,21 +169,21 @@ static GtkWidget *create_options()
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	label = gtk_label_new("Auto-start (Quiet) these actions:");
+	label = gtk_label_new(_("Auto-start (Quiet) these actions:"));
 	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
 
 	hbox = gtk_hbox_new(TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
-	w_auto_copy = gtk_check_button_new_with_label("Copy");
+	w_auto_copy = gtk_check_button_new_with_label(_("Copy"));
 	gtk_box_pack_start(GTK_BOX(hbox), w_auto_copy, FALSE, TRUE, 0);
-	w_auto_move = gtk_check_button_new_with_label("Move");
+	w_auto_move = gtk_check_button_new_with_label(_("Move"));
 	gtk_box_pack_start(GTK_BOX(hbox), w_auto_move, FALSE, TRUE, 0);
-	w_auto_link = gtk_check_button_new_with_label("Link");
+	w_auto_link = gtk_check_button_new_with_label(_("Link"));
 	gtk_box_pack_start(GTK_BOX(hbox), w_auto_link, FALSE, TRUE, 0);
-	w_auto_delete = gtk_check_button_new_with_label("Delete");
+	w_auto_delete = gtk_check_button_new_with_label(_("Delete"));
 	gtk_box_pack_start(GTK_BOX(hbox), w_auto_delete, FALSE, TRUE, 0);
-	w_auto_mount = gtk_check_button_new_with_label("Mount");
+	w_auto_mount = gtk_check_button_new_with_label(_("Mount"));
 	gtk_box_pack_start(GTK_BOX(hbox), w_auto_mount, FALSE, TRUE, 0);
 
 	return vbox;
@@ -264,7 +264,7 @@ static char *action_auto_quiet(char *data)
 				o_auto_mount = state;
 				break;
 			default:
-				return "Unknown flag";
+				return _("Unknown flag");
 		}
 	}
 	
@@ -340,66 +340,66 @@ static void show_condition_help(gpointer data)
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
 		gtk_window_set_title(GTK_WINDOW(help),
-				"Find expression reference");
+				_("Find expression reference"));
 
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(help), vbox);
 
-		frame = gtk_frame_new("Quick Start");
+		frame = gtk_frame_new(_("Quick Start"));
 		text = gtk_label_new(
-"Just put the name of the file you're looking for in single quotes:\n"
-"'index.html'	(to find a file called 'index.html')");
+_("Just put the name of the file you're looking for in single quotes:\n"
+"'index.html'	(to find a file called 'index.html')"));
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
 		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
-		frame = gtk_frame_new("Examples");
+		frame = gtk_frame_new(_("Examples"));
 		text = gtk_label_new(
-"'*.htm', '*.html'      (finds HTML files)\n"
+_("'*.htm', '*.html'      (finds HTML files)\n"
 "IsDir 'lib'            (finds directories called 'lib')\n"
 "IsReg 'core'           (finds a regular file called 'core')\n"
 "! (IsDir, IsReg)       (is neither a directory nor a regualr file)\n"
 "mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
-"IsReg system(grep -q fred \"%\")         (contains the word 'fred')");
+"IsReg system(grep -q fred \"%\")         (contains the word 'fred')"));
 		gtk_widget_set_style(text, fixed_style);
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
 		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
-		frame = gtk_frame_new("Simple Tests");
+		frame = gtk_frame_new(_("Simple Tests"));
 		text = gtk_label_new(
-"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+_("IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable (permissions)"
 "\n"
 "IsEmpty, IsMine\n"
 "\n"
 "A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
 "contains a slash then the match is agaist the full path; otherwise it is \n"
-"agaist the leafname only.");
+"agaist the leafname only."));
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
 		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
-		frame = gtk_frame_new("Comparisons");
+		frame = gtk_frame_new(_("Comparisons"));
 		text = gtk_label_new(
-"<, <=, =, !=, >, >=, After, Before (compare two values)\n"
+_("<, <=, =, !=, >, >=, After, Before (compare two values)\n"
 "5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
 "2 secs|mins|hours|days|weeks|years  ago|hence (times)\n"
-"atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)");
+"atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)"));
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
 		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
 
-		frame = gtk_frame_new("Specials");
+		frame = gtk_frame_new(_("Specials"));
 		text = gtk_label_new(
-"system(command) (true if 'command' returns with a zero exit status; a % \n"
+_("system(command) (true if 'command' returns with a zero exit status; a % \n"
 "in 'command' is replaced with the path of the current file)\n"
-"prune (false, and prevents searching the contents of a directory)."
+"prune (false, and prevents searching the contents of a directory).")
 );
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
@@ -410,9 +410,9 @@ static void show_condition_help(gpointer data)
 		gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
 
 		text = gtk_label_new(
-			"See the ROX-Filer manual for full details.");
+			_("See the ROX-Filer manual for full details."));
 		gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);
-		button = gtk_button_new_with_label("Close");
+		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 				gtk_widget_hide, GTK_OBJECT(help));
@@ -437,13 +437,13 @@ static void show_chmod_help(gpointer data)
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
 		gtk_window_set_title(GTK_WINDOW(help),
-				"Permissions command reference");
+				_("Permissions command reference"));
 
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(help), vbox);
 
 		text = gtk_label_new(
-	"The format of a command is:\n"
+	_("The format of a command is:\n"
 	"CHANGE, CHANGE, ...\n"
 	"Each CHANGE is:\n"
 	"WHO HOW PERMISSIONS\n"
@@ -464,7 +464,7 @@ static void show_chmod_help(gpointer data)
 	"u+s	(set the SetUID bit - often has no effect on script files)\n"
 	"755	(set the permissions directly)\n"
 	
-	"\nSee the chmod(1) man page for full details.");
+	"\nSee the chmod(1) man page for full details."));
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
 
@@ -473,7 +473,7 @@ static void show_chmod_help(gpointer data)
 
 		sep = gtk_hseparator_new();
 		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
-		button = gtk_button_new_with_label("Close");
+		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 				gtk_widget_hide, GTK_OBJECT(help));
@@ -616,7 +616,7 @@ static void message_from_child(gpointer 	 data,
 			g_free(buffer);
 			return;
 		}
-		g_print("Child died in the middle of a message.\n");
+		g_printerr("Child died in the middle of a message.\n");
 	}
 
 	/* The child is dead */
@@ -630,16 +630,18 @@ static void message_from_child(gpointer 	 data,
 
 	if (gui_side->errors)
 	{
-		GString *report;
-		report = g_string_new(NULL);
-		g_string_sprintf(report, "There %s %d error%s.\n",
-				gui_side->errors == 1 ? "was" : "were",
-				gui_side->errors,
-				gui_side->errors == 1 ? "" : "s");
-		gtk_text_insert(GTK_TEXT(log), NULL, &red, NULL,
-				report->str, report->len);
+		guchar *report;
 
-		g_string_free(report, TRUE);
+		if (gui_side->errors == 1)
+			report = g_strdup(_("There was one error.\n"));
+		else
+			report = g_strdup_printf(_("There were %d errors.\n"),
+							gui_side->errors);
+
+		gtk_text_insert(GTK_TEXT(log), NULL, &red, NULL,
+				report, -1);
+
+		g_free(report);
 	}
 	else if (gui_side->show_info == FALSE)
 		gtk_widget_destroy(gui_side->window);
@@ -655,7 +657,9 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 	d = mc_opendir(src_dir);
 	if (!d)
 	{
-		g_string_sprintf(message, "!ERROR reading '%s': %s\n",
+		/* Message displayed is "ERROR reading 'path': message" */
+		g_string_sprintf(message, "!%s '%s': %s\n",
+				_("ERROR reading"),
 				src_dir, g_strerror(errno));
 		send();
 		return;
@@ -732,7 +736,7 @@ static gboolean send_dir(char *dir)
 
 static gboolean send_error()
 {
-	g_string_sprintf(message, "!ERROR: %s\n", g_strerror(errno));
+	g_string_sprintf(message, "!%s: %s\n", _("ERROR"), g_strerror(errno));
 	return send();
 }
 
@@ -871,11 +875,11 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 				}
 				break;
 			case 'Y':
-				g_string_assign(message, "' Yes\n");
+				g_string_sprintf(message, "' %s\n", _("Yes"));
 				send();
 				return TRUE;
 			case 'N':
-				g_string_assign(message, "' No\n");
+				g_string_sprintf(message, "' %s\n", _("No"));
 				send();
 				return FALSE;
 			case 'E':
@@ -889,7 +893,7 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 
 	if (asked)
 	{
-		g_string_assign(message, "' Quiet\n");
+		g_string_sprintf(message, "' %s\n", _("Quiet"));
 		send();
 	}
 	return TRUE;
@@ -942,7 +946,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 
 	if (pipe(filedes))
 	{
-		report_error("ROX-Filer", g_strerror(errno));
+		report_error(PROJECT, g_strerror(errno));
 		return NULL;
 	}
 
@@ -950,7 +954,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	{
 		close(filedes[0]);
 		close(filedes[1]);
-		report_error("ROX-Filer", g_strerror(errno));
+		report_error(PROJECT, g_strerror(errno));
 		return NULL;
 	}
 
@@ -958,7 +962,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	switch (child)
 	{
 		case -1:
-			report_error("ROX-Filer", g_strerror(errno));
+			report_error(PROJECT, g_strerror(errno));
 			return NULL;
 		case 0:
 			/* We are the child */
@@ -1009,7 +1013,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gui_side->vbox = vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
 
-	gui_side->dir = gtk_label_new("<dir>");
+	gui_side->dir = gtk_label_new(_("<dir>"));
 	gui_side->next_dir = NULL;
 	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
@@ -1028,25 +1032,25 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), actions, FALSE, TRUE, 0);
 
-	gui_side->quiet = button = gtk_toggle_button_new_with_label("Quiet");
+	gui_side->quiet = button = gtk_toggle_button_new_with_label(_("Quiet"));
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(button), autoq);
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Q");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			button_reply, gui_side);
-	gui_side->yes = button = gtk_button_new_with_label("Yes");
+	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			button_reply, gui_side);
-	gui_side->no = button = gtk_button_new_with_label("No");
+	gui_side->no = button = gtk_button_new_with_label(_("No"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "N");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			button_reply, gui_side);
 	SENSITIVE_YESNO(gui_side, FALSE);
 
-	button = gtk_button_new_with_label("Abort");
+	button = gtk_button_new_with_label(_("Abort"));
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(gui_side->window));
@@ -1086,7 +1090,7 @@ static gboolean do_usage(char *src_path, char *dest_path)
 		size_tally += info.st_size;
 	else if (S_ISDIR(info.st_mode))
 	{
-		g_string_sprintf(message, "?Count contents of %s?",
+		g_string_sprintf(message, _("?Count contents of %s?"),
 				src_path);
 		if (reply(from_parent, FALSE))
 		{
@@ -1118,15 +1122,15 @@ static gboolean do_delete(char *src_path, char *dest_path)
 					   : access(src_path, W_OK) != 0;
 	if (write_prot || !quiet)
 	{
-		g_string_sprintf(message, "?Delete %s'%s'?",
-				write_prot ? "WRITE-PROTECTED " : " ",
+		g_string_sprintf(message, _("?Delete %s'%s'?"),
+				write_prot ? _("WRITE-PROTECTED ") : " ",
 				src_path);
 		if (!reply(from_parent, write_prot && !o_force))
 			return FALSE;
 	}
 	else if (!o_brief)
 	{
-		g_string_sprintf(message, "'Deleting '%s'\n", src_path);
+		g_string_sprintf(message, _("'Deleting '%s'\n"), src_path);
 		send();
 	}
 
@@ -1141,7 +1145,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 			send_error();
 			return FALSE;
 		}
-		g_string_sprintf(message, "'Directory '%s' deleted\n",
+		g_string_sprintf(message, _("'Directory '%s' deleted\n"),
 				safe_path);
 		send();
 		g_string_sprintf(message, "m%s", safe_path);
@@ -1169,7 +1173,7 @@ static gboolean do_find(char *path, char *dummy)
 
 	if (!quiet)
 	{
-		g_string_sprintf(message, "?Check '%s'?", path);
+		g_string_sprintf(message, _("?Check '%s'?"), path);
 		if (!reply(from_parent, FALSE))
 			return FALSE;
 	}
@@ -1188,10 +1192,10 @@ static gboolean do_find(char *path, char *dummy)
 		if (find_condition)
 			break;
 
-		g_string_assign(message,
-			"!Invalid find condition - change it and try again\n");
+		g_string_assign(message, _("!Invalid find condition - "
+						"change it and try again\n"));
 		send();
-		g_string_sprintf(message, "?Check '%s'?", path);
+		g_string_sprintf(message, _("?Check '%s'?"), path);
 		if (!reply(from_parent, TRUE))
 			return FALSE;
 	}
@@ -1199,7 +1203,7 @@ static gboolean do_find(char *path, char *dummy)
 	if (mc_lstat(path, &info.stats))
 	{
 		send_error();
-		g_string_sprintf(message, "'(while checking '%s')\n", path);
+		g_string_sprintf(message, _("'(while checking '%s')\n"), path);
 		send();
 		return FALSE;
 	}
@@ -1244,13 +1248,15 @@ static gboolean do_chmod(char *path, char *dummy)
 
 	if (!quiet)
 	{
-		g_string_sprintf(message, "?Change permissions of '%s'?", path);
+		g_string_sprintf(message,
+				_("?Change permissions of '%s'?"), path);
 		if (!reply(from_parent, FALSE))
 			return FALSE;
 	}
 	else if (!o_brief)
 	{
-		g_string_sprintf(message, "'Changing permissions of '%s'\n",
+		g_string_sprintf(message,
+				_("'Changing permissions of '%s'\n"),
 				path);
 		send();
 	}
@@ -1271,9 +1277,10 @@ static gboolean do_chmod(char *path, char *dummy)
 			break;
 
 		g_string_assign(message,
-			"!Invalid mode command - change it and try again\n");
+			_("!Invalid mode command - change it and try again\n"));
 		send();
-		g_string_sprintf(message, "?Change permissions of '%s'?", path);
+		g_string_sprintf(message,
+				_("?Change permissions of '%s'?"), path);
 		if (!reply(from_parent, TRUE))
 			return FALSE;
 	}
@@ -1352,9 +1359,9 @@ static gboolean do_copy2(char *path, char *dest)
 
 		merge = S_ISDIR(info.st_mode) && S_ISDIR(dest_info.st_mode);
 
-		g_string_sprintf(message, "?'%s' already exists - %s?",
+		g_string_sprintf(message, _("?'%s' already exists - %s?"),
 				dest_path,
-				merge ? "merge contents" : "overwrite");
+				merge ? _("merge contents") : _("overwrite"));
 		
 		if (!reply(from_parent, TRUE))
 			return FALSE;
@@ -1372,20 +1379,21 @@ static gboolean do_copy2(char *path, char *dest)
 				if (errno != ENOENT)
 					return FALSE;
 				g_string_sprintf(message,
-						"'Trying copy anyway...\n");
+						_("'Trying copy anyway...\n"));
 				send();
 			}
 		}
 	}
 	else if (!quiet)
 	{
-		g_string_sprintf(message, "?Copy %s as %s?", path, dest_path);
+		g_string_sprintf(message,
+				_("?Copy %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
 			return FALSE;
 	}
 	else
 	{
-		g_string_sprintf(message, "'Copying %s as %s\n", path,
+		g_string_sprintf(message, _("'Copying %s as %s\n"), path,
 				dest_path);
 		send();
 	}
@@ -1409,8 +1417,8 @@ static gboolean do_copy2(char *path, char *dest)
 		if (exists && !S_ISDIR(dest_info.st_mode))
 		{
 			g_string_sprintf(message,
-					"!ERROR: Destination already exists, "
-					"but is not a directory\n");
+				_("!ERROR: Destination already exists, "
+					"but is not a directory\n"));
 		}
 		else if (exists == FALSE && mkdir(dest_path, info.st_mode))
 			send_error();
@@ -1464,7 +1472,7 @@ static gboolean do_copy2(char *path, char *dest)
 
 		if (error)
 		{
-			g_string_sprintf(message, "!ERROR: %s\n", error);
+			g_string_sprintf(message, _("!ERROR: %s\n"), error);
 			send();
 			retval = FALSE;
 		}
@@ -1481,7 +1489,7 @@ static gboolean do_copy(char *path, char *dest)
 	if (is_sub_dir(make_dest_path(path, dest), path))
 	{
 		g_string_sprintf(message,
-				"!ERROR: Can't copy directory into itself\n");
+			_("!ERROR: Can't copy directory into itself\n"));
 		send();
 		return FALSE;
 	}
@@ -1503,7 +1511,7 @@ static gboolean do_move(char *path, char *dest)
 	if (is_sub_dir(dest, path))
 	{
 		g_string_sprintf(message,
-				"!ERROR: Can't move directory into itself\n");
+			_("!ERROR: Can't move directory into itself\n"));
 		send();
 		return FALSE;
 	}
@@ -1525,7 +1533,8 @@ static gboolean do_move(char *path, char *dest)
 		struct stat	info;
 		int		err;
 
-		g_string_sprintf(message, "?'%s' already exists - overwrite?",
+		g_string_sprintf(message,
+				_("?'%s' already exists - overwrite?"),
 				dest_path);
 		if (!reply(from_parent, TRUE))
 			return FALSE;
@@ -1547,19 +1556,20 @@ static gboolean do_move(char *path, char *dest)
 			if (errno != ENOENT)
 				return FALSE;
 			g_string_sprintf(message,
-					"'Trying move anyway...\n");
+					_("'Trying move anyway...\n"));
 			send();
 		}
 	}
 	else if (!quiet)
 	{
-		g_string_sprintf(message, "?Move %s as %s?", path, dest_path);
+		g_string_sprintf(message,
+				_("?Move %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
 			return FALSE;
 	}
 	else
 	{
-		g_string_sprintf(message, "'Moving %s as %s\n", path,
+		g_string_sprintf(message, _("'Moving %s as %s\n"), path,
 				dest_path);
 		send();
 	}
@@ -1579,7 +1589,8 @@ static gboolean do_move(char *path, char *dest)
 	}
 	else
 	{
-		g_string_sprintf(message, "!ERROR: Failed to move %s as %s\n",
+		g_string_sprintf(message,
+				_("!ERROR: Failed to move %s as %s\n"),
 				path, dest_path);
 		send();
 		retval = FALSE;
@@ -1605,13 +1616,14 @@ static gboolean do_link(char *path, char *dest)
 
 	if (quiet)
 	{
-		g_string_sprintf(message, "'Linking %s as %s\n", path,
+		g_string_sprintf(message, _("'Linking %s as %s\n"), path,
 				dest_path);
 		send();
 	}
 	else
 	{
-		g_string_sprintf(message, "?Link %s as %s?", path, dest_path);
+		g_string_sprintf(message,
+				_("?Link %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
 			return FALSE;
 	}
@@ -1629,22 +1641,27 @@ static gboolean do_link(char *path, char *dest)
 static void do_mount(FilerWindow *filer_window, DirItem *item)
 {
 	char		*argv[3] = {NULL, NULL, NULL};
-	char		*action;
+	gboolean	mount = (item->flags & ITEM_FLAG_MOUNTED) == 0;
 
 	check_flags();
 
-	argv[0] = item->flags & ITEM_FLAG_MOUNTED ? "umount" : "mount";
-	action = item->flags & ITEM_FLAG_MOUNTED ? "Unmount" : "Mount";
+	argv[0] = mount ? "mount" : "umount";
 	argv[1] = make_path(filer_window->path, item->leafname)->str;
 
 	if (quiet)
 	{
-		g_string_sprintf(message, "'%sing %s\n", action, argv[1]);
+		g_string_sprintf(message,
+				mount ? _("'Mounting %s\n")
+				      : _("'Unmounting %s\n"),
+				argv[1]);
 		send();
 	}
 	else
 	{
-		g_string_sprintf(message, "?%s %s?", action, argv[1]);
+		g_string_sprintf(message,
+				mount ? _("?Mount %s?\n")
+				      : _("?Unmount %s?\n"),
+				argv[1]);
 		if (!reply(from_parent, FALSE))
 			return;
 	}
@@ -1658,7 +1675,7 @@ static void do_mount(FilerWindow *filer_window, DirItem *item)
 	}
 	else
 	{
-		g_string_sprintf(message, "!ERROR: %s failed\n", action);
+		g_string_sprintf(message, _("!ERROR: Mount failed\n"));
 		send();
 	}
 }
@@ -1696,7 +1713,7 @@ static void usage_cb(gpointer data)
 		left--;
 	}
 	
-	g_string_sprintf(message, "'\nTotal: %s\n",
+	g_string_sprintf(message, _("'\nTotal: %s\n"),
 			format_size((unsigned long) total_size));
 	send();
 }
@@ -1731,12 +1748,12 @@ static void mount_cb(gpointer data)
 		if (!mount_points)
 		{
 			g_string_sprintf(message,
-					"!No mount points selected!\n");
+					_("!No mount points selected!\n"));
 			send();
 		}
 	}
 
-	g_string_sprintf(message, "'\nDone\n");
+	g_string_sprintf(message, _("'\nDone\n"));
 	send();
 }
 #endif
@@ -1767,7 +1784,7 @@ static void delete_cb(gpointer data)
 		left--;
 	}
 	
-	g_string_sprintf(message, "'\nDone\n");
+	g_string_sprintf(message, _("'\nDone\n"));
 	send();
 }
 
@@ -1793,7 +1810,7 @@ static void find_cb(gpointer data)
 		left--;
 	}
 	
-	g_string_sprintf(message, "'\nDone\n");
+	g_string_sprintf(message, _("'\nDone\n"));
 	send();
 }
 
@@ -1815,7 +1832,8 @@ static void chmod_cb(gpointer data)
 		item = (DirItem *) collection->items[i].data;
 		if (item->flags & ITEM_FLAG_SYMLINK)
 		{
-			g_string_sprintf(message, "!'%s' is a symbolic link\n",
+			g_string_sprintf(message,
+					_("!'%s' is a symbolic link\n"),
 					item->leafname);
 			send();
 		}
@@ -1828,7 +1846,7 @@ static void chmod_cb(gpointer data)
 		left--;
 	}
 	
-	g_string_sprintf(message, "'\nDone\n");
+	g_string_sprintf(message, _("'\nDone\n"));
 	send();
 }
 
@@ -1849,7 +1867,7 @@ static void list_cb(gpointer data)
 		paths = paths->next;
 	}
 
-	g_string_sprintf(message, "'\nDone\n");
+	g_string_sprintf(message, _("'\nDone\n"));
 	send();
 }
 
@@ -1872,14 +1890,17 @@ void action_find(FilerWindow *filer_window)
 	GUIside		*gui_side;
 	Collection 	*collection;
 	GtkWidget	*hbox, *label, *button, *scroller;
-	gchar		*titles[] = {"Name", "Directory"};
+	gchar		*titles[2];
+	
+	titles[0] = _("Name");
+	titles[1] = _("Directory");
 
 	collection = filer_window->collection;
 
 	if (collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "You need to select some items "
-				"to search through");
+		report_error(PROJECT, _("You need to select some items "
+				"to search through"));
 		return;
 	}
 
@@ -1911,7 +1932,7 @@ void action_find(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(select_row_callback), gui_side);
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new("Expression:");
+	label = gtk_label_new(_("Expression:"));
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_find_string;
 	gui_side->entry = gtk_entry_new();
@@ -1923,12 +1944,12 @@ void action_find(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
-	button = gtk_button_new_with_label("Show expression reference");
+	button = gtk_button_new_with_label(_("Show expression reference"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			show_condition_help, NULL);
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Find");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
 			gtk_button_clicked, GTK_OBJECT(gui_side->quiet));
@@ -1946,8 +1967,8 @@ void action_usage(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "You need to select some items "
-				"to count");
+		report_error(PROJECT,
+			_("You need to select some items to count"));
 		return;
 	}
 
@@ -1957,7 +1978,7 @@ void action_usage(FilerWindow *filer_window)
 
 	gui_side->show_info = TRUE;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Disk Usage");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Disk Usage"));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -1973,8 +1994,8 @@ void action_mount(FilerWindow *filer_window, DirItem *item)
 
 	if (item == NULL && collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "You need to select some items "
-				"to mount or unmount");
+		report_error(PROJECT,
+			_("You need to select some items to mount or unmount"));
 		return;
 	}
 
@@ -1983,13 +2004,14 @@ void action_mount(FilerWindow *filer_window, DirItem *item)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Mount / Unmount");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window),
+					_("Mount / Unmount"));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 #else
-	report_error("ROX-Filer",
-			"ROX-Filer does not yet support mount points on your "
-			"system. Sorry.");
+	report_error(PROJECT,
+		_("ROX-Filer does not yet support mount points on your "
+			"system. Sorry."));
 #endif /* DO_MOUNT_POINTS */
 }
 
@@ -2003,8 +2025,8 @@ void action_delete(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "You need to select some items "
-				"to delete");
+		report_error(PROJECT,
+				_("You need to select some items to delete"));
 		return;
 	}
 
@@ -2012,11 +2034,13 @@ void action_delete(FilerWindow *filer_window)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Delete");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Delete"));
 	add_toggle(gui_side,
-		"Force - don't confirm deletion of non-writeable items", "F");
+		_("Force - don't confirm deletion of non-writeable items"),
+		"F");
 	add_toggle(gui_side,
-		"Brief - only log directories being deleted", "B");
+		_("Brief - only log directories being deleted"),
+		"B");
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
@@ -2033,8 +2057,9 @@ void action_chmod(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "You need to select the items "
-				"whose permissions you want to change");
+		report_error(PROJECT,
+			_("You need to select the items "
+				"whose permissions you want to change"));
 		return;
 	}
 
@@ -2046,11 +2071,11 @@ void action_chmod(FilerWindow *filer_window)
 		return;
 
 	add_toggle(gui_side,
-		"Brief - don't list processed files", "B");
+		_("Brief - don't list processed files"), "B");
 	add_toggle(gui_side,
-		"Recurse - also change contents of subdirectories", "R");
+		_("Recurse - also change contents of subdirectories"), "R");
 	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new("Command:");
+	label = gtk_label_new(_("Command:"));
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_chmod_string;
 	gui_side->entry = gtk_entry_new();
@@ -2061,13 +2086,13 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
-	button = gtk_button_new_with_label("Show command reference");
+	button = gtk_button_new_with_label(_("Show command reference"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			show_chmod_help, NULL);
 	
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Permissions");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Permissions"));
 	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
 			gtk_button_clicked, GTK_OBJECT(gui_side->yes));
 
@@ -2086,7 +2111,7 @@ void action_copy(GSList *paths, char *dest, char *leaf)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Copy");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Copy"));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2101,7 +2126,7 @@ void action_move(GSList *paths, char *dest)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Move");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Move"));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2116,7 +2141,7 @@ void action_link(GSList *paths, char *dest)
 	if (!gui_side)
 		return;
 
-	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Link");
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Link"));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }

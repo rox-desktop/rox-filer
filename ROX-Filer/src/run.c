@@ -62,7 +62,7 @@ void run_app(char *path)
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
 	if (!spawn_full(argv, home_dir))
-		report_error("ROX-Filer", "Failed to fork() child process");
+		report_error(PROJECT, "Failed to fork() child process");
 	
 	g_string_free(apprun, TRUE);
 }
@@ -79,7 +79,7 @@ void run_with_files(char *path, GSList *uri_list)
 
 	if (stat(path, &info))
 	{
-		delayed_error("ROX-Filer", "Program not found - deleted?");
+		delayed_error(PROJECT, _("Program not found - deleted?"));
 		return;
 	}
 
@@ -106,7 +106,7 @@ void run_with_files(char *path, GSList *uri_list)
 	argv[argc++] = NULL;
 
 	if (!spawn_full(argv, home_dir))
-		delayed_error("ROX-Filer", "Failed to fork() child process");
+		delayed_error(PROJECT, _("Failed to fork() child process"));
 }
 
 /* Run the program as '<path> -', piping the data to it via stdin.
@@ -121,7 +121,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 
 	if (stat(path, &info))
 	{
-		delayed_error("ROX-Filer", "Program not found - deleted?");
+		delayed_error(PROJECT, _("Program not found - deleted?"));
 		return;
 	}
 
@@ -196,7 +196,7 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond)
 		{
 			if (errno == EAGAIN)
 				return;
-			delayed_error("ROX-Filer - Sending data to program",
+			delayed_error(_("ROX-Filer - Sending data to program"),
 					g_strerror(errno));
 			goto finish;
 		}

@@ -219,7 +219,7 @@ char *format_size(unsigned long size)
 			units = "K";
 	}
 	else
-		units = "bytes";
+		units = _("bytes");
 
 	if (buffer)
 		g_free(buffer);
@@ -502,7 +502,7 @@ err:
 			mc_close(read_fd);
 		if (write_fd != -1)
 			mc_close(write_fd);
-		return error ? g_strerror(error) : "Copy error";
+		return error ? g_strerror(error) : _("Copy error");
 	}
 #endif
 
@@ -510,7 +510,7 @@ err:
 	argv[3] = to;
 
 	if (fork_exec_wait(argv))
-		return "Copy failed";
+		return _("Copy failed");
 	return NULL;
 }
 

@@ -566,8 +566,8 @@ static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	switch (child)
 	{
 		case -1:
-			delayed_error("ROX-Filer", "Failed to create "
-					"child process");
+			delayed_error(PROJECT, _("Failed to create "
+					"child process"));
 			break;
 		case 0:	/* Child */
 			dup2(to_error_log, STDOUT_FILENO);

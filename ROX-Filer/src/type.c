@@ -125,7 +125,7 @@ static char *import_extensions(guchar *line)
 	if (isspace(*line))
 	{
 		if (!current_type)
-			return "Missing MIME-type";
+			return _("Missing MIME-type");
 		while (*line && isspace(*line))
 			line++;
 
@@ -160,7 +160,7 @@ static char *import_extensions(guchar *line)
 		while (*line && isspace(*line))
 			line++;
 		if (*line)
-			return "Trailing chars after MIME-type";
+			return _("Trailing chars after MIME-type");
 		current_type = g_strdup(type);
 	}
 	return NULL;
@@ -169,29 +169,29 @@ static char *import_extensions(guchar *line)
 char *basetype_name(DirItem *item)
 {
 	if (item->flags & ITEM_FLAG_SYMLINK)
-		return "Sym link";
+		return _("Sym link");
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-		return "Mount point";
+		return _("Mount point");
 	else if (item->flags & ITEM_FLAG_APPDIR)
-		return "App dir";
+		return _("App dir");
 
 	switch (item->base_type)
 	{
 		case TYPE_FILE:
-			return "File";
+			return _("File");
 		case TYPE_DIRECTORY:
-			return "Dir";
+			return _("Dir");
 		case TYPE_CHAR_DEVICE:
-			return "Char dev";
+			return _("Char dev");
 		case TYPE_BLOCK_DEVICE:
-			return "Block dev";
+			return _("Block dev");
 		case TYPE_PIPE:
-			return "Pipe";
+			return _("Pipe");
 		case TYPE_SOCKET:
-			return "Socket";
+			return _("Socket");
 	}
 	
-	return "Unknown";
+	return _("Unknown");
 }
 
 /*			MIME-type guessing 			*/
@@ -240,7 +240,7 @@ gboolean type_open(char *path, MIME_type *type)
 
 	if (stat(open, &info))
 	{
-		report_error("ROX-Filer", g_strerror(errno));
+		report_error(PROJECT, g_strerror(errno));
 		return FALSE;
 	}
 
@@ -251,8 +251,8 @@ gboolean type_open(char *path, MIME_type *type)
 
 	if (!spawn_full(argv, home_dir))
 	{
-		report_error("ROX-Filer",
-				"Failed to fork() child process");
+		report_error(PROJECT,
+				_("Failed to fork() child process"));
 		retval = FALSE;
 	}
 

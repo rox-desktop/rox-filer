@@ -55,7 +55,7 @@ void options_init()
 	
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
-	gtk_window_set_title(GTK_WINDOW(window), "ROX-Filer options");
+	gtk_window_set_title(GTK_WINDOW(window), _("ROX-Filer options"));
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
 			GTK_SIGNAL_FUNC(hide_dialog_event), window);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
@@ -79,41 +79,41 @@ void options_init()
 	sections_vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(border), sections_vbox);
 	
-	save_path = choices_find_path_save("...", "ROX-Filer", FALSE);
+	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
 	{
-		string = g_strconcat("Choices will be saved as ",
+		string = g_strconcat(_("Choices will be saved as "),
 					save_path,
 					NULL);
 		label = gtk_label_new(string);
 		g_free(string);
 	}
 	else
-		label = gtk_label_new("Choices saving is disabled by "
-					"CHOICESPATH variable");
+		label = gtk_label_new(_("Choices saving is disabled by "
+					"CHOICESPATH variable"));
 	gtk_box_pack_start(GTK_BOX(tl_vbox), label, FALSE, TRUE, 0);
 
 	actions = gtk_hbox_new(TRUE, 16);
 	gtk_box_pack_start(GTK_BOX(tl_vbox), actions, FALSE, TRUE, 0);
 	
-	button = gtk_button_new_with_label("Save");
+	button = gtk_button_new_with_label(_("Save"));
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	if (!save_path)
 		gtk_widget_set_sensitive(button, FALSE);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_SAVE);
 
-	button = gtk_button_new_with_label("OK");
+	button = gtk_button_new_with_label(_("OK"));
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_OK);
 
-	button = gtk_button_new_with_label("Apply");
+	button = gtk_button_new_with_label(_("Apply"));
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_APPLY);
 
-	button = gtk_button_new_with_label("Cancel");
+	button = gtk_button_new_with_label(_("Cancel"));
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
@@ -144,7 +144,7 @@ void options_load(void)
 		need_init = FALSE;
 	}
 
-	path = choices_find_path_load("options", "ROX-Filer");
+	path = choices_find_path_load("options", PROJECT);
 	if (!path)
 		return;		/* Nothing to load */
 
@@ -177,16 +177,14 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 				message = g_string_new(NULL);
 				g_string_sprintf(message,
-					"Error in options file at line %d: "
-					"\n\"%s\"\n"
-					"This may be due to upgrading from "
-					"a previous version of ROX-Filer. "
-					"Open the Options window and click "
-					"on Save.\n"
-					"Further errors will be ignored.",
+		_("Error in options file at line %d: "
+		"\n\"%s\"\n"
+		"This may be due to upgrading from a previous version of "
+		"ROX-Filer. Open the Options window and click on Save.\n"
+		"Further errors will be ignored."),
 					line_number,
 					error);
-				delayed_error("ROX-Filer", message->str);
+				delayed_error(PROJECT, message->str);
 				g_string_free(message, TRUE);
 				seen_error = TRUE;
 			}
@@ -225,7 +223,7 @@ static char *process_option_line(guchar *line)
 
 	eq = strchr(line, '=');
 	if (!eq)
-		return "Missing '='";
+		return _("Missing '='");
 
 	c = eq - 1;
 	while (c > line && (*c == ' ' || *c == '\t'))
@@ -237,7 +235,7 @@ static char *process_option_line(guchar *line)
 
 	func = (OptionFunc *) g_hash_table_lookup(option_hash, line);
 	if (!func)
-		return "Unknown option";
+		return _("Unknown option");
 
 	return func(c);
 }
@@ -258,18 +256,17 @@ static void save_options(GtkWidget *widget, gpointer data)
 	{
 		char 		*path;
 		
-		path = choices_find_path_save("options", "ROX-Filer", TRUE);
+		path = choices_find_path_save("options", PROJECT, TRUE);
 		g_return_if_fail(path != NULL);
 
 		save_file = fopen(path, "wb");
 		if (!save_file)
 		{
 			char *str;
-			str = g_strconcat("Unable to open '", path,
-					  "' for writing: ",
-					  g_strerror(errno),
-					  NULL);
-			report_error("ROX-Filer", str);
+			str = g_strdup_printf(
+				_("Unable to open '%s' for writing: %s"),
+					path, g_strerror(errno));
+			report_error(PROJECT, str);
 			g_free(str);
 			return;
 		}
@@ -284,7 +281,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 
 		if (save_file && fclose(save_file) == EOF)
 		{
-			report_error("ROX-Filer", g_strerror(errno));
+			report_error(PROJECT, g_strerror(errno));
 			return;
 		}
 	}
@@ -322,7 +319,7 @@ void option_write(char *name, char *value)
 	len = strlen(string);
 	if (fwrite(string, sizeof(char), len, save_file) < len)
 	{
-		delayed_error("Saving options", g_strerror(errno));
+		delayed_error(_("Saving options"), g_strerror(errno));
 		fclose(save_file);
 		save_file = NULL;
 	}

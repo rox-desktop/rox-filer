@@ -87,7 +87,7 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 		start_scanning(dir, dir->pathname);
 
 	if (dir->error)
-		delayed_error("ROX-Filer", dir->error);
+		delayed_error(PROJECT, dir->error);
 	
 	if (!dir->dir_handle)
 		callback(dir, DIR_END_SCAN, NULL, data);
@@ -282,7 +282,7 @@ static void start_scanning(Directory *dir, char *pathname)
 
 	if (!dir->dir_handle)
 	{
-		dir->error = g_strdup_printf("Can't open directory: %s",
+		dir->error = g_strdup_printf(_("Can't open directory: %s"),
 				g_strerror(errno));
 		return;		/* Report on attach */
 	}
@@ -613,5 +613,5 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 	start_scanning(dir, pathname);
 
 	if (dir->error)
-		delayed_error("ROX-Filer", dir->error);
+		delayed_error(PROJECT, dir->error);
 }
