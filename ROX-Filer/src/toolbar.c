@@ -601,6 +601,15 @@ static gboolean drag_motion(GtkWidget		*widget,
 
 	dest = (DropDest) g_object_get_data(G_OBJECT(widget), "toolbar_dest");
 
+	if ((context->actions & GDK_ACTION_ASK) && o_dnd_left_menu.int_value &&
+		dest != DROP_BOOKMARK)
+	{
+		guint state;
+		gdk_window_get_pointer(NULL, NULL, NULL, &state);
+		if (state & GDK_BUTTON1_MASK)
+			action = GDK_ACTION_ASK;
+	}
+
 	if (dest == DROP_TO_HOME)
 		g_dataset_set_data(context, "drop_dest_path",
 				   (gchar *) home_dir);
