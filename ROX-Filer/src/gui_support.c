@@ -229,9 +229,8 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
-	static GdkAtom xa_state, xa_atom, xa_net_state, xa_hints, xa_win_hints;
+	static GdkAtom xa_state, xa_atom, xa_hints, xa_win_hints;
 	static GdkAtom xa_NET_WM_DESKTOP;
-	static GdkAtom state_list[3];
 	GdkWindow *window = widget->window;
 	gint32  wm_hints_values[] = {1, False, 0, 0, 0, 0, 0, 0};
 	GdkAtom	wm_protocols[2];
@@ -249,29 +248,15 @@ void make_panel_window(GtkWidget *widget)
 		xa_win_hints = gdk_atom_intern("_WIN_HINTS", FALSE);
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
-		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
 		xa_hints = gdk_atom_intern("WM_HINTS", FALSE);
 		xa_NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
 
-		/* Note: Starting with Gtk+-1.3.12, Gtk+ converts GdkAtoms
-		 * to X atoms automatically when the type is ATOM.
-		 */
-		state_list[0] = gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE);
-		state_list[1] = gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER",
-						FALSE);
-		state_list[2] = gdk_atom_intern("_NET_WM_STATE_SKIP_TASKBAR",
-						FALSE);
-		
 		need_init = FALSE;
 	}
 	
 	gdk_window_set_decorations(window, 0);
 	gdk_window_set_functions(window, 0);
 	gtk_window_set_resizable(GTK_WINDOW(widget), FALSE);
-
-	/* Note: DON'T do gtk_window_stick(). Setting the state via
-	 * gdk will override our other atoms (pager/taskbar).
-	 */
 
 	/* Don't hide panel/pinboard windows initially (WIN_STATE_HIDDEN).
 	 * Needed for IceWM - Christopher Arndt <chris.arndt@web.de>
@@ -287,9 +272,6 @@ void make_panel_window(GtkWidget *widget)
 	/* Appear on all workspaces */
 	set_cardinal_property(window, xa_NET_WM_DESKTOP, 0xffffffff);
 
-	gdk_property_change(window, xa_net_state, xa_atom, 32,
-			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);
-
 	gdk_property_change(window, xa_hints, xa_hints, 32,
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_hints_values,
 			sizeof(wm_hints_values) / sizeof(gint32));
@@ -300,6 +282,9 @@ void make_panel_window(GtkWidget *widget)
 			gdk_atom_intern("WM_PROTOCOLS", FALSE), xa_atom, 32,
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_protocols,
 			sizeof(wm_protocols) / sizeof(GdkAtom));
+
+	gdk_window_set_skip_taskbar_hint(window, TRUE);	
+	gdk_window_set_skip_pager_hint(window, TRUE);
 }
 
 static gboolean error_idle_cb(gpointer data)
