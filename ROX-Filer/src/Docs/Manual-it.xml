@@ -887,6 +887,8 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Rinomina...</guimenuitem></entry><entry>
          Cambia il nome di questo oggetto o lo sposta in un'altra directory.
+       	 Se sono selezionati più file, allora apre <xref linkend='bulkrename' />.
+
        </entry></row>
 
        <row><entry>
@@ -1498,7 +1500,7 @@ $ rox --bottom=</screen>
   <para>
     Le miniature vengono memorizzate in <filename>~/.thumbnails</filename>, per caricarle
     più velocemente la volta dopo. Durante il caricamento delle miniature, nella parte
-    bassa della finestra compare una barra di avanzamento. Facendo clic sul pulsante  
+    inferiore della finestra compare una barra di avanzamento. Facendo clic sul pulsante  
     <guibutton>Annulla</guibutton> che è accanto alla barra, viene interrotta la scansione.
     È anche possibile creare miniature di altri tipi di file, come ad esempio i video:
     basta visualizzare un frame usando un programma opportuno.
@@ -1747,6 +1749,40 @@ $ rox --bottom=</screen>
 
    </para>
   </sect1>
+ </chapter>
+
+ <chapter>
+  <title>
+   <anchor id="bulkrename" xreflabel="La finestra di rinominazione multipla dei file"/>Rinominazione multipla dei file
+  </title>
+  <para>
+   Se c'è un numero elevato di file da rinominare, è noioso rinominarli uno alla volta. È meglio aprire la finestra 
+   di rinominazione multipla, selezionando prima tutti i file da rinominare e poi scegliendo
+   <guimenuitem>Rinomina...</guimenuitem> dal menù.
+  </para>
+
+  <para>
+   La finestra mostra una tabella con due colonne. La colonna <guilabel>Prima</guilabel>
+   mostra il nome attuale di ciascun file selezionato, la colonna <guilabel>Dopo</guilabel>
+   mostra il nuovo nome, che inizialmente è identico.
+  </para>
+
+  <para>
+   Ci sono due modi per cambiare i nomi: si possono modificarli direttamente nella tabella,
+   oppure si può usare la funzione "cerca e sostituisci" che si trova nella parte superiore della finestra. 
+   Qui si specifica un'espressione regolare per la ricerca e il testo da sostituire in caso di 
+   corrispondenza. Per esempio, se ci sono molti file i cui nomi terminano per 
+   <filename>.htm</filename> e se si desidera cambiarli in
+   <filename>.html</filename>, bisogna inserire <userinput>\.htm$</userinput> nel campo
+   <guilabel>Sostituisci:</guilabel> e <userinput>.html</userinput> nel campo 
+   <guilabel>con:</guilabel>. Cliccando su <guibutton>Applica</guibutton>, la tabella viene
+   aggiornata e ora mostra i nuovi nomi proposti (ma non vengono ancora rinominati).
+  </para>
+
+  <para>
+   Dopo aver controllato che i nuovi nomi sono corretti, cliccare sul pulsante <guibutton>Rinomina</guibutton>
+   per rinominarli.
+  </para>
  </chapter>
 
  <chapter id="actions">
