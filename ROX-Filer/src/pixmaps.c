@@ -104,12 +104,7 @@ void pixmaps_init(void)
 {
 	gtk_widget_push_colormap(gdk_rgb_get_cmap());
 
-	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file,
-					(GFSRefFunc) g_object_ref,
-					(GFSRefFunc) g_object_unref,
-					(GFSGetRefFunc) object_getref,
-					NULL,	/* Update func */
-					NULL);
+	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
 
 	gtk_timeout_add(10000, purge, NULL);
 
@@ -581,8 +576,6 @@ static gpointer parent_class;
 static void masked_pixmap_finialize(GObject *object)
 {
 	MaskedPixmap *mp = (MaskedPixmap *) object;
-
-	g_print("[ finalize ]\n");
 
 	if (mp->huge_pixbuf)
 	{

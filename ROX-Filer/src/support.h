@@ -13,7 +13,6 @@
 
 #include <glib-object.h>
 
-gint object_getref(GObject *object);
 XMLwrapper *xml_cache_load(const gchar *pathname);
 int save_xml_file(xmlDocPtr doc, const gchar *filename);
 xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);

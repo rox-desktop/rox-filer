@@ -33,10 +33,17 @@ struct _DirUser
 	gpointer	data;
 };
 
+typedef struct _DirectoryClass DirectoryClass;
+
+struct _DirectoryClass {
+	GObjectClass parent;
+};
+
 struct _Directory
 {
+	GObject object;
+
 	char	*pathname;	/* Internal use only */
-	int	ref;
 	GList	*users;		/* Functions to call on update */
 	char	*error;		/* NULL => no error */
 

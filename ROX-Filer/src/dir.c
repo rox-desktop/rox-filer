@@ -71,12 +71,7 @@
 GFSCache *dir_cache = NULL;
 
 /* Static prototypes */
-static Directory *load(char *pathname, gpointer data);
-static void ref(Directory *dir, gpointer data);
-static void unref(Directory *dir, gpointer data);
-static int getref(Directory *dir, gpointer data);
 static void update(Directory *dir, gchar *pathname, gpointer data);
-static void destroy(Directory *dir);
 static void set_idle_callback(Directory *dir);
 static DirItem *insert_item(Directory *dir, const guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
@@ -84,6 +79,7 @@ static void dir_recheck(Directory *dir,
 			const guchar *path, const guchar *leafname);
 static GPtrArray *hash_to_array(GHashTable *hash);
 static void dir_force_update_item(Directory *dir, const gchar *leaf);
+static Directory *dir_new(const char *pathname);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -91,10 +87,7 @@ static void dir_force_update_item(Directory *dir, const gchar *leaf);
 
 void dir_init(void)
 {
-	dir_cache = g_fscache_new((GFSLoadFunc) load,
-				(GFSRefFunc) ref,
-				(GFSRefFunc) unref,
-				(GFSGetRefFunc) getref,
+	dir_cache = g_fscache_new((GFSLoadFunc) dir_new,
 				(GFSUpdateFunc) update, NULL);
 }
 
@@ -118,7 +111,7 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 	
 	dir->users = g_list_prepend(dir->users, user);
 
-	ref(dir, NULL);
+	g_object_ref(dir);
 
 	items = hash_to_array(dir->known_items);
 	if (items->len)
@@ -155,7 +148,7 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 		{
 			g_free(user);
 			dir->users = g_list_remove(dir->users, user);
-			unref(dir, NULL);
+			g_object_unref(dir);
 
 			/* May stop scanning if noone's watching */
 			set_idle_callback(dir);
@@ -561,7 +554,7 @@ static gint notify_timeout(gpointer data)
 	dir_merge_new(dir);
 
 	dir->notify_active = FALSE;
-	unref(dir, NULL);
+	g_object_unref(dir);
 
 	return FALSE;
 }
@@ -571,7 +564,7 @@ static void delayed_notify(Directory *dir)
 {
 	if (dir->notify_active)
 		return;
-	ref(dir, NULL);
+	g_object_ref(dir);
 	gtk_timeout_add(500, notify_timeout, dir);
 	dir->notify_active = TRUE;
 }
@@ -659,74 +652,6 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 	delayed_notify(dir);
 
 	return item;
-}
-
-static Directory *load(char *pathname, gpointer data)
-{
-	Directory *dir;
-
-	dir = g_new(Directory, 1);
-	dir->ref = 1;
-	dir->known_items = g_hash_table_new(g_str_hash, g_str_equal);
-	dir->recheck_list = NULL;
-	dir->idle_callback = 0;
-	dir->scanning = FALSE;
-	dir->have_scanned = FALSE;
-	
-	dir->users = NULL;
-	dir->needs_update = TRUE;
-	dir->notify_active = FALSE;
-	dir->pathname = g_strdup(pathname);
-	dir->error = NULL;
-
-	dir->new_items = g_ptr_array_new();
-	dir->up_items = g_ptr_array_new();
-	dir->gone_items = g_ptr_array_new();
-	
-	return dir;
-}
-
-/* Note: dir_cache is never purged, so this shouldn't get called */
-static void destroy(Directory *dir)
-{
-	GPtrArray *items;
-
-	g_return_if_fail(dir->users == NULL);
-
-	g_print("[ destroy %p ]\n", dir);
-
-	free_recheck_list(dir);
-	set_idle_callback(dir);
-
-	dir_merge_new(dir);	/* Ensures new, up and gone are empty */
-
-	g_ptr_array_free(dir->up_items, TRUE);
-	g_ptr_array_free(dir->new_items, TRUE);
-	g_ptr_array_free(dir->gone_items, TRUE);
-
-	items = hash_to_array(dir->known_items);
-	free_items_array(items);
-	g_hash_table_destroy(dir->known_items);
-	
-	g_free(dir->error);
-	g_free(dir->pathname);
-	g_free(dir);
-}
-
-static void ref(Directory *dir, gpointer data)
-{
-	dir->ref++;
-}
-	
-static void unref(Directory *dir, gpointer data)
-{
-	if (--dir->ref == 0)
-		destroy(dir);
-}
-
-static int getref(Directory *dir, gpointer data)
-{
-	return dir->ref;
 }
 
 static void update(Directory *dir, gchar *pathname, gpointer data)
@@ -826,4 +751,102 @@ static GPtrArray *hash_to_array(GHashTable *hash)
 	g_hash_table_foreach(hash, to_array, array);
 
 	return array;
+}
+
+static gpointer parent_class;
+
+/* Note: dir_cache is never purged, so this shouldn't get called */
+static void dir_finialize(GObject *object)
+{
+	GPtrArray *items;
+	Directory *dir = (Directory *) object;
+
+	g_return_if_fail(dir->users == NULL);
+
+	g_print("[ dir finalize ]\n");
+
+	free_recheck_list(dir);
+	set_idle_callback(dir);
+
+	dir_merge_new(dir);	/* Ensures new, up and gone are empty */
+
+	g_ptr_array_free(dir->up_items, TRUE);
+	g_ptr_array_free(dir->new_items, TRUE);
+	g_ptr_array_free(dir->gone_items, TRUE);
+
+	items = hash_to_array(dir->known_items);
+	free_items_array(items);
+	g_hash_table_destroy(dir->known_items);
+	
+	g_free(dir->error);
+	g_free(dir->pathname);
+
+	G_OBJECT_CLASS(parent_class)->finalize(object);
+}
+
+static void directory_class_init(gpointer gclass, gpointer data)
+{
+	GObjectClass *object = (GObjectClass *) gclass;
+
+	parent_class = g_type_class_peek_parent(gclass);
+
+	object->finalize = dir_finialize;
+}
+
+static void directory_init(GTypeInstance *object, gpointer gclass)
+{
+	Directory *dir = (Directory *) object;
+
+	dir->known_items = g_hash_table_new(g_str_hash, g_str_equal);
+	dir->recheck_list = NULL;
+	dir->idle_callback = 0;
+	dir->scanning = FALSE;
+	dir->have_scanned = FALSE;
+	
+	dir->users = NULL;
+	dir->needs_update = TRUE;
+	dir->notify_active = FALSE;
+	dir->pathname = NULL;
+	dir->error = NULL;
+
+	dir->new_items = g_ptr_array_new();
+	dir->up_items = g_ptr_array_new();
+	dir->gone_items = g_ptr_array_new();
+}
+
+static GType dir_get_type(void)
+{
+	static GType type = 0;
+
+	if (!type)
+	{
+		static const GTypeInfo info =
+		{
+			sizeof (DirectoryClass),
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			directory_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(Directory),
+			0,			/* n_preallocs */
+			directory_init
+		};
+
+		type = g_type_register_static(G_TYPE_OBJECT, "Directory",
+					      &info, 0);
+	}
+
+	return type;
+}
+
+static Directory *dir_new(const char *pathname)
+{
+	Directory *dir;
+
+	dir = g_object_new(dir_get_type(), NULL);
+
+	dir->pathname = g_strdup(pathname);
+	
+	return dir;
 }

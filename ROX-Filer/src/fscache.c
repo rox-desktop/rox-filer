@@ -34,6 +34,34 @@
 
 #include "fscache.h"
 
+typedef struct _GFSCacheKey GFSCacheKey;
+typedef struct _GFSCacheData GFSCacheData;
+
+struct _GFSCache
+{
+	GHashTable	*inode_to_stats;
+	GFSLoadFunc	load;
+	GFSUpdateFunc	update;
+	gpointer	user_data;
+};
+
+struct _GFSCacheKey
+{
+	dev_t		device;
+	ino_t		inode;
+};
+
+struct _GFSCacheData
+{
+	GObject		*data;		/* The object from the file */
+	time_t		last_lookup;
+
+	/* Details of the file last time we checked it */
+	time_t		m_time;
+	off_t		length;
+	mode_t		mode;
+};
+
 #define UPTODATE(data, info)				\
 		(data->m_time == info.st_mtime		\
 		 && data->length == info.st_size	\
@@ -84,9 +112,6 @@ struct PurgeInfo
  * 'user_data' will be passed to all of the above functions.
  */
 GFSCache *g_fscache_new(GFSLoadFunc load,
-			GFSRefFunc ref,
-			GFSRefFunc unref,
-			GFSGetRefFunc getref,
 			GFSUpdateFunc update,
 			gpointer user_data)
 {
@@ -95,9 +120,6 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 	cache = g_new(GFSCache, 1);
 	cache->inode_to_stats = g_hash_table_new(hash_key, cmp_stats);
 	cache->load = load;
-	cache->ref = ref;
-	cache->unref = unref;
-	cache->getref = getref;
 	cache->update = update;
 	cache->user_data = user_data;
 
@@ -108,7 +130,7 @@ void g_fscache_destroy(GFSCache *cache)
 {
 	g_return_if_fail(cache != NULL);
 
-	g_hash_table_foreach(cache->inode_to_stats, destroy_hash_entry, cache);
+	g_hash_table_foreach(cache->inode_to_stats, destroy_hash_entry, NULL);
 	g_hash_table_destroy(cache->inode_to_stats);
 
 	g_free(cache);
@@ -119,8 +141,8 @@ void g_fscache_data_ref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
 
-	if (cache->ref && data)
-		cache->ref(data, cache->user_data);
+	if (data)
+		g_object_ref(data);
 }
 
 /* Call the unref() user function for this object */
@@ -128,8 +150,8 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
 
-	if (cache->unref && data)
-		cache->unref(data, cache->user_data);
+	if (data)
+		g_object_unref(data);
 }
 
 /* Find the data for this file in the cache, loading it into
@@ -165,11 +187,11 @@ void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 	if (!data)
 		return;
 
-	if (cache->unref && data->data)
-		cache->unref(data->data, cache->user_data);
+	if (data->data)
+		g_object_unref(data->data);
 	data->data = obj;
-	if (cache->ref && data->data)
-		cache->ref(data->data, cache->user_data);
+	if (data->data)
+		g_object_ref(data->data);
 }
 
 /* As g_fscache_lookup, but 'lookup_type' controls what happens if the data
@@ -199,8 +221,7 @@ gpointer g_fscache_lookup_full(GFSCache *cache, const char *pathname,
 	if (found)
 		*found = TRUE;
 
-	if (cache->ref)
-		cache->ref(data->data, cache->user_data);
+	g_object_ref(data->data);
 
 	return data->data;
 }
@@ -305,11 +326,10 @@ static gint cmp_stats(gconstpointer a, gconstpointer b)
 
 static void destroy_hash_entry(gpointer key, gpointer data, gpointer user_data)
 {
-	GFSCache *cache = (GFSCache *) user_data;
 	GFSCacheData *cache_data = (GFSCacheData *) data;
 	
-	if (cache->unref)
-		cache->unref(cache_data->data, cache->user_data);
+	if (cache_data->data)
+		g_object_unref(cache_data->data);
 
 	g_free(key);
 	g_free(data);
@@ -320,20 +340,21 @@ static gboolean purge_hash_entry(gpointer key, gpointer data,
 {
 	struct PurgeInfo *info = (struct PurgeInfo *) user_data;
 	GFSCacheData *cache_data = (GFSCacheData *) data;
-	GFSCache *cache = info->cache;
+
+	if (!cache_data->data)
+		goto remove;
 
 	/* It's wasteful to remove an entry if someone else is using it */
-	if (cache->getref &&
-		cache->getref(cache_data->data, cache->user_data) > 1)
+	if (cache_data->data->ref_count > 1)
 		return FALSE;
-			
+
 	if (cache_data->last_lookup <= info->now
 		&& cache_data->last_lookup >= info->now - info->age)
 		return FALSE;
 
-	if (cache->unref)
-		cache->unref(cache_data->data, cache->user_data);
+	g_object_unref(cache_data->data);
 
+remove:
 	g_free(key);
 	g_free(data);
 
@@ -385,8 +406,8 @@ static GFSCacheData *lookup_internal(GFSCache *cache, const char *pathname,
 			cache->update(data->data, pathname, cache->user_data);
 		else
 		{
-			if (cache->unref)
-				cache->unref(data->data, cache->user_data);
+			if (data->data)
+				g_object_unref(data->data);
 			data->data = NULL;
 		}
 	}

@@ -60,23 +60,13 @@ static void MD5Transform(guint32 buf[4], guint32 const in[16]);
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-/* XXX */
-gint object_getref(GObject *object)
-{
-	return object->ref_count;
-}
-
 /* g_fscache_data_unref() the result! */
 XMLwrapper *xml_cache_load(const gchar *pathname)
 {
 	static GFSCache *xml_cache = NULL;
 
 	if (!xml_cache)
-		xml_cache = g_fscache_new((GFSLoadFunc) xml_new,
-					  (GFSRefFunc) g_object_ref,
-					  (GFSRefFunc) g_object_unref,
-					  (GFSGetRefFunc) object_getref,
-					  NULL, NULL);
+		xml_cache = g_fscache_new((GFSLoadFunc) xml_new, NULL, NULL);
 	return g_fscache_lookup(xml_cache, pathname);
 }
 
