@@ -357,9 +357,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-/* Create a thumbnail file for this image.
- * XXX: Thumbnails should be deleted somewhere!
- */
+/* Create a thumbnail file for this image */
 static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 {
 	struct stat info;
