@@ -123,7 +123,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
 	soap_register("OpenDir", rpc_OpenDir, "Filename",
-					      "Style,Details,Sort,Class");
+					      "Style,Details,Sort,Class,Window");
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
@@ -568,16 +568,27 @@ static xmlNodePtr rpc_Version(GList *args)
 	return reply;
 }
 
-/* Args: Path, [Style, Details, Sort, Class] */
+/* Args: Path, [Style, Details, Sort, Class, Window] */
 static xmlNodePtr rpc_OpenDir(GList *args)
 {
 	char	   *path;
-	char       *style, *details, *sort, *class;
-	FilerWindow *fwin;
+	char       *style, *details, *sort, *class, *window;
+	FilerWindow *fwin=NULL;
+	xmlNodePtr  reply;
+	gchar      *magic;  
 
 	path = string_value(ARG(0));
 	class = string_value(ARG(4));
-	fwin = filer_opendir(path, NULL, class);
+	window = string_value(ARG(5));
+	if(window) {
+		fwin=(FilerWindow *) strtoull(window, NULL, 16);
+		if(filer_exists(fwin))
+			filer_change_to(fwin, path, NULL);
+		else
+			fwin=NULL;
+	}
+	if(!fwin)
+		fwin = filer_opendir(path, NULL, class);
 	g_free(path);
 	g_free(class);
 	if (!fwin)
@@ -654,7 +665,14 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		g_free(sort);
 	}
 
-	return NULL;
+	reply = xmlNewNode(NULL, "rox:OpenDirResponse");
+	magic = g_strdup_printf("%08x", fwin);
+
+	xmlNewNs(reply, SOAP_RPC_NS, "soap");
+	xmlNewChild(reply, NULL, "soap:result", magic);
+	g_free(magic);
+
+	return reply;
 }
 
 static xmlNodePtr rpc_Run(GList *args)
