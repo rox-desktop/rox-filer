@@ -1543,19 +1543,21 @@ static void customise_send_to(gpointer data)
 static void show_send_to_menu(GList *paths, GdkEvent *event)
 {
 	GtkWidget	*menu, *item;
-	gchar		*sendto_dname = NULL;
-	GList		*widgets = NULL;
+	GPtrArray	*path;
+	int		i;
 
 	menu = gtk_menu_new();
 
-	sendto_dname = choices_find_path_load("SendTo", "");
-	if (sendto_dname)
+	path = choices_list_dirs("SendTo");
+
+	for (i = 0; i < path->len; i++)
 	{
-		widgets = menu_from_dir(menu, sendto_dname, 
-					MIS_SMALL,
+		GList	*widgets = NULL;
+		guchar	*dir = (guchar *) path->pdata[i];
+
+		widgets = menu_from_dir(menu, dir, MIS_SMALL,
 					(CallbackFn) do_send_to,
 					FALSE, FALSE);
-		g_free(sendto_dname);
 
 		if (widgets)
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
@@ -1563,6 +1565,8 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 
 		g_list_free(widgets);	/* TODO: Get rid of this */
 	}
+
+	choices_free_list(path);
 
 	item = gtk_menu_item_new_with_label(_("Customise"));
 	gtk_signal_connect_object(GTK_OBJECT(item), "activate",
