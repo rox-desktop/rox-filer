@@ -79,11 +79,29 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 	while (next)
 	{
 		cb((char *) next->data);
+		g_string_sprintf(message, "+%s", dir);
+		send();
+
 		g_free(next->data);
 		next = next->next;
 	}
 	g_slist_free(list);
 	return;
+}
+
+/* Read this many bytes into the buffer. TRUE on success. */
+static gboolean read_exact(int source, char *buffer, ssize_t len)
+{
+	while (len > 0)
+	{
+		ssize_t got;
+		got = read(source, buffer, len);
+		if (got < 1)
+			return FALSE;
+		len -= got;
+		buffer += got;
+	}
+	return TRUE;
 }
 
 /* Send 'message' to our parent process. TRUE on success. */
@@ -274,9 +292,9 @@ static void do_delete(char *path)
 			send_error();
 			return;
 		}
-		g_free(safe_path);
 		g_string_assign(message, "'Directory deleted\n");
 		send();
+		g_free(safe_path);
 	}
 	else if (unlink(path) == 0)
 	{
@@ -302,10 +320,14 @@ static void delete_cb(FilerWindow *filer_window)
 			continue;
 		item = (FileItem *) collection->items[i].data;
 		do_delete(make_path(filer_window->path, item->leafname)->str);
+		g_string_sprintf(message, "+%s", filer_window->path);
+		send();
 		left--;
 	}
 	
 	g_string_sprintf(message, "'\nDone\n");
+	send();
+	g_string_sprintf(message, "+%s", filer_window->path);
 	send();
 	sleep(5);
 }
@@ -316,25 +338,29 @@ static void got_delete_data(gpointer 		data,
 			    GdkInputCondition 	condition)
 {
 	char buf[5];
-	ssize_t len;
 	GUIside	*gui_side = (GUIside *) data;
 	GtkWidget *log = gui_side->log;
 
-	len = read(source, buf, 4);
-	if (len == 4)
+	if (read_exact(source, buf, 4))
 	{
 		ssize_t message_len;
 		char	*buffer;
 
 		buf[4] = '\0';
 		message_len = strtol(buf, NULL, 16);
-		buffer = g_malloc(message_len);
-		if (message_len > 0 &&
-			read(source, buffer, message_len) == message_len)
+		buffer = g_malloc(message_len + 1);
+		if (message_len > 0 && read_exact(source, buffer, message_len))
 		{
+			buffer[message_len] = '\0';
 			if (*buffer == '?')
 				gtk_widget_set_sensitive(gui_side->actions,
 							TRUE);
+			else if (*buffer == '+')
+			{
+				refresh_dirs(buffer + 1);
+				g_free(buffer);
+				return;
+			}
 			gtk_text_insert(GTK_TEXT(log),
 					NULL,
 					NULL, NULL,

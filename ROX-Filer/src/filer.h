@@ -18,9 +18,7 @@ typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 
-#include "type.h"
-
-enum
+typedef enum
 {
 	ITEM_FLAG_SYMLINK 	= 0x01,	/* Is a symlink */
 	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains /AppInfo */
@@ -28,7 +26,14 @@ enum
 	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is in /etc/mtab */
 	ITEM_FLAG_TEMP_ICON  	= 0x10,	/* Free icon after use */
 	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */
-};
+} ItemFlags;
+
+typedef enum
+{
+	FILER_NEEDS_RESCAN	= 0x01, /* Call may_rescan after scanning */
+} FilerFlags;
+
+#include "type.h"
 
 struct _FilerWindow
 {
@@ -38,6 +43,7 @@ struct _FilerWindow
 	gboolean	panel;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
+	FilerFlags	flags;
 	Side		panel_side;
 	time_t		m_time;		/* m-time at last scan */
 
@@ -53,7 +59,7 @@ struct _FileItem
 	
 	int		base_type;	/* (regular file, dir, pipe, etc) */
 	MIME_type	*mime_type;	/* May be NULL */
-	int		flags;
+	ItemFlags	flags;
 	
 	int		text_width;
 	int		pix_width;
@@ -70,5 +76,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side);
 void scan_dir(FilerWindow *filer_window);
 void panel_set_timeout(FilerWindow *filer_window, gulong msec);
 FileItem *selected_item(Collection *collection);
+void refresh_dirs(char *path);
 
 #endif /* _FILER_H */

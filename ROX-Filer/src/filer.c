@@ -41,6 +41,9 @@ FilerWindow 	*window_with_focus = NULL;
  */
 GHashTable	*child_to_filer = NULL;
 
+/* Link paths to GLists of filer windows */
+GHashTable	*path_to_window_list = NULL;
+
 static FilerWindow *window_with_selection = NULL;
 static FilerWindow *panel_with_timeout = NULL;
 static gint panel_timeout;
@@ -67,10 +70,46 @@ static gint focus_in(GtkWidget *widget,
 static gint focus_out(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
+static void add_view(FilerWindow *filer_window);
+static void remove_view(FilerWindow *filer_window);
 
 void filer_init()
 {
 	child_to_filer = g_hash_table_new(NULL, NULL);
+	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
+}
+
+/* When a filer window shows a directory, use this function to add
+ * it to the list of directories to be updated when the contents
+ * change.
+ */
+static void add_view(FilerWindow *filer_window)
+{
+	GList	*list, *newlist;
+
+	g_return_if_fail(filer_window != NULL);
+	
+	list = g_hash_table_lookup(path_to_window_list, filer_window->path);
+	newlist = g_list_prepend(list, filer_window);
+	if (newlist != list)
+		g_hash_table_insert(path_to_window_list, filer_window->path,
+				newlist);
+}
+
+/* When a filer window no longer shows a directory, call this to reverse
+ * the effect of add_view().
+ */
+static void remove_view(FilerWindow *filer_window)
+{
+	GList	*list, *newlist;
+
+	g_return_if_fail(filer_window != NULL);
+
+	list = g_hash_table_lookup(path_to_window_list, filer_window->path);
+	newlist = g_list_remove(list, filer_window);
+	if (newlist != list)
+		g_hash_table_insert(path_to_window_list, filer_window->path,
+				newlist);
 }
 
 /* When a filer window is destroyed we call this for each entry in the
@@ -117,6 +156,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		gtk_timeout_remove(panel_timeout);
 	}
 
+	remove_view(filer_window);
 	g_hash_table_foreach_remove(child_to_filer, child_eq, filer_window);
 
 	free_temp_icons(filer_window);
@@ -411,6 +451,26 @@ void show_menu(Collection *collection, GdkEventButton *event,
 	show_filer_menu((FilerWindow *) user_data, event, item);
 }
 
+static void may_rescan(FilerWindow *filer_window)
+{
+	struct stat info;
+
+	g_return_if_fail(filer_window != NULL);
+	
+	if (stat(filer_window->path, &info))
+	{
+		delayed_error("ROX-Filer", "Directory deleted");
+		gtk_widget_destroy(filer_window->window);
+	}
+	else if (info.st_mtime > filer_window->m_time)
+	{
+		if (filer_window->dir)
+			filer_window->flags |= FILER_NEEDS_RESCAN;
+		else
+			scan_dir(filer_window);
+	}
+}
+
 void scan_dir(FilerWindow *filer_window)
 {
 	struct stat info;
@@ -530,7 +590,9 @@ void open_item(Collection *collection,
 				(event->type != GDK_2BUTTON_PRESS ||
 					event->button == 1))
 			{
+				remove_view(filer_window);
 				filer_window->path = pathdup(full_path);
+				add_view(filer_window);
 				scan_dir(filer_window);
 			}
 			else
@@ -573,27 +635,7 @@ static gint pointer_in(GtkWidget *widget,
 			GdkEventCrossing *event,
 			FilerWindow *filer_window)
 {
-	static time_t last_stat_time = 0;
-	static FilerWindow *last_stat_filer = NULL;
-	time_t now;
-
-	now = time(NULL);
-	if (now > last_stat_time + 1 || filer_window != last_stat_filer)
-	{
-		struct stat info;
-		
-		last_stat_time = now;
-		last_stat_filer = filer_window;
-
-		if (stat(filer_window->path, &info))
-		{
-			delayed_error("ROX-Filer", "Directory deleted");
-			gtk_widget_destroy(filer_window->window);
-		}
-		else if (info.st_mtime > filer_window->m_time)
-			scan_dir(filer_window);
-	}
-
+	may_rescan(filer_window);
 	return FALSE;
 }
 
@@ -638,9 +680,11 @@ static gint key_press_event(GtkWidget	*widget,
 		   case GDK_Return:
 		 */
 		case GDK_BackSpace:
+			remove_view(filer_window);
 			filer_window->path = pathdup(make_path(
 						filer_window->path,
 						"..")->str);
+			add_view(filer_window);
 			scan_dir(filer_window);
 			return TRUE;
 	}
@@ -663,6 +707,24 @@ FileItem *selected_item(Collection *collection)
 	g_warning("selected_item: number_selected is wrong\n");
 
 	return NULL;
+}
+
+/* Refresh all windows onto this directory */
+void refresh_dirs(char *path)
+{
+	char 	*real;
+	GList	*list, *next;
+
+	real = pathdup(path);
+	list = g_hash_table_lookup(path_to_window_list, real);
+	g_free(real);
+
+	while (list)
+	{
+		next = list->next;
+		may_rescan((FilerWindow *) list->data);
+		list = next;
+	}
 }
 
 void filer_opendir(char *path, gboolean panel, Side panel_side)
@@ -774,5 +836,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
 
+	add_view(filer_window);
 	scan_dir(filer_window);
 }
