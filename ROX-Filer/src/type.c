@@ -57,6 +57,7 @@
 #include "filer.h"
 #include "action.h"		/* (for action_chmod) */
 #include "xml.h"
+#include "dropbox.h"
 
 #define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
 enum {SET_MEDIA, SET_TYPE};
@@ -85,10 +86,11 @@ static GdkColor	type_colours[NUM_TYPE_COLOURS];
 /* Static prototypes */
 static void load_mime_types(void);
 static void alloc_type_colours(void);
-char *get_action_save_path(GtkWidget *dialog);
+static char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static GList *build_type_edit(Option *none, xmlNode *node, guchar *label);
+static gboolean remove_handler_with_confirm(const guchar *path);
 
 /* When working out the type for a file, this hash table is checked
  * first...
@@ -554,40 +556,89 @@ static void set_action_response(GtkWidget *dialog, gint response, gpointer data)
 	gtk_widget_destroy(dialog);
 }
 
+/* Return the path of the file in choices that handles this type and
+ * radio setting.
+ * NULL if nothing is defined for it.
+ */
+static guchar *handler_for_radios(GObject *dialog)
+{
+	Radios	*radios;
+	MIME_type *type;
+
+	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
+	type = g_object_get_data(G_OBJECT(dialog), "mime_type");
+	
+	g_return_val_if_fail(radios != NULL, NULL);
+	g_return_val_if_fail(type != NULL, NULL);
+	
+	switch (radios_get_value(radios))
+	{
+		case SET_MEDIA:
+			return choices_find_path_load(type->media_type,
+							 "MIME-types");
+		case SET_TYPE:
+		{
+			gchar *tmp, *handler;
+			tmp = g_strconcat(type->media_type, "_",
+					  type->subtype, NULL);
+			handler = choices_find_path_load(tmp, "MIME-types");
+			g_free(tmp);
+			return handler;
+		}
+		default:
+			g_warning("Bad type");
+			return NULL;
+	}
+}
+
+static void run_action_update(gpointer data)
+{
+	guchar *handler;
+	DropBox *drop_box;
+	GObject *dialog = G_OBJECT(data);
+
+	drop_box = g_object_get_data(dialog, "rox-dropbox");
+
+	g_return_if_fail(drop_box != NULL);
+
+	handler = handler_for_radios(dialog);
+
+	if (handler)
+	{
+		char *old = handler;
+
+		handler = readlink_dup(old);
+		if (handler)
+			g_free(old);
+		else
+			handler = old;
+	}
+
+	drop_box_set_path(DROP_BOX(drop_box), handler);
+	g_free(handler);
+}
+
+static void clear_run_action(GtkWidget *drop_box, GtkWidget *dialog)
+{
+	guchar *handler;
+
+	handler = handler_for_radios(G_OBJECT(dialog));
+
+	if (handler)
+		remove_handler_with_confirm(handler);
+
+	run_action_update(dialog);
+}
+
 /* Called when a URI list is dropped onto the box in the Set Run Action
  * dialog. Make sure it's an application, and make that the default
  * handler.
  */
-static void drag_app_dropped(GtkWidget		*eb,
-		      GdkDragContext    *context,
-		      gint              x,
-		      gint              y,
-		      GtkSelectionData  *selection_data,
-		      guint             info,
-		      guint32           time,
-		      GtkWidget		*dialog)
+static void drag_app_dropped(GtkWidget	*drop_box,
+			     const guchar *app,
+			     GtkWidget	*dialog)
 {
-	GList	*uris;
-	const gchar *app = NULL;
 	DirItem	*item;
-
-	if (!selection_data->data)
-		return; 		/* Timeout? */
-
-	uris = uri_list_to_glist(selection_data->data);
-
-	if (g_list_length(uris) == 1)
-		app = get_local_path((guchar *) uris->data);
-	g_list_free(uris);
-
-	if (!app)
-	{
-		delayed_error(
-			_("You should drop a single (local) application "
-			"onto the drop box - that application will be "
-			"used to load files of this type in future"));
-		return;
-	}
 
 	item = diritem_new("");
 	diritem_restat(app, item, NULL);
@@ -745,14 +796,10 @@ out:
 void type_set_handler_dialog(MIME_type *type)
 {
 	guchar		*tmp;
-	gchar           *handler;
 	GtkDialog	*dialog;
 	GtkWidget	*frame, *entry, *label;
-	GtkWidget	*eb, *hbox;
+	GtkWidget	*hbox;
 	Radios		*radios;
-	GtkTargetEntry 	targets[] = {
-		{"text/uri-list", 0, TARGET_URI_LIST},
-	};
 
 	g_return_if_fail(type != NULL);
 
@@ -764,7 +811,7 @@ void type_set_handler_dialog(MIME_type *type)
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
 
-	radios = radios_new(NULL, NULL);
+	radios = radios_new(run_action_update, dialog);
 	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
 	radios_add(radios,
@@ -782,43 +829,17 @@ void type_set_handler_dialog(MIME_type *type)
 
 	radios_set_value(radios, SET_TYPE);
 
+	frame = drop_box_new(_("Drop a suitable application here"));
+
+	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
+	
 	radios_pack(radios, GTK_BOX(dialog->vbox));
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 0);
 
-	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	eb = gtk_event_box_new();
-	gtk_container_add(GTK_CONTAINER(frame), eb);
-
-	gtk_container_set_border_width(GTK_CONTAINER(eb), 4);
-
-	handler = handler_for(type);
-	if (handler)
-	{
-		char *link;
-
-		link = readlink_dup(handler);
-		if (link)
-		{
-			char *msg;
-
-			msg = g_strdup_printf(_("Currently %s"), link);
-			gtk_tooltips_set_tip(tooltips, eb, msg, NULL);
-			g_free(link);
-			g_free(msg);
-		}
-		g_free(handler);
-	}
-
-	gtk_drag_dest_set(eb, GTK_DEST_DEFAULT_ALL,
-			targets, sizeof(targets) / sizeof(*targets),
-			GDK_ACTION_COPY);
-	g_signal_connect(eb, "drag_data_received",
+	g_signal_connect(frame, "path_dropped",
 			G_CALLBACK(drag_app_dropped), dialog);
-
-	label = gtk_label_new(_("Drop a suitable\napplication here"));
-	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
-	gtk_container_add(GTK_CONTAINER(eb), label);
+	g_signal_connect(frame, "clear",
+			G_CALLBACK(clear_run_action), dialog);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 4);
@@ -873,14 +894,48 @@ void type_set_handler_dialog(MIME_type *type)
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
 
-/* The user wants to set a new default action for files of this type.
- * Removes the current binding if possible and returns the path to
- * save the new one to. NULL means cancel. g_free() the result.
+/* path is an entry in Choices. If it's a symlink or a very small executable
+ * then just get rid of it, otherwise confirm first. It it doesn't exist,
+ * do nothing.
+ *
+ * FALSE on error (abort operation).
  */
-char *get_action_save_path(GtkWidget *dialog)
+static gboolean remove_handler_with_confirm(const guchar *path)
+{
+	struct stat info;
+
+	if (lstat(path, &info) == 0)
+	{
+		/* A binding already exists... */
+		if (S_ISREG(info.st_mode) && info.st_size > 256)
+		{
+			if (!confirm(_("A run action already exists and is "
+				      "quite a big program - are you sure "
+				      "you want to delete it?"),
+				    GTK_STOCK_DELETE, NULL))
+			{
+				return FALSE;
+			}
+		}
+		
+		if (unlink(path))
+		{
+			report_error(_("Can't remove %s: %s"),
+				path, g_strerror(errno));
+			return FALSE;
+		}
+	}
+
+	return TRUE;
+}
+
+/* The user wants to set a new default action for files of this type (or just
+ * clear the action). Removes the current binding if possible and returns the
+ * path to save the new one to. NULL means cancel. g_free() the result.
+ */
+static char *get_action_save_path(GtkWidget *dialog)
 {
 	guchar		*path = NULL;
-	struct stat 	info;
 	guchar 		*type_name = NULL;
 	MIME_type	*type;
 	Radios		*radios;
@@ -909,30 +964,8 @@ char *get_action_save_path(GtkWidget *dialog)
 
 	path = choices_find_path_save(type_name, "MIME-types", TRUE);
 
-	if (lstat(path, &info) == 0)
-	{
-		/* A binding already exists... */
-		if (S_ISREG(info.st_mode) && info.st_size > 256)
-		{
-			if (!confirm(_("A run action already exists and is "
-				      "quite a big program - are you sure "
-				      "you want to delete it?"),
-				    GTK_STOCK_DELETE, NULL))
-			{
-				null_g_free(&path);
-				goto out;
-			}
-		}
-		
-		if (unlink(path))
-		{
-			report_error(_("Can't remove %s: %s"),
-				path, g_strerror(errno));
-			null_g_free(&path);
-			goto out;
-		}
-	}
-
+	if (!remove_handler_with_confirm(path))
+		null_g_free(&path);
 out:
 	g_free(type_name);
 	return path;

@@ -841,6 +841,7 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 	}
 
 	radio = gtk_radio_button_new_with_label(group, s);
+	gtk_label_set_line_wrap(GTK_LABEL(GTK_BIN(radio)->child), TRUE);
 	gtk_widget_show(radio);
 	if (tip)
 		gtk_tooltips_set_tip(tooltips, radio, tip, NULL);

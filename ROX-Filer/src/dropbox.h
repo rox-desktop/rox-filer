@@ -13,7 +13,7 @@ typedef struct _DropBox DropBox;
 
 #define DROP_BOX(obj) (GTK_CHECK_CAST((obj), drop_box_get_type(), DropBox))
 
-GtkWidget *drop_box_new(const char *message, const char *open_tip);
+GtkWidget *drop_box_new(const char *message);
 GType drop_box_get_type(void);
 void drop_box_set_path(DropBox *drop_box, const guchar *path);
 const gchar *drop_box_get_path(DropBox *drop_box);

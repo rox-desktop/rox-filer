@@ -311,8 +311,7 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	}
 
 
-	frame = drop_box_new(_("Drop an icon file here"),
-			_("Menu of directories previously used for icons")),
+	frame = drop_box_new(_("Drop an icon file here"));
 	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
 
 	/* Make sure rox-dropbox is set before packing (calls changed) */

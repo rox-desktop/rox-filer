@@ -72,7 +72,7 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-GtkWidget *drop_box_new(const char *message, const char *open_tip)
+GtkWidget *drop_box_new(const char *message)
 {
 	GtkWidget *button, *label, *vbox, *icon;
 	MaskedPixmap *mp;
@@ -118,7 +118,8 @@ GtkWidget *drop_box_new(const char *message, const char *open_tip)
 	g_signal_connect(button, "clicked",
 			G_CALLBACK(open_dir_clicked), drop_box);
 
-	gtk_tooltips_set_tip(tooltips, button, open_tip, NULL);
+	gtk_tooltips_set_tip(tooltips, button,
+			_("Show the current choice in a filer window"), NULL);
 
 	drop_box_set_path(drop_box, NULL);
 
@@ -164,8 +165,8 @@ void drop_box_set_path(DropBox *drop_box, const guchar *path)
 	{
 		int l;
 		l = strlen(path);
-		if (l > 30)
-			copy = g_strdup_printf("...%s", path + l - 28);
+		if (l > 40)
+			copy = g_strdup_printf("...%s", path + l - 38);
 		else
 			copy = g_strdup(path);
 		gtk_widget_set_sensitive(drop_box->buttons, TRUE);

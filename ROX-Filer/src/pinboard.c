@@ -605,7 +605,7 @@ void pinboard_set_backdrop(void)
 	radios_pack(radios, GTK_BOX(hbox));
 	
 	/* The drop area... */
-	frame = drop_box_new(_("Drop an image here"), NULL);
+	frame = drop_box_new(_("Drop an image here"));
 	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
 	gtk_box_pack_start(vbox, frame, TRUE, TRUE, 4);
 	drop_box_set_path(DROP_BOX(frame), current_pinboard->backdrop);
