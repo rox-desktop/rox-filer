@@ -72,5 +72,6 @@ void pixmap_make_small(MaskedPixmap *mp);
 MaskedPixmap *load_pixmap(const char *name);
 void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data);
 MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size);
+GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 
 #endif /* _PIXMAP_H */

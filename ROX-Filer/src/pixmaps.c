@@ -105,7 +105,6 @@ static void load_default_pixmaps(void);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
-static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
@@ -552,7 +551,7 @@ static MaskedPixmap *image_from_file(const char *path)
 /* Scale src down to fit in max_w, max_h and return the new pixbuf.
  * If src is small enough, then ref it and return that.
  */
-static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h)
+GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h)
 {
 	int	w, h;
 

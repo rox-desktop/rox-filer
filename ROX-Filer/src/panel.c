@@ -51,6 +51,7 @@
 #include "icon.h"
 #include "run.h"
 #include "appinfo.h"
+#include "pixmaps.h"
 #include "xml.h"
 #include "pinboard.h"		/* For pinboard_get_window() */
 
@@ -59,6 +60,8 @@
 
 /* The gap between panel icons */
 #define PANEL_ICON_SPACING 8
+
+enum {TEXT_BESIDE_ICON, TEXT_UNDER_ICON};
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
@@ -71,11 +74,14 @@ struct _PanelIconClass {
 
 struct _PanelIcon {
 	Icon		icon;
+	GdkPixbuf 	*image;
 
 	Panel		*panel;
 	GtkWidget	*widget;	/* The drawing area for the icon */
 	GtkWidget	*label;
 	GtkWidget	*socket;	/* For applets */
+
+	int		style;
 };
 
 #define PANEL_ICON(obj) GTK_CHECK_CAST((obj), panel_icon_get_type(), PanelIcon)
@@ -195,6 +201,7 @@ static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
 #define SHOW_APPS_SMALL 1
 #define SHOW_ICON 2
 static Option o_panel_style;
+static Option o_panel_width;
 
 static int closing_panel = 0;	/* Don't panel_save; destroying! */
 
@@ -205,6 +212,7 @@ static int closing_panel = 0;	/* Don't panel_save; destroying! */
 void panel_init(void)
 {
 	option_add_int(&o_panel_style, "panel_style", SHOW_APPS_SMALL);
+	option_add_int(&o_panel_width, "panel_width", 52);
 
 	option_add_notify(panel_style_changed);
 }
@@ -718,19 +726,47 @@ static void panel_add_item(Panel *panel,
  */
 static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 {
-	int	im_width, im_height;
-	Icon	*icon = (Icon *) pi;
+	Icon *icon = (Icon *) pi;
+	gboolean horz = (pi->panel->side == PANEL_TOP ||
+			 pi->panel->side == PANEL_BOTTOM);
+	int max_width = 100;
+	int max_height = 100;
+	int image_width, image_height;
 
-	im_width = icon->item->image->width;
-	im_height = MIN(icon->item->image->height, ICON_HEIGHT);
-
-	req->height += im_height;
-	req->width = MAX(req->width, im_width);
-
-	if (pi->panel->side == PANEL_LEFT || pi->panel->side == PANEL_RIGHT)
-		req->height += PANEL_ICON_SPACING;
+	if (horz)
+		max_height = o_panel_width.int_value - req->height;
 	else
+		max_width = MAX(o_panel_width.int_value, req->width);
+
+	/* TODO: really need to recreate? */
+	if (pi->image)
+		g_object_unref(pi->image);
+
+	pi->image = scale_pixbuf(icon->item->image->src_pixbuf,
+			MAX(20, max_width), MAX(20, max_height));
+
+	image_width = gdk_pixbuf_get_width(pi->image);
+	image_height = gdk_pixbuf_get_height(pi->image);
+	
+	if (req->height > 0 && max_height < req->height)
+	{
+		pi->style = TEXT_BESIDE_ICON;
+		req->width += image_width;
+		req->height = MAX(req->height, image_height);
+		gtk_misc_set_alignment(GTK_MISC(pi->label), 1, 0.5);
+	}
+	else
+	{
+		pi->style = TEXT_UNDER_ICON;
+		req->width = MAX(req->width, image_width);
+		req->height += image_height;
+		gtk_misc_set_alignment(GTK_MISC(pi->label), 0.5, 1);
+	}
+	
+	if (horz)
 		req->width += PANEL_ICON_SPACING;
+	else
+		req->height += PANEL_ICON_SPACING;
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -745,29 +781,67 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *pi)
 	GdkRectangle	area;
 	int		width, height;
 	Icon		*icon = (Icon *) pi;
+	int		image_x;
+	int		image_y;
+	GdkPixbuf	*image;
+	int		text_height = 0;
 
-	gdk_drawable_get_size(widget->window, &width, &height);
-
-	area.x = 0;
-	area.width = width;
-	area.height = icon->item->image->height;
-
+	gdk_drawable_get_size(widget->window, &area.width, &area.height);
+	
 	if (panel_want_show_text(pi))
-	{
-		int text_height = pi->label->requisition.height;
+		text_height = pi->label->requisition.height;
+	
+	g_return_val_if_fail(pi->image != NULL, FALSE);
 
-		area.y = height - text_height - area.height;
-		
-		draw_large_icon(widget->window, &area, icon->item,
-				icon->item->image, icon->selected);
+	image = pi->image;
+
+	width = gdk_pixbuf_get_width(image);
+	height = gdk_pixbuf_get_height(image);
+
+	if (pi->style == TEXT_UNDER_ICON)
+	{
+		image_x = (area.width - width) >> 1;
+		image_y = (area.height - height - text_height) >> 1;
 	}
 	else
 	{
-		area.y = (height - area.height) >> 1;
-		draw_large_icon(widget->window, &area, icon->item,
-				icon->item->image, icon->selected);
+		image_x = PANEL_ICON_SPACING - 2;
+		image_y = (area.height - height) >> 1;
 	}
+	
+	gdk_pixbuf_render_to_drawable_alpha(
+			image,
+			widget->window,
+			0, 0, 				/* src */
+			image_x, image_y,		/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
 
+	if (icon->item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, image_y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
+	if (icon->item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MaskedPixmap	*mp = icon->item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
+
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, image_y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
 	return FALSE;
 }
 
@@ -1603,6 +1677,29 @@ static gboolean recreate_panels(char **names)
 	return FALSE;
 }
 
+static void update_side_size(GtkWidget *side)
+{
+	GList	*kids, *next;
+
+	kids = gtk_container_get_children(GTK_CONTAINER(side));
+	for (next = kids; next; next = next->next)
+	{
+		PanelIcon *pi;
+		pi = g_object_get_data(next->data, "icon");
+		gtk_widget_queue_resize(pi->widget);
+	}
+	g_list_free(kids);
+}
+
+/* Update panel size and redraw */
+static void panel_update(Panel *panel)
+{
+	update_side_size(panel->before);
+	update_side_size(panel->after);
+	gtk_widget_queue_resize(panel->window);
+	gtk_widget_queue_draw(panel->window);
+}
+
 static void panel_style_changed(void)
 {
 	int i;
@@ -1629,6 +1726,14 @@ static void panel_style_changed(void)
 		{
 			if (current_panel[i])
 				panel_set_style(current_panel[i]);
+		}
+	}
+	if (o_panel_width.has_changed)
+	{
+		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+		{
+			if (current_panel[i])
+				panel_update(current_panel[i]);
 		}
 	}
 }
@@ -1673,6 +1778,11 @@ static gpointer parent_class;
 static void panel_icon_destroy(Icon *icon)
 {
 	PanelIcon *pi = (PanelIcon *) icon;
+	
+	g_return_if_fail(pi != NULL);
+	
+	if (pi->image)
+		g_object_unref(pi->image);
 
 	g_return_if_fail(pi->widget != NULL);
 
@@ -1743,8 +1853,10 @@ static void panel_icon_init(GTypeInstance *object, gpointer gclass)
 	PanelIcon *pi = (PanelIcon *) object;
 
 	pi->widget = NULL;
+	pi->image = NULL;
 	pi->label = NULL;
 	pi->socket = NULL;
+	pi->style = TEXT_UNDER_ICON;
 }
 
 static GType panel_icon_get_type(void)
