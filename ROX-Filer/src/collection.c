@@ -1072,7 +1072,7 @@ static gint collection_button_press(GtkWidget      *widget,
 			return FALSE;	/* Ignore extra presses */
 	}
 
-	if (event->state & GDK_CONTROL_MASK && !collection_single_click)
+	if (event->state & GDK_CONTROL_MASK)
 		action = 2;
 	else
 		action = event->button;
@@ -1156,7 +1156,7 @@ static gint collection_button_press(GtkWidget      *widget,
 	}
 	else if (event->type == GDK_BUTTON_PRESS)
 	{
-		collection->may_drag = event->button < collection_menu_button;
+		collection->may_drag = event->button != collection_menu_button;
 
 		if (item >= 0)
 		{

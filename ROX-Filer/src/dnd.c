@@ -375,7 +375,8 @@ void drag_selection(Collection 		*collection,
 	context = gtk_drag_begin(widget,
 			target_list,
 			actions,
-			(event->state & GDK_BUTTON1_MASK) ? 1 : 2,
+			(event->state & GDK_BUTTON1_MASK) ? 1 :
+			(event->state & GDK_BUTTON2_MASK) ? 2 : 3,
 			(GdkEvent *) event);
 	g_dataset_set_data(context, "filer_window", filer_window);
 
