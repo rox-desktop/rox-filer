@@ -619,7 +619,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 update:
 	item->may_delete = FALSE;
 
-	font = gtk_widget_get_default_style()->font;
+	font = item_font;
 	new.name_width = gdk_string_width(font, item->leafname);
 	new.leafname = item->leafname;
 

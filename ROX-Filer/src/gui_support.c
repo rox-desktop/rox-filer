@@ -34,6 +34,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdk.h>
+#include "collection.h"
 
 #include "global.h"
 
@@ -55,8 +56,18 @@ static GtkWidget *current_dialog = NULL;
 
 void gui_support_init()
 {
+	GtkWidget *tmp;
+
 	fixed_font = gdk_font_load("fixed");
-	item_font = gtk_widget_get_default_style()->font;
+
+	/* Create a window and get its font rather than using
+	 * the default style (allows customisation via .gtkrc)
+	 */
+	tmp = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_widget_realize(tmp);
+	item_font = gtk_widget_get_style(tmp)->font;
+	gdk_font_ref(item_font);
+	gtk_widget_destroy(tmp);
 
 	fixed_style = gtk_style_copy(gtk_widget_get_default_style());
 	fixed_style->font = fixed_font;

@@ -459,13 +459,15 @@ static void build_widget(Node *widget, GtkWidget *box)
 		tmp = g_strconcat(section_name, "_", oname, NULL);
 		g_free(oname);
 		option = g_hash_table_lookup(option_hash, tmp);
-		g_free(tmp);
 
 		if (!option)
 		{
 			g_warning("No Option for '%s'!\n", tmp);
+			g_free(tmp);
 			return;
 		}
+
+		g_free(tmp);
 	}
 
 	if (strcmp(name, "toggle") == 0)

@@ -167,8 +167,6 @@ static void pinboard_check_options(void);
 
 void pinboard_init(void)
 {
-	GtkStyle	*style;
-	
 	option_add_string("pinboard_fg_colour", "#000", NULL);
 	option_add_string("pinboard_bg_colour", "#ddd", NULL);
 
@@ -176,8 +174,6 @@ void pinboard_init(void)
 	option_add_int("pinboard_clamp_icons", 1, NULL);
 	option_add_int("pinboard_grid_step", GRID_STEP_COARSE, NULL);
 	option_add_notify(pinboard_check_options);
-
-	style = gtk_widget_get_default_style();
 
 	gdk_color_parse(option_get_static_string("pinboard_fg_colour"),
 			&text_fg_col);
