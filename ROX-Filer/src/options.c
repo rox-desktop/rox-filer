@@ -124,6 +124,7 @@ static void build_options_window(void);
 static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
 static Option *new_option(guchar *key, OptionChanged *changed, guchar *def);
+static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
 
 static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label);
 static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label);
@@ -1286,3 +1287,20 @@ static GList *build_menu(OptionUI *ui, xmlNode *node, guchar *label)
 	return g_list_append(NULL, hbox);
 }
 
+static void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
+{
+	GtkStyle   	*style;
+	GtkWidget	*patch;
+
+	patch = GTK_BIN(button)->child;
+
+	style = gtk_style_copy(GTK_WIDGET(patch)->style);
+	style->bg[GTK_STATE_NORMAL].red = colour->red;
+	style->bg[GTK_STATE_NORMAL].green = colour->green;
+	style->bg[GTK_STATE_NORMAL].blue = colour->blue;
+	gtk_widget_set_style(patch, style);
+	gtk_style_unref(style);
+
+	if (GTK_WIDGET_REALIZED(patch))
+		gdk_window_clear(patch->window);
+}
