@@ -218,7 +218,8 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 void make_panel_window(GdkWindow *window)
 {
 	static gboolean need_init = TRUE;
-	static GdkAtom	xa_state;
+	static GdkAtom	xa_state, xa_atom, xa_net_state;
+	static GdkAtom	state_list[3];
 
 	if (override_redirect)
 	{
@@ -230,6 +231,15 @@ void make_panel_window(GdkWindow *window)
 	if (need_init)
 	{
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
+		xa_atom = gdk_atom_intern("ATOM", FALSE);
+		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
+
+		state_list[0] = gdk_atom_intern("_NET_WM_STATE_STICKY", FALSE);
+		state_list[1] = gdk_atom_intern("_NET_WM_STATE_SKIP_PAGER",
+							FALSE);
+		state_list[2] = gdk_atom_intern("_NET_WM_STATE_SKIP_TASKBAR",
+							FALSE);
+		
 		need_init = FALSE;
 	}
 	
@@ -242,6 +252,9 @@ void make_panel_window(GdkWindow *window)
 	set_cardinal_property(window, xa_state,
 			WIN_STATE_STICKY |
 			WIN_STATE_FIXED_POSITION | WIN_STATE_ARRANGE_IGNORE);
+
+	gdk_property_change(window, xa_net_state, xa_atom, 32,
+			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);
 }
 
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window)
