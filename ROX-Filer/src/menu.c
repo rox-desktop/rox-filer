@@ -813,16 +813,19 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_widget_show_all(window);
 	gdk_flush();
 
-	pipe(file_data);
+	if (pipe(file_data))
+	{
+		g_string_sprintf(gstring, "pipe(): %s", g_strerror(errno));
+		goto out;
+	}
 	switch (fork())
 	{
 		case -1:
 			close(file_data[0]);
 			close(file_data[1]);
-			gtk_label_set_text(GTK_LABEL(file_label),
-					"fork() error");
-			g_string_free(gstring, TRUE);
-			return;
+			g_string_sprintf(gstring, "fork(): %s",
+					g_strerror(errno));
+			goto out;
 		case 0:
 			close(file_data[0]);
 			dup2(file_data[1], STDOUT_FILENO);
@@ -842,12 +845,13 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	g_string_truncate(gstring, 0);
 	while (gtk_events_pending())
 		g_main_iteration(FALSE);
-	while ((got = read(file_data[0], buffer, sizeof(buffer) - 1)))
+	while ((got = read(file_data[0], buffer, sizeof(buffer) - 1)) > 0)
 	{
 		buffer[got] = '\0';
 		g_string_append(gstring, buffer);
 	}
 	close(file_data[0]);
+out:
 	gtk_label_set_text(GTK_LABEL(file_label), gstring->str);
 	g_string_free(gstring, TRUE);
 }
