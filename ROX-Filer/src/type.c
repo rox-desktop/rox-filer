@@ -1106,31 +1106,19 @@ GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 }
 
 /* Process the 'Patterns' value */
-static void add_patterns(MIME_type *type, gchar *patterns, GHashTable *globs)
+static void add_pattern(MIME_type *type, const char *pattern, GHashTable *globs)
 {
-	while (1)
+	if (pattern[0] == '*' && pattern[1] == '.' &&
+	    strpbrk(pattern + 2, "*?[") == NULL)
 	{
-		char *semi;
-
-		semi = strchr(patterns, ';');
-		if (semi)
-			*semi = '\0';
-		g_strstrip(patterns);
-		if (patterns[0] == '*' && patterns[1] == '.' &&
-				strpbrk(patterns + 2, "*?[") == NULL)
-		{
-			g_hash_table_insert(extension_hash,
-					g_strdup(patterns + 2), type);
-		}
-		else if (strpbrk(patterns, "*?[") == NULL)
-			g_hash_table_insert(literal_hash,
-					g_strdup(patterns), type);
-		else
-			g_hash_table_insert(globs, g_strdup(patterns), type);
-		if (!semi)
-			return;
-		patterns = semi + 1;
+		g_hash_table_insert(extension_hash,
+				    g_strdup(pattern + 2),
+				    type);
 	}
+	else if (strpbrk(pattern, "*?[") == NULL)
+		g_hash_table_insert(literal_hash, g_strdup(pattern), type);
+	else
+		g_hash_table_insert(globs, g_strdup(pattern), type);
 }
 
 /* Load and parse this file. literal_hash and extension_hash are updated
@@ -1142,9 +1130,12 @@ static void import_file(const gchar *file, GHashTable *globs)
 	GError *error = NULL;
 	gchar  *data, *line;
 
+	if (access(file, F_OK) != 0)
+		return;		/* Doesn't exist. No problem. */
+
 	if (!g_file_get_contents(file, &data, NULL, &error))
 	{
-		delayed_error("Error loading MIME-Info database:\n%s",
+		delayed_error("Error loading MIME database:\n%s",
 				error->message);
 		g_error_free(error);
 		return;
@@ -1161,111 +1152,31 @@ static void import_file(const gchar *file, GHashTable *globs)
 			break;
 		*nl = '\0';
 
-		if (*line == '[')
+		if (*line != '#')
 		{
-			const gchar *end;
+			const gchar *colon;
+			gchar *name;
 
-			type = NULL;
-
-			end = strchr(line, ']');
-			if (!end)
+			colon = strchr(line, ':');
+			if (!colon)
 			{
 				delayed_error(_("File '%s' corrupted!"), file);
 				break;
 			}
 
-			if (strncmp(line + 1, "MIME-Info ", 10) == 0)
-			{
-				gchar *name;
+			name = g_strndup(line, colon - line);
+			type = get_mime_type(name, TRUE);
+			g_free(name);
+			if (!type)
+				g_warning("Invalid type in '%s'", file);
 
-				line += 11;
-				while (*line == ' ' || *line == '\t')
-					line++;
-				name = g_strndup(line, end - line);
-				g_strstrip(name);
-
-				type = get_mime_type(name, TRUE);
-				if (!type)
-				{
-					delayed_error(
-						_("Invalid type '%s' in '%s'"),
-						name, file);
-					break;
-				}
-				g_free(name);
-			}
-		}
-		else if (type)
-		{
-			char *eq;
-			eq = strchr(line, '=');
-			if (eq)
-			{
-				char *tmp = eq;
-
-				while (tmp > line &&
-					(tmp[-1] == ' ' || tmp[-1] == '\t'))
-					tmp--;
-				*tmp = '\0';
-
-				eq++;
-				while (*eq == ' ' || *eq == '\t')
-					eq++;
-
-				if (strcmp(line, "Patterns") == 0)
-					add_patterns(type, eq, globs);
-			}
+			add_pattern(type, colon + 1, globs);
 		}
 
 		line = nl + 1;
 	}
 
 	g_free(data);
-}
-
-/* Parse every .mimeinfo file in 'dir' */
-static void import_for_dir(guchar *path, GHashTable *globs, gboolean *freedesk)
-{
-	DIR		*dir;
-	struct dirent	*item;
-
-	dir = opendir(path);
-	if (!dir)
-		return;
-
-	while ((item = readdir(dir)))
-	{
-		gchar   *dot;
-
-		dot = strrchr(item->d_name, '.');
-		if (!dot)
-			continue;
-		if (strcmp(dot + 1, "mimeinfo") != 0)
-			continue;
-
-		if (*freedesk == FALSE &&
-			!strcmp(item->d_name, "freedesktop-shared.mimeinfo"))
-		{
-			*freedesk = TRUE;
-		}
-		
-		import_file(make_path(path, item->d_name)->str, globs);
-#if 0
-		{
-			struct timeval start, end;
-			g_print("[ %s ]\n", item->d_name);
-			gettimeofday(&start, NULL);
-			import_file(make_path(path, item->d_name)->str, globs);
-			gettimeofday(&end, NULL);
-
-			g_print("Delay = %lf s\n", 
-						(end.tv_sec +   ((double) end.tv_usec)   / 1000000) - 
-						(start.tv_sec + ((double) start.tv_usec) / 1000000));
-		}
-#endif
-	}
-
-	closedir(dir);
 }
 
 static void add_to_glob_patterns(gpointer key, gpointer value, gpointer unused)
@@ -1295,7 +1206,6 @@ static gint sort_by_strlen(gconstpointer a, gconstpointer b)
 /* Clear all currently stored information and re-read everything */
 static void load_mime_types(void)
 {
-	gboolean got_freedesk = FALSE;
 	GHashTable *globs;
 	gchar *tmp;
 
@@ -1324,27 +1234,29 @@ static void load_mime_types(void)
 						g_free, NULL);
 	globs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	import_for_dir("/usr/share/mime/mime-info", globs, &got_freedesk);
+	import_file("/usr/share/mime/globs", globs);
+	import_file("/usr/local/share/mime/globs", globs);
 
-	import_for_dir("/usr/local/share/mime/mime-info", globs, &got_freedesk);
-
-	tmp = g_strconcat(home_dir, "/.mime/mime-info", NULL);
-	import_for_dir(tmp, globs, &got_freedesk);
+	tmp = g_strconcat(home_dir, "/.mime/globs", NULL);
+	import_file(tmp, globs);
 	g_free(tmp);
 
 	/* Turn the globs hash into a pointer array */
 	g_hash_table_foreach(globs, add_to_glob_patterns, NULL);
 	g_hash_table_destroy(globs);
+	globs = NULL;
 
 	if (glob_patterns->len)
 		g_ptr_array_sort(glob_patterns, sort_by_strlen);
 
-	if (!got_freedesk)
+	if (g_hash_table_size(extension_hash) == 0)
 	{
-		delayed_error(_("The standard MIME type database was not "
-			"found. The filer will probably not show the correct "
+		delayed_error(_("The standard MIME type database "
+			"(version 0.8 or later) was not found. "
+			"The filer will probably not show the correct "
 			"types for different files. You should download and "
-			"install the 'Common types package' from here:\n"
+			"install the 'shared-mime-info-0.8' package from "
+			"here:\n"
 		"http://www.freedesktop.org/standards/shared-mime-info.html"));
 	}
 
