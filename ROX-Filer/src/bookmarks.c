@@ -94,6 +94,8 @@ void bookmarks_edit(void)
 		return;
 	}
 
+	update_bookmarks();
+
 	bookmarks_window = gtk_dialog_new();
 
 	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),

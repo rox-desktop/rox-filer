@@ -243,6 +243,7 @@ void view_set_selected(ViewIface *obj, ViewIter *iter, gboolean selected)
 	VIEW_IFACE_GET_CLASS(obj)->set_selected(obj, iter, selected);
 }
 
+/* TRUE if this item is selected */
 gboolean view_get_selected(ViewIface *obj, ViewIter *iter)
 {
 	g_return_val_if_fail(VIEW_IS_IFACE(obj), FALSE);

@@ -18,6 +18,5 @@ typedef struct _ViewCollectionClass ViewCollectionClass;
 
 GtkWidget *view_collection_new(FilerWindow *filer_window);
 GType view_collection_get_type(void);
-GtkWidget *view_collection_get_collection(ViewCollection *view);
 
 #endif /* __VIEW_COLLECTION_H__ */

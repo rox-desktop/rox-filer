@@ -61,6 +61,7 @@
 #include "xml.h"
 #include "view_iface.h"
 #include "view_collection.h"
+#include "view_details.h"
 #include "action.h"
 
 static XMLwrapper *groups = NULL;
