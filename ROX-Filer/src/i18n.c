@@ -109,7 +109,10 @@ void i18n_init(void)
 	trans = choices_find_path_load("Translation", "ROX-Filer");
 
 	if (trans)
+	{
 		parse_file(trans, load_trans);
+		g_free(trans);
+	}
 	else
 		load_trans("From LANG");
 }
@@ -312,6 +315,7 @@ static void save_options()
 		return;
 
 	f = fopen(path, "wb");
+	g_free(path);
 	if (!f)
 	{
 		delayed_error(PROJECT, g_strerror(errno));

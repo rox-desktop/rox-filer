@@ -1194,14 +1194,14 @@ static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
 
 static void panel_save(Panel *panel)
 {
-	guchar	*save;
+	guchar	*save = NULL;
 	FILE	*file = NULL;
 	guchar	*save_new = NULL;
 
 	g_return_if_fail(panel != NULL);
 	
 	if (strchr(panel->name, '/'))
-		save = panel->name;
+		save = g_strdup(panel->name);
 	else
 	{
 		guchar	*leaf;
@@ -1247,6 +1247,7 @@ err:
 out:
 	if (file)
 		fclose(file);
+	g_free(save);
 	g_free(save_new);
 }
 

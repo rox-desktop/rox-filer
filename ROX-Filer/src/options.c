@@ -91,6 +91,7 @@ void options_init()
 		string = g_strconcat(_("Choices will be saved as "),
 					save_path,
 					NULL);
+		g_free(save_path);
 		label = gtk_label_new(string);
 		g_free(string);
 	}
@@ -155,6 +156,7 @@ void options_load(void)
 		return;		/* Nothing to load */
 
 	parse_file(path, process_option_line);
+	g_free(path);
 }
 
 
@@ -228,8 +230,10 @@ static void save_options(GtkWidget *widget, gpointer data)
 					path, g_strerror(errno));
 			report_error(PROJECT, str);
 			g_free(str);
+			g_free(path);
 			return;
 		}
+		g_free(path);
 
 		next = options_sections;
 		while (next)

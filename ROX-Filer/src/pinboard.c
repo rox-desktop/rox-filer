@@ -289,8 +289,8 @@ void pinboard_activate(guchar *name)
 	{
 		loading_pinboard++;
 		parse_file(path, pin_from_file);
-		g_free(path);
 		loading_pinboard--;
+		g_free(path);
 	}
 }
 
@@ -1212,7 +1212,7 @@ static void forward_root_clicks(void)
 /* Write the current state of the pinboard to the current pinboard file */
 static void pinboard_save(void)
 {
-	guchar	*save;
+	guchar	*save = NULL;
 	GString	*tmp;
 	FILE	*file = NULL;
 	GList	*next;
@@ -1223,7 +1223,7 @@ static void pinboard_save(void)
 	pinboard_modified = FALSE;
 	
 	if (strchr(current_pinboard->name, '/'))
-		save = current_pinboard->name;
+		save = g_strdup(current_pinboard->name);
 	else
 	{
 		guchar	*leaf;
@@ -1272,6 +1272,7 @@ out:
 	if (file)
 		fclose(file);
 	g_free(save_new);
+	g_free(save);
 }
 
 /*

@@ -275,6 +275,7 @@ gboolean type_open(char *path, MIME_type *type)
 	if (stat(open, &info))
 	{
 		report_error(PROJECT, g_strerror(errno));
+		g_free(open);
 		return FALSE;
 	}
 
@@ -292,6 +293,8 @@ gboolean type_open(char *path, MIME_type *type)
 
 	if (argv[0] != open)
 		g_free(argv[0]);
+
+	g_free(open);
 	
 	return retval;
 }
@@ -342,7 +345,10 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	g_free(type_name);
 
 	if (path)
+	{
 		type->image = g_fscache_lookup(pixmap_cache, path);
+		g_free(path);
+	}
 
 	if (!type->image)
 	{
@@ -418,6 +424,7 @@ static void set_shell_action(GtkWidget *dialog)
 		report_error(PROJECT, g_strerror(errno));
 
 	g_free(tmp);
+	g_free(path);
 
 	gtk_widget_destroy(dialog);
 }
@@ -472,6 +479,8 @@ void drag_app_dropped(GtkWidget		*frame,
 			else
 				destroy_on_idle(dialog);
 		}
+
+		g_free(path);
 	}
 	else
 		delayed_error(PROJECT,
@@ -581,7 +590,7 @@ void type_set_handler_dialog(MIME_type *type)
 
 /* The user wants to set a new default action for files of this type.
  * Removes the current binding if possible and returns the path to
- * save the new one to. NULL means cancel.
+ * save the new one to. NULL means cancel. g_free() the result.
  */
 char *get_action_save_path(GtkWidget *dialog)
 {
@@ -602,12 +611,14 @@ char *get_action_save_path(GtkWidget *dialog)
 		type_name = g_strconcat(type->media_type, "_",
 				type->subtype, NULL);
 
-	if (!choices_find_path_save("", PROJECT, FALSE))
+	path = choices_find_path_save("", PROJECT, FALSE);
+	if (!path)
 	{
 		report_error(PROJECT,
 		_("Choices saving is disabled by CHOICESPATH variable"));
 		goto out;
 	}
+	g_free(path);
 
 	path = choices_find_path_save(type_name, "MIME-types", TRUE);
 
@@ -621,6 +632,7 @@ char *get_action_save_path(GtkWidget *dialog)
 				"a big program - are you sure you want to "
 				"delete it?"), 2, "Delete", "Cancel") != 0)
 			{
+				g_free(path);
 				path = NULL;
 				goto out;
 			}
@@ -632,6 +644,7 @@ char *get_action_save_path(GtkWidget *dialog)
 				path, g_strerror(errno));
 			report_error(PROJECT, tmp);
 			g_free(tmp);
+			g_free(path);
 			path = NULL;
 			goto out;
 		}

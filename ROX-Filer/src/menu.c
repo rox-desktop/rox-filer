@@ -309,6 +309,7 @@ void menu_init()
 	{
 		gtk_item_factory_parse_rc(menurc);
 		mark_menus_modified(FALSE);
+		g_free(menurc);
 	}
 
 	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
@@ -1507,6 +1508,8 @@ static void save_menus(void)
 	{
 		gboolean	mod = FALSE;
 
+		g_free(menurc);
+
 		/* Find out if anything changed... */
 		gtk_item_factory_dump_items(NULL, TRUE,
 				(GtkPrintFunc) set_mod, &mod);
@@ -1515,9 +1518,11 @@ static void save_menus(void)
 		if (mod)
 		{
 			menurc = choices_find_path_save("menus", PROJECT, TRUE);
+			g_return_if_fail(menurc != NULL);
 			mark_menus_modified(TRUE);
 			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 			mark_menus_modified(FALSE);
+			g_free(menurc);
 		}
 	}
 }
