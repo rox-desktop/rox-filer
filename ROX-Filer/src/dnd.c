@@ -507,9 +507,6 @@ static gboolean drag_motion(GtkWidget		*widget,
 	char		*type = NULL;
 	gboolean	retval = FALSE;
 
-	if (filer_window->collection->auto_scroll == -1)
-		collection_set_autoscroll(filer_window->collection, TRUE);
-
 	if (o_dnd_drag_to_icons.int_value)
 		item_number = collection_get_item(filer_window->collection,
 							x, y);

@@ -135,6 +135,8 @@ static void collection_item_set_selected(Collection *collection,
 static void collection_drag_leave(GtkWidget *widget, GdkDragContext *context,
 				  guint time);
 static void collection_drag_end(GtkWidget *widget, GdkDragContext *context);
+static gboolean collection_drag_motion(GtkWidget *widget, GdkDragContext
+					*context, gint x, gint y, guint time);
 static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
 
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
@@ -218,8 +220,9 @@ static void collection_class_init(GObjectClass *gclass, gpointer data)
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->map = collection_map;
 	widget_class->scroll_event = collection_scroll_event;
-	widget_class->drag_end = collection_drag_end;
+	widget_class->drag_motion = collection_drag_motion;
 	widget_class->drag_leave = collection_drag_leave;
+	widget_class->drag_end = collection_drag_end;
 
 	gclass->set_property = collection_set_property;
 	gclass->get_property = collection_get_property;
@@ -396,6 +399,20 @@ static void collection_drag_leave(GtkWidget *widget, GdkDragContext *context,
 	if (GTK_WIDGET_CLASS(parent_class)->drag_leave)
 		(*GTK_WIDGET_CLASS(parent_class)->drag_leave)(widget, context,
 							      time);
+}
+
+/* Turn on auto scrolling */
+static gboolean collection_drag_motion(GtkWidget *widget, GdkDragContext
+					*context, gint x, gint y, guint time)
+{
+	Collection *collection = COLLECTION(widget);
+
+	collection_set_autoscroll(collection, TRUE);
+
+	if (GTK_WIDGET_CLASS(parent_class)->drag_motion)
+		return (*GTK_WIDGET_CLASS(parent_class)->drag_motion)(widget,
+				context, x, y, time);
+	return FALSE;
 }
 
 /* Turn off auto scrolling.
