@@ -25,6 +25,7 @@ extern MaskedPixmap *im_dirs;
 
 /* Note: don't change these two - thumbnails saving assumes 96x96 */
 /* If making the huge size larger, be sure to update SMALL_IMAGE_THRESHOLD! */
+/* XXX: Spec has changed... should be 128x128 now */
 #define HUGE_WIDTH 96
 #define HUGE_HEIGHT 96
 

@@ -476,9 +476,9 @@ GdkAtom type_to_atom(MIME_type *type)
 
 static void show_shell_help(gpointer data)
 {
-	info_message(_("Enter a shell command which will load \"$1\" into "
+	info_message(_("Enter a shell command which will load \"$@\" into "
 			"a suitable program. Eg:\n\n"
-			"gimp \"$1\""));
+			"gimp \"$@\""));
 }
 
 /* Called if the user clicks on the OK button. Returns FALSE if an error
@@ -844,7 +844,7 @@ void type_set_handler_dialog(MIME_type *type)
 	}
 	else
 	{
-		gtk_entry_set_text(GTK_ENTRY(entry), " \"$1\"");
+		gtk_entry_set_text(GTK_ENTRY(entry), " \"$@\"");
 		gtk_editable_set_position(GTK_EDITABLE(entry), 0);
 	}
 

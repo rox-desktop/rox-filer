@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
-"POT-Creation-Date: 2002-08-26 11:49+0100\n"
+"POT-Creation-Date: 2002-09-01 14:05+0100\n"
 "PO-Revision-Date: 2002-03-26 21:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai_cheung@hotmail.com>\n"
 "Language-Team: none\n"
@@ -433,11 +433,11 @@ msgstr "掛載 / 解除掛載"
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer 對系統上的掛載點尚未支援"
 
-#: action.c:1778 action.c:2053 menu.c:210 type.c:910 tips:164
+#: action.c:1778 action.c:2053 menu.c:210 type.c:910 tips:167
 msgid "Delete"
 msgstr "刪除"
 
-#: action.c:1788 tips:170
+#: action.c:1788 tips:173
 msgid "Force"
 msgstr "強制"
 
@@ -445,7 +445,7 @@ msgstr "強制"
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "不可確認刪除唯讀的項目"
 
-#: action.c:1791 action.c:1846 tips:172
+#: action.c:1791 action.c:1846 tips:175
 msgid "Brief"
 msgstr "簡潔"
 
@@ -485,7 +485,7 @@ msgstr "權限"
 msgid "Don't list processed files"
 msgstr "不列出已處理的檔案"
 
-#: action.c:1849 tips:174
+#: action.c:1849 tips:177
 msgid "Recurse"
 msgstr "包含"
 
@@ -493,24 +493,24 @@ msgstr "包含"
 msgid "Also change contents of subdirectories"
 msgstr "同時改變子目錄的內容"
 
-#: action.c:1887 dnd.c:123 menu.c:1897 tips:158
+#: action.c:1887 dnd.c:123 menu.c:1897 tips:161
 msgid "Copy"
 msgstr "複製"
 
-#: action.c:1897 action.c:1930 tips:176
+#: action.c:1897 action.c:1930 tips:179
 #, fuzzy
 msgid "Newer"
 msgstr "新增"
 
-#: action.c:1898 action.c:1931 tips:177 tips:178 tips:179 tips:180
+#: action.c:1898 action.c:1931 tips:180 tips:181 tips:182 tips:183
 msgid "Only over-write if source is newer than destination."
 msgstr ""
 
-#: action.c:1920 dnd.c:124 tips:160
+#: action.c:1920 dnd.c:124 tips:163
 msgid "Move"
 msgstr "移動"
 
-#: action.c:1948 dnd.c:125 tips:162
+#: action.c:1948 dnd.c:125 tips:165
 msgid "Link"
 msgstr "連結"
 
@@ -538,7 +538,7 @@ msgstr "將影嚮面板上某些項目 - 真的刪除?"
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr "將影嚮面板上某些項目 - 真的刪除?"
 
-#: action.c:2053 filer.c:1224 infobox.c:92 menu.c:1660 panel.c:439 type.c:910
+#: action.c:2053 filer.c:1226 infobox.c:92 menu.c:1660 panel.c:439 type.c:910
 msgid "Cancel"
 msgstr "取消"
 
@@ -691,35 +691,35 @@ msgstr "'目錄 '%s' 不能被訪問"
 msgid "Directory '%s' not found."
 msgstr "'找不到目錄 '%s' "
 
-#: filer.c:1451
+#: filer.c:1453
 msgid "S"
 msgstr ""
 
-#: filer.c:1452
+#: filer.c:1454
 msgid "A"
 msgstr ""
 
-#: filer.c:1453
+#: filer.c:1455
 msgid "T"
 msgstr ""
 
-#: filer.c:1459
+#: filer.c:1461
 msgid "Scanning, "
 msgstr "從新檢視中, "
 
-#: filer.c:1460
+#: filer.c:1462
 msgid "All, "
 msgstr "全部, "
 
-#: filer.c:1461
+#: filer.c:1463
 msgid "Thumbs, "
 msgstr "縮圖啟動, "
 
-#: filer.c:1745
+#: filer.c:1747
 msgid "Symbolic link to "
 msgstr "符號連結予"
 
-#: filer.c:1776
+#: filer.c:1778
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
@@ -1095,7 +1095,7 @@ msgstr "顯示隱藏檔"
 msgid "Name:"
 msgstr "名稱"
 
-#: infobox.c:320 tips:231
+#: infobox.c:320 tips:234
 msgid "Error:"
 msgstr "錯誤"
 
@@ -1273,11 +1273,11 @@ msgstr "顯示"
 msgid "Huge Icons"
 msgstr "巨圖示"
 
-#: menu.c:177 tips:64 tips:207
+#: menu.c:177 tips:64 tips:210
 msgid "Large Icons"
 msgstr "大圖示"
 
-#: menu.c:178 tips:65 tips:206
+#: menu.c:178 tips:65 tips:209
 msgid "Small Icons"
 msgstr "小圖示"
 
@@ -1452,7 +1452,7 @@ msgstr "%d 項目"
 msgid "Unmount"
 msgstr "解除掛載%"
 
-#: menu.c:850 tips:166
+#: menu.c:850 tips:169
 msgid "Mount"
 msgstr "掛載"
 
@@ -1725,38 +1725,43 @@ msgstr "非法的搜尋定義"
 msgid "ROX-Filer has converted your Options file to the new XML format"
 msgstr "你的舊面板資信檔已轉為新的XML格式."
 
-#: options.c:842
+#: options.c:483 options.c:1229
+#, fuzzy
+msgid "(use default)"
+msgstr "跟預設值相同"
+
+#: options.c:862
 #, fuzzy
 msgid "Options"
 msgstr "選項..."
 
-#: options.c:891
+#: options.c:911
 #, fuzzy
 msgid "_Revert"
 msgstr "移除"
 
-#: options.c:897
+#: options.c:917
 msgid "Restore all choices to how they were when the Options box was opened."
 msgstr ""
 
-#: options.c:912
+#: options.c:932
 #, fuzzy, c-format
 msgid ""
 "Choices will be saved as:\n"
 "%s"
 msgstr "選擇將被儲存為 %s"
 
-#: options.c:920
+#: options.c:940
 #, fuzzy
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "設定圖示被終止,因應 CHOICEPATH"
 
-#: options.c:1115 usericons.c:444
+#: options.c:1135 usericons.c:444
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "錯誤儲存 %s: %s"
 
-#: options.c:1725
+#: options.c:1781
 msgid "Missing '='"
 msgstr "遺失 '='"
 
@@ -1800,18 +1805,18 @@ msgstr ""
 "錯誤檢視 '%s' :\n"
 "%s"
 
-#: pinboard.c:311
+#: pinboard.c:313
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "你的舊桌板資信檔已轉為新的XML格式."
 
-#: pinboard.c:510
+#: pinboard.c:512
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
 
-#: pinboard.c:529
+#: pinboard.c:531
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -1820,36 +1825,36 @@ msgid ""
 "element, as described in ROX-Filer's manual."
 msgstr ""
 
-#: pinboard.c:546
+#: pinboard.c:548
 #, fuzzy
 msgid "Set backdrop"
 msgstr "設定圖示"
 
-#: pinboard.c:555
+#: pinboard.c:557
 msgid "Display backdrop image:"
 msgstr ""
 
-#: pinboard.c:564
+#: pinboard.c:566
 #, fuzzy
 msgid "Centred"
 msgstr "日期"
 
-#: pinboard.c:570
+#: pinboard.c:572
 #, fuzzy
 msgid "Scaled"
 msgstr "儲存"
 
-#: pinboard.c:576
+#: pinboard.c:578
 #, fuzzy
 msgid "Tiled"
 msgstr "檔案"
 
-#: pinboard.c:593
+#: pinboard.c:595
 #, fuzzy
 msgid "Drop an image here"
 msgstr "拖放圖示檔到此處"
 
-#: pinboard.c:641
+#: pinboard.c:643
 #, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
@@ -1857,33 +1862,33 @@ msgid ""
 "applications onto this box."
 msgstr "你必須拖放一個圖示檔案至拖放欄內 - 此圖示將 被應用到你選擇的項目上."
 
-#: pinboard.c:651
+#: pinboard.c:653
 #, fuzzy, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
 msgstr "不能移除 $s: %s"
 
-#: pinboard.c:682
+#: pinboard.c:684
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 
-#: pinboard.c:1116
+#: pinboard.c:1115
 msgid "Missing '>' in icon label"
 msgstr "沒有 '>' 在圖示標簽內"
 
-#: pinboard.c:1125
+#: pinboard.c:1124
 msgid "Missing ',' after icon label"
 msgstr "沒有 ',' 在圖示標簽後"
 
-#: pinboard.c:1205
+#: pinboard.c:1204
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "錯誤儲存桌板 %s: %s"
 
-#: pinboard.c:1720
+#: pinboard.c:1719
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -1891,7 +1896,7 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1980
+#: pinboard.c:1979
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -1901,7 +1906,7 @@ msgstr ""
 msgid "Unknown error"
 msgstr "不明錯誤"
 
-#: remote.c:969
+#: remote.c:971
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "嘗試呼叫不明的 SOAP 方式 '%s'"
@@ -2569,7 +2574,7 @@ msgstr ""
 msgid "Single-click navigation in filer windows"
 msgstr "單擊以瀏覽檔案"
 
-#: tips:42 tips:43 tips:117
+#: tips:42 tips:43 tips:120
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -2792,10 +2797,10 @@ msgid ""
 "background to create shortcuts to them."
 msgstr ""
 
-#: tips:112 tips:223
+#: tips:112
 #, fuzzy
-msgid "Colours"
-msgstr "小時"
+msgid "Appearance"
+msgstr "工具欄類型"
 
 #: tips:113
 #, fuzzy
@@ -2809,73 +2814,83 @@ msgstr "背景"
 
 #: tips:115
 #, fuzzy
+msgid "Use custom font:"
+msgstr "移除自定圖示"
+
+#: tips:116 tips:117
+#, fuzzy
+msgid "The font used for the text displayed under the icons"
+msgstr "圖示的文字信息為:"
+
+#: tips:118
+#, fuzzy
 msgid "Pinboard behaviour"
 msgstr "桌板"
 
-#: tips:116
+#: tips:119
 msgid "Single-click to open"
 msgstr "單擊予開啟"
 
-#: tips:118
+#: tips:121
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr ""
 
-#: tips:119
+#: tips:122
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
 "events to your window manager instead. Clicks on icons will not be forwarded."
 msgstr ""
 
-#: tips:120
+#: tips:123
 msgid "Keep icons within screen limits"
 msgstr "限制圖示在可見屏幕上"
 
-#: tips:121
+#: tips:124
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
 msgstr "桌板內的圖示和標簽全顯示在屏幕中"
 
-#: tips:122
+#: tips:125
 msgid "Icon grid step:"
 msgstr "圖示格式程序:"
 
-#: tips:123
+#: tips:126
 msgid "Fine"
 msgstr "高質素"
 
-#: tips:124
+#: tips:127
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "以2像素圖示在桌面顯示"
 
-#: tips:125
+#: tips:128
 msgid "Medium"
 msgstr "中等"
 
-#: tips:126
+#: tips:129
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "以16像素圖示在桌面顯示"
 
-#: tips:127
+#: tips:130
 msgid "Coarse"
 msgstr "粗糙的"
 
-#: tips:128 tips:129 tips:130 tips:131
+#: tips:131 tips:132 tips:133 tips:134
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "以32像素圖示在桌面顯示"
 
-#: tips:132
+#: tips:135
 #, fuzzy
-msgid "Iconfied windows"
+msgid "Iconified windows"
 msgstr "程序診斷窗口"
 
-#: tips:133
+#: tips:136
 #, fuzzy
 msgid "Show iconified windows"
 msgstr "容許在窗口間拖效圖示"
 
-#: tips:134
+#: tips:137
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -2883,43 +2898,43 @@ msgid ""
 "a small button on the screen. Requires a compatible window manager."
 msgstr ""
 
-#: tips:135
+#: tips:138
 msgid "Iconify to the"
 msgstr ""
 
-#: tips:136
+#: tips:139
 msgid "top-left"
 msgstr ""
 
-#: tips:137
+#: tips:140
 msgid "top-right"
 msgstr ""
 
-#: tips:138
+#: tips:141
 msgid "bottom-left"
 msgstr ""
 
-#: tips:139
+#: tips:142
 msgid "bottom-right"
 msgstr ""
 
-#: tips:140
+#: tips:143
 msgid ", going"
 msgstr ""
 
-#: tips:141
+#: tips:144
 msgid "horizontally"
 msgstr ""
 
-#: tips:142
+#: tips:145
 msgid "vertically"
 msgstr ""
 
-#: tips:143
+#: tips:146
 msgid "Panels"
 msgstr "面板"
 
-#: tips:144
+#: tips:147
 #, fuzzy
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
@@ -2928,102 +2943,102 @@ msgstr ""
 "面板是以多圖示連成的工具欄.\n"
 "詳情請參閱說明."
 
-#: tips:145
+#: tips:148
 #, fuzzy
 msgid "Panel style"
 msgstr "面板"
 
-#: tips:146
+#: tips:149
 msgid "Image and text"
 msgstr "圖像及文字"
 
-#: tips:147
+#: tips:150
 msgid "Every panel icon is shown with an image and some text."
 msgstr "面板上顯示圖示及文字"
 
-#: tips:148
+#: tips:151
 msgid "Image only for applications"
 msgstr "程式檔只顯示圖像"
 
-#: tips:149
+#: tips:152
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr "程式檔只以圖示表達,其他的檔案則有圖示及文字敘述."
 
-#: tips:150
+#: tips:153
 msgid "Image only"
 msgstr "只顯示圖像"
 
-#: tips:151 tips:152 tips:153 tips:154
+#: tips:154 tips:155 tips:156 tips:157
 msgid "Only the image is shown."
 msgstr "只顯示該圖像"
 
-#: tips:155
+#: tips:158
 msgid "Action windows"
 msgstr "程序診斷窗口"
 
-#: tips:156
+#: tips:159
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
 msgstr "程序診斷窗口會在你執行一些程序,如複製或刪除檔案時,自動出現."
 
-#: tips:157
+#: tips:160
 #, fuzzy
 msgid "Auto-start (Quiet) these actions"
 msgstr "自動啟用 (離開) 這些程序:"
 
-#: tips:159
+#: tips:162
 msgid "Copy files without confirming first."
 msgstr "複製檔案而無須先被確認"
 
-#: tips:161
+#: tips:164
 msgid "Move files without confirming first."
 msgstr "移動檔案而無須先被確認"
 
-#: tips:163
+#: tips:166
 msgid "Create links to files without confirming first."
 msgstr "連結檔案而無須先被確認"
 
-#: tips:165
+#: tips:168
 msgid "Delete files without confirming first."
 msgstr "刪除檔案而無須先被確認"
 
-#: tips:167 tips:168
+#: tips:170 tips:171
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "掛載檔案而無須先被確認"
 
-#: tips:169
+#: tips:172
 #, fuzzy
 msgid "Default settings"
 msgstr "默認設定"
 
-#: tips:171
+#: tips:174
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "不可確認刪除唯讀項目"
 
-#: tips:173
+#: tips:176
 msgid "Don't display so much information in the message area."
 msgstr "不可在信息框內顯示太多資料"
 
-#: tips:175
+#: tips:178
 msgid "Also change contents of subdirectories."
 msgstr "同樣改變子目錄內容"
 
-#: tips:181
+#: tips:184
 msgid "Drag and Drop"
 msgstr "滑鼠拖放"
 
-#: tips:182 tips:201 tips:214
+#: tips:185 tips:204 tips:217
 #, fuzzy
 msgid "General"
 msgstr "德文"
 
-#: tips:183
+#: tips:186
 msgid "Don't use hostnames"
 msgstr "不用主機名稱"
 
-#: tips:184
+#: tips:187
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -3032,11 +3047,11 @@ msgstr ""
 "某些舊的應用程式不完全支援拖放來執行的功能 此選項便須要開啟，以達致將檔案拖到"
 "當鼠標出現 a + 符號的應用程式上."
 
-#: tips:185
+#: tips:188
 msgid "Allow dragging to icons in filer windows"
 msgstr "容許在窗口間拖效圖示"
 
-#: tips:186
+#: tips:189
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -3045,11 +3060,11 @@ msgstr ""
 "選項開啟後你可將檔案在子目錄或程式上拖放.該項目會被加亮並拖放進你指定的目錄"
 "內 或在你拖放進的程式內執行."
 
-#: tips:187
+#: tips:190
 msgid "Directories spring open"
 msgstr "目錄彈出並開啟"
 
-#: tips:188
+#: tips:191
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -3058,16 +3073,16 @@ msgstr ""
 "此選項必須連帶上一個選項同時開啟,在指向加亮的目錄時,使它在按著滑鼠一段短時間"
 "內自動開啟."
 
-#: tips:189
+#: tips:192
 #, fuzzy
 msgid "Spring delay:"
 msgstr "延遲彈出"
 
-#: tips:190
+#: tips:193
 msgid "ms"
 msgstr ""
 
-#: tips:191 tips:192
+#: tips:194 tips:195
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -3076,36 +3091,36 @@ msgstr ""
 "此選項是用作是設定:你在加亮的目錄上按著滑鼠而引發該目錄被自動開啟的延遲時間,"
 "並會以 ms 微秒來計算"
 
-#: tips:193
+#: tips:196
 #, fuzzy
 msgid "Dragging files with the middle mouse button"
 msgstr "以滑鼠中鍵拖放"
 
-#: tips:194
+#: tips:197
 #, fuzzy
 msgid "Shows a menu of possible actions"
 msgstr "...顯示一個可用的動作選單"
 
-#: tips:195
+#: tips:198
 #, fuzzy
 msgid "Moves the files"
 msgstr "...移動檔案"
 
-#: tips:196 tips:197 tips:198 tips:199
+#: tips:199 tips:200 tips:201 tips:202
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key"
 msgstr "注意，如想選單再出現，可按著左鍵並 同時按下鍵盤上的 Alt 鍵"
 
-#: tips:200
+#: tips:203
 msgid "Menus"
 msgstr "選單"
 
-#: tips:202
+#: tips:205
 msgid "Menu on button 2 (RISC OS style)"
 msgstr "以滑鼠2(中)鍵啟動選單 (RISC OS 風格)"
 
-#: tips:203
+#: tips:206
 msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
@@ -3113,41 +3128,41 @@ msgstr ""
 "以滑鼠第2鍵，即中鍵 (或對雙鍵滑鼠兩鍵同時按下)來開啟選單，否則，會用第3鍵(右"
 "鍵)代替."
 
-#: tips:204
+#: tips:207
 #, fuzzy
 msgid "Size of icons in menus:"
 msgstr "選單上的圖示大小"
 
-#: tips:205
+#: tips:208
 msgid "No Icons"
 msgstr "沒有圖示"
 
-#: tips:208
+#: tips:211
 msgid "Same as current window"
 msgstr "跟現行窗口相同"
 
-#: tips:209
+#: tips:212
 msgid "Same as default"
 msgstr "跟預設值相同"
 
-#: tips:210
+#: tips:213
 #, fuzzy
 msgid "`Xterm Here' program"
 msgstr "預設的終端機程式:"
 
-#: tips:211 tips:212
+#: tips:214 tips:215
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "當你從選單選擇“終端機”這程式將被啟動"
 
-#: tips:213
+#: tips:216
 msgid "Types"
 msgstr "類型"
 
-#: tips:215
+#: tips:218
 msgid "Ignore eXecutable bit for known extensions"
 msgstr "忽略已知紳延檔的執行性"
 
-#: tips:216 tips:217
+#: tips:219 tips:220
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -3157,11 +3172,11 @@ msgstr ""
 "你正在瀏覽一些MS-Windows的系統時，遇到某些在你的系統上沒法執行但 被標記為可執"
 "行的檔案，你便有需要忽略其可執行性."
 
-#: tips:218
+#: tips:221
 msgid "MIME types"
 msgstr ""
 
-#: tips:219
+#: tips:222
 #, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
@@ -3173,86 +3188,91 @@ msgstr ""
 "於每一常規的檔案，並會為每一檔案的類型配置一個合適的圖示.\n"
 "請在每次編輯檔案後，單擊“重新讀取”的按鈕，或重新啟動 ROX-Filer."
 
-#: tips:220
+#: tips:223
 msgid "Show name-to-type rules"
 msgstr "顯示名稱類型的規則"
 
-#: tips:221 tips:222
+#: tips:224 tips:225
 #, fuzzy
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
 msgstr "請以“設定圖示...”對話框來設定圖示的類型"
 
-#: tips:224
+#: tips:226
+#, fuzzy
+msgid "Colours"
+msgstr "小時"
+
+#: tips:227
 #, fuzzy
 msgid "File type colours"
 msgstr "文字顏色"
 
-#: tips:225
+#: tips:228
 msgid "Colour files based on their types"
 msgstr "基於檔案類型配色"
 
-#: tips:226
+#: tips:229
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr "檔案名稱(及詳述)會根據它的類型而配色"
 
-#: tips:227
+#: tips:230
 #, fuzzy
 msgid "Directory:"
 msgstr "目錄"
 
-#: tips:228
+#: tips:231
 #, fuzzy
 msgid "Regular file:"
 msgstr "常規檔"
 
-#: tips:229
+#: tips:232
 #, fuzzy
 msgid "Pipe:"
 msgstr "管道"
 
-#: tips:230
+#: tips:233
 #, fuzzy
 msgid "Socket:"
 msgstr "套節"
 
-#: tips:232 tips:233
+#: tips:235 tips:236
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr "錯誤，此連結所指向的是一個不存在或 你的權限不足以檢察的檔案."
 
-#: tips:234
+#: tips:237
 #, fuzzy
 msgid "Character device:"
 msgstr "字符設備"
 
-#: tips:235
+#: tips:238
 #, fuzzy
 msgid "Block device:"
 msgstr "區塊設備"
 
-#: tips:236
+#: tips:239
 #, fuzzy
 msgid "Door:"
 msgstr "移至:"
 
-#: tips:237
+#: tips:240
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
 
-#: tips:238
+#: tips:241
 #, fuzzy
 msgid "Executable file:"
 msgstr "可執行檔"
 
-#: tips:239
+#: tips:242
 #, fuzzy
 msgid "Application directory:"
 msgstr "應用程式目錄"
 
-#: tips:240
+#: tips:243
 #, fuzzy
 msgid "Unknown type:"
 msgstr "不明類型"
@@ -3365,9 +3385,6 @@ msgstr "不明類型"
 
 #~ msgid "Copy error"
 #~ msgstr "複製錯誤"
-
-#~ msgid "Remove custom icon"
-#~ msgstr "移除自定圖示"
 
 #~ msgid "Display messages in..."
 #~ msgstr "顯示信息於..."
