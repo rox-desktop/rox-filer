@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 1.3.6 - Manuel de l'utilisateur
+   ROX-Filer 1.3.7 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -42,17 +42,14 @@
   <legalnotice>
    <title>Conditions</title>
    <para>
-	Ce logiciel est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier
-	si vous respectez les termes de la licence 'GNU General Public License', publiée par
-	la 'Free Software Foundation' ; soit la version 2 de cette licence, soit (comme vous
-	le souhaitez) toute autre version postérieure.
-	Ce logiciel est distribué en espérant qu'il soit utile, mais SANS AUCUNE GARANTIE ;
-	sans même la garantie implicite de sa VALEUR INTRINSÈQUE ou de son ADÉQUATION POUR
-	QUELQUE USAGE QUE CE SOIT. Voir la licence 'GNU General Public License' pour plus
-	de détails.
-	Vous devriez avoir reçu une copie de la licence 'GNU General Public License'
-	avec ce logiciel ; si ce n'est pas le cas, écrivez à : Free Software Foundation, Inc.,
-	59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
+	Ce programme est un logiciel libre, vous pouvez le redistribuer et/ou le modifier
+	suivant les termes de la 'GNU General Public License', publiée par 
+	la 'Free Software Foundation', soit la version 2, soit (à votre convenance) une 
+	version ultérieure.
+	Ce programme est distribué en espérant qu'il sera utile, mais SANS AUCUNE GARANTIE.
+	Consultez la 'GNU General Public License' pour plus de détails.
+	Vous devez avoir reçu une copie de la 'GNU General Public License' avec ce programme.
+	Si ce n'est pas le cas, écrivez à la Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
    </para>
    <para>
 	NDT : Vous pouvez consulter une traduction non officielle de la licence 'GNU General
@@ -63,9 +60,8 @@
   <abstract>
    <para>
 	Note du traducteur :
-	Je ne suis pas programmeur, le point 4 du paragraphe 'Appliquettes pour les panneaux', ainsi que le
-	paragraphe 'Data-Structures' n'ont donc pas été traduits, mais si vous voulez me donner un petit
-	coup de main, c'est possible !
+	Je ne suis pas programmeur, les paragraphes 'Appliquettes pour les panneaux' et 
+	'Structures de données' ont été traduits par Laurent Moussault <laurent.moussault@9online.fr>.
    </para>
    <para>
 	<application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11.
@@ -155,7 +151,18 @@
 		les différents gestionnaires de bureau n'utilisent plus qu'un seul système.
 	   </para>
 	 </listitem>
-	</varlistentry>
+    </varlistentry>
+    
+	<varlistentry>
+     <term>Support DNotify (Linux seulement)</term>
+	 <listitem>
+      <para>
+       Si le filer est utilisé avec un noyau Linux récent (i.e. 2.4.x), il mettra à jour automatiquement 
+	   ses fenêtres. Sur d'autres systèmes, les dossiers seront mis à jour dès que le pointeur passera 
+	   au-dessus.
+      </para>
+     </listitem>
+    </varlistentry>
 
 	</variablelist>
    </para>
@@ -163,154 +170,16 @@
 
  </chapter>
 
- <chapter id="compiling">
-  <title>Compilation</title>
-  <para>
-   Si vous venez d'obtenir le filer en téléchargeant l'archive de ses sources,
-   vous devez donc les compiler pour vous en servir. Si vous avez téléchargé et
-   installé les binaires (le logiciel est donc déjà compilé), ou si <application>ROX-Filer</application>
-   était déjà installé sur votre système, vous pouvez passer directement à la
-   section suivante. Si vous êtes arrivés ici en cliquant sur l'icône représentant une bouée, 
-   ou si taper <command>rox</command> dans un XTerm fonctionne,
-   vous n'avez pas besoin de compiler.
-
-   <itemizedlist>
-	<title>Pour compiler, vous aurez besoin de ce qui suit :</title>
-	<listitem>
-	 <para>
-	  Unix ou Linux (le mot de passe root n'est pas nécessaire),
-	 </para>
-	</listitem>
-
-	<listitem>
-	 <para>
-	  Le système 'X Window' (fourni en standard sur tous les systèmes modernes),
-	 </para>
-	</listitem>
-
-	<listitem>
-	 <para>
-	  GTK+ 2.0.1 ou postérieure (bibliothèques et en-têtes) &mdash; dernière
-	  version téléchargeable depuis <citation>GTK+</citation>,
-	 </para>
-	</listitem>
-
-	<listitem>
-	 <para>
-	  LibXML 2.0.0 ou postérieure (bibliothèques et en-têtes)  &mdash; dernière
-	  version téléchargeable depuis <citation>libxml</citation>,
-	 </para>
-	</listitem>
-
-	<listitem>
-	 <para>
-	  Un compilateur C, comme 'gcc' (standard sur la plupart des systèmes).
-	 </para>
-	</listitem>
-   </itemizedlist>
-
-   Tout ceci est standard sur la plupart des distributions Linux modernes.
-   Pour vérifier quelle version de GTK+ est installée, utilisez la commande
-   <command>pkg-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
-
-   <screen>$ pkg-config --modversion gtk+-2.0
-	2.0.5</screen>
-
-  </para>
-
-  <procedure>
-   <title>Pour compiler :</title>
-
-   <step>
-	<para>
-	 Le filer utilise maintenant la base de données <citation>SharedMIME</citation>
-	 pour gérer les types MIME des fichiers. Vous devez installer cette base avant 
-	 d'installer rox, sinon le filer ne fonctionnera pas correctement (ROX-Filer 
-	 vous avertira lors de son démarrage si elle n'est pas installée).
-	</para>
-   </step>
-
-   <step>
-	<para>
-	 Allez dans le répertoire qui contient le sous-répertoire ROX-Filer.
-	</para>
-   </step>
-
-   <step>
-	<para>
-	 Exécutez le script d'installation <command>install.sh</command>, comme ceci :
-
-	 <screen>
-	  $ ./install.sh
-	 </screen>
-
-	</para>
-   </step>
-
-   <step>
-	<para>
-	 <application>ROX-Filer</application> va effectuer quelques tests pour trouver sur quel type de système
-	 vous travaillez, puis va commencer la compilation.
-	 Si ça ne fonctionne pas, envoyez-moi un e-mail et plaignez-vous ! (ndt : plaignez-vous -en anglais- à
-	 l'auteur de ce manuel, pas à moi ;-)
-	 Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés.
-	 Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
-	</para>
-	<para>
-	 Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans un sous-répertoire différent
-	 pour chaque plate-forme. Ainsi, vous pouvez compiler la même application sur plusieurs types de machines
-	 différents et l'exécuter depuis n'importe laquelle en utilisant le script <filename>AppRun</filename>.
-	 C'est particulièrement utile dans un environnement réseau.
-    </para>
-   </step>
-
-   <step>
-	<para>
-	 Une fois que le filer est compilé, vous allez devoir préciser où vous voulez l'installer.
-	 Si vous voulez effectuer une installation standard en root, vous devriez
-	 arrêter ici, passer en root (un <command>su</command> suffit), et relancer le script
-	 d'installation.
-
-	 Si vous n'avez pas le mot de passe root, ne vous inquiétez pas &mdash; suivez simplement
-	 les instructions, pour installer le filer dans votre dossier personnel (home).
-    </para>
-   </step>
-
-  </procedure>
-
-  <para>
-   Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command>
-   sans aucune option, comme ceci :
-
-   <screen>
-	$ rox
-   </screen>
-
-   Une fenêtre devrait apparaître et afficher le contenu du dossier courant.
-   Si vous avez installé le script dans votre home, vous devrez sûrement mettre
-   à jour votre variable d'environnement <envar>PATH</envar> pour que le shell
-   puisse le trouver.
-   Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename>
-   dans votre home, tapez ceci :
-
-   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
-
-   ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
-   <manvolnum>1</manvolnum></citerefentry>) :
-
-   <screen>$ setenv PATH $HOME/bin:$PATH
-	$ rehash</screen>
-
-  </para>
-
- </chapter>
-
 <chapter id="invoking">
-	<title>Arguments</title>
+ <title>Arguments</title>
   <para>
+   Vous devriez pouvoir démarrer le filer en tapant la commande <userinput>rox</userinput>.
+   S'il n'est pas encore installé, voyez <xref linkend="compiling"/>.
+  </para>
 
-	  Par défaut, <application>ROX-Filer</application> démarre en affichant le répertoire courant.
-	  Vous pouvez lui spécifier d'ouvrir d'autres dossiers à la place en les passant en arguments :
+  <para>
+   Par défaut, <application>ROX-Filer</application> démarre en affichant le répertoire courant.
+   Vous pouvez lui spécifier d'ouvrir d'autres dossiers à la place en les passant en arguments :
 	
 <screen>$ rox /home /usr /usr/local</screen>
 
@@ -590,8 +459,9 @@ pour ouvrir fichiers et dossiers.</para></listitem>
 
   <listitem>
    <para>
-	Glissez-déposez des fichiers entre des fenêtres avec le bouton gauche pour les copier, ou 
-	avec le bouton du milieu pour obtenir un menu avec les actions possibles (copier, déplacer, lier, etc...).
+    Glissez-déposez des fichiers entre des fenêtres avec le bouton gauche pour les copier, 
+    les déplacer, les lier, etc... (action à choisir dans un menu).
+	Lier crée un raccourci vers le fichier original.
    </para>
   </listitem>
 
@@ -642,9 +512,12 @@ pour ouvrir fichiers et dossiers.</para></listitem>
 <row>
  <entry>Drag and drop d'un objet (bouton gauche)</entry>
  <entry>
-		Copie le(s) fichier(s) dans la fenêtre de destination (un dossier-application ou une autre fenêtre du filer).
-		Maintenez enfoncé <keycap>Shift</keycap> pour déplacer le fichier, <keycap>Ctrl</keycap>+<keycap>Shift</keycap>
-		pour créer un lien symbolique, ou <keycap>ALT</keycap> pour avoir un menu avec les différentes actions possibles.
+  Affiche un menu vous permettant de choisir différentes actions. Vous pouvez désactiver cette 
+  fonction de menu via une option, ce qui permettra de copier par défaut le(s) fichier(s) dans 
+  la destination (un dossier-application ou une autre fenêtre du filer).
+  Maintenez enfoncé <keycap>Shift</keycap> pour déplacer le fichier, 
+  <keycap>Control</keycap>+<keycap>Shift</keycap> pour créer un lien symbolique, ou 
+  <keycap>Alt</keycap> pour avoir un menu avec les différentes actions possibles.
  </entry>
 </row>
 
@@ -851,9 +724,14 @@ Autre bouton
   <entry>Ouvrir une nouvelle fenêtre</entry>
  </row>
  <row>
-  <entry>Loupe</entry>
-  <entry>Propose un menu pour choisir la taille des icônes.</entry>
-  <entry>En choisissant 'Automatique', la fenêtre sera redimensionnée.</entry>
+  <entry>Loupe (+)</entry>
+  <entry>Sélectionne une taille d'icônes plus grande.</entry>
+  <entry>Sélectionne une taille d'icônes plus petite.</entry>
+ </row>
+ <row>
+  <entry>Loupe (zone)</entry>
+  <entry>Sélectionne le mode 'Taille automatique'.</entry>
+  <entry>-</entry>
  </row>
  <row>
   <entry>Liste</entry>
@@ -882,8 +760,10 @@ fenêtre (le comportement du filer est inversé).
   <para>
 	  Glisser-déposer des objets sur les outils 'Flèche vers le haut' ou 'Maison',
       produit le même effet que de les glisser-déposer vers les dossiers auxquels
-      ces outils mènent.
-
+	  ces outils mènent. Glisser-déposer sur l'outil 'Signets' créera un signet 
+	  pour cet objet.
+  </para>
+  <para>
 	  La barre d'outils peut aussi montrer le nombre de fichiers dans un dossier,
 	  et quelques informations sur la sélection.
 	  Ceci peut être activé/désactivé dans l'espace configuration ('Options...').
@@ -1524,6 +1404,11 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ce
   Dans cette boîte, vous pouvez retirer des dossiers de la liste, les classer (en utilisant 
   les flèches ou en les faisant glisser) et modifier les chemins directement si vous le souhaitez.
  </para>
+ <para>
+  Le sous-menu <guimenuitem>Récemment visités</guimenuitem> propose un historique des derniers 
+  dossiers affichés, dans lesquels vous pouvez vous rendre d'un simple clic. Le dossier actif, s'il 
+  est dans ce sous-menu, est désactivé puisque vous êtes déjà dans celui-ci.
+ </para>
 </sect1>
 
 </chapter>
@@ -1668,9 +1553,10 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
 	<step>
 	 <para>
 	  Créez un exécutable appelé <filename>AppletRun</filename>. 
-	  This will be passed the XID of the panel socket window when the directory is dragged 
-	  onto the panel. You can use this to create a GtkPlug widget. An example applet 
-	  (written in python) is available at <ulink url="http://rox.sourceforge.net/applets.php3"/>
+	  Lorsque le dossier de l'appliquette sera glissé sur un panneau, ROX-Filer lancera cet 
+	  exécutable avec pour argument un identifiant XID, correspondant à une fenêtre-socket 
+	  pour ce panneau. Vous pouvez utiliser l'identifiant pour créer une widget GtkPlug.
+	  Un exemple d'appliquette (en Python) est disponible ici : <ulink url="http://rox.sourceforge.net/applets.php3"/>
      </para>
 	</step>
 
@@ -1682,10 +1568,9 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
  <para>
   Quand le punaiseur est utilisé, ROX-Filer peut afficher une icône pour chaque fenêtre iconisée (ou 
   "réduite"). Vous pouvez activer/désactiver cette fonctionnalité dans la boîte Options. 
-  Les icônes des fenêtres réduites sont mises en surbrillance quand vous passez la souris au-dessus d'elles 
-  et elles peuvent être déplacées.
-  Si vous cliquez sur une d'elles, celle-ci reprendra la taille normale de l'application qu'elle représente. 
-  Quelques vieux gestionnaires de fenêtres ne sont pas compatibles avec cette fonctionnalité, et n'affichent 
+  Les icônes des fenêtres réduites sont sur un fond semi-transparent et peuvent être déplacées à la souris.
+  Si vous cliquez sur une de ces icônes, celle-ci reprendra la taille normale de l'application qu'elle représente. 
+  Quelques anciens gestionnaires de fenêtres ne sont pas compatibles avec cette fonctionnalité, et n'affichent 
   donc pas ces icônes.
  </para>
 </sect1>
@@ -1697,8 +1582,8 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   dans le menu du punaiseur (clic droit sur le bureau quand le punaiseur est activé).
  </para>
  <para>
-   Pour choisir une image, choisissez <guilabel>Centrée</guilabel>, <guilabel>Redimensionnée</guilabel> ou 
-   <guilabel>Pavée</guilabel> pour le style, puis faites glisser une image dans l'emplacement prévu.
+   Pour choisir une image, choisissez <guilabel>Centrer</guilabel>, <guilabel>Redimensionner</guilabel>, 
+   <guilabel>Étirer</guilabel> ou <guilabel>Paver</guilabel> pour le style, puis faites glisser une image dans l'emplacement prévu.
    Pour retrouver un bureau avec une simple couleur (définie dans la boîte Options), cliquez sur 
    <guibutton>Effacer</guibutton>.
    </para>
@@ -3045,14 +2930,157 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
   </para>
 </sect1>
 
-<sect1><title>Data-structures</title>
+<sect1><title>Structures de données</title>
  <para>
-  The <filename>global.h</filename> file lists each major data-structure used
-  in the filer and explains its purpose. This is a good place to start reading
-  if you want to know how the filer works.
+  Le fichier <filename>global.h</filename> contient les principales structures de données 
+  de ROX-Filer et explique la façon dont elles sont utilisées dans le code-source.
+  C'est un bon point de départ si vous voulez comprendre son fonctionnement.
  </para>
 </sect1>
 </chapter>
+
+<appendix id="compiling">
+ <title>Compilation</title>
+ <para>
+	 Si vous venez d'obtenir le filer en téléchargeant l'archive de ses sources, 
+	 vous devez donc les compiler pour vous en servir. Si vous avez téléchargé et 
+	 installé les binaires (le logiciel est donc déjà compilé), ou si 
+	 <application>ROX-Filer</application> était déjà installé sur votre système, 
+	 vous pouvez passer directement à la section suivante. Si vous êtes arrivés 
+	 ici en cliquant sur l'icône représentant une bouée, ou si taper 
+	 <command>rox</command> dans un XTerm fonctionne, vous n'avez pas besoin de 
+	 compiler.
+	 <itemizedlist>
+      <title>Pour compiler, vous aurez besoin de ce qui suit :</title>
+	  <listitem>
+       <para>
+        Unix ou Linux (le mot de passe root n'est pas nécessaire),
+       </para>
+      </listitem>
+
+	  <listitem>
+       <para>
+        Le système 'X Window' (fourni en standard sur tous les systèmes modernes),
+       </para>
+      </listitem>
+
+      <listitem>
+       <para>
+        GTK+ 2.0.1 ou postérieure (bibliothèques et en-têtes) &mdash; dernière 
+		version téléchargeable depuis <citation>GTK+</citation>,
+       </para>
+      </listitem>
+
+	  <listitem>
+       <para>
+        LibXML 2.0.0 ou postérieure (bibliothèques et en-têtes)  &mdash; dernière 
+		version téléchargeable depuis <citation>libxml</citation>,
+       </para>
+      </listitem>
+
+	  <listitem>
+       <para>
+        Un compilateur C, comme 'gcc' (standard sur la plupart des systèmes).
+       </para>
+      </listitem>
+
+     </itemizedlist>
+
+     Tout ceci est standard sur la plupart des distributions Linux modernes. 
+	 Pour vérifier quelle version de GTK+ est installée, utilisez la commande 
+	 <command>pkg-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
+
+     <screen>$ pkg-config --modversion gtk+-2.0
+      2.0.5</screen>
+
+    </para>
+
+	<procedure>
+     <title>Pour compiler :</title>
+
+	 <step>
+      <para>
+       Le filer utilise maintenant la base de données <citation>SharedMIME</citation> 
+	   pour gérer les types MIME des fichiers. Vous devez installer cette base avant 
+	   d'installer rox, sinon le filer ne fonctionnera pas correctement (ROX-Filer 
+	   vous avertira lors de son démarrage si elle n'est pas installée).
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Allez dans le répertoire qui contient le sous-répertoire ROX-Filer.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Exécutez le script d'installation <command>install.sh</command>, comme ceci :
+
+	   <screen>
+        $ ./install.sh
+       </screen>
+
+      </para>
+     </step>
+
+     <step>
+      <para>
+       <application>ROX-Filer</application> va effectuer quelques tests pour trouver 
+	   sur quel type de système vous travaillez, puis va commencer la compilation. 
+	   Si ça ne fonctionne pas, envoyez-moi un e-mail et plaignez-vous ! (ndt : plaignez-vous 
+	   -en anglais- à l'auteur de ce manuel, pas à moi ;-)
+	   Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés. 
+	   Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
+      </para>
+	  <para>
+       Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans un 
+       sous-répertoire différent pour chaque plate-forme. Ainsi, vous pouvez compiler 
+	   la même application sur plusieurs types de machines différents et l'exécuter depuis 
+	   n'importe laquelle en utilisant le script <filename>AppRun</filename>. 
+	   C'est particulièrement utile dans un environnement réseau.
+      </para>
+     </step>
+
+     <step>
+      <para>
+       Une fois que le filer est compilé, vous allez devoir préciser où vous voulez l'installer. 
+	   Si vous voulez effectuer une installation standard en root, vous devriez arrêter ici, 
+	   passer en root (un <command>su</command> suffit), et relancer le script d'installation. 
+
+       Si vous n'avez pas le mot de passe root, ne vous inquiétez pas &mdash; suivez simplement 
+	   les instructions, pour installer le filer dans votre dossier personnel (home).
+      </para>
+     </step>
+
+    </procedure>
+
+    <para>
+     Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command> 
+	 sans aucune option, comme ceci :
+
+	 <screen>
+      $ rox
+     </screen>
+
+     Une fenêtre devrait apparaître et afficher le contenu du dossier courant. 
+	 Si vous avez installé le script dans votre home, vous devrez sûrement mettre 
+	 à jour votre variable d'environnement <envar>PATH</envar> pour que le shell 
+	 puisse le trouver.
+     Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename> 
+	 dans votre home, tapez ceci :
+
+     <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
+
+     ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
+     <manvolnum>1</manvolnum></citerefentry>) :
+
+     <screen>$ setenv PATH $HOME/bin:$PATH
+      $ rehash</screen>
+
+    </para>
+
+</appendix>
 
 <appendix id="manpage"><title>Page de manuel</title>
 
@@ -3131,10 +3159,6 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
   <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
    <listitem><para>démarre un nouveau filer, même s'il y en a déjà un. Cette option interdit au filer
 	 de forker (s'exécuter en arrière plan), et n'est quasiment utile que pour débugger.
-  </para></listitem></varlistentry>
-
-  <varlistentry><term><option>-o</option></term><term><option>--override</option></term>
-   <listitem><para>outrepasse le contrôle des panneaux par le window manager.
   </para></listitem></varlistentry>
 
   <varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
@@ -3256,6 +3280,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Taras</member>
 	 <member>Simon Truss</member>
 	 <member>Jan Wagemakers</member>
+     <member>Keith Warno</member>
 	 <member>Stephen Watson</member>
 	 <member>Andre Wyrwa</member>
 	 <member>Geoff Youngs</member>
