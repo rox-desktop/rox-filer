@@ -137,6 +137,15 @@ MIME-info rules will be:
 	$MIMEINFO
 
 EOF
+if [ ! -f rox.1 ]; then
+	echo '*** The ROX-Filer manpage (rox.1) is missing.'
+	echo '*** It can be created from Manual.xml by running'
+	echo "*** 'make' in the ROX-Filer/src/Docs directory."
+	echo '*** The daily CVS snapshots have it ready-built'
+	echo
+	MANDIR=""
+fi
+
 if [ -n "$MANDIR" ]; then
 	echo "The manual pages will be:"
 	echo "	$MANDIR/man1/rox.1"
