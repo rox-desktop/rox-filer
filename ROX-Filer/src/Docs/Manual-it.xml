@@ -21,7 +21,7 @@
 	 <surname>Bongiorno</surname>
 	 <contrib><ulink url="http://yuri.webhop.org">Traduzione italiana</ulink></contrib>
   </othercredit>
-  <copyright><year>2004</year><holder>Thomas Leonard</holder></copyright>
+  <copyright><year>2005</year><holder>Thomas Leonard</holder></copyright>
   <legalnotice>
    <title>Conditions</title>
    <para>
@@ -159,7 +159,7 @@
    Notare che se la stessa versione del filer è già in esecuzione sulla macchina, di norma, 
    per aprire le directory, viene usata quella già in esecuzione.
    </para><para>
-   Per un elenco completo delle opzioni a linea di comando, vedere l'<xref linkend="manpage"/>
+   Per un elenco completo delle opzioni a riga di comando, vedere l'<xref linkend="manpage"/>
   </para>
 
   <sect1>
@@ -195,7 +195,7 @@
 
     I pannelli funzionano come la bacheca: per crearne uno su qualsiasi lato dello schermo,
     usare le opzioni <option>--left</option>, <option>--right,</option>
-    <option>--top</option>, <option>--bottom</option>, a seconda di dove lo si vuole
+    <option>--top</option>, <option>--bottom</option>, a seconda di dove lo si voglia
     far apparire. In alcuni sistemi, si deve usare per forza l'opzione corta.
     Per esempio, per creare un pannello in basso:
 
@@ -229,7 +229,7 @@ $ rox --bottom=</screen>
    <sect2><title>Sawfish / Sawmill</title>
     <para>
      Sawfish all'avvio tenta di capire se si sta usando GNOME e, se è così, fornisce il 
-     supporto necessario. Si deve quindi aggiungere la linea
+     supporto necessario. Si deve quindi aggiungere la riga
      <programlisting>(require 'gnome)</programlisting>
      al file <filename>.sawfishrc</filename> (consultare il manuale di sawfish per ulteriori
      dettagli).
@@ -939,9 +939,9 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Proprietà</guimenuitem></entry><entry>
          Mostra ulteriori informazioni dell'oggetto selezionato. Qui è anche possibile 
-         cambiare i permessi (ma il menù <guimenuitem>Permessi</guimenuitem> che è più in 
-	 basso, permette di cambiarli a più file contemporaneamente) e la destinazione di un 
-	 collegamento simbolico.
+         cambiare la destinazione di un collegamento simbolico e i permessi (ma il menù 
+         <guimenuitem>Permessi</guimenuitem> che è più in basso, permette di 
+         cambiarli a più file contemporaneamente).
        </entry></row>
 
        <row><entry>
@@ -976,7 +976,7 @@ $ rox --bottom=</screen>
    <formalpara><title>Nota sui collegamenti simbolici:</title>
     <para>
      un collegamento simbolico memorizza il <emphasis>percorso</emphasis>
-     di un altro flle. Eliminando questo collegamento, non si influenza l'altro
+     di un altro file. Eliminando questo collegamento, non si influenza l'altro
      file. Eliminando invece l'altro file, il collegamento simbolico viene interrotto. 
      Ci sono due tipi di collegamento simbolico: assoluto e relativo. Un collegamento
      simbolico assoluto memorizza il percorso partendo dalla radice («/» o «root»),
@@ -1119,12 +1119,12 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Segue i collegamenti simbolici</guimenuitem></entry><entry>
+         <guimenuitem>Segui i collegamenti simbolici</guimenuitem></entry><entry>
 	 Converte il percorso mostrato nella barra del titolo della finestra nella sua forma
 	 canonica. Per esempio, se <filename>/home/fred/link</filename> è il collegamento simbolico
 	 che punta a <filename>/usr/share/doc/</filename>, facendo clic sul collegamento si va in quella
 	 directory, poi facendo clic su «Su» si torna in <filename>/home/fred</filename>.
-	 Se invece si fa clic su <guimenuitem>Segue i collegamenti simbolici</guimenuitem>, quando poi
+	 Se invece si fa clic su <guimenuitem>Segui i collegamenti simbolici</guimenuitem>, quando poi
 	 si torna «Su», si va in <filename>/usr/share</filename>.
        </entry></row>
 
@@ -1396,7 +1396,7 @@ $ rox --bottom=</screen>
     Selezionare <guilabel>Centra</guilabel>, <guilabel>Scala</guilabel>,
     <guilabel>Stira</guilabel> o <guilabel>Affianca</guilabel> per impostare lo stile,
     poi trascinare un'immagine nell'area sottostante.  Per ritornare a un colore uniforme,
-    (definito nella finestra «Opzioni»), fare clic su <guibutton>Cancella</guibutton>.
+    (definito nella finestra «Opzioni»), fare clic su <guibutton>Pulisci</guibutton>.
    </para><para>
     Si può usare l'applicazione «Wallpaper» <citation>Wallpaper</citation> per creare
     effetti più complessi, come la scelta casuale di un'immagine ogni ora o il rendering
@@ -1789,7 +1789,7 @@ $ rox --bottom=</screen>
   <title>Finestre d'azione</title>
   <para>
    Le finestre d'azione sono quelle finestre che appaiono quando inizia un'operazione
-   in background, come la copia o l'eliminazione dei file. La linea di stato nella 
+   in background, come la copia o l'eliminazione dei file. La riga di stato nella 
    parte superiore della finestra mostra la directory o l'oggetto attuale che la 
    finestra sta elaborando.
    Sotto, nella parte che scorre, ci sono i log che mostrano tutto quello che è
@@ -2226,7 +2226,7 @@ $ rox --bottom=</screen>
     dentro le directory di nome <filename>src</filename>.
     L'espressione si legge così:
     </para><para>
-    Se il file si chiama <filename>src</filename> allora «Prune».
+    se il file si chiama <filename>src</filename> allora «Prune».
     Altrimenti, controlla se termina per <filename>.c</filename> e se è
     così, includilo nei risultati.
    </para>
@@ -2326,7 +2326,7 @@ $ rox --bottom=</screen>
      dello stesso media-type che non hanno già una specifica azione.
      </para><para>
      Dal momento che Gimp può caricare molti tipi di immagine, ha senso selezionare l'opzione
-     <guilabel>Imposta come azione predefinita per tutti i file di tipo 
+     <guilabel>Impostare come azione predefinita per tutti i file di tipo 
      «image/&lt;anything&gt;»</guilabel>, così non bisogna ripetere lo stesso procedimento
      per i file «image/jpeg» e così via. Comunque, questo influenza solo i tipi che non hanno
      già una specifica azione (cioè quelli per cui appare un errore se si prova ad aprirli).
@@ -2995,7 +2995,7 @@ $ rehash</screen>
    </refsect1>
 
    <refsect1><title>LICENZA</title>
-    <para>Copyright (C) 2004 Thomas Leonard.
+    <para>Copyright (C) 2005 Thomas Leonard.
      </para><para>
      È possibile redistribuire copie di ROX-Filer secondo i termini della licenza
      GNU GPL.
