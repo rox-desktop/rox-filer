@@ -35,6 +35,7 @@
  * If this is too small, then looking inside ~/.thumbnails will
  * cause nasty effects ;-)
  */
+/* XXX: This is stupid! */
 #define SMALL_IMAGE_THRESHOLD 50000
 
 #include <stdlib.h>
@@ -322,7 +323,7 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	int name_len;
 	GdkPixbuf *thumb;
 
-	thumb = scale_pixbuf(full, HUGE_WIDTH, HUGE_HEIGHT);
+	thumb = scale_pixbuf(full, 128, 128);
 
 	original_width = gdk_pixbuf_get_width(full);
 	original_height = gdk_pixbuf_get_height(full);
