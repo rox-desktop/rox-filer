@@ -38,7 +38,16 @@ clean:
 	rm -f *.o Makefile.bak
 
 depend:
-	makedepend -- $(CFLAGS) -- $(SRCS)
+	makedepend -- ${CFLAGS} -- ${SRCS}
+
+Makefile: Makefile.in config.status
+	./config.status
+
+config.status: configure
+	./configure --bindir=${PLATFORM_DIR}
+
+configure: configure.in
+	autoconf
 
 messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
