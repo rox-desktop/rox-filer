@@ -59,6 +59,7 @@ struct _Tool {
 };
 
 Option o_toolbar, o_toolbar_info, o_toolbar_disable;
+Option o_toolbar_min_width;
 
 static GtkTooltips *tooltips = NULL;
 static FilerWindow *filer_window_being_counted;
@@ -172,6 +173,7 @@ void toolbar_init(void)
 	option_add_int(&o_toolbar_info, "toolbar_show_info", 1);
 	option_add_string(&o_toolbar_disable, "toolbar_disable",
 					GTK_STOCK_CLOSE);
+	option_add_int(&o_toolbar_min_width, "toolbar_min_width", 1);
 	option_add_notify(option_notify);
 	
 	tooltips = gtk_tooltips_new();
@@ -496,12 +498,9 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	GtkWidget	*bar;
 	GtkWidget	*b;
 	int		i;
-	int		width;;
+	int		width;
 
 	bar = gtk_toolbar_new();
-
-	if (filer_window)
-		gtk_widget_set_size_request(bar, 100, -1);
 
 	if (o_toolbar.int_value == TOOLBAR_NORMAL || !filer_window)
 		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_ICONS);
@@ -528,13 +527,18 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 			handle_drops(filer_window, b, tool->drop_action);
 	}
 
-	/* Make the toolbar wide enough for all icons to be seen, plus
-	   a little for the (start of the) text label */
-	if (filer_window)
-		gtk_widget_set_size_request(bar, width+32, -1);
-
 	if (filer_window)
 	{
+		if(o_toolbar_min_width.int_value)
+		{
+			/* Make the toolbar wide enough for all icons to be
+			   seen, plus a little for the (start of the) text
+			   label */
+			gtk_widget_set_size_request(bar, width+32, -1);
+		} else {
+			gtk_widget_set_size_request(bar, 100, -1);
+		}
+		
 		filer_window->toolbar_text = gtk_label_new("");
 		gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text),
 					0, 0.5);
