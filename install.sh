@@ -112,7 +112,7 @@ case $REPLY in
 	   get_dir "/usr/local/share"
 	   SHAREDIR="$DIR"
 	   echo
-	   echo "Where should the default icons and run actions go?"
+	   echo "Where should the default run actions go?"
 	   get_dir "$SHAREDIR/Choices"
 	   CHOICESDIR="$DIR"
 	   echo
@@ -134,7 +134,7 @@ The application directory will be:
 The launcher script will be:
 	$BINDIR/rox
 
-Icons and run actions will be in:
+Run actions will be in:
 	$CHOICESDIR
 
 MIME rules will be:
@@ -174,11 +174,10 @@ if [ -n "$MANDIR" ]; then
 	ln -s "$MANDIR/man1/rox.1" "$MANDIR/man1/ROX-Filer.1" || die "Can't install manpage!"
 fi
 
-echo "Installing icons (existing icons will not be replaced)..."
-endir "$CHOICESDIR/MIME-icons"
+echo "Installing run actions (existing actions will not be replaced)..."
 endir "$CHOICESDIR/MIME-types"
 cd Choices || die "Choices missing"
-for file in MIME-*/*; do
+for file in MIME-types/*; do
   if [ -f "$file" ]; then
     dest="$CHOICESDIR/$file"
     if [ ! -f "$dest" ]; then
