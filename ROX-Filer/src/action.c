@@ -52,10 +52,13 @@ struct _GUIside
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-	GtkWidget 	*log, *window, *actions;
+	GtkWidget 	*log, *window, *actions, *dir;
 	int		child;		/* Process ID */
 	int		errors;
 	gboolean	show_info;	/* For Disk Usage */
+	
+	char		*next_dir;	/* NULL => no timer active */
+	gint		next_timer;
 };
 
 /* These don't need to be in a structure because we fork() before
@@ -72,7 +75,19 @@ static size_t	size_tally;	/* For Disk Usage */
 /* Static prototypes */
 static gboolean send();
 static gboolean send_error();
+static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
+
+static gboolean display_dir(gpointer data)
+{
+	GUIside	*gui_side = (GUIside *) data;
+
+	gtk_label_set_text(GTK_LABEL(gui_side->dir), gui_side->next_dir + 1);
+	g_free(gui_side->next_dir);
+	gui_side->next_dir = NULL;
+	
+	return FALSE;
+}
 
 /* Called when the child sends us a message */
 static void message_from_child(gpointer 	 data,
@@ -101,6 +116,18 @@ static void message_from_child(gpointer 	 data,
 			{
 				refresh_dirs(buffer + 1);
 				g_free(buffer);
+				return;
+			}
+			else if (*buffer == '/')
+			{
+				if (gui_side->next_dir)
+					g_free(gui_side->next_dir);
+				else
+					gui_side->next_timer =
+						gtk_timeout_add(500,
+								display_dir,
+								gui_side);
+				gui_side->next_dir = buffer;
 				return;
 			}
 			else if (*buffer == '!')
@@ -154,6 +181,8 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 		send_error();
 		return;
 	}
+
+	send_dir(src_dir);
 
 	while ((ent = readdir(d)))
 	{
@@ -215,6 +244,13 @@ static gboolean send()
 	return len == message->len;
 }
 
+/* Set the directory indicator at the top of the window */
+static gboolean send_dir(char *dir)
+{
+	g_string_sprintf(message, "/%s", dir);
+	return send();
+}
+
 static gboolean send_error()
 {
 	g_string_sprintf(message, "!ERROR: %s\n", g_strerror(errno));
@@ -260,7 +296,12 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 		gdk_input_remove(gui_side->input_tag);
 	}
 
-	g_free(data);
+	if (gui_side->next_dir)
+	{
+		gtk_timeout_remove(gui_side->next_timer);
+		g_free(gui_side->next_dir);
+	}
+	g_free(gui_side);
 	
 	if (--number_of_windows < 1)
 		gtk_main_quit();
@@ -325,6 +366,11 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 
 	vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
+
+	gui_side->dir = gtk_label_new("<dir>");
+	gui_side->next_dir = NULL;
+	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
+	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
@@ -398,14 +444,12 @@ static gboolean do_usage(char *src_path, char *dest_path)
 		return FALSE;
 	}
 
-	if (S_ISREG(info.st_mode))
+	if (S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
 		size_tally += info.st_size;
 	else if (S_ISDIR(info.st_mode))
 	{
 		char *safe_path;
 		safe_path = g_strdup(src_path);
-		g_string_sprintf(message, "'Scanning in '%s'\n", safe_path);
-		send();
 		for_dir_contents(do_usage, safe_path, safe_path);
 		g_free(safe_path);
 	}
@@ -444,8 +488,6 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	{
 		char *safe_path;
 		safe_path = g_strdup(src_path);
-		g_string_sprintf(message, "'Scanning in '%s'\n", safe_path);
-		send();
 		for_dir_contents(do_delete, safe_path, safe_path);
 		if (rmdir(safe_path))
 		{
@@ -542,9 +584,6 @@ static gboolean do_copy(char *path, char *dest)
 				send();
 			}
 			
-			g_string_sprintf(message, "'Scanning in '%s'\n",
-					safe_path);
-			send();
 			for_dir_contents(do_copy, safe_path, safe_dest);
 			/* Note: dest_path now invalid... */
 		}
@@ -611,9 +650,6 @@ static gboolean do_move(char *path, char *dest)
 
 			safe_path = g_strdup(path);
 			safe_dest = g_strdup(dest_path);
-			g_string_sprintf(message, "'Scanning in '%s'\n",
-					safe_path);
-			send();
 			for_dir_contents(do_move, safe_path, safe_dest);
 			g_free(safe_dest);
 			if (rmdir(safe_path))
@@ -691,6 +727,8 @@ static void usage_cb(gpointer data)
 	int	i = -1;
 	off_t	total_size = 0;
 
+	send_dir(filer_window->path);
+
 	while (left > 0)
 	{
 		i++;
@@ -722,6 +760,8 @@ static void mount_cb(gpointer data)
 	int		i;
 	char		*command;
 	gboolean	mount_points = FALSE;
+
+	send_dir(filer_window->path);
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
@@ -768,6 +808,8 @@ static void delete_cb(gpointer data)
 	int	left = collection->number_selected;
 	int	i = -1;
 
+	send_dir(filer_window->path);
+
 	while (left > 0)
 	{
 		i++;
@@ -794,6 +836,8 @@ static void list_cb(gpointer data)
 
 	while (paths)
 	{
+		send_dir((char *) paths->data);
+
 		if (action_do_func((char *) paths->data, action_dest))
 		{
 			g_string_sprintf(message, "+%s", action_dest);

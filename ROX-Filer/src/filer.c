@@ -675,25 +675,33 @@ void show_menu(Collection *collection, GdkEventButton *event,
 	show_filer_menu((FilerWindow *) user_data, event, item);
 }
 
-static void may_rescan(FilerWindow *filer_window)
+/* Returns TRUE iff the directory still exits. */
+static gboolean may_rescan(FilerWindow *filer_window)
 {
 	Directory *dir;
 	
-	g_return_if_fail(filer_window != NULL);
+	g_return_val_if_fail(filer_window != NULL, FALSE);
 
 	/* We do a fresh lookup (rather than update) because the inode may
 	 * have changed.
 	 */
 	dir = g_fscache_lookup(dir_cache, filer_window->path);
-	if (dir == filer_window->directory)
+	if (!dir)
 	{
-		g_fscache_data_unref(dir_cache, dir);
-		return;
+		delayed_error("ROX-Filer", "Directory missing/deleted");
+		gtk_widget_destroy(filer_window->window);
+		return FALSE;
 	}
-	
-	detach(filer_window);
-	filer_window->directory = dir;
-	attach(filer_window);
+	if (dir == filer_window->directory)
+		g_fscache_data_unref(dir_cache, dir);
+	else
+	{
+		detach(filer_window);
+		filer_window->directory = dir;
+		attach(filer_window);
+	}
+
+	return TRUE;
 }
 
 /* Callback to collection_delete_if() */
@@ -1422,10 +1430,11 @@ static char *filer_toolbar(char *data)
 	return NULL;
 }
 
+/* Note that filer_window may not exist after this call. */
 void update_dir(FilerWindow *filer_window)
 {
-	may_rescan(filer_window);
-	dir_update(filer_window->directory, filer_window->path);
+	if (may_rescan(filer_window))
+		dir_update(filer_window->directory, filer_window->path);
 }
 
 void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
