@@ -224,7 +224,7 @@ if test "$gtk2" != "1" ; then
   if test "$png" = "yes" ; then
     AC_MSG_CHECKING([if libpng version is >= 1.0.1])
     oldLIBS=$LIBS
-    LIBS="$LIBS -lpng -lz"
+    LIBS="$LIBS -lpng -lz -lm"
     AC_TRY_RUN(
   [#include <stdlib.h>
   #include <png.h>
@@ -243,7 +243,7 @@ if test "$gtk2" != "1" ; then
     AC_MSG_RESULT($png)
     LIBS=$oldLIBS
     if test "$png" = "yes" ; then
-      LIBPNG="-lpng -lz"
+      LIBPNG="-lpng -lz -lm"
       AC_DEFINE(HAVE_LIBPNG)
     fi
   fi
