@@ -43,6 +43,7 @@ typedef struct _Eval Eval;
 /* Static prototypes */
 static FindCondition *parse_expression(guchar **expression);
 static FindCondition *parse_case(guchar **expression);
+static FindCondition *parse_system(guchar **expression);
 static FindCondition *parse_condition(guchar **expression);
 static FindCondition *parse_match(guchar **expression);
 static FindCondition *parse_comparison(guchar **expression);
@@ -148,23 +149,12 @@ FindCondition *find_compile(guchar *string)
 	return cond;
 }
 
-gboolean find_test_condition(FindCondition *condition, guchar *path)
+gboolean find_test_condition(FindCondition *condition, FindInfo *info)
 {
-	FindInfo	info;
-	guchar		*slash;
-
 	g_return_val_if_fail(condition != NULL, FALSE);
-	g_return_val_if_fail(path != NULL, FALSE);
+	g_return_val_if_fail(info != NULL, FALSE);
 
-	info.fullpath = path;
-
-	slash = strrchr(path, '/');
-	info.leaf = slash ? slash + 1 : path;
-	if (lstat(path, &info.stats))
-		return FALSE;	/* XXX: Log error? */
-	time(&info.now);	/* FIXME: Not for each check! */
-
-	return condition->test(condition, &info);
+	return condition->test(condition, info);
 }
 
 void find_condition_free(FindCondition *condition)
@@ -178,7 +168,72 @@ void find_condition_free(FindCondition *condition)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+/* Call this when you've just eaten '('. Returns the string upto the
+ * matching ')' (and eats that bracket), or NULL on failure.
+ * Brackets within the string may be quoted or escaped.
+ */
+static guchar *get_bracketed_string(guchar **expression)
+{
+	GString		*str;
+	int		opens = 1;
+	guchar		quote = '\0';
+
+	str = g_string_new(NULL);
+
+	while (NEXT != '\0')
+	{
+		guchar	c = NEXT;
+
+		EAT;
+
+		if (quote == '\0')
+		{
+			if (c == '\'' || c == '"')
+				quote = c;	/* Start quoted section */
+			else if (c == '\\' && (NEXT == '(' || NEXT == ')'))
+			{
+				c = NEXT;
+				EAT;
+			}
+			else if (c == ')')
+			{
+				opens--;
+				if (opens < 1)
+				{
+					guchar	*retval = str->str;
+
+					g_string_free(str, FALSE);
+					return retval;
+				}
+			}
+			else if (c == '(')
+				opens++;
+		}
+		else if (c == quote)
+			quote = '\0';		/* End quoted section */
+		else if (c == '\\' && NEXT == quote)
+		{
+			g_string_append_c(str, c);
+			c = NEXT;
+			EAT;
+		}
+
+		g_string_append_c(str, c);
+	}
+	
+	g_string_free(str, TRUE);
+
+	return NULL;
+}
+
+
 /*				TESTING CODE				*/
+
+static gboolean test_prune(FindCondition *condition, FindInfo *info)
+{
+	info->prune = TRUE;
+	return FALSE;
+}
 
 static gboolean test_leaf(FindCondition *condition, FindInfo *info)
 {
@@ -188,6 +243,44 @@ static gboolean test_leaf(FindCondition *condition, FindInfo *info)
 static gboolean test_path(FindCondition *condition, FindInfo *info)
 {
 	return fnmatch(condition->data1, info->fullpath, FNM_PATHNAME) == 0;
+}
+
+static gboolean test_system(FindCondition *condition, FindInfo *info)
+{
+	guchar	*command = (guchar *) condition->data1;
+	guchar	*start = command;
+	GString	*to_sys = NULL;
+	guchar	*perc;
+	int	retcode;
+
+	to_sys = g_string_new(NULL);
+
+	while ((perc = strchr(command, '%')))
+	{
+		if (perc > start && perc[-1] == '\\')
+			perc--;
+
+		while (command < perc)
+			g_string_append_c(to_sys, *(command++));
+		
+		if (*perc == '%')
+			g_string_append(to_sys, info->fullpath);
+		else
+		{
+			g_string_append_c(to_sys, '%');
+			perc++;
+		}
+		
+		command = perc + 1;
+	}
+
+	g_string_append(to_sys, command);
+
+	retcode = system(to_sys->str);
+
+	g_string_free(to_sys, TRUE);
+	
+	return retcode == 0;
 }
 
 static gboolean test_OR(FindCondition *condition, FindInfo *info)
@@ -444,7 +537,25 @@ static FindCondition *parse_condition(guchar **expression)
 		return parse_match(expression);
 	}
 
-	if (g_strncasecmp(*expression, "Is", 2) == 0)
+	if (MATCH("system"))
+	{
+		SKIP;
+		if (NEXT != '(')
+			return NULL;
+		EAT;
+		return parse_system(expression);
+	}
+	else if (MATCH("prune"))
+	{
+		cond = g_new(FindCondition, 1);
+		cond->test = test_prune;
+		cond->free = (FindFree) g_free;
+		cond->data1 = NULL;
+		cond->data2 = NULL;
+
+		return cond;
+	}
+	else if (g_strncasecmp(*expression, "Is", 2) == 0)
 	{
 		EAT;
 		EAT;
@@ -452,6 +563,25 @@ static FindCondition *parse_condition(guchar **expression)
 	}
 
 	return parse_comparison(expression);
+}
+
+/* Call this when you've just eaten 'system(' */
+static FindCondition *parse_system(guchar **expression)
+{	
+	FindCondition	*cond = NULL;
+	guchar		*command_string;
+
+	command_string = get_bracketed_string(expression);
+	if (!command_string)
+		return NULL;
+
+	cond = g_new(FindCondition, 1);
+	cond->test = test_system;
+	cond->free = &free_simple;
+	cond->data1 = command_string;
+	cond->data2 = NULL;
+
+	return cond;
 }
 
 static FindCondition *parse_comparison(guchar **expression)

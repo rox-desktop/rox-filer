@@ -136,14 +136,25 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 
 	if (!window)
 	{
+		GtkWidget	*hbox, *scrollbar;
+
 		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_title(GTK_WINDOW(window), "ROX-Filer error log");
+		gtk_window_set_title(GTK_WINDOW(window),
+						"ROX-Filer message log");
 		gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
 		gtk_window_set_default_size(GTK_WINDOW(window), 600, 300);
 		gtk_signal_connect_object(GTK_OBJECT(window), "delete_event",
 				gtk_widget_hide, GTK_OBJECT(window));
-		log = gtk_text_new(NULL, NULL);
-		gtk_container_add(GTK_CONTAINER(window), log);
+
+
+		hbox = gtk_hbox_new(FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(window), hbox);
+		scrollbar = gtk_vscrollbar_new(NULL);
+		
+		log = gtk_text_new(NULL,
+				gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
+		gtk_box_pack_start(GTK_BOX(hbox), log, TRUE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 	}
 
 	if (!GTK_WIDGET_MAPPED(window))

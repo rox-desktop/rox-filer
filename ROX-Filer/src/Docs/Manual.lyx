@@ -1,4 +1,4 @@
-#This file was created by <tal197> Sat Apr  8 16:21:26 2000
+#This file was created by <tal197> Sat Apr  8 19:52:01 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1690,6 +1690,100 @@ atime = 1 day ago
 exactly
 \emph toggle 
  86400 seconds ago...
+\layout Subsection
+
+Specials
+\layout Description
+
+System(Command) executes `Command' on the file.
+ The test succeeds if the command returns an exit status of zero.
+ A `%' character in `Command' is replaced by the full path of the file being
+ checked.
+ System is a very slow test to perform, so do it last if possible.
+ For example, if you're looking for a .c file containing the word `main',
+ do
+\begin_deeper 
+\layout LyX-Code
+
+'*.c' system(grep -q main
+\latex latex 
+ "
+\backslash 
+thinspace{}
+\latex default 
+%
+\latex latex 
+
+\backslash 
+thinspace{}"
+\latex default 
+)
+\layout Standard
+
+so that the grep is only performed for files ending in .c (as opposed to
+ only checking that the file ends in .c if it contains the word `main').
+\end_deeper 
+\layout Description
+
+Prune Always fails!
+\begin_float footnote 
+\layout Standard
+
+Note that this is the opposite of the 
+\noun on 
+find(1)
+\noun toggle 
+ command.
+\end_float 
+ However, if it gets evaluated at all then it prevents the filer from checking
+ inside the current directory.
+ Remember the order in which the filer checks the expression!
+\layout Standard
+
+Examples:
+\layout LyX-Code
+
+'*.old' system(echo rm %)
+\layout LyX-Code
+
+'src' prune, '*.c'
+\layout Standard
+
+The first displays a command to delete each file ending in 
+\family typewriter 
+.old
+\family default 
+; you can either paste the results into an xterm to execute them or run
+ the search again without the 
+\family typewriter 
+echo
+\family default 
+.
+ It's always a good idea to use 
+\family typewriter 
+echo
+\family default 
+ first with dangerous commands! The second looks for 
+\family typewriter 
+.c
+\family default 
+ files, but does not bother checking inside directories called 
+\family typewriter 
+src
+\family default 
+.
+ The expression is evaluated like this:
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset Figure size 216 180
+file Prune.eps
+height 2 2.5
+flags 9
+
+\end_inset 
+
+
 \layout Subsection
 
 Options

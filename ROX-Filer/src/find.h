@@ -29,8 +29,9 @@ struct _FindInfo
 	guchar		*leaf;
 	struct stat	stats;
 	time_t		now;
+	gboolean	prune;
 };
 
 FindCondition *find_compile(guchar *string);
-gboolean find_test_condition(FindCondition *condition, guchar *path);
+gboolean find_test_condition(FindCondition *condition, FindInfo *info);
 void find_condition_free(FindCondition *condition);

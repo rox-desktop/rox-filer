@@ -362,7 +362,9 @@ static void show_condition_help(gpointer data)
 "IsDir 'lib'            (finds directories called 'lib')\n"
 "IsReg 'core'           (finds a regular file called 'core')\n"
 "! (IsDir, IsReg)       (is neither a directory nor a regualr file)\n"
-"mtime after 1 day ago and size > 1Mb   (big, and recently modified)");
+"mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
+"'CVS' prune, isreg                     (a regular file not in CVS)\n"
+"IsReg system(grep -q fred \"%\")         (contains the word 'fred')");
 		gtk_widget_set_style(text, fixed_style);
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
@@ -390,6 +392,17 @@ static void show_condition_help(gpointer data)
 "5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
 "2 secs|mins|hours|days|weeks|years  ago|hence (times)\n"
 "atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)");
+		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_container_add(GTK_CONTAINER(frame), text);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+
+		frame = gtk_frame_new("Specials");
+		text = gtk_label_new(
+"system(command) (true if 'command' returns with a zero exit status; a % \n"
+"in 'command' is replaced with the path of the current file)\n"
+"prune (false, and prevents searching the contents of a directory)."
+);
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
@@ -644,7 +657,9 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 	d = opendir(src_dir);
 	if (!d)
 	{
-		send_error();
+		g_string_sprintf(message, "!ERROR reading '%s': %s\n",
+				src_dir, g_strerror(errno));
+		send();
 		return;
 	}
 
@@ -950,6 +965,11 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 		case 0:
 			/* We are the child */
 
+			dup2(to_error_log, STDOUT_FILENO);
+			close_on_exec(STDOUT_FILENO, FALSE);
+			dup2(to_error_log, STDERR_FILENO);
+			close_on_exec(STDERR_FILENO, FALSE);
+
 			quiet = autoq;
 
 			/* Reset the SIGCHLD handler */
@@ -1144,7 +1164,8 @@ static gboolean do_delete(char *src_path, char *dest_path)
  */
 static gboolean do_find(char *path, char *dummy)
 {
-	struct stat 	info;
+	FindInfo	info;
+	char		*slash;
 
 	check_flags();
 
@@ -1177,7 +1198,7 @@ static gboolean do_find(char *path, char *dummy)
 			return FALSE;
 	}
 
-	if (lstat(path, &info))
+	if (lstat(path, &info.stats))
 	{
 		send_error();
 		g_string_sprintf(message, "'(while checking '%s')\n", path);
@@ -1185,13 +1206,19 @@ static gboolean do_find(char *path, char *dummy)
 		return FALSE;
 	}
 
-	if (find_test_condition(find_condition, path))
+	info.fullpath = path;
+	time(&info.now);	/* XXX: Not for each check! */
+
+	slash = strrchr(path, '/');
+	info.leaf = slash ? slash + 1 : path;
+	info.prune = FALSE;
+	if (find_test_condition(find_condition, &info))
 	{
 		g_string_sprintf(message, "=%s", path);
 		send();
 	}
 
-	if (S_ISDIR(info.st_mode))
+	if (S_ISDIR(info.stats.st_mode) && !info.prune)
 	{
 		char *safe_path;
 		safe_path = g_strdup(path);
@@ -1875,6 +1902,7 @@ void action_find(FilerWindow *filer_window)
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), scroller, TRUE, TRUE, 4);
 	gui_side->results = gtk_clist_new_with_titles(
 			sizeof(titles) / sizeof(*titles), titles);
+	gtk_clist_column_titles_passive(GTK_CLIST(gui_side->results));
 	gtk_widget_set_usize(gui_side->results, 100, 100);
 	gtk_clist_set_column_width(GTK_CLIST(gui_side->results), 0, 100);
 	gtk_clist_set_selection_mode(GTK_CLIST(gui_side->results),
