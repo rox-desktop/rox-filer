@@ -12,6 +12,7 @@
 #include <sys/types.h>
 
 #define PRETTY_SIZE_LIMIT 4096
+#define TIME_FORMAT "%T %d %b %Y"
 
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
@@ -29,5 +30,6 @@ gint applicable(uid_t uid, gid_t gid);
 char *get_local_path(char *uri);
 void close_on_exec(int fd, gboolean close);
 void set_blocking(int fd, gboolean blocking);
+char *pretty_time(time_t *time);
 
 #endif /* _SUPPORT_H */

@@ -59,7 +59,7 @@ void run_app(char *path)
 	apprun = g_string_new(path);
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
-	if (!spawn_full(argv, getenv("HOME")))
+	if (!spawn_full(argv, home_dir))
 		report_error("ROX-Filer", "Failed to fork() child process");
 	
 	g_string_free(apprun, TRUE);
@@ -103,7 +103,7 @@ void run_with_files(char *path, GSList *uri_list)
 	
 	argv[argc++] = NULL;
 
-	if (!spawn_full(argv, getenv("HOME")))
+	if (!spawn_full(argv, home_dir))
 		delayed_error("ROX-Filer", "Failed to fork() child process");
 }
 
@@ -144,7 +144,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 			break;
 		case 0:
 			/* We are the child */
-			chdir(getenv("HOME"));
+			chdir(home_dir);
 			dup2(to_error_log, STDERR_FILENO);
 			close_on_exec(STDERR_FILENO, FALSE);
 			if (dup2(fds[0], 0) == -1)

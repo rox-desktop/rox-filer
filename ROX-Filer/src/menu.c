@@ -31,7 +31,6 @@
 #include <unistd.h>
 #include <errno.h>
 #include <string.h>
-#include <time.h>
 
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
@@ -890,27 +889,21 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Change time:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
-	g_string_sprintf(gstring, "%s", ctime(&info.st_ctime));
-	g_string_truncate(gstring, gstring->len - 1);
-	label = gtk_label_new(gstring->str);
+	label = gtk_label_new(pretty_time(&info.st_ctime));
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
 	
 	label = gtk_label_new("Modify time:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
-	g_string_sprintf(gstring, "%s", ctime(&info.st_mtime));
-	g_string_truncate(gstring, gstring->len - 1);
-	label = gtk_label_new(gstring->str);
+	label = gtk_label_new(pretty_time(&info.st_mtime));
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 3, 4);
 	
 	label = gtk_label_new("Access time:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 4, 5);
-	g_string_sprintf(gstring, "%s", ctime(&info.st_atime));
-	g_string_truncate(gstring, gstring->len - 1);
-	label = gtk_label_new(gstring->str);
+	label = gtk_label_new(pretty_time(&info.st_atime));
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 4, 5);
 	
@@ -983,7 +976,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 #ifdef FILE_B_FLAG
 			argv[2] = path;
 #else
-			argv[1] = path;
+			argv[1] = file->leafname;
+			chdir(window_with_focus->path);
 #endif
 			if (execvp(argv[0], argv))
 				fprintf(stderr, "execvp() error: %s\n",
@@ -1154,10 +1148,27 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
+	char	*copy;
+	char	*slash;
+
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_opendir(make_path(window_with_focus->path, "/..")->str,
-			PANEL_NO);
+	if (window_with_focus->path[0] == '/'
+			&& window_with_focus->path[1] == '\0')
+		return;		/* Already in the root */
+	
+	copy = g_strdup(window_with_focus->path);
+	slash = strrchr(copy, '/');
+
+	if (slash)
+	{
+		*slash = '\0';
+		filer_opendir(*copy ? copy : "/", PANEL_NO);
+	}
+	else
+		g_warning("No / in directory path!\n");
+
+	g_free(copy);
 }
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget)

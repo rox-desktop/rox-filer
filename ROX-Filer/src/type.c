@@ -30,6 +30,7 @@
 #include <time.h>
 
 #include "string.h"
+#include "main.h"
 #include "filer.h"
 #include "pixmaps.h"
 #include "run.h"
@@ -223,7 +224,7 @@ gboolean type_open(char *path, MIME_type *type)
 	else
 		argv[0] = open;
 
-	if (!spawn_full(argv, getenv("HOME")))
+	if (!spawn_full(argv, home_dir))
 	{
 		report_error("ROX-Filer",
 				"Failed to fork() child process");

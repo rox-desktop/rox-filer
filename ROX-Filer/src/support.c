@@ -33,11 +33,15 @@
 #include <sys/wait.h>
 #include <sys/stat.h>
 #include <string.h>
+#include <time.h>
 
 #include <glib.h>
 
 #include "main.h"
 #include "support.h"
+
+static GHashTable *uid_hash = NULL;	/* UID -> User name */
+static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 
 /* Static prototypes */
 
@@ -141,33 +145,45 @@ void debug_free_string(void *data)
 
 char *user_name(uid_t uid)
 {
-	struct passwd   *passwd;
-	GString	*tmp;
 	char	*retval;
+	
+	if (!uid_hash)
+		uid_hash = g_hash_table_new(NULL, NULL);
 
-	passwd = getpwuid(uid);
-	if (passwd)
-		return passwd->pw_name;
-	tmp = g_string_new(NULL);
-	g_string_sprintf(tmp, "[%d]", (int) uid);
-	retval = tmp->str;
-	g_string_free(tmp, FALSE);
+	retval = g_hash_table_lookup(uid_hash, (gpointer) uid);
+
+	if (!retval)
+	{
+		struct passwd *passwd;
+
+		passwd = getpwuid(uid);
+		retval = passwd ? g_strdup(passwd->pw_name)
+			       : g_strdup_printf("[%d]", (int) uid);
+		g_hash_table_insert(uid_hash, (gpointer) uid, retval);
+	}
+
 	return retval;
 }
 
 char *group_name(gid_t gid)
 {
-	struct group 	*group;
-	GString	*tmp;
 	char	*retval;
 	
-	group = getgrgid(gid);
-	if (group)
-		return group->gr_name;
-	tmp = g_string_new(NULL);
-	g_string_sprintf(tmp, "[%d]", (int) gid);
-	retval = tmp->str;
-	g_string_free(tmp, FALSE);
+	if (!gid_hash)
+		gid_hash = g_hash_table_new(NULL, NULL);
+
+	retval = g_hash_table_lookup(gid_hash, (gpointer) gid);
+
+	if (!retval)
+	{
+		struct group *group;
+
+		group = getgrgid(gid);
+		retval = group ? g_strdup(group->gr_name)
+			       : g_strdup_printf("[%d]", (int) gid);
+		g_hash_table_insert(gid_hash, (gpointer) gid, retval);
+	}
+
 	return retval;
 }
 
@@ -385,3 +401,19 @@ void set_blocking(int fd, gboolean blocking)
 	if (fcntl(fd, F_SETFL, blocking ? 0 : O_NONBLOCK))
 		g_warning("fcntl() failed: %s\n", g_strerror(errno));
 }
+
+/* Format this time nicely. The result is a pointer to a static buffer,
+ * valid until the next call.
+ */
+char *pretty_time(time_t *time)
+{
+        static char time_buf[32];
+
+        if (strftime(time_buf, sizeof(time_buf),
+			TIME_FORMAT, localtime(time)) == 0)
+		time_buf[0]= 0;
+
+	return time_buf;
+}
+
+	

@@ -81,6 +81,7 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *filer_single_click(char *data);
+static char *filer_unique_windows(char *data);
 static char *filer_menu_on_2(char *data);
 static char *filer_new_window_on_1(char *data);
 static char *filer_toolbar(char *data);
@@ -112,6 +113,8 @@ static GtkWidget *toggle_single_click;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 static GtkWidget *toggle_new_window_on_1;
 static GtkWidget *toggle_menu_on_2;
+static GtkWidget *toggle_unique_filer_windows;
+static gboolean o_unique_filer_windows = FALSE;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -172,6 +175,7 @@ static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
 			FilerWindow *filer_window);
+static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static void shrink_width(FilerWindow *filer_window);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static void open_item(Collection *collection,
@@ -179,6 +183,9 @@ static void open_item(Collection *collection,
 		gpointer user_data);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static void set_autoselect(FilerWindow *filer_window, guchar *leaf);
+static FilerWindow *find_filer_window(char *path);
+static void filer_set_title(FilerWindow *filer_window);
+static gboolean exists(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 enum
@@ -198,6 +205,7 @@ void filer_init()
 	option_register("filer_new_window_on_1", filer_new_window_on_1);
 	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
+	option_register("filer_unique_windows", filer_unique_windows);
 	option_register("filer_toolbar", filer_toolbar);
 	option_register("filer_display_style", filer_display_style);
 	option_register("filer_sort_by", filer_sort_by);
@@ -289,6 +297,9 @@ static void update_display(Directory *dir,
 					if_deleted,
 					items);
 			break;
+		case DIR_START_SCAN:
+			set_scanning_display(filer_window, TRUE);
+			break;
 		case DIR_END_SCAN:
 			if (filer_window->window->window)
 				gdk_window_set_cursor(
@@ -301,6 +312,7 @@ static void update_display(Directory *dir,
 				collection_set_cursor_item(collection, 0);
 				filer_window->had_cursor = FALSE;
 			}
+			set_scanning_display(filer_window, FALSE);
 			break;
 		case DIR_UPDATE:
 			for (i = 0; i < items->len; i++)
@@ -319,8 +331,10 @@ static void attach(FilerWindow *filer_window)
 {
 	gdk_window_set_cursor(filer_window->window->window, busy_cursor);
 	collection_clear(filer_window->collection);
+	filer_window->scanning = TRUE;
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
+	filer_set_title(filer_window);
 }
 
 static void detach(FilerWindow *filer_window)
@@ -616,33 +630,31 @@ static void draw_string(GtkWidget *widget,
 			x, y,
 			string, strlen(string));
 }
-	
+
 /* Return a string (valid until next call) giving details
  * of this item.
  */
 char *details(DirItem *item)
 {
-	mode_t	m = item->mode;
-	static GString *buf = NULL;
-        static char time_buf[32];
+	mode_t		m = item->mode;
+	static GString 	*buf = NULL;
+
 	if (!buf)
 		buf = g_string_new(NULL);
 
-        if (strftime(time_buf, sizeof(time_buf),
-			"%d-%b-%Y %T", localtime(&item->mtime)) == 0)
-		time_buf[0]= 0;
-
-	g_string_sprintf(buf, "%s%s %s %s",
+	g_string_sprintf(buf, "%s %s %8s %8s %s %s",
 				item->flags & ITEM_FLAG_APPDIR? "App  " :
-			        S_ISDIR(m) ? "Dir  " :
-				S_ISCHR(m) ? "Char " :
-				S_ISBLK(m) ? "Blck " :
-				S_ISLNK(m) ? "Link " :
-				S_ISSOCK(m) ? "Sock " :
-				S_ISFIFO(m) ? "Pipe " : "File ",
+			        S_ISDIR(m) ? "Dir " :
+				S_ISCHR(m) ? "Char" :
+				S_ISBLK(m) ? "Blck" :
+				S_ISLNK(m) ? "Link" :
+				S_ISSOCK(m) ? "Sock" :
+				S_ISFIFO(m) ? "Pipe" : "File",
 			pretty_permissions(m),
+			user_name(item->uid),
+			group_name(item->gid),
 			format_size_aligned(item->size),
-			time_buf);
+			pretty_time(&item->mtime));
 	return buf->str;
 }
 
@@ -1194,7 +1206,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_change_to(filer_window, getenv("HOME"), NULL);
+	filer_change_to(filer_window, home_dir, NULL);
 }
 
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -1234,15 +1246,25 @@ void change_to_parent(FilerWindow *filer_window)
 void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 {
 	char	*from_dup;
+	char	*real_path = pathdup(path);
 	
+	if (o_unique_filer_windows)
+	{
+		FilerWindow *fw;
+		
+		fw = find_filer_window(real_path);
+		if (fw && fw != filer_window)
+			gtk_widget_destroy(fw->window);
+	}
+
 	from_dup = from && *from ? g_strdup(from) : NULL;
 
 	detach(filer_window);
 	g_free(filer_window->path);
-	filer_window->path = pathdup(path);
+	filer_window->path = real_path;
 
 	filer_window->directory = g_fscache_lookup(dir_cache,
-					filer_window->path);
+						   filer_window->path);
 	if (filer_window->directory)
 	{
 		g_free(filer_window->auto_select);
@@ -1251,8 +1273,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 			|| filer_window->had_cursor;
 		filer_window->auto_select = from_dup;
 
-		gtk_window_set_title(GTK_WINDOW(filer_window->window),
-				filer_window->path);
+		filer_set_title(filer_window);
 		collection_set_cursor_item(filer_window->collection, -1);
 		attach(filer_window);
 
@@ -1396,10 +1417,32 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 		{"text/uri-list", 0, TARGET_URI_LIST},
 		{"STRING", 0, TARGET_STRING},
 	};
+	char		*real_path;
+	
+	real_path = pathdup(path);
+
+	if (o_unique_filer_windows && panel_type == PANEL_NO)
+	{
+		FilerWindow *fw;
+		
+		fw = find_filer_window(real_path);
+		
+		if (fw)
+		{
+			    /* TODO: this should bring the window to the front
+			     * at the same coordinates.
+			     */
+			    gtk_widget_hide(fw->window);
+			    gtk_widget_show(fw->window);
+			    g_free(real_path);
+			    return fw;
+		}
+	}
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->minibuffer = NULL;
-	filer_window->path = pathdup(path);
+	filer_window->path = real_path;
+	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
 	filer_window->auto_select = NULL;
 
@@ -1425,8 +1468,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->display_style = UNKNOWN_STYLE;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_title(GTK_WINDOW(filer_window->window),
-			filer_window->path);
+	filer_set_title(filer_window);
 
 	collection = collection_new(NULL);
 	gtk_object_set_data(GTK_OBJECT(collection),
@@ -1564,6 +1606,26 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	return filer_window;
 }
 
+static gint clear_scanning_display(FilerWindow *filer_window)
+{
+	if (exists(filer_window))
+		filer_set_title(filer_window);
+	return FALSE;
+}
+
+static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
+{
+	if (scanning == filer_window->scanning)
+		return;
+	filer_window->scanning = scanning;
+
+	if (scanning)
+		filer_set_title(filer_window);
+	else
+		gtk_timeout_add(300, (GtkFunction) clear_scanning_display,
+				filer_window);
+}
+
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*frame, *box;
@@ -1672,6 +1734,10 @@ static GtkWidget *create_options()
 		gtk_check_button_new_with_label("Single-click nagivation");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
+	toggle_unique_filer_windows =
+		gtk_check_button_new_with_label("Unique windows");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows, FALSE, TRUE, 0);
+
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
@@ -1709,6 +1775,8 @@ static void update_options()
 			collection_menu_button == 2 ? 1 : 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
 			o_single_click);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
+			o_unique_filer_windows);
 	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
 
 	update_options_label();
@@ -1728,6 +1796,10 @@ static void set_options()
 
 	o_single_click = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_single_click));
+
+	o_unique_filer_windows = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows));
+
 	collection_single_click = o_single_click ? TRUE : FALSE;
 	
 	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(menu_toolbar));
@@ -1759,6 +1831,7 @@ static void save_options()
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
+	option_write("filer_unique_windows", o_unique_filer_windows ? "1" : "0");
 	option_write("filer_display_style", style_to_name());
 	option_write("filer_sort_by", sort_fn_to_name());
 	option_write("filer_toolbar", o_toolbar == TOOLBAR_NONE ? "None" :
@@ -1783,6 +1856,12 @@ static char *filer_single_click(char *data)
 {
 	o_single_click = atoi(data) != 0;
 	collection_single_click = o_single_click ? TRUE : FALSE;
+	return NULL;
+}
+
+static char *filer_unique_windows(char *data)
+{
+	o_unique_filer_windows = atoi(data) != 0;
 	return NULL;
 }
 
@@ -1859,6 +1938,27 @@ void full_refresh(void)
 	mount_update(TRUE);
 }
 
+/* See whether a filer window with a given path already exists */
+static FilerWindow *find_filer_window(char *path)
+{
+	GList	*next = all_filer_windows;
+
+	while (next)
+	{
+		FilerWindow *filer_window = (FilerWindow *) next->data;
+
+		if (filer_window->panel_type == PANEL_NO
+		    && strcmp(path, filer_window->path) == 0)
+		{
+			return filer_window;
+		}
+
+		next = next->next;
+	}
+	
+	return NULL;
+}
+
 /* This path has been mounted/umounted - update all dirs */
 void filer_check_mounted(char *path)
 {
@@ -1889,20 +1989,21 @@ void filer_check_mounted(char *path)
  */
 static gboolean minibuffer_show_cb(FilerWindow *filer_window)
 {
-	GList	*next = all_filer_windows;
+	if (exists(filer_window))
+		minibuffer_show(filer_window);
+	return FALSE;
+}
 
-	while (next)
+static gboolean exists(FilerWindow *filer_window)
+{
+	GList	*next;
+
+	for (next = all_filer_windows; next; next = next->next)
 	{
 		FilerWindow *fw = (FilerWindow *) next->data;
 
-
 		if (fw == filer_window)
-		{
-			minibuffer_show(filer_window);
-			break;
-		}
-		
-		next = next->next;
+			return TRUE;
 	}
 
 	return FALSE;
@@ -1935,4 +2036,20 @@ static void set_autoselect(FilerWindow *filer_window, guchar *leaf)
 	}
 	
 	filer_window->auto_select = g_strdup(leaf);
+}
+
+static void filer_set_title(FilerWindow *filer_window)
+{
+	if (filer_window->scanning)
+	{
+		guchar	*title;
+
+		title = g_strdup_printf("%s (Scanning)", filer_window->path);
+		gtk_window_set_title(GTK_WINDOW(filer_window->window),
+				title);
+		g_free(title);
+	}
+	else
+		gtk_window_set_title(GTK_WINDOW(filer_window->window),
+				filer_window->path);
 }

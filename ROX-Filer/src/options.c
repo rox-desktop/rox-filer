@@ -153,6 +153,7 @@ void parse_file(char *path, ParseFunc *parse_line)
 {
 	char		*data;
 	long		length;
+	gboolean	seen_error = FALSE;
 
 	if (load_file(path, &data, &length))
 	{
@@ -168,7 +169,7 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 			error = parse_line(line);
 
-			if (error)
+			if (error && !seen_error)
 			{
 				GString *message;
 
@@ -179,12 +180,13 @@ void parse_file(char *path, ParseFunc *parse_line)
 					"This may be due to upgrading from "
 					"a previous version of ROX-Filer. "
 					"Open the Options window and click "
-					"on Save.",
+					"on Save.\n"
+					"Further errors will be ignored.",
 					line_number,
 					error);
 				delayed_error("ROX-Filer", message->str);
 				g_string_free(message, TRUE);
-				break;
+				seen_error = TRUE;
 			}
 
 			if (!eol)

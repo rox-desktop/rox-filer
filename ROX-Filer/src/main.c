@@ -58,6 +58,7 @@ uid_t euid;
 gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
+char *home_dir;
 
 #define VERSION "ROX-Filer 0.1.16\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
@@ -159,6 +160,8 @@ int main(int argc, char **argv)
 	GList		*panel_dirs = NULL;
 	GList		*panel_sides = NULL;
 
+	home_dir = g_get_home_dir();
+
 	gtk_init(&argc, &argv);
 
 	while (1)
@@ -250,7 +253,7 @@ int main(int argc, char **argv)
 	}
 
 	if (optind == argc && !panel_dirs)
-		filer_opendir(getenv("HOME"), PANEL_NO);
+		filer_opendir(home_dir, PANEL_NO);
 	else
 	{
 		int	 i = optind;

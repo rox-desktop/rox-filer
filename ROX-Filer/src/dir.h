@@ -13,7 +13,8 @@
 #include <dirent.h>
 
 typedef enum {
-	DIR_END_SCAN,	/* Remove busy cursor */
+	DIR_START_SCAN,	/* Set 'scanning' indicator */
+	DIR_END_SCAN,	/* Clear 'scanning' indicator */
 	DIR_ADD,	/* Add the listed items to the display */
 	DIR_REMOVE,	/* Remove listed items from display */
 	DIR_UPDATE,	/* Redraw these items */

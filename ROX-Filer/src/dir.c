@@ -258,6 +258,8 @@ static void init_for_scan(Directory *dir)
 
 static void start_scanning(Directory *dir, char *pathname)
 {
+	GList	*next;
+
 	if (dir->dir_handle)
 	{
 		/* We are already scanning */
@@ -286,6 +288,14 @@ static void start_scanning(Directory *dir, char *pathname)
 	init_for_scan(dir);
 
 	dir->idle = gtk_idle_add((GtkFunction) idle_callback, dir);
+
+	/* Let all the filer windows know we're scanning */
+	for (next = dir->users; next; next = next->next)
+	{
+		DirUser *user = (DirUser *) next->data;
+
+		user->callback(dir, DIR_START_SCAN, NULL, user->data);
+	}
 }
 
 static gint notify_timeout(gpointer data)

@@ -39,13 +39,13 @@ typedef enum
 struct _FilerWindow
 {
 	GtkWidget	*window;
+	gboolean	scanning;	/* State of the 'scanning' indicator */
 	char		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
 	PanelType	panel_type;
-	time_t		m_time;		/* m-time at last scan */
 	int 		(*sort_fn)(const void *a, const void *b);
 	DisplayStyle	display_style;
 
