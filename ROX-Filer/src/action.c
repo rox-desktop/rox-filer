@@ -443,7 +443,10 @@ static void show_chmod_help(gpointer data)
 		gtk_container_add(GTK_CONTAINER(help), vbox);
 
 		text = gtk_label_new(
-	_("The format of a command is:\n"
+	_("Normally, you can just select a command from the menu (click \n"
+	"on the arrow beside the command box). Sometimes, you need more...\n"
+	"\n"
+	"The format of a command is:\n"
 	"CHANGE, CHANGE, ...\n"
 	"Each CHANGE is:\n"
 	"WHO HOW PERMISSIONS\n"
@@ -451,6 +454,8 @@ static void show_chmod_help(gpointer data)
 	"change the permissions for the User (owner), Group or Others.\n"
 	"HOW is +, - or = to add, remove or set exactly the permissions.\n"
 	"PERMISSIONS is some combination of the letters 'rwxXstugo'\n\n"
+
+	"Bracketed text and spaces are ignored.\n\n"
 
 	"Examples:\n"
 	"u+rw 	(the file owner gains read and write permission)\n"
@@ -1232,6 +1237,38 @@ static gboolean do_find(char *path, char *dummy)
 	return FALSE;
 }
 
+/* Like mode_compile(), but ignores spaces and bracketed bits */
+struct mode_change *nice_mode_compile(const char *mode_string,
+				      unsigned int masked_ops)
+{
+	GString			*new;
+	int			brackets = 0;
+	struct mode_change	*retval = NULL;
+
+	new = g_string_new(NULL);
+
+	for (; *mode_string; mode_string++)
+	{
+		if (*mode_string == '(')
+			brackets++;
+		if (*mode_string == ')')
+		{
+			brackets--;
+			if (brackets < 0)
+				break;
+			continue;
+		}
+
+		if (brackets == 0 && *mode_string != ' ')
+			g_string_append_c(new, *mode_string);
+	}
+
+	if (brackets == 0)
+		retval = mode_compile(new->str, masked_ops);
+	g_string_free(new, TRUE);
+	return retval;
+}
+
 static gboolean do_chmod(char *path, char *dummy)
 {
 	struct stat 	info;
@@ -1268,7 +1305,7 @@ static gboolean do_chmod(char *path, char *dummy)
 		{
 			if (mode_change)
 				mode_free(mode_change);
-			mode_change = mode_compile(new_entry_string,
+			mode_change = nice_mode_compile(new_entry_string,
 							MODE_MASK_ALL);
 			g_free(new_entry_string);
 			new_entry_string = NULL;
@@ -2031,7 +2068,8 @@ void action_chmod(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
-	GtkWidget	*hbox, *label;
+	GtkWidget	*hbox, *label, *combo;
+	static GList	*presets = NULL;
 
 	collection = filer_window->collection;
 
@@ -2043,8 +2081,22 @@ void action_chmod(FilerWindow *filer_window)
 		return;
 	}
 
+	if (!presets)
+	{
+		presets = g_list_append(presets,
+				_("a+x (Make executable/searchable)"));
+		presets = g_list_append(presets,
+				_("a-x (Make non-executable/non-searchable)"));
+		presets = g_list_append(presets,
+				_("u+rw (Give owner read+write)"));
+		presets = g_list_append(presets,
+				_("go-rwx (Private - owner access only)"));
+		presets = g_list_append(presets,
+				_("go=u-w (Public read, not write)"));
+	}
+
 	if (!last_chmod_string)
-		last_chmod_string = g_strdup("a+x");
+		last_chmod_string = g_strdup((guchar *) presets->data);
 	new_entry_string = last_chmod_string;
 	gui_side = start_action(filer_window, chmod_cb, FALSE);
 	if (!gui_side)
@@ -2054,15 +2106,22 @@ void action_chmod(FilerWindow *filer_window)
 		_("Brief - don't list processed files"), "B");
 	add_toggle(gui_side,
 		_("Recurse - also change contents of subdirectories"), "R");
+
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new(_("Command:"));
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_chmod_string;
-	gui_side->entry = gtk_entry_new();
+	
+	combo = gtk_combo_new();
+	gtk_combo_disable_activate(GTK_COMBO(combo));
+	gtk_combo_set_use_arrows_always(GTK_COMBO(combo), TRUE);
+	gtk_combo_set_popdown_strings(GTK_COMBO(combo), presets);
+	
+	gui_side->entry = GTK_COMBO(combo)->entry;
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_chmod_string);
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
-	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);

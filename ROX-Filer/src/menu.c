@@ -86,7 +86,7 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 static GList *list_paths(FilerWindow *filer_window);
 static void free_paths(GList *paths);
-static void mark_menus_unmodified(void);
+static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 
 /* Note that for most of these callbacks none of the arguments are used. */
@@ -343,7 +343,7 @@ void menu_init()
 	if (menurc)
 	{
 		gtk_item_factory_parse_rc(menurc);
-		mark_menus_unmodified();
+		mark_menus_modified(FALSE);
 	}
 
 	gtk_accel_group_lock(panel_keys);
@@ -1563,25 +1563,29 @@ static void save_menus(void)
 
 		/* Dump out if so... */
 		if (mod)
+		{
+			mark_menus_modified(TRUE);
 			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
+			mark_menus_modified(FALSE);
+		}
 	}
 }
 
-static void mark_unmodified(gpointer hash_key,
-			    gpointer value,
-			    gpointer user_data)
+static void mark_modified(gpointer hash_key,
+			  gpointer value,
+			  gpointer user_data)
 {
 	GtkItemFactoryItem *item = (GtkItemFactoryItem *) value;
 
-	item->modified = FALSE;
+	item->modified = (gboolean) user_data;
 }
 
-/* Clear the 'modified' flag in all menu items. Messy... */
-static void mark_menus_unmodified(void)
+/* Set or clear the 'modified' flag in all menu items. Messy... */
+static void mark_menus_modified(gboolean mod)
 {
 	GtkItemFactoryClass	*class;
 
 	class = gtk_type_class(GTK_TYPE_ITEM_FACTORY);
 
-	g_hash_table_foreach(class->item_ht, mark_unmodified, NULL);
+	g_hash_table_foreach(class->item_ht, mark_modified, (gpointer) mod);
 }
