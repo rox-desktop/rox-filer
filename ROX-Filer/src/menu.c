@@ -93,6 +93,7 @@ typedef gboolean (*SaveCb)(GObject *savebox,
 			   const gchar *current, const gchar *new);
 
 GtkAccelGroup	*filer_keys = NULL;
+static gboolean filer_keys_need_init = TRUE;
 
 static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 
@@ -265,17 +266,18 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 		g_free(tmp);		\
 	} while (0)
 
-void ensure_filer_menu(void)
+/* Returns TRUE if the keys were installed (first call only) */
+gboolean ensure_filer_menu(void)
 {
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
 	GtkItemFactory  	*item_factory;
 
-	if (filer_keys)
-		return;
+	if (!filer_keys_need_init)
+		return FALSE;
+	filer_keys_need_init = FALSE;
 
-	filer_keys = gtk_accel_group_new();
 	item_factory = menu_create(filer_menu_def,
 		sizeof(filer_menu_def) / sizeof(*filer_menu_def),
 		"<filer>", filer_keys);
@@ -311,6 +313,8 @@ void ensure_filer_menu(void)
 
 	g_signal_connect(filer_keys, "accel_changed",
 			G_CALLBACK(save_menus), NULL);
+
+	return TRUE;
 }
 
 void menu_init(void)
@@ -329,6 +333,8 @@ void menu_init(void)
 	option_add_saver(save_menus);
 
 	option_register_widget("menu-set-keys", set_keys_button);
+
+	filer_keys = gtk_accel_group_new();
 }
 
 /* Name is in the form "<panel>" */
@@ -854,7 +860,7 @@ static void view_type(gpointer data, guint action, GtkWidget *widget)
 	if (view_type == VIEW_TYPE_COLLECTION)
 		display_set_layout(window_with_focus,
 				window_with_focus->display_style_wanted,
-				DETAILS_NONE);
+				DETAILS_NONE, FALSE);
 
 	filer_set_view_type(window_with_focus, (ViewType) action);
 }
@@ -876,10 +882,10 @@ static void change_size_auto(gpointer data, guint action, GtkWidget *widget)
 	if (window_with_focus->display_style_wanted == AUTO_SIZE_ICONS)
 		display_set_layout(window_with_focus,
 				   window_with_focus->display_style,
-				   window_with_focus->details_type);
+				   window_with_focus->details_type, FALSE);
 	else
 		display_set_layout(window_with_focus, AUTO_SIZE_ICONS,
-				   window_with_focus->details_type);
+				   window_with_focus->details_type, FALSE);
 }
 
 static void set_with(gpointer data, guint action, GtkWidget *widget)
@@ -891,7 +897,7 @@ static void set_with(gpointer data, guint action, GtkWidget *widget)
 	size = window_with_focus->display_style_wanted;
 
 	filer_set_view_type(window_with_focus, VIEW_TYPE_COLLECTION);
-	display_set_layout(window_with_focus, size, action);
+	display_set_layout(window_with_focus, size, action, FALSE);
 }
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)

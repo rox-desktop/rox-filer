@@ -38,7 +38,8 @@ extern Option o_small_width;
 void display_init(void);
 void display_set_layout(FilerWindow  *filer_window,
 			DisplayStyle style,
-			DetailsType  details);
+			DetailsType  details,
+			gboolean     force_resize);
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
 void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs);
 int sort_by_name(const void *item1, const void *item2);
@@ -67,6 +68,6 @@ void display_update_view(FilerWindow *filer_window,
 void display_update_views(FilerWindow *filer_window);
 void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 		     DirItem  *item, MaskedPixmap *image, gboolean selected);
-void display_set_actual_size(FilerWindow *filer_window);
+void display_set_actual_size(FilerWindow *filer_window, gboolean force_resize);
 
 #endif /* _DISPLAY_H */

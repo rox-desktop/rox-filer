@@ -121,7 +121,7 @@
    then you'll need to compile it before you can use it. If you downloaded
    and installed a binary package, or if <application>ROX-Filer</application>
    was included with your system, then you can skip this section. If you got
-   here by clicking on the `i' symbol in a filer window, or if typing
+   here by clicking on the lifebelt symbol in a filer window, or if typing
    <command>rox</command> at a shell prompt works, then you don't need to
    compile.
 
@@ -3178,32 +3178,6 @@ when clicked and from doing other odd things.
     in the filer and explains its purpose. This is a good place to start reading
     if you want to know how the filer works.
    </para>
-
-   <para>
-    In summary, each window has its own <classname>FilerWindow</classname>
-    structure.
-    This structure has pointers to a <classname>Collection</classname>
-    (which is the widget which actually displays the files) and to a
-    <classname>Directory</classname>, which is used to cache the directory
-    contents.
-    </para><para>
-    Both <classname>Collection</classname> and
-    <classname>Directory</classname> have pointers to (the same)
-    <classname>DirItem</classname>s, each of which corresponds to one filesystem
-    object.
-    </para><para>
-    Several <classname>FilerWindow</classname>s may share the same
-    <classname>Directory</classname>.
-    </para><para>
-    While scanning is in progress the <classname>Directory</classname>
-    keeps a list of the new items it has found
-    (<emphasis>new_items</emphasis>) and the items which have changed in some way
-    (<emphasis>up_items</emphasis>). It periodically notifies the filer window of
-    the changes-so-far by calling all the functions in the
-    <emphasis>users</emphasis> list (use <function>attach()</function>
-    and <function>detach()</function> to add and remove functions to or from
-    the list).
-   </para>
   </sect1>
  </chapter>
 
@@ -3459,7 +3433,7 @@ EOF</screen>
      Open a window showing directory <parameter>Filename</parameter>.
      <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      or <userinput>Automatic</userinput>.
-     <parameter>Details</parameter> is one of <userinput>None</userinput>, <userinput>Summary</userinput>, <userinput>Size</userinput>, <userinput>Type</userinput>, <userinput>Times</userinput> or <userinput>Permissions</userinput>.
+     <parameter>Details</parameter> is one of <userinput>None</userinput>, <userinput>ListView</userinput>, <userinput>Size</userinput>, <userinput>Type</userinput>, <userinput>Times</userinput> or <userinput>Permissions</userinput>.
      <parameter>Sort</parameter> is one of <userinput>Name</userinput>, <userinput>Type</userinput>, <userinput>Date</userinput> or <userinput>Size</userinput>.
      If any of these three option parameters are missing, the default is used.
      <parameter>Class</parameter> can be used to set the WM_CLASS property on the new window. You can

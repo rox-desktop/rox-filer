@@ -334,9 +334,13 @@ void display_set_sort_fn(FilerWindow *filer_window,
 	view_sort(filer_window->view);
 }
 
+/* Change the icon size and style.
+ * force_resize should only be TRUE for new windows.
+ */
 void display_set_layout(FilerWindow  *filer_window,
 			DisplayStyle style,
-			DetailsType  details)
+			DetailsType  details,
+			gboolean     force_resize)
 {
 	g_return_if_fail(filer_window != NULL);
 
@@ -346,7 +350,7 @@ void display_set_layout(FilerWindow  *filer_window,
 	/* Recreate layouts because wrapping may have changed */
 	view_style_changed(filer_window->view, VIEW_UPDATE_NAME);
 
-	if (o_filer_auto_resize.int_value != RESIZE_NEVER)
+	if (force_resize || o_filer_auto_resize.int_value != RESIZE_NEVER)
 		view_autosize(filer_window->view);
 }
 
@@ -420,7 +424,8 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
 			break;
 	}
 
-	display_set_layout(filer_window, new, filer_window->details_type);
+	display_set_layout(filer_window, new, filer_window->details_type,
+			   FALSE);
 }
 
 ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
@@ -442,10 +447,10 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
  * is AUTO_SIZE_ICONS, choose an appropriate size. Also resizes filer
  * window, if requested.
  */
-void display_set_actual_size(FilerWindow *filer_window)
+void display_set_actual_size(FilerWindow *filer_window, gboolean force_resize)
 {
 	display_set_layout(filer_window, filer_window->display_style_wanted,
-					 filer_window->details_type);
+			   filer_window->details_type, force_resize);
 }
 
 

@@ -261,7 +261,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
-		display_set_actual_size(filer_window);
+		display_set_actual_size(filer_window, TRUE);
 		gtk_widget_show(filer_window->window);
 	}
 
@@ -862,10 +862,12 @@ void filer_window_toggle_cursor_item_selected(FilerWindow *filer_window)
 }
 
 /* Handle keys that can't be bound with the menu */
-static gint key_press_event(GtkWidget	*widget,
-			GdkEventKey	*event,
-			FilerWindow	*filer_window)
+gint filer_key_press_event(GtkWidget	*widget,
+			   GdkEventKey	*event,
+			   FilerWindow	*filer_window)
 {
+	ViewIface *view = filer_window->view;
+	ViewIter cursor;
 	GtkWidget *focus = GTK_WINDOW(widget)->focus_widget;
 	guint key = event->keyval;
 	char group[2] = "1";
@@ -873,17 +875,29 @@ static gint key_press_event(GtkWidget	*widget,
 	window_with_focus = filer_window;
 
 	/* Delay setting up the keys until now to speed loading... */
-	if (!filer_keys)
-		ensure_filer_menu();	/* Gets the keys working... */
+	if (ensure_filer_menu())
+	{
+		/* Gtk updates in an idle-handler, so force a recheck now */
+		g_signal_emit_by_name(widget, "keys_changed");
+	}
 
-	if (!g_slist_find(filer_keys->acceleratables, widget))
-		gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
-					   filer_keys);
-
-	if (focus && focus != widget &&
-	    gtk_widget_get_toplevel(focus) == widget)
+	if (focus && focus == filer_window->minibuffer)
 		if (gtk_widget_event(focus, (GdkEvent *) event))
 			return TRUE;	/* Handled */
+
+	if (!focus)
+		gtk_widget_grab_focus(GTK_WIDGET(view));
+
+	view_get_cursor(view, &cursor);
+	if (!cursor.peek(&cursor) && (key == GDK_Up || key == GDK_Down))
+	{
+		ViewIter iter;
+		view_get_iter(view, &iter, 0);
+		if (iter.next(&iter))
+			view_cursor_to_iter(view, &iter);
+		gtk_widget_grab_focus(GTK_WIDGET(view));
+		return TRUE;
+	}
 
 	switch (key)
 	{
@@ -924,8 +938,14 @@ static gint key_press_event(GtkWidget	*widget,
 			else if (key >= GDK_KP_0 && key <= GDK_KP_9)
 				group[0] = key - GDK_KP_0 + '0';
 			else
+			{
+				if (focus && focus != widget &&
+				    gtk_widget_get_toplevel(focus) == widget)
+					if (gtk_widget_event(focus,
+							(GdkEvent *) event))
+						return TRUE;	/* Handled */
 				return FALSE;
-
+			}
 
 			if (event->state & GDK_CONTROL_MASK)
 				group_save(filer_window, group);
@@ -1042,7 +1062,7 @@ void filer_change_to(FilerWindow *filer_window,
 
 	attach(filer_window);
 	
-	display_set_actual_size(filer_window);
+	display_set_actual_size(filer_window, FALSE);
 
 	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
 		view_autosize(filer_window->view);
@@ -1192,7 +1212,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
-	display_set_layout(filer_window, dstyle, dtype);
+	display_set_layout(filer_window, dstyle, dtype, TRUE);
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to
@@ -1404,7 +1424,10 @@ static void filer_add_signals(FilerWindow *filer_window)
 	g_signal_connect(filer_window->window, "popup-menu",
 			G_CALLBACK(popup_menu), filer_window);
 	g_signal_connect(filer_window->window, "key_press_event",
-			G_CALLBACK(key_press_event), filer_window);
+			G_CALLBACK(filer_key_press_event), filer_window);
+
+	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
+				   filer_keys);
 }
 
 static gint clear_scanning_display(FilerWindow *filer_window)
@@ -1483,6 +1506,7 @@ void filer_check_mounted(const char *real_path)
 	GList	*next = all_filer_windows;
 	gchar	*parent;
 	int	len;
+	gboolean resize = o_filer_auto_resize.int_value == RESIZE_ALWAYS;
 
 	len = strlen(real_path);
 
@@ -1497,7 +1521,11 @@ void filer_check_mounted(const char *real_path)
 			char	s = filer_window->real_path[len];
 
 			if (s == '/' || s == '\0')
+			{
 				filer_update_dir(filer_window, FALSE);
+				if (resize)
+					view_autosize(filer_window->view);
+			}
 		}
 	}
 
@@ -2046,10 +2074,7 @@ static gboolean tooltip_activate(GtkWidget *window)
 	filer_window = g_object_get_data(G_OBJECT(window), "filer_window");
 
 	if (!filer_window)
-	{
-		g_print("[ window destroyed ]\n");
 		return FALSE;	/* Window has been destroyed */
-	}
 
 	view = filer_window->view;
 

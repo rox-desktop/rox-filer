@@ -590,7 +590,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		if (ds == UNKNOWN_STYLE)
 			g_warning("Unknown style '%s'\n", style);
 		else
-			display_set_layout(fwin, ds, fwin->details_type);
+			display_set_layout(fwin, ds, fwin->details_type, TRUE);
 
 		g_free(style);
 	}
@@ -598,9 +598,10 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	if (details)
 	{
 		DetailsType dt;
+		ViewType view_type;
 		
 		dt = !g_strcasecmp(details, "None") ? DETAILS_NONE :
-		     !g_strcasecmp(details, "Summary") ? DETAILS_NONE :
+		     !g_strcasecmp(details, "ListView") ? DETAILS_NONE :
 		     !g_strcasecmp(details, "Size") ? DETAILS_SIZE :
 		     !g_strcasecmp(details, "Type") ? DETAILS_TYPE :
 		     !g_strcasecmp(details, "Times") ? DETAILS_TIMES :
@@ -611,8 +612,16 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		if (dt == DETAILS_UNKNOWN)
 			g_warning("Unknown details type '%s'\n", details);
 		else
-			display_set_layout(fwin,
-					   fwin->display_style_wanted, dt);
+			display_set_layout(fwin, fwin->display_style_wanted,
+					   dt, TRUE);
+
+		if (g_strcasecmp(details, "ListView") == 0)
+			view_type = VIEW_TYPE_DETAILS;
+		else
+			view_type = VIEW_TYPE_COLLECTION;
+
+		if (view_type != fwin->view_type)
+			filer_set_view_type(fwin, view_type);
 		
 		g_free(details);
 	}

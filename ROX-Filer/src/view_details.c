@@ -88,6 +88,8 @@ struct _ViewDetails {
 	int	    (*sort_fn)(const void *, const void *);
 
 	int	    cursor_base;	/* Cursor when minibuffer opened */
+
+	GtkRequisition desired_size;
 };
 
 /* Static prototypes */
@@ -610,6 +612,11 @@ static gboolean view_details_button_press(GtkWidget *widget,
 					  GdkEventButton *bev)
 {
 	FilerWindow *filer_window = ((ViewDetails *) widget)->filer_window;
+	GtkTreeView *tree = (GtkTreeView *) widget;
+
+	if (bev->window != gtk_tree_view_get_bin_window(tree))
+		return GTK_WIDGET_CLASS(parent_class)->button_press_event(
+								widget, bev);
 
 	if (dnd_motion_press(widget, bev))
 		filer_perform_action(filer_window, bev);
@@ -621,6 +628,11 @@ static gboolean view_details_button_release(GtkWidget *widget,
 					    GdkEventButton *bev)
 {
 	FilerWindow *filer_window = ((ViewDetails *) widget)->filer_window;
+	GtkTreeView *tree = (GtkTreeView *) widget;
+
+	if (bev->window != gtk_tree_view_get_bin_window(tree))
+		return GTK_WIDGET_CLASS(parent_class)->button_release_event(
+								widget, bev);
 
 	if (!dnd_motion_release(bev))
 		filer_perform_action(filer_window, bev);
@@ -628,27 +640,14 @@ static gboolean view_details_button_release(GtkWidget *widget,
 	return TRUE;
 }
 
-static gint view_details_key_press_event(GtkWidget *widget, GdkEventKey *event)
-{
-	ViewDetails *view_details = (ViewDetails *) widget;
-	FilerWindow *filer_window = view_details->filer_window;
-
-	switch (event->keyval)
-	{
-		case ' ':
-			filer_window_toggle_cursor_item_selected(filer_window);
-			return TRUE;
-		case GDK_BackSpace:
-			change_to_parent(filer_window);
-			return TRUE;
-	}
-
-	return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget, event);
-}
-
 static gint view_details_motion_notify(GtkWidget *widget, GdkEventMotion *event)
 {
 	ViewDetails *view_details = (ViewDetails *) widget;
+	GtkTreeView *tree = (GtkTreeView *) widget;
+
+	if (event->window != gtk_tree_view_get_bin_window(tree))
+		return GTK_WIDGET_CLASS(parent_class)->motion_notify_event(
+								widget, event);
 
 	return filer_motion_notify(view_details->filer_window, event);
 }
@@ -696,6 +695,19 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 	return FALSE;
 }
 
+static void view_details_size_request(GtkWidget *widget,
+				      GtkRequisition *requisition)
+{
+	ViewDetails *view_details = (ViewDetails *) widget;
+
+	(*GTK_WIDGET_CLASS(parent_class)->size_request)(widget, requisition);
+
+	view_details->desired_size = *requisition;
+	
+	requisition->height = 50;
+	requisition->width = 50;
+}
+
 static void view_details_destroy(GtkObject *view_details)
 {
 	VIEW_DETAILS(view_details)->filer_window = NULL;
@@ -723,9 +735,9 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 
 	widget->button_press_event = view_details_button_press;
 	widget->button_release_event = view_details_button_release;
-	widget->key_press_event = view_details_key_press_event;
 	widget->motion_notify_event = view_details_motion_notify;
 	widget->expose_event = view_details_expose;
+	widget->size_request = view_details_size_request;
 }
 
 static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
@@ -757,6 +769,8 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	view_details->items = g_ptr_array_new();
 	view_details->cursor_base = -1;
+	view_details->desired_size.width = -1;
+	view_details->desired_size.height = -1;
 
 	selection = gtk_tree_view_get_selection(treeview);
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
@@ -780,6 +794,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	ADD_TEXT_COLUMN(_("_Name"), COL_LEAF);
 	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
+	gtk_tree_view_column_set_resizable(column, TRUE);
 	ADD_TEXT_COLUMN(_("_Type"), COL_TYPE);
 	gtk_tree_view_column_set_sort_column_id(column, COL_TYPE);
 	ADD_TEXT_COLUMN(_("_Permissions"), COL_PERM);
@@ -791,8 +806,6 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
 	ADD_TEXT_COLUMN(_("Last _Modified"), COL_MTIME);
 	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
-
-	gtk_widget_set_size_request(GTK_WIDGET(treeview), -1, 50);
 }
 
 /* Create the handers for the View interface */
@@ -1247,28 +1260,19 @@ static void view_details_autosize(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 	FilerWindow *filer_window = view_details->filer_window;
-	GdkWindow *bin;
+	int max_width = (o_filer_size_limit.int_value * screen_width) / 100;
 	int max_height = (o_filer_size_limit.int_value * screen_height) / 100;
-	int h, y;
-	GtkTreeView *tree = (GtkTreeView *) view;
-	GtkTreeViewColumn *column;
+	int h;
 	GtkRequisition req;
 
+	gtk_widget_queue_resize(GTK_WIDGET(view));
 	gtk_widget_size_request(GTK_WIDGET(view), &req);
-	column = gtk_tree_view_get_column(tree, 1);
-	gtk_tree_view_column_cell_get_size(column, NULL, NULL, NULL, NULL, &h);
 
-	bin = gtk_tree_view_get_bin_window(GTK_TREE_VIEW(view));
+	h = MAX(view_details->desired_size.height, SMALL_HEIGHT);
 
-	gdk_window_get_position(bin, NULL, &y);
-
-	h = MAX(h, SMALL_HEIGHT);
-
-	h = (view_details->items->len + 2) * h + y;
-
-	h = MIN(h, max_height);
-
-	filer_window_set_size(filer_window, 5, h);
+	filer_window_set_size(filer_window,
+			MIN(view_details->desired_size.width, max_width),
+			MIN(h, max_height));
 }
 
 static gboolean view_details_cursor_visible(ViewIface *view)

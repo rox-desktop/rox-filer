@@ -406,7 +406,8 @@ static void set_size(GtkMenuItem *item, gpointer data)
 	size = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(item),
 						 "rox-icon-size"));
 
-	display_set_layout(filer_window, size, filer_window->details_type);
+	display_set_layout(filer_window, size, filer_window->details_type,
+			   FALSE);
 }
 
 static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -425,7 +426,7 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	{
 		if (bev->button != 1)
 			display_set_layout(filer_window, AUTO_SIZE_ICONS,
-					   filer_window->details_type);
+					   filer_window->details_type, TRUE);
 		return;
 	}
 
