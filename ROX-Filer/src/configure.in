@@ -16,6 +16,20 @@ Thank you.
 ])
 ])
 
+dnl Checks for programs.
+AC_PROG_CC
+
+dnl Use -Wall, etc if possible
+dnl Note: GTK uses func(), so can't use -Wstrict-prototypes 
+[
+if test "x$GCC" = "xyes"; then
+  case " $CFLAGS " in
+  *[\ \	]-Wall[\ \	]*) ;;
+  *) CFLAGS="$CFLAGS -Wall -Wmissing-prototypes" ;;
+  esac
+fi
+]
+
 if test -z "$PKG_CONFIG"; then
   PKG_CONFIG=pkg-config
 fi
@@ -73,20 +87,6 @@ if "$PKG_CONFIG" --atleast-version=1.1.2 pango ; then
 else
   AC_MSG_RESULT(no; better wrapping not enabled)
 fi
-
-dnl Checks for programs.
-AC_PROG_CC
-
-dnl Use -Wall, etc if possible
-dnl Note: GTK uses func(), so can't use -Wstrict-prototypes 
-[
-if test "x$GCC" = "xyes"; then
-  case " $CFLAGS " in
-  *[\ \	]-Wall[\ \	]*) ;;
-  *) CFLAGS="$CFLAGS -Wall -Wmissing-prototypes" ;;
-  esac
-fi
-]
 
 dnl Find the X libraries
 AC_PATH_XTRA
