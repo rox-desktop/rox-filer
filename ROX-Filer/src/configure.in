@@ -26,6 +26,22 @@ else
 fi
 changequote([,])dnl
 
+dnl Find ImLib
+AC_MSG_CHECKING(for ImLib library)
+IMLIB_LIBS=`imlib-config --libs-gdk 2> /dev/null`
+changequote(,)dnl
+if [ -n "$IMLIB_LIBS" ]; then
+changequote([,])dnl
+  AC_MSG_RESULT(yes - use '$IMLIB_LIBS')
+  AC_DEFINE(HAVE_IMLIB)
+  IMLIB_CFLAGS=`imlib-config --cflags-gdk`
+else
+  AC_MSG_RESULT(no - 'imlib-config --libs-gdk' failed)
+  IMLIB_CFLAGS=""
+fi
+AC_SUBST(IMLIB_CFLAGS)
+AC_SUBST(IMLIB_LIBS)
+
 dnl Does file(1) support '-b' ?
 AC_MSG_CHECKING(whether file -b works)
 if file -b / > /dev/null 2> /dev/null

@@ -6,8 +6,10 @@ LIBS = @LIBS@
 .SUFFIXES: .c .o
 
 CC = @CC@
+IMLIB_CFLAGS = @IMLIB_CFLAGS@
+IMLIB_LIBS = @IMLIB_LIBS@
 CFLAGS = @CFLAGS@ `gtk-config --cflags` -I.
-LDFLAGS = @LDFLAGS@ `gtk-config --libs` ${LIBS}
+LDFLAGS = @LDFLAGS@ `gtk-config --libs` ${LIBS} ${IMLIB_LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
@@ -35,3 +37,9 @@ clean:
 
 depend:
 	makedepend -- $(CFLAGS) -- $(SRCS)
+
+############ Special case
+
+pixmaps.o: pixmaps.c
+	${CC} ${CFLAGS} ${IMLIB_CFLAGS} -c $< -o $@
+
