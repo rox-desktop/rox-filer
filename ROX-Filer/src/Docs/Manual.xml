@@ -601,7 +601,7 @@ get the pathnames of the selected files.
 <procedure>
   <title>Example: loading a file into an application that doesn't support drag-and-drop:</title>
 
-  <step><para>Open the application's <guilabel>Open</guilabel> dialog box.</para></step>
+  <step><para>Open the application's Open dialog box.</para></step>
 
   <step><para>
 Ctrl-click on the file in <application>ROX-Filer</application> to select it.
@@ -869,9 +869,10 @@ people who own the files even if they have write permission on the
 directory itself.</para></listitem>
 
 </itemizedlist>
-<!-- XXX: Make this appear underlined! -->
-For example, <computeroutput>_r_w_x_,rwx,r-x/&mdash;</computeroutput> means
-that the owner of the file is the same as the effective user of
+For example,
+<programlisting>
+<emphasis role="underline">rwx</emphasis>,rwx,r-x/---</programlisting>
+means that the owner of the file is the same as the effective user of
 <application>ROX-Filer</application> (basically, you own the file), you and
 members of the file's group have read, write and execute permission and other
 people have only read and execute permission. There are no special flags set.

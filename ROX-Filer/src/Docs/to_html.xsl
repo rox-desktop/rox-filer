@@ -139,5 +139,16 @@ span.keycap {
       <xsl:apply-templates/>
     </div>
   </xsl:template>
+
+  <xsl:template match="emphasis">
+    <xsl:choose>
+      <xsl:when test="@role='underline'">
+        <u><xsl:apply-templates/></u>
+      </xsl:when>
+      <xsl:otherwise>
+        <xsl:apply-imports/>
+      </xsl:otherwise>
+    </xsl:choose>
+  </xsl:template>
   
 </xsl:stylesheet>
