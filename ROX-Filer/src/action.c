@@ -557,7 +557,13 @@ static void message_from_child(gpointer 	 data,
 		{
 			buffer[message_len] = '\0';
 			if (*buffer == '?')
+			{
 				SENSITIVE_YESNO(gui_side, TRUE);
+				gtk_window_set_focus(
+					GTK_WINDOW(gui_side->window),
+					gui_side->entry ? gui_side->entry
+							: gui_side->yes);
+			}
 			else if (*buffer == '+')
 			{
 				refresh_dirs(buffer + 1);
@@ -899,7 +905,6 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 		gtk_signal_disconnect_by_data(
 				GTK_OBJECT(gui_side->preview->window),
 				gui_side);
-		g_print("[ forget preview ]\n");
 		gui_side->preview = NULL;
 	}
 	
@@ -1900,6 +1905,8 @@ void action_find(FilerWindow *filer_window)
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Find");
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
+	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
+			gtk_button_clicked, GTK_OBJECT(gui_side->quiet));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2036,6 +2043,8 @@ void action_chmod(FilerWindow *filer_window)
 	
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Permissions");
+	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
+			gtk_button_clicked, GTK_OBJECT(gui_side->yes));
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
