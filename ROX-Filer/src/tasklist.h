@@ -9,5 +9,6 @@
 #define _TASKLIST_H
 
 void tasklist_set_active(gboolean active);
+void tasklist_style_changed(void);
 
 #endif /* _TASKLIST_H */

@@ -106,8 +106,8 @@ struct _PinIcon {
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
-/* Used for the text colours (only) in the icons */
-static GdkColor text_fg_col, text_bg_col;
+/* Used for the text colours (only) in the icons (and tasklist windows) */
+GdkColor pin_text_fg_col, pin_text_bg_col;
 
 /* Style that all the icons should use. NULL => regenerate from text_fg/bg */
 static GtkStyle *pinicon_style = NULL;
@@ -131,6 +131,7 @@ static Option o_pinboard_tasklist;
 /* Static prototypes */
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
+static gint stop_expose(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
@@ -199,8 +200,8 @@ static void abandon_backdrop_app(Pinboard *pinboard);
 
 void pinboard_init(void)
 {
-	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#000");
-	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#ddd");
+	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#fff");
+	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#888");
 
 	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
@@ -209,8 +210,8 @@ void pinboard_init(void)
 
 	option_add_notify(pinboard_check_options);
 
-	gdk_color_parse(o_pinboard_fg_colour.value, &text_fg_col);
-	gdk_color_parse(o_pinboard_bg_colour.value, &text_bg_col);
+	gdk_color_parse(o_pinboard_fg_colour.value, &pin_text_fg_col);
+	gdk_color_parse(o_pinboard_bg_colour.value, &pin_text_bg_col);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -410,6 +411,8 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 			G_CALLBACK(button_release_event), pi);
 	g_signal_connect(pi->win, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), pi);
+	g_signal_connect(pi->win, "expose-event",
+			G_CALLBACK(stop_expose), pi);
 	g_signal_connect(pi->widget, "expose-event",
 			G_CALLBACK(draw_icon), pi);
 	g_signal_connect_swapped(pi->win, "destroy",
@@ -568,11 +571,13 @@ static void pinboard_check_options(void)
 	gdk_color_parse(o_pinboard_fg_colour.value, &n_fg);
 	gdk_color_parse(o_pinboard_bg_colour.value, &n_bg);
 
-	if (gdk_color_equal(&n_fg, &text_fg_col) == 0 ||
-		gdk_color_equal(&n_bg, &text_bg_col) == 0)
+	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
+
+	if (gdk_color_equal(&n_fg, &pin_text_fg_col) == 0 ||
+		gdk_color_equal(&n_bg, &pin_text_bg_col) == 0)
 	{
-		memcpy(&text_fg_col, &n_fg, sizeof(GdkColor));
-		memcpy(&text_bg_col, &n_bg, sizeof(GdkColor));
+		memcpy(&pin_text_fg_col, &n_fg, sizeof(GdkColor));
+		memcpy(&pin_text_bg_col, &n_bg, sizeof(GdkColor));
 
 		if (pinicon_style)
 		{
@@ -582,9 +587,9 @@ static void pinboard_check_options(void)
 
 		if (current_pinboard)
 			reshape_all();
-	}
 
-	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
+		tasklist_style_changed();
+	}
 }
 
 static gint end_wink(gpointer data)
@@ -603,22 +608,29 @@ static void set_size_and_style(PinIcon *pi)
 	int		iwidth = image->width;
 	int		iheight = image->height;
 
-	if (!pinicon_style)
-	{
-		pinicon_style = gtk_style_copy(pi->widget->style);
-		memcpy(&pinicon_style->fg[GTK_STATE_NORMAL],
-			&text_fg_col, sizeof(GdkColor));
-		memcpy(&pinicon_style->bg[GTK_STATE_NORMAL],
-			&text_bg_col, sizeof(GdkColor));
-	}
-	/* XXX */
-#if 0
-	gtk_widget_set_style(pi->widget, pinicon_style);
-#endif
+	gtk_widget_modify_fg(pi->label, GTK_STATE_PRELIGHT, &pin_text_fg_col);
+	gtk_widget_modify_bg(pi->label, GTK_STATE_PRELIGHT, &pin_text_bg_col);
+	gtk_widget_modify_fg(pi->label, GTK_STATE_NORMAL, &pin_text_fg_col);
+	gtk_widget_modify_bg(pi->label, GTK_STATE_NORMAL, &pin_text_bg_col);
 
 	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
 
 	gtk_widget_set_size_request(pi->widget, iwidth, iheight);
+}
+
+/* Don't draw the normal button effect */
+static gint stop_expose(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
+{
+	static GtkWidgetClass *parent_class = NULL;
+	
+	if (!parent_class)
+	{
+		gpointer c = ((GTypeInstance *) widget)->g_class;
+		parent_class = (GtkWidgetClass *) g_type_class_peek_parent(c);
+	}
+
+	(parent_class->expose_event)(widget, event);
+	return TRUE;
 }
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
@@ -629,8 +641,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	int		iwidth = image->width;
 	int		iheight = image->height;
 	int		x, y;
-	//GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
-	//				       : GTK_STATE_NORMAL;
+	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
+					       : GTK_STATE_NORMAL;
 
 
 	x = widget->allocation.x;
@@ -670,28 +682,18 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 
-#if 0
-	text_x = (pi->width - pi->name_width) >> 1;
-	text_y = WINK_FRAME + iheight + GAP + 1;
+	if (icon->selected)
+	{
+		gtk_paint_flat_box(pi->label->style, pi->label->window,
+				state,
+				GTK_SHADOW_NONE,
+				NULL, pi->label, "text",
+				pi->label->allocation.x,
+				pi->label->allocation.y,
+				pi->label->allocation.width,
+				pi->label->allocation.height);
+	}
 
-	pango_layout_get_pixel_extents(pi->layout, NULL, &logical);
-
-	gtk_paint_flat_box(widget->style, widget->window,
-			state,
-			GTK_SHADOW_NONE,
-			NULL, widget, "text",
-			text_x - 1,
-			text_y - 1,
-			pi->name_width + 2,
-			logical.height - logical.y + 2);
-
-	gtk_paint_layout(widget->style, widget->window,
-			state,
-			FALSE, NULL, widget, "text",
-			text_x,
-			text_y,
-			pi->layout);
-#endif
 	return FALSE;
 }
 

@@ -279,15 +279,8 @@ int main(int argc, char **argv)
 		"style \"rox-default-pinboard-style\" {\n"
 		"  bg[NORMAL] = \"#666666\"\n"
 		"}\n"
-		"style \"rox-default-pinboard-icon-style\" {\n"
-		"  fg[NORMAL] = \"#ffffff\"\n"
-		"}\n"
-		"\n"
 		"widget \"rox-pinboard\" style : gtk "
 		"\"rox-default-pinboard-style\"\n"
-		
-		"widget \"rox-pinboard.*\" style : gtk "
-		"\"rox-default-pinboard-icon-style\"\n"
 
 		"class \"Collection\" style : gtk "
 		"\"rox-default-collection-style\"\n");

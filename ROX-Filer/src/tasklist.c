@@ -40,6 +40,7 @@
 #include "gui_support.h"
 #include "main.h"
 #include "pinboard.h"
+#include "pixmaps.h"
 
 /* There is one of these for each window controlled by the window
  * manager (all tasks) in the _NET_CLIENT_LIST property.
@@ -48,6 +49,7 @@ typedef struct _IconWindow IconWindow;
 
 struct _IconWindow {
 	GtkWidget *widget;	/* Widget used for icon when iconified */
+	GtkWidget *label;
 	gchar *text;
 	Window xwindow;
 	gboolean iconified;
@@ -84,6 +86,7 @@ static void state_changed(IconWindow *win);
 static void show_icon(IconWindow *win);
 static void icon_win_free(IconWindow *win);
 static void set_iconify_pos(IconWindow *win);
+static void update_style(gpointer key, gpointer data, gpointer user_data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -135,6 +138,11 @@ void tasklist_set_active(gboolean active)
 	tasklist_update(!active);
 }
 
+/* User has changes the colours in the options box... */
+void tasklist_style_changed(void)
+{
+	g_hash_table_foreach(known, update_style, NULL);
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -143,6 +151,7 @@ void tasklist_set_active(gboolean active)
 static void icon_win_free(IconWindow *win)
 {
 	g_return_if_fail(win->widget == NULL);
+	g_return_if_fail(win->label == NULL);
 
 	if (win->text)
 		g_free(win->text);
@@ -350,6 +359,7 @@ static void add_window(Window win)
 
 		w = g_new(IconWindow, 1);
 		w->widget = NULL;
+		w->label = NULL;
 		w->text = NULL;
 		w->xwindow = win;
 		w->iconified = FALSE;
@@ -524,11 +534,31 @@ static void button_released(GtkWidget *widget, IconWindow *win)
 /* A window has been iconified -- display it on the screen */
 static void show_icon(IconWindow *win)
 {
+	static MaskedPixmap *icon = NULL;
 	GtkRequisition req;
+	GtkWidget *vbox;
 
 	g_return_if_fail(win->widget == NULL);
+	g_return_if_fail(win->label == NULL);
 
-	win->widget = gtk_button_new_with_label(win->text);
+	if (!icon)
+		icon = load_pixmap("images/iconified.png");
+
+	win->widget = gtk_button_new();
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(win->widget), vbox);
+
+	gtk_box_pack_start(GTK_BOX(vbox),
+		gtk_image_new_from_pixbuf(icon->pixbuf),
+		FALSE, TRUE, 0);
+
+	gtk_button_set_relief(GTK_BUTTON(win->widget), GTK_RELIEF_NONE);
+		
+	win->label = gtk_label_new(win->text);
+
+	update_style(NULL, win, NULL);
+
+	gtk_box_pack_start(GTK_BOX(vbox), win->label, FALSE, TRUE, 0);
 
 	gtk_widget_add_events(win->widget, GDK_BUTTON1_MOTION_MASK);
 	g_signal_connect(win->widget, "button-press-event",
@@ -555,6 +585,7 @@ static void hide_icon(IconWindow *win)
 	g_return_if_fail(widget != NULL);
 
 	win->widget = NULL;
+	win->label = NULL;
 	gtk_widget_destroy(widget);
 }
 
@@ -584,5 +615,18 @@ static void set_iconify_pos(IconWindow *win)
 	XChangeProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(xa__NET_WM_ICON_GEOMETRY),
 			XA_CARDINAL, 32, PropModeReplace, (guchar *) data, 4);
+}
+
+static void update_style(gpointer key, gpointer data, gpointer user_data)
+{
+	IconWindow *win = (IconWindow *) data;
+
+	if (win->widget)
+	{
+		gtk_widget_modify_fg(win->label,
+					GTK_STATE_NORMAL, &pin_text_fg_col);
+		gtk_widget_modify_bg(win->label,
+					GTK_STATE_NORMAL, &pin_text_bg_col);
+	}
 }
 
