@@ -787,14 +787,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 				filer_window->show_hidden);
 		buffer = g_string_new(NULL);
 
-		if (collection->number_selected == 1)
-		{
-			item = selected_item(filer_window->collection);
-			if (!item->image)
-				dir_update_item(filer_window->directory,
-						item->leafname);
-		}
-		
 		switch (collection->number_selected)
 		{
 			case 0:
@@ -802,6 +794,10 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 				items_sensitive(TRUE);
 				break;
 			case 1:
+				item = selected_item(filer_window->collection);
+				if (!item->image)
+					dir_update_item(filer_window->directory,
+							item->leafname);
 				items_sensitive(TRUE);
 				file_item = selected_item(
 						filer_window->collection);
