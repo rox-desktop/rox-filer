@@ -693,22 +693,6 @@ gboolean rox_spawn(const gchar *dir, const gchar **argv)
 	return TRUE;
 }
 
-/* Called before gtk_init(). Override default styles with our defaults,
- * and override them with user choices, if any.
- */
-void add_default_styles(void)
-{
-	gtk_rc_parse_string("style \"rox-default-collection-style\" {\n"
-		"  bg[NORMAL] = \"#f3f3f3\"\n"
-		"  fg[NORMAL] = \"#000000\"\n"
-		"  bg[INSENSITIVE] = \"#bfbfbf\"\n"
-		"  fg[INSENSITIVE] = \"#000000\"\n"
-		"}\n"
-		"\n"
-		"class \"Collection\" style : "
-		"gtk \"rox-default-collection-style\"\n");
-}
-
 GtkWidget *button_new_mixed(const char *stock, const char *message)
 {
 	GtkWidget *button, *align, *image, *hbox, *label;

@@ -45,7 +45,6 @@ void centre_window(GdkWindow *window, int x, int y);
 void wink_widget(GtkWidget *widget);
 void destroy_on_idle(GtkWidget *widget);
 gboolean rox_spawn(const gchar *dir, const gchar **argv);
-void add_default_styles(void);
 GtkWidget *button_new_mixed(const char *stock, const char *message);
 void entry_set_error(GtkWidget *entry, gboolean error);
 

@@ -269,7 +269,16 @@ int main(int argc, char **argv)
 	 * otherwise we report an error for Gtk's options.
 	 */
 	gtk_init(&argc, &argv);
-	add_default_styles();
+	/* Set a default style for the collection widget */
+	gtk_rc_parse_string("style \"rox-default-collection-style\" {\n"
+		"  bg[NORMAL] = \"#f3f3f3\"\n"
+		"  fg[NORMAL] = \"#000000\"\n"
+		"  bg[INSENSITIVE] = \"#bfbfbf\"\n"
+		"  fg[INSENSITIVE] = \"#000000\"\n"
+		"}\n"
+		"\n"
+		"class \"Collection\" style : "
+		"gtk \"rox-default-collection-style\"\n");
 
 	/* Process each option in turn */
 	while (1)
