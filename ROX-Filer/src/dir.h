@@ -54,6 +54,7 @@ struct _Directory
 
 	GList		*recheck_list;	/* Items to check on callback */
 
+	gboolean	have_scanned;	/* TRUE after first complete scan */
 	gboolean	scanning;	/* TRUE if we sent DIR_START_SCAN */
 
 	/* Old stuff.. */

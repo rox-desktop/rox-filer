@@ -189,8 +189,6 @@ void dir_check_this(guchar *path)
 
 	real_path = pathdup(path);
 
-	g_print("[ dir_check_this(%s) ]\n", real_path);
-
 	slash = strrchr(real_path, '/');
 
 	if (slash)
@@ -276,11 +274,14 @@ static gboolean recheck_callback(gpointer data)
 
 	g_free(leaf);
 
+	/* usleep(200); */
+
 	if (dir->recheck_list)
 		return TRUE;	/* Call again */
 
 	dir_merge_new(dir);
 	
+	dir->have_scanned = TRUE;
 	dir_set_scanning(dir, FALSE);
 	gtk_idle_remove(dir->idle_callback);
 	dir->idle_callback = 0;
@@ -346,12 +347,18 @@ void dir_rescan(Directory *dir, guchar *pathname)
 		g_ptr_array_add(names, g_strdup(ent->d_name));
 	}
 
-	/* Give everyone the list of names, so they can resize if needed */
-	for (next = dir->users; next; next = next->next)
+	/* Give everyone the list of names, so they can resize if needed.
+	 * Only do this if we haven't scanned before, as then the statted
+	 * items will be a better guess.
+	 */
+	if (!dir->have_scanned)
 	{
-		DirUser *user = (DirUser *) next->data;
+		for (next = dir->users; next; next = next->next)
+		{
+			DirUser *user = (DirUser *) next->data;
 
-		user->callback(dir, DIR_NAMES, names, user->data);
+			user->callback(dir, DIR_NAMES, names, user->data);
+		}
 	}
 
 	/* Compare the (sorted) list with the current DirItems, removing
@@ -470,7 +477,6 @@ static void remove_missing(Directory *dir, GPtrArray *keep)
 			 * if it was still there - kill it!
 			 */
 			old++;
-			g_print("[ remove item '%s' ]\n", old_item->leafname);
 			g_ptr_array_add(deleted, old_item);
 		}
 		else if (cmp == 0)
@@ -486,7 +492,6 @@ static void remove_missing(Directory *dir, GPtrArray *keep)
 		{
 			/* new_name wasn't here before. Skip it */
 			new++;
-			g_print("[ new item '%s' ]\n", new_name);
 		}
 	}
 
@@ -650,6 +655,7 @@ static Directory *load(char *pathname, gpointer data)
 	dir->recheck_list = NULL;
 	dir->idle_callback = 0;
 	dir->scanning = FALSE;
+	dir->have_scanned = FALSE;
 	
 	dir->users = NULL;
 	dir->dir_handle = NULL;
@@ -665,6 +671,7 @@ static Directory *load(char *pathname, gpointer data)
 	return dir;
 }
 
+/* Note: dir_cache is never purged, so this shouldn't get called */
 static void destroy(Directory *dir)
 {
 	g_return_if_fail(dir->users == NULL);
@@ -740,8 +747,6 @@ static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
 {
 	g_free(dir->pathname);
 	dir->pathname = g_strdup(path);
-
-	g_print("[ recheck %s - %s ]\n", path, leafname);
 
 	insert_item(dir, leafname);
 	dir_merge_new(dir);

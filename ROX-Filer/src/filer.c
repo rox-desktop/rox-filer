@@ -220,20 +220,35 @@ static void filer_window_set_size(FilerWindow *filer_window,
 						w, h);
 }
 
+/* Resize the window to fit the items currently in the Directory.
+ * This should be used once the Directory has been fully scanned, otherwise
+ * the window will appear too small.
+ * When opening a Directory that hasn't yet been scanned use the DIR_NAMES
+ * instead for a quick estimate.
+ *
+ * This should all work unless you open a directory, get DIR_NAMES, and then
+ * open it again in other window before the items get added. Oh well.
+ */
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 {
 	Collection	*collection = filer_window->collection;
 	int 		n;
 
-	/* If any items are queued to be added, add them now */
+	if (!filer_window->directory->have_scanned)
+		return;
+
+	/* If any items are queued to be added, add them now.
+	 * (this adds items that have been stat()d but not added to the
+	 * Collection, but not items only in recheck_list).
+	 */
 	dir_merge_new(filer_window->directory);
 
 	n = collection->number_of_items;
-	/* XXX: This counts duplicates => may overestimate */
-	n += g_list_length(filer_window->directory->recheck_list);
 	n = MAX(n, 2);
-	g_print("[ Guess n is %d (%d new) ]\n", n,
-			g_list_length(filer_window->directory->recheck_list));
+
+	g_print("[ actual size  = %d x %d ]\n", 
+			collection->item_width,
+			collection->item_height);
 	
 	filer_size_for(filer_window,
 			collection->item_width,
@@ -891,7 +906,9 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 
 	filer_set_title(filer_window);
 	collection_set_cursor_item(filer_window->collection, -1);
+
 	attach(filer_window);
+	filer_window_autosize(filer_window, TRUE);
 
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,

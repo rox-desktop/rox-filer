@@ -585,8 +585,6 @@ void shrink_grid(FilerWindow *filer_window)
 			height = h;
 	}
 
-	g_print("[ actual size %d x %d ]\n", width, height);
-
 	collection_set_item_size(filer_window->collection, width, height);
 }
 
@@ -610,6 +608,8 @@ void display_set_layout(FilerWindow  *filer_window,
 
 	display_style_set(filer_window, style);
 	display_details_set(filer_window, details);
+
+	shrink_grid(filer_window);
 
 	if (option_get_int("filer_auto_resize") != RESIZE_NEVER)
 		filer_window_autosize(filer_window, TRUE);
@@ -1213,6 +1213,7 @@ static void draw_item(GtkWidget *widget,
 				selected, template.details_string);
 }
 
+/* Note: Call shrink_grid after this */
 static void display_details_set(FilerWindow *filer_window, DetailsType details)
 {
 	if (filer_window->details_type == details)
@@ -1221,10 +1222,9 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details)
 
 	filer_window->collection->paint_level = PAINT_CLEAR;
 	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
-	
-	shrink_grid(filer_window);
 }
 
+/* Note: Call shrink_grid after this */
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 {
 	if (filer_window->display_style == style)
@@ -1236,6 +1236,4 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 			(CollectionDrawFunc) draw_item,
 			(CollectionTestFunc) test_point,
 			filer_window);
-
-	shrink_grid(filer_window);
 }
