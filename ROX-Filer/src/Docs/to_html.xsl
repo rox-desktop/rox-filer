@@ -76,4 +76,14 @@
     </div>
   </xsl:template>
 
+  <xsl:template match="email">
+    <xsl:call-template name="inline.monoseq">
+      <xsl:with-param name="content">
+        <xsl:text>&lt;</xsl:text>
+        <xsl:apply-templates/>
+        <xsl:text>&gt;</xsl:text>
+      </xsl:with-param>
+    </xsl:call-template>
+  </xsl:template>
+
 </xsl:stylesheet>
