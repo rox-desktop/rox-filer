@@ -299,13 +299,25 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 	event = gtk_get_current_event();
 	if (event && event->type == GDK_KEY_PRESS)
 	{
+		int x, y;
+		int nx, ny;
+
 		GdkWindow *win = filer_window->window->window;
+
+		gdk_window_get_pointer(filer_window->window->window,
+					&x, &y, NULL);
+
+		nx = CLAMP(x, 4, w - 4);
+		ny = CLAMP(y, 4, h - 4);
 		
-		XWarpPointer(gdk_x11_drawable_get_xdisplay(win),
-			     None,
-			     gdk_x11_drawable_get_xid(win),
-			     0, 0, 0, 0,
-			     w - 4, h - 4);
+		if (nx != x || ny != y)
+		{
+			XWarpPointer(gdk_x11_drawable_get_xdisplay(win),
+					None,
+					gdk_x11_drawable_get_xid(win),
+					0, 0, 0, 0,
+					nx, ny);
+		}
 	}
 }
 

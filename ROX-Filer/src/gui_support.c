@@ -1230,6 +1230,7 @@ void keep_below(GdkWindow *window, gboolean setting)
 				gdk_atom_intern("_NET_WM_STATE_BELOW", FALSE),
 				GDK_NONE);
 	}
+#if 0
 	else
 	{
 #if GTK_CHECK_VERSION(2,4,0)
@@ -1239,4 +1240,5 @@ void keep_below(GdkWindow *window, gboolean setting)
 				setting ? GDK_WINDOW_STATE_BELOW : 0);
 #endif
 	}
+#endif
 }
