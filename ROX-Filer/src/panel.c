@@ -211,6 +211,7 @@ static Option o_panel_width;
 static Option o_panel_xinerama;
 static Option o_panel_monitor;
 static Option o_panel_avoid;
+static Option o_panel_is_dock;
 
 static gint panel_monitor = -1;
 GdkRectangle panel_geometry;
@@ -230,6 +231,7 @@ void panel_init(void)
 	option_add_int(&o_panel_monitor, "panel_monitor", 0);
 
 	option_add_int(&o_panel_avoid, "panel_avoid", TRUE);
+	option_add_int(&o_panel_is_dock, "panel_is_dock", FALSE);
 
 	option_add_notify(panel_style_changed);
 
@@ -356,6 +358,10 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	frame = make_insert_frame(panel);
 	g_object_set_data(G_OBJECT(frame), "after", "yes");
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
+
+        if (o_panel_is_dock.int_value)
+		gtk_window_set_type_hint(GTK_WINDOW(panel->window),
+				GDK_WINDOW_TYPE_HINT_DOCK);	
 
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window);
