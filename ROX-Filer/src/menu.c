@@ -58,6 +58,12 @@
 
 #define C_ "<control>"
 
+typedef enum menu_icon_style {
+  MIS_NONE, MIS_SMALL, MIS_LARGE, MIS_HUGE,
+  MIS_CURRENT, /* As per current filer window */
+  MIS_DEFAULT
+} MenuIconStyle;
+
 typedef void (*ActionFn)(GList *paths, char *dest_dir, char *leaf);
 typedef void MenuCallback(GtkWidget *widget, gpointer data);
 
@@ -334,6 +340,7 @@ void menu_init(void)
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
 	option_add_string("menu_xterm", "xterm", NULL);
+	option_add_int("menu_iconsize", MIS_SMALL, NULL);
 	option_add_saver(save_menus);
 
 	tips = gtk_tooltips_new();
@@ -473,11 +480,6 @@ void show_style_menu(FilerWindow *filer_window,
 			(gpointer) pos, event->button, event->time);
 }
 #endif
-
-/* XXX: Is there any point to this? */
-typedef enum menu_icon_style {
-	MIS_NONE, MIS_SMALL, MIS_LARGE, MIS_HUGE
-} MenuIconStyle;
 
 static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			    MenuIconStyle style, CallbackFn func,
@@ -646,6 +648,50 @@ void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item)
 	select_nth_item(GTK_MENU_SHELL(menu), item);
 }
 
+static MenuIconStyle get_menu_icon_style(void)
+{
+	MenuIconStyle mis;
+	int display;
+
+	mis = option_get_int("menu_iconsize");
+
+	switch (mis)
+	{
+		case MIS_NONE: case MIS_SMALL: case MIS_LARGE: case MIS_HUGE:
+			return mis;
+	}
+
+	if (mis == MIS_CURRENT && window_with_focus)
+	{
+		switch (window_with_focus->display_style)
+		{
+			case HUGE_ICONS:
+				return MIS_HUGE;
+			case LARGE_ICONS:
+				return MIS_LARGE;
+			case SMALL_ICONS:
+				return MIS_SMALL;
+			default:
+				break;
+		}
+	}
+
+	display = option_get_int("display_size");
+	switch (display)
+	{
+		case HUGE_ICONS:
+			return MIS_HUGE;
+		case LARGE_ICONS:
+			return MIS_LARGE;
+		case SMALL_ICONS:
+			return MIS_SMALL;
+		default:
+			break;
+	}
+
+	return MIS_SMALL;
+}
+
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
@@ -740,7 +786,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 					file_item, filer_file_menu);
 	}
 
-	update_new_files_menu(MIS_SMALL);
+	update_new_files_menu(get_menu_icon_style());
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
@@ -1554,7 +1600,7 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 		GList	*widgets = NULL;
 		guchar	*dir = (guchar *) path->pdata[i];
 
-		widgets = menu_from_dir(menu, dir, MIS_SMALL,
+		widgets = menu_from_dir(menu, dir, get_menu_icon_style(),
 					(CallbackFn) do_send_to,
 					FALSE, FALSE);
 
