@@ -679,6 +679,14 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	{
 		GList *paths;
 
+		if (filer_window->collection->number_selected == 0)
+		{
+			report_error(PROJECT,
+				_("You should Shift+Menu click over a file to "
+				"send it somewhere"));
+			return;
+		}
+
 		paths = filer_selected_items(filer_window);
 
 		updating_menu--;
