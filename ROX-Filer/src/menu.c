@@ -822,6 +822,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	DirItem		*file;
 	struct stat	info;
 	FileStatus 	*fs = NULL;
+	guint		perm;
 	
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -916,8 +917,12 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
-	label = gtk_label_new(pretty_permissions(info.st_uid, info.st_gid,
-						 info.st_mode));
+	label = gtk_label_new(pretty_permissions(info.st_mode));
+	perm = applicable(info.st_uid, info.st_gid);
+	gtk_label_set_pattern(GTK_LABEL(label),
+			perm == 0 ? "___        " :
+			perm == 1 ? "    ___    " :
+				    "        ___");
 	gtk_widget_set_style(label, fixed_style);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);

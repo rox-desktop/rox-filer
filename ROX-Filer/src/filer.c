@@ -643,7 +643,7 @@ char *details(DirItem *item)
 				S_ISLNK(m) ? "Link " :
 				S_ISSOCK(m) ? "Sock " :
 				S_ISFIFO(m) ? "Pipe " : "File ",
-			pretty_permissions(item->uid, item->gid, m),
+			pretty_permissions(m),
 			format_size_aligned(item->size),
 			time_buf);
 	return buf->str;
@@ -681,6 +681,14 @@ static void draw_item_full_info(GtkWidget *widget,
 			text_x, low_text_y,
 			item->details_width,
 			selected);
+	gdk_draw_rectangle(widget->window,
+			selected ? widget->style->white_gc
+				 : widget->style->black_gc,
+			TRUE,
+			text_x - 1 + fixed_width *
+				(5 + 4 * applicable(item->uid, item->gid)),
+			low_text_y + fixed_font->descent - 1,
+			fixed_width * 3 + 1, 1);
 }
 
 static void draw_item_small(GtkWidget *widget,

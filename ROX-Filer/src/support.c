@@ -270,48 +270,47 @@ int fork_exec_wait(char **argv)
 	return status;
 }
 
-/* Converts a file's mode to a string. Result is a pointer
- * to a static buffer, valid until the next call.
- * uid and gid are for the file - the permissions that affect the
- * filer will be highlighted.
+/* If a file has this UID and GID, which permissions apply to us?
+ * 0 = User, 1 = Group, 2 = World
  */
-char *pretty_permissions(uid_t uid, gid_t gid, mode_t m)
+gint applicable(uid_t uid, gid_t gid)
 {
-	static char buffer[sizeof("rwx,rwx,rwx/UGT")];
-	int	high1 = ~0, high2 = ~0, high3 = ~0;
+	int	i;
 
 	if (uid == euid)
-		high1 = ~32;
-	else if (gid == egid)
-		high2 = ~32;
-	else
-	{
-		int	i;
+		return 0;
 
-		high3 = ~32;
-		for (i = 0; i < ngroups; i++)
-		{
-			if (supplemental_groups[i] == gid)
-			{
-				high2 = ~32;
-				high3 = ~0;
-				break;
-			}
-		}
+	if (gid == egid)
+		return 1;
+
+	for (i = 0; i < ngroups; i++)
+	{
+		if (supplemental_groups[i] == gid)
+			return 1;
 	}
 
-	buffer[0]  = m & S_IRUSR ? 'r'&high1 : '-';
-	buffer[1]  = m & S_IWUSR ? 'w'&high1 : '-';
-	buffer[2]  = m & S_IXUSR ? 'x'&high1 : '-';
-	buffer[3]  = ',';
-	buffer[4]  = m & S_IRGRP ? 'r'&high2 : '-';
-	buffer[5]  = m & S_IWGRP ? 'w'&high2 : '-';
-	buffer[6]  = m & S_IXGRP ? 'x'&high2 : '-';
-	buffer[7]  = ',';
-	buffer[8]  = m & S_IROTH ? 'r'&high3 : '-';
-	buffer[9]  = m & S_IWOTH ? 'w'&high3 : '-';
-	buffer[10] = m & S_IXOTH ? 'x'&high3 : '-';
-	buffer[11] = '/';
+	return 2;
+}
+
+/* Converts a file's mode to a string. Result is a pointer
+ * to a static buffer, valid until the next call.
+ */
+char *pretty_permissions(mode_t m)
+{
+	static char buffer[] = "rwx,rwx,rwx/UGT";
+
+	buffer[0]  = m & S_IRUSR ? 'r' : '-';
+	buffer[1]  = m & S_IWUSR ? 'w' : '-';
+	buffer[2]  = m & S_IXUSR ? 'x' : '-';
+
+	buffer[4]  = m & S_IRGRP ? 'r' : '-';
+	buffer[5]  = m & S_IWGRP ? 'w' : '-';
+	buffer[6]  = m & S_IXGRP ? 'x' : '-';
+
+	buffer[8]  = m & S_IROTH ? 'r' : '-';
+	buffer[9]  = m & S_IWOTH ? 'w' : '-';
+	buffer[10] = m & S_IXOTH ? 'x' : '-';
+
 	buffer[12] = m & S_ISUID ? 'U' : '-';
 	buffer[13] = m & S_ISGID ? 'G' : '-';
 #ifdef S_ISVTX
