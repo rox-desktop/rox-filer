@@ -217,6 +217,8 @@ MIME_type *mime_type_from_contents(const char *path)
 {
 #ifdef HAVE_GNOME_VFS
 	return get_mime_type(gnome_vfs_get_mime_type(path), TRUE);
+#else
+	return NULL;
 #endif
 }
 
