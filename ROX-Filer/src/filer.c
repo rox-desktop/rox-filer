@@ -1219,7 +1219,8 @@ static void filer_set_title(FilerWindow *filer_window)
 	guchar	*title = NULL;
 	guchar	*scanning = filer_window->scanning ? _(" (Scanning)") : "";
 
-	if (strncmp(filer_window->path, home_dir, home_dir_len) == 0)
+	if (home_dir_len > 1 &&
+		strncmp(filer_window->path, home_dir, home_dir_len) == 0)
 	{
 		guchar 	sep = filer_window->path[home_dir_len];
 

@@ -2,10 +2,22 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+24-Sep-2000
+~~~~~~~~~~~
+If the home directory is '/' then don't show it as '~' (suggested by
+Bernard Jungen).
+
+Added '--show=FILE' option - this will be needed by other ROX
+applications, so it needs to be in version 1.0.0.
+
+Bugfix: -d option didn't use realpath before sending to an already-running
+filer.
+
 22-Sep-2000
 ~~~~~~~~~~~
 The 'install.sh' script now uses 'printf' instead of 'echo -e' to suppress
-newlines.
+newlines (suggested by Bernard Jungen).
+
 Bugfix: Close tool was always disabled on started (reported by Martin Ward).
 
 20-Sep-2000

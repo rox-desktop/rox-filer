@@ -1505,7 +1505,7 @@ static void save_menus(void)
 {
 	char	*menurc;
 	
-	menurc = choices_find_path_save("menus", PROJECT, TRUE);
+	menurc = choices_find_path_save("menus", PROJECT, FALSE);
 	if (menurc)
 	{
 		gboolean	mod = FALSE;
@@ -1517,6 +1517,7 @@ static void save_menus(void)
 		/* Dump out if so... */
 		if (mod)
 		{
+			menurc = choices_find_path_save("menus", PROJECT, TRUE);
 			mark_menus_modified(TRUE);
 			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 			mark_menus_modified(FALSE);

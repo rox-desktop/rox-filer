@@ -29,7 +29,7 @@
 
 #include "global.h"
 
-#include "stdlib.h"
+#include "run.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -362,6 +362,9 @@ void run_list(guchar *to_open)
 				break;
 			case 'p':
 				pinboard_activate(value);
+				break;
+			case 's':
+				open_to_show(value);
 				break;
 			case 'd':
 				filer_opendir(value);

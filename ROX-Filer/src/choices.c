@@ -179,6 +179,8 @@ guchar *choices_find_path_load(char *leaf, char *dir)
  * disabled. If 'create' is TRUE then intermediate directories will
  * be created (set this to FALSE if you just want to find out where
  * a saved file would go without actually altering the filesystem).
+ *
+ * Result is valid until the next call.
  */
 guchar *choices_find_path_save(char *leaf, char *dir, gboolean create)
 {

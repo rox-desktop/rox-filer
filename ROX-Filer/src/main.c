@@ -25,6 +25,7 @@
 #include <stdio.h>
 #include <sys/types.h>
 #include <signal.h>
+#include <string.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
@@ -110,6 +111,7 @@ static void show_features(void);
        "  -o, --override	override window manager control of panels\n" \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
+       "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
@@ -117,7 +119,7 @@ static void show_features(void);
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:hvnu"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnu"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -133,6 +135,7 @@ static struct option long_opts[] =
 	{"version", 0, NULL, 'v'},
 	{"user", 0, NULL, 'u'},
 	{"new", 0, NULL, 'n'},
+	{"show", 1, NULL, 's'},
 	{NULL, 0, NULL, 0},
 };
 #endif
@@ -239,7 +242,7 @@ int main(int argc, char **argv)
 	int		 stderr_pipe[2];
 	int		 i;
 	struct sigaction act;
-	guchar		*tmp;
+	guchar		*tmp, *dir, *slash;
 
 	/* This is a list of \0 separated strings. Each string starts with a
 	 * character indicating what kind of operation to perform:
@@ -249,6 +252,7 @@ int main(int argc, char **argv)
 	 * pPIN		display this pinboard
 	 * tDIR		open DIR as a top-panel
 	 * bDIR		open DIR as a bottom-panel
+	 * sFILE	open a directory to show FILE
 	 */
 	GString		*to_open;
 
@@ -324,11 +328,35 @@ int main(int argc, char **argv)
 				fprintf(stderr, _(HELP));
 				fprintf(stderr, _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
+			case 'd':
+				tmp = pathdup(VALUE);
+				g_string_append(to_open, "<d>");
+				g_string_append(to_open, tmp);
+				g_free(tmp);
+				break;
+			case 's':
+				tmp = g_strdup(VALUE);
+				slash = strrchr(tmp, '/');
+				if (slash)
+					*slash = '\0';
+
+				dir = pathdup(tmp);
+				g_string_append(to_open, "<s>");
+				g_string_append(to_open, dir);
+				g_free(dir);
+				
+				if (slash)
+				{
+					*slash = '/';
+					g_string_append(to_open, slash);
+				}
+
+				g_free(tmp);
+				break;
 			case 'l':
 			case 'r':
 			case 't':
 			case 'b':
-			case 'd':
 			case 'p':
 				g_string_append_c(to_open, '<');
 				g_string_append_c(to_open, c);
@@ -353,6 +381,8 @@ int main(int argc, char **argv)
 
 		g_string_append(to_open, "<f>");
 		g_string_append(to_open, tmp);
+
+		g_free(tmp);
 	}
 
 	if (to_open->len == 0)
