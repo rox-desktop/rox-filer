@@ -267,7 +267,7 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 	xmlNode *node;
 
 	menu = gtk_menu_new();
-	item = gtk_menu_item_new_with_label(_("Add"));
+	item = gtk_menu_item_new_with_label(_("Add new bookmark"));
 	g_signal_connect(item, "activate",
 			 G_CALLBACK(bookmarks_add), filer_window);
 	gtk_widget_show(item);
