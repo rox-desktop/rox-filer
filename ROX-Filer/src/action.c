@@ -23,9 +23,6 @@
  * These routines generally fork() and talk to us via pipes.
  */
 
-/* Allow use of GtkText widget */
-/* #define GTK_ENABLE_BROKEN */
-
 #include "config.h"
 
 #include <stdio.h>
@@ -160,17 +157,18 @@ static void preview_closed(GtkWidget *window, GUIside *gui_side)
 	gui_side->preview = NULL;
 }
 
-static void select_row_callback(GtkWidget *widget,
-                             gint row, gint column,
-                             GdkEventButton *event,
-                             GUIside *gui_side)
+static void select_row_callback(GtkTreeView *treeview,
+				GtkTreePath *path,
+				GtkTreeViewColumn *col,
+				GUIside	    *gui_side)
 {
+	GtkTreeModel	*model;
+	GtkTreeIter	iter;
 	char		*leaf, *dir;
 
-	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 0, &leaf);
-	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 1, &dir);
-
-	gtk_clist_unselect_row(GTK_CLIST(gui_side->results), row, column);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(gui_side->results));
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_model_get(model, &iter, 0, &leaf, 1, &dir, -1);
 
 	if (gui_side->preview)
 	{
@@ -178,7 +176,7 @@ static void select_row_callback(GtkWidget *widget,
 			display_set_autoselect(gui_side->preview, leaf);
 		else
 			filer_change_to(gui_side->preview, dir, leaf);
-		return;
+		goto out;
 	}
 
 	gui_side->preview = filer_opendir(dir, NULL);
@@ -189,6 +187,10 @@ static void select_row_callback(GtkWidget *widget,
 				"destroy",
 				GTK_SIGNAL_FUNC(preview_closed), gui_side);
 	}
+
+out:
+	g_free(dir);
+	g_free(leaf);
 }
 
 
@@ -398,20 +400,20 @@ static gboolean display_dir(gpointer data)
 
 static void add_to_results(GUIside *gui_side, gchar *path)
 {
-	gchar	*row[] = {"Leaf", "Dir"};
-	gchar	*slash;
-	int	len;
+	GtkTreeModel *model;
+	GtkTreeIter iter;
+	gchar	*dir;
 
-	slash = strrchr(path, '/');
-	g_return_if_fail(slash != NULL);
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(gui_side->results));
 
-	len = slash - path;
-	row[1] = g_strndup(path, MAX(len, 1));
-	row[0] = slash + 1;
+	gtk_list_store_append(GTK_LIST_STORE(model), &iter);
 
-	gtk_clist_append(GTK_CLIST(gui_side->results), row);
+	dir = g_dirname(path);
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter,
+			   0, g_basename(path),
+			   1, dir, -1);
 
-	g_free(row[1]);
+	g_free(dir);
 }
 
 /* Called when the child sends us a message */
@@ -464,7 +466,11 @@ static void message_from_child(gpointer 	 data,
 			else if (*buffer == '#')
 			{
 				/* Clear search results area */
-				gtk_clist_clear(GTK_CLIST(gui_side->results));
+				GtkTreeModel *model;
+				
+				model = gtk_tree_view_get_model(
+					GTK_TREE_VIEW(gui_side->results));
+				gtk_list_store_clear(GTK_LIST_STORE(model));
 				g_free(buffer);
 				return;
 			}
@@ -1925,10 +1931,9 @@ void action_find(GList *paths)
 {
 	GUIside		*gui_side;
 	GtkWidget	*hbox, *label, *scroller;
-	const gchar	*titles[2];
-	
-	titles[0] = _("Name");
-	titles[1] = _("Directory");
+	GtkListStore	*model;
+	GtkCellRenderer	*cell_renderer;
+	GtkTreeViewColumn	*column;
 
 	if (!paths)
 	{
@@ -1952,17 +1957,25 @@ void action_find(GList *paths)
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
 			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), scroller, TRUE, TRUE, 4);
-	gui_side->results = gtk_clist_new_with_titles(
-			sizeof(titles) / sizeof(*titles), (gchar **) titles);
-	gtk_clist_column_titles_passive(GTK_CLIST(gui_side->results));
+
+	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	gui_side->results = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	cell_renderer = gtk_cell_renderer_text_new();
+	column = gtk_tree_view_column_new_with_attributes(
+				_("Name"), cell_renderer, "text", 0, NULL);
+	gtk_tree_view_column_set_resizable(column, TRUE);
+	gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_GROW_ONLY);
+	gtk_tree_view_append_column(GTK_TREE_VIEW(gui_side->results), column);
+	gtk_tree_view_insert_column_with_attributes(
+			GTK_TREE_VIEW(gui_side->results),
+			1, (gchar *) _("Directory"), cell_renderer,
+			"text", 1, NULL);
+
 	gtk_widget_set_usize(gui_side->results, 100, 100);
-	gtk_clist_set_column_width(GTK_CLIST(gui_side->results), 0, 100);
-	gtk_clist_set_selection_mode(GTK_CLIST(gui_side->results),
-					GTK_SELECTION_SINGLE);
 	gtk_container_add(GTK_CONTAINER(scroller), gui_side->results);
 	gtk_box_set_child_packing(GTK_BOX(gui_side->vbox),
 			  gui_side->log_hbox, FALSE, TRUE, 4, GTK_PACK_START);
-	gtk_signal_connect(GTK_OBJECT(gui_side->results), "select_row",
+	gtk_signal_connect(GTK_OBJECT(gui_side->results), "row-activated",
 			GTK_SIGNAL_FUNC(select_row_callback), gui_side);
 
 	hbox = gtk_hbox_new(FALSE, 0);
