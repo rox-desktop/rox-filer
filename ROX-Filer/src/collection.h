@@ -36,6 +36,12 @@ enum
 	PAINT_CLEAR,		/* Blank everything, then redraw */
 };
 
+typedef struct _Collection Collection;
+
+/* Each item in a Collection has one of these, which stores its selected
+ * state, data, and view_data.
+ */
+typedef struct _CollectionItem   CollectionItem;
 
 typedef struct _CollectionClass  CollectionClass;
 typedef void (*CollectionDrawFunc)(GtkWidget *widget,

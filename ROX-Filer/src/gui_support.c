@@ -895,8 +895,10 @@ void tooltip_show(guchar *text)
 	time(&tip_time);
 }
 
-/* Call callback(user_data) after a while, unless cancelled */
-void tooltip_prime(GtkFunction callback, gpointer user_data)
+/* Call callback(user_data) after a while, unless cancelled.
+ * Object is refd now and unref when cancelled / after callback called.
+ */
+void tooltip_prime(GtkFunction callback, GObject *object)
 {
 	time_t  now;
 	int	delay;
@@ -906,5 +908,10 @@ void tooltip_prime(GtkFunction callback, gpointer user_data)
 	time(&now);
 	delay = now - tip_time > 2 ? 1000 : 200;
 
-	tip_timeout = gtk_timeout_add(delay, (GtkFunction) callback, user_data);
+	g_object_ref(object);
+	tip_timeout = gtk_timeout_add_full(delay,
+					   (GtkFunction) callback,
+					   NULL,
+					   object,
+					   g_object_unref);
 }

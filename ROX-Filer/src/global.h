@@ -40,30 +40,15 @@ typedef struct _DirItem DirItem;
 typedef struct _ViewIface ViewIface;
 
 /* A ViewIter specifies a single item in a View, rather like an index.
- * They can be used to iterate over all the items in a View and remain
+ * They can be used to iterate over all the items in a View, and remain
  * valid until the View is changed. If allocated on the stack, they do not need
  * to be freed.
  */
 typedef struct _ViewIter ViewIter;
 
-/* A Collection is a GtkWidget used to arrange a grid of items.
- * Each filer window has its own one of these; the data field
- * of each item is the corresponding DirItem, shared with the
- * FilerWindow's Directory and other windows' Collections.
+/* This contains the pixbufs for an image, in various sizes.
+ * Despite the name, it now contains neither pixmaps nor masks!
  */
-typedef struct _Collection Collection;
-
-/* Each item in a Collection has one of these, which stores its selected
- * state, data, and view_data.
- */
-typedef struct _CollectionItem   CollectionItem;
-
-/* A viewport containing a Collection which also handles redraw.
- * This is the Collection-based implementation of the View interface.
- */
-typedef struct _ViewCollection ViewCollection;
-
-/* This contains the pixbufs for an image, in various sizes */
 typedef struct _MaskedPixmap MaskedPixmap;
 
 /* Each MIME type (eg 'text/plain') has one of these. It contains

@@ -43,7 +43,6 @@ struct _FilerWindow
 	gboolean	scanning;	/* State of the 'scanning' indicator */
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
-	Collection	*collection;
 	ViewIface	*view;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;

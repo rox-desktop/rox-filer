@@ -45,6 +45,30 @@
  * the actual function through that.
  */
 
+/* ViewIters
+ *
+ * A ViewIter is used to index items. They are usually allocated
+ * on the stack and then initialised using view_get_iter().
+ * 
+ * Normally, an iterator starts of not pointing at any item, but
+ * each call to iter->next(iter) returns the next item, and leaves
+ * the iterator pointing at the returned item. If you like the item,
+ * you can then pass the iterator to view_cursor_to_iter(), etc.
+ *
+ * Using flags passed to view_get_iter, you can start the sequence from the
+ * beginning, end, cursor or 'base' (a saved cursor position). You can
+ * go forwards or backwards. You can opt to only get selected items returned.
+ *
+ * You can also have one-shot iterators which already point to an item, and
+ * you never call the next method (view_get_cursor, for example). In fact,
+ * these iterators return a sequence of one item, but next() gets called
+ * automatically for you.
+ *
+ * You don't need to free iterators, and they become invalid if the
+ * View changes (items added, removed or altered), so don't hang on to
+ * them!
+ */
+
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -189,7 +213,9 @@ void view_get_iter(ViewIface *obj, ViewIter *iter, IterFlags flags)
 	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter, flags);
 }
 
-/* Make an 'iter' whose next method will return the cursor item, if any */
+/* Make an 'iter' for the cursor item, if any. Use iter->peek() to get
+ * the DirItem (will be NULL if the cursor isn't on an item).
+ */
 void view_get_cursor(ViewIface *obj, ViewIter *iter)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));

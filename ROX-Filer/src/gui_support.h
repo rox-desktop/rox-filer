@@ -50,6 +50,6 @@ void entry_set_error(GtkWidget *entry, gboolean error);
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower);
 void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y);
 void tooltip_show(guchar *text);
-void tooltip_prime(GtkFunction callback, gpointer user_data);
+void tooltip_prime(GtkFunction callback, GObject *object);
 
 #endif /* _GUI_SUPPORT_H */

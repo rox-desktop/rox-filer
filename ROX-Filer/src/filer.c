@@ -585,15 +585,22 @@ static gint pointer_out(GtkWidget *widget,
  */
 static void next_selected(FilerWindow *filer_window, int dir)
 {
-	ViewIter	iter;
+	ViewIter	iter, cursor;
+	gboolean	have_cursor;
 	ViewIface	*view = filer_window->view;
 
 	g_return_if_fail(dir == 1 || dir == -1);
 
+	view_get_cursor(view, &cursor);
+	have_cursor = cursor.peek(&cursor) != NULL;
+
 	view_get_iter(view, &iter,
 			VIEW_ITER_SELECTED |
-			VIEW_ITER_FROM_CURSOR | 
+			(have_cursor ? VIEW_ITER_FROM_CURSOR : 0) | 
 			(dir < 0 ? VIEW_ITER_BACKWARDS : 0));
+
+	if (have_cursor && view_get_selected(view, &cursor))
+		iter.next(&iter);	/* Skip the cursor itself */
 
 	if (iter.next(&iter))
 		view_cursor_to_iter(view, &iter);

@@ -35,6 +35,11 @@ typedef enum {
 
 typedef struct _ViewIfaceClass	ViewIfaceClass;
 
+/* A viewport containing a Collection which also handles redraw.
+ * This is the Collection-based implementation of the View interface.
+ */
+typedef struct _ViewCollection ViewCollection;
+
 struct _ViewIter {
 	/* Returns the value last returned by next() */
 	DirItem	   *(*peek)(ViewIter *iter);
