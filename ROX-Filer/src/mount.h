@@ -8,7 +8,8 @@
 #ifndef _MOUNT_H
 #define _MOUNT_H
 
-#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_UCRED_H)
+#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_UCRED_H) || \
+						defined(HAVE_SYS_MNTENT_H)
 #    define DO_MOUNT_POINTS
 #  endif
 

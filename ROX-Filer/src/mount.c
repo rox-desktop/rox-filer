@@ -23,6 +23,9 @@
 
 #include <config.h>
 #include <stdio.h>
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>
+#endif
 #ifdef HAVE_MNTENT_H
   /* Linux, etc */
 # include <mntent.h>
@@ -33,6 +36,10 @@
 # include <sys/ucred.h>
 # include <sys/mount.h>
 # include <stdlib.h>
+#elif HAVE_SYS_MNTENT_H
+  /* SunOS */
+# include <sys/mntent.h>
+# include <sys/mnttab.h>
 #endif
 #include <sys/stat.h>
 #include <sys/time.h>
@@ -47,7 +54,16 @@
 GHashTable *fstab_mounts = NULL;
 GHashTable *mtab_mounts = NULL;
 time_t fstab_time;
-#ifdef HAVE_MNTENT_H
+
+#ifdef HAVE_SYS_MNTENT_H
+#define THE_MTAB MNTTAB
+#define THE_FSTAB VFSTAB
+#else
+#define THE_MTAB "/etc/mtab"
+#define THE_FSTAB "/etc/fstab"
+#endif
+
+#if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
 time_t mtab_time;
 #endif
 
@@ -68,11 +84,11 @@ void mount_init()
 	mtab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
 
 #ifdef DO_MOUNT_POINTS
-	fstab_time = read_time("/etc/fstab");
-	read_table(fstab_mounts, "/etc/fstab");
-#  ifdef HAVE_MNTENT_H
-	mtab_time = read_time("/etc/mtab");
-	read_table(mtab_mounts, "/etc/mtab");
+	fstab_time = read_time(THE_FSTAB);
+	read_table(fstab_mounts, THE_FSTAB);
+#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
+	mtab_time = read_time(THE_MTAB);
+	read_table(mtab_mounts, THE_MTAB);
 #  elif HAVE_SYS_UCRED_H
 	/* mtab_time not used */
 	build_mtab_table(mtab_mounts);
@@ -87,18 +103,18 @@ void mount_update(gboolean force)
 	time_t	time;
 	/* Ensure everything is uptodate */
 
-	time = read_time("/etc/fstab");
+	time = read_time(THE_FSTAB);
 	if (force || time != fstab_time)
 	{
 		fstab_time = time;
-		read_table(fstab_mounts, "/etc/fstab");
+		read_table(fstab_mounts, THE_FSTAB);
 	}
-#  ifdef HAVE_MNTENT_H
-	time = read_time("/etc/mtab");
+#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
+	time = read_time(THE_MTAB);
 	if (force || time != mtab_time)
 	{
 		mtab_time = time;
-		read_table(mtab_mounts, "/etc/mtab");
+		read_table(mtab_mounts, THE_MTAB);
 	}
 #  else
 	build_mtab_table(mtab_mounts);
@@ -163,6 +179,45 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 	}
 
 	endmntent(tab);
+
+	return mount_points;
+}
+
+#elif HAVE_SYS_MNTENT_H
+static GHashTable *read_table(GHashTable *mount_points, char *path)
+{
+	FILE		*tab;
+	struct mnttab	ent;
+	MountPoint	*mp;
+#ifdef HAVE_FCNTL_H
+	struct flock	lb;
+#endif
+
+	tab = fopen(path, "r");
+	g_return_val_if_fail(tab != NULL, NULL);
+	clear_table(mount_points);
+
+#ifdef HAVE_FCNTL_H
+	lb.l_type = F_RDLCK;
+	lb.l_whence = 0;
+	lb.l_start = 0;
+	lb.l_len = 0;
+	fcntl(fileno(tab), F_SETLKW, &lb);
+#endif
+
+	while (getmntent(tab, &ent)==0)
+	{
+		if (strcmp(ent.mnt_special, "swap") == 0)
+			continue;
+
+		mp = g_malloc(sizeof(MountPoint));
+		mp->dir = g_strdup(ent.mnt_mountp);
+		mp->name = g_strdup(ent.mnt_special);
+
+		g_hash_table_insert(mount_points, mp->dir, mp);
+	}
+
+	fclose(tab);
 
 	return mount_points;
 }
