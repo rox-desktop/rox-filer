@@ -591,7 +591,7 @@ static void show_features(void)
 			_("Yes (using Gtk+-2.0)")
 #else
 # ifdef HAVE_ICONV_H
-			_("Yes (using libiconv)")
+			_("Yes")
 # else
 			_("No (needs libiconv or Gtk+-2.0)")
 # endif
