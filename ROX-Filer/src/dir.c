@@ -663,6 +663,8 @@ static void set_idle_callback(Directory *dir)
 			return;
 		time(&diritem_recent_time);
 		dir->idle_callback = gtk_idle_add(recheck_callback, dir);
+		/* Do the first call now (will remove the callback itself) */
+		recheck_callback(dir);
 	}
 	else
 	{
@@ -846,6 +848,8 @@ static void dir_rescan(Directory *dir)
 	struct dirent	*ent;
 	guint		i;
 	const char	*pathname;
+	int		longest_len = -1;
+	GList		*longest = NULL;
 
 	g_return_if_fail(dir != NULL);
 
@@ -889,9 +893,10 @@ static void dir_rescan(Directory *dir)
 			if (ent->d_name[1] == '.' && ent->d_name[2] == '\0')
 				continue;		/* Ignore '..' */
 		}
-		
+
 		g_ptr_array_add(names, g_strdup(ent->d_name));
 	}
+	mc_closedir(d);
 
 	/* Sort, so the names are scanned in a sensible order */
 	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
@@ -909,6 +914,8 @@ static void dir_rescan(Directory *dir)
 	for (i = 0; i < names->len; i++)
 	{
 		guchar *name = names->pdata[i];
+		int len = strlen(name);
+		
 		dir->recheck_list = g_list_prepend(dir->recheck_list, name);
 		if (!g_hash_table_lookup(dir->known_items, name))
 		{
@@ -917,15 +924,34 @@ static void dir_rescan(Directory *dir)
 			new = diritem_new(name);
 			g_ptr_array_add(dir->new_items, new);
 		}
+
+		if (name[0] != '.' && len > longest_len)
+		{
+			longest_len = len;
+			longest = dir->recheck_list;
+		}
 	}
+
 	dir_merge_new(dir);
 	
 	dir->recheck_list = g_list_reverse(dir->recheck_list);
 
-	g_ptr_array_free(names, TRUE);
-	mc_closedir(d);
+	if (longest)
+	{
+		gpointer data = longest->data;
 
+		/* Move the longest item to the start. Helps with
+		 * auto sizing.
+		 */
+		dir->recheck_list = g_list_remove_link(dir->recheck_list,
+							longest);
+		dir->recheck_list = g_list_prepend(dir->recheck_list, data);
+	}
+
+	g_ptr_array_free(names, TRUE);
+		
 	set_idle_callback(dir);
+	dir_merge_new(dir);
 }
 
 #ifdef USE_DNOTIFY
