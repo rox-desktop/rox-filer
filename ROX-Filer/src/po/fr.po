@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.7-preview\n"
-"POT-Creation-Date: 2003-02-12 22:53+0100\n"
-"PO-Revision-Date: 2003-02-12 22:56+0100\n"
+"POT-Creation-Date: 2003-02-23 00:52+0100\n"
+"PO-Revision-Date: 2003-02-23 00:54+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1227,7 +1227,7 @@ msgstr "Fichier"
 msgid "Shift Open"
 msgstr "Shift Ouvrir"
 
-#: icon.c:143 menu.c:210 menu.c:247 toolbar.c:140
+#: icon.c:143 menu.c:210 menu.c:247 toolbar.c:145
 msgid "Help"
 msgstr "Aide"
 
@@ -1568,7 +1568,7 @@ msgstr "Icônes plus grandes"
 msgid "Smaller Icons"
 msgstr "Icônes plus petites"
 
-#: menu.c:191 tips:72 toolbar.c:380
+#: menu.c:191 tips:72
 msgid "Automatic"
 msgstr "Automatique"
 
@@ -2373,108 +2373,100 @@ msgstr ""
 msgid "byte"
 msgstr "octet"
 
-#: toolbar.c:108
+#: toolbar.c:109
 msgid "Close"
 msgstr "Fermer"
 
-#: toolbar.c:108
+#: toolbar.c:109
 msgid "Close filer window"
 msgstr "Fermer la fenêtre du filer"
 
-#: toolbar.c:112
+#: toolbar.c:113
 msgid "Up"
 msgstr "Père"
 
-#: toolbar.c:112
+#: toolbar.c:113
 msgid "Change to parent directory"
 msgstr "Aller au répertoire père"
 
-#: toolbar.c:116
+#: toolbar.c:117
 msgid "Home"
 msgstr "Perso"
 
-#: toolbar.c:116
+#: toolbar.c:117
 msgid "Change to home directory"
 msgstr "Aller au répertoire personnel"
 
-#: toolbar.c:120
+#: toolbar.c:121
 msgid "Bookmarks"
 msgstr "Signets"
 
-#: toolbar.c:120
+#: toolbar.c:121
 msgid "Bookmarks menu"
 msgstr "Menu des signets"
 
-#: toolbar.c:124
+#: toolbar.c:125
 msgid "Scan"
 msgstr "Lire"
 
-#: toolbar.c:124
+#: toolbar.c:125
 msgid "Rescan directory contents"
 msgstr "Relire le contenu du répertoire"
 
-#: tips:61 toolbar.c:128
+#: toolbar.c:129 toolbar.c:133 tips:61
 msgid "Size"
 msgstr "Taille"
 
-#: toolbar.c:128
+#: toolbar.c:129
 msgid "Change icon size"
 msgstr "Changer la taille des icônes"
 
-#: toolbar.c:132
+#: toolbar.c:133
+msgid "Automatic size mode"
+msgstr "Mode taille automatique"
+
+#: toolbar.c:137
 msgid "Details"
 msgstr "Détails"
 
-#: toolbar.c:132
+#: toolbar.c:137
 msgid "Show extra details"
 msgstr "Montrer tous les détails"
 
-#: toolbar.c:136
+#: toolbar.c:141
 msgid "Hidden"
 msgstr "Cachés"
 
-#: toolbar.c:136
+#: toolbar.c:141
 msgid "Show/hide hidden files"
 msgstr "Montrer/cacher les fichiers cachés"
 
-#: toolbar.c:140
+#: toolbar.c:145
 msgid "Show ROX-Filer help"
 msgstr "Montrer l'aide de ROX-Filer"
 
-#: toolbar.c:199
+#: toolbar.c:204
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u caché(s))"
 
-#: tips:81 toolbar.c:207
+#: toolbar.c:212 tips:81
 msgid "items"
 msgstr "objets"
 
-#: toolbar.c:207
+#: toolbar.c:212
 msgid "item"
 msgstr "objet"
 
-#: toolbar.c:210
+#: toolbar.c:215
 #, c-format
 msgid "No items%s"
 msgstr "Pas d'objet%s"
 
-#: toolbar.c:226
+#: toolbar.c:231
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u sélectionné(s) (%s)"
-
-#: toolbar.c:379
-msgid "Huge"
-msgstr "Énorme"
-
-#: toolbar.c:379
-msgid "Large"
-msgstr "Grande"
-
-#: toolbar.c:380
-msgid "Small"
-msgstr "Petite"
 
 #: type.c:204
 msgid "Sym link"
@@ -2918,7 +2910,6 @@ msgid "Largest window size:"
 msgstr "Plus grande taille de fenêtre :"
 
 #: tips:28
-#, c-format
 msgid "%"
 msgstr "%"
 
@@ -3586,7 +3577,9 @@ msgstr "Copier les fichiers"
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
-msgstr "Notez que vous pouvez toujours faire apparaître le menu par glisser-déposer tout en maintenant <Alt> enfoncée."
+msgstr ""
+"Notez que vous pouvez toujours faire apparaître le menu par glisser-déposer "
+"tout en maintenant <Alt> enfoncée."
 
 #: tips:218
 msgid "When dragging files with the middle mouse button"
@@ -3836,6 +3829,15 @@ msgstr ""
 "option. Utilisez-la si le « glisser » de fichiers vers une application "
 "provoque bien l'apparition d'un signe '+' sur le pointeur mais que le "
 "« déposer » ne fonctionne pas."
+
+#~ msgid "Huge"
+#~ msgstr "Énorme"
+
+#~ msgid "Large"
+#~ msgstr "Grande"
+
+#~ msgid "Small"
+#~ msgstr "Petite"
 
 #~ msgid "Set Icon"
 #~ msgstr "Fixer l'icône"
