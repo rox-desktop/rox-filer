@@ -293,8 +293,8 @@ gtk_savebox_set_pathname (GtkSavebox *savebox, gchar *pathname)
   gtk_widget_realize (savebox->entry);
   gtk_entry_set_position (GTK_ENTRY (savebox->entry), -1);
 
-  gtk_entry_select_region (GTK_ENTRY (savebox->entry), leaf,
-		  dot ? dot - pathname : -1);
+  gtk_editable_select_region (GTK_EDITABLE (savebox->entry), leaf,
+			      dot ? dot - pathname : -1);
 }
 
 static void

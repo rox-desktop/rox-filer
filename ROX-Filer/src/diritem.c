@@ -167,7 +167,8 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 			
 		/* Try to find AppRun... */
 		strcpy(tmp + path_len + 1, "AppRun");
-		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid)
+		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid &&
+				info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 			item->flags |= ITEM_FLAG_APPDIR;
 			
 		/* Are we still missing an icon for this app? */

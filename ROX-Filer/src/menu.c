@@ -830,6 +830,8 @@ void target_callback(FilerWindow *filer_window,
 	collection_clear_selection(collection);
 	collection_select_item(collection, item);
 	((GtkItemFactoryCallback1) real_fn)(NULL, 0, GTK_WIDGET(collection));
+
+	/* TODO: Opening a Savebox grabs the selection; don't lose it again! */
 	if (item < collection->number_of_items)
 		collection_unselect_item(collection, item);
 }
