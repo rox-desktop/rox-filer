@@ -45,6 +45,9 @@ struct _FilerWindow
 	DisplayStyle	display_style;
 
 	Directory	*directory;
+
+	gboolean	had_cursor;	/* (before changing directory) */
+	char		*auto_select;	/* If it we find while scanning */
 };
 
 extern FilerWindow 	*window_with_focus;
@@ -55,6 +58,7 @@ void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
 void update_dir(FilerWindow *filer_window, gboolean warning);
 void scan_dir(FilerWindow *filer_window);
+int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
@@ -67,7 +71,7 @@ int sort_by_size(const void *item1, const void *item2);
 void filer_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void full_refresh(void);
-void filer_openitem(FilerWindow *filer_window, DirItem *item,
+void filer_openitem(FilerWindow *filer_window, int item_number,
 		gboolean shift, gboolean adjust);
 void filer_check_mounted(char *path);
 

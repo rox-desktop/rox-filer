@@ -27,6 +27,7 @@
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkkeysyms.h>
 #include "collection.h"
 
 #define MIN_WIDTH 80
@@ -132,6 +133,9 @@ static void draw_lasso_box(Collection *collection);
 static int item_at_row_col(Collection *collection, int row, int col);
 static void collection_clear_except(Collection *collection, gint exception);
 static void cancel_wink(Collection *collection);
+static gint collection_key_press(GtkWidget *widget, GdkEventKey *event);
+static void get_visible_limits(Collection *collection, int *first, int *last);
+static void scroll_to_show(Collection *collection, int item);
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 {
@@ -206,6 +210,7 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->size_request = collection_size_request;
 	widget_class->size_allocate = collection_size_allocate;
 
+	widget_class->key_press_event = collection_key_press;
 	widget_class->button_press_event = collection_button_press;
 	widget_class->button_release_event = collection_button_release;
 	widget_class->motion_notify_event = collection_motion_notify;
@@ -268,8 +273,13 @@ static void collection_class_init(CollectionClass *class)
 
 static void collection_init(Collection *object)
 {
+	g_return_if_fail(object != NULL);
+	g_return_if_fail(IS_COLLECTION(object));
+
 	if (!crosshair)
 		crosshair = gdk_cursor_new(GDK_CROSSHAIR);
+
+	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(object), GTK_CAN_FOCUS);
 
 	object->panel = FALSE;
 	object->number_of_items = 0;
@@ -466,6 +476,9 @@ static void collection_size_allocate(GtkWidget *widget,
 		}
 
 		set_vadjustment(collection);
+
+		if (collection->cursor_item != -1)
+			scroll_to_show(collection, collection->cursor_item);
 	}
 }
 
@@ -781,6 +794,9 @@ static void scroll_by(Collection *collection, gint diff)
 	guint		amount;
 	GdkRectangle	new_area;
 
+	if (diff == 0)
+		return;
+
 	widget = GTK_WIDGET(collection);
 	
 	if (collection->lasso_box)
@@ -843,6 +859,37 @@ static void resize_arrays(Collection *collection, guint new_size)
 	collection->items = g_realloc(collection->items,
 					sizeof(CollectionItem) * new_size);
 	collection->array_size = new_size;
+}
+
+static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
+{
+	Collection *collection;
+
+	g_return_val_if_fail(widget != NULL, FALSE);
+	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
+	g_return_val_if_fail(event != NULL, FALSE);
+
+	collection = (Collection *) widget;
+	
+	switch (event->keyval)
+	{
+		case GDK_Left:
+			collection_move_cursor(collection, 0, -1);
+			break;
+		case GDK_Right:
+			collection_move_cursor(collection, 0, 1);
+			break;
+		case GDK_Up:
+			collection_move_cursor(collection, -1, 0);
+			break;
+		case GDK_Down:
+			collection_move_cursor(collection, 1, 0);
+			break;
+		default:
+			return FALSE;
+	}
+
+	return TRUE;
 }
 
 static gint collection_button_press(GtkWidget      *widget,
@@ -1316,6 +1363,66 @@ static int item_at_row_col(Collection *collection, int row, int col)
 	return item;
 }
 
+/* Make sure that 'item' is fully visible (vertically), scrolling if not. */
+static void scroll_to_show(Collection *collection, int item)
+{
+	int	first, last, row;
+
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+
+	row = item / collection->columns;
+	get_visible_limits(collection, &first, &last);
+
+	if (row <= first)
+	{
+		gtk_adjustment_set_value(collection->vadj,
+				row * collection->item_height);
+	}
+	else if (row >= last)
+	{
+		GtkWidget	*widget = (GtkWidget *) collection;
+		int 		height;
+
+		if (GTK_WIDGET_REALIZED(widget))
+		{
+			gdk_window_get_size(widget->window, NULL, &height);
+			gtk_adjustment_set_value(collection->vadj,
+				(row + 1) * collection->item_height - height);
+		}
+	}
+}
+
+/* Return the first and last rows which are [partly] visible. Does not
+ * ensure that the rows actually exist (contain items).
+ */
+static void get_visible_limits(Collection *collection, int *first, int *last)
+{
+	GtkWidget	*widget = (GtkWidget *) collection;
+	int	scroll, height;
+
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(first != NULL && last != NULL);
+
+	if (!GTK_WIDGET_REALIZED(widget))
+	{
+		*first = 0;
+		*last = 0;
+	}
+	else
+	{
+		scroll = collection->vadj->value;
+		gdk_window_get_size(widget->window, NULL, &height);
+
+		*first = MAX(scroll / collection->item_height, 0);
+		*last = (scroll + height - 1) /collection->item_height;
+
+		if (*last < *first)
+			*last = *first;
+	}
+}
+
 /* Unselect all items except number item (-1 to unselect everything) */
 static void collection_clear_except(Collection *collection, gint exception)
 {
@@ -1361,7 +1468,7 @@ static void collection_clear_except(Collection *collection, gint exception)
 }
 
 /* Cancel the current wink effect. */
-void cancel_wink(Collection *collection)
+static void cancel_wink(Collection *collection)
 {
 	gint	item;
 	
@@ -1377,7 +1484,7 @@ void cancel_wink(Collection *collection)
 	collection_draw_item(collection, item, TRUE);
 }
 
-gboolean cancel_wink_timeout(Collection *collection)
+static gboolean cancel_wink_timeout(Collection *collection)
 {
 	gint	item;
 	
@@ -1650,16 +1757,39 @@ void collection_set_item_size(Collection *collection, int width, int height)
 					  1);
 
 		set_vadjustment(collection);
+		if (collection->cursor_item != -1)
+			scroll_to_show(collection, collection->cursor_item);
 		gtk_widget_queue_draw(widget);
 	}
 }
 
+/* Cursor is positioned on item with the same data as before the sort.
+ * Same for the wink item.
+ */
 void collection_qsort(Collection *collection,
 			int (*compar)(const void *, const void *))
 {
+	int	cursor, wink, items;
+	gpointer cursor_data = NULL;
+	gpointer wink_data = NULL;
+	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(compar != NULL);
+
+	items = collection->number_of_items;
+
+	wink = collection->wink_item;
+	if (wink >= 0 && wink < items)
+		wink_data = collection->items[wink].data;
+	else
+		wink = -1;
+
+	cursor = collection->cursor_item;
+	if (cursor >= 0 && cursor < items)
+		cursor_data = collection->items[cursor].data;
+	else
+		cursor = -1;
 
 	if (collection->wink_item != -1)
 	{
@@ -1667,9 +1797,21 @@ void collection_qsort(Collection *collection,
 		gtk_timeout_remove(collection->wink_timeout);
 	}
 	
-	qsort(collection->items, collection->number_of_items,
-			sizeof(collection->items[0]), compar); 
+	qsort(collection->items, items, sizeof(collection->items[0]), compar); 
 
+	if (cursor > -1 || wink > -1)
+	{
+		int	item;
+
+		for (item = 0; item < items; item++)
+		{
+			if (collection->items[item].data == cursor_data)
+				collection_set_cursor_item(collection, item);
+			if (collection->items[item].data == wink_data)
+				collection_wink_item(collection, item);
+		}
+	}
+	
 	collection->paint_level = PAINT_CLEAR;
 
 	gtk_widget_queue_draw(GTK_WIDGET(collection));
@@ -1773,8 +1915,12 @@ void collection_set_cursor_item(Collection *collection, gint item)
 	
 	if (old_item != -1)
 		collection_draw_item(collection, old_item, TRUE);
+
 	if (item != -1)
+	{
 		collection_draw_item(collection, item, TRUE);
+		scroll_to_show(collection, item);
+	}
 }
 
 /* Briefly highlight an item to draw the user's attention to it.
@@ -1794,10 +1940,11 @@ void collection_wink_item(Collection *collection, gint item)
 		return;
 
 	collection->wink_item = item;
-	collection->wink_timeout = gtk_timeout_add(200,
+	collection->wink_timeout = gtk_timeout_add(300,
 					   (GtkFunction) cancel_wink_timeout,
 					   collection);
 	collection_draw_item(collection, item, TRUE);
+	scroll_to_show(collection, item);
 
 	gdk_flush();
 }
@@ -1813,10 +1960,13 @@ void collection_delete_if(Collection *collection,
 {
 	int	in, out = 0;
 	int	selected = 0;
+	int	cursor;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(test != NULL);
+
+	cursor = collection->cursor_item;
 
 	for (in = 0; in < collection->number_of_items; in++)
 	{
@@ -1833,10 +1983,14 @@ void collection_delete_if(Collection *collection,
 			collection->items[out++].data =
 				collection->items[in].data;
 		}
+		else if (cursor >= in)
+			cursor--;
 	}
 
 	if (in != out)
 	{
+		collection->cursor_item = cursor;
+
 		if (collection->wink_item != -1)
 		{
 			collection->wink_item = -1;
@@ -1880,19 +2034,31 @@ void collection_target(Collection *collection,
 void collection_move_cursor(Collection *collection, int drow, int dcol)
 {
 	int	row, col, item;
+	int	first, last;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 
+	get_visible_limits(collection, &first, &last);
+
 	item = collection->cursor_item;
 	if (item == -1)
-		row = col = 0;
+	{
+		col = 0;
+		row = first;
+	}
 	else
 	{
 		row = item / collection->columns;
 		col = item % collection->columns;
 
-		row = MAX(row + drow, 0);
+		if (row < first)
+			row = first;
+		else if (row > last)
+			row = last;
+		else
+			row = MAX(row + drow, 0);
+
 		col = MAX(col + dcol, 0);
 	}
 

@@ -152,7 +152,7 @@ static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
 			FilerWindow *filer_window);
-void filer_change_to(FilerWindow *filer_window, char *path);
+static void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 static void shrink_width(FilerWindow *filer_window);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 
@@ -221,15 +221,34 @@ static void update_display(Directory *dir,
 			FilerWindow *filer_window)
 {
 	int	i;
+	int	cursor = filer_window->collection->cursor_item;
+	char	*as;
+	Collection *collection = filer_window->collection;
 
 	switch (action)
 	{
 		case DIR_ADD:
+			as = filer_window->auto_select;
+
 			for (i = 0; i < items->len; i++)
 			{
 				DirItem *item = (DirItem *) items->pdata[i];
 
 				add_item(filer_window, item);
+
+				if (cursor != -1 || !as)
+					continue;
+
+				if (strcmp(as, item->leafname) != 0)
+					continue;
+
+				cursor = collection->number_of_items - 1;
+				if (filer_window->had_cursor)
+					collection_set_cursor_item(collection,
+							cursor);
+				else
+					collection_wink_item(collection,
+							cursor);
 			}
 
 			collection_qsort(filer_window->collection,
@@ -246,6 +265,9 @@ static void update_display(Directory *dir,
 						filer_window->window->window,
 						NULL);
 			shrink_width(filer_window);
+			if (filer_window->had_cursor &&
+					collection->cursor_item == -1)
+				collection_set_cursor_item(collection, 0);
 			break;
 		case DIR_UPDATE:
 			for (i = 0; i < items->len; i++)
@@ -289,6 +311,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	if (filer_window->directory)
 		detach(filer_window);
 
+	g_free(filer_window->auto_select);
 	g_free(filer_window->path);
 	g_free(filer_window);
 
@@ -888,12 +911,9 @@ void open_item(Collection *collection,
 		gpointer user_data)
 {
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
-	DirItem	*item = (DirItem *) item_data;
 	GdkEventButton 	*event;
 	gboolean	shift;
 	gboolean	adjust;		/* do alternative action */
-
-	collection_wink_item(filer_window->collection, item_number);
 
 	event = (GdkEventButton *) gtk_get_current_event();
 	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS
@@ -910,38 +930,54 @@ void open_item(Collection *collection,
 		adjust = FALSE;
 	}
 
-	filer_openitem(filer_window, item, shift, adjust);
+	filer_openitem(filer_window, item_number, shift, adjust);
 }
 
 /* Return the full path to the directory containing object 'path'.
- * Relative paths are resolved from 'depart'.
- * g_free() the result.
+ * Relative paths are resolved from the filerwindow's path.
  */
-static char *follow_symlink(char *depart, char *path)
+static void follow_symlink(FilerWindow *filer_window, char *path)
 {
 	char	*real, *slash;
+	char	*new_dir;
 
 	if (path[0] != '/')
-		path = make_path(depart, path)->str;
+		path = make_path(filer_window->path, path)->str;
 
 	real = pathdup(path);
 	slash = strrchr(real, '/');
-	if (slash)
+	if (!slash)
 	{
-		if (slash == real)
-			slash[1] = '\0';
-		else
-			slash[0] = '\0';
+		g_free(real);
+		delayed_error("ROX-Filer",
+				"Broken symlink (or you don't have permission "
+				"to follow it.");
+		return;
 	}
 
-	return real;
+	*slash = '\0';
+
+	if (*real)
+		new_dir = real;
+	else
+		new_dir = "/";
+
+	if (filer_window->panel)
+		filer_opendir(new_dir, FALSE, BOTTOM);
+	else
+		filer_change_to(filer_window, new_dir, slash + 1);
+
+	g_free(real);
 }
 
-void filer_openitem(FilerWindow *filer_window, DirItem *item,
+void filer_openitem(FilerWindow *filer_window, int item_number,
 		gboolean shift, gboolean adjust)
 {
 	GtkWidget	*widget;
 	char		*full_path;
+	DirItem		*item = (DirItem *)
+			filer_window->collection->items[item_number].data;
+	gboolean	wink = TRUE;
 
 	widget = filer_window->window;
 	full_path = make_path(filer_window->path,
@@ -959,21 +995,10 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 			delayed_error("ROX-Filer", g_strerror(errno));
 		else
 		{
-			char	*real;
-
 			g_return_if_fail(got <= MAXPATHLEN);
 			path[got] = '\0';
 
-			real = follow_symlink(filer_window->path, path);
-
-			if (real)
-			{
-				if (filer_window->panel)
-					filer_opendir(real, FALSE, BOTTOM);
-				else
-					filer_change_to(filer_window, real);
-				g_free(real);
-			}
+			follow_symlink(filer_window, path);
 		}
 		return;
 	}
@@ -1000,7 +1025,10 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 			if ((adjust ^ o_new_window_on_1) || filer_window->panel)
 				filer_opendir(full_path, FALSE, BOTTOM);
 			else
-				filer_change_to(filer_window, full_path);
+			{
+				wink = FALSE;
+				filer_change_to(filer_window, full_path, NULL);
+			}
 			break;
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE
@@ -1013,7 +1041,10 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 				if (spawn_full(argv, getenv("HOME"), 0))
 				{
 					if (adjust && !filer_window->panel)
+					{
+						wink = FALSE;
 						gtk_widget_destroy(widget);
+					}
 				}
 				else
 					report_error("ROX-Filer",
@@ -1030,7 +1061,10 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 				if (type_open(full_path, type))
 				{
 					if (adjust && !filer_window->panel)
+					{
+						wink = FALSE;
 						gtk_widget_destroy(widget);
+					}
 				}
 				else
 				{
@@ -1050,6 +1084,9 @@ void filer_openitem(FilerWindow *filer_window, DirItem *item,
 					"I don't know how to open that");
 			break;
 	}
+
+	if (wink)
+		collection_wink_item(filer_window->collection, item_number);
 }
 
 static gint pointer_in(GtkWidget *widget,
@@ -1088,18 +1125,6 @@ static gint key_press_event(GtkWidget	*widget,
 
 	switch (event->keyval)
 	{
-		case GDK_Left:
-			collection_move_cursor(collection, 0, -1);
-			break;
-		case GDK_Right:
-			collection_move_cursor(collection, 0, 1);
-			break;
-		case GDK_Up:
-			collection_move_cursor(collection, -1, 0);
-			break;
-		case GDK_Down:
-			collection_move_cursor(collection, 1, 0);
-			break;
 		case GDK_Return:
 			/* XXX: This won't work properly if button-1 new
 			 * window is set.
@@ -1107,7 +1132,7 @@ static gint key_press_event(GtkWidget	*widget,
 			if (item < 0 || item >= collection->number_of_items)
 				break;
 			filer_openitem(filer_window,
-				(DirItem *) collection->items[item].data,
+					item,
 				(event->state & GDK_SHIFT_MASK) != 0,
 				FALSE);
 			break;
@@ -1128,7 +1153,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_change_to(filer_window, getenv("HOME"));
+	filer_change_to(filer_window, getenv("HOME"), NULL);
 }
 
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -1138,11 +1163,26 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 void change_to_parent(FilerWindow *filer_window)
 {
-	filer_change_to(filer_window, make_path(filer_window->path, "..")->str);
+	char	*from;
+
+	from = strrchr(filer_window->path, '/');
+	if (from)
+		from++;
+
+	filer_change_to(filer_window, make_path(filer_window->path, "..")->str,
+			from);
 }
 
-void filer_change_to(FilerWindow *filer_window, char *path)
+/* Make filer_window display path. When finished, highlight item 'from', or
+ * the first item if from is NULL. If there is currently no cursor then
+ * simply wink 'from' (if not NULL).
+ */
+static void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 {
+	char	*from_dup;
+	
+	from_dup = from && *from ? g_strdup(from) : NULL;
+
 	detach(filer_window);
 	g_free(filer_window->path);
 	filer_window->path = pathdup(path);
@@ -1151,14 +1191,21 @@ void filer_change_to(FilerWindow *filer_window, char *path)
 					filer_window->path);
 	if (filer_window->directory)
 	{
+		g_free(filer_window->auto_select);
+		filer_window->had_cursor =
+			filer_window->collection->cursor_item != -1;
+		filer_window->auto_select = from_dup;
+
 		gtk_window_set_title(GTK_WINDOW(filer_window->window),
 				filer_window->path);
+		collection_set_cursor_item(filer_window->collection, -1);
 		attach(filer_window);
 	}
 	else
 	{
 		char	*error;
 
+		g_free(from_dup);
 		error = g_strdup_printf("Directory '%s' is not accessible.",
 				path);
 		delayed_error("ROX-Filer", error);
@@ -1167,20 +1214,31 @@ void filer_change_to(FilerWindow *filer_window, char *path)
 	}
 }
 
-DirItem *selected_item(Collection *collection)
+int selected_item_number(Collection *collection)
 {
 	int	i;
 	
-	g_return_val_if_fail(collection != NULL, NULL);
-	g_return_val_if_fail(IS_COLLECTION(collection), NULL);
-	g_return_val_if_fail(collection->number_selected == 1, NULL);
+	g_return_val_if_fail(collection != NULL, -1);
+	g_return_val_if_fail(IS_COLLECTION(collection), -1);
+	g_return_val_if_fail(collection->number_selected == 1, -1);
 
 	for (i = 0; i < collection->number_of_items; i++)
 		if (collection->items[i].selected)
-			return (DirItem *) collection->items[i].data;
+			return i;
 
 	g_warning("selected_item: number_selected is wrong\n");
 
+	return -1;
+}
+
+DirItem *selected_item(Collection *collection)
+{
+	int	item;
+
+	item = selected_item_number(collection);
+
+	if (item > -1)
+		return (DirItem *) collection->items[item].data;
 	return NULL;
 }
 
@@ -1272,6 +1330,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->path = pathdup(path);
+	filer_window->had_cursor = FALSE;
+	filer_window->auto_select = NULL;
 
 	filer_window->directory = g_fscache_lookup(dir_cache,
 						   filer_window->path);
@@ -1420,6 +1480,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 		gtk_accel_group_attach(filer_keys,
 				GTK_OBJECT(filer_window->window));
+		gtk_window_set_focus(GTK_WINDOW(filer_window->window),
+				collection);
 	}
 
 	number_of_windows++;

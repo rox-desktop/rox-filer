@@ -743,7 +743,8 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	else if (collection->number_selected != 1)
 		collection_target(collection, target_callback, open_file);
 	else
-		filer_openitem(window_with_focus, selected_item(collection),
+		filer_openitem(window_with_focus,
+				selected_item_number(collection),
 				TRUE, FALSE);
 }
 
