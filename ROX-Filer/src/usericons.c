@@ -630,7 +630,11 @@ static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
 	GtkWidget *item;
 	
 	item = gtk_menu_item_new_with_label(key);
+#ifdef GTK2
+	_gtk_widget_set_accel_path(item, NULL, NULL);
+#else
 	gtk_widget_lock_accelerators(item);
+#endif
 	gtk_signal_connect(GTK_OBJECT(item), "activate",
 			GTK_SIGNAL_FUNC(open_icon_dir), NULL);
 	g_free(key);

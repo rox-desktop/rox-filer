@@ -83,7 +83,6 @@ static void items_sensitive(gboolean state);
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new));
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
-static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean link_cb(guchar *initial, guchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
@@ -147,6 +146,13 @@ static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void set_icon(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
+#ifdef GTK2
+#define MENUS_NAME "menus2"
+static void keys_changed(gpointer data);
+#else
+# define MENUS_NAME "menus"
+static void mark_menus_modified(gboolean mod);
+#endif
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
@@ -326,11 +332,15 @@ void menu_init(void)
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
 	filer_new_window = GTK_BIN(item)->child;
 
-	menurc = choices_find_path_load("menus", PROJECT);
+	menurc = choices_find_path_load(MENUS_NAME, PROJECT);
 	if (menurc)
 	{
+#ifdef GTK2
+		gtk_accel_map_load(menurc);
+#else
 		gtk_item_factory_parse_rc(menurc);
 		mark_menus_modified(FALSE);
+#endif
 		g_free(menurc);
 	}
 
@@ -366,7 +376,12 @@ void menu_init(void)
 				GTK_SIGNAL_FUNC(gtk_widget_hide),
 				GTK_OBJECT(savebox));
 
+#ifdef GTK2
+	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
+				  (GCallback) keys_changed, NULL, 0);
+#else
 	atexit(save_menus);
+#endif
 }
 
 /* Name is in the form "<panel>" */
@@ -389,6 +404,20 @@ GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
 	gtk_accel_group_lock(keys);
 
 	return item_factory;
+}
+
+/* Prevent the user from setting a short-cut on this item */
+void menuitem_no_shortcuts(GtkWidget *item)
+{
+#ifdef GTK2
+	GtkMenuItem *menuitem = GTK_MENU_ITEM(item);
+
+	_gtk_widget_set_accel_path(item, NULL, NULL);
+	g_free(menuitem->accel_path);
+	menuitem->accel_path = NULL;
+#else
+	gtk_widget_lock_accelerators(item);
+#endif
 }
  
 static void items_sensitive(gboolean state)
@@ -551,7 +580,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 
 			item = gtk_menu_item_new();
 			/* TODO: Find a way to allow short-cuts */
-			gtk_widget_lock_accelerators(item);
+			menuitem_no_shortcuts(item);
 
 			hbox = gtk_hbox_new(FALSE, 2);
 			gtk_container_add(GTK_CONTAINER(item), hbox);
@@ -1808,6 +1837,7 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 	g_list_free(items);
 }
 
+#ifndef GTK2
 /* This is called for every modified menu entry. We just use it to
  * find out if the menu has changed at all.
  */
@@ -1816,12 +1846,21 @@ static void set_mod(gboolean *mod, guchar *str)
 	if (str && str[0] == '(')
 		*mod = TRUE;
 }
+#endif
 
 static void save_menus(void)
 {
 	char	*menurc;
-	
-	menurc = choices_find_path_save("menus", PROJECT, FALSE);
+
+#ifdef GTK2
+	menurc = choices_find_path_save(MENUS_NAME, PROJECT, TRUE);
+	if (menurc)
+	{
+		gtk_accel_map_save(menurc);
+		g_free(menurc);
+	}
+#else
+	menurc = choices_find_path_save(MENUS_NAME, PROJECT, FALSE);
 	if (menurc)
 	{
 		gboolean	mod = FALSE;
@@ -1835,7 +1874,8 @@ static void save_menus(void)
 		/* Dump out if so... */
 		if (mod)
 		{
-			menurc = choices_find_path_save("menus", PROJECT, TRUE);
+			menurc = choices_find_path_save(MENUS_NAME,
+							PROJECT, TRUE);
 			g_return_if_fail(menurc != NULL);
 			mark_menus_modified(TRUE);
 			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
@@ -1843,8 +1883,16 @@ static void save_menus(void)
 			g_free(menurc);
 		}
 	}
+#endif
 }
 
+#ifdef GTK2
+static void keys_changed(gpointer data)
+{
+	g_print("[ changed - saving ]\n");
+	save_menus();
+}
+#else
 static void mark_modified(gpointer hash_key,
 			  gpointer value,
 			  gpointer user_data)
@@ -1864,6 +1912,7 @@ static void mark_menus_modified(gboolean mod)
 	g_hash_table_foreach(class->item_ht, mark_modified,
 			GINT_TO_POINTER(mod));
 }
+#endif
 
 static void select_nth_item(GtkMenuShell *shell, int n)
 {

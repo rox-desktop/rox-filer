@@ -671,7 +671,32 @@ static FindCondition *parse_is(guchar **expression)
 	FindCondition	*cond;
 	IsTest		test;
 
-	if (MATCH(_("IsReg")))
+	if (NEXT == '-')
+	{
+		switch ((*expression)[1])
+		{
+			case 'f': test = IS_REG; break;;
+			case 'l': test = IS_LNK; break;;
+			case 'd': test = IS_DIR; break;;
+			case 'b': test = IS_BLK; break;;
+			case 'c': test = IS_CHR; break;;
+			case 'D': test = IS_DEV; break;;
+			case 'p': test = IS_FIFO; break;;
+			case 'S': test = IS_SOCK; break;;
+			case 'u': test = IS_SUID; break;;
+			case 'g': test = IS_SGID; break;;
+			case 'k': test = IS_STICKY; break;;
+			case 'r': test = IS_READABLE; break;;
+			case 'w': test = IS_WRITEABLE; break;;
+			case 'x': test = IS_EXEC; break;;
+			case 'o': test = IS_MINE; break;;
+			case 'z': test = IS_EMPTY; break;;
+			default: return NULL;
+		}
+		EAT;
+		EAT;
+	}
+	else if (MATCH(_("IsReg")))
 		test = IS_REG;
 	else if (MATCH(_("IsLink")))
 		test = IS_LNK;
