@@ -55,6 +55,8 @@ void load_default_pixmaps(GdkWindow *window)
 	load_pixmap(window, "pixmaps/socket.xpm",
 			default_pixmap + TYPE_SOCKET);
 
+	load_pixmap(window, "pixmaps/mount.xpm",
+			default_pixmap + TYPE_MOUNT);
 	load_pixmap(window, "pixmaps/multiple.xpm",
 			default_pixmap + TYPE_MULTIPLE);
 	load_pixmap(window, "pixmaps/application.xpm",

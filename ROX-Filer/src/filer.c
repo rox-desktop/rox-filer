@@ -25,6 +25,7 @@
 #include "menu.h"
 #include "dnd.h"
 #include "apps.h"
+#include "mount.h"
 
 FilerWindow 	*window_with_focus = NULL;
 
@@ -151,7 +152,15 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 		if (S_ISREG(info.st_mode))
 			base_type = TYPE_FILE;
 		else if (S_ISDIR(info.st_mode))
+		{
+			struct mntent *ent;
+
 			base_type = TYPE_DIRECTORY;
+
+			ent = g_hash_table_lookup(mount_points, path->str);
+			if (ent)
+				item->flags |= ITEM_FLAG_MOUNT_POINT;
+		}
 		else if (S_ISBLK(info.st_mode))
 			base_type = TYPE_BLOCK_DEVICE;
 		else if (S_ISCHR(info.st_mode))
@@ -272,7 +281,17 @@ static void draw_item(GtkWidget *widget,
 					default_pixmap[TYPE_SYMLINK].mask);
 			gdk_draw_pixmap(widget->window, gc,
 					default_pixmap[TYPE_SYMLINK].pixmap,
-					0, 0,			/* Source x,y */
+					0, 0,		/* Source x,y */
+					image_x, area->y + 8,	/* Dest x,y */
+					-1, -1);
+		}
+		else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+		{
+			gdk_gc_set_clip_mask(gc,
+					default_pixmap[TYPE_MOUNT].mask);
+			gdk_draw_pixmap(widget->window, gc,
+					default_pixmap[TYPE_MOUNT].pixmap,
+					0, 0,		/* Source x,y */
 					image_x, area->y + 8,	/* Dest x,y */
 					-1, -1);
 		}

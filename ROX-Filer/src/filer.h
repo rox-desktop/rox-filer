@@ -19,8 +19,9 @@ typedef struct _FileItem FileItem;
 
 enum
 {
-	ITEM_FLAG_SYMLINK = 0x1,	/* Is a symlink */
-	ITEM_FLAG_APPDIR  = 0x2,	/* Contains /AppInfo */
+	ITEM_FLAG_SYMLINK 	= 0x1,	/* Is a symlink */
+	ITEM_FLAG_APPDIR  	= 0x2,	/* Contains /AppInfo */
+	ITEM_FLAG_MOUNT_POINT  	= 0x4,	/* Is in /etc/fstab */
 };
 
 struct _FilerWindow
@@ -49,7 +50,7 @@ struct _FileItem
 extern FilerWindow 	*window_with_focus;
 extern GHashTable	*child_to_filer;
 
-/* Prototype */
+/* Prototypes */
 void filer_init();
 void filer_opendir(char *path);
 void scan_dir(FilerWindow *filer_window);

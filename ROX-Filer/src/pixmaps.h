@@ -24,6 +24,7 @@ enum
 	TYPE_SOCKET,
 
 	/* Extended types */
+	TYPE_MOUNT,
 	TYPE_MULTIPLE,
 	TYPE_APPDIR,
 	LAST_DEFAULT_PIXMAP

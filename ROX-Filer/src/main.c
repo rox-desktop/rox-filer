@@ -13,6 +13,7 @@
 #include <collection.h>
 
 #include "filer.h"
+#include "mount.h"
 #include "menu.h"
 #include "dnd.h"
 
@@ -51,6 +52,7 @@ int main(int argc, char **argv)
 	menu_init();
 	dnd_init();
 	filer_init();
+	mount_init();
 
 	signal(SIGCHLD, child_died);
 
