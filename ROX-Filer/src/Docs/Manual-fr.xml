@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 1.3.0 - Manuel de l'utilisateur
+   ROX-Filer 1.3.2 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -146,6 +146,17 @@
 	   </para>
 	  </listitem>
 	 </varlistentry>
+	 <varlistentry>
+	  <term>Shared MIME Info Database</term>
+	  <listitem>
+	   <para>
+		Avant, chaque gestionnaire de bureau avait son propre système pour gérer les types de fichiers.
+		La base de données des types MIME <citation>SharedMIME</citation> propose un standard pour que
+		les différents gestionnaires de bureau n'utilisent plus qu'un seul système.
+	   </para>
+	 </listitem>
+	</varlistentry>
+
 	</variablelist>
    </para>
   </sect1>
@@ -179,7 +190,7 @@
 
 	<listitem>
 	 <para>
-	  GTK+ 2.0.0 ou postérieure (bibliothèques et en-têtes) &mdash; dernière
+	  GTK+ 2.0.1 ou postérieure (bibliothèques et en-têtes) &mdash; dernière
 	  version téléchargeable depuis <citation>GTK+</citation>,
 	 </para>
 	</listitem>
@@ -203,7 +214,7 @@
    <command>pkg-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
 
    <screen>$ pkg-config --modversion gtk+-2.0
-2.0.0</screen>
+	2.0.5</screen>
 
   </para>
 
@@ -212,13 +223,10 @@
 
    <step>
 	<para>
-	 Le filer a besoin de quelques fichiers partagés pour fonctionner
-	 &mdash; des icônes pour les différents types de fichiers, des règles
-	 pour déterminer le type des fichiers et quelques commandes par défaut
-	 pour certains types de fichiers.
-	 Tout ceci est installé avec le paquetage 'rox-base'.
-	 Installez rox-base maintenant (depuis <ulink url="http://rox.sourceforge.net"/>
-	 si vous ne l'avez pas encore fait.
+	 Le filer utilise maintenant la base de données <citation>SharedMIME</citation>
+	 pour gérer les types MIME des fichiers. Vous devez installer cette base avant 
+	 d'installer rox, sinon le filer ne fonctionnera pas correctement (ROX-Filer 
+	 vous avertira lors de son démarrage si elle n'est pas installée).
 	</para>
    </step>
 
@@ -232,7 +240,9 @@
 	<para>
 	 Exécutez le script d'installation <command>install.sh</command>, comme ceci :
 
-	 <screen>$ ./install.sh</screen>
+	 <screen>
+	  $ ./install.sh
+	 </screen>
 
 	</para>
    </step>
@@ -272,7 +282,9 @@
    Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command>
    sans aucune option, comme ceci :
 
-   <screen>$ rox</screen>
+   <screen>
+	$ rox
+   </screen>
 
    Une fenêtre devrait apparaître et afficher le contenu du dossier courant.
    Si vous avez installé le script dans votre home, vous devrez sûrement mettre
@@ -287,7 +299,7 @@
    <manvolnum>1</manvolnum></citerefentry>) :
 
    <screen>$ setenv PATH $HOME/bin:$PATH
-$ rehash</screen>
+	$ rehash</screen>
 
   </para>
 
@@ -391,12 +403,6 @@ $ rox --bottom=</screen>
 	  En particulier, vérifiez les options concernant les différentes
 	  "couches" (au-dessus, en dessous, premier, dernier, etc...) et affectez le
 	  punaiseur aux couches les plus basses.
-
-Pour que le filer reçoive les clics de la souris sur le bureau (dans le cas du punaiseur),
-vous devez avoir un gestionnaire de fenêtres compatible GNOME.
-Pour savoir si votre gestionnaire de fenêtres est compatible, essayez de
-cliquer avec le bouton droit de la souris sur une partie vide du bureau. Si
-le menu du punaiseur s'affiche, tout fonctionne !
   </para>
 
 <sect2><title>Sawfish / sawmill</title>
@@ -900,10 +906,6 @@ Configure <application>ROX-Filer</application>.
 Crée un nouveau fichier ou dossier à l'intérieur de ce dossier.
 </entry></row>
 
-<row><entry><guimenuitem>Xterm ici</guimenuitem></entry><entry>
-Ouvre un xterm avec ce dossier comme dossier courant.
-</entry></row>
-
 <row><entry><guimenuitem>Fenêtre</guimenuitem></entry><entry>
 Opérations diverses agissant sur la fenêtre.
 </entry></row>
@@ -1380,6 +1382,21 @@ Ouvre une nouvelle fenêtre avec le même dossier courant.
 Affiche le contenu de votre répertoire personnel.
 </entry></row>
 
+<row>
+ <entry>
+  <guimenuitem>Suivre les liens symboliques</guimenuitem>
+ </entry>
+ <entry>
+  Convertit le chemin affiché dans la barre de titre en son nom canonique.
+  Par exemple, si <filename>/home/fred/lien</filename> est un lien symbolique 
+  pointant sur <filename>/usr/share/doc/</filename>, cliquer le lien vous 
+  amènera dans ce dossier, et remonter avec la flèche vous ramènera dans 
+  <filename>/home/fred</filename>.
+  Si vous aviez utilisé <guimenuitem>Suivre les liens symboliques</guimenuitem>, 
+  vous seriez revenu dans <filename>/usr/share</filename>.
+ </entry>
+</row>
+
 <row><entry>
 <guimenuitem>Changer taille de la fenêtre</guimenuitem></entry><entry>
 Ajuste la taille de la fenêtre à son contenu.
@@ -1392,13 +1409,32 @@ Ferme la fenêtre.
 
 <row><entry>
 <guimenuitem>Entrer un chemin...</guimenuitem></entry><entry>
-Ouvre un 'espace de saisie' pour ouvrir un autre dossier (voir section <xref linkend="mini"/>).
+Ouvre un "espace de saisie" pour ouvrir un autre dossier (voir section <xref linkend="mini"/>).
 </entry></row>
 
 <row><entry>
 <guimenuitem>Commande shell...</guimenuitem></entry><entry>
-Ouvre un 'espace de saisie' pour exécuter une commande shell (voir section <xref linkend="mini"/>).
+Ouvre un "espace de saisie" pour exécuter une commande shell (voir section <xref linkend="mini"/>).
 </entry></row>
+
+<row>
+ <entry>
+  <guimenuitem>Xterm ici</guimenuitem>
+ </entry>
+ <entry>
+  Ouvre un xterm avec ce dossier comme dossier courant.
+ </entry>
+</row>
+
+<row>
+ <entry>
+  <guimenuitem>Remplacer par un xterm</guimenuitem>
+ </entry>
+ <entry>
+  Ouvre un xterm avec ce dossier comme dossier courant, et ferme la fenêtre du filer 
+  automatiquement.
+ </entry>
+</row>
 
 <row>
  <entry>
@@ -1435,6 +1471,24 @@ Ouvre un 'espace de saisie' pour exécuter une commande shell (voir section <xref
   en cliquant sur un fichier avec le bouton droit en maintenant la touche <keycap>Shift</keycap> 
   enfoncée.
  </para>
+
+ <sect2>
+  <title>Afficher différentes applications selon les types MIME</title>
+  <para>
+   Vous pouvez personnaliser votre environnement pour que, par exemple, 
+   seule "the Gimp" soit affichée quand une image est sélectionnée.
+   Pour cela, créez un dossier caché dans <filename>SendTo</filename> nommé 
+   <filename>.image</filename>, ou portant le nom d'un autre type MIME. 
+   Vous pouvez utiliser le nom complet d'un type MIME (par ex <filename>.image_png</filename>) 
+   ou juste le "media type". Utilisez <guimenuitem>Info</guimenuitem> sur un fichier pour 
+   connaître son type MIME.
+  </para>
+  <para>
+   Les objets créés dans ces dossiers cachés ne sont affichés que pour les fichiers correspondant 
+   au type MIME décrit par le nom dudit dossier. Si plusieurs fichiers sont sélectionnés, le dossier 
+   <filename>.group</filename> est alors utilisé.
+  </para>
+ </sect2>
 </sect1>
 
 </chapter>
@@ -1478,9 +1532,6 @@ de fichiers, en général...
   <title>Les menus du punaiseur et des panneaux</title>
   <para>
 
-Ces menus sont les mêmes. Ils sont très simples :
-
-
 <informaltable><tgroup cols="2">
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
@@ -1510,6 +1561,16 @@ Ouvre une fenêtre montrant le dossier où est enregistré l'objet original.
 <guimenuitem>Enlever le(s) objet(s)</guimenuitem></entry><entry>
 Supprime du punaiseur ou des panneaux les objets sélectionnés.
 </entry></row>
+
+<row>
+ <entry>
+  <guimenuitem>Image de fond...</guimenuitem>
+ </entry>
+ <entry>
+  Définit l'image de fond pour le punaiseur (voir ci-dessous). Disponible dans 
+  le menu du punaiseur seulement.
+ </entry>
+</row>
 
 </tbody></tgroup></informaltable>
 
@@ -1572,7 +1633,139 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
 
   </procedure>
 </sect1>
-</chapter>
+
+<sect1>
+ <title><anchor id="iconify" xreflabel="Iconified windows"/>Fenêtres iconifiées sur le punaiseur</title>
+ <para>
+  Quand le punaiseur est utilisé, ROX-Filer peut afficher une icône pour chaque fenêtre iconisée (ou 
+  "réduite"). Vous pouvez activer/désactiver cette fonctionnalité dans la boîte Options. 
+  Les icônes des fenêtres réduites sont mises en surbrillance quand vous passez la souris au-dessus d'elles 
+  et elles peuvent être déplacées.
+  Si vous cliquez sur une d'elles, celle-ci reprendra la taille normale de l'application qu'elle représente. 
+  Quelques vieux gestionnaires de fenêtres ne sont pas compatibles avec cette fonctionnalité, et n'affichent 
+  donc pas ces icônes.
+ </para>
+</sect1>
+
+<sect1>
+ <title><anchor id="backdropapp" xreflabel="Backdrop applications"/>L'image de fond</title>
+ <para>
+  Vous pouvez choisir une image de fond pour le punaiseur en choisissant <guimenuitem>Image de fond...</guimenuitem>   
+  dans le menu du punaiseur (clic droit sur le bureau quand le punaiseur est activé).
+ </para>
+ <para>
+   Pour choisir une image, choisissez <guilabel>Centrée</guilabel>, <guilabel>Redimensionnée</guilabel> ou 
+   <guilabel>Pavée</guilabel> pour le style, puis faites glisser une image dans l'emplacement prévu.
+   Pour retrouver un bureau avec une simple couleur (définie dans la boîte Options), cliquez sur 
+   <guibutton>Effacer</guibutton>.
+ </para>
+ <formalpara>
+  <title>Pour les programmeurs...</title>
+  <para>
+   Si vous voulez créer une application qui gère le fond d'écran (par exemple pour choisir une image au hasard 
+   ou pour faire un diaporama), vous devez d'abord créer un dossier-application (voir <xref linkend="AppDir"/>).
+  </para>
+ </formalpara>
+ <para>
+  Exécutée sans argument, l'application doit invoquer la méthode SOAP <function>SetBackdropApp</function> 
+  (voir <xref linkend="soap"/>). Le filer ré-exécutera immédiatement l'application, cette fois avec l'option 
+  <option>--backdrop</option>.
+ </para>
+ <para>
+  Exécutée avec l'option <option>--backdrop</option>, l'application doit afficher le style et le nom de 
+  l'image utilisée sur sa sortie standard, ie :
+  <screen>tile /tmp/image.png</screen>
+  <userinput>centre</userinput> et <userinput>scale</userinput> sont les 2 autres styles acceptés. 
+  Le filer va ensuite charger cette image et l'afficher. L'application ne gère pas l'affichage de 
+  l'image, elle indique seulement au filer quoi afficher.
+ </para>
+ <para>
+  Dans le cas d'une application qui choisirait une image aléatoirement, elle peut s'arrêter immédiatement. 
+  Si l'application a créé une image temporaire, elle doit lire la ligne "ok\n" sur son entrée standard avant 
+  d'effacer l'image.
+ </para>
+ <para>
+  Si l'application doit afficher une séquence d'images, elle doit toujours lire "ok\n", puis attendre 
+  jusqu'à ce que le moment soit venu d'afficher l'image suivante, afficher le nom du fichier, et ainsi de suite.
+ </para>
+ <para>
+  Le filer indiquera à l'application qu'elle doit s'arrêter en fermant les deux "flux" (entrée et sortie). 
+  L'application devra alors nettoyer et sortir proprement à ce moment. 
+  Vérifiez que SIGPIPE soit bien géré quand vous écrivez sur la sortie standard si vous devez supprimer 
+  des fichiers temporaires.
+ </para>
+ <para>
+  Cet exemple affiche une image de la Terre en fond d'écran, en l'actualisant toutes les minutes.
+  Notez les trois endroits qui gèrent le test de la connexion avec le filer : en envoyant l'image, 
+  en attendant des infos, et en étant en veille. 
+  Ce fichier devrait être enregistré sous le nom <filename>AppRun</filename> à l'intérieur de votre 
+  nouveau dossier-application. Pour changer le fond d'écran, exécutez l'application (ie : cliquez dessus).
+  <programlisting><![CDATA[
+#!/usr/bin/env python
+
+import sys, os
+
+if len(sys.argv) == 1:
+    # Become the backdrop application
+	app = os.path.abspath(os.path.dirname(sys.argv[0]))
+	cin = os.popen('rox -R', 'w')
+	cin.write("""<?xml version="1.0"?>
+<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
+  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
+   <SetBackdropApp><App>""" + app + """</App></SetBackdropApp>
+  </env:Body>
+</env:Envelope>
+""")
+    sys.exit(0)
+elif len(sys.argv) != 2 or sys.argv[1] != '--backdrop':
+	sys.stderr.write("Usage: %s [--backdrop]\n" % sys.argv[0])
+	sys.exit(1)
+
+# If we get here, we've been run by the filer.
+# Generate a sequence of images, sending them to the filer one by one.
+
+import tempfile, time, signal
+from select import select
+
+time_between_updates = 60
+
+while 1:
+    # Write image to a temporary file
+	path = tempfile.mktemp('.ppm')
+	child = os.fork()
+	if child == 0:
+		fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0600)
+		os.dup2(fd, 1)
+		os.execvp("xearth", ["xearth", "-ppm"])
+		os._exit(1)
+	pid, status = os.waitpid(child, 0)
+	if status:
+		break       # xearth didn't work
+
+	# Send message to filer
+	quit = 0
+	try:
+		print "centre " + path
+		sys.stdout.flush()
+		if sys.stdin.readline() != 'ok\n':
+			quit = 1        # filer closed connection
+	except:
+		quit = 1            # filer closed connection
+	# Delete temporary file
+	os.unlink(path)
+	if quit:
+		break
+
+    # Wait until the next image is due, or the filer tells us to quit
+	ready = select([sys.stdin], [], [], time_between_updates)[0]
+    if ready:
+		# filer closed connection while we were waiting
+		break
+]]>
+	</programlisting>
+   </para>
+  </sect1>
+ </chapter>
 
 <chapter id="virtual">
   <title>
@@ -2239,7 +2432,7 @@ pour que grep ne soit exécuté que pour les fichiers ayant pour extension <filena
 
 <listitem><para>
 <userinput>Prune</userinput> Ne réussit jamais !
-<footnote><para>Notez que c'est l'inverse de la commande <citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
+<footnote><para>Notez que c'est l'inverse de la commande<citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
 </citerefentry>.</para></footnote>
 
 Ce mot-clé peut empêcher la recherche à l'intérieur du dossier courant.
@@ -2277,26 +2470,19 @@ Choisissez pour cela <guimenuitem>Options...</guimenuitem> dans le menu d'une fe
 La liste à gauche montre les différentes sections &mdash; cliquez sur celle de votre choix 
 pour voir les options dont elle dispose.
 
-Il y a trois boutons en bas de la boîte de configuration :
+Il y a deux boutons en bas de la boîte de configuration :
 
 <itemizedlist>
 
  <listitem>
   <para>
-   <guibutton>Sauver</guibutton>
+   <guibutton>OK</guibutton>
    sauve vos choix dans votre dossier Choices, pour que <application>ROX-Filer</application> 
    les retrouve la prochaine fois qu'il sera exécuté. 
-   L'endroit exact où les choix sont sauvegardés est défini par la variable 
-   d'environnement <envar>CHOICESPATH</envar> &mdash; voir <citation>Choices</citation> 
-   pour plus de détails.
-  </para>
- </listitem>
-
- <listitem>
-  <para>
-   <guibutton>OK</guibutton>
-   Puisque tous vos choix prennent effet immédiatement, ce bouton ne sert 
-   qu'à fermer la fenêtre.
+   L'endroit exact où les choix sont sauvegardés est défini par la variable d'environnement 
+   <envar>CHOICESPATH</envar> &mdash; voir <citation>Choices</citation> pour plus de détails. 
+   Puisque tous vos choix prennent effet immédiatement, vous n'avez pas besoin de cliquer sur 
+   <guibutton>OK</guibutton> pour voir ce qui change.
   </para>
  </listitem>
 
@@ -2304,7 +2490,8 @@ Il y a trois boutons en bas de la boîte de configuration :
   <para>
    <guibutton>Revenir</guibutton>
    Annule toutes les modifications effectuées depuis l'ouverture de la fenêtre Options. 
-   Cette fenêtre n'est pas fermée si vous utilisez ce bouton.
+   Ce bouton est grisé si vous n'avez effectué aucun changement.
+   La boîte Options n'est pas fermée si vous utilisez ce bouton.
   </para>
  </listitem>
 
@@ -2369,6 +2556,14 @@ obtenir la langue désirée.
    <guilabel>Taille maximum</guilabel> fixe -en pourcentage de la taille 
    de l'écran- la taille maximum des fenêtres lorsque celles-ci sont 
    automatiquement redimensionnées.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Passer automatiquement des grandes aux petites icônes</guilabel>
+   autorise le filer à choisir la taille des icônes quand il change de dossier. 
+   Le seuil pour ce changement d'affichage est fixé par l'option juste en-dessous.
   </para>
  </listitem>
 
@@ -2498,8 +2693,11 @@ obtenir la langue désirée.
 	  <guilabel>Type de barre d'outils</guilabel>
 	  vous permet de choisir quel type de barre d'outils vous voulez.
 	  <guimenuitem>Aucune</guimenuitem> désactive l'affichage de la barre d'outils,
-	  <guimenuitem>Petit</guimenuitem> affiche une petite barre d'icônes, et
-	  <guimenuitem>Grand</guimenuitem> affiche de plus grands boutons, avec des labels textuels.
+	  <guimenuitem>Icônes seulement</guimenuitem> affiche une petite barre d'icônes, 
+	  <guimenuitem>Texte sous les icônes</guimenuitem> affiche de plus grands boutons, 
+	  avec des labels textuels dessous, et 
+	  <guimenuitem>Texte à côté des icônes</guimenuitem> affiche de plus larges boutons, 
+	  avec des labels textuels à côté des icônes.
 	 </para>
 	</listitem>
 
@@ -2555,8 +2753,9 @@ obtenir la langue désirée.
    <itemizedlist>
 	<listitem>
 	 <para>
-	  <guilabel>Style du texte</guilabel>
-	  Permet de choisir les couleurs à utiliser pour le texte des icônes.
+	  <guilabel>Couleurs</guilabel>
+	  permet de définir les couleurs à appliquer pour le texte des icônes et pour le fond d'écran 
+	  (si aucune image n'est utilisée).
 	 </para>
 	</listitem>
 
@@ -2572,6 +2771,15 @@ obtenir la langue désirée.
 
 	<listitem>
 	 <para>
+	  <guilabel>Passer les clics du bouton 3 au gestionnaire de fenêtres</guilabel>
+	  est peut-être nécessaire si votre gestionnaire de fenêtres utilise les clics du bouton 3 sur le bureau 
+	  pour une fonction importante. Normalement, un clic du bouton 3 sur le bureau affichera le menu du 
+	  punaiseur.
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
 	  <guilabel>Garder les icônes à l'intérieur des limites de l'écran</guilabel> 
 	  évite que les icônes soient affichées à moitié en dehors de l'écran.
 	 </para>
@@ -2581,6 +2789,17 @@ obtenir la langue désirée.
 	 <para>
 	  <guilabel>Pas de la grille pour les icônes</guilabel> contrôle la finesse 
 	  du positionnement des icônes.
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
+	  <guilabel>Fenêtres iconifiées</guilabel> contrôle la manière dont le filer gère 
+	  les fenêtres iconifiées (ie "réduites"). 
+	  Si <guilabel>Montrer les fenêtres iconifiées</guilabel> est activée, le filer affichera 
+	  une icône sur le punaiseur pour chaque fenêtre réduite. Les deux autres options vous permettent 
+	  de choisir comment les icônes sont placées par le filer. Voir <xref linkend="iconify"/> pour plus 
+	  de détails.
 	 </para>
 	</listitem>
 
@@ -2867,27 +3086,12 @@ obtenir la langue désirée.
 <sect1>
  <title>Comment les types de fichier sont enregistrés</title>
  <para>
-  <application>ROX-Filer</application> utilise trois sous-dossiers dans votre dossier Choices pour gérer
+  <application>ROX-Filer</application> utilise deux sous-dossiers dans votre dossier Choices pour gérer
   les types de fichier :
   <variablelist>
-   <varlistentry><term><filename>MIME-info</filename></term><listitem>
-	 <para>
-	  contient des fichiers qui définissent le type MIME des fichiers
-	  en fonction de leur extension. Tous les fichiers se trouvant dans les dossiers
-	  <filename>MIME-info</filename> sont lus quand le filer démarre.
-	  <application>ROX-Filer</application> est installé avec beaucoup de ces règles déjà configurées
-	  &mdash; celles-ci sont installées par le paquetage rox-base.
-	 </para>
-	 <para>
-	  Beaucoup d'applications sont maintenant distribuées avec un fichier nommé <filename>something.mime</filename> ;
-	  copiez-les dans ce dossier <filename>MIME-info</filename> pour que <application>ROX-Filer</application> reconnaisse
-	  automatiquement les nouvelles extensions.
-	  <application>ROX-Filer</application> ne lit pas automatiquement ces fichiers. Vous pouvez soit redémarrer le filer,
-	  soit cliquer sur le bouton <guibutton>Relire les fichiers</guibutton> de l'onglet <guilabel>Types</guilabel> dans la boîte Options.
-	 </para>
-	</listitem>
-   </varlistentry>
-   <varlistentry><term><filename>MIME-types</filename></term><listitem>
+   <varlistentry>
+	<term><filename>MIME-types</filename></term>
+	<listitem>
 	 <para>
 	  contient des liens symboliques, un par type MIME, qui pointent vers des programmes
 	  qui connaissent ce type de fichiers. Pour définir quel programme est exécuté quand vous
@@ -2922,7 +3126,7 @@ obtenir la langue désirée.
   <para>
    contient les images utilisées pour afficher chaque type de fichier.
    Donc le filer essaiera d'afficher un fichier HTML en utilisant l'icône nommée
-   <filename>MIME-icons/text_html.xpm</filename>.
+   <filename>MIME-icons/text_html.png</filename>.
   </para>
  </listitem>
 </varlistentry>
@@ -2934,6 +3138,10 @@ vous pouvez définir les actions/images par défaut pour chaque type de média.
 Par exemple, si <filename>text_html</filename> n'est pas trouvé, le filer
 essaiera simplement d'utiliser <filename>text</filename>.
 
+  </para>
+  <para>
+   Le filer cherche le type d'un fichier en fonction de son nom. Ces types sont définis par 
+   des fichiers `.mimeinfo' &mdash; voir <citation>SharedMIME</citation> pour plus de détails.
   </para>
  </sect1>
 </chapter>
@@ -3447,6 +3655,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
    </para>
    <para>
 	<simplelist columns='3'>
+	 <member>Michael Adams</member>
 	 <member>Christopher Arndt</member>
 	 <member>Jens Askengren</member>
 	 <member>Liav Asseraf</member>
@@ -3456,6 +3665,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Richard Boulton</member>
 	 <member>Simon Britnell</member>
 	 <member>Arnaud Calvo</member>
+	 <member>Babyfai Cheung</member>
 	 <member>Andrew Clover</member>
 	 <member>Fabien Coutant</member>
 	 <member>Couderc Damien</member>
@@ -3467,12 +3677,14 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Olivier Fourdan</member>
 	 <member>Eric Gillespie</member>
 	 <member>Thierry Godefroy</member>
+	 <member>Olli Helenius</member>
 	 <member>Alex Holden</member>
 	 <member>Jasper Huijsmans</member>
 	 <member>Bernard Jungen</member>
 	 <member>James Kermode</member>
 	 <member>Jim Knoble</member>
 	 <member>Krzysztof Krzyzaniak</member>
+	 <member>Aaron Kurtz</member>
 	 <member>Vincent Ledda</member>
 	 <member>Vincent Lefèvre</member>
 	 <member>Victor Liu See-le</member>
@@ -3556,8 +3768,17 @@ Les méthodes suivantes sont reconnues :</para>
 
  <listitem>
   <para>
-   <function>OpenDir</function>(<parameter>Filename</parameter>)
+   <function>OpenDir</function>(<parameter>Filename</parameter>,
+   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>]))
    Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
+   <parameter>Style</parameter> peut prendre la valeur <userinput>Large</userinput>, 
+   <userinput>Small</userinput> ou <userinput>Huge</userinput>. 
+   <parameter>Details</parameter> peut prendre la valeur <userinput>None</userinput>, 
+   <userinput>Summary</userinput>, <userinput>Size</userinput>, <userinput>Type</userinput>, 
+   <userinput>Times</userinput> ou <userinput>Permissions</userinput>. 
+   <parameter>Sort</parameter> peut prendre la valeur <userinput>Name</userinput>, 
+   <userinput>Type</userinput>, <userinput>Date</userinput> ou <userinput>Size</userinput>. 
+   Si une de ces options n'est pas renseignée, l'affichage par défaut est utilisé.
   </para>
  </listitem>
 
@@ -3600,6 +3821,26 @@ Les méthodes suivantes sont reconnues :</para>
 	<parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
 	Ajoute <parameter>Path</parameter> au punaiseur à la position 
 	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter>.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+   <function>SetBackdropApp</function>(<parameter>App</parameter>)
+   Définit <parameter>App</parameter> (un dossier-application) comme le "gestionnaire" 
+   du fond d'écran du punaiseur courant. 
+   Le fichier <filename>AppInfo.xml</filename> à l'intérieur de <parameter>App</parameter> 
+   doit contenir l'élément CanSetBackdrop, ie : 
+   <programlisting>
+&lt;?xml version="1.0"?&gt;
+&lt;AppInfo&gt;
+	  &lt;ROX:CanSetBackdrop xmlns:ROX="http://rox.sourceforge.net/SOAP/ROX-Filer"/>
+&lt;/AppInfo&gt;</programlisting>
+	 L'application sera exécutée avec l'option <option>--backdrop</option> comme seul argument 
+	 après avoir invoqué cette méthode, et chaque fois que le punaiseur sera réactivé. 
+	 N'UTILISEZ PAS cette méthode si vous invoquez l'option <option>--backdrop</option>, vous seriez 
+	 bloqué dans une boucle sans fin !
+	 Voir <xref linkend="backdropapp"/> pour un guide sur l'écriture d'applications gèrant le fond d'écran.
   </para>
  </listitem>
 
@@ -3738,6 +3979,11 @@ Les méthodes suivantes sont reconnues :</para>
 <bibliomixed>
  <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
   <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+ <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.7)
+  <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
 </bibliomixed>
 
 </bibliography>
