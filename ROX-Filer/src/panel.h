@@ -8,6 +8,8 @@
 #ifndef _PANEL_H
 #define _PANEL_H
 
+#define MENU_MARGIN 32
+
 typedef enum {
 	PANEL_TOP,
 	PANEL_BOTTOM,

@@ -55,6 +55,7 @@ void i18n_init(void)
 	doing_init = TRUE;
 	option_add_string("i18n_translation", "From LANG", trans_changed);
 	doing_init = FALSE;
+	set_trans(option_get_static_string("i18n_translation"));
 }
 
 /* These two stolen from dia :-).
@@ -148,11 +149,13 @@ void free_translated_entries(GtkItemFactoryEntry *entries, gint n)
 
 static void trans_changed(guchar *lang)
 {
+	if (doing_init)
+		return;
+
 	set_trans(lang);
-	if (!doing_init)
-		delayed_error(
-			_("You must restart the filer for the new language "
-			  "setting to take full effect"));
+	delayed_error(
+		_("You must restart the filer for the new language "
+		  "setting to take full effect"));
 }
 
 /* Load the 'Messages/<name>.gmo' translation.

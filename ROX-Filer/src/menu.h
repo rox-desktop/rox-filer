@@ -8,8 +8,6 @@
 #ifndef _MENU_H
 #define _MENU_H
 
-#define MENU_MARGIN 32
-
 extern GtkAccelGroup	*filer_keys;
 extern GtkWidget 	*popup_menu;
 
