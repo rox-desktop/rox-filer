@@ -757,7 +757,7 @@ static int getref(Directory *dir, gpointer data)
 static void update(Directory *dir, gchar *pathname, gpointer data)
 {
 	g_free(dir->pathname);
-	dir->pathname = g_strdup(pathname);
+	dir->pathname = pathdup(pathname);
 
 	start_scanning(dir, pathname);
 

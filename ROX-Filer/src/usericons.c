@@ -92,7 +92,7 @@ void check_globicon(guchar *path, DirItem *item)
 	GlobIcon *gi;
 
 	g_return_if_fail(item && !item->image);
-	
+
 	gi = get_globicon_struct(path);
 	if (gi)
 		item->image = g_fscache_lookup(pixmap_cache, gi->iconpath);
