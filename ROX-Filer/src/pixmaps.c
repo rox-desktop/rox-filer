@@ -371,13 +371,15 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(smtime);
 	g_free(uri);
 }
+#endif
 
 /* Check if we have an up-to-date thumbnail for this image.
  * If so, return it. Otherwise, returns NULL.
  */
 static GdkPixbuf *get_thumbnail_for(char *path)
 {
-	GdkPixbuf *thumb;
+	GdkPixbuf *thumb = NULL;
+#ifdef GTK2
 	char *thumb_path, *md5, *uri;
 	char *ssize, *smtime;
 	struct stat info;
@@ -418,11 +420,9 @@ err:
 out:
 	g_free(path);
 	g_free(thumb_path);
-
+#endif
 	return thumb;
 }
-
-#endif
 
 /* Load the image 'path' and return a pointer to the resulting
  * MaskedPixmap. NULL on failure.
