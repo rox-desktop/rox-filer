@@ -734,9 +734,7 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 /* Change stacking position of higher to be just above lower */
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 {
-	if (!lower)
-		gdk_window_lower(higher);	/* To bottom of stack */
-	else
+	if (override_redirect && lower)
 	{
 		XWindowChanges restack;
 		Window root, parent, w;
@@ -781,6 +779,8 @@ void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 		if (gdk_error_trap_pop())
 			g_warning("window_put_just_above()\n");
 	}
+	else
+		gdk_window_lower(higher);	/* To bottom of stack */
 }
 
 /* Copied from Gtk */
