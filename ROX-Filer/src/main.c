@@ -540,11 +540,15 @@ void on_child_death(gint child, CallbackFn callback, gpointer data)
 static void show_features(void)
 {
 	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
-	g_printerr("%s... %s\n", _("VFS support"),
+	g_printerr("%s... %s\n", _("Old VFS support"),
 #ifdef HAVE_LIBVFS
 		_("Yes")
 #else
+# ifdef LARGE_FILE_SUPPORT
+		_("No (incompatible with Large File Support)")
+# else
 		_("No (couldn't find a valid libvfs)")
+# endif
 #endif
 		);
 	g_printerr("%s... %s\n", _("GTK+-2.0 support"),

@@ -7,10 +7,6 @@ when someone sends patches!).
 
 BUGS
 
-Pinboard icons can only be dragged one at a time.
-
-Remove icon should work with MIME stuff.
-
 Think about XXXs in dnd menu.
 
 Deleting a symlink to a pinboard icon shows a warning
@@ -22,19 +18,26 @@ Gtk+ 2.0:
 	- Effective permissions aren't underlined
 	- Can't set menu shortcuts to a single key (eg, 'L') (GTK bug)
 	- Eventboxes don't DnD highlight (GTK bug)
-	- Details should use a monospace font (GTK bug?)
+	- Details should use a monospace font (GTK/Pango bug?)
 	- Action window log doesn't scroll properly (GTK bugs?)
-
-'Edit Item' doesn't make much sense for applets...
 
 Rescanning sometimes causes the display to scroll (automounter problem).
 
-Panel sometimes won't accept drops (window frame problem?).
-
-Deleting / moving files should update the globicons.
+Panel sometimes won't accept drops:
+	- Create panel without a window manager running
+	- Start sawfish. Panel no longer accepts drops.
+	- Same thing happens with gnome-terminal => sawfish bug (WM_STATE)?
 
 
 FEATURES FOR 1.1
+
+Deleting / moving files should update the globicons?
+
+Pinboard icons can only be dragged one at a time.
+
+Remove icon should work with MIME stuff.
+
+'Edit Item' doesn't make much sense for applets...
 
 Option to mount on click, Shift+Click to open without mounting.
 
