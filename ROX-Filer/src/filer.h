@@ -13,8 +13,6 @@
 #include "pixmaps.h"
 #include <sys/types.h>
 #include <dirent.h>
-#include "mount.h"
-#include "dir.h"
 
 typedef struct _FilerWindow FilerWindow;
 typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
@@ -34,6 +32,9 @@ typedef enum
 	FILER_UPDATING		= 0x02, /* (scanning) items may already exist */
 } FilerFlags;
 
+#include "mount.h"
+#include "minibuffer.h"
+#include "dir.h"
 #include "type.h"
 
 struct _FilerWindow
@@ -56,6 +57,7 @@ struct _FilerWindow
 
 	GtkWidget	*minibuffer;
 	int		mini_cursor_base;
+	MiniType	mini_type;
 };
 
 extern FilerWindow 	*window_with_focus;

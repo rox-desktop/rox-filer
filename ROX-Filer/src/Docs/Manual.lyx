@@ -1,7 +1,10 @@
-#This file was created by <tal197> Sun Apr  9 12:48:48 2000
+#This file was created by <tal197> Sun Apr  9 16:01:14 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
+\begin_preamble
+\def \Tab {\thinspace$\langle\hbox{Tab}\rangle$\thinspace}
+\end_preamble
 \language default
 \inputencoding latin1
 \fontscheme default
@@ -946,9 +949,10 @@ The Window Menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-7 2 0 0 -1 -1 -1 -1
+8 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -960,6 +964,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -994,6 +1000,15 @@ Close this window.
 Enter Path
 \newline 
 Open the path-entry box (see section 
+\begin_inset LatexCommand \ref{sec: mini}
+
+\end_inset 
+
+).
+\newline 
+Shell Command
+\newline 
+Open the shell command box (see section 
 \begin_inset LatexCommand \ref{sec: mini}
 
 \end_inset 
@@ -1174,11 +1189,19 @@ If you saw that line then it's worked! Well done!
 
 \end_inset 
 
+The mini-buffer
+\layout Standard
+
+The mini-buffer is a white bar that appears along the bottom of the window
+ and allows you to enter some text.
+ Press Escape to get rid of it again.
+ It behaves in different ways depending on how you invoked it:
+\layout Subsubsection
+
 The path-entry box
 \layout Standard
 
-The path-entry box is a white bar that appears along the bottom of the window.
- It allows you to type in a path directly.
+This allows you to type in a path directly.
  As you type the display is updated to show the item entered visually.
  The main use is to find a file in a large directory quickly, but you can
  also use it for navigating between directories, or for selecting a full
@@ -1187,8 +1210,7 @@ The path-entry box is a white bar that appears along the bottom of the window.
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-5 2 0 0 -1 -1 -1 -1
-1 1 0 0
+4 2 0 0 -1 -1 -1 -1
 1 1 0 0
 0 1 0 0
 0 1 0 0
@@ -1197,8 +1219,6 @@ multicol5
 2 1 1 "8cm" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1209,10 +1229,6 @@ multicol5
 Key
 \newline 
 Action
-\newline 
-Escape
-\newline 
-Close the path-entry box.
 \newline 
 Return
 \newline 
@@ -1234,7 +1250,7 @@ Tab completion tries to fill in as many characters for you as it can.
  If you use tab completion on a directory and it is unique then the filer
  will automatically change into the directory.
  This behavior should be familiar to shell users.
-\layout Subsubsection
+\layout Subsubsection*
 
 Example
 \layout Standard
@@ -1252,9 +1268,98 @@ Press CTRL-U to delete the existing contents - this moves you to the root
  directory.
 \layout Enumerate
 
-Type `u<Tab>do<Tab>wi<Tab>'.
+Type `u
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+do
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+wi
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+'.
  As you type, the cursor will move to the correct subdirectory.
  If it beeps when you press Tab then you need to supply more letters.
+\layout Subsubsection
+
+The shell command box
+\layout Standard
+
+This provides a quick way of entering shell commands if you don't want to
+ open an xterm.
+ If you don't know what shell commands are, skip this section!
+\layout Standard
+
+Just type in the command and press Return to execute it.
+ Up and Down arrows move through previously entered commands.
+ If some items are selected then they are assigned to the positional parameters
+ $1, $2, etc.
+\layout Subsubsection*
+
+Example
+\layout Standard
+
+To print all the selected files:
+\layout Enumerate
+
+Open the minibuffer by choosing `Shell Command' from the Window menu.
+ I usually bind this to the bang (`!') key.
+\layout Enumerate
+
+Type 
+\family typewriter 
+`lpr $*
+\family default 
+' and press Return.
+\layout Subsubsection*
+
+Notes
+\layout Itemize
+
+Be careful; you will not be asked to confirm! If in doubt, start the command
+ with `
+\family typewriter 
+echo
+\family default 
+' so that it will be displayed rather than executed.
+\layout Itemize
+
+The above command won't work if some of the files contain spaces --- use
+ `
+\family typewriter 
+lpr 
+\latex latex 
+"
+\latex default 
+$@
+\latex latex 
+"
+\family default 
+\latex default 
+' instead to be safe.
+\layout Itemize
+
+`sh' is always used as the name of the shell to run (mainly because bash
+ and csh treat positional parameters differently).
+ However, PATH is searched to find it so you can still use another shell
+ if you want by naming it sh and putting it in your path.
+\layout Itemize
+
+Commands execute in the background, so you can say:
+\begin_deeper 
+\layout LyX-Code
+
+sleep 240; xmessage Time to go!
+\end_deeper 
 \layout Subsection
 
 Action windows

@@ -1287,7 +1287,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 		collection_set_cursor_item(filer_window->collection, -1);
 		attach(filer_window);
 
-		if (GTK_WIDGET_VISIBLE(filer_window->minibuffer))
+		if (filer_window->mini_type == MINI_PATH)
 			gtk_idle_add((GtkFunction) minibuffer_show_cb,
 					filer_window);
 	}
@@ -1455,6 +1455,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
 	filer_window->auto_select = NULL;
+	filer_window->mini_type = MINI_NONE;
 
 	filer_window->directory = g_fscache_lookup(dir_cache,
 						   filer_window->path);
@@ -2003,7 +2004,7 @@ void filer_check_mounted(char *path)
 static gboolean minibuffer_show_cb(FilerWindow *filer_window)
 {
 	if (exists(filer_window))
-		minibuffer_show(filer_window);
+		minibuffer_show(filer_window, MINI_PATH);
 	return FALSE;
 }
 

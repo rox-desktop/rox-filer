@@ -24,14 +24,19 @@
 #include "config.h"
 
 #include <string.h>
+#include <errno.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
 #include "collection.h"
+#include "gui_support.h"
 #include "support.h"
 #include "minibuffer.h"
 #include "filer.h"
+#include "main.h"
+
+static GList *shell_history = NULL;
 
 /* Static prototypes */
 static gint key_press_event(GtkWidget	*widget,
@@ -61,7 +66,7 @@ GtkWidget *create_minibuffer(FilerWindow *filer_window)
 	return mini;
 }
 
-void minibuffer_show(FilerWindow *filer_window)
+void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 {
 	Collection	*collection;
 	GtkEntry	*mini;
@@ -69,12 +74,30 @@ void minibuffer_show(FilerWindow *filer_window)
 	g_return_if_fail(filer_window != NULL);
 	g_return_if_fail(filer_window->minibuffer != NULL);
 
-	collection = filer_window->collection;
-	filer_window->mini_cursor_base = MAX(collection->cursor_item, 0);
-
 	mini = GTK_ENTRY(filer_window->minibuffer);
 
-	gtk_entry_set_text(mini, make_path(filer_window->path, "")->str);
+	filer_window->mini_type = MINI_NONE;
+
+	switch (mini_type)
+	{
+		case MINI_PATH:
+			collection = filer_window->collection;
+			filer_window->mini_cursor_base =
+					MAX(collection->cursor_item, 0);
+			gtk_entry_set_text(mini,
+					make_path(filer_window->path, "")->str);
+			break;
+		case MINI_SHELL:
+			filer_window->mini_cursor_base = -1;	/* History */
+			gtk_entry_set_text(mini, "");
+			break;
+		default:
+			g_warning("Bad minibuffer type\n");
+			return;
+	}
+	
+	filer_window->mini_type = mini_type;
+
 	gtk_entry_set_position(mini, -1);
 
 	gtk_widget_show(filer_window->minibuffer);
@@ -85,6 +108,8 @@ void minibuffer_show(FilerWindow *filer_window)
 
 void minibuffer_hide(FilerWindow *filer_window)
 {
+	filer_window->mini_type = MINI_NONE;
+
 	gtk_widget_hide(filer_window->minibuffer);
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			GTK_WIDGET(filer_window->collection));
@@ -95,7 +120,9 @@ void minibuffer_hide(FilerWindow *filer_window)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
+/*			PATH ENTRY			*/
+
+static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	Collection 	*collection = filer_window->collection;
 	int		item = collection->cursor_item;
@@ -212,36 +239,7 @@ static void complete(FilerWindow *filer_window)
 	}
 }
 
-static gint key_press_event(GtkWidget	*widget,
-			GdkEventKey	*event,
-			FilerWindow	*filer_window)
-{
-	switch (event->keyval)
-	{
-		case GDK_Escape:
-			minibuffer_hide(filer_window);
-			break;
-		case GDK_Up:
-			search_in_dir(filer_window, -1);
-			break;
-		case GDK_Down:
-			search_in_dir(filer_window, 1);
-			break;
-		case GDK_Return:
-			return_pressed(filer_window, event);
-			break;
-		case GDK_Tab:
-			complete(filer_window);
-			break;
-		default:
-			return FALSE;
-	}
-
-	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
-	return TRUE;
-}
-
-static void changed(GtkEditable *mini, FilerWindow *filer_window)
+static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 {
 	char	*new, *slash;
 	char	*path, *real;
@@ -346,4 +344,157 @@ static void search_in_dir(FilerWindow *filer_window, int dir)
 	filer_window->mini_cursor_base = filer_window->collection->cursor_item;
 	find_next_match(filer_window, pattern, dir);
 	filer_window->mini_cursor_base = filer_window->collection->cursor_item;
+}
+
+/*			SHELL COMMANDS			*/
+
+static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
+{
+	GPtrArray	*argv;
+	int		i;
+	guchar		*entry;
+	Collection	*collection = filer_window->collection;
+
+	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
+	shell_history = g_list_prepend(shell_history, g_strdup(entry));
+	
+	argv = g_ptr_array_new();
+	g_ptr_array_add(argv, "sh");
+	g_ptr_array_add(argv, "-c");
+	g_ptr_array_add(argv, entry);
+	g_ptr_array_add(argv, "sh");
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		DirItem *item = (DirItem *) collection->items[i].data;
+		if (collection->items[i].selected)
+			g_ptr_array_add(argv, item->leafname);
+	}
+	
+	g_ptr_array_add(argv, NULL);
+
+	switch (fork())
+	{
+		case -1:
+			delayed_error("ROX-Filer", "Failed to create "
+					"child process");
+			return;
+		case 0:	/* Child */
+			dup2(to_error_log, STDOUT_FILENO);
+			close_on_exec(STDOUT_FILENO, FALSE);
+			dup2(to_error_log, STDERR_FILENO);
+			close_on_exec(STDERR_FILENO, FALSE);
+			if (chdir(filer_window->path))
+				g_printerr("chdir(%s) failed: %s\n",
+						filer_window->path,
+						g_strerror(errno));
+			execvp((char *) argv->pdata[0],
+				(char **) argv->pdata);
+			g_printerr("execvp(%s, ...) failed: %s\n",
+					(char *) argv->pdata[0],
+					g_strerror(errno));
+			_exit(0);
+	}
+
+	g_ptr_array_free(argv, TRUE);
+
+	minibuffer_hide(filer_window);
+}
+
+/* Move through the shell history */
+static void shell_recall(FilerWindow *filer_window, int dir)
+{
+	guchar	*command;
+	int	pos = filer_window->mini_cursor_base;
+
+	pos += dir;
+	if (pos >= 0)
+	{
+		command = g_list_nth_data(shell_history, pos);
+		if (!command)
+			return;
+	}
+	else
+		command = "";
+
+	if (pos < -1)
+		pos = -1;
+	filer_window->mini_cursor_base = pos;
+
+	gtk_entry_set_text(GTK_ENTRY(filer_window->minibuffer), command);
+}
+
+/*			EVENT HANDLERS			*/
+
+static gint key_press_event(GtkWidget	*widget,
+			GdkEventKey	*event,
+			FilerWindow	*filer_window)
+{
+	if (event->keyval == GDK_Escape)
+	{
+		minibuffer_hide(filer_window);
+		return TRUE;
+	}
+
+	switch (filer_window->mini_type)
+	{
+		case MINI_PATH:
+			switch (event->keyval)
+			{
+				case GDK_Up:
+					search_in_dir(filer_window, -1);
+					break;
+				case GDK_Down:
+					search_in_dir(filer_window, 1);
+					break;
+				case GDK_Return:
+					path_return_pressed(filer_window,
+								event);
+					break;
+				case GDK_Tab:
+					complete(filer_window);
+					break;
+				default:
+					return FALSE;
+			}
+			break;
+
+		case MINI_SHELL:
+			switch (event->keyval)
+			{
+				case GDK_Up:
+					shell_recall(filer_window, 1);
+					break;
+				case GDK_Down:
+					shell_recall(filer_window, -1);
+					break;
+				case GDK_Tab:
+					break;
+				case GDK_Return:
+					shell_return_pressed(filer_window,
+								event);
+				default:
+					return FALSE;
+			}
+			break;
+		default:
+			break;
+	}
+
+	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
+	return TRUE;
+}
+
+static void changed(GtkEditable *mini, FilerWindow *filer_window)
+{
+	switch (filer_window->mini_type)
+	{
+		case MINI_PATH:
+			path_changed(mini, filer_window);
+			return;
+		case MINI_SHELL:
+			break;
+		default:
+			break;
+	}
 }
