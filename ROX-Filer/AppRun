@@ -16,7 +16,7 @@ DEBUGGER=""
 
 case $1 in
 	--debug) shift ; DEBUGGER=gdb ;;
-	--valgrind) shift ; DEBUGGER=valgrind ;;
+	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
 	--compile)
 		shift
 		if [ ! -d "$APP_DIR/src" ] ; then

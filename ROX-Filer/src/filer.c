@@ -1205,6 +1205,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->flags = (FilerFlags) 0;
 	filer_window->details_type = DETAILS_TIMES;
 	filer_window->display_style = UNKNOWN_STYLE;
+	filer_window->display_style_wanted = UNKNOWN_STYLE;
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;
 	filer_window->sort_type = -1;
@@ -2480,4 +2481,29 @@ void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll)
 		gtk_timeout_remove(filer_window->auto_scroll);
 		filer_window->auto_scroll = -1;
 	}
+}
+
+#define ZERO_MNT "/uri/0install"
+
+static void refresh_done(FilerWindow *filer_window)
+{
+	if (filer_exists(filer_window))
+		filer_update_dir(filer_window, TRUE);
+}
+
+void filer_refresh(FilerWindow *filer_window)
+{
+	if (!strncmp(ZERO_MNT "/", filer_window->real_path, sizeof(ZERO_MNT)))
+	{
+		/* Try to run 0refresh */
+		gint pid;
+		const gchar *argv[] = {"0refresh",
+					filer_window->real_path, NULL};
+		pid = rox_spawn(filer_window->real_path, argv);
+		if (pid)
+			on_child_death(pid, (CallbackFn) refresh_done,
+					filer_window);
+	}
+	
+	full_refresh();
 }

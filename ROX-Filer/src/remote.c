@@ -426,7 +426,12 @@ static gboolean client_event(GtkWidget *window,
 		return FALSE;
 
 	src_window = gdk_window_foreign_new(event->data.l[0]);
-	g_return_val_if_fail(src_window != NULL, FALSE);
+	if (!src_window)
+	{
+		g_warning("SOAP message sender window was destroyed before I \n"
+			  "could read it.");
+		return FALSE;
+	}
 	prop = gdk_x11_xatom_to_atom(event->data.l[1]);
 
 	data = read_property(src_window, prop, &length);

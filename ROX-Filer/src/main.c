@@ -444,6 +444,7 @@ int main(int argc, char **argv)
 	 */
 	if (!new_copy)
 	{
+		int fd;
 		pid_t child;
 
 		child = fork();
@@ -452,13 +453,10 @@ int main(int argc, char **argv)
 		/* Otherwise we're the child (or an error occurred - ignore
 		 * it!).
 		 */
-	}
 
-	/* Close stdin. We don't need it, and it can cause problems if
-	 * a child process wants a password, etc...
-	 */
-	{
-		int fd;
+		/* Close stdin. We don't need it, and it can cause problems if
+		 * a child process wants a password, etc...
+		 */
 		fd = open("/dev/null", O_RDONLY);
 		if (fd > 0)
 		{

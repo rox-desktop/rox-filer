@@ -144,5 +144,6 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event);
 gint filer_key_press_event(GtkWidget *widget, GdkEventKey *event,
 			   FilerWindow *filer_window);
 void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
+void filer_refresh(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

@@ -509,27 +509,28 @@ void destroy_on_idle(GtkWidget *widget)
 }
 
 /* Spawn a child process (as spawn_full), and report errors.
- * TRUE on success.
+ * Returns the child's PID on succes, or 0 on failure.
  */
-gboolean rox_spawn(const gchar *dir, const gchar **argv)
+gint rox_spawn(const gchar *dir, const gchar **argv)
 {
 	GError	*error = NULL;
+	gint pid = 0;
 
 	if (!g_spawn_async_with_pipes(dir, (gchar **) argv, NULL,
 			G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_STDOUT_TO_DEV_NULL |
 			G_SPAWN_SEARCH_PATH,
 			NULL, NULL,		/* Child setup fn */
-			NULL,			/* Child PID */
+			&pid,			/* Child PID */
 			NULL, NULL, NULL,	/* Standard pipes */
 			&error))
 	{
 		delayed_error("%s", error ? error->message : "(null)");
 		g_error_free(error);
 
-		return FALSE;
+		return 0;
 	}
 
-	return TRUE;
+	return pid;
 }
 
 GtkWidget *button_new_image_text(GtkWidget *image, const char *message)

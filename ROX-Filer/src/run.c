@@ -235,7 +235,7 @@ gboolean run_diritem(const guchar *full_path,
 
 				argv[0] = full_path;
 
-				return rox_spawn(dir, argv);
+				return rox_spawn(dir, argv) != 0;
 			}
 
 			return open_file(full_path, edit ? text_plain

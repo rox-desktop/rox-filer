@@ -391,7 +391,7 @@ gboolean type_open(const char *path, MIME_type *type)
 	else
 		argv[0] = open;
 
-	retval = rox_spawn(home_dir, (const gchar **) argv);
+	retval = rox_spawn(home_dir, (const gchar **) argv) != 0;
 
 	if (argv[0] != open)
 		g_free(argv[0]);
