@@ -21,6 +21,8 @@ directory in its new location until you click refresh.
 
 MISSING FEATURES
 
+Pinboard selection becomes the primary selection.
+
 Allow applets inside the panel? Allow the filer to go inside GNOME-panel
 and similar?
 
@@ -36,14 +38,11 @@ More permissions checking in Find?
 
 Fully configurable toolbar.
 
-Can't create a panel if the filer is already running (can use --new option).
+Use an environment variable to override the platform-name guessing in
+AppRun.
 
-Use an environment variable to override the platform-name guessing in AppRun.
-
-People sometimes forget to save the key bindings - auto save?
-
-Enable (temporarily) single-click navigation when a special key (e.g. Alt) is
-pressed?
+Enable (temporarily) single-click navigation when a special key (e.g. Alt)
+is pressed?
 
 Improve MIME-type guessing:
 	- Try to find longest extension match (eg .ps.gz, then .gz)
@@ -60,8 +59,6 @@ Options to set where the toolbar appears.
 Display extra info in the toolbar (file under cursor, size, target mode, etc).
 
 More display styles.
-
-Better pinboard features (dnd, popup menu).
 
 
 RISC OS COMPATIBILITY
@@ -81,6 +78,3 @@ Recursive 'a-x' acts on the directory first and so can't then change the
 permissions on the contents. chmod(1) has the same problem.
 
 Set Run Action should be on the 'File' menu, not in the minibuffer.
-
-Remove PERL script - the filer can do all this itself now with only minor
-changes. Should speed things up.

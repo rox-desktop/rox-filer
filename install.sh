@@ -17,6 +17,17 @@ function endir () {
 	fi
 }
 
+function confirm_or_die () {
+	while [ 1 -eq 1 ]; do
+		echo -n "[yes/no] >>> "
+		read CONFIRM
+		case $CONFIRM in
+			[yY]*) return;;
+			[nN]*) die "OK.";;
+		esac
+	done
+}
+
 cd `dirname $0`
 
 ./ROX-Filer/AppRun --version 2> /dev/null
@@ -92,14 +103,18 @@ EOF
 	esac
 fi
 
+endir "$CHOICES/MIME-icons"
+endir "$CHOICES/MIME-info"
+endir "$CHOICES/MIME-types"
+
 echo "Installing icons..."
-cp -r Choices/MIME-icons "$CHOICES"
+cp Choices/MIME-icons/* "$CHOICES/MIME-icons"
 
 echo "Installing other files. If you haven't modified these since the "
 echo "last installation then answer 'yes' to any questions about overwriting "
 echo "files. Otherwise, you'll have to decide what to do!"
-cp -ri Choices/MIME-types "$CHOICES"
-cp -ri Choices/MIME-info "$CHOICES"
+cp -i Choices/MIME-types/* "$CHOICES/MIME-types"
+cp -i Choices/MIME-info/* "$CHOICES/MIME-info"
 echo
 echo "OK, done that. Next step..."
 
@@ -134,7 +149,14 @@ if [ -n "$APPDIR" ]; then
 	endir "$APPDIR"
 
 	(cd ROX-Filer/src; make clean) > /dev/null
-	cp -r ROX-Filer $APPDIR
+	if [ -e "$APPDIR/ROX-Filer" ]; then
+		echo "ROX-Filer is already installed - delete the existing"
+		echo "copy?"
+		confirm_or_die
+		echo Deleting...
+		rm -rf "$APPDIR/ROX-Filer.old"
+	fi
+	cp -r ROX-Filer "$APPDIR"
 else
 	echo "OK, I'll leave it where it is."
 	APPDIR=`pwd`
@@ -147,8 +169,8 @@ ln -s "$APPDIR/ROX-Filer" "$CHOICES/MIME-types/special_directory"
 cat << EOF
 
 
-Where would you like to install the 'rox' script, which is used to open
-files (and, often, start the filer)?
+Where would you like to install the 'rox' script, which is used to run
+the filer?
 
 1) /usr/local/bin
 2) ${HOME}/bin
@@ -174,7 +196,12 @@ esac
 if [ -n "$BINDIR" ]; then
 	endir "$BINDIR"
 
-	cp rox "$BINDIR" || die "Failed to install 'rox' script"
+	cat > "$BINDIR/rox" << EOF
+#!/bin/sh
+exec $APPDIR/ROX-Filer/AppRun "\$@"
+EOF
+	[ $? -eq 0 ] || die "Failed to install 'rox' script"
+	chmod a+x "$BINDIR/rox"
 
 	cat << EOF
 Script installed. You can run the filer by simply typing 'rox'
@@ -195,12 +222,12 @@ fi
 sleep 3
 cat << EOF
 
-	****************************"
-	*** Now read the manual! ***"
-	****************************"
+	****************************
+	*** Now read the manual! ***
+	****************************
 
-Type:
+Run ROX and click on the information icon on the toolbar:
 
-	\$ $APPDIR/ROX-Filer/AppRun $APPDIR/ROX-Filer/Help &
+	\$ rox &
 
 EOF

@@ -900,6 +900,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	filer_window->minibuffer = NULL;
 	filer_window->minibuffer_label = NULL;
 	filer_window->minibuffer_area = NULL;
+	filer_window->temp_show_hidden = FALSE;
 	filer_window->path = real_path;
 	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
@@ -961,7 +962,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 			drag_data_get, NULL);
 	gtk_signal_connect(GTK_OBJECT(collection), "selection_clear_event",
 			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
-	gtk_signal_connect (GTK_OBJECT(collection), "selection_get",
+	gtk_signal_connect(GTK_OBJECT(collection), "selection_get",
 			GTK_SIGNAL_FUNC(selection_get), NULL);
 	gtk_selection_add_targets(collection, GDK_SELECTION_PRIMARY,
 			target_table,

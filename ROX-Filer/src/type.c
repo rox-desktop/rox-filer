@@ -282,7 +282,11 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	char	*type_name;
 	time_t	now;
 
-	g_return_val_if_fail(type != NULL, im_unknown);
+	if (type == NULL)
+	{
+		pixmap_ref(im_unknown);
+		return im_unknown;
+	}
 
 	now = time(NULL);
 	/* Already got an image? */

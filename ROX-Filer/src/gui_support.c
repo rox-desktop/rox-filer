@@ -180,6 +180,9 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 				GDK_PROP_MODE_REPLACE, (gchar *) &value, 1);
 }
 
+/* NB: Also used for pinned icons.
+ * TODO: Set the level here too.
+ */
 void make_panel_window(GdkWindow *window)
 {
 	static gboolean need_init = TRUE;
@@ -279,8 +282,12 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			delayed_error(_("Error reading file"),
-						g_strerror(errno));
+			guchar *tmp;
+
+			tmp = g_strdup_printf("%s: %s\n",
+					pathname, g_strerror(errno));
+			delayed_error(_("Error reading file"), tmp);
+			g_free(tmp);
 			g_free(buffer);
 		}
 		else
@@ -463,5 +470,94 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	}
 	
 	return !proxy;
+}
+
+/* xid is the window (usually the root) which points to the proxy */
+void release_xdnd_proxy(guint32 xid)
+{
+	GdkAtom	xdnd_proxy_atom;
+
+	xdnd_proxy_atom = gdk_atom_intern("XdndProxy", FALSE);
+
+	XDeleteProperty(GDK_DISPLAY(), xid, xdnd_proxy_atom);
+}
+
+/* Looks for the proxy window to get root window clicks from the window
+ * manager. Taken from gmc. NULL if there is no proxy window.
+ */
+GdkWindow *find_click_proxy_window(void)
+{
+	GdkAtom click_proxy_atom;
+	Atom type;
+	int format;
+	unsigned long nitems, after;
+	Window *proxy_data;
+	Window proxy;
+	guint32 old_warnings;
+	GdkWindow *proxy_gdk_window;
+
+	XGrabServer(GDK_DISPLAY());
+
+	click_proxy_atom = gdk_atom_intern("_WIN_DESKTOP_BUTTON_PROXY", FALSE);
+	type = None;
+	proxy = None;
+
+	old_warnings = gdk_error_warnings;
+
+	gdk_error_code = 0;
+	gdk_error_warnings = 0;
+
+	/* Check if the proxy window exists */
+
+	XGetWindowProperty(GDK_DISPLAY(), GDK_ROOT_WINDOW(),
+			   click_proxy_atom, 0,
+			   1, False, AnyPropertyType,
+			   &type, &format, &nitems, &after,
+			   (guchar **) &proxy_data);
+
+	if (type != None)
+	{
+		if (format == 32 && nitems == 1)
+			proxy = *proxy_data;
+
+		XFree(proxy_data);
+	}
+
+	/* If the property was set, check if the window it points to exists
+	 * and has a _WIN_DESKTOP_BUTTON_PROXY property pointing to itself.
+	 */
+
+	if (proxy)
+	{
+		XGetWindowProperty(GDK_DISPLAY(), proxy,
+				   click_proxy_atom, 0,
+				   1, False, AnyPropertyType,
+				   &type, &format, &nitems, &after,
+				   (guchar **) &proxy_data);
+
+		if (!gdk_error_code && type != None)
+		{
+			if (format == 32 && nitems == 1)
+				if (*proxy_data != proxy)
+					proxy = GDK_NONE;
+
+			XFree(proxy_data);
+		}
+		else
+			proxy = GDK_NONE;
+	}
+
+	gdk_error_code = 0;
+	gdk_error_warnings = old_warnings;
+
+	XUngrabServer(GDK_DISPLAY());
+	gdk_flush();
+
+	if (proxy)
+		proxy_gdk_window = gdk_window_foreign_new(proxy);
+	else
+		proxy_gdk_window = NULL;
+
+	return proxy_gdk_window;
 }
 

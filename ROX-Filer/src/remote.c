@@ -37,6 +37,8 @@
 #include "support.h"
 #include "filer.h"
 #include "gui_support.h"
+#include "run.h"
+#include "remote.h"
 
 static GdkAtom filer_atom;	/* _ROX_FILER_VERSION_HOST */
 static GdkAtom ipc_atom;	/* _ROX_FILER_OPEN */
@@ -47,8 +49,6 @@ static gboolean get_ipc_property(GdkWindow *window, Window *r_xid);
 static gboolean ipc_prop_changed(GtkWidget *window,
 				 GdkEventProperty *event,
 				 gpointer data);
-static void send_request(GdkWindow *ipc_window, int argc, char **argv);
-static void open_dirs(guchar *data, int length);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -58,8 +58,10 @@ static void open_dirs(guchar *data, int length);
 /* Try to get an already-running filer to handle things (only if
  * new_copy is FALSE); TRUE if we succeed.
  * Create and IPC widget so that future filers can contact us.
+ *
+ * See main() for a description of 'to_open'.
  */
-gboolean remote_init(int argc, char **argv, gboolean new_copy)
+gboolean remote_init(GString *to_open, gboolean new_copy)
 {
 	guchar	*unique_id;
 	GdkWindowPrivate	*window;
@@ -76,7 +78,8 @@ gboolean remote_init(int argc, char **argv, gboolean new_copy)
 	existing_ipc_window = new_copy ? NULL : get_existing_ipc_window();
 	if (existing_ipc_window)
 	{
-		send_request(existing_ipc_window, argc, argv);
+		gdk_property_change(existing_ipc_window, ipc_atom, XA_STRING, 8,
+			GDK_PROP_MODE_APPEND, to_open->str, to_open->len);
 		return TRUE;
 	}
 
@@ -172,10 +175,10 @@ static gboolean ipc_prop_changed(GtkWidget *window,
 		while (1)
 		{
 
-			if (!gdk_property_get(window->window, ipc_atom,
+			if (!(gdk_property_get(window->window, ipc_atom,
 					XA_STRING, 0, grab_len,
 					TRUE, NULL, NULL,
-					&length, &data) && data)
+					&length, &data) && data))
 				return TRUE;	/* Error? */
 
 			if (length >= grab_len)
@@ -189,7 +192,7 @@ static gboolean ipc_prop_changed(GtkWidget *window,
 			data = g_realloc(data, length + 1);
 			data[length] = '\0';
 
-			open_dirs(data, length);
+			run_list(data);
 
 			g_free(data);
 			break;
@@ -201,50 +204,3 @@ static gboolean ipc_prop_changed(GtkWidget *window,
 	return FALSE;
 }
 
-static void send_request(GdkWindow *ipc_window, int argc, char **argv)
-{
-	char	*data, *d;
-	int	i, size = 0;
-
-	if (argc == 0)
-	{
-		argc = 1;
-		argv = &home_dir;
-	}
-
-	for (i = 0; i < argc; i++)
-		size += strlen(argv[i]) + 1;
-	
-	data = g_malloc(size);
-	
-	d = data;
-	for (i = 0; i < argc; i++)
-	{
-		int	len;
-
-		len = strlen(argv[i]);
-		memcpy(d, argv[i], len + 1);
-		d += len + 1;
-	}
-	
-	gdk_property_change(ipc_window, ipc_atom, XA_STRING, 8,
-			GDK_PROP_MODE_APPEND, data, size);
-
-	g_free(data);
-}
-
-/* data is a sequence of nul-term'd strings */
-static void open_dirs(guchar *data, int length)
-{
-	while (length > 0)
-	{
-		int	len;
-		
-		if (*data)
-			filer_opendir(data, PANEL_NO);
-		
-		len = strlen(data) + 1;
-		data += len;
-		length -= len;
-	}
-}

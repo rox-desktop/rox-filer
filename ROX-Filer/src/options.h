@@ -12,8 +12,6 @@ typedef char *OptionFunc(char *value);
 
 typedef struct _OptionsSection OptionsSection;
 
-#include "filer.h"
-
 struct _OptionsSection
 {
 	char 	*name;
@@ -30,7 +28,7 @@ extern GSList *options_sections;
 void options_init(void);
 void option_register(char *key, OptionFunc *func);
 void options_load(void);
-void options_show(FilerWindow *filer_window);
+void options_show(void);
 void option_write(char *name, char *value);
 
 #endif /* _OPTIONS_H */

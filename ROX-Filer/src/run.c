@@ -40,6 +40,7 @@
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
 static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
 static gboolean open_file(guchar *path, MIME_type *type);
+static void app_show_help(char *path);
 
 typedef struct _PipedData PipedData;
 
@@ -247,12 +248,139 @@ gboolean run_diritem(guchar *full_path,
 			return open_file(full_path, edit ? &text_plain
 						  : item->mime_type);
 		default:
-			report_error("open_item",
+			delayed_error(full_path,
 					"I don't know how to open that");
 			return FALSE;
 	}
 }
 
+/* Attempt to open this item */
+gboolean run_by_path(guchar *full_path)
+{
+	gboolean retval;
+	DirItem	item;
+
+	/* XXX: Loads an image - wasteful */
+	dir_stat(full_path, &item);
+	retval = run_diritem(full_path, &item, NULL, FALSE);
+	dir_item_clear(&item);
+	
+	return retval;
+}
+
+void show_item_help(guchar *path, DirItem *item)
+{
+	switch (item->base_type)
+	{
+		case TYPE_FILE:
+			if (item->flags & ITEM_FLAG_EXEC_FILE)
+				delayed_error(_("Executable file"),
+				      _("This is a file with an eXecute bit "
+					"set - it can be run as a program."));
+			else
+				delayed_error(_("File"), _(
+					"This is a data file. Try using the "
+					"Info menu item to find out more..."));
+			break;
+		case TYPE_DIRECTORY:
+			if (item->flags & ITEM_FLAG_APPDIR)
+				app_show_help(path);
+			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+				delayed_error(_("Mount point"), _(
+				"A mount point is a directory which another "
+				"filing system can be mounted on. Everything "
+				"on the mounted filesystem then appears to be "
+				"inside the directory."));
+			else
+				delayed_error(_("Directory"), _(
+				"This is a directory. It contains an index to "
+				"other items - open it to see the list."));
+			break;
+		case TYPE_CHAR_DEVICE:
+		case TYPE_BLOCK_DEVICE:
+			delayed_error(_("Device file"), _(
+				"Device files allow you to read from or write "
+				"to a device driver as though it was an "
+				"ordinary file."));
+			break;
+		case TYPE_PIPE:
+			delayed_error(_("Named pipe"), _(
+				"Pipes allow different programs to "
+				"communicate. One program writes data to the "
+				"pipe while another one reads it out again."));
+			break;
+		case TYPE_SOCKET:
+			delayed_error(_("Socket"), _(
+				"Sockets allow processes to communicate."));
+			break;
+		default:
+			delayed_error(_("Unknown type"),  _(
+				"I couldn't find out what kind of file this "
+				"is. Maybe it doesn't exist anymore or you "
+				"don't have search permission on the directory "
+				"it's in?"));
+			break;
+	}
+}
+
+/* Runs each item in the list. Items may be files, directories,
+ * panels or pinboards.
+ *
+ * See main() for a description of 'to_open'.
+ */
+void run_list(guchar *to_open)
+{
+	guchar	*next;
+
+	/* TODO: Should escape < characters in case one really does
+	 * appear in a filename!
+	 */
+
+	while (*to_open)
+	{
+		guchar	code;
+		guchar	*value;
+
+		g_return_if_fail(to_open[0] == '<');
+		code = to_open[1];
+
+		next = strchr(to_open + 1, '<');
+		if (!next)
+			next = to_open + strlen(to_open);
+
+		g_return_if_fail(next - to_open > 2);
+		g_return_if_fail(to_open[2] == '>');
+
+		value = g_strndup(to_open + 3, next - to_open - 3);
+		to_open = next;
+
+		switch (code)
+		{
+			case 'f':
+				run_by_path(value);
+				break;
+			case 'p':
+				pinboard_activate(value);
+				break;
+			case 'd':
+				filer_opendir(value, PANEL_NO);
+				break;
+			case 't':
+				filer_opendir(value, PANEL_TOP);
+				break;
+			case 'b':
+				filer_opendir(value, PANEL_BOTTOM);
+				break;
+			default:
+				g_warning("Don't know how to handle '%s'",
+						value);
+				return;
+		}
+
+		g_free(value);
+	}
+
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -376,3 +504,21 @@ static gboolean open_file(guchar *path, MIME_type *type)
 
 	return FALSE;
 }
+
+static void app_show_help(char *path)
+{
+	char		*help_dir;
+	struct stat 	info;
+
+	help_dir = g_strconcat(path, "/Help", NULL);
+	
+	if (mc_stat(help_dir, &info))
+		delayed_error(_("Application"),
+			_("This is an application directory - you can "
+			"run it as a program, or open it (hold down "
+			"Shift while you open it). Most applications provide "
+			"their own help here, but this one doesn't."));
+	else
+		filer_opendir(help_dir, PANEL_NO);
+}
+

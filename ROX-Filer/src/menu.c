@@ -35,6 +35,7 @@
 
 #include <gtk/gtk.h>
 
+#include "menu.h"
 #include "run.h"
 #include "action.h"
 #include "filer.h"
@@ -54,6 +55,7 @@
 
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*panel_keys;
+GtkAccelGroup	*pinboard_keys;
 
 static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 
@@ -63,9 +65,14 @@ static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GtkWidget *xterm_here_entry;
 static char *xterm_here_value;
 
+/* TRUE if we selected an icon automatically when the menu was opened */
+static gboolean pin_temp_item_selected;
+
 /* Static prototypes */
 
+static void save_menus(void);
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
+static void pin_menu_closed(GtkWidget *widget);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
 static char *load_xterm_here(char *data);
@@ -127,6 +134,11 @@ static void rox_help(gpointer data, guint action, GtkWidget *widget);
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
 
+static void pin_help(gpointer data, guint action, GtkWidget *widget);
+static void pin_remove(gpointer data, guint action, GtkWidget *widget);
+
+static void set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
+
 static GtkWidget *create_options();
 static void update_options();
 static void set_options();
@@ -150,6 +162,7 @@ static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
 static GtkWidget	*panel_hidden_menu;	/* The Show Hidden item */
+static GtkWidget	*pinboard_menu;		/* The popup pinboard menu */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -234,6 +247,15 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {N_("Remove Item"),		NULL,	remove_link, 0, NULL},
 };
 
+static GtkItemFactoryEntry pinboard_menu_def[] = {
+{N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
+{N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
+{"",				NULL,	NULL, 0, "<Separator>"},
+{N_("ROX-Filer Help"),		NULL,   rox_help, 0, NULL},
+{N_("ROX-Filer Options..."),	NULL,   show_options, 0, NULL},
+};
+
+
 typedef struct _FileStatus FileStatus;
 
 /* This is for the 'file(1) says...' thing */
@@ -262,26 +284,35 @@ struct _FileStatus
 		g_free(tmp);		\
 	} while (0)
 
+/* Creates menu <name> from the <name>_menu_def array.
+ * The accel group <name>_keys must also have been created.
+ * All menu items are translated. Sets 'item_factory'.
+ */
+#define MAKE_MENU(name) \
+do {									\
+	GtkItemFactoryEntry	*translated;				\
+	int			n_entries;				\
+									\
+	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,		\
+				"<" #name ">", name ## _keys);		\
+									\
+	n_entries = sizeof(name ## _menu_def) / sizeof(*name ## _menu_def); \
+	translated = translate_entries(name ## _menu_def, n_entries);	\
+	gtk_item_factory_create_items (item_factory, n_entries,		\
+					translated, NULL);		\
+	free_translated_entries(translated, n_entries);			\
+} while (0)
+
 void menu_init()
 {
-	GtkItemFactory  	*item_factory;
 	char			*menurc;
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
-	int			n_entries;
-	GtkItemFactoryEntry	*translated;
+	GtkItemFactory  	*item_factory;				\
 
 	filer_keys = gtk_accel_group_new();
-	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
-					    "<filer>",
-					    filer_keys);
-
-	n_entries = sizeof(filer_menu_def) / sizeof(*filer_menu_def);
-	translated = translate_entries(filer_menu_def, n_entries);
-	gtk_item_factory_create_items (item_factory, n_entries,
-			translated, NULL);
-	free_translated_entries(translated, n_entries);
+	MAKE_MENU(filer);
 
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
@@ -296,15 +327,7 @@ void menu_init()
 	filer_new_window = GTK_BIN(item)->child;
 
 	panel_keys = gtk_accel_group_new();
-	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
-					    "<panel>",
-					    panel_keys);
-	
-	n_entries = sizeof(panel_menu_def) / sizeof(*panel_menu_def);
-	translated = translate_entries(panel_menu_def, n_entries);
-	gtk_item_factory_create_items (item_factory, n_entries,
-			translated, NULL);
-	free_translated_entries(translated, n_entries);
+	MAKE_MENU(panel);
 
 	GET_MENU_ITEM(panel_menu, "panel");
 	GET_SSMENU_ITEM(panel_hidden_menu, "panel", "Display", "Show Hidden");
@@ -314,7 +337,14 @@ void menu_init()
 		gtk_item_factory_parse_rc(menurc);
 
 	gtk_accel_group_lock(panel_keys);
+	
+	pinboard_keys = gtk_accel_group_new();
+	MAKE_MENU(pinboard);
+	gtk_accel_group_lock(pinboard_keys);
+	GET_MENU_ITEM(pinboard_menu, "pinboard");
 
+	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(pin_menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
@@ -332,6 +362,8 @@ void menu_init()
 	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_done",
 				GTK_SIGNAL_FUNC(gtk_widget_hide),
 				GTK_OBJECT(savebox));
+
+	atexit(save_menus);
 }
  
 /* Build up some option widgets to go in the options dialog, but don't
@@ -345,13 +377,11 @@ static GtkWidget *create_options()
 	gtk_container_set_border_width(GTK_CONTAINER(table), 4);
 
 	label = gtk_label_new(
-			_("To set the keyboard short-cuts you simply open "
+			_("To set the keyboard short-cuts, simply open "
 			"the menu over a filer window, move the pointer over "
 			"the item you want to use and press a key. The key "
 			"will appear next to the menu item and you can just "
-			"press that key without opening the menu in future. "
-			"To save the current menu short-cuts for next time, "
-			"click the Save button at the bottom of this window."));
+			"press that key without opening the menu in future."));
 	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
 
@@ -385,12 +415,7 @@ static void set_options()
 
 static void save_options()
 {
-	char	*menurc;
-
-	menurc = choices_find_path_save("menus", PROJECT, TRUE);
-	if (menurc)
-		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
-
+	save_menus();
 	option_write("xterm_here", xterm_here_value);
 }
 
@@ -440,6 +465,44 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
+}
+
+/* Display the pinboard menu. Set icon to NULL if no particular icon
+ * was clicked.
+ */
+void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
+{
+	int		pos[2];
+	GList		*icons;
+
+	if (icon)
+	{
+		if (pinboard_is_selected(icon))
+			pin_temp_item_selected = FALSE;
+		else
+		{
+			pinboard_select_only(icon);
+			pin_temp_item_selected = TRUE;
+		}
+	}
+
+	icons = pinboard_get_selected();
+
+	pos[0] = event->x_root;
+	pos[1] = event->y_root;
+
+	if (icons)
+	{
+		set_items_shaded(pinboard_menu,
+				icons->next ? TRUE : FALSE , 0, 1);
+
+		set_items_shaded(pinboard_menu, FALSE, 1, 1);
+	}
+	else
+		set_items_shaded(pinboard_menu, TRUE, 0, 2);
+
+	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
+			(gpointer) pos, event->button, event->time);
 }
 
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
@@ -534,6 +597,12 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	
 	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
+}
+
+static void pin_menu_closed(GtkWidget *widget)
+{
+	if (pin_temp_item_selected)
+		pinboard_clear_selection();
 }
 
 static void menu_closed(GtkWidget *widget)
@@ -1173,23 +1242,6 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-static void app_show_help(char *path)
-{
-	char		*help_dir;
-	struct stat 	info;
-
-	help_dir = g_strconcat(path, "/Help", NULL);
-	
-	if (mc_stat(help_dir, &info))
-		delayed_error(_("Application"),
-			_("This is an application directory - you can "
-			"run it as a program, or open it (hold down "
-			"Shift while you open it). Most applications provide "
-			"their own help here, but this one doesn't."));
-	else
-		filer_opendir(help_dir, PANEL_NO);
-}
-
 static void help(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection 	*collection;
@@ -1210,59 +1262,9 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	item = selected_item(collection);
-	switch (item->base_type)
-	{
-		case TYPE_FILE:
-			if (item->flags & ITEM_FLAG_EXEC_FILE)
-				delayed_error(_("Executable file"),
-				      _("This is a file with an eXecute bit "
-					"set - it can be run as a program."));
-			else
-				delayed_error(_("File"), _(
-					"This is a data file. Try using the "
-					"Info menu item to find out more..."));
-			break;
-		case TYPE_DIRECTORY:
-			if (item->flags & ITEM_FLAG_APPDIR)
-				app_show_help(
-					make_path(window_with_focus->path,
-					  item->leafname)->str);
-			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-				delayed_error(_("Mount point"), _(
-				"A mount point is a directory which another "
-				"filing system can be mounted on. Everything "
-				"on the mounted filesystem then appears to be "
-				"inside the directory."));
-			else
-				delayed_error(_("Directory"), _(
-				"This is a directory. It contains an index to "
-				"other items - open it to see the list."));
-			break;
-		case TYPE_CHAR_DEVICE:
-		case TYPE_BLOCK_DEVICE:
-			delayed_error(_("Device file"), _(
-				"Device files allow you to read from or write "
-				"to a device driver as though it was an "
-				"ordinary file."));
-			break;
-		case TYPE_PIPE:
-			delayed_error(_("Named pipe"), _(
-				"Pipes allow different programs to "
-				"communicate. One program writes data to the "
-				"pipe while another one reads it out again."));
-			break;
-		case TYPE_SOCKET:
-			delayed_error(_("Socket"), _(
-				"Sockets allow processes to communicate."));
-			break;
-		default:
-			delayed_error(_("Unknown type"),  _(
-				"I couldn't find out what kind of file this "
-				"is. Maybe it doesn't exist anymore or you "
-				"don't have search permission on the directory "
-				"it's in?"));
-			break;
-	}
+
+	show_item_help(make_path(window_with_focus->path, item->leafname)->str,
+			item);
 }
 
 #define OPEN_VFS(fs)		\
@@ -1325,9 +1327,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 
 static void show_options(gpointer data, guint action, GtkWidget *widget)
 {
-	g_return_if_fail(window_with_focus != NULL);
-
-	options_show(window_with_focus);
+	options_show();
 }
 
 static gboolean new_directory_cb(guchar *initial, guchar *path)
@@ -1424,10 +1424,8 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 	minibuffer_show(window_with_focus, MINI_SELECT_IF);
 }
 
-static void rox_help(gpointer data, guint action, GtkWidget *widget)
+void rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	g_return_if_fail(window_with_focus != NULL);
-	
 	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, PANEL_NO);
 }
 
@@ -1480,4 +1478,48 @@ static void free_paths(GList *paths)
 		g_free(next->data);
 
 	g_list_free(paths);
+}
+
+static void pin_help(gpointer data, guint action, GtkWidget *widget)
+{
+	PinIcon	*icon;
+
+	icon = pinboard_selected_icon();
+
+	if (icon)
+		pinboard_show_help(icon);
+	else
+		delayed_error(PROJECT,
+			_("You must first select a single pinned icon to get "
+			"help on."));
+}
+
+static void pin_remove(gpointer data, guint action, GtkWidget *widget)
+{
+	pinboard_unpin_selection();
+}
+
+/* Set n items from position 'from' in 'menu' to the 'shaded' state */
+static void set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
+{
+	GList	*items, *item;
+
+	items = gtk_container_children(GTK_CONTAINER(menu));
+
+	item = g_list_nth(items, from);
+	while (item && n--)
+	{
+		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, !shaded);
+		item = item->next;
+	}
+	g_list_free(items);
+}
+
+static void save_menus(void)
+{
+	char	*menurc;
+	
+	menurc = choices_find_path_save("menus", PROJECT, TRUE);
+	if (menurc)
+		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 }

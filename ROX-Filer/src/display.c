@@ -1092,6 +1092,7 @@ static char *display_truncate(char *data)
 	return NULL;
 }
 
+/* Set the 'Show Hidden' flag for this window */
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 {
 	if (filer_window->show_hidden == hidden)

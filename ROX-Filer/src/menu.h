@@ -9,6 +9,7 @@
 #define _MENU_H
 
 #include "filer.h"
+#include "pinboard.h"
 
 extern GtkAccelGroup	*filer_keys;
 
@@ -19,6 +20,7 @@ void menu_update_options(void);
 void menu_set_options(void);
 void menu_save_options(void);
 
+void show_pinboard_menu(GdkEventButton *event, PinIcon *icon);
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item);
 #endif /* _MENU_H */

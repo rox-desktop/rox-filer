@@ -39,5 +39,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out);
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data);
 void parse_file(char *path, ParseFunc *parse_line);
 gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window);
+void release_xdnd_proxy(guint32 xid);
+GdkWindow *find_click_proxy_window(void);
 
 #endif /* _GUI_SUPPORT_H */

@@ -62,6 +62,11 @@ struct _FilerWindow
 	GtkWidget	*minibuffer;		/* The text entry */
 	int		mini_cursor_base;
 	MiniType	mini_type;
+
+	/* TRUE if hidden files are shown because the minibuffer leafname
+	 * starts with a dot.
+	 */
+	gboolean 	temp_show_hidden;
 };
 
 extern FilerWindow 	*window_with_focus;

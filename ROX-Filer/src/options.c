@@ -244,7 +244,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 		gtk_widget_hide(window);
 }
 
-void options_show(FilerWindow *filer_window)
+void options_show(void)
 {
 	GSList		*next = options_sections;
 	

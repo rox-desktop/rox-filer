@@ -35,8 +35,10 @@
 #include "pinboard.h"
 #include "type.h"
 #include "choices.h"
+#include "support.h"
 #include "gui_support.h"
 #include "run.h"
+#include "menu.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -46,12 +48,19 @@
 /* The size of the border around the icon which is used when winking */
 #define WINK_FRAME 2
 
+enum
+{
+	TARGET_STRING,
+	TARGET_URI_LIST,
+};
+
 struct _PinIcon {
 	GtkWidget	*win, *paper;
 	GdkBitmap	*mask;
 	guchar		*path;
 	DirItem		item;
 	int		x, y;
+	gboolean	selected;
 };
 
 struct _Pinboard {
@@ -67,12 +76,20 @@ static gint	loading_pinboard = 0;	/* Non-zero => loading */
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
 
+static gint	number_selected = 0;
+
 static GdkColor		mask_solid = {1, 1, 1, 1};
 static GdkColor		mask_transp = {0, 0, 0, 0};
 static  GdkGC	*mask_gc = NULL;
 
 /* Proxy window for DnD and clicks on the desktop */
 static GtkWidget *proxy_invisible;
+
+/* The window (owned by the wm) which root clicks are forwarded to.
+ * NULL if wm does not support forwarding clicks.
+ */
+static GdkWindow *click_proxy_gdk_window = NULL;
+static GdkAtom   win_button_proxy; /* _WIN_DESKTOP_BUTTON_PROXY */
 
 static gint	drag_start_x, drag_start_y;
 /* If the drag type is not DRAG_NONE then there is a grab in progress */
@@ -93,6 +110,15 @@ static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
                             	     PinIcon *icon);
+static gboolean root_property_event(GtkWidget *widget,
+			    	    GdkEventProperty *event,
+                            	    gpointer data);
+static gboolean root_button_press(GtkWidget *widget,
+			    	  GdkEventButton *event,
+                            	  gpointer data);
+static gboolean enter_notify(GtkWidget *widget,
+			     GdkEventCrossing *event,
+			     PinIcon *icon);
 static gboolean button_press_event(GtkWidget *widget,
 			    GdkEventButton *event,
                             PinIcon *icon);
@@ -121,6 +147,16 @@ static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
 		       PinIcon		*icon);
+static void icon_may_update(PinIcon *icon);
+static void forward_root_clicks(void);
+static void change_number_selected(int delta);
+static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
+static void selection_get(GtkWidget *widget, 
+		       GtkSelectionData *selection_data,
+		       guint      info,
+		       guint      time,
+		       gpointer   data);
+
 
 
 /****************************************************************
@@ -138,6 +174,10 @@ void pinboard_activate(guchar *name)
 	Pinboard	*old_board = current_pinboard;
 	guchar		*path, *slash;
 
+	/* Treat an empty name the same as NULL */
+	if (!*name)
+		name = NULL;
+
 	if (old_board)
 	{
 		pinboard_clear();
@@ -151,24 +191,14 @@ void pinboard_activate(guchar *name)
 		return;
 	}
 
-	number_of_windows++;
-	
-	if (!proxy_invisible)
-	{
-		proxy_invisible = gtk_invisible_new();
-		gtk_widget_show(proxy_invisible);
-		gdk_window_add_filter(proxy_invisible->window,
-					proxy_filter, NULL);
-		gdk_window_add_filter(GDK_ROOT_PARENT(),
-					proxy_filter, NULL);
-	}
-
 	if (!add_root_handlers())
 	{
 		delayed_error(PROJECT, _("Another application is already "
 					"managing the pinboard!"));
 		return;
 	}
+
+	number_of_windows++;
 	
 	slash = strchr(name, '/');
 	if (slash)
@@ -214,6 +244,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 		path_len--;
 
 	icon = g_new(PinIcon, 1);
+	icon->selected = FALSE;
 	icon->path = g_strndup(path, path_len);
 	icon->mask = NULL;
 	snap_to_grid(&x, &y);
@@ -243,13 +274,13 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 				drag_data_get, NULL);
 
 	gtk_widget_realize(icon->win);
-	gdk_window_set_decorations(icon->win->window, 0);
-	gdk_window_set_functions(icon->win->window, 0);
 	if (override_redirect)
 	{
 		gdk_window_lower(icon->win->window);
 		gdk_window_set_override_redirect(icon->win->window, TRUE);
 	}
+	else
+		make_panel_window(icon->win->window);
 
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
@@ -257,8 +288,10 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	gtk_widget_add_events(icon->paper,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			GDK_BUTTON1_MOTION_MASK |
+			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
 			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
+	gtk_signal_connect(GTK_OBJECT(icon->paper), "enter-notify-event",
+			GTK_SIGNAL_FUNC(enter_notify), icon);
 	gtk_signal_connect(GTK_OBJECT(icon->paper), "button-press-event",
 			GTK_SIGNAL_FUNC(button_press_event), icon);
 	gtk_signal_connect(GTK_OBJECT(icon->paper), "button-release-event",
@@ -284,6 +317,35 @@ void pinboard_unpin(PinIcon *icon)
 	g_return_if_fail(icon != NULL);
 
 	gtk_widget_destroy(icon->win);
+	pinboard_save();
+}
+
+/* Unpin all selected items */
+void pinboard_unpin_selection(void)
+{
+	GList	*next;
+
+	g_return_if_fail(current_pinboard != NULL);
+
+	if (number_selected == 0)
+	{
+		delayed_error(PROJECT,
+			_("You should first select some pinned icons to "
+			"unpin. Hold down the Ctrl key to select some icons."));
+		return;
+	}
+
+	next = current_pinboard->icons;
+	while (next)
+	{
+		PinIcon	*icon = (PinIcon *) next->data;
+
+		next = next->next;
+
+		if (icon->selected)
+			gtk_widget_destroy(icon->win);
+	}
+
 	pinboard_save();
 }
 
@@ -322,13 +384,27 @@ void pinboard_wink_item(PinIcon *icon, gboolean timeout)
  */
 void pinboard_clear(void)
 {
+	GList	*next;
+
 	g_return_if_fail(current_pinboard != NULL);
-	g_return_if_fail(current_pinboard->icons = NULL);	/* XXX */
+
+	next = current_pinboard->icons;
+	while (next)
+	{
+		PinIcon	*icon = (PinIcon *) next->data;
+
+		next = next->next;
+
+		gtk_widget_destroy(icon->win);
+	}
 	
 	g_free(current_pinboard->name);
 	g_free(current_pinboard);
 	current_pinboard = NULL;
-	/* TODO: Remove handlers */
+
+	release_xdnd_proxy(GDK_ROOT_WINDOW());
+	gdk_window_remove_filter(GDK_ROOT_PARENT(), proxy_filter, NULL);
+	gdk_window_set_user_data(GDK_ROOT_PARENT(), NULL);
 }
 
 /* If path is on the pinboard then it may have changed... check! */
@@ -344,16 +420,141 @@ void pinboard_may_update(guchar *path)
 		PinIcon	*icon = (PinIcon *) next->data;
 
 		if (strcmp(icon->path, path) == 0)
-		{
-			dir_restat(icon->path, &icon->item);
-			gtk_widget_queue_draw(icon->win);
-		}
+			icon_may_update(icon);
 	}
 }
+
+/* Return the single selected icon, or NULL */
+PinIcon *pinboard_selected_icon(void)
+{
+	GList	*next;
+	PinIcon	*found = NULL;
+	
+	g_return_val_if_fail(current_pinboard != NULL, NULL);
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon	*icon = (PinIcon *) next->data;
+
+		if (icon->selected)
+		{
+			if (found)
+				return NULL;	/* >1 icon selected */
+			else
+				found = icon;
+		}
+	}
+
+	return found;
+}
+
+/* Display the help for this application/item */
+void pinboard_show_help(PinIcon *icon)
+{
+	g_return_if_fail(icon != NULL);
+
+	show_item_help(icon->path, &icon->item);
+}
+
+void pinboard_clear_selection(void)
+{
+	pinboard_select_only(NULL);
+}
+
+gboolean pinboard_is_selected(PinIcon *icon)
+{
+	g_return_val_if_fail(icon != NULL, FALSE);
+
+	return icon->selected;
+}
+
+/* Set whether an icon is selected or not */
+void pinboard_set_selected(PinIcon *icon, gboolean selected)
+{
+	g_return_if_fail(icon != NULL);
+
+	if (icon->selected == selected)
+		return;
+
+	if (selected)
+		change_number_selected(+1);
+	else
+		change_number_selected(-1);
+	
+	icon->selected = selected;
+	gtk_widget_queue_draw(icon->win);
+}
+
+/* Return a list of all the selected icons.
+ * g_list_free() the result.
+ */
+GList *pinboard_get_selected(void)
+{
+	GList	*next;
+	GList	*selected = NULL;
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon	*i = (PinIcon *) next->data;
+
+		if (i->selected)
+			selected = g_list_append(selected, i);
+	}
+
+	return selected;
+}
+
+/* Clear the selection and then select this icon.
+ * Doesn't release and claim the selection unnecessarily.
+ * If icon is NULL, then just clears the selection.
+ */
+void pinboard_select_only(PinIcon *icon)
+{
+	GList	*next;
+	
+	g_return_if_fail(current_pinboard != NULL);
+
+	if (icon)
+		pinboard_set_selected(icon, TRUE);
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon	*i = (PinIcon *) next->data;
+
+		if (i->selected && i != icon)
+			pinboard_set_selected(i, FALSE);
+	}
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+/* See if the file the icon points to has changed. Update the icon
+ * if so.
+ */
+static void icon_may_update(PinIcon *icon)
+{
+	MaskedPixmap *image = icon->item.image;
+
+	pixmap_ref(image);
+	dir_restat(icon->path, &icon->item);
+
+	if (icon->item.image != image)
+	{
+		int	x = icon->x, y = icon->y;
+		int	width, height;
+
+		set_size_and_shape(icon, &width, &height);
+		gdk_window_resize(icon->win->window, width, height);
+		offset_from_centre(icon, width, height, &x, &y);
+		gtk_widget_set_uposition(icon->win, x, y);
+		gtk_widget_queue_draw(icon->win);
+	}
+
+	pixmap_unref(image);
+}
 
 static gint end_wink(gpointer data)
 {
@@ -387,7 +588,6 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	int		width, height;
 	GdkFont		*font = icon->win->style->font;
 	int		font_height;
-	GdkBitmap	*mask;
 	MaskedPixmap	*image = icon->item.image;
 	DirItem		*item = &icon->item;
 	
@@ -399,27 +599,40 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	height = image->height + GAP + (font_height + 2) + 2 * WINK_FRAME;
 	gtk_widget_set_usize(icon->win, width, height);
 
-	mask = gdk_pixmap_new(icon->win->window, width, height, 1);
+	if (icon->mask)
+		gdk_pixmap_unref(icon->mask);
+	icon->mask = gdk_pixmap_new(icon->win->window, width, height, 1);
 	if (!mask_gc)
-		mask_gc = gdk_gc_new(mask);
+		mask_gc = gdk_gc_new(icon->mask);
 
 	/* Clear the mask to transparent */
 	gdk_gc_set_foreground(mask_gc, &mask_transp);
-	gdk_draw_rectangle(mask, mask_gc, TRUE, 0, 0, width, height);
+	gdk_draw_rectangle(icon->mask, mask_gc, TRUE, 0, 0, width, height);
 
 	gdk_gc_set_foreground(mask_gc, &mask_solid);
 	/* Make the icon area solid */
-	gdk_draw_pixmap(mask, mask_gc, image->mask,
+	if (image->mask)
+	{
+		gdk_draw_pixmap(icon->mask, mask_gc, image->mask,
 				0, 0,
 				(width - image->width) >> 1,
 				WINK_FRAME,
 				image->width,
 				image->height);
+	}
+	else
+	{
+		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
+				(width - image->width) >> 1,
+				WINK_FRAME,
+				image->width,
+				image->height);
+	}
 
 	gdk_gc_set_function(mask_gc, GDK_OR);
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_draw_pixmap(mask, mask_gc, im_symlink->mask,
+		gdk_draw_pixmap(icon->mask, mask_gc, im_symlink->mask,
 				0, 0,		/* Source x,y */
 				(width - image->width) >> 1,	/* Dest x */
 				WINK_FRAME,			/* Dest y */
@@ -428,7 +641,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		/* Note: Both mount state pixmaps must have the same mask */
-		gdk_draw_pixmap(mask, mask_gc, im_mounted->mask,
+		gdk_draw_pixmap(icon->mask, mask_gc, im_mounted->mask,
 				0, 0,		/* Source x,y */
 				(width - image->width) >> 1,	/* Dest x */
 				WINK_FRAME,			/* Dest y */
@@ -437,16 +650,12 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 	gdk_gc_set_function(mask_gc, GDK_COPY);
 
 	/* Mask off an area for the text */
-	gdk_draw_rectangle(mask, mask_gc, TRUE,
+	gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
 			(width - (item->name_width + 2)) >> 1,
 			WINK_FRAME + image->height + GAP,
 			item->name_width + 2, font_height + 2);
 	
-	gtk_widget_shape_combine_mask(icon->win, mask, 0, 0);
-
-	if (icon->mask)
-		gdk_pixmap_unref(icon->mask);
-	icon->mask = mask;
+	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
 	*rwidth = width;
 	*rheight = height;
@@ -462,6 +671,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 	MaskedPixmap	*image = item->image;
 	int		image_x;
 	GdkGC		*gc = widget->style->black_gc;
+	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
+					       : GTK_STATE_NORMAL;
 
 	font_height = font->ascent + font->descent;
 
@@ -512,7 +723,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 	text_y = WINK_FRAME + image->height + GAP + 1;
 
 	gtk_paint_flat_box(widget->style, widget->window,
-			GTK_STATE_NORMAL, GTK_SHADOW_NONE,
+			state,
+			GTK_SHADOW_NONE,
 			NULL, widget, "text",
 			text_x - 1,
 			text_y - 1,
@@ -520,7 +732,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 			font_height + 2);
 
 	gtk_paint_string(widget->style, widget->window,
-			GTK_STATE_NORMAL,
+			state,
 			NULL, widget, "text",
 			text_x,
 			text_y + font->ascent,
@@ -574,6 +786,41 @@ static gboolean button_release_event(GtkWidget *widget,
 	return TRUE;
 }
 
+static gboolean root_property_event(GtkWidget *widget,
+			    	    GdkEventProperty *event,
+                            	    gpointer data)
+{
+	if (event->atom == win_button_proxy &&
+			event->state == GDK_PROPERTY_NEW_VALUE)
+	{
+		/* Setup forwarding on the new proxy window, if possible */
+		forward_root_clicks();
+	}
+
+	return FALSE;
+}
+
+static gboolean root_button_press(GtkWidget *widget,
+			    	  GdkEventButton *event,
+                            	  gpointer data)
+{
+	if (event->button == collection_menu_button)
+		show_pinboard_menu(event, NULL);
+	else
+		pinboard_clear_selection();
+
+	return TRUE;
+}
+
+static gboolean enter_notify(GtkWidget *widget,
+			     GdkEventCrossing *event,
+			     PinIcon *icon)
+{
+	icon_may_update(icon);
+
+	return FALSE;
+}
+
 static gboolean button_press_event(GtkWidget *widget,
 			    	   GdkEventButton *event,
                             	   PinIcon *icon)
@@ -584,20 +831,81 @@ static gboolean button_press_event(GtkWidget *widget,
 		return TRUE;
 
 	if (b == collection_menu_button)
-		pinboard_unpin(icon);
+		show_pinboard_menu(event, icon);
 	else if (b < 4)
 	{
-		drag_start_x = event->x_root;
-		drag_start_y = event->y_root;
-		gtk_grab_add(widget);
-
-		if (b == 1)
-			pin_drag_type = DRAG_MAY_COPY;
+		if (event->state & GDK_CONTROL_MASK)
+		{
+			pin_drag_type = DRAG_NONE;
+			pinboard_set_selected(icon, !icon->selected);
+		}
 		else
-			pin_drag_type = DRAG_MOVE_ICON;
+		{
+			drag_start_x = event->x_root;
+			drag_start_y = event->y_root;
+			gtk_grab_add(widget);
+
+			if (b == 1)
+				pin_drag_type = DRAG_MAY_COPY;
+			else
+				pin_drag_type = DRAG_MOVE_ICON;
+		}
 	}
 
 	return TRUE;
+}
+
+/* Return a text/uri-list of all the icons in the list */
+static guchar *create_uri_list(GList *list)
+{
+	GString	*tmp;
+	guchar	*retval;
+	guchar	*leader;
+
+	tmp = g_string_new(NULL);
+	leader = g_strdup_printf("file://%s", o_no_hostnames
+						? ""
+						: our_host_name());
+
+	for (; list; list = list->next)
+	{
+		PinIcon *icon = (PinIcon *) list->data;
+
+		g_string_append(tmp, leader);
+		g_string_append(tmp, icon->path);
+		g_string_append(tmp, "\r\n");
+	}
+
+	g_free(leader);
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
+	
+	return retval;
+}
+
+static void start_drag(PinIcon *icon, GdkEventMotion *event)
+{
+	GtkWidget *widget = icon->paper;
+	GList	*selected;
+
+	if (!icon->selected)
+		pinboard_select_only(icon);
+	
+	selected = pinboard_get_selected();
+	g_return_if_fail(selected != NULL);
+
+	if (selected->next == NULL)
+		drag_one_item(widget, event, icon->path, &icon->item, FALSE);
+	else
+	{
+		guchar	*uri_list;
+
+		uri_list = create_uri_list(selected);
+		drag_selection(widget, event, uri_list);
+		g_free(uri_list);
+	}
+
+	g_list_free(selected);
 }
 
 /* An icon is being dragged around... */
@@ -629,8 +937,7 @@ static gint icon_motion_notify(GtkWidget *widget,
 		{
 			pin_drag_type = DRAG_NONE;
 			gtk_grab_remove(widget);
-			drag_one_item(widget, event, icon->path,
-					&icon->item, FALSE);
+			start_drag(icon, event);
 		}
 	}
 
@@ -657,6 +964,47 @@ static gboolean add_root_handlers(void)
 {
 	GdkWindow	*root;
 
+	if (!proxy_invisible)
+	{
+		GtkTargetEntry 	target_table[] =
+		{
+			{"text/uri-list", 0, TARGET_URI_LIST},
+			{"STRING", 0, TARGET_STRING},
+		};
+
+		win_button_proxy = gdk_atom_intern("_WIN_DESKTOP_BUTTON_PROXY",
+						   FALSE);
+		proxy_invisible = gtk_invisible_new();
+		gtk_widget_show(proxy_invisible);
+		/*
+		gdk_window_add_filter(proxy_invisible->window,
+					proxy_filter, NULL);
+					*/
+
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
+				"property_notify_event",
+				GTK_SIGNAL_FUNC(root_property_event), NULL);
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
+				"button_press_event",
+				GTK_SIGNAL_FUNC(root_button_press), NULL);
+		drag_set_pinboard_dest(proxy_invisible);
+
+		/* The proxy window is also used to hold the selection... */
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
+				"selection_clear_event",
+				GTK_SIGNAL_FUNC(lose_selection),
+				NULL);
+		
+		gtk_signal_connect(GTK_OBJECT(proxy_invisible),
+				"selection_get",
+				GTK_SIGNAL_FUNC(selection_get), NULL);
+
+		gtk_selection_add_targets(proxy_invisible,
+				GDK_SELECTION_PRIMARY,
+				target_table,
+				sizeof(target_table) / sizeof(*target_table));
+	}
+
 	root = gdk_window_lookup(GDK_ROOT_WINDOW());
 	if (!root)
 		root = gdk_window_foreign_new(GDK_ROOT_WINDOW());
@@ -665,11 +1013,38 @@ static gboolean add_root_handlers(void)
 		return FALSE;
 
 	/* Forward events from the root window to our proxy window */
+	gdk_window_add_filter(GDK_ROOT_PARENT(), proxy_filter, NULL);
 	gdk_window_set_user_data(GDK_ROOT_PARENT(), proxy_invisible);
-	
-	drag_set_pinboard_dest(proxy_invisible);
+	gdk_window_set_events(GDK_ROOT_PARENT(),
+			gdk_window_get_events(GDK_ROOT_PARENT()) |
+				GDK_PROPERTY_CHANGE_MASK);
 
+	forward_root_clicks();
+	
 	return TRUE;
+}
+
+/* See if the window manager is offering to forward root window clicks.
+ * If so, grab them. Otherwise, do nothing.
+ * Call this whenever the _WIN_DESKTOP_BUTTON_PROXY property changes.
+ */
+static void forward_root_clicks(void)
+{
+	click_proxy_gdk_window = find_click_proxy_window();
+	if (!click_proxy_gdk_window)
+		return;
+
+	/* Events on the wm's proxy are dealt with by our proxy widget */
+	gdk_window_set_user_data(click_proxy_gdk_window, proxy_invisible);
+	gdk_window_add_filter(click_proxy_gdk_window, proxy_filter, NULL);
+
+	/* The proxy window for clicks sends us button press events with
+	 * SubstructureNotifyMask. We need StructureNotifyMask to receive
+	 * DestroyNotify events, too.
+	 */
+	XSelectInput(GDK_DISPLAY(),
+			GDK_WINDOW_XWINDOW(click_proxy_gdk_window),
+			SubstructureNotifyMask | StructureNotifyMask);
 }
 
 /* Write the current state of the pinboard to the current pinboard file */
@@ -732,6 +1107,8 @@ out:
 /*
  * Filter that translates proxied events from virtual root windows into normal
  * Gdk events for the proxy_invisible widget. Stolen from gmc.
+ *
+ * Also gets events from the root window.
  */
 static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 				    GdkEvent *event,
@@ -759,6 +1136,8 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 			event->button.window = proxy;
 			event->button.send_event = xev->xbutton.send_event;
 			event->button.time = xev->xbutton.time;
+			event->button.x_root = xev->xbutton.x_root;
+			event->button.y_root = xev->xbutton.y_root;
 			event->button.x = xev->xbutton.x;
 			event->button.y = xev->xbutton.y;
 			event->button.state = xev->xbutton.state;
@@ -786,7 +1165,10 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 /* Does not save the new state */
 static void icon_destroyed(GtkWidget *widget, PinIcon *icon)
 {
-	g_print("[ icon '%s' destroyed! ]\n", icon->item.leafname);
+	g_return_if_fail(icon != NULL);
+
+	if (icon->selected)
+		change_number_selected(-1);
 
 	gdk_pixmap_unref(icon->mask);
 	dir_item_clear(&icon->item);
@@ -914,3 +1296,88 @@ static void drag_leave(GtkWidget	*widget,
 {
 	pinboard_wink_item(NULL, FALSE);
 }
+
+/* When changing the 'selected' attribute of an icon, call this
+ * to update the global counter and claim or release the primary
+ * selection as needed.
+ */
+static void change_number_selected(int delta)
+{
+	guint32	time;
+
+	g_return_if_fail(delta != 0);
+	g_return_if_fail(number_selected + delta >= 0);
+	
+	if (number_selected == 0)
+	{
+		time = gdk_event_get_time(gtk_get_current_event());
+
+		gtk_selection_owner_set(proxy_invisible,
+				GDK_SELECTION_PRIMARY,
+				time);
+	}
+	
+	number_selected += delta;
+
+	if (number_selected == 0)
+	{
+		time = gdk_event_get_time(gtk_get_current_event());
+
+		gtk_selection_owner_set(NULL,
+				GDK_SELECTION_PRIMARY,
+				time);
+	}
+}
+
+/* Called when another application wants the contents of our selection */
+static void selection_get(GtkWidget *widget, 
+		       GtkSelectionData *selection_data,
+		       guint      info,
+		       guint      time,
+		       gpointer   data)
+{
+	GString	*str;
+	GList	*next;
+	guchar	*leader = NULL;
+
+	str = g_string_new(NULL);
+
+	if (info == TARGET_URI_LIST)
+		leader = g_strdup_printf("file://%s",
+				o_no_hostnames ? "" : our_host_name());
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon	*icon = (PinIcon *) next->data;
+
+		if (!icon->selected)
+			continue;
+
+		if (leader)
+			g_string_append(str, leader);
+		g_string_append(str, icon->path);
+		g_string_append_c(str, ' ');
+	}
+
+	g_free(leader);
+	
+	gtk_selection_data_set(selection_data,
+				gdk_atom_intern("STRING", FALSE),
+				8,
+				str->str,
+				str->len ? str->len - 1 : 0);
+
+	g_string_free(str, TRUE);
+}
+
+/* Called when another application takes the selection away from us */
+static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
+{
+	/* 'lock' number_selected so that we don't send any events */
+	number_selected++;
+	pinboard_clear_selection();
+	number_selected--;
+
+	return TRUE;
+}
+

@@ -28,9 +28,19 @@
 \layout Title
 
 ROX-Filer User Manual
+\newline 
+
+\latex latex 
+
+\backslash 
+medskip
+\backslash 
+large{<http://rox.sourceforge.net>}
 \layout Author
 
-Thomas Leonard, tal197@users.sourceforge.net
+Thomas Leonard,
+\newline 
+tal197@users.sourceforge.net
 \layout Date
 
 
@@ -44,6 +54,8 @@ ROX-Filer is a graphical file manger for the X Window System.
  Its user interface is based on the RISC OS filer and it supports similar
  features such as application directories and drag-and-drop loading and
  saving of files.
+ The filer can also act as a pinboard, allowing you to pin frequently used
+ files onto the desktop background.
 \layout Standard
 
 
@@ -249,91 +261,69 @@ You can now run the filer by running the AppRun script without any options,
 $ ROX-Filer/AppRun
 \layout Standard
 
-A window should appear and display the contents of your home directory.
- If you opted to install the `
+A window should appear and display the contents of the current directory.
+ If you opted to install the `rox' script then you can simply do this instead:
+\layout LyX-Code
+
+$ rox
+\layout Standard
+
+If you installed the script into your home directory then you may need to
+ set your PATH environment variable so that the shell can find it.
+ For example, if you installed it into a directory called `
 \family typewriter 
-rox
+bin
 \family default 
-' script then you can simply run that to open a viewer onto the current
- directory.
- You can also use it to open files in the same way that the filer would.
- If you installed the script into your home directory then you may need
- to set your PATH environment variable so that the shell can find it.
+' in your home directory, use this:
+\layout LyX-Code
+
+$ PATH=${HOME}/bin:${PATH}; export PATH
+\layout Standard
+
+or (if you are using the 
+\noun on 
+csh(1)
+\noun default 
+ shell):
+\layout LyX-Code
+
+$ setenv PATH ${HOME}/bin:${PATH}
+\layout LyX-Code
+
+$ rehash
 \layout Subsection
 
 Invoking
 \layout Standard
 
-By default, ROX-Filer will start by displaying your home directory.
+By default, ROX-Filer will start by displaying the current directory.
  You can get it to display other directories instead by listing them after
  the command:
 \layout LyX-Code
 
-$ ROX-Filer/AppRun /home /usr /usr/local
+$ rox /home /usr /usr/local
 \layout Standard
 
-If you want the filer to manage your desktop background then you use the
- 
-\family typewriter 
---pinboard
-\family default 
- option and supply a name for the pinboard:
+You can also use it to open files, like this:
 \layout LyX-Code
 
-$ ROX-Filer/AppRun --pinboard MyPinboard
+$ rox ~/.xsession
 \layout Standard
 
-The pinboard configuration is saved in `
-\emph on 
-<Choices>/ROX-Filer/pb_MyPinboard
-\emph default 
-'.
- You may have to use the 
+The filer supports various options, use `
 \family typewriter 
---new
+-h
 \family default 
- option when creating a pinboard (this will be fixed in later versions).
-\layout Standard
-
-If you want one of the directories to be opened as a panel put 
+' for a list.
+ All options have long and short forms (eg `
 \family typewriter 
--b
+-h
 \family default 
- or 
+' and `
 \family typewriter 
--t
+--help
 \family default 
- before the directory (for `bottom' or `top' panels).
- If you don't know what a panel is, try it and see! To run the filer in
- the background, put an & at the end of the line.
-\layout LyX-Code
-
-$ mkdir ~/Panel
-\layout LyX-Code
-
-$ ln -s $HOME ~/Panel/Home
-\layout LyX-Code
-
-$ ROX-Filer/AppRun -b ~/Panel &
-\layout Standard
-
-The panel should be displayed in a window without a title bar.
- If this does not work then you may need to update your window manager.
- The filer was designed and tested using the Enlightenment window manager
-\begin_inset LatexCommand \cite{enlightenment}
-
-\end_inset 
-
-.
- You could also try using the 
-\family typewriter 
--o
-\family default 
- option which bypasses the window manager entirely (also use this if the
- panel appears in the wrong place):
-\layout LyX-Code
-
-$ ROX-Filer/AppRun -o -b ~/Panel &
+') --- although on some systems you can only use the short versions.
 \layout Standard
 
 Note that if the same version of the filer is already running on this machine
@@ -345,6 +335,129 @@ Note that if the same version of the filer is already running on this machine
 --new
 \family default 
 ' option.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{run_pin}
+
+\end_inset 
+
+Pinboard support
+\layout Standard
+
+If you want the filer to manage your desktop background then you use the
+ 
+\family typewriter 
+--pinboard
+\family default 
+ option and supply a name for the pinboard, eg:
+\layout LyX-Code
+
+$ rox --pinboard=MyPinboard
+\layout Standard
+
+The pinboard configuration is saved in `
+\emph on 
+<Choices>/ROX-Filer/pb_MyPinboard
+\emph default 
+' as soon as you change it in some way (for example, by dropping a file
+ onto the background).
+ You can have as many pinboards as you like and switch between them by running
+ rox again, eg:
+\layout LyX-Code
+
+$ rox --pinboard=MyOtherPinboard
+\layout Standard
+
+To turn off the pinboard again, set the name to an empty string:
+\layout LyX-Code
+
+$ rox --pinboard=
+\layout Standard
+
+See section 
+\begin_inset LatexCommand \ref{winman}
+
+\end_inset 
+
+ if you have trouble getting the icons to display correctly.
+\layout Subsubsection
+
+Panels
+\layout Standard
+
+If you want a directory to be opened as a panel, put 
+\family typewriter 
+-b
+\family default 
+ or 
+\family typewriter 
+-t
+\family default 
+ before the directory (for `bottom' or `top' panels).
+ If you don't know what a panel is, try it and see!
+\layout LyX-Code
+
+$ mkdir ~/Panel
+\layout LyX-Code
+
+$ ln -s $HOME ~/Panel/Home
+\layout LyX-Code
+
+$ rox -b ~/Panel
+\layout Standard
+
+The panel should be displayed in a window without a title bar.
+ If this does not work then see section 
+\begin_inset LatexCommand \ref{winman}
+
+\end_inset 
+
+ for some ideas.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{winman}
+
+\end_inset 
+
+Window manager notes
+\layout Standard
+
+You may have to play around with your window manager a bit to get the pinboard
+ icons and panels to display correctly (eg, without borders and underneath
+ all other windows).
+ In particular, try setting the stacking level / depth to low (or a negative
+ value).
+ Make sure any 'Keep transients above other windows' type options are turned
+ off!
+\layout Standard
+
+If order for the filer to receive mouse clicks on the background (used for
+ the pinboard support) you need a GNOME-compliant window manager.
+ To see if your window manager supports this, try clicking the right mouse
+ button on an unused area of the background.
+ If you get the pinboard menu, all is well.
+\layout Standard
+
+Note for sawfish users: sawfish trys to guess whether you are using GNOME
+ at start-up and only provides support if so.
+ You need to add the line `
+\family typewriter 
+(require 'gnome)
+\family default 
+' to you 
+\family typewriter 
+.sawfishrc
+\family default 
+ file (see the sawfish manual for more details).
+\layout Standard
+
+If all else fails, try running rox with the `
+\family typewriter 
+-no
+\family default 
+' options; this overrides window manager control of the icons altogether.
 \layout Subsection
 
 Mouse button and key bindings
@@ -548,8 +661,7 @@ noindent
 Other keys can easily be defined by opening the menu, moving the pointer
  over the item you want to use and pressing a key.
  The key will appear in the menu and can be used from then on.
- To make the new key bindings permanent, open the Options box from the menu
- and click on Save.
+ Key bindings are automatically saved when the filer quits.
 \layout Subsection
 
 The selection
@@ -1062,11 +1174,11 @@ Action
 \newline 
 Copy...
 \newline 
-Make a copy of this object in the same directory.
+Make a copy of this object.
 \newline 
 Rename...
 \newline 
-Change the name used for this object.
+Change the name used for this object, or move it between directories.
 \newline 
 Link...
 \newline 
@@ -1262,6 +1374,45 @@ This is just a cut-down version of the window menu.
  links and never asks for confirmation.
  Since dragging applications and directories to the panel creates symlinks
  it is very easy to change the panel contents to suit your needs.
+\layout Subsection
+
+The pinboard
+\layout Standard
+
+Section 
+\begin_inset LatexCommand \ref{run_pin}
+
+\end_inset 
+
+ explains how to turn the pinboard on.
+ Once on, you may drop icons from filer windows onto the pinboard to pin
+ them up.
+ Clicking on a pinned file acts just like clicking on it in a filer window.
+ You can drag pinned icons just like normal icons and you can right-click
+ on one to see the pinboard's popup menu.
+\layout Standard
+
+Drag pinned icons with the middle mouse button to move them around (they
+ snap to a grid).
+ Changes to the pinboard are automatically saved.
+\layout Standard
+
+Clicking on pinned icons with Control held down selects and unselects them.
+ Click on the desktop background to unselect them all.
+\layout Standard
+
+
+\series bold 
+IMPORTANT: 
+\series default 
+Pinning a file to the pinboard does 
+\series bold 
+not
+\series default 
+ copy it, it merely creates a shortcut to the original file.
+ If you delete the file, then you've lost it! Removing a file from the pinboard
+ only removes the link.
+ This is different to most other filers...
 \layout Subsection
 
 
@@ -1473,6 +1624,10 @@ Shell-style tab completion.
 Up, Down
 \newline 
 Select the previous/next matching entry.
+\layout Standard
+
+If you start entering a name beginning with a `.' then the `Show Hidden'
+ feature is temporarily turned on so that the file can be shown.
 \layout Standard
 
 Tab completion tries to fill in as many characters for you as it can.
@@ -2873,7 +3028,7 @@ detach()
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
 
-\begin_inset Figure size 595 618
+\begin_inset Figure size 595 606
 file Structs.eps
 width 3 100.00
 flags 9

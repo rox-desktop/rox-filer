@@ -2,6 +2,43 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+17-Jul-2000
+~~~~~~~~~~~
+Clicking on the root window works (button-1 clears the selection,
+button-3 opens the pinboard menu). The pinboard can own the primary
+selection, which means that you can select something and then paste
+its name into another program.
+
+Keys bound to menu entries are automatically saved when the filer quits.
+
+16-Jul-2000
+~~~~~~~~~~~
+Changed the install script so that the CVS directories don't get installed.
+
+The 'rox' script now just calls AppRun directly.
+Panels can be created without starting a new copy of the filer.
+The pinboard can be changed or removed by using --pinboard a second time.
+
+Files can be given as arguments - they are opened as if they were clicked
+on in a filer window (suggested by Alex Holden).  If no arguments are
+given then the default is now the current directory (not your home
+directory).
+
+If you start the leafname in the path minibuffer with '.' then the Show
+Hidden feature is temporarily turned on.
+
+15-Jul-2000
+~~~~~~~~~~~
+Ctrl-clicking selects and unselects pinboard icons. Menu clicking
+selects the icon clicked on while the menu is open. Pinned icons are
+now updated when the pointer moves over them, if necessary.
+
+14-Jul-2000
+~~~~~~~~~~~
+Menu-clicking on a pinboard icon now brings up a menu.
+Clicks on the root window are still ignored though; need to support
+the GNOME-compliant window manager system for passing root clicks on...
+
 12-Jul-2000
 ~~~~~~~~~~~
 Files can now be dragged to pinboard icons, and they highlight nicely too!
@@ -17,7 +54,7 @@ like normal icons.
 ~~~~~~~~~~~
 Changed the DnD code to make it easier for the pinboard code to use it.
 Up and Home buttons on the toolbar now use the 'New window on button 1'
-option setting.
+option setting (suggested by Vincent Lefèvre).
 
 09-Jul-2000
 ~~~~~~~~~~~
@@ -46,7 +83,8 @@ some versions of GTK+.
 
 30-Jun-2000
 ~~~~~~~~~~~
-First steps towards pinboard support.
+First steps towards pinboard support (requested by P.S.S.Camp and
+Darren Winsper).
 
 16-Jun-2000
 ~~~~~~~~~~~

@@ -116,6 +116,11 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,
 					make_path(filer_window->path, "")->str);
+			if (filer_window->temp_show_hidden)
+			{
+				display_set_hidden(filer_window, FALSE);
+				filer_window->temp_show_hidden = FALSE;
+			}
 			break;
 		case MINI_SHELL:
 		case MINI_RUN_ACTION:
@@ -145,6 +150,12 @@ void minibuffer_hide(FilerWindow *filer_window)
 	gtk_widget_hide(filer_window->minibuffer_area);
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			GTK_WIDGET(filer_window->collection));
+
+	if (filer_window->temp_show_hidden)
+	{
+		display_set_hidden(filer_window, FALSE);
+		filer_window->temp_show_hidden = FALSE;
+	}
 }
 
 /* Insert this leafname at the cursor (replacing the selection, if any).
@@ -369,6 +380,20 @@ static void path_changed(GtkEditable *mini, FilerWindow *filer_window)
 		Collection 	*collection = filer_window->collection;
 		int 		item;
 
+		if (slash[1] == '.')
+		{
+			if (!filer_window->show_hidden)
+			{
+				filer_window->temp_show_hidden = TRUE;
+				display_set_hidden(filer_window, TRUE);
+			}
+		}
+		else if (filer_window->temp_show_hidden)
+		{
+			display_set_hidden(filer_window, FALSE);
+			filer_window->temp_show_hidden = FALSE;
+		}
+		
 		find_next_match(filer_window, slash + 1, 0);
 		item = collection->cursor_item;
 		if (item != -1 && !matches(collection, item, slash + 1))

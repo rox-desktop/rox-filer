@@ -55,6 +55,7 @@
 #include "i18n.h"
 #include "remote.h"
 #include "pinboard.h"
+#include "run.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -88,9 +89,9 @@ static void show_features(void);
 		"you must use the short versions instead.\n\n")
 #endif
 
-#define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"	\
-       "Open filer windows showing each directory listed, or $HOME \n"	\
-       "if no directories are given.\n\n"				\
+#define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
+       "Open each directory or file listed, or the current working\n"	\
+       "directory if no arguments are given.\n\n"			\
        "  -b, --bottom=DIR	open DIR as a bottom-edge panel\n"	\
        "  -h, --help		display this help and exit\n"		      \
        "  -n, --new		start a new filer, even if already running\n"  \
@@ -98,7 +99,9 @@ static void show_features(void);
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -t, --top=DIR		open DIR as a top-edge panel\n"		\
        "  -v, --version		display the version information and exit\n"   \
-       "\nReport bugs to <tal197@ecs.soton.ac.uk>.\n")
+       "\nThe latest version can be found at:\n"			\
+       "\thttp://rox.sourceforge.net\n"					\
+       "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
 #define SHORT_OPS "t:b:op:hvn"
 
@@ -210,13 +213,28 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 	}
 }
 
+/* The value that goes with an option */
+#define VALUE (*optarg == '=' ? optarg + 1 : optarg)
+
 int main(int argc, char **argv)
 {
 	int		 stderr_pipe[2];
+	int		 i;
 	struct sigaction act;
-	GList		*panel_dirs = NULL;
-	GList		*panel_sides = NULL;
-	guchar		*pinboard = NULL;
+	guchar		*tmp;
+
+	/* This is a list of \0 separated strings. Each string starts with a
+	 * character indicating what kind of operation to perform:
+	 *
+	 * fFILE	open this file (or directory)
+	 * dDIR		open this dir (even if it looks like an app)
+	 * pPIN		display this pinboard
+	 * tDIR		open DIR as a top-panel
+	 * bDIR		open DIR as a bottom-panel
+	 */
+	GString		*to_open;
+
+	to_open = g_string_new(NULL);
 
 	choices_init();
 	i18n_init();
@@ -251,10 +269,6 @@ int main(int argc, char **argv)
 			case 'o':
 				override_redirect = TRUE;
 				break;
-			case 'p':
-				pinboard = *optarg == '=' ? optarg + 1
-							  : optarg;
-				break;
 			case 'v':
 				fprintf(stderr, "ROX-Filer %s\n", VERSION);
 				fprintf(stderr, _(COPYING));
@@ -266,20 +280,43 @@ int main(int argc, char **argv)
 				return EXIT_SUCCESS;
 			case 't':
 			case 'b':
-				panel_sides = g_list_prepend(panel_sides,
-							(gpointer) c);
-				panel_dirs = g_list_prepend(panel_dirs,
-						*optarg == '=' ? optarg + 1
-							: optarg);
+				g_string_append_c(to_open, '<');
+				g_string_append_c(to_open, c);
+				g_string_append_c(to_open, '>');
+				tmp = pathdup(VALUE);
+				g_string_append(to_open, tmp);
+				g_free(tmp);
+				break;
+			case 'p':
+				g_string_append(to_open, "<p>");
+				g_string_append(to_open, VALUE);
 				break;
 			default:
 				printf(_(USAGE));
 				return EXIT_FAILURE;
 		}
 	}
+	
+	i = optind;
+	while (i < argc)
+	{
+		tmp = pathdup(argv[i++]);
+
+		g_string_append(to_open, "<f>");
+		g_string_append(to_open, tmp);
+	}
+
+	if (to_open->len == 0)
+	{
+		guchar	*dir;
+
+		dir = g_get_current_dir();
+		g_string_sprintf(to_open, "<d>%s", dir);
+		g_free(dir);
+	}
 
 	gui_support_init();
-	if (remote_init(argc - optind, argv + optind, new_copy))
+	if (remote_init(to_open, new_copy))
 		return EXIT_SUCCESS;	/* Already running */
 	pixmaps_init();
 
@@ -328,41 +365,17 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 	}
 
-	if (pinboard)
-		pinboard_activate(pinboard);
-
-	if (optind == argc && (!panel_dirs) && !pinboard)
-		filer_opendir(home_dir, PANEL_NO);
-	else
-	{
-		int	 i = optind;
-		GList	 *dir = panel_dirs;
-		GList	 *side = panel_sides;
-
-		while (dir)
-		{
-			int	c = (int) side->data;
-			
-			filer_opendir((char *) dir->data,
-					c == 't' ? PANEL_TOP : PANEL_BOTTOM);
-			dir = dir->next;
-			side = side->next;
-		}
-
-		g_list_free(dir);
-		g_list_free(side);
-		
-		while (i < argc)
-			filer_opendir(argv[i++], PANEL_NO);
-	}
-
+	run_list(to_open->str);
+	g_string_free(to_open, TRUE);
+	
 	pipe(stderr_pipe);
 	close_on_exec(stderr_pipe[0], TRUE);
 	close_on_exec(stderr_pipe[1], TRUE);
 	gdk_input_add(stderr_pipe[0], GDK_INPUT_READ, stderr_cb, NULL);
 	to_error_log = stderr_pipe[1];
 
-	gtk_main();
+	if (number_of_windows > 0)
+		gtk_main();
 
 	return EXIT_SUCCESS;
 }
