@@ -21,7 +21,7 @@ struct _WrappedLabelClass {
 struct _WrappedLabel {
 	GtkWidget widget;
 	PangoLayout *layout;
-	gint width;
+	gint width, text_width;
 	int x_off, y_off;
 };
 

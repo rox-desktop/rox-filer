@@ -54,6 +54,7 @@
 #include "xml.h"
 #include "tasklist.h"
 #include "panel.h"		/* For panel_mark_used() */
+#include "wrapped.h"
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
@@ -145,7 +146,7 @@ static Option o_pinboard_shadow_labels;
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
-static void draw_label_shadow(GtkLabel *label);
+static void draw_label_shadow(WrappedLabel *label);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
@@ -437,8 +438,7 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 	g_signal_connect(pi->win, "drag_data_get",
 				G_CALLBACK(drag_data_get), NULL);
 
-	pi->label = gtk_label_new(icon->item->leafname);
-	gtk_label_set_line_wrap(GTK_LABEL(pi->label), TRUE);
+	pi->label = wrapped_label_new(icon->item->leafname, 180);
 	gtk_box_pack_start(GTK_BOX(vbox), pi->label, TRUE, TRUE, 0);
 
 	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), pi->win, 0, 0);
@@ -793,7 +793,7 @@ static void set_size_and_style(PinIcon *pi)
 	gtk_widget_modify_bg(pi->label, GTK_STATE_NORMAL, &pin_text_bg_col);
 	widget_modify_font(pi->label, pinboard_font);
 
-	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
+	wrapped_label_set_text(WRAPPED_LABEL(pi->label), icon->item->leafname);
 
 	gtk_widget_set_size_request(pi->widget, iwidth, iheight);
 }
@@ -868,50 +868,37 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	{
 		gdk_gc_set_clip_region(current_pinboard->shadow_gc,
 					event->region);
-		draw_label_shadow((GtkLabel *) pi->label);
+		draw_label_shadow((WrappedLabel *) pi->label);
 		gdk_gc_set_clip_region(current_pinboard->shadow_gc, NULL);
 	}
 
 	/* Draw children */
+	gdk_gc_set_clip_region(pi->label->style->fg_gc[GTK_STATE_NORMAL],
+				event->region);
 	(parent_class->expose_event)(widget, event);
+	gdk_gc_set_clip_region(pi->label->style->fg_gc[GTK_STATE_NORMAL], NULL);
 
 	/* Stop the button effect */
 	return TRUE;
 }
 
-static void draw_label_shadow(GtkLabel *label)
+static void draw_label_shadow(WrappedLabel *wl)
 {
-	PangoLayout	*layout;
-	GtkMisc		*misc;
 	GtkWidget	*widget;
-	gfloat		xalign;
 	gint		x, y;
 
-	misc = GTK_MISC(label);
-	widget = GTK_WIDGET(label);
-	layout = gtk_label_get_layout(label);
+	widget = GTK_WIDGET(wl);
 
-	/* Taken from gtklabel.c ... */
-	if (gtk_widget_get_direction(widget) == GTK_TEXT_DIR_LTR)
-		xalign = misc->xalign;
-	else
-		xalign = 1.0 - misc->xalign;
-
-	x = floor (widget->allocation.x + (gint)misc->xpad
-		   + ((widget->allocation.width
-		       - widget->requisition.width) * xalign)
-		   + 0.5);
-	y = floor (widget->allocation.y + (gint)misc->ypad
-		   + ((widget->allocation.height
-		       - widget->requisition.height) * misc->yalign)
-		   + 0.5);
+	y = widget->allocation.y - wl->y_off;
+	x = widget->allocation.x - wl->x_off -
+		((wl->text_width - widget->allocation.width) >> 1);
 
 	gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
-			x + 1, y + 1, layout);
+			x + 1, y + 1, wl->layout);
 
 	if (o_pinboard_shadow_labels.int_value > 1)
 		gdk_draw_layout(widget->window, current_pinboard->shadow_gc,
-				x + 2, y + 2, layout);
+				x + 2, y + 2, wl->layout);
 }
 
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)

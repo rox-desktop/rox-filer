@@ -113,6 +113,7 @@ static void wrapped_label_init(GTypeInstance *object, gpointer gclass)
 
 	wl->layout = NULL;
 	wl->width = -1;
+	wl->text_width = -1;
 }
 
 GType wrapped_label_get_type(void)
@@ -153,6 +154,7 @@ static void wrapped_label_size_request(GtkWidget *widget,
 
 	wl->x_off = PANGO_PIXELS(logical_rect.x);
 	wl->y_off = PANGO_PIXELS(logical_rect.y);
+	wl->text_width = PANGO_PIXELS(logical_rect.width);
 
 	requisition->width = PANGO_PIXELS(logical_rect.width);
 	requisition->height = PANGO_PIXELS(logical_rect.height);
@@ -161,18 +163,22 @@ static void wrapped_label_size_request(GtkWidget *widget,
 static gint wrapped_label_expose(GtkWidget *widget, GdkEventExpose *event)
 {
 	WrappedLabel *wl = (WrappedLabel *) widget;
+	int x;
 
 	g_return_val_if_fail(event != NULL, TRUE);
 	g_return_val_if_fail(wl->layout != NULL, TRUE);
+
+	x = widget->allocation.x -
+		((wl->text_width - widget->allocation.width) >> 1);
 
 	gtk_paint_layout(widget->style,
 			 widget->window,
 			 GTK_WIDGET_STATE(widget),
 			 FALSE,
-			 &event->area,
+			 NULL,		/* DON'T clip! */
 			 widget,
 			 "label",
-			 widget->allocation.x - wl->x_off,
+			 x - wl->x_off,
 			 widget->allocation.y - wl->y_off,
 			 wl->layout);
 
