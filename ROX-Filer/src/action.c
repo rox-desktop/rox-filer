@@ -624,7 +624,6 @@ static gboolean do_move(char *path, char *dest)
 	char		*leaf;
 	gboolean	retval = TRUE;
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
-	int		error;
 
 	leaf = strrchr(path, '/');
 	if (!leaf)

@@ -127,7 +127,7 @@ static char *import_extensions(guchar *line)
 	else
 	{
 		char		*type = line;
-		while (*line && !isspace(*line))
+		while (*line && *line != ':' && !isspace(*line))
 			line++;
 		if (*line)
 			*line++ = '\0';
