@@ -1337,12 +1337,13 @@ out:
 
 static gboolean pinboard_shadow = FALSE;
 static gint shadow_x, shadow_y;
-static GdkGC *shadow_gc = NULL;
 #define SHADOW_SIZE (ICON_WIDTH)
 
 static void bg_expose(GdkRectangle *area)
 {
 	GdkWindow *root = GDK_ROOT_PARENT();
+	static GdkGC *shadow_gc = NULL;
+	static GdkColor white, black;
 
 	if (!pinboard_shadow)
 	{
@@ -1351,11 +1352,22 @@ static void bg_expose(GdkRectangle *area)
 	}
 	
 	if (!shadow_gc)
+	{
+		GdkColormap *cm;
+		
+		cm = gdk_window_get_colormap(root);
 		shadow_gc = gdk_gc_new(root);
+		gdk_color_white(cm, &white);
+		gdk_color_black(cm, &black);
+	}
 
 	gdk_gc_set_clip_rectangle(shadow_gc, area);
-	gdk_draw_rectangle(root, shadow_gc, TRUE, shadow_x, shadow_y,
+	gdk_gc_set_foreground(shadow_gc, &white);
+	gdk_draw_rectangle(root, shadow_gc, FALSE, shadow_x, shadow_y,
 			SHADOW_SIZE, SHADOW_SIZE);
+	gdk_gc_set_foreground(shadow_gc, &black);
+	gdk_draw_rectangle(root, shadow_gc, FALSE, shadow_x + 1, shadow_y + 1,
+			SHADOW_SIZE - 2, SHADOW_SIZE - 2);
 	gdk_gc_set_clip_rectangle(shadow_gc, NULL);
 }
 
@@ -1365,72 +1377,31 @@ static void bg_expose(GdkRectangle *area)
 static void pinboard_set_shadow(gboolean on)
 {
 	GdkWindow *root = GDK_ROOT_PARENT();
-	int	  new_x, new_y;
-	int	  x1, y1, x2, y2;
+
+	if (pinboard_shadow)
+	{
+		gdk_window_clear_area_e(root, shadow_x, shadow_y,
+					SHADOW_SIZE + 1, SHADOW_SIZE + 1);
+	}
 
 	if (on)
 	{
-		gdk_window_get_pointer(NULL, &new_x, &new_y, NULL);
-		snap_to_grid(&new_x, &new_y);
-		new_x -= SHADOW_SIZE / 2;
-		new_y -= SHADOW_SIZE / 2;
-	}
+		int	old_x = shadow_x, old_y = shadow_y;
 
-	if (pinboard_shadow != on)
-	{
-		/* Turning the shadow on or off; redraw whole area */
-		if (on)
-		{
-			shadow_x = new_x;
-			shadow_y = new_y;
-		}
+		gdk_window_get_pointer(root, &shadow_x, &shadow_y, NULL);
+		snap_to_grid(&shadow_x, &shadow_y);
+		shadow_x -= SHADOW_SIZE / 2;
+		shadow_y -= SHADOW_SIZE / 2;
+
+
+		if (pinboard_shadow && shadow_x == old_x && shadow_y == old_y)
+			return;
+
 		gdk_window_clear_area_e(root, shadow_x, shadow_y,
-					SHADOW_SIZE, SHADOW_SIZE);
-		pinboard_shadow = on;
-		return;
+					SHADOW_SIZE + 1, SHADOW_SIZE + 1);
 	}
 
-	if (!on)
-		return;		/* Staying off */
-
-	/* Otherwise we're moving it. Only redraw the bits that have
-	 * changed (to avoid flicker).
-	 */
-
-	x1 = MIN(new_x, shadow_x);
-	x2 = MAX(new_x, shadow_x);
-
-	y1 = MIN(new_y, shadow_y);
-	y2 = MAX(new_y, shadow_y);
-	
-	if (x1 != x2)
-	{
-		gdk_window_clear_area_e(root,
-					x1, y1,
-					x2 - x1,
-					SHADOW_SIZE + (y2 - y1));
-		gdk_window_clear_area_e(root,
-					x1 + SHADOW_SIZE, y1,
-					x2 - x1,
-					SHADOW_SIZE + (y2 - y1));
-	}
-
-	if (new_y != shadow_y)
-	{
-		gdk_window_clear_area_e(root,
-					x1, y1,
-					SHADOW_SIZE + (x2 - x1),
-					y2 - y1);
-		gdk_window_clear_area_e(root,
-					x1, y1 + SHADOW_SIZE,
-					SHADOW_SIZE + (x2 - x1),
-					y2 - y1);
-	}
-
-	shadow_x = new_x;
-	shadow_y = new_y;
-
-	pinboard_shadow = TRUE;
+	pinboard_shadow = on;
 }
 
 /* Called when dragging some pinboard icons finishes */
