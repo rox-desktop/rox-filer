@@ -887,3 +887,42 @@ gint radios_get_value(Radios *radios)
 
 	return -1;
 }
+
+/* Convert a list of URIs into a list of strings.
+ * Lines beginning with # are skipped.
+ * The text block passed in is zero terminated (after the final CRLF)
+ */
+GList *uri_list_to_glist(const char *uri_list)
+{
+	GList   *list = NULL;
+
+	while (*uri_list)
+	{
+		char	*linebreak;
+		char	*uri;
+		int	length;
+
+		linebreak = strchr(uri_list, 13);
+
+		if (!linebreak || linebreak[1] != 10)
+		{
+			delayed_error("uri_list_to_glist: %s",
+					_("Incorrect or missing line "
+					  "break in text/uri-list data"));
+			return list;
+		}
+
+		length = linebreak - uri_list;
+
+		if (length && uri_list[0] != '#')
+		{
+			uri = g_strndup(uri_list, length);
+			list = g_list_append(list, uri);
+		}
+
+		uri_list = linebreak + 2;
+	}
+
+	return list;
+}
+

@@ -63,6 +63,10 @@ static void reorder_down(GtkButton *button, GtkTreeView *view);
 static void edit_response(GtkWidget *window, gint response,
 			  GtkTreeModel *model);
 static void edit_delete(GtkButton *button, GtkTreeView *view);
+static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
+			    int x, int y,
+			    GtkSelectionData *selection_data, guint info,
+			    guint time, GtkTreeView *view);
 
 
 /****************************************************************
@@ -190,6 +194,16 @@ void bookmarks_edit(void)
 
 	g_signal_connect(bookmarks_window, "response",
 			 G_CALLBACK(edit_response), model);
+
+	/* Allow directories to be dropped in */
+	{
+		GtkTargetEntry targets[] = { {"text/uri-list", 0, 0} };
+		gtk_drag_dest_set(bookmarks_window, GTK_DEST_DEFAULT_ALL,
+				targets, G_N_ELEMENTS(targets),
+				GDK_ACTION_COPY |GDK_ACTION_PRIVATE);
+		g_signal_connect(bookmarks_window, "drag-data-received",
+				G_CALLBACK(dir_dropped), list);
+	}
 
 	gtk_widget_show_all(bookmarks_window);
 }
@@ -472,6 +486,55 @@ static void reorder_up(GtkButton *button, GtkTreeView *view)
 static void reorder_down(GtkButton *button, GtkTreeView *view)
 {
 	reorder(view, 1);
+}
+
+static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
+			    int x, int y,
+			    GtkSelectionData *selection_data, guint info,
+			    guint time, GtkTreeView *view)
+{
+	GtkListStore *model;
+	GList *uris, *next;
+
+	if (!selection_data->data)
+	{
+		/* Timeout? */
+		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
+		return TRUE;
+	}
+
+	model = GTK_LIST_STORE(gtk_tree_view_get_model(view));
+	
+	uris = uri_list_to_glist(selection_data->data);
+
+	for (next = uris; next; next = next->next)
+	{
+		const guchar *path;
+
+		path = get_local_path((gchar *) next->data);
+
+		if (path)
+		{
+			GtkTreeIter iter;
+			struct stat info;
+			
+			if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
+			{
+				gtk_list_store_append(model, &iter);
+				gtk_list_store_set(model, &iter, 0, path, -1);
+			}
+			else
+				delayed_error(_("'%s' isn't a directory"),
+						path);
+		}
+		else
+			delayed_error(_("Can't bookmark non-local directories "
+					"like '%s'"), (gchar *) next->data);
+	}
+
+	destroy_glist(&uris);
+
+	return TRUE;
 }
 
 static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)

@@ -56,6 +56,10 @@
 #include "options.h"
 #include "filer.h"
 #include "action.h"		/* (for action_chmod) */
+#include "xml.h"
+
+#define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
+enum {SET_MEDIA, SET_TYPE};
 
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
@@ -185,6 +189,7 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	mtype->media_type = g_strndup(type_name, slash - type_name);
 	mtype->subtype = g_strdup(slash + 1);
 	mtype->image = NULL;
+	mtype->comment = NULL;
 
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
@@ -487,14 +492,13 @@ static void show_shell_help(gpointer data)
 static gboolean set_shell_action(GtkWidget *dialog)
 {
 	GtkEntry *entry;
-	GtkToggleButton *for_all;
 	const guchar *command;
 	gchar	*tmp, *path;
 	int	error = 0, len;
 	int	fd;
 
 	entry = g_object_get_data(G_OBJECT(dialog), "shell_command");
-	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
+
 	g_return_val_if_fail(entry != NULL, FALSE);
 
 	command = gtk_entry_get_text(entry);
@@ -744,7 +748,8 @@ void type_set_handler_dialog(MIME_type *type)
 	gchar           *handler;
 	GtkDialog	*dialog;
 	GtkWidget	*frame, *entry, *label;
-	GtkWidget	*radio, *eb, *hbox;
+	GtkWidget	*eb, *hbox;
+	Radios		*radios;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
@@ -759,21 +764,25 @@ void type_set_handler_dialog(MIME_type *type)
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
 
-	tmp = g_strdup_printf(_("Set default for all `%s/<anything>'"),
-				type->media_type);
-	radio = gtk_radio_button_new_with_label(NULL, tmp);
-	g_free(tmp);
-	g_object_set_data(G_OBJECT(dialog), "set_for_all", radio);
+	radios = radios_new();
+	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
-	tmp = g_strdup_printf(_("Only for the type `%s/%s'"), type->media_type,
-			type->subtype);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
-	radio = gtk_radio_button_new_with_label(
-			gtk_radio_button_get_group(GTK_RADIO_BUTTON(radio)),
-			tmp);
-	g_free(tmp);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
+	radios_add(radios,
+			_("If a handler for the specific type isn't set up, "
+			  "use this as the default."), SET_MEDIA,
+			_("Set default for all `%s/<anything>'"),
+			type->media_type);
+	
+	radios_add(radios,
+			_("Use this application for all files with this MIME "
+			  "type."), SET_TYPE,
+			_("Only for the type `%s' (%s/%s)"),
+			mime_type_comment(type),
+			type->media_type, type->subtype);
+
+	radios_set_value(radios, SET_TYPE);
+
+	radios_pack(radios, GTK_BOX(dialog->vbox));
 
 	frame = gtk_frame_new(NULL);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
@@ -874,14 +883,16 @@ char *get_action_save_path(GtkWidget *dialog)
 	struct stat 	info;
 	guchar 		*type_name = NULL;
 	MIME_type	*type;
-	GtkToggleButton *for_all;
+	Radios		*radios;
 
 	g_return_val_if_fail(dialog != NULL, NULL);
-	type = g_object_get_data(G_OBJECT(dialog), "mime_type");
-	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
-	g_return_val_if_fail(for_all != NULL && type != NULL, NULL);
 
-	if (gtk_toggle_button_get_active(for_all))
+	type = g_object_get_data(G_OBJECT(dialog), "mime_type");
+	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
+
+	g_return_val_if_fail(radios != NULL && type != NULL, NULL);
+
+	if (radios_get_value(radios) == SET_MEDIA)
 		type_name = g_strdup(type->media_type);
 	else
 		type_name = g_strconcat(type->media_type, "_",
@@ -1242,4 +1253,64 @@ static void load_mime_types(void)
 	}
 
 	filer_update_all();
+}
+
+#define MIME_TRY doc = xml_cache_load(path); g_free(path); if (doc) return doc;
+
+/* Find the media/subtype.xml file for a MIME_type and load it, returning
+ * an XML document (NULL if not found)
+ *
+ * g_object_unref() the result.
+ */
+static XMLwrapper *load_type_file(MIME_type *type)
+{
+	guchar *path;
+	XMLwrapper *doc;
+
+	path = g_strdup_printf("%s/.mime/%s/%s.xml", home_dir,
+			type->media_type, type->subtype);
+	MIME_TRY;
+
+	path = g_strdup_printf("/usr/local/share/mime/%s/%s.xml",
+			type->media_type, type->subtype);
+	MIME_TRY;
+
+	path = g_strdup_printf("/usr/share/mime/%s/%s.xml",
+			type->media_type, type->subtype);
+	MIME_TRY;
+
+	return NULL;
+}
+
+static void find_comment(MIME_type *type)
+{
+	XMLwrapper *typedoc;
+	xmlNode *node;
+
+	typedoc = load_type_file(type);
+	if (!typedoc)
+		goto out;
+
+	node = xml_get_section(typedoc, TYPE_NS, "comment");
+
+	if (node)
+	{
+		if (type->comment)
+			g_free(type->comment);
+		type->comment = xmlNodeListGetString(node->doc,
+						     node->xmlChildrenNode, 1);
+	}
+
+	g_object_unref(typedoc);
+out:
+	if (!type->comment)
+		type->comment = g_strdup(_("No description"));
+}
+
+const char *mime_type_comment(MIME_type *type)
+{
+	if (!type->comment)
+		find_comment(type);
+
+	return type->comment;
 }

@@ -278,7 +278,8 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	radios_add(radios,
 			_("Use a copy of the image for all files of this MIME "
 			  "type."), SET_TYPE,
-			_("Only for the type `%s/%s'"),
+			_("Only for the type `%s' (%s/%s)"),
+			mime_type_comment(item->mime_type),
 			item->mime_type->media_type,
 			item->mime_type->subtype);
 

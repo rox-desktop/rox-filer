@@ -380,9 +380,8 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 	tmp = g_path_get_dirname(path);
 	tmp2 = pathdup(tmp);
 	if (strcmp(tmp, tmp2) != 0)
-		add_row(store, _("Real directory:"), tmp2);
+		add_row_and_free(store, _("Real directory:"), tmp2);
 	g_free(tmp);
-	g_free(tmp2);
 
 	add_row_and_free(store, _("Owner, Group:"),
 			 g_strdup_printf("%s, %s",
@@ -406,6 +405,9 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 	add_row(store, _("Permissions:"), pretty_permissions(item->mode));
 
 	add_row(store, _("Type:"), pretty_type(item, path));
+
+	if (item->mime_type)
+		add_row(store, "", mime_type_comment(item->mime_type));
 
 	if (item->base_type != TYPE_DIRECTORY)
 		add_row_and_free(store, _("Run action:"),

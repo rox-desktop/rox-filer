@@ -60,7 +60,6 @@ gboolean provides(GdkDragContext *context, GdkAtom target);
 
 void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win);
 void dnd_spring_abort(void);
-GList *uri_list_to_glist(const char *uri_list);
 const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
 
 gboolean dnd_motion_press(GtkWidget *widget, GdkEventButton *event);

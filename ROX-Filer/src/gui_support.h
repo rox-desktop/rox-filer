@@ -59,5 +59,6 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 void radios_pack(Radios *radios, GtkBox *box);
 void radios_set_value(Radios *radios, gint value);
 gint radios_get_value(Radios *radios);
+GList *uri_list_to_glist(const char *uri_list);
 
 #endif /* _GUI_SUPPORT_H */

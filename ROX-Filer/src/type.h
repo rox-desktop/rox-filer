@@ -44,6 +44,9 @@ struct _MIME_type
 	char		*subtype;
 	MaskedPixmap 	*image;		/* NULL => not loaded yet */
 	time_t		image_time;	/* When we loaded the image */
+
+	/* Private: use mime_type_comment() instead */
+	char		*comment;	/* Name in local language */
 };
 
 /* Prototypes */
@@ -62,5 +65,6 @@ gboolean can_set_run_action(DirItem *item);
 gchar *describe_current_command(MIME_type *type);
 GdkColor *type_get_colour(DirItem *item, GdkColor *normal);
 void reread_mime_files(void);
+extern const char *mime_type_comment(MIME_type *type);
 
 #endif /* _TYPE_H */

@@ -556,10 +556,10 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 		MIME_type	*type = item->mime_type;
 
 		if (!scanned)
-			return g_strdup("(application/octet-stream)");
+			return g_strdup("application/octet-stream");
 
-		buf = g_strdup_printf("(%s/%s)",
-				type->media_type, type->subtype);
+		buf = g_strdup_printf("%s/%s",
+				      type->media_type, type->subtype);
 	}
 	else if (filer_window->details_type == DETAILS_TIMES)
 	{
