@@ -29,6 +29,11 @@ else
 fi
 changequote([,])dnl
 
+if test -z "$GTK_CONFIG"; then
+  GTK_CONFIG=gtk-config
+fi
+AC_SUBST(GTK_CONFIG)
+
 dnl Find ImLib
 AC_MSG_CHECKING(for ImLib library)
 IMLIB_LIBS=`imlib-config --libs-gdk 2> /dev/null`
