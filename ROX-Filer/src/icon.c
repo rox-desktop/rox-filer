@@ -57,7 +57,6 @@
 static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 
 GtkWidget		*icon_menu;		/* The popup icon menu */
-static GtkWidget	*icon_menu_set_backdrop;
 static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
@@ -92,6 +91,7 @@ static void icon_class_init(gpointer gclass, gpointer data);
 static void icon_init(GTypeInstance *object, gpointer gclass);
 static void icon_hash_path(Icon *icon);
 static void icon_unhash_path(Icon *icon);
+static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n);
 
 enum {
 	ACTION_SHIFT,
@@ -119,6 +119,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, NULL},
 {N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, NULL},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
+{"",				NULL, NULL, 0, "<Separator>"},
 {N_("Backdrop..."),		NULL, set_backdrop, 0, NULL},
 };
 
@@ -211,10 +212,7 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 
 	menu_icon = icon;
 
-	if (pinboard)
-		gtk_widget_show(icon_menu_set_backdrop);
-	else
-		gtk_widget_hide(icon_menu_set_backdrop);
+	menu_set_hidden(icon_menu, !pinboard, 5, 2);
 
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
@@ -724,10 +722,6 @@ static void icon_class_init(gpointer gclass, gpointer data)
 	file_shift_item = GTK_BIN(items->data)->child;
 	g_list_free(items);
 
-	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
-	icon_menu_set_backdrop = g_list_nth(items, 5)->data;
-	g_list_free(items);
-
 	g_signal_connect(icon_menu, "unmap_event",
 			G_CALLBACK(menu_closed), NULL);
 }
@@ -790,4 +784,22 @@ static void icon_set_selected_int(Icon *icon, gboolean selected)
 
 	icon->selected = selected;
 	g_signal_emit_by_name(icon, "redraw");
+}
+
+static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n)
+{
+	GList	*items, *item;
+
+	items = gtk_container_get_children(GTK_CONTAINER(menu));
+
+	item = g_list_nth(items, from);
+	while (item && n--)
+	{
+		if (hidden)
+			gtk_widget_hide(GTK_WIDGET(item->data));
+		else
+			gtk_widget_show(GTK_WIDGET(item->data));
+		item = item->next;
+	}
+	g_list_free(items);
 }
