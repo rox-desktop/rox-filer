@@ -146,6 +146,12 @@ You should have received a copy of the GNU General Public License along
 \layout Section
 
 Instructions
+\layout Standard
+
+If you've just got hold of the filer by downloading the source archive then
+ you'll need to compile it before you can use it.
+ If you downloaded and installed a binary package, or if ROX-Filer was included
+ with your system, then you should skip the `Compiling' section.
 \layout Subsection
 
 Compiling
@@ -316,10 +322,10 @@ $ rox /home /usr /usr/local
 You can also use it to open files, like this:
 \layout LyX-Code
 
-$ rox ~/.xsession
+$ rox README
 \layout Standard
 
-The filer supports various options, use `
+The filer supports various options; use `
 \family typewriter 
 -h
 \family default 
@@ -719,8 +725,8 @@ Move to the first/last entry in the directory.
 \newline 
 Return
 \newline 
-Open the item under the cursor.
- With Shift held down this acts like choosing 'Shift Open' from the menu.
+Acts like clicking on the file.
+ You may hold down Shift for other effects, as with clicking.
 \newline 
 Spacebar
 \newline 
@@ -752,24 +758,18 @@ While items are selected in a ROX-Filer window the filer has the global
  selection.
  You can then paste into another window to get the pathnames of the selected
  files.
- For example, to extract the files from a .tgz archive on a floppy disk into
- your home directory:
+ For example, if you want to load a file into an application that doesn't
+ support drag-and-drop:
 \layout Enumerate
 
-Choose `Xterm here' from the menu in your home directory.
+Open the application's `Open' dialog box.
 \layout Enumerate
 
-Type `tar xzf ' (but don't press Return)
+Ctrl-click on the file in ROX-Filer to select it.
 \layout Enumerate
 
-Ctrl-click on the .tgz file to select it.
-\layout Enumerate
-
-Click the middle button in the xterm window to paste the name of the file
- into the command.
-\layout Enumerate
-
-Press Return in the xterm to execute the command.
+Click the middle button in the filename box in the application to paste
+ the name in.
 \layout Subsection
 
 
@@ -874,7 +874,7 @@ Use large icons in the display
 \newline 
 Menu of extra details
 \newline 
-Small squale
+Small squares
 \newline 
 Use small icons in the display
 \newline 
@@ -930,13 +930,13 @@ multicol5
 0 1 0 0
 0 1 0 0
 8 1 0 "" ""
-2 1 1 "8cm" ""
+2 1 1 "10cm" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1168,7 +1168,7 @@ access time
 \emph on 
 modification time
 \emph default 
-; changing a files owner or permissions updates the 
+; changing a file's owner or permissions updates the 
 \emph on 
 change time
 \emph default 
@@ -1183,8 +1183,7 @@ change time
 Permissions
 \layout Standard
 
-The permissions display, shown in Full Info mode, is made up of four groups
- of three flags.
+The permissions field, when shown, is made up of four groups of three flags.
  Each flag is displayed as a letter if it is on and a dash (--) if not.
  The first three characters show the permissions for the owner of the file,
  the second for other members of the file's group and the third for everyone
@@ -1916,7 +1915,7 @@ Let's say you want to locate the documentation for Wine in the directory
  Here's how you could do it:
 \layout Enumerate
 
-Open the minibuffer by choosing 'Enter Path' from the Window menu.
+Open the minibuffer by choosing `Enter Path' from the Window menu.
  I usually bind this function to the slash (`/') key.
 \layout Enumerate
 
@@ -2225,7 +2224,7 @@ If the pattern you enter contains a slash ('/') character then the pattern
 \family typewriter 
 '*tmp*'
 \family default 
- will find 'tmp' and 'tmpfile' but not '/tmp/file' --- 
+ will find `tmp' and `tmpfile' but not `/tmp/file' --- 
 \family typewriter 
 '/*tmp*'
 \family default 
@@ -2521,7 +2520,11 @@ atime = 1 day ago
 \emph on 
 exactly
 \emph toggle 
- 86400 seconds ago...
+ 86400 seconds ago
+\latex latex 
+$
+\backslash 
+ldots$
 \layout Subsubsection
 
 Specials
@@ -2778,7 +2781,7 @@ ROX-Filer uses the standard XDND protocol for drag-and-drop.
 \layout Itemize
 
 `Directories spring open' controls what happens when you hold a file over
- a directory in a filer window or on the pinboard.
+ a directory while dragging it.
  If on, the directory will `spring open' after a short pause, allowing you
  to navigate to any directory during a drag.
  You can also hold the pointer over the Home and Up buttons on the toolbar
@@ -2816,15 +2819,10 @@ Mouse bindings
  This is provided for people who are used to the RISC OS mouse bindings.
 \layout Itemize
 
-`Single-click navigation' treats a single click over an item as if it was
- a double click.
- This allows you to move around, run applications and open files without
- double clicking.
- To select a file 
-\emph on 
-without
-\emph toggle 
- opening it you must hold down CTRL while you click.
+`Single-click navigation' means that clicking on a file or directory will
+ open it.
+ If off, clicking on files selects them instead --- you must double click
+ on a file to open it.
 \layout Standard
 
 As an alternative to using the options window to put menu on button-2, some
@@ -3019,7 +3017,7 @@ Because you can compile an application as a user and then simply copy it
 
 To make a directory executable all you need to do is create a executable
  file called `AppRun' inside it.
- This file is run when the user double-clicks on the application.
+ This file is run when the user clicks on the application.
  You should also provide `AppIcon.xpm' (which will be used as the image for
  the application) and `Help' (which is a directory that is opened when the
  user asks for help).
@@ -3049,14 +3047,19 @@ LANG
  the filer, eg:
 \layout LyX-Code
 
-LANG=fr; export LANG
+$ LANG=fr; export LANG
 \layout LyX-Code
 
-ROX-Filer/AppRun
+$ rox
 \layout Standard
 
-To see which translations are currently provided, open the ROX-Filer application
- directory (hold down Shift and double-click) and look inside the `
+The `
+\family typewriter 
+--new
+\family default 
+' option is needed if the filer is already running.
+ To see which translations are currently provided, open the ROX-Filer applicatio
+n directory (hold down Shift when you click) and look inside the `
 \family typewriter 
 Messages
 \family default 
@@ -3336,7 +3339,7 @@ The diagram below shows some of the major structures found in the filer
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
 
-\begin_inset Figure size 595 314
+\begin_inset Figure size 595 344
 file Structs.eps
 width 3 100.00
 flags 9

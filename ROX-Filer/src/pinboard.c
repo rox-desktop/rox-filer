@@ -1773,12 +1773,12 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 	if (icons)
 	{
 		menu_set_items_shaded(pinboard_menu,
-				icons->next ? TRUE : FALSE, 4, 2);
+				icons->next ? TRUE : FALSE, 4, 3);
 
-		menu_set_items_shaded(pinboard_menu, FALSE, 6, 1);
+		menu_set_items_shaded(pinboard_menu, FALSE, 7, 1);
 	}
 	else
-		menu_set_items_shaded(pinboard_menu, TRUE, 4, 3);
+		menu_set_items_shaded(pinboard_menu, TRUE, 4, 4);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);

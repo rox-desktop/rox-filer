@@ -21,10 +21,14 @@ system "cvs tag -F Release-$a-$b-$c";
 
 chdir;
 
-mkdir "rox-$a.$b.$c", 0777;
+mkdir "rox-$a.$b.$c", 0775 or warn "mkdir() failed: $!\n";
 chdir "rox-$a.$b.$c";
 
 system "cvs -d:pserver:anonymous\@cvs.rox.sourceforge.net:/cvsroot/rox export -r Release-$a-$b-$c rox";
+
+system "mv rox/* .";
+rmdir "rox";
+
 system "cd rox/ROX-Filer/src; autoconf";
 system "cp ~/Apps/ROX-Filer/Help/Manual.ps rox/ROX-Filer/Help";
 system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
