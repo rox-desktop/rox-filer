@@ -40,7 +40,6 @@
 #include "gtk/gtkdnd.h"
 #include "gtk/gtkbutton.h"
 #include "gtk/gtksignal.h"
-#include "gtk/gtkpixmap.h"
 #include "gtk/gtkhbox.h"
 #include "gtk/gtkeventbox.h"
 #include "gtk/gtkentry.h"
@@ -365,7 +364,6 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
 			GtkSavebox *savebox)
 {
   GdkDragContext  *context;
-  GdkPixmap	  *pixmap, *mask;
   const gchar	  *uri = NULL, *leafname;
 
   g_return_if_fail (savebox != NULL);
@@ -387,11 +385,8 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
   
   write_xds_property (context, leafname);
 
-  gtk_image_get_pixmap (GTK_IMAGE (savebox->icon), &pixmap, &mask);
-  gtk_drag_set_icon_pixmap (context,
-			    gtk_widget_get_colormap (savebox->icon),
-			    pixmap,
-			    mask,
+  gtk_drag_set_icon_pixbuf (context,
+			    gtk_image_get_pixbuf (GTK_IMAGE (savebox->icon)),
 			    event->x, event->y);
 
 }
