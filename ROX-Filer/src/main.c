@@ -695,9 +695,6 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 #if GTK_CHECK_VERSION(2,2,0)
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 {
-	screen_width = gdk_screen_get_width(screen);
-	screen_height = gdk_screen_get_height(screen);
-
 	gui_store_screen_geometry(screen);
 
 	panel_update_size();

@@ -51,6 +51,7 @@ gint	screen_width, screen_height;
 gint		n_monitors;
 GdkRectangle	*monitor_geom = NULL;
 gint		monitor_width, monitor_height;
+MonitorAdjacent *monitor_adjacent;
 
 static GdkAtom xa_cardinal;
 
@@ -64,26 +65,56 @@ static gint tip_timeout = 0;	/* When primed */
 static void run_error_info_dialog(GtkMessageType type, const char *message,
 				  va_list args);
 static GType simple_image_get_type(void);
+static void gui_get_monitor_adjacent(int monitor, MonitorAdjacent *adj);
+
+#if GTK_CHECK_VERSION(2, 2, 0)
+#define gdk_screen_get_monitor_at_point(s, x, y) 0
+#endif
 
 void gui_store_screen_geometry(GdkScreen *screen)
 {
 	gint mon;
 
+	screen_width = gdk_screen_get_width(screen);
+	screen_height = gdk_screen_get_height(screen);
+
+	if (monitor_adjacent)
+		g_free(monitor_adjacent);
+
+#if GTK_CHECK_VERSION(2, 2, 0)
 	monitor_width = monitor_height = G_MAXINT;
 	n_monitors = gdk_screen_get_n_monitors(screen);
 	if (monitor_geom)
 		g_free(monitor_geom);
-	monitor_geom = g_new(GdkRectangle, n_monitors);
-	for (mon = 0; mon < n_monitors; ++mon)
+	monitor_geom = g_new(GdkRectangle, n_monitors ? n_monitors : 1);
+
+	if (n_monitors)
 	{
-		gdk_screen_get_monitor_geometry(screen, mon,
-				&monitor_geom[mon]);
-		if (monitor_geom[mon].width < monitor_width)
-			monitor_width = monitor_geom[mon].width; 
-		if (monitor_geom[mon].height < monitor_height)
-			monitor_height = monitor_geom[mon].height; 
+		for (mon = 0; mon < n_monitors; ++mon)
+		{
+			gdk_screen_get_monitor_geometry(screen, mon,
+					&monitor_geom[mon]);
+			if (monitor_geom[mon].width < monitor_width)
+				monitor_width = monitor_geom[mon].width; 
+			if (monitor_geom[mon].height < monitor_height)
+				monitor_height = monitor_geom[mon].height; 
+		}
+		monitor_adjacent = g_new(MonitorAdjacent, n_monitors);
+		for (mon = 0; mon < n_monitors; ++mon)
+		{
+			gui_get_monitor_adjacent(mon, &monitor_adjacent[mon]);
+		}
 	}
-	
+	else
+#endif /* GTK_CHECK_VERSION(2, 2, 0) */
+	{
+		n_monitors = 1;
+		monitor_geom[0].x = monitor_geom[0].y = 0;
+		monitor_width = monitor_geom[0].width = screen_width;
+		monitor_height = monitor_geom[0].height = screen_height;
+		monitor_adjacent = g_new0(MonitorAdjacent, 1);
+	}
+
 }
 
 void gui_support_init()
@@ -95,8 +126,6 @@ void gui_support_init()
 	/* This call starts returning strange values after a while, so get
 	 * the result here during init.
 	 */
-	gdk_drawable_get_size(gdk_get_default_root_window(),
-			    &screen_width, &screen_height);
 	gui_store_screen_geometry(gdk_screen_get_default());
 
 	/* Work around the scrollbar placement bug */
@@ -436,8 +465,11 @@ gboolean get_pointer_xy(int *x, int *y)
 void centre_window(GdkWindow *window, int x, int y)
 {
 	int	w, h;
+	int m;
 
 	g_return_if_fail(window != NULL);
+
+	m = gdk_screen_get_monitor_at_point(gdk_screen_get_default(), x, y);
 
 	gdk_drawable_get_size(window, &w, &h);
 	
@@ -445,8 +477,12 @@ void centre_window(GdkWindow *window, int x, int y)
 	y -= h / 2;
 
 	gdk_window_move(window,
-		CLAMP(x, DECOR_BORDER, screen_width - w - DECOR_BORDER),
-		CLAMP(y, DECOR_BORDER, screen_height - h - DECOR_BORDER));
+		CLAMP(x, DECOR_BORDER + monitor_geom[m].x,
+			monitor_geom[m].x + monitor_geom[m].width 
+			- w - DECOR_BORDER),
+		CLAMP(y, DECOR_BORDER + monitor_geom[m].y,
+			monitor_geom[m].y + monitor_geom[m].height 
+			- h - DECOR_BORDER));
 }
 
 static void run_error_info_dialog(GtkMessageType type, const char *message,
@@ -713,6 +749,7 @@ void tooltip_show(guchar *text)
 	GtkWidget *label;
 	int	x, y, py;
 	int	w, h;
+	int m;
 
 	if (tip_timeout)
 	{
@@ -747,16 +784,20 @@ void tooltip_show(guchar *text)
 	h = tip_widget->allocation.height;
 	gdk_window_get_pointer(NULL, &x, &py, NULL);
 
+	m = gdk_screen_get_monitor_at_point(gdk_screen_get_default(), x, py);
+	
 	x -= w / 2;
 	y = py + 12; /* I don't know the pointer height so I use a constant */
 
 	/* Now check for screen boundaries */
-	x = CLAMP(x, 0, screen_width - w);
-	y = CLAMP(y, 0, screen_height - h);
+	x = CLAMP(x, monitor_geom[m].x,
+			monitor_geom[m].x + monitor_geom[m].width - w);
+	y = CLAMP(y, monitor_geom[m].y,
+			monitor_geom[m].y + monitor_geom[m].height - h);
 
 	/* And again test if pointer is over the tooltip window */
 	if (py >= y && py <= y + h)
-		y = py - h- 2;
+		y = py - h - 2;
 	gtk_window_move(GTK_WINDOW(tip_widget), x, y);
 	gtk_widget_show(tip_widget);
 
@@ -1121,4 +1162,53 @@ GtkWidget *simple_image_new(GdkPixbuf *pixbuf)
 	image->height = gdk_pixbuf_get_height(pixbuf);
 
 	return GTK_WIDGET(image);
+}
+
+/* Whether a line l1 long starting from n1 overlaps a line l2 from n2 */
+inline static gboolean gui_ranges_overlap(int n1, int l1, int n2, int l2)
+{
+	return (n1 > n2 && n1 < n2 + l2) ||
+		(n1 + l1 > n2 && n1 + l1 < n2 + l2) ||
+		(n1 <= n2 && n1 + l1 >= n2 + l2);
+}
+
+static void gui_get_monitor_adjacent(int monitor, MonitorAdjacent *adj)
+{
+	int m;
+
+	adj->left = adj->right = adj->top = adj->bottom = FALSE;
+
+	for (m = 0; m < n_monitors; ++m)
+	{
+		if (m == monitor)
+			continue;
+		if (gui_ranges_overlap(monitor_geom[m].y,
+				monitor_geom[m].height,
+				monitor_geom[monitor].y,
+				monitor_geom[monitor].height))
+		{
+			if (monitor_geom[m].x < monitor_geom[monitor].x)
+			{
+				adj->left = TRUE;
+			}
+			else if (monitor_geom[m].x > monitor_geom[monitor].x)
+			{
+				adj->right = TRUE;
+			}
+		}
+		if (gui_ranges_overlap(monitor_geom[m].x,
+				monitor_geom[m].width,
+				monitor_geom[monitor].x,
+				monitor_geom[monitor].width))
+		{
+			if (monitor_geom[m].y < monitor_geom[monitor].y)
+			{
+				adj->top = TRUE;
+			}
+			else if (monitor_geom[m].y > monitor_geom[monitor].y)
+			{
+				adj->bottom = TRUE;
+			}
+		}
+	}
 }

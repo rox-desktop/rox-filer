@@ -1011,7 +1011,13 @@ static void reposition_panel(GtkWidget *window,
 
 	/* Stop windows from maximising over all/part of us */
 	{
-		guint32	wm_strut[] = {0, 0, 0, 0};
+		struct {
+			guint32 left, right, top, bottom;
+			guint32 left_start_y, left_end_y;
+			guint32 right_start_y, right_end_y;
+			guint32 top_start_x, top_end_x;
+			guint32 bottom_start_x, bottom_end_x;
+		} strut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 		if (o_panel_avoid.int_value == FALSE)
 			thickness = 2;
@@ -1021,20 +1027,114 @@ static void reposition_panel(GtkWidget *window,
 		else
 			thickness = alloc->width;
 
-		if (panel->side == PANEL_LEFT)
-			wm_strut[0] = thickness;
-		else if (panel->side == PANEL_RIGHT)
-			wm_strut[1] = thickness;
-		else if (panel->side == PANEL_TOP)
-			wm_strut[2] = thickness;
-		else
-			wm_strut[3] = thickness;
+		switch (panel->side)
+		{
+			case PANEL_LEFT:
+				if (!o_panel_xinerama.int_value ||
+					!monitor_adjacent
+					[o_panel_monitor.int_value].left)
+				{
+					strut.left = panel_geometry.x +
+						thickness;
+					strut.left_start_y = panel_geometry.y;
+					strut.left_end_y = panel_geometry.y +
+						panel_geometry.height - 1;
+				}
+				/* else there is (part of) a monitor
+				 * to the left */
+				else
+				{
+					thickness = 0;
+				}
+				break;
+			case PANEL_RIGHT:
+				if (!o_panel_xinerama.int_value ||
+					!monitor_adjacent
+					[o_panel_monitor.int_value].right)
+				{
+					/* RHS of monitor might not abut edge
+					 * of total virtual screen */
+					strut.right = screen_width -
+						panel_geometry.x -
+						panel_geometry.width +
+						thickness;
+					strut.right_start_y = panel_geometry.y;
+					strut.right_end_y = panel_geometry.y +
+						panel_geometry.height - 1;
+				}
+				/* else there is (part of) a monitor
+				 * to the right */
+				else
+				{
+					thickness = 0;
+				}
+				break;
+			case PANEL_TOP:
+				if (!o_panel_xinerama.int_value ||
+					!monitor_adjacent
+					[o_panel_monitor.int_value].top)
+				{
+					strut.top = panel_geometry.y +
+						thickness;
+					strut.top_start_x = panel_geometry.x;
+					strut.top_end_x = panel_geometry.x +
+						panel_geometry.width - 1;
+				}
+				/* else there is (part of) a monitor above */
+				else
+				{
+					thickness = 0;
+				}
+				break;
+			default:	/* PANEL_BOTTOM */
+				if (!o_panel_xinerama.int_value ||
+					!monitor_adjacent
+					[o_panel_monitor.int_value].bottom)
+				{
+					/* Bottom of monitor might not abut
+					 * edge of total virtual screen */
+					strut.bottom = screen_height -
+						panel_geometry.y -
+						panel_geometry.height +
+						thickness;
+					strut.bottom_start_x = panel_geometry.x;
+					strut.bottom_end_x = panel_geometry.x +
+						panel_geometry.width - 1;
+				}
+				/* else there is (part of) a monitor below */
+				else
+				{
+					thickness = 0;
+				}
+				break;
+		}
 
-		gdk_property_change(panel->window->window,
-				gdk_atom_intern("_NET_WM_STRUT", FALSE),
-				gdk_atom_intern("CARDINAL", FALSE),
-				32, GDK_PROP_MODE_REPLACE,
-				(gchar *) &wm_strut, 4);
+		if (thickness)
+		{
+			/* Set full-width strut as well as partial in case
+			 * partial isn't supported by wm */
+			gdk_property_change(panel->window->window,
+					gdk_atom_intern("_NET_WM_STRUT",
+						FALSE),
+					gdk_atom_intern("CARDINAL", FALSE),
+					32, GDK_PROP_MODE_REPLACE,
+					(gchar *) &strut, 4);
+			gdk_property_change(panel->window->window,
+					gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
+						FALSE),
+					gdk_atom_intern("CARDINAL", FALSE),
+					32, GDK_PROP_MODE_REPLACE,
+					(gchar *) &strut, 12);
+		}
+		else
+		{
+			gdk_property_delete(panel->window->window,
+					gdk_atom_intern("_NET_WM_STRUT_PARTIAL",
+						FALSE));
+			gdk_property_delete(panel->window->window,
+					gdk_atom_intern("_NET_WM_STRUT",
+						FALSE));
+		}
 	}
 
 }

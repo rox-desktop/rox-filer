@@ -27,6 +27,10 @@ extern gint		n_monitors;
 extern GdkRectangle	*monitor_geom;
 /* Smallest monitor - use for sizing windows */
 extern gint		monitor_width, monitor_height;
+typedef struct {
+	gboolean left, right, top, bottom;
+} MonitorAdjacent;
+extern MonitorAdjacent *monitor_adjacent;
 
 typedef void (*HelpFunc)(gpointer data);
 typedef const char *ParseFunc(gchar *line);

@@ -13,6 +13,7 @@ Bugfix: A race in the code for updating iconified window titles could cause
 ~~~~~~~~~~~
 Another Properties window fix: if there is no output from the du command
 then put a message indicating an error (Stephen Watson).
+Can now compile without Xinerama support on GTK+ < 2.2.0 (Tony Houghton).
 
 23-Jun-2004
 ~~~~~~~~~~~
@@ -22,6 +23,12 @@ Let the panel autoscroll during a drag (Stephen Watson).
 ~~~~~~~~~~~
 Fix another bug when closing Properties window before it has finished
 scanning the directory (Stephen Watson).
+
+09-Jun-2004
+~~~~~~~~~~~
+Improved Xinerama support: now works for tooltips and action windows; filer
+windows are no longer prone to leaving their borders overlapping; panel uses
+_NET_WM_STRUT_PARTIAL so it only affects the monitor it's on (Tony Houghton).
 
 04-Jun-2004
 ~~~~~~~~~~~

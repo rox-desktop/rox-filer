@@ -236,6 +236,8 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 	return FALSE;
 }
 
+#define DECOR_BORDER 32
+
 /* Resize the filer window to w x h pixels, plus border (not clamped).
  * If triggered by a key event, warp the pointer (for SloppyFocus users).
  */
@@ -266,12 +268,13 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		h = MAX(req->height, h);
 		gdk_window_get_position(gdk_window, &x, &y);
 
-		if (x + w > monitor_width || y + h > monitor_height)
+		if (x + w + DECOR_BORDER > monitor_width ||
+				y + h > monitor_height + DECOR_BORDER)
 		{
-			if (x + w > monitor_width)
-				x = monitor_width - w - 4;
-			if (y + h > monitor_height)
-				y = monitor_height - h - 4;
+			if (x + w + DECOR_BORDER > monitor_width)
+				x = monitor_width - w - 4 - DECOR_BORDER;
+			if (y + h + DECOR_BORDER > monitor_height)
+				y = monitor_height - h - 4 - DECOR_BORDER;
 			gdk_window_move_resize(gdk_window, x, y, w, h);
 		}
 		else
