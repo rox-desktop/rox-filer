@@ -1289,7 +1289,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 	leaf = g_basename(path);
 	paths = g_list_append(NULL, templ);
 
-	action_copy(paths, dest, leaf, -1);
+	action_copy(paths, dest, leaf, TRUE);
 
 	g_list_free(paths);
 	g_free(dest);
