@@ -519,6 +519,7 @@ void drag_data_get(GtkWidget          		*widget,
 		case	TARGET_URI_LIST:
 			to_send = g_dataset_get_data(context, "uri_list");
 			to_send_length = strlen(to_send);
+			type = text_uri_list;		/* (needed for xine) */
 			delete_once_sent = FALSE;
 			break;
 		default:
