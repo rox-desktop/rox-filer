@@ -1668,6 +1668,10 @@ void collection_delete_if(Collection *collection,
 
 		collection->paint_level = PAINT_CLEAR;
 
-		gtk_widget_queue_draw(GTK_WIDGET(collection));
+		if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
+		{
+			set_vadjustment(collection);
+			gtk_widget_queue_draw(GTK_WIDGET(collection));
+		}
 	}
 }
