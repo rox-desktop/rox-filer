@@ -29,6 +29,11 @@ int mc_closedir (DIR *dir);
 int mc_telldir (DIR *dir);
 void mc_seekdir (DIR *dir, int offset);
 
+int mc_open  (const char *filename, int flags, ...);
+int mc_close (int handle);
+int mc_read  (int handle, char *buffer, int count);
+int mc_write (int hanlde, char *buffer, int count);
+
 int mc_stat  (char *path, struct stat *buf);
 int mc_lstat (char *path, struct stat *buf);
 int mc_fstat (int fd, struct stat *buf);
@@ -37,6 +42,11 @@ int mc_fstat (int fd, struct stat *buf);
 #else	/* HAVE_LIBVFS */
 
 /* We don't have VFS installed. Just use the normal functions instead. */
+
+#  define mc_open open
+#  define mc_close close
+#  define mc_read read
+#  define mc_write write
 
 #  define mc_stat(x, y) stat(x, y)
 #  define mc_lstat(x, y) lstat(x, y)

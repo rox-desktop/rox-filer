@@ -31,5 +31,6 @@ char *get_local_path(char *uri);
 void close_on_exec(int fd, gboolean close);
 void set_blocking(int fd, gboolean blocking);
 char *pretty_time(time_t *time);
+guchar *copy_file(guchar *from, guchar *to);
 
 #endif /* _SUPPORT_H */

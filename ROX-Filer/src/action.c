@@ -654,7 +654,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 	struct dirent *ent;
 	GSList  *list = NULL, *next;
 
-	d = opendir(src_dir);
+	d = mc_opendir(src_dir);
 	if (!d)
 	{
 		g_string_sprintf(message, "!ERROR reading '%s': %s\n",
@@ -665,7 +665,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 
 	send_dir(src_dir);
 
-	while ((ent = readdir(d)))
+	while ((ent = mc_readdir(d)))
 	{
 		if (ent->d_name[0] == '.' && (ent->d_name[1] == '\0'
 			|| (ent->d_name[1] == '.' && ent->d_name[2] == '\0')))
@@ -673,7 +673,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 		list = g_slist_append(list, g_strdup(make_path(src_dir,
 						       ent->d_name)->str));
 	}
-	closedir(d);
+	mc_closedir(d);
 
 	if (!list)
 		return;
@@ -1076,7 +1076,7 @@ static gboolean do_usage(char *src_path, char *dest_path)
 
 	check_flags();
 
-	if (lstat(src_path, &info))
+	if (mc_lstat(src_path, &info))
 	{
 		g_string_sprintf(message, "'%s:\n", src_path);
 		send();
@@ -1110,7 +1110,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 
 	check_flags();
 
-	if (lstat(src_path, &info))
+	if (mc_lstat(src_path, &info))
 	{
 		send_error();
 		return FALSE;
@@ -1198,7 +1198,7 @@ static gboolean do_find(char *path, char *dummy)
 			return FALSE;
 	}
 
-	if (lstat(path, &info.stats))
+	if (mc_lstat(path, &info.stats))
 	{
 		send_error();
 		g_string_sprintf(message, "'(while checking '%s')\n", path);
@@ -1236,7 +1236,7 @@ static gboolean do_chmod(char *path, char *dummy)
 
 	check_flags();
 
-	if (lstat(path, &info))
+	if (mc_lstat(path, &info))
 	{
 		send_error();
 		return FALSE;
@@ -1280,7 +1280,7 @@ static gboolean do_chmod(char *path, char *dummy)
 			return FALSE;
 	}
 
-	if (lstat(path, &info))
+	if (mc_lstat(path, &info))
 	{
 		send_error();
 		return FALSE;
@@ -1341,13 +1341,13 @@ static gboolean do_copy2(char *path, char *dest)
 
 	dest_path = make_dest_path(path, dest);
 
-	if (lstat(path, &info))
+	if (mc_lstat(path, &info))
 	{
 		send_error();
 		return FALSE;
 	}
 
-	if (lstat(dest_path, &dest_info) == 0)
+	if (mc_lstat(dest_path, &dest_info) == 0)
 	{
 		int		err;
 		gboolean	merge;
@@ -1406,7 +1406,7 @@ static gboolean do_copy2(char *path, char *dest)
 		safe_path = g_strdup(path);
 		safe_dest = g_strdup(dest_path);
 
-		exists = !lstat(dest_path, &dest_info);
+		exists = !mc_lstat(dest_path, &dest_info);
 
 		if (exists && !S_ISDIR(dest_info.st_mode))
 		{
@@ -1460,14 +1460,13 @@ static gboolean do_copy2(char *path, char *dest)
 	}
 	else
 	{
-		char	*argv[] = {"cp", "-pRf", NULL, NULL, NULL};
+		guchar	*error;
 
-		argv[2] = path;
-		argv[3] = dest_path;
+		error = copy_file(path, dest_path);
 
-		if (fork_exec_wait(argv))
+		if (error)
 		{
-			g_string_sprintf(message, "!ERROR: Copy failed\n");
+			g_string_sprintf(message, "!ERROR: %s\n", error);
 			send();
 			retval = FALSE;
 		}
@@ -1521,7 +1520,7 @@ static gboolean do_move(char *path, char *dest)
 
 	dest_path = make_path(dest, leaf)->str;
 
-	is_dir = lstat(path, &info2) == 0 && S_ISDIR(info2.st_mode);
+	is_dir = mc_lstat(path, &info2) == 0 && S_ISDIR(info2.st_mode);
 
 	if (access(dest_path, F_OK) == 0)
 	{
@@ -1533,7 +1532,7 @@ static gboolean do_move(char *path, char *dest)
 		if (!reply(from_parent, TRUE))
 			return FALSE;
 
-		if (lstat(dest_path, &info))
+		if (mc_lstat(dest_path, &info))
 		{
 			send_error();
 			return FALSE;
