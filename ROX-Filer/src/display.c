@@ -154,29 +154,28 @@ void display_init()
 static void fill_template(GdkRectangle *area, DirItem *item,
 			FilerWindow *filer_window, Template *template)
 {
+	DisplayStyle	style = filer_window->display_style;
+
 	template->split = 0;
 	template->details_string = NULL;
 
-	switch (filer_window->display_style)
+	if (filer_window->details_type == DETAILS_NONE)
 	{
-		case HUGE_ICONS:
+		if (style == HUGE_ICONS)
 			huge_template(area, item, filer_window, template);
-			break;
-		case LARGE_ICONS:
+		else if (style == LARGE_ICONS)
 			large_template(area, item, filer_window, template);
-			break;
-		case SMALL_FULL_INFO:
-			small_full_template(area, item, filer_window, template);
-			break;
-		case LARGE_FULL_INFO:
-			large_full_template(area, item, filer_window, template);
-			break;
-		case HUGE_FULL_INFO:
-			huge_full_template(area, item, filer_window, template);
-			break;
-		default:
+		else
 			small_template(area, item, filer_window, template);
-			break;
+	}
+	else
+	{
+		if (style == SMALL_ICONS)
+			small_full_template(area, item, filer_window, template);
+		else if (style == LARGE_ICONS)
+			large_full_template(area, item, filer_window, template);
+		else
+			huge_full_template(area, item, filer_window, template);
 	}
 }
 
@@ -189,45 +188,54 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 	int		text_height = item_font->ascent + item_font->descent;
 	int		fixed_height;
 	Template	temp;
+	DisplayStyle	style = filer_window->display_style;
 
-        switch (filer_window->display_style)
-        {
-                case HUGE_ICONS:
+	if (filer_window->details_type == DETAILS_NONE)
+	{
+                if (style == HUGE_ICONS)
+		{
 			if (!item->image->huge_pixmap)
 				pixmap_make_huge(item->image);
 			wrap_text(&temp, item, HUGE_WRAP);
 			pix_width = PIXMAP_WIDTH(item->image->huge_pixmap);
 			*width = MAX(pix_width, temp.leafname.width) + 4;
 			*height = temp.leafname.height + HUGE_HEIGHT + 4;
-			break;
-                case HUGE_FULL_INFO:
+		}
+		else if (style == SMALL_ICONS)
+		{
+			w = MIN(item->name_width, o_small_truncate);
+			*width = SMALL_WIDTH + 12 + w;
+			*height = MAX(text_height, SMALL_HEIGHT) + 4;
+		}
+		else
+		{
+			wrap_text(&temp, item, o_large_truncate);
+                        *width = MAX(pix_width, temp.leafname.width) + 4;
+			*height = temp.leafname.height + ICON_HEIGHT + 2;
+		}
+	}
+	else
+	{
+		if (style == HUGE_ICONS)
+		{
 			w = details_width(filer_window, item);
-                        *width = HUGE_WIDTH + 12 + MAX(w, item->name_width);
+			*width = HUGE_WIDTH + 12 + MAX(w, item->name_width);
 			*height = HUGE_HEIGHT - 4;
-			break;
-                case LARGE_FULL_INFO:
-			w = details_width(filer_window, item);
-                        *width = ICON_WIDTH + 12 + MAX(w, item->name_width);
-			*height = ICON_HEIGHT - 4;
-			break;
-                case SMALL_FULL_INFO:
+		}
+		else if (style == SMALL_ICONS)
+		{
 			w = details_width(filer_window, item);
 			*width = SMALL_WIDTH + item->name_width + 12 + w;
 			fixed_height = fixed_font->ascent + fixed_font->descent;
 			text_height = MAX(text_height, fixed_height);
 			*height = MAX(text_height, SMALL_HEIGHT) + 4;
-			break;
-		case SMALL_ICONS:
-			w = MIN(item->name_width, o_small_truncate);
-			*width = SMALL_WIDTH + 12 + w;
-			*height = MAX(text_height, SMALL_HEIGHT) + 4;
-			break;
-		case LARGE_ICONS:
-                default:
-			wrap_text(&temp, item, o_large_truncate);
-                        *width = MAX(pix_width, temp.leafname.width) + 4;
-			*height = temp.leafname.height + ICON_HEIGHT + 2;
-			break;
+		}
+		else
+		{
+			w = details_width(filer_window, item);
+                        *width = ICON_WIDTH + 12 + MAX(w, item->name_width);
+			*height = ICON_HEIGHT - 4;
+		}
         }
 }
 
@@ -543,16 +551,6 @@ void display_set_layout(FilerWindow  *filer_window,
 {
 	g_return_if_fail(filer_window != NULL);
 
-	if (details != DETAILS_NONE)
-	{
-		if (style == SMALL_ICONS)
-			style = SMALL_FULL_INFO;
-		else if (style == LARGE_ICONS)
-			style = LARGE_FULL_INFO;
-		else
-			style = HUGE_FULL_INFO;
-	}
-
 	display_style_set(filer_window, style);
 	display_details_set(filer_window, details);
 	filer_window_autosize(filer_window, TRUE);
@@ -634,16 +632,12 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
 
 	switch (filer_window->display_style)
 	{
-		case LARGE_FULL_INFO:
 		case LARGE_ICONS:
 			new = bigger ? HUGE_ICONS : SMALL_ICONS;
 			break;
 		case HUGE_ICONS:
-		case HUGE_FULL_INFO:
 			new = bigger ? SMALL_ICONS : LARGE_ICONS;
 			break;
-		case SMALL_ICONS:
-		case SMALL_FULL_INFO:
 		default:
 			new = bigger ? LARGE_ICONS : HUGE_ICONS;
 			break;
@@ -1069,7 +1063,7 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	{
 		if (item->base_type != TYPE_DIRECTORY)
 		{
-			if (filer_window->display_style == SMALL_FULL_INFO)
+			if (filer_window->display_style == SMALL_ICONS)
 				buf = g_strdup(format_size_aligned(item->size));
 			else
 				buf = g_strdup(format_size(item->size));

@@ -19,9 +19,6 @@ typedef enum {
 	LARGE_ICONS = 0,
 	SMALL_ICONS = 1,
 	HUGE_ICONS = 2,
-	LARGE_FULL_INFO,
-	SMALL_FULL_INFO,
-	HUGE_FULL_INFO,
 	UNKNOWN_STYLE,
 } DisplayStyle;
 

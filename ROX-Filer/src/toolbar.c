@@ -74,6 +74,8 @@ static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
 static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_details_clicked(GtkWidget *widget,
+				    FilerWindow *filer_window);
 static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 				FilerWindow *filer_window);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
@@ -115,6 +117,10 @@ static Tool all_tools[] = {
 	
 	{N_("Size"), "zoom", N_("Change icon size"),
 	 toolbar_size_clicked, DROP_NONE, TRUE,
+	 NULL, NULL},
+	
+	{N_("Details"), "details", N_("Show extra details"),
+	 toolbar_details_clicked, DROP_NONE, TRUE,
 	 NULL, NULL},
 	
 	{N_("Help"), "help", N_("Show ROX-Filer help"),
@@ -291,6 +297,17 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	display_change_size(filer_window, 
 		bev->type == GDK_BUTTON_RELEASE && bev->button == 1);
+}
+
+static void toolbar_details_clicked(GtkWidget *widget,
+				    FilerWindow *filer_window)
+{
+	if (filer_window->details_type == DETAILS_NONE)
+		display_set_layout(filer_window, SMALL_ICONS, DETAILS_SUMMARY);
+	else
+		display_set_layout(filer_window,
+				option_get_int("display_size"),
+				DETAILS_NONE);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
