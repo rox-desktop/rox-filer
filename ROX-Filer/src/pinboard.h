@@ -22,7 +22,6 @@ void pinboard_activate(const gchar *name);
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y);
 void pinboard_unpin(Icon *icon);
 void pinboard_wink_item(Icon *icon, gboolean timeout);
-void pinboard_clear(void);
 void pinboard_icon_may_update(Icon *icon);
 void pinboard_reshape_icon(Icon *icon);
 void pinboard_save(void);

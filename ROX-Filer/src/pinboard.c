@@ -168,6 +168,7 @@ static void drag_end(GtkWidget *widget,
 static void reshape_all(void);
 static void pinboard_check_options(void);
 static void pinboard_load_from_xml(xmlDocPtr doc);
+static void pinboard_clear(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -204,10 +205,7 @@ void pinboard_activate(const gchar *name)
 		name = NULL;
 
 	if (old_board)
-	{
 		pinboard_clear();
-		number_of_windows--;
-	}
 
 	if (!name)
 	{
@@ -417,35 +415,6 @@ void pinboard_wink_item(Icon *icon, gboolean timeout)
 		else
 			wink_timeout = -1;
 	}
-}
-
-/* Remove everything on the current pinboard and disables the pinboard.
- * Does not change any files. Does not change number_of_windows.
- */
-void pinboard_clear(void)
-{
-	GList	*next;
-
-	g_return_if_fail(current_pinboard != NULL);
-
-	next = current_pinboard->icons;
-	while (next)
-	{
-		Icon	*icon = (Icon *) next->data;
-
-		next = next->next;
-
-		gtk_widget_destroy(icon->win);
-	}
-	
-	g_free(current_pinboard->name);
-	g_free(current_pinboard);
-	current_pinboard = NULL;
-
-	release_xdnd_proxy(GDK_ROOT_WINDOW());
-	gdk_window_remove_filter(gdk_get_default_root_window(),
-				 proxy_filter, NULL);
-	gdk_window_set_user_data(gdk_get_default_root_window(), NULL);
 }
 
 /* Icon's size, shape or appearance has changed - update the display */
@@ -1507,4 +1476,33 @@ static void reshape_all(void)
 		Icon *icon = (Icon *) next->data;
 		pinboard_reshape_icon(icon);
 	}
+}
+
+/* Turns off the pinboard. Does not call gtk_main_quit. */
+static void pinboard_clear(void)
+{
+	GList	*next;
+
+	g_return_if_fail(current_pinboard != NULL);
+
+	next = current_pinboard->icons;
+	while (next)
+	{
+		Icon	*icon = (Icon *) next->data;
+
+		next = next->next;
+
+		gtk_widget_destroy(icon->win);
+	}
+	
+	g_free(current_pinboard->name);
+	g_free(current_pinboard);
+	current_pinboard = NULL;
+
+	release_xdnd_proxy(GDK_ROOT_WINDOW());
+	gdk_window_remove_filter(gdk_get_default_root_window(),
+				 proxy_filter, NULL);
+	gdk_window_set_user_data(gdk_get_default_root_window(), NULL);
+
+	number_of_windows--;
 }
