@@ -129,6 +129,12 @@ static void collection_item_set_selected(Collection *collection,
                                          gint item,
                                          gboolean selected,
 					 gboolean signal);
+#ifdef GTK2
+static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
+#else
+static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event);
+#endif
+
 #ifndef GTK2
 static void collection_adjustment(GtkAdjustment *adjustment,
 				  Collection    *collection);
@@ -136,7 +142,6 @@ static void collection_set_style(GtkWidget *widget,
                                  GtkStyle *previous_style);
 static void collection_disconnect(GtkAdjustment *adjustment,
 				  Collection    *collection);
-static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event);
 static void scroll_by(Collection *collection, gint diff);
 static void set_vadjustment(Collection *collection);
 static void draw_focus(GtkWidget *widget);
@@ -258,9 +263,14 @@ static void collection_class_init(CollectionClass *class)
 	
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->map = collection_map;
+#ifdef GTK2
+	widget_class->scroll_event = collection_scroll_event;
+#else
+	widget_class->button_press_event = collection_scroll_event;
+#endif
+
 #ifndef GTK2
 	widget_class->style_set = collection_set_style; /* XXX: Test for 2.0 */
-	widget_class->button_press_event = collection_scroll_event;
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
 	widget_class->draw = collection_draw;
@@ -699,16 +709,16 @@ static gint collection_paint(Collection 	*collection,
 #ifndef GTK2
 	GtkWidget	*widget;
 	GdkRectangle	whole;
-	gint     	width;
+	gint     	width, height;
 
 	widget = GTK_WIDGET(collection);
 
 	scroll = collection->vadj->value;
-	gdk_window_get_size(widget->window, &width, NULL);
+	gdk_window_get_size(widget->window, &width, &height);
 	whole.x = 0;
 	whole.y = 0;
 	whole.width = width;
-	whole.height = collection->vadj->page_size;
+	whole.height = height;
 	
 	if (collection->paint_level > PAINT_NORMAL || area == NULL)
 	{
@@ -1186,8 +1196,12 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 	return TRUE;
 }
 
-#ifndef GTK2
+/* Wheel mouse scrolling */
+#ifdef GTK2
+static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event)
+#else
 static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
+#endif
 {
 	Collection    	*collection;
 	int		diff = 0;
@@ -1198,24 +1212,33 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 
 	collection = COLLECTION(widget);
 
+#ifdef GTK2
+	if (event->direction == GDK_SCROLL_UP)
+		diff = -1;
+	else if (event->direction == GDK_SCROLL_DOWN)
+		diff = 1;
+	else
+		return FALSE;
+#else
 	if (event->button <= 3 || event->type != GDK_BUTTON_PRESS)
 		return FALSE;		/* Only deal with wheel events here */
 		
-	/* Wheel mouse scrolling */
-	diff = 32;
-
 	if (event->button == 4)
-		diff = -diff;
-	else if (event->button != 5)
+		diff = -1;
+	else if (event->button == 5)
+		diff = 1;
+	else
 		return FALSE;
+#endif
 
 	if (diff)
 	{
 		int	old_value = collection->vadj->value;
 		int	new_value = 0;
 		gboolean box = collection->lasso_box;
+		int	step = collection->vadj->page_increment / 2;
 
-		new_value = CLAMP(old_value + diff, 0.0, 
+		new_value = CLAMP(old_value + diff * step, 0.0, 
 				collection->vadj->upper
 				- collection->vadj->page_size);
 		diff = new_value - old_value;
@@ -1226,10 +1249,7 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 				remove_lasso_box(collection);
 				collection->drag_box_y[0] -= diff;
 			}
-			collection->vadj->value = new_value;
-			gtk_signal_emit_by_name(
-					GTK_OBJECT(collection->vadj),
-					"changed");
+			gtk_adjustment_set_value(collection->vadj, new_value);
 			if (box)
 				add_lasso_box(collection);
 		}
@@ -1237,7 +1257,6 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 
 	return TRUE;
 }
-#endif
 
 /* 'from' and 'to' are pixel positions. 'step' is the size of each item.
  * Returns the index of the first item covered, and the number of items.

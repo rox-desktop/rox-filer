@@ -34,6 +34,7 @@
 #include "global.h"
 
 #include "support.h"
+#include "main.h"
 #include "gui_support.h"
 #include "dir.h"
 #include "type.h"
@@ -62,6 +63,7 @@ static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static guchar *pretty_type(DirItem *file, guchar *path);
 static GtkWidget *make_vbox(guchar *path);
+static void info_destroyed(gpointer data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -108,12 +110,22 @@ void infobox_new(guchar *path)
 	gtk_object_set_data(GTK_OBJECT(window), "details", details);
 	gtk_object_set_data_full(GTK_OBJECT(window), "path", path, g_free);
 
+	gtk_signal_connect_object(GTK_OBJECT(window), "destroy",
+			GTK_SIGNAL_FUNC(info_destroyed), NULL);
+
+	number_of_windows++;
 	gtk_widget_show_all(window);
 }
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void info_destroyed(gpointer data)
+{
+	if (--number_of_windows < 1)
+		gtk_main_quit();
+}
 
 static void refresh_info(GtkObject *window)
 {
