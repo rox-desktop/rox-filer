@@ -117,6 +117,8 @@ void filer_close_recursive(const char *path);
 void filer_change_to(FilerWindow *filer_window,
 			const char *path, const char *from);
 gboolean filer_exists(FilerWindow *filer_window);
+FilerWindow *filer_get_by_id(const char *id);
+void filer_set_id(FilerWindow *, const char *id);
 void filer_open_parent(FilerWindow *filer_window);
 void filer_detach_rescan(FilerWindow *filer_window);
 void filer_target_mode(FilerWindow	*filer_window,

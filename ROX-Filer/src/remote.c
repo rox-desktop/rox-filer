@@ -574,21 +574,17 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	char	   *path;
 	char       *style, *details, *sort, *class, *window;
 	FilerWindow *fwin=NULL;
-	xmlNodePtr  reply;
-	gchar      *magic;  
 
 	path = string_value(ARG(0));
 	class = string_value(ARG(4));
 	window = string_value(ARG(5));
 	if(window) {
-		fwin=(FilerWindow *) strtoull(window, NULL, 16);
-		if(filer_exists(fwin))
-			filer_change_to(fwin, path, NULL);
-		else
-			fwin=NULL;
+		fwin=filer_get_by_id(window);
 	}
 	if(!fwin)
 		fwin = filer_opendir(path, NULL, class);
+	else
+		filer_change_to(fwin, path, NULL);
 	g_free(path);
 	g_free(class);
 	if (!fwin)
@@ -665,14 +661,10 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		g_free(sort);
 	}
 
-	reply = xmlNewNode(NULL, "rox:OpenDirResponse");
-	magic = g_strdup_printf("%08x", fwin);
+	if(window)
+		filer_set_id(fwin, window); 
 
-	xmlNewNs(reply, SOAP_RPC_NS, "soap");
-	xmlNewChild(reply, NULL, "soap:result", magic);
-	g_free(magic);
-
-	return reply;
+	return NULL;
 }
 
 static xmlNodePtr rpc_Run(GList *args)

@@ -3054,9 +3054,9 @@ EOF</screen>
      <parameter>Class</parameter> can be used to set the WM_CLASS property on the new window. You can
      use this to get your window manager to treat the window
 specially.
-     <parameter>Window</parameter> is a magic token returned from a 
-     previous <function>OpenDir</function> call and when given will
-re-use an existing window, instead of opening a new one.
+     <parameter>Window</parameter> is a string used to identify the 
+     opened window and when given will attempt to
+re-use an existing window of the same name, instead of opening a new one.
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,

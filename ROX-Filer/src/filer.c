@@ -82,6 +82,8 @@ FilerWindow 	*window_with_focus = NULL;
 
 GList		*all_filer_windows = NULL;
 
+static GHashTable *windows_with_id = NULL;
+
 static FilerWindow *window_with_primary = NULL;
 
 /* Static prototypes */
@@ -150,6 +152,9 @@ void filer_init(void)
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
+
+	windows_with_id = g_hash_table_new_full(g_str_hash, g_str_equal,
+					       g_free, NULL);
 
 	/* Is the display on the local machine, or are we being
 	 * run remotely? See filer_set_title().
@@ -400,9 +405,17 @@ gboolean filer_window_delete(GtkWidget *window,
 	return FALSE;
 }
 
+static gboolean remove_this_window(gpointer key, gpointer value,
+				   gpointer udata)
+{
+	return (value==udata);
+}
+
 static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
+	g_hash_table_foreach_remove(windows_with_id, remove_this_window,
+				    filer_window);
 
 	g_object_set_data(G_OBJECT(widget), "filer_window", NULL);
 
@@ -1661,6 +1674,16 @@ gboolean filer_exists(FilerWindow *filer_window)
 	}
 
 	return FALSE;
+}
+
+FilerWindow *filer_get_by_id(const char *id)
+{
+	return g_hash_table_lookup(windows_with_id, id);
+}
+
+void filer_set_id(FilerWindow *fwin, const char *id)
+{
+	g_hash_table_insert(windows_with_id, id, fwin);
 }
 
 /* Make sure the window title is up-to-date */
