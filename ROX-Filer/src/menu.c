@@ -1490,13 +1490,59 @@ static void new_file_type(gchar *templ)
 			new_file_type_cb);
 }
 
+static void customise_send_to(gpointer data)
+{
+	GPtrArray	*path;
+	guchar		*msg, *save;
+	GString		*dirs;
+	int		i;
+
+	dirs = g_string_new(NULL);
+
+	path = choices_list_dirs("");
+	for (i = 0; i < path->len; i++)
+	{
+		guchar *old = (guchar *) path->pdata[i];
+
+		g_string_append(dirs, old);
+		g_string_append(dirs, "SendTo\n");
+	}
+	choices_free_list(path);
+
+	save = choices_find_path_save("", "SendTo", TRUE);
+	if (save)
+		mkdir(save, 0777);
+
+	msg = g_strdup_printf(
+		_("The `Send To' menu provides a quick way to send some files "
+		"to an application. The applications listed are those in "
+		"the following directories:\n\n%s\n%s\n"
+		"The `Send To' menu may be opened by Shift+Menu clicking "
+		"over a file."),
+		dirs->str,
+		save ? _("I'll show you your SendTo directory now; you should "
+			"symlink (Ctrl+Shift drag) any applications you want "
+			"into it.")
+		     : _("You're CHOICESPATH variable setting prevents "
+			 "customisations. Sorry."));
+
+	g_string_free(dirs, TRUE);
+	
+	report_error(PROJECT, msg);
+
+	if (save)
+		filer_opendir(save);
+
+	g_free(msg);
+}
+
 /* Scan the SendTo dir and create and show the Send To menu.
  * The 'paths' list and every path in it is claimed, and will be
  * freed later -- don't free it yourself!
  */
 static void show_send_to_menu(GList *paths, GdkEvent *event)
 {
-	GtkWidget	*menu;
+	GtkWidget	*menu, *item;
 	gchar		*sendto_dname = NULL;
 	GList		*widgets = NULL;
 
@@ -1511,8 +1557,17 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 					FALSE, FALSE);
 		g_free(sendto_dname);
 
+		if (widgets)
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
+					gtk_menu_item_new());
+
 		g_list_free(widgets);	/* TODO: Get rid of this */
 	}
+
+	item = gtk_menu_item_new_with_label(_("Customise"));
+	gtk_signal_connect_object(GTK_OBJECT(item), "activate",
+				GTK_SIGNAL_FUNC(customise_send_to), NULL);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	if (send_to_paths)
 	{
@@ -1804,10 +1859,11 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 
 	items = gtk_container_children(GTK_CONTAINER(shell));
 	nth = g_list_nth(items, n);
-	g_list_free(items);
 
 	g_return_if_fail(nth != NULL);
 
 	item = (GtkWidget *) (nth->data);
+	g_list_free(items);
+
 	gtk_menu_shell_select_item(shell, item);
 }
