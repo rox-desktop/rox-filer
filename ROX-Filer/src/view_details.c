@@ -687,11 +687,14 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 	GtkTreeView *tree = (GtkTreeView *) widget;
 	GtkTreePath *path = NULL;
 	GdkRectangle focus_rectangle;
+	ViewDetails *view_details = (ViewDetails *) widget;
 	gboolean     had_cursor;
 
 	had_cursor = (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS) != 0;
 	
-	if (had_cursor)
+	if (view_details->filer_window->selection_state == GTK_STATE_SELECTED)
+		GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS);
+	else
 		GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
 	GTK_WIDGET_CLASS(parent_class)->expose_event(widget, event);
 	if (had_cursor)
