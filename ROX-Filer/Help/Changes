@@ -2,12 +2,22 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+15-Jun-2000
+~~~~~~~~~~~
+Changed the display menu - you can now choose large or small icons, with or
+without details. The details displayed can also be changed. I'm not quite
+happy with the UI yet though...
+
+Split the filer.c source file into two (filer.c and display.c) since it was
+becoming rather unwieldy. This means that some of the option names have
+changed because they've moved to a new section in the options window...
+
 14-Jun-2000
 ~~~~~~~~~~~
-Fixed (hopefully) a problem where ImLib support failed on multi-depth
-displays.
+Fixed a problem where ImLib support failed on multi-depth displays (reported
+by Stephen Harrison).
 
-06-Jun-2000
+06-Jun-2000 (Release 0.1.24)
 ~~~~~~~~~~~
 Added the install.sh script for easier installation.
 Removed 'MIME-info' file from ROX-Filer - now we always assume that the

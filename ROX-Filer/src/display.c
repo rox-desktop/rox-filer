@@ -25,6 +25,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <math.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/param.h>
@@ -80,10 +81,10 @@ static GtkWidget *create_options();
 static void update_options();
 static void set_options();
 static void save_options();
-static char *filer_sort_nocase(char *data);
-static char *filer_display_style(char *data);
-static char *filer_sort_by(char *data);
-static char *filer_truncate(char *data);
+static char *display_sort_nocase(char *data);
+static char *display_display_style(char *data);
+static char *display_sort_by(char *data);
+static char *display_truncate(char *data);
 
 static OptionsSection options =
 {
@@ -157,15 +158,23 @@ static gboolean test_point_small_full(Collection *collection,
 void display_init()
 {
 	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("filer_sort_nocase", filer_sort_nocase);
-	option_register("filer_display_style", filer_display_style);
-	option_register("filer_sort_by", filer_sort_by);
-	option_register("filer_truncate", filer_truncate);
+	option_register("display_sort_nocase", display_sort_nocase);
+	option_register("display_display_style", display_display_style);
+	option_register("display_sort_by", display_sort_by);
+	option_register("display_truncate", display_truncate);
 }
+
+#define BAR_SIZE(size) ((size) > 0 ? (log((size) + 1) * 16) : 0)
 
 static int details_width(FilerWindow *filer_window, DirItem *item)
 {
-	return fixed_width * strlen(details(filer_window, item));
+	int	bar = 0;
+
+	if (filer_window->details_type == DETAILS_SIZE_BARS &&
+			item->base_type != TYPE_DIRECTORY)
+		return 11 * fixed_width + BAR_SIZE(item->size) + 8;
+
+	return bar + fixed_width * strlen(details(filer_window, item));
 }
 
 int calc_width(FilerWindow *filer_window, DirItem *item)
@@ -474,17 +483,46 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 			 int width, gboolean selected, gboolean box)
 {
 	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
+	int		w;
+	
+	w = details_width(filer_window, item);
 
 	draw_string(widget,
 			fixed_font,
 			details(filer_window, item),
 			x, y,
-			details_width(filer_window, item),
+			w,
 			width,
 			selected, box);
 
 	if (item->lstat_errno)
 		return;
+
+	if (filer_window->details_type == DETAILS_SIZE_BARS)
+	{
+		int	bar;
+
+		if (item->base_type == TYPE_DIRECTORY)
+			return;
+		
+		bar = BAR_SIZE(item->size);
+
+		gdk_draw_rectangle(widget->window,
+				widget->style->black_gc,
+				TRUE,
+				x + 11 * fixed_width, y - fixed_font->ascent,
+				bar + 4,
+				fixed_font->ascent + fixed_font->descent);
+		gdk_draw_rectangle(widget->window,
+				widget->style->white_gc,
+				TRUE,
+				x + 11 * fixed_width + 2,
+				y - fixed_font->ascent + 2,
+				bar,
+				fixed_font->ascent + fixed_font->descent - 4);
+				
+		return;
+	}
 
 	if (filer_window->details_type == DETAILS_SUMMARY)
 	{
@@ -541,7 +579,7 @@ char *details(FilerWindow *filer_window, DirItem *item)
 				buf = g_strdup(format_size(item->size));
 		}
 		else
-			buf = g_strdup("");
+			buf = g_strdup("-");
 	}
 		
 	return buf;
@@ -784,7 +822,7 @@ void shrink_width(FilerWindow *filer_window)
 	collection_set_item_size(filer_window->collection, width, height);
 }
 
-void filer_set_sort_fn(FilerWindow *filer_window,
+void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b))
 {
 	if (filer_window->sort_fn == fn)
@@ -799,7 +837,7 @@ void filer_set_sort_fn(FilerWindow *filer_window,
 	update_options_label();
 }
 
-void filer_details_set(FilerWindow *filer_window, DetailsType details)
+void display_details_set(FilerWindow *filer_window, DetailsType details)
 {
 	if (filer_window->details_type == details)
 		return;
@@ -808,7 +846,7 @@ void filer_details_set(FilerWindow *filer_window, DetailsType details)
 	update_options_label();
 }
 
-void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
+void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 {
 	if (filer_window->display_style == style)
 		return;
@@ -967,30 +1005,30 @@ static void save_options()
 {
 	guchar	*tmp;
 
-	option_write("filer_sort_nocase", o_sort_nocase ? "1" : "0");
-	option_write("filer_display_style",
+	option_write("display_sort_nocase", o_sort_nocase ? "1" : "0");
+	option_write("display_display_style",
 		last_display_style == LARGE_ICONS ? "Large Icons" :
 		last_display_style == SMALL_ICONS ? "Small Icons" :
 		last_display_style == SMALL_FULL_INFO ? "Small, Full Info" :
 			"Large, Full Info");
-	option_write("filer_sort_by",
+	option_write("display_sort_by",
 		last_sort_fn == sort_by_name ? "Name" :
 		last_sort_fn == sort_by_type ? "Type" :
 		last_sort_fn == sort_by_date ? "Date" :
 			"Size");
 
 	tmp = g_strdup_printf("%d, %d", o_large_truncate, o_small_truncate);
-	option_write("filer_truncate", tmp);
+	option_write("display_truncate", tmp);
 	g_free(tmp);
 }
 
-static char *filer_sort_nocase(char *data)
+static char *display_sort_nocase(char *data)
 {
 	o_sort_nocase = atoi(data) != 0;
 	return NULL;
 }
 
-static char *filer_display_style(char *data)
+static char *display_display_style(char *data)
 {
 	if (g_strcasecmp(data, "Large Icons") == 0)
 		last_display_style = LARGE_ICONS;
@@ -1006,7 +1044,7 @@ static char *filer_display_style(char *data)
 	return NULL;
 }
 
-static char *filer_sort_by(char *data)
+static char *display_sort_by(char *data)
 {
 	if (g_strcasecmp(data, "Name") == 0)
 		last_sort_fn = sort_by_name;
@@ -1022,13 +1060,13 @@ static char *filer_sort_by(char *data)
 	return NULL;
 }
 
-static char *filer_truncate(char *data)
+static char *display_truncate(char *data)
 {
 	guchar	*comma;
 
 	comma = strchr(data, ',');
 	if (!comma)
-		return "Missing , in filer_truncate";
+		return "Missing , in display_truncate";
 
 	o_large_truncate = CLAMP(atoi(data), MIN_TRUNCATE, MAX_TRUNCATE);
 	o_small_truncate = CLAMP(atoi(comma + 1), MIN_TRUNCATE, MAX_TRUNCATE);
@@ -1036,7 +1074,7 @@ static char *filer_truncate(char *data)
 	return NULL;
 }
 
-void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
+void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 {
 	if (filer_window->show_hidden == hidden)
 		return;
@@ -1051,7 +1089,7 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
  * isn't already there but we're scanning then highlight it if it
  * appears later.
  */
-void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf)
+void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 {
 	Collection	*col = filer_window->collection;
 	int		i;

@@ -552,7 +552,7 @@ static void follow_symlink(FilerWindow *filer_window, char *path,
 		FilerWindow *new;
 		
 		new = filer_opendir(new_dir, PANEL_NO);
-		filer_set_autoselect(new, slash + 1);
+		display_set_autoselect(new, slash + 1);
 	}
 	else
 		filer_change_to(filer_window, new_dir, slash + 1);
@@ -1032,7 +1032,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	filer_style_set(filer_window, last_display_style);
+	display_style_set(filer_window, last_display_style);
 	drag_set_dest(filer_window);
 
 	if (panel_type)

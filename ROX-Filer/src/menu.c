@@ -74,14 +74,13 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new));
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 
-/* Note that for these callbacks none of the arguments are used. */
+/* Note that for most of these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
 static void small(gpointer data, guint action, GtkWidget *widget);
-static void large_full_info(gpointer data, guint action, GtkWidget *widget);
-static void small_full_info(gpointer data, guint action, GtkWidget *widget);
 
-static void details_summary(gpointer data, guint action, GtkWidget *widget);
-static void details_sizes(gpointer data, guint action, GtkWidget *widget);
+/* (action used in these two - (DetailsType) */
+static void large_with(gpointer data, guint action, GtkWidget *widget);
+static void small_with(gpointer data, guint action, GtkWidget *widget);
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget);
 static void sort_type(gpointer data, guint action, GtkWidget *widget);
@@ -165,11 +164,14 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL,	NULL, 0, "<Branch>"},
 {">" N_("Large Icons"),   	NULL,  	large, 0, NULL},
 {">" N_("Small Icons"),   	NULL,  	small, 0, NULL},
-{">" N_("Large, Full Info"),	NULL,  	large_full_info, 0, NULL},
-{">" N_("Small, Full Info"),	NULL,  	small_full_info, 0, NULL},
-{">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Summary"),	NULL,  	details_summary, 0, NULL},
-{">" N_("Sizes"),	NULL,  	details_sizes, 0, NULL},
+{">" N_("Large, With..."),	NULL,  	NULL, 0, "<Branch>"},
+{">>" N_("Summary"),	NULL,  	large_with, DETAILS_SUMMARY, NULL},
+{">>" N_("Sizes"),	NULL,  	large_with, DETAILS_SIZE, NULL},
+{">>" N_("Size Bars"),	NULL,  	large_with, DETAILS_SIZE_BARS, NULL},
+{">" N_("Small, With..."),	NULL,  	NULL, 0, "<Branch>"},
+{">>" N_("Summary"),	NULL,  	small_with, DETAILS_SUMMARY, NULL},
+{">>" N_("Sizes"),	NULL,  	small_with, DETAILS_SIZE, NULL},
+{">>" N_("Size Bars"),	NULL,  	small_with, DETAILS_SIZE_BARS, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL,  	sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL,  	sort_type, 0, NULL},
@@ -572,71 +574,58 @@ static void large(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_style_set(window_with_focus, LARGE_ICONS);
+	display_style_set(window_with_focus, LARGE_ICONS);
 }
 
 static void small(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_style_set(window_with_focus, SMALL_ICONS);
+	display_style_set(window_with_focus, SMALL_ICONS);
 }
 
-static void large_full_info(gpointer data, guint action, GtkWidget *widget)
+static void large_with(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_style_set(window_with_focus, LARGE_FULL_INFO);
+	display_style_set(window_with_focus, LARGE_FULL_INFO);
+	display_details_set(window_with_focus, (DetailsType) action);
 }
 
-static void small_full_info(gpointer data, guint action, GtkWidget *widget)
+static void small_with(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_style_set(window_with_focus, SMALL_FULL_INFO);
+	display_style_set(window_with_focus, SMALL_FULL_INFO);
+	display_details_set(window_with_focus, (DetailsType) action);
 }
-
-static void details_summary(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	filer_details_set(window_with_focus, DETAILS_SUMMARY);
-}
-
-static void details_sizes(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	filer_details_set(window_with_focus, DETAILS_SIZE);
-}
-
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_set_sort_fn(window_with_focus, sort_by_name);
+	display_set_sort_fn(window_with_focus, sort_by_name);
 }
 
 static void sort_type(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_set_sort_fn(window_with_focus, sort_by_type);
+	display_set_sort_fn(window_with_focus, sort_by_type);
 }
 
 static void sort_date(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_set_sort_fn(window_with_focus, sort_by_date);
+	display_set_sort_fn(window_with_focus, sort_by_date);
 }
 
 static void sort_size(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_set_sort_fn(window_with_focus, sort_by_size);
+	display_set_sort_fn(window_with_focus, sort_by_size);
 }
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)
@@ -646,7 +635,7 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_set_hidden(window_with_focus, !window_with_focus->show_hidden);
+	display_set_hidden(window_with_focus, !window_with_focus->show_hidden);
 }
 
 static void refresh(gpointer data, guint action, GtkWidget *widget)

@@ -291,7 +291,7 @@ static void select_row_callback(GtkWidget *widget,
 	if (gui_side->preview)
 	{
 		if (strcmp(gui_side->preview->path, dir) == 0)
-			filer_set_autoselect(gui_side->preview, leaf);
+			display_set_autoselect(gui_side->preview, leaf);
 		else
 			filer_change_to(gui_side->preview, dir, leaf);
 		return;
@@ -300,7 +300,7 @@ static void select_row_callback(GtkWidget *widget,
 	gui_side->preview = filer_opendir(dir, PANEL_NO);
 	if (gui_side->preview)
 	{
-		filer_set_autoselect(gui_side->preview, leaf);
+		display_set_autoselect(gui_side->preview, leaf);
 		gtk_signal_connect(GTK_OBJECT(gui_side->preview->window),
 				"destroy",
 				GTK_SIGNAL_FUNC(preview_closed), gui_side);

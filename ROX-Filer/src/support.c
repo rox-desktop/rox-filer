@@ -218,6 +218,8 @@ char *format_size(unsigned long size)
 		else
 			units = "K";
 	}
+	else if (size == 1)
+		units = _("byte");
 	else
 		units = _("bytes");
 

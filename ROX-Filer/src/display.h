@@ -27,6 +27,7 @@ typedef enum {
 typedef enum {
 	DETAILS_SUMMARY,
 	DETAILS_SIZE,
+	DETAILS_SIZE_BARS,
 } DetailsType;
 
 extern DetailsType last_details_type;
@@ -38,17 +39,17 @@ extern int (*last_sort_fn)(const void *a, const void *b);
 
 /* Prototypes */
 void display_init();
-void filer_details_set(FilerWindow *filer_window, DetailsType details);
-void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
+void display_details_set(FilerWindow *filer_window, DetailsType details);
+void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 char *details(FilerWindow *filer_window, DirItem *item);
-void filer_set_hidden(FilerWindow *filer_window, gboolean hidden);
+void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);
 int sort_by_date(const void *item1, const void *item2);
 int sort_by_size(const void *item1, const void *item2);
-void filer_set_sort_fn(FilerWindow *filer_window,
+void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
-void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf);
+void display_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 void shrink_width(FilerWindow *filer_window);
 int calc_width(FilerWindow *filer_window, DirItem *item);
 
