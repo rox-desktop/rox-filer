@@ -81,8 +81,6 @@ static char *load_xterm_here(char *data);
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new));
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
-static GList *list_paths(FilerWindow *filer_window);
-static void free_paths(GList *paths);
 static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean can_set_run_action(DirItem *item);
@@ -91,7 +89,7 @@ static gboolean can_set_run_action(DirItem *item);
 static void large(gpointer data, guint action, GtkWidget *widget);
 static void small(gpointer data, guint action, GtkWidget *widget);
 
-/* (action used in these two - (DetailsType) */
+/* (action used in these two - DetailsType) */
 static void large_with(gpointer data, guint action, GtkWidget *widget);
 static void small_with(gpointer data, guint action, GtkWidget *widget);
 
@@ -109,7 +107,6 @@ static void link_item(gpointer data, guint action, GtkWidget *widget);
 static void open_file(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
-static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
@@ -155,6 +152,7 @@ static OptionsSection options =
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
+static GtkWidget	*file_shift_item;	/* Shift Open label */
 GtkWidget	*display_large_menu;	/* Display->Large With... */
 GtkWidget	*display_small_menu;	/* Display->Small With... */
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
@@ -203,7 +201,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
 {">>" N_("RPM"),		NULL, open_vfs_rpm, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Mount"),	    	NULL, mount, 0,	NULL},
 {">" N_("Delete"),	    	NULL, delete, 0,	NULL},
 {">" N_("Disk Usage"),		NULL, usage, 0, NULL},
 {">" N_("Permissions"),		NULL, chmod_items, 0, NULL},
@@ -306,8 +303,14 @@ void menu_init()
 	GET_SSMENU_ITEM(display_small_menu, "filer",
 			"Display", "Small, With...");
 
+	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
+
+	/* Shift Open... label */
+	items = gtk_container_children(GTK_CONTAINER(filer_file_menu));
+	file_shift_item = GTK_BIN(g_list_nth(items, 3)->data)->child;
 	g_list_free(items);
 
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
@@ -522,8 +525,9 @@ void show_style_menu(FilerWindow *filer_window,
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item)
 {
-	DirItem		*file_item;
+	DirItem		*file_item = NULL;
 	int		pos[2];
+	guchar		*shift_action;
 
 	updating_menu++;
 	
@@ -538,7 +542,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		filer_window->temp_item_selected = TRUE;
 	}
 	else
+	{
 		filer_window->temp_item_selected = FALSE;
+	}
 
 	{
 		GtkWidget	*file_label, *file_menu;
@@ -576,6 +582,30 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		}
 		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 		g_string_free(buffer, TRUE);
+
+		shift_action = NULL;
+		if (collection->number_selected == 1)
+		{
+			if (file_item->flags & ITEM_FLAG_MOUNT_POINT)
+			{
+				if (file_item->flags & ITEM_FLAG_MOUNTED)
+					shift_action = N_("Unmount");
+				else
+					shift_action = N_("Mount");
+			}
+			else if (file_item->flags & ITEM_FLAG_SYMLINK)
+				shift_action = N_("Show Target");
+			else if (file_item->base_type == TYPE_DIRECTORY)
+				shift_action = N_("Look Inside");
+			else if (file_item->base_type == TYPE_FILE)
+				shift_action = N_("Open As Text");
+		}
+		gtk_widget_set_sensitive(file_shift_item,
+					 shift_action != NULL ||
+					 collection->number_selected == 0);
+		gtk_label_set_text(GTK_LABEL(file_shift_item),
+				shift_action ? _(shift_action)
+					     : _("Shift Open"));
 	}
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
@@ -714,24 +744,6 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 
 	full_refresh();
 	filer_update_dir(window_with_focus, TRUE);
-}
-
-static void mount(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected == 0)
-		filer_target_mode(window_with_focus,
-				target_callback, mount,
-				_("Mount ... ?"));
-	else
-	{
-		GList	*paths;
-
-		paths = list_paths(window_with_focus);
-		action_mount(paths);
-		free_paths(paths);
-	}
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
@@ -957,7 +969,7 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	else if (collection->number_selected != 1)
 		filer_target_mode(window_with_focus,
 				target_callback, open_file,
-				_("Shift open ... ?"));
+				_("Shift Open ... ?"));
 	else
 		filer_openitem(window_with_focus,
 				selected_item_number(collection),
@@ -1531,43 +1543,6 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(make_path(app_dir, "Help")->str);
-}
-
-/* Return a list of full paths of all the selected items */
-static GList *list_paths(FilerWindow *filer_window)
-{
-	Collection	*collection = filer_window->collection;
-	GList		*paths = NULL;
-	int		i;
-	
-	for (i = 0; i < collection->number_of_items; i++)
-	{
-		CollectionItem	*colitem = &collection->items[i];
-		
-		if (colitem->selected)
-		{
-			DirItem	*item = (DirItem *) colitem->data;
-
-			paths = g_list_prepend(paths,
-				g_strdup(make_path(filer_window->path,
-						   item->leafname)->str));
-		}
-	}
-
-	return paths;
-}
-
-static void free_paths(GList *paths)
-{
-	GList	*next;
-
-	if (!paths)
-		return;
-
-	for (next = paths; next; next = next->next)
-		g_free(next->data);
-
-	g_list_free(paths);
 }
 
 static void pin_help(gpointer data, guint action, GtkWidget *widget)

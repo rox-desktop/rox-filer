@@ -98,6 +98,9 @@ static GdkAtom   win_button_proxy; /* _WIN_DESKTOP_BUTTON_PROXY */
 
 static gboolean pinboard_drag_in_progress = FALSE;
 
+/* Used when dragging icons around... */
+static gboolean pinboard_modified = FALSE;
+
 /* Options bits */
 static GtkWidget *create_options();
 static void update_options();
@@ -952,6 +955,9 @@ static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
                             	     PinIcon *icon)
 {
+	if (pinboard_modified)
+		pinboard_save();
+
 	if (dnd_motion_release(event))
 		return TRUE;
 
@@ -1046,12 +1052,17 @@ static gint icon_motion_notify(GtkWidget *widget,
 		return FALSE;
 
 	snap_to_grid(&x, &y);
+	if (icon->x == x && icon->y == y)
+		return TRUE;
+
 	icon->x = x;
 	icon->y = y;
 	gdk_window_get_size(icon->win->window, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 
 	gdk_window_move(icon->win->window, x, y);
+
+	pinboard_modified = TRUE;
 
 	return TRUE;
 }
@@ -1174,6 +1185,8 @@ static void pinboard_save(void)
 	guchar	*save_new = NULL;
 
 	g_return_if_fail(current_pinboard != NULL);
+
+	pinboard_modified = FALSE;
 	
 	if (strchr(current_pinboard->name, '/'))
 		save = current_pinboard->name;
@@ -1523,7 +1536,7 @@ static GtkWidget *create_options(void)
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	tog = gtk_radio_button_new_with_label( NULL, _("No background"));
+	tog = gtk_radio_button_new_with_label(NULL, _("No background"));
 	radio_bg_none = GTK_TOGGLE_BUTTON(tog);
 	OPTION_TIP(tog, _("The text is drawn directly on the desktop "
 			  "background."));

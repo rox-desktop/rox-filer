@@ -781,29 +781,44 @@ The toolbar
 \layout Standard
 
 By default, each window has a toolbar along the top.
- You can disable this (or make it larger) from the Options window.
- The four buttons on the toolbar are:
+ You can disable this (or make it larger) from the Options window, as well
+ as set which tools appear on the toolbar.
+ Normally, you should click with the left mouse button (1).
+ However, many tools can perform a related function if clicked on with buttons
+ 2 or 3 (middle or right).
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-5 3 0 0 -1 -1 -1 -1
+8 3 0 0 -1 -1 -1 -1
 1 1 0 0
+1 0 0 0
 1 1 0 0
+0 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
 8 1 0 "" ""
 2 1 1 "4.5cm" ""
-2 0 1 "4.5cm" ""
+2 0 1 "5.5cm" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -813,27 +828,57 @@ multicol5
 
 Icon
 \newline 
-Action
+Mouse button 1
 \newline 
-Other action
+Other button
+\newline 
+Cross
+\newline 
+Close the window
+\newline 
+Open a new window
 \newline 
 Up arrow
 \newline 
 Change to parent directory
 \newline 
 Show parent in a new window
+\latex latex 
+
+\backslash 
+dag
+\latex default 
+
 \newline 
 House
 \newline 
 Change to home directory
 \newline 
 Show home in a new window
+\latex latex 
+
+\backslash 
+dag
+\latex default 
+
 \newline 
 Looping arrows
 \newline 
 Reread the directory contents
 \newline 
 Open a new window
+\newline 
+Big square
+\newline 
+Use large icons in the display
+\newline 
+Menu of extra details
+\newline 
+Small squale
+\newline 
+Use small icons in the display
+\newline 
+Menu of extra details
 \newline 
 Information
 \newline 
@@ -846,11 +891,16 @@ Same
 \latex latex 
 
 \backslash 
-noindent 
+noindent
+\backslash 
+dag{}
 \latex default 
-You may also use either of the other buttons to perform the `Other action'.
- If the 'New window on button 1' option is turned on then the `Action' and
- `Other action' of the first two are swapped.
+If the 'New window on button 1' option is turned on then the default is
+ to open a new window
+\latex latex 
+~
+\latex default 
+--- clicking with the other button reuses the same window instead.
 \layout Standard
 
 Dragging files to the Up or Home icons acts just like dragging them into
@@ -1200,11 +1250,11 @@ multicol5
 0 1 1 0
 0 1 1 0
 0 1 1 0
+0 1 1 0
 0 1 0 0
 0 1 0 0
 0 0 0 0
 0 1 1 0
-0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 1 0
@@ -1230,6 +1280,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1237,8 +1289,6 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1289,6 +1339,11 @@ containing the thing they point to.
 
 \newline 
 This is the same effect as clicking with Shift held down.
+ The text of the menu
+\newline 
+
+\newline 
+entry changes to show which action will be performed.
 \newline 
 Help
 \newline 
@@ -1321,10 +1376,6 @@ Open the file as if it was a directory --- see section
 \end_inset 
 
 .
-\newline 
-Mount
-\newline 
-Mount or unmount each mount point selected.
 \newline 
 Delete
 \newline 
@@ -1366,7 +1417,7 @@ The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-11 2 0 0 -1 -1 -1 -1
+9 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -1374,12 +1425,10 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 1 0 0
-0 1 0 0
-0 1 1 0
 0 1 0 0
 0 1 0 0
 8 1 0 "" ""
-2 1 1 "8cm" ""
+2 1 1 "9cm" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1389,13 +1438,9 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1441,17 +1486,13 @@ Open the shell command box (see section
 
 ).
 \newline 
-
-\newline 
-
-\newline 
-
-\newline 
-
-\newline 
 Select If...
 \newline 
-Select just those files that match the given pattern --- see section 
+Select just those files that match the given pattern
+\latex latex 
+~
+\latex default 
+--- see section 
 \begin_inset LatexCommand \ref{sec: SelectIf}
 
 \end_inset 
@@ -2589,7 +2630,13 @@ The last display style and sort type you chose will also be saved as the
 \layout Subsubsection
 
 Toolbar options
-\layout Standard
+\layout Itemize
+
+`Unshade the tools you want:' allows you to set which tools should appear
+ on the toolbar.
+ Click on the buttons below to shade and unshade them --- shaded tools will
+ not be shown on filer window toolbars.
+\layout Itemize
 
 `Toolbar type for new windows' allows you to choose what kind of toolbar
  will be used for future filer windows (the currently open windows are not
@@ -2607,7 +2654,9 @@ Normal
 Large
 \series default 
  displays larger icons with textual labels.
- See section 
+\layout Standard
+
+See section 
 \begin_inset LatexCommand \ref{sec: Toolbar}
 
 \end_inset 
@@ -2698,6 +2747,15 @@ Mouse bindings
 without
 \emph toggle 
  opening it you must hold down CTRL while you click.
+\layout Standard
+
+As an alternative to using the options window to put menu on button-2, some
+ people prefer to use the command `
+\family typewriter 
+xmodmap -e "pointer = 1 3 2"
+\family default 
+', which makes the right mouse button button-2 and the middle one button-3
+ (this affects all programs, not just ROX-Filer).
 \layout Section
 
 Filetypes
@@ -3210,7 +3268,7 @@ flags 9
 
 \layout Standard
 
-To summarise, each window (or panel) has its own 
+To summarise, each window has its own 
 \series bold 
 FilerWindow
 \series default 
@@ -3304,7 +3362,7 @@ The GNOME desktop
 \emph on 
 The Drag and Drop protocol
 \emph toggle 
-, <http://www.its.caltech.edu/~jafl/xdnd/>
+, <http://www.newplanetsoftware.com/xdnd/>
 \layout Bibliography
 \bibitem {XDS}
 
@@ -3312,7 +3370,7 @@ The Drag and Drop protocol
 \emph on 
 The X Direct Save protocol
 \emph toggle 
-, <http://www.its.caltech.edu/~jafl/xds/>
+, <http://www.newplanetsoftware.com/xds/>
 \layout Bibliography
 \bibitem {Choices}
 

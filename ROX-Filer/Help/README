@@ -4,14 +4,18 @@
 
 ROX-Filer is a simple and easy to use graphical file manager for X11, the
 windowing system used on Unix and Unix-like operating systems. It is also
-the core component of the ROX Desktop.
-	<http://www.ecs.soton.ac.uk/~tal197>
+the core component of the ROX Desktop:
+
+	http://rox.sourceforge.net
 
 To compile:
 	$ ROX-Filer/AppRun --compile
 
+To install:
+	$ ./install.sh
+
 To run:
-	$ ROX-Filer/AppRun
+	$ rox
 
 For full instructions, read the Manual.ps file:
 	$ gv ROX-Filer/Help/Manual.ps
@@ -35,7 +39,7 @@ You should have received a copy of the GNU General Public License
 along with this program; if not, write to the Free Software
 Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-Please report any bugs to me, <tal197@ecs.soton.ac.uk>.
+Please report any bugs to me, <tal197@users.sourceforge.net>.
 
 
 Credits
@@ -48,19 +52,11 @@ If you think you should be included here then write and tell me ;-)
 First, a few people/projects whose work I've used:
 
 	Andrew Clover		most of the file icons
+	Victor Liu See-le	the executable icons (the cogs)
 	David MacKenzie		the code for parsing Permissions commands
 	John Lindal		co-author of the XDS protocol
 	Midnight Commander	the Virtual File System library, pinboard bits
 	GNOME Desktop		some of the icons (including the toolbar)
 
-And now, people who've actually written bits of it ;-)
-
-	Jens Askengren		GNOME-style toolbar
-	Bernard Jungen		lots of patches all over the place!
-	Vincent Lefevre		French translation
-	Christiansen Merel	initial support for ImLib
-	Chris Sawer		leafname field in the Info box
-	Simon Truss		support for mount points on NetBSD
-
-Also - to everyone who sent in bug reports, suggestions and encouragement -
-I can't list all of you, but thanks!
+A huge number of people have submitted code, suggestions and encouragement -
+many of them are listed in the `Changes' file... thanks!

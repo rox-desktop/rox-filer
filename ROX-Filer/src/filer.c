@@ -473,6 +473,8 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	}
 
 	full_path = make_path(filer_window->path, item->leafname)->str;
+	if (shift && (item->flags & ITEM_FLAG_SYMLINK))
+		wink = FALSE;
 
 	old_dir = filer_window->directory;
 	if (run_diritem(full_path, item,

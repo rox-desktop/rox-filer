@@ -452,6 +452,7 @@ static gboolean follow_symlink(char *full_path, FilerWindow *filer_window)
 
 		tmp = g_strndup(full_path, slash - full_path);
 		real = pathdup(make_path(tmp, path)->str);
+		/* NB: full_path may be invalid here... */
 		g_free(tmp);
 	}
 	else
