@@ -1162,7 +1162,7 @@ void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win)
 		dnd_spring_abort();
 	
 	spring_context = context;
-	gdk_drag_context_ref(spring_context);
+	g_object_ref(spring_context);
 	spring_src_window = src_win;
 	spring_timeout = gtk_timeout_add(
 			o_dnd_spring_delay.int_value, spring_now, NULL);
@@ -1173,7 +1173,7 @@ void dnd_spring_abort(void)
 	if (!spring_context)
 		return;
 
-	gdk_drag_context_unref(spring_context);
+	g_object_unref(spring_context);
 	spring_context = NULL;
 	gtk_timeout_remove(spring_timeout);
 }

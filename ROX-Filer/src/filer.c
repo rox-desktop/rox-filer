@@ -242,8 +242,8 @@ static void filer_window_set_size(FilerWindow *filer_window,
 		{
 			gint	old_w, old_h;
 
-			gdk_window_get_size(filer_window->window->window,
-					&old_w, &old_h);
+			gdk_drawable_get_size(filer_window->window->window,
+						&old_w, &old_h);
 			w = MAX(w, old_w);
 			h = MAX(h, old_h);
 

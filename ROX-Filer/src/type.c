@@ -1202,7 +1202,7 @@ static void alloc_type_colours(void)
 	 */
 	if (allocated && (change_count || !o_display_colour_types.int_value))
 	{
-		gdk_colormap_free_colors(gdk_rgb_get_cmap(),
+		gdk_colormap_free_colors(gdk_rgb_get_colormap(),
 					 type_colours, NUM_TYPE_COLOURS);
 		allocated = FALSE;
 	}
@@ -1213,7 +1213,7 @@ static void alloc_type_colours(void)
 	 */
 	if (!allocated && o_display_colour_types.int_value)
 	{
-		gdk_colormap_alloc_colors(gdk_rgb_get_cmap(),
+		gdk_colormap_alloc_colors(gdk_rgb_get_colormap(),
 				type_colours, NUM_TYPE_COLOURS,
 				FALSE, TRUE, success);
 		allocated = TRUE;

@@ -377,8 +377,9 @@ static GtkWidget *make_file_says(guchar *path)
 			fs->label = GTK_LABEL(file_label);
 			fs->fd = file_data[0];
 			fs->text = g_strdup("");
-			fs->input = gdk_input_add(fs->fd, GDK_INPUT_READ,
-				(GdkInputFunction) add_file_output, fs);
+			fs->input = gtk_input_add_full(fs->fd, GDK_INPUT_READ,
+				(GdkInputFunction) add_file_output,
+				NULL, fs, NULL);
 			g_signal_connect(frame, "destroy",
 				G_CALLBACK(file_info_destroyed), fs);
 			break;

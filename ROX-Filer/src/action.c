@@ -393,7 +393,7 @@ static void message_from_child(gpointer 	  data,
 	fclose(gui_side->to_child);
 	gui_side->to_child = NULL;
 	close(gui_side->from_child);
-	gdk_input_remove(gui_side->input_tag);
+	g_source_remove(gui_side->input_tag);
 	/* XXX: gtk_widget_set_sensitive(gui_side->quiet, FALSE); */
 
 	if (gui_side->errors)
@@ -682,7 +682,7 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 		kill(gui_side->child, SIGTERM);
 		fclose(gui_side->to_child);
 		close(gui_side->from_child);
-		gdk_input_remove(gui_side->input_tag);
+		g_source_remove(gui_side->input_tag);
 	}
 
 	g_free(gui_side);
@@ -775,10 +775,10 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	g_signal_connect(abox, "flag_toggled",
 			 G_CALLBACK(flag_toggled), gui_side);
 
-	gui_side->input_tag = gdk_input_add(gui_side->from_child,
+	gui_side->input_tag = gtk_input_add_full(gui_side->from_child,
 						GDK_INPUT_READ,
 						message_from_child,
-						gui_side);
+						NULL, gui_side, NULL);
 
 	return gui_side;
 }

@@ -187,7 +187,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			G_CALLBACK(client_event), NULL);
 
 	/* Make the root window contain a pointer to the IPC window */
-	gdk_property_change(GDK_ROOT_PARENT(), filer_atom,
+	gdk_property_change(gdk_get_default_root_window(), filer_atom,
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
@@ -205,7 +205,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 	/* ... and on the root */
-	gdk_property_change(GDK_ROOT_PARENT(), filer_atom_any,
+	gdk_property_change(gdk_get_default_root_window(), filer_atom_any,
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
@@ -307,7 +307,7 @@ static GdkWindow *get_existing_ipc_window(void)
 	Window		xid, xid_confirm;
 	GdkWindow	*window;
 
-	if (!get_ipc_property(GDK_ROOT_PARENT(), &xid))
+	if (!get_ipc_property(gdk_get_default_root_window(), &xid))
 		return NULL;
 
 	if (gdk_window_lookup(xid))

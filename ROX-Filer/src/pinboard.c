@@ -443,8 +443,9 @@ void pinboard_clear(void)
 	current_pinboard = NULL;
 
 	release_xdnd_proxy(GDK_ROOT_WINDOW());
-	gdk_window_remove_filter(GDK_ROOT_PARENT(), proxy_filter, NULL);
-	gdk_window_set_user_data(GDK_ROOT_PARENT(), NULL);
+	gdk_window_remove_filter(gdk_get_default_root_window(),
+				 proxy_filter, NULL);
+	gdk_window_set_user_data(gdk_get_default_root_window(), NULL);
 }
 
 /* Icon's size, shape or appearance has changed - update the display */
@@ -559,7 +560,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	icon->height = height;
 
 	if (icon->mask)
-		gdk_pixmap_unref(icon->mask);
+		g_object_unref(icon->mask);
 	icon->mask = gdk_pixmap_new(icon->win->window, width, height, 1);
 	if (!mask_gc)
 		mask_gc = gdk_gc_new(icon->mask);
@@ -572,7 +573,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	/* Make the icon area solid */
 	if (image->mask)
 	{
-		gdk_draw_pixmap(icon->mask, mask_gc, image->mask,
+		gdk_draw_drawable(icon->mask, mask_gc, image->mask,
 				0, 0,
 				(width - iwidth) >> 1,
 				WINK_FRAME,
@@ -591,7 +592,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	gdk_gc_set_function(mask_gc, GDK_OR);
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_draw_pixmap(icon->mask, mask_gc, im_symlink->mask,
+		gdk_draw_drawable(icon->mask, mask_gc, im_symlink->mask,
 				0, 0,		/* Source x,y */
 				(width - iwidth) >> 1,		/* Dest x */
 				WINK_FRAME,			/* Dest y */
@@ -600,7 +601,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		/* Note: Both mount state pixmaps must have the same mask */
-		gdk_draw_pixmap(icon->mask, mask_gc, im_mounted->mask,
+		gdk_draw_drawable(icon->mask, mask_gc, im_mounted->mask,
 				0, 0,		/* Source x,y */
 				(width - iwidth) >> 1,		/* Dest x */
 				WINK_FRAME,			/* Dest y */
@@ -641,7 +642,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	/* TODO: If the shape extension is missing we might need to set
 	 * the clip mask here...
 	 */
-	gdk_draw_pixmap(widget->window, gc,
+	gdk_draw_drawable(widget->window, gc,
 			image->pixmap,
 			0, 0,
 			image_x,
@@ -653,7 +654,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	{
 		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_pixmap(widget->window, gc,
+		gdk_draw_drawable(widget->window, gc,
 				im_symlink->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, WINK_FRAME,	/* Dest x,y */
@@ -669,7 +670,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 					
 		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
 		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_pixmap(widget->window, gc,
+		gdk_draw_drawable(widget->window, gc,
 				mp->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, WINK_FRAME,	/* Dest x,y */
@@ -941,7 +942,7 @@ static gint icon_motion_notify(GtkWidget *widget,
 
 	icon->x = x;
 	icon->y = y;
-	gdk_window_get_size(icon->win->window, &width, &height);
+	gdk_drawable_get_size(icon->win->window, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 
 	gdk_window_move(icon->win->window, x, y);
@@ -1074,10 +1075,12 @@ static gboolean add_root_handlers(void)
 		return FALSE;
 
 	/* Forward events from the root window to our proxy window */
-	gdk_window_add_filter(GDK_ROOT_PARENT(), proxy_filter, NULL);
-	gdk_window_set_user_data(GDK_ROOT_PARENT(), proxy_invisible);
-	gdk_window_set_events(GDK_ROOT_PARENT(),
-			gdk_window_get_events(GDK_ROOT_PARENT()) |
+	gdk_window_add_filter(gdk_get_default_root_window(),
+			      proxy_filter, NULL);
+	gdk_window_set_user_data(gdk_get_default_root_window(),
+				 proxy_invisible);
+	gdk_window_set_events(gdk_get_default_root_window(),
+			gdk_window_get_events(gdk_get_default_root_window()) |
 				GDK_EXPOSURE_MASK |
 				GDK_PROPERTY_CHANGE_MASK);
 
@@ -1199,7 +1202,7 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 			else
 				event->button.type = GDK_BUTTON_RELEASE;
 
-			gdk_window_ref(proxy);
+			g_object_ref(proxy);
 
 			event->button.window = proxy;
 			event->button.send_event = xev->xbutton.send_event;
@@ -1340,9 +1343,11 @@ static gint shadow_x, shadow_y;
 
 static void bg_expose(GdkRectangle *area)
 {
-	GdkWindow *root = GDK_ROOT_PARENT();
+	GdkWindow *root;
 	static GdkGC *shadow_gc = NULL;
 	static GdkColor white, black;
+
+	root = gdk_get_default_root_window();	 /* XXX */
 
 	if (!pinboard_shadow)
 	{
@@ -1353,11 +1358,16 @@ static void bg_expose(GdkRectangle *area)
 	if (!shadow_gc)
 	{
 		GdkColormap *cm;
+		gboolean success;
+
+		white.red = white.green = white.blue = 0xffff;
+		black.red = black.green = black.blue = 0;
 		
-		cm = gdk_window_get_colormap(root);
+		cm = gdk_drawable_get_colormap(root);
 		shadow_gc = gdk_gc_new(root);
-		gdk_color_white(cm, &white);
-		gdk_color_black(cm, &black);
+
+		gdk_colormap_alloc_colors(cm, &white, 1, FALSE, TRUE, &success);
+		gdk_colormap_alloc_colors(cm, &black, 1, FALSE, TRUE, &success);
 	}
 
 	gdk_gc_set_clip_rectangle(shadow_gc, area);
@@ -1375,7 +1385,9 @@ static void bg_expose(GdkRectangle *area)
  */
 static void pinboard_set_shadow(gboolean on)
 {
-	GdkWindow *root = GDK_ROOT_PARENT();
+	GdkWindow *root;
+	
+	root = gdk_get_default_root_window();
 
 	if (pinboard_shadow)
 	{
@@ -1421,7 +1433,7 @@ void pinboard_move_icons(void)
 
 	icon->x = x;
 	icon->y = y;
-	gdk_window_get_size(icon->win->window, &width, &height);
+	gdk_drawable_get_size(icon->win->window, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 
 	gdk_window_move(icon->win->window, x, y);

@@ -102,7 +102,7 @@ static GdkPixbuf *get_thumbnail_for(const char *path);
 
 void pixmaps_init(void)
 {
-	gtk_widget_push_colormap(gdk_rgb_get_cmap());
+	gtk_widget_push_colormap(gdk_rgb_get_colormap());
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
 
@@ -164,9 +164,9 @@ void pixmap_make_huge(MaskedPixmap *mp)
 
 	if (!mp->huge_pixmap)
 	{
-		gdk_pixmap_ref(mp->pixmap);
+		g_object_ref(mp->pixmap);
 		if (mp->mask)
-			gdk_bitmap_ref(mp->mask);
+			g_object_ref(mp->mask);
 		mp->huge_pixmap = mp->pixmap;
 		mp->huge_mask = mp->mask;
 		mp->huge_width = mp->width;
@@ -199,9 +199,9 @@ void pixmap_make_small(MaskedPixmap *mp)
 	if (mp->sm_pixmap)
 		return;
 
-	gdk_pixmap_ref(mp->pixmap);
+	g_object_ref(mp->pixmap);
 	if (mp->mask)
-		gdk_bitmap_ref(mp->mask);
+		g_object_ref(mp->mask);
 	mp->sm_pixmap = mp->pixmap;
 	mp->sm_mask = mp->mask;
 	mp->sm_width = mp->width;
@@ -270,8 +270,9 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	SET_LOADER("thumb-callback", callback);
 	SET_LOADER("thumb-callback-data", data);
 	
-	tag = gdk_input_add(fd, GDK_INPUT_READ,
-			    (GdkInputFunction) got_thumb_data, loader);
+	tag = gtk_input_add_full(fd, GDK_INPUT_READ,
+			    (GdkInputFunction) got_thumb_data, NULL,
+			    loader, NULL);
 
 	SET_LOADER("thumb-input-tag", GINT_TO_POINTER(tag));
 }
@@ -534,7 +535,7 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 	path = GET_LOADER("thumb-path");
 
 	tag = GPOINTER_TO_INT(GET_LOADER("thumb-input-tag"));
-	gdk_input_remove(tag);
+	g_source_remove(tag);
 
 	gdk_pixbuf_loader_close(loader, NULL);
 
@@ -579,18 +580,18 @@ static void masked_pixmap_finialize(GObject *object)
 
 	if (mp->huge_pixbuf)
 	{
-		gdk_pixbuf_unref(mp->huge_pixbuf);
+		g_object_unref(mp->huge_pixbuf);
 		mp->huge_pixbuf = NULL;
 	}
 
 	if (mp->huge_pixmap)
 	{
-		gdk_pixmap_unref(mp->huge_pixmap);
+		g_object_unref(mp->huge_pixmap);
 		mp->huge_pixmap = NULL;
 	}
 	if (mp->huge_mask)
 	{
-		gdk_bitmap_unref(mp->huge_mask);
+		g_object_unref(mp->huge_mask);
 		mp->huge_mask = NULL;
 	}
 

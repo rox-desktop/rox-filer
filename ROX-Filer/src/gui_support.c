@@ -44,8 +44,6 @@
 #include "pixmaps.h"
 #include "choices.h"
 
-GdkGC		*red_gc = NULL;	/* Not automatically initialised */
-GdkColor 	red = {0, 0xffff, 0, 0};
 gint		screen_width, screen_height;
 
 static GdkAtom xa_cardinal;
@@ -54,14 +52,13 @@ static GtkWidget *current_dialog = NULL;
 
 void gui_support_init()
 {
-	gdk_color_alloc(gtk_widget_get_default_colormap(), &red); /* XXX */
-
-	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
+	xa_cardinal = gdk_atom_intern("CARDINAL", FALSE);
 
 	/* This call starts returning strange values after a while, so get
 	 * the result here during init.
 	 */
-	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
+	gdk_drawable_get_size(gdk_get_default_root_window(),
+			    &screen_width, &screen_height);
 }
 
 /* Open a modal dialog box showing a message.
@@ -597,7 +594,7 @@ void centre_window(GdkWindow *window, int x, int y)
 
 	g_return_if_fail(window != NULL);
 
-	gdk_window_get_size(window, &w, &h);
+	gdk_drawable_get_size(window, &w, &h);
 	
 	x -= w / 2;
 	y -= h / 2;

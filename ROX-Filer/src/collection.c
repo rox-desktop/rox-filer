@@ -361,7 +361,7 @@ static void collection_destroy(GtkObject *object)
 
 	if (collection->bg_gc)
 	{
-		gdk_gc_destroy(collection->bg_gc);
+		g_object_unref(collection->bg_gc);
 		collection->bg_gc = NULL;
 	}
 
@@ -1219,7 +1219,7 @@ static gboolean as_timeout(Collection *collection)
 	int		diff = 0;
 
 	gdk_window_get_pointer(window, &x, &y, &mask);
-	gdk_window_get_size(window, &w, NULL);
+	gdk_drawable_get_size(window, &w, NULL);
 
 	h = collection->vadj->page_size;
 	y -= collection->vadj->value;
@@ -1493,7 +1493,7 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	{
 		gint		window_width;
 
-		gdk_window_get_size(widget->window, &window_width, NULL);
+		gdk_drawable_get_size(widget->window, &window_width, NULL);
 		collection->columns = MAX(window_width / collection->item_width,
 					  1);
 		if (collection->cursor_item != -1)

@@ -177,8 +177,8 @@ void run_with_data(const char *path, gpointer data, gulong length)
 			memcpy(pd->data, data, length);
 			pd->length = length;
 			pd->sent = 0;
-			pd->tag = gdk_input_add(fds[1], GDK_INPUT_WRITE,
-							write_data, pd);
+			pd->tag = gtk_input_add_full(fds[1], GDK_INPUT_WRITE,
+						write_data, NULL, pd, NULL);
 			break;
 	}
 
@@ -415,7 +415,7 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond)
 	}
 
 finish:
-	gdk_input_remove(pd->tag);
+	g_source_remove(pd->tag);
 	g_free(pd->data);
 	g_free(pd);
 	close(fd);

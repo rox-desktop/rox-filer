@@ -293,11 +293,11 @@ void draw_huge_icon(GtkWidget *widget,
 
 	image_y = MAX(0, area->height - height - 6);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_pixmap(widget->window, gc,
-			image->huge_pixmap,
-			0, 0,			/* Source x,y */
-			image_x, area->y + image_y, /* Dest x,y */
-			width, height);
+	gdk_draw_drawable(widget->window, gc,
+			  image->huge_pixmap,
+			  0, 0,			/* Source x,y */
+			  image_x, area->y + image_y, /* Dest x,y */
+			  width, height);
 
 	if (selected)
 	{
@@ -313,7 +313,7 @@ void draw_huge_icon(GtkWidget *widget,
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
+		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 2,	/* Dest x,y */
 				-1, -1);
@@ -326,7 +326,7 @@ void draw_huge_icon(GtkWidget *widget,
 
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_pixmap(widget->window, gc, mp->pixmap,
+		gdk_draw_drawable(widget->window, gc, mp->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 2, /* Dest x,y */
 				-1, -1);
@@ -362,7 +362,7 @@ void draw_large_icon(GtkWidget *widget,
 
 	image_y = MAX(0, area->height - height - 6);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_pixmap(widget->window, gc,
+	gdk_draw_drawable(widget->window, gc,
 			image->pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
@@ -382,7 +382,7 @@ void draw_large_icon(GtkWidget *widget,
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
+		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 2,	/* Dest x,y */
 				-1, -1);
@@ -395,7 +395,7 @@ void draw_large_icon(GtkWidget *widget,
 
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_pixmap(widget->window, gc, mp->pixmap,
+		gdk_draw_drawable(widget->window, gc, mp->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 2, /* Dest x,y */
 				-1, -1);
@@ -1020,7 +1020,7 @@ static void draw_small_icon(GtkWidget *widget,
 
 	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_pixmap(widget->window, gc,
+	gdk_draw_drawable(widget->window, gc,
 			image->sm_pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
@@ -1040,7 +1040,7 @@ static void draw_small_icon(GtkWidget *widget,
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
+		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
 				0, 0,			/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
@@ -1055,7 +1055,7 @@ static void draw_small_icon(GtkWidget *widget,
 			pixmap_make_small(mp);
 		gdk_gc_set_clip_origin(gc, image_x + 2, area->y + 2);
 		gdk_gc_set_clip_mask(gc, mp->sm_mask);
-		gdk_draw_pixmap(widget->window, gc,
+		gdk_draw_drawable(widget->window, gc,
 				mp->sm_pixmap,
 				0, 0,			/* Source x,y */
 				image_x + 2, area->y + 2, /* Dest x,y */
@@ -1390,6 +1390,8 @@ static void draw_string(GtkWidget *widget,
 
 	if (width > area->width)
 	{
+		/* XXX */
+#if 0
 		if (!red_gc)
 		{
 			red_gc = gdk_gc_new(widget->window);
@@ -1399,6 +1401,7 @@ static void draw_string(GtkWidget *widget,
 				area->x + area->width - 1, area->y,
 				1, area->height);
 		gdk_gc_set_clip_rectangle(gc, NULL);
+#endif
 	}
 }
 

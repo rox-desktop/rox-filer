@@ -487,7 +487,8 @@ int main(int argc, char **argv)
 	pipe(wakeup_pipe);
 	close_on_exec(wakeup_pipe[0], TRUE);
 	close_on_exec(wakeup_pipe[1], TRUE);
-	gdk_input_add(wakeup_pipe[0], GDK_INPUT_READ, wake_up_cb, NULL);
+	gtk_input_add_full(wakeup_pipe[0], GDK_INPUT_READ, wake_up_cb,
+			NULL, NULL, NULL);
 	to_wakeup_pipe = wakeup_pipe[1];
 
 	/* If the pipe is full then we're going to get woken up anyway... */

@@ -607,7 +607,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 	GdkRectangle	area;
 	int		width, height;
 
-	gdk_window_get_size(widget->window, &width, &height);
+	gdk_drawable_get_size(widget->window, &width, &height);
 
 	area.x = 0;
 	area.width = width;
@@ -1082,7 +1082,7 @@ static gint icon_motion_event(GtkWidget *widget,
 		else
 			prev = panel->gap;
 
-		gdk_window_get_deskrelative_origin(prev->window, &x, &y);
+		gdk_window_get_origin(prev->window, &x, &y);
 
 		if (val <= (horz ? x : y))
 			dir = -1;
@@ -1098,9 +1098,9 @@ static gint icon_motion_event(GtkWidget *widget,
 		else
 			next = panel->gap;
 
-		gdk_window_get_deskrelative_origin(next->window, &x, &y);
+		gdk_window_get_origin(next->window, &x, &y);
 
-		gdk_window_get_size(next->window, &w, &h);
+		gdk_drawable_get_size(next->window, &w, &h);
 
 		x += w;
 		y += h;

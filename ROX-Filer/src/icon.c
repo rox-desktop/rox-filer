@@ -513,7 +513,7 @@ void icon_destroyed(Icon *icon)
 
 	if (icon->panel == NULL)
 	{
-		gdk_pixmap_unref(icon->mask);
+		g_object_unref(icon->mask);
 		if (current_pinboard)
 			current_pinboard->icons =
 				g_list_remove(current_pinboard->icons, icon);

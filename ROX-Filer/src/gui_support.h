@@ -20,8 +20,6 @@
 #define WIN_HINTS_SKIP_TASKBAR    (1<<2) /* Not on taskbar */
 
 extern GdkFont	   	*fixed_font;
-extern GdkColor 	red;
-extern GdkGC 		*red_gc;
 extern gint		screen_width, screen_height;
 
 typedef void (*HelpFunc)(gpointer data);
