@@ -1318,19 +1318,29 @@ static gint shadow_x, shadow_y;
 static gboolean bg_expose(GtkWidget *widget,
 			  GdkEventExpose *event, gpointer data)
 {
-	if (!pinboard_shadow)
-		return FALSE;
+	gpointer gclass = ((GTypeInstance *) widget)->g_class;
 
-	gdk_draw_rectangle(widget->window,
-			widget->style->white_gc, FALSE,
-			shadow_x, shadow_y,
-			SHADOW_SIZE, SHADOW_SIZE);
-	gdk_draw_rectangle(widget->window,
-			widget->style->black_gc, FALSE,
-			shadow_x + 1, shadow_y + 1,
-			SHADOW_SIZE - 2, SHADOW_SIZE - 2);
+	/* TODO: Split large regions into smaller chunks... */
 
-	return FALSE;
+	gdk_window_begin_paint_region(widget->window, event->region);
+	
+	if (pinboard_shadow)
+	{
+		gdk_draw_rectangle(widget->window,
+				widget->style->white_gc, FALSE,
+				shadow_x, shadow_y,
+				SHADOW_SIZE, SHADOW_SIZE);
+		gdk_draw_rectangle(widget->window,
+				widget->style->black_gc, FALSE,
+				shadow_x + 1, shadow_y + 1,
+				SHADOW_SIZE - 2, SHADOW_SIZE - 2);
+	}
+
+	((GtkWidgetClass *) gclass)->expose_event(widget, event);
+
+	gdk_window_end_paint(widget->window);
+
+	return TRUE;
 }
 
 /* Draw a 'shadow' under an icon being dragged, showing where
@@ -1661,6 +1671,7 @@ static void create_pinboard_window(Pinboard *pinboard)
 
 	gtk_widget_modify_bg(win, GTK_STATE_NORMAL, &pin_text_bg_col);
 
+	gtk_widget_set_double_buffered(win, FALSE);
 	gtk_widget_set_app_paintable(win, TRUE);
 	gtk_widget_set_name(win, "rox-pinboard");
 	pinboard->window = win;
