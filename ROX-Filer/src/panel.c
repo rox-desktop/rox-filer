@@ -105,9 +105,6 @@ static gint icon_button_press(GtkWidget *widget,
 			      PanelIcon *pi);
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel);
-static gint expose_icon_background(GtkWidget *widget,
-			GdkEventExpose *event,
-			PanelIcon *pi);
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
 			PanelIcon *pi);
@@ -711,8 +708,6 @@ static void panel_add_item(Panel *panel,
 	{
 		g_signal_connect(widget, "enter-notify-event",
 				G_CALLBACK(enter_icon), pi);
-		g_signal_connect(widget, "expose_event",
-				G_CALLBACK(expose_icon_background), pi);
 		g_signal_connect_after(widget, "expose_event",
 				G_CALLBACK(expose_icon), pi);
 		g_signal_connect(widget, "drag_data_get",
@@ -784,20 +779,6 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 		req->width += PANEL_ICON_SPACING;
 	else
 		req->height += PANEL_ICON_SPACING;
-}
-
-static gint expose_icon_background(GtkWidget *widget,
-			GdkEventExpose *event,
-			PanelIcon *pi)
-{
-	if (((Icon *) pi)->selected)
-		gtk_paint_flat_box(widget->style, widget->window,
-				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
-				&event->area, widget, NULL, 0, 0,
-				widget->allocation.width,
-				widget->allocation.height);
-	
-	return FALSE;
 }
 
 static gint expose_icon(GtkWidget *widget,
