@@ -643,9 +643,11 @@ static xmlNodePtr rpc_FileType(GList *args)
 	type = type_get_type(path);
 	g_free(path);
 	
-	reply = xmlNewNode(ARG(0)->ns, "FileTypeReply");
+	reply = xmlNewNode(NULL, "rox:FileTypeResponse");
 	tname = g_strconcat(type->media_type, "/", type->subtype, NULL);
-	xmlNewChild(reply, reply->ns, "MIMEType", tname);
+
+	xmlNewNs(reply, "http://www.w3.org/2001/09/soap-rpc", "soap");
+	xmlNewChild(reply, NULL, "soap:result", tname);
 	g_free(tname);
 
 	return reply;
