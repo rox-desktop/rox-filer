@@ -74,6 +74,9 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest);
 static gboolean client_event(GtkWidget *window,
 				 GdkEventClient *event,
 				 gpointer data);
+static void soap_done(GtkWidget *widget,
+		      GdkEventProperty *event,
+		      gpointer data);
 static void soap_register(char *name, SOAP_func func, char *req, char *opt);
 static xmlNodePtr soap_invoke(xmlNode *method);
 
@@ -166,6 +169,13 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		xmlDocDumpMemory(rpc, &mem, &size);
 		g_return_val_if_fail(size > 0, FALSE);
 		
+		/* Since Gtk might have selected this already, we'd
+		 * better do it BEFORE changing the property.
+		 */
+		gtk_widget_add_events(ipc_window, GDK_PROPERTY_CHANGE_MASK);
+		g_signal_connect(ipc_window, "property-notify-event",
+				G_CALLBACK(soap_done), GINT_TO_POINTER(xsoap));
+
 		gdk_property_change(ipc_window->window, xsoap,
 				gdk_x11_xatom_to_atom(XA_STRING), 8,
 				GDK_PROP_MODE_REPLACE, mem, size);
@@ -857,11 +867,22 @@ static xmlNodePtr rpc_Mount(GList *args)
 	return NULL;
 }
 
+/* The first time the property changes, do nothing (it's us setting the
+ * property). The second time, get the result.
+ * Don't call this function three times!
+ */
 static void soap_done(GtkWidget *widget, GdkEventProperty *event, gpointer data)
 {
+	static gboolean times_called = 0;
 	GdkAtom	prop = (GdkAtom) data;
 
 	if (prop != event->atom)
+		return;
+
+	times_called++;
+	g_return_if_fail(times_called < 3);
+
+	if (times_called == 1)
 		return;
 
 	/* If we got a reply, display it here */
@@ -896,10 +917,6 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 	event.data_format = 32;
 	event.message_type = xsoap;
 	
-	gtk_widget_add_events(from, GDK_PROPERTY_CHANGE_MASK);
-	g_signal_connect(from, "property-notify-event",
-			 G_CALLBACK(soap_done), GINT_TO_POINTER(prop));
-
 	gdk_event_send_client_message((GdkEvent *) &event,
 				      GDK_WINDOW_XWINDOW(dest));
 
