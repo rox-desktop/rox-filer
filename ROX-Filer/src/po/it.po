@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.00\n"
-"POT-Creation-Date: 2002-06-22 13:58+0100\n"
+"POT-Creation-Date: 2002-07-25 14:05+0100\n"
 "PO-Revision-Date: 2002-02-03 21:30-0500\n"
 "Last-Translator: Denis Manente <denis72@libero.it>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -33,7 +33,7 @@ msgstr "Non confermare ogni operazione"
 msgid "Name"
 msgstr "Nome"
 
-#: abox.c:399 menu.c:231
+#: abox.c:399 menu.c:232
 msgid "Directory"
 msgstr ""
 
@@ -88,8 +88,10 @@ msgid "Simple Tests"
 msgstr "Test semplici"
 
 #: action.c:205
+#, fuzzy
 msgid ""
-"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+"(types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
 "(permissions)\n"
 "IsEmpty, IsMine\n"
@@ -109,11 +111,11 @@ msgstr ""
 "considerando il path completo; altrimenti viene utilizzato solamente il nome "
 "del file."
 
-#: action.c:218
+#: action.c:219
 msgid "Comparisons"
 msgstr "Confronti"
 
-#: action.c:220
+#: action.c:221
 msgid ""
 "<, <=, =, !=, >, >=, After, Before (compare two values)\n"
 "5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
@@ -125,11 +127,11 @@ msgstr ""
 "2 secs|mins|hours|days|weeks|years  ago|hence (tempi)\n"
 "atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (valori)"
 
-#: action.c:229
+#: action.c:230
 msgid "Specials"
 msgstr "Speciali"
 
-#: action.c:231
+#: action.c:232
 msgid ""
 "system(command) (true if 'command' returns with a zero exit status; a % \n"
 "in 'command' is replaced with the path of the current file)\n"
@@ -139,15 +141,15 @@ msgstr ""
 "un % in 'command' viene sostituito con il path del file corrente)\n"
 "prune (impedisce la ricerca in una determinata directory)."
 
-#: action.c:244
+#: action.c:245
 msgid "See the ROX-Filer manual for full details."
 msgstr "Consulta il manuale del ROX-Filer per ulteriori dettagli."
 
-#: action.c:273
+#: action.c:274
 msgid "Permissions command reference"
 msgstr "Informazioni sulla Modifica permessi"
 
-#: action.c:279
+#: action.c:280
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -209,115 +211,115 @@ msgstr ""
 "\n"
 "Vedi la pagina man di chmod(1) per ulteriori dettagli."
 
-#: action.c:404
+#: action.c:405
 msgid "There was one error.\n"
 msgstr "C'e' stato un errore.\n"
 
-#: action.c:406
+#: action.c:407
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "Ci sono stati %d errori.\n"
 
-#: action.c:431
+#: action.c:432
 msgid "ERROR reading"
 msgstr "ERRORE in lettura"
 
-#: action.c:503 support.c:401
+#: action.c:504 support.c:401
 msgid "ERROR"
 msgstr "ERRORE"
 
-#: action.c:649 main.c:570 main.c:578
+#: action.c:650 main.c:570 main.c:578
 msgid "Yes"
 msgstr "Si"
 
-#: action.c:653 main.c:572
+#: action.c:654 main.c:572
 msgid "No"
 msgstr ""
 
-#: action.c:797
+#: action.c:798
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?Calcola il contenuto di %s?"
 
-#: action.c:830
+#: action.c:831
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?Cancella %s'%s'?"
 
-#: action.c:831
+#: action.c:832
 msgid "WRITE-PROTECTED "
 msgstr "PROTETTO DA SCRITTURA "
 
-#: action.c:838
+#: action.c:839
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'Cancellazione di '%s' in corso\n"
 
-#: action.c:853
+#: action.c:854
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'Directory '%s' cancellata\n"
 
-#: action.c:889 action.c:911
+#: action.c:890 action.c:912
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?Controlla '%s'?"
 
-#: action.c:908
+#: action.c:909
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!Condizione di ricerca non valida - cambiala e riprova\n"
 
-#: action.c:919
+#: action.c:920
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(controllando '%s')\n"
 
-#: action.c:994 action.c:1025
+#: action.c:995 action.c:1026
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?Cambia i permessi a '%s'?"
 
-#: action.c:1001
+#: action.c:1002
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'Cambiando i permessi di '%s'\n"
 
-#: action.c:1022
+#: action.c:1023
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Modo non valido - cambialo e riprova\n"
 
-#: action.c:1116
+#: action.c:1117
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' esiste gia' - %s?"
 
-#: action.c:1117
+#: action.c:1118
 msgid "merge contents"
 msgstr "fondi il contenuto"
 
-#: action.c:1117
+#: action.c:1118
 msgid "overwrite"
 msgstr "sovrascrivi"
 
-#: action.c:1136
+#: action.c:1137
 msgid "'Trying copy anyway...\n"
 msgstr "'Tenta la copia comunque...\n"
 
-#: action.c:1144
+#: action.c:1145
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?Copia %s come %s?"
 
-#: action.c:1150
+#: action.c:1151
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'Copia di %s come %s\n"
 
-#: action.c:1170
+#: action.c:1171
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!ERRORE: La destinazione esiste gia', ma non e' una directory\n"
 
-#: action.c:1250
+#: action.c:1251
 #, c-format
 msgid ""
 "!%s\n"
@@ -326,26 +328,26 @@ msgstr ""
 "!%s\n"
 "Copia di '%s' fallita"
 
-#: action.c:1296
+#: action.c:1297
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' esiste gia' - sovrascrivi?"
 
-#: action.c:1313
+#: action.c:1314
 msgid "'Trying move anyway...\n"
 msgstr "'Prova a muovere comunque...\n"
 
-#: action.c:1320
+#: action.c:1321
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?Sposta %s in %s?"
 
-#: action.c:1326
+#: action.c:1327
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'Spostamento di %s in %s\n"
 
-#: action.c:1338
+#: action.c:1339
 #, c-format
 msgid ""
 "!%s\n"
@@ -354,45 +356,45 @@ msgstr ""
 "!%s\n"
 "Spostamento di %s in %s fallito\n"
 
-#: action.c:1366
+#: action.c:1367
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!ERROR: Non posso copiare l'oggetto su se stesso\n"
 
-#: action.c:1381
+#: action.c:1382
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!ERRORE: Non posso muovere/rinominare l'oggetto su se stesso\n"
 
-#: action.c:1398
+#: action.c:1399
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'Collegamento di %s in %s\n"
 
-#: action.c:1405
+#: action.c:1406
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?Collega %s come %s?"
 
-#: action.c:1433
+#: action.c:1434
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'Mount di %s in corso\n"
 
-#: action.c:1434
+#: action.c:1435
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'Unmount di %s in corso\n"
 
-#: action.c:1441
+#: action.c:1442
 #, fuzzy, c-format
 msgid "?Mount %s?"
 msgstr "'Mount di %s in corso\n"
 
-#: action.c:1442
+#: action.c:1443
 #, fuzzy, c-format
 msgid "?Unmount %s?"
 msgstr "'Unmount di %s in corso\n"
 
-#: action.c:1452
+#: action.c:1453
 #, c-format
 msgid ""
 "!%s\n"
@@ -401,7 +403,7 @@ msgstr ""
 "!%s\n"
 "Mount fallito\n"
 
-#: action.c:1453
+#: action.c:1454
 #, c-format
 msgid ""
 "!%s\n"
@@ -410,7 +412,7 @@ msgstr ""
 "!%s\n"
 "Unmount fallito\n"
 
-#: action.c:1499
+#: action.c:1500
 #, c-format
 msgid ""
 "'\n"
@@ -419,27 +421,27 @@ msgstr ""
 "'\n"
 "Totale: %s ("
 
-#: action.c:1506
+#: action.c:1507
 msgid "file"
 msgstr ""
 
-#: action.c:1506
+#: action.c:1507
 msgid "files"
 msgstr ""
 
-#: action.c:1513
+#: action.c:1514
 msgid "no directories)\n"
 msgstr ""
 
-#: action.c:1518
+#: action.c:1519
 msgid "directory"
 msgstr ""
 
-#: action.c:1519
+#: action.c:1520
 msgid "directories"
 msgstr ""
 
-#: action.c:1548 action.c:1585 action.c:1612 action.c:1640 action.c:1657
+#: action.c:1549 action.c:1586 action.c:1613 action.c:1641 action.c:1658
 msgid ""
 "'\n"
 "Done\n"
@@ -447,154 +449,154 @@ msgstr ""
 "'\n"
 "Fatto\n"
 
-#: action.c:1549
+#: action.c:1550
 msgid "!No mount points selected!\n"
 msgstr "!Nessun mount point selezionato!\n"
 
-#: action.c:1605
+#: action.c:1606
 msgid "?Another search?"
 msgstr "?Un'altra ricerca?"
 
-#: action.c:1632
+#: action.c:1633
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' e' un link simbolico\n"
 
-#: action.c:1670
+#: action.c:1671
 msgid "You need to select some items to search through"
 msgstr "Hai bisogno di selezionare degli elementi in cui cercare"
 
-#: action.c:1680 menu.c:223
+#: action.c:1681 menu.c:224
 msgid "Find"
 msgstr "Cerca"
 
-#: action.c:1713
+#: action.c:1714
 msgid "You need to select some items to count"
 msgstr "Hai bisogno di selezionare degli elementi da contare"
 
-#: action.c:1717 menu.c:221
+#: action.c:1718
 msgid "Disk Usage"
 msgstr "Utilizzo Disco"
 
-#: action.c:1750
+#: action.c:1751
 msgid "Mount / Unmount"
 msgstr ""
 
-#: action.c:1763
+#: action.c:1764
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "Il ROX-Filer non supporta ancora i punti di mount sul tuo sistema."
 
-#: action.c:1777 action.c:2042 menu.c:220 tips:164 type.c:858
+#: action.c:1778 action.c:2053 menu.c:211 tips:164 type.c:907
 msgid "Delete"
 msgstr "Cancella"
 
-#: action.c:1787 tips:170
+#: action.c:1788 tips:170
 msgid "Force"
 msgstr "Forza"
 
-#: action.c:1787
+#: action.c:1788
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Non confermare la cancellazione di elementi protetti da scrittura"
 
-#: action.c:1790 action.c:1839 tips:172
+#: action.c:1791 action.c:1846 tips:172
 msgid "Brief"
 msgstr "Breve"
 
-#: action.c:1790
+#: action.c:1791
 msgid "Only log directories being deleted"
 msgstr "Elenca solo le directories cancellate"
 
-#: action.c:1806
+#: action.c:1808
 msgid "You need to select the items whose permissions you want to change"
 msgstr ""
 "Hai bisogno di selezionare gli elementi ai quali desideri cambiare i permessi"
 
-#: action.c:1814
+#: action.c:1816
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (Rende eseguibile/ricercabile)"
 
-#: action.c:1816
+#: action.c:1818
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (Rende non-eseguibile/non-ricercabile)"
 
-#: action.c:1818
+#: action.c:1820
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (Permette al proprietario di leggere e scrivere)"
 
-#: action.c:1820
+#: action.c:1822
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (Privato - accesso solo al proprietario)"
 
-#: action.c:1822
+#: action.c:1824
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Accesso pubblico ma non in scrittura)"
 
-#: action.c:1829 menu.c:184 menu.c:190 menu.c:196 menu.c:222 tips:70
+#: action.c:1835 menu.c:183 menu.c:189 menu.c:195 menu.c:222 tips:70
 msgid "Permissions"
 msgstr "Permessi"
 
-#: action.c:1839
+#: action.c:1846
 msgid "Don't list processed files"
 msgstr "Non elenca i file elaborati"
 
-#: action.c:1842 tips:174
+#: action.c:1849 tips:174
 msgid "Recurse"
 msgstr "Ricorsivo"
 
-#: action.c:1842
+#: action.c:1849
 msgid "Also change contents of subdirectories"
 msgstr "Cambia anche il contenuto delle sottodirectory"
 
-#: action.c:1876 dnd.c:136 menu.c:1857 tips:158
+#: action.c:1887 dnd.c:137 menu.c:1887 tips:158
 msgid "Copy"
 msgstr "Copia"
 
-#: action.c:1886 action.c:1919 tips:176
+#: action.c:1897 action.c:1930 tips:176
 #, fuzzy
 msgid "Newer"
 msgstr "Nuovo"
 
-#: action.c:1887 action.c:1920 tips:177 tips:178 tips:179 tips:180
+#: action.c:1898 action.c:1931 tips:177 tips:178 tips:179 tips:180
 msgid "Only over-write if source is newer than destination."
 msgstr ""
 
-#: action.c:1909 dnd.c:137 tips:160
+#: action.c:1920 dnd.c:138 tips:160
 msgid "Move"
 msgstr "Sposta"
 
-#: action.c:1937 dnd.c:138 tips:162
+#: action.c:1948 dnd.c:139 tips:162
 msgid "Link"
 msgstr "Collegamento"
 
-#: action.c:1996
+#: action.c:2007
 msgid "Deleting items such as "
 msgstr "Cancellazione degli elementi come "
 
-#: action.c:2000
+#: action.c:2011
 msgid "Deleting the item "
 msgstr "Cancellazione di "
 
-#: action.c:2002
+#: action.c:2013
 msgid "Deleting the items "
 msgstr "Cancellazione di "
 
-#: action.c:2021
+#: action.c:2032
 msgid " and "
 msgstr " e "
 
-#: action.c:2030
+#: action.c:2041
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
 " influenzera' alcuni elementi della scrivania o del pannello - vuoi "
 "veramente cancellarlo?"
 
-#: action.c:2037
+#: action.c:2048
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 " influenzera' alcuni elementi della scrivania o del pannello - vuoi "
 "veramente cancellarli?"
 
-#: action.c:2042 filer.c:1313 infobox.c:90 menu.c:1648 panel.c:439 type.c:858
+#: action.c:2053 filer.c:1318 infobox.c:92 menu.c:1655 panel.c:439 type.c:907
 msgid "Cancel"
 msgstr "Annulla"
 
@@ -634,91 +636,91 @@ msgstr "Non e' possibile aprire la directory: %s"
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) fallito: %s"
 
-#: dnd.c:140
+#: dnd.c:141
 msgid "Set Icon"
 msgstr "Imposta Icona"
 
-#: dnd.c:247
+#: dnd.c:248
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "A capo mancante o errato nei dati di tipo testo/uri-list"
 
-#: dnd.c:420
+#: dnd.c:421
 msgid "Internal error - bad info type"
 msgstr "Errore interno - info type errato"
 
-#: dnd.c:690
+#: dnd.c:691
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr ""
 "Errore di protocollo XDS: il nome del file potrebbe non contenere il "
 "carattere: '/'\n"
 
-#: dnd.c:715
+#: dnd.c:716
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
 
-#: dnd.c:726
+#: dnd.c:727
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
 "Spiacente - Ho bisogno di un destinatario di tipo text/uri-list o "
 "XdndDirectSave()."
 
-#: dnd.c:729
+#: dnd.c:730
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 "Spiacente - Ho bisogno di un destinatario di tipo text/uri-list o "
 "application/octet-stream."
 
-#: dnd.c:828
+#: dnd.c:829
 msgid "Unknown target"
 msgstr "Destinatario sconosciuto"
 
-#: dnd.c:861
+#: dnd.c:862
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "L'applicazione remota non puo' o non vuole inviare i dati richiesti"
 
-#: dnd.c:874
+#: dnd.c:875
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "Errore di protocollo XDS: il codice di ritorno dovrebbe essere 'S', 'F' o "
 "'E'\n"
 
-#: dnd.c:907
+#: dnd.c:908
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Spiacente, non posso visualizzare un menu di azioni per un file remoto o dei "
 "dati"
 
-#: dnd.c:923
+#: dnd.c:924
 msgid "UntitledData"
 msgstr "DatiSenzaNome"
 
-#: dnd.c:950
+#: dnd.c:951
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Errore salvando il file: %s"
 
-#: dnd.c:981
+#: dnd.c:982
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Nessuna URI nel text/uri-list"
 
-#: dnd.c:1005
+#: dnd.c:1006
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Non posso ottenere i dati dalla macchina remota (application/octet-stream "
 "non fornito)"
 
-#: dnd.c:1027
+#: dnd.c:1028
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Alcuni di questi file sono su un'altra macchina - verranno ignorati - "
 "spiacente"
 
-#: dnd.c:1034
+#: dnd.c:1035
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -726,16 +728,16 @@ msgstr ""
 "Nessuno di questi file si trova sulla macchina locale - Non posso operare su "
 "file remoti multipli - spiacente"
 
-#: dnd.c:1047
+#: dnd.c:1048
 msgid "Unknown action requested"
 msgstr "Azione sconosciuta richiesta"
 
-#: dnd.c:1057
+#: dnd.c:1058
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Errore ottenendo la lista dei file: %s"
 
-#: dnd.c:1087
+#: dnd.c:1088
 msgid "You can't use multiple files with Set Icon!"
 msgstr "Non puoi usare piu' files con Imposta Icona!"
 
@@ -743,246 +745,251 @@ msgstr "Non puoi usare piu' files con Imposta Icona!"
 msgid "Directory missing/deleted"
 msgstr "Directory mancante/cancellata"
 
-#: filer.c:841
-#, c-format
+#: filer.c:845
+#, fuzzy, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
-"Press %s on its own to reselect the files later."
+"Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
 msgstr ""
 "Il gruppo %s non e' impostato. Seleziona dei file e premi Ctrl+%s per "
 "impostare il gruppo.Premi %s sul gruppo per riselezionare i file in seguito."
 
-#: filer.c:1025
+#: filer.c:1030
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "La directory '%s' non e' accessibile"
 
-#: filer.c:1162
+#: filer.c:1167
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Directory '%s' non trovata."
 
-#: filer.c:1548
+#: filer.c:1553
 msgid "S"
 msgstr ""
 
-#: filer.c:1549
+#: filer.c:1554
 msgid "A"
 msgstr ""
 
-#: filer.c:1550
+#: filer.c:1555
 msgid "T"
 msgstr ""
 
-#: filer.c:1556
+#: filer.c:1561
 msgid "Scanning, "
 msgstr "Scansione, "
 
-#: filer.c:1557
+#: filer.c:1562
 msgid "All, "
 msgstr "Tutti, "
 
-#: filer.c:1558
+#: filer.c:1563
 msgid "Thumbs, "
 msgstr "Miniature, "
 
-#: filer.c:1842
+#: filer.c:1847
 msgid "Symbolic link to "
 msgstr "Collegamento a "
 
-#: filer.c:1873
+#: filer.c:1878
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
-#: find.c:485
+#: find.c:488
 msgid "And"
 msgstr ""
 
-#: find.c:509
+#: find.c:512
 msgid "Not"
 msgstr ""
 
-#: find.c:552
+#: find.c:555
 msgid "system"
 msgstr ""
 
-#: find.c:560
+#: find.c:563
 msgid "prune"
 msgstr ""
 
-#: find.c:648
+#: find.c:651
 msgid "After"
 msgstr ""
 
-#: find.c:650
+#: find.c:653
 msgid "Before"
 msgstr ""
 
-#: find.c:744
+#: find.c:748
 msgid "IsReg"
 msgstr ""
 
-#: find.c:746
+#: find.c:750
 msgid "IsLink"
 msgstr ""
 
-#: find.c:748
+#: find.c:752
 msgid "IsDir"
 msgstr ""
 
-#: find.c:750
+#: find.c:754
 msgid "IsChar"
 msgstr ""
 
-#: find.c:752
+#: find.c:756
 msgid "IsBlock"
 msgstr ""
 
-#: find.c:754
+#: find.c:758
 msgid "IsDev"
 msgstr ""
 
-#: find.c:756
+#: find.c:760
 msgid "IsPipe"
 msgstr ""
 
-#: find.c:758
+#: find.c:762
 msgid "IsSocket"
 msgstr ""
 
-#: find.c:760
-msgid "IsSUID"
-msgstr ""
-
-#: find.c:762
-msgid "IsSGID"
-msgstr ""
-
 #: find.c:764
-msgid "IsSticky"
+msgid "IsDoor"
 msgstr ""
 
 #: find.c:766
-msgid "IsReadable"
+msgid "IsSUID"
 msgstr ""
 
 #: find.c:768
-msgid "IsWriteable"
+msgid "IsSGID"
 msgstr ""
 
 #: find.c:770
-msgid "IsExecutable"
+msgid "IsSticky"
 msgstr ""
 
 #: find.c:772
-msgid "IsEmpty"
+msgid "IsReadable"
 msgstr ""
 
 #: find.c:774
+msgid "IsWriteable"
+msgstr ""
+
+#: find.c:776
+msgid "IsExecutable"
+msgstr ""
+
+#: find.c:778
+msgid "IsEmpty"
+msgstr ""
+
+#: find.c:780
 msgid "IsMine"
 msgstr ""
 
-#: find.c:902
+#: find.c:908
 msgid "Now"
 msgstr ""
 
-#: find.c:915
+#: find.c:921
 msgid "Byte"
 msgstr ""
 
-#: find.c:915
+#: find.c:921
 msgid "Bytes"
 msgstr ""
 
-#: find.c:923
+#: find.c:929
 msgid "Sec"
 msgstr ""
 
-#: find.c:923
+#: find.c:929
 msgid "Secs"
 msgstr ""
 
-#: find.c:925
+#: find.c:931
 msgid "Min"
 msgstr ""
 
-#: find.c:925
+#: find.c:931
 msgid "Mins"
 msgstr ""
 
-#: find.c:927
+#: find.c:933
 msgid "Hour"
 msgstr ""
 
-#: find.c:927
+#: find.c:933
 msgid "Hours"
 msgstr ""
 
-#: find.c:929
+#: find.c:935
 msgid "Day"
 msgstr ""
 
-#: find.c:929
+#: find.c:935
 msgid "Days"
 msgstr ""
 
-#: find.c:931
+#: find.c:937
 msgid "Week"
 msgstr ""
 
-#: find.c:931
+#: find.c:937
 msgid "Weeks"
 msgstr ""
 
-#: find.c:933
+#: find.c:939
 msgid "Year"
 msgstr ""
 
-#: find.c:933
+#: find.c:939
 msgid "Years"
 msgstr ""
 
-#: find.c:942
+#: find.c:948
 msgid "Ago"
 msgstr ""
 
-#: find.c:944
+#: find.c:950
 msgid "Hence"
 msgstr ""
 
-#: find.c:959
+#: find.c:965
 msgid "atime"
 msgstr ""
 
-#: find.c:961
+#: find.c:967
 msgid "ctime"
 msgstr ""
 
-#: find.c:963
+#: find.c:969
 msgid "mtime"
 msgstr ""
 
-#: find.c:965
+#: find.c:971
 msgid "size"
 msgstr ""
 
-#: find.c:967
+#: find.c:973
 msgid "inode"
 msgstr ""
 
-#: find.c:969
+#: find.c:975
 msgid "nlinks"
 msgstr ""
 
-#: find.c:971
+#: find.c:977
 msgid "uid"
 msgstr ""
 
-#: find.c:973
+#: find.c:979
 msgid "gid"
 msgstr ""
 
-#: find.c:975
+#: find.c:981
 msgid "blocks"
 msgstr ""
 
@@ -1059,186 +1066,204 @@ msgstr ""
 msgid "ROX-Filer"
 msgstr ""
 
-#: icon.c:110 icon.c:115 menu.c:213 toolbar.c:136
-msgid "Help"
-msgstr "Aiuto"
+#: icon.c:110 menu.c:250
+msgid "About ROX-Filer..."
+msgstr ""
 
-#: icon.c:111 menu.c:229
+#: icon.c:111 menu.c:251
+#, fuzzy
+msgid "Show Help Files"
+msgstr "Mostra file nascosti"
+
+#: icon.c:112 menu.c:252
+msgid "Manual"
+msgstr ""
+
+#: icon.c:114 menu.c:230
 msgid "Options..."
 msgstr "Opzioni..."
 
-#: icon.c:112 menu.c:237
+#: icon.c:115 menu.c:238
 msgid "Home Directory"
 msgstr ""
 
-#: icon.c:113 icon.c:707 menu.c:208 type.c:197
+#: icon.c:116 icon.c:710 menu.c:207 type.c:203
 msgid "File"
 msgstr ""
 
-#: icon.c:114 menu.c:212 menu.c:856
+#: icon.c:117 menu.c:214 menu.c:863
 msgid "Shift Open"
 msgstr "Shift+Apri"
 
-#: icon.c:116 menu.c:214
+#: icon.c:118 menu.c:213 menu.c:249 toolbar.c:135
+msgid "Help"
+msgstr "Aiuto"
+
+#: icon.c:119 menu.c:220
 msgid "Info"
 msgstr ""
 
-#: icon.c:117 menu.c:215
+#: icon.c:120 menu.c:218
 msgid "Set Run Action..."
 msgstr "Imposta Azione..."
 
-#: icon.c:118 menu.c:216
+#: icon.c:121 menu.c:219
 msgid "Set Icon..."
 msgstr "Imposta Icona..."
 
-#: icon.c:119 icon.c:604
+#: icon.c:122 icon.c:607
 msgid "Edit Item"
 msgstr "Modifica Elemento"
 
-#: icon.c:120
+#: icon.c:123
 msgid "Show Location"
 msgstr "Mostra Locazione"
 
-#: icon.c:121
+#: icon.c:124
 msgid "Remove Item(s)"
 msgstr "Rimuovi Elemento/i"
 
-#: icon.c:123
+#: icon.c:126
 msgid "Backdrop..."
 msgstr ""
 
-#: icon.c:248
+#: icon.c:251
 msgid "Nothing"
 msgstr "Niente"
 
-#: icon.c:450
+#: icon.c:453
 msgid "The location must contain at least one character!"
 msgstr "La locazione deve contenere almeno un carattere!"
 
-#: icon.c:521
+#: icon.c:524
 msgid "You must first select some items to remove"
 msgstr "Devi prima selezionare alcuni elementi da rimuovere"
 
-#: icon.c:535
+#: icon.c:538
 msgid "You must open the menu over an item"
 msgstr "Devi aprire il menu sopra un elemento"
 
-#: icon.c:563 menu.c:1172
+#: icon.c:566 menu.c:1179
 msgid "You can only set the run action for a regular file"
 msgstr "Puoi impostare l'azione da eseguire solo per i file"
 
-#: icon.c:607
+#: icon.c:610
 msgid "Clicking the icon opens:"
 msgstr "Cliccando l'icona verra' aperto:"
 
-#: icon.c:620
+#: icon.c:623
 msgid "The text displayed under the icon is:"
 msgstr "Il testo visualizzato sotto l'icona e':"
 
-#: infobox.c:88
+#: infobox.c:90
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr ""
 
-#: infobox.c:89
+#: infobox.c:91
 #, fuzzy
 msgid "File Information"
 msgstr "Opzioni del ROX-Filer"
 
-#: infobox.c:90
+#: infobox.c:92
 #, fuzzy
 msgid "Show Info"
 msgstr "Mostra Nascosti"
 
-#: infobox.c:267
+#: infobox.c:212
+#, fuzzy
+msgid "Show _Help Files"
+msgstr "Mostra file nascosti"
+
+#: infobox.c:316
 msgid "Name:"
 msgstr "Nome:"
 
-#: infobox.c:271 tips:232
+#: infobox.c:320 tips:232
 msgid "Error:"
 msgstr "Errore:"
 
-#: infobox.c:278
+#: infobox.c:327
 #, fuzzy
 msgid "Real directory:"
 msgstr "Nuova Directory"
 
-#: infobox.c:286
+#: infobox.c:335
 msgid "Owner, Group:"
 msgstr "Proprietario, Gruppo:"
 
-#: infobox.c:292 support.c:271 support.c:351
+#: infobox.c:341 support.c:271 support.c:351
 msgid "bytes"
 msgstr ""
 
-#: infobox.c:299
+#: infobox.c:348
 msgid "Size:"
 msgstr "Dimensione:"
 
-#: infobox.c:302
+#: infobox.c:351
 msgid "Change time:"
 msgstr "Ultimo Cambiamento:"
 
-#: infobox.c:306
+#: infobox.c:355
 msgid "Modify time:"
 msgstr "Ultima Modifica:"
 
-#: infobox.c:310
+#: infobox.c:359
 msgid "Access time:"
 msgstr "Ultimo Accesso:"
 
-#: infobox.c:315
+#: infobox.c:364
 msgid "Permissions:"
 msgstr "Permessi:"
 
-#: infobox.c:318
+#: infobox.c:367
 msgid "Type:"
 msgstr "Tipo:"
 
-#: infobox.c:324
+#: infobox.c:373
 msgid "Run action:"
 msgstr "Azione:"
 
-#: infobox.c:362
+#: infobox.c:423
 msgid "file(1) says..."
 msgstr "file(1) dice..."
 
-#: infobox.c:363
+#: infobox.c:424
 msgid "<nothing yet>"
 msgstr "<ancora niente>"
 
-#: infobox.c:434
+#: infobox.c:495
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) dice... %s"
 
-#: infobox.c:474
+#: infobox.c:535
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Collegamento a %s"
 
-#: infobox.c:480
+#: infobox.c:541
 msgid "Symbolic link"
 msgstr "Collegamento"
 
-#: infobox.c:484
+#: infobox.c:545
 msgid "ROX application"
 msgstr "Applicazione ROX"
 
-#: infobox.c:492
+#: infobox.c:553
 msgid "mounted"
 msgstr ""
 
-#: infobox.c:492
+#: infobox.c:553
 msgid "unmounted"
 msgstr ""
 
-#: infobox.c:496
+#: infobox.c:557
 #, fuzzy, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Punto di Mount"
 
-#: infobox.c:498
+#: infobox.c:559
 #, fuzzy, c-format
 msgid "Mount point (%s)"
 msgstr "Punto di Mount"
@@ -1319,216 +1344,216 @@ msgstr ""
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
-#: menu.c:177 tips:44
+#: menu.c:176 tips:44
 msgid "Display"
 msgstr "Visualizzazione"
 
-#: menu.c:178 tips:63
+#: menu.c:177 tips:63
 msgid "Huge Icons"
 msgstr "Icone Enormi"
 
-#: menu.c:179 tips:64 tips:207
+#: menu.c:178 tips:64 tips:207
 msgid "Large Icons"
 msgstr "Icone Grandi"
 
-#: menu.c:180 tips:65 tips:206
+#: menu.c:179 tips:65 tips:206
 msgid "Small Icons"
 msgstr "Icone Piccole"
 
-#: menu.c:181
+#: menu.c:180
 msgid "Huge, With..."
 msgstr "Enormi, Con..."
 
-#: menu.c:182 menu.c:188 menu.c:194 tips:68
+#: menu.c:181 menu.c:187 menu.c:193 tips:68
 msgid "Summary"
 msgstr "Sommario"
 
-#: menu.c:183 menu.c:189 menu.c:195 tips:69
+#: menu.c:182 menu.c:188 menu.c:194 tips:69
 msgid "Sizes"
 msgstr "Dim."
 
-#: menu.c:185 menu.c:191 menu.c:197 tips:71 tips:75
+#: menu.c:184 menu.c:190 menu.c:196 tips:71 tips:75
 msgid "Type"
 msgstr "Tipo"
 
-#: menu.c:186 menu.c:192 menu.c:198 tips:72
+#: menu.c:185 menu.c:191 menu.c:197 tips:72
 msgid "Times"
 msgstr "Tempi"
 
-#: menu.c:187
+#: menu.c:186
 msgid "Large, With..."
 msgstr "Grandi, Con..."
 
-#: menu.c:193
+#: menu.c:192
 msgid "Small, With..."
 msgstr "Piccole, Con..."
 
-#: menu.c:200
+#: menu.c:199
 msgid "Sort by Name"
 msgstr "Ordina per Nome"
 
-#: menu.c:201
+#: menu.c:200
 msgid "Sort by Type"
 msgstr "Ordina per Tipo"
 
-#: menu.c:202
+#: menu.c:201
 msgid "Sort by Date"
 msgstr "Ordina per Data"
 
-#: menu.c:203
+#: menu.c:202
 msgid "Sort by Size"
 msgstr "Ordina per Dim."
 
-#: menu.c:205
+#: menu.c:204
 msgid "Show Hidden"
 msgstr "Mostra Nascosti"
 
-#: menu.c:206
+#: menu.c:205
 msgid "Show Thumbnails"
 msgstr "Mostra Miniature"
 
-#: menu.c:207
+#: menu.c:206
 msgid "Refresh"
 msgstr "Aggiorna"
 
-#: menu.c:209
+#: menu.c:208
 msgid "Copy..."
 msgstr "Copia..."
 
-#: menu.c:210
+#: menu.c:209
 msgid "Rename..."
 msgstr "Rinomina..."
 
-#: menu.c:211
+#: menu.c:210
 msgid "Link..."
 msgstr "Collegamento..."
 
-#: menu.c:217
+#: menu.c:215
 msgid "Open AVFS"
 msgstr "Apri AVFS"
 
-#: menu.c:219
+#: menu.c:216
 msgid "Send To..."
 msgstr "Invia A..."
 
-#: menu.c:224
+#: menu.c:221
+msgid "Count"
+msgstr ""
+
+#: menu.c:225
 msgid "Select"
 msgstr "Selezione"
 
-#: menu.c:225
+#: menu.c:226
 msgid "Select All"
 msgstr "Seleziona Tutto"
 
-#: menu.c:226
+#: menu.c:227
 msgid "Clear Selection"
 msgstr "Annulla Selezione"
 
-#: menu.c:227
+#: menu.c:228
 msgid "Invert Selection"
 msgstr "Inverti Selezione"
 
-#: menu.c:228
+#: menu.c:229
 msgid "Select If..."
 msgstr "Seleziona Se..."
 
-#: menu.c:230
+#: menu.c:231
 msgid "New"
 msgstr "Nuovo"
 
-#: menu.c:232
+#: menu.c:233
 msgid "Blank file"
 msgstr "File vuoto"
 
-#: menu.c:233 tasklist.c:268
+#: menu.c:234 tasklist.c:269
 msgid "Window"
 msgstr "Finestra"
 
-#: menu.c:234
+#: menu.c:235
 msgid "Parent, New Window"
 msgstr "Genitore, Nuova Finestra"
 
-#: menu.c:235
+#: menu.c:236
 msgid "Parent, Same Window"
 msgstr "Genitore, Stessa Finestra"
 
-#: menu.c:236
+#: menu.c:237
 msgid "New Window"
 msgstr "Nuova Finestra"
 
-#: menu.c:238
+#: menu.c:239
 #, fuzzy
 msgid "Follow Symbolic Links"
 msgstr "Collegamento"
 
-#: menu.c:239
+#: menu.c:240
 msgid "Resize Window"
 msgstr "Ridimensiona Finestra"
 
-#: menu.c:242
+#: menu.c:243
 msgid "Close Window"
 msgstr "Chiudi Finestra"
 
-#: menu.c:244
+#: menu.c:245
 msgid "Enter Path..."
 msgstr "Inserisci Percorso..."
 
-#: menu.c:245
+#: menu.c:246
 msgid "Shell Command..."
 msgstr "Comando Shell..."
 
-#: menu.c:246
+#: menu.c:247
 msgid "Xterm Here"
 msgstr "Xterm Qui"
 
-#: menu.c:247
+#: menu.c:248
 msgid "Switch to xterm"
 msgstr ""
 
-#: menu.c:249
-msgid "Show ROX-Filer Help"
-msgstr "Mostra l'Aiuto"
-
-#: menu.c:714
+#: menu.c:719
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr ""
 "Dovresti usare il Shift+'Menu click' su un file per mandarlo a qualche "
 "applicazione"
 
-#: menu.c:744
+#: menu.c:749
 msgid "Next Click"
 msgstr "Prossimo Click"
 
-#: menu.c:763
+#: menu.c:768
 #, c-format
 msgid "%d items"
 msgstr "%d elementi"
 
-#: menu.c:843
+#: menu.c:850
 msgid "Unmount"
 msgstr ""
 
-#: menu.c:845 tips:166
+#: menu.c:852 tips:166
 msgid "Mount"
 msgstr ""
 
-#: menu.c:848
+#: menu.c:855
 msgid "Show Target"
 msgstr "Mostra Destinazione"
 
-#: menu.c:850
+#: menu.c:857
 msgid "Look Inside"
 msgstr "Guarda all'Interno"
 
-#: menu.c:852
+#: menu.c:859
 msgid "Open As Text"
 msgstr "Apri Come Testo"
 
-#: menu.c:988
+#: menu.c:995
 #, fuzzy
 msgid "_Relative link"
 msgstr "Collegamento relativo"
 
-#: menu.c:994
+#: menu.c:1001
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1541,43 +1566,43 @@ msgstr ""
 "Se inattivo, il collegamento sara' eseguito con un path assoluto - utile se "
 "il collegamento viene mosso ma il destinatario no."
 
-#: menu.c:1061
+#: menu.c:1068
 msgid "New pathname is not absolute"
 msgstr "Il nuovo percorso non e' assoluto"
 
-#: menu.c:1126
+#: menu.c:1133
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr ""
 
-#: menu.c:1132
+#: menu.c:1139
 msgid "_Replace"
 msgstr ""
 
-#: menu.c:1256 menu.c:1296 menu.c:1356
+#: menu.c:1263 menu.c:1303 menu.c:1363
 #, fuzzy
 msgid "Create"
 msgstr "Data"
 
-#: menu.c:1257
+#: menu.c:1264
 msgid "NewDir"
 msgstr "NuovaDir"
 
-#: menu.c:1270 menu.c:1276
+#: menu.c:1277 menu.c:1283
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Errore creando '%s': %s"
 
-#: menu.c:1297
+#: menu.c:1304
 msgid "NewFile"
 msgstr "NuovoFile"
 
-#: menu.c:1315
+#: menu.c:1322
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "Errore creando il file: non trovo il template per %s"
 
-#: menu.c:1386
+#: menu.c:1393
 #, fuzzy, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1601,7 +1626,7 @@ msgstr ""
 "%s\n"
 "Il menu `Invia A' puo essere aperto con un Shift+'Menu click' su un file."
 
-#: menu.c:1397
+#: menu.c:1404
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -1609,19 +1634,19 @@ msgstr ""
 "Adesso ti mostrero' la tua SendTo directory; li potrai creare un (Ctrl+Shift "
 "drag) collegamento a qualsiasi applicazione tu desideri."
 
-#: menu.c:1400
+#: menu.c:1407
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "La tua variabile CHOICESPATH impedisce personalizzazioni - spiacente."
 
-#: menu.c:1477
+#: menu.c:1484
 msgid "Customise"
 msgstr "Personalizza"
 
-#: menu.c:1537
+#: menu.c:1544
 msgid "This is already the canonical name for this directory."
 msgstr ""
 
-#: menu.c:1568
+#: menu.c:1575
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1629,100 +1654,100 @@ msgstr ""
 "Non puoi aprire una seconda vista su questa directory poiche' e' attiva "
 "l'opzione 'Finestra Unica' nella finestra delle Opzioni."
 
-#: menu.c:1597
+#: menu.c:1604
 #, c-format
 msgid "fork: %s"
 msgstr ""
 
-#: menu.c:1612
+#: menu.c:1619
 msgid "New window, as user..."
 msgstr "Nuova finestra, come utente..."
 
-#: menu.c:1620
+#: menu.c:1627
 msgid "Browse as which user?"
 msgstr "Come quale utente?"
 
-#: menu.c:1627
+#: menu.c:1634
 msgid "User:"
 msgstr "Utente:"
 
-#: menu.c:1641
+#: menu.c:1648
 msgid "OK"
 msgstr ""
 
-#: menu.c:1749
+#: menu.c:1779
 msgid "Copy ... ?"
 msgstr "Copia ... ?"
 
-#: menu.c:1752
+#: menu.c:1782
 msgid "Rename ... ?"
 msgstr "Rinomina ... ?"
 
-#: menu.c:1755
+#: menu.c:1785
 msgid "Symlink ... ?"
 msgstr "Collegamento ... ?"
 
-#: menu.c:1758
+#: menu.c:1788
 msgid "Shift Open ... ?"
 msgstr "Shift+Apri ... ?"
 
-#: menu.c:1761
+#: menu.c:1791
 msgid "Help about ... ?"
 msgstr "Aiuto su ... ?"
 
-#: menu.c:1764
+#: menu.c:1794
 msgid "Examine ... ?"
 msgstr "Esamina ... ?"
 
-#: menu.c:1767
+#: menu.c:1797
 msgid "Set run action for ... ?"
 msgstr "Imposta l'azione per ... ?"
 
-#: menu.c:1770
+#: menu.c:1800
 msgid "Set icon for ... ?"
 msgstr "Imposta l'icona per ... ?"
 
-#: menu.c:1773
+#: menu.c:1803
 msgid "Send ... to ... ?"
 msgstr "Invia ... a ... ?"
 
-#: menu.c:1776
+#: menu.c:1806
 msgid "DELETE ... ?"
 msgstr "CANCELLARE ... ?"
 
-#: menu.c:1779
+#: menu.c:1809
 msgid "Count the size of ... ?"
 msgstr "Calcola la dimensione di ... ?"
 
-#: menu.c:1782
+#: menu.c:1812
 msgid "Set permissions on ... ?"
 msgstr "Imposta i permessi per ... ?"
 
-#: menu.c:1785
+#: menu.c:1815
 msgid "Search inside ... ?"
 msgstr "Cerca all'interno ... ?"
 
-#: menu.c:1788
+#: menu.c:1818
 msgid "Look inside ... ?"
 msgstr "Guarda all'interno ... ?"
 
-#: menu.c:1834
+#: menu.c:1864
 msgid "You cannot do this to more than one item at a time"
 msgstr "Non puoi fare cio' a piu' di un elemento alla volta"
 
-#: menu.c:1847 view_collection.c:914
+#: menu.c:1877 view_collection.c:921
 msgid "Item no longer exists!"
 msgstr "L'elemento non esiste piu!"
 
-#: menu.c:1861
+#: menu.c:1891
 msgid "Rename"
 msgstr "Rinomina"
 
-#: menu.c:1865
+#: menu.c:1895
 msgid "Symlink"
 msgstr "Collegamento"
 
-#: menu.c:1901
+#: menu.c:1931
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1732,7 +1757,7 @@ msgid ""
 "\tgtk-can-change-accels = 1"
 msgstr ""
 
-#: menu.c:1911
+#: menu.c:1941
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1748,7 +1773,7 @@ msgstr ""
 "Il tasto apparira' vicino alla voce desiderata e potrai cosi premere il "
 "tasto anziche' aprire il menu."
 
-#: menu.c:1927
+#: menu.c:1957
 msgid "Set keyboard shortcuts"
 msgstr "Imposta scorciatoie"
 
@@ -1869,14 +1894,14 @@ msgstr ""
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "La tua vecchia scrivania e' stata convertita nel nuovo formato XML."
 
-#: pinboard.c:519
+#: pinboard.c:509
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
 
-#: pinboard.c:538
+#: pinboard.c:528
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -1885,36 +1910,36 @@ msgid ""
 "element, as described in ROX-Filer's manual."
 msgstr ""
 
-#: pinboard.c:555
+#: pinboard.c:545
 #, fuzzy
 msgid "Set backdrop"
 msgstr "Imposta icona"
 
-#: pinboard.c:564
+#: pinboard.c:554
 msgid "Display backdrop image:"
 msgstr ""
 
-#: pinboard.c:573
+#: pinboard.c:563
 #, fuzzy
 msgid "Centred"
 msgstr "Data"
 
-#: pinboard.c:579
+#: pinboard.c:569
 #, fuzzy
 msgid "Scaled"
 msgstr "Salva"
 
-#: pinboard.c:585
+#: pinboard.c:575
 #, fuzzy
 msgid "Tiled"
 msgstr "Tempi"
 
-#: pinboard.c:602
+#: pinboard.c:592
 #, fuzzy
 msgid "Drop an image here"
 msgstr "Trascina qui un'icona"
 
-#: pinboard.c:650
+#: pinboard.c:640
 #, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
@@ -1924,33 +1949,33 @@ msgstr ""
 "Dovresti trascinare qui una singola icona - quell'icona verra' usata per "
 "questo file da adesso in avanti."
 
-#: pinboard.c:660
+#: pinboard.c:650
 #, fuzzy, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
 msgstr "Non posso cancellare %s: %s"
 
-#: pinboard.c:691
+#: pinboard.c:681
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 
-#: pinboard.c:1125
+#: pinboard.c:1115
 msgid "Missing '>' in icon label"
 msgstr "Manca '>' nell'etichetta dell'icona"
 
-#: pinboard.c:1134
+#: pinboard.c:1124
 msgid "Missing ',' after icon label"
 msgstr "Manca ',' dopo l'etichetta dell'icona"
 
-#: pinboard.c:1214
+#: pinboard.c:1204
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Errore nel salvataggio della scrivania %s: %s"
 
-#: pinboard.c:1729
+#: pinboard.c:1719
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -1958,7 +1983,7 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1989
+#: pinboard.c:1979
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2056,6 +2081,12 @@ msgstr ""
 
 #: run.c:323
 msgid ""
+"Door:\n"
+"Doors are a little-used Solaris method for processes to communicate."
+msgstr ""
+
+#: run.c:329
+msgid ""
 "Unknown type:\n"
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
 "anymore or you don't have search permission on the directory it's in?"
@@ -2065,22 +2096,22 @@ msgstr ""
 "cancellato o che non vi siano i permessi di accesso alla directory che lo "
 "contiene."
 
-#: run.c:409
+#: run.c:415
 #, c-format
 msgid "Could not send data to program: %s"
 msgstr "Impossibile inviare dati al programma: %s"
 
-#: run.c:439
+#: run.c:445
 #, c-format
 msgid "Could not read link: %s"
 msgstr "Impossibile leggere il collegamento: %s"
 
-#: run.c:467
+#: run.c:473
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "Collegamento rotto (o non vi sono i permessi per seguirlo): %s"
 
-#: run.c:504
+#: run.c:510
 #, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
@@ -2091,7 +2122,7 @@ msgstr ""
 "puoi impostarne una (usando 'Imposta Azione' dal menu) oppure puoi "
 "trascinare il file su un'applicazione"
 
-#: run.c:528
+#: run.c:534
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2104,7 +2135,7 @@ msgstr ""
 "Shift mentre tenti di aprirla). Molte applicazioni forniscono qui il loro "
 "aiuto, ma questa no."
 
-#: run.c:534
+#: run.c:540
 msgid ""
 "Directory:\n"
 "This is a directory. It contains an index to other items - open it to see "
@@ -2117,126 +2148,149 @@ msgstr ""
 msgid "byte"
 msgstr ""
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close"
 msgstr "Chiudi"
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close filer window"
 msgstr "Chiudi la finestra del filer"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Up"
 msgstr "Su"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Change to parent directory"
 msgstr "Directory superiore"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Home"
 msgstr ""
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Change to home directory"
 msgstr "Vai alla Home Directory"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Scan"
 msgstr "Aggiorna"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Rescan directory contents"
 msgstr "Aggiorna la directory"
 
-#: tips:77 toolbar.c:124
+#: tips:77 toolbar.c:123
 msgid "Size"
 msgstr "Dimensioni"
 
-#: toolbar.c:124
+#: toolbar.c:123
 msgid "Change icon size"
 msgstr "Cambia le dim. delle icone"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Details"
 msgstr "Dettagli"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Show extra details"
 msgstr "Mostra dettagli extra"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Hidden"
 msgstr "Nascosti"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Show/hide hidden files"
 msgstr "Mostra/nascondi file nascosti"
 
-#: toolbar.c:136
+#: toolbar.c:135
 msgid "Show ROX-Filer help"
 msgstr "Mostra l'aiuto del ROX-Filer"
 
-#: toolbar.c:614
+#: toolbar.c:630
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u nascosti)"
 
-#: tips:31 toolbar.c:622
+#: tips:31 toolbar.c:638
 msgid "items"
 msgstr "elementi"
 
-#: toolbar.c:622
+#: toolbar.c:638
 msgid "item"
 msgstr "elemento"
 
-#: toolbar.c:625
+#: toolbar.c:641
 #, c-format
 msgid "No items%s"
 msgstr "Niente elementi%s"
 
-#: toolbar.c:641
+#: toolbar.c:657
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u selezionati (%s)"
 
-#: type.c:188
+#: type.c:194
 msgid "Sym link"
 msgstr "Collegamento"
 
-#: type.c:190
+#: type.c:196
 msgid "Mount point"
 msgstr "Punto di Mount"
 
-#: type.c:192
+#: type.c:198
 msgid "App dir"
 msgstr "Applicaz"
 
-#: type.c:199
+#: type.c:205
 msgid "Dir"
 msgstr ""
 
-#: type.c:201
+#: type.c:207
 msgid "Char dev"
 msgstr ""
 
-#: type.c:203
+#: type.c:209
 msgid "Block dev"
 msgstr ""
 
-#: type.c:205
+#: type.c:211
 msgid "Pipe"
 msgstr ""
 
-#: type.c:207
+#: type.c:213
 msgid "Socket"
 msgstr ""
 
-#: type.c:210
+#: type.c:215
+msgid "Door"
+msgstr ""
+
+#: type.c:218
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: type.c:443
+#: type.c:361
+#, c-format
+msgid ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the "
+"permissions now (this problem may have been caused by a bug in earlier "
+"versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who "
+"use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. "
+"Otherwise, you should check, or even just delete, all the existing run "
+"actions."
+msgstr ""
+
+#: type.c:374
+msgid "go-w (Fix security problem)"
+msgstr ""
+
+#: type.c:476
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2247,7 +2301,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:530
+#: type.c:579
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2255,53 +2309,53 @@ msgstr ""
 "Dovresti trascinare qui una applicazione - l'applicazione verra' usata in "
 "futuro per caricare questo tipo di files."
 
-#: type.c:557
+#: type.c:606
 msgid "This is not a program! Give me an application instead!"
 msgstr "Questa non e' un'applicazione. Dammi un'applicazione!"
 
-#: type.c:615
+#: type.c:664
 msgid "Execute file"
 msgstr ""
 
-#: type.c:620
+#: type.c:669
 msgid "No run action defined"
 msgstr "Nessuna azione definita"
 
-#: type.c:646
+#: type.c:695
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Errore nell'handler %s: %s"
 
-#: type.c:661
+#: type.c:710
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Applicazione non valida %s (AppRun errato)"
 
-#: type.c:672
+#: type.c:721
 #, c-format
 msgid "Non-executable %s"
 msgstr "Non-eseguibile %s"
 
-#: type.c:708
+#: type.c:757
 msgid "Set run action"
 msgstr "Imposta azione"
 
-#: type.c:710
+#: type.c:759
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Imposta predefinita per tutti `%s/<qualunque>'"
 
-#: type.c:716 usericons.c:284
+#: type.c:765 usericons.c:284
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Solo per il tipo `%s/%s'"
 
-#: type.c:744
+#: type.c:793
 #, c-format
 msgid "Currently %s"
 msgstr "Attualmente %s"
 
-#: type.c:758
+#: type.c:807
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2309,45 +2363,40 @@ msgstr ""
 "Trascina qui una\n"
 "applicazione adatta"
 
-#: type.c:765 usericons.c:363
+#: type.c:814 usericons.c:363
 msgid "OR"
 msgstr ""
 
-#: type.c:772
+#: type.c:821
 msgid "Enter a shell command:"
 msgstr "Inserisci un comando di shell:"
 
-#: type.c:842
+#: type.c:891
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr ""
 "Il salvataggio delle opzioni e' disabilitato dalla variabile CHOICESPATH"
 
-#: type.c:855
+#: type.c:904
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "Una azione esiste gia' - sei sicuro di volerla cancellare?"
 
-#: type.c:868
+#: type.c:917
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Non posso cancellare %s: %s"
 
-#: type.c:1116
+#: type.c:1163
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1134
-#, c-format
-msgid "Invalid type '%s' in '%s'"
-msgstr ""
-
-#: type.c:1274
+#: type.c:1254
 msgid ""
-"The standard MIME type database was not found. The filer will probably not "
-"show the correct types for different files. You should download and install "
-"the 'Common types package' from here:\n"
+"The standard MIME type database (version 0.8 or later) was not found. The "
+"filer will probably not show the correct types for different files. You "
+"should download and install the 'shared-mime-info-0.8' package from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
 
@@ -3344,18 +3393,32 @@ msgstr ""
 
 #: tips:237
 #, fuzzy
+msgid "Door:"
+msgstr "Vai a:"
+
+#: tips:238
+msgid ""
+"Door files are a bit like sockets or pipes, and have only been seen on "
+"Solaris."
+msgstr ""
+
+#: tips:239
+#, fuzzy
 msgid "Executable file:"
 msgstr "File eseguibile"
 
-#: tips:238
+#: tips:240
 #, fuzzy
 msgid "Application directory:"
 msgstr "Applicazione"
 
-#: tips:239
+#: tips:241
 #, fuzzy
 msgid "Unknown type:"
 msgstr "Tipo sconosciuto"
+
+#~ msgid "Show ROX-Filer Help"
+#~ msgstr "Mostra l'Aiuto"
 
 #~ msgid "Failed to create child process"
 #~ msgstr "Creazione del processo figlio fallita."

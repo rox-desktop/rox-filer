@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
-"POT-Creation-Date: 2002-06-22 13:58+0100\n"
+"POT-Creation-Date: 2002-07-25 14:05+0100\n"
 "PO-Revision-Date: 2002-03-26 21:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai_cheung@hotmail.com>\n"
 "Language-Team: none\n"
@@ -35,7 +35,7 @@ msgstr "不可确认操作"
 msgid "Name"
 msgstr "名称"
 
-#: abox.c:399 menu.c:231
+#: abox.c:399 menu.c:232
 msgid "Directory"
 msgstr "目录"
 
@@ -84,7 +84,8 @@ msgstr "简单测试"
 
 #: action.c:205
 msgid ""
-"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+"(types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
 "(permissions)\n"
 "IsEmpty, IsMine\n"
@@ -95,11 +96,11 @@ msgid ""
 "against the leafname only."
 msgstr ""
 
-#: action.c:218
+#: action.c:219
 msgid "Comparisons"
 msgstr "比较"
 
-#: action.c:220
+#: action.c:221
 msgid ""
 "<, <=, =, !=, >, >=, After, Before (compare two values)\n"
 "5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
@@ -107,26 +108,26 @@ msgid ""
 "atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)"
 msgstr ""
 
-#: action.c:229
+#: action.c:230
 msgid "Specials"
 msgstr "特别项目"
 
-#: action.c:231
+#: action.c:232
 msgid ""
 "system(command) (true if 'command' returns with a zero exit status; a % \n"
 "in 'command' is replaced with the path of the current file)\n"
 "prune (false, and prevents searching the contents of a directory)."
 msgstr ""
 
-#: action.c:244
+#: action.c:245
 msgid "See the ROX-Filer manual for full details."
 msgstr "详情请查看ROX-Filer的man档"
 
-#: action.c:273
+#: action.c:274
 msgid "Permissions command reference"
 msgstr "权限方式"
 
-#: action.c:279
+#: action.c:280
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -157,115 +158,115 @@ msgid ""
 "See the chmod(1) man page for full details."
 msgstr ""
 
-#: action.c:404
+#: action.c:405
 msgid "There was one error.\n"
 msgstr "发现错误.\n"
 
-#: action.c:406
+#: action.c:407
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "发现 %d 错误\n"
 
-#: action.c:431
+#: action.c:432
 msgid "ERROR reading"
 msgstr "错误读取"
 
-#: action.c:503 support.c:401
+#: action.c:504 support.c:401
 msgid "ERROR"
 msgstr "错误"
 
-#: action.c:649 main.c:570 main.c:578
+#: action.c:650 main.c:570 main.c:578
 msgid "Yes"
 msgstr "是"
 
-#: action.c:653 main.c:572
+#: action.c:654 main.c:572
 msgid "No"
 msgstr "否"
 
-#: action.c:797
+#: action.c:798
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?计算内容从 %s?"
 
-#: action.c:830
+#: action.c:831
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?删除 %s'%s'?"
 
-#: action.c:831
+#: action.c:832
 msgid "WRITE-PROTECTED "
 msgstr "防写入的"
 
-#: action.c:838
+#: action.c:839
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'正在删除 '%s'\n"
 
-#: action.c:853
+#: action.c:854
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'目录 '%s' 已删除\n"
 
-#: action.c:889 action.c:911
+#: action.c:890 action.c:912
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?检查 '%s'?"
 
-#: action.c:908
+#: action.c:909
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!非法的找寻设定-请更改后再尝试\n"
 
-#: action.c:919
+#: action.c:920
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(正当检查 '%s')\n"
 
-#: action.c:994 action.c:1025
+#: action.c:995 action.c:1026
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?改变 '%s' 的权限?"
 
-#: action.c:1001
+#: action.c:1002
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'正在改变 '%s' 的权限\n"
 
-#: action.c:1022
+#: action.c:1023
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!非法指令模式-请更改后再试\n"
 
-#: action.c:1116
+#: action.c:1117
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' 经已存在 - %s?"
 
-#: action.c:1117
+#: action.c:1118
 msgid "merge contents"
 msgstr "合拼内容"
 
-#: action.c:1117
+#: action.c:1118
 msgid "overwrite"
 msgstr "覆盖"
 
-#: action.c:1136
+#: action.c:1137
 msgid "'Trying copy anyway...\n"
 msgstr "'尝试硬复制..\n"
 
-#: action.c:1144
+#: action.c:1145
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?复制%s 为 %s?"
 
-#: action.c:1150
+#: action.c:1151
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'正在复制 %s 为 %s\n"
 
-#: action.c:1170
+#: action.c:1171
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!错误: 目标已存在，但不是一个目录\n"
 
-#: action.c:1250
+#: action.c:1251
 #, c-format
 msgid ""
 "!%s\n"
@@ -274,26 +275,26 @@ msgstr ""
 "!%s\n"
 "复制 '%s' 失败"
 
-#: action.c:1296
+#: action.c:1297
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' 档案已存在-覆盖?"
 
-#: action.c:1313
+#: action.c:1314
 msgid "'Trying move anyway...\n"
 msgstr "'尝试硬移动...\n"
 
-#: action.c:1320
+#: action.c:1321
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?移动 %s 为 %s?"
 
-#: action.c:1326
+#: action.c:1327
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'正在移动 %s 为 %s\n"
 
-#: action.c:1338
+#: action.c:1339
 #, c-format
 msgid ""
 "!%s\n"
@@ -302,45 +303,45 @@ msgstr ""
 "!%s\n"
 "移动 %s 到 %s 失败\n"
 
-#: action.c:1366
+#: action.c:1367
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!错误: 不能复制物件到本身内\n"
 
-#: action.c:1381
+#: action.c:1382
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!错误: 不能移动/改名物件到本身内\n"
 
-#: action.c:1398
+#: action.c:1399
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'连结 %s 为 %s\n"
 
-#: action.c:1405
+#: action.c:1406
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?连结 %s 为 %s?"
 
-#: action.c:1433
+#: action.c:1434
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'挂载 %s\n"
 
-#: action.c:1434
+#: action.c:1435
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'解除挂载 %s\n"
 
-#: action.c:1441
+#: action.c:1442
 #, fuzzy, c-format
 msgid "?Mount %s?"
 msgstr "?挂载%s?\n"
 
-#: action.c:1442
+#: action.c:1443
 #, fuzzy, c-format
 msgid "?Unmount %s?"
 msgstr "?解除挂载%s?\n"
 
-#: action.c:1452
+#: action.c:1453
 #, c-format
 msgid ""
 "!%s\n"
@@ -349,7 +350,7 @@ msgstr ""
 "!%s\n"
 "挂载失败\n"
 
-#: action.c:1453
+#: action.c:1454
 #, c-format
 msgid ""
 "!%s\n"
@@ -358,7 +359,7 @@ msgstr ""
 "!%s\n"
 "解除挂载失败\n"
 
-#: action.c:1499
+#: action.c:1500
 #, c-format
 msgid ""
 "'\n"
@@ -367,27 +368,27 @@ msgstr ""
 "'\n"
 "总数: %s("
 
-#: action.c:1506
+#: action.c:1507
 msgid "file"
 msgstr "档案"
 
-#: action.c:1506
+#: action.c:1507
 msgid "files"
 msgstr "档案"
 
-#: action.c:1513
+#: action.c:1514
 msgid "no directories)\n"
 msgstr "没有目录)\n"
 
-#: action.c:1518
+#: action.c:1519
 msgid "directory"
 msgstr "目录"
 
-#: action.c:1519
+#: action.c:1520
 msgid "directories"
 msgstr "目录"
 
-#: action.c:1548 action.c:1585 action.c:1612 action.c:1640 action.c:1657
+#: action.c:1549 action.c:1586 action.c:1613 action.c:1641 action.c:1658
 msgid ""
 "'\n"
 "Done\n"
@@ -395,149 +396,149 @@ msgstr ""
 "'\n"
 "完成\n"
 
-#: action.c:1549
+#: action.c:1550
 msgid "!No mount points selected!\n"
 msgstr "!没有挂载点被标记!\n"
 
-#: action.c:1605
+#: action.c:1606
 msgid "?Another search?"
 msgstr "?其他的搜寻?"
 
-#: action.c:1632
+#: action.c:1633
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' 是一符号连结\n"
 
-#: action.c:1670
+#: action.c:1671
 msgid "You need to select some items to search through"
 msgstr "你需要一些选项来帮助搜寻"
 
-#: action.c:1680 menu.c:223
+#: action.c:1681 menu.c:224
 msgid "Find"
 msgstr "找寻"
 
-#: action.c:1713
+#: action.c:1714
 msgid "You need to select some items to count"
 msgstr "你需要一些选项来帮助计算"
 
-#: action.c:1717 menu.c:221
+#: action.c:1718
 msgid "Disk Usage"
 msgstr "磁碟用量"
 
-#: action.c:1750
+#: action.c:1751
 msgid "Mount / Unmount"
 msgstr "挂载 / 解除挂载"
 
-#: action.c:1763
+#: action.c:1764
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer 对系统上的挂载点尚未支援"
 
-#: action.c:1777 action.c:2042 menu.c:220 tips:164 type.c:858
+#: action.c:1778 action.c:2053 menu.c:211 tips:164 type.c:907
 msgid "Delete"
 msgstr "删除"
 
-#: action.c:1787 tips:170
+#: action.c:1788 tips:170
 msgid "Force"
 msgstr "强制"
 
-#: action.c:1787
+#: action.c:1788
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "不可确认删除唯读的项目"
 
-#: action.c:1790 action.c:1839 tips:172
+#: action.c:1791 action.c:1846 tips:172
 msgid "Brief"
 msgstr "简洁"
 
-#: action.c:1790
+#: action.c:1791
 msgid "Only log directories being deleted"
 msgstr "祗记录已删除的目录"
 
-#: action.c:1806
+#: action.c:1808
 msgid "You need to select the items whose permissions you want to change"
 msgstr "你需选择更改权限的选项"
 
-#: action.c:1814
+#: action.c:1816
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (使之可执行/可被搜寻)"
 
-#: action.c:1816
+#: action.c:1818
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (使之不可执行/不可被搜寻)"
 
-#: action.c:1818
+#: action.c:1820
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (给拥有者写读的权限)"
 
-#: action.c:1820
+#: action.c:1822
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (私有化 - 只拥有者可访问)"
 
-#: action.c:1822
+#: action.c:1824
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u_w (共享访问，不可写入)"
 
-#: action.c:1829 menu.c:184 menu.c:190 menu.c:196 menu.c:222 tips:70
+#: action.c:1835 menu.c:183 menu.c:189 menu.c:195 menu.c:222 tips:70
 msgid "Permissions"
 msgstr "权限"
 
-#: action.c:1839
+#: action.c:1846
 msgid "Don't list processed files"
 msgstr "不列出已处理的档案"
 
-#: action.c:1842 tips:174
+#: action.c:1849 tips:174
 msgid "Recurse"
 msgstr "包含"
 
-#: action.c:1842
+#: action.c:1849
 msgid "Also change contents of subdirectories"
 msgstr "同时改变子目录的内容"
 
-#: action.c:1876 dnd.c:136 menu.c:1857 tips:158
+#: action.c:1887 dnd.c:137 menu.c:1887 tips:158
 msgid "Copy"
 msgstr "复制"
 
-#: action.c:1886 action.c:1919 tips:176
+#: action.c:1897 action.c:1930 tips:176
 #, fuzzy
 msgid "Newer"
 msgstr "新增"
 
-#: action.c:1887 action.c:1920 tips:177 tips:178 tips:179 tips:180
+#: action.c:1898 action.c:1931 tips:177 tips:178 tips:179 tips:180
 msgid "Only over-write if source is newer than destination."
 msgstr ""
 
-#: action.c:1909 dnd.c:137 tips:160
+#: action.c:1920 dnd.c:138 tips:160
 msgid "Move"
 msgstr "移动"
 
-#: action.c:1937 dnd.c:138 tips:162
+#: action.c:1948 dnd.c:139 tips:162
 msgid "Link"
 msgstr "连结"
 
-#: action.c:1996
+#: action.c:2007
 msgid "Deleting items such as "
 msgstr "删除项目为"
 
-#: action.c:2000
+#: action.c:2011
 msgid "Deleting the item "
 msgstr "删除中"
 
-#: action.c:2002
+#: action.c:2013
 msgid "Deleting the items "
 msgstr "删除中"
 
-#: action.c:2021
+#: action.c:2032
 msgid " and "
 msgstr " 及 "
 
-#: action.c:2030
+#: action.c:2041
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr "将影向面板上某些项目 - 真的删除?"
 
-#: action.c:2037
+#: action.c:2048
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr "将影向面板上某些项目 - 真的删除?"
 
-#: action.c:2042 filer.c:1313 infobox.c:90 menu.c:1648 panel.c:439 type.c:858
+#: action.c:2053 filer.c:1318 infobox.c:92 menu.c:1655 panel.c:439 type.c:907
 msgid "Cancel"
 msgstr "取消"
 
@@ -577,92 +578,92 @@ msgstr "不能打开目录: %s"
 msgid "lstat(2) failed: %s"
 msgstr ""
 
-#: dnd.c:140
+#: dnd.c:141
 msgid "Set Icon"
 msgstr "设定图示"
 
-#: dnd.c:247
+#: dnd.c:248
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "开启 文字/连结 档时发生错误"
 
-#: dnd.c:420
+#: dnd.c:421
 msgid "Internal error - bad info type"
 msgstr "内部错误 - 信息已损坏"
 
-#: dnd.c:690
+#: dnd.c:691
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "XDS 协定错误: 名称不存在'/'\n"
 
-#: dnd.c:715
+#: dnd.c:716
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
 
-#: dnd.c:726
+#: dnd.c:727
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
 
-#: dnd.c:729
+#: dnd.c:730
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 
-#: dnd.c:828
+#: dnd.c:829
 msgid "Unknown target"
 msgstr "不明目标"
 
-#: dnd.c:861
+#: dnd.c:862
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr ""
 
-#: dnd.c:874
+#: dnd.c:875
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr "XDS错误,回传码必须为'S','F'或'E'\n"
 
-#: dnd.c:907
+#: dnd.c:908
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 
-#: dnd.c:923
+#: dnd.c:924
 msgid "UntitledData"
 msgstr "未命名资料"
 
-#: dnd.c:950
+#: dnd.c:951
 #, c-format
 msgid "Error saving file: %s"
 msgstr "储存: %s 时发生错误"
 
-#: dnd.c:981
+#: dnd.c:982
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr ""
 
-#: dnd.c:1005
+#: dnd.c:1006
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 
-#: dnd.c:1027
+#: dnd.c:1028
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 
-#: dnd.c:1034
+#: dnd.c:1035
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
 msgstr ""
 
-#: dnd.c:1047
+#: dnd.c:1048
 msgid "Unknown action requested"
 msgstr "不明的执行要求"
 
-#: dnd.c:1057
+#: dnd.c:1058
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "错误的档案列表: %s"
 
-#: dnd.c:1087
+#: dnd.c:1088
 msgid "You can't use multiple files with Set Icon!"
 msgstr "不能同时对多种档案设定图示！"
 
@@ -670,246 +671,252 @@ msgstr "不能同时对多种档案设定图示！"
 msgid "Directory missing/deleted"
 msgstr "目录已删除/或不存在"
 
-#: filer.c:841
-#, c-format
+#: filer.c:845
+#, fuzzy, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
-"Press %s on its own to reselect the files later."
+"Press %s on its own to reselect the files later.\n"
+"Make sure NumLock is on if you use the keypad."
 msgstr ""
 "组别 %s 尚未设定。先选择某些档案再按键 Ctrl+%s 来设定组别 按键 %s 后完成可再"
 "重选其他档案 "
 
-#: filer.c:1025
+#: filer.c:1030
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "'目录 '%s' 不能被访问"
 
-#: filer.c:1162
+#: filer.c:1167
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "'找不到目录 '%s' "
 
-#: filer.c:1548
+#: filer.c:1553
 msgid "S"
 msgstr ""
 
-#: filer.c:1549
+#: filer.c:1554
 msgid "A"
 msgstr ""
 
-#: filer.c:1550
+#: filer.c:1555
 msgid "T"
 msgstr ""
 
-#: filer.c:1556
+#: filer.c:1561
 msgid "Scanning, "
 msgstr "从新检视中, "
 
-#: filer.c:1557
+#: filer.c:1562
 msgid "All, "
 msgstr "全部, "
 
-#: filer.c:1558
+#: filer.c:1563
 msgid "Thumbs, "
 msgstr "缩图启动, "
 
-#: filer.c:1842
+#: filer.c:1847
 msgid "Symbolic link to "
 msgstr "符号连结予"
 
-#: filer.c:1873
+#: filer.c:1878
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
-#: find.c:485
+#: find.c:488
 msgid "And"
 msgstr "及"
 
-#: find.c:509
+#: find.c:512
 msgid "Not"
 msgstr "否"
 
-#: find.c:552
+#: find.c:555
 msgid "system"
 msgstr "系统"
 
-#: find.c:560
+#: find.c:563
 msgid "prune"
 msgstr ""
 
-#: find.c:648
+#: find.c:651
 msgid "After"
 msgstr "之后"
 
-#: find.c:650
+#: find.c:653
 msgid "Before"
 msgstr "之前"
 
-#: find.c:744
+#: find.c:748
 msgid "IsReg"
 msgstr "列出常规档"
 
-#: find.c:746
+#: find.c:750
 msgid "IsLink"
 msgstr "列出连结档"
 
-#: find.c:748
+#: find.c:752
 msgid "IsDir"
 msgstr "列出目录"
 
-#: find.c:750
+#: find.c:754
 msgid "IsChar"
 msgstr "列出Char"
 
-#: find.c:752
+#: find.c:756
 msgid "IsBlock"
 msgstr "列出区块档"
 
-#: find.c:754
+#: find.c:758
 msgid "IsDev"
 msgstr "列出装置档"
 
-#: find.c:756
+#: find.c:760
 msgid "IsPipe"
 msgstr "列出管道"
 
-#: find.c:758
+#: find.c:762
 msgid "IsSocket"
 msgstr "列出Socket"
 
-#: find.c:760
+#: find.c:764
+#, fuzzy
+msgid "IsDoor"
+msgstr "列出目录"
+
+#: find.c:766
 msgid "IsSUID"
 msgstr "列出SUID"
 
-#: find.c:762
+#: find.c:768
 msgid "IsSGID"
 msgstr "列出SGID"
 
-#: find.c:764
+#: find.c:770
 msgid "IsSticky"
 msgstr "列出Sticky"
 
-#: find.c:766
+#: find.c:772
 msgid "IsReadable"
 msgstr "列出可读档"
 
-#: find.c:768
+#: find.c:774
 msgid "IsWriteable"
 msgstr "列出可写入档"
 
-#: find.c:770
+#: find.c:776
 msgid "IsExecutable"
 msgstr "列出可执行档"
 
-#: find.c:772
+#: find.c:778
 msgid "IsEmpty"
 msgstr "列出空档"
 
-#: find.c:774
+#: find.c:780
 msgid "IsMine"
 msgstr "列出Mine"
 
-#: find.c:902
+#: find.c:908
 msgid "Now"
 msgstr "现在"
 
-#: find.c:915
+#: find.c:921
 msgid "Byte"
 msgstr ""
 
-#: find.c:915
+#: find.c:921
 msgid "Bytes"
 msgstr ""
 
-#: find.c:923
+#: find.c:929
 msgid "Sec"
 msgstr "秒"
 
-#: find.c:923
+#: find.c:929
 msgid "Secs"
 msgstr "秒"
 
-#: find.c:925
+#: find.c:931
 msgid "Min"
 msgstr "分"
 
-#: find.c:925
+#: find.c:931
 msgid "Mins"
 msgstr "分"
 
-#: find.c:927
+#: find.c:933
 msgid "Hour"
 msgstr "小时"
 
-#: find.c:927
+#: find.c:933
 msgid "Hours"
 msgstr "小时"
 
-#: find.c:929
+#: find.c:935
 msgid "Day"
 msgstr "日"
 
-#: find.c:929
+#: find.c:935
 msgid "Days"
 msgstr "日"
 
-#: find.c:931
+#: find.c:937
 msgid "Week"
 msgstr "星期"
 
-#: find.c:931
+#: find.c:937
 msgid "Weeks"
 msgstr "星期"
 
-#: find.c:933
+#: find.c:939
 msgid "Year"
 msgstr "年"
 
-#: find.c:933
+#: find.c:939
 msgid "Years"
 msgstr "年"
 
-#: find.c:942
+#: find.c:948
 msgid "Ago"
 msgstr "之后"
 
-#: find.c:944
+#: find.c:950
 msgid "Hence"
 msgstr ""
 
-#: find.c:959
+#: find.c:965
 msgid "atime"
 msgstr ""
 
-#: find.c:961
+#: find.c:967
 msgid "ctime"
 msgstr ""
 
-#: find.c:963
+#: find.c:969
 msgid "mtime"
 msgstr ""
 
-#: find.c:965
+#: find.c:971
 msgid "size"
 msgstr "大小"
 
-#: find.c:967
+#: find.c:973
 msgid "inode"
 msgstr ""
 
-#: find.c:969
+#: find.c:975
 msgid "nlinks"
 msgstr ""
 
-#: find.c:971
+#: find.c:977
 msgid "uid"
 msgstr ""
 
-#: find.c:973
+#: find.c:979
 msgid "gid"
 msgstr ""
 
-#: find.c:975
+#: find.c:981
 msgid "blocks"
 msgstr ""
 
@@ -975,188 +982,206 @@ msgstr "请重新启动ROX-Filer,新的语言设定才会生效"
 msgid "ROX-Filer"
 msgstr ""
 
-#: icon.c:110 icon.c:115 menu.c:213 toolbar.c:136
-msgid "Help"
-msgstr "说明"
+#: icon.c:110 menu.c:250
+msgid "About ROX-Filer..."
+msgstr ""
 
-#: icon.c:111 menu.c:229
+#: icon.c:111 menu.c:251
+#, fuzzy
+msgid "Show Help Files"
+msgstr "显示隐藏档"
+
+#: icon.c:112 menu.c:252
+msgid "Manual"
+msgstr ""
+
+#: icon.c:114 menu.c:230
 msgid "Options..."
 msgstr "选项..."
 
-#: icon.c:112 menu.c:237
+#: icon.c:115 menu.c:238
 msgid "Home Directory"
 msgstr "家目录"
 
-#: icon.c:113 icon.c:707 menu.c:208 type.c:197
+#: icon.c:116 icon.c:710 menu.c:207 type.c:203
 msgid "File"
 msgstr "档案"
 
-#: icon.c:114 menu.c:212 menu.c:856
+#: icon.c:117 menu.c:214 menu.c:863
 msgid "Shift Open"
 msgstr "以新窗口开启"
 
-#: icon.c:116 menu.c:214
+#: icon.c:118 menu.c:213 menu.c:249 toolbar.c:135
+msgid "Help"
+msgstr "说明"
+
+#: icon.c:119 menu.c:220
 msgid "Info"
 msgstr "信息"
 
-#: icon.c:117 menu.c:215
+#: icon.c:120 menu.c:218
 msgid "Set Run Action..."
 msgstr "设定执行档"
 
-#: icon.c:118 menu.c:216
+#: icon.c:121 menu.c:219
 msgid "Set Icon..."
 msgstr "设定图示"
 
-#: icon.c:119 icon.c:604
+#: icon.c:122 icon.c:607
 msgid "Edit Item"
 msgstr "编辑项目"
 
-#: icon.c:120
+#: icon.c:123
 msgid "Show Location"
 msgstr "显示位址"
 
-#: icon.c:121
+#: icon.c:124
 msgid "Remove Item(s)"
 msgstr "移除项目"
 
-#: icon.c:123
+#: icon.c:126
 msgid "Backdrop..."
 msgstr ""
 
-#: icon.c:248
+#: icon.c:251
 msgid "Nothing"
 msgstr "空的"
 
-#: icon.c:450
+#: icon.c:453
 msgid "The location must contain at least one character!"
 msgstr "位址名称最少要包含一个字元"
 
-#: icon.c:521
+#: icon.c:524
 msgid "You must first select some items to remove"
 msgstr "请先选择项目以删除"
 
-#: icon.c:535
+#: icon.c:538
 msgid "You must open the menu over an item"
 msgstr "请在项目上开启选单"
 
-#: icon.c:563 menu.c:1172
+#: icon.c:566 menu.c:1179
 msgid "You can only set the run action for a regular file"
 msgstr "只可对常规档案设定开启的程式"
 
-#: icon.c:607
+#: icon.c:610
 msgid "Clicking the icon opens:"
 msgstr "单击图示以开启:"
 
-#: icon.c:620
+#: icon.c:623
 msgid "The text displayed under the icon is:"
 msgstr "图示的文字信息为:"
 
-#: infobox.c:88
+#: infobox.c:90
 #, c-format
 msgid "Are you sure you want to open %d windows?"
 msgstr ""
 
-#: infobox.c:89
+#: infobox.c:91
 #, fuzzy
 msgid "File Information"
 msgstr "ROX-Filer 选项"
 
-#: infobox.c:90
+#: infobox.c:92
 #, fuzzy
 msgid "Show Info"
 msgstr "信息"
 
-#: infobox.c:267
+#: infobox.c:212
+#, fuzzy
+msgid "Show _Help Files"
+msgstr "显示隐藏档"
+
+#: infobox.c:316
 msgid "Name:"
 msgstr "名称"
 
-#: infobox.c:271 tips:232
+#: infobox.c:320 tips:232
 msgid "Error:"
 msgstr "错误"
 
-#: infobox.c:278
+#: infobox.c:327
 #, fuzzy
 msgid "Real directory:"
 msgstr "目录"
 
-#: infobox.c:286
+#: infobox.c:335
 msgid "Owner, Group:"
 msgstr "拥有者，组别:"
 
-#: infobox.c:292 support.c:271 support.c:351
+#: infobox.c:341 support.c:271 support.c:351
 msgid "bytes"
 msgstr ""
 
-#: infobox.c:299
+#: infobox.c:348
 msgid "Size:"
 msgstr "大小"
 
-#: infobox.c:302
+#: infobox.c:351
 msgid "Change time:"
 msgstr "改变时间"
 
-#: infobox.c:306
+#: infobox.c:355
 msgid "Modify time:"
 msgstr "被更改时间"
 
-#: infobox.c:310
+#: infobox.c:359
 msgid "Access time:"
 msgstr "被访问时间"
 
-#: infobox.c:315
+#: infobox.c:364
 msgid "Permissions:"
 msgstr "权限"
 
-#: infobox.c:318
+#: infobox.c:367
 msgid "Type:"
 msgstr "类型"
 
-#: infobox.c:324
+#: infobox.c:373
 msgid "Run action:"
 msgstr "执行程序"
 
-#: infobox.c:362
+#: infobox.c:423
 msgid "file(1) says..."
 msgstr "档案(1) 显示..."
 
-#: infobox.c:363
+#: infobox.c:424
 msgid "<nothing yet>"
 msgstr "<还是空的>"
 
-#: infobox.c:434
+#: infobox.c:495
 #, c-format
 msgid "file(1) says... %s"
 msgstr "档案(1) 显示...%s"
 
-#: infobox.c:474
+#: infobox.c:535
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "符号连结 %s"
 
-#: infobox.c:480
+#: infobox.c:541
 msgid "Symbolic link"
 msgstr "是一符号连结"
 
-#: infobox.c:484
+#: infobox.c:545
 msgid "ROX application"
 msgstr "ROX 程式"
 
-#: infobox.c:492
+#: infobox.c:553
 #, fuzzy
 msgid "mounted"
 msgstr "解除挂载%"
 
-#: infobox.c:492
+#: infobox.c:553
 #, fuzzy
 msgid "unmounted"
 msgstr "解除挂载%"
 
-#: infobox.c:496
+#: infobox.c:557
 #, fuzzy, c-format
 msgid "Mount point for %s (%s)"
 msgstr "挂载点"
 
-#: infobox.c:498
+#: infobox.c:559
 #, fuzzy, c-format
 msgid "Mount point (%s)"
 msgstr "挂载点"
@@ -1240,214 +1265,215 @@ msgstr ""
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
-#: menu.c:177 tips:44
+#: menu.c:176 tips:44
 msgid "Display"
 msgstr "显示"
 
-#: menu.c:178 tips:63
+#: menu.c:177 tips:63
 msgid "Huge Icons"
 msgstr "巨图示"
 
-#: menu.c:179 tips:64 tips:207
+#: menu.c:178 tips:64 tips:207
 msgid "Large Icons"
 msgstr "大图示"
 
-#: menu.c:180 tips:65 tips:206
+#: menu.c:179 tips:65 tips:206
 msgid "Small Icons"
 msgstr "小图示"
 
-#: menu.c:181
+#: menu.c:180
 msgid "Huge, With..."
 msgstr "巨图示，并显示..."
 
-#: menu.c:182 menu.c:188 menu.c:194 tips:68
+#: menu.c:181 menu.c:187 menu.c:193 tips:68
 msgid "Summary"
 msgstr "详细"
 
-#: menu.c:183 menu.c:189 menu.c:195 tips:69
+#: menu.c:182 menu.c:188 menu.c:194 tips:69
 msgid "Sizes"
 msgstr "大小"
 
-#: menu.c:185 menu.c:191 menu.c:197 tips:71 tips:75
+#: menu.c:184 menu.c:190 menu.c:196 tips:71 tips:75
 msgid "Type"
 msgstr "类型"
 
-#: menu.c:186 menu.c:192 menu.c:198 tips:72
+#: menu.c:185 menu.c:191 menu.c:197 tips:72
 msgid "Times"
 msgstr "次数"
 
-#: menu.c:187
+#: menu.c:186
 msgid "Large, With..."
 msgstr "大图示，并显示..."
 
-#: menu.c:193
+#: menu.c:192
 msgid "Small, With..."
 msgstr "小图示，并显示..."
 
-#: menu.c:200
+#: menu.c:199
 msgid "Sort by Name"
 msgstr "以名称排序"
 
-#: menu.c:201
+#: menu.c:200
 msgid "Sort by Type"
 msgstr "以类型排序"
 
-#: menu.c:202
+#: menu.c:201
 msgid "Sort by Date"
 msgstr "以日期排序"
 
-#: menu.c:203
+#: menu.c:202
 msgid "Sort by Size"
 msgstr "以大小排序"
 
-#: menu.c:205
+#: menu.c:204
 msgid "Show Hidden"
 msgstr "显示隐藏档"
 
-#: menu.c:206
+#: menu.c:205
 msgid "Show Thumbnails"
 msgstr "显示缩图"
 
-#: menu.c:207
+#: menu.c:206
 msgid "Refresh"
 msgstr "更新"
 
-#: menu.c:209
+#: menu.c:208
 msgid "Copy..."
 msgstr "复制..."
 
-#: menu.c:210
+#: menu.c:209
 msgid "Rename..."
 msgstr "改名..."
 
-#: menu.c:211
+#: menu.c:210
 msgid "Link..."
 msgstr "连结..."
 
-#: menu.c:217
+#: menu.c:215
 msgid "Open AVFS"
 msgstr "开启AVFS"
 
-#: menu.c:219
+#: menu.c:216
 msgid "Send To..."
 msgstr "传送至..."
 
-#: menu.c:224
+#: menu.c:221
+#, fuzzy
+msgid "Count"
+msgstr "挂载"
+
+#: menu.c:225
 msgid "Select"
 msgstr "选择"
 
-#: menu.c:225
+#: menu.c:226
 msgid "Select All"
 msgstr "全选"
 
-#: menu.c:226
+#: menu.c:227
 msgid "Clear Selection"
 msgstr "取消选择"
 
-#: menu.c:227
+#: menu.c:228
 msgid "Invert Selection"
 msgstr "反向选择"
 
-#: menu.c:228
+#: menu.c:229
 msgid "Select If..."
 msgstr "挑选"
 
-#: menu.c:230
+#: menu.c:231
 msgid "New"
 msgstr "新增"
 
-#: menu.c:232
+#: menu.c:233
 msgid "Blank file"
 msgstr "空档案"
 
-#: menu.c:233 tasklist.c:268
+#: menu.c:234 tasklist.c:269
 msgid "Window"
 msgstr "窗口"
 
-#: menu.c:234
+#: menu.c:235
 msgid "Parent, New Window"
 msgstr "上层，新窗口"
 
-#: menu.c:235
+#: menu.c:236
 msgid "Parent, Same Window"
 msgstr "上层，窗口"
 
-#: menu.c:236
+#: menu.c:237
 msgid "New Window"
 msgstr "新窗口"
 
-#: menu.c:238
+#: menu.c:239
 #, fuzzy
 msgid "Follow Symbolic Links"
 msgstr "是一符号连结"
 
-#: menu.c:239
+#: menu.c:240
 msgid "Resize Window"
 msgstr "调整窗口大小"
 
-#: menu.c:242
+#: menu.c:243
 msgid "Close Window"
 msgstr "关闭窗口"
 
-#: menu.c:244
+#: menu.c:245
 msgid "Enter Path..."
 msgstr "输入路径"
 
-#: menu.c:245
+#: menu.c:246
 msgid "Shell Command..."
 msgstr "命令环境"
 
-#: menu.c:246
+#: menu.c:247
 msgid "Xterm Here"
 msgstr "终端机"
 
-#: menu.c:247
+#: menu.c:248
 msgid "Switch to xterm"
 msgstr ""
 
-#: menu.c:249
-msgid "Show ROX-Filer Help"
-msgstr "显示ROX-Filer说明"
-
-#: menu.c:714
+#: menu.c:719
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "你可用滑鼠在档案上点击选单,并同时按下Shift键.开启`传送至'功能"
 
-#: menu.c:744
+#: menu.c:749
 msgid "Next Click"
 msgstr "进阶"
 
-#: menu.c:763
+#: menu.c:768
 #, c-format
 msgid "%d items"
 msgstr "%d 项目"
 
-#: menu.c:843
+#: menu.c:850
 msgid "Unmount"
 msgstr "解除挂载%"
 
-#: menu.c:845 tips:166
+#: menu.c:852 tips:166
 msgid "Mount"
 msgstr "挂载"
 
-#: menu.c:848
+#: menu.c:855
 msgid "Show Target"
 msgstr "显示目标"
 
-#: menu.c:850
+#: menu.c:857
 msgid "Look Inside"
 msgstr "察看内部"
 
-#: menu.c:852
+#: menu.c:859
 msgid "Open As Text"
 msgstr "以文字模式开启"
 
-#: menu.c:988
+#: menu.c:995
 #, fuzzy
 msgid "_Relative link"
 msgstr "相关连结"
 
-#: menu.c:994
+#: menu.c:1001
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1455,43 +1481,43 @@ msgid ""
 "may move but the target will stay put."
 msgstr ""
 
-#: menu.c:1061
+#: menu.c:1068
 msgid "New pathname is not absolute"
 msgstr "新的路径名称属不绝对"
 
-#: menu.c:1126
+#: menu.c:1133
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr ""
 
-#: menu.c:1132
+#: menu.c:1139
 msgid "_Replace"
 msgstr ""
 
-#: menu.c:1256 menu.c:1296 menu.c:1356
+#: menu.c:1263 menu.c:1303 menu.c:1363
 #, fuzzy
 msgid "Create"
 msgstr "日期"
 
-#: menu.c:1257
+#: menu.c:1264
 msgid "NewDir"
 msgstr "新目录"
 
-#: menu.c:1270 menu.c:1276
+#: menu.c:1277 menu.c:1283
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "错误创建 '%s': %s"
 
-#: menu.c:1297
+#: menu.c:1304
 msgid "NewFile"
 msgstr "新档案"
 
-#: menu.c:1315
+#: menu.c:1322
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "错误创建档案: 找不到样板予 %s"
 
-#: menu.c:1386
+#: menu.c:1393
 #, fuzzy, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1514,25 +1540,25 @@ msgstr ""
 "%s\n"
 "这'传送至'功能,可用滑鼠和Shift+Menu来快速开启."
 
-#: menu.c:1397
+#: menu.c:1404
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr "请将适用的程式以符号连结 (Ctrl+Shift并 拖放)到'传送至'的目录内."
 
-#: menu.c:1400
+#: menu.c:1407
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr ""
 
-#: menu.c:1477
+#: menu.c:1484
 msgid "Customise"
 msgstr "自定"
 
-#: menu.c:1537
+#: menu.c:1544
 msgid "This is already the canonical name for this directory."
 msgstr ""
 
-#: menu.c:1568
+#: menu.c:1575
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1540,100 +1566,100 @@ msgstr ""
 "你不能对此目录开启第二个窗口,因为你已在选项->Filer窗口内惕选了`唯一的窗口'的"
 "功能."
 
-#: menu.c:1597
+#: menu.c:1604
 #, c-format
 msgid "fork: %s"
 msgstr "分枝: %s"
 
-#: menu.c:1612
+#: menu.c:1619
 msgid "New window, as user..."
 msgstr "新窗口,以用户..."
 
-#: menu.c:1620
+#: menu.c:1627
 msgid "Browse as which user?"
 msgstr "以何种用户身份来浏览?"
 
-#: menu.c:1627
+#: menu.c:1634
 msgid "User:"
 msgstr "用户"
 
-#: menu.c:1641
+#: menu.c:1648
 msgid "OK"
 msgstr "确定"
 
-#: menu.c:1749
+#: menu.c:1779
 msgid "Copy ... ?"
 msgstr "复制...?"
 
-#: menu.c:1752
+#: menu.c:1782
 msgid "Rename ... ?"
 msgstr "改名为...?"
 
-#: menu.c:1755
+#: menu.c:1785
 msgid "Symlink ... ?"
 msgstr "符号连结...?"
 
-#: menu.c:1758
+#: menu.c:1788
 msgid "Shift Open ... ?"
 msgstr "新窗口开启...?"
 
-#: menu.c:1761
+#: menu.c:1791
 msgid "Help about ... ?"
 msgstr "说明关于...?"
 
-#: menu.c:1764
+#: menu.c:1794
 msgid "Examine ... ?"
 msgstr "检查...?"
 
-#: menu.c:1767
+#: menu.c:1797
 msgid "Set run action for ... ?"
 msgstr "设定执行程式予... ?"
 
-#: menu.c:1770
+#: menu.c:1800
 msgid "Set icon for ... ?"
 msgstr "设定图示予...?"
 
-#: menu.c:1773
+#: menu.c:1803
 msgid "Send ... to ... ?"
 msgstr "传送...至...?"
 
-#: menu.c:1776
+#: menu.c:1806
 msgid "DELETE ... ?"
 msgstr "移除...?"
 
-#: menu.c:1779
+#: menu.c:1809
 msgid "Count the size of ... ?"
 msgstr "计算容量从 ...?"
 
-#: menu.c:1782
+#: menu.c:1812
 msgid "Set permissions on ... ?"
 msgstr "改变权限予...?"
 
-#: menu.c:1785
+#: menu.c:1815
 msgid "Search inside ... ?"
 msgstr "搜索内部...?"
 
-#: menu.c:1788
+#: menu.c:1818
 msgid "Look inside ... ?"
 msgstr "察看内部...?"
 
-#: menu.c:1834
+#: menu.c:1864
 msgid "You cannot do this to more than one item at a time"
 msgstr "不可同时以此方式处理多个项目"
 
-#: menu.c:1847 view_collection.c:914
+#: menu.c:1877 view_collection.c:921
 msgid "Item no longer exists!"
 msgstr "项目已不存在!"
 
-#: menu.c:1861
+#: menu.c:1891
 msgid "Rename"
 msgstr "改名"
 
-#: menu.c:1865
+#: menu.c:1895
 msgid "Symlink"
 msgstr "符号连结"
 
-#: menu.c:1901
+#: menu.c:1931
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1643,7 +1669,7 @@ msgid ""
 "\tgtk-can-change-accels = 1"
 msgstr ""
 
-#: menu.c:1911
+#: menu.c:1941
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1663,7 +1689,7 @@ msgstr ""
 "对应的热键会出现在选单的某个项目上，而日后你想开启这项目． 祗须按下热键而不需"
 "先开启选单."
 
-#: menu.c:1927
+#: menu.c:1957
 msgid "Set keyboard shortcuts"
 msgstr "设定热键"
 
@@ -1778,14 +1804,14 @@ msgstr ""
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "你的旧桌板资信档已转为新的XML格式."
 
-#: pinboard.c:519
+#: pinboard.c:509
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
 
-#: pinboard.c:538
+#: pinboard.c:528
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -1794,36 +1820,36 @@ msgid ""
 "element, as described in ROX-Filer's manual."
 msgstr ""
 
-#: pinboard.c:555
+#: pinboard.c:545
 #, fuzzy
 msgid "Set backdrop"
 msgstr "设定图示"
 
-#: pinboard.c:564
+#: pinboard.c:554
 msgid "Display backdrop image:"
 msgstr ""
 
-#: pinboard.c:573
+#: pinboard.c:563
 #, fuzzy
 msgid "Centred"
 msgstr "日期"
 
-#: pinboard.c:579
+#: pinboard.c:569
 #, fuzzy
 msgid "Scaled"
 msgstr "储存"
 
-#: pinboard.c:585
+#: pinboard.c:575
 #, fuzzy
 msgid "Tiled"
 msgstr "档案"
 
-#: pinboard.c:602
+#: pinboard.c:592
 #, fuzzy
 msgid "Drop an image here"
 msgstr "拖放图示档到此处"
 
-#: pinboard.c:650
+#: pinboard.c:640
 #, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
@@ -1831,33 +1857,33 @@ msgid ""
 "applications onto this box."
 msgstr "你必须拖放一个图示档案至拖放栏内 - 此图示将 被应用到你选择的项目上."
 
-#: pinboard.c:660
+#: pinboard.c:650
 #, fuzzy, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
 msgstr "不能移除 $s: %s"
 
-#: pinboard.c:691
+#: pinboard.c:681
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 
-#: pinboard.c:1125
+#: pinboard.c:1115
 msgid "Missing '>' in icon label"
 msgstr "没有 '>' 在图示标签内"
 
-#: pinboard.c:1134
+#: pinboard.c:1124
 msgid "Missing ',' after icon label"
 msgstr "没有 ',' 在图示标签后"
 
-#: pinboard.c:1214
+#: pinboard.c:1204
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "错误储存桌板 %s: %s"
 
-#: pinboard.c:1729
+#: pinboard.c:1719
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -1865,7 +1891,7 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1989
+#: pinboard.c:1979
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -1958,6 +1984,12 @@ msgstr ""
 
 #: run.c:323
 msgid ""
+"Door:\n"
+"Doors are a little-used Solaris method for processes to communicate."
+msgstr ""
+
+#: run.c:329
+msgid ""
 "Unknown type:\n"
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
 "anymore or you don't have search permission on the directory it's in?"
@@ -1965,22 +1997,22 @@ msgstr ""
 "不明的类型:\n"
 "档案的类型不明或档案已不存在.亦可能是权限设定问题."
 
-#: run.c:409
+#: run.c:415
 #, c-format
 msgid "Could not send data to program: %s"
 msgstr "不能传送资料到: %s"
 
-#: run.c:439
+#: run.c:445
 #, c-format
 msgid "Could not read link: %s"
 msgstr "不能读取连结档: %s"
 
-#: run.c:467
+#: run.c:473
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "无效的连结档 (或权限问题): %s"
 
-#: run.c:504
+#: run.c:510
 #, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
@@ -1990,7 +2022,7 @@ msgstr ""
 "没有标记的执行动作对应此档案 (%s/%s) - 你可在选单中的 `设定执行档' 设入程式,"
 "或将此档案拖放到指定的程式上."
 
-#: run.c:528
+#: run.c:534
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2001,7 +2033,7 @@ msgstr ""
 "这是一个执行程式的目录 - 你可执行或开启它(开启时按下Shift键).但此程式并没有说"
 "明档."
 
-#: run.c:534
+#: run.c:540
 msgid ""
 "Directory:\n"
 "This is a directory. It contains an index to other items - open it to see "
@@ -2014,126 +2046,149 @@ msgstr ""
 msgid "byte"
 msgstr "byte"
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close"
 msgstr "关闭"
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close filer window"
 msgstr "关闭窗口"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Up"
 msgstr "往上"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Change to parent directory"
 msgstr "到根目录"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Home"
 msgstr "家目录"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Change to home directory"
 msgstr "移至家目录"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Scan"
 msgstr "检视"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Rescan directory contents"
 msgstr "重新检视内容"
 
-#: tips:77 toolbar.c:124
+#: tips:77 toolbar.c:123
 msgid "Size"
 msgstr "大小"
 
-#: toolbar.c:124
+#: toolbar.c:123
 msgid "Change icon size"
 msgstr "改变图示大小"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Details"
 msgstr "详述"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Show extra details"
 msgstr "更详述"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Hidden"
 msgstr "隐藏"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Show/hide hidden files"
 msgstr "显示/或隐藏隐藏档"
 
-#: toolbar.c:136
+#: toolbar.c:135
 msgid "Show ROX-Filer help"
 msgstr "显示ROX-Filer说明"
 
-#: toolbar.c:614
+#: toolbar.c:630
 #, c-format
 msgid " (%u hidden)"
 msgstr "(%u 隐藏)"
 
-#: tips:31 toolbar.c:622
+#: tips:31 toolbar.c:638
 msgid "items"
 msgstr "项目"
 
-#: toolbar.c:622
+#: toolbar.c:638
 msgid "item"
 msgstr "项目"
 
-#: toolbar.c:625
+#: toolbar.c:641
 #, c-format
 msgid "No items%s"
 msgstr "没有项目%s"
 
-#: toolbar.c:641
+#: toolbar.c:657
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u 已选择 (%s)"
 
-#: type.c:188
+#: type.c:194
 msgid "Sym link"
 msgstr "符号连结"
 
-#: type.c:190
+#: type.c:196
 msgid "Mount point"
 msgstr "挂载点"
 
-#: type.c:192
+#: type.c:198
 msgid "App dir"
 msgstr "程序目录"
 
-#: type.c:199
+#: type.c:205
 msgid "Dir"
 msgstr "目录"
 
-#: type.c:201
+#: type.c:207
 msgid "Char dev"
 msgstr "字符装置"
 
-#: type.c:203
+#: type.c:209
 msgid "Block dev"
 msgstr "区块装置"
 
-#: type.c:205
+#: type.c:211
 msgid "Pipe"
 msgstr "管道"
 
-#: type.c:207
+#: type.c:213
 msgid "Socket"
 msgstr "套节"
 
-#: type.c:210
+#: type.c:215
+msgid "Door"
+msgstr ""
+
+#: type.c:218
 msgid "Unknown"
 msgstr "不明的"
 
-#: type.c:443
+#: type.c:361
+#, c-format
+msgid ""
+"Executable '%s' is world-writeable! Refusing to run. Please change the "
+"permissions now (this problem may have been caused by a bug in earlier "
+"versions of the filer).\n"
+"\n"
+"Having (non-symlink) run actions world-writeable means that other people who "
+"use your computer can replace your run actions with malicious versions.\n"
+"\n"
+"If you trust everyone who could write to these files then you needn't worry. "
+"Otherwise, you should check, or even just delete, all the existing run "
+"actions."
+msgstr ""
+
+#: type.c:374
+msgid "go-w (Fix security problem)"
+msgstr ""
+
+#: type.c:476
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2143,60 +2198,60 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:530
+#: type.c:579
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
 msgstr ""
 "请拖放一个(本机)执行程式入拖放栏内 - 而日后此程式将会用以开启此类型的档案"
 
-#: type.c:557
+#: type.c:606
 msgid "This is not a program! Give me an application instead!"
 msgstr "这不是一个程式!请给予一个可执行的程式!"
 
-#: type.c:615
+#: type.c:664
 msgid "Execute file"
 msgstr "执行档案"
 
-#: type.c:620
+#: type.c:669
 msgid "No run action defined"
 msgstr "没有执行动作被定义"
 
-#: type.c:646
+#: type.c:695
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "错误处理 %s: %s"
 
-#: type.c:661
+#: type.c:710
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "非法的执行程式 %s (错误执行)"
 
-#: type.c:672
+#: type.c:721
 #, c-format
 msgid "Non-executable %s"
 msgstr "非执行性的 %s"
 
-#: type.c:708
+#: type.c:757
 msgid "Set run action"
 msgstr "设定执行的动作"
 
-#: type.c:710
+#: type.c:759
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "设为预设值予全部的 `%s/<anything>'"
 
-#: type.c:716 usericons.c:284
+#: type.c:765 usericons.c:284
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "仅对应此类型 `%s/%s'"
 
-#: type.c:744
+#: type.c:793
 #, c-format
 msgid "Currently %s"
 msgstr "当前的 %s"
 
-#: type.c:758
+#: type.c:807
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2204,44 +2259,39 @@ msgstr ""
 "请拖放一个适的\n"
 "程式在此处"
 
-#: type.c:765 usericons.c:363
+#: type.c:814 usericons.c:363
 msgid "OR"
 msgstr "或"
 
-#: type.c:772
+#: type.c:821
 msgid "Enter a shell command:"
 msgstr "请输入指令"
 
-#: type.c:842
+#: type.c:891
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "路径参数错误,储存取消"
 
-#: type.c:855
+#: type.c:904
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "一个相同而颇大的程序正在执行中 - 你决定要删除它？"
 
-#: type.c:868
+#: type.c:917
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "不能移除 $s: %s"
 
-#: type.c:1116
+#: type.c:1163
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1134
-#, c-format
-msgid "Invalid type '%s' in '%s'"
-msgstr ""
-
-#: type.c:1274
+#: type.c:1254
 msgid ""
-"The standard MIME type database was not found. The filer will probably not "
-"show the correct types for different files. You should download and install "
-"the 'Common types package' from here:\n"
+"The standard MIME type database (version 0.8 or later) was not found. The "
+"filer will probably not show the correct types for different files. You "
+"should download and install the 'shared-mime-info-0.8' package from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
 
@@ -3187,18 +3237,32 @@ msgstr "区块设备"
 
 #: tips:237
 #, fuzzy
+msgid "Door:"
+msgstr "移至:"
+
+#: tips:238
+msgid ""
+"Door files are a bit like sockets or pipes, and have only been seen on "
+"Solaris."
+msgstr ""
+
+#: tips:239
+#, fuzzy
 msgid "Executable file:"
 msgstr "可执行档"
 
-#: tips:238
+#: tips:240
 #, fuzzy
 msgid "Application directory:"
 msgstr "应用程式目录"
 
-#: tips:239
+#: tips:241
 #, fuzzy
 msgid "Unknown type:"
 msgstr "不明类型"
+
+#~ msgid "Show ROX-Filer Help"
+#~ msgstr "显示ROX-Filer说明"
 
 #~ msgid "Failed to create child process"
 #~ msgstr "不能导出子程序"
