@@ -1,0 +1,202 @@
+#!/usr/bin/env perl
+
+sub type_from_path;
+sub try_running;
+sub set_type;
+sub show_help;
+
+if (defined($choices = $ENV{CHOICESPATH})) {
+	@choices = split(":", $choices);
+} else {
+	@choices = (glob("~/Choices"),
+		    "/usr/local/share/Choices",
+		    "/usr/share/Choices");
+}
+
+@choices or die("No directories listed in CHOICESPATH!\n");
+
+while ($ARGV[0] =~ /^--?(.*?)(\=(.*))?$/)
+{
+	shift;
+
+	($opt, $value) = ($1, $3);
+
+	&show_help, next	if $opt eq "h" or $opt eq "help";
+	&set_type, next		if $opt eq "t" or $opt eq "type";
+	$verbose = 1, next	if $opt eq "v" or $opt eq "verbose";
+	$display = 1, next	if $opt eq "d" or $opt eq "display";
+
+	die "Unknown option: $opt\n";
+}
+
+$item = shift or '.';
+
+unless ($item =~ /^\//) {
+	chomp($pwd = `pwd`);
+	$item = "$pwd/$item";
+}
+
+unshift @ARGV, $item;
+
+-e $item or die "File $item not found\n";
+
+$type or
+-f _ && ($type = type_from_path($item)) or
+-d _ && ($type = "special/directory") or
+-p _ && ($type = "special/pipe") or
+-S _ && ($type = "special/socket") or
+-b _ && ($type = "special/block-device") or
+-c _ && ($type = "special/char-device") or
+	die "Don't know what kind of thing '$item' is!\n";
+
+if ($display) {
+	print "$type\n";
+	exit;
+}
+
+print "Looking for a handler for files of type '$type'\n" if $verbose;
+
+if ($type =~ /^(.*?)\/(.*)$/) {
+	($media, $subtype) = ($1, $2);
+	foreach (@choices) {
+		try_running "$_/MIME-types/${media}_$subtype" if $_;
+	}
+} else {
+	$media = $type;
+}
+
+foreach (@choices) {
+	try_running "$_/MIME-types/$media" if $_;
+}
+
+die "No run action specified for files of type '$type'.\n";
+
+exit;
+	
+sub try_running
+{
+	my $path = shift;
+
+	print "Checking for '$path'\n" if $verbose;
+
+	return unless -e $path;
+
+	-f _ and -x _ and (exec("$path", @ARGV), die "exec($path): $!\n");
+
+	if (-d _)
+	{
+		die "$path/AppRun is not executable" unless -x "$path/AppRun";
+
+		exec("$path/AppRun", @ARGV), die "exec($path): $!\n";
+	}
+	
+	warn "$path exists but cannot be executed!\n";
+}
+
+sub check_entry
+{
+	my ($key, $prio, $values) = @_;
+
+	return undef if $prio <= $best_rating;
+
+	if ($key eq "ext" and $ext) {
+		foreach $e (split ' ', $values) {
+			return 1 if $e eq $ext;
+		}
+	} elsif ($key eq "regex") {
+		return 1 if $leaf =~ /$values/;
+	}
+
+	undef;
+}
+
+sub find_type
+{
+	my $file = shift;
+	my $type = undef;
+
+	open(FILE, "<$file") or warn("Can't open $file\n"), return;
+
+	while (<FILE>) {
+		s/^\s+//;
+		s/\s+$//;
+
+		next if /^(#.*)?$/;
+
+		if (/^([^:]*)\/(.*):?/) {
+			$type = "$1/$2" 
+		} elsif (/^([^ :,]+)\s*(,\s*(\d+)\s*)?:\s*(.*)$/) {
+			my ($key, $prio, $values) = ($1, $3, $4);
+
+			$prio ||= 1;
+
+			if (check_entry($key, $prio, $values)) {
+				print "New best guess is '$type', " .
+					"rating $prio\n" if $verbose;
+
+				$best_type = $type;
+				$best_rating = $prio;
+			}
+		}
+	}
+
+	close FILE;
+
+	return $type;
+}
+
+sub type_from_path
+{
+	my $type;
+	local ($best_type, $best_rating) = ("text/plain", 0);
+	local ($leaf, $ext);
+
+	($leaf = $item) =~ s/.*\///;
+	($ext = $leaf) =~ s/.*\.// or $ext = undef;
+
+	foreach $dir (@choices) {
+		print "Looking inside '$dir'\n" if $verbose;
+
+		if (-d "$dir/MIME-info") {
+			foreach (glob("$dir/MIME-info/*")) {
+				print "Scanning '$_'\n" if $verbose;
+				find_type($_);
+			}
+		}
+	}
+
+	return $best_type;
+}
+
+sub show_help
+{
+	print <<"EOF";
+Usage: rox [FILE [ARGS]]
+
+Open FILE using an appropriate program, invoking it with additional arguments
+ARGS. If no FILE is given then the current directory is used.
+
+  -h, --help		display this help and exit
+  -d, --display		display the guessed type rather than opening the file
+  -t, --type=TYPE	assume TYPE instead of guessing
+  -v, --verbose		display lots of extra info
+
+Report bugs to <tal197\@ecs.soton.ac.uk>.
+EOF
+	exit 0;
+}
+
+sub set_type
+{
+	$value = shift @ARGV unless $value;
+
+	$type = $value or die "Missing argument to --type option\n";
+}
+
+sub set_by_drag
+{
+	$prog = `dropbox -l "Drop a program which can open $type files here"`;
+	die "'dropbox' program failed (is it installed?)\n" if $?;
+
+	print "OK, will use $prog to edit $type files.\n";
+}

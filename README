@@ -1,0 +1,101 @@
+			ROX-Filer
+			A RISC OS-like filer for X
+			by Thomas Leonard
+
+
+
+Quick start
+~~~~~~~~~~~
+Type this ($ is the shell prompt):
+
+	$ ./install.sh
+
+and follow the on-screen instructions. If you want to compile as a normal
+user and install as root then you should do this instead:
+
+	$ ROX-Filer/AppRun --compile
+	$ su
+	[ enter root password ]
+	$ ./install.sh
+
+
+ROX-Filer
+~~~~~~~~~
+Help for ROX-Filer can be found in the directory ROX-Filer/Help.
+
+
+About the 'rox' script
+~~~~~~~~~~~~~~~~~~~~~~
+This is a little PERL script for opening files. It will guess the type of
+the file and then find a program to open it with. It is intended to be used
+as part of the ROX Desktop:
+	<http://www.ecs.soton.ac.uk/~tal197/rox.php3>
+
+Note that it requires a little setting up, but after that you can say, eg:
+
+	$ rox Picture.gif
+	(to display the picture)
+
+	$ rox /tmp
+	(shows the /tmp directory in a filer)
+
+	$ rox
+	(opens the current directory)
+
+	$ rox -h
+	(shows the help text)
+
+To install the script, simply put it into a directory in your PATH variable.
+'/usr/local/bin' is a good choice, if you have permission to write there.
+The install script will do this for you.
+
+
+Files
+~~~~~
+
+Two places are used for configuration files:
+
+<Choices>/MIME-info/*
+	Contains the rules for guessing a file's type from its name.
+	Many programs come with files called '<prog>.mime' which contain
+	additional rules. Put these files in the MIME-info directory too.
+
+<Choices>/MIME-types/*
+	Contains programs or symlinks which will be run.
+	For example:
+
+	$ rox picture.gif
+	is like doing
+	$ <Choices>/MIME-types/image_gif picture.gif
+	or, if that isn't found,
+	$ <Choices>/MIME-types/image picture.gif
+
+In both cases, <Choices> is all the directories in your CHOICESPATH
+environment variable, which defaults to:
+
+	~/Choices:/usr/local/share/Choices:/usr/share/Choices
+
+The leftmost directory listed is searched first, followed by the others in
+order. If the string starts with a `:' then saving is disabled and no program
+will attempt to save any configuration into it. For more details, see:
+
+	<http://www.ecs.soton.ac.uk/~tal197/choices.php3>
+
+
+Conditions
+~~~~~~~~~~
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program; if not, write to the Free Software
+Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+
+Please report any bugs to me, <tal197@ecs.soton.ac.uk>.
