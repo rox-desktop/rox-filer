@@ -422,3 +422,24 @@ MIME_type *mime_type_from_base_type(int base_type)
 	}
 	return &special_unknown;
 }
+
+/* Takes the st_mode field from stat() and returns the base type.
+ * Should not be a symlink.
+ */
+int mode_to_base_type(int st_mode)
+{
+	if (S_ISREG(st_mode))
+		return TYPE_FILE;
+	else if (S_ISDIR(st_mode))
+		return TYPE_DIRECTORY;
+	else if (S_ISBLK(st_mode))
+		return TYPE_BLOCK_DEVICE;
+	else if (S_ISCHR(st_mode))
+		return TYPE_CHAR_DEVICE;
+	else if (S_ISFIFO(st_mode))
+		return TYPE_PIPE;
+	else if (S_ISSOCK(st_mode))
+		return TYPE_SOCKET;
+
+	return TYPE_UNKNOWN;
+}

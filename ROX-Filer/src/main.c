@@ -54,6 +54,7 @@
 #include "action.h"
 #include "i18n.h"
 #include "remote.h"
+#include "pinboard.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -87,8 +88,6 @@ static void show_features(void);
 		"you must use the short versions instead.\n\n")
 #endif
 
-#define SHORT_OPS "t:b:ohvn"
-
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"	\
        "Open filer windows showing each directory listed, or $HOME \n"	\
        "if no directories are given.\n\n"				\
@@ -96,9 +95,12 @@ static void show_features(void);
        "  -h, --help		display this help and exit\n"		      \
        "  -n, --new		start a new filer, even if already running\n"  \
        "  -o, --override	override window manager control of panels\n" \
+       "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -t, --top=DIR		open DIR as a top-edge panel\n"		\
        "  -v, --version		display the version information and exit\n"   \
        "\nReport bugs to <tal197@ecs.soton.ac.uk>.\n")
+
+#define SHORT_OPS "t:b:op:hvn"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -106,6 +108,7 @@ static struct option long_opts[] =
 	{"top", 1, NULL, 't'},
 	{"bottom", 1, NULL, 'b'},
 	{"override", 0, NULL, 'o'},
+	{"pinboard", 1, NULL, 'p'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
 	{"new", 0, NULL, 'n'},
@@ -213,6 +216,7 @@ int main(int argc, char **argv)
 	struct sigaction act;
 	GList		*panel_dirs = NULL;
 	GList		*panel_sides = NULL;
+	guchar		*pinboard = NULL;
 
 	choices_init();
 	i18n_init();
@@ -246,6 +250,10 @@ int main(int argc, char **argv)
 				break;
 			case 'o':
 				override_redirect = TRUE;
+				break;
+			case 'p':
+				pinboard = *optarg == '=' ? optarg + 1
+							  : optarg;
 				break;
 			case 'v':
 				fprintf(stderr, "ROX-Filer %s\n", VERSION);
@@ -320,7 +328,10 @@ int main(int argc, char **argv)
 			exit(EXIT_SUCCESS);
 	}
 
-	if (optind == argc && !panel_dirs)
+	if (pinboard)
+		pinboard_pin(home_dir, "Home", 32, 32);
+
+	if (optind == argc && (!panel_dirs) && !pinboard)
 		filer_opendir(home_dir, PANEL_NO);
 	else
 	{

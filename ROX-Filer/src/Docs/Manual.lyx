@@ -1,4 +1,4 @@
-#This file was created by <tal197> Thu Jun 15 21:22:36 2000
+#This file was created by <tal197> Wed Jun 21 22:42:45 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -31,7 +31,7 @@
 ROX-Filer User Manual
 \layout Author
 
-Thomas Leonard, tal197@ecs.soton.ac.uk
+Thomas Leonard, tal197@users.sourceforge.net
 \layout Date
 
 
@@ -705,11 +705,14 @@ The display menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-12 2 0 0 -1 -1 -1 -1
+15 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
 0 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 1 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -719,13 +722,19 @@ multicol5
 0 1 0 0
 0 1 1 0
 8 1 0 "" ""
-2 1 1 "8cm" ""
+2 1 1 "10cm" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 1 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -763,12 +772,36 @@ dag
 \latex default 
 
 \newline 
-Large, Full Info
+Large, With...
 \newline 
-Entries are displayed with their icon, name, type, permissions, owner and
- size.
+Entries are displayed along with some extra details:
 \newline 
-Small, Full Info
+
+\newline 
+
+\series bold 
+Summary
+\series default 
+ shows the file permissions, owner, group, size and modification time.
+\newline 
+
+\newline 
+
+\series bold 
+Sizes
+\series default 
+ shows just the size of each file (not directories).
+\newline 
+
+\newline 
+
+\series bold 
+Size Bars
+\series default 
+ displays a bar indicating the size of each file.
+ This is on a log scale.
+\newline 
+Small, With...
 \newline 
 As above, but with a smaller icon and all on one line.
 \newline 
@@ -2686,24 +2719,19 @@ $ ../AppRun --compile
 
 You can remove the patch by simply repeating the above sequence --- patch
  will detect that the patch is already applied and offer to remove it.
- To create a patch you need to take a copy of the old 'src' directory before
- you modify it (before you compile, even):
-\layout LyX-Code
-
-$ cd ROX-Filer
-\layout LyX-Code
-
-$ cp -r src old_src
 \layout Standard
 
-Now, modify and compile until it works they way you want it to.
- To make the patch:
+To create a patch you should first get the latest version of the filer from
+ CVS (instructions on using CVS can be found on the web-site).
+ Modify the program as you please.
+ Create the patch using `
+\family typewriter 
+cvs diff
+\family default 
+' from the appropriate directory:
 \layout LyX-Code
 
-$ cd ROX-Filer
-\layout LyX-Code
-
-$ diff -cr old_src src > my_patch
+$ cvs diff -c > my_patch
 \layout Standard
 
 This creates a human- and machine-readable patch file.
@@ -2826,7 +2854,7 @@ detach()
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
 
-\begin_inset Figure size 595 613
+\begin_inset Figure size 595 618
 file Structs.eps
 width 3 100
 flags 9
@@ -2841,7 +2869,7 @@ flags 9
 \emph on 
 The ROX desktop
 \emph toggle 
-, <http://www.ecs.soton.ac.uk/~tal197/rox.php3>
+, <http://rox.sourceforge.net>
 \layout Bibliography
 \bibitem {GTK+}
 
@@ -2881,7 +2909,7 @@ The X Direct Save protocol
 \emph on 
 The ROX Choices system
 \emph toggle 
-, <http://www.ecs.soton.ac.uk/~tal197/choices.php3>
+, <http://rox.sourceforge.net/choices.php3>
 \layout Bibliography
 \bibitem {enlightenment}
 

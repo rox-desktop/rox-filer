@@ -165,6 +165,7 @@ void display_init()
 }
 
 #define BAR_SIZE(size) ((size) > 0 ? (log((size) + 1) * 16) : 0)
+#define MAX_BAR_SIZE 460
 
 static int details_width(FilerWindow *filer_window, DirItem *item)
 {
@@ -172,7 +173,7 @@ static int details_width(FilerWindow *filer_window, DirItem *item)
 
 	if (filer_window->details_type == DETAILS_SIZE_BARS &&
 			item->base_type != TYPE_DIRECTORY)
-		return 11 * fixed_width + BAR_SIZE(item->size) + 8;
+		return 6 * fixed_width + MAX_BAR_SIZE + 16;
 
 	return bar + fixed_width * strlen(details(filer_window, item));
 }
@@ -267,8 +268,24 @@ static gboolean test_point_small_full(Collection *collection,
 
 	if (point_x < iwidth + 2)
 		return point_x > 2 && point_y > image_y;
+
+	if (point_y < low_top)
+		return FALSE;
+
+	if (filer_window->details_type == DETAILS_SIZE_BARS)
+	{
+		int	bar_x = width - MAX_BAR_SIZE - 4;
+		int	bar_size;
+
+		if (item->base_type == TYPE_DIRECTORY)
+			bar_size = 0;
+		else
+			bar_size = BAR_SIZE(item->size);
+
+		return point_x < bar_x + bar_size;
+	}
 	
-	return point_y >= low_top;
+	return TRUE;
 }
 
 static gboolean test_point_small(Collection *collection,
@@ -501,6 +518,7 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 	if (filer_window->details_type == DETAILS_SIZE_BARS)
 	{
 		int	bar;
+		int	bar_x = x + width - MAX_BAR_SIZE - 4;
 
 		if (item->base_type == TYPE_DIRECTORY)
 			return;
@@ -510,13 +528,13 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 		gdk_draw_rectangle(widget->window,
 				widget->style->black_gc,
 				TRUE,
-				x + 11 * fixed_width, y - fixed_font->ascent,
+				bar_x, y - fixed_font->ascent,
 				bar + 4,
 				fixed_font->ascent + fixed_font->descent);
 		gdk_draw_rectangle(widget->window,
 				widget->style->white_gc,
 				TRUE,
-				x + 11 * fixed_width + 2,
+				bar_x + 2,
 				y - fixed_font->ascent + 2,
 				bar,
 				fixed_font->ascent + fixed_font->descent - 4);

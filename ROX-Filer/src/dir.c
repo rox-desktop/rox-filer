@@ -363,53 +363,32 @@ static void insert_item(Directory *dir, struct dirent *ent)
 		new.mtime = info.st_mtime;
 		new.uid = info.st_uid;
 		new.gid = info.st_gid;
-		if (S_ISREG(info.st_mode))
-			new.base_type = TYPE_FILE;
-		else if (S_ISDIR(info.st_mode))
-		{
-			new.base_type = TYPE_DIRECTORY;
 
-			if (g_hash_table_lookup(mtab_mounts, tmp->str))
-				new.flags |= ITEM_FLAG_MOUNT_POINT
-						| ITEM_FLAG_MOUNTED;
-			else if (g_hash_table_lookup(fstab_mounts, tmp->str))
-				new.flags |= ITEM_FLAG_MOUNT_POINT;
-		}
-		else if (S_ISBLK(info.st_mode))
-			new.base_type = TYPE_BLOCK_DEVICE;
-		else if (S_ISCHR(info.st_mode))
-			new.base_type = TYPE_CHAR_DEVICE;
-		else if (S_ISFIFO(info.st_mode))
-			new.base_type = TYPE_PIPE;
-		else if (S_ISSOCK(info.st_mode))
-			new.base_type = TYPE_SOCKET;
-		else if (S_ISLNK(info.st_mode))
+		if (S_ISLNK(info.st_mode))
 		{
 			if (mc_stat(tmp->str, &info))
 				new.base_type = TYPE_ERROR;
 			else
-			{
-				if (S_ISREG(info.st_mode))
-					new.base_type = TYPE_FILE;
-				else if (S_ISDIR(info.st_mode))
-					new.base_type = TYPE_DIRECTORY;
-				else if (S_ISBLK(info.st_mode))
-					new.base_type = TYPE_BLOCK_DEVICE;
-				else if (S_ISCHR(info.st_mode))
-					new.base_type = TYPE_CHAR_DEVICE;
-				else if (S_ISFIFO(info.st_mode))
-					new.base_type = TYPE_PIPE;
-				else if (S_ISSOCK(info.st_mode))
-					new.base_type = TYPE_SOCKET;
-				else
-					new.base_type = TYPE_UNKNOWN;
-			}
+				new.base_type = mode_to_base_type(info.st_mode);
 
 			new.flags |= ITEM_FLAG_SYMLINK;
 		}
 		else
-			new.base_type = TYPE_UNKNOWN;
+		{
+			new.base_type = mode_to_base_type(info.st_mode);
+
+			if (new.base_type == TYPE_DIRECTORY)
+			{
+				if (g_hash_table_lookup(mtab_mounts, tmp->str))
+					new.flags |= ITEM_FLAG_MOUNT_POINT
+							| ITEM_FLAG_MOUNTED;
+				else if (g_hash_table_lookup(fstab_mounts,
+								tmp->str))
+					new.flags |= ITEM_FLAG_MOUNT_POINT;
+			}
+		}
 	}
+
 	if (new.base_type == TYPE_DIRECTORY &&
 			!(new.flags & ITEM_FLAG_MOUNT_POINT))
 	{

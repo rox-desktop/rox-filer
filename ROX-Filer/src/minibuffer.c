@@ -73,7 +73,7 @@ void create_minibuffer(FilerWindow *filer_window)
 			new_help_button((HelpFunc) show_help, filer_window),
 			FALSE, TRUE, 0);
 
-	label = gtk_label_new(NULL);
+	label = gtk_label_new("");
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 2);
 
 	mini = gtk_entry_new();
