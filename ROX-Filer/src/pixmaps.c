@@ -132,7 +132,7 @@ void pixmaps_init(void)
 
 	load_default_pixmaps();
 
-	factory=gtk_icon_factory_new();
+	factory = gtk_icon_factory_new();
 	for (i = 0; i < G_N_ELEMENTS(stocks); i++)
 	{
 		GdkPixbuf *pixbuf;
