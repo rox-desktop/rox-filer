@@ -897,14 +897,60 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 	g_free(fs);
 }
 
+/* g_free() the result */
+guchar *pretty_type(DirItem *file, guchar *path)
+{
+	if (file->mime_type)
+		return g_strconcat(file->mime_type->media_type, "/",
+				file->mime_type->subtype, NULL);
+
+	if (file->flags & ITEM_FLAG_APPDIR)
+		return g_strdup("ROX application");
+
+	if (file->flags & ITEM_FLAG_SYMLINK)
+	{
+		char	p[MAXPATHLEN + 1];
+		int	got;
+		got = readlink(path, p, MAXPATHLEN);
+		if (got > 0 && got <= MAXPATHLEN)
+		{
+			p[got] = '\0';
+			return g_strconcat("Symbolic link to ", p, NULL);
+		}
+
+		return g_strdup("Symbolic link");
+	}
+
+	if (file->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MountPoint *mp;
+		if ((file->flags & ITEM_FLAG_MOUNTED) &&
+			(mp = g_hash_table_lookup(mtab_mounts, path)))
+			return g_strconcat("Mount point for ", mp->name, NULL);
+
+		return g_strdup("Mount point");
+	}
+
+	return g_strdup("-");
+}
+
+#define LABEL(text, row)						\
+	label = gtk_label_new(text ":");				\
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);			\
+	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);	\
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
+
+#define VALUE(label, row)						\
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);			\
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, row, row + 1);
+
 static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 {
-	GtkWidget	*window, *table, *label, *button, *frame;
+	GtkWidget	*window, *table, *label, *button, *frame, *value;
 	GtkWidget	*file_label;
 	GString		*gstring;
-	char		*string;
 	int		file_data[2];
-	char		*path;
+	guchar		*path, *tmp;
 	char 		*argv[] = {"file", "-b", NULL, NULL};
 	Collection 	*collection;
 	DirItem		*file;
@@ -942,24 +988,21 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	table = gtk_table_new(9, 2, FALSE);
+	table = gtk_table_new(10, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
 	
-	label = gtk_label_new("Owner, group:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
+	value = gtk_label_new(file->leafname);
+	LABEL("Name", 0);
+	VALUE(value, 0);
+
 	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
 					    group_name(info.st_gid));
-	label = gtk_label_new(gstring->str);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
+	value = gtk_label_new(gstring->str);
+	LABEL("Owner, Group", 1);
+	VALUE(value, 1);
 	
-	label = gtk_label_new("Size:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
 	if (info.st_size >= PRETTY_SIZE_LIMIT)
 	{
 		g_string_sprintf(gstring, "%s (%ld bytes)",
@@ -972,87 +1015,40 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 				(unsigned long) info.st_size,
 				info.st_size == 1 ? "" : "s");
 	}
-	label = gtk_label_new(gstring->str);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
+	value = gtk_label_new(gstring->str);
+	LABEL("Size", 2);
+	VALUE(value, 2);
 	
-	label = gtk_label_new("Change time:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
-	label = gtk_label_new(pretty_time(&info.st_ctime));
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
+	value = gtk_label_new(pretty_time(&info.st_ctime));
+	LABEL("Change time", 3);
+	VALUE(value, 3);
 	
-	label = gtk_label_new("Modify time:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
-	label = gtk_label_new(pretty_time(&info.st_mtime));
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 3, 4);
+	value = gtk_label_new(pretty_time(&info.st_mtime));
+	LABEL("Modify time", 4);
+	VALUE(value, 4);
 	
-	label = gtk_label_new("Access time:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 4, 5);
-	label = gtk_label_new(pretty_time(&info.st_atime));
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 4, 5);
+	value = gtk_label_new(pretty_time(&info.st_atime));
+	LABEL("Access time", 5);
+	VALUE(value, 5);
 	
-	label = gtk_label_new("Permissions:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
-	label = gtk_label_new(pretty_permissions(info.st_mode));
+	value = gtk_label_new(pretty_permissions(info.st_mode));
 	perm = applicable(info.st_uid, info.st_gid);
-	gtk_label_set_pattern(GTK_LABEL(label),
+	gtk_label_set_pattern(GTK_LABEL(value),
 			perm == 0 ? "___        " :
 			perm == 1 ? "    ___    " :
 				    "        ___");
-	gtk_widget_set_style(label, fixed_style);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);
+	gtk_widget_set_style(value, fixed_style);
+	LABEL("Permissions", 6);
+	VALUE(value, 6);
 	
-	label = gtk_label_new("Type:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 6, 7);
-	if (file->mime_type)
-	{
-		string = g_strconcat(file->mime_type->media_type, "/",
-				file->mime_type->subtype, NULL);
-	}
-	else if (file->flags & ITEM_FLAG_APPDIR)
-		string = g_strdup("ROX application");
-	else if (file->flags & ITEM_FLAG_SYMLINK)
-	{
-		char	p[MAXPATHLEN + 1];
-		int	got;
-		got = readlink(path, p, MAXPATHLEN);
-		if (got > 0 && got <= MAXPATHLEN)
-		{
-			p[got] = '\0';
-			string = g_strconcat("Symbolic link to ",
-						p, NULL);
-		}
-		else
-			string = g_strdup("Symbolic link");
-	}
-	else if (file->flags & ITEM_FLAG_MOUNT_POINT)
-	{
-		MountPoint *mp;
-		if ((file->flags & ITEM_FLAG_MOUNTED) &&
-			(mp = g_hash_table_lookup(mtab_mounts, path)))
-			string = g_strconcat("Mount point for ",
-					mp->name, NULL);
-		else
-			string = g_strdup("Mount point");
-	}
-	else
-		string = g_strdup("-");
-	label = gtk_label_new(string);
-	g_free(string);
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 6, 7);
+	tmp = pretty_type(file, path);
+	value = gtk_label_new(tmp);
+	g_free(tmp);
+	LABEL("Type", 7);
+	VALUE(value, 7);
 
 	frame = gtk_frame_new("file(1) says...");
-	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 7, 8);
+	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 8, 9);
 	file_label = gtk_label_new("<nothing yet>");
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
 	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
@@ -1060,7 +1056,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	
 	button = gtk_button_new_with_label("OK");
 	gtk_window_set_focus(GTK_WINDOW(window), button);
-	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 9, 10,
+	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 10, 11,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(window));

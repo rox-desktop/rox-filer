@@ -417,5 +417,3 @@ char *pretty_time(time_t *time)
 
 	return time_buf;
 }
-
-	
