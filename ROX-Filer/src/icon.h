@@ -12,13 +12,11 @@
 
 #include "dir.h"
 
-typedef void (*RenameFn)(Icon *icon);
-
-typedef enum {ICON_PANEL, ICON_PINBOARD} IconType;
+extern GList *icon_selection;
+extern gboolean tmp_icon_selected;
 
 struct _Icon {
-	IconType	type;
-
+	Panel		*panel;		/* NULL => Pinboard icon */
 	GtkWidget	*widget;	/* The drawing area for the icon */
 	gboolean	selected;
 	guchar		*src_path;	/* Eg: ~/Apps */
@@ -31,19 +29,19 @@ struct _Icon {
 	int		x, y;
 
 	/* Only used on the panel... */
-	Panel		*panel;		/* Panel containing this icon */
 	GtkWidget	*socket;	/* For applets */
 };
 
 void icon_init(void);
-void show_rename_box(GtkWidget	*widget,
-		     Icon	*icon,
-		     RenameFn	callback);
 guchar *icon_convert_path(guchar *path);
 void icon_hash_path(Icon *icon);
 void icon_unhash_path(Icon *icon);
 gboolean icons_require(guchar *path);
 void icons_may_update(guchar *path);
 void update_all_icons(void);
+void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel);
+void icon_set_selected(Icon *icon, gboolean selected);
+void icon_select_only(Icon *select);
+void icon_destroyed(Icon *icon);
 
 #endif /* _ICON_H */

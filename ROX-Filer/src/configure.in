@@ -73,7 +73,7 @@ fi
 AC_SUBST(GTK_CONFIG)
 
 if test -z "$XML_CONFIG"; then
-  XML_CONFIG=xml-config
+  AC_CHECK_PROG(XML_CONFIG, xml2-config, xml2-config, xml-config)
 fi
 AC_SUBST(XML_CONFIG)
 

@@ -58,7 +58,6 @@
 #include "i18n.h"
 #include "remote.h"
 #include "pinboard.h"
-#include "panel.h"
 #include "run.h"
 #include "toolbar.h"
 #include "bind.h"
@@ -428,7 +427,6 @@ int main(int argc, char **argv)
 
 	icon_init();
 	pinboard_init();
-	panel_init();
 
 	options_load();
 

@@ -17,8 +17,22 @@ typedef enum {
 	PANEL_NUMBER_OF_SIDES	/* This goes last! */
 } PanelSide;
 
-void panel_init(void);
+struct _Panel {
+	GtkWidget	*window;
+	int		height;
+	GtkAdjustment	*adj;		/* Scroll position of the bar */
+	PanelSide	side;
+	guchar		*name;		/* Leaf name */
+
+	GtkWidget	*before;	/* Icons at the left/top end */
+	GtkWidget	*after;		/* Icons at the right/bottom end */
+
+	GtkWidget	*gap;		/* Event box between sides */
+};
+
 Panel *panel_new(guchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);
+void panel_size_icon(Icon *icon);
+void panel_save(Panel *panel);
 
 #endif /* _PANEL_H */
