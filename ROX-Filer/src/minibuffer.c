@@ -106,6 +106,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 {
 	Collection	*collection;
 	GtkEntry	*mini;
+	int		pos = -1, i;
 	
 	g_return_if_fail(filer_window != NULL);
 	g_return_if_fail(filer_window->minibuffer != NULL);
@@ -121,10 +122,10 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			"?");
 
 	collection = filer_window->collection;
-	collection_move_cursor(collection, 0, 0);  /* Turn the cursor on */
 	switch (mini_type)
 	{
 		case MINI_PATH:
+			collection_move_cursor(collection, 0, 0);
 			filer_window->mini_cursor_base =
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,
@@ -135,10 +136,28 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 				filer_window->temp_show_hidden = FALSE;
 			}
 			break;
-		case MINI_SHELL:
 		case MINI_SELECT_IF:
-			filer_window->mini_cursor_base = -1;	/* History */
 			gtk_entry_set_text(mini, "");
+			filer_window->mini_cursor_base = -1;	/* History */
+			break;
+		case MINI_SHELL:
+			pos = 0;
+			i = collection->cursor_item;
+			if (collection->number_selected)
+				gtk_entry_set_text(mini, " \"$@\"");
+			else if (i > -1)
+			{
+				DirItem *item = (DirItem *) 
+						collection->items[i].data;
+				guchar *tmp;
+
+				tmp = g_strconcat(" ", item->leafname, NULL);
+				gtk_entry_set_text(mini, tmp);
+				g_free(tmp);
+			}
+			else
+				gtk_entry_set_text(mini, "");
+			filer_window->mini_cursor_base = -1;	/* History */
 			break;
 		default:
 			g_warning("Bad minibuffer type\n");
@@ -147,7 +166,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	
 	filer_window->mini_type = mini_type;
 
-	gtk_entry_set_position(mini, -1);
+	gtk_entry_set_position(mini, pos);
 
 	gtk_widget_show_all(filer_window->minibuffer_area);
 
