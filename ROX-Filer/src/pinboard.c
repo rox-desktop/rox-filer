@@ -194,7 +194,7 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 			       gpointer		data);
 static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
-			FilerWindow *filer_window);
+			PinIcon *icon);
 static void reshape_icon(PinIcon *icon);
 static void reshape_all(void);
 
@@ -1332,11 +1332,6 @@ static void drag_set_pinicon_dest(PinIcon *icon)
 			GTK_SIGNAL_FUNC(drag_leave), icon);
 	gtk_signal_connect(obj, "drag_end",
 			GTK_SIGNAL_FUNC(drag_end), icon);
-
-	/*
-	gtk_signal_connect(obj, "drag_end",
-			GTK_SIGNAL_FUNC(drag_end), filer_window);
-			*/
 }
 
 /* Called during the drag when the mouse is in a widget registered
@@ -1502,7 +1497,7 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
-		     FilerWindow *filer_window)
+		     PinIcon *icon)
 {
 	pinboard_drag_in_progress = FALSE;
 	pinboard_clear_selection();

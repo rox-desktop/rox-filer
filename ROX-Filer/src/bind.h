@@ -28,6 +28,7 @@ typedef enum {
 	ACT_POPUP_MENU,		/* Show the popup menu */
 	ACT_CLEAR_SELECTION,	/* Unselect all icons in this area */
 	ACT_MOVE_ICON,		/* Reposition a pinboard/panel icon */
+	ACT_PRIME_FOR_DND,	/* Significant motion will start dnd */
 } BindAction;
 
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event);

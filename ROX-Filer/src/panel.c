@@ -77,6 +77,14 @@ struct _PanelIcon {
 
 /* The icon which holds the current pointer grab, if any */
 static PanelIcon *current_grab_icon = NULL;
+static gint drag_start_x, drag_start_y;
+typedef enum {
+	MOTION_NONE,		/* Ignore motion events */
+	MOTION_REPOSITION,	/* Motion events move current_grab_icon */
+	MOTION_READY_FOR_DND,	/* Moving much will start dnd */
+	MOTION_DISABLED,	/* Something (maybe a drag) as happened */
+} MotionType;
+static MotionType motion_state = MOTION_NONE;
 
 /* NULL => Not loading a panel */
 static Panel *loading_panel = NULL;
@@ -145,10 +153,15 @@ static void selection_get(GtkWidget *widget,
 		       guint      time,
 		       gpointer   data);
 static void icon_start_move(PanelIcon *icon);
-static gint icon_motion_reposition(GtkWidget *widget,
-				   GdkEventMotion *event,
-				   PanelIcon *icon);
+static gint icon_motion_event(GtkWidget *widget,
+			      GdkEventMotion *event,
+			      PanelIcon *icon);
 static void reposition_icon(PanelIcon *icon, int index);
+static void start_drag(PanelIcon *icon, GdkEventMotion *event);
+static guchar *create_uri_list(GList *list);
+static void drag_end(GtkWidget *widget,
+		     GdkDragContext *context,
+		     PanelIcon *icon);
 
 
 static GtkItemFactoryEntry menu_def[] = {
@@ -422,7 +435,7 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 	gtk_signal_connect_after(GTK_OBJECT(widget), "enter-notify-event",
                            GTK_SIGNAL_FUNC(enter_icon), icon);
 	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
-			GTK_SIGNAL_FUNC(icon_motion_reposition), icon);
+			GTK_SIGNAL_FUNC(icon_motion_event), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
                            GTK_SIGNAL_FUNC(draw_icon), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
@@ -431,6 +444,8 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
                            GTK_SIGNAL_FUNC(icon_button_release), icon);
 	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
                            GTK_SIGNAL_FUNC(icon_button_press), icon);
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
+				drag_data_get, NULL);
 
 	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
@@ -632,24 +647,29 @@ static gint icon_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        PanelIcon *icon)
 {
+	BindAction	action;
+	gint		dx, dy;
+	MotionType	motion = motion_state;
+
+	motion_state = MOTION_NONE;
+
 	if (current_grab_icon)
 	{
 		gdk_pointer_ungrab(GDK_CURRENT_TIME);
 		gtk_grab_remove(current_grab_icon->widget);
 		current_grab_icon = NULL;
-		g_print("[ ungrab ]\n");
+		return TRUE;
 	}
 
-	return FALSE;
-}
+	if (motion == MOTION_REPOSITION || motion == MOTION_DISABLED)
+		return TRUE;
 
-static gint icon_button_press(GtkWidget *widget,
-			      GdkEventButton *event,
-			      PanelIcon *icon)
-{
-	BindAction	action;
-
-	if (current_grab_icon)
+	/* Ignore release events that happen too far from the click
+	 * source.
+	 */
+	dx = event->x_root - drag_start_x;
+	dy = event->y_root - drag_start_y;
+	if (ABS(dx) > 5 || ABS(dy) > 5)
 		return TRUE;
 
 	action = bind_lookup_bev(BIND_PANEL_ICON, event);
@@ -673,10 +693,63 @@ static gint icon_button_press(GtkWidget *widget,
 		case ACT_POPUP_MENU:
 			popup_panel_menu(event, icon->panel, icon);
 			break;
+		case ACT_IGNORE:
+			break;
+		default:
+			g_warning("Unsupported action : %d\n", action);
+			break;
+	}
+
+	return TRUE;
+}
+
+static gint icon_button_press(GtkWidget *widget,
+			      GdkEventButton *event,
+			      PanelIcon *icon)
+{
+	BindAction	action;
+
+	if (current_grab_icon)
+		return TRUE;
+
+	if (motion_state != MOTION_NONE)
+		return TRUE;		/* Ignore clicks - we're busy! */
+	
+	motion_state = MOTION_DISABLED;
+	drag_start_x = event->x_root;
+	drag_start_y = event->y_root;
+	
+	action = bind_lookup_bev(BIND_PANEL_ICON, event);
+
+	switch (action)
+	{
+		case ACT_TOGGLE_SELECTED:
+			icon_set_selected(icon, !icon->selected);
+			break;
+		case ACT_SELECT_EXCL:
+			icon_set_selected(icon, TRUE);
+			break;
+		case ACT_OPEN_ITEM:
+			wink_widget(icon->widget);
+			run_diritem(icon->path, &icon->item, NULL, FALSE);
+			break;
+		case ACT_EDIT_ITEM:
+			wink_widget(icon->widget);
+			run_diritem(icon->path, &icon->item, NULL, TRUE);
+			break;
+		case ACT_POPUP_MENU:
+			motion_state = MOTION_NONE;
+			popup_panel_menu(event, icon->panel, icon);
+			break;
 		case ACT_MOVE_ICON:
+			motion_state = MOTION_REPOSITION;
 			icon_start_move(icon);
 			break;
+		case ACT_PRIME_FOR_DND:
+			motion_state = MOTION_READY_FOR_DND;
+			break;
 		case ACT_IGNORE:
+			motion_state = MOTION_NONE;
 			break;
 		default:
 			g_warning("Unsupported action : %d\n", action);
@@ -891,6 +964,8 @@ static void drag_set_panel_dest(PanelIcon *icon)
 			GTK_SIGNAL_FUNC(drag_motion), icon);
 	gtk_signal_connect(obj, "drag_leave",
 			GTK_SIGNAL_FUNC(drag_leave), icon);
+	gtk_signal_connect(obj, "drag_end",
+			GTK_SIGNAL_FUNC(drag_end), icon);
 }
 
 static gboolean drag_motion(GtkWidget		*widget,
@@ -984,6 +1059,17 @@ static void add_uri_list(GtkWidget          *widget,
 	}
 
 	g_slist_free(uris);
+}
+
+static void drag_end(GtkWidget *widget,
+		     GdkDragContext *context,
+		     PanelIcon *icon)
+{
+	if (tmp_icon_selected)
+	{
+		panel_clear_selection(NULL);
+		tmp_icon_selected = FALSE;
+	}
 }
 
 static void menu_closed(GtkWidget *widget)
@@ -1208,16 +1294,33 @@ static void icon_start_move(PanelIcon *icon)
 	gtk_grab_add(icon->widget);
 }
 
-/* When dragging an icon within the panel */
-static gint icon_motion_reposition(GtkWidget *widget,
-				   GdkEventMotion *event,
-				   PanelIcon *icon)
+static gint icon_motion_event(GtkWidget *widget,
+			      GdkEventMotion *event,
+			      PanelIcon *icon)
 {
 	Panel	*panel = icon->panel;
 	GList	*list, *me;
 	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
 	int	val;
 	int	dir = 0;
+
+	if (motion_state == MOTION_READY_FOR_DND)
+	{
+		int	dx, dy;
+
+		dx = event->x_root - drag_start_x;
+		dy = event->y_root - drag_start_y;
+		
+		if (ABS(dx) > 3 || ABS(dy) > 3)
+		{
+			motion_state = MOTION_DISABLED;
+			start_drag(icon, event);
+		}
+
+		return TRUE;
+	}
+	else if (motion_state != MOTION_REPOSITION)
+		return FALSE;
 
 	list = get_widget_list(panel);
 	me = g_list_find(list, widget);
@@ -1316,3 +1419,54 @@ static void reposition_icon(PanelIcon *icon, int index)
 	panel_save(panel);
 }
 
+static void start_drag(PanelIcon *icon, GdkEventMotion *event)
+{
+	GtkWidget *widget = icon->widget;
+
+	if (!icon->selected)
+	{
+		panel_clear_selection(icon);	/* Select just this one */
+		tmp_icon_selected = TRUE;
+	}
+	
+	g_return_if_fail(panel_selection != NULL);
+
+	if (panel_selection->next == NULL)
+		drag_one_item(widget, event, icon->path, &icon->item, FALSE);
+	else
+	{
+		guchar	*uri_list;
+
+		uri_list = create_uri_list(panel_selection);
+		drag_selection(widget, event, uri_list);
+		g_free(uri_list);
+	}
+}
+
+/* Return a text/uri-list of all the icons in the list */
+static guchar *create_uri_list(GList *list)
+{
+	GString	*tmp;
+	guchar	*retval;
+	guchar	*leader;
+
+	tmp = g_string_new(NULL);
+	leader = g_strdup_printf("file://%s", o_no_hostnames
+						? ""
+						: our_host_name());
+
+	for (; list; list = list->next)
+	{
+		PanelIcon *icon = (PanelIcon *) list->data;
+
+		g_string_append(tmp, leader);
+		g_string_append(tmp, icon->path);
+		g_string_append(tmp, "\r\n");
+	}
+
+	g_free(leader);
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
+	
+	return retval;
+}

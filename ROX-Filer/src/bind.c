@@ -48,9 +48,18 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	gboolean background = context == BIND_PINBOARD ||
 				context == BIND_PANEL ||
 				context == BIND_DIRECTORY;
+	gboolean press = event->type == GDK_BUTTON_PRESS;
 
 	if (b > 3)
 		return ACT_IGNORE;
+
+	if (!press)
+	{
+		/* Mouse button was released rather than pressed */
+		if (b == 1 && item)
+			return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
+		return ACT_IGNORE;
+	}
 
 	if (b == 3)
 		return ACT_POPUP_MENU;
@@ -65,7 +74,7 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 		return ACT_MOVE_ICON;
 
 	if (item)
-		return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
+		return ACT_PRIME_FOR_DND;
 
 	return ACT_IGNORE;
 }
