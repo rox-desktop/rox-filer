@@ -144,6 +144,7 @@ AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 
 dnl Check for extended attribute support
 AC_CHECK_FUNCS(attropen getxattr)
+AC_CHECK_HEADERS(attr/xattr.h sys/xattr.h)
 
 dnl Extract version info from AppInfo.xml
 AC_MSG_CHECKING(extracting version information)

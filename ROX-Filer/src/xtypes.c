@@ -37,7 +37,13 @@
 #include <glib.h>
 
 #ifdef HAVE_GETXATTR
+#if defined(HAVE_ATTR_XATTR_H)
 #include <attr/xattr.h>
+#elif defined(HAVE_SYS_XATTR_H)
+#include <sys/xattr.h>
+#else
+#error "Where is getxattr defined?"
+#endif
 #endif
 
 #include "global.h"
