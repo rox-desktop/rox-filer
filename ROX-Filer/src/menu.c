@@ -53,6 +53,7 @@
 #include "dir.h"
 #include "appmenu.h"
 #include "usericons.h"
+#include "infobox.h"
 
 #define C_ "<control>"
 
@@ -217,17 +218,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Show ROX-Filer Help"), NULL, menu_rox_help, 0, NULL},
 };
 
-
-typedef struct _FileStatus FileStatus;
-
-/* This is for the 'file(1) says...' thing */
-struct _FileStatus
-{
-	int	fd;	/* FD to read from, -1 if closed */
-	int	input;	/* Input watcher tag if fd valid */
-	GtkLabel *label;	/* Widget to output to */
-	gboolean	start;	/* No output yet */
-};
 
 #define GET_MENU_ITEM(var, menu)	\
 		var = gtk_item_factory_get_widget(item_factory,	"<" menu ">");
@@ -949,106 +939,11 @@ static void set_icon(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-/* Got some data from file(1) - stick it in the window. */
-static void add_file_output(FileStatus *fs,
-			    gint source, GdkInputCondition condition)
+static void show_file_info(gpointer unused, guint action, GtkWidget *widget)
 {
-	char	buffer[20];
-	char	*str;
-	int	got;
-
-	got = read(source, buffer, sizeof(buffer) - 1);
-	if (got <= 0)
-	{
-		int	err = errno;
-		gtk_input_remove(fs->input);
-		close(source);
-		fs->fd = -1;
-		if (got < 0)
-			delayed_error(_("ROX-Filer: file(1) says..."),
-					g_strerror(err));
-		return;
-	}
-	buffer[got] = '\0';
-
-	if (fs->start)
-	{
-		str = "";
-		fs->start = FALSE;
-	}
-	else
-		gtk_label_get(fs->label, &str);
-
-	str = g_strconcat(str, buffer, NULL);
-	gtk_label_set_text(fs->label, str);
-	g_free(str);
-}
-
-static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
-{
-	if (fs->fd != -1)
-	{
-		gtk_input_remove(fs->input);
-		close(fs->fd);
-	}
-
-	g_free(fs);
-}
-
-/* g_free() the result */
-guchar *pretty_type(DirItem *file, guchar *path)
-{
-	if (file->flags & ITEM_FLAG_SYMLINK)
-	{
-		char	p[MAXPATHLEN + 1];
-		int	got;
-		got = readlink(path, p, MAXPATHLEN);
-		if (got > 0 && got <= MAXPATHLEN)
-		{
-			p[got] = '\0';
-			return g_strconcat(_("Symbolic link to "), p, NULL);
-		}
-
-		return g_strdup(_("Symbolic link"));
-	}
-
-	if (file->flags & ITEM_FLAG_APPDIR)
-		return g_strdup(_("ROX application"));
-
-	if (file->flags & ITEM_FLAG_MOUNT_POINT)
-		return g_strdup(_("Mount point"));
-
-	if (file->mime_type)
-		return g_strconcat(file->mime_type->media_type, "/",
-				file->mime_type->subtype, NULL);
-
-	return g_strdup("-");
-}
-
-#define LABEL(text, row)						\
-	label = gtk_label_new(text);				\
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);			\
-	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);	\
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, row, row + 1);
-
-#define VALUE(label, row)						\
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);			\
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, row, row + 1);
-
-static void show_file_info(gpointer data, guint action, GtkWidget *widget)
-{
-	GtkWidget	*window, *table, *label, *button, *frame, *value;
-	GtkWidget	*file_label;
-	GString		*gstring;
-	int		file_data[2];
-	guchar		*path, *tmp;
-	char 		*argv[] = {"file", "-b", NULL, NULL};
-	Collection 	*collection;
 	DirItem		*file;
-	struct stat	info;
-	FileStatus 	*fs = NULL;
-	guint		perm;
-	
+	Collection 	*collection;
+
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
@@ -1065,144 +960,11 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 				_("Examine ... ?"));
 		return;
 	}
+
 	file = selected_item(collection);
-	path = make_path(window_with_focus->path,
-			file->leafname)->str;
-	if (lstat(path, &info))
-	{
-		delayed_error(PROJECT, g_strerror(errno));
-		return;
-	}
-	
-	gstring = g_string_new(NULL);
-
-	window = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
-	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
-	gtk_window_set_title(GTK_WINDOW(window), path);
-
-	table = gtk_table_new(10, 2, FALSE);
-	gtk_container_add(GTK_CONTAINER(window), table);
-	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
-	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
-	
-	value = gtk_label_new(file->leafname);
-	LABEL(_("Name:"), 0);
-	VALUE(value, 0);
-
-	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
-					    group_name(info.st_gid));
-	value = gtk_label_new(gstring->str);
-	LABEL(_("Owner, Group:"), 1);
-	VALUE(value, 1);
-	
-	if (info.st_size >= PRETTY_SIZE_LIMIT)
-	{
-		g_string_sprintf(gstring, "%s (%ld %s)",
-				format_size((unsigned long) info.st_size),
-				(unsigned long) info.st_size, _("bytes"));
-	}
-	else
-	{
-		g_string_assign(gstring, 
-				format_size((unsigned long) info.st_size));
-	}
-	value = gtk_label_new(gstring->str);
-	LABEL(_("Size:"), 2);
-	VALUE(value, 2);
-	
-	value = gtk_label_new(pretty_time(&info.st_ctime));
-	LABEL(_("Change time:"), 3);
-	VALUE(value, 3);
-	
-	value = gtk_label_new(pretty_time(&info.st_mtime));
-	LABEL(_("Modify time:"), 4);
-	VALUE(value, 4);
-	
-	value = gtk_label_new(pretty_time(&info.st_atime));
-	LABEL(_("Access time:"), 5);
-	VALUE(value, 5);
-	
-	value = gtk_label_new(pretty_permissions(info.st_mode));
-	perm = applicable(info.st_uid, info.st_gid);
-	gtk_label_set_pattern(GTK_LABEL(value),
-			perm == 0 ? "___        " :
-			perm == 1 ? "    ___    " :
-				    "        ___");
-	gtk_widget_set_style(value, fixed_style);
-	LABEL(_("Permissions:"), 6);
-	VALUE(value, 6);
-	
-	tmp = pretty_type(file, path);
-	value = gtk_label_new(tmp);
-	g_free(tmp);
-	LABEL(_("Type:"), 7);
-	VALUE(value, 7);
-
-	frame = gtk_frame_new(_("file(1) says..."));
-	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 8, 9);
-	file_label = gtk_label_new(_("<nothing yet>"));
-	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
-	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
-	gtk_container_add(GTK_CONTAINER(frame), file_label);
-	
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_window_set_focus(GTK_WINDOW(window), button);
-	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 10, 11,
-			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			gtk_widget_destroy, GTK_OBJECT(window));
-
-	gtk_widget_show_all(window);
-	gdk_flush();
-
-	if (pipe(file_data))
-	{
-		g_string_sprintf(gstring, "pipe(): %s", g_strerror(errno));
-		g_string_free(gstring, TRUE);
-		return;
-	}
-	switch (fork())
-	{
-		case -1:
-			g_string_sprintf(gstring, "fork(): %s",
-					g_strerror(errno));
-			gtk_label_set_text(GTK_LABEL(file_label), gstring->str);
-			g_string_free(gstring, TRUE);
-			close(file_data[0]);
-			close(file_data[1]);
-			break;
-		case 0:
-			/* We are the child */
-			close(file_data[0]);
-			dup2(file_data[1], STDOUT_FILENO);
-			dup2(file_data[1], STDERR_FILENO);
-#ifdef FILE_B_FLAG
-			argv[2] = path;
-#else
-			argv[1] = file->leafname;
-			chdir(window_with_focus->path);
-#endif
-			if (execvp(argv[0], argv))
-				fprintf(stderr, "execvp() error: %s\n",
-						g_strerror(errno));
-			_exit(0);
-		default:
-			/* We are the parent */
-			close(file_data[1]);
-			fs = g_new(FileStatus, 1);
-			fs->label = GTK_LABEL(file_label);
-			fs->fd = file_data[0];
-			fs->start = TRUE;
-			fs->input = gdk_input_add(fs->fd, GDK_INPUT_READ,
-				(GdkInputFunction) add_file_output, fs);
-			gtk_signal_connect(GTK_OBJECT(window), "destroy",
-				GTK_SIGNAL_FUNC(file_info_destroyed), fs);
-			g_string_free(gstring, TRUE);
-			break;
-	}
+	infobox_new(make_path(window_with_focus->path, file->leafname)->str);
 }
-
+	
 void open_home(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(home_dir);
