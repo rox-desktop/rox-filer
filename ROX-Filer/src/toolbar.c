@@ -408,14 +408,10 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
-	if (filer_window->details_type == DETAILS_NONE)
-		display_set_layout(filer_window,
-				filer_window->display_style,
-				DETAILS_SUMMARY);
+	if (filer_window->view_type == VIEW_TYPE_DETAILS)
+		filer_set_view_type(filer_window, VIEW_TYPE_COLLECTION);
 	else
-		display_set_layout(filer_window,
-				filer_window->display_style,
-				DETAILS_NONE);
+		filer_set_view_type(filer_window, VIEW_TYPE_DETAILS);
 }
 
 static void toolbar_hidden_clicked(GtkWidget *widget,

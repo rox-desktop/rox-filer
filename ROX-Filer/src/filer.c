@@ -1061,7 +1061,8 @@ DirItem *filer_selected_item(FilerWindow *filer_window)
  * Returns the new filer window, or NULL on error.
  * Note: if unique windows is in use, may return an existing window.
  */
-FilerWindow *filer_opendir(const char *path, FilerWindow *src_win, const gchar *wm_class)
+FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
+			   const gchar *wm_class)
 {
 	FilerWindow	*filer_window;
 	char		*real_path;
@@ -1101,6 +1102,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win, const gchar *
 	filer_window->selection_state = GTK_STATE_INSENSITIVE;
 	filer_window->toolbar = NULL;
 	filer_window->toplevel_vbox = NULL;
+	filer_window->view = NULL;
+	filer_window->scrollbar = NULL;
 
 	tidy_sympath(filer_window->sym_path);
 
@@ -1189,6 +1192,49 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win, const gchar *
 	return filer_window;
 }
 
+void filer_set_view_type(FilerWindow *filer_window, ViewType type)
+{
+	GtkWidget *view = NULL;
+	Directory *dir = NULL;
+	
+	g_return_if_fail(filer_window != NULL);
+
+	if (filer_window->view)
+	{
+		gtk_widget_destroy(GTK_WIDGET(filer_window->view));
+		filer_window->view = NULL;
+
+		dir = filer_window->directory;
+		g_object_ref(dir);
+		detach(filer_window);
+	}
+
+	switch (type)
+	{
+		case VIEW_TYPE_COLLECTION:
+			view = view_collection_new(filer_window);
+			break;
+		case VIEW_TYPE_DETAILS:
+			view = view_details_new(filer_window);
+			break;
+	}
+
+	g_return_if_fail(view != NULL);
+
+	filer_window->view = VIEW(view);
+	filer_window->view_type = type;
+
+	gtk_box_pack_start(filer_window->toplevel_vbox, view, TRUE, TRUE, 0);
+	gtk_widget_show(view);
+
+	if (dir)
+	{
+		/* Only when changing type. Otherwise, will attach later. */
+		filer_window->directory = dir;
+		attach(filer_window);
+	}
+}
+
 /* This adds all the widgets to a new filer window. It is in a separate
  * function because filer_opendir() was getting too long...
  */
@@ -1200,7 +1246,8 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
 	if (wm_class)
-		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window), wm_class, PROJECT);
+		gtk_window_set_wmclass(GTK_WINDOW(filer_window->window),
+					wm_class, PROJECT);
 
 	/* This property is cleared when the window is destroyed.
 	 * You can thus ref filer_window->window and use this to see
@@ -1212,10 +1259,6 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	/* Create this now to make the Adjustment before the View */
 	filer_window->scrollbar = gtk_vscrollbar_new(NULL);
 	
-	/* The view is the area that actually displays the files */
-	filer_window->view = VIEW(view_collection_new(filer_window));
-	gtk_widget_show(GTK_WIDGET(filer_window->view));
-
 	/* Scrollbar on the right, everything else on the left */
 	hbox = gtk_hbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
@@ -1223,6 +1266,8 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start_defaults(GTK_BOX(hbox), vbox);
 	filer_window->toplevel_vbox = GTK_BOX(vbox);
+
+	filer_set_view_type(filer_window, VIEW_TYPE_COLLECTION);
 	
 	/* If we want a toolbar, create it now */
 	toolbar_update_toolbar(filer_window);
@@ -1238,13 +1283,9 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 		gtk_widget_show(filer_window->message);
 	}
 
-	/* Now add the area for displaying the files */
-	gtk_box_pack_start_defaults(GTK_BOX(vbox),
-				    GTK_WIDGET(filer_window->view));
-
 	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
-	gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
+	gtk_box_pack_end(GTK_BOX(vbox), filer_window->minibuffer_area,
 				FALSE, TRUE, 0);
 
 	/* And the thumbnail progress bar (also hidden) */
@@ -1252,7 +1293,7 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 		GtkWidget *cancel;
 
 		filer_window->thumb_bar = gtk_hbox_new(FALSE, 2);
-		gtk_box_pack_start(GTK_BOX(vbox), filer_window->thumb_bar,
+		gtk_box_pack_end(GTK_BOX(vbox), filer_window->thumb_bar,
 				FALSE, TRUE, 0);
 
 		filer_window->thumb_progress = gtk_progress_bar_new();

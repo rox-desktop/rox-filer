@@ -31,6 +31,12 @@ typedef enum
 	FILER_CREATE_THUMBS	= 0x04, /* Create thumbs when scan ends */
 } FilerFlags;
 
+typedef enum
+{
+	VIEW_TYPE_COLLECTION,		/* Icons view */
+	VIEW_TYPE_DETAILS		/* TreeView details list */
+} ViewType;
+
 /* iter's next method has just returned the clicked item... */
 typedef void (*TargetFunc)(FilerWindow *filer_window,
 			   ViewIter *iter,
@@ -44,6 +50,7 @@ struct _FilerWindow
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
 	ViewIface	*view;
+	ViewType	view_type;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
@@ -127,5 +134,6 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h);
 gboolean filer_window_delete(GtkWidget *window,
 			     GdkEvent *unused,
 			     FilerWindow *filer_window);
+void filer_set_view_type(FilerWindow *filer_window, ViewType type);
 
 #endif /* _FILER_H */

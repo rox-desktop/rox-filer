@@ -295,6 +295,7 @@ static void view_collection_init(GTypeInstance *object, gpointer gclass)
 
 	adj = view_collection->collection->vadj;
 	gtk_viewport_set_vadjustment(viewport, adj);
+	gtk_viewport_set_hadjustment(viewport, NULL); /* Or Gtk will crash */
 	gtk_viewport_set_shadow_type(viewport, GTK_SHADOW_NONE);
 	gtk_container_add(GTK_CONTAINER(object), collection);
 	gtk_widget_show(collection);
