@@ -1390,18 +1390,23 @@ static void draw_string(GtkWidget *widget,
 
 	if (width > area->width)
 	{
-		/* XXX */
-#if 0
+		static GdkGC *red_gc = NULL;
+
 		if (!red_gc)
 		{
+			gboolean success;
+			GdkColor red = {0, 0xffff, 0, 0};
+
 			red_gc = gdk_gc_new(widget->window);
+			gdk_colormap_alloc_colors(
+					gtk_widget_get_colormap(widget),
+					&red, 1, FALSE, TRUE, &success);
 			gdk_gc_set_foreground(red_gc, &red);
 		}
 		gdk_draw_rectangle(widget->window, red_gc, TRUE,
 				area->x + area->width - 1, area->y,
 				1, area->height);
 		gdk_gc_set_clip_rectangle(gc, NULL);
-#endif
 	}
 }
 
