@@ -795,7 +795,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 						   "filer_window");
 		g_return_if_fail(filer_window != NULL);
 
-		scan_dir(filer_window);
+		update_dir(filer_window);
 	}
 	else if (response != 'E')
 	{
@@ -852,7 +852,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		if (close(fd) == -1 && !error)
 			error = g_strerror(errno);
 
-		scan_dir(filer_window);
+		update_dir(filer_window);
 	}
 	
 	if (error)

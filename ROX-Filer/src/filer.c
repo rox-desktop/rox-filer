@@ -67,6 +67,8 @@ static gint focus_out(GtkWidget *widget,
 			FilerWindow *filer_window);
 static void add_view(FilerWindow *filer_window);
 static void remove_view(FilerWindow *filer_window);
+static void free_item(FileItem *item);
+static gboolean remove_deleted(gpointer item_data, gpointer data);
 
 static GdkAtom xa_string;
 enum
@@ -116,26 +118,33 @@ static void remove_view(FilerWindow *filer_window)
 				newlist);
 }
 
-/* Go though all the FileItems in a collection, freeing all the temp
- * icons.
+/* Go though all the FileItems in a collection, freeing all items.
  * TODO: Maybe we should cache icons?
  */
-static void free_temp_icons(FilerWindow *filer_window)
+static void free_items(FilerWindow *filer_window)
 {
 	int		i;
 	Collection	*collection = filer_window->collection;
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
-		FileItem	*item = (FileItem *) collection->items[i].data;
-		if (item->flags & ITEM_FLAG_TEMP_ICON)
-		{
-			gdk_pixmap_unref(item->image->pixmap);
-			gdk_pixmap_unref(item->image->mask);
-			g_free(item->image);
-			item->image = default_pixmap + TYPE_ERROR;
-		}
+		free_item((FileItem *) collection->items[i].data);
+		collection->items[i].data = NULL;
 	}
+}
+
+/* Set one item in a collection to NULL, freeing all data for it */
+static void free_item(FileItem *item)
+{
+	if (item->flags & ITEM_FLAG_TEMP_ICON)
+	{
+		gdk_pixmap_unref(item->image->pixmap);
+		gdk_pixmap_unref(item->image->mask);
+		g_free(item->image);
+		item->image = default_pixmap + TYPE_ERROR;
+	}
+	g_free(item->leafname);
+	g_free(item);
 }
 
 static void filer_window_destroyed(GtkWidget 	*widget,
@@ -154,7 +163,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 
 	remove_view(filer_window);
 
-	free_temp_icons(filer_window);
+	free_items(filer_window);
 	if (filer_window->dir)
 		stop_scanning(filer_window);
 	g_free(filer_window->path);
@@ -192,8 +201,13 @@ static gboolean idle_scan_dir(gpointer data)
 					filer_window->collection->item_height);
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
+			if (filer_window->flags & FILER_UPDATING)
+			{
+				collection_delete_if(filer_window->collection,
+						     remove_deleted, NULL);
+			}
 			if (filer_window->flags & FILER_NEEDS_RESCAN)
-				scan_dir(filer_window);
+				update_dir(filer_window);
 
 			return FALSE;		/* Finished */
 		}
@@ -208,6 +222,7 @@ static gboolean idle_scan_dir(gpointer data)
 static void add_item(FilerWindow *filer_window, char *leafname)
 {
 	FileItem	*item;
+	int		old_item;
 	int		item_width;
 	struct stat	info;
 	int		base_type;
@@ -343,7 +358,18 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 					 item_width,
 					 filer_window->collection->item_height);
 
-	collection_insert(filer_window->collection, item);
+	old_item = collection_find_item(filer_window->collection, item,
+			filer_window->sort_fn);
+
+	if (old_item >= 0)
+	{
+		free_item((FileItem *)
+				filer_window->collection->items[old_item].data);
+		filer_window->collection->items[old_item].data = item;
+		collection_draw_item(filer_window->collection, old_item, TRUE);
+	}
+	else
+		collection_insert(filer_window->collection, item);
 }
 
 static gboolean test_point(Collection *collection,
@@ -463,13 +489,47 @@ static void may_rescan(FilerWindow *filer_window)
 		if (filer_window->dir)
 			filer_window->flags |= FILER_NEEDS_RESCAN;
 		else
-			scan_dir(filer_window);
+			update_dir(filer_window);
 	}
 }
 
+/* Callback to collection_delete_if() */
+static gboolean remove_deleted(gpointer item_data, gpointer data)
+{
+	FileItem *item = (FileItem *) item_data;
+
+	if (item->flags & ITEM_FLAG_MAY_DELETE)
+	{
+		free_item(item);
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+/* Forget the old contents of a filer window and scan the directory
+ * from the start. If we are already scanning then rescan later.
+ */
 void scan_dir(FilerWindow *filer_window)
 {
-	struct stat info;
+	if (filer_window->dir)
+		stop_scanning(filer_window);
+
+	free_items(filer_window);
+	collection_clear(filer_window->collection);
+
+	update_dir(filer_window);
+	filer_window->flags &= ~FILER_UPDATING;
+}
+
+/* Like scan_dir(), but assume new display will be similar to the old
+ * one (less flicker and doesn't lose the selection).
+ */
+void update_dir(FilerWindow *filer_window)
+{
+	Collection	*collection = filer_window->collection;
+	struct stat 	info;
+	int		i;
 
 	if (filer_window->dir)
 	{
@@ -478,6 +538,7 @@ void scan_dir(FilerWindow *filer_window)
 		return;
 	}
 	filer_window->flags &= ~FILER_NEEDS_RESCAN;
+	filer_window->flags |= FILER_UPDATING;
 
 	if (panel_with_timeout == filer_window)
 	{
@@ -485,10 +546,14 @@ void scan_dir(FilerWindow *filer_window)
 		gtk_timeout_remove(panel_timeout);
 	}
 
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		FileItem *item = (FileItem *) collection->items[i].data;
+		item->flags |= ITEM_FLAG_MAY_DELETE;
+	}
+
 	mount_update();
 	
-	free_temp_icons(filer_window);
-	collection_clear(filer_window->collection);
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
 			filer_window->path);
 
@@ -869,7 +934,7 @@ void refresh_dirs(char *path)
 	while (list)
 	{
 		next = list->next;
-		scan_dir((FilerWindow *) list->data);
+		update_dir((FilerWindow *) list->data);
 		list = next;
 	}
 }
@@ -892,6 +957,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->panel_side = panel_side;
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = sort_by_type;
+	filer_window->flags = 0;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 

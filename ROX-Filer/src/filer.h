@@ -26,11 +26,13 @@ typedef enum
 	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is in /etc/mtab */
 	ITEM_FLAG_TEMP_ICON  	= 0x10,	/* Free icon after use */
 	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */
+	ITEM_FLAG_MAY_DELETE	= 0x40, /* Delete on finishing scan */
 } ItemFlags;
 
 typedef enum
 {
 	FILER_NEEDS_RESCAN	= 0x01, /* Call may_rescan after scanning */
+	FILER_UPDATING		= 0x02, /* (scanning) items may already exist */
 } FilerFlags;
 
 #include "type.h"
@@ -74,6 +76,7 @@ extern GHashTable	*child_to_filer;
 /* Prototypes */
 void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
+void update_dir(FilerWindow *filer_window);
 void scan_dir(FilerWindow *filer_window);
 void panel_set_timeout(FilerWindow *filer_window, gulong msec);
 FileItem *selected_item(Collection *collection);

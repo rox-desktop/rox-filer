@@ -123,10 +123,18 @@ void 	collection_set_item_size	(Collection *collection,
 void 	collection_qsort		(Collection *collection,
 					 int (*compar)(const void *,
 						       const void *));
+int 	collection_find_item		(Collection *collection,
+					 gpointer data,
+					 int (*compar)(const void *,
+						       const void *));
 void 	collection_set_panel		(Collection *collection,
 					 gboolean panel);
 int 	collection_get_item		(Collection *collection, int x, int y);
 void 	collection_set_cursor_item	(Collection *collection, gint item);
+void 	collection_delete_if		(Collection *collection,
+			  		 gboolean (*test)(gpointer item,
+						          gpointer data),
+			  		 gpointer data);
 
 #ifdef __cplusplus
 }

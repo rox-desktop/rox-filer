@@ -1524,6 +1524,26 @@ void collection_qsort(Collection *collection,
 	gtk_widget_queue_draw(GTK_WIDGET(collection));
 }
 
+/* Find an item in a sorted collection.
+ * Returns the item number, or -1 if not found.
+ * XXX: Make this efficient!!!
+ */
+int collection_find_item(Collection *collection, gpointer data,
+		         int (*compar)(const void *, const void *))
+{
+	int	i;
+
+	g_return_val_if_fail(collection != NULL, -1);
+	g_return_val_if_fail(IS_COLLECTION(collection), -1);
+	g_return_val_if_fail(compar != NULL, -1);
+
+	for (i = 0; i < collection->number_of_items; i++)
+		if (compar(&collection->items[i].data, &data) == 0)
+			return i;
+
+	return -1;
+}
+
 /* The collection may be in either normal mode or panel mode.
  * In panel mode:
  * - a single click calls open_item
@@ -1604,4 +1624,50 @@ void collection_set_cursor_item(Collection *collection, gint item)
 		collection_draw_item(collection, old_item, TRUE);
 	if (item != -1)
 		collection_draw_item(collection, item, TRUE);
+}
+
+/* Call test(item, data) on each item in the collection.
+ * Remove all items for which it returns TRUE. test() should
+ * free the data before returning TRUE. The collection is in an
+ * inconsistant state during this call (ie, when test() is called).
+ */
+void collection_delete_if(Collection *collection,
+			  gboolean (*test)(gpointer item, gpointer data),
+			  gpointer data)
+{
+	int	in, out = 0;
+	int	selected = 0;
+
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(test != NULL);
+
+	for (in = 0; in < collection->number_of_items; in++)
+	{
+		if (!test(collection->items[in].data, data))
+		{
+			if (collection->items[in].selected)
+			{
+				collection->items[out].selected = TRUE;
+				selected++;
+			}
+			else
+				collection->items[out].selected = FALSE;
+
+			collection->items[out++].data =
+				collection->items[in].data;
+		}
+	}
+
+	if (in != out)
+	{
+		collection->number_of_items = out;
+		collection->number_selected = selected;
+		resize_arrays(collection,
+			MAX(collection->number_of_items, MINIMUM_ITEMS));
+
+		collection->paint_level = PAINT_CLEAR;
+
+		gtk_widget_queue_draw(GTK_WIDGET(collection));
+	}
 }

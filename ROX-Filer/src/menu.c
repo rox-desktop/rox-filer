@@ -417,14 +417,14 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	window_with_focus->show_hidden = !window_with_focus->show_hidden;
-	scan_dir(window_with_focus);
+	update_dir(window_with_focus);
 }
 
 static void refresh(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	scan_dir(window_with_focus);
+	update_dir(window_with_focus);
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
@@ -785,7 +785,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 			}
 		}
 	if (count)
-		scan_dir(window_with_focus);
+		update_dir(window_with_focus);
 	else if (!error)
 		error = "You must select some mount points first!";
 
