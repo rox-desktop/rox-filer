@@ -68,6 +68,7 @@ static XMLwrapper *groups = NULL;
 
 /* Item we are about to display a tooltip for */
 static DirItem *tip_item = NULL;
+
 /* The window which the motion event for the tooltip came from. Use this
  * to get the correct widget for finding the item under the pointer.
  */
@@ -1253,6 +1254,8 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 	
 	g_return_if_fail(filer_window != NULL);
 
+	motion_window = NULL;
+
 	if (filer_window->view)
 	{
 		/* Save the current selection */
@@ -2109,7 +2112,7 @@ static gboolean tooltip_activate(GtkWidget *window)
 
 	filer_window = g_object_get_data(G_OBJECT(window), "filer_window");
 
-	if (!filer_window)
+	if (!motion_window || !filer_window)
 		return FALSE;	/* Window has been destroyed */
 
 	view = filer_window->view;
