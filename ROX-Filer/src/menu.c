@@ -172,7 +172,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Window/Parent, Same Window",	NULL,   open_parent_same, 0, NULL},
 {"/Window/New Window",		NULL,   new_window, 0, NULL},
 {"/Window/Close Window",	C_"Q",  close_window, 0, NULL},
-{"/Window/Enter path",		NULL,  	enter_path, 0, NULL},
+{"/Window/Enter Path",		NULL,  	enter_path, 0, NULL},
 {"/Window/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Window/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
@@ -195,6 +195,7 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/File/Info",			NULL,  	show_file_info, 0, NULL},
 {"/File/Delete",		NULL,	delete,	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
+{"/Options...",			NULL,   show_options, 0, NULL},
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
 {"/Separator",			NULL,	NULL, 0, "<Separator>"},
 {"/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
@@ -760,7 +761,7 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	else
 		filer_openitem(window_with_focus,
 				selected_item_number(collection),
-				TRUE, FALSE);
+				OPEN_SAME_WINDOW | OPEN_SHIFT);
 }
 
 /* Got some data from file(1) - stick it in the window. */

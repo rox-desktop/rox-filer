@@ -13,5 +13,6 @@
 
 GtkWidget *create_minibuffer(FilerWindow *filer_window);
 void minibuffer_show(FilerWindow *filer_window);
+void minibuffer_hide(FilerWindow *filer_window);
 
 #endif /* _MINIBUFFER_H */

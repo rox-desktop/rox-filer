@@ -24,6 +24,14 @@ typedef enum {UNKNOWN_STYLE, LARGE_ICONS, SMALL_ICONS, FULL_INFO} DisplayStyle;
 
 typedef enum
 {
+	OPEN_SHIFT		= 0x01,	/* Do ShiftOpen */
+	OPEN_SAME_WINDOW	= 0x02, /* Directories open in same window */
+	OPEN_CLOSE_WINDOW	= 0x04, /* Opening files closes the window */
+	OPEN_FROM_MINI		= 0x08,	/* Non-dir => close minibuffer */
+} OpenFlags;
+
+typedef enum
+{
 	FILER_NEEDS_RESCAN	= 0x01, /* Call may_rescan after scanning */
 	FILER_UPDATING		= 0x02, /* (scanning) items may already exist */
 } FilerFlags;
@@ -58,7 +66,7 @@ extern GHashTable	*child_to_filer;
 
 /* Prototypes */
 void filer_init();
-void filer_opendir(char *path, gboolean panel, Side panel_side);
+FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side);
 void update_dir(FilerWindow *filer_window, gboolean warning);
 void scan_dir(FilerWindow *filer_window);
 int selected_item_number(Collection *collection);
@@ -75,7 +83,7 @@ void filer_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
-		gboolean shift, gboolean adjust);
+		OpenFlags flags);
 void filer_check_mounted(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 

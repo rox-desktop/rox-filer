@@ -929,8 +929,7 @@ static void open_item(Collection *collection,
 	GdkEvent 	*event;
 	GdkEventButton 	*bevent;
 	GdkEventKey 	*kevent;
-	gboolean	shift;
-	gboolean	adjust;		/* do alternative action */
+	OpenFlags	flags = 0;
 
 	event = (GdkEvent *) gtk_get_current_event();
 
@@ -942,22 +941,29 @@ static void open_item(Collection *collection,
 		case GDK_2BUTTON_PRESS:
 		case GDK_BUTTON_PRESS:
 		case GDK_BUTTON_RELEASE:
-			shift = bevent->state & GDK_SHIFT_MASK;
-			adjust = (bevent->button != 1)
-				^ ((bevent->state & GDK_CONTROL_MASK) != 0
-						&& o_single_click == 0);
+			if (bevent->state & GDK_SHIFT_MASK)
+				flags |= OPEN_SHIFT;
+
+			if (o_new_window_on_1 ^ (bevent->button == 1))
+				flags |= OPEN_SAME_WINDOW;
+			
+			if (bevent->button != 1)
+				flags |= OPEN_CLOSE_WINDOW;
+			
+			if (o_single_click == FALSE &&
+				(bevent->state & GDK_CONTROL_MASK) != 0)
+				flags ^= OPEN_SAME_WINDOW | OPEN_CLOSE_WINDOW;
 			break;
 		case GDK_KEY_PRESS:
-			shift = kevent->state & GDK_SHIFT_MASK;
-			adjust = FALSE;
+			flags |= OPEN_SAME_WINDOW;
+			if (kevent->state & GDK_SHIFT_MASK)
+				flags |= OPEN_SHIFT;
 			break;
 		default:
-			shift = FALSE;
-			adjust = FALSE;
 			break;
 	}
 
-	filer_openitem(filer_window, item_number, shift, adjust);
+	filer_openitem(filer_window, item_number, flags);
 }
 
 /* Return the full path to the directory containing object 'path'.
@@ -990,16 +996,27 @@ static void follow_symlink(FilerWindow *filer_window, char *path)
 		new_dir = "/";
 
 	if (filer_window->panel)
-		filer_opendir(new_dir, FALSE, BOTTOM);
+	{
+		FilerWindow *new;
+		
+		new = filer_opendir(new_dir, FALSE, BOTTOM);
+		g_free(new->auto_select);
+		new->auto_select = g_strdup(slash + 1);
+	}
 	else
 		filer_change_to(filer_window, new_dir, slash + 1);
 
 	g_free(real);
 }
 
-void filer_openitem(FilerWindow *filer_window, int item_number,
-		gboolean shift, gboolean adjust)
+void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 {
+	gboolean	shift = (flags & OPEN_SHIFT) != 0;
+	gboolean	close_mini = flags & OPEN_FROM_MINI;
+	gboolean	same_window = (flags & OPEN_SAME_WINDOW) != 0
+					&& !filer_window->panel;
+	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0
+					&& !filer_window->panel;
 	GtkWidget	*widget;
 	char		*full_path;
 	DirItem		*item = (DirItem *)
@@ -1037,7 +1054,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 			{
 				run_app(make_path(filer_window->path,
 						item->leafname)->str);
-				if (adjust && !filer_window->panel)
+				if (close_window)
 					gtk_widget_destroy(widget);
 				break;
 			}
@@ -1049,17 +1066,17 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 					break;
 			}
 
-			if ((adjust ^ o_new_window_on_1) || filer_window->panel)
-				filer_opendir(full_path, FALSE, BOTTOM);
-			else
+			if (same_window)
 			{
 				wink = FALSE;
 				filer_change_to(filer_window, full_path, NULL);
+				close_mini = FALSE;
 			}
+			else
+				filer_opendir(full_path, FALSE, BOTTOM);
 			break;
 		case TYPE_FILE:
-			if (item->flags & ITEM_FLAG_EXEC_FILE
-					&& !shift)
+			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !shift)
 			{
 				char	*argv[] = {NULL, NULL};
 
@@ -1067,7 +1084,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 
 				if (spawn_full(argv, getenv("HOME"), 0))
 				{
-					if (adjust && !filer_window->panel)
+					if (close_window)
 					{
 						wink = FALSE;
 						gtk_widget_destroy(widget);
@@ -1087,7 +1104,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 
 				if (type_open(full_path, type))
 				{
-					if (adjust && !filer_window->panel)
+					if (close_window)
 					{
 						wink = FALSE;
 						gtk_widget_destroy(widget);
@@ -1114,6 +1131,9 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 
 	if (wink)
 		collection_wink_item(filer_window->collection, item_number);
+
+	if (close_mini)
+		minibuffer_hide(filer_window);
 }
 
 static gint pointer_in(GtkWidget *widget,
@@ -1351,7 +1371,7 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 	shrink_width(filer_window);
 }
 
-void filer_opendir(char *path, gboolean panel, Side panel_side)
+FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
@@ -1378,7 +1398,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		g_free(error);
 		g_free(filer_window->path);
 		g_free(filer_window);
-		return;
+		return NULL;
 	}
 
 	filer_window->show_hidden = FALSE;
@@ -1533,6 +1553,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	attach(filer_window);
 
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
+
+	return filer_window;
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)

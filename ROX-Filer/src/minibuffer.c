@@ -81,6 +81,13 @@ void minibuffer_show(FilerWindow *filer_window)
 			filer_window->minibuffer);
 }
 
+void minibuffer_hide(FilerWindow *filer_window)
+{
+	gtk_widget_hide(filer_window->minibuffer);
+	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
+			GTK_WIDGET(filer_window->collection));
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -91,6 +98,7 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	Collection 	*collection = filer_window->collection;
 	int		item = collection->cursor_item;
 	char		*path, *pattern;
+	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 	pattern = strrchr(path, '/');
@@ -105,9 +113,10 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 		return;
 	}
 	
-	filer_openitem(filer_window, item,
-			(event->state & GDK_SHIFT_MASK) != 0,
-			FALSE);
+	if ((event->state & GDK_SHIFT_MASK) != 0)
+		flags |= OPEN_SHIFT;
+
+	filer_openitem(filer_window, item, flags);
 }
 
 /* Use the cursor item to fill in the minibuffer */
@@ -136,9 +145,7 @@ static gint key_press_event(GtkWidget	*widget,
 	switch (event->keyval)
 	{
 		case GDK_Escape:
-			gtk_widget_hide(widget);
-			gtk_window_set_focus(GTK_WINDOW(filer_window->window),
-					GTK_WIDGET(filer_window->collection));
+			minibuffer_hide(filer_window);
 			break;
 		case GDK_Up:
 			search_in_dir(filer_window, -1);
