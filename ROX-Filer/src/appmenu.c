@@ -46,12 +46,14 @@
 
 /* Static prototypes */
 static void apprun_menu(GtkWidget *item, gpointer data);
-static GtkWidget *create_menu_item(char *label, char *option);
+static GtkWidget *create_menu_item(xmlNode *node);
 
 /* There can only be one menu open at a time... we store: */
 static GtkWidget *current_menu = NULL;	/* The GtkMenu */
-static GList *current_items = NULL;	/* The GtkMenuItems we added to it */
 static guchar *current_app_path = NULL;	/* The path of the application */
+static GList *current_items = NULL;	/* The GtkMenuItems we added directly
+					 * to it --- not submenu items.
+					 */
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -112,20 +114,14 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 	/* Add the menu entries */
 	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
-		if (strcmp(node->name, "Item") == 0)
-		{
-			guchar	*label, *option;
+		GtkWidget *item;
 
-			label = xmlGetProp(node, "label");
-			option = xmlGetProp(node, "option");
-			current_items = g_list_prepend(current_items,
-					create_menu_item(label, option));
+		item = create_menu_item(node);
 
-			g_free(label);
-			g_free(option);
-		}
+		if (item)
+			current_items = g_list_prepend(current_items, item);
 	}
-
+		
 	sep = gtk_menu_item_new();
 	current_items = g_list_prepend(current_items, sep);
 	gtk_widget_show(sep);
@@ -142,26 +138,79 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
  *                      INTERNAL FUNCTIONS                      *
  ****************************************************************/
 
+/* Create a new menu and return it */
+static GtkWidget *appmenu_add_submenu(xmlNode *subm_node)
+{
+	xmlNode	*node;
+	GtkWidget *sub_menu;
+
+        /* Create the new submenu */
+	sub_menu = gtk_menu_new();
+	
+	/* Add the menu entries */
+	for (node = subm_node->xmlChildrenNode; node; node = node->next)
+	{
+		GtkWidget *item;
+
+		item = create_menu_item(node);
+		if (item)
+			gtk_menu_append(GTK_MENU(sub_menu), item);
+	}
+
+	return sub_menu;
+}
+
 /* Create and return a menu item */
-static GtkWidget *create_menu_item(char *label, char *option)
+static GtkWidget *create_menu_item(xmlNode *node)
 {
 	GtkWidget *item;
+	guchar	*label, *option = NULL;
+	gboolean is_submenu;
 
+	if (node->type != XML_ELEMENT_NODE)
+		return NULL;
+
+	if (strcmp(node->name, "Item") == 0)
+	{
+		is_submenu = FALSE;
+		option = xmlGetProp(node, "option");
+	}
+	else if (strcmp(node->name, "AppMenu") == 0)
+		is_submenu = TRUE;
+	else
+		return NULL;
+			
+	/* Create the item */
+	label = xmlGetProp(node, "label");
 	if (!label)
-		label = "<missing label>";
-
-	/* Create the new item and tie it to the appropriate callback */
+		label = g_strdup(_("<missing label>"));
 	item = gtk_menu_item_new_with_label(label);
 	gtk_widget_lock_accelerators(item);
+	g_free(label);
 
-	if (option)
-		gtk_object_set_data_full(GTK_OBJECT(item), "option",
-						g_strdup(option),
-						g_free);
+	if (is_submenu)
+	{
+		/* Add submenu items */
 
-	gtk_signal_connect(GTK_OBJECT(item), "activate",
-			   GTK_SIGNAL_FUNC(apprun_menu),
-			   NULL);
+		gtk_menu_item_set_submenu(GTK_MENU_ITEM(item),
+					  appmenu_add_submenu(node));
+	}
+	else
+	{
+		/* Set up callback */
+
+		if (option)
+		{
+			gtk_object_set_data_full(GTK_OBJECT(item), "option",
+					g_strdup(option),
+					g_free);
+			g_free(option);
+		}
+
+		gtk_signal_connect(GTK_OBJECT(item), "activate",
+				GTK_SIGNAL_FUNC(apprun_menu),
+				NULL);
+	}
 
 	gtk_widget_show(item);
 
