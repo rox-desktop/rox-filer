@@ -246,9 +246,11 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 	n = collection->number_of_items;
 	n = MAX(n, 2);
 
+#if 0
 	g_print("[ actual size  = %d x %d ]\n", 
 			collection->item_width,
 			collection->item_height);
+#endif
 	
 	filer_size_for(filer_window,
 			collection->item_width,
