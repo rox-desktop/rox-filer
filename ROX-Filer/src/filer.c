@@ -1348,7 +1348,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 static void filer_add_signals(FilerWindow *filer_window)
 {
-	GtkObject	*collection = GTK_OBJECT(filer_window->collection);
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
@@ -1368,12 +1367,6 @@ static void filer_add_signals(FilerWindow *filer_window)
 	g_signal_connect(filer_window->window, "selection_clear_event",
 			G_CALLBACK(filer_lost_primary), filer_window);
 
-	/* Events on the collection widget */
-	gtk_widget_set_events(GTK_WIDGET(collection),
-			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
-			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
-			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
-
 	g_signal_connect(filer_window->window, "selection_get",
 			G_CALLBACK(selection_get), filer_window);
 	gtk_selection_add_targets(GTK_WIDGET(filer_window->window),
@@ -1383,11 +1376,6 @@ static void filer_add_signals(FilerWindow *filer_window)
 
 	g_signal_connect(filer_window->window, "key_press_event",
 			G_CALLBACK(key_press_event), filer_window);
-
-	/* Drag and drop events */
-	g_signal_connect(collection, "drag_data_get",
-			GTK_SIGNAL_FUNC(drag_data_get), NULL);
-	drag_set_dest(filer_window);
 }
 
 static gint clear_scanning_display(FilerWindow *filer_window)

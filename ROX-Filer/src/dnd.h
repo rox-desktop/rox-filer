@@ -29,7 +29,7 @@ extern gint drag_start_x, drag_start_y;
 extern gint motion_buttons_pressed;
 
 extern gboolean o_no_hostnames;
-extern Option o_dnd_spring_open;
+extern Option o_dnd_spring_open, o_dnd_drag_to_icons;
 extern const char *drop_dest_prog;
 extern const char *drop_dest_dir;
 extern GdkAtom XdndDirectSave0;
@@ -51,7 +51,6 @@ void drag_data_get(GtkWidget      	*widget,
 		   guint32             	time,
 		   gpointer	       	data);
 void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults);
-void drag_set_dest(FilerWindow *filer_window);
 void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init(void);
 gboolean provides(GdkDragContext *context, GdkAtom target);

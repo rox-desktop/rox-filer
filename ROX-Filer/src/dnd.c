@@ -72,16 +72,6 @@ gint motion_buttons_pressed = 0;
 
 /* Static prototypes */
 static void set_xds_prop(GdkDragContext *context, const char *text);
-static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
-			    FilerWindow		*filer_window);
-static void drag_leave(GtkWidget		*widget,
-                       GdkDragContext		*context,
-		       guint32			time,
-		       FilerWindow		*filer_window);
 static void desktop_drag_data_received(GtkWidget      		*widget,
 				GdkDragContext  	*context,
 				gint            	x,
@@ -102,9 +92,6 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time);
-static void drag_end(GtkWidget *widget,
-		     GdkDragContext *context,
-		     FilerWindow *filer_window);
 static gboolean drag_drop(GtkWidget 	  *widget,
 			  GdkDragContext  *context,
 			  gint            x,
@@ -142,12 +129,6 @@ static GtkItemFactoryEntry menu_def[] = {
 };
 static GtkWidget *dnd_menu = NULL;
 
-/* The handler of the signal handler for scroll events.
- * This is used to cancel spring loading when autoscrolling is used.
- */
-static gulong scrolled_signal = -1;
-static GtkObject *scrolled_adj = NULL;	/* The object watched */
-
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
  */
@@ -160,7 +141,7 @@ GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
-static Option o_dnd_drag_to_icons;
+Option o_dnd_drag_to_icons;
 Option o_dnd_spring_open;
 static Option o_dnd_spring_delay;
 static Option o_dnd_middle_menu;
@@ -368,17 +349,6 @@ void drag_one_item(GtkWidget		*widget,
 	gtk_drag_set_icon_pixbuf(context, image->pixbuf, 0, 0);
 }
 
-static void drag_end(GtkWidget *widget,
-			GdkDragContext *context,
-			FilerWindow *filer_window)
-{
-	if (filer_window->temp_item_selected)
-	{
-		view_clear_selection(filer_window->view);
-		filer_window->temp_item_selected = FALSE;
-	}
-}
-
 /* Called when a remote app wants us to send it some data.
  * TODO: Maybe we should handle errors better (ie, let the remote app know
  * the drag has failed)?
@@ -458,23 +428,6 @@ void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults)
 			G_CALLBACK(drag_data_received), NULL);
 }
 
-/* Set up this filer window as a drop target. Called once, when the
- * filer window is first created.
- */
-void drag_set_dest(FilerWindow *filer_window)
-{
-	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
-
-	make_drop_target(widget, 0);
-
-	g_signal_connect(widget, "drag_motion",
-			G_CALLBACK(drag_motion), filer_window);
-	g_signal_connect(widget, "drag_leave",
-			G_CALLBACK(drag_leave), filer_window);
-	g_signal_connect(widget, "drag_end",
-			G_CALLBACK(drag_end), filer_window);
-}
-
 /* Like drag_set_dest, but for a pinboard-type widget */
 void drag_set_pinboard_dest(GtkWidget *widget)
 {
@@ -489,109 +442,6 @@ void drag_set_pinboard_dest(GtkWidget *widget)
 			  GDK_ACTION_LINK);
 	g_signal_connect(widget, "drag_data_received",
 			    G_CALLBACK(desktop_drag_data_received), NULL);
-}
-
-/* Called during the drag when the mouse is in a widget registered
- * as a drop target. Returns TRUE if we can accept the drop.
- */
-static gboolean drag_motion(GtkWidget		*widget,
-                            GdkDragContext	*context,
-                            gint		x,
-                            gint		y,
-                            guint		time,
-			    FilerWindow		*filer_window)
-{
-	DirItem		*item;
-	int		item_number;
-	GdkDragAction	action = context->suggested_action;
-	char	 	*new_path = NULL;
-	const char	*type = NULL;
-	gboolean	retval = FALSE;
-
-	if (o_dnd_drag_to_icons.int_value)
-		item_number = collection_get_item(filer_window->collection,
-							x, y);
-	else
-		item_number = -1;
-
-	item = item_number >= 0
-		? (DirItem *) filer_window->collection->items[item_number].data
-		: NULL;
-
-	if (item && filer_window->collection->items[item_number].selected)
-		type = NULL;
-	else
-		type = dnd_motion_item(context, &item);
-
-	if (!type)
-		item = NULL;
-
-	/* Don't allow drops to non-writeable directories. BUT, still
-	 * allow drops on non-writeable SUBdirectories so that we can
-	 * do the spring-open thing.
-	 */
-	if (item && type == drop_dest_dir &&
-			!(item->flags & ITEM_FLAG_APPDIR))
-	{
-#if 0
-		/* XXX: This is needed so that directories don't
-		 * spring open while we scroll. Should go in
-		 * view_collection.c, I think.
-		 */
-		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
-
-		/* Subdir: prepare for spring-open */
-		if (scrolled_adj != vadj)
-		{
-			if (scrolled_adj)
-				gtk_signal_disconnect(scrolled_adj,
-							scrolled_signal);
-			scrolled_adj = vadj;
-			scrolled_signal = gtk_signal_connect(
-						scrolled_adj,
-						"value_changed",
-						GTK_SIGNAL_FUNC(scrolled),
-						filer_window->collection);
-		}
-#endif
-		dnd_spring_load(context, filer_window);
-	}
-	else
-		dnd_spring_abort();
-
-	if (item)
-	{
-		collection_set_cursor_item(filer_window->collection,
-				item_number);
-	}
-	else
-	{
-		collection_set_cursor_item(filer_window->collection, -1);
-
-		/* Disallow background drops within a single window */
-		if (type && gtk_drag_get_source_widget(context) == widget)
-			type = NULL;
-	}
-
-	if (type)
-	{
-		if (item)
-			new_path = make_path(filer_window->sym_path,
-					item->leafname)->str;
-		else
-			new_path = filer_window->sym_path;
-	}
-
-	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
-	if (type)
-	{
-		gdk_drag_status(context, action, time);
-		g_dataset_set_data_full(context, "drop_dest_path",
-					g_strdup(new_path), g_free);
-		retval = TRUE;
-	}
-
-	return retval;
 }
 
 /* item is the item the file is held over, NULL for directory background.
@@ -644,20 +494,6 @@ const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 	}
 
 	return NULL;
-}
-
-/* Remove highlights */
-static void drag_leave(GtkWidget		*widget,
-                           GdkDragContext	*context,
-			   guint32		time,
-			   FilerWindow		*filer_window)
-{
-	dnd_spring_abort();
-	if (scrolled_adj)
-	{
-		g_signal_handler_disconnect(scrolled_adj, scrolled_signal);
-		scrolled_adj = NULL;
-	}
 }
 
 /* User has tried to drop some data on us. Decide what format we would
