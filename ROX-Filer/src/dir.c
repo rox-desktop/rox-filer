@@ -478,7 +478,6 @@ update:
 	font = gtk_widget_get_default_style()->font;
 	new.name_width = gdk_string_width(font, item->leafname);
 	new.leafname = item->leafname;
-	new.details_width = gdk_string_width(fixed_font, details(&new));
 
 	if (is_new == FALSE)
 	{
@@ -494,8 +493,7 @@ update:
 		 && item->gid == new.gid
 		 && item->image == new.image
 		 && item->mime_type == new.mime_type
-		 && item->name_width == new.name_width
-		 && item->details_width == new.details_width)
+		 && item->name_width == new.name_width)
 			return;
 	}
 
@@ -510,7 +508,6 @@ update:
 	item->mtime = new.mtime;
 	item->mime_type = new.mime_type;
 	item->name_width = new.name_width;
-	item->details_width = new.details_width;
 
 	if (!is_new)
 	{

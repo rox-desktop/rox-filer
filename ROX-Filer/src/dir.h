@@ -57,7 +57,6 @@ struct _DirItem
 	MaskedPixmap	*image;
 	MIME_type	*mime_type;
 	int		name_width;
-	int		details_width;
 	uid_t		uid;
 	gid_t		gid;
 	int		lstat_errno;	/* 0 if details are valid */

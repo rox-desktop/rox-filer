@@ -42,6 +42,7 @@
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
+#include "display.h"
 #include "mount.h"
 #include "menu.h"
 #include "dnd.h"
@@ -278,6 +279,7 @@ int main(int argc, char **argv)
 	menu_init();
 	dnd_init();
 	filer_init();
+	display_init();
 	mount_init();
 	options_init();
 	type_init();

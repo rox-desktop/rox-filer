@@ -80,6 +80,9 @@ static void small(gpointer data, guint action, GtkWidget *widget);
 static void large_full_info(gpointer data, guint action, GtkWidget *widget);
 static void small_full_info(gpointer data, guint action, GtkWidget *widget);
 
+static void details_summary(gpointer data, guint action, GtkWidget *widget);
+static void details_sizes(gpointer data, guint action, GtkWidget *widget);
+
 static void sort_name(gpointer data, guint action, GtkWidget *widget);
 static void sort_type(gpointer data, guint action, GtkWidget *widget);
 static void sort_size(gpointer data, guint action, GtkWidget *widget);
@@ -164,6 +167,9 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Small Icons"),   	NULL,  	small, 0, NULL},
 {">" N_("Large, Full Info"),	NULL,  	large_full_info, 0, NULL},
 {">" N_("Small, Full Info"),	NULL,  	small_full_info, 0, NULL},
+{">",			NULL,  	NULL, 0, "<Separator>"},
+{">" N_("Summary"),	NULL,  	details_summary, 0, NULL},
+{">" N_("Sizes"),	NULL,  	details_sizes, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL,  	sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL,  	sort_type, 0, NULL},
@@ -589,6 +595,21 @@ static void small_full_info(gpointer data, guint action, GtkWidget *widget)
 
 	filer_style_set(window_with_focus, SMALL_FULL_INFO);
 }
+
+static void details_summary(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_details_set(window_with_focus, DETAILS_SUMMARY);
+}
+
+static void details_sizes(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_details_set(window_with_focus, DETAILS_SIZE);
+}
+
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)
 {

@@ -41,11 +41,13 @@ typedef struct _CollectionClass  CollectionClass;
 typedef struct _CollectionItem   CollectionItem;
 typedef void (*CollectionDrawFunc)(GtkWidget *widget,
 			     	  CollectionItem *item,
-			     	  GdkRectangle *area);
+			     	  GdkRectangle *area,
+				  gpointer user_data);
 typedef gboolean (*CollectionTestFunc)( Collection *collection,
 					int point_x, int point_y,
 			       		CollectionItem *item,
-			       		int width, int height);
+			       		int width, int height,
+					gpointer user_data);
 typedef void (*CollectionTargetFunc)(Collection *collection,
 					gint item,
 					gpointer user_data);
@@ -66,6 +68,7 @@ struct _Collection
 
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;
+	gpointer	cb_user_data;	/* Passed to above two functions */
 	int		paint_level;	/* Complete redraw on next paint? */
 	GdkGC		*bg_gc;		/* NULL unless pixmap background */
 	
@@ -127,7 +130,8 @@ void	collection_draw_item		(Collection *collection, gint item,
 					 gboolean blank);
 void 	collection_set_functions	(Collection *collection,
 					 CollectionDrawFunc draw_item,
-					 CollectionTestFunc test_point);
+					 CollectionTestFunc test_point,
+					 gpointer user_data);
 void 	collection_set_item_size	(Collection *collection,
 					 int width, int height);
 void 	collection_qsort		(Collection *collection,

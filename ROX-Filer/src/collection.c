@@ -122,11 +122,13 @@ static gint collection_button_release(GtkWidget      *widget,
 				      GdkEventButton *event);
 static void default_draw_item(GtkWidget *widget,
 				CollectionItem *data,
-				GdkRectangle *area);
+				GdkRectangle *area,
+				gpointer user_data);
 static gboolean	default_test_point(Collection *collection,
 				   int point_x, int point_y,
 				   CollectionItem *data,
-				   int width, int height);
+				   int width, int height,
+				   gpointer user_data);
 static gint collection_motion_notify(GtkWidget *widget,
 				     GdkEventMotion *event);
 static void add_lasso_box(Collection *collection);
@@ -168,7 +170,8 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 	{
 		collection->draw_item((GtkWidget *) collection,
 				&collection->items[item],
-				area);
+				area,
+				collection->cb_user_data);
 		if (item == collection->wink_item)
 			gdk_draw_rectangle(((GtkWidget *) collection)->window,
 				   ((GtkWidget *) collection)->style->black_gc,
@@ -358,7 +361,8 @@ GtkWidget* collection_new(GtkAdjustment *vadj)
 
 void collection_set_functions(Collection *collection,
 				CollectionDrawFunc draw_item,
-				CollectionTestFunc test_point)
+				CollectionTestFunc test_point,
+				gpointer user_data)
 {
 	GtkWidget	*widget;
 
@@ -374,6 +378,7 @@ void collection_set_functions(Collection *collection,
 
 	collection->draw_item = draw_item;
 	collection->test_point = test_point;
+	collection->cb_user_data = user_data;
 
 	if (GTK_WIDGET_REALIZED(widget))
 	{
@@ -702,7 +707,8 @@ static gint collection_paint(Collection 	*collection,
 
 static void default_draw_item(  GtkWidget *widget,
 				CollectionItem *item,
-				GdkRectangle *area)
+				GdkRectangle *area,
+				gpointer user_data)
 {
 	gdk_draw_arc(widget->window,
 			item->selected ? widget->style->white_gc
@@ -717,7 +723,8 @@ static void default_draw_item(  GtkWidget *widget,
 static gboolean	default_test_point(Collection *collection,
 				   int point_x, int point_y,
 				   CollectionItem *item,
-				   int width, int height)
+				   int width, int height,
+				   gpointer user_data)
 {
 	float	f_x, f_y;
 
@@ -1160,7 +1167,8 @@ static gint collection_button_press(GtkWidget      *widget,
 					+ scroll,
 				&collection->items[item],
 				collection->item_width,
-				collection->item_height))
+				collection->item_height,
+				collection->cb_user_data))
 		{
 			item = -1;
 		}
@@ -1457,7 +1465,8 @@ static gint collection_motion_notify(GtkWidget *widget,
 					+ scroll,
 				&collection->items[item],
 				collection->item_width,
-				collection->item_height))
+				collection->item_height,
+				collection->cb_user_data))
 			{
 				collection->buttons_pressed = 0;
 				gtk_grab_remove(widget);
@@ -2082,7 +2091,8 @@ int collection_get_item(Collection *collection, int x, int y)
 				+ scroll,
 			&collection->items[item],
 			collection->item_width,
-			collection->item_height))
+			collection->item_height,
+			collection->cb_user_data))
 	{
 		return -1;
 	}

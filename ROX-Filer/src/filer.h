@@ -17,14 +17,6 @@
 typedef struct _FilerWindow FilerWindow;
 typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
 
-typedef enum {
-	UNKNOWN_STYLE,
-	LARGE_ICONS,
-	SMALL_ICONS,
-	LARGE_FULL_INFO,
-	SMALL_FULL_INFO,
-} DisplayStyle;
-
 typedef enum
 {
 	OPEN_SHIFT		= 0x01,	/* Do ShiftOpen */
@@ -43,6 +35,7 @@ typedef enum
 #include "minibuffer.h"
 #include "dir.h"
 #include "type.h"
+#include "display.h"
 
 struct _FilerWindow
 {
@@ -56,6 +49,7 @@ struct _FilerWindow
 	PanelType	panel_type;
 	int 		(*sort_fn)(const void *a, const void *b);
 
+	DetailsType	details_type;
 	DisplayStyle	display_style;
 
 	Directory	*directory;
@@ -71,6 +65,7 @@ struct _FilerWindow
 };
 
 extern FilerWindow 	*window_with_focus;
+extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
 extern gboolean 	o_unique_filer_windows;
 
@@ -81,22 +76,13 @@ void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
-void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
-char *details(DirItem *item);
-void filer_set_hidden(FilerWindow *filer_window, gboolean hidden);
-int sort_by_name(const void *item1, const void *item2);
-int sort_by_type(const void *item1, const void *item2);
-int sort_by_date(const void *item1, const void *item2);
-int sort_by_size(const void *item1, const void *item2);
-void filer_set_sort_fn(FilerWindow *filer_window,
-			int (*fn)(const void *a, const void *b));
 void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		OpenFlags flags);
 void filer_check_mounted(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
-void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 gboolean filer_exists(FilerWindow *filer_window);
 void filer_open_parent(FilerWindow *filer_window);
+void filer_detach_rescan(FilerWindow *filer_window);
 
 #endif /* _FILER_H */
