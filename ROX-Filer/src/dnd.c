@@ -638,6 +638,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 				       FilerWindow	*filer_window)
 {
 	GList	*uris, *next;
+	char *error_example = NULL;
 	gint dx, dy;
 
 	if (!selection_data->data)
@@ -663,20 +664,28 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		guchar	*path;
 
 		path = get_local_path((gchar *) next->data);
-		/*printf("%s -> %s\n", (char *) next->data,
-		  path? path: "NULL");*/
 		if (path)
 		{
 			pinboard_pin(path, NULL, x, y, NULL);
 			x += 64;
 			g_free(path);
 		}
+		else if (!error_example)
+			error_example = g_strdup(next->data);
 
 		g_free(next->data);
 	}
 
 	if (uris)	
 		g_list_free(uris);
+
+	if (error_example)
+	{
+		delayed_error(_("Failed to add some items to the pinboard, "
+			"because they are on a remote machine. For example:\n"
+			"\n%s"), error_example);
+		g_free(error_example);
+	}
 }
 
 /* Convert Mozilla's text/x-moz-uri into a text/uri-list */
