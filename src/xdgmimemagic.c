@@ -25,6 +25,10 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <assert.h>
 #include "xdgmimemagic.h"
 #include "xdgmimeint.h"
