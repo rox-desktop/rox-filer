@@ -1831,6 +1831,12 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 		return;
 	}
 
+	/* Load the backdrop. May abandon the program if loading fails. */
+	reload_backdrop(pinboard, command, style);
+
+	if (pinboard->to_backdrop_app == -1)
+		return;
+
 	while (*ok)
 	{
 		int sent;
@@ -1844,8 +1850,6 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 		}
 		ok += sent;
 	}
-
-	reload_backdrop(pinboard, command, style);
 }
 
 static void backdrop_from_child(Pinboard *pinboard,
