@@ -31,6 +31,7 @@ struct _ViewData
 
 extern Option o_display_inherit_options, o_display_sort_by;
 extern Option o_display_size, o_display_details, o_display_show_hidden;
+extern Option o_display_show_headers;
 extern Option o_display_show_thumbs;
 extern Option o_small_width;
 

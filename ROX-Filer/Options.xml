@@ -51,7 +51,6 @@
     <section title='Display'>
       <frame label='Default settings for new windows'>
         <toggle name='display_inherit_options' label='Inherit options from source window'>If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below.</toggle>
-	<spacer/>
         <hbox>
           <vbox>
 	    <menu name='filer_view_type' label='View type:' sizegroup='disp-def'>
@@ -92,8 +91,14 @@
 	  </vbox>
         </hbox>
 	<spacer/>
-        <numentry name='display_large_width' label='Large wrap width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
-        <numentry name='display_small_width' label='Max Small Icons width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
+	<hbox>
+          <numentry name='display_large_width' label='Max width (Large icons):' unit='pixels' min='0' max='250' width='3'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
+	  <spacer/>
+          <numentry name='display_small_width' label='(Small Icons):' unit='pixels' min='0' max='250' width='3'>Maximum width for the text beside a Small Icon.</numentry>
+        </hbox>
+      </frame>
+      <frame label='List View'>
+        <toggle name='display_show_headers' label='Show column headings'>If this is on then column headings will be shown in the list view.</toggle>
       </frame>
     </section>
     <section title='Tools/Minibuffer'>

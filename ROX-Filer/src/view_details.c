@@ -134,6 +134,7 @@ static void view_details_sortable_init(GtkTreeSortableIface *iface);
 static void set_selected(ViewDetails *view_details, int i, gboolean selected);
 static gboolean get_selected(ViewDetails *view_details, int i);
 static void free_view_item(ViewItem *view_item);
+static void details_update_header_visibility(ViewDetails *view_details);
 
 
 /****************************************************************
@@ -152,6 +153,8 @@ GtkWidget *view_details_new(FilerWindow *filer_window)
 
 	if (filer_window->sort_type != -1)
 		view_details_sort((ViewIface *) view_details);
+
+	details_update_header_visibility(view_details);
 
 	return GTK_WIDGET(view_details);
 }
@@ -205,6 +208,13 @@ GType view_details_get_type(void)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+/* Update the visibility of the list headers */
+static void details_update_header_visibility(ViewDetails *view_details)
+{
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view_details),
+					  o_display_show_headers.int_value);
+}
 
 /* Fulfill the GtkTreeModel requirements */
 static guint details_get_flags(GtkTreeModel *tree_model)
@@ -902,6 +912,9 @@ static void view_details_style_changed(ViewIface *view, int flags)
 	gtk_tree_path_free(path);
 
 	gtk_tree_view_columns_autosize((GtkTreeView *) view);
+
+	if (flags & VIEW_UPDATE_HEADERS)
+		details_update_header_visibility(view_details);
 }
 
 static gint wrap_sort(gconstpointer a, gconstpointer b,
