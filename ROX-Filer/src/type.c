@@ -149,12 +149,11 @@ void type_init(void)
 		char *icon_home;
 		delayed_error(_("No icon theme found... installing ROX default "
 				"icon theme..."));
-
+	
 		icon_home = g_build_filename(home_dir, ".icons", NULL);
 		if(!file_exists(icon_home))
 			mkdir(icon_home, 0755);
 		g_free(icon_home);	
-	       
 
 		icon_home = g_build_filename(home_dir, ".icons", "ROX", NULL);
 		if (symlink(make_path(app_dir, "ROX"), icon_home))

@@ -15,7 +15,7 @@ PLATFORM=`uname -s`-$ARCH
 DEBUGGER=""
 
 case $1 in
-	--debug) shift ; DEBUGGER=gdb ;;
+	--debug) shift ; DEBUGGER="gdb --args" ; DEBUG_OPTIONS="-n --g-fatal-warnings";;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
 	--compile)
 		shift
@@ -50,7 +50,7 @@ fi
 BIN="$APP_DIR/$PLATFORM/$PROG"
 
 if [ -x "$BIN" ]; then
-  exec $DEBUGGER "$BIN" "$@"
+  exec $DEBUGGER "$BIN" $DEBUG_OPTIONS "$@"
 else
   echo "ERROR from $0:" >&2
   echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
