@@ -559,7 +559,7 @@ static void shell_tab(FilerWindow *filer_window)
 	if (leaf->len == 0)
 		leaf_start = pos;
 
-	if (leaf->str[0] != '/')
+	if (leaf->str[0] != '/' && leaf->str[0] != '~')
 	{
 		g_string_prepend_c(leaf, '/');
 		g_string_prepend(leaf, filer_window->path);
