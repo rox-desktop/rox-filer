@@ -120,7 +120,6 @@ static void initModifiers(void);
 
 enum {
 	ACTION_SHIFT,
-	ACTION_HELP,
 	ACTION_INFO,
 	ACTION_RUN_ACTION,
 	ACTION_SET_ICON,
@@ -140,7 +139,6 @@ static GtkItemFactoryEntry menu_def[] = {
 {">" N_("Home Directory"),	NULL, open_home, 0, "<StockItem>", GTK_STOCK_HOME},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Shift Open"),   	NULL, file_op, ACTION_SHIFT, NULL},
-{">" N_("Help"),    		NULL, file_op, ACTION_HELP, "<StockItem>", GTK_STOCK_HELP},
 {">" N_("Info"),    		NULL, file_op, ACTION_INFO, "<StockItem>", GTK_STOCK_DIALOG_INFO},
 {">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
 {">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
@@ -256,7 +254,7 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 		guchar *tmp;
 
 		menu_set_items_shaded(icon_menu, FALSE, 1, 3);
-		menu_set_items_shaded(icon_file_menu, FALSE, 0, 6);
+		menu_set_items_shaded(icon_file_menu, FALSE, 0, 5);
 		if (!can_set_run_action(icon->item))
 			menu_set_items_shaded(icon_file_menu, TRUE, 3, 1);
 
@@ -272,7 +270,7 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 	else
 	{
 		menu_set_items_shaded(icon_menu, TRUE, 1, 3);
-		menu_set_items_shaded(icon_file_menu, TRUE, 0, 6);
+		menu_set_items_shaded(icon_file_menu, TRUE, 0, 5);
 		gtk_label_set_text(GTK_LABEL(icon_file_item), _("Nothing"));
 	}
 }
@@ -602,9 +600,6 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 			break;
 		case ACTION_LOCATION:
 			open_to_show(menu_icon->path);
-			break;
-		case ACTION_HELP:
-			show_item_help(menu_icon->path, menu_icon->item);
 			break;
 		case ACTION_INFO:
 			infobox_new(menu_icon->path);

@@ -41,7 +41,7 @@
 #include "infobox.h"
 #include "appinfo.h"
 #include "dnd.h"	/* For xa_string */
-#include "run.h"	/* For show_item_help() */
+#include "run.h"	/* For show_help_files() */
 #include "xml.h"
 #include "mount.h"
 #include "pixmaps.h"
@@ -153,16 +153,6 @@ void infobox_new(const gchar *pathname)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
-
-static void show_help_clicked(const gchar *path)
-{
-	DirItem *item;
-
-	item = diritem_new("");
-	diritem_restat(path, item, NULL);
-	show_item_help(path, item);
-	diritem_free(item);
-}
 
 static void got_response(GObject *window, gint response, gpointer data)
 {
@@ -284,7 +274,7 @@ static GtkWidget *make_vbox(const guchar *path)
 		gtk_box_pack_start(vbox, align, FALSE, TRUE, 0);
 		gtk_container_add(GTK_CONTAINER(align), button);
 		g_signal_connect_swapped(button, "clicked", 
-				G_CALLBACK(show_help_clicked),
+				G_CALLBACK(show_help_files),
 				(gpointer) path);
 	}
 	g_free(help_dir);

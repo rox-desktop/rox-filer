@@ -66,7 +66,6 @@ typedef enum {
 	FILE_RENAME_ITEM,
 	FILE_LINK_ITEM,
 	FILE_OPEN_FILE,
-	FILE_HELP,
 	FILE_SHOW_FILE_INFO,
 	FILE_RUN_ACTION,
 	FILE_SET_ICON,
@@ -214,7 +213,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Link..."),		NULL, file_op, FILE_LINK_ITEM, NULL},
 {">" N_("Delete"),	    	NULL, file_op, FILE_DELETE, "<StockItem>", GTK_STOCK_DELETE},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Help"),		NULL, file_op, FILE_HELP, "<StockItem>", GTK_STOCK_HELP},
 {">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE},
 {">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, "<StockItem>", GTK_STOCK_OPEN},
 {">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
@@ -1813,9 +1811,6 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			case FILE_OPEN_FILE:
 				prompt = _("Shift Open ... ?");
 				break;
-			case FILE_HELP:
-				prompt = _("Help about ... ?");
-				break;
 			case FILE_SHOW_FILE_INFO:
 				prompt = _("Examine ... ?");
 				break;
@@ -1929,9 +1924,6 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 		case FILE_OPEN_FILE:
 			filer_openitem(window_with_focus, &iter,
 				OPEN_SAME_WINDOW | OPEN_SHIFT);
-			break;
-		case FILE_HELP:
-			show_item_help(path, item);
 			break;
 		case FILE_RUN_ACTION:
 			run_action(item);

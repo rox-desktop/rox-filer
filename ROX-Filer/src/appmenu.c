@@ -43,10 +43,13 @@
 #include "type.h"
 #include "appinfo.h"
 #include "xml.h"
+#include "run.h"
+#include "diritem.h"
 
 /* Static prototypes */
 static void apprun_menu(GtkWidget *item, gpointer data);
 static GtkWidget *create_menu_item(xmlNode *node);
+static void show_app_help(GtkWidget *item, gpointer data);
 
 /* There can only be one menu open at a time... we store: */
 static GtkWidget *current_menu = NULL;	/* The GtkMenu */
@@ -83,44 +86,51 @@ void appmenu_remove(void)
  * is the corresponding DirItem.
  * Call appmenu_remove() to undo the effect.
  */
-void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
+void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 {
 	XMLwrapper	*ai = NULL;
 	xmlNode	*node;
 	GList	*next;
 	GtkWidget *sep;
+	GtkWidget *item;
 
 	g_return_if_fail(menu != NULL);
 
 	/* Should have called appmenu_remove() already... */
 	g_return_if_fail(current_menu == NULL);
 
-	ai = appinfo_get(app_dir, item);
-	if (!ai)
-		return;	/* No appmenu (or invalid XML) */
-
-	/* OK, we've got a valid info file and parsed it.
-	 * Now build the GtkMenuItem widgets and add them to the menu
-	 * (if there are any).
-	 */
-
-	node = xml_get_section(ai, NULL, "AppMenu");
-	if (!node)
-		goto out;
+	ai = appinfo_get(app_dir, app_item);
+	if (ai)
+	{
+		node = xml_get_section(ai, NULL, "AppMenu");
+		if (node)
+			node = node->xmlChildrenNode;
+	}
+	else
+	{
+		if (app_item->flags & ITEM_FLAG_APPDIR)
+			node = NULL;
+		else
+			return;	/* Not an application AND no AppInfo */
+	}
 
 	g_return_if_fail(current_items == NULL);
 
 	/* Add the menu entries */
-	for (node = node->xmlChildrenNode; node; node = node->next)
+	for (; node; node = node->next)
 	{
-		GtkWidget *item;
-
 		item = create_menu_item(node);
 
 		if (item)
 			current_items = g_list_prepend(current_items, item);
 	}
 		
+	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
+	gtk_widget_show(item);
+	current_items = g_list_prepend(current_items, item);
+	g_signal_connect(item, "activate", G_CALLBACK(show_app_help), NULL);
+	gtk_label_set_text(GTK_LABEL(GTK_BIN(item)->child), _("Help"));
+
 	sep = gtk_menu_item_new();
 	current_items = g_list_prepend(current_items, sep);
 	gtk_widget_show(sep);
@@ -132,10 +142,10 @@ void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 	current_menu = menu;
 	current_app_path = g_strdup(app_dir);
 
-out:
 	if (ai)
 		g_object_unref(ai);
 }
+
 
 /****************************************************************
  *                      INTERNAL FUNCTIONS                      *
@@ -248,4 +258,11 @@ static void apprun_menu(GtkWidget *item, gpointer data)
 	rox_spawn(NULL, (const gchar **) argv);
 
 	g_free(argv[0]);
+}
+
+static void show_app_help(GtkWidget *item, gpointer data)
+{
+	g_return_if_fail(current_app_path != NULL);
+
+	show_help_files(current_app_path);
 }

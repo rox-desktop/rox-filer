@@ -17,8 +17,8 @@ gboolean run_diritem(const guchar *full_path,
 		     FilerWindow *filer_window,
 		     FilerWindow *src_window,
 		     gboolean edit);
-void show_item_help(const guchar *path, DirItem *item);
 void open_to_show(const guchar *path);
 void examine(const guchar *path);
+void show_help_files(const char *dir);
 
 #endif /* _RUN_H */
