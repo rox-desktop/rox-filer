@@ -86,19 +86,18 @@
               <item label='Times' value='5'/>
             </menu>
 	  </vbox>
-          <numentry name='filer_change_size_num' label='Automatic small icons at:' unit='items' min='1' max='1000' width='4'>When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used.</numentry>
+	  <vbox>
+	    <label>Automatic small icons:</label>
+            <numentry name='filer_change_size_num' label='Change at:' unit='items' min='1' max='1000' width='4'>When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used.</numentry>
+	  </vbox>
         </hbox>
 	<spacer/>
         <numentry name='display_large_width' label='Large wrap width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
         <numentry name='display_small_width' label='Max Small Icons width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
       </frame>
     </section>
-    <section title='Toolbar'>
-      <frame label='Toolbar buttons'>
-        <label help='1'>Unshade the tools you want.</label>
-        <tool-options name='toolbar_disable'/>
-      </frame>
-      <frame label='Toolbar appearance'>
+    <section title='Tools/Minibuffer'>
+      <frame label='Toolbar'>
         <hbox>
 	  <menu name='toolbar_type' label='Toolbar type:'>
 	  <item label='None' value='0'/>
@@ -109,13 +108,21 @@
 	  <spacer/>
 	  <toggle name='toolbar_show_info' label='Show totals of items'>Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size.</toggle>
   	</hbox>
+	<spacer/>
+	<label>Select the buttons you want on the bar:</label>
+	<spacer/>
+        <tool-options name='toolbar_disable'/>
       </frame>
-    </section>
-    <section title='Minibuffers'>
-      <label help='1'>The minibuffers are text entry fields that appear along the bottom of a filer window. They are used to enter pathnames, search conditions and shell commands.</label>
-      <frame label='Beeping'>
+      <frame label='Minibuffer'>
         <toggle name='filer_beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
         <toggle name='filer_beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
+      </frame>
+    </section>
+    <section title='Thumbnails'>
+      <label help='1'>When thumbnails are turned on (see the Display section), each image file in a directory is loaded and a small thumbnail of it is shown.</label>
+      <frame label='Thumbnails cache'>
+	<label help='1'>To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed.</label>
+        <thumbs-purge-cache/>
       </frame>
     </section>
   </section>

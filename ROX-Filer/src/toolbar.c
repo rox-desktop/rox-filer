@@ -99,7 +99,7 @@ static void drag_leave(GtkWidget	*widget,
 static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
-static void toggle_shaded(GtkWidget *widget);
+static void toggle_selected(GtkToggleButton *widget, gpointer data);
 static void option_notify(void);
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label);
 static void tally_items(gpointer key, gpointer value, gpointer data);
@@ -158,46 +158,6 @@ void toolbar_init(void)
 	tooltips = gtk_tooltips_new();
 
 	option_register_widget("tool-options", build_tool_options);
-}
-
-/* Returns a button which can be used to turn a tool on and off.
- * Button has 'tool_name' set to the tool's name.
- * NULL if tool number i is too big.
- */
-GtkWidget *toolbar_tool_option(int i)
-{
-	Tool		*tool = &all_tools[i];
-	GtkWidget	*button;
-	GtkWidget	*icon_widget, *vbox, *text;
-
-	g_return_val_if_fail(i >= 0, NULL);
-
-	if (i >= sizeof(all_tools) / sizeof(*all_tools))
-		return NULL;
-
-	button = gtk_button_new();
-	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
-
-	icon_widget = gtk_image_new_from_stock(tool->name,
-						GTK_ICON_SIZE_LARGE_TOOLBAR);
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
-
-	text = gtk_label_new(_(tool->label));
-	gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, TRUE, 0);
-
-	gtk_container_add(GTK_CONTAINER(button), vbox);
-
-	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
-
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(toggle_shaded), vbox);
-
-	g_object_set_data(G_OBJECT(button), "tool_name",
-				(gchar *) tool->name);
-
-	return button;
 }
 
 void toolbar_update_info(FilerWindow *filer_window)
@@ -472,6 +432,7 @@ static void toolbar_hidden_clicked(GtkWidget *widget,
 	display_set_hidden(filer_window, !filer_window->show_hidden);
 }
 
+/* If filer_window is NULL, the toolbar is for the options window */
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*bar;
@@ -479,31 +440,36 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	int		i;
 
 	bar = gtk_toolbar_new();
-	gtk_widget_set_size_request(bar, 100, -1);
+	if (filer_window)
+		gtk_widget_set_size_request(bar, 100, -1);
 
-	if (o_toolbar.int_value == TOOLBAR_LARGE)
-		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
+	if (o_toolbar.int_value == TOOLBAR_NORMAL || !filer_window)
+		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_ICONS);
 	else if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
 		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH_HORIZ);
 	else
-		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_ICONS);
+		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
 		Tool	*tool = &all_tools[i];
 
-		if (!tool->enabled)
+		if (filer_window && !tool->enabled)
 			continue;
 
 		b = add_button(bar, tool, filer_window);
-		if (tool->drop_action != DROP_NONE)
+		if (filer_window && tool->drop_action != DROP_NONE)
 			handle_drops(filer_window, b, tool->drop_action);
 	}
 
-	filer_window->toolbar_text = gtk_label_new("");
-	gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text), 0, 0.5);
-	gtk_toolbar_append_widget(GTK_TOOLBAR(bar),
-				  filer_window->toolbar_text, NULL, NULL);
+	if (filer_window)
+	{
+		filer_window->toolbar_text = gtk_label_new("");
+		gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text),
+					0, 0.5);
+		gtk_toolbar_append_widget(GTK_TOOLBAR(bar),
+				filer_window->toolbar_text, NULL, NULL);
+	}
 
 	return bar;
 }
@@ -556,6 +522,7 @@ static gint toolbar_button_released(GtkButton *button,
 	return FALSE;
 }
 
+/* If filer_window is NULL, the toolbar is for the options window */
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window)
 {
@@ -565,13 +532,14 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 						GTK_ICON_SIZE_LARGE_TOOLBAR);
 
 	button = gtk_toolbar_insert_element(GTK_TOOLBAR(bar),
-				   GTK_TOOLBAR_CHILD_BUTTON,
-				   NULL,
-				   _(tool->label),
-				   _(tool->tip), NULL,
-				   icon_widget,
-				   NULL, NULL,	/* CB, userdata */
-				   GTK_TOOLBAR(bar)->num_children);
+			   filer_window ? GTK_TOOLBAR_CHILD_BUTTON
+					: GTK_TOOLBAR_CHILD_TOGGLEBUTTON,
+			   NULL,
+			   _(tool->label),
+			   _(tool->tip), NULL,
+			   icon_widget,
+			   NULL, NULL,	/* CB, userdata */
+			   GTK_TOOLBAR(bar)->num_children);
 	
 	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
 	{
@@ -592,19 +560,28 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 
 	g_object_set_data(G_OBJECT(button), "rox-tool", tool);
 
-	g_signal_connect(button, "clicked",
+	if (filer_window)
+	{
+		g_signal_connect(button, "clicked",
 			G_CALLBACK(tool->clicked), filer_window);
-	g_signal_connect(button, "button_press_event",
-		G_CALLBACK(toolbar_button_pressed), filer_window);
-	g_signal_connect(button, "button_release_event",
-		G_CALLBACK(toolbar_button_released), filer_window);
+		g_signal_connect(button, "button_press_event",
+			G_CALLBACK(toolbar_button_pressed), filer_window);
+		g_signal_connect(button, "button_release_event",
+			G_CALLBACK(toolbar_button_released), filer_window);
+	}
+	else
+	{
+		g_signal_connect(button, "clicked",
+			G_CALLBACK(toggle_selected), NULL);
+		g_object_set_data(G_OBJECT(button), "tool_name",
+				  (gpointer) tool->name);
+	}
 
 	return button;
 }
 
-static void toggle_shaded(GtkWidget *widget)
+static void toggle_selected(GtkToggleButton *widget, gpointer data)
 {
-	gtk_widget_set_sensitive(widget, !GTK_WIDGET_SENSITIVE(widget));
 	option_check_widget(&o_toolbar_disable);
 }
 
@@ -708,14 +685,14 @@ static void update_tools(Option *option)
 
 	for (next = kids; next; next = next->next)
 	{
-		GtkWidget	*kid = (GtkWidget *) next->data;
+		GtkToggleButton	*kid = (GtkToggleButton *) next->data;
 		guchar		*name;
 
 		name = g_object_get_data(G_OBJECT(kid), "tool_name");
 
 		g_return_if_fail(name != NULL);
 		
-		gtk_widget_set_sensitive(GTK_BIN(kid)->child,
+		gtk_toggle_button_set_active(kid,
 					 !in_list(name, option->value));
 	}
 
@@ -734,10 +711,10 @@ static guchar *read_tools(Option *option)
 
 	for (next = kids; next; next = next->next)
 	{
-		GtkObject	*kid = (GtkObject *) next->data;
+		GtkToggleButton	*kid = (GtkToggleButton *) next->data;
 		guchar		*name;
 
-		if (!GTK_WIDGET_SENSITIVE(GTK_BIN(kid)->child))
+		if (!gtk_toggle_button_get_active(kid))
 		{
 			name = g_object_get_data(G_OBJECT(kid), "tool_name");
 			g_return_val_if_fail(name != NULL, list->str);
@@ -757,31 +734,15 @@ static guchar *read_tools(Option *option)
 
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label)
 {
-	guint		num_tools = G_N_ELEMENTS(all_tools);
-	guint		rows = 3;
-	guint		cols = (num_tools + rows - 1) / rows;
-	int		i;
-	GtkWidget	*hbox, *tool, *table;
+	GtkWidget	*bar;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
-	hbox = gtk_hbox_new(FALSE, 0);
-	table = gtk_table_new(rows, cols, TRUE);
-
-	for (i = 0; (tool = toolbar_tool_option(i)) != NULL; i++)
-	{
-		guint left = i % cols;
-		guint top = i / cols;
-	
-		gtk_table_attach_defaults(GTK_TABLE(table), tool,
-				left, left + 1, top, top + 1);
-	}
-
-	gtk_box_pack_start(GTK_BOX(hbox), table, FALSE, FALSE, 0);
+	bar = create_toolbar(NULL);
 
 	option->update_widget = update_tools;
 	option->read_widget = read_tools;
-	option->widget = table;
+	option->widget = bar;
 
-	return g_list_append(NULL, hbox);
+	return g_list_append(NULL, bar);
 }

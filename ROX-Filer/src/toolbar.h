@@ -22,7 +22,6 @@ extern Option o_toolbar, o_toolbar_info;
 
 /* Prototypes */
 void toolbar_init(void);
-GtkWidget *toolbar_tool_option(int i);
 void toolbar_update_info(FilerWindow *filer_window);
 void toolbar_update_toolbar(FilerWindow *filer_window);
 

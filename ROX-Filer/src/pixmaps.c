@@ -56,6 +56,8 @@
 #include "main.h"
 #include "filer.h"
 #include "dir.h"
+#include "options.h"
+#include "action.h"
 
 GFSCache *pixmap_cache = NULL;
 
@@ -118,6 +120,7 @@ static void thumbnail_child_done(ChildThumbnail *info);
 static void child_create_thumbnail(const gchar *path);
 static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
 					  guchar alpha);
+static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -163,6 +166,8 @@ void pixmaps_init(void)
 	mount_icon_size = gtk_icon_size_register("rox-mount-size", 14, 14);
 
 	load_default_pixmaps();
+
+	option_register_widget("thumbs-purge-cache", thumbs_purge_cache);
 }
 
 /* Load image <appdir>/images/name.png.
@@ -850,3 +855,58 @@ static void load_default_pixmaps(void)
 	}
 }
 
+/* Also purges memory cache */
+static void purge_disk_cache(GtkWidget *button, gpointer data)
+{
+	char *path;
+	GList *list = NULL;
+	DIR *dir;
+	struct dirent *ent;
+
+	g_fscache_purge(pixmap_cache, 0);
+
+	path = g_strconcat(home_dir, "/.thumbnails/normal/", NULL);
+
+	dir = opendir(path);
+	if (!dir)
+	{
+		report_error(_("Can't delete thumbnails in %s:\n%s"),
+				path, g_strerror(errno));
+		goto out;
+	}
+
+	while ((ent = readdir(dir)))
+	{
+		if (ent->d_name[0] == '.')
+			continue;
+		list = g_list_prepend(list,
+				      g_strconcat(path, ent->d_name, NULL));
+	}
+
+	closedir(dir);
+
+	if (list)
+	{
+		action_delete(list);
+		destroy_glist(&list);
+	}
+	else
+		info_message(_("There are no thumbnails to delete"));
+out:
+	g_free(path);
+}
+
+static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label)
+{
+	GtkWidget *button, *align;
+
+	g_return_val_if_fail(option == NULL, NULL);
+	
+	align = gtk_alignment_new(0, 0.5, 0, 0);
+	button = button_new_mixed(GTK_STOCK_CLEAR,
+				  _("Purge thumbnails disk cache"));
+	gtk_container_add(GTK_CONTAINER(align), button);
+	g_signal_connect(button, "clicked", G_CALLBACK(purge_disk_cache), NULL);
+
+	return g_list_append(NULL, align);
+}

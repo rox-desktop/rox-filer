@@ -1477,11 +1477,19 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
 				filer_window);
 }
 
-/* Note that filer_window may not exist after this call */
-void filer_update_dir(FilerWindow *filer_window, gboolean warning)
+/* Note that filer_window may not exist after this call.
+ * Returns TRUE iff the directory still exists.
+ */
+gboolean filer_update_dir(FilerWindow *filer_window, gboolean warning)
 {
-	if (may_rescan(filer_window, warning))
+	gboolean still_exists;
+
+	still_exists = may_rescan(filer_window, warning);
+
+	if (still_exists)
 		dir_update(filer_window->directory, filer_window->sym_path);
+
+	return still_exists;
 }
 
 void filer_update_all(void)
@@ -1549,8 +1557,8 @@ void filer_check_mounted(const char *real_path)
 
 			if (s == '/' || s == '\0')
 			{
-				filer_update_dir(filer_window, FALSE);
-				if (resize)
+				if (filer_update_dir(filer_window, FALSE) &&
+				    resize)
 					view_autosize(filer_window->view);
 			}
 		}

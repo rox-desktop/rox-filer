@@ -1633,7 +1633,7 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 #endif /* DO_MOUNT_POINTS */
 }
 
-/* Deletes all selected items in the window */
+/* Delete these paths */
 void action_delete(GList *paths)
 {
 	GUIside		*gui_side;
