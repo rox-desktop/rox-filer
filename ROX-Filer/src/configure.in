@@ -17,7 +17,10 @@ changequote([,])dnl
 
 dnl Find GLib (needed for future tests)
 AC_MSG_CHECKING(for GLib library)
-GLIB_LIBS=`glib-config --libs`
+if test -z "$GLIB_CONFIG"; then
+  GLIB_CONFIG=glib-config
+fi
+GLIB_LIBS=`$GLIB_CONFIG --libs`
 changequote(,)dnl
 if [ -n "$GLIB_LIBS" ]; then
   AC_MSG_RESULT(yes - use '$GLIB_LIBS')

@@ -30,8 +30,9 @@
   /* Linux, etc */
 # include <mntent.h>
 #elif HAVE_SYS_UCRED_H
-  /* NetBSD, etc */
+  /* NetBSD, OSF1, etc */
 # include <fstab.h>
+# include <sys/types.h>
 # include <sys/param.h>
 # include <sys/ucred.h>
 # include <sys/mount.h>

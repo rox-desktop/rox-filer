@@ -8,8 +8,10 @@ LIBS = @LIBS@
 CC = @CC@
 IMLIB_CFLAGS = @IMLIB_CFLAGS@
 IMLIB_LIBS = @IMLIB_LIBS@
-CFLAGS = @CFLAGS@ `gtk-config --cflags` -I.
-LDFLAGS = @LDFLAGS@ `gtk-config --libs` ${LIBS} ${IMLIB_LIBS}
+
+GTK_CONFIG ?= gtk-config
+CFLAGS = @CFLAGS@ `${GTK_CONFIG} --cflags` -I.
+LDFLAGS = @LDFLAGS@ `${GTK_CONFIG} --libs` ${LIBS} ${IMLIB_LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
