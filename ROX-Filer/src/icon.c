@@ -1126,7 +1126,7 @@ static GdkFilterReturn filter_keys(GdkXEvent *xevent,
 	GList *next;
 	XKeyEvent *kev = (XKeyEvent *) xevent;
 	guint state;
-	
+
 	if (kev->type != KeyPress)
 		return GDK_FILTER_CONTINUE;
 
@@ -1190,14 +1190,15 @@ static gboolean grabKey(MyKey *key)
 
 	GRAB(key, 0);
 
+	GRAB(key, ScrollLockMask);
+	GRAB(key, NumLockMask);
+	GRAB(key, CapsLockMask);
+
 	if (key->modifier != AnyModifier && key->modifier != 0)
 	{
 		/* Here we grab all combinations of well known
 		 * modifiers.
 		 */
-		GRAB(key, ScrollLockMask);
-		GRAB(key, NumLockMask);
-		GRAB(key, CapsLockMask);
 		GRAB(key, ScrollLockMask | NumLockMask);
 		GRAB(key, ScrollLockMask | CapsLockMask);
 		GRAB(key, CapsLockMask | NumLockMask);
@@ -1217,11 +1218,12 @@ static gboolean ungrabKey(MyKey *key)
 
 	UNGRAB(key, 0);
 
+	UNGRAB(key, ScrollLockMask);
+	UNGRAB(key, NumLockMask);
+	UNGRAB(key, CapsLockMask);
+
 	if (key->modifier != AnyModifier && key->modifier != 0)
 	{
-		UNGRAB(key, ScrollLockMask);
-		UNGRAB(key, NumLockMask);
-		UNGRAB(key, CapsLockMask);
 		UNGRAB(key, ScrollLockMask | NumLockMask);
 		UNGRAB(key, ScrollLockMask | CapsLockMask);
 		UNGRAB(key, CapsLockMask | NumLockMask);
