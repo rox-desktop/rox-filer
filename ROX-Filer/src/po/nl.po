@@ -12,10 +12,12 @@
 # Updated translations August 2001
 # Copyright (C) 2001 Jasper Huijsmans <j.b.huijsmans@chem.rug.nl>
 #
+# Bijgewerkt Jan 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
+# 
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.6\n"
-"POT-Creation-Date: 2002-01-22 13:13+0000\n"
+"POT-Creation-Date: 2002-01-23 13:18+0000\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jasper Huijsmans <j.b.huijsmans@chem.rug.nl>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
@@ -63,7 +65,7 @@ msgstr ""
 
 #: action.c:256
 msgid "Simple Tests"
-msgstr "Eenvoudige Tests"
+msgstr "Eenvoudige tests"
 
 #: action.c:258
 msgid ""
@@ -126,7 +128,7 @@ msgstr "Sluiten"
 
 #: action.c:328
 msgid "Permissions command reference"
-msgstr "Uitleg Toegangsrechten"
+msgstr "Uitleg toegangsrechten"
 
 #: action.c:334
 msgid ""
@@ -184,7 +186,7 @@ msgstr ""
 "u+s\t(zet de SetUID bit - heeft meestal geen effect op script-bestanden)\n"
 "755\t(zet de toegangsrechten direct)\n"
 "\n"
-"Zie de chmod(1) man page voor de volledige uitleg."
+"Zie de chmod(1) manual page voor de volledige uitleg."
 
 #: action.c:539
 msgid "There was one error.\n"
@@ -225,7 +227,7 @@ msgstr "Afbreken"
 
 #: action.c:1019
 msgid "Don't confirm every operation"
-msgstr ""
+msgstr "Niet alle bewerkingen bevestigen"
 
 #: action.c:1059
 #, c-format
@@ -364,36 +366,40 @@ msgstr "?Koppel %s als %s?"
 #: action.c:1668
 #, c-format
 msgid "'Mounting %s\n"
-msgstr "'Aansluiten %s\n"
+msgstr "'Aankoppelen %s\n"
 
 #: action.c:1669
 #, c-format
 msgid "'Unmounting %s\n"
-msgstr "'Afsluiten %s\n"
+msgstr "'Afkoppelen %s\n"
 
 #: action.c:1676
 #, c-format
 msgid "?Mount %s?\n"
-msgstr "?%s aansluiten?\n"
+msgstr "?%s aankoppelen?\n"
 
 #: action.c:1677
 #, c-format
 msgid "?Unmount %s?\n"
-msgstr "?%s afsluiten?\n"
+msgstr "?%s afkoppelen?\n"
 
 #: action.c:1687
 #, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Mount failed\n"
-msgstr "!FOUT: Aansluiten mislukt\n"
+msgstr ""
+"!%s\n"
+"Aankoppelen mislukt\n"
 
 #: action.c:1688
 #, fuzzy, c-format
 msgid ""
 "!%s\n"
 "Unmount failed\n"
-msgstr "!FOUT: Afsluiten mislukt\n"
+msgstr ""
+"!%s\n"
+"Afkoppelen mislukt\n"
 
 #: action.c:1734
 #, fuzzy, c-format
@@ -402,32 +408,32 @@ msgid ""
 "Total: %s ("
 msgstr ""
 "'\n"
-"Totaal: %s\n"
+"Totaal: %s ("
 
 #: action.c:1741
 #, fuzzy
 msgid "file"
-msgstr "Bestand"
+msgstr "bestand"
 
 #: action.c:1741
 #, fuzzy
 msgid "files"
-msgstr "Bestand"
+msgstr "bestanden"
 
 #: action.c:1748
 #, fuzzy
 msgid "no directories)\n"
-msgstr "Thuis Map"
+msgstr "geen mappen)\n"
 
 #: action.c:1753
 #, fuzzy
 msgid "directory"
-msgstr "Map"
+msgstr "map"
 
 #: action.c:1754
 #, fuzzy
 msgid "directories"
-msgstr "Map"
+msgstr "mappen"
 
 #: action.c:1783 action.c:1820 action.c:1847 action.c:1875 action.c:1892
 msgid ""
@@ -439,7 +445,7 @@ msgstr ""
 
 #: action.c:1784
 msgid "!No mount points selected!\n"
-msgstr "!Geen aansluitpunten geselecteerd!\n"
+msgstr "!Geen aankoppelpunten geselecteerd!\n"
 
 #: action.c:1840
 msgid "?Another search?"
@@ -480,11 +486,11 @@ msgstr "Schijfgebruik"
 
 #: action.c:2028
 msgid "Mount / Unmount"
-msgstr "Aansluiten / Afsluiten"
+msgstr "Aankoppelen / Afkoppelen"
 
 #: action.c:2033
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Filer ondersteund nog geen aansluitpunten op uw systeem. Sorry."
+msgstr "ROX-Filer ondersteunt nog geen aankoppelpunten op uw systeem. Sorry."
 
 #: action.c:2051 action.c:2290 menu.c:239 tips:93
 msgid "Delete"
@@ -506,7 +512,7 @@ msgstr "Beknopt"
 #: action.c:2056
 #, fuzzy
 msgid "Only log directories being deleted"
-msgstr "Beknopt - toon alleen mappen die verwijderd worden"
+msgstr "Toon alleen mappen die verwijderd worden"
 
 #: action.c:2072
 msgid "You need to select the items whose permissions you want to change"
@@ -535,7 +541,7 @@ msgstr "go=u-w (Publieke toegang, onschrijfbaar)"
 #: action.c:2099
 #, fuzzy
 msgid "Don't list processed files"
-msgstr "Beknopt - toon geen verwerkte bestanden"
+msgstr "Toon geen verwerkte bestanden"
 
 #: action.c:2102 tips:102
 msgid "Recurse"
@@ -544,7 +550,7 @@ msgstr "Doorlopen"
 #: action.c:2102
 #, fuzzy
 msgid "Also change contents of subdirectories"
-msgstr "Ook de inhoud van sub-mappen veranderen."
+msgstr "Ook de inhoud van sub-mappen veranderen"
 
 #: action.c:2106
 msgid "Command:"
@@ -585,15 +591,14 @@ msgstr " en "
 #: action.c:2278
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
-" zal bepaalde items op het paneel of prikbord beïnvloeden -  echt "
-"verwijderen?"
+" zal bepaalde items op het paneel of prikbord beïnvloeden - echt verwijderen?"
 
 #: action.c:2285
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 " zal bepaalde items op het paneel of prikbord beïnvloeden - echt verwijderen?"
 
-#: action.c:2290 filer.c:1534 gtksavebox.c:243 icon.c:863 infobox.c:106
+#: action.c:2290 filer.c:1534 gtksavebox.c:247 icon.c:863 infobox.c:106
 #: menu.c:1573 options.c:742 panel.c:335 type.c:977 usericons.c:343
 msgid "Cancel"
 msgstr "Afbreken"
@@ -601,14 +606,14 @@ msgstr "Afbreken"
 #: appmenu.c:185
 #, fuzzy
 msgid "<missing label>"
-msgstr "Ontbrekende '>' in icoon label"
+msgstr "<label ontbreekt>"
 
 #: dir.c:137 dir.c:734
 #, fuzzy, c-format
 msgid ""
 "Error scanning '%s':\n"
 "%s"
-msgstr "Fout tijdens bewaren bestand"
+msgstr "Fout tijdens doorzoeken '%s':\n"
 
 #: dir.c:353
 #, c-format
@@ -680,7 +685,7 @@ msgstr "TitellozeData"
 #: dnd.c:976
 #, fuzzy, c-format
 msgid "Error saving file: %s"
-msgstr "Fout tijdens bewaren bestand"
+msgstr "Fout tijdens bewaren bestand: %s"
 
 #: dnd.c:1007
 msgid "No URIs in the text/uri-list (nothing to do!)"
@@ -715,11 +720,11 @@ msgstr "Onbekende actie aangevraagd"
 #: dnd.c:1083
 #, fuzzy, c-format
 msgid "Error getting file list: %s"
-msgstr "Fout tijdens het verkrijgen van de bestandenlijst"
+msgstr "Fout tijdens het verkrijgen van de bestandenlijst: %s"
 
 #: dnd.c:1113
 msgid "You can't use multiple files with Set Icon!"
-msgstr ""
+msgstr "Je kan niet meerdere bestanden gebruiken voor Icoon instellen!"
 
 #: filer.c:578
 msgid "Directory missing/deleted"
@@ -731,6 +736,9 @@ msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later."
 msgstr ""
+"Groep %s is niet ingesteld. Selecteer enkele bestanden en druk op Ctrl+%s om "
+"de groep in te stellen. Druk dan later op %s om de bestanden opnieuw te "
+"selecteren."
 
 #: filer.c:1135
 #, c-format
@@ -743,25 +751,24 @@ msgid "Directory '%s' not found."
 msgstr "Map '%s' niet gevonden."
 
 #: filer.c:1789
-#, fuzzy
 msgid "Scanning, "
-msgstr " (Scannen)"
+msgstr "Scannen, "
 
 #: filer.c:1790
 msgid "All, "
-msgstr ""
+msgstr "Alle, "
 
 #: filer.c:1791
 msgid "Thumbs, "
-msgstr ""
+msgstr "Voorbeelden, "
 
 #: filer.c:2040 menu.c:1823
 msgid "Item no longer exists!"
-msgstr ""
+msgstr "Item bestaat niet meer!"
 
 #: filer.c:2162
 msgid "Symbolic link to "
-msgstr "Symbolische koppeling naar "
+msgstr "Symbolische link naar "
 
 #: find.c:485
 msgid "And"
@@ -777,7 +784,7 @@ msgstr ""
 
 #: find.c:560
 msgid "prune"
-msgstr "afkappen"
+msgstr ""
 
 #: find.c:648
 msgid "After"
@@ -959,16 +966,16 @@ msgstr "blokken"
 msgid "Save As:"
 msgstr "Bewaren Als:"
 
-#: gtksavebox.c:236 gtksavebox.c:510 gui_support.c:257 icon.c:856 menu.c:1566
+#: gtksavebox.c:236 gtksavebox.c:514 gui_support.c:257 icon.c:856 menu.c:1566
 #: options.c:730 type.c:970 usericons.c:335
 msgid "OK"
 msgstr "OK"
 
-#: gtksavebox.c:335
+#: gtksavebox.c:339
 msgid "Unnamed"
 msgstr "Naamloos"
 
-#: gtksavebox.c:405
+#: gtksavebox.c:409
 msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
@@ -976,7 +983,7 @@ msgstr ""
 "Remote applicatie wil Direct Bewaren gebruiken, maar ik kan de "
 "XdndDirectSave0 (type text/plain) eigenschap niet lezen.\n"
 
-#: gtksavebox.c:503
+#: gtksavebox.c:507
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
@@ -993,11 +1000,11 @@ msgstr ""
 #: gui_support.c:435
 #, fuzzy, c-format
 msgid "Error reading file %s: %s"
-msgstr "Fout tijdens lezen bestand"
+msgstr "Fout tijdens lezen bestand %s: %s"
 
 #: gui_support.c:448
 msgid "Can't allocate memory for buffer to load this file"
-msgstr "Kan geen geheugen bezetten voor buffer om dit bestand te laden"
+msgstr "Kan geen geheugen reserveren voor buffer om dit bestand te laden"
 
 #: gui_support.c:491
 #, c-format
@@ -1013,7 +1020,7 @@ msgid ""
 "Options window and click on Save.\n"
 "Further errors will be ignored."
 msgstr ""
-"Fout in '%s' bestand op lijn %d: \n"
+"Fout in '%s' bestand op regel %d: \n"
 "\"%s\"\n"
 "Dit kan het gevolg zijn van het 'upgraden' vanaf een vorige versie van ROX-"
 "Filer. Open het Optievenster en druk op Bewaren.\n"
@@ -1022,7 +1029,7 @@ msgstr ""
 #: i18n.c:157
 msgid ""
 "You must restart the filer for the new language setting to take full effect"
-msgstr "Herstart ROX-Filer om de nieuwe taal-instelling effect te laten hebben"
+msgstr "Herstart ROX-Filer om de nieuwe taalinstelling effect te laten hebben"
 
 #: icon.c:105
 msgid "ROX-Filer"
@@ -1038,7 +1045,7 @@ msgstr "Opties..."
 
 #: icon.c:108 menu.c:257
 msgid "Home Directory"
-msgstr "Thuis Map"
+msgstr "Thuis map"
 
 #: icon.c:109 icon.c:141 menu.c:219 type.c:376
 msgid "File"
@@ -1054,15 +1061,15 @@ msgstr "Info"
 
 #: icon.c:113 menu.c:226
 msgid "Set Run Action..."
-msgstr "Start Actie..."
+msgstr "Startactie instellen..."
 
 #: icon.c:114 menu.c:227
 msgid "Set Icon..."
-msgstr "Zet Icoon..."
+msgstr "Icoon instellen..."
 
 #: icon.c:115 icon.c:814
 msgid "Edit Item"
-msgstr "Item Bewerken"
+msgstr "Item bewerken"
 
 #: icon.c:116
 msgid "Show Location"
@@ -1070,7 +1077,7 @@ msgstr "Locatie tonen"
 
 #: icon.c:117
 msgid "Remove Item(s)"
-msgstr "Item(s) Verwijderen"
+msgstr "Item(s) verwijderen"
 
 #: icon.c:393
 msgid "Nothing"
@@ -1078,11 +1085,11 @@ msgstr "Niets"
 
 #: icon.c:573
 msgid "The label must contain at least one character!"
-msgstr "Het label moet minstens één karakter bevatten!"
+msgstr "Het label moet minstens één letterteken bevatten!"
 
 #: icon.c:576
 msgid "The location must contain at least one character!"
-msgstr "De locatie moet minstens één karakter bevatten!"
+msgstr "De locatie moet minstens één letterteken bevatten!"
 
 #: icon.c:722
 msgid "You must first select some items to remove"
@@ -1102,7 +1109,7 @@ msgstr "Klikken op het icoon opent:"
 
 #: icon.c:832
 msgid "The text displayed under the icon is:"
-msgstr "De tekst getoond onder het icoon is:"
+msgstr "De tekst onder het icoon is:"
 
 #: infobox.c:99 menu.c:218
 msgid "Refresh"
@@ -1130,15 +1137,15 @@ msgstr "Grootte:"
 
 #: infobox.c:291
 msgid "Change time:"
-msgstr "Verander-tijd:"
+msgstr "Laatst veranderd:"
 
 #: infobox.c:295
 msgid "Modify time:"
-msgstr "Aanpas-tijd:"
+msgstr "Laatst gewijzigd:"
 
 #: infobox.c:299
 msgid "Access time:"
-msgstr "Toegangstijd:"
+msgstr "Laatst geopend:"
 
 #: infobox.c:305
 msgid "Permissions:"
@@ -1151,7 +1158,7 @@ msgstr "Type:"
 #: infobox.c:316
 #, fuzzy
 msgid "Run action:"
-msgstr "Start-actie instellen"
+msgstr "Startactie:"
 
 #: infobox.c:356
 msgid "file(1) says..."
@@ -1164,12 +1171,12 @@ msgstr "<nog niets>"
 #: infobox.c:431
 #, fuzzy, c-format
 msgid "file(1) says... %s"
-msgstr "file(1) zegt..."
+msgstr "file(1) zegt... %s"
 
 #: infobox.c:473
 #, fuzzy, c-format
 msgid "Symbolic link to %s"
-msgstr "Symbolische koppeling naar "
+msgstr "Symbolische koppeling naar %s"
 
 #: infobox.c:479
 msgid "Symbolic link"
@@ -1252,7 +1259,9 @@ msgstr ""
 "argumenten zijn gegeven.\n"
 "\n"
 "  -b, --bottom=PANEL    open PANEL als paneel onderaan het scherm\n"
+"  -c, --client-id=ID    gebruik ID voor sessiebeheer\n"
 "  -d, --dir=DIR         open DIR als map (niet als applicatie)\n"
+"  -D, --close=DIR       sluit DIR en de subdirectories ervan\n"
 "  -h, --help            toon deze helptekst en sluit af\n"
 "  -l, --left=PANEL      open PANEL als paneel links op het scherm\n"
 "  -m, --mime-type=FILE  print MIME type van FILE en sluit af\n"
@@ -1261,6 +1270,7 @@ msgstr ""
 "  -o, --override        Neem controle over panelen over van window manager\n"
 "  -p, --pinboard=PIN    gebruik PIN als het prikbord\n"
 "  -r, --right=PANEL     open PANEL als paneel rechts op het scherm\n"
+"  -R, --RPC             lees Remote Procedure Call van standaard invoer\n"
 "  -s, --show=FILE       open een map en toon FILE\n"
 "  -t, --top=PANEL       open PANEL als paneel bovenaan het scherm\n"
 "  -u, --user            toon gebruikersnaam in ieder venster\n"
@@ -1275,7 +1285,7 @@ msgstr ""
 #: main.c:388
 #, c-format
 msgid "Running as user '%s'"
-msgstr "Lopend onder gebruiker '%s'"
+msgstr "Lopend als gebruiker '%s'"
 
 #: main.c:554
 msgid "features set at compile time"
@@ -1283,16 +1293,16 @@ msgstr "eigenschappen ingesteld tijdens het compileren"
 
 #: main.c:555
 msgid "Large File Support"
-msgstr ""
+msgstr "Ondersteuning voor grote bestanden"
 
 #: main.c:562
 #, fuzzy
 msgid "Old VFS support"
-msgstr "VFS ondersteuning"
+msgstr "VFS ondersteuning (oud)"
 
 #: main.c:567
 msgid "No (incompatible with Large File Support)"
-msgstr ""
+msgstr "Nee (niet compatible met ondersteuning voor grote bestanden)"
 
 #: main.c:569
 msgid "No (couldn't find a valid libvfs)"
@@ -1300,40 +1310,42 @@ msgstr "Nee (kon geen geldige libvfs vinden)"
 
 #: main.c:573
 msgid "Gtk+-2.0 support"
-msgstr ""
+msgstr "Ondersteuning voor Gtk+ 2.0"
 
 #: main.c:577
 msgid "No (using Gtk+-1.2 instead)"
-msgstr ""
+msgstr "Nee (gebruik Gtk+ 1.2 inplaats)"
 
 #: main.c:580
 #, fuzzy
 msgid "Save thumbnails"
-msgstr "Extra details tonen"
+msgstr "Voorbeelden opslaan"
 
 #: main.c:582 main.c:591
 msgid "Yes (using Gtk+-2.0)"
-msgstr ""
+msgstr "Ja (gebruikmakend van Gtk+ 2.0)"
 
 #: main.c:584
 msgid "Yes (using libpng)"
-msgstr ""
+msgstr "Ja (gebruikmakend van libpng)"
 
 #: main.c:586
 msgid "No (needs libpng or Gtk+-2.0)"
-msgstr ""
+msgstr "Nee (libpng of Gtk+ 2.0 vereist)"
 
 #: main.c:589
 msgid "Character set translations"
 msgstr ""
 
 #: main.c:594
+#, fuzzy
 msgid "Yes (using libiconv)"
-msgstr ""
+msgstr "Ja (gebruikmakend van libpng)"
 
 #: main.c:596
+#, fuzzy
 msgid "No (needs libiconv or Gtk+-2.0)"
-msgstr ""
+msgstr "Nee (libpng of Gtk+ 2.0 vereist)"
 
 #: menu.c:188 tips:14
 msgid "Display"
@@ -1341,19 +1353,19 @@ msgstr "Weergave"
 
 #: menu.c:189 tips:27
 msgid "Huge Icons"
-msgstr "Hele Grote Iconen"
+msgstr "Grote iconen"
 
 #: menu.c:190 tips:28 tips:159
 msgid "Large Icons"
-msgstr "Grote Iconen"
+msgstr "Normale iconen"
 
 #: menu.c:191 tips:29 tips:158
 msgid "Small Icons"
-msgstr "Kleine Iconen"
+msgstr "Kleine iconen"
 
 #: menu.c:192
 msgid "Huge, With..."
-msgstr "Heel Groot, Met..."
+msgstr "Groot, met..."
 
 #: menu.c:193 menu.c:199 menu.c:205 tips:32
 msgid "Summary"
@@ -1373,36 +1385,36 @@ msgstr "Tijden"
 
 #: menu.c:198
 msgid "Large, With..."
-msgstr "Groot, Met..."
+msgstr "Normaal, met..."
 
 #: menu.c:204
 msgid "Small, With..."
-msgstr "Klein, Met..."
+msgstr "Klein, met..."
 
 #: menu.c:211
 msgid "Sort by Name"
-msgstr "Sorteer op Naam"
+msgstr "Sorteer op naam"
 
 #: menu.c:212
 msgid "Sort by Type"
-msgstr "Sorteer volgens Type"
+msgstr "Sorteer volgens type"
 
 #: menu.c:213
 msgid "Sort by Date"
-msgstr "Sorteer op Datum"
+msgstr "Sorteer op datum"
 
 #: menu.c:214
 msgid "Sort by Size"
-msgstr "Sorteer volgens Grootte"
+msgstr "Sorteer volgens grootte"
 
 #: menu.c:216
 msgid "Show Hidden"
-msgstr "Toon Verborgen"
+msgstr "Toon verborgen"
 
 #: menu.c:217
 #, fuzzy
 msgid "Show Thumbnails"
-msgstr "Toon Verborgen"
+msgstr "Toon voorbeelden"
 
 #: menu.c:220
 msgid "Copy..."
@@ -1422,19 +1434,19 @@ msgstr "Open VFS"
 
 #: menu.c:230
 msgid "Unzip"
-msgstr "Ont-zip"
+msgstr "Open zip"
 
 #: menu.c:231
 msgid "Untar"
-msgstr "Ont-tar"
+msgstr "Open tar"
 
 #: menu.c:232
 msgid "Deb"
-msgstr "Deb"
+msgstr "Open .deb"
 
 #: menu.c:233
 msgid "RPM"
-msgstr "RPM"
+msgstr "Open RPM"
 
 #: menu.c:235
 msgid "Open AVFS"
@@ -1447,11 +1459,11 @@ msgstr "Zenden naar..."
 #: menu.c:243
 #, fuzzy
 msgid "Select"
-msgstr "Alles Selecteren"
+msgstr "Selecteer"
 
 #: menu.c:244
 msgid "Select All"
-msgstr "Alles Selecteren"
+msgstr "Alles selecteren"
 
 #: menu.c:245
 msgid "Clear Selection"
@@ -1460,7 +1472,7 @@ msgstr "Selectie wissen"
 #: menu.c:246
 #, fuzzy
 msgid "Invert Selection"
-msgstr "Selectie wissen"
+msgstr "Selectie inverteren"
 
 #: menu.c:247
 msgid "Select If..."
@@ -1476,7 +1488,7 @@ msgstr "Leeg bestand"
 
 #: menu.c:252
 msgid "Xterm Here"
-msgstr "Xterm Hier"
+msgstr "Open een terminal"
 
 #: menu.c:253
 msgid "Window"
@@ -1484,19 +1496,19 @@ msgstr "Venster"
 
 #: menu.c:254
 msgid "Parent, New Window"
-msgstr "Hogere map, Nieuw Venster"
+msgstr "Hogere map, nieuw venster"
 
 #: menu.c:255
 msgid "Parent, Same Window"
-msgstr "Hogere map, Zelfde Venster"
+msgstr "Hogere map, zelfde venster"
 
 #: menu.c:256
 msgid "New Window"
-msgstr "Nieuw Venster"
+msgstr "Nieuw venster"
 
 #: menu.c:258
 msgid "Resize Window"
-msgstr "Afmeting Venster aanpassen"
+msgstr "Afmeting venster aanpassen"
 
 #: menu.c:261
 msgid "Close Window"
@@ -1508,7 +1520,7 @@ msgstr "Pad opgeven..."
 
 #: menu.c:264
 msgid "Shell Command..."
-msgstr "Shell Commando..."
+msgstr "Shell commando..."
 
 #: menu.c:266
 msgid "Show ROX-Filer Help"
@@ -1539,7 +1551,7 @@ msgstr "Gebruik menu-muisknop + Shift om het bestand ergens naartoe te zenden"
 
 #: menu.c:801
 msgid "Next Click"
-msgstr "Volgende Klik"
+msgstr "Volgende klik"
 
 #: menu.c:817
 #, c-format
@@ -1548,15 +1560,15 @@ msgstr "%d items"
 
 #: menu.c:893
 msgid "Unmount"
-msgstr "Afsluiten"
+msgstr "Afkoppelen"
 
 #: menu.c:895 tips:95
 msgid "Mount"
-msgstr "Aansluiten"
+msgstr "Aankoppelen"
 
 #: menu.c:898
 msgid "Show Target"
-msgstr "Doel Tonen"
+msgstr "Doel tonen"
 
 #: menu.c:900
 msgid "Look Inside"
@@ -1564,15 +1576,15 @@ msgstr "Binnenin kijken"
 
 #: menu.c:902
 msgid "Open As Text"
-msgstr "Als Tekst Openen"
+msgstr "Als tekst openen"
 
 #: menu.c:1072
 msgid "New pathname is not absolute"
-msgstr "Nieuwe pad-naam is niet absoluut"
+msgstr "Nieuwe padnaam is niet absoluut"
 
 #: menu.c:1237
 msgid "New Directory"
-msgstr "Nieuwe Map"
+msgstr "Nieuwe map"
 
 #: menu.c:1238
 msgid "NewDir"
@@ -1581,7 +1593,7 @@ msgstr "NieuweMap"
 #: menu.c:1251 menu.c:1257
 #, fuzzy, c-format
 msgid "Error creating '%s': %s"
-msgstr "Fout tijdens maken bestand"
+msgstr "Fout tijdens maken bestand '%s': %s"
 
 #: menu.c:1277 menu.c:1335
 msgid "New File"
@@ -1594,7 +1606,7 @@ msgstr "NieuwBestand"
 #: menu.c:1294
 #, fuzzy, c-format
 msgid "Error creating file: could not find the template for %s"
-msgstr "Kon template niet vinden voor "
+msgstr "Kon template niet vinden voor %s"
 
 #: menu.c:1365
 #, c-format
@@ -1636,13 +1648,13 @@ msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
 msgstr ""
-"Kan geen tweede venster met deze map openen omdat de 'Unieke Vensters' optie "
+"Kan geen tweede venster met deze map openen omdat de 'Unieke vensters' optie "
 "ingesteld is in bij de Opties."
 
 #: menu.c:1522
 #, c-format
 msgid "fork: %s"
-msgstr ""
+msgstr "fork: %s"
 
 #: menu.c:1537
 msgid "New window, as user..."
@@ -1757,7 +1769,7 @@ msgstr "Creëren kind-proces mislukt"
 
 #: minibuffer.c:813
 msgid "Invalid Find condition"
-msgstr ""
+msgstr "Ongeldige zoekconditie"
 
 #: options.c:689
 msgid "ROX-Filer options"
@@ -1766,11 +1778,11 @@ msgstr "ROX-Filer opties"
 #: options.c:706
 #, fuzzy, c-format
 msgid "Choices will be saved as %s"
-msgstr "Keuzes zullen bewaart worden als "
+msgstr "Keuzes zullen bewaard worden als %s"
 
 #: options.c:713 options.c:949 type.c:1014
 msgid "Choices saving is disabled by CHOICESPATH variable"
-msgstr "Bewaren Keuzes is uitgezet door de CHOICESPATH variabele"
+msgstr "Bewaren van instellingen is uitgezet door de CHOICESPATH variabele"
 
 #: options.c:720
 msgid "Save"
@@ -1787,11 +1799,11 @@ msgstr "Ontbrekende '='"
 #: options.c:925 options.c:948 options.c:960
 #, c-format
 msgid "Could not save options: %s"
-msgstr ""
+msgstr "Kon instellingen niet opslaan: %s"
 
 #: panel.c:267
 msgid "Your old panel file has been converted to the new XML format."
-msgstr ""
+msgstr "Je oude paneel-bestand is omgezet naar het nieuwe XML formaat."
 
 #: panel.c:331
 msgid "Close panel?"
@@ -1809,18 +1821,18 @@ msgstr ""
 msgid "Remove"
 msgstr "Verwijderen"
 
-#: panel.c:410
+#: panel.c:421
 msgid "Missing < or > in panel config file"
 msgstr "Ontbrekende < of > in paneel configuratie bestand"
 
-#: panel.c:951
+#: panel.c:958
 #, fuzzy, c-format
 msgid "Error saving panel %s: %s"
-msgstr "Fout tijdens bewaren bestand"
+msgstr "Fout tijdens bewaren bestand %s: %s"
 
-#: panel.c:1217
+#: panel.c:1224
 msgid "Applet quit without ever creating a widget!"
-msgstr ""
+msgstr "Applet afgesloten zonder dat het een venster aanmaakte!"
 
 #: pinboard.c:224
 msgid "Another application is already managing the pinboard!"
@@ -1828,55 +1840,56 @@ msgstr "Een andere applicatie beheert op dit moment het prikbord!"
 
 #: pinboard.c:265
 msgid "Your old pinboard file has been converted to the new XML format."
-msgstr ""
+msgstr "Je oude prikbord-bestand is omgezet naar het nieuwe XML formaat."
 
-#: pinboard.c:1083
+#: pinboard.c:1084
 msgid "Missing '>' in icon label"
 msgstr "Ontbrekende '>' in icoon label"
 
-#: pinboard.c:1092
+#: pinboard.c:1093
 msgid "Missing ',' after icon label"
 msgstr "Ontbrekende ',' na icoon label"
 
-#: pinboard.c:1251
+#: pinboard.c:1256
 #, fuzzy, c-format
 msgid "Error saving pinboard %s: %s"
-msgstr "Fout tijdens bewaren van prikbord"
+msgstr "Fout tijdens bewaren van prikbord %s: %s"
 
-#: pixmaps.c:803
+#: pixmaps.c:802
 #, fuzzy
 msgid "Unknown error"
-msgstr "Onbekend type"
+msgstr "Onbekende fout"
 
 #: remote.c:767
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr ""
+msgstr "Poging onbekend SOAP methode '%s' aan te roepen"
 
 #: rox_gettext.c:93
 #, fuzzy, c-format
 msgid "Invalid .gmo translation file (too short): %s"
-msgstr "Ongeldig .gmo vertalingsbestand (te kort)"
+msgstr "Ongeldig .gmo vertalingsbestand (te kort): %s"
 
 #: rox_gettext.c:106
 #, fuzzy, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-msgstr "Ongeldige .gmo vertalingsbestand (GNU magisch nummer niet gevonden)\n"
+msgstr ""
+"Ongeldige .gmo vertalingsbestand (GNU magisch nummer niet gevonden): %s"
 
 #: run.c:94 run.c:135
 #, fuzzy, c-format
 msgid "Program %s not found - deleted?"
-msgstr "Programma niet gevonden - verwijderd?"
+msgstr "Programma %s niet gevonden - verwijderd?"
 
 #: run.c:247
 #, fuzzy, c-format
 msgid "File doesn't exist, or I can't access it: %s"
-msgstr "Bestand bestaat niet, of is ontoegankelijk"
+msgstr "Bestand bestaat niet, of is ontoegankelijk: %s"
 
 #: run.c:252
 #, fuzzy, c-format
 msgid "I don't know how to open '%s'"
-msgstr "Ik weet niet hoe ik dat moet openen"
+msgstr "Ik weet niet hoe ik '%s' moet openen"
 
 #: run.c:279
 #, fuzzy
@@ -1884,6 +1897,7 @@ msgid ""
 "Executable file:\n"
 "This is a file with an eXecute bit set - it can be run as a program."
 msgstr ""
+"Programmabestand:\n"
 "Dit is een bestand waarvan een uitvoer-bit gezet is - het kan als een "
 "programma gestart worden."
 
@@ -1892,7 +1906,9 @@ msgstr ""
 msgid ""
 "File:\n"
 "This is a data file. Try using the Info menu item to find out more..."
-msgstr "Dit is een data bestand. Gebruik het Info menu voor meer informatie..."
+msgstr ""
+"Databestand:\n"
+"Dit is een data bestand. Gebruik het Info menu voor meer informatie..."
 
 #: run.c:291
 #, fuzzy
@@ -1901,7 +1917,8 @@ msgid ""
 "A mount point is a directory which another filing system can be mounted on. "
 "Everything on the mounted filesystem then appears to be inside the directory."
 msgstr ""
-"Een aansluit punt is een map waarop een ander bestandssysteem kan "
+"Aankoppelpunt (mount point):\n"
+"Een aankoppelpunt is een map waarop een ander bestandssysteem kan "
 "aangesloten worden. Alles op het aangesloten bestandssysteem zal dan "
 "verschijnen in deze map."
 
@@ -1912,8 +1929,9 @@ msgid ""
 "Device files allow you to read from or write to a device driver as though it "
 "was an ordinary file."
 msgstr ""
-"Apparaat-bestanden laten toe om te schrijven/lezen van/naar een apparaat "
-"alsof het een gewoon bestand was."
+"Apparaatbestand:\n"
+"Apparaatbestanden laten toe om te schrijven/lezen van/naar een apparaat "
+"alsof het een gewoon bestand is."
 
 #: run.c:309
 #, fuzzy
@@ -1922,6 +1940,7 @@ msgid ""
 "Pipes allow different programs to communicate. One program writes data to "
 "the pipe while another one reads it out again."
 msgstr ""
+"Named pipe:\n"
 "'Pipes' make communicatie tussen programma's mogelijk. Het ene programma "
 "schrijft data naar de pipe terwijl een ander er uit leest."
 
@@ -1930,7 +1949,9 @@ msgstr ""
 msgid ""
 "Socket:\n"
 "Sockets allow processes to communicate."
-msgstr "'Sockets' laten processen toe om te communiceren."
+msgstr ""
+"Socket:\n"
+"Sockets laten processen toe om te communiceren."
 
 #: run.c:321
 #, fuzzy
@@ -1939,23 +1960,24 @@ msgid ""
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
 "anymore or you don't have search permission on the directory it's in?"
 msgstr ""
+"Onbekend type:\n"
 "Ik kan niet uitzoeken wat voor type dit bestand is. Misschien bestaat het "
-"niet meer of je hebt geen zoek toegang in de map waarin het zich bevind?"
+"niet meer of heb je geen zoektoegang in de map waarin het zich bevind?"
 
 #: run.c:409
 #, fuzzy, c-format
 msgid "Could not send data to program: %s"
-msgstr "ROX-Filer - Zenden van data naar programma"
+msgstr "Kon data niet zenden aan programma: %s"
 
 #: run.c:439
 #, c-format
 msgid "Could not read link: %s"
-msgstr ""
+msgstr "Kon link niet lezen: %s"
 
 #: run.c:467
 #, fuzzy, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
-msgstr "Slechte symbolische koppeling (of je hebt er geen toegang naar)."
+msgstr "Verbroken symbolische koppeling (of je hebt er geen toegang naar)."
 
 #: run.c:504
 #, c-format
@@ -1976,6 +1998,7 @@ msgid ""
 "(hold down Shift while you open it). Most applications provide their own "
 "help here, but this one doesn't."
 msgstr ""
+"Applicatie:\n"
 "Dit is een applicatie-map - Het is mogelijk om de map te starten als een "
 "programma, of te openen als map (houd Shift ingedrukt terwijl je het opent). "
 "De meeste applicaties leveren hun eigen hulp hier, maar deze applicatie doet "
@@ -1988,6 +2011,7 @@ msgid ""
 "This is a directory. It contains an index to other items - open it to see "
 "the list."
 msgstr ""
+"Map:\n"
 "Dit is een map. Het bevat een index naar andere items - open het om deze "
 "lijst te zien."
 
@@ -2017,7 +2041,7 @@ msgstr "Thuis"
 
 #: toolbar.c:116
 msgid "Change to home directory"
-msgstr "Ga naar thuis-map"
+msgstr "Ga naar thuismap"
 
 #: toolbar.c:120
 msgid "Scan"
@@ -2025,7 +2049,7 @@ msgstr "Scan"
 
 #: toolbar.c:120
 msgid "Rescan directory contents"
-msgstr "Herscan map inhoud"
+msgstr "Map inhoud verversen"
 
 #: tips:41 toolbar.c:124
 msgid "Size"
@@ -2046,12 +2070,12 @@ msgstr "Extra details tonen"
 #: toolbar.c:132
 #, fuzzy
 msgid "Hidden"
-msgstr "Toon Verborgen"
+msgstr "Verborgen"
 
 #: toolbar.c:132
 #, fuzzy
 msgid "Show/hide hidden files"
-msgstr "Toon Verborgen"
+msgstr "Toon/verberg verborgen bestanden"
 
 #: toolbar.c:136
 msgid "Show ROX-Filer help"
@@ -2094,7 +2118,7 @@ msgstr "Symlink"
 
 #: type.c:371
 msgid "App dir"
-msgstr "App-map"
+msgstr "Applicatiemap"
 
 #: type.c:378
 msgid "Dir"
@@ -2114,7 +2138,7 @@ msgstr "Pipe"
 
 #: tips:173 type.c:386
 msgid "Socket"
-msgstr "'Socket'"
+msgstr "Socket"
 
 #: type.c:389
 msgid "Unknown"
@@ -2126,7 +2150,8 @@ msgid ""
 "\n"
 "gimp \"$1\""
 msgstr ""
-"Geef een schil commando dat \"$1\" zal laden in een geschikt programma. Bv:\n"
+"Geef een shellcommando dat \"$1\" zal laden in een geschikt programma. "
+"Bijv:\n"
 "\n"
 "gimp \"$1\""
 
@@ -2145,31 +2170,31 @@ msgstr "Dit is geen programma! Geef me een applicatie in plaats daarvan!"
 #: type.c:777
 #, fuzzy
 msgid "Execute file"
-msgstr "Uitvoerbaar bestand"
+msgstr "Uitvoeren"
 
 #: type.c:782
 #, fuzzy
 msgid "No run action defined"
-msgstr "Start-actie instellen"
+msgstr "Geen startactie ingesteld"
 
 #: type.c:808
 #, fuzzy, c-format
 msgid "Error in handler %s: %s"
-msgstr "Fout tijdens lezen bestand"
+msgstr "Fout in afhandeling %s: %s"
 
 #: type.c:823
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
-msgstr ""
+msgstr "Ongeldige applicatie %s (slechte AppRun)"
 
 #: type.c:834
 #, fuzzy, c-format
 msgid "Non-executable %s"
-msgstr "Uitvoerbaar bestand"
+msgstr "Niet-uitvoerbaar %s"
 
 #: type.c:871
 msgid "Set run action"
-msgstr "Start-actie instellen"
+msgstr "Startactie instellen"
 
 #: type.c:877
 #, c-format
@@ -2184,15 +2209,15 @@ msgstr "Alleen voor type `%s/%s'"
 #: type.c:911
 #, c-format
 msgid "Currently %s"
-msgstr ""
+msgstr "Momenteel %s"
 
 #: type.c:925
 msgid ""
 "Drop a suitable\n"
 "application here"
 msgstr ""
-"Drop een geschikte\n"
-"applicatie hier"
+"Sleep een geschikte\n"
+"applicatie hiernaartoe"
 
 #: type.c:932 usericons.c:290 usericons.c:319
 msgid "OR"
@@ -2200,7 +2225,7 @@ msgstr "OF"
 
 #: type.c:939
 msgid "Enter a shell command:"
-msgstr "Geef een shell-commando:"
+msgstr "Geef een shellcommando:"
 
 #: type.c:1027
 msgid ""
@@ -2225,6 +2250,9 @@ msgid ""
 "maybe the permissions are wrong?\n"
 "The icon has not been changed."
 msgstr ""
+"Kan afbeelding niet laden -- mogelijk is het in een formaat dat ik niet ken, "
+"of de toegangsrechten zijn onjuist?\n"
+"Het icoon is niet veranderd."
 
 #: usericons.c:223
 msgid "Set icon"
@@ -2242,11 +2270,11 @@ msgstr "Alleen voor type `%s/%s'"
 
 #: usericons.c:272
 msgid "Drop an icon file here"
-msgstr "Drop hier een icoon bestand"
+msgstr "Sleep hier een icoon bestand"
 
 #: usericons.c:282
 msgid "Menu of directories previously used for icons"
-msgstr ""
+msgstr "Menu met eerdergebruikte mappen met iconen"
 
 #: usericons.c:297
 msgid "Enter the path of an icon file:"
@@ -2259,14 +2287,14 @@ msgstr "Verwijder zelfgekozen icoon"
 #: usericons.c:397
 #, fuzzy, c-format
 msgid "Error saving %s: %s"
-msgstr "Fout tijdens bewaren bestand"
+msgstr "Fout tijdens bewaren bestand %s: %s"
 
 #: usericons.c:528
 msgid ""
 "You should drop a single local icon file onto the drop box - that icon will "
 "be used for this file from now on."
 msgstr ""
-"Drop een (lokaal) icoon op de drop-rechthoek - dit icoon zal in het vervolg "
+"Sleep een (lokaal) icoon op de drop-rechthoek - dit icoon zal in het vervolg "
 "voor dit bestand gebruikt worden."
 
 #: usericons.c:571
@@ -2280,13 +2308,15 @@ msgstr ""
 #: usericons.c:595
 #, fuzzy
 msgid "Setting icon disabled by CHOICESPATH"
-msgstr "Bewaren Keuzes is uitgezet door de CHOICESPATH variabele"
+msgstr "Instellen icoon is uitgezet door de CHOICESPATH variabele"
 
 #: usericons.c:664
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
 msgstr ""
+"Je hebt nog niet eerder bijzondere iconen ingesteld; daarom heb ik nog geen "
+"mappen om je te tonen"
 
 #: tips:1 tips:3
 msgid "Translation"
@@ -2295,7 +2325,7 @@ msgstr "Vertaling"
 #: tips:2
 #, fuzzy
 msgid "Display messages in..."
-msgstr "Toon gebruikmakend van grote iconen"
+msgstr "Toon interface in..."
 
 #: tips:4
 msgid "Dutch"
@@ -2303,7 +2333,7 @@ msgstr "Nederlands"
 
 #: tips:5
 msgid "English (no translation)"
-msgstr ""
+msgstr "Engels (geen vertaling)"
 
 #: tips:6
 msgid "French"
@@ -2331,11 +2361,11 @@ msgstr "Russisch"
 
 #: tips:12
 msgid "Spanish"
-msgstr ""
+msgstr "Spaans"
 
 #: tips:13
 msgid "Use the LANG environment variable"
-msgstr ""
+msgstr "Gebruik de LANG ongevingsvariabele"
 
 #: tips:15
 msgid "Ignore case when sorting"
@@ -2346,8 +2376,8 @@ msgid ""
 "If off: Ben, animal, zoo.\n"
 "If on: animal, Ben, zoo."
 msgstr ""
-"Indien uit: Ben, dier, dierentuin.\n"
-"Indien aan: dier, Ben, dierentuin."
+"Indien uit: Ben, aap, dierentuin.\n"
+"Indien aan: aap, Ben, dierentuin."
 
 #: tips:17
 msgid "Directories always come first"
@@ -2382,13 +2412,16 @@ msgstr "Maximale breedte van de tekst onder een klein icoon."
 
 #: tips:23
 msgid "Inherit options from source window"
-msgstr ""
+msgstr "Erf opties over van bronvenster"
 
 #: tips:24
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
 msgstr ""
+"Indien aan worden instellingen voor nieuwe vensters overgenomen van het "
+"venster waarvandaan het nieuwe venster werd geopend, anders heeft het nieuwe "
+"venster de standaardinstellingen."
 
 #: tips:25
 msgid "Default settings for new windows:"
@@ -2413,24 +2446,26 @@ msgstr "Datum"
 #: tips:42
 #, fuzzy
 msgid "Show hidden files"
-msgstr "Toon Verborgen"
+msgstr "Toon verborgen bestanden"
 
 #: tips:43
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
 msgstr ""
+"Indien aan worden bestanden waarvan de naam met een punt begint (.) ook "
+"afgebeeld, anders zijn ze verborgen."
 
 #: tips:44
 #, fuzzy
 msgid "Show image thumbnails"
-msgstr "Extra details tonen"
+msgstr "Toon voorbeeldplaatjes"
 
 #: tips:45 tips:46
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
-msgstr ""
+msgstr "Toon elke afbeeldingsbestand verkleind inplaats van een normaal icoon."
 
 #: tips:47
 msgid "Pinboard"
@@ -2517,7 +2552,7 @@ msgstr ""
 
 #: tips:64
 msgid "Icon grid step:"
-msgstr "Icoon rooster:"
+msgstr "Icoon raster-grootte:"
 
 #: tips:65
 msgid "Fine"
@@ -2614,11 +2649,11 @@ msgstr "Bestanden verwijderen zonder bevestiging."
 
 #: tips:96
 msgid "Mount and unmount filesystems without confirming first."
-msgstr "Aan- en afsluiten bestandssystemen zonder bevestiging."
+msgstr "Aan- en afkoppelen bestandssystemen zonder bevestiging."
 
 #: tips:97
 msgid "Default settings:"
-msgstr "Standaard instellingen:"
+msgstr "Standaardinstellingen:"
 
 #: tips:99
 msgid "Don't confirm deletion of non-writeable items."
@@ -2848,21 +2883,23 @@ msgstr ""
 
 #: tips:145
 msgid "Dragging files with the middle mouse button..."
-msgstr ""
+msgstr "Slepen van bestanden met de middelste muisknop"
 
 #: tips:146
 msgid "... shows a menu of possible actions"
-msgstr ""
+msgstr "... toont een menu van mogelijke acties"
 
 #: tips:147
 msgid "... moves the files"
-msgstr ""
+msgstr "... verplaatst de bestanden"
 
 #: tips:148 tips:149 tips:150
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key"
 msgstr ""
+"Het menu kan ook worden opgeroepen door te slepen met de linker muisknop "
+"terwijl de Alt toets wordt ingedrukt"
 
 #: tips:151
 msgid "Menus"
@@ -2870,11 +2907,12 @@ msgstr "Menus"
 
 #: tips:152
 msgid "`Xterm Here' program:"
-msgstr "`Xterm Hier' programma:"
+msgstr "`Open terminal' programma:"
 
 #: tips:153
 msgid "The program to launch when you choose `Xterm Here' from the menu."
-msgstr "Het programma dat moet starten als je 'Xterm Hier' kiest van het menu"
+msgstr ""
+"Het programma dat moet starten als je `Open terminal' kiest van het menu."
 
 #: tips:154
 msgid "Set keyboard shortcuts"
@@ -2901,21 +2939,21 @@ msgstr ""
 
 #: tips:156
 msgid "Size of icons in menus"
-msgstr ""
+msgstr "Grootte van iconen in menus"
 
 #: tips:157
 #, fuzzy
 msgid "No Icons"
-msgstr "Hele Grote Iconen"
+msgstr "Geen iconen"
 
 #: tips:160
 #, fuzzy
 msgid "Same as current window"
-msgstr "Hogere map, Nieuw Venster"
+msgstr "Zelfde als huidig venster"
 
 #: tips:161
 msgid "Same as default"
-msgstr ""
+msgstr "Zelfde als standaard"
 
 #: tips:162
 msgid "Menu on button 2 (RISC OS style)"
@@ -2933,11 +2971,11 @@ msgstr ""
 #: tips:165
 #, fuzzy
 msgid "Types"
-msgstr "Type"
+msgstr "Types"
 
 #: tips:166
 msgid "Ignore eXecutable bit for known extensions"
-msgstr ""
+msgstr "Negeer eXecutable bit voor bekende extensies"
 
 #: tips:167
 msgid ""
@@ -2945,29 +2983,34 @@ msgid ""
 "This is useful if you have files on a Windows-type filesystem which are "
 "being shown as executable programs."
 msgstr ""
+"Als een bestand een bekende extensie heeft (bijv. '.gif') negeer dan het "
+"executable bit. Dit is handig als je bestanden op een Windows-achtig "
+"bestandssysteem hebt, zonder permissies, die worden aangegeven alsof ze "
+"uitvoerbaar zijn."
 
 #: tips:168
 msgid "Colour files based on their types"
-msgstr ""
+msgstr "Kleur bestanden op basis van hun type"
 
 #: tips:169
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr ""
+"Bestandsnamen (en details) worden gekleurd naargelang hun bestandstype."
 
 #: tips:171
 #, fuzzy
 msgid "Regular file"
-msgstr "Leeg bestand"
+msgstr "Normaal bestand"
 
 #: tips:174
 #, fuzzy
 msgid "Character device"
-msgstr "Char dev"
+msgstr "Karakter device"
 
 #: tips:175
 #, fuzzy
 msgid "Block device"
-msgstr "Block dev"
+msgstr "Block device"
 
 #: tips:176
 msgid "Executable file"
@@ -2976,7 +3019,7 @@ msgstr "Uitvoerbaar bestand"
 #: tips:177
 #, fuzzy
 msgid "Application directory"
-msgstr "Applicatie"
+msgstr "Applicatie map"
 
 #: tips:178
 msgid "Unknown type"
@@ -2991,6 +3034,8 @@ msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr ""
+"Fout, zoals wanneer een symlink wijst naar een niet bestaand bestand, of "
+"naar een bestand waar geen toegang toe te krijgen is."
 
 #: tips:183
 msgid ""
@@ -2999,26 +3044,32 @@ msgid ""
 "After editing the files, click the re-read button below, or restart the "
 "filer."
 msgstr ""
+"ROX gebruikt een set van regels om het juiste MIME-type te be-\n"
+"palen voor elk bestand, en kiest dan een passend icoon.\n"
+"Na de regel-bestanden te hebben bewerkt, klik dan op de knop "
+"Verversenhieronder, of herstart de filer."
 
 #: tips:184
 msgid "Show name-to-type rules"
-msgstr ""
+msgstr "Toon naam-naar-type regels"
 
 #: tips:185
 #, fuzzy
 msgid "Re-read files"
-msgstr "Leeg bestand"
+msgstr "Verversen"
 
 #: tips:186 tips:187 tips:188
 msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
+"Gebruik de 'Icoon instellen' dialoog om het icoon in te stellen voor elk "
+"type."
 
 #~ msgid "Sorry, but the name must not contain < or >"
 #~ msgstr "Sorry, maar de naam mag geen < of > bevatten"
 
 #, fuzzy
 #~ msgid "Could not save panel: %s"
-#~ msgstr "Paneel sluiten?"
+#~ msgstr "Kon paneel niet opslaan: %s"
 
 #~ msgid "!ERROR: %s\n"
 #~ msgstr "!FOUT: %s\n"
