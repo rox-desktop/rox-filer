@@ -706,7 +706,7 @@ static GdkPixbuf *get_image_for(IconWindow *win)
 	if (!retval)
 	{
 		if (!default_icon)
-			default_icon = load_pixmap("images/iconified.png");
+			default_icon = load_pixmap("iconified");
 
 		retval = default_icon->pixbuf;
 		g_object_ref(retval);
