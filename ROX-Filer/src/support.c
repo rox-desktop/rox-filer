@@ -1175,10 +1175,15 @@ CollateKey *collate_key_new(const guchar *name)
 
 	for (i = name; *i; i = g_utf8_next_char(i))
 	{
+		gunichar first_char;
+
 		/* We're in a (possibly blank) text section starting at 'name'.
 		 * Find the end of it (the next digit, or end of string).
+		 * Note: g_ascii_isdigit takes char, not unichar, while
+		 * g_unicode_isdigit returns true for non ASCII digits.
 		 */
-		if (g_ascii_isdigit(g_utf8_get_char(i)))
+		first_char = g_utf8_get_char(i);
+		if (first_char >= '0' && first_char <= '9')
 		{
 			char *endp;
 			
