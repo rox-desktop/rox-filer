@@ -1,0 +1,37 @@
+			ROX-Filer
+			A RISCOS-like filer for X
+			by Thomas Leonard
+
+			Hacking (technical)
+
+This is a quick start guide for people who want to modify the source code.
+If you make useful changes or fix bugs, please send patches to me (either
+the changed code or a 'diff -crN old new'). Tell me which version you're
+using!
+
+
+COMPILING
+
+The first time you compile the program you need to do 'AppRun --compile', but
+in future you only need to run 'make' in the 'src' directory when you change
+the .c and .h files.
+
+
+AUTOCONF
+
+Here's a quick explanation of the autoconf system in case you haven't used it
+before. See 'info autoconf' for full details. I've only recently started using
+it myself...
+
+There's a file called 'configure.in' which contains various tests ('info m4').
+You run 'autoconf' and it reads through the file and generates a shell script
+to perform the tests, saving it as 'configure'. 'configure' is normally
+distributed with the program because not everyone has autoconf.
+
+You then run 'configure' (in fact, let the 'AppRun' script do it because it
+passes it some arguments), which performs all the tests. It reads in
+'Makefile.in' and 'config.h.in' and fills in the missing values with the test
+results to produce 'Makefile' and 'config.h'.
+
+You run 'make', which creates .o files from the .c files and links to produce
+ROX-Filer.
