@@ -82,7 +82,7 @@ void run_app(char *path)
  * URIs that are files on the local machine will be passed as simple
  * pathnames. The uri_list should be freed after this function returns.
  */
-void run_with_files(char *path, GSList *uri_list)
+void run_with_files(char *path, GList *uri_list)
 {
 	char		**argv;
 	int		argc = 0;
@@ -94,7 +94,7 @@ void run_with_files(char *path, GSList *uri_list)
 		return;
 	}
 
-	argv = g_malloc(sizeof(char *) * (g_slist_length(uri_list) + 2));
+	argv = g_malloc(sizeof(char *) * (g_list_length(uri_list) + 2));
 
 	if (S_ISDIR(info.st_mode))
 		argv[argc++] = make_path(path, "AppRun")->str;

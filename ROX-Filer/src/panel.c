@@ -292,6 +292,13 @@ gboolean panel_want_show_text(Icon *icon)
 	return TRUE;
 }
 
+void panel_icon_renamed(Icon *icon)
+{
+	GtkLabel *label = GTK_LABEL(icon->label);
+
+	gtk_label_set_text(label, icon->item.leafname);
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -778,7 +785,7 @@ static void add_uri_list(GtkWidget          *widget,
 			 Panel		    *panel)
 {
 	gboolean after = FALSE;
-	GSList *uris, *next;
+	GList *uris, *next;
 	
 	if (!selection_data->data)
 		return;
@@ -788,7 +795,7 @@ static void add_uri_list(GtkWidget          *widget,
 	if (gtk_object_get_data(GTK_OBJECT(widget), "after"))
 		after = TRUE;
 
-	uris = uri_list_to_gslist(selection_data->data);
+	uris = uri_list_to_glist(selection_data->data);
 
 	for (next = uris; next; next = next->next)
 	{
@@ -800,7 +807,7 @@ static void add_uri_list(GtkWidget          *widget,
 			panel_add_item(panel, path, NULL, after);
 	}
 
-	g_slist_free(uris);
+	g_list_free(uris);
 }
 
 static void drag_end(GtkWidget *widget,

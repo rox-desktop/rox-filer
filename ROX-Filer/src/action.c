@@ -519,7 +519,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 {
 	DIR	*d;
 	struct dirent *ent;
-	GSList  *list = NULL, *next;
+	GList  *list = NULL, *next;
 
 	d = mc_opendir(src_dir);
 	if (!d)
@@ -539,7 +539,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 		if (ent->d_name[0] == '.' && (ent->d_name[1] == '\0'
 			|| (ent->d_name[1] == '.' && ent->d_name[2] == '\0')))
 			continue;
-		list = g_slist_append(list, g_strdup(make_path(src_dir,
+		list = g_list_append(list, g_strdup(make_path(src_dir,
 						       ent->d_name)->str));
 	}
 	mc_closedir(d);
@@ -560,7 +560,7 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 		g_free(next->data);
 		next = next->next;
 	}
-	g_slist_free(list);
+	g_list_free(list);
 	return;
 }
 
@@ -1788,7 +1788,7 @@ static void chmod_cb(gpointer data)
 
 static void list_cb(gpointer data)
 {
-	GSList	*paths = (GSList *) data;
+	GList	*paths = (GList *) data;
 
 	while (paths)
 	{
@@ -2060,7 +2060,7 @@ void action_chmod(FilerWindow *filer_window)
 }
 
 /* If leaf is NULL then the copy has the same name as the original */
-void action_copy(GSList *paths, char *dest, char *leaf)
+void action_copy(GList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
 
@@ -2077,7 +2077,7 @@ void action_copy(GSList *paths, char *dest, char *leaf)
 }
 
 /* If leaf is NULL then the file is not renamed */
-void action_move(GSList *paths, char *dest, char *leaf)
+void action_move(GList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
 
@@ -2093,7 +2093,7 @@ void action_move(GSList *paths, char *dest, char *leaf)
 	gtk_widget_show_all(gui_side->window);
 }
 
-void action_link(GSList *paths, char *dest)
+void action_link(GList *paths, char *dest)
 {
 	GUIside		*gui_side;
 

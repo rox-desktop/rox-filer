@@ -718,6 +718,7 @@ static void rename_cb(Icon *icon)
 	if (icon->panel)
 	{
 		gtk_widget_queue_clear(icon->widget);
+		panel_icon_renamed(icon);
 		panel_save(icon->panel);
 	}
 	else

@@ -58,7 +58,8 @@
 
 #define C_ "<control>"
 
-typedef void (*ActionFn)(GSList *paths, char *dest_dir, char *leaf);
+typedef void (*ActionFn)(GList *paths, char *dest_dir, char *leaf);
+typedef void MenuCallback(GtkWidget *widget, gpointer data);
 
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*pinboard_keys;
@@ -79,7 +80,8 @@ static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean link_cb(guchar *initial, guchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
-static void new_file_type(GtkWidget *widget, gpointer data);
+static void new_file_type(gchar *templ);
+static void send_file_to(char *send_to);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -149,6 +151,7 @@ static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
+static GtkWidget        *filer_sendto_menu;     /* The Send To submenu */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -210,6 +213,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Open AVFS"),		NULL, open_vfs_avfs, 0, NULL},
 #endif
 {">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Send To"),		NULL, NULL, 0, "<Branch>"},
 {">" N_("Delete"),	    	NULL, delete, 0,	NULL},
 {">" N_("Disk Usage"),		NULL, usage, 0, NULL},
 {">" N_("Permissions"),		NULL, chmod_items, 0, NULL},
@@ -300,6 +304,7 @@ void menu_init(void)
 			"Display", "Small, With...");
 
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
+	GET_SSMENU_ITEM(filer_sendto_menu, "filer", "File", "Send To");
 
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
@@ -380,7 +385,7 @@ GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
  
 static void items_sensitive(gboolean state)
 {
-	int	n = 8;
+	int	n = 9;
 	GList	*items, *item;
 
 	items = item = gtk_container_children(GTK_CONTAINER(filer_file_menu));
@@ -442,16 +447,149 @@ void show_style_menu(FilerWindow *filer_window,
 			(gpointer) pos, event->button, event->time);
 }
 
+/* XXX: Is there any point to this? */
+typedef enum menu_icon_style {
+	MIS_NONE, MIS_SMALL, MIS_LARGE, MIS_HUGE
+} MenuIconStyle;
+
+static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
+			    MenuIconStyle style, CallbackFn func,
+			    gboolean separator, gboolean strip_ext)
+{
+	GList *widgets = NULL;
+	DirItem ditem;
+	DIR	*dir;
+	struct dirent *ent;
+	GtkWidget *item;
+
+	dir = opendir(dname);
+	if (!dir)
+		goto out;
+
+	if (separator)
+	{
+		item = gtk_menu_item_new();
+		widgets = g_list_append(widgets, item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	}
+
+	while ((ent = readdir(dir)))
+	{
+		char	*dot, *leaf;
+		GtkWidget *hbox;
+		GtkWidget *img;
+		GtkWidget *label;
+		gchar *fname;
+		GdkPixmap *icon;
+		GdkBitmap *mask;
+
+		/* Ignore hidden files */
+		if (ent->d_name[0] == '.')
+			continue;
+
+		/* Strip off extension, if any */
+		dot = strchr(ent->d_name, '.');
+		if (strip_ext && dot)
+			leaf = g_strndup(ent->d_name, dot - ent->d_name);
+		else
+			leaf = g_strdup(ent->d_name);
+
+		fname = g_strconcat(dname, "/", ent->d_name, NULL);
+		diritem_stat(fname, &ditem, FALSE);
+
+		if (ditem.image && style != MIS_NONE)
+		{
+			switch (style) {
+				case MIS_HUGE:
+					if (!ditem.image->huge_pixmap)
+						pixmap_make_huge(ditem.image);
+					icon = ditem.image->huge_pixmap;
+					mask = ditem.image->huge_mask;
+					break;
+				case MIS_LARGE:
+					icon = ditem.image->pixmap;
+					mask = ditem.image->mask;
+					break;
+
+				case MIS_SMALL:
+				default:
+					if (!ditem.image->sm_pixmap)
+						pixmap_make_small(ditem.image);
+					icon = ditem.image->sm_pixmap;
+					mask = ditem.image->sm_mask;
+					break;
+			}
+
+			item = gtk_menu_item_new();
+			/* TODO: Find a way to allow short-cuts */
+			gtk_widget_lock_accelerators(item);
+
+			hbox = gtk_hbox_new(FALSE, 2);
+			gtk_container_add(GTK_CONTAINER(item), hbox);
+
+			img = gtk_pixmap_new(icon, mask);
+			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
+
+			label = gtk_label_new(leaf);
+			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
+
+			diritem_clear(&ditem);
+		}
+		else
+			item = gtk_menu_item_new_with_label(leaf);
+
+		g_free(leaf);
+
+		gtk_signal_connect_object(GTK_OBJECT(item), "activate",
+				GTK_SIGNAL_FUNC(func), (GtkObject *) fname);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
+				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
+
+		widgets = g_list_append(widgets, item);
+	}
+
+	closedir(dir);
+out:
+
+	return widgets;
+}
+
 /* Scan the templates dir and create entries for the New menu */
-static void update_new_files_menu(void)
+static void update_new_files_menu(MenuIconStyle style)
 {
 	static GList *widgets = NULL;
 
 	gchar	*templ_dname = NULL;
-	GtkWidget *item;
-	DirItem ditem;
-	DIR	*dir;
-	struct dirent *ent;
+
+	if (widgets)
+	{
+		GList	*next;
+		
+		for (next = widgets; next; next = next->next)
+			gtk_widget_destroy((GtkWidget *) next->data);
+
+		g_list_free(widgets);
+		widgets = NULL;
+	}
+
+	templ_dname = choices_find_path_load("Templates", "");
+	if (templ_dname)
+	{
+		widgets = menu_from_dir(filer_new_menu, templ_dname, style,
+					(CallbackFn) new_file_type, TRUE, TRUE);
+		g_free(templ_dname);
+	}
+	gtk_widget_show_all(filer_new_menu);
+}
+
+/* Scan the templates dir and create entries for the Send to menu */
+static void update_send_to_menu(MenuIconStyle style)
+{
+	static GList *widgets = NULL;
+
+	gchar	*sendto_dname = NULL;
 
 	if (widgets)
 	{
@@ -468,79 +606,17 @@ static void update_new_files_menu(void)
 		widgets = NULL;
 	}
 
-	templ_dname = choices_find_path_load("Templates", "");
-	if (!templ_dname)
-		goto out;
-
-	dir = opendir(templ_dname);
-	if (!dir)
-		goto out;
-
-	item = gtk_menu_item_new();
-	widgets = g_list_append(widgets, item);
-	gtk_menu_shell_append(GTK_MENU_SHELL(filer_new_menu), item);
-
-	while ((ent = readdir(dir)))
+	sendto_dname = choices_find_path_load("SendTo", "");
+	if (sendto_dname)
 	{
-		char	*dot, *leaf;
-		GtkWidget *hbox;
-		GtkWidget *img;
-		GtkWidget *label;
-		gchar *fname;
-
-		/* Ignore hidden files */
-		if (ent->d_name[0] == '.')
-			continue;
-
-		/* Strip off extension, if any */
-		dot = strchr(ent->d_name, '.');
-		if (dot)
-			leaf = g_strndup(ent->d_name, dot - ent->d_name);
-		else
-			leaf = g_strdup(ent->d_name);
-		
-		fname = g_strconcat(templ_dname, "/", ent->d_name, NULL);
-		diritem_stat(fname, &ditem, FALSE);
-		if (ditem.image)
-		{
-			if (!ditem.image->sm_pixmap)
-				pixmap_make_small(ditem.image);
-
-			item = gtk_menu_item_new();
-			/* TODO: Find a way to allow short-cuts */
-			gtk_widget_lock_accelerators(item);
-
-			hbox = gtk_hbox_new(FALSE, 2);
-			gtk_container_add(GTK_CONTAINER(item), hbox);
-
-			img = gtk_pixmap_new(ditem.image->sm_pixmap,
-						ditem.image->sm_mask);
-			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
-
-			label = gtk_label_new(leaf);
-			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
-			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
-
-			diritem_clear(&ditem);
-		}
-		else
-			item = gtk_menu_item_new_with_label(leaf);
-
-		g_free(leaf);
-
-		gtk_signal_connect(GTK_OBJECT(item), "activate",
-				GTK_SIGNAL_FUNC(new_file_type), fname);
-		gtk_menu_shell_append(GTK_MENU_SHELL(filer_new_menu), item);
-		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
-				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
-
-		widgets = g_list_append(widgets, item);
+		widgets = menu_from_dir(filer_sendto_menu, sendto_dname, 
+					style,
+					(CallbackFn) send_file_to,
+					FALSE, FALSE);
+		g_free(sendto_dname);
 	}
 
-	closedir(dir);
-out:
-	g_free(templ_dname);
-	gtk_widget_show_all(filer_new_menu);
+	gtk_widget_show_all(filer_sendto_menu);
 }
 
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
@@ -637,7 +713,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 					file_item, filer_file_menu);
 	}
 
-	update_new_files_menu();
+	update_new_files_menu(MIS_SMALL);
+	update_send_to_menu(MIS_SMALL);
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
@@ -887,7 +964,7 @@ static gboolean copy_cb(guchar *current, guchar *new)
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 {
 	char	*new_dir, *leaf;
-	GSList	*local_paths;
+	GList	*local_paths;
 
 	if (new[0] != '/')
 	{
@@ -909,9 +986,9 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 		leaf = slash + 1;
 	}
 
-	local_paths = g_slist_append(NULL, current);
+	local_paths = g_list_append(NULL, current);
 	action(local_paths, new_dir, leaf);
-	g_slist_free(local_paths);
+	g_list_free(local_paths);
 
 	g_free(new_dir);
 
@@ -1335,7 +1412,7 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 static gboolean new_file_type_cb(guchar *initial, guchar *path)
 {
 	gchar *templ, *templ_dname, *oleaf, *dest, *leaf;
-	GSList *paths;
+	GList *paths;
 
 	/* We can work out the template path from the initial name */
 	oleaf = g_basename(initial);
@@ -1357,11 +1434,11 @@ static gboolean new_file_type_cb(guchar *initial, guchar *path)
 
 	dest = g_dirname(path);
 	leaf = g_basename(path);
-	paths = g_slist_append(NULL, templ);
+	paths = g_list_append(NULL, templ);
 
 	action_copy(paths, dest, leaf);
 
-	g_slist_free(paths);
+	g_list_free(paths);
 	g_free(dest);
 	g_free(templ);
 
@@ -1371,9 +1448,8 @@ static gboolean new_file_type_cb(guchar *initial, guchar *path)
 	return TRUE;
 }
 
-static void new_file_type(GtkWidget *widget, gpointer data)
+static void new_file_type(gchar *templ)
 {
-        gchar *templ = (char *) data;
 	gchar *leaf;
 	MIME_type *type;
 
@@ -1386,6 +1462,42 @@ static void new_file_type(GtkWidget *widget, gpointer data)
 			make_path(window_with_focus->path, leaf)->str,
 			type_to_icon(type),
 			new_file_type_cb);
+}
+
+static void send_file_to(char *send_to)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected < 1)
+	{
+		/* XXX: How could this work? */
+#if 0
+		filer_target_mode(window_with_focus,
+				target_callback_signal,
+				send_file_to,
+				_("Send ... ?"));
+#endif
+	}
+	else
+	{
+		GList		*paths, *tmp;
+		GList		*spaths = NULL;
+
+		paths = filer_selected_items(window_with_focus);
+
+		for(tmp = paths; tmp; tmp = g_list_next(tmp))
+			spaths = g_list_prepend(spaths, tmp->data);
+
+		g_list_free(paths);
+
+		run_with_files(send_to, spaths);
+
+		g_list_foreach(spaths, (GFunc) g_free, NULL);
+		g_list_free(spaths);
+	}
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)

@@ -11,7 +11,7 @@
 #include <gtk/gtk.h>
 
 void run_app(char *path);
-void run_with_files(char *path, GSList *uri_list);
+void run_with_files(char *path, GList *uri_list);
 void run_with_data(char *path, gpointer data, gulong length);
 gboolean run_by_path(guchar *full_path);
 gboolean run_diritem(guchar *full_path,

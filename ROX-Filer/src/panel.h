@@ -35,5 +35,6 @@ Panel *panel_new(guchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);
 void panel_save(Panel *panel);
 gboolean panel_want_show_text(Icon *icon);
+void panel_icon_renamed(Icon *icon);
 
 #endif /* _PANEL_H */

@@ -196,9 +196,9 @@ gboolean provides(GdkDragContext *context, GdkAtom target)
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)
  */
-GSList *uri_list_to_gslist(char *uri_list)
+GList *uri_list_to_glist(char *uri_list)
 {
-	GSList   *list = NULL;
+	GList   *list = NULL;
 
 	while (*uri_list)
 	{
@@ -210,7 +210,7 @@ GSList *uri_list_to_gslist(char *uri_list)
 
 		if (!linebreak || linebreak[1] != 10)
 		{
-			delayed_error("uri_list_to_gslist",
+			delayed_error("uri_list_to_glist",
 					_("Incorrect or missing line "
 					  "break in text/uri-list data"));
 			return list;
@@ -223,7 +223,7 @@ GSList *uri_list_to_gslist(char *uri_list)
 			uri = g_malloc(sizeof(char) * (length + 1));
 			strncpy(uri, uri_list, length);
 			uri[length] = 0;
-			list = g_slist_append(list, uri);
+			list = g_list_append(list, uri);
 		}
 
 		uri_list = linebreak + 2;
@@ -721,7 +721,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 				       guint32          time,
 				       FilerWindow	*filer_window)
 {
-	GSList	*uris, *next;
+	GList	*uris, *next;
 	gint dx, dy;
 
 	if (!selection_data->data)
@@ -734,7 +734,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 	x += dx;
 	y += dy;
 
-	uris = uri_list_to_gslist(selection_data->data);
+	uris = uri_list_to_glist(selection_data->data);
 
 	for (next = uris; next; next = next->next)
 	{
@@ -751,7 +751,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 	}
 
 	if (uris)	
-		g_slist_free(uris);
+		g_list_free(uris);
 }
 
 /* Called when some data arrives from the remote app (which we asked for
@@ -918,9 +918,9 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time)
 {
-	GSList		*uri_list;
+	GList		*uri_list;
 	char		*error = NULL;
-	GSList		*next_uri;
+	GList		*next_uri;
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
 	char		*type;
@@ -930,7 +930,7 @@ static void got_uri_list(GtkWidget 		*widget,
 
 	g_return_if_fail(dest_path != NULL);
 
-	uri_list = uri_list_to_gslist(selection_data->data);
+	uri_list = uri_list_to_glist(selection_data->data);
 
 	if (!uri_list)
 		error = _("No URIs in the text/uri-list (nothing to do!)");
@@ -962,8 +962,8 @@ static void got_uri_list(GtkWidget 		*widget,
 	}
 	else
 	{
-		GSList		*local_paths = NULL;
-		GSList		*next;
+		GList		*local_paths = NULL;
+		GList		*next;
 
 		/* Either one local URI, or a list. If everything in the list
 		 * isn't local then we are stuck.
@@ -976,7 +976,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			path = get_local_path((char *) next_uri->data);
 
 			if (path)
-				local_paths = g_slist_append(local_paths,
+				local_paths = g_list_append(local_paths,
 								g_strdup(path));
 			else
 				error = _("Some of these files are on a "
@@ -1001,7 +1001,7 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		for (next = local_paths; next; next = next->next)
 			g_free(next->data);
-		g_slist_free(local_paths);
+		g_list_free(local_paths);
 	}
 
 	if (error)
@@ -1018,7 +1018,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		g_free(next_uri->data);
 		next_uri = next_uri->next;
 	}
-	g_slist_free(uri_list);
+	g_list_free(uri_list);
 }
 
 

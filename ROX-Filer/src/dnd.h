@@ -58,7 +58,7 @@ gboolean provides(GdkDragContext *context, GdkAtom target);
 
 void dnd_spring_load(GdkDragContext *context);
 void dnd_spring_abort(void);
-GSList *uri_list_to_gslist(char *uri_list);
+GList *uri_list_to_glist(char *uri_list);
 guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
 
 gboolean dnd_motion_press(GtkWidget *widget, GdkEventButton *event);
