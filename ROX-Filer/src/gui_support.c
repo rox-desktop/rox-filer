@@ -48,6 +48,10 @@
 
 gint	screen_width, screen_height;
 
+gint		n_monitors;
+GdkRectangle	*monitor_geom = NULL;
+gint		monitor_width, monitor_height;
+
 static GdkAtom xa_cardinal;
 
 static GtkWidget *current_dialog = NULL;
@@ -61,6 +65,27 @@ static void run_error_info_dialog(GtkMessageType type, const char *message,
 				  va_list args);
 static GType simple_image_get_type(void);
 
+void gui_store_screen_geometry(GdkScreen *screen)
+{
+	gint mon;
+
+	monitor_width = monitor_height = G_MAXINT;
+	n_monitors = gdk_screen_get_n_monitors(screen);
+	if (monitor_geom)
+		g_free(monitor_geom);
+	monitor_geom = g_new(GdkRectangle, n_monitors);
+	for (mon = 0; mon < n_monitors; ++mon)
+	{
+		gdk_screen_get_monitor_geometry(screen, mon,
+				&monitor_geom[mon]);
+		if (monitor_geom[mon].width < monitor_width)
+			monitor_width = monitor_geom[mon].width; 
+		if (monitor_geom[mon].height < monitor_height)
+			monitor_height = monitor_geom[mon].height; 
+	}
+	
+}
+
 void gui_support_init()
 {
 	gpointer klass;
@@ -72,7 +97,8 @@ void gui_support_init()
 	 */
 	gdk_drawable_get_size(gdk_get_default_root_window(),
 			    &screen_width, &screen_height);
-	
+	gui_store_screen_geometry(gdk_screen_get_default());
+
 	/* Work around the scrollbar placement bug */
 	klass = g_type_class_ref(gtk_scrolled_window_get_type());
 	((GtkScrolledWindowClass *) klass)->scrollbar_spacing = 0;

@@ -60,6 +60,7 @@
 #include "view_iface.h"
 #include "display.h"
 #include "bookmarks.h"
+#include "panel.h"
 
 typedef enum {
 	FILE_COPY_ITEM,

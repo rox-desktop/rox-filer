@@ -1468,8 +1468,8 @@ static void view_collection_autosize(ViewIface *view)
 		h = ICON_HEIGHT * 1.5;
 	n = MAX(n, 2);
 
-	max_x = (o_filer_size_limit.int_value * screen_width) / 100;
-	max_rows = (o_filer_size_limit.int_value * screen_height) / (h * 100);
+	max_x = (o_filer_size_limit.int_value * monitor_width) / 100;
+	max_rows = (o_filer_size_limit.int_value * monitor_height) / (h * 100);
 
 	/* Aim for a size where
 	 * 	   x = r(y + t + h),		(1)

@@ -36,6 +36,8 @@ void option_add_string(Option *option, const gchar *key, const gchar *value);
 void options_notify(void);
 void option_add_notify(OptionNotify *callback);
 void option_add_saver(OptionNotify *callback);
+GList *build_numentry_base(Option *option, xmlNode *node,
+				  guchar *label, GtkAdjustment *adj);
 
 GtkWidget *options_show(void);
 

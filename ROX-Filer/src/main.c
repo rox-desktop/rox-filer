@@ -698,6 +698,8 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 	screen_width = gdk_screen_get_width(screen);
 	screen_height = gdk_screen_get_height(screen);
 
+	gui_store_screen_geometry(screen);
+
 	panel_update_size();
 	pinboard_update_size();
 }

@@ -207,6 +207,12 @@
       <spacer/>
       <slider name='panel_width' label='Panel width (thin)' min='16' max='96' end='(thick)'>The size of the panels.</slider>
     </frame>
+    <frame label='Xinerama'>
+      <hbox>
+	<toggle name='panel_xinerama' label='Confine to Xinerama monitor'>If you have an Xinerama multi-monitor setup, use this option to confine the panels to one monitor instead of spanning them.</toggle>
+	<monitor-number name='panel_monitor' label='' min='0' max='1' width='1'>The monitor the panels are confined to in Xinerama mode (numbered from 0).</monitor-number>
+      </hbox>
+    </frame>
   </section>
   
   <section title='Action windows'>

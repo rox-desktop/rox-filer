@@ -266,12 +266,12 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		h = MAX(req->height, h);
 		gdk_window_get_position(gdk_window, &x, &y);
 
-		if (x + w > screen_width || y + h > screen_height)
+		if (x + w > monitor_width || y + h > monitor_height)
 		{
-			if (x + w > screen_width)
-				x = screen_width - w - 4;
-			if (y + h > screen_height)
-				y = screen_height - h - 4;
+			if (x + w > monitor_width)
+				x = monitor_width - w - 4;
+			if (y + h > monitor_height)
+				y = monitor_height - h - 4;
 			gdk_window_move_resize(gdk_window, x, y, w, h);
 		}
 		else

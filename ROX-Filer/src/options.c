@@ -134,6 +134,9 @@ static void option_add(Option *option, const gchar *key);
 static void set_not_changed(gpointer key, gpointer value, gpointer data);
 static void load_options(xmlDoc *doc);
 static gboolean check_anything_changed(void);
+static int get_int(xmlNode *node, guchar *attr);
+static void may_add_tip(GtkWidget *widget, xmlNode *element);
+static void add_to_size_group(xmlNode *node, GtkWidget *widget);
 
 static const char *process_option_line(gchar *line);
 
@@ -144,11 +147,13 @@ static GList *build_frame(Option *option, xmlNode *node, guchar *label);
 static GList *build_toggle(Option *option, xmlNode *node, guchar *label);
 static GList *build_slider(Option *option, xmlNode *node, guchar *label);
 static GList *build_entry(Option *option, xmlNode *node, guchar *label);
-static GList *build_numentry(Option *option, xmlNode *node, guchar *label);
 static GList *build_radio_group(Option *option, xmlNode *node, guchar *label);
 static GList *build_colour(Option *option, xmlNode *node, guchar *label);
 static GList *build_menu(Option *option, xmlNode *node, guchar *label);
 static GList *build_font(Option *option, xmlNode *node, guchar *label);
+static GList *build_numentry(Option *option, xmlNode *node, guchar *label);
+static void update_numentry(Option *option);
+static guchar *read_numentry(Option *option);
 
 static gboolean updating_file_format = FALSE;
 
@@ -350,6 +355,52 @@ void option_add_saver(OptionNotify *callback)
 	g_return_if_fail(callback != NULL);
 
 	saver_callbacks = g_list_append(saver_callbacks, callback);
+}
+
+/* Base class for building numentry widgets with particular ranges */
+GList *build_numentry_base(Option *option, xmlNode *node,
+				  guchar *label, GtkAdjustment *adj)
+{
+	GtkWidget	*hbox;
+	GtkWidget	*spin;
+	GtkWidget	*label_wid;
+	guchar		*unit;
+	int		width;
+
+	width = get_int(node, "width");
+	unit = xmlGetProp(node, "unit");
+
+	hbox = gtk_hbox_new(FALSE, 4);
+
+	if (label)
+	{
+		label_wid = gtk_label_new(_(label));
+		gtk_misc_set_alignment(GTK_MISC(label_wid), 1.0, 0.5);
+		gtk_box_pack_start(GTK_BOX(hbox), label_wid, FALSE, TRUE, 0);
+		add_to_size_group(node, label_wid);
+	}
+
+	spin = gtk_spin_button_new(adj, adj->step_increment, 0);
+	gtk_entry_set_width_chars(GTK_ENTRY(spin),
+			width > 1 ? width + 1 : 2);
+	gtk_box_pack_start(GTK_BOX(hbox), spin, FALSE, TRUE, 0);
+	may_add_tip(spin, node);
+
+	if (unit)
+	{
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(unit)),
+				FALSE, TRUE, 0);
+		g_free(unit);
+	}
+
+	option->update_widget = update_numentry;
+	option->read_widget = read_numentry;
+	option->widget = spin;
+
+	g_signal_connect_swapped(spin, "value-changed",
+			G_CALLBACK(option_check_widget), option);
+
+	return g_list_append(NULL, hbox);
 }
 
 /****************************************************************
@@ -1496,52 +1547,20 @@ static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 
 static GList *build_numentry(Option *option, xmlNode *node, guchar *label)
 {
-	GtkWidget	*hbox;
-	GtkWidget	*spin;
-	GtkWidget	*label_wid;
-	guchar		*unit;
-	int		min, max, step, width;
+	GtkObject *adj;
+	int	min, max, step;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
 	min = get_int(node, "min");
 	max = get_int(node, "max");
-	step = get_int(node, "step");
-	width = get_int(node, "width");
-	unit = xmlGetProp(node, "unit");
-	
-	hbox = gtk_hbox_new(FALSE, 4);
+	step = MAX(1, get_int(node, "step"));
 
-	if (label)
-	{
-		label_wid = gtk_label_new(_(label));
-		gtk_misc_set_alignment(GTK_MISC(label_wid), 1.0, 0.5);
-		gtk_box_pack_start(GTK_BOX(hbox), label_wid, FALSE, TRUE, 0);
-		add_to_size_group(node, label_wid);
-	}
+	adj = gtk_adjustment_new(min, min, max, step, step * 10, 1);
 
-	spin = gtk_spin_button_new_with_range(min, max, step > 0 ? step : 1);
-	gtk_entry_set_width_chars(GTK_ENTRY(spin), width > 1 ? width + 1 : -1);
-	gtk_box_pack_start(GTK_BOX(hbox), spin, FALSE, TRUE, 0);
-	may_add_tip(spin, node);
-
-	if (unit)
-	{
-		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(unit)),
-				FALSE, TRUE, 0);
-		g_free(unit);
-	}
-
-	option->update_widget = update_numentry;
-	option->read_widget = read_numentry;
-	option->widget = spin;
-
-	g_signal_connect_swapped(spin, "value-changed",
-			G_CALLBACK(option_check_widget), option);
-
-	return g_list_append(NULL, hbox);
+	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
-
+	
 static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 {
 	GList		*list = NULL;

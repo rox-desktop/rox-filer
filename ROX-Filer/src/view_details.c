@@ -1569,8 +1569,8 @@ static void view_details_autosize(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 	FilerWindow *filer_window = view_details->filer_window;
-	int max_width = (o_filer_size_limit.int_value * screen_width) / 100;
-	int max_height = (o_filer_size_limit.int_value * screen_height) / 100;
+	int max_width = (o_filer_size_limit.int_value * monitor_width) / 100;
+	int max_height = (o_filer_size_limit.int_value * monitor_height) / 100;
 	int h;
 	GtkRequisition req;
 

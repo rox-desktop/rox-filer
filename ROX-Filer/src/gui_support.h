@@ -22,8 +22,16 @@ typedef struct _Radios Radios;
 extern GdkFont	   	*fixed_font;
 extern gint		screen_width, screen_height;
 
+/* For Xinerama */
+extern gint		n_monitors;
+extern GdkRectangle	*monitor_geom;
+/* Smallest monitor - use for sizing windows */
+extern gint		monitor_width, monitor_height;
+
 typedef void (*HelpFunc)(gpointer data);
 typedef const char *ParseFunc(gchar *line);
+
+void gui_store_screen_geometry(GdkScreen *screen);
 
 void gui_support_init(void);
 int get_choice(const char *title,
