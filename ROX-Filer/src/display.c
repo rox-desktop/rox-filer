@@ -625,6 +625,33 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i)
 	return template.leafname.width < item->name_width;
 }
 
+/* Change the icon size (wraps) */
+void display_change_size(FilerWindow *filer_window, gboolean bigger)
+{
+	DisplayStyle	new;
+
+	g_return_if_fail(filer_window != NULL);
+
+	switch (filer_window->display_style)
+	{
+		case LARGE_FULL_INFO:
+		case LARGE_ICONS:
+			new = bigger ? HUGE_ICONS : SMALL_ICONS;
+			break;
+		case HUGE_ICONS:
+		case HUGE_FULL_INFO:
+			new = bigger ? SMALL_ICONS : LARGE_ICONS;
+			break;
+		case SMALL_ICONS:
+		case SMALL_FULL_INFO:
+		default:
+			new = bigger ? LARGE_ICONS : HUGE_ICONS;
+			break;
+	}
+
+	display_set_layout(filer_window, new, filer_window->details_type);
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/

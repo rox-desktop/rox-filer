@@ -70,5 +70,6 @@ void draw_string(GtkWidget *widget,
 		gboolean selected,
 		gboolean box);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);
+void display_change_size(FilerWindow *filer_window, gboolean bigger);
 
 #endif /* _DISPLAY_H */

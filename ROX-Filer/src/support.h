@@ -21,7 +21,7 @@ char *user_name(uid_t uid);
 char *group_name(gid_t gid);
 char *format_size(unsigned long size);
 char *format_size_aligned(unsigned long size);
-gchar *format_double_size_brief(double size);
+gchar *format_double_size(double size);
 int fork_exec_wait(char **argv);
 char *pretty_permissions(mode_t m);
 gint applicable(uid_t uid, gid_t gid);

@@ -286,7 +286,7 @@ char *format_size_aligned(unsigned long size)
  * sum sizes above 4 GB. At most 2 digits are shown after the decimal
  * point.
  */
-gchar *format_double_size_brief(double size)
+gchar *format_double_size(double size)
 {
 	static gchar	*buf = NULL;
 	char		*units;
@@ -312,9 +312,9 @@ gchar *format_double_size_brief(double size)
 
 	}
 	else if (size != 1)
-		units = "bytes";
+		units = _("bytes");
 	else
-		units = "byte";
+		units = _("byte");
 
 	if (buf)
 		g_free(buf);

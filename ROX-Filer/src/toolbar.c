@@ -73,8 +73,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
-static void toolbar_large_clicked(GtkWidget *widget, FilerWindow *filer_window);
-static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 				FilerWindow *filer_window);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
@@ -114,14 +113,10 @@ static Tool all_tools[] = {
 	 toolbar_refresh_clicked, DROP_NONE, TRUE,
 	 NULL, NULL},
 	
-	{N_("Large"), "large", N_("Display using large icons"),
-	 toolbar_large_clicked, DROP_NONE, TRUE,
-	 NULL, &display_large_menu},
+	{N_("Size"), "zoom", N_("Change icon size"),
+	 toolbar_size_clicked, DROP_NONE, TRUE,
+	 NULL, NULL},
 	
-	{N_("Small"), "small", N_("Display using small icons"),
-	 toolbar_small_clicked, DROP_NONE, TRUE,
-	 NULL, &display_small_menu},
-
 	{N_("Help"), "help", N_("Show ROX-Filer help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
 	 NULL, NULL},
@@ -288,14 +283,14 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 		change_to_parent(filer_window);
 }
 
-static void toolbar_large_clicked(GtkWidget *widget, FilerWindow *filer_window)
+static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	display_set_layout(filer_window, LARGE_ICONS, DETAILS_NONE);
-}
+	GdkEventButton	*bev;
 
-static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window)
-{
-	display_set_layout(filer_window, SMALL_ICONS, DETAILS_NONE);
+	bev = (GdkEventButton *) gtk_get_current_event();
+
+	display_change_size(filer_window, 
+		bev->type == GDK_BUTTON_RELEASE && bev->button == 1);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
@@ -563,7 +558,7 @@ static void coll_selection_changed(Collection *collection, guint time,
 		}
 		label = g_strdup_printf(_("%u selected (%s)"),
 				collection->number_selected,
-				format_double_size_brief(size));
+				format_double_size(size));
 	}
 
 	gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), label);
