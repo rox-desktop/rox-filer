@@ -35,10 +35,12 @@
 #include "gui_support.h"
 #include "main.h"
 
+/* Used to stop the translation-changed message on startup */
+static gboolean doing_init;
+
 /* Static Prototypes */
-static char *load_trans(guchar *lang);
 static void set_trans(guchar *lang);
-static void save(void);
+static void trans_changed(guchar *lang);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -48,21 +50,11 @@ static void save(void);
 /* Set things up for internationalisation */
 void i18n_init(void)
 {
-	guchar		*trans;
-
 	gtk_set_locale();
-	
-	trans = choices_find_path_load("Translation", PROJECT);
 
-	if (trans)
-	{
-		parse_file(trans, load_trans);
-		g_free(trans);
-	}
-	else
-		load_trans("From LANG");
-
-	option_add_saver(save);
+	doing_init = TRUE;
+	option_add_string("i18n_translation", "From LANG", trans_changed);
+	doing_init = FALSE;
 }
 
 /* These two stolen from dia :-).
@@ -157,25 +149,10 @@ void free_translated_entries(GtkItemFactoryEntry *entries, gint n)
 static void trans_changed(guchar *lang)
 {
 	set_trans(lang);
-	delayed_error(_("You must restart the filer for the new language "
-		  "setting to take full effect"));
-}
-
-/* Just read the Translation file on startup */
-static char *load_trans(guchar *lang)
-{
-	static gboolean init = FALSE;
-
-	if (!init)
-	{
-		init = TRUE;
-		option_add_string("i18n_translation", lang, trans_changed);
-		option_set_save("i18n_translation", FALSE);
-	}
-
-	set_trans(lang);
-
-	return NULL;
+	if (!doing_init)
+		delayed_error(
+			_("You must restart the filer for the new language "
+			  "setting to take full effect"));
 }
 
 /* Load the 'Messages/<name>.gmo' translation.
@@ -213,35 +190,4 @@ static void set_trans(guchar *lang)
 		rox_add_translations(path);
 	g_free(path);
 	g_free(lang2);
-}
-
-static void save(void)
-{
-	guchar	*path;
-	int	len, err;
-	FILE	*f;
-	guchar	*lang;
-
-	path = choices_find_path_save("Translation", PROJECT, TRUE);
-	if (!path)
-		return;
-
-	lang = option_get_static_string("i18n_translation");
-
-	f = fopen(path, "wb");
-	g_free(path);
-	if (!f)
-	{
-		delayed_error(g_strerror(errno));
-		return;
-	}
-
-	len = strlen(lang);
-
-	err = (fwrite(lang, 1, len, f) < len) |
-		(fwrite("\n", 1, 1, f) < 1)   |
-		  (fclose(f) != 0);
-
-	if (err)
-		delayed_error(g_strerror(errno));
 }

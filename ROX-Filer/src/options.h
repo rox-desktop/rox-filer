@@ -25,10 +25,10 @@ guchar *option_get_static_string(guchar *key);
 
 void option_add_void(gchar *key, OptionChanged *changed);
 
+void options_notify(void);
 void option_add_notify(OptionNotify *callback);
 void option_add_saver(OptionNotify *callback);
 
-void options_load(void);
 void options_show(void);
 
 void option_set_save(guchar *key, gboolean save);

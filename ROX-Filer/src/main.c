@@ -210,6 +210,7 @@ int main(int argc, char **argv)
 	 * choices system, to discover the user's preferred language.
 	 */
 	choices_init();
+	options_init();
 	i18n_init();
 
 	if (!app_dir)
@@ -459,7 +460,6 @@ int main(int argc, char **argv)
 	toolbar_init();
 	display_init();
 	mount_init();
-	options_init();
 	type_init();
 	action_init();
 	appinfo_init();
@@ -468,8 +468,8 @@ int main(int argc, char **argv)
 	pinboard_init();
 	panel_init();
 
-	/* Load user settings */
-	options_load();
+	/* Let everyone update */
+	options_notify();
 
 	/* When we get a signal, we can't do much right then. Instead,
 	 * we send a char down this pipe, which causes the main loop to

@@ -23,32 +23,41 @@
 
 /* How it works:
  *
- * On startup, each part of the filer calls option_add_int() or a related
- * function, supplying a name for the option and a default value.
+ * On startup:
  *
- * Once everything has initialised, the options file (if any) is read,
- * which may change some or all of the values. Update callbacks are called
- * if values change from their defaults.
+ * - The <Choices>/PROJECT/Options file is read in. Each line
+ *   is a name/value pair, and these are stored in the 'loading' hash table.
  *
- * All the notify_callbacks are called.
+ * - Each part of the filer then calls option_add_int(), or a related function,
+ *   supplying the name for the option and a default value. Once an option is
+ *   registered, it is removed from the loading table.
+ *   Update callbacks are called if the default value isn't used.
+ *
+ * - Option_register_widget() can be used during initialisation (any time
+ *   before the Options box is display) to tell the system how to render a
+ *   particular type of option.
+ *
+ * - All notify callbacks are called.
  *
  * When the user opens the Options box:
+ *
  * - The Options.xml file is read and used to create the Options dialog box.
  *   Each element in the file has a key corresponding to an option named
  *   above.
+ *
  * - For each widget in the box, the current value of the option is used to
  *   set the widget's state.
  *
- * When the user clicks Save/OK/Apply, the state of each widget is copied
- * to the options values and the update callbacks are called for those values
- * which have changed.
+ * When the user clicks Save/OK/Apply:
  *
- * All the notify_callbacks are called.
+ * - The state of each widget is copied to the options values.
  *
- * If Save or OK was clicked then the box is also closed.
+ * - The update callbacks are called for those values which have changed.
  *
- * If Save was clicked then the options are written to the filesystem
- * and the saver_callbacks are called.
+ * - If Save or OK was clicked then the box is also closed.
+ *
+ * - If Save was clicked then the options are written to the filesystem and the
+ *   saver_callbacks are called.
  */
 
 #include "config.h"
@@ -106,6 +115,12 @@ enum {BUTTON_SAVE, BUTTON_OK, BUTTON_APPLY};
 /* "filer_unique" -> (Option *) */
 static GHashTable *option_hash = NULL;
 
+/* A mapping (name -> value) for options which have been loaded by not
+ * yet registered. The options in this table cannot be used until
+ * option_add_*() is called to move them into option_hash.
+ */
+static GHashTable *loading = NULL;
+
 /* List of functions to call after all option values are updated */
 static GList *notify_callbacks = NULL;
 
@@ -118,7 +133,7 @@ static char *process_option_line(guchar *line);
 static void build_options_window(void);
 static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
-static Option *new_option(guchar *key, OptionChanged *changed);
+static Option *new_option(guchar *key, OptionChanged *changed, guchar *def);
 static guchar *tools_to_list(GtkWidget *hbox);
 
 
@@ -128,20 +143,29 @@ static guchar *tools_to_list(GtkWidget *hbox);
 
 void options_init(void)
 {
-	option_tooltips = gtk_tooltips_new();
-}
-
-void options_load(void)
-{
-	GList	*next;
 	char	*path;
+
+	loading = g_hash_table_new(g_str_hash, g_str_equal);
+	option_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	path = choices_find_path_load("Options", PROJECT);
 	if (!path)
 		return;		/* Nothing to load */
 
+	/* Load in all the options set in the filer, storing them
+	 * temporarily in the loading hash table.
+	 * They get moved to option_hash when they're registered.
+	 */
 	parse_file(path, process_option_line);
 	g_free(path);
+}
+
+/* Call all the notify callbacks. This should happen after any options
+ * have their values changed.
+ */
+void options_notify(void)
+{
+	GList	*next;
 
 	for (next = notify_callbacks; next; next = next->next)
 	{
@@ -153,6 +177,15 @@ void options_load(void)
 
 void options_show(void)
 {
+	if (!option_tooltips)
+		option_tooltips = gtk_tooltips_new();
+
+	if (g_hash_table_size(loading) != 0)
+	{
+		g_printerr(PROJECT ": Some options loaded but not used:\n");
+		g_hash_table_foreach(loading, (GHFunc) puts, NULL);
+	}
+
 	if (window)
 		gtk_widget_destroy(window);
 
@@ -166,10 +199,7 @@ void options_show(void)
 /* Create a new option and register it */
 void option_add_int(guchar *key, int value, OptionChanged *changed)
 {
-	Option	*option;
-
-	option = new_option(key, changed);
-	option->value = g_strdup_printf("%d", value);
+	new_option(key, changed, g_strdup_printf("%d", value));
 }
 
 int option_get_int(guchar *key)
@@ -185,10 +215,7 @@ int option_get_int(guchar *key)
 
 void option_add_string(guchar *key, guchar *value, OptionChanged *changed)
 {
-	Option	*option;
-
-	option = new_option(key, changed);
-	option->value = g_strdup(value);
+	new_option(key, changed, g_strdup(value));
 }
 
 /* The string returned is only valid until the option value changes.
@@ -209,7 +236,7 @@ void option_add_void(gchar *key, OptionChanged *changed)
 {
 	Option	*option;
 
-	option = new_option(key, changed);
+	option = new_option(key, changed, NULL);
 	option->save = FALSE;
 }
 
@@ -247,21 +274,40 @@ void option_set_save(guchar *key, gboolean save)
  *                      INTERNAL FUNCTIONS                      *
  ****************************************************************/
 
-static Option *new_option(guchar *key, OptionChanged *changed)
+/* 'def' is placed directly into the new Option. It will be g_free()d
+ * automatically.
+ */
+static Option *new_option(guchar *key, OptionChanged *changed, guchar *def)
 {
 	Option	*option;
+	gpointer okey, value;
 
-	if (!option_hash)
-		option_hash = g_hash_table_new(g_str_hash, g_str_equal);
+	g_return_val_if_fail(option_hash != NULL, NULL);
+	g_return_val_if_fail(g_hash_table_lookup(option_hash, key) == NULL,
+									NULL);
 	
 	option = g_new(Option, 1);
 
 	option->save = TRUE;	/* Save by default */
 	option->widget = NULL;
-	option->value = NULL;
 	option->changed_cb = changed;
-	
+
 	g_hash_table_insert(option_hash, key, option);
+
+	/* Use the value loaded from the file, if any */
+	if (g_hash_table_lookup_extended(loading, key, &okey, &value))
+	{
+		option->value = value;
+		g_hash_table_remove(loading, key);
+		g_free(okey);
+
+		if (changed && strcmp(def, option->value) != 0)
+			changed(option->value);
+
+		g_free(def);	/* Don't need the default */
+	}
+	else
+		option->value = def;
 
 	return option;
 }
@@ -898,7 +944,7 @@ static GtkWidget *build_frame(void)
 static char *process_option_line(guchar *line)
 {
 	guchar 		*eq, *c;
-	Option		*option;
+	char		*name = line;
 
 	g_return_val_if_fail(option_hash != NULL, "No registered options!");
 
@@ -914,17 +960,10 @@ static char *process_option_line(guchar *line)
 	while (*c == ' ' || *c == '\t')
 		c++;
 
-	option = g_hash_table_lookup(option_hash, line);
-	if (!option)
-		return NULL;	/* Unknown option - silently ignore */
+	if (g_hash_table_lookup(loading, name))
+		return "Duplicate option found!";
 
-	if (strcmp(option->value, line) == 0)
-		return NULL;	/* Value unchanged */
-
-	g_free(option->value);
-	option->value = g_strdup(g_strstrip(c));
-	if (option->changed_cb)
-		option->changed_cb(option->value);
+	g_hash_table_insert(loading, g_strdup(name), g_strdup(g_strstrip(c)));
 
 	return NULL;
 }
@@ -1121,12 +1160,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 
 	g_hash_table_foreach(option_hash, may_change_cb, NULL);
 
-	for (next = notify_callbacks; next; next = next->next)
-	{
-		OptionNotify *cb = (OptionNotify *) next->data;
-
-		cb();
-	}
+	options_notify();
 
 	if (button == BUTTON_SAVE)
 	{
