@@ -10,6 +10,7 @@
 
 extern MIME_type *text_plain;		/* Often used as a default type */
 extern MIME_type *inode_directory;
+extern MIME_type *inode_mountpoint;
 extern MIME_type *inode_pipe;
 extern MIME_type *inode_socket;
 extern MIME_type *inode_block_dev;

@@ -261,7 +261,10 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 	check_globicon(path, item);
 
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		item->mime_type = inode_mountpoint;
 		return;		/* Try to avoid automounter problems */
+	}
 
 	/* Finding the icon:
 	 *

@@ -373,6 +373,8 @@ int main(int argc, char **argv)
 			{
 				MIME_type *type;
 				type_init();
+				diritem_init();
+				pixmaps_init();
 				type = type_get_type(VALUE);
 				printf("%s/%s\n", type->media_type,
 						type->subtype);
@@ -475,7 +477,6 @@ int main(int argc, char **argv)
 	dir_init();
 	diritem_init();
 	menu_init();
-	appmenu_init();
 	minibuffer_init();
 	filer_init();
 	toolbar_init();

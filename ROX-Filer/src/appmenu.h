@@ -11,7 +11,6 @@
 #include <gtk/gtk.h>
 
 /* External interface */
-void appmenu_init(void);
 void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu);
 void appmenu_remove(void);
 

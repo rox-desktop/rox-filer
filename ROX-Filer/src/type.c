@@ -120,6 +120,7 @@ static GHashTable *type_hash = NULL;
 /* Most things on Unix are text files, so this is the default type */
 MIME_type *text_plain;
 MIME_type *inode_directory;
+MIME_type *inode_mountpoint;
 MIME_type *inode_pipe;
 MIME_type *inode_socket;
 MIME_type *inode_block_dev;
@@ -169,6 +170,7 @@ void type_init(void)
 
 	text_plain = get_mime_type("text/plain", TRUE);
 	inode_directory = get_mime_type("inode/directory", TRUE);
+	inode_mountpoint = get_mime_type("inode/mountpoint", TRUE);
 	inode_pipe = get_mime_type("inode/fifo", TRUE);
 	inode_socket = get_mime_type("inode/socket", TRUE);
 	inode_block_dev = get_mime_type("inode/blockdevice", TRUE);
@@ -265,28 +267,22 @@ const char *basetype_name(DirItem *item)
  */
 MIME_type *type_get_type(const guchar *path)
 {
-	struct stat	info;
+	DirItem		*item;
 	MIME_type	*type = NULL;
-	int		base = TYPE_FILE;
-	gboolean	exec = FALSE;
 
-	if (mc_stat(path, &info) == 0)
-	{
-		base = mode_to_base_type(info.st_mode);
-		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-			exec = TRUE;
-	}
+	item = diritem_new("");
+	diritem_restat(path, item, NULL);
+	if (item->base_type != TYPE_ERROR)
+		type = item->mime_type;
+	diritem_free(item);
 
-	if (base == TYPE_FILE)
-		type = type_from_path(path);
+	if (type)
+		return type;
+
+	type = type_from_path(path);
 
 	if (!type)
-	{
-		if (base == TYPE_FILE && exec)
-			type = application_executable;
-		else
-			type = mime_type_from_base_type(base);
-	}
+		return text_plain;
 
 	return type;
 }

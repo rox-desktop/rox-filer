@@ -1371,3 +1371,46 @@ gchar *unescape_uri(const char *uri)
 
 	return tmp;
 }
+
+/* Used as the sort function for sorting GPtrArrays */
+static gint strcmp2(gconstpointer a, gconstpointer b)
+{
+	const char *aa = *(char **) a;
+	const char *bb = *(char **) b;
+
+	return g_strcasecmp(aa, bb);
+}
+
+/* Returns an array listing all the names in the directory 'path'.
+ * The array is sorted.
+ * '.' and '..' are skipped.
+ * On error, the error is reported with g_warning and NULL is returned.
+ */
+GPtrArray *list_dir(const guchar *path)
+{
+	GDir *dir;
+	GError *error = NULL;
+	GPtrArray *names;
+	const char *leaf;
+	
+	dir = g_dir_open(path, 0, &error);
+	if (error)
+	{
+		g_warning("Can't list directory:\n%s", error->message);
+		g_error_free(error);
+		return NULL;
+	}
+
+	names = g_ptr_array_new();
+
+	while ((leaf = g_dir_read_name(dir))) {
+		if (leaf[0] != '.')
+			g_ptr_array_add(names, g_strdup(leaf));
+	}
+
+	g_dir_close(dir);
+
+	g_ptr_array_sort(names, strcmp2);
+
+	return names;
+}

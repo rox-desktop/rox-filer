@@ -77,13 +77,6 @@ typedef enum {
 	FILE_OPEN_VFS_AVFS,
 } FileOp;
 
-typedef enum menu_icon_style {
-  MIS_NONE, MIS_SMALL, MIS_LARGE,
-  MIS_HUGE_UNUSED,
-  MIS_CURRENT, /* As per current filer window */
-  MIS_DEFAULT
-} MenuIconStyle;
-
 typedef void (*ActionFn)(GList *paths,
 			 const char *dest_dir, const char *leaf, int quiet);
 typedef void MenuCallback(GtkWidget *widget, gpointer data);
@@ -422,45 +415,38 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
-/* Returns an array listing all the names in the directory 'path'.
- * The array is unsorted.
- * '.' and '..' are skipped.
- * On error, the error is reported with g_warning and NULL is returned.
- */
-static GPtrArray *list_dir(const guchar *path)
+GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
+				MenuIconStyle style)
 {
-	GDir *dir;
-	GError *error = NULL;
-	GPtrArray *names;
-	const char *leaf;
+	GtkWidget *item;
 	
-	dir = g_dir_open(path, 0, &error);
-	if (error)
+	if (ditem->image && style != MIS_NONE)
 	{
-		g_warning("Can't list directory:\n%s", error->message);
-		g_error_free(error);
-		return NULL;
+		GdkPixbuf *pixbuf;
+
+		switch (style)
+		{
+			case MIS_LARGE:
+				pixbuf = ditem->image->pixbuf;
+				break;
+			default:
+				if (!ditem->image->sm_pixbuf)
+					pixmap_make_small(ditem->image);
+				pixbuf = ditem->image->sm_pixbuf;
+				break;
+		}
+
+		item = gtk_image_menu_item_new_with_label(label);
+		/* TODO: Find a way to allow short-cuts */
+		menuitem_no_shortcuts(item);
+
+		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
+				gtk_image_new_from_pixbuf(pixbuf));
 	}
+	else
+		item = gtk_menu_item_new_with_label(label);
 
-	names = g_ptr_array_new();
-
-	while ((leaf = g_dir_read_name(dir))) {
-		if (leaf[0] != '.')
-			g_ptr_array_add(names, g_strdup(leaf));
-	}
-
-	g_dir_close(dir);
-
-	return names;
-}
-
-/* Used as the sort function for sorting GPtrArrays */
-static gint strcmp2(gconstpointer a, gconstpointer b)
-{
-	const char *aa = *(char **) a;
-	const char *bb = *(char **) b;
-
-	return g_strcasecmp(aa, bb);
+	return item;
 }
 
 static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
@@ -488,8 +474,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	}
 
-	g_ptr_array_sort(names, strcmp2);
-
 	for (i = 0; i < names->len; i++)
 	{
 		char	*leaf = names->pdata[i];
@@ -509,31 +493,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		ditem = diritem_new("");
 		diritem_restat(fname, ditem, NULL);
 
-		if (ditem->image && style != MIS_NONE)
-		{
-			GdkPixbuf *pixbuf;
-
-			switch (style)
-			{
-				case MIS_LARGE:
-					pixbuf = ditem->image->pixbuf;
-					break;
-				default:
-					if (!ditem->image->sm_pixbuf)
-						pixmap_make_small(ditem->image);
-					pixbuf = ditem->image->sm_pixbuf;
-					break;
-			}
-
-			item = gtk_image_menu_item_new_with_label(leaf);
-			/* TODO: Find a way to allow short-cuts */
-			menuitem_no_shortcuts(item);
-
-			gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
-					gtk_image_new_from_pixbuf(pixbuf));
-		}
-		else
-			item = gtk_menu_item_new_with_label(leaf);
+		item = make_send_to_item(ditem, leaf, style);
 
 		g_free(leaf);
 
