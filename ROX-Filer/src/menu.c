@@ -76,6 +76,7 @@ static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean can_set_run_action(DirItem *item);
+static gboolean link_cb(guchar *initial, guchar *path);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -141,6 +142,7 @@ static GtkWidget	*filer_new_window;	/* The New Window item */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
+static GtkWidget	*check_relative = NULL;	
 static guchar		*current_path = NULL;
 static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
@@ -269,6 +271,7 @@ void menu_init(void)
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
+	GtkTooltips		*tips;
 	GtkItemFactory  	*item_factory;
 
 	filer_keys = gtk_accel_group_new();
@@ -313,7 +316,23 @@ void menu_init(void)
 	option_add_string("menu_xterm", "xterm", NULL);
 	option_add_saver(save_menus);
 
+	tips = gtk_tooltips_new();
+	check_relative = gtk_check_button_new_with_label(_("Relative link"));
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check_relative), TRUE);
+	GTK_WIDGET_UNSET_FLAGS(check_relative, GTK_CAN_FOCUS);
+	gtk_tooltips_set_tip(tips, check_relative,
+			_("If on, the symlink will store the path from the "
+			"symlink to the target file. Use this if the symlink "
+			"and the target will be moved together.\n"
+			"If off, the path from the root directory is stored - "
+			"use this if the symlink may move but the target will "
+			"stay put."), NULL);
+			
 	savebox = gtk_savebox_new();
+	gtk_box_pack_start(GTK_BOX(GTK_SAVEBOX(savebox)->vbox),
+			   check_relative, FALSE, TRUE, 0);
+	gtk_widget_show(check_relative);
+
 	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_to_file",
 				GTK_SIGNAL_FUNC(save_to_file), NULL);
 	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_done",
@@ -676,6 +695,11 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 	if (GTK_WIDGET_VISIBLE(savebox))
 		gtk_widget_hide(savebox);
 
+	if (callback == link_cb)
+		gtk_widget_show(check_relative);
+	else
+		gtk_widget_hide(check_relative);
+
 	if (current_path)
 		g_free(current_path);
 	current_path = g_strdup(path);
@@ -795,7 +819,21 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 
 static gboolean link_cb(guchar *initial, guchar *path)
 {
-	if (symlink(initial, path))
+	int	err;
+
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(check_relative)))
+	{
+		guchar *rpath;
+		
+		rpath = get_relative_path(path, initial);
+		err = symlink(rpath, path);
+		
+		g_free(rpath);
+	}
+	else
+		err = symlink(initial, path);
+			
+	if (err)
 	{
 		report_error("ROX-Filer: symlink()", g_strerror(errno));
 		return FALSE;

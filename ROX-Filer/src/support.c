@@ -635,3 +635,104 @@ gboolean in_list(guchar *item, guchar *list)
 
 	return FALSE;
 }
+
+/* Split a path into its components. Eg:
+ *
+ * /bob/fred -> ["bob", "fred"]
+ * ///a//b// -> ["a", "b"]
+ * /	     -> []
+ *
+ * The array and the strings in it must be freed after use.
+ */
+GPtrArray *split_path(guchar *path)
+{
+	GPtrArray *array;
+	guchar	*slash;
+
+	g_return_val_if_fail(path != NULL, NULL);
+
+	array = g_ptr_array_new();
+
+	while (1)
+	{
+		while (path[0] == '/')
+			path++;
+		if (path[0] == '\0')
+			break;
+		
+		slash = strchr(path, '/');
+		if (slash)
+		{
+			g_ptr_array_add(array, g_strndup(path, slash - path));
+			path = slash + 1;
+			continue;
+		}
+		g_ptr_array_add(array, g_strdup(path));
+		break;
+	}
+
+	return array;
+}
+
+/* Return the shortest path from 'from' to 'to'.
+ * Eg: get_relative_path("/a/b/c", "a/d/e") -> "../d/e"
+ */
+guchar *get_relative_path(guchar *from, guchar *to)
+{
+	GString  *path;
+	guchar	 *retval;
+	GPtrArray *src, *dst;
+	int	i, j;
+
+	src = split_path(from);
+	dst = split_path(to);
+
+	/* The last component of src doesn't matter... */
+	if (src->len)
+	{
+		g_free(src->pdata[src->len - 1]);
+		g_ptr_array_remove_index(src, src->len - 1);
+	}
+
+	/* Strip off common path elements... */
+	i = 0;
+	while (i < src->len && i < dst->len)
+	{
+		guchar	*a = (guchar *) src->pdata[i];
+		guchar	*b = (guchar *) dst->pdata[i];
+
+		if (strcmp(a, b) != 0)
+			break;
+		i++;
+	}
+
+	/* Go up one dir for each element remaining in src */
+	path = g_string_new(NULL);
+	for (j = i; j < src->len; j++)
+		g_string_append(path, "../");
+
+	/* Go down one dir for each element remaining in dst */
+	for (j = i; j < dst->len; j++)
+	{
+		g_string_append(path, (guchar *) dst->pdata[j]);
+		g_string_append_c(path, '/');
+	}
+
+	if (path->str[path->len - 1] == '/')
+		g_string_truncate(path, path->len - 1);
+	if (path->len == 0)
+		g_string_assign(path, ".");
+
+	/* Free the arrays */
+	for (i = 0; i < src->len; i++)
+		g_free(src->pdata[i]);
+	g_ptr_array_free(src, TRUE);
+	for (i = 0; i < dst->len; i++)
+		g_free(dst->pdata[i]);
+	g_ptr_array_free(dst, TRUE);
+
+	retval = path->str;
+	g_string_free(path, FALSE);
+
+	return retval;
+}
