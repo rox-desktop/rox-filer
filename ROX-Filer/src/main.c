@@ -48,6 +48,7 @@
 #include "type.h"
 #include "pixmaps.h"
 #include "dir.h"
+#include "action.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -71,9 +72,10 @@ gid_t *supplemental_groups = NULL;
 #  define SHORT_ONLY_WARNING ""
 #else
 #  define USAGE   "Try `ROX-Filer/AppRun -h' for more information.\n"
-#  define SHORT_ONLY_WARNING "NOTE: Your system does not support long options - \n" \
-				"you must use the short versions instead.\n\n"
-#endif									\
+#  define SHORT_ONLY_WARNING	\
+		"NOTE: Your system does not support long options - \n" \
+		"you must use the short versions instead.\n\n"
+#endif
 
 #define HELP "Usage: ROX-Filer/AppRun [OPTION]... [DIR]...\n"		\
        "Open filer windows showing each directory listed, or $HOME \n"	\
@@ -213,6 +215,7 @@ int main(int argc, char **argv)
 	options_init();
 	savebox_init();
 	type_init();
+	action_init();
 
 	options_load();
 

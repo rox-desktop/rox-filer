@@ -10,6 +10,8 @@
 
 #include "filer.h"
 
+void action_init(void);
+
 void action_usage(FilerWindow *filer_window);
 void action_mount(FilerWindow *filer_window, DirItem *item);
 void action_delete(FilerWindow *filer_window);
