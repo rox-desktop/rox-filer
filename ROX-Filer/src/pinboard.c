@@ -1835,8 +1835,6 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 		return;
 	}
 
-	reload_backdrop(pinboard, command, style);
-
 	while (*ok)
 	{
 		int sent;
@@ -1846,10 +1844,12 @@ static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
 		{
 			/* Remote app quit? Not an error. */
 			abandon_backdrop_app(pinboard);
-			return;
+			break;
 		}
 		ok += sent;
 	}
+
+	reload_backdrop(pinboard, command, style);
 }
 
 static void backdrop_from_child(Pinboard *pinboard,
@@ -1992,6 +1992,10 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 			"future."));
 		g_return_if_fail(current_pinboard != NULL);
 	}
+
+	/* We might have just run the old backdrop program and now
+	 * we're going to set a new one! Seems a bit mean...
+	 */
 
 	abandon_backdrop_app(current_pinboard);
 

@@ -1257,8 +1257,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 	savebox_show(_("Create"),
 		make_path(window_with_focus->sym_path, _("NewDir"))->str,
-		type_to_icon(special_directory),
-			new_directory_cb);
+		type_to_icon(inode_directory), new_directory_cb);
 }
 
 static gboolean new_file_cb(GObject *savebox,

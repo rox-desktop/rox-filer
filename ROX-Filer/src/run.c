@@ -231,7 +231,7 @@ gboolean run_diritem(const guchar *full_path,
 				filer_opendir(full_path, src_window);
 			return TRUE;
 		case TYPE_FILE:
-			if ((item->mime_type == special_exec) && !edit)
+			if ((item->mime_type == application_executable) && !edit)
 			{
 				const char *argv[] = {NULL, NULL};
 				guchar	*dir = filer_window

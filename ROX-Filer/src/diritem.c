@@ -148,19 +148,19 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
 			/* Note that the flag is set for ALL executable
-			 * files, but the mime_type is only special_exec
+			 * files, but the mime_type is only application_executable
 			 * if the file doesn't have a known extension when
 			 * that option is in force.
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
 			if (!o_ignore_exec.int_value)
-				item->mime_type = special_exec;
+				item->mime_type = application_executable;
 		}
 
 		if (!item->mime_type)
 			item->mime_type = item->flags & ITEM_FLAG_EXEC_FILE
-						? special_exec
+						? application_executable
 						: text_plain;
 
 		check_globicon(path, item);

@@ -111,15 +111,14 @@ static GPtrArray *glob_patterns = NULL;	/* [Pattern] */
 static GHashTable *type_hash = NULL;
 
 /* Most things on Unix are text files, so this is the default type */
-/* XXX: special -> inode! */
 MIME_type *text_plain;
-MIME_type *special_directory;
-MIME_type *special_pipe;
-MIME_type *special_socket;
-MIME_type *special_block_dev;
-MIME_type *special_char_dev;
-MIME_type *special_exec;
-MIME_type *special_unknown;
+MIME_type *inode_directory;
+MIME_type *inode_pipe;
+MIME_type *inode_socket;
+MIME_type *inode_block_dev;
+MIME_type *inode_char_dev;
+MIME_type *application_executable;
+MIME_type *inode_unknown;
 
 static Option o_display_colour_types;
 
@@ -131,13 +130,13 @@ void type_init(void)
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	text_plain = get_mime_type("text/plain", TRUE);
-	special_directory = get_mime_type("special/directory", TRUE);
-	special_pipe = get_mime_type("special/pipe", TRUE);
-	special_socket = get_mime_type("special/socket", TRUE);
-	special_block_dev = get_mime_type("special/block-device", TRUE);
-	special_char_dev = get_mime_type("special/char-device", TRUE);
-	special_exec = get_mime_type("special/executable", TRUE);
-	special_unknown = get_mime_type("special/unknown", TRUE);
+	inode_directory = get_mime_type("inode/directory", TRUE);
+	inode_pipe = get_mime_type("inode/fifo", TRUE);
+	inode_socket = get_mime_type("inode/socket", TRUE);
+	inode_block_dev = get_mime_type("inode/blockdevice", TRUE);
+	inode_char_dev = get_mime_type("inode/chardevice", TRUE);
+	application_executable = get_mime_type("application/x-executable", TRUE);
+	inode_unknown = get_mime_type("inode/unknown", TRUE);
 
 	load_mime_types();
 
@@ -236,7 +235,7 @@ MIME_type *type_get_type(const guchar *path)
 	if (!type)
 	{
 		if (base == TYPE_FILE && exec)
-			type = special_exec;
+			type = application_executable;
 		else
 			type = mime_type_from_base_type(base);
 	}
@@ -396,11 +395,11 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	}
 
 	type_name = g_strconcat(type->media_type, "_",
-				type->subtype, ".xpm", NULL);
+				type->subtype, ".png", NULL);
 	path = choices_find_path_load(type_name, "MIME-icons");
 	if (!path)
 	{
-		strcpy(type_name + strlen(type->media_type), ".xpm");
+		strcpy(type_name + strlen(type->media_type), ".png");
 		path = choices_find_path_load(type_name, "MIME-icons");
 	}
 	
@@ -612,7 +611,7 @@ gchar *describe_current_command(MIME_type *type)
 
 	g_return_val_if_fail(type != NULL, NULL);
 
-	if (type == special_exec)
+	if (type == application_executable)
 		return g_strdup(_("Execute file"));
 
 	handler = handler_for(type);
@@ -885,17 +884,17 @@ MIME_type *mime_type_from_base_type(int base_type)
 		case TYPE_FILE:
 			return text_plain;
 		case TYPE_DIRECTORY:
-			return special_directory;
+			return inode_directory;
 		case TYPE_PIPE:
-			return special_pipe;
+			return inode_pipe;
 		case TYPE_SOCKET:
-			return special_socket;
+			return inode_socket;
 		case TYPE_BLOCK_DEVICE:
-			return special_block_dev;
+			return inode_block_dev;
 		case TYPE_CHAR_DEVICE:
-			return special_char_dev;
+			return inode_char_dev;
 	}
-	return special_unknown;
+	return inode_unknown;
 }
 
 /* Takes the st_mode field from stat() and returns the base type.
@@ -927,7 +926,7 @@ gboolean can_set_run_action(DirItem *item)
 	g_return_val_if_fail(item != NULL, FALSE);
 
 	return item->base_type == TYPE_FILE &&
-		!(item->mime_type == special_exec);
+		!(item->mime_type == application_executable);
 }
 
 /* To edit the MIME types, open a filer window for <Choices>/MIME-info */
