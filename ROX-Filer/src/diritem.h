@@ -38,6 +38,7 @@ struct _DirItem
 };
 
 void diritem_init(void);
+DirItem *diritem_new(guchar *leafname);
 void diritem_stat(guchar *path, DirItem *item, gboolean make_thumb);
 void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb);
 void diritem_clear(DirItem *item);

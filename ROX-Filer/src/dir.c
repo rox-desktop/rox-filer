@@ -279,8 +279,6 @@ static gboolean recheck_callback(gpointer data)
 
 	g_free(leaf);
 
-	/* usleep(200); */
-
 	if (dir->recheck_list)
 		return TRUE;	/* Call again */
 
@@ -307,7 +305,6 @@ static gboolean recheck_callback(gpointer data)
  */
 void dir_rescan(Directory *dir, guchar *pathname)
 {
-	GList		*next;
 	GPtrArray	*names;
 	DIR		*d;
 	struct dirent	*ent;
@@ -353,20 +350,6 @@ void dir_rescan(Directory *dir, guchar *pathname)
 		g_ptr_array_add(names, g_strdup(ent->d_name));
 	}
 
-	/* Give everyone the list of names, so they can resize if needed.
-	 * Only do this if we haven't scanned before, as then the statted
-	 * items will be a better guess.
-	 */
-	if (!dir->have_scanned)
-	{
-		for (next = dir->users; next; next = next->next)
-		{
-			DirUser *user = (DirUser *) next->data;
-
-			user->callback(dir, DIR_NAMES, names, user->data);
-		}
-	}
-
 	/* Sort, so the names are scanned in a sensible order */
 	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
 
@@ -377,10 +360,23 @@ void dir_rescan(Directory *dir, guchar *pathname)
 
 	free_recheck_list(dir);
 
+	/* For each name found, add it to the recheck_list.
+	 * If the item is new, put a blank place-holder item in the directory.
+	 */
 	for (i = 0; i < names->len; i++)
-		dir->recheck_list = g_list_prepend(dir->recheck_list,
-						   names->pdata[i]);
+	{
+		guchar *name = names->pdata[i];
+		dir->recheck_list = g_list_prepend(dir->recheck_list, name);
+		if (!g_hash_table_lookup(dir->known_items, name))
+		{
+			DirItem *new;
 
+			new = diritem_new(name);
+			g_ptr_array_add(dir->new_items, new);
+		}
+	}
+	dir_merge_new(dir);
+	
 	dir->recheck_list = g_list_reverse(dir->recheck_list);
 
 	g_ptr_array_free(names, TRUE);
@@ -532,7 +528,7 @@ static gint notify_timeout(gpointer data)
 	return FALSE;
 }
 
-/* Call merge_new() after a while. */
+/* Call dir_merge_new() after a while. */
 static void delayed_notify(Directory *dir)
 {
 	if (dir->notify_active)
@@ -561,79 +557,69 @@ static void insert_item(Directory *dir, guchar *leafname)
 	static GString  *tmp = NULL;
 
 	DirItem		*item;
-	DirItem		new;
-	gboolean	is_new = FALSE;
-	gboolean	deleted;
+	DirItem		old;
+	gboolean	do_compare = FALSE;	/* (old is filled in) */
 
 	tmp = make_path(dir->pathname, leafname);
-	diritem_stat(tmp->str, &new, dir->do_thumbs);
-	deleted = new.base_type == TYPE_ERROR && new.lstat_errno == ENOENT;
-
 	item = g_hash_table_lookup(dir->known_items, leafname);
 
-	if (deleted)
+	if (item)
 	{
-		diritem_clear(&new);
-		if (item)
-			remove_item(dir, item);
+		if (item->base_type != TYPE_UNKNOWN)
+		{
+			/* Preserve the old details so we can compare */
+			memcpy(&old, item, sizeof(DirItem));
+			pixmap_ref(old.image);
+			do_compare = TRUE;
+		}
+		diritem_restat(tmp->str, item, dir->do_thumbs);
+	}
+	else
+	{
+		/* Item isn't already here. This won't normally happen,
+		 * because blank items are added when scanning, before
+		 * we get here.
+		 */
+		item = diritem_new(leafname);
+		diritem_restat(tmp->str, item, dir->do_thumbs);
+		g_ptr_array_add(dir->new_items, item);
+		dir_merge_new(dir);
+	}
+
+	if (item->base_type == TYPE_ERROR && item->lstat_errno == ENOENT)
+	{
+		/* Item has been deleted */
+		remove_item(dir, item);
+		if (do_compare)
+			pixmap_unref(old.image);
 		return;
 	}
 
-	if (!item)
+	if (do_compare)
 	{
-		/* Item isn't already here... */
-		item = g_new(DirItem, 1);
-		item->leafname = g_strdup(leafname);
-		g_ptr_array_add(dir->new_items, item);
-		delayed_notify(dir);
-		is_new = TRUE;
-	}
-
-	item->may_delete = FALSE;
-
-	new.name_width = gdk_string_measure(item_font, item->leafname);
-	new.leafname = item->leafname;
-
-	if (!is_new)
-	{
-		if (item->lstat_errno == new.lstat_errno
-		 && item->base_type == new.base_type
-		 && item->flags == new.flags
-		 && item->size == new.size
-		 && item->mode == new.mode
-		 && item->atime == new.atime
-		 && item->ctime == new.ctime
-		 && item->mtime == new.mtime
-		 && item->uid == new.uid
-		 && item->gid == new.gid
-		 && item->image == new.image
-		 && item->mime_type == new.mime_type
-		 && item->name_width == new.name_width)
+		if (item->lstat_errno == old.lstat_errno
+		 && item->base_type == old.base_type
+		 && item->flags == old.flags
+		 && item->size == old.size
+		 && item->mode == old.mode
+		 && item->atime == old.atime
+		 && item->ctime == old.ctime
+		 && item->mtime == old.mtime
+		 && item->uid == old.uid
+		 && item->gid == old.gid
+		 && item->image == old.image
+		 && item->mime_type == old.mime_type
+		 && item->name_width == old.name_width)
 		{
-			pixmap_unref(new.image);
+			pixmap_unref(old.image);
 			return;
 		}
+		pixmap_unref(old.image);
+
 	}
 
-	item->image = new.image;
-	item->lstat_errno = new.lstat_errno;
-	item->base_type = new.base_type;
-	item->flags = new.flags;
-	item->size = new.size;
-	item->mode = new.mode;
-	item->uid = new.uid;
-	item->gid = new.gid;
-	item->atime = new.atime;
-	item->ctime = new.ctime;
-	item->mtime = new.mtime;
-	item->mime_type = new.mime_type;
-	item->name_width = new.name_width;
-
-	if (!is_new)
-	{
-		g_ptr_array_add(dir->up_items, item);
-		delayed_notify(dir);	/* TODO: Do we need this? */
-	}
+	g_ptr_array_add(dir->up_items, item);
+	delayed_notify(dir);
 }
 
 static Directory *load(char *pathname, gpointer data)

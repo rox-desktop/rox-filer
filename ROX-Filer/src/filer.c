@@ -271,26 +271,14 @@ static void filer_window_set_size(FilerWindow *filer_window,
 
 /* Resize the window to fit the items currently in the Directory.
  * This should be used once the Directory has been fully scanned, otherwise
- * the window will appear too small.
- * When opening a Directory that hasn't yet been scanned use the DIR_NAMES
- * instead for a quick estimate.
- *
- * This should all work unless you open a directory, get DIR_NAMES, and then
- * open it again in other window before the items get added. Oh well.
+ * the window will appear too small. When opening a directory for the first
+ * time, the names will be known but not the types and images. We can
+ * still make a good estimate of the size.
  */
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 {
 	Collection	*collection = filer_window->collection;
 	int 		n;
-
-	if (!filer_window->directory->have_scanned)
-		return;
-
-	/* If any items are queued to be added, add them now.
-	 * (this adds items that have been stat()d but not added to the
-	 * Collection, but not items only in recheck_list).
-	 */
-	dir_merge_new(filer_window->directory);
 
 	n = collection->number_of_items;
 	n = MAX(n, 2);
@@ -396,6 +384,8 @@ static void filer_size_for(FilerWindow *filer_window,
  */
 static gint open_filer_window(FilerWindow *filer_window)
 {
+	shrink_grid(filer_window);
+
 	if (filer_window->open_timeout)
 	{
 		gtk_timeout_remove(filer_window->open_timeout);
@@ -409,22 +399,6 @@ static gint open_filer_window(FilerWindow *filer_window)
 	}
 
 	return FALSE;
-}
-
-/* The list of names in the directory is known, but the images for each
- * one are not. Choose a sensible size.
- */
-static void filer_auto_size_names(FilerWindow *filer_window, GPtrArray *names)
-{
-	int	w, h, n;
-
-	if (GTK_WIDGET_VISIBLE(filer_window->window))
-		if (option_get_int("filer_auto_resize") != RESIZE_ALWAYS)
-			return;
-			
-	display_guess_size(filer_window, names, &w, &h, &n);
-	
-	filer_size_for(filer_window, w, h, n, TRUE);
 }
 
 static void update_display(Directory *dir,
@@ -472,6 +446,9 @@ static void update_display(Directory *dir,
 			if (old_num != collection->number_of_items)
 				collection_qsort(filer_window->collection,
 						filer_window->sort_fn);
+
+			/* Open and resize if currently hidden */
+			open_filer_window(filer_window);
 			break;
 		case DIR_REMOVE:
 			collection_delete_if(filer_window->collection,
@@ -487,7 +464,6 @@ static void update_display(Directory *dir,
 				gdk_window_set_cursor(
 						filer_window->window->window,
 						NULL);
-			shrink_grid(filer_window);
 			if (filer_window->had_cursor &&
 					collection->cursor_item == -1)
 			{
@@ -507,9 +483,6 @@ static void update_display(Directory *dir,
 			}
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
-			break;
-		case DIR_NAMES:
-			filer_auto_size_names(filer_window, items);
 			break;
 	}
 }

@@ -7,6 +7,10 @@ when someone sends patches!).
 
 BUGS
 
+TYPE_UNKNOWN items with no image can now be present in a window.
+Some code assumes that image is valid and may crash (eg, Copy in menu).
+Check everywhere!
+
 Remove icon should work with MIME stuff.
 
 Show Hidden flashes the last winked item.

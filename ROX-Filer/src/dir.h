@@ -12,7 +12,6 @@
 #include <dirent.h>
 
 typedef enum {
-	DIR_NAMES,	/* Got a list of names (used for resizing) */
 	DIR_START_SCAN,	/* Set 'scanning' indicator */
 	DIR_END_SCAN,	/* Clear 'scanning' indicator */
 	DIR_ADD,	/* Add the listed items to the display */

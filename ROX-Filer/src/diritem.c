@@ -176,6 +176,22 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 	}
 }
 
+DirItem *diritem_new(guchar *leafname)
+{
+	DirItem *item;
+
+	item = g_new(DirItem, 1);
+	item->leafname = g_strdup(leafname);
+	item->may_delete = FALSE;
+	item->image = NULL;
+	item->base_type = TYPE_UNKNOWN;
+	item->name_width = -1;
+	item->flags = 0;
+	item->mime_type = NULL;
+
+	return item;
+}
+
 /* Fill in the item structure with the appropriate details.
  * 'leafname' field is set to NULL; text_width is unset.
  */
