@@ -54,6 +54,14 @@ ROX_REQUIRE(gtk+-2.0, 2.0.1)
 ROX_REQUIRE(glib-2.0, 2.0.3)
 ROX_REQUIRE(libxml-2.0, 2.0.0)
 
+AC_MSG_CHECKING(if pango (version >= 1.1.2) is installed)
+if "$PKG_CONFIG" --atleast-version=1.1.2 pango ; then
+  AC_DEFINE(USE_PANGO_WRAP_WORD_CHAR)
+  AC_MSG_RESULT(yes. enabling better wrapping)
+else
+  AC_MSG_RESULT(no. better wrapping not enabled)
+fi
+
 dnl Checks for programs.
 AC_PROG_CC
 
