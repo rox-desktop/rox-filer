@@ -123,19 +123,13 @@ char *our_host_name(void)
 	return name;
 }
 
-/* fork() and run a new program.
- * Returns the new PID, or 0 on failure.
+/* Create a child process. cd to dir first (if dir is non-NULL).
+ * Returns the PID of the child, or 0 on failure.
  */
-pid_t spawn(char **argv)
-{
-	return spawn_full(argv, NULL);
-}
-
-/* As spawn(), but cd to dir first (if dir is non-NULL) */
 pid_t spawn_full(char **argv, char *dir)
 {
 	int	child;
-	
+
 	child = fork();
 
 	if (child == -1)

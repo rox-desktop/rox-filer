@@ -1670,8 +1670,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	if (!spawn_full(argv, window_with_focus->path))
-		report_error(_("Failed to fork() child process"));
+	rox_spawn(window_with_focus->path, argv);
 }
 
 static void home_directory(gpointer data, guint action, GtkWidget *widget)

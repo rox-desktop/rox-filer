@@ -879,3 +879,35 @@ void destroy_on_idle(GtkWidget *widget)
 	gtk_widget_ref(widget);
 	gtk_idle_add((GtkFunction) idle_destroy_cb, widget);
 }
+
+/* Spawn a child process (as spawn_full), and report errors.
+ * TRUE on success.
+ */
+gboolean rox_spawn(gchar *dir, gchar **argv)
+{
+#ifdef GTK2
+	GError	*error = NULL;
+	
+	if (!g_spawn_async_with_pipes(dir, argv, NULL,
+			G_SPAWN_DO_NOT_REAP_CHILD |
+			G_SPAWN_SEARCH_PATH,
+			NULL, NULL,		/* Child setup fn */
+			NULL,			/* Child PID */
+			NULL, NULL, NULL,	/* Standard pipes */
+			&error))
+	{
+		delayed_error("%s", error ? error->message : "(null)");
+		g_error_free(error);
+
+		return FALSE;
+	}
+#else
+	if (spawn_full(argv, dir) == 0)
+	{
+		report_error("Failed to start child process:\n%s",
+				g_strerror(errno));
+		return FALSE;
+	}
+#endif
+	return TRUE;
+}

@@ -72,8 +72,7 @@ void run_app(char *path)
 	apprun = g_string_new(path);
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
-	if (!spawn_full(argv, home_dir))
-		report_error(_("Failed to fork() child process"));
+	rox_spawn(home_dir, argv);
 	
 	g_string_free(apprun, TRUE);
 }
@@ -116,8 +115,7 @@ void run_with_files(char *path, GList *uri_list)
 	
 	argv[argc++] = NULL;
 
-	if (!spawn_full(argv, home_dir))
-		delayed_error(_("Failed to fork() child process"));
+	rox_spawn(home_dir, argv);
 }
 
 /* Run the program as '<path> -', piping the data to it via stdin.
@@ -238,14 +236,7 @@ gboolean run_diritem(guchar *full_path,
 
 				argv[0] = full_path;
 
-				if (spawn_full(argv, dir))
-					return TRUE;
-				else
-				{
-					report_error(
-						_("Failed to fork() child"));
-					return FALSE;
-				}
+				return rox_spawn(dir, argv);
 			}
 
 			return open_file(full_path, edit ? text_plain

@@ -15,7 +15,6 @@ char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
 char *our_host_name_for_dnd();
-pid_t spawn(char **argv);
 pid_t spawn_full(char **argv, char *dir);
 void debug_free_string(void *data);
 char *user_name(uid_t uid);

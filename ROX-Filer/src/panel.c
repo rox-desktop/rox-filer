@@ -1232,7 +1232,7 @@ static void run_applet(Icon *icon)
 			GDK_WINDOW_XWINDOW(icon->socket->window));
 	argv[2] = NULL;
 
-	pid = spawn(argv);
+	pid = spawn_full(argv, NULL);
 	
 	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
 	

@@ -472,7 +472,7 @@ gboolean type_open(char *path, MIME_type *type)
 {
 	char	*argv[] = {NULL, NULL, NULL};
 	char	*open;
-	gboolean	retval = TRUE;
+	gboolean	retval;
 	struct stat	info;
 
 	argv[1] = path;
@@ -493,11 +493,7 @@ gboolean type_open(char *path, MIME_type *type)
 	else
 		argv[0] = open;
 
-	if (!spawn_full(argv, home_dir))
-	{
-		report_error(_("Failed to fork() child process"));
-		retval = FALSE;
-	}
+	retval = rox_spawn(home_dir, argv);
 
 	if (argv[0] != open)
 		g_free(argv[0]);
