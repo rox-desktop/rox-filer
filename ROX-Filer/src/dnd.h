@@ -20,7 +20,8 @@ void drag_data_get(GtkWidget          *widget,
 		   GdkDragContext     *context,
 		   GtkSelectionData   *selection_data,
 		   guint               info,
-		   guint32             time);
+		   guint32             time,
+		   FilerWindow	      *filer_window);
 void drag_set_dest(FilerWindow *filer_window);
 void dnd_init();
 GtkWidget *create_dnd_options();

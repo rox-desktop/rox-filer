@@ -55,27 +55,33 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			GdkDragContext  *context,
 			gint            x,
 			gint            y,
-			guint           time);
+			guint           time,
+			FilerWindow	*filer_window);
 static gboolean provides(GdkDragContext *context, GdkAtom target);
 static void set_xds_prop(GdkDragContext *context, char *text);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
                             gint		y,
-                            guint		time);
+                            guint		time,
+			    FilerWindow		*filer_window);
 static void drag_leave(GtkWidget		*widget,
-                           GdkDragContext	*context);
+                       GdkDragContext		*context,
+		       guint32			time,
+		       FilerWindow		*filer_window);
 static void drag_data_received(GtkWidget      		*widget,
 				GdkDragContext  	*context,
 				gint            	x,
 				gint            	y,
 				GtkSelectionData 	*selection_data,
 				guint               	info,
-				guint32             	time);
+				guint32             	time,
+		       		FilerWindow		*filer_window);
 static void got_data_xds_reply(GtkWidget 		*widget,
 		  		GdkDragContext 		*context,
 				GtkSelectionData 	*selection_data,
-				guint32             	time);
+				guint32             	time,
+				FilerWindow		*filer_window);
 static void got_data_raw(GtkWidget 		*widget,
 			GdkDragContext 		*context,
 			GtkSelectionData 	*selection_data,
@@ -91,6 +97,9 @@ static void set_options();
 static void save_options();
 static char *load_no_hostnames(char *data);
 static char *drag_to_icons(char *data);
+static void drag_end(GtkWidget *widget,
+		     GdkDragContext *context,
+		     FilerWindow *filer_window);
 
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
@@ -334,7 +343,6 @@ void drag_selection(Collection 		*collection,
 		    gint		number_selected,
 		    gpointer 		user_data)
 {
-	FilerWindow 	*filer_window = (FilerWindow *) user_data;
 	GtkWidget	*widget;
 	MaskedPixmap	*image;
 	GdkDragContext 	*context;
@@ -378,7 +386,6 @@ void drag_selection(Collection 		*collection,
 			(event->state & GDK_BUTTON1_MASK) ? 1 :
 			(event->state & GDK_BUTTON2_MASK) ? 2 : 3,
 			(GdkEvent *) event);
-	g_dataset_set_data(context, "filer_window", filer_window);
 
 	image = item ? item->image : default_pixmap[TYPE_MULTIPLE];
 	
@@ -389,6 +396,13 @@ void drag_selection(Collection 		*collection,
 			0, 0);
 }
 
+static void drag_end(GtkWidget *widget,
+			GdkDragContext *context,
+			FilerWindow *filer_window)
+{
+	collection_clear_selection(filer_window->collection);
+}
+
 /* Called when a remote app wants us to send it some data.
  * TODO: Maybe we should handle errors better (ie, let the remote app know
  * the drag has failed)?
@@ -397,19 +411,16 @@ void drag_data_get(GtkWidget          		*widget,
 			GdkDragContext     	*context,
 			GtkSelectionData   	*selection_data,
 			guint               	info,
-			guint32             	time)
+			guint32             	time,
+			FilerWindow		*filer_window)
 {
 	char		*to_send = "E";	/* Default to sending an error */
 	long		to_send_length = 1;
 	gboolean	delete_once_sent = FALSE;
 	GdkAtom		type = XA_STRING;
 	GString		*string;
-	FilerWindow 	*filer_window;
 	DirItem	*item;
 	
-	filer_window = g_dataset_get_data(context, "filer_window");
-	g_return_if_fail(filer_window != NULL);
-
 	switch (info)
 	{
 		case	TARGET_RAW:
@@ -448,8 +459,6 @@ void drag_data_get(GtkWidget          		*widget,
 
 	if (delete_once_sent)
 		g_free(to_send);
-
-	collection_clear_selection(filer_window->collection);
 }
 
 /*			DRAGGING TO US				*/
@@ -482,6 +491,9 @@ void drag_set_dest(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(drag_drop), filer_window);
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
 			GTK_SIGNAL_FUNC(drag_data_received), filer_window);
+
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_end",
+			GTK_SIGNAL_FUNC(drag_end), filer_window);
 }
 
 /* Called during the drag when the mouse is in a widget registered
@@ -491,17 +503,14 @@ static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
                             gint		y,
-                            guint		time)
+                            guint		time,
+			    FilerWindow		*filer_window)
 {
-	FilerWindow 	*filer_window;
 	DirItem		*item;
 	int		item_number;
 	GdkDragAction	action = context->suggested_action;
 	char	 	*new_path = NULL;
 	char		*type = NULL;
-
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_val_if_fail(filer_window != NULL, TRUE);
 
 	if (o_drag_to_icons || filer_window->panel_type != PANEL_NO)
 		item_number = collection_get_item(filer_window->collection,
@@ -601,13 +610,10 @@ out:
 
 /* Remove panel highlights */
 static void drag_leave(GtkWidget		*widget,
-                           GdkDragContext	*context)
+                           GdkDragContext	*context,
+			   guint32		time,
+			   FilerWindow		*filer_window)
 {
-	FilerWindow 	*filer_window;
-
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_if_fail(filer_window != NULL);
-
 	collection_set_cursor_item(filer_window->collection, -1);
 }
 
@@ -618,17 +624,16 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			GdkDragContext  *context,
 			gint            x,
 			gint            y,
-			guint           time)
+			guint           time,
+			FilerWindow	*filer_window)
 {
 	char		*error = NULL;
 	char		*leafname = NULL;
-	FilerWindow	*filer_window;
 	GdkAtom		target = GDK_NONE;
 	char		*dest_path;
 	char		*dest_type = NULL;
 	
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_val_if_fail(filer_window != NULL, TRUE);
+	g_print("[ filer_window = %s ]\n", filer_window->path);
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	dest_type = g_dataset_get_data(context, "drop_dest_type");
@@ -706,7 +711,8 @@ static void drag_data_received(GtkWidget      		*widget,
 				gint            	y,
 				GtkSelectionData 	*selection_data,
 				guint               	info,
-				guint32             	time)
+				guint32             	time,
+				FilerWindow		*filer_window)
 {
 	if (!selection_data->data)
 	{
@@ -719,7 +725,8 @@ static void drag_data_received(GtkWidget      		*widget,
 	{
 		case TARGET_XDS:
 			got_data_xds_reply(widget, context,
-					selection_data, time);
+					selection_data, time,
+					filer_window);
 			break;
 		case TARGET_RAW:
 			got_data_raw(widget, context, selection_data, time);
@@ -738,7 +745,8 @@ static void drag_data_received(GtkWidget      		*widget,
 static void got_data_xds_reply(GtkWidget 		*widget,
 		  		GdkDragContext 		*context,
 				GtkSelectionData 	*selection_data,
-				guint32             	time)
+				guint32             	time,
+				FilerWindow		*filer_window)
 {
 	gboolean	mark_unsafe = TRUE;
 	char		response = *selection_data->data;
@@ -768,15 +776,9 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 	else if (response == 'S')
 	{
-		FilerWindow	*filer_window;
-
 		/* Success - data is saved */
 		mark_unsafe = FALSE;	/* It really is safe */
 		gtk_drag_finish(context, TRUE, FALSE, time);
-
-		filer_window = gtk_object_get_data(GTK_OBJECT(widget),
-						   "filer_window");
-		g_return_if_fail(filer_window != NULL);
 
 		refresh_dirs(dest_path);
 	}
