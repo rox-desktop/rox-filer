@@ -604,16 +604,18 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	text_x = (width - item->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
+#ifndef GTK2
 	if (o_text_bg == TEXT_BG_SOLID)
 	{
+#endif
 		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
 				(width - (item->name_width + 2)) >> 1,
 				WINK_FRAME + iheight + GAP,
 				item->name_width + 2, font_height + 2);
+#ifndef GTK2
 	}
 	else
 	{
-#if 0
 		int	y = text_y + font->ascent;
 
 		TEXT_AT(0, 0);
@@ -629,8 +631,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 			TEXT_AT(0, -1);
 			TEXT_AT(1, -1);
 		}
-#endif
 	}
+#endif
 	
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 

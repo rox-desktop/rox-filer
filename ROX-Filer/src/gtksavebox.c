@@ -18,10 +18,8 @@
  */
 
 /*
- * Modified by the GTK+ Team and others 1997-1999.  See the AUTHORS
- * file for a list of people on the GTK+ Team.  See the ChangeLog
- * files for a list of changes.  These files are distributed with
- * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
+ * Note: This file is formatted like the Gtk+ sources, as it is/was hoped
+ * to include it in Gtk+ at some point.
  */
 
 #include "config.h"
@@ -277,7 +275,7 @@ gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixmap *pixmap, GdkPixmap *mask)
 void
 gtk_savebox_set_pathname (GtkSavebox *savebox, gchar *pathname)
 {
-  gchar *slash;
+  gchar *slash, *dot;
   gint	leaf;
   
   g_return_if_fail (savebox != NULL);
@@ -289,12 +287,14 @@ gtk_savebox_set_pathname (GtkSavebox *savebox, gchar *pathname)
   slash = strrchr (pathname, '/');
   
   leaf = slash ? slash - pathname + 1 : 0;
+  dot = strchr(pathname + leaf, '.');
   
   /* Gtk+ doesn't seem to scroll the entry properly without this... */
   gtk_widget_realize (savebox->entry);
   gtk_entry_set_position (GTK_ENTRY (savebox->entry), -1);
 
-  gtk_entry_select_region (GTK_ENTRY (savebox->entry), leaf, -1);
+  gtk_entry_select_region (GTK_ENTRY (savebox->entry), leaf,
+		  dot ? dot - pathname : -1);
 }
 
 static void
