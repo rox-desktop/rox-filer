@@ -625,6 +625,14 @@ out:
 	return TRUE;
 }
 
+static gint view_details_key_press(GtkWidget *widget, GdkEventKey *event)
+{
+	if (event->keyval == GDK_Up || event->keyval == GDK_Down)
+		return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget,
+									event);
+	return FALSE;
+}
+
 static gboolean view_details_button_press(GtkWidget *widget,
 					  GdkEventButton *bev)
 {
@@ -901,6 +909,7 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	GTK_OBJECT_CLASS(object)->destroy = view_details_destroy;
 
 	widget->scroll_event = view_details_scroll;
+	widget->key_press_event = view_details_key_press;
 	widget->button_press_event = view_details_button_press;
 	widget->button_release_event = view_details_button_release;
 	widget->motion_notify_event = view_details_motion_notify;
@@ -1577,7 +1586,14 @@ static void view_details_autosize(ViewIface *view)
 
 static gboolean view_details_cursor_visible(ViewIface *view)
 {
-	return FALSE;
+	GtkTreePath *path = NULL;
+
+	gtk_tree_view_get_cursor((GtkTreeView *) view, &path, NULL);
+
+	if (path)
+		gtk_tree_path_free(path);
+
+	return path != NULL;
 }
 
 static void view_details_set_base(ViewIface *view, ViewIter *iter)

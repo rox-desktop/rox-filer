@@ -887,7 +887,6 @@ void filer_window_toggle_cursor_item_selected(FilerWindow *filer_window)
 		view_cursor_to_iter(view, &iter);
 }
 
-/* Handle keys that can't be bound with the menu */
 gint filer_key_press_event(GtkWidget	*widget,
 			   GdkEventKey	*event,
 			   FilerWindow	*filer_window)
@@ -921,7 +920,7 @@ gint filer_key_press_event(GtkWidget	*widget,
 		view_get_iter(view, &iter, 0);
 		if (iter.next(&iter))
 			view_cursor_to_iter(view, &iter);
-		gtk_widget_grab_focus(GTK_WIDGET(view));
+		gtk_widget_grab_focus(GTK_WIDGET(view)); /* Needed? */
 		return TRUE;
 	}
 
