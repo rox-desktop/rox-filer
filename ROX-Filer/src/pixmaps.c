@@ -134,7 +134,7 @@ void pixmaps_init(void)
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
 
-	gtk_timeout_add(10000, purge, NULL);
+	g_timeout_add(10000, purge, NULL);
 
 	factory = gtk_icon_factory_new();
 	for (i = 0; i < G_N_ELEMENTS(stocks); i++)

@@ -404,7 +404,7 @@ static gboolean recheck_callback(gpointer data)
 	
 	dir->have_scanned = TRUE;
 	dir_set_scanning(dir, FALSE);
-	gtk_idle_remove(dir->idle_callback);
+	g_source_remove(dir->idle_callback);
 	dir->idle_callback = 0;
 
 	if (dir->needs_update)
@@ -499,7 +499,7 @@ static void dir_rescan_soon(Directory *dir)
 {
 	if (dir->rescan_timeout != -1)
 		return;
-	dir->rescan_timeout = gtk_timeout_add(500, rescan_soon_timeout, dir);
+	dir->rescan_timeout = g_timeout_add(500, rescan_soon_timeout, dir);
 }
 #endif
 
@@ -616,7 +616,7 @@ static void delayed_notify(Directory *dir)
 	if (dir->notify_active)
 		return;
 	g_object_ref(dir);
-	gtk_timeout_add(1500, notify_timeout, dir);
+	g_timeout_add(1500, notify_timeout, dir);
 	dir->notify_active = TRUE;
 }
 
@@ -732,7 +732,7 @@ static void set_idle_callback(Directory *dir)
 		if (dir->idle_callback)
 			return;
 		time(&diritem_recent_time);
-		dir->idle_callback = gtk_idle_add(recheck_callback, dir);
+		dir->idle_callback = g_idle_add(recheck_callback, dir);
 		/* Do the first call now (will remove the callback itself) */
 		recheck_callback(dir);
 	}
@@ -741,7 +741,7 @@ static void set_idle_callback(Directory *dir)
 		dir_set_scanning(dir, FALSE);
 		if (dir->idle_callback)
 		{
-			gtk_idle_remove(dir->idle_callback);
+			g_source_remove(dir->idle_callback);
 			dir->idle_callback = 0;
 		}
 	}
@@ -825,7 +825,7 @@ static void dir_finialize(GObject *object)
 	free_recheck_list(dir);
 	set_idle_callback(dir);
 	if (dir->rescan_timeout != -1)
-		gtk_timeout_remove(dir->rescan_timeout);
+		g_source_remove(dir->rescan_timeout);
 
 	dir_merge_new(dir);	/* Ensures new, up and gone are empty */
 

@@ -343,7 +343,7 @@ void delayed_error(const char *error, ...)
 	else
 	{
 		delayed_error_data = new;
-		gtk_idle_add(error_idle_cb, &delayed_error_data);
+		g_idle_add(error_idle_cb, &delayed_error_data);
 
 		number_of_windows++;
 	}
@@ -520,14 +520,14 @@ static gboolean end_wink(gpointer data)
 
 static void cancel_wink(void)
 {
-	gtk_timeout_remove(wink_timeout);
+	g_source_remove(wink_timeout);
 	end_wink(NULL);
 }
 
 static void wink_widget_died(gpointer data)
 {
 	current_wink_widget = NULL;
-	gtk_timeout_remove(wink_timeout);
+	g_source_remove(wink_timeout);
 }
 
 /* Draw a black box around this widget, briefly.
@@ -543,7 +543,7 @@ void wink_widget(GtkWidget *widget)
 	current_wink_widget = widget;
 	gtk_drag_highlight(current_wink_widget);
 	
-	wink_timeout = gtk_timeout_add(300, (GtkFunction) end_wink, NULL);
+	wink_timeout = g_timeout_add(300, (GSourceFunc) end_wink, NULL);
 
 	wink_destroy = g_signal_connect_swapped(widget, "destroy",
 				G_CALLBACK(wink_widget_died), NULL);
@@ -560,7 +560,7 @@ static gboolean idle_destroy_cb(GtkWidget *widget)
 void destroy_on_idle(GtkWidget *widget)
 {
 	gtk_widget_ref(widget);
-	gtk_idle_add((GtkFunction) idle_destroy_cb, widget);
+	g_idle_add((GSourceFunc) idle_destroy_cb, widget);
 }
 
 /* Spawn a child process (as spawn_full), and report errors.
@@ -747,7 +747,7 @@ void tooltip_show(guchar *text)
 
 	if (tip_timeout)
 	{
-		gtk_timeout_remove(tip_timeout);
+		g_source_remove(tip_timeout);
 		tip_timeout = 0;
 	}
 
@@ -814,11 +814,11 @@ void tooltip_prime(GtkFunction callback, GObject *object)
 	delay = now - tip_time > 2 ? 1000 : 200;
 
 	g_object_ref(object);
-	tip_timeout = gtk_timeout_add_full(delay,
-					   (GtkFunction) callback,
-					   NULL,
-					   object,
-					   g_object_unref);
+	tip_timeout = g_timeout_add_full(G_PRIORITY_DEFAULT_IDLE,
+					 delay,
+					 (GSourceFunc) callback,
+					 object,
+					 g_object_unref);
 }
 
 /* Like gtk_widget_modify_font, but copes with font_desc == NULL */

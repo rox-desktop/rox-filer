@@ -841,10 +841,10 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	g_signal_connect(abox, "abort_operation",
 			 G_CALLBACK(abort_operation), gui_side);
 
-	gui_side->input_tag = gtk_input_add_full(gui_side->from_child,
+	gui_side->input_tag = gdk_input_add_full(gui_side->from_child,
 						GDK_INPUT_READ,
 						message_from_child,
-						NULL, gui_side, NULL);
+						gui_side, NULL);
 
 	return gui_side;
 }

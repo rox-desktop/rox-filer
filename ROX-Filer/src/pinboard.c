@@ -558,7 +558,7 @@ static void pinboard_wink_item(PinIcon *pi, gboolean timeout)
 		gdk_window_process_updates(old->widget->window, TRUE);
 
 		if (wink_timeout != -1)
-			gtk_timeout_remove(wink_timeout);
+			g_source_remove(wink_timeout);
 	}
 
 	if (pi)
@@ -567,7 +567,7 @@ static void pinboard_wink_item(PinIcon *pi, gboolean timeout)
 		gdk_window_process_updates(pi->widget->window, TRUE);
 
 		if (timeout)
-			wink_timeout = gtk_timeout_add(300, end_wink, NULL);
+			wink_timeout = g_timeout_add(300, end_wink, NULL);
 		else
 			wink_timeout = -1;
 	}
@@ -842,7 +842,7 @@ static void pinboard_check_options(void)
 		gchar *name;
 		name = g_strdup(current_pinboard->name);
 		pinboard_activate(NULL);
-		gtk_idle_add((GtkFunction) recreate_pinboard, name);
+		g_idle_add((GtkFunction) recreate_pinboard, name);
 	}
 
 	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
@@ -2215,7 +2215,7 @@ static void abandon_backdrop_app(Pinboard *pinboard)
 	{
 		close(pinboard->to_backdrop_app);
 		close(pinboard->from_backdrop_app);
-		gtk_input_remove(pinboard->input_tag);
+		g_source_remove(pinboard->input_tag);
 		g_string_free(pinboard->input_buffer, TRUE);
 		pinboard->to_backdrop_app = -1;
 		pinboard->from_backdrop_app = -1;
@@ -2357,11 +2357,11 @@ static void reload_backdrop(Pinboard *pinboard,
 				&error))
 		{
 			pinboard->input_buffer = g_string_new(NULL);
-			pinboard->input_tag = gtk_input_add_full(
+			pinboard->input_tag = gdk_input_add_full(
 					pinboard->from_backdrop_app,
 					GDK_INPUT_READ,
 					(GdkInputFunction) backdrop_from_child,
-					NULL, pinboard, NULL);
+					pinboard, NULL);
 		}
 		else
 		{

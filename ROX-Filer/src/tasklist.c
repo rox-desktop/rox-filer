@@ -170,7 +170,7 @@ static void icon_win_free(IconWindow *win)
 	g_return_if_fail(win->label == NULL);
 
 	if (win->timeout_update)
-		gtk_timeout_remove(win->timeout_update);
+		g_source_remove(win->timeout_update);
 
 	g_free(win->text);
 	g_free(win);
@@ -396,7 +396,7 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 			w = g_hash_table_lookup(known, &win);
 
 			if (w && w->widget && !w->timeout_update)
-				w->timeout_update = gtk_timeout_add(100,
+				w->timeout_update = g_timeout_add(100,
 							update_title, w);
 		}
 		else if (atom == xa__NET_CLIENT_LIST)

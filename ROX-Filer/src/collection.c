@@ -1047,7 +1047,7 @@ static void cancel_wink(Collection *collection)
 	item = collection->wink_item;
 
 	collection->wink_item = -1;
-	gtk_timeout_remove(collection->wink_timeout);
+	g_source_remove(collection->wink_timeout);
 
 	collection_draw_item(collection, item, TRUE);
 }
@@ -1597,8 +1597,8 @@ void collection_wink_item(Collection *collection, gint item)
 	collection->cursor_item_old = collection->wink_item = item;
 	collection->winks_left = MAX_WINKS;
 
-	collection->wink_timeout = gtk_timeout_add(70,
-					   (GtkFunction) wink_timeout,
+	collection->wink_timeout = g_timeout_add(70,
+					   (GSourceFunc) wink_timeout,
 					   collection);
 	scroll_to_show(collection, item);
 	invert_wink(collection);
@@ -1664,7 +1664,7 @@ void collection_delete_if(Collection *collection,
 		if (collection->wink_item != -1)
 		{
 			collection->wink_item = -1;
-			gtk_timeout_remove(collection->wink_timeout);
+			g_source_remove(collection->wink_timeout);
 		}
 		
 		collection->number_of_items = out;

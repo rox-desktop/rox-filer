@@ -1029,7 +1029,7 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 	gdk_event_send_client_message((GdkEvent *) &event,
 				      GDK_WINDOW_XWINDOW(dest));
 
-	gtk_timeout_add(10000, too_slow, NULL);
+	g_timeout_add(10000, too_slow, NULL);
 			
 	gtk_main();
 }

@@ -532,7 +532,7 @@ static void cell_edited(GtkCellRendererText *cell,
 	}
 
 	g_object_ref(window);
-	gtk_idle_add(refresh_info_idle, window);
+	g_idle_add(refresh_info_idle, window);
 }
 
 /* Create the TreeView widget with the file's details */
@@ -782,9 +782,9 @@ static GtkWidget *make_file_says(const guchar *path)
 			fs->label = l_file_label;
 			fs->fd = file_data[0];
 			fs->text = g_strdup("");
-			fs->input = gtk_input_add_full(fs->fd, GDK_INPUT_READ,
+			fs->input = gdk_input_add_full(fs->fd, GDK_INPUT_READ,
 				(GdkInputFunction) add_file_output,
-				NULL, fs, NULL);
+				fs, NULL);
 			g_signal_connect(w_file_label, "destroy",
 				G_CALLBACK(file_info_destroyed), fs);
 			break;
@@ -805,7 +805,7 @@ static void add_file_output(FileStatus *fs,
 	if (got <= 0)
 	{
 		int	err = errno;
-		gtk_input_remove(fs->input);
+		g_source_remove(fs->input);
 		close(source);
 		fs->fd = -1;
 		if (got < 0)
@@ -829,7 +829,7 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 {
 	if (fs->fd != -1)
 	{
-		gtk_input_remove(fs->input);
+		g_source_remove(fs->input);
 		close(fs->fd);
 	}
 

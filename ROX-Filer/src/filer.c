@@ -318,7 +318,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (filer_window->open_timeout)
 	{
-		gtk_timeout_remove(filer_window->open_timeout);
+		g_source_remove(filer_window->open_timeout);
 		filer_window->open_timeout = 0;
 	}
 
@@ -481,13 +481,13 @@ static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 
 	if (filer_window->open_timeout)
 	{
-		gtk_timeout_remove(filer_window->open_timeout);
+		g_source_remove(filer_window->open_timeout);
 		filer_window->open_timeout = 0;
 	}
 
 	if (filer_window->auto_scroll != -1)
 	{
-		gtk_timeout_remove(filer_window->auto_scroll);
+		g_source_remove(filer_window->auto_scroll);
 		filer_window->auto_scroll = -1;
 	}
 
@@ -1163,8 +1163,7 @@ void filer_change_to(FilerWindow *filer_window,
 		view_autosize(filer_window->view);
 
 	if (filer_window->mini_type == MINI_PATH)
-		gtk_idle_add((GtkFunction) minibuffer_show_cb,
-				filer_window);
+		g_idle_add((GSourceFunc) minibuffer_show_cb, filer_window);
 }
 
 /* Returns a list containing the full (sym) pathname of every selected item.
@@ -1369,8 +1368,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	 * Do this before attaching, because attach() might tell us to
 	 * stop scanning (if a scan isn't needed).
 	 */
-	filer_window->open_timeout = gtk_timeout_add(500,
-					  (GtkFunction) open_filer_window,
+	filer_window->open_timeout = g_timeout_add(500,
+					  (GSourceFunc) open_filer_window,
 					  filer_window);
 
 	/* The view is created empty and then attach() is called, which
@@ -1627,7 +1626,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
 	if (scanning)
 		filer_set_title(filer_window);
 	else
-		gtk_timeout_add(300, (GtkFunction) clear_scanning_display,
+		g_timeout_add(300, (GSourceFunc) clear_scanning_display,
 				filer_window);
 }
 
@@ -2024,7 +2023,7 @@ static void filer_next_thumb(GObject *window, const gchar *path)
 	if (path)
 		dir_force_update_path(path);
 
-	gtk_idle_add((GtkFunction) filer_next_thumb_real, window);
+	g_idle_add((GSourceFunc) filer_next_thumb_real, window);
 }
 
 static void start_thumb_scanning(FilerWindow *filer_window)
@@ -2645,8 +2644,8 @@ void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll)
 		if (filer_window->auto_scroll != -1)
 			return;		/* Already on! */
 
-		filer_window->auto_scroll = gtk_timeout_add(50,
-					(GtkFunction) as_timeout,
+		filer_window->auto_scroll = g_timeout_add(50,
+					(GSourceFunc) as_timeout,
 					filer_window);
 	}
 	else
@@ -2654,7 +2653,7 @@ void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll)
 		if (filer_window->auto_scroll == -1)
 			return;		/* Already off! */
 
-		gtk_timeout_remove(filer_window->auto_scroll);
+		g_source_remove(filer_window->auto_scroll);
 		filer_window->auto_scroll = -1;
 	}
 }

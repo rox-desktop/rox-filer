@@ -57,10 +57,17 @@
 # define SIZE_FMT "ld"
 #endif
 
-/* Only for developer releases... */
-/* #define GTK_DISABLE_DEPRECATED */
-/* #define GDK_DISABLE_DEPRECATED */
-/* #define G_DISABLE_DEPRECATED */
+#if 1
+/* For releases... */
+# define GTK_ENABLE_DEPRECATED
+# define GDK_ENABLE_DEPRECATED
+# define G_ENABLE_DEPRECATED
+#else
+/* Only for testing... */
+# define GTK_DISABLE_DEPRECATED 
+# define GDK_DISABLE_DEPRECATED
+# define G_DISABLE_DEPRECATED
+#endif
 
 #ifndef S_ISDOOR
 # define S_ISDOOR(mode) (FALSE)

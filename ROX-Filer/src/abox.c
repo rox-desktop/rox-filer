@@ -334,7 +334,7 @@ static void abox_finalise(GObject *object)
 	if (abox->next_dir)
 	{
 		null_g_free(&abox->next_dir);
-		gtk_timeout_remove(abox->next_timer);
+		g_source_remove(abox->next_timer);
 	}
 
 	parent_class = gtk_type_class(GTK_TYPE_DIALOG);
@@ -371,7 +371,7 @@ void abox_set_current_object(ABox *abox, const gchar *message)
 	else
 	{
 		gtk_label_set_text(GTK_LABEL(abox->dir_label), message);
-		abox->next_timer = gtk_timeout_add(500, show_next_dir, abox);
+		abox->next_timer = g_timeout_add(500, show_next_dir, abox);
 	}
 
 	abox->next_dir = g_strdup(message);
