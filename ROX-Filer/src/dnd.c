@@ -48,7 +48,6 @@
 #define MAXURILEN 4096		/* Longest URI to allow */
 
 /* Static prototypes */
-static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context);
 static void create_uri_list(GString *string,
 				Collection *collection,
 				FilerWindow *filer_window);
@@ -204,15 +203,6 @@ static char *drag_to_icons(char *data)
 }
 
 /*			SUPPORT FUNCTIONS			*/
-
-static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context)
-{
-	char	*path;
-
-	path = g_dataset_get_data(context, "drop_dest_path");
-
-	return path ? path : filer_window->path;
-}
 
 /* Set the XdndDirectSave0 property on the source window for this context */
 static void set_xds_prop(GdkDragContext *context, char *text)
@@ -556,10 +546,6 @@ static gboolean drag_motion(GtkWidget		*widget,
 	else
 	{
 		/* Drop onto a program/directory of some sort */
-		if (!(provides(context, text_uri_list) ||
-			 provides(context, application_octet_stream)))
-			goto out;
-		/* (actually, we should probably allow any data type) */
 
 		if (gtk_drag_get_source_widget(context) == widget)
 		{
@@ -571,14 +557,25 @@ static gboolean drag_motion(GtkWidget		*widget,
 		
 		if (item->base_type == TYPE_DIRECTORY &&
 				!(item->flags & ITEM_FLAG_APPDIR))
-			type = drop_dest_dir;
+		{
+			if (provides(context, text_uri_list) ||
+			    provides(context, XdndDirectSave0))
+				type = drop_dest_dir;
+		}
 		else
-			type = drop_dest_prog;
+		{
+			if (provides(context, text_uri_list) ||
+			    provides(context, application_octet_stream))
+				type = drop_dest_prog;
+		}
 
-		new_path = make_path(filer_window->path,
-				item->leafname)->str;
-		collection_set_cursor_item(filer_window->collection,
-				item_number);
+		if (type)
+		{
+			new_path = make_path(filer_window->path,
+					item->leafname)->str;
+			collection_set_cursor_item(filer_window->collection,
+					item_number);
+		}
 	}
 
 out:
@@ -737,6 +734,9 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	gboolean	mark_unsafe = TRUE;
 	char		response = *selection_data->data;
 	char		*error = NULL;
+	char		*dest_path;
+
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
 
 	if (selection_data->length != 1)
 		response = '?';
@@ -769,7 +769,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 						   "filer_window");
 		g_return_if_fail(filer_window != NULL);
 
-		update_dir(filer_window, TRUE);
+		refresh_dirs(dest_path);
 	}
 	else if (response != 'E')
 	{
@@ -794,7 +794,6 @@ static void got_data_raw(GtkWidget 		*widget,
 			GtkSelectionData 	*selection_data,
 			guint32             	time)
 {
-	FilerWindow	*filer_window;
 	char		*leafname;
 	int		fd;
 	char		*error = NULL;
@@ -802,9 +801,7 @@ static void got_data_raw(GtkWidget 		*widget,
 
 	g_return_if_fail(selection_data->data != NULL);
 
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_if_fail(filer_window != NULL);
-	dest_path = get_dest_path(filer_window, context);
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
 
 	if (g_dataset_get_data(context, "drop_dest_type") == drop_dest_prog)
 	{
@@ -836,7 +833,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		if (close(fd) == -1 && !error)
 			error = g_strerror(errno);
 
-		update_dir(filer_window, TRUE);
+		refresh_dirs(dest_path);
 	}
 	
 	if (error)
@@ -860,7 +857,6 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time)
 {
-	FilerWindow	*filer_window;
 	GSList		*uri_list;
 	char		*error = NULL;
 	GSList		*next_uri;
@@ -868,11 +864,10 @@ static void got_uri_list(GtkWidget 		*widget,
 	char		*dest_path;
 	char		*type;
 	
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_if_fail(filer_window != NULL);
-
-	dest_path = get_dest_path(filer_window, context);
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
+
+	g_return_if_fail(dest_path != NULL);
 
 	uri_list = uri_list_to_gslist(selection_data->data);
 
