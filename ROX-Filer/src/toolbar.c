@@ -571,7 +571,15 @@ static void disable_tool(char *name)
 
 static char *toolbar_disable(char *data)
 {
+	int	i;
 	char	*comma, *word;
+
+	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
+	{
+		Tool	*tool = &all_tools[i];
+
+		tool->enabled = TRUE;
+	}
 
 	while (*data)
 	{
