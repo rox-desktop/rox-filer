@@ -81,6 +81,20 @@ void run_app(const char *path)
 	g_string_free(apprun, TRUE);
 }
 
+void run_app_with_arg(const char *path, const char *arg)
+{
+	GString	*apprun;
+	const char *argv[] = {NULL, NULL, NULL};
+
+	apprun = g_string_new(path);
+	argv[0] = g_string_append(apprun, "/AppRun")->str;
+	argv[1] = arg;
+
+	rox_spawn(home_dir, argv);
+	
+	g_string_free(apprun, TRUE);
+}
+
 /* Execute this program, passing all the URIs in the list as arguments.
  * URIs that are files on the local machine will be passed as simple
  * pathnames. The uri_list should be freed after this function returns.
@@ -194,14 +208,17 @@ void run_with_data(const char *path, gpointer data, gulong length)
 /* Load a file, open a directory or run an application. Or, if 'edit' is set:
  * edit a file, open an application, follow a symlink or mount a device.
  *
+ * arg is a string to append to the command when running apps or executables,
+ * or NULL.   Ignored for non-executables
  * filer_window is the window to use for displaying a directory.
  * NULL will always use a new directory when needed.
  * src_window is the window to copy options from, or NULL.
  *
  * Returns TRUE on success.
  */
-gboolean run_diritem(const guchar *full_path,
+gboolean run_diritem_with_arg(const guchar *full_path,
 		     DirItem *item,
+			      const gchar *arg,
 		     FilerWindow *filer_window,
 		     FilerWindow *src_window,
 		     gboolean edit)
@@ -214,7 +231,10 @@ gboolean run_diritem(const guchar *full_path,
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_APPDIR && !edit)
 			{
-				run_app(full_path);
+				if(arg)
+					run_app_with_arg(full_path, arg);
+				else
+					run_app(full_path);
 				return TRUE;
 			}
 
@@ -231,12 +251,13 @@ gboolean run_diritem(const guchar *full_path,
 		case TYPE_FILE:
 			if (item->mime_type == application_executable && !edit)
 			{
-				const char *argv[] = {NULL, NULL};
+				const char *argv[] = {NULL, NULL, NULL};
 				guchar	*dir = filer_window
 						? filer_window->sym_path
 						: NULL;
 
 				argv[0] = full_path;
+				argv[1] = arg;
 
 				return rox_spawn(dir, argv) != 0;
 			}
@@ -252,6 +273,25 @@ gboolean run_diritem(const guchar *full_path,
 				_("I don't know how to open '%s'"), full_path);
 			return FALSE;
 	}
+}
+
+/* Load a file, open a directory or run an application. Or, if 'edit' is set:
+ * edit a file, open an application, follow a symlink or mount a device.
+ *
+ * filer_window is the window to use for displaying a directory.
+ * NULL will always use a new directory when needed.
+ * src_window is the window to copy options from, or NULL.
+ *
+ * Returns TRUE on success.
+ */
+gboolean run_diritem(const guchar *full_path,
+		     DirItem *item,
+		     FilerWindow *filer_window,
+		     FilerWindow *src_window,
+		     gboolean edit)
+{
+	run_diritem_with_arg(full_path, item, NULL, filer_window,
+			     src_window, edit);
 }
 
 /* Attempt to open this item */

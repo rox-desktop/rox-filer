@@ -23,6 +23,8 @@ void pinboard_init(void);
 void pinboard_activate(const gchar *name);
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut);
+void pinboard_pin_with_arg(const gchar *path, const gchar *name, int x, int y,
+			   const gchar *shortcut, const char *arg);
 void pinboard_move_icons(void);
 const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop_box(void);

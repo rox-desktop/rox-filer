@@ -132,7 +132,8 @@ static void panel_add_item(Panel *panel,
 			   const gchar *path,
 			   const gchar *name,
 			   gboolean after,
-			   const gchar *shortcut);
+			   const gchar *shortcut,
+			   const gchar *arg);
 static gboolean panel_drag_motion(GtkWidget	*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -385,12 +386,12 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		/* Don't scare users with an empty panel... */
 		guchar *apps;
 		
-		panel_add_item(panel, "~", "Home", FALSE, NULL);
+		panel_add_item(panel, "~", "Home", FALSE, NULL, NULL);
 
 		apps = pathdup(make_path(app_dir, ".."));
 		if (apps)
 		{
-			panel_add_item(panel, apps, "Apps", FALSE, NULL);
+			panel_add_item(panel, apps, "Apps", FALSE, NULL, NULL);
 			g_free(apps);
 		}
 	}
@@ -430,7 +431,7 @@ gboolean panel_add(PanelSide side,
 	
 	g_return_val_if_fail(current_panel[side] != NULL, FALSE);
 
-	panel_add_item(current_panel[side], path, label, after, NULL);
+	panel_add_item(current_panel[side], path, label, after, NULL, NULL);
 
 	return TRUE;
 }
@@ -509,7 +510,7 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 {
 	xmlNodePtr node;
-	char	   *label, *path, *shortcut;
+	char	   *label, *path, *shortcut, *arg;
 
 	for (node = side->xmlChildrenNode; node; node = node->next)
 	{
@@ -525,12 +526,14 @@ static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 		if (!path)
 			path = g_strdup("<missing path>");
 		shortcut = xmlGetProp(node, "shortcut");
+		arg = xmlGetProp(node, "arg");
 
-		panel_add_item(panel, path, label, after, shortcut);
+		panel_add_item(panel, path, label, after, shortcut, arg);
 
 		g_free(path);
 		g_free(label);
 		g_free(shortcut);
+		g_free(arg);
 	}
 }
 
@@ -564,7 +567,8 @@ static const char *pan_from_file(gchar *line)
 	else
 		leaf = NULL;
 	
-	panel_add_item(loading_panel, sep + 1, leaf, sep[0] == '>', NULL);
+	panel_add_item(loading_panel, sep + 1, leaf, sep[0] == '>',
+		       NULL, NULL);
 
 	g_free(leaf);
 
@@ -654,7 +658,8 @@ static void panel_add_item(Panel *panel,
 			   const gchar *path,
 			   const gchar *name,
 			   gboolean after,
-			   const gchar *shortcut)
+			   const gchar *shortcut,
+			   const gchar *arg)
 {
 	GtkWidget	*widget;
 	PanelIcon	*pi;
@@ -726,6 +731,7 @@ static void panel_add_item(Panel *panel,
 	}
 
 	icon_set_shortcut(icon, shortcut);
+	icon_set_argument(icon, arg);
 
 	if (!loading_panel)
 		panel_save(panel);
@@ -882,7 +888,8 @@ static void perform_action(Panel *panel, PanelIcon *pi, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(pi->widget);
-			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
+			run_diritem_with_arg(icon->path, icon->item, icon->arg,
+					     NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
@@ -1261,7 +1268,7 @@ static void add_uri_list(GtkWidget          *widget,
 		path = get_local_path((guchar *) next->data);
 
 		if (path) {
-			panel_add_item(panel, path, NULL, after, NULL);
+			panel_add_item(panel, path, NULL, after, NULL, NULL);
 			g_free(path);
 		}
 	}
@@ -1321,6 +1328,8 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 		xmlSetProp(tree, "label", icon->item->leafname);
 		if (icon->shortcut)
 			xmlSetProp(tree, "shortcut", icon->shortcut);
+		if (icon->arg)
+			xmlSetProp(tree, "arg", icon->arg);
 	}
 	
 	if (widgets)

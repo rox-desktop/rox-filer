@@ -41,6 +41,7 @@ struct _Icon {
 	DirItem		*item;
 	gchar		*shortcut;	/* Eg: Control + x */
 	MyKey		shortcut_key;	/* Parsed version of shortcut */
+        gchar           *arg;           /* Arg to pass for apps and executables*/
 
 	GtkWidget	*dialog;	/* Current rename box, if any */
 };
@@ -56,5 +57,6 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name);
 gchar *icon_create_uri_list(void);
 void icon_destroy(Icon *icon);
 void icon_set_shortcut(Icon *icon, const gchar *shortcut);
+void icon_set_argument(Icon *icon, const gchar *arg);
 
 #endif /* _ICON_H */
