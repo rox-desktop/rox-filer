@@ -1,13 +1,13 @@
-# Swedish messages for ROX-Filer.
+# Norwegian messages for ROX-Filer.
 # Copyright (C) 2002 Free Software Foundation, Inc.
-# Marcus Lundblad <ml@update.uu.set>, 2002.
+# Sigve Indregard <sigve@elev.no>, 2002.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "POT-Creation-Date: 2002-10-28 11:05+0000\n"
-"PO-Revision-Date: 2002-09-15 19:25+0200\n"
-"Last-Translator: Marcys Lundblad <ml@update.uu.se>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: Sigve Indregard <sigve@elev.no>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO-8859-1\n"
@@ -15,28 +15,28 @@ msgstr ""
 
 #: abox.c:113
 msgid "<dir>"
-msgstr "<katalog>"
+msgstr "<mappe>"
 
 #: abox.c:165
 #, fuzzy
 msgid "_Quiet"
-msgstr "_Tyst"
+msgstr "Stille"
 
 #: abox.c:173
 msgid "Quiet"
-msgstr "Tyst"
+msgstr "Stille"
 
 #: abox.c:173
 msgid "Don't confirm every operation"
-msgstr "Bekräfta inte alla kommandon"
+msgstr ""
 
 #: abox.c:398 tips:75
 msgid "Name"
-msgstr "Namn"
+msgstr "Navn"
 
 #: abox.c:404 menu.c:231
 msgid "Directory"
-msgstr "Katalog"
+msgstr "Mappe"
 
 #: abox.c:457
 msgid "Command:"
@@ -44,27 +44,27 @@ msgstr "Kommando:"
 
 #: abox.c:488
 msgid "Expression:"
-msgstr "Uttryck:"
+msgstr "Uttrykk:"
 
 #: action.c:180
 msgid "Find expression reference"
-msgstr "Find uttrycksreferens"
+msgstr "Finn uttrykksreferanse"
 
 #: action.c:185
 msgid "Quick Start"
-msgstr "Snabbstart"
+msgstr "Hurtigstart"
 
 #: action.c:187
 msgid ""
 "Just put the name of the file you're looking for in single quotes:\n"
 "'index.html' (to find a file called 'index.html')"
 msgstr ""
-"Skriv namnet på filen du letar efter inom citattecken:\n"
-"'index.html'\t(för att hitta en fil som heter 'index.html')"
+"Bare skriv navnet på filen du leter etter i anførselstegn:\n"
+"'index.html' (for å finne en fil som heter 'index.html')"
 
 #: action.c:194
 msgid "Examples"
-msgstr "Exempel"
+msgstr "Eksempler"
 
 #: action.c:196
 msgid ""
@@ -76,20 +76,19 @@ msgid ""
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contains the word 'fred')"
 msgstr ""
-"'*.htm', '*.html'      (hittar HTML-filer)\n"
-"ÄrKatalog 'lib'          (hittar kataloger som heter 'lib')\n"
-"ÄrVanlig 'core'          (hittar vanliga filer som heter 'core')\n"
-"! (ÄrKatalog, ÄrVanlig)    (är varken en katalog eller en vanlig fil)\n"
-"mtime efter 1 dag sedan och större 1Mb (stor, och ändrad nyligen)\n"
-"'CVS' beskär, ärvanlig                 (en vanlig fil som inte är i CVS)\n"
-"ÄrVanlig system(grep -q fred \"%\")       (innehåller ordet 'fred')"
+"'*.htm', '*.html'      (finner HTML-filer)\n"
+"ErMappe 'lib'          (finner mapper som heter 'lib')\n"
+"ErNormal 'core'          (finner en normal fil som heter 'core')\n"
+"! (ErMappe, ErNormal)    (er hverken en mappe eller en normal fil)\n"
+"mtime etter 1 dag siden og str > 1Mb (stor, og endret nylig)\n"
+"'CVS' utelukket, ErNormal              (en normal fil som ikke er i CVS)\n"
+"ErNormal system(grep -q fred \"%\")       (inneholder ordet 'fred')"
 
 #: action.c:209
 msgid "Simple Tests"
-msgstr "Enkla tester"
+msgstr "Enkle tester"
 
 #: action.c:211
-#, fuzzy
 msgid ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
 "(types)\n"
@@ -102,20 +101,18 @@ msgid ""
 "contains a slash then the match is against the full path; otherwise it is \n"
 "against the leafname only."
 msgstr ""
-"ÄrVanlig, ÄrGenväg, ÄrKatalog, ÄrChar, ÄrBlock, ÄrDev, ÄrPipe, ÄrSocket  "
+"ErNormal, ErLenke, ErMappe, ErChar, ErBlokk, ErDev, ErPipe, ErSocket, ErDør "
 "(typer)\n"
-"ÄrSUID, ÄrSGID, ÄrKlibbig, ÄrLäsbar, ÄrSkrivbar, ÄrKörbar (tillåtelser)\n"
-"ÄrTom, ÄrMin\n"
+"ErSUID, ErSGID, ErKlebrig, ErLesbar, ErSkrivbar, ErUtførbar (tillatelser)\n"
+"ErTom, ErMin\n"
 "\n"
-"Ett mönster i enkla citationstecken söks som ett \"wildcard\" i  shell-stils-"
-"mönster.\n"
-"Om det innehåller ett snedstreck så matchas den mot den fulla sökvägen; om "
-"inte\n"
-"matches den endast mot filnamnet."
+"Et mønster i enkle anførselstegn søkes som et vanlig jokertegn-søk.\n"
+"Hvis det inneholder en skråstrek så sammenlignes det mot hele stien;\n"
+"hvis ikke sammenlignes det bare mot filnavnet."
 
 #: action.c:225
 msgid "Comparisons"
-msgstr "Jämförelser"
+msgstr "Sammenligninger"
 
 #: action.c:227
 msgid ""
@@ -124,15 +121,14 @@ msgid ""
 "2 secs|mins|hours|days|weeks|years  ago|hence (times)\n"
 "atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)"
 msgstr ""
-"<, <=, =, !=, >, >=, Efter, Före (jämför två värden)\n"
-"5 byte, 1Kb, 2Mb, 3Gb (filstorlekar)\n"
-"2 sekunder|minuter|timmar|dagar|veckor|år  sedan|om (tider)\n"
-"atime, ctime, mtime, nu, storlek, i-nod, antal genvägar, användar-ID, grupp-"
-"ID, block (värden)"
+"<, <=, =, !=, >, >=, Etter, Før (sammenlign to verdier)\n"
+"5 byte, 1Kb, 2Mb, 3Gb (filstørrelser)\n"
+"2 sekunder|minutter|timer|dager|uker|år  siden|om (tider)\n"
+"atid, ctid, mtid, nå, str, inode, nlenke, uid, gid, blokker (verdier)"
 
 #: action.c:236
 msgid "Specials"
-msgstr "Speciella"
+msgstr "Spesielle"
 
 #: action.c:238
 msgid ""
@@ -140,18 +136,18 @@ msgid ""
 "in 'command' is replaced with the path of the current file)\n"
 "prune (false, and prevents searching the contents of a directory)."
 msgstr ""
-"system(kommando) (sant om 'kommando' returnerer med en slut-status av 0; ett "
-"% \n"
-"i-'kommando' ersätts med sökvägen till den valda filen)\n"
-"beskär (falsk, och förebygger sökning i innehållet av en katalog)."
+"system(kommando) (sant hvis 'kommando' returnerer med en sluttstatus på 0; "
+"en % \n"
+"i 'kommando' blir erstattet med stien til den valgte fila)\n"
+"utelukket (usant, og utelukker søking i en mappe)."
 
 #: action.c:251
 msgid "See the ROX-Filer manual for full details."
-msgstr "Se ROX-Filer-manualen för detaljer."
+msgstr "Se ROX-Filer-manualen for detaljer."
 
 #: action.c:280
 msgid "Permissions command reference"
-msgstr "Referens till kommandorättigheter"
+msgstr "Kommandoreferanse: Tillatelser"
 
 #: action.c:286
 msgid ""
@@ -183,46 +179,46 @@ msgid ""
 "\n"
 "See the chmod(1) man page for full details."
 msgstr ""
-"Normalt kan du bara välja ett kommando från menyn (klicka på \n"
-"pilen vid sidan av kommandorutan). Ibland, behövs det mer...\n"
+"Vanligvis kan du velge en kommando fra menyen (klikk på \n"
+"pilen ved siden av kommando-boksen). Noen ganger kreves det mer...\n"
 "\n"
-"Formatey för ett kommando är:\n"
-"ÄNDRING, ÄNDRING, ...\n"
-"Där ÄNDRING är:\n"
-"VEM HUR RÄTTIGHETER\n"
-"VEM är en kombination av u, g och o som bestämmer huruvida\n"
-"rättigheter för ägaren, grupen eller övriga skall ändras.\n"
-"HUR är +, - eller = för att lägga till, ta bort eller sätta "
-"dessarättigheter.\n"
-"RÄTTIGHETER är en kombination av bokstäverna 'rwxXstugo'\n"
+"Formatet på en kommando er:\n"
+"ENDRING, ENDRING, ...\n"
+"Hver ENDRING er:\n"
+"HVEM, HVORDAN, TILLATELSER\n"
+"HVEM er en kombinasjon av u, g og o som bestemmer om vi skal endre\n"
+"tillatelser for User (eieren), Group (gruppen) eller Others (andre).\n"
+"HVORDAN er +, - eller = for å tilføye, fjerne eller sette spesifiserte "
+"tillatelser.\n"
+"TILLATELSER er en kombinasjon av bokstavene 'rwxXstugo'\n"
 "\n"
-"Text mellan { och } samt mellanrum saknar betydelse.\n"
+"Tekst mellem { og } og mellomrom blir oversett.\n"
 "\n"
-"Exempel:\n"
-"u+rw \t(filens ägare får rättighet att läsa och skriva)\n"
-"g=u\t(gruppens rättigheter sätts till samma som för filens ägare)\n"
-"o=u-w\t(övriga får samma rättigheter som ägaren, dock utanskrivrättigheter)\n"
-"a+x\t(alla får kör- och öppningsrättigheter - det samma som 'ugo+x')\n"
-"a+X\t(kataloger blir tillgängliga för alla; filer som var\n"
-"körbara för någon blir körbara för alla)\n"
-"u+rw, go+r\t(två kommandon på en gång!)\n"
-"u+s\t(sätt SetUID-biten - har ofta ingen effekt på skript-filer)\n"
-"755\t(sätt rättigheter direkt)\n"
+"Eksempler:\n"
+"u+rw \t(filens eier får lese- og skrivetillatelser)\n"
+"g=u\t(gruppens tillatelser blir de samme som eierens)\n"
+"o=u-w\t(andre får samme tillatelser som eieren, men ikke skrive-tillatelse)\n"
+"a+x\t(alle får utfør- og tilgangstillatelser - det samme som 'ugo+x')\n"
+"a+X\t(mapper blir tilgjengelige for alle; filer som var\n"
+"kjørbare af noen blir kjørbare av alle)\n"
+"u+rw, go+r\t(to kommandoer på en gang!)\n"
+"u+s\t(sett SetUID-delen - har ofte ingen effekt på skript-filer)\n"
+"755\t(sett tillatelsene direkte)\n"
 "\n"
-"Se manualsidan chmod(1) för detaljer."
+"Se chmod(1)s manside for detaljer."
 
 #: action.c:411
 msgid "There was one error.\n"
-msgstr "Det uppstod ett fel.\n"
+msgstr "En feil oppstod.\n"
 
 #: action.c:413
 #, c-format
 msgid "There were %d errors.\n"
-msgstr "Det uppstod %d fel.\n"
+msgstr "%d feil oppstod.\n"
 
 #: action.c:437
 msgid "ERROR reading"
-msgstr "FEL under läsning"
+msgstr "Lesefeil"
 
 #: action.c:483
 msgid ""
@@ -230,11 +226,11 @@ msgid ""
 "Done\n"
 msgstr ""
 "'\n"
-"Klar\n"
+"Ferdig\n"
 
 #: action.c:539 support.c:394
 msgid "ERROR"
-msgstr "FEL"
+msgstr "FEIL"
 
 #: action.c:692 main.c:577 main.c:585
 msgid "Yes"
@@ -242,90 +238,90 @@ msgstr "Ja"
 
 #: action.c:695 main.c:579
 msgid "No"
-msgstr "Nej"
+msgstr "Nei"
 
 #: action.c:838
 #, c-format
 msgid "?Count contents of %s?"
-msgstr "?Räkna innehållet i %s?"
+msgstr "?Tell inneholdet i %s?"
 
 #: action.c:870
 #, c-format
 msgid "?Delete %s'%s'?"
-msgstr "?Radera %s'%s'?"
+msgstr "?Slett %s'%s'?"
 
 #: action.c:871
 msgid "WRITE-PROTECTED "
-msgstr "SKRIVSKYDDAD "
+msgstr "SKRIVEBESKYTTET "
 
 #: action.c:876
 #, c-format
 msgid "'Deleting '%s'\n"
-msgstr "'Raderar '%s'\n"
+msgstr "'Sletter '%s'\n"
 
 #: action.c:889
 #, c-format
 msgid "'Directory '%s' deleted\n"
-msgstr "'Katalogen '%s' är raderad\n"
+msgstr "'Mappen '%s' er slettet\n"
 
 #: action.c:920 action.c:939
 #, c-format
 msgid "?Check '%s'?"
-msgstr "?Kontrollera '%s'?"
+msgstr "?Sjekk '%s'?"
 
 #: action.c:936
 msgid "!Invalid find condition - change it and try again\n"
-msgstr "!Ogiltiga sökparametrar - rätta dem och försök igen\n"
+msgstr "!Ugyldige søkeparametre - rett dem og prøv igjen\n"
 
 #: action.c:946
 #, c-format
 msgid "'(while checking '%s')\n"
-msgstr "'(medan '%s' kontrolleras)\n"
+msgstr "'(mens '%s' ble sjekket)\n"
 
 #: action.c:1017 action.c:1040
 #, c-format
 msgid "?Change permissions of '%s'?"
-msgstr "?Äbdra rättigheterna på '%s'?"
+msgstr "?Endre tillatelsene til '%s'?"
 
 #: action.c:1021
 #, c-format
 msgid "'Changing permissions of '%s'\n"
-msgstr "'Ändrar rättigheter på '%s'\n"
+msgstr "'Endrer tillatelsene til '%s'\n"
 
 #: action.c:1038
 msgid "!Invalid mode command - change it and try again\n"
-msgstr "!Ogiltigt mode-kommando - rätta det och försök igen\n"
+msgstr "!Ugyldig moduskommando - rett den og prøv igjen\n"
 
 #: action.c:1128
 #, c-format
 msgid "?'%s' already exists - %s?"
-msgstr "?'%s' finns redan - %s?"
+msgstr "?'%s' finnes allerede - %s?"
 
 #: action.c:1130
 msgid "merge contents"
-msgstr "sammansmält innehåll"
+msgstr "smelt sammen innholdet"
 
 #: action.c:1131
 msgid "overwrite"
-msgstr "skriv över"
+msgstr "skriv over"
 
 #: action.c:1147
 msgid "'Trying copy anyway...\n"
-msgstr "'Försöker kopiera iallafall...\n"
+msgstr "'Prøver å kopiere allikevel...\n"
 
 #: action.c:1154
 #, c-format
 msgid "?Copy %s as %s?"
-msgstr "?Kopierar %s som %s?"
+msgstr "?Kopier %s som %s?"
 
 #: action.c:1158
 #, c-format
 msgid "'Copying %s as %s\n"
-msgstr "'Kopierar %s som %s\n"
+msgstr "'Kopierer %s som %s\n"
 
 #: action.c:1173
 msgid "!ERROR: Destination already exists, but is not a directory\n"
-msgstr "!FEL: Destinationen finns redan, men är inte en katalog\n"
+msgstr "!FEIL: Målet finnes allerede, men er ikke en mappe\n"
 
 #: action.c:1245
 #, c-format
@@ -334,26 +330,26 @@ msgid ""
 "Failed to copy '%s'"
 msgstr ""
 "!%s\n"
-"Kopiering av '%s' misslyckades"
+"Mislykket kopiering av '%s'"
 
 #: action.c:1284
 #, c-format
 msgid "?'%s' already exists - overwrite?"
-msgstr "?'%s' finns redan - skriv över?"
+msgstr "?'%s' finnes allerede - skriv over?"
 
 #: action.c:1298
 msgid "'Trying move anyway...\n"
-msgstr "'Försöker flytta iallafall...\n"
+msgstr "'Prøver å flytte allikevel...\n"
 
 #: action.c:1304
 #, c-format
 msgid "?Move %s as %s?"
-msgstr "?Flytta %s som %s?"
+msgstr "?Flytt %s som %s?"
 
 #: action.c:1308
 #, c-format
 msgid "'Moving %s as %s\n"
-msgstr "'Flyttar %s som %s\n"
+msgstr "'Flytter %s som %s\n"
 
 #: action.c:1316
 #, c-format
@@ -362,45 +358,45 @@ msgid ""
 "Failed to move %s as %s\n"
 msgstr ""
 "!%s\n"
-"!FEL: Misslyckades med att flytta %s som %s\n"
+"!FEIL: Mislykket flytting av %s som %s\n"
 
 #: action.c:1337
 msgid "!ERROR: Can't copy object into itself\n"
-msgstr "!FEL: Kan inte kopiera objektet till sig sälv\n"
+msgstr "!FEIL: Kan ikke kopiere objektet til seg selv\n"
 
 #: action.c:1349
 msgid "!ERROR: Can't move/rename object into itself\n"
-msgstr "!FEL: Kan inte flytta/byta namn på objekt till sig sälv\n"
+msgstr "!FEIL: Kan ikke flytte/omdøpe objektet til seg selv\n"
 
 #: action.c:1363
 #, c-format
 msgid "'Linking %s as %s\n"
-msgstr "'Skapar genväg till %s som %s\n"
+msgstr "'Opretter lenke til %s som %s\n"
 
 #: action.c:1365
 #, c-format
 msgid "?Link %s as %s?"
-msgstr "?Skapar genväg till %s som %s?"
+msgstr "?Oprett lenke til %s som %s?"
 
 #: action.c:1386
 #, c-format
 msgid "'Mounting %s\n"
-msgstr "'Monterar %s\n"
+msgstr "'Monterer %s\n"
 
 #: action.c:1387
 #, c-format
 msgid "'Unmounting %s\n"
-msgstr "'Avmonterar %s\n"
+msgstr "'Demonterer %s\n"
 
 #: action.c:1390
 #, fuzzy, c-format
 msgid "?Mount %s?"
-msgstr "?Montera %s?\n"
+msgstr "?Montér %s?\n"
 
 #: action.c:1391
 #, fuzzy, c-format
 msgid "?Unmount %s?"
-msgstr "?Avmontera %s?\n"
+msgstr "?Demontér %s?\n"
 
 #: action.c:1399
 #, c-format
@@ -409,7 +405,7 @@ msgid ""
 "Mount failed\n"
 msgstr ""
 "!%s\n"
-"Montering misslyckades\n"
+"Montering mislyktes\n"
 
 #: action.c:1400
 #, c-format
@@ -418,7 +414,7 @@ msgid ""
 "Unmount failed\n"
 msgstr ""
 "!%s\n"
-"Avmontering misslyckades\n"
+"Demontering mislyktes\n"
 
 #: action.c:1439
 #, c-format
@@ -439,64 +435,66 @@ msgstr "filer"
 
 #: action.c:1449
 msgid "no directories)\n"
-msgstr "inga inga kataloger)\n"
+msgstr "ingen mapper)\n"
 
 #: action.c:1453
 msgid "directory"
-msgstr "katalog"
+msgstr "mappe"
 
 #: action.c:1454
 msgid "directories"
-msgstr "katalog"
+msgstr "mapper"
 
 #: action.c:1482
 msgid "!No mount points selected!\n"
-msgstr "!Inga monteringspunkter valda!\n"
+msgstr "!Ingen monteringspunkter er valgt!\n"
 
 #: action.c:1536
 msgid "?Another search?"
-msgstr "?En sökning till?"
+msgstr "?Nytt søk?"
 
 #: action.c:1558
 #, c-format
 msgid "!'%s' is a symbolic link\n"
-msgstr "!'%s' är en symbolsk genväg\n"
+msgstr "!'%s' er en symbolsk lenke\n"
 
 #: action.c:1590
 msgid "You need to select some items to search through"
-msgstr "Du måste välja något/några objekt att genomsöka"
+msgstr "Du må velge noen objekter som skal søkes gjennom"
 
 #: action.c:1600 menu.c:223
 msgid "Find"
-msgstr "Leta"
+msgstr "Finn"
 
 #: action.c:1633
 msgid "You need to select some items to count"
-msgstr "Du måste välja något/några objekt att räkna igenom"
+msgstr "Du må velge noen objekter som skal telles"
 
 #: action.c:1637
 msgid "Disk Usage"
-msgstr "Diskutnyttjande"
+msgstr "Diskbruk"
 
 #: action.c:1670
 msgid "Mount / Unmount"
-msgstr "Montera/avmontera"
+msgstr "Montér / Demontér"
 
 #: action.c:1683
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Filer stödjer tyvärr ännu inte monteringspunkter på ditt system."
+msgstr ""
+"ROX-Filer støtter desverre enda ikke monteringspunkter på ditt system. "
+"Beklager."
 
 #: action.c:1697 action.c:1969 menu.c:210 type.c:910 tips:166
 msgid "Delete"
-msgstr "Radera"
+msgstr "Slett"
 
 #: action.c:1707 tips:172
 msgid "Force"
-msgstr "Tvinga"
+msgstr "Tving"
 
 #: action.c:1707
 msgid "Don't confirm deletion of non-writeable items"
-msgstr "Fråga inte om lov för att radera skrivskyddade objekt."
+msgstr "Ikke spør igjen om sletting av ikke-skrivbare objekter."
 
 #: action.c:1710 action.c:1765 tips:174
 msgid "Brief"
@@ -504,39 +502,39 @@ msgstr "Kort"
 
 #: action.c:1710
 msgid "Only log directories being deleted"
-msgstr "Logga endast radering av kataloger"
+msgstr "Lag bare logg for sletting av mapper"
 
 #: action.c:1727
 msgid "You need to select the items whose permissions you want to change"
-msgstr "Du måste välja något/några objekt att ändra rättigheter på"
+msgstr "Du må velge hvilke objekter du vil endre tillatelsene på"
 
 #: action.c:1735
 msgid "a+x (Make executable/searchable)"
-msgstr "a+x (Gör kör-/sökbar)"
+msgstr "a+x (Gjør kjørbar/søkbar)"
 
 #: action.c:1737
 msgid "a-x (Make non-executable/non-searchable)"
-msgstr "a-x (Gör icke kör-/sökbar)"
+msgstr "a-x (Gjør ukjørbar/usøkbar)"
 
 #: action.c:1739
 msgid "u+rw (Give owner read+write)"
-msgstr "u+rw (Ge ägaren läs- och skrivrättigheter)"
+msgstr "u+rw (Gi eier lese+skrive)"
 
 #: action.c:1741
 msgid "go-rwx (Private - owner access only)"
-msgstr "go-rwx (Privat - endast ägaren har tillgång)"
+msgstr "go-rwx (Privat - kun eier har tilgang)"
 
 #: action.c:1743
 msgid "go=u-w (Public access, not write)"
-msgstr "go=u-w (Allmänn, ej skrivbar)"
+msgstr "go=u-w (Offentlig tilgang, ikke skrivbar)"
 
 #: action.c:1754 menu.c:182 menu.c:188 menu.c:194 menu.c:221 tips:71
 msgid "Permissions"
-msgstr "Rättigheter"
+msgstr "Tillatelser"
 
 #: action.c:1765
 msgid "Don't list processed files"
-msgstr "Lista ej bearbetade filer "
+msgstr "Ikke list opp bearbeidede filer"
 
 #: action.c:1768 tips:176
 msgid "Recurse"
@@ -544,56 +542,52 @@ msgstr "Rekursivt"
 
 #: action.c:1768
 msgid "Also change contents of subdirectories"
-msgstr "Innehållet i underkataloger skall också ändras."
+msgstr "Innholdet i undermapper skal også endres"
 
 #: action.c:1805 dnd.c:123 menu.c:1889 tips:160
 msgid "Copy"
-msgstr "Kopiera"
+msgstr "Kopiér"
 
 #: action.c:1815 action.c:1848 tips:178
 #, fuzzy
 msgid "Newer"
-msgstr "Nyare"
+msgstr "Nyere"
 
 #: action.c:1816 action.c:1849 tips:179 tips:180 tips:181 tips:182
 msgid "Only over-write if source is newer than destination."
-msgstr "Skriv endast över om källan är nyare än destinationen"
+msgstr "Skriv bare over hvis kildefila er nyere enn målfila"
 
 #: action.c:1838 dnd.c:124 tips:162
 msgid "Move"
-msgstr "Flytta"
+msgstr "Flytt"
 
 #: action.c:1866 dnd.c:125 tips:164
 msgid "Link"
-msgstr "Gör en genväg"
+msgstr "Lag Lenke"
 
 #: action.c:1923
 msgid "Deleting items such as "
-msgstr "Raderar objekt som tex. "
+msgstr "Sletter objekter som f.eks. "
 
 #: action.c:1927
 msgid "Deleting the item "
-msgstr "Raderar objektet "
+msgstr "Sletter objektet "
 
 #: action.c:1929
 msgid "Deleting the items "
-msgstr "Raderar objekten "
+msgstr "Sletter objektene "
 
 #: action.c:1948
 msgid " and "
-msgstr " och "
+msgstr " og "
 
 #: action.c:1957
 msgid " will affect some items on the pinboard or panel - really delete it?"
-msgstr ""
-" kommer påverka ett objekt på skrivbordet eller panelen - är du säker på att "
-"du vill radera det?"
+msgstr " vil påvirke noen objekter på tavla eller panelet - slette uansett?"
 
 #: action.c:1964
 msgid " will affect some items on the pinboard or panel - really delete them?"
-msgstr ""
-" kommer påverka några objekt på skrivbordet eller panelen - är du säker på "
-"att du vill radera dem?"
+msgstr "vil påvirke noen objekter på tavla eller panelet - slette uansett?"
 
 #: action.c:1969 filer.c:1227 infobox.c:92 menu.c:1656 panel.c:440 type.c:910
 msgid "Cancel"
@@ -601,7 +595,7 @@ msgstr "Avbryt"
 
 #: appmenu.c:198
 msgid "<missing label>"
-msgstr "<titel saknas>"
+msgstr "<manglende tittel>"
 
 #: collection.c:268
 msgid "Vertical Adjustment"
@@ -609,7 +603,7 @@ msgstr "Vertikal justering"
 
 #: collection.c:269
 msgid "The GtkAdjustment for the vertical position."
-msgstr "GtkAdjustment för den vertikala positionen"
+msgstr "GtkAdjustment for den vertikale posisjonen."
 
 #: dir.c:131 dir.c:653
 #, c-format
@@ -617,130 +611,126 @@ msgid ""
 "Error scanning '%s':\n"
 "%s"
 msgstr ""
-"Fel under scanning av '%s:\n"
+"Feil under oppdatering av '%s:\n"
 "%s"
 
 #: dir.c:333
-#, fuzzy, c-format
+#, c-format
 msgid "Can't stat directory: %s"
-msgstr "Kan inte öppna katalogen: %s"
+msgstr "Kan ikke finne mappen: %s"
 
 #: dir.c:341
 #, c-format
 msgid "Can't open directory: %s"
-msgstr "Kan inte öppna katalogen: %s"
+msgstr "Kan ikke åpne mappen: %s"
 
 #: display.c:453
 #, c-format
 msgid "lstat(2) failed: %s"
-msgstr "lstat(2) misslyckades: %s"
+msgstr "lstat(2) mislyktes: %s"
 
 #: dnd.c:127
 msgid "Set Icon"
-msgstr "Sätt ikon"
+msgstr "Velg Ikon"
 
 #: dnd.c:228
 msgid "Incorrect or missing line break in text/uri-list data"
-msgstr "Inkorrekt eller avsaknad radbrytning i text-/uri-list-data"
+msgstr "Inkorrekt eller manglende linjeavslutning i tekst/uri-liste - data."
 
 #: dnd.c:394
 msgid "Internal error - bad info type"
-msgstr "Internt fel - dålig info-typ"
+msgstr "Intern feil - inkorrekt infotype"
 
 #: dnd.c:530
 msgid "XDS protocol error: leafname may not contain '/'\n"
-msgstr "XDS-protokollfel: namn får inte innehålla '/'\n"
+msgstr "XDS protokollfeil: bladnavn kan ikke inneholde '/'\n"
 
 #: dnd.c:553
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 msgstr ""
-"XdndDirectSave0-mål givet, men atomem XdndDirectSave0 (typ text/plain) kan "
-"inte innehålla et lövnamn\n"
+"XdndDirectSave0 mål gitt, men atomet XdndDirectSave0 (type text/plain) kan "
+"ikke inneholde et bladnavn\n"
 
 #: dnd.c:564
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
-"Tyvärr - Jag behöver en destination av typ text/uri-list eller "
-"XdndDirectSave0."
+"Beklager - Jeg krever et mål av typen text/uri-list eller XdndDirectSave0."
 
 #: dnd.c:567
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
-"Tyvärr - Jag behöver en destination av typ text/uri-list eller application/"
-"octet-stream."
+"Beklager - Jeg krever et mål av typen text/uri-list eller application/octet-"
+"stream."
 
 #: dnd.c:666
 msgid "Unknown target"
-msgstr "Okänd destination"
+msgstr "Ukjent mål"
 
 #: dnd.c:699
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr "Det andra programmer kan eller vill inte skicka mig datan - tyvärr"
+msgstr "Det andre programmet kan eller vil ikke sende meg data - beklager"
 
 #: dnd.c:712
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
-msgstr "XDS-protokollfel: returkoden skall vara 'S', 'F' eller 'E'\n"
+msgstr "XDS protokollfeil: returkoden burde være 'S', 'F' eller 'E'\n"
 
 #: dnd.c:745
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
-msgstr ""
-"Tyvärr, kan inte visa en meny med kommandon för en fil på en annanmaskin "
-"eller rådata"
+msgstr "Beklager, kan ikke vise en handlingsmeny for en fjern fil / rådata."
 
 #: dnd.c:761
 msgid "UntitledData"
-msgstr "Data utan namn"
+msgstr "NavnløsData"
 
 #: dnd.c:788
 #, c-format
 msgid "Error saving file: %s"
-msgstr "Fel vid sparande av fil: %s"
+msgstr "Feil under lagring av fil: %s"
 
 #: dnd.c:819
 msgid "No URIs in the text/uri-list (nothing to do!)"
-msgstr "Inga URI:er i text/uri-list (inget att göra!)"
+msgstr "Ingen URIer i text/uri-list (intet å gjøre!)"
 
 #: dnd.c:843
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
-"Kan inte få data från den andra maskinen (application/octet-stream inte "
-"givet)"
+"Kan ikke motta data fra den andre maskinen (application/octet-stream ikke "
+"gitt)"
 
 #: dnd.c:864
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
-"Någon av dessa filer finns på en annan maskin - dessa kommer hoppas över - "
-"tyvärr"
+"Noen av disse filene er på en annen maskin. De vil bli oversett. Beklager."
 
 #: dnd.c:871
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
 msgstr ""
-"Ingen av desse filerna finns på den här maskinen - Jag kan inte arbeta på "
-"nätvärks-filer - tyvärr."
+"Ingen av disse filene er på den lokale maskinen. Jeg kan ikke behandle flere "
+"fjerne filer. Beklager."
 
 #: dnd.c:884
 msgid "Unknown action requested"
-msgstr "Okänd handling förfrågad"
+msgstr "Ukjent handling etterspurt"
 
 #: dnd.c:892
 #, c-format
 msgid "Error getting file list: %s"
-msgstr "Fel vid hämtning av fillista: %s"
+msgstr "Feil under henting av fil-liste: %s"
 
 #: dnd.c:916
 msgid "You can't use multiple files with Set Icon!"
-msgstr "Du kan inte välja flera filer med Sätt ikon!"
+msgstr "Du kan ikke velge flere filer med Velg Ikon!"
 
 #: filer.c:390
 msgid "Directory missing/deleted"
-msgstr "Katalogen saknas/är raderad"
+msgstr "Mappe mangler/er slettet"
 
 #: filer.c:751
 #, fuzzy, c-format
@@ -749,58 +739,58 @@ msgid ""
 "Press %s on its own to reselect the files later.\n"
 "Make sure NumLock is on if you use the keypad."
 msgstr ""
-"Grupp %s är inte satt. Välj någon/några filer och tryck Ctrl+%s för att "
-"sätta gruppen. Tryck %s för att åter välja filerne senare."
+"Gruppe %s er ikke satt. Velg noen filer og trykk Ctrl+%s for å huske "
+"gruppen. Trykk %s alene for å velge filene senere."
 
 #: filer.c:937
 #, c-format
 msgid "Directory '%s' is not accessible"
-msgstr "Katalogen '%s' är inte tillgänglig"
+msgstr "Mappen '%s' er ikke tilgjengelig"
 
 #: filer.c:1078
 #, c-format
 msgid "Directory '%s' not found."
-msgstr "Katalogen '%s' hittades inte."
+msgstr "Mappen '%s' ble ikke funnet."
 
 #: filer.c:1454
 msgid "S"
-msgstr ""
+msgstr "O"
 
 #: filer.c:1455
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: filer.c:1456
 msgid "T"
-msgstr ""
+msgstr "M"
 
 #: filer.c:1462
 msgid "Scanning, "
-msgstr "Skannar, "
+msgstr "Oppdaterer, "
 
 #: filer.c:1463
 msgid "All, "
-msgstr "Alla, "
+msgstr "Alle, "
 
 #: filer.c:1464
 msgid "Thumbs, "
-msgstr "Förhandsgranskning, "
+msgstr "Miniatyrer, "
 
 #: filer.c:1751
 msgid "Symbolic link to "
-msgstr "Symbolisk genväg till "
+msgstr "Symbolsk lenke til "
 
 #: filer.c:1782
 msgid "This filename is not valid UTF-8. You should rename it.\n"
-msgstr "Detta filnamn är inte giltig UTF-8. Du måste ändra dess namn.\n"
+msgstr "Dette filnavnet er ikke gyldig UTF-8. Du burde omdøpe den.\n"
 
 #: find.c:487
 msgid "And"
-msgstr "Och"
+msgstr "Og"
 
 #: find.c:511
 msgid "Not"
-msgstr "Icke"
+msgstr "Ikke"
 
 #: find.c:554
 msgid "system"
@@ -808,88 +798,88 @@ msgstr "system"
 
 #: find.c:562
 msgid "prune"
-msgstr "beskär"
+msgstr "utelukket"
 
 #: find.c:650
 msgid "After"
-msgstr "Efter"
+msgstr "Etter"
 
 #: find.c:652
 msgid "Before"
-msgstr "Före"
+msgstr "Før"
 
 #: find.c:746
 msgid "IsReg"
-msgstr "ÄrVanlig"
+msgstr "ErNormal"
 
 #: find.c:748
 msgid "IsLink"
-msgstr "ÄrGenväg"
+msgstr "ErLenke"
 
 #: find.c:750
 msgid "IsDir"
-msgstr "ÄrKatalog"
+msgstr "ErMappe"
 
 #: find.c:752
 msgid "IsChar"
-msgstr "ÄrChar"
+msgstr "ErChar"
 
 #: find.c:754
 msgid "IsBlock"
-msgstr "ÄrBlock"
+msgstr "ErBlokk"
 
 #: find.c:756
 msgid "IsDev"
-msgstr "ÄrDev"
+msgstr "ErDev"
 
 #: find.c:758
 msgid "IsPipe"
-msgstr "ÄrPipe"
+msgstr "ErPipe"
 
 #: find.c:760
 msgid "IsSocket"
-msgstr "ÄrSocket"
+msgstr "ErSocket"
 
 #: find.c:762
 #, fuzzy
 msgid "IsDoor"
-msgstr "ÄrDoor"
+msgstr "ErMappe"
 
 #: find.c:764
 msgid "IsSUID"
-msgstr "ÄrSUID"
+msgstr "ErSUID"
 
 #: find.c:766
 msgid "IsSGID"
-msgstr "ÄrSGID"
+msgstr "ErSGID"
 
 #: find.c:768
 msgid "IsSticky"
-msgstr "ÄrSticky"
+msgstr "ErKlebrig"
 
 #: find.c:770
 msgid "IsReadable"
-msgstr "ÄrLäsbar"
+msgstr "ErLesbar"
 
 #: find.c:772
 msgid "IsWriteable"
-msgstr "ÄrSkrivbar"
+msgstr "ErSkrivbar"
 
 #: find.c:774
 msgid "IsExecutable"
-msgstr "ÄrKörbar"
+msgstr "ErKjørbar"
 
 #: find.c:776
 msgid "IsEmpty"
-msgstr "ÄrTom"
+msgstr "ErTom"
 
 #: find.c:778
 msgid "IsMine"
-msgstr "ÄrMin"
+msgstr "ErMin"
 
 #: find.c:906
 msgid "Now"
-msgstr "Nu"
+msgstr "Nå"
 
 #: find.c:919
 msgid "Byte"
@@ -897,11 +887,11 @@ msgstr "Byte"
 
 #: find.c:919
 msgid "Bytes"
-msgstr "Byte"
+msgstr "Bytes"
 
 #: find.c:927
 msgid "Sec"
-msgstr "Sekund"
+msgstr "Sek"
 
 #: find.c:927
 msgid "Secs"
@@ -909,19 +899,19 @@ msgstr "Sekunder"
 
 #: find.c:929
 msgid "Min"
-msgstr "Minut"
+msgstr "Min"
 
 #: find.c:929
 msgid "Mins"
-msgstr "Minuter"
+msgstr "Minutter"
 
 #: find.c:931
 msgid "Hour"
-msgstr "Timme"
+msgstr "Time"
 
 #: find.c:931
 msgid "Hours"
-msgstr "Timmar"
+msgstr "Timer"
 
 #: find.c:933
 msgid "Day"
@@ -929,15 +919,15 @@ msgstr "Dag"
 
 #: find.c:933
 msgid "Days"
-msgstr "Dagar"
+msgstr "Dager"
 
 #: find.c:935
 msgid "Week"
-msgstr "Vecka"
+msgstr "Uke"
 
 #: find.c:935
 msgid "Weeks"
-msgstr "Veckor"
+msgstr "Uker"
 
 #: find.c:937
 msgid "Year"
@@ -949,7 +939,7 @@ msgstr "År"
 
 #: find.c:946
 msgid "Ago"
-msgstr "Sedan"
+msgstr "Siden"
 
 #: find.c:948
 msgid "Hence"
@@ -957,71 +947,71 @@ msgstr "Om"
 
 #: find.c:963
 msgid "atime"
-msgstr "a-tid"
+msgstr "atid"
 
 #: find.c:965
 msgid "ctime"
-msgstr "c-tid"
+msgstr "ctid"
 
 #: find.c:967
 msgid "mtime"
-msgstr "m-tid"
+msgstr "mtid"
 
 #: find.c:969
 msgid "size"
-msgstr "storlek"
+msgstr "str"
 
 #: find.c:971
 msgid "inode"
-msgstr "i-nod"
+msgstr "inode"
 
 #: find.c:973
 msgid "nlinks"
-msgstr "antal genvägar"
+msgstr "nlenker"
 
 #: find.c:975
 msgid "uid"
-msgstr "användar-ID"
+msgstr "uid"
 
 #: find.c:977
 msgid "gid"
-msgstr "grupp-ID"
+msgstr "gid"
 
 #: find.c:979
 msgid "blocks"
-msgstr "block"
+msgstr "blokker"
 
 #: gtksavebox.c:231
 msgid "Has Discard"
-msgstr "Har radera"
+msgstr "Har Forkast"
 
 #: gtksavebox.c:232
 msgid "The dialog has a Discard button"
-msgstr "Dialogan har en raderaknapp"
+msgstr "Dialogboksen har en Forkast-knapp"
 
 #: gtksavebox.c:250
 msgid "Save As:"
-msgstr "Spara som:"
+msgstr "Lagre som:"
 
 #: gtksavebox.c:385
 msgid "Unnamed"
-msgstr "Namnlös"
+msgstr "Navnløs"
 
 #: gtksavebox.c:451
 msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
 msgstr ""
-"Det andra programmet vill använda Direct Save, men jag kan inte läsa "
-"XdndDirectSave0(typ text/plain)-delen.\n"
+"Det andre programmet vil gjerne bruke Direct Save, men jeg kan ikke lese "
+"XdndDirectSave0 (type text/plain)-delen.\n"
 
 #: gtksavebox.c:556
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
 msgstr ""
-"Dra ikonen till en katalogvy\n"
-"(eller skriv den fullständiga sökvägen)"
+"Dra ikonet til en mappe-oversikt\n"
+"(eller skriv hele stien)"
 
 #: gui_support.c:290
 msgid ""
@@ -1035,7 +1025,7 @@ msgstr ""
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr ""
-"Forsök att läse en XML-fil som en textfil. Filen '%s' är kanske trasig."
+"Forsøk på å lese en XML fil som en tekstfil. Filen '%s' er kanskje ødelagt."
 
 #: gui_support.c:376
 #, c-format
@@ -1046,11 +1036,11 @@ msgid ""
 "Options window and click on Save.\n"
 "Further errors will be ignored."
 msgstr ""
-"Fel i filen '%s' på rad %d: \n"
+"Feil i filen '%s' på linje %d: \n"
 "\"%s\"\n"
-"Detta kan bero på en uppgradering från en tidigare verson av ROX-Filer. "
-"Öppna inställiningar och klicka på Spara.\n"
-"Fler av detta fel kommer ignoreras."
+"Dette kan skyldes en oppgradering fra en tidligere versjon av ROX-Filer. "
+"Åpne Innstillinger-vinduet og trykk Lagre.\n"
+"Ytterligere feil vil bli oversett."
 
 #: i18n.c:38
 #, fuzzy
@@ -1058,8 +1048,8 @@ msgid ""
 "Note that you must save your choices and restart the filer for the new "
 "language setting to take full effect."
 msgstr ""
-"Du måste starta om programmet för att de nya språkinställningarna ska få "
-"effekt"
+"Merk at du må starte programmet på nytt før den nye språkinnstillingen trer "
+"i kraft."
 
 #: icon.c:77
 msgid "(click to set)"
@@ -1077,19 +1067,19 @@ msgstr "Om ROX-Filer"
 #: icon.c:135 menu.c:250
 #, fuzzy
 msgid "Show Help Files"
-msgstr "Visa hjälpfiler"
+msgstr "Vis hjelpefiler"
 
 #: icon.c:136 menu.c:251
 msgid "Manual"
-msgstr "Manual"
+msgstr ""
 
 #: icon.c:138 menu.c:229
 msgid "Options..."
-msgstr "Inställningar..."
+msgstr "Innstillinger..."
 
 #: icon.c:139 menu.c:237
 msgid "Home Directory"
-msgstr "Hemkatalogen"
+msgstr "Hjemme-mappen"
 
 #: icon.c:140 icon.c:887 menu.c:206 type.c:206
 msgid "File"
@@ -1097,59 +1087,59 @@ msgstr "Fil"
 
 #: icon.c:141 menu.c:213 menu.c:863
 msgid "Shift Open"
-msgstr "Shift-öppna"
+msgstr "Shift-åpne"
 
 #: icon.c:142 menu.c:212 menu.c:248 toolbar.c:133
 msgid "Help"
-msgstr "Hjälp"
+msgstr "Hjelp"
 
 #: icon.c:143 menu.c:219
 msgid "Info"
-msgstr "Information"
+msgstr "Info"
 
 #: icon.c:144 menu.c:217
 msgid "Set Run Action..."
-msgstr "Sätt körhändelse..."
+msgstr "Sett Kjør-Hendelse..."
 
 #: icon.c:145 menu.c:218
 msgid "Set Icon..."
-msgstr "Sätt ikon..."
+msgstr "Velg Ikon..."
 
 #: icon.c:146 icon.c:762
 msgid "Edit Item"
-msgstr "Redigera objektet"
+msgstr "Rediger Objekt"
 
 #: icon.c:147
 msgid "Show Location"
-msgstr "Visa plats"
+msgstr "Vis Sti"
 
 #: icon.c:148
 msgid "Remove Item(s)"
-msgstr "Ta bort objekt"
+msgstr "Fjern Objekt(er)"
 
 #: icon.c:150
 msgid "Backdrop..."
-msgstr "Bakgrund..."
+msgstr ""
 
 #: icon.c:275
 msgid "Nothing"
-msgstr "Inget"
+msgstr "Ingenting"
 
 #: icon.c:502
 msgid "The location must contain at least one character!"
-msgstr "Sökvägen måste innehålla minst ett tecken!"
+msgstr "Stien må inneholde minst ett tegn!"
 
 #: icon.c:574
 msgid "You must first select some items to remove"
-msgstr "Du måste först välja något/några objekt att ta bort"
+msgstr "Du må først velge noen objekter som skal fjernes"
 
 #: icon.c:588
 msgid "You must open the menu over an item"
-msgstr "Du måste öppna menyn över ett objekt"
+msgstr "Du må åpne menyen over et objekt"
 
 #: icon.c:616 menu.c:1175
 msgid "You can only set the run action for a regular file"
-msgstr "Du kan endast sätta körhändelsen för en vanlig fil"
+msgstr "Du kan bare sette kjør-hendelsen for en normal fil"
 
 #: icon.c:700
 msgid "Press the desired shortcut (eg, Control+F1)"
@@ -1161,135 +1151,131 @@ msgstr ""
 
 #: icon.c:765
 msgid "Clicking the icon opens:"
-msgstr "Klicka på ikonen öppnar:"
+msgstr "Ett klikk på ikonet åpner:"
 
 #: icon.c:778
 msgid "The text displayed under the icon is:"
-msgstr "Texten som visas under ikonen är:"
+msgstr "Teksten som blir vist under ikonet er:"
 
 #: icon.c:787
 #, fuzzy
 msgid "The keyboard shortcut is:"
-msgstr "Ställ in kortkommandon"
+msgstr "Innstill tastatursnarveier"
 
 #: infobox.c:90
 #, c-format
 msgid "Are you sure you want to open %d windows?"
-msgstr "Är du säker på att du vill öppna %d fönster?"
+msgstr "Er du sikker på at du vil åpne %d vinduer?"
 
 #: infobox.c:91
 #, fuzzy
 msgid "File Information"
-msgstr "Filinformation"
+msgstr "ROX-Filer innstillinger"
 
 #: infobox.c:92
 #, fuzzy
 msgid "Show Info"
-msgstr "Visa information"
+msgstr "Info"
 
 #: infobox.c:114 menu.c:766
 msgid "(bad utf-8)"
 msgstr ""
 
 #: infobox.c:223
-#, fuzzy
 msgid "Show _Help Files"
-msgstr "Visa _hjälpfiler"
+msgstr "Vis hjelpefiler"
 
 #: infobox.c:332
 msgid "Name:"
-msgstr "Namn:"
+msgstr "Navn:"
 
 #: infobox.c:336 tips:231
 msgid "Error:"
-msgstr "Fel:"
+msgstr "Feil:"
 
 #: infobox.c:343
-#, fuzzy
 msgid "Real directory:"
-msgstr "Katalog"
+msgstr "Virkelig mappe"
 
 #: infobox.c:347
 msgid "Owner, Group:"
-msgstr "Ägare, grupp:"
+msgstr "Eier, Gruppe:"
 
 #: infobox.c:352
 msgid "Size:"
-msgstr "Storlek:"
+msgstr "Størrelse:"
 
 #: infobox.c:356 support.c:271 support.c:348
 msgid "bytes"
-msgstr "byte"
+msgstr "bytes"
 
 #: infobox.c:359
 msgid "Change time:"
-msgstr "Ändrad:"
+msgstr "Endre tid:"
 
 #: infobox.c:361
 msgid "Modify time:"
-msgstr "Modifierad:"
+msgstr "Modifiser tid:"
 
 #: infobox.c:363
 msgid "Access time:"
-msgstr "Åtkomsttid:"
+msgstr "Sist endret:"
 
 #: infobox.c:365
 msgid "Permissions:"
-msgstr "Rättigheter:"
+msgstr "Tillatelser:"
 
 #: infobox.c:367
 msgid "Type:"
-msgstr "Typ:"
+msgstr "Type:"
 
 #: infobox.c:370
 msgid "Run action:"
-msgstr "Körhändelse:"
+msgstr "Kjør-handling:"
 
 #: infobox.c:419
 msgid "file(1) says..."
-msgstr "file(1) säger..."
+msgstr "fil(1) sier..."
 
 #: infobox.c:420
 msgid "<nothing yet>"
-msgstr "<inget ännu>"
+msgstr "<ingenting ennå>"
 
 #: infobox.c:492
 #, c-format
 msgid "file(1) says... %s"
-msgstr "file(1) säger... %s"
+msgstr "fil(1) sier... %s"
 
 #: infobox.c:536
 #, c-format
 msgid "Symbolic link to %s"
-msgstr "Symbolisk genväg till %s"
+msgstr "Symbolsk lenke til %s"
 
 #: infobox.c:542
 msgid "Symbolic link"
-msgstr "Symbolisk genväg"
+msgstr "Symbolsk lenke"
 
 #: infobox.c:546
 msgid "ROX application"
-msgstr "ROX-programmet"
+msgstr "ROX programmet"
 
 #: infobox.c:554
-#, fuzzy
 msgid "mounted"
-msgstr "monterad"
+msgstr "montert"
 
 #: infobox.c:554
-#, fuzzy
 msgid "unmounted"
-msgstr "avmonterad"
+msgstr "demontert"
 
 #: infobox.c:558
-#, fuzzy, c-format
+#, c-format
 msgid "Mount point for %s (%s)"
-msgstr "Monteringspunkt"
+msgstr "Monteringspunkt for %s (%s)"
 
 #: infobox.c:561
-#, fuzzy, c-format
+#, c-format
 msgid "Mount point (%s)"
-msgstr "Mounteringspunkt (%s) "
+msgstr "Monteringspunkt (%s)"
 
 #: main.c:93
 msgid ""
@@ -1301,19 +1287,19 @@ msgid ""
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
 "Copyright (C) 2002 Thomas Leonard.\n"
-"ROX-Filer kommer med ABSOLUT INGEN GARANTI,\n"
-"i den grad det är tillåtet enligt lag.\n"
-"Du får återdistribuera kopior av ROX-Filer\n"
-"under villkoren i GNU General Public License.\n"
-"För mer information om detta, se filen COPYING.\n"
+"ROX-Filer kommer med ABSOLUTT INGEN GARANTI,\n"
+"i den grad det er tillatt av loven.\n"
+"Du kan redistribuere kopier af ROX-Filer\n"
+"under reglene bestemt i GNU General Public License.\n"
+"For mer informasjon om dette, se filen som heter COPYING.\n"
 
 #: main.c:102
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
-msgstr "Prova 'ROX-Filer/AppRun --help' för mer information.\n"
+msgstr "Prøv 'ROX-Filer/AppRun --help' for mer informasjon.\n"
 
 #: main.c:105
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
-msgstr "Prova 'ROX-Filer/AppRun -h' för mer information.\n"
+msgstr "Prøv 'ROX-Filer/AppRun -h' for mer informasjon.\n"
 
 #: main.c:107
 msgid ""
@@ -1321,8 +1307,8 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
-"NOTERA: Ditt system stödjer inte långa kommandoradsparametrar - \n"
-"du måste använda de korta istället.\n"
+"BEMÆRK: Systemet ditt støtter ikke lange alternativer - \n"
+"du må bruke de korte i stedet.\n"
 
 #: main.c:111
 #, fuzzy
@@ -1354,32 +1340,32 @@ msgid ""
 "\n"
 "Report bugs to <tal197@users.sourceforge.net>.\n"
 msgstr ""
-"Användning: ROX-Filer/AppRun [VALMÖJLIGHETER]... [FIL]...\n"
-"Öppna alla kataloger eller filer, eller den nuvarande arbets-\n"
-"katalogen om inget annat är givet.\n"
+"Bruk: ROX-Filer/AppRun [ALTERNATIVER]... [FIL]...\n"
+"Åpne hver spesifisert mappe eller fil, eller den gjeldende\n"
+"mappa hvis ingenting annet er spesifisert.\n"
 "\n"
-"  -b, --bottom=PANEL\töppna PANEL som en underkantspanel\n"
-"  -c, --client-id=ID\tanvänd som sessionshanterare\n"
-"  -d, --dir=KATALOG\t\töppna KATALOG som katalog (inte program)\n"
-"  -D, --close=KATALOG\tstäng KATALOG och dess underkataloger\n"
-"  -h, --help\t\tvisa denna hjälp och avsluta\n"
-"  -l, --left=PANEL\töppna PANEL som en vänsterkantspanel\n"
-"  -m, --mime-type=FIL\tskriv ut MIME-typen för FIL och avsluta\n"
-"  -n, --new\t\tstarta en ny 'filer', även om en redan är igång\n"
-"  -o, --override\tförbigå fönsterhanterarens kontroll av paneler\n"
-"  -p, --pinboard=SKRIVBORD\tanvänd skrivbord SKRIVBORD som skrivbord\n"
-"  -r, --right=PANEL\töppna PANEL som en högerkantspanel\n"
-"  -R, --RPC\t\tkör metodanrop läst från stdin\n"
-"  -s, --show=FIL\töppna den katalog som innehåller FIL\n"
-"  -t, --top=PANEL\töppna PANEL som eb toppkantspanel\n"
-"  -u, --user\t\tvisa användarnamn i alla fönster \n"
-"  -v, --version\t\tvisa versionsinformationen och avsluta\n"
-"  -x, --examine=FIL\tFIL har ändrats - undersök den igen\n"
+"  -b, --bottom=PANEL\tåpne PANEL som et bunnpanel\n"
+"  -c, --client-id=ID\tbrukes til sesjonsbehandling\n"
+"  -d, --dir=MAPPE\t\tåpne MAPPE som mappe (ikke program)\n"
+"  -D, --close=MAPPE\tlukk MAPPE og dens undermapper\n"
+"  -h, --help\t\tvis denne hjelpen og avslutt\n"
+"  -l, --left=PANEL\tåpne PANEL som et venstrekantspanel\n"
+"  -m, --mime-type=FIL\tskriv MIME-typen til FIL og avslutt\n"
+"  -n, --new\t\tstart en ny 'filer', selv om en kjører allerede\n"
+"  -o, --override\toverse vindusbehandlerens kontroll over paneler\n"
+"  -p, --pinboard=TAVLE\tbruk tavla TAVLE som tavle\n"
+"  -r, --right=PANEL\tåpne PANEL som et høyrekantspanel\n"
+"  -R, --RPC\t\tkør metodekall, lest fra stdin\n"
+"  -s, --show=FIL\tåpne en mappe som viser FIL\n"
+"  -t, --top=PANEL\tåpne PANEL som et toppkantspanel\n"
+"  -u, --user\t\tvis brukerens navn i hvert vindu\n"
+"  -v, --version\t\tvis versjonsinformasjon og avslutt\n"
+"  -x, --examine=FIL\tFIL er endret - undersøk den igjen\n"
 "\n"
-"Den nyeste versionen finns på:\n"
+"Den nyeste versjonen finner du på:\n"
 "\thttp://rox.sourceforge.net\n"
 "\n"
-"Rapportera fel till <tal197@users.sourceforge.net>.\n"
+"Rapporter feil til <tal197@users.sourceforge.net>.\n"
 
 #: main.c:313
 msgid ""
@@ -1390,15 +1376,15 @@ msgstr ""
 #: main.c:402
 #, c-format
 msgid "Running as user '%s'"
-msgstr "Kör som användare '%s'"
+msgstr "Kjører som bruker '%s'"
 
 #: main.c:574
 msgid "features set at compile time"
-msgstr "funktioner satt vid kompilering"
+msgstr "funksjoner bestemt ved kompilering"
 
 #: main.c:575
 msgid "Large File Support"
-msgstr "Stöd för stora filer"
+msgstr "Støtte for store filer"
 
 #: main.c:583
 msgid "GNOME-VFS library"
@@ -1406,39 +1392,39 @@ msgstr "GNOME-VFS-bibliotek"
 
 #: main.c:587
 msgid "No (gnome-vfs-config not found)"
-msgstr "Nej (gnome-vfs-config hittades inte"
+msgstr "Nei (gnome-vfs-config ikke funnet)"
 
 #: menu.c:175 tips:45
 msgid "Display"
-msgstr "Visa"
+msgstr "Vis"
 
 #: menu.c:176 tips:64
 msgid "Huge Icons"
-msgstr "Jättestora ikoner"
+msgstr "Kjempeikoner"
 
 #: menu.c:177 tips:65 tips:207
 msgid "Large Icons"
-msgstr "Stora ikoner"
+msgstr "Store Ikoner"
 
 #: menu.c:178 tips:66 tips:206
 msgid "Small Icons"
-msgstr "Små ikoner"
+msgstr "Små Ikoner"
 
 #: menu.c:179
 msgid "Huge, With..."
-msgstr "Jättestora, med..."
+msgstr "Kjempe, med..."
 
 #: menu.c:180 menu.c:186 menu.c:192 tips:69
 msgid "Summary"
-msgstr "Översikt"
+msgstr "Oversikt"
 
 #: menu.c:181 menu.c:187 menu.c:193 tips:70
 msgid "Sizes"
-msgstr "Storlekar"
+msgstr "Størrelser"
 
 #: menu.c:183 menu.c:189 menu.c:195 tips:72 tips:76
 msgid "Type"
-msgstr "Typ"
+msgstr "Type"
 
 #: menu.c:184 menu.c:190 menu.c:196 tips:73
 msgid "Times"
@@ -1446,7 +1432,7 @@ msgstr "Tider"
 
 #: menu.c:185
 msgid "Large, With..."
-msgstr "Stora, med..."
+msgstr "Store, med..."
 
 #: menu.c:191
 msgid "Small, With..."
@@ -1454,76 +1440,75 @@ msgstr "Små, med..."
 
 #: menu.c:198
 msgid "Sort by Name"
-msgstr "Sortera efter mann"
+msgstr "Sortér etter Navn"
 
 #: menu.c:199
 msgid "Sort by Type"
-msgstr "Sortera efter typ"
+msgstr "Sortér etter Type"
 
 #: menu.c:200
 msgid "Sort by Date"
-msgstr "Sortera efter datum"
+msgstr "Sortér etter Dato"
 
 #: menu.c:201
 msgid "Sort by Size"
-msgstr "Sortera efter storlek"
+msgstr "Sortér etter Størrelse"
 
 #: menu.c:203
 msgid "Show Hidden"
-msgstr "Visa gömda"
+msgstr "Vis Skjulte"
 
 #: menu.c:204
 msgid "Show Thumbnails"
-msgstr "Visa förhandsgranskningar"
+msgstr "Vis Miniatyrer"
 
 #: menu.c:205
 msgid "Refresh"
-msgstr "Uppdatera"
+msgstr "Oppdater"
 
 #: menu.c:207
 msgid "Copy..."
-msgstr "Kopiera..."
+msgstr "Kopiér..."
 
 #: menu.c:208
 msgid "Rename..."
-msgstr "Byt namn..."
+msgstr "Omdøp..."
 
 #: menu.c:209
 msgid "Link..."
-msgstr "Sätt genväg..."
+msgstr "Lag lenke..."
 
 #: menu.c:214
 msgid "Open AVFS"
-msgstr "Öppna med virtuellt filsystem"
+msgstr "Åpne med AVFS"
 
 #: menu.c:215
 msgid "Send To..."
-msgstr "Sänd till..."
+msgstr "Send til..."
 
 #: menu.c:220
-#, fuzzy
 msgid "Count"
-msgstr "Räkna"
+msgstr "Tell"
 
 #: menu.c:224
 msgid "Select"
-msgstr "Välj"
+msgstr "Velg"
 
 #: menu.c:225
 msgid "Select All"
-msgstr "Välj alla"
+msgstr "Velg Alle"
 
 #: menu.c:226
 msgid "Clear Selection"
-msgstr "Välj ingen"
+msgstr "Velg Ingen"
 
 #: menu.c:227
 msgid "Invert Selection"
-msgstr "Invertera val"
+msgstr "Velg motsatt"
 
 #: menu.c:228
 msgid "Select If..."
-msgstr "Välj om..."
+msgstr "Velg hvis..."
 
 #: menu.c:230
 msgid "New"
@@ -1535,88 +1520,85 @@ msgstr "Tom fil"
 
 #: menu.c:233 tasklist.c:265
 msgid "Window"
-msgstr "Fönster"
+msgstr "Vindu"
 
 #: menu.c:234
 msgid "Parent, New Window"
-msgstr "Förälder, nytt fönster"
+msgstr "Overmappe, Nytt Vindu"
 
 #: menu.c:235
 msgid "Parent, Same Window"
-msgstr "Förälder, samma fönster"
+msgstr "Overmappe, Samme Vindu"
 
 #: menu.c:236
 msgid "New Window"
-msgstr "Nytt fönster"
+msgstr "Nytt Vindu"
 
 #: menu.c:238
-#, fuzzy
 msgid "Follow Symbolic Links"
-msgstr "Symbolsk genväg"
+msgstr "Følg symbolske lenker"
 
 #: menu.c:239
 msgid "Resize Window"
-msgstr "Ändra storlek på fönster"
+msgstr "Endre vindustørrelse"
 
 #: menu.c:242
 msgid "Close Window"
-msgstr "Stäng fönster"
+msgstr "Lukk Vindu"
 
 #: menu.c:244
 msgid "Enter Path..."
-msgstr "Skriv in sökväg..."
+msgstr "Skriv inn sti..."
 
 #: menu.c:245
 msgid "Shell Command..."
-msgstr "Shell-kommando..."
+msgstr "Shellkommando..."
 
 #: menu.c:246
 msgid "Xterm Here"
-msgstr "Terminalemulator i denna katalog"
+msgstr "Xterm her"
 
 #: menu.c:247
 msgid "Switch to xterm"
-msgstr "Byt till terminalemulator"
+msgstr "Bytt til xterm"
 
 #: menu.c:721
 msgid "You should Shift+Menu click over a file to send it somewhere"
-msgstr ""
-"Du måste klicka med shift-tangenten nertryckt på en fil för att skicka den "
-"någonstans"
+msgstr "Du burde Shift+Meny-klikke over en fil for å sende den et sted"
 
 #: menu.c:751
 msgid "Next Click"
-msgstr "Nästa klickning"
+msgstr "Neste klikk"
 
 #: menu.c:773
 #, c-format
 msgid "%d items"
-msgstr "%d objekt"
+msgstr "%d objekter"
 
 #: menu.c:850
 msgid "Unmount"
-msgstr "Avmontera"
+msgstr "Demonter"
 
 #: menu.c:852 tips:168
 msgid "Mount"
-msgstr "Montera"
+msgstr "Monter"
 
 #: menu.c:855
 msgid "Show Target"
-msgstr "Visa destination"
+msgstr "Vis mål"
 
 #: menu.c:857
 msgid "Look Inside"
-msgstr "Titta inuti"
+msgstr "Se innhold"
 
 #: menu.c:859
 msgid "Open As Text"
-msgstr "Öppna som text"
+msgstr "Åpne som tekst"
 
 #: menu.c:991
 #, fuzzy
 msgid "_Relative link"
-msgstr "Relativ genväg"
+msgstr "Relativ lenke"
 
 #: menu.c:997
 msgid ""
@@ -1625,51 +1607,48 @@ msgid ""
 "If off, the path from the root directory is stored - use this if the symlink "
 "may move but the target will stay put."
 msgstr ""
-"Om påslaget kommer den symbolske genvägen endast innehålla filnamnet på "
-"destinations-filen. Använd detta om genvägen och destinationen alltid kommer "
-"flyttas tillsammans.\n"
-"Om avslaget kommer den fulla sökvgen till destinationsfilen sparas - använd "
-"detta om genvägen kan bli flyttad, men destinationsfilen alltid kommer "
-"finnas på samma ställe."
+"Hvis denne er valgt, vil lenken inneholde veien fra lenken til målfilen.Bruk "
+"dette hvis lenken og målet alltid flyttes sammen.\n"
+"Hvis denne ikke er valgt, vil hele stien bli lagret. Bruk dette hvis lenken "
+"kan bli flyttet, men målfilen alltid vil være på samme sted."
 
 #: menu.c:1064
 msgid "New pathname is not absolute"
-msgstr "Nytt katalognamn är inte absolut"
+msgstr "Nytt mappenavn er ikke absolutt"
 
 #: menu.c:1129
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
-msgstr "Genväg från '%s' finns redan. Byt ut den mot en genväg till '%s'?"
+msgstr "Lenke fra '%s' finnes allerede. Erstatt den med en lenke til '%s'?"
 
 #: menu.c:1135
 msgid "_Replace"
-msgstr "_Byt ut"
+msgstr "Erstatt"
 
 #: menu.c:1266 menu.c:1306 menu.c:1366
-#, fuzzy
 msgid "Create"
-msgstr "Skapa"
+msgstr "Lag"
 
 #: menu.c:1267
 msgid "NewDir"
-msgstr "Ny katalog"
+msgstr "Ny Mappe"
 
 #: menu.c:1280 menu.c:1286
 #, c-format
 msgid "Error creating '%s': %s"
-msgstr "Fel när '%s' skapades: %s"
+msgstr "Feil under laging av: '%s': %s"
 
 #: menu.c:1307
 msgid "NewFile"
-msgstr "Ny fil"
+msgstr "Ny Fil"
 
 #: menu.c:1325
 #, c-format
 msgid "Error creating file: could not find the template for %s"
-msgstr "Fel när fil skapades: kunde inte finna mall för %s"
+msgstr "Feil under laging av fil: kunne ikke finne malen for %s"
 
 #: menu.c:1396
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
 "application. The applications listed are those in the following "
@@ -1684,41 +1663,44 @@ msgid ""
 "will only be shown for files of that type. `.group' is shown only when "
 "multiple files are selected."
 msgstr ""
-"'Sänd till'-menyn är ett snabbt sätt att skicka filer till ett program. "
-"Programmen i listan är i följande kataloger:\n"
+"'Send Til'-menuen er en hurtig måte å sende filer til et program. "
+"Programmerne på listen er i de følgende mapper:\n"
 "\n"
 "%s\n"
 "%s\n"
-"'Sänd till'-menyn kan öppnas genom att Shift-klicka på en fil."
+"'Send Til' menuen kan åbnes ved å Shift-klikke på en fil.\n"
+"\n"
+"Avansert bruk:\n"
+"Du kan også lage undermapper kalt `.text.html'. `.text' osv. som bare vil "
+"vises for filer av denne typen. `.group' vises bare når flere filer er valgt."
 
 #: menu.c:1407
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr ""
-"Jag visar dig nu din 'Send till'-katalog; du bör sätta symboliske genvägar "
-"(Ctrl+Shift-klicka) till varje program du vill ha i den."
+"Jeg viser deg nå din 'Send Til'-mappe. Du bør lage symbolske lenker (Ctrl"
+"+Shift) til alle programmer du vil ha i den."
 
 #: menu.c:1410
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
-msgstr ""
-"Din inställning av CHOICESPATH-variabeln omöjliggör ändringar - tyvärr."
+msgstr "Din CHOICESPATH-variabels innstilling umuliggjør endringer - desverre."
 
 #: menu.c:1487
 msgid "Customise"
-msgstr "Ställ in"
+msgstr "Tilpass"
 
 #: menu.c:1545
 msgid "This is already the canonical name for this directory."
-msgstr "Detta är redan ett entydigt naman för denna katalog"
+msgstr "Dette er allerede det kanoniske navnet til denne mappen."
 
 #: menu.c:1576
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
 msgstr ""
-"Du kan inte öppna en till översikt av denna katalog därför att 'Unika "
-"fönster' är påslagen i inställingar."
+"Du kan ikke åpne enda en oversikt over denne mappen fordi 'Unike Vinduer'-"
+"innstillingen er slått på i Innstillinger-vinduet."
 
 #: menu.c:1605
 #, c-format
@@ -1727,15 +1709,15 @@ msgstr "fork: %s"
 
 #: menu.c:1620
 msgid "New window, as user..."
-msgstr "Nytt fönster, som användare ... "
+msgstr "Nytt vindu som bruker ... "
 
 #: menu.c:1628
 msgid "Browse as which user?"
-msgstr "Bläddra som vilken användare?"
+msgstr "Let gjennom som hvilken bruker?"
 
 #: menu.c:1635
 msgid "User:"
-msgstr "Användare:"
+msgstr "Bruker:"
 
 #: menu.c:1649
 msgid "OK"
@@ -1743,75 +1725,75 @@ msgstr "OK"
 
 #: menu.c:1778
 msgid "Copy ... ?"
-msgstr "Kopiera ... ?"
+msgstr "Kopier ... ?"
 
 #: menu.c:1781
 msgid "Rename ... ?"
-msgstr "Byt namn ... ?"
+msgstr "Omdøp ... ?"
 
 #: menu.c:1784
 msgid "Symlink ... ?"
-msgstr "Sätt symbolisk genväg ... ?"
+msgstr "Lag symbolsk lenke ... ?"
 
 #: menu.c:1787
 msgid "Shift Open ... ?"
-msgstr "Shift-öppna ... ?"
+msgstr "Shift-åpne ... ?"
 
 #: menu.c:1790
 msgid "Help about ... ?"
-msgstr "Hjälp om ... ?"
+msgstr "Hjelp om ... ?"
 
 #: menu.c:1793
 msgid "Examine ... ?"
-msgstr "Undersök ... ?"
+msgstr "Undersøk ... ?"
 
 #: menu.c:1796
 msgid "Set run action for ... ?"
-msgstr "Sätt körhändelsen för ... ?"
+msgstr "Velg kjørhandling for ... ?"
 
 #: menu.c:1799
 msgid "Set icon for ... ?"
-msgstr "Sätt ikonen för ... ?"
+msgstr "Velg ikon for ... ?"
 
 #: menu.c:1802
 msgid "Send ... to ... ?"
-msgstr "Skicka ... till ... ?"
+msgstr "Send ... til ... ?"
 
 #: menu.c:1805
 msgid "DELETE ... ?"
-msgstr "RADERA ... ?"
+msgstr "SLETT ... ?"
 
 #: menu.c:1808
 msgid "Count the size of ... ?"
-msgstr "Räkna ut storleken av ... ?"
+msgstr "Regn ut størrelsen til ... ?"
 
 #: menu.c:1811
 msgid "Set permissions on ... ?"
-msgstr "Sätt rättigheterna på ... ?"
+msgstr "Velg tillatelser til ... ?"
 
 #: menu.c:1814
 msgid "Search inside ... ?"
-msgstr "Sök inuti ... ?"
+msgstr "Søk i ... ?"
 
 #: menu.c:1817
 msgid "Look inside ... ?"
-msgstr "Titta inuti ... ?"
+msgstr "Se i ... ?"
 
 #: menu.c:1862
 msgid "You cannot do this to more than one item at a time"
-msgstr "Du kan inte göra detta med mer än ett objekt åt gången"
+msgstr "Du kan ikke gjøre dette med mer enn et objekt om gangen"
 
 #: menu.c:1879 view_collection.c:999
 msgid "Item no longer exists!"
-msgstr "Objektet finns inte längre!"
+msgstr "Objektet eksisterer ikke lengre!"
 
 #: menu.c:1893
 msgid "Rename"
-msgstr "Ändra namn"
+msgstr "Omdøp"
 
 #: menu.c:1897
 msgid "Symlink"
-msgstr "Sätt symbolisk genväg"
+msgstr "Lag symbolsk lenke"
 
 #: menu.c:1931
 msgid ""
@@ -1822,11 +1804,11 @@ msgid ""
 "2) adding this line to ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 msgstr ""
-"Användardefinerade kortkommandon är avstängda som standard i Gtk2 och duhar "
-"inte slagit på dem. Du kan slå på dessa genom att:\n"
-"1) använda en XSettings-hanterare som tex. ROX-Session\n"
+"Brukerdefinerte snarveier er som standard skrudd av i Gtk2, og du har ikke "
+"skrudd de på. Du kan skru dette på ved å:\n"
+"1) bruke en XSettings-behandler, som ROX-Session\n"
 "eller\n"
-"2) lägga till denna rad i ~/.gtkrc-2.9:\n"
+"2) legge denne linjen til ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 
 #: menu.c:1941
@@ -1840,145 +1822,144 @@ msgid ""
 "The key will appear next to the menu item and you can just press that key "
 "without opening the menu in future."
 msgstr ""
-"För att ställa in ett kortkommando för en menyfunktion:\n"
+"For å stille inn en tastatur-snarvei for en menyfunksjon:\n"
 "\n"
-"- Öppna menyn,\n"
-"- Flytta muspekaran till den funktion du vill ändra,\n"
-"- Tryck på den tangent du vill binda till funktionen.\n"
+"- Åpne menyen,\n"
+"- Flytt musepekeren over den funksjonen du vil bruke,\n"
+"- Trykk på den tasten du vil sette av til funksjonen.\n"
 "\n"
-"Tangentan kommer visa sig vid sidan av funktionen och du kan nu trycka "
-"dennatangent för att använda funktionen."
+"Tasten vil vise seg ved siden av funksjonen, og du kan trykke denne tasten "
+"uten å åpne menyen fra nå av"
 
 #: menu.c:1957
 msgid "Set keyboard shortcuts"
-msgstr "Ställ in kortkommandon"
+msgstr "Innstill tastatursnarveier"
 
 #: minibuffer.c:126
 msgid "Goto:"
-msgstr "Gå till:"
+msgstr "Gå til:"
 
 #: minibuffer.c:127
 msgid "Shell:"
-msgstr "Shell:"
+msgstr "Skall:"
 
 #: minibuffer.c:128
 msgid "Select If:"
-msgstr "Välj om:"
+msgstr "Velg hvis:"
 
 #: minibuffer.c:244
 msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
 msgstr ""
-"Skriv namner på en fil och jag kommer visa den för dig. Tryck på Tab for att "
-"fylla den längsta matchningen. Escapetangenten stänger inmatningsraden."
+"Skriv navnet på en fil og jeg vil vise den til deg. Tryk på Tab for å fylle "
+"ut den lengste lignende filen. Escape-tasten lukker minibufferet."
 
 #: minibuffer.c:250
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
-"Skriv ett shell-kommando som skall köras. Klicka på en fil for att lägga "
-"till den till bufferten."
+"Skriv en skallkommando som skal utføres. Klikk på en fil for å føye den til "
+"bufferen."
 
 #: minibuffer.c:820
 msgid "Invalid Find condition"
-msgstr "Ogiltigt sökvillkor"
+msgstr "Ugyldige søkeparametere"
 
 #: options.c:271
-#, fuzzy
 msgid "ROX-Filer has converted your Options file to the new XML format"
-msgstr "Din gamla panelfil har blivit konverterad till det nya XML-formatet."
+msgstr ""
+"ROX-Filer har kovertert din gamle Alternativ-fil til det nye XML-formatet."
 
 #: options.c:483 options.c:1229
-#, fuzzy
 msgid "(use default)"
-msgstr "Samma som standardstorleken"
+msgstr "(bruk standard)"
 
 #: options.c:754
 #, fuzzy, c-format
 msgid "Internal error: %s unreadable"
-msgstr "Internt fel - dålig info-typ"
+msgstr "Intern feil - inkorrekt infotype"
 
 #: options.c:862
-#, fuzzy
 msgid "Options"
-msgstr "Inställningar..."
+msgstr "Innstillinger..."
 
 #: options.c:911
-#, fuzzy
 msgid "_Revert"
-msgstr "Ändra tillbaka"
+msgstr " Angre"
 
 #: options.c:917
 msgid "Restore all choices to how they were when the Options box was opened."
 msgstr ""
-"Återställ alla inställningar som de var innan inställningsfönstret öppnades"
+"Tilbakestill alle endringer til det de var når Innstillinger ble åpnet."
 
 #: options.c:932
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Choices will be saved as:\n"
 "%s"
-msgstr "Inställingar kommer sparas som %s"
+msgstr ""
+"Dine valg vil lagres som\n"
+"%s"
 
 #: options.c:940
-#, fuzzy
 msgid "(saving disabled by CHOICESPATH)"
-msgstr "Sparande av inställingar är avslaget i CHOICESPATH-variablen"
+msgstr "(lagring skrudd av pga. CHOICESPATH)"
 
 #: options.c:1135 usericons.c:444
 #, c-format
 msgid "Error saving %s: %s"
-msgstr "Fel vid sparande av %s: %s"
+msgstr "Feil under lagring av %s: %s"
 
 #: options.c:1781
 msgid "Missing '='"
-msgstr "Saknas '='"
+msgstr "Mangler '='"
 
 #: panel.c:327
 msgid "Your old panel file has been converted to the new XML format."
-msgstr "Din gamla panelfil har blivit konverterad till det nya XML-formatet."
+msgstr "Din gamle panel-fil ble konvertert til det nye XML-formatet."
 
 #: panel.c:436
 msgid "Close panel?"
-msgstr "Stäng panelen?"
+msgstr "Lukk panel?"
 
 #: panel.c:437
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
 msgstr ""
-"Du har försökt att stänga en panel via fönsterhanteraren - Jag tror att "
-"detta är ett misstag... vilk du verkligen stänga den?"
+"Du prøver å lukke et panel via vindushåndtereren. Jeg oppfatter vanligvis "
+"dette som et uhell... vil du virkelig lukke?"
 
 #: panel.c:440
 msgid "Remove"
-msgstr "Ta bort"
+msgstr "Fjern"
 
 #: panel.c:515
 msgid "Missing < or > in panel config file"
-msgstr "Saknas < eller > i panelinställingsfilen"
+msgstr "Mangler < eller > i panelkonfigurasjonsfilen"
 
 #: panel.c:1106
 #, c-format
 msgid "Error saving panel %s: %s"
-msgstr "Fel vid sparande av panel %s: %s"
+msgstr "Feil under lagring av panel %s: %s"
 
 #: panel.c:1363
 msgid "Applet quit without ever creating a widget!"
-msgstr "Applet avslutade utan att skapa en widget!"
+msgstr "Appleten avsluttet uten å lage noen widget!"
 
 #: panel.c:1448
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error running applet:\n"
 "%s"
-msgstr "Fel vid körning av '%s:"
+msgstr ""
+"Fejl under kjøring av applet:\n"
+"%s"
 
 #: pinboard.c:320
 msgid "Your old pinboard file has been converted to the new XML format."
-msgstr ""
-"Din gamla skrivbordsfil har blivit konverterad till det nya XML-formatet."
+msgstr "Din gamle tavlefil ble konvertert til det nye XML-formatet."
 
 #: pinboard.c:523
 msgid ""
@@ -1986,9 +1967,9 @@ msgid ""
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
 msgstr ""
-"Bakgrundshanteraren måste vara en applikationskatalog. Dra en "
-"applikationskatalog till dialogrutan Sätt bakgrund, eller (för "
-"programmerare) skicka den till metodenSetBackdropApp i SOAP"
+"Bakgrunnsbehandleren må være en programmappe. Dra en programmappe til Velg "
+"Backdrop-dialogboksen, eller (for programmerere) send den til SOAPs "
+"SetBackdropApp-metode."
 
 #: pinboard.c:542
 msgid ""
@@ -1998,77 +1979,75 @@ msgid ""
 "Programmers: the application's AppInfo.xml must contain the CanSetBackdrop "
 "element, as described in ROX-Filer's manual."
 msgstr ""
-"Du kan endast sätta bakgrunden till en bild eller ett program som känner "
-"tillhur det använder ROX-Filers bakgrund\n"
+"Du kan bare sette bakgrunnsbildet til et bilde eller et program som kan "
+"behandle ROX-Filers bakgrunnsbilde.\n"
 "\n"
-"Programmerare: applikationens AppInfo.xml måste innehålla elementet "
-"CanSetBackdrop som beskrivs i ROX-Filers manual"
+"Programmerere: Applikasjonens AppInfo.xml må inneholde CanSetBackdrop-"
+"elementet, som beskrevet i ROX-Filers manual."
 
 #: pinboard.c:559
-#, fuzzy
 msgid "Set backdrop"
-msgstr "Sätt bakgrund"
+msgstr "Velg bakgrunn"
 
 #: pinboard.c:568
 msgid "Display backdrop image:"
-msgstr "Visa bakrundsbild"
+msgstr "Vis bakgrunnsbilde:"
 
 #: pinboard.c:577
-#, fuzzy
 msgid "Centred"
-msgstr "Centrerad"
+msgstr "Midtstilt"
 
 #: pinboard.c:583
-#, fuzzy
 msgid "Scaled"
-msgstr "Skalad"
+msgstr "Strukket"
 
 #: pinboard.c:589
 #, fuzzy
 msgid "Tiled"
-msgstr "Upprepad"
+msgstr "Side ved side"
 
 #: pinboard.c:606
-#, fuzzy
 msgid "Drop an image here"
-msgstr "Släpp en bild här"
+msgstr "Dra et bilde hit"
 
 #: pinboard.c:654
-#, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
 "will be used for the desktop background. You can also drag certain "
 "applications onto this box."
 msgstr ""
-"Du ska dra en bildfil till boxen - denna bild kommer användas "
-"somskrivbordsbakgrund. Du kan också dra vissa program till denna box."
+"Du burde trekke en enkelt (lokal) bildefil til dropp-boksen - dette bildet "
+"vil brukes som skrivebordsbakgrunn. Du kan også dra bestemte programmer til "
+"denne boksen."
 
 #: pinboard.c:664
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
-msgstr "Kan inte ta bort %s: %s"
+msgstr ""
+"Ingen tilgang til %s:\n"
+"%s"
 
 #: pinboard.c:695
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
-"Endast filer (och vissa program) kan användas för att sätta bakgrundsbilden"
+"Bare filer (og bestemte programmer) kan brukes til å sette bakgrunnsbildet."
 
 #: pinboard.c:1234
 msgid "Missing '>' in icon label"
-msgstr "Saknas '>' i ikontiteln"
+msgstr "Mangler '>' i ikontittelen"
 
 #: pinboard.c:1243
 msgid "Missing ',' after icon label"
-msgstr "Saknas ',' efter ikontiteln"
+msgstr "Mangler ',' etter ikontittelen"
 
 #: pinboard.c:1325
 #, c-format
 msgid "Error saving pinboard %s: %s"
-msgstr "Fel vid sparande av skrivbord %s: %s"
+msgstr "Feil under lagring av tavlen %s: %s"
 
 #: pinboard.c:1895
 #, c-format
@@ -2077,56 +2056,55 @@ msgid ""
 "%s\n"
 "Backdrop removed."
 msgstr ""
-"Fel vid inladdning av bakgrundsbild:\n"
+"Feil under lasting av bakgrunnsbildet:\n"
 "%s\n"
-"Bakgrunden borttagen"
+"Bakgrunnsbildet fjernet."
 
 #: pinboard.c:2155
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
-"Ingen skrivbord användes... standardskrivbordet har valts. Kör som'rox -"
-"p=Default' för att använda det i framtiden"
+"Ingen tavle var i bruk... 'Standard'-tavla ble valgt. Bruk 'rox -p=Default' "
+"for å skru den på i framtida."
 
 #: remote.c:967
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr "Försökte anropa okänd SOAP-metod '%s'"
+msgstr "Forsøk på å starte ukjent SOAP-metode '%s'"
 
 #: rox_gettext.c:90
 #, c-format
 msgid "Invalid .gmo translation file (too short): %s"
-msgstr "Ogiltig .gmo-översättningsfil (för kort): %s"
+msgstr "Ugyldig .gmo oversettelses-fil (for kort): %s"
 
 #: rox_gettext.c:103
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-msgstr "Ogiltig .gmo-översättningsfil ('GNU magic number' hittades inte): %s"
+msgstr "Ugyldig .gmo oversettelses-fil (GNU magic number ikke funnet): %s"
 
 #: run.c:97 run.c:138
 #, c-format
 msgid "Program %s not found - deleted?"
-msgstr "Programmet %s hittades inte - raderat?"
+msgstr "Programmet %s ikke funnet - slettet?"
 
 #: run.c:244
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
-msgstr "Filen existerer inte, eller jag har inte tillgång till den: %s"
+msgstr "Filen eksisterer ikke, eller jeg har ikke tilgang til den: %s"
 
 #: run.c:249
 #, c-format
 msgid "I don't know how to open '%s'"
-msgstr "Jag vet inte hur man öppnar '%s'"
+msgstr "Jeg vet ikke hvordan man åpner '%s'"
 
 #: run.c:276
 msgid ""
 "Executable file:\n"
 "This is a file with an eXecute bit set - it can be run as a program."
 msgstr ""
-"Körbar fil:\n"
-"Detta är en fil som är satt till att vara körbar - den kan köras som ett "
-"program."
+"Kjørbar fil:\n"
+"Dette er en fil som er satt til 'kjørbar' - den kan kjøres som et program."
 
 #: run.c:281
 msgid ""
@@ -2134,8 +2112,7 @@ msgid ""
 "This is a data file. Try using the Info menu item to find out more..."
 msgstr ""
 "Fil:\n"
-"Detta är en datafil. Försök att använda 'Information' i menyn för att få "
-"reda på mer... "
+"Dette er en datafil. Prøv å bruke 'Info' i menyen for å finne ut mere..."
 
 #: run.c:288
 msgid ""
@@ -2144,8 +2121,8 @@ msgid ""
 "Everything on the mounted filesystem then appears to be inside the directory."
 msgstr ""
 "Monteringspunkt:\n"
-"En monteringspunk är en katalog som ett annat filsystem kan monteras på.Allt "
-"i det monterade filsystemet kommer att finnas inuti katalogen."
+"Et monteringspunkt er en mappe hvor et annet filsystem kan settes på. Alt på "
+"det monterte filsystemet finnes deretter inne i mappen."
 
 #: run.c:299
 msgid ""
@@ -2153,9 +2130,9 @@ msgid ""
 "Device files allow you to read from or write to a device driver as though it "
 "was an ordinary file."
 msgstr ""
-"Device-fil:\n"
-"Device-filer gör att du kan skriva till eller läsa från en drivrutin precis "
-"som om det vore en vanlig fil."
+"Device-fil (enhetsfil):\n"
+"Devicefiler gjør at du kan skrive til eller fra en enhetsdriver akkurat som "
+"om det var det en normal fil."
 
 #: run.c:306
 msgid ""
@@ -2163,9 +2140,9 @@ msgid ""
 "Pipes allow different programs to communicate. One program writes data to "
 "the pipe while another one reads it out again."
 msgstr ""
-"Namngivet rör:\n"
-"Rör gör att olika program kan kommunicera. Ett program skriver data till "
-"röret och ett annat program läser datat från röret."
+"Navngitt pipe (rør):\n"
+"Pipes (rør) gjør at forsjkellige programmer kan kommunisere. Et program "
+"skriver data til pipen mens et annet program leser fra den."
 
 #: run.c:313
 msgid ""
@@ -2173,15 +2150,15 @@ msgid ""
 "Sockets allow processes to communicate."
 msgstr ""
 "Socket:\n"
-"Sockets gör att processer kan kommunicera."
+"Sockets sørger for at prosesser kan kommunisere."
 
 #: run.c:318
 msgid ""
 "Door:\n"
 "Doors are a little-used Solaris method for processes to communicate."
 msgstr ""
-"Dörr:\n"
-"Dörrar är en sällan använd metod i Solaris för processer att kommunicera."
+"Dør:\n"
+"Dører er en lite brukt Solaris-metode for å interprosesskommunikasjon."
 
 #: run.c:324
 msgid ""
@@ -2189,26 +2166,25 @@ msgid ""
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
 "anymore or you don't have search permission on the directory it's in?"
 msgstr ""
-"Ukendt type:\n"
-"Jag kunde inte komma på vilken typ av fil det här är. Den kanske inte "
-"existerar längre eller så har du inte rättighet att läsa från katalogen?"
+"Ukjent type:\n"
+"Jeg kunne ikke finne ut hvilken type fil dette er. Kanskje finnes den ikke "
+"lenger eller kanskje du ikke har søketillatelse i mappen den ligger i?"
 
 #: run.c:410
 #, c-format
 msgid "Could not send data to program: %s"
-msgstr "Kunde inte skicka data till programmet %s"
+msgstr "Kunne ikke sende data til programmet %s"
 
 #: run.c:440
 #, c-format
 msgid "Could not read link: %s"
-msgstr "Kunde inte läsa genvägen: %s"
+msgstr "Kunne ikke lese lenken: %s"
 
 #: run.c:468
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr ""
-"Bruten symbolisk genväg (eller så har du inte rättighet att läsa "
-"destinationen): %s"
+"Brutt symbolsk lenge (eller du har ikke tillatelse til å følge den): %s"
 
 #: run.c:505
 #, c-format
@@ -2217,9 +2193,9 @@ msgid ""
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
 "the file to an application"
 msgstr ""
-"Det är inte satt någon körhändelse för filer av typ (%s/%s) - du kan sätta "
-"denna genom att välja 'Sätt körhändelse' från filmenyn, eller så kan du "
-"också dra filen till ett program"
+"Ingen kjør-handling er satt for filer av denne typen(%s/%s). Du kan sette en "
+"kjør-handling ved å velge `Velg Kjør-handling' fra Fil-menyen, eller du kan "
+"dra filen rett til et prorgam"
 
 #: run.c:529
 msgid ""
@@ -2229,10 +2205,9 @@ msgid ""
 "help here, but this one doesn't."
 msgstr ""
 "Program:\n"
-"Detta är en applikationskatalog - du kan öppna den som ett program, eller "
-"öppna den \n"
-"som en katalog (håll ner Shift medan du öppnar den). \n"
-"De flesta program har sin egen hjälp där, men detta program har inte det."
+"Dette er en programmappe - du kan kjøre den som et program, eller åpne den "
+"(hold Shift nede mens du åpner den). De fleste programmer har sin egen hjelp "
+"her, men denne har det ikke."
 
 #: run.c:535
 msgid ""
@@ -2240,8 +2215,9 @@ msgid ""
 "This is a directory. It contains an index to other items - open it to see "
 "the list."
 msgstr ""
-"Katalog:\n"
-"Detta är en katalog. Den inehåller andra objekt - öppna den för att se dessa."
+"Mappe:\n"
+"Dette er en mappe. Den inneholder en oversikt over andre objekter - åpne den "
+"for å se listen."
 
 #: support.c:269 support.c:350
 msgid "byte"
@@ -2249,43 +2225,43 @@ msgstr "byte"
 
 #: toolbar.c:105
 msgid "Close"
-msgstr "Stäng"
+msgstr "Lukk"
 
 #: toolbar.c:105
 msgid "Close filer window"
-msgstr "Stäng 'filer'-fönstret"
+msgstr "Lukk 'Filer'-vinduet"
 
 #: toolbar.c:109
 msgid "Up"
-msgstr "Upp"
+msgstr "Opp"
 
 #: toolbar.c:109
 msgid "Change to parent directory"
-msgstr "Gå till föräldekatalogen"
+msgstr "Gå til overmappen"
 
 #: toolbar.c:113
 msgid "Home"
-msgstr "Hem"
+msgstr "Hjem"
 
 #: toolbar.c:113
 msgid "Change to home directory"
-msgstr "Gå till hemkatalogen"
+msgstr "Gå til hjemme-mappen"
 
 #: toolbar.c:117
 msgid "Scan"
-msgstr "Skanna"
+msgstr "Oppdater"
 
 #: toolbar.c:117
 msgid "Rescan directory contents"
-msgstr "Skanna om katalogens innehåll"
+msgstr "Oppdater mappens innhold"
 
 #: toolbar.c:121 tips:78
 msgid "Size"
-msgstr "Storlek"
+msgstr "Størrelse"
 
 #: toolbar.c:121
 msgid "Change icon size"
-msgstr "Ändra ikonstorleken"
+msgstr "Endre ikonstørrelsen"
 
 #: toolbar.c:125
 msgid "Details"
@@ -2293,28 +2269,28 @@ msgstr "Detaljer"
 
 #: toolbar.c:125
 msgid "Show extra details"
-msgstr "Visa extra detaljer"
+msgstr "Vis ekstra detaljer"
 
 #: toolbar.c:129
 msgid "Hidden"
-msgstr "Göm"
+msgstr "Skjult"
 
 #: toolbar.c:129
 msgid "Show/hide hidden files"
-msgstr "Visa/göm osynliga filer"
+msgstr "Vis/Skjul skjulte filer"
 
 #: toolbar.c:133
 msgid "Show ROX-Filer help"
-msgstr "Visa ROX-Filers hjälp"
+msgstr "Vis ROX-Filers hjelp"
 
 #: toolbar.c:232
 #, c-format
 msgid " (%u hidden)"
-msgstr " (%u osynliga)"
+msgstr " (%u skjulte)"
 
 #: toolbar.c:240 tips:32
 msgid "items"
-msgstr "objekt"
+msgstr "objekter"
 
 #: toolbar.c:240
 msgid "item"
@@ -2323,16 +2299,16 @@ msgstr "objekt"
 #: toolbar.c:243
 #, c-format
 msgid "No items%s"
-msgstr "Inga objekt%s"
+msgstr "Ingen objekter%s"
 
 #: toolbar.c:259
 #, c-format
 msgid "%u selected (%s)"
-msgstr "%u valda (%s)"
+msgstr "%u valgt (%s)"
 
 #: type.c:197
 msgid "Sym link"
-msgstr "Symbolisk genväg"
+msgstr "Symbolsk lenke"
 
 #: type.c:199
 msgid "Mount point"
@@ -2340,35 +2316,35 @@ msgstr "Monteringspunkt"
 
 #: type.c:201
 msgid "App dir"
-msgstr "Programkatalog"
+msgstr "Programmappe"
 
 #: type.c:208
 msgid "Dir"
-msgstr "Katalog"
+msgstr "Mappe"
 
 #: type.c:210
 msgid "Char dev"
-msgstr ""
+msgstr "Char-enhet"
 
 #: type.c:212
 msgid "Block dev"
-msgstr ""
+msgstr "Block-enhet"
 
 #: type.c:214
 msgid "Pipe"
-msgstr "Rör"
+msgstr "Pipe (rør)"
 
 #: type.c:216
 msgid "Socket"
-msgstr ""
+msgstr "Socket"
 
 #: type.c:218
 msgid "Door"
-msgstr "Dörr"
+msgstr "Dør"
 
 #: type.c:221
 msgid "Unknown"
-msgstr "Okänd"
+msgstr "Ukjent"
 
 #: type.c:364
 #, c-format
@@ -2384,17 +2360,21 @@ msgid ""
 "Otherwise, you should check, or even just delete, all the existing run "
 "actions."
 msgstr ""
-"Programmet '%s' är skrivbart för alla! Vägrar köra. Var snäll och "
-"ändrarättigheterna nu (detta problem kan ha orsakats av ett fel i en "
-"tidigare version av filhanteraren).\n"
+"Kjørbar fil '%s' er offentlig skrivbar! Nekter å kjøre. Vennligst endre "
+"tillatelsene nå (dette problemet kan komme av en feil i tidligere versjoner "
+"av ROX-Filer).\n"
 "\n"
-"Om du litar på alla som kan skriva till dessa filer behöver du inte oroa "
-"dig. I annat fall, kontollera, eller tom. ta bort, alla nuvarande "
-"körhändelser. "
+"Å ha (ikke-lenke) kjørehandlinger som er offentlig skrivbare betyr at andre "
+"som bruker din datamaskin kan erstatte dine kjørehandlinger med farlige "
+"erstatninger.\n"
+"\n"
+"Hvis du stoler på alle som har tilgang til disse filene trenger du ikke "
+"bekymre deg. Hvis ikke bør du sjekke, eller slette, alle eksisterende "
+"kjørehandlinger."
 
 #: type.c:377
 msgid "go-w (Fix security problem)"
-msgstr "go-w (Rättar till säkerhetsluckan)"
+msgstr "go-w (Fiks sikkerhetsproblem)"
 
 #: type.c:479
 #, fuzzy
@@ -2403,7 +2383,7 @@ msgid ""
 "\n"
 "gimp \"$@\""
 msgstr ""
-"Skriv ett shell-kommando som skall öppna \"$1\" i ett program. Tex..:\n"
+"Skriv en skallkommando som åpner \"$1\" inn i et program. F.eks.:\n"
 "\n"
 "gimp \"$1\""
 
@@ -2412,62 +2392,62 @@ msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
 msgstr ""
-"Du kan dra ett (lokalt) pogram till boxen - detta program kommer användas "
-"för att öppna filer av denna typ i framtiden"
+"Du kan dra et enkelt (lokalt) pogram til dropp-boksen - programmet vil "
+"deretter bli brukt til å laste filer av denne typen"
 
 #: type.c:609
 msgid "This is not a program! Give me an application instead!"
-msgstr "Detta är inte ett program! Ge mig ett program istället!"
+msgstr "Dette er ikke et program! Gi meg et program i stedet!"
 
 #: type.c:667
 msgid "Execute file"
-msgstr "Kör fil"
+msgstr "Kjørbar fil"
 
 #: type.c:672
 msgid "No run action defined"
-msgstr "Ingen körhändelse är definierad"
+msgstr "Ingen kjør-handling er valgt"
 
 #: type.c:698
 #, c-format
 msgid "Error in handler %s: %s"
-msgstr "Fel i behandlaren %s: %s"
+msgstr "Feil i behandler %s: %s"
 
 #: type.c:713
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
-msgstr "Ogiltigt program %s (trasig AppRun)"
+msgstr "Ugyldig program %s (feil i AppRun)"
 
 #: type.c:724
 #, c-format
 msgid "Non-executable %s"
-msgstr "Icke-körbar fil %s"
+msgstr "Ikke-kjørbar fil %s"
 
 #: type.c:760
 msgid "Set run action"
-msgstr "Sätt körhändelse"
+msgstr "Velg kjør-handling"
 
 #: type.c:762
 #, c-format
 msgid "Set default for all `%s/<anything>'"
-msgstr "Sätt som standard för alla `%s/<vad som helst>'"
+msgstr "Sett som standard for alle `%s/<hva som helst>'"
 
 #: type.c:768 usericons.c:284
 #, c-format
 msgid "Only for the type `%s/%s'"
-msgstr "Endast för typen `%s/%s'"
+msgstr "Bare for typen `%s/%s'"
 
 #: type.c:796
 #, c-format
 msgid "Currently %s"
-msgstr "Just nu %s"
+msgstr "Nå: %s"
 
 #: type.c:810
 msgid ""
 "Drop a suitable\n"
 "application here"
 msgstr ""
-"Släpp ett passande\n"
-"program här"
+"Dra et passende\n"
+"program hit"
 
 #: type.c:817 usericons.c:363
 msgid "OR"
@@ -2475,24 +2455,24 @@ msgstr "ELLER"
 
 #: type.c:824
 msgid "Enter a shell command:"
-msgstr "Skriv in ett shell-kommando:"
+msgstr "Skriv en skallkommando:"
 
 #: type.c:894
 msgid "Choices saving is disabled by CHOICESPATH variable"
-msgstr "Sparande av Choices är avslaget i CHOICESPATH-variabeln"
+msgstr "Lagring av Choices er slått av vha. CHOICESPATH-variablen"
 
 #: type.c:907
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr ""
-"Det finns redan en körhändelse och den är ett ganska stort program - är du "
-"säker på att du vill radera den?"
+"Det finnes allerede en kjør-handling og den er et ganske stort program - "
+"sikker på at du vil slette den?"
 
 #: type.c:919
 #, c-format
 msgid "Can't remove %s: %s"
-msgstr "Kan inte ta bort %s: %s"
+msgstr "Kan ikke fjerne %s: %s"
 
 #: type.c:1118
 #, fuzzy, c-format
@@ -2504,7 +2484,7 @@ msgstr "Fejl under læsning af fil: %s: %s"
 #: type.c:1143
 #, c-format
 msgid "File '%s' corrupted!"
-msgstr "Filen '%s' är trasig!"
+msgstr "Filen '%s' inneholder en feil"
 
 #: type.c:1234
 msgid ""
@@ -2513,14 +2493,14 @@ msgid ""
 "should download and install the 'shared-mime-info-0.8' package from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
-"Standard-MIME-databasen (version 0.8 eller senare) kunde inte hitas."
-"Filhanteraren kommer troligtvis inte visa rätt typer för olika filer. Du "
-"borde laddaner och installera 'shared-mime-info-0.8' från http://www."
-"freedesktop.org/standards/shared-mime-info.html"
+"Standard MIME-type-databasen (versjon 0.8 eller senere) ble ikke funnet. ROX-"
+"Filer vil sannsynligvis ikke vise korrekte typer for forskjellige filer. Du "
+"burde laste ned og innstallere 'shared-mime-info'-pakken fra:\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html"
 
 #: usericons.c:191
 msgid "The pathname you gave does not exist. The icon has not been changed."
-msgstr "Sökvägen du angav finns. Ikonen har inte ändrats."
+msgstr "Sti-navnet du ga finnes ikke. Ikonet ble ikke endret."
 
 #: usericons.c:201 usericons.c:717
 msgid ""
@@ -2528,36 +2508,35 @@ msgid ""
 "maybe the permissions are wrong?\n"
 "The icon has not been changed."
 msgstr ""
-"Kunde inte läsa bildfilen -- den kanske inte är i ett format jag förstårr,  "
-"eller så kanske rättigheterna är fel?\n"
-"Ikonen har inte ändrats."
+"Kunne ikke lese bilde-filen -- kanskje den er i et format jeg ikke forstår,  "
+"eller at tillatelsene ikke er i orden?\n"
+"Ikonet ble i alle fall ikke endret."
 
 #: usericons.c:272
 msgid "Set icon"
-msgstr "Sätt ikon"
+msgstr "Velg ikon"
 
 #: usericons.c:276
 #, c-format
 msgid "Set icon for all `%s/<anything>'"
-msgstr "Sätt som ikon for alla `%s/<vad som helst>'"
+msgstr "Sett som ikon for alle `%s/<hva som helst>'"
 
 #: usericons.c:293
 #, c-format
 msgid "Only for the file `%s'"
-msgstr "Endast för filen `%s'"
+msgstr "Kun for filen `%s'"
 
 #: usericons.c:299
 msgid ""
 "Add the file and image filenames to your personal list. The setting will be "
 "lost if the image or the file is moved."
 msgstr ""
-"Lägg till filen och namn på bildfiler till din personliga lista. "
-"Inställningarnakommer gå förlorade om filen eller bilderna flyttas."
+"Legg til filens og bildets filnavn til din personlige liste. Disse "
+"innstillingene vil gå tapt hvis bildet eller filen flyttes"
 
 #: usericons.c:309
-#, fuzzy
 msgid "Copy image into directory"
-msgstr "Gå till hemkatalogen"
+msgstr "Kopier bilde til mappen"
 
 #: usericons.c:313
 msgid ""
@@ -2565,123 +2544,122 @@ msgid ""
 "users will then see the icon, and you can move the directory around safely. "
 "This is usually the best option if you can write to the directory."
 msgstr ""
-"Kopiera bilden in i katalogen som en osynlig fil '.DirIcon'. Alla "
-"användarekan då se ikonen och du kan flytta katalogen utan problem.Detta är "
-"vanligtvis den bästa lösningen om du kan skriva till katalogen."
+"Kopier bildet til mappen, som en skjult fil kalt '.DirIcon'. Alle brukere "
+"kan da se ikonet, og du kan trygt flytte mappen rundt. Dette er vanligvis "
+"det beste valget hvis du har skriverettigheter til mappen."
 
 #: usericons.c:345
 msgid "Drop an icon file here"
-msgstr "Släpp en ikonfil här"
+msgstr "Dra en ikon-fil hit"
 
 #: usericons.c:355
 msgid "Menu of directories previously used for icons"
-msgstr "Meny med kataloger som tidigare använts för ikoner"
+msgstr "Meny av mapper tidligere brukt til ikoner"
 
 #: usericons.c:370
 msgid "Enter the path of an icon file:"
-msgstr "Skriv in namnet på en ikonfil:"
+msgstr "Skriv stien til en ikon-fil:"
 
 #: usericons.c:387
 #, fuzzy
 msgid "_Remove"
-msgstr "Ta bort"
+msgstr "Fjern"
 
 #: usericons.c:579
 msgid ""
 "You should drop a single local icon file onto the drop box - that icon will "
 "be used for this file from now on."
 msgstr ""
-"Du skall släppa en lokal ikonfil på boxen - denna ikon kommer att användas "
-"till denna fil från och med nu"
+"Du kan dra en enkelt lokal ikon-fil til dropp-boksen - det ikonet vil så bli "
+"brukt til denne filen fra nå av"
 
 #: usericons.c:607
 msgid ""
 "Enter the full path of a file that contains a valid image to be used as the "
 "icon for this file or directory."
 msgstr ""
-"Skriv in den fullständiga sökvägen till en fil som innehåller en giltig "
-"bildfil som skall användas som ikon för denna katalog."
+"Skriv hele stien til en fil som inneholder et gyldig bilde til bruk som ikon "
+"for denne filen eller mappen."
 
 #: usericons.c:629
 msgid "Setting icon disabled by CHOICESPATH"
-msgstr "Sätter ikon som är avslagen av variabeln CHOICESPATH"
+msgstr "Lagring av Choices er slått av fra CHOICESPATH-variablen"
 
 #: usericons.c:691
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
 msgstr ""
-"Du har ännu inte satt några speciella ikoner, därför har jag inga kataloger "
-"att visa dig"
+"Du har ikke defineret nogle specielle ikoner; derfor har jeg ingen mapper "
+"vise dig"
 
 #: usericons.c:732
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error creating image '%s':\n"
 "%s"
-msgstr "Fel när '%s' skulle skapas: %s"
+msgstr "Feil under laging av bildet '%s': %s"
 
 #: tips:1
 msgid "Translation"
-msgstr "Översättning"
+msgstr "Oversettelse"
 
 #: tips:2
-#, fuzzy
 msgid "Language"
 msgstr "Språk"
 
 #: tips:3
 msgid "Use the LANG environment variable"
-msgstr "Använd miljövariabeln LANG"
+msgstr "Bruk miljøvariabelen LANG"
 
 #: tips:4
 msgid "Chinese (traditional)"
-msgstr "Kinesiska (traditionell)"
+msgstr "Kinesisk (tradisjonell)"
 
 #: tips:5
 msgid "Chinese (simplified)"
-msgstr "Kinesiska (förenklad)"
+msgstr "Kinesisk (forenklet)"
 
 # tips=x
 #: tips:6
 msgid "Danish"
-msgstr "Danska"
+msgstr "Dansk"
 
 #: tips:7
 msgid "Dutch"
-msgstr "Holländska"
+msgstr "Hollandsk"
 
 #: tips:8
 msgid "English (no translation)"
-msgstr "Engelska (ingen översättning)"
+msgstr "Engelsk (ingen oversettelse)"
 
 #: tips:9
 msgid "French"
-msgstr "Franska"
+msgstr "Fransk"
 
 #: tips:10
 msgid "German"
-msgstr "Tyska"
+msgstr "Tysk"
 
 #: tips:11
 msgid "Hungarian"
-msgstr "Ungerska"
+msgstr "Ungarsk"
 
 #: tips:12
 msgid "Italian"
-msgstr "Italienska"
+msgstr "Italiensk"
 
 #: tips:13
 msgid "Polish"
-msgstr "Polska"
+msgstr "Polsk"
 
 #: tips:14
 msgid "Russian"
-msgstr "Ryska"
+msgstr "Russisk"
 
 #: tips:15
 msgid "Spanish"
-msgstr "Spanska"
+msgstr "Spansk"
 
 #: tips:16
 msgid "Swedish"
@@ -2689,126 +2667,120 @@ msgstr ""
 
 #: tips:17
 msgid "Filer windows"
-msgstr "'Filer'-fönster"
+msgstr "'Filer'-vinduer"
 
 #: tips:18
-#, fuzzy
 msgid "Auto-resize filer windows"
-msgstr "Ändra automatiskt storlek på 'filer'-fönster..."
+msgstr "Automatisk størrelse på Filer-vindu"
 
 #: tips:19
-#, fuzzy
 msgid "Never automatically resize"
-msgstr "Ändra aldrig storlek på 'filer'-fönster..."
+msgstr "Tilpass aldri automatisk"
 
 #: tips:20
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
 msgstr ""
-"Du kommer bli tvungen att ändra storlek på fönster manuellt. Antigen mha. "
-"fönsterhateraren, genom menyn 'Ändra fönsterstorlek' eller genom att "
-"dubbelklicka på fönstrets bakgrund."
+"Du blir nødt til å tilpasses størrelsen manuelt, ved hjelp av "
+"vindushåndtereren, `Tilpass størrelse'-menykommandoen eller ved å "
+"dobbeltklikke vindusbakgrunnen"
 
 #: tips:21
-#, fuzzy
 msgid "Resize when changing the display style"
-msgstr "Ändra storlek när vystil ändras"
+msgstr "Tilpass størrelse ved endring av visningsstil"
 
 #: tips:22
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
 msgstr ""
-"När du ändrar storlek på ikoner eller ändrar vilka detaljer som visas\n"
-"kommer fönstret ändra storlek."
+"Når du endrer størrelsen på ikonene eller detaljnivået vil vinduet "
+"automatisk endre størrelse for deg."
 
 #: tips:23
 msgid "Always resize"
-msgstr "Ändra alltid storlek"
+msgstr "Tilpass alltid størrelsen"
 
 #: tips:24 tips:25
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
 msgstr ""
-"Fönstet kommer ändrar storlek när det är vettigt \n"
-"(dvs. vid byte av katalog eller vystil)."
+"Vinduet vil tilpasse størrelsen hver gang det virker nyttig (mao. ved skifte "
+"av mappe- eller visningsstil)."
 
 #: tips:26
-#, fuzzy
 msgid "Largest window size:"
-msgstr "Sätt fönstertorlek:"
+msgstr "Største vindusstørrelse:"
 
 #: tips:27
 msgid "%"
-msgstr "%"
+msgstr ""
 
 #: tips:28
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
 msgstr ""
-"Den största storlek i procent av skärmen som fönstret kan ändra storlek\n"
-"till"
+"Den største størrelsen, som en prosentdel av skjermstørrelsen, som vinduet "
+"vil tilpasse seg til."
 
 #: tips:29
 msgid "Change from Large icons to Small automatically:"
-msgstr "Ändra från stora till små ikoner automatiskt"
+msgstr "Endre fra store til små ikoner automatisk:"
 
 #: tips:30
 msgid ""
 "If this is on then filer windows will change from Large icons to Small when "
 "showing a new directory with lots of files."
 msgstr ""
-"Om detta är påslaget kommer storleken på ikoner att ändras till små\n"
-"när en katalog med många objekt visas."
+"Hvis dette er på vil vinduene automatisk endre fra store til små ikoner når "
+"de viser en mappe med mange filer."
 
 #: tips:31
-#, fuzzy
 msgid "Small Icons if at least:"
-msgstr "Små ikoner om minst:"
+msgstr "Små ikoner ved minst:"
 
 #: tips:33 tips:34
 msgid ""
 "If the directory contains this many items then it will be shown using Small "
 "Icons, otherwise Large Icons will be used."
 msgstr ""
-"Om katalogen innehåller minst så här många objekt kommer det att visas med\n"
-"små ikoner"
+"Hvis mappen inneholder minst så mange objekter vil den bli vist med små "
+"ikoner, ellers vil store ikoner bli brukt."
 
 #: tips:35
 msgid "Window behaviour"
-msgstr "Fönsterbeteeende"
+msgstr "Vindusoppførsel"
 
 #: tips:36
 msgid "Short titlebar flags"
-msgstr "Korta titelradsflaggor"
+msgstr "Korte tittellinjeflagg"
 
 #: tips:37
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 msgstr ""
-"Visa enstaka bokstäver istället för ord för 'Skannar', 'Alla' och "
-"'Förhandsgranskning\n"
-"i titelraden"
+"Bruk enkeltbokstaver i stedet for ord for Oppdaterer, Alle og "
+"Miniatyrindikatorene i tittellinjen."
 
 #: tips:38
 msgid "Unique windows"
-msgstr "Unika fönster"
+msgstr "Unike vinduer"
 
 #: tips:39
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
 msgstr ""
-"Om du öppnar en katalog och den redan visas i ett annat fönster\n"
-"kommer det andra fönstret stängas."
+"Hvis du åpner en mappe og denne mappen allerede vises i et annet vindu, "
+"fører dette valget til at det andre vinduet lukkes."
 
 #: tips:40
 msgid "New window on button 1 (RISC OS style)"
-msgstr "Nytt fönster med musknapp 1 (RISC OS-stil)"
+msgstr "Nytt vindu på knapp 1 (RISC OS-stil)"
 
 #: tips:41
 msgid ""
@@ -2816,14 +2788,13 @@ msgid ""
 "a new window with this turned on. Clicking with the button-2 (middle) will "
 "reuse the current window."
 msgstr ""
-"Att klicka med musknapp 1 (vanligtvis vänster musknapp) öppnar en katalog i\n"
-"ett nytt fönster när detta är påslaget. Klicka med musknapp 2 (mitten) "
-"kommer\n"
-"återanvända samma fönster."
+"Ett klikk med museknapp 1 (venstre) åpner en mappe i et nytt vindu dersom du "
+"tar i bruk dette alternativet. Museknapp 2 (midt) vil gjenbruke det "
+"gjeldende vinduet."
 
 #: tips:42
 msgid "Single-click navigation in filer windows"
-msgstr "Enkelklicka för att öppna filer och kataloger"
+msgstr "Ettklikks navigasjon i 'Filer'-vinduer"
 
 #: tips:43 tips:44 tips:121
 msgid ""
@@ -2831,16 +2802,15 @@ msgid ""
 "item instead. If off, clicking once selects an item; double click to open "
 "things."
 msgstr ""
-"Ett klick med detta påslaget öppnar objektet. Håll ner Control för att\n"
-"välja det istället. Om avslaget öppnar dubbelklick objekt."
+"Med dette alternativet åpnes et objekt med ett klikk. Hold nede CTRL for å "
+"velge objektet i stedet. Uten dette alternativet velges objektet med et "
+"klikk; dobbeltklikk for å åpne."
 
 #: tips:46
-#, fuzzy
 msgid "Sorting"
-msgstr "Sorterar"
+msgstr "Sortering"
 
 #: tips:47
-#, fuzzy
 msgid "Intelligent sorting"
 msgstr "Intelligent sortering"
 
@@ -2850,165 +2820,149 @@ msgid ""
 "If on, ignores case and punctuation and handles numbers properly: file8, "
 "File9, File10"
 msgstr ""
-"Om av sorteras objekt i ASCII-ordning: Fil10, Fil8, fil9\n"
-"Om på behandla stora/små bokstäver lika, strunta i skiljetecken och\n"
-"hantera tal korrekt: fil8, Fil9, Fil10"
+"Hvis av: ASCII-sortering: Fil10, Fil9, fil8.\n"
+"Hvis på: overser store/små, tegnsetting og behandler nummer korrekt: fil8, "
+"Fil9, Fil10"
 
 #: tips:49
 msgid "Directories always come first"
-msgstr "Kataloger kommer alltid först"
+msgstr "Mapper kommer alltid først"
 
 #: tips:50 tips:51
 msgid ""
 "If this is on then directories will always appear before anything else, "
 "regardless of the sort type."
 msgstr ""
-"Om detta är påslaget kommer kataloger alltid att visas före andra objekt "
-"oavsätt\n"
-"hur sortering görs."
+"Hvis dette er slått på vil mapper alltid vises først i listen, uansett "
+"sorteringsmekanisme."
 
 #: tips:52
 msgid "Icon text width"
-msgstr "Bredd för ikontext"
+msgstr "Ikontekstbredde"
 
 #: tips:53
-#, fuzzy
 msgid "Large wrap width:"
-msgstr "Radbrytningsbredd för stora ikoner"
+msgstr "Brytningsbredde for store"
 
 #: tips:54 tips:57
 msgid "pixels"
-msgstr "pixlar"
+msgstr "piksler"
 
 #: tips:55
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
 msgstr ""
-"Text som är bredare än detta delas på två rader när stora ikoner visas.\n"
-"Vid jättestora ikoner bryts text som är 50% bredare än detta."
+"Tekst som er bredere enn dette blir brutt i to linjer med Store ikoner-"
+"visning. Med Kjempe-visning blir teksten brutt hvis den er større enn 50% av "
+"dette"
 
 #: tips:56
-#, fuzzy
 msgid "Max Small Icons width:"
-msgstr "Maximal bredd för små ikoner:"
+msgstr "Maks bredde, små ikoner:"
 
 #: tips:58 tips:59
 msgid "Maximum width for the text beside a Small Icon."
-msgstr "Maximal bredd för texten bredvid små ikoner."
+msgstr "Maksimal bredde for tekst ved siden av et lite ikon."
 
 #: tips:60
-#, fuzzy
 msgid "Default settings for new windows"
-msgstr "Standardstorlek för nya fönster"
+msgstr "Standardinnstilling for nye vinduer"
 
 #: tips:61
 msgid "Inherit options from source window"
-msgstr "Ärv inställningar från föregående fönster"
+msgstr "Arv innstillinger fra kildevinduet"
 
 #: tips:62
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
 msgstr ""
-"Om detta är påslaget kommer inställningar för nya fönster att ärvas från det "
-"fönster\n"
-"från vilket det nya öppnades, annars sätts det till nedandstående "
-"inställingar."
+"Hvis dette er på blir visningsinnstillingene kopiert fra kildevinduet "
+"såfremt det er mulig, hvis ikke settes de til standardene under."
 
 #: tips:63
-#, fuzzy
 msgid "Icon size:"
-msgstr "Ikonstorlek"
+msgstr "Ikonstørrelse:"
 
 #: tips:67
-#, fuzzy
 msgid "Details:"
-msgstr "Detaljer"
+msgstr "Detaljer:"
 
 #: tips:68
 msgid "No details"
-msgstr "Inga detaljer"
+msgstr "Ingen detaljer"
 
 #: tips:74
 #, fuzzy
 msgid "Sort by:"
-msgstr "Sortera efter"
+msgstr "Sortér etter"
 
 #: tips:77
 msgid "Date"
-msgstr "Datum"
+msgstr "Dato"
 
 #: tips:79
 msgid "Show hidden files"
-msgstr "Visa dolda filer"
+msgstr "Vis skjulte filer"
 
 #: tips:80
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
-msgstr ""
-"Om detta är påslaget kommer även filer vars namn börjar med en punk att "
-"visas,\n"
-"annars visas dom inte."
+msgstr "Hvis dette er på vises filer som begynner med ., ellers er de skjulte."
 
 #: tips:81
 msgid "Show image thumbnails"
-msgstr "Visa förhandsgransking av bilder (thumnails)"
+msgstr "Vis miniatyrer av bilder"
 
 #: tips:82 tips:83 tips:84 tips:85 tips:86
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
 msgstr ""
-"Läs in varje bild och visa den nerskalad i fönstret istället för en vanlig "
-"ikon."
+"Last inn hver bildefil og vis den i miniatyrformat i vinduet, i stedet for "
+"et ikon"
 
 #: tips:87
 msgid "Toolbar"
-msgstr "Verktygsfält"
+msgstr "Verktøylinje"
 
 #: tips:88
-#, fuzzy
 msgid "Toolbar buttons"
-msgstr "Verktygsfältsknappar"
+msgstr "Verktøylinjeknapper"
 
 #: tips:89
-#, fuzzy
 msgid "Unshade the tools you want."
-msgstr "Välj de verktygsknappar du vill se."
+msgstr "Velg de verktøy du ønsker."
 
 #: tips:90
-#, fuzzy
 msgid "Toolbar appearance"
-msgstr "Utseende på verktygsfältet"
+msgstr "Verktøylinjeutseende"
 
 #: tips:91
-#, fuzzy
 msgid "Toolbar type:"
-msgstr "Verktygsfältstyp:"
+msgstr "Verktøylinjetype"
 
 #: tips:92
 msgid "None"
-msgstr "Inget"
+msgstr "Ingen"
 
 #: tips:93
-#, fuzzy
 msgid "Icons only"
-msgstr "Endast ikoner"
+msgstr "Kun ikoner"
 
 #: tips:94
-#, fuzzy
 msgid "Text under icons"
-msgstr "Text under ikonerna"
+msgstr "Tekst under ikoner"
 
 #: tips:95
 msgid "Text beside icons"
-msgstr "Text vid sidan om ikonerna"
+msgstr "Tekst ved siden av ikoner"
 
 #: tips:96
 msgid "Show totals of items"
-msgstr "Visa totalt antal objekt"
+msgstr "Vis totaler av objekter"
 
 #: tips:97 tips:98 tips:99 tips:100
 msgid ""
@@ -3016,12 +2970,13 @@ msgid ""
 "of hidden items (if any). When there's a selection, show the number of "
 "selected items and their combined size."
 msgstr ""
-"Visa antalet objekt som visas i ett fönster och antalet dolda objekt.\n"
-"När objekt är markerade, visa antalet och deras sammalagda storlek"
+"Vis antallet objekter vist i 'Filer'-vindeuet, sammen med antallet skjulte "
+"objekter. Når noe er valgt vises antallet valgte objekter og deres samlede "
+"størrelse."
 
 #: tips:101
 msgid "Minibuffers"
-msgstr "Minbuffertar"
+msgstr "Minibuffere"
 
 #: tips:102
 msgid ""
@@ -3029,16 +2984,16 @@ msgid ""
 "filer window. They are used to enter pathnames, search conditions and shell "
 "commands."
 msgstr ""
-"Minibuffertarna är textfält som visas i undre delen av fönstren.\n"
-"De används för att skriva in sökvägar, sökvillkor och shellkommandon."
+"Minibufferne er tekstinnskrivingsfelt som vises nær bunnen av vinduet. De "
+"brukes til å skrive inn stier, søkeparametre og skallkommandoer."
 
 #: tips:103
 msgid "Beeping"
-msgstr "Ljudsignal"
+msgstr "Tuting"
 
 #: tips:104
 msgid "Beep if Tab-completion fails"
-msgstr "Ge en ljudsignal om tabb-komplettering misslyckas"
+msgstr "Tut hvis Tab-fullføring slår feil"
 
 #: tips:105
 msgid ""
@@ -3046,117 +3001,109 @@ msgid ""
 "nothing happens (eg, because there are several possibilities and the next "
 "letter varies)."
 msgstr ""
-"Vid användade av 'Skriv in sökväg...'-minibufferten om tabb trycks ner,\n"
-"kommer inget att hända (tex. för att det finns flera möjligheter för nästa "
-"tecken)."
+"Når man bruker `Skiv sti...'-minibufferen og Tab blir trykket tuter ROX hvis "
+"ingenting skjer (f.eks. fordi det er flere muligheter og det neste tegnet "
+"varierer)."
 
 #: tips:106
 msgid "Beep if there are several matches"
-msgstr "Ge ljudsignal om det finns flera träffar"
+msgstr "Tut hvis det er flere muligheter"
 
 #: tips:107 tips:108 tips:109 tips:110
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
 msgstr ""
-"Vid användande av 'Skriv in sökväg...'-minibufferten om tabb trycks ner,\n"
-"ges en ljudsignal om det finns fler än en matchande fil, även om fler "
-"tecken\n"
-"las till."
+"Når man bruker `Skiv sti...'-minibufferen og Tab blir trykket tuter ROX hvis "
+"mer enn en fil passer, selv om noen tegn ble lagt til."
 
 #: tips:111
 msgid "Pinboard"
-msgstr "Skrivbord"
+msgstr "Tavle"
 
 #: tips:112
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
 msgstr ""
-"När du använder ett skrivbord kan du dra filer och program till detta\n"
-"för att skapa genvägar till dem."
+"Når du bruker ei tavle, kan du dra filer og programmer til "
+"skrivebordsbakgrunnen for å lage snarveier til dem."
 
 #: tips:113
-#, fuzzy
 msgid "Appearance"
-msgstr "Utseende på verktygsfältet"
+msgstr "Utseende"
 
 #: tips:114
-#, fuzzy
 msgid "Foreground:"
-msgstr "Förgrund:"
+msgstr "Forgrunnsfarge:"
 
 #: tips:115
-#, fuzzy
 msgid "Background:"
-msgstr "Bakgrund:"
+msgstr "Bakgrunnsfarge:"
 
 #: tips:116
-#, fuzzy
 msgid "Use custom font:"
-msgstr "Fjern specielt ikon"
+msgstr "Bruk egen skrift:"
 
 #: tips:117 tips:118
-#, fuzzy
 msgid "The font used for the text displayed under the icons"
-msgstr "Texten som visas under ikonen är:"
+msgstr "Skrifttypen for teksten som vises under ikonene"
 
 #: tips:119
-#, fuzzy
 msgid "Pinboard behaviour"
-msgstr "Skrivbordsbeteende"
+msgstr "Tavlas oppførsel"
 
 #: tips:120
 msgid "Single-click to open"
-msgstr "Enkelklick för att öppna"
+msgstr "Enkelklikk for å åpne"
 
 #: tips:122
 msgid "Keep icons within screen limits"
-msgstr "Håll ikoner inom skärmytan"
+msgstr "Hold ikoner innenfor skjerm-arealet"
 
 #: tips:123
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
-msgstr "Om detta är påslaget kommer ikoner alltid att visas inom skärmens yta."
+msgstr ""
+"Hvis dette er på holdes ikoner på tavla alltid fullstendig innenfor "
+"skjermens areal - også tittelen."
 
 #: tips:124
 msgid "Icon grid step:"
-msgstr "Rutnätstäthet för ikoner:"
+msgstr "Ikongitterstørrelse:"
 
 #: tips:125
 msgid "Fine"
-msgstr "Fin"
+msgstr "Liten"
 
 #: tips:126
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
-msgstr "Använd ett 2-pixlarsnät för placering av ikoner på skrivbordet."
+msgstr "Bruker et 2-piksels gitter til å plassere ikoner på skrivebordet."
 
 #: tips:127
 msgid "Medium"
-msgstr "Medium"
+msgstr "Middels"
 
 #: tips:128
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
-msgstr "Använd ett 16-pixlarsnät för placering av ikoner på skrivbordet."
+msgstr "Bruker et 16-piksels gitter til å plassere ikoner på skrivebordet."
 
 #: tips:129
 msgid "Coarse"
-msgstr "Grovt"
+msgstr "Stor"
 
 #: tips:130 tips:131 tips:132 tips:133
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
-msgstr "Använd ett 32-pixlarsnät för placering av ikoner på skrivbordet."
+msgstr "Bruker et 32-piksels gitter til å plassere ikoner på skrivebordet."
 
 #: tips:134
-#, fuzzy
 msgid "Iconified windows"
-msgstr "Minimerade fönster"
+msgstr "Minimerte vinduer"
 
 #: tips:135
-#, fuzzy
 msgid "Show iconified windows"
-msgstr "Visa minimerade fönster"
+msgstr "Vis minimerte vinduer"
 
 #: tips:136
 msgid ""
@@ -3165,40 +3112,39 @@ msgid ""
 "windows. If this option is on, the filer will show each iconified window as "
 "a small button on the screen. Requires a compatible window manager."
 msgstr ""
-"De flesta fönsterhanterare tillhandahåller ett sätt att minimera "
-"(ikonifiera)\n"
-"fönster och vissa program, som ROX-Filer, kan användas för att visa "
-"minimerade\n"
-"fönster. Om detta är påslaget visas varje minimerat katalogfönster som en\n"
-"liten knapp på skärmen. Kräver en kompatibel fönsterhanterare."
+"De fleste vindushåndterere har en måte å minimere vinduer på, og "
+"forskjellige programmer, f.eks. ROX-Filer, kan brukes til å vise de "
+"minimerte vinduene. Hvis dette alternativet er på, vil Filer vise alle "
+"minimerte vinduer som en liten knapp på skjermen. Krever en kompatibel "
+"vindushåndterer."
 
 #: tips:137
 msgid "Iconify to the"
-msgstr "Minimera till"
+msgstr "Minimer til"
 
 #: tips:138
 msgid "top-left"
-msgstr "övre vänstra hörnet"
+msgstr "øvre venstre hjørne"
 
 #: tips:139
 msgid "top-right"
-msgstr "övre högra hörnet"
+msgstr "øvre høyre hjørne"
 
 #: tips:140
 msgid "bottom-left"
-msgstr "undre vänstra hörnet"
+msgstr "nedre venstre hjørne"
 
 #: tips:141
 msgid "bottom-right"
-msgstr "undre högra hörnet"
+msgstr "nedre høyre hjørne"
 
 #: tips:142
 msgid ", going"
-msgstr ", sprid"
+msgstr ", og så"
 
 #: tips:143
 msgid "horizontally"
-msgstr "horisontellt"
+msgstr "horisontalt"
 
 #: tips:144
 msgid "vertically"
@@ -3209,112 +3155,105 @@ msgid "Panels"
 msgstr "Paneler"
 
 #: tips:146
-#, fuzzy
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
 msgstr ""
-"Paneler är rader med ikoner som löper längs skärmens kanter. Se manualen "
-"för\n"
-"information om att använda paneler."
+"Paneler er rekker av ikoner som løper langs siden av skjermen.\n"
+"Se manualen for mer informasjon om paneler."
 
 #: tips:147
-#, fuzzy
 msgid "Panel style"
-msgstr "Panelutseende"
+msgstr "Panelstil"
 
 #: tips:148
 msgid "Image and text"
-msgstr "Bilder och text"
+msgstr "Bilder og tekst"
 
 #: tips:149
 msgid "Every panel icon is shown with an image and some text."
-msgstr "Varje panelikon visas som en bild och text."
+msgstr "Alle panel-ikoner blir vist med bilde og tekst."
 
 #: tips:150
 msgid "Image only for applications"
-msgstr "Endast bilder för program"
+msgstr "Kun bilder for programmer"
 
 #: tips:151
 msgid ""
 "Applications have just an image, everything else has both an image and text."
-msgstr ""
-"Program har endast en bild. Allt annat visas med både en bild och text."
+msgstr "Programmer har bare bilde, alt annet har bilde og tekst."
 
 #: tips:152
 msgid "Image only"
-msgstr "Endast bilder"
+msgstr "Kun bilde"
 
 #: tips:153 tips:154 tips:155 tips:156
 msgid "Only the image is shown."
-msgstr "Endast bilder visas."
+msgstr "Bare bilde vises"
 
 #: tips:157
 msgid "Action windows"
-msgstr "Handlingsfönster"
+msgstr "Handlingsvinduer"
 
 #: tips:158
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
 msgstr ""
-"Händelsefönster kommer upp när du startar en bakgrundshandling, tex.\n"
-"kopiering eller radering av filer. "
+"Handlingsvinduer dukker opp når du starter en bakgrunns-\n"
+"operasjon, f.eks. å kopiere eller slette filer."
 
 #: tips:159
-#, fuzzy
 msgid "Auto-start (Quiet) these actions"
-msgstr "Starta dessa händelser automatiskt:"
+msgstr "Auto-start (Stille) disse handlingene"
 
 #: tips:161
 msgid "Copy files without confirming first."
-msgstr "Kopiera filer utan att fråga först."
+msgstr "Kopiér filer uten å spørre først."
 
 #: tips:163
 msgid "Move files without confirming first."
-msgstr "Flytta filer utan att fråga först."
+msgstr "Flytt filer uten å spørre først."
 
 #: tips:165
 msgid "Create links to files without confirming first."
-msgstr "Skapa genvägar till filer utan att fråga först."
+msgstr "Lag lenker til filer uten å spørre først."
 
 #: tips:167
 msgid "Delete files without confirming first."
-msgstr "Radera filer utan att fråga först."
+msgstr "Slett filer uten å spørre først."
 
 #: tips:169 tips:170
 msgid "Mount and unmount filesystems without confirming first."
-msgstr "Montera och avmontera filsystem utan att fråga först."
+msgstr "Monter og demonter filsystemer uten å spørre først."
 
 #: tips:171
-#, fuzzy
 msgid "Default settings"
-msgstr "Standardinställning:"
+msgstr "Standardinnstillinger"
 
 #: tips:173
 msgid "Don't confirm deletion of non-writeable items."
-msgstr "Fråga inte angående radering av icke-skrivbara objekt."
+msgstr "Spørr ikke om sletting av ikke-skrivbare objekter."
 
 #: tips:175
 msgid "Don't display so much information in the message area."
-msgstr "Visa inte så mycket information i meddelandeområdet."
+msgstr "Ikke vis så mye informasjon i beskjedområdet."
 
 #: tips:177
 msgid "Also change contents of subdirectories."
-msgstr "Ändra även innehållet i underkataloger."
+msgstr "Innholdet i undermapper skal også endres."
 
 #: tips:183
 msgid "Drag and Drop"
-msgstr "Dra och släpp"
+msgstr "Dra og Slipp"
 
 #: tips:184 tips:201 tips:214
-#, fuzzy
 msgid "General"
-msgstr "Allmänt"
+msgstr "Generelt"
 
 #: tips:185
 msgid "Allow dragging to icons in filer windows"
-msgstr "Tillåt att dra ikoner till 'filer'-fönster"
+msgstr "Tillat draing til ikoner i 'Filer'-vinduer"
 
 #: tips:186
 msgid ""
@@ -3322,13 +3261,13 @@ msgid ""
 "filer window. The item will highlight when you do this and dropping the file "
 "will put it into that directory, or load it into the program."
 msgstr ""
-"När detta är påslaget kan du dra filer till en katalog eller ett program i\n"
-"ett fönster. Objektet kommer markeras och att släppa filen flyttar den till\n"
-"katalogen eller öppnar den med programmet."
+"Når dette er slått på kan du dra en fil til en undermappe eller program i et "
+"vindu. Objektet blir da markert, og hvis du slipper filen puttes den i "
+"mappen eller lastes i programmet"
 
 #: tips:187
 msgid "Directories spring open"
-msgstr "Kataloger öppnas automatiskt"
+msgstr "Åpne mapper ved draing"
 
 #: tips:188
 msgid ""
@@ -3336,18 +3275,17 @@ msgid ""
 "highlighted directory to 'spring open' after the file is held over it for a "
 "short while."
 msgstr ""
-"Denna inställing, som kräver att föregående är påslaget, gör att den "
-"markerade\n"
-"katalogen 'poppar upp' efter det att filen hållts över den en kort tid."
+"Dette alternativet, som krever alternativet ovenfor også, gjør at mappen "
+"under musepekeren åpnes av seg selv etter at en fil holdes over den en liten "
+"stund."
 
 #: tips:189
-#, fuzzy
 msgid "Spring delay:"
-msgstr "Väntetid för 'poppa upp':"
+msgstr "Mappeåpningsventetid"
 
 #: tips:190
 msgid "ms"
-msgstr "ms"
+msgstr ""
 
 #: tips:191 tips:192
 msgid ""
@@ -3355,34 +3293,29 @@ msgid ""
 "before it will spring open. The above option must be turned on for this to "
 "have any effect."
 msgstr ""
-"Denna inställning sätter hur lång tid, i millisekunder, du måste hålla en "
-"fil\n"
-"över en katalog för att katalogen ska öppnas. Föregående inställning måste\n"
-"vara påslagen för att detta ska ha någon effekt. "
+"Innstillingen regulerer hvor lenge ROX skal vente før den åpner en mappe når "
+"du drar en fil over den. Innstillingen ovenfor må slås på for at denne skal "
+"ha effekt."
 
 #: tips:193
-#, fuzzy
 msgid "Dragging files with the middle mouse button"
-msgstr "Dra filer med mittersta musknappen"
+msgstr "Midtknapp-draing"
 
 #: tips:194
-#, fuzzy
 msgid "Shows a menu of possible actions"
-msgstr "... visar en meny med möjliga handlingar"
+msgstr "Viser en meny med mulige handlinger"
 
 #: tips:195
-#, fuzzy
 msgid "Moves the files"
-msgstr ".... flyttar filerna"
+msgstr "Flytter filene"
 
 #: tips:196 tips:197 tips:198 tips:199
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key"
 msgstr ""
-"Observera att du fortfarande får upp menyn genom att dra med vänstra "
-"musknappen\n"
-"och hålla in Alt-tangenten"
+"Merk at du stadig kan få opp menyen hvis du drar med venstre museknapp og "
+"holder nede Alt"
 
 #: tips:200
 msgid "Menus"
@@ -3397,36 +3330,32 @@ msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
 msgstr ""
-"Använd musknapp 2, mittenknappen (klicka med båda knapparna samtidigt på\n"
-"2-knapparsmus), för att få upp menyn. Om avslaget, använd musknapp 3 "
-"(höger)\n"
-"istället."
+"Bruk knapp 2 (den midterste knappen, eller begge samtidig på toknappsmus) "
+"for å åpne menyen. Hvis av, brukes knapp 3 (høyre)."
 
 #: tips:204
-#, fuzzy
 msgid "Size of icons in menus:"
-msgstr "Storlek på ikoner i menyer:"
+msgstr "Størrelse på ikoner i menyer:"
 
 #: tips:205
 msgid "No Icons"
-msgstr "Inga ikoner"
+msgstr "Ingen ikoner"
 
 #: tips:208
 msgid "Same as current window"
-msgstr "Samma som i aktuellt fönster"
+msgstr "Det samme som det nåværende vindu"
 
 #: tips:209
 msgid "Same as default"
-msgstr "Samma som standardstorleken"
+msgstr "Det samme som standard"
 
 #: tips:210
-#, fuzzy
 msgid "`Xterm Here' program"
-msgstr "Program för 'Terminalemulator här':"
+msgstr "'Xterm Her'-program"
 
 #: tips:211 tips:212
 msgid "The program to launch when you choose `Xterm Here' from the menu."
-msgstr "Programmet som körs när du väljer 'Terminalemulator här' från menyn."
+msgstr "Programmet som brukes når du velger `Xterm her' fra menyen."
 
 #: tips:213
 msgid "Types"
@@ -3434,7 +3363,7 @@ msgstr "Typer"
 
 #: tips:215
 msgid "Ignore eXecutable bit for known extensions"
-msgstr "Ignorera filer satt som körbara för kända filtyper"
+msgstr "Overse Kjørbar-flagg (x) for kjente filetternavn"
 
 #: tips:216 tips:217
 msgid ""
@@ -3442,72 +3371,63 @@ msgid ""
 "This is useful if you have files on a Windows-type filesystem which are "
 "being shown as executable programs."
 msgstr ""
-"Om en fil har en känd ändelse (tex. '.gif') ignorera körhändelsen.\n"
-"Detta är användbart om du har filer på ett filsystem av Windows-typ där\n"
-"alla filer visas som körbara."
+"Hvis en fil har en kjent fil-type (f.eks. '.png') overses kjørbar-flagget. "
+"Dette er nyttig hvis du har et Windows-aktig filsystem hvor alle filer vises "
+"som kjørbare."
 
 #: tips:218
 msgid "MIME types"
 msgstr "MIME-typer"
 
 #: tips:219
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. After editing "
 "the files, you must run the 'update-mime-database' command. Use the Refresh "
 "toolbar button to reload the new types."
 msgstr ""
-"Filhanteraren använder en uppsättning regler för att hitta den rätta\n"
-"MIME-typen för en vanlig fil och väljer därefter en passande ikon för den\n"
-"typen. Efter att ha ändrat filer, tryck på knappen 'läs om' nedan eller\n"
-"starta om filhanteraren."
+"ROX Filer bruker et sett med regler til å bestemme den korrekte MIME-typen "
+"for hver fil, og velger så et passende ikon. Etter å ha endret disse filene, "
+"må du kjøre 'update-mime-database'-kommandoen. Bruk 'Oppdater' på "
+"verktøylinjen for å laste de nye typene."
 
 #: tips:220
 msgid "Show name-to-type rules"
-msgstr "Visa namn-till-typ-regler"
+msgstr "Vis navn-til-type-regler"
 
 #: tips:221 tips:222
-#, fuzzy
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
-msgstr "Använd 'Sätt ikon...'-dialogrutan för att sätta ikonen för varje typ."
+msgstr "Bruk 'Velg Ikon...'-dialogboksen til å definere ikonet for hver type."
 
 #: tips:223
-#, fuzzy
 msgid "Colours"
-msgstr "Färger"
+msgstr "Farger"
 
 #: tips:224
-#, fuzzy
 msgid "File type colours"
-msgstr "Färger för filtyper"
+msgstr "Filtypefarger"
 
 #: tips:225
 msgid "Colour files based on their types"
-msgstr "Färg för filer baserat på deras typ"
+msgstr "Farg filer basert på deres type"
 
 #: tips:226
 msgid "Filenames (and details) are coloured according to the file's type."
-msgstr "Filnamn (och detaljer) visas med olika färg beroende på filtyp."
+msgstr "Filnavn (og detaljer) skal farges etter deres filtype."
 
 #: tips:227
-#, fuzzy
 msgid "Directory:"
-msgstr "Katalog:"
+msgstr "Mappe:"
 
 #: tips:228
-#, fuzzy
 msgid "Regular file:"
 msgstr "Vanlig fil:"
 
 #: tips:229
-#, fuzzy
 msgid "Pipe:"
-msgstr "Rör:"
+msgstr "Pipe (rør):"
 
-# Socket:
 #: tips:230
-#, fuzzy
 msgid "Socket:"
 msgstr "Socket:"
 
@@ -3516,45 +3436,38 @@ msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr ""
-"Fel, som tex. en symbolisk genväg som pekar på ett objekt som inte finns "
-"eller\n"
-"en fil som filhanteraren inte har tillåtelse att granska."
+"Feil, som f.eks. en symbolsk lenke som peker mot en ikke-eksisterende fil, "
+"eller en fil som ikke kan undersøkes."
 
 #: tips:234
-#, fuzzy
 msgid "Character device:"
-msgstr "Character device"
+msgstr "Character-enhet:"
 
 #: tips:235
-#, fuzzy
 msgid "Block device:"
-msgstr "Block device"
+msgstr "Blokkenhet:"
 
 #: tips:236
-#, fuzzy
 msgid "Door:"
-msgstr "Dörr:"
+msgstr "Dør:"
 
 #: tips:237
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
-msgstr "Dörrar är likanande socket eller rör och har bara setts på Solaris."
+msgstr "Dørfiler er omtrent som socketer og rør, og finnes bare på Solaris"
 
 #: tips:238
-#, fuzzy
 msgid "Executable file:"
-msgstr "Körbar fil"
+msgstr "Kjørbar fil"
 
 #: tips:239
-#, fuzzy
 msgid "Application directory:"
-msgstr "Programkatalog"
+msgstr "Programmappe"
 
 #: tips:240
-#, fuzzy
 msgid "Unknown type:"
-msgstr "Okänd typ:"
+msgstr "Ukjent type"
 
 #: tips:241
 msgid "Compatibility"
@@ -3578,30 +3491,28 @@ msgid ""
 msgstr ""
 
 #: tips:245
-#, fuzzy
 msgid "Pass all backdrop mouse clicks to window manager"
-msgstr "Skicka klick med musknapp 3 till fönsterhanteraren"
+msgstr "Send alle bakgrunnsmuseklikk til vindusbehandleren"
 
 #: tips:246 tips:247
-#, fuzzy
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
 "events to your window manager instead. Clicks on icons will not be forwarded."
 msgstr ""
-"Vanligtvis orsakar klick med musknapp på skrivbordet att skrivbordsmenyn "
-"öppnas.\n"
-"Slå på dette för att låta din fönsterhanterare ta hand om dessa klick.\n"
-"Klick på ikoner kommer inte att skickas vidare."
+"Når du høyreklikker bakgrunnen åpnes vanligvis tavlemenyen, og venstreklikk "
+"fjerner vanligvis gjeldende valg. Hvis du skrur dette alternativet på, "
+"sendes museklikkene videre til vindusbehandleren i stedet. Klikk på ikoner "
+"sendes ikke videre."
 
 #: tips:248
 #, fuzzy
 msgid "Drag and drop"
-msgstr "Dra och släpp"
+msgstr "Dra og Slipp"
 
 #: tips:249
 msgid "Don't use hostnames"
-msgstr "Använd inte maskinnamn"
+msgstr "Ikke bruk vertsnavn"
 
 #: tips:250 tips:251 tips:252 tips:253
 msgid ""
@@ -3609,15 +3520,15 @@ msgid ""
 "option turned on. Use this if dragging files to an application shows a + "
 "sign on the pointer but the drop doesn't work."
 msgstr ""
-"En del äldre prohram stödjer inte XDND fullt ut och kan behöva denna\n"
-"inställning påslagen. Använd detta om ett +-tecken visas som pekera när du\n"
-"drar filer till ett visst program, men det inte fungerar att släppa."
+"Noen gamle programmer støtter ikke XDND helt og kan ha behov for dette "
+"alternativet. Bruk det hvis fil-draing til et program viser et +-tegn på "
+"mysepekeren men slipping ikke virker"
 
 #~ msgid "Unknown error"
-#~ msgstr "Okänt fel"
+#~ msgstr "Ukjent feil"
 
 #~ msgid "Re-read files"
-#~ msgstr "Läs om filer"
+#~ msgstr "Genlæs filer"
 
 #~ msgid "Show ROX-Filer Help"
 #~ msgstr "Vis ROX-Filer Hjælp"
