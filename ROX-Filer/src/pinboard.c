@@ -282,7 +282,7 @@ void pinboard_activate(guchar *name)
  * image should be if it is TRUE.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  *
- * names are in UTF-8.
+ * name and path are in UTF-8 for Gtk+-2.0 only.
  */
 void pinboard_pin(guchar *path, guchar *name, int x, int y)
 {
@@ -313,17 +313,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 			name = icon->path;
 	}
 
-#ifndef GTK2
-	{
-		gchar *loc_name;
-
-		loc_name = from_utf8(name);
-		icon->item = diritem_new(loc_name);
-		g_free(loc_name);
-	}
-#else
 	icon->item = diritem_new(name);
-#endif
 	diritem_restat(icon->path, icon->item);
 
 	icon->win = gtk_window_new(GTK_WINDOW_DIALOG);
@@ -1058,7 +1048,19 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 		if (!path)
 			path = g_strdup("<missing path>");
 
+#ifdef GTK2
 		pinboard_pin(path, label, x, y);
+#else
+		{
+			gchar *loc_path, *loc_label;
+
+			loc_path = from_utf8(path);
+			loc_label = from_utf8(leaf);
+			pinboard_pin(loc_path, loc_label, x, y);
+			g_free(loc_label);
+			g_free(loc_path);
+		}
+#endif
 
 		g_free(path);
 		g_free(label);
@@ -1071,7 +1073,6 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 static char *pin_from_file(guchar *line)
 {
 	guchar	*leaf = NULL;
-	gchar	*u8_path, *u8_leaf;
 	int	x, y, n;
 
 	if (*line == '<')
@@ -1096,14 +1097,9 @@ static char *pin_from_file(guchar *line)
 	if (sscanf(line, " %d , %d , %n", &x, &y, &n) < 2)
 		return NULL;		/* Ignore format errors */
 
-	u8_path = to_utf8(line + n);
-	u8_leaf = to_utf8(leaf);
-	g_free(leaf);
-	
-	pinboard_pin(u8_path, u8_leaf, x, y);
+	pinboard_pin(line + n, leaf, x, y);
 
-	g_free(u8_path);
-	g_free(u8_leaf);
+	g_free(leaf);
 
 	return NULL;
 }
@@ -1224,7 +1220,16 @@ void pinboard_save(void)
 		Icon *icon = (Icon *) next->data;
 		char *tmp;
 
+#ifdef GTK2
 		tree = xmlNewTextChild(root, NULL, "icon", icon->src_path);
+#else
+		{
+			gchar *u8;
+			u8 = to_utf8(icon->src_path);
+			tree = xmlNewTextChild(root, NULL, "icon", u8);
+			g_free(u8);
+		}
+#endif
 
 		tmp = g_strdup_printf("%d", icon->x);
 		xmlSetProp(tree, "x", tmp);
