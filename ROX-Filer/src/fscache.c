@@ -138,6 +138,16 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
  */
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 {
+	return g_fscache_lookup_full(cache, pathname, TRUE);
+}
+
+/* As g_fscache_lookup, but 'load' flags control what happens if the data
+ * is out-of-date.
+ * TRUE => Data is updated / reloaded
+ * FALSE => Returns NULL
+ */
+gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load)
+{
 	struct stat 	info;
 	GFSCacheKey	key;
 	GFSCacheData	*data;
@@ -159,6 +169,9 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 
 		if (UPTODATE(data, info))
 			goto out;
+		
+		if (!load)
+			return NULL;
 
 		/* Out-of-date */
 		if (cache->update)
@@ -173,6 +186,9 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	else
 	{
 		GFSCacheKey *new_key;
+
+		if (!load)
+			return NULL;
 		
 		new_key = g_memdup(&key, sizeof(key));
 
@@ -196,35 +212,6 @@ out:
 	if (cache->ref)
 		cache->ref(data->data, cache->user_data);
 	data->last_lookup = time(NULL);
-	return data->data;
-}
-
-/* Like g_fscache_lookup(), but doesn't load or update the item.
- * Returns NULL if the item isn't cached.
- */
-gpointer g_fscache_lookup_cached(GFSCache *cache, char *pathname)
-{
-	GFSCacheKey	key;
-	GFSCacheData	*data;
-	struct stat 	info;
-
-	g_return_val_if_fail(cache != NULL, NULL);
-	g_return_val_if_fail(pathname != NULL, NULL);
-
-	if (mc_stat(pathname, &info))
-		return NULL;
-
-	key.device = info.st_dev;
-	key.inode = info.st_ino;
-
-	data = g_hash_table_lookup(cache->inode_to_stats, &key);
-	if (!data)
-		return NULL;
-
-	if (cache->ref)
-		cache->ref(data->data, cache->user_data);
-	data->last_lookup = time(NULL);
-
 	return data->data;
 }
 

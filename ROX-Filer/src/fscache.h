@@ -61,7 +61,7 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 			gpointer user_data);
 void g_fscache_destroy(GFSCache *cache);
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname);
-gpointer g_fscache_lookup_cached(GFSCache *cache, char *pathname);
+gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load);
 void g_fscache_may_update(GFSCache *cache, char *pathname);
 void g_fscache_update(GFSCache *cache, char *pathname);
 void g_fscache_purge(GFSCache *cache, gint age);

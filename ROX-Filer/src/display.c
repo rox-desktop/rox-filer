@@ -253,6 +253,9 @@ static gboolean test_point_small_full(Collection *collection,
 				- fixed_font->descent - 2 - item_font->ascent;
 	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
 
+	if (point_x > width)
+		return FALSE;	/* (for the right-most column) */
+	
 	if (point_x < iwidth + 2)
 		return point_x > 2 && point_y > image_y;
 
@@ -1115,6 +1118,10 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details)
 	if (filer_window->details_type == details)
 		return;
 	filer_window->details_type = details;
+
+	filer_window->collection->paint_level = PAINT_CLEAR;
+	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
+	
 	shrink_width(filer_window);
 	update_options_label();
 }

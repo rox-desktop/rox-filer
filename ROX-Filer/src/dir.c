@@ -284,8 +284,8 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		if (make_thumb)
 			item->image = g_fscache_lookup(thumb_cache, path);
 		else
-			item->image = g_fscache_lookup_cached(thumb_cache,
-								path);
+			item->image = g_fscache_lookup_full(thumb_cache,
+								path, FALSE);
 	}
 
 	if (!item->mime_type)
