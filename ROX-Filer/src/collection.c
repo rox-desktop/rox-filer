@@ -690,8 +690,12 @@ static void clear_area(Collection *collection, GdkRectangle *area)
 				area->width, area->height);
 	}
 	else
+	{
+		gdk_window_set_background(widget->window,
+				&widget->style->bg[GTK_STATE_NORMAL]);
 		gdk_window_clear_area(widget->window,
 				area->x, area->y, area->width, area->height);
+	}
 }
 
 /* Return the area occupied by the item at (row, col) by filling
