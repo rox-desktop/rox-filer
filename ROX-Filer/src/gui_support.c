@@ -187,9 +187,9 @@ int get_choice(char *title,
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
 
+#ifndef GTK2
 	gtk_window_set_focus(GTK_WINDOW(dialog), button);
 	gtk_window_set_default(GTK_WINDOW(dialog), button);
-#ifndef GTK2
 	gtk_container_set_focus_child(GTK_CONTAINER(action_area), button);
 #endif
 

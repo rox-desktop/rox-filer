@@ -1013,6 +1013,7 @@ static gint key_press_event(GtkWidget	*widget,
 			FilerWindow	*filer_window)
 {
 	gboolean handled;
+	guint key = event->keyval;
 	char group[2] = "1";
 
 	window_with_focus = filer_window;
@@ -1037,7 +1038,7 @@ static gint key_press_event(GtkWidget	*widget,
 	if (handled)
 		return TRUE;
 
-	switch (event->keyval)
+	switch (key)
 	{
 		case GDK_Escape:
 			filer_target_mode(filer_window, NULL, NULL, NULL);
@@ -1060,10 +1061,13 @@ static gint key_press_event(GtkWidget	*widget,
 					filer_window->collection->cursor_item);
 			break;
 		default:
-			if (event->keyval < GDK_0 || event->keyval > GDK_9)
+			if (key >= GDK_0 && key <= GDK_9)
+				group[0] = key - GDK_0 + '0';
+			else if (key >= GDK_KP_0 && key <= GDK_KP_9)
+				group[0] = key - GDK_KP_0 + '0';
+			else
 				return FALSE;
 
-			group[0] = event->keyval - GDK_0 + '0';
 
 			if (event->state & GDK_CONTROL_MASK)
 				group_save(filer_window, group);
