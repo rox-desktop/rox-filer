@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <glob.h>
+#include <stdio.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
@@ -56,18 +57,28 @@ static guchar *mini_contents(FilerWindow *filer_window);
  ****************************************************************/
 
 
-GtkWidget *create_minibuffer(FilerWindow *filer_window)
+/* Creates the minibuffer widgets, setting the appropriate fields
+ * in filer_window.
+ */
+void create_minibuffer(FilerWindow *filer_window)
 {
-	GtkWidget *mini;
+	GtkWidget *hbox, *label, *mini;
+
+	hbox = gtk_hbox_new(FALSE, 0);
+	label = gtk_label_new(NULL);
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 2);
 
 	mini = gtk_entry_new();
+	gtk_box_pack_start(GTK_BOX(hbox), mini, TRUE, TRUE, 0);
 	gtk_widget_set_style(mini, fixed_style);
 	gtk_signal_connect(GTK_OBJECT(mini), "key_press_event",
 			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(mini), "changed",
 			GTK_SIGNAL_FUNC(changed), filer_window);
 
-	return mini;
+	filer_window->minibuffer = mini;
+	filer_window->minibuffer_label = label;
+	filer_window->minibuffer_area = hbox;
 }
 
 void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
@@ -81,6 +92,11 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	mini = GTK_ENTRY(filer_window->minibuffer);
 
 	filer_window->mini_type = MINI_NONE;
+	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),
+			mini_type == MINI_PATH ? "Goto:" :
+			mini_type == MINI_SHELL ? "Shell:" :
+			mini_type == MINI_RUN_ACTION ? "Run Action:" :
+			"?");
 
 	switch (mini_type)
 	{
@@ -92,6 +108,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 					make_path(filer_window->path, "")->str);
 			break;
 		case MINI_SHELL:
+		case MINI_RUN_ACTION:
 			filer_window->mini_cursor_base = -1;	/* History */
 			gtk_entry_set_text(mini, "");
 			break;
@@ -104,7 +121,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 
 	gtk_entry_set_position(mini, -1);
 
-	gtk_widget_show(filer_window->minibuffer);
+	gtk_widget_show_all(filer_window->minibuffer_area);
 
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			filer_window->minibuffer);
@@ -114,13 +131,13 @@ void minibuffer_hide(FilerWindow *filer_window)
 {
 	filer_window->mini_type = MINI_NONE;
 
-	gtk_widget_hide(filer_window->minibuffer);
+	gtk_widget_hide(filer_window->minibuffer_area);
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			GTK_WIDGET(filer_window->collection));
 }
 
 /* Insert this leafname at the cursor (replacing the selection, if any).
- * Must be in SHELL mode.
+ * Must be in SHELL or RUN_ACTION mode.
  */
 void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 {
@@ -129,7 +146,8 @@ void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 	GtkEntry 	*entry = GTK_ENTRY(edit);
 	int		pos;
 
-	g_return_if_fail(filer_window->mini_type == MINI_SHELL);
+	g_return_if_fail(filer_window->mini_type == MINI_SHELL ||
+			 filer_window->mini_type == MINI_RUN_ACTION);
 
 	esc = shell_escape(leafname);
 
@@ -532,6 +550,64 @@ static void shell_tab(FilerWindow *filer_window)
 	g_string_free(leaf, TRUE);
 }
 
+/* This is called from shell_return_pressed() so that the command is already
+ * in the history. Returns TRUE if the buffer should be closed.
+ */
+gboolean set_run_action(FilerWindow *filer_window, guchar *command)
+{
+	Collection	*collection = filer_window->collection;
+	int		n = collection->cursor_item;
+	DirItem		*item;
+	guchar		*path, *tmp;
+	FILE		*file;
+	int		error = 0, len;
+
+	if (!strchr(command, '$'))
+	{
+		delayed_error(PROJECT,
+	_("To set the run action for a file, either:\n"
+	  "- Drag a file to an application directory (eg drag an image to the "
+	  "Gimp), or\n" "- Enter a shell command which contains a \"$1\""
+	  "where the name of the file should go (eg ` gimp \"$1\" ')"));
+		return FALSE;
+	}
+
+	if (n < 0 || n >= collection->number_of_items)
+	{
+		delayed_error(PROJECT,
+	_("You must have the cursor on the item to use for '$1'. Clicking "
+	  "on an item will select it."));
+		return FALSE;
+	}
+
+	item = (DirItem *) collection->items[n].data;
+	path = type_ask_which_action(item->mime_type);
+
+	if (!path)
+		return TRUE;
+
+	report_error("Setting action!", path);
+
+	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
+	len = strlen(tmp);
+	
+	file = fopen(path, "wb");
+	if (fwrite(tmp, 1, len, file) < len)
+		error = errno;
+	if (fclose(file) && error == 0)
+		error = errno;
+	if (chmod(path, 0777))
+		error = errno;
+
+	if (error)
+		report_error(PROJECT, g_strerror(errno));
+
+	g_free(tmp);
+
+	return TRUE;
+}
+
+/* Either execute the command or make it the default run action */
 static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	GPtrArray	*argv;
@@ -546,6 +622,14 @@ static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 		goto out;
 
 	add_to_history(entry);
+
+	if (filer_window->mini_type == MINI_RUN_ACTION)
+	{
+		if (set_run_action(filer_window, entry))
+			goto out;
+		else
+			return;
+	}
 	
 	argv = g_ptr_array_new();
 	g_ptr_array_add(argv, "sh");
@@ -665,6 +749,7 @@ static gint key_press_event(GtkWidget	*widget,
 			break;
 
 		case MINI_SHELL:
+		case MINI_RUN_ACTION:
 			switch (event->keyval)
 			{
 				case GDK_Up:
@@ -698,8 +783,6 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 		case MINI_PATH:
 			path_changed(mini, filer_window);
 			return;
-		case MINI_SHELL:
-			break;
 		default:
 			break;
 	}

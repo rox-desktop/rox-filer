@@ -464,3 +464,59 @@ void show_set_run_action(MIME_type *type)
 	
 	gtk_widget_show_all(box);
 }
+
+/* The user wants to set a new default action for files of this type.
+ * Ask the user if they want to set eg 'text/plain' or just 'text'.
+ * Removes the current binding if possible and returns the path to
+ * save the new one to. NULL means cancel.
+ */
+char *type_ask_which_action(MIME_type *type)
+{
+	int	r;
+	guchar	*tmp, *type_name, *path;
+
+	g_return_val_if_fail(type != NULL, NULL);
+
+	if (!choices_find_path_save("", PROJECT, FALSE))
+	{
+		report_error(PROJECT,
+		_("Choices saving is disabled by CHOICESPATH variable"));
+		return NULL;
+	}
+
+	type_name = g_strconcat(type->media_type, "/", type->subtype, NULL);
+	tmp = g_strdup_printf(
+		_("You can choose to set the action for just '%s' files, or "
+		  "the default action for all '%s' files which don't already "
+		  "have a run action:"), type_name, type->media_type);
+	r = get_choice(PROJECT, tmp, 3, type_name, type->media_type, "Cancel");
+	g_free(tmp);
+	g_free(type_name);
+
+	if (r == 0)
+	{
+		type_name = g_strconcat(type->media_type, "_",
+					type->subtype, NULL);
+		path = choices_find_path_save(type_name, "MIME-types", TRUE);
+		g_free(type_name);
+	}
+	else if (r == 1)
+		path = choices_find_path_save(type->media_type,
+						"MIME-types", TRUE);
+	else
+		return NULL;
+
+	if (access(path, F_OK) == 0)
+	{
+		if (unlink(path))
+		{
+			tmp = g_strdup_printf( _("Can't remove %s: %s"),
+				path, g_strerror(errno));
+			report_error(PROJECT, tmp);
+			g_free(tmp);
+			return NULL;
+		}
+	}
+
+	return path;
+}

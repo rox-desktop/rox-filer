@@ -55,7 +55,9 @@ struct _FilerWindow
 	gboolean	had_cursor;	/* (before changing directory) */
 	char		*auto_select;	/* If it we find while scanning */
 
-	GtkWidget	*minibuffer;
+	GtkWidget	*minibuffer_area;	/* The hbox to show/hide */
+	GtkWidget	*minibuffer_label;	/* The operation name */
+	GtkWidget	*minibuffer;		/* The text entry */
 	int		mini_cursor_base;
 	MiniType	mini_type;
 };

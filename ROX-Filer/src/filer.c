@@ -1079,6 +1079,12 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 		minibuffer_add(filer_window, item->leafname);
 		return;
 	}
+	else if (filer_window->mini_type == MINI_RUN_ACTION)
+	{
+		collection_set_cursor_item(filer_window->collection,
+						item_number);
+		return;
+	}
 	
 	full_path = make_path(filer_window->path,
 			item->leafname)->str;
@@ -1529,6 +1535,8 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->minibuffer = NULL;
+	filer_window->minibuffer_label = NULL;
+	filer_window->minibuffer_area = NULL;
 	filer_window->path = real_path;
 	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
@@ -1669,9 +1677,9 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 
 		gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
 
-		filer_window->minibuffer = create_minibuffer(filer_window);
-		gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer,
-				FALSE, TRUE, 0);
+		create_minibuffer(filer_window);
+		gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer_area,
+					FALSE, TRUE, 0);
 
 		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
