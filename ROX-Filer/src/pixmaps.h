@@ -54,13 +54,14 @@ struct _MaskedPixmap
 {
 	GObject		object;
 
-	GdkPixbuf	*huge_pixbuf;	/* 'Huge' source image */
+	GdkPixbuf	*src_pixbuf;	/* Limited to 'huge' size */
+
+	/* If huge_pixbuf is NULL then call pixmap_make_huge() */
+	GdkPixbuf	*huge_pixbuf;
+	GdkPixbuf	*huge_pixbuf_lit;
 	int		huge_width, huge_height;
 
-	/* If huge_pixmap is NULL then call pixmap_make_huge() */
-	GdkPixmap	*huge_pixmap;	/* Huge image */
-	GdkBitmap	*huge_mask;
-
+	GdkPixbuf	*pixbuf;
 	GdkPixmap	*pixmap;	/* Normal size image (always valid) */
 	GdkBitmap	*mask;
 	int		width, height;

@@ -186,7 +186,7 @@ gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 	}
 
 	icon_path = make_path(filepath, ".DirIcon")->str;
-	gdk_pixbuf_save(pic->huge_pixbuf, icon_path,
+	gdk_pixbuf_save(pic->src_pixbuf, icon_path,
 			"png", &error,
 			"tEXt::Software", PROJECT,
 			NULL);

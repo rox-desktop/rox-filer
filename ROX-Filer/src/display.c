@@ -213,7 +213,7 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		{
 			if (view->image)
 			{
-				if (!view->image->huge_pixmap)
+				if (!view->image->huge_pixbuf)
 					pixmap_make_huge(view->image);
 				pix_width = view->image->huge_width;
 				pix_height = view->image->huge_height;
@@ -287,26 +287,17 @@ void draw_huge_icon(GtkWidget *widget,
 	width = image->huge_width;
 	height = image->huge_height;
 	image_x = area->x + ((area->width - width) >> 1);
-		
-	gdk_gc_set_clip_mask(gc, image->huge_mask);
-
 	image_y = MAX(0, area->height - height - 6);
-	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_drawable(widget->window, gc,
-			  image->huge_pixmap,
-			  0, 0,			/* Source x,y */
-			  image_x, area->y + image_y, /* Dest x,y */
-			  width, height);
 
-	if (selected)
-	{
-		gdk_gc_set_function(gc, GDK_INVERT);
-		gdk_draw_rectangle(widget->window,
-				gc,
-				TRUE, image_x, area->y + image_y,
-				width, height);
-		gdk_gc_set_function(gc, GDK_COPY);
-	}
+	gdk_pixbuf_render_to_drawable_alpha(
+			selected ? image->huge_pixbuf_lit
+				 : image->huge_pixbuf,
+			widget->window,
+			0, 0, 				/* src */
+			image_x, area->y + image_y,	/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -356,19 +347,19 @@ void draw_large_icon(GtkWidget *widget,
 	width = MIN(image->width, ICON_WIDTH);
 	height = MIN(image->height, ICON_HEIGHT);
 	image_x = area->x + ((area->width - width) >> 1);
-
-	gdk_gc_set_clip_mask(gc, image->mask);
-
 	image_y = MAX(0, area->height - height - 6);
-	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_drawable(widget->window, gc,
-			image->pixmap,
-			0, 0,			/* Source x,y */
-			image_x, area->y + image_y, /* Dest x,y */
-			width, height);
+
+	gdk_pixbuf_render_to_drawable_alpha(image->pixbuf, widget->window,
+			0, 0, 				/* src */
+			image_x, area->y + image_y,	/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
 
 	if (selected)
 	{
+		gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
+		gdk_gc_set_clip_mask(gc, image->mask);
 		gdk_gc_set_function(gc, GDK_INVERT);
 		gdk_draw_rectangle(widget->window,
 				gc,
@@ -800,7 +791,7 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 
 	if (image)
 	{
-		if (!image->huge_pixmap)
+		if (!image->huge_pixbuf)
 			pixmap_make_huge(image);
 		template->icon.width = image->huge_width;
 		template->icon.height = image->huge_height;
@@ -896,7 +887,7 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	if (image)
 	{
-		if (!image->huge_pixmap)
+		if (!image->huge_pixbuf)
 			pixmap_make_huge(image);
 		template->icon.width = image->huge_width;
 		template->icon.height = image->huge_height;

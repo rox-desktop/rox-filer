@@ -108,6 +108,7 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
 static void child_create_thumbnail(const gchar *path);
+static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -153,38 +154,24 @@ static void load_default_pixmaps(void)
 
 void pixmap_make_huge(MaskedPixmap *mp)
 {
-	GdkPixbuf	*hg;
-
-	if (mp->huge_pixmap)
+	if (mp->huge_pixbuf)
 		return;
 
-	g_return_if_fail(mp->huge_pixbuf != NULL);
+	g_return_if_fail(mp->src_pixbuf != NULL);
 
-	hg = scale_pixbuf_up(mp->huge_pixbuf,
-				HUGE_WIDTH * 0.7,
-				HUGE_HEIGHT * 0.7);
+	mp->huge_pixbuf = scale_pixbuf_up(mp->src_pixbuf,
+					  HUGE_WIDTH * 0.7,
+					  HUGE_HEIGHT * 0.7);
 
-	if (hg)
+	if (!mp->huge_pixbuf)
 	{
-		gdk_pixbuf_render_pixmap_and_mask(hg,
-				&mp->huge_pixmap,
-				&mp->huge_mask,
-				128);
-		mp->huge_width = gdk_pixbuf_get_width(hg);
-		mp->huge_height = gdk_pixbuf_get_height(hg);
-		gdk_pixbuf_unref(hg);
+		mp->huge_pixbuf = mp->src_pixbuf;
+		g_object_ref(mp->huge_pixbuf);
 	}
 
-	if (!mp->huge_pixmap)
-	{
-		g_object_ref(mp->pixmap);
-		if (mp->mask)
-			g_object_ref(mp->mask);
-		mp->huge_pixmap = mp->pixmap;
-		mp->huge_mask = mp->mask;
-		mp->huge_width = mp->width;
-		mp->huge_height = mp->height;
-	}
+	mp->huge_pixbuf_lit = create_spotlight_pixbuf(mp->huge_pixbuf);
+	mp->huge_width = gdk_pixbuf_get_width(mp->huge_pixbuf);
+	mp->huge_height = gdk_pixbuf_get_height(mp->huge_pixbuf);
 }
 
 void pixmap_make_small(MaskedPixmap *mp)
@@ -194,9 +181,9 @@ void pixmap_make_small(MaskedPixmap *mp)
 	if (mp->sm_pixmap)
 		return;
 
-	g_return_if_fail(mp->huge_pixbuf != NULL);
+	g_return_if_fail(mp->src_pixbuf != NULL);
 			
-	sm = scale_pixbuf(mp->huge_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
+	sm = scale_pixbuf(mp->src_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
 
 	if (sm)
 	{
@@ -594,23 +581,28 @@ static void masked_pixmap_finialize(GObject *object)
 {
 	MaskedPixmap *mp = (MaskedPixmap *) object;
 
+	if (mp->src_pixbuf)
+	{
+		g_object_unref(mp->src_pixbuf);
+		mp->src_pixbuf = NULL;
+	}
+
 	if (mp->huge_pixbuf)
 	{
 		g_object_unref(mp->huge_pixbuf);
 		mp->huge_pixbuf = NULL;
 	}
-
-	if (mp->huge_pixmap)
+	if (mp->huge_pixbuf_lit)
 	{
-		g_object_unref(mp->huge_pixmap);
-		mp->huge_pixmap = NULL;
-	}
-	if (mp->huge_mask)
-	{
-		g_object_unref(mp->huge_mask);
-		mp->huge_mask = NULL;
+		g_object_unref(mp->huge_pixbuf_lit);
+		mp->huge_pixbuf_lit = NULL;
 	}
 
+	if (mp->pixbuf)
+	{
+		g_object_unref(mp->pixbuf);
+		mp->pixbuf = NULL;
+	}
 	if (mp->pixmap)
 	{
 		g_object_unref(mp->pixmap);
@@ -649,13 +641,14 @@ static void masked_pixmap_init(GTypeInstance *object, gpointer gclass)
 {
 	MaskedPixmap *mp = (MaskedPixmap *) object;
 
-	mp->huge_pixbuf = NULL;
+	mp->src_pixbuf = NULL;
 
-	mp->huge_pixmap = NULL;
-	mp->huge_mask = NULL;
+	mp->huge_pixbuf = NULL;
+	mp->huge_pixbuf_lit = NULL;
 	mp->huge_width = -1;
 	mp->huge_height = -1;
 
+	mp->pixbuf = NULL;
 	mp->pixmap = NULL;
 	mp->mask = NULL;
 	mp->width = -1;
@@ -696,37 +689,94 @@ static GType masked_pixmap_get_type(void)
 MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size)
 {
 	MaskedPixmap *mp;
-	GdkPixbuf	*huge_pixbuf, *normal_pixbuf;
+	GdkPixbuf	*src_pixbuf, *normal_pixbuf;
 	GdkPixmap	*pixmap;
 	GdkBitmap	*mask;
 
 	g_return_val_if_fail(full_size != NULL, NULL);
 
-	huge_pixbuf = scale_pixbuf(full_size, HUGE_WIDTH, HUGE_HEIGHT);
-	g_return_val_if_fail(huge_pixbuf != NULL, NULL);
+	src_pixbuf = scale_pixbuf(full_size, HUGE_WIDTH, HUGE_HEIGHT);
+	g_return_val_if_fail(src_pixbuf != NULL, NULL);
 
-	normal_pixbuf = scale_pixbuf(huge_pixbuf, ICON_WIDTH, ICON_HEIGHT);
+	normal_pixbuf = scale_pixbuf(src_pixbuf, ICON_WIDTH, ICON_HEIGHT);
 	g_return_val_if_fail(normal_pixbuf != NULL, NULL);
 
 	gdk_pixbuf_render_pixmap_and_mask(normal_pixbuf, &pixmap, &mask, 128);
 
 	if (!pixmap)
 	{
-		gdk_pixbuf_unref(huge_pixbuf);
+		gdk_pixbuf_unref(src_pixbuf);
 		gdk_pixbuf_unref(normal_pixbuf);
 		return NULL;
 	}
 
 	mp = g_object_new(masked_pixmap_get_type(), NULL);
 
-	mp->huge_pixbuf = huge_pixbuf;
+	mp->src_pixbuf = src_pixbuf;
 
+	mp->pixbuf = normal_pixbuf;
 	mp->pixmap = pixmap;
 	mp->mask = mask;
 	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
 	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
 
-	gdk_pixbuf_unref(normal_pixbuf);
-
 	return mp;
+}
+
+static guchar lighten_component(guchar cur_value)
+{
+	int new_value = cur_value;
+
+	new_value += 48 + (new_value >> 3);
+	if (new_value > 255)
+		new_value = 255;
+	
+	return (guchar) new_value;
+}
+
+/* Stolen from eel */
+static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src)
+{
+	GdkPixbuf *dest;
+	int i, j;
+	int width, height, has_alpha, src_row_stride, dst_row_stride;
+	guchar *target_pixels, *original_pixels;
+	guchar *pixsrc, *pixdest;
+	gint n_channels;
+
+	n_channels = gdk_pixbuf_get_n_channels(src);
+	has_alpha = gdk_pixbuf_get_has_alpha(src);
+	width = gdk_pixbuf_get_width(src);
+	height = gdk_pixbuf_get_height(src);
+
+	g_return_val_if_fail(gdk_pixbuf_get_colorspace(src) ==
+			     GDK_COLORSPACE_RGB, NULL);
+	g_return_val_if_fail((!has_alpha && n_channels == 3) ||
+			     (has_alpha && n_channels == 4), NULL);
+	g_return_val_if_fail(gdk_pixbuf_get_bits_per_sample(src) == 8, NULL);
+
+	dest = gdk_pixbuf_new(gdk_pixbuf_get_colorspace(src), has_alpha,
+			       gdk_pixbuf_get_bits_per_sample(src),
+			       width, height);
+	
+	dst_row_stride = gdk_pixbuf_get_rowstride(dest);
+	src_row_stride = gdk_pixbuf_get_rowstride(src);
+	target_pixels = gdk_pixbuf_get_pixels(dest);
+	original_pixels = gdk_pixbuf_get_pixels(src);
+
+	for (i = 0; i < height; i++)
+	{
+		pixdest = target_pixels + i * dst_row_stride;
+		pixsrc = original_pixels + i * src_row_stride;
+		for (j = 0; j < width; j++)
+		{
+			*pixdest++ = (*pixsrc++);
+			*pixdest++ = (*pixsrc++);
+			*pixdest++ = lighten_component(*pixsrc++);
+			if (has_alpha)
+				*pixdest++ = *pixsrc++;
+		}
+	}
+
+	return dest;
 }

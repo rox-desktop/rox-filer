@@ -78,7 +78,8 @@ typedef enum {
 } FileOp;
 
 typedef enum menu_icon_style {
-  MIS_NONE, MIS_SMALL, MIS_LARGE, MIS_HUGE,
+  MIS_NONE, MIS_SMALL, MIS_LARGE,
+  MIS_HUGE_UNUSED,
   MIS_CURRENT, /* As per current filer window */
   MIS_DEFAULT
 } MenuIconStyle;
@@ -488,12 +489,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 		if (ditem->image && style != MIS_NONE)
 		{
 			switch (style) {
-				case MIS_HUGE:
-					if (!ditem->image->huge_pixmap)
-						pixmap_make_huge(ditem->image);
-					icon = ditem->image->huge_pixmap;
-					mask = ditem->image->huge_mask;
-					break;
 				case MIS_LARGE:
 					icon = ditem->image->pixmap;
 					mask = ditem->image->mask;
@@ -641,7 +636,7 @@ static MenuIconStyle get_menu_icon_style(void)
 
 	switch (mis)
 	{
-		case MIS_NONE: case MIS_SMALL: case MIS_LARGE: case MIS_HUGE:
+		case MIS_NONE: case MIS_SMALL: case MIS_LARGE:
 			return mis;
 		default:
 			break;
@@ -652,7 +647,6 @@ static MenuIconStyle get_menu_icon_style(void)
 		switch (window_with_focus->display_style)
 		{
 			case HUGE_ICONS:
-				return MIS_HUGE;
 			case LARGE_ICONS:
 				return MIS_LARGE;
 			case SMALL_ICONS:
@@ -666,7 +660,6 @@ static MenuIconStyle get_menu_icon_style(void)
 	switch (display)
 	{
 		case HUGE_ICONS:
-			return MIS_HUGE;
 		case LARGE_ICONS:
 			return MIS_LARGE;
 		case SMALL_ICONS:
