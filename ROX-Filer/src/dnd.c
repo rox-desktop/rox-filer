@@ -480,7 +480,11 @@ static void drag_end(GtkWidget *widget,
 			FilerWindow *filer_window)
 {
 	collection_set_autoscroll(filer_window->collection, FALSE);
-	collection_clear_selection(filer_window->collection);
+	if (filer_window->temp_item_selected)
+	{
+		collection_clear_selection(filer_window->collection);
+		filer_window->temp_item_selected = FALSE;
+	}
 }
 
 /* Called when a remote app wants us to send it some data.
@@ -1238,6 +1242,7 @@ static gboolean spring_check_idle(gpointer data)
 
 static gboolean spring_now(gpointer data)
 {
+	gboolean	old_unique = o_unique_filer_windows;
 	guchar		*dest_path;
 	gint		x, y;
 	
@@ -1259,6 +1264,7 @@ static gboolean spring_now(gpointer data)
 
 	get_pointer_xy(&x, &y);
 	
+	o_unique_filer_windows = FALSE;
 	if (spring_window)
 	{
 		collection_set_cursor_item(spring_window->collection, -1);
@@ -1276,6 +1282,7 @@ static gboolean spring_now(gpointer data)
 		if (spring_window)
 			centre_window(spring_window->window->window, x, y);
 	}
+	o_unique_filer_windows = old_unique;
 
 	dnd_spring_abort();
 

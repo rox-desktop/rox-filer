@@ -799,16 +799,11 @@ FilerWindow *filer_opendir(char *path)
 		
 		fw = find_filer_window(real_path, NULL);
 		
+		/* Destroy and recreate to make sure it becomes
+		 * visible.
+		 */
 		if (fw)
-		{
-			    /* TODO: this should bring the window to the front
-			     * at the same coordinates.
-			     */
-			    gtk_widget_hide(fw->window);
-			    g_free(real_path);
-			    gtk_widget_show(fw->window);
-			    return fw;
-		}
+			gtk_widget_destroy(fw->window);
 	}
 
 	filer_window = g_new(FilerWindow, 1);
@@ -1378,7 +1373,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 		{
 			/* Select just this one */
 			collection_clear_except(collection, i);
-			/* tmp_icon_selected = TRUE; */
+			filer_window->temp_item_selected = TRUE;
 		}
 		else
 			collection_select_item(collection, i);

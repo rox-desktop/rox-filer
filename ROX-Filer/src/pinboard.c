@@ -76,7 +76,8 @@ struct _Pinboard {
 };
 
 static Pinboard	*current_pinboard = NULL;
-static gint	loading_pinboard = 0;	/* Non-zero => loading */
+static gint	loading_pinboard = 0;		/* Non-zero => loading */
+static gboolean tmp_icon_selected = FALSE;	/* For drag-and-drop */
 
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
@@ -1010,7 +1011,10 @@ static void start_drag(PinIcon *icon, GdkEventMotion *event)
 	GList	*selected;
 
 	if (!icon->selected)
+	{
+		tmp_icon_selected = TRUE;
 		pinboard_select_only(icon);
+	}
 	
 	selected = pinboard_get_selected();
 	g_return_if_fail(selected != NULL);
@@ -1516,7 +1520,11 @@ static void drag_end(GtkWidget *widget,
 		     PinIcon *icon)
 {
 	pinboard_drag_in_progress = FALSE;
-	pinboard_clear_selection();
+	if (tmp_icon_selected)
+	{
+		pinboard_clear_selection();
+		tmp_icon_selected = FALSE;
+	}
 }
 
 /*			OPTIONS BITS				*/

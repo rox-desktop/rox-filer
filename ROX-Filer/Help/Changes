@@ -2,6 +2,18 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+09-Sep-2000
+~~~~~~~~~~~
+'Unique filer windows' option now has no effect while the spring open
+feature is active (spotted by Andrew Booker). Also, when opening a new
+window, the old window is destroyed and a new one created (rather than
+reusing the old one). This ensures that the new window appears in the
+right place.
+
+When a drag from the pinboard or a filer window ends, the selection is
+only cleared if the icon was selected by starting the drag. Thus, it now
+works like the panels.
+
 08-Sep-2000
 ~~~~~~~~~~~
 New Close toolbar button (requested by Martin Ward).
