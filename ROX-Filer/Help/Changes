@@ -2,6 +2,19 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+11-Nov-2000
+~~~~~~~~~~~
+Mounting or unmounting a directory forces mtab to be reread, even if the
+timestamp hasn't changed (problem reported by Wilbert Berendsen).
+
+When the 'Unique windows' option is on, remove the old window AFTER creating
+the new one, so that the filer doesn't quit because there are zero windows
+open... (Denis Manente).
+
+07-Nov-2000
+~~~~~~~~~~~
+Updated the Dutch translation (Jan Wagemakers).
+
 29-Oct-2000
 ~~~~~~~~~~~
 Updated the French translation (Vincent Lefèvre).

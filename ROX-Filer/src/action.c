@@ -564,8 +564,10 @@ static void message_from_child(gpointer 	 data,
 				g_free(buffer);
 				return;
 			}
-			else if (*buffer == 'm')
+			else if (*buffer == 'm' || *buffer == 'M')
 			{
+				if (*buffer == 'M')
+					mount_update(TRUE);
 				filer_check_mounted(buffer + 1);
 				g_free(buffer);
 				return;
@@ -1682,7 +1684,7 @@ static void do_mount(guchar *path, gboolean mount)
 
 	if (fork_exec_wait(argv) == 0)
 	{
-		g_string_sprintf(message, "m%s", path);
+		g_string_sprintf(message, "M%s", path);
 		send();
 	}
 	else

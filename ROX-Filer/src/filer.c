@@ -784,19 +784,6 @@ FilerWindow *filer_opendir(char *path)
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
-	/* If the user doesn't want duplicate windows then check
-	 * for an existing one and close it if found.
-	 */
-	if (o_unique_filer_windows)
-	{
-		FilerWindow *fw;
-		
-		fw = find_filer_window(real_path, NULL);
-
-		if (fw)
-			gtk_widget_destroy(fw->window);
-	}
-
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->minibuffer = NULL;
 	filer_window->minibuffer_label = NULL;
@@ -859,8 +846,24 @@ FilerWindow *filer_opendir(char *path)
 
 	attach(filer_window);
 
-	/* Make the window visible */
+	/* Make the window visible. Update number_of_windows BEFORE destroying the
+	 * old window!
+	 */
 	number_of_windows++;
+
+	/* If the user doesn't want duplicate windows then check
+	 * for an existing one and close it if found.
+	 */
+	if (o_unique_filer_windows)
+	{
+		FilerWindow *fw;
+		
+		fw = find_filer_window(filer_window->path, NULL);
+
+		if (fw)
+			gtk_widget_destroy(fw->window);
+	}
+
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
 	gtk_widget_show(filer_window->window);
 

@@ -1353,9 +1353,11 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (o_unique_filer_windows)
+	{
 		report_error(PROJECT, _("You can't open a second view onto "
 			"this directory because the `Unique Windows' option "
 			"is turned on in the Options window."));
+	}
 	else
 		filer_opendir(window_with_focus->path);
 }

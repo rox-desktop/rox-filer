@@ -6,11 +6,12 @@
 # van mijn vrienden in Linux.B (Fidonet) : 
 #	- Johan Zwiekhorst
 #	- Bruno Tuteleers
+#	- Tom Laermans
 # Bedankt mannen! :-)
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 0.1.21\n"
-"POT-Creation-Date: 2000-10-20 21:30+0100\n"
+"POT-Creation-Date: 2000-11-04 10:09+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@linuxfreak.com>\n"
 "Language-Team: ROX Mailing List <rox@ecs.soton.ac.uk>\n"
@@ -105,6 +106,15 @@ msgid ""
 "contains a slash then the match is against the full path; otherwise it is \n"
 "against the leafname only."
 msgstr ""
+"IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
+"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
+"(rechten)\n"
+"IsEmpty, IsMine\n"
+"\n"
+"Een patroon in enkele aanhalingstekens is een schil-stijl joker om mee "
+"overeen te komen. Als het\n"
+"een slash bevat dan is de overeenkomst tegenover het volledige pad; anders \n"
+"is het enkel tegenover het bladnaam."
 
 #: action.c:390
 msgid "Comparisons"
@@ -179,6 +189,35 @@ msgid ""
 "\n"
 "See the chmod(1) man page for full details."
 msgstr ""
+"Normaal kan je gewoon een commando kiezen uit het menu (klik op de pijltjes \n"
+"naast de commando-rechthoek). Soms, heb je iets anders nodig....\n"
+"\n"
+"Het formaat van een commando is:"
+"VERANDER, VERANDER, ...\n"
+"Elke VERANDER is:\n"
+"WIE HOE TOEGANGSRECHTEN\n"
+"WIE is een combinatie van u, g en o welke bepaald van wie je de\n"
+"toegangsrechten wil aanpassen, User (eigenaar), Group (Groep)\n"
+"of Others (Anderen).\n"
+"HOE is +, - of = om resp. toevoegen, verwijderen, hetzelfde te zetten van\n"
+"de toegangsrechten.\n"
+"TOEGANGSRECHTEN is een combinatie van de letters 'rwxXstugo'\n"
+"\n"
+"Tekst tussen haakjes en spaties worden genegeerd.\n"
+"\n"
+"Voorbeelden:\n"
+"u+rw \t(de bestands-eigenaar krijgt lees en schrijf toegang)\n"
+"g=u\t(de groepsrechten worden gezet hetzelfde als de eigenaar)\n"
+"o=u-w\t(anderen krijgen dezelfde rechten als de eigenaar maar zonder "
+"schrijftoegang)\n"
+"a+x\t(iedereen krijgt voeruit-toegang - hetzelfde als 'ugo+x')\n"
+"a+X\t(mappen worden bereikbaar voor iedereen; bestanden die uitvoerbaar\n"
+"waren door iemand worden uitvoerbaar door iedereen)\n"
+"u+rw, go+r\t(twee commando's in één keer!)\n"
+"u+s\t(zet de SetUID bit - heeft meestal geen effect op script-bestanden)\n"
+"755\t(zet de toegangsrechten direct)\n"
+"\n"
+"Zie de chmod(1) handleiding (man) voor de volledige uitleg."
 
 #: action.c:613
 msgid "There was one error.\n"
@@ -449,7 +488,7 @@ msgstr "Beknopt - geef alleen melding als mappen worden gewist"
 #: action.c:2054
 msgid "You need to select the items whose permissions you want to change"
 msgstr ""
-"Je moet een paar items selecteren waarvan je de toegangsrechten wilaanpassen"
+"Je moet een paar items selecteren waarvan je de toegangsrechten wil aanpassen"
 
 #: action.c:2062
 msgid "a+x (Make executable/searchable)"
@@ -549,7 +588,7 @@ msgid ""
 "mice), to pop up the menu. If off, use button 3 (right) instead."
 msgstr ""
 "gebruik knop 2, de middelste knop (klik met beidde knoppen tegelijkertijd op "
-"twee-knops muizen, om het menu tevoorschijn te halen. Indien 'af', gebruik "
+"twee-knops muizen), om het menu tevoorschijn te halen. Indien 'af', gebruik "
 "knop 3 (rechts) in de plaats."
 
 #: bind.c:170
@@ -694,7 +733,7 @@ msgstr "Interne fout - slechte info type"
 # dnd.c:807 ***
 #: dnd.c:807
 msgid "XDS protocol error: leafname may not contain '/'\n"
-msgstr ""
+msgstr "XDS protocol fout: bladnaam mag geen '/' bevatten\n"
 
 # dnd.c:832 ***
 #: dnd.c:832
@@ -702,11 +741,13 @@ msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type "
 "text/plain) did not contain a leafname\n"
 msgstr ""
+"XdndDirectSave0 doel afgeleverd, maar het atoom XdndDirectSave0 (type "
+"text/plain) bevat geen bladnaam\n"
 
 #: dnd.c:843
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
-"Sorry - I heb een doel van het type text/uri-lijst nodig ofXdndDirectSave0."
+"Sorry - I heb een doel van het type text/uri-lijst nodig of XdndDirectSave0."
 
 #: dnd.c:846
 msgid ""
@@ -1590,8 +1631,8 @@ msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
 msgstr ""
-"je hebt getracht om het paneel via de venster-manager te sluiten - Meestal "
-"is dit per ongeluk... wel degelijk sluiten?"
+"Je hebt getracht om het paneel via de venster-manager te sluiten - Meestal "
+"is dit per ongeluk... weldegelijk sluiten?"
 
 #: panel.c:406
 msgid "Remove"
@@ -1611,7 +1652,7 @@ msgid ""
 "filesystem."
 msgstr ""
 "Selecteer één item, gebruik dit dan om uit te zoeken waar het zich bevind "
-"inhet bestandssysteem."
+"in het bestandssysteem."
 
 #: panel.c:1014
 msgid "You must select a single item to get help on"
@@ -1754,7 +1795,7 @@ msgid ""
 "Device files allow you to read from or write to a device driver as though it "
 "was an ordinary file."
 msgstr ""
-"Rand-apparaat bestanden laten toe om te schijven/lezen van/naar een "
+"Rand-apparaat bestanden laten toe om te schrijven/lezen van/naar een "
 "rand-apparaat alsof het een gewoon bestand was."
 
 #: run.c:308
@@ -1798,6 +1839,7 @@ msgid "Broken symlink (or you don't have permission to follow it)."
 msgstr "Gebroken symbolische koppeling (of je hebt er geen toegang naar)."
 
 #: run.c:537
+#, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
@@ -1915,7 +1957,7 @@ msgstr "Overbodige karakters na MIME-type"
 
 #: type.c:189
 msgid "Sym link"
-msgstr ""
+msgstr "Sym kopp"
 
 #: type.c:193
 msgid "App dir"
@@ -1989,24 +2031,11 @@ msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr ""
+"Er bestaat reeds een start actie in de vorm van een vrij groot programma - "
+"ben je zeker dat je dit wil wissen?"
 
 #: type.c:617
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Kan %s niet verwijderen: %s"
 
-#~ msgid "!!!DANGER!!!"
-#~ msgstr "!!!GEVAAR!!!"
-
-#~ msgid ""
-#~ "Running ROX-Filer as root is VERY dangerous. If I had a warranty (I don't) "
-#~ "then doing this would void it"
-#~ msgstr ""
-#~ "Het gebruik van ROX-Bestander als root is ZEER gevaarlijk. Als ik garantie "
-#~ "gaf (wat ik niet doe) dan zou die hierdoor verbroken worden"
-
-#~ msgid "Don't click here"
-#~ msgstr "Klik hier niet"
-
-#~ msgid "Quit"
-#~ msgstr "Stoppen"
