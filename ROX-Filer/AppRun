@@ -5,12 +5,14 @@ PROG=ROX-Filer
 APP_DIR=`dirname $0`
 APP_DIR=`cd "$APP_DIR";pwd`; export APP_DIR
 
-ARCH=`uname -m`
-case "$ARCH" in
-	i?86) ARCH=ix86 ;;
-esac
+if [ "x$PLATFORM" = x ]; then
+	ARCH=`uname -m`
+	case "$ARCH" in
+		i?86) ARCH=ix86 ;;
+	esac
 
-PLATFORM=`uname -s`-"$ARCH"
+	PLATFORM=`uname -s`-"$ARCH" export PLATFORM
+fi
 
 DEBUGGER=""
 
