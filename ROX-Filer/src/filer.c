@@ -1165,7 +1165,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 
 	filer_window->temp_item_selected = FALSE;
 	filer_window->flags = (FilerFlags) 0;
-	filer_window->details_type = DETAILS_SUMMARY;
+	filer_window->details_type = DETAILS_TIMES;
 	filer_window->display_style = UNKNOWN_STYLE;
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;

@@ -599,7 +599,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		DetailsType dt;
 		
 		dt = !g_strcasecmp(details, "None") ? DETAILS_NONE :
-		     !g_strcasecmp(details, "Summary") ? DETAILS_SUMMARY :
+		     !g_strcasecmp(details, "Summary") ? DETAILS_NONE :
 		     !g_strcasecmp(details, "Size") ? DETAILS_SIZE :
 		     !g_strcasecmp(details, "Type") ? DETAILS_TYPE :
 		     !g_strcasecmp(details, "Times") ? DETAILS_TIMES :

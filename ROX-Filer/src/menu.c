@@ -122,10 +122,11 @@ static GList *set_keys_button(Option *option, xmlNode *node, guchar *label);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
+static void view_type(gpointer data, guint action, GtkWidget *widget);
+
 /* (action used in these three - DetailsType) */
-static void huge_with(gpointer data, guint action, GtkWidget *widget);
-static void large_with(gpointer data, guint action, GtkWidget *widget);
-static void small_with(gpointer data, guint action, GtkWidget *widget);
+static void change_size(gpointer data, guint action, GtkWidget *widget);
+static void set_with(gpointer data, guint action, GtkWidget *widget);
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget);
 static void sort_type(gpointer data, guint action, GtkWidget *widget);
@@ -175,27 +176,16 @@ static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Huge Icons"),   	NULL, huge_with, DETAILS_NONE, NULL},
-{">" N_("Large Icons"),   	NULL, large_with, DETAILS_NONE, NULL},
-{">" N_("Small Icons"),   	NULL, small_with, DETAILS_NONE, NULL},
-{">" N_("Huge, With..."),	NULL, NULL, 0, "<Branch>"},
-{">>" N_("Summary"),		NULL, huge_with, DETAILS_SUMMARY, NULL},
-{">>" N_("Sizes"),		NULL, huge_with, DETAILS_SIZE, NULL},
-{">>" N_("Permissions"),	NULL, huge_with, DETAILS_PERMISSIONS, NULL},
-{">>" N_("Type"),		NULL, huge_with, DETAILS_TYPE, NULL},
-{">>" N_("Times"),		NULL, huge_with, DETAILS_TIMES, NULL},
-{">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
-{">>" N_("Summary"),		NULL, large_with, DETAILS_SUMMARY, NULL},
-{">>" N_("Sizes"),		NULL, large_with, DETAILS_SIZE, NULL},
-{">>" N_("Permissions"),	NULL, large_with, DETAILS_PERMISSIONS, NULL},
-{">>" N_("Type"),		NULL, large_with, DETAILS_TYPE, NULL},
-{">>" N_("Times"),		NULL, large_with, DETAILS_TIMES, NULL},
-{">" N_("Small, With..."),	NULL, NULL, 0, "<Branch>"},
-{">>" N_("Summary"),		NULL, small_with, DETAILS_SUMMARY, NULL},
-{">>" N_("Sizes"),		NULL, small_with, DETAILS_SIZE, NULL},
-{">>" N_("Permissions"),	NULL, small_with, DETAILS_PERMISSIONS, NULL},
-{">>" N_("Type"),		NULL, small_with, DETAILS_TYPE, NULL},
-{">>" N_("Times"),		NULL, small_with, DETAILS_TIMES, NULL},
+{">" N_("Icons View"),   	NULL, view_type, VIEW_TYPE_COLLECTION, NULL},
+{">" N_("Icons, With..."),	NULL, NULL, 0, "<Branch>"},
+{">>" N_("Sizes"),		NULL, set_with, DETAILS_SIZE, NULL},
+{">>" N_("Permissions"),	NULL, set_with, DETAILS_PERMISSIONS, NULL},
+{">>" N_("Type"),		NULL, set_with, DETAILS_TYPE, NULL},
+{">>" N_("Times"),		NULL, set_with, DETAILS_TIMES, NULL},
+{">" N_("Details View"),   	NULL, view_type, VIEW_TYPE_DETAILS, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Bigger Icons"),   	NULL, change_size, 1, NULL},
+{">" N_("Smaller Icons"),   	NULL, change_size, -1, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL, sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL, sort_type, 0, NULL},
@@ -869,19 +859,61 @@ void menu_show_shift_action(GtkWidget *menu_item, DirItem *item, gboolean next)
 
 /* Actions */
 
-static void huge_with(gpointer data, guint action, GtkWidget *widget)
+static void view_type(gpointer data, guint action, GtkWidget *widget)
 {
-	display_set_layout(window_with_focus, HUGE_ICONS, action);
+	ViewType view_type = (ViewType) action;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (view_type == VIEW_TYPE_COLLECTION)
+		display_set_layout(window_with_focus,
+				window_with_focus->display_style, DETAILS_NONE);
+
+	filer_set_view_type(window_with_focus, (ViewType) action);
 }
 
-static void large_with(gpointer data, guint action, GtkWidget *widget)
+static void change_size(gpointer data, guint action, GtkWidget *widget)
 {
-	display_set_layout(window_with_focus, LARGE_ICONS, action);
+	DisplayStyle size;
+	DetailsType type;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	type = window_with_focus->details_type;
+	size = window_with_focus->display_style;
+
+	if (action == 1)
+	{
+		if (size == SMALL_ICONS)
+			size = LARGE_ICONS;
+		else if (size == LARGE_ICONS)
+			size = HUGE_ICONS;
+		else
+			return;
+	}
+	else if (action == -1)
+	{
+		if (size == LARGE_ICONS)
+			size = SMALL_ICONS;
+		else if (size == HUGE_ICONS)
+			size = LARGE_ICONS;
+		else
+			return;
+	}
+
+	display_set_layout(window_with_focus, size, type);
 }
 
-static void small_with(gpointer data, guint action, GtkWidget *widget)
+static void set_with(gpointer data, guint action, GtkWidget *widget)
 {
-	display_set_layout(window_with_focus, SMALL_ICONS, action);
+	DisplayStyle size;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	size = window_with_focus->display_style;
+
+	filer_set_view_type(window_with_focus, VIEW_TYPE_COLLECTION);
+	display_set_layout(window_with_focus, size, action);
 }
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)

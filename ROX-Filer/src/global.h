@@ -116,7 +116,6 @@ typedef enum {		/* Values used in options, must start at 0 */
 
 typedef enum {		/* Values used in options, must start at 0 */
 	DETAILS_NONE		= 0,
-	DETAILS_SUMMARY 	= 1,
 	DETAILS_SIZE		= 2,
 	DETAILS_PERMISSIONS	= 3,
 	DETAILS_TYPE		= 4,

@@ -474,37 +474,6 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 	if (scanned && item->lstat_errno)
 		buf = g_strdup_printf(_("lstat(2) failed: %s"),
 				g_strerror(item->lstat_errno));
-	else if (filer_window->details_type == DETAILS_SUMMARY)
-	{
-		gchar *time;
-
-		if (!scanned)
-			return g_strdup("XXXX ---,---,---/--"
-#ifdef S_ISVTX
-					"-"
-#endif
-					" 12345678 12345678 "
-					"1234M 00:00:00 01 Mmm Yyyy");
-
-		time = pretty_time(&item->mtime);
-		
-		buf = g_strdup_printf("%s %s %-8.8s %-8.8s %s %s",
-				item->flags & ITEM_FLAG_APPDIR? "App " :
-			        S_ISDIR(m) ? "Dir " :
-				S_ISCHR(m) ? "Char" :
-				S_ISBLK(m) ? "Blck" :
-				S_ISLNK(m) ? "Link" :
-				S_ISSOCK(m) ? "Sock" :
-				S_ISFIFO(m) ? "Pipe" :
-				S_ISDOOR(m) ? "Door" :
-				"File",
-			pretty_permissions(m),
-			user_name(item->uid),
-			group_name(item->gid),
-			format_size_aligned(item->size),
-			time);
-		g_free(time);
-	}
 	else if (filer_window->details_type == DETAILS_TYPE)
 	{
 		MIME_type	*type = item->mime_type;
@@ -622,9 +591,7 @@ void display_update_view(FilerWindow *filer_window,
 		view->details_width = w / PANGO_SCALE;
 		view->details_height = h / PANGO_SCALE;
 
-		if (filer_window->details_type == DETAILS_SUMMARY)
-			perm_offset = 5;
-		else if (filer_window->details_type == DETAILS_PERMISSIONS)
+		if (filer_window->details_type == DETAILS_PERMISSIONS)
 			perm_offset = 0;
 		if (perm_offset > -1)
 		{
