@@ -172,7 +172,8 @@ static void stop_scanning(FilerWindow *filer_window)
 	closedir(filer_window->dir);
 	gtk_idle_remove(filer_window->idle_scan_id);
 	filer_window->dir = NULL;
-	gdk_window_set_cursor(filer_window->window->window, NULL);
+	if (filer_window->window->window)
+		gdk_window_set_cursor(filer_window->window->window, NULL);
 }
 
 /* This is called while we are scanning the directory */
@@ -688,8 +689,8 @@ static int sort_by_name(const void *item1, const void *item2)
 
 static int sort_by_type(const void *item1, const void *item2)
 {
-	const FileItem *i1 = *((FileItem **) item1);
-	const FileItem *i2 = *((FileItem **) item2);
+	const FileItem *i1 = (FileItem *) ((CollectionItem *) item1)->data;
+	const FileItem *i2 = (FileItem *) ((CollectionItem *) item2)->data;
 	MIME_type *m1, *m2;
 
 	int	 diff = i1->base_type - i2->base_type;
@@ -709,8 +710,10 @@ static int sort_by_type(const void *item1, const void *item2)
 		if (!diff)
 			diff = strcmp(m1->subtype, m2->subtype);
 	}
+	else if (m1 || m2)
+		diff = m1 ? 1 : -1;
 	else
-		diff = m1 - m2;
+		diff = 0;
 
 	if (diff)
 		return diff > 0 ? 1 : -1;
