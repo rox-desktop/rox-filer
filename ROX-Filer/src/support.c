@@ -1123,7 +1123,14 @@ void null_g_free(gpointer p)
 	*(gpointer *)p = NULL;
 }
 
+typedef struct _CollatePart CollatePart;
+
 struct _CollateKey {
+	CollatePart *parts;
+	gboolean caps;
+};
+
+struct _CollatePart {
 	guchar *text;	/* NULL => end of list */
 	long number;
 };
@@ -1138,13 +1145,13 @@ CollateKey *collate_key_new(const guchar *name)
 	const guchar *i;
 	guchar *to_free = NULL;
 	GArray *array;
-	CollateKey new;
+	CollatePart new;
 	CollateKey *retval;
 	char *tmp;
 
 	g_return_val_if_fail(name != NULL, NULL);
 
-	array = g_array_new(FALSE, FALSE, sizeof(CollateKey));
+	array = g_array_new(FALSE, FALSE, sizeof(CollatePart));
 
 	/* Ensure valid UTF-8 */
 	if (!g_utf8_validate(name, -1, NULL))
@@ -1152,6 +1159,9 @@ CollateKey *collate_key_new(const guchar *name)
 		to_free = to_utf8(name);
 		name = to_free;
 	}
+
+	retval = g_new(CollateKey, 1);
+	retval->caps = g_unichar_isupper(g_utf8_get_char(name));
 
 	for (i = name; *i; i = g_utf8_next_char(i))
 	{
@@ -1186,7 +1196,7 @@ CollateKey *collate_key_new(const guchar *name)
 	new.text = NULL;
 	g_array_append_val(array, new);
 
-	retval = (CollateKey *) array->data;
+	retval->parts = (CollatePart *) array->data;
 	g_array_free(array, FALSE);
 
 	if (to_free)
@@ -1197,16 +1207,28 @@ CollateKey *collate_key_new(const guchar *name)
 
 void collate_key_free(CollateKey *key)
 {
-	CollateKey *part;
+	CollatePart *part;
 
-	for (part = key; part->text; part++)
+	for (part = key->parts; part->text; part++)
 		g_free(part->text);
+	g_free(key->parts);
 	g_free(key);
 }
 
-int collate_key_cmp(const CollateKey *n1, const CollateKey *n2)
+int collate_key_cmp(const CollateKey *key1, const CollateKey *key2,
+		    gboolean caps_first)
 {
+	CollatePart *n1 = key1->parts;
+	CollatePart *n2 = key2->parts;
 	int r;
+
+	if (caps_first)
+	{
+		if (key1->caps && !key2->caps)
+			return -1;
+		else if (key2->caps && !key1->caps)
+			return 1;
+	}
 
 	while (1)
 	{

@@ -61,6 +61,7 @@
 #define HUGE_WRAP (1.5 * o_large_width.int_value)
 
 /* Options bits */
+static Option o_display_caps_first;
 static Option o_display_dirs_first;
 Option o_display_size;
 Option o_display_details;
@@ -85,6 +86,7 @@ static void display_set_actual_size_real(FilerWindow *filer_window);
 
 void display_init()
 {
+	option_add_int(&o_display_caps_first, "display_caps_first", FALSE);
 	option_add_int(&o_display_dirs_first, "display_dirs_first", FALSE);
 	option_add_int(&o_display_size, "display_icon_size", AUTO_SIZE_ICONS);
 	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
@@ -287,7 +289,7 @@ int sort_by_name(const void *item1, const void *item2)
 
 	SORT_DIRS;
 
-	retval = collate_key_cmp(n1, n2);
+	retval = collate_key_cmp(n1, n2, o_display_caps_first.int_value);
 
 	return retval ? retval : strcmp(i1->leafname, i2->leafname);
 }
@@ -522,7 +524,8 @@ static void options_changed(void)
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 		int flags = 0;
 
-		if (o_display_dirs_first.has_changed)
+		if (o_display_dirs_first.has_changed ||
+		    o_display_caps_first.has_changed)
 			view_sort(VIEW(filer_window->view));
 
 		if (o_large_width.has_changed || o_small_width.has_changed)
