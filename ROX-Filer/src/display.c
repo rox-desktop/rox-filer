@@ -472,9 +472,8 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 void display_set_filter(FilerWindow *filer_window, FilterType type,
 			const gchar *filter_string)
 {
-	filer_set_filter(filer_window, type, filter_string);
-
-	display_update_hidden(filer_window);
+	if (filer_set_filter(filer_window, type, filter_string))
+		display_update_hidden(filer_window);
 }
 
 
@@ -748,7 +747,7 @@ void display_update_view(FilerWindow *filer_window,
 
 	if (!view->image)
 	{
-		view->image = item->image;
+		view->image = di_image(item);
 		if (view->image)
 			g_object_ref(view->image);
 	}

@@ -76,10 +76,10 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 {
 	struct stat	info;
 
-	if (item->image)
+	if (item->_image)
 	{
-		g_object_unref(item->image);
-		item->image = NULL;
+		g_object_unref(item->_image);
+		item->_image = NULL;
 	}
 	item->flags = 0;
 	item->mime_type = NULL;
@@ -204,17 +204,6 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 
 	if (!item->mime_type)
 		item->mime_type = mime_type_from_base_type(item->base_type);
-
-	if (!item->image)
-	{
-		if (item->base_type == TYPE_ERROR)
-		{
-			item->image = im_error;
-			g_object_ref(im_error);
-		}
-		else
-			item->image = type_to_icon(item->mime_type);
-	}
 }
 
 DirItem *diritem_new(const guchar *leafname)
@@ -224,9 +213,9 @@ DirItem *diritem_new(const guchar *leafname)
 	item = g_new(DirItem, 1);
 	item->leafname = g_strdup(leafname);
 	item->may_delete = FALSE;
-	item->image = NULL;
+	item->_image = NULL;
 	item->base_type = TYPE_UNKNOWN;
-	item->flags = 0;
+	item->flags = ITEM_FLAG_NEED_RESCAN_QUEUE;
 	item->mime_type = NULL;
 	item->leafname_collate = collate_key_new(leafname);
 
@@ -237,14 +226,27 @@ void diritem_free(DirItem *item)
 {
 	g_return_if_fail(item != NULL);
 
-	if (item->image)
-		g_object_unref(item->image);
-	item->image = NULL;
+	if (item->_image)
+		g_object_unref(item->_image);
+	item->_image = NULL;
 	collate_key_free(item->leafname_collate);
 	g_free(item->leafname);
 	g_free(item);
 }
 
+/* For use by di_image() only. Sets item->_image. */
+void _diritem_get_image(DirItem *item)
+{
+	g_return_if_fail(item->_image == NULL);
+
+	if (item->base_type == TYPE_ERROR)
+	{
+		item->_image = im_error;
+		g_object_ref(im_error);
+	}
+	else
+		item->_image = type_to_icon(item->mime_type);
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -288,7 +290,7 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 
 	g_string_printf(tmp, "%s/.DirIcon", path);
 
-	if (item->image)
+	if (item->_image)
 		goto no_diricon;	/* Already got an icon */
 
 	if (mc_lstat(tmp->str, &info) != 0 || info.st_uid != uid)
@@ -301,7 +303,7 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 		goto no_diricon;	/* Too big, or non-regular file */
 
 	/* Try to load image; may still get NULL... */
-	item->image = g_fscache_lookup(pixmap_cache, tmp->str);
+	item->_image = g_fscache_lookup(pixmap_cache, tmp->str);
 
 no_diricon:
 
@@ -319,7 +321,7 @@ no_diricon:
 
 	/* Try to load AppIcon.xpm... */
 
-	if (item->image)
+	if (item->_image)
 		goto out;	/* Already got an icon */
 
 	g_string_truncate(tmp, tmp->len - 3);
@@ -336,14 +338,14 @@ no_diricon:
 		goto out;	/* Too big, or non-regular file */
 
 	/* Try to load image; may still get NULL... */
-	item->image = g_fscache_lookup(pixmap_cache, tmp->str);
+	item->_image = g_fscache_lookup(pixmap_cache, tmp->str);
 
 out:
 
-	if ((item->flags & ITEM_FLAG_APPDIR) && !item->image)
+	if ((item->flags & ITEM_FLAG_APPDIR) && !item->_image)
 	{
 		/* This is an application without an icon */
-		item->image = im_appdir;
-		g_object_ref(item->image);
+		item->_image = im_appdir;
+		g_object_ref(item->_image);
 	}
 }

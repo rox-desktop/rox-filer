@@ -162,7 +162,7 @@ void icon_may_update(Icon *icon)
 
 	g_return_if_fail(icon != NULL);
 
-	image = icon->item->image;
+	image = di_image(icon->item);
 	flags = icon->item->flags;
 
 	if (image)
@@ -170,7 +170,7 @@ void icon_may_update(Icon *icon)
 	mount_update(FALSE);
 	diritem_restat(icon->path, icon->item, NULL);
 
-	if (icon->item->image != image || icon->item->flags != flags)
+	if (di_image(icon->item) != image || icon->item->flags != flags)
 	{
 		/* Appearance changed; need to redraw */
 		g_signal_emit_by_name(icon, "update");

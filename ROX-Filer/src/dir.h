@@ -26,6 +26,7 @@ typedef enum {
 	DIR_REMOVE,	/* Remove listed items from display */
 	DIR_UPDATE,	/* Redraw these items */
 	DIR_ERROR_CHANGED,	/* Check dir->error */
+	DIR_QUEUE_INTERESTING,  /* Call dir_queue_recheck */
 } DirAction;
 
 typedef struct _DirUser DirUser;
@@ -99,5 +100,6 @@ void dir_merge_new(Directory *dir);
 void dir_force_update_path(const gchar *path);
 void dnotify_wakeup(void);
 void dir_drop_all_dnotifies(void);
+void dir_queue_recheck(Directory *dir, DirItem *item);
 
 #endif /* _DIR_H */

@@ -225,7 +225,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(vbox, hbox, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),
-			   gtk_image_new_from_pixbuf(item->image->pixbuf),
+			   gtk_image_new_from_pixbuf(di_image(item)->pixbuf),
 			   FALSE, FALSE, 4);
 
 	if (g_utf8_validate(item->leafname, -1, NULL))

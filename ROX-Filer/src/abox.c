@@ -633,7 +633,7 @@ void abox_set_file(ABox *abox, int i, const gchar *path)
 	diritem_restat(path, item, NULL);
 
 	gtk_image_set_from_pixbuf(GTK_IMAGE(abox->cmp_icon[i]),
-				  item->image->pixbuf);
+				  di_image(item)->pixbuf);
 	gtk_widget_show(abox->cmp_icon[i]);
 
 	gtk_label_set_text(GTK_LABEL(abox->cmp_name[i]), item->leafname);

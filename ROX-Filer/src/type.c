@@ -215,11 +215,18 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 /* NULL if we don't know / don't support contents checking */
 MIME_type *mime_type_from_contents(const char *path)
 {
+	MIME_type *type = NULL;
 #ifdef HAVE_GNOME_VFS
-	return get_mime_type(gnome_vfs_get_mime_type(path), TRUE);
-#else
-	return NULL;
+	char *type_name;
+
+	type_name = gnome_vfs_get_mime_type(path);
+	if (type_name)
+	{
+		type = get_mime_type(type_name, TRUE);
+		free(type_name);
+	}
 #endif
+	return type;
 }
 
 const char *basetype_name(DirItem *item)

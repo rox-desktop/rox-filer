@@ -428,19 +428,22 @@ GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
 {
 	GtkWidget *item;
 	
-	if (ditem->image && style != MIS_NONE)
+	if (style != MIS_NONE && di_image(ditem))
 	{
 		GdkPixbuf *pixbuf;
+		MaskedPixmap *image;
+
+		image = di_image(ditem);
 
 		switch (style)
 		{
 			case MIS_LARGE:
-				pixbuf = ditem->image->pixbuf;
+				pixbuf = image->pixbuf;
 				break;
 			default:
-				if (!ditem->image->sm_pixbuf)
-					pixmap_make_small(ditem->image);
-				pixbuf = ditem->image->sm_pixbuf;
+				if (!image->sm_pixbuf)
+					pixmap_make_small(image);
+				pixbuf = image->sm_pixbuf;
 				break;
 		}
 
@@ -745,7 +748,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 				break;
 			case 1:
 				item = filer_selected_item(filer_window);
-				if (!item->image)
+				if (item->base_type == TYPE_UNKNOWN)
 					dir_update_item(filer_window->directory,
 							item->leafname);
 				shade_file_menu_items(FALSE);
@@ -1893,7 +1896,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 	g_return_if_fail(item != NULL);
 	/* iter may be passed to filer_openitem... */
 
-	if (!item->image)
+	if (item->base_type == TYPE_UNKNOWN)
 		item = dir_update_item(window_with_focus->directory,
 					item->leafname);
 
@@ -1908,17 +1911,17 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 	switch (action)
 	{
 		case FILE_COPY_ITEM:
-			src_dest_action_item(path, item->image,
+			src_dest_action_item(path, di_image(item),
 					_("Copy"), copy_cb,
 					GDK_ACTION_COPY);
 			break;
 		case FILE_RENAME_ITEM:
-			src_dest_action_item(path, item->image,
+			src_dest_action_item(path, di_image(item),
 					_("Rename"), rename_cb,
 					GDK_ACTION_MOVE);
 			break;
 		case FILE_LINK_ITEM:
-			src_dest_action_item(path, item->image,
+			src_dest_action_item(path, di_image(item),
 					_("Symlink"), link_cb,
 					GDK_ACTION_LINK);
 			break;

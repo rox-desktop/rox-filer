@@ -19,24 +19,6 @@ extern MIME_type *application_executable;
 extern MIME_type *inode_unknown;
 extern MIME_type *inode_door;
 
-enum
-{
-	/* Base types - this also determines the sort order */
-	TYPE_ERROR,
-	TYPE_UNKNOWN,		/* Not scanned yet */
-	TYPE_DIRECTORY,
-	TYPE_PIPE,
-	TYPE_SOCKET,
-	TYPE_FILE,
-	TYPE_CHAR_DEVICE,
-	TYPE_BLOCK_DEVICE,
-	TYPE_DOOR,
-
-	/* These are purely for colour allocation */
-	TYPE_EXEC,
-	TYPE_APPDIR,
-};
-
 struct _MIME_type
 {
 	char		*media_type;

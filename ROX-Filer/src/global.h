@@ -142,6 +142,24 @@ typedef enum {		/* Values used in options */
 	SORT_GROUP = 5
 } SortType;
 
+enum
+{
+	/* Base types - this also determines the sort order */
+	TYPE_ERROR,
+	TYPE_UNKNOWN,		/* Not scanned yet */
+	TYPE_DIRECTORY,
+	TYPE_PIPE,
+	TYPE_SOCKET,
+	TYPE_FILE,
+	TYPE_CHAR_DEVICE,
+	TYPE_BLOCK_DEVICE,
+	TYPE_DOOR,
+
+	/* These are purely for colour allocation */
+	TYPE_EXEC,
+	TYPE_APPDIR,
+};
+
 /* The namespaces for the SOAP messages */
 #define SOAP_ENV_NS_OLD "http://www.w3.org/2001/06/soap-envelope"
 #define SOAP_ENV_NS "http://www.w3.org/2001/12/soap-envelope"

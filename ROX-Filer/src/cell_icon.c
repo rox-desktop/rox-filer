@@ -215,7 +215,7 @@ static DisplayStyle get_style(GtkCellRenderer *cell)
 		}
 		if (!view_item->image)
 		{
-			view_item->image = item->image;
+			view_item->image = di_image(item);
 			if (view_item->image)
 				g_object_ref(view_item->image);
 		}
@@ -225,7 +225,7 @@ static DisplayStyle get_style(GtkCellRenderer *cell)
 
 	if (size == AUTO_SIZE_ICONS)
 	{
-		if (!view_item->image || view_item->image == item->image)
+		if (!view_item->image || view_item->image == di_image(item))
 			size = SMALL_ICONS;
 		else
 			size = HUGE_ICONS;
@@ -340,8 +340,8 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 					view_item->image, selected);
 			break;
 		case HUGE_ICONS:
-			if (!item->image->huge_pixbuf)
-				pixmap_make_huge(item->image);
+			if (!di_image(item)->huge_pixbuf)
+				pixmap_make_huge(di_image(item));
 			draw_huge_icon(window, cell_area, item,
 					view_item->image, selected);
 			break;

@@ -242,8 +242,11 @@ void toolbar_update_info(FilerWindow *filer_window)
 		view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 
 		while ((item = iter.next(&iter)))
-			if (item->base_type != TYPE_DIRECTORY)
+		{
+			if (item->base_type != TYPE_DIRECTORY &&
+			    item->base_type != TYPE_UNKNOWN)
 				size += (double) item->size;
+		}
 
 		label = g_strdup_printf(_("%u selected (%s)"),
 				n_selected, format_double_size(size));

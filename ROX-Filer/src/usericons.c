@@ -153,11 +153,11 @@ void check_globicon(const guchar *path, DirItem *item)
 {
 	gchar *gi;
 
-	g_return_if_fail(item && !item->image);
+	g_return_if_fail(item && !item->_image);
 
 	gi = g_hash_table_lookup(glob_icons, path);
 	if (gi)
-		item->image = g_fscache_lookup(pixmap_cache, gi);
+		item->_image = g_fscache_lookup(pixmap_cache, gi);
 }
 
 static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)

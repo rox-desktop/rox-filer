@@ -2,6 +2,14 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+21-Sep-2004
+~~~~~~~~~~~
+Only examine items that are actually displayed, not all items in a directory.
+Saves checking hidden files, which typically speeds up opening the home
+directory. Removed an unnecessary extra scan when opening a directory
+with the default filter setting. Removed the double scan when clicking Refresh
+and two windows show the same directory (Thomas Leonard).
+
 17-Sep-2004
 ~~~~~~~~~~~
 If we can't guess a file's type from its name or extended attribute, try

@@ -343,6 +343,22 @@ static gint open_filer_window(FilerWindow *filer_window)
 	return FALSE;
 }
 
+/* Look through all items we want to display, and queue a recheck on any
+ * that require it.
+ */
+static void queue_interesting(FilerWindow *filer_window)
+{
+	DirItem	*item;
+	ViewIter iter;
+
+	view_get_iter(filer_window->view, &iter, 0);
+	while ((item = iter.next(&iter)))
+	{
+		if (item->flags & ITEM_FLAG_NEED_RESCAN_QUEUE)
+			dir_queue_recheck(filer_window->directory, item);
+	}
+}
+
 static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
@@ -399,6 +415,9 @@ static void update_display(Directory *dir,
 			break;
 		case DIR_ERROR_CHANGED:
 			filer_set_title(filer_window);
+			break;
+		case DIR_QUEUE_INTERESTING:
+			queue_interesting(filer_window);
 			break;
 	}
 }
@@ -678,7 +697,7 @@ void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags)
 		return;
 	}
 
-	if (!item->image)
+	if (item->base_type == TYPE_UNKNOWN)
 		dir_update_item(filer_window->directory, item->leafname);
 
 	if (item->base_type == TYPE_DIRECTORY)
@@ -1670,7 +1689,13 @@ void filer_update_all(void)
 		 */
 		next = next->next;
 
-		filer_update_dir(filer_window, TRUE);
+		/* Don't trigger a refresh if we're already scanning.
+		 * Otherwise, two views of a single directory will trigger
+		 * two scans.
+		 */
+		if (filer_window->directory &&
+		    !filer_window->directory->scanning)
+			filer_update_dir(filer_window, TRUE);
 	}
 }
 
@@ -2473,7 +2498,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 
 	if (view_count_selected(view) == 1)
 	{
-		if (!item->image)
+		if (item->base_type == TYPE_UNKNOWN)
 			item = dir_update_item(filer_window->directory,
 						item->leafname);
 
@@ -2485,7 +2510,7 @@ gint filer_motion_notify(FilerWindow *filer_window, GdkEventMotion *event)
 
 		drag_one_item(GTK_WIDGET(view), event,
 			make_path(filer_window->sym_path, item->leafname),
-			item, item->image);
+			item, di_image(item));
 #if 0
 		/* XXX: Use thumbnail */
 			item, view ? view->image : NULL);
@@ -2705,6 +2730,8 @@ void filer_refresh(FilerWindow *filer_window)
 
 gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename)
 {
+	g_return_val_if_fail(filename != NULL, FALSE);
+
 	if(filename[0]=='.' &&
 	   (!filer_window->temp_show_hidden && !filer_window->show_hidden))
 		return FALSE;
@@ -2730,55 +2757,61 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	filer_window->show_hidden=hidden;
 }
 
-void filer_set_filter(FilerWindow *filer_window, FilterType type,
+/* Set the filter type. Returns TRUE if the type has changed
+ * (must call filer_detach_rescan).
+ */
+gboolean filer_set_filter(FilerWindow *filer_window, FilterType type,
 			     const gchar *filter_string)
 {
-	/*printf("filer_set_filter(%p, %d, %s)\n", filer_window, type,
-	  filter_string? filter_string: "NULL");*/
 	/* Is this new filter the same as the old one? */
-	if(filer_window->filter==type) {
-		switch(filer_window->filter) {
+	if (filer_window->filter == type)
+	{
+		switch(filer_window->filter)
+		{
 		case FILER_SHOW_ALL:
-			return;
+			return FALSE;
 		case FILER_SHOW_GLOB:
 		case FILER_SHOW_REGEXP:
-			if(strcmp(filer_window->filter_string,
-				  filter_string)==0)
-				return;
+			if (strcmp(filer_window->filter_string,
+				   filter_string) == 0)
+				return FALSE;
 			break;
 		}
 	}
 
 	/* Clean up old filter */
-	if(filer_window->filter_string) {
+	if (filer_window->filter_string)
+	{
 		g_free(filer_window->filter_string);
-		filer_window->filter_string=NULL;
+		filer_window->filter_string = NULL;
 	}
 	/* Also clean up compiled regexp when implemented */
 
-	/*printf("set %d %s\n", type,
-	  filter_string? filter_string: "NULL");*/
-	filer_window->filter=type;
-	switch(type) {
+	filer_window->filter = type;
+
+	switch(type)
+	{
 	case FILER_SHOW_ALL:
 		/* No extra work */
 		break;
 
 	case FILER_SHOW_GLOB:
-		filer_window->filter_string=g_strdup(filter_string);
+		filer_window->filter_string = g_strdup(filter_string);
 		break;
 
 	case FILER_SHOW_REGEXP:
-		filer_window->filter_string=g_strdup(filter_string);
+		filer_window->filter_string = g_strdup(filter_string);
 		/* Compile the pattern */
 		break;
 
 	default:
 		/* oops */
-		filer_window->filter=FILER_SHOW_ALL;
-		report_error("Impossible: filter type %d", type);
+		filer_window->filter = FILER_SHOW_ALL;
+		g_warning("Impossible: filter type %d", type);
 		break;
 	}
+
+	return TRUE;
 }
 
 /* Setting stuff */

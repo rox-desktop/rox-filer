@@ -20,6 +20,11 @@ typedef enum
 	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */
 	ITEM_FLAG_MAY_DELETE	= 0x40, /* Delete on finishing scan */
 	ITEM_FLAG_RECENT	= 0x80, /* [MC]-time is around now */
+
+	/* DirItems are created with this flag set. Accessing the item in
+	 * this state will add it to the directory's rescan list.
+	 */
+	ITEM_FLAG_NEED_RESCAN_QUEUE = 0x100,
 } ItemFlags;
 
 struct _DirItem
@@ -32,7 +37,7 @@ struct _DirItem
 	mode_t		mode;
 	off_t		size;
 	time_t		atime, ctime, mtime;
-	MaskedPixmap	*image;		/* NULL => leafname only so far */
+	MaskedPixmap	*_image;	/* NULL => leafname only so far */
 	MIME_type	*mime_type;
 	uid_t		uid;
 	gid_t		gid;
@@ -42,6 +47,14 @@ struct _DirItem
 void diritem_init(void);
 DirItem *diritem_new(const guchar *leafname);
 void diritem_restat(const guchar *path, DirItem *item, struct stat *parent);
+void _diritem_get_image(DirItem *item);
 void diritem_free(DirItem *item);
+
+static inline MaskedPixmap *di_image(DirItem *item)
+{
+	if (!item->_image && item->base_type != TYPE_UNKNOWN)
+		_diritem_get_image(item);
+	return item->_image;
+}
 
 #endif /* _DIRITEM_H */

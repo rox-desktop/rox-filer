@@ -284,7 +284,7 @@ void drag_one_item(GtkWidget		*widget,
 	g_return_if_fail(item != NULL);
 
 	if (!image)
-		image = item->image;
+		image = di_image(item);
 
 	if (item->base_type == TYPE_FILE)
 	{

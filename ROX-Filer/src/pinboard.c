@@ -902,7 +902,7 @@ static gint end_wink(gpointer data)
 static void set_size_and_style(PinIcon *pi)
 {
 	Icon		*icon = (Icon *) pi;
-	MaskedPixmap	*image = icon->item->image;
+	MaskedPixmap	*image = di_image(icon->item);
 	int		iwidth = image->width;
 	int		iheight = image->height;
 
@@ -922,7 +922,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	static GtkWidgetClass *parent_class = NULL;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
-	MaskedPixmap	*image = item->image;
+	MaskedPixmap	*image = di_image(item);
 	int		iwidth = image->width;
 	int		iheight = image->height;
 	int		x, y;

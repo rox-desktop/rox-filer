@@ -761,7 +761,7 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 	if (pi->image)
 		g_object_unref(pi->image);
 
-	pi->image = scale_pixbuf(icon->item->image->src_pixbuf,
+	pi->image = scale_pixbuf(di_image(icon->item)->src_pixbuf,
 			MAX(20, max_width), MAX(20, max_height));
 
 	image_width = gdk_pixbuf_get_width(pi->image);

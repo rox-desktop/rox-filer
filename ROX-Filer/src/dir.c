@@ -36,10 +36,12 @@
  *   of the extra details.
  * - This list is compared to the current DirItems, removing any that are now
  *   missing.
- * - The recheck list is replaced with this new list.
+ * - Each window onto the directory is asked which items it will actually
+ *   display, and the union of these sets is the new recheck list.
  *
  * This system is designed to get the number of items and their names quickly,
- * so that the auto-sizer can make a good guess.
+ * so that the auto-sizer can make a good guess. It also prevents checking
+ * hidden files if they're not going to be displayed.
  *
  * To get the Directory object, use dir_cache, which will automatically
  * trigger a rescan if needed.
@@ -135,7 +137,9 @@ void dir_init(void)
  * of the directory.
  * Before this function returns, it calls the callback once to add all
  * the items currently in the directory (unless the dir is empty).
- * If we are not scanning, it also calls update(DIR_END_SCAN).
+ * It then calls callback(DIR_QUEUE_INTERESTING) to find out which items the
+ * caller cares about.
+ * If we are not scanning, it also calls callback(DIR_END_SCAN).
  */
 void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 {
@@ -183,6 +187,8 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 
 	if (dir->needs_update && !dir->scanning)
 		dir_rescan(dir);
+	else
+		callback(dir, DIR_QUEUE_INTERESTING, NULL, data);
 
 	/* May start scanning if noone was watching before */
 	set_idle_callback(dir);
@@ -318,9 +324,19 @@ DirItem *dir_update_item(Directory *dir, const gchar *leafname)
 	return item;
 }
 
-static int sort_names(const void *a, const void *b)
+/* Add item to the recheck_list if it's marked as needing it.
+ * Item must have ITEM_FLAG_NEED_RESCAN_QUEUE.
+ * Items on the list will get checked later in an idle callback.
+ */
+void dir_queue_recheck(Directory *dir, DirItem *item)
 {
-	return strcmp(*((char **) a), *((char **) b));
+	g_return_if_fail(dir != NULL);
+	g_return_if_fail(item != NULL);
+	g_return_if_fail(item->flags & ITEM_FLAG_NEED_RESCAN_QUEUE);
+
+	dir->recheck_list = g_list_prepend(dir->recheck_list,
+			g_strdup(item->leafname));
+	item->flags &= ~ITEM_FLAG_NEED_RESCAN_QUEUE;
 }
 
 static void free_recheck_list(Directory *dir)
@@ -645,8 +661,8 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		{
 			/* Preserve the old details so we can compare */
 			old = *item;
-			if (old.image)
-				g_object_ref(old.image);
+			if (old._image)
+				g_object_ref(old._image);
 			do_compare = TRUE;
 		}
 		diritem_restat(full_path, item, &dir->stat_info);
@@ -669,19 +685,27 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 
 	}
 
+	/* No need to queue the item for scanning. If we got here because
+	 * the item was queued, this flag will normally already be clear.
+	 */
+	item->flags &= ~ITEM_FLAG_NEED_RESCAN_QUEUE;
+
 	if (item->base_type == TYPE_ERROR && item->lstat_errno == ENOENT)
 	{
 		/* Item has been deleted */
 		g_hash_table_remove(dir->known_items, item->leafname);
 		g_ptr_array_add(dir->gone_items, item);
-		if (do_compare && old.image)
-			g_object_unref(old.image);
+		if (do_compare && old._image)
+			g_object_unref(old._image);
 		delayed_notify(dir);
 		return NULL;
 	}
 
 	if (do_compare)
 	{
+		/* It's a bit inefficient that we force the image to be
+		 * loaded here, if we had an old image.
+		 */
 		if (item->lstat_errno == old.lstat_errno
 		 && item->base_type == old.base_type
 		 && item->flags == old.flags
@@ -692,15 +716,15 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		 && item->mtime == old.mtime
 		 && item->uid == old.uid
 		 && item->gid == old.gid
-		 && item->image == old.image
-		 && item->mime_type == old.mime_type)
+		 && item->mime_type == old.mime_type
+		 && (old._image == NULL || di_image(item) == old._image))
 		{
-			if (old.image)
-				g_object_unref(old.image);
+			if (old._image)
+				g_object_unref(old._image);
 			return item;
 		}
-		if (old.image)
-			g_object_unref(old.image);
+		if (old._image)
+			g_object_unref(old._image);
 	}
 
 	g_ptr_array_add(dir->up_items, item);
@@ -925,8 +949,7 @@ static void dir_rescan(Directory *dir)
 	struct dirent	*ent;
 	guint		i;
 	const char	*pathname;
-	int		longest_len = -1;
-	GList		*longest = NULL;
+	GList		*next;
 
 	g_return_if_fail(dir != NULL);
 
@@ -981,9 +1004,6 @@ static void dir_rescan(Directory *dir)
 	}
 	mc_closedir(d);
 
-	/* Sort, so the names are scanned in a sensible order */
-	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
-
 	/* Compare the list with the current DirItems, removing
 	 * any that are missing.
 	 */
@@ -991,16 +1011,24 @@ static void dir_rescan(Directory *dir)
 
 	free_recheck_list(dir);
 
-	/* For each name found, add it to the recheck_list.
+	/* For each name found, mark it as needing to be put on the rescan
+	 * list at some point in the future.
 	 * If the item is new, put a blank place-holder item in the directory.
 	 */
 	for (i = 0; i < names->len; i++)
 	{
+		DirItem *old;
 		guchar *name = names->pdata[i];
-		int len = strlen(name);
-		
-		dir->recheck_list = g_list_prepend(dir->recheck_list, name);
-		if (!g_hash_table_lookup(dir->known_items, name))
+
+		old = g_hash_table_lookup(dir->known_items, name); 
+		if (old)
+		{
+			/* This flag is cleared when the item is added
+			 * to the rescan list.
+			 */
+			old->flags |= ITEM_FLAG_NEED_RESCAN_QUEUE;
+		}
+		else
 		{
 			DirItem *new;
 
@@ -1008,28 +1036,23 @@ static void dir_rescan(Directory *dir)
 			g_ptr_array_add(dir->new_items, new);
 		}
 
-		if (name[0] != '.' && len > longest_len)
-		{
-			longest_len = len;
-			longest = dir->recheck_list;
-		}
 	}
 
 	dir_merge_new(dir);
 	
-	dir->recheck_list = g_list_reverse(dir->recheck_list);
-
-	if (longest)
+	/* Ask everyone which items they need to display, and add them to
+	 * the recheck list. Typically, this means we don't waste time
+	 * scanning hidden items.
+	 */
+	in_callback++;
+	for (next = dir->users; next; next = next->next)
 	{
-		gpointer data = longest->data;
-
-		/* Move the longest item to the start. Helps with
-		 * auto sizing.
-		 */
-		dir->recheck_list = g_list_remove_link(dir->recheck_list,
-							longest);
-		dir->recheck_list = g_list_prepend(dir->recheck_list, data);
+		DirUser *user = (DirUser *) next->data;
+		user->callback(dir,
+				DIR_QUEUE_INTERESTING,
+				NULL, user->data);
 	}
+	in_callback--;
 
 	g_ptr_array_free(names, TRUE);
 		

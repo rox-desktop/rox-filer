@@ -162,7 +162,8 @@ void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
 void filer_refresh(FilerWindow *filer_window);
 
 gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename);
-void filer_set_filter(FilerWindow *filer_window, FilterType type, const gchar *filter_string);
+gboolean filer_set_filter(FilerWindow *filer_window,
+			  FilterType type, const gchar *filter_string);
 void filer_set_hidden(FilerWindow *fwin, gboolean hidden);
 void filer_next_selected(FilerWindow *filer_window, int dir);
 void filer_save_settings(FilerWindow *fwin);
