@@ -34,8 +34,8 @@
  * 
  * - A list of all filenames in the directory is fetched, without any
  *   of the extra details.
- * - This list is sorted, and compared to the current DirItems, removing
- *   any that are now missing.
+ * - This list is compared to the current DirItems, removing any that are now
+ *   missing.
  * - The recheck list is replaced with this new list.
  *
  * This system is designed to get the number of items and their names quickly,
@@ -122,7 +122,7 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 		callback(dir, DIR_ADD, items, data);
 	g_ptr_array_free(items, TRUE);
 
-	if (dir->needs_update)
+	if (dir->needs_update && !dir->scanning)
 		dir_rescan(dir, dir->pathname);
 
 	/* May start scanning if noone was watching before */
@@ -283,6 +283,10 @@ static gboolean recheck_callback(gpointer data)
 	if (dir->recheck_list)
 		return TRUE;	/* Call again */
 
+	/* The recheck_list list empty. Stop scanning, unless
+	 * needs_update, in which case we start scanning again.
+	 */
+
 	dir_merge_new(dir);
 	
 	dir->have_scanned = TRUE;
@@ -291,10 +295,7 @@ static gboolean recheck_callback(gpointer data)
 	dir->idle_callback = 0;
 
 	if (dir->needs_update)
-	{
-		g_print("[ needs_update ]\n");
 		dir_rescan(dir, dir->pathname);
-	}
 
 	return FALSE;
 }
@@ -558,7 +559,6 @@ static void insert_item(Directory *dir, guchar *leafname)
 {
 	static GString  *tmp = NULL;
 
-	GdkFont		*font;
 	DirItem		*item;
 	DirItem		new;
 	gboolean	is_new = FALSE;
@@ -578,22 +578,22 @@ static void insert_item(Directory *dir, guchar *leafname)
 		return;
 	}
 
-	if (item)
-		goto update;
+	if (!item)
+	{
+		/* Item isn't already here... */
+		item = g_new(DirItem, 1);
+		item->leafname = g_strdup(leafname);
+		g_ptr_array_add(dir->new_items, item);
+		delayed_notify(dir);
+		is_new = TRUE;
+	}
 
-	item = g_new(DirItem, 1);
-	item->leafname = g_strdup(leafname);
-	g_ptr_array_add(dir->new_items, item);
-	delayed_notify(dir);
-	is_new = TRUE;
-update:
 	item->may_delete = FALSE;
 
-	font = item_font;
-	new.name_width = gdk_string_measure(font, item->leafname);
+	new.name_width = gdk_string_measure(item_font, item->leafname);
 	new.leafname = item->leafname;
 
-	if (is_new == FALSE)
+	if (!is_new)
 	{
 		if (item->lstat_errno == new.lstat_errno
 		 && item->base_type == new.base_type
@@ -631,7 +631,7 @@ update:
 	if (!is_new)
 	{
 		g_ptr_array_add(dir->up_items, item);
-		delayed_notify(dir);
+		delayed_notify(dir);	/* TODO: Do we need this? */
 	}
 }
 
@@ -648,7 +648,6 @@ static Directory *load(char *pathname, gpointer data)
 	dir->have_scanned = FALSE;
 	
 	dir->users = NULL;
-	dir->dir_handle = NULL;
 	dir->needs_update = TRUE;
 	dir->notify_active = FALSE;
 	dir->pathname = g_strdup(pathname);
@@ -741,8 +740,10 @@ static void set_idle_callback(Directory *dir)
 
 static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
 {
-	g_free(dir->pathname);
+	guchar *old = dir->pathname;
+
 	dir->pathname = g_strdup(path);
+	g_free(old);
 
 	insert_item(dir, leafname);
 	dir_merge_new(dir);

@@ -57,12 +57,15 @@ struct _Directory
 	gboolean	have_scanned;	/* TRUE after first complete scan */
 	gboolean	scanning;	/* TRUE if we sent DIR_START_SCAN */
 
-	/* Old stuff.. */
-
-	gboolean	needs_update;	/* When scan is finished, rescan */
-	gboolean	done_some_scanning;	/* Read any items this scan? */
-	DIR		*dir_handle;	/* NULL => not scanning */
-	off_t		dir_start;	/* For seekdir() to beginning */
+	/* Indicates that the directory needs to be rescanned.
+	 * This is cleared when scanning starts, and set when the fscache
+	 * detects that the directory needs to be rescanned and is already
+	 * scanning.
+	 *
+	 * If scanning finishes when this is set, or if someone attaches
+	 * and scanning is not in progress, a rescan is triggered.
+	 */
+	gboolean	needs_update;
 };
 
 void dir_init(void);

@@ -1105,7 +1105,7 @@ static gboolean spring_now(gpointer data)
 	g_return_val_if_fail(dest_path != NULL, FALSE);
 
 	/*
-	 * XXX: Due to a bug in gtk, if a window disappears during
+	 * Note: Due to a bug in gtk, if a window disappears during
 	 * a drag and the pointer moves over where the window was,
 	 * the sender crashes! Therefore, do not close any windows
 	 * while dragging! (fixed in later versions)

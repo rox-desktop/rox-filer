@@ -1033,7 +1033,7 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 			new = tools_to_list(widget);
 			break;
 		default:
-			g_print("[ unknown widget for change '%s' ]\n",
+			g_printerr("[ unknown widget for change '%s' ]\n",
 					(guchar *) key);
 			break;
 	}
@@ -1215,7 +1215,7 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 			disable_tools(widget, option->value);
 			break;
 		default:
-			g_print("Unknown widget for update '%s'\n",
+			g_printerr("Unknown widget for update '%s'\n",
 					(guchar *) key);
 			break;
 	}
