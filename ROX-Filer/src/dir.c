@@ -238,14 +238,7 @@ static int sort_names(const void *a, const void *b)
 
 static void free_recheck_list(Directory *dir)
 {
-	GList	*next;
-
-	for (next = dir->recheck_list; next; next = next->next)
-		g_free(next->data);
-
-	g_list_free(dir->recheck_list);
-
-	dir->recheck_list = NULL;
+	destroy_glist(&dir->recheck_list);
 }
 
 /* If scanning state has changed then notify all filer windows */
@@ -332,11 +325,7 @@ void dir_rescan(Directory *dir, const guchar *pathname)
 
 	read_globicons();
 	mount_update(FALSE);
-	if (dir->error)
-	{
-		g_free(dir->error);
-		dir->error = NULL;
-	}
+	null_g_free(&dir->error);
 
 	/* Saves statting the parent for each item... */
 	if (mc_stat(pathname, &dir->stat_info))

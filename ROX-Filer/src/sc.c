@@ -69,12 +69,11 @@ static SmProperty *find_property(SmClient *client, const gchar *name)
 	GSList *list = client->props;
 	SmProperty *prop;
 
-	while(list)
+	for (; list; list = list->next)
 	{
 		prop = (SmProperty *)list->data;
-		if(strcmp(prop->prop.name, name) == 0)
+		if (strcmp(prop->prop.name, name) == 0)
 			return prop;
-		list = g_slist_next(list);		
 	}
 	return NULL;		
 }
@@ -229,7 +228,7 @@ void sc_destroy(SmClient *client)
 #ifdef DEBUG
 	g_printerr("destroying client\n");
 #endif	
-	while(list)
+	for (; list; list = list->next)
 	{
 		prop = (SmProperty *)list->data;
 		g_free(prop->prop.vals->value);
@@ -237,7 +236,6 @@ void sc_destroy(SmClient *client)
 		g_free(prop->prop.name);
 		g_free(prop->prop.type);
 		g_free(prop);
-		list = g_slist_next(list);
 	}
 	g_slist_free(client->props);
 	g_free(client->id);
@@ -340,7 +338,7 @@ void sc_register_properties(SmClient *client)
 	gint i;
 #endif
 	
-	while(list)
+	for (; list; list = list->next)
 	{
 		prop = (SmProperty *)list->data;
 		if(prop->set == TRUE)
@@ -348,7 +346,6 @@ void sc_register_properties(SmClient *client)
 			g_ptr_array_add(set_props, &prop->prop);
 			prop->set = FALSE;
 		}
-		list = g_slist_next(list);
 	}
 #ifdef DEBUG
 	g_printerr("Registering props:\n");

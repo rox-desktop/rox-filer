@@ -70,8 +70,7 @@ void appmenu_remove(void)
 	for (next = current_items; next; next = next->next)
 		gtk_widget_destroy((GtkWidget *) next->data);
 
-	g_free(current_app_path);
-	current_app_path = NULL;
+	null_g_free(&current_app_path);
 	current_menu = NULL;
 
 	g_list_free(current_items);

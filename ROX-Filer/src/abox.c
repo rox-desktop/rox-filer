@@ -35,6 +35,7 @@
 #include "gui_support.h"
 #include "filer.h"
 #include "display.h"
+#include "support.h"
 
 #define RESPONSE_QUIET 1
 
@@ -273,8 +274,7 @@ static void abox_finalise(GObject *object)
 	
 	if (abox->next_dir)
 	{
-		g_free(abox->next_dir);
-		abox->next_dir = NULL;
+		null_g_free(&abox->next_dir);
 		gtk_timeout_remove(abox->next_timer);
 	}
 
@@ -289,8 +289,7 @@ static gboolean show_next_dir(gpointer data)
 	ABox	*abox = (ABox *) data;
 
 	gtk_label_set_text(GTK_LABEL(abox->dir_label), abox->next_dir);
-	g_free(abox->next_dir);
-	abox->next_dir = NULL;
+	null_g_free(&abox->next_dir);
 	
 	return FALSE;
 }

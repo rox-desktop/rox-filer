@@ -600,9 +600,9 @@ static void drag_app_dropped(GtkWidget		*eb,
 						g_strerror(errno));
 			else
 				destroy_on_idle(dialog);
-		}
 
-		g_free(path);
+			g_free(path);
+		}
 	}
 	else
 		delayed_error(
@@ -909,8 +909,7 @@ char *get_action_save_path(GtkWidget *dialog)
 				"delete it?"), 2,
 				_("Cancel"), _("Delete")) != 1)
 			{
-				g_free(path);
-				path = NULL;
+				null_g_free(&path);
 				goto out;
 			}
 		}
@@ -919,8 +918,7 @@ char *get_action_save_path(GtkWidget *dialog)
 		{
 			report_error(_("Can't remove %s: %s"),
 				path, g_strerror(errno));
-			g_free(path);
-			path = NULL;
+			null_g_free(&path);
 			goto out;
 		}
 	}
@@ -1117,7 +1115,7 @@ static void import_file(const gchar *file, GHashTable *globs)
 
 	if (!g_file_get_contents(file, &data, NULL, &error))
 	{
-		delayed_error("Error loading MIME database:\n%s",
+		delayed_error(_("Error loading MIME database:\n%s"),
 				error->message);
 		g_error_free(error);
 		return;

@@ -561,7 +561,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      guint32           time,
 		       	      GtkWidget	 	*dialog)
 {
-	GList	*uris, *next;
+	GList	*uris;
 	guchar	*icon = NULL;
 
 	if (!selection_data->data)
@@ -572,9 +572,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 	if (g_list_length(uris) == 1)
 		icon = g_strdup(get_local_path((guchar *) uris->data));
 
-	for (next = uris; next; next = next->next)
-		g_free(next->data);
-	g_list_free(uris);
+	destroy_glist(&uris);
 
 	if (!icon)
 	{

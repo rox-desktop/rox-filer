@@ -116,7 +116,7 @@ GPtrArray *choices_list_dirs(char *dir)
 
 	list = g_ptr_array_new();
 
-	while (*cdir)
+	for (; *cdir; cdir++)
 	{
 		guchar	*path;
 
@@ -125,8 +125,6 @@ GPtrArray *choices_list_dirs(char *dir)
 			g_ptr_array_add(list, path);
 		else
 			g_free(path);
-
-		cdir++;
 	}
 
 	return list;
@@ -158,7 +156,7 @@ guchar *choices_find_path_load(const char *leaf, const char *dir)
 
 	g_return_val_if_fail(dir_list != NULL, NULL);
 
-	while (*cdir)
+	for (; *cdir; cdir++)
 	{
 		gchar	*path;
 
@@ -168,8 +166,6 @@ guchar *choices_find_path_load(const char *leaf, const char *dir)
 			return path;
 
 		g_free(path);
-
-		cdir++;
 	}
 
 	return NULL;

@@ -1659,8 +1659,7 @@ static void pinboard_clear(void)
 	abandon_backdrop_app(current_pinboard);
 	
 	g_free(current_pinboard->name);
-	g_free(current_pinboard);
-	current_pinboard = NULL;
+	null_g_free(&current_pinboard);
 
 	number_of_windows--;
 }

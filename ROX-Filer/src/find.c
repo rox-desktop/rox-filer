@@ -172,9 +172,8 @@ gboolean find_test_condition(FindCondition *condition, FindInfo *info)
 
 void find_condition_free(FindCondition *condition)
 {
-	g_return_if_fail(condition != NULL);
-
-	condition->free(condition);
+	if (condition)
+		condition->free(condition);
 }
 
 /****************************************************************
@@ -705,8 +704,7 @@ static FindCondition *parse_dash(const gchar **expression)
 			case 'o': test = IS_MINE; break;
 			case 'z': test = IS_EMPTY; break;
 			default:
-				  if (retval)
-					  find_condition_free(retval);
+				  find_condition_free(retval);
 				  return NULL;
 		}
 		i++;

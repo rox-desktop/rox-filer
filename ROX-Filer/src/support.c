@@ -270,8 +270,7 @@ char *format_size(off_t size)
 	else
 		units = _("bytes");
 
-	if (buffer)
-		g_free(buffer);
+	g_free(buffer);
 	buffer = g_strdup_printf("%" SIZE_FMT " %s", size, units);
 
 	return buffer;
@@ -308,9 +307,7 @@ char *format_size_aligned(off_t size)
 	else
 		units = ' ';
 
-	if (buffer)
-		g_free(buffer);
-
+	g_free(buffer);
 	buffer = g_strdup_printf("%4" SIZE_FMT "%c", size, units);
 	
 	return buffer;
@@ -352,8 +349,7 @@ gchar *format_double_size(double size)
 	else
 		units = _("byte");
 
-	if (buf)
-		g_free(buf);
+	g_free(buf);
 	buf = g_strdup_printf("%.0f %s", floor(size), units);
 
 	return buf;
@@ -385,10 +381,7 @@ char *fork_exec_wait(const char **argv)
 	}
 
 	if (errors && !*errors)
-	{
-		g_free(errors);
-		errors = NULL;
-	}
+		null_g_free(&errors);
 
 	if (!WIFEXITED(status))
 	{
@@ -1106,4 +1099,21 @@ gchar *expand_path(const gchar *path)
 	}
 
 	return retval;
+}
+
+/* g_free() every element in the list, then free the list itself and
+ * NULL the pointer to the list.
+ */
+void destroy_glist(GList **list)
+{
+	GList *l = *list;
+	g_list_foreach(l, (GFunc) g_free, NULL);
+	g_list_free(l);
+	*list = NULL;
+}
+
+void null_g_free(gpointer p)
+{
+	g_free(*(gpointer *)p);
+	*(gpointer *)p = NULL;
 }

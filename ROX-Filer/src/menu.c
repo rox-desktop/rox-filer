@@ -365,8 +365,7 @@ static void menuitem_no_shortcuts(GtkWidget *item)
 	GtkMenuItem *menuitem = GTK_MENU_ITEM(item);
 
 	_gtk_widget_set_accel_path(item, NULL, NULL);
-	g_free(menuitem->accel_path);
-	menuitem->accel_path = NULL;
+	null_g_free(&menuitem->accel_path);
 #endif
 }
 
@@ -940,8 +939,7 @@ static void delete(FilerWindow *filer_window)
 	GList *paths;
 	paths = filer_selected_items(filer_window);
 	action_delete(paths);
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
+	destroy_glist(&paths);
 }
 
 static void usage(FilerWindow *filer_window)
@@ -949,8 +947,7 @@ static void usage(FilerWindow *filer_window)
 	GList *paths;
 	paths = filer_selected_items(filer_window);
 	action_usage(paths);
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
+	destroy_glist(&paths);
 }
 
 static void chmod_items(FilerWindow *filer_window)
@@ -958,8 +955,7 @@ static void chmod_items(FilerWindow *filer_window)
 	GList *paths;
 	paths = filer_selected_items(filer_window);
 	action_chmod(paths, FALSE, NULL);
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
+	destroy_glist(&paths);
 }
 
 static void find(FilerWindow *filer_window)
@@ -967,8 +963,7 @@ static void find(FilerWindow *filer_window)
 	GList *paths;
 	paths = filer_selected_items(filer_window);
 	action_find(paths);
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
+	destroy_glist(&paths);
 }
 
 /* This creates a new savebox widget, and allows the user to pick a new path
@@ -1492,10 +1487,8 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	if (send_to_paths)
-	{
-		g_list_foreach(send_to_paths, (GFunc) g_free, NULL);
-		g_list_free(send_to_paths);
-	}
+		destroy_glist(&send_to_paths);
+
 	send_to_paths = paths;
 
 	g_signal_connect(menu, "unmap_event", G_CALLBACK(menu_closed), NULL);
@@ -1703,10 +1696,7 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 			manual = g_strconcat(app_dir, "/Help/Manual-",
 					     current_lang, ".html", NULL);
 			if (access(manual, F_OK))
-			{
-				g_free(manual);
-				manual = NULL;
-			}
+				null_g_free(&manual);
 		}
 
 		if (!manual)
@@ -1855,8 +1845,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 
 			items = filer_selected_items(window_with_focus);
 			infobox_show_list(items);
-			g_list_foreach(items, (GFunc) g_free, NULL);
-			g_list_free(items);
+			destroy_glist(&items);
 			return;
 		}
 		default:

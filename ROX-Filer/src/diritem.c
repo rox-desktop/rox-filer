@@ -262,8 +262,7 @@ void diritem_free(DirItem *item)
 	item->image = NULL;
 	if (item->leafname_collate != item->leafname)
 		g_free(item->leafname_collate);
-	g_free(item->leafname);
-	item->leafname = NULL;
+	null_g_free(&item->leafname);
 	g_free(item);
 }
 

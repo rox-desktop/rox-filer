@@ -45,5 +45,7 @@ gchar *to_utf8(const gchar *src);
 gchar *from_utf8(const gchar *src);
 char *md5_hash(const char *message);
 gchar *expand_path(const gchar *path);
+void destroy_glist(GList **list);
+void null_g_free(gpointer p);
 
 #endif /* _SUPPORT_H */

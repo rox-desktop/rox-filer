@@ -366,8 +366,7 @@ void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf)
 
 	new = g_strdup(leaf);	/* leaf == old value sometimes */
 
-	g_free(filer_window->auto_select);
-	filer_window->auto_select = NULL;
+	null_g_free(&filer_window->auto_select);
 
 	if (view_autoselect(filer_window->view, new))
 		g_free(new);

@@ -751,7 +751,7 @@ static void build_options_window(void)
 
 	if (!options_doc)
 	{
-		report_error("Internal error: %s unreadable", path);
+		report_error(_("Internal error: %s unreadable"), path);
 		g_free(path);
 		return;
 	}

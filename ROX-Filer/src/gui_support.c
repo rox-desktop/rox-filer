@@ -259,8 +259,7 @@ static gboolean error_idle_cb(gpointer data)
 	char	**error = (char **) data;
 	
 	report_error("%s", *error);
-	g_free(*error);
-	*error = NULL;
+	null_g_free(error);
 
 	one_less_window();
 	return FALSE;

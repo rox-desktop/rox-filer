@@ -274,6 +274,8 @@ static void update_display(Directory *dir,
 			break;
 		case DIR_REMOVE:
 			view_delete_if(view, if_deleted, items);
+			/* XXX: Slow? */
+			toolbar_update_info(filer_window);
 			break;
 		case DIR_START_SCAN:
 			set_scanning_display(filer_window, TRUE);
@@ -301,8 +303,7 @@ static void update_display(Directory *dir,
 			if (filer_window->auto_select)
 				display_set_autoselect(filer_window,
 						filer_window->auto_select);
-			g_free(filer_window->auto_select);
-			filer_window->auto_select = NULL;
+			null_g_free(&filer_window->auto_select);
 
 			filer_create_thumbs(filer_window);
 
@@ -361,10 +362,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	}
 
 	if (filer_window->thumb_queue)
-	{
-		g_list_foreach(filer_window->thumb_queue, (GFunc) g_free, NULL);
-		g_list_free(filer_window->thumb_queue);
-	}
+		destroy_glist(&filer_window->thumb_queue);
 
 	tooltip_show(NULL);
 
@@ -1561,9 +1559,7 @@ void filer_cancel_thumbnails(FilerWindow *filer_window)
 {
 	gtk_widget_hide(filer_window->thumb_bar);
 
-	g_list_foreach(filer_window->thumb_queue, (GFunc) g_free, NULL);
-	g_list_free(filer_window->thumb_queue);
-	filer_window->thumb_queue = NULL;
+	destroy_glist(&filer_window->thumb_queue);
 	filer_window->max_thumbs = 0;
 }
 

@@ -1269,6 +1269,31 @@ static gint icon_motion_event(GtkWidget *widget,
 	return TRUE;
 }
 
+static void reposition_icon_on_side(GtkWidget *side, GtkWidget *widget,
+				    int index)
+{
+	GList *list;
+
+	list = gtk_container_get_children(GTK_CONTAINER(side));
+
+	/* Want to move icon to the list in the given 'side'. Is it there
+	 * already?
+	 */
+
+	if (!g_list_find(list, widget))
+	{
+		/* No, reparent */
+		gtk_grab_remove(widget);
+		gtk_widget_reparent(widget, side);
+		dnd_motion_grab_pointer();
+		gtk_grab_add(widget);
+	}
+
+	gtk_box_reorder_child(GTK_BOX(side), widget, index);
+
+	g_list_free(list);
+}
+
 /* Move icon to this index in the complete widget list.
  * 0 makes the icon the left-most icon. The gap in the middle has
  * an index number, which allows you to specify that the icon should
@@ -1283,47 +1308,13 @@ static void reposition_icon(PanelIcon *pi, int index)
 
 	list = gtk_container_get_children(GTK_CONTAINER(panel->before));
 	before_len = g_list_length(list);
+	g_list_free(list);
 
 	if (index <= before_len)
-	{
-		/* Want to move icon to the 'before' list. Is it there
-		 * already?
-		 */
-
-		if (!g_list_find(list, widget))
-		{
-			/* No, reparent */
-			gtk_grab_remove(widget);
-			gtk_widget_reparent(widget, panel->before);
-			dnd_motion_grab_pointer();
-			gtk_grab_add(widget);
-		}
-		
-		gtk_box_reorder_child(GTK_BOX(panel->before), widget, index);
-	}
+		reposition_icon_on_side(panel->before, widget, index);
 	else
-	{
-		/* Else, we need it in the 'after' list. */
-
-		index -= before_len + 1;
-
-		g_list_free(list);
-
-		list = gtk_container_get_children(GTK_CONTAINER(panel->after));
-
-		if (!g_list_find(list, widget))
-		{
-			/* Not already there, reparent */
-			gtk_grab_remove(widget);
-			gtk_widget_reparent(widget, panel->after);
-			dnd_motion_grab_pointer();
-			gtk_grab_add(widget);
-		}
-
-		gtk_box_reorder_child(GTK_BOX(panel->after), widget, index);
-	}
-
-	g_list_free(list);
+		reposition_icon_on_side(panel->after, widget,
+					index - (before_len + 1));
 
 	panel_save(panel);
 }
@@ -1500,12 +1491,11 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 	}
 }
 
-/* Tips or style has changed -- update everything on this panel */
-static void panel_set_style(Panel *panel)
+static void update_side(GtkWidget *side)
 {
 	GList	*kids, *next;
 
-	kids = gtk_container_get_children(GTK_CONTAINER(panel->before));
+	kids = gtk_container_get_children(GTK_CONTAINER(side));
 	for (next = kids; next; next = next->next)
 	{
 		PanelIcon *pi;
@@ -1513,16 +1503,13 @@ static void panel_set_style(Panel *panel)
 		panel_icon_set_tip(pi);
 	}
 	g_list_free(kids);
+}
 
-	kids = gtk_container_get_children(GTK_CONTAINER(panel->after));
-	for (next = kids; next; next = next->next)
-	{
-		PanelIcon *pi;
-		pi = g_object_get_data(next->data, "icon");
-		panel_icon_set_tip(pi);
-	}
-	g_list_free(kids);
-
+/* Tips or style has changed -- update everything on this panel */
+static void panel_set_style(Panel *panel)
+{
+	update_side(panel->before);
+	update_side(panel->after);
 	gtk_widget_queue_resize(panel->window);
 }
 
@@ -1776,11 +1763,10 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
 	PanelSide side = panel->side;
-	int pos[3];
+	int pos[2];
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
-	pos[2] = 1;
 
 	icon_prepare_menu((Icon *) pi, FALSE);
 

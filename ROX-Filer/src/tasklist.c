@@ -44,6 +44,7 @@
 #include "main.h"
 #include "pinboard.h"
 #include "pixmaps.h"
+#include "support.h"
 
 /* There is one of these for each window controlled by the window
  * manager (all tasks) in the _NET_CLIENT_LIST property.
@@ -152,8 +153,7 @@ static void icon_win_free(IconWindow *win)
 	g_return_if_fail(win->widget == NULL);
 	g_return_if_fail(win->label == NULL);
 
-	if (win->text)
-		g_free(win->text);
+	g_free(win->text);
 	g_free(win);
 }
 
@@ -252,11 +252,7 @@ static gchar *get_str(IconWindow *win, GdkAtom atom)
 
 static void get_icon_name(IconWindow *win)
 {
-	if (win->text)
-	{
-		g_free(win->text);
-		win->text = NULL;
-	}
+	null_g_free(&win->text);
 
 	win->text = get_str(win, xa__NET_WM_ICON_NAME);
 	if (!win->text)

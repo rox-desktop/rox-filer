@@ -529,9 +529,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 			{
 				error = _("XDS protocol error: "
 					"leafname may not contain '/'\n");
-				g_free(leafname);
-
-				leafname = NULL;
+				null_g_free(&leafname);
 			}
 			else
 			{
@@ -848,7 +846,6 @@ static void got_uri_list(GtkWidget 		*widget,
 	else
 	{
 		GList		*local_paths = NULL;
-		GList		*next;
 
 		/* Either one local URI, or a list. If everything in the list
 		 * isn't local then we are stuck.
@@ -886,9 +883,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		else
 			error = _("Unknown action requested");
 
-		for (next = local_paths; next; next = next->next)
-			g_free(next->data);
-		g_list_free(local_paths);
+		destroy_glist(&local_paths);
 	}
 
 	if (error)
@@ -899,13 +894,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	else if (send_reply)
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 
-	next_uri = uri_list;
-	while (next_uri)
-	{
-		g_free(next_uri->data);
-		next_uri = next_uri->next;
-	}
-	g_list_free(uri_list);
+	destroy_glist(&uri_list);
 }
 
 /* Called when an item from the ACTION_ASK menu is chosen */
@@ -937,12 +926,8 @@ static void prompt_action(GList *paths, gchar *dest)
 
 	if (prompt_local_paths)
 	{
-		g_list_foreach(prompt_local_paths, (GFunc) g_free, NULL);
-		g_list_free(prompt_local_paths);
-		g_free(prompt_dest_path);
-
-		prompt_dest_path = NULL;
-		prompt_local_paths = NULL;
+		destroy_glist(&prompt_local_paths);
+		null_g_free(&prompt_dest_path);
 	}
 	
 	/* Make a copy of the arguments */

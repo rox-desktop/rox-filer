@@ -112,8 +112,7 @@ GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n)
 		ret[i].path = trans;
 
 		g_free(first);
-		g_free(second);
-		second = NULL;
+		null_g_free(&second);
 
 		trans++;
 		slash = strchr(trans, '/');
@@ -182,12 +181,8 @@ static void set_trans(guchar *lang)
 
 	rox_clear_translation();
 
-	if (current_lang)
-	{
-		g_free(current_lang);
-		current_lang = NULL;
-	}
-	
+	null_g_free(&current_lang);
+
 	if (strcmp(lang, "None") == 0)
 		return;
 	else if (strcmp(lang, "From LANG") == 0)

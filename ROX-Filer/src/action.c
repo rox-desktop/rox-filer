@@ -33,6 +33,7 @@
 #include <signal.h>
 #include <sys/time.h>
 #include <utime.h>
+#include <stdarg.h>
 
 #include "global.h"
 
@@ -121,12 +122,17 @@ static guchar	*last_find_string = NULL;
 static guchar	*new_entry_string = NULL;
 
 /* Static prototypes */
+static void send_done(void);
+static void send_check_path(const gchar *path);
+static void send_mount_path(const gchar *path);
+static gboolean printf_send(const char *msg, ...);
 static gboolean send(void);
 static gboolean send_error(void);
 static gboolean send_dir(const char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
-static gboolean reply(int fd, gboolean ignore_quiet);
+static gboolean printf_reply(int fd, gboolean ignore_quiet,
+			     const char *msg, ...);
 static gboolean remove_pinned_ok(GList *paths);
 
 /*			SUPPORT				*/
@@ -428,10 +434,8 @@ static void for_dir_contents(ForDirCB *cb,
 	if (!d)
 	{
 		/* Message displayed is "ERROR reading 'path': message" */
-		g_string_sprintf(message, "!%s '%s': %s\n",
-				_("ERROR reading"),
-				src_dir, g_strerror(errno));
-		send();
+		printf_send("!%s '%s': %s\n", _("ERROR reading"),
+			    src_dir, g_strerror(errno));
 		return;
 	}
 
@@ -450,14 +454,11 @@ static void for_dir_contents(ForDirCB *cb,
 	if (!list)
 		return;
 
-	next = list;
-
-	while (next)
+	for (next = list; next; next = next->next)
 	{
 		cb((char *) next->data, dest_path);
 
 		g_free(next->data);
-		next = next->next;
 	}
 	g_list_free(list);
 }
@@ -475,6 +476,41 @@ static gboolean read_exact(int source, char *buffer, ssize_t len)
 		buffer += got;
 	}
 	return TRUE;
+}
+
+static void send_done(void)
+{
+	printf_send(_("'\nDone\n"));
+}
+
+/* Notify the filer that this item has been updated */
+static void send_check_path(const gchar *path)
+{
+	printf_send("s%s", path);
+}
+
+/* Notify the filer that this whole subtree has changed (eg, been unmounted) */
+static void send_mount_path(const gchar *path)
+{
+	printf_send("m%s", path);
+}
+
+/* Send a message to the filer process. The first character indicates the
+ * type of the message.
+ */
+static gboolean printf_send(const char *msg, ...)
+{
+        va_list args;
+	gchar *tmp;
+
+	va_start(args, msg);
+	tmp = g_strdup_vprintf(msg, args);
+	va_end(args);
+
+	g_string_assign(message, tmp);
+	g_free(tmp);
+
+	return send();
 }
 
 /* Send 'message' to our parent process. TRUE on success. */
@@ -495,14 +531,12 @@ static gboolean send(void)
 /* Set the directory indicator at the top of the window */
 static gboolean send_dir(const char *dir)
 {
-	g_string_sprintf(message, "/%s", dir);
-	return send();
+	return printf_send("/%s", dir);
 }
 
 static gboolean send_error(void)
 {
-	g_string_sprintf(message, "!%s: %s\n", _("ERROR"), g_strerror(errno));
-	return send();
+	return printf_send("!%s: %s\n", _("ERROR"), g_strerror(errno));
 }
 
 static void response(GtkDialog *dialog, gint response, GUIside *gui_side)
@@ -583,9 +617,7 @@ static void process_flag(char flag)
 			read_new_entry_text();
 			break;
 		default:
-			g_string_sprintf(message,
-					"!ERROR: Bad message '%c'\n", flag);
-			send();
+			printf_send("!ERROR: Bad message '%c'\n", flag);
 			break;
 	}
 }
@@ -624,13 +656,23 @@ static void check_flags(void)
  * the user MUST click Yes or No, else treat quiet on as Yes.
  * If the user needs prompting then does send().
  */
-static gboolean reply(int fd, gboolean ignore_quiet)
+static gboolean printf_reply(int fd, gboolean ignore_quiet,
+			     const char *msg, ...)
 {
 	ssize_t len;
 	char retval;
+	va_list args;
+	gchar *tmp;
 
 	if (quiet && !ignore_quiet)
 		return TRUE;
+
+	va_start(args, msg);
+	tmp = g_strdup_vprintf(msg, args);
+	va_end(args);
+
+	g_string_assign(message, tmp);
+	g_free(tmp);
 
 	send();
 
@@ -647,12 +689,10 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 		switch (retval)
 		{
 			case 'Y':
-				g_string_sprintf(message, "' %s\n", _("Yes"));
-				send();
+				printf_send("' %s\n", _("Yes"));
 				return TRUE;
 			case 'N':
-				g_string_sprintf(message, "' %s\n", _("No"));
-				send();
+				printf_send("' %s\n", _("No"));
 				return FALSE;
 			default:
 				process_flag(retval);
@@ -783,8 +823,7 @@ static void do_usage(const char *src_path, const char *unused)
 
 	if (mc_lstat(src_path, &info))
 	{
-		g_string_sprintf(message, "'%s:\n", src_path);
-		send();
+		printf_send("'%s:\n", src_path);
 		send_error();
 	}
 	else if (S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
@@ -795,9 +834,8 @@ static void do_usage(const char *src_path, const char *unused)
 	else if (S_ISDIR(info.st_mode))
 	{
 	        dir_counter++;
-		g_string_sprintf(message, _("?Count contents of %s?"),
-				src_path);
-		if (reply(from_parent, FALSE))
+		if (printf_reply(from_parent, FALSE,
+				 _("?Count contents of %s?"), src_path))
 		{
 			char *safe_path;
 			safe_path = g_strdup(src_path);
@@ -828,17 +866,14 @@ static void do_delete(const char *src_path, const char *unused)
 					   : access(src_path, W_OK) != 0;
 	if (write_prot || !quiet)
 	{
-		g_string_sprintf(message, _("?Delete %s'%s'?"),
-				write_prot ? _("WRITE-PROTECTED ") : "",
-				src_path);
-		if (!reply(from_parent, write_prot && !o_force))
+		if (!printf_reply(from_parent, write_prot && !o_force,
+				  _("?Delete %s'%s'?"),
+				  write_prot ? _("WRITE-PROTECTED ") : "",
+				  src_path))
 			return;
 	}
 	else if (!o_brief)
-	{
-		g_string_sprintf(message, _("'Deleting '%s'\n"), src_path);
-		send();
-	}
+		printf_send(_("'Deleting '%s'\n"), src_path);
 
 	safe_path = g_strdup(src_path);
 
@@ -851,25 +886,20 @@ static void do_delete(const char *src_path, const char *unused)
 			send_error();
 			return;
 		}
-		g_string_sprintf(message, _("'Directory '%s' deleted\n"),
-				safe_path);
-		send();
-		g_string_sprintf(message, "m%s", safe_path);
-		send();
+		printf_send(_("'Directory '%s' deleted\n"), safe_path);
+		send_mount_path(safe_path);
 	}
 	else if (unlink(src_path))
 		send_error();
 	else
 	{
-		g_string_sprintf(message, "s%s", safe_path);
-		send();
+		send_check_path(safe_path);
 		if (strcmp(g_basename(safe_path), ".DirIcon") == 0)
 		{
 			gchar *dir;
 			dir = g_dirname(safe_path);
-			g_string_sprintf(message, "s%s", dir);
+			send_check_path(dir);
 			g_free(dir);
-			send();
 		}
 	}
 
@@ -887,8 +917,7 @@ static void do_find(const char *path, const char *unused)
 
 	if (!quiet)
 	{
-		g_string_sprintf(message, _("?Check '%s'?"), path);
-		if (!reply(from_parent, FALSE))
+		if (!printf_reply(from_parent, FALSE, _("?Check '%s'?"), path))
 			return;
 	}
 
@@ -896,29 +925,25 @@ static void do_find(const char *path, const char *unused)
 	{
 		if (new_entry_string)
 		{
-			if (find_condition)
-				find_condition_free(find_condition);
+			find_condition_free(find_condition);
 			find_condition = find_compile(new_entry_string);
-			g_free(new_entry_string);
-			new_entry_string = NULL;
+			null_g_free(&new_entry_string);
 		}
 
 		if (find_condition)
 			break;
 
-		g_string_assign(message, _("!Invalid find condition - "
-						"change it and try again\n"));
-		send();
-		g_string_sprintf(message, _("?Check '%s'?"), path);
-		if (!reply(from_parent, TRUE))
+		printf_send(_("!Invalid find condition - "
+			      "change it and try again\n"));
+		if (!printf_reply(from_parent, TRUE,
+				  _("?Check '%s'?"), path))
 			return;
 	}
 
 	if (mc_lstat(path, &info.stats))
 	{
 		send_error();
-		g_string_sprintf(message, _("'(while checking '%s')\n"), path);
-		send();
+		printf_send(_("'(while checking '%s')\n"), path);
 		return;
 	}
 
@@ -928,10 +953,7 @@ static void do_find(const char *path, const char *unused)
 	info.leaf = g_basename(path);
 	info.prune = FALSE;
 	if (find_test_condition(find_condition, &info))
-	{
-		g_string_sprintf(message, "=%s", path);
-		send();
-	}
+		printf_send("=%s", path);
 
 	if (S_ISDIR(info.stats.st_mode) && !info.prune)
 	{
@@ -991,18 +1013,12 @@ static void do_chmod(const char *path, const char *unused)
 
 	if (!quiet)
 	{
-		g_string_sprintf(message,
-				_("?Change permissions of '%s'?"), path);
-		if (!reply(from_parent, FALSE))
+		if (!printf_reply(from_parent, FALSE,
+				  _("?Change permissions of '%s'?"), path))
 			return;
 	}
 	else if (!o_brief)
-	{
-		g_string_sprintf(message,
-				_("'Changing permissions of '%s'\n"),
-				path);
-		send();
-	}
+		printf_send(_("'Changing permissions of '%s'\n"), path);
 
 	for (;;)
 	{
@@ -1012,19 +1028,16 @@ static void do_chmod(const char *path, const char *unused)
 				mode_free(mode_change);
 			mode_change = nice_mode_compile(new_entry_string,
 							MODE_MASK_ALL);
-			g_free(new_entry_string);
-			new_entry_string = NULL;
+			null_g_free(&new_entry_string);
 		}
 
 		if (mode_change)
 			break;
 
-		g_string_assign(message,
+		printf_send(
 			_("!Invalid mode command - change it and try again\n"));
-		send();
-		g_string_sprintf(message,
-				_("?Change permissions of '%s'?"), path);
-		if (!reply(from_parent, TRUE))
+		if (!printf_reply(from_parent, TRUE,
+				  _("?Change permissions of '%s'?"), path))
 			return;
 	}
 
@@ -1043,13 +1056,11 @@ static void do_chmod(const char *path, const char *unused)
 		return;
 	}
 
-	g_string_sprintf(message, "s%s", path);
-	send();
+	send_check_path(path);
 
 	if (S_ISDIR(info.st_mode))
 	{
-		g_string_sprintf(message, "m%s", path);
-		send();
+		send_mount_path(path);
 
 		if (o_recurse)
 		{
@@ -1109,15 +1120,15 @@ static void do_copy2(const char *path, const char *dest)
 
 		if (!merge && o_newer && info.st_mtime > dest_info.st_mtime)
 		{
-		  /* Newer; keep going */
+			/* Newer; keep going */
 		}
 		else
 		{
-			g_string_sprintf(message,
-				_("?'%s' already exists - %s?"), dest_path,
-				merge ? _("merge contents") : _("overwrite"));
-
-			if (!reply(from_parent, TRUE))
+			if (!printf_reply(from_parent, TRUE,
+					  _("?'%s' already exists - %s?"),
+					  dest_path,
+					  merge ? _("merge contents")
+					  	: _("overwrite")))
 				return;
 		}
 
@@ -1133,25 +1144,18 @@ static void do_copy2(const char *path, const char *dest)
 				send_error();
 				if (errno != ENOENT)
 					return;
-				g_string_sprintf(message,
-						_("'Trying copy anyway...\n"));
-				send();
+				printf_send(_("'Trying copy anyway...\n"));
 			}
 		}
 	}
 	else if (!quiet)
 	{
-		g_string_sprintf(message,
-				_("?Copy %s as %s?"), path, dest_path);
-		if (!reply(from_parent, FALSE))
+		if (!printf_reply(from_parent, FALSE,
+				  _("?Copy %s as %s?"), path, dest_path))
 			return;
 	}
 	else
-	{
-		g_string_sprintf(message, _("'Copying %s as %s\n"), path,
-				dest_path);
-		send();
-	}
+		printf_send(_("'Copying %s as %s\n"), path, dest_path);
 
 	if (S_ISDIR(info.st_mode))
 	{
@@ -1166,22 +1170,15 @@ static void do_copy2(const char *path, const char *dest)
 		exists = !mc_lstat(dest_path, &dest_info);
 
 		if (exists && !S_ISDIR(dest_info.st_mode))
-		{
-			g_string_sprintf(message,
-				_("!ERROR: Destination already exists, "
-					"but is not a directory\n"));
-			send();
-		}
+			printf_send(_("!ERROR: Destination already exists, "
+				      "but is not a directory\n"));
 		else if (exists == FALSE && mkdir(dest_path, 0700 | mode))
 			send_error();
 		else
 		{
 			if (!exists)
-			{
 				/* (just been created then) */
-				g_string_sprintf(message, "s%s", dest_path);
-				send();
-			}
+				send_check_path(dest_path);
 
 			action_leaf = NULL;
 			for_dir_contents(do_copy2, safe_path, safe_dest);
@@ -1230,10 +1227,7 @@ static void do_copy2(const char *path, const char *dest)
 			if (symlink(target, dest_path))
 				send_error();
 			else
-			{
-				g_string_sprintf(message, "s%s", dest_path);
-				send();
-			}
+				send_check_path(dest_path);
 
 			g_free(target);
 		}
@@ -1248,16 +1242,11 @@ static void do_copy2(const char *path, const char *dest)
 
 		if (error)
 		{
-			g_string_sprintf(message, _("!%s\nFailed to copy '%s'"),
-					error, path);
+			printf_send(_("!%s\nFailed to copy '%s'"), error, path);
 			g_free(error);
-			send();
 		}
 		else
-		{
-			g_string_sprintf(message, "s%s", dest_path);
-			send();
-		}
+			send_check_path(dest_path);
 	}
 }
 
@@ -1291,14 +1280,10 @@ static void do_move2(const char *path, const char *dest)
 		{
 			/* Newer; keep going */
 		}
-		else
-		{
-			g_string_sprintf(message,
-					_("?'%s' already exists - overwrite?"),
-					dest_path);
-			if (!reply(from_parent, TRUE))
-				return;
-		}
+		else if (!printf_reply(from_parent, TRUE,
+				       _("?'%s' already exists - overwrite?"),
+				       dest_path))
+			return;
 
 		if (S_ISDIR(info.st_mode))
 			err = rmdir(dest_path);
@@ -1310,24 +1295,17 @@ static void do_move2(const char *path, const char *dest)
 			send_error();
 			if (errno != ENOENT)
 				return;
-			g_string_sprintf(message,
-					_("'Trying move anyway...\n"));
-			send();
+			printf_send(_("'Trying move anyway...\n"));
 		}
 	}
 	else if (!quiet)
 	{
-		g_string_sprintf(message,
-				_("?Move %s as %s?"), path, dest_path);
-		if (!reply(from_parent, FALSE))
+		if (!printf_reply(from_parent, FALSE,
+				  _("?Move %s as %s?"), path, dest_path))
 			return;
 	}
 	else
-	{
-		g_string_sprintf(message, _("'Moving %s as %s\n"), path,
-				dest_path);
-		send();
-	}
+		printf_send(_("'Moving %s as %s\n"), path, dest_path);
 
 	argv[2] = path;
 	argv[3] = dest_path;
@@ -1335,24 +1313,18 @@ static void do_move2(const char *path, const char *dest)
 	err = fork_exec_wait(argv);
 	if (err)
 	{
-		g_string_sprintf(message,
-				_("!%s\nFailed to move %s as %s\n"),
-				err, path, dest_path);
-		send();
-
+		printf_send(_("!%s\nFailed to move %s as %s\n"),
+			    err, path, dest_path);
 		g_free(err);
 	}
 	else
 	{
-		g_string_sprintf(message, "s%s", dest_path);
-		send();
+		send_check_path(dest_path);
 
 		if (is_dir)
-			g_string_sprintf(message, "m%s", path);
+			send_mount_path(path);
 		else
-			g_string_sprintf(message, "s%s", path);
-
-		send();
+			send_check_path(path);
 	}
 }
 
@@ -1362,11 +1334,7 @@ static void do_move2(const char *path, const char *dest)
 static void do_copy(const char *path, const char *dest)
 {
 	if (is_sub_dir(make_dest_path(path, dest), path))
-	{
-		g_string_sprintf(message,
-			_("!ERROR: Can't copy object into itself\n"));
-		send();
-	}
+		printf_send(_("!ERROR: Can't copy object into itself\n"));
 	else
 		do_copy2(path, dest);
 }
@@ -1377,11 +1345,8 @@ static void do_copy(const char *path, const char *dest)
 static void do_move(const char *path, const char *dest)
 {
 	if (is_sub_dir(make_dest_path(path, dest), path))
-	{
-		g_string_sprintf(message,
-			_("!ERROR: Can't move/rename object into itself\n"));
-		send();
-	}
+		printf_send(
+		     _("!ERROR: Can't move/rename object into itself\n"));
 	else
 		do_move2(path, dest);
 }
@@ -1395,26 +1360,15 @@ static void do_link(const char *path, const char *dest)
 	dest_path = make_dest_path(path, dest);
 
 	if (quiet)
-	{
-		g_string_sprintf(message, _("'Linking %s as %s\n"), path,
-				dest_path);
-		send();
-	}
-	else
-	{
-		g_string_sprintf(message,
-				_("?Link %s as %s?"), path, dest_path);
-		if (!reply(from_parent, FALSE))
-			return;
-	}
+		printf_send(_("'Linking %s as %s\n"), path, dest_path);
+	else if (!printf_reply(from_parent, FALSE,
+			       _("?Link %s as %s?"), path, dest_path))
+		return;
 
 	if (symlink(path, dest_path))
 		send_error();
 	else
-	{
-		g_string_sprintf(message, "s%s", dest_path);
-		send();
-	}
+		send_check_path(dest_path);
 }
 
 /* Mount/umount this item (depending on 'mount') */
@@ -1429,41 +1383,28 @@ static void do_mount(guchar *path, gboolean mount)
 	argv[1] = path;
 
 	if (quiet)
-	{
-		g_string_sprintf(message,
-				mount ? _("'Mounting %s\n")
-				      : _("'Unmounting %s\n"),
-				path);
-		send();
-	}
-	else
-	{
-		g_string_sprintf(message,
-				mount ? _("?Mount %s?")
-				      : _("?Unmount %s?"),
-				path);
-		if (!reply(from_parent, FALSE))
-			return;
-	}
+		printf_send(mount ? _("'Mounting %s\n")
+			          : _("'Unmounting %s\n"),
+			    path);
+	else if (!printf_reply(from_parent, FALSE,
+			       mount ? _("?Mount %s?")
+				     : _("?Unmount %s?"),
+			       path))
+		return;
 
 	err = fork_exec_wait(argv);
 	if (err)
 	{
-		g_string_sprintf(message, mount ?
+		printf_send(mount ?
 			_("!%s\nMount failed\n") :
 			_("!%s\nUnmount failed\n"), err);
-		send();
 		g_free(err);
 	}
 	else
 	{
-		g_string_sprintf(message, "M%s", path);
-		send();
+		printf_send("M%s", path);
 		if (mount && mount_open_dir)
-		{
-			g_string_sprintf(message, "o%s", path);
-			send();
-		}
+			printf_send("o%s", path);
 	}
 }
 
@@ -1476,7 +1417,6 @@ static void usage_cb(gpointer data)
 {
 	GList *paths = (GList *) data;
 	double	total_size = 0;
-	gchar	*tmp;
 
 	dir_counter = file_counter = 0;
 
@@ -1490,37 +1430,28 @@ static void usage_cb(gpointer data)
 		
 		do_usage(path, NULL);
 
-		g_string_sprintf(message, "'%s: %s\n",
-				g_basename(path),
-				format_double_size(size_tally));
-		send();
+		printf_send("'%s: %s\n",
+			    g_basename(path),
+			    format_double_size(size_tally));
 		total_size += size_tally;
 	}
 
-	g_string_sprintf(message, _("'\nTotal: %s ("),
-			 format_double_size(total_size));
+	g_string_printf(message, _("'\nTotal: %s ("),
+			format_double_size(total_size));
 	
 	if (file_counter)
-	{
-		tmp = g_strdup_printf("%ld %s%s",
-				file_counter,
+		g_string_append_printf(message,
+				"%ld %s%s", file_counter,
 				file_counter == 1 ? _("file") : _("files"),
 				dir_counter ? ", " : ")\n");
-		g_string_append(message, tmp);
-		g_free(tmp);
-	}
 
 	if (file_counter == 0 && dir_counter == 0)
 		g_string_append(message, _("no directories)\n"));
 	else if (dir_counter)
-	{
-		tmp = g_strdup_printf("%ld %s)\n",
-				dir_counter,
+		g_string_append_printf(message,
+				"%ld %s)\n", dir_counter,
 				dir_counter == 1 ? _("directory")
 						 : _("directories"));
-		g_string_append(message, tmp);
-		g_free(tmp);
-	}
 	
 	send();
 }
@@ -1545,10 +1476,10 @@ static void mount_cb(gpointer data)
 		mount_points = TRUE;
 	}
 
-	g_string_sprintf(message,
-			 mount_points ? _("'\nDone\n")
-			 	      : _("!No mount points selected!\n"));
-	send();
+	if (mount_points)
+		send_done();
+	else
+		printf_send(_("!No mount points selected!\n"));
 }
 #endif
 
@@ -1569,7 +1500,7 @@ static void delete_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
 
-	while (paths)
+	for (; paths; paths = paths->next)
 	{
 		guchar	*path = (guchar *) paths->data;
 		guchar	*dir;
@@ -1580,11 +1511,9 @@ static void delete_cb(gpointer data)
 		do_delete(path, dir);
 
 		g_free(dir);
-		paths = paths->next;
 	}
 	
-	g_string_sprintf(message, _("'\nDone\n"));
-	send();
+	send_done();
 }
 
 static void find_cb(gpointer data)
@@ -1603,15 +1532,13 @@ static void find_cb(gpointer data)
 			do_find(path, NULL);
 		}
 
-		g_string_assign(message, _("?Another search?"));
-		if (!reply(from_parent, TRUE))
+		if (!printf_reply(from_parent, TRUE,
+				  _("?Another search?")))
 			break;
-		g_string_assign(message, "#");
-		send();
+		printf_send("#");
 	}
 	
-	g_string_sprintf(message, _("'\nDone\n"));
-	send();
+	send_done();
 }
 
 static void chmod_cb(gpointer data)
@@ -1628,35 +1555,27 @@ static void chmod_cb(gpointer data)
 		if (mc_stat(path, &info) != 0)
 			send_error();
 		else if (S_ISLNK(info.st_mode))
-		{
-			g_string_sprintf(message,
-					_("!'%s' is a symbolic link\n"),
-					g_basename(path));
-			send();
-		}
+			printf_send(_("!'%s' is a symbolic link\n"),
+				    g_basename(path));
 		else
 			do_chmod(path, NULL);
 	}
 	
-	g_string_sprintf(message, _("'\nDone\n"));
-	send();
+	send_done();
 }
 
 static void list_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
 
-	while (paths)
+	for (; paths; paths = paths->next)
 	{
 		send_dir((char *) paths->data);
 
 		action_do_func((char *) paths->data, action_dest);
-
-		paths = paths->next;
 	}
 
-	g_string_sprintf(message, _("'\nDone\n"));
-	send();
+	send_done();
 }
 
 /*			EXTERNAL INTERFACE			*/
@@ -1865,8 +1784,7 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 	gtk_widget_show(abox);
 
 out:
-	g_free(new_entry_string);
-	new_entry_string = NULL;
+	null_g_free(&new_entry_string);
 }
 
 /* If leaf is NULL then the copy has the same name as the original.
@@ -1985,7 +1903,7 @@ static gboolean remove_pinned_ok(GList *paths)
 	int		i, ask_n = 0;
 	gboolean	retval;
 
-	while (paths)
+	for (; paths; paths = paths->next)
 	{
 		guchar	*path = (guchar *) paths->data;
 		
@@ -1995,8 +1913,6 @@ static gboolean remove_pinned_ok(GList *paths)
 				break;
 			ask = g_list_append(ask, path);
 		}
-
-		paths = paths->next;
 	}
 
 	if (!ask)
@@ -2064,6 +1980,5 @@ void set_find_string_colour(GtkWidget *widget, const guchar *string)
 	cond = find_compile(string);
 	entry_set_error(widget, !cond);
 
-	if (cond)
-		find_condition_free(cond);
+	find_condition_free(cond);
 }

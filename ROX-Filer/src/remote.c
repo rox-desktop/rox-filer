@@ -798,8 +798,7 @@ static xmlNodePtr rpc_Copy(GList *args)
 	if (from)
 		action_copy(from, to, leaf, quiet);
 
-	g_list_foreach(from, (GFunc) g_free, NULL);
-	g_list_free(from);
+	destroy_glist(&from);
 	g_free(to);
 	g_free(leaf);
 
@@ -821,8 +820,7 @@ static xmlNodePtr rpc_Move(GList *args)
 	if (from)
 		action_move(from, to, leaf, quiet);
 
-	g_list_foreach(from, (GFunc) g_free, NULL);
-	g_list_free(from);
+	destroy_glist(&from);
 	g_free(to);
 	g_free(leaf);
 
@@ -842,8 +840,7 @@ static xmlNodePtr rpc_Link(GList *args)
 	if (from)
 		action_link(from, to, leaf);
 
-	g_list_foreach(from, (GFunc) g_free, NULL);
-	g_list_free(from);
+	destroy_glist(&from);
 	g_free(to);
 	g_free(leaf);
 
@@ -885,8 +882,7 @@ static xmlNodePtr rpc_Mount(GList *args)
 	if (paths)
 		action_mount(paths, open_dir, quiet);
 
-	g_list_foreach(paths, (GFunc) g_free, NULL);
-	g_list_free(paths);
+	destroy_glist(&paths);
 
 	return NULL;
 }
