@@ -50,7 +50,9 @@ static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 
 /* Static prototypes */
+#ifdef GTK2
 static void MD5Transform(guint32 buf[4], guint32 const in[16]);
+#endif
 
 
 /* Like g_strdup, but does realpath() too (if possible) */
@@ -244,7 +246,7 @@ char *format_size(off_t size)
 }
 
 /* Return a string in the form '23Mb' in a static buffer valid until
- * the next call. Aligned to the right.
+ * the next call. Aligned to the right (5 chars).
  */
 char *format_size_aligned(off_t size)
 {

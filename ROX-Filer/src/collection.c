@@ -1695,8 +1695,6 @@ void collection_clear(Collection *collection)
 
 /* Inserts a new item at the end. The new item is unselected, and its
  * number is returned.
- * The new item is *not* drawn; use collection_draw_item(). This is to
- * allow you to fill in the view_data field.
  */
 gint collection_insert(Collection *collection, gpointer data, gpointer view)
 {
@@ -1721,6 +1719,8 @@ gint collection_insert(Collection *collection, gpointer data, gpointer view)
 	if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
 		set_vadjustment(collection);
 #endif
+
+	collection_draw_item(collection, item, FALSE);
 
 	return item;
 }

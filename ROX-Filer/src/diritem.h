@@ -29,7 +29,7 @@ struct _DirItem
 	mode_t		mode;
 	off_t		size;
 	time_t		atime, ctime, mtime;
-	MaskedPixmap	*image;
+	MaskedPixmap	*image;		/* NULL => leafname only so far */
 	MIME_type	*mime_type;
 	uid_t		uid;
 	gid_t		gid;

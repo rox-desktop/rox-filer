@@ -201,6 +201,7 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	int	old_w = filer_window->collection->item_width;
 	int	old_h = filer_window->collection->item_height;
 	int	w, h;
+	CollectionItem *colitem;
 	
 	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
@@ -212,8 +213,14 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 		g_warning("Failed to find '%s'\n", item->leafname);
 		return;
 	}
+	
+	colitem = &filer_window->collection->items[i];
 
-	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
+	display_update_view(filer_window,
+			(DirItem *) colitem->data,
+			(ViewData *) colitem->view_data);
+	
+	calc_size(filer_window, colitem, &w, &h); 
 	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,
 					 MAX(old_w, w),
@@ -563,10 +570,11 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 		return;
 	}
 
-	/* The ViewData field is created in calc_size() */
-	i = collection_insert(filer_window->collection, item, NULL);
+	i = collection_insert(filer_window->collection,
+			item,
+			display_create_viewdata(filer_window, item));
+
 	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
-	collection_draw_item(filer_window->collection, i, FALSE);
 
 	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,

@@ -14,6 +14,8 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+typedef struct _ViewData ViewData;
+
 /* Prototypes */
 void display_init();
 void display_set_layout(FilerWindow  *filer_window,
@@ -48,6 +50,11 @@ void draw_string(GtkWidget *widget,
 		gboolean box);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);
 void display_change_size(FilerWindow *filer_window, gboolean bigger);
+
+ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item);
 void display_free_colitem(Collection *collection, CollectionItem *colitem);
+void display_update_view(FilerWindow *filer_window,
+			 DirItem *item,
+			 ViewData *view);
 
 #endif /* _DISPLAY_H */
