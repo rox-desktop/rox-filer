@@ -2,7 +2,8 @@
 <options>
   <section title='Translation'>
     <frame label='Language'>
-      <radio-group name='i18n_translation'>
+      <radio-group name='i18n_translation' columns='2'>
+        <radio label='Use the LANG environment variable' value='From LANG'/>
         <radio label='Danish' value='da'/>
         <radio label='Dutch' value='nl'/>
         <radio label='English (no translation)' value='None'/>
@@ -13,7 +14,6 @@
         <radio label='Polish' value='pl'/>
         <radio label='Russian' value='ru'/>
         <radio label='Spanish' value='sp'/>
-        <radio label='Use the LANG environment variable' value='From LANG'/>
       </radio-group>
     </frame>
     <label help='1'>Note that you must save your choices and restart the filer for the new language setting to take full effect.</label>
@@ -34,7 +34,7 @@
       <toggle name='bind_single_click' label='Single-click navigation in filer windows'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
     </frame>
     <section title='Display'>
-      <frame label='General'>
+      <frame label='Sorting'>
         <toggle name='display_intelligent_sort' label='Intelligent sorting'>If off, does ASCII sort: File10, File9, file8.
 If on, ignores case and punctuation and handles numbers properly: file8, File9, File10</toggle>
         <toggle name='display_dirs_first' label='Directories always come first'>If this is on then directories will always appear before anything else, regardless of the sort type.</toggle>
@@ -129,8 +129,7 @@ See the manual for information about using the pinboard.</label>
   </section>
 
   <section title='Panels'>
-    <label help='1'>Panels are bars of icons that run along the side of the screen.
-See the manual for information about using panels.</label>
+    <label help='1'>Panels are bars of icons that run along the side of the screen. See the manual for information about using panels.</label>
     <frame label='Panel style'>
       <radio-group name='panel_style'>
         <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
@@ -151,10 +150,12 @@ operation, such as copying or deleting some files.</label>
       <toggle name='action_mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
     </frame>
     <frame label='Default settings'>
-      <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
-      <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
-      <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
-      <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
+      <hbox>
+        <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
+        <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
+        <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
+        <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
+      </hbox>
     </frame>
   </section>
   <section title='Drag and Drop'>
@@ -203,7 +204,7 @@ operation, such as copying or deleting some files.</label>
         <type-reread label='Re-read files'/>
       </hbox>
       <spacer/>
-      <label help='1'>Use the 'Set Icon...' dialog box to set the icon for each type.</label>
+      <label help='1'>Use the 'Set Icon...' dialog box to set the icon for each MIME type.</label>
     </frame>
     <section title='Colours'>
       <frame label='File type colours'>

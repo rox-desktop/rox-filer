@@ -501,6 +501,7 @@ static void may_add_tip(GtkWidget *widget, xmlNode *element)
 	g_free(tip);
 }
 
+/* Returns zero if attribute is not present */
 static int get_int(xmlNode *node, guchar *attr)
 {
 	guchar *txt;
@@ -1494,6 +1495,7 @@ static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 	GList		*list = NULL;
 	GtkWidget	*button = NULL;
 	xmlNode		*rn;
+	int		cols;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
@@ -1511,6 +1513,36 @@ static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 	option->update_widget = update_radio_group;
 	option->read_widget = read_radio_group;
 	option->widget = button;
+
+	cols = get_int(node, "columns");
+	if (cols > 1)
+	{
+		GtkWidget *table;
+		GList	*next;
+		int	i, n;
+		int	rows;
+
+		n = g_list_length(list);
+		rows = (n + cols - 1) / cols;
+
+		table = gtk_table_new(rows, cols, FALSE);
+
+		i = 0;
+		for (next = list; next; next = next->next)
+		{
+			GtkWidget *button = GTK_WIDGET(next->data);
+			int left = i / rows;
+			int top = i % rows;
+
+			gtk_table_attach_defaults(GTK_TABLE(table), button,
+					left, left + 1, top, top + 1);
+
+			i++;
+		}
+
+		g_list_free(list);
+		list = g_list_prepend(NULL, table);
+	}
 
 	return list;
 }
