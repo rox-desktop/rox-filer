@@ -75,6 +75,9 @@ struct _PanelIcon {
 	DirItem		item;
 };
 
+/* The icon which holds the current pointer grab, if any */
+static PanelIcon *current_grab_icon = NULL;
+
 /* NULL => Not loading a panel */
 static Panel *loading_panel = NULL;
 
@@ -83,6 +86,9 @@ static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel);
 static void panel_destroyed(GtkWidget *widget, Panel *panel);
 static char *pan_from_file(guchar *line);
 static void icon_destroyed(PanelIcon *icon);
+static gint icon_button_release(GtkWidget *widget,
+			        GdkEventButton *event,
+			        PanelIcon *icon);
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      PanelIcon *icon);
@@ -138,6 +144,11 @@ static void selection_get(GtkWidget *widget,
 		       guint      info,
 		       guint      time,
 		       gpointer   data);
+static void icon_start_move(PanelIcon *icon);
+static gint icon_motion_reposition(GtkWidget *widget,
+				   GdkEventMotion *event,
+				   PanelIcon *icon);
+static void reposition_icon(PanelIcon *icon, int index);
 
 
 static GtkItemFactoryEntry menu_def[] = {
@@ -380,7 +391,8 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,
-			GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK);
+			GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
+			GDK_BUTTON_RELEASE_MASK);
 	
 	gtk_box_pack_start(GTK_BOX(after ? panel->after : panel->before),
 			widget, FALSE, TRUE, 4);
@@ -409,10 +421,14 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 
 	gtk_signal_connect_after(GTK_OBJECT(widget), "enter-notify-event",
                            GTK_SIGNAL_FUNC(enter_icon), icon);
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
+			GTK_SIGNAL_FUNC(icon_motion_reposition), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
                            GTK_SIGNAL_FUNC(draw_icon), icon);
 	gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
                            GTK_SIGNAL_FUNC(expose_icon), icon);
+	gtk_signal_connect(GTK_OBJECT(widget), "button_release_event",
+                           GTK_SIGNAL_FUNC(icon_button_release), icon);
 	gtk_signal_connect(GTK_OBJECT(widget), "button_press_event",
                            GTK_SIGNAL_FUNC(icon_button_press), icon);
 
@@ -485,6 +501,9 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *icon)
 static void icon_destroyed(PanelIcon *icon)
 {
 	GList		*list;
+
+	if (icon == current_grab_icon)
+		current_grab_icon = NULL;
 
 	list = g_hash_table_lookup(icons_hash, icon->path);
 	g_return_if_fail(list != NULL);
@@ -609,11 +628,29 @@ static gint panel_button_press(GtkWidget *widget,
 	return TRUE;
 }
 
+static gint icon_button_release(GtkWidget *widget,
+			        GdkEventButton *event,
+			        PanelIcon *icon)
+{
+	if (current_grab_icon)
+	{
+		gdk_pointer_ungrab(GDK_CURRENT_TIME);
+		gtk_grab_remove(current_grab_icon->widget);
+		current_grab_icon = NULL;
+		g_print("[ ungrab ]\n");
+	}
+
+	return FALSE;
+}
+
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      PanelIcon *icon)
 {
 	BindAction	action;
+
+	if (current_grab_icon)
+		return TRUE;
 
 	action = bind_lookup_bev(BIND_PANEL_ICON, event);
 
@@ -635,6 +672,9 @@ static gint icon_button_press(GtkWidget *widget,
 			break;
 		case ACT_POPUP_MENU:
 			popup_panel_menu(event, icon->panel, icon);
+			break;
+		case ACT_MOVE_ICON:
+			icon_start_move(icon);
 			break;
 		case ACT_IGNORE:
 			break;
@@ -1157,5 +1197,122 @@ static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
 	losing_selection--;
 
 	return TRUE;
+}
+
+/* Allow the icon to be repositioned */
+static void icon_start_move(PanelIcon *icon)
+{
+	g_return_if_fail(current_grab_icon == NULL);
+
+	current_grab_icon = icon;
+	gtk_grab_add(icon->widget);
+}
+
+/* When dragging an icon within the panel */
+static gint icon_motion_reposition(GtkWidget *widget,
+				   GdkEventMotion *event,
+				   PanelIcon *icon)
+{
+	Panel	*panel = icon->panel;
+	GList	*list, *me;
+	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
+	int	val;
+	int	dir = 0;
+
+	list = get_widget_list(panel);
+	me = g_list_find(list, widget);
+
+	g_return_val_if_fail(me != NULL, TRUE);
+
+	val = horz ? event->x_root : event->y_root;
+
+	if (me->prev)
+	{
+		GtkWidget *prev = GTK_WIDGET(me->prev->data);
+		int	  x, y;
+
+		gdk_window_get_deskrelative_origin(prev->window, &x, &y);
+
+		if (val <= (horz ? x : y))
+			dir = -1;
+	}
+
+	if (dir == 0 && me->next)
+	{
+		GtkWidget *next = GTK_WIDGET(me->next->data);
+		int	  x, y, w, h;
+
+		gdk_window_get_deskrelative_origin(next->window, &x, &y);
+		gdk_window_get_size(next->window, &w, &h);
+
+		x += w;
+		y += h;
+
+		if (val >= (horz ? x : y))
+			dir = +1;
+	}
+
+	if (dir)
+		reposition_icon(icon, g_list_index(list, widget) + dir);
+
+	return TRUE;
+}
+
+/* Move icon to this index in the complete widget list */
+static void reposition_icon(PanelIcon *icon, int index)
+{
+	Panel	  *panel = icon->panel;
+	GtkWidget *widget = icon->widget;
+	GList	  *list;
+	int	  before_len;
+
+	list = gtk_container_children(GTK_CONTAINER(panel->before));
+	before_len = g_list_length(list);
+
+	if (index < before_len)
+	{
+		/* Want to move icon to the 'before' list. Is it there
+		 * already?
+		 */
+
+		if (!g_list_find(list, widget))
+		{
+			/* No, reparent */
+			gtk_widget_reparent(widget, panel->before);
+			gdk_pointer_grab(widget->window, FALSE,
+					GDK_POINTER_MOTION_MASK |
+					GDK_BUTTON_RELEASE_MASK,
+					FALSE, NULL, GDK_CURRENT_TIME);
+		}
+		
+		gtk_box_reorder_child(GTK_BOX(panel->before), widget, index);
+	}
+	else
+	{
+		/* Else, we need it in the 'after' list. */
+
+		index -= before_len;
+
+		g_list_free(list);
+
+		list = gtk_container_children(GTK_CONTAINER(panel->after));
+
+		if (!g_list_find(list, widget))
+		{
+			/* Not already there, reparent */
+			gtk_grab_remove(widget);
+			gtk_widget_reparent(widget, panel->after);
+			gdk_pointer_grab(widget->window, FALSE,
+					GDK_POINTER_MOTION_MASK |
+					GDK_BUTTON_RELEASE_MASK,
+					FALSE, NULL, GDK_CURRENT_TIME);
+		}
+
+		gtk_box_reorder_child(GTK_BOX(panel->after), widget, index);
+	}
+
+	g_list_free(list);
+
+	panel_save(panel);
 }
 

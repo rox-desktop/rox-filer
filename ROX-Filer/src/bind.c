@@ -34,12 +34,20 @@
 
 /* Call this when a button event occurrs and you want to know what
  * to do.
+ *
+ * NOTE: Currently, this is only used for the panels.
  */
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 {
 	gint	b = event->button;
 	gboolean shift = (event->state & GDK_SHIFT_MASK) != 0;
 	gboolean ctrl = (event->state & GDK_CONTROL_MASK) != 0;
+	gboolean icon  = context == BIND_PINBOARD_ICON ||
+				context == BIND_PANEL_ICON;
+	gboolean item = icon || context == BIND_DIRECTORY_ICON;
+	gboolean background = context == BIND_PINBOARD ||
+				context == BIND_PANEL ||
+				context == BIND_DIRECTORY;
 
 	if (b > 3)
 		return ACT_IGNORE;
@@ -47,19 +55,19 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	if (b == 3)
 		return ACT_POPUP_MENU;
 
-	if (context == BIND_PANEL)
-	{
-		if (b == 1)
-			return ACT_CLEAR_SELECTION;
-	}
+	if (background && b == 1)
+		return ACT_CLEAR_SELECTION;
 
-	if (context != BIND_PANEL_ICON)
-		return ACT_IGNORE;
-
-	if (ctrl)
+	if (item && ctrl)
 		return ACT_TOGGLE_SELECTED;
-	
-	return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
+
+	if (icon && b == 2)
+		return ACT_MOVE_ICON;
+
+	if (item)
+		return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
+
+	return ACT_IGNORE;
 }
 
 /****************************************************************

@@ -12,6 +12,7 @@
 
 typedef enum {
 	BIND_DIRECTORY,
+	BIND_DIRECTORY_ICON,
 	BIND_PANEL,
 	BIND_PANEL_ICON,
 	BIND_PINBOARD,
@@ -26,6 +27,7 @@ typedef enum {
 	ACT_EDIT_ITEM,		/* Open app, load text file or mount dir */
 	ACT_POPUP_MENU,		/* Show the popup menu */
 	ACT_CLEAR_SELECTION,	/* Unselect all icons in this area */
+	ACT_MOVE_ICON,		/* Reposition a pinboard/panel icon */
 } BindAction;
 
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event);

@@ -1586,14 +1586,14 @@ static gboolean do_move2(char *path, char *dest)
 	{
 		char	*leaf;
 
-		leaf = strrchr(dest_path, '/');
+		leaf = strrchr(path, '/');
 		if (!leaf)
-			leaf = dest_path;		/* Error? */
+			leaf = path;		/* Error? */
 		else
 			leaf++;
 
 		g_string_sprintf(message, "+%s", path);
-		g_string_truncate(message, leaf - dest_path);
+		g_string_truncate(message, leaf - path + 1);
 		send();
 		if (is_dir) {
 			g_string_sprintf(message, "m%s", path);

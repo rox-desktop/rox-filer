@@ -73,6 +73,7 @@ static char *filer_single_click(char *data);
 static char *filer_unique_windows(char *data);
 static char *filer_menu_on_2(char *data);
 static char *filer_new_window_on_1(char *data);
+static char *filer_initial_window_height(char *data);
 
 static OptionsSection options =
 {
@@ -86,10 +87,12 @@ static OptionsSection options =
 gboolean o_single_click = TRUE;
 gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
+static gint o_initial_window_height = 3;
 static GtkWidget *toggle_single_click;
 static GtkWidget *toggle_new_window_on_1;
 static GtkWidget *toggle_menu_on_2;
 static GtkWidget *toggle_unique_filer_windows;
+static GtkAdjustment *adj_initial_window_height;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -131,6 +134,8 @@ void filer_init()
 	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
 	option_register("filer_unique_windows", filer_unique_windows);
+	option_register("filer_initial_window_height",
+						filer_initial_window_height);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 }
@@ -953,7 +958,8 @@ FilerWindow *filer_opendir(char *path)
 
 	{
 		GtkWidget	*vbox;
-		int		col_height = ROW_HEIGHT_LARGE * 3;
+		int		col_height = ROW_HEIGHT_LARGE *
+							o_initial_window_height;
 
 		gtk_signal_connect(GTK_OBJECT(collection),
 				"key_press_event",
@@ -1051,7 +1057,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
  */
 static GtkWidget *create_options(void)
 {
-	GtkWidget	*vbox;
+	GtkWidget	*vbox, *hbox, *label, *scale;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -1079,9 +1085,10 @@ static GtkWidget *create_options(void)
 	toggle_single_click =
 		gtk_check_button_new_with_label(_("Single-click nagivation"));
 	OPTION_TIP(toggle_single_click,
-			_("Clicking on an item opens it with this on. Hold down "
-			"Control to select the item instead. If off, clicking "
-			"once selects an item; double click to open things."));
+			_("Clicking on an item opens it with this on. Hold "
+			"down Control to select the item instead. If off, "
+			"clicking once selects an item; double click to open "
+			"things."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
 	toggle_unique_filer_windows =
@@ -1093,6 +1100,21 @@ static GtkWidget *create_options(void)
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
 			FALSE, TRUE, 0);
 
+	adj_initial_window_height = GTK_ADJUSTMENT(gtk_adjustment_new(
+							o_initial_window_height,
+							2, 10, 1, 2, 0));
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	label = gtk_label_new(_("Initial window height "));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
+	scale = gtk_hscale_new(adj_initial_window_height);
+	gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_LEFT);
+	gtk_scale_set_digits(GTK_SCALE(scale), 0);
+	gtk_box_pack_start(GTK_BOX(hbox), scale, TRUE, TRUE, 0);
+	OPTION_TIP(scale, 
+		_("This option sets the initial height of filer windows, "
+		  "in rows of icons at Large Icons size."));
+	
 	return vbox;
 }
 
@@ -1108,6 +1130,8 @@ static void update_options()
 	gtk_toggle_button_set_active(
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
 			o_unique_filer_windows);
+	gtk_adjustment_set_value(adj_initial_window_height,
+				 o_initial_window_height);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
@@ -1126,16 +1150,24 @@ static void set_options()
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows));
 
 	collection_single_click = o_single_click ? TRUE : FALSE;
+	
+	o_initial_window_height = adj_initial_window_height->value;
 }
 
 static void save_options()
 {
+	guchar *str;
+	
 	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
 	option_write("filer_unique_windows",
 			o_unique_filer_windows ? "1" : "0");
+			
+	str = g_strdup_printf("%d", o_initial_window_height);
+	option_write("filer_initial_window_height", str);
+	g_free(str);
 }
 
 static char *filer_new_window_on_1(char *data)
@@ -1160,6 +1192,12 @@ static char *filer_single_click(char *data)
 static char *filer_unique_windows(char *data)
 {
 	o_unique_filer_windows = atoi(data) != 0;
+	return NULL;
+}
+
+static char *filer_initial_window_height(char *data)
+{
+	o_initial_window_height = atoi(data);
 	return NULL;
 }
 
