@@ -8,8 +8,6 @@
 #ifndef _PANEL_H
 #define _PANEL_H
 
-#define MENU_MARGIN 32
-
 typedef enum {
 	PANEL_TOP,
 	PANEL_BOTTOM,
@@ -18,6 +16,8 @@ typedef enum {
 
 	PANEL_NUMBER_OF_SIDES	/* This goes last! */
 } PanelSide;
+
+#define MENU_MARGIN(side) ((side) == PANEL_BOTTOM ? 32 : 8)
 
 struct _Panel {
 	GtkWidget	*window;

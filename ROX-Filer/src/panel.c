@@ -1426,7 +1426,7 @@ static void run_applet(PanelIcon *pi)
 				side == PANEL_TOP ? "Top" :
 				side == PANEL_BOTTOM ? "Bottom" :
 				side == PANEL_LEFT ? "Left" :
-				"Right", MENU_MARGIN);
+				"Right", MENU_MARGIN(side));
 		gdk_property_change(pi->socket->window,
 				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
 				gdk_atom_intern("STRING", FALSE),
@@ -1737,20 +1737,21 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
+	int		margin = pos[2];
 
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
 	if (pos[0] == -1)
-		*x = screen_width - MENU_MARGIN - requisition.width;
+		*x = screen_width - margin - requisition.width;
 	else if (pos[0] == -2)
-		*x = MENU_MARGIN;
+		*x = margin;
 	else
 		*x = pos[0] - (requisition.width >> 2);
 		
 	if (pos[1] == -1)
-		*y = screen_height - MENU_MARGIN - requisition.height;
+		*y = screen_height - margin - requisition.height;
 	else if (pos[1] == -2)
-		*y = MENU_MARGIN;
+		*y = margin;
 	else
 		*y = pos[1] - (requisition.height >> 2);
 
@@ -1763,10 +1764,11 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
 	PanelSide side = panel->side;
-	int pos[2];
+	int pos[3];
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
+	pos[2] = MENU_MARGIN(side);
 
 	icon_prepare_menu((Icon *) pi, FALSE);
 
