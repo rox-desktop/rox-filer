@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.12\n"
-"POT-Creation-Date: 2002-05-24 17:09+0100\n"
+"POT-Creation-Date: 2002-05-30 15:13+0100\n"
 "PO-Revision-Date: 2001-11-05\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -547,7 +547,7 @@ msgstr "Recursivo"
 msgid "Also change contents of subdirectories"
 msgstr "Modificar también el contenido de los subdirectorios."
 
-#: action.c:1877 dnd.c:135 menu.c:1849 tips:152
+#: action.c:1877 dnd.c:135 menu.c:1848 tips:152
 msgid "Copy"
 msgstr "Copiar"
 
@@ -594,7 +594,7 @@ msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 " afectará algunos elementos del pinboard o del panel - aún quieres borrarlos?"
 
-#: action.c:2043 filer.c:1519 menu.c:1649 panel.c:439
+#: action.c:2043 filer.c:1504 menu.c:1648 panel.c:439
 msgid "Cancel"
 msgstr "Cancelar"
 
@@ -755,44 +755,44 @@ msgstr ""
 msgid "Directory '%s' is not accessible"
 msgstr "El directorio '%s' no es accesible"
 
-#: filer.c:1336
+#: filer.c:1338
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "El directorio '%s' no fue encontrado."
 
-#: filer.c:1768
+#: filer.c:1753
 msgid "S"
 msgstr ""
 
-#: filer.c:1769
+#: filer.c:1754
 msgid "A"
 msgstr ""
 
-#: filer.c:1770
+#: filer.c:1755
 msgid "T"
 msgstr ""
 
-#: filer.c:1776
+#: filer.c:1761
 msgid "Scanning, "
 msgstr "Explorando, "
 
-#: filer.c:1777
+#: filer.c:1762
 msgid "All, "
 msgstr "Todo, "
 
-#: filer.c:1778
+#: filer.c:1763
 msgid "Thumbs, "
 msgstr "Miniaturas, "
 
-#: filer.c:2025 menu.c:1839
+#: filer.c:2010 menu.c:1838
 msgid "Item no longer exists!"
 msgstr "El elemento no existe más!"
 
-#: filer.c:2146
+#: filer.c:2131
 msgid "Symbolic link to "
 msgstr "Enlace simbólico a "
 
-#: filer.c:2177
+#: filer.c:2162
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
@@ -1062,7 +1062,7 @@ msgstr ""
 msgid "ROX-Filer"
 msgstr ""
 
-#: icon.c:110 icon.c:115 menu.c:213 toolbar.c:136
+#: icon.c:110 icon.c:115 menu.c:213 toolbar.c:135
 msgid "Help"
 msgstr "Ayuda"
 
@@ -1074,7 +1074,7 @@ msgstr "Opciones..."
 msgid "Home Directory"
 msgstr "Abrir el directorio Home"
 
-#: icon.c:113 icon.c:710 menu.c:208 type.c:198
+#: icon.c:113 icon.c:710 menu.c:208 type.c:197
 msgid "File"
 msgstr "Archivo"
 
@@ -1212,7 +1212,7 @@ msgstr "Enlace simbólico"
 msgid "ROX application"
 msgstr "Aplicación de ROX"
 
-#: infobox.c:459 type.c:191
+#: infobox.c:459 type.c:190
 msgid "Mount point"
 msgstr "Punto de montaje"
 
@@ -1522,7 +1522,7 @@ msgstr ""
 msgid "_Replace"
 msgstr ""
 
-#: menu.c:1258 menu.c:1299 menu.c:1359
+#: menu.c:1258 menu.c:1298 menu.c:1358
 #, fuzzy
 msgid "Create"
 msgstr "Fecha"
@@ -1531,21 +1531,21 @@ msgstr "Fecha"
 msgid "NewDir"
 msgstr ""
 
-#: menu.c:1273 menu.c:1279
+#: menu.c:1272 menu.c:1278
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Error creando archivo '%s': %s"
 
-#: menu.c:1300
+#: menu.c:1299
 msgid "NewFile"
 msgstr ""
 
-#: menu.c:1318
+#: menu.c:1317
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "Error creando el archivo: no pude encontrar el template para %s"
 
-#: menu.c:1389
+#: menu.c:1388
 #, fuzzy, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1570,7 +1570,7 @@ msgstr ""
 "El menú `Enviar A' puede ser abierto haciendo click Shift+Menú sobre el "
 "archivo."
 
-#: menu.c:1400
+#: menu.c:1399
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -1578,20 +1578,20 @@ msgstr ""
 "Te mostraré tu directorio EnviarA ahora; deberías enlazar simbólicamente "
 "(Ctrl+Shift arrastrar) las aplicaciones que quieras que estén dentro de él."
 
-#: menu.c:1403
+#: menu.c:1402
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr ""
 "El valor de tu variable CHOICESPATH impide personalizaciones - lo siento."
 
-#: menu.c:1480
+#: menu.c:1479
 msgid "Customise"
 msgstr "Personalizar"
 
-#: menu.c:1538
+#: menu.c:1537
 msgid "This is already the canonical name for this directory."
 msgstr ""
 
-#: menu.c:1569
+#: menu.c:1568
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1599,96 +1599,96 @@ msgstr ""
 "No puedes abrir una segunda vista de éste directorio porque la opción "
 "`Ventanas Unicas' está activada en la ventana Opciones."
 
-#: menu.c:1598
+#: menu.c:1597
 #, c-format
 msgid "fork: %s"
 msgstr "fork: %s"
 
-#: menu.c:1613
+#: menu.c:1612
 msgid "New window, as user..."
 msgstr "Nueva ventana, como el usuario..."
 
-#: menu.c:1621
+#: menu.c:1620
 msgid "Browse as which user?"
 msgstr "Explorar como cual usuario?"
 
-#: menu.c:1628
+#: menu.c:1627
 msgid "User:"
 msgstr "Usuario:"
 
-#: menu.c:1642
+#: menu.c:1641
 msgid "OK"
 msgstr ""
 
-#: menu.c:1751
+#: menu.c:1750
 msgid "Copy ... ?"
 msgstr "Copiar ... ?"
 
-#: menu.c:1754
+#: menu.c:1753
 msgid "Rename ... ?"
 msgstr "Renombrar ... ?"
 
-#: menu.c:1757
+#: menu.c:1756
 msgid "Symlink ... ?"
 msgstr "Enlazar ... ?"
 
-#: menu.c:1760
+#: menu.c:1759
 msgid "Shift Open ... ?"
 msgstr "Shift Abrir ... ?"
 
-#: menu.c:1763
+#: menu.c:1762
 msgid "Help about ... ?"
 msgstr "Ayuda acerca de ... ?"
 
-#: menu.c:1766
+#: menu.c:1765
 msgid "Examine ... ?"
 msgstr "Examinar ... ?"
 
-#: menu.c:1769
+#: menu.c:1768
 msgid "Set run action for ... ?"
 msgstr "Definir acción para ... ?"
 
-#: menu.c:1772
+#: menu.c:1771
 msgid "Set icon for ... ?"
 msgstr "Definir ícono para ... ?"
 
-#: menu.c:1775
+#: menu.c:1774
 msgid "Send ... to ... ?"
 msgstr "Enviar ... a ... ?"
 
-#: menu.c:1778
+#: menu.c:1777
 msgid "DELETE ... ?"
 msgstr "BORRAR ... ?"
 
-#: menu.c:1781
+#: menu.c:1780
 msgid "Count the size of ... ?"
 msgstr "Calcular el tamaño de ... ?"
 
-#: menu.c:1784
+#: menu.c:1783
 msgid "Set permissions on ... ?"
 msgstr "Definir los permisos de ... ?"
 
-#: menu.c:1787
+#: menu.c:1786
 msgid "Search inside ... ?"
 msgstr "Buscar adentro de ... ?"
 
-#: menu.c:1790
+#: menu.c:1789
 msgid "Look inside ... ?"
 msgstr "Mirar adentro ... ?"
 
-#: menu.c:1826
+#: menu.c:1825
 msgid "You cannot do this to more than one item at a time"
 msgstr "No puedes hacer ésto a más de un elemento a la vez"
 
-#: menu.c:1853
+#: menu.c:1852
 msgid "Rename"
 msgstr "Renombrar"
 
-#: menu.c:1857
+#: menu.c:1856
 msgid "Symlink"
 msgstr "Enlace"
 
-#: menu.c:1895
+#: menu.c:1894
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1698,7 +1698,7 @@ msgid ""
 "\tgtk-can-change-accels = 1"
 msgstr ""
 
-#: menu.c:1905
+#: menu.c:1904
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1718,7 +1718,7 @@ msgstr ""
 "La tecla aparecerá próxima al elemento del menú y bastará con presionar ésa "
 "tecla sin abrir el menú en el futuro."
 
-#: menu.c:1921
+#: menu.c:1920
 msgid "Set keyboard shortcuts"
 msgstr "Definir atajos de teclado"
 
@@ -1788,7 +1788,7 @@ msgstr "Las opciones serán guardadas como %s"
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "La variable CHOICESPATH impide definir íconos"
 
-#: options.c:1115 usericons.c:470
+#: options.c:1115 usericons.c:444
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "Error guardando %s: %s"
@@ -1839,47 +1839,47 @@ msgstr ""
 "Error explorando '%s':\n"
 "%s"
 
-#: pinboard.c:315
+#: pinboard.c:310
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr ""
 "Tu antiguo archivo de pinboard ha sido convertido al nuevo formato XML."
 
-#: pinboard.c:548
+#: pinboard.c:525
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop."
 msgstr ""
 
-#: pinboard.c:562
+#: pinboard.c:539
 #, fuzzy
 msgid "Set backdrop"
 msgstr "Definir ícono"
 
-#: pinboard.c:571
+#: pinboard.c:548
 msgid "Display backdrop image:"
 msgstr ""
 
-#: pinboard.c:580
+#: pinboard.c:557
 #, fuzzy
 msgid "Centred"
 msgstr "Fecha"
 
-#: pinboard.c:586
+#: pinboard.c:563
 #, fuzzy
 msgid "Scaled"
 msgstr "Guardar"
 
-#: pinboard.c:592
+#: pinboard.c:569
 #, fuzzy
 msgid "Tiled"
 msgstr "Archivo"
 
-#: pinboard.c:609
+#: pinboard.c:586
 #, fuzzy
 msgid "Drop an image here"
 msgstr "Suelta un ícono aquí"
 
-#: pinboard.c:657
+#: pinboard.c:634
 #, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
@@ -1889,33 +1889,33 @@ msgstr ""
 "Tienes que soltar un ícono local dentro de la casilla de arrastre - ése "
 "ícono será utilizado para éste archivo a partir de ahora."
 
-#: pinboard.c:667
+#: pinboard.c:644
 #, fuzzy, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
 msgstr "No puedo eliminar %s: %s"
 
-#: pinboard.c:698
+#: pinboard.c:675
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 
-#: pinboard.c:1137
+#: pinboard.c:1109
 msgid "Missing '>' in icon label"
 msgstr "Falta un '>' en la etiqueta del ícono"
 
-#: pinboard.c:1146
+#: pinboard.c:1118
 msgid "Missing ',' after icon label"
 msgstr "Falta una ',' después de la etiqueta del ícono"
 
-#: pinboard.c:1226
+#: pinboard.c:1198
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Error guardando el pinboard %s: %s"
 
-#: pinboard.c:1730
+#: pinboard.c:1702
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -1923,7 +1923,7 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1970
+#: pinboard.c:1958
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2084,123 +2084,123 @@ msgstr ""
 msgid "byte"
 msgstr ""
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close"
 msgstr "Cerrar"
 
-#: toolbar.c:108
+#: toolbar.c:107
 msgid "Close filer window"
 msgstr "Cerrar ventana del filer"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Up"
 msgstr "Arriba"
 
-#: toolbar.c:112
+#: toolbar.c:111
 msgid "Change to parent directory"
 msgstr "Cambiar al directorio padre"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Home"
 msgstr "Home"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Change to home directory"
 msgstr "Cambiar al directorio home"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Scan"
 msgstr "Explorar"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Rescan directory contents"
 msgstr "Actualizar el contenido del directorio"
 
-#: tips:72 toolbar.c:124
+#: tips:72 toolbar.c:123
 msgid "Size"
 msgstr "Tamaño"
 
-#: toolbar.c:124
+#: toolbar.c:123
 msgid "Change icon size"
 msgstr "Cambiar el tamaño del ícono"
 
 # tips:30 toolbar.c:128/
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Details"
 msgstr "Detalles"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Show extra details"
 msgstr "Mostrar detalles adicionales"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Hidden"
 msgstr "Ocultos"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Show/hide hidden files"
 msgstr "Mostrar/ocultar archivos ocultos"
 
-#: toolbar.c:136
+#: toolbar.c:135
 msgid "Show ROX-Filer help"
 msgstr "Mostrar ayuda de ROX-Filer"
 
-#: toolbar.c:579
+#: toolbar.c:595
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u oculto)"
 
-#: toolbar.c:586
+#: toolbar.c:602
 msgid "items"
 msgstr "elementos"
 
-#: toolbar.c:586
+#: toolbar.c:602
 msgid "item"
 msgstr "elemento"
 
-#: toolbar.c:589
+#: toolbar.c:605
 #, c-format
 msgid "No items%s"
 msgstr "No elementos%s"
 
-#: toolbar.c:606
+#: toolbar.c:622
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u seleccionado (%s)"
 
-#: type.c:189
+#: type.c:188
 msgid "Sym link"
 msgstr ""
 
-#: type.c:193
+#: type.c:192
 msgid "App dir"
 msgstr ""
 
-#: type.c:200
+#: type.c:199
 msgid "Dir"
 msgstr ""
 
-#: type.c:202
+#: type.c:201
 msgid "Char dev"
 msgstr ""
 
-#: type.c:204
+#: type.c:203
 msgid "Block dev"
 msgstr ""
 
-#: type.c:206
+#: type.c:205
 msgid "Pipe"
 msgstr "Tubería"
 
-#: type.c:208
+#: type.c:207
 msgid "Socket"
 msgstr ""
 
-#: type.c:211
+#: type.c:210
 msgid "Unknown"
 msgstr "Desconocido"
 
-#: type.c:444
+#: type.c:443
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2211,7 +2211,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:531
+#: type.c:530
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2219,53 +2219,53 @@ msgstr ""
 "Tienes que soltar una aplicación (local) dentro de la casilla de arrastre - "
 "ésa aplicación será utilizada para cargar archivos de éste tipo en el futuro"
 
-#: type.c:558
+#: type.c:557
 msgid "This is not a program! Give me an application instead!"
 msgstr "Esto no es un programa! En lugar de ésto dáme una aplicación!"
 
-#: type.c:616
+#: type.c:615
 msgid "Execute file"
 msgstr "Ejecutar archivo"
 
-#: type.c:621
+#: type.c:620
 msgid "No run action defined"
 msgstr "No hay ninguna acción definida"
 
-#: type.c:647
+#: type.c:646
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Error en el manipulador (handler) %s: %s"
 
-#: type.c:662
+#: type.c:661
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Aplicación inválida %s (AppRun incorrecto)"
 
-#: type.c:673
+#: type.c:672
 #, c-format
 msgid "Non-executable %s"
 msgstr "No ejecutable %s"
 
-#: type.c:709
+#: type.c:708
 msgid "Set run action"
 msgstr "Definir acción"
 
-#: type.c:711
+#: type.c:710
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Definir por defecto para todos los `%s/<algo>'"
 
-#: type.c:717 usericons.c:310
+#: type.c:716 usericons.c:284
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Sólo para el tipo `%s/%s'"
 
-#: type.c:745
+#: type.c:744
 #, c-format
 msgid "Currently %s"
 msgstr "Actualmente %s"
 
-#: type.c:759
+#: type.c:758
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2273,19 +2273,19 @@ msgstr ""
 "Suelta una aplicación\n"
 "adecuada aquí"
 
-#: type.c:766 usericons.c:389
+#: type.c:765 usericons.c:363
 msgid "OR"
 msgstr "O"
 
-#: type.c:773
+#: type.c:772
 msgid "Enter a shell command:"
 msgstr "Ingresa un comando de shell:"
 
-#: type.c:843
+#: type.c:842
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "La variable CHOICESPATH impide guardar las opciones"
 
-#: type.c:856
+#: type.c:855
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2293,22 +2293,22 @@ msgstr ""
 "Ya existe una acción y es un programa bastante grande - estás seguro de que "
 "quieres borrarla?"
 
-#: type.c:868
+#: type.c:867
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "No puedo eliminar %s: %s"
 
-#: type.c:1124
+#: type.c:1115
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1142
+#: type.c:1133
 #, c-format
 msgid "Invalid type '%s' in '%s'"
 msgstr ""
 
-#: type.c:1282
+#: type.c:1273
 msgid ""
 "The standard MIME type database was not found. The filer will probably not "
 "show the correct types for different files. You should download and install "
@@ -2316,7 +2316,11 @@ msgid ""
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
 
-#: usericons.c:181 usericons.c:227
+#: usericons.c:191
+msgid "The pathname you gave does not exist. The icon has not been changed."
+msgstr "La ruta que diste no existe. El ícono no cambiado."
+
+#: usericons.c:201 usericons.c:719
 msgid ""
 "Unable to load image file -- maybe it's not in a format I understand, or "
 "maybe the permissions are wrong?\n"
@@ -2326,67 +2330,56 @@ msgstr ""
 "comprenda, o tal vez los permisos están mal?\n"
 "El ícono no ha cambiado."
 
-#: usericons.c:197
-#, fuzzy, c-format
-msgid ""
-"Error creating image '%s':\n"
-"%s"
-msgstr "Error creando archivo '%s': %s"
-
-#: usericons.c:217
-msgid "The pathname you gave does not exist. The icon has not been changed."
-msgstr "La ruta que diste no existe. El ícono no cambiado."
-
-#: usericons.c:298
+#: usericons.c:272
 msgid "Set icon"
 msgstr "Definir ícono"
 
-#: usericons.c:302
+#: usericons.c:276
 #, c-format
 msgid "Set icon for all `%s/<anything>'"
 msgstr "Definir ícono para todos los `%s/<algo>'"
 
-#: usericons.c:319
+#: usericons.c:293
 #, c-format
 msgid "Only for the file `%s'"
 msgstr "Sólo para el archivo `%s'"
 
-#: usericons.c:325
+#: usericons.c:299
 msgid ""
 "Add the file and image filenames to your personal list. The setting will be "
 "lost if the image or the file is moved."
 msgstr ""
 
-#: usericons.c:335
+#: usericons.c:309
 #, fuzzy
 msgid "Copy image into directory"
 msgstr "Cambiar al directorio home"
 
-#: usericons.c:339
+#: usericons.c:313
 msgid ""
 "Copy the image inside the directory, as a hidden file called '.DirIcon'. All "
-"users will than see the icon, and you can move the directory around safely. "
+"users will then see the icon, and you can move the directory around safely. "
 "This is usually the best option if you can write to the directory."
 msgstr ""
 
-#: usericons.c:371
+#: usericons.c:345
 msgid "Drop an icon file here"
 msgstr "Suelta un ícono aquí"
 
-#: usericons.c:381
+#: usericons.c:355
 msgid "Menu of directories previously used for icons"
 msgstr "Menú de directorios utilizados previamente como fuente de íconos"
 
-#: usericons.c:396
+#: usericons.c:370
 msgid "Enter the path of an icon file:"
 msgstr "Ingresa la ruta de un ícono:"
 
-#: usericons.c:413
+#: usericons.c:387
 #, fuzzy
 msgid "_Remove"
 msgstr "Eliminar"
 
-#: usericons.c:607
+#: usericons.c:581
 msgid ""
 "You should drop a single local icon file onto the drop box - that icon will "
 "be used for this file from now on."
@@ -2394,7 +2387,7 @@ msgstr ""
 "Tienes que soltar un ícono local dentro de la casilla de arrastre - ése "
 "ícono será utilizado para éste archivo a partir de ahora."
 
-#: usericons.c:635
+#: usericons.c:609
 msgid ""
 "Enter the full path of a file that contains a valid image to be used as the "
 "icon for this file or directory."
@@ -2402,17 +2395,24 @@ msgstr ""
 "Ingresa la ruta completa de un archivo que contiene una imágen válida para "
 "ser utilizada como el ícono de éste archivo o directorio."
 
-#: usericons.c:659
+#: usericons.c:631
 msgid "Setting icon disabled by CHOICESPATH"
 msgstr "La variable CHOICESPATH impide definir íconos"
 
-#: usericons.c:724
+#: usericons.c:693
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
 msgstr ""
 "No has definido ningún ícono especial todavía; por lo tanto no tengo "
 "directorios que mostrarte"
+
+#: usericons.c:734
+#, fuzzy, c-format
+msgid ""
+"Error creating image '%s':\n"
+"%s"
+msgstr "Error creando archivo '%s': %s"
 
 #: tips:1
 msgid "Translation"
