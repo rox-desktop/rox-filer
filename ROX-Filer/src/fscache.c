@@ -119,7 +119,7 @@ void g_fscache_data_ref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
 
-	if (cache->ref)
+	if (cache->ref && data)
 		cache->ref(data, cache->user_data);
 }
 
@@ -128,7 +128,7 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
 {
 	g_return_if_fail(cache != NULL);
 
-	if (cache->unref)
+	if (cache->unref && data)
 		cache->unref(data, cache->user_data);
 }
 
@@ -165,10 +165,10 @@ void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 	if (!data)
 		return;
 
-	if (cache->unref)
+	if (cache->unref && data->data)
 		cache->unref(data->data, cache->user_data);
 	data->data = obj;
-	if (cache->ref)
+	if (cache->ref && data->data)
 		cache->ref(data->data, cache->user_data);
 }
 

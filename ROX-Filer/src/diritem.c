@@ -68,7 +68,7 @@ void diritem_restat(const guchar *path, DirItem *item)
 
 	if (item->image)
 	{
-		pixmap_unref(item->image);
+		g_object_unref(item->image);
 		item->image = NULL;
 	}
 	item->flags = 0;
@@ -174,7 +174,7 @@ void diritem_restat(const guchar *path, DirItem *item)
 		if (item->base_type == TYPE_ERROR)
 		{
 			item->image = im_error;
-			pixmap_ref(im_error);
+			g_object_ref(im_error);
 		}
 		else
 			item->image = type_to_icon(item->mime_type);
@@ -200,7 +200,8 @@ void diritem_free(DirItem *item)
 {
 	g_return_if_fail(item != NULL);
 
-	pixmap_unref(item->image);
+	if (item->image)
+		g_object_unref(item->image);
 	item->image = NULL;
 	g_free(item->leafname);
 	item->leafname = NULL;
@@ -300,6 +301,6 @@ out:
 	{
 		/* This is an application without an icon */
 		item->image = im_appdir;
-		pixmap_ref(item->image);
+		g_object_ref(item->image);
 	}
 }

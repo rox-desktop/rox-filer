@@ -992,7 +992,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 	gtk_window_set_title(GTK_WINDOW(savebox), action);
 	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
-	pixmap_unref(image);
+	g_object_unref(image);
 				
 	gtk_widget_show(savebox);
 }
@@ -1061,7 +1061,7 @@ static gboolean action_with_leaf(ActionFn action,
 static void src_dest_action_item(const gchar *path, MaskedPixmap *image,
 			 const gchar *action, SaveCb callback)
 {
-	pixmap_ref(image);
+	g_object_ref(image);
 	savebox_show(action, path, image, callback);
 }
 

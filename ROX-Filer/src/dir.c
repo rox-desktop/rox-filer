@@ -597,7 +597,8 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		{
 			/* Preserve the old details so we can compare */
 			memcpy(&old, item, sizeof(DirItem));
-			pixmap_ref(old.image);
+			if (old.image)
+				g_object_ref(old.image);
 			do_compare = TRUE;
 		}
 		diritem_restat(tmp->str, item);
@@ -625,8 +626,8 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		/* Item has been deleted */
 		g_hash_table_remove(dir->known_items, item->leafname);
 		g_ptr_array_add(dir->gone_items, item);
-		if (do_compare)
-			pixmap_unref(old.image);
+		if (do_compare && old.image)
+			g_object_unref(old.image);
 		delayed_notify(dir);
 		return NULL;
 	}
@@ -646,11 +647,12 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		 && item->image == old.image
 		 && item->mime_type == old.mime_type)
 		{
-			pixmap_unref(old.image);
+			if (old.image)
+				g_object_unref(old.image);
 			return item;
 		}
-		pixmap_unref(old.image);
-
+		if (old.image)
+			g_object_unref(old.image);
 	}
 
 	g_ptr_array_add(dir->up_items, item);

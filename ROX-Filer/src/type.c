@@ -552,7 +552,7 @@ gboolean type_open(const char *path, MIME_type *type)
  * 2. Choices:MIME-icons/<base>
  * 3. Unknown type icon.
  *
- * Note: You must pixmap_unref() the image afterwards.
+ * Note: You must g_object_unref() the image afterwards.
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
 {
@@ -562,7 +562,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	if (type == NULL)
 	{
-		pixmap_ref(im_unknown);
+		g_object_ref(im_unknown);
 		return im_unknown;
 	}
 
@@ -573,10 +573,10 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		/* Yes - don't recheck too often */
 		if (abs(now - type->image_time) < 2)
 		{
-			pixmap_ref(type->image);
+			g_object_ref(type->image);
 			return type->image;
 		}
-		pixmap_unref(type->image);
+		g_object_unref(type->image);
 		type->image = NULL;
 	}
 
@@ -601,12 +601,12 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	{
 		/* One ref from the type structure, one returned */
 		type->image = im_unknown;
-		pixmap_ref(im_unknown);
+		g_object_ref(im_unknown);
 	}
 
 	type->image_time = now;
 	
-	pixmap_ref(type->image);
+	g_object_ref(type->image);
 	return type->image;
 }
 

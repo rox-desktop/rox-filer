@@ -220,7 +220,8 @@ void icon_may_update(Icon *icon)
 	image = icon->item->image;
 	flags = icon->item->flags;
 
-	pixmap_ref(image);
+	if (image)
+		g_object_ref(image);
 	mount_update(FALSE);
 	diritem_restat(icon->path, icon->item);
 
@@ -233,7 +234,8 @@ void icon_may_update(Icon *icon)
 			pinboard_reshape_icon(icon);
 	}
 
-	pixmap_unref(image);
+	if (image)
+		g_object_unref(image);
 }
 
 /* If path is on an icon then it may have changed... check! */

@@ -750,7 +750,7 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 		g_object_unref(G_OBJECT(view->details));
 
 	if (view->image)
-		pixmap_unref(view->image);
+		g_object_unref(view->image);
 	
 	g_free(view);
 }
@@ -1309,7 +1309,7 @@ void display_update_view(FilerWindow *filer_window,
 
 	if (view->image)
 	{
-		pixmap_unref(view->image);
+		g_object_unref(view->image);
 		view->image = NULL;
 	}
 
@@ -1327,7 +1327,8 @@ void display_update_view(FilerWindow *filer_window,
 	if (!view->image)
 	{
 		view->image = item->image;
-		pixmap_ref(view->image);
+		if (view->image)
+			g_object_ref(view->image);
 	}
 
 	if (view->layout)

@@ -61,7 +61,7 @@ static void MD5Transform(guint32 buf[4], guint32 const in[16]);
  ****************************************************************/
 
 /* XXX */
-static gint object_getref(GObject *object)
+gint object_getref(GObject *object)
 {
 	return object->ref_count;
 }

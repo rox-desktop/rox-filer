@@ -35,6 +35,12 @@ extern MaskedPixmap *im_dirs;
 #define SMALL_HEIGHT 18
 #define SMALL_WIDTH 22
 
+typedef struct _MaskedPixmapClass MaskedPixmapClass;
+
+struct _MaskedPixmapClass {
+	GObjectClass parent;
+};
+
 /* When a MaskedPixmap is created we load the image from disk and
  * scale the pixbuf down to the 'huge' size (if it's bigger).
  * The 'normal' pixmap and mask are created automatically - you have
@@ -45,7 +51,8 @@ extern MaskedPixmap *im_dirs;
  */
 struct _MaskedPixmap
 {
-	int		ref;
+	GObject		object;
+
 	GdkPixbuf	*huge_pixbuf;	/* 'Huge' source image */
 	int		huge_width, huge_height;
 
@@ -64,12 +71,10 @@ struct _MaskedPixmap
 };
 
 void pixmaps_init(void);
-void pixmap_ref(MaskedPixmap *mp);
-void pixmap_unref(MaskedPixmap *mp);
 void pixmap_make_huge(MaskedPixmap *mp);
 void pixmap_make_small(MaskedPixmap *mp);
-MaskedPixmap *load_pixmap(char *name);
-MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size);
+MaskedPixmap *load_pixmap(const char *name);
 void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data);
+MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size);
 
 #endif /* _PIXMAP_H */
