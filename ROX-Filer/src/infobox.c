@@ -214,7 +214,7 @@ static GtkWidget *make_vbox(const guchar *path)
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
 	gchar		*help_dir;
-	GtkWidget	*hbox, *name;
+	GtkWidget	*hbox, *name, *label;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
@@ -226,10 +226,11 @@ static GtkWidget *make_vbox(const guchar *path)
 		about = xml_get_section(ai, NULL, "About");
 
 	vbox = GTK_BOX(gtk_vbox_new(FALSE, 4));
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
 	/* Heading, with icon and name */
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(vbox), hbox);
+	gtk_box_pack_start(vbox, hbox, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),
 			   gtk_image_new_from_pixbuf(item->image->pixbuf),
 			   FALSE, FALSE, 4);
@@ -288,12 +289,26 @@ static GtkWidget *make_vbox(const guchar *path)
 	}
 	g_free(help_dir);
 
-	add_frame(vbox, make_permissions(path, item));
+	label = gtk_label_new(NULL);
+	gtk_label_set_markup(GTK_LABEL(label), _("<b>Permissions</b>"));
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
+	gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
+
+	gtk_box_pack_start(vbox, make_permissions(path, item),
+			FALSE, TRUE, 0);
 
 	if (about)
 		add_frame(vbox, make_about(path, ai));
-	else
+	else if (item->base_type == TYPE_FILE)
+	{
+		label = gtk_label_new(NULL);
+		gtk_label_set_markup(GTK_LABEL(label),
+				_("<b>Contents indicate...</b>"));
+		gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
+		gtk_box_pack_start(vbox, label, FALSE, TRUE, 2);
+
 		gtk_box_pack_start_defaults(vbox, make_file_says(path));
+	}
 
 	if (ai)
 		g_object_unref(ai);
@@ -523,11 +538,6 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 
 	add_row_and_free(store, _("Access time:"), pretty_time(&item->atime));
 
-	/* Disable because we use the tick boxes */
-	/*
-	add_row(store, _("Permissions:"), pretty_permissions(item->mode));
-	*/
-	
 	add_row(store, _("Type:"), pretty_type(item, path));
 
 	if (item->mime_type)
@@ -617,7 +627,6 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 
 static GtkWidget *make_file_says(const guchar *path)
 {
-	GtkWidget	*frame;
 	GtkWidget	*w_file_label;
 	GtkLabel	*l_file_label;
 	int		file_data[2];
@@ -625,19 +634,16 @@ static GtkWidget *make_file_says(const guchar *path)
 	FileStatus 	*fs = NULL;
 	guchar 		*tmp;
 
-	frame = gtk_frame_new(_("file(1) says..."));
 	w_file_label = gtk_label_new(_("<nothing yet>"));
 	l_file_label = GTK_LABEL(w_file_label);
-	gtk_misc_set_padding(GTK_MISC(w_file_label), 4, 4);
 	gtk_label_set_line_wrap(l_file_label, TRUE);
-	gtk_container_add(GTK_CONTAINER(frame), w_file_label);
 	
 	if (pipe(file_data))
 	{
 		tmp = g_strdup_printf("pipe(): %s", g_strerror(errno));
 		gtk_label_set_text(l_file_label, tmp);
 		g_free(tmp);
-		return frame;
+		return w_file_label;
 	}
 
 	switch (fork())
@@ -674,12 +680,12 @@ static GtkWidget *make_file_says(const guchar *path)
 			fs->input = gtk_input_add_full(fs->fd, GDK_INPUT_READ,
 				(GdkInputFunction) add_file_output,
 				NULL, fs, NULL);
-			g_signal_connect(frame, "destroy",
+			g_signal_connect(w_file_label, "destroy",
 				G_CALLBACK(file_info_destroyed), fs);
 			break;
 	}
 
-	return frame;
+	return w_file_label;
 }
 
 /* Got some data from file(1) - stick it in the window. */
@@ -761,7 +767,6 @@ static void permissions_apply(GtkWidget *widget, Permissions *perm)
 static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 {
 	Permissions *perm;
-	GtkWidget *frame;
 	GtkWidget *table;
 	GtkWidget *tick, *label;
 	int i, x, y;
@@ -771,10 +776,7 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 	perm->path=g_strdup(path);
 	perm->item=diritem_new(path);
 
-	frame=gtk_frame_new(_("Permissions"));
-
 	table=gtk_table_new(4, 5, TRUE);
-	gtk_container_add(GTK_CONTAINER(frame), table);
 
 	label=gtk_label_new(_("Owner"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
@@ -827,11 +829,11 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 				G_CALLBACK(permissions_apply ), perm);
 	perm->bits[11]=tick;
 
-	g_signal_connect(frame, "destroy",
+	g_signal_connect(table, "destroy",
 				G_CALLBACK(permissions_destroyed), perm);
 			
-	gtk_widget_show_all(frame);
-	return frame;
+	gtk_widget_show_all(table);
+	return table;
 }
 
 /* Don't g_free() the result */
