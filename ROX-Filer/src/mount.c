@@ -214,8 +214,11 @@ static void clear_table(void)
 static time_t read_time(char *path)
 {
 	struct stat info;
+	int err = 0;
 
-	g_return_val_if_fail(stat(path, &info) == 0, 0);
+	err = stat(path, &info);
+
+	g_return_val_if_fail(err == 0, 0);
 
 	return info.st_mtime;
 }
