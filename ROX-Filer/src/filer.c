@@ -160,6 +160,8 @@ enum
 	TARGET_URI_LIST,
 };
 
+static GdkCursor *busy_cursor = NULL;
+
 void filer_init()
 {
 	xa_string = gdk_atom_intern("STRING", FALSE);
@@ -170,6 +172,8 @@ void filer_init()
 	option_register("filer_toolbar", filer_toolbar);
 
 	fixed_font = gdk_font_load("fixed");
+
+	busy_cursor = gdk_cursor_new(GDK_WATCH);
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -252,8 +256,7 @@ static void update_display(Directory *dir,
 
 static void attach(FilerWindow *filer_window)
 {
-	gdk_window_set_cursor(filer_window->window->window,
-			gdk_cursor_new(GDK_WATCH));
+	gdk_window_set_cursor(filer_window->window->window, busy_cursor);
 	collection_clear(filer_window->collection);
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);

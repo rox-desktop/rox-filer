@@ -61,11 +61,13 @@ static GtkWidget *xterm_here_entry;
 static char *xterm_here_value;
 
 /* Static prototypes */
+
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 static char *load_xterm_here(char *data);
 
+/* Note that for these callbacks none of the arguments are used. */
 static void not_yet(gpointer data, guint action, GtkWidget *widget);
 
 static void large(gpointer data, guint action, GtkWidget *widget);
@@ -417,15 +419,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	switch (filer_window->collection->number_selected)
 	{
 		case 0:
-			g_string_assign(buffer, "<nothing selected>");
-			items_sensitive(file_menu, 0, 6, FALSE);
-			items_sensitive(file_menu, 7, -1, FALSE);
-			gtk_widget_set_sensitive(file_label, FALSE);
+			g_string_assign(buffer, "Next click");
+			items_sensitive(file_menu, 0, 6, TRUE);
 			break;
 		case 1:
 			items_sensitive(file_menu, 0, 6, TRUE);
-			items_sensitive(file_menu, 7, -1, TRUE);
-			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
 					basetype_name(file_item),
@@ -433,8 +431,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 			break;
 		default:
 			items_sensitive(file_menu, 0, 6, FALSE);
-			items_sensitive(file_menu, 7, -1, TRUE);
-			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
 			break;
@@ -465,6 +461,19 @@ static void menu_closed(GtkWidget *widget)
 		collection_clear_selection(window_with_focus->collection);
 		window_with_focus->temp_item_selected = FALSE;
 	}
+}
+
+void target_callback(Collection *collection, gint item, gpointer real_fn)
+{
+	g_return_if_fail(window_with_focus != NULL);
+	g_return_if_fail(window_with_focus->collection == collection);
+	g_return_if_fail(real_fn != NULL);
+	
+	collection_wink_item(collection, item);
+	collection_clear_selection(collection);
+	collection_select_item(collection, item);
+	((CollectionTargetFunc)real_fn)(NULL, 0, collection);
+	collection_unselect_item(collection, item);
 }
 
 /* Actions */
@@ -549,21 +558,33 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	action_mount(window_with_focus, NULL);
+	if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, mount);
+	else
+		action_mount(window_with_focus, NULL);
 }
 
 static void delete(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	action_delete(window_with_focus);
+	if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, delete);
+	else
+		action_delete(window_with_focus);
 }
 
 static void usage(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	action_usage(window_with_focus);
+	if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, usage);
+	else
+		action_usage(window_with_focus);
 }
 
 static gboolean copy_cb(char *initial, char *path)
@@ -615,9 +636,14 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
-		report_error("ROX-Filer", "You must select a single "
-				"item to copy");
+	if (collection->number_selected > 1)
+	{
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+		collection_target(collection, target_callback, copy_item);
 	else
 	{
 		DirItem *item = selected_item(collection);
@@ -646,9 +672,14 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
-		report_error("ROX-Filer", "You must select a single "
-				"item to rename");
+	if (collection->number_selected > 1)
+	{
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+		collection_target(collection, target_callback, rename_item);
 	else
 	{
 		DirItem *item = selected_item(collection);
@@ -677,9 +708,14 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
-		report_error("ROX-Filer", "You must select a single "
-				"item to link");
+	if (collection->number_selected > 1)
+	{
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+		collection_target(collection, target_callback, link_item);
 	else
 	{
 		DirItem *item = selected_item(collection);
@@ -698,9 +734,14 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
-		report_error("ROX-Filer", "You must select a single "
-				"file or application to open");
+	if (collection->number_selected > 1)
+	{
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+		collection_target(collection, target_callback, open_file);
 	else
 		filer_openitem(window_with_focus, selected_item(collection),
 				TRUE, FALSE);
@@ -724,10 +765,15 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
+	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You must select a single "
-				"item before using Info");
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+	{
+		collection_target(collection, target_callback, show_file_info);
 		return;
 	}
 	file = selected_item(collection);
@@ -913,10 +959,15 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection = window_with_focus->collection;
-	if (collection->number_selected != 1)
+	if (collection->number_selected > 1)
 	{
-		report_error("ROX-Filer", "You must select a single "
-				"item to get help on");
+		report_error("ROX-Filer", "You cannot do this to more than "
+				"one item at a time");
+		return;
+	}
+	else if (collection->number_selected != 1)
+	{
+		collection_target(collection, target_callback, help);
 		return;
 	}
 	item = selected_item(collection);

@@ -80,6 +80,8 @@ static guint32 current_event_time = GDK_CURRENT_TIME;
 
 static GtkWidgetClass *parent_class = NULL;
 
+static GdkCursor *crosshair = NULL;
+
 /* Static prototypes */
 static void draw_one_item(Collection 	*collection,
 			  int 		item,
@@ -261,6 +263,9 @@ static void collection_class_init(CollectionClass *class)
 
 static void collection_init(Collection *object)
 {
+	if (!crosshair)
+		crosshair = gdk_cursor_new(GDK_CROSSHAIR);
+
 	object->panel = FALSE;
 	object->number_of_items = 0;
 	object->number_selected = 0;
@@ -902,7 +907,7 @@ static gint collection_button_press(GtkWidget      *widget,
 		else
 			return FALSE;	/* Ignore extra presses */
 	}
-	
+
 	if (event->state & GDK_CONTROL_MASK && !collection_single_click)
 		action = 2;
 	else
@@ -934,6 +939,22 @@ static gint collection_button_press(GtkWidget      *widget,
 		}
 	}
 
+	if (collection->target_cb)
+	{
+		CollectionTargetFunc cb = collection->target_cb;
+		gpointer	data = collection->target_data;
+		
+		collection_target(collection, NULL, NULL);
+		if (collection->buttons_pressed)
+		{
+			gtk_grab_remove(widget);
+			collection->buttons_pressed = 0;
+		}
+		if (item > -1)
+			cb(collection, item, data);
+		return TRUE;
+	}
+	
 	collection->drag_box_x[0] = event->x;
 	collection->drag_box_y[0] = event->y;
 	collection->item_clicked = item;
@@ -1814,4 +1835,22 @@ void collection_delete_if(Collection *collection,
 			gtk_widget_queue_draw(GTK_WIDGET(collection));
 		}
 	}
+}
+
+/* Display a cross-hair pointer and the next time an item is clicked,
+ * call the callback function. If the background is clicked or NULL
+ * is passed as the callback then revert to normal operation.
+ */
+void collection_target(Collection *collection,
+			CollectionTargetFunc callback,
+			gpointer user_data)
+{
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+
+	collection->target_cb = callback;
+	collection->target_data = user_data;
+
+	gdk_window_set_cursor(GTK_WIDGET(collection)->window,
+			callback ? crosshair : NULL);
 }

@@ -46,6 +46,9 @@ typedef gboolean (*CollectionTestFunc)( Collection *collection,
 					int point_x, int point_y,
 			       		CollectionItem *item,
 			       		int width, int height);
+typedef void (*CollectionTargetFunc)(Collection *collection,
+					gint item,
+					gpointer user_data);
 
 struct _CollectionItem
 {
@@ -84,6 +87,9 @@ struct _Collection
 	int		item_clicked;	/* For collection_single_click */
 
 	guint		array_size;
+
+	CollectionTargetFunc target_cb;
+	gpointer	target_data;
 };
 
 struct _CollectionClass
@@ -138,6 +144,9 @@ void 	collection_delete_if		(Collection *collection,
 			  		 gboolean (*test)(gpointer item,
 						          gpointer data),
 			  		 gpointer data);
+void	collection_target		(Collection *collection,
+					 CollectionTargetFunc callback,
+					 gpointer user_data);
 
 #ifdef __cplusplus
 }
