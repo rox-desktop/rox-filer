@@ -1191,14 +1191,18 @@ static void view_details_select_all(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 
+	view_details->can_change_selection++;
 	gtk_tree_selection_select_all(view_details->selection);
+	view_details->can_change_selection--;
 }
 
 static void view_details_clear_selection(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 
+	view_details->can_change_selection++;
 	gtk_tree_selection_unselect_all(view_details->selection);
+	view_details->can_change_selection--;
 }
 
 static int view_details_count_items(ViewIface *view)
@@ -1328,7 +1332,9 @@ static void view_details_select_only(ViewIface *view, ViewIter *iter)
 
 	path = gtk_tree_path_new();
 	gtk_tree_path_append_index(path, iter->i);
+	view_details->can_change_selection++;
 	gtk_tree_selection_select_range(view_details->selection, path, path);
+	view_details->can_change_selection--;
 	gtk_tree_path_free(path);
 }
 
