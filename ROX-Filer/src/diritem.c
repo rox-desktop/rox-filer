@@ -64,7 +64,7 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid);
 
 void diritem_init(void)
 {
-	option_add_int(&o_ignore_exec, "display_ignore_exec", FALSE);
+	option_add_int(&o_ignore_exec, "display_ignore_exec", TRUE);
 
 	read_globicons();
 }
