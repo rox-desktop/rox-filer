@@ -187,6 +187,13 @@ GtkWidget *view_collection_new(FilerWindow *filer_window)
 	view_collection = g_object_new(view_collection_get_type(), NULL);
 	view_collection->filer_window = filer_window;
 
+	/* Starting with GTK+-2.2.2, the vadjustment is reset after init
+	 * (even though it's already set during init) to a new adjustment.
+	 * Change it back:
+	 */
+	gtk_viewport_set_vadjustment(GTK_VIEWPORT(view_collection),
+				 view_collection->collection->vadj);
+				 
 	gtk_range_set_adjustment(GTK_RANGE(filer_window->scrollbar),
 				 view_collection->collection->vadj);
 
