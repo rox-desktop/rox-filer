@@ -9,6 +9,8 @@
 #include <stdio.h>
 #include <signal.h>
 #include <sys/wait.h>
+#include <unistd.h>
+#include <fcntl.h>
 
 #include <gtk/gtk.h>
 #include <collection.h>
@@ -55,8 +57,38 @@ static void child_died(int signum)
 	} while (1);
 }
 
+#define BUFLEN 40
+void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
+{
+	char buf[BUFLEN];
+	static GtkWidget *log = NULL;
+	static GtkWidget *window = NULL;
+	ssize_t len;
+
+	if (!window)
+	{
+		window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+		gtk_window_set_title(GTK_WINDOW(window), "ROX-Filer error log");
+		gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_CENTER);
+		gtk_window_set_default_size(GTK_WINDOW(window), 600, 300);
+		gtk_signal_connect_object(GTK_OBJECT(window), "delete_event",
+				gtk_widget_hide, GTK_OBJECT(window));
+		log = gtk_text_new(NULL, NULL);
+		gtk_container_add(GTK_CONTAINER(window), log);
+	}
+
+	if (!GTK_WIDGET_MAPPED(window))
+		gtk_widget_show_all(window);
+	
+	len = read(source, buf, BUFLEN);
+	if (len > 0)
+		gtk_text_insert(GTK_TEXT(log), NULL, NULL, NULL, buf, len);
+}
+
 int main(int argc, char **argv)
 {
+	int	stderr_pipe[2];
+
 	gtk_init(&argc, &argv);
 	choices_init("ROX-Filer");
 
@@ -107,6 +139,11 @@ int main(int argc, char **argv)
 			i++;
 		}
 	}
+
+	pipe(stderr_pipe);
+	dup2(stderr_pipe[1], STDERR_FILENO);
+	gdk_input_add(stderr_pipe[0], GDK_INPUT_READ, stderr_cb, NULL);
+	fcntl(STDERR_FILENO, F_SETFD, 0);
 
 	gtk_main();
 

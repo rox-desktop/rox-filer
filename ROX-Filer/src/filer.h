@@ -37,6 +37,7 @@ struct _FilerWindow
 	Collection	*collection;
 	gboolean	panel;
 	gboolean	temp_item_selected;
+	gboolean	show_hidden;
 	Side		panel_side;
 	time_t		m_time;		/* m-time at last scan */
 

@@ -175,9 +175,12 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	int		base_type;
 	GString		*path;
 
-	/* Ignore dot files (should be an option) */
 	if (leafname[0] == '.')
+	{
+		if (filer_window->show_hidden == FALSE || leafname[1] == '\0'
+				|| (leafname[1] == '.' && leafname[2] == '\0'))
 		return;
+	}
 
 	item = g_malloc(sizeof(FileItem));
 	item->leafname = g_strdup(leafname);
@@ -670,6 +673,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window = g_malloc(sizeof(FilerWindow));
 	filer_window->path = pathdup(path);
 	filer_window->dir = NULL;	/* Not scanning */
+	filer_window->show_hidden = FALSE;
 	filer_window->panel = panel;
 	filer_window->panel_side = panel_side;
 	filer_window->temp_item_selected = FALSE;

@@ -44,6 +44,7 @@ static void menu_closed(GtkWidget *widget);
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 static char *load_xterm_here(char *data);
 
+static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
@@ -80,7 +81,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Sort by Size",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
+{"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
 {"/File/Copy...",		NULL,  	NULL, 0, NULL},
@@ -114,7 +115,7 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Sort by Size",	NULL,   NULL, 0, "/Display/Sort by Name"},
 {"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Show Hidden",   	NULL, 	NULL, 0, "<ToggleItem>"},
+{"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
 {"/File/Help",		    	NULL,  	help, 0, NULL},
@@ -381,6 +382,14 @@ static void menu_closed(GtkWidget *widget)
 }
 
 /* Actions */
+
+static void hidden(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	window_with_focus->show_hidden = !window_with_focus->show_hidden;
+	scan_dir(window_with_focus);
+}
 
 static void refresh(gpointer data, guint action, GtkWidget *widget)
 {
