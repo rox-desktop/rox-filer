@@ -958,25 +958,26 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window)
 {
-#ifdef GTK2
 	gboolean handled;
-#endif
 
 	window_with_focus = filer_window;
 
-#ifdef GTK2
 	/* Note: Not convinced this is the way Gtk's key system is supposed
 	 * to be used...
 	 */
 	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
 					filer_keys);
+#ifdef GTK2
 	handled = gtk_accel_groups_activate(G_OBJECT(filer_window->window),
 				event->keyval, event->state);
+#else
+	handled = gtk_accel_groups_activate(GTK_OBJECT(filer_window->window),
+				event->keyval, event->state);
+#endif
 	gtk_window_remove_accel_group(GTK_WINDOW(filer_window->window),
 				filer_keys);
 	if (handled)
 		return TRUE;
-#endif
 
 	switch (event->keyval)
 	{
@@ -1419,7 +1420,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	 * For Gtk+-2.0, we activate the group manually from the key handler,
 	 * because the order has changed.
 	 */
-#ifndef GTK2
+#if 0
 	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
 #endif
 
