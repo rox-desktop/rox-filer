@@ -506,7 +506,7 @@ pixbuf_supports_svg ()
   return found_svg;
 }
 
-#define GTK_DATA_PREFIX "/tmp/"
+#define GTK_DATA_PREFIX "/usr/local/share/"
 static void
 gtk_icon_theme_init (GtkIconTheme *icon_theme)
 {
@@ -520,11 +520,9 @@ gtk_icon_theme_init (GtkIconTheme *icon_theme)
   priv->search_path = g_new (char *, 5);
   
 
-  priv->search_path[0] = g_build_filename (g_get_home_dir (),
-					   ".icons",
-					   NULL);
-  priv->search_path[1] = g_build_filename (GTK_DATA_PREFIX, "pixmaps", NULL);
-  priv->search_path[2] = g_build_filename (GTK_DATA_PREFIX, "icons", NULL);
+  priv->search_path[0] = g_build_filename (g_get_home_dir (), ".icons", NULL);
+  priv->search_path[1] = g_strdup ("/usr/local/share/icons");
+  priv->search_path[2] = g_strdup ("/usr/local/share/pixmaps");
   priv->search_path[3] = g_strdup ("/usr/share/icons");
   priv->search_path[4] = g_strdup ("/usr/share/pixmaps");
   priv->search_path_len = 5;
