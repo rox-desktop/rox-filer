@@ -178,8 +178,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 
 	gtk_widget_show_all(filer_window->minibuffer_area);
 
-	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
-			filer_window->minibuffer);
+	gtk_widget_grab_focus(filer_window->minibuffer);
 }
 
 void minibuffer_hide(FilerWindow *filer_window)
@@ -187,8 +186,8 @@ void minibuffer_hide(FilerWindow *filer_window)
 	filer_window->mini_type = MINI_NONE;
 
 	gtk_widget_hide(filer_window->minibuffer_area);
-	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
-			GTK_WIDGET(filer_window->collection));
+
+	gtk_widget_child_focus(filer_window->window, GTK_DIR_TAB_FORWARD);
 
 	if (filer_window->temp_show_hidden)
 	{

@@ -1356,8 +1356,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_box_pack_start(GTK_BOX(hbox),
 			filer_window->scrollbar, FALSE, TRUE, 0);
 
-	gtk_window_set_focus(GTK_WINDOW(filer_window->window), collection);
-
 	gtk_widget_show(hbox);
 	gtk_widget_show(vbox);
 	gtk_widget_show(filer_window->scrollbar);
