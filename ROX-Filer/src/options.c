@@ -373,6 +373,7 @@ static void open_coloursel(GtkWidget *button, Option *option)
 	dialog = gtk_color_selection_dialog_new(NULL);
 	csel = GTK_COLOR_SELECTION_DIALOG(dialog);
 	current_csel_box = csel;
+	gtk_window_set_position(GTK_WINDOW(csel), GTK_WIN_POS_MOUSE);
 
 	gtk_signal_connect_object(GTK_OBJECT(dialog), "destroy",
 			GTK_SIGNAL_FUNC(set_to_null),
@@ -679,6 +680,9 @@ static void null_widget(gpointer key, gpointer value, gpointer data)
 
 static void options_destroyed(GtkWidget *widget, gpointer data)
 {
+	if (current_csel_box)
+		gtk_widget_destroy(GTK_WIDGET(current_csel_box));
+	
 	if (widget == window)
 	{
 		window = NULL;

@@ -12,8 +12,6 @@ Thumbnailing in a sub-process.
 
 Tab completion in save boxes.
 
-Set/Save/Cancel for Options window (simpler).
-
 Have an option to set what happens when you double-click the background.
 
 Option to auto-choose Large or Small icons depending on the number of files.
@@ -21,9 +19,7 @@ Option to auto-choose Large or Small icons depending on the number of files.
 Using spring-opening with a missing directory has grab problems (Gkt+
 problem?).
 
-Gtk+ 2.0:
-	- Pinboard text background types none/outline don't work
-	- Can't set menu shortcuts to a single key (eg, 'L')
+Pinboard text background types none/outline don't work
 
 User icons for mounted/unmounted?
 
@@ -63,13 +59,11 @@ Make Find expressions easier for beginners.
 Improve thumbnail handling:
 	- Lazy scanning?
 	- Recursive scanning?
+	- Create in subprocess
 
 Individual sliders for max window horizontal and vertical sizes.
 
 Winking of items should be an option.
-
-Scanning:
-	- Clear window before resizing
 
 Don't beep for paths with a # in the leafname (for AVFS).
 
@@ -82,7 +76,10 @@ Option to make menu-click over a file open the File submenu only?
 
 Key bindings in the New File menu doesn't work (move to dialog box?).
 
+Option to set fonts.
+
 All leafnames to be truncated, even when details are displayed.
+Use condensed fonts for long names?
 
 Use an environment variable to override the platform-name guessing in
 AppRun.
@@ -94,6 +91,9 @@ Right-most icon in the last row should extend to the far right of the window,
 even if it isn't in the last column.
 
 Allow find expression with Permissions command...
+
+Use same MIME-info database as GNOME. Still use our own system for MIME
+handlers, though.
 
 
 OTHERS
@@ -137,7 +137,7 @@ Remember last scroll position when returning to a directory?
 LONG TERM
 
 Use a separate process to access the filesystem. Prevents hanging when you
-try to access a dead filesystem.
+try to access a dead filesystem. Do this via gnome-vfs?
 
 Allow user to change permissions to another user on the fly, by entering a
-password. 'su' requires a tty - do we need an SUID binary?
+password. 'su' requires a tty - use xsu?
