@@ -83,6 +83,7 @@ static gboolean o_ro_bindings = FALSE;
 static GtkWidget *toggle_ro_bindings;
 
 /* Static prototypes */
+static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
@@ -231,6 +232,14 @@ static void update_display(Directory *dir,
 	}
 }
 
+static void attach(FilerWindow *filer_window)
+{
+	gdk_window_set_cursor(filer_window->window->window,
+			gdk_cursor_new(GDK_WATCH));
+	dir_attach(filer_window->directory, (DirCallback) update_display,
+			filer_window);
+}
+
 static void detach(FilerWindow *filer_window)
 {
 	g_return_if_fail(filer_window->directory != NULL);
@@ -364,7 +373,7 @@ static gboolean test_point_small(Collection *collection,
 	if (point_x < iwidth + 2)
 		return point_x > 2 && point_y > image_y;
 	
-	point_x -= iwidth + 8;
+	point_x -= SMALL_ICON_WIDTH + 4;
 
 	if (point_y >= low_top)
 		return point_x < item->name_width;
@@ -1001,11 +1010,7 @@ void filer_change_to(FilerWindow *filer_window, char *path)
 		collection_clear(filer_window->collection);
 		gtk_window_set_title(GTK_WINDOW(filer_window->window),
 				filer_window->path);
-		gdk_window_set_cursor(filer_window->window->window,
-				gdk_cursor_new(GDK_WATCH));
-		dir_attach(filer_window->directory,
-				(DirCallback) update_display,
-				filer_window);
+		attach(filer_window);
 	}
 	else
 	{
@@ -1176,8 +1181,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			sizeof(target_table) / sizeof(*target_table));
 
 	filer_style_set(filer_window, LARGE_ICONS);
-	dir_attach(filer_window->directory, (DirCallback) update_display,
-			filer_window);
 	drag_set_dest(collection);
 
 	if (panel)
@@ -1264,8 +1267,9 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 				GTK_OBJECT(filer_window->window));
 	}
 
-	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
+	gtk_widget_show_all(filer_window->window);
+	attach(filer_window);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
@@ -1380,6 +1384,5 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	detach(filer_window);
 	filer_window->directory = dir;
 	collection_clear(filer_window->collection);
-	dir_attach(filer_window->directory, (DirCallback) update_display,
-			filer_window);
+	attach(filer_window);
 }

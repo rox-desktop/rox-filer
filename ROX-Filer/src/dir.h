@@ -72,6 +72,7 @@ struct _Directory
 	char	*error;		/* NULL => no error */
 
 	gboolean	needs_update;	/* When scan is finished, rescan */
+	gboolean	notify_active;	/* Notify timeout is running */
 	gint		idle;		/* Idle callback ID */
 	DIR		*dir_handle;	/* NULL => not scanning */
 

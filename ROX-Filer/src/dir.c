@@ -286,7 +286,31 @@ static void start_scanning(Directory *dir, char *pathname)
 
 	dir->idle = gtk_idle_add((GtkFunction) idle_callback, dir);
 }
-	
+
+static gint notify_timeout(gpointer data)
+{
+	Directory	*dir = (Directory *) data;
+
+	g_return_val_if_fail(dir->notify_active == TRUE, FALSE);
+
+	merge_new(dir);
+
+	dir->notify_active = FALSE;
+	unref(dir, NULL);
+
+	return FALSE;
+}
+
+/* Call merge_new() after a while. */
+static void delayed_notify(Directory *dir)
+{
+	if (dir->notify_active)
+		return;
+	ref(dir, NULL);
+	gtk_timeout_add(500, notify_timeout, dir);
+	dir->notify_active = TRUE;
+}
+
 static void insert_item(Directory *dir, struct dirent *ent)
 {
 	static GString  *tmp = NULL;
@@ -392,7 +416,8 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	}
 	else if (new.base_type == TYPE_FILE)
 	{
-		if (new.mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+		/* Note: for symlinks we use need the mode of the target */
+		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
 			new.image = default_pixmap + TYPE_EXEC_FILE;
 			new.flags |= ITEM_FLAG_EXEC_FILE;
@@ -418,6 +443,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	item = g_new(DirItem, 1);
 	item->leafname = g_strdup(ent->d_name);
 	g_ptr_array_add(dir->new_items, item);
+	delayed_notify(dir);
 	is_new = TRUE;
 update:
 	item->may_delete = FALSE;
@@ -448,7 +474,10 @@ update:
 	item->details_width = new.details_width;
 
 	if (!is_new)
+	{
 		g_ptr_array_add(dir->up_items, item);
+		delayed_notify(dir);
+	}
 }
 
 static gint idle_callback(Directory *dir)
@@ -496,6 +525,7 @@ static Directory *load(char *pathname, gpointer data)
 	dir->users = NULL;
 	dir->dir_handle = NULL;
 	dir->needs_update = TRUE;
+	dir->notify_active = FALSE;
 	dir->pathname = g_strdup(pathname);
 	dir->error = NULL;
 	
