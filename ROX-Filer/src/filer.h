@@ -16,7 +16,14 @@
 
 typedef struct _FilerWindow FilerWindow;
 typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
-typedef enum {UNKNOWN_STYLE, LARGE_ICONS, SMALL_ICONS, FULL_INFO} DisplayStyle;
+
+typedef enum {
+	UNKNOWN_STYLE,
+	LARGE_ICONS,
+	SMALL_ICONS,
+	LARGE_FULL_INFO,
+	SMALL_FULL_INFO,
+} DisplayStyle;
 
 typedef enum
 {
@@ -48,6 +55,7 @@ struct _FilerWindow
 	FilerFlags	flags;
 	PanelType	panel_type;
 	int 		(*sort_fn)(const void *a, const void *b);
+
 	DisplayStyle	display_style;
 
 	Directory	*directory;

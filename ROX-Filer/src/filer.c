@@ -167,14 +167,18 @@ static void draw_string(GtkWidget *widget,
 		int 	y,
 		int 	width,
 		int	area_width,
-		gboolean selected);
+		gboolean selected,
+		gboolean box);
 static void draw_item_large(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area);
 static void draw_item_small(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area);
-static void draw_item_full_info(GtkWidget *widget,
+static void draw_item_large_full(GtkWidget *widget,
+			CollectionItem *colitem,
+			GdkRectangle *area);
+static void draw_item_small_full(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area);
 static gboolean test_point_large(Collection *collection,
@@ -185,7 +189,11 @@ static gboolean test_point_small(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
-static gboolean test_point_full_info(Collection *collection,
+static gboolean test_point_large_full(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height);
+static gboolean test_point_small_full(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
@@ -396,9 +404,12 @@ static int calc_width(FilerWindow *filer_window, DirItem *item)
 
         switch (filer_window->display_style)
         {
-                case FULL_INFO:
+                case LARGE_FULL_INFO:
                         return MAX_ICON_WIDTH + 12 + 
 				MAX(item->details_width, item->name_width);
+                case SMALL_FULL_INFO:
+			return SMALL_ICON_WIDTH + item->name_width +
+				12 + item->details_width;
 		case SMALL_ICONS:
 			w = MIN(item->name_width, o_small_truncate);
 			return SMALL_ICON_WIDTH + 12 + w;
@@ -456,7 +467,7 @@ static gboolean test_point_large(Collection *collection,
 	return ABS(point_x - (width >> 1)) < x_limit;
 }
 
-static gboolean test_point_full_info(Collection *collection,
+static gboolean test_point_large_full(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *colitem,
 				int width, int height)
@@ -477,6 +488,24 @@ static gboolean test_point_full_info(Collection *collection,
 	if (point_y >= low_top - item_font->ascent - item_font->descent)
 		return point_x < item->name_width;
 	return FALSE;
+}
+
+static gboolean test_point_small_full(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *colitem,
+				int width, int height)
+{
+	DirItem		*item = (DirItem *) colitem->data;
+	MaskedPixmap	*image = item->image;
+	int		image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
+	int		low_top = height
+				- fixed_font->descent - 2 - item_font->ascent;
+	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
+
+	if (point_x < iwidth + 2)
+		return point_x > 2 && point_y > image_y;
+	
+	return point_y >= low_top;
 }
 
 static gboolean test_point_small(Collection *collection,
@@ -631,6 +660,7 @@ static void draw_large_icon(GtkWidget *widget,
 	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
+/* 'box' renders a background box if the string is also selected */
 static void draw_string(GtkWidget *widget,
 		GdkFont	*font,
 		char	*string,
@@ -638,7 +668,8 @@ static void draw_string(GtkWidget *widget,
 		int 	y,
 		int 	width,
 		int	area_width,
-		gboolean selected)
+		gboolean selected,
+		gboolean box)
 {
 	int		text_height = font->ascent + font->descent;
 	GdkRectangle	clip;
@@ -646,7 +677,7 @@ static void draw_string(GtkWidget *widget,
 			? widget->style->fg_gc[GTK_STATE_SELECTED]
 			: widget->style->fg_gc[GTK_STATE_NORMAL];
 
-	if (selected)
+	if (selected && box)
 		gtk_paint_flat_box(widget->style, widget->window, 
 				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
 				NULL, widget, "text",
@@ -683,6 +714,32 @@ static void draw_string(GtkWidget *widget,
 	}
 }
 
+/* Render the details somewhere */
+static void draw_details(GtkWidget *widget, DirItem *item, int x, int y,
+			 int width, gboolean selected, gboolean box)
+{
+	draw_string(widget,
+			fixed_font,
+			details(item),
+			x, y,
+			item->details_width,
+			width,
+			selected, box);
+
+	if (item->lstat_errno)
+		return;
+
+	/* Underline the effective permissions */
+	gdk_draw_rectangle(widget->window,
+			widget->style->fg_gc[selected ? GTK_STATE_SELECTED
+						      : GTK_STATE_NORMAL],
+			TRUE,
+			x - 1 + fixed_width *
+				(5 + 4 * applicable(item->uid, item->gid)),
+			y + fixed_font->descent - 1,
+			fixed_width * 3 + 1, 1);
+}
+
 /* Return a string (valid until next call) giving details
  * of this item.
  */
@@ -714,7 +771,7 @@ char *details(DirItem *item)
 	return buf;
 }
 
-static void draw_item_full_info(GtkWidget *widget,
+static void draw_item_large_full(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area)
 {
@@ -740,27 +797,52 @@ static void draw_item_full_info(GtkWidget *widget,
 			low_text_y - item_font->descent - fixed_font->ascent,
 			item->name_width,
 			text_area_width,
-			selected);
+			selected, TRUE);
+
+	draw_details(widget, item, text_x, low_text_y,
+			text_area_width, selected, TRUE);
+}
+
+static void draw_item_small_full(GtkWidget *widget,
+			CollectionItem *colitem,
+			GdkRectangle *area)
+{
+	DirItem	*item = (DirItem *) colitem->data;
+	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
+	int	bottom = area->y + area->height;
+	int	low_text_y = bottom - item_font->descent - 2;
+	gboolean	selected = colitem->selected;
+	GdkRectangle	pic_area;
+	int		text_height = item_font->ascent + item_font->descent;
+	int		fixed_height = fixed_font->ascent + fixed_font->descent;
+	int		box_height = MAX(text_height, fixed_height) + 2;
+
+	pic_area.x = area->x;
+	pic_area.y = area->y;
+	pic_area.width = SMALL_ICON_WIDTH;
+	pic_area.height = SMALL_ICON_HEIGHT;
+
+	draw_small_icon(widget, &pic_area, item, selected);
+	
+	if (selected)
+		gtk_paint_flat_box(widget->style, widget->window, 
+				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
+				NULL, widget, "text",
+				text_x, bottom - 1 - box_height,
+				area->width - text_x - 1,
+				box_height);
 	draw_string(widget,
-			fixed_font,
-			details(item),
-			text_x, low_text_y,
-			item->details_width,
-			text_area_width,
-			selected);
+			item_font,
+			item->leafname, 
+			text_x,
+			low_text_y,
+			item->name_width,
+			area->width - (text_x - area->x),
+			selected, FALSE);
 
-	if (item->lstat_errno)
-		return;
-
-	/* Underline the effective permissions */
-	gdk_draw_rectangle(widget->window,
-			selected ? widget->style->white_gc
-				 : widget->style->black_gc,
-			TRUE,
-			text_x - 1 + fixed_width *
-				(5 + 4 * applicable(item->uid, item->gid)),
-			low_text_y + fixed_font->descent - 1,
-			fixed_width * 3 + 1, 1);
+	text_x = area->width - item->details_width - 4 + area->x;
+	draw_details(widget, item, text_x, bottom - fixed_font->descent - 2,
+			item->details_width + 2, selected, FALSE);
 }
 
 static void draw_item_small(GtkWidget *widget,
@@ -787,7 +869,7 @@ static void draw_item_small(GtkWidget *widget,
 			low_text_y,
 			item->name_width,
 			area->width - (text_x - area->x),
-			selected);
+			selected, TRUE);
 }
 
 static void draw_item_large(GtkWidget *widget,
@@ -811,7 +893,7 @@ static void draw_item_large(GtkWidget *widget,
 			text_x, text_y,
 			item->name_width,
 			area->width,
-			selected);
+			selected, TRUE);
 }
 
 static void show_menu(Collection *collection, GdkEventButton *event,
@@ -1479,7 +1561,8 @@ static void shrink_width(FilerWindow *filer_window)
 	int		width = MIN_ITEM_WIDTH;
 	int		this_width;
 	DisplayStyle	style = filer_window->display_style;
-	int		text_height;
+	int		text_height, fixed_height;
+	int		height;
 
 	text_height = item_font->ascent + item_font->descent;
 	
@@ -1491,11 +1574,25 @@ static void shrink_width(FilerWindow *filer_window)
 			width = this_width;
 	}
 	
-	collection_set_item_size(filer_window->collection,
-		width,
-		style == FULL_INFO ? 	MAX_ICON_HEIGHT + 4 :
-		style == SMALL_ICONS ? 	MAX(text_height, SMALL_ICON_HEIGHT) + 4
-				     :	text_height + MAX_ICON_HEIGHT + 8);
+	switch (style)
+	{
+		case LARGE_FULL_INFO:
+			height = MAX_ICON_HEIGHT + 4;
+			break;
+		case SMALL_FULL_INFO:
+			fixed_height = fixed_font->ascent + fixed_font->descent;
+			text_height = MAX(text_height, fixed_height);
+			/* No break */
+		case SMALL_ICONS:
+			height = MAX(text_height, SMALL_ICON_HEIGHT) + 4;
+			break;
+		case LARGE_ICONS:
+		default:
+			height = text_height + MAX_ICON_HEIGHT + 8;
+			break;
+	}
+
+	collection_set_item_size(filer_window->collection, width, height);
 }
 
 void filer_set_sort_fn(FilerWindow *filer_window,
@@ -1527,13 +1624,17 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 
 	switch (style)
 	{
+		case SMALL_FULL_INFO:
+			collection_set_functions(filer_window->collection,
+				draw_item_small_full, test_point_small_full);
+			break;
 		case SMALL_ICONS:
 			collection_set_functions(filer_window->collection,
 				draw_item_small, test_point_small);
 			break;
-		case FULL_INFO:
+		case LARGE_FULL_INFO:
 			collection_set_functions(filer_window->collection,
-				draw_item_full_info, test_point_full_info);
+				draw_item_large_full, test_point_large_full);
 			break;
 		default:
 			collection_set_functions(filer_window->collection,
@@ -2082,12 +2183,13 @@ static void save_options()
 	option_write("filer_display_style",
 		last_display_style == LARGE_ICONS ? "Large Icons" :
 		last_display_style == SMALL_ICONS ? "Small Icons" :
-		"Full Info");
+		last_display_style == SMALL_FULL_INFO ? "Small, Full Info" :
+			"Large, Full Info");
 	option_write("filer_sort_by",
 		last_sort_fn == sort_by_name ? "Name" :
 		last_sort_fn == sort_by_type ? "Type" :
 		last_sort_fn == sort_by_date ? "Date" :
-		"Size");
+			"Size");
 	option_write("filer_toolbar", o_toolbar == TOOLBAR_NONE ? "None" :
 				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
 				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
@@ -2135,8 +2237,10 @@ static char *filer_display_style(char *data)
 		last_display_style = LARGE_ICONS;
 	else if (g_strcasecmp(data, "Small Icons") == 0)
 		last_display_style = SMALL_ICONS;
-	else if (g_strcasecmp(data, "Full Info") == 0)
-		last_display_style = FULL_INFO;
+	else if (g_strcasecmp(data, "Large, Full Info") == 0)
+		last_display_style = LARGE_FULL_INFO;
+	else if (g_strcasecmp(data, "Small, Full Info") == 0)
+		last_display_style = SMALL_FULL_INFO;
 	else
 		return _("Unknown display style");
 

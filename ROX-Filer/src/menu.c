@@ -77,7 +77,8 @@ static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 /* Note that for these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
 static void small(gpointer data, guint action, GtkWidget *widget);
-static void full_info(gpointer data, guint action, GtkWidget *widget);
+static void large_full_info(gpointer data, guint action, GtkWidget *widget);
+static void small_full_info(gpointer data, guint action, GtkWidget *widget);
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget);
 static void sort_type(gpointer data, guint action, GtkWidget *widget);
@@ -161,7 +162,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL,	NULL, 0, "<Branch>"},
 {">" N_("Large Icons"),   	NULL,  	large, 0, NULL},
 {">" N_("Small Icons"),   	NULL,  	small, 0, NULL},
-{">" N_("Full Info"),	NULL,  	full_info, 0, NULL},
+{">" N_("Large, Full Info"),	NULL,  	large_full_info, 0, NULL},
+{">" N_("Small, Full Info"),	NULL,  	small_full_info, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL,  	sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL,  	sort_type, 0, NULL},
@@ -574,11 +576,18 @@ static void small(gpointer data, guint action, GtkWidget *widget)
 	filer_style_set(window_with_focus, SMALL_ICONS);
 }
 
-static void full_info(gpointer data, guint action, GtkWidget *widget)
+static void large_full_info(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_style_set(window_with_focus, FULL_INFO);
+	filer_style_set(window_with_focus, LARGE_FULL_INFO);
+}
+
+static void small_full_info(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_style_set(window_with_focus, SMALL_FULL_INFO);
 }
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)
