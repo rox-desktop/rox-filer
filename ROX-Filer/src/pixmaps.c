@@ -339,10 +339,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 
 	type = type_from_path(path);
 	if (!type)
-	{
-		callback(data, NULL);
-		return;  /* Can't create thumbnail */
-	}
+		type=text_plain;
 
 	/* Add an entry, set to NULL, so no-one else tries to load this
 	 * image.
