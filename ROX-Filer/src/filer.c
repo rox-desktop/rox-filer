@@ -1462,17 +1462,3 @@ void filer_target_mode(FilerWindow *filer_window,
 		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text),
 				fn ? reason : "");
 }
-
-/* Check every window to see if it needs a rescan */
-void filer_update_all(void)
-{
-	GList *next = all_filer_windows;
-
-	while (next)
-	{
-		FilerWindow	*filer_window = (FilerWindow *) next->data;
-		next = next->next;
-
-		filer_update_dir(filer_window, FALSE);
-	}
-}
