@@ -370,7 +370,8 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (child == 0)
 	{
 		/* We are the child process */
-		if (thumb_prog) {
+		if (thumb_prog)
+		{
 			execl(thumb_prog, thumb_prog, path,
 				thumbnail_path(path),
 				g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
@@ -508,7 +509,8 @@ static gchar *thumbnail_program(MIME_type *type)
 
 	leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
 	path = choices_find_path_load(leaf, "MIME-thumb");
-	if (path) {
+	if (path)
+	{
 		g_free(leaf);
 		return path;
 	}

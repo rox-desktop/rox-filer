@@ -336,13 +336,14 @@ static void set_selection(GtkTreeView *view, gpointer data)
 	g_free(text);
 }
 
-static gchar *add_row(GtkListStore *store, const gchar *label,
+/* Returns a GtkTreePath for the item */
+static const gchar *add_row(GtkListStore *store, const gchar *label,
 		      const gchar *data)
 {
 	GtkTreeIter	iter;
 	gchar		*u8 = NULL;
 	GtkTreePath     *tpath;
-	gchar           *last=NULL;
+	static gchar    *last = NULL;
 
 	if (!g_utf8_validate(data, -1, NULL))
 		u8 = to_utf8(data);
@@ -352,10 +353,10 @@ static gchar *add_row(GtkListStore *store, const gchar *label,
 
 	g_free(u8);
 
-	tpath=gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
-	if(last)
+	tpath = gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+	if (last)
 		g_free(last);
-	last=gtk_tree_path_to_string(tpath);
+	last = gtk_tree_path_to_string(tpath);
 	gtk_tree_path_free(tpath);
 
 	return last;
@@ -413,13 +414,13 @@ static void insert_size(DU *du, const char *line)
 	gchar *cell;
 
 #ifdef	LARGE_FILE_SUPPORT
-	size=strtoll(line, NULL, 10);
+	size = strtoll(line, NULL, 10);
 #else
-	size=strtol(line, NULL, 10);
+	size = strtol(line, NULL, 10);
 #endif
-	size<<=10; /* Because du reports in K */
-	cell=(size >= PRETTY_SIZE_LIMIT)?
-		g_strdup_printf("%s (%" SIZE_FMT " %s)",
+	size <<= 10; /* Because du reports in K */
+	cell = (size >= PRETTY_SIZE_LIMIT)
+		? g_strdup_printf("%s (%" SIZE_FMT " %s)",
 				format_size(size),
 				size, _("bytes"))
 		: g_strdup(format_size(size));
@@ -429,27 +430,27 @@ static void insert_size(DU *du, const char *line)
 	g_free(cell);
 }
 
-static gboolean read_du_output(GIOChannel *source, GIOCondition cond,
-			       DU *du)
+static gboolean read_du_output(GIOChannel *source, GIOCondition cond, DU *du)
 {
 	GString *line;
 	GIOStatus stat;
-	GError *err=NULL;
+	GError *err = NULL;
 
-	line=g_string_new("");
-	stat=g_io_channel_read_line_string(source, line, NULL, &err);
-	switch(stat) {
-	case G_IO_STATUS_NORMAL:
-		insert_size(du, line->str);
-		break;
-	case G_IO_STATUS_EOF:
-		break;
-	case G_IO_STATUS_AGAIN:
-		g_string_free(line, TRUE);
-		return TRUE;
-	case G_IO_STATUS_ERROR:
-		set_cell(du->store, du->path, err->message);
-		break;
+	line = g_string_new("");
+	stat = g_io_channel_read_line_string(source, line, NULL, &err);
+	switch (stat)
+	{
+		case G_IO_STATUS_NORMAL:
+			insert_size(du, line->str);
+			break;
+		case G_IO_STATUS_EOF:
+			break;
+		case G_IO_STATUS_AGAIN:
+			g_string_free(line, TRUE);
+			return TRUE;
+		case G_IO_STATUS_ERROR:
+			set_cell(du->store, du->path, err->message);
+			break;
 	}
 	g_string_free(line, TRUE);
 	
@@ -489,33 +490,40 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 					 user_name(item->uid),
 					 group_name(item->gid)));
 
-	if (item->base_type != TYPE_DIRECTORY) {
+	if (item->base_type != TYPE_DIRECTORY)
+	{
 		add_row_and_free(store, _("Size:"),
 				 item->size >= PRETTY_SIZE_LIMIT
 				 ? g_strdup_printf("%s (%" SIZE_FMT " %s)",
 						   format_size(item->size),
 						   item->size, _("bytes"))
 				 : g_strdup(format_size(item->size)));
-	} else {
-		DU *du=g_new(DU, 1);
+	}
+	else
+	{
+		DU *du;
 		int out;
-		gchar *args[]={"du", "-sk", "", NULL};
+		gchar *args[] = {"du", "-sk", "", NULL};
 
-		du->store=store;
-		du->path=g_strdup(add_row(store, _("Size:"), _("Scanning")));
+		du = g_new(DU, 1);
+		du->store = store;
+		du->path = g_strdup(add_row(store, _("Size:"), _("Scanning")));
 
-		args[2]=(gchar *) path;
-		if(g_spawn_async_with_pipes(NULL, args, NULL,
+		args[2] = (gchar *) path;
+		if (g_spawn_async_with_pipes(NULL, args, NULL,
 					    G_SPAWN_SEARCH_PATH,
 					    NULL, NULL, NULL,
 					    NULL, &out, NULL,
-					    NULL)) {
-			du->chan=g_io_channel_unix_new(out);
-			du->watch=g_io_add_watch(du->chan, G_IO_IN,
+					    NULL))
+		{
+			du->chan = g_io_channel_unix_new(out);
+			du->watch = g_io_add_watch(du->chan, G_IO_IN,
 						 (GIOFunc) read_du_output, du);
 			g_signal_connect(G_OBJECT(view), "destroy",
 				  G_CALLBACK(kill_du_output), du);
-		} else {
+		}
+		else
+		{
 			set_cell(store, du->path, _("Failed to scan"));
 			g_free(du->path);
 			g_free(du);
@@ -725,7 +733,7 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 static void permissions_destroyed(GtkWidget *widget, Permissions *perm)
 {
 	g_free(perm->path);
-	g_free(perm->item);
+	diritem_free(perm->item);
 	
 	g_free(perm);
 }
@@ -737,21 +745,22 @@ static void permissions_apply(GtkWidget *widget, Permissions *perm)
 
 	nmode=0;
 	
-	for(i=0; i<9; i++) {
-		if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[i])))
-			nmode|=(1<<i);
+	for (i = 0; i < 9; i++)
+	{
+		GtkToggleButton *bit = GTK_TOGGLE_BUTTON(perm->bits[i]);
+		if (gtk_toggle_button_get_active(bit))
+			nmode |= 1 << i;
 	}
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[9])))
-		nmode|=S_ISUID;
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[10])))
-		nmode|=S_ISGID;
-	if(gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[11])))
-		nmode|=S_ISVTX;
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[9])))
+		nmode |= S_ISUID;
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[10])))
+		nmode |= S_ISGID;
+	if (gtk_toggle_button_get_active(GTK_TOGGLE_BUTTON(perm->bits[11])))
+		nmode |= S_ISVTX;
 	
-	if(chmod(perm->path, nmode)) {
+	if (chmod(perm->path, nmode))
 		report_error(_("Could not change permissions: %s"),
-			     strerror(errno));
-	}
+			     g_strerror(errno));
 }
 
 static GtkWidget *make_permissions(const gchar *path, DirItem *item)
@@ -761,63 +770,61 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 	GtkWidget *tick, *label;
 	int i, x, y;
 
-	perm=g_new(Permissions, 1);
+	perm = g_new(Permissions, 1);
 
-	perm->path=g_strdup(path);
-	perm->item=diritem_new(path);
+	perm->path = g_strdup(path);
+	perm->item = diritem_new(path);
 
-	table=gtk_table_new(4, 5, TRUE);
+	table = gtk_table_new(4, 5, TRUE);
 
-	label=gtk_label_new(_("Owner"));
+	label = gtk_label_new(_("Owner"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	label=gtk_label_new(_("Group"));
+	label = gtk_label_new(_("Group"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
-	label=gtk_label_new(_("World"));
+	label = gtk_label_new(_("World"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 3, 4);
 
-	label=gtk_label_new(_("Read"));
+	label = gtk_label_new(_("Read"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
-	label=gtk_label_new(_("Write"));
+	label = gtk_label_new(_("Write"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 2, 3, 0, 1);
-	label=gtk_label_new(_("Exec"));
+	label = gtk_label_new(_("Exec"));
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 3, 4, 0, 1);
 
-	for(i=0; i<9; i++) {
-		x=1+2-i%3;
-		y=1+2-i/3;
-		perm->bits[i]=tick=gtk_check_button_new();
+	for (i = 0; i < 9; i++)
+	{
+		x = 1 + 2 - i % 3;
+		y = 1 + 2 - i / 3;
+		perm->bits[i] = tick = gtk_check_button_new();
 		gtk_table_attach_defaults(GTK_TABLE(table), tick,
-					  x, x+1, y, y+1);
-		if(item->mode & (1<<i))
+					  x, x + 1, y, y + 1);
+		if (item->mode & (1 << i))
 			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick),
 						     TRUE);
 		g_signal_connect(tick, "toggled",
-				G_CALLBACK(permissions_apply ), perm);
+				G_CALLBACK(permissions_apply), perm);
 	}
 
-	tick=gtk_check_button_new_with_label(_("SUID"));
+	tick = gtk_check_button_new_with_label(_("SUID"));
 	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 1, 2);
-	if(item->mode & S_ISUID)
+	if (item->mode & S_ISUID)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
-	g_signal_connect(tick, "toggled",
-				G_CALLBACK(permissions_apply ), perm);
-	perm->bits[9]=tick;
+	g_signal_connect(tick, "toggled", G_CALLBACK(permissions_apply), perm);
+	perm->bits[9] = tick;
 
-	tick=gtk_check_button_new_with_label(_("SGID"));
+	tick = gtk_check_button_new_with_label(_("SGID"));
 	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 2, 3);
-	if(item->mode & S_ISGID)
+	if (item->mode & S_ISGID)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
-	g_signal_connect(tick, "toggled",
-				G_CALLBACK(permissions_apply ), perm);
-	perm->bits[10]=tick;
+	g_signal_connect(tick, "toggled", G_CALLBACK(permissions_apply), perm);
+	perm->bits[10] = tick;
 
-	tick=gtk_check_button_new_with_label(_("Sticky"));
+	tick = gtk_check_button_new_with_label(_("Sticky"));
 	gtk_table_attach_defaults(GTK_TABLE(table), tick, 4, 5, 3, 4);
-	if(item->mode & S_ISVTX)
+	if (item->mode & S_ISVTX)
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(tick), TRUE);
-	g_signal_connect(tick, "toggled",
-				G_CALLBACK(permissions_apply ), perm);
-	perm->bits[11]=tick;
+	g_signal_connect(tick, "toggled", G_CALLBACK(permissions_apply), perm);
+	perm->bits[11] = tick;
 
 	g_signal_connect(table, "destroy",
 				G_CALLBACK(permissions_destroyed), perm);

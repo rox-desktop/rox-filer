@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-06 15:36+0200\n"
+"POT-Creation-Date: 2003-10-07 11:46+0100\n"
 "PO-Revision-Date: 2003-10-04 16:20+0200\n"
 "Last-Translator: Yuri Bongiorno http://yuri.webhop.org\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -1984,13 +1984,17 @@ msgid "Symlink"
 msgstr "Collegamento simbolico"
 
 #: menu.c:1880
+#, fuzzy
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
-"1) using an XSettings manager, such as ROX-Session\n"
+"\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
 "or\n"
+"\n"
 "2) adding this line to ~/.gtkrc-2.0:\n"
-"\tgtk-can-change-accels = 1"
+"\tgtk-can-change-accels = 1\n"
+"\t(this only works if NOT using XSETTINGS)"
 msgstr ""
 "Le scorciatoie definite dall'utente sono normalmente disattivate in Gtk2 e "
 "non andrebbero abilitate. Si possono tuttavia attivare:\n"
@@ -1999,7 +2003,7 @@ msgstr ""
 "2) aggiungendo questa riga in «~/.gtkrc-2.0»:\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1890
+#: menu.c:1891
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2019,7 +2023,7 @@ msgstr ""
 "Il tasto appare vicino alla voce di menù e da questo momento è possibile "
 "premere solo quel tasto anziché attivare il menù."
 
-#: menu.c:1905
+#: menu.c:1906
 msgid "Set keyboard shortcuts"
 msgstr "Imposta le scorciatoie da tastiera"
 

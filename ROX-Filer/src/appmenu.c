@@ -21,6 +21,8 @@
 
 /* appmenu.c - handles application-specific menus read from XMLwrapper.xml */
 
+/* XXX: This handles all File menu extensions. Needs renaming! */
+
 #include "config.h"
 
 #include <gtk/gtk.h>

@@ -54,7 +54,6 @@ gboolean file_exists(const char *path);
 GPtrArray *list_dir(const guchar *path);
 gint strcmp2(gconstpointer a, gconstpointer b);
 
-extern gchar *escape_uri(const char *uri);
 extern gchar *escape_uri_path(const char *path);
 extern gchar *encode_path_as_uri(const guchar *path);
 extern gchar *unescape_uri(const char *uri);

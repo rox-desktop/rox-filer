@@ -1329,7 +1329,8 @@ static void do_move2(const char *path, const char *dest)
 		{
 			/* Newer; keep going */
 		}
-		else {
+		else
+		{
 			printf_send("<%s", path);
 			printf_send(">%s", dest_path);
 			if (!printf_reply(from_parent, TRUE,

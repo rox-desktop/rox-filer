@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.5\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-02 20:54-0300\n"
+"POT-Creation-Date: 2003-10-07 11:46+0100\n"
 "PO-Revision-Date: 2002-11-21\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -275,14 +275,17 @@ msgid "'Directory '%s' deleted\n"
 msgstr "'Directorio '%s' borrado\n"
 
 #: action.c:919
+#, c-format
 msgid "?Eject '%s'?"
 msgstr "?Expulsar '%s'?"
 
 #: action.c:924
+#, c-format
 msgid "'Eject '%s'\n"
 msgstr "'Expulsar '%s'\n"
 
 #: action.c:943
+#, c-format
 msgid ""
 "!%s\n"
 "eject failed\n"
@@ -1129,7 +1132,7 @@ msgstr ""
 msgid "blocks"
 msgstr "bloques"
 
-#: gtkicontheme.c:903
+#: gtkicontheme.c:829
 #, c-format
 msgid "Icon '%s' not present in theme"
 msgstr "Icono '%s' no está presente en el tema"
@@ -1396,6 +1399,7 @@ msgid "file(1) says... %s"
 msgstr "file(1) dice... %s"
 
 #: infobox.c:752
+#, c-format
 msgid "Could not change permissions: %s"
 msgstr "No pude cambiar los permisos: %s"
 
@@ -1984,13 +1988,17 @@ msgid "Symlink"
 msgstr "Enlace"
 
 #: menu.c:1880
+#, fuzzy
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
-"1) using an XSettings manager, such as ROX-Session\n"
+"\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
 "or\n"
+"\n"
 "2) adding this line to ~/.gtkrc-2.0:\n"
-"\tgtk-can-change-accels = 1"
+"\tgtk-can-change-accels = 1\n"
+"\t(this only works if NOT using XSETTINGS)"
 msgstr ""
 "Los atajos definibles por el usuario están deshabilitados por defecto en "
 "Gtk2, y no los has habilitado. Puedes activar ésta funcionalidad:\n"
@@ -1999,7 +2007,7 @@ msgstr ""
 "2) agregando ésta línea en ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1890
+#: menu.c:1891
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2019,7 +2027,7 @@ msgstr ""
 "La tecla aparecerá próxima al elemento del menú y bastará con presionar ésa "
 "tecla sin abrir el menú en el futuro."
 
-#: menu.c:1905
+#: menu.c:1906
 msgid "Set keyboard shortcuts"
 msgstr "Definir atajos de teclado"
 
@@ -2250,7 +2258,7 @@ msgstr ""
 "%s\n"
 "Fondo de pantalla eliminado."
 
-#: pixmaps.c:960
+#: pixmaps.c:961
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2259,11 +2267,11 @@ msgstr ""
 "No puedo eliminar las miniaturas en %s:\n"
 "%s"
 
-#: pixmaps.c:981
+#: pixmaps.c:982
 msgid "There are no thumbnails to delete"
 msgstr "No hay miniaturas que eliminar"
 
-#: pixmaps.c:994
+#: pixmaps.c:995
 msgid "Purge thumbnails disk cache"
 msgstr "Eliminar el caché de miniaturas en el disco"
 
@@ -2468,35 +2476,35 @@ msgstr "No elementos%s"
 msgid "%u selected (%s)"
 msgstr "%u seleccionado (%s)"
 
-#: toolbar.c:411
+#: toolbar.c:410
 msgid "Sort by name"
 msgstr "Ordenar por nombre"
 
-#: toolbar.c:411
+#: toolbar.c:410
 msgid "Sort by type"
 msgstr "Ordenar por tipo"
 
-#: toolbar.c:411
+#: toolbar.c:410
 msgid "Sort by date"
 msgstr "Ordenar por fecha"
 
-#: toolbar.c:412
+#: toolbar.c:411
 msgid "Sort by size"
 msgstr "Ordenar por tamaño"
 
-#: toolbar.c:412
+#: toolbar.c:411
 msgid "Sort by owner"
 msgstr "Ordenar por propietario"
 
-#: toolbar.c:412
+#: toolbar.c:411
 msgid "Sort by group"
 msgstr "Ordenar por grupo"
 
-#: toolbar.c:446
+#: toolbar.c:444
 msgid "ascending"
 msgstr "ascendente"
 
-#: toolbar.c:446
+#: toolbar.c:444
 msgid "descending"
 msgstr "descendente"
 
@@ -2724,6 +2732,7 @@ msgid "ROX icon theme not found... installing..."
 msgstr "No se halló el tema de íconos ROX... instalando..."
 
 #: type.c:1470
+#, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
 "%s"
@@ -2781,6 +2790,7 @@ msgstr ""
 "Usar una copia de la imágen para todos los archivos con éste tipo MIME."
 
 #: usericons.c:288
+#, c-format
 msgid "For all files of type `%s' (%s/%s)"
 msgstr "Para todos los archivos de tipo `%s' (%s/%s)"
 

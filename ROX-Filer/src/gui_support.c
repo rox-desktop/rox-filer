@@ -928,7 +928,7 @@ gint radios_get_value(Radios *radios)
 	return -1;
 }
 
-/* Convert a list of URIs into a list of strings.
+/* Convert a list of URIs as a string into a GList of URIs.
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)
  */
@@ -958,7 +958,7 @@ GList *uri_list_to_glist(const char *uri_list)
 		{
 			char *tmp;
 			tmp = g_strndup(uri_list, length);
-			uri=unescape_uri(tmp);
+			uri = unescape_uri(tmp);
 			g_free(tmp);
 			list = g_list_append(list, uri);
 		}

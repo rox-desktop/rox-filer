@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-07 01:51+0200\n"
+"POT-Creation-Date: 2003-10-07 11:46+0100\n"
 "PO-Revision-Date: 2003-10-07 02:45+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
@@ -639,7 +639,9 @@ msgstr "<étiquette manquante>"
 msgid ""
 "Symlink any programs you want into this directory. They will appear in the "
 "menu for all items of this type (%s/%s)."
-msgstr "Faites un lien symbolique des programmes que vous voulez dans ce répertoire. Ils apparaîtront dans le menu pour tous les objets de ce type (%s/%s)."
+msgstr ""
+"Faites un lien symbolique des programmes que vous voulez dans ce répertoire. "
+"Ils apparaîtront dans le menu pour tous les objets de ce type (%s/%s)."
 
 #: appmenu.c:330
 msgid "Customise Menu..."
@@ -1996,13 +1998,17 @@ msgid "Symlink"
 msgstr "Lien symbolique"
 
 #: menu.c:1880
+#, fuzzy
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
-"1) using an XSettings manager, such as ROX-Session\n"
+"\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
 "or\n"
+"\n"
 "2) adding this line to ~/.gtkrc-2.0:\n"
-"\tgtk-can-change-accels = 1"
+"\tgtk-can-change-accels = 1\n"
+"\t(this only works if NOT using XSETTINGS)"
 msgstr ""
 "Les raccourcis utilisateur sont désactivés par défaut dans Gtk2 et vous ne "
 "les avez pas activés. Vous pouvez activer cette fonctionnalité en :\n"
@@ -2010,7 +2016,7 @@ msgstr ""
 "2) ajoutant cette ligne à ~/.gtkrc-2.0 :\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1890
+#: menu.c:1891
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2030,7 +2036,7 @@ msgstr ""
 "La touche apparaîtra à côté de l'entrée du menu et vous pourrez à l'avenir "
 "juste appuyer sur cette touche, sans avoir à ouvrir le menu."
 
-#: menu.c:1905
+#: menu.c:1906
 msgid "Set keyboard shortcuts"
 msgstr "Fixer les raccourcis clavier"
 
@@ -2712,10 +2718,15 @@ msgid ""
 "the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/"
 "globs)."
 msgstr ""
-"La base de données des types MIME standard (version 0.9 ou ultérieure) n'a pas été trouvée. Le filer ne pourra probablement pas montrer les types corrects pour les différents fichiers. Vous devez télécharger et installer le paquet 'shared-mime-info-0.9' à partir de :\n"
+"La base de données des types MIME standard (version 0.9 ou ultérieure) n'a "
+"pas été trouvée. Le filer ne pourra probablement pas montrer les types "
+"corrects pour les différents fichiers. Vous devez télécharger et installer "
+"le paquet 'shared-mime-info-0.9' à partir de :\n"
 "http://www.freedesktop.org/software/shared-mime-info\n"
 "\n"
-"Si vous avez déjà installé ce paquet, vérifiez que les droits d'accès permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /usr/share/mime/globs)."
+"Si vous avez déjà installé ce paquet, vérifiez que les droits d'accès "
+"permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /"
+"usr/share/mime/globs)."
 
 #: type.c:1409
 msgid "No description"
@@ -2725,7 +2736,9 @@ msgstr "Pas de description"
 #, c-format
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
-msgstr "Le thème d'icônes '%s' ne contient pas d'icônes MIME. Utilisation du thème par défaut de ROX."
+msgstr ""
+"Le thème d'icônes '%s' ne contient pas d'icônes MIME. Utilisation du thème "
+"par défaut de ROX."
 
 #: type.c:1461
 msgid "ROX icon theme not found... installing..."
@@ -3775,7 +3788,10 @@ msgstr "Thème d'icônes"
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set in Choices override those from the selected theme."
-msgstr "Utilisez la boîte de dialogue « Fixer l'icône... » pour fixer l'icône pour chaque type MIME. Notez que les icônes fixées dans Choices ont la priorité sur celles du thème sélectionné."
+msgstr ""
+"Utilisez la boîte de dialogue « Fixer l'icône... » pour fixer l'icône pour "
+"chaque type MIME. Notez que les icônes fixées dans Choices ont la priorité "
+"sur celles du thème sélectionné."
 
 #: tips:253
 msgid "Colours"
