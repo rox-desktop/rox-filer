@@ -867,6 +867,7 @@ static gint key_press_event(GtkWidget	*widget,
 					search_in_dir(filer_window, 1);
 					break;
 				case GDK_Return:
+				case GDK_KP_Enter:
 					path_return_pressed(filer_window,
 								event);
 					break;
@@ -891,6 +892,7 @@ static gint key_press_event(GtkWidget	*widget,
 					shell_tab(filer_window);
 					break;
 				case GDK_Return:
+				case GDK_KP_Enter:
 					shell_return_pressed(filer_window);
 					break;
 				default:
@@ -909,6 +911,7 @@ static gint key_press_event(GtkWidget	*widget,
 				case GDK_Tab:
 					break;
 				case GDK_Return:
+				case GDK_KP_Enter:
 					select_return_pressed(filer_window,
 								event->time);
 					break;
