@@ -466,6 +466,17 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	g_free(type_name);
 	if (!full)
 	{
+		/* Ugly hack... try for a GNOME icon */
+		type_name = g_strconcat("gnome-mime-", type->media_type,
+				"-", type->subtype, NULL);
+		full = gtk_icon_theme_load_icon(icon_theme,
+						type_name,
+						ICON_HEIGHT, 0, NULL);
+		g_free(type_name);
+	}
+	if (!full)
+	{
+		/* Try for a media type */
 		type_name = g_strconcat("mime-", type->media_type, NULL);
 		full = gtk_icon_theme_load_icon(icon_theme,
 						type_name,
@@ -1425,6 +1436,12 @@ static void set_icon_theme(void)
 		info = gtk_icon_theme_lookup_icon(icon_theme,
 				"mime-application:postscript",
 				ICON_HEIGHT, 0);
+		if (!info)
+		{
+			info = gtk_icon_theme_lookup_icon(icon_theme,
+					"gnome-mime-application-postscript",
+					ICON_HEIGHT, 0);
+		}
 		if (info)
 		{
 			gtk_icon_info_free(info);
@@ -1516,13 +1533,17 @@ static void add_themes_from_dir(GPtrArray *names, const char *dir)
 
 	for (i = 0; i < list->len; i++)
 	{
-		struct stat info;
+		char *index_path;
+
+		index_path = g_build_filename(dir, list->pdata[i],
+						"index.theme", NULL);
 		
-		if (stat(make_path(dir, list->pdata[i]), &info) == 0 &&
-		    S_ISDIR(info.st_mode))
+		if (access(index_path, F_OK) == 0)
 			g_ptr_array_add(names, list->pdata[i]);
 		else
 			g_free(list->pdata[i]);
+
+		g_free(index_path);
 	}
 
 	g_ptr_array_free(list, TRUE);
