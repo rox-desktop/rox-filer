@@ -78,6 +78,7 @@ struct _GUIside
 
 	GtkWidget	*entry;		/* May be NULL */
 	guchar		**default_string; /* Changed when the entry changes */
+	void		(*entry_string_func)(GtkWidget *widget, guchar *string);
 	
 	char		*next_dir;	/* NULL => no timer active */
 	gint		next_timer;
@@ -177,6 +178,9 @@ static void entry_changed(GtkEntry *entry, GUIside *gui_side)
 	g_return_if_fail(gui_side->default_string != NULL);
 
 	text = gtk_entry_get_text(entry);
+
+	if (gui_side->entry_string_func)
+		gui_side->entry_string_func(GTK_WIDGET(gui_side->entry), text);
 
 	g_free(*(gui_side->default_string));
 	*(gui_side->default_string) = g_strdup(text);
@@ -856,6 +860,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gui_side->results = NULL;
 	gui_side->entry = NULL;
 	gui_side->default_string = NULL;
+	gui_side->entry_string_func = NULL;
 
 	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
@@ -1812,6 +1817,7 @@ void action_find(FilerWindow *filer_window)
 		return;
 
 	gui_side->show_info = TRUE;
+	gui_side->entry_string_func = set_find_string_colour;
 
 	scroller = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
@@ -1837,6 +1843,7 @@ void action_find(FilerWindow *filer_window)
 	gui_side->entry = gtk_entry_new();
 	gtk_widget_set_style(gui_side->entry, fixed_style);
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
+	set_find_string_colour(gui_side->entry, last_find_string);
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
@@ -2156,4 +2163,22 @@ static gboolean remove_pinned_ok(GList *paths)
 	g_string_free(message, TRUE);
 	
 	return retval;
+}
+
+void set_find_string_colour(GtkWidget *widget, guchar *string)
+{
+	static GtkStyle *error_style = NULL;
+	FindCondition *cond;
+
+	if (!error_style)
+	{
+		error_style = gtk_style_copy(fixed_style);
+		error_style->fg[GTK_STATE_NORMAL] = red;
+	}
+
+	cond = find_compile(string);
+	gtk_widget_set_style(widget, cond ? fixed_style : error_style);
+
+	if (cond)
+		find_condition_free(cond);
 }

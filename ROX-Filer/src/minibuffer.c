@@ -111,6 +111,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	g_return_if_fail(filer_window->minibuffer != NULL);
 
 	mini = GTK_ENTRY(filer_window->minibuffer);
+	gtk_widget_set_style(filer_window->minibuffer, fixed_style);
 
 	filer_window->mini_type = MINI_NONE;
 	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),
@@ -898,6 +899,10 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 	{
 		case MINI_PATH:
 			path_changed(mini, filer_window);
+			return;
+		case MINI_SELECT_IF:
+			set_find_string_colour(GTK_WIDGET(mini), 
+				gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer)));
 			return;
 		default:
 			break;
