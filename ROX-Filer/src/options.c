@@ -146,15 +146,15 @@ void options_init(void)
 	widget_builder = g_hash_table_new(g_str_hash, g_str_equal);
 
 	path = choices_find_path_load("Options", PROJECT);
-	if (!path)
-		return;		/* Nothing to load */
-
-	/* Load in all the options set in the filer, storing them
-	 * temporarily in the loading hash table.
-	 * They get moved to option_hash when they're registered.
-	 */
-	parse_file(path, process_option_line);
-	g_free(path);
+	if (path)
+	{
+		/* Load in all the options set in the filer, storing them
+		 * temporarily in the loading hash table.
+		 * They get moved to option_hash when they're registered.
+		 */
+		parse_file(path, process_option_line);
+		g_free(path);
+	}
 
 	option_register_widget("toggle", build_toggle);
 	option_register_widget("slider", build_slider);
