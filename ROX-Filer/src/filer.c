@@ -908,28 +908,24 @@ static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
 			FilerWindow	*filer_window)
 {
-	gboolean handled;
+	GtkWidget *focus = GTK_WINDOW(widget)->focus_widget;
 	guint key = event->keyval;
 	char group[2] = "1";
 
 	window_with_focus = filer_window;
 
-	/* Note: Not convinced this is the way Gtk's key system is supposed
-	 * to be used...
-	 */
+	/* Delay setting up the keys until now to speed loading... */
 	if (!filer_keys)
 		ensure_filer_menu();	/* Gets the keys working... */
-	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
-						filer_keys);
-	handled = gtk_accel_groups_activate(G_OBJECT(filer_window->window),
-				event->keyval, event->state);
-	if (window_with_focus)
-		gtk_window_remove_accel_group(GTK_WINDOW(filer_window->window),
-						filer_keys);
-	else
-		return TRUE;	/* Window no longer exists */
-	if (handled)
-		return TRUE;
+
+	if (!g_slist_find(filer_keys->acceleratables, widget))
+		gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
+					   filer_keys);
+
+	if (focus && focus != widget &&
+	    gtk_widget_get_toplevel(focus) == widget)
+		if (gtk_widget_event(focus, (GdkEvent *) event))
+			return TRUE;	/* Handled */
 
 	switch (key)
 	{
@@ -1385,7 +1381,7 @@ static void filer_add_signals(FilerWindow *filer_window)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
-	g_signal_connect(collection, "key_press_event",
+	g_signal_connect(filer_window->window, "key_press_event",
 			G_CALLBACK(key_press_event), filer_window);
 
 	/* Drag and drop events */
