@@ -7,9 +7,6 @@ APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
 PLATFORM=`uname -s`-`uname -m`
 
-echo APP_DIR is $APP_DIR
-echo PLATFORM is $PLATFORM
-
 DEBUGGER=""
 case $1 in
 	--debug) shift ; DEBUGGER=gdb ;;
