@@ -1,13 +1,14 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 PROG=ROX-Filer
 
-set -P
-APP_DIR=${0%/*}
-if [ "$APP_DIR" = "$0" ] ; then APP_DIR=. ; fi
+APP_DIR=`dirname $0`
 APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
-PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
+PLATFORM=`uname -s`-`uname -m`
+
+echo APP_DIR is $APP_DIR
+echo PLATFORM is $PLATFORM
 
 DEBUGGER=""
 case $1 in

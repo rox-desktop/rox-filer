@@ -197,6 +197,17 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
 
+typedef struct _FileStatus FileStatus;
+
+/* This is for the 'file(1) says...' thing */
+struct _FileStatus
+{
+	int	fd;	/* FD to read from, -1 if closed */
+	int	input;	/* Input watcher tag if fd valid */
+	GtkLabel *label;	/* Widget to output to */
+	gboolean	start;	/* No output yet */
+};
+
 void menu_init()
 {
 	GtkItemFactory  	*item_factory;
@@ -748,6 +759,52 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 				TRUE, FALSE);
 }
 
+/* Got some data from file(1) - stick it in the window. */
+static void add_file_output(FileStatus *fs,
+			    gint source, GdkInputCondition condition)
+{
+	char	buffer[20];
+	char	*str;
+	int	got;
+
+	got = read(source, buffer, sizeof(buffer) - 1);
+	if (got <= 0)
+	{
+		int	err = errno;
+		gtk_input_remove(fs->input);
+		close(source);
+		fs->fd = -1;
+		if (got < 0)
+			delayed_error("ROX-Filer: file(1) says...",
+					g_strerror(err));
+		return;
+	}
+	buffer[got] = '\0';
+
+	if (fs->start)
+	{
+		str = "";
+		fs->start = FALSE;
+	}
+	else
+		gtk_label_get(fs->label, &str);
+
+	str = g_strconcat(str, buffer, NULL);
+	gtk_label_set_text(fs->label, str);
+	g_free(str);
+}
+
+static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
+{
+	if (fs->fd != -1)
+	{
+		gtk_input_remove(fs->input);
+		close(fs->fd);
+	}
+
+	g_free(fs);
+}
+
 static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 {
 	GtkWidget	*window, *table, *label, *button, *frame;
@@ -756,12 +813,11 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	char		*string;
 	int		file_data[2];
 	char		*path;
-	char		buffer[20];
 	char 		*argv[] = {"file", "-b", NULL, NULL};
-	int		got;
 	Collection 	*collection;
-	DirItem	*file;
+	DirItem		*file;
 	struct stat	info;
+	FileStatus 	*fs = NULL;
 	
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -895,17 +951,21 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	if (pipe(file_data))
 	{
 		g_string_sprintf(gstring, "pipe(): %s", g_strerror(errno));
-		goto out;
+		g_string_free(gstring, TRUE);
+		return;
 	}
 	switch (fork())
 	{
 		case -1:
-			close(file_data[0]);
-			close(file_data[1]);
 			g_string_sprintf(gstring, "fork(): %s",
 					g_strerror(errno));
-			goto out;
+			gtk_label_set_text(GTK_LABEL(file_label), gstring->str);
+			g_string_free(gstring, TRUE);
+			close(file_data[0]);
+			close(file_data[1]);
+			break;
 		case 0:
+			/* We are the child */
 			close(file_data[0]);
 			dup2(file_data[1], STDOUT_FILENO);
 			dup2(file_data[1], STDERR_FILENO);
@@ -918,21 +978,20 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 				fprintf(stderr, "execvp() error: %s\n",
 						g_strerror(errno));
 			_exit(0);
+		default:
+			/* We are the parent */
+			close(file_data[1]);
+			fs = g_new(FileStatus, 1);
+			fs->label = GTK_LABEL(file_label);
+			fs->fd = file_data[0];
+			fs->start = TRUE;
+			fs->input = gdk_input_add(fs->fd, GDK_INPUT_READ,
+				(GdkInputFunction) add_file_output, fs);
+			gtk_signal_connect(GTK_OBJECT(window), "destroy",
+				GTK_SIGNAL_FUNC(file_info_destroyed), fs);
+			g_string_free(gstring, TRUE);
+			break;
 	}
-	/* We are the parent... */
-	close(file_data[1]);
-	g_string_truncate(gstring, 0);
-	while (gtk_events_pending())
-		g_main_iteration(FALSE);
-	while ((got = read(file_data[0], buffer, sizeof(buffer) - 1)) > 0)
-	{
-		buffer[got] = '\0';
-		g_string_append(gstring, buffer);
-	}
-	close(file_data[0]);
-out:
-	gtk_label_set_text(GTK_LABEL(file_label), gstring->str);
-	g_string_free(gstring, TRUE);
 }
 
 static void app_show_help(char *path)
