@@ -2453,43 +2453,63 @@ open them).
   <title>How filetypes are stored</title>
   <para>
 
-<application>ROX-Filer</application> uses three sub-directories in your Choices directory for
-filetypes:
+<application>ROX-Filer</application> uses three sub-directories in your Choices
+directory for filetypes:
 
-\begin{description}
-\item [MIME-info]contains files which specify what the MIME types for files
-should be, based on their extentions. All the files in all the MIME-info
-directories are scanned when the filer loads. <application>ROX-Filer</application> comes with
-a file containing many such rules &mdash; this is installed into the MIME-info
+<variablelist>
+
+<varlistentry><term><filename>MIME-info</filename></term><listitem><para>
+contains files which specify what the MIME types for files
+should be, based on their extentions. All the files in all the
+<filename>MIME-info</filename> directories are scanned when the filer loads.
+<application>ROX-Filer</application> comes with a file containing many such
+rules &mdash; this is installed into the <filename>MIME-info</filename>
 directory by the rox-base package.
+  </para><para>
+Many applications now come with a file called
+<filename>something.mime</filename>; copy these files into your
+<filename>MIME-info</filename> directory to make
+<application>ROX-Filer</application> automatically recognise the new extensions.
+Note that the filer must be restarted for the new files to be read.
+</para></listitem></varlistentry>
 
-
-Many applications now come with a file called `something.mime'; copy
-these files into your MIME-info directory to make <application>ROX-Filer</application> automatically
-recognise the new extensions.
-
-\item [MIME-types]contains symlinks, one for each MIME type, which point
+<varlistentry><term><filename>MIME-types</filename></term><listitem><para>
+contains symlinks, one for each MIME type, which point
 to programs that can handle files of that type. To set what program
-is run when you click on the file you should normally use the `Set
-Run Action' feature (see section \ref{sec: RunAction}). However,
-you can also set the actions manually &mdash; for example, to make opening
-an HTML file load it into Netscape:
+is run when you click on the file you should normally use the <guimenuitem>Set
+Run Action...</guimenuitem> feature (see the <xref linkend="RunAction"/> section).
+However, you can also set the actions manually &mdash; for example, to make
+opening an HTML file load it into Netscape:
 
-\begin{enumerate}
-\item Find the Netscape application and go to `Link...' on the menu.
-\item Enter `text_html' as the name for the link and drag the icon from
-the Link box into the MIME-types directory.
-\end{enumerate}
+<orderedlist>
+<listitem><para>
+Find the Netscape application and go to <guimenuitem>Link...</guimenuitem>
+on the menu.
+</para></listitem>
+
+<listitem><para>
+Enter <userinput>text_html</userinput> as the name for the link and drag the
+icon from the Link box into the <filename>MIME-types</filename> directory.
+</para></listitem>
+
+</orderedlist>
+
 You can also put actual programs in here as well as links if you want
 to.
+</para></listitem></varlistentry>
 
-\item [MIME-icons]contains the images used to display each type of file.
-So the filer will try to display an HTML file using the icon `MIME-icons/text_html.xpm'.
-\end{description}
-In both MIME-types and MIME-icons directories you can also provide
-default actions/images for each media type. For example, if `text_html'
-isn't found then the filer will try simply using `text'.
+<varlistentry><term><filename>MIME-icons</filename></term><listitem><para>
+contains the images used to display each type of file.
+So the filer will try to display an HTML file using the icon
+<filename>MIME-icons/text_html.xpm</filename>.
+</para></listitem></varlistentry>
 
+</variablelist>
+
+In both <filename>MIME-types</filename> and <filename>MIME-icons</filename>
+directories you can also provide default actions/images for each media type.
+For example, if <filename>text_html</filename> isn't found then the filer
+will try simply using <filename>text</filename>.
 
   </para>
 </sect1>
