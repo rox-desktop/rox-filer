@@ -126,7 +126,7 @@ typedef enum {
 
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
-static Option o_pinboard_tasklist;
+static Option o_pinboard_tasklist, o_forward_button_3;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -216,6 +216,7 @@ void pinboard_init(void)
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
 							GRID_STEP_COARSE);
 	option_add_int(&o_pinboard_tasklist, "pinboard_tasklist", TRUE);
+	option_add_int(&o_forward_button_3, "pinboard_forward_button_3", FALSE);
 
 	option_add_notify(pinboard_check_options);
 
@@ -931,12 +932,15 @@ static void forward_to_root(GdkEventButton *event)
 		ButtonPressMask | ButtonReleaseMask, (XEvent *) &xev);
 }
 
+#define FORWARDED_BUTTON(pi, button) ((button) == 2 || \
+			((button) == 3 && o_forward_button_3.int_value && !pi))
+
 /* pi is NULL if this is a root event */
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
                             	     PinIcon *pi)
 {
-	if (event->button == 2)
+	if (FORWARDED_BUTTON(pi, event->button))
 		forward_to_root(event);
 	else if (dnd_motion_release(event))
 		return TRUE;
@@ -954,7 +958,7 @@ static gboolean button_press_event(GtkWidget *widget,
 	/* Just in case we've jumped in front of everything... */
 	gdk_window_lower(current_pinboard->window->window);
 	
-	if (event->button == 2)
+	if (FORWARDED_BUTTON(pi, event->button))
 		forward_to_root(event);
 	else if (dnd_motion_press(widget, event))
 		perform_action(pi, event);
