@@ -18,6 +18,7 @@
 #include <signal.h>
 #include <dirent.h>
 
+#include "action.h"
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
@@ -376,7 +377,9 @@ static void got_delete_data(gpointer 		data,
 	gtk_widget_destroy(gui_side->window);
 }
 
-/* Called from outside - deletes all selected items */
+/*			EXTERNAL INTERFACE			*/
+
+/* Deletes all selected items in the window */
 void action_delete(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
@@ -420,5 +423,20 @@ void action_delete(FilerWindow *filer_window)
 	gtk_widget_set_sensitive(gui_side->actions, FALSE);
 
 	gtk_widget_show_all(gui_side->window);
+}
+
+void action_copy(GSList *paths, char *dest)
+{
+	delayed_error("Copy", "Not implemented yet - sorry!");
+}
+
+void action_move(GSList *paths, char *dest)
+{
+	delayed_error("Move", "Not implemented yet - sorry!");
+}
+
+void action_link(GSList *paths, char *dest)
+{
+	delayed_error("Link", "Not implemented yet - sorry!");
 }
 

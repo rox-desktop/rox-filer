@@ -21,6 +21,7 @@
 #include <collection.h>
 
 #include "filer.h"
+#include "action.h"
 #include "pixmaps.h"
 #include "gui_support.h"
 #include "support.h"
@@ -452,6 +453,9 @@ static gboolean panel_drag_ok(FilerWindow 	*filer_window,
 	else
 		new_path = NULL;
 	
+	if (new_path && access(new_path, W_OK))
+		new_path = NULL;
+
 	old_path = g_dataset_get_data(context, "drop_dest_path");
 	if (old_path == new_path ||
 		(old_path && new_path && strcmp(old_path, new_path) == 0))
@@ -496,6 +500,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 
 	if (filer_window->panel == FALSE)
 	{
+		if (access(filer_window->path, W_OK))
+			return FALSE;	/* We can't write here */
 		gdk_drag_status(context, context->suggested_action, time);
 		return TRUE;
 	}
@@ -816,7 +822,7 @@ static void run_with_files(char *path, GSList *uri_list)
 		delayed_error("ROX-Filer", "Failed to fork() child process");
 }
 
-/* We've got a list of URIs from somewhere (probably another filer).
+/* We've got a list of URIs from somewhere (probably another filer window).
  * If the files are on the local machine then try to copy them ourselves,
  * otherwise, if there was only one file and application/octet-stream was
  * provided, get the data via the X server.
@@ -873,68 +879,46 @@ static void got_uri_list(GtkWidget 		*widget,
 	}
 	else
 	{
-		int		local_files = 0;
-		const char	*start_args[] = {"xterm", "-wf", "-e"};
-		int		argc = sizeof(start_args) / sizeof(char *);
-		
-		next_uri = uri_list;
+		GSList		*local_paths = NULL;
+		GSList		*next;
 
-		argv = g_malloc(sizeof(start_args) +
-			sizeof(char *) * (g_slist_length(uri_list) + 4));
-		memcpy(argv, start_args, sizeof(start_args));
-
-		if (context->action == GDK_ACTION_MOVE)
-		{
-			argv[argc++] = "mv";
-			argv[argc++] = "-iv";
-		}
-		else if (context->action == GDK_ACTION_LINK)
-		{
-			argv[argc++] = "ln";
-			argv[argc++] = "-vis";
-		}
-		else
-		{
-			argv[argc++] = "cp";
-			argv[argc++] = "-Riva";
-		}
-
-		/* Either one local URI, or a list. If anything in the list
+		/* Either one local URI, or a list. If everything in the list
 		 * isn't local then we are stuck.
 		 */
 
-		while (next_uri)
+		for (next_uri = uri_list; next_uri; next_uri = next_uri->next)
 		{
 			char	*path;
 
 			path = get_local_path((char *) next_uri->data);
 
 			if (path)
-			{
-				argv[argc++] = path;
-				local_files++;
-			}
+				local_paths = g_slist_append(local_paths,
+								g_strdup(path));
 			else
 				error = "Some of these files are on a "
 					"different machine - they will be "
 					"ignored - sorry";
-
-			next_uri = next_uri->next;
 		}
 
-		if (local_files < 1)
+		if (!local_paths)
 		{
 			error = "None of these files are on the local machine "
 				"- I can't operate on multiple remote files - "
 				"sorry.";
-			g_free(argv);
-			argv = NULL;
 		}
+		else if (context->action == GDK_ACTION_MOVE)
+			action_move(local_paths, filer_window->path);
+		else if (context->action == GDK_ACTION_COPY)
+			action_copy(local_paths, filer_window->path);
+		else if (context->action == GDK_ACTION_LINK)
+			action_link(local_paths, filer_window->path);
 		else
-		{
-			argv[argc++] = dest_path;
-			argv[argc++] = NULL;
-		}
+			error = "Unknown action requested";
+
+		for (next = local_paths; next; next = next->next)
+			g_free(next->data);
+		g_slist_free(local_paths);
 	}
 
 	if (error)
