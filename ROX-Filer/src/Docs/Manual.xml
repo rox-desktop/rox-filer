@@ -418,9 +418,17 @@ between systems (which is why this isn't built in to the filer!).
 <listitem><para>open PANEL as a bottom-edge panel.
 </para></listitem></varlistentry>
 
+<varlistentry><term><option>-c</option></term><term><option>--client-id=ID</option></term>
+<listitem><para>used for session management.
+</para></listitem></varlistentry>
+
 <varlistentry><term><option>-d</option></term><term><option>--dir=DIR</option></term>
 <listitem><para>open DIR as directory (not as an application, even if it looks
 like one).
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-D</option></term><term><option>--close=DIR</option></term>
+<listitem><para>close DIR and all its subdirectories.
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-h</option></term><term><option>--help</option></term>
@@ -449,6 +457,10 @@ like one).
 
 <varlistentry><term><option>-r</option></term><term><option>--right=PANEL</option></term>
 <listitem><para>open PANEL as a right-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-R</option></term><term><option>--RPC</option></term>
+<listitem><para>read and invoke SOAP RPC from standard input (see <xref linkend="soap"/>).
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-s</option></term><term><option>--show=FILE</option></term>
@@ -528,12 +540,14 @@ Selection submenu.
 
 <row><entry>Drag an item  (left mouse button)</entry><entry>
 Copy the file(s) to the destination (an application or another filer
-window). Hold down Shift to move the file, or Ctrl+Shift to create
-a symbolic link.
+window). Hold down <keycap>Shift</keycap> to move the file,
+<keycap>Ctrl</keycap>+<keycap>Shift</keycap> to create
+a symbolic link, or <keycap>Alt</keycap> to get a menu of possible actions.
 </entry></row>
 
 <row><entry>Drag an item (middle mouse button)</entry><entry>
-As above, but always moves rather than copying or symlinking.
+When you let go, display a menu of possible actions.
+There is an option to make this move rather than open the menu.
 </entry></row>
 
 <row><entry>Drag (not over an item)</entry><entry>
@@ -2152,6 +2166,20 @@ two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
 but applies when the display is in `Small Icons' display mode.
 </para></listitem>
 
+<listitem><para><guilabel>Inherit options from source window</guilabel> controls what
+happens when you open a new window from an existing window (eg, by clicking the middle button
+over a file). If on, the new window has the same options (icon size, sort order, etc) as the
+old window. If off, the new window has the default options.</para></listitem>
+
+<listitem><para><guilabel>Default settings for new windows</guilabel>. These correspond to the
+display styles you can choose from the <guimenuitem>Display</guimenuitem> menu.
+</para></listitem>
+
+<listitem><para><guilabel>Colour files based on their types</guilabel>.
+If on, each file's name is coloured depending on what kind of thing it is
+(regular file, directory, executable, etc). You can choose the colours from
+the list below.</para></listitem>
+
 </itemizedlist>
 
 The remaining options provide the default settings for newly opened
@@ -2312,7 +2340,7 @@ beep if there are several matches, even though some letters were added.
   <para>
 
 <itemizedlist>
-<listitem><para> <application>ROX-Filer</application> uses the standard XDND protocol for drag-and-drop. This
+<listitem><para><application>ROX-Filer</application> uses the standard XDND protocol for drag-and-drop. This
 protocol recommends that URIs should contain the hostname of the computer
 that the resource is on so that the program receiving the data can
 determine whether it can get the data directly or whether it must
@@ -2323,7 +2351,7 @@ omitted and <application>ROX-Filer</application> will work with these applicatio
 drag data to a program running on a different machine.
 </para></listitem>
 
-<listitem><para> <guilabel>Allow dragging to icons in filer windows</guilabel> controls what happens when
+<listitem><para><guilabel>Allow dragging to icons in filer windows</guilabel> controls what happens when
 you drop files onto icons in filer windows. If on then drops onto
 directories will save the data inside the directory, while dropping
 onto programs will invoke the program on that data. If off then drops
@@ -2331,7 +2359,12 @@ anywhere inside a filer window act like drops onto the window background
 &mdash; that is, the data will be saved into the directory being displayed.
 </para></listitem>
 
-<listitem><para> <guilabel>Directories spring open</guilabel> controls what happens when you hold a file
+<listitem><para><guilabel>Dragging files with the middle mouse button...</guilabel>
+you can choose whether this displays a menu (like <keycap>Alt</keycap> dragging) or moves the
+files (like <keycap>Shift</keycap> dragging).
+</para></listitem>
+
+<listitem><para><guilabel>Directories spring open</guilabel> controls what happens when you hold a file
 over a directory while dragging it. If on, the directory will `spring
 open' after a short pause, allowing you to navigate to any directory
 during a drag. You can also hold the pointer over the Home and Up
@@ -2340,7 +2373,7 @@ previous option enabled for this to have any effect on files displayed
 in a directory.
 </para></listitem>
 
-<listitem><para> <guilabel>Spring delay</guilabel> sets how long, in thousanths of a second, the filer
+<listitem><para><guilabel>Spring delay</guilabel> sets how long, in thousanths of a second, the filer
 will wait before spring opening a directory as described above. If
 the above option is turned off, then this has no effect.
 </para></listitem>
@@ -2354,11 +2387,19 @@ the above option is turned off, then this has no effect.
   <title>Menu options</title>
   <para>
 
-The <guilabel>Xterm here</guilabel> program is the command used when you choose
+<itemizedlist>
+
+<listitem><para><guilabel>Xterm here program</guilabel> is the command used when you choose
 <guimenuitem>Xterm here</guimenuitem> from the menu.
-You can replace it with another command such
-as <command>gnome-terminal</command>, <command>konsole</command>,
-or anything else.
+You can replace it with another command such as
+<command>gnome-terminal</command>, <command>konsole</command>, or anything
+else.</para></listitem>
+
+<listitem><para><guilabel>Size of icons in menus</guilabel> controls the size of the
+icons in the <guimenuitem>Send To</guimenuitem> and <guimenuitem>New</guimenuitem> menus.
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2634,7 +2675,8 @@ are suggested).
 <userinput>AppMenu</userinput>
 is a list of extra menu items to display for the application.
 When one is chosen, <filename>AppRun</filename> is called with
-<userinput>option</userinput> as its only argument.
+<userinput>option</userinput> as its only argument. You can nest
+AppMenus inside other AppMenus.
 </para></listitem>
 
 </itemizedlist>
@@ -2896,6 +2938,71 @@ the list).
 </sect1>
 </chapter>
 
+<appendix id="soap"><title>SOAP RPC</title>
+
+<para>When the filer starts you can use command-line options to control its behaviour.
+As an alternative to this, the filer allows you to specify operation as a
+<citation>SOAP</citation> RPC format message. In fact, if you use the command-line options,
+the filer converts to SOAP RPC internally.
+</para>
+
+<para>Currently, there is no advantage to this method, but in future this may provide
+a more flexible way to interface to the filer.</para>
+
+<para>All SOAP RPC messages are passed on standard input, like this:
+
+<screen>
+$ rox --RPC &lt;&lt; EOF
+&lt;?xml version="1.0"?&gt;
+&lt;env:Envelope xmlns:env="http://www.w3.org/2001/06/soap-envelope"&gt;
+  &lt;env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer"&gt;
+    &lt;Panel&gt;
+      &lt;Name&gt;Default&lt;/Name&gt;
+      &lt;Side&gt;Bottom&lt;/Side&gt;
+    &lt;/Panel&gt;
+  &lt;/env:Body&gt;
+&lt;/env:Envelope&gt;
+EOF
+</screen>
+
+The following methods are recognised:</para>
+
+<itemizedlist>
+
+<listitem><para><function>CloseDir(Filename)</function>
+Close directory Filename and all its subdirectories.
+</para></listitem>
+
+<listitem><para><function>Examine(Filename)</function>
+Filename may have changed &mdash; check it and update the display.
+</para></listitem>
+
+<listitem><para><function>OpenDir(Filename)</function>
+Open a window showing directory Filename.
+</para></listitem>
+
+<listitem><para><function>Panel(Name, Side)</function>
+Open the panel named Name on screen side Side (Top|Bottom|Left|Right).
+Name can be a name in Choices (eg, `MyPanel') or a full pathname.
+</para></listitem>
+
+<listitem><para><function>Pinboard(Name)</function>
+Display pinboard Name on the desktop background.
+Name can be a name in Choices (eg, `MyPinboard') or a full pathname.
+</para></listitem>
+
+<listitem><para><function>Run(Filename)</function>
+Run Filename as if it was clicked on in the filer.
+</para></listitem>
+
+<listitem><para><function>Show(Directory, Leafname)</function>
+Open Directory and flash the file Leafname inside it.
+</para></listitem>
+
+</itemizedlist>
+
+</appendix>
+
 <bibliography>
   <title>References</title>
 
@@ -2942,6 +3049,11 @@ the list).
 <bibliomixed>
   <abbrev>AVFS</abbrev><citetitle>AVFS - A Virtual File System,
   <ulink url="http://sourceforge.net/projects/avf/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+  <abbrev>SOAP</abbrev><citetitle>Simple Object Access Protocol (SOAP) 1.1
+  <ulink url="http://www.w3.org/TR/SOAP/"/></citetitle>
 </bibliomixed>
 
 </bibliography>

@@ -103,6 +103,7 @@ char *home_dir, *app_dir;
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
        "  -b, --bottom=PANEL	open PAN as a bottom-edge panel\n"	\
+       "  -c, --client-id=ID	used for session management\n"		\
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -D, --close=DIR	close DIR and its subdirectories\n"     \
        "  -h, --help		display this help and exit\n"		\
