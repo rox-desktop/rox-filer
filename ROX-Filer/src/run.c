@@ -46,6 +46,7 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond);
 static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
 static gboolean open_file(guchar *path, MIME_type *type);
 static void app_show_help(char *path);
+static void examine(guchar *path);
 
 typedef struct _PipedData PipedData;
 
@@ -387,14 +388,8 @@ void run_list(guchar *to_open)
 			case 'r':
 				panel_new(value, PANEL_RIGHT);
 				break;
-		        case 'i':
-			        update_all_icons();
-				break;
-		        case 'w':
-			        filer_check_mounted(value);
-				break;
-		        case 'W':
-			        filer_update_all();
+		        case 'x':
+				examine(value);
 				break;
 			default:
 				g_warning("Don't know how to handle '%s'",
@@ -578,3 +573,27 @@ static void app_show_help(char *path)
 		filer_opendir(help_dir);
 }
 
+/* Invoked using -x, this indicates that the filesystem has been modified
+ * and we should look at this item again.
+ */
+static void examine(guchar *path)
+{
+	struct stat info;
+
+	if (mc_stat(path, &info) != 0)
+	{
+		/* Deleted? Do a paranoid update of everything... */
+		filer_check_mounted(path);
+	}
+	else
+	{
+		/* Update directory containing this item... */
+		dir_check_this(path);
+
+		/* If this is itself directory then rescan its contents... */
+		refresh_dirs(path);
+
+		/* If it's on the pinboard, update the icon... */
+		icons_may_update(path);
+	}
+}

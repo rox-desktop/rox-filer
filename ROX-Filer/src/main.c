@@ -115,15 +115,13 @@ static void show_features(void);
        "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
-       "  -i, --icons           update all pinboard and panel icons\n"  \
-       "  -w, --window=DIR      update windows showing DIR\n" 		\
-       "  -W, --allwindows      update all currently open windows\n"    \
+       "  -x, --examine=FILE    FILE has changed - re-examine it\n"	\
        "  -v, --version		display the version information and exit\n"   \
        "\nThe latest version can be found at:\n"			\
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:s:hvnuiw:W"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -140,9 +138,7 @@ static struct option long_opts[] =
 	{"user", 0, NULL, 'u'},
 	{"new", 0, NULL, 'n'},
 	{"show", 1, NULL, 's'},
-	{"icons", 0, NULL, 'i'},
-	{"window", 1, NULL, 'w'},
-	{"allwindows", 0, NULL, 'W'},
+	{"examine", 1, NULL, 'x'},
 	{NULL, 0, NULL, 0},
 };
 #endif
@@ -341,7 +337,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
 			case 'd':
-		        case 'w':
+		        case 'x':
 				/* Argument is a path */
 				tmp = pathdup(VALUE);
 				g_string_append_c(to_open, '<');
@@ -382,12 +378,6 @@ int main(int argc, char **argv)
 				break;
 			case 'u':
 				show_user = TRUE;
-				break;
-		        case 'i':
-		        case 'W':
-			        g_string_append_c(to_open, '<');
-				g_string_append_c(to_open, c);
-				g_string_append_c(to_open, '>');
 				break;
 			default:
 				printf(_(USAGE));
