@@ -197,7 +197,6 @@ GtkWidget *toolbar_tool_option(int i)
 	gtk_container_add(GTK_CONTAINER(button), vbox);
 
 	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
-	gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
 
 	g_signal_connect_swapped(button, "clicked",
 			G_CALLBACK(toggle_shaded), vbox);
