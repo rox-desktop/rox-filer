@@ -71,6 +71,7 @@ Option o_small_width;
 Option o_display_show_hidden;
 Option o_display_show_thumbs;
 Option o_display_show_headers;
+Option o_display_show_full_type;
 Option o_display_inherit_options;
 static Option o_filer_change_size_num;
 
@@ -97,6 +98,7 @@ void display_init()
 	option_add_int(&o_display_show_hidden, "display_show_hidden", FALSE);
 	option_add_int(&o_display_show_thumbs, "display_show_thumbs", FALSE);
 	option_add_int(&o_display_show_headers, "display_show_headers", TRUE);
+	option_add_int(&o_display_show_full_type, "display_show_full_type", FALSE);
 	option_add_int(&o_display_inherit_options,
 		       "display_inherit_options", FALSE); 
 	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 

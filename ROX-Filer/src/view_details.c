@@ -377,16 +377,22 @@ static void details_get_value(GtkTreeModel *tree_model,
 			break;
 		case COL_TYPE:
 			g_value_init(value, G_TYPE_STRING);
-			g_value_set_string(value, 
-				item->flags & ITEM_FLAG_APPDIR? "App" :
-				S_ISDIR(m) ? "Dir" :
-				S_ISCHR(m) ? "Char" :
-				S_ISBLK(m) ? "Blck" :
-				S_ISLNK(m) ? "Link" :
-				S_ISSOCK(m) ? "Sock" :
-				S_ISFIFO(m) ? "Pipe" :
-				S_ISDOOR(m) ? "Door" :
-				"File");
+			if(o_display_show_full_type.int_value)
+				g_value_set_string(value, 
+						   item->flags & ITEM_FLAG_APPDIR? "Application" :
+						   mime_type_comment(item->mime_type));
+			else
+				g_value_set_string(value, 
+						   item->flags & ITEM_FLAG_APPDIR? "App" :
+						   S_ISDIR(m) ? "Dir" :
+						   S_ISCHR(m) ? "Char" :
+						   S_ISBLK(m) ? "Blck" :
+						   S_ISLNK(m) ? "Link" :
+						   S_ISSOCK(m) ? "Sock" :
+						   S_ISFIFO(m) ? "Pipe" :
+						   S_ISDOOR(m) ? "Door" :
+						   "File");
+			
 			break;
 		case COL_WEIGHT:
 			g_value_init(value, G_TYPE_INT);
@@ -1005,6 +1011,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	ADD_TEXT_COLUMN(_("_Type"), COL_TYPE);
 	gtk_tree_view_column_set_sort_column_id(column, COL_TYPE);
+	gtk_tree_view_column_set_resizable(column, TRUE);
 	ADD_TEXT_COLUMN(_("_Permissions"), COL_PERM);
 	ADD_TEXT_COLUMN(_("_Owner"), COL_OWNER);
 	gtk_tree_view_column_set_sort_column_id(column, COL_OWNER);
