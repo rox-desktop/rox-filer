@@ -60,8 +60,8 @@ void xtype_init(void)
 	if (!libc)
 		return;	/* Give up on xattr support */
 
-	(void *) dyn_setxattr = dlsym(libc, "setxattr");
-	(void *) dyn_getxattr = dlsym(libc, "setxattr");
+	dyn_setxattr = (void *) dlsym(libc, "setxattr");
+	dyn_getxattr = (void *) dlsym(libc, "getxattr");
 }
 
 MIME_type *xtype_get(const char *path)

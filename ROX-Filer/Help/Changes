@@ -2,6 +2,11 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+30-Jun-2004
+~~~~~~~~~~~
+Bugfix: On Linux, the filer called setxattr instead of getxattr, thus
+	preventing setting filetypes with extended attributes from working.
+
 29-Jun-2004
 ~~~~~~~~~~~
 Bugfix: On multi-monitor setups, filer windows always opened on the top/left
