@@ -54,6 +54,14 @@
 #include "type.h"
 #include "xtypes.h"
 
+#if defined(HAVE_GETXATTR)
+# define ATTR_MAN_PAGE N_("See the attr(5) man page for full details.")
+#elif defined(HAVE_ATTROPEN)
+# define ATTR_MAN_PAGE N_("See the fsattr(5) man page for full details.")
+#else
+# define ATTR_MAN_PAGE N_("You do not appear to have OS support.")
+#endif 
+
 /* Parent->Child messages are one character each:
  *
  * Y/N 		Yes/No button clicked
@@ -308,9 +316,11 @@ static void show_settype_help(gpointer data)
 "\n"
 "File types are only supported for regular files, not\n"
 "directories, devices, pipes or sockets, and then only\n"
-"on certain file systems and where the OS implements them.\n" 
-"\n"
-ATTR_MAN_PAGE));
+"on certain file systems and where the OS implements them.\n"));
+
+	text = gtk_label_new(_(ATTR_MAN_PAGE));
+	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(help)->vbox), text);
 
 	g_signal_connect(help, "response",
 			G_CALLBACK(gtk_widget_destroy), NULL);
