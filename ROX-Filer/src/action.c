@@ -1325,7 +1325,7 @@ static void do_copy2(const char *path, const char *dest)
 				  _("?Copy %s as %s?"), path, dest_path))
 			return;
 	}
-	else if (!o_brief)
+	else if (!o_brief || S_ISDIR(info.st_mode))
 		printf_send(_("'Copying %s as %s\n"), path, dest_path);
 
 	if (S_ISDIR(info.st_mode))
@@ -2130,6 +2130,9 @@ void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 		   _("Newer"),
 		   _("Only over-write if source is newer than destination."),
 		   'W', o_action_newer.int_value);
+	abox_add_flag(ABOX(abox),
+		_("Brief"), _("Only log directories as they are copied"),
+		'B', o_action_brief.int_value);
 
 	number_of_windows++;
 	gtk_widget_show(abox);
@@ -2163,6 +2166,9 @@ void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 		   _("Newer"),
 		   _("Only over-write if source is newer than destination."),
 		   'W', o_action_newer.int_value);
+	abox_add_flag(ABOX(abox),
+		_("Brief"), _("Don't log each file as it is moved"),
+		'B', o_action_brief.int_value);
 	number_of_windows++;
 	gtk_widget_show(abox);
 }
