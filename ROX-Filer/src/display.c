@@ -733,7 +733,6 @@ static void draw_item_large(GtkWidget *widget,
 	if (o_dirs_first) {	\
 		gboolean id1 = IS_A_DIR(i1);	\
 		gboolean id2 = IS_A_DIR(i2);	\
-		g_print("%s:%d - %s:%d\n", i1->leafname, id1, i2->leafname, id2);\
 		if (id1 && !id2) return -1;				\
 		if (id2 && !id1) return 1;				\
 	}
