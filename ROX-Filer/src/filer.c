@@ -180,6 +180,14 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 static void update_item(FilerWindow *filer_window, DirItem *item)
 {
 	int	i;
+	char	*leafname = item->leafname;
+
+	if (leafname[0] == '.')
+	{
+		if (filer_window->show_hidden == FALSE || leafname[1] == '\0'
+				|| (leafname[1] == '.' && leafname[2] == '\0'))
+		return;
+	}
 
 	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
 
@@ -1119,7 +1127,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->path = pathdup(path);
 
-	filer_window->directory = g_fscache_lookup(dir_cache, path);
+	filer_window->directory = g_fscache_lookup(dir_cache,
+						   filer_window->path);
 	if (!filer_window->directory)
 	{
 		char	*error;

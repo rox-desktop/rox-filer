@@ -27,7 +27,7 @@
 #include "dir.h"
 #include "fscache.h"
 #include "mount.h"
-#include "pixmaps.h"		/* TODO: Sort this out!! */
+#include "pixmaps.h"
 #include "filer.h"
 
 GFSCache *dir_cache = NULL;
@@ -113,7 +113,6 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 			{
 				if (dir->dir_handle)
 				{
-					g_print("[ stop ]\n");
 					closedir(dir->dir_handle);
 					dir->dir_handle = NULL;
 					gtk_idle_remove(dir->idle);
