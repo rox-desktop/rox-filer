@@ -102,26 +102,12 @@ static gboolean pinboard_drag_in_progress = FALSE;
 /* Used when dragging icons around... */
 static gboolean pinboard_modified = FALSE;
 
-/* Options bits */
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-static char *text_bg(char *data);
-static char *text_colours(char *data);
-static char *clamp_icons(char *data);
-static char *grid_step(char *data);
+typedef enum {
+	TEXT_BG_NONE = 0,
+	TEXT_BG_OUTLINE = 1,
+	TEXT_BG_SOLID = 2,
+} TextBgType;
 
-static OptionsSection options =
-{
-	N_("Pinboard options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
-};
-
-typedef enum {TEXT_BG_SOLID, TEXT_BG_OUTLINE, TEXT_BG_NONE} TextBgType;
 TextBgType o_text_bg = TEXT_BG_SOLID;
 gboolean o_clamp_icons = TRUE;
 static int o_grid_step = GRID_STEP_COARSE;
@@ -200,6 +186,7 @@ static void pin_help(gpointer data, guint action, GtkWidget *widget);
 static void pin_remove(gpointer data, guint action, GtkWidget *widget);
 static void show_pinboard_menu(GdkEventButton *event, Icon *icon);
 
+static void pinboard_check_options(void);
 
 static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
@@ -214,8 +201,6 @@ static GtkItemFactoryEntry menu_def[] = {
 
 static GtkWidget	*pinboard_menu;		/* The popup pinboard menu */
 
-
-
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -224,16 +209,20 @@ void pinboard_init(void)
 {
 	GtkStyle	*style;
 	
-	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("pinboard_text_bg", text_bg);
-	option_register("pinboard_text_colours", text_colours);
-	option_register("pinboard_clamp_icons", clamp_icons);
-	option_register("pinboard_grid_step", grid_step);
+	option_add_string("pinboard_fg_colour", "#000", NULL);
+	option_add_string("pinboard_bg_colour", "#ddd", NULL);
+
+	option_add_int("pinboard_text_bg", TEXT_BG_SOLID, NULL);
+	option_add_int("pinboard_clamp_icons", 1, NULL);
+	option_add_int("pinboard_grid_step", GRID_STEP_COARSE, NULL);
+	option_add_notify(pinboard_check_options);
 
 	style = gtk_widget_get_default_style();
 
-	memcpy(&text_fg_col, &style->fg[GTK_STATE_NORMAL], sizeof(GdkColor));
-	memcpy(&text_bg_col, &style->bg[GTK_STATE_NORMAL], sizeof(GdkColor));
+	gdk_color_parse(option_get_static_string("pinboard_fg_colour"),
+			&text_fg_col);
+	gdk_color_parse(option_get_static_string("pinboard_bg_colour"),
+			&text_bg_col);
 
 	pinboard_menu = menu_create(menu_def,
 				 sizeof(menu_def) / sizeof(*menu_def),
@@ -584,6 +573,35 @@ void pinboard_select_only(Icon *icon)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void pinboard_check_options(void)
+{
+	int		old_text_bg = o_text_bg;
+	GdkColor	n_fg, n_bg;
+
+	o_text_bg = option_get_int("pinboard_text_bg");
+	o_grid_step = option_get_int("pinboard_grid_step");
+	o_clamp_icons = option_get_int("pinboard_clamp_icons");
+
+	gdk_color_parse(option_get_static_string("pinboard_fg_colour"), &n_fg);
+	gdk_color_parse(option_get_static_string("pinboard_bg_colour"), &n_bg);
+
+	if (o_text_bg != old_text_bg ||
+		gdk_color_equal(&n_fg, &text_fg_col) == 0 ||
+		gdk_color_equal(&n_bg, &text_bg_col) == 0)
+	{
+		memcpy(&text_fg_col, &n_fg, sizeof(GdkColor));
+		memcpy(&text_bg_col, &n_bg, sizeof(GdkColor));
+
+		if (pinicon_style)
+		{
+			gtk_style_unref(pinicon_style);
+			pinicon_style = NULL;
+		}
+
+		reshape_all();
+	}
+}
 
 /* Icon's size, shape or appearance has changed - update the display */
 static void reshape_icon(Icon *icon)
@@ -994,9 +1012,7 @@ static guchar *create_uri_list(GList *list)
 	guchar	*leader;
 
 	tmp = g_string_new(NULL);
-	leader = g_strdup_printf("file://%s", o_no_hostnames
-						? ""
-						: our_host_name());
+	leader = g_strdup_printf("file://%s", our_host_name());
 
 	for (; list; list = list->next)
 	{
@@ -1435,7 +1451,7 @@ out:
 	 */
 
 	/* Don't allow drops to non-writeable directories */
-	if (o_spring_open == FALSE &&
+	if (option_get_int("dnd_spring_open") == FALSE &&
 			type == drop_dest_dir &&
 			access(icon->path, W_OK) != 0)
 	{
@@ -1512,8 +1528,7 @@ static void selection_get(GtkWidget *widget,
 	str = g_string_new(NULL);
 
 	if (info == TARGET_URI_LIST)
-		leader = g_strdup_printf("file://%s",
-				o_no_hostnames ? "" : our_host_name());
+		leader = g_strdup_printf("file://%s", our_host_name());
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
@@ -1575,245 +1590,6 @@ static void drag_end(GtkWidget *widget,
 		pinboard_clear_selection();
 		tmp_icon_selected = FALSE;
 	}
-}
-
-/*			OPTIONS BITS				*/
-
-static GtkToggleButton *radio_bg_none;
-static GtkToggleButton *radio_bg_outline;
-static GtkToggleButton *radio_bg_solid;
-static GtkToggleButton *radio_grid_fine;
-static GtkToggleButton *radio_grid_med;
-static GtkToggleButton *radio_grid_coarse;
-static GtkWidget *fg_colour_square, *bg_colour_square;
-static GtkWidget	*toggle_clamp_icons;
-
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options(void)
-{
-	GtkWidget	*vbox, *tog, *hbox, *label, *tog2;
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-
-	tog = gtk_radio_button_new_with_label(NULL, _("No background"));
-	radio_bg_none = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, _("The text is drawn directly on the desktop "
-			  "background."));
-	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
-
-	tog = gtk_radio_button_new_with_label(
-			gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
-			_("Outlined text"));
-	radio_bg_outline = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, _("The text has a thin outline around each letter."));
-	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
-
-	tog = gtk_radio_button_new_with_label(
-		gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
-		_("Rectangular background slab"));
-	radio_bg_solid = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, _("The text is drawn on a solid rectangle."));
-	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	label = gtk_label_new(_("Text colours: "));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, FALSE, 0);
-
-	label = gtk_label_new(_("Foreground"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	fg_colour_square = gtk_button_new();
-	make_colour_patch(fg_colour_square);
-	gtk_box_pack_start(GTK_BOX(hbox), fg_colour_square, FALSE, FALSE, 0);
-
-	label = gtk_label_new(_("Background"));
-	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, FALSE, 0);
-	bg_colour_square = gtk_button_new();
-	make_colour_patch(bg_colour_square);
-	gtk_box_pack_start(GTK_BOX(hbox), bg_colour_square, FALSE, FALSE, 0);
-
-	toggle_clamp_icons =
-	  gtk_check_button_new_with_label(
-	     _("Keep icons within screen limits"));
-	OPTION_TIP(toggle_clamp_icons,
-		   _("If this is set, pinboard icons are always kept "
-		     "completely within screen limits, including the label."));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_clamp_icons, FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			   gtk_label_new(_("Icon grid step: ")),
-			   FALSE, FALSE, 0);
-	tog2 = gtk_radio_button_new_with_label(NULL, _("Fine"));
-	radio_grid_fine = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 2-pixel grid for positioning icons "
-			   "on the desktop."));
-	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
-
-	tog2 = gtk_radio_button_new_with_label(
-			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
-			_("Medium"));
-	radio_grid_med = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 16-pixel grid for positioning icons "
-			   "on the desktop."));
-	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
-
-	tog2 = gtk_radio_button_new_with_label(
-			gtk_radio_button_group(GTK_RADIO_BUTTON(tog2)),
-			_("Coarse"));
-	radio_grid_coarse = GTK_TOGGLE_BUTTON(tog2);
-	OPTION_TIP(tog2, _("Use a 32-pixel grid for positioning icons "
-			   "on the desktop."));
-	gtk_box_pack_start(GTK_BOX(hbox), tog2, FALSE, TRUE, 0);
-
-	return vbox;
-}
-
-/* Reflect current state by changing the widgets in the options box */
-static void update_options()
-{
-	if (o_text_bg == TEXT_BG_SOLID)
-		gtk_toggle_button_set_active(radio_bg_solid, TRUE);
-	else if (o_text_bg == TEXT_BG_OUTLINE)
-		gtk_toggle_button_set_active(radio_bg_outline, TRUE);
-	else
-		gtk_toggle_button_set_active(radio_bg_none, TRUE);
-
-	if (o_grid_step == GRID_STEP_FINE)
-	    gtk_toggle_button_set_active(radio_grid_fine, TRUE);
-	else if (o_grid_step == GRID_STEP_MED)
-	    gtk_toggle_button_set_active(radio_grid_med, TRUE);
-	else
-	    gtk_toggle_button_set_active(radio_grid_coarse, TRUE);
-	    
-	button_patch_set_colour(fg_colour_square, &text_fg_col);
-	button_patch_set_colour(bg_colour_square, &text_bg_col);
-
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_clamp_icons),
-				     o_clamp_icons);
-}
-
-/* Set current values by reading the states of the widgets in the options box */
-static void set_options()
-{
-	GdkColor	*fg, *bg;
-	TextBgType	old = o_text_bg;
-	gboolean	colours_changed = FALSE;
-	
-	if (gtk_toggle_button_get_active(radio_bg_none))
-		o_text_bg = TEXT_BG_NONE;
-	else if (gtk_toggle_button_get_active(radio_bg_outline))
-		o_text_bg = TEXT_BG_OUTLINE;
-	else
-		o_text_bg = TEXT_BG_SOLID;
-
-	if (gtk_toggle_button_get_active(radio_grid_fine))
-	    o_grid_step = GRID_STEP_FINE;
-	else if (gtk_toggle_button_get_active(radio_grid_med))
-	    o_grid_step = GRID_STEP_MED;
-	else
-	    o_grid_step = GRID_STEP_COARSE;
-
-	fg = button_patch_get_colour(fg_colour_square);
-	bg = button_patch_get_colour(bg_colour_square);
-
-	if (gdk_color_equal(fg, &text_fg_col) == FALSE ||
-	    gdk_color_equal(bg, &text_bg_col) == FALSE)
-	{
-		colours_changed = TRUE;
-
-		text_fg_col.red = fg->red;
-		text_fg_col.green = fg->green;
-		text_fg_col.blue = fg->blue;
-
-		text_bg_col.red = bg->red;
-		text_bg_col.green = bg->green;
-		text_bg_col.blue = bg->blue;
-
-		if (pinicon_style)
-		{
-			gtk_style_unref(pinicon_style);
-			pinicon_style = NULL;
-		}
-	}
-
-	if ((colours_changed || o_text_bg != old) && current_pinboard)
-		reshape_all();
-
-	o_clamp_icons = gtk_toggle_button_get_active(
-			  GTK_TOGGLE_BUTTON(toggle_clamp_icons));
-}
-
-static void save_options()
-{
-	guchar	*str;
-
-	option_write("pinboard_text_bg",
-			o_text_bg == TEXT_BG_NONE ? "None" :
-			o_text_bg == TEXT_BG_OUTLINE ? "Outline" :
-			"Solid");
-
-	str = g_strdup_printf("%hx,%hx,%hx : %hx,%hx,%hx",
-			text_fg_col.red,
-			text_fg_col.green,
-			text_fg_col.blue,
-			text_bg_col.red,
-			text_bg_col.green,
-			text_bg_col.blue);
-	option_write("pinboard_text_colours", str);
-	option_write("pinboard_clamp_icons", o_clamp_icons ? "1" : "0");
-	option_write("pinboard_grid_step",
-		     o_grid_step == GRID_STEP_FINE ? "Fine" :
-		     o_grid_step == GRID_STEP_MED  ? "Medium" :
-		     "Coarse");
-	g_free(str);
-}
-
-static char *text_colours(char *data)
-{
-	if (sscanf(data, " %hx , %hx , %hx : %hx , %hx , %hx ",
-			&text_fg_col.red,
-			&text_fg_col.green,
-			&text_fg_col.blue,
-			&text_bg_col.red,
-			&text_bg_col.green,
-			&text_bg_col.blue) != 6)
-		return _("Bad colour format");
-	return NULL;
-}
-
-static char *text_bg(char *data)
-{
-	if (g_strcasecmp(data, "None") == 0)
-		o_text_bg = TEXT_BG_NONE;
-	else if (g_strcasecmp(data, "Outline") == 0)
-		o_text_bg = TEXT_BG_OUTLINE;
-	else if (g_strcasecmp(data, "Solid") == 0)
-		o_text_bg = TEXT_BG_SOLID;
-	else
-		return _("Unknown pinboard text background type");
-
-	return NULL;
-}
-
-static char *grid_step(char *data)
-{
-	if (g_strcasecmp(data, "Fine") == 0)
-		o_grid_step = GRID_STEP_FINE;
-	else if (g_strcasecmp(data, "Medium") == 0)
-		o_grid_step = GRID_STEP_MED;
-	else if (g_strcasecmp(data, "Coarse") == 0)
-		o_grid_step = GRID_STEP_COARSE;
-	else
-		return _("Unknown grid step size");
-
-	return NULL;
 }
 
 /* Something which affects all the icons has changed - reshape
@@ -1945,10 +1721,4 @@ static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 			_("First, select a single item to edit"));
 		return;
 	}
-}
-
-static char *clamp_icons(char *data)
-{
-  o_clamp_icons = atoi(data) != 0;
-  return NULL;
 }

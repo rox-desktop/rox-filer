@@ -64,16 +64,11 @@ GtkWidget *popup_menu = NULL;		/* Currently open menu */
 
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 
-/* Options */
-static GtkWidget *xterm_here_entry;
-char *xterm_here_value;
-
 /* Static prototypes */
 
 static void save_menus(void);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
-static char *load_xterm_here(char *data);
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new));
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
@@ -130,20 +125,6 @@ static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void select_if(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-
-static OptionsSection options =
-{
-	N_("Menu options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
-};
-
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
@@ -165,8 +146,8 @@ static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Large Icons"),   	NULL, large, 0, NULL},
-{">" N_("Small Icons"),   	NULL, small, 0, NULL},
+{">" N_("Large Icons"),   	NULL, large_with, DETAILS_NONE, NULL},
+{">" N_("Small Icons"),   	NULL, small_with, DETAILS_NONE, NULL},
 {">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
 {">>" N_("Summary"),		NULL, large_with, DETAILS_SUMMARY, NULL},
 {">>" N_("Sizes"),		NULL, large_with, DETAILS_SIZE, NULL},
@@ -275,7 +256,7 @@ do {									\
 	free_translated_entries(translated, n_entries);			\
 } while (0)
 
-void menu_init()
+void menu_init(void)
 {
 	char			*menurc;
 	GList			*items;
@@ -325,9 +306,8 @@ void menu_init()
 	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
-	options_sections = g_slist_prepend(options_sections, &options);
-	xterm_here_value = g_strdup("xterm");
-	option_register("xterm_here", load_xterm_here);
+	option_add_string("menu_xterm", "xterm", NULL);
+	option_add_saver(save_menus);
 
 	savebox = gtk_savebox_new();
 	gtk_signal_connect_object(GTK_OBJECT(savebox), "save_to_file",
@@ -363,60 +343,6 @@ GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
 	return menu;
 }
  
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options()
-{
-	GtkWidget	*table, *label;
-
-	table = gtk_table_new(2, 2, FALSE);
-	gtk_container_set_border_width(GTK_CONTAINER(table), 4);
-
-	label = gtk_label_new(
-			_("To set the keyboard short-cuts, simply open "
-			"the menu over a filer window, move the pointer over "
-			"the item you want to use and press a key. The key "
-			"will appear next to the menu item and you can just "
-			"press that key without opening the menu in future."));
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
-
-	label = gtk_label_new(_("'Xterm here' program:"));
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	xterm_here_entry = gtk_entry_new();
-	gtk_table_attach_defaults(GTK_TABLE(table), xterm_here_entry,
-			1, 2, 1, 2);
-
-	return table;
-}
-
-static char *load_xterm_here(char *data)
-{
-	g_free(xterm_here_value);
-	xterm_here_value = g_strdup(data);
-	return NULL;
-}
-
-static void update_options()
-{
-	gtk_entry_set_text(GTK_ENTRY(xterm_here_entry), xterm_here_value);
-}
-
-static void set_options()
-{
-	g_free(xterm_here_value);
-	xterm_here_value = g_strdup(gtk_entry_get_text(
-				GTK_ENTRY(xterm_here_entry)));
-}
-
-static void save_options()
-{
-	save_menus();
-	option_write("xterm_here", xterm_here_value);
-}
-
-
 static void items_sensitive(gboolean state)
 {
 	int	n = 7;
@@ -622,46 +548,14 @@ void target_callback(FilerWindow *filer_window,
 
 /* Actions */
 
-static void large(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_set_layout(window_with_focus, "Large");
-}
-
-static void small(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_set_layout(window_with_focus, "Small");
-}
-
-static void set_layout(gboolean large, DetailsType details)
-{
-	guchar	*style;
-
-	g_return_if_fail(window_with_focus != NULL);
-
-	style = g_strdup_printf("%s+%s",
-		large ? "Large" : "Small",
-		details == DETAILS_SUMMARY ? "Summary" :
-		details == DETAILS_TIMES ? "Times" :
-		details == DETAILS_PERMISSIONS ? "Permissions" :
-		details == DETAILS_TYPE ? "Type" :
-		"Sizes");
-
-	display_set_layout(window_with_focus, style);
-	g_free(style);
-}
-
 static void large_with(gpointer data, guint action, GtkWidget *widget)
 {
-	set_layout(TRUE, (DetailsType) action);
+	display_set_layout(window_with_focus, LARGE_ICONS, action);
 }
 
 static void small_with(gpointer data, guint action, GtkWidget *widget)
 {
-	set_layout(FALSE, (DetailsType) action);
+	display_set_layout(window_with_focus, SMALL_ICONS, action);
 }
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget)
@@ -1357,7 +1251,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
 	char	*argv[] = {NULL, NULL};
 
-	argv[0] = xterm_here_value;
+	argv[0] = option_get_static_string("menu_xterm");
 
 	g_return_if_fail(window_with_focus != NULL);
 

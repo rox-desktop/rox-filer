@@ -64,42 +64,10 @@
 #define MIN_TRUNCATE 0
 #define MAX_TRUNCATE 250
 
-/* This is a string so the saving code doesn't get out of sync (again ;-) */
-guchar *last_layout = NULL;
-
-gboolean last_show_hidden = FALSE;
-int (*last_sort_fn)(const void *a, const void *b) = sort_by_type;
-
 /* Options bits */
-static guchar *sort_fn_to_name(void);
-static void update_options_label(void);
-
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-static char *display_sort_nocase(char *data);
-static char *display_layout(char *data);
-static char *display_sort_by(char *data);
-static char *display_truncate(char *data);
-
-static OptionsSection options =
-{
-	N_("Display options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
-};
-
-static GtkWidget *display_label;
-
 static gboolean o_sort_nocase = TRUE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
-static GtkAdjustment *adj_small_truncate;
-static GtkAdjustment *adj_large_truncate;
-static GtkWidget *toggle_sort_nocase;
 
 /* Static prototypes */
 static void draw_item_large(GtkWidget *widget,
@@ -140,26 +108,54 @@ static gboolean test_point_small_full(Collection *collection,
 				FilerWindow *filer_window);
 static void display_details_set(FilerWindow *filer_window, DetailsType details);
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
+static void options_changed(void);
+
+enum {
+	SORT_BY_NAME = 0,
+	SORT_BY_TYPE = 1,
+	SORT_BY_DATE = 2,
+	SORT_BY_SIZE = 3,
+};
 
 void display_init()
 {
-	last_layout = g_strdup("Large");
+	option_add_int("display_sort_nocase", o_sort_nocase, NULL);
+	option_add_int("display_size", LARGE_ICONS, NULL);
+	option_add_int("display_details", DETAILS_NONE, NULL);
+	option_add_int("display_sort_by", SORT_BY_TYPE, NULL);
+	option_add_int("display_large_width", o_large_truncate, NULL);
+	option_add_int("display_small_width", o_small_truncate, NULL);
 
-	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("display_sort_nocase", display_sort_nocase);
-	option_register("display_layout", display_layout);
-	option_register("display_sort_by", display_sort_by);
-	option_register("display_truncate", display_truncate);
+	option_add_notify(options_changed);
 }
 
-#define BAR_SIZE(size) ((size) > 0 ? (log((size) + 1) * 16) : 0)
-#define MAX_BAR_SIZE 460
+static void options_changed(void)
+{
+	gboolean	old_case = o_sort_nocase;
+	GList		*next = all_filer_windows;
+
+	o_sort_nocase = option_get_int("display_sort_nocase");
+	o_large_truncate = option_get_int("display_large_width");
+	o_small_truncate = option_get_int("display_small_width");
+
+	while (next)
+	{
+		FilerWindow *filer_window = (FilerWindow *) next->data;
+
+		if (o_sort_nocase != old_case)
+		{
+			collection_qsort(filer_window->collection,
+					filer_window->sort_fn);
+		}
+		shrink_width(filer_window);
+
+		next = next->next;
+	}
+}
 
 static int details_width(FilerWindow *filer_window, DirItem *item)
 {
-	int	bar = 0;
-
-	return bar + fixed_width * strlen(details(filer_window, item));
+	return fixed_width * strlen(details(filer_window, item));
 }
 
 int calc_width(FilerWindow *filer_window, DirItem *item)
@@ -837,236 +833,31 @@ void display_set_sort_fn(FilerWindow *filer_window,
 		return;
 
 	filer_window->sort_fn = fn;
-	last_sort_fn = fn;
 
 	collection_qsort(filer_window->collection,
 			filer_window->sort_fn);
-
-	update_options_label();
 }
 
 /* Make 'layout' the default display layout.
  * If filer_window is not NULL then set the style for that window too.
  * FALSE if layout is invalid.
  */
-gboolean display_set_layout(FilerWindow *filer_window, guchar *layout)
+void display_set_layout(FilerWindow  *filer_window,
+			DisplayStyle style,
+			DetailsType  details)
 {
-	DisplayStyle	style = LARGE_ICONS;
-	DetailsType	details = DETAILS_SUMMARY;
+	g_return_if_fail(filer_window != NULL);
 
-	g_return_val_if_fail(layout != NULL, FALSE);
-			
-	if (g_strncasecmp(layout, "Large", 5) == 0)
+	if (details != DETAILS_NONE)
 	{
-		if (layout[5])
+		if (style == LARGE_ICONS)
 			style = LARGE_FULL_INFO;
 		else
-			style = LARGE_ICONS;
-	}
-	else if (g_strncasecmp(layout, "Small", 5) == 0)
-	{
-		if (layout[5])
 			style = SMALL_FULL_INFO;
-		else
-			style = SMALL_ICONS;
-	}
-	else
-		return FALSE;
-
-	if (layout[5])
-	{
-		if (g_strcasecmp(layout + 5, "+Summary") == 0)
-			details = DETAILS_SUMMARY;
-		else if (g_strcasecmp(layout + 5, "+Sizes") == 0)
-			details = DETAILS_SIZE;
-		else if (g_strcasecmp(layout + 5, "+Times") == 0)
-			details = DETAILS_TIMES;
-		else if (g_strcasecmp(layout + 5, "+Type") == 0)
-			details = DETAILS_TYPE;
-		else if (g_strcasecmp(layout + 5, "+Permissions") == 0)
-			details = DETAILS_PERMISSIONS;
-		else
-			return FALSE;
 	}
 
-	if (last_layout != layout)
-	{
-		g_free(last_layout);
-		last_layout = g_strdup(layout);
-	}
-	
-	if (filer_window)
-	{
-		display_style_set(filer_window, style);
-		if (layout[5])
-			display_details_set(filer_window, details);
-	}
-
-	return TRUE;
-}
-
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options()
-{
-	GtkWidget	*vbox, *hbox, *slide;
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-
-	display_label = gtk_label_new("<>");
-	gtk_label_set_line_wrap(GTK_LABEL(display_label), TRUE);
-	gtk_box_pack_start(GTK_BOX(vbox), display_label, FALSE, TRUE, 0);
-
-	toggle_sort_nocase =
-		gtk_check_button_new_with_label(_("Ignore case when sorting"));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_sort_nocase, FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new(_("Max Large Icons width")),
-			TRUE, TRUE, 0);
-	adj_large_truncate = GTK_ADJUSTMENT(gtk_adjustment_new(0,
-				MIN_TRUNCATE, MAX_TRUNCATE, 1, 10, 0));
-	slide = gtk_hscale_new(adj_large_truncate);
-	gtk_widget_set_usize(slide, MAX_TRUNCATE, 24);
-	gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
-	gtk_box_pack_start(GTK_BOX(hbox), slide, FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new(_("Max Small Icons width")),
-			TRUE, TRUE, 0);
-	adj_small_truncate = GTK_ADJUSTMENT(gtk_adjustment_new(0,
-				MIN_TRUNCATE, MAX_TRUNCATE, 1, 10, 0));
-	slide = gtk_hscale_new(adj_small_truncate);
-	gtk_widget_set_usize(slide, MAX_TRUNCATE, 24);
-	gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
-	gtk_box_pack_start(GTK_BOX(hbox), slide, FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	return vbox;
-}
-
-static void update_options_label(void)
-{
-	guchar	*str;
-	
-	str = g_strdup_printf(_("The last used display style (%s) and sort "
-			"function (Sort By %s) will be saved if you click on "
-			"Save."), last_layout, sort_fn_to_name());
-	gtk_label_set_text(GTK_LABEL(display_label), str);
-	g_free(str);
-}
-
-/* Reflect current state by changing the widgets in the options box */
-static void update_options()
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_sort_nocase),
-			o_sort_nocase);
-
-	gtk_adjustment_set_value(adj_small_truncate, o_small_truncate);
-	gtk_adjustment_set_value(adj_large_truncate, o_large_truncate);
-
-	update_options_label();
-}
-
-/* Set current values by reading the states of the widgets in the options box */
-static void set_options()
-{
-	gboolean	old_case = o_sort_nocase;
-	GList		*next = all_filer_windows;
-	
-	o_sort_nocase = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_sort_nocase));
-
-	o_small_truncate = adj_small_truncate->value;
-	o_large_truncate = adj_large_truncate->value;
-
-	while (next)
-	{
-		FilerWindow *filer_window = (FilerWindow *) next->data;
-
-		if (o_sort_nocase != old_case)
-		{
-			collection_qsort(filer_window->collection,
-					filer_window->sort_fn);
-		}
-		shrink_width(filer_window);
-
-		next = next->next;
-	}
-}
-
-static guchar *sort_fn_to_name(void)
-{
-	return last_sort_fn == sort_by_name ? _("Name") :
-		last_sort_fn == sort_by_type ? _("Type") :
-		last_sort_fn == sort_by_date ? _("Date") :
-		_("Size");
-}
-
-static void save_options()
-{
-	guchar	*tmp;
-
-	option_write("display_sort_nocase", o_sort_nocase ? "1" : "0");
-	option_write("display_layout", last_layout);
-	option_write("display_sort_by",
-		last_sort_fn == sort_by_name ? "Name" :
-		last_sort_fn == sort_by_type ? "Type" :
-		last_sort_fn == sort_by_date ? "Date" :
-			"Size");
-
-	tmp = g_strdup_printf("%d, %d", o_large_truncate, o_small_truncate);
-	option_write("display_truncate", tmp);
-	g_free(tmp);
-}
-
-static char *display_sort_nocase(char *data)
-{
-	o_sort_nocase = atoi(data) != 0;
-	return NULL;
-}
-
-static char *display_layout(char *data)
-{
-	if (display_set_layout(NULL, data))
-		return NULL;
-
-	return _("Unknown display style");
-}
-
-static char *display_sort_by(char *data)
-{
-	if (g_strcasecmp(data, "Name") == 0)
-		last_sort_fn = sort_by_name;
-	else if (g_strcasecmp(data, "Type") == 0)
-		last_sort_fn = sort_by_type;
-	else if (g_strcasecmp(data, "Date") == 0)
-		last_sort_fn = sort_by_date;
-	else if (g_strcasecmp(data, "Size") == 0)
-		last_sort_fn = sort_by_size;
-	else
-		return _("Unknown sort type");
-
-	return NULL;
-}
-
-static char *display_truncate(char *data)
-{
-	guchar	*comma;
-
-	comma = strchr(data, ',');
-	if (!comma)
-		return "Missing , in display_truncate";
-
-	o_large_truncate = CLAMP(atoi(data), MIN_TRUNCATE, MAX_TRUNCATE);
-	o_small_truncate = CLAMP(atoi(comma + 1), MIN_TRUNCATE, MAX_TRUNCATE);
-
-	return NULL;
+	display_style_set(filer_window, style);
+	display_details_set(filer_window, details);
 }
 
 /* Set the 'Show Hidden' flag for this window */
@@ -1076,7 +867,6 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 		return;
 
 	filer_window->show_hidden = hidden;
-	last_show_hidden = hidden;
 
 	filer_detach_rescan(filer_window);
 }
@@ -1123,7 +913,6 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details)
 	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
 	
 	shrink_width(filer_window);
-	update_options_label();
 }
 
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
@@ -1162,6 +951,4 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 	}
 
 	shrink_width(filer_window);
-
-	update_options_label();
 }

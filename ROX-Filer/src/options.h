@@ -10,31 +10,25 @@
 
 #include <gtk/gtk.h>
 
-#define OPTION_TIP(widget, tip)	\
-	gtk_tooltips_set_tip(option_tooltips, widget, tip, NULL)
-
-typedef char *OptionFunc(char *value);
-
-typedef struct _OptionsSection OptionsSection;
-
-struct _OptionsSection
-{
-	char 	*name;
-	GtkWidget *(*create)(void);	/* Create widgets */
-	void 	(*update)(void);	/* Update widgets */
-	void 	(*set)(void);		/* Read values from widgets */
-	void 	(*save)(void);		/* Save values to Choices */
-};
-
-extern GSList *options_sections;
-extern GtkTooltips *option_tooltips;
+typedef void OptionChanged(guchar *new_value);
+typedef void OptionNotify(void);
 
 /* Prototypes */
 
 void options_init(void);
-void option_register(guchar *key, OptionFunc *func);
+
+void option_add_int(guchar *key, int value, OptionChanged *changed);
+int option_get_int(guchar *key);
+
+void option_add_string(guchar *key, guchar *value, OptionChanged *changed);
+guchar *option_get_static_string(guchar *key);
+
+void option_add_notify(OptionNotify *callback);
+void option_add_saver(OptionNotify *callback);
+
 void options_load(void);
 void options_show(void);
-void option_write(guchar *name, guchar *value);
+
+void option_set_save(guchar *key, gboolean save);
 
 #endif /* _OPTIONS_H */

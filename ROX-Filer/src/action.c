@@ -47,34 +47,6 @@
 #include "dir.h"
 #include "icon.h"
 
-/* Options bits */
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-static char *action_auto_quiet(char *data);
-
-static OptionsSection options =
-{
-	N_("Action window options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
-};
-
-static gboolean o_auto_copy = TRUE;
-static gboolean o_auto_move = TRUE;
-static gboolean o_auto_link = TRUE;
-static gboolean o_auto_delete = FALSE;
-static gboolean o_auto_mount = TRUE;
-
-static GtkWidget *w_auto_copy = NULL;
-static GtkWidget *w_auto_move = NULL;
-static GtkWidget *w_auto_link = NULL;
-static GtkWidget *w_auto_delete = NULL;
-static GtkWidget *w_auto_mount = NULL;
-
 /* Parent->Child messages are one character each:
  *
  * Q/Y/N 	Quiet/Yes/No button clicked
@@ -154,120 +126,6 @@ static void do_mount(guchar *path, gboolean mount);
 static void add_toggle(GUIside *gui_side, guchar *label, guchar *code);
 static gboolean reply(int fd, gboolean ignore_quiet);
 static gboolean remove_pinned_ok(FilerWindow *filer_window);
-
-/*			OPTIONS 				*/
-
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options()
-{
-	GtkWidget	*vbox, *hbox, *label;
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-
-	label = gtk_label_new(_("Auto-start (Quiet) these actions:"));
-	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	w_auto_copy = gtk_check_button_new_with_label(_("Copy"));
-	gtk_box_pack_start(GTK_BOX(hbox), w_auto_copy, FALSE, TRUE, 0);
-	w_auto_move = gtk_check_button_new_with_label(_("Move"));
-	gtk_box_pack_start(GTK_BOX(hbox), w_auto_move, FALSE, TRUE, 0);
-	w_auto_link = gtk_check_button_new_with_label(_("Link"));
-	gtk_box_pack_start(GTK_BOX(hbox), w_auto_link, FALSE, TRUE, 0);
-	w_auto_delete = gtk_check_button_new_with_label(_("Delete"));
-	gtk_box_pack_start(GTK_BOX(hbox), w_auto_delete, FALSE, TRUE, 0);
-	w_auto_mount = gtk_check_button_new_with_label(_("Mount"));
-	gtk_box_pack_start(GTK_BOX(hbox), w_auto_mount, FALSE, TRUE, 0);
-
-	return vbox;
-}
-
-/* Reflect current state by changing the widgets in the options box */
-static void update_options()
-{
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_auto_copy),
-			o_auto_copy);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_auto_move),
-			o_auto_move);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_auto_link),
-			o_auto_link);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_auto_delete),
-			o_auto_delete);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(w_auto_mount),
-			o_auto_mount);
-}
-
-/* Set current values by reading the states of the widgets in the options box */
-static void set_options()
-{
-	o_auto_copy = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(w_auto_copy));
-	o_auto_move = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(w_auto_move));
-	o_auto_link = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(w_auto_link));
-	o_auto_delete = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(w_auto_delete));
-	o_auto_mount = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(w_auto_mount));
-}
-
-static void save_options()
-{
-	guchar	str[] = "cmldt";
-
-	if (o_auto_copy)
-		str[0] = 'C';
-	if (o_auto_move)
-		str[1] = 'M';
-	if (o_auto_link)
-		str[2] = 'L';
-	if (o_auto_delete)
-		str[3] = 'D';
-	if (o_auto_mount)
-		str[4] = 'T';
-
-	option_write("action_auto_quiet", str);
-}
-
-static char *action_auto_quiet(char *data)
-{
-	while (*data)
-	{
-		guchar	c = *data++;
-		gboolean state;
-
-		state = isupper(c);
-
-		switch (tolower(c))
-		{
-			case 'c':
-				o_auto_copy = state;
-				break;
-			case 'm':
-				o_auto_move = state;
-				break;
-			case 'l':
-				o_auto_link = state;
-				break;
-			case 'd':
-				o_auto_delete = state;
-				break;
-			case 't':
-				o_auto_mount = state;
-				break;
-			default:
-				return _("Unknown flag");
-		}
-	}
-	
-	return NULL;
-}
 
 /*			SUPPORT				*/
 
@@ -698,7 +556,7 @@ static gboolean read_exact(int source, char *buffer, ssize_t len)
 }
 
 /* Send 'message' to our parent process. TRUE on success. */
-static gboolean send()
+static gboolean send(void)
 {
 	char len_buffer[5];
 	ssize_t len;
@@ -719,7 +577,7 @@ static gboolean send_dir(char *dir)
 	return send();
 }
 
-static gboolean send_error()
+static gboolean send_error(void)
 {
 	g_string_sprintf(message, "!%s: %s\n", _("ERROR"), g_strerror(errno));
 	return send();
@@ -2004,7 +1862,8 @@ void action_mount(GList	*paths)
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
 
-	gui_side = start_action(paths, mount_cb, o_auto_mount);
+	gui_side = start_action(paths, mount_cb,
+					option_get_int("action_mount"));
 	if (!gui_side)
 		return;
 
@@ -2037,7 +1896,8 @@ void action_delete(FilerWindow *filer_window)
 	if (!remove_pinned_ok(filer_window))
 		return;
 
-	gui_side = start_action(filer_window, delete_cb, o_auto_delete);
+	gui_side = start_action(filer_window, delete_cb,
+					option_get_int("action_delete"));
 	if (!gui_side)
 		return;
 
@@ -2136,7 +1996,7 @@ void action_copy(GSList *paths, char *dest, char *leaf)
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_copy;
-	gui_side = start_action(paths, list_cb, o_auto_copy);
+	gui_side = start_action(paths, list_cb, option_get_int("action_copy"));
 	if (!gui_side)
 		return;
 
@@ -2153,7 +2013,7 @@ void action_move(GSList *paths, char *dest, char *leaf)
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_move;
-	gui_side = start_action(paths, list_cb, o_auto_move);
+	gui_side = start_action(paths, list_cb, option_get_int("action_move"));
 	if (!gui_side)
 		return;
 
@@ -2168,7 +2028,7 @@ void action_link(GSList *paths, char *dest)
 
 	action_dest = dest;
 	action_do_func = do_link;
-	gui_side = start_action(paths, list_cb, o_auto_link);
+	gui_side = start_action(paths, list_cb, option_get_int("action_link"));
 	if (!gui_side)
 		return;
 
@@ -2179,8 +2039,11 @@ void action_link(GSList *paths, char *dest)
 
 void action_init(void)
 {
-	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("action_auto_quiet", action_auto_quiet);
+	option_add_int("action_copy", 1, NULL);
+	option_add_int("action_move", 1, NULL);
+	option_add_int("action_link", 1, NULL);
+	option_add_int("action_delete", 0, NULL);
+	option_add_int("action_mount", 1, NULL);
 }
 
 #define MAX_ASK 4

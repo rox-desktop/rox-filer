@@ -62,26 +62,6 @@ GList		*all_filer_windows = NULL;
 
 static FilerWindow *window_with_selection = NULL;
 
-/* Options bits */
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-static char *filer_unique_windows(char *data);
-static char *filer_initial_window_height(char *data);
-
-static OptionsSection options =
-{
-	N_("Filer window options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
-};
-
-gboolean o_unique_filer_windows = FALSE;
-static GtkWidget *toggle_unique_filer_windows;
-
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
@@ -113,22 +93,29 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
 static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
 
+static void set_unique(guchar *unique);
+
 static GdkAtom xa_string;
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
 
+gboolean o_unique_filer_windows = FALSE;
+
 void filer_init(void)
 {
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
-	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("filer_unique_windows", filer_unique_windows);
-	option_register("filer_initial_window_height",
-						filer_initial_window_height);
+	option_add_int("filer_unique_windows", o_unique_filer_windows,
+			set_unique);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
+}
+
+static void set_unique(guchar *unique)
+{
+	o_unique_filer_windows = atoi(unique);
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -868,8 +855,7 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 	int i, num_selected;
 
 	leader = g_string_new("file://");
-	if (!o_no_hostnames)
-		g_string_append(leader, our_host_name());
+	g_string_append(leader, our_host_name());
 	g_string_append(leader, filer_window->path);
 	if (leader->str[leader->len - 1] != '/')
 		g_string_append_c(leader, '/');
@@ -899,6 +885,7 @@ FilerWindow *filer_opendir(char *path)
 {
 	FilerWindow	*filer_window;
 	char		*real_path;
+	int		i;
 	
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -934,9 +921,15 @@ FilerWindow *filer_opendir(char *path)
 		return NULL;
 	}
 
-	filer_window->show_hidden = last_show_hidden;
+	filer_window->show_hidden = FALSE;
 	filer_window->temp_item_selected = FALSE;
-	filer_window->sort_fn = last_sort_fn;
+
+	i = option_get_int("display_sort_by");
+	filer_window->sort_fn = i == 0 ? sort_by_name :
+				i == 1 ? sort_by_type :
+				i == 2 ? sort_by_date :
+				sort_by_size;
+		
 	filer_window->flags = (FilerFlags) 0;
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
@@ -947,7 +940,9 @@ FilerWindow *filer_opendir(char *path)
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
-	display_set_layout(filer_window, last_layout);
+	display_set_layout(filer_window,
+			option_get_int("display_size"),
+			option_get_int("display_details"));
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to
@@ -981,6 +976,7 @@ FilerWindow *filer_opendir(char *path)
 	/* If the user doesn't want duplicate windows then check
 	 * for an existing one and close it if found.
 	 */
+
 	if (o_unique_filer_windows)
 	{
 		FilerWindow *fw;
@@ -1152,61 +1148,6 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
 	else
 		gtk_timeout_add(300, (GtkFunction) clear_scanning_display,
 				filer_window);
-}
-
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options(void)
-{
-	GtkWidget	*vbox;
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-
-	toggle_unique_filer_windows =
-		gtk_check_button_new_with_label(_("Unique windows"));
-	OPTION_TIP(toggle_unique_filer_windows,
-			_("If you open a directory and that directory is "
-			"already displayed in another window, then this "
-			"option causes the other window to be closed."));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
-			FALSE, TRUE, 0);
-
-	return vbox;
-}
-
-/* Reflect current state by changing the widgets in the options box */
-static void update_options()
-{
-	gtk_toggle_button_set_active(
-			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
-			o_unique_filer_windows);
-}
-
-/* Set current values by reading the states of the widgets in the options box */
-static void set_options()
-{
-	o_unique_filer_windows = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows));
-}
-
-static void save_options()
-{
-	option_write("filer_unique_windows",
-			o_unique_filer_windows ? "1" : "0");
-}
-
-static char *filer_unique_windows(char *data)
-{
-	o_unique_filer_windows = atoi(data) != 0;
-	return NULL;
-}
-
-static char *filer_initial_window_height(char *data)
-{
-	/* (ignore - old) */
-	return NULL;
 }
 
 /* Note that filer_window may not exist after this call. */

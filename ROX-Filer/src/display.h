@@ -18,14 +18,15 @@
 #include <dirent.h>
 
 typedef enum {
-	UNKNOWN_STYLE,
-	LARGE_ICONS,
-	SMALL_ICONS,
+	LARGE_ICONS = 0,
+	SMALL_ICONS = 1,
 	LARGE_FULL_INFO,
 	SMALL_FULL_INFO,
+	UNKNOWN_STYLE,
 } DisplayStyle;
 
 typedef enum {
+	DETAILS_NONE,		/* Used in options */
 	DETAILS_SUMMARY,
 	DETAILS_SIZE,
 	DETAILS_PERMISSIONS,
@@ -40,7 +41,9 @@ extern int (*last_sort_fn)(const void *a, const void *b);
 /* Prototypes */
 void display_init();
 char *details(FilerWindow *filer_window, DirItem *item);
-gboolean display_set_layout(FilerWindow *filer_window, guchar *layout);
+void display_set_layout(FilerWindow  *filer_window,
+			DisplayStyle style,
+			DetailsType  details);
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);

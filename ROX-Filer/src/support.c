@@ -40,6 +40,7 @@
 #include "global.h"
 
 #include "main.h"
+#include "options.h"
 #include "support.h"
 #include "my_vfs.h"
 
@@ -85,9 +86,12 @@ GString *make_path(char *dir, char *leaf)
 }
 
 /* Return our complete host name */
-char *our_host_name()
+char *our_host_name(void)
 {
 	static char *name = NULL;
+
+	if (option_get_int("dnd_no_hostnames"))
+		return "";
 
 	if (!name)
 	{
@@ -604,8 +608,32 @@ gboolean is_sub_dir(char *sub, char *parent)
 			*slash = '\0';
 	}
 
+	g_free(real_sub);
+	g_free(real_parent);
 	g_free(sub);
+
+	return retval;
+}
+
+/* True if the string 'list' contains 'item'.
+ * Eg ("close", "close, help") -> TRUE
+ */
+gboolean in_list(guchar *item, guchar *list)
+{
+	int	len;
+
+	len = strlen(item);
+	
+	while (*list)
+	{
+		if (strncmp(item, list, len) == 0 && !isalpha(list[len]))
+			return TRUE;
+		list = strchr(list, ',');
+		if (!list)
+			return FALSE;
+		while (isspace(*++list))
+			;
+	}
 
 	return FALSE;
 }
-

@@ -34,6 +34,7 @@
 #include "global.h"
 
 #include "panel.h"
+#include "options.h"
 #include "choices.h"
 #include "main.h"
 #include "gui_support.h"
@@ -1063,7 +1064,7 @@ out:
 	 */
 
 	/* Don't allow drops to non-writeable directories */
-	if (o_spring_open == FALSE &&
+	if (option_get_int("dnd_spring_open") == FALSE &&
 			type == drop_dest_dir &&
 			access(icon->path, W_OK) != 0)
 	{
@@ -1322,8 +1323,7 @@ static void selection_get(GtkWidget *widget,
 	str = g_string_new(NULL);
 
 	if (info == TARGET_URI_LIST)
-		leader = g_strdup_printf("file://%s",
-				o_no_hostnames ? "" : our_host_name());
+		leader = g_strdup_printf("file://%s", our_host_name());
 
 	for (next = panel_selection; next; next = next->next)
 	{
@@ -1555,9 +1555,7 @@ static guchar *create_uri_list(GList *list)
 	guchar	*leader;
 
 	tmp = g_string_new(NULL);
-	leader = g_strdup_printf("file://%s", o_no_hostnames
-						? ""
-						: our_host_name());
+	leader = g_strdup_printf("file://%s", our_host_name());
 
 	for (; list; list = list->next)
 	{

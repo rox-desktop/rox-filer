@@ -1,0 +1,177 @@
+<?xml version="1.0"?>
+<options>
+
+<section name="pinboard" title="Pinboard options">
+<radio-group name="text_bg">
+<radio label="No background" value="0">
+The text is drawn directly on the desktop background.
+</radio>
+<radio label="Outlined text" value="1">
+The text has a thin outline around each letter.
+</radio>
+<radio label="Rectangular background slab" value="2">
+The text is drawn on a solid rectangle.
+</radio>
+</radio-group>
+
+<hbox label="Text colours:">
+<colour name="fg_colour" label="Foreground"/>
+<colour name="bg_colour" label="Background"/>
+</hbox>
+
+<toggle name="clamp_icons" label="Keep icons within screen limits">
+If this is set, pinboard icons are always kept completely within screen limits, including the label.
+</toggle>
+
+<hbox label="Icon grid step:">
+<radio-group name="grid_step">
+<radio label="Fine" value="2">
+Use a 2-pixel grid for positioning icons on the desktop.
+</radio>
+<radio label="Medium" value="16">
+Use a 16-pixel grid for positioning icons on the desktop.
+</radio>
+<radio label="Coarse" value="32">
+Use a 32-pixel grid for positioning icons on the desktop.
+</radio>
+</radio-group>
+</hbox>
+
+</section>
+
+<section name="action" title="Action window options">
+<label>Auto-start (Quiet) these actions:</label>
+<hbox>
+<toggle name="copy" label="Copy"/>
+<toggle name="move" label="Move"/>
+<toggle name="link" label="Link"/>
+<toggle name="delete" label="Delete"/>
+<toggle name="mount" label="Mount"/>
+</hbox>
+</section>
+
+<section name="display" title="Display options">
+
+<toggle name="sort_nocase" label="Ignore case when sorting">
+If off: animal, zoo, Ben.
+If on: animal, Ben, zoo.
+</toggle>
+
+<slider name="large_width" label="Max Large Icons width" min="0" max="250" fixed="1">
+Maximum width for the text under a Large Icon.
+</slider>
+
+<slider name="small_width" label="Max Small Icons width" min="0" max="250" fixed="1">
+Maximum width for the text beside a Small Icon.
+</slider>
+
+<label>Default settings for new windows</label>
+<hbox>
+<menu name="size" label="Icon size">
+<item value="0" label="Large Icons"/>
+<item value="1" label="Small Icons"/>
+</menu>
+
+<menu name="details" label="Details">
+<item value="0" label="No details"/>
+<item value="1" label="Summary"/>
+<item value="2" label="Sizes"/>
+<item value="3" label="Permissions"/>
+<item value="4" label="Type"/>
+<item value="5" label="Times"/>
+</menu>
+</hbox>
+
+<menu name="sort_by" label="Sort by">
+<item value="0" label="Name"/>
+<item value="1" label="Type"/>
+<item value="2" label="Date"/>
+<item value="3" label="Size"/>
+</menu>
+</section>
+
+<section name="toolbar" title="Toolbar options">
+<label>Unshade the tools you want:</label>
+<tool-options name="disable"/>
+
+<menu label="Toolbar type" name="type">
+<item value="0" label="None"/>
+<item value="1" label="Small"/>
+<item value="2" label="Large"/>
+</menu>
+
+</section>
+
+<section name="filer" title="Filer window options">
+
+<toggle label="Unique windows" name="unique_windows">
+If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.
+</toggle>
+
+</section>
+
+<section name="dnd" title="Drag and Drop options">
+
+<toggle name="no_hostnames" label="Don't use hostnames">
+Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.
+</toggle>
+
+<toggle name="drag_to_icons" label="Allow dragging to icons in filer windows">
+When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.
+</toggle>
+
+<toggle name="spring_open" label="Directories spring open">
+This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.
+</toggle>
+
+<slider name="spring_delay" label="Spring delay" min="100" max="2000">
+This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.
+</slider>
+
+</section>
+
+<section name="menu" title="Menu options">
+
+<label>
+To set the keyboard short-cuts, simply open the
+menu over a filer window, move the pointer over
+the item you want to use and press a key. The key
+will appear next to the menu item and you can just
+press that key without opening the menu in future.
+</label>
+
+<entry label="`Xterm Here' program:" name="xterm">
+The program to launch when you choose `Xterm Here' from the menu.
+</entry>
+
+</section>
+
+<section name="bind" title="Mouse bindings">
+
+<toggle name="new_button_1" label="New window on button 1 (RISC OS style)">
+Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.
+</toggle>
+
+<toggle name="menu_button_2" label="Menu on button 2 (RISC OS style)">
+Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.
+</toggle>
+
+<toggle name="single_click" label="Single-click navigation">
+Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.
+</toggle>
+
+</section>
+
+<section name="i18n" title="Translation options">
+
+<menu label="Translation" name="translation">
+<item value="None" label="None"/>
+<item value="LANG" label="From LANG"/>
+<item value="fr" label="French"/>
+<item value="it" label="Italian"/>
+<item value="nl" label="Dutch"/>
+</menu>
+
+</section>
+
+</options>

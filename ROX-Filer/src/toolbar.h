@@ -22,5 +22,6 @@ extern ToolbarType o_toolbar;
 /* Prototypes */
 void toolbar_init(void);
 GtkWidget *toolbar_new(FilerWindow *filer_window);
+GtkWidget *toolbar_tool_option(int i);
 
 #endif /* _TOOLBAR_H */

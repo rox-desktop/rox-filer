@@ -23,6 +23,26 @@ esac
 $3
 ], [$4])])
 
+dnl rox_CHECK_EXISTS(PROGRAM, ERROR)
+dnl Ensure that PROGRAM is in PATH.
+dnl Stops and displays ERROR if it's missing.
+AC_DEFUN(rox_CHECK_EXISTS, [
+changequote(,)dnl
+AC_MSG_CHECKING(for $1)
+if [ -x "`which \"$1\" 2> /dev/null`" ]; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+changequote([,])dnl
+  AC_MSG_ERROR([*** Missing program ***
+
+$1 failed to run - make sure it is inside one of the
+directories in your PATH environment variable!
+]
+$2)
+fi
+])
+
 dnl Checks for programs.
 AC_PROG_CC
 
@@ -36,24 +56,23 @@ if test "x$GCC" = "xyes"; then
 fi
 changequote([,])dnl
 
-dnl Find GLib (needed for future tests)
-AC_MSG_CHECKING(for GLib library)
-if test -z "$GLIB_CONFIG"; then
-  GLIB_CONFIG=glib-config
-fi
-GLIB_LIBS=`$GLIB_CONFIG --libs`
-changequote(,)dnl
-if [ -n "$GLIB_LIBS" ]; then
-  AC_MSG_RESULT(yes - use '$GLIB_LIBS')
-else
-  AC_MSG_ERROR(can't run '$GLIB_CONFIG --libs' - make sure it is in your PATH)
-fi
-changequote([,])dnl
-
 if test -z "$GTK_CONFIG"; then
   GTK_CONFIG=gtk-config
 fi
 AC_SUBST(GTK_CONFIG)
+
+if test -z "$XML_CONFIG"; then
+  XML_CONFIG=xml-config
+fi
+AC_SUBST(XML_CONFIG)
+
+dnl Warn the user if stuff is missing...
+rox_CHECK_EXISTS([$GTK_CONFIG],
+		 [You need to install the gtk-devel package before compiling:
+		  http://www.gtk.org])
+rox_CHECK_EXISTS([$XML_CONFIG],
+		 [You need to install the xml-devel package before compiling:
+		  http://www.gnome.org])
 
 dnl Make sure we have gdk-pixbuf
 AC_MSG_CHECKING(for gdk-pixbuf library)

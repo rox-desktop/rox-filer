@@ -376,15 +376,17 @@ int main(int argc, char **argv)
 		g_free(dir);
 	}
 
+	option_add_int("dnd_no_hostnames", 1, NULL);
+
 	gui_support_init();
 	if (remote_init(to_open, new_copy))
 		return EXIT_SUCCESS;	/* Already running */
 	pixmaps_init();
 
+	dnd_init();
 	bind_init();
 	dir_init();
 	menu_init();
-	dnd_init();
 	filer_init();
 	toolbar_init();
 	display_init();

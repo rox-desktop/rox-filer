@@ -50,29 +50,10 @@ struct _Tool {
 	gboolean	enabled;
 	MaskedPixmap	*icon;
 	GtkWidget	**menu;		/* Right-click menu widget addr */
-	GtkWidget	*option_button;	/* Button in the Options window */
-};
-
-/* Options bits */
-static GtkWidget *create_options();
-static void update_options();
-static void set_options();
-static void save_options();
-static char *toolbar_type(char *data);
-static char *toolbar_disable(char *data);
-
-static OptionsSection options =
-{
-	N_("Toolbar options"),
-	create_options,
-	update_options,
-	set_options,
-	save_options
 };
 
 ToolbarType o_toolbar = TOOLBAR_NORMAL;
 
-static GtkWidget *menu_toolbar;
 static GtkTooltips *tooltips = NULL;
 
 /* TRUE if the button presses (or released) should open a new window,
@@ -108,37 +89,38 @@ static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
 static void recreate_toolbar(FilerWindow *filer_window);
+static void toggle_shaded(GtkWidget *widget);
+static void option_notify(void);
 
 static Tool all_tools[] = {
 	{N_("Close"), "close", N_("Close filer window"),
 	 toolbar_close_clicked, DROP_NONE, FALSE,
-	 NULL, NULL, NULL},
+	 NULL, NULL},
 	 
 	{N_("Up"), "up", N_("Change to parent directory"),
 	 toolbar_up_clicked, DROP_TO_PARENT, TRUE,
-	 NULL, NULL, NULL},
+	 NULL, NULL},
 	 
 	{N_("Home"), "home", N_("Change to home directory"),
 	 toolbar_home_clicked, DROP_TO_HOME, TRUE,
-	 NULL, NULL, NULL},
+	 NULL, NULL},
 	
 	{N_("Scan"), "refresh", N_("Rescan directory contents"),
 	 toolbar_refresh_clicked, DROP_NONE, TRUE,
-	 NULL, NULL, NULL},
+	 NULL, NULL},
 	
 	{N_("Large"), "large", N_("Display using large icons"),
 	 toolbar_large_clicked, DROP_NONE, TRUE,
-	 NULL, &display_large_menu, NULL},
+	 NULL, &display_large_menu},
 	
 	{N_("Small"), "small", N_("Display using small icons"),
 	 toolbar_small_clicked, DROP_NONE, TRUE,
-	 NULL, &display_small_menu, NULL},
+	 NULL, &display_small_menu},
 
 	{N_("Help"), "help", N_("Show ROX-Filer help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
-	 NULL, NULL, NULL},
+	 NULL, NULL},
 };
-
 
 
 /****************************************************************
@@ -149,10 +131,10 @@ void toolbar_init(void)
 {
 	int	i;
 	
-	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("toolbar_type", toolbar_type);
-	option_register("toolbar_disable", toolbar_disable);
-
+	option_add_int("toolbar_type", o_toolbar, NULL);
+	option_add_string("toolbar_disable", "close", NULL);
+	option_add_notify(option_notify);
+	
 	tooltips = gtk_tooltips_new();
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
@@ -171,6 +153,47 @@ void toolbar_init(void)
 	}
 }
 
+/* Returns a button which can be used to turn a tool on and off.
+ * Button has 'tool_name' set to the tool's name.
+ * NULL if tool number i is too big.
+ */
+GtkWidget *toolbar_tool_option(int i)
+{
+	Tool		*tool = &all_tools[i];
+	GtkWidget	*button;
+	GtkWidget	*icon_widget, *vbox, *text;
+
+	g_return_val_if_fail(i >= 0, NULL);
+
+	if (i >= sizeof(all_tools) / sizeof(*all_tools))
+		return NULL;
+
+	button = gtk_button_new();
+	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
+	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
+
+	icon_widget = gtk_pixmap_new(tool->icon->pixmap,
+				     tool->icon->mask);
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
+
+	text = gtk_label_new(_(tool->label));
+	gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, TRUE, 0);
+
+	gtk_container_add(GTK_CONTAINER(button), vbox);
+
+	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
+	gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
+
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+		GTK_SIGNAL_FUNC(toggle_shaded), GTK_OBJECT(vbox));
+
+	gtk_object_set_data(GTK_OBJECT(button), "tool_name", tool->name);
+
+	return button;
+}
+
 /* Create a new toolbar widget, suitable for adding to a filer window,
  * and return it.
  */
@@ -181,7 +204,6 @@ GtkWidget *toolbar_new(FilerWindow *filer_window)
 
 	return create_toolbar(filer_window);
 }
-
 
 
 /****************************************************************
@@ -255,12 +277,12 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 static void toolbar_large_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	display_set_layout(filer_window, "Large");
+	display_set_layout(filer_window, LARGE_ICONS, DETAILS_NONE);
 }
 
 static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	display_set_layout(filer_window, "Small");
+	display_set_layout(filer_window, SMALL_ICONS, DETAILS_NONE);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
@@ -401,226 +423,6 @@ static void toggle_shaded(GtkWidget *widget)
 	gtk_widget_set_sensitive(widget, !GTK_WIDGET_SENSITIVE(widget));
 }
 
-/* Build up some option widgets to go in the options dialog, but don't
- * fill them in yet.
- */
-static GtkWidget *create_options(void)
-{
-	int		i;
-	GtkWidget	*vbox, *menu, *hbox;
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
-
-	gtk_box_pack_start(GTK_BOX(vbox),
-			gtk_label_new(_("Unshade the tools you want:")),
-			FALSE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool		*tool = &all_tools[i];
-		GtkWidget	*button;
-		GtkWidget	*icon_widget, *vbox, *text;
-
-		button = gtk_button_new();
-		GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
-		gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
-
-		icon_widget = gtk_pixmap_new(tool->icon->pixmap,
-					     tool->icon->mask);
-
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
-
-		text = gtk_label_new(_(tool->label));
-		gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, TRUE, 0);
-
-		gtk_container_add(GTK_CONTAINER(button), vbox);
-
-		gtk_container_set_border_width(GTK_CONTAINER(button), 1);
-		gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
-		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
-
-		tool->option_button = button;
-
-		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(toggle_shaded), GTK_OBJECT(vbox));
-	}
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new(_("Toolbar type")),
-			FALSE, TRUE, 0);
-	menu_toolbar = gtk_option_menu_new();
-	menu = gtk_menu_new();
-	gtk_menu_append(GTK_MENU(menu),
-			gtk_menu_item_new_with_label(_("None")));
-	gtk_menu_append(GTK_MENU(menu),
-			gtk_menu_item_new_with_label(_("Normal")));
-	gtk_menu_append(GTK_MENU(menu),
-			gtk_menu_item_new_with_label(_("Large")));
-	gtk_option_menu_set_menu(GTK_OPTION_MENU(menu_toolbar), menu);
-	gtk_box_pack_start(GTK_BOX(hbox), menu_toolbar, TRUE, TRUE, 0);
-
-	return vbox;
-}
-
-/* Reflect current state by changing the widgets in the options box */
-static void update_options()
-{
-	int	i;
-
-	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool		*tool = &all_tools[i];
-
-		gtk_widget_set_sensitive(GTK_BIN(tool->option_button)->child,
-				tool->enabled);
-	}
-}
-
-/* Set current values by reading the states of the widgets in the options box */
-static void set_options()
-{
-	GtkWidget 	*item, *menu;
-	GList		*list;
-	int		i;
-	gboolean	changed = FALSE;
-	ToolbarType	old_type = o_toolbar;
-	
-	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(menu_toolbar));
-	item = gtk_menu_get_active(GTK_MENU(menu));
-	list = gtk_container_children(GTK_CONTAINER(menu));
-	o_toolbar = (ToolbarType) g_list_index(list, item);
-	g_list_free(list);
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool		*tool = &all_tools[i];
-		gboolean	old = tool->enabled;
-		
-		tool->enabled = GTK_WIDGET_SENSITIVE(
-					GTK_BIN(tool->option_button)->child);
-		if (tool->enabled != old)
-			changed = TRUE;
-	}
-
-	if (changed || old_type != o_toolbar)
-	{
-		GList	*next;
-
-		for (next = all_filer_windows; next; next = next->next)
-		{
-			FilerWindow *filer_window = (FilerWindow *) next->data;
-
-			recreate_toolbar(filer_window);
-		}
-	}
-}
-
-static void save_options()
-{
-	GString	*tools;
-	int	i;
-
-	tools = g_string_new(NULL);
-
-	option_write("toolbar_type", o_toolbar == TOOLBAR_NONE ? "None" :
-				     o_toolbar == TOOLBAR_NORMAL ? "Normal" :
-				     o_toolbar == TOOLBAR_LARGE ? "Large" :
-				     "Unknown");
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool		*tool = &all_tools[i];
-		
-		if (!tool->enabled)
-		{
-			if (tools->len)
-				g_string_append(tools, ", ");
-			g_string_append(tools, tool->name);
-		}
-	}
-
-	option_write("toolbar_disable", tools->str);
-	g_string_free(tools, TRUE);
-}
-
-static void disable_tool(char *name)
-{
-	int	i;
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool	*tool = &all_tools[i];
-
-		if (g_strcasecmp(tool->name, name) == 0)
-		{
-			tool->enabled = FALSE;
-			return;
-		}
-	}
-}
-
-static char *toolbar_disable(char *data)
-{
-	int	i;
-	char	*comma, *word;
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-		Tool	*tool = &all_tools[i];
-
-		tool->enabled = TRUE;
-	}
-
-	while (*data)
-	{
-		comma = strchr(data, ',');
-
-		if (comma)
-			word = g_strndup(data, comma - data);
-		else
-			word = g_strdup(data);
-
-		g_strstrip(word);
-		if (!*word)
-			break;
-
-		disable_tool(word);
-
-		g_free(word);
-
-		if (!comma)
-			break;
-
-		data = comma + 1;
-	}
-
-	return NULL;
-}
-
-static char *toolbar_type(char *data)
-{
-	if (g_strcasecmp(data, "None") == 0)
-		o_toolbar = TOOLBAR_NONE;
-	else if (g_strcasecmp(data, "Normal") == 0)
-		o_toolbar = TOOLBAR_NORMAL;
-	else if (g_strcasecmp(data, "Large") == 0)
-		o_toolbar = TOOLBAR_LARGE;
-	else
-		return _("Unknown toolbar type");
-
-	return NULL;
-}
-
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
  */
@@ -707,4 +509,39 @@ static void recreate_toolbar(FilerWindow *filer_window)
 	}
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
+}
+
+static void option_notify(void)
+{
+	ToolbarType	old_type = o_toolbar;
+	guchar		*list;
+	int		i;
+	gboolean	changed = FALSE;
+
+	list = option_get_static_string("toolbar_disable");
+
+	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
+	{
+		Tool	*tool = &all_tools[i];
+		gboolean old = tool->enabled;
+
+		tool->enabled = !in_list(tool->name, list);
+
+		if (old != tool->enabled)
+			changed = TRUE;
+	}
+	
+	o_toolbar = option_get_int("toolbar_type");
+
+	if (changed || old_type != o_toolbar)
+	{
+		GList	*next;
+
+		for (next = all_filer_windows; next; next = next->next)
+		{
+			FilerWindow *filer_window = (FilerWindow *) next->data;
+
+			recreate_toolbar(filer_window);
+		}
+	}
 }
