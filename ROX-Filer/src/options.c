@@ -90,6 +90,7 @@ typedef enum {
 	OPTION_SLIDER,
 	OPTION_COLOUR,
 	OPTION_TOOLS,
+	OPTION_BUTTON,
 } OptionType;
 
 struct _Option {
@@ -202,6 +203,14 @@ guchar *option_get_static_string(guchar *key)
 	g_return_val_if_fail(option != NULL, NULL);
 
 	return option->value;
+}
+
+void option_add_void(gchar *key, OptionChanged *changed)
+{
+	Option	*option;
+
+	option = new_option(key, changed);
+	option->save = FALSE;
 }
 
 /* Add a callback which will be called after all the options have
@@ -400,6 +409,12 @@ static void show_notice(GtkObject *button)
 	report_error(_("Notice"), _(text));
 }
 
+static void button_click(Option *option)
+{
+	if (option->changed_cb)
+		option->changed_cb(NULL);
+}
+
 static void build_widget(xmlNode *widget, GtkWidget *box)
 {
 	const char *name = widget->name;
@@ -500,7 +515,23 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 		g_free(tmp);
 	}
 
-	if (strcmp(name, "toggle") == 0)
+	if (strcmp(name, "button") == 0)
+	{
+		GtkWidget *button, *align;
+
+		align = gtk_alignment_new(0.1, 0, 0.1, 0);
+		gtk_box_pack_start(GTK_BOX(box), align, FALSE, TRUE, 0);
+		button = gtk_button_new_with_label(_(label));
+		gtk_container_add(GTK_CONTAINER(align), button);
+
+		option->widget_type = OPTION_BUTTON;
+		option->widget = button;
+
+		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+				GTK_SIGNAL_FUNC(button_click), option);
+
+	}
+	else if (strcmp(name, "toggle") == 0)
 	{
 		GtkWidget	*toggle;
 
@@ -1228,6 +1259,8 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 		case OPTION_TOOLS:
 			disable_tools(widget, option->value);
 			break;
+	        case OPTION_BUTTON:
+	                break;
 		default:
 			g_printerr("Unknown widget for update '%s'\n",
 					(guchar *) key);

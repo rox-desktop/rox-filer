@@ -27,6 +27,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <unistd.h>
 #include <fnmatch.h>
 #include <parser.h>
 
@@ -35,6 +36,7 @@
 #include "gui_support.h"
 #include "choices.h"
 #include "pixmaps.h"
+#include "type.h"
 #include "run.h"
 #include "dnd.h"
 #include "support.h"
@@ -42,6 +44,7 @@
 #include "main.h"
 #include "menu.h"
 #include "filer.h"
+#include "action.h"
 
 /* Store glob-to-icon mappings */
 typedef struct _GlobIcon {
@@ -68,6 +71,8 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      guint32           time,
 		       	      GtkWidget	 	*dialog);
 static void remove_icon(GtkWidget *dialog);
+static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
+				  gboolean just_media);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -191,6 +196,7 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 	guchar		*tmp;
 	GtkWidget	*dialog, *vbox, *frame, *hbox, *vbox2;
 	GtkWidget	*entry, *label, *button, *align, *icon;
+	GtkWidget	**radio;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
@@ -212,9 +218,32 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 	vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(dialog), vbox);
 
-	tmp = g_strconcat(_("Path: "), path, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(tmp), FALSE, TRUE, 0);
+	radio = g_new(GtkWidget *, 3);
+
+	tmp = g_strconcat(_("Set icon for all `"), item->mime_type->media_type,
+			  "/<anything>'", NULL);
+	radio[2] = gtk_radio_button_new_with_label(NULL, tmp);
+	gtk_box_pack_start(GTK_BOX(vbox), radio[2], FALSE, TRUE, 0);
 	g_free(tmp);
+
+	tmp = g_strconcat(_("Only for the type `"), item->mime_type->media_type,
+			  "/", item->mime_type->subtype, "'", NULL);
+	radio[1] = gtk_radio_button_new_with_label_from_widget(
+					GTK_RADIO_BUTTON(radio[2]), tmp);
+	gtk_box_pack_start(GTK_BOX(vbox), radio[1], FALSE, TRUE, 0);
+	g_free(tmp);
+
+	tmp = g_strconcat(_("Only for the file `"), path, "'", NULL);
+	radio[0] = gtk_radio_button_new_with_label_from_widget(
+					GTK_RADIO_BUTTON(radio[2]), tmp);
+	gtk_box_pack_start(GTK_BOX(vbox), radio[0], FALSE, TRUE, 0);
+	g_free(tmp);
+
+	gtk_object_set_data_full(GTK_OBJECT(dialog),
+				 "radios", radio, g_free);
+	gtk_object_set_data(GTK_OBJECT(dialog),
+				 "mime_type", item->mime_type);
+
 
 	frame = gtk_frame_new(NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
@@ -443,6 +472,38 @@ static void delete_globicon(guchar *path)
 	examine(path);
 }
 
+/* Set the icon for this dialog's file to 'icon' */
+static void do_set_icon(GtkWidget *dialog, gchar *icon)
+{
+	guchar  *path = NULL;
+	GtkToggleButton **radio;
+
+	path = gtk_object_get_data(GTK_OBJECT(dialog), "pathname");
+	g_return_if_fail(path != NULL);
+
+	radio = gtk_object_get_data(GTK_OBJECT(dialog), "radios");
+	g_return_if_fail(radio != NULL);
+
+	if (gtk_toggle_button_get_active(radio[0]))
+	{
+		if (!set_icon_path(path, icon))
+			return;
+	}
+	else
+	{
+		gboolean just_media;
+		MIME_type *type;
+		
+		type = gtk_object_get_data(GTK_OBJECT(dialog), "mime_type");
+		just_media = gtk_toggle_button_get_active(radio[2]);
+
+		if (!set_icon_for_type(type, icon, just_media))
+			return;
+	}
+
+	destroy_on_idle(dialog);
+}
+
 /* Called when a URI list is dropped onto the box in the Set Icon
  * dialog. Make that the default icon.
  */
@@ -455,9 +516,8 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      guint32           time,
 		       	      GtkWidget	 	*dialog)
 {
-	GList	*uris;
+	GList	*uris, *next;
 	guchar	*icon = NULL;
-	guchar  *path = NULL;
 
 	if (!selection_data->data)
 		return;
@@ -465,7 +525,10 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 	uris = uri_list_to_glist(selection_data->data);
 
 	if (g_list_length(uris) == 1)
-		icon = get_local_path((guchar *) uris->data);
+		icon = g_strdup(get_local_path((guchar *) uris->data));
+
+	for (next = uris; next; next = next->next)
+		g_free(next->data);
 	g_list_free(uris);
 
 	if (!icon)
@@ -476,30 +539,23 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		return;
 	}
 
-	path = gtk_object_get_data(GTK_OBJECT(dialog), "pathname");
+	do_set_icon(dialog, icon);
 
-	if (!set_icon_path(path, icon))
-		return;
-
-	destroy_on_idle(dialog);
+	g_free(icon);
 }
 
 /* Called if the user clicks on the OK button on the Set Icon dialog */
 static void get_path_set_icon(GtkWidget *dialog)
 {
 	GtkEntry *entry;
-	guchar	*icon, *path;
+	guchar	*icon;
 
 	entry = gtk_object_get_data(GTK_OBJECT(dialog), "icon_path");
-	path = gtk_object_get_data(GTK_OBJECT(dialog), "pathname");
-	g_return_if_fail(entry != NULL && path != NULL);
+	g_return_if_fail(entry != NULL);
 
 	icon = gtk_entry_get_text(entry);
 
-	if (!set_icon_path(path, icon))
-		return;
-
-	destroy_on_idle(dialog);
+	do_set_icon(dialog, icon);
 }
 
 /* Called if the user clicks on the "Remove custom icon" button */
@@ -522,6 +578,44 @@ static void show_icon_help(gpointer data)
 	report_rox_error(
 		_("Enter the full path of a file that contains a valid "
 		  "image to be used as the icon for this file or directory."));
+}
+
+/* Set the icon for the given MIME type.  We copy the file. */
+static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
+				  gboolean just_media)
+{
+	gchar *target;
+	gchar *leaf;
+	gchar *dir;
+	GList *paths;
+
+	/* XXX: Should convert to XPM format... */
+
+	if (just_media)
+		leaf = g_strconcat(type->media_type, ".xpm", NULL);
+	else
+		leaf = g_strconcat(type->media_type, "_", type->subtype,
+								".xpm", NULL);
+
+	target = choices_find_path_save(leaf, "MIME-icons", TRUE);
+	if (!target)
+	{
+		delayed_rox_error(_("Setting icon disabled by CHOICESPATH"));
+		g_free(leaf);
+		return FALSE;
+	}
+
+	dir = g_dirname(target);
+	paths = g_list_append(NULL, iconpath);
+
+	action_copy(paths, dir, leaf);
+
+	g_free(leaf);
+	g_free(dir);
+	g_free(target);
+	g_list_free(paths);
+
+	return TRUE;
 }
 
 static void get_dir(gpointer key, gpointer value, gpointer data)

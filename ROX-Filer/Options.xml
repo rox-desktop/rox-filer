@@ -181,4 +181,16 @@ The key will appear next to the menu item and you can just press that key withou
     <toggle name='menu_button_2' label='Menu on button 2 (RISC OS style)'>Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.</toggle>
     <toggle name='single_click' label='Single-click navigation'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
   </section>
+  <section name='type' title='Types'>
+    <label>The filer uses a set of rules to work out the correct MIME type
+for each file, and then chooses a suitable icon for that type.</label>
+    <button name='edit' label='Show name-to-type rules'/>
+    <spacer/>
+    <label>After editing the files, click the reload button below, or
+restart the filer.</label>
+    <button name='reread' label='Re-read files'/>
+    <spacer/>
+    <label>Use the 'Set Icon...' dialog box to set the icon for each type.
+    </label>
+  </section>
 </options>

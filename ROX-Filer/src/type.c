@@ -46,6 +46,8 @@
 #include "support.h"
 #include "dir.h"
 #include "dnd.h"
+#include "options.h"
+#include "filer.h"
 
 #if defined(HAVE_REGEX_H) && \
 		defined(HAVE_RE_COMPILE_PATTERN) && defined(HAVE_RE_SEARCH)
@@ -66,6 +68,8 @@ typedef struct pattern {
 static char *import_extensions(guchar *line);
 static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
+static void edit_mime_types(guchar *unused);
+static void reread_mime_files(guchar *unused);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
  * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
@@ -77,6 +81,11 @@ static char *current_type = NULL;	/* (used while reading file) */
 #ifdef USE_REGEX
 static GList *patterns = NULL;		/* [(regexp -> MIME type)] */
 #endif
+/* Hash of all allocated MIME types, indexed by "media/subtype".
+ * MIME_type structs are never freed; this table prevents memory leaks
+ * when rereading the config files.
+ */
+static GHashTable *type_hash = NULL;
 
 /* Most things on Unix are text files, so this is the default type */
 MIME_type text_plain 		= {"text", "plain", NULL};
@@ -99,6 +108,7 @@ void type_init()
 #endif
 
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
+	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	current_type = NULL;
 
@@ -106,6 +116,79 @@ void type_init()
 	for (i = 0; i < list->len; i++)
 		import_for_dir((gchar *) g_ptr_array_index(list, i));
 	choices_free_list(list);
+
+	option_add_void("type_edit", edit_mime_types);
+	option_add_void("type_reread", reread_mime_files);
+}
+
+/* Returns the MIME_type structure for the given type name. It is looked
+ * up in type_hash and returned if found. If not found (and can_create is
+ * TRUE) then a new MIME_type is made, added to type_hash and returned.
+ * NULL is returned if type_name is not in type_hash and can_create is
+ * FALSE, or if type_name does not contain a '/' character.
+ */
+static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
+{
+        MIME_type *mtype;
+	gchar *slash;
+
+	mtype = g_hash_table_lookup(type_hash, type_name);
+	if (mtype || !can_create)
+		return mtype;
+
+	slash = strchr(type_name, '/');
+	g_return_val_if_fail(slash != NULL, NULL);     /* XXX: Report nicely */
+
+	mtype = g_new(MIME_type, 1);
+	mtype->media_type = g_strndup(type_name, slash - type_name);
+	mtype->subtype = g_strdup(slash + 1);
+	mtype->image = NULL;
+
+	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
+
+	return mtype;
+}
+
+static void pattern_delete(gpointer patt, gpointer udata)
+{
+	Pattern *pattern = (Pattern *) patt;
+
+	regfree(&pattern->buffer);
+
+	g_free(pattern);
+}
+
+static gboolean extension_delete(gpointer key, gpointer value, gpointer udata)
+{
+	/* key is a g_strdup'ed string */
+	g_free(key);
+
+	/* value is also preserved in type_hash, so don't delete */
+
+	return TRUE; /* Removes this entry */
+}
+
+/* XXX: Dup code */
+void type_reread(void)
+{
+	GPtrArray	*list;
+	int i;
+
+	g_hash_table_foreach_remove(extension_hash, extension_delete, NULL);
+#ifdef USE_REGEX
+	g_list_foreach(patterns, pattern_delete, NULL);
+	g_list_free(patterns);
+	patterns = NULL;
+#endif
+
+	current_type = NULL;
+
+	list = choices_list_dirs("MIME-info");
+	for (i = 0; i < list->len; i++)
+		import_for_dir((gchar *) g_ptr_array_index(list, i));
+	choices_free_list(list);
+
+	filer_update_all();
 }
 
 /* Parse every file in 'dir' */
@@ -140,16 +223,11 @@ static void import_for_dir(guchar *path)
 static void add_ext(char *type_name, char *ext)
 {
 	MIME_type *new;
-	char	  *slash;
 
-	slash = strchr(type_name, '/');
-	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
+	new = get_mime_type(type_name, TRUE);
+	
+	g_return_if_fail(new != NULL);
 			
-	new = g_new(MIME_type, 1);
-	new->media_type = g_strndup(type_name, slash - type_name);
-	new->subtype = g_strdup(slash + 1);
-	new->image = NULL;
-
 	g_hash_table_insert(extension_hash, g_strdup(ext), new);
 }
 
@@ -176,10 +254,9 @@ static void add_regex(char *type_name, char *reg)
 		return;
 	}
 	
-	new = g_new(MIME_type, 1);
-	new->media_type = g_strndup(type_name, slash - type_name);
-	new->subtype = g_strdup(slash + 1);
-	new->image = NULL;
+	new = get_mime_type(type_name, TRUE);
+	
+	g_return_if_fail(new != NULL);
 
 	pattern->type = new;
 
@@ -473,7 +550,11 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	}
 
 	if (!type->image)
+	{
+		/* One ref from the type structure, one returned */
 		type->image = im_unknown;
+		pixmap_ref(im_unknown);
+	}
 
 	type->image_time = now;
 	
@@ -874,5 +955,35 @@ gboolean can_set_run_action(DirItem *item)
 
 	return item->base_type == TYPE_FILE &&
 		!(item->mime_type == &special_exec);
+}
+
+/* Open all <Choices>/type directories and display a message */
+static void open_choices_dirs(gchar *type, gchar *what)
+{
+	guchar *dir;
+	GPtrArray *list;
+	int i;
+
+	dir = choices_find_path_save("", type, TRUE);
+	list = choices_list_dirs(type);
+
+	report_rox_error(_("These %s directories contain %s."), type, what);
+
+	for (i = list->len - 1; i >= 0; i--)
+		filer_opendir(list->pdata[i], NULL);
+
+	choices_free_list(list);
+	g_free(dir);
+}
+
+/* To edit the MIME types, open a filer window for <Choices>/MIME-info */
+static void edit_mime_types(guchar *unused)
+{
+	open_choices_dirs("MIME-info", "the files defining MIME types");
+}
+
+static void reread_mime_files(guchar *unused)
+{
+	type_reread();
 }
 

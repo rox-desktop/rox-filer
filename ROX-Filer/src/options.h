@@ -23,6 +23,8 @@ int option_get_int(guchar *key);
 void option_add_string(guchar *key, guchar *value, OptionChanged *changed);
 guchar *option_get_static_string(guchar *key);
 
+void option_add_void(gchar *key, OptionChanged *changed);
+
 void option_add_notify(OptionNotify *callback);
 void option_add_saver(OptionNotify *callback);
 

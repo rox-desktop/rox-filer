@@ -1374,6 +1374,20 @@ void filer_update_dir(FilerWindow *filer_window, gboolean warning)
 		dir_update(filer_window->directory, filer_window->path);
 }
 
+void filer_update_all(void)
+{
+	GList	*next = all_filer_windows;
+
+	while (next)
+	{
+		FilerWindow *filer_window = (FilerWindow *) next->data;
+
+		next = next->next;
+
+		filer_update_dir(filer_window, TRUE);
+	}
+}
+
 /* Refresh the various caches even if we don't think we need to */
 void full_refresh(void)
 {
