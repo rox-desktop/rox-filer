@@ -93,6 +93,7 @@ static xmlNodePtr rpc_Mount(GList *args);
 
 static xmlNodePtr rpc_PanelAdd(GList *args);
 static xmlNodePtr rpc_PinboardAdd(GList *args);
+static xmlNodePtr rpc_SetBackdropApp(GList *args);
 static xmlNodePtr rpc_SetBackdrop(GList *args);
 
 /****************************************************************
@@ -133,7 +134,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
 
-	soap_register("SetBackdrop", rpc_SetBackdrop, "App,Path", "Style");
+	soap_register("SetBackdrop", rpc_SetBackdrop, "Path", "Style");
+	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
 
@@ -654,22 +656,35 @@ static xmlNodePtr rpc_Pinboard(GList *args)
 	return NULL;
 }
 
-/* args = App, [Path, Style] */
-static xmlNodePtr rpc_SetBackdrop(GList *args)
+/* args = App */
+static xmlNodePtr rpc_SetBackdropApp(GList *args)
 {
-	char *app, *path, *style;
-	BackdropStyle s = BACKDROP_TILE;
+	char *app;
 
 	app = string_value(ARG(0));
-	path = string_value(ARG(1));
+
+	pinboard_set_backdrop_from_program(app, BACKDROP_PROGRAM);
+
+	g_free(app);
+
+	return NULL;
+}
+
+/* args = Path, [Style] */
+static xmlNodePtr rpc_SetBackdrop(GList *args)
+{
+	char *path, *style;
+	BackdropStyle s = BACKDROP_TILE;
+
+	path = string_value(ARG(0));
 
 	if (!path)
 	{
-		pinboard_set_backdrop_from_program(app, NULL, BACKDROP_NONE);
-		goto out;
+		pinboard_set_backdrop_from_program(NULL, BACKDROP_NONE);
+		return NULL;
 	}
 
-	style = string_value(ARG(2));
+	style = string_value(ARG(1));
 	if (style)
 	{
 		s = !g_strcasecmp(style, "Tiled")   ? BACKDROP_TILE :
@@ -681,10 +696,9 @@ static xmlNodePtr rpc_SetBackdrop(GList *args)
 		g_free(style);
 	}
 
-	pinboard_set_backdrop_from_program(app, path, s);
-out:
+	pinboard_set_backdrop_from_program(path, s);
+
 	g_free(path);
-	g_free(app);
 
 	return NULL;
 }

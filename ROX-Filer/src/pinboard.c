@@ -182,9 +182,10 @@ static void pin_icon_destroyed(PinIcon *pi);
 static void pin_icon_set_tip(PinIcon *pi);
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi);
 static void create_pinboard_window(Pinboard *pinboard);
-static void reload_backdrop(Pinboard *pinboard);
-static void set_backdrop(Pinboard *pinboard, const gchar *image,
-			 const gchar *path, BackdropStyle style);
+static void reload_backdrop(Pinboard *pinboard,
+			    const gchar *backdrop,
+			    BackdropStyle backdrop_style);
+static void set_backdrop(const gchar *path, BackdropStyle style);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -266,7 +267,9 @@ void pinboard_activate(const gchar *name)
 		{
 			pinboard_load_from_xml(doc);
 			xmlFreeDoc(doc);
-			reload_backdrop(current_pinboard);
+			reload_backdrop(current_pinboard,
+					current_pinboard->backdrop,
+					current_pinboard->backdrop_style);
 		}
 		else
 		{
@@ -423,22 +426,28 @@ void pinboard_reshape_icon(Icon *icon)
 	gtk_widget_queue_draw(current_pinboard->fixed);
 }
 
-/* Sets 'app' as the new backdrop handler, and loads 'image'.
- * If image is NULL, will run program to get image.
+/* If style is BACKDROP_PROGRAM, 'path' saved as the new application to set
+ * the backdrop. It will then be run, and should invoke the SetBackdrop
+ * SOAP method.
+ * Otherwise, 'path' is an image to display. It will not be saved (since
+ * we want to store the program that asked for it, not the image itself).
  */
-void pinboard_set_backdrop_from_program(const gchar *app, const gchar *image,
-					BackdropStyle style)
+void pinboard_set_backdrop_from_program(const gchar *path, BackdropStyle style)
 {
 	XMLwrapper *ai;
 	DirItem *item;
 	gboolean can_set;
 
-	if (!image)
-		style = BACKDROP_PROGRAM;
+	if (style != BACKDROP_PROGRAM)
+	{
+		g_return_if_fail(current_pinboard != NULL);
+		reload_backdrop(current_pinboard, path, style);
+		return;
+	}
 
 	item = diritem_new("");
-	diritem_restat(app, item, NULL);
-	ai = appinfo_get(app, item);
+	diritem_restat(path, item, NULL);
+	ai = appinfo_get(path, item);
 	diritem_free(item);
 
 	can_set = ai && xml_get_section(ai, ROX_NS, "CanSetBackdrop") != NULL;
@@ -446,13 +455,10 @@ void pinboard_set_backdrop_from_program(const gchar *app, const gchar *image,
 		g_object_unref(ai);
 
 	if (can_set)
-		set_backdrop(current_pinboard, image, app, style);
+		set_backdrop(path, BACKDROP_PROGRAM);
 	else
-	{
 		delayed_error(_("This program does not know how to "
 				"manage ROX-Filer's backdrop image."));
-		return;
-	}
 }
 
 /* Use this icon / program as the backdrop for the current pinboard.
@@ -462,15 +468,12 @@ void pinboard_set_backdrop_from_program(const gchar *app, const gchar *image,
  */
 void pinboard_set_backdrop(DirItem *item, const gchar *path)
 {
-	BackdropStyle type = BACKDROP_NONE;
-
 	if (path == NULL || item == NULL)
 	{
 		/* Remove backdrop */
 
 		if (current_pinboard && current_pinboard->backdrop)
-			set_backdrop(current_pinboard,
-				     NULL, NULL, BACKDROP_NONE);
+			set_backdrop(NULL, BACKDROP_NONE);
 		else
 			delayed_error(_("No backdrop image is currently "
 					"set. Use the 'Use for Backdrop' menu "
@@ -481,41 +484,29 @@ void pinboard_set_backdrop(DirItem *item, const gchar *path)
 
 	if (item->flags & ITEM_FLAG_APPDIR)
 	{
-		pinboard_set_backdrop_from_program(path, NULL, BACKDROP_NONE);
-		return;
+		/* Use this program to set the backdrop */
+		pinboard_set_backdrop_from_program(path, BACKDROP_PROGRAM);
 	}
-	
-	if (type == BACKDROP_NONE && item->base_type == TYPE_FILE)
+	else if (item->base_type == TYPE_FILE)
 	{
 		int i;
+
+		/* Use this file as the backdrop */
+
 		i = get_choice(_("Set backdrop"),
 			_("How should this image be displayed?"),
 			4, GTK_STOCK_CANCEL,
 			_("Centred"), _("_Scaled"), _("Tiled"));
-		if (i < 1)
-			return;
-		type = i == 1 ? BACKDROP_CENTRE :
-		       i == 2 ? BACKDROP_SCALE :
-				BACKDROP_TILE;
-	}
 
-	if (type == BACKDROP_NONE)
-	{
+		if (i >= 0)
+			set_backdrop(path,
+				     i == 1 ? BACKDROP_CENTRE :
+				     i == 2 ? BACKDROP_SCALE :
+					      BACKDROP_TILE);
+	}
+	else
 		delayed_error(_("Only files and certain applications can be "
 				"used to set the background image."));
-		return;
-	}
-
-	if (!current_pinboard)
-	{
-		pinboard_activate("Default");
-		delayed_error(_("No pinboard was in use... "
-			"the 'Default' pinboard has been selected. "
-			"Use 'rox -p=Default' to turn it on in "
-			"future."));
-	}
-
-	set_backdrop(current_pinboard, NULL, path, type);
 }
 
 /****************************************************************
@@ -801,6 +792,9 @@ static gboolean button_press_event(GtkWidget *widget,
 			    	   GdkEventButton *event,
                             	   PinIcon *pi)
 {
+	/* Just in case we've jumped in front of everything... */
+	gdk_window_lower(current_pinboard->window->window);
+	
 	if (event->button == 2)
 		forward_to_root(event);
 	else if (dnd_motion_press(widget, event))
@@ -1549,15 +1543,79 @@ static void create_pinboard_window(Pinboard *pinboard)
 	gdk_window_lower(win->window);
 }
 
-static void reload_backdrop(Pinboard *pinboard)
+/* Load image 'path' and scale according to 'style' */
+static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
+{
+	GdkPixmap *pixmap;
+	GdkPixbuf *pixbuf;
+	GError *error = NULL;
+
+	pixbuf = gdk_pixbuf_new_from_file(path, &error);
+	if (error)
+	{
+		delayed_error(_("Error loading backdrop image:\n%s\n"
+				"Backdrop removed."),
+				error->message);
+		g_error_free(error);
+		set_backdrop(NULL, BACKDROP_NONE);
+		return NULL;
+	}
+
+	if (style == BACKDROP_SCALE)
+	{
+		GdkPixbuf *old = pixbuf;
+
+		pixbuf = gdk_pixbuf_scale_simple(old,
+				screen_width, screen_height,
+				GDK_INTERP_HYPER);
+
+		g_object_unref(old);
+	}
+	else if (style == BACKDROP_CENTRE)
+	{
+		GdkPixbuf *old = pixbuf;
+		int	  x, y, width, height;
+
+		width = gdk_pixbuf_get_width(pixbuf);
+		height = gdk_pixbuf_get_height(pixbuf);
+
+		pixbuf = gdk_pixbuf_new(
+				gdk_pixbuf_get_colorspace(pixbuf), 0,
+				8, screen_width, screen_height);
+		gdk_pixbuf_fill(pixbuf, 0);
+
+		x = (screen_width - width) / 2;
+		y = (screen_height - height) / 2;
+		x = MAX(x, 0);
+		y = MAX(y, 0);
+
+		gdk_pixbuf_composite(old, pixbuf,
+				x, y,
+				MIN(screen_width, width),
+				MIN(screen_height, height),
+				x, y, 1, 1,
+				GDK_INTERP_NEAREST, 255);
+		g_object_unref(old);
+	}
+
+	gdk_pixbuf_render_pixmap_and_mask(pixbuf,
+			&pixmap, NULL, 0);
+	g_object_unref(pixbuf);
+
+	return pixmap;
+}
+
+static void reload_backdrop(Pinboard *pinboard,
+			    const gchar *backdrop,
+			    BackdropStyle backdrop_style)
 {
 	GtkStyle *style;
 
-	if (pinboard->backdrop && pinboard->backdrop_style == BACKDROP_PROGRAM)
+	if (backdrop && backdrop_style == BACKDROP_PROGRAM)
 	{
 		const char *argv[] = {NULL, "--backdrop", NULL};
 
-		argv[0] = make_path(pinboard->backdrop, "AppRun")->str;
+		argv[0] = make_path(backdrop, "AppRun")->str;
 
 		/* Run the program. It'll send us a SOAP message and we'll 
 		 * get back here with a different style and image.
@@ -1569,104 +1627,45 @@ static void reload_backdrop(Pinboard *pinboard)
 	/* Note: Copying a style does not ref the pixmaps! */
 	
 	style = gtk_style_copy(gtk_widget_get_style(pinboard->window));
-
 	style->bg_pixmap[GTK_STATE_NORMAL] = NULL;
 
-	if (pinboard->backdrop)
-	{
-		GdkPixbuf *pixbuf;
-		GError *error = NULL;
-		
-		pixbuf = gdk_pixbuf_new_from_file(pinboard->backdrop, &error);
-		if (error)
-		{
-			delayed_error(_("Error loading backdrop image:\n%s\n"
-					"Backdrop removed."),
-					error->message);
-			g_error_free(error);
-			set_backdrop(pinboard, NULL, NULL, BACKDROP_NONE);
-		}
-		else
-		{
-			GdkPixmap *pixmap;
-			
-			if (pinboard->backdrop_style == BACKDROP_SCALE)
-			{
-				GdkPixbuf *old = pixbuf;
-
-				pixbuf = gdk_pixbuf_scale_simple(old,
-						screen_width, screen_height,
-						GDK_INTERP_HYPER);
-				
-				g_object_unref(old);
-			}
-			else if (pinboard->backdrop_style == BACKDROP_CENTRE)
-			{
-				GdkPixbuf *old = pixbuf;
-				int	  x, y, width, height;
-
-				width = gdk_pixbuf_get_width(pixbuf);
-				height = gdk_pixbuf_get_height(pixbuf);
-
-				pixbuf = gdk_pixbuf_new(
-					gdk_pixbuf_get_colorspace(pixbuf), 0,
-					8, screen_width, screen_height);
-				gdk_pixbuf_fill(pixbuf, 0);
-
-				x = (screen_width - width) / 2;
-				y = (screen_height - height) / 2;
-				x = MAX(x, 0);
-				y = MAX(y, 0);
-
-				gdk_pixbuf_composite(old, pixbuf,
-					x, y,
-					MIN(screen_width, width),
-					MIN(screen_height, height),
-					x, y, 1, 1,
-					GDK_INTERP_NEAREST, 255);
-				g_object_unref(old);
-			}
-
-			gdk_pixbuf_render_pixmap_and_mask(pixbuf,
-				&pixmap, NULL, 0);
-			g_object_unref(pixbuf);
-
-			style->bg_pixmap[GTK_STATE_NORMAL] = pixmap;
-		}
-	}
+	if (backdrop)
+		style->bg_pixmap[GTK_STATE_NORMAL] =
+			load_backdrop(backdrop, backdrop_style);
 	
 	gtk_widget_set_style(pinboard->window, style);
-
 	g_object_unref(style);
+
 	gtk_widget_queue_draw(pinboard->window);
 }
 
-/* If image is NULL (normal case), (path,style) is both displayed and saved.
- * Otherwise, (image, style) is displayed and (path, BACKDROP_PROGRAM) saved.
+/* Set and save (path, style) as the new backdrop.
+ * If style is BACKDROP_PROGRAM, the program is run to get the backdrop.
+ * Otherwise, the image is displayed now.
  */
-static void set_backdrop(Pinboard *pinboard, const gchar *image,
-			 const gchar *path, BackdropStyle style)
+static void set_backdrop(const gchar *path, BackdropStyle style)
 {
-	gchar *tmp;
+	g_return_if_fail((path == NULL && style == BACKDROP_NONE) ||
+			 (path != NULL && style != BACKDROP_NONE));
 
-	g_return_if_fail(pinboard != NULL);
+	if (!current_pinboard)
+	{
+		if (!path)
+			return;
+		pinboard_activate("Default");
+		delayed_error(_("No pinboard was in use... "
+			"the 'Default' pinboard has been selected. "
+			"Use 'rox -p=Default' to turn it on in "
+			"future."));
+		g_return_if_fail(current_pinboard != NULL);
+	}
 
-	g_free(pinboard->backdrop);
-	pinboard->backdrop = NULL;
-
-	/* Set the image to display... */
-	tmp = g_strdup(image ? image : path);
-	pinboard->backdrop = tmp;
-	pinboard->backdrop_style = style;
-	reload_backdrop(pinboard);
-	g_free(tmp);
+	g_free(current_pinboard->backdrop);
+	current_pinboard->backdrop = g_strdup(path);
+	current_pinboard->backdrop_style = style;
+	reload_backdrop(current_pinboard,
+			current_pinboard->backdrop,
+			current_pinboard->backdrop_style);
 	
-	/* Set the stored values... */
-	if (path)
-		pinboard->backdrop = g_strdup(path);
-	else
-		pinboard->backdrop = NULL;
-
-	pinboard->backdrop_style = image ? BACKDROP_PROGRAM : style;
 	pinboard_save();
 }

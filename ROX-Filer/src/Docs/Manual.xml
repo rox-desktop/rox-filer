@@ -3173,17 +3173,17 @@ $ rox --bottom=</screen>
   <para>All SOAP RPC messages are passed on standard input, like this:
 
    <screen>
-    $ rox --RPC &lt;&lt; EOF
-    &lt;?xml version="1.0"?&gt;
-    &lt;env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope"&gt;
-    &lt;env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer"&gt;
-    &lt;Panel&gt;
-    &lt;Name&gt;Default&lt;/Name&gt;
-    &lt;Side&gt;Bottom&lt;/Side&gt;
-    &lt;/Panel&gt;
-    &lt;/env:Body&gt;
-    &lt;/env:Envelope&gt;
-    EOF</screen>
+$ rox --RPC &lt;&lt; EOF
+&lt;?xml version="1.0"?&gt;
+&lt;env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope"&gt;
+ &lt;env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer"&gt;
+  &lt;Panel&gt;
+   &lt;Name&gt;Default&lt;/Name&gt;
+   &lt;Side&gt;Bottom&lt;/Side&gt;
+  &lt;/Panel&gt;
+ &lt;/env:Body&gt;
+&lt;/env:Envelope&gt;
+EOF</screen>
 
    The following methods are recognised:</para>
 
@@ -3238,13 +3238,9 @@ $ rox --bottom=</screen>
      <parameter>Label</parameter>.
    </para></listitem>
 
-   <listitem><para><function>SetBackdrop</function>(<parameter>App</parameter>,
-     <parameter>Path</parameter>, [<parameter>Style</parameter>])
+   <listitem><para><function>SetBackdropApp</function>(<parameter>App</parameter>)
      Make <parameter>App</parameter> (an application directory) the new handler
-     for the current pinboard's backdrop. <parameter>Path</parameter> is the
-     image to use, and <parameter>Style</parameter> is
-     <userinput>Tiled</userinput>, <userinput>Scaled</userinput> or
-     <userinput>Centred</userinput>.
+     for the current pinboard's backdrop.
      The <filename>AppInfo.xml</filename> file inside <parameter>App</parameter>
      must contain the CanSetBackdrop element, eg:
      <programlisting>
@@ -3253,15 +3249,61 @@ $ rox --bottom=</screen>
       &lt;ROX:CanSetBackdrop xmlns:ROX="http://rox.sourceforge.net/SOAP/ROX-Filer"/>
 &lt;/AppInfo&gt;</programlisting>
      The application will be run with the <option>--backdrop</option> option
-     as it's only argument when the pinboard is next activated... it should
-     respond by sending this SOAP message to choose the particular image.
+     as it's only argument after invoking this method, and whenever the pinboard is
+     reloaded. It should respond by sending the SetBackdrop SOAP message
+     (described below) to choose the particular image.
+     </para><para>
+     An application can become the default handler either by being run normally,
+     and using this call, or using the filer's <guimenuitem>Use for
+     Backdrop</guimenuitem> menu item.
+     </para><para>
+     DO NOT use this method if invoked with <option>--backdrop</option> or
+     you will get stuck in an infinite loop!
+   </para></listitem>
+
+   <listitem><para><function>SetBackdrop</function>(<parameter>Path</parameter>,
+     [<parameter>Style</parameter>])
+     Set the new backdrop image. This must only be used by an application started
+     by the filer with the <option>--backdrop</option> option (see above).
+     <parameter>Path</parameter> is displayed on the backdrop in the given
+     <parameter>Style</parameter> (<userinput>Tiled</userinput>,
+     <userinput>Scaled</userinput> or <userinput>Centred</userinput>).
+     </para><para>
+     The image is displayed but not saved &mdash; the application will be run again
+     next time an image is required. An application may call this method several
+     times (eg, for a slideshow). The filer will send the TERM signal if the
+     program is still running when the user chooses a new backdrop.
+     </para><para>
      The application is responsible for deleting the image afterwards, if
      required.
      </para><para>
-     An application can become the default handler either by being run normally,
-     and using this call, or using the filer's
-     <guimenuitem>Use for Backdrop</guimenuitem> menu item.
-     
+     Sample application:
+     <programlisting><![CDATA[
+#!/bin/sh
+if [ "$#" = 0 ]; then
+	app=`dirname "$0"`
+	app=`cd "$app"; pwd`
+	image=
+	message="<SetBackdropApp><App>$app</App></SetBackdropApp>"
+else
+	image=`mktemp` || exit 1
+	xearth -ppm > "$image"
+        message="<SetBackdrop><Path>$image</Path><Style>Centred</Style></SetBackdrop>"
+fi
+
+rox -R << EOF
+<?xml version="1.0"?>
+<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
+  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
+  $message
+  </env:Body>
+</env:Envelope>
+EOF
+
+if [ "x$image" != "x" ]; then
+	rm "$image"
+fi
+]]></programlisting>
    </para></listitem>
 
    <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
