@@ -85,7 +85,6 @@ static guint32 current_event_time = GDK_CURRENT_TIME;
 static GtkWidgetClass *parent_class = NULL;
 
 /* Static prototypes */
-static void clear_area(Collection *collection, GdkRectangle *area);
 static void draw_one_item(Collection 	*collection,
 			  int 		item,
 			  GdkRectangle 	*area);
@@ -579,29 +578,6 @@ static void collection_set_style(GtkWidget *widget,
 }
 #endif
 
-static void clear_area(Collection *collection, GdkRectangle *area)
-{
-	GtkWidget	*widget = GTK_WIDGET(collection);
-
-	if (collection->bg_gc)
-	{
-		gdk_gc_set_ts_origin(collection->bg_gc, 0, 0);
-
-		gdk_draw_rectangle(widget->window,
-				collection->bg_gc,
-				TRUE,
-				area->x, area->y,
-				area->width, area->height);
-	}
-	else
-	{
-		gdk_window_set_background(widget->window,
-				&widget->style->bg[GTK_STATE_NORMAL]);
-		gdk_window_clear_area(widget->window,
-				area->x, area->y, area->width, area->height);
-	}
-}
-
 /* Return the area occupied by the item at (row, col) by filling
  * in 'area'.
  */
@@ -628,7 +604,6 @@ static gint collection_paint(Collection 	*collection,
 	int		start_row, last_row;
 	int		start_col, last_col;
 	int		phys_last_col;
-	GdkRectangle 	clip;
 
 	/* Calculate the ranges to plot */
 	start_row = area->y / collection->item_height;
@@ -637,22 +612,6 @@ static gint collection_paint(Collection 	*collection,
 
 	start_col = area->x / collection->item_width;
 	phys_last_col = (area->x + area->width - 1) / collection->item_width;
-
-	if (collection->lasso_box)
-	{
-		/* You can't be too careful with lasso boxes...
-		 *
-		 * clip gives the total area drawn over (this may be larger
-		 * than the requested area). It's used to redraw the lasso
-		 * box.
-		 */
-		collection_get_item_area(collection,
-					start_row, start_col, &clip);
-		clip.width *= phys_last_col - start_col + 1;
-		clip.height *= last_row - start_row + 1;
-
-		clear_area(collection, &clip);
-	}
 
 	/* The right-most column may be wider than the others.
 	 * Therefore, to redraw the area after the last 'real' column
@@ -670,7 +629,6 @@ static gint collection_paint(Collection 	*collection,
 
 	item = row * collection->columns + col;
 
-	/* g_print("[ paint %d..%d ]\n", row, last_row); */
 	while ((item == 0 || item < collection->number_of_items)
 			&& row <= last_row)
 	{
@@ -690,11 +648,7 @@ static gint collection_paint(Collection 	*collection,
 	}
 
 	if (collection->lasso_box)
-	{
-		gdk_gc_set_clip_rectangle(collection->xor_gc, &clip);
 		draw_lasso_box(collection);
-		gdk_gc_set_clip_rectangle(collection->xor_gc, NULL);
-	}
 
 	return FALSE;
 }
@@ -811,11 +765,6 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	g_return_val_if_fail(event != NULL, FALSE);
 
 	collection = COLLECTION(widget);
-
-	gtk_paint_flat_box(widget->style, widget->window,
-			   widget->state, GTK_SHADOW_NONE,
-			   &event->area, widget, "collection",
-			   0, 0, -1, -1);
 
 	collection_paint(collection, &event->area);
 

@@ -60,7 +60,7 @@ static void MD5Transform(guint32 buf[4], guint32 const in[16]);
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-/* g_fscache_data_unref() the result! */
+/* g_object_unref() the result! */
 XMLwrapper *xml_cache_load(const gchar *pathname)
 {
 	static GFSCache *xml_cache = NULL;

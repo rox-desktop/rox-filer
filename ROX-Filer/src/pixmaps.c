@@ -233,7 +233,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (found)
 	{
 		/* Thumbnail is known, or being created */
-		g_fscache_data_unref(pixmap_cache, image);
+		g_object_unref(image);
 		callback(data, NULL);
 		return;
 	}

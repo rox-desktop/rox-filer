@@ -487,7 +487,7 @@ static void detach(FilerWindow *filer_window)
 
 	dir_detach(filer_window->directory,
 			(DirCallback) update_display, filer_window);
-	g_fscache_data_unref(dir_cache, filer_window->directory);
+	g_object_unref(filer_window->directory);
 	filer_window->directory = NULL;
 }
 
@@ -580,7 +580,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 		return FALSE;
 	}
 	if (dir == filer_window->directory)
-		g_fscache_data_unref(dir_cache, dir);
+		g_object_unref(dir);
 	else
 	{
 		detach(filer_window);
@@ -1805,7 +1805,7 @@ void filer_detach_rescan(FilerWindow *filer_window)
 {
 	Directory *dir = filer_window->directory;
 	
-	g_fscache_data_ref(dir_cache, dir);
+	g_object_ref(dir);
 	detach(filer_window);
 	filer_window->directory = dir;
 	attach(filer_window);
@@ -2395,7 +2395,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 
 		pixmap = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, &found);
-		g_fscache_data_unref(pixmap_cache, pixmap);
+		g_object_unref(pixmap);
 
 		/* If we didn't get an image, it could be because:
 		 *

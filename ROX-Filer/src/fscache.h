@@ -39,9 +39,6 @@ void g_fscache_may_update(GFSCache *cache, const char *pathname);
 void g_fscache_update(GFSCache *cache, const char *pathname);
 void g_fscache_purge(GFSCache *cache, gint age);
 
-void g_fscache_data_ref(GFSCache *cache, gpointer data);
-void g_fscache_data_unref(GFSCache *cache, gpointer data);
-
 void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 		      gboolean update_details);
 

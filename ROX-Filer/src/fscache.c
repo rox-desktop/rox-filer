@@ -136,28 +136,10 @@ void g_fscache_destroy(GFSCache *cache)
 	g_free(cache);
 }
 
-/* Call the ref() user function for this object */
-void g_fscache_data_ref(GFSCache *cache, gpointer data)
-{
-	g_return_if_fail(cache != NULL);
-
-	if (data)
-		g_object_ref(data);
-}
-
-/* Call the unref() user function for this object */
-void g_fscache_data_unref(GFSCache *cache, gpointer data)
-{
-	g_return_if_fail(cache != NULL);
-
-	if (data)
-		g_object_unref(data);
-}
-
 /* Find the data for this file in the cache, loading it into
  * the cache if it isn't there already.
  *
- * Remember to g_fscache_data_unref() the returned value when
+ * Remember to g_object_unref() the returned value when
  * you're done with it.
  *
  * Returns NULL on failure.

@@ -198,7 +198,7 @@ void dir_check_this(const guchar *path)
 	if (dir)
 	{
 		dir_recheck(dir, real_path, g_basename(path));
-		g_fscache_data_unref(dir_cache, dir);
+		g_object_unref(dir);
 	}
 	
 	g_free(real_path);
@@ -221,7 +221,7 @@ void dir_force_update_path(const gchar *path)
 	if (dir)
 	{
 		dir_force_update_item(dir, g_basename(path));
-		g_fscache_data_unref(dir_cache, dir);
+		g_object_unref(dir);
 	}
 	
 	g_free(dir_path);

@@ -186,7 +186,7 @@ gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 			  "The icon has not been changed."));
 		return FALSE;
 	}
-	g_fscache_data_unref(pixmap_cache, pic);
+	g_object_unref(pic);
 
 	/* Add the globicon mapping and update visible icons */
 	add_globicon(filepath, iconpath);
