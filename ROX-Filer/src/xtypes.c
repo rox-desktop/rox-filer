@@ -51,6 +51,8 @@ static int (*dyn_setxattr)(const char *path, const char *name,
 		     const void *value, size_t size, int flags) = NULL;
 static ssize_t (*dyn_getxattr)(const char *path, const char *name,
 			 void *value, size_t size) = NULL;
+static ssize_t (*dyn_listxattr)(const char *path, char *list,
+			 size_t size) = NULL;
 
 void xtype_init(void)
 {
@@ -62,6 +64,43 @@ void xtype_init(void)
 
 	dyn_setxattr = (void *) dlsym(libc, "setxattr");
 	dyn_getxattr = (void *) dlsym(libc, "getxattr");
+	dyn_listxattr = (void *) dlsym(libc, "listxattr");
+}
+
+int xtype_supported(const char *path)
+{
+	char buf[1];
+	ssize_t nent;
+	
+	if (!dyn_getxattr)
+		return FALSE;
+
+	if(path) {
+		errno=0;
+		nent=dyn_getxattr(path, XTYPE_ATTR, buf, sizeof(buf));
+
+		if(nent<0 && errno==ENOTSUP)
+			return FALSE;
+	}
+
+	return TRUE;
+}
+
+int xtype_have_attr(const char *path)
+{
+	char buf[1];
+	ssize_t nent;
+	
+	if (!dyn_listxattr)
+		return FALSE;
+
+	errno=0;
+	nent=dyn_listxattr(path, buf, sizeof(buf));
+
+	if(nent<0 && errno==ERANGE)
+		return TRUE;
+	
+	return (nent>0);
 }
 
 MIME_type *xtype_get(const char *path)
@@ -117,11 +156,35 @@ int xtype_set(const char *path, const MIME_type *type)
 
 #elif defined(HAVE_ATTROPEN)
 
+/* Solaris 9 implementation */
+
 void xtype_init(void)
 {
 }
 
-/* Solaris 9 implementation */
+int xtype_supported(const char *path)
+{
+#ifdef _PC_XATTR_EXISTS
+	if(!path)
+		return TRUE;
+	
+	errno=0;
+	if(pathconf(path, _PC_XATTR_EXISTS)==-1 && errno)
+		return FALSE;
+	return TRUE;
+#else
+	return FALSE;
+#endif
+}
+
+int xtype_have_attr(const char *path)
+{
+#ifdef _PC_XATTR_EXISTS
+	return pathconf(path, _PC_XATTR_EXISTS);
+#else
+	return FALSE;
+#endif
+}
 
 MIME_type *xtype_get(const char *path)
 {
@@ -182,6 +245,16 @@ int xtype_set(const char *path, const MIME_type *type)
 
 void xtype_init(void)
 {
+}
+
+int xtype_supported(const char *path)
+{
+	return FALSE;
+}
+
+int xtype_have_attr(const char *path)
+{
+	return FALSE;
 }
 
 MIME_type *xtype_get(const char *path)

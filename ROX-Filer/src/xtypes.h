@@ -21,4 +21,9 @@ MIME_type *xtype_get(const char *path);
 int xtype_set(const char *path, const MIME_type *type);
 void xtype_init(void);
 
+int xtype_have_attr(const char *path);
+
+/* path may be NULL to test for support in libc */
+int xtype_supported(const char *path);
+
 #endif

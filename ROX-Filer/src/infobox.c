@@ -46,6 +46,7 @@
 #include "xml.h"
 #include "mount.h"
 #include "pixmaps.h"
+#include "xtypes.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -629,6 +630,13 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 
 	if (item->mime_type)
 		add_row(store, "", mime_type_comment(item->mime_type));
+
+	if (xtype_supported(NULL)) {
+		add_row(store, _("Extended attributes:"),
+			xtype_supported(path)?
+		  (item->flags & ITEM_FLAG_HAS_XATTR)? _("Present"): _("None")
+			: _("Not supported"));
+	}
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{

@@ -61,6 +61,7 @@
 #include "display.h"
 #include "bookmarks.h"
 #include "panel.h"
+#include "xtypes.h"
 
 typedef enum {
 	FILE_COPY_ITEM,
@@ -168,6 +169,7 @@ static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
 static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
+static GtkWidget        *filer_set_type;        /* Set type item */
 
 #undef N_
 #define N_(x) x
@@ -290,6 +292,8 @@ gboolean ensure_filer_menu(void)
 	GET_SSMENU_ITEM(filer_auto_size_menu, "filer", "Display", "Automatic");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
 							"Show Thumbnails");
+	GET_SSMENU_ITEM(item, "filer", "File", "Set Type...");
+	filer_set_type = GTK_BIN(item)->child;
 
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
 	GET_SSMENU_ITEM(item, "filer", "Window", "Follow Symbolic Links");
@@ -786,6 +790,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 			!o_unique_filer_windows.int_value);
 	gtk_widget_set_sensitive(filer_follow_sym,
 		strcmp(filer_window->sym_path, filer_window->real_path) != 0);
+	gtk_widget_set_sensitive(filer_set_type,
+				 xtype_supported(filer_window->real_path));
 
 	if (n_selected && o_menu_quick.int_value) 
 		popup_menu = (state & GDK_CONTROL_MASK)
@@ -1007,9 +1013,22 @@ static void chmod_items(FilerWindow *filer_window)
 
 static void set_type_items(FilerWindow *filer_window)
 {
-	GList *paths;
+	GList *paths, *p;
+	int npass=0, nfail=0;
+	
 	paths = filer_selected_items(filer_window);
-	action_settype(paths, FALSE, NULL);
+	for(p=paths; p; p=g_list_next(p)) {
+		if(xtype_supported((const char *) p->data))
+			npass++;
+		else
+			nfail++;
+	}
+	if(npass==0) 
+		report_error(_("Setting type not supported for this file or files"));
+	else if(nfail>0)
+		report_error(_("Setting type not supported for some of these files"));
+	if(npass>0)
+		action_settype(paths, FALSE, NULL);
 	destroy_glist(&paths);
 }
 
