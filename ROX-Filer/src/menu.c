@@ -425,7 +425,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 
 	next = items = gtk_container_children(GTK_CONTAINER(menu));
 
-	while (item >= 0)
+	while (item >= 0 && next)
 	{
 		int h = ((GtkWidget *) next->data)->requisition.height;
 
@@ -1799,11 +1799,15 @@ static void mark_menus_modified(gboolean mod)
 
 static void select_nth_item(GtkMenuShell *shell, int n)
 {
-	GList	  *items;
-	GtkWidget *item;
+	GList	  *items, *nth;
+	GtkWidget *item = NULL;
 
 	items = gtk_container_children(GTK_CONTAINER(shell));
-	item = (GtkWidget *) (g_list_nth(items, n)->data);
+	nth = g_list_nth(items, n);
 	g_list_free(items);
+
+	g_return_if_fail(nth != NULL);
+
+	item = (GtkWidget *) (nth->data);
 	gtk_menu_shell_select_item(shell, item);
 }
