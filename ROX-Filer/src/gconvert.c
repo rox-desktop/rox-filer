@@ -52,6 +52,7 @@ static gboolean
 g_utf8_get_charset_internal (const char **a)
 {
   const char *charset = getenv("CHARSET");
+  iconv_t cd;
 
   if (charset && *charset)
     {
@@ -63,9 +64,19 @@ g_utf8_get_charset_internal (const char **a)
 	return FALSE;
     }
 
-  /* Assume this for compatibility at present.  */
+  /* Try to find a sensible default... */
   *a = "ISO8859-1";
-  
+  cd = iconv_open (*a, "UTF-8");
+  if (cd == (iconv_t) -1)
+  {
+	  *a = "iso-8859-1";
+	  cd = (GIConv) iconv_open (*a, "UTF-8");
+  }
+  if (cd == (iconv_t) -1)
+	  *a = "UTF-8";
+  else
+	  iconv_close (cd);
+
   return FALSE;
 }
 
