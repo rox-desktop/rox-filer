@@ -514,6 +514,17 @@ void pinboard_set_backdrop_app(const gchar *app)
 
 	item = diritem_new("");
 	diritem_restat(app, item, NULL);
+	if (!(item->flags & ITEM_FLAG_APPDIR))
+	{
+		delayed_error(_("The backdrop handler must be an application "
+				"directory. Drag an application directory "
+				"into the Set Backdrop dialog box, or (for "
+				"programmers) pass it to the SOAP "
+				"SetBackdropApp method."));
+		diritem_free(item);
+		return;
+	}
+	
 	ai = appinfo_get(app, item);
 	diritem_free(item);
 
@@ -526,7 +537,10 @@ void pinboard_set_backdrop_app(const gchar *app)
 	else
 		delayed_error(_("You can only set the backdrop to an image "
 				"or to a program which knows how to "
-				"manage ROX-Filer's backdrop."));
+				"manage ROX-Filer's backdrop.\n\n"
+				"Programmers: the application's AppInfo.xml "
+				"must contain the CanSetBackdrop element, as "
+				"described in ROX-Filer's manual."));
 }
 
 /* Open a dialog box allowing the user to set the backdrop */
