@@ -106,6 +106,13 @@
 	unifies these into a single system shared by all desktops.
      </para></listitem></varlistentry>
 
+     <varlistentry><term>DNotify support (Linux only)</term>
+      <listitem><para>
+        If used with a recent Linux kernel (2.4.x series), the filer will notice changes
+	to directories automatically. On other systems, directories will update when the
+	pointer is moved over them.
+     </para></listitem></varlistentry>
+
     </variablelist>
 
    </para>
@@ -113,127 +120,14 @@
 
  </chapter>
 
- <chapter id="compiling">
-  <title>Compiling</title>
-  <para>
-
-   If you've just got hold of the filer by downloading the source archive
-   then you'll need to compile it before you can use it. If you downloaded
-   and installed a binary package, or if <application>ROX-Filer</application>
-   was included with your system, then you can skip this section. If you got
-   here by clicking on the lifebelt symbol in a filer window, or if typing
-   <command>rox</command> at a shell prompt works, then you don't need to
-   compile.
-
-   <itemizedlist><title>To compile, you will need the following:</title>
-
-    <listitem><para>
-      Unix or Linux (root access is not required),
-    </para></listitem>
-
-    <listitem><para>
-      The X Window system (supplied as standard on all modern systems),
-    </para></listitem>
-
-    <listitem><para>
-      GTK+ 2.0.1 or later (libraries and headers) &mdash; get the latest version
-      from <citation>GTK+</citation>,
-    </para></listitem>
-
-    <listitem><para>
-      LibXML 2.0.0 or later (libraries and headers) &mdash; get the latest
-      version from <citation>libxml</citation>,
-    </para></listitem>
-
-    <listitem><para>
-      A C compiler, such as `gcc' (standard on most systems).
-    </para></listitem>
-
-   </itemizedlist>
-
-   All of the above are standard on most modern Linux distributions.
-   To check which version of GTK+ you have installed, run the
-   <command>pkg-config</command> command, like this
-   (<prompt>$</prompt> is the shell prompt):
-
-   <screen>$ pkg-config --modversion gtk+-2.0
-2.0.5</screen>
-  </para>
-
-  <procedure><title>To compile:</title>
-
-   <step><para>
-     The filer now uses the Shared MIME Database<citation>SharedMIME</citation>
-     to work out the types of files. You need to install this before the
-     filer will work properly (ROX-Filer will warn you if it's not installed
-     when you run it).
-   </para></step>
-
-   <step><para>
-     Change to the directory containing the ROX-Filer subdirectory.
-   </para></step>
-
-   <step><para>
-     Run the <command>install.sh</command> script, like this:
-
-     <screen>$ ./install.sh</screen>
-
-   </para></step>
-
-   <step><para>
-     <application>ROX-Filer</application> will perform various checks to find
-     out what kind of system it is being run on and will then compile. If it
-     doesn't work then please e-mail me and complain! Tell me what kind of
-     system you have and what errors were reported. If you manage to fix the
-     problem yourself then please e-mail me the fix.
-    </para><para>
-     The executable file is stored inside the ROX-Filer directory in a
-     different subdirectory for each platform. Therefore, you can compile
-     the same application on several different types of machine and then
-     run it from any of them using the <filename>AppRun</filename> script.
-     This is particularly useful in a network environment.
-   </para></step>
-
-   <step><para>
-     Once the filer has compiled you will be asked where you want to install
-     it. If you want to do a system-wide installation as root, you may
-     want to stop here, <command>su</command> to root and rerun the install
-     script.
-
-     If you don't have the root password then don't worry &mdash; just follow
-     the instructions for installing into your home directory.
-   </para></step>
-  </procedure>
-
-  <para>
-   You can now run the filer by running the <command>rox</command> script
-   without any options, like this:
-
-   <screen>$ rox</screen>
-
-   A window should appear and display the contents of the current directory.
-
-   If you installed the script into your home directory then you may
-   need to set your <envar>PATH</envar> environment variable so that the shell can
-   find it. For example, if you installed it into a directory called
-   <filename>bin</filename> in your home directory, use this:
-
-   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
-
-   or (if you are using the <citerefentry><refentrytitle>csh</refentrytitle>
-    <manvolnum>1</manvolnum></citerefentry> shell):
-
-   <screen>$ setenv PATH $HOME/bin:$PATH
-$ rehash</screen>
-
-  </para>
-
- </chapter>
-
  <chapter id="invoking">
   <title>Invoking</title>
   <para>
-
+   You should be able to start the filer by simply running the <userinput>rox</userinput>
+   command, by typing it at a shell prompt or otherwise. If the filer isn't installed yet,
+   consult <xref linkend="compiling"/>.
+  </para>
+  <para>
    By default, <application>ROX-Filer</application> will start by displaying
    the current directory.  You can get it to display other directories instead
    by listing them after the command:
@@ -480,9 +374,8 @@ $ rox --bottom=</screen>
    </para></listitem>
 
    <listitem><para>
-     Drag files between windows with the left button to copy them, or with
-     the middle button to get a menu of possible actions (copy, move, link,
-     etc).
+     Drag files between windows with the left button to copy, move or link them
+     (choose from a menu). Linking creates a shortcut to the original file.
    </para></listitem>
 
   </itemizedlist>
@@ -519,10 +412,12 @@ $ rox --bottom=</screen>
      </entry></row>
 
      <row><entry>Drag an item  (left mouse button)</entry><entry>
-       Copy the file(s) to the destination (an application or another filer
-       window). Hold down <keycap>Shift</keycap> to move the file,
-       <keycap>Control</keycap>+<keycap>Shift</keycap> to create
-       a symbolic link, or <keycap>Alt</keycap> to get a menu of possible actions.
+       Show a menu of possible actions. There is an option to disable this menu,
+       in which case this gesture will copy the file(s) to the destination (an
+       application or another filer window). Hold down <keycap>Shift</keycap>
+       to move the file, <keycap>Control</keycap>+<keycap>Shift</keycap> to
+       create a symbolic link, or <keycap>Alt</keycap> to get the menu of
+       possible actions.
      </entry></row>
 
      <row><entry>Drag an item (middle mouse button)</entry><entry>
@@ -693,9 +588,13 @@ $ rox --bottom=</screen>
        Reread the directory contents</entry><entry>
        Open a new window
        </entry></row><row><entry>
-       Magnifying glass</entry><entry>
-       Choose icon size from a menu.</entry><entry>
-       Select Automatic icon sizing and resize the window.
+       Magnifying glass (+)</entry><entry>
+       Select a larger icon size.</entry><entry>
+       Select a smaller icon size.
+       </entry></row><row><entry>
+       Magnifying glass (fit)</entry><entry>
+       Set Automatic sizing mode and resize the window.</entry><entry>
+       -
        </entry></row><row><entry>
        List</entry><entry>
        Hide or show extra details</entry><entry>
@@ -720,13 +619,13 @@ $ rox --bottom=</screen>
 
   <para>
    Dragging files to the Up or Home icons acts just like dragging them
-   into the directory which the button leads to.
-
+   into the directory which the button leads to. Dragging to the Bookmarks button
+   will add the directory as a bookmark.
+  </para>
+  <para>
    The toolbar can also show the number of files in the directory, and
    information about the selection. This can be turned on or off in the
    Options box.
-
-
   </para>
  </chapter>
 
@@ -1309,6 +1208,11 @@ $ rox --bottom=</screen>
     box, you can remove entries, rearrange them (using the arrows or by
     dragging) and edit the pathnames directly, if required.
    </para>
+   <para>
+    The <guimenuitem>Recently Visited</guimenuitem> submenu shows the last few directories
+    viewed. Choosing one will switch to that directory. The current directory is shown
+    shaded, since you are already there.
+   </para>
   </sect1>
 
  </chapter>
@@ -1446,9 +1350,9 @@ $ rox --bottom=</screen>
    <para>
     When the pinboard is in use, ROX-Filer can be used to display an icon for each iconified
     (or 'minimised') window. You can turn this on or off from the Options box. Iconified window icons
-    highlight when you move the mouse over them and can be dragged around.
-    Clicking on one will expand it back into the window it represents. Some older window managers do not
-    support this, and no icons will be shown.
+    have a semi-transparent background slab effect, and can be dragged around.
+    Clicking on one will expand it back into the window it represents. Some
+    older window managers do not support this, and no icons will be shown.
    </para>
   </sect1>
 
@@ -1459,10 +1363,10 @@ $ rox --bottom=</screen>
     from the pinboard menu (right-click over the desktop background when the pinboard is turned on).
    </para>
    <para>
-    To set an image, select <guilabel>Centred</guilabel>, <guilabel>Scaled</guilabel> or
-    <guilabel>Tiled</guilabel> to set the style, and then drag an image onto the marked area.
-    To return to a solid colour backdrop (as set in the Options box), click on
-    <guibutton>Clear</guibutton>.
+    To set an image, select <guilabel>Centre</guilabel>, <guilabel>Scale</guilabel>,
+    <guilabel>Stretch</guilabel> or <guilabel>Tile</guilabel> to set the style,
+    and then drag an image onto the marked area.  To return to a solid colour
+    backdrop (as set in the Options box), click on <guibutton>Clear</guibutton>.
    </para><para>
     The Wallpaper<citation>Wallpaper</citation> application can be used for more complicated
     effects, such as choosing a new random image each hour, or rendering an image of the Earth
@@ -2300,10 +2204,9 @@ $ rox --bottom=</screen>
 
   <sect1>
    <title><anchor id="RunAction" xreflabel="the Set Run Action box"/>
-    The run action box
+    The Set Run Action box
    </title>
    <para>
-
     This box appears when you choose <guimenuitem>Set Run Action...</guimenuitem>
     from the File menu, and is used to set which application is loaded when you click
     on a file.
@@ -2779,6 +2682,123 @@ $ rox --bottom=</screen>
   </sect1>
  </chapter>
 
+ <appendix id="compiling">
+  <title>Compiling</title>
+  <para>
+
+   If you've just got hold of the filer by downloading the source archive
+   then you'll need to compile it before you can use it. If you downloaded
+   and installed a binary package, or if <application>ROX-Filer</application>
+   was included with your system, then you can skip this section. If you got
+   here by clicking on the lifebelt symbol in a filer window, or if typing
+   <command>rox</command> at a shell prompt works, then you don't need to
+   compile.
+
+   <itemizedlist><title>To compile, you will need the following:</title>
+
+    <listitem><para>
+      Unix or Linux (root access is not required),
+    </para></listitem>
+
+    <listitem><para>
+      The X Window system (supplied as standard on all modern systems),
+    </para></listitem>
+
+    <listitem><para>
+      GTK+ 2.0.1 or later (libraries and headers) &mdash; get the latest version
+      from <citation>GTK+</citation>,
+    </para></listitem>
+
+    <listitem><para>
+      LibXML 2.0.0 or later (libraries and headers) &mdash; get the latest
+      version from <citation>libxml</citation>,
+    </para></listitem>
+
+    <listitem><para>
+      A C compiler, such as `gcc' (standard on most systems).
+    </para></listitem>
+
+   </itemizedlist>
+
+   All of the above are standard on most modern Linux distributions.
+   To check which version of GTK+ you have installed, run the
+   <command>pkg-config</command> command, like this
+   (<prompt>$</prompt> is the shell prompt):
+
+   <screen>$ pkg-config --modversion gtk+-2.0
+2.0.5</screen>
+  </para>
+
+  <procedure><title>To compile:</title>
+
+   <step><para>
+     The filer now uses the Shared MIME Database<citation>SharedMIME</citation>
+     to work out the types of files. You need to install this before the
+     filer will work properly (ROX-Filer will warn you if it's not installed
+     when you run it).
+   </para></step>
+
+   <step><para>
+     Change to the directory containing the ROX-Filer subdirectory.
+   </para></step>
+
+   <step><para>
+     Run the <command>install.sh</command> script, like this:
+
+     <screen>$ ./install.sh</screen>
+
+   </para></step>
+
+   <step><para>
+     <application>ROX-Filer</application> will perform various checks to find
+     out what kind of system it is being run on and will then compile. If it
+     doesn't work then please e-mail me and complain! Tell me what kind of
+     system you have and what errors were reported. If you manage to fix the
+     problem yourself then please e-mail me the fix.
+    </para><para>
+     The executable file is stored inside the ROX-Filer directory in a
+     different subdirectory for each platform. Therefore, you can compile
+     the same application on several different types of machine and then
+     run it from any of them using the <filename>AppRun</filename> script.
+     This is particularly useful in a network environment.
+   </para></step>
+
+   <step><para>
+     Once the filer has compiled you will be asked where you want to install
+     it. If you want to do a system-wide installation as root, you may
+     want to stop here, <command>su</command> to root and rerun the install
+     script.
+
+     If you don't have the root password then don't worry &mdash; just follow
+     the instructions for installing into your home directory.
+   </para></step>
+  </procedure>
+
+  <para>
+   You can now run the filer by running the <command>rox</command> script
+   without any options, like this:
+
+   <screen>$ rox</screen>
+
+   A window should appear and display the contents of the current directory.
+
+   If you installed the script into your home directory then you may
+   need to set your <envar>PATH</envar> environment variable so that the shell can
+   find it. For example, if you installed it into a directory called
+   <filename>bin</filename> in your home directory, use this:
+
+   <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
+
+   or (if you are using the <citerefentry><refentrytitle>csh</refentrytitle>
+    <manvolnum>1</manvolnum></citerefentry> shell):
+
+   <screen>$ setenv PATH $HOME/bin:$PATH
+$ rehash</screen>
+
+  </para>
+
+ </appendix>
+
  <appendix id="manpage"><title>Manual page</title>
 
   <refentry id="rox">
@@ -2850,10 +2870,6 @@ $ rox --bottom=</screen>
       <listitem><para>start a new filer, even if one already seems to be
       running. This also prevents the filer from forking (running in the
       background). This option is mainly useful for debugging.
-      </para></listitem></varlistentry>
-
-      <varlistentry><term><option>-o</option></term><term><option>--override</option></term>
-       <listitem><para>override window manager control of panels.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
@@ -2973,6 +2989,7 @@ $ rox --bottom=</screen>
       <member>Taras</member>
       <member>Simon Truss</member>
       <member>Jan Wagemakers</member>
+      <member>Keith Warno</member>
       <member>Stephen Watson</member>
       <member>Andre Wyrwa</member>
       <member>Geoff Youngs</member>
