@@ -231,7 +231,10 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 	struct stat	info;
 	char		*data[] = {NULL, NULL, NULL};
 	xmlNode 	*prop;
-	GtkTargetEntry 	target_table[] = { {"STRING", 0, 0} };
+	GtkTargetEntry 	target_table[] = {
+		{"STRING", 0, 0},
+		{"COMPOUND_TEXT", 0, 0},	/* XXX: Treats as STRING */
+	};
 
 	table = GTK_CLIST(gtk_clist_new(2));
 	GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(table), GTK_CAN_FOCUS);

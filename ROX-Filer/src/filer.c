@@ -1565,6 +1565,7 @@ static void filer_add_signals(FilerWindow *filer_window)
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
 		{"STRING", 0, TARGET_STRING},
+		{"COMPOUND_TEXT", 0, TARGET_STRING},/* XXX: Treats as STRING */
 	};
 
 	/* Events on the top-level window */
