@@ -442,6 +442,7 @@ GtkWidget *make_send_to_item(DirItem *ditem, const char *label,
 
 		gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(item),
 				gtk_image_new_from_pixbuf(pixbuf));
+		gtk_widget_show_all(item);
 	}
 	else
 		item = gtk_menu_item_new_with_label(label);

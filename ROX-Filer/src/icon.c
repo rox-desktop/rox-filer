@@ -132,7 +132,7 @@ enum {
 #define N_(x) x
 static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer"),		NULL, NULL, 0, "<Branch>"},
-{">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, NULL},
+{">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, "<StockItem>", GTK_STOCK_DIALOG_INFO},
 {">" N_("Show Help Files"),	NULL, menu_rox_help, HELP_DIR, "<StockItem>", GTK_STOCK_HELP},
 {">" N_("Manual"),		NULL, menu_rox_help, HELP_MANUAL, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
@@ -143,9 +143,9 @@ static GtkItemFactoryEntry menu_def[] = {
 {">" N_("Info"),    		NULL, file_op, ACTION_INFO, "<StockItem>", GTK_STOCK_DIALOG_INFO},
 {">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
 {">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
-{N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, NULL},
-{N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, NULL},
-{N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
+{N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, "<StockItem>", GTK_STOCK_PROPERTIES},
+{N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, "<StockItem>", GTK_STOCK_JUMP_TO},
+{N_("Remove Item(s)"),		NULL, remove_items, 0, "<StockItem>", GTK_STOCK_REMOVE},
 {"",				NULL, NULL, 0, "<Separator>"},
 {N_("Backdrop..."),		NULL, set_backdrop, 0, NULL},
 };

@@ -1978,12 +1978,16 @@ static void pin_icon_set_tip(PinIcon *pi)
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 {
 	int		pos[3];
+	GList		*list;
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
-	pos[2] = 1;
 
 	icon_prepare_menu((Icon *) pi, TRUE);
+
+	list = gtk_container_get_children(GTK_CONTAINER(icon_menu));
+	pos[2] = g_list_length(list) - 6;
+	g_list_free(list);
 
 	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
 			position_menu,
