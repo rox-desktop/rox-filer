@@ -601,7 +601,7 @@ static gboolean do_copy(char *path, char *dest)
 	}
 	else
 	{
-		g_string_sprintf(message, "cp -af %s %s", path, dest_path);
+		g_string_sprintf(message, "cp -dpRf %s %s", path, dest_path);
 		if (system(message->str))
 		{
 			g_string_sprintf(message, "!ERROR: %s\n",

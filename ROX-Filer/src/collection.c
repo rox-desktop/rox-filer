@@ -2104,7 +2104,7 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	else
 	{
 		row = item / collection->columns;
-		col = item % collection->columns;
+		col = item % collection->columns + dcol;
 
 		if (row < first)
 			row = first;
@@ -2112,22 +2112,20 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 			row = last;
 		else
 			row = MAX(row + drow, 0);
-
-		col = MAX(col + dcol, 0);
 	}
-
-	if (col >= collection->columns)
-		col = collection->columns - 1;
 
 	total_rows = (collection->number_of_items + collection->columns - 1)
 				/ collection->columns;
 
-	if (row >= total_rows - 1)
+	if (row >= total_rows - 1 && drow > 0)
 	{
 		row = total_rows - 1;
 		item = col + row * collection->columns;
 		if (item >= collection->number_of_items)
+		{
 			row--;
+			scroll_to_show(collection, item);
+		}
 	}
 	if (row < 0)
 		row = 0;

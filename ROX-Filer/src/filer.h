@@ -33,6 +33,7 @@ typedef enum
 struct _FilerWindow
 {
 	GtkWidget	*window;
+	GtkWidget	*minibuffer;
 	char		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	panel;
@@ -74,5 +75,6 @@ void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		gboolean shift, gboolean adjust);
 void filer_check_mounted(char *path);
+void filer_enter_path(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

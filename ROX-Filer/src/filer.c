@@ -111,7 +111,7 @@ static void add_item(FilerWindow *filer_window, DirItem *item);
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void add_button(GtkContainer *box, int pixmap,
-			GtkSignalFunc cb, gpointer data);
+			GtkSignalFunc cb, gpointer data, char *tip);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window);
@@ -164,6 +164,7 @@ enum
 };
 
 static GdkCursor *busy_cursor = NULL;
+static GtkTooltips *tooltips = NULL;
 
 void filer_init()
 {
@@ -178,6 +179,8 @@ void filer_init()
 	fixed_font = gdk_font_load("fixed");
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
+
+	tooltips = gtk_tooltips_new();
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -1348,6 +1351,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	};
 
 	filer_window = g_new(FilerWindow, 1);
+	filer_window->minibuffer = NULL;
 	filer_window->path = pathdup(path);
 	filer_window->had_cursor = FALSE;
 	filer_window->auto_select = NULL;
@@ -1422,6 +1426,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		int		swidth, sheight, iwidth, iheight;
 		GtkWidget	*frame, *win = filer_window->window;
 
+		gtk_window_set_wmclass(GTK_WINDOW(win), "ROX-Panel",
+				"ROX-Filer");
 		collection_set_panel(filer_window->collection, TRUE);
 		gtk_signal_connect(GTK_OBJECT(filer_window->window),
 				"delete_event",
@@ -1458,6 +1464,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		gtk_container_add(GTK_CONTAINER(frame), collection);
 		gtk_container_add(GTK_CONTAINER(win), frame);
 
+		gtk_widget_show_all(frame);
 		gtk_widget_realize(win);
 		if (override_redirect)
 			gdk_window_set_override_redirect(win->window, TRUE);
@@ -1465,8 +1472,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	}
 	else
 	{
-		hbox = gtk_hbox_new(FALSE, 0);
-		
+		GtkWidget	*vbox;
+
 		gtk_signal_connect(GTK_OBJECT(filer_window->window),
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
@@ -1474,26 +1481,28 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			filer_window->display_style == LARGE_ICONS ? 400 : 512,
 			o_toolbar ? 220 : 200);
 
+		hbox = gtk_hbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(filer_window->window),
 					hbox);
+
+		vbox = gtk_vbox_new(FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+		
 		if (o_toolbar)
 		{
-			GtkWidget *vbox, *toolbar;
-
+			GtkWidget *toolbar;
 			
-			vbox = gtk_vbox_new(FALSE, 0);
-			gtk_box_pack_start(GTK_BOX(hbox), vbox,
-					TRUE, TRUE, 0);
 			toolbar = create_toolbar(filer_window);
 			gtk_box_pack_start(GTK_BOX(vbox), toolbar,
 					FALSE, TRUE, 0);
-
-			gtk_box_pack_start(GTK_BOX(vbox), collection,
-					TRUE, TRUE, 0);
+			gtk_widget_show_all(toolbar);
 		}
-		else
-			gtk_box_pack_start(GTK_BOX(hbox), collection,
-					TRUE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
+
+		filer_window->minibuffer = gtk_entry_new();
+		gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer,
+				FALSE, TRUE, 0);
 
 		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
@@ -1501,10 +1510,15 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 				GTK_OBJECT(filer_window->window));
 		gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 				collection);
+
+		gtk_widget_show(hbox);
+		gtk_widget_show(vbox);
+		gtk_widget_show(scrollbar);
+		gtk_widget_show(collection);
 	}
 
 	number_of_windows++;
-	gtk_widget_show_all(filer_window->window);
+	gtk_widget_show(filer_window->window);
 	attach(filer_window);
 
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
@@ -1522,21 +1536,23 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	gtk_hbutton_box_set_spacing_default(2);
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(box), GTK_BUTTONBOX_START);
 	gtk_container_add(GTK_CONTAINER(frame), box);
+
 	add_button(GTK_CONTAINER(box), TOOLBAR_UP_ICON,
 			GTK_SIGNAL_FUNC(toolbar_up_clicked),
-			filer_window);
+			filer_window, "Change to parent directory");
 	add_button(GTK_CONTAINER(box), TOOLBAR_HOME_ICON,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
-			filer_window);
+			filer_window, "Change to home directory");
 	add_button(GTK_CONTAINER(box), TOOLBAR_REFRESH_ICON,
 			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
-			filer_window);
+			filer_window, "Rescan directory contents");
 
 	return frame;
 }
 
 static void add_button(GtkContainer *box, int pixmap,
-			GtkSignalFunc cb, gpointer data)
+			GtkSignalFunc cb, gpointer data,
+			char *tip)
 {
 	GtkWidget 	*button, *icon;
 
@@ -1548,6 +1564,8 @@ static void add_button(GtkContainer *box, int pixmap,
 				default_pixmap[pixmap].mask);
 	gtk_container_add(GTK_CONTAINER(button), icon);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, data);
+
+	gtk_tooltips_set_tip(tooltips, button, tip, NULL);
 }
 
 /* Build up some option widgets to go in the options dialog, but don't
@@ -1697,3 +1715,17 @@ void filer_check_mounted(char *path)
 		}
 	}
 }
+
+/* Display the minibuffer and let the user edit the path */
+void filer_enter_path(FilerWindow *filer_window)
+{
+	g_return_if_fail(filer_window != NULL);
+	g_return_if_fail(filer_window->minibuffer != NULL);
+
+	gtk_entry_set_text(GTK_ENTRY(filer_window->minibuffer),
+			filer_window->path);
+
+	gtk_widget_show(filer_window->minibuffer);
+}
+
+

@@ -102,6 +102,7 @@ static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 static void close_window(gpointer data, guint action, GtkWidget *widget);
+static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void rox_help(gpointer data, guint action, GtkWidget *widget);
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
@@ -170,6 +171,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Window/Parent, Same Window",	NULL,   open_parent_same, 0, NULL},
 {"/Window/New Window",		NULL,   new_window, 0, NULL},
 {"/Window/Close Window",	C_"Q",  close_window, 0, NULL},
+{"/Window/Enter path",		NULL,  	enter_path, 0, NULL},
 {"/Window/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Window/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
@@ -1170,6 +1172,13 @@ static void close_window(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	gtk_widget_destroy(window_with_focus->window);
+}
+
+static void enter_path(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_enter_path(window_with_focus);
 }
 
 static void rox_help(gpointer data, guint action, GtkWidget *widget)
