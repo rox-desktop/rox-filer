@@ -103,7 +103,61 @@ void display_init()
 /* Draw this icon (including any symlink or mount symbol) inside the
  * given rectangle.
  */
-void draw_large_icon(GtkWidget *widget,
+void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
+		   DirItem  *item, MaskedPixmap *image, gboolean selected)
+{
+	int		width, height;
+	int		image_x;
+	int		image_y;
+
+	if (!image)
+		return;
+
+	width = image->huge_width;
+	height = image->huge_height;
+	image_x = area->x + ((area->width - width) >> 1);
+	image_y = MAX(0, area->height - height - 6);
+
+	gdk_pixbuf_render_to_drawable_alpha(
+			selected ? image->huge_pixbuf_lit
+				 : image->huge_pixbuf,
+			window,
+			0, 0, 				/* src */
+			image_x, area->y + image_y,	/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
+
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
+	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
+					? im_mounted
+					: im_unmounted;
+
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,		/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	}
+}
+
+/* Draw this icon (including any symlink or mount symbol) inside the
+ * given rectangle.
+ */
+void draw_large_icon(GdkWindow *window,
 		     GdkRectangle *area,
 		     DirItem  *item,
 		     MaskedPixmap *image,
@@ -124,7 +178,7 @@ void draw_large_icon(GtkWidget *widget,
 
 	gdk_pixbuf_render_to_drawable_alpha(
 			selected ? image->pixbuf_lit : image->pixbuf,
-			widget->window,
+			window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,
@@ -134,7 +188,7 @@ void draw_large_icon(GtkWidget *widget,
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
 		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				widget->window,
+				window,
 				0, 0, 				/* src */
 				image_x, area->y + 2,	/* dest */
 				-1, -1,
@@ -148,7 +202,7 @@ void draw_large_icon(GtkWidget *widget,
 					: im_unmounted;
 
 		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				widget->window,
+				window,
 				0, 0, 				/* src */
 				image_x, area->y + 2,	/* dest */
 				-1, -1,

@@ -8,6 +8,6 @@
 #ifndef _CELL_ICON_H
 #define _CELL_ICON_H
 
-GtkCellRenderer *cell_icon_new(void);
+GtkCellRenderer *cell_icon_new(ViewDetails *view_details);
 
 #endif /* _CELL_ICON_H */

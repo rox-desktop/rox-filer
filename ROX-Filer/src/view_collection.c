@@ -117,11 +117,6 @@ static void draw_string(GtkWidget *widget,
 		int 	width,		/* Width of the full string */
 		GtkStateType selection_state,
 		gboolean box);
-static void draw_huge_icon(GtkWidget *widget,
-			   GdkRectangle *area,
-			   DirItem  *item,
-			   MaskedPixmap *image,
-			   gboolean selected);
 static void view_collection_iface_init(gpointer giface, gpointer iface_data);
 static gint coll_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
@@ -352,12 +347,12 @@ static void draw_item(GtkWidget *widget,
 	else if (template.icon.width <= ICON_WIDTH &&
 			template.icon.height <= ICON_HEIGHT)
 	{
-		draw_large_icon(widget, &template.icon,
+		draw_large_icon(widget->window, &template.icon,
 				item, view->image, selected);
 	}
 	else
 	{
-		draw_huge_icon(widget, &template.icon,
+		draw_huge_icon(widget->window, &template.icon,
 				item, view->image, selected);
 	}
 	
@@ -671,63 +666,6 @@ static void draw_string(GtkWidget *widget,
 				area->x + area->width - 1, area->y,
 				1, area->height);
 		gdk_gc_set_clip_rectangle(gc, NULL);
-	}
-}
-
-/* Draw this icon (including any symlink or mount symbol) inside the
- * given rectangle.
- */
-static void draw_huge_icon(GtkWidget *widget,
-			   GdkRectangle *area,
-			   DirItem  *item,
-			   MaskedPixmap *image,
-			   gboolean selected)
-{
-	int		width, height;
-	int		image_x;
-	int		image_y;
-
-	if (!image)
-		return;
-
-	width = image->huge_width;
-	height = image->huge_height;
-	image_x = area->x + ((area->width - width) >> 1);
-	image_y = MAX(0, area->height - height - 6);
-
-	gdk_pixbuf_render_to_drawable_alpha(
-			selected ? image->huge_pixbuf_lit
-				 : image->huge_pixbuf,
-			widget->window,
-			0, 0, 				/* src */
-			image_x, area->y + image_y,	/* dest */
-			width, height,
-			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-			GDK_RGB_DITHER_NORMAL, 0, 0);
-
-	if (item->flags & ITEM_FLAG_SYMLINK)
-	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
-	}
-	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
-	{
-		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
-					? im_mounted
-					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				widget->window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,		/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 }
 

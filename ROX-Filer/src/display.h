@@ -52,7 +52,7 @@ void display_set_sort_type(FilerWindow *filer_window, SortType sort_type,
 			   GtkSortType order);
 void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf);
 
-void draw_large_icon(GtkWidget *widget,
+void draw_large_icon(GdkWindow *window,
 		     GdkRectangle *area,
 		     DirItem  *item,
 		     MaskedPixmap *image,
@@ -68,6 +68,8 @@ void display_update_view(FilerWindow *filer_window,
 void display_update_views(FilerWindow *filer_window);
 void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 		     DirItem  *item, MaskedPixmap *image, gboolean selected);
+void draw_huge_icon(GdkWindow *window, GdkRectangle *area, DirItem *item,
+			   MaskedPixmap *image, gboolean selected);
 void display_set_actual_size(FilerWindow *filer_window, gboolean force_resize);
 
 #endif /* _DISPLAY_H */

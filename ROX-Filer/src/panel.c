@@ -731,13 +731,13 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *pi)
 
 		area.y = height - text_height - area.height;
 		
-		draw_large_icon(widget, &area, icon->item,
+		draw_large_icon(widget->window, &area, icon->item,
 				icon->item->image, icon->selected);
 	}
 	else
 	{
 		area.y = (height - area.height) >> 1;
-		draw_large_icon(widget, &area, icon->item,
+		draw_large_icon(widget->window, &area, icon->item,
 				icon->item->image, icon->selected);
 	}
 

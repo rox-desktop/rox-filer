@@ -54,41 +54,15 @@
 #define COL_MTIME 6
 #define COL_ITEM 7
 #define COL_COLOUR 8
-#define COL_ICON 9
-#define COL_BG_COLOUR 10
-#define COL_WEIGHT 11
+#define COL_BG_COLOUR 9
+#define COL_WEIGHT 10
+#define COL_VIEW_ITEM 11
 #define N_COLUMNS 12
 
 static gpointer parent_class = NULL;
 
 struct _ViewDetailsClass {
 	GtkTreeViewClass parent;
-};
-
-typedef struct _ViewItem ViewItem;
-
-struct _ViewItem {
-	DirItem *item;
-	GdkPixbuf *image;
-	int	old_pos;	/* Used while sorting */
-	gboolean selected;
-	gchar   *utf8_name;	/* NULL => leafname is valid */
-};
-
-typedef struct _ViewDetails ViewDetails;
-
-struct _ViewDetails {
-	GtkTreeView treeview;
-
-	FilerWindow *filer_window;	/* Used for styles, etc */
-
-	GPtrArray   *items;		/* ViewItem */
-	
-	int	    (*sort_fn)(const void *, const void *);
-
-	int	    cursor_base;	/* Cursor when minibuffer opened */
-
-	GtkRequisition desired_size;
 };
 
 /* Static prototypes */
@@ -247,10 +221,8 @@ static GType details_get_column_type(GtkTreeModel *tree_model, gint index)
 
 	if (index == COL_COLOUR || index == COL_BG_COLOUR)
 		return GDK_TYPE_COLOR;
-	else if (index == COL_ITEM)
+	else if (index == COL_ITEM || index == COL_VIEW_ITEM)
 		return G_TYPE_POINTER;
-	else if (index == COL_ICON)
-		return GDK_TYPE_PIXBUF;
 	else if (index == COL_WEIGHT)
 		return G_TYPE_INT;
 	return G_TYPE_STRING;
@@ -314,6 +286,12 @@ static void details_get_value(GtkTreeModel *tree_model,
 					     : item->leafname);
 		return;
 	}
+	else if (column == COL_VIEW_ITEM)
+	{
+		g_value_init(value, G_TYPE_POINTER);
+		g_value_set_pointer(value, view_item);
+		return;
+	}
 	else if (column == COL_ITEM)
 	{
 		g_value_init(value, G_TYPE_POINTER);
@@ -344,12 +322,6 @@ static void details_get_value(GtkTreeModel *tree_model,
 		case COL_LEAF:
 			g_value_init(value, G_TYPE_STRING);
 			g_value_set_string(value, item->leafname);
-			break;
-		case COL_ICON:
-			g_value_init(value, GDK_TYPE_PIXBUF);
-			if (!item->image->sm_pixbuf)
-				pixmap_make_small(item->image);
-			g_value_set_object(value, item->image->sm_pixbuf);
 			break;
 		case COL_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
@@ -804,12 +776,13 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(view_details));
 
 	/* Icon */
-	cell = cell_icon_new();
+	cell = cell_icon_new(view_details);
 	column = gtk_tree_view_column_new_with_attributes(NULL, cell,
-					    "item", COL_ITEM,
+					    "item", COL_VIEW_ITEM,
 					    "background-gdk", COL_BG_COLOUR,
 					    NULL);
 	gtk_tree_view_append_column(treeview, column);
+	gtk_tree_view_column_set_sizing(column, GTK_TREE_VIEW_COLUMN_AUTOSIZE);
 
 	ADD_TEXT_COLUMN(_("_Name"), COL_LEAF);
 	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
@@ -866,6 +839,25 @@ static void view_details_iface_init(gpointer giface, gpointer iface_data)
 
 static void view_details_style_changed(ViewIface *view, int flags)
 {
+	ViewDetails *view_details = (ViewDetails *) view;
+	GtkTreeModel *model = (GtkTreeModel *) view;
+	GtkTreePath *path;
+	int i;
+	int n = view_details->items->len;
+
+	path = gtk_tree_path_new();
+	gtk_tree_path_append_index(path, 0);
+
+	for (i = 0; i < n; i++)
+	{
+		GtkTreeIter iter;
+
+		iter.user_data = GINT_TO_POINTER(i);
+		gtk_tree_model_row_changed(model, path, &iter);
+		gtk_tree_path_next(path);
+	}
+
+	gtk_tree_path_free(path);
 }
 
 static gint wrap_sort(gconstpointer a, gconstpointer b,
@@ -1058,6 +1050,12 @@ static void view_details_update_items(ViewIface *view, GPtrArray *items)
 		{
 			GtkTreePath *path;
 			GtkTreeIter iter;
+			ViewItem *view_item = view_details->items->pdata[j];
+			if (view_item->image)
+			{
+				g_object_unref(G_OBJECT(view_item->image));
+				view_item->image = NULL;
+			}
 			path = gtk_tree_path_new();
 			gtk_tree_path_append_index(path, j);
 			iter.user_data = GINT_TO_POINTER(j);
@@ -1492,6 +1490,8 @@ static void make_iter(ViewDetails *view_details, ViewIter *iter,
 
 static void free_view_item(ViewItem *view_item)
 {
+	if (view_item->image)
+		g_object_unref(G_OBJECT(view_item->image));
 	g_free(view_item->utf8_name);
 	g_free(view_item);
 }

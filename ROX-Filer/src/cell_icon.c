@@ -30,10 +30,15 @@
 
 #include "global.h"
 
+#include "view_details.h"
 #include "cell_icon.h"
 #include "display.h"
 #include "diritem.h"
 #include "pixmaps.h"
+#include "filer.h"
+#include "type.h"
+#include "support.h"
+#include "fscache.h"
 
 typedef struct _CellIcon CellIcon;
 typedef struct _CellIconClass CellIconClass;
@@ -41,9 +46,9 @@ typedef struct _CellIconClass CellIconClass;
 struct _CellIcon {
 	GtkCellRenderer parent;
 
-	DirItem *item;
+	ViewDetails *view_details;
+	ViewItem *item;
 	GdkColor background;
-	gboolean selected;
 };
 
 struct _CellIconClass {
@@ -82,9 +87,14 @@ enum {
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-GtkCellRenderer *cell_icon_new(void)
+GtkCellRenderer *cell_icon_new(ViewDetails *view_details)
 {
-	return GTK_CELL_RENDERER(g_object_new(cell_icon_get_type(), NULL));
+	GtkCellRenderer *cell;
+
+	cell = GTK_CELL_RENDERER(g_object_new(cell_icon_get_type(), NULL));
+	((CellIcon *) cell)->view_details = view_details;
+
+	return cell;
 }
 
 /****************************************************************
@@ -121,6 +131,7 @@ static GtkType cell_icon_get_type(void)
 
 static void cell_icon_init(CellIcon *icon)
 {
+	icon->view_details = NULL;
 }
 
 static void cell_icon_class_init(CellIconClass *class)
@@ -157,12 +168,11 @@ static void cell_icon_set_property(GObject *object, guint param_id,
 	switch (param_id)
 	{
 		case PROP_ITEM:
-			icon->item = (DirItem *) g_value_get_pointer(value);
+			icon->item = (ViewItem *) g_value_get_pointer(value);
 			break;
 		case PROP_BACKGROUND_GDK:
 		{
 			GdkColor *bg = g_value_get_boxed(value);
-			icon->selected = bg != NULL;
 			if (bg)
 			{
 				icon->background.red = bg->red;
@@ -178,6 +188,55 @@ static void cell_icon_set_property(GObject *object, guint param_id,
 	}
 }
 
+/* Return the size to display this icon at. If huge, ensures that the image
+ * exists in that size, if present at all.
+ */
+static DisplayStyle get_style(GtkCellRenderer *cell)
+{
+	CellIcon *icon = (CellIcon *) cell;
+	ViewItem *view_item = icon->item;
+	DisplayStyle size;
+	DirItem *item = view_item->item;
+
+	if (!view_item->image)
+	{
+		FilerWindow *filer_window = icon->view_details->filer_window;
+
+		if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
+			strcmp(item->mime_type->media_type, "image") == 0)
+		{
+			const guchar    *path;
+
+			path = make_path(filer_window->real_path,
+					 item->leafname);
+
+			view_item->image = g_fscache_lookup_full(pixmap_cache,
+					path, FSCACHE_LOOKUP_ONLY_NEW, NULL);
+		}
+		if (!view_item->image)
+		{
+			view_item->image = item->image;
+			if (view_item->image)
+				g_object_ref(view_item->image);
+		}
+	}
+	
+	size = icon->view_details->filer_window->display_style_wanted;
+
+	if (size == AUTO_SIZE_ICONS)
+	{
+		if (!view_item->image || view_item->image == item->image)
+			size = SMALL_ICONS;
+		else
+			size = HUGE_ICONS;
+	}
+	if (size == HUGE_ICONS && view_item->image &&
+	    !view_item->image->huge_pixbuf)
+		pixmap_make_huge(view_item->image);
+
+	return size;
+}
+
 static void cell_icon_get_size(GtkCellRenderer *cell,
 				   GtkWidget       *widget,
 				   GdkRectangle    *cell_area,
@@ -186,14 +245,58 @@ static void cell_icon_get_size(GtkCellRenderer *cell,
 				   gint            *width,
 				   gint            *height)
 {
+	MaskedPixmap *image;
+	DisplayStyle size;
+	int w, h;
+
+	size = get_style(cell);
+	image = ((CellIcon *) cell)->item->image;
+
 	if (x_offset)
 		*x_offset = 0;
 	if (y_offset)
 		*y_offset = 0;
+
+	switch (size)
+	{
+		case SMALL_ICONS:
+			w = SMALL_WIDTH;
+			h = SMALL_HEIGHT;
+			break;
+		case LARGE_ICONS:
+			if (image)
+			{
+				w = image->width;
+				h = image->height;
+			}
+			else
+			{
+				w = ICON_WIDTH;
+				h = ICON_HEIGHT;
+			}
+			break;
+		case HUGE_ICONS:
+			if (image)
+			{
+				w = image->huge_width;
+				h = image->huge_height;
+			}
+			else
+			{
+				w = HUGE_WIDTH;
+				h = HUGE_HEIGHT;
+			}
+			break;
+		default:
+			w = 2;
+			h = 2;
+			break;
+	}
+
 	if (width)
-		*width = SMALL_WIDTH;
+		*width = w;
 	if (height)
-		*height = SMALL_HEIGHT;
+		*height = h;
 }
 
 static void cell_icon_render(GtkCellRenderer    *cell,
@@ -205,12 +308,18 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 			     guint		flags)
 {
 	CellIcon *icon = (CellIcon *) cell;
+	ViewItem *view_item = icon->item;
+	DirItem *item;
+	DisplayStyle size;
+	
+	g_return_if_fail(view_item != NULL);
 
-	g_return_if_fail(icon->item != NULL);
+	item = view_item->item;
+	size = get_style(cell);
 
 	/* Drag the background */
 
-	if (icon->selected)
+	if (view_item->selected)
 	{
 		GdkColor color;
 		GdkGC *gc;
@@ -234,9 +343,27 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 
 	/* Draw the icon */
 
-	if (!icon->item->image)
+	if (!view_item->image)
 		return;
 
-	draw_small_icon(window, cell_area, icon->item, icon->item->image,
-			FALSE);	/* XXX: selected */
+	switch (size)
+	{
+		case SMALL_ICONS:
+			draw_small_icon(window, cell_area, item,
+					view_item->image, view_item->selected);
+			break;
+		case LARGE_ICONS:
+			draw_large_icon(window, cell_area, item,
+					view_item->image, view_item->selected);
+			break;
+		case HUGE_ICONS:
+			if (!item->image->huge_pixbuf)
+				pixmap_make_huge(item->image);
+			draw_huge_icon(window, cell_area, item,
+					view_item->image, view_item->selected);
+			break;
+		default:
+			g_warning("Unknown size %d\n", size);
+			break;
+	}
 }
