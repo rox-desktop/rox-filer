@@ -836,6 +836,8 @@ static void menu_closed(GtkWidget *widget)
 		view_clear_selection(window_with_focus->view);
 		window_with_focus->temp_item_selected = FALSE;
 	}
+
+	appmenu_remove();
 }
 
 static void target_callback(FilerWindow *filer_window,
