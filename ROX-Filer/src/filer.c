@@ -22,6 +22,7 @@
 #include "filer.h"
 #include "pixmaps.h"
 #include "menu.h"
+#include "dnd.h"
 
 static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
@@ -341,6 +342,10 @@ void filer_opendir(char *path)
 			show_menu, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
 			gain_selection, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "drag_selection",
+			drag_selection, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
+			drag_data_get, filer_window);
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;

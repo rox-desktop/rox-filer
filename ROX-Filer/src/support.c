@@ -50,3 +50,22 @@ GString *make_path(char *dir, char *leaf)
 
 	return buffer;
 }
+
+/* Return our complete host name */
+char *our_host_name()
+{
+	static char *name = NULL;
+
+	if (!name)
+	{
+		char buffer[4096];
+
+		g_return_val_if_fail(gethostname(buffer, 4096) == 0,
+					"localhost");
+
+		buffer[4095] = '\0';
+		name = g_strdup(buffer);
+	}
+
+	return name;
+}
