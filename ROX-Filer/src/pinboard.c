@@ -129,7 +129,7 @@ typedef enum {
 	TEXT_BG_SOLID = 2,
 } TextBgType;
 
-static Option o_pinboard_text_bg, o_pinboard_clamp_icons, o_pinboard_grid_step;
+static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 
 /* Static prototypes */
@@ -213,7 +213,6 @@ void pinboard_init(void)
 	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#000");
 	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#ddd");
 
-	option_add_int(&o_pinboard_text_bg, "pinboard_text_bg", TEXT_BG_SOLID);
 	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
 							GRID_STEP_COARSE);
@@ -468,8 +467,7 @@ static void pinboard_check_options(void)
 	gdk_color_parse(o_pinboard_fg_colour.value, &n_fg);
 	gdk_color_parse(o_pinboard_bg_colour.value, &n_bg);
 
-	if (o_pinboard_text_bg.has_changed ||
-		gdk_color_equal(&n_fg, &text_fg_col) == 0 ||
+	if (gdk_color_equal(&n_fg, &text_fg_col) == 0 ||
 		gdk_color_equal(&n_bg, &text_bg_col) == 0)
 	{
 		memcpy(&text_fg_col, &n_fg, sizeof(GdkColor));
@@ -600,7 +598,7 @@ static void set_size_and_shape(PinIcon *pi, int *rwidth, int *rheight)
 	}
 	gdk_gc_set_function(mask_gc, GDK_COPY);
 
-	/* Mask off an area for the text (from o_pinboard_text_bg) */
+	/* Mask off an area for the text */
 
 	text_x = (width - pi->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
@@ -628,6 +626,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	GdkGC		*gc = widget->style->black_gc;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 					       : GTK_STATE_NORMAL;
+	PangoRectangle	logical;
 
 	image_x = (pi->width - iwidth) >> 1;
 
@@ -674,23 +673,16 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	text_x = (pi->width - pi->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
-	if (o_pinboard_text_bg.int_value != TEXT_BG_NONE)
-	{
-		PangoRectangle logical;
-		int		font_height;
+	pango_layout_get_pixel_extents(pi->layout, NULL, &logical);
 
-		pango_layout_get_pixel_extents(pi->layout, NULL, &logical);
-		font_height = logical.height - logical.y;
-
-		gtk_paint_flat_box(widget->style, widget->window,
-				state,
-				GTK_SHADOW_NONE,
-				NULL, widget, "text",
-				text_x - 1,
-				text_y - 1,
-				pi->name_width + 2,
-				font_height + 2);
-	}
+	gtk_paint_flat_box(widget->style, widget->window,
+			state,
+			GTK_SHADOW_NONE,
+			NULL, widget, "text",
+			text_x - 1,
+			text_y - 1,
+			pi->name_width + 2,
+			logical.height - logical.y + 2);
 
 	gtk_paint_layout(widget->style, widget->window,
 			state,
