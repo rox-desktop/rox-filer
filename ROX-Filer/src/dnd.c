@@ -263,7 +263,7 @@ void drag_one_item(GtkWidget		*widget,
 		   DirItem		*item,
 		   MaskedPixmap		*image)
 {
-	guchar		*uri;
+	guchar		*uri, *tmp;
 	GdkDragContext 	*context;
 	GdkDragAction	actions;
 	GtkTargetList   *target_list;
@@ -313,8 +313,10 @@ void drag_one_item(GtkWidget		*widget,
 
 	g_dataset_set_data_full(context, "full_path",
 			g_strdup(full_path), g_free);
-	uri = g_strconcat("file://", our_host_name_for_dnd(),
-			full_path, "\r\n", NULL);
+	tmp = encode_path_as_uri(full_path);
+	uri = g_strconcat(tmp, "\r\n", NULL);
+	/*printf("%s\n", tmp);*/
+	g_free(tmp);
 	g_dataset_set_data_full(context, "uri_list", uri, g_free);
 
 	g_return_if_fail(image != NULL);
@@ -567,15 +569,12 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 			}
 			else
 			{
-				GString	*uri;
+				gchar	*uri;
 
-				uri = g_string_new(NULL);
-				g_string_printf(uri, "file://%s%s",
-						our_host_name_for_dnd(),
-						make_path(dest_path,
+				uri=encode_path_as_uri(make_path(dest_path,
 							  leafname));
-				set_xds_prop(context, uri->str);
-				g_string_free(uri, TRUE);
+				set_xds_prop(context, uri);
+				g_free(uri);
 
 				target = XdndDirectSave0;
 				g_dataset_set_data_full(context, "leafname",
@@ -650,6 +649,8 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 		const guchar	*path;
 
 		path = get_local_path((gchar *) next->data);
+		/*printf("%s -> %s\n", (char *) next->data,
+		  path? path: "NULL");*/
 		if (path)
 		{
 			pinboard_pin(path, NULL, x, y, NULL);
@@ -845,6 +846,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
 
+	/*printf("got_uri_list\n");*/
 	uri_list = uri_list_to_glist(selection_data->data);
 
 	if (type == drop_dest_bookmark)
@@ -878,7 +880,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			else
 				leaf = uri_list->data;
 			g_dataset_set_data_full(context, "leafname",
-					g_strdup(leaf), g_free);
+					unescape_uri(leaf), g_free);
 			gtk_drag_get_data(widget, context,
 					application_octet_stream, time);
 			send_reply = FALSE;
@@ -900,6 +902,8 @@ static void got_uri_list(GtkWidget 		*widget,
 			const char *path;
 
 			path = get_local_path((char *) next_uri->data);
+			/*printf("%s -> %s\n", (char *) next_uri->data,
+			  path? path: "NULL");*/
 
 			if (path)
 				local_paths = g_list_append(local_paths,

@@ -52,4 +52,9 @@ int collate_key_cmp(const CollateKey *n1, const CollateKey *n2,
 		    gboolean caps_first);
 gboolean file_exists(const char *path);
 
+extern gchar *escape_uri(const char *uri);
+extern gchar *escape_uri_path(const char *path);
+extern gchar *encode_path_as_uri(const guchar *path);
+extern gchar *unescape_uri(const char *uri);
+
 #endif /* _SUPPORT_H */

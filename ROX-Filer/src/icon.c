@@ -334,22 +334,21 @@ gchar *icon_create_uri_list(void)
 {
 	GString	*tmp;
 	guchar	*retval;
-	guchar	*leader;
 	GList	*next;
 
 	tmp = g_string_new(NULL);
-	leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
 
 	for (next = icon_selection; next; next = next->next)
 	{
 		Icon *icon = (Icon *) next->data;
+		gchar *uri;
 
-		g_string_append(tmp, leader);
-		g_string_append(tmp, icon->path);
+		uri = encode_path_as_uri(icon->path);
+		g_string_append(tmp, uri);
+		g_free(uri);
 		g_string_append(tmp, "\r\n");
 	}
 
-	g_free(leader);
 	retval = tmp->str;
 	g_string_free(tmp, FALSE);
 	

@@ -955,7 +955,10 @@ GList *uri_list_to_glist(const char *uri_list)
 
 		if (length && uri_list[0] != '#')
 		{
-			uri = g_strndup(uri_list, length);
+			char *tmp;
+			tmp = g_strndup(uri_list, length);
+			uri=unescape_uri(tmp);
+			g_free(tmp);
 			list = g_list_append(list, uri);
 		}
 

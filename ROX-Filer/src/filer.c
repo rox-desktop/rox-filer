@@ -1998,18 +1998,21 @@ static guchar *filer_create_uri_list(FilerWindow *filer_window)
 
 	string = g_string_new(NULL);
 
-	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name_for_dnd());
-	g_string_append(leader, filer_window->sym_path);
+	leader = g_string_new(filer_window->sym_path);
 	if (leader->str[leader->len - 1] != '/')
 		g_string_append_c(leader, '/');
 
 	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 	while ((item = iter.next(&iter)))
 	{
-		g_string_append(string, leader->str);
-		g_string_append(string, item->leafname);
+		gchar *uri, *path;
+		
+		path=g_strconcat(leader->str, item->leafname, NULL);
+		uri=encode_path_as_uri(path);
+		g_string_append(string, uri);
 		g_string_append(string, "\r\n");
+		g_free(path);
+		g_free(uri);
 	}
 
 	g_string_free(leader, TRUE);

@@ -1257,3 +1257,120 @@ gboolean file_exists(const char *path)
 
 	return !mc_stat(path, &info);
 }
+
+/* Code for escaping and unescaping URI's for DnD */
+gchar *escape_uri(const char *uri)
+{
+	const char *p;
+	const char *spath=NULL;
+	gchar *tmp, *t2, *enc;
+
+	/* skip the scheme */
+	p=uri;
+	do {
+		p++;
+		if(*p==':' || *p=='/')
+			break;
+	} while(*p);
+
+ 
+	if(*p==':') 
+		p++;
+	/* What is next is either
+	  //host/path
+	  ///path
+	  /path
+	  not-a-path
+	*/
+	if(p[0]=='/' && p[1]=='/') {
+		p+=2;
+		while(*p!='/')
+			p++;
+		if(*p)
+			spath=p;
+	} else if(p[0]) {
+		spath=p;
+	}
+
+	if(!spath)
+		return g_strdup(uri);
+
+	tmp=escape_uri_path(spath);
+	t2=g_strndup(uri, spath-uri);
+	/*printf("%s %s (%s)\n", t2, tmp, spath);*/
+	enc=g_strconcat(t2, tmp, NULL);
+	g_free(tmp);
+	g_free(t2);
+
+	return enc;
+}
+
+/* Escape path for future use in URI */
+gchar *escape_uri_path(const char *path)
+{
+	const char *safe="-_./"; /* Plus isalnum() */
+	int l;
+	const gchar *s;
+	gchar *ans;
+	GString *str;
+
+	/* Worst case is expansion by 3 */
+	l=strlen(path);
+	str=g_string_sized_new(l*3);
+
+	for(s=path; *s; s++) {
+		if(!g_ascii_isalnum(*s) && strchr(safe, *s)==0) {
+			guchar c=*s;
+			/*printf("%d (%c %02x)\n", c, c, c);*/
+			g_string_append_printf(str, "%%%02x", c);
+		} else {
+			str=g_string_append_c(str, *s);
+		}
+	}
+
+	ans=g_strdup(str->str);
+	g_string_free(str, TRUE);
+	
+	return ans;
+}
+
+gchar *encode_path_as_uri(const guchar *path)
+{
+  gchar *tpath=escape_uri_path(path);
+  gchar *uri;
+
+  uri=g_strconcat("file://", our_host_name_for_dnd(), tpath, NULL);
+  g_free(tpath);
+
+  return uri;
+}
+
+gchar *unescape_uri(const char *uri)
+{
+	const gchar *s;
+	gchar *d;
+	gchar *tmp;
+	
+	tmp=g_strdup(uri);
+	for(s=uri, d=tmp; *s; s++, d++) {
+		/*printf("%s\n", s);*/
+		if(*s=='%' && g_ascii_isxdigit(s[1]) &&
+		   g_ascii_isxdigit(s[2])) {
+			int c;
+			char buf[3];
+			buf[0]=s[1];
+			buf[1]=s[2];
+			buf[2]=0;
+			c=(int) strtol(buf, NULL, 16);
+			*d=c;
+			s+=2;
+		} else {
+			*d=*s;
+		}
+	}
+	*d=0;
+
+	return tmp;
+}
+
+    
