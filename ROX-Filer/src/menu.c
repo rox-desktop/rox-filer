@@ -439,7 +439,8 @@ void show_style_menu(FilerWindow *filer_window,
 
 static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			    MenuIconStyle style, CallbackFn func,
-			    gboolean separator, gboolean strip_ext)
+			    gboolean separator, gboolean strip_ext,
+			    gboolean recurse)
 {
 	GList *widgets = NULL;
 	DirItem *ditem;
@@ -520,15 +521,32 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
 
-			diritem_free(ditem);
 		}
 		else
 			item = gtk_menu_item_new_with_label(leaf);
 
+		/* If it is a directory (but NOT an AppDir) and we are
+		 * recursing then set up a sub menu.
+		 */
+		if (recurse && ditem->base_type == TYPE_DIRECTORY &&
+			   !(ditem->flags & ITEM_FLAG_APPDIR))
+		{
+			GtkWidget *sub;
+			GList *new_widgets;
+
+			sub = gtk_menu_new();
+			new_widgets = menu_from_dir(sub, fname, style, func,
+						separator, strip_ext, FALSE);
+			g_list_free(new_widgets);
+			gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), sub);
+		}
+		else
+			g_signal_connect_swapped(item, "activate",
+					G_CALLBACK(func), fname);
+
+		diritem_free(ditem);
 		g_free(leaf);
 
-		g_signal_connect_swapped(item, "activate",
-				G_CALLBACK(func), fname);
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		g_signal_connect_swapped(item, "destroy",
 				G_CALLBACK(g_free), fname);
@@ -564,7 +582,8 @@ static void update_new_files_menu(MenuIconStyle style)
 	if (templ_dname)
 	{
 		widgets = menu_from_dir(filer_new_menu, templ_dname, style,
-					(CallbackFn) new_file_type, TRUE, TRUE);
+					(CallbackFn) new_file_type, TRUE, TRUE,
+					FALSE);
 		g_free(templ_dname);
 	}
 	gtk_widget_show_all(filer_new_menu);
@@ -1368,7 +1387,7 @@ static void show_send_to_menu(GList *paths, GdkEvent *event)
 
 		widgets = menu_from_dir(menu, dir, get_menu_icon_style(),
 					(CallbackFn) do_send_to,
-					FALSE, FALSE);
+					FALSE, FALSE, TRUE);
 
 		if (widgets)
 			gtk_menu_shell_append(GTK_MENU_SHELL(menu),
