@@ -144,8 +144,6 @@ static Tool all_tools[] = {
 
 void toolbar_init(void)
 {
-	int	i;
-	
 	option_add_int(&o_toolbar, "toolbar_type", TOOLBAR_NORMAL);
 	option_add_int(&o_toolbar_info, "toolbar_show_info", 1);
 	option_add_string(&o_toolbar_disable, "toolbar_disable",
@@ -153,16 +151,6 @@ void toolbar_init(void)
 	option_add_notify(option_notify);
 	
 	tooltips = gtk_tooltips_new();
-
-	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
-	{
-#if 0
-		Tool	*tool = &all_tools[i];
-
-		if (!tool->icon)
-			tool->icon = load_pixmap(tool->name);
-#endif
-	}
 
 	option_register_widget("tool-options", build_tool_options);
 }
@@ -427,59 +415,10 @@ static gint toolbar_adjust_released(GtkButton *button,
 	return FALSE;
 }
 
-#if 0
-static gint menu_pressed(GtkWidget *button,
-			 GdkEventButton *event,
-			 FilerWindow *filer_window)
-{
-	GtkWidget	*menu;
-
-	if (event->button != 3 && event->button != 2)
-		return FALSE;
-
-	menu = gtk_object_get_data(GTK_OBJECT(button), "popup_menu");
-	g_return_val_if_fail(menu != NULL, TRUE);
-
-	show_style_menu(filer_window, event, menu);
-
-	return TRUE;
-}
-#endif
-
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window)
 {
 	GtkWidget 	*button, *icon_widget;
-
-#if 0
-	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
-		box = gtk_hbox_new(FALSE, 0);
-	else if (o_toolbar.int_value == TOOLBAR_LARGE)
-		box = gtk_vbox_new(FALSE, 0);
-
-	if (box)
-	{
-		GtkWidget	*text;
-
-		gtk_box_pack_start(GTK_BOX(box), icon_widget, TRUE, TRUE, 0);
-
-		text = gtk_label_new(_(tool->label));
-		gtk_box_pack_start(GTK_BOX(box), text, FALSE, TRUE, 0);
-
-		gtk_container_add(GTK_CONTAINER(button), box);
-	}
-	else
-		gtk_container_add(GTK_CONTAINER(button), icon_widget);
-
-	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
-
-	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
-		gtk_misc_set_padding(GTK_MISC(icon_widget), 4, 1);
-	else if (o_toolbar.int_value == TOOLBAR_LARGE)
-		gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
-	else
-		gtk_misc_set_padding(GTK_MISC(icon_widget), 8, 1);
-#endif
 
 	icon_widget = gtk_image_new_from_stock(tool->name,
 						GTK_ICON_SIZE_LARGE_TOOLBAR);
@@ -497,7 +436,6 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 	{
 		GtkWidget *hbox, *label;
 		GList	  *kids;
-		//gtk_toolbar_append_space(GTK_TOOLBAR(bar));
 		hbox = GTK_BIN(button)->child;
 		kids = gtk_container_get_children(GTK_CONTAINER(hbox));
 		label = g_list_nth_data(kids, 1);
