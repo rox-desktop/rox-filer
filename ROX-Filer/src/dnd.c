@@ -507,16 +507,14 @@ static gboolean panel_drag_ok(FilerWindow 	*filer_window,
 	FileItem 	*fileitem = NULL;
 	char	 	*old_path;
 	char	 	*new_path;
-	char		*type;
+	char		*type = NULL;	/* Quiet gcc */
 
 	if (item >= 0)
 		fileitem = (FileItem *)
 			filer_window->collection->items[item].data;
 
 	if (item == -1)
-	{
-		new_path = NULL;
-	}
+		new_path = NULL;   /* Drag to panel background - disallow */
 	else if (fileitem->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		if (provides(context, text_uri_list))
@@ -628,9 +626,9 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	char		*error = NULL;
 	char		*leafname = NULL;
 	FilerWindow	*filer_window;
-	GdkAtom		target;
+	GdkAtom		target = GDK_NONE;
 	char		*dest_path;
-	char		*dest_type;
+	char		*dest_type = NULL;
 	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_val_if_fail(filer_window != NULL, TRUE);
@@ -990,11 +988,11 @@ static void got_uri_list(GtkWidget 		*widget,
 				"sorry.";
 		}
 		else if (context->action == GDK_ACTION_MOVE)
-			action_move(local_paths, filer_window->path);
+			action_move(local_paths, dest_path);
 		else if (context->action == GDK_ACTION_COPY)
-			action_copy(local_paths, filer_window->path);
+			action_copy(local_paths, dest_path);
 		else if (context->action == GDK_ACTION_LINK)
-			action_link(local_paths, filer_window->path);
+			action_link(local_paths, dest_path);
 		else
 			error = "Unknown action requested";
 

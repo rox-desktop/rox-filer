@@ -121,7 +121,7 @@ static void remove_view(FilerWindow *filer_window)
  */
 static void free_items(FilerWindow *filer_window)
 {
-	int		i;
+	guint		i;
 	Collection	*collection = filer_window->collection;
 
 	for (i = 0; i < collection->number_of_items; i++)
@@ -229,7 +229,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 
 	item = g_malloc(sizeof(FileItem));
 	item->leafname = g_strdup(leafname);
-	item->flags = 0;
+	item->flags = (ItemFlags) 0;
 
 	path = make_path(filer_window->path, leafname);
 	if (lstat(path->str, &info))
@@ -533,7 +533,7 @@ void update_dir(FilerWindow *filer_window)
 {
 	Collection	*collection = filer_window->collection;
 	struct stat 	info;
-	int		i;
+	guint		i;
 
 	if (filer_window->dir)
 	{
@@ -631,7 +631,8 @@ static void selection_get(GtkWidget *widget,
 			g_string_append(reply, item->leafname);
 		}
 	}
-	g_string_append_c(reply, ' ');
+	/* This works, but I don't think I like it... */
+	/* g_string_append_c(reply, ' '); */
 	
 	gtk_selection_data_set(selection_data, xa_string,
 			8, reply->str + 1, reply->len - 1);
@@ -764,7 +765,9 @@ void open_item(Collection *collection,
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE && !shift)
 			{
-				char	*argv[] = {full_path, NULL};
+				char	*argv[] = {NULL, NULL};
+
+				argv[0] = full_path;
 
 				if (spawn_full(argv, getenv("HOME"), 0))
 				{
@@ -922,7 +925,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->panel_side = panel_side;
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = sort_by_type;
-	filer_window->flags = 0;
+	filer_window->flags = (FilerFlags) 0;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 

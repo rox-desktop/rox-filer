@@ -49,4 +49,4 @@ void load_default_pixmaps(GdkWindow *window);
 void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image);
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path);
 
-#endif _PIXMAP_H
+#endif /* _PIXMAP_H */

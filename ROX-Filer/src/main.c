@@ -78,7 +78,7 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 int main(int argc, char **argv)
 {
 	int		 stderr_pipe[2];
-	struct sigaction act = {};
+	struct sigaction act;
 
 	gtk_init(&argc, &argv);
 	choices_init("ROX-Filer");

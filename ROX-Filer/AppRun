@@ -1,23 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -P
 APP_DIR=${0%/*}
 if [ "$APP_DIR" = "$0" ] ; then APP_DIR=. ; fi
 APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
-PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
+DEBUGGER=""
+case $1 in
+	--debug) shift ; DEBUGGER=gdb ;;
+	--compile)
+		if [ ! -e $APP_DIR/src/Makefile ] ; then
+			echo "ERROR from $0:" >&2
+			echo "Cannot compile - source code is missing!" >&2
+			exit 1
+		fi
+		echo "Compiling $APP_DIR... please wait..." >&2
+		cd $APP_DIR/src && make clean && make depend \
+					&& make && echo Done >&2 && exit 0
+		echo Compile failed >&2
+		exit 1
+esac
 
+PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
 BIN=$APP_DIR/$PLATFORM/ROX-Filer
 
 if [ -x $BIN ] ; then
-  DEBUGGER=""
-  case $1 in
-  	--debug) shift; DEBUGGER=gdb;
-  esac
   exec $DEBUGGER $BIN $*
 else
   echo "ERROR from $0:" >&2
   echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
-  echo "Look inside this application directory for a 'src' directory - if" >&2
-  echo "there is one then try running make inside it to create the executable." >&2
+  echo "Try using the --compile option" >&2
 fi

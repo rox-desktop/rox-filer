@@ -22,16 +22,10 @@
 #include "main.h"
 #include "gui_support.h"
 
-static GdkAtom xa_win_state;
-static GdkAtom xa_win_layer;
-static GdkAtom xa_win_hints;
 static GdkAtom xa_cardinal;
 
 void gui_support_init()
 {
-	xa_win_state = gdk_atom_intern("_WIN_STATE", FALSE);
-	xa_win_layer = gdk_atom_intern("_WIN_LAYER", FALSE);
-	xa_win_hints = gdk_atom_intern("_WIN_HINTS", FALSE);
 	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
 }
 
@@ -58,7 +52,7 @@ int get_choice(char *title,
 	GtkWidget	*dialog;
 	GtkWidget	*vbox, *action_area, *separator;
 	GtkWidget	*text, *text_container;
-	GtkWidget	*button;
+	GtkWidget	*button = NULL;
 	int		i, retval;
 	va_list	ap;
 	int		choice_return;

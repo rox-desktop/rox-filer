@@ -527,9 +527,14 @@ static gboolean do_move(char *path, char *dest)
 
 	dest_path = make_path(dest, leaf)->str;
 
+	g_string_sprintf(message, "'Moving %s into %s...\n", path, dest);
+	send();
+	
 	if (access(dest_path, F_OK) == 0)
 	{
-		char	rep;
+		char		rep;
+		struct stat	info;
+
 		g_string_sprintf(message, "?'%s' already exists - overwrite?\n",
 				dest_path);
 		send();
@@ -539,16 +544,46 @@ static gboolean do_move(char *path, char *dest)
 			quiet = TRUE;
 		else if (rep != 'Y')
 			return FALSE;
+
+		if (lstat(dest_path, &info))
+		{
+			send_error();
+			return FALSE;
+		}
+
+		if (S_ISDIR(info.st_mode))
+		{
+			char *safe_path, *safe_dest;
+
+			safe_path = g_strdup(path);
+			safe_dest = g_strdup(dest_path);
+			g_string_sprintf(message, "'Scanning in '%s'\n",
+					safe_path);
+			send();
+			for_dir_contents(do_move, safe_path, safe_dest);
+			g_free(safe_dest);
+			if (rmdir(safe_path))
+			{
+				g_free(safe_path);
+				send_error();
+				return FALSE;
+			}
+			g_string_assign(message, "'Directory deleted\n");
+			send();
+			g_free(safe_path);
+			g_string_sprintf(message, "+%s", path);
+			g_string_truncate(message, leaf - path);
+			send();
+			return TRUE;
+		}
 	}
 
-	g_string_sprintf(message, "mv -f %s %s", path, dest_path);
+	g_string_sprintf(message, "mv -f %s %s", path, dest);
 	if (system(message->str) == 0)
 	{
 		g_string_sprintf(message, "+%s", path);
 		g_string_truncate(message, leaf - path);
 		send();
-		g_string_sprintf(message, "'Moved %s as %s\n",
-				path, dest_path);
 	}
 	else
 	{

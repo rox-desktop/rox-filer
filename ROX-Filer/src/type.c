@@ -178,9 +178,11 @@ MIME_type *type_from_path(char *path)
 
 gboolean type_open(char *path, MIME_type *type)
 {
-	char	*argv[] = {NULL, path, NULL};
+	char	*argv[] = {NULL, NULL, NULL};
 	char	*open;
 	char	*type_name;
+
+	argv[1] = path;
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
 	open = choices_find_path_load_shared(type_name, "MIME-types");

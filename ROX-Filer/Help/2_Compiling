@@ -24,13 +24,14 @@ the GTK+ web page and get the latest copy:
 
 To compile the application:
 
-	$ cd ROX-Filer/src
-	$ make depend
-	$ make
+	$ ./ROX-Filer/AppRun --compile
 
-If that fails, email me and I'll try to fix it. Otherwise, test it as before:
+If that fails, email me and I'll try to fix it. Note, you may have to edit the
+Makefile (ROX-Filer/src/Makefile) and change 'gcc' to 'cc' and remove '-Wall -g'
+if you can't use gcc.
 
-	$ cd ../..
+Otherwise, test it as before:
+
 	$ ./ROX-Filer/AppRun
 
 Hopefully it will work this time!

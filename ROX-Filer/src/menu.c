@@ -316,7 +316,10 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	GString		*buffer;
 	GtkWidget	*file_label, *file_menu;
 	FileItem	*file_item;
-	int		pos[] = {event->x_root, event->y_root};
+	int		pos[2];
+	
+	pos[0] = event->x_root;
+	pos[1] = event->y_root;
 
 	window_with_focus = filer_window;
 
@@ -873,7 +876,9 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*argv[] = {xterm_here_value, NULL};
+	char	*argv[] = {NULL, NULL};
+
+	argv[0] = xterm_here_value;
 
 	g_return_if_fail(window_with_focus != NULL);
 
