@@ -420,7 +420,6 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 	GtkListStore	*store;
 	GtkWidget	*view;
 	xmlNode 	*prop;
-	gchar		*tmp;
 	xmlNode		*about, *about_trans;
 	GHashTable	*translate;
 
@@ -444,8 +443,7 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 	/* Add each field in about to the list, but overriding each element
 	 * with about_trans if a translation is supplied.
 	 */
-	translate = g_hash_table_new_full(g_str_hash, g_str_equal,
-					  NULL, g_free);
+	translate = g_hash_table_new(g_str_hash, g_str_equal);
 	if (about_trans != about)
 	{
 		xmlNode *p;
@@ -453,34 +451,33 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 		{
 			if (p->type != XML_ELEMENT_NODE)
 				continue;
-			tmp = xmlNodeListGetString(p->doc,
-						   p->xmlChildrenNode, 1);
-			if (tmp)
-				g_hash_table_insert(translate,
-						(char *) p->name, tmp);
+			g_hash_table_insert(translate, (char *) p->name, p);
 		}
-
 	}
-
 	for (prop = about->xmlChildrenNode; prop; prop = prop->next)
 	{
 		if (prop->type == XML_ELEMENT_NODE)
 		{
-			char *l;
-			char *trans;
+			char *label = NULL;
+			char *value = NULL;
+			char *tmp = NULL;
+			xmlNode *trans;
 
 			trans = g_hash_table_lookup(translate, prop->name);
-			
-			l = g_strconcat((char *) prop->name, ":", NULL);
-			if (trans)
-				tmp = g_strdup(trans);
-			else
-				tmp = xmlNodeListGetString(prop->doc,
-						prop->xmlChildrenNode, 1);
-			if (!tmp)
-				tmp = g_strdup("-");
-			add_row_and_free(store, l, tmp);
-			g_free(l);
+			if (!trans)
+				trans = prop;
+
+			tmp = xmlGetProp(trans, "label");
+			label = g_strconcat(tmp ? tmp
+						: (char *) trans->name,
+					    ":", NULL);
+			g_free(tmp);
+			value = xmlNodeListGetString(trans->doc,
+					   trans->xmlChildrenNode, 1);
+			if (!value)
+				value = g_strdup("-");
+			add_row_and_free(store, label, value);
+			g_free(label);
 		}
 	}
 
