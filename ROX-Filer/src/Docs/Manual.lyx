@@ -129,6 +129,11 @@ directories Self contained relocatable applications, where installati
 on is as simple as copying it to where you want it and uninstalling it is
  just a matter of deleting a directory.
  Described later in this documentation.
+\layout Description
+
+Thumbnails The filer can be made to display image files by using the image
+ itself for the icon, instead of a generic `this-is-an-image' icon.
+ Very useful for organising a directory full of photos!
 \layout Section
 
 Conditions
@@ -534,6 +539,65 @@ xhost
 \family default 
 ' may give you some hints, but it varies between systems (which is why this
  isn't built in to the filer!).
+\layout Subsubsection
+
+Full list of command-line options
+\layout Standard
+
+The full list of options is:
+\layout Description
+
+-b,\SpecialChar ~
+--bottom=PANEL open PANEL as a bottom-edge panel
+\layout Description
+
+-d,\SpecialChar ~
+--dir=DIR open DIR as directory (not as an application, even if it looks
+ like one)
+\layout Description
+
+-h,\SpecialChar ~
+--help display help about the various options
+\layout Description
+
+-l,\SpecialChar ~
+--left=PANEL open PANEL as a left-edge panel
+\layout Description
+
+-n,\SpecialChar ~
+--new start a new filer, even if one already seems to be running
+\layout Description
+
+-o,\SpecialChar ~
+--override override window manager control of panels
+\layout Description
+
+-p,\SpecialChar ~
+--pinboard=PIN use pinboard PIN as the pinboard
+\layout Description
+
+-r,\SpecialChar ~
+--right=PANEL open PANEL as a right-edge panel
+\layout Description
+
+-s,\SpecialChar ~
+--show=FILE open a directory showing FILE
+\layout Description
+
+-t,\SpecialChar ~
+--top=PANEL open PANEL as a top-edge panel
+\layout Description
+
+-u,\SpecialChar ~
+--user show user name in each window
+\layout Description
+
+-x,\SpecialChar ~
+--examine=FILE FILE has changed - re-examine it
+\layout Description
+
+-v,\SpecialChar ~
+--version display the version information and exit
 \layout Subsection
 
 Mouse button and key bindings
@@ -962,7 +1026,7 @@ The display menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-17 2 0 0 -1 -1 -1 -1
+19 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -978,6 +1042,8 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 1 0 0
+0 1 0 0
+0 1 1 0
 0 1 0 0
 0 1 1 0
 8 1 0 "" ""
@@ -1010,6 +1076,10 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1117,25 +1187,15 @@ Rereads the contents of the directory and details of all the files in it.
 
 \newline 
 Use this if the display becomes out-of-date.
-\layout Standard
+\newline 
+Create Thumbs
+\newline 
+Tries to load every file as an image and use that image as the file's icon.
+ Useful
+\newline 
 
-
-\latex latex 
-
-\backslash 
-noindent
-\backslash 
-dag
-\backslash 
-thinspace{}
-\latex default 
-If ROX-Filer was unable to find ImLib
-\begin_inset LatexCommand \cite{ImLib}
-
-\end_inset 
-
- when it was compiled then the icons are shown cropped rather than scaled.
- Get ImLib and recompile if you want it to look nice.
+\newline 
+if you have a directory full of photos and can't remember which is which!
 \layout Standard
 
 
@@ -1458,9 +1518,10 @@ The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-9 2 0 0 -1 -1 -1 -1
+10 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -1474,6 +1535,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1504,6 +1567,10 @@ As above, but reuse this window.
 New Window
 \newline 
 Open another window onto this directory.
+\newline 
+Resize Window
+\newline 
+Set the window to a sensible size for its contents.
 \newline 
 Close Window
 \newline 
@@ -2739,11 +2806,6 @@ Filer window options
 
 `Unique windows' prevents you from having two windows showing the same directory.
  Opening a second view onto a directory closes the first.
-\layout Itemize
-
-`Initial window height' determines how large newly opened filer windows
- will be.
- The height is given as the number of rows at Large Icons size.
 \layout Subsubsection
 
 Drag-And-Drop options
@@ -3473,12 +3535,4 @@ Enlightenment,
 POrtable Dodgy Filesystems in Userland (hacK), 
 \emph toggle 
 <http://atrey.karlin.mff.cuni.cz/~pavel/podfuk/podfuk.html>
-\layout Bibliography
-\bibitem {ImLib}
-
-
-\emph on 
-ImLib
-\emph toggle 
-, <http://www.gnome.org>
 \the_end
