@@ -38,6 +38,7 @@
 #include <assert.h>
 
 typedef struct XdgDirTimeList XdgDirTimeList;
+typedef struct XdgCallbackList XdgCallbackList;
 
 static int need_reread = TRUE;
 static time_t last_stat_time = 0;
@@ -45,6 +46,7 @@ static time_t last_stat_time = 0;
 static XdgGlobHash *global_hash = NULL;
 static XdgMimeMagic *global_magic = NULL;
 static XdgDirTimeList *dir_time_list = NULL;
+static XdgCallbackList *callback_list = NULL;
 const char *xdg_mime_type_unknown = "application/octet-stream";
 
 
@@ -61,6 +63,16 @@ struct XdgDirTimeList
   char *directory_name;
   int checked;
   XdgDirTimeList *next;
+};
+
+struct XdgCallbackList
+{
+  XdgCallbackList *next;
+  XdgCallbackList *prev;
+  int              callback_id;
+  XdgMimeCallback  callback;
+  void            *data;
+  XdgMimeDestroy   destroy;
 };
 
 /* Function called by xdg_run_command_on_dirs.  If it returns TRUE, further
@@ -460,6 +472,8 @@ xdg_mime_is_valid_mime_type (const char *mime_type)
 void
 xdg_mime_shutdown (void)
 {
+  XdgCallbackList *list;
+
   /* FIXME: Need to make this (and the whole library) thread safe */
   if (dir_time_list)
     {
@@ -478,6 +492,9 @@ xdg_mime_shutdown (void)
       global_magic = NULL;
     }
 
+  for (list = callback_list; list; list = list->next)
+    (list->callback) (list->data);
+
   need_reread = TRUE;
 }
 
@@ -487,4 +504,56 @@ xdg_mime_get_max_buffer_extents (void)
   xdg_mime_init ();
   
   return _xdg_mime_magic_get_buffer_extents (global_magic);
+}
+
+
+/* Registers a function to be called every time the mime database reloads its files
+ */
+int
+xdg_mime_register_reload_callback (XdgMimeCallback  callback,
+				   void            *data,
+				   XdgMimeDestroy   destroy)
+{
+  XdgCallbackList *list_el;
+  static int callback_id = 1;
+
+  /* Make a new list element */
+  list_el = calloc (1, sizeof (XdgCallbackList));
+  list_el->callback_id = callback_id;
+  list_el->callback = callback;
+  list_el->data = data;
+  list_el->destroy = destroy;
+  list_el->next = callback_list;
+  if (list_el->next)
+    list_el->next->prev = list_el;
+
+  callback_list = list_el;
+  callback_id ++;
+
+  return callback_id - 1;
+}
+
+void
+xdg_mime_remove_callback (int callback_id)
+{
+  XdgCallbackList *list;
+
+  for (list = callback_list; list; list = list->next)
+    {
+      if (list->callback_id == callback_id)
+	{
+	  if (list->next)
+	    list->next = list->prev;
+
+	  if (list->prev)
+	    list->prev->next = list->next;
+	  else
+	    callback_list = list->next;
+
+	  /* invoke the destroy handler */
+	  (list->destroy) (list->data);
+	  free (list);
+	  return;
+	}
+    }
 }

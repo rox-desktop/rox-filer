@@ -41,6 +41,9 @@ extern "C" {
 #define _XDG_ENTRY3(prefix,func) prefix##_##func
 #endif
 
+typedef void (*XdgMimeCallback) (void *user_data);
+typedef void (*XdgMimeDestroy)  (void *user_data);
+
   
 #ifdef XDG_PREFIX
 #define xdg_mime_get_mime_type_for_data       XDG_ENTRY(get_mime_type_for_data)
@@ -49,6 +52,8 @@ extern "C" {
 #define xdg_mime_is_valid_mime_type           XDG_ENTRY(is_valid_mime_type)
 #define xdg_mime_get_max_buffer_extents       XDG_ENTRY(get_max_buffer_extents)
 #define xdg_mime_shutdown                     XDG_ENTRY(shutdown)
+#define xdg_mime_register_reload_callback     XDG_ENTRY(register_reload_callback)
+#define xdg_mime_remove_callback              XDG_ENTRY(remove_callback)
 #define xdg_mime_type_unknown                 XDG_ENTRY(type_unknown)
 #endif
 
@@ -62,7 +67,10 @@ const char *xdg_mime_get_mime_type_from_file_name (const char *file_name);
 int         xdg_mime_is_valid_mime_type           (const char *mime_type);
 int         xdg_mime_get_max_buffer_extents       (void);
 void        xdg_mime_shutdown                     (void);
-
+int         xdg_mime_register_reload_callback     (XdgMimeCallback  callback,
+						   void            *data,
+						   XdgMimeDestroy   destroy);
+void        xdg_mime_remove_callback              (int              callback_id);
 
 #ifdef __cplusplus
 }
