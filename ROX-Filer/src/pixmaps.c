@@ -128,12 +128,6 @@ static void load_default_pixmaps(void)
 	default_pixmap[TYPE_ERROR] = load_pixmap("pixmaps/error.xpm");
 	default_pixmap[TYPE_UNKNOWN] = load_pixmap("pixmaps/unknown.xpm");
 	default_pixmap[TYPE_SYMLINK] = load_pixmap("pixmaps/symlink.xpm");
-	default_pixmap[TYPE_FILE] = load_pixmap("pixmaps/file.xpm");
-	default_pixmap[TYPE_DIRECTORY] = load_pixmap("pixmaps/directory.xpm");
-	default_pixmap[TYPE_CHAR_DEVICE] = load_pixmap("pixmaps/char.xpm");
-	default_pixmap[TYPE_BLOCK_DEVICE] = load_pixmap("pixmaps/block.xpm");
-	default_pixmap[TYPE_PIPE] = load_pixmap("pixmaps/pipe.xpm");
-	default_pixmap[TYPE_SOCKET] = load_pixmap("pixmaps/socket.xpm");
 
 	default_pixmap[TYPE_UNMOUNTED] = load_pixmap("pixmaps/mount.xpm");
 	default_pixmap[TYPE_MOUNTED] = load_pixmap("pixmaps/mounted.xpm");

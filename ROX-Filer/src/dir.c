@@ -436,8 +436,6 @@ static void insert_item(Directory *dir, struct dirent *ent)
 			else
 				new.image = default_pixmap[TYPE_APPDIR];
 		}
-		else
-			new.image = default_pixmap[TYPE_DIRECTORY];
 	}
 	else if (new.base_type == TYPE_FILE)
 	{
@@ -450,15 +448,15 @@ static void insert_item(Directory *dir, struct dirent *ent)
 		else
 		{
 			new.mime_type = type_from_path(tmp->str);
-			new.image = type_to_icon(new.mime_type);
 			new.flags |= ITEM_FLAG_TEMP_ICON;
 		}
 	}
-	else
-		new.image = default_pixmap[new.base_type];
 
 	if (!new.mime_type)
 		new.mime_type = mime_type_from_base_type(new.base_type);
+
+	if (!new.image)
+		new.image = type_to_icon(new.mime_type);
 
 	for (i = 0; i < array->len; i++)
 	{
