@@ -34,5 +34,6 @@ gboolean is_sub_dir(char *sub, char *parent);
 gboolean in_list(guchar *item, guchar *list);
 GPtrArray *split_path(guchar *path);
 guchar *get_relative_path(guchar *from, guchar *to);
+void add_default_styles(void);
 
 #endif /* _SUPPORT_H */

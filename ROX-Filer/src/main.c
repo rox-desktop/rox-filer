@@ -218,7 +218,6 @@ int main(int argc, char **argv)
 	struct sigaction act;
 	guchar		*tmp, *dir, *slash;
 	gboolean	show_user = FALSE;
-	guchar			*rc_file;
 
 	/* This is a list of \0 separated strings. Each string starts with a
 	 * character indicating what kind of operation to perform:
@@ -362,10 +361,8 @@ int main(int argc, char **argv)
 		}
 	}
 
+	add_default_styles();
 	gtk_init(&argc, &argv);
-	rc_file = g_strconcat(app_dir, "/Styles", NULL);
-	gtk_rc_parse(rc_file);
-	g_free(rc_file);
 
 	if (euid == 0 || show_user)
 		show_user_message = g_strdup_printf( _("Running as user '%s'"), 
