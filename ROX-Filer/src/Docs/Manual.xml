@@ -99,6 +99,13 @@
         (spec is still in developement).
      </para></listitem></varlistentry>
 
+     <varlistentry><term>Shared MIME Info Database</term>
+      <listitem><para>
+        In the past, each desktop had its own database of rules for determining the
+	type of files. The Shared MIME Info Database<citation>SharedMIME</citation>
+	unifies these into a single system shared by all desktops.
+     </para></listitem></varlistentry>
+
     </variablelist>
 
    </para>
@@ -309,18 +316,11 @@ $ rox --bottom=</screen>
   <sect1>
    <title id="winman" xreflabel="window manager notes">Window manager notes</title>
    <para>
-
     You may have to play around with your window manager a bit to get
     the pinboard icons and panels to display correctly (eg, without borders
     and underneath all other windows). In particular, try setting the
     stacking level / depth to low (or a negative value). Make sure any
     'Keep transients above other windows' type options are turned off!
-
-    In order for the filer to receive mouse clicks on the background (used
-    for the pinboard support) you need a GNOME-compliant window manager.
-    To see if your window manager supports this, try clicking the right
-    mouse button on an unused area of the background. If you get the pinboard
-    menu, all is well.
    </para>
 
    <sect2><title>Sawfish / sawmill</title>
@@ -1211,6 +1211,17 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
+         <guimenuitem>Follow Symbolic Links</guimenuitem></entry><entry>
+	 Converts the path shown in the window's titlebar to its canonical form.
+	 For example, if <filename>/home/fred/link</filename> is a symlink
+	 pointing to <filename>/usr/share/doc/</filename> then clicking on the symlink
+	 will take you to that directory and going `up' will take you back to
+	 <filename>/home/fred</filename>.
+	 If you'd used <guimenuitem>Follow Symbolic Links</guimenuitem>, you would
+	 have ended up in <filename>/usr/share</filename> instead.
+       </entry></row>
+
+       <row><entry>
          <guimenuitem>Resize Window</guimenuitem></entry><entry>
          Set the window to a sensible size for its contents.
        </entry></row>
@@ -1259,8 +1270,24 @@ $ rox --bottom=</screen>
     Opening the Send To menu via the main menu is rather slow, so it is
     normally opened by clicking the Menu mouse button over a file while
     holding the <keycap>Shift</keycap> key down.
-
    </para>
+   <sect2>
+    <title>Showing different applications for different types</title>
+    <para>
+     You may want to set things up so that, for example, the Gimp is
+     only shown when an image is selected. To do this, create a
+     hidden directory inside <filename>SendTo</filename> called
+     <filename>.image</filename>, or whatever type you want to use.
+     You can use either the complete type (eg <filename>.image_png</filename>)
+     or just the media type. Use <guimenuitem>Info</guimenuitem> over a file to
+     find out its MIME type.
+    </para>
+    <para>
+     Entries in these hidden directories are shown only for files of
+     the appropriate type. If multiple files are selected, the
+     <filename>.group</filename> directory is used instead.
+    </para>
+   </sect2>
   </sect1>
 
  </chapter>
@@ -1299,9 +1326,6 @@ $ rox --bottom=</screen>
    <title>The pinboard and panel menus</title>
    <para>
 
-    These menus are both the same, and very simple:
-
-
     <informaltable><tgroup cols="2">
       <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
       <tbody>
@@ -1330,6 +1354,12 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Remove Item(s)</guimenuitem></entry><entry>
          Remove the selected items from the pinboard or panel.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Backdrop...</guimenuitem></entry><entry>
+	 Set the desktop backdrop image (see below). Only available from
+	 the pinboard menu.
        </entry></row>
 
     </tbody></tgroup></informaltable>
@@ -1387,15 +1417,35 @@ $ rox --bottom=</screen>
   </sect1>
 
   <sect1>
+   <title><anchor id="iconify" xreflabel="Iconified windows"/>Iconified windows on the pinboard</title>
+   <para>
+    When the pinboard is in use, ROX-Filer can be used to display an icon for each iconified
+    (or 'minimised') window. You can turn this on or off from the Options box. Iconified window icons
+    highlight when you move the mouse over them and can be dragged around.
+    Clicking on one will expand it back into the window it represents. Some older window managers do not
+    support this, and no icons will be shown.
+   </para>
+  </sect1>
+
+  <sect1>
    <title><anchor id="backdropapp" xreflabel="Backdrop applications"/>The pinboard backdrop image</title>
    <para>
-    You can use any image as a background using...
+    You can set any image for the backdrop by choosing <guimenuitem>Backdrop...</guimenuitem>
+    from the pinboard menu (right-click over the desktop background when the pinboard is turned on).
    </para>
    <para>
-    If you want to create an application to set the backdrop (eg, to choose a
-    random image, or a slideshow) you need to first create an application directory
-    (see <xref linkend="AppDir"/>).
-   </para><para>
+    To set an image, select <guilabel>Centred</guilabel>, <guilabel>Scaled</guilabel> or
+    <guilabel>Tiled</guilabel> to set the style, and then drag an image onto the marked area.
+    To return to a solid colour backdrop (as set in the Options box), click on
+    <guibutton>Clear</guibutton>.
+   </para>
+   <formalpara><title>For programmers...</title>
+    <para>
+     If you want to create an application to set the backdrop (eg, to choose a
+     random image, or a slideshow) you need to first create an application directory
+     (see <xref linkend="AppDir"/>).
+    </para>
+   </formalpara><para>
     When run without arguments, the application should invoke the
     <function>SetBackdropApp</function> SOAP method (see <xref
     linkend="soap"/>). The filer will immediately run the application again,
@@ -2184,29 +2234,26 @@ while 1:
    open it. The list on the left of the window lists the various sections &mdash;
    click on one to see its options.
 
-   At the bottom of the window are three buttons:
+   At the bottom of the window are two buttons:
 
    <itemizedlist>
 
     <listitem><para>
-      <guibutton>Save</guibutton>
-      saves the current choices into your Choices directory for next time
-      <application>ROX-Filer</application> is loaded. Exactly where choices are
-      loaded from and saved to is controlled by the <envar>CHOICESPATH</envar>
-      environment variable &mdash; see <citation>Choices</citation> for
-      details.
-    </para></listitem>
-
-    <listitem><para>
       <guibutton>OK</guibutton>
-      closes the window. All choices take effect instantly, so this
-      button doesn't actually do anything else.
+      saves the current choices into your Choices directory for next time
+      <application>ROX-Filer</application> is loaded, if anything changed.
+      Exactly where choices are loaded from and saved to is controlled by the
+      <envar>CHOICESPATH</envar> environment variable &mdash; see
+      <citation>Choices</citation> for details.
+      Changes made in the Options box take effect instantly, so you don't need to
+      click on <guibutton>OK</guibutton> just to try them out.
     </para></listitem>
 
     <listitem><para>
       <guibutton>Revert</guibutton>
       Restores all choices to how they were when the options box was opened.
-      The Options window is not closed.
+      This button is shown shaded if you haven't made any changes.
+      The Options window is not closed when this is used.
     </para></listitem>
 
    </itemizedlist>
@@ -2384,8 +2431,9 @@ while 1:
 
     <itemizedlist>
 
-     <listitem><para><guilabel>Text style</guilabel>
-       sets the colours to use for the text under the icons.
+     <listitem><para><guilabel>Colours</guilabel>
+       sets the colours used for the text under the icons, and the background colour
+       (if no background image is set).
      </para></listitem>
 
      <listitem><para><guilabel>Single-click to open</guilabel>
@@ -2394,12 +2442,27 @@ while 1:
        and double-clicking opens.
      </para></listitem>
 
+     <listitem><para><guilabel>Pass button-3 clicks to window manager</guilabel>
+       may be needed if your window manager uses button-3 clicks on the desktop
+       for an important function. Normally, clicking button-3 will display
+       the filer's pinboard menu.
+     </para></listitem>
+
      <listitem><para><guilabel>Keep icons within screen limits</guilabel>
        prevents icons from going partly off the side of the screen.
      </para></listitem>
 
      <listitem><para> <guilabel>Icon grid step</guilabel> controls how finely
-       the icons may be positioned.</para></listitem>
+       the icons may be positioned.
+     </para></listitem>
+
+     <listitem><para> <guilabel>Iconified windows</guilabel> controls how the
+       filer deals with iconified (or 'minimised') windows. If
+       <guilabel>Show iconified windows</guilabel> is on then the filer shows
+       an icon on the pinboard for each iconified window. The other two options
+       let you choose the method of placing the icons. See <xref linkend="iconify"/>
+       for details.
+     </para></listitem>
 
     </itemizedlist>
 
@@ -2647,27 +2710,10 @@ while 1:
    <title>How filetypes are stored</title>
    <para>
 
-    <application>ROX-Filer</application> uses three sub-directories in your Choices
+    <application>ROX-Filer</application> uses two sub-directories in your Choices
     directory for filetypes:
 
     <variablelist>
-
-     <varlistentry><term><filename>MIME-info</filename></term><listitem><para>
-        contains files which specify what the MIME types for files
-        should be, based on their extentions. All the files in all the
-        <filename>MIME-info</filename> directories are scanned when the filer loads.
-        <application>ROX-Filer</application> comes with a file containing many such
-        rules &mdash; this is installed into the <filename>MIME-info</filename>
-        directory by the rox-base package.
-        </para><para>
-        Many applications now come with a file called
-        <filename>something.mime</filename>; copy these files into your
-        <filename>MIME-info</filename> directory to make
-        <application>ROX-Filer</application> automatically recognise the new extensions.
-        ROX-Filer doesn't automatically re-read these files when they change. You can
-        either restart the filer, or click on the <guibutton>Re-read files</guibutton>
-        button in the <guilabel>Types</guilabel> section of the Options box.
-     </para></listitem></varlistentry>
 
      <varlistentry><term><filename>MIME-types</filename></term><listitem><para>
         contains symlinks, one for each MIME type, which point
@@ -2707,6 +2753,10 @@ while 1:
     For example, if <filename>text_html</filename> isn't found then the filer
     will try simply using <filename>text</filename>.
 
+   </para>
+   <para>
+    The filer works out the type for a file from its name. These are specified by
+    `.mimeinfo' files &mdash; see <citation>SharedMIME</citation> for details.
    </para>
   </sect1>
  </chapter>
@@ -3304,8 +3354,14 @@ EOF</screen>
      update the display.
    </para></listitem>
 
-   <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>)
+   <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>,
+     [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>])
      Open a window showing directory <parameter>Filename</parameter>.
+     <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>
+     or <userinput>Huge</userinput>.
+     <parameter>Details</parameter> is one of <userinput>None</userinput>, <userinput>Summary</userinput>, <userinput>Size</userinput>, <userinput>Type</userinput>, <userinput>Times</userinput> or <userinput>Permissions</userinput>.
+     <parameter>Sort</parameter> is one of <userinput>Name</userinput>, <userinput>Type</userinput>, <userinput>Date</userinput> or <userinput>Size</userinput>.
+     If any of these three option parameters are missing, the default is used.
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
@@ -3475,6 +3531,11 @@ EOF</screen>
   <bibliomixed>
    <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
     <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.7)
+    <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
   </bibliomixed>
 
  </bibliography>
