@@ -833,37 +833,37 @@ of the file, the second for other members of the file's group and
 the third for everyone else. Whichever group applies to the <application>ROX-Filer</application>
 process itself is shown underlined. The fourth group shows any special
 flags.
+  </para><para>
+The meanings of the characters are:
 
+<itemizedlist>
 
-
-<variablelist><title>The meanings of the characters are:</title>
-
-<varlistentry><term>r</term><listitem><para>
+<listitem><para><computeroutput>r</computeroutput> &mdash;
 Permission to read the contents of a file, or the names of files
-in a directory.</para></listitem></varlistentry>
+in a directory.</para></listitem>
 
-<varlistentry><term>w</term><listitem><para>
+<listitem><para><computeroutput>w</computeroutput> &mdash;
 Permission to alter the contents of a file, or change which names
-appear in a directory.</para></listitem></varlistentry>
+appear in a directory.</para></listitem>
 
-<varlistentry><term>x</term><listitem><para>
+<listitem><para><computeroutput>x</computeroutput> &mdash;
 Permission to run the file as a program, or refer to the files
-listed within the directory.</para></listitem></varlistentry>
+listed within the directory.</para></listitem>
 
-<varlistentry><term>U</term><listitem><para>
+<listitem><para><computeroutput>U</computeroutput> &mdash;
 This program executes with the <emphasis>effective user ID</emphasis> of its
-owner rather than the person who ran it.</para></listitem></varlistentry>
+owner rather than the person who ran it.</para></listitem>
 
-<varlistentry><term>G</term><listitem><para>
+<listitem><para><computeroutput>G</computeroutput> &mdash;
 This program executes with the <emphasis>effective group ID</emphasis> of its
-group, regardless of who ran it.</para></listitem></varlistentry>
+group, regardless of who ran it.</para></listitem>
 
-<varlistentry><term>T</term><listitem><para>
+<listitem><para><computeroutput>T</computeroutput> &mdash;
 Entries in this directory can only be altered or removed by the
 people who own the files even if they have write permission on the
-directory itself.</para></listitem></varlistentry>
+directory itself.</para></listitem>
 
-</variablelist>
+</itemizedlist>
 <!-- XXX: Make this appear underlined! -->
 For example, <computeroutput>_r_w_x_,rwx,r-x/&mdash;</computeroutput> means
 that the owner of the file is the same as the effective user of
@@ -915,11 +915,10 @@ top of this submenu when you click over them &mdash; see <xref linkend="AppDir"/
 for details.
 
 
-<informaltable><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+<tbody>
 <row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
 Copy...</entry><entry>
 Make a copy of this object.
 </entry></row><row><entry>
@@ -999,11 +998,10 @@ or directory. There are two standard entries; the others are the contents
 of your <filename>&lt;Choices&gt;/Templates</filename> directory, if it exists.
 
 
-<informaltable><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+<tbody>
 <row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
 Directory</entry><entry>
 Create a new directory.
 </entry></row><row><entry>
@@ -1050,11 +1048,10 @@ entries at present.
   <para>
 
 
-<informaltable><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+<tbody>
 <row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
 Parent, New Window</entry><entry>
 Open a new window displaying this window's parent.
 </entry></row><row><entry>
@@ -1146,11 +1143,10 @@ only removes the link. This is different to most other filers...
 These menus are both the same, and very simple:
 
 
-<informaltable><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+<tbody>
 <row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
 ROX-Filer</entry><entry>
 Show the filer's help, edit the options or open your home directory.
 </entry></row><row><entry> 
@@ -1344,11 +1340,10 @@ between directories, or for selecting a full pathname from somewhere
 else and pasting it directly into the path-entry box.
 
 
-<informaltable><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Key</entry><entry>Action</entry></row></thead>
+<tbody>
 <row><entry> 
-Key</entry><entry>
-Action
-</entry></row><row><entry>
 Return</entry><entry>
 Open the currently selected item.
 </entry></row><row><entry>
@@ -2270,9 +2265,8 @@ on a GIF file will load it into the Gimp.
 
 Type:
 
-<screen>
-gimp {}``\$1''
-</screen>
+<screen>gimp "$1"</screen>
+
 into the box labelled `Enter a shell command' and press Return. `\texttt{\$1}'
 will be replaced by the name of the file you click on when this command
 is used. As before, clicking on any GIF image will now load it into

@@ -34,21 +34,73 @@ table.simplelist tr td {
 
 table {
   border-collapse: collapse;
-  border-top: 1px solid #888;
+  border-top: 1px solid #ccc;
   border-right: none;
   border-bottom: none;
-  border-left: 1px solid #888;
+  border-left: 1px solid #ccc;
   border-spacing: 0;
 }
 
-td {
+th {
+  background-color: #eee;
   border-top: none;
-  border-right: 1px solid #888;
-  border-bottom: 1px solid #888;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
   border-left: none;
+}
+
+td {
+  padding: 2px;
+  border-top: none;
+  border-right: 1px solid #ccc;
+  border-bottom: 1px solid #ccc;
+  border-left: none;
+}
+
+pre.programlisting {
+  padding: 1em;
+  background-color: #eee;
+}
+
+pre.screen {
+  padding: 1em;
+  background-color: #eee;
+}
+
+span.guimenuitem {
+  border: 1px solid #888;
+  padding: 1px;
+}
+
+div.chapter {
+  padding-top: 3em;
+}
+
+tt.filename {
+  color: #c00;
+}
+
+span.keycap {
+  background-color: #ddd;
+  border: 1px solid #888;
+  padding: 1px;
 }
 
     ]]></STYLE>
   </xsl:template>
 
+  <xsl:template match="guimenuitem">
+    <span class="guimenuitem">
+      <xsl:call-template name="inline.charseq"/>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="filename">
+    '<tt class="filename"><xsl:apply-templates/></tt>'
+  </xsl:template>
+
+  <xsl:template match="keycap">
+    <span class="keycap"><xsl:apply-templates/></span>
+  </xsl:template>
+  
 </xsl:stylesheet>
