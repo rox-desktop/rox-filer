@@ -1182,6 +1182,8 @@ void filer_check_mounted(char *path)
 
 		g_free(parent);
 	}
+	else
+		refresh_dirs("/");
 
 	icons_may_update(path);
 }

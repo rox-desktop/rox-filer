@@ -254,14 +254,12 @@ int main(int argc, char **argv)
 	 * character indicating what kind of operation to perform:
 	 *
 	 * fFILE	open this file (or directory)
+	 * dDIR		open DIR as a directory (not as an application)
 	 * eDIR		shift-open this file (edit)
 	 * pPIN		display this pinboard
-	 * tDIR		open DIR as a top-panel
-	 * bDIR		open DIR as a bottom-panel
+	 * [lrtb]PANEL	open PANEL as a {left, right, top, bottom} panel
 	 * sFILE	open a directory to show FILE
-	 * i            update pinboard and panel icons
-	 * wDIR         update the DIR window, if it's being displayed
-	 * W            update all the open filer windows
+	 * xFILE        eXamine FILE
 	 */
 	GString		*to_open;
 
