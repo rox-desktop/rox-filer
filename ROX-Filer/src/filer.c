@@ -816,6 +816,7 @@ static gint key_press_event(GtkWidget	*widget,
 			change_to_parent(filer_window);
 			break;
 		case GDK_backslash:
+			filer_tooltip_prime(NULL, NULL);
 			show_filer_menu(filer_window, (GdkEvent *) event,
 					filer_window->collection->cursor_item);
 			break;
@@ -1524,6 +1525,7 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
+			filer_tooltip_prime(NULL, NULL);
 			show_filer_menu(filer_window, (GdkEvent *) event, item);
 			break;
 		case ACT_PRIME_AND_SELECT:
