@@ -247,6 +247,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Help"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("About ROX-Filer..."),	NULL, menu_rox_help, HELP_ABOUT, NULL},
 {">" N_("Show Help Files"),	"F1", menu_rox_help, HELP_DIR, NULL},
+{">" N_("Manual"),		NULL, menu_rox_help, HELP_MANUAL, NULL},
 };
 
 
@@ -1684,6 +1685,24 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 		infobox_new(app_dir);
 	else if (action == HELP_DIR)
 		filer_opendir(make_path(app_dir, "Help")->str, NULL);
+	else if (action == HELP_MANUAL)
+	{
+		gchar *manual;
+
+		manual = g_strconcat(app_dir, "/Help/Manual-",
+				     current_lang, ".html", NULL);
+
+		if (access(manual, F_OK))
+		{
+			g_free(manual);
+			manual = g_strconcat(app_dir,
+						"/Help/Manual.html", NULL);
+		}
+		
+		run_by_path(manual);
+
+		g_free(manual);
+	}
 	else
 		g_warning("Unknown help action %d\n", action);
 }

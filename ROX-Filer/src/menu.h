@@ -9,7 +9,7 @@
 #define _MENU_H
 
 /* 'action's for menu_rox_help */
-enum {HELP_ABOUT, HELP_DIR};
+enum {HELP_ABOUT, HELP_DIR, HELP_MANUAL};
 
 extern GtkAccelGroup	*filer_keys;
 
