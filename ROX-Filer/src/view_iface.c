@@ -142,3 +142,11 @@ void view_clear_selection(ViewIface *obj)
 
 	VIEW_IFACE_GET_CLASS(obj)->clear_selection(obj);
 }
+
+/* Return the number of selected items */
+int view_count_selected(ViewIface *obj)
+{
+	g_return_val_if_fail(VIEW_IS_IFACE(obj), 0);
+
+	return VIEW_IFACE_GET_CLASS(obj)->count_selected(obj);
+}

@@ -57,6 +57,7 @@
 #include "appmenu.h"
 #include "usericons.h"
 #include "infobox.h"
+#include "view_iface.h"
 #include "collection.h"
 #include "display.h"
 
@@ -667,6 +668,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
 	GdkModifierType	state = 0;
+	int		n_selected;
+
+	n_selected = view_count_selected(VIEW(filer_window->view));
 
 	ensure_filer_menu();
 
@@ -682,10 +686,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	else if (event->type == GDK_KEY_PRESS)
 		state = ((GdkEventKey *) event)->state;
 
-	if (filer_window->collection->number_selected == 0 && item >= 0)
+	if (n_selected == 0 && item >= 0)
 	{
 		filer_window->temp_item_selected = TRUE;
 		collection_select_item(filer_window->collection, item);
+		n_selected = view_count_selected(VIEW(filer_window->view));
 	}
 	else
 	{
@@ -699,7 +704,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 		updating_menu--;
 
-		if (filer_window->collection->number_selected == 0)
+		if (n_selected == 0)
 		{
 			report_error(
 				_("You should Shift+Menu click over a file to "
@@ -716,7 +721,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	{
 		GtkWidget	*file_label, *file_menu;
-		Collection 	*collection = filer_window->collection;
 		GString		*buffer;
 		DirItem		*item;
 
@@ -730,7 +734,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 				filer_window->show_hidden);
 		buffer = g_string_new(NULL);
 
-		switch (collection->number_selected)
+		switch (n_selected)
 		{
 			case 0:
 				g_string_assign(buffer, _("Next Click"));
@@ -753,14 +757,14 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 			default:
 				shade_file_menu_items(TRUE);
 				g_string_sprintf(buffer, _("%d items"),
-						collection->number_selected);
+						 n_selected);
 				break;
 		}
 		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 		g_string_free(buffer, TRUE);
 
 		menu_show_shift_action(file_shift_item, file_item,
-				collection->number_selected == 0);
+					n_selected == 0);
 		if (file_item)
 			appmenu_add(make_path(filer_window->sym_path,
 						file_item->leafname)->str,
@@ -793,7 +797,7 @@ static void menu_closed(GtkWidget *widget)
 
 	if (window_with_focus->temp_item_selected)
 	{
-		collection_clear_selection(window_with_focus->collection);
+		view_clear_selection(VIEW(window_with_focus->view));
 		window_with_focus->temp_item_selected = FALSE;
 	}
 }
@@ -1193,7 +1197,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	window_with_focus->temp_item_selected = FALSE;
-	collection_clear_selection(window_with_focus->collection);
+	view_clear_selection(VIEW(window_with_focus->view));
 }
 
 static void invert_selection(gpointer data, guint action, GtkWidget *widget)
@@ -1722,15 +1726,15 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 
 static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 {
-	Collection *collection;
 	DirItem	*item;
 	gchar	*path;
+	int	n_selected;
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	collection = window_with_focus->collection;
+	n_selected = view_count_selected(VIEW(window_with_focus->view));
 
-	if (collection->number_selected < 1)
+	if (n_selected < 1)
 	{
 		const char *prompt;
 
@@ -1820,7 +1824,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 
 	/* All the following actions require exactly one file selected */
 
-	if (collection->number_selected > 1)
+	if (n_selected > 1)
 	{
 		report_error(_("You cannot do this to more than "
 				"one item at a time"));
@@ -1857,7 +1861,8 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			break;
 		case FILE_OPEN_FILE:
 			filer_openitem(window_with_focus,
-				collection_selected_item_number(collection),
+				collection_selected_item_number(
+					window_with_focus->collection),
 				OPEN_SAME_WINDOW | OPEN_SHIFT);
 			break;
 		case FILE_HELP:

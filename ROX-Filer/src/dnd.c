@@ -535,7 +535,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 #if 0
 		/* XXX: This is needed so that directories don't
 		 * spring open while we scroll. Should go in
-		 * collection.c, I think.
+		 * view_collection.c, I think.
 		 */
 		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
 

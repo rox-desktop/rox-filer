@@ -159,6 +159,7 @@ static void view_collection_delete_if(ViewIface *view,
 			  gpointer data);
 static void view_collection_clear(ViewIface *view);
 static void view_collection_clear_selection(ViewIface *view);
+static int view_collection_count_selected(ViewIface *view);
 
 
 /****************************************************************
@@ -749,6 +750,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->delete_if = view_collection_delete_if;
 	iface->clear = view_collection_clear;
 	iface->clear_selection = view_collection_clear_selection;
+	iface->count_selected = view_collection_count_selected;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -1433,4 +1435,12 @@ static void view_collection_clear_selection(ViewIface *view)
 	Collection	*collection = view_collection->collection;
 	
 	collection_clear_selection(collection);
+}
+
+static int view_collection_count_selected(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+	
+	return collection->number_selected;
 }
