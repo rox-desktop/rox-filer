@@ -87,9 +87,47 @@ msgid ""
 "a \\% in 'command' is replaced with the path of the current file)\n"
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
+"<u>Inicio Rápido</u>\n"
+"Simplemente coloca el nombre del archivo que estás buscando entre comillas "
+"simples:\n"
+"<b>'index.html'</b> (para buscar un archivo llamado 'index.html')\n"
+"\n"
+"<u>Ejemplos</u>\n"
+"<b>'*.htm', '*.html'</b> (busca archivos HTML files)\n"
+"<b>IsDir 'lib'</b> (busca directorios llamados 'lib')\n"
+"<b>IsReg 'core'</b> (busca un archivo regular llamado 'core')\n"
+"<b>! (IsDir, IsReg)</b> (no es ni un directorio ni un archivo regular)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (grande, y modificado "
+"recientemente)\n"
+"<b>'CVS' prune, isreg</b> (archivo regular no en CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (contiene la palabra 'fred')\n"
+"\n"
+"<u>Pruebas Simples</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
+"b> (tipos)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
+"(permisos)\n"
+"<b>IsEmpty, IsMine</b>\n"
+"Un patrón entre comillas simples es un patrón con comodines estilo shell a\n"
+"ser buscado. Si contiene una / entonces la concordancia es contra la ruta\n"
+"completa; sino es sólo el nombre del archivo.\n"
+"\n"
+"<u>Comparaciones</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compara dos valores)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (tamaños de archivo)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (tiempos)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
+"(valores)\n"
+"\n"
+"<u>Especiales</u>\n"
+"<b>system(comando)</b> (verdadero si 'comando' termina con un estado de "
+"salida\n"
+"cero;\n"
+"un \\% en 'comando' es reemplazado con la ruta del archivo actual)\n"
+"<b>prune</b> (falso, e impide la búsqueda en los contenidos de un "
+"directorio)."
 
 #: action.c:242
-#, fuzzy
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -123,31 +161,34 @@ msgstr ""
 "en la flecha al lado de la casilla de comandos). Algunas veces, necesitas "
 "más...\n"
 "\n"
-"El formato del comando es:\n"
-"CAMBIO, CAMBIO, ...\n"
-"Cada CAMBIO es:\n"
-"QUIEN COMO PERMISOS\n"
-"QUIEN es alguna combinación de u, g y o la cual determina si se modifican "
-"los\n"
-"permisos del Usuario (propietario), del Grupo o de los Otros.\n"
-"COMO es +, - o = para añadir, eliminar o establecer exactamente los "
-"permisos.\n"
-"PERMISOS es alguna combinación de las letras 'rwxXstugo'\n"
+"El formato de un comando es: <b>CAMBIO, CAMBIO, ...</b>\n"
+"Cada <b>CAMBIO</b> es: <b>QUIEN COMO PERMISOS</b>\n"
+"<b>QUIEN</b> es alguna combinación de <b>u</b>, <b>g</b> y <b>o</b> la cual "
+"determina si \n"
+"se modifican los permisos del Usuario (propietario), del Grupo o de los "
+"Otros.\n"
+"<b>COMO</b> es <b>+</b>, <b>-</b> o <b>=</b> para añadir, eliminar o "
+"establecer exactamente los permisos.\n"
+"<b>PERMISOS</b> es alguna combinación de las letras <b>rwxXstugo</b>\n"
 "\n"
 "El texto entre paréntesis rectos y los espacios son ignorados.\n"
 "\n"
-"Ejemplos:\n"
-"u+rw \t(el propietario del archivo obtiene permisos de lectura y escritura)\n"
-"g=u\t(los permisos del grupo son establecidos idénticamente a los del "
-"usuario)\n"
-"o=u-w\t(los otros obtienen los mismos permisos que el propietario, pero sin\n"
-"permiso de escritura)\n"
-"a+x\t(todos obtienen permiso de ejecución/acceso - lo mismo que 'ugo+x')\n"
-"a+X\t(los directorios se vuelven accesibles por todos; los archivos que\n"
-"no podían ser ejecutados por nadie se vuelven ejecutables por todos)\n"
-"u+rw, go+r\t(dos comandos simultáneamente!)\n"
-"u+s\t(activa el bit SetUID - a menudo no tiene efecto en archivos script)\n"
-"755\t(establece los permisos directamente)\n"
+"<u>Ejemplos</u>\n"
+"<b>u+rw</b>: el propietario del archivo obtiene permisos de lectura y "
+"escritura\n"
+"<b>g=u</b>: los permisos del grupo son establecidos idénticamente a los del "
+"usuario\n"
+"<b>o=u-w</b>: los otros obtienen los mismos permisos que el propietario, "
+"pero sin permiso de escritura\n"
+"<b>a+x</b>: todos obtienen permiso de ejecución/acceso - lo mismo que <b>ugo"
+"+x</b>\n"
+"<b>a+X</b>: los directorios se vuelven accesibles por todos; los archivos "
+"que\n"
+"no podían ser ejecutados por nadie se vuelven ejecutables por todos\n"
+"<b>u+rw, go+r</b>: dos comandos simultáneamente!\n"
+"<b>u+s</b>: activa el bit SetUID - a menudo no tiene efecto en archivos "
+"script\n"
+"<b>755</b>: establece los permisos directamente\n"
 "\n"
 "Consulta la página manual chmod(1) por los detalles completos."
 
@@ -539,25 +580,24 @@ msgid "<missing label>"
 msgstr "<etiqueta ausente>"
 
 #: bookmarks.c:339
-#, fuzzy
 msgid "You should first select some rows to delete"
-msgstr "Tiens que seleccionar primero algunos elementos a ser borrados"
+msgstr "Tienes que seleccionar primero algunas filas a ser borradas"
 
 #: bookmarks.c:362
 msgid "Put the cursor on an entry in the list to move it"
-msgstr ""
+msgstr "Selecciona una entrada en la lista para moverla"
 
 #: bookmarks.c:382
 msgid "This item is already at the end"
-msgstr ""
+msgstr "Este elemento ya es el último"
 
 #: bookmarks.c:475
 msgid "Add new bookmark"
-msgstr ""
+msgstr "Agregar nuevo marcador"
 
 #: bookmarks.c:482
 msgid "Edit bookmarks"
-msgstr ""
+msgstr "Editar marcadores"
 
 #: collection.c:268
 msgid "Vertical Adjustment"
@@ -699,6 +739,9 @@ msgid ""
 "\n"
 "Unmounting a device makes it safe to remove the disk."
 msgstr ""
+"¿Quieres desmontar éste dispositivo?\n"
+"\n"
+"Al desmontar un dispositivo puedes remover el disco en forma segura."
 
 #: filer.c:356 menu.c:853
 msgid "Unmount"
@@ -1283,7 +1326,6 @@ msgstr ""
 "debes usar las versiones cortas en su lugar.\n"
 
 #: main.c:111
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1333,10 +1375,8 @@ msgstr ""
 "  -v, --version\t\tmuestra la información de versión y termina\n"
 "  -x, --examine=ARCHIVO\tARCHIVO ha cambiado - examinarlo de nuevo\n"
 "\n"
-"La versión más reciente puede encontrarse en:\n"
-"\thttp://rox.sourceforge.net\n"
-"\n"
 "Informa los fallos a <tal197@users.sourceforge.net>.\n"
+"Página web (incluyendo versiones actualizadas): http://rox.sourceforge.net/\n"
 
 #: main.c:312
 msgid ""
@@ -1509,7 +1549,7 @@ msgstr "Nueva Ventana"
 
 #: menu.c:240
 msgid "Show Bookmarks"
-msgstr ""
+msgstr "Mostrar Marcadores"
 
 #: menu.c:241
 msgid "Follow Symbolic Links"
@@ -1555,9 +1595,8 @@ msgid "%d items"
 msgstr "%d elementos"
 
 #: menu.c:855
-#, fuzzy
 msgid "Open unmounted"
-msgstr "desmontado"
+msgstr "Abrir desmontado"
 
 #: menu.c:858
 msgid "Show Target"
@@ -2227,11 +2266,11 @@ msgstr "Cambiar al directorio home"
 
 #: toolbar.c:120
 msgid "Bookmarks"
-msgstr ""
+msgstr "Marcadores"
 
 #: toolbar.c:120
 msgid "Bookmarks menu"
-msgstr ""
+msgstr "Menú de marcadores"
 
 #: toolbar.c:124
 msgid "Scan"
@@ -2476,7 +2515,6 @@ msgid "File '%s' corrupted!"
 msgstr "¿El archivo '%s' está corrupto!"
 
 #: type.c:1233
-#, fuzzy
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -2487,11 +2525,15 @@ msgid ""
 "the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/"
 "globs)."
 msgstr ""
-"La base de datos de tipos MIME (versión 0.8 o posterior) no fue hallada. El "
-"filer probablemente no mostrará los tipos correctos para diferentes "
-"archivos. Deberás descargar e instalar el paquete 'shared-mime-info-0.8' "
-"desde aquí:\n"
-"http://www.freedesktop.org/standards/shared-mime-info.html"
+"La base de datos estándar de tipos MIME (versión 0.9 o posterior) no fue "
+"hallada. El filer probablemente no mostrará los tipos correctos para "
+"diferentes archivos. Deberás descargar e instalar el paquete 'shared-mime-"
+"info-0.9' desde aquí:\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html\n"
+"\n"
+"Si ya has intalado éste paquete, verifica que los permisos permitan que los "
+"archivos puedan ser leídos (verifica /usr/local/share/mime/globs o /usr/"
+"share/mime/globs)."
 
 #: usericons.c:191
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -2520,10 +2562,13 @@ msgstr "Definir ícono para todos los `%s/<algo>'"
 msgid ""
 "Use a copy of the image as the default for all files of these MIME types."
 msgstr ""
+"Usar una copia de la imágen por defecto para todos los archivos con éstos "
+"tipos MIME."
 
 #: usericons.c:296
 msgid "Use a copy of the image for all files of this MIME type."
 msgstr ""
+"Usar una copia de la imágen para todos los archivos con éste tipo MIME."
 
 #: usericons.c:299
 #, c-format
@@ -2652,7 +2697,7 @@ msgstr "Húngaro"
 
 #: tips:12
 msgid "Norwegian"
-msgstr ""
+msgstr "Noruego"
 
 #: tips:13
 msgid "Italian"
@@ -3044,15 +3089,15 @@ msgstr "Fondo:"
 
 #: tips:115
 msgid "Label shadow:"
-msgstr ""
+msgstr "Sombra de etiqueta:"
 
 #: tips:117
 msgid "Thin"
-msgstr ""
+msgstr "Delgada"
 
 #: tips:118
 msgid "Thick"
-msgstr ""
+msgstr "Gruesa"
 
 #: tips:119
 msgid "Use custom font:"
