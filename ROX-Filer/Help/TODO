@@ -14,12 +14,14 @@ When the minibuffer is highlighted in red, scanning more items should recheck.
 
 Selecting a region and then clicking to the right of it leaves a dot.
 
+Pinboard text background types none/outline don't work
+
+Panel sometimes won't accept drops (sawfish bug).
+
 
 FEATURES FOR 1.3
 
 Put Disk Usage in the Info box.
-
-Thumbnailing in a sub-process.
 
 Tab completion in save boxes.
 
@@ -30,8 +32,6 @@ Option to auto-choose Large or Small icons depending on the number of files.
 Using spring-opening with a missing directory has grab problems (Gkt+
 problem?).
 
-Pinboard text background types none/outline don't work
-
 User icons for mounted/unmounted?
 
 When setting the icon for a directory, offer to create a .DirIcon instead of
@@ -40,8 +40,6 @@ adding a path to globicons.
 Order icons vertically or horizontally (option).
 
 Rescanning sometimes causes the display to scroll (automounter problem).
-
-Panel sometimes won't accept drops (sawfish bug).
 
 Allow command-line arguments for executation pinboard/panel icons.
 
@@ -67,13 +65,10 @@ Make Find expressions easier for beginners.
 Improve thumbnail handling:
 	- Lazy scanning?
 	- Recursive scanning?
-	- Create in subprocess
 
 Individual sliders for max window horizontal and vertical sizes.
 
 Winking of items should be an option.
-
-Don't beep for paths with a # in the leafname (for AVFS).
 
 Path Entry minibuffer -- add a drop down list for bookmarks.
 Way to reopen last closed directory. Also do this for Select If.
@@ -138,7 +133,8 @@ accidentally)?
 
 Remember last scroll position when returning to a directory?
 
-'Edge folders'?
+'Edge folders' (panel items spring-open with zero delay when the pointer
+is at the edge of the scree)?
 
 
 LONG TERM
