@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.8\n"
-"POT-Creation-Date: 2003-03-28 12:03+0100\n"
-"PO-Revision-Date: 2003-03-28 12:06+0100\n"
+"POT-Creation-Date: 2003-04-27 00:00+0200\n"
+"PO-Revision-Date: 2003-04-27 00:25+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -221,7 +221,7 @@ msgstr ""
 "'\n"
 "Terminé\n"
 
-#: action.c:492 support.c:397
+#: action.c:492 support.c:395
 msgid "ERROR"
 msgstr "ERREUR"
 
@@ -554,7 +554,7 @@ msgstr "Récursif"
 msgid "Also change contents of subdirectories"
 msgstr "Changer aussi le contenu des sous-répertoires"
 
-#: action.c:1822 dnd.c:123 menu.c:1833 tips:182
+#: action.c:1822 dnd.c:123 menu.c:1832 tips:182
 msgid "Copy"
 msgstr "Copier"
 
@@ -606,42 +606,42 @@ msgstr ""
 msgid "<missing label>"
 msgstr "<étiquette manquante>"
 
-#: bookmarks.c:275
+#: bookmarks.c:277
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "Impossible de mettre en signet la ressource non locale '%s'\n"
 
-#: bookmarks.c:283 bookmarks.c:560
+#: bookmarks.c:285 bookmarks.c:571
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s' n'est pas un répertoire"
 
-#: bookmarks.c:453
+#: bookmarks.c:464
 msgid "You should first select some rows to delete"
 msgstr "Vous devez d'abord sélectionner des rangées à supprimer"
 
-#: bookmarks.c:476
+#: bookmarks.c:487
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "Placez le curseur sur une entrée de la liste pour la déplacer"
 
-#: bookmarks.c:496
+#: bookmarks.c:507
 msgid "This item is already at the end"
 msgstr "Cet objet est déjà à la fin"
 
-#: bookmarks.c:564
+#: bookmarks.c:575
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "Impossible de mettre en signets des répertoires non locaux comme '%s'"
 
-#: bookmarks.c:688
+#: bookmarks.c:699
 msgid "Add New Bookmark"
 msgstr "Ajouter un nouveau signet"
 
-#: bookmarks.c:695
+#: bookmarks.c:706
 msgid "Edit Bookmarks"
 msgstr "Éditer les signets"
 
-#: bookmarks.c:700
+#: bookmarks.c:711
 msgid "Recently Visited"
 msgstr "Récemment visités"
 
@@ -788,7 +788,7 @@ msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr ""
 "Désolé, je ne peux pas utiliser '%s' parce que ce n'est pas un fichier local."
 
-#: dropbox.c:283 pinboard.c:685
+#: dropbox.c:283 pinboard.c:690
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -846,54 +846,54 @@ msgstr ""
 "fichiers à l'avenir.\n"
 "Assurez-vous que NumLock est activé si vous utilisez le pavé numérique."
 
-#: filer.c:1050
+#: filer.c:1049
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Le répertoire '%s' n'est pas accessible"
 
-#: filer.c:1198
+#: filer.c:1197
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
-#: filer.c:1432
+#: filer.c:1431
 msgid "Cancel"
 msgstr "Annuler"
 
-#: filer.c:1672
+#: filer.c:1671
 msgid "S"
 msgstr "L"
 
-#: filer.c:1673
+#: filer.c:1672
 msgid "A"
 msgstr "T"
 
-#: filer.c:1674
+#: filer.c:1673
 msgid "T"
 msgstr "I"
 
-#: filer.c:1680
+#: filer.c:1679
 msgid "Scanning, "
 msgstr "Lecture, "
 
-#: filer.c:1681
+#: filer.c:1680
 msgid "All, "
 msgstr "Tous, "
 
-#: filer.c:1682
+#: filer.c:1681
 msgid "Thumbs, "
 msgstr "Imagettes, "
 
-#: filer.c:1951
+#: filer.c:1950
 msgid "Symbolic link to "
 msgstr "Lien symbolique vers "
 
-#: filer.c:1982
+#: filer.c:1981
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 "Ce nom de fichier n'est pas en UTF-8 valide. Vous devriez le renommer.\n"
 
-#: filer.c:2286 menu.c:1823
+#: filer.c:2285 menu.c:1822
 msgid "Item no longer exists!"
 msgstr "L'objet n'existe plus !"
 
@@ -1151,6 +1151,14 @@ msgstr ""
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "Fin de ligne incorrecte ou manquante dans les données text/uri-list"
 
+#: gui_support.c:1020
+msgid ""
+"Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
+"2.0 but is running with GTK+-2.2. Please recompile it."
+msgstr ""
+"Les icônes du punaiseur ne peuvent pas être dessinées car ROX-Filer a été "
+"compilé avec GTK+-2.0 mais tourne avec GTK+-2.2. Recompilez-le SVP."
+
 #: i18n.c:38
 msgid ""
 "Note that you must save your choices and restart the filer for the new "
@@ -1187,7 +1195,7 @@ msgstr "Options..."
 msgid "Home Directory"
 msgstr "Répertoire personnel"
 
-#: icon.c:141 icon.c:903 menu.c:205 type.c:213
+#: icon.c:141 icon.c:903 menu.c:205 type.c:215
 msgid "File"
 msgstr "Fichier"
 
@@ -1243,7 +1251,7 @@ msgstr "Vous devez d'abord sélectionner des objets à supprimer"
 msgid "You must open the menu over an item"
 msgstr "Vous devez ouvrir le menu au-dessus d'un objet"
 
-#: icon.c:619 menu.c:1194
+#: icon.c:619 menu.c:1193
 msgid "You can only set the run action for a regular file"
 msgstr ""
 "Vous ne pouvez fixer l'action d'exécution que pour un fichier ordinaire"
@@ -1301,7 +1309,7 @@ msgstr "Propriétaire, groupe :"
 msgid "Size:"
 msgstr "Taille :"
 
-#: infobox.c:396 support.c:274 support.c:351
+#: infobox.c:396 support.c:349
 msgid "bytes"
 msgstr "octets"
 
@@ -1711,11 +1719,11 @@ msgstr "Voir à l'intérieur"
 msgid "Open As Text"
 msgstr "Ouvrir en texte"
 
-#: menu.c:1009
+#: menu.c:1008
 msgid "_Relative link"
 msgstr "_Lien relatif"
 
-#: menu.c:1015
+#: menu.c:1014
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -1727,44 +1735,44 @@ msgstr ""
 "Si désactivée, le lien symbolique est absolu - utiliser ceci si le lien peut "
 "être déplacé sans que la cible bouge."
 
-#: menu.c:1082
+#: menu.c:1081
 msgid "New pathname is not absolute"
 msgstr "Le nouveau chemin n'est pas absolu"
 
-#: menu.c:1148
+#: menu.c:1147
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr "Un lien depuis '%s' existe déjà. Le remplacer par un lien vers '%s' ?"
 
-#: menu.c:1154
+#: menu.c:1153
 msgid "_Replace"
 msgstr "_Remplacer"
 
-#: menu.c:1285 menu.c:1326 menu.c:1386
+#: menu.c:1284 menu.c:1325 menu.c:1385
 msgid "Create"
 msgstr "Créer"
 
-#: menu.c:1286
+#: menu.c:1285
 msgid "NewDir"
 msgstr "NouveauRep"
 
-#: menu.c:1300 menu.c:1306
+#: menu.c:1299 menu.c:1305
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Erreur lors de la création de '%s' : %s"
 
-#: menu.c:1327
+#: menu.c:1326
 msgid "NewFile"
 msgstr "NouveauFichier"
 
-#: menu.c:1345
+#: menu.c:1344
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr ""
 "Erreur lors de la création du fichier : impossible de trouver le modèle pour "
 "%s"
 
-#: menu.c:1416
+#: menu.c:1415
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1794,7 +1802,7 @@ msgstr ""
 "etc. qui n'apparaîtront que pour des fichiers de ce type. `.group' n'est "
 "montré que si plusieurs fichiers sont sélectionnés."
 
-#: menu.c:1427
+#: menu.c:1426
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -1803,21 +1811,21 @@ msgstr ""
 "vous devez y lier (faire glisser avec <Ctrl> et <Shift> enfoncées) les "
 "applications voulues."
 
-#: menu.c:1430
+#: menu.c:1429
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr ""
 "Le contenu de votre variable CHOICESPATH ne permet pas la personnalisation - "
 "désolé."
 
-#: menu.c:1507
+#: menu.c:1506
 msgid "Customise"
 msgstr "Personnaliser"
 
-#: menu.c:1572
+#: menu.c:1571
 msgid "This is already the canonical name for this directory."
 msgstr "C'est déjà le nom canonique de ce répertoire."
 
-#: menu.c:1603
+#: menu.c:1602
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1825,75 +1833,75 @@ msgstr ""
 "Vous ne pouvez pas ouvrir une seconde vue de ce répertoire parce que "
 "l'option « Fenêtres Uniques » est activée dans la fenêtre « Options »."
 
-#: menu.c:1722
+#: menu.c:1721
 msgid "Copy ... ?"
 msgstr "Copier ... ?"
 
-#: menu.c:1725
+#: menu.c:1724
 msgid "Rename ... ?"
 msgstr "Renommer ... ?"
 
-#: menu.c:1728
+#: menu.c:1727
 msgid "Symlink ... ?"
 msgstr "Lien symbolique ... ?"
 
-#: menu.c:1731
+#: menu.c:1730
 msgid "Shift Open ... ?"
 msgstr "Shift Ouvrir ... ?"
 
-#: menu.c:1734
+#: menu.c:1733
 msgid "Help about ... ?"
 msgstr "Aide à propos de ... ?"
 
-#: menu.c:1737
+#: menu.c:1736
 msgid "Examine ... ?"
 msgstr "Examiner ... ?"
 
-#: menu.c:1740
+#: menu.c:1739
 msgid "Set run action for ... ?"
 msgstr "Fixer l'action d'exécution pour ... ?"
 
-#: menu.c:1743
+#: menu.c:1742
 msgid "Set icon for ... ?"
 msgstr "Fixer l'icône pour ... ?"
 
-#: menu.c:1746
+#: menu.c:1745
 msgid "Send ... to ... ?"
 msgstr "Envoyer ... à ... ?"
 
-#: menu.c:1749
+#: menu.c:1748
 msgid "DELETE ... ?"
 msgstr "SUPPRIMER ... ?"
 
-#: menu.c:1752
+#: menu.c:1751
 msgid "Count the size of ... ?"
 msgstr "Calculer la taille de ... ?"
 
-#: menu.c:1755
+#: menu.c:1754
 msgid "Set permissions on ... ?"
 msgstr "Fixer les permissions de ... ?"
 
-#: menu.c:1758
+#: menu.c:1757
 msgid "Search inside ... ?"
 msgstr "Chercher dans ... ?"
 
-#: menu.c:1761
+#: menu.c:1760
 msgid "Look inside ... ?"
 msgstr "Regarder dans ... ?"
 
-#: menu.c:1806
+#: menu.c:1805
 msgid "You cannot do this to more than one item at a time"
 msgstr "Vous ne pouvez pas appliquer cette action à plus d'un objet à la fois"
 
-#: menu.c:1838
+#: menu.c:1837
 msgid "Rename"
 msgstr "Renommer"
 
-#: menu.c:1843
+#: menu.c:1842
 msgid "Symlink"
 msgstr "Lien symbolique"
 
-#: menu.c:1878
+#: menu.c:1877
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -1908,7 +1916,7 @@ msgstr ""
 "2) ajoutant cette ligne à ~/.gtkrc-2.0 :\n"
 "\tgtk-can-change-accels = 1"
 
-#: menu.c:1888
+#: menu.c:1887
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -1928,7 +1936,7 @@ msgstr ""
 "La touche apparaîtra à côté de l'entrée du menu et vous pourrez à l'avenir "
 "juste appuyer sur cette touche, sans avoir à ouvrir le menu."
 
-#: menu.c:1903
+#: menu.c:1902
 msgid "Set keyboard shortcuts"
 msgstr "Fixer les raccourcis clavier"
 
@@ -2047,11 +2055,11 @@ msgstr ""
 "Erreur lors de l'exécution de l'appliquette :\n"
 "%s"
 
-#: pinboard.c:333
+#: pinboard.c:338
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "Votre vieux fichier de punaiseur a été converti au nouveau format XML."
 
-#: pinboard.c:535
+#: pinboard.c:540
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
@@ -2062,7 +2070,7 @@ msgstr ""
 "de fond » ou (pour les programmeurs) passez-le à la méthode SOAP "
 "SetBackdropApp."
 
-#: pinboard.c:554
+#: pinboard.c:559
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2076,53 +2084,53 @@ msgstr ""
 "Programmeurs : le fichier AppInfo.xml de l'application doit contenir "
 "l'élément CanSetBackdrop, comme indiqué dans le manuel de ROX-Filer."
 
-#: pinboard.c:574
+#: pinboard.c:579
 msgid "Set backdrop"
 msgstr "Fixer l'image de fond"
 
-#: pinboard.c:585
+#: pinboard.c:590
 msgid "Choose a style and drag an image in:"
 msgstr "Choisissez un style et faites glisser une image dans :"
 
-#: pinboard.c:598
+#: pinboard.c:603
 msgid "Centre the image without scaling it"
 msgstr "Centrer l'image sans changer sa taille"
 
-#: pinboard.c:599
+#: pinboard.c:604
 msgid "Centre"
 msgstr "Centrer"
 
-#: pinboard.c:600
+#: pinboard.c:605
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr ""
 "Changer la taille de l'image sans la déformer pour l'ajuster à la zone de "
 "fond"
 
-#: pinboard.c:602
+#: pinboard.c:607
 msgid "Scale"
 msgstr "Redimensionner"
 
-#: pinboard.c:603
+#: pinboard.c:608
 msgid "Stretch the image to fill the backdrop area"
 msgstr "Étirer l'image pour remplir la zone de fond"
 
-#: pinboard.c:604
+#: pinboard.c:609
 msgid "Stretch"
 msgstr "Étirer"
 
-#: pinboard.c:605
+#: pinboard.c:610
 msgid "Tile the image over the backdrop area"
 msgstr "Paver la zone de fond avec l'image"
 
-#: pinboard.c:606
+#: pinboard.c:611
 msgid "Tile"
 msgstr "Paver"
 
-#: pinboard.c:611
+#: pinboard.c:616
 msgid "Drop an image here"
 msgstr "Faites glisser ici une image"
 
-#: pinboard.c:698
+#: pinboard.c:703
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
@@ -2130,20 +2138,20 @@ msgstr ""
 "Seuls des fichiers (et certaines applications) peuvent être utilisés pour "
 "fixer l'image de fond."
 
-#: pinboard.c:1268
+#: pinboard.c:1306
 msgid "Missing '>' in icon label"
 msgstr "'>' manquant dans l'étiquette de l'icône"
 
-#: pinboard.c:1277
+#: pinboard.c:1315
 msgid "Missing ',' after icon label"
 msgstr "',' manquant après l'étiquette de l'icône"
 
-#: pinboard.c:1360
+#: pinboard.c:1398
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Erreur lors de la sauvegarde du punaiseur %s : %s"
 
-#: pinboard.c:1974
+#: pinboard.c:2018
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2154,7 +2162,7 @@ msgstr ""
 "%s\n"
 "Image de fond enlevée."
 
-#: pinboard.c:2252
+#: pinboard.c:2296
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2352,7 +2360,11 @@ msgstr ""
 "C'est un répertoire. Il contient un index d'autres objets - ouvrez-le pour "
 "en voir la liste."
 
-#: support.c:272 support.c:353
+#: support.c:272
+msgid "B"
+msgstr "O"
+
+#: support.c:351
 msgid "byte"
 msgstr "octet"
 
@@ -2451,47 +2463,47 @@ msgstr "Pas d'objet%s"
 msgid "%u selected (%s)"
 msgstr "%u sélectionné(s) (%s)"
 
-#: type.c:204
+#: type.c:206
 msgid "Sym link"
 msgstr "Lien symb."
 
-#: type.c:206
+#: type.c:208
 msgid "Mount point"
 msgstr "Point de montage"
 
-#: type.c:208
+#: type.c:210
 msgid "App dir"
 msgstr "Rép. App."
 
-#: type.c:215
+#: type.c:217
 msgid "Dir"
 msgstr "Rép."
 
-#: type.c:217
+#: type.c:219
 msgid "Char dev"
 msgstr "Périph. car."
 
-#: type.c:219
+#: type.c:221
 msgid "Block dev"
 msgstr "Périph. bloc"
 
-#: type.c:221
+#: type.c:223
 msgid "Pipe"
 msgstr "Tube"
 
-#: type.c:223
+#: type.c:225
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:225
+#: type.c:227
 msgid "Door"
 msgstr "Porte"
 
-#: type.c:228
+#: type.c:230
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: type.c:371
+#: type.c:373
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2518,11 +2530,11 @@ msgstr ""
 "vous n'avez pas à vous inquiéter. Dans le cas contraire, vous devez "
 "vérifier, ou même juste supprimer, toutes les actions d'exécution existantes."
 
-#: type.c:384
+#: type.c:386
 msgid "go-w (Fix security problem)"
 msgstr "go-w (corriger un problème de sécurité)"
 
-#: type.c:486
+#: type.c:488
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -2533,71 +2545,71 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:664
+#: type.c:666
 msgid "This is not a program! Give me an application instead!"
 msgstr "Ce n'est pas un programme ! Donnez-moi une application à la place !"
 
-#: type.c:722
+#: type.c:724
 msgid "Execute file"
 msgstr "Exécuter le fichier"
 
-#: type.c:727
+#: type.c:729
 msgid "No run action defined"
 msgstr "Pas d'action d'exécution de définie"
 
-#: type.c:753
+#: type.c:755
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Erreur dans le handler %s : %s"
 
-#: type.c:768
+#: type.c:770
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Application %s invalide (mauvais AppRun)"
 
-#: type.c:779
+#: type.c:781
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non exécutable"
 
-#: type.c:812
+#: type.c:814
 msgid "Set run action"
 msgstr "Fixer l'action d'exécution"
 
-#: type.c:818
+#: type.c:820
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Si un gestionnaire n'est pas fixé pour le type spécifique, utiliser celui-ci "
 "par défaut."
 
-#: type.c:820
+#: type.c:822
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Fixer en tant que défaut pour tout `%s/<quelconque>'"
 
-#: type.c:824
+#: type.c:826
 msgid "Use this application for all files with this MIME type."
 msgstr "Utiliser cette application pour tous les fichiers ayant ce type MIME."
 
-#: type.c:826 usericons.c:285
+#: type.c:828 usericons.c:285
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Seulement pour le type `%s' (%s/%s)"
 
-#: type.c:832
+#: type.c:834
 msgid "Drop a suitable application here"
 msgstr "Faites glisser ici une application adéquate"
 
-#: type.c:847
+#: type.c:849
 msgid "OR"
 msgstr "OU"
 
-#: type.c:854
+#: type.c:856
 msgid "Enter a shell command:"
 msgstr "Entrez une commande shell :"
 
-#: type.c:912
+#: type.c:914
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2605,16 +2617,16 @@ msgstr ""
 "Une action d'exécution existe déjà et est un assez gros programme - êtes-"
 "vous sûr de vouloir la supprimer ?"
 
-#: type.c:923
+#: type.c:925
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossible de supprimer %s : %s"
 
-#: type.c:960
+#: type.c:962
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "La sauvegarde des choix est désactivée par la variable CHOICESPATH"
 
-#: type.c:1160
+#: type.c:1162
 #, c-format
 msgid ""
 "Error loading MIME database:\n"
@@ -2623,12 +2635,22 @@ msgstr ""
 "Erreur lors de la lecture de la base de données MIME :\n"
 "%s"
 
-#: type.c:1185
+#: type.c:1187
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr "Fichier '%s' altéré !"
 
-#: type.c:1276
+#: type.c:1273
+msgid ""
+"The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
+"should move it there (and make a symlink from ~/.mime to it for older "
+"applications)."
+msgstr ""
+"Le répertoire ~/.mime a été déplacé. Ce doit maintenant être ~/.local/share/"
+"mime. Vous devez le déplacer là (et créer un lien symbolique de ~/.mime vers "
+"lui pour les anciennes applications)."
+
+#: type.c:1325
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -2649,7 +2671,7 @@ msgstr ""
 "permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /"
 "usr/share/mime/globs)."
 
-#: type.c:1350
+#: type.c:1399
 msgid "No description"
 msgstr "Pas de description"
 
@@ -2747,31 +2769,31 @@ msgstr ""
 "Erreur lors de la création de l'image '%s' :\n"
 "%s"
 
-#: view_details.c:851
+#: view_details.c:998
 msgid "_Name"
 msgstr "_Nom"
 
-#: view_details.c:854
+#: view_details.c:1001
 msgid "_Type"
 msgstr "_Type"
 
-#: view_details.c:856
+#: view_details.c:1003
 msgid "_Permissions"
 msgstr "_Droits d'accès"
 
-#: view_details.c:857
+#: view_details.c:1004
 msgid "_Owner"
 msgstr "_Propriétaire"
 
-#: view_details.c:859
+#: view_details.c:1006
 msgid "_Group"
 msgstr "_Groupe"
 
-#: view_details.c:861
+#: view_details.c:1008
 msgid "_Size"
 msgstr "_Taille"
 
-#: view_details.c:863
+#: view_details.c:1010
 msgid "Last _Modified"
 msgstr "Dernière _Modification"
 
@@ -3794,7 +3816,7 @@ msgstr ""
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "Passer tous les clics sur l'image de fond au gestionnaire de fenêtres"
 
-#: tips:276 tips:277
+#: tips:276
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
@@ -3805,15 +3827,31 @@ msgstr ""
 "Activez cette option pour transmettre à la place les événements à votre "
 "gestionnaire de fenêtres. Les clics sur les icônes ne seront pas transmis."
 
-#: tips:278
+#: tips:277
+msgid "Blackbox root menus hack"
+msgstr "Hack des menus racine de Blackbox"
+
+#: tips:278 tips:279
+msgid ""
+"Blackbox, Fluxbox and similar window managers do not yet work well with the "
+"ROX-Filer pinboard. This option enables some workarounds. These window "
+"managers are expected to change their behaviour in new versions so that this "
+"isn't necessary."
+msgstr ""
+"Blackbox, Fluxbox et les gestionnaires de fenêtres similaires ne "
+"fonctionnent pas encore bien avec le punaiseur de ROX-Filer. Ces "
+"gestionnaires de fenêtres devraient changer leur comportement dans leurs "
+"nouvelles versions de manière à ce que ceci ne soit pas nécessaire."
+
+#: tips:280
 msgid "Drag and drop"
 msgstr "Glisser-déposer"
 
-#: tips:279
+#: tips:281
 msgid "Don't use hostnames"
 msgstr "Ne pas utiliser de nom d'hôte"
 
-#: tips:280 tips:281 tips:282 tips:283
+#: tips:282 tips:283 tips:284 tips:285
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
