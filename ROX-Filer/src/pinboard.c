@@ -310,7 +310,8 @@ const char *pinboard_get_name(void)
  */
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 {
-	GtkWidget	*align;
+	GtkWidget	*align, *vbox;
+	GdkWindow	*events;
 	PinIcon		*pi;
 	Icon		*icon;
 
@@ -322,28 +323,42 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	pi->x = x;
 	pi->y = y;
 
-	/* Box takes the initial ref of Icon */
-	pi->win = gtk_vbox_new(FALSE, 0);
-	gtk_container_set_border_width(GTK_CONTAINER(pi->win), WINK_FRAME);
+	/* This is a bit complicated...
+	 * 
+	 * An icon needs to be a NO_WINDOW widget so that the image can
+	 * blend with the background (A ParentRelative window also works, but
+	 * is slow, causes the xfree86's memory consumption to grow without
+	 * bound, and doesn't even get freed when the filer quits!).
+	 *
+	 * However, the icon also needs to have a window, so we get events
+	 * delivered correctly. The solution is to float an InputOnly window
+	 * over the icon. Since GtkButton works the same way, we just use
+	 * that :-)
+	 */
 
+	 /* Button takes the initial ref of Icon */
+	pi->win = gtk_button_new();
+	gtk_container_set_border_width(GTK_CONTAINER(pi->win), WINK_FRAME);
 	g_signal_connect(pi->win, "expose-event", G_CALLBACK(draw_wink), pi);
+	gtk_button_set_relief(GTK_BUTTON(pi->win), GTK_RELIEF_NONE);
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(pi->win), vbox);
 
 	align = gtk_alignment_new(0.5, 0.5, 0, 0);
-	pi->widget = gtk_drawing_area_new();
+	pi->widget = gtk_hbox_new(FALSE, 0);	/* Placeholder */
 	gtk_container_add(GTK_CONTAINER(align), pi->widget);
 	
-	gtk_box_pack_start(GTK_BOX(pi->win), align, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), align, FALSE, TRUE, 0);
 	drag_set_pinicon_dest(pi);
-	g_signal_connect(pi->widget, "drag_data_get",
+	g_signal_connect(pi->win, "drag_data_get",
 				G_CALLBACK(drag_data_get), NULL);
 
 	pi->label = gtk_label_new(icon->item->leafname);
 	gtk_label_set_line_wrap(GTK_LABEL(pi->label), TRUE);
-	gtk_box_pack_start(GTK_BOX(pi->win), pi->label, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), pi->label, TRUE, TRUE, 0);
 
 	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), pi->win, 0, 0);
-	gtk_widget_realize(pi->win);
-	gtk_widget_realize(pi->widget);
 
 	snap_to_grid(&x, &y);
 	pi->x = x;
@@ -351,17 +366,21 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	gtk_widget_show_all(pi->win);
 	pinboard_reshape_icon((Icon *) pi);
 	
-	gtk_widget_add_events(pi->widget,
+	gtk_widget_realize(pi->win);
+	events = GTK_BUTTON(pi->win)->event_window;
+	gdk_window_set_events(events,
+			GDK_EXPOSURE_MASK |
+			GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
 			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
-	g_signal_connect(pi->widget, "enter-notify-event",
+	g_signal_connect(pi->win, "enter-notify-event",
 			G_CALLBACK(enter_notify), pi);
-	g_signal_connect(pi->widget, "button-press-event",
+	g_signal_connect(pi->win, "button-press-event",
 			G_CALLBACK(button_press_event), pi);
-	g_signal_connect(pi->widget, "button-release-event",
+	g_signal_connect(pi->win, "button-release-event",
 			G_CALLBACK(button_release_event), pi);
-	g_signal_connect(pi->widget, "motion-notify-event",
+	g_signal_connect(pi->win, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), pi);
 	g_signal_connect(pi->widget, "expose-event",
 			G_CALLBACK(draw_icon), pi);
@@ -575,14 +594,19 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	MaskedPixmap	*image = item->image;
 	int		iwidth = image->width;
 	int		iheight = image->height;
+	int		x, y;
 	//GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 	//				       : GTK_STATE_NORMAL;
+
+
+	x = widget->allocation.x;
+	y = widget->allocation.y;
 
 	gdk_pixbuf_render_to_drawable_alpha(
 			icon->selected ? image->pixbuf_lit : image->pixbuf,
 			widget->window,
 			0, 0, 				/* src */
-			0, 0,				/* dest */
+			x, y,				/* dest */
 			iwidth, iheight,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
@@ -592,7 +616,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
 				widget->window,
 				0, 0, 				/* src */
-				0, 0,
+				x, y,
 				-1, -1,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
@@ -606,7 +630,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
 				widget->window,
 				0, 0, 				/* src */
-				0, 0,
+				x, y,
 				-1, -1,
 				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 				GDK_RGB_DITHER_NORMAL, 0, 0);
@@ -797,7 +821,7 @@ static gboolean button_press_event(GtkWidget *widget,
 
 static void start_drag(PinIcon *pi, GdkEventMotion *event)
 {
-	GtkWidget *widget = pi->widget;
+	GtkWidget *widget = pi->win;
 	Icon	  *icon = (Icon *) pi;
 
 	if (!icon->selected)
@@ -1044,9 +1068,9 @@ static void offset_from_centre(PinIcon *pi, int *x, int *y)
 /* Same as drag_set_dest(), but for pinboard icons */
 static void drag_set_pinicon_dest(PinIcon *pi)
 {
-	GtkObject	*obj = GTK_OBJECT(pi->widget);
+	GtkObject	*obj = GTK_OBJECT(pi->win);
 
-	make_drop_target(pi->widget, 0);
+	make_drop_target(pi->win, 0);
 
 	g_signal_connect(obj, "drag_motion", G_CALLBACK(drag_motion), pi);
 	g_signal_connect(obj, "drag_leave", G_CALLBACK(drag_leave), pi);
@@ -1727,8 +1751,9 @@ static void reload_backdrop(Pinboard *pinboard,
 	if (backdrop)
 		style->bg_pixmap[GTK_STATE_NORMAL] =
 			load_backdrop(backdrop, backdrop_style);
-	
+
 	gtk_widget_set_style(pinboard->window, style);
+
 	g_object_unref(style);
 
 	gtk_widget_queue_draw(pinboard->window);

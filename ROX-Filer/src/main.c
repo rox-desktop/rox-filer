@@ -280,7 +280,6 @@ int main(int argc, char **argv)
 		"  bg[NORMAL] = \"#666666\"\n"
 		"}\n"
 		"style \"rox-default-pinboard-icon-style\" {\n"
-		"  bg_pixmap[NORMAL] = \"<parent>\"\n"
 		"  fg[NORMAL] = \"#ffffff\"\n"
 		"}\n"
 		"\n"
