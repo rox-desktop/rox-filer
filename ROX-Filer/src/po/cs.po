@@ -3,13 +3,12 @@
 # This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
-#: tips:203
 #, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: rox\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-15 14:10+0000\n"
+"POT-Creation-Date: 2005-01-29 10:19+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Jan 'jenik' Provaznik <xprovazn@fi.muni.cz>\n"
 "Language-Team:\n"
@@ -33,7 +32,7 @@ msgstr "Potichu"
 msgid "Don't confirm every operation"
 msgstr "Nepotvrzovat ka¾dou operaci"
 
-#: abox.c:455 tips:64
+#: abox.c:455 tips:65
 msgid "Name"
 msgstr "Jméno"
 
@@ -45,7 +44,7 @@ msgstr "Adresáø"
 msgid "Expression:"
 msgstr "Výraz:"
 
-#: action.c:179 action.c:237
+#: action.c:179
 msgid "Find expression reference"
 msgstr "Najít referenci výrazu"
 
@@ -123,6 +122,11 @@ msgstr ""
 "<b>system(command)</b> (true pokud 'command' vrátil 0;\n"
 "% v 'command' je nahrazen cestou souèasného souboru)\n"
 "<b>prune</b> (false, zabrání prohledávání obsahu adresáøe)."
+
+#: action.c:237
+#, fuzzy
+msgid "Change permissions reference"
+msgstr "Najít referenci výrazu"
 
 #: action.c:248
 msgid ""
@@ -586,7 +590,7 @@ msgstr "go-rwx (Soukromé - pøístup povolen pouze vlastníkovi)"
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Pøístup povolen v¹em, bez práva zápisu)"
 
-#: action.c:2081 menu.c:183 menu.c:220 tips:82
+#: action.c:2081 menu.c:183 menu.c:220 tips:83
 msgid "Permissions"
 msgstr "Pøístupová práva"
 
@@ -621,7 +625,7 @@ msgstr "Tøídit podle typu"
 msgid "Change contents of subdirectories"
 msgstr "Zmìnit i obsah podadresáøù"
 
-#: action.c:2161 infobox.c:629
+#: action.c:2161 infobox.c:633
 msgid "Type:"
 msgstr "Typ:"
 
@@ -878,19 +882,19 @@ msgstr "Nelze otevøít adresáø: %s"
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) selhalo: %s"
 
-#: dnd.c:426
+#: dnd.c:424
 msgid "Internal error - bad info type"
 msgstr "Interní chyba - bad info type"
 
-#: dnd.c:566
+#: dnd.c:564
 msgid "Drag a directory here to bookmark it."
 msgstr "K pøidání adresáøe mezi zálo¾ky jej sem pøetáhnìte."
 
-#: dnd.c:581
+#: dnd.c:579
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "Chyba protokolu XDS: leafname nemá obsahovat '/'\n"
 
-#: dnd.c:606
+#: dnd.c:604
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
@@ -898,17 +902,17 @@ msgstr ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
 
-#: dnd.c:619
+#: dnd.c:617
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Promiòte - je vy¾adován cíl typu text/uri-list nebo XdndDirectSave0."
 
-#: dnd.c:622
+#: dnd.c:620
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 "Promiòte - je vy¾adován cíl typu text/uri-list nebo application/octet-stream."
 
-#: dnd.c:692
+#: dnd.c:690
 #, c-format
 msgid ""
 "Failed to add some items to the pinboard, because they are on a remote "
@@ -917,52 +921,52 @@ msgid ""
 "%s"
 msgstr ""
 
-#: dnd.c:767
+#: dnd.c:765
 msgid "Unknown target"
 msgstr "Neznámý cíl"
 
-#: dnd.c:800
+#: dnd.c:798
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "Vzdálená aplikace mi nemù¾e nebo nechce poslat data - sorry"
 
-#: dnd.c:813
+#: dnd.c:811
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr "chyba protokolu XDS: návratový kód by mìl být 'S', 'F' nebo 'E'\n"
 
-#: dnd.c:846
+#: dnd.c:844
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Promiòte, nemohu zobrazit nabídku akcí pro vzdálené soubory / nezpracovaná"
 "(syrová) data."
 
-#: dnd.c:862
+#: dnd.c:860
 msgid "UntitledData"
 msgstr "NepojmenovanáData"
 
-#: dnd.c:889
+#: dnd.c:887
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Chyba pøi ukládání souboru: %s"
 
-#: dnd.c:962
+#: dnd.c:960
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "®ádné URI v text/uri-seznamu (není co dìlat)"
 
-#: dnd.c:994
+#: dnd.c:992
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Nelze získat data ze vzdáleného poèítaèe (application/octet-stream není "
 "poskytován)"
 
-#: dnd.c:1017
+#: dnd.c:1015
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Nìkteré z tìchto souborù jsou na vzdáleném poèítaèi - tyto soubory budou "
 "ignorovány - sorry"
 
-#: dnd.c:1024
+#: dnd.c:1022
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -970,11 +974,11 @@ msgstr ""
 "®ádný z tìchto souborù není na tomto poèítaèi - nemohu pracovat s více "
 "vzdálenými soubory - promiòte."
 
-#: dnd.c:1037
+#: dnd.c:1035
 msgid "Unknown action requested"
 msgstr "Po¾adována neznámá akce"
 
-#: dnd.c:1045
+#: dnd.c:1043
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Chyba pøi získání seznamu souborù: %s"
@@ -1050,9 +1054,8 @@ msgstr ""
 msgid "No change"
 msgstr "Nic"
 
-#: filer.c:561
-#, fuzzy
-msgid "Umount"
+#: filer.c:561 menu.c:860
+msgid "Unmount"
 msgstr "Odpojit"
 
 #: filer.c:658
@@ -1123,7 +1126,7 @@ msgstr ""
 msgid "Position"
 msgstr "®ádný popis"
 
-#: filer.c:3324 toolbar.c:136 toolbar.c:140 tips:67
+#: filer.c:3324 toolbar.c:136 toolbar.c:140 tips:68
 msgid "Size"
 msgstr "Velikost"
 
@@ -1146,7 +1149,7 @@ msgstr "Tøídit podle vlastníka"
 msgid "Details"
 msgstr "Podrobnosti"
 
-#: filer.c:3351 tips:125 tips:126
+#: filer.c:3351 tips:126 tips:127
 msgid "Thumbnails"
 msgstr "Náhledy"
 
@@ -1250,6 +1253,30 @@ msgstr "Byte"
 #: find.c:919
 msgid "Bytes"
 msgstr "Bytes"
+
+#: find.c:921
+msgid "Kb"
+msgstr ""
+
+#: find.c:921
+msgid "K"
+msgstr ""
+
+#: find.c:923
+msgid "Mb"
+msgstr ""
+
+#: find.c:923
+msgid "M"
+msgstr ""
+
+#: find.c:925
+msgid "Gb"
+msgstr ""
+
+#: find.c:925
+msgid "G"
+msgstr ""
 
 #: find.c:927
 msgid "Sec"
@@ -1555,32 +1582,32 @@ msgstr "(¹patné utf-8)"
 msgid "Show _Help Files"
 msgstr "Zobrazit _Help soubory"
 
-#: infobox.c:287
+#: infobox.c:290
 #, fuzzy
 msgid "<b>Permissions</b>"
 msgstr "Pøístupová práva"
 
-#: infobox.c:300
+#: infobox.c:304
 msgid "<b>Contents indicate...</b>"
 msgstr ""
 
-#: infobox.c:437 infobox.c:574 support.c:349
+#: infobox.c:441 infobox.c:578 support.c:349
 msgid "bytes"
 msgstr "bytù"
 
-#: infobox.c:460
+#: infobox.c:464
 #, fuzzy
 msgid "Failed to read size"
 msgstr ""
 "!%s\n"
 "Kopírování '%s' selhalo\n"
 
-#: infobox.c:518
+#: infobox.c:522
 #, fuzzy, c-format
 msgid "'%s' is no longer a symlink"
 msgstr "!'%s' je symbolický odkaz\n"
 
-#: infobox.c:525
+#: infobox.c:529
 #, fuzzy, c-format
 msgid ""
 "Failed to unlink '%s':\n"
@@ -1589,7 +1616,7 @@ msgstr ""
 "!%s\n"
 "Kopírování '%s' selhalo\n"
 
-#: infobox.c:530
+#: infobox.c:534
 #, fuzzy, c-format
 msgid ""
 "Failed to create symlink from '%s':\n"
@@ -1599,155 +1626,156 @@ msgstr ""
 "!%s\n"
 "Kopírování '%s' selhalo\n"
 
-#: infobox.c:553 tips:294
+#: infobox.c:557 tips:294
 msgid "Error:"
 msgstr "Chyba:"
 
-#: infobox.c:560
+#: infobox.c:564
 msgid "Real directory:"
 msgstr "Skuteèný adresáø:"
 
-#: infobox.c:563
+#: infobox.c:567
 msgid "Owner, Group:"
 msgstr "Vlastník, Skupina:"
 
-#: infobox.c:570 infobox.c:585 infobox.c:594
+#: infobox.c:574 infobox.c:589 infobox.c:598
 msgid "Size:"
 msgstr "Velikost:"
 
-#: infobox.c:595
+#: infobox.c:599
 #, fuzzy
 msgid "Scanning"
 msgstr "Prozkoumávám"
 
-#: infobox.c:616
+#: infobox.c:620
 msgid "Failed to scan"
 msgstr ""
 
-#: infobox.c:623
+#: infobox.c:627
 msgid "Change time:"
 msgstr "Èas zmìny:"
 
-#: infobox.c:625
+#: infobox.c:629
 msgid "Modify time:"
 msgstr "Èas úpravy:"
 
-#: infobox.c:627
+#: infobox.c:631
 msgid "Access time:"
 msgstr "Èas pøístupu:"
 
-#: infobox.c:635
+#: infobox.c:639
 msgid "Extended attributes:"
 msgstr ""
 
-#: infobox.c:637
+#: infobox.c:641
 msgid "Present"
 msgstr ""
 
-#: infobox.c:638 tips:107 tips:139
+#: infobox.c:642
 msgid "None"
 msgstr "®ádný"
 
-#: infobox.c:639
+#: infobox.c:643
 #, fuzzy
 msgid "Not supported"
 msgstr "Dnotify support"
 
-#: infobox.c:651
+#: infobox.c:655
 #, fuzzy
 msgid "Link target:"
 msgstr "Neznámý cíl"
 
-#: infobox.c:661
+#: infobox.c:665
 msgid "Run action:"
 msgstr "Spou¹tìcí akce"
 
-#: infobox.c:751
+#: infobox.c:755
 msgid "<nothing yet>"
 msgstr "<zatím nic>"
 
-#: infobox.c:821
+#: infobox.c:825
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) identifikuje polo¾ku jako... %s"
 
-#: infobox.c:878
+#: infobox.c:882
 #, fuzzy, c-format
 msgid "Could not change permissions: %s"
 msgstr "?Zmìnit práva '%s'?"
 
-#: infobox.c:896
+#: infobox.c:900
 #, fuzzy
 msgid "Owner"
 msgstr "_Vlastník"
 
-#: infobox.c:898
+#: infobox.c:902
 #, fuzzy
 msgid "Group"
 msgstr "_Skupina"
 
-#: infobox.c:900
+#: infobox.c:904
 msgid "World"
 msgstr ""
 
-#: infobox.c:903
+#: infobox.c:907
 #, fuzzy
 msgid "Read"
 msgstr "Pøejmenovat"
 
-#: infobox.c:905
+#: infobox.c:909
 #, fuzzy
 msgid "Write"
 msgstr "polo¾ka"
 
-#: infobox.c:907
+#: infobox.c:911
 msgid "Exec"
 msgstr ""
 
-#: infobox.c:924
+#: infobox.c:928
 #, fuzzy
 msgid "SUID"
 msgstr "IsSUID"
 
-#: infobox.c:931
+#: infobox.c:935
 #, fuzzy
 msgid "SGID"
 msgstr "IsSGID"
 
-#: infobox.c:938
+#: infobox.c:942
 #, fuzzy
 msgid "Sticky"
 msgstr "IsSticky"
 
-#: infobox.c:960
+#: infobox.c:964
 msgid "Symbolic link"
 msgstr "Symbolický odkaz"
 
-#: infobox.c:963
+#: infobox.c:967
 msgid "ROX application"
 msgstr "ROX aplikace"
 
-#: infobox.c:971
+#: infobox.c:975
 msgid "mounted"
 msgstr "pøipojeno"
 
-#: infobox.c:971
+#: infobox.c:975
 msgid "unmounted"
 msgstr "odpojeno"
 
-#: infobox.c:975
+#: infobox.c:979
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Bod pøipojení pro %s (%s)"
 
-#: infobox.c:978
+#: infobox.c:982
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Bod pøipojení (%s)"
 
 #: main.c:95
+#, fuzzy
 msgid ""
-"Copyright (C) 2003 Thomas Leonard.\n"
+"Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
@@ -1891,11 +1919,11 @@ msgstr ""
 msgid "No (apsymbols.h not found)"
 msgstr ""
 
-#: menu.c:179 tips:56
+#: menu.c:179 tips:57
 msgid "Display"
 msgstr "Zobrazit"
 
-#: menu.c:180 tips:61
+#: menu.c:180 tips:62
 msgid "Icons View"
 msgstr "Ikonový pohled"
 
@@ -1903,7 +1931,7 @@ msgstr "Ikonový pohled"
 msgid "Icons, With..."
 msgstr "Ikony, S..."
 
-#: menu.c:182 tips:81
+#: menu.c:182 tips:82
 msgid "Sizes"
 msgstr "Velikostmi"
 
@@ -1911,11 +1939,11 @@ msgstr "Velikostmi"
 msgid "Types"
 msgstr "Typy"
 
-#: menu.c:185 tips:84
+#: menu.c:185 tips:85
 msgid "Times"
 msgstr "Èasy"
 
-#: menu.c:186 tips:62 tips:99
+#: menu.c:186 tips:63 tips:100
 msgid "List View"
 msgstr "Seznamový pohled"
 
@@ -1927,7 +1955,7 @@ msgstr "Vìt¹í ikony"
 msgid "Smaller Icons"
 msgstr "Men¹í ikony"
 
-#: menu.c:190 tips:78
+#: menu.c:190 tips:79
 msgid "Automatic"
 msgstr "Automaticky"
 
@@ -2103,10 +2131,6 @@ msgstr "Dal¹í kliknutí"
 #, c-format
 msgid "%d items"
 msgstr "%d polo¾ek"
-
-#: menu.c:860
-msgid "Unmount"
-msgstr "Odpojit"
 
 #: menu.c:862
 msgid "Open unmounted"
@@ -2812,7 +2836,7 @@ msgstr "Zobrazit nápovìdu programu ROX-Filer"
 msgid " (%u hidden)"
 msgstr "(%u skrytých)"
 
-#: toolbar.c:231 tips:87
+#: toolbar.c:231 tips:88
 msgid "items"
 msgstr "polo¾ek"
 
@@ -3256,66 +3280,71 @@ msgid "English (no translation)"
 msgstr "Anglicky (bez pøekladu)"
 
 #: tips:10
+#, fuzzy
+msgid "Finnish"
+msgstr "Dánsky"
+
+#: tips:11
 msgid "French"
 msgstr "Francouzsky"
 
-#: tips:11
+#: tips:12
 msgid "German"
 msgstr "Nìmecky"
 
-#: tips:12
+#: tips:13
 msgid "Hungarian"
 msgstr "Maïarsky"
 
-#: tips:13
+#: tips:14
 msgid "Japanese"
 msgstr "Japonsky"
 
-#: tips:14
+#: tips:15
 msgid "Norwegian"
 msgstr "Norsky"
 
-#: tips:15
+#: tips:16
 msgid "Italian"
 msgstr "Italsky"
 
-#: tips:16
+#: tips:17
 msgid "Polish"
 msgstr "Polsky"
 
-#: tips:17
+#: tips:18
 msgid "Portuguese (Brasil)"
 msgstr ""
 
-#: tips:18
+#: tips:19
 msgid "Romanian"
 msgstr ""
 
-#: tips:19
+#: tips:20
 msgid "Russian"
 msgstr "Rusky"
 
-#: tips:20
+#: tips:21
 msgid "Spanish"
 msgstr "©panìlsky"
 
-#: tips:21
+#: tips:22
 msgid "Swedish"
 msgstr "©védsky"
 
-#: tips:22
+#: tips:23
 msgid "Filer windows"
 msgstr "Okna správce souborù"
 
-#: tips:23
+#: tips:24
 msgid "Auto-resize filer windows"
 msgstr "Automaticky mìnit velikost oken správce souborù"
 
-#: tips:24
+#: tips:25
 msgid "Never automatically resize"
 msgstr "Nikdy automaticky nìmìnit velikost"
 
-#: tips:25
+#: tips:26
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
@@ -3323,11 +3352,11 @@ msgstr ""
 "Budete muset mìnit velikost oken ruènì pomocí správce oken, pomcí nabídky "
 "`Resize Window' v menu nebo pomocí dvojkliku na pozadí okna."
 
-#: tips:26
+#: tips:27
 msgid "Resize when changing the display style"
 msgstr "Zmìnit velikost pøi zmìnì stylu pohledu"
 
-#: tips:27
+#: tips:28
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
@@ -3335,11 +3364,11 @@ msgstr ""
 "Zmìna velikosti ikon nebo toho, které podrobnosti mají být zobrazeny, zmìní "
 "velikost okna."
 
-#: tips:28
+#: tips:29
 msgid "Always resize"
 msgstr "V¾dy mìnit velikost"
 
-#: tips:29 tips:30
+#: tips:30 tips:31
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
@@ -3347,15 +3376,15 @@ msgstr ""
 "Správce souborù bude mìnit velikost oken kdykoliv to bude potøeba (pøi zmìnì "
 "adresáøe nebo stylu pohledu)."
 
-#: tips:31
+#: tips:32
 msgid "Largest window size:"
 msgstr "Nejvìt¹í velikost okna"
 
-#: tips:32
+#: tips:33
 msgid "%"
 msgstr "%"
 
-#: tips:33 tips:34
+#: tips:34 tips:35
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
@@ -3363,15 +3392,15 @@ msgstr ""
 "Nejvìt¹í velikost v procentech plochy obrazovky, která mù¾e být pou¾ita pøi "
 "automatické zmìnì velikosti."
 
-#: tips:35
+#: tips:36
 msgid "Window behaviour"
 msgstr "Chování okna"
 
-#: tips:36
+#: tips:37
 msgid "Short titlebar flags"
 msgstr "Krátké popisky v titulku"
 
-#: tips:37
+#: tips:38
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
@@ -3379,11 +3408,11 @@ msgstr ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 
-#: tips:38
+#: tips:39
 msgid "Unique windows"
 msgstr "Unikátní okna"
 
-#: tips:39 tips:40
+#: tips:40 tips:41
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -3391,11 +3420,11 @@ msgstr ""
 "Pokud otevøete adresáø a tento adresáø je u¾ zobrazen v jimém, oknì, potom "
 "toto nastavení zpùsobí, ¾e jiná okna budou zavøena."
 
-#: tips:41
+#: tips:42
 msgid "New window on button 1"
 msgstr "Nové okno po stisku tlaèítka 1"
 
-#: tips:42
+#: tips:43
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -3405,11 +3434,11 @@ msgstr ""
 "otevøe adresáø v v novém oknì. Kliknutí tlaèítka 2 na my¹i (prostøední) "
 "pou¾ije souèasné okno."
 
-#: tips:43
+#: tips:44
 msgid "Single-click navigation"
 msgstr "Procházení pomocí jednoho kliknutí"
 
-#: tips:44 tips:149
+#: tips:45 tips:150
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -3419,25 +3448,25 @@ msgstr ""
 "chcete vybrat, musíte pøi kliknutí dr¾et Control. Pokud není tato volba "
 "zapnutá, jedno kliknutí polo¾ku vybere, dvojklik ji otevøe.things."
 
-#: tips:45
+#: tips:46
 msgid "Double-click on background resizes"
 msgstr ""
 
-#: tips:46 tips:47 tips:48 tips:49
+#: tips:47 tips:48 tips:49 tips:50
 msgid ""
 "If on then double clicking on the window background resizes the window, just "
 "like clicking on the Automatic size mode button in the toolbar."
 msgstr ""
 
-#: tips:50
+#: tips:51
 msgid "Sorting"
 msgstr "Tøídìní"
 
-#: tips:51
+#: tips:52
 msgid "Directories come first (for sort by name)"
 msgstr "Adresáøe jsou zobrazovány první (u tøídìní podle jména)"
 
-#: tips:52
+#: tips:53
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
@@ -3445,11 +3474,11 @@ msgstr ""
 "Tato volba zpùsobí, ¾e pokud se tøídí podle jména, adresáøe budou zobrazeny "
 "v¾dy pøed v¹ím ostatním."
 
-#: tips:53
+#: tips:54
 msgid "Capitalised names first (for sort by name)"
 msgstr "Velká písmena první (u tøídìní podle jména)"
 
-#: tips:54 tips:55
+#: tips:55 tips:56
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
@@ -3457,15 +3486,15 @@ msgstr ""
 "Tato volba zpùsobí, ¾e jména souborù zaèínající velkým písmenem mají "
 "pøednost pøed soubory, které zaèínají malým písmenem"
 
-#: tips:57
+#: tips:58
 msgid "Default settings for new windows"
 msgstr "Defaultní nastavení pro nová okna"
 
-#: tips:58
+#: tips:59
 msgid "Inherit options from source window"
 msgstr "Zdìdit nastavení ze zdrojového okna"
 
-#: tips:59
+#: tips:60
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
@@ -3474,27 +3503,27 @@ msgstr ""
 "zdrojového okna, pokud je to mo¾né, jinak je nastaveno na ní¾e uvedené "
 "defaultní hodnoty."
 
-#: tips:60
+#: tips:61
 msgid "View type:"
 msgstr "Typ pohledu:"
 
-#: tips:63
+#: tips:64
 msgid "Sort by:"
 msgstr "Tøídit podle:"
 
-#: tips:65 tips:83
+#: tips:66 tips:84
 msgid "Type"
 msgstr "Typu"
 
-#: tips:66
+#: tips:67
 msgid "Date"
 msgstr "Data"
 
-#: tips:68
+#: tips:69
 msgid "Show hidden files"
 msgstr "Zobrazovat skryté soubory"
 
-#: tips:69 tips:70 tips:71 tips:72
+#: tips:70 tips:71 tips:72 tips:73
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
@@ -3502,43 +3531,43 @@ msgstr ""
 "Tato volba zpùsobí, ¾e jsou zobrazovány i soubory, jejich¾ jméno zaèíná "
 "teèkou, jinak jsou tyto soubory skryté."
 
-#: tips:73
+#: tips:74
 msgid "Icon View"
 msgstr "Ikonový pohled"
 
-#: tips:74
+#: tips:75
 msgid "Default size:"
 msgstr "Defaultní velikost"
 
-#: tips:75
+#: tips:76
 msgid "Huge Icons"
 msgstr "Obrovské ikony"
 
-#: tips:76 tips:265
+#: tips:77 tips:265
 msgid "Large Icons"
 msgstr "Velké ikony"
 
-#: tips:77 tips:264
+#: tips:78 tips:264
 msgid "Small Icons"
 msgstr "Malé ikony"
 
-#: tips:79
+#: tips:80
 msgid "Default details:"
 msgstr "Defaultní podrobnosti:"
 
-#: tips:80
+#: tips:81
 msgid "No details"
 msgstr "®ádné podrobnosti"
 
-#: tips:85
+#: tips:86
 msgid "Automatic small icons:"
 msgstr "Automaticky nastavit malé ikony:"
 
-#: tips:86
+#: tips:87
 msgid "Change at:"
 msgstr "Zmìnit u:"
 
-#: tips:88 tips:89 tips:90
+#: tips:89 tips:90 tips:91
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
@@ -3548,15 +3577,15 @@ msgstr ""
 "obsahuje alespoò tolik polo¾ek, potom jsou zobrazovány malé ikony, jinak "
 "jsou pou¾ity velké ikony "
 
-#: tips:91
+#: tips:92
 msgid "Max width (Large icons):"
 msgstr "Maximální velikost (Velké ikony):"
 
-#: tips:92 tips:95
+#: tips:93 tips:96
 msgid "pixels"
 msgstr "pixelù"
 
-#: tips:93
+#: tips:94
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -3564,54 +3593,59 @@ msgstr ""
 "Text, který je ¹ir¹í je rozdìlen na dva øádky, pokud je pou¾it mód Velké "
 "ikony. V módu Obrovské ikony je text rozdìlen, kdy¾ je ¹ir¹í o 50%."
 
-#: tips:94
+#: tips:95
 msgid "(Small Icons):"
 msgstr "(Malé ikony)"
 
-#: tips:96 tips:97 tips:98
+#: tips:97 tips:98 tips:99
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maximání ¹íøka textu vedle malých ikon."
 
-#: tips:100
+#: tips:101
 msgid "Show column headings"
 msgstr "Ukazovat nadpisy sloupcù"
 
-#: tips:101 tips:102 tips:103
+#: tips:102 tips:103 tips:104
 msgid "If this is on then column headings will be shown in the list view."
 msgstr ""
 "Tato volb zpùsobí, ¾e nadpisy sloupcù budou zobrazeny v seznamovém pohledu."
 
-#: tips:104
+#: tips:105
 msgid "Tools/Minibuffer"
 msgstr "Nástroje/Minibuffer"
 
-#: tips:105
+#: tips:106
 msgid "Toolbar"
 msgstr "Panel nástrojù"
 
-#: tips:106
+#: tips:107
 msgid "Toolbar type:"
 msgstr "Typ panelu nástrojù:"
 
 #: tips:108
+#, fuzzy
+msgid "No toolbar"
+msgstr "Panel nástrojù"
+
+#: tips:109
 msgid "Icons only"
 msgstr "Pouze ikony"
 
-#: tips:109
+#: tips:110
 msgid "Text under icons"
 msgstr "Text pod ikonami"
 
-#: tips:110
+#: tips:111
 msgid "Text beside icons"
 msgstr "Text vedle ikon"
 
-#: tips:111
+#: tips:112
 msgid "Show totals of items"
 msgstr ""
 "Zobrazovat souhrnné \n"
 "informace o polo¾kách"
 
-#: tips:112 tips:113
+#: tips:113 tips:114
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -3621,29 +3655,29 @@ msgstr ""
 "existují. Pokud jsou vybrány nìjaké polo¾ky, je zobrazen jejich poèet a "
 "celková velikost."
 
-#: tips:114
+#: tips:115
 msgid "Select the buttons you want on the bar:"
 msgstr "Vyberte tlaèítka, které mají být zobrazeny na panelu:"
 
-#: tips:115
+#: tips:116
 msgid "Width of toolbar sets minimum width of window"
 msgstr ""
 
-#: tips:116 tips:117
+#: tips:117 tips:118
 msgid ""
 "Each filer window is constrained to be wide enough to show the whole of the "
 "toolbar"
 msgstr ""
 
-#: tips:118
+#: tips:119
 msgid "Minibuffer"
 msgstr "Minibuffer"
 
-#: tips:119
+#: tips:120
 msgid "Beep if Tab-completion fails"
 msgstr "Pípnout, pokud Tab-doplnìní sel¾e"
 
-#: tips:120
+#: tips:121
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
@@ -3652,11 +3686,11 @@ msgstr ""
 "Pøi pou¾ívání minibufferu `Zadat cestu...' a pøi stisku Tab pípnout, kdy¾ se "
 "nic nestane (napø. proto¾e existuje více mo¾ností závislých na dal¹ím znaku)."
 
-#: tips:121
+#: tips:122
 msgid "Beep if there are several matches"
 msgstr "Pípnout, kdy¾ existuje více shod"
 
-#: tips:122 tips:123 tips:124
+#: tips:123 tips:124 tips:125
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
@@ -3665,7 +3699,7 @@ msgstr ""
 "existuje více odpovídajících souborù, even though some more letters were "
 "added."
 
-#: tips:127
+#: tips:128
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
@@ -3673,11 +3707,11 @@ msgstr ""
 "Pokud jsou zapnuty náhledy, ka¾dý obrázek v adresáøi je naèten a je zobrazen "
 "jeho malý náhled."
 
-#: tips:128
+#: tips:129
 msgid "Show image thumbnails"
 msgstr "Zobrazovat náhledy obrázkù"
 
-#: tips:129 tips:130
+#: tips:130 tips:131
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
@@ -3685,11 +3719,11 @@ msgstr ""
 "Toto je dafultní nastavení pro nová okna. Pou¾ijte menu Zobrazit pro "
 "zapnutía vypnutí náhledù v individuálních oknech."
 
-#: tips:131
+#: tips:132
 msgid "Thumbnails cache"
 msgstr "Ke¹ náhledù"
 
-#: tips:132
+#: tips:133
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
@@ -3699,11 +3733,11 @@ msgstr ""
 "thumbnails. Kliknìte sem pro odtranìní v¹ech ke¹ovaných náhledù. V pøípadì "
 "potøeby budou znovu vytvoøeny."
 
-#: tips:133
+#: tips:134
 msgid "Pinboard"
 msgstr "Plocha"
 
-#: tips:134
+#: tips:135
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
@@ -3711,61 +3745,66 @@ msgstr ""
 "Pokud pou¾íváte plochu, mù¾ete pøetáhnout soubory a aplikace na plochu a tím "
 "na nì vytvoøíte odkaz."
 
-#: tips:135 tips:261
+#: tips:136 tips:261
 msgid "Appearance"
 msgstr "Vzhled"
 
-#: tips:136
+#: tips:137
 msgid "Foreground:"
 msgstr "Popøedí"
 
-#: tips:137
+#: tips:138
 msgid "Text shadow:"
 msgstr "Stín textu:"
 
-#: tips:138
+#: tips:139
 msgid "Background:"
 msgstr "Pozadí"
 
 #: tips:140
+#, fuzzy
+msgid "No shadow"
+msgstr "Stín textu:"
+
+#: tips:141
 msgid "Thin"
 msgstr "Tenký"
 
-#: tips:141
+#: tips:142
 msgid "Thick"
 msgstr "Tlustý"
 
-#: tips:142
+#: tips:143
 msgid "Use custom font:"
 msgstr "Pou¾ít vlastní písmo:"
 
-#: tips:143
+#: tips:144
 msgid "The font used for the text displayed under the icons"
 msgstr "Písmo pou¾ité pro text zobrazovaný pod ikonami"
 
-#: tips:144
+#: tips:145
 msgid "Fast scaling of images"
 msgstr ""
 
-#: tips:145 tips:146
+#: tips:146 tips:147
 msgid ""
 "Choose between the fast or slow method of scaling backdrop images.  The slow "
 "method can give better results."
 msgstr ""
 
-#: tips:147
+#: tips:148
 msgid "Pinboard behaviour"
 msgstr "Chování plochy"
 
-#: tips:148
+#: tips:149
 msgid "Single-click to open"
 msgstr "Jednoduché kliknutí pro otevøení"
 
-#: tips:150
+#: tips:151
 msgid "Keep icons within screen limits"
 msgstr "Dr¾et ikony v mezích obrazovky"
 
-#: tips:151
+#: tips:152
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -3773,39 +3812,39 @@ msgstr ""
 "Tato volba zpùsobí, ¾e ikony na plo¹e jsou v¾dy úplnì umístìny v mezích "
 "obrazovky vèetnì jejich popisku."
 
-#: tips:152
+#: tips:153
 msgid "Icon grid step:"
 msgstr "Møí¾ka pro umístìní ikon:"
 
-#: tips:153
+#: tips:154
 msgid "Fine"
 msgstr "Jemná"
 
-#: tips:154
+#: tips:155
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "Pou¾ije se 2-pixelová møí¾ka pro umís»ování ikon na plo¹e."
 
-#: tips:155
+#: tips:156
 msgid "Medium"
 msgstr "Støední"
 
-#: tips:156
+#: tips:157
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "Pou¾ije se 16-pixelová møí¾ka pro umís»ování ikon na plo¹e."
 
-#: tips:157
+#: tips:158
 msgid "Coarse"
 msgstr "Hrubá"
 
-#: tips:158 tips:159 tips:160 tips:161
+#: tips:159 tips:160 tips:161 tips:162
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "Pou¾ije se 32-pixelová møí¾ka pro umís»ování ikon na plo¹e."
 
-#: tips:162 tips:164
+#: tips:163 tips:165
 msgid "Iconified windows"
 msgstr "Ikonifikovaná okna"
 
-#: tips:163
+#: tips:164
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -3815,11 +3854,11 @@ msgstr ""
 "rùzné programy, vèetnì ROX-Fileru, mohou být pou¾ity ke zobrazování "
 "ikonifikovaných oken."
 
-#: tips:165
+#: tips:166
 msgid "Show iconified windows"
 msgstr "Zobrazovat ikonifikovaná okna"
 
-#: tips:166
+#: tips:167
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
@@ -3829,39 +3868,39 @@ msgstr ""
 "malé tlaèítko na plo¹e. Je potøeba kompatibilní správce oken a musí být "
 "pou¾ívána plocha."
 
-#: tips:167
+#: tips:168
 msgid "Iconify to the"
 msgstr "Ikonifikovat "
 
-#: tips:168
+#: tips:169
 msgid "top-left"
 msgstr "nahoøe-vlevo"
 
-#: tips:169
+#: tips:170
 msgid "top-right"
 msgstr "nahoøe-vpravo"
 
-#: tips:170
+#: tips:171
 msgid "bottom-left"
 msgstr "dole-vlevo"
 
-#: tips:171
+#: tips:172
 msgid "bottom-right"
 msgstr "dole-vpravo"
 
-#: tips:172
+#: tips:173
 msgid ", going"
 msgstr ", smìrem"
 
-#: tips:173
+#: tips:174
 msgid "horizontally"
 msgstr "horizontálním"
 
-#: tips:174
+#: tips:175
 msgid "vertically"
 msgstr "vertikálním"
 
-#: tips:175
+#: tips:176
 msgid ""
 "Sometimes the filer doesn't know about your desktop furniture and puts "
 "iconified windows under (for example) the Gnome panel. You can define a top "
@@ -3869,27 +3908,27 @@ msgid ""
 "about its own panel."
 msgstr ""
 
-#: tips:176
+#: tips:177
 msgid "Top margin"
 msgstr ""
 
-#: tips:177
+#: tips:178
 msgid "Height of no-go area at top of screen."
 msgstr ""
 
-#: tips:178
+#: tips:179
 msgid "Bottom margin"
 msgstr ""
 
-#: tips:179 tips:180 tips:181 tips:182 tips:183
+#: tips:180 tips:181 tips:182 tips:183 tips:184
 msgid "Height of no-go area at bottom of screen."
 msgstr ""
 
-#: tips:184
+#: tips:185
 msgid "Panels"
 msgstr "Panely"
 
-#: tips:185
+#: tips:186
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
@@ -3897,52 +3936,52 @@ msgstr ""
 "Panely jsou pásy ikon umístìné podél okraje obrazovky. Více informací o "
 "pu¾ití panelù je v manuálu."
 
-#: tips:186
+#: tips:187
 msgid "Panel style"
 msgstr "Styl panelu"
 
-#: tips:187
+#: tips:188
 msgid "Image and text"
 msgstr "Obrázek a text"
 
-#: tips:188
+#: tips:189
 msgid "Every panel icon is shown with an image and some text."
 msgstr "Ka¾dá ikona panelu je zobrazena s obrázkem a nìjakým textem."
 
-#: tips:189
+#: tips:190
 msgid "Image only for applications"
 msgstr "Obrázek pouze pro aplikace"
 
-#: tips:190
+#: tips:191
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr "Aplikace mají pouze obrázek, v¹echno ostatní má orázek i text."
 
-#: tips:191
+#: tips:192
 msgid "Image only"
 msgstr "Jen obrázek"
 
-#: tips:192 tips:193
+#: tips:193 tips:194
 msgid "Only the image is shown."
 msgstr "Je zobrazen pouze obrázek."
 
-#: tips:194
+#: tips:195
 msgid "Panel width (thin)"
 msgstr "©íøka panelu (úzký)"
 
-#: tips:195
+#: tips:196
 msgid "(thick)"
 msgstr "(¹iroký)"
 
-#: tips:196
+#: tips:197
 msgid "The size of the panels."
 msgstr "Velikost panelù."
 
-#: tips:197
+#: tips:198
 msgid "Do not cover panel"
 msgstr ""
 
-#: tips:198 tips:199
+#: tips:199 tips:200
 msgid ""
 "Ask the window manager not to cover panels at all when you maximise windows. "
 "Some window managers may not honour this. If unset, the filer asks for just "
@@ -3950,15 +3989,15 @@ msgid ""
 "auto-raising works."
 msgstr ""
 
-#: tips:200
+#: tips:201
 msgid "Xinerama"
 msgstr ""
 
-#: tips:201
+#: tips:202
 msgid "Confine to Xinerama monitor"
 msgstr ""
 
-#: tips:202
+#: tips:203
 msgid ""
 "If you have an Xinerama multi-monitor setup, use this option to confine the "
 "panels to one monitor instead of spanning them."
@@ -4395,6 +4434,10 @@ msgid ""
 "disabled, the MIME type of the file is only derived from the file name and "
 "the properties window does not report extended attributes."
 msgstr ""
+
+#, fuzzy
+#~ msgid "Umount"
+#~ msgstr "Odpojit"
 
 #~ msgid "A"
 #~ msgstr "A"
