@@ -187,13 +187,38 @@ void display_guess_size(FilerWindow *filer_window,
 			GPtrArray *names,
 			int *ret_w, int *ret_h, int *ret_n)
 {
-	int		i = 0;
+	int		i = 0, dw;
 	int		width = 16, height = 16;
 	DisplayStyle	style = filer_window->display_style;
 	int		text_height = item_font->ascent + item_font->descent;
 	int		w, h, n = 0;
+	DetailsType	details = filer_window->details_type;
+	int		fixed_height = fixed_font->ascent + fixed_font->descent;
 
-	/* TODO: Details display styles */
+	/* If there are extra details, guess how much space they will
+	 * use. Overestimating is better than underestimating.
+	 */
+	switch (details)
+	{
+		case DETAILS_SUMMARY:
+			dw = fixed_width * 70;
+			break;
+		case DETAILS_SIZE:
+			dw = fixed_width * 7;
+			break;
+		case DETAILS_PERMISSIONS:
+			dw = fixed_width * 35;
+			break;
+		case DETAILS_TYPE:
+			dw = fixed_width * 23;
+			break;
+		case DETAILS_TIMES:
+			dw = fixed_width * 80;
+			break;
+		default:
+			dw = 0;
+			break;
+	}
 
 	for (i = 0; i < names->len; i++)
 	{
@@ -208,30 +233,55 @@ void display_guess_size(FilerWindow *filer_window,
 
 		if (style == SMALL_ICONS)
 		{
-			w = MIN(w, o_small_truncate);
+			if (details == DETAILS_NONE)
+				w = MIN(w, o_small_truncate);
 			w = SMALL_WIDTH + 12 + w;
 			h = MAX(text_height, SMALL_HEIGHT) + 4;
 		}
 		else if (style == LARGE_ICONS)
 		{
-			w = MAX(ICON_WIDTH, w) + 4;
-			h = text_height + ICON_HEIGHT + 2;
+			w = MAX(w, dw);
+			if (details == DETAILS_NONE)
+			{
+				h = text_height + ICON_HEIGHT + 2;
+				w = MAX(ICON_WIDTH, w) + 4;
+			}
+			else
+			{
+				w = ICON_WIDTH + w + 12;
+				h = MAX(text_height + fixed_height + 2,
+						ICON_HEIGHT - 4);
+			}
 		}
 		else
 		{
-			w = MAX(HUGE_WIDTH, w) + 4;
-			h = text_height + HUGE_HEIGHT + 4;
+			w = MAX(w, dw);
+			w = HUGE_WIDTH + w + 4;
+			if (details == DETAILS_NONE)
+			{
+				h = text_height + HUGE_HEIGHT + 2;
+				w = MAX(HUGE_WIDTH, w) + 4;
+			}
+			else
+			{
+				w = HUGE_WIDTH + w + 4;
+				h = MAX(text_height + fixed_height + 2,
+						HUGE_HEIGHT) + 4;
+			}
 		}
 
 		width = MAX(w, width);
 		height = MAX(h, height);
 	}
 
+	if (style == SMALL_ICONS && details != DETAILS_NONE)
+		width += 12 + dw;
+
 	*ret_w = width;
 	*ret_h = height;
 	*ret_n = n;
 
-	g_print("[ guessed size = %d x %d ]\n", width, height);
+	/* g_print("[ guessed size = %d x %d ]\n", width, height); */
 }
 
 /* Return the size needed for this item */
