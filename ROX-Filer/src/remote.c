@@ -119,7 +119,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	soap_register("Copy", rpc_Copy, "From,To", "Leafname,Quiet");
 	soap_register("Move", rpc_Move, "From,To", "Leafname,Quiet");
-	soap_register("Link", rpc_Link, "From,To", "Leafname,Quiet");
+	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
 
 	/* Look for a property on the root window giving the IPC window

@@ -269,7 +269,6 @@ To turn off the pinboard again, set the name to an empty string:
 See the <xref linkend="winman"/> if you have trouble getting the icons to
 display correctly. The pinboard may also be turned on and off by locating
 <filename>ROX-Filer</filename> in a filer window and choosing `Enable pinboard' or `Disable pinboard' from the menu.
-
   </para>
 </sect1>
 
@@ -288,7 +287,7 @@ a panel along the bottom edge of the screen:
 
 The panel should be displayed in a window without a title bar. If
 this does not work then see the <xref linkend="winman"/> for some ideas.
-You can drag files onto either side of the panel to add them. Icons
+You can drag files onto either side of the panel to add them. Panel icons
 can be repositioned by dragging them with the middle mouse button.
 Changes to the panel are automatically saved to
 <filename>&lt;Choices&gt;/ROX-Filer/pan_MyPanel</filename>.
@@ -447,7 +446,7 @@ behave as follows:
 <tbody>
 
 <row><entry>Left button click</entry><entry>
-Open the file or directory clicked on. Hold down <keycap>Ctrl</keycap>
+Open the file or directory clicked on. Hold down <keycap>Control</keycap>
 to select things instead of opening them. Hold down <keycap>Shift</keycap>
 to look inside applications, treat files as text, follow symlinks or
 mount devices.
@@ -459,7 +458,7 @@ when opening a file.
 </entry></row>
 
 <row><entry>Right button click</entry><entry>
-Open the main menu. Hold down <keycap>Ctrl</keycap> while clicking to go
+Open the main menu. Hold down <keycap>Control</keycap> while clicking to go
 directly to the Selection submenu. Hold down <keycap>Shift</keycap> to get the
 <guimenu>Send To</guimenu> menu. See the <xref linkend="SendTo"/> section.
 </entry></row>
@@ -467,7 +466,7 @@ directly to the Selection submenu. Hold down <keycap>Shift</keycap> to get the
 <row><entry>Drag an item  (left mouse button)</entry><entry>
 Copy the file(s) to the destination (an application or another filer
 window). Hold down <keycap>Shift</keycap> to move the file,
-<keycap>Ctrl</keycap>+<keycap>Shift</keycap> to create
+<keycap>Control</keycap>+<keycap>Shift</keycap> to create
 a symbolic link, or <keycap>Alt</keycap> to get a menu of possible actions.
 </entry></row>
 
@@ -479,7 +478,7 @@ There is an option to make this move the files rather than open the menu.
 <row><entry>Drag (not over an item)</entry><entry>
 Select a group of items by dragging a box around them. With the left
 mouse button, only the files in the box will be selected. If you hold
-down <keycap>Ctrl</keycap> then the boxed items are added to the selection.
+down <keycap>Control</keycap> then the boxed items are added to the selection.
 If you use the middle button then the boxed items switch between being selected
 and unselected.
 </entry></row>
@@ -519,6 +518,12 @@ and moves to the next item.
 Moves the cursor to the next/previous selected item.
 </entry></row>
 
+<row><entry>Hold mouse over an item</entry><entry>
+Shows a tooltip containing a brief description of an application (if
+available), the target of a symbolic link, and the full name of a file,
+if it's too long to show in the main window.
+</entry></row>
+
 </tbody></tgroup></informaltable>
 
   <para>
@@ -531,7 +536,7 @@ Key bindings are automatically saved when the filer quits.
 </chapter>
 
 <chapter id="selection">
-  <title>The selection</title>
+  <title>The selection and file groups</title>
   <para>
 When you select items in a <application>ROX-Filer</application> window,
 the filer takes the <emphasis>primary selection</emphasis>. You can then paste
@@ -544,12 +549,12 @@ into another window to get the pathnames of the selected files.
   <step><para>Open the application's Open dialog box.</para></step>
 
   <step><para>
-<keycap>Ctrl</keycap>-click on the file in <application>ROX-Filer</application> to select it.
+<keycap>Control</keycap>-click on the file in <application>ROX-Filer</application> to select it.
   </para></step>
 
   <step><para>
-Click the middle button in the filename box in the application to
-paste the name in.
+Click the middle button in the filename box in the application to paste the
+name in.
   </para></step>
 </procedure>
 
@@ -559,9 +564,27 @@ will open the selected file.
   </para><para>
 If you select something else (eg, some text in another program), the selected
 items in the filer window will be shown shaded (the filer no longer has the primary selection).
-Changing the selection (eg, by dragging a box around an item with the middle
-button) will cause the filer to regain the primary selection.
+Clicking on one of the shaded items will cause the filer to regain the primary selection.
   </para>
+
+  <sect1><title>Saving and restoring the selection</title>
+    <para>
+It is sometimes useful to save the current selection for later. You can save the current
+selection to one of ten numbered groups by pressing
+<keycap>Control</keycap>+<keycap>&lt;number&gt;</keycap>.
+You can restore a saved group by pressing the group number on its own. You can do this from
+a different directory, or even a different filer window.
+    </para><para>
+    Saving is also useful even if there is no selection, since it still saves the current directory.
+    </para>
+    <procedure><title>Example: saving a directory and returning to it later:</title>
+	    <step><para>You are looking at a directory, and wish to remember it.
+Press <keycap>Control</keycap>+<keycap>1</keycap>.</para></step>
+	    <step><para>Move to another directory, or close the window, etc.</para></step>
+	    <step><para>Press <keycap>1</keycap> in any filer window to return
+to the first directory.</para></step> </procedure>
+    <para>Note that the groups are not saved, so you will lose them when you restart the filer</para>
+  </sect1>
 </chapter>
 
 <chapter id="toolbar">
@@ -618,7 +641,7 @@ Same
 </entry></row><row><entry>
 Information</entry><entry>
 Show <application>ROX-Filer</application>'s help files</entry><entry>
-Same
+Show help files and close window
 </entry></row>
 </tbody></tgroup></informaltable>
 
@@ -782,6 +805,8 @@ in it. Use this if the display becomes out-of-date.
 Tries to load every file as an image and use that image as the file's
 icon. Useful if you have a directory full of photos and can't remember
 which is which!
+When using Gtk+-2.0, the thumbnails are saved in <filename>~/.thumbnails</filename>
+for quick loading next time. Otherwise, they are lost when the filer quits.
 </entry></row>
 </tbody></tgroup></informaltable>
 
@@ -1163,11 +1188,14 @@ windows onto the them to pin them up. Clicking on a pinned item acts just like
 clicking on it in a filer window. You can drag pinned icons just like normal
 icons and you can right-click on one to see the popup menu.
   </para><para>
-Drag pinned icons with the middle mouse button to move them around
-(they snap to a grid on the pinboard). Changes to the pinboard and
-panel are automatically saved. Clicking on pinned icons with Control
-held down selects and unselects them. Click on the background to unselect
-them all.
+Drag panel icons with the middle mouse button to move them around.
+In previous versions of the filer, pinboard icons were also moved using the
+middle mouse button. This may still work (depending on your window manager),
+but using the left mouse button is now preferred.
+  </para><para>
+Changes to the pinboard and panel are automatically saved. Clicking on pinned
+icons with <keycap>Control</keycap> held down selects and unselects them. Click on the
+background to unselect them all.
   </para><para>
 If the panel has so many icons that they can't all be shown at once
 then you can scroll it by dragging the blank area in the middle.
@@ -1298,8 +1326,7 @@ the VFS library &mdash; this means having <filename>libvfs.so</filename>
 (or <filename>libvfs.a</filename>) in a system library directory or in the
 directory in the environment variable <envar>LD_LIBRARY_PATH</envar>. In this case,
 you will be able to view the directory structure and copy files out of it, but
-not change it. Support for this may be added later.
-<application>Midnight Commander</application> is part of the GNOME project.
+not change it.
 </para>
 
 <para>
@@ -1310,70 +1337,15 @@ if you want to use a VFS not listed on the menu you can type in the path
 directly, eg: <filename>/home/fred/archive.zip#uzip/</filename>.
 
 Don't forget the final slash!
-
-</para></listitem>
+</para><para>
+Use of libvfs is strongly discouraged; use AVFS instead. Recent versions of the library
+don't compile properly, and it can't be used on many systems because it conflicts with
+large file support.
+</para>
+</listitem>
 </itemizedlist>
 
 </para>
-
-<procedure><title>Step by step example of adding VFS support</title>
-<note><para>
-	Some versions of libvfs don't work correctly this way. AVFS is recommended instead.
-</para></note>
-
-  <step><para>
-		  
-This assumes that you have the Midnight Commander source in a directory
-called <filename>mc</filename>.
-You might need to replace <filename>libvfs.so</filename> with
-<filename>libvfs.a</filename>.
-
-<screen>
-$ cd mc
-$ ./configure
-$ cd vfs
-$ make libvfs.so
-</screen>
-
-  </para></step><step><para>
-
-If you have the root password then install the library in a system library
-directory as normal.
-
-  </para></step><step><para>
-
-If not,
-
-<screen>
-$ mkdir ~/lib
-$ cp libvfs.so ~/lib
-$ cd ~/Apps/ROX-Filer
-</screen>
-Edit the <filename>AppRun</filename> file to include this as the <emphasis>second</emphasis>
-line:
-
-<programlisting>LD_LIBRARY_PATH=$HOME/lib; export LD_LIBRARY_PATH</programlisting>
-
-This will ensure that <application>ROX-Filer</application> will look for the
-library in the new <filename>~/lib</filename> directory.
-
-  </para></step><step><para>
-
-Finally, recompile:
-
-<screen>
-$ ./AppRun --compile
-
-...
-
-checking for mc_stat in -lvfs... yes
-</screen>
-
-If you saw that line then it's worked! Well done!
-
-  </para></step>
-
-</procedure>
 
 </chapter>
 
@@ -2405,6 +2377,23 @@ the middle one button-3 (this affects all programs, not just
 
   </para>
 </sect1>
+
+<sect1>
+  <title>Types</title>
+  <para>
+The type system used in the filer is described more fully in <xref linkend="types"/>.
+<itemizedlist>
+<listitem><para><guibutton>Show name-to-type rules</guibutton> 
+opens the directories containing the files which tell the filer what type to give each file.
+</para></listitem>
+
+<listitem><para><guibutton>Re-read files</guibutton> causes the filer to reread these
+files after you've finished changing them.
+</para></listitem>
+</itemizedlist>
+
+  </para>
+</sect1>
 </chapter>
 
 <chapter id="types">
@@ -2515,7 +2504,9 @@ Many applications now come with a file called
 <filename>something.mime</filename>; copy these files into your
 <filename>MIME-info</filename> directory to make
 <application>ROX-Filer</application> automatically recognise the new extensions.
-Note that the filer must be restarted for the new files to be read.
+ROX-Filer doesn't automatically re-read these files when they change. You can
+either restart the filer, or click on the <guibutton>Re-read files</guibutton>
+button in the <guilabel>Types</guilabel> section of the Options box.
 </para></listitem></varlistentry>
 
 <varlistentry><term><filename>MIME-types</filename></term><listitem><para>
@@ -2573,7 +2564,6 @@ versions of a program by simply having several application directories.
 You may move and rename them as you please. Application directories
 make programs easier to use and install.
   </para><para>
-  <!-- Note to translaters: Changed the wording here a bit from 1.1.7 -->
 They're more secure too, because you can compile an application as a user and
 then simply copy it as root. Since you don't have to run an install script
 you are free from the danger of running untrusted code as root. All you have
@@ -3117,13 +3107,10 @@ detailed information!
 <appendix id="soap"><title>SOAP RPC</title>
 
 <para>When the filer starts you can use command-line options to control its behaviour.
-As an alternative to this, the filer allows you to specify operation as a
+As an alternative to this, the filer allows you to specify an operation with a
 <citation>SOAP</citation> RPC format message. In fact, if you use the command-line options,
 the filer converts to SOAP RPC internally.
 </para>
-
-<para>Currently, there is no advantage to this method, but in future this may provide
-a more flexible way to interface to the filer.</para>
 
 <para>All SOAP RPC messages are passed on standard input, like this:
 
@@ -3173,6 +3160,43 @@ Run Filename as if it was clicked on in the filer.
 
 <listitem><para><function>Show(Directory, Leafname)</function>
 Open Directory and flash the file Leafname inside it.
+</para></listitem>
+
+<listitem><para><function>FileType(Filename)</function>
+Returns the MIME-type of Filename (by writing the SOAP response
+to standard output).
+</para></listitem>
+</itemizedlist>
+
+<para>
+The following calls can be used to start new file actions.
+Quiet can be "true" if the operation should start immediately, instead
+of waiting for the user to confirm. If "false", the user must always
+confirm. If not given, the default setting is used.
+</para>
+
+<itemizedlist>
+<listitem><para><function>Copy(From, To, [Leafname, Quiet])</function>
+	Copy each file in the array From to the directory To. If Leafname
+	is given then From should contain a single entry only; Leafname
+	gives the new leafname.
+</para></listitem>
+
+<listitem><para><function>Move(From, To, [Leafname, Quiet])</function>
+	Move each file in the array From to the directory To. If Leafname
+	is given then From should contain a single entry only; Leafname
+	gives the new leafname.
+</para></listitem>
+
+<listitem><para><function>Link(From, To, [Leafname])</function>
+	Symlink each file in the array From to the directory To. If Leafname
+	is given then From should contain a single entry only; Leafname
+	gives the new leafname.
+</para></listitem>
+
+<listitem><para><function>Mount(MountPoints, [OpenDir, Quiet])</function>
+	Mount each directory in the list MountPoints. If "true", OpenDir
+	causes each directory to be opened once it is mounted.
 </para></listitem>
 
 </itemizedlist>

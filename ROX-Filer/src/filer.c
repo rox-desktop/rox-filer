@@ -141,7 +141,6 @@ void filer_init(void)
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
 			set_unique);
-	option_add_int("filer_default_minibuffer", MINI_NONE, NULL);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
@@ -1325,7 +1324,6 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 static void filer_add_widgets(FilerWindow *filer_window)
 {
 	GtkWidget *hbox, *vbox, *collection;
-	int def_minibuffer;
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -1423,11 +1421,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_widget_realize(filer_window->window);
 	
 	gdk_window_set_role(filer_window->window->window, filer_window->path);
-
-	/* Show the default minibuffer, if any */
-	def_minibuffer = option_get_int("filer_default_minibuffer");
-        if (def_minibuffer != MINI_NONE)
-		minibuffer_show(filer_window, (MiniType) def_minibuffer);
 
 	filer_window_set_size(filer_window, 4, 4, TRUE);
 }
@@ -1726,6 +1719,14 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 		return;
 
 	item = collection_get_item(collection, event->x, event->y);
+
+	if (item != -1 && collection->items[item].selected
+		&& filer_window->selection_state == GTK_STATE_INSENSITIVE)
+	{
+		selection_changed(filer_window->collection,
+				event->time, filer_window);
+		return;
+	}
 
 	if (filer_window->target_cb)
 	{
