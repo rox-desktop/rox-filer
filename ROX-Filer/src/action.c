@@ -504,19 +504,6 @@ static gboolean send_error(void)
 	return send();
 }
 
-/* Send 'Quiet' if possible, 'Yes' otherwise */
-#if 0
-static void find_return_pressed(GtkWidget *button, GUIside *gui_side)
-{
-	if (GTK_WIDGET_SENSITIVE(gui_side->quiet))
-		gtk_button_clicked(GTK_BUTTON(gui_side->quiet));
-	else if (GTK_WIDGET_SENSITIVE(gui_side->yes))
-		gtk_button_clicked(GTK_BUTTON(gui_side->yes));
-	else
-		gdk_beep();
-}
-#endif
-
 static void response(GtkDialog *dialog, gint response, GUIside *gui_side)
 {
 	gchar code;
