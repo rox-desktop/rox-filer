@@ -1953,16 +1953,15 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 
 	if (tip_item->flags & ITEM_FLAG_SYMLINK)
 	{
-		char target[MAXPATHLEN + 1];
-		int l;
+		char *target;
 
-		l = readlink(fullpath, target, sizeof(target) - 1);
-		if (l > 0)
+		target = readlink_dup(fullpath);
+		if (target)
 		{
-			target[l] = '\0';
 			g_string_append(tip, _("Symbolic link to "));
 			g_string_append(tip, target);
 			g_string_append_c(tip, '\n');
+			g_free(target);
 		}
 	}
 	

@@ -624,7 +624,7 @@ guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 		 * window background.
 		 */
 		if (item->base_type != TYPE_DIRECTORY
-				&& !(item->mime_type == &special_exec))
+				&& !(item->mime_type == special_exec))
 		{
 			item = NULL;
 			*item_p = NULL;

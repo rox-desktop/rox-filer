@@ -290,6 +290,14 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 	gtk_clist_append(table, data);
 	g_free(data[1]);
 
+	if (item->base_type != TYPE_DIRECTORY)
+	{
+	        data[0] = _("Run action:");
+		data[1] = describe_current_command(item->mime_type);
+		gtk_clist_append(table, data);
+		g_free(data[1]);
+	}
+
 	if (about)
 	{
 		data[0] = data[1] = "";
@@ -434,13 +442,17 @@ static guchar *pretty_type(DirItem *file, guchar *path)
 {
 	if (file->flags & ITEM_FLAG_SYMLINK)
 	{
-		char	p[MAXPATHLEN + 1];
-		int	got;
-		got = readlink(path, p, MAXPATHLEN);
-		if (got > 0 && got <= MAXPATHLEN)
+		char	*target;
+
+		target = readlink_dup(path);
+		if (target)
 		{
-			p[got] = '\0';
-			return g_strdup_printf(_("Symbolic link to %s"), p);
+			char *retval;
+
+			retval = g_strdup_printf(_("Symbolic link to %s"),
+						target);
+			g_free(target);
+			return retval;
 		}
 
 		return g_strdup(_("Symbolic link"));

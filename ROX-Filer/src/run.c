@@ -230,7 +230,7 @@ gboolean run_diritem(guchar *full_path,
 				filer_opendir(full_path, src_window);
 			return TRUE;
 		case TYPE_FILE:
-			if ((item->mime_type == &special_exec) && !edit)
+			if ((item->mime_type == special_exec) && !edit)
 			{
 				char	*argv[] = {NULL, NULL};
 				guchar	*dir = filer_window ? filer_window->path
@@ -248,7 +248,7 @@ gboolean run_diritem(guchar *full_path,
 				}
 			}
 
-			return open_file(full_path, edit ? &text_plain
+			return open_file(full_path, edit ? text_plain
 						  : item->mime_type);
 		case TYPE_ERROR:
 			delayed_rox_error(_("File doesn't exist, or I can't "

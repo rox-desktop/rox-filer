@@ -10,14 +10,14 @@
 
 #include <gtk/gtk.h>
 
-extern MIME_type text_plain;		/* Often used as a default type */
-extern MIME_type special_directory;
-extern MIME_type special_pipe;
-extern MIME_type special_socket;
-extern MIME_type special_block_dev;
-extern MIME_type special_char_dev;
-extern MIME_type special_exec;
-extern MIME_type special_unknown;
+extern MIME_type *text_plain;		/* Often used as a default type */
+extern MIME_type *special_directory;
+extern MIME_type *special_pipe;
+extern MIME_type *special_socket;
+extern MIME_type *special_block_dev;
+extern MIME_type *special_char_dev;
+extern MIME_type *special_exec;
+extern MIME_type *special_unknown;
 
 enum
 {
@@ -53,5 +53,6 @@ MIME_type *mime_type_from_base_type(int base_type);
 int mode_to_base_type(int st_mode);
 void type_set_handler_dialog(MIME_type *type);
 gboolean can_set_run_action(DirItem *item);
+gchar *describe_current_command(MIME_type *type);
 
 #endif /* _TYPE_H */

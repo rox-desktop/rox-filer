@@ -1415,7 +1415,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 	savebox_show(_("New Directory"),
 			make_path(window_with_focus->path, _("NewDir"))->str,
-			type_to_icon(&special_directory),
+			type_to_icon(special_directory),
 			new_directory_cb);
 }
 
@@ -1455,7 +1455,7 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 	
 	savebox_show(_("New File"),
 			make_path(window_with_focus->path, _("NewFile"))->str,
-			type_to_icon(&text_plain),
+			type_to_icon(text_plain),
 			new_file_cb);
 }
 

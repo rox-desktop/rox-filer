@@ -144,13 +144,13 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
 			if (!o_ignore_exec)
-				item->mime_type = &special_exec;
+				item->mime_type = special_exec;
 		}
 
 		if (!item->mime_type)
 			item->mime_type = item->flags & ITEM_FLAG_EXEC_FILE
-						? &special_exec
-						: &text_plain;
+						? special_exec
+						: text_plain;
 
 		if (make_thumb)
 			item->image = g_fscache_lookup(pixmap_cache, path);

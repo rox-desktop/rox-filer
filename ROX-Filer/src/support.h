@@ -40,5 +40,6 @@ void add_default_styles(void);
 xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name);
 void set_to_null(gpointer *data);
 int save_xml_file(xmlDocPtr doc, gchar *filename);
+char *readlink_dup(char *path);
 
 #endif /* _SUPPORT_H */

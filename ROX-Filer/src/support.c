@@ -860,3 +860,18 @@ int save_xml_file(xmlDocPtr doc, gchar *filename)
 	return 0;
 }
 
+/* Return the pathname that this symlink points to.
+ * NULL on error (not a symlink, path too long) and errno set.
+ * g_free() the result.
+ */
+char *readlink_dup(char *source)
+{
+	char	path[MAXPATHLEN + 1];
+	int	got;
+
+	got = readlink(source, path, MAXPATHLEN);
+	if (got < 0 || got > MAXPATHLEN)
+		return NULL;
+
+	return g_strndup(path, got);
+}

@@ -1369,27 +1369,27 @@ static gboolean do_copy2(char *path, char *dest)
 	}
 	else if (S_ISLNK(info.st_mode))
 	{
-		char	target[MAXPATHLEN + 1];
-		int	count;
+		char	*target;
 
 		/* Not all versions of cp(1) can make symlinks,
 		 * so we special-case it.
 		 */
 
-		count = readlink(path, target, sizeof(target) - 1);
-		if (count < 0)
+		target = readlink_dup(path);
+		if (target)
 		{
-			send_error();
-			retval = FALSE;
-		}
-		else
-		{
-			target[count] = '\0';
 			if (symlink(target, dest_path))
 			{
 				send_error();
 				retval = FALSE;
 			}
+
+			g_free(target);
+		}
+		else
+		{
+			send_error();
+			retval = FALSE;
 		}
 	}
 	else

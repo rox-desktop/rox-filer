@@ -70,6 +70,7 @@ static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
 static void reread_mime_files(guchar *unused);
+static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
  * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
@@ -88,15 +89,14 @@ static GList *patterns = NULL;		/* [(regexp -> MIME type)] */
 static GHashTable *type_hash = NULL;
 
 /* Most things on Unix are text files, so this is the default type */
-MIME_type text_plain 		= {"text", "plain", NULL};
-
-MIME_type special_directory 	= {"special", "directory", NULL};
-MIME_type special_pipe 		= {"special", "pipe", NULL};
-MIME_type special_socket 	= {"special", "socket", NULL};
-MIME_type special_block_dev 	= {"special", "block-device", NULL};
-MIME_type special_char_dev 	= {"special", "char-device", NULL};
-MIME_type special_exec 		= {"special", "executable", NULL};
-MIME_type special_unknown 	= {"special", "unknown", NULL};
+MIME_type *text_plain;
+MIME_type *special_directory;
+MIME_type *special_pipe;
+MIME_type *special_socket;
+MIME_type *special_block_dev;
+MIME_type *special_char_dev;
+MIME_type *special_exec;
+MIME_type *special_unknown;
 
 void type_init()
 {
@@ -109,6 +109,15 @@ void type_init()
 
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+	text_plain = get_mime_type("text/plain", TRUE);
+	special_directory = get_mime_type("special/directory", TRUE);
+	special_pipe = get_mime_type("special/pipe", TRUE);
+	special_socket = get_mime_type("special/socket", TRUE);
+	special_block_dev = get_mime_type("special/block-device", TRUE);
+	special_char_dev = get_mime_type("special/char-device", TRUE);
+	special_exec = get_mime_type("special/executable", TRUE);
+	special_unknown = get_mime_type("special/unknown", TRUE);
 
 	current_type = NULL;
 
@@ -377,7 +386,7 @@ MIME_type *type_get_type(guchar *path)
 	if (!type)
 	{
 		if (base == TYPE_FILE && exec)
-			type = &special_exec;
+			type = special_exec;
 		else
 			type = mime_type_from_base_type(base);
 	}
@@ -632,7 +641,7 @@ static void set_shell_action(GtkWidget *dialog)
  * dialog. Make sure it's an application, and make that the default
  * handler.
  */
-void drag_app_dropped(GtkWidget		*frame,
+void drag_app_dropped(GtkWidget		*eb,
 		      GdkDragContext    *context,
 		      gint              x,
 		      gint              y,
@@ -727,14 +736,100 @@ out:
 	return command;
 }
 
+/* Find the current command which is used to run files of this type,
+ * and return a textual description of it.
+ * g_free() the result.
+ */
+gchar *describe_current_command(MIME_type *type)
+{
+	char *handler;
+	char *desc = NULL;
+	struct stat info;
+	char *target;
+
+	g_return_val_if_fail(type != NULL, NULL);
+
+	if (type == special_exec)
+		return g_strdup(_("Execute file"));
+
+	handler = handler_for(type);
+
+	if (!handler)
+		return g_strdup(_("No run action defined"));
+
+	target = readlink_dup(handler);
+	if (target)
+	{
+		/* Cope with relative paths (shouldn't normally be needed) */
+
+		if (target[0] == '/')
+		{
+			g_free(handler);
+			handler = target;
+		}
+		else
+		{
+			gchar *dir;
+
+			dir = g_dirname(handler);
+			g_free(handler);
+			handler = g_strconcat(dir, "/", target, NULL);
+			g_free(target);
+			g_free(dir);
+		}
+	}
+
+	if (mc_stat(handler, &info) !=0 )
+	{
+		desc = g_strdup_printf(_("Error in handler %s: %s"), handler,
+					g_strerror(errno));
+		goto out;
+	}
+
+	if (S_ISDIR(info.st_mode))
+	{
+		gchar *tmp;
+		uid_t dir_uid = info.st_uid;
+
+		tmp = make_path(handler, "AppRun")->str;
+
+		if (mc_lstat(tmp, &info) != 0 || info.st_uid != dir_uid
+			|| !(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
+			desc = g_strdup_printf(
+				_("Invalid application %s (bad AppRun)"),
+				handler);
+		/* Else, just report handler... */
+
+		goto out;
+	}
+
+	/* It's not an application directory, and it's not a symlink... */
+
+	if (access(handler, X_OK) != 0)
+	{
+		desc = g_strdup_printf(_("Non-executable %s"), handler);
+		goto out;
+	}
+
+	desc = get_current_command(type);
+out:
+	if (!desc)
+		desc = handler;
+	else
+		g_free(handler);
+
+	return desc;
+}
+
 /* Display a dialog box allowing the user to set the default run action
  * for this type.
  */
 void type_set_handler_dialog(MIME_type *type)
 {
 	guchar		*tmp;
+	gchar           *handler;
 	GtkWidget	*dialog, *vbox, *frame, *hbox, *entry, *label, *button;
-	GtkWidget	*radio;
+	GtkWidget	*radio, *eb;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
@@ -770,17 +865,38 @@ void type_set_handler_dialog(MIME_type *type)
 	frame = gtk_frame_new(NULL);
 	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+	eb = gtk_event_box_new();
+	gtk_container_add(GTK_CONTAINER(frame), eb);
 
-	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
+	gtk_container_set_border_width(GTK_CONTAINER(eb), 4);
+
+	handler = handler_for(type);
+	if (handler)
+	{
+		char *link;
+
+		link = readlink_dup(handler);
+		if (link)
+		{
+			char *msg;
+
+			msg = g_strdup_printf(_("Currently %s"), link);
+			gtk_tooltips_set_tip(tooltips, eb, msg, NULL);
+			g_free(link);
+			g_free(msg);
+		}
+		g_free(handler);
+	}
+
+	gtk_drag_dest_set(eb, GTK_DEST_DEFAULT_ALL,
 			targets, sizeof(targets) / sizeof(*targets),
 			GDK_ACTION_COPY);
-	gtk_signal_connect(GTK_OBJECT(frame), "drag_data_received",
+	gtk_signal_connect(GTK_OBJECT(eb), "drag_data_received",
 			GTK_SIGNAL_FUNC(drag_app_dropped), dialog);
 
 	label = gtk_label_new(_("Drop a suitable\napplication here"));
 	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
-	gtk_container_add(GTK_CONTAINER(frame), label);
+	gtk_container_add(GTK_CONTAINER(eb), label);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
@@ -808,7 +924,7 @@ void type_set_handler_dialog(MIME_type *type)
 
 	hbox = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
+	
 	/* If possible, fill in the entry box with the current command */
 	tmp = get_current_command(type);
 	if (tmp)
@@ -910,19 +1026,19 @@ MIME_type *mime_type_from_base_type(int base_type)
 	switch (base_type)
 	{
 		case TYPE_FILE:
-			return &text_plain;
+			return text_plain;
 		case TYPE_DIRECTORY:
-			return &special_directory;
+			return special_directory;
 		case TYPE_PIPE:
-			return &special_pipe;
+			return special_pipe;
 		case TYPE_SOCKET:
-			return &special_socket;
+			return special_socket;
 		case TYPE_BLOCK_DEVICE:
-			return &special_block_dev;
+			return special_block_dev;
 		case TYPE_CHAR_DEVICE:
-			return &special_char_dev;
+			return special_char_dev;
 	}
-	return &special_unknown;
+	return special_unknown;
 }
 
 /* Takes the st_mode field from stat() and returns the base type.
@@ -954,7 +1070,7 @@ gboolean can_set_run_action(DirItem *item)
 	g_return_val_if_fail(item != NULL, FALSE);
 
 	return item->base_type == TYPE_FILE &&
-		!(item->mime_type == &special_exec);
+		!(item->mime_type == special_exec);
 }
 
 /* Open all <Choices>/type directories and display a message */
