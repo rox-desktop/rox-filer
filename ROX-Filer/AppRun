@@ -34,8 +34,20 @@ BIN=$APP_DIR/$PLATFORM/$PROG
 if [ -x $BIN ] ; then
   exec $DEBUGGER $BIN "$@"
 else
-  echo "ERROR from $0:" >&2
-  echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
-  echo "Try using the --compile option." >&2
-  exit 1
+  if [ -n "$DISPLAY" ]; then
+    xmessage -buttons Compile:1,Abort:0 -file - << EOF
+$APP_DIR:
+I cannot find an executable file for your host type ($PLATFORM).
+Try to compile from source?
+EOF
+    if [ "$?" -eq 0 ]; then
+      exit 0
+    fi
+    exec xterm -e "$0" --compile
+  else
+    echo "ERROR from $0:" >&2
+    echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
+    echo "Try using the --compile option." >&2
+  fi
 fi
+exit 1

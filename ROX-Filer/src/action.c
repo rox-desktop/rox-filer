@@ -1741,7 +1741,7 @@ static void mount_cb(gpointer data)
 	{
 		guchar	*path = (guchar *) paths->data;
 
-		if (g_hash_table_lookup(mtab_mounts, path))
+		if (mount_is_mounted(path))
 			do_mount(path, FALSE);	/* Unmount */
 		else if (g_hash_table_lookup(fstab_mounts, path))
 			do_mount(path, TRUE);	/* Mount */

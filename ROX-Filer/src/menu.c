@@ -1012,15 +1012,7 @@ guchar *pretty_type(DirItem *file, guchar *path)
 		return g_strdup(_("ROX application"));
 
 	if (file->flags & ITEM_FLAG_MOUNT_POINT)
-	{
-		MountPoint *mp;
-		if ((file->flags & ITEM_FLAG_MOUNTED) &&
-			(mp = g_hash_table_lookup(mtab_mounts, path)))
-			return g_strconcat(_("Mount point for "),
-					mp->name, NULL);
-
 		return g_strdup(_("Mount point"));
-	}
 
 	if (file->mime_type)
 		return g_strconcat(file->mime_type->media_type, "/",

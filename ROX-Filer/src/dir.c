@@ -208,7 +208,7 @@ void dir_restat(guchar *path, DirItem *item)
 
 			if (item->base_type == TYPE_DIRECTORY)
 			{
-				if (g_hash_table_lookup(mtab_mounts, path))
+				if (mount_is_mounted(path))
 					item->flags |= ITEM_FLAG_MOUNT_POINT
 							| ITEM_FLAG_MOUNTED;
 				else if (g_hash_table_lookup(fstab_mounts,

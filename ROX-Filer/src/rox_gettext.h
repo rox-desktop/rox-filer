@@ -7,3 +7,4 @@
 
 char *rox_gettext(char *from);
 void rox_add_translations(char *path);
+void rox_clear_translation(void);

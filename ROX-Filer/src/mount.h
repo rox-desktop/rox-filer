@@ -14,7 +14,6 @@
 #  endif
 
 extern GHashTable *fstab_mounts;
-extern GHashTable *mtab_mounts;
 
 typedef struct _MountPoint MountPoint;
 
@@ -27,5 +26,6 @@ struct _MountPoint
 /* Prototypes */
 void mount_init();
 void mount_update(gboolean force);
+gboolean mount_is_mounted(guchar *path);
 
 #endif /* _MOUNT_H */

@@ -60,6 +60,15 @@ char *rox_gettext(char *from)
 	return retval ? retval : from;
 }
 
+void rox_clear_translation(void)
+{
+	if (translate)
+	{
+		g_hash_table_destroy(translate);
+		translate = NULL;
+	}
+}
+
 /* Read in this .gmo format file; all translations found override
  * any existing translations for future calls to rox_gettext().
  */

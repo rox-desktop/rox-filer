@@ -52,25 +52,15 @@
 
 /* Map mount points to mntent structures */
 GHashTable *fstab_mounts = NULL;
-GHashTable *mtab_mounts = NULL;
 time_t fstab_time;
 
 #ifdef HAVE_SYS_MNTENT_H
-#define THE_MTAB MNTTAB
 #define THE_FSTAB VFSTAB
 #else
-#define THE_MTAB "/etc/mtab"
 #define THE_FSTAB "/etc/fstab"
 #endif
 
-#if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
-time_t mtab_time;
-#endif
-
 /* Static prototypes */
-#ifdef HAVE_SYS_UCRED_H
-static GHashTable *build_mtab_table(GHashTable *mount_points);
-#endif
 #ifdef DO_MOUNT_POINTS
 static GHashTable *read_table(GHashTable *mount_points, char *path);
 static void clear_table(GHashTable *table);
@@ -78,22 +68,19 @@ static time_t read_time(char *path);
 static gboolean free_mp(gpointer key, gpointer value, gpointer data);
 #endif
 
-void mount_init()
+
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
+
+void mount_init(void)
 {
 	fstab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
-	mtab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
 
 #ifdef DO_MOUNT_POINTS
 	fstab_time = read_time(THE_FSTAB);
 	read_table(fstab_mounts, THE_FSTAB);
-#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
-	mtab_time = read_time(THE_MTAB);
-	read_table(mtab_mounts, THE_MTAB);
-#  elif HAVE_SYS_UCRED_H
-	/* mtab_time not used */
-	build_mtab_table(mtab_mounts);
-#  endif
-#endif /* DO_MOUNT_POINTS */
+#endif
 }
 
 /* If force is true then ignore the timestamps */
@@ -101,7 +88,6 @@ void mount_update(gboolean force)
 {
 #ifdef DO_MOUNT_POINTS
 	time_t	time;
-	/* Ensure everything is uptodate */
 
 	time = read_time(THE_FSTAB);
 	if (force || time != fstab_time)
@@ -109,18 +95,43 @@ void mount_update(gboolean force)
 		fstab_time = time;
 		read_table(fstab_mounts, THE_FSTAB);
 	}
-#  if defined(HAVE_MNTENT_H) || defined(HAVE_SYS_MNTENT_H)
-	time = read_time(THE_MTAB);
-	if (force || time != mtab_time)
-	{
-		mtab_time = time;
-		read_table(mtab_mounts, THE_MTAB);
-	}
-#  else
-	build_mtab_table(mtab_mounts);
-#  endif
 #endif /* DO_MOUNT_POINTS */
 }
+
+/* TRUE iff this directory is a mount point. Uses python's method to
+ * check:
+ * The function checks whether path's parent, path/.., is on a different device
+ * than path, or whether path/.. and path point to the same i-node on the same
+ * device -- this should detect mount points for all Unix and POSIX variants.
+ */
+gboolean mount_is_mounted(guchar *path)
+{
+	struct stat info_path, info_parent;
+	guchar *tmp;
+
+	if (stat(path, &info_path))
+		return FALSE; /*It doesn't exist -- so not a mount point :-) */
+
+	tmp = g_strconcat(path, "/..", NULL);
+	if (stat(tmp, &info_parent))
+	{
+		g_free(tmp);
+		return FALSE;
+	}
+	g_free(tmp);
+
+	if (info_path.st_dev != info_parent.st_dev)
+		return TRUE;
+
+	if (info_path.st_ino == info_parent.st_ino)
+		return TRUE;	/* Same device and inode */
+		
+	return FALSE;
+}
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
 
 
 #ifdef DO_MOUNT_POINTS
@@ -224,6 +235,8 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 
 #elif HAVE_SYS_UCRED_H	/* We don't have /etc/mtab */
 
+/* XXX: Don't use mtab anymore. Is this still needed? */
+
 static GHashTable *read_table(GHashTable *mount_points, char *path)
 {
 	int		tab;
@@ -250,47 +263,6 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 	}
 
 	endfsent();
-
-	return mount_points;
-}
-
-
-/* build table of mounted file systems */
-static GHashTable *build_mtab_table(GHashTable *mount_points)
-{
-	int		fsstat_index;
-	int		fsstat_entries;
-	struct statfs	*mntbufp;
-	MountPoint	*mp;
-
-	clear_table( mount_points);
-
-	/* we could use getfsstat twice and do the memory allocation
-	 * ourselves, but I feel lazy today. we can't free memory after use
-	 * though.
-	 */
-	fsstat_entries = getmntinfo( &mntbufp, MNT_WAIT);
-	/* wait for mount entries to be updated by each file system.
-	 * Use MNT_NOWAIT if you don't want this to block, but results
-	 * may not be up to date.
-	 */
-	g_return_val_if_fail(fsstat_entries >= 0, NULL);
-	if (fsstat_entries == 0) return NULL;
-		/* not a failure but nothing mounted! */
-
-	for (fsstat_index = 0; fsstat_index < fsstat_entries; fsstat_index++)
-	{
-		if(strcmp(mntbufp[fsstat_index].f_fstypename, "swap") == 0)
-			continue;
-		if(strcmp(mntbufp[fsstat_index].f_fstypename, "kernfs") == 0)
-			continue;
-
-		mp = g_malloc(sizeof(MountPoint));
-		mp->name = g_strdup( mntbufp[fsstat_index].f_mntfromname);
-		mp->dir  = g_strdup( mntbufp[fsstat_index].f_mntonname);
-
-		g_hash_table_insert(mount_points, mp->dir, mp);
-	}
 
 	return mount_points;
 }

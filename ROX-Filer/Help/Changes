@@ -2,6 +2,15 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+17-Dec-2000
+~~~~~~~~~~~
+Attempting to run the filer before compiling will now ask if you want
+to compile.
+Removed lots of platform-specific mount point code and replaced it with
+python's portable system.
+New options section allows you to choose a translation without having to
+set the LANG variable.
+
 16-Dec-2000
 ~~~~~~~~~~~
 Added '-w', '-i' and '-W' command line options for forcing icons or
