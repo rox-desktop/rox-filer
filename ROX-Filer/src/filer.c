@@ -2395,7 +2395,8 @@ void filer_create_thumbs(FilerWindow *filer_window)
 
 		pixmap = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, &found);
-		g_object_unref(pixmap);
+		if (pixmap)
+			g_object_unref(pixmap);
 
 		/* If we didn't get an image, it could be because:
 		 *

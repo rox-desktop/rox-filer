@@ -203,7 +203,8 @@ gpointer g_fscache_lookup_full(GFSCache *cache, const char *pathname,
 	if (found)
 		*found = TRUE;
 
-	g_object_ref(data->data);
+	if (data->data)
+		g_object_ref(data->data);
 
 	return data->data;
 }
