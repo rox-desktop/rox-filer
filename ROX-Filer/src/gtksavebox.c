@@ -47,6 +47,8 @@
 #include "gtk/gtkdialog.h"
 #include "gtk/gtklabel.h"
 
+#include "support.h"
+
 /* Signals:
  *
  * gint save_to_file (GtkSavebox *savebox, guchar *pathname) 
@@ -99,8 +101,6 @@ static guchar *read_xds_property   (GdkDragContext    *context,
 				    gboolean	      delete);
 static void write_xds_property	   (GdkDragContext    *context,
 				    guchar	      *value);
-static char *get_local_path	   (char *uri);
-static guchar *our_host_name	   (void);
 static void drag_end 		   (GtkWidget 	      *widget,
 				    GdkDragContext    *context);
 static void do_save		   (GtkWidget	      *widget,
@@ -432,77 +432,6 @@ write_xds_property (GdkDragContext *context, guchar *value)
     }
   else
     gdk_property_delete (context->source_window, XdndDirectSave);
-}
-
-/* Convert a URI to a local pathname (or NULL if it isn't local).
- * The returned pointer points inside the input string.
- * Possible input formats:
- *	/path
- *	///path
- *	//host/path
- *	file://host/path
- * This function is quite useful generally - it should be somewhere
- * publically accessible.
- */
-static char *get_local_path (char *uri)
-{
-  char	*host;
-
-  host = our_host_name ();
-
-  if (*uri == '/')
-    {
-      char    *path;
-
-      if (uri[1] != '/')
-	return uri;	    /* Just a local path - no host part */
-
-      path = strchr (uri + 2, '/');
-      if (!path)
-	return NULL;	    /* //something */
-
-      if (path - uri == 2)
-	return path;	    /* ///path */
-      if (strlen (host) == path - uri - 2 &&
-	  strncmp (uri + 2, host, path - uri - 2) == 0)
-	return path;	    /* //my.host/path */
-      /* //other.host/path */
-    }
-  else if (g_strncasecmp (uri, "file:", 5) == 0)
-    {
-      uri += 5;
-
-      if (*uri == '/')
-	return get_local_path (uri);
-    }
-  else if (strncmp (uri, "./", 2) == 0 || strncmp (uri, "../", 3) == 0)
-    return uri;	    /* Relative path - let this through */
-
-  return NULL;
-}
-
-/* Return our complete host name */
-static guchar *our_host_name (void)
-{
-  static char *name = NULL;
-
-  if (!name)
-  {
-    char buffer[XDS_MAXURILEN];
-
-    if (gethostname (buffer, XDS_MAXURILEN))
-      {
-	g_warning ("gethostname(): %s\n", g_strerror (errno));
-	name = "localhost";
-      }
-    else
-      {
-	buffer[XDS_MAXURILEN - 1] = '\0';
-	name = g_strdup (buffer);
-      }
-  }
-
-  return name;
 }
 
 static void drag_end (GtkWidget *widget, GdkDragContext *context)

@@ -359,7 +359,7 @@ static gboolean is_local_address(char *address)
 
 	ent = gethostbyname(address);
 
-	return strcmp(our_host_name(), ent ? ent->h_name : address);
+	return strcmp(our_host_name(), ent ? ent->h_name : address) == 0;
 }
 
 /* Convert a URI to a local pathname (or NULL if it isn't local).
