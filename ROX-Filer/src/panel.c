@@ -403,6 +403,28 @@ gboolean panel_add(PanelSide side,
 	return TRUE;
 }
 
+/* Add the area covered by the panels to the region */
+void panel_mark_used(GdkRegion *used)
+{
+	int i;
+
+	for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+	{
+		Panel *panel = current_panel[i];
+		GdkRectangle rect;
+
+		if (!panel)
+			continue;
+
+		gdk_window_get_root_origin(panel->window->window,
+					   &rect.x, &rect.y);
+		rect.width = panel->window->allocation.width;
+		rect.height = panel->window->allocation.height;
+
+		gdk_region_union_with_rect(used, &rect);
+	}
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/

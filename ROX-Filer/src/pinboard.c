@@ -53,6 +53,7 @@
 #include "menu.h"
 #include "xml.h"
 #include "tasklist.h"
+#include "panel.h"		/* For panel_mark_used() */
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
 
@@ -201,6 +202,7 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 			      guint32           time,
 			      GtkWidget		*dialog);
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
+static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect);
 
 
 /****************************************************************
@@ -333,11 +335,23 @@ const char *pinboard_get_name(void)
 /* Add widget to the pinboard. Caller is responsible for coping with pinboard
  * being cleared.
  */
-void pinboard_add_widget(GtkWidget *widget, int x, int y)
+void pinboard_add_widget(GtkWidget *widget)
 {
+	GtkRequisition req;
+	GdkRectangle rect;
+
 	g_return_if_fail(current_pinboard != NULL);
 
-	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), widget, x, y);
+	gtk_fixed_put(GTK_FIXED(current_pinboard->fixed), widget, 0, 0);
+
+	gtk_widget_size_request(widget, &req);
+
+	rect.width = req.width;
+	rect.height = req.height;
+	find_free_rect(current_pinboard, &rect);
+	
+	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed),
+			widget, rect.x, rect.y);
 }
 
 /* Add a new icon to the background.
@@ -1952,4 +1966,57 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 			current_pinboard->backdrop_style);
 	
 	pinboard_save();
+}
+
+/* Finds a free area on the pinboard large enough for the width and height
+ * of the given rectangle, by filling in the x and y fields of 'rect'.
+ * The search order respects user preferences.
+ * If no area is free, returns any old area.
+ */
+static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
+{
+	GdkRegion *used;
+	GList *next;
+	
+	used = gdk_region_new();
+
+	panel_mark_used(used);
+
+	/* Subtract the used areas... */
+
+	next = GTK_FIXED(pinboard->fixed)->children;
+	for (; next; next = next->next)
+	{
+		GtkFixedChild *fix = (GtkFixedChild *) next->data;
+		GdkRectangle used_rect;
+
+		if (!GTK_WIDGET_VISIBLE(fix->widget))
+			continue;
+
+		used_rect.x = fix->x;
+		used_rect.y = fix->y;
+		used_rect.width = fix->widget->requisition.width;
+		used_rect.height = fix->widget->requisition.height;
+
+		gdk_region_union_with_rect(used, &used_rect);
+	}
+
+	/* Find the first free area (yes, this isn't exactly pretty, but
+	 * it works). If you know a better (fast!) algorithm, let me know!
+	 */
+
+	for (rect->y = 0; rect->y < screen_height; rect->y += 32)
+	{
+		for (rect->x = 0; rect->x < screen_width; rect->x += 32)
+		{
+			if (gdk_region_rect_in(used, rect) ==
+					GDK_OVERLAP_RECTANGLE_OUT)
+				goto out;
+		}
+	}
+
+	rect->x = 0;
+	rect->y = 0;
+out:
+	gdk_region_destroy(used);
 }

@@ -71,10 +71,6 @@ static GdkAtom xa__NET_WM_ICON_GEOMETRY = GDK_NONE;
  */
 static GHashTable *known = NULL;	/* XID -> IconWindow */
 
-/* Top-left corner of next icon to be created */
-static int iconify_next_x = 0;
-static int iconify_next_y = 0;
-
 /* Static prototypes */
 static void remove_window(Window win);
 static void tasklist_update(gboolean to_empty);
@@ -86,7 +82,6 @@ static gboolean xid_equal(XID *a, XID *b);
 static void state_changed(IconWindow *win);
 static void show_icon(IconWindow *win);
 static void icon_win_free(IconWindow *win);
-static void set_iconify_pos(IconWindow *win);
 static void update_style(gpointer key, gpointer data, gpointer user_data);
 
 /****************************************************************
@@ -372,7 +367,9 @@ static void add_window(Window win)
 
 	window_check_status(w);
 
+#if 0
 	set_iconify_pos(w);
+#endif
 
 	if (gdk_error_trap_pop() != Success)
 		g_hash_table_remove(known, &win);
@@ -536,7 +533,6 @@ static void button_released(GtkWidget *widget, IconWindow *win)
 static void show_icon(IconWindow *win)
 {
 	static MaskedPixmap *icon = NULL;
-	GtkRequisition req;
 	GtkWidget *vbox;
 
 	g_return_if_fail(win->widget == NULL);
@@ -569,14 +565,9 @@ static void show_icon(IconWindow *win)
 	g_signal_connect(win->widget, "released",
 			G_CALLBACK(button_released), win);
 	
-	pinboard_add_widget(win->widget, iconify_next_x, iconify_next_y);
-
-	gtk_widget_show_all(win->widget);
-	gtk_widget_size_request(win->widget, &req);
-
-	iconify_next_y += req.height;
-	if (iconify_next_y + req.height > screen_height)
-		iconify_next_y = 0;
+	gtk_widget_show_all(vbox);	/* So the size comes out right */
+	pinboard_add_widget(win->widget);
+	gtk_widget_show(win->widget);
 }
 
 /* A window has been destroyed/expanded -- remove its icon */
@@ -602,6 +593,7 @@ static void state_changed(IconWindow *win)
 		hide_icon(win);
 }
 
+#if 0
 /* Set the _NET_WM_ICON_GEOMETRY property, which indicates where this window
  * will be iconified to. Should be inside a push/pop.
  */
@@ -618,6 +610,7 @@ static void set_iconify_pos(IconWindow *win)
 			gdk_x11_atom_to_xatom(xa__NET_WM_ICON_GEOMETRY),
 			XA_CARDINAL, 32, PropModeReplace, (guchar *) data, 4);
 }
+#endif
 
 static void update_style(gpointer key, gpointer data, gpointer user_data)
 {
