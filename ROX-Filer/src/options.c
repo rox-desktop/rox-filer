@@ -412,7 +412,18 @@ static void build_widget(Node *widget, GtkWidget *box)
 		label = gtk_label_new(_(text));
 		g_free(text);
 
+		gtk_misc_set_alignment(GTK_MISC(label), 0, 1);
+		gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_LEFT);
 		gtk_box_pack_start(GTK_BOX(box), label, FALSE, TRUE, 0);
+		return;
+	}
+	else if (strcmp(name, "spacer") == 0)
+	{
+		GtkWidget *eb;
+
+		eb = gtk_event_box_new();
+		gtk_widget_set_usize(eb, 8, 8);
+		gtk_box_pack_start(GTK_BOX(box), eb, FALSE, TRUE, 0);
 		return;
 	}
 
