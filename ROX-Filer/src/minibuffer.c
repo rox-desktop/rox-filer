@@ -733,7 +733,8 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	
 	g_ptr_array_add(argv, NULL);
 
-	if (!g_spawn_async_with_pipes(NULL, (gchar **) argv->pdata, NULL,
+	if (!g_spawn_async_with_pipes(filer_window->sym_path,
+			(gchar **) argv->pdata, NULL,
 			G_SPAWN_DO_NOT_REAP_CHILD |
 			G_SPAWN_SEARCH_PATH,
 			run_child, NULL,	/* Child setup fn */
