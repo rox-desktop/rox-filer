@@ -94,7 +94,7 @@ void create_minibuffer(FilerWindow *filer_window)
 
 	mini = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(hbox), mini, TRUE, TRUE, 0);
-	gtk_widget_set_style(mini, fixed_style);
+	gtk_widget_set_name(mini, "fixed-style");
 	gtk_signal_connect(GTK_OBJECT(mini), "key_press_event",
 			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(mini), "changed",
@@ -122,7 +122,6 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	g_return_if_fail(filer_window->minibuffer != NULL);
 
 	mini = GTK_ENTRY(filer_window->minibuffer);
-	gtk_widget_set_style(filer_window->minibuffer, fixed_style);
 
 	filer_window->mini_type = MINI_NONE;
 	gtk_label_set_text(GTK_LABEL(filer_window->minibuffer_label),

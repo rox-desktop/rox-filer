@@ -263,7 +263,6 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 {
 	int		pix_width;
 	int		w;
-	int		fixed_height;
 	DisplayStyle	style = filer_window->display_style;
 	ViewData	*view = (ViewData *) colitem->view_data;
 
@@ -321,8 +320,8 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 			int	text_height;
 
 			*width = SMALL_WIDTH + view->name_width + 12 + w;
-			fixed_height = fixed_font->ascent + fixed_font->descent;
-			text_height = MAX(view->name_height, fixed_height);
+			text_height = MAX(view->name_height,
+					  view->details_height);
 			*height = MAX(text_height, SMALL_HEIGHT) + 4;
 		}
 		else
@@ -977,7 +976,6 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	max_text_width = area->width - HUGE_WIDTH - 4;
-	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	ViewData *view = (ViewData *) colitem->view_data;
 	MaskedPixmap	*image = view->image;
 
@@ -999,7 +997,7 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	template->leafname.x = area->x + HUGE_WIDTH + 4;
 	template->leafname.y = area->y + area->height / 2
-			     - (view->name_height + 2 + fixed_height) / 2;
+			- (view->name_height + 2 + view->details_height) / 2;
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
@@ -1013,7 +1011,6 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
-	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	int	max_text_width = area->width - ICON_WIDTH - 4;
 	ViewData *view = (ViewData *) colitem->view_data;
 
@@ -1024,7 +1021,7 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	template->leafname.x = area->x + ICON_WIDTH + 4;
 	template->leafname.y = area->y + area->height / 2
-				- (view->name_height + 2 + fixed_height) / 2;
+			- (view->name_height + 2 + view->details_height) / 2;
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
@@ -1039,7 +1036,6 @@ static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	col_width = filer_window->collection->item_width;
-	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	ViewData *view = (ViewData *) colitem->view_data;
 
 	small_template(area, colitem, filer_window, template);
@@ -1048,7 +1044,8 @@ static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 		return;		/* Not scanned yet */
 
 	template->details.x = area->x + col_width - template->details.width;
-	template->details.y = area->y + area->height / 2 - fixed_height / 2;
+	template->details.y = area->y + area->height / 2 - \
+				view->details_height / 2;
 }
 
 #define INSIDE(px, py, area)	\

@@ -44,12 +44,12 @@
 
 #ifndef GTK2
 GdkFont	   	*item_font = NULL;
-#endif
 GdkFont	   	*fixed_font = NULL;
 GtkStyle   	*fixed_style = NULL;
 gint		fixed_width;
-GdkColor 	red = {0, 0xffff, 0, 0};
+#endif
 GdkGC		*red_gc = NULL;	/* Not automatically initialised */
+GdkColor 	red = {0, 0xffff, 0, 0};
 gint		screen_width, screen_height;
 
 static GdkAtom xa_cardinal;
@@ -69,22 +69,18 @@ void gui_support_init()
 	item_font = gtk_widget_get_style(tmp)->font;
 	gdk_font_ref(item_font);
 	gtk_widget_destroy(tmp);
-#endif
 
 	fixed_font = gdk_font_load("fixed");
 
 	fixed_style = gtk_style_copy(gtk_widget_get_default_style());
-#ifdef GTK2
-	gtk_style_set_font(fixed_style, fixed_font);
-#else
 	fixed_style->font = fixed_font;
-#endif
 
 	fixed_width = gdk_string_width(fixed_font, "m");
-
-	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
+#endif
 
 	gdk_color_alloc(gtk_widget_get_default_colormap(), &red);
+
+	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
 
 	/* This call starts returning strange values after a while, so get
 	 * the result here during init.

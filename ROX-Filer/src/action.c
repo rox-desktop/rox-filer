@@ -250,7 +250,7 @@ _("'*.htm', '*.html'      (finds HTML files)\n"
 "mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contains the word 'fred')"));
-		gtk_widget_set_style(text, fixed_style);
+		gtk_widget_set_name(text, "fixed-font");
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
@@ -541,7 +541,7 @@ static void message_from_child(gpointer 	 data,
 #ifdef GTK2
 		gtk_text_buffer_insert_at_cursor(gui_side->log, report, -1);
 #else
-		gtk_text_insert(GTK_TEXT(log), NULL, &red, NULL,
+		gtk_text_insert(GTK_TEXT(gui_side->log), NULL, &red, NULL,
 				report, -1);
 #endif
 
@@ -1956,7 +1956,7 @@ void action_find(GList *paths)
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_find_string;
 	gui_side->entry = gtk_entry_new();
-	gtk_widget_set_style(gui_side->entry, fixed_style);
+	gtk_widget_set_name(gui_side->entry, "fixed-font");
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
 	set_find_string_colour(gui_side->entry, last_find_string);
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
@@ -2289,6 +2289,7 @@ static gboolean remove_pinned_ok(GList *paths)
 
 void set_find_string_colour(GtkWidget *widget, guchar *string)
 {
+#ifndef GTK2
 	static GtkStyle *error_style = NULL;
 	FindCondition *cond;
 
@@ -2303,4 +2304,5 @@ void set_find_string_colour(GtkWidget *widget, guchar *string)
 
 	if (cond)
 		find_condition_free(cond);
+#endif
 }
