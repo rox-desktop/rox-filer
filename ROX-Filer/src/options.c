@@ -60,10 +60,11 @@
  * - All notify callbacks are called. Use the Option->has_changed field
  *   to see what changed.
  *
- * When Save is clicked:
+ * When OK is clicked:
  *
- * - All the options are written to the filesystem and the saver_callbacks are
- *   called.
+ * - If anything changed then:
+ *   - All the options are written to the filesystem
+ *   - The saver_callbacks are called.
  */
 
 #include "config.h"
@@ -122,7 +123,7 @@ static int updating_widgets = 0;	/* Ignore change signals when set */
 static GtkWidget *revert_widget = NULL;
 
 /* Static prototypes */
-static void save_options(gpointer unused);
+static void save_options(void);
 static void revert_options(GtkWidget *widget, gpointer data);
 static void build_options_window(void);
 static GtkWidget *build_window_frame(GtkTreeView **tree_view);
@@ -266,7 +267,7 @@ void options_notify(void)
 	if (updating_file_format)
 	{
 		updating_file_format = FALSE;
-		save_options(NULL);
+		save_options();
 		info_message(_("ROX-Filer has converted your Options file "
 				"to the new XML format"));
 	}
@@ -778,6 +779,9 @@ static void options_destroyed(GtkWidget *widget, gpointer data)
 		gtk_widget_destroy(GTK_WIDGET(current_fontsel_box));
 
 	revert_widget = NULL;
+
+	if (check_anything_changed())
+		save_options();
 	
 	if (widget == window)
 	{
@@ -898,7 +902,7 @@ static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	g_signal_connect_swapped(button, "clicked",
-				 G_CALLBACK(save_options), NULL);
+				G_CALLBACK(gtk_widget_destroy), window);
 	gtk_widget_grab_default(button);
 	gtk_widget_grab_focus(button);
 
@@ -1089,14 +1093,12 @@ static int save_xml_file(xmlDocPtr doc, gchar *filename)
 	return 0;
 }
 
-static void save_options(gpointer unused)
+static void save_options(void)
 {
 	xmlDoc	*doc;
 	GList	*next;
 	guchar	*save, *save_new;
 
-	if (!check_anything_changed())
-		goto out;
 	save = choices_find_path_save("Options", PROJECT, TRUE);
 	if (!save)
 		goto out;
