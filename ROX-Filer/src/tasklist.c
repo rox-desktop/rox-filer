@@ -139,7 +139,8 @@ void tasklist_set_active(gboolean active)
 /* User has changes the colours in the options box... */
 void tasklist_style_changed(void)
 {
-	g_hash_table_foreach(known, update_style, NULL);
+	if (known)
+		g_hash_table_foreach(known, update_style, NULL);
 }
 
 /****************************************************************
