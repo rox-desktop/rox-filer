@@ -15,6 +15,15 @@ typedef void OptionNotify(void);
 typedef struct _OptionUI OptionUI;
 typedef GList * (*OptionBuildFn)(OptionUI *ui, xmlNode *node, guchar *label);
 
+struct _Option {
+	OptionUI	*ui;		/* NULL => No UI yet */
+	guchar		*value;
+	long		int_value;
+	OptionChanged	*changed_cb;
+	gboolean	save;		/* Save to options file */
+	gboolean	has_changed;
+};
+
 struct _OptionUI {
 	GtkWidget	*widget;
 	void		(*update_widget)(OptionUI *ui, guchar *value);
@@ -26,9 +35,8 @@ struct _OptionUI {
 void options_init(void);
 void option_register_widget(char *name, OptionBuildFn builder);
 
-void option_add_int(guchar *key, int value, OptionChanged *changed);
-int option_get_int(guchar *key);
-
+void option_add_int(Option *option, guchar *key,
+		    int value, OptionChanged *changed);
 void option_add_string(guchar *key, guchar *value, OptionChanged *changed);
 guchar *option_get_static_string(guchar *key);
 

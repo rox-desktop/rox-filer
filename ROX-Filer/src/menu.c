@@ -102,6 +102,8 @@ GtkWidget *popup_menu = NULL;		/* Currently open menu */
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
 
+static Option o_menu_iconsize;
+
 /* Static prototypes */
 
 static void save_menus(void);
@@ -345,7 +347,7 @@ void menu_init(void)
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
 	option_add_string("menu_xterm", "xterm", NULL);
-	option_add_int("menu_iconsize", MIS_SMALL, NULL);
+	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL, NULL);
 	option_add_saver(save_menus);
 
 	tips = gtk_tooltips_new();
@@ -681,7 +683,7 @@ static MenuIconStyle get_menu_icon_style(void)
 	MenuIconStyle mis;
 	int display;
 
-	mis = option_get_int("menu_iconsize");
+	mis = o_menu_iconsize.int_value;
 
 	switch (mis)
 	{
@@ -706,7 +708,7 @@ static MenuIconStyle get_menu_icon_style(void)
 		}
 	}
 
-	display = option_get_int("display_size");
+	display = o_display_size.int_value;
 	switch (display)
 	{
 		case HUGE_ICONS:
@@ -827,7 +829,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	update_new_files_menu(get_menu_icon_style());
 
-	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
+	gtk_widget_set_sensitive(filer_new_window,
+			!o_unique_filer_windows.int_value);
 
 	popup_menu = (state & GDK_CONTROL_MASK)
 				? filer_file_menu
@@ -1484,7 +1487,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	if (o_unique_filer_windows)
+	if (o_unique_filer_windows.int_value)
 	{
 		report_error(_("You can't open a second view onto "
 			"this directory because the `Unique Windows' option "

@@ -138,7 +138,7 @@ static gint slide_from_value = 0;
 #define SHOW_BOTH 0
 #define SHOW_APPS_SMALL 1
 #define SHOW_ICON 2
-static int panel_style = SHOW_APPS_SMALL;
+static Option o_panel_style;
 
 static int closing_panel = 0;	/* Don't panel_save; destroying! */
 
@@ -148,7 +148,8 @@ static int closing_panel = 0;	/* Don't panel_save; destroying! */
 
 void panel_init(void)
 {
-	option_add_int("panel_style", panel_style, panel_set_style);
+	option_add_int(&o_panel_style, "panel_style",
+				SHOW_APPS_SMALL, panel_set_style);
 }
 
 /* 'name' may be NULL or "" to remove the panel */
@@ -302,9 +303,9 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 gboolean panel_want_show_text(Icon *icon)
 {
-	if (panel_style == SHOW_BOTH)
+	if (o_panel_style.int_value == SHOW_BOTH)
 		return TRUE;
-	if (panel_style == SHOW_ICON)
+	if (o_panel_style.int_value == SHOW_ICON)
 		return FALSE;
 
 	if (icon->item->flags & ITEM_FLAG_APPDIR)
@@ -779,7 +780,7 @@ out:
 	 */
 
 	/* Don't allow drops to non-writeable directories */
-	if (option_get_int("dnd_spring_open") == FALSE &&
+	if (o_dnd_spring_open.int_value == FALSE &&
 			type == drop_dest_dir &&
 			access(icon->path, W_OK) != 0)
 	{
@@ -1341,11 +1342,7 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 /* The style setting has been changed -- update all panels */
 static void panel_set_style(guchar *new)
 {
-	int	os = panel_style;
-	
-	panel_style = option_get_int("panel_style");
-
-	if (os != panel_style)
+	if (o_panel_style.has_changed)
 	{
 		int	i;
 
@@ -1362,5 +1359,3 @@ static void panel_set_style(guchar *new)
 		}
 	}
 }
-
-

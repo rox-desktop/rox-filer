@@ -78,8 +78,6 @@
 #include "main.h"
 #include "support.h"
 
-typedef struct _Option Option;
-
 /* Add all option tooltips to this group */
 static GtkTooltips *option_tooltips = NULL;
 #define OPTION_TIP(widget, tip)	\
@@ -87,13 +85,6 @@ static GtkTooltips *option_tooltips = NULL;
 
 /* The Options window. NULL if not yet created. */
 static GtkWidget *window = NULL;
-
-struct _Option {
-	OptionUI	*ui;		/* NULL => No UI yet */
-	guchar		*value;
-	OptionChanged	*changed_cb;
-	gboolean	save;		/* Save to options file */
-};
 
 enum {BUTTON_SAVE, BUTTON_OK, BUTTON_APPLY};
 
@@ -125,6 +116,7 @@ static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
 static Option *new_option(guchar *key, OptionChanged *changed, guchar *def);
 static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
+static void option_add(Option *option, guchar *key, OptionChanged *changed);
 
 static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label);
 static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label);
@@ -180,7 +172,7 @@ void option_register_widget(char *name, OptionBuildFn builder)
 }
 
 /* Call all the notify callbacks. This should happen after any options
- * have their values changed.
+ * have their values changed. Set each has_changed before calling.
  */
 void options_notify(void)
 {
@@ -215,21 +207,55 @@ void options_show(void)
 	gtk_widget_show_all(window);
 }
 
-/* Create a new option and register it */
-void option_add_int(guchar *key, int value, OptionChanged *changed)
+/* Option should contain the default value.
+ * It must never be destroyed after being registered (Options are typically
+ * statically allocated).
+ * The key corresponds to the option's name in Options.xml, and to the key
+ * in the saved options file.
+ * 'changed' is called whenever the value changes.
+ *
+ * On exit, the value will have been updated to the loaded value, if
+ * different to the default.
+ * XXX: Still call changed?
+ */
+static void option_add(Option *option, guchar *key, OptionChanged *changed)
 {
-	new_option(key, changed, g_strdup_printf("%d", value));
+	gpointer okey, value;
+
+	g_return_if_fail(option_hash != NULL);
+	g_return_if_fail(g_hash_table_lookup(option_hash, key) == NULL);
+	g_return_if_fail(option->value != NULL);
+	
+	option->save = TRUE;	/* Save by default */
+	option->ui = NULL;
+	option->changed_cb = changed;
+	option->has_changed = FALSE;
+
+	g_hash_table_insert(option_hash, key, option);
+
+	/* Use the value loaded from the file, if any */
+	if (g_hash_table_lookup_extended(loading, key, &okey, &value))
+	{
+		option->has_changed = strcmp(option->value, value) != 0;
+			
+		g_free(option->value);
+		option->value = value;
+		option->int_value = atoi(value);
+		g_hash_table_remove(loading, key);
+		g_free(okey);
+
+		if (changed && option->has_changed)
+			changed(option->value);
+	}
 }
 
-int option_get_int(guchar *key)
+/* Initialise and register a new integer option */
+void option_add_int(Option *option, guchar *key,
+		    int value, OptionChanged *changed)
 {
-	Option	*option;
-
-	option = g_hash_table_lookup(option_hash, key);
-
-	g_return_val_if_fail(option != NULL, -1);
-
-	return atoi(option->value);
+	option->value = g_strdup_printf("%d", value);
+	option->int_value = value;
+	option_add(option, key, changed);
 }
 
 void option_add_string(guchar *key, guchar *value, OptionChanged *changed)
@@ -895,7 +921,9 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 
 	g_return_if_fail(new != NULL);
 
-	if (strcmp(option->value, new) == 0)
+	option->has_changed = strcmp(option->value, new) != 0;
+
+	if (!option->has_changed)
 	{
 		g_free(new);
 		return;
@@ -903,6 +931,7 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 
 	g_free(option->value);
 	option->value = new;
+	option->int_value = atoi(new);
 
 	if (option->changed_cb)
 		option->changed_cb(option->value);
@@ -934,6 +963,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 	GList		*next;
 	int		button = (int) data;
 
+	/* Updates every value, and sets or clears has_changed */
 	g_hash_table_foreach(option_hash, may_change_cb, NULL);
 
 	options_notify();

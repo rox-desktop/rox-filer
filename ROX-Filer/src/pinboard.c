@@ -99,11 +99,10 @@ typedef enum {
 	TEXT_BG_SOLID = 2,
 } TextBgType;
 
-TextBgType o_text_bg = TEXT_BG_SOLID;
-gboolean o_clamp_icons = TRUE;
-static int o_grid_step = GRID_STEP_COARSE;
 static int old_x, old_y;		/* For dragging (mouse start) */
 static int icon_old_x, icon_old_y;	/* For dragging (icon start) */
+
+static Option o_pinboard_text_bg, o_pinboard_clamp_icons, o_pinboard_grid_step;
 
 /* Static prototypes */
 static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight);
@@ -179,9 +178,12 @@ void pinboard_init(void)
 	option_add_string("pinboard_fg_colour", "#000", NULL);
 	option_add_string("pinboard_bg_colour", "#ddd", NULL);
 
-	option_add_int("pinboard_text_bg", TEXT_BG_SOLID, NULL);
-	option_add_int("pinboard_clamp_icons", 1, NULL);
-	option_add_int("pinboard_grid_step", GRID_STEP_COARSE, NULL);
+	option_add_int(&o_pinboard_text_bg, "pinboard_text_bg",
+					TEXT_BG_SOLID, NULL);
+	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons",
+					1, NULL);
+	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
+						GRID_STEP_COARSE, NULL);
 	option_add_notify(pinboard_check_options);
 
 	gdk_color_parse(option_get_static_string("pinboard_fg_colour"),
@@ -470,17 +472,12 @@ void pinboard_reshape_icon(Icon *icon)
 
 static void pinboard_check_options(void)
 {
-	int		old_text_bg = o_text_bg;
 	GdkColor	n_fg, n_bg;
-
-	o_text_bg = option_get_int("pinboard_text_bg");
-	o_grid_step = option_get_int("pinboard_grid_step");
-	o_clamp_icons = option_get_int("pinboard_clamp_icons");
 
 	gdk_color_parse(option_get_static_string("pinboard_fg_colour"), &n_fg);
 	gdk_color_parse(option_get_static_string("pinboard_bg_colour"), &n_bg);
 
-	if (o_text_bg != old_text_bg ||
+	if (o_pinboard_text_bg.has_changed ||
 		gdk_color_equal(&n_fg, &text_fg_col) == 0 ||
 		gdk_color_equal(&n_bg, &text_bg_col) == 0)
 	{
@@ -725,7 +722,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	text_x = (icon->width - icon->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
-	if (o_text_bg != TEXT_BG_NONE)
+	if (o_pinboard_text_bg.int_value != TEXT_BG_NONE)
 	{
 #ifdef GTK2
 		PangoRectangle logical;
@@ -1334,8 +1331,10 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 
 static void snap_to_grid(int *x, int *y)
 {
-	*x = ((*x + o_grid_step / 2) / o_grid_step) * o_grid_step;
-	*y = ((*y + o_grid_step / 2) / o_grid_step) * o_grid_step;
+	int step = o_pinboard_grid_step.int_value;
+
+	*x = ((*x + step / 2) / step) * step;
+	*y = ((*y + step / 2) / step) * step;
 }
 
 /* Convert (x,y) from a centre point to a window position */
@@ -1343,10 +1342,12 @@ static void offset_from_centre(Icon *icon,
 			       int width, int height,
 			       int *x, int *y)
 {
+	gboolean clamp = o_pinboard_clamp_icons.int_value;
+
 	*x -= width >> 1;
 	*y -= height >> 1;
-	*x = CLAMP(*x, 0, screen_width - (o_clamp_icons ? width : 0));
-	*y = CLAMP(*y, 0, screen_height - (o_clamp_icons ? height : 0));
+	*x = CLAMP(*x, 0, screen_width - (clamp ? width : 0));
+	*y = CLAMP(*y, 0, screen_height - (clamp ? height : 0));
 }
 
 /* Convert (x,y) from a window position to a centre point */
@@ -1404,7 +1405,7 @@ out:
 	 */
 
 	/* Don't allow drops to non-writeable directories */
-	if (option_get_int("dnd_spring_open") == FALSE &&
+	if (o_dnd_spring_open.int_value == FALSE &&
 			type == drop_dest_dir &&
 			access(icon->path, W_OK) != 0)
 	{

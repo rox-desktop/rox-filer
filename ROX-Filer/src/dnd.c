@@ -158,6 +158,11 @@ GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
+static Option o_dnd_drag_to_icons;
+Option o_dnd_spring_open;
+static Option o_dnd_spring_delay;
+static Option o_dnd_middle_menu;
+
 void dnd_init()
 {
 	GtkItemFactory	*item_factory;
@@ -169,10 +174,10 @@ void dnd_init()
 			FALSE);
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
-	option_add_int("dnd_drag_to_icons", 1, NULL);
-	option_add_int("dnd_spring_open", 0, NULL);
-	option_add_int("dnd_spring_delay", 400, NULL);
-	option_add_int("dnd_middle_menu", TRUE, NULL);
+	option_add_int(&o_dnd_drag_to_icons, "dnd_drag_to_icons", 1, NULL);
+	option_add_int(&o_dnd_spring_open, "dnd_spring_open", 0, NULL);
+	option_add_int(&o_dnd_spring_delay, "dnd_spring_delay", 400, NULL);
+	option_add_int(&o_dnd_middle_menu, "dnd_middle_menu", TRUE, NULL);
 
 	item_factory = menu_create(menu_def,
 				sizeof(menu_def) / sizeof(*menu_def),
@@ -285,7 +290,7 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 			| GDK_ACTION_LINK | GDK_ACTION_ASK;
 	else
 	{
-		if (option_get_int("dnd_middle_menu"))
+		if (o_dnd_middle_menu.int_value)
 			actions = GDK_ACTION_ASK;
 		else
 			actions = GDK_ACTION_MOVE;
@@ -350,7 +355,7 @@ void drag_one_item(GtkWidget		*widget,
 			| GDK_ACTION_MOVE | GDK_ACTION_LINK;
 	else
 	{
-		if (option_get_int("dnd_middle_menu"))
+		if (o_dnd_middle_menu.int_value)
 			actions = GDK_ACTION_ASK;
 		else
 			actions = GDK_ACTION_MOVE;
@@ -533,7 +538,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (filer_window->collection->auto_scroll == -1)
 		collection_set_autoscroll(filer_window->collection, TRUE);
 
-	if (option_get_int("dnd_drag_to_icons"))
+	if (o_dnd_drag_to_icons.int_value)
 		item_number = collection_get_item(filer_window->collection,
 							x, y);
 	else
@@ -1163,7 +1168,7 @@ void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win)
 {
 	g_return_if_fail(context != NULL);
 
-	if (!option_get_int("dnd_spring_open"))
+	if (!o_dnd_spring_open.int_value)
 		return;
 
 	if (spring_context)
@@ -1173,7 +1178,7 @@ void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win)
 	gdk_drag_context_ref(spring_context);
 	spring_src_window = src_win;
 	spring_timeout = gtk_timeout_add(
-			option_get_int("dnd_spring_delay"), spring_now, NULL);
+			o_dnd_spring_delay.int_value, spring_now, NULL);
 }
 
 void dnd_spring_abort(void)
@@ -1219,7 +1224,7 @@ static gboolean spring_check_idle(gpointer data)
 
 static gboolean spring_now(gpointer data)
 {
-	gboolean	old_unique = o_unique_filer_windows;
+	gboolean	old_unique = o_unique_filer_windows.int_value;
 	guchar		*dest_path;
 	gint		x, y;
 	
@@ -1241,7 +1246,7 @@ static gboolean spring_now(gpointer data)
 
 	get_pointer_xy(&x, &y);
 	
-	o_unique_filer_windows = FALSE;
+	o_unique_filer_windows.int_value = FALSE;	/* XXX: yuck! */
 	if (spring_window)
 	{
 		collection_set_cursor_item(spring_window->collection, -1);
@@ -1263,7 +1268,7 @@ static gboolean spring_now(gpointer data)
 			centre_window(spring_window->window->window, x, y);
 		}
 	}
-	o_unique_filer_windows = old_unique;
+	o_unique_filer_windows.int_value = old_unique;
 
 	dnd_spring_abort();
 

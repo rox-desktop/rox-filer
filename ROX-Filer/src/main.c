@@ -169,6 +169,8 @@ gboolean new_copy = FALSE;
 static GHashTable *death_callbacks = NULL;
 static gboolean child_died_flag = FALSE;
 
+Option o_dnd_no_hostnames;
+
 /* Static prototypes */
 static void show_features(void);
 static void soap_add(xmlNodePtr body,
@@ -421,7 +423,7 @@ int main(int argc, char **argv)
 		g_free(dir);
 	}
 
-	option_add_int("dnd_no_hostnames", 1, NULL);
+	option_add_int(&o_dnd_no_hostnames, "dnd_no_hostnames", 1, NULL);
 
 	/* Try to send the request to an already-running copy of the filer */
 	gui_support_init();

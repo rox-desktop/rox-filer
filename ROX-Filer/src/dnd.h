@@ -29,7 +29,7 @@ extern gint drag_start_x, drag_start_y;
 extern gint motion_buttons_pressed;
 
 extern gboolean o_no_hostnames;
-extern gboolean o_spring_open;
+extern Option o_dnd_spring_open;
 extern char *drop_dest_prog;
 extern char *drop_dest_dir;
 extern GdkAtom XdndDirectSave0;

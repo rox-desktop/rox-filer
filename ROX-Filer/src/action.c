@@ -120,6 +120,10 @@ static gboolean o_force = FALSE;
 static gboolean o_brief = FALSE;
 static gboolean o_recurse = FALSE;
 
+static Option o_action_copy, o_action_move, o_action_link;
+static Option o_action_delete, o_action_mount;
+static Option o_action_force, o_action_brief, o_action_recurse;
+
 /* Whenever the text in these boxes is changed we store a copy of the new
  * string to be used as the default next time.
  */
@@ -1024,9 +1028,9 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 {
 	return start_action_with_options(data, func, autoq,
-					 option_get_int("action_force"),
-					 option_get_int("action_brief"),
-					 option_get_int("action_recurse"));
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value);
 }
 
 /* 			ACTIONS ON ONE ITEM 			*/
@@ -2015,7 +2019,7 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 	GUIside		*gui_side;
 
 	if (quiet == -1)
-	 	quiet = option_get_int("action_mount");
+	 	quiet = o_action_mount.int_value;
 
 	mount_open_dir = open_dir;
 	gui_side = start_action(paths, mount_cb, quiet);
@@ -2041,18 +2045,17 @@ void action_delete(GList *paths)
 	if (!remove_pinned_ok(paths))
 		return;
 
-	gui_side = start_action(paths, delete_cb,
-					option_get_int("action_delete"));
+	gui_side = start_action(paths, delete_cb, o_action_delete.int_value);
 	if (!gui_side)
 		return;
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Delete"));
 	add_toggle(gui_side,
 		_("Force"), _("Don't confirm deletion of non-writeable items"),
-		"F", option_get_int("action_force"));
+		"F", o_action_force.int_value);
 	add_toggle(gui_side,
 		_("Brief"), _("Only log directories being deleted"),
-		"B", option_get_int("action_brief"));
+		"B", o_action_brief.int_value);
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
@@ -2095,10 +2098,10 @@ void action_chmod(GList *paths)
 
 	add_toggle(gui_side,
 		_("Brief"), _("Don't list processed files"),
-		"B", option_get_int("action_brief"));
+		"B", o_action_brief.int_value);
 	add_toggle(gui_side,
 		_("Recurse"), _("Also change contents of subdirectories"),
-		"R", option_get_int("action_recurse"));
+		"R", o_action_recurse.int_value);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new(_("Command:"));
@@ -2140,7 +2143,7 @@ void action_copy(GList *paths, char *dest, char *leaf, int quiet)
 	GUIside		*gui_side;
 
 	if (quiet == -1)
-		quiet = option_get_int("action_copy");
+		quiet = o_action_copy.int_value;
 
 	action_dest = dest;
 	action_leaf = leaf;
@@ -2162,7 +2165,7 @@ void action_move(GList *paths, char *dest, char *leaf, int quiet)
 	GUIside		*gui_side;
 
 	if (quiet == -1)
-		quiet = option_get_int("action_move");
+		quiet = o_action_move.int_value;
 
 	action_dest = dest;
 	action_leaf = leaf;
@@ -2185,7 +2188,7 @@ void action_link(GList *paths, char *dest, char *leaf)
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_link;
-	gui_side = start_action(paths, list_cb, option_get_int("action_link"));
+	gui_side = start_action(paths, list_cb, o_action_link.int_value);
 	if (!gui_side)
 		return;
 
@@ -2196,14 +2199,14 @@ void action_link(GList *paths, char *dest, char *leaf)
 
 void action_init(void)
 {
-	option_add_int("action_copy", 1, NULL);
-	option_add_int("action_move", 1, NULL);
-	option_add_int("action_link", 1, NULL);
-	option_add_int("action_delete", 0, NULL);
-	option_add_int("action_mount", 1, NULL);
-	option_add_int("action_force", o_force, NULL);
-	option_add_int("action_brief", o_brief, NULL);
-	option_add_int("action_recurse", o_recurse, NULL);
+	option_add_int(&o_action_copy, "action_copy", 1, NULL);
+	option_add_int(&o_action_move, "action_move", 1, NULL);
+	option_add_int(&o_action_link, "action_link", 1, NULL);
+	option_add_int(&o_action_delete, "action_delete", 0, NULL);
+	option_add_int(&o_action_mount, "action_mount", 1, NULL);
+	option_add_int(&o_action_force, "action_force", o_force, NULL);
+	option_add_int(&o_action_brief, "action_brief", o_brief, NULL);
+	option_add_int(&o_action_recurse, "action_recurse", o_recurse, NULL);
 }
 
 #define MAX_ASK 4

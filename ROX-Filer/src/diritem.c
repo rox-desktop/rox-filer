@@ -44,10 +44,9 @@
 #include "fscache.h"
 #include "pixmaps.h"
 
-static gboolean o_ignore_exec = FALSE;
+static Option o_ignore_exec;
 
 /* Static prototypes */
-static void set_ignore_exec(guchar *new);
 static void examine_dir(guchar *path, DirItem *item);
 
 
@@ -57,7 +56,7 @@ static void examine_dir(guchar *path, DirItem *item);
 
 void diritem_init(void)
 {
-	option_add_int("display_ignore_exec", o_ignore_exec, set_ignore_exec);
+	option_add_int(&o_ignore_exec, "display_ignore_exec", FALSE, NULL);
 
 	read_globicons();
 }
@@ -152,7 +151,7 @@ void diritem_restat(guchar *path, DirItem *item)
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
-			if (!o_ignore_exec)
+			if (!o_ignore_exec.int_value)
 				item->mime_type = special_exec;
 		}
 
@@ -212,12 +211,6 @@ void diritem_free(DirItem *item)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
-
-
-static void set_ignore_exec(guchar *new)
-{
-	o_ignore_exec = atoi(new);
-}
 
 /* Fill in more details of the DirItem for a directory item.
  * - Looks for an image (but maybe still NULL on error)

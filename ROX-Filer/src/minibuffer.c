@@ -70,10 +70,12 @@ static gboolean grab_focus(GtkWidget *minibuffer);
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
+static Option o_filer_beep_fail, o_filer_beep_multi;
+
 void minibuffer_init(void)
 {
-	option_add_int("filer_beep_fail", 1, NULL);
-	option_add_int("filer_beep_multi", 1, NULL);
+	option_add_int(&o_filer_beep_fail, "filer_beep_fail", 1, NULL);
+	option_add_int(&o_filer_beep_multi, "filer_beep_multi", 1, NULL);
 }
 
 /* Creates the minibuffer widgets, setting the appropriate fields
@@ -364,7 +366,7 @@ static void complete(FilerWindow *filer_window)
 	if (current_stem == shortest_stem)
 	{
 		/* We didn't add anything... */
-		if (option_get_int("filer_beep_fail"))
+		if (o_filer_beep_fail.int_value)
 			gdk_beep();
 	}
 	else if (current_stem < shortest_stem)
@@ -379,7 +381,7 @@ static void complete(FilerWindow *filer_window)
 		gtk_entry_set_position(entry, -1);
 #endif
 
-		if (option_get_int("filer_beep_multi"))
+		if (o_filer_beep_multi.int_value)
 			gdk_beep();
 	}
 	else

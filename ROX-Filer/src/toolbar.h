@@ -17,8 +17,7 @@ typedef enum {
 	TOOLBAR_LARGE 	= 2,
 } ToolbarType;
 
-extern ToolbarType o_toolbar;
-extern gint o_toolbar_info;
+extern Option o_toolbar, o_toolbar_info;
 
 /* Prototypes */
 void toolbar_init(void);

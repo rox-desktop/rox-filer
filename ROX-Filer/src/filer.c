@@ -108,7 +108,6 @@ static void show_tooltip(guchar *text);
 static void filer_size_for(FilerWindow *filer_window,
 			   int w, int h, int n, gboolean allow_shrink);
 
-static void set_unique(guchar *unique);
 static void set_selection_state(FilerWindow *collection, gboolean normal);
 static void filer_next_thumb(GtkObject *window, gchar *path);
 
@@ -117,12 +116,13 @@ static void start_thumb_scanning(FilerWindow *filer_window);
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
 
-gboolean o_unique_filer_windows = FALSE;
-
 /* Indicates whether the filer's display is different to the machine it
  * is actually running on.
  */
 static gboolean not_local=FALSE;
+
+static Option o_filer_size_limit;
+Option o_filer_auto_resize, o_unique_filer_windows;
 
 void filer_init(void)
 {
@@ -130,10 +130,11 @@ void filer_init(void)
 	gchar *dpyhost, *dpy;
 	gchar *tmp;
   
-	option_add_int("filer_size_limit", 75, NULL);
-	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
-	option_add_int("filer_unique_windows", o_unique_filer_windows,
-			set_unique);
+	option_add_int(&o_filer_size_limit, "filer_size_limit", 75, NULL);
+	option_add_int(&o_filer_auto_resize, "filer_auto_resize",
+						RESIZE_ALWAYS, NULL);
+	option_add_int(&o_unique_filer_windows, "filer_unique_windows",
+					0, NULL);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
@@ -161,11 +162,6 @@ void filer_init(void)
 	}
 	
 	g_free(dpyhost);
-}
-
-static void set_unique(guchar *unique)
-{
-	o_unique_filer_windows = atoi(unique);
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -228,7 +224,7 @@ static void filer_window_set_size(FilerWindow *filer_window,
 	if (filer_window->scrollbar)
 		w += filer_window->scrollbar->allocation.width;
 	
-	if (o_toolbar != TOOLBAR_NONE)
+	if (o_toolbar.int_value != TOOLBAR_NONE)
 		h += filer_window->toolbar_frame->allocation.height;
 	if (filer_window->message)
 		h += filer_window->message->allocation.height;
@@ -304,12 +300,12 @@ static void filer_size_for(FilerWindow *filer_window,
 	int		size_limit;
 	int		space = 0;
 
-	size_limit = option_get_int("filer_size_limit");
+	size_limit = o_filer_size_limit.int_value;
 
 	/* Get the extra height required for the toolbar and minibuffer,
 	 * if visible.
 	 */
-	if (o_toolbar != TOOLBAR_NONE)
+	if (o_toolbar.int_value != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
 	if (filer_window->message)
 		t += filer_window->message->allocation.height;
@@ -1174,7 +1170,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 		return;
 	}
 	
-	if (o_unique_filer_windows)
+	if (o_unique_filer_windows.int_value)
 	{
 		FilerWindow *fw;
 		
@@ -1203,7 +1199,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	collection_set_cursor_item(filer_window->collection, -1);
 
 	attach(filer_window);
-	if (option_get_int("filer_auto_resize") == RESIZE_ALWAYS)
+	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
 		filer_window_autosize(filer_window, TRUE);
 
 	if (filer_window->mini_type == MINI_PATH)
@@ -1332,7 +1328,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
-	if (o_unique_filer_windows)
+	if (o_unique_filer_windows.int_value)
 		same_dir_window = find_filer_window(real_path, NULL);
 
 #ifdef GTK2
@@ -1379,7 +1375,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;
 
-	if (src_win && option_get_int("display_inherit_options"))
+	if (src_win && o_display_inherit_options.int_value)
 	{
 	        filer_window->sort_fn = src_win->sort_fn;
 		dstyle = src_win->display_style;
@@ -1389,18 +1385,18 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	}
 	else
 	{
-	        int i = option_get_int("display_sort_by");
+	        int i = o_display_sort_by.int_value;
 		filer_window->sort_fn = i == 0 ? sort_by_name :
 		                        i == 1 ? sort_by_type :
 		                        i == 2 ? sort_by_date :
 		                        sort_by_size;
 		
-		dstyle = option_get_int("display_size");
-		dtype = option_get_int("display_details");
+		dstyle = o_display_size.int_value;
+		dtype = o_display_details.int_value;
 		filer_window->show_hidden =
-			option_get_int("display_show_hidden");
+			o_display_show_hidden.int_value;
 		filer_window->show_thumbs =
-			option_get_int("display_show_thumbs");
+			o_display_show_thumbs.int_value;
 	}
 
 	/* Add all the user-interface elements & realise */
@@ -1500,7 +1496,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 			filer_window->toolbar_frame, FALSE, TRUE, 0);
 
 	/* If we want a toolbar, create it and put it in the frame */
-	if (o_toolbar != TOOLBAR_NONE)
+	if (o_toolbar.int_value != TOOLBAR_NONE)
 	{
 		GtkWidget *toolbar;
 		
@@ -1956,7 +1952,7 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 				flags |= OPEN_CLOSE_WINDOW;
 			else
 				flags |= OPEN_SAME_WINDOW;
-			if (o_new_window_on_1)
+			if (o_new_button_1.int_value)
 				flags ^= OPEN_SAME_WINDOW;
 			if (event->type == GDK_2BUTTON_PRESS)
 				collection_unselect_item(collection, item);
@@ -2121,7 +2117,7 @@ void filer_target_mode(FilerWindow *filer_window,
 	if (fn)
 		gtk_label_set_text(
 			GTK_LABEL(filer_window->toolbar_text), reason);
-	else if (o_toolbar_info)
+	else if (o_toolbar_info.int_value)
 	{
 		if (old_fn)
 			toolbar_update_info(filer_window);

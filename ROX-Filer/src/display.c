@@ -65,13 +65,20 @@
 #define MIN_TRUNCATE 0
 #define MAX_TRUNCATE 250
 
-#define HUGE_WRAP (1.5 * o_large_truncate)
+#define HUGE_WRAP (1.5 * o_large_width.int_value)
 
 /* Options bits */
-static gboolean o_intelligent_sort = TRUE;
-static gboolean o_dirs_first = FALSE;
-static gint	o_small_truncate = 250;
-static gint	o_large_truncate = 89;
+static Option o_intelligent_sort;
+static Option o_display_dirs_first;
+Option o_display_size;
+Option o_display_details;
+Option o_display_sort_by;
+static Option o_large_width;
+static Option o_small_width;
+Option o_display_show_hidden;
+Option o_display_show_thumbs;
+Option o_display_inherit_options;
+
 
 /* GC for drawing colour filenames */
 static GdkGC	*type_gc = NULL;
@@ -148,16 +155,25 @@ enum {
 
 void display_init()
 {
-	option_add_int("display_sort_nocase", o_intelligent_sort, NULL);
-	option_add_int("display_dirs_first", o_dirs_first, NULL);
-	option_add_int("display_size", LARGE_ICONS, NULL);
-	option_add_int("display_details", DETAILS_NONE, NULL);
-	option_add_int("display_sort_by", SORT_BY_NAME, NULL);
-	option_add_int("display_large_width", o_large_truncate, NULL);
-	option_add_int("display_small_width", o_small_truncate, NULL);
-	option_add_int("display_show_hidden", FALSE, NULL);
-	option_add_int("display_show_thumbs", FALSE, NULL);
-	option_add_int("display_inherit_options", FALSE, NULL);
+	option_add_int(&o_intelligent_sort, "display_intelligent_sort",
+			1, NULL);
+	option_add_int(&o_display_dirs_first, "display_dirs_first",
+			FALSE, NULL);
+	option_add_int(&o_display_size, "display_size",
+			LARGE_ICONS,
+			NULL);
+	option_add_int(&o_display_details, "display_details",
+			DETAILS_NONE, NULL);
+	option_add_int(&o_display_sort_by, "display_sort_by",
+			SORT_BY_NAME, NULL);
+	option_add_int(&o_large_width, "display_large_width", 89, NULL);
+	option_add_int(&o_small_width, "display_small_width", 250, NULL);
+	option_add_int(&o_display_show_hidden, "display_show_hidden",
+			FALSE, NULL);
+	option_add_int(&o_display_show_thumbs, "display_show_thumbs",
+			FALSE, NULL);
+	option_add_int(&o_display_inherit_options,"display_inherit_options",
+			FALSE, NULL);
 
 	option_add_notify(options_changed);
 }
@@ -233,7 +249,7 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		}
 		else if (style == SMALL_ICONS)
 		{
-			w = MIN(view->name_width, o_small_truncate);
+			w = MIN(view->name_width, o_small_width.int_value);
 			*width = SMALL_WIDTH + 12 + w;
 			*height = MAX(view->name_height, SMALL_HEIGHT) + 4;
 		}
@@ -422,7 +438,7 @@ void draw_large_icon(GtkWidget *widget,
 			!(item->flags & ITEM_FLAG_APPDIR))
 
 #define SORT_DIRS	\
-	if (o_dirs_first) {	\
+	if (o_display_dirs_first.int_value) {	\
 		gboolean id1 = IS_A_DIR(i1);	\
 		gboolean id2 = IS_A_DIR(i2);	\
 		if (id1 && !id2) return -1;				\
@@ -438,7 +454,7 @@ int sort_by_name(const void *item1, const void *item2)
 
 	SORT_DIRS;
 		
-	if (!o_intelligent_sort)
+	if (!o_intelligent_sort.int_value)
 		return strcmp(i1->leafname, i2->leafname);
 	
 	/* The following code was copied from PicoGUI (was LGPL) */
@@ -605,7 +621,7 @@ void display_set_layout(FilerWindow  *filer_window,
 
 	shrink_grid(filer_window);
 
-	if (option_get_int("filer_auto_resize") != RESIZE_NEVER)
+	if (o_filer_auto_resize.int_value != RESIZE_NEVER)
 		filer_window_autosize(filer_window, TRUE);
 }
 
@@ -781,33 +797,22 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 
 static void options_changed(void)
 {
-	gboolean	old_intel = o_intelligent_sort;
-	gboolean	old_dirs = o_dirs_first;
-#ifdef GTK2
-	gboolean	old_large_wrap = o_large_truncate;
-	gboolean	old_small_trunc = o_small_truncate;
-#endif
 	GList		*next = all_filer_windows;
-
-	o_intelligent_sort = option_get_int("display_sort_nocase");
-	o_dirs_first = option_get_int("display_dirs_first");
-	o_large_truncate = option_get_int("display_large_width");
-	o_small_truncate = option_get_int("display_small_width");
 
 	while (next)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
 #ifdef GTK2
-		if (old_large_wrap != o_large_truncate ||
-			old_small_trunc != o_small_truncate)
+		if (o_large_width.has_changed || o_small_width.has_changed)
 		{
 			/* Recreate PangoLayout */
 			update_views(filer_window);
 		}
 #endif
 
-		if (o_intelligent_sort != old_intel || o_dirs_first != old_dirs)
+		if (o_intelligent_sort.has_changed ||
+				o_display_dirs_first.has_changed)
 		{
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
@@ -1478,7 +1483,7 @@ void display_update_view(FilerWindow *filer_window,
 		if (style == HUGE_ICONS)
 			wrap_width = HUGE_WRAP * PANGO_SCALE;
 		else if (style == LARGE_ICONS)
-			wrap_width = o_large_truncate * PANGO_SCALE;
+			wrap_width = o_large_width.int_value * PANGO_SCALE;
 	}
 
 	if (wrap_width != -1)

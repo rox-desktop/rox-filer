@@ -85,7 +85,7 @@ struct _FilerWindow
 extern FilerWindow 	*window_with_focus;
 extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
-extern gboolean 	o_unique_filer_windows;
+extern Option		o_filer_auto_resize, o_unique_filer_windows;
 
 /* Prototypes */
 void filer_init(void);

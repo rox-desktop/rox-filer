@@ -30,13 +30,9 @@
 #include "options.h"
 #include "bind.h"
 
-gboolean o_new_window_on_1 = FALSE;
-static gboolean o_menu_button = 3;
-static gboolean o_single_click = TRUE;
-static gboolean o_single_pin = TRUE;
-
-/* Static prototypes */
-static void update_options(void);
+Option o_new_button_1;
+static Option o_menu_button_2;
+static Option o_single_click, o_single_pinboard;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -44,12 +40,10 @@ static void update_options(void);
 
 void bind_init(void)
 {
-	option_add_int("bind_new_button_1", o_new_window_on_1, NULL);
-	option_add_int("bind_menu_button_2", FALSE, NULL);
-	option_add_int("bind_single_click", o_single_click, NULL);
-	option_add_int("bind_single_pinboard", o_single_pin, NULL);
-
-	option_add_notify(update_options);
+	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE, NULL);
+	option_add_int(&o_menu_button_2, "bind_menu_button_2", FALSE, NULL);
+	option_add_int(&o_single_click, "bind_single_click", TRUE, NULL);
+	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE, NULL);
 }
 
 /* Call this when a button event occurs and you want to know what
@@ -58,6 +52,7 @@ void bind_init(void)
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 {
 	gint	b = event->button;
+	gint	menu_button = o_menu_button_2.int_value ? 2 : 3;
 	gboolean shift = (event->state & GDK_SHIFT_MASK) != 0;
 	gboolean ctrl = (event->state & GDK_CONTROL_MASK) != 0;
 	gboolean icon  = context == BIND_PINBOARD_ICON ||
@@ -73,13 +68,13 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 
 	gboolean dclick = event->type == GDK_2BUTTON_PRESS;
 	gboolean dclick_mode =
-		(context == BIND_DIRECTORY_ICON && !o_single_click) ||
-		(context == BIND_PINBOARD_ICON && !o_single_pin);
+		(context == BIND_DIRECTORY_ICON && !o_single_click.int_value) ||
+		(context == BIND_PINBOARD_ICON && !o_single_pinboard.int_value);
 
 	if (b > 3)
 		return ACT_IGNORE;
 
-	if (b == o_menu_button)
+	if (b == menu_button)
 		return press ? ACT_POPUP_MENU : ACT_IGNORE;
 
 	if (item && dclick && dclick_mode)
@@ -117,16 +112,3 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 
 	return dclick_mode ? ACT_PRIME_AND_SELECT : ACT_PRIME_FOR_DND;
 }
-
-/****************************************************************
- *			INTERNAL FUNCTIONS			*
- ****************************************************************/
-
-static void update_options(void)
-{
-	o_new_window_on_1 = option_get_int("bind_new_button_1");
-	o_menu_button = option_get_int("bind_menu_button_2") ? 2 : 3;
-	o_single_click = option_get_int("bind_single_click");
-	o_single_pin = option_get_int("bind_single_pinboard");
-}
-

@@ -10,7 +10,7 @@
 
 #include <gtk/gtk.h>
 
-extern gboolean 	o_new_window_on_1;
+extern Option o_new_button_1;
 
 typedef enum {
 	BIND_DIRECTORY,

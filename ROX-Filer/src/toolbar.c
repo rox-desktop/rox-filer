@@ -57,8 +57,7 @@ struct _Tool {
 	GtkWidget	**menu;		/* Right-click menu widget addr */
 };
 
-ToolbarType o_toolbar = TOOLBAR_NORMAL;
-gint o_toolbar_info = TRUE;
+Option o_toolbar, o_toolbar_info;
 
 static GtkTooltips *tooltips = NULL;
 
@@ -66,8 +65,9 @@ static GtkTooltips *tooltips = NULL;
  * rather than reusing the existing one.
  */
 #define NEW_WIN_BUTTON(button_event)	\
-  (o_new_window_on_1 ? ((GdkEventButton *) button_event)->button == 1	\
-		     : ((GdkEventButton *) button_event)->button != 1)
+  (o_new_button_1.int_value		\
+   	? ((GdkEventButton *) button_event)->button == 1	\
+	: ((GdkEventButton *) button_event)->button != 1)
 
 /* Static prototypes */
 static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window);
@@ -147,8 +147,8 @@ void toolbar_init(void)
 {
 	int	i;
 	
-	option_add_int("toolbar_type", o_toolbar, NULL);
-	option_add_int("toolbar_show_info", o_toolbar_info, NULL);
+	option_add_int(&o_toolbar, "toolbar_type", TOOLBAR_NORMAL, NULL);
+	option_add_int(&o_toolbar_info, "toolbar_show_info", 1, NULL);
 	option_add_string("toolbar_disable", "close", NULL);
 	option_add_notify(option_notify);
 	
@@ -219,14 +219,14 @@ GtkWidget *toolbar_tool_option(int i)
 GtkWidget *toolbar_new(FilerWindow *filer_window)
 {
 	g_return_val_if_fail(filer_window != NULL, NULL);
-	g_return_val_if_fail(o_toolbar != TOOLBAR_NONE, NULL);
+	g_return_val_if_fail(o_toolbar.int_value != TOOLBAR_NONE, NULL);
 
 	return create_toolbar(filer_window);
 }
 
 void toolbar_update_info(FilerWindow *filer_window)
 {
-	if (o_toolbar != TOOLBAR_NONE && o_toolbar_info)
+	if (o_toolbar.int_value != TOOLBAR_NONE && o_toolbar_info.int_value)
 		coll_selection_changed(filer_window->collection,
 				GDK_CURRENT_TIME, filer_window);
 }
@@ -364,11 +364,13 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
 			TRUE, TRUE, 4);
 
-	if (o_toolbar_info)
-		gtk_signal_connect(GTK_OBJECT(filer_window->collection),
+	if (o_toolbar_info.int_value)
+		gtk_signal_connect_while_alive(
+				GTK_OBJECT(filer_window->collection),
 				"selection_changed",
 				GTK_SIGNAL_FUNC(coll_selection_changed),
-				(gpointer) filer_window);
+				(gpointer) filer_window,
+				GTK_OBJECT(box));
 
 	return box;
 }
@@ -465,7 +467,7 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 
 	icon_widget = gtk_pixmap_new(tool->icon->pixmap, tool->icon->mask);
 
-	if (o_toolbar == TOOLBAR_LARGE)
+	if (o_toolbar.int_value == TOOLBAR_LARGE)
 	{
 		GtkWidget	*vbox, *text;
 
@@ -482,7 +484,7 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 
 	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
 	gtk_misc_set_padding(GTK_MISC(icon_widget),
-			o_toolbar == TOOLBAR_LARGE ? 16 : 8, 1);
+			o_toolbar.int_value == TOOLBAR_LARGE ? 16 : 8, 1);
 	gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 0);
 
 	return button;
@@ -639,7 +641,7 @@ static void recreate_toolbar(FilerWindow *filer_window)
 		gtk_widget_destroy(((GtkBin *) frame)->child);
 	}
 	
-	if (o_toolbar == TOOLBAR_NONE)
+	if (o_toolbar.int_value == TOOLBAR_NONE)
 		gtk_widget_hide(frame);
 	else
 	{
@@ -657,8 +659,6 @@ static void recreate_toolbar(FilerWindow *filer_window)
 
 static void option_notify(void)
 {
-	ToolbarType	old_type = o_toolbar;
-	gint		old_info = o_toolbar_info;
 	guchar		*list;
 	int		i;
 	gboolean	changed = FALSE;
@@ -675,11 +675,8 @@ static void option_notify(void)
 		if (old != tool->enabled)
 			changed = TRUE;
 	}
-	
-	o_toolbar = option_get_int("toolbar_type");
-	o_toolbar_info = option_get_int("toolbar_show_info");
 
-	if (changed || old_type != o_toolbar || old_info != o_toolbar_info)
+	if (changed || o_toolbar.has_changed || o_toolbar_info.has_changed)
 	{
 		GList	*next;
 
@@ -687,12 +684,6 @@ static void option_notify(void)
 		{
 			FilerWindow *filer_window = (FilerWindow *) next->data;
 			
-			if (old_info && old_type != TOOLBAR_NONE)
-				gtk_signal_disconnect_by_func(
-					GTK_OBJECT(filer_window->collection),
-					GTK_SIGNAL_FUNC(coll_selection_changed),
-					(gpointer) filer_window);
-
 			recreate_toolbar(filer_window);
 		}
 	}

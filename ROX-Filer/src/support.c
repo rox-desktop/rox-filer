@@ -47,6 +47,7 @@
 #include "my_vfs.h"
 #include "fscache.h"
 #include "i18n.h"
+#include "main.h"
 
 #ifndef GTK2
 # include "gconvert.h"
@@ -245,7 +246,7 @@ GString *make_path(char *dir, char *leaf)
 /* Return our complete host name for DND */
 char *our_host_name_for_dnd(void)
 {
-	if (option_get_int("dnd_no_hostnames"))
+	if (o_dnd_no_hostnames.int_value)
 		return "";
 	return our_host_name();
 }

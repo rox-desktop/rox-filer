@@ -32,6 +32,7 @@ extern gid_t *supplemental_groups;
 extern guchar *show_user_message;
 extern int home_dir_len;
 extern char *home_dir, *app_dir;
+extern Option o_dnd_no_hostnames;
 
 /* Prototypes */
 int main(int argc, char **argv);

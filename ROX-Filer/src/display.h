@@ -35,6 +35,10 @@ struct _ViewData
 	MaskedPixmap *image;		/* Image; possibly thumbnail */
 };
 
+extern Option o_display_inherit_options, o_display_sort_by;
+extern Option o_display_size, o_display_details, o_display_show_hidden;
+extern Option o_display_show_thumbs;
+
 /* Prototypes */
 void display_init();
 void display_set_layout(FilerWindow  *filer_window,

@@ -69,6 +69,12 @@ typedef struct _Pinboard Pinboard;
  */
 typedef struct _Panel Panel;
 
+/* Each option has a static Option structure. This is initialised by
+ * calling option_add_int() or similar. See options.c for details.
+ * This structure is read-only.
+ */
+typedef struct _Option Option;
+
 /* A filesystem cache provides a quick and easy way to load files.
  * When a cache is created, functions to load and update files are
  * registered to it. Requesting an object from the cache will load

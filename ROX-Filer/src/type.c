@@ -64,8 +64,6 @@ typedef struct pattern {
 } Pattern;
 #endif
 
-static gboolean	o_display_colour_types = TRUE;
-
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
 	{"display_err_colour",  "#ff0000"},
@@ -122,6 +120,8 @@ MIME_type *special_char_dev;
 MIME_type *special_exec;
 MIME_type *special_unknown;
 
+static Option o_display_colour_types;
+
 void type_init(void)
 {
 	int		i;
@@ -149,7 +149,8 @@ void type_init(void)
 	option_register_widget("type-edit", build_type_edit);
 	option_register_widget("type-reread", build_type_reread);
 	
-	option_add_int("display_colour_types", o_display_colour_types, NULL);
+	option_add_int(&o_display_colour_types, "display_colour_types",
+					TRUE, NULL);
 	
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
 		option_add_string(opt_type_colours[i][0],
@@ -1165,8 +1166,6 @@ static void alloc_type_colours(void)
 	int		i;
 	static gboolean	allocated = FALSE;
 
-	o_display_colour_types = option_get_int("display_colour_types");
-
 	/* Parse colours */
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
 	{
@@ -1186,7 +1185,7 @@ static void alloc_type_colours(void)
 	/* Free colours if they were previously allocated and
 	 * have changed or become unneeded.
 	 */
-	if (allocated && (change_count || !o_display_colour_types))
+	if (allocated && (change_count || !o_display_colour_types.int_value))
 	{
 		gdk_colormap_free_colors(gdk_rgb_get_cmap(),
 					 type_colours, NUM_TYPE_COLOURS);
@@ -1197,7 +1196,7 @@ static void alloc_type_colours(void)
 	 * change) or we don't want them anymore.
 	 * XXX: what should be done if allocation fails?
 	 */
-	if (!allocated && o_display_colour_types)
+	if (!allocated && o_display_colour_types.int_value)
 	{
 		gdk_colormap_alloc_colors(gdk_rgb_get_cmap(),
 				type_colours, NUM_TYPE_COLOURS,
@@ -1211,7 +1210,7 @@ static void alloc_type_colours(void)
  */
 GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 {
-	if (!o_display_colour_types)
+	if (!o_display_colour_types.int_value)
 		return normal;
 
 	if (item->flags & ITEM_FLAG_EXEC_FILE)
