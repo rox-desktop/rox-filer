@@ -824,8 +824,11 @@ static GdkPixbuf *get_image_for(IconWindow *win)
 	 */
 	{
 		GdkPixbuf *old = retval;
-		retval = apply_window_effect(old);
+		GdkPixbuf *small;
+		small = scale_pixbuf(old, ICON_WIDTH, ICON_HEIGHT);
 		g_object_unref(old);
+		retval = apply_window_effect(small);
+		g_object_unref(small);
 	}
 
 	return retval;
