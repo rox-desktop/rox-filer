@@ -445,6 +445,8 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 			G_CALLBACK(icon_motion_notify), pi);
 	g_signal_connect(pi->win, "expose-event",
 			G_CALLBACK(draw_icon), pi);
+	g_signal_connect_swapped(pi->win, "style-set",
+			G_CALLBACK(pinboard_reshape_icon), pi);
 	g_signal_connect_swapped(pi->win, "destroy",
 			G_CALLBACK(pin_icon_destroyed), pi);
 
