@@ -135,7 +135,7 @@ echo "Installing application..."
 endir "$APPDIR"
 
 (cd ROX-Filer/src; make clean) > /dev/null
-if [ -f "$APPDIR/ROX-Filer" ]; then
+if [ -d "$APPDIR/ROX-Filer" ]; then
 	echo "ROX-Filer is already installed - delete the existing"
 	echo "copy?"
 	confirm_or_die
