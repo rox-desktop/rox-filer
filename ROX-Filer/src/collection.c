@@ -1,8 +1,8 @@
 /*
  * $Id$
  *
- * Collection - a GTK+ widge1
- * the ROX-Filer team.
+ * Collection - a GTK+ widget
+ * Copyright (C) 2001, the ROX-Filer team.
  *
  * The collection widget provides an area for displaying a collection of
  * objects (such as files). It allows the user to choose a selection of
@@ -33,6 +33,7 @@
 #define MIN_WIDTH 80
 #define MIN_HEIGHT 60
 #define MINIMUM_ITEMS 16
+#define AUTOSCROLL_STEP 20
 
 enum
 {
@@ -558,6 +559,25 @@ static void clear_area(Collection *collection, GdkRectangle *area)
 				area->x, area->y, area->width, area->height);
 }
 
+/* Return the area occupied by the item at (row, col) by filling
+ * in 'area'.
+ */
+static void collection_get_item_area(Collection *collection,
+					int row, int col,
+					GdkRectangle *area)
+
+{
+	int scroll = collection->vadj->value;	/* (round to int) */
+
+	area->x = col * collection->item_width;
+	area->y = row * collection->item_height - scroll;
+
+	area->width = collection->item_width;
+	area->height = collection->item_height;
+	if (col == collection->columns - 1)
+		area->width <<= 1;
+}
+
 static gint collection_paint(Collection 	*collection,
 			     GdkRectangle 	*area)
 {
@@ -570,14 +590,13 @@ static gint collection_paint(Collection 	*collection,
 	int		start_col, last_col;
 	int		phys_last_col;
 	GdkRectangle 	clip;
-	guint		width, height;
+	gint     	width, height;
 
 	scroll = collection->vadj->value;
 
 	widget = GTK_WIDGET(collection);
 
 	gdk_window_get_size(widget->window, &width, &height);
-	
 	whole.x = 0;
 	whole.y = 0;
 	whole.width = width;
@@ -611,12 +630,10 @@ static gint collection_paint(Collection 	*collection,
 		 * than the requested area). It's used to redraw the lasso
 		 * box.
 		 */
-		clip.x = start_col * collection->item_width;
-		clip.y = start_row * collection->item_height - scroll;
-		clip.width = (phys_last_col - start_col + 1)
-			* collection->item_width;
-		clip.height = (last_row - start_row + 1)
-			* collection->item_height;
+		collection_get_item_area(collection,
+					start_row, start_col, &clip);
+		clip.width *= phys_last_col - start_col + 1;
+		clip.height *= last_row - start_row + 1;
 
 		clear_area(collection, &clip);
 	}
@@ -636,17 +653,11 @@ static gint collection_paint(Collection 	*collection,
 	col = start_col;
 
 	item = row * collection->columns + col;
-	item_area.height = collection->item_height;
 
 	while ((item == 0 || item < collection->number_of_items)
 			&& row <= last_row)
 	{
-		item_area.x = col * collection->item_width;
-		item_area.y = row * collection->item_height - scroll;
-
-		item_area.width = collection->item_width;
-		if (col == collection->columns - 1)
-			item_area.width <<= 1;
+		collection_get_item_area(collection, row, col, &item_area);
 				
 		draw_one_item(collection, item, &item_area);
 		col++;
@@ -820,7 +831,7 @@ static void collection_disconnect(GtkAdjustment *adjustment,
 static void set_vadjustment(Collection *collection)
 {	
 	GtkWidget	*widget;
-	guint		height;
+	gint		height;
 	int		cols, rows;
 
 	widget = GTK_WIDGET(collection);
@@ -902,7 +913,7 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 static void scroll_by(Collection *collection, gint diff)
 {
 	GtkWidget	*widget;
-	guint		width, height;
+	gint		width, height;
 	guint		from_y, to_y;
 	guint		amount;
 	GdkRectangle	new_area;
@@ -1199,7 +1210,7 @@ static gint collection_motion_notify(GtkWidget *widget,
 				     GdkEventMotion *event)
 {
 	Collection    	*collection;
-	int		x, y;
+	gint		x, y;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -1292,7 +1303,7 @@ static void scroll_to_show(Collection *collection, int item)
 	else if (row >= last)
 	{
 		GtkWidget	*widget = (GtkWidget *) collection;
-		int 		height;
+		gint 		height;
 
 		if (GTK_WIDGET_REALIZED(widget))
 		{
@@ -1309,7 +1320,7 @@ static void scroll_to_show(Collection *collection, int item)
 static void get_visible_limits(Collection *collection, int *first, int *last)
 {
 	GtkWidget	*widget = (GtkWidget *) collection;
-	int	scroll, height;
+	gint		scroll, height;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1411,10 +1422,10 @@ static gboolean as_timeout(Collection *collection)
 		return FALSE;		/* Out of window - stop */
 	}
 
-	if (y < 20)
-		diff = y - 20;
-	else if (y > h - 20)
-		diff = 20 + y - h;
+	if (y < AUTOSCROLL_STEP)
+		diff = y - AUTOSCROLL_STEP;
+	else if (y > h - AUTOSCROLL_STEP)
+		diff = AUTOSCROLL_STEP + y - h;
 
 	if (diff)
 		diff_vpos(collection, diff);
@@ -1542,13 +1553,11 @@ void collection_select_all(Collection *collection)
 {
 	GtkWidget	*widget;
 	int		item = 0;
-	int		scroll;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 
 	widget = GTK_WIDGET(collection);
-	scroll = collection->vadj->value;
 
 	if (collection->number_selected == collection->number_of_items)
 		return;		/* Nothing to do */
@@ -1577,7 +1586,6 @@ void collection_clear_except(Collection *collection, gint item)
 {
 	GtkWidget	*widget;
 	int		i = 0;
-	int		scroll;
 	int		end;		/* Selected items to end up with */
 
 	g_return_if_fail(collection != NULL);
@@ -1585,7 +1593,6 @@ void collection_clear_except(Collection *collection, gint item)
 	g_return_if_fail(item >= -1 && item < collection->number_of_items);
 	
 	widget = GTK_WIDGET(collection);
-	scroll = collection->vadj->value;
 
 	if (item == -1)
 		end = 0;
@@ -1628,12 +1635,10 @@ void collection_clear_selection(Collection *collection)
 /* Force a redraw of the specified item, if it is visible */
 void collection_draw_item(Collection *collection, gint item, gboolean blank)
 {
-	int		width, height;
+	gint		height;
 	GdkRectangle	area;
 	GtkWidget	*widget;
 	int		row, col;
-	int		scroll;
-	int		area_y, area_height;	/* NOT shorts! */
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1646,27 +1651,17 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 
 	col = item % collection->columns;
 	row = item / collection->columns;
-	scroll = collection->vadj->value;	/* (round to int) */
 
-	area.x = col * collection->item_width;
-	area_y = row * collection->item_height - scroll;
-	area_height = collection->item_height;
+	collection_get_item_area(collection, row, col, &area);
 
-	if (area_y + area_height < 0)
+	if (area.y + area.height < 0)
 		return;
 
-	gdk_window_get_size(widget->window, &width, &height);
+	gdk_window_get_size(widget->window, NULL, &height);
 
-	if (area_y > height)
+	if (area.y > height)
 		return;
 
-	area.y = area_y;
-	area.height = area_height;
-
-	area.width = collection->item_width;
-	if (col == collection->columns - 1)
-		area.width <<= 1;
-			
 	if (blank || collection->lasso_box)
 		clear_area(collection, &area);
 
@@ -1699,7 +1694,7 @@ void collection_set_item_size(Collection *collection, int width, int height)
 
 	if (GTK_WIDGET_REALIZED(widget))
 	{
-		int		window_width;
+		gint		window_width;
 
 		collection->paint_level = PAINT_CLEAR;
 		gdk_window_get_size(widget->window, &window_width, NULL);
