@@ -5,10 +5,10 @@
 #: tips:194
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.1.1\n"
+"Project-Id-Version: ROX-Filer 2.1.2\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2004-04-20 19:12+0200\n"
-"PO-Revision-Date: 2004-04-20 19:47+0200\n"
+"POT-Creation-Date: 2004-05-01 00:51+0200\n"
+"PO-Revision-Date: 2004-05-01 01:29+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -779,19 +779,19 @@ msgstr "Impossible d'ouvrir le répertoire : %s"
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) a échoué : %s"
 
-#: dnd.c:419
+#: dnd.c:423
 msgid "Internal error - bad info type"
 msgstr "Erreur interne - mauvais type d'info"
 
-#: dnd.c:559
+#: dnd.c:563
 msgid "Drag a directory here to bookmark it."
 msgstr "Faites glisser ici un répertoire pour le mettre en signet."
 
-#: dnd.c:574
+#: dnd.c:578
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "Erreur de protocole XDS : le nom de fichier ne doit pas contenir '/'\n"
 
-#: dnd.c:594
+#: dnd.c:598
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
@@ -799,66 +799,66 @@ msgstr ""
 "Cible XdndDirectSave0 fournie, mais l'atome XdndDirectSave0 (type text/"
 "plain) ne contenait pas de nom de fichier (feuille)\n"
 
-#: dnd.c:607
+#: dnd.c:611
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Désolé - j'ai besoin d'un type cible text/uri-list ou XdndDirectSave0."
 
-#: dnd.c:610
+#: dnd.c:614
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 "Désolé - j'ai besoin d'un type cible text/uri-list ou application/octet-"
 "stream."
 
-#: dnd.c:746
+#: dnd.c:750
 msgid "Unknown target"
 msgstr "Cible inconnue"
 
-#: dnd.c:779
+#: dnd.c:783
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr ""
 "L'application distante ne peut pas ou ne veut pas m'envoyer les données - "
 "désolé"
 
-#: dnd.c:792
+#: dnd.c:796
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "Erreur de protocole XDS : le code de retour devrait être 'S', 'F' ou 'E'\n"
 
-#: dnd.c:825
+#: dnd.c:829
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Désolé, impossible d'afficher un menu des actions pour un fichier distant / "
 "des données brutes."
 
-#: dnd.c:841
+#: dnd.c:845
 msgid "UntitledData"
 msgstr "UntitledData"
 
-#: dnd.c:868
+#: dnd.c:872
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Erreur lors de la sauvegarde du fichier : %s"
 
-#: dnd.c:919
+#: dnd.c:945
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Pas d'URI dans le text/uri-list (il n'y a rien à faire !)"
 
-#: dnd.c:943
+#: dnd.c:977
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Impossible d'obtenir les données de la machine distante (application/octet-"
 "stream non fourni)"
 
-#: dnd.c:966
+#: dnd.c:1000
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Certains de ces fichiers sont sur une machine différente - ils seront "
 "ignorés - désolé"
 
-#: dnd.c:973
+#: dnd.c:1007
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -866,11 +866,11 @@ msgstr ""
 "Aucun de ces fichiers n'est sur la machine locale - je ne peux pas traiter "
 "de multiples fichiers distants - désolé."
 
-#: dnd.c:986
+#: dnd.c:1020
 msgid "Unknown action requested"
 msgstr "Action demandée inconnue"
 
-#: dnd.c:994
+#: dnd.c:1028
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Erreur lors du chargement de la liste des fichiers : %s"
@@ -1029,9 +1029,8 @@ msgid "Display style"
 msgstr "Style d'affichage"
 
 #: filer.c:3128
-#, fuzzy
 msgid "Sort type and order"
-msgstr "Trier par propriétaire"
+msgstr "Type de tri et ordre"
 
 #: filer.c:3133 toolbar.c:143
 msgid "Details"
@@ -1304,7 +1303,7 @@ msgstr ""
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "Fin de ligne incorrecte ou manquante dans les données text/uri-list"
 
-#: gui_support.c:1047
+#: gui_support.c:1041
 msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
@@ -1484,7 +1483,7 @@ msgstr ""
 "%s\n"
 "(note: l'ancien lien a été supprimé)"
 
-#: infobox.c:549 tips:282
+#: infobox.c:549 tips:285
 msgid "Error:"
 msgstr "Erreur :"
 
@@ -1759,7 +1758,7 @@ msgstr "Icônes, avec..."
 msgid "Sizes"
 msgstr "Tailles"
 
-#: menu.c:181 tips:263
+#: menu.c:181 tips:266
 msgid "Types"
 msgstr "Types"
 
@@ -1816,8 +1815,8 @@ msgid "Show Hidden"
 msgstr "Montrer les fichiers cachés"
 
 #: menu.c:198
-msgid "Filter files"
-msgstr "Filtrer des fichiers"
+msgid "Filter Files..."
+msgstr "Filtrer des fichiers..."
 
 #: menu.c:199
 msgid "Show Thumbnails"
@@ -1828,8 +1827,8 @@ msgid "Refresh"
 msgstr "Rafraîchir"
 
 #: menu.c:201
-msgid "Save display settings"
-msgstr "Sauver les options d'affichage"
+msgid "Save Display Settings..."
+msgstr "Sauver les options d'affichage..."
 
 #: menu.c:203
 msgid "Copy..."
@@ -2241,7 +2240,7 @@ msgid ""
 "* means zero or more characters\n"
 "[aA] means 'a' or 'A'\n"
 "[a-z] means any character from a to z (lowercase)\n"
-"*.png means any name ending in '.png')"
+"*.png means any name ending in '.png'"
 msgstr ""
 "Entrez un motif de nom de fichier pour sélectionner tous les fichiers "
 "correspondants :\n"
@@ -2313,11 +2312,11 @@ msgstr "Erreur lors de la sauvegarde de %s : %s"
 msgid "Missing '='"
 msgstr "Symbole '=' manquant"
 
-#: panel.c:377
+#: panel.c:375
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "Votre vieux fichier de panneau a été converti au nouveau format XML."
 
-#: panel.c:498
+#: panel.c:496
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2326,20 +2325,20 @@ msgstr ""
 "considère généralement cette action comme accidentelle... Voulez-vous "
 "vraiment le fermer ?"
 
-#: panel.c:579
+#: panel.c:577
 msgid "Missing < or > in panel config file"
 msgstr "'<' ou '>' manquant dans le fichier de config du panneau"
 
-#: panel.c:1248
+#: panel.c:1246
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "Erreur lors de la sauvegarde du panneau %s : %s"
 
-#: panel.c:1554
+#: panel.c:1552
 msgid "Applet quit without ever creating a widget!"
 msgstr "L'appliquette a quitté sans avoir créé de widget !"
 
-#: panel.c:1648
+#: panel.c:1646
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2348,7 +2347,7 @@ msgstr ""
 "Erreur lors de l'exécution de l'appliquette :\n"
 "%s"
 
-#: panel.c:2117
+#: panel.c:2115
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Moniteur Xinerama %d non disponible"
@@ -2807,7 +2806,7 @@ msgstr "Pas d'action d'exécution de définie"
 #: type.c:814
 #, c-format
 msgid "Error in handler %s: %s"
-msgstr "Erreur dans le handler %s : %s"
+msgstr "Erreur dans le gestionnaire %s : %s"
 
 #: type.c:829
 #, c-format
@@ -3353,11 +3352,11 @@ msgstr "Taille par défaut :"
 msgid "Huge Icons"
 msgstr "Énormes icônes"
 
-#: tips:74 tips:253
+#: tips:74 tips:256
 msgid "Large Icons"
 msgstr "Grandes icônes"
 
-#: tips:75 tips:252
+#: tips:75 tips:255
 msgid "Small Icons"
 msgstr "Petites icônes"
 
@@ -3546,7 +3545,7 @@ msgstr ""
 "Quand vous utilisez un punaiseur, vous pouvez faire glisser des fichiers et "
 "des applications sur le fond du bureau pour créer des raccourcis vers eux."
 
-#: tips:130 tips:249
+#: tips:130 tips:252
 msgid "Appearance"
 msgstr "Apparence"
 
@@ -3939,7 +3938,7 @@ msgstr "Quand vous glissez-déposez des fichiers avec le bouton du milieu"
 msgid "Move the files"
 msgstr "Déplacer les fichiers"
 
-#: tips:244 tips:245 tips:246 tips:247
+#: tips:244 tips:245 tips:246
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
@@ -3947,35 +3946,52 @@ msgstr ""
 "Notez que vous pouvez toujours faire apparaître le menu en glissant-déposant "
 "avec le bouton gauche tout en appuyant sur la touche <Alt>."
 
-#: tips:248
+#: tips:247
+msgid "Download handler"
+msgstr "Gestionnaire de téléchargement"
+
+#: tips:248 tips:249 tips:250
+msgid ""
+"When you drag a file from a web browser or other remote source, this program "
+"will be run to download it. $1 is the URI\n"
+"dragged to the filer, and the current directory is the destination. Eg:\n"
+"xterm -e wget $1"
+msgstr ""
+"Lorsque vous faites glisser un fichier depuis un navigateur web ou autre "
+"source distante, ce programme sera exécuté pour le télécharger. $1 est l'URI "
+"glissé sur le filer, et le répertoire courant est la destination. Par "
+"exemple :\n"
+"xterm -e wget $1"
+
+#: tips:251
 msgid "Menus"
 msgstr "Menus"
 
-#: tips:250
+#: tips:253
 msgid "Size of icons in menus:"
 msgstr "Taille des icônes dans les menus :"
 
-#: tips:251
+#: tips:254
 msgid "No Icons"
 msgstr "Pas d'icônes"
 
-#: tips:254
+#: tips:257
 msgid "Same as current window"
 msgstr "Comme la fenêtre courante"
 
-#: tips:255
+#: tips:258
 msgid "Same as default"
 msgstr "Comme le choix par défaut"
 
-#: tips:256
+#: tips:259
 msgid "Behaviour"
 msgstr "Comportement"
 
-#: tips:257
+#: tips:260
 msgid "File menu on right-click"
 msgstr "Menu « Fichier » par clic droit"
 
-#: tips:258
+#: tips:261
 msgid ""
 "Show the File menu instead of the main menu when right-clicking with files "
 "selected (the main menu can be accessed by holding down Control)."
@@ -3984,28 +4000,28 @@ msgstr ""
 "avec le bouton droit alors que des fichiers sont sélectionnés (le menu "
 "principal peut être obtenu en appuyant sur la touche « Control »)."
 
-#: tips:259
+#: tips:262
 msgid "`Xterm Here' program"
 msgstr "Programme pour « Xterm ici »"
 
-#: tips:260 tips:261
+#: tips:263 tips:264
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr ""
 "Le programme à lancer quand vous choisissez « Xterm ici » dans le menu."
 
-#: tips:262
+#: tips:265
 msgid "Keyboard shortcuts"
 msgstr "Raccourcis clavier"
 
-#: tips:264
+#: tips:267
 msgid "Executable files"
 msgstr "Fichiers exécutables"
 
-#: tips:265
+#: tips:268
 msgid "Ignore eXecutable bit for known extensions"
 msgstr "Ignorer le bit « eXécutable » pour les extensions connues"
 
-#: tips:266 tips:267
+#: tips:269 tips:270
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -4016,11 +4032,11 @@ msgstr ""
 "fichiers sur un système de fichiers de type Windows qui sont montrés comme "
 "des programmes exécutables."
 
-#: tips:268
+#: tips:271
 msgid "MIME types"
 msgstr "Types MIME"
 
-#: tips:269
+#: tips:272
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. Use the MIME-"
@@ -4035,15 +4051,15 @@ msgstr ""
 "\n"
 "http://rox.sourceforge.net/mime_editor.html"
 
-#: tips:270
+#: tips:273
 msgid "Icon theme"
 msgstr "Thème d'icônes"
 
-#: tips:271
+#: tips:274
 msgid "Themes should be placed inside the ~/.icons directory."
 msgstr "Les thèmes doivent être placés dans le répertoire « ~/.icons »."
 
-#: tips:272 tips:273
+#: tips:275 tips:276
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set this way override those from the selected theme."
@@ -4052,41 +4068,41 @@ msgstr ""
 "chaque type MIME. Notez que les icônes fixées de cette façon ont la priorité "
 "sur celles du thème sélectionné."
 
-#: tips:274
+#: tips:277
 msgid "Colours"
 msgstr "Couleurs"
 
-#: tips:275
+#: tips:278
 msgid "File type colours"
 msgstr "Couleurs des types de fichier"
 
-#: tips:276
+#: tips:279
 msgid "Colour files based on their types"
 msgstr "Mettre les fichiers en couleur en fonction de leur type"
 
-#: tips:277
+#: tips:280
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr ""
 "Les noms de fichier (et les détails) sont mis en couleur en fonction du type "
 "du fichier."
 
-#: tips:278
+#: tips:281
 msgid "Directory:"
 msgstr "Répertoire :"
 
-#: tips:279
+#: tips:282
 msgid "Regular file:"
 msgstr "Fichier ordinaire :"
 
-#: tips:280
+#: tips:283
 msgid "Pipe:"
 msgstr "Tube :"
 
-#: tips:281
+#: tips:284
 msgid "Socket:"
 msgstr "Socket :"
 
-#: tips:283 tips:284
+#: tips:286 tips:287
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
@@ -4094,19 +4110,19 @@ msgstr ""
 "Erreur, comme un lien qui pointe vers un fichier inexistant, ou un fichier "
 "que le filer n'a pas la permission d'examiner."
 
-#: tips:285
+#: tips:288
 msgid "Character device:"
 msgstr "Périphérique caractère :"
 
-#: tips:286
+#: tips:289
 msgid "Block device:"
 msgstr "Périphérique bloc :"
 
-#: tips:287
+#: tips:290
 msgid "Door:"
 msgstr "Porte :"
 
-#: tips:288
+#: tips:291
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
@@ -4114,31 +4130,31 @@ msgstr ""
 "Les portes sont un peu comme les sockets ou les tubes, et n'ont été vues que "
 "sous Solaris."
 
-#: tips:289
+#: tips:292
 msgid "Executable file:"
 msgstr "Fichier exécutable :"
 
-#: tips:290
+#: tips:293
 msgid "Application directory:"
 msgstr "Répertoire application :"
 
-#: tips:291
+#: tips:294
 msgid "Unknown type:"
 msgstr "Type inconnu :"
 
-#: tips:292
+#: tips:295
 msgid "Compatibility"
 msgstr "Compatibilité"
 
-#: tips:293
+#: tips:296
 msgid "Window manager problems"
 msgstr "Problèmes de WM (gestionnaires de fenêtres)"
 
-#: tips:294
+#: tips:297
 msgid "Override window manager control of the pinboard and panels"
 msgstr "Outrepasser le contrôle du punaiseur et des panneaux par le WM"
 
-#: tips:295
+#: tips:298
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -4154,11 +4170,11 @@ msgstr ""
 "fenêtres, ou ces fenêtres apparaissent dans les listes de sélection de "
 "fenêtres."
 
-#: tips:296
+#: tips:299
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "Passer tous les clics sur l'image de fond au gestionnaire de fenêtres"
 
-#: tips:297
+#: tips:300
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
@@ -4169,11 +4185,11 @@ msgstr ""
 "Activez cette option pour transmettre à la place les événements à votre "
 "gestionnaire de fenêtres. Les clics sur les icônes ne seront pas transmis."
 
-#: tips:298
+#: tips:301
 msgid "Blackbox root menus hack"
 msgstr "Hack des menus racine de Blackbox"
 
-#: tips:299 tips:300
+#: tips:302 tips:303
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -4185,15 +4201,15 @@ msgstr ""
 "gestionnaires de fenêtres devraient changer leur comportement dans leurs "
 "nouvelles versions de manière à ce que ceci ne soit pas nécessaire."
 
-#: tips:301
+#: tips:304
 msgid "Drag and drop"
 msgstr "Glisser-déposer"
 
-#: tips:302
+#: tips:305
 msgid "Don't use hostnames"
 msgstr "Ne pas utiliser de nom d'hôte"
 
-#: tips:303 tips:304 tips:305 tips:306
+#: tips:306 tips:307 tips:308 tips:309
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
