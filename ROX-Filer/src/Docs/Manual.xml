@@ -740,6 +740,12 @@ $ rox --bottom=</screen>
        Sort in reverse order (newest to oldest, largest to smallest, etc).
        </entry></row>
 
+       <row><entry><guimenuitem>Filter Files...</guimenuitem></entry><entry>
+       Restrict the display to only show files with names matching the
+       given pattern.
+       The titlebar shows <guilabel>(Glob (pattern))</guilabel> when this is on.
+       </entry></row>
+
        <row><entry><guimenuitem>Show Hidden</guimenuitem></entry><entry>
        If on, files beginning with a dot are shown, otherwise they are hidden.
        The titlebar shows <guilabel>(All)</guilabel> when this is on.
@@ -755,6 +761,11 @@ $ rox --bottom=</screen>
        <row><entry><guimenuitem>Refresh</guimenuitem></entry><entry>
        Rereads the contents of the directory and details of all the files
        in it. Use this if the display becomes out-of-date.
+       </entry></row>
+
+       <row><entry><guimenuitem>Save Display Settings...</guimenuitem></entry><entry>
+       Remember the display settings just for this directory. Each time you
+       open the directory, the saved settings will be used.
        </entry></row>
     </tbody></tgroup></informaltable>
 
@@ -997,6 +1008,16 @@ $ rox --bottom=</screen>
        <row><entry><guimenuitem>Invert Selection</guimenuitem></entry><entry>
 	 Every selected file becomes unselected, and every unselected file
 	 becomes selected.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Select by Name...</guimenuitem></entry><entry>
+         Select just those files that match the given name pattern. This
+	 isn't as flexible as <guimenuitem>Select If...</guimenuitem> (see
+	 below), but it is quicker to use. Files also highlight as you type
+	 with this option. The default key binding is <keycap>.</keycap>,
+	 so you can type <userinput>.png</userinput> to select all
+	 <filename>.png</filename> files, for example.
        </entry></row>
 
        <row><entry>

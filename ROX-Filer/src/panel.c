@@ -264,8 +264,6 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->name = g_strdup(name);
 	panel->side = side;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_type_hint(GTK_WINDOW(panel->window),
-			GDK_WINDOW_TYPE_HINT_TOOLBAR);
 	panel->autoscroll_speed = 0;
 	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
