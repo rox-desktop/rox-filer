@@ -466,7 +466,87 @@ Redémarrez IceWM et le filer pour que les changements prennent effet.
   </para>
 </sect2>
 
-<sect2><title>Autres</title>
+<sect2>
+ <title>Window Maker</title>
+ <procedure>
+  <step>
+   <para>
+	Démarrez le filer comme ceci : <userinput>rox -p=Default</userinput>
+   </para>
+  </step>
+
+  <step>
+   <para>
+	Appuyez sur <keycap>Ctrl</keycap>+<keycap>Esc</keycap>, ou 
+	faites un clic droit sur la barre de titre de n'importe quelle
+	fenêtre.
+	Choisissez <guimenuitem>Attributes...</guimenuitem>.
+   </para>
+  </step>
+
+  <step>
+   <para>
+	La fenêtre Attributes Inspector apparaît. Choisissez <guimenuitem>Window Specification</guimenuitem>
+	dans le menu, en haut (1er choix).
+   </para>
+  </step>
+
+  <step>
+   <para>
+	Cliquez sur le bouton <guibutton>Select window</guibutton>.
+	Le curseur de la souris s'est transformé en double croix. Sélectionnez
+	une des icônes du punaiseur de <application>ROX-Filer</application>. Les
+	boutons radios dans le cadre <guilabel>Window Specification</guilabel>
+	doivent maintenant être modifiés et afficher <userinput>ROX-Pinboard.ROX-Filer</userinput>
+	pour le premier élément. Sélectionnez ce bouton radio.
+   </para>
+  </step>
+
+  <step>
+   <para>
+	Dans le menu du haut, revenez à <guimenuitem>Window Attributes</guimenuitem>.
+	Dans le cadre <guilabel>Attributes</guilabel>, choisissez les caractéristiques
+	que vous voulez donnez aux icônes du punaiseur ; je vous recommande celles-ci :
+
+	<itemizedlist>
+	 <listitem><para>Disable titlebar</para></listitem>
+	 <listitem><para>Disable resizebar</para></listitem>
+	 <listitem><para>Disable close button</para></listitem>
+	 <listitem><para>Disable miniaturize button</para></listitem>
+	 <listitem><para>Keep at bottom (sunken)</para></listitem>
+	 <listitem><para>Omnipresent</para></listitem>
+	</itemizedlist>
+
+   </para>
+  </step>
+
+  <step>
+   <para>
+	Toujours dans le menu du haut, choisissez <guimenuitem>Advanced Options</guimenuitem>.
+	Dans le cadre <guilabel>Advanced</guilabel>, choisissez les options qui vous conviennent ;
+	je vous recommande les suivantes :
+
+	<itemizedlist>
+	 <listitem><para>Do not show in the window list</para></listitem>
+	 <listitem><para>Ignore 'Hide Others'</para></listitem>
+	 <listitem><para>Ignore 'Save Session' (éventuellement)</para></listitem>
+    </itemizedlist>
+
+   </para>
+  </step>
+
+  <step>
+   <para>
+	Quand vous aurez fini, cliquez sur <guibutton>Save</guibutton>, et fermez
+	la fenêtre Attributes Inspector en cliquant sur le bouton <guibutton>X</guibutton>
+	dans la barre de titre.
+   </para>
+  </step>
+ </procedure>
+</sect2>
+
+<sect2>
+ <title>Autres</title>
   <para>
 
 	  Si rien ne fonctionne, essayez de lancer rox avec les options <option>-n</option> et <option>-o</option> ;
@@ -527,9 +607,12 @@ pour ouvrir fichiers et dossiers.</para></listitem>
 		  Faites un clic droit pour obtenir un menu. Clic droit sur un fichier/dossier pour opérer une action sur celui-ci.
   </para></listitem>
 
-  <listitem><para>
-Glissez-déposez des fichiers entre des fenêtres pour les copier (bouton gauche) ou pour les déplacer (bouton du milieu).
-  </para></listitem>
+  <listitem>
+   <para>
+	Glissez-déposez des fichiers entre des fenêtres avec le bouton gauche pour les copier, ou 
+	avec le bouton du milieu pour obtenir un menu avec les actions possibles (copier, déplacer, lier, etc...).
+   </para>
+  </listitem>
 
 </itemizedlist>
 
@@ -1021,21 +1104,24 @@ le groupe du fichier est le même qu'un des groupes auxquels l'utilisateur appart
 
 <sect1>
  <title>Le menu Fichier</title>
-  <para>
-
-Si vous ouvrez le menu alors que plusieurs objets sont sélectionnés, l'opération
-s'applique alors à tous ces objets. Si vous ouvrez le menu en cliquant droit sur
-un objet, alors qu'il n'y a pas de sélection, l'objet cliqué est alors temporairement
-sélectionné. Si vous choisissez une commande du menu sélection sans qu'il n'y ait de
-sélection, vous entrez en mode 'cible' ; l'opération choisie s'appliquera au prochain
-objet choisi. Cliquez sur le fond de la fenêtre, appuyez sur 'Echap' ou faites un clic
-droit pour sortir du mode 'cible'. Le mode 'cible' est surtout utile si vous utilisez
-l'option 'Navigation en simple clic' ou pour utiliser avec des raccourcis claviers.
-
-Notez que pour les dossiers-applications, il peut y avoir quelques commandes qui sont
-ajoutées au début de ce sous-menu quand vous cliquez sur ceux-ci &mdash; voir la section
-<xref linkend="AppDir"/> pour plus de détails.
-
+ <para>
+  Si vous ouvrez le menu alors que plusieurs objets sont sélectionnés, l'opération
+  s'applique alors à tous ces objets. Si vous ouvrez le menu en cliquant droit sur
+  un objet, alors qu'il n'y a pas de sélection, l'objet cliqué est alors temporairement
+  sélectionné.
+ </para>
+ <para>
+  Si vous choisissez une commande du menu sélection sans qu'il n'y ait de
+  sélection, vous entrez en mode 'cible' ; l'opération choisie s'appliquera au prochain
+  objet choisi. Cliquez sur le fond de la fenêtre, appuyez sur <keycap>Echap</keycap> ou 
+  faites un clic droit pour sortir du mode 'cible'. Le mode 'cible' est surtout utile si 
+  vous utilisez l'option <guilabel>Navigation en simple clic</guilabel> ou pour utiliser 
+  avec des raccourcis claviers.
+ </para>
+ <para>
+  Notez que pour les dossiers-applications, il peut y avoir quelques commandes qui sont
+  ajoutées au début de ce sous-menu quand vous cliquez sur ceux-ci &mdash; voir la section
+  <xref linkend="AppDir"/> pour plus de détails.
 
 <informaltable><tgroup cols="2">
 		<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
@@ -1062,7 +1148,7 @@ Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers,
 ouvre les fichiers comme s'il s'agissait de simple texte brut, monte/démonte
 un point de montage, ou ouvre le dossier contenant la cible du lien symbolique
 sur lequel vous "shift-cliquez". C'est la même chose que de cliquer en
-maintenant Shift enfoncé. La commande du menu sélection prend alors le nom de
+maintenant <keycap>Shift</keycap> enfoncé. La commande du menu sélection prend alors le nom de
 la commande a effectuer.
 </entry></row>
 
@@ -1286,10 +1372,17 @@ Ouvre un 'espace de saisie' pour ouvrir un autre dossier (voir section <xref lin
 Ouvre un 'espace de saisie' pour exécuter une commande shell (voir section <xref linkend="mini"/>).
 </entry></row>
 
-<row><entry>
-<guimenuitem>Voir l'aide de ROX-Filer</guimenuitem></entry><entry>
-Comme si vous affichiez le dossier-application ROX-Filer, et que vous choisissiez 'Aide' dans le menu sélection.
-</entry></row>
+<row>
+ <entry>
+  <guimenuitem>
+   Voir l'aide de ROX-Filer
+  </guimenuitem>
+ </entry>
+ <entry>
+  Comme si vous affichiez le dossier-application ROX-Filer, et que vous choisissiez 
+  <guimenuitem>Aide</guimenuitem> dans le menu sélection.
+ </entry>
+</row>
 
 </tbody></tgroup></informaltable>
   </para>
@@ -1489,7 +1582,7 @@ sur beaucoup de systèmes car elle crée un problème avec le support des gros fich
 
 Le mini-buffer est une barre blanche qui apparaît le long de la fenêtre du filer,
 en bas, et qui vous permet d'entrer du texte.
-Pressez 'Echap' pour vous en débarrasser. Le mini-buffer se comporte différemment,
+Pressez <keycap>Echap<keycap> pour vous en débarrasser. Le mini-buffer se comporte différemment,
 selon la manière dont il a été appelé :
   </para>
 
@@ -1579,13 +1672,14 @@ Les touches <keycap>Haut</keycap> et <keycap>Bas</keycap> rappellent les command
 <keycap>Tab</keycap> effectue toujours la complétion.
 Cliquer sur un objet insère son nom dans le mini-buffer.
 Si plusieurs objets sont sélectionnés, ils sont assignés aux paramètres <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
-  </para><para>
-Ouvrir le mini-buffer alors que des objets sont sélectionnés ajoute <computeroutput>$@</computeroutput>
-à la fin de la commande &mdash; ce qui remplace le nom des objets sélectionnés.
-S'il n'y a pas de sélection mais qu'un fichier est "entouré", le nom de celui-ci est inséré.
+  </para>
+  <para>
+   Ouvrir le mini-buffer alors que des objets sont sélectionnés ajoute <computeroutput>$@</computeroutput>
+   à la fin de la commande &mdash; ce qui remplace le nom des objets sélectionnés.
   </para>
 
-  <informalexample><para>Exemples :
+  <informalexample>
+   <para>Exemples :
 
 <orderedlist><title>Pour "détarer" une archive <filename>.tgz</filename> :</title>
 
@@ -1927,6 +2021,7 @@ Not isdir and not isreg
 
 !-d !-f
 </screen>
+
 Ces 4 expressions signifient la même chose.
   </para>
 </sect1>
@@ -2048,14 +2143,17 @@ size &gt; 10 Mb
 
 IsReg and nlinks &gt; 1
 </screen>
+
 La première expression trouve les fichiers modifiés au cours des dernières
 24 heures (ndt : 'after 1 day ago', littéralement, veut dire 'après il y a
 un jour'). Vous pourriez utiliser <userinput>&gt;</userinput> au lieu de <userinput>after</userinput>,
 mais ce serait moins clair.
-</para><para>
-La deuxième trouve les fichiers pesant plus de 10 Mb et la dernière trouve
-les fichiers normaux qui ont plus qu'1 lien physique sur eux.
-</para><para>
+</para>
+<para>
+ La deuxième trouve les fichiers pesant plus de 10 Mb.
+ La dernière trouve les fichiers normaux qui ont plus qu'un lien physique sur eux.
+</para>
+<para>
 Attention &mdash; le filer ne vérifie pas le contexte des opérateurs, donc
 <userinput>size &gt; 1 day ago</userinput> est admis (ndt : 'taille > 1 jour avant'), même si ça n'a pas de sens !
 
@@ -2086,6 +2184,7 @@ l'extension est <filename>.c</filename> et qui contient le mot 'main', utilisez 
 <screen>
 '*.c' system(grep -q main "%")
 </screen>
+
 pour que grep ne soit exécuté que pour les fichiers ayant pour extension <filename>.c</filename>
 (à opposer à une recherche des fichiers qui contiendraient le mot 'main', puis qui seraient du type <filename>.c</filename>.
 </para></listitem>
@@ -2108,6 +2207,7 @@ Exemples :
 
 'src' prune, '*.c'
 </screen>
+
 La première expression supprime chaque fichier ayant pour extension <filename>.old</filename>.
 La seconde cherche les fichiers ayant pour extension <filename>.c</filename>, mais ne prend pas la peine
 de vérifier le contenu des dossiers nommés <filename>src</filename>.
@@ -2854,6 +2954,7 @@ $ cd ROX-Filer/src/po
 $ ./make-mo ml
 Created file ../../Messages/ml.gmo OK
 </screen>
+
 </para></listitem>
 
 <listitem><para>Éditez <filename>ROX-Filer/Options.xml</filename> pour que
@@ -2883,6 +2984,7 @@ modifiées et met à jour tous les fichiers de traduction.
 $ cd ROX-Filer/src/po
 $ ./update-po
 </screen>
+
 </para></listitem>
 
 <listitem><para>Éditez le fichier à la main, comme pour une nouvelle traduction, en traduisant
@@ -2948,7 +3050,7 @@ Modifiez le programme comme bon vous semble.
 Créez le patch en utilisant <command>cvs diff</command> depuis le dossier approprié :
 
 <screen>
-$ cvs diff -c &gt; my_patch
+$ cvs diff -u &gt; my_patch
 </screen>
 
 Ceci crée un patch lisible par l'homme &ndash; et la machine. Soumettez-le
@@ -3084,9 +3186,14 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 			  <listitem><para>utile pour la gestion de session.
 			 </para></listitem></varlistentry>
 
-  <varlistentry><term><option>-d</option></term><term><option>--dir=DIR</option></term>
-   <listitem><para>ouvre le dossier DIR en tant que répertoire (pas comme une application, même si ce dossier y ressemble).
-  </para></listitem></varlistentry>
+ <varlistentry>
+  <term><option>-d</option></term><term><option>--dir=DIR</option></term>
+  <listitem>
+   <para>
+	ouvre le dossier DIR en tant que répertoire (pas comme une application, même si ce dossier y ressemble).
+   </para>
+  </listitem>
+ </varlistentry>
 
   <varlistentry><term><option>-D</option></term><term><option>--close=DIR</option></term>
    <listitem><para>ferme le dossier DIR et tous ses sous-dossiers.
@@ -3181,6 +3288,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Christopher Arndt</member>
 	 <member>Jens Askengren</member>
 	 <member>Liav Asseraf</member>
+	 <member>Wilbert Berendsen</member>
 	 <member>Francesco Bochicchio</member>
 	 <member>Andrzej Borsuk</member>
 	 <member>Richard Boulton</member>
@@ -3189,6 +3297,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Andrew Clover</member>
 	 <member>Fabien Coutant</member>
 	 <member>Couderc Damien</member>
+	 <member>Andreas Dehmel</member>
 	 <member>Dmitry Elfimov</member>
 	 <member>Mattias Engdegard</member>
 	 <member>Andrew Flegg</member>
@@ -3199,6 +3308,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Jasper Huijsmans</member>
 	 <member>Bernard Jungen</member>
 	 <member>James Kermode</member>
+	 <member>Jim Knoble</member>
 	 <member>Krzysztof Krzyzaniak</member>
 	 <member>Vincent Ledda</member>
 	 <member>Vincent Lefèvre</member>
@@ -3434,7 +3544,7 @@ Les méthodes suivantes sont reconnues :</para>
 </bibliomixed>
 
 <bibliomixed>
- <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard
+ <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
   <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
 </bibliomixed>
 
