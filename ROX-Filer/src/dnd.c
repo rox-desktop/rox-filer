@@ -9,6 +9,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -20,6 +21,8 @@
 #include "gui_support.h"
 #include "support.h"
 
+#define MAXURILEN 4096		/* Longest URI to allow */
+
 enum
 {
 	TARGET_RAW,
@@ -28,6 +31,8 @@ enum
 };
 
 GdkAtom XdndDirectSave0;
+GdkAtom text_plain;
+GdkAtom application_octet_stream;
 
 /* Static prototypes */
 static void create_uri_list(GString *string,
@@ -40,6 +45,14 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			gint            y,
 			guint           time);
 static gboolean provides(GdkDragContext *context, GdkAtom target);
+static void set_xds_prop(GdkDragContext *context, char *text);
+static void drag_data_received(GtkWidget      		*widget,
+				GdkDragContext  	*context,
+				gint            	x,
+				gint            	y,
+				GtkSelectionData 	*selection_data,
+				guint               	info,
+				guint32             	time);
 
 
 static FileItem *selected_item(Collection *collection)
@@ -101,11 +114,11 @@ void drag_selection(Collection 		*collection,
 }
 
 /* Called when a remote app wants us to send it some data */
-void drag_data_get(GtkWidget          *widget,
-		   GdkDragContext     *context,
-		   GtkSelectionData   *selection_data,
-		   guint               info,
-		   guint32             time)
+void drag_data_get(GtkWidget          		*widget,
+			GdkDragContext     	*context,
+			GtkSelectionData   	*selection_data,
+			guint               	info,
+			guint32             	time)
 {
 	char		*to_send = "E";	/* Default to sending an error */
 	int		to_send_length = 1;
@@ -199,10 +212,12 @@ void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
 			GTK_DEST_DEFAULT_MOTION,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table),
-			GDK_ACTION_COPY);
+			GDK_ACTION_COPY | GDK_ACTION_PRIVATE);
 
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_drop",
 			GTK_SIGNAL_FUNC(drag_drop), filer_window);
+	gtk_signal_connect(GTK_OBJECT(widget), "drag_data_received",
+			GTK_SIGNAL_FUNC(drag_data_received), filer_window);
 }
 
 static gboolean drag_drop(GtkWidget 	*widget,
@@ -211,6 +226,14 @@ static gboolean drag_drop(GtkWidget 	*widget,
 			gint            y,
 			guint           time)
 {
+	char		*error = NULL;
+	char		*leafname = NULL;
+	FilerWindow	*filer_window;
+	GdkAtom		target;
+	
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	g_return_val_if_fail(filer_window != NULL, TRUE);
+
 	if (gtk_drag_get_source_widget(context) == widget)
 	{
 		gtk_drag_finish(context,
@@ -221,19 +244,60 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	}
 
 	if (provides(context, XdndDirectSave0))
-		report_error("drag_drop", "Use XDS");
-	else
-		report_error("drag_drop", "Normal DND");
+	{
+		guchar	*prop_text;	/* Note - not terminated */
+		guint	length;
 
-	gtk_drag_finish(context,
-			FALSE,	/* Success */
-			FALSE,  /* Delete */
-			time);
+		if (gdk_property_get(context->source_window,
+					XdndDirectSave0,
+					text_plain,
+					0, MAXURILEN,
+					FALSE,
+					NULL, NULL,
+					&length, &prop_text)
+				&& prop_text)
+		{
+			if (memchr(prop_text, '/', length))
+			{
+				error = "XDS protocol error: "
+					"leafname may not contain '/'\n";
+				g_free(prop_text);
+			}
+			else
+			{
+				/* Terminate the string */
+				leafname = g_realloc(prop_text, length + 1);
+				leafname[length] = '\0';
+
+				set_xds_prop(context, "file://wibble/bob");
+				target = XdndDirectSave0;
+			}
+		}
+		else
+			error = "XdndDirectSave0 target provided, but the atom "
+				"XdndDirectSave0 (type text/plain) did not "
+					"contain a leafname\n";
+	}
+	else
+	{
+		error = "Normal DND";
+	}
+
+	if (error)
+	{
+		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
+		
+		report_error("ROX-Filer", error);
+	}
+	else
+		gtk_drag_get_data(widget, context, target, time);
+
+	g_free(leafname);
 
 	return TRUE;
 }
 
-/* Is the sended willing to supply this target type? */
+/* Is the sender willing to supply this target type? */
 static gboolean provides(GdkDragContext *context, GdkAtom target)
 {
 	GList	    *targets = context->targets;
@@ -247,4 +311,87 @@ static gboolean provides(GdkDragContext *context, GdkAtom target)
 void dnd_init()
 {
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
+	text_plain = gdk_atom_intern("text/plain", FALSE);
+	application_octet_stream = gdk_atom_intern("application/octet-stream",
+			FALSE);
+}
+
+/* Set the XdndDirectSave0 property on the source window for this context */
+static void set_xds_prop(GdkDragContext *context, char *text)
+{
+	gdk_property_change(context->source_window,
+			XdndDirectSave0,
+			text_plain, 8,
+			GDK_PROP_MODE_REPLACE,
+			text,
+			strlen(text));
+}
+
+/* Called when some data arrives from the remote app (which we asked for
+ * in drag_drop.
+ */
+static void drag_data_received(GtkWidget      		*widget,
+				GdkDragContext  	*context,
+				gint            	x,
+				gint            	y,
+				GtkSelectionData 	*selection_data,
+				guint               	info,
+				guint32             	time)
+{
+	if (!selection_data->data)
+	{
+		/* Timeout? */
+		gtk_drag_finish(context, FALSE, FALSE, time);
+		return;
+	}
+
+	if (selection_data->target == XdndDirectSave0)
+	{
+		char	response = *selection_data->data;
+
+		if (selection_data->length != 1 || !strchr("SFE", response))
+		{
+			gtk_drag_finish(context, FALSE, FALSE, time);
+			report_error("ROX-Filer",
+				"XDS return code should be 'S', 'F' or 'E'\n");
+			return;
+		}
+
+		if (response == 'E')
+		{
+			/* Error reported by sender - abort silently */
+			gtk_drag_finish(context, FALSE, FALSE, time);
+			return;
+		}
+
+		if (response == 'F')
+		{
+			/* Sender couldn't save there - ask for another
+			 * type if possible.
+			 */
+			if (provides(context, application_octet_stream))
+			{
+				gtk_drag_get_data(widget, context,
+						application_octet_stream, time);
+			}
+			else
+			{
+				gtk_drag_finish(context, FALSE, FALSE, time);
+				report_error("ROX-Filer",
+					"Remote app can't or won't send me "
+					"the data - sorry");
+			}
+
+			return;
+		}
+
+		gtk_drag_finish(context, TRUE, FALSE, time);
+		report_error("ROX-Filer", "Saved OK");
+	}
+	else
+	{
+		set_xds_prop(context, "");	/* Clear to indicate failure */
+		gtk_drag_finish(context, FALSE, FALSE, time);
+		report_error("drag_data_received", "got raw data");
+	}
 }

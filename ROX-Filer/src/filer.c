@@ -420,6 +420,8 @@ void filer_opendir(char *path)
 	filer_window->dir = NULL;	/* Not scanning */
 
 	collection = collection_new(NULL);
+	gtk_object_set_data(GTK_OBJECT(collection),
+			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
 	collection_set_functions(filer_window->collection,
 			draw_item, test_point);
@@ -454,7 +456,7 @@ void filer_opendir(char *path)
 			drag_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
 			drag_data_get, filer_window);
-	drag_set_dest(collection, filer_window);
+	drag_set_dest(collection);
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
