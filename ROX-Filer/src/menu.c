@@ -129,6 +129,7 @@ static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
+static void invert_selection(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_file(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
@@ -235,6 +236,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Select"),	    		NULL, NULL, 0, "<Branch>"},
 {">" N_("Select All"),	    	NULL, select_all, 0, NULL},
 {">" N_("Clear Selection"),	NULL, clear_selection, 0, NULL},
+{">" N_("Invert Selection"),	NULL, invert_selection, 0, NULL},
 {">" N_("Select If..."),	NULL, mini_buffer, MINI_SELECT_IF, NULL},
 {N_("Options..."),		NULL, menu_show_options, 0, NULL},
 {N_("New"),			NULL, NULL, 0, "<Branch>"},
@@ -1396,6 +1398,14 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection_clear_selection(window_with_focus->collection);
+	window_with_focus->temp_item_selected = FALSE;
+}
+
+static void invert_selection(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection_invert_selection(window_with_focus->collection);
 	window_with_focus->temp_item_selected = FALSE;
 }
 

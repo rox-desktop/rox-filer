@@ -1683,6 +1683,39 @@ void collection_select_all(Collection *collection)
 	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
 
+/* Toggle all items in the collection */
+void collection_invert_selection(Collection *collection)
+{
+	int		item;
+	
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+
+	if (collection->number_selected == 0)
+	{
+		collection_select_all(collection);
+		return;
+	}
+	else if (collection->number_of_items == collection->number_selected)
+	{
+		collection_clear_selection(collection);
+		return;
+	}
+
+	for (item = 0; item < collection->number_of_items; item++)
+		collection->items[item].selected =
+			!collection->items[item].selected;
+
+	collection->number_selected = collection->number_of_items -
+				      collection->number_selected;
+	
+	/* Have to redraw everything... */
+	collection->paint_level = PAINT_CLEAR;
+	gtk_widget_queue_clear(GTK_WIDGET(collection));
+	
+	EMIT_SELECTION_CHANGED(collection, current_event_time);
+}
+
 /* Unselect all items except number item, which is selected (-1 to unselect
  * everything).
  */
@@ -2183,7 +2216,6 @@ void collection_end_lasso(Collection *collection, GdkFunction fn)
 	}
 
 	abort_lasso(collection);
-
 }
 
 /* Unblock the selection_changed signal, emitting the signal if the
