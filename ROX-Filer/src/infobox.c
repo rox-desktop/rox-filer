@@ -74,6 +74,8 @@ void infobox_new(guchar *path)
 	
 	g_return_if_fail(path != NULL);
 
+	path = g_strdup(path);	/* Gets attached to window & freed later */
+
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
@@ -104,8 +106,7 @@ void infobox_new(guchar *path)
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
 
 	gtk_object_set_data(GTK_OBJECT(window), "details", details);
-	gtk_object_set_data_full(GTK_OBJECT(window), "path", g_strdup(path),
-			g_free);
+	gtk_object_set_data_full(GTK_OBJECT(window), "path", path, g_free);
 
 	gtk_widget_show_all(window);
 }
