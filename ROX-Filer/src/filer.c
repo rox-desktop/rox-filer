@@ -24,25 +24,32 @@
 #include "menu.h"
 
 static int number_of_windows = 0;
+static FilerWindow *window_with_selection = NULL;
 
 /* Static prototypes */
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
 static gboolean idle_scan_dir(gpointer data);
 static void draw_item(GtkWidget *widget,
-			gpointer data,
-			gboolean selected,
+			CollectionItem *item,
 			GdkRectangle *area);
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
 static void scan_dir(FilerWindow *filer_window);
 static void add_item(FilerWindow *filer_window, char *leafname);
+static gboolean test_point(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height);
 
 
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
+	if (window_with_selection == filer_window)
+		window_with_selection = NULL;
+
 	if (filer_window->dir)
 	{
 		closedir(filer_window->dir);
@@ -68,6 +75,9 @@ static gboolean idle_scan_dir(gpointer data)
 		{
 			closedir(filer_window->dir);
 			filer_window->dir = NULL;
+
+			collection_qsort(filer_window->collection,
+					sort_by_name);
 			return FALSE;		/* Finished */
 		}
 
@@ -84,7 +94,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	int		item_width;
 	struct stat	info;
 	int		base_type;
-	char		*path;
+	GString		*path;
 
 	/* Ignore dot files (should be an option) */
 	if (leafname[0] == '.')
@@ -94,8 +104,8 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	item->leafname = g_strdup(leafname);
 	item->flags = 0;
 
-	path = make_path(filer_window->path, leafname)->str;
-	if (lstat(path, &info))
+	path = make_path(filer_window->path, leafname);
+	if (lstat(path->str, &info))
 		base_type = TYPE_ERROR;
 	else
 	{
@@ -113,7 +123,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			base_type = TYPE_SOCKET;
 		else if (S_ISLNK(info.st_mode))
 		{
-			if (stat(path, &info))
+			if (stat(path->str, &info))
 			{
 				base_type = TYPE_ERROR;
 			}
@@ -141,6 +151,17 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			base_type = TYPE_UNKNOWN;
 	}
 
+	if (base_type == TYPE_DIRECTORY)
+	{
+		/* Might be an application directory - better check... */
+		path = g_string_append(path, "/AppInfo");
+		if (!stat(path->str, &info))
+		{
+			base_type = TYPE_APPDIR;
+		}
+	}
+	item->base_type = base_type;
+
 	item->text_width = gdk_string_width(filer_window->window->style->font,
 			leafname);
 	item->image = default_pixmap + base_type;
@@ -158,27 +179,40 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	collection_insert(filer_window->collection, item);
 }
 
+static gboolean test_point(Collection *collection,
+				int point_x, int point_y,
+				CollectionItem *item,
+				int width, int height)
+{
+	FileItem	*fileitem = (FileItem *) item->data;
+	GdkFont		*font = GTK_WIDGET(collection)->style->font;
+	int		text_height = font->ascent + font->descent;
+	int		x_off = ABS(point_x - (width >> 1));
+	
+	if (x_off <= (fileitem->pix_width >> 1) + 2 &&
+		point_y < height - text_height - 2 &&
+		point_y > 6)
+		return TRUE;
+	
+	if (x_off <= (fileitem->text_width >> 1) + 2 &&
+		point_y > height - text_height - 2)
+		return TRUE;
+
+	return FALSE;
+}
+
 static void draw_item(GtkWidget *widget,
-			gpointer data,
-			gboolean selected,
+			CollectionItem *colitem,
 			GdkRectangle *area)
 {
-	FileItem	*item = (FileItem *) data;
-	GdkGC		*gc = selected ? widget->style->white_gc
-				       : widget->style->black_gc;
+	FileItem	*item = (FileItem *) colitem->data;
+	GdkGC		*gc = colitem->selected ? widget->style->white_gc
+				       		: widget->style->black_gc;
 	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
 	GdkFont	*font = widget->style->font;
 	int	text_x = area->x + ((area->width - item->text_width) >> 1);
 	int	text_y = area->y + area->height - font->descent - 2;
 	int	text_height = font->ascent + font->descent;
-
-	/*
-	gdk_draw_rectangle(widget->window,
-			widget->style->black_gc,
-			FALSE,
-			area->x, area->y,
-			area->width - 1, area->height - 1);
-	*/
 
 	if (item->image)
 	{
@@ -205,7 +239,7 @@ static void draw_item(GtkWidget *widget,
 		gdk_gc_set_clip_origin(gc, 0, 0);
 	}
 	
-	if (selected)
+	if (colitem->selected)
 		gtk_paint_flat_box(widget->style, widget->window, 
 				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
 				NULL, widget, "text",
@@ -215,8 +249,8 @@ static void draw_item(GtkWidget *widget,
 
 	gdk_draw_text(widget->window,
 			widget->style->font,
-			selected ? widget->style->white_gc
-				 : widget->style->black_gc,
+			colitem->selected ? widget->style->white_gc
+					  : widget->style->black_gc,
 			text_x, text_y,
 			item->leafname, strlen(item->leafname));
 }
@@ -225,6 +259,32 @@ void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data)
 {
 	show_filer_menu((FilerWindow *) user_data, event);
+}
+
+static void scan_dir(FilerWindow *filer_window)
+{
+	g_return_if_fail(filer_window->dir == NULL);	/* XXX */
+	
+	filer_window->dir = opendir(filer_window->path);
+	if (!filer_window->dir)
+	{
+		report_error("Error scanning directory:", g_strerror(errno));
+		return;
+	}
+
+	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
+}
+
+static void gain_selection(Collection 	*collection,
+			   gint		number_selected,
+			   gpointer 	user_data)
+{
+	FilerWindow *filer_window = (FilerWindow *) user_data;
+
+	if (window_with_selection && window_with_selection != filer_window)
+		collection_clear_selection(window_with_selection->collection);
+	
+	window_with_selection = filer_window;
 }
 
 static int sort_by_name(const void *item1, const void *item2)
@@ -240,7 +300,9 @@ void open_item(Collection *collection,
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
 	FileItem	*item = (FileItem *) item_data;
 
-	filer_opendir(make_path(filer_window->path, item->leafname)->str);
+	if (item->base_type == TYPE_DIRECTORY)
+		filer_opendir(make_path(filer_window->path,
+					item->leafname)->str);
 }
 
 void filer_opendir(char *path)
@@ -255,7 +317,7 @@ void filer_opendir(char *path)
 	collection = collection_new(NULL);
 	filer_window->collection = COLLECTION(collection);
 	collection_set_functions(filer_window->collection,
-			draw_item, NULL);
+			draw_item, test_point);
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
@@ -277,6 +339,8 @@ void filer_opendir(char *path)
 			filer_window_destroyed, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "show_menu",
 			show_menu, filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
+			gain_selection, filer_window);
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
@@ -284,20 +348,4 @@ void filer_opendir(char *path)
 	load_default_pixmaps(collection->window);
 
 	scan_dir(filer_window);
-
-	collection_qsort(filer_window->collection, sort_by_name);
-}
-
-static void scan_dir(FilerWindow *filer_window)
-{
-	g_return_if_fail(filer_window->dir == NULL);	/* XXX */
-	
-	filer_window->dir = opendir(filer_window->path);
-	if (!filer_window->dir)
-	{
-		report_error("Error scanning directory:", g_strerror(errno));
-		return;
-	}
-
-	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
 }

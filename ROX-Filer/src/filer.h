@@ -33,10 +33,13 @@ struct _FilerWindow
 struct _FileItem
 {
 	char		*leafname;
+	
+	int		base_type;	/* (regular file, dir, pipe, etc) */
+	int		flags;
+	
 	int		text_width;
 	int		pix_width;
 	MaskedPixmap	*image;
-	int		flags;
 };
 
 void filer_opendir(char *path);
