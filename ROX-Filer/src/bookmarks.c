@@ -493,7 +493,8 @@ static void reorder(GtkTreeView *view, int dir)
 	GtkListStore *list;
 	GtkTreePath *cursor = NULL;
 	GtkTreeIter iter, old, new;
-	GValue value = {0};
+	GValue mark = {0};
+	GValue title = {0};
 	gboolean    ok;
 
 	g_return_if_fail(view != NULL);
@@ -529,15 +530,18 @@ static void reorder(GtkTreeView *view, int dir)
 		return;
 	}
 
-	gtk_tree_model_get_value(model, &old, 0, &value);
+	gtk_tree_model_get_value(model, &old, 0, &mark);
+	gtk_tree_model_get_value(model, &old, 1, &title);
 	if (dir > 0)
 		gtk_list_store_insert_after(list, &new, &iter);
 	else
 		gtk_list_store_insert_before(list, &new, &iter);
-	gtk_list_store_set(list, &new, 0, g_value_get_string(&value), -1);
+	gtk_list_store_set(list, &new, 0, g_value_get_string(&mark), -1);
+	gtk_list_store_set(list, &new, 1, g_value_get_string(&title), -1);
 	gtk_list_store_remove(list, &old);
 
-	g_value_unset(&value);
+	g_value_unset(&mark);
+	g_value_unset(&title);
 
 	gtk_tree_view_set_cursor(view, cursor, 0, FALSE);
 	gtk_tree_path_free(cursor);
