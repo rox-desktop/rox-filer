@@ -819,6 +819,8 @@ static xmlNodePtr rpc_Copy(GList *args)
 
 	if (from)
 		action_copy(from, to, leaf, quiet);
+	else
+		g_warning("No files in SOAP request list");
 
 	destroy_glist(&from);
 	g_free(to);
@@ -841,6 +843,8 @@ static xmlNodePtr rpc_Move(GList *args)
 
 	if (from)
 		action_move(from, to, leaf, quiet);
+	else
+		g_warning("No files in SOAP request list");
 
 	destroy_glist(&from);
 	g_free(to);
@@ -861,6 +865,8 @@ static xmlNodePtr rpc_Link(GList *args)
 
 	if (from)
 		action_link(from, to, leaf);
+	else
+		g_warning("No files in SOAP request list");
 
 	destroy_glist(&from);
 	g_free(to);
