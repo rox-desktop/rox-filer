@@ -819,6 +819,30 @@ void filer_open_parent(FilerWindow *filer_window)
 	g_free(copy);
 }
 
+/* Returns a list containing the full pathname of every selected item.
+ * You must g_free() each item in the list.
+ */
+GList *filer_selected_items(FilerWindow *filer_window)
+{
+	Collection	*collection = filer_window->collection;
+	GList		*retval = NULL;
+	guchar		*dir = filer_window->path;
+	int		i;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		if (collection->items[i].selected)
+		{
+			DirItem	*item = (DirItem *) collection->items[i].data;
+
+			retval = g_list_prepend(retval,
+				g_strdup(make_path(dir, item->leafname)->str));
+		}
+	}
+
+	return g_list_reverse(retval);
+}
+
 int selected_item_number(Collection *collection)
 {
 	int	i;

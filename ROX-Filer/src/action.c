@@ -125,7 +125,7 @@ static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
 static void add_toggle(GUIside *gui_side, guchar *label, guchar *code);
 static gboolean reply(int fd, gboolean ignore_quiet);
-static gboolean remove_pinned_ok(FilerWindow *filer_window);
+static gboolean remove_pinned_ok(GList *paths);
 
 /*			SUPPORT				*/
 
@@ -1618,30 +1618,38 @@ static void mount_cb(gpointer data)
 }
 #endif
 
+static guchar *dirname(guchar *path)
+{
+	guchar	*slash;
+
+	slash = strrchr(path, '/');
+	g_return_val_if_fail(slash != NULL, g_strdup(path));
+
+	if (slash != path)
+		return g_strndup(path, slash - path);
+	return g_strdup("/");
+}
+
 static void delete_cb(gpointer data)
 {
-	FilerWindow *filer_window = (FilerWindow *) data;
-	Collection *collection = filer_window->collection;
-	DirItem   *item;
-	int	left = collection->number_selected;
-	int	i = -1;
+	GList	*paths = (GList *) data;
 
-	send_dir(filer_window->path);
-
-	while (left > 0)
+	while (paths)
 	{
-		i++;
-		if (!collection->items[i].selected)
-			continue;
-		item = (DirItem *) collection->items[i].data;
-		if (do_delete(make_path(filer_window->path,
-						item->leafname)->str,
-						filer_window->path))
+		guchar	*path = (guchar *) paths->data;
+		guchar	*dir;
+		
+		dir = dirname(path);
+		send_dir(dir);
+
+		if (do_delete(path, dir))
 		{
-			g_string_sprintf(message, "+%s", filer_window->path);
+			g_string_sprintf(message, "+%s", dir);
 			send();
 		}
-		left--;
+
+		g_free(dir);
+		paths = paths->next;
 	}
 	
 	g_string_sprintf(message, _("'\nDone\n"));
@@ -1882,21 +1890,14 @@ void action_mount(GList	*paths)
 void action_delete(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
-	Collection 	*collection;
+	GList		*paths;
 
-	collection = filer_window->collection;
+	paths = filer_selected_items(filer_window);
 
-	if (collection->number_selected < 1)
-	{
-		report_error(PROJECT,
-				_("You need to select some items to delete"));
-		return;
-	}
+	if (!remove_pinned_ok(paths))
+		goto out;
 
-	if (!remove_pinned_ok(filer_window))
-		return;
-
-	gui_side = start_action(filer_window, delete_cb,
+	gui_side = start_action(paths, delete_cb,
 					option_get_int("action_delete"));
 	if (!gui_side)
 		return;
@@ -1911,6 +1912,10 @@ void action_delete(FilerWindow *filer_window)
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
+
+out:
+	g_list_foreach(paths, (GFunc) g_free, NULL);
+	g_list_free(paths);
 }
 
 /* Change the permissions of the selected items */
@@ -2053,32 +2058,25 @@ void action_init(void)
  *
  * TRUE if it's OK to lose them.
  */
-static gboolean remove_pinned_ok(FilerWindow *filer_window)
+static gboolean remove_pinned_ok(GList *paths)
 {
-	Collection 	*collection = filer_window->collection;
-	int		i;
 	GList		*ask = NULL, *next;
 	GString		*message;
-	int		ask_n = 0;
+	int		i, ask_n = 0;
 	gboolean	retval;
 
-	for (i = 0; i < collection->number_of_items; i++)
+	while (paths)
 	{
-		DirItem	*item;
-		guchar	*path;
+		guchar	*path = (guchar *) paths->data;
 		
-		if (!collection->items[i].selected)
-			continue;
-
-		item = (DirItem *) collection->items[i].data;
-		path = make_path(filer_window->path, item->leafname)->str;
-
 		if (icons_require(path))
 		{
 			if (++ask_n > MAX_ASK)
 				break;
-			ask = g_list_append(ask, item->leafname);
+			ask = g_list_append(ask, path);
 		}
+
+		paths = paths->next;
 	}
 
 	if (!ask)
@@ -2097,7 +2095,14 @@ static gboolean remove_pinned_ok(FilerWindow *filer_window)
 	i = 0;
 	for (next = ask; next; next = next->next)
 	{
-		guchar	*leaf = (guchar *) next->data;
+		guchar	*path = (guchar *) next->data;
+		guchar	*leaf;
+
+		leaf = strrchr(path, '/');
+		if (leaf)
+			leaf++;
+		else
+			leaf = path;
 		
 		g_string_append_c(message, '`');
 		g_string_append(message, leaf);

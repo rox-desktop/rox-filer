@@ -97,5 +97,6 @@ void filer_target_mode(FilerWindow	*filer_window,
 			gpointer	data,
 			char		*reason);
 void filer_window_autosize(FilerWindow *filer_window);
+GList *filer_selected_items(FilerWindow *filer_window);
 
 #endif /* _FILER_H */
