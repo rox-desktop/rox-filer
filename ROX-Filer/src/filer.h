@@ -122,6 +122,5 @@ void filer_add_tip_details(FilerWindow *filer_window,
 void filer_lost_selection(FilerWindow *filer_window, gint time);
 void filer_lost_primary(FilerWindow *filer_window);
 void filer_selection_changed(FilerWindow *filer_window, gint time);
-void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
 
 #endif /* _FILER_H */

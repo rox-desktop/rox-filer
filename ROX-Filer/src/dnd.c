@@ -130,6 +130,7 @@ typedef enum {
 	MENU_LINK,
 	MENU_SET_ICON,
 } MenuActionType;
+
 #undef N_
 #define N_(x) x
 static GtkItemFactoryEntry menu_def[] = {

@@ -43,6 +43,7 @@
 
 #include "display.h"	/* XXX */
 #include "filer.h"	/* XXX */
+#include "menu.h"	/* XXX */
 
 #define MIN_ITEM_WIDTH 64
 
