@@ -141,6 +141,9 @@ static gboolean enter_icon(GtkWidget *widget,
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      PanelIcon *pi);
+static gint panel_leave_event(GtkWidget *widget,
+			      GdkEventCrossing *event,
+			      Panel *panel);
 static gint panel_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      Panel *panel);
@@ -224,8 +227,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_events(panel->window,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
-			GDK_BUTTON2_MOTION_MASK);
+			GDK_POINTER_MOTION_MASK | GDK_LEAVE_NOTIFY_MASK);
 
 	g_signal_connect(panel->window, "delete-event",
 			G_CALLBACK(panel_delete), panel);
@@ -237,6 +239,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 			G_CALLBACK(panel_button_release), panel);
 	g_signal_connect(panel->window, "motion-notify-event",
 			G_CALLBACK(panel_motion_event), panel);
+	g_signal_connect(panel->window, "leave-notify-event",
+			G_CALLBACK(panel_leave_event), panel);
 
 	if (strchr(name, '/'))
 		load_path = g_strdup(name);
@@ -346,8 +350,32 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	g_signal_connect(panel->window, "size-allocate",
 			G_CALLBACK(reposition_panel), panel);
 
+	/* Stop windows from maximising over us completely, so that the
+	 * auto-raise stuff works...
+	 */
+	{
+		guint32	wm_strut[] = {0, 0, 0, 0};
+
+		if (panel->side == PANEL_LEFT)
+			wm_strut[0] = 2;
+		else if (panel->side == PANEL_RIGHT)
+			wm_strut[1] = 2;
+		else if (panel->side == PANEL_TOP)
+			wm_strut[2] = 2;
+		else
+			wm_strut[3] = 2;
+
+		gdk_property_change(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT", FALSE),
+				gdk_atom_intern("CARDINAL", FALSE),
+				32, GDK_PROP_MODE_REPLACE,
+				(gchar *) &wm_strut, 4);
+	}
+
 	number_of_windows++;
+	gdk_window_lower(panel->window->window);
 	gtk_widget_show(panel->window);
+	gdk_window_lower(panel->window->window);
 
 	return panel;
 }
@@ -1070,12 +1098,34 @@ static gboolean enter_icon(GtkWidget *widget,
 	return FALSE;
 }
 
+static gint panel_leave_event(GtkWidget *widget,
+			      GdkEventCrossing *event,
+			      Panel *panel)
+{
+	gdk_window_lower(panel->window->window);
+
+	return 0;
+}
+
 static gint panel_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      Panel *panel)
 {
 	gint	delta, new;
+	gboolean raise;
 	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
+
+	if (panel->side == PANEL_TOP)
+		raise = event->y == 0;
+	else if (panel->side == PANEL_BOTTOM)
+		raise = event->y == panel->window->allocation.height - 1;
+	else if (panel->side == PANEL_LEFT)
+		raise = event->x == 0;
+	else
+		raise = event->x == panel->window->allocation.width - 1;
+
+	if (raise)
+		gdk_window_raise(panel->window->window);
 
 	if (motion_state != MOTION_REPOSITION)
 		return FALSE;
