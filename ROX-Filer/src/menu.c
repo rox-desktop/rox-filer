@@ -937,13 +937,6 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 /* g_free() the result */
 guchar *pretty_type(DirItem *file, guchar *path)
 {
-	if (file->mime_type)
-		return g_strconcat(file->mime_type->media_type, "/",
-				file->mime_type->subtype, NULL);
-
-	if (file->flags & ITEM_FLAG_APPDIR)
-		return g_strdup(_("ROX application"));
-
 	if (file->flags & ITEM_FLAG_SYMLINK)
 	{
 		char	p[MAXPATHLEN + 1];
@@ -958,6 +951,12 @@ guchar *pretty_type(DirItem *file, guchar *path)
 		return g_strdup(_("Symbolic link"));
 	}
 
+	if (file->flags & ITEM_FLAG_EXEC_FILE)
+		return g_strdup(_("Executable file"));
+
+	if (file->flags & ITEM_FLAG_APPDIR)
+		return g_strdup(_("ROX application"));
+
 	if (file->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MountPoint *mp;
@@ -968,6 +967,10 @@ guchar *pretty_type(DirItem *file, guchar *path)
 
 		return g_strdup(_("Mount point"));
 	}
+
+	if (file->mime_type)
+		return g_strconcat(file->mime_type->media_type, "/",
+				file->mime_type->subtype, NULL);
 
 	return g_strdup("-");
 }

@@ -98,10 +98,11 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			mini_type == MINI_RUN_ACTION ? "Run Action:" :
 			"?");
 
+	collection = filer_window->collection;
+	collection_move_cursor(collection, 0, 0);  /* Turn the cursor on */
 	switch (mini_type)
 	{
 		case MINI_PATH:
-			collection = filer_window->collection;
 			filer_window->mini_cursor_base =
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,

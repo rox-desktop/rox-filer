@@ -76,8 +76,9 @@ struct _Collection
 	gboolean	may_drag;	/* Tried to drag since first press? */
 
 	CollectionItem	*items;
-	gint		cursor_item;	/* -1 if not shown */
-	gint		wink_item;	/* -1 if not active */
+	gint		cursor_item;		/* -1 if not shown */
+	gint		cursor_item_old;	/* May be -1 */
+	gint		wink_item;		/* -1 if not active */
 	gint		wink_timeout;
 	guint		columns;
 	gint		number_of_items;	/* (often compared with -1) */

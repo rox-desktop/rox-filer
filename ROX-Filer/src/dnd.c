@@ -380,7 +380,7 @@ void drag_selection(Collection 		*collection,
 
 		target_list = gtk_target_list_new(target_table, 1);
 	}
-	else if (item && item->mime_type)
+	else if (item && item->base_type == TYPE_FILE)
 	{
 		MIME_type *t = item->mime_type;
 		

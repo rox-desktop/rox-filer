@@ -333,6 +333,7 @@ static void collection_init(Collection *object)
 
 	object->items = g_malloc(sizeof(CollectionItem) * MINIMUM_ITEMS);
 	object->cursor_item = -1;
+	object->cursor_item_old = -1;
 	object->wink_item = -1;
 	object->array_size = MINIMUM_ITEMS;
 	object->draw_item = default_draw_item;
@@ -986,7 +987,10 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 			break;
 		case GDK_Escape:
 			if (!collection->target_cb)
+			{
+				collection_set_cursor_item(collection, -1);
 				return FALSE;		/* Pass it on */
+			}
 			collection_target(collection, NULL, NULL);
 			break;
 		case ' ':
@@ -1653,6 +1657,7 @@ void collection_clear(Collection *collection)
 
 	collection_set_cursor_item(collection,
 			collection->cursor_item == -1 ? -1: 0);
+	collection->cursor_item_old = -1;
 	prev_selected = collection->number_selected;
 	collection->number_of_items = collection->number_selected = 0;
 
@@ -2053,6 +2058,8 @@ void collection_set_cursor_item(Collection *collection, gint item)
 		collection_draw_item(collection, item, TRUE);
 		scroll_to_show(collection, item);
 	}
+	else if (old_item != -1)
+		collection->cursor_item_old = old_item;
 }
 
 /* Briefly highlight an item to draw the user's attention to it.
@@ -2071,7 +2078,7 @@ void collection_wink_item(Collection *collection, gint item)
 	if (item == -1)
 		return;
 
-	collection->wink_item = item;
+	collection->cursor_item_old = collection->wink_item = item;
 	collection->wink_timeout = gtk_timeout_add(300,
 					   (GtkFunction) cancel_wink_timeout,
 					   collection);
@@ -2167,7 +2174,9 @@ void collection_target(Collection *collection,
 				FALSE);
 }
 
-/* Move the cursor by the given row and column offsets. */
+/* Move the cursor by the given row and column offsets.
+ * Moving by (0,0) can be used to simply make the cursor appear.
+ */
 void collection_move_cursor(Collection *collection, int drow, int dcol)
 {
 	int	row, col, item;
@@ -2179,6 +2188,12 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	get_visible_limits(collection, &first, &last);
 
 	item = collection->cursor_item;
+	if (item == -1)
+	{
+		item = MIN(collection->cursor_item_old,
+			   collection->number_of_items - 1);
+	}
+
 	if (item == -1)
 	{
 		col = 0;
@@ -2218,4 +2233,3 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	if (item >= 0 && item < collection->number_of_items)
 		collection_set_cursor_item(collection, item);
 }
-

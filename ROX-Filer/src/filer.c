@@ -1165,7 +1165,9 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				{
 					message = g_string_new(NULL);
 					g_string_sprintf(message,
-		_("No open action specified for files of this type (%s/%s)"),
+		_("No run action specified for files of this type (%s/%s) - "
+		"you can set a run action using by choosing `Set Run Action' "
+		"from the Window menu"),
 						type->media_type,
 						type->subtype);
 					report_error(PROJECT, message->str);

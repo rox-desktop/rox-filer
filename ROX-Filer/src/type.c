@@ -53,7 +53,14 @@ static GHashTable *extension_hash = NULL;
 static char *current_type = NULL;	/* (used while reading file) */
 
 /* Most things on Unix are text files, so this is the default type */
-MIME_type text_plain = {"text", "plain", NULL};
+MIME_type text_plain 		= {"text", "plain", NULL};
+
+MIME_type special_directory 	= {"special", "directory", NULL};
+MIME_type special_pipe 		= {"special", "pipe", NULL};
+MIME_type special_socket 	= {"special", "socket", NULL};
+MIME_type special_block_dev 	= {"special", "block-device", NULL};
+MIME_type special_char_dev 	= {"special", "char-device", NULL};
+MIME_type special_unknown 	= {"special", "unknown", NULL};
 
 void type_init()
 {
@@ -341,8 +348,9 @@ GdkAtom type_to_atom(MIME_type *type)
  */
 char *type_ask_which_action(guchar *media_type, guchar *subtype)
 {
-	int	r;
-	guchar	*tmp, *type_name, *path;
+	int		r;
+	guchar		*tmp, *type_name, *path;
+	struct stat 	info;
 
 	g_return_val_if_fail(media_type != NULL, NULL);
 	g_return_val_if_fail(subtype != NULL, NULL);
@@ -374,8 +382,18 @@ char *type_ask_which_action(guchar *media_type, guchar *subtype)
 	else
 		return NULL;
 
-	if (access(path, F_OK) == 0)
+	if (lstat(path, &info) == 0)
 	{
+		/* A binding already exists... */
+		if (S_ISREG(info.st_mode) && info.st_size > 256)
+		{
+			if (get_choice(PROJECT,
+				_("A run action already exists and is quite "
+				"a big program - are you sure you want to "
+				"delete it?"), 2, "Delete", "Cancel") != 0)
+				return NULL;
+		}
+		
 		if (unlink(path))
 		{
 			tmp = g_strdup_printf( _("Can't remove %s: %s"),
@@ -387,4 +405,22 @@ char *type_ask_which_action(guchar *media_type, guchar *subtype)
 	}
 
 	return path;
+}
+
+MIME_type *mime_type_from_base_type(int base_type)
+{
+	switch (base_type)
+	{
+		case TYPE_DIRECTORY:
+			return &special_directory;
+		case TYPE_PIPE:
+			return &special_pipe;
+		case TYPE_SOCKET:
+			return &special_socket;
+		case TYPE_BLOCK_DEVICE:
+			return &special_block_dev;
+		case TYPE_CHAR_DEVICE:
+			return &special_char_dev;
+	}
+	return &special_unknown;
 }

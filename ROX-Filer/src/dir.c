@@ -457,6 +457,9 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	else
 		new.image = default_pixmap[new.base_type];
 
+	if (!new.mime_type)
+		new.mime_type = mime_type_from_base_type(new.base_type);
+
 	for (i = 0; i < array->len; i++)
 	{
 		item = (DirItem *) array->pdata[i];
