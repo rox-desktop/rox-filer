@@ -2,7 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
-18-Sep-2000
+20-Sep-2000
+~~~~~~~~~~~
+Added a man-page (Andy Piper).
+Changed `install.sh' from bash to sh (Bernard Jungen).
+
+18-Sep-2000 (Release 0.1.28)
 ~~~~~~~~~~~
 Bugfix: menu entries on the pinboard menu weren't being shaded and
 	unshaded correctly.
@@ -560,4 +565,15 @@ Added Bernard Jungen's patch:
 - Errors in options are only reported once.
 - File does chdir() if -b isn't possible (prevents getting the full path
   in the file(1) says... box).
+
+
+Before the Changes file
+~~~~~~~~~~~~~~~~~~~~~~~
+The following people added code before I started keeping this log:
+
+Jens Askengren		GNOME-style toolbar
+Bernard Jungen		lots of patches all over the place!
+Christiansen Merel	initial support for ImLib
+Chris Sawer		leafname field in the Info box
+Simon Truss		support for mount points on NetBSD
 

@@ -26,12 +26,13 @@ chdir "rox-$a.$b.$c";
 
 system "cvs -d:pserver:anonymous\@cvs.rox.sourceforge.net:/cvsroot/rox export -r Release-$a-$b-$c rox";
 
-system "mv rox/* .";
-rmdir "rox";
-
 system "cd rox/ROX-Filer/src; autoconf";
 system "cp ~/Apps/ROX-Filer/Help/Manual.ps rox/ROX-Filer/Help";
 system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
+
+system "mv rox/* .";
+rmdir "rox";
+
 chdir "..";
 system "tar czf rox-$a.$b.$c.tgz rox-$a.$b.$c";
 system "rm -r rox-$a.$b.$c";

@@ -1,25 +1,25 @@
-#!/usr/bin/env bash
+#!/bin/sh
 
 if [ -n "$CHOICESPATH" ]; then
 	CHOICESPATH=${HOME}/Choices:/usr/local/share/Choices:/usr/share/Choices
 fi
 
-function die () {
+die() {
 	echo "$*" >&2
 	echo "Aborting..." >&2
 	exit 1
 }
 
 # Create the directory if it doesn't exist. Exit if it can't be created.
-function endir () {
+endir() {
 	if [ ! -d "$1" ]; then
 		mkdir "$1" || die "Can't create $1 directory!"
 	fi
 }
 
-function confirm_or_die () {
+confirm_or_die() {
 	while [ 1 -eq 1 ]; do
-		echo -n "[yes/no] >>> "
+		echo -e "[yes/no] >>> \c"
 		read CONFIRM
 		case $CONFIRM in
 			[yY]*) return;;
@@ -29,9 +29,9 @@ function confirm_or_die () {
 }
 
 # Installs a file in Choices if it isn't there already.
-function install_if_missing () {
+install_if_missing() {
 	dest="$CHOICES/$1"
-	if [ -e "$CHOICES/$1" ]; then
+	if [ -f "$CHOICES/$1" ]; then
 		echo "'$dest' already exists - skipping..."
 	else
 		echo "Installing '$dest'"
@@ -78,7 +78,7 @@ if you have root access; otherwise option (2) is best.
 
 Enter 1, 2, 3 or a path (starting with /):
 EOF
-echo -n ">>> "
+echo -e ">>> \c"
 
 read REPLY
 echo
@@ -139,7 +139,7 @@ Normally, you should choose (1) if you have root access, or (2) if not.
 
 Enter 1, 2, 3, 4 or a path (starting with /):
 EOF
-echo -n ">>> "
+echo -e ">>> \c"
 
 read REPLY
 echo
@@ -157,7 +157,7 @@ if [ -n "$APPDIR" ]; then
 	endir "$APPDIR"
 
 	(cd ROX-Filer/src; make clean) > /dev/null
-	if [ -e "$APPDIR/ROX-Filer" ]; then
+	if [ -f "$APPDIR/ROX-Filer" ]; then
 		echo "ROX-Filer is already installed - delete the existing"
 		echo "copy?"
 		confirm_or_die
@@ -188,7 +188,7 @@ the filer?
 Enter 1, 2, 3, 4 or a path (starting with /):
 EOF
 
-echo -n ">>> "
+echo -e ">>> \c"
 read REPLY
 echo
 
