@@ -431,11 +431,11 @@ void draw_large_icon(GtkWidget *widget,
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
 		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
 				0, 0,		/* Source x,y */
-				image_x, area->y + 8,	/* Dest x,y */
+				image_x, area->y + 2,	/* Dest x,y */
 				-1, -1);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
@@ -444,11 +444,11 @@ void draw_large_icon(GtkWidget *widget,
 					? im_mounted
 					: im_unmounted;
 
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
 		gdk_gc_set_clip_mask(gc, mp->mask);
 		gdk_draw_pixmap(widget->window, gc, mp->pixmap,
 				0, 0,		/* Source x,y */
-				image_x, area->y + 8, /* Dest x,y */
+				image_x, area->y + 2, /* Dest x,y */
 				-1, -1);
 	}
 	

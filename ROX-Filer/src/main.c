@@ -392,6 +392,23 @@ int main(int argc, char **argv)
 	gui_support_init();
 	if (remote_init(to_open, new_copy))
 		return EXIT_SUCCESS;	/* Already running */
+
+	/* Put ourselves into the background (so 'rox' always works the
+	 * same, whether we're already running or not).
+	 * Not for -n, though (helps when debugging).
+	 */
+	if (!new_copy)
+	{
+		pid_t child;
+
+		child = fork();
+		if (child > 0)
+			_exit(0);	/* Parent exits */
+		/* Otherwise we're the child (or an error occurred - ignore
+		 * it!).
+		 */
+	}
+	
 	pixmaps_init();
 
 	dnd_init();
