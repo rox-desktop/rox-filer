@@ -928,16 +928,32 @@ static void group_save(FilerWindow *filer_window, char *name)
 			NULL, "group", NULL);
 	xmlSetProp(group, "name", name);
 
+#ifdef GTK2
 	xmlNewChild(group, NULL, "directory", filer_window->path);
+#else
+	{
+		gchar *u8_path;
+		u8_path = to_utf8(filer_window->path);
+		xmlNewChild(group, NULL, "directory", u8_path);
+		g_free(u8_path);
+	}
+#endif
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
 		DirItem *item = (DirItem *) collection->items[i].data;
+		gchar	*u8_leaf = item->leafname;
 		
 		if (!collection->items[i].selected)
 			continue;
 
-		xmlNewChild(group, NULL, "item", item->leafname);
+#ifdef GTK2
+		xmlNewChild(group, NULL, "item", u8_leaf);
+#else
+		u8_leaf = to_utf8(u8_leaf);
+		xmlNewChild(group, NULL, "item", u8_leaf);
+		g_free(u8_leaf);
+#endif
 	}
 
 	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
@@ -972,6 +988,14 @@ static void group_restore(FilerWindow *filer_window, char *name)
 	path = xmlNodeListGetString(groups->doc, node->xmlChildrenNode, 1);
 	g_return_if_fail(path != NULL);
 
+#ifndef GTK2
+	{
+		gchar *old = path;
+		path = from_utf8(old);
+		g_free(old);
+	}
+#endif
+
 	if (strcmp(path, filer_window->path) != 0)
 		filer_change_to(filer_window, path, NULL);
 	g_free(path);
@@ -999,7 +1023,15 @@ static void group_restore(FilerWindow *filer_window, char *name)
 		if (!leaf)
 			g_warning("Missing leafname!\n");
 		else
+		{
+#ifdef GTK2
 			g_hash_table_insert(in_group, leaf, filer_window);
+#else
+			g_hash_table_insert(in_group, from_utf8(leaf),
+								filer_window);
+			g_free(leaf);
+#endif
+		}
 	}
 	
 	for (j = 0; j < n; j++)

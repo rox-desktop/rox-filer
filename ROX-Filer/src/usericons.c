@@ -134,6 +134,7 @@ void read_globicons()
 				g_free(loc_match);
 				loc_icon = from_utf8(icon_path);
 				g_hash_table_insert(glob_icons, path, loc_icon);
+				g_free(icon_path);
 			}
 #else
 			path = icon_convert_path(match);
@@ -387,6 +388,9 @@ static void write_globicon(gpointer key, gpointer value, gpointer data)
 	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
 	xmlSetProp(tree, "match", u8_path);
 	xmlNewChild(tree, NULL, "icon", u8_icon);
+
+	g_free(u8_path);
+	g_free(u8_icon);
 #else
 	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
 	xmlSetProp(tree, "match", key);
