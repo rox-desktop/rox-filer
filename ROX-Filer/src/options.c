@@ -25,8 +25,8 @@
  *
  * On startup:
  *
- * - The <Choices>/PROJECT/Options file is read in. Each line
- *   is a name/value pair, and these are stored in the 'loading' hash table.
+ * - The <Choices>/PROJECT/Options file is read in, which contains a list of
+ *   name/value pairs, and these are stored in the 'loading' hash table.
  *
  * - Each part of the filer then calls option_add_int(), or a related function,
  *   supplying the name for each option and a default value. Once an option is
