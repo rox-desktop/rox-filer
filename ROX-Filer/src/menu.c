@@ -148,7 +148,7 @@ static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 #endif
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
-static GtkWidget        *filer_new_file;        /* The New File item */
+static GtkWidget        *filer_new_menu;        /* The New submenu */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -217,8 +217,9 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Select All"),	    	NULL, select_all, 0, NULL},
 {N_("Clear Selection"),		NULL, clear_selection, 0, NULL},
 {N_("Options..."),		NULL, menu_show_options, 0, NULL},
-{N_("New Directory..."),	NULL, new_directory, 0, NULL},
-{N_("New File"),		NULL, NULL, 0, NULL},
+{N_("New"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Directory"),		NULL, new_directory, 0, NULL},
+{">" N_("Blank file"),		NULL, new_file, 0, NULL},
 {N_("Xterm Here"),		NULL, xterm_here, 0, NULL},
 {N_("Window"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
@@ -297,7 +298,8 @@ void menu_init(void)
 			"Display", "Large, With...");
 	GET_SSMENU_ITEM(display_small_menu, "filer",
 			"Display", "Small, With...");
-	GET_SMENU_ITEM(filer_new_file, "filer", "New File");
+
+	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
 
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
@@ -440,23 +442,31 @@ void show_style_menu(FilerWindow *filer_window,
 			(gpointer) pos, event->button, event->time);
 }
 
-/* Scan the templates dir and return a menu of entries */
-static GtkWidget *get_new_files_menu(void)
+/* Scan the templates dir and create entries for the New menu */
+static void update_new_files_menu(void)
 {
+	static GList *widgets = NULL;
+
 	gchar	*templ_dname = NULL;
-	GtkWidget *menu;
 	GtkWidget *item;
 	DirItem ditem;
 	DIR	*dir;
 	struct dirent *ent;
 
-	menu = gtk_menu_new();
+	if (widgets)
+	{
+		GList	*next;
+		
+		for (next = widgets; next; next = next->next)
+		{
+			GtkWidget *w = (GtkWidget *) next->data;
 
-	item = gtk_menu_item_new_with_label(_("Empty file"));
-	gtk_signal_connect(GTK_OBJECT(item), "activate",
-			GTK_SIGNAL_FUNC(new_file), NULL);
+			gtk_widget_destroy(w);
+		}
 
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		g_list_free(widgets);
+		widgets = NULL;
+	}
 
 	templ_dname = choices_find_path_load("Templates", "");
 	if (!templ_dname)
@@ -467,7 +477,8 @@ static GtkWidget *get_new_files_menu(void)
 		goto out;
 
 	item = gtk_menu_item_new();
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	widgets = g_list_append(widgets, item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(filer_new_menu), item);
 
 	while ((ent = readdir(dir)))
 	{
@@ -517,16 +528,17 @@ static GtkWidget *get_new_files_menu(void)
 
 		gtk_signal_connect(GTK_OBJECT(item), "activate",
 				GTK_SIGNAL_FUNC(new_file_type), fname);
-		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(filer_new_menu), item);
 		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
 				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
+
+		widgets = g_list_append(widgets, item);
 	}
 
 	closedir(dir);
 out:
 	g_free(templ_dname);
-	gtk_widget_show_all(menu);
-	return menu;
+	gtk_widget_show_all(filer_new_menu);
 }
 
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
@@ -623,8 +635,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 					file_item, filer_file_menu);
 	}
 
-	gtk_menu_item_set_submenu(GTK_MENU_ITEM(filer_new_file),
-				get_new_files_menu());
+	update_new_files_menu();
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
