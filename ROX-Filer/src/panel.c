@@ -51,6 +51,9 @@
 #include "icon.h"
 #include "run.h"
 
+/* The width of the separator at the inner edge of the panel */
+#define EDGE_WIDTH 2
+
 Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
 /* NULL => Not loading a panel */
@@ -128,6 +131,8 @@ static void run_applet(Icon *icon);
 static void panel_set_style(void);
 static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon);
 static void panel_load_from_xml(Panel *panel, xmlDocPtr doc);
+static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
+				Panel *panel);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -158,7 +163,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 {
 	guchar	*load_path;
 	Panel	*panel;
-	GtkWidget	*vp, *box, *frame;
+	GtkWidget	*vp, *box, *frame, *align;
 
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, NULL);
 	g_return_val_if_fail(loading_panel == NULL, NULL);
@@ -213,10 +218,24 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		g_free(leaf);
 	}
 
+	if (panel->side == PANEL_RIGHT)
+		align = gtk_alignment_new(1.0, 0.0, 0.0, 1.0);
+	else if (panel->side == PANEL_BOTTOM)
+		align = gtk_alignment_new(0.0, 1.0, 1.0, 0.0);
+	else if (panel->side == PANEL_TOP)
+		align = gtk_alignment_new(0.0, 0.0, 1.0, 0.0);
+	else
+		align = gtk_alignment_new(0.0, 0.0, 0.0, 1.0);
+
+	gtk_container_add(GTK_CONTAINER(panel->window), align);
+
 	vp = gtk_viewport_new(NULL, NULL);
 	gtk_container_set_resize_mode(GTK_CONTAINER(vp), GTK_RESIZE_PARENT);
-	gtk_viewport_set_shadow_type(GTK_VIEWPORT(vp), GTK_SHADOW_OUT);
-	gtk_container_add(GTK_CONTAINER(panel->window), vp);
+	gtk_viewport_set_shadow_type(GTK_VIEWPORT(vp), GTK_SHADOW_NONE);
+	gtk_container_add(GTK_CONTAINER(align), vp);
+
+	gtk_signal_connect(GTK_OBJECT(align), "expose-event",
+			GTK_SIGNAL_FUNC(draw_panel_edge), panel);
 
 	if (side == PANEL_TOP || side == PANEL_BOTTOM)
 	{
@@ -251,7 +270,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window);
 
-	gtk_widget_show_all(vp);
+	gtk_widget_show_all(align);
 	
 	loading_panel = panel;
 	if (load_path && access(load_path, F_OK) == 0)
@@ -1298,7 +1317,10 @@ static void run_applet(Icon *icon)
 static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 {
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
+	{
 		req->width = screen_width;
+		req->height += EDGE_WIDTH;
+	}
 	else
 	{
 		int h = screen_height;
@@ -1316,6 +1338,7 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 		}
 
 		req->height = h;
+		req->width += EDGE_WIDTH;
 	}
 }
 
@@ -1338,4 +1361,39 @@ static void panel_set_style(void)
 			gtk_widget_queue_resize(panel->window);
 		}
 	}
+}
+
+static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
+				Panel *panel)
+{
+	int	x, y, width, height;
+
+	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
+	{
+		width = screen_width;
+		height = EDGE_WIDTH;
+
+		x = 0;
+		if (panel->side == PANEL_BOTTOM)
+			y = 0;
+		else
+			y = widget->allocation.height - EDGE_WIDTH;
+	}
+	else
+	{
+		width = EDGE_WIDTH;
+		height = screen_height;
+
+		y = 0;
+		if (panel->side == PANEL_RIGHT)
+			x = 0;
+		else
+			x = widget->allocation.width - EDGE_WIDTH;
+	}
+	
+	gdk_draw_rectangle(widget->window,
+			widget->style->fg_gc[GTK_STATE_NORMAL], TRUE,
+			x, y, width, height);
+
+	return FALSE;
 }

@@ -138,6 +138,8 @@ static void drag_end 		   (GtkWidget 	      *widget,
 				    GdkDragContext    *context);
 static void gtk_savebox_response   (GtkDialog	      *savebox,
 				    gint	      response);
+static void discard_clicked	   (GtkWidget	      *button,
+				    GtkWidget	      *savebox);
 static void do_save		   (GtkSavebox	      *savebox);
 static void gtk_savebox_set_property (GObject         *object,
 				      guint           prop_id,
@@ -263,6 +265,8 @@ gtk_savebox_init (GtkSavebox *savebox)
   
   button = button_new_mixed (GTK_STOCK_DELETE, "_Discard");
   gtk_box_pack_start (GTK_BOX (savebox->discard_area), button, FALSE, TRUE, 2);
+  gtk_signal_connect (GTK_OBJECT( button), "clicked",
+		  GTK_SIGNAL_FUNC (discard_clicked), savebox);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
 
@@ -531,6 +535,12 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 		       savebox_signals[SAVED_TO_URI], NULL);
       gtk_widget_destroy (widget);
     }
+}
+
+static void discard_clicked (GtkWidget *button, GtkWidget *savebox)
+{
+  gtk_signal_emit (GTK_OBJECT (savebox), savebox_signals[SAVED_TO_URI], NULL);
+  gtk_widget_destroy (savebox);
 }
 
 /* User has clicked Save or pressed Return... */
