@@ -1246,11 +1246,15 @@ static gboolean spring_now(gpointer data)
 	else
 	{
 		spring_window = filer_opendir(dest_path, spring_src_window);
-		gtk_timeout_add(500, spring_check_idle, NULL);
-		gtk_signal_connect(GTK_OBJECT(spring_window->window), "destroy",
-				GTK_SIGNAL_FUNC(spring_win_destroyed), NULL);
 		if (spring_window)
+		{
+			gtk_timeout_add(500, spring_check_idle, NULL);
+			gtk_signal_connect(GTK_OBJECT(spring_window->window),
+					"destroy",
+					GTK_SIGNAL_FUNC(spring_win_destroyed),
+					NULL);
 			centre_window(spring_window->window->window, x, y);
+		}
 	}
 	o_unique_filer_windows = old_unique;
 

@@ -483,7 +483,8 @@ static gboolean follow_symlink(char *full_path,
 		FilerWindow *new;
 		
 		new = filer_opendir(new_dir, src_window);
-		display_set_autoselect(new, slash + 1);
+		if (new)
+			display_set_autoselect(new, slash + 1);
 	}
 
 	g_free(real);
