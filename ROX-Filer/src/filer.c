@@ -23,6 +23,7 @@
 #include "pixmaps.h"
 #include "menu.h"
 #include "dnd.h"
+#include "apps.h"
 
 static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
@@ -300,10 +301,29 @@ void open_item(Collection *collection,
 {
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
 	FileItem	*item = (FileItem *) item_data;
+	GdkEventButton 	*event;
 
-	if (item->base_type == TYPE_DIRECTORY)
-		filer_opendir(make_path(filer_window->path,
-					item->leafname)->str);
+	switch (item->base_type)
+	{
+		case TYPE_APPDIR:
+			event = (GdkEventButton *) gtk_get_current_event();
+			if (event->type != GDK_2BUTTON_PRESS ||
+					(event->state & GDK_SHIFT_MASK) == 0)
+			{
+				run_app(make_path(filer_window->path,
+							item->leafname)->str);
+				break;
+			}
+			/* FALLTHROUGH */
+		case TYPE_DIRECTORY:
+			filer_opendir(make_path(filer_window->path,
+						item->leafname)->str);
+			break;
+		default:
+			report_error("open_item",
+					"I don't know how to open that");
+			break;
+	}
 }
 
 void filer_opendir(char *path)
