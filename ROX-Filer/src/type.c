@@ -356,7 +356,14 @@ gboolean type_open(const char *path, MIME_type *type)
 		report_error(_("Executable '%s' is world-writeable! Refusing "
 			"to run. Please change the permissions now (this "
 			"problem may have been caused by a bug in earlier "
-			"versions of the filer)."), open);
+			"versions of the filer).\n\n"
+			"Having (non-symlink) run actions world-writeable "
+			"means that other people who use your computer can "
+			"replace your run actions with malicious versions.\n\n"
+			"If you trust everyone who could write to these files "
+			"then you needn't worry. Otherwise, you should check, "
+			"or even just delete, all the existing run actions."),
+			open);
 		choices_dir = g_dirname(open);
 		paths = g_list_append(NULL, choices_dir);
 		action_chmod(paths, TRUE, "go-w (Fix security problem)");

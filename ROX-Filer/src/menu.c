@@ -809,9 +809,11 @@ static void target_callback(FilerWindow *filer_window,
 			gint item,
 			gpointer action)
 {
-	Collection	*collection = filer_window->collection;
+	Collection	*collection;
 
 	g_return_if_fail(filer_window != NULL);
+
+	collection = filer_window->collection;
 
 	window_with_focus = filer_window;
 	
