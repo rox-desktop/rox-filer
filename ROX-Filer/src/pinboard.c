@@ -818,24 +818,18 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	x = pi->widget->allocation.x;
 	y = pi->widget->allocation.y;
 
-	gdk_pixbuf_render_to_drawable_alpha(
-			icon->selected ? image->pixbuf_lit : image->pixbuf,
+	gdk_gc_set_clip_region(pi->widget->style->black_gc, event->region);
+
+	render_pixmap(icon->selected ? image->pixbuf_lit : image->pixbuf,
 			pi->widget->window,
-			0, 0, 				/* src */
-			x, y,				/* dest */
-			iwidth, iheight,
-			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-			GDK_RGB_DITHER_NORMAL, 0, 0);
+			pi->widget->style->black_gc,
+			x, y, iwidth, iheight);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				pi->widget->window,
-				0, 0, 				/* src */
-				x, y,
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		render_pixmap(im_symlink->pixbuf, pi->widget->window,
+				pi->widget->style->black_gc,
+				x, y, -1, -1);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -843,14 +837,12 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 					? im_mounted
 					: im_unmounted;
 					
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				pi->widget->window,
-				0, 0, 				/* src */
-				x, y,
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		render_pixmap(mp->pixbuf, pi->widget->window,
+				pi->widget->style->black_gc,
+				x, y, -1, -1);
 	}
+
+	gdk_gc_set_clip_region(pi->widget->style->black_gc, NULL);
 
 	if (icon->selected)
 	{

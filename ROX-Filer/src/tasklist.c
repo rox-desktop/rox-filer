@@ -863,8 +863,7 @@ static void show_icon(IconWindow *win)
 
 	pixbuf = get_image_for(win);
 
-	gtk_box_pack_start(GTK_BOX(vbox),
-			  gtk_image_new_from_pixbuf(pixbuf),
+	gtk_box_pack_start(GTK_BOX(vbox), simple_image_new(pixbuf),
 			  FALSE, TRUE, 0);
 	g_object_unref(pixbuf);
 

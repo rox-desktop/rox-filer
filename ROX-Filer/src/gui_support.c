@@ -60,6 +60,7 @@ static gint tip_timeout = 0;	/* When primed */
 /* Static prototypes */
 static void run_error_info_dialog(GtkMessageType type, const char *message,
 				  va_list args);
+static GType simple_image_get_type(void);
 
 void gui_support_init()
 {
@@ -966,3 +967,124 @@ GList *uri_list_to_glist(const char *uri_list)
 	return list;
 }
 
+typedef struct _SimpleImageClass SimpleImageClass;
+typedef struct _SimpleImage SimpleImage;
+
+struct _SimpleImageClass {
+	GtkWidgetClass parent;
+};
+
+struct _SimpleImage {
+	GtkWidget widget;
+
+	GdkPixbuf *pixbuf;
+	int	  width, height;
+};
+
+#define SIMPLE_IMAGE(obj) (GTK_CHECK_CAST((obj), \
+				simple_image_get_type(), SimpleImage))
+
+static void simple_image_finialize(GObject *object)
+{
+	SimpleImage *image = SIMPLE_IMAGE(object);
+
+	g_object_unref(G_OBJECT(image->pixbuf));
+	image->pixbuf = NULL;
+}
+
+static void simple_image_size_request(GtkWidget      *widget,
+				      GtkRequisition *requisition)
+{
+	SimpleImage *image = (SimpleImage *) widget;
+
+	requisition->width = image->width;
+	requisition->height = image->height;
+}
+
+void render_pixmap(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
+		   int x, int y, int width, int height)
+{
+#if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION > 1
+	gdk_draw_pixbuf(target, gc, pixbuf, 0, 0, x, y, width, height,
+		        GDK_RGB_DITHER_NORMAL, 0, 0);
+
+#else
+	gdk_pixbuf_render_to_drawable_alpha(pixbuf, target,
+			0, 0,			/* src */
+			x, y, width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
+#endif
+}
+
+static gint simple_image_expose(GtkWidget *widget, GdkEventExpose *event)
+{
+	SimpleImage *image = (SimpleImage *) widget;
+	
+	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
+	
+	render_pixmap(image->pixbuf, widget->window, widget->style->black_gc,
+			widget->allocation.x, widget->allocation.y,
+			image->width, image->height);
+			
+	gdk_gc_set_clip_region(widget->style->black_gc, NULL);
+	return FALSE;
+}
+
+static void simple_image_class_init(gpointer gclass, gpointer data)
+{
+	GObjectClass *object = (GObjectClass *) gclass;
+	GtkWidgetClass *widget = (GtkWidgetClass *) gclass;
+
+	object->finalize = simple_image_finialize;
+	widget->size_request = simple_image_size_request;
+	widget->expose_event = simple_image_expose;
+}
+
+static void simple_image_init(GTypeInstance *object, gpointer gclass)
+{
+	GTK_WIDGET_SET_FLAGS(object, GTK_NO_WINDOW);
+}
+
+static GType simple_image_get_type(void)
+{
+	static GType type = 0;
+
+	if (!type)
+	{
+		static const GTypeInfo info =
+		{
+			sizeof (SimpleImageClass),
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			simple_image_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(SimpleImage),
+			0,			/* n_preallocs */
+			simple_image_init,
+		};
+
+		type = g_type_register_static(gtk_widget_get_type(),
+						"SimpleImage", &info, 0);
+	}
+
+	return type;
+}
+
+GtkWidget *simple_image_new(GdkPixbuf *pixbuf)
+{
+	SimpleImage *image;
+
+	g_return_val_if_fail(pixbuf != NULL, NULL);
+
+	image = g_object_new(simple_image_get_type(), NULL);
+
+	image->pixbuf = pixbuf;
+	g_object_ref(G_OBJECT(pixbuf));
+
+	image->width = gdk_pixbuf_get_width(pixbuf);
+	image->height = gdk_pixbuf_get_height(pixbuf);
+
+	return GTK_WIDGET(image);
+}
