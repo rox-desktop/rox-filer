@@ -227,7 +227,7 @@ gtk_savebox_init (GtkSavebox *savebox)
   hbox = gtk_hbox_new (TRUE, 0);
   gtk_box_pack_start (GTK_BOX (savebox->vbox), hbox, FALSE, TRUE, 0);
 
-  button = gtk_button_new_with_label (_("Save"));
+  button = gtk_button_new_with_label (_("OK"));
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (do_save), savebox);
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, TRUE, 0);
@@ -559,8 +559,8 @@ static void do_save (GtkWidget *widget, GtkSavebox *savebox)
       dialog = gtk_dialog_new ();
       GTK_WINDOW (dialog)->type = GTK_WINDOW_DIALOG;
 
-      label = gtk_label_new ("To save, drag icon to a directory viewer\n"
-	  "(or enter a full pathname)");
+      label = gtk_label_new ("Drag the icon to a directory viewer\n"
+				  "(or enter a full pathname)");
       gtk_misc_set_padding (GTK_MISC (label), 8, 32);
 
       gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
