@@ -559,37 +559,47 @@ guchar *shell_escape(guchar *word)
 }
 
 /* TRUE iff `sub' is (or would be) an object inside the directory `parent',
- * (or the two are the same item/directory)
+ * (or the two are the same item/directory).
+ * FALSE if parent doesn't exist.
  */
 gboolean is_sub_dir(char *sub, char *parent)
 {
-	int 		parent_len;
-	guchar		*real_sub, *real_parent;
-	gboolean	retval;
+	struct stat	parent_info;
 
 	/* These were pathdup()s, but that follows symlinks!
 	 * I guess they were here for a reason - something is probably
 	 * broken now...
 	 */
-	real_sub = g_strdup(sub);
-	real_parent = g_strdup(parent);
+	sub = g_strdup(sub);
+	
+	if (mc_stat(parent, &parent_info))
+		return FALSE;		/* Parent doesn't exist */
 
-	parent_len = strlen(real_parent);
-	if (strncmp(real_parent, real_sub, parent_len))
-		retval = FALSE;
-	else
+	while (1)
 	{
-		/* real_sub is at least as long as real_parent and all
-		 * characters upto real_parent's length match.
-		 */
-
-		retval = real_sub[parent_len] == '\0' ||
-			 real_sub[parent_len] == '/';
+		guchar	    *slash;
+		struct stat info;
+		
+		if (mc_stat(sub, &info) == 0)
+		{
+			if (info.st_dev == parent_info.st_dev &&
+				info.st_ino == parent_info.st_ino)
+			{
+				g_free(sub);
+				return TRUE;
+			}
+		}
+		else
+			g_print("[ %s doesn't exist ]\n", sub);
+		
+		slash = strrchr(sub, '/');
+		if (!slash)
+			break;
+		*slash = '\0';
 	}
 
-	g_free(real_sub);
-	g_free(real_parent);
+	g_free(sub);
 
-	return retval;
+	return FALSE;
 }
 

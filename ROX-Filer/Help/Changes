@@ -2,6 +2,15 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+30-Jan-2001
+~~~~~~~~~~~
+Bugfix: On filesystems which aren't case sensitive (eg DOS) it was possible
+	to copy 'tmp' as 'Tmp' and lose it! (reported by Denis Manente)
+
+28-Jan-2001
+~~~~~~~~~~~
+Added Diego Zamboni's patch to make configuring VFS easier.
+
 27-Jan-2001
 ~~~~~~~~~~~
 Improved compiling - now correctly reports an error if the file doesn't
