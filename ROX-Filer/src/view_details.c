@@ -83,8 +83,6 @@ struct _ViewDetails {
 
 	GPtrArray   *items;		/* ViewItem */
 	
-	gint	    sort_column_id;
-	GtkSortType order;
 	int	    (*sort_fn)(const void *, const void *);
 
 	int	    cursor_base;	/* Cursor when minibuffer opened */
@@ -175,6 +173,8 @@ GtkWidget *view_details_new(FilerWindow *filer_window)
 
 	gtk_range_set_adjustment(GTK_RANGE(filer_window->scrollbar),
 		gtk_tree_view_get_vadjustment(GTK_TREE_VIEW(view_details)));
+
+	view_details_sort((ViewIface *) view_details);
 
 	return GTK_WIDGET(view_details);
 }
@@ -523,14 +523,28 @@ static gboolean details_get_sort_column_id(GtkTreeSortable *sortable,
 					   GtkSortType     *order)
 {
 	ViewDetails *view_details = (ViewDetails *) sortable;
+	FilerWindow *filer_window = view_details->filer_window;
+	int col;
 
-	if (view_details->sort_column_id == -1)
-		return FALSE;
+	if (!filer_window)
+		return FALSE;	/* Not yet initialised */
 
+	switch (filer_window->sort_type)
+	{
+		case SORT_NAME: col = COL_LEAF; break;
+		case SORT_TYPE: col = COL_TYPE; break;
+		case SORT_DATE: col = COL_MTIME; break;
+		case SORT_SIZE: col = COL_SIZE; break;
+		case SORT_OWNER: col = COL_OWNER; break;
+		case SORT_GROUP: col = COL_GROUP; break;
+		default:
+			g_assert_not_reached();
+			return FALSE;
+	}
 	if (sort_column_id)
-		*sort_column_id = view_details->sort_column_id;
+		*sort_column_id = col;
 	if (order)
-		*order = view_details->order;
+		*order = filer_window->sort_order;
 	return TRUE;
 }
 
@@ -539,41 +553,34 @@ static void details_set_sort_column_id(GtkTreeSortable     *sortable,
 				       GtkSortType         order)
 {
 	ViewDetails *view_details = (ViewDetails *) sortable;
+	FilerWindow *filer_window = view_details->filer_window;
 
-	if (view_details->sort_column_id == sort_column_id &&
-	    view_details->order == order)
-		return;
-
-	view_details->sort_column_id = sort_column_id;
-	view_details->order = order;
+	if (!filer_window)
+		return;		/* Not yet initialised */
 
 	switch (sort_column_id)
 	{
 		case COL_LEAF:
-			view_details->sort_fn = sort_by_name;
+			display_set_sort_type(filer_window, SORT_NAME, order);
 			break;
 		case COL_SIZE:
-			view_details->sort_fn = sort_by_size;
+			display_set_sort_type(filer_window, SORT_SIZE, order);
 			break;
 		case COL_MTIME:
-			view_details->sort_fn = sort_by_date;
+			display_set_sort_type(filer_window, SORT_DATE, order);
 			break;
 		case COL_TYPE:
-			view_details->sort_fn = sort_by_type;
+			display_set_sort_type(filer_window, SORT_TYPE, order);
 			break;
 		case COL_OWNER:
-			view_details->sort_fn = sort_by_owner;
+			display_set_sort_type(filer_window, SORT_OWNER, order);
 			break;
 		case COL_GROUP:
-			view_details->sort_fn = sort_by_group;
+			display_set_sort_type(filer_window, SORT_GROUP, order);
 			break;
 		default:
 			g_assert_not_reached();
 	}
-
-	view_details_sort((ViewIface *) view_details);
-
-	gtk_tree_sortable_sort_column_changed(sortable);
 }
 
 static void details_set_sort_func(GtkTreeSortable          *sortable,
@@ -776,11 +783,8 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
 
 	/* Sorting */
-	view_details->sort_column_id = -1;
 	view_details->sort_fn = NULL;
 	sortable_list = GTK_TREE_SORTABLE(object);
-	gtk_tree_sortable_set_sort_column_id(sortable_list, COL_LEAF,
-			GTK_SORT_ASCENDING);
 
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(view_details));
 
@@ -855,27 +859,36 @@ static gint wrap_sort(gconstpointer a, gconstpointer b,
 	ViewItem *ia = *(ViewItem **) a;
 	ViewItem *ib = *(ViewItem **) b;
 
-	if (view_details->order == GTK_SORT_ASCENDING)
+	if (view_details->filer_window->sort_order == GTK_SORT_ASCENDING)
 		return view_details->sort_fn(ia->item, ib->item);
 	else
 		return -view_details->sort_fn(ia->item, ib->item);
 }
 
-static void view_details_sort(ViewIface *view)
+static void resort(ViewDetails *view_details)
 {
-	ViewDetails *view_details = (ViewDetails *) view;
 	ViewItem **items = (ViewItem **) view_details->items->pdata;
 	GArray *new_order;
 	gint i, len = view_details->items->len;
 	GtkTreePath *path;
-
-	g_return_if_fail(view_details->sort_fn != NULL);
 
 	if (!len)
 		return;
 
 	for (i = len - 1; i >= 0; i--)
 		items[i]->old_pos = i;
+
+	switch (view_details->filer_window->sort_type)
+	{
+		case SORT_NAME: view_details->sort_fn = sort_by_name; break;
+		case SORT_TYPE: view_details->sort_fn = sort_by_type; break;
+		case SORT_DATE: view_details->sort_fn = sort_by_date; break;
+		case SORT_SIZE: view_details->sort_fn = sort_by_size; break;
+		case SORT_OWNER: view_details->sort_fn = sort_by_owner; break;
+		case SORT_GROUP: view_details->sort_fn = sort_by_group; break;
+		default:
+			g_assert_not_reached();
+	}
 	
 	g_ptr_array_sort_with_data(view_details->items,
 				   (GCompareDataFunc) wrap_sort,
@@ -888,11 +901,17 @@ static void view_details_sort(ViewIface *view)
 		g_array_insert_val(new_order, items[i]->old_pos, i);
 
 	path = gtk_tree_path_new();
-	gtk_tree_model_rows_reordered((GtkTreeModel *) view,
+	gtk_tree_model_rows_reordered((GtkTreeModel *) view_details,
 					path, NULL,
 					(gint *) new_order->data);
 	gtk_tree_path_free(path);
 	g_array_free(new_order, TRUE);
+}
+
+static void view_details_sort(ViewIface *view)
+{
+	gtk_tree_sortable_sort_column_changed((GtkTreeSortable *) view);
+	resort((ViewDetails *) view);
 }
 
 static gboolean view_details_autoselect(ViewIface *view, const gchar *leaf)
@@ -951,7 +970,7 @@ static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
 
 	gtk_tree_path_free(path);
 
-	view_details_sort(view);
+	resort(view_details);
 }
 
 /* Find an item in the sorted array.
@@ -961,7 +980,6 @@ static int details_find_item(ViewDetails *view_details, DirItem *item)
 {
 	ViewItem **items, tmp, *tmpp;
 	int	lower, upper;
-	int (*compar)(const void *, const void *);
 
 	g_return_val_if_fail(view_details != NULL, -1);
 	g_return_val_if_fail(item != NULL, -1);
@@ -970,9 +988,6 @@ static int details_find_item(ViewDetails *view_details, DirItem *item)
 	tmpp = &tmp;
 
 	items = (ViewItem **) view_details->items->pdata;
-	compar = view_details->sort_fn;
-
-	g_return_val_if_fail(compar != NULL, -1);
 
 	/* If item is here, then: lower <= i < upper */
 	lower = 0;
@@ -1009,7 +1024,7 @@ static void view_details_update_items(ViewIface *view, GPtrArray *items)
 	/* The item data has already been modified, so this gives the
 	 * final sort order...
 	 */
-	view_details_sort(view);
+	resort(view_details);
 
 	for (i = 0; i < items->len; i++)
 	{

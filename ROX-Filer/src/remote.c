@@ -628,17 +628,19 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 
 	if (sort)
 	{
-		int (*cmp)(const void *, const void *);
+		SortType type;
 
-		cmp = !g_strcasecmp(sort, "Name") ? sort_by_name :
-		      !g_strcasecmp(sort, "Type") ? sort_by_type :
-		      !g_strcasecmp(sort, "Date") ? sort_by_date :
- 		      !g_strcasecmp(sort, "Size") ? sort_by_size :
-		     				     NULL;
-		if (!cmp)
+		type = !g_strcasecmp(sort, "Name") ? SORT_NAME :
+		       !g_strcasecmp(sort, "Type") ? SORT_TYPE :
+		       !g_strcasecmp(sort, "Date") ? SORT_DATE :
+ 		       !g_strcasecmp(sort, "Size") ? SORT_SIZE :
+ 		       !g_strcasecmp(sort, "Owner") ? SORT_OWNER :
+ 		       !g_strcasecmp(sort, "Group") ? SORT_GROUP :
+						       -1;
+		if (type != -1)
 			g_warning("Unknown sorting criteria '%s'\n", sort);
 		else
-			display_set_sort_fn(fwin, cmp);
+			display_set_sort_type(fwin, type, GTK_SORT_ASCENDING);
 
 		g_free(sort);
 	}

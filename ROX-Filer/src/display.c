@@ -79,13 +79,6 @@ static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
 static void display_set_actual_size_real(FilerWindow *filer_window);
 
-enum {
-	SORT_BY_NAME = 0,
-	SORT_BY_TYPE = 1,
-	SORT_BY_DATE = 2,
-	SORT_BY_SIZE = 3,
-};
-
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -95,7 +88,7 @@ void display_init()
 	option_add_int(&o_display_dirs_first, "display_dirs_first", FALSE);
 	option_add_int(&o_display_size, "display_icon_size", AUTO_SIZE_ICONS);
 	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
-	option_add_int(&o_display_sort_by, "display_sort_by", SORT_BY_NAME);
+	option_add_int(&o_display_sort_by, "display_sort_by", SORT_NAME);
 	option_add_int(&o_large_width, "display_large_width", 89);
 	option_add_int(&o_small_width, "display_small_width", 250);
 	option_add_int(&o_display_show_hidden, "display_show_hidden", FALSE);
@@ -323,13 +316,15 @@ int sort_by_size(const void *item1, const void *item2)
 		sort_by_name(item1, item2);
 }
 
-void display_set_sort_fn(FilerWindow *filer_window,
-			int (*fn)(const void *a, const void *b))
+void display_set_sort_type(FilerWindow *filer_window, SortType sort_type,
+			   GtkSortType order)
 {
-	if (filer_window->sort_fn == fn)
+	if (filer_window->sort_type == sort_type &&
+	    filer_window->sort_order == order)
 		return;
 
-	filer_window->sort_fn = fn;
+	filer_window->sort_type = sort_type;
+	filer_window->sort_order = order;
 
 	view_sort(filer_window->view);
 }

@@ -1119,6 +1119,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	char		*real_path;
 	DisplayStyle    dstyle;
 	DetailsType     dtype;
+	SortType	s_type;
+	GtkSortType	s_order;
 
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -1178,10 +1180,12 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->display_style = UNKNOWN_STYLE;
 	filer_window->thumb_queue = NULL;
 	filer_window->max_thumbs = 0;
+	filer_window->sort_type = -1;
 
 	if (src_win && o_display_inherit_options.int_value)
 	{
-	        filer_window->sort_fn = src_win->sort_fn;
+		s_type = src_win->sort_type;
+		s_order = src_win->sort_order;
 		dstyle = src_win->display_style_wanted;
 		dtype = src_win->details_type;
 		filer_window->show_hidden = src_win->show_hidden;
@@ -1190,12 +1194,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	}
 	else
 	{
-	        int i = o_display_sort_by.int_value;
-		filer_window->sort_fn = i == 0 ? sort_by_name :
-		                        i == 1 ? sort_by_type :
-		                        i == 2 ? sort_by_date :
-		                        sort_by_size;
-		
+		s_type = o_display_sort_by.int_value;
+		s_order = GTK_SORT_ASCENDING;
 		dstyle = o_display_size.int_value;
 		dtype = o_display_details.int_value;
 		filer_window->show_hidden = o_display_show_hidden.int_value;
@@ -1213,6 +1213,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_add_signals(filer_window);
 
 	display_set_layout(filer_window, dstyle, dtype, TRUE);
+	display_set_sort_type(filer_window, s_type, s_order);
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to

@@ -1058,12 +1058,32 @@ static void view_collection_style_changed(ViewIface *view, int flags)
 	gtk_widget_queue_draw(GTK_WIDGET(view_collection));
 }
 
+typedef int (*SortFn)(gconstpointer a, gconstpointer b);
+
+static SortFn sort_fn(FilerWindow *fw)
+{
+	switch (fw->sort_type)
+	{
+		case SORT_NAME: return sort_by_name;
+		case SORT_TYPE: return sort_by_type;
+		case SORT_DATE: return sort_by_date;
+		case SORT_SIZE: return sort_by_size;
+		case SORT_OWNER: return sort_by_owner;
+		case SORT_GROUP: return sort_by_group;
+		default:
+			g_assert_not_reached();
+	}
+
+	return NULL;
+}
+
 static void view_collection_sort(ViewIface *view)
 {
-	ViewCollection *view_collection = VIEW_COLLECTION(view);
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	FilerWindow	*filer_window = view_collection->filer_window;
 
-	collection_qsort(view_collection->collection,
-			view_collection->filer_window->sort_fn);
+	collection_qsort(view_collection->collection, sort_fn(filer_window),
+			filer_window->sort_order);
 }
 
 static gboolean view_collection_autoselect(ViewIface *view, const gchar *leaf)
@@ -1124,7 +1144,8 @@ static void view_collection_update_items(ViewIface *view, GPtrArray *items)
 	/* The item data has already been modified, so this gives the
 	 * final sort order...
 	 */
-	collection_qsort(collection, filer_window->sort_fn);
+	collection_qsort(collection, sort_fn(filer_window),
+			 filer_window->sort_order);
 
 	for (i = 0; i < items->len; i++)
 	{
@@ -1136,7 +1157,8 @@ static void view_collection_update_items(ViewIface *view, GPtrArray *items)
 			continue;
 
 		j = collection_find_item(collection, item,
-						     filer_window->sort_fn);
+					 sort_fn(filer_window),
+					 filer_window->sort_order);
 
 		if (j < 0)
 			g_warning("Failed to find '%s'\n", leafname);

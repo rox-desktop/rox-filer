@@ -130,10 +130,8 @@ static void change_size(gpointer data, guint action, GtkWidget *widget);
 static void change_size_auto(gpointer data, guint action, GtkWidget *widget);
 static void set_with(gpointer data, guint action, GtkWidget *widget);
 
-static void sort_name(gpointer data, guint action, GtkWidget *widget);
-static void sort_type(gpointer data, guint action, GtkWidget *widget);
-static void sort_size(gpointer data, guint action, GtkWidget *widget);
-static void sort_date(gpointer data, guint action, GtkWidget *widget);
+static void set_sort(gpointer data, guint action, GtkWidget *widget);
+static void reverse_sort(gpointer data, guint action, GtkWidget *widget);
 
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
@@ -169,6 +167,7 @@ static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
 static GtkWidget	*filer_auto_size_menu;	/* The Automatic item */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
+static GtkWidget	*filer_reverse_menu;	/* The Reversed item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
@@ -176,6 +175,8 @@ static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
 
 #undef N_
 #define N_(x) x
+
+#define SORT_PATH "/Display/Sort by Name"
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
@@ -191,10 +192,13 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Smaller Icons"),   	NULL, change_size, -1, NULL},
 {">" N_("Automatic"),   	NULL, change_size_auto, 0, "<ToggleItem>"},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Sort by Name"),	NULL, sort_name, 0, NULL},
-{">" N_("Sort by Type"),	NULL, sort_type, 0, NULL},
-{">" N_("Sort by Date"),	NULL, sort_date, 0, NULL},
-{">" N_("Sort by Size"),	NULL, sort_size, 0, NULL},
+{">" N_("Sort by Name"),	NULL, set_sort, SORT_NAME, NULL},
+{">" N_("Sort by Type"),	NULL, set_sort, SORT_TYPE, NULL},
+{">" N_("Sort by Date"),	NULL, set_sort, SORT_DATE, NULL},
+{">" N_("Sort by Size"),	NULL, set_sort, SORT_SIZE, NULL},
+{">" N_("Sort by Owner"),	NULL, set_sort, SORT_OWNER, NULL},
+{">" N_("Sort by Group"),	NULL, set_sort, SORT_GROUP, NULL},
+{">" N_("Reversed"),		NULL, reverse_sort, 0, "<ToggleItem>"},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
@@ -285,6 +289,7 @@ gboolean ensure_filer_menu(void)
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
+	GET_SSMENU_ITEM(filer_reverse_menu, "filer", "Display", "Reversed");
 	GET_SSMENU_ITEM(filer_auto_size_menu, "filer", "Display", "Automatic");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
 							"Show Thumbnails");
@@ -726,6 +731,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
 		gtk_check_menu_item_set_active(
+				GTK_CHECK_MENU_ITEM(filer_reverse_menu),
+				filer_window->sort_order != GTK_SORT_ASCENDING);
+		gtk_check_menu_item_set_active(
 			GTK_CHECK_MENU_ITEM(filer_auto_size_menu),
 			filer_window->display_style_wanted == AUTO_SIZE_ICONS);
 		buffer = g_string_new(NULL);
@@ -900,32 +908,33 @@ static void set_with(gpointer data, guint action, GtkWidget *widget)
 	display_set_layout(window_with_focus, size, action, FALSE);
 }
 
-static void sort_name(gpointer data, guint action, GtkWidget *widget)
+static void set_sort(gpointer data, guint action, GtkWidget *widget)
 {
+	if (updating_menu)
+		return;
+
 	g_return_if_fail(window_with_focus != NULL);
 
-	display_set_sort_fn(window_with_focus, sort_by_name);
+	display_set_sort_type(window_with_focus, action, GTK_SORT_ASCENDING);
 }
 
-static void sort_type(gpointer data, guint action, GtkWidget *widget)
+static void reverse_sort(gpointer data, guint action, GtkWidget *widget)
 {
+	GtkSortType order;
+
+	if (updating_menu)
+		return;
+	
 	g_return_if_fail(window_with_focus != NULL);
 
-	display_set_sort_fn(window_with_focus, sort_by_type);
-}
+	order = window_with_focus->sort_order;
+	if (order == GTK_SORT_ASCENDING)
+		order = GTK_SORT_DESCENDING;
+	else
+		order = GTK_SORT_ASCENDING;
 
-static void sort_date(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_set_sort_fn(window_with_focus, sort_by_date);
-}
-
-static void sort_size(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_set_sort_fn(window_with_focus, sort_by_size);
+	display_set_sort_type(window_with_focus, window_with_focus->sort_type,
+			      order);
 }
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)

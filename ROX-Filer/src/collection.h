@@ -134,11 +134,13 @@ void 	collection_set_item_size	(Collection *collection,
 					 int width, int height);
 void 	collection_qsort		(Collection *collection,
 					 int (*compar)(const void *,
-						       const void *));
+						       const void *),
+					 GtkSortType order);
 int 	collection_find_item		(Collection *collection,
 					 gpointer data,
 					 int (*compar)(const void *,
-						       const void *));
+						       const void *),
+					 GtkSortType order);
 int 	collection_get_item		(Collection *collection, int x, int y);
 void 	collection_set_cursor_item	(Collection *collection, gint item);
 void 	collection_wink_item		(Collection *collection, gint item);

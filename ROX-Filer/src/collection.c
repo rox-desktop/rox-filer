@@ -1473,12 +1473,18 @@ static int collection_cmp(const void *a, const void *b)
 	return cmp_callback(((CollectionItem *) a)->data,
 			    ((CollectionItem *) b)->data);
 }
+static int collection_rcmp(const void *a, const void *b)
+{
+	return -cmp_callback(((CollectionItem *) a)->data,
+			     ((CollectionItem *) b)->data);
+}
 
 /* Cursor is positioned on item with the same data as before the sort.
  * Same for the wink item.
  */
 void collection_qsort(Collection *collection,
-			int (*compar)(const void *, const void *))
+		      int (*compar)(const void *, const void *),
+		      GtkSortType order)
 {
 	int	cursor, wink, items, wink_on_map;
 	gpointer cursor_data = NULL;
@@ -1486,6 +1492,7 @@ void collection_qsort(Collection *collection,
 	gpointer wink_on_map_data = NULL;
 	CollectionItem *array;
 	int	i;
+	int	mul = order == GTK_SORT_ASCENDING ? 1 : -1;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1499,7 +1506,7 @@ void collection_qsort(Collection *collection,
 	array = collection->items;
 	for (i = 1; i < collection->number_of_items; i++)
 	{
-		if (compar(array[i - 1].data, array[i].data) > 0)
+		if (mul * compar(array[i - 1].data, array[i].data) > 0)
 			break;
 	}
 	if (i == collection->number_of_items)
@@ -1533,7 +1540,8 @@ void collection_qsort(Collection *collection,
 	
 	cmp_callback = compar;
 	qsort(collection->items, items, sizeof(collection->items[0]),
-			collection_cmp); 
+			order == GTK_SORT_ASCENDING ? collection_cmp
+						    : collection_rcmp);
 	cmp_callback = NULL;
 
 	if (cursor > -1 || wink > -1 || wink_on_map > -1)
@@ -1562,9 +1570,11 @@ void collection_qsort(Collection *collection,
  * Returns the item number, or -1 if not found.
  */
 int collection_find_item(Collection *collection, gpointer data,
-		         int (*compar)(const void *, const void *))
+		         int (*compar)(const void *, const void *),
+			 GtkSortType order)
 {
 	int	lower, upper;
+	int	mul = order == GTK_SORT_ASCENDING ? 1 : -1;
 
 	g_return_val_if_fail(collection != NULL, -1);
 	g_return_val_if_fail(IS_COLLECTION(collection), -1);
@@ -1580,7 +1590,7 @@ int collection_find_item(Collection *collection, gpointer data,
 
 		i = (lower + upper) >> 1;
 
-		cmp = compar(collection->items[i].data, data);
+		cmp = mul * compar(collection->items[i].data, data);
 		if (cmp == 0)
 			return i;
 

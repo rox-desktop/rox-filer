@@ -124,6 +124,15 @@ typedef enum {		/* Values used in options, must start at 0 */
 	DETAILS_UNKNOWN		= -1,
 } DetailsType;
 
+typedef enum {		/* Values used in options */
+	SORT_NAME = 0,
+	SORT_TYPE = 1,
+	SORT_DATE = 2,
+	SORT_SIZE = 3,
+	SORT_OWNER = 4,
+	SORT_GROUP = 5
+} SortType;
+
 /* The namespaces for the SOAP messages */
 #define SOAP_ENV_NS_OLD "http://www.w3.org/2001/06/soap-envelope"
 #define SOAP_ENV_NS "http://www.w3.org/2001/12/soap-envelope"

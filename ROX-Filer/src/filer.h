@@ -55,7 +55,8 @@ struct _FilerWindow
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
-	int 		(*sort_fn)(const void *a, const void *b);
+	SortType	sort_type;
+	GtkSortType	sort_order;
 
 	DetailsType	details_type;
 	DisplayStyle	display_style;
