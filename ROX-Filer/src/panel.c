@@ -191,9 +191,6 @@ static void motion_may_raise(Panel *panel, int x, int y);
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
 
-/* When sliding the panel, records where the panel was before */
-static gint slide_from_value = 0;
-
 #define SHOW_BOTH 0
 #define SHOW_APPS_SMALL 1
 #define SHOW_ICON 2
@@ -243,6 +240,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	panel->name = g_strdup(name);
 	panel->side = side;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	panel->autoscroll_speed = 0;
 	gtk_window_set_resizable(GTK_WINDOW(panel->window), FALSE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_name(panel->window, "rox-panel");
@@ -479,6 +477,9 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 			gtk_widget_queue_resize(
 					current_panel[PANEL_LEFT]->window);
 	}
+
+	if (panel->autoscroll_speed)
+		g_source_remove(panel->autoscroll_to);
 
 	g_free(panel->name);
 	g_free(panel);
@@ -826,17 +827,10 @@ static void perform_action(Panel *panel, PanelIcon *pi, GdkEventButton *event)
 		case ACT_SELECT_EXCL:
 			icon_set_selected(icon, TRUE);
 			break;
-		case ACT_SLIDE_CLEAR_PANEL:
-			icon_select_only(NULL);
-			/* (no break) */
-		case ACT_SLIDE_PANEL:
-			dnd_motion_grab_pointer();
-			slide_from_value = panel->adj->value;
-			dnd_motion_start(MOTION_REPOSITION);
-			break;
 		case ACT_IGNORE:
 			break;
 		case ACT_CLEAR_SELECTION:
+			dnd_motion_ungrab();
 			icon_select_only(NULL);
 			break;
 		default:
@@ -1212,29 +1206,62 @@ static void motion_may_raise(Panel *panel, int x, int y)
 		gdk_window_raise(panel->window->window);
 }
 
+static gboolean may_autoscroll(Panel *panel)
+{
+	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
+	gint max, panel_x, panel_y, delta, new;
+
+	if (panel->adj->upper <= panel->adj->page_size)
+		goto stop_scrolling;	/* Can see everything already */
+
+	gdk_window_get_pointer(panel->window->window, &panel_x, &panel_y, NULL);
+
+	if (horz)
+	{
+		delta = panel_x;
+		max   = panel->window->allocation.width;
+		if (panel_y < 0 || panel_y > panel->window->allocation.height)
+			goto stop_scrolling;	/* Not over the panel */
+	}
+	else
+	{
+		delta = panel_y;
+		max   = panel->window->allocation.height;
+		if (panel_x < 0 || panel_x > panel->window->allocation.width)
+			goto stop_scrolling;	/* Not over the panel */
+	}
+
+	if (delta >= 20 && delta <= max - 20)
+		goto stop_scrolling;	/* Not at either end */
+
+	panel->autoscroll_speed = MIN(panel->autoscroll_speed + 2, 200);
+
+	new = panel->adj->value - ((delta < 20) ? panel->autoscroll_speed
+						: -panel->autoscroll_speed);
+	new = CLAMP(new, 0, panel->adj->upper - panel->adj->page_size);
+	gtk_adjustment_set_value(panel->adj, new);
+
+	panel->autoscroll_to = g_timeout_add(40,
+			(GSourceFunc) may_autoscroll, panel);
+
+	return FALSE;
+
+stop_scrolling:
+	panel->autoscroll_speed = 0;
+	return FALSE;
+}
+
 static gint panel_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      Panel *panel)
 {
-	gint	delta, new;
-	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
-
 	motion_may_raise(panel, event->x, event->y);
 
 	if (motion_state != MOTION_REPOSITION)
-		return FALSE;
+		if (panel->autoscroll_speed == 0)
+			may_autoscroll(panel);
 
-	if (horz)
-		delta = event->x_root - drag_start_x;
-	else
-		delta = event->y_root - drag_start_y;
-
-	new = slide_from_value - delta;
-	new = CLAMP(new, 0, panel->adj->upper - panel->adj->page_size);
-
-	gtk_adjustment_set_value(panel->adj, new);
-
-	return TRUE;
+	return FALSE;
 }
 
 static gint icon_motion_event(GtkWidget *widget,

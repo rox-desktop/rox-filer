@@ -27,6 +27,9 @@ struct _Panel {
 	GtkWidget	*after;		/* Icons at the right/bottom end */
 
 	GtkWidget	*gap;		/* Event box between sides */
+
+	int		autoscroll_to;	/* Timeout */
+	int		autoscroll_speed; /* 0 => not scrolling */
 };
 
 extern Panel *current_panel[PANEL_NUMBER_OF_SIDES];
