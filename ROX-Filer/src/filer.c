@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2003, the ROX-Filer team.
+ * Copyright (C) 2005, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -558,7 +558,7 @@ static void may_offer_unmount(FilerWindow *filer_window, char *mount)
 					GTK_RESPONSE_CANCEL);
 	gtk_widget_show(button);
 
-	button = button_new_mixed(ROX_STOCK_MOUNT, _("Umount"));
+	button = button_new_mixed(ROX_STOCK_MOUNT, _("Unmount"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button,
 					GTK_RESPONSE_OK);
