@@ -195,7 +195,7 @@ endir "$MIMEDIR/packages"
 cp rox.xml "$MIMEINFO" || die "Failed to create $MIMEINFO"
 update-mime-database "$MIMEDIR" || die "update-mime-database failed
 Make sure you have installed the shared MIME database from:
-http://www.freedesktop.org/standards/shared-mime-info.html"
+http://www.freedesktop.org/software/shared-mime-info"
 
 echo "Installing application..."
 endir "$APPDIR"

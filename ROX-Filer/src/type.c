@@ -1345,7 +1345,7 @@ static void load_mime_types(void)
 			"types for different files. You should download and "
 			"install the 'shared-mime-info-0.9' package from "
 			"here:\n"
-		"http://www.freedesktop.org/standards/shared-mime-info.html\n\n"
+		"http://www.freedesktop.org/software/shared-mime-info\n\n"
 		"If you have already installed this package, check that the "
 		"permissions allow the files to be read (check "
 		"/usr/local/share/mime/globs or /usr/share/mime/globs)."));
