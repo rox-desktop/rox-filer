@@ -8,6 +8,8 @@ Big changes to internationalisation for pinboards and panels to fix problems
 with incompatible character sets (reported by Arnaud Calvo).
 When creating thumbnails, create to a temporary file and rename in case another
 program tries to write the save thumbnail at the same time.
+As a special case, running with just '-v' doesn't call gtk_init, allowing
+installing without an X server (requested by Michael Duelli).
 
 16-Jan-2001
 ~~~~~~~~~~~

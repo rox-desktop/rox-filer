@@ -249,6 +249,18 @@ int main(int argc, char **argv)
 		getgroups(ngroups, supplemental_groups);
 	}
 
+	if (argc == 2 && strcmp(argv[1], "-v") == 0)
+	{
+		/* This is used by install.sh to test if the filer
+		 * compiled OK. Do this test before gtk_init so that
+		 * we don't need an X server to install.
+		 */
+		fprintf(stderr, "ROX-Filer %s\n", VERSION);
+		fprintf(stderr, _(COPYING));
+		show_features();
+		return EXIT_SUCCESS;
+	}
+
 	/* The idea here is to convert the command-line arguments
 	 * into a SOAP RPC.
 	 * We attempt to invoke the call on an already-running copy of
