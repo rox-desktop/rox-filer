@@ -845,7 +845,7 @@ static void draw_small_icon(GtkWidget *widget,
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc, im_symlink->mask);
 		gdk_draw_pixmap(widget->window, gc, im_symlink->pixmap,
-				0, 0,		/* Source x,y */
+				0, 0,			/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
 	}
@@ -857,12 +857,12 @@ static void draw_small_icon(GtkWidget *widget,
 
 		if (!mp->sm_pixmap)
 			pixmap_make_small(mp);
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+		gdk_gc_set_clip_origin(gc, image_x + 2, area->y + 2);
 		gdk_gc_set_clip_mask(gc, mp->sm_mask);
 		gdk_draw_pixmap(widget->window, gc,
 				mp->sm_pixmap,
-				0, 0,		/* Source x,y */
-				image_x, area->y + 8, /* Dest x,y */
+				0, 0,			/* Source x,y */
+				image_x + 2, area->y + 2, /* Dest x,y */
 				-1, -1);
 	}
 	

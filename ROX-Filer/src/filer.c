@@ -1546,6 +1546,9 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 		case ACT_LASSO_MODIFY:
 			collection_lasso_box(collection, event->x, event->y);
 			break;
+		case ACT_RESIZE:
+			filer_window_autosize(filer_window, TRUE);
+			break;
 		default:
 			g_warning("Unsupported action : %d\n", action);
 			break;

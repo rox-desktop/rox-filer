@@ -82,6 +82,9 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	if (item && dclick && dclick_mode)
 		return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
 
+	if (dclick && context == BIND_DIRECTORY)
+		return ACT_RESIZE;
+
 	if (!press)
 	{
 		if (release && item && (!dclick_mode) && (!ctrl) &&
