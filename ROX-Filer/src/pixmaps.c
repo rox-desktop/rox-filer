@@ -277,7 +277,8 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	if (found)
 	{
 		/* Thumbnail is known, or being created */
-		g_object_unref(image);
+		if (image)
+			g_object_unref(image);
 		callback(data, NULL);
 		return;
 	}
@@ -469,25 +470,30 @@ static gchar *thumbnail_path(const char *path)
 	return ans;
 }
 
+/* Return a program to create thumbnails for files of this type.
+ * NULL to try to make it ourself (using gdk).
+ * g_free the result.
+ */
 static gchar *thumbnail_program(MIME_type *type)
 {
-	gchar     *leaf;
+	gchar *leaf;
 	gchar *path;
 
-	if(!type)
+	if (!type)
 		return NULL;
 
-	leaf=g_strconcat(type->media_type, "_", type->subtype, NULL);
-	path=choices_find_path_load(leaf, "MIME-thumb");
-	if(path) {
+	leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
+	path = choices_find_path_load(leaf, "MIME-thumb");
+	if (path) {
 		g_free(leaf);
 		return path;
 	}
 
-	path=choices_find_path_load(type->media_type, "MIME-thumb");
+	path = choices_find_path_load(type->media_type, "MIME-thumb");
 
 	return path;
 }
+
 /* Called in a subprocess. Load path and create the thumbnail
  * file. Parent will notice when we die.
  * Type is for future expansion: we could run an external command, selected
@@ -496,21 +502,12 @@ static gchar *thumbnail_program(MIME_type *type)
 static void child_create_thumbnail(const gchar *path, MIME_type *type)
 {
 	GdkPixbuf *image;
-	gchar    *thumb_prog;
+	gchar	  *thumb_prog;
 
-	thumb_prog=thumbnail_program(type);
-        if(thumb_prog) {
-		char     *args[5];
-	
-		args[0]=thumb_prog;
-		args[1]=(char *) path;
-		args[2]=thumbnail_path(path);
-		args[3]=g_strdup_printf("%d", PIXMAP_THUMB_SIZE);
-		args[4]=0;
-
+	thumb_prog = thumbnail_program(type);
+        if (thumb_prog) {
 		execl(thumb_prog, thumb_prog, path, thumbnail_path(path),
 		      g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
-
 		_exit(1);
 	}
 
