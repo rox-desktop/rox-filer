@@ -59,13 +59,19 @@ struct _Collection
 {
 	GtkWidget 	parent_widget;
 
+	/* For gtk+-1.2, the adjustment is used for redrawing in the right
+	 * place. With 2.0, the collection is in a Viewport, and this is
+	 * used only to force scrolling, etc.
+	 */
 	GtkAdjustment	*vadj;
+#ifndef GTK2
 	guint		last_scroll;	/* Current/previous scroll value */
+	int		paint_level;	/* Complete redraw on next paint? */
+#endif
 
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;
 	gpointer	cb_user_data;	/* Passed to above two functions */
-	int		paint_level;	/* Complete redraw on next paint? */
 	GdkGC		*bg_gc;		/* NULL unless pixmap background */
 	
 	gboolean	lasso_box;	/* Is the box drawn? */
@@ -106,7 +112,7 @@ struct _CollectionClass
 };
 
 guint   collection_get_type   		(void);
-GtkWidget *collection_new          	(GtkAdjustment *vadj);
+GtkWidget *collection_new		(void);
 void    collection_clear           	(Collection *collection);
 void	collection_clear_except		(Collection *collection, gint item);
 gint    collection_insert          	(Collection *collection, gpointer data);

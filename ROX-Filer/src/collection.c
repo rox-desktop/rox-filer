@@ -97,8 +97,6 @@ static void collection_size_request(GtkWidget 		*widget,
 				    GtkRequisition 	*requisition);
 static void collection_size_allocate(GtkWidget 		*widget,
 			     GtkAllocation 	*allocation);
-static void collection_set_style(GtkWidget *widget,
-                                 GtkStyle *previous_style);
 static void collection_set_adjustment(Collection 	*collection,
 				      GtkAdjustment 	*vadj);
 static void collection_set_arg(	GtkObject *object,
@@ -107,20 +105,7 @@ static void collection_set_arg(	GtkObject *object,
 static void collection_get_arg(	GtkObject *object,
 				GtkArg    *arg,
 				guint     arg_id);
-static void collection_adjustment(GtkAdjustment *adjustment,
-				  Collection    *collection);
-#ifndef GTK2
-static void collection_disconnect(GtkAdjustment *adjustment,
-				  Collection    *collection);
-#endif
-static void set_vadjustment(Collection *collection);
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
-static void scroll_by(Collection *collection, gint diff);
-#ifdef GTK2
-static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
-#else
-static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event);
-#endif
 static void default_draw_item(GtkWidget *widget,
 				CollectionItem *data,
 				GdkRectangle *area,
@@ -145,6 +130,15 @@ static void collection_item_set_selected(Collection *collection,
                                          gboolean selected,
 					 gboolean signal);
 #ifndef GTK2
+static void collection_adjustment(GtkAdjustment *adjustment,
+				  Collection    *collection);
+static void collection_set_style(GtkWidget *widget,
+                                 GtkStyle *previous_style);
+static void collection_disconnect(GtkAdjustment *adjustment,
+				  Collection    *collection);
+static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event);
+static void scroll_by(Collection *collection, gint diff);
+static void set_vadjustment(Collection *collection);
 static void draw_focus(GtkWidget *widget);
 static void collection_draw(GtkWidget *widget, GdkRectangle *area);
 static gint focus_in(GtkWidget *widget, GdkEventFocus *event);
@@ -259,25 +253,20 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->expose_event = collection_expose;
 	widget_class->size_request = collection_size_request;
 	widget_class->size_allocate = collection_size_allocate;
-	widget_class->style_set = collection_set_style;
 
 	widget_class->key_press_event = collection_key_press;
 	
-#ifdef GTK2
-	widget_class->scroll_event = collection_scroll_event;
-#else
-	widget_class->button_press_event = collection_scroll_event;
-#endif
-
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->map = collection_map;
 #ifndef GTK2
+	widget_class->style_set = collection_set_style; /* XXX: Test for 2.0 */
+	widget_class->button_press_event = collection_scroll_event;
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
 	widget_class->draw = collection_draw;
 	widget_class->draw_focus = draw_focus;
 #endif
-
+	
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
 
@@ -331,8 +320,10 @@ static void collection_init(Collection *object)
 	object->item_width = 64;
 	object->item_height = 64;
 	object->vadj = NULL;
+#ifndef GTK2
 	object->paint_level = PAINT_OVERWRITE;
 	object->last_scroll = 0;
+#endif
 	object->bg_gc = NULL;
 
 	object->items = g_malloc(sizeof(CollectionItem) * MINIMUM_ITEMS);
@@ -349,14 +340,9 @@ static void collection_init(Collection *object)
 	return;
 }
 
-GtkWidget* collection_new(GtkAdjustment *vadj)
+GtkWidget* collection_new(void)
 {
-	if (vadj)
-		g_return_val_if_fail(GTK_IS_ADJUSTMENT(vadj), NULL);
-
-	return GTK_WIDGET(gtk_widget_new(collection_get_type(),
-				"vadjustment", vadj,
-				NULL));
+	return GTK_WIDGET(gtk_widget_new(collection_get_type(), NULL));
 }
 
 /* Note: The draw_item call gives the maximum area that can be
@@ -390,7 +376,9 @@ void collection_set_functions(Collection *collection,
 
 	if (GTK_WIDGET_REALIZED(widget))
 	{
+#ifndef GTK2
 		collection->paint_level = PAINT_CLEAR;
+#endif
 		gtk_widget_queue_clear(widget);
 	}
 }
@@ -427,8 +415,10 @@ static void collection_destroy(GtkObject *object)
 
 	if (collection->vadj)
 	{
+#ifndef GTK2
 		gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
 				collection);
+#endif
 		gtk_object_unref(GTK_OBJECT(collection->vadj));
 		collection->vadj = NULL;
 	}
@@ -503,7 +493,7 @@ static void collection_realize(GtkWidget *widget)
 
 	attributes_mask = GDK_WA_X | GDK_WA_Y |
 				GDK_WA_VISUAL | GDK_WA_COLORMAP;
-	widget->window = gdk_window_new(widget->parent->window,
+	widget->window = gdk_window_new(gtk_widget_get_parent_window(widget),
 			&attributes, attributes_mask);
 
 	widget->style = gtk_style_attach(widget->style, widget->window);
@@ -515,10 +505,12 @@ static void collection_realize(GtkWidget *widget)
 	if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
 		collection->bg_gc = create_bg_gc(widget);
 
+#ifndef GTK2
 	/* Try to stop everything flickering horribly */
 	gdk_window_set_static_gravities(widget->window, TRUE);
 
 	set_vadjustment(collection);
+#endif
 
 	bg = &widget->style->bg[GTK_STATE_NORMAL];
 	fg = &widget->style->fg[GTK_STATE_NORMAL];
@@ -533,8 +525,20 @@ static void collection_realize(GtkWidget *widget)
 static void collection_size_request(GtkWidget *widget,
 				GtkRequisition *requisition)
 {
+#ifdef GTK2
+	Collection *collection = COLLECTION(widget);
+	int	rows, cols = collection->columns;
+
+	/* We ask for the total size we need; our containing viewport
+	 * will deal with scrolling.
+	 */
+	requisition->width = MIN_WIDTH;
+	rows = (collection->number_of_items + cols - 1) / cols;
+	requisition->height = rows * collection->item_height;
+#else
 	requisition->width = MIN_WIDTH;
 	requisition->height = MIN_HEIGHT;
+#endif
 }
 
 static void collection_size_allocate(GtkWidget *widget,
@@ -561,9 +565,11 @@ static void collection_size_allocate(GtkWidget *widget,
 	}
 
 	old_columns = collection->columns;
+#ifndef GTK2
 	if (widget->allocation.x != allocation->x
 		|| widget->allocation.y != allocation->y)
 		collection->paint_level = PAINT_CLEAR;
+#endif
 
 	widget->allocation = *allocation;
 
@@ -577,6 +583,7 @@ static void collection_size_allocate(GtkWidget *widget,
 				allocation->x, allocation->y,
 				allocation->width, allocation->height);
 
+#ifndef GTK2
 		/* Force a redraw if the number of columns has changed
 		 * or we have a background pixmap (!).
 		 */
@@ -587,12 +594,22 @@ static void collection_size_allocate(GtkWidget *widget,
 		}
 
 		set_vadjustment(collection);
+#endif
 
 		if (cursor_visible)
 			scroll_to_show(collection, collection->cursor_item);
 	}
+
+#ifdef GTK2
+	if (old_columns != collection->columns)
+	{
+		/* Need to go around again... */
+		gtk_widget_queue_resize(widget);
+	}
+#endif
 }
 
+#ifndef GTK2
 static void collection_set_style(GtkWidget *widget,
                                  GtkStyle *previous_style)
 {
@@ -619,11 +636,16 @@ static void collection_set_style(GtkWidget *widget,
 			collection->bg_gc = create_bg_gc(widget);
 	}
 }
+#endif
 
 static void clear_area(Collection *collection, GdkRectangle *area)
 {
 	GtkWidget	*widget = GTK_WIDGET(collection);
+#ifdef GTK2
+	int		scroll = 0;
+#else
 	int		scroll = collection->vadj->value;
+#endif
 
 	if (collection->bg_gc)
 	{
@@ -648,7 +670,11 @@ static void collection_get_item_area(Collection *collection,
 					GdkRectangle *area)
 
 {
+#ifdef GTK2
+	int		scroll = 0;
+#else
 	int scroll = collection->vadj->value;	/* (round to int) */
+#endif
 
 	area->x = col * collection->item_width;
 	area->y = row * collection->item_height - scroll;
@@ -662,26 +688,27 @@ static void collection_get_item_area(Collection *collection,
 static gint collection_paint(Collection 	*collection,
 			     GdkRectangle 	*area)
 {
-	GdkRectangle	whole, item_area;
-	GtkWidget	*widget;
+	GdkRectangle	item_area;
 	int		row, col;
 	int		item;
-	int		scroll;
+	int		scroll = 0;
 	int		start_row, last_row;
 	int		start_col, last_col;
 	int		phys_last_col;
 	GdkRectangle 	clip;
-	gint     	width, height;
-
-	scroll = collection->vadj->value;
+#ifndef GTK2
+	GtkWidget	*widget;
+	GdkRectangle	whole;
+	gint     	width;
 
 	widget = GTK_WIDGET(collection);
 
-	gdk_window_get_size(widget->window, &width, &height);
+	scroll = collection->vadj->value;
+	gdk_window_get_size(widget->window, &width, NULL);
 	whole.x = 0;
-	whole.y = 0;
+	whole.y = collection->vadj->value;
 	whole.width = width;
-	whole.height = height;
+	whole.height = collection->vadj->page_size;
 	
 	if (collection->paint_level > PAINT_NORMAL || area == NULL)
 	{
@@ -693,6 +720,7 @@ static gint collection_paint(Collection 	*collection,
 
 		collection->paint_level = PAINT_NORMAL;
 	}
+#endif
 
 	/* Calculate the ranges to plot */
 	start_row = (area->y + scroll) / collection->item_height;
@@ -735,6 +763,7 @@ static gint collection_paint(Collection 	*collection,
 
 	item = row * collection->columns + col;
 
+	/* g_print("[ paint %d..%d ]\n", row, last_row); */
 	while ((item == 0 || item < collection->number_of_items)
 			&& row <= last_row)
 	{
@@ -812,8 +841,8 @@ static void collection_set_arg(	GtkObject *object,
 	}
 }
 
-static void collection_set_adjustment(  Collection    *collection,
-					GtkAdjustment *vadj)
+static void collection_set_adjustment(Collection    *collection,
+				      GtkAdjustment *vadj)
 {
 	if (vadj)
 		g_return_if_fail (GTK_IS_ADJUSTMENT (vadj));
@@ -823,8 +852,10 @@ static void collection_set_adjustment(  Collection    *collection,
 							 0.0, 0.0, 0.0));
 	if (collection->vadj && (collection->vadj != vadj))
 	{
+#ifndef GTK2
 		gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
 						collection);
+#endif
 		gtk_object_unref(GTK_OBJECT(collection->vadj));
 	}
 
@@ -834,6 +865,7 @@ static void collection_set_adjustment(  Collection    *collection,
 		gtk_object_ref(GTK_OBJECT(collection->vadj));
 		gtk_object_sink(GTK_OBJECT(collection->vadj));
 
+#ifndef GTK2
 		gtk_signal_connect(GTK_OBJECT(collection->vadj),
 				"changed",
 				(GtkSignalFunc) collection_adjustment,
@@ -842,14 +874,13 @@ static void collection_set_adjustment(  Collection    *collection,
 				"value_changed",
 				(GtkSignalFunc) collection_adjustment,
 				collection);
-#ifndef GTK2
 		/* Is this used for anything? */
 		gtk_signal_connect(GTK_OBJECT(collection->vadj),
 				"disconnect",
 				(GtkSignalFunc) collection_disconnect,
 				collection);
-#endif
 		collection_adjustment(vadj, collection);
+#endif
 	}
 }
 
@@ -872,6 +903,7 @@ static void collection_get_arg(	GtkObject *object,
 	}
 }
 
+#ifndef GTK2
 /* Something about the adjustment has changed */
 static void collection_adjustment(GtkAdjustment *adjustment,
 				  Collection    *collection)
@@ -901,7 +933,6 @@ static void collection_adjustment(GtkAdjustment *adjustment,
 	}
 }
 
-#ifndef GTK2
 static void collection_disconnect(GtkAdjustment *adjustment,
 				  Collection    *collection)
 {
@@ -912,7 +943,6 @@ static void collection_disconnect(GtkAdjustment *adjustment,
 
 	collection_set_adjustment(collection, NULL);
 }
-#endif
 
 static void set_vadjustment(Collection *collection)
 {	
@@ -951,17 +981,6 @@ static void set_vadjustment(Collection *collection)
 	gtk_signal_emit_by_name(GTK_OBJECT(collection->vadj), "changed");
 }
 
-/* Change the adjustment by this amount. Bounded. */
-static void diff_vpos(Collection *collection, int diff)
-{
-	int	value = collection->vadj->value + diff;
-
-	value = CLAMP(value, 0,
-			collection->vadj->upper - collection->vadj->page_size);
-	gtk_adjustment_set_value(collection->vadj, value);
-}
-
-#ifndef GTK2
 static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 {
 	Collection    *collection;
@@ -972,15 +991,19 @@ static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 
 	collection = COLLECTION(widget);
 
-	/* This doesn't always work - I think Gtk+ may be doing some
-	 * kind of expose-event compression...
-	 * 29/9/2000: Turned expose_events on in copy_area... maybe
-	 * we can use this again? Try after 1.0.0!
-	if (collection->paint_level > PAINT_NORMAL)
-	*/
-		collection_paint(collection, area);
+	collection_paint(collection, area);
 }
 #endif
+
+/* Change the adjustment by this amount. Bounded. */
+static void diff_vpos(Collection *collection, int diff)
+{
+	int	value = collection->vadj->value + diff;
+
+	value = CLAMP(value, 0,
+			collection->vadj->upper - collection->vadj->page_size);
+	gtk_adjustment_set_value(collection->vadj, value);
+}
 
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 {
@@ -1001,16 +1024,15 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	return FALSE;
 }
 
+#ifndef GTK2
 /* Positive makes the contents go move up the screen */
 static void scroll_by(Collection *collection, gint diff)
 {
 	GtkWidget	*widget;
-#ifndef GTK2
 	gint		width, height;
 	guint		from_y, to_y;
 	guint		amount;
 	GdkRectangle	new_area;
-#endif
 
 	if (diff == 0)
 		return;
@@ -1020,9 +1042,6 @@ static void scroll_by(Collection *collection, gint diff)
 	if (collection->lasso_box)
 		abort_lasso(collection);
 
-#ifdef GTK2
-	gdk_window_scroll(widget->window, 0, -diff);
-#else
 	gdk_window_get_size(widget->window, &width, &height);
 	new_area.x = 0;
 	new_area.width = width;
@@ -1076,8 +1095,8 @@ static void scroll_by(Collection *collection, gint diff)
 
 	clear_area(collection, &new_area);
 	collection_paint(collection, NULL);
-#endif
 }
+#endif
 
 static void resize_arrays(Collection *collection, guint new_size)
 {
@@ -1167,11 +1186,8 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 	return TRUE;
 }
 
-#ifdef GTK2
-static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event)
-#else
+#ifndef GTK2
 static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
-#endif
 {
 	Collection    	*collection;
 	int		diff = 0;
@@ -1182,14 +1198,6 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 
 	collection = COLLECTION(widget);
 
-#ifdef GTK2
-	if (event->direction == GDK_SCROLL_UP)
-		diff = -32;
-	else if (event->direction == GDK_SCROLL_DOWN)
-		diff = 32;
-	else
-		return FALSE;
-#else
 	if (event->button <= 3 || event->type != GDK_BUTTON_PRESS)
 		return FALSE;		/* Only deal with wheel events here */
 		
@@ -1200,7 +1208,6 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 		diff = -diff;
 	else if (event->button != 5)
 		return FALSE;
-#endif
 
 	if (diff)
 	{
@@ -1230,6 +1237,7 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
 
 	return TRUE;
 }
+#endif
 
 /* 'from' and 'to' are pixel positions. 'step' is the size of each item.
  * Returns the index of the first item covered, and the number of items.
@@ -1262,7 +1270,7 @@ static void get_range(int from, int to, int step, short *pos, short *len)
  */
 static void find_lasso_area(Collection *collection, GdkRectangle *area)
 {
-	int	scroll;
+	int	scroll = 0;
 	int	cols = collection->columns;
 	int	dx = collection->drag_box_x[0] - collection->drag_box_x[1];
 	int	dy = collection->drag_box_y[0] - collection->drag_box_y[1];
@@ -1276,7 +1284,9 @@ static void find_lasso_area(Collection *collection, GdkRectangle *area)
 		return;
 	}
 
+#ifndef GTK2
 	scroll = collection->vadj->value;
+#endif
 
 	get_range(collection->drag_box_x[0],
 		  collection->drag_box_x[1],
@@ -1454,7 +1464,7 @@ static void scroll_to_show(Collection *collection, int item)
 
 		if (GTK_WIDGET_REALIZED(widget))
 		{
-			gdk_window_get_size(widget->window, NULL, &height);
+			height = collection->vadj->page_size;
 			gtk_adjustment_set_value(collection->vadj,
 				(row + 1) * collection->item_height - height);
 		}
@@ -1467,7 +1477,7 @@ static void scroll_to_show(Collection *collection, int item)
 static void get_visible_limits(Collection *collection, int *first, int *last)
 {
 	GtkWidget	*widget = (GtkWidget *) collection;
-	gint		scroll, height;
+	gint		scroll = 0, height;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1481,7 +1491,7 @@ static void get_visible_limits(Collection *collection, int *first, int *last)
 	else
 	{
 		scroll = collection->vadj->value;
-		gdk_window_get_size(widget->window, NULL, &height);
+		height = collection->vadj->page_size;
 
 		*first = MAX(scroll / collection->item_height, 0);
 		*last = (scroll + height - 1) /collection->item_height;
@@ -1591,7 +1601,10 @@ static gboolean as_timeout(Collection *collection)
 	int		diff = 0;
 
 	gdk_window_get_pointer(window, &x, &y, &mask);
-	gdk_window_get_size(window, &w, &h);
+	gdk_window_get_size(window, &w, NULL);
+
+	h = collection->vadj->page_size;
+	y -= collection->vadj->value;
 
 	if ((x < 0 || x > w || y < 0 || y > h) && !collection->lasso_box)
 	{
@@ -1676,7 +1689,11 @@ void collection_clear(Collection *collection)
 
 	resize_arrays(collection, MINIMUM_ITEMS);
 
+#ifdef GTK2
+	gtk_widget_queue_resize(GTK_WIDGET(collection));
+#else
 	collection->paint_level = PAINT_CLEAR;
+#endif
 
 	gtk_widget_queue_clear(GTK_WIDGET(collection));
 
@@ -1707,11 +1724,17 @@ gint collection_insert(Collection *collection, gpointer data)
 
 	if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
 	{
+#ifndef GTK2
 		set_vadjustment(collection);
+#endif
 		collection_draw_item(collection,
 				collection->number_of_items - 1,
 				FALSE);
 	}
+
+#ifdef GTK2
+	gtk_widget_queue_resize(GTK_WIDGET(collection));
+#endif
 
 	return item;
 }
@@ -1791,7 +1814,9 @@ void collection_invert_selection(Collection *collection)
 				      collection->number_selected;
 	
 	/* Have to redraw everything... */
+#ifndef GTK2
 	collection->paint_level = PAINT_CLEAR;
+#endif
 	gtk_widget_queue_clear(GTK_WIDGET(collection));
 	
 	EMIT_SELECTION_CHANGED(collection, current_event_time);
@@ -1854,10 +1879,12 @@ void collection_clear_selection(Collection *collection)
 /* Force a redraw of the specified item, if it is visible */
 void collection_draw_item(Collection *collection, gint item, gboolean blank)
 {
-	gint		height;
 	GdkRectangle	area;
 	GtkWidget	*widget;
 	int		row, col;
+#ifndef GTK2
+	gint		height;
+#endif
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1873,6 +1900,10 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 
 	collection_get_item_area(collection, row, col, &area);
 
+#ifdef GTK2
+	if (GTK_WIDGET_REALIZED(widget))
+		gdk_window_invalidate_rect(widget->window, &area, FALSE);
+#else
 	if (area.y + area.height < 0)
 		return;
 
@@ -1892,6 +1923,7 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 		draw_lasso_box(collection);
 		gdk_gc_set_clip_rectangle(collection->xor_gc, NULL);
 	}
+#endif
 }
 
 void collection_set_item_size(Collection *collection, int width, int height)
@@ -1915,16 +1947,21 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	{
 		gint		window_width;
 
-		collection->paint_level = PAINT_CLEAR;
 		gdk_window_get_size(widget->window, &window_width, NULL);
 		collection->columns = MAX(window_width / collection->item_width,
 					  1);
-
+#ifndef GTK2
+		collection->paint_level = PAINT_CLEAR;
 		set_vadjustment(collection);
+#endif
 		if (collection->cursor_item != -1)
 			scroll_to_show(collection, collection->cursor_item);
 		gtk_widget_queue_draw(widget);
 	}
+
+#ifdef GTK2
+	gtk_widget_queue_resize(GTK_WIDGET(collection));
+#endif
 }
 
 /* Cursor is positioned on item with the same data as before the sort.
@@ -1989,7 +2026,9 @@ void collection_qsort(Collection *collection,
 		}
 	}
 	
+#ifndef GTK2
 	collection->paint_level = PAINT_CLEAR;
+#endif
 
 	gtk_widget_queue_draw(GTK_WIDGET(collection));
 }
@@ -2019,14 +2058,16 @@ int collection_find_item(Collection *collection, gpointer data,
  */
 int collection_get_item(Collection *collection, int x, int y)
 {
-	int		scroll;
+	int		scroll = 0;
 	int		row, col;
 	int		width;
 	int		item;
 
 	g_return_val_if_fail(collection != NULL, -1);
 
+#ifndef GTK2
 	scroll = collection->vadj->value;
+#endif
 	col = x / collection->item_width;
 	row = (y + scroll) / collection->item_height;
 
@@ -2187,13 +2228,20 @@ void collection_delete_if(Collection *collection,
 		resize_arrays(collection,
 			MAX(collection->number_of_items, MINIMUM_ITEMS));
 
+#ifndef GTK2
 		collection->paint_level = PAINT_CLEAR;
+#endif
 
 		if (GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
 		{
+#ifndef GTK2
 			set_vadjustment(collection);
+#endif
 			gtk_widget_queue_draw(GTK_WIDGET(collection));
 		}
+#ifdef GTK2
+		gtk_widget_queue_resize(GTK_WIDGET(collection));
+#endif
 	}
 }
 

@@ -500,11 +500,13 @@ void drag_set_pinboard_dest(GtkWidget *widget)
 			    NULL);
 }
 
+#ifndef GTK2
 static void scrolled(GtkAdjustment *adj, Collection *collection)
 {
 	collection_set_cursor_item(collection, -1);
 	dnd_spring_abort();
 }
+#endif
 
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
@@ -551,6 +553,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (item && type == drop_dest_dir &&
 			!(item->flags & ITEM_FLAG_APPDIR))
 	{
+#ifndef GTK2
+		/* XXX: Do we still need this under 2.0? */
 		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
 
 		/* Subdir: prepare for spring-open */
@@ -566,6 +570,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 						GTK_SIGNAL_FUNC(scrolled),
 						filer_window->collection);
 		}
+#endif
 		dnd_spring_load(context, filer_window);
 	}
 	else

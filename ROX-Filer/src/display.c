@@ -754,8 +754,12 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i)
 	Collection *collection = filer_window->collection;
 	int	col = i % collection->columns;
 	int	row = i / collection->columns;
-	int	scroll = collection->vadj->value;	/* (round to int) */
+	int	scroll = 0;
 	GdkRectangle area;
+
+#ifndef GTK2
+	scroll = collection->vadj->value;	/* (round to int) */
+#endif
 
 	if (filer_window->display_style == LARGE_ICONS ||
 	    filer_window->display_style == HUGE_ICONS)
@@ -1388,7 +1392,9 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details)
 		return;
 	filer_window->details_type = details;
 
+#ifndef GTK2
 	filer_window->collection->paint_level = PAINT_CLEAR;
+#endif
 	gtk_widget_queue_clear(GTK_WIDGET(filer_window->collection));
 }
 

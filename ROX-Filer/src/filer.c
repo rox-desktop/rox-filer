@@ -1356,7 +1356,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	filer_set_title(filer_window);
 
 	/* The collection is the area that actually displays the files */
-	collection = collection_new(NULL);
+	collection = collection_new();
 
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
@@ -1402,8 +1402,31 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_widget_show_all(filer_window->toolbar_frame);
 	}
 
-	/* Now add the area for displaying the files... */
+	/* Now add the area for displaying the files.
+	 * If we've got Gtk+-2.0 then the collection is one huge window
+	 * that goes in a Viewport. Otherwise, the collection handles
+	 * scrolling itself.
+	 */
+#ifdef GTK2
+	{
+		GtkWidget *viewport;
+		GtkAdjustment *adj;
+
+		adj = filer_window->collection->vadj;
+		viewport = gtk_viewport_new(NULL, adj);
+		gtk_viewport_set_shadow_type(GTK_VIEWPORT(viewport),
+				GTK_SHADOW_NONE);
+		gtk_container_add(GTK_CONTAINER(viewport), collection);
+		gtk_widget_show_all(viewport);
+		gtk_box_pack_start(GTK_BOX(vbox), viewport, TRUE, TRUE, 0);
+		filer_window->scrollbar = gtk_vscrollbar_new(adj);
+		gtk_widget_set_usize(viewport, 4, 4);
+	}
+#else
 	gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
+	filer_window->scrollbar =
+			gtk_vscrollbar_new(COLLECTION(collection)->vadj);
+#endif
 
 	/* And the minibuffer (hidden unless differently selected in options) */
 	create_minibuffer(filer_window);
@@ -1411,18 +1434,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 				FALSE, TRUE, 0);
 
 	/* Put the scrollbar on the left of everything else... */
-	filer_window->scrollbar =
-			gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 	gtk_box_pack_start(GTK_BOX(hbox),
 			filer_window->scrollbar, FALSE, TRUE, 0);
-
-	/* Connect the menu's accelerator group to the window.
-	 * For Gtk+-2.0, we activate the group manually from the key handler,
-	 * because the order has changed.
-	 */
-#if 0
-	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
-#endif
 
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window), collection);
 
