@@ -51,12 +51,6 @@
 #include "action.h"
 #include "display.h"
 
-/* Store glob-to-icon mappings */
-typedef struct _GlobIcon {
-	guchar *pattern;
-	guchar *iconpath;
-} GlobIcon;
-
 static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 
 /* Static prototypes */
