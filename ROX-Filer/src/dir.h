@@ -46,6 +46,7 @@ struct _Directory
 	GHashTable 	*known_items;	/* What our users know about */
 	GPtrArray	*new_items;	/* New items to add in */
 	GPtrArray	*up_items;	/* Items to redraw */
+	GPtrArray	*gone_items;	/* Items removed */
 
 	GList		*recheck_list;	/* Items to check on callback */
 

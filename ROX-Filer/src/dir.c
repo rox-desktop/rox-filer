@@ -356,6 +356,7 @@ void dir_rescan(Directory *dir, guchar *pathname)
 	}
 
 	dir_set_scanning(dir, TRUE);
+	dir_merge_new(dir);
 	gdk_flush();
 
 	/* Make a list of all the names in the directory */
@@ -415,6 +416,7 @@ void dir_merge_new(Directory *dir)
 	GList *list = dir->users;
 	GPtrArray	*new = dir->new_items;
 	GPtrArray	*up = dir->up_items;
+	GPtrArray	*gone = dir->gone_items;
 	int	i;
 
 	while (list)
@@ -425,10 +427,11 @@ void dir_merge_new(Directory *dir)
 			user->callback(dir, DIR_ADD, new, user->data);
 		if (up->len)
 			user->callback(dir, DIR_UPDATE, up, user->data);
+		if (gone->len)
+			user->callback(dir, DIR_REMOVE, gone, user->data);
 		
 		list = list->next;
 	}
-
 
 	for (i = 0; i < new->len; i++)
 	{
@@ -437,6 +440,14 @@ void dir_merge_new(Directory *dir)
 		g_hash_table_insert(dir->known_items, item->leafname, item);
 	}
 
+	for (i = 0; i < gone->len; i++)
+	{
+		DirItem	*item = (DirItem *) gone->pdata[i];
+
+		diritem_free(item);
+	}
+	
+	g_ptr_array_set_size(gone, 0);
 	g_ptr_array_set_size(new, 0);
 	g_ptr_array_set_size(up, 0);
 }
@@ -558,19 +569,6 @@ static void delayed_notify(Directory *dir)
 	dir->notify_active = TRUE;
 }
 
-static void remove_item(Directory *dir, DirItem *item)
-{
-	GPtrArray *gone;
-
-	g_hash_table_remove(dir->known_items, item->leafname);
-
-	/* Move deleted item from 'items' to 'gone' */
-	gone = g_ptr_array_new();
-	g_ptr_array_add(gone, item);
-	notify_deleted(dir, gone);
-	free_items_array(gone);
-}
-
 /* Stat this item and add, update or remove it.
  * Returns the new/updated item, if any.
  * (leafname may be from the current DirItem item)
@@ -605,16 +603,24 @@ static DirItem *insert_item(Directory *dir, guchar *leafname)
 		 */
 		item = diritem_new(leafname);
 		diritem_restat(tmp->str, item);
+		if (item->base_type == TYPE_ERROR &&
+				item->lstat_errno == ENOENT)
+		{
+			diritem_free(item);
+			return NULL;
+		}
 		g_ptr_array_add(dir->new_items, item);
-		dir_merge_new(dir);
+
 	}
 
 	if (item->base_type == TYPE_ERROR && item->lstat_errno == ENOENT)
 	{
 		/* Item has been deleted */
-		remove_item(dir, item);
+		g_hash_table_remove(dir->known_items, item->leafname);
+		g_ptr_array_add(dir->gone_items, item);
 		if (do_compare)
 			pixmap_unref(old.image);
+		delayed_notify(dir);
 		return NULL;
 	}
 
@@ -666,6 +672,7 @@ static Directory *load(char *pathname, gpointer data)
 
 	dir->new_items = g_ptr_array_new();
 	dir->up_items = g_ptr_array_new();
+	dir->gone_items = g_ptr_array_new();
 	
 	return dir;
 }
@@ -682,13 +689,16 @@ static void destroy(Directory *dir)
 	free_recheck_list(dir);
 	set_idle_callback(dir);
 
+	dir_merge_new(dir);	/* Ensures new, up and gone are empty */
+
 	g_ptr_array_free(dir->up_items, TRUE);
+	g_ptr_array_free(dir->new_items, TRUE);
+	g_ptr_array_free(dir->gone_items, TRUE);
 
 	items = hash_to_array(dir->known_items);
 	free_items_array(items);
 	g_hash_table_destroy(dir->known_items);
 	
-	free_items_array(dir->new_items);
 	g_free(dir->error);
 	g_free(dir->pathname);
 	g_free(dir);
@@ -785,7 +795,6 @@ static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
 	g_free(old);
 
 	insert_item(dir, leafname);
-	dir_merge_new(dir);
 }
 
 static void to_array(gpointer key, gpointer value, gpointer data)

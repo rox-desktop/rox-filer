@@ -62,9 +62,7 @@ void diritem_init(void)
 	read_globicons();
 }
 
-/* Bring this item's structure uptodate.
- * Use diritem_stat() instead the first time to initialise the item.
- */
+/* Bring this item's structure uptodate */
 void diritem_restat(guchar *path, DirItem *item)
 {
 	struct stat	info;
