@@ -55,8 +55,6 @@ static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
 
-static GtkTooltips	*tooltips = NULL;
-
 /* Widget which holds the selection when we have it */
 static GtkWidget *selection_invisible = NULL;
 static guint losing_selection = 0;	/* > 0 => Don't send events */

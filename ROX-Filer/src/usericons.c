@@ -39,6 +39,9 @@
 #include "dnd.h"
 #include "support.h"
 #include "usericons.h"
+#include "main.h"
+#include "menu.h"
+#include "filer.h"
 
 /* Store glob-to-icon mappings */
 typedef struct _GlobIcon {
@@ -46,15 +49,25 @@ typedef struct _GlobIcon {
 	guchar *iconpath;
 } GlobIcon;
 
-static GList *glob_icons = NULL;
+static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 
 /* Static prototypes */
 static char *process_globicons_line(guchar *line);
-static GlobIcon *get_globicon_struct(guchar *path);
-static void free_globicon(GlobIcon *gi, gpointer user_data);
+static gboolean free_globicon(gpointer key, gpointer value, gpointer data);
 static void get_path_set_icon(GtkWidget *dialog);
 static void show_icon_help(gpointer data);
 static void write_globicons(void);
+static void show_current_dirs_menu(GtkWidget *button, gpointer data);
+static void add_globicon(guchar *path, guchar *icon);
+static void drag_icon_dropped(GtkWidget	 	*frame,
+		       	      GdkDragContext    *context,
+		       	      gint              x,
+		       	      gint              y,
+		       	      GtkSelectionData  *selection_data,
+		       	      guint             info,
+		       	      guint32           time,
+		       	      GtkWidget	 	*dialog);
+static void remove_icon(GtkWidget *dialog);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -67,7 +80,10 @@ void read_globicons()
 	struct stat info;
 	guchar *path;
 	xmlDocPtr doc;
-	
+
+	if (!glob_icons)
+		glob_icons = g_hash_table_new(g_str_hash, g_str_equal);
+
 	path = choices_find_path_load("globicons", PROJECT);
 	if (!path)
 		return;	/* Nothing to load */
@@ -78,19 +94,13 @@ void read_globicons()
 	if (info.st_mtime <= last_read)
 		goto out;  /* File hasn't been modified since we last read it */
 
-	if (glob_icons)
-	{
-		g_list_foreach(glob_icons, (GFunc) free_globicon, NULL);
-		g_list_free(glob_icons);
-		glob_icons = NULL;
-	}
+	g_hash_table_foreach_remove(glob_icons, free_globicon, NULL);
 
 	doc = xmlParseFile(path);
 	if (doc)
 	{
 		xmlNodePtr node, icon, root;
 		char	   *match;
-		GlobIcon   *gi;
 		
 		root = xmlDocGetRootElement(doc);
 		
@@ -108,15 +118,8 @@ void read_globicons()
 			if (!match)
 				continue;
 
-			gi = g_new(GlobIcon, 1);
-			gi->pattern = match;
-			gi->iconpath = xmlNodeGetContent(icon);
-
-			/* Prepend so that later patterns override earlier ones
-			 * when we loop through the list.
-			 */
-			glob_icons = g_list_prepend(glob_icons, gi);
-			
+			g_hash_table_insert(glob_icons, match,
+					xmlNodeGetContent(icon));
 		}
 
 		xmlFreeDoc(doc);
@@ -125,7 +128,7 @@ void read_globicons()
 	{
 		/* Handle the old non-XML format */
 		parse_file(path, process_globicons_line);
-		if (glob_icons)
+		if (g_hash_table_size(glob_icons))
 			write_globicons();	/* Upgrade to new format */
 	}
 
@@ -139,33 +142,202 @@ out:
  */
 void check_globicon(guchar *path, DirItem *item)
 {
-	GlobIcon *gi;
+	gchar *gi;
 
 	g_return_if_fail(item && !item->image);
 
-	gi = get_globicon_struct(path);
+	gi = g_hash_table_lookup(glob_icons, path);
 	if (gi)
-		item->image = g_fscache_lookup(pixmap_cache, gi->iconpath);
+		item->image = g_fscache_lookup(pixmap_cache, gi);
 }
+
+/* Add a globicon mapping for the given file to the given icon path */
+gboolean set_icon_path(guchar *filepath, guchar *iconpath)
+{
+	struct stat icon;
+	MaskedPixmap *pic;
+
+	/* Check if file exists */
+	if (!mc_stat(iconpath, &icon) == 0) {
+		delayed_rox_error(_("The pathname you gave does not exist. "
+			      	    "The icon has not been changed."));
+		return FALSE;
+	}
+
+	/* Check if we can load the image, warn the user if not. */
+	pic = g_fscache_lookup(pixmap_cache, iconpath);
+	if (!pic)
+	{
+		delayed_rox_error(
+			_("Unable to load image file -- maybe it's not in a "
+			  "format I understand, or maybe the permissions are "
+			  "wrong?\n"
+			  "The icon has not been changed."));
+		return FALSE;
+	}
+	g_fscache_data_unref(pixmap_cache, pic);
+
+	/* Add the globicon mapping and update visible icons */
+	add_globicon(filepath, iconpath);
+
+	return TRUE;
+}
+
+/* Display a dialog box allowing the user to set the icon for
+ * a file or directory.
+ */
+void icon_set_handler_dialog(DirItem *item, guchar *path)
+{
+	guchar		*tmp;
+	GtkWidget	*dialog, *vbox, *frame, *hbox, *vbox2;
+	GtkWidget	*entry, *label, *button, *align, *icon;
+	GtkTargetEntry 	targets[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
+	char	*gi;
+	
+	g_return_if_fail(item != NULL && path != NULL);
+
+	gi = g_hash_table_lookup(glob_icons, path);
+
+	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_object_set_data_full(GTK_OBJECT(dialog),
+				 "pathname",
+				 strdup(path),
+				 g_free);
+
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
+	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
+
+	vbox = gtk_vbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(dialog), vbox);
+
+	tmp = g_strconcat(_("Path: "), path, NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(tmp), FALSE, TRUE, 0);
+	g_free(tmp);
+
+	frame = gtk_frame_new(NULL);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+
+	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
+			targets, sizeof(targets) / sizeof(*targets),
+			GDK_ACTION_COPY);
+	gtk_signal_connect(GTK_OBJECT(frame), "drag_data_received",
+			GTK_SIGNAL_FUNC(drag_icon_dropped), dialog);
+
+	vbox2 = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(frame), vbox2);
+
+	label = gtk_label_new(_("Drop an icon file here"));
+	gtk_misc_set_padding(GTK_MISC(label), 10, 10);
+	gtk_box_pack_start(GTK_BOX(vbox2), label, TRUE, TRUE, 0);
+	align = gtk_alignment_new(1, 1, 0, 0);
+	gtk_box_pack_start(GTK_BOX(vbox2), align, FALSE, TRUE, 0);
+	button = gtk_button_new();
+	gtk_container_add(GTK_CONTAINER(align), button);
+	icon = gtk_pixmap_new(im_dirs->pixmap, im_dirs->mask);
+	gtk_container_add(GTK_CONTAINER(button), icon);
+	gtk_tooltips_set_tip(tooltips, button,
+			_("Menu of directories previously used for icons"),
+			NULL);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(show_current_dirs_menu), NULL);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
+						FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	label = gtk_label_new(_("Enter the path of an icon file:")),
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 4);
+
+	gtk_box_pack_start(GTK_BOX(hbox),
+			new_help_button(show_icon_help, NULL), FALSE, TRUE, 0);
+
+	entry = gtk_entry_new();
+	/* Set the current icon as the default text if there is one */
+	if (gi)
+		gtk_entry_set_text(GTK_ENTRY(entry), gi);
+
+	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
+	gtk_widget_grab_focus(entry);
+	gtk_object_set_data(GTK_OBJECT(dialog), "icon_path", entry);
+	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
+			GTK_SIGNAL_FUNC(get_path_set_icon),
+			GTK_OBJECT(dialog));
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
+						FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
+
+	hbox = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	button = gtk_button_new_with_label(_("Remove custom icon"));
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+				  GTK_SIGNAL_FUNC(remove_icon),
+				  GTK_OBJECT(dialog));
+
+	hbox = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	button = gtk_button_new_with_label(_("OK"));
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_window_set_default(GTK_WINDOW(dialog), button);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(get_path_set_icon),
+			GTK_OBJECT(dialog));
+	
+	button = gtk_button_new_with_label(_("Cancel"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(dialog));
+
+	gtk_widget_show_all(dialog);
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void free_globicon(GlobIcon *gi, gpointer user_data)
+static gboolean free_globicon(gpointer key, gpointer value, gpointer data)
 {
-	g_return_if_fail(gi != NULL);
+	g_free(key);
+	g_free(value);
 
-	g_free(gi->pattern);
-	g_free(gi->iconpath);
-	g_free(gi);
+	return TRUE;		/* For g_hash_table_foreach_remove() */
+}
+
+static void write_globicon(gpointer key, gpointer value, gpointer data)
+{
+	xmlNodePtr doc = (xmlNodePtr) data;
+	xmlNodePtr tree;
+
+	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
+	xmlSetProp(tree, "match", key);
+	xmlNewChild(tree, NULL, "icon", value);
 }
 
 /* Write globicons file */
 static void write_globicons(void)
 {
 	gchar *save = NULL;
-	GList *next;
 	gchar *save_new = NULL;
 	xmlDocPtr doc = NULL;
 
@@ -180,16 +352,8 @@ static void write_globicons(void)
 	xmlDocSetRootElement(doc,
 		             xmlNewDocNode(doc, NULL, "special-files", NULL));
 
-	for (next = g_list_last(glob_icons); next; next = next->prev)
-	{
-		GlobIcon *gi = (GlobIcon *) next->data;
-		xmlNodePtr tree;
-
-		tree = xmlNewTextChild(xmlDocGetRootElement(doc),
-				   NULL, "rule", NULL);
-		xmlSetProp(tree, "match", gi->pattern);
-		xmlNewChild(tree, NULL, "icon", gi->iconpath);
-	}
+	g_hash_table_foreach(glob_icons, write_globicon,
+			     xmlDocGetRootElement(doc));
 
 #if LIBXML_VERSION > 20400
 	if (xmlSaveFormatFileEnc(save_new, doc, NULL, 1) < 0)
@@ -229,7 +393,6 @@ static void write_globicons(void)
 static char *process_globicons_line(guchar *line)
 {
 	guchar *pattern, *iconpath;
-	GlobIcon *gi;
 	
 	pattern = strtok(line, " \t");
 	/* We ignore empty lines, but they are no cause for a message */
@@ -242,36 +405,8 @@ static char *process_globicons_line(guchar *line)
 	g_return_val_if_fail(iconpath != NULL,
 			"Invalid line in globicons: no icon specified");
 
-	gi = g_new(GlobIcon, 1);
-	gi->pattern = g_strdup(pattern);
-	gi->iconpath = g_strdup(iconpath);
+	g_hash_table_insert(glob_icons, g_strdup(pattern), g_strdup(iconpath));
 
-	/* Prepend so that later patterns override earlier ones when we loop
-	 * through the list.
-	 */
-	glob_icons = g_list_prepend(glob_icons, gi);
-
-	return NULL;
-}
-
-/* If there is a globicon entry that matches the given path, return
- * a pointer to the GlobIcon structure, otherwise return NULL.
- * The returned pointer should not be freed because it is part of
- * the glob_icons list.
- */
-static GlobIcon *get_globicon_struct(guchar *path)
-{
-	GList *list;
-	
-	for (list = glob_icons; list; list = list->next)
-	{
-		GlobIcon *gi = (GlobIcon *) list->data;
-
-		if (fnmatch(gi->pattern, path, FNM_PATHNAME) == 0)
-			return gi;
-	}
-
-	/* If we get here, there is no corresponding globicon */
 	return NULL;
 }
 
@@ -282,31 +417,8 @@ static GlobIcon *get_globicon_struct(guchar *path)
  */
 static void add_globicon(guchar *path, guchar *icon)
 {
-	GList *list;
-	GlobIcon *gi;
-	
-	for (list = glob_icons; list; list = list->next)
-	{
-		gi = (GlobIcon *) list->data;
-		
-		if (strcmp(gi->pattern, path) == 0)
-		{
-			g_free(gi->iconpath);
-			gi->iconpath = g_strdup(icon);
-			goto out;
-		}
-	}
+	g_hash_table_insert(glob_icons, g_strdup(path), g_strdup(icon));
 
-	gi = g_new(GlobIcon, 1);
-	gi->pattern = g_strdup(path);
-	gi->iconpath = g_strdup(icon);
-
-	/* Prepend so that later patterns override earlier ones when we loop
-	 * through the list.
-	 */
-	glob_icons = g_list_prepend(glob_icons, gi);
-
-out:
 	/* Rewrite the globicons file */
 	write_globicons();
 
@@ -314,22 +426,19 @@ out:
 	examine(path);
 }
 
-/* Remove the globicon for a certain path from the list. If the path
- * has no associated globicon, the list is not modified.
- */
+/* Remove the globicon for a certain path */
 static void delete_globicon(guchar *path)
 {
-	GlobIcon *gi;
-	
-	/* XXX: What happens if the user tries to unset /home/fred/Mail
-	 * and there is a rule for /home/<*>/Mail ?
-	 */
-	gi = get_globicon_struct(path);
-	if (!gi)
-		return;	/* Not in the list */
+	gpointer key, value;
 
-	glob_icons = g_list_remove(glob_icons, gi);
-	free_globicon(gi, NULL);
+	if (!g_hash_table_lookup_extended(glob_icons, path, &key, &value))
+		return;
+
+	g_hash_table_remove(glob_icons, path);
+
+	g_free(key);
+	g_free(value);
+
 	write_globicons();
 	examine(path);
 }
@@ -408,154 +517,67 @@ static void remove_icon(GtkWidget *dialog)
 	destroy_on_idle(dialog);
 }
 
-/* Add a globicon mapping for the given file to the given icon path */
-gboolean set_icon_path(guchar *filepath, guchar *iconpath)
-{
-	struct stat icon;
-	MaskedPixmap *pic;
-
-	/* Check if file exists */
-	if (!mc_stat(iconpath, &icon) == 0) {
-		delayed_rox_error(_("The pathname you gave does not exist. "
-			      	    "The icon has not been changed."));
-		return FALSE;
-	}
-
-	/* Check if we can load the image, warn the user if not. */
-	pic = g_fscache_lookup(pixmap_cache, iconpath);
-	if (!pic)
-	{
-		delayed_rox_error(
-			_("Unable to load image file -- maybe it's not in a "
-			  "format I understand, or maybe the permissions are "
-			  "wrong?\n"
-			  "The icon has not been changed."));
-		return FALSE;
-	}
-	g_fscache_data_unref(pixmap_cache, pic);
-
-	/* Add the globicon mapping and update visible icons */
-	add_globicon(filepath, iconpath);
-
-	return TRUE;
-}
-
-/* Display a dialog box allowing the user to set the icon for
- * a file or directory.
- */
-void icon_set_handler_dialog(DirItem *item, guchar *path)
-{
-	guchar		*tmp;
-	GtkWidget	*dialog, *vbox, *frame, *hbox, *entry, *label, *button;
-	GtkTargetEntry 	targets[] = {
-		{"text/uri-list", 0, TARGET_URI_LIST},
-	};
-	GlobIcon	*gi;
-	
-	gi = get_globicon_struct(path);
-
-	g_return_if_fail(item != NULL && path != NULL);
-
-	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_object_set_data_full(GTK_OBJECT(dialog),
-				 "pathname",
-				 strdup(path),
-				 g_free);
-
-	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
-
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
-
-	tmp = g_strconcat(_("Path: "), path, NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_label_new(tmp), FALSE, TRUE, 0);
-	g_free(tmp);
-
-	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
-
-	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
-			targets, sizeof(targets) / sizeof(*targets),
-			GDK_ACTION_COPY);
-	gtk_signal_connect(GTK_OBJECT(frame), "drag_data_received",
-			GTK_SIGNAL_FUNC(drag_icon_dropped), dialog);
-
-	label = gtk_label_new(_("Drop an icon file here"));
-	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
-	gtk_container_add(GTK_CONTAINER(frame), label);
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
-						FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	label = gtk_label_new(_("Enter the path of an icon file:")),
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 4);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			new_help_button(show_icon_help, NULL), FALSE, TRUE, 0);
-
-	entry = gtk_entry_new();
-	/* Set the current icon as the default text if there is one */
-	if (gi && gi->iconpath)
-		gtk_entry_set_text(GTK_ENTRY(entry), gi->iconpath);
-
-	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
-	gtk_widget_grab_focus(entry);
-	gtk_object_set_data(GTK_OBJECT(dialog), "icon_path", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(get_path_set_icon),
-			GTK_OBJECT(dialog));
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
-						FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("Remove custom icon"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-				  GTK_SIGNAL_FUNC(remove_icon),
-				  GTK_OBJECT(dialog));
-
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(get_path_set_icon),
-			GTK_OBJECT(dialog));
-	
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
-
-	gtk_widget_show_all(dialog);
-}
-
 static void show_icon_help(gpointer data)
 {
 	report_rox_error(
 		_("Enter the full path of a file that contains a valid "
 		  "image to be used as the icon for this file or directory."));
+}
+
+static void get_dir(gpointer key, gpointer value, gpointer data)
+{
+	GHashTable *names = (GHashTable *) data;
+	gchar *dir;
+	
+	dir = g_dirname(value);	/* Freed in add_dir_to_menu */
+	if (dir)
+	{
+		g_hash_table_insert(names, dir, NULL);
+	}
+}
+
+static void open_icon_dir(GtkMenuItem *item, gpointer data)
+{
+	char *dir;
+
+	dir = gtk_label_get_text(GTK_LABEL(GTK_BIN(item)->child));
+	filer_opendir(dir, NULL);
+}
+
+static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
+{
+	GtkMenuShell *menu = (GtkMenuShell *) data;
+	GtkWidget *item;
+	
+	item = gtk_menu_item_new_with_label(key);
+	gtk_widget_lock_accelerators(item);
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			GTK_SIGNAL_FUNC(open_icon_dir), NULL);
+	g_free(key);
+	gtk_menu_shell_append(menu, item);
+}
+
+static void show_current_dirs_menu(GtkWidget *button, gpointer data)
+{
+	GHashTable *names;
+	GtkWidget *menu;
+
+	names = g_hash_table_new(g_str_hash, g_str_equal);
+
+	g_hash_table_foreach(glob_icons, get_dir, names);
+	if (g_hash_table_size(glob_icons) == 0)
+	{
+		/* TODO: Include MIME-icons? */
+		delayed_rox_error(_("You have not yet set any special icons; "
+			"therefore, I have no directories to show you"));
+		return;
+	}
+	
+	menu = gtk_menu_new();
+
+	g_hash_table_foreach(names, add_dir_to_menu, menu);
+
+	g_hash_table_destroy(names);
+
+	show_popup_menu(menu, gtk_get_current_event(), 0);
 }

@@ -9,9 +9,12 @@
 #define _MAIN_H
 
 #include <sys/types.h>
+#include <gtk/gtk.h>
 
 typedef struct _Callback Callback;
 typedef void (*CallbackFn)(gpointer data);
+
+extern GtkTooltips *tooltips;
 
 struct _Callback
 {

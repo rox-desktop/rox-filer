@@ -80,6 +80,8 @@ guchar *show_user_message = NULL;
 int home_dir_len;
 char *home_dir, *app_dir;
 
+GtkTooltips *tooltips = NULL;
+
 #define COPYING								\
 	     N_("Copyright (C) 2001 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -342,6 +344,7 @@ int main(int argc, char **argv)
 
 	add_default_styles();
 	gtk_init(&argc, &argv);
+	tooltips = gtk_tooltips_new();
 
 	if (euid == 0 || show_user)
 		show_user_message = g_strdup_printf( _("Running as user '%s'"), 

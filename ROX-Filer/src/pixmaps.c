@@ -77,6 +77,7 @@ MaskedPixmap *im_exec_file;
 MaskedPixmap *im_appdir;
 
 MaskedPixmap *im_help;
+MaskedPixmap *im_dirs;
 
 /* Static prototypes */
 
@@ -142,6 +143,7 @@ static void load_default_pixmaps(void)
 	im_appdir = load_pixmap("pixmaps/application.xpm");
 
 	im_help = load_pixmap("pixmaps/help.xpm");
+	im_dirs = load_pixmap("pixmaps/dirs.xpm");
 }
 
 void pixmap_ref(MaskedPixmap *mp)
