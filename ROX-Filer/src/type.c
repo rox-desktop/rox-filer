@@ -75,16 +75,11 @@ MIME_type *type_from_path(char *path)
 gboolean type_open(char *path, MIME_type *type)
 {
 	char		*argv[] = {NULL, path, NULL};
-	GString		*type_path;
 	char		*open;
 	struct stat 	info;
 	gboolean	needs_free = FALSE;
 
-	type_path = g_string_new(type->name);
-	g_string_append(type_path, "/open");
-	open = choices_find_path_load_shared(type_path->str, "MIME-types");
-	g_string_free(type_path, TRUE);
-
+	open = choices_find_path_load_shared(type->name, "MIME-open");
 	if (!open)
 		return FALSE;
 
@@ -119,14 +114,14 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 
 	if (!type->image)
 	{
-		char	*path, *open;
+		char	*open, *path;
 
-		path = g_strconcat(type->name, "/icon.xpm", NULL);
-		open = choices_find_path_load_shared(path, "MIME-types");
+		path = g_strconcat(type->name, ".xpm", NULL);
+		open = choices_find_path_load_shared(path, "MIME-icons");
+		g_free(path);
 		type->image = load_pixmap_from(window, open);
 		if (!type->image)
 			type->image = default_pixmap + TYPE_UNKNOWN;
-		g_free(path);
 	}
 		
 	return type->image;

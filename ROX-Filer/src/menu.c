@@ -30,6 +30,7 @@ GtkAccelGroup	*panel_keys;
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void menu_closed(GtkWidget *widget);
+static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
@@ -45,9 +46,11 @@ static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
-static GtkWidget	*filer_file_item;	/* The File '' menu */
+static GtkWidget	*filer_file_item;	/* The File '' label */
+static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
-static GtkWidget	*panel_file_item;	/* The File '' menu */
+static GtkWidget	*panel_file_item;	/* The File '' label */
+static GtkWidget	*panel_file_menu;	/* The File '' menu */
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
@@ -67,8 +70,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Rename",		NULL,  	NULL, 0, NULL},
 {"/File/Help",		    	"F1",  	NULL, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
-{"/File/Mount",	    		C_"M",  mount, 0,	NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
+{"/File/Mount",	    		C_"M",  mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
 {"/File/Disk Usage",	    	C_"U", 	NULL, 0, NULL},
 {"/File/Permissions",		NULL,   NULL, 0, NULL},
@@ -117,6 +120,8 @@ void menu_init()
 			filer_menu_def,
 			NULL);
 	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
+	filer_file_menu = gtk_item_factory_get_widget(item_factory,
+			"<filer>/File");
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
@@ -130,6 +135,8 @@ void menu_init()
 			panel_menu_def,
 			NULL);
 	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
+	panel_file_menu = gtk_item_factory_get_widget(item_factory, 
+			"<panel>/File");
 	items = gtk_container_children(GTK_CONTAINER(panel_menu));
 	panel_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
@@ -146,6 +153,22 @@ void menu_init()
 	gtk_accel_group_lock(panel_keys);
 }
  
+static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
+{
+	GList	*items, *item;
+
+	items = gtk_container_children(GTK_CONTAINER(menu));
+
+	item = g_list_nth(items, from);
+	while (item && n--)
+	{
+		gtk_widget_set_sensitive(GTK_WIDGET(item->data), state);
+		item = item->next;
+	}
+
+	g_list_free(items);
+}
+
 /* Save the keybindings... */
 void menu_save()
 {
@@ -188,7 +211,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item)
 {
 	GString		*buffer;
-	GtkWidget	*file_label;
+	GtkWidget	*file_label, *file_menu;
 	FileItem	*file_item;
 	int		pos[] = {event->x_root, event->y_root};
 
@@ -220,18 +243,26 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		filer_window->temp_item_selected = FALSE;
 
 	if (filer_window->panel)
+	{
 		file_label = panel_file_item;
+		file_menu = panel_file_menu;
+	}
 	else
+	{
 		file_label = filer_file_item;
+		file_menu = filer_file_menu;
+	}
 
 	buffer = g_string_new(NULL);
 	switch (filer_window->collection->number_selected)
 	{
 		case 0:
 			g_string_assign(buffer, "<nothing selected>");
+			items_sensitive(file_menu, 0, -1, FALSE);
 			gtk_widget_set_sensitive(file_label, FALSE);
 			break;
 		case 1:
+			items_sensitive(file_menu, 0, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
@@ -239,6 +270,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 					file_item->leafname);
 			break;
 		default:
+			items_sensitive(file_menu, 0, 4, FALSE);
+			items_sensitive(file_menu, 4, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
