@@ -325,6 +325,7 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 	GUIside		*gui_side;
 	int		child;
 	GtkWidget	*vbox, *button, *control, *hbox, *scrollbar;
+	struct sigaction act;
 
 	if (pipe(filedes))
 	{
@@ -348,6 +349,13 @@ static GUIside *start_action(gpointer data, ActionChild *func)
 			return NULL;
 		case 0:
 			/* We are the child */
+
+			/* Reset the SIGCHLD handler */
+			act.sa_handler = SIG_DFL;
+			sigemptyset(&act.sa_mask);
+			act.sa_flags = 0;
+			sigaction(SIGCHLD, &act, NULL);
+
 			message = g_string_new(NULL);
 			close(filedes[0]);
 			close(filedes[3]);
@@ -542,11 +550,23 @@ static gboolean do_copy(char *path, char *dest)
 	g_string_sprintf(message, "'Copying %s as %s\n", path, dest_path);
 	send();
 
+	if (lstat(path, &info))
+	{
+		send_error();
+		return FALSE;
+	}
+
 	if (lstat(dest_path, &dest_info) == 0)
 	{
-		char	rep;
-		g_string_sprintf(message, "?'%s' already exists - overwrite?\n",
-				dest_path);
+		int		err;
+		char		rep;
+		gboolean	merge;
+
+		merge = S_ISDIR(info.st_mode) && S_ISDIR(dest_info.st_mode);
+
+		g_string_sprintf(message, "?'%s' already exists - %s?\n",
+				dest_path,
+				merge ? "merge contents" : "overwrite");
 		send();
 		
 		rep = reply(from_parent);
@@ -555,14 +575,26 @@ static gboolean do_copy(char *path, char *dest)
 		else if (rep != 'Y')
 			return FALSE;
 		do_overwrite = TRUE;
+
+		if (!merge)
+		{
+			if (S_ISDIR(dest_info.st_mode))
+				err = rmdir(dest_path);
+			else
+				err = unlink(dest_path);
+
+			if (err)
+			{
+				send_error();
+				if (errno != ENOENT)
+					return FALSE;
+				g_string_sprintf(message,
+						"'Trying copy anyway...\n");
+				send();
+			}
+		}
 	}
 
-	if (lstat(path, &info))
-	{
-		send_error();
-		return FALSE;
-	}
-	
 	if (S_ISDIR(info.st_mode))
 	{
 		char *safe_path, *safe_dest;
@@ -621,8 +653,7 @@ static gboolean do_copy(char *path, char *dest)
 		else
 		{
 			target[count] = '\0';
-			if ((do_overwrite && unlink(dest_path))
-				|| (symlink(target, dest_path)))
+			if (symlink(target, dest_path))
 			{
 				send_error();
 				retval = FALSE;
