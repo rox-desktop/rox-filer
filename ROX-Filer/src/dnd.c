@@ -235,7 +235,7 @@ gboolean provides(GdkDragContext *context, GdkAtom target)
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)
  */
-GList *uri_list_to_glist(char *uri_list)
+GList *uri_list_to_glist(const char *uri_list)
 {
 	GList   *list = NULL;
 
@@ -259,9 +259,7 @@ GList *uri_list_to_glist(char *uri_list)
 
 		if (length && uri_list[0] != '#')
 		{
-			uri = g_malloc(sizeof(char) * (length + 1));
-			strncpy(uri, uri_list, length);
-			uri[length] = 0;
+			uri = g_strndup(uri_list, length);
 			list = g_list_append(list, uri);
 		}
 
@@ -318,7 +316,7 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 /* Copy/Load this item into another directory/application */
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
-		   guchar		*full_path,
+		   const guchar		*full_path,
 		   DirItem		*item,
 		   MaskedPixmap		*image)
 {
@@ -700,7 +698,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 			  guint           time,
 			  gpointer	  data)
 {
-	char		*error = NULL;
+	const char	*error = NULL;
 	char		*leafname = NULL;
 	GdkAtom		target = GDK_NONE;
 	char		*dest_path;
@@ -806,7 +804,7 @@ static void desktop_drag_data_received(GtkWidget      	*widget,
 
 	for (next = uris; next; next = next->next)
 	{
-		guchar	*path;
+		const guchar	*path;
 
 		path = get_local_path((gchar *) next->data);
 		if (path)
@@ -868,7 +866,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 {
 	gboolean	mark_unsafe = TRUE;
 	char		response = *selection_data->data;
-	char		*error = NULL;
+	const char	*error = NULL;
 	char		*dest_path;
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
@@ -923,10 +921,10 @@ static void got_data_raw(GtkWidget 		*widget,
 			GtkSelectionData 	*selection_data,
 			guint32             	time)
 {
-	char		*leafname;
+	const char	*leafname;
 	int		fd;
-	char		*error = NULL;
-	char		*dest_path;
+	const char	*error = NULL;
+	const char	*dest_path;
 
 	g_return_if_fail(selection_data->data != NULL);
 
@@ -995,7 +993,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			 guint32             	time)
 {
 	GList		*uri_list;
-	char		*error = NULL;
+	const char	*error = NULL;
 	GList		*next_uri;
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
@@ -1047,7 +1045,7 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		for (next_uri = uri_list; next_uri; next_uri = next_uri->next)
 		{
-			char	*path;
+			const char *path;
 
 			path = get_local_path((char *) next_uri->data);
 

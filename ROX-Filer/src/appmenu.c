@@ -29,7 +29,7 @@
 #include <string.h>
 #include <ctype.h>
 
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include "global.h"
 
@@ -83,7 +83,7 @@ void appmenu_remove(void)
  * is the corresponding DirItem.
  * Call appmenu_remove() to undo the effect.
  */
-void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
+void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 {
 	XMLwrapper	*ai;
 	xmlNode	*node;
@@ -225,7 +225,7 @@ static GtkWidget *create_menu_item(xmlNode *node)
 static void apprun_menu(GtkWidget *item, gpointer data)
 {
 	guchar	*option;
-	char *argv[3];
+	gchar *argv[3];
 
 	g_return_if_fail(current_app_path != NULL);
 
@@ -235,7 +235,7 @@ static void apprun_menu(GtkWidget *item, gpointer data)
 	argv[1] = option;	/* (may be NULL) */
 	argv[2] = NULL;
 
-	rox_spawn(NULL, argv);
+	rox_spawn(NULL, (const gchar **) argv);
 
 	g_free(argv[0]);
 }

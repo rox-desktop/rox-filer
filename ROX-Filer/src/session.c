@@ -77,7 +77,7 @@ void save_state(SmClient *client)
 	}
 	
 	sc_set_list_of_array_prop(client, SmRestartCommand, 
-				(gchar **)restart_cmd->pdata, restart_cmd->len);
+			(const gchar **) restart_cmd->pdata, restart_cmd->len);
 
 	g_ptr_array_free(restart_cmd, TRUE);
 }
@@ -120,7 +120,8 @@ void session_init(gchar *client_id)
 	
 	sc_set_array_prop(client, SmProgram, bin_path);
 	sc_set_array_prop(client, SmUserID, pw->pw_name);
-	sc_set_list_of_array_prop(client, SmCloneCommand, clone_cmd, 2);
+	sc_set_list_of_array_prop(client, SmCloneCommand,
+			(const gchar **) clone_cmd, 2);
 	sc_set_card_prop(client, SmRestartStyleHint, SmRestartIfRunning);
 	
 	client->save_yourself_fn = &save_yourself;

@@ -29,7 +29,7 @@
 #include <string.h>
 #include <unistd.h>
 #include <fnmatch.h>
-#include <parser.h>
+#include <libxml/parser.h>
 #include <time.h>
 
 #include "global.h"
@@ -50,17 +50,18 @@
 #include "filer.h"
 #include "action.h"
 #include "display.h"
+#include "icon.h"
 
 static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 
 /* Static prototypes */
-static char *process_globicons_line(guchar *line);
+static const char *process_globicons_line(gchar *line);
 static gboolean free_globicon(gpointer key, gpointer value, gpointer data);
 static void get_path_set_icon(GtkWidget *dialog);
 static void show_icon_help(gpointer data);
 static void write_globicons(void);
 static void show_current_dirs_menu(GtkWidget *button, gpointer data);
-static void add_globicon(guchar *path, guchar *icon);
+static void add_globicon(const gchar *path, const gchar *icon);
 static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      GdkDragContext    *context,
 		       	      gint              x,
@@ -70,7 +71,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 		       	      guint32           time,
 		       	      GtkWidget	 	*dialog);
 static void remove_icon(GtkWidget *dialog);
-static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
+static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
 
 /****************************************************************
@@ -161,7 +162,7 @@ out:
 /* Set an item's image field according to the globicons patterns if
  * it matches one of them and the file exists.
  */
-void check_globicon(guchar *path, DirItem *item)
+void check_globicon(const guchar *path, DirItem *item)
 {
 	gchar *gi;
 
@@ -173,7 +174,7 @@ void check_globicon(guchar *path, DirItem *item)
 }
 
 /* Add a globicon mapping for the given file to the given icon path */
-gboolean set_icon_path(guchar *filepath, guchar *iconpath)
+gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 {
 	struct stat icon;
 	MaskedPixmap *pic;
@@ -207,7 +208,7 @@ gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 /* Display a dialog box allowing the user to set the icon for
  * a file or directory.
  */
-void icon_set_handler_dialog(DirItem *item, guchar *path)
+void icon_set_handler_dialog(DirItem *item, const guchar *path)
 {
 	guchar		*tmp;
 	GtkWidget	*dialog, *vbox, *frame, *hbox, *vbox2;
@@ -222,11 +223,9 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 
 	gi = g_hash_table_lookup(glob_icons, path);
 
-	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-#ifdef GTK2
+	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_type_hint(GTK_WINDOW(dialog),
 			GDK_WINDOW_TYPE_HINT_DIALOG);
-#endif
 	gtk_object_set_data_full(GTK_OBJECT(dialog),
 				 "pathname",
 				 strdup(path),
@@ -436,7 +435,7 @@ static void write_globicons(void)
          (<*> represents a single asterisk, enclosed in brackets to not break
          the C comment).
 */
-static char *process_globicons_line(guchar *line)
+static const char *process_globicons_line(gchar *line)
 {
 	guchar *pattern, *iconpath;
 	
@@ -461,7 +460,7 @@ static char *process_globicons_line(guchar *line)
  * added to the top of the list (so that it takes precedence over
  * other entries).
  */
-static void add_globicon(guchar *path, guchar *icon)
+static void add_globicon(const gchar *path, const gchar *icon)
 {
 	g_hash_table_insert(glob_icons, g_strdup(path), g_strdup(icon));
 
@@ -490,7 +489,7 @@ static void delete_globicon(guchar *path)
 }
 
 /* Set the icon for this dialog's file to 'icon' */
-static void do_set_icon(GtkWidget *dialog, gchar *icon)
+static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 {
 	guchar  *path = NULL;
 	GtkToggleButton **radio;
@@ -565,7 +564,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 static void get_path_set_icon(GtkWidget *dialog)
 {
 	GtkEntry *entry;
-	guchar	*icon;
+	const gchar *icon;
 
 	entry = gtk_object_get_data(GTK_OBJECT(dialog), "icon_path");
 	g_return_if_fail(entry != NULL);
@@ -598,7 +597,7 @@ static void show_icon_help(gpointer data)
 }
 
 /* Set the icon for the given MIME type.  We copy the file. */
-static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
+static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media)
 {
 	gchar *target;
@@ -623,7 +622,7 @@ static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
 	}
 
 	dir = g_dirname(target);
-	paths = g_list_append(NULL, iconpath);
+	paths = g_list_append(NULL, (gchar *) iconpath);
 
 	action_copy(paths, dir, leaf, -1);
 
@@ -664,11 +663,7 @@ static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
 	GtkWidget *item;
 	
 	item = gtk_menu_item_new_with_label(key);
-#ifdef GTK2
-	gtk_widget_set_accel_path(item, NULL, NULL);
-#else
-	gtk_widget_lock_accelerators(item);
-#endif
+	gtk_widget_set_accel_path(item, NULL, NULL);	/* XXX */
 	gtk_signal_connect(GTK_OBJECT(item), "activate",
 			GTK_SIGNAL_FUNC(open_icon_dir), NULL);
 	g_free(key);

@@ -10,7 +10,7 @@
 #include <gtk/gtk.h>
 
 /* External interface */
-void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu);
+void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu);
 void appmenu_remove(void);
 
 #endif   /* _APPMENU_H */

@@ -513,10 +513,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 							"toolbar_dest");
 
 	if (dest == DROP_TO_HOME)
-		g_dataset_set_data(context, "drop_dest_path", home_dir);
+		g_dataset_set_data(context, "drop_dest_path",
+				   (gchar *) home_dir);
 	else
 	{
-		guchar	*slash, *path;
+		gchar	*slash, *path;
 
 		slash = strrchr(filer_window->path, '/');
 		if (slash == NULL || slash == filer_window->path)

@@ -37,7 +37,7 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -83,10 +83,10 @@ int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
 
 /* Message to display at the top of each filer window */
-guchar *show_user_message = NULL;
+const gchar *show_user_message = NULL;
 
 int home_dir_len;
-char *home_dir, *app_dir;
+const char *home_dir, *app_dir;
 
 GtkTooltips *tooltips = NULL;
 

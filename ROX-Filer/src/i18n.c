@@ -73,8 +73,8 @@ GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n)
 	ret = g_malloc(sizeof(GtkItemFactoryEntry) * n);
 	for (i = 0; i < n; i++)
 	{
-		guchar	*from = entries[i].path;
-		guchar	*trans, *slash;
+		const gchar	*from = entries[i].path;
+		gchar	*trans, *slash;
 		int	indent;
 
 		if (from[0] == '>')

@@ -105,7 +105,7 @@ static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static void got_thumb_data(GdkPixbufLoader *loader,
 				gint fd, GdkInputCondition cond);
-static GdkPixbuf *get_thumbnail_for(char *path);
+static GdkPixbuf *get_thumbnail_for(const char *path);
 
 
 /****************************************************************
@@ -257,7 +257,7 @@ void pixmap_make_small(MaskedPixmap *mp)
  * If the image is already uptodate, or being created already, calls the
  * callback right away.
  */
-void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
+void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 {
 	GdkPixbufLoader *loader;
 	int		fd, tag;
@@ -283,7 +283,7 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 		image = image_from_pixbuf(pixbuf);
 		gdk_pixbuf_unref(pixbuf);
 		g_fscache_insert(pixmap_cache, path, image, TRUE);
-		callback(data, path);
+		callback(data, (gchar *) path);
 		return;
 	}
 
@@ -722,18 +722,14 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 /* Check if we have an up-to-date thumbnail for this image.
  * If so, return it. Otherwise, returns NULL.
  */
-static GdkPixbuf *get_thumbnail_for(char *path)
+static GdkPixbuf *get_thumbnail_for(const char *pathname)
 {
 	GdkPixbuf *thumb = NULL;
-#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
-	char *thumb_path, *md5, *uri;
-	char *ssize, *smtime;
+	char *thumb_path, *md5, *uri, *path;
+	const char *ssize, *smtime;
 	struct stat info;
-#ifndef GTK2
-	GHashTable *text_hash;
-#endif
 
-	path = pathdup(path);
+	path = pathdup(pathname);
 	uri = g_strconcat("file://", path, NULL);
 	md5 = md5_hash(uri);
 	g_free(uri);
@@ -742,28 +738,16 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 					home_dir, md5);
 	g_free(md5);
 
-#ifdef GTK2
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
-#else
-	thumb = pixbuf_new_from_png(thumb_path, &text_hash);
-#endif
 	if (!thumb)
 		goto err;
 
 	/* Note that these don't need freeing... */
-#ifdef GTK2
 	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::Size");
-#else
-	ssize = g_hash_table_lookup(text_hash, "Thumb::Size");
-#endif	
 	if (!ssize)
 		goto err;
 
-#ifdef GTK2
 	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::MTime");
-#else
-	smtime = g_hash_table_lookup(text_hash, "Thumb::MTime");
-#endif
 	if (!smtime)
 		goto err;
 	
@@ -781,7 +765,6 @@ err:
 out:
 	g_free(path);
 	g_free(thumb_path);
-#endif /* GTK2 or THUMBS_USE_LIBPNG */
 	return thumb;
 }
 

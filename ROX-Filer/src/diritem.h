@@ -37,8 +37,8 @@ struct _DirItem
 };
 
 void diritem_init(void);
-DirItem *diritem_new(guchar *leafname);
-void diritem_restat(guchar *path, DirItem *item);
+DirItem *diritem_new(const guchar *leafname);
+void diritem_restat(const guchar *path, DirItem *item);
 void diritem_free(DirItem *item);
 
 #endif /* _DIRITEM_H */

@@ -120,11 +120,11 @@ static void build_options_window(void);
 static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
 static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
-static void option_add(Option *option, guchar *key);
+static void option_add(Option *option, const gchar *key);
 static void set_not_changed(gpointer key, gpointer value, gpointer data);
 static void load_options(xmlDoc *doc);
 
-static char *process_option_line(guchar *line);
+static const char *process_option_line(gchar *line);
 
 static GList *build_toggle(Option *option, xmlNode *node, guchar *label);
 static GList *build_slider(Option *option, xmlNode *node, guchar *label);
@@ -293,14 +293,14 @@ GtkWidget *options_show(void)
 }
 
 /* Initialise and register a new integer option */
-void option_add_int(Option *option, guchar *key, int value)
+void option_add_int(Option *option, const gchar *key, int value)
 {
 	option->value = g_strdup_printf("%d", value);
 	option->int_value = value;
 	option_add(option, key);
 }
 
-void option_add_string(Option *option, guchar *key, guchar *value)
+void option_add_string(Option *option, const gchar *key, const gchar *value)
 {
 	option->value = g_strdup(value);
 	option->int_value = atoi(value);
@@ -339,7 +339,7 @@ void option_add_saver(OptionNotify *callback)
  * On exit, the value will have been updated to the loaded value, if
  * different to the default.
  */
-static void option_add(Option *option, guchar *key)
+static void option_add(Option *option, const gchar *key)
 {
 	gpointer okey, value;
 
@@ -354,7 +354,7 @@ static void option_add(Option *option, guchar *key)
 	option->read_widget = NULL;
 	option->backup = NULL;
 
-	g_hash_table_insert(option_hash, key, option);
+	g_hash_table_insert(option_hash, (gchar *) key, option);
 
 	/* Use the value loaded from the file, if any */
 	if (g_hash_table_lookup_extended(loading, key, &okey, &value))
@@ -1469,10 +1469,10 @@ static void load_options(xmlDoc *doc)
  * Returns NULL on success, or a pointer to an error message.
  * The line is modified.
  */
-static char *process_option_line(guchar *line)
+static const char *process_option_line(gchar *line)
 {
-	guchar 		*eq, *c;
-	char		*name = line;
+	gchar 		*eq, *c;
+	gchar		*name = line;
 
 	g_return_val_if_fail(option_hash != NULL, "No registered options!");
 

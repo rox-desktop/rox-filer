@@ -125,7 +125,7 @@ typedef enum {		/* Values used in options, must start at 0 */
 #define SHOW(var, fmt) (g_print("[ " #var " = '%" #fmt "' ]\n", var))
 
 
-#include <tree.h>
+#include <libxml/tree.h>
 
 /* For very old versions of libxml... */
 #ifndef xmlChildrenNode

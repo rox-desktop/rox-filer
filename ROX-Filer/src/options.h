@@ -32,8 +32,8 @@ void options_init(void);
 void option_register_widget(char *name, OptionBuildFn builder);
 void option_check_widget(Option *option);
 
-void option_add_int(Option *option, guchar *key, int value);
-void option_add_string(Option *option, guchar *key, guchar *value);
+void option_add_int(Option *option, const gchar *key, int value);
+void option_add_string(Option *option, const gchar *key, const gchar *value);
 
 void options_notify(void);
 void option_add_notify(OptionNotify *callback);

@@ -50,7 +50,7 @@ static guint32 word(char *addr, gboolean swap);
  * is the translation of 'from' (or 'from' itself if there is
  * no translation).
  */
-char *rox_gettext(char *from)
+const char *rox_gettext(const char *from)
 {
 	char	*retval;
 	
@@ -74,7 +74,7 @@ void rox_clear_translation(void)
 /* Read in this .gmo format file; all translations found override
  * any existing translations for future calls to rox_gettext().
  */
-void rox_add_translations(char *path)
+void rox_add_translations(const char *path)
 {
 	guint32		magic;
 	char		*data, *from_base, *to_base;

@@ -31,7 +31,7 @@
 
 #include "sc.h"
 
-static SmPropValue *make_list_of_array_value(gchar *vals[], gint nvals)
+static SmPropValue *make_list_of_array_value(const gchar *vals[], gint nvals)
 {
 	SmPropValue *values = g_new(SmPropValue, nvals);
 	gint i;
@@ -44,7 +44,7 @@ static SmPropValue *make_list_of_array_value(gchar *vals[], gint nvals)
 	return values;
 }
 
-static SmPropValue *make_array_value(gchar *val)
+static SmPropValue *make_array_value(const gchar *val)
 {
 	SmPropValue *value = g_new(SmPropValue, 1);
 	
@@ -64,7 +64,7 @@ static SmPropValue *make_card_value(gchar val)
 	return value;
 }
 
-static SmProperty *find_property(SmClient *client, gchar *name)
+static SmProperty *find_property(SmClient *client, const gchar *name)
 {
 	GSList *list = client->props;
 	SmProperty *prop;
@@ -79,7 +79,8 @@ static SmProperty *find_property(SmClient *client, gchar *name)
 	return NULL;		
 }
 
-static SmProperty *new_property(SmClient *client, gchar *name, gchar *type)
+static SmProperty *new_property(SmClient *client,
+				const gchar *name, const gchar *type)
 {
 	SmProperty *prop;
 
@@ -113,7 +114,8 @@ void poll_ice_messages(gpointer data, gint source, GdkInputCondition condition)
 	SmClient *client = (SmClient *)data;
 	Bool ret;
 
-	if(IceProcessMessages(client->ice_conn, NULL, &ret) == IceProcessMessagesIOError)
+	if (IceProcessMessages(client->ice_conn, NULL, &ret) ==
+			IceProcessMessagesIOError)
 		SmcCloseConnection(client->conn, 0, NULL);
 	return;
 }
@@ -244,7 +246,9 @@ void sc_destroy(SmClient *client)
 /* Set a property with a SmLISTofARRAY8 value as in SmRestartCommand,
    SmCloneCommand and SmDiscardCommand */ 
 
-void sc_set_list_of_array_prop(SmClient *client, gchar *name, gchar *vals[], gint nvals)
+void sc_set_list_of_array_prop(SmClient *client,
+			const gchar *name, 
+			const char *vals[], gint nvals)
 {
 	SmProperty *prop = find_property(client, name);
 	SmPropValue *value = make_list_of_array_value(vals, nvals);
@@ -263,7 +267,7 @@ void sc_set_list_of_array_prop(SmClient *client, gchar *name, gchar *vals[], gin
 /* Set a prop with a SmARRAY8 value, SmProgram, SmUserID and
    SmDiscardCommand (if using XSM) are suitable victims. */
 
-void sc_set_array_prop(SmClient *client, gchar *name, gchar *vals)
+void sc_set_array_prop(SmClient *client, const gchar *name, const gchar *vals)
 {
 	SmProperty *prop = find_property(client, name);
 	SmPropValue *value = make_array_value(vals);
@@ -281,7 +285,7 @@ void sc_set_array_prop(SmClient *client, gchar *name, gchar *vals)
 
 /* This one is for the SmRestarStyleHint */
 
-void sc_set_card_prop(SmClient *client, gchar *name, gchar val)
+void sc_set_card_prop(SmClient *client, const gchar *name, const gchar val)
 {
 	SmProperty *prop = find_property(client, name);
 	SmPropValue *value = make_card_value(val);
@@ -307,7 +311,8 @@ void sc_set_card_prop(SmClient *client, gchar *name, gchar val)
   The values are those stored in the SmClient struct,
   They're not fetched from the session manager */
 
-void sc_get_prop_value(SmClient *client, gchar *name, SmPropValue **val_ret, gint *nvals_ret)
+void sc_get_prop_value(SmClient *client, const gchar *name,
+			SmPropValue **val_ret, gint *nvals_ret)
 {
 	SmProperty *prop = find_property(client, name);
 	

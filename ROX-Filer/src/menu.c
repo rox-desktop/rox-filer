@@ -91,7 +91,8 @@ typedef enum menu_icon_style {
   MIS_DEFAULT
 } MenuIconStyle;
 
-typedef void (*ActionFn)(GList *paths, char *dest_dir, char *leaf, int quiet);
+typedef void (*ActionFn)(GList *paths,
+			 const char *dest_dir, const char *leaf, int quiet);
 typedef void MenuCallback(GtkWidget *widget, gpointer data);
 
 GtkAccelGroup	*filer_keys;
@@ -109,11 +110,13 @@ static Option o_menu_iconsize, o_menu_xterm;
 static void save_menus(void);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
-static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
-		gboolean (*callback)(guchar *current, guchar *new));
-static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
-static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
-static gboolean link_cb(guchar *initial, guchar *path);
+static void savebox_show(const gchar *title, const gchar *path,
+		MaskedPixmap *image,
+		gboolean (*callback)(const gchar *current, const gchar *new));
+static gint save_to_file(GtkSavebox *savebox, const gchar *pathname);
+static gboolean action_with_leaf(ActionFn action,
+				 const gchar *current, const gchar *new);
+static gboolean link_cb(const gchar *initial, const gchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
 static void new_file_type(gchar *templ);
 static void do_send_to(gchar *templ);
@@ -178,11 +181,13 @@ static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
 
+typedef gboolean (*SaveCb)(const gchar *current, const gchar *new);
+
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
 static GtkWidget	*check_relative = NULL;	
 static guchar		*current_path = NULL;
-static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
+static SaveCb		current_savebox_callback;
 
 #undef N_
 #define N_(x) x
@@ -386,7 +391,7 @@ void menu_init(void)
 
 /* Name is in the form "<panel>" */
 GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
-			    guchar *name, GtkAccelGroup *keys)
+			    const gchar *name, GtkAccelGroup *keys)
 {
 	GtkItemFactory  	*item_factory;
 	GtkItemFactoryEntry	*translated;
@@ -1024,8 +1029,8 @@ static void find(FilerWindow *filer_window)
  * both the current and new paths.
  * NOTE: This function unrefs 'image'!
  */
-static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
-		gboolean (*callback)(guchar *current, guchar *new))
+static void savebox_show(const gchar *title, const gchar *path,
+			 MaskedPixmap *image, SaveCb callback)
 {
 	g_return_if_fail(image != NULL);
 	
@@ -1050,7 +1055,7 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 	gtk_widget_show(savebox);
 }
 
-static gint save_to_file(GtkSavebox *savebox, guchar *pathname)
+static gint save_to_file(GtkSavebox *savebox, const gchar *pathname)
 {
 	g_return_val_if_fail(current_savebox_callback != NULL,
 			GTK_XDS_SAVE_ERROR);
@@ -1059,15 +1064,17 @@ static gint save_to_file(GtkSavebox *savebox, guchar *pathname)
 			? GTK_XDS_SAVED : GTK_XDS_SAVE_ERROR;
 }
 
-static gboolean copy_cb(guchar *current, guchar *new)
+static gboolean copy_cb(const gchar *current, const gchar *new)
 {
 	return action_with_leaf(action_copy, current, new);
 }
 
-static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
+static gboolean action_with_leaf(ActionFn action,
+				 const gchar *current, const gchar *new)
 {
-	char	*new_dir, *leaf;
-	GList	*local_paths;
+	const char	*leaf;
+	char		*new_dir;
+	GList		*local_paths;
 
 	if (new[0] != '/')
 	{
@@ -1082,14 +1089,14 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 	}
 	else
 	{
-		guchar *slash;
+		const gchar *slash;
 		
 		slash = strrchr(new, '/');
 		new_dir = g_strndup(new, slash - new);
 		leaf = slash + 1;
 	}
 
-	local_paths = g_list_append(NULL, current);
+	local_paths = g_list_append(NULL, (gchar *) current);
 	action(local_paths, new_dir, leaf, -1);
 	g_list_free(local_paths);
 
@@ -1101,20 +1108,20 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 /* Open a savebox to act on the selected file.
  * Call 'callback' later to perform the operation.
  */
-static void src_dest_action_item(guchar *path, MaskedPixmap *image,
-				 guchar *title,
-				 gboolean (*callback)(guchar *, guchar *))
+static void src_dest_action_item(const gchar *path, MaskedPixmap *image,
+			 const gchar *title,
+			 gboolean (*callback)(const gchar *, const gchar *))
 {
 	pixmap_ref(image);
 	savebox_show(title, path, image, callback);
 }
 
-static gboolean rename_cb(guchar *current, guchar *new)
+static gboolean rename_cb(const gchar *current, const gchar *new)
 {
 	return action_with_leaf(action_move, current, new);
 }
 
-static gboolean link_cb(guchar *initial, guchar *path)
+static gboolean link_cb(const gchar *initial, const gchar *path)
 {
 	int	err;
 
@@ -1211,7 +1218,7 @@ void menu_show_options(gpointer data, guint action, GtkWidget *widget)
 	options_show();
 }
 
-static gboolean new_directory_cb(guchar *initial, guchar *path)
+static gboolean new_directory_cb(const gchar *initial, const gchar *path)
 {
 	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
 	{
@@ -1242,7 +1249,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 			new_directory_cb);
 }
 
-static gboolean new_file_cb(guchar *initial, guchar *path)
+static gboolean new_file_cb(const gchar *initial, const gchar *path)
 {
 	int fd;
 
@@ -1282,9 +1289,10 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 			new_file_cb);
 }
 
-static gboolean new_file_type_cb(guchar *initial, guchar *path)
+static gboolean new_file_type_cb(const gchar *initial, const gchar *path)
 {
-	gchar *templ, *templ_dname, *oleaf, *dest, *leaf;
+	const gchar *oleaf, *leaf;
+	gchar *templ, *templ_dname, *dest;
 	GList *paths;
 
 	/* We can work out the template path from the initial name */
@@ -1449,7 +1457,7 @@ static void send_to(FilerWindow *filer_window)
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*argv[] = {"sh", "-c", NULL, NULL};
+	const char *argv[] = {"sh", "-c", NULL, NULL};
 
 	argv[2] = o_menu_xterm.value;
 
@@ -1624,81 +1632,22 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 	g_list_free(items);
 }
 
-#ifndef GTK2
-/* This is called for every modified menu entry. We just use it to
- * find out if the menu has changed at all.
- */
-static void set_mod(gboolean *mod, guchar *str)
-{
-	if (str && str[0] == '(')
-		*mod = TRUE;
-}
-#endif
-
 static void save_menus(void)
 {
 	char	*menurc;
 
-#ifdef GTK2
 	menurc = choices_find_path_save(MENUS_NAME, PROJECT, TRUE);
 	if (menurc)
 	{
 		gtk_accel_map_save(menurc);
 		g_free(menurc);
 	}
-#else
-	menurc = choices_find_path_save(MENUS_NAME, PROJECT, FALSE);
-	if (menurc)
-	{
-		gboolean	mod = FALSE;
-
-		g_free(menurc);
-
-		/* Find out if anything changed... */
-		gtk_item_factory_dump_items(NULL, TRUE,
-				(GtkPrintFunc) set_mod, &mod);
-
-		/* Dump out if so... */
-		if (mod)
-		{
-			menurc = choices_find_path_save(MENUS_NAME,
-							PROJECT, TRUE);
-			g_return_if_fail(menurc != NULL);
-			mark_menus_modified(TRUE);
-			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
-			mark_menus_modified(FALSE);
-			g_free(menurc);
-		}
-	}
-#endif
 }
 
-#ifdef GTK2
 static void keys_changed(gpointer data)
 {
 	save_menus();
 }
-#else
-static void mark_modified(gpointer hash_key,
-			  gpointer value,
-			  gpointer user_data)
-{
-	GtkItemFactoryItem *item = (GtkItemFactoryItem *) value;
-
-	item->modified = (gboolean) GPOINTER_TO_INT(user_data);
-}
-
-/* Set or clear the 'modified' flag in all menu items. Messy... */
-static void mark_menus_modified(gboolean mod)
-{
-	GtkItemFactoryClass	*class;
-
-	class = gtk_type_class(GTK_TYPE_ITEM_FACTORY);
-
-	g_hash_table_foreach(class->item_ht, mark_modified,
-			GINT_TO_POINTER(mod));
-}
-#endif
 
 static void select_nth_item(GtkMenuShell *shell, int n)
 {
@@ -1728,7 +1677,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 
 	if (collection->number_selected < 1)
 	{
-		char *prompt;
+		const char *prompt;
 
 		switch (action)
 		{

@@ -105,7 +105,7 @@ void mount_update(gboolean force)
  * than path, or whether path/.. and path point to the same i-node on the same
  * device -- this should detect mount points for all Unix and POSIX variants.
  */
-gboolean mount_is_mounted(guchar *path)
+gboolean mount_is_mounted(const guchar *path)
 {
 	struct stat info_path, info_parent;
 	guchar *tmp;

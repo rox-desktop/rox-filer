@@ -69,11 +69,11 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data);
 void dir_detach(Directory *dir, DirCallback callback, gpointer data);
 void dir_update(Directory *dir, gchar *pathname);
 int dir_item_cmp(const void *a, const void *b);
-void refresh_dirs(char *path);
-void dir_check_this(guchar *path);
-DirItem *dir_update_item(Directory *dir, gchar *leafname);
-void dir_rescan(Directory *dir, guchar *pathname);
+void refresh_dirs(const char *path);
+void dir_check_this(const guchar *path);
+DirItem *dir_update_item(Directory *dir, const gchar *leafname);
+void dir_rescan(Directory *dir, const guchar *pathname);
 void dir_merge_new(Directory *dir);
-void dir_force_update_path(gchar *path);
+void dir_force_update_path(const gchar *path);
 
 #endif /* _DIR_H */

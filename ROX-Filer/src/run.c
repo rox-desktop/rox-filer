@@ -43,11 +43,11 @@
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
-static gboolean follow_symlink(char *full_path,
+static gboolean follow_symlink(const char *full_path,
 			       FilerWindow *filer_window,
 			       FilerWindow *src_window);
-static gboolean open_file(guchar *path, MIME_type *type);
-static void dir_show_help(DirItem *item, char *path);
+static gboolean open_file(const guchar *path, MIME_type *type);
+static void dir_show_help(DirItem *item, const char *path);
 
 typedef struct _PipedData PipedData;
 
@@ -66,10 +66,10 @@ struct _PipedData
 
 
 /* An application has been double-clicked (or run in some other way) */
-void run_app(char *path)
+void run_app(const char *path)
 {
 	GString	*apprun;
-	char	*argv[] = {NULL, NULL};
+	const char *argv[] = {NULL, NULL};
 
 	apprun = g_string_new(path);
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
@@ -83,9 +83,9 @@ void run_app(char *path)
  * URIs that are files on the local machine will be passed as simple
  * pathnames. The uri_list should be freed after this function returns.
  */
-void run_with_files(char *path, GList *uri_list)
+void run_with_files(const char *path, GList *uri_list)
 {
-	char		**argv;
+	const char	**argv;
 	int		argc = 0;
 	struct stat 	info;
 
@@ -104,8 +104,8 @@ void run_with_files(char *path, GList *uri_list)
 	
 	while (uri_list)
 	{
-		char *uri = (char *) uri_list->data;
-		char *local;
+		const char *uri = uri_list->data;
+		const char *local;
 
 		local = get_local_path(uri);
 		if (local)
@@ -123,9 +123,9 @@ void run_with_files(char *path, GList *uri_list)
 /* Run the program as '<path> -', piping the data to it via stdin.
  * You can g_free() the data as soon as this returns.
  */
-void run_with_data(char *path, gpointer data, gulong length)
+void run_with_data(const char *path, gpointer data, gulong length)
 {
-	char		*argv[] = {NULL, "-", NULL};
+	const char	*argv[] = {NULL, "-", NULL};
 	struct stat 	info;
 	int		fds[2];
 	PipedData	*pd;
@@ -164,7 +164,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 			else
 			{
 				close_on_exec(0, FALSE);
-				if (execv(argv[0], argv))
+				if (execv(argv[0], (char **) argv))
 					g_warning("execv(%s) failed: %s\n",
 						argv[0], g_strerror(errno));
 			}
@@ -194,7 +194,7 @@ void run_with_data(char *path, gpointer data, gulong length)
  *
  * Returns TRUE on success.
  */
-gboolean run_diritem(guchar *full_path,
+gboolean run_diritem(const guchar *full_path,
 		     DirItem *item,
 		     FilerWindow *filer_window,
 		     FilerWindow *src_window,
@@ -216,7 +216,8 @@ gboolean run_diritem(guchar *full_path,
 			{
 				GList	*paths;
 
-				paths = g_list_prepend(NULL, full_path);
+				paths = g_list_prepend(NULL,
+							(gpointer) full_path);
 				action_mount(paths, filer_window == NULL, -1);
 				g_list_free(paths);
 				if (item->flags & ITEM_FLAG_MOUNTED ||
@@ -232,7 +233,7 @@ gboolean run_diritem(guchar *full_path,
 		case TYPE_FILE:
 			if ((item->mime_type == special_exec) && !edit)
 			{
-				char	*argv[] = {NULL, NULL};
+				const char *argv[] = {NULL, NULL};
 				guchar	*dir = filer_window ? filer_window->path
 							    : NULL;
 
@@ -255,7 +256,7 @@ gboolean run_diritem(guchar *full_path,
 }
 
 /* Attempt to open this item */
-gboolean run_by_path(guchar *full_path)
+gboolean run_by_path(const guchar *full_path)
 {
 	gboolean retval;
 	DirItem	*item;
@@ -269,7 +270,7 @@ gboolean run_by_path(guchar *full_path)
 	return retval;
 }
 
-void show_item_help(guchar *path, DirItem *item)
+void show_item_help(const guchar *path, DirItem *item)
 {
 	switch (item->base_type)
 	{
@@ -328,7 +329,7 @@ void show_item_help(guchar *path, DirItem *item)
 }
 
 /* Open a directory viewer showing this file, and wink it */
-void open_to_show(guchar *path)
+void open_to_show(const guchar *path)
 {
 	FilerWindow	*new;
 	guchar		*dir, *slash;
@@ -363,7 +364,7 @@ void open_to_show(guchar *path)
 /* Invoked using -x, this indicates that the filesystem has been modified
  * and we should look at this item again.
  */
-void examine(guchar *path)
+void examine(const guchar *path)
 {
 	struct stat info;
 
@@ -424,7 +425,7 @@ finish:
 /* Follow the link 'full_path' and display it in filer_window, or a
  * new window if that is NULL.
  */
-static gboolean follow_symlink(char *full_path,
+static gboolean follow_symlink(const char *full_path,
 			       FilerWindow *filer_window,
 			       FilerWindow *src_window)
 {
@@ -493,7 +494,7 @@ static gboolean follow_symlink(char *full_path,
 }
 
 /* Load this file into an appropriate editor */
-static gboolean open_file(guchar *path, MIME_type *type)
+static gboolean open_file(const guchar *path, MIME_type *type)
 {
 	g_return_val_if_fail(type != NULL, FALSE);
 
@@ -514,7 +515,7 @@ static gboolean open_file(guchar *path, MIME_type *type)
 /* Show the help for a directory - tries to open App/Help, but if
  * that doesn't work then it displays a default message.
  */
-static void dir_show_help(DirItem *item, char *path)
+static void dir_show_help(DirItem *item, const char *path)
 {
 	char		*help_dir;
 	struct stat 	info;

@@ -43,18 +43,18 @@
 typedef struct _Eval Eval;
 
 /* Static prototypes */
-static FindCondition *parse_expression(guchar **expression);
-static FindCondition *parse_case(guchar **expression);
-static FindCondition *parse_system(guchar **expression);
-static FindCondition *parse_condition(guchar **expression);
-static FindCondition *parse_match(guchar **expression);
-static FindCondition *parse_comparison(guchar **expression);
-static FindCondition *parse_dash(guchar **expression);
-static FindCondition *parse_is(guchar **expression);
-static Eval *parse_eval(guchar **expression);
-static Eval *parse_variable(guchar **expression);
+static FindCondition *parse_expression(const gchar **expression);
+static FindCondition *parse_case(const gchar **expression);
+static FindCondition *parse_system(const gchar **expression);
+static FindCondition *parse_condition(const gchar **expression);
+static FindCondition *parse_match(const gchar **expression);
+static FindCondition *parse_comparison(const gchar **expression);
+static FindCondition *parse_dash(const gchar **expression);
+static FindCondition *parse_is(const gchar **expression);
+static Eval *parse_eval(const gchar **expression);
+static Eval *parse_variable(const gchar **expression);
 
-static gboolean match(guchar **expression, guchar *word);
+static gboolean match(const gchar **expression, const gchar *word);
 
 typedef enum {
 	IS_DIR,
@@ -140,10 +140,10 @@ struct _Eval
  * can be passed to find_test_condition() later. NULL if the string
  * is not a valid expression.
  */
-FindCondition *find_compile(guchar *string)
+FindCondition *find_compile(const gchar *string)
 {
 	FindCondition 	*cond;
-	guchar		**expression = &string;
+	const gchar	**expression = &string;
 
 	g_return_val_if_fail(string != NULL, NULL);
 
@@ -184,17 +184,17 @@ void find_condition_free(FindCondition *condition)
  * matching ')' (and eats that bracket), or NULL on failure.
  * Brackets within the string may be quoted or escaped.
  */
-static guchar *get_bracketed_string(guchar **expression)
+static gchar *get_bracketed_string(const gchar **expression)
 {
 	GString		*str;
 	int		opens = 1;
-	guchar		quote = '\0';
+	gchar		quote = '\0';
 
 	str = g_string_new(NULL);
 
 	while (NEXT != '\0')
 	{
-		guchar	c = NEXT;
+		gchar	c = NEXT;
 
 		EAT;
 
@@ -212,7 +212,7 @@ static guchar *get_bracketed_string(guchar **expression)
 				opens--;
 				if (opens < 1)
 				{
-					guchar	*retval = str->str;
+					gchar	*retval = str->str;
 
 					g_string_free(str, FALSE);
 					return retval;
@@ -259,10 +259,10 @@ static gboolean test_path(FindCondition *condition, FindInfo *info)
 
 static gboolean test_system(FindCondition *condition, FindInfo *info)
 {
-	guchar	*command = (guchar *) condition->data1;
-	guchar	*start = command;
+	gchar	*command = (gchar *) condition->data1;
+	gchar	*start = command;
 	GString	*to_sys = NULL;
-	guchar	*perc;
+	gchar	*perc;
 	int	retcode;
 
 	to_sys = g_string_new(NULL);
@@ -441,7 +441,7 @@ static void free_comp(FindCondition *condition)
 /* An expression is a series of comma-separated cases, any of which
  * may match.
  */
-static FindCondition *parse_expression(guchar **expression)
+static FindCondition *parse_expression(const gchar **expression)
 {
 	FindCondition	*first, *second, *cond;
 
@@ -470,7 +470,7 @@ static FindCondition *parse_expression(guchar **expression)
 	return cond;
 }
 
-static FindCondition *parse_case(guchar **expression)
+static FindCondition *parse_case(const gchar **expression)
 {
 	FindCondition	*first, *second, *cond;
 
@@ -500,7 +500,7 @@ static FindCondition *parse_case(guchar **expression)
 	return cond;
 }
 
-static FindCondition *parse_condition(guchar **expression)
+static FindCondition *parse_condition(const gchar **expression)
 {
 	FindCondition	*cond = NULL;
 
@@ -580,10 +580,10 @@ static FindCondition *parse_condition(guchar **expression)
 }
 
 /* Call this when you've just eaten 'system(' */
-static FindCondition *parse_system(guchar **expression)
+static FindCondition *parse_system(const gchar **expression)
 {	
 	FindCondition	*cond = NULL;
-	guchar		*command_string;
+	gchar		*command_string;
 
 	command_string = get_bracketed_string(expression);
 	if (!command_string)
@@ -598,7 +598,7 @@ static FindCondition *parse_system(guchar **expression)
 	return cond;
 }
 
-static FindCondition *parse_comparison(guchar **expression)
+static FindCondition *parse_comparison(const gchar **expression)
 {
 	FindCondition	*cond = NULL;
 	Eval		*first;
@@ -670,9 +670,9 @@ static FindCondition *parse_comparison(guchar **expression)
 	return cond;
 }
 
-static FindCondition *parse_dash(guchar **expression)
+static FindCondition *parse_dash(const gchar **expression)
 {
-	guchar *exp = *expression;
+	const gchar *exp = *expression;
 	FindCondition *cond, *retval = NULL;
 	IsTest	 test;
 	int i = 1;
@@ -736,7 +736,7 @@ static FindCondition *parse_dash(guchar **expression)
 }
 
 /* Returns NULL if expression is not an is-expression */
-static FindCondition *parse_is(guchar **expression)
+static FindCondition *parse_is(const gchar **expression)
 {
 	FindCondition	*cond;
 	IsTest		test;
@@ -787,7 +787,7 @@ static FindCondition *parse_is(guchar **expression)
 }
 
 /* Call this just after reading a ' */
-static FindCondition *parse_match(guchar **expression)
+static FindCondition *parse_match(const gchar **expression)
 {
 	FindCondition	*cond = NULL;
 	GString		*str;
@@ -796,7 +796,7 @@ static FindCondition *parse_match(guchar **expression)
 
 	while (NEXT != '\'')
 	{
-		guchar	c = NEXT;
+		gchar	c = NEXT;
 
 		if (c == '\0')
 			goto out;
@@ -885,9 +885,10 @@ static void free_constant(Eval *eval)
  * This function tries to get a constant - if it fails then it tries
  * interpreting the next token as a variable.
  */
-static Eval *parse_eval(guchar **expression)
+static Eval *parse_eval(const gchar **expression)
 {
-	char	*start, *end;
+	const char *start;
+	char	*end;
 	double	value;
 	Eval	*eval;
 	gint	flags = 0;
@@ -948,7 +949,7 @@ static Eval *parse_eval(guchar **expression)
 	return eval;
 }
 
-static Eval *parse_variable(guchar **expression)
+static Eval *parse_variable(const gchar **expression)
 {
 	Eval	*eval;
 	VarType	var;
@@ -985,7 +986,7 @@ static Eval *parse_variable(guchar **expression)
 	return eval;
 }
 
-static gboolean match(guchar **expression, guchar *word)
+static gboolean match(const gchar **expression, const gchar *word)
 {
 	int	len;
 

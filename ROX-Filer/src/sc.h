@@ -29,10 +29,12 @@ struct _SmClient {
 gboolean sc_session_up();
 SmClient *sc_new(gchar *client_id);
 gboolean sc_connect(SmClient *client);
-void sc_get_prop_value(SmClient *client, gchar *name, SmPropValue **val_ret, gint *nvals_ret);
-void sc_set_list_of_array_prop(SmClient *client, gchar *name, gchar *vals[], gint nvals);
-void sc_set_array_prop(SmClient *client, gchar *name, gchar *vals);
-void sc_set_card_prop(SmClient *client, gchar *name, gchar val);
+void sc_get_prop_value(SmClient *client, const gchar *name,
+			SmPropValue **val_ret, gint *nvals_ret);
+void sc_set_list_of_array_prop(SmClient *client, const gchar *name,
+				const gchar *vals[], gint nvals);
+void sc_set_array_prop(SmClient *client, const gchar *name, const gchar *vals);
+void sc_set_card_prop(SmClient *client, const gchar *name, gchar val);
 void sc_register_properties(SmClient *client);
 void sc_destroy(SmClient *client);
 

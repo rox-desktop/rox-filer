@@ -14,6 +14,6 @@ void minibuffer_init(void);
 void create_minibuffer(FilerWindow *filer_window);
 void minibuffer_show(FilerWindow *filer_window, MiniType mini_type);
 void minibuffer_hide(FilerWindow *filer_window);
-void minibuffer_add(FilerWindow *filer_window, guchar *leafname);
+void minibuffer_add(FilerWindow *filer_window, const gchar *leafname);
 
 #endif /* _MINIBUFFER_H */

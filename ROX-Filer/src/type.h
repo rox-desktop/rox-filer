@@ -42,11 +42,11 @@ struct _MIME_type
 
 /* Prototypes */
 void type_init(void);
-char *basetype_name(DirItem *item);
-MIME_type *type_get_type(guchar *path);
+const char *basetype_name(DirItem *item);
+MIME_type *type_get_type(const guchar *path);
 
-MIME_type *type_from_path(char *path);
-gboolean type_open(char *path, MIME_type *type);
+MIME_type *type_from_path(const char *path);
+gboolean type_open(const char *path, MIME_type *type);
 MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);
 MIME_type *mime_type_from_base_type(int base_type);

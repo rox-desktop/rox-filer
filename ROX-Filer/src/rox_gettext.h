@@ -5,6 +5,6 @@
  * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
-char *rox_gettext(char *from);
-void rox_add_translations(char *path);
+const char *rox_gettext(const char *from);
+void rox_add_translations(const char *path);
 void rox_clear_translation(void);

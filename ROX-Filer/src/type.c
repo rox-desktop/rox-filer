@@ -95,7 +95,7 @@ static GdkColor	type_colours[NUM_TYPE_COLOURS];
 
 /* Static prototypes */
 static void alloc_type_colours(void);
-static char *import_extensions(guchar *line);
+static const char *import_extensions(gchar *line);
 static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
@@ -272,7 +272,7 @@ static void import_for_dir(guchar *path)
 }
 
 /* Add one entry to the extension_hash table */
-static void add_ext(char *type_name, char *ext)
+static void add_ext(const char *type_name, const char *ext)
 {
 	MIME_type *new;
 
@@ -313,9 +313,8 @@ static void add_regex(char *type_name, char *reg)
 }
 
 /* Parse one line from the file and add entries to extension_hash */
-static char *import_extensions(guchar *line)
+static const char *import_extensions(gchar *line)
 {
-
 	if (*line == '\0' || *line == '#')
 		return NULL;		/* Comment */
 
@@ -372,7 +371,7 @@ static char *import_extensions(guchar *line)
 	return NULL;
 }
 
-char *basetype_name(DirItem *item)
+const char *basetype_name(DirItem *item)
 {
 	if (item->flags & ITEM_FLAG_SYMLINK)
 		return _("Sym link");
@@ -405,7 +404,7 @@ char *basetype_name(DirItem *item)
 /* Get the type of this file - stats the file and uses that if
  * possible. For regular or missing files, uses the pathname.
  */
-MIME_type *type_get_type(guchar *path)
+MIME_type *type_get_type(const guchar *path)
 {
 	struct stat	info;
 	MIME_type	*type = NULL;
@@ -436,9 +435,10 @@ MIME_type *type_get_type(guchar *path)
 /* Returns a pointer to the MIME-type.
  * NULL if we can't think of anything.
  */
-MIME_type *type_from_path(char *path)
+MIME_type *type_from_path(const char *path)
 {
-	char	*ext, *dot, *lower, *leafname;
+	const char *ext, *dot, *leafname;
+	char *lower;
 #ifdef USE_REGEX
 	GList *patt;
 	int len;
@@ -511,14 +511,14 @@ static char *handler_for(MIME_type *type)
 
 /*			Actions for types 			*/
 
-gboolean type_open(char *path, MIME_type *type)
+gboolean type_open(const char *path, MIME_type *type)
 {
-	char	*argv[] = {NULL, NULL, NULL};
-	char	*open;
+	gchar *argv[] = {NULL, NULL, NULL};
+	char		*open;
 	gboolean	retval;
 	struct stat	info;
 
-	argv[1] = path;
+	argv[1] = (char *) path;
 
 	open = handler_for(type);
 	if (!open)
@@ -536,7 +536,7 @@ gboolean type_open(char *path, MIME_type *type)
 	else
 		argv[0] = open;
 
-	retval = rox_spawn(home_dir, argv);
+	retval = rox_spawn(home_dir, (const gchar **) argv);
 
 	if (argv[0] != open)
 		g_free(argv[0]);
@@ -636,7 +636,8 @@ static void set_shell_action(GtkWidget *dialog)
 {
 	GtkEntry *entry;
 	GtkToggleButton *for_all;
-	guchar	*command, *path, *tmp;
+	const guchar *command;
+	gchar	*tmp, *path;
 	int	error = 0, len;
 	FILE	*file;
 
@@ -690,7 +691,7 @@ void drag_app_dropped(GtkWidget		*eb,
 		      GtkWidget		*dialog)
 {
 	GList	*uris;
-	guchar	*app = NULL;
+	const gchar *app = NULL;
 	DirItem	*item;
 
 	if (!selection_data->data)

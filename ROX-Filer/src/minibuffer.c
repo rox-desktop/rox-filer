@@ -211,7 +211,7 @@ void minibuffer_hide(FilerWindow *filer_window)
 /* Insert this leafname at the cursor (replacing the selection, if any).
  * Must be in SHELL mode.
  */
-void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
+void minibuffer_add(FilerWindow *filer_window, const gchar *leafname)
 {
 	guchar		*esc;
 	GtkEditable 	*edit = GTK_EDITABLE(filer_window->minibuffer);
@@ -241,7 +241,7 @@ void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 
 static void show_help(FilerWindow *filer_window)
 {
-	guchar	*message;
+	const gchar	*message;
 
 	gtk_widget_grab_focus(filer_window->minibuffer);
 

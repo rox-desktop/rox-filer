@@ -18,8 +18,8 @@ struct _Pinboard {
 };
 
 void pinboard_init(void);
-void pinboard_activate(guchar *name);
-void pinboard_pin(guchar *path, guchar *name, int x, int y);
+void pinboard_activate(const gchar *name);
+void pinboard_pin(const gchar *path, const gchar *name, int x, int y);
 void pinboard_unpin(Icon *icon);
 void pinboard_wink_item(Icon *icon, gboolean timeout);
 void pinboard_clear(void);

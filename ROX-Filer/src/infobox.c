@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include <gtk/gtk.h>
 
@@ -70,13 +70,14 @@ static void info_destroyed(gpointer data);
  ****************************************************************/
 
 /* Create and display a new info box showing details about this item */
-void infobox_new(guchar *path)
+void infobox_new(const gchar *pathname)
 {
 	GtkWidget	*window, *hbox, *vbox, *details, *button;
+	gchar		*path;
 	
-	g_return_if_fail(path != NULL);
+	g_return_if_fail(pathname != NULL);
 
-	path = g_strdup(path);	/* Gets attached to window & freed later */
+	path = g_strdup(pathname); /* Gets attached to window & freed later */
 
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
 #ifdef GTK2
@@ -260,7 +261,7 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 	if (lstat(path, &info))
 	{
 		data[0] = _("Error:");
-		data[1] = g_strerror(errno);
+		data[1] = (guchar *) g_strerror(errno);
 		gtk_clist_append(table, data);
 		return GTK_WIDGET(table);
 	}

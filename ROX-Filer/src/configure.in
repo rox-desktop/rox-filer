@@ -19,24 +19,43 @@ Thank you.
 #AC_ARG_WITH(gtk2,
 #[  --with-gtk2		  Use Gtk+-2.0 API instead of Gtk+-1.2], gtk2=1, gtk2=0)
 
+if test -z "$PKG_CONFIG"; then
+  PKG_CONFIG=pkg-config
+fi
+AC_SUBST(PKG_CONFIG)
 
-dnl rox_CHECK_EXISTS(PROGRAM, ERROR)
-dnl Ensure that PROGRAM --version works.
-dnl Stops and displays ERROR if it's missing.
-AC_DEFUN(rox_CHECK_EXISTS, [
-AC_MSG_CHECKING(that $1 runs)
-if "$1" --version > /dev/null 2>&1 ; then
+AC_MSG_CHECKING(that pkg-config runs)
+if "$PKG_CONFIG" --version > /dev/null 2>&1 ; then
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
-  AC_MSG_ERROR([*** Missing program ***
+  AC_MSG_ERROR([*** $PKG_CONFIG missing ***
 
-$1 failed to run - make sure it is inside one of the
+\'$PKG_CONFIG --version\' failed to run - make sure it is inside one of the
 directories in your PATH environment variable!
-]
-$2)
+
+pkg-config comes with the developement packages for GTK+-2.0, available at:
+
+    http://www.gtk.org])
+fi
+
+AC_DEFUN(ROX_REQUIRE, [
+AC_MSG_CHECKING(that $1 (version >= $2) is installed)
+if "$PKG_CONFIG" --atleast-version=$2 $1 ; then
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+  if "$PKG_CONFIG" --exists $1 ; then
+    AC_MSG_ERROR(Current version is only `"$PKG_CONFIG" "$1" --modversion`)
+  else
+    AC_MSG_ERROR(Package is not installed)
+  fi
 fi
 ])
+
+ROX_REQUIRE(gtk+-2.0, 1.3.15)
+ROX_REQUIRE(libxml-2.0, 2.4.0)
+
 
 dnl Checks for programs.
 AC_PROG_CC
@@ -51,84 +70,13 @@ if test "x$GCC" = "xyes"; then
 fi
 ]
 
-if test -z "$PKG_CONFIG"; then
-  PKG_CONFIG=pkg-config
-fi
-AC_SUBST(PKG_CONFIG)
-
-if test -z "$XML_CONFIG"; then
-  AC_CHECK_PROG(XML_CONFIG, xml2-config, xml2-config, xml-config)
-fi
-AC_SUBST(XML_CONFIG)
-
-if test -z "$GTK_CONFIG"; then
-  GTK_CONFIG=gtk-config
-fi
-
-dnl Find the X libraries (needed for Gtk+-1.2.0-rc1)
+dnl Find the X libraries
 AC_PATH_XTRA
 if test x$no_x = xyes ; then
   AC_MSG_ERROR([X development libraries not found])
 fi
 LIBS="$LIBS $X_LIBS -lX11 $X_EXTRA_LIBS"
 CFLAGS="$CFLAGS $X_CFLAGS"
-
-dnl See if we've got Gtk+ 2.0 (or 1.3 developement version)
-AC_MSG_CHECKING(for Gtk+-1.3.13 or later)
-gtk2=0
-if $PKG_CONFIG "--atleast-version=1.3.13" "gtk+-2.0"; then
-  AC_MSG_RESULT(yes)
-  AC_MSG_WARN([Using EXPERIMENTAL Gtk+-2.0 API])
-  AC_DEFINE(GTK2)
-  gtk2=1
-  GTK_CFLAGS="$PKG_CONFIG gtk+-2.0 --cflags"
-  GTK_LIBS="$PKG_CONFIG gtk+-2.0 --libs"
-  GDK_PIXBUF_LIBS=`$PKG_CONFIG gdk-pixbuf-2.0 --libs`
-  GDK_PIXBUF_CFLAGS=`$PKG_CONFIG gdk-pixbuf-2.0 --cflags`
-else
-  AC_MSG_RESULT(no)
-  GTK_CFLAGS="$GTK_CONFIG --cflags"
-  GTK_LIBS="$GTK_CONFIG --libs"
-
-  dnl Warn the user if stuff is missing...
-  rox_CHECK_EXISTS([$GTK_CONFIG],
-		   [You need to install the gtk-devel package before compiling:
-		    http://www.gtk.org])
-
-  dnl Make sure we have gdk-pixbuf
-  AC_MSG_CHECKING(for gdk-pixbuf library)
-  if test -z "$GDK_PIXBUF_CONFIG"; then
-    GDK_PIXBUF_CONFIG=gdk-pixbuf-config
-  fi
-  GDK_PIXBUF_CFLAGS=`$GDK_PIXBUF_CONFIG --cflags`
-  GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
-  [
-  if [ -n "$GDK_PIXBUF_LIBS" ]; then
-  ]
-    AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
-  else
-    AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - make sure it is in your PATH)
-  fi
-
-  dnl Check for the Gnome VFS library
-  AC_MSG_CHECKING(for gnome-vfs-config)
-  if gnome-vfs-config --version > /dev/null 2>&1 ; then
-    AC_MSG_RESULT(yes)
-    CFLAGS="$CFLAGS `gnome-vfs-config --cflags`"
-    LIBS="$LIBS `gnome-vfs-config --libs`"
-    AC_DEFINE(WITH_GNOMEVFS)
-  else
-    AC_MSG_RESULT(no -- make sure libgnome-vfs-dev is installed)
-  fi
-fi
-AC_SUBST(GTK_CFLAGS)
-AC_SUBST(GTK_LIBS)
-AC_SUBST(GDK_PIXBUF_CFLAGS)
-AC_SUBST(GDK_PIXBUF_LIBS)
-
-rox_CHECK_EXISTS([$XML_CONFIG],
-	   [You need to install the xml-devel package before compiling:
-	    http://xmlsoft.org/])
 
 dnl Does file(1) support '-b' ?
 AC_MSG_CHECKING(whether file -b works)
@@ -163,7 +111,7 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h)
-AC_CHECK_HEADERS(regex.h iconv.h)
+AC_CHECK_HEADERS(regex.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -180,41 +128,5 @@ VERSION=`sed -n 's/^.*<Version>\([.0-9]*\).*<\/Version>.*$/\1/p' ../AppInfo.xml`
 ]
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
-
-dnl Check for libpng
-LIBPNG=""
-if test "$gtk2" != "1" ; then
-  AC_CHECK_LIB(png, png_read_info,
-    AC_TRY_CPP([#include <png.h>], png=yes, png=no),
-    png=no,
-    -lz -lm)
-  if test "$png" = "yes" ; then
-    AC_MSG_CHECKING([if libpng version is >= 1.0.1])
-    oldLIBS=$LIBS
-    LIBS="$LIBS -lpng -lz -lm"
-    AC_TRY_RUN(
-  [#include <stdlib.h>
-  #include <png.h>
-  int main(int argc, char **argv)
-  {
-  #ifdef PNG_LIBPNG_VER
-    if (PNG_LIBPNG_VER >= 10001)
-  	exit(0);
-    else
-  	exit(1);
-  #else
-    exit(2);
-  #endif
-  }
-  ], png=yes, png=no, png=no)
-    AC_MSG_RESULT($png)
-    LIBS=$oldLIBS
-    if test "$png" = "yes" ; then
-      LIBPNG="-lpng -lz -lm"
-      AC_DEFINE(HAVE_LIBPNG)
-    fi
-  fi
-fi
-AC_SUBST(LIBPNG)
 
 AC_OUTPUT(Makefile)

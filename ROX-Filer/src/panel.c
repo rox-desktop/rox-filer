@@ -28,7 +28,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <unistd.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -59,7 +59,7 @@ static Panel *loading_panel = NULL;
 /* Static prototypes */
 static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel);
 static void panel_destroyed(GtkWidget *widget, Panel *panel);
-static char *pan_from_file(guchar *line);
+static const char *pan_from_file(gchar *line);
 static gint icon_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        Icon *icon);
@@ -92,8 +92,8 @@ static void add_uri_list(GtkWidget          *widget,
                          guint32            time,
 			 Panel		    *panel);
 static void panel_add_item(Panel *panel,
-			   guchar *path,
-			   guchar *name,
+			   const guchar *path,
+			   const guchar *name,
 			   gboolean after);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
@@ -154,7 +154,7 @@ void panel_init(void)
 }
 
 /* 'name' may be NULL or "" to remove the panel */
-Panel *panel_new(guchar *name, PanelSide side)
+Panel *panel_new(const gchar *name, PanelSide side)
 {
 	guchar	*load_path;
 	Panel	*panel;
@@ -323,7 +323,8 @@ void panel_icon_renamed(Icon *icon)
 }
 
 /* Externally visible function to add an item to a panel */
-gboolean panel_add(PanelSide side, gchar *path, gchar *label, gboolean after)
+gboolean panel_add(PanelSide side,
+		   const gchar *path, const gchar *label, gboolean after)
 {
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
 	
@@ -419,9 +420,9 @@ static void panel_load_from_xml(Panel *panel, xmlDocPtr doc)
 }
 
 /* Called for each line in the config file while loading a new panel */
-static char *pan_from_file(guchar *line)
+static const char *pan_from_file(gchar *line)
 {
-	guchar	*sep, *leaf;
+	gchar	*sep, *leaf;
 	
 	g_return_val_if_fail(line != NULL, NULL);
 	g_return_val_if_fail(loading_panel != NULL, NULL);
@@ -453,8 +454,8 @@ static char *pan_from_file(guchar *line)
  * name and path are in UTF-8 for Gtk+-2.0 only.
  */
 static void panel_add_item(Panel *panel,
-			   guchar *path,
-			   guchar *name,
+			   const guchar *path,
+			   const guchar *name,
 			   gboolean after)
 {
 	GtkWidget	*widget;
@@ -852,7 +853,7 @@ static void add_uri_list(GtkWidget          *widget,
 
 	for (next = uris; next; next = next->next)
 	{
-		guchar	*path;
+		const guchar	*path;
 
 		path = get_local_path((guchar *) next->data);
 
@@ -1323,7 +1324,7 @@ static void run_applet(Icon *icon)
 			GDK_WINDOW_XWINDOW(icon->socket->window));
 	argv[2] = NULL;
 
-	pid = spawn_full(argv, NULL, NULL);
+	pid = spawn_full((const char **) argv, NULL, NULL);
 	
 	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
 	

@@ -47,7 +47,7 @@
 static Option o_ignore_exec;
 
 /* Static prototypes */
-static void examine_dir(guchar *path, DirItem *item);
+static void examine_dir(const guchar *path, DirItem *item);
 
 
 /****************************************************************
@@ -62,7 +62,7 @@ void diritem_init(void)
 }
 
 /* Bring this item's structure uptodate */
-void diritem_restat(guchar *path, DirItem *item)
+void diritem_restat(const guchar *path, DirItem *item)
 {
 	struct stat	info;
 
@@ -181,7 +181,7 @@ void diritem_restat(guchar *path, DirItem *item)
 	}
 }
 
-DirItem *diritem_new(guchar *leafname)
+DirItem *diritem_new(const guchar *leafname)
 {
 	DirItem *item;
 
@@ -216,7 +216,7 @@ void diritem_free(DirItem *item)
  * - Looks for an image (but maybe still NULL on error)
  * - Updates ITEM_FLAG_APPDIR
  */
-static void examine_dir(guchar *path, DirItem *item)
+static void examine_dir(const guchar *path, DirItem *item)
 {
 	uid_t	uid = item->uid;
 	struct stat info;

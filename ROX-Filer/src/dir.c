@@ -78,11 +78,12 @@ static int getref(Directory *dir, gpointer data);
 static void update(Directory *dir, gchar *pathname, gpointer data);
 static void destroy(Directory *dir);
 static void set_idle_callback(Directory *dir);
-static DirItem *insert_item(Directory *dir, guchar *leafname);
+static DirItem *insert_item(Directory *dir, const guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
-static void dir_recheck(Directory *dir, guchar *path, guchar *leafname);
+static void dir_recheck(Directory *dir,
+			const guchar *path, const guchar *leafname);
 static GPtrArray *hash_to_array(GHashTable *hash);
-static void dir_force_update_item(Directory *dir, gchar *leaf);
+static void dir_force_update_item(Directory *dir, const gchar *leaf);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -181,7 +182,7 @@ int dir_item_cmp(const void *a, const void *b)
 }
 
 /* Rescan this directory */
-void refresh_dirs(char *path)
+void refresh_dirs(const char *path)
 {
 	g_fscache_update(dir_cache, path);
 }
@@ -189,7 +190,7 @@ void refresh_dirs(char *path)
 /* When something has happened to a particular object, call this
  * and all appropriate changes will be made.
  */
-void dir_check_this(guchar *path)
+void dir_check_this(const guchar *path)
 {
 	guchar	*real_path;
 	guchar	*dir_path;
@@ -210,7 +211,7 @@ void dir_check_this(guchar *path)
 /* Tell watchers that this item has changed, but don't rescan.
  * (used when thumbnail has been created for an item)
  */
-void dir_force_update_path(gchar *path)
+void dir_force_update_path(const gchar *path)
 {
 	gchar	*dir_path;
 	Directory *dir;
@@ -230,7 +231,7 @@ void dir_force_update_path(gchar *path)
 /* Ensure that 'leafname' is up-to-date. Returns the new/updated
  * DirItem, or NULL if the file no longer exists.
  */
-DirItem *dir_update_item(Directory *dir, gchar *leafname)
+DirItem *dir_update_item(Directory *dir, const gchar *leafname)
 {
 	DirItem *item;
 	
@@ -325,7 +326,7 @@ static gboolean recheck_callback(gpointer data)
  * Remove any DirItems that are no longer listed.
  * Replace the recheck_list with the items found.
  */
-void dir_rescan(Directory *dir, guchar *pathname)
+void dir_rescan(Directory *dir, const guchar *pathname)
 {
 	GPtrArray	*names;
 	DIR		*d;
@@ -573,7 +574,7 @@ static void delayed_notify(Directory *dir)
  * Returns the new/updated item, if any.
  * (leafname may be from the current DirItem item)
  */
-static DirItem *insert_item(Directory *dir, guchar *leafname)
+static DirItem *insert_item(Directory *dir, const guchar *leafname)
 {
 	static GString  *tmp = NULL;
 
@@ -760,7 +761,7 @@ static void set_idle_callback(Directory *dir)
 }
 
 /* See dir_force_update_path() */
-static void dir_force_update_item(Directory *dir, gchar *leaf)
+static void dir_force_update_item(Directory *dir, const gchar *leaf)
 {
 	GList *list = dir->users;
 	GPtrArray *items;
@@ -787,7 +788,8 @@ out:
 	g_ptr_array_free(items, TRUE);
 }
 
-static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
+static void dir_recheck(Directory *dir,
+			const guchar *path, const guchar *leafname)
 {
 	guchar *old = dir->pathname;
 

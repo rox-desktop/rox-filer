@@ -8,6 +8,6 @@
 #ifndef _INFOBOX_H
 #define _INFOBOX_H
 
-void infobox_new(guchar *path);
+void infobox_new(const gchar *pathname);
 
 #endif /* _INFOBOX_H */

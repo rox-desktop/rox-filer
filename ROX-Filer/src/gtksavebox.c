@@ -99,7 +99,7 @@ static void drag_data_get	   (GtkWidget	      *widget,
 static guchar *read_xds_property   (GdkDragContext    *context,
 				    gboolean	      delete);
 static void write_xds_property	   (GdkDragContext    *context,
-				    guchar	      *value);
+				    const guchar      *value);
 static void drag_end 		   (GtkWidget 	      *widget,
 				    GdkDragContext    *context);
 static void do_save		   (GtkWidget	      *widget,
@@ -281,7 +281,7 @@ gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixmap *pixmap, GdkPixmap *mask)
 }
 
 void
-gtk_savebox_set_pathname (GtkSavebox *savebox, gchar *pathname)
+gtk_savebox_set_pathname (GtkSavebox *savebox, const gchar *pathname)
 {
   gchar *slash, *dot;
   gint	leaf;
@@ -311,7 +311,7 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
 {
   GdkDragContext  *context;
   GdkPixmap	  *pixmap, *mask;
-  guchar	  *uri = NULL, *leafname;
+  const guchar	  *uri = NULL, *leafname;
 
   g_return_if_fail (savebox != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));
@@ -356,8 +356,8 @@ drag_data_get (GtkWidget	*widget,
 {
   GtkSavebox  *savebox;
   guchar      to_send = 'E';
-  guchar      *uri;
-  guchar      *pathname;
+  gchar	      *uri;
+  const gchar *pathname;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (widget));
@@ -436,7 +436,7 @@ read_xds_property (GdkDragContext *context, gboolean delete)
 }
 
 static void
-write_xds_property (GdkDragContext *context, guchar *value)
+write_xds_property (GdkDragContext *context, const guchar *value)
 {
   if (value)
     {
@@ -461,13 +461,13 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 
       if (uri)
 	{
-	  guchar  *path;
+	  const gchar  *path;
 
 	  path = get_local_path (uri);
 	  
 	  gtk_signal_emit (GTK_OBJECT (widget),
 			   savebox_signals[SAVED_TO_URI],
-			   path ? path : uri);
+			   path ? path : (const gchar *) uri);
 	  g_free(uri);
 	}
     }
@@ -487,7 +487,7 @@ static void cancel_clicked (GtkWidget *widget, GtkSavebox *savebox)
 static void do_save (GtkWidget *widget, GtkSavebox *savebox)
 {
   gint	  result = GTK_XDS_NO_HANDLER;
-  guchar  *pathname, *uri;
+  const guchar  *pathname, *uri;
 
   g_return_if_fail (savebox != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));

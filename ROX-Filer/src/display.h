@@ -52,7 +52,7 @@ int sort_by_date(const void *item1, const void *item2);
 int sort_by_size(const void *item1, const void *item2);
 void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
-void display_set_autoselect(FilerWindow *filer_window, guchar *leaf);
+void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf);
 void shrink_grid(FilerWindow *filer_window);
 void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		int *width, int *height);

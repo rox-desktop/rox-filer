@@ -10,12 +10,6 @@
 
 #include <gtk/gtk.h>
 
-#ifndef GTK2
-# ifndef PIXMAPS_C
-  typedef struct _GdkPixbuf GdkPixbuf;
-# endif
-#endif
-
 extern GFSCache *pixmap_cache;
 
 extern MaskedPixmap *im_error;
@@ -76,6 +70,6 @@ void pixmap_make_huge(MaskedPixmap *mp);
 void pixmap_make_small(MaskedPixmap *mp);
 MaskedPixmap *load_pixmap(char *name);
 MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size);
-void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data);
+void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data);
 
 #endif /* _PIXMAP_H */

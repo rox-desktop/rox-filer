@@ -65,7 +65,7 @@
  *
  * appinfo_unref() the result.
  */
-XMLwrapper *appinfo_get(guchar *app_dir, DirItem *item)
+XMLwrapper *appinfo_get(const gchar *app_dir, DirItem *item)
 {
 	XMLwrapper	*ai;
 	guchar	*tmp;
@@ -88,7 +88,7 @@ XMLwrapper *appinfo_get(guchar *app_dir, DirItem *item)
  *
  * Returns an xmlNode or NULL if there isn't one.
  */
-xmlNode *appinfo_get_section(XMLwrapper *ai, guchar *name)
+xmlNode *appinfo_get_section(XMLwrapper *ai, const gchar *name)
 {
 	xmlNode *node;
 

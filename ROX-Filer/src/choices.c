@@ -152,7 +152,7 @@ void choices_free_list(GPtrArray *list)
  * The return values may be NULL - use built-in defaults.
  * g_free() the result.
  */
-guchar *choices_find_path_load(char *leaf, char *dir)
+guchar *choices_find_path_load(const char *leaf, const char *dir)
 {
 	gchar	**cdir = dir_list;
 
@@ -182,7 +182,8 @@ guchar *choices_find_path_load(char *leaf, char *dir)
  *
  * g_free() the result.
  */
-guchar *choices_find_path_save(char *leaf, char *dir, gboolean create)
+guchar *choices_find_path_save(const char *leaf, const char *dir,
+				gboolean create)
 {
 	gchar	*path, *retval;
 	

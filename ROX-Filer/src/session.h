@@ -5,6 +5,6 @@
 #include <gtk/gtk.h>
 #include <X11/SM/SMlib.h>
 
-void session_init(gchar *client_id);
+void session_init(const gchar *client_id);
 
 #endif

@@ -27,7 +27,7 @@
 
 #include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include "global.h"
 
@@ -241,7 +241,7 @@ void icon_may_update(Icon *icon)
 }
 
 /* If path is on an icon then it may have changed... check! */
-void icons_may_update(guchar *path)
+void icons_may_update(const gchar *path)
 {
 	GList	*affected;
 
@@ -253,8 +253,8 @@ void icons_may_update(guchar *path)
 
 typedef struct _CheckData CheckData;
 struct _CheckData {
-	guchar	 *path;
-	gboolean found;
+	const gchar *path;
+	gboolean    found;
 };
 
 static void check_has(gpointer key, GList *icons, CheckData *check)
@@ -319,7 +319,7 @@ void icon_set_tip(Icon *icon)
 /* Returns TRUE if any icon links to this item (or any item inside
  * this item).
  */
-gboolean icons_require(guchar *path)
+gboolean icons_require(const gchar *path)
 {
 	CheckData	check;
 
@@ -544,6 +544,33 @@ void icons_update_tip(void)
 	g_hash_table_foreach(icons_hash, (GHFunc) set_tip, NULL);
 }
 
+/* Removes trailing / chars and converts a leading '~/' (if any) to
+ * the user's home dir. g_free() the result.
+ */
+gchar *icon_convert_path(const gchar *path)
+{
+	guchar		*retval;
+	int		path_len;
+
+	g_return_val_if_fail(path != NULL, NULL);
+
+	path_len = strlen(path);
+	while (path_len > 1 && path[path_len - 1] == '/')
+		path_len--;
+	
+	retval = g_strndup(path, path_len);
+
+	if (path[0] == '~' && (path[1] == '\0' || path[1] == '/'))
+	{
+		guchar *tmp = retval;
+
+		retval = g_strconcat(home_dir, retval + 1, NULL);
+		g_free(tmp);
+	}
+
+	return retval;
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -553,7 +580,7 @@ static void rename_activate(GtkWidget *dialog)
 	GtkWidget *entry, *src;
 	RenameFn callback;
 	Icon	*icon;
-	guchar	*new_name, *new_src;
+	const guchar	*new_name, *new_src;
 	
 	entry = gtk_object_get_data(GTK_OBJECT(dialog), "new_name");
 	icon = gtk_object_get_data(GTK_OBJECT(dialog), "callback_icon");

@@ -96,7 +96,8 @@ GtkType    gtk_savebox_get_type 	(void);
 GtkWidget* gtk_savebox_new		(void);
 void	   gtk_savebox_set_icon		(GtkSavebox *savebox,
 					 GdkPixmap *pixmap, GdkPixmap *mask);
-void	   gtk_savebox_set_pathname	(GtkSavebox *savebox, gchar *pathname);
+void	   gtk_savebox_set_pathname	(GtkSavebox *savebox,
+					 const gchar *pathname);
 
 
 #ifdef __cplusplus

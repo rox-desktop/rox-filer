@@ -16,16 +16,15 @@
 
 typedef struct _GFSCacheKey GFSCacheKey;
 typedef struct _GFSCacheData GFSCacheData;
-typedef gpointer (*GFSLoadFunc)(char *pathname, gpointer user_data);
+typedef gpointer (*GFSLoadFunc)(const char *pathname, gpointer user_data);
 typedef void (*GFSRefFunc)(gpointer object, gpointer user_data);
 typedef int (*GFSGetRefFunc)(gpointer object, gpointer user_data);
 typedef void (*GFSUpdateFunc)(gpointer object,
-			      char *pathname,
+			      const char *pathname,
 			      gpointer user_data);
 
 struct _GFSCache
 {
-	
 	GHashTable	*inode_to_stats;
 	GFSLoadFunc	load;
 	GFSRefFunc	ref;
@@ -67,18 +66,18 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 			GFSUpdateFunc update,
 			gpointer user_data);
 void g_fscache_destroy(GFSCache *cache);
-gpointer g_fscache_lookup(GFSCache *cache, char *pathname);
-gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
+gpointer g_fscache_lookup(GFSCache *cache, const char *pathname);
+gpointer g_fscache_lookup_full(GFSCache *cache, const char *pathname,
 				FSCacheLookup lookup_type,
 				gboolean *found);
-void g_fscache_may_update(GFSCache *cache, char *pathname);
-void g_fscache_update(GFSCache *cache, char *pathname);
+void g_fscache_may_update(GFSCache *cache, const char *pathname);
+void g_fscache_update(GFSCache *cache, const char *pathname);
 void g_fscache_purge(GFSCache *cache, gint age);
 
 void g_fscache_data_ref(GFSCache *cache, gpointer data);
 void g_fscache_data_unref(GFSCache *cache, gpointer data);
 
-void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj,
+void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 		      gboolean update_details);
 
 #endif /* _FSCACHE_H */

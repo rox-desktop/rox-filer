@@ -656,7 +656,7 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
  * isn't already there but we're scanning then highlight it if it
  * appears later.
  */
-void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
+void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf)
 {
 	Collection	*col;
 	int		i;
@@ -680,10 +680,11 @@ void display_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 	}
 	
 out:
-	if (leaf)
-		leaf = g_strdup(leaf);
 	g_free(filer_window->auto_select);
-	filer_window->auto_select = leaf;
+	if (leaf)
+		filer_window->auto_select = g_strdup(leaf);
+	else
+		filer_window->auto_select = NULL;
 }
 
 gboolean display_is_truncated(FilerWindow *filer_window, int i)

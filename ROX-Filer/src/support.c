@@ -36,7 +36,7 @@
 #include <string.h>
 #include <time.h>
 #include <unistd.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include "global.h"
 
@@ -71,7 +71,7 @@ static int xml_getref(XMLwrapper *dir, gpointer data);
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-XMLwrapper *xml_cache_load(gchar *pathname)
+XMLwrapper *xml_cache_load(const gchar *pathname)
 {
 	static GFSCache *xml_cache = NULL;
 
@@ -96,7 +96,7 @@ void xml_cache_unref(XMLwrapper *wrapper)
 static xmlNode *best_lang(xmlNode *first)
 {
 	xmlNode *node = first;
-	char *target_lang = current_lang ? current_lang : "en";
+	const char *target_lang = current_lang ? current_lang : "en";
 	
 	g_return_val_if_fail(first != NULL, NULL);
 
@@ -165,7 +165,7 @@ xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
 }
 
 /* Save doc as XML as filename, 0 on success or -1 on failure */
-int save_xml_file(xmlDocPtr doc, gchar *filename)
+int save_xml_file(xmlDocPtr doc, const gchar *filename)
 {
 #if LIBXML_VERSION > 20400
 	if (xmlSaveFormatFileEnc(filename, doc, NULL, 1) < 0)
@@ -209,7 +209,7 @@ xmlDocPtr soap_new(xmlNodePtr *ret_body)
 }
 
 /* Like g_strdup, but does realpath() too (if possible) */
-char *pathdup(char *path)
+char *pathdup(const char *path)
 {
 	char real[MAXPATHLEN];
 
@@ -225,7 +225,7 @@ char *pathdup(char *path)
  * return a pointer to a buffer with the result. Buffer is valid until
  * the next call to make_path.
  */
-GString *make_path(char *dir, char *leaf)
+GString *make_path(const char *dir, const char *leaf)
 {
 	static GString *buffer = NULL;
 
@@ -244,7 +244,7 @@ GString *make_path(char *dir, char *leaf)
 }
 
 /* Return our complete host name for DND */
-char *our_host_name_for_dnd(void)
+const char *our_host_name_for_dnd(void)
 {
 	if (o_dnd_no_hostnames.int_value)
 		return "";
@@ -252,7 +252,7 @@ char *our_host_name_for_dnd(void)
 }
 
 /* Return our complete host name, unconditionally */
-char *our_host_name(void)
+const char *our_host_name(void)
 {
 	static char *name = NULL;
 
@@ -284,7 +284,7 @@ char *our_host_name(void)
  * side here.
  * Returns the PID of the child, or 0 on failure (from_stderr is still valid).
  */
-pid_t spawn_full(char **argv, char *dir, int *from_stderr)
+pid_t spawn_full(const char **argv, const char *dir, int *from_stderr)
 {
 	int	child;
 	int	fd[2];
@@ -322,7 +322,7 @@ pid_t spawn_full(char **argv, char *dir, int *from_stderr)
 			if (chdir(dir))
 				fprintf(stderr, "chdir() failed: %s\n",
 						g_strerror(errno));
-		execvp(argv[0], argv);
+		execvp(argv[0], (char **) argv);
 		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
 				argv[0],
 				g_strerror(errno));
@@ -342,9 +342,9 @@ void debug_free_string(void *data)
 	g_free(data);
 }
 
-char *user_name(uid_t uid)
+const char *user_name(uid_t uid)
 {
-	char	*retval;
+	const char *retval;
 	
 	if (!uid_hash)
 		uid_hash = g_hash_table_new(NULL, NULL);
@@ -358,15 +358,16 @@ char *user_name(uid_t uid)
 		passwd = getpwuid(uid);
 		retval = passwd ? g_strdup(passwd->pw_name)
 			       : g_strdup_printf("[%d]", (int) uid);
-		g_hash_table_insert(uid_hash, GINT_TO_POINTER(uid), retval);
+		g_hash_table_insert(uid_hash, GINT_TO_POINTER(uid),
+				(gchar *) retval);
 	}
 
 	return retval;
 }
 
-char *group_name(gid_t gid)
+const char *group_name(gid_t gid)
 {
-	char	*retval;
+	const char *retval;
 	
 	if (!gid_hash)
 		gid_hash = g_hash_table_new(NULL, NULL);
@@ -380,7 +381,8 @@ char *group_name(gid_t gid)
 		group = getgrgid(gid);
 		retval = group ? g_strdup(group->gr_name)
 			       : g_strdup_printf("[%d]", (int) gid);
-		g_hash_table_insert(gid_hash, GINT_TO_POINTER(gid), retval);
+		g_hash_table_insert(gid_hash, GINT_TO_POINTER(gid),
+				(gchar *) retval);
 	}
 
 	return retval;
@@ -392,7 +394,7 @@ char *group_name(gid_t gid)
 char *format_size(off_t size)
 {
 	static	char *buffer = NULL;
-	char	*units;
+	const char	*units;
 	
 	if (size >= PRETTY_SIZE_LIMIT)
 	{
@@ -473,7 +475,7 @@ char *format_size_aligned(off_t size)
 gchar *format_double_size(double size)
 {
 	static gchar	*buf = NULL;
-	char		*units;
+	const char	*units;
 
 	if (size >= PRETTY_SIZE_LIMIT)
 	{
@@ -522,7 +524,7 @@ static void newline(GString *str)
  * a suitable message is created.
  * g_free() the result.
  */
-char *fork_exec_wait(char **argv)
+char *fork_exec_wait(const char **argv)
 {
 	pid_t	child;
 	int	status = -1;
@@ -676,7 +678,7 @@ static gboolean is_local_address(char *address)
  *	//host/path
  *	file://host/path
  */
-char *get_local_path(char *uri)
+const char *get_local_path(const char *uri)
 {
 	if (*uri == '/')
 	{
@@ -783,9 +785,9 @@ static int copy_fd(int read_fd, int write_fd)
  *
  * Returns an error string, or NULL on success. g_free() the result.
  */
-guchar *copy_file(guchar *from, guchar *to)
+guchar *copy_file(const guchar *from, const guchar *to)
 {
-	char	*argv[] = {"cp", "-pRf", NULL, NULL, NULL};
+	const char *argv[] = {"cp", "-pRf", NULL, NULL, NULL};
 
 #ifdef HAVE_LIBVFS
 	struct	stat	info;
@@ -842,7 +844,7 @@ err:
  * into a shell command.
  * Eg: 'My Dir?' becomes 'My\ Dir\?'. g_free() the result.
  */
-guchar *shell_escape(guchar *word)
+guchar *shell_escape(const guchar *word)
 {
 	GString	*tmp;
 	guchar	*retval;
@@ -866,9 +868,10 @@ guchar *shell_escape(guchar *word)
  * (or the two are the same item/directory).
  * FALSE if parent doesn't exist.
  */
-gboolean is_sub_dir(char *sub, char *parent)
+gboolean is_sub_dir(const char *sub_obj, const char *parent)
 {
 	struct stat parent_info;
+	char *sub;
 
 	if (mc_lstat(parent, &parent_info))
 		return FALSE;		/* Parent doesn't exist */
@@ -881,7 +884,7 @@ gboolean is_sub_dir(char *sub, char *parent)
 	 * When checking if an icon depends on a file (parent), use realpath on
 	 * sub (the icon) too.
 	 */
-	sub = pathdup(sub);
+	sub = pathdup(sub_obj);
 	
 	while (1)
 	{
@@ -920,7 +923,7 @@ gboolean is_sub_dir(char *sub, char *parent)
 /* True if the string 'list' contains 'item'.
  * Eg ("close", "close, help") -> TRUE
  */
-gboolean in_list(guchar *item, guchar *list)
+gboolean in_list(const guchar *item, const guchar *list)
 {
 	int	len;
 
@@ -948,7 +951,7 @@ gboolean in_list(guchar *item, guchar *list)
  *
  * The array and the strings in it must be freed after use.
  */
-GPtrArray *split_path(guchar *path)
+GPtrArray *split_path(const guchar *path)
 {
 	GPtrArray *array;
 	guchar	*slash;
@@ -981,7 +984,7 @@ GPtrArray *split_path(guchar *path)
 /* Return the shortest path from 'from' to 'to'.
  * Eg: get_relative_path("/a/b/c", "a/d/e") -> "../d/e"
  */
-guchar *get_relative_path(guchar *from, guchar *to)
+guchar *get_relative_path(const guchar *from, const guchar *to)
 {
 	GString  *path;
 	guchar	 *retval;
@@ -1065,7 +1068,7 @@ int text_to_boolean(const char *text, int defvalue)
  * NULL on error (not a symlink, path too long) and errno set.
  * g_free() the result.
  */
-char *readlink_dup(char *source)
+char *readlink_dup(const char *source)
 {
 	char	path[MAXPATHLEN + 1];
 	int	got;
@@ -1315,7 +1318,7 @@ static void MD5Transform(guint32 buf[4], guint32 const in[16])
 
 # endif /* ASM_MD5 */
 
-char *md5_hash(char *message)
+char *md5_hash(const char *message)
 {
 	MD5Context ctx;
 
@@ -1325,35 +1328,8 @@ char *md5_hash(char *message)
 }
 #endif /* GTK2 or THUMBS_USE_LIBPNG */
 
-/* Removes trailing / chars and converts a leading '~/' (if any) to
- * the user's home dir. g_free() the result.
- */
-gchar *icon_convert_path(gchar *path)
-{
-	guchar		*retval;
-	int		path_len;
-
-	g_return_val_if_fail(path != NULL, NULL);
-
-	path_len = strlen(path);
-	while (path_len > 1 && path[path_len - 1] == '/')
-		path_len--;
-	
-	retval = g_strndup(path, path_len);
-
-	if (path[0] == '~' && (path[1] == '\0' || path[1] == '/'))
-	{
-		guchar *tmp = retval;
-
-		retval = g_strconcat(home_dir, retval + 1, NULL);
-		g_free(tmp);
-	}
-
-	return retval;
-}
-
 /* Convert string 'src' from the current locale to UTF-8 */
-gchar *to_utf8(gchar *src)
+gchar *to_utf8(const gchar *src)
 {
 	gchar *retval;
 
@@ -1366,7 +1342,7 @@ gchar *to_utf8(gchar *src)
 }
 
 /* Convert string 'src' to the current locale from UTF-8 */
-gchar *from_utf8(gchar *src)
+gchar *from_utf8(const gchar *src)
 {
 	gchar *retval;
 	

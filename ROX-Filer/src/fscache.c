@@ -47,7 +47,7 @@ static gint cmp_stats(gconstpointer a, gconstpointer b);
 static void destroy_hash_entry(gpointer key, gpointer data, gpointer user_data);
 static gboolean purge_hash_entry(gpointer key, gpointer data,
 				 gpointer user_data);
-static GFSCacheData *lookup_internal(GFSCache *cache, char *pathname,
+static GFSCacheData *lookup_internal(GFSCache *cache, const char *pathname,
 					FSCacheLookup lookup_type);
 
 
@@ -140,7 +140,7 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
  *
  * Returns NULL on failure.
  */
-gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
+gpointer g_fscache_lookup(GFSCache *cache, const char *pathname)
 {
 	return g_fscache_lookup_full(cache, pathname,
 			FSCACHE_LOOKUP_CREATE, NULL);
@@ -153,7 +153,7 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
  * start loading some data and then with update_details = FALSE when you
  * put in the loaded object.
  */
-void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj,
+void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
 		      gboolean update_details)
 {
 	GFSCacheData	*data;
@@ -178,7 +178,7 @@ void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj,
  * returned (a NULL return could indicate that the data is cached, but
  * the data is NULL).
  */
-gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
+gpointer g_fscache_lookup_full(GFSCache *cache, const char *pathname,
 				FSCacheLookup lookup_type,
 				gboolean *found)
 {
@@ -207,7 +207,7 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 /* Call the update() function on this item if it's in the cache
  * AND it's out-of-date.
  */
-void g_fscache_may_update(GFSCache *cache, char *pathname)
+void g_fscache_may_update(GFSCache *cache, const char *pathname)
 {
 	GFSCacheKey	key;
 	GFSCacheData	*data;
@@ -235,7 +235,7 @@ void g_fscache_may_update(GFSCache *cache, char *pathname)
 }
 
 /* Call the update() function on this item iff it's in the cache. */
-void g_fscache_update(GFSCache *cache, char *pathname)
+void g_fscache_update(GFSCache *cache, const char *pathname)
 {
 	GFSCacheKey	key;
 	GFSCacheData	*data;
@@ -342,7 +342,7 @@ static gboolean purge_hash_entry(gpointer key, gpointer data,
 /* As for g_fscache_lookup_full, but return the GFSCacheData rather than
  * the data it contains. Doesn't increment the refcount.
  */
-static GFSCacheData *lookup_internal(GFSCache *cache, char *pathname,
+static GFSCacheData *lookup_internal(GFSCache *cache, const char *pathname,
 					FSCacheLookup lookup_type)
 {
 	struct stat 	info;

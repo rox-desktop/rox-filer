@@ -27,7 +27,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
-#include <parser.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtkinvisible.h>
@@ -128,7 +127,7 @@ static gboolean button_press_event(GtkWidget *widget,
 static gint icon_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       Icon *icon);
-static char *pin_from_file(guchar *line);
+static const char *pin_from_file(gchar *line);
 static gboolean add_root_handlers(void);
 static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 				    GdkEvent *event,
@@ -195,7 +194,7 @@ void pinboard_init(void)
  * at least once before using the pinboard. NULL disables the
  * pinboard.
  */
-void pinboard_activate(guchar *name)
+void pinboard_activate(const gchar *name)
 {
 	Pinboard	*old_board = current_pinboard;
 	guchar		*path, *slash;
@@ -282,7 +281,7 @@ void pinboard_activate(guchar *name)
  *
  * name and path are in UTF-8 for Gtk+-2.0 only.
  */
-void pinboard_pin(guchar *path, guchar *name, int x, int y)
+void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 {
 	Icon		*icon;
 	int		width, height;
@@ -1063,14 +1062,14 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 /* Called for each line in the pinboard file while loading a new board.
  * Only used for old-format files when converting to XML.
  */
-static char *pin_from_file(guchar *line)
+static const char *pin_from_file(gchar *line)
 {
-	guchar	*leaf = NULL;
+	gchar	*leaf = NULL;
 	int	x, y, n;
 
 	if (*line == '<')
 	{
-		guchar	*end;
+		gchar	*end;
 
 		end = strchr(line + 1, '>');
 		if (!end)

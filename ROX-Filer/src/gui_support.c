@@ -123,8 +123,8 @@ static gboolean dialog_key_event(GtkWidget *dialog,
  * If a dialog is already open, returns -1 without waiting AND
  * brings the current dialog to the front.
  */
-int get_choice(char *title,
-	       char *message,
+int get_choice(const char *title,
+	       const char *message,
 	       int number_of_buttons, ...)
 {
 	GtkWidget	*dialog;
@@ -242,7 +242,7 @@ int get_choice(char *title,
 }
 
 /* Display a message in a window with "ROX-Filer" as title */
-void report_error(char *message, ...)
+void report_error(const char *message, ...)
 {
         va_list args;
 	gchar *s;
@@ -371,7 +371,7 @@ static gboolean error_idle_cb(gpointer data)
  * all are displayed in a single window.
  * If an error is reported while the error window is open, it is discarded.
  */
-void delayed_error(char *error, ...)
+void delayed_error(const char *error, ...)
 {
 	static char *delayed_error_data = NULL;
 	char *old, *new;
@@ -405,7 +405,7 @@ void delayed_error(char *error, ...)
 /* Load the file into memory. Return TRUE on success.
  * Block is zero terminated (but this is not included in the length).
  */
-gboolean load_file(char *pathname, char **data_out, long *length_out)
+gboolean load_file(const char *pathname, char **data_out, long *length_out)
 {
 #ifdef GTK2
 	gsize len;
@@ -488,7 +488,7 @@ GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
  * in the file. Callback returns NULL on success, or an error message
  * if something went wrong. Only the first error is displayed to the user.
  */
-void parse_file(char *path, ParseFunc *parse_line)
+void parse_file(const char *path, ParseFunc *parse_line)
 {
 	char		*data;
 	long		length;
@@ -496,7 +496,8 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 	if (load_file(path, &data, &length))
 	{
-		char *eol, *error;
+		char *eol;
+		const char *error;
 		char *line = data;
 		int  line_number = 1;
 
@@ -858,12 +859,11 @@ void destroy_on_idle(GtkWidget *widget)
 /* Spawn a child process (as spawn_full), and report errors.
  * TRUE on success.
  */
-gboolean rox_spawn(gchar *dir, gchar **argv)
+gboolean rox_spawn(const gchar *dir, const gchar **argv)
 {
-#ifdef GTK2
 	GError	*error = NULL;
 	
-	if (!g_spawn_async_with_pipes(dir, argv, NULL,
+	if (!g_spawn_async_with_pipes(dir, (gchar **) argv, NULL,
 			G_SPAWN_DO_NOT_REAP_CHILD |
 			G_SPAWN_SEARCH_PATH,
 			NULL, NULL,		/* Child setup fn */
@@ -876,14 +876,7 @@ gboolean rox_spawn(gchar *dir, gchar **argv)
 
 		return FALSE;
 	}
-#else
-	if (spawn_full(argv, dir, NULL) == 0)
-	{
-		report_error("Failed to start child process:\n%s",
-				g_strerror(errno));
-		return FALSE;
-	}
-#endif
+
 	return TRUE;
 }
 
@@ -906,7 +899,7 @@ void add_default_styles(void)
 	}
 }
 
-GtkWidget *button_new_mixed(char *stock, char *message)
+GtkWidget *button_new_mixed(const char *stock, const char *message)
 {
 	GtkWidget *button, *align, *image, *hbox, *label;
 	

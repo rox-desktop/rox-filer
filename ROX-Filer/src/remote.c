@@ -34,7 +34,7 @@
 #include <X11/Xatom.h>
 #include <gtk/gtk.h>
 #include <gtk/gtkinvisible.h>
-#include <parser.h>
+#include <libxml/parser.h>
 
 #include "global.h"
 

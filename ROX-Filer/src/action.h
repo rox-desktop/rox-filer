@@ -17,10 +17,10 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet);
 void action_delete(GList *paths);
 void action_chmod(GList *paths);
 void action_find(GList *paths);
-void action_move(GList *paths, char *dest, char *leaf, int quiet);
-void action_copy(GList *paths, char *dest, char *leaf, int quiet);
-void action_link(GList *paths, char *dest, char *leaf);
+void action_move(GList *paths, const char *dest, const char *leaf, int quiet);
+void action_copy(GList *paths, const char *dest, const char *leaf, int quiet);
+void action_link(GList *paths, const char *dest, const char *leaf);
 void show_condition_help(gpointer data);
-void set_find_string_colour(GtkWidget *widget, guchar *string);
+void set_find_string_colour(GtkWidget *widget, const guchar *string);
 
 #endif /* _ACTION_H */

@@ -37,7 +37,7 @@ struct _FilerWindow
 {
 	GtkWidget	*window;
 	gboolean	scanning;	/* State of the 'scanning' indicator */
-	guchar		*path;		/* pathname */
+	gchar		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
@@ -89,7 +89,7 @@ extern Option		o_filer_auto_resize, o_unique_filer_windows;
 
 /* Prototypes */
 void filer_init(void);
-FilerWindow *filer_opendir(char *path, FilerWindow *src_win);
+FilerWindow *filer_opendir(const char *path, FilerWindow *src_win);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 void filer_update_all(void);
 int selected_item_number(Collection *collection);
@@ -98,19 +98,20 @@ void change_to_parent(FilerWindow *filer_window);
 void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		OpenFlags flags);
-void filer_check_mounted(char *path);
-void filer_close_recursive(char *path);
-void filer_change_to(FilerWindow *filer_window, char *path, char *from);
+void filer_check_mounted(const char *path);
+void filer_close_recursive(const char *path);
+void filer_change_to(FilerWindow *filer_window,
+			const char *path, const char *from);
 gboolean filer_exists(FilerWindow *filer_window);
 void filer_open_parent(FilerWindow *filer_window);
 void filer_detach_rescan(FilerWindow *filer_window);
 void filer_target_mode(FilerWindow	*filer_window,
 			TargetFunc	fn,
 			gpointer	data,
-			char		*reason);
+			const char	*reason);
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink);
 GList *filer_selected_items(FilerWindow *filer_window);
-void filer_create_thumb(FilerWindow *filer_window, gchar *pathname);
+void filer_create_thumb(FilerWindow *filer_window, const gchar *pathname);
 void filer_cancel_thumbnails(FilerWindow *filer_window);
 void filer_set_title(FilerWindow *filer_window);
 void filer_create_thumbs(FilerWindow *filer_window);

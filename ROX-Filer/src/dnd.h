@@ -41,7 +41,7 @@ extern GdkAtom xa_string;
 void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list);
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
-		   guchar		*full_path,
+		   const guchar		*full_path,
 		   DirItem		*item,
 		   MaskedPixmap		*image);
 void drag_data_get(GtkWidget      	*widget,
@@ -59,7 +59,7 @@ gboolean provides(GdkDragContext *context, GdkAtom target);
 
 void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win);
 void dnd_spring_abort(void);
-GList *uri_list_to_glist(char *uri_list);
+GList *uri_list_to_glist(const char *uri_list);
 guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
 
 gboolean dnd_motion_press(GtkWidget *widget, GdkEventButton *event);

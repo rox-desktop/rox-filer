@@ -34,12 +34,13 @@ struct _Panel {
 extern Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
 void panel_init(void);
-Panel *panel_new(guchar *name, PanelSide side);
+Panel *panel_new(const gchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);
 void panel_save(Panel *panel);
 gboolean panel_want_show_text(Icon *icon);
 void panel_icon_renamed(Icon *icon);
 
-gboolean panel_add(PanelSide side, gchar *path, gchar *label, gboolean after);
+gboolean panel_add(PanelSide side,
+		   const gchar *path, const gchar *label, gboolean after);
 
 #endif /* _PANEL_H */

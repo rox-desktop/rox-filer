@@ -126,9 +126,9 @@ Option o_filer_auto_resize, o_unique_filer_windows;
 
 void filer_init(void)
 {
-	gchar *ohost;
-	gchar *dpyhost, *dpy;
-	gchar *tmp;
+	const gchar *ohost;
+	const gchar *dpy;
+	gchar *dpyhost, *tmp;
   
 	option_add_int(&o_filer_size_limit, "filer_size_limit", 75);
 	option_add_int(&o_filer_auto_resize, "filer_auto_resize",
@@ -1146,7 +1146,8 @@ void change_to_parent(FilerWindow *filer_window)
  * the first item if from is NULL. If there is currently no cursor then
  * simply wink 'from' (if not NULL).
  */
-void filer_change_to(FilerWindow *filer_window, char *path, char *from)
+void filer_change_to(FilerWindow *filer_window,
+			const char *path, const char *from)
 {
 	char	*from_dup;
 	char	*real_path;
@@ -1316,7 +1317,7 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
  * Returns the new filer window, or NULL on error.
  * Note: if unique windows is in use, may return an existing window.
  */
-FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
+FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 {
 	FilerWindow	*filer_window;
 	char		*real_path;
@@ -1714,7 +1715,7 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 }
 
 /* This path has been mounted/umounted/deleted some files - update all dirs */
-void filer_check_mounted(char *path)
+void filer_check_mounted(const char *path)
 {
 	GList	*next = all_filer_windows;
 	char	*slash;
@@ -1755,7 +1756,7 @@ void filer_check_mounted(char *path)
 }
 
 /* Close all windows displaying 'path' or subdirectories of 'path' */
-void filer_close_recursive(char *path)
+void filer_close_recursive(const char *path)
 {
 	GList	*next = all_filer_windows;
 	int	len;
@@ -2098,7 +2099,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 void filer_target_mode(FilerWindow *filer_window,
 			TargetFunc fn,
 			gpointer data,
-			char	 *reason)
+			const char *reason)
 {
 	TargetFunc old_fn = filer_window->target_cb;
 
@@ -2411,7 +2412,7 @@ static void start_thumb_scanning(FilerWindow *filer_window)
 }
 
 /* Set this image to be loaded some time in the future */
-void filer_create_thumb(FilerWindow *filer_window, gchar *path)
+void filer_create_thumb(FilerWindow *filer_window, const gchar *path)
 {
 	filer_window->max_thumbs++;
 

@@ -15,13 +15,13 @@ typedef void (*FindFree)(FindCondition *condition);
 
 struct _FindInfo
 {
-	guchar		*fullpath;
-	guchar		*leaf;
+	const guchar	*fullpath;
+	const guchar	*leaf;
 	struct stat	stats;
 	time_t		now;
 	gboolean	prune;
 };
 
-FindCondition *find_compile(guchar *string);
+FindCondition *find_compile(const gchar *string);
 gboolean find_test_condition(FindCondition *condition, FindInfo *info);
 void find_condition_free(FindCondition *condition);
