@@ -122,6 +122,8 @@ static void set_selection_state(FilerWindow *collection, gboolean normal);
 static void cancel_thumbnails(FilerWindow *filer_window);
 static void filer_next_thumb(FilerWindow *filer_window);
 
+static void start_thumb_scanning(FilerWindow *filer_window);
+
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
 
@@ -490,6 +492,9 @@ static void update_display(Directory *dir,
 			set_scanning_display(filer_window, FALSE);
 			toolbar_update_info(filer_window);
 			open_filer_window(filer_window);
+
+			if (filer_window->thumb_queue)
+				start_thumb_scanning(filer_window);
 			break;
 		case DIR_UPDATE:
 			for (i = 0; i < items->len; i++)
@@ -2256,6 +2261,15 @@ static void filer_next_thumb(FilerWindow *filer_window)
 	gtk_idle_add((GtkFunction) filer_next_thumb_real, filer_window);
 }
 
+static void start_thumb_scanning(FilerWindow *filer_window)
+{
+	if (GTK_WIDGET_VISIBLE(filer_window->thumb_bar))
+		return;		/* Already scanning */
+
+	gtk_widget_show_all(filer_window->thumb_bar);
+	filer_next_thumb(filer_window);
+}
+
 void filer_create_thumb(FilerWindow *filer_window, gchar *path)
 {
 	filer_window->max_thumbs++;
@@ -2263,10 +2277,8 @@ void filer_create_thumb(FilerWindow *filer_window, gchar *path)
 	filer_window->thumb_queue = g_list_append(filer_window->thumb_queue,
 						  g_strdup(path));
 
-	if (!GTK_WIDGET_VISIBLE(filer_window->thumb_bar))
-	{
-		g_return_if_fail(filer_window->thumb_queue->next == NULL);
-		gtk_widget_show_all(filer_window->thumb_bar);
-		filer_next_thumb(filer_window);
-	}
+	if (filer_window->scanning)
+		return;			/* Will start when scan ends */
+
+	start_thumb_scanning(filer_window);
 }

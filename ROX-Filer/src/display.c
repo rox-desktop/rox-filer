@@ -1500,7 +1500,8 @@ void display_update_view(FilerWindow *filer_window,
 		view->image = NULL;
 	}
 
-	if (filer_window->show_thumbs)
+	if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
+		strcmp(item->mime_type->media_type, "image") == 0)
 	{
 		pixmap_cache_load_via = filer_window;
 		view->image = g_fscache_lookup(pixmap_cache,
