@@ -28,7 +28,7 @@ typedef struct _FilerWindow FilerWindow;
  */
 typedef struct _Directory Directory;
 
-/* Each item in a directory has a DirItem. The contains information from
+/* Each item in a directory has a DirItem. This contains information from
  * stat()ing the file, plus a few other bits. There may be several of these
  * for a single file, if it appears (hard-linked) in several directories.
  * Each pinboard and panel icon also has one of these (not shared).
@@ -55,7 +55,7 @@ typedef struct _MaskedPixmap MaskedPixmap;
 
 /* Each MIME type (eg 'text/plain') has one of these. It contains
  * a link to the image and the type's name (used so that the image can
- * be refreshed, amoung other things).
+ * be refreshed, among other things).
  */
 typedef struct _MIME_type MIME_type;
 
@@ -142,6 +142,10 @@ typedef enum {		/* Values used in options */
 	SORT_GROUP = 5
 } SortType;
 
+/* Each DirItem has a base type with indicates what kind of object it is.
+ * If the base_type is TYPE_FILE, then the MIME type field gives the exact
+ * type.
+ */
 enum
 {
 	/* Base types - this also determines the sort order */
