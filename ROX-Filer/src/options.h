@@ -13,7 +13,7 @@ typedef char *OptionFunc(char *value);
 /* Take a line from the file and process it. Return NULL on success,
  * or a pointer to an error string.
  */
-typedef char *ParseFunc(char *line);
+typedef char *ParseFunc(guchar *line);
 
 typedef struct _OptionsSection OptionsSection;
 

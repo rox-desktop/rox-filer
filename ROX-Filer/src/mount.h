@@ -25,6 +25,6 @@ struct _MountPoint
 
 /* Prototypes */
 void mount_init();
-void mount_update();
+void mount_update(gboolean force);
 
 #endif /* _MOUNT_H */

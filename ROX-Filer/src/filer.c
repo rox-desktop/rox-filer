@@ -1037,6 +1037,7 @@ static gint key_press_event(GtkWidget	*widget,
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
+	full_refresh();
 	update_dir(filer_window);
 }
 
@@ -1460,4 +1461,10 @@ void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	detach(filer_window);
 	filer_window->directory = dir;
 	attach(filer_window);
+}
+
+/* Refresh the various caches even if we don't think we need to */
+void full_refresh(void)
+{
+	mount_update(TRUE);
 }

@@ -752,6 +752,7 @@ static void usage_cb(gpointer data)
 	send();
 }
 
+#ifdef DO_MOUNT_POINTS
 static void mount_cb(gpointer data)
 {
 	FilerWindow 	*filer_window = (FilerWindow *) data;
@@ -799,6 +800,7 @@ static void mount_cb(gpointer data)
 	g_string_sprintf(message, "'\nDone\n");
 	send();
 }
+#endif
 
 static void delete_cb(gpointer data)
 {

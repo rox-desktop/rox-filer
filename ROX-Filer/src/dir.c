@@ -264,7 +264,7 @@ static void start_scanning(Directory *dir, char *pathname)
 		return;
 	}
 
-	mount_update();
+	mount_update(FALSE);
 
 	if (dir->error)
 	{

@@ -40,7 +40,7 @@ static GHashTable *option_hash = NULL;
 
 /* Static prototypes */
 static void save_options(GtkWidget *widget, gpointer data);
-static char *process_option_line(char *line);
+static char *process_option_line(guchar *line);
 
 void options_init()
 {
@@ -199,9 +199,9 @@ void option_register(char *key, OptionFunc *func)
  * Returns NULL on success, or a pointer to an error message.
  * The line is modified.
  */
-static char *process_option_line(char *line)
+static char *process_option_line(guchar *line)
 {
-	char 		*eq, *c;
+	guchar 		*eq, *c;
 	OptionFunc 	*func;
 
 	g_return_val_if_fail(option_hash != NULL, "No registered functions!");

@@ -66,5 +66,6 @@ int sort_by_date(const void *item1, const void *item2);
 int sort_by_size(const void *item1, const void *item2);
 void filer_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
+void full_refresh(void);
 
 #endif /* _FILER_H */

@@ -80,21 +80,22 @@ void mount_init()
 #endif /* DO_MOUNT_POINTS */
 }
 
-void mount_update()
+/* If force is true then ignore the timestamps */
+void mount_update(gboolean force)
 {
 #ifdef DO_MOUNT_POINTS
 	time_t	time;
 	/* Ensure everything is uptodate */
 
 	time = read_time("/etc/fstab");
-	if (time != fstab_time)
+	if (force || time != fstab_time)
 	{
 		fstab_time = time;
 		read_table(fstab_mounts, "/etc/fstab");
 	}
 #  ifdef HAVE_MNTENT_H
 	time = read_time("/etc/mtab");
-	if (time != mtab_time)
+	if (force || time != mtab_time)
 	{
 		mtab_time = time;
 		read_table(mtab_mounts, "/etc/mtab");

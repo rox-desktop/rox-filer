@@ -40,7 +40,7 @@
 #include "options.h"
 
 /* Static prototypes */
-static char *import_extensions(char *line);
+static char *import_extensions(guchar *line);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
 static GHashTable *extension_hash = NULL;
@@ -90,7 +90,7 @@ static void add_ext(char *type_name, char *ext)
 }
 
 /* Parse one line from the file and add entries to extension_hash */
-static char *import_extensions(char *line)
+static char *import_extensions(guchar *line)
 {
 
 	if (*line == '\0' || *line == '#')
