@@ -694,7 +694,19 @@ static void pinboard_check_options(void)
 		}
 
 		if (current_pinboard)
+		{
+			GtkWidget *w = current_pinboard->window;
+			GdkColormap *cm;
+
+			cm = gtk_widget_get_colormap(w);
+
+			gdk_colormap_alloc_color(cm, &n_bg, FALSE, TRUE);
+			gtk_widget_modify_bg(w, GTK_STATE_NORMAL, &n_bg);
+			gdk_window_set_background(w->window, &n_bg);
+
+			gtk_widget_queue_draw(w);
 			reshape_all();
+		}
 
 		tasklist_style_changed();
 	}
@@ -1628,6 +1640,9 @@ static void create_pinboard_window(Pinboard *pinboard)
 	g_return_if_fail(pinboard->window == NULL);
 
 	win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+
+	gtk_widget_modify_bg(win, GTK_STATE_NORMAL, &pin_text_bg_col);
+
 	gtk_widget_set_app_paintable(win, TRUE);
 	gtk_widget_set_name(win, "rox-pinboard");
 	pinboard->window = win;
