@@ -39,6 +39,7 @@
 #include "bind.h"
 #include "gui_support.h"
 #include "menu.h"
+#include "options.h"
 
 /* These are the column numbers in the ListStore */
 #define COL_LEAF 0
@@ -586,14 +587,17 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 {
 	BindAction	action;
 	FilerWindow	*filer_window = view_details->filer_window;
+	ViewIface	*view = (ViewIface *) view_details;
 	DirItem		*item = NULL;
 	GtkTreeView	*tree = (GtkTreeView *) view_details;
 	GtkTreePath	*path = NULL;
 	GtkTreeIter	iter;
 	GtkTreeModel	*model;
 	GtkTreeSelection *selection;
+	gboolean	press = event->type == GDK_BUTTON_PRESS;
 	int		i = -1;
-	/* OpenFlags	flags = 0; */
+	ViewIter	viter;
+	OpenFlags	flags = 0;
 
 	model = gtk_tree_view_get_model(tree);
 	selection = gtk_tree_view_get_selection(tree);
@@ -609,11 +613,22 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 
 	if (i != -1)
 		item = ((ViewItem *) view_details->items->pdata[i])->item;
-
-	g_print("[ item %d clicked ]\n", i);
+	make_item_iter(view_details, &viter, i);
+	iter.user_data = GINT_TO_POINTER(i);
 
 	/* TODO: Cancel slow DnD */
-	/* TODO: Target callbacks */
+
+	if (filer_window->target_cb)
+	{
+		dnd_motion_ungrab();
+		if (item && press && event->button == 1)
+			filer_window->target_cb(filer_window, &viter,
+					filer_window->target_data);
+
+		filer_target_mode(filer_window, NULL, NULL, NULL);
+
+		return;
+	}
 
 	action = bind_lookup_bev(
 			item ? BIND_DIRECTORY_ICON : BIND_DIRECTORY,
@@ -627,54 +642,40 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 		case ACT_TOGGLE_SELECTED:
 			toggle_selected(selection, &iter);
 			break;
-#if 0
 		case ACT_SELECT_EXCL:
-			collection_clear_except(collection, item);
+			view_details_select_only(view, &viter);
 			break;
 		case ACT_EDIT_ITEM:
 			flags |= OPEN_SHIFT;
 			/* (no break) */
 		case ACT_OPEN_ITEM:
-		{
-			ViewIter	viter;
-
-			make_item_iter(view_details, &viter, &iter);
-			
 			if (event->button != 1 || event->state & GDK_MOD1_MASK)
 				flags |= OPEN_CLOSE_WINDOW;
 			else
 				flags |= OPEN_SAME_WINDOW;
 			if (o_new_button_1.int_value)
 				flags ^= OPEN_SAME_WINDOW;
-			/* TODO */
 			if (event->type == GDK_2BUTTON_PRESS)
-				collection_unselect_item(collection, item);
+				view_details_set_selected(view, &viter, FALSE);
 			dnd_motion_ungrab();
 
 			filer_openitem(filer_window, &viter, flags);
 			break;
-		}
-#endif
 		case ACT_POPUP_MENU:
-		{
-			ViewIter viter;
 			
 			dnd_motion_ungrab();
 			tooltip_show(NULL);
 
-			make_item_iter(view_details, &viter, i);
 			show_filer_menu(filer_window,
 					(GdkEvent *) event, &viter);
 			break;
-		}
-#if 0
 		case ACT_PRIME_AND_SELECT:
-			if (!selected)
-				collection_clear_except(collection, item);
+			if (item && !is_selected(view_details, i))
+				view_details_select_only(view, &viter);
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_PRIME_AND_TOGGLE:
-			collection_toggle_item(collection, item);
+			toggle_selected(selection, &iter);
 			dnd_motion_start(MOTION_READY_FOR_DND);
 			break;
 		case ACT_PRIME_FOR_DND:
@@ -684,20 +685,21 @@ static void perform_action(ViewDetails *view_details, GdkEventButton *event)
 			if (press && event->button < 4)
 			{
 				if (item)
-					collection_wink_item(collection, item);
+					view_details_wink_item(view, &viter);
 				dnd_motion_start(MOTION_NONE);
 			}
 			break;
 		case ACT_LASSO_CLEAR:
-			collection_clear_selection(collection);
+			gtk_tree_selection_unselect_all(selection);
 			/* (no break) */
+#if 0
 		case ACT_LASSO_MODIFY:
 			collection_lasso_box(collection, event->x, event->y);
 			break;
+#endif
 		case ACT_RESIZE:
 			filer_window_autosize(filer_window);
 			break;
-#endif
 		default:
 			g_warning("Unsupported action : %d\n", action);
 			break;
@@ -757,10 +759,14 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	GtkTreeViewColumn *column;
 	GtkCellRenderer *cell;
 	GtkTreeSortable *sortable_list;
+	GtkTreeSelection *selection;
 	ViewDetails *view_details = (ViewDetails *) object;
 
 	view_details->items = g_ptr_array_new();
 	view_details->cursor_base = -1;
+
+	selection = gtk_tree_view_get_selection(treeview);
+	gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
 
 	/* Sorting */
 	view_details->sort_column_id = -1;
@@ -1049,6 +1055,34 @@ static void view_details_delete_if(ViewIface *view,
 			  gboolean (*test)(gpointer item, gpointer data),
 			  gpointer data)
 {
+	GtkTreePath *path;
+	ViewDetails *view_details = (ViewDetails *) view;
+	int	    i = 0;
+	GPtrArray   *items = view_details->items;
+	GtkTreeModel *model = (GtkTreeModel *) view;
+
+	path = gtk_tree_path_new();
+
+	gtk_tree_path_append_index(path, i);
+
+	while (i < items->len)
+	{
+		ViewItem *item = items->pdata[i];
+
+		if (test(item->item, data))
+		{
+			g_free(items->pdata[i]);
+			g_ptr_array_remove_index(items, i);
+			gtk_tree_model_row_deleted(model, path);
+		}
+		else
+		{
+			i++;
+			gtk_tree_path_next(path);
+		}
+	}
+
+	gtk_tree_path_free(path);
 }
 
 static void view_details_clear(ViewIface *view)
@@ -1069,10 +1103,20 @@ static void view_details_clear(ViewIface *view)
 
 static void view_details_select_all(ViewIface *view)
 {
+	GtkTreeSelection *selection;
+
+	selection = gtk_tree_view_get_selection((GtkTreeView *) view);
+
+	gtk_tree_selection_select_all(selection);
 }
 
 static void view_details_clear_selection(ViewIface *view)
 {
+	GtkTreeSelection *selection;
+
+	selection = gtk_tree_view_get_selection((GtkTreeView *) view);
+
+	gtk_tree_selection_unselect_all(selection);
 }
 
 static int view_details_count_items(ViewIface *view)
@@ -1114,11 +1158,16 @@ static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter)
 {
 	GtkTreePath *path;
 
+	if (!iter)
+	{
+		/* XXX: How do we get rid of the cursor? */
+		g_print("FIXME: Remove cursor\n");
+		return;
+	}
+		
 	path = gtk_tree_path_new();
 
-	/* XXX: How do we get rid of the cursor? */
-	if (iter)
-		gtk_tree_path_append_index(path, iter->i);
+	gtk_tree_path_append_index(path, iter->i);
 	gtk_tree_view_set_cursor((GtkTreeView *) view, path, NULL, FALSE);
 	gtk_tree_path_free(path);
 }
@@ -1147,6 +1196,17 @@ static gboolean view_details_get_selected(ViewIface *view, ViewIter *iter)
 
 static void view_details_select_only(ViewIface *view, ViewIter *iter)
 {
+	GtkTreePath *path;
+	GtkTreeSelection *selection;
+
+	selection = gtk_tree_view_get_selection((GtkTreeView *) view);
+
+	path = gtk_tree_path_new();
+	gtk_tree_path_append_index(path, iter->i);
+
+	gtk_tree_selection_unselect_all(selection);
+	gtk_tree_selection_select_path(selection, path);
+	gtk_tree_path_free(path);
 }
 
 static void view_details_set_frozen(ViewIface *view, gboolean frozen)
