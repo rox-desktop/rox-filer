@@ -280,28 +280,36 @@ MIME_type *type_from_path(char *path)
 	return NULL;
 }
 
+/* Returns the file/dir in Choices for handling this type.
+ * NULL if there isn't one. g_free() the result.
+ */
+static char *handler_for(MIME_type *type)
+{
+	char	*type_name;
+	char	*open;
+
+	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
+	open = choices_find_path_load(type_name, "MIME-types");
+	g_free(type_name);
+
+	if (!open)
+		open = choices_find_path_load(type->media_type, "MIME-types");
+
+	return open;
+}
+
 /*			Actions for types 			*/
 
 gboolean type_open(char *path, MIME_type *type)
 {
 	char	*argv[] = {NULL, NULL, NULL};
 	char	*open;
-	char	*type_name;
 	gboolean	retval = TRUE;
 	struct stat	info;
 
 	argv[1] = path;
 
-	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
-	open = choices_find_path_load(type_name, "MIME-types");
-	g_free(type_name);
-	if (!open)
-	{
-		open = choices_find_path_load(type->media_type,
-				"MIME-types");
-		if (!open)
-			return FALSE;
-	}
+	open = handler_for(type);
 
 	if (stat(open, &info))
 	{
@@ -521,6 +529,44 @@ void drag_app_dropped(GtkWidget		*frame,
 	dir_item_clear(&item);
 }
 
+/* Find the current command which is used to run files of this type.
+ * Returns NULL on failure. g_free() the result.
+ */
+static guchar *get_current_command(MIME_type *type)
+{
+	struct stat	info;
+	char *handler, *nl, *data = NULL;
+	long len;
+	guchar *command = NULL;
+
+	handler = handler_for(type);
+
+	if (!handler)
+		return NULL;		/* No current handler */
+
+	if (stat(handler, &info))
+		goto out;		/* Can't stat */
+
+	if ((!S_ISREG(info.st_mode)) || info.st_size > 256)
+		goto out;		/* Only use small regular files */
+	
+	if (!load_file(handler, &data, &len))
+		goto out;		/* Didn't load OK */
+
+	if (strncmp(data, "#! /bin/sh\nexec ", 16) != 0)
+		goto out;		/* Not one of ours */
+
+	nl = strchr(data + 16, '\n');
+	if (!nl)
+		goto out;		/* No newline! */
+
+	command = g_strndup(data + 16, nl - data - 16);
+out:
+	g_free(handler);
+	g_free(data);
+	return command;
+}
+
 /* Display a dialog box allowing the user to set the default run action
  * for this type.
  */
@@ -602,6 +648,15 @@ void type_set_handler_dialog(MIME_type *type)
 
 	hbox = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	/* If possible, fill in the entry box with the current command */
+	tmp = get_current_command(type);
+	if (tmp)
+	{
+		gtk_entry_set_text(GTK_ENTRY(entry), tmp);
+		gtk_entry_set_position(GTK_ENTRY(entry), -1);
+		g_free(tmp);
+	}
 
 	button = gtk_button_new_with_label(_("OK"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);

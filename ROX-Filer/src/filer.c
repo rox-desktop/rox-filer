@@ -227,7 +227,7 @@ static gboolean autosize_timeout_cb(FilerWindow *filer_window)
 }
 
 /* Add a gtk_timeout that calls the autosize routine after the period of time
- * passed with t, if t is equal to zero than remove the previously defined
+ * passed with t, if t is equal to zero then remove the previously defined
  * timeout.
  */
 static void filer_window_autosize_request(FilerWindow *filer_window, int t)
