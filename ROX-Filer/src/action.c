@@ -687,7 +687,7 @@ void action_delete(FilerWindow *filer_window)
 	if (collection->number_selected < 1)
 	{
 		report_error("ROX-Filer", "You need to select some items "
-				"first");
+				"to delete");
 		return;
 	}
 

@@ -345,6 +345,9 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	item->text_width = gdk_string_width(filer_window->window->style->font,
 			leafname);
 	
+	if (!item->image)
+		item->image = default_pixmap + TYPE_UNKNOWN;
+	
 	/* XXX: Must be a better way... */
 	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
 	item->pix_height = ((GdkPixmapPrivate *) item->image->pixmap)->height;

@@ -119,24 +119,32 @@ void debug_free_string(void *data)
 
 char *user_name(uid_t uid)
 {
-	static char	buffer[40];
 	struct passwd   *passwd;
+	GString	*tmp;
+	char	*retval;
 
 	passwd = getpwuid(uid);
 	if (passwd)
 		return passwd->pw_name;
-	snprintf(buffer, sizeof(buffer), "[%d]", uid);
-	return buffer;
+	tmp = g_string_new(NULL);
+	g_string_sprintf(tmp, "[%d]", uid);
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
+	return retval;
 }
 
 char *group_name(gid_t gid)
 {
-	static char	buffer[40];
 	struct group 	*group;
+	GString	*tmp;
+	char	*retval;
 	
 	group = getgrgid(gid);
 	if (group)
 		return group->gr_name;
-	snprintf(buffer, sizeof(buffer), "[%d]", gid);
-	return buffer;
+	tmp = g_string_new(NULL);
+	g_string_sprintf(tmp, "[%d]", gid);
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
+	return retval;
 }

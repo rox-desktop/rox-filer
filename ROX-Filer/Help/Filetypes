@@ -28,17 +28,12 @@ If that's not found then it will try:
 The idea is that you create symlinks in MIME-types to applications that you
 want to handle files of that type.
 
-To decide what icon to give a file the Filer first tries to find the application
-which will be loaded if you double clicked the file, as above.
-It then tries to load an icon with the type name from the application's
-MIME-icons subdirectory. If this is missing then it tries again using just the
-media type. If that's missing too then it'll use a default icon for that media
-type from inside ROX-Filer itself.
+To decide what icon to give a file the Filer uses the same system, but tries
+to find the file in 'MIME-icons' and with '.xpm' on the end.
 
 For example: when trying to display something of type 'image/gif' the following
 files may be tried:
 
-Choices/MIME-types/image_gif/MIME-icons/image_gif.xpm
-Choices/MIME-types/image_gif/MIME-icons/image.xpm
-ROX-Filer/MIME-icons/image.xpm
+Choices/MIME-icons/image_gif.xpm
+Choices/MIME-icons/image.xpm
 <built-in default icon>
