@@ -40,12 +40,6 @@
 #include "support.h"
 #include "usericons.h"
 
-#ifdef LIBXML_VERSION
-# if LIBXML_VERSION > 20400
-#  define XML24 1
-# endif
-#endif
-
 /* Store glob-to-icon mappings */
 typedef struct _GlobIcon {
 	guchar *pattern;
@@ -170,9 +164,9 @@ static void free_globicon(GlobIcon *gi, gpointer user_data)
 /* Write globicons file */
 static void write_globicons(void)
 {
-	guchar *save = NULL;
+	gchar *save = NULL;
 	GList *next;
-	guchar *save_new = NULL;
+	gchar *save_new = NULL;
 	xmlDocPtr doc = NULL;
 
 	save = choices_find_path_save("globicons", "ROX-Filer", TRUE);
@@ -197,12 +191,25 @@ static void write_globicons(void)
 		xmlNewChild(tree, NULL, "icon", gi->iconpath);
 	}
 
-#ifdef XML24
+#if LIBXML_VERSION > 20400
 	if (xmlSaveFormatFileEnc(save_new, doc, NULL, 1) < 0)
-#else
-	if (xmlSaveFile(save_new, doc) < 0)
-#endif
 		goto err;
+#else
+	{
+		FILE *out;
+		
+		out = fopen(save_new, "w");
+		if (!out)
+			goto err;
+		if (xmlDocDump(out, doc) < 0)
+		{
+			fclose(out);
+			goto err;
+		}
+		if (fclose(out))
+			goto err;
+	}
+#endif
 
 	if (rename(save_new, save))
 		goto err;
