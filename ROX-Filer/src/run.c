@@ -356,7 +356,11 @@ void open_to_show(guchar *path)
 		*slash = '\0';
 		new = filer_opendir(dir, NULL);
 		if (new)
+		{
+			if (slash[1] == '.')
+				display_set_hidden(new, TRUE);
 			display_set_autoselect(new, slash + 1);
+		}
 	}
 
 	g_free(dir);

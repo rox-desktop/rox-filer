@@ -90,6 +90,7 @@ static void collection_init(Collection *object);
 static void collection_destroy(GtkObject *object);
 static void collection_finalize(GtkObject *object);
 static void collection_realize(GtkWidget *widget);
+static void collection_map(GtkWidget *widget);
 static gint collection_paint(Collection 	*collection,
 			     GdkRectangle 	*area);
 static void collection_size_request(GtkWidget 		*widget,
@@ -260,6 +261,7 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->key_press_event = collection_key_press;
 	widget_class->button_press_event = collection_button_press;
 	widget_class->motion_notify_event = collection_motion_notify;
+	widget_class->map = collection_map;
 #ifndef GTK2
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
@@ -328,6 +330,7 @@ static void collection_init(Collection *object)
 	object->cursor_item = -1;
 	object->cursor_item_old = -1;
 	object->wink_item = -1;
+	object->wink_on_map = -1;
 	object->array_size = MINIMUM_ITEMS;
 	object->draw_item = default_draw_item;
 	object->test_point = default_test_point;
@@ -433,6 +436,20 @@ static void collection_finalize(GtkObject *object)
 	collection = COLLECTION(object);
 
 	g_free(collection->items);
+}
+
+static void collection_map(GtkWidget *widget)
+{
+	Collection *collection = COLLECTION(widget);
+	
+	if (GTK_WIDGET_CLASS(parent_class)->map)
+		(*GTK_WIDGET_CLASS(parent_class)->map)(widget);
+
+	if (collection->wink_on_map >= 0)
+	{
+		collection_wink_item(collection, collection->wink_on_map);
+		collection->wink_on_map = -1;
+	}
 }
 
 static GdkGC *create_bg_gc(GtkWidget *widget)
@@ -1887,15 +1904,25 @@ void collection_set_item_size(Collection *collection, int width, int height)
 void collection_qsort(Collection *collection,
 			int (*compar)(const void *, const void *))
 {
-	int	cursor, wink, items;
+	int	cursor, wink, items, wink_on_map;
 	gpointer cursor_data = NULL;
 	gpointer wink_data = NULL;
+	gpointer wink_on_map_data = NULL;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(compar != NULL);
 
 	items = collection->number_of_items;
+
+	wink_on_map = collection->wink_on_map;
+	if (wink_on_map >= 0 && wink_on_map < items)
+	{
+		wink_on_map_data = collection->items[wink_on_map].data;
+		collection->wink_on_map = -1;
+	}
+	else
+		wink = -1;
 
 	wink = collection->wink_item;
 	if (wink >= 0 && wink < items)
@@ -1914,7 +1941,7 @@ void collection_qsort(Collection *collection,
 	
 	qsort(collection->items, items, sizeof(collection->items[0]), compar); 
 
-	if (cursor > -1 || wink > -1)
+	if (cursor > -1 || wink > -1 || wink_on_map > -1)
 	{
 		int	item;
 
@@ -1922,6 +1949,8 @@ void collection_qsort(Collection *collection,
 		{
 			if (collection->items[item].data == cursor_data)
 				collection_set_cursor_item(collection, item);
+			if (collection->items[item].data == wink_on_map_data)
+				collection->wink_on_map = item;
 			if (collection->items[item].data == wink_data)
 			{
 				collection->cursor_item_old = item;
@@ -2050,8 +2079,15 @@ void collection_wink_item(Collection *collection, gint item)
 	if (item == -1)
 		return;
 
+	if (!GTK_WIDGET_MAPPED(GTK_WIDGET(collection)))
+	{
+		collection->wink_on_map = item;
+		return;
+	}
+
 	collection->cursor_item_old = collection->wink_item = item;
 	collection->winks_left = 3;
+
 	collection->wink_timeout = gtk_timeout_add(70,
 					   (GtkFunction) wink_timeout,
 					   collection);

@@ -77,6 +77,7 @@ struct _Collection
 	gint		cursor_item;		/* -1 if not shown */
 	gint		cursor_item_old;	/* May be -1 */
 	gint		wink_item;		/* -1 if not active */
+	gint		wink_on_map;		/* -1 if not waiting for map */
 	gint		winks_left;		/* Flashes in this wink op */
 	gint		wink_timeout;
 	guint		columns;
