@@ -32,6 +32,7 @@
 
 Option o_new_button_1, o_single_click;
 static Option o_single_pinboard;
+static Option o_dclick_resizes;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -42,6 +43,7 @@ void bind_init(void)
 	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE);
 	option_add_int(&o_single_click, "bind_single_click", TRUE);
 	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE);
+	option_add_int(&o_dclick_resizes, "bind_dclick_resizes", TRUE);
 }
 
 /* Call this when a button event occurs and you want to know what
@@ -81,7 +83,7 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	if (item && dclick && dclick_mode)
 		return shift ? ACT_EDIT_ITEM : ACT_OPEN_ITEM;
 
-	if (dclick && context == BIND_DIRECTORY)
+	if (dclick && context == BIND_DIRECTORY && o_dclick_resizes.int_value)
 		return ACT_RESIZE;
 
 	if (!press)
