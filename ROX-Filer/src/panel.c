@@ -199,8 +199,6 @@ void panel_init(void)
 				 "<panel>");
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
-	/* This is used for AppMenus */
-	gtk_object_set_data(GTK_OBJECT(panel_menu), "last_appmenu", NULL);
 
 	selection_invisible = gtk_invisible_new();
 
@@ -878,7 +876,8 @@ static void popup_panel_menu(GdkEventButton *event,
 {
 	int		pos[2];
 	PanelSide	side = panel->side;
-	AppMenus	*menus = NULL;
+
+	appmenu_remove();
 
 	if (icon != NULL)
 	{
@@ -896,13 +895,7 @@ static void popup_panel_menu(GdkEventButton *event,
 			/* Unselect when panel closes */
 			tmp_icon_selected = TRUE;
 		}
-		/* Check for icon-specific menu */
-		if (icon->path)
-			menus = appmenu_query(icon->path, &icon->item);
 	}
-
-	/* Remove the previous appmenu used on this menu */
-	appmenu_remove(panel_menu);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
@@ -918,21 +911,25 @@ static void popup_panel_menu(GdkEventButton *event,
 	else
 		pos[1] = event->y_root;
 
-	/* Shade the Rename/Location/Help items unless exactly one item is
-	 * selected.
-	 */
-	menu_set_items_shaded(panel_menu,
-		panel_selection == NULL || panel_selection->next ? TRUE : FALSE,
-		4, 3);
-
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(panel_menu,
 		panel_selection ? FALSE : TRUE,
 		7, 1);
 
-	/* Add the AppMenu items if necessary */
-	if (menus)
-		appmenu_add(menus, panel_menu);
+	/* Shade the Rename/Location/Help items unless exactly one item is
+	 * selected.
+	 */
+	if (panel_selection == NULL || panel_selection->next)
+		menu_set_items_shaded(panel_menu, TRUE, 4, 3);
+	else
+	{
+		Icon	*icon = (Icon *) panel_selection->data;
+
+		menu_set_items_shaded(panel_menu, FALSE, 4, 3);
+
+		/* Check for app-specific menu */
+		appmenu_add(icon->path, &icon->item, panel_menu);
+	}
 
 	gtk_menu_popup(GTK_MENU(panel_menu), NULL, NULL, panel_position_menu,
 			(gpointer) pos, event->button, event->time);

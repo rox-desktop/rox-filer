@@ -231,8 +231,6 @@ void pinboard_init(void)
 				 "<pinboard>");
 	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
-	/* This is used for AppMenus */
-	gtk_object_set_data(GTK_OBJECT(pinboard_menu), "last_appmenu", NULL);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -1640,7 +1638,9 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 {
 	int		pos[2];
 	GList		*icons;
-	AppMenus	*menus = NULL;
+
+	/* Remove the previous appmenu used on this menu */
+	appmenu_remove();
 
 	if (icon)
 	{
@@ -1651,13 +1651,7 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 			pinboard_select_only(icon);
 			tmp_icon_selected = TRUE;
 		}
-		/* Check for icon-specific menu */
-		if (icon->path)
-			menus = appmenu_query(icon->path, &icon->item);
 	}
-
-	/* Remove the previous appmenu used on this menu */
-	appmenu_remove(pinboard_menu);
 
 	icons = pinboard_get_selected();
 
@@ -1670,13 +1664,16 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 				icons->next ? TRUE : FALSE, 4, 3);
 
 		menu_set_items_shaded(pinboard_menu, FALSE, 7, 1);
+
+		/* Check for app-specific menu */
+		if (!icons->next)
+		{
+			Icon	*icon = (Icon *) icons->data;
+			appmenu_add(icon->path, &icon->item, pinboard_menu);
+		}
 	}
 	else
 		menu_set_items_shaded(pinboard_menu, TRUE, 4, 4);
-
-	/* Add the AppMenu items if necessary */
-	if (menus)
-		appmenu_add(menus, pinboard_menu);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
@@ -1703,6 +1700,8 @@ static void pin_remove(gpointer data, guint action, GtkWidget *widget)
 
 static void menu_closed(GtkWidget *widget)
 {
+	appmenu_remove();
+
 	if (tmp_icon_selected)
 	{
 		pinboard_clear_selection();

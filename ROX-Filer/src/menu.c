@@ -280,9 +280,6 @@ void menu_init(void)
 	GET_SSMENU_ITEM(display_small_menu, "filer",
 			"Display", "Small, With...");
 
-	/* This is used for AppMenus */
-	gtk_object_set_data(GTK_OBJECT(filer_file_menu), "last_appmenu", NULL);
-
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
@@ -406,12 +403,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	DirItem		*file_item = NULL;
 	int		pos[2];
 	guchar		*shift_action;
-	AppMenus	*menus = NULL;
 
 	updating_menu++;
 
 	/* Remove previous AppMenu, if any */
-	appmenu_remove(filer_file_menu);
+	appmenu_remove();
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
@@ -478,18 +474,18 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 			else if (file_item->flags & ITEM_FLAG_SYMLINK)
 			{
 				shift_action = N_("Show Target");
-				menus = appmenu_query(
-						make_path(filer_window->path,
-						   file_item->leafname)->str,
-						file_item);
+				appmenu_add(make_path(filer_window->path,
+						    file_item->leafname)->str,
+						 file_item,
+						 filer_file_menu);
 			}
 			else if (file_item->base_type == TYPE_DIRECTORY)
 			{
 				shift_action = N_("Look Inside");
-				menus = appmenu_query(
-						make_path(filer_window->path,
-						   file_item->leafname)->str,
-						file_item);
+				appmenu_add(make_path(filer_window->path,
+						    file_item->leafname)->str,
+						 file_item,
+						 filer_file_menu);
 			}
 			else if (file_item->base_type == TYPE_FILE)
 				shift_action = N_("Open As Text");
@@ -507,9 +503,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	popup_menu = (event->state & GDK_CONTROL_MASK)
 				? filer_file_menu
 				: filer_menu;
-
-	if (menus)
-		appmenu_add(menus, filer_file_menu);
 
 	updating_menu--;
 	

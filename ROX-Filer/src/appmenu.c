@@ -21,6 +21,15 @@
 
 /* appmenu.c - handles application-specific menus */
 
+/* The format of an AppMenu file is:
+ *
+ * <?xml version="1.0"?>
+ * <AppMenu>
+ *   <Item label="..." option="..."/>
+ *   ...
+ * </AppMenu>
+ */
+
 #include "config.h"
 
 #include <gtk/gtk.h>
@@ -28,6 +37,9 @@
 #include <stdio.h>
 #include <string.h>
 #include <ctype.h>
+
+#include <parser.h>
+#include <tree.h>
 
 #include "global.h"
 
@@ -40,22 +52,29 @@
 #include "dir.h"
 #include "type.h"
 
-GFSCache *appmenu_cache = NULL;
+typedef struct _AppMenu AppMenu;
 
-static AppMenus *cur_appmenu = NULL;
+static GFSCache *appmenu_cache = NULL;
 
 /* Static prototypes */
-static AppMenus *load(char *pathname, gpointer data);
-static void load_appmenu(AppMenus *appmenu, char *file);
-static void ref(AppMenus *dir, gpointer data);
-static void unref(AppMenus *dir, gpointer data);
-static int getref(AppMenus *dir, gpointer data);
+static AppMenu *load(char *pathname, gpointer data);
+static void ref(AppMenu *dir, gpointer data);
+static void unref(AppMenu *dir, gpointer data);
+static int getref(AppMenu *dir, gpointer data);
 
-static char *process_appmenu_line(guchar *line);
-static void apprun_menu(GtkWidget *item, AppMenus *menu);
-static void destroy_widget(gpointer data, gpointer user_data);
-static void destroy_contents(AppMenus *dir);
-static GtkWidget *appmenu_item_new(AppMenus *menu, char *text, char *entryid);
+static void apprun_menu(GtkWidget *item, gpointer data);
+static GtkWidget *create_menu_item(char *label, char *option);
+
+/* There can only be one menu open at a time... we store: */
+static GtkWidget *current_menu = NULL;	/* The GtkMenu */
+static GList *current_items = NULL;	/* The GtkMenuItems we added to it */
+static guchar *current_app_path = NULL;	/* The path of the application */
+
+/* Stores the appmenu for one application */
+struct _AppMenu {
+	int	ref;
+	xmlDocPtr doc;		/* Parsed AppMenu file */
+};
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -70,98 +89,93 @@ void appmenu_init(void)
 				      NULL, NULL);
 }
 
-/* Remove the appmenu stored in the given menu, if any */
-/* This function modifies the menu stored in "menu" */
-void appmenu_remove(GtkWidget *menu)
-{
-	AppMenus *last_appmenu;
-	GList *next;
-
-	/* Get the last appmenu posted on this menu, if any */
-	last_appmenu = gtk_object_get_data(GTK_OBJECT(menu), "last_appmenu");
-	if (!last_appmenu)
-		return;
-
-	for (next = last_appmenu->items; next; next = next->next)
-		gtk_container_remove(GTK_CONTAINER(menu),
-				     GTK_WIDGET(next->data));
-
-	gtk_object_set_data(GTK_OBJECT(menu), "last_appmenu", NULL);
-
-	/* Lose the ref count returned from appmenu_query() */
-	g_fscache_data_unref(appmenu_cache, last_appmenu);
-}
-
-/* Add AppMenu entries to a standard menu, if necessary */
-/* This function modifies the menu stored in "menu" */
-void appmenu_add(AppMenus *dir, GtkWidget *menu)
+/* Removes all appmenu menu items */
+void appmenu_remove(void)
 {
 	GList *next;
 
-	if (dir == NULL || menu == NULL)
+	if (!current_menu)
 		return;
 
-	/* Remove the previous appmenu, if any */
-	appmenu_remove(menu);
+	for (next = current_items; next; next = next->next)
+		gtk_widget_destroy((GtkWidget *) next->data);
 
-	/* If this AppMenu had been posted on a different menu, remove it from
-	 * there.
-	 */
-	if (dir->last_menu) 
-		appmenu_remove(dir->last_menu);
+	g_free(current_app_path);
+	current_app_path = NULL;
+	current_menu = NULL;
 
-	/* The dir we get must have been obtained from the cache, so that its
-	 * items element is already properly populated. We check anyway.
-	 */
-	if (dir->items == NULL)
-		return;
-
-	/* Add the menu entries */
-	for (next = dir->items; next; next = next->next)
-		gtk_menu_prepend(GTK_MENU(menu), GTK_WIDGET(next->data));
-
-	/* Store a pointer to the current AppMenus entry in the menu itself */
-	gtk_object_set_data(GTK_OBJECT(menu), "last_appmenu", dir);
-
-	/* Store a pointer to the current menu in the AppMenus object too, in
-	 * case we later try to post this same AppMenu to a different menu.
-	 */
-	dir->last_menu = menu;
+	g_list_free(current_items);
+	current_items = NULL;
 }
 
-/* Return the AppMenus object corresponding to a certain item, if there
- * is one.
- * This is the approved interface to appmenu_cache. g_fscache_lookup should
- * preferably never be called on appmenu_cache other than through this
- * function.
- * 'app_dir' is the full path of 'app'.
- * Returned value will unref automatically on appmenu_remove().
+/* Add AppMenu entries to 'menu', if appropriate.
+ * This function modifies the menu stored in "menu".
+ * 'app_dir' is the pathname of the application directory, and 'item'
+ * is the corresponding DirItem.
+ * Call appmenu_remove() to undo the effect.
  */
-AppMenus *appmenu_query(guchar *app_dir, DirItem *app)
+void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 {
-	AppMenus *retval;
+	AppMenu	*am;
+	struct _xmlNode	*node;
 	guchar	*tmp;
+	GList	*next;
+	GtkWidget *sep;
+
+	g_return_if_fail(menu != NULL);
+
+	/* Should have called appmenu_remove() already... */
+	g_return_if_fail(current_menu == NULL);
 
 	/* Is it even an application directory? */
-	if (app->base_type != TYPE_DIRECTORY ||
-			!(app->flags & ITEM_FLAG_APPDIR))
-		return NULL;
+	if (item->base_type != TYPE_DIRECTORY ||
+			!(item->flags & ITEM_FLAG_APPDIR))
+		return;	/* Not an application */
 
 	tmp = g_strconcat(app_dir, "/" APPMENU_FILENAME, NULL);
-	
-	retval = g_fscache_lookup(appmenu_cache, tmp);
-	/* We set the path on every query because the app dir can move
-	 * without the cache causing a reload.
+	am = g_fscache_lookup(appmenu_cache, tmp);
+	g_free(tmp);
+	if (!am)
+		return;	/* No appmenu (or invalid XML) */
+
+	/* OK, we've got a valid menu and parsed it.
+	 * Now build the GtkMenuItem widgets and add them to the menu...
 	 */
-	if (retval)
+
+	node = xmlDocGetRootElement(am->doc);
+	g_return_if_fail(node != NULL);
+
+	if (strcmp(node->name, "AppMenu") != 0)
 	{
-		g_free(retval->app_dir);
-		retval->app_dir = g_strdup(app_dir);
+		g_warning("%s/AppMenu root node must be 'AppMenu'\n", app_dir);
+		return;
 	}
 
-	g_free(tmp);
+	g_return_if_fail(current_items == NULL);
 
-	return retval;
+	/* Add the menu entries */
+	for (node = node->childs; node; node = node->next)
+	{
+		if (strcmp(node->name, "Item") == 0)
+		{
+			guchar	*label, *option;
+
+			label = xmlGetProp(node, "label");
+			option = xmlGetProp(node, "option");
+			current_items = g_list_prepend(current_items,
+					create_menu_item(label, option));
+		}
+	}
+
+	sep = gtk_menu_item_new();
+	current_items = g_list_prepend(current_items, sep);
+	gtk_widget_show(sep);
+
+	for (next = current_items; next; next = next->next)
+		gtk_menu_prepend(GTK_MENU(menu), GTK_WIDGET(next->data));
+
+	current_menu = menu;
+	current_app_path = g_strdup(app_dir);
 }
 
 /****************************************************************
@@ -171,157 +185,83 @@ AppMenus *appmenu_query(guchar *app_dir, DirItem *app)
 /* The pathname is the full path of the AppMenu file.
  * If we get here, assume that this really is an application.
  */
-static AppMenus *load(char *pathname, gpointer data)
+static AppMenu *load(char *pathname, gpointer data)
 {
-	AppMenus *appmenu = NULL;
+	xmlDocPtr doc;
+	AppMenu *appmenu = NULL;
 
-	appmenu = g_new(AppMenus, 1);
+	doc = xmlParseFile(pathname);
+	if (!doc)
+		return NULL;	/* Bad XML */
+
+	appmenu = g_new(AppMenu, 1);
 	appmenu->ref = 1;
-	appmenu->app_dir = NULL;
-	appmenu->last_menu = NULL;
-	appmenu->items = NULL;
-
-	load_appmenu(appmenu, pathname);
+	appmenu->doc = doc;
 
 	return appmenu;
 }
 
-static void ref(AppMenus *dir, gpointer data)
+static void ref(AppMenu *am, gpointer data)
 {
-	if (dir)
-		dir->ref++;
+	if (am)
+		am->ref++;
 }
 
-static void unref(AppMenus *dir, gpointer data)
+static void unref(AppMenu *am, gpointer data)
 {
-	if (dir && --dir->ref == 0)
-		destroy_contents(dir);
+	if (am && --am->ref == 0)
+	{
+		xmlFreeDoc(am->doc);
+		g_free(am);
+	}
 }
 	
-static int getref(AppMenus *dir, gpointer data)
+static int getref(AppMenu *am, gpointer data)
 {
-	return dir ? dir->ref : 0;
-}
-
-/* This function is the one that actually loads an appmenu from a file.
- * It doesn't do any permissions checking, that must have been done
- * before...
- */
-static void load_appmenu(AppMenus *appmenu, char *file)
-{
-	GtkWidget *sep;
-
-	g_return_if_fail(appmenu != NULL);
-	
-	cur_appmenu = appmenu;
-	/* TODO: Make sure the file isn't too big... */
-	parse_file(file, process_appmenu_line);
-	cur_appmenu = NULL;
-
-	sep = gtk_menu_item_new();
-	/* When separator is added to a container widget for the first time,
-	 * that widget takes our reference count from us. Therefore, we need an
-	 * extra one...
-	 */
-	gtk_widget_ref(sep);
-	gtk_object_sink(GTK_OBJECT(sep));
-	gtk_widget_show(sep);
-	appmenu->items = g_list_prepend(appmenu->items, sep);
-}
-
-/* Process lines from an AppMenu file. The format is:
- * entryid	Entry text
- * The corresponding entry is created, and when it is invoked, the
- * corresponding AppRun is invoked with option --entryid.
- */
-static char *process_appmenu_line(guchar *line)
-{
-	guchar *entryid, *text;
-
-	entryid = strtok(line, " \t");
-	/* Silently ignore empty lines and those that start with '#' */
-	if (entryid == NULL || entryid[0] == '#')
-		return NULL;
-
-	text = strtok(NULL, "");
-
-	/* Noisily ignore lines with no text */
-	if (!text)
-		text = _("[ missing text ]");
-
-	/* Skip white space */
-	while (isspace(*text))
-		text++;
-
-	/* Create a new entry and store the appropriate information */
-	cur_appmenu->items = g_list_prepend(cur_appmenu->items, 
-				  appmenu_item_new(cur_appmenu, text, entryid));
-
-	return NULL;
+	return am ? am->ref : 0;
 }
 
 /* Create and return a menu item */
-static GtkWidget *appmenu_item_new(AppMenus *menu, char *text, char *entryid)
+static GtkWidget *create_menu_item(char *label, char *option)
 {
 	GtkWidget *item;
 
-	g_return_val_if_fail(text != NULL && entryid != NULL, NULL);
+	if (!label)
+		label = "<missing label>";
 
 	/* Create the new item and tie it to the appropriate callback */
-	item = gtk_menu_item_new_with_label(text);
+	item = gtk_menu_item_new_with_label(label);
 
-	gtk_object_set_data_full(GTK_OBJECT(item), "entryid",
-					g_strconcat("--", entryid, NULL),
-					g_free);
+	if (option)
+		gtk_object_set_data_full(GTK_OBJECT(item), "option",
+						g_strdup(option),
+						g_free);
 
 	gtk_signal_connect(GTK_OBJECT(item), "activate",
 			   GTK_SIGNAL_FUNC(apprun_menu),
-			   (gpointer) menu);
+			   NULL);
 
-	gtk_widget_ref(item);
-	gtk_object_sink(GTK_OBJECT(item));
 	gtk_widget_show(item);
 
 	return item;
 }
 
 /* Function called to execute an AppMenu item */
-static void apprun_menu(GtkWidget *item, AppMenus *menu)
+static void apprun_menu(GtkWidget *item, gpointer data)
 {
-	guchar	*entryid;
+	guchar	*option;
 	char *argv[3];
 
-	entryid = gtk_object_get_data(GTK_OBJECT(item), "entryid");
-	g_return_if_fail(entryid != NULL);
+	g_return_if_fail(current_app_path != NULL);
+
+	option = gtk_object_get_data(GTK_OBJECT(item), "option");
 	
-	argv[0] = g_strconcat(menu->app_dir, "/AppRun", NULL);
-	argv[1] = entryid;
+	argv[0] = g_strconcat(current_app_path, "/AppRun", NULL);
+	argv[1] = option;	/* (may be NULL) */
 	argv[2] = NULL;
 
 	if (!spawn(argv))
 		report_error(_("fork() failed"), g_strerror(errno));
 
 	g_free(argv[0]);
-}
-
-/* Destroy the contents of an AppMenus structure */
-static void destroy_contents(AppMenus *dir)
-{
-	g_return_if_fail(dir != NULL);
-
-	if (dir->items)
-	{
-		g_list_foreach(dir->items, destroy_widget, NULL);
-		g_list_free(dir->items);
-	}
-
-	dir->items = NULL;
-	dir->last_menu = NULL;
-}
-
-/* Free a GTK widget */
-static void destroy_widget(gpointer data, gpointer user_data)
-{
-	if (data)
-		gtk_widget_unref((GtkWidget *)data);
 }
