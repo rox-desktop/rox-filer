@@ -117,6 +117,7 @@ static void grab_key(Icon *icon);
 static void parseKeyString(MyKey *key, const char *str);
 static void icon_wink(Icon *icon);
 static void initModifiers(void);
+static void create_menu(void);
 
 enum {
 	ACTION_SHIFT,
@@ -237,6 +238,9 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 	appmenu_remove();
 
 	menu_icon = icon;
+
+	if (!icon_menu)
+		create_menu();
 
 	menu_set_hidden(icon_menu, !pinboard, 5, 2);
 
@@ -852,9 +856,6 @@ static void icon_finialize(GObject *object)
 
 static void icon_class_init(gpointer gclass, gpointer data)
 {
-	guchar		*tmp;
-	GList		*items;
-	GtkItemFactory	*item_factory;
 	GObjectClass *object = (GObjectClass *) gclass;
 	IconClass *icon = (IconClass *) gclass;
 
@@ -892,28 +893,6 @@ static void icon_class_init(gpointer gclass, gpointer data)
 			G_TYPE_NONE, 0);
 
 	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
-
-	item_factory = menu_create(menu_def,
-				sizeof(menu_def) / sizeof(*menu_def),
-				 "<icon>", NULL);
-
-	tmp = g_strconcat("<icon>/", _("File"), NULL);
-	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
-	icon_file_menu = gtk_item_factory_get_widget(item_factory, tmp);
-	g_free(tmp);
-
-	/* File '' label... */
-	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
-	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
-	g_list_free(items);
-
-	/* Shift Open... label */
-	items = gtk_container_get_children(GTK_CONTAINER(icon_file_menu));
-	file_shift_item = GTK_BIN(items->data)->child;
-	g_list_free(items);
-
-	g_signal_connect(icon_menu, "unmap_event",
-			G_CALLBACK(menu_closed), NULL);
 }
 
 static void icon_init(GTypeInstance *object, gpointer gclass)
@@ -1326,3 +1305,36 @@ static void icon_wink(Icon *icon)
 
 	iclass->wink(icon);
 }
+
+/* Sets icon_menu */
+static void create_menu(void)
+{
+	GList		*items;
+	guchar		*tmp;
+	GtkItemFactory	*item_factory;
+
+	g_return_if_fail(icon_menu == NULL);
+
+	item_factory = menu_create(menu_def,
+				sizeof(menu_def) / sizeof(*menu_def),
+				 "<icon>", NULL);
+
+	tmp = g_strconcat("<icon>/", _("File"), NULL);
+	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
+	icon_file_menu = gtk_item_factory_get_widget(item_factory, tmp);
+	g_free(tmp);
+
+	/* File '' label... */
+	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
+	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
+
+	/* Shift Open... label */
+	items = gtk_container_get_children(GTK_CONTAINER(icon_file_menu));
+	file_shift_item = GTK_BIN(items->data)->child;
+	g_list_free(items);
+
+	g_signal_connect(icon_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
+}
+
