@@ -36,7 +36,7 @@
 #include <gdk/gdkx.h>
 #include <gtk/gtk.h>
 
-#include "apps.h"
+#include "run.h"
 #include "action.h"
 #include "filer.h"
 #include "type.h"
@@ -81,6 +81,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void link_item(gpointer data, guint action, GtkWidget *widget);
+static void open_file(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
@@ -97,6 +98,7 @@ static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 static void close_window(gpointer data, guint action, GtkWidget *widget);
+static void rox_help(gpointer data, guint action, GtkWidget *widget);
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
@@ -144,6 +146,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Copy...",		NULL,  	copy_item, 0, NULL},
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
 {"/File/Link...",		NULL,  	link_item, 0, NULL},
+{"/File/Open",	    		"O",  	open_file, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			"I",  	show_file_info, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
@@ -163,6 +166,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Window/Parent, same window",	NULL,   open_parent_same, 0, NULL},
 {"/Window/New window",		NULL,   new_window, 0, NULL},
 {"/Window/Close window",	C_"Q",  close_window, 0, NULL},
+{"/Window/Separator",		NULL,  	NULL, 0, "<Separator>"},
+{"/Window/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
 
 static GtkItemFactoryEntry panel_menu_def[] = {
@@ -184,6 +189,8 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/File/Delete",		NULL,	delete,	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
+{"/Separator",			NULL,	NULL, 0, "<Separator>"},
+{"/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
 };
 
 void menu_init()
@@ -407,13 +414,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		case 0:
 			g_string_assign(buffer, "<nothing selected>");
-			items_sensitive(file_menu, 0, 5, FALSE);
-			items_sensitive(file_menu, 6, -1, FALSE);
+			items_sensitive(file_menu, 0, 6, FALSE);
+			items_sensitive(file_menu, 7, -1, FALSE);
 			gtk_widget_set_sensitive(file_label, FALSE);
 			break;
 		case 1:
-			items_sensitive(file_menu, 0, 5, TRUE);
-			items_sensitive(file_menu, 6, -1, TRUE);
+			items_sensitive(file_menu, 0, 6, TRUE);
+			items_sensitive(file_menu, 7, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
@@ -421,8 +428,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 					file_item->leafname);
 			break;
 		default:
-			items_sensitive(file_menu, 0, 5, FALSE);
-			items_sensitive(file_menu, 6, -1, TRUE);
+			items_sensitive(file_menu, 0, 6, FALSE);
+			items_sensitive(file_menu, 7, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
@@ -675,6 +682,34 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
+static void open_file(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected != 1)
+		report_error("ROX-Filer", "You must select a single "
+				"file or application to open");
+	else
+	{
+		DirItem *item = selected_item(collection);
+		char	*path;
+
+		path = make_path(window_with_focus->path, item->leafname)->str;
+
+		if (item->base_type == TYPE_APPDIR ||
+		    item->base_type == TYPE_DIRECTORY)
+			filer_opendir(path, FALSE, BOTTOM);
+		else
+			if (!type_open(path, &text_plain))
+				delayed_error("ROX-Filer",
+					"You haven't specified any action "
+					"for text/plain files.");
+	}
+}
+
 static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 {
 	GtkWidget	*window, *table, *label, *button, *frame;
@@ -857,6 +892,23 @@ out:
 	g_string_free(gstring, TRUE);
 }
 
+static void app_show_help(char *path)
+{
+	char		*help_dir;
+	struct stat 	info;
+
+	help_dir = g_strconcat(path, "/Help", NULL);
+	
+	if (stat(help_dir, &info))
+		report_error("Application",
+			"This is an application directory - you can "
+			"run it as a program, or open it (hold down "
+			"Shift while you open it). Most applications provide "
+			"their own help here, but this one doesn't.");
+	else
+		filer_opendir(help_dir, FALSE, BOTTOM);
+}
+
 static void help(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection 	*collection;
@@ -1009,6 +1061,13 @@ static void close_window(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	gtk_widget_destroy(window_with_focus->window);
+}
+
+static void rox_help(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+	
+	filer_opendir(make_path(getenv("APP_DIR"), "Help")->str, FALSE, BOTTOM);
 }
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
