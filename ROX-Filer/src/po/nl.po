@@ -12,14 +12,15 @@
 # Updated translations August 2001
 # Copyright (C) 2001 Jasper Huijsmans <j.b.huijsmans@chem.rug.nl>
 #
-# Bijgewerkt Jan 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
+# Bijgewerkt Jan 2002 en Mei 2002
+# Copyright (C) 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.6\n"
-"POT-Creation-Date: 2002-05-24 17:09+0100\n"
+"Project-Id-Version: ROX-Filer 1.3.0\n"
+"POT-Creation-Date: 2002-05-26 06:44+0200\n"
 "PO-Revision-Date: \n"
-"Last-Translator: Jasper Huijsmans <j.b.huijsmans@chem.rug.nl>\n"
+"Last-Translator: Wilbert Berendsen <wbsoft@xs4all.nl>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=iso-8859-1\n"
@@ -30,9 +31,8 @@ msgid "<dir>"
 msgstr "<map>"
 
 #: abox.c:164
-#, fuzzy
 msgid "_Quiet"
-msgstr "Stil"
+msgstr "_Stil"
 
 #: abox.c:172
 msgid "Quiet"
@@ -391,14 +391,14 @@ msgid "'Unmounting %s\n"
 msgstr "'Afkoppelen %s\n"
 
 #: action.c:1442
-#, fuzzy, c-format
+#, c-format
 msgid "?Mount %s?"
-msgstr "?%s aankoppelen?\n"
+msgstr "?%s aankoppelen?"
 
 #: action.c:1443
-#, fuzzy, c-format
+#, c-format
 msgid "?Unmount %s?"
-msgstr "?%s afkoppelen?\n"
+msgstr "?%s afkoppelen?"
 
 #: action.c:1453
 #, c-format
@@ -557,13 +557,12 @@ msgid "Copy"
 msgstr "Kopiëren"
 
 #: action.c:1887 action.c:1920 tips:170
-#, fuzzy
 msgid "Newer"
-msgstr "Nieuw"
+msgstr "Nieuwer"
 
 #: action.c:1888 action.c:1921 tips:171 tips:172 tips:173 tips:174
 msgid "Only over-write if source is newer than destination."
-msgstr ""
+msgstr "Alleen overschrijven als het bronbestand nieuwer is dan de bestemming."
 
 #: action.c:1910 dnd.c:136 tips:154
 msgid "Move"
@@ -609,11 +608,11 @@ msgstr "<label ontbreekt>"
 
 #: collection.c:261
 msgid "Vertical Adjustment"
-msgstr ""
+msgstr "Vertikale Adjustment"
 
 #: collection.c:262
 msgid "The GtkAdjustment for the vertical position."
-msgstr ""
+msgstr "De GtkAdjustment voor de vertikale positie."
 
 #: dir.c:131 dir.c:664
 #, c-format
@@ -625,9 +624,9 @@ msgstr ""
 "%s"
 
 #: dir.c:344
-#, fuzzy, c-format
+#, c-format
 msgid "Can't stat directory: %s"
-msgstr "Kan map niet openen: %s"
+msgstr "Kan map status niet verkrijgen: %s"
 
 #: dir.c:352
 #, c-format
@@ -689,7 +688,8 @@ msgstr "XDS protocol fout: return code zou 'S', 'F' of 'E' moeten zijn\n"
 
 #: dnd.c:909
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
-msgstr ""
+msgstr "Sorry, kan geen actiemenu afbeelden voor een remote bestand of ruwe "
+"gegevens."
 
 #: dnd.c:925
 msgid "UntitledData"
@@ -765,15 +765,15 @@ msgstr "Map '%s' niet gevonden."
 
 #: filer.c:1768
 msgid "S"
-msgstr ""
+msgstr "S"
 
 #: filer.c:1769
 msgid "A"
-msgstr ""
+msgstr "A"
 
 #: filer.c:1770
 msgid "T"
-msgstr ""
+msgstr "M"
 
 #: filer.c:1776
 msgid "Scanning, "
@@ -785,7 +785,7 @@ msgstr "Alle, "
 
 #: filer.c:1778
 msgid "Thumbs, "
-msgstr "Voorbeelden, "
+msgstr "Miniaturen, "
 
 #: filer.c:2025 menu.c:1839
 msgid "Item no longer exists!"
@@ -797,7 +797,8 @@ msgstr "Symbolische link naar "
 
 #: filer.c:2177
 msgid "This filename is not valid UTF-8. You should rename it.\n"
-msgstr ""
+msgstr "Dit bestand heeft geen geldige UTF-8 naam.  U zou het moeten "
+"hernoemen.\n"
 
 #: find.c:485
 msgid "And"
@@ -993,11 +994,11 @@ msgstr "blokken"
 
 #: gtksavebox.c:231
 msgid "Has Discard"
-msgstr ""
+msgstr "Heeft Negeren"
 
 #: gtksavebox.c:232
 msgid "The dialog has a Discard button"
-msgstr ""
+msgstr "De dialoog heeft een `Negeren' knop"
 
 #: gtksavebox.c:250
 msgid "Save As:"
@@ -1051,11 +1052,12 @@ msgstr ""
 "Verdere fouten zullen genegeerd worden."
 
 #: i18n.c:38
-#, fuzzy
 msgid ""
 "Note that you must save your choices and restart the filer for the new "
 "language setting to take full effect."
-msgstr "Herstart ROX-Filer om de nieuwe taalinstelling effect te laten hebben"
+msgstr ""
+"Sla uw instellingen op en herstart ROX-Filer om de nieuwe taalinstelling "
+"effect te laten hebben."
 
 #: icon.c:109
 msgid "ROX-Filer"
@@ -1107,7 +1109,7 @@ msgstr "Item(s) verwijderen"
 
 #: icon.c:123
 msgid "Backdrop..."
-msgstr ""
+msgstr "Achtergrond..."
 
 #: icon.c:248
 msgid "Nothing"
@@ -1320,11 +1322,11 @@ msgstr "Ondersteuning voor grote bestanden"
 
 #: main.c:570
 msgid "GNOME-VFS library"
-msgstr ""
+msgstr "GNOME-VFS bibliotheek"
 
 #: main.c:574
 msgid "No (gnome-vfs-config not found)"
-msgstr ""
+msgstr "Nee (gnome-vfs-config niet gevonden)"
 
 #: menu.c:177 tips:39
 msgid "Display"
@@ -1376,7 +1378,7 @@ msgstr "Sorteer op naam"
 
 #: menu.c:201
 msgid "Sort by Type"
-msgstr "Sorteer volgens type"
+msgstr "Sorteer op type"
 
 #: menu.c:202
 msgid "Sort by Date"
@@ -1384,7 +1386,7 @@ msgstr "Sorteer op datum"
 
 #: menu.c:203
 msgid "Sort by Size"
-msgstr "Sorteer volgens grootte"
+msgstr "Sorteer op grootte"
 
 #: menu.c:205
 msgid "Show Hidden"
@@ -1392,7 +1394,7 @@ msgstr "Toon verborgen"
 
 #: menu.c:206
 msgid "Show Thumbnails"
-msgstr "Toon voorbeelden"
+msgstr "Toon miniaturen"
 
 #: menu.c:207
 msgid "Refresh"
@@ -1467,9 +1469,8 @@ msgid "New Window"
 msgstr "Nieuw venster"
 
 #: menu.c:239
-#, fuzzy
 msgid "Follow Symbolic Links"
-msgstr "Symbolische link"
+msgstr "Symbolische links volgen"
 
 #: menu.c:240
 msgid "Resize Window"
@@ -1525,9 +1526,8 @@ msgid "Open As Text"
 msgstr "Als tekst openen"
 
 #: menu.c:990
-#, fuzzy
 msgid "_Relative link"
-msgstr "Relatieve link"
+msgstr "_Relatieve link"
 
 #: menu.c:996
 msgid ""
@@ -1550,16 +1550,16 @@ msgstr "Nieuwe padnaam is niet absoluut"
 #: menu.c:1128
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
-msgstr ""
+msgstr "Symbolische link van '$s' bestaat reeds. Vervangen door link naar "
+"'%s'?"
 
 #: menu.c:1134
 msgid "_Replace"
-msgstr ""
+msgstr "_Vervangen"
 
 #: menu.c:1258 menu.c:1299 menu.c:1359
-#, fuzzy
 msgid "Create"
-msgstr "Maak Duimnagels"
+msgstr "Nieuw"
 
 #: menu.c:1259
 msgid "NewDir"
@@ -1580,7 +1580,7 @@ msgid "Error creating file: could not find the template for %s"
 msgstr "Fout bij aanmaken bestand: Kon template niet vinden voor %s"
 
 #: menu.c:1389
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
 "application. The applications listed are those in the following "
@@ -1601,7 +1601,12 @@ msgstr ""
 "%s\n"
 "%s\n"
 "Het `Zenden naar' menu kan geopend worden door de menu-muisknop + Shift te "
-"gebruiken op een bestand."
+"gebruiken op een bestand.\n"
+"\n"
+"Geavanceerd gebruik:\n"
+"U kunt ook submappen aanmaken met namen als `.text_html', `.text', etc die "
+"alleen worden getoond bij bestanden van dat type. `.group' wordt alleen "
+"getoond als meer dan 1 bestand geselecteerd is."
 
 #: menu.c:1400
 msgid ""
@@ -1621,7 +1626,7 @@ msgstr "Aanpassen"
 
 #: menu.c:1538
 msgid "This is already the canonical name for this directory."
-msgstr ""
+msgstr "Dit is reeds de gebruikelijke naam voor deze map."
 
 #: menu.c:1569
 msgid ""
@@ -1729,6 +1734,12 @@ msgid ""
 "2) adding this line to ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 msgstr ""
+"Instelbare sneltoetsen zijn standaard uitgeschakeld in Gtk2, en u heeft ze "
+"niet ingeschakeld. U kunt deze mogelijk inschakelen door:\n"
+"1) een XSettings manager te gebruiken, zoals ROX-Session\n"
+"of\n"
+"2) de volgende regel aan ~/.gtkrc-2.0 toe te voegen:\n"
+"\tgtk-can-change-accels = 1"
 
 #: menu.c:1905
 msgid ""
@@ -1789,35 +1800,34 @@ msgid "Invalid Find condition"
 msgstr "Ongeldige zoekconditie"
 
 #: options.c:271
-#, fuzzy
 msgid "ROX-Filer has converted your Options file to the new XML format"
-msgstr "Je oude paneel-bestand is omgezet naar het nieuwe XML formaat."
+msgstr "ROX-Filer heeft uw oude Options-bestand omgezet naar het nieuwe "
+"XML formaat"
 
 #: options.c:842
-#, fuzzy
 msgid "Options"
-msgstr "Opties..."
+msgstr "Opties"
 
 #: options.c:891
-#, fuzzy
 msgid "_Revert"
-msgstr "Verwijderen"
+msgstr "O_ngedaan maken"
 
 #: options.c:897
 msgid "Restore all choices to how they were when the Options box was opened."
-msgstr ""
+msgstr "Zet alle instellingen terug naar de toestand toen het Opties venster "
+"werd geopend."
 
 #: options.c:912
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Choices will be saved as:\n"
 "%s"
-msgstr "Instellingen zullen bewaard worden als %s"
+msgstr "Instellingen zullen worden bewaard als:\n"
+"%s"
 
 #: options.c:920
-#, fuzzy
 msgid "(saving disabled by CHOICESPATH)"
-msgstr "Instellen icoon is uitgezet door de CHOICESPATH variabele"
+msgstr "(opslaan is uitgezet door de CHOICESPATH variabele)"
 
 #: options.c:1115 usericons.c:470
 #, c-format
@@ -1862,75 +1872,76 @@ msgid "Applet quit without ever creating a widget!"
 msgstr "Applet afgesloten zonder dat het een venster aanmaakte!"
 
 #: panel.c:1443
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error running applet:\n"
 "%s"
 msgstr ""
-"Fout tijdens doorzoeken '%s':\n"
+"Fout bij starten applet:\n"
 "%s"
 
 #: pinboard.c:315
 msgid "Your old pinboard file has been converted to the new XML format."
-msgstr "Je oude prikbord-bestand is omgezet naar het nieuwe XML formaat."
+msgstr "Uw oude prikbord-bestand is omgezet naar het nieuwe XML formaat."
 
 #: pinboard.c:548
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop."
 msgstr ""
+"U kunt de achtergrond alleen instellen met een afbeelding of met een "
+"programma dat weet hoe de ROX-Filer achtergrond in te stellen."
 
 #: pinboard.c:562
-#, fuzzy
 msgid "Set backdrop"
-msgstr "Icoon instellen"
+msgstr "Achtergrond instellen"
 
 #: pinboard.c:571
 msgid "Display backdrop image:"
-msgstr ""
+msgstr "Toon achtergrond afbeelding:"
 
 #: pinboard.c:580
-#, fuzzy
 msgid "Centred"
-msgstr "Maak Duimnagels"
+msgstr "Gecentreerd"
 
 #: pinboard.c:586
-#, fuzzy
 msgid "Scaled"
-msgstr "Bewaren"
+msgstr "Geschaald"
 
 #: pinboard.c:592
-#, fuzzy
 msgid "Tiled"
-msgstr "Bestand"
+msgstr "Herhaald"
 
 #: pinboard.c:609
-#, fuzzy
 msgid "Drop an image here"
-msgstr "Sleep hier een icoon bestand"
+msgstr "Sleep hier een afbeeldings"
 
 #: pinboard.c:657
-#, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
 "will be used for the desktop background. You can also drag certain "
 "applications onto this box."
 msgstr ""
-"Sleep een (lokaal) icoon naar de drop-rechthoek - dit icoon zal in het "
-"vervolg voor dit bestand gebruikt worden."
+"Sleep een (lokale) afbeelding naar de drop-rechthoek - dit icoon zal in het "
+"vervolg als achtergrond gebruikt worden. U kunt ook bepaalde programma's "
+"naar deze rechthoek slepen."
 
 #: pinboard.c:667
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
-msgstr "Kan %s niet verwijderen: %s"
+msgstr ""
+"Geen toegang tot '%s':\n"
+"%s"
 
 #: pinboard.c:698
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
+"Alleen bestanden (en bepaalde programma's) kunnen worden gebruikt om de "
+"achtergrond in te stellen."
 
 #: pinboard.c:1137
 msgid "Missing '>' in icon label"
@@ -1952,12 +1963,17 @@ msgid ""
 "%s\n"
 "Backdrop removed."
 msgstr ""
+"Fout bij het laden van de achtergrond:\n"
+"%s\n"
+"Achtergrond verwijderd."
 
 #: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
+"Er is geen prikbord in gebruik... het 'Default' prikbord is geselecteerd. "
+"Gebruik 'rox -p=Default' om het in het vervolg in te schakelen."
 
 #: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
@@ -2329,12 +2345,12 @@ msgstr "Kan %s niet verwijderen: %s"
 #: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
-msgstr ""
+msgstr "Bestand '%s' ongeldig!"
 
 #: type.c:1142
 #, c-format
 msgid "Invalid type '%s' in '%s'"
-msgstr ""
+msgstr "Ongeldig type '%s' in '%s'"
 
 #: type.c:1282
 msgid ""
@@ -2343,6 +2359,10 @@ msgid ""
 "the 'Common types package' from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
+"De standaard MIME type database is niet gevonden.  De filer zal "
+"waarschijnlijk niet de juiste types afbeelden voor verschillende bestanden. "
+"U kunt het 'Common types package' downloaden van:\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html"
 
 #: usericons.c:181 usericons.c:227
 msgid ""
@@ -2355,11 +2375,13 @@ msgstr ""
 "Het icoon is niet veranderd."
 
 #: usericons.c:197
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error creating image '%s':\n"
 "%s"
-msgstr "Fout tijdens maken bestand '%s': %s"
+msgstr ""
+"Fout tijdens maken afbeelding '%s':\n"
+"%s"
 
 #: usericons.c:217
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -2384,11 +2406,13 @@ msgid ""
 "Add the file and image filenames to your personal list. The setting will be "
 "lost if the image or the file is moved."
 msgstr ""
+"Voeg het bestand en de bestandsnamen van afbeeldingen toe aan uw persoonlijke "
+"lijst. Deze instelling gaat verloren als de afbeelding of het bestand wordt "
+"verplaatst."
 
 #: usericons.c:335
-#, fuzzy
 msgid "Copy image into directory"
-msgstr "Ga naar thuismap"
+msgstr "Kopieer afbeelding naar map"
 
 #: usericons.c:339
 msgid ""
@@ -2396,6 +2420,10 @@ msgid ""
 "users will than see the icon, and you can move the directory around safely. "
 "This is usually the best option if you can write to the directory."
 msgstr ""
+"Kopieer de afbeelding naar de map, als een verborgen bestand met de naam "
+"'.DirIcon'. Alle gebruikers kunnen dan het icoon zien, en u kunt de map "
+"veilig verplaatsen. Dit is normaal gesproken de beste optie als u "
+"schrijftoegang tot de map heeft."
 
 #: usericons.c:371
 msgid "Drop an icon file here"
@@ -2410,9 +2438,8 @@ msgid "Enter the path of an icon file:"
 msgstr "Geef het pad van een icoon bestand:"
 
 #: usericons.c:413
-#, fuzzy
 msgid "_Remove"
-msgstr "Verwijderen"
+msgstr "Ver_wijderen"
 
 #: usericons.c:607
 msgid ""
@@ -2447,9 +2474,8 @@ msgid "Translation"
 msgstr "Taal"
 
 #: tips:2
-#, fuzzy
 msgid "Language"
-msgstr "Groot"
+msgstr "Taal"
 
 #: tips:3
 msgid "Use the LANG environment variable"
@@ -2457,16 +2483,15 @@ msgstr "Gebruik de LANG ongevingsvariabele"
 
 #: tips:4
 msgid "Chinese (traditional)"
-msgstr ""
+msgstr "Chinees (traditioneel)"
 
 #: tips:5
 msgid "Chinese (simplified)"
-msgstr ""
+msgstr "Chinees (vereenvoudigd)"
 
 #: tips:6
-#, fuzzy
 msgid "Danish"
-msgstr "Spaans"
+msgstr "Deens"
 
 #: tips:7
 msgid "Dutch"
@@ -2509,14 +2534,12 @@ msgid "Filer windows"
 msgstr "Bestandsvensters"
 
 #: tips:17
-#, fuzzy
 msgid "Auto-resize filer windows"
-msgstr "Automatisch afmeting aanpassen..."
+msgstr "Automatisch afmetingen aanpassen"
 
 #: tips:18
-#, fuzzy
 msgid "Never automatically resize"
-msgstr "Automatisch afmeting aanpassen..."
+msgstr "Nooit automatisch afmeting aanpassen"
 
 #: tips:19
 msgid ""
@@ -2528,9 +2551,8 @@ msgstr ""
 "de vensterachtergrond."
 
 #: tips:20
-#, fuzzy
 msgid "Resize when changing the display style"
-msgstr "...wanneer de weergave stijl verandert"
+msgstr "Aanpassen wanneer de weergavestijl verandert"
 
 #: tips:21
 msgid ""
@@ -2542,7 +2564,7 @@ msgstr ""
 
 #: tips:22
 msgid "Always resize"
-msgstr ""
+msgstr "Altijd aanpassen"
 
 #: tips:23 tips:24
 msgid ""
@@ -2553,14 +2575,13 @@ msgstr ""
 "wil zeggen bij verandering van map of weergave stijl)."
 
 #: tips:25
-#, fuzzy
 msgid "Largest window size:"
-msgstr "Icoon-grootte veranderen"
+msgstr "Maximale venstergrootte:"
 
 #: tips:26
 #, c-format
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: tips:27 tips:28
 msgid ""
@@ -2572,17 +2593,19 @@ msgstr ""
 
 #: tips:29
 msgid "Window behaviour"
-msgstr ""
+msgstr "Venster gedrag"
 
 #: tips:30
 msgid "Short titlebar flags"
-msgstr ""
+msgstr "Korte vlaggen in titelbalk"
 
 #: tips:31
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
 msgstr ""
+"Gebruik enkele lettertekens in plaats van woorden voor Scannen, Alle en "
+"Miniaturen in de titelbalk."
 
 #: tips:32
 msgid "Unique windows"
@@ -2625,14 +2648,12 @@ msgstr ""
 "dubbel klikken opent."
 
 #: tips:40
-#, fuzzy
 msgid "Sorting"
-msgstr "Niets"
+msgstr "Sorteren"
 
 #: tips:41
-#, fuzzy
 msgid "Intelligent sorting"
-msgstr "Negeer hoofd-/kleine letters bij het sorteren"
+msgstr "Intelligent sorteren"
 
 #: tips:42
 msgid ""
@@ -2640,6 +2661,9 @@ msgid ""
 "If on, ignores case and punctuation and handles numbers properly: file8, "
 "File9, File10"
 msgstr ""
+"Indien uit, sorteert gewoon ASCII: File10, File9, file8.\n"
+"Indien aan, negeert hoofd- en kleine letters, leestekens en let op getallen: "
+"file8, File9, File10"
 
 #: tips:43
 msgid "Directories always come first"
@@ -2649,20 +2673,19 @@ msgstr "Mappen altijd eerst"
 msgid ""
 "If this is on then directories will always appear before anything else, "
 "regardless of the sort type."
-msgstr "Indien aan zullen mappen altijd eerst komen ongeacht de sortering."
+msgstr "Indien aan zullen mappen altijd vooraan komen ongeacht de sortering."
 
 #: tips:46
 msgid "Icon text width"
-msgstr ""
+msgstr "Icoon tekst breedte"
 
 #: tips:47
-#, fuzzy
 msgid "Large wrap width:"
-msgstr "Grote afbrekingsbreedte"
+msgstr "Grote afbrekingsbreedte:"
 
 #: tips:48 tips:51
 msgid "pixels"
-msgstr ""
+msgstr "pixels"
 
 #: tips:49
 msgid ""
@@ -2674,18 +2697,16 @@ msgstr ""
 "dan dit."
 
 #: tips:50
-#, fuzzy
 msgid "Max Small Icons width:"
-msgstr "Max Kleine Iconen breedte"
+msgstr "Maximale Kleine Iconen breedte:"
 
 #: tips:52 tips:53
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maximale breedte van de tekst onder een klein icoon."
 
 #: tips:54
-#, fuzzy
 msgid "Default settings for new windows"
-msgstr "Standaard instellingen voor nieuwe vensters:"
+msgstr "Standaard instellingen voor nieuwe vensters"
 
 #: tips:55
 msgid "Inherit options from source window"
@@ -2701,23 +2722,20 @@ msgstr ""
 "venster de standaardinstellingen."
 
 #: tips:57
-#, fuzzy
 msgid "Icon size:"
-msgstr "Iconen grootte"
+msgstr "Iconen grootte:"
 
 #: tips:61
-#, fuzzy
 msgid "Details:"
-msgstr "Details"
+msgstr "Details:"
 
 #: tips:62
 msgid "No details"
 msgstr "Geen details"
 
 #: tips:68
-#, fuzzy
 msgid "Sort by:"
-msgstr "Sorteren op"
+msgstr "Sorteren op:"
 
 #: tips:71
 msgid "Date"
@@ -2751,24 +2769,20 @@ msgid "Toolbar"
 msgstr "Werkbalk"
 
 #: tips:82
-#, fuzzy
 msgid "Toolbar buttons"
-msgstr "Werktuig-balk opties"
+msgstr "Werkbalk knoppen"
 
 #: tips:83
-#, fuzzy
 msgid "Unshade the tools you want."
-msgstr "Activeer de gewenste hulpmiddelen:"
+msgstr "Activeer de gewenste hulpmiddelen."
 
 #: tips:84
-#, fuzzy
 msgid "Toolbar appearance"
-msgstr "Werkbalk type"
+msgstr "Werkbalk uiterlijk"
 
 #: tips:85
-#, fuzzy
 msgid "Toolbar type:"
-msgstr "Werkbalk type"
+msgstr "Werkbalk type:"
 
 #: tips:86
 msgid "None"
@@ -2798,7 +2812,7 @@ msgstr ""
 
 #: tips:94
 msgid "Minibuffers"
-msgstr ""
+msgstr "Minibuffers"
 
 #: tips:95
 msgid ""
@@ -2806,10 +2820,13 @@ msgid ""
 "filer window. They are used to enter pathnames, search conditions and shell "
 "commands."
 msgstr ""
+"De minibuffers zijn kleine tekstvelden die onderaan een bestandsvenster "
+"verschijnen. Ze worden gebruikt om paden, zoekacties en shell commando's "
+"in te voeren."
 
 #: tips:96
 msgid "Beeping"
-msgstr ""
+msgstr "Geluid"
 
 #: tips:97
 msgid "Beep if Tab-completion fails"
@@ -2846,26 +2863,24 @@ msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
 msgstr ""
+"Als u een prikbord gebruikt kunt u bestanden en programma's naar het "
+"bureaublad slepen om daar snelkoppelingen aan te maken."
 
 #: tips:106 tips:218
-#, fuzzy
 msgid "Colours"
-msgstr "Uren"
+msgstr "Kleuren"
 
 #: tips:107
-#, fuzzy
 msgid "Foreground:"
-msgstr "Voorgrond"
+msgstr "Voorgrond:"
 
 #: tips:108
-#, fuzzy
 msgid "Background:"
-msgstr "Achtergrond"
+msgstr "Achtergrond:"
 
 #: tips:109
-#, fuzzy
 msgid "Pinboard behaviour"
-msgstr "Prikbord"
+msgstr "Prikbord gedrag"
 
 #: tips:110
 msgid "Single-click to open"
@@ -2873,7 +2888,7 @@ msgstr "Enkel klikken om te openen"
 
 #: tips:112
 msgid "Pass button-3 clicks to window manager"
-msgstr ""
+msgstr "Geef rechtsklik door aan window manager"
 
 #: tips:113
 msgid ""
@@ -2881,6 +2896,9 @@ msgid ""
 "Turn this on to forward the event to your window manager instead. Clicks on "
 "icons will not be forwarded."
 msgstr ""
+"Normaal zal rechts klikken op de bureaublad achtergrond het prikbordmenu "
+"openen. Schakel deze optie in om de muisklik naar de window manager door "
+"te sturen. Klikken op iconen zullen niet worden doorgestuurd."
 
 #: tips:114
 msgid "Keep icons within screen limits"
@@ -2923,14 +2941,12 @@ msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "Gebruik een 32-pixel raster om iconen op de desktop te plaatsen."
 
 #: tips:126
-#, fuzzy
 msgid "Iconfied windows"
-msgstr "Actie-venster"
+msgstr "Geminimaliseerde vensters"
 
 #: tips:127
-#, fuzzy
 msgid "Show iconified windows"
-msgstr "Laat het slepen naar iconen in het bestandsvenster toe"
+msgstr "Toon geminimaliseerde vensters"
 
 #: tips:128
 msgid ""
@@ -2939,56 +2955,59 @@ msgid ""
 "windows. If this option is on, the filer will show each iconified window as "
 "a small button on the screen. Requires a compatible window manager."
 msgstr ""
+"De meeste window managers hebben een manier om vensters te minimaliseren, "
+"en verschillende programma's, inclusief ROX-Filer, kunnen worden gebruikt "
+"om de geminimaliseerde vensters te tonen. Als deze optie ingeschakeld is, "
+"zal de filer elk geminimaliseerd venster als een klein icoon op het scherm "
+"afbeelden. Een compatibele window manager is vereist."
 
 #: tips:129
 msgid "Iconify to the"
-msgstr ""
+msgstr "Minimaliseer naar"
 
 #: tips:130
 msgid "top-left"
-msgstr ""
+msgstr "linksboven"
 
 #: tips:131
 msgid "top-right"
-msgstr ""
+msgstr "rechtsboven"
 
 #: tips:132
 msgid "bottom-left"
-msgstr ""
+msgstr "linksonder"
 
 #: tips:133
 msgid "bottom-right"
-msgstr ""
+msgstr "rechtsonder"
 
 #: tips:134
 msgid ", going"
-msgstr ""
+msgstr ", in"
 
 #: tips:135
 msgid "horizontally"
-msgstr ""
+msgstr "horizontale richting"
 
 #: tips:136
 msgid "vertically"
-msgstr ""
+msgstr "vertikale richting"
 
 #: tips:137
 msgid "Panels"
 msgstr "Panelen"
 
 #: tips:138
-#, fuzzy
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
 msgstr ""
-"Panelen zijn balken met iconen aan een zijde van het scherm.\n"
-"zie de handleiding voor informatie over het gebruik van panelen."
+"Panelen zijn balken met iconen aan een zijde van het scherm. "
+"Zie de handleiding voor informatie over het gebruik van panelen."
 
 #: tips:139
-#, fuzzy
 msgid "Panel style"
-msgstr "Panelen"
+msgstr "Paneel stijl"
 
 #: tips:140
 msgid "Image and text"
@@ -3028,9 +3047,8 @@ msgstr ""
 "zoals kopiëren en verwijderen."
 
 #: tips:151
-#, fuzzy
 msgid "Auto-start (Quiet) these actions"
-msgstr "Auto-start deze acties (Stil):"
+msgstr "Auto-start deze acties (Stil)"
 
 #: tips:153
 msgid "Copy files without confirming first."
@@ -3053,9 +3071,8 @@ msgid "Mount and unmount filesystems without confirming first."
 msgstr "Aan- en afkoppelen bestandssystemen zonder bevestiging."
 
 #: tips:163
-#, fuzzy
 msgid "Default settings"
-msgstr "Standaardinstellingen:"
+msgstr "Standaardinstellingen"
 
 #: tips:165
 msgid "Don't confirm deletion of non-writeable items."
@@ -3074,9 +3091,8 @@ msgid "Drag and Drop"
 msgstr "Sleep en Drop"
 
 #: tips:176 tips:195 tips:208
-#, fuzzy
 msgid "General"
-msgstr "Duits"
+msgstr "Algemeen"
 
 #: tips:177
 msgid "Don't use hostnames"
@@ -3123,13 +3139,12 @@ msgstr ""
 "over werd gehouden."
 
 #: tips:183
-#, fuzzy
 msgid "Spring delay:"
-msgstr "Openspring vertraging"
+msgstr "Openspring vertraging:"
 
 #: tips:184
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: tips:185 tips:186
 msgid ""
@@ -3142,19 +3157,16 @@ msgstr ""
 "hier enig effect kan hebben."
 
 #: tips:187
-#, fuzzy
 msgid "Dragging files with the middle mouse button"
 msgstr "Slepen van bestanden met de middelste muisknop"
 
 #: tips:188
-#, fuzzy
 msgid "Shows a menu of possible actions"
-msgstr "... toont een menu van mogelijke acties"
+msgstr "Toont een menu van mogelijke acties"
 
 #: tips:189
-#, fuzzy
 msgid "Moves the files"
-msgstr "... verplaatst de bestanden"
+msgstr "Verplaatst de bestanden"
 
 #: tips:190 tips:191 tips:192 tips:193
 msgid ""
@@ -3182,9 +3194,8 @@ msgstr ""
 "knop 3 (rechts) in de plaats."
 
 #: tips:198
-#, fuzzy
 msgid "Size of icons in menus:"
-msgstr "Grootte van iconen in menus"
+msgstr "Grootte van iconen in menus:"
 
 #: tips:199
 msgid "No Icons"
@@ -3199,9 +3210,8 @@ msgid "Same as default"
 msgstr "Zelfde als standaard"
 
 #: tips:204
-#, fuzzy
 msgid "`Xterm Here' program"
-msgstr "`Xterm hier' programma:"
+msgstr "`Xterm hier' programma"
 
 #: tips:205 tips:206
 msgid "The program to launch when you choose `Xterm Here' from the menu."
@@ -3228,19 +3238,18 @@ msgstr ""
 
 #: tips:212
 msgid "MIME types"
-msgstr ""
+msgstr "MIME types"
 
 #: tips:213
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. After editing "
 "the files, click the re-read button below, or restart the filer."
 msgstr ""
-"ROX gebruikt een set van regels om het juiste MIME-type te be-\n"
-"palen voor elk bestand, en kiest dan een passend icoon.\n"
-"Na de regel-bestanden te hebben bewerkt, klik dan op de knop Verversen\n"
-"hieronder, of herstart de filer."
+"ROX gebruikt een set van regels om het juiste MIME-type te bepalen "
+"voor elk bestand, en kiest dan een passend icoon. "
+"Na de regel-bestanden te hebben bewerkt, klik dan op de knop Verversen "
+"hieronder, of herstart ROX-Filer."
 
 #: tips:214
 msgid "Show name-to-type rules"
@@ -3251,16 +3260,14 @@ msgid "Re-read files"
 msgstr "Verversen"
 
 #: tips:216 tips:217
-#, fuzzy
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
 msgstr ""
-"Gebruik de 'Icoon instellen' dialoog om het icoon in te stellen voor elk\n"
+"Gebruik de 'Icoon instellen' dialoog om het icoon in te stellen voor elk "
 "individueel type."
 
 #: tips:219
-#, fuzzy
 msgid "File type colours"
-msgstr "Tekstkleuren: "
+msgstr "Kleuren bestandstypen"
 
 #: tips:220
 msgid "Colour files based on their types"
@@ -3272,24 +3279,20 @@ msgstr ""
 "Bestandsnamen (en details) worden gekleurd naargelang hun bestandstype."
 
 #: tips:222
-#, fuzzy
 msgid "Directory:"
-msgstr "Map"
+msgstr "Map:"
 
 #: tips:223
-#, fuzzy
 msgid "Regular file:"
-msgstr "Normaal bestand"
+msgstr "Normaal bestand:"
 
 #: tips:224
-#, fuzzy
 msgid "Pipe:"
-msgstr "Pipe"
+msgstr "Pipe:"
 
 #: tips:225
-#, fuzzy
 msgid "Socket:"
-msgstr "Socket"
+msgstr "Socket:"
 
 #: tips:227 tips:228
 msgid ""
@@ -3300,29 +3303,24 @@ msgstr ""
 "naar een bestand waar geen toegang toe te krijgen is."
 
 #: tips:229
-#, fuzzy
 msgid "Character device:"
-msgstr "Karakter device"
+msgstr "Karakter device:"
 
 #: tips:230
-#, fuzzy
 msgid "Block device:"
-msgstr "Block device"
+msgstr "Blok device:"
 
 #: tips:231
-#, fuzzy
 msgid "Executable file:"
-msgstr "Uitvoerbaar bestand"
+msgstr "Uitvoerbaar bestand:"
 
 #: tips:232
-#, fuzzy
 msgid "Application directory:"
-msgstr "Applicatie map"
+msgstr "Applicatie map:"
 
 #: tips:233
-#, fuzzy
 msgid "Unknown type:"
-msgstr "Onbekend type"
+msgstr "Onbekend type:"
 
 #, fuzzy
 #~ msgid "_OK"
@@ -3398,7 +3396,7 @@ msgstr "Onbekend type"
 #~ msgstr "Nee (gebruik Gtk+ 1.2 inplaats)"
 
 #~ msgid "Save thumbnails"
-#~ msgstr "Voorbeelden opslaan"
+#~ msgstr "Miniaturen opslaan"
 
 #~ msgid "Yes (using Gtk+-2.0)"
 #~ msgstr "Ja (gebruikmakend van Gtk+ 2.0)"

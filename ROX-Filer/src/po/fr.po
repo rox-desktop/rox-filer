@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.0\n"
+"Project-Id-Version: ROX-Filer 1.3.1\n"
 "POT-Creation-Date: 2002-05-24 17:09+0100\n"
-"PO-Revision-Date: 2002-04-15 04:04+0200\n"
+"PO-Revision-Date: 2002-05-26 02:10+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -1116,7 +1116,7 @@ msgstr "Enlever le(s) objet(s)"
 
 #: icon.c:123
 msgid "Backdrop..."
-msgstr ""
+msgstr "Image de fond..."
 
 #: icon.c:248
 msgid "Nothing"
@@ -1477,9 +1477,8 @@ msgid "New Window"
 msgstr "Nouvelle fenêtre"
 
 #: menu.c:239
-#, fuzzy
 msgid "Follow Symbolic Links"
-msgstr "Lien symbolique"
+msgstr "Suivre les liens symboliques"
 
 #: menu.c:240
 msgid "Resize Window"
@@ -1559,11 +1558,11 @@ msgstr "Le nouveau chemin n'est pas absolu"
 #: menu.c:1128
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
-msgstr ""
+msgstr "Un lien depuis '%s' existe déjà. Le remplacer par un lien vers '%s' ?"
 
 #: menu.c:1134
 msgid "_Replace"
-msgstr ""
+msgstr "_Remplacer"
 
 #: menu.c:1258 menu.c:1299 menu.c:1359
 msgid "Create"
@@ -1590,7 +1589,7 @@ msgstr ""
 "%s"
 
 #: menu.c:1389
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
 "application. The applications listed are those in the following "
@@ -1605,14 +1604,14 @@ msgid ""
 "will only be shown for files of that type. `.group' is shown only when "
 "multiple files are selected."
 msgstr ""
-"Le menu `Envoyer à' fournit une manière rapide d'envoyer des fichiers à une "
-"application. Les applications listées sont celles contenues dans les "
-"répertoires suivants :\n"
+"Le menu `Envoyer à' fournit une manière rapide d'envoyer des fichiers à une application. Les applications listées sont celles contenues dans les répertoires suivants :\n"
 "\n"
 "%s\n"
 "%s\n"
-"Le menu `Envoyer à' peut être ouvert par <Shift>+<clic Menu> au-dessus d'un "
-"fichier."
+"Le menu `Envoyer à' peut être ouvert par <Shift>+<clic Menu> au-dessus d'un fichier.\n"
+"\n"
+"Utilisation avancée :\n"
+"Vous pouvez aussi créer des sous-répertoires appelés `.text_html', `.text', etc. qui n'apparaîtront que pour des fichiers de ce type. `.group' n'est montré que si plusieurs fichiers sont sélectionnés."
 
 #: menu.c:1400
 msgid ""
@@ -1635,7 +1634,7 @@ msgstr "Personnaliser"
 
 #: menu.c:1538
 msgid "This is already the canonical name for this directory."
-msgstr ""
+msgstr "C'est déjà le nom canonique de ce répertoire."
 
 #: menu.c:1569
 msgid ""
@@ -1743,6 +1742,10 @@ msgid ""
 "2) adding this line to ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1"
 msgstr ""
+"Les raccourcis utilisateur sont désactivés par défaut dans Gtk2 et vous ne les avez pas activés. Vous pouvez activer cette fonctionnalité en :\n"
+"1) utilisant un gestionnaire XSettings, comme ROX-Session\n"
+"2) ajoutant cette ligne à ~/.gtkrc-2.0 :\n"
+"\tgtk-can-change-accels = 1"
 
 #: menu.c:1905
 msgid ""
@@ -1894,59 +1897,53 @@ msgstr "Votre vieux fichier de punaiseur a été converti au nouveau format XML."
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop."
-msgstr ""
+msgstr "Vous ne pouvez fixer l'image de fond que sur une image ou sur un programme qui sait comment manier l'image de fond de ROX-Filer."
 
 #: pinboard.c:562
-#, fuzzy
 msgid "Set backdrop"
-msgstr "Fixer l'icône"
+msgstr "Fixer l'image de fond"
 
 #: pinboard.c:571
 msgid "Display backdrop image:"
-msgstr ""
+msgstr "Afficher l'image de fond :"
 
 #: pinboard.c:580
-#, fuzzy
 msgid "Centred"
-msgstr "Créer"
+msgstr "Centrée"
 
 #: pinboard.c:586
-#, fuzzy
 msgid "Scaled"
-msgstr "Sauver"
+msgstr "Redimensionnée"
 
 #: pinboard.c:592
-#, fuzzy
 msgid "Tiled"
-msgstr "Fichier"
+msgstr "Pavée"
 
 #: pinboard.c:609
-#, fuzzy
 msgid "Drop an image here"
-msgstr "Faites glisser ici un fichier d'icône"
+msgstr "Faites glisser ici une image"
 
 #: pinboard.c:657
-#, fuzzy
 msgid ""
 "You should drop a single (local) image file onto the drop box - that image "
 "will be used for the desktop background. You can also drag certain "
 "applications onto this box."
-msgstr ""
-"Vous devez faire glisser un seul fichier d'icône local sur la boîte - cette "
-"icône sera utilisée pour ce fichier à partir de maintenant."
+msgstr "Vous devez faire glisser un seul fichier d'image (local) sur la boîte - cette image sera utilisée comme fond de bureau. Vous pouvez aussi faire glisser certaines applications sur cette boîte."
 
 #: pinboard.c:667
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Can't access '%s':\n"
 "%s"
-msgstr "Impossible de supprimer %s : %s"
+msgstr ""
+"Impossible d'accéder à '%s' :\n"
+"%s"
 
 #: pinboard.c:698
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
-msgstr ""
+msgstr "Seuls des fichiers (et certaines applications) peuvent être utilisés pour fixer l'image de fond."
 
 #: pinboard.c:1137
 msgid "Missing '>' in icon label"
@@ -1968,12 +1965,15 @@ msgid ""
 "%s\n"
 "Backdrop removed."
 msgstr ""
+"Erreur lors du chargement de l'image de fond :\n"
+"%s\n"
+"Image de fond enlevée."
 
 #: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
-msgstr ""
+msgstr "Aucun punaiseur n'était utilisé... le punaiseur 'Default' a été sélectionné. Utilisez 'rox -p=Default' pour le choisir à l'avenir."
 
 #: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
@@ -2349,12 +2349,12 @@ msgstr "Impossible de supprimer %s : %s"
 #: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
-msgstr ""
+msgstr "Fichier '%s' altéré !"
 
 #: type.c:1142
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid type '%s' in '%s'"
-msgstr "Impossible d'ouvrir '%s' en écriture : %s"
+msgstr "Type invalide '%s' dans '%s'"
 
 #: type.c:1282
 msgid ""
@@ -2363,6 +2363,8 @@ msgid ""
 "the 'Common types package' from here:\n"
 "http://www.freedesktop.org/standards/shared-mime-info.html"
 msgstr ""
+"La base de données des types MIME standard n'a pas été trouvée. Le filer ne pourra probablement pas montrer les types corrects pour les différents fichiers. Vous devriez télécharger et installer le paquet « Common types package » ici :\n"
+"http://www.freedesktop.org/standards/shared-mime-info.html"
 
 #: usericons.c:181 usericons.c:227
 msgid ""
@@ -2375,11 +2377,13 @@ msgstr ""
 "L'icône n'a pas été changée."
 
 #: usericons.c:197
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error creating image '%s':\n"
 "%s"
-msgstr "Erreur lors de la création de '%s' : %s"
+msgstr ""
+"Erreur lors de la création de l'image '%s' :\n"
+"%s"
 
 #: usericons.c:217
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -2404,19 +2408,18 @@ msgstr "Seulement pour le fichier `%s'"
 msgid ""
 "Add the file and image filenames to your personal list. The setting will be "
 "lost if the image or the file is moved."
-msgstr ""
+msgstr "Ajoutez les noms du fichier et de l'image à votre liste personnelle. Ce choix sera perdu si l'image ou le fichier est déplacé."
 
 #: usericons.c:335
-#, fuzzy
 msgid "Copy image into directory"
-msgstr "Aller au répertoire personnel"
+msgstr "Copier l'image dans le répertoire"
 
 #: usericons.c:339
 msgid ""
 "Copy the image inside the directory, as a hidden file called '.DirIcon'. All "
 "users will than see the icon, and you can move the directory around safely. "
 "This is usually the best option if you can write to the directory."
-msgstr ""
+msgstr "Copier l'image dans le répertoire comme fichier caché '.DirIcon'. Tous les utilisateurs verront alors l'icône et vous pourrez déplacer le répertoire sans risque. C'est généralement la meilleure option si vous avez le droit d'écrire dans le répertoire."
 
 #: usericons.c:371
 msgid "Drop an icon file here"
@@ -2476,11 +2479,11 @@ msgstr "Utiliser la variable d'environnement LANG"
 
 #: tips:4
 msgid "Chinese (traditional)"
-msgstr ""
+msgstr "Chinois (traditionnel)"
 
 #: tips:5
 msgid "Chinese (simplified)"
-msgstr ""
+msgstr "Chinois (simplifié)"
 
 #: tips:6
 msgid "Danish"
@@ -2574,7 +2577,7 @@ msgstr "Plus grande taille de fenêtre :"
 #: tips:26
 #, c-format
 msgid "%"
-msgstr ""
+msgstr "%"
 
 #: tips:27 tips:28
 msgid ""
@@ -2641,9 +2644,8 @@ msgstr ""
 "fois sélectionne l'objet; double-cliquez pour ouvrir des choses."
 
 #: tips:40
-#, fuzzy
 msgid "Sorting"
-msgstr "Rien"
+msgstr "Tri"
 
 #: tips:41
 msgid "Intelligent sorting"
@@ -2681,7 +2683,7 @@ msgstr "Largeur du texte replié :"
 
 #: tips:48 tips:51
 msgid "pixels"
-msgstr ""
+msgstr "pixels"
 
 #: tips:49
 msgid ""
@@ -2809,14 +2811,14 @@ msgstr ""
 
 #: tips:94
 msgid "Minibuffers"
-msgstr ""
+msgstr "Minibuffers"
 
 #: tips:95
 msgid ""
 "The minibuffers are text entry fields that appear along the bottom of a "
 "filer window. They are used to enter pathnames, search conditions and shell "
 "commands."
-msgstr ""
+msgstr "Les minibuffers sont des champs d'entrée de texte qui apparaissent au bas d'une fenêtre du filer. Ils sont utilisés pour entrer des chemins, des conditions de recherche et des commandes shell."
 
 #: tips:96
 msgid "Beeping"
@@ -2857,7 +2859,7 @@ msgstr "Punaiseur"
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
-msgstr ""
+msgstr "Quand vous utilisez un punaiseur, vous pouvez faire glisser des fichiers et des applications sur le fond du bureau pour créer des raccourcis vers eux."
 
 #: tips:106 tips:218
 msgid "Colours"
@@ -2881,14 +2883,14 @@ msgstr "Simple clic pour ouvrir"
 
 #: tips:112
 msgid "Pass button-3 clicks to window manager"
-msgstr ""
+msgstr "Passer les clics du bouton 3 au gestionnaire de fenêtres"
 
 #: tips:113
 msgid ""
 "Normally, clicking on the desktop background will open the pinboard menu. "
 "Turn this on to forward the event to your window manager instead. Clicks on "
 "icons will not be forwarded."
-msgstr ""
+msgstr "Normalement, cliquer sur le fond du bureau ouvre le menu du punaiseur. Activez cette option pour transmettre l'événement à votre gestionnaire de fenêtres. Les clics sur les icônes ne seront pas transmis."
 
 #: tips:114
 msgid "Keep icons within screen limits"
@@ -2937,15 +2939,12 @@ msgstr ""
 "sur le bureau."
 
 #: tips:126
-#, fuzzy
 msgid "Iconfied windows"
-msgstr "Fenêtres d'action"
+msgstr "Fenêtres iconifiées"
 
 #: tips:127
-#, fuzzy
 msgid "Show iconified windows"
-msgstr ""
-"Autoriser le glisser-déposer vers des icônes dans les fenêtres du filer"
+msgstr "Montrer les fenêtres iconifiées"
 
 #: tips:128
 msgid ""
@@ -2953,53 +2952,49 @@ msgid ""
 "various programs, including ROX-Filer, can be used to display the iconified "
 "windows. If this option is on, the filer will show each iconified window as "
 "a small button on the screen. Requires a compatible window manager."
-msgstr ""
+msgstr "La plupart des gestionnaires de fenêtres fournissent une méthode pour iconifier (ou « minimiser ») les fenêtres, et divers programmes, dont ROX-Filer, peuvent servir à afficher les fenêtres iconifiées. Si cette option est active, le filer affichera chaque fenêtre iconifiée comme un petit bouton sur l'écran. Nécessite un gestionnaire de fenêtres compatible."
 
 #: tips:129
-#, fuzzy
 msgid "Iconify to the"
-msgstr "Largeur du texte de l'icône"
+msgstr "Iconifier en"
 
 #: tips:130
 msgid "top-left"
-msgstr ""
+msgstr "haut à gauche"
 
 #: tips:131
 msgid "top-right"
-msgstr ""
+msgstr "haut à droite"
 
 #: tips:132
 msgid "bottom-left"
-msgstr ""
+msgstr "bas à gauche"
 
 #: tips:133
 msgid "bottom-right"
-msgstr ""
+msgstr "bas à droite"
 
 #: tips:134
 msgid ", going"
-msgstr ""
+msgstr ", en allant"
 
 #: tips:135
 msgid "horizontally"
-msgstr ""
+msgstr "horizontalement"
 
 #: tips:136
 msgid "vertically"
-msgstr ""
+msgstr "verticalement"
 
 #: tips:137
 msgid "Panels"
 msgstr "Panneaux"
 
 #: tips:138
-#, fuzzy
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
-msgstr ""
-"Les panneaux sont des barres d'icônes situées sur les côtés de l'écran.\n"
-"Voir le manuel pour toute information sur l'utilisation des panneaux."
+msgstr "Les panneaux sont des barres d'icônes situées sur les côtés de l'écran. Voir le manuel pour toute information sur l'utilisation des panneaux."
 
 #: tips:139
 msgid "Panel style"
@@ -3145,7 +3140,7 @@ msgstr "Délai de surgissement :"
 
 #: tips:184
 msgid "ms"
-msgstr ""
+msgstr "ms"
 
 #: tips:185 tips:186
 msgid ""
@@ -3262,11 +3257,8 @@ msgid "Re-read files"
 msgstr "Relire les fichiers"
 
 #: tips:216 tips:217
-#, fuzzy
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
-msgstr ""
-"Utilisez la boîte de dialogue « Fixer l'icône... » pour fixer l'icône pour "
-"chaque type."
+msgstr "Utilisez la boîte de dialogue « Fixer l'icône... » pour fixer l'icône pour chaque type MIME."
 
 #: tips:219
 msgid "File type colours"
