@@ -753,12 +753,42 @@ static void perform_action(PinIcon *pi, GdkEventButton *event)
 	}
 }
 
+static void forward_to_root(GdkEventButton *event)
+{
+	XButtonEvent xev;
+
+	if (event->type == GDK_BUTTON_PRESS)
+	{
+		xev.type = ButtonPress;
+		XUngrabPointer(gdk_display, event->time);
+	}
+	else
+		xev.type = ButtonRelease;
+
+	xev.window = gdk_x11_get_default_root_xwindow();
+	xev.root =  xev.window;
+	xev.subwindow = None;
+	xev.time = event->time;
+	xev.x = event->x;
+	xev.y = event->y;
+	xev.x_root = event->x_root;
+	xev.y_root = event->y_root;
+	xev.state = event->state;
+	xev.button = event->button;
+	xev.same_screen = True;
+
+	XSendEvent(gdk_display, xev.window, False,
+		ButtonPressMask | ButtonReleaseMask, (XEvent *) &xev);
+}
+
 /* pi is NULL if this is a root event */
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
                             	     PinIcon *pi)
 {
-	if (dnd_motion_release(event))
+	if (event->button == 2)
+		forward_to_root(event);
+	else if (dnd_motion_release(event))
 		return TRUE;
 
 	perform_action(pi, event);
@@ -771,7 +801,9 @@ static gboolean button_press_event(GtkWidget *widget,
 			    	   GdkEventButton *event,
                             	   PinIcon *pi)
 {
-	if (dnd_motion_press(widget, event))
+	if (event->button == 2)
+		forward_to_root(event);
+	else if (dnd_motion_press(widget, event))
 		perform_action(pi, event);
 
 	return TRUE;
