@@ -594,12 +594,9 @@ GdkWindow *find_click_proxy_window(void)
  */
 gboolean get_pointer_xy(int *x, int *y)
 {
-	Window	root, child;
-	int	win_x, win_y;
 	unsigned int mask;
-	
-	XQueryPointer(GDK_DISPLAY(), GDK_ROOT_WINDOW(),
-			&root, &child, x, y, &win_x, &win_y, &mask);
+
+	gdk_window_get_pointer(NULL, x, y, &mask);
 
 	return mask != 0;
 }

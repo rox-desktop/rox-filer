@@ -7,11 +7,10 @@
 #	- Johan Zwiekhorst
 #	- Bruno Tuteleers
 # Bedankt mannen! :-)
-
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 0.1.21\n"
-"POT-Creation-Date: 2000-10-02 17:08+0200\n"
+"POT-Creation-Date: 2000-10-20 21:30+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@linuxfreak.com>\n"
 "Language-Team: ROX Mailing List <rox@ecs.soton.ac.uk>\n"
@@ -93,7 +92,8 @@ msgstr ""
 msgid "Simple Tests"
 msgstr "Eenvoudige Testen"
 
-#: action.c:377 ***
+# action.c:377 ***
+#: action.c:377
 msgid ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
@@ -148,7 +148,8 @@ msgstr "Sluiten"
 msgid "Permissions command reference"
 msgstr "Toegangsrechten commando referentie"
 
-#: action.c:449 ***
+# action.c:449 ***
+#: action.c:449
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -196,7 +197,7 @@ msgstr "FOUT lezen"
 msgid "ERROR"
 msgstr "FOUT"
 
-#: action.c:855 action.c:1019 main.c:430 main.c:437
+#: action.c:855 action.c:1019 main.c:453 main.c:460
 msgid "Yes"
 msgstr "Ja"
 
@@ -430,7 +431,8 @@ msgstr "Aansluiten / Afsluiten"
 
 #: action.c:2002
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Bestander ondersteund nog geen aansluitpunten op uw systeem. Sorry."
+msgstr ""
+"ROX-Bestander ondersteund nog geen aansluitpunten op uw systeem. Sorry."
 
 #: action.c:2018
 msgid "You need to select some items to delete"
@@ -446,8 +448,8 @@ msgstr "Beknopt - geef alleen melding als mappen worden gewist"
 
 #: action.c:2054
 msgid "You need to select the items whose permissions you want to change"
-msgstr "Je moet een paar items selecteren waarvan je de toegangsrechten wil"
-       "aanpassen"
+msgstr ""
+"Je moet een paar items selecteren waarvan je de toegangsrechten wilaanpassen"
 
 #: action.c:2062
 msgid "a+x (Make executable/searchable)"
@@ -499,21 +501,23 @@ msgstr "Bezig met de items te wissen "
 
 #: action.c:2238
 msgid " will affect some items on the pinboard or panel - really delete it?"
-msgstr " zal bepaalde items op het paneel of prikbord beïnvloeden - "
-       " wil je het echt wissen?"
+msgstr ""
+" zal bepaalde items op het paneel of prikbord beïnvloeden -  wil je het echt "
+"wissen?"
 
 #: action.c:2245
 msgid " will affect some items on the pinboard or panel - really delete them?"
-msgstr " zal bepaalde items op het paneel of prikbord beïnvloeden - "
-       "wil je ze echt wissen?"
+msgstr ""
+" zal bepaalde items op het paneel of prikbord beïnvloeden - wil je ze echt "
+"wissen?"
 
-#: action.c:2250 gtksavebox.c:226 gtksavebox.c:565 icon.c:98 menu.c:1151
-#: menu.c:1428 options.c:112 type.c:539
+#: action.c:2250 gtksavebox.c:226 gtksavebox.c:569 icon.c:98 menu.c:1151
+#: menu.c:1428 options.c:112 type.c:551
 msgid "OK"
 msgstr "OK"
 
 #: action.c:2250 gtksavebox.c:233 icon.c:105 menu.c:1435 options.c:122
-#: panel.c:406 type.c:546
+#: panel.c:406 type.c:558
 msgid "Cancel"
 msgstr "Afbreken"
 
@@ -562,7 +566,7 @@ msgstr ""
 "ingedrukt om het item te selecteren. Als 'af', enkel klikken selecteert; "
 "dubbel klikken opent."
 
-#: dir.c:465
+#: dir.c:467
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Kan map niet openen: %s"
@@ -687,11 +691,13 @@ msgstr "Onjuiste of ontbrekende lijnbreuk in text/uri-lijst data"
 msgid "Internal error - bad info type"
 msgstr "Interne fout - slechte info type"
 
-#: dnd.c:807 ***
+# dnd.c:807 ***
+#: dnd.c:807
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr ""
 
-#: dnd.c:832 ***
+# dnd.c:832 ***
+#: dnd.c:832
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type "
 "text/plain) did not contain a leafname\n"
@@ -700,8 +706,7 @@ msgstr ""
 #: dnd.c:843
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
-"Sorry - I heb een doel van het type text/uri-lijst nodig of"
-"XdndDirectSave0."
+"Sorry - I heb een doel van het type text/uri-lijst nodig ofXdndDirectSave0."
 
 #: dnd.c:846
 msgid ""
@@ -738,15 +743,15 @@ msgstr "Geen URIs in de text/uri-lijst (niets te doen!)"
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
-"Kan geen data verkrijgen van de afstand machine "
-"(application/octet-stream niet geleverd)"
+"Kan geen data verkrijgen van de afstand machine (application/octet-stream "
+"niet geleverd)"
 
 #: dnd.c:1130
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
-"Sommige van deze bestanden zijn op een andere machine - zij zullen "
-"genegeerd worden - sorry"
+"Sommige van deze bestanden zijn op een andere machine - zij zullen genegeerd "
+"worden - sorry"
 
 #: dnd.c:1137
 msgid ""
@@ -782,11 +787,11 @@ msgstr "Map '%s' is niet toegankelijk"
 msgid "Directory '%s' not found."
 msgstr "Map '%s' niet gevonden."
 
-#: filer.c:1046
+#: filer.c:1047
 msgid "Unique windows"
 msgstr "Unieke vensters"
 
-#: filer.c:1048
+#: filer.c:1049
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -794,11 +799,11 @@ msgstr ""
 "Als je een map opent en deze map wordt reeds getoond in een ander venster, "
 "dan zal deze optie ervoor zorgen dat dit andere venster gesloten wordt."
 
-#: filer.c:1059
+#: filer.c:1060
 msgid "Initial window height "
 msgstr "Standaard venster hoogte"
 
-#: filer.c:1066
+#: filer.c:1067
 msgid ""
 "This option sets the initial height of filer windows, in rows of icons at "
 "Large Icons size."
@@ -806,7 +811,7 @@ msgstr ""
 "Deze optie zet de standaard hoogte van het bestandsvenster, in rijen van "
 "iconen op Grote Iconen afmeting."
 
-#: filer.c:1220
+#: filer.c:1221
 msgid " (Scanning)"
 msgstr " (Bezig met scannen)"
 
@@ -1006,11 +1011,11 @@ msgstr "blokken"
 msgid "Save As:"
 msgstr "Bewaren Als:"
 
-#: gtksavebox.c:319
+#: gtksavebox.c:323
 msgid "Unnamed"
 msgstr "Naamloos"
 
-#: gtksavebox.c:389
+#: gtksavebox.c:393
 msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
@@ -1018,7 +1023,7 @@ msgstr ""
 "Afstand applicatie wil Direct Bewaren gebruiken, maar ik kan de "
 "XdndDirectSave0 (type text/plain) eigenschap niet lezen.\n"
 
-#: gtksavebox.c:558
+#: gtksavebox.c:562
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
@@ -1049,8 +1054,8 @@ msgid ""
 msgstr ""
 "Fout in '%s' bestand op lijn %d: \n"
 "\"%s\"\n"
-"Dit kan het gevolg zijn van het 'upgraden' vanuit een vorige versie van ROX-"
-"Bestander. Open het Optie venster en druk op Bewaar.\n"
+"Dit kan het gevolg zijn van het 'upgraden' vanuit een vorige versie van "
+"ROX-Bestander. Open het Optie venster en druk op Bewaar.\n"
 "Verdere fouten zullen genegeerd worden."
 
 #: icon.c:56 panel.c:166 pinboard.c:197
@@ -1077,52 +1082,32 @@ msgstr "De lokatie moet minstens één karakter bevatten!"
 msgid "Sorry, but the name must not contain < or >"
 msgstr "Sorry, maar de naam mag geen < of > bevatten"
 
-#: main.c:200
+#: main.c:203
 msgid "ROX-Filer message log"
 msgstr "ROX-Bestander berichten log"
 
-#: main.c:340
+#: main.c:377
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Lopend onder gebruiker '%s'"
 
-#: main.c:402
-msgid "!!!DANGER!!!"
-msgstr "!!!GEVAAR!!!"
-
-#: main.c:403
-msgid ""
-"Running ROX-Filer as root is VERY dangerous. If I had a warranty (I don't) "
-"then doing this would void it"
-msgstr ""
-"Het gebruik van ROX-Bestander als root is ZEER gevaarlijk. Als ik garantie "
-"gaf (wat ik niet doe) dan zou die hierdoor verbroken worden"
-
-#: main.c:406
-msgid "Don't click here"
-msgstr "Klik hier niet"
-
-#: main.c:406
-msgid "Quit"
-msgstr "Stoppen"
-
-#: main.c:427
+#: main.c:450
 msgid "features set at compile time"
 msgstr "eigenschappen gezet tijdens het compileren"
 
-#: main.c:428
+#: main.c:451
 msgid "VFS support"
 msgstr "VFS ondersteuning"
 
-#: main.c:432
+#: main.c:455
 msgid "No (couldn't find a valid libvfs)"
 msgstr "Nee (kon geen geldige libvfs vinden)"
 
-#: main.c:435
+#: main.c:458
 msgid "ImLib support"
 msgstr "ImLib ondersteuning"
 
-#: main.c:439
+#: main.c:462
 msgid "No (the imlib-config command didn't work)"
 msgstr "Nee (het imlib-config commando werkte niet)"
 
@@ -1186,7 +1171,7 @@ msgstr "Toon Verborgen"
 msgid "Refresh"
 msgstr "Opfrissen"
 
-#: menu.c:186 run.c:282 type.c:189
+#: menu.c:186 run.c:282 type.c:198
 msgid "File"
 msgstr "Bestand"
 
@@ -1408,7 +1393,7 @@ msgstr "ROX applicatie"
 msgid "Mount point for "
 msgstr "Aansluit punt voor "
 
-#: menu.c:1020 run.c:290 type.c:182
+#: menu.c:1020 run.c:290 type.c:191
 msgid "Mount point"
 msgstr "Aansluit punt"
 
@@ -1476,7 +1461,7 @@ msgstr "Nieuwe Map"
 msgid "NewDir"
 msgstr "NieuweMap"
 
-#: menu.c:1334 run.c:119 type.c:263
+#: menu.c:1334 run.c:119 type.c:275
 msgid "Failed to fork() child process"
 msgstr "Mislukt om een kinder-proces te fork()'en"
 
@@ -1524,7 +1509,6 @@ msgstr ""
 "Geef een bestandsnaam en ik zal het tonen. Druk op Tab om het d.m.v. de "
 "langste overeenkomst aan te vullen. Esc om de minibuffer te sluiten."
 
-
 #: minibuffer.c:211
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
@@ -1544,7 +1528,7 @@ msgstr "ROX-Bestander opties"
 msgid "Choices will be saved as "
 msgstr "Keuzes zullen bewaart worden als "
 
-#: options.c:98 type.c:582
+#: options.c:98 type.c:594
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Keuzes bewaren is uitgezet door de CHOICESPATH variabele"
 
@@ -1617,17 +1601,17 @@ msgstr "Verwijder"
 msgid "Missing < or > in panel config file"
 msgstr "Ontbrekende < of > in paneel configuratie bestand"
 
-#: panel.c:982 pinboard.c:1850
+#: panel.c:982 pinboard.c:1853
 msgid "First, select a single item to edit"
 msgstr "Selecteer eerst één item om te bewerken"
 
-#: panel.c:997 pinboard.c:1827
+#: panel.c:997 pinboard.c:1830
 msgid ""
 "Select a single item, then use this to find out where it is in the "
 "filesystem."
 msgstr ""
-"Selecteer één item, gebruik dit dan om uit te zoeken waar het zich bevind in"
-"het bestandssysteem."
+"Selecteer één item, gebruik dit dan om uit te zoeken waar het zich bevind "
+"inhet bestandssysteem."
 
 #: panel.c:1014
 msgid "You must select a single item to get help on"
@@ -1669,47 +1653,47 @@ msgstr "Ontbrekende ',' na icoon label"
 msgid "Error saving pinboard"
 msgstr "Fout tijdens bewaren van prikbord"
 
-#: pinboard.c:1592
+#: pinboard.c:1595
 msgid "No background"
 msgstr "Geen achtergrond"
 
-#: pinboard.c:1594
+#: pinboard.c:1597
 msgid "The text is drawn directly on the desktop background."
 msgstr "De tekst wordt direct op de desktop achtergrond getekend."
 
-#: pinboard.c:1600
+#: pinboard.c:1603
 msgid "Outlined text"
 msgstr "Uitgelijnde tekst"
 
-#: pinboard.c:1607
+#: pinboard.c:1610
 msgid "Rectangular background slab"
 msgstr "Rechthoekige achtergrond tegel"
 
-#: pinboard.c:1609
+#: pinboard.c:1612
 msgid "The text is drawn on a solid rectangle."
 msgstr "De tekst wordt op een solide rechthoek getekend."
 
-#: pinboard.c:1615
+#: pinboard.c:1618
 msgid "Text colours: "
 msgstr "Tekst kleuren: "
 
-#: pinboard.c:1618
+#: pinboard.c:1621
 msgid "Foreground"
 msgstr "Voorgrond"
 
-#: pinboard.c:1624
+#: pinboard.c:1627
 msgid "Background"
 msgstr "Achtergrond"
 
-#: pinboard.c:1717
+#: pinboard.c:1720
 msgid "Bad colour format"
 msgstr "Slecht kleuren formaat"
 
-#: pinboard.c:1730
+#: pinboard.c:1733
 msgid "Unknown pinboard text background type"
 msgstr "Onbekend prikbord tekst achtergrond type "
 
-#: pinboard.c:1797
+#: pinboard.c:1800
 msgid "You must first select a single pinned icon to get help on."
 msgstr ""
 "Je moet eerst één vastgeprikt icoon selecteren om hulp over te krijgen."
@@ -1749,9 +1733,9 @@ msgid ""
 "A mount point is a directory which another filing system can be mounted on. "
 "Everything on the mounted filesystem then appears to be inside the directory."
 msgstr ""
-"Een aansluit punt is een map waarop een ander bestandssysteem kan aangesloten "
-"worden. Alles op het aangesloten bestandssysteem zal dan verschijnen in deze "
-"map."
+"Een aansluit punt is een map waarop een ander bestandssysteem kan "
+"aangesloten worden. Alles op het aangesloten bestandssysteem zal dan "
+"verschijnen in deze map."
 
 #: run.c:297
 msgid ""
@@ -1785,7 +1769,7 @@ msgstr ""
 "Pijpen laten toe dat verschillende programma's met elkaar communiceren. Het "
 "ene programma schrijft data naar de pijp terwijl een ander er uit leest."
 
-#: run.c:314 type.c:199
+#: run.c:314 type.c:208
 msgid "Socket"
 msgstr "'Socket'"
 
@@ -1805,30 +1789,29 @@ msgstr ""
 "Ik kan niet uitzoeken wat voor type dit bestand is. Misschien bestaat het "
 "niet meer of je hebt geen zoek toegang in de map waarin het zich bevind?"
 
-#: run.c:440
+#: run.c:443
 msgid "ROX-Filer - Sending data to program"
 msgstr "ROX-Bestander - Zenden van data naar programma"
 
-#: run.c:495
+#: run.c:498
 msgid "Broken symlink (or you don't have permission to follow it)."
 msgstr "Gebroken symbolische koppeling (of je hebt er geen toegang naar)."
 
-#: run.c:534
-#, c-format
+#: run.c:537
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
-"action using by choosing `Set Run Action' from the File menu, or you can "
-"just drag the file to an application"
+"action by choosing `Set Run Action' from the File menu, or you can just drag "
+"the file to an application"
 msgstr ""
-"Er is geen start actie ingesteld voor bestanden van dit type (%s/%s) - Je kan "
-"een start actie zetten door 'Zet Start Actie' te kiezen van het Bestand "
+"Er is geen start actie ingesteld voor bestanden van dit type (%s/%s) - Je "
+"kan een start actie zetten door 'Zet Start Actie' te kiezen van het Bestand "
 "menu, of je kan gewoon een bestand slepen naar een applicatie"
 
-#: run.c:554
+#: run.c:557
 msgid "Application"
 msgstr "Applicatie"
 
-#: run.c:555
+#: run.c:558
 msgid ""
 "This is an application directory - you can run it as a program, or open it "
 "(hold down Shift while you open it). Most applications provide their own "
@@ -1918,47 +1901,47 @@ msgstr "Geen"
 msgid "Normal"
 msgstr "Normaal"
 
-#: toolbar.c:611
+#: toolbar.c:619
 msgid "Unknown toolbar type"
 msgstr "Onbekend werktuig-balk type"
 
-#: type.c:136
+#: type.c:145
 msgid "Missing MIME-type"
 msgstr "Ontbrekend MIME-type"
 
-#: type.c:171
+#: type.c:180
 msgid "Trailing chars after MIME-type"
 msgstr "Overbodige karakters na MIME-type"
 
-#: type.c:180
+#: type.c:189
 msgid "Sym link"
 msgstr ""
 
-#: type.c:184
+#: type.c:193
 msgid "App dir"
 msgstr "App map"
 
-#: type.c:191
+#: type.c:200
 msgid "Dir"
 msgstr "Map"
 
-#: type.c:193
+#: type.c:202
 msgid "Char dev"
 msgstr "Kar app"
 
-#: type.c:195
+#: type.c:204
 msgid "Block dev"
 msgstr "Blok app"
 
-#: type.c:197
+#: type.c:206
 msgid "Pipe"
 msgstr "Pijp"
 
-#: type.c:202
+#: type.c:211
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: type.c:350
+#: type.c:362
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -1968,24 +1951,24 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:428
+#: type.c:440
 msgid ""
-"You should drop a single (local) applicationonto the drop box - that "
+"You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
 msgstr ""
 "Je kan een enkele (lokale) applicatie droppen op het drop-rechthoek - deze "
 "applicatie zal in de toekomst gebruikt worden om bestanden van van dit type "
 "te laden"
 
-#: type.c:452
+#: type.c:464
 msgid "This is not a program! Give me an application instead!"
 msgstr "Dit is geen programma! Geef mij een applicatie in de plaats!"
 
-#: type.c:475
+#: type.c:487
 msgid "Set run action"
 msgstr "Zet start actie"
 
-#: type.c:508
+#: type.c:520
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -1993,21 +1976,37 @@ msgstr ""
 "Drop een geschikte\n"
 "applicatie hier"
 
-#: type.c:515
+#: type.c:527
 msgid "OR"
 msgstr "OF"
 
-#: type.c:522
+#: type.c:534
 msgid "Enter a shell command:"
 msgstr "Geef een schil commando:"
 
-#: type.c:594
+#: type.c:606
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr ""
 
-#: type.c:605
+#: type.c:617
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Kan %s niet verwijderen: %s"
+
+#~ msgid "!!!DANGER!!!"
+#~ msgstr "!!!GEVAAR!!!"
+
+#~ msgid ""
+#~ "Running ROX-Filer as root is VERY dangerous. If I had a warranty (I don't) "
+#~ "then doing this would void it"
+#~ msgstr ""
+#~ "Het gebruik van ROX-Bestander als root is ZEER gevaarlijk. Als ik garantie "
+#~ "gaf (wat ik niet doe) dan zou die hierdoor verbroken worden"
+
+#~ msgid "Don't click here"
+#~ msgstr "Klik hier niet"
+
+#~ msgid "Quit"
+#~ msgstr "Stoppen"

@@ -33,6 +33,8 @@ system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
 system "mv rox/* .";
 rmdir "rox";
 
+system "find -name '.cvsignore' | xargs rm";
+
 chdir "..";
 system "tar czf rox-$a.$b.$c.tgz rox-$a.$b.$c";
 system "rm -r rox-$a.$b.$c";
