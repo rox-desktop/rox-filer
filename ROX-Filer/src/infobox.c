@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include <string.h>
 #include <sys/param.h>
+#include <signal.h>
 #include <libxml/parser.h>
 
 #include <gtk/gtk.h>
@@ -62,6 +63,7 @@ typedef struct du {
 	GtkListStore *store;
 	guint         watch;
 	GIOChannel   *chan;
+	gint          child;
 } DU;
 
 typedef struct _Permissions Permissions;
@@ -460,6 +462,8 @@ static gboolean read_du_output(GIOChannel *source, GIOCondition cond, DU *du)
 static void kill_du_output(GtkWidget *widget, DU *du)
 {
 	g_io_channel_unref(du->chan);
+	kill((pid_t) du->child, SIGTERM);
+	g_object_unref(G_OBJECT(du->store));
 	g_free(du->path);
 	g_free(du);
 }
@@ -512,15 +516,16 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 		args[2] = (gchar *) path;
 		if (g_spawn_async_with_pipes(NULL, args, NULL,
 					    G_SPAWN_SEARCH_PATH,
-					    NULL, NULL, NULL,
+					    NULL, NULL, &du->child,
 					    NULL, &out, NULL,
 					    NULL))
 		{
 			du->chan = g_io_channel_unix_new(out);
 			du->watch = g_io_add_watch(du->chan, G_IO_IN,
 						 (GIOFunc) read_du_output, du);
-			g_signal_connect(G_OBJECT(view), "destroy",
-				  G_CALLBACK(kill_du_output), du);
+			g_object_ref(G_OBJECT(du->store));
+ 			g_signal_connect(G_OBJECT(view), "destroy",
+ 				  G_CALLBACK(kill_du_output), du);
 		}
 		else
 		{
