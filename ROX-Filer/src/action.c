@@ -884,6 +884,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
 
 	gui_side->dir = gtk_label_new(_("<dir>"));
+	gtk_widget_set_usize(gui_side->dir, 8, -1);
 	gui_side->next_dir = NULL;
 	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
