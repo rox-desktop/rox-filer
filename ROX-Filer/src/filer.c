@@ -1312,7 +1312,8 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 		filer_window->directory = dir;
 		attach(filer_window);
 
-		view_autosize(filer_window->view);
+		if (o_filer_auto_resize.int_value != RESIZE_NEVER)
+			view_autosize(filer_window->view);
 	}
 
 	if (selected)
