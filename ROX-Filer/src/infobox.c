@@ -477,6 +477,9 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 			value = xmlNodeListGetString(trans->doc,
 					   trans->xmlChildrenNode, 1);
 			if (!value)
+				value = xmlNodeListGetString(prop->doc,
+						prop->xmlChildrenNode, 1);
+			if (!value)
 				value = g_strdup("-");
 			add_row_and_free(store, label, value);
 			g_free(label);
