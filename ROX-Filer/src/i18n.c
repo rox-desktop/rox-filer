@@ -65,7 +65,7 @@ void i18n_init(void)
 		g_free(trans);
 	}
 	else
-		load_trans("LANG");
+		load_trans("From LANG");
 
 	option_add_saver(save);
 }
@@ -185,7 +185,7 @@ static char *load_trans(guchar *lang)
 }
 
 /* Load the 'Messages/<name>.gmo' translation.
- * Special values 'None' and 'LANG' are also allowed.
+ * Special values 'None' and 'From LANG' are also allowed.
  */
 static void set_trans(guchar *lang)
 {
@@ -199,9 +199,9 @@ static void set_trans(guchar *lang)
 		rox_clear_translation();
 		return;
 	}
-	else if (strcmp(lang, "LANG") == 0)
+	else if (strcmp(lang, "From LANG") == 0)
 	{
-		lang = getenv("LANG");
+		lang = getenv("From LANG");
 		if (!lang)
 			return;
 	}

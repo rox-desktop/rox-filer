@@ -1599,6 +1599,8 @@ static void reshape_all(void)
 {
 	GList	*next;
 
+	g_return_if_fail(current_pinboard != NULL);
+
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
 		Icon *icon = (Icon *) next->data;

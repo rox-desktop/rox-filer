@@ -77,8 +77,6 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
 static gboolean can_set_run_action(DirItem *item);
 
 /* Note that for most of these callbacks none of the arguments are used. */
-static void large(gpointer data, guint action, GtkWidget *widget);
-static void small(gpointer data, guint action, GtkWidget *widget);
 
 /* (action used in these two - DetailsType) */
 static void large_with(gpointer data, guint action, GtkWidget *widget);

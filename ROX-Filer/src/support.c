@@ -608,11 +608,9 @@ gboolean is_sub_dir(char *sub, char *parent)
 			*slash = '\0';
 	}
 
-	g_free(real_sub);
-	g_free(real_parent);
 	g_free(sub);
 
-	return retval;
+	return FALSE;
 }
 
 /* True if the string 'list' contains 'item'.

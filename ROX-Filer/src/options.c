@@ -146,7 +146,7 @@ void options_load(void)
 	GList	*next;
 	char	*path;
 
-	path = choices_find_path_load("options", PROJECT);
+	path = choices_find_path_load("Options", PROJECT);
 	if (!path)
 		return;		/* Nothing to load */
 
@@ -1147,7 +1147,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 		guchar	*path;
 		FILE	*file;
 
-		path = choices_find_path_save("options", PROJECT, TRUE);
+		path = choices_find_path_save("Options", PROJECT, TRUE);
 		if (!path)
 		{
 			delayed_error(_("Saving options"),
