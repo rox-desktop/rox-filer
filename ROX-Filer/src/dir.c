@@ -114,6 +114,14 @@ void dir_init(void)
 		act.sa_flags = SA_SIGINFO;
 		sigaction(SIGRTMIN, &act, NULL);
 
+		/* Sometimes we get this instead of SIGRTMIN.
+		 * Don't know why :-( but don't crash...
+		 */
+		act.sa_handler = SIG_IGN;
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = 0;
+		sigaction(SIGIO, &act, NULL);
+
 		dnotify_fd_to_dir = g_hash_table_new(NULL, NULL);
 	}
 #endif
