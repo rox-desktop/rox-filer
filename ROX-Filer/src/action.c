@@ -601,8 +601,12 @@ static gboolean do_copy(char *path, char *dest)
 	}
 	else
 	{
-		g_string_sprintf(message, "cp -dpRf %s %s", path, dest_path);
-		if (system(message->str))
+		char	*argv[] = {"cp", "-dpRf", NULL, NULL, NULL};
+
+		argv[2] = path;
+		argv[3] = dest_path;
+
+		if (fork_exec_wait(argv))
 		{
 			g_string_sprintf(message, "!ERROR: %s\n",
 					"Copy failed\n");
@@ -619,6 +623,8 @@ static gboolean do_move(char *path, char *dest)
 	char		*dest_path;
 	char		*leaf;
 	gboolean	retval = TRUE;
+	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
+	int		error;
 
 	leaf = strrchr(path, '/');
 	if (!leaf)
@@ -676,8 +682,10 @@ static gboolean do_move(char *path, char *dest)
 		}
 	}
 
-	g_string_sprintf(message, "mv -f %s %s", path, dest);
-	if (system(message->str) == 0)
+	argv[2] = path;
+	argv[3] = dest;
+
+	if (fork_exec_wait(argv) == 0)
 	{
 		g_string_sprintf(message, "+%s", path);
 		g_string_truncate(message, leaf - path);
@@ -723,6 +731,7 @@ static gboolean do_link(char *path, char *dest)
 }
 
 /* Mount/umount this item */
+/* XXX: Spaces? */
 static void do_mount(FilerWindow *filer_window, DirItem *item)
 {
 	char		*command;

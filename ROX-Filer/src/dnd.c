@@ -914,7 +914,7 @@ static void run_with_files(char *path, GSList *uri_list)
 	
 	argv[argc++] = NULL;
 
-	if (!spawn_full(argv, getenv("HOME"), 0))
+	if (!spawn_full(argv, getenv("HOME")))
 		delayed_error("ROX-Filer", "Failed to fork() child process");
 }
 

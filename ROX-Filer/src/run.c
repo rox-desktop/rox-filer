@@ -38,7 +38,7 @@ void run_app(char *path)
 	apprun = g_string_new(path);
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
-	if (!spawn_full(argv, getenv("HOME"), 0))
+	if (!spawn_full(argv, getenv("HOME")))
 		report_error("ROX-Filer", "Failed to fork() child process");
 	
 	g_string_free(apprun, TRUE);

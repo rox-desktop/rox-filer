@@ -29,6 +29,7 @@
 #include <pwd.h>
 #include <grp.h>
 #include <fcntl.h>
+#include <sys/wait.h>
 
 #include <glib.h>
 
@@ -95,13 +96,13 @@ char *our_host_name()
 /* fork() and run a new program.
  * Returns the new PID, or 0 on failure.
  */
-int spawn(char **argv)
+pid_t spawn(char **argv)
 {
-	return spawn_full(argv, NULL, 0);
+	return spawn_full(argv, NULL);
 }
 
 /* As spawn(), but cd to dir first (if dir is non-NULL) */
-int spawn_full(char **argv, char *dir, SpawnFlags flags)
+pid_t spawn_full(char **argv, char *dir)
 {
 	int	child;
 	
@@ -201,3 +202,28 @@ char *format_size(unsigned long size)
 
 	return buffer;
 }
+
+/* Fork and exec argv. Wait and return the child's exit status.
+ * -1 if spawn fails.
+ */
+int fork_exec_wait(char **argv)
+{
+	pid_t	child;
+	int	status = -1;
+	
+	child = spawn_full(argv, NULL);
+
+	while (child)
+	{
+		if (waitpid(child, &status, 0) == -1)
+		{
+			if (errno != EINTR)
+				return -1;
+		}
+		else
+			break;
+	};
+
+	return status;
+}
+

@@ -223,7 +223,7 @@ gboolean type_open(char *path, MIME_type *type)
 	else
 		argv[0] = open;
 
-	if (!spawn_full(argv, getenv("HOME"), 0))
+	if (!spawn_full(argv, getenv("HOME")))
 	{
 		report_error("ROX-Filer",
 				"Failed to fork() child process");

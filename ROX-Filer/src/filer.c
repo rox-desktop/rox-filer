@@ -1091,7 +1091,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 
 				argv[0] = full_path;
 
-				if (spawn_full(argv, getenv("HOME"), 0))
+				if (spawn_full(argv, getenv("HOME")))
 				{
 					if (close_window)
 					{

@@ -631,6 +631,7 @@ static gboolean copy_cb(char *initial, char *path)
 
 	command = g_string_new(NULL);
 	g_string_sprintf(command, "cp -a %s %s", initial, path);
+	/* XXX: Use system. In fact, use action! */
 
 	if (system(command->str))
 	{
@@ -1142,7 +1143,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	if (!spawn_full(argv, window_with_focus->path, 0))
+	if (!spawn_full(argv, window_with_focus->path))
 		report_error("ROX-Filer", "Failed to fork() child "
 					"process");
 }

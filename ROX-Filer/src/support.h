@@ -16,11 +16,12 @@ typedef enum {NONE} SpawnFlags;
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
-int spawn(char **argv);
-int spawn_full(char **argv, char *dir, SpawnFlags flags);
+pid_t spawn(char **argv);
+pid_t spawn_full(char **argv, char *dir);
 void debug_free_string(void *data);
 char *user_name(uid_t uid);
 char *group_name(gid_t gid);
 char *format_size(unsigned long size);
+int fork_exec_wait(char **argv);
 
 #endif /* _SUPPORT_H */
