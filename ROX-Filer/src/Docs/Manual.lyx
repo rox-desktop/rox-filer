@@ -1,4 +1,4 @@
-#This file was created by <tal197> Fri Apr 14 10:40:15 2000
+#This file was created by <tal197> Fri Apr 14 15:40:53 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -625,7 +625,13 @@ Each object in the directory is shown as a large icon with its name below.
 \newline 
 Small Icons
 \newline 
-Each entry is shown as the top part of its icon with the name beside it.
+Items are drawn smaller that usual, allowing you to see more files at once.
+\latex latex 
+
+\backslash 
+dag
+\latex default 
+
 \newline 
 Full Info
 \newline 
@@ -660,6 +666,23 @@ Rereads the contents of the directory and details of all the files in it.
 
 \newline 
 Use this if the display becomes out-of-date.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+dag{}
+\latex default 
+If ROX-Filer was unable to find ImLib
+\begin_inset LatexCommand \cite{ImLib}
+
+\end_inset 
+
+ when it was compiled then the icons are shown cropped rather than scaled.
+ Get ImLib and recompile if you want it to look nice.
 \layout Subsubsection
 
 
@@ -2361,7 +2384,7 @@ The ROX Choices system
 \emph on 
 Enlightenment,
 \emph toggle 
- <http://www.enlightenment.org> 
+ <http://www.enlightenment.org>
 \layout Bibliography
 \bibitem {PODFUK}
 
@@ -2370,4 +2393,12 @@ Enlightenment,
 POrtable Dodgy Filesystems in Userland (hacK), 
 \emph toggle 
 <http://atrey.karlin.mff.cuni.cz/~pavel/podfuk/podfuk.html>
+\layout Bibliography
+\bibitem {ImLib}
+
+
+\emph on 
+ImLib
+\emph toggle 
+, <http://www.labs.redhat.com/imlib/>
 \the_end

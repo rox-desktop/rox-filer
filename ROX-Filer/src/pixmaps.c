@@ -84,7 +84,9 @@ static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
+#ifdef HAVE_IMLIB
 static GdkImlibImage *make_half_size(GdkImlibImage *big);
+#endif
 
 
 /****************************************************************
@@ -231,8 +233,8 @@ static MaskedPixmap *image_from_file(char *path)
 
 	if (!pixmap)
 		return NULL;
-	width = ((GdkPixmapPrivate *) mp->pixmap)->width;
-	height = ((GdkPixmapPrivate *) mp->pixmap)->height;
+	width = ((GdkPixmapPrivate *) pixmap)->width;
+	height = ((GdkPixmapPrivate *) pixmap)->height;
 #endif
 
 	mp = g_new(MaskedPixmap, 1);

@@ -423,6 +423,7 @@ char *pretty_time(time_t *time)
 #  define O_NOFOLLOW 0x0
 #endif
 
+#ifdef HAVE_LIBVFS
 /* Copy data from 'read_fd' FD to 'write_fd' FD until EOF or error.
  * Returns 0 on success, -1 on error (and sets errno).
  */
@@ -448,6 +449,7 @@ static int copy_fd(int read_fd, int write_fd)
 
 	return got;
 }
+#endif
 
 /* 'from' and 'to' are complete pathnames of files (not dirs or symlinks).
  * This spawns 'cp' to do the copy if lstat() succeeds, otherwise we

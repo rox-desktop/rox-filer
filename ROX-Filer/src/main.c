@@ -61,7 +61,11 @@ int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
 char *home_dir;
 
-#define VERSION "ROX-Filer 0.1.19\n"					\
+/* Static prototypes */
+static void show_features(void);
+
+
+#define VERSION "ROX-Filer 0.1.20\n"					\
 		"Copyright (C) 2000 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
 		"to the extent permitted by law.\n"			\
@@ -200,6 +204,7 @@ int main(int argc, char **argv)
 				break;
 			case 'v':
 				printf(VERSION);
+				show_features();
 				return EXIT_SUCCESS;
 			case 'h':
 				printf(HELP);
@@ -300,4 +305,23 @@ int main(int argc, char **argv)
 	gtk_main();
 
 	return EXIT_SUCCESS;
+}
+
+static void show_features(void)
+{
+	g_printerr("\n-- features set at compile time --\n\n");
+	g_printerr("VFS support... "
+#ifdef HAVE_LIBVFS
+		"Yes"
+#else
+		"No (couldn't find a valid libvfs)"
+#endif
+		"\n");
+	g_printerr("ImLib support... "
+#ifdef HAVE_IMLIB
+		"Yes"
+#else
+		"No (the imlib-config command didn't work)"
+#endif
+		"\n");
 }
