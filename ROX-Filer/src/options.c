@@ -80,32 +80,21 @@ static GtkTooltips *option_tooltips = NULL;
 /* The Options window. NULL if not yet created. */
 static GtkWidget *window = NULL;
 
-typedef struct _ParseContext ParseContext;
-
-/* What tag we are in.
- * Also used for the widget_type.
- */
+/* The various widget types */
 typedef enum {
-	PARSE_TOPLEVEL,
-	PARSE_OPTIONS,
-	PARSE_SECTION,
-	PARSE_HBOX,
-	PARSE_MENU,
-	PARSE_ITEM,
-	PARSE_RADIO_GROUP,
-	PARSE_RADIO,
-	PARSE_TOGGLE,
-	PARSE_ENTRY,
-	PARSE_SLIDER,
-	PARSE_COLOUR,
-	PARSE_LABEL,
-	PARSE_TOOLS,
-	PARSE_UNKNOWN,
-} ParserState;
+	OPTION_MENU,
+	OPTION_ITEM,
+	OPTION_RADIO_GROUP,
+	OPTION_TOGGLE,
+	OPTION_ENTRY,
+	OPTION_SLIDER,
+	OPTION_COLOUR,
+	OPTION_TOOLS,
+} OptionType;
 
 struct _Option {
 	GtkWidget	*widget;	/* NULL => No widget yet */
-	ParserState	widget_type;
+	OptionType	widget_type;
 	guchar		*value;
 	OptionChanged	*changed_cb;
 	gboolean	save;		/* Save to options file */
@@ -126,7 +115,7 @@ static GList *saver_callbacks = NULL;
 static void save_options(GtkWidget *widget, gpointer data);
 static char *process_option_line(guchar *line);
 static void build_options_window(void);
-static GtkWidget *build_frame(ParseContext *context);
+static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
 static Option *new_option(guchar *key, OptionChanged *changed);
 static guchar *tools_to_list(GtkWidget *hbox);
@@ -268,32 +257,6 @@ static Option *new_option(guchar *key, OptionChanged *changed)
 	return option;
 }
 
-struct _ParseContext {
-	GList		*state;		/* First item is current state */
-	GtkWidget	*vbox, *hbox, *option_menu;
-	GString		*data;
-	GtkWidget	*prev_radio;
-	GtkAdjustment	*adj;
-	guchar		*section, *label, *radio_group, *value;
-	gboolean	fixed;
-	gboolean	showvalue;
-	Option		*option;
-};
-
-static ParseContext context;
-
-static CHAR *get_attr(const CHAR **attrs, char *name)
-{
-	while (attrs && *attrs)
-	{
-		if (strcmp(*attrs, name) == 0)
-			return (guchar *) attrs[1];
-		attrs += 2;
-	}
-
-	return NULL;
-}
-
 static GtkColorSelectionDialog *current_csel_box = NULL;
 
 static void set_to_null(gpointer *data)
@@ -354,340 +317,182 @@ static void open_coloursel(GtkWidget *ok, GtkWidget *button)
 	gtk_widget_show(dialog);
 }
 
-static void startElement(void *user_data, const CHAR *name, const CHAR **attrs)
+/* These are used during parsing... */
+typedef struct _xmlNode Node;
+static guchar *section_name = NULL;
+static xmlDocPtr options_doc = NULL;
+
+#define DATA(node) (xmlNodeListGetString(options_doc, node->childs, 1))
+
+static void may_add_tip(GtkWidget *widget, Node *element)
 {
-	ParserState old = (ParserState) context.state->data;
-	ParserState new = PARSE_UNKNOWN;
+	guchar	*data, *tip;
 
-	g_string_truncate(context.data, 0);
-	
-	if (old == PARSE_TOPLEVEL)
-	{
-		if (strcmp(name, "options") == 0)
-			new = PARSE_OPTIONS;
-	}
-	else if (old == PARSE_OPTIONS)
-	{
-		if (strcmp(name, "section") == 0)
-		{
-			GtkWidget	*hbox;
+	data = DATA(element);
+	if (!data)
+		return;
 
-			if (context.section)
-				gtk_box_pack_start(GTK_BOX(context.vbox),
-							gtk_event_box_new(),
-							FALSE, TRUE, 8);
-			g_free(context.section);
-			context.section = g_strdup(get_attr(attrs, "name"));
-
-			hbox = gtk_hbox_new(FALSE, 4);
-			gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_hseparator_new(), TRUE, TRUE, 0);
-			
-			gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new(_(get_attr(attrs, "title"))),
-				FALSE, TRUE, 0);
-
-			gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_hseparator_new(), TRUE, TRUE, 0);
-
-			gtk_box_pack_start(GTK_BOX(context.vbox), hbox,
-						FALSE, TRUE, 2);
-
-			new = PARSE_SECTION;
-		}
-	}
-	else if (old == PARSE_SECTION || old == PARSE_HBOX)
-	{
-		guchar	*oname;
-
-		oname = get_attr(attrs, "name");
-		if (oname)
-		{
-			Option	*option;
-			guchar	*tmp;
-
-			tmp = g_strconcat(context.section, "_", oname, NULL);
-			option = g_hash_table_lookup(option_hash, tmp);
-
-			if (option)
-				context.option = option;
-			else
-			{
-				context.option = NULL;
-				g_print("No Option for '%s'!\n", tmp);
-			}
-
-			g_free(tmp);
-		}
-		
-		if (strcmp(name, "toggle") == 0)
-		{
-			new = PARSE_TOGGLE;
-			g_free(context.label);
-			context.label = g_strdup(get_attr(attrs, "label"));
-		}
-		else if (strcmp(name, "slider") == 0)
-		{
-			guchar	*fixed;
-			guchar  *showvalue;
-
-			new = PARSE_SLIDER;
-			g_free(context.label);
-			context.label = g_strdup(get_attr(attrs, "label"));
-			context.adj = GTK_ADJUSTMENT(gtk_adjustment_new(0,
-				atoi(get_attr(attrs, "min")),
-				atoi(get_attr(attrs, "max")),
-				1, 10, 0));
-
-			fixed = get_attr(attrs, "fixed");
-			context.fixed = fixed ? atoi(fixed) : 0;
-			showvalue = get_attr(attrs, "showvalue");
-			context.showvalue = showvalue ? atoi(showvalue) : 0;
-		}
-		else if (strcmp(name, "label") == 0)
-			new = PARSE_LABEL;
-		else if (strcmp(name, "hbox") == 0 && !context.hbox)
-		{
-			guchar	*label;
-			
-			new = PARSE_HBOX;
-
-			label = get_attr(attrs, "label");
-			context.hbox = gtk_hbox_new(FALSE, 4);
-			if (label)
-				gtk_box_pack_start(GTK_BOX(context.hbox),
-					gtk_label_new(_(label)),
-					FALSE, TRUE, 4);
-			gtk_box_pack_start(GTK_BOX(context.vbox), context.hbox,
-					FALSE, TRUE, 0);
-		}
-		else if (strcmp(name, "radio-group") == 0)
-		{
-			new = PARSE_RADIO_GROUP;
-
-			g_free(context.radio_group);
-			context.radio_group = g_strdup(get_attr(attrs, "name"));
-			context.prev_radio = NULL;
-		}
-		else if (strcmp(name, "colour") == 0)
-		{
-			g_free(context.label);
-			context.label = g_strdup(get_attr(attrs, "label"));
-
-			new = PARSE_COLOUR;
-		}
-		else if (strcmp(name, "menu") == 0)
-		{
-			GtkWidget	*hbox, *om;
-			GtkWidget	*box = context.hbox;
-
-			if (!box)
-				box = context.vbox;
-
-			hbox = gtk_hbox_new(FALSE, 4);
-			gtk_box_pack_start(GTK_BOX(box), hbox,
-					FALSE, TRUE, 0);
-
-			gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new(_(get_attr(attrs, "label"))),
-				FALSE, TRUE, 0);
-
-			context.option_menu = gtk_option_menu_new();
-			gtk_box_pack_start(GTK_BOX(hbox), context.option_menu,
-					FALSE, TRUE, 0);
-
-			om = gtk_menu_new();
-			gtk_option_menu_set_menu(
-					GTK_OPTION_MENU(context.option_menu),
-					om);
-
-			new = PARSE_MENU;
-		}
-		else if (strcmp(name, "entry") == 0)
-		{
-			new = PARSE_ENTRY;
-			g_free(context.label);
-			context.label = g_strdup(get_attr(attrs, "label"));
-		}
-		else if (strcmp(name, "tool-options") == 0)
-			new = PARSE_TOOLS;
-	}
-	else if (old == PARSE_MENU)
-	{
-		if (strcmp(name, "item") == 0)
-		{
-			GtkWidget	*item, *menu;
-
-			item = gtk_menu_item_new_with_label(
-					_(get_attr(attrs, "label")));
-
-			menu = gtk_option_menu_get_menu(
-					GTK_OPTION_MENU(context.option_menu));
-			gtk_menu_append(GTK_MENU(menu), item);
-			gtk_widget_show_all(menu);
-
-			gtk_object_set_data(GTK_OBJECT(item), "value",
-					g_strdup(get_attr(attrs, "value")));
-
-			new = PARSE_ITEM;
-		}
-	}
-	else if (old == PARSE_RADIO_GROUP)
-	{
-		if (strcmp(name, "radio") == 0)
-		{
-			new = PARSE_RADIO;
-			g_free(context.label);
-			context.label = g_strdup(get_attr(attrs, "label"));
-
-			g_free(context.value);
-			context.value = g_strdup(get_attr(attrs, "value"));
-		}
-	}
-	
-	if (new == PARSE_UNKNOWN)
-		g_warning("Unknown Options.xml tag '%s'\n", name);
-
-	context.state = g_list_prepend(context.state, GINT_TO_POINTER(new));
-}
-
-static void may_add_tip(GtkWidget *widget, guchar *tip)
-{
-	tip = g_strstrip(g_strdup(tip));
+	tip = g_strstrip(g_strdup(data));
+	g_free(data);
 	if (*tip)
 		OPTION_TIP(widget, _(tip));
 	g_free(tip);
 }
 
-static void endElement(void *user_data, const CHAR *name)
+static int get_int(Node *node, guchar *attr)
 {
-	ParserState old = (ParserState) context.state->data;
-	GtkWidget	*box = context.hbox;
+	guchar *txt;
+	int	retval;
 
-	if (!box)
-		box = context.vbox;
+	txt = xmlGetProp(node, attr);
+	if (!txt)
+		return 0;
 
-	if (old == PARSE_TOGGLE)
+	retval = atoi(txt);
+	g_free(txt);
+
+	return retval;
+}
+
+static GtkWidget *build_radio(Node *radio, GtkWidget *box, GtkWidget *prev)
+{
+	GtkWidget	*button;
+	GtkRadioButton	*prev_button = (GtkRadioButton *) prev;
+	guchar		*label;
+
+	label = xmlGetProp(radio, "label");
+
+	button = gtk_radio_button_new_with_label(
+			prev_button ? gtk_radio_button_group(prev_button)
+				    : NULL,
+			_(label));
+	g_free(label);
+
+	gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 0);
+	may_add_tip(button, radio);
+
+	gtk_object_set_data(GTK_OBJECT(button), "value",
+			xmlGetProp(radio, "value"));
+
+	return button;
+}
+
+static void build_menu_item(Node *node, GtkWidget *option_menu)
+{
+	GtkWidget	*item, *menu;
+	guchar		*label;
+
+	g_return_if_fail(strcmp(node->name, "item") == 0);
+
+	label = xmlGetProp(node, "label");
+	item = gtk_menu_item_new_with_label(_(label));
+	g_free(label);
+
+	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
+	gtk_menu_append(GTK_MENU(menu), item);
+	gtk_widget_show_all(menu);
+
+	gtk_object_set_data(GTK_OBJECT(item),
+				"value", xmlGetProp(node, "value"));
+}
+
+static void build_widget(Node *widget, GtkWidget *box)
+{
+	const CHAR *name = widget->name;
+	guchar	*oname;
+	Option	*option;
+	guchar	*label;
+
+	if (strcmp(name, "label") == 0)
+	{
+		GtkWidget *label;
+		guchar *text;
+
+		text = DATA(widget);
+		label = gtk_label_new(_(text));
+		g_free(text);
+
+		gtk_box_pack_start(GTK_BOX(box), label, FALSE, TRUE, 0);
+		return;
+	}
+
+	label = xmlGetProp(widget, "label");
+
+	if (strcmp(name, "hbox") == 0)
+	{
+		GtkWidget *hbox;
+		Node	  *hw;
+
+		hbox = gtk_hbox_new(FALSE, 4);
+		if (label)
+			gtk_box_pack_start(GTK_BOX(hbox),
+				gtk_label_new(_(label)), FALSE, TRUE, 4);
+		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
+
+		for (hw = widget->childs; hw; hw = hw->next)
+			build_widget(hw, hbox);
+
+		g_free(label);
+		return;
+	}
+
+	oname = xmlGetProp(widget, "name");
+	g_return_if_fail(oname != NULL);
+
+	{
+		guchar	*tmp;
+
+		tmp = g_strconcat(section_name, "_", oname, NULL);
+		g_free(oname);
+		option = g_hash_table_lookup(option_hash, tmp);
+		g_free(tmp);
+
+		if (!option)
+		{
+			g_warning("No Option for '%s'!\n", tmp);
+			return;
+		}
+	}
+
+	if (strcmp(name, "toggle") == 0)
 	{
 		GtkWidget	*toggle;
 
-		toggle = gtk_check_button_new_with_label(_(context.label));
-		gtk_box_pack_start(GTK_BOX(box), toggle,
-				FALSE, TRUE, 0);
-		may_add_tip(toggle, context.data->str);
-
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = toggle;
-		}
-	}
-	else if (old == PARSE_ENTRY)
-	{
-		GtkWidget	*hbox;
-		GtkWidget	*entry;
-
-		hbox = gtk_hbox_new(FALSE, 4);
-
-		gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new(_(context.label)),
-				FALSE, TRUE, 0);
-
-		entry = gtk_entry_new();
-		gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
-		may_add_tip(entry, context.data->str);
-
-		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
-
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = entry;
-		}
-	}
-	else if (old == PARSE_RADIO)
-	{
-		GtkWidget	*radio;
-		GtkRadioButton	*prev = (GtkRadioButton *) context.prev_radio;
-
-		radio = gtk_radio_button_new_with_label(
-				prev ? gtk_radio_button_group(prev)
-				     : NULL,
-				_(context.label));
-		gtk_box_pack_start(GTK_BOX(box), radio, FALSE, TRUE, 0);
-		context.prev_radio = radio;
-		may_add_tip(radio, context.data->str);
-
-		g_return_if_fail(context.value != NULL);
-		gtk_object_set_data(GTK_OBJECT(radio), "value", context.value);
-		context.value = NULL;
-	}
-	else if (old == PARSE_RADIO_GROUP)
-	{
-		GtkWidget	*prev = (GtkWidget *) context.prev_radio;
-
-		g_return_if_fail(prev != NULL);
-
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = prev;
-		}
-	}
-	else if (old == PARSE_LABEL)
-	{
-		GtkWidget	*label;
-		guchar		*str;
-
-		str = g_strstrip(g_strdup(context.data->str));
-		label = gtk_label_new(_(str));
-		g_free(str);
-		gtk_box_pack_start(GTK_BOX(box), label, FALSE, TRUE, 0);
-	}
-	else if (old == PARSE_HBOX)
-		context.hbox = NULL;
-	else if (old == PARSE_COLOUR)
-	{
-		GtkWidget	*hbox, *da, *button;
-
-		hbox = gtk_hbox_new(FALSE, 4);
-		gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new(_(context.label)),
-				FALSE, TRUE, 0);
-
-		button = gtk_button_new();
-		da = gtk_drawing_area_new();
-		gtk_drawing_area_size(GTK_DRAWING_AREA(da), 64, 12);
-		gtk_container_add(GTK_CONTAINER(button), da);
-		gtk_signal_connect(GTK_OBJECT(button), "clicked",
-				GTK_SIGNAL_FUNC(open_coloursel), button);
-
-		may_add_tip(button, context.data->str);
+		toggle = gtk_check_button_new_with_label(_(label));
 		
-		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(box), toggle, FALSE, TRUE, 0);
+		may_add_tip(toggle, widget);
 
-		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
-
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = button;
-		}
+		option->widget_type = OPTION_TOGGLE;
+		option->widget = toggle;
 	}
-	else if (old == PARSE_SLIDER)
+	else if (strcmp(name, "slider") == 0)
 	{
-		GtkWidget	*hbox, *slide;
+		GtkAdjustment *adj;
+		GtkWidget *hbox, *slide;
+		int	min, max;
+		int	fixed;
+		int	showvalue;
+
+		min = get_int(widget, "min");
+		max = get_int(widget, "max");
+		fixed = get_int(widget, "fixed");
+		showvalue = get_int(widget, "showvalue");
+
+		adj = GTK_ADJUSTMENT(gtk_adjustment_new(0,
+					min, max, 1, 10, 0));
 
 		hbox = gtk_hbox_new(FALSE, 4);
 		gtk_box_pack_start(GTK_BOX(hbox),
-				gtk_label_new(_(context.label)),
+				gtk_label_new(_(label)),
 				FALSE, TRUE, 0);
 
-		slide = gtk_hscale_new(context.adj);
+		slide = gtk_hscale_new(adj);
 
-		if (context.fixed)
-			gtk_widget_set_usize(slide, context.adj->upper, 24);
-		if (context.showvalue) {
+		if (fixed)
+			gtk_widget_set_usize(slide, adj->upper, 24);
+		if (showvalue)
+		{
 			gtk_scale_set_draw_value(GTK_SCALE(slide), TRUE);
 			gtk_scale_set_value_pos(GTK_SCALE(slide),
 						GTK_POS_LEFT);
@@ -697,27 +502,93 @@ static void endElement(void *user_data, const CHAR *name)
 			gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
 		GTK_WIDGET_UNSET_FLAGS(slide, GTK_CAN_FOCUS);
 
-		may_add_tip(slide, context.data->str);
+		may_add_tip(slide, widget);
 		
-		gtk_box_pack_start(GTK_BOX(hbox), slide,
-				!context.fixed, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(hbox), slide, !fixed, TRUE, 0);
 
 		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
 
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = slide;
-		}
+		option->widget_type = OPTION_SLIDER;
+		option->widget = slide;
 	}
-	else if (old == PARSE_MENU)
+	else if (strcmp(name, "entry") == 0)
 	{
+		GtkWidget	*hbox;
+		GtkWidget	*entry;
+
+		hbox = gtk_hbox_new(FALSE, 4);
+
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
+					FALSE, TRUE, 0);
+
+		entry = gtk_entry_new();
+		gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 0);
+		may_add_tip(entry, widget);
+
+		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
+
+		option->widget_type = OPTION_ENTRY;
+		option->widget = entry;
+	}
+	else if (strcmp(name, "radio-group") == 0)
+	{
+		GtkWidget	*button = NULL;
+		Node		*radio;
+
+		for (radio = widget->childs; radio; radio = radio->next)
+			button = build_radio(radio, box, button);
+
+		option->widget_type = OPTION_RADIO_GROUP;
+		option->widget = button;
+	}
+	else if (strcmp(name, "colour") == 0)
+	{
+		GtkWidget	*hbox, *da, *button;
+
+		hbox = gtk_hbox_new(FALSE, 4);
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
+				FALSE, TRUE, 0);
+
+		button = gtk_button_new();
+		da = gtk_drawing_area_new();
+		gtk_drawing_area_size(GTK_DRAWING_AREA(da), 64, 12);
+		gtk_container_add(GTK_CONTAINER(button), da);
+		gtk_signal_connect(GTK_OBJECT(button), "clicked",
+				GTK_SIGNAL_FUNC(open_coloursel), button);
+
+		may_add_tip(button, widget);
+		
+		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
+
+		option->widget_type = OPTION_COLOUR;
+		option->widget = button;
+	}
+	else if (strcmp(name, "menu") == 0)
+	{
+		GtkWidget	*hbox, *om, *option_menu;
+		Node		*item;
 		GtkWidget	*menu;
 		GList		*list, *kids;
 		int		min_w = 4, min_h = 4;
 
-		menu = gtk_option_menu_get_menu(
-				GTK_OPTION_MENU(context.option_menu));
+		hbox = gtk_hbox_new(FALSE, 4);
+		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
+				FALSE, TRUE, 0);
+
+		option_menu = gtk_option_menu_new();
+		gtk_box_pack_start(GTK_BOX(hbox), option_menu, FALSE, TRUE, 0);
+
+		om = gtk_menu_new();
+		gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), om);
+
+		for (item = widget->childs; item; item = item->next)
+			build_menu_item(item, option_menu);
+
+		menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
 		list = kids = gtk_container_children(GTK_CONTAINER(menu));
 
 		while (kids)
@@ -736,17 +607,14 @@ static void endElement(void *user_data, const CHAR *name)
 
 		g_list_free(list);
 
-		gtk_widget_set_usize(context.option_menu,
+		gtk_widget_set_usize(option_menu,
 				min_w + 50,	/* Else widget doesn't work! */
 				min_h + 4);
 
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = context.option_menu;
-		}
+		option->widget_type = OPTION_MENU;
+		option->widget = option_menu;
 	}
-	else if (old == PARSE_TOOLS)
+	else if (strcmp(name, "tool-options") == 0)
 	{
 		int		i = 0;
 		GtkWidget	*hbox, *tool;
@@ -758,28 +626,54 @@ static void endElement(void *user_data, const CHAR *name)
 
 		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
 
-		if (context.option)
-		{
-			context.option->widget_type = old;
-			context.option->widget = hbox;
-		}
+		option->widget_type = OPTION_TOOLS;
+		option->widget = hbox;
 	}
-	
-	context.state = g_list_remove(context.state, GINT_TO_POINTER(old));
-	g_string_truncate(context.data, 0);
+	else
+		g_warning("Unknown option type '%s'\n", name);
+
+	g_free(label);
 }
 
-static void characters(void *user_data, const CHAR *ch, int len)
+static void build_sections(Node *options, GtkWidget *sections_vbox)
 {
-	guchar	*tmp;
+	Node	*section;
 
-	tmp = g_strndup(ch, len);
-	g_string_append(context.data, tmp);
-	g_free(tmp);
-}
+	g_return_if_fail(strcmp(options->name, "options") == 0);
 
-static xmlEntityPtr getEntity(void *user_data, const CHAR *name) {
-	return xmlGetPredefinedEntity(name);
+	for (section = options->childs; section; section = section->next)
+	{
+		guchar 		*title;
+		GtkWidget	*hbox;
+		Node		*widget;
+
+		title = xmlGetProp(section, "title");
+		section_name = xmlGetProp(section, "name");
+
+		hbox = gtk_hbox_new(FALSE, 4);
+		gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_hseparator_new(), TRUE, TRUE, 0);
+		
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(title)),
+					FALSE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_hseparator_new(), TRUE, TRUE, 0);
+
+		gtk_box_pack_start(GTK_BOX(sections_vbox), hbox,
+					FALSE, TRUE, 2);
+
+		for (widget = section->childs; widget; widget = widget->next)
+			build_widget(widget, sections_vbox);
+
+		g_free(title);
+		g_free(section_name);
+		section_name = NULL;
+
+		if (section->next)
+			gtk_box_pack_start(GTK_BOX(sections_vbox),
+					gtk_event_box_new(), TRUE, TRUE, 8);
+	}
 }
 
 /* Parse ROX-Filer/Options.xml to create the options window.
@@ -787,56 +681,22 @@ static xmlEntityPtr getEntity(void *user_data, const CHAR *name) {
  */
 static void build_options_window(void)
 {
-	xmlSAXHandler 	sax = {
-		NULL,	/* internalSubset */
-		NULL,	/* isStandalone */
-		NULL,	/* hasInternalSubset */
-		NULL,	/* hasExternalSubset */
-		NULL,	/* resolveEntity */
-		getEntity,
-		NULL,	/* entityDecl */
-		NULL,	/* notationDecl */
-		NULL,	/* attributeDecl */
-		NULL,	/* elementDecl */
-		NULL,	/* unparsedEntityDecl */
-		NULL,	/* setDocumentLocator */
-		NULL,	/* startDocument */
-		NULL,	/* endDocument */
-		startElement,
-		endElement,
-		NULL,	/* reference */
-		characters,
-		NULL,	/* ignorableWhitespace */
-		NULL,	/* processingInstruction */
-		NULL,	/* comment */
-		NULL,	/* warning */
-		NULL,	/* error */
-		NULL,	/* fatalError */
-	};
+	GtkWidget *sections_vbox;
+	xmlDocPtr options_doc;
 
-	context.vbox = context.hbox = context.option_menu = NULL;
-	context.prev_radio = NULL;
-	context.adj = NULL;
-	context.radio_group = NULL;
-	context.option = NULL;
+	sections_vbox = build_frame();
 	
-	window = build_frame(&context);
+	options_doc = xmlParseFile(make_path(app_dir, "Options.xml")->str);
+	if (!options_doc)
+	{
+		report_error(PROJECT, "Internal error: Options.xml unreadable");
+		return;
+	}
 
-	context.state = g_list_prepend(NULL, PARSE_TOPLEVEL);
-	context.label = NULL;
-	context.section = NULL;
-	context.value = NULL;
-	context.data = g_string_new(NULL);
+	build_sections(xmlDocGetRootElement(options_doc), sections_vbox);
 
-	xmlSAXParseFile(&sax, make_path(app_dir, "Options.xml")->str, 0);
-	if ((ParserState) context.state->data != PARSE_TOPLEVEL)
-		g_warning("Failed to parse Options.xml file!\n");
-
-	g_free(context.section);
-	g_free(context.label);
-	g_free(context.radio_group);
-	g_free(context.value);
-	g_string_free(context.data, TRUE);
+	xmlFreeDoc(options_doc);
+	options_doc = NULL;
 }
 
 static void null_widget(gpointer key, gpointer value, gpointer data)
@@ -857,11 +717,12 @@ static void options_destroyed(GtkWidget *widget, gpointer data)
 }
 
 /* Creates the window and adds the various buttons to it.
- * context->vbox becomes the box to add sections to.
+ * Returns the vbox to add sections to and sets the global
+ * 'window'.
  */
-static GtkWidget *build_frame(ParseContext *context)
+static GtkWidget *build_frame(void)
 {
-	GtkWidget	*window;
+	GtkWidget	*sections_vbox;
 	GtkWidget	*tl_vbox, *scrolled_area;
 	GtkWidget	*border, *label;
 	GtkWidget	*actions, *button;
@@ -891,8 +752,8 @@ static GtkWidget *build_frame(ParseContext *context)
 	gtk_scrolled_window_add_with_viewport(
 			GTK_SCROLLED_WINDOW(scrolled_area), border);
 
-	context->vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(border), context->vbox);
+	sections_vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_add(GTK_CONTAINER(border), sections_vbox);
 	
 	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
@@ -940,7 +801,7 @@ static GtkWidget *build_frame(ParseContext *context)
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 		GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(window));
 
-	return window;
+	return sections_vbox;
 }
 
 /* Process one line from the options file (\0 term'd).
@@ -1090,28 +951,28 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 
 	switch (option->widget_type)
 	{
-		case PARSE_TOGGLE:
+		case OPTION_TOGGLE:
 			new = g_strdup_printf("%d",
 				gtk_toggle_button_get_active(
 					GTK_TOGGLE_BUTTON(widget)));
 			break;
-		case PARSE_ENTRY:
+		case OPTION_ENTRY:
 			new = gtk_editable_get_chars(GTK_EDITABLE(widget),
 					0, -1);
 			break;
-		case PARSE_SLIDER:
+		case OPTION_SLIDER:
 			new = g_strdup_printf("%f",
 				gtk_range_get_adjustment(
 					GTK_RANGE(widget))->value);
 			break;
-		case PARSE_RADIO_GROUP:
+		case OPTION_RADIO_GROUP:
 			new = radio_group_get_value(GTK_RADIO_BUTTON(widget));
 			break;
-		case PARSE_MENU:
+		case OPTION_MENU:
 			new = g_strdup(option_menu_get(
 						GTK_OPTION_MENU(widget)));
 			break;
-		case PARSE_COLOUR:
+		case OPTION_COLOUR:
 			style = GTK_BIN(widget)->child->style;
 
 			new = g_strdup_printf("#%04x%04x%04x",
@@ -1119,7 +980,7 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 					style->bg[GTK_STATE_NORMAL].green,
 					style->bg[GTK_STATE_NORMAL].blue);
 			break;
-		case PARSE_TOOLS:
+		case OPTION_TOOLS:
 			new = tools_to_list(widget);
 			break;
 		default:
@@ -1278,30 +1139,30 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 
 	switch (option->widget_type)
 	{
-		case PARSE_TOGGLE:
+		case OPTION_TOGGLE:
 			gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(widget),
 					atoi(option->value));
 			break;
-		case PARSE_ENTRY:
+		case OPTION_ENTRY:
 			gtk_entry_set_text(GTK_ENTRY(widget), option->value);
 			break;
-		case PARSE_RADIO_GROUP:
+		case OPTION_RADIO_GROUP:
 			radio_group_set_value(GTK_RADIO_BUTTON(widget),
 						option->value);
 			break;
-		case PARSE_SLIDER:
+		case OPTION_SLIDER:
 			gtk_adjustment_set_value(
 				gtk_range_get_adjustment(GTK_RANGE(widget)),
 				atoi(option->value));
 			break;
-		case PARSE_MENU:
+		case OPTION_MENU:
 			option_menu_set(GTK_OPTION_MENU(widget), option->value);
 			break;
-		case PARSE_COLOUR:
+		case OPTION_COLOUR:
 			gdk_color_parse(option->value, &colour);
 			button_patch_set_colour(widget, &colour);
 			break;
-		case PARSE_TOOLS:
+		case OPTION_TOOLS:
 			disable_tools(widget, option->value);
 			break;
 		default:

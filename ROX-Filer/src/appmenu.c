@@ -164,6 +164,9 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 			option = xmlGetProp(node, "option");
 			current_items = g_list_prepend(current_items,
 					create_menu_item(label, option));
+
+			g_free(label);
+			g_free(option);
 		}
 	}
 
