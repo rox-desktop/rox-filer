@@ -75,6 +75,8 @@ struct _FilerWindow
 	GtkWidget	*scrollbar;
 
 	gint		open_timeout;	/* Will resize and show window... */
+
+	GtkStateType	selection_state;	/* for drawing selection */
 };
 
 extern FilerWindow 	*window_with_focus;

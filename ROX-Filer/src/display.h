@@ -60,6 +60,7 @@ void draw_string(GtkWidget *widget,
 		int 	y,
 		int 	width,
 		int	area_width,
+		GtkStateType selection_state,
 		gboolean selected,
 		gboolean box);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);

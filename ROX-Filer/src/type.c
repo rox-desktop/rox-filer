@@ -998,7 +998,7 @@ char *get_action_save_path(GtkWidget *dialog)
 			if (get_choice(PROJECT,
 				_("A run action already exists and is quite "
 				"a big program - are you sure you want to "
-				"delete it?"), 2, "Delete", "Cancel") != 0)
+				"delete it?"), 2, "Cancel", "Delete") != 1)
 			{
 				g_free(path);
 				path = NULL;

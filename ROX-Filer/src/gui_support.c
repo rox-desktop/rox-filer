@@ -93,6 +93,7 @@ void gui_support_init()
 	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
 }
 
+#ifndef GTK2
 static void choice_clicked(GtkWidget *widget, gpointer number)
 {
 	int	*choice_return;
@@ -103,6 +104,7 @@ static void choice_clicked(GtkWidget *widget, gpointer number)
 	if (choice_return)
 		*choice_return = GPOINTER_TO_INT(number);
 }
+#endif
 
 /* Open a modal dialog box showing a message.
  * The user can choose from a selection of buttons at the bottom.
@@ -117,12 +119,14 @@ int get_choice(char *title,
 	       int number_of_buttons, ...)
 {
 	GtkWidget	*dialog;
-	GtkWidget	*vbox, *action_area, *separator;
-	GtkWidget	*text, *text_container;
-	GtkWidget	*button = NULL, *default_button;
+	GtkWidget	*button = NULL;
 	int		i, retval;
 	va_list	ap;
+#ifndef GTK2
+	GtkWidget	*vbox, *action_area, *separator;
+	GtkWidget	*text, *text_container;
 	int		choice_return;
+#endif
 
 	if (current_dialog)
 	{
@@ -131,11 +135,17 @@ int get_choice(char *title,
 		return -1;
 	}
 
+#ifdef GTK2
+	current_dialog = dialog = gtk_message_dialog_new(NULL,
+					GTK_DIALOG_MODAL,
+					GTK_MESSAGE_QUESTION,
+					GTK_BUTTONS_NONE,
+					"%s", message);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+#else
 	current_dialog = dialog = gtk_window_new(GTK_WINDOW_DIALOG);
 	GTK_WIDGET_UNSET_FLAGS(dialog, GTK_CAN_FOCUS);
 	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-	gtk_window_set_title(GTK_WINDOW(dialog), title);
-	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
 	gtk_container_set_border_width(GTK_CONTAINER(dialog), 2);
 
 	vbox = gtk_vbox_new(FALSE, 0);
@@ -157,12 +167,16 @@ int get_choice(char *title,
 	gtk_box_pack_start(GTK_BOX(vbox),
 			text_container,
 			TRUE, TRUE, 0);
+#endif
 
 	va_start(ap, number_of_buttons);
 
-	default_button = NULL;
 	for (i = 0; i < number_of_buttons; i++)
 	{
+#ifdef GTK2
+		button = gtk_dialog_add_button(GTK_DIALOG(current_dialog),
+				va_arg(ap, char *), i);
+#else
 		button = gtk_button_new_with_label(va_arg(ap, char *));
 		GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 		gtk_misc_set_padding(GTK_MISC(GTK_BIN(button)->child), 16, 2);
@@ -171,17 +185,26 @@ int get_choice(char *title,
 		gtk_box_pack_start(GTK_BOX(action_area), button, TRUE, TRUE, 0);
 		gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(i));
-		if (!default_button)
-			default_button = button;
+#endif
 	}
 
-	gtk_window_set_focus(GTK_WINDOW(dialog), default_button);
-	gtk_window_set_default(GTK_WINDOW(dialog), default_button);
-	gtk_container_set_focus_child(GTK_CONTAINER(action_area),
-			default_button);
+	gtk_window_set_title(GTK_WINDOW(dialog), title);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+
+	gtk_window_set_focus(GTK_WINDOW(dialog), button);
+	gtk_window_set_default(GTK_WINDOW(dialog), button);
+#ifndef GTK2
+	gtk_container_set_focus_child(GTK_CONTAINER(action_area), button);
+#endif
 
 	va_end(ap);
 
+#ifdef GTK2
+	retval = gtk_dialog_run(GTK_DIALOG(dialog));
+	if (retval == GTK_RESPONSE_NONE)
+		retval = -1;
+	gtk_widget_destroy(dialog);
+#else
 	gtk_object_set_data(GTK_OBJECT(dialog), "choice_return",
 				&choice_return);
 	gtk_signal_connect(GTK_OBJECT(dialog), "destroy",
@@ -198,6 +221,7 @@ int get_choice(char *title,
 
 	if (retval != -1)
 		gtk_widget_destroy(dialog);
+#endif
 
 	current_dialog = NULL;
 

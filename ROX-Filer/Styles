@@ -2,6 +2,12 @@ style "filer"
 {
         bg[NORMAL] = { 0.95, 0.95, 0.95}
         fg[NORMAL] = { 0.0, 0.0, 0.0 }
+	/*
+	 * Used for selected items when the filer does NOT own
+	 * the primary selection.
+	 */
+        bg[INSENSITIVE] = { 0.75, 0.75, 0.75 }
+        fg[INSENSITIVE] = { 0.0, 0.0, 0.0 }
 }
 
 class "Collection" style "filer"

@@ -520,18 +520,19 @@ void draw_string(GtkWidget *widget,
 		int 	y,
 		int 	width,		/* Width of the full string */
 		int	area_width,	/* Width available for drawing in */
+		GtkStateType selection_state,
 		gboolean selected,
 		gboolean box)
 {
 	int		text_height = font->ascent + font->descent;
 	GdkRectangle	clip;
 	GdkGC		*gc = selected
-			? widget->style->fg_gc[GTK_STATE_SELECTED]
+			? widget->style->fg_gc[selection_state]
 			: type_gc;
 	
 	if (selected && box)
 		gtk_paint_flat_box(widget->style, widget->window, 
-				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
+				selection_state, GTK_SHADOW_NONE,
 				NULL, widget, "text",
 				x, y - font->ascent,
 				MIN(width, area_width),
@@ -1185,6 +1186,7 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 			x, y,
 			w,
 			width,
+			filer_window->selection_state,
 			selected, TRUE);
 
 	if (item->lstat_errno)
@@ -1199,7 +1201,8 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 		/* Underline the effective permissions */
 		gdk_draw_rectangle(widget->window,
 				selected
-				? widget->style->fg_gc[GTK_STATE_SELECTED]
+				? widget->style->fg_gc[
+					filer_window->selection_state]
 				: type_gc,
 				TRUE,
 				x - 1 + fixed_width * perm_offset,
@@ -1346,6 +1349,7 @@ static void draw_item(GtkWidget *widget,
 				template.leafname.y + item_font->ascent,
 				template.leafname.width,
 				template.leafname.width,
+				filer_window->selection_state,
 				selected, TRUE);
 		draw_string(widget,
 				item_font,
@@ -1355,6 +1359,7 @@ static void draw_item(GtkWidget *widget,
 					item_font->descent,
 				MAX(w, template.leafname.width),
 				template.leafname.width,
+				filer_window->selection_state,
 				selected, TRUE);
 	}
 	else
@@ -1365,6 +1370,7 @@ static void draw_item(GtkWidget *widget,
 				template.leafname.y + item_font->ascent,
 				item->name_width,
 				template.leafname.width,
+				filer_window->selection_state,
 				selected, TRUE);
 	
 	if (template.details_string)

@@ -315,7 +315,7 @@ static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel)
 		      _("You have tried to close a panel via the window "
 			"manager - I usually find that this is accidental... "
 			"really close?"),
-			2, _("Remove"), _("Cancel")) != 0;
+			2, _("Cancel"), _("Remove")) != 1;
 }
 
 static void panel_destroyed(GtkWidget *widget, Panel *panel)

@@ -73,7 +73,7 @@ GList		*all_filer_windows = NULL;
 #define N_GROUPS 10
 static Group groups[N_GROUPS];
 
-static FilerWindow *window_with_selection = NULL;
+static FilerWindow *window_with_primary = NULL;
 
 /* Item we are about to display a tooltip for */
 static DirItem *tip_item = NULL;
@@ -115,6 +115,7 @@ static void filer_size_for(FilerWindow *filer_window,
 static void group_free(int i);
 
 static void set_unique(guchar *unique);
+static void set_selection_state(FilerWindow *collection, gboolean normal);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -524,8 +525,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
 
-	if (window_with_selection == filer_window)
-		window_with_selection = NULL;
+	if (window_with_primary == filer_window)
+		window_with_primary = NULL;
 	
 	if (window_with_focus == filer_window)
 	{
@@ -605,16 +606,16 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	return TRUE;
 }
 
-/* Another app has grabbed the selection */
+/* The collection widget has lost the primary selection */
 static gint collection_lose_selection(GtkWidget *widget,
 				      GdkEventSelection *event)
 {
-	if (window_with_selection &&
-			window_with_selection->collection == COLLECTION(widget))
+	if (window_with_primary &&
+			window_with_primary->collection == COLLECTION(widget))
 	{
-		FilerWindow *filer_window = window_with_selection;
-		window_with_selection = NULL;
-		collection_clear_selection(filer_window->collection);
+		FilerWindow *filer_window = window_with_primary;
+		window_with_primary = NULL;
+		set_selection_state(filer_window, FALSE);
 	}
 
 	return FALSE;
@@ -687,29 +688,39 @@ static void lose_selection(Collection 	*collection,
 {
 	FilerWindow *filer_window = (FilerWindow *) user_data;
 
-	if (window_with_selection == filer_window)
+	if (window_with_primary == filer_window)
 	{
-		window_with_selection = NULL;
+		window_with_primary = NULL;
 		gtk_selection_owner_set(NULL,
 				GDK_SELECTION_PRIMARY,
 				time);
 	}
 }
 
-static void gain_selection(Collection 	*collection,
-			   guint	time,
-			   gpointer 	user_data)
+static void selection_changed(Collection *collection,
+			      gint time,
+			      gpointer user_data)
 {
 	FilerWindow *filer_window = (FilerWindow *) user_data;
+
+	/* Selection has been changed -- try to grab the primary selection
+	 * if we don't have it.
+	 */
+	if (window_with_primary == filer_window)
+		return;		/* Already got it */
+
+	if (!collection->number_selected)
+		return;		/* Nothing selected */
 
 	if (gtk_selection_owner_set(GTK_WIDGET(collection),
 				GDK_SELECTION_PRIMARY,
 				time))
 	{
-		window_with_selection = filer_window;
+		window_with_primary = filer_window;
+		set_selection_state(filer_window, TRUE);
 	}
 	else
-		collection_clear_selection(filer_window->collection);
+		set_selection_state(filer_window, FALSE);
 }
 
 /* Open the item (or add it to the shell command minibuffer) */
@@ -1223,6 +1234,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	filer_window->toolbar_text = NULL;
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
+	filer_window->selection_state = GTK_STATE_INSENSITIVE;
 
 	/* Finds the entry for this directory in the dir cache, creating
 	 * a new one if needed. This does not cause a scan to start,
@@ -1436,10 +1448,10 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-	gtk_signal_connect(collection, "gain_selection",
-			GTK_SIGNAL_FUNC(gain_selection), filer_window);
 	gtk_signal_connect(collection, "lose_selection",
 			GTK_SIGNAL_FUNC(lose_selection), filer_window);
+	gtk_signal_connect(collection, "selection_changed",
+			GTK_SIGNAL_FUNC(selection_changed), filer_window);
 	gtk_signal_connect(collection, "selection_clear_event",
 			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
 	gtk_signal_connect(collection, "selection_get",
@@ -2106,4 +2118,17 @@ static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item)
 					(GtkFunction) filer_tooltip_activate,
 					filer_window);
 	}
+}
+
+static void set_selection_state(FilerWindow *filer_window, gboolean normal)
+{
+	GtkStateType old_state;
+
+	old_state = filer_window->selection_state;
+	filer_window->selection_state = normal
+			? GTK_STATE_SELECTED : GTK_STATE_INSENSITIVE;
+
+	if (old_state != filer_window->selection_state
+	    && filer_window->collection->number_selected)
+		gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 }
