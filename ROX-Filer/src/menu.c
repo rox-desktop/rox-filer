@@ -549,12 +549,15 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 			else if (file_item->flags & ITEM_FLAG_SYMLINK)
 				shift_action = N_("Show Target");
 			else if (file_item->base_type == TYPE_DIRECTORY)
+			{
 				shift_action = N_("Look Inside");
+				menus = appmenu_query(
+						make_path(filer_window->path,
+						   file_item->leafname)->str,
+						file_item);
+			}
 			else if (file_item->base_type == TYPE_FILE)
 				shift_action = N_("Open As Text");
-
-			menus = appmenu_query(filer_window->path,
-						file_item);
 		}
 		gtk_widget_set_sensitive(file_shift_item,
 					 shift_action != NULL ||

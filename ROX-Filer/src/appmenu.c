@@ -134,20 +134,19 @@ void appmenu_add(AppMenus *dir, GtkWidget *menu)
  * This is the approved interface to appmenu_cache. g_fscache_lookup should
  * preferably never be called on appmenu_cache other than through this
  * function.
- * 'dir' is the directory containing DirItem.
+ * 'app_dir' is the full path of 'app'.
  * Returned value will unref automatically on appmenu_remove().
  */
-AppMenus *appmenu_query(guchar *dir, DirItem *app)
+AppMenus *appmenu_query(guchar *app_dir, DirItem *app)
 {
 	AppMenus *retval;
-	guchar	*tmp, *app_dir;
+	guchar	*tmp;
 
 	/* Is it even an application directory? */
 	if (app->base_type != TYPE_DIRECTORY ||
 			!(app->flags & ITEM_FLAG_APPDIR))
 		return NULL;
 
-	app_dir = g_strconcat(dir, "/", app->leafname, NULL);
 	tmp = g_strconcat(app_dir, "/" APPMENU_FILENAME, NULL);
 	
 	retval = g_fscache_lookup(appmenu_cache, tmp);
@@ -157,10 +156,8 @@ AppMenus *appmenu_query(guchar *dir, DirItem *app)
 	if (retval)
 	{
 		g_free(retval->app_dir);
-		retval->app_dir = app_dir;
+		retval->app_dir = g_strdup(app_dir);
 	}
-	else
-		g_free(app_dir);
 
 	g_free(tmp);
 
