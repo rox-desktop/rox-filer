@@ -163,6 +163,83 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 		g_warning("Failed to find '%s'\n", item->leafname);
 }
 
+/* Resize the filer window to w x h icons (not clamped) */
+static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
+{
+	g_return_if_fail(filer_window != NULL);
+
+	w = filer_window->collection->item_width * MAX(w, 1);
+	h = filer_window->collection->item_height * MAX(h, 1);
+
+	if (filer_window->scrollbar)
+		w += filer_window->scrollbar->allocation.width;
+	
+	if (o_toolbar != TOOLBAR_NONE)
+		h += filer_window->toolbar_frame->allocation.height;
+
+	if (GTK_WIDGET_VISIBLE(filer_window->window))
+		gdk_window_resize(filer_window->window->window, w, h);
+	else
+		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
+						w, h);
+}
+
+static void filer_window_autosize(FilerWindow *filer_window)
+{
+	Collection	*collection = filer_window->collection;
+	int 		n = collection->number_of_items;
+	int 		nx, ny;
+	int 		maxw, maxh;
+
+	/* If there are too many files (or other problems), do
+	 * not resize. n is zero at this time?
+	 */
+	if (GTK_WIDGET_VISIBLE(filer_window->window) || filer_window->scanning)
+		return;
+
+	maxw = (2 * screen_width) / (collection->item_width * 3);
+	maxh = (2 * screen_height) / (collection->item_height * 3);
+
+	/* Taking the requested number of rows as a starting point,
+	 * how many columns would we need?
+	 */
+	ny = MAX(o_initial_window_height, 1);
+	nx = (n + ny - 1) / ny;
+
+	if (nx > maxw)
+	{
+		/* Looks like we'll need more rows, then... */
+
+		nx = MAX(maxw, 1);
+
+		ny = (n + nx - 1) / nx;
+		if (ny > maxh)
+			ny = maxh;
+	}
+
+	filer_window_set_size(filer_window, nx, ny);
+}
+
+/* Called on a timeout while scanning or when scanning ends
+ * (whichever happens first).
+ */
+static gint open_filer_window(FilerWindow *filer_window)
+{
+	if (filer_window->open_timeout)
+	{
+		gtk_timeout_remove(filer_window->open_timeout);
+		filer_window->open_timeout = 0;
+	}
+
+	if (!GTK_WIDGET_VISIBLE(filer_window->window))
+	{
+		filer_window_autosize(filer_window);
+		gtk_widget_show(filer_window->window);
+	}
+
+	return FALSE;
+}
+
 static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
@@ -229,6 +306,7 @@ static void update_display(Directory *dir,
 				filer_window->had_cursor = FALSE;
 			}
 			set_scanning_display(filer_window, FALSE);
+			open_filer_window(filer_window);
 			break;
 		case DIR_UPDATE:
 			for (i = 0; i < items->len; i++)
@@ -829,6 +907,14 @@ FilerWindow *filer_opendir(char *path)
 
 	display_set_layout(filer_window, last_layout);
 
+	/* Open the window after a timeout, or when scanning stops.
+	 * Do this before attaching, because attach() might tell us to
+	 * stop scanning (if a scan isn't needed).
+	 */
+	filer_window->open_timeout = gtk_timeout_add(500,
+					  (GtkFunction) open_filer_window,
+					  filer_window);
+
 	/* The collection is created empty and then attach() is called, which
 	 * links the filer window to the entry in the directory cache we
 	 * looked up / created above.
@@ -845,8 +931,8 @@ FilerWindow *filer_opendir(char *path)
 
 	attach(filer_window);
 
-	/* Make the window visible. Update number_of_windows BEFORE destroying the
-	 * old window!
+	/* Make the window visible. Update number_of_windows BEFORE destroying
+	 * the old window!
 	 */
 	number_of_windows++;
 
@@ -864,8 +950,7 @@ FilerWindow *filer_opendir(char *path)
 	}
 
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
-	gtk_widget_show(filer_window->window);
-
+	
 	return filer_window;
 }
 
@@ -874,8 +959,7 @@ FilerWindow *filer_opendir(char *path)
  */
 static void filer_add_widgets(FilerWindow *filer_window)
 {
-	GtkWidget *hbox, *vbox, *scrollbar, *collection;
-	int	  col_height = ROW_HEIGHT_LARGE * o_initial_window_height;
+	GtkWidget *hbox, *vbox, *collection;
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
@@ -937,8 +1021,10 @@ static void filer_add_widgets(FilerWindow *filer_window)
 				FALSE, TRUE, 0);
 
 	/* Put the scrollbar on the left of everything else... */
-	scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
-	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
+	filer_window->scrollbar =
+			gtk_vscrollbar_new(COLLECTION(collection)->vadj);
+	gtk_box_pack_start(GTK_BOX(hbox),
+			filer_window->scrollbar, FALSE, TRUE, 0);
 
 	/* Connect the menu's accelerator group to the window */
 	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
@@ -947,17 +1033,15 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	gtk_widget_show(hbox);
 	gtk_widget_show(vbox);
-	gtk_widget_show(scrollbar);
+	gtk_widget_show(filer_window->scrollbar);
 	gtk_widget_show(collection);
 
 	gtk_widget_realize(filer_window->window);
 
-	if (o_toolbar != TOOLBAR_NONE)
-		col_height += filer_window->toolbar_frame->allocation.height;
-	
-	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-		filer_window->display_style == LARGE_ICONS ? 400 : 512,
-		col_height);
+	/* XXX: 6 or 8 ? */
+	filer_window_set_size(filer_window,
+			filer_window->display_style == LARGE_ICONS ? 6 : 8,
+			o_initial_window_height);
 }
 
 static void filer_add_signals(FilerWindow *filer_window)
