@@ -647,6 +647,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 static void build_sections(Node *options, GtkWidget *sections_vbox)
 {
 	Node	*section = options->xmlChildrenNode;
+	gboolean need_spacer = FALSE;
 
 	g_return_if_fail(strcmp(options->name, "options") == 0);
 
@@ -658,6 +659,12 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
 
 		if (section->type != XML_ELEMENT_NODE)
 			continue;
+
+		if (need_spacer)
+			gtk_box_pack_start(GTK_BOX(sections_vbox),
+					gtk_event_box_new(), TRUE, TRUE, 8);
+		else
+			need_spacer = TRUE;
 
 		title = xmlGetProp(section, "title");
 		section_name = xmlGetProp(section, "name");
@@ -685,10 +692,6 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
 		g_free(title);
 		g_free(section_name);
 		section_name = NULL;
-
-		if (section->next)
-			gtk_box_pack_start(GTK_BOX(sections_vbox),
-					gtk_event_box_new(), TRUE, TRUE, 8);
 	}
 }
 
