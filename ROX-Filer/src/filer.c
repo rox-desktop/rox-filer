@@ -123,7 +123,7 @@ static gboolean o_sort_nocase = FALSE;
 static gboolean o_single_click = FALSE;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
-static gint	o_small_truncate = 144;
+static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
 static GtkAdjustment *adj_small_truncate;
 static GtkAdjustment *adj_large_truncate;
@@ -400,7 +400,8 @@ static int calc_width(FilerWindow *filer_window, DirItem *item)
                         return MAX_ICON_WIDTH + 12 + 
 				MAX(item->details_width, item->name_width);
 		case SMALL_ICONS:
-			return SMALL_ICON_WIDTH + 12 + item->name_width;
+			w = MIN(item->name_width, o_small_truncate);
+			return SMALL_ICON_WIDTH + 12 + w;
                 default:
 			w = MIN(item->name_width, o_large_truncate);
                         return MAX(pix_width, w) + 4;

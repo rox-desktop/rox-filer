@@ -78,8 +78,8 @@ void choices_init(void)
 
 		dir_list = g_new(gchar *, 4);
 		dir_list[0] = g_strconcat(getenv("HOME"), "/Choices", NULL);
-		dir_list[1] = g_strdup("/usr/local/Choices");
-		dir_list[2] = g_strdup("/usr/Choices");
+		dir_list[1] = g_strdup("/usr/local/share/Choices");
+		dir_list[2] = g_strdup("/usr/share/Choices");
 		dir_list[3] = NULL;
 	}
 
@@ -146,7 +146,7 @@ void choices_free_list(GPtrArray *list)
 /* Get the pathname of a choices file to load. Eg:
  *
  * choices_find_path_load("menus", "ROX-Filer")
- *		 		-> "/usr/local/Choices/ROX-Filer/menus".
+ *		 		-> "/usr/local/share/Choices/ROX-Filer/menus".
  *
  * The return values may be NULL - use built-in defaults - otherwise
  * g_free() the result.

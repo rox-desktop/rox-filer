@@ -830,7 +830,10 @@ static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 
 	collection = COLLECTION(widget);
 
+	/* This doesn't always work - I think Gtk+ may be doing some
+	 * kind of expose-event compression...
 	if (collection->paint_level > PAINT_NORMAL)
+	*/
 		collection_paint(collection, area);
 }
 

@@ -6,15 +6,22 @@
 02-Jun-2000
 ~~~~~~~~~~~
 Made the help button look a bit nicer and changed the Find and Permissions
-action windows to use the icon instead of a text button. Removed the 3D
-borders from the help and toolbar buttons when not selected (looks much
-better!).
+action windows to use the icon instead of a text button.
+Removed the 3D borders from the help and toolbar buttons when not selected
+(looks much better!). Setting a run action by dragging to a symlink now
+dereferences the link (suggested by Ewan Mac Mahon).
+
+Default search path for Choices is now:
+	~/Choices:/usr/local/share/Choices:/usr/share/Choices
+
+Fixed (possibly) a bug which sometimes causes the redraw to miss bits. This
+probably slows everything down, but the next Gtk+ release should do double
+buffering so all this will get changed then...
 
 01-Jun-2000
 ~~~~~~~~~~~
 Added a Help icon to the toolbar, which does the same as choosing `Show
 ROX-Filer Help' from the menu.
-
 
 25-May-2000
 ~~~~~~~~~~~
