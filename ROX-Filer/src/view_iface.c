@@ -53,7 +53,7 @@
  * A ViewIter is used to index items. They are usually allocated
  * on the stack and then initialised using view_get_iter().
  * 
- * Normally, an iterator starts of not pointing at any item, but
+ * Normally, an iterator starts off not pointing at any item, but
  * each call to iter->next(iter) returns the next item, and leaves
  * the iterator pointing at the returned item. If you like the item,
  * you can then pass the iterator to view_cursor_to_iter(), etc.

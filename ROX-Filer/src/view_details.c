@@ -627,7 +627,8 @@ out:
 
 static gint view_details_key_press(GtkWidget *widget, GdkEventKey *event)
 {
-	if (event->keyval == GDK_Up || event->keyval == GDK_Down)
+	if (event->keyval == GDK_Up || event->keyval == GDK_Down ||
+	    event->keyval == GDK_Prior || event->keyval == GDK_Next)
 		return GTK_WIDGET_CLASS(parent_class)->key_press_event(widget,
 									event);
 	return FALSE;
