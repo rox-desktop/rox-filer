@@ -362,9 +362,19 @@ static void details_get_value(GtkTreeModel *tree_model,
 			break;
 		case COL_BG_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
-			g_value_set_boxed(value, view_item->selected
-					? &style->base[GTK_STATE_SELECTED]
-					: NULL);
+			if (view_item->selected)
+				g_value_set_boxed(value,
+					&style->base[GTK_STATE_SELECTED]);
+			else if (item->flags & ITEM_FLAG_RECENT)
+			{
+				GdkColor prelight;
+				prelight.red = 0xffff;
+				prelight.green = 0xcece;
+				prelight.blue = 0xcece;
+				g_value_set_boxed(value, &prelight);
+			}
+			else
+				g_value_set_boxed(value, NULL);
 			break;
 		case COL_OWNER:
 			g_value_init(value, G_TYPE_STRING);

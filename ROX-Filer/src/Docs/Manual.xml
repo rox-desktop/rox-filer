@@ -694,15 +694,15 @@ $ rox --bottom=</screen>
        Open a new window
        </entry></row><row><entry>
        Magnifying glass</entry><entry>
-       Make icons bigger</entry><entry>
-       Make icons smaller
+       Choose icon size from a menu.</entry><entry>
+       Select Automatic icon sizing and resize the window.
        </entry></row><row><entry>
        List</entry><entry>
        Hide or show extra details</entry><entry>
        Same
        </entry></row><row><entry>
-       Crossed out text</entry><entry>
-       Toggle the display of hidden file (those with names starting with a dot)</entry><entry>
+       Eye</entry><entry>
+       Toggle the display of hidden files (those with names starting with a dot)</entry><entry>
        Same
        </entry></row><row><entry>
        Life-belt</entry><entry>
@@ -787,100 +787,63 @@ $ rox --bottom=</screen>
       <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 
       <tbody>
-       <row><entry><guimenuitem>Huge Icons</guimenuitem></entry><entry>
-         Extra large icons (mainly useful with thumbnails, see below).
-         </entry></row><row><entry>
+       <row><entry><guimenuitem>Icons View</guimenuitem></entry><entry>
+       Files are displayed as rows of icons.
+       </entry></row>
 
-         <guimenuitem>Large Icons</guimenuitem></entry><entry>
-         Each object in the directory is shown as a large icon with its name
-         below.
-         </entry></row><row><entry>
+       <row><entry><guimenuitem>Icons, With...</guimenuitem></entry><entry>
+       Files are displayed as rows of icons with additional details
+       (chosen from the submenu). To see fuller information about each file
+       use the List View instead.
+       </entry></row>
 
-         <guimenuitem>Small Icons</guimenuitem></entry><entry>
-         Items are drawn smaller than usual, allowing you to see more files
-         at once.
-         </entry></row><row><entry>
+       <row><entry><guimenuitem>List View</guimenuitem></entry><entry>
+       Show files in a list along with their details. Click on a column heading
+       to sort by that column.
+       </entry></row>
 
-         <guimenuitem>Huge, With...</guimenuitem></entry><entry>
-         As for <guimenuitem>Large, With...</guimenuitem>, but with extra large icons.
-         </entry></row><row><entry>
+       <row><entry><guimenuitem>Bigger Icons</guimenuitem></entry><entry>
+       Increase the size of the icons. Turns of Automatic mode.
+       </entry></row>
 
-         <guimenuitem>Large, With...</guimenuitem></entry><entry>
-         <para>Entries are displayed along with some extra details:</para>
-         <itemizedlist>
+       <row><entry><guimenuitem>Smaller Icons</guimenuitem></entry><entry>
+       Reduce the size of the icons. Turns of Automatic mode.
+       </entry></row>
 
-          <listitem><para><guimenuitem>Summary</guimenuitem>
-            shows the file permissions, owner, group, size and modification time.
-          </para></listitem>
+       <row><entry><guimenuitem>Automatic</guimenuitem></entry><entry>
+       Select a sensbile icon size automatically now and when changing
+       directory, etc.
+       </entry></row>
 
-          <listitem><para><guimenuitem>Sizes</guimenuitem>
-            shows just the size of each file (not directories).
-          </para></listitem>
+       <row><entry><guimenuitem>Sort by XXX</guimenuitem></entry><entry>
+       Set the sort mode. In List View you can also set the sort type by
+       clicking on the column headings.
+       </entry></row>
 
-          <listitem><para><guimenuitem>Permissions</guimenuitem>
-            shows just the permissions and owner.
-          </para></listitem>
+       <row><entry><guimenuitem>Reversed</guimenuitem></entry><entry>
+       Sort in reverse order (newest to oldest, largest to smallest, etc).
+       </entry></row>
 
-          <listitem><para><guimenuitem>Type</guimenuitem>
-            shows the MIME type of each file.
-          </para></listitem>
+       <row><entry><guimenuitem>Show Hidden</guimenuitem></entry><entry>
+       If on, files beginning with a dot are shown, otherwise they are hidden.
+       The titlebar shows <guilabel>(All)</guilabel> when this is on.
+       </entry></row>
 
-          <listitem><para><guimenuitem>Times</guimenuitem>
-            shows the times the file was last accessed, modifed and changed.
-            Reading a file's contents or listing a directory updates the
-            <emphasis>access time</emphasis>; modifying the contents of a file or
-            the list of files in a directory updates the <emphasis>modification
-             time</emphasis>; changing a file's owner or permissions updates the
-            <emphasis>change time</emphasis>.
-          </para></listitem>
+       <row><entry><guimenuitem>Show Thumbnails</guimenuitem></entry><entry>
+       When on, the filer tries to load every image file and use that
+       image as the file's icon. Useful if you have a directory full of
+       photos and can't remember which is which!
+       The thumbnails are saved in <filename>~/.thumbnails</filename> for
+       quick loading next time.
+       While loading thumbnails, a progress bar appears at the bottom of
+       the window. Clicking on the <guibutton>Cancel</guibutton> button
+       beside the bar stops the scan.
+       The titlebar shows <guilabel>(Thumbs)</guilabel> when this is on.
+       </entry></row>
 
-         </itemizedlist>
-
-         </entry></row><row><entry>
-
-         <guimenuitem>Small, With...</guimenuitem></entry><entry>
-         As above, but with a smaller icon and all on one line.
-         </entry></row><row><entry>
-
-         <guimenuitem>Sort by Name</guimenuitem></entry><entry>
-	 Items are arranged by name. The default sort mode is case-insensitive
-	 and deals with numbers sensibly.
-         </entry></row><row><entry>
-
-         <guimenuitem>Sort by Type</guimenuitem></entry><entry>
-         Items are grouped by their types and then sorted by name within the
-         groups.
-         </entry></row><row><entry>
-
-         <guimenuitem>Sort by Date</guimenuitem></entry><entry>
-         Most recently modified first.
-         </entry></row><row><entry>
-
-         <guimenuitem>Sort by Size</guimenuitem></entry><entry>
-         Largest first.
-         </entry></row><row><entry>
-
-         <guimenuitem>Show Hidden</guimenuitem></entry><entry>
-         If on, files beginning with a dot are shown, otherwise they are hidden.
-	 The titlebar shows <guilabel>(All)</guilabel> when this is on.
-         </entry></row><row><entry>
-
-	 <guimenuitem>Show Thumbnails</guimenuitem></entry><entry>
-	 When on, the filer tries to load every image file and use that
-	 image as the file's icon. Useful if you have a directory full of
-	 photos and can't remember which is which!
-	 The thumbnails are saved in <filename>~/.thumbnails</filename> for
-	 quick loading next time.
-	 While loading thumbnails, a progress bar appears at the bottom of
-	 the window. Clicking on the <guibutton>Cancel</guibutton> button
-	 beside the bar stops the scan.
-	 The titlebar shows <guilabel>(Thumbs)</guilabel> when this is on.
-         </entry></row><row><entry>
-
-         <guimenuitem>Refresh</guimenuitem></entry><entry>
-         Rereads the contents of the directory and details of all the files
-         in it. Use this if the display becomes out-of-date.
-
+       <row><entry><guimenuitem>Refresh</guimenuitem></entry><entry>
+       Rereads the contents of the directory and details of all the files
+       in it. Use this if the display becomes out-of-date.
        </entry></row>
     </tbody></tgroup></informaltable>
 
@@ -2315,376 +2278,11 @@ $ rox --bottom=</screen>
 
    </itemizedlist>
 
-   Many of the options in the Options window have tooltips &mdash; hold the
-   mouse pointer over the option to find out what it does.
+   The options in the Options window have tooltips explaining the use of each
+   option &mdash; hold the mouse pointer over an option to find out what it
+   does.
 
   </para>
-
-  <sect1>
-   <title>Translation options</title>
-   <para>
-
-    You can choose which language the filer will display messages in from
-    here, or get it to read the LANG environment variable to get the desired
-    language.
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Filer window options</title>
-   <para>
-
-    <itemizedlist>
-     <listitem><para><guilabel>Automatically resize filer windows</guilabel> can be
-       used to control when windows are automatically resized:
-
-       <itemizedlist>
-        <listitem><para><guilabel>Never automatically resize</guilabel>
-          turns off auto-resizing. Windows must be resized manually.
-        </para></listitem>
-
-        <listitem><para><guilabel>Resize when changing the display style</guilabel>
-	  will resize the window automatically when you change the icon size or
-	  the type of details to be displayed.
-        </para></listitem>
-
-        <listitem><para><guilabel>Always resize</guilabel>
-	  causes the window to resize whenever it seems useful (that is, when
-	  changing to a different directory or when switching between display
-	  styles).
-        </para></listitem>
-       </itemizedlist>
-
-     </para></listitem>
-
-     <listitem><para> <guilabel>Largest window size</guilabel> sets the largest size
-       (as a percentage of the screen size) that the auto-resizer will resize windows
-       to.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Change from Large icons to Small automatically</guilabel>
-       allows the filer to choose the size when changing directory. The
-       switching threshold is set using the number entry below.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Short titlebar flags</guilabel> abbreviates
-     the All, Thumbs and Scanning titlebar indicators to single letters.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Unique windows</guilabel> prevents you from having
-       two windows showing the same directory. Opening a second view onto a directory
-       simply reshows the first one.
-     </para></listitem>
-
-     <listitem><para> <guilabel>New window on button 1</guilabel> swaps the
-       actions of the two non-menu buttons when opening directories. This is
-       provided for people who are used to the RISC OS mouse bindings.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Single-click navigation in filer windows</guilabel>
-       means that clicking on a file or directory will open it. If off, clicking on
-       files selects them instead &mdash; you must double click on a file to open it.
-     </para></listitem>
-
-    </itemizedlist>
-   </para>
-
-   <sect2>
-    <title>Display options</title>
-    <para>
-
-     <itemizedlist>
-
-      <listitem><para><guilabel>Directories always come first</guilabel> means that
-	all directories are sorted and displayed at the top, then all the other items
-	are sorted and displayed below. With this option off, directories are mixed in
-	with the other files.
-      </para></listitem>
-
-      <listitem><para><guilabel>Large wrap width</guilabel> sets the maximum width
-	for a file's name in `Large Icons' display mode before the text will wrap onto
-	two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
-      </para></listitem>
-
-      <listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; in
-	`Small Icons' mode, any text longer than this is chopped off (a red bar
-	indicates that some text is not shown). You can hold the mouse over the
-	truncated name to see the full text.
-      </para></listitem>
-
-      <listitem><para><guilabel>Default settings for new windows</guilabel> &mdash;
-	these options provide the default settings for newly opened
-	windows. They correspond to choosing styles from the
-	<guimenuitem>Display</guimenuitem> menu.
-	If <guilabel>Inherit options from source window</guilabel>
-	is on then opening a new window from an existing window
-	(eg, by clicking the middle button over a directory) gives the new window
-	the same options (icon size, sort order, etc) as the old window. If
-	off, the new window has the default settings chosen here.
-      </para></listitem>
-
-     </itemizedlist>
-    </para>
-   </sect2>
-
-   <sect2><title>Toolbar options</title>
-    <para>
-     The toolbar is described in the <xref linkend="Toolbar"/> section.
-     <itemizedlist>
-      <listitem><para> <guilabel>Unshade the tools you want:</guilabel> allows
-	you to set which tools should appear on the toolbar. Click on the
-	buttons below to shade and unshade them &mdash; shaded tools will not be
-	shown on filer window toolbars.
-      </para></listitem>
-
-      <listitem><para> <guilabel>Toolbar type</guilabel> allows you to choose
-	what kind of toolbars you want.
-	<guimenuitem>None</guimenuitem> means that windows will not have a
-	toolbar,
-	<guimenuitem>Icons only</guimenuitem> provides a small bar of icons,
-	<guimenuitem>Text under icons</guimenuitem> displays larger buttons,
-	with textual labels below, and
-	<guimenuitem>Text beside icons</guimenuitem> displays wider buttons,
-	with textual labels next to the icons.
-      </para></listitem>
-
-      <listitem><para> <guilabel>Show totals of items</guilabel> shows the
-	number of items displayed in a filer window, as well as the number of
-	hidden items (if any) on the toolbar.  When there's a selection, it
-	shows the number of selected items and their combined size (excluding
-	directories).
-      </para></listitem>
-
-     </itemizedlist>
-
-    </para>
-   </sect2>
-
-   <sect2><title>Minibuffers</title>
-    <para>
-     These two options control what happens when you press <keycap>Tab</keycap>
-     in the path entry minibuffer:
-
-     <itemizedlist>
-
-      <listitem><para> <guilabel>Beep if Tab-completion fails</guilabel> &mdash; beep
-       if there is no match, or there are several possible completions, each starting
-       differently.
-      </para></listitem>
-
-      <listitem><para> <guilabel>Beep if there are several matches</guilabel> &mdash;
-       beep if there are several matches, even though some letters were added.
-      </para></listitem>
-
-     </itemizedlist>
-    </para>
-   </sect2>
-  </sect1>
-
-  <sect1>
-   <title>Pinboard options</title>
-   <para>
-    See the <xref linkend="run_pin"/> section for instructions on enabling the
-    pinboard.
-
-    <itemizedlist>
-
-     <listitem><para><guilabel>Colours</guilabel>
-       sets the colours used for the text under the icons, and the background colour
-       (if no background image is set). You can also choose to give the text a
-       shadow, which can help with some backgrounds.
-     </para></listitem>
-
-     <listitem><para><guilabel>Use custom font</guilabel> can be used to set a
-     different font for pinboard icons. If unset, the global default font, as set
-     by your session manager (eg ROX-Session) is used.
-     </para></listitem>
-
-     <listitem><para><guilabel>Single-click to open</guilabel>
-       allows you to open a file or directory just by clicking on it. Hold down
-       <keycap>Control</keycap> to select things. If this is off, clicking selects
-       and double-clicking opens.
-     </para></listitem>
-
-     <listitem><para><guilabel>Keep icons within screen limits</guilabel>
-       prevents icons from going partly off the side of the screen.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Icon grid step</guilabel> controls how finely
-       the icons may be positioned.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Iconified windows</guilabel> controls how the
-       filer deals with iconified (or 'minimised') windows. If
-       <guilabel>Show iconified windows</guilabel> is on then the filer shows
-       an icon on the pinboard for each iconified window. The other two options
-       let you choose the method of placing the icons. See <xref linkend="iconify"/>
-       for details.
-     </para></listitem>
-
-    </itemizedlist>
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Panel options</title>
-   <para>
-
-    If you are using panels (see the <xref linkend="run_pan"/> section)
-    then this section lets you choose which icons will have textual labels
-    underneath them.
-    You can have labels on all icons, on no icons, or on all icons except
-    applications.
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Action window options</title>
-   <para>
-
-    You can choose to start some operations automatically, without waiting
-    for you to click on <guibutton>Quiet</guibutton>.
-    Select each operation that you want to auto-start here. You can also set
-    the default state for each of the options that appear inside action
-    windows.
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Drag-And-Drop options</title>
-   <para>
-
-    <itemizedlist>
-     <listitem><para><guilabel>Allow dragging to icons in filer
-        windows</guilabel> controls what happens when you drop files onto icons
-       in filer windows. If on then drops onto directories will save the data
-       inside the directory, while dropping onto programs will invoke the
-       program on that data. If off then drops anywhere inside a filer window
-       act like drops onto the window background &mdash; that is, the data will
-       be saved into the directory being displayed.
-     </para></listitem>
-
-     <listitem><para><guilabel>Directories spring open</guilabel> controls what
-       happens when you hold a file over a directory while dragging it. If on,
-       the directory will `spring open' after a short pause, allowing you to
-       navigate to any directory during a drag. You can also hold the pointer
-       over the Home and Up buttons on the toolbar for a similar effect. You
-       need to have the previous option enabled for this to have any effect on
-       files displayed in a directory.
-     </para></listitem>
-
-     <listitem><para><guilabel>Spring delay</guilabel> sets how long, in
-       thousanths of a second, the filer will wait before spring opening a
-       directory as described above. If the above option is turned off, then
-       this has no effect.
-     </para></listitem>
-
-     <listitem><para><guilabel>Dragging files with the middle mouse button</guilabel>
-       you can choose whether this displays a menu (like <keycap>Alt</keycap>
-       dragging) or moves the files (like <keycap>Shift</keycap> dragging).
-     </para></listitem>
-
-    </itemizedlist>
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Menu options</title>
-   <para>
-
-    <itemizedlist>
-
-     <listitem><para><guilabel>Menu on button 2</guilabel> swaps the actions
-       of buttons 2 and 3 so that the middle button brings up the menus. This
-       is provided for people who are used to the RISC OS mouse bindings.
-       </para><para>
-       As an alternative to using the options window to put menu on button-2,
-       some people prefer to use the command <command>xmodmap -e "pointer
-	= 1 3 2"</command>, which makes the right mouse button button-2 and
-       the middle one button-3 (this affects all programs, not just
-       <application>ROX-Filer</application>).
-     </para></listitem>
-
-     <listitem><para><guilabel>Size of icons in menus</guilabel> controls the
-       size of the icons in the <guimenuitem>Send To</guimenuitem> and
-       <guimenuitem>New</guimenuitem> menus.</para></listitem>
-
-     <listitem><para><guilabel>Xterm here program</guilabel> is the command
-       used when you choose <guimenuitem>Xterm here</guimenuitem> from the
-       menu. You can replace it with another command such as
-       <command>gnome-terminal</command>, <command>konsole</command>, or
-       anything else.</para></listitem>
-
-    </itemizedlist>
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Types</title>
-   <para>
-     <guilabel>Ignore eXecutable bit for known extensions</guilabel> means that
-     when a file has a known extension (eg <filename>.gif</filename>) the
-     executable bit is ignored. This is useful if you have files on a
-     Windows-type filesystem which are being shown as executable programs.
-     However, it prevents a file such as <filename>script.sh</filename> from
-     being treated as a program.
-     </para><para>
-     The MIME type system used in the filer is described more fully in
-     <xref linkend="types"/>.
-     <itemizedlist>
-      <listitem><para><guibutton>Show name-to-type rules</guibutton>
-        opens the directories containing the files which tell the filer what
-        type to give each file.</para></listitem>
-     </itemizedlist>
-     Make sure you run the `update-mime-database' command after editing the files,
-     and click on the Refresh toolbar button to make the filer read the new
-     settings.
-   </para>
-
-   <sect2><title>Colours</title>
-     <para>
-       <guilabel>Colour files based on their types</guilabel>. If on, each
-       file's name is coloured depending on what kind of thing it is (regular
-       file, directory, executable, etc). You can choose the colours from the
-       list below.
-      </para>
-   </sect2>
-
-  </sect1>
-
-  <sect1><title>Compatibility</title>
-   <para>
-    <itemizedlist>
-     <listitem><para><guilabel>Override window manager control of the pinboard
-and panels</guilabel> may need to be turned on to stop older window managers from
-trying to display the pinboard and panels in a normal window, or from raising them
-when clicked and from doing other odd things.
-     </para></listitem>
-     <listitem><para><guilabel>Pass all backdrop mouse clicks to window manager</guilabel>
-      may be needed if your window manager has important functions on these buttons.
-      Normally, clicking button-3 will display the filer's pinboard menu, and
-      button-1 dragging allows you to select multiple icons.
-     </para></listitem>
-     <listitem><para><application>ROX-Filer</application> uses the standard
-       XDND protocol for drag-and-drop. This protocol recommends that URIs
-       should contain the hostname of the computer that the resource is on so
-       that the program receiving the data can determine whether it can get the
-       data directly or whether it must go via the X-server. However, many
-       older programs (particularly GNOME applications) get confused by the
-       hostname and fail to load the data correctly. If <guilabel>Don't use
-        hostnames</guilabel> is on then the hostname part is omitted and
-       <application>ROX-Filer</application> will work with these applications
-       BUT you can't drag data to a program running on a different machine.
-     </para></listitem>
-
-    </itemizedlist>
-   </para>
-  </sect1>
  </chapter>
 
  <chapter id="types">
@@ -3249,7 +2847,9 @@ when clicked and from doing other odd things.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
-       <listitem><para>start a new filer, even if one already seems to be running. This also prevents the filer from forking (running in the background). This option is only useful for debugging.
+      <listitem><para>start a new filer, even if one already seems to be
+      running. This also prevents the filer from forking (running in the
+      background). This option is mainly useful for debugging.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-o</option></term><term><option>--override</option></term>
@@ -3434,7 +3034,8 @@ EOF</screen>
      <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      or <userinput>Automatic</userinput>.
      <parameter>Details</parameter> is one of <userinput>None</userinput>, <userinput>ListView</userinput>, <userinput>Size</userinput>, <userinput>Type</userinput>, <userinput>Times</userinput> or <userinput>Permissions</userinput>.
-     <parameter>Sort</parameter> is one of <userinput>Name</userinput>, <userinput>Type</userinput>, <userinput>Date</userinput> or <userinput>Size</userinput>.
+     <parameter>Sort</parameter> is one of <userinput>Name</userinput>, <userinput>Type</userinput>, <userinput>Date</userinput>, <userinput>Size</userinput>,
+<userinput>Owner</userinput> or <userinput>Group</userinput>.
      If any of these three option parameters are missing, the default is used.
      <parameter>Class</parameter> can be used to set the WM_CLASS property on the new window. You can
      use this to get your window manager to treat the window specially.

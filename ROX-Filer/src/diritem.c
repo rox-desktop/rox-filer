@@ -47,6 +47,13 @@
 
 static Option o_ignore_exec;
 
+#define RECENT_DELAY (5 * 60)	/* Time in seconds to consider a file recent */
+#define ABOUT_NOW(time) (diritem_recent_time - time < RECENT_DELAY)
+/* If you want to make use of the RECENT flag, make sure this is set to
+ * the current time before calling diritem_restat().
+ */
+time_t diritem_recent_time;
+
 /* Static prototypes */
 static void examine_dir(const guchar *path, DirItem *item);
 
@@ -97,6 +104,8 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		item->mtime = info.st_mtime;
 		item->uid = info.st_uid;
 		item->gid = info.st_gid;
+		if (ABOUT_NOW(item->mtime) || ABOUT_NOW(item->ctime))
+			item->flags |= ITEM_FLAG_RECENT;
 
 		if (S_ISLNK(info.st_mode))
 		{

@@ -87,6 +87,7 @@ void bookmarks_edit(void)
 	GtkTreeSelection *selection;
 	GtkCellRenderer *cell;
 	xmlNode *node;
+	GtkTreeIter iter;
 
 	if (bookmarks_window)
 	{
@@ -167,6 +168,12 @@ void bookmarks_edit(void)
 
 	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
 	gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
+
+	/* Select the first item, otherwise the first click starts edit
+	 * mode, which is very confusing!
+	 */
+	if (gtk_tree_model_get_iter_first(GTK_TREE_MODEL(model), &iter))
+		gtk_tree_selection_select_iter(selection, &iter);
 
 	g_signal_connect(bookmarks_window, "response",
 			 G_CALLBACK(edit_response), model);

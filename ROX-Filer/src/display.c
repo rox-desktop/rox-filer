@@ -376,6 +376,8 @@ void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 	filer_window->show_hidden = hidden;
 
 	filer_detach_rescan(filer_window);	/* (updates titlebar) */
+
+	display_set_actual_size(filer_window, FALSE);
 }
 
 /* Highlight (wink or cursor) this item in the filer window. If the item

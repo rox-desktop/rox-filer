@@ -225,6 +225,7 @@ DirItem *dir_update_item(Directory *dir, const gchar *leafname)
 {
 	DirItem *item;
 	
+	time(&diritem_recent_time);
 	item = insert_item(dir, leafname);
 	dir_merge_new(dir);
 
@@ -558,6 +559,7 @@ static void delayed_notify(Directory *dir)
 /* Stat this item and add, update or remove it.
  * Returns the new/updated item, if any.
  * (leafname may be from the current DirItem item)
+ * Ensure diritem_recent_time is reasonably up-to-date before calling this.
  */
 static DirItem *insert_item(Directory *dir, const guchar *leafname)
 {
@@ -669,6 +671,7 @@ static void set_idle_callback(Directory *dir)
 		dir_set_scanning(dir, TRUE);
 		if (dir->idle_callback)
 			return;
+		time(&diritem_recent_time);
 		dir->idle_callback = gtk_idle_add(recheck_callback, dir);
 	}
 	else
@@ -716,6 +719,7 @@ static void dir_recheck(Directory *dir,
 	dir->pathname = g_strdup(path);
 	g_free(old);
 
+	time(&diritem_recent_time);
 	insert_item(dir, leafname);
 }
 

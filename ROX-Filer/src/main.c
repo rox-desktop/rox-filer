@@ -272,6 +272,7 @@ int main(int argc, char **argv)
 	gtk_init(&argc, &argv);
 	/* Set a default style for the collection widget */
 	gtk_rc_parse_string("style \"rox-default-collection-style\" {\n"
+		"  bg[PRELIGHT] = \"#ffcece\"\n"
 		"  bg[NORMAL] = \"#f3f3f3\"\n"
 		"  fg[NORMAL] = \"#000000\"\n"
 		"  bg[INSENSITIVE] = \"#bfbfbf\"\n"

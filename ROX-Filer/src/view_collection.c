@@ -116,7 +116,6 @@ static void draw_string(GtkWidget *widget,
 		GdkRectangle *area,	/* Area available on screen */
 		int 	width,		/* Width of the full string */
 		GtkStateType selection_state,
-		gboolean selected,
 		gboolean box);
 static void draw_huge_icon(GtkWidget *widget,
 			   GdkRectangle *area,
@@ -326,8 +325,16 @@ static void draw_item(GtkWidget *widget,
 	ViewData *view = (ViewData *) colitem->view_data;
 	ViewCollection	*view_collection = (ViewCollection *) user_data;
 	FilerWindow	*filer_window = view_collection->filer_window;
+	GtkStateType	selection_state;
 
 	g_return_if_fail(view != NULL);
+
+	if (selected)
+		selection_state = filer_window->selection_state;
+	else if (item->flags & ITEM_FLAG_RECENT)
+		selection_state = GTK_STATE_PRELIGHT;
+	else
+		selection_state = GTK_STATE_NORMAL;
 	
 	fill_template(area, colitem, view_collection, &template);
 		
@@ -359,14 +366,14 @@ static void draw_item(GtkWidget *widget,
 	draw_string(widget, view->layout,
 			&template.leafname,
 			view->name_width,
-			filer_window->selection_state,
-			selected, TRUE);
+			selection_state,
+			TRUE);
 	if (view->details)
 		draw_string(widget, view->details,
 				&template.details,
 				template.details.width,
-				filer_window->selection_state,
-				selected, TRUE);
+				selection_state,
+				TRUE);
 }
 
 /* A template contains the locations of the three rectangles (for the icon,
@@ -625,14 +632,14 @@ static void draw_string(GtkWidget *widget,
 		GdkRectangle *area,	/* Area available on screen */
 		int 	width,		/* Width of the full string */
 		GtkStateType selection_state,
-		gboolean selected,
 		gboolean box)
 {
-	GdkGC		*gc = selected
-			? widget->style->fg_gc[selection_state]
-			: type_gc;
+	GdkGC	*gc = (selection_state == GTK_STATE_NORMAL ||
+		       selection_state == GTK_STATE_PRELIGHT)
+			? type_gc
+			: widget->style->fg_gc[selection_state];
 	
-	if (selected && box)
+	if (selection_state != GTK_STATE_NORMAL && box)
 		gtk_paint_flat_box(widget->style, widget->window, 
 				selection_state, GTK_SHADOW_NONE,
 				NULL, widget, "text",
