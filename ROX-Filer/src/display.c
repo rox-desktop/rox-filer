@@ -104,6 +104,20 @@ void display_init()
 	option_add_notify(options_changed);
 }
 
+static void draw_emblem_on_icon(GdkWindow *window, MaskedPixmap *image,
+				int *x, int y)
+{
+	gdk_pixbuf_render_to_drawable_alpha(image->pixbuf,
+				window,
+				0, 0, 				/* src */
+				*x, y,		                /* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
+	
+	*x+=image->width+1;
+}
+
 /* Draw this icon (including any symlink or mount symbol) inside the
  * given rectangle.
  */
@@ -132,29 +146,20 @@ void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
 
-	if (item->flags & ITEM_FLAG_SYMLINK)
-	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
-	}
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted
 					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,		/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		draw_emblem_on_icon(window, mp, &image_x, area->y + 2);
+	}
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
+	}
+	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	{
+		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
 }
 
@@ -189,29 +194,20 @@ void draw_large_icon(GdkWindow *window,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
 
-	if (item->flags & ITEM_FLAG_SYMLINK)
-	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
-	}
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted
 					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		draw_emblem_on_icon(window, mp, &image_x, area->y + 2);
+	}
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 2);
+	}
+	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	{
+		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 2);
 	}
 }
 
@@ -240,29 +236,20 @@ void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
 
-	if (item->flags & ITEM_FLAG_SYMLINK)
-	{
-		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x, area->y + 8,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
-	}
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		MaskedPixmap	*mp = item->flags & ITEM_FLAG_MOUNTED
 					? im_mounted
 					: im_unmounted;
-
-		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				window,
-				0, 0, 				/* src */
-				image_x + 2, area->y + 2,	/* dest */
-				-1, -1,
-				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-				GDK_RGB_DITHER_NORMAL, 0, 0);
+		draw_emblem_on_icon(window, mp, &image_x, area->y + 2);
+	}
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		draw_emblem_on_icon(window, im_symlink, &image_x, area->y + 8);
+	}
+	if (item->flags & ITEM_FLAG_HAS_XATTR)
+	{
+		draw_emblem_on_icon(window, im_xattr, &image_x, area->y + 8);
 	}
 }
 

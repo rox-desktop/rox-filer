@@ -83,6 +83,7 @@ MaskedPixmap *im_symlink;
 MaskedPixmap *im_unmounted;
 MaskedPixmap *im_mounted;
 MaskedPixmap *im_appdir;
+MaskedPixmap *im_xattr;
 
 MaskedPixmap *im_dirs;
 
@@ -940,6 +941,7 @@ static void load_default_pixmaps(void)
 	im_unmounted = mp_from_stock(ROX_STOCK_MOUNT, mount_icon_size);
 	im_mounted = mp_from_stock(ROX_STOCK_MOUNTED, mount_icon_size);
 	im_appdir = load_pixmap("application");
+	im_xattr = load_pixmap("rox-xattr");
 
 	im_dirs = load_pixmap("dirs");
 
