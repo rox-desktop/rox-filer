@@ -74,7 +74,7 @@ case $REPLY in
 	   BINDIR=/usr/local/bin
 	   MANDIR=/usr/local/man
 	   CHOICESDIR=/usr/local/share/Choices
-	   MIMEDIR=/usr/local/share/mime/mime-info
+	   MIMEDIR=/usr/local/share/mime
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
@@ -85,7 +85,7 @@ case $REPLY in
 	   if [ ! -n "$CHOICESDIR" ]; then
 	   	CHOICESDIR=${HOME}/Choices
 	   fi
-	   MIMEDIR=${HOME}/.mime/mime-info
+	   MIMEDIR=${HOME}/.mime
 	   if [ ! -d ${HOME}/man ]; then
 		MANDIR=""
 	   else
@@ -96,7 +96,7 @@ case $REPLY in
 	   BINDIR=/usr/bin
 	   MANDIR=/usr/man
 	   CHOICESDIR=/usr/share/Choices
-	   MIMEDIR=/usr/local/mime/mime-info
+	   MIMEDIR=/usr/local/mime
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
 	   get_dir "/usr/local/apps"
@@ -115,13 +115,13 @@ case $REPLY in
 	   CHOICESDIR="$DIR"
 	   echo
 	   echo "Where should the MIME info file go?"
-	   get_dir "/usr/local/share/mime/mime-info"
+	   get_dir "/usr/local/share/mime"
 	   MIMEDIR="$DIR"
 	   ;;
 	*) die "Invalid choice!";;
 esac
 
-MIMEINFO="${MIMEDIR}/rox.mimeinfo"
+MIMEINFO="${MIMEDIR}/packages/rox.xml"
 
 cat << EOF
 The application directory will be:
@@ -133,7 +133,7 @@ The launcher script will be:
 Icons and run actions will be in:
 	$CHOICESDIR
 
-MIME-info rules will be:
+MIME rules will be:
 	$MIMEINFO
 
 EOF
@@ -186,7 +186,11 @@ done
 cd ..
 
 endir "$MIMEDIR"
-cp rox.mimeinfo "$MIMEINFO" || die "Failed to create $MIMEINFO"
+endir "$MIMEDIR/packages"
+cp rox.xml "$MIMEINFO" || die "Failed to create $MIMEINFO"
+update-mime-database "$MIMEDIR" || die "update-mime-database failed
+Make sure you have installed the shared MIME database from:
+http://www.freedesktop.org/standards/shared-mime-info.html"
 
 echo "Installing application..."
 endir "$APPDIR"
