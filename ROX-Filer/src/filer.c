@@ -111,6 +111,7 @@ static void set_selection_state(FilerWindow *collection, gboolean normal);
 static void filer_next_thumb(GObject *window, const gchar *path);
 static void start_thumb_scanning(FilerWindow *filer_window);
 static void filer_options_changed(void);
+static void set_style_by_number_of_items(FilerWindow *filer_window);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -118,8 +119,9 @@ static GdkCursor *crosshair = NULL;
 /* Indicates whether the filer's display is different to the machine it
  * is actually running on.
  */
-static gboolean not_local=FALSE;
+static gboolean not_local = FALSE;
 
+static Option o_filer_change_size, o_filer_change_size_num;
 static Option o_filer_size_limit, o_short_flag_names;
 Option o_filer_auto_resize, o_unique_filer_windows;
 
@@ -135,6 +137,9 @@ void filer_init(void)
 	option_add_int(&o_unique_filer_windows, "filer_unique_windows", 0);
 
 	option_add_int(&o_short_flag_names, "filer_short_flag_names", FALSE);
+
+	option_add_int(&o_filer_change_size, "filer_change_size", TRUE);
+	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 
 
 	option_add_notify(filer_options_changed);
 
@@ -394,6 +399,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
+		set_style_by_number_of_items(filer_window);
 		filer_window_autosize(filer_window, TRUE);
 		gtk_widget_show(filer_window->window);
 	}
@@ -1189,6 +1195,9 @@ void filer_change_to(FilerWindow *filer_window,
 	collection_set_cursor_item(filer_window->collection, -1);
 
 	attach(filer_window);
+	
+	set_style_by_number_of_items(filer_window);
+
 	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
 		filer_window_autosize(filer_window, TRUE);
 
@@ -1401,9 +1410,9 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	 * collection->number_of_items may be valid after the call to
 	 * attach() returns).
 	 *
-	 * BUT, if the directory was not in the cache (because it hadn't been
-	 * opened it before) then the cached dir will be empty and nothing gets
-	 * added until a while later when some entries are actually available.
+	 * If the directory was not in the cache (because it hadn't been
+	 * opened it before) then the types and icons for the entries are
+	 * not know, but the list of names is.
 	 */
 
 	attach(filer_window);
@@ -2421,4 +2430,30 @@ static void filer_options_changed(void)
 			filer_set_title(filer_window);
 		}
 	}
+}
+
+/* Change to Large or Small icons depending on the number of items
+ * in the directory, subject to options.
+ */
+static void set_style_by_number_of_items(FilerWindow *filer_window)
+{
+	int n;
+	
+	g_return_if_fail(filer_window != NULL);
+
+	if (!o_filer_change_size.int_value)
+		return;		/* Don't auto-set style */
+	
+	if (filer_window->display_style != LARGE_ICONS &&
+	    filer_window->display_style != SMALL_ICONS)
+		return;		/* Only change between these two styles */
+
+	n = filer_window->collection->number_of_items;
+
+	if (n >= o_filer_change_size_num.int_value)
+		display_set_layout(filer_window, SMALL_ICONS,
+				   filer_window->details_type);
+	else
+		display_set_layout(filer_window, LARGE_ICONS,
+				   filer_window->details_type);
 }

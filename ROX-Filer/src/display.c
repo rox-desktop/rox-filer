@@ -79,7 +79,6 @@ Option o_display_show_hidden;
 Option o_display_show_thumbs;
 Option o_display_inherit_options;
 
-
 /* GC for drawing colour filenames */
 static GdkGC	*type_gc = NULL;
 
@@ -157,8 +156,9 @@ void display_init()
 	option_add_int(&o_small_width, "display_small_width", 250);
 	option_add_int(&o_display_show_hidden, "display_show_hidden", FALSE);
 	option_add_int(&o_display_show_thumbs, "display_show_thumbs", FALSE);
-	option_add_int(&o_display_inherit_options,"display_inherit_options",
-								FALSE); 
+	option_add_int(&o_display_inherit_options,
+		       "display_inherit_options", FALSE); 
+
 	option_add_notify(options_changed);
 }
 
@@ -237,7 +237,7 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 			if (view->image)
 				pix_width = view->image->width;
 			else
-				pix_width = HUGE_WIDTH * 3 / 2;
+				pix_width = ICON_WIDTH;
 			*width = MAX(pix_width, view->name_width) + 4;
 			*height = view->name_height + ICON_HEIGHT + 2;
 		}
