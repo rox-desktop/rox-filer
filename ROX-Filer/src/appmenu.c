@@ -154,7 +154,7 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 	g_return_if_fail(current_items == NULL);
 
 	/* Add the menu entries */
-	for (node = node->childs; node; node = node->next)
+	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
 		if (strcmp(node->name, "Item") == 0)
 		{

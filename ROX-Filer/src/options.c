@@ -322,7 +322,7 @@ typedef struct _xmlNode Node;
 static guchar *section_name = NULL;
 static xmlDocPtr options_doc = NULL;
 
-#define DATA(node) (xmlNodeListGetString(options_doc, node->childs, 1))
+#define DATA(node) (xmlNodeListGetString(options_doc, node->xmlChildrenNode, 1))
 
 static void may_add_tip(GtkWidget *widget, Node *element)
 {
@@ -429,7 +429,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 				gtk_label_new(_(label)), FALSE, TRUE, 4);
 		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
 
-		for (hw = widget->childs; hw; hw = hw->next)
+		for (hw = widget->xmlChildrenNode; hw; hw = hw->next)
 			build_widget(hw, hbox);
 
 		g_free(label);
@@ -533,10 +533,10 @@ static void build_widget(Node *widget, GtkWidget *box)
 	else if (strcmp(name, "radio-group") == 0)
 	{
 		GtkWidget	*button = NULL;
-		Node		*radio;
+		Node		*rn;
 
-		for (radio = widget->childs; radio; radio = radio->next)
-			button = build_radio(radio, box, button);
+		for (rn = widget->xmlChildrenNode; rn; rn = rn->next)
+			button = build_radio(rn, box, button);
 
 		option->widget_type = OPTION_RADIO_GROUP;
 		option->widget = button;
@@ -585,7 +585,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 		om = gtk_menu_new();
 		gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), om);
 
-		for (item = widget->childs; item; item = item->next)
+		for (item = widget->xmlChildrenNode; item; item = item->next)
 			build_menu_item(item, option_menu);
 
 		menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
@@ -637,11 +637,11 @@ static void build_widget(Node *widget, GtkWidget *box)
 
 static void build_sections(Node *options, GtkWidget *sections_vbox)
 {
-	Node	*section;
+	Node	*section = options->xmlChildrenNode;
 
 	g_return_if_fail(strcmp(options->name, "options") == 0);
 
-	for (section = options->childs; section; section = section->next)
+	for (; section; section = section->next)
 	{
 		guchar 		*title;
 		GtkWidget	*hbox;
@@ -663,7 +663,8 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
 		gtk_box_pack_start(GTK_BOX(sections_vbox), hbox,
 					FALSE, TRUE, 2);
 
-		for (widget = section->childs; widget; widget = widget->next)
+		widget = section->xmlChildrenNode;
+		for (; widget; widget = widget->next)
 			build_widget(widget, sections_vbox);
 
 		g_free(title);
