@@ -718,7 +718,7 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	int			item = collection->cursor_item;
 	TargetFunc 		cb = filer_window->target_cb;
 	gpointer		data = filer_window->target_data;
-	OpenFlags		flags = OPEN_SAME_WINDOW;
+	OpenFlags		flags = 0;
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
 	if (item < 0 || item >= collection->number_of_items)
@@ -732,6 +732,10 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 
 	if (event->state & GDK_SHIFT_MASK)
 		flags |= OPEN_SHIFT;
+	if (event->state & GDK_MOD1_MASK)
+		flags |= OPEN_CLOSE_WINDOW;
+	else
+		flags |= OPEN_SAME_WINDOW;
 
 	filer_openitem(filer_window, item, flags);
 }

@@ -1074,7 +1074,7 @@ static void perform_action(ViewCollection *view_collection,
 			flags |= OPEN_SHIFT;
 			/* (no break) */
 		case ACT_OPEN_ITEM:
-			if (event->button != 1)
+			if (event->button != 1 || event->state & GDK_MOD1_MASK)
 				flags |= OPEN_CLOSE_WINDOW;
 			else
 				flags |= OPEN_SAME_WINDOW;
