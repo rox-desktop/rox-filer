@@ -268,7 +268,7 @@ void icon_set_selected(Icon *icon, gboolean selected)
 		}
 	}
 
-	icon_set_selected_int(icon, TRUE);
+	icon_set_selected_int(icon, selected);
 }
 
 /* Clear everything, except 'select', which is selected.
