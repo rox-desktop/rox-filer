@@ -118,7 +118,7 @@ GtkTooltips *tooltips = NULL;
        "  -h, --help		display this help and exit\n"		\
        "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
        "  -m, --mime-type=FILE	print MIME type of FILE and exit\n" \
-       "  -n, --new		start a new filer, even if already running\n"  \
+       "  -n, --new		start new copy; for debugging the filer\n"  \
        "  -o, --override	override window manager control of panels\n" \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\

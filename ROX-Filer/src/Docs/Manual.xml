@@ -251,8 +251,6 @@ $ rehash</screen>
    </para><para>
    Note that if the same version of the filer is already running on this
    machine then, by default, it will be used to open the directories.
-   You can override this (perhaps because the old copy has stopped responding for
-   some reason) using the <option>--new</option> option.
    </para><para>
    For a complete list of command-line options, see <xref linkend="manpage"/>
   </para>
@@ -3269,7 +3267,7 @@ when clicked and from doing other odd things.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
-       <listitem><para>start a new filer, even if one already seems to be running. This also prevents the filer from forking (running in the background), which is useful for debugging.
+       <listitem><para>start a new filer, even if one already seems to be running. This also prevents the filer from forking (running in the background). This option is only useful for debugging.
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-o</option></term><term><option>--override</option></term>
