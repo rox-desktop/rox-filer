@@ -140,7 +140,7 @@ static char *import_extensions(char *line)
 	return NULL;
 }
 
-char *basetype_name(FileItem *item)
+char *basetype_name(DirItem *item)
 {
 	if (item->flags & ITEM_FLAG_SYMLINK)
 		return "Sym link";
@@ -244,7 +244,7 @@ gboolean type_open(char *path, MIME_type *type)
  *
  * Note: You must pixmap_unref() the image afterwards.
  */
-MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
+MaskedPixmap *type_to_icon(MIME_type *type)
 {
 	char	*path;
 	char	*type_name;
@@ -278,7 +278,7 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 	g_free(type_name);
 
 	if (path)
-		type->image = load_pixmap_from(window, path);
+		type->image = g_fscache_lookup(pixmap_cache, path);
 
 	if (!type->image)
 	{

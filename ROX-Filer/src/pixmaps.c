@@ -31,6 +31,7 @@
 #include <errno.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include "collection.h"
 
 #include "fscache.h"
@@ -38,7 +39,7 @@
 #include "gui_support.h"
 #include "pixmaps.h"
 
-static GFSCache *pixmap_cache = NULL;
+GFSCache *pixmap_cache = NULL;
 
 static char * bad_xpm[] = {
 "12 12 3 1",
@@ -66,6 +67,7 @@ static void load_default_pixmaps(void);
 static MaskedPixmap *load(char *pathname, gpointer data);
 static void ref(MaskedPixmap *mp, gpointer data);
 static void unref(MaskedPixmap *mp, gpointer data);
+static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 
 
@@ -76,28 +78,15 @@ static gint purge(gpointer data);
 void pixmaps_init(void)
 {
 	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
-					(GFSFunc) ref,
-					(GFSFunc) unref,
+					(GFSRefFunc) ref,
+					(GFSRefFunc) unref,
+					(GFSGetRefFunc) getref,
+					NULL,	/* Update func */
 					NULL);
 
 	gtk_timeout_add(10000, purge, NULL);
 
 	load_default_pixmaps();
-}
-
-/* Try to load the pixmap from the given path, allocate a MaskedPixmap
- * structure for it and return a pointer to the structure. NULL on failure.
- * Remember to pixmap_unref() the result afterwards.
- */
-MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
-{
-	MaskedPixmap	*masked_pixmap;
-	
-	pixmap_cache->user_data = window;
-	masked_pixmap = g_fscache_lookup(pixmap_cache, path);
-	pixmap_cache->user_data = NULL;
-
-	return masked_pixmap;
 }
 
 void load_pixmap(char *name, MaskedPixmap *image)
@@ -116,6 +105,9 @@ void load_pixmap(char *name, MaskedPixmap *image)
 	}
 
 	image->ref = 1;
+	/* XXX: ugly */
+	image->width = ((GdkPixmapPrivate *) image->pixmap)->width;
+	image->height = ((GdkPixmapPrivate *) image->pixmap)->height;
 }
 
 /* Load all the standard pixmaps */
@@ -160,17 +152,14 @@ void pixmap_unref(MaskedPixmap *mp)
  */
 static MaskedPixmap *load(char *pathname, gpointer user_data)
 {
-	GtkWidget	*window = (GtkWidget *) user_data;
 	GdkPixmap	*pixmap;
 	GdkBitmap	*mask;
-	GtkStyle	*style;
 	MaskedPixmap	*masked_pixmap;
 
-	style = gtk_widget_get_style(window);
-
-	pixmap = gdk_pixmap_create_from_xpm(window->window,
+	pixmap = gdk_pixmap_colormap_create_from_xpm(NULL,
+			gtk_widget_get_default_colormap(),
 			&mask,
-			&style->bg[GTK_STATE_NORMAL],
+			0,
 			pathname);
 	if (!pixmap)
 		return NULL;
@@ -179,6 +168,9 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 	masked_pixmap->pixmap = pixmap;
 	masked_pixmap->mask = mask;
 	masked_pixmap->ref = 1;
+	/* XXX: ugly */
+	masked_pixmap->width = ((GdkPixmapPrivate *) pixmap)->width;
+	masked_pixmap->height = ((GdkPixmapPrivate *) pixmap)->height;
 
 	return masked_pixmap;
 }
@@ -205,6 +197,11 @@ static void unref(MaskedPixmap *mp, gpointer data)
 		gdk_bitmap_unref(mp->mask);
 		g_free(mp);
 	}	
+}
+
+static int getref(MaskedPixmap *mp)
+{
+	return mp->ref;
 }
 
 /* Called now and then to clear out old pixmaps */

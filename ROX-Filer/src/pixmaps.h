@@ -9,6 +9,9 @@
 #define _PIXMAP_H
 
 #include <gtk/gtk.h>
+#include "fscache.h"
+
+extern GFSCache *pixmap_cache;
 
 enum
 {
@@ -46,6 +49,8 @@ struct _MaskedPixmap
 	GdkPixmap	*pixmap;
 	GdkBitmap	*mask;
 	int		ref;
+	int		width;
+	int		height;
 };
 
 
@@ -54,7 +59,6 @@ extern MaskedPixmap	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 void pixmaps_init(void);
 void load_pixmap(char *name, MaskedPixmap *image);
-MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
 

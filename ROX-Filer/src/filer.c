@@ -30,7 +30,6 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
-#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include <gdk/gdkkeysyms.h>
 #include "collection.h"
 
@@ -50,14 +49,12 @@
 #define ROW_HEIGHT_FULL_INFO 44
 #define MAX_ICON_HEIGHT 42
 #define PANEL_BORDER 2
+#define MIN_ITEM_WIDTH 64
 
 FilerWindow 	*window_with_focus = NULL;
-
-/* Link paths to GLists of filer windows */
-GHashTable	*path_to_window_list = NULL;
+GdkFont	   *fixed_font = NULL;
 
 static FilerWindow *window_with_selection = NULL;
-static GdkFont	   *fixed_font = NULL;
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -81,24 +78,19 @@ static gboolean o_ro_bindings = FALSE;
 static GtkWidget *toggle_ro_bindings;
 
 /* Static prototypes */
+static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-static gboolean idle_scan_dir(gpointer data);
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
-static void add_item(FilerWindow *filer_window, char *leafname);
-static void stop_scanning(FilerWindow *filer_window);
 static gint focus_in(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
 static gint focus_out(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
-static void add_view(FilerWindow *filer_window);
-static void remove_view(FilerWindow *filer_window);
-static void free_item(FileItem *item);
-static gboolean remove_deleted(gpointer item_data, gpointer data);
+static void add_item(FilerWindow *filer_window, DirItem *item);
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void add_button(GtkContainer *box, int pixmap,
@@ -106,10 +98,10 @@ static void add_button(GtkContainer *box, int pixmap,
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window);
-static void consider_width(FilerWindow *filer_window, FileItem *item);
+static int calc_width(FilerWindow *filer_window, DirItem *item);
 static void draw_large_icon(GtkWidget *widget,
 			    GdkRectangle *area,
-			    FileItem  *item,
+			    DirItem  *item,
 			    gboolean selected);
 static void draw_string(GtkWidget *widget,
 		GdkFont *font,
@@ -124,7 +116,6 @@ static void draw_item_large(GtkWidget *widget,
 static void draw_item_full_info(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area);
-static char *details(FileItem *item);
 static gboolean test_point_large(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
@@ -133,6 +124,12 @@ static gboolean test_point_full_info(Collection *collection,
 				int point_x, int point_y,
 				CollectionItem *item,
 				int width, int height);
+static void update_display(Directory *dir,
+			DirAction	action,
+			GPtrArray	*items,
+			FilerWindow *filer_window);
+void filer_change_to(FilerWindow *filer_window, char *path);
+static void shrink_width(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 enum
@@ -145,8 +142,6 @@ void filer_init()
 {
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
-	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
-
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("filer_ro_bindings", filer_ro_bindings);
 	option_register("filer_toolbar", filer_toolbar);
@@ -154,65 +149,80 @@ void filer_init()
 	fixed_font = gdk_font_load("fixed");
 }
 
-
-/* When a filer window shows a directory, use this function to add
- * it to the list of directories to be updated when the contents
- * change.
- */
-static void add_view(FilerWindow *filer_window)
+static gboolean if_deleted(gpointer item, gpointer removed)
 {
-	GList	*list, *newlist;
+	int	i = ((GPtrArray *) removed)->len;
+	DirItem	**r = (DirItem **) ((GPtrArray *) removed)->pdata;
+	char	*leafname = ((DirItem *) item)->leafname;
 
-	g_return_if_fail(filer_window != NULL);
-	
-	list = g_hash_table_lookup(path_to_window_list, filer_window->path);
-	newlist = g_list_prepend(list, filer_window);
-	if (newlist != list)
-		g_hash_table_insert(path_to_window_list, filer_window->path,
-				newlist);
-}
-
-/* When a filer window no longer shows a directory, call this to reverse
- * the effect of add_view().
- */
-static void remove_view(FilerWindow *filer_window)
-{
-	GList	*list, *newlist;
-
-	g_return_if_fail(filer_window != NULL);
-
-	list = g_hash_table_lookup(path_to_window_list, filer_window->path);
-	newlist = g_list_remove(list, filer_window);
-	if (newlist != list)
-		g_hash_table_insert(path_to_window_list, filer_window->path,
-				newlist);
-}
-
-/* Go though all the FileItems in a collection, freeing all items.
- * TODO: Maybe we should cache icons?
- */
-static void free_items(FilerWindow *filer_window)
-{
-	guint		i;
-	Collection	*collection = filer_window->collection;
-
-	for (i = 0; i < collection->number_of_items; i++)
+	while (i--)
 	{
-		free_item((FileItem *) collection->items[i].data);
-		collection->items[i].data = NULL;
+		if (strcmp(leafname, r[i]->leafname) == 0)
+			return TRUE;
+	}
+
+	return FALSE;
+}
+
+static void update_item(FilerWindow *filer_window, DirItem *item)
+{
+	int	i;
+
+	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
+	collection_draw_item(filer_window->collection, i, TRUE);
+}
+
+static void update_display(Directory *dir,
+			DirAction	action,
+			GPtrArray	*items,
+			FilerWindow *filer_window)
+{
+	int	i;
+
+	switch (action)
+	{
+		case DIR_ADD:
+			for (i = 0; i < items->len; i++)
+			{
+				DirItem *item = (DirItem *) items->pdata[i];
+
+				add_item(filer_window, item);
+			}
+
+			collection_qsort(filer_window->collection,
+					filer_window->sort_fn);
+			break;
+		case DIR_REMOVE:
+			collection_delete_if(filer_window->collection,
+					if_deleted,
+					items);
+			break;
+		case DIR_END_SCAN:
+			if (filer_window->window->window)
+				gdk_window_set_cursor(
+						filer_window->window->window,
+						NULL);
+			shrink_width(filer_window);
+			break;
+		case DIR_UPDATE:
+			for (i = 0; i < items->len; i++)
+			{
+				DirItem *item = (DirItem *) items->pdata[i];
+
+				update_item(filer_window, item);
+			}
+			break;
 	}
 }
 
-/* Set one item in a collection to NULL, freeing all data for it */
-static void free_item(FileItem *item)
+static void detach(FilerWindow *filer_window)
 {
-	if (item->flags & ITEM_FLAG_TEMP_ICON)
-	{
-		pixmap_unref(item->image);
-		item->image = default_pixmap + TYPE_ERROR;
-	}
-	g_free(item->leafname);
-	g_free(item);
+	g_return_if_fail(filer_window->directory != NULL);
+
+	dir_detach(filer_window->directory,
+			(DirCallback) update_display, filer_window);
+	g_fscache_data_unref(dir_cache, filer_window->directory);
+	filer_window->directory = NULL;
 }
 
 static void filer_window_destroyed(GtkWidget 	*widget,
@@ -223,11 +233,9 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	if (window_with_focus == filer_window)
 		window_with_focus = NULL;
 
-	remove_view(filer_window);
+	if (filer_window->directory)
+		detach(filer_window);
 
-	free_items(filer_window);
-	if (filer_window->dir)
-		stop_scanning(filer_window);
 	g_free(filer_window->path);
 	g_free(filer_window);
 
@@ -235,99 +243,26 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		gtk_main_quit();
 }
 
-static void stop_scanning(FilerWindow *filer_window)
+static int calc_width(FilerWindow *filer_window, DirItem *item)
 {
-	g_return_if_fail(filer_window->dir != NULL);
+	int		pix_width = item->image->width;
 
-	closedir(filer_window->dir);
-	gtk_idle_remove(filer_window->idle_scan_id);
-	filer_window->dir = NULL;
-	if (filer_window->window->window)
-		gdk_window_set_cursor(filer_window->window->window, NULL);
-}
-
-/* This is called while we are scanning the directory */
-static gboolean idle_scan_dir(gpointer data)
-{
-	struct dirent	*next;
-	FilerWindow 	*filer_window = (FilerWindow *) data;
-
-	do
-	{
-		next = readdir(filer_window->dir);
-		if (!next)
-		{
-			closedir(filer_window->dir);
-			filer_window->dir = NULL;
-			gdk_window_set_cursor(filer_window->window->window,
-					NULL);
-
-			collection_set_item_size(filer_window->collection,
-					filer_window->scan_min_width,
-					filer_window->collection->item_height);
-			collection_qsort(filer_window->collection,
-					filer_window->sort_fn);
-			if (filer_window->flags & FILER_UPDATING)
-			{
-				collection_delete_if(filer_window->collection,
-						     remove_deleted, NULL);
-			}
-			if (filer_window->flags & FILER_NEEDS_RESCAN)
-				update_dir(filer_window);
-
-			return FALSE;		/* Finished */
-		}
-
-		add_item(filer_window, next->d_name);
-	} while (!gtk_events_pending());
-
-	return TRUE;
+        switch (filer_window->display_style)
+        {
+                case FULL_INFO:
+                        return pix_width + item->details_width + 12;
+                        break;
+                default:
+                        return MAX(pix_width, item->name_width) + 4;
+			break;
+        }
 }
 	
-/* Make sure that the collection's width is big enough for this
- * item. Updates scan_min_width.
- */
-static void consider_width(FilerWindow *filer_window, FileItem *item)
-{
-	int		w1, w2;
-	int		item_width;
-	
-	/* XXX: Must be a better way... */
-	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
-	item->pix_height = ((GdkPixmapPrivate *) item->image->pixmap)->height;
-
-	switch (filer_window->display_style)
-	{
-		case FULL_INFO:
-			w1 = gdk_string_width(
-					filer_window->window->style->font,
-					item->leafname);
-			w2 = gdk_string_width(
-					fixed_font,
-					details(item));
-			item->text_width = MAX(w1, w2);
-			item_width = item->pix_width + item->text_width + 12;
-			break;
-		default:
-			item->text_width = gdk_string_width(
-					filer_window->window->style->font,
-					item->leafname);
-			item_width = MAX(item->pix_width, item->text_width) + 4;
-			break;
-	}
-
-	if (item_width > filer_window->scan_min_width)
-		filer_window->scan_min_width = item_width;
-}
-
 /* Add a single object to a directory display */
-static void add_item(FilerWindow *filer_window, char *leafname)
+static void add_item(FilerWindow *filer_window, DirItem *item)
 {
-	FileItem	*item;
-	int		old_item;
-	struct stat	info;
-	int		base_type;
-	GString		*path;
+	char		*leafname = item->leafname;
+	int		item_width;
 
 	if (leafname[0] == '.')
 	{
@@ -336,145 +271,12 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 		return;
 	}
 
-	item = g_malloc(sizeof(FileItem));
-	item->leafname = g_strdup(leafname);
-	item->flags = (ItemFlags) 0;
-	item->mode = 0;
-	item->size = 0;
-
-	path = make_path(filer_window->path, leafname);
-	if (lstat(path->str, &info))
-		base_type = TYPE_ERROR;
-	else
-	{
-		item->mode = info.st_mode;
-		item->size = info.st_size;
-		if (S_ISREG(info.st_mode))
-			base_type = TYPE_FILE;
-		else if (S_ISDIR(info.st_mode))
-		{
-			base_type = TYPE_DIRECTORY;
-
-			if (g_hash_table_lookup(mtab_mounts, path->str))
-				item->flags |= ITEM_FLAG_MOUNT_POINT
-						| ITEM_FLAG_MOUNTED;
-			else if (g_hash_table_lookup(fstab_mounts, path->str))
-				item->flags |= ITEM_FLAG_MOUNT_POINT;
-		}
-		else if (S_ISBLK(info.st_mode))
-			base_type = TYPE_BLOCK_DEVICE;
-		else if (S_ISCHR(info.st_mode))
-			base_type = TYPE_CHAR_DEVICE;
-		else if (S_ISFIFO(info.st_mode))
-			base_type = TYPE_PIPE;
-		else if (S_ISSOCK(info.st_mode))
-			base_type = TYPE_SOCKET;
-		else if (S_ISLNK(info.st_mode))
-		{
-			if (stat(path->str, &info))
-			{
-				base_type = TYPE_ERROR;
-			}
-			else
-			{
-				if (S_ISREG(info.st_mode))
-					base_type = TYPE_FILE;
-				else if (S_ISDIR(info.st_mode))
-					base_type = TYPE_DIRECTORY;
-				else if (S_ISBLK(info.st_mode))
-					base_type = TYPE_BLOCK_DEVICE;
-				else if (S_ISCHR(info.st_mode))
-					base_type = TYPE_CHAR_DEVICE;
-				else if (S_ISFIFO(info.st_mode))
-					base_type = TYPE_PIPE;
-				else if (S_ISSOCK(info.st_mode))
-					base_type = TYPE_SOCKET;
-				else
-					base_type = TYPE_UNKNOWN;
-			}
-
-			item->flags |= ITEM_FLAG_SYMLINK;
-		}
-		else
-			base_type = TYPE_UNKNOWN;
-	}
-
-	item->base_type = base_type;
-	item->mime_type = NULL;
-
-	if (base_type == TYPE_DIRECTORY &&
-			!(item->flags & ITEM_FLAG_MOUNT_POINT))
-	{
-		uid_t	uid = info.st_uid;
-		
-		/* Might be an application directory - better check...
-		 * AppRun must have the same owner as the directory
-		 * (to stop people putting an AppRun in, eg, /tmp)
-		 */
-		g_string_append(path, "/AppRun");
-		if (!stat(path->str, &info) && info.st_uid == uid)
-		{
-			item->flags |= ITEM_FLAG_APPDIR;
-		}
-	}
-
-	if (item->flags & ITEM_FLAG_APPDIR)	/* path still ends /AppRun */
-	{
-		MaskedPixmap *app_icon;
-		
-		g_string_truncate(path, path->len - 3);
-		g_string_append(path, "Icon.xpm");
-		app_icon = load_pixmap_from(filer_window->window, path->str);
-		if (app_icon)
-		{
-			item->image = app_icon;
-			item->flags |= ITEM_FLAG_TEMP_ICON;
-		}
-		else
-			item->image = default_pixmap + TYPE_APPDIR;
-	}
-	else
-	{
-		if (base_type == TYPE_FILE &&
-				(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
-		{
-			item->image = default_pixmap + TYPE_EXEC_FILE;
-			item->flags |= ITEM_FLAG_EXEC_FILE;
-		}
-		else if (base_type == TYPE_FILE)
-		{
-			item->mime_type = type_from_path(path->str);
-			item->image = type_to_icon(filer_window->window, 
-						   item->mime_type);
-			item->flags |= ITEM_FLAG_TEMP_ICON;
-		}
-		else
-			item->image = default_pixmap + base_type;
-	}
-
-	if (!item->image)
-		item->image = default_pixmap + TYPE_UNKNOWN;
-	
-	consider_width(filer_window, item);
-
-	if (filer_window->scan_min_width > filer_window->collection->item_width)
+	item_width = calc_width(filer_window, item); 
+	if (item_width > filer_window->collection->item_width)
 		collection_set_item_size(filer_window->collection,
-					 filer_window->scan_min_width,
+					 item_width,
 					 filer_window->collection->item_height);
-	old_item = collection_find_item(filer_window->collection, item,
-			sort_by_name);
-
-	if (old_item >= 0)
-	{
-		CollectionItem *old =
-			&filer_window->collection->items[old_item];
-
-		free_item((FileItem *) old->data);
-		old->data = item;
-		collection_draw_item(filer_window->collection, old_item, TRUE);
-	}
-	else
-		collection_insert(filer_window->collection, item);
+	collection_insert(filer_window->collection, item);
 }
 
 /* Is a point inside an item? */
@@ -483,18 +285,19 @@ static gboolean test_point_large(Collection *collection,
 				CollectionItem *colitem,
 				int width, int height)
 {
-	FileItem	*item = (FileItem *) colitem->data;
+	DirItem		*item = (DirItem *) colitem->data;
 	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	int		text_height = font->ascent + font->descent;
-	int		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
-	int		image_width = (item->pix_width >> 1) + 2;
-	int		text_width = (item->text_width >> 1) + 2;
+	MaskedPixmap	*image = item->image;
+	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
+	int		image_width = (image->width >> 1) + 2;
+	int		text_width = (item->name_width >> 1) + 2;
 	int		x_limit;
 
 	if (point_y < image_y)
 		return FALSE;	/* Too high up (don't worry about too low) */
 
-	if (point_y <= image_y + item->pix_height + 2)
+	if (point_y <= image_y + image->height + 2)
 		x_limit = image_width;
 	else if (point_y > height - text_height - 2)
 		x_limit = text_width;
@@ -509,24 +312,26 @@ static gboolean test_point_full_info(Collection *collection,
 				CollectionItem *colitem,
 				int width, int height)
 {
-	FileItem	*item = (FileItem *) colitem->data;
+	DirItem		*item = (DirItem *) colitem->data;
 	GdkFont		*font = GTK_WIDGET(collection)->style->font;
-	int		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
+	MaskedPixmap	*image = item->image;
+	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
 
-	if (point_x < item->pix_width + 2)
+	if (point_x < image->width + 2)
 		return point_x > 2 && point_y > image_y;
 	
-	return point_x > item->pix_width + 2 &&
+	return point_x > image->width + 2 &&
 	point_y > (height >> 1) - font->ascent - font->descent &&
 	point_y < (height >> 1) + fixed_font->ascent + fixed_font->descent;
 }
 
 static void draw_large_icon(GtkWidget *widget,
 			    GdkRectangle *area,
-			    FileItem  *item,
+			    DirItem  *item,
 			    gboolean selected)
 {
-	int	image_x = area->x + ((area->width - item->pix_width) >> 1);
+	MaskedPixmap	*image = item->image;
+	int	image_x = area->x + ((area->width - image->width) >> 1);
 	int	image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
 						: widget->style->black_gc;
@@ -535,13 +340,13 @@ static void draw_large_icon(GtkWidget *widget,
 		
 	gdk_gc_set_clip_mask(gc, item->image->mask);
 
-	image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
+	image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
 			item->image->pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
-			-1, MIN(item->pix_height, MAX_ICON_HEIGHT));
+			-1, MIN(image->height, MAX_ICON_HEIGHT));
 
 	if (selected)
 	{
@@ -549,7 +354,7 @@ static void draw_large_icon(GtkWidget *widget,
 		gdk_draw_rectangle(widget->window,
 				gc,
 				TRUE, image_x, area->y + image_y,
-				item->pix_width, item->pix_height);
+				image->width, image->height);
 		gdk_gc_set_function(gc, GDK_COPY);
 	}
 
@@ -612,7 +417,7 @@ static void draw_string(GtkWidget *widget,
 /* Return a string (valid until next call) giving details
  * of this item.
  */
-static char *details(FileItem *item)
+char *details(DirItem *item)
 {
 	mode_t	m = item->mode;
 	static GString *buf = NULL;
@@ -649,16 +454,17 @@ static void draw_item_full_info(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area)
 {
-	FileItem	*item = (FileItem *) colitem->data;
+	DirItem	*item = (DirItem *) colitem->data;
+	MaskedPixmap	*image = item->image;
 	GdkFont	*font = widget->style->font;
-	int	text_x = area->x + item->pix_width + 8;
+	int	text_x = area->x + image->width + 8;
 	int	mid_y = area->y + (area->height >> 1);
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
 
 	pic_area.x = area->x;
 	pic_area.y = area->y;
-	pic_area.width = item->pix_width + 8;
+	pic_area.width = image->width + 8;
 	pic_area.height = area->height;
 
 	draw_large_icon(widget, &pic_area, item, selected);
@@ -667,13 +473,13 @@ static void draw_item_full_info(GtkWidget *widget,
 			widget->style->font,
 			item->leafname, 
 			text_x, mid_y - font->descent,
-			item->text_width,
+			item->name_width,
 			selected);
 	draw_string(widget,
 			fixed_font,
 			details(item),
 			text_x,	mid_y + font->ascent,
-			item->text_width,
+			item->name_width,
 			selected);
 }
 
@@ -681,9 +487,9 @@ static void draw_item_large(GtkWidget *widget,
 			CollectionItem *colitem,
 			GdkRectangle *area)
 {
-	FileItem	*item = (FileItem *) colitem->data;
+	DirItem		*item = (DirItem *) colitem->data;
 	GdkFont	*font = widget->style->font;
-	int	text_x = area->x + ((area->width - item->text_width) >> 1);
+	int	text_x = area->x + ((area->width - item->name_width) >> 1);
 	int	text_y = area->y + area->height - font->descent - 2;
 	gboolean	selected = colitem->selected;
 
@@ -692,7 +498,7 @@ static void draw_item_large(GtkWidget *widget,
 	draw_string(widget,
 			widget->style->font,
 			item->leafname, 
-			text_x, text_y, item->text_width,
+			text_x, text_y, item->name_width,
 			selected);
 }
 
@@ -704,28 +510,16 @@ void show_menu(Collection *collection, GdkEventButton *event,
 
 static void may_rescan(FilerWindow *filer_window)
 {
-	struct stat info;
-
 	g_return_if_fail(filer_window != NULL);
-	
-	if (stat(filer_window->path, &info))
-	{
-		delayed_error("ROX-Filer", "Directory deleted");
-		gtk_widget_destroy(filer_window->window);
-	}
-	else if (info.st_mtime > filer_window->m_time)
-	{
-		if (filer_window->dir)
-			filer_window->flags |= FILER_NEEDS_RESCAN;
-		else
-			update_dir(filer_window);
-	}
+
+	// XXX: g_fscache_data_update(dir_cache, filer_window->directory);
 }
 
 /* Callback to collection_delete_if() */
+#if 0
 static gboolean remove_deleted(gpointer item_data, gpointer data)
 {
-	FileItem *item = (FileItem *) item_data;
+	DirItem *item = (DirItem *) item_data;
 
 	if (item->flags & ITEM_FLAG_MAY_DELETE)
 	{
@@ -735,72 +529,7 @@ static gboolean remove_deleted(gpointer item_data, gpointer data)
 
 	return FALSE;
 }
-
-/* Forget the old contents of a filer window and scan the directory
- * from the start. If we are already scanning then rescan later.
- */
-void scan_dir(FilerWindow *filer_window)
-{
-	if (filer_window->dir)
-		stop_scanning(filer_window);
-
-	free_items(filer_window);
-	collection_clear(filer_window->collection);
-
-	update_dir(filer_window);
-	filer_window->flags &= ~FILER_UPDATING;
-
-	gdk_window_set_cursor(filer_window->window->window,
-			gdk_cursor_new(GDK_WATCH));
-}
-
-/* Like scan_dir(), but assume new display will be similar to the old
- * one (less flicker and doesn't lose the selection).
- */
-void update_dir(FilerWindow *filer_window)
-{
-	Collection	*collection = filer_window->collection;
-	struct stat 	info;
-	guint		i;
-
-	if (filer_window->dir)
-	{
-		/* Already scanning - start again when we finish */
-		filer_window->flags |= FILER_NEEDS_RESCAN;
-		return;
-	}
-	filer_window->flags &= ~FILER_NEEDS_RESCAN;
-	filer_window->flags |= FILER_UPDATING;
-
-	for (i = 0; i < collection->number_of_items; i++)
-	{
-		FileItem *item = (FileItem *) collection->items[i].data;
-		item->flags |= ITEM_FLAG_MAY_DELETE;
-	}
-
-	mount_update();
-	
-	gtk_window_set_title(GTK_WINDOW(filer_window->window),
-			filer_window->path);
-
-	if (stat(filer_window->path, &info))
-	{
-		report_error("Error statting directory", g_strerror(errno));
-		return;
-	}
-	filer_window->m_time = info.st_mtime;
-
-	filer_window->dir = opendir(filer_window->path);
-	if (!filer_window->dir)
-	{
-		report_error("Error scanning directory", g_strerror(errno));
-		return;
-	}
-
-	filer_window->scan_min_width = 64;
-
-	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
-}
+#endif
 
 /* Another app has grabbed the selection */
 static gint collection_lose_selection(GtkWidget *widget,
@@ -852,8 +581,8 @@ static void selection_get(GtkWidget *widget,
 	{
 		if (collection->items[i].selected)
 		{
-			FileItem *item =
-				(FileItem *) collection->items[i].data;
+			DirItem *item =
+				(DirItem *) collection->items[i].data;
 			
 			g_string_append(reply, header->str);
 			g_string_append(reply, item->leafname);
@@ -904,14 +633,14 @@ static void gain_selection(Collection 	*collection,
 
 static int sort_by_name(const void *item1, const void *item2)
 {
-	return strcmp((*((FileItem **)item1))->leafname,
-		      (*((FileItem **)item2))->leafname);
+	return strcmp((*((DirItem **)item1))->leafname,
+		      (*((DirItem **)item2))->leafname);
 }
 
 static int sort_by_type(const void *item1, const void *item2)
 {
-	const FileItem *i1 = (FileItem *) ((CollectionItem *) item1)->data;
-	const FileItem *i2 = (FileItem *) ((CollectionItem *) item2)->data;
+	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
+	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
 	MIME_type *m1, *m2;
 
 	int	 diff = i1->base_type - i2->base_type;
@@ -947,7 +676,7 @@ void open_item(Collection *collection,
 		gpointer user_data)
 {
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
-	FileItem	*item = (FileItem *) item_data;
+	DirItem	*item = (DirItem *) item_data;
 	GdkEventButton 	*event;
 	char		*full_path;
 	GtkWidget	*widget;
@@ -955,7 +684,8 @@ void open_item(Collection *collection,
 	gboolean	adjust;		/* do alternative action */
 
 	event = (GdkEventButton *) gtk_get_current_event();
-	full_path = make_path(filer_window->path, item->leafname)->str;
+	full_path = make_path(filer_window->path,
+			item->leafname)->str;
 
 	collection_wink_item(filer_window->collection, item_number);
 
@@ -979,7 +709,7 @@ void open_item(Collection *collection,
 			if (item->flags & ITEM_FLAG_APPDIR && !shift)
 			{
 				run_app(make_path(filer_window->path,
-							item->leafname)->str);
+						item->leafname)->str);
 				if (adjust && !filer_window->panel)
 					gtk_widget_destroy(widget);
 				break;
@@ -987,15 +717,11 @@ void open_item(Collection *collection,
 			if ((adjust ^ o_ro_bindings) || filer_window->panel)
 				filer_opendir(full_path, FALSE, BOTTOM);
 			else
-			{
-				remove_view(filer_window);
-				filer_window->path = pathdup(full_path);
-				add_view(filer_window);
-				scan_dir(filer_window);
-			}
+				filer_change_to(filer_window, full_path);
 			break;
 		case TYPE_FILE:
-			if (item->flags & ITEM_FLAG_EXEC_FILE && !shift)
+			if (item->flags & ITEM_FLAG_EXEC_FILE
+					&& !shift)
 			{
 				char	*argv[] = {NULL, NULL};
 
@@ -1101,10 +827,7 @@ static gint key_press_event(GtkWidget	*widget,
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	remove_view(filer_window);
-	filer_window->path = pathdup(getenv("HOME"));
-	add_view(filer_window);
-	scan_dir(filer_window);
+	filer_change_to(filer_window, getenv("HOME"));
 }
 
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -1114,15 +837,41 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 void change_to_parent(FilerWindow *filer_window)
 {
-	remove_view(filer_window);
-	filer_window->path = pathdup(make_path(
-				filer_window->path,
-				"..")->str);
-	add_view(filer_window);
-	scan_dir(filer_window);
+	filer_change_to(filer_window, make_path(filer_window->path, "..")->str);
 }
 
-FileItem *selected_item(Collection *collection)
+void filer_change_to(FilerWindow *filer_window, char *path)
+{
+	detach(filer_window);
+	g_free(filer_window->path);
+	filer_window->path = pathdup(path);
+
+	filer_window->directory = g_fscache_lookup(dir_cache,
+					filer_window->path);
+	if (filer_window->directory)
+	{
+		collection_clear(filer_window->collection);
+		gtk_window_set_title(GTK_WINDOW(filer_window->window),
+				filer_window->path);
+		gdk_window_set_cursor(filer_window->window->window,
+				gdk_cursor_new(GDK_WATCH));
+		dir_attach(filer_window->directory,
+				(DirCallback) update_display,
+				filer_window);
+	}
+	else
+	{
+		char	*error;
+
+		error = g_strdup_printf("Directory '%s' is not accessible.",
+				path);
+		delayed_error("ROX-Filer", error);
+		g_free(error);
+		gtk_widget_destroy(filer_window->window);
+	}
+}
+
+DirItem *selected_item(Collection *collection)
 {
 	int	i;
 	
@@ -1132,29 +881,11 @@ FileItem *selected_item(Collection *collection)
 
 	for (i = 0; i < collection->number_of_items; i++)
 		if (collection->items[i].selected)
-			return (FileItem *) collection->items[i].data;
+			return (DirItem *) collection->items[i].data;
 
 	g_warning("selected_item: number_selected is wrong\n");
 
 	return NULL;
-}
-
-/* Refresh all windows onto this directory */
-void refresh_dirs(char *path)
-{
-	char 	*real;
-	GList	*list, *next;
-
-	real = pathdup(path);
-	list = g_hash_table_lookup(path_to_window_list, real);
-	g_free(real);
-
-	while (list)
-	{
-		next = list->next;
-		update_dir((FilerWindow *) list->data);
-		list = next;
-	}
 }
 
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
@@ -1168,11 +899,30 @@ static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 			2, "Remove", "Cancel") != 0;
 }
 
-void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
+/* Make the items as narrow as possible */
+static void shrink_width(FilerWindow *filer_window)
 {
 	int		i;
 	Collection	*col = filer_window->collection;
+	int		width = MIN_ITEM_WIDTH;
+	int		this_width;
 	
+	for (i = 0; i < col->number_of_items; i++)
+	{
+		this_width = calc_width(filer_window,
+				(DirItem *) col->items[i].data);
+		if (this_width > width)
+			width = this_width;
+	}
+	
+	collection_set_item_size(filer_window->collection,
+		width,
+		filer_window->display_style == FULL_INFO ? ROW_HEIGHT_FULL_INFO
+						         : ROW_HEIGHT_LARGE);
+}
+
+void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
+{
 	if (filer_window->display_style == style)
 		return;
 
@@ -1189,14 +939,7 @@ void filer_style_set(FilerWindow *filer_window, DisplayStyle style)
 			break;
 	}
 
-	filer_window->scan_min_width = 64;
-	for (i = 0; i < col->number_of_items; i++)
-		consider_width(filer_window, (FileItem *) col->items[i].data);
-	
-	collection_set_item_size(filer_window->collection,
-			filer_window->scan_min_width,
-			style == FULL_INFO ? ROW_HEIGHT_FULL_INFO
-					   : ROW_HEIGHT_LARGE);
+	shrink_width(filer_window);
 }
 
 void filer_opendir(char *path, gboolean panel, Side panel_side)
@@ -1211,7 +954,20 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->path = pathdup(path);
-	filer_window->dir = NULL;	/* Not scanning */
+
+	filer_window->directory = g_fscache_lookup(dir_cache, path);
+	if (!filer_window->directory)
+	{
+		char	*error;
+
+		error = g_strdup_printf("Directory '%s' not found.", path);
+		delayed_error("ROX-Filer", error);
+		g_free(error);
+		g_free(filer_window->path);
+		g_free(filer_window);
+		return;
+	}
+
 	filer_window->show_hidden = FALSE;
 	filer_window->panel = panel;
 	filer_window->panel_side = panel_side;
@@ -1221,6 +977,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->display_style = UNKNOWN_STYLE;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_title(GTK_WINDOW(filer_window->window),
+			filer_window->path);
 
 	collection = collection_new(NULL);
 	gtk_object_set_data(GTK_OBJECT(collection),
@@ -1259,6 +1017,8 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			sizeof(target_table) / sizeof(*target_table));
 
 	filer_style_set(filer_window, LARGE);
+	dir_attach(filer_window->directory, (DirCallback) update_display,
+			filer_window);
 	drag_set_dest(collection);
 
 	if (panel)
@@ -1347,9 +1107,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
-
-	add_view(filer_window);
-	scan_dir(filer_window);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
@@ -1440,9 +1197,13 @@ static char *filer_ro_bindings(char *data)
 	return NULL;
 }
 
-
 static char *filer_toolbar(char *data)
 {
 	o_toolbar = atoi(data) != 0;
 	return NULL;
+}
+
+void update_dir(FilerWindow *filer_window)
+{
+	dir_update(filer_window->directory, filer_window->path);
 }

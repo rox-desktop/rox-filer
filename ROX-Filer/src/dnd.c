@@ -344,7 +344,7 @@ static void create_uri_list(GString *string,
 	{
 		if (collection->items[i].selected)
 		{
-			FileItem *item = (FileItem *) collection->items[i].data;
+			DirItem *item = (DirItem *) collection->items[i].data;
 			
 			g_string_append(string, leader->str);
 			g_string_append(string, item->leafname);
@@ -380,7 +380,7 @@ void drag_selection(Collection 		*collection,
 		{"application/octet-stream", 0, TARGET_RAW},
 		{"", 0, TARGET_RAW},
 	};
-	FileItem	*item;
+	DirItem	*item;
 
 	if (number_selected == 1)
 		item = selected_item(collection);
@@ -433,7 +433,7 @@ void drag_data_get(GtkWidget          		*widget,
 	GdkAtom		type = XA_STRING;
 	GString		*string;
 	FilerWindow 	*filer_window;
-	FileItem	*item;
+	DirItem	*item;
 	
 	filer_window = g_dataset_get_data(context, "filer_window");
 	g_return_if_fail(filer_window != NULL);
@@ -443,7 +443,7 @@ void drag_data_get(GtkWidget          		*widget,
 		case	TARGET_RAW:
 			item = selected_item(filer_window->collection);
 			if (item && load_file(make_path(filer_window->path,
-							item->leafname)->str,
+						item->leafname)->str,
 						&to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
@@ -518,18 +518,19 @@ static gboolean panel_drag_ok(FilerWindow 	*filer_window,
 			      GdkDragContext 	*context,
 			      int	     	item)
 {
-	FileItem 	*fileitem = NULL;
+	DirItem 	*fileitem = NULL;
 	char	 	*old_path;
 	char	 	*new_path;
 	char		*type = NULL;	/* Quiet gcc */
 
 	if (item >= 0)
-		fileitem = (FileItem *)
+		fileitem = (DirItem *)
 			filer_window->collection->items[item].data;
 
 	if (item == -1)
 		new_path = NULL;   /* Drag to panel background - disallow */
-	else if (fileitem->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	else if (fileitem->flags &
+			(ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		if (provides(context, text_uri_list))
 		{

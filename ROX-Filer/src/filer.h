@@ -13,22 +13,14 @@
 #include "pixmaps.h"
 #include <sys/types.h>
 #include <dirent.h>
+#include "mount.h"
+#include "dir.h"
+
+extern GdkFont	   *fixed_font;
 
 typedef struct _FilerWindow FilerWindow;
-typedef struct _FileItem FileItem;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 typedef enum {UNKNOWN_STYLE, LARGE, FULL_INFO} DisplayStyle;
-
-typedef enum
-{
-	ITEM_FLAG_SYMLINK 	= 0x01,	/* Is a symlink */
-	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains /AppInfo */
-	ITEM_FLAG_MOUNT_POINT  	= 0x04,	/* Is in mtab or fstab */
-	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is in /etc/mtab */
-	ITEM_FLAG_TEMP_ICON  	= 0x10,	/* Free icon after use */
-	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */
-	ITEM_FLAG_MAY_DELETE	= 0x40, /* Delete on finishing scan */
-} ItemFlags;
 
 typedef enum
 {
@@ -52,26 +44,7 @@ struct _FilerWindow
 	int 		(*sort_fn)(const void *a, const void *b);
 	DisplayStyle	display_style;
 
-	/* Scanning */
-	DIR		*dir;
-	gint		idle_scan_id;	/* (only if dir != NULL) */
-	guint		scan_min_width;	/* Min width possible so far */
-};
-
-struct _FileItem
-{
-	char		*leafname;
-	mode_t		mode;
-	off_t		size;
-	
-	int		base_type;	/* (regular file, dir, pipe, etc) */
-	MIME_type	*mime_type;	/* NULL, except for non-exec files */
-	ItemFlags	flags;
-	
-	int		text_width;
-	int		pix_width;
-	int		pix_height;
-	MaskedPixmap	*image;
+	Directory	*directory;
 };
 
 extern FilerWindow 	*window_with_focus;
@@ -82,9 +55,9 @@ void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
 void update_dir(FilerWindow *filer_window);
 void scan_dir(FilerWindow *filer_window);
-FileItem *selected_item(Collection *collection);
-void refresh_dirs(char *path);
+DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
 void filer_style_set(FilerWindow *filer_window, DisplayStyle style);
+char *details(DirItem *item);
 
 #endif /* _FILER_H */

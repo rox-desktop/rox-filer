@@ -54,19 +54,29 @@ struct PurgeInfo
 
 /* Create a new GFSCache object and return a pointer to it.
  *
- * When someone tries to lookup a file which is not in the cache or
- * which is out-of-date, load() is called.
+ * When someone tries to lookup a file which is not in the cache,
+ * load() is called.
  * It should load the file and return a pointer to an object for the file.
  * The object should have a ref count of 1.
  *
  * ref() and unref() should modify the reference counter of the object.
  * When the counter reaches zero, destroy the object.
+ * 
+ * getref() returns the current value. This can be used to stop objects
+ * being purged from the cache while they are being used elsewhere, which
+ * is rather wasteful. If NULL then this check isn't done.
  *
+ * update() will be called to update an object which is cached, but
+ * out of date. If NULL, the object will be unref'd and load() used
+ * to make a new one.
+ * 
  * 'user_data' will be passed to all of the above functions.
  */
 GFSCache *g_fscache_new(GFSLoadFunc load,
-			GFSFunc ref,
-			GFSFunc unref,
+			GFSRefFunc ref,
+			GFSRefFunc unref,
+			GFSGetRefFunc getref,
+			GFSUpdateFunc update,
 			gpointer user_data)
 {
 	GFSCache *cache;
@@ -76,6 +86,8 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 	cache->load = load;
 	cache->ref = ref;
 	cache->unref = unref;
+	cache->getref = getref;
+	cache->update = update;
 	cache->user_data = user_data;
 
 	return cache;
@@ -144,9 +156,14 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 			goto out;
 
 		/* Out-of-date */
-		if (cache->unref)
-			cache->unref(data->data, cache->user_data);
-		data->data = NULL;
+		if (cache->update)
+			cache->update(data->data, pathname, cache->user_data);
+		else
+		{
+			if (cache->unref)
+				cache->unref(data->data, cache->user_data);
+			data->data = NULL;
+		}
 	}
 	else
 	{
@@ -164,16 +181,40 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	data->length = info.st_size;
 	data->mode = info.st_mode;
 
-	/* data->data is NULL - create the object for the file */
-
-	if (cache->load)
-		data->data = cache->load(pathname, cache->user_data);
-
+	if (data->data == NULL)
+	{
+		/* Create the object for the file (ie, not an update) */
+		if (cache->load)
+			data->data = cache->load(pathname, cache->user_data);
+	}
 out:
 	if (cache->ref)
 		cache->ref(data->data, cache->user_data);
 	data->last_lookup = time(NULL);
 	return data->data;
+}
+
+/* Call the update() function on this item iff it's in the cache. */
+void g_fscache_update(GFSCache *cache, char *pathname)
+{
+	GFSCacheKey	key;
+	GFSCacheData	*data;
+	struct stat 	info;
+
+	g_return_if_fail(cache != NULL);
+	g_return_if_fail(pathname != NULL);
+	g_return_if_fail(cache->update != NULL);
+
+	if (stat(pathname, &info))
+		return;
+
+	key.device = info.st_dev;
+	key.inode = info.st_ino;
+
+	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+
+	if (data)
+		cache->update(data->data, pathname, cache->user_data);
 }
 
 /* Remove all cache entries last accessed more than 'age' seconds
@@ -235,6 +276,11 @@ static gboolean purge_hash_entry(gpointer key, gpointer data,
 	GFSCacheData *cache_data = (GFSCacheData *) data;
 	GFSCache *cache = info->cache;
 
+	/* It's wasteful to remove an entry if someone else is using it */
+	if (cache->getref &&
+		cache->getref(cache_data->data, cache->user_data) > 1)
+		return FALSE;
+			
 	if (cache_data->last_lookup <= info->now
 		&& cache_data->last_lookup >= info->now - info->age)
 		return FALSE;

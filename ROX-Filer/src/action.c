@@ -684,7 +684,7 @@ static void usage_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
 	Collection *collection = filer_window->collection;
-	FileItem   *item;
+	DirItem   *item;
 	int	left = collection->number_selected;
 	int	i = -1;
 	off_t	total_size = 0;
@@ -694,9 +694,10 @@ static void usage_cb(gpointer data)
 		i++;
 		if (!collection->items[i].selected)
 			continue;
-		item = (FileItem *) collection->items[i].data;
+		item = (DirItem *) collection->items[i].data;
 		size_tally = 0;
-		do_usage(make_path(filer_window->path, item->leafname)->str,
+		do_usage(make_path(filer_window->path,
+					item->leafname)->str,
 					filer_window->path);
 		g_string_sprintf(message, "'%s: %s\n",
 				item->leafname,
@@ -715,7 +716,7 @@ static void delete_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
 	Collection *collection = filer_window->collection;
-	FileItem   *item;
+	DirItem   *item;
 	int	left = collection->number_selected;
 	int	i = -1;
 
@@ -724,9 +725,10 @@ static void delete_cb(gpointer data)
 		i++;
 		if (!collection->items[i].selected)
 			continue;
-		item = (FileItem *) collection->items[i].data;
-		if (do_delete(make_path(filer_window->path, item->leafname)
-					->str, filer_window->path))
+		item = (DirItem *) collection->items[i].data;
+		if (do_delete(make_path(filer_window->path,
+						item->leafname)->str,
+						filer_window->path))
 		{
 			g_string_sprintf(message, "+%s", filer_window->path);
 			send();

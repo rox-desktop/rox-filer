@@ -24,11 +24,11 @@ struct _MIME_type
 
 /* Prototypes */
 void type_init();
-char *basetype_name(FileItem *item);
+char *basetype_name(DirItem *item);
 
 MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);
-MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type);
+MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);
 
 #endif /* _TYPE_H */

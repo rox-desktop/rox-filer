@@ -47,6 +47,7 @@
 #include "savebox.h"
 #include "type.h"
 #include "pixmaps.h"
+#include "dir.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -199,6 +200,7 @@ int main(int argc, char **argv)
 
 	gui_support_init();
 	pixmaps_init();
+	dir_init();
 	menu_init();
 	dnd_init();
 	filer_init();

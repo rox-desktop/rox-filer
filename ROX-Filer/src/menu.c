@@ -349,7 +349,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 {
 	GString		*buffer;
 	GtkWidget	*file_label, *file_menu;
-	FileItem	*file_item;
+	DirItem	*file_item;
 	int		pos[2];
 	
 	pos[0] = event->x_root;
@@ -561,10 +561,11 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 				"item to copy");
 	else
 	{
-		FileItem *item = selected_item(collection);
+		DirItem *item = selected_item(collection);
 
 		savebox_show(window_with_focus, "Copy",
-				window_with_focus->path, item->leafname,
+				window_with_focus->path,
+				item->leafname,
 				item->image, copy_cb);
 	}
 }
@@ -591,10 +592,11 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 				"item to rename");
 	else
 	{
-		FileItem *item = selected_item(collection);
+		DirItem *item = selected_item(collection);
 
 		savebox_show(window_with_focus, "Rename",
-				window_with_focus->path, item->leafname,
+				window_with_focus->path,
+				item->leafname,
 				item->image, rename_cb);
 	}
 }
@@ -621,10 +623,11 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 				"item to link");
 	else
 	{
-		FileItem *item = selected_item(collection);
+		DirItem *item = selected_item(collection);
 
 		savebox_show(window_with_focus, "Symlink",
-				window_with_focus->path, item->leafname,
+				window_with_focus->path,
+				item->leafname,
 				item->image, link_cb);
 	}
 }
@@ -641,7 +644,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	char 		*argv[] = {"file", "-b", NULL, NULL};
 	int		got;
 	Collection 	*collection;
-	FileItem	*file;
+	DirItem	*file;
 	struct stat	info;
 	
 	g_return_if_fail(window_with_focus != NULL);
@@ -654,7 +657,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	file = selected_item(collection);
-	path = make_path(window_with_focus->path, file->leafname)->str;
+	path = make_path(window_with_focus->path,
+			file->leafname)->str;
 	if (lstat(path, &info))
 	{
 		delayed_error("ROX-Filer", g_strerror(errno));
@@ -809,7 +813,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 static void help(gpointer data, guint action, GtkWidget *widget)
 {
 	Collection 	*collection;
-	FileItem	*item;
+	DirItem	*item;
 	
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -837,7 +841,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 			if (item->flags & ITEM_FLAG_APPDIR)
 				app_show_help(
 					make_path(window_with_focus->path,
-						  item->leafname)->str);
+					  item->leafname)->str);
 			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 				report_error("Mount point",
 				"A mount point is a directory which another "
@@ -879,7 +883,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 static void mount(gpointer data, guint action, GtkWidget *widget)
 {
 #ifdef DO_MOUNT_POINTS
-	FileItem	*item;
+	DirItem	*item;
 	int		i;
 	Collection	*collection;
 	char		*error = NULL;
@@ -892,7 +896,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 	for (i = 0; i < collection->number_of_items; i++)
 		if (collection->items[i].selected)
 		{
-			item = (FileItem *) collection->items[i].data;
+			item = (DirItem *) collection->items[i].data;
 			if (item->flags & ITEM_FLAG_MOUNT_POINT)
 			{
 				char	*argv[] = {"mount", NULL, NULL};
@@ -902,7 +906,7 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 				if (item->flags & ITEM_FLAG_MOUNTED)
 					argv[0] = "umount";
 				argv[1] = make_path(window_with_focus->path,
-							item->leafname)->str;
+						item->leafname)->str;
 				child = spawn(argv);
 				if (child)
 					waitpid(child, NULL, 0);
