@@ -1455,11 +1455,12 @@ $ rox --bottom=</screen>
     the image file to display to its standard output stream, eg:
     <screen>tile /tmp/image.png</screen>
     <userinput>centre</userinput> and <userinput>scale</userinput> are the other possible
-    styles.
+    styles. The filer will then load this image and display it. The application does not
+    set the backdrop itself, it only tells the filer what to display.
    </para><para>
-    In the case of a random backdrop chooser it may then quit immediately. If the application
-    created a temporary image then it should read the line "ok\n" from its standard input
-    before deleting the image.
+    In the case of a random backdrop chooser, the program may then quit immediately. If
+    the application created a temporary image then it should read the line "ok\n" from its
+    standard input before deleting the image.
    </para><para>
     If the application wishes to show a sequence of images it should still read "ok\n",
     then wait until it's time to display the next image and then write that filename, and
