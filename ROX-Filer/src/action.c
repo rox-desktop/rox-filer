@@ -23,6 +23,8 @@
  * These routines generally fork() and talk to us via pipes.
  */
 
+#define GTK_DISABLE_DEPRECATED
+
 #include "config.h"
 
 #include <stdio.h>
@@ -152,11 +154,6 @@ static gboolean remove_pinned_ok(GList *paths);
 
 /*			SUPPORT				*/
 
-static void preview_closed(GtkWidget *window, GUIside *gui_side)
-{
-	gui_side->preview = NULL;
-}
-
 static void select_row_callback(GtkTreeView *treeview,
 				GtkTreePath *path,
 				GtkTreeViewColumn *col,
@@ -183,9 +180,9 @@ static void select_row_callback(GtkTreeView *treeview,
 	if (gui_side->preview)
 	{
 		display_set_autoselect(gui_side->preview, leaf);
-		gtk_signal_connect(GTK_OBJECT(gui_side->preview->window),
-				"destroy",
-				GTK_SIGNAL_FUNC(preview_closed), gui_side);
+		g_signal_connect(gui_side->preview->window, "destroy",
+				G_CALLBACK(gtk_widget_destroyed),
+				&gui_side->preview);
 	}
 
 out:
@@ -307,11 +304,11 @@ _("system(command) (true if 'command' returns with a zero exit status; a % \n"
 		gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);
 		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
-		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
+		g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(gtk_widget_hide), help);
 
-		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
-			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
+		g_signal_connect_swapped(help, "delete_event",
+			G_CALLBACK(gtk_widget_hide), help);
 	}
 
 	if (GTK_WIDGET_VISIBLE(help))
@@ -375,11 +372,11 @@ static void show_chmod_help(gpointer data)
 		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
 		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
-		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
+		g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(gtk_widget_hide), help);
 
-		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
-			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
+		g_signal_connect_swapped(help, "delete_event",
+			G_CALLBACK(gtk_widget_hide), help);
 	}
 
 	if (GTK_WIDGET_VISIBLE(help))
@@ -676,7 +673,7 @@ static void button_reply(GtkWidget *button, GUIside *gui_side)
 	if (!gui_side->to_child)
 		return;
 
-	text = gtk_object_get_data(GTK_OBJECT(button), "send-code");
+	text = g_object_get_data(G_OBJECT(button), "send-code");
 	g_return_if_fail(text != NULL);
 	fputc(*text, gui_side->to_child);
 	fflush(gui_side->to_child);
@@ -840,8 +837,8 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 
 	if (gui_side->preview)
 	{
-		gtk_signal_disconnect_by_data(
-				GTK_OBJECT(gui_side->preview->window),
+		g_signal_handlers_disconnect_matched(gui_side->preview->window,
+				G_SIGNAL_MATCH_DATA, 0, 0, NULL, NULL,
 				gui_side);
 		gui_side->preview = NULL;
 	}
@@ -936,14 +933,14 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 				    GDK_WINDOW_TYPE_HINT_DIALOG);
 	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
 	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 450, 200);
-	gtk_signal_connect(GTK_OBJECT(gui_side->window), "destroy",
-			GTK_SIGNAL_FUNC(destroy_action_window), gui_side);
+	g_signal_connect(gui_side->window, "destroy",
+			G_CALLBACK(destroy_action_window), gui_side);
 
 	gui_side->vbox = vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_add(GTK_CONTAINER(gui_side->window), vbox);
 
 	gui_side->dir = gtk_label_new(_("<dir>"));
-	gtk_widget_set_usize(gui_side->dir, 8, -1);
+	gtk_widget_set_size_request(gui_side->dir, 8, -1);
 	gui_side->next_dir = NULL;
 	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
@@ -973,7 +970,7 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 			NULL);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
 	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);
-	gtk_widget_set_usize(text, 400, 100);
+	gtk_widget_set_size_request(text, 400, 100);
 
 	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
 				scrollbar, FALSE, TRUE, 0);
@@ -986,26 +983,26 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gui_side->quiet = button = gtk_button_new_with_label(_("Quiet"));
 	gtk_misc_set_padding(GTK_MISC(GTK_BIN(button)->child), 12, 0);
 	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), button, FALSE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(quiet_clicked), gui_side);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(quiet_clicked), gui_side);
 
 	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
+	g_object_set_data(G_OBJECT(button), "send-code", "Y");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(button_reply), gui_side);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(button_reply), gui_side);
 	gui_side->no = button = gtk_button_new_with_label(_("No"));
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "N");
+	g_object_set_data(G_OBJECT(button), "send-code", "N");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(button_reply), gui_side);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(button_reply), gui_side);
 	SENSITIVE_YESNO(gui_side, FALSE);
 
 	button = gtk_button_new_with_label(_("Abort"));
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(gui_side->window));
+	g_signal_connect_swapped(button, "clicked",
+			G_CALLBACK(gtk_widget_destroy),
+			gui_side->window);
 
 	gui_side->input_tag = gdk_input_add(gui_side->from_child,
 						GDK_INPUT_READ,
@@ -1915,10 +1912,10 @@ static GtkWidget *add_toggle(GUIside *gui_side,
 
 	check = gtk_check_button_new_with_label(label);
 	gtk_tooltips_set_tip(tooltips, check, tip, NULL);
-	gtk_object_set_data(GTK_OBJECT(check), "send-code", (gchar *) code);
+	g_object_set_data(G_OBJECT(check), "send-code", (gchar *) code);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), active);
-	gtk_signal_connect(GTK_OBJECT(check), "clicked",
-			GTK_SIGNAL_FUNC(button_reply), gui_side);
+	g_signal_connect(check, "clicked",
+			G_CALLBACK(button_reply), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), check, FALSE, TRUE, 0);
 
 	return check;
@@ -1977,12 +1974,12 @@ void action_find(GList *paths)
 			1, (gchar *) _("Directory"), cell_renderer,
 			"text", 1, NULL);
 
-	gtk_widget_set_usize(gui_side->results, 100, 100);
+	gtk_widget_set_size_request(gui_side->results, 100, 100);
 	gtk_container_add(GTK_CONTAINER(scroller), gui_side->results);
 	gtk_box_set_child_packing(GTK_BOX(gui_side->vbox),
 			  gui_side->log_hbox, FALSE, TRUE, 4, GTK_PACK_START);
-	gtk_signal_connect(GTK_OBJECT(gui_side->results), "row-activated",
-			GTK_SIGNAL_FUNC(select_row_callback), gui_side);
+	g_signal_connect(gui_side->results, "row-activated",
+			G_CALLBACK(select_row_callback), gui_side);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new(_("Expression:"));
@@ -1995,8 +1992,8 @@ void action_find(GList *paths)
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
-	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
-			GTK_SIGNAL_FUNC(entry_changed), gui_side);
+	g_signal_connect(gui_side->entry, "changed",
+			G_CALLBACK(entry_changed), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox),
 				new_help_button(show_condition_help, NULL),
@@ -2004,8 +2001,8 @@ void action_find(GList *paths)
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
-	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "activate",
-			GTK_SIGNAL_FUNC(find_return_pressed), gui_side);
+	g_signal_connect(gui_side->entry, "activate",
+			G_CALLBACK(find_return_pressed), gui_side);
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2142,8 +2139,8 @@ void action_chmod(GList *paths)
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
-	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
-			GTK_SIGNAL_FUNC(entry_changed), gui_side);
+	g_signal_connect(gui_side->entry, "changed",
+			G_CALLBACK(entry_changed), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),
 				new_help_button(show_chmod_help, NULL),
@@ -2151,9 +2148,9 @@ void action_chmod(GList *paths)
 	
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Permissions"));
-	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
-			GTK_SIGNAL_FUNC(gtk_button_clicked),
-			GTK_OBJECT(gui_side->yes));
+	g_signal_connect_swapped(gui_side->entry, "activate",
+			G_CALLBACK(gtk_button_clicked),
+			gui_side->yes);
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
