@@ -19,6 +19,8 @@ void pinboard_may_update(guchar *path);
 void pinboard_show_help(PinIcon *icon);
 void pinboard_clear_selection(void);
 
+gboolean pinboard_has(guchar *path);
+
 PinIcon *pinboard_selected_icon(void);
 gboolean pinboard_is_selected(PinIcon *icon);
 void pinboard_set_selected(PinIcon *icon, gboolean selected);

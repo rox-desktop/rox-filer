@@ -30,5 +30,6 @@ void set_blocking(int fd, gboolean blocking);
 char *pretty_time(time_t *time);
 guchar *copy_file(guchar *from, guchar *to);
 guchar *shell_escape(guchar *word);
+gboolean is_sub_dir(char *sub, char *parent);
 
 #endif /* _SUPPORT_H */

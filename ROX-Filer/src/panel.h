@@ -20,5 +20,6 @@ typedef enum {
 void panel_init(void);
 Panel *panel_new(guchar *name, PanelSide side);
 void panel_may_update(guchar *path);
+gboolean panel_has(guchar *path);
 
 #endif /* _PANEL_H */

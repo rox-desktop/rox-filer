@@ -537,3 +537,35 @@ guchar *shell_escape(guchar *word)
 	g_string_free(tmp, FALSE);
 	return retval;
 }
+
+/* TRUE iff `sub' is (or would be) an object inside the directory `parent',
+ * (or the two are the same item/directory)
+ */
+gboolean is_sub_dir(char *sub, char *parent)
+{
+	int 		parent_len;
+	guchar		*real_sub, *real_parent;
+	gboolean	retval;
+
+	real_sub = pathdup(sub);
+	real_parent = pathdup(parent);
+
+	parent_len = strlen(real_parent);
+	if (strncmp(real_parent, real_sub, parent_len))
+		retval = FALSE;
+	else
+	{
+		/* real_sub is at least as long as real_parent and all
+		 * characters upto real_parent's length match.
+		 */
+
+		retval = real_sub[parent_len] == '\0' ||
+			 real_sub[parent_len] == '/';
+	}
+
+	g_free(real_sub);
+	g_free(real_parent);
+
+	return retval;
+}
+

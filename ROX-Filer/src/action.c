@@ -45,6 +45,8 @@
 #include "modechange.h"
 #include "find.h"
 #include "dir.h"
+#include "pinboard.h"
+#include "panel.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -152,6 +154,7 @@ static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
 static void add_toggle(GUIside *gui_side, guchar *label, guchar *code);
 static gboolean reply(int fd, gboolean ignore_quiet);
+static gboolean remove_pinned_ok(FilerWindow *filer_window);
 
 /*			OPTIONS 				*/
 
@@ -490,37 +493,6 @@ static void show_chmod_help(gpointer data)
 	if (GTK_WIDGET_VISIBLE(help))
 		gtk_widget_hide(help);
 	gtk_widget_show_all(help);
-}
-
-/* TRUE iff `sub' is (or would be) an object inside the directory `parent',
- * (or the two are the same directory)
- */
-static gboolean is_sub_dir(char *sub, char *parent)
-{
-	int 		parent_len;
-	guchar		*real_sub, *real_parent;
-	gboolean	retval;
-
-	real_sub = pathdup(sub);
-	real_parent = pathdup(parent);
-
-	parent_len = strlen(real_parent);
-	if (strncmp(real_parent, real_sub, parent_len))
-		retval = FALSE;
-	else
-	{
-		/* real_sub is at least as long as real_parent and all
-		 * characters upto real_parent's length match.
-		 */
-
-		retval = real_sub[parent_len] == '\0' ||
-			 real_sub[parent_len] == '/';
-	}
-
-	g_free(real_sub);
-	g_free(real_parent);
-
-	return retval;
 }
 
 static gboolean display_dir(gpointer data)
@@ -2047,6 +2019,9 @@ void action_delete(FilerWindow *filer_window)
 		return;
 	}
 
+	if (!remove_pinned_ok(filer_window))
+		return;
+
 	gui_side = start_action(filer_window, delete_cb, o_auto_delete);
 	if (!gui_side)
 		return;
@@ -2191,4 +2166,90 @@ void action_init(void)
 {
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("action_auto_quiet", action_auto_quiet);
+}
+
+#define MAX_ASK 4
+
+/* Check to see if any of the selected items (or their children) are
+ * on the pinboard or panel. If so, ask for confirmation.
+ *
+ * TRUE if it's OK to lose them.
+ */
+static gboolean remove_pinned_ok(FilerWindow *filer_window)
+{
+	Collection 	*collection = filer_window->collection;
+	int		i;
+	GList		*ask = NULL, *next;
+	GString		*message;
+	int		ask_n = 0;
+	gboolean	retval;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		DirItem	*item;
+		guchar	*path;
+		
+		if (!collection->items[i].selected)
+			continue;
+
+		item = (DirItem *) collection->items[i].data;
+		path = make_path(filer_window->path, item->leafname)->str;
+
+		if (pinboard_has(path) || panel_has(path))
+		{
+			if (++ask_n > MAX_ASK)
+				break;
+			ask = g_list_append(ask, item->leafname);
+		}
+	}
+
+	if (!ask)
+		return TRUE;
+
+	if (ask_n > MAX_ASK)
+	{
+		message = g_string_new(_("Deleting items such as "));
+		ask_n--;
+	}
+	else if (ask_n == 1)
+		message = g_string_new(_("Deleting the item "));
+	else
+		message = g_string_new(_("Deleting the items "));
+
+	i = 0;
+	for (next = ask; next; next = next->next)
+	{
+		guchar	*leaf = (guchar *) next->data;
+		
+		g_string_append_c(message, '`');
+		g_string_append(message, leaf);
+		g_string_append_c(message, '\'');
+		i++;
+		if (i == ask_n - 1 && i > 0)
+			g_string_append(message, " and ");
+		else if (i < ask_n)
+			g_string_append(message, ", ");
+	}
+
+	g_list_free(ask);
+
+	if (ask_n == 1)
+		message = g_string_append(message,
+				_(" will affect some items on the pinboard "
+				  "or panel - really delete it?"));
+	else
+	{
+		if (ask_n > MAX_ASK)
+			message = g_string_append_c(message, ',');
+		message = g_string_append(message,
+				_(" will affect some items on the pinboard "
+					"or panel - really delete them?"));
+	}
+	
+	retval = get_choice(PROJECT, message->str,
+				2, _("OK"), _("Cancel")) == 0;
+
+	g_string_free(message, TRUE);
+	
+	return retval;
 }

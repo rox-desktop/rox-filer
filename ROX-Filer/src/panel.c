@@ -359,6 +359,39 @@ void panel_may_update(guchar *path)
 	}
 }
 
+typedef struct _CheckData CheckData;
+struct _CheckData {
+	guchar	 *path;
+	gboolean found;
+};
+
+static void check_has(gpointer key, GList *icons, CheckData *check)
+{
+	PanelIcon	*icon;
+	
+	g_return_if_fail(icons != NULL);
+	
+	icon = icons->data;
+
+	if (is_sub_dir(icon->path, check->path))
+		check->found = TRUE;
+}
+
+/* Returns TRUE if the pinboard contains this item (or any item inside
+ * this item).
+ */
+gboolean panel_has(guchar *path)
+{
+	CheckData	check;
+
+	check.path = path;
+	check.found = FALSE;
+	g_hash_table_foreach(icons_hash, (GHFunc) check_has, &check);
+
+	return check.found;
+}
+
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
