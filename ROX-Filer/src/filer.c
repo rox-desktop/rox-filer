@@ -230,6 +230,8 @@ static void filer_window_set_size(FilerWindow *filer_window,
 	
 	if (o_toolbar != TOOLBAR_NONE)
 		h += filer_window->toolbar_frame->allocation.height;
+	if (filer_window->message)
+		h += filer_window->message->allocation.height;
 
 	if (GTK_WIDGET_VISIBLE(filer_window->window))
 	{
@@ -309,6 +311,8 @@ static void filer_size_for(FilerWindow *filer_window,
 	 */
 	if (o_toolbar != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
+	if (filer_window->message)
+		t += filer_window->message->allocation.height;
 	if (GTK_WIDGET_VISIBLE(filer_window->minibuffer_area))
 	{
 		GtkRequisition req;
@@ -1308,6 +1312,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 #endif
 
 	filer_window = g_new(FilerWindow, 1);
+	filer_window->message = NULL;
 	filer_window->minibuffer = NULL;
 	filer_window->minibuffer_label = NULL;
 	filer_window->minibuffer_area = NULL;
@@ -1452,18 +1457,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 	
-	/* If there's a message that should go at the top of every
-	 * window (eg 'Running as root'), add it here.
-	 */
-	if (show_user_message)
-	{
-		GtkWidget *label;
-
-		label = gtk_label_new(show_user_message);
-		gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
-		gtk_widget_show(label);
-	}
-
 	/* Create a frame for the toolbar, but don't show it unless we actually
 	 * have a toolbar.
 	 * (allows us to change the toolbar later)
@@ -1483,6 +1476,17 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_container_add(GTK_CONTAINER(filer_window->toolbar_frame),
 				toolbar);
 		gtk_widget_show_all(filer_window->toolbar_frame);
+	}
+
+	/* If there's a message that should be displayed in each window (eg
+	 * 'Running as root'), add it here.
+	 */
+	if (show_user_message)
+	{
+		filer_window->message = gtk_label_new(show_user_message);
+		gtk_box_pack_start(GTK_BOX(vbox), filer_window->message,
+				   FALSE, TRUE, 0);
+		gtk_widget_show(filer_window->message);
 	}
 
 	/* Now add the area for displaying the files.

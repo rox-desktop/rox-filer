@@ -52,6 +52,8 @@ struct _FilerWindow
 	gboolean	had_cursor;	/* (before changing directory) */
 	char		*auto_select;	/* If it we find while scanning */
 
+	GtkWidget	*message;	/* The 'Running as ...' message */
+
 	GtkWidget	*minibuffer_area;	/* The hbox to show/hide */
 	GtkWidget	*minibuffer_label;	/* The operation name */
 	GtkWidget	*minibuffer;		/* The text entry */
