@@ -110,11 +110,11 @@ else
   GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
   changequote(,)dnl
   if [ -n "$GDK_PIXBUF_LIBS" ]; then
+  changequote([,])dnl
     AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
   else
     AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - make sure it is in your PATH)
   fi
-  changequote([,])dnl
 fi
 AC_SUBST(GTK_CFLAGS)
 AC_SUBST(GTK_LIBS)

@@ -13,8 +13,19 @@ Note: Currently in the middle of upgrading the dir scanning code.
 	- Think about needs_rescan, etc
 	- Remove debugging output
 	- Clear window before resizing
+	- Use a hash table for dir->items. Avoids duplicates problem?
 
 BUGS
+
+Escape in Enter Path minibuffer scrolls to cursor. Why?
+
+Some versions of configure require --bindir to be an absolute path.
+
+Send To menu:
+
+- Next click doesn't work
+- Empty menu looks ugly
+- Short-cut to open it?
 
 Translated text doesn't always display. Converting to UTF-8 fixes it, but
 does this work everywhere? Should convert from translator's encoding when
@@ -29,6 +40,7 @@ Gtk+ 2.0:
 	- Savebox doesn't highlight leafname
 	- Pinboard text background types none/outline don't work
 	- Can't set menu shortcuts to a single key (eg, 'L')
+	- Wheel mice don't work anymore?
 
 Return for 'Do another search' toggles Quiet...
 
@@ -37,6 +49,8 @@ Return for 'Do another search' toggles Quiet...
 Root click with sawfish 0.99 doesn't work (bug in sawfish).
 
 Rescanning sometimes causes the display to scroll (unrepeatable).
+
+Panel sometimes won't accept drops (unrepeatable).
 
 
 FEATURES FOR 1.1
