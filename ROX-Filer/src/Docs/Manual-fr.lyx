@@ -56,7 +56,7 @@ Traduction française : Arnaud Calvo <arnaud@calvo-france.com>
 \newline 
 Notes du traducteur :
 \newline 
-Cette version a été traduite à partir du manuel ROX-Filer version 1.1.6.
+Cette version a été traduite à partir du manuel ROX-Filer version 1.1.7.
 \newline 
 Le point 4 de la section 9.2, ainsi que le point 18.4 n'ont pas été traduits.
 \newline 
@@ -748,12 +748,12 @@ Autres
 
 Si rien ne fonctionne, essayez de lancer rox avec les options `
 \family typewriter 
--no
+-n
 \family default 
-' (ndt : -n et -o) ; cela devrait outrepasser le contr\i \^{o}
+' et `-o' ; cela devrait outrepasser le contr\i \^{o}
 le des ic\i \^{o}
-nes par le
- gestionnaire de fen\i \^{e}
+nes par le gestionnaire
+ de fen\i \^{e}
 tres.
 \layout Subsection
 
@@ -866,6 +866,34 @@ Voici la liste complète :
 me si un autre semble \i \^{e}
 tre déjà
  ouvert
+\layout Description
+
+-m, 
+\series bold 
+--mime-type=FILE
+\series default 
+ affiche le type MIME du fichier 
+\begin_inset Quotes eld
+\end_inset 
+
+FILE
+\begin_inset Quotes erd
+\end_inset 
+
+ et s'arr\i \^{e}
+te.
+\layout Description
+
+-n, 
+\series bold 
+--new
+\series default 
+ démarre un nouveau 
+\shape italic 
+filer
+\shape default 
+, m\i \^{e}
+me si il y en a déjà un.
 \layout Description
 
 -o, 
@@ -1020,9 +1048,10 @@ Clic gauche
 \layout Standard
 
 Ouvre le fichier ou le dossier cliqué.Maintenez enfoncé Ctrl pour sélectionner
- les objets au lieu de les ouvrir.Maintenez enfoncé Shift pour voir à l'intérieur
- des dossiers-application, pour ouvrir les fichiers avec l'éditeur de texte,.pour
- suivre les liens symboliques ou pour monter des périphériques.
+ les objets au lieu de les ouvrir.
+ Maintenez enfoncé Shift pour voir à l'intérieur des dossiers-application,
+ pour ouvrir les fichiers avec l'éditeur de texte, pour suivre les liens
+ symboliques ou pour monter des périphériques.
 \end_inset 
 </cell>
 </row>
@@ -1315,6 +1344,11 @@ filer
 \shape default 
  est quitté.
 \layout Section
+
+
+\begin_inset LatexCommand \label{Sec: La sélection}
+
+\end_inset 
 
 La sélection
 \layout Standard
@@ -2294,7 +2328,7 @@ Notez que pour les dossiers-application, il peut y avoir quelques commandes
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
 
 \begin_inset  Tabular
-<lyxtabular version="2" rows="14" columns="2">
+<lyxtabular version="2" rows="15" columns="2">
 <features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
 <column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
 <column alignment="left" valignment="top" leftline="true" rightline="true" width="10cm" special="">
@@ -2443,7 +2477,7 @@ Affiche plus de détails sur l'objet.
 \end_inset 
 </cell>
 </row>
-<row topline="false" bottomline="false" newpage="false">
+<row topline="false" bottomline="true" newpage="false">
 <cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
 \begin_inset Text
 
@@ -2510,6 +2544,30 @@ Ouvrir (A)VFS
 Ouvre le fichier comme s'il s'agissait d'un dossier --- voir la section
  
 \begin_inset LatexCommand \ref{sec: vfs}
+
+\end_inset 
+
+.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Envoyers à...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre le menu `Envoyer à...`, ce qui permet d'envoyer les objets à une application.
+ Voir la section 
+\begin_inset LatexCommand \ref{SubSec: Envoyers à}
 
 \end_inset 
 
@@ -2632,6 +2690,11 @@ tre déplacée, utilisez un lien absolu
 tre déplacée (le lien devra l'\i \^{e}
 tre aussi...), alors optez pour un lien relatif.
 \layout Subsection
+
+
+\begin_inset LatexCommand \label{SubSec: Menu Nouveau}
+
+\end_inset 
 
 Le menu Nouveau
 \layout Standard
@@ -3033,6 +3096,35 @@ Comme si vous affichiez le dossier-application ROX-Filer,et que vous choisissiez
 \end_inset 
 
 
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{SubSec: Envoyers à}
+
+\end_inset 
+
+Le menu `Envoyers à...`
+\layout Standard
+
+Le menu `Envoyer à...` permet d'envoyer très facilement un (des) objet(s) à
+ une application.
+ Le 
+\shape italic 
+filer
+\shape default 
+ cherche le dossier `SendTo` dans votre CHOICESPATH et liste son contenu
+ dans ce menu.
+ Pour changer les applications qui apparaissent ici, vous pouvez utiliser
+ la commande `Personnaliser` qui se trouve en bas du menu ; elle créera
+ si nécessaire le dossier `SendTo` et l'ouvrira.
+ Vous pouvez placer dans ce dossier des liens symboliques en glissant/déposant
+ des applications avec les touches Ctrl et Shift maintenues enfoncées.
+\layout Standard
+
+L'affichage du menu `Envoyers à...` via le menu principal est plut\i \^{o}
+t lent ;
+ vous devriez l'ouvrir en cliquant sur un fichier avec le bouton droit en
+ maintenant la touche Shift enfoncée.
 \layout Section
 
 Le punaiseur et les panneaux
@@ -4657,6 +4749,11 @@ tres, chaque fois que
 \end_deeper 
 \layout Itemize
 
+`Taille maximum` fixe -en pourcentage de la taille de l'écran- la taille
+ maximum des fen\i \^{e}
+tres lorsque celles-ci sont redimensionnées automatiquement.
+\layout Itemize
+
 `Fen\i \^{e}
 tres uniques' évite que deux fen\i \^{e}
 tres puissent afficher le m\i \^{e}
@@ -4900,7 +4997,7 @@ ROX-Filer utilise trois sous-dossiers dans votre dossier Choices pour gérer
  les types de fichier :
 \layout Description
 
-MIME-info héberge un fichier `Standard' qui définit le type MIME des fichiers
+MIME-info contient des fichiers qui définissent le type MIME des fichiers
  en fonction de leur extension.
  ROX-Filer est installé avec beaucoup de ces règles déjà configurées ---
  celles-ci sont installées par le paquetage `rox-base'.
@@ -4908,8 +5005,8 @@ MIME-info héberge un fichier `Standard' qui définit le type MIME des fichiers
 \layout Standard
 
 Beaucoup d'applications sont maintenant distribuées avec un fichier nommé
- `quelquechose.mime' ; copiez leur contenu dans le fichier `Standard' pour
- que ROX-Filer reconnaisse automatiquement les nouvelles extensions.
+ `quelquechose.mime' ; copiez-les dans ce dossier pour que ROX-Filer reconnaisse
+ automatiquement les nouvelles extensions.
 \end_deeper 
 \layout Description
 
