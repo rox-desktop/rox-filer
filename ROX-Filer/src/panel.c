@@ -60,6 +60,7 @@ typedef struct _PanelIcon PanelIcon;
 
 struct _Panel {
 	GtkWidget	*window;
+	GtkAdjustment	*adj;		/* Scroll position of the bar */
 	PanelSide	side;
 	guchar		*name;		/* Leaf name */
 
@@ -101,6 +102,9 @@ static void popup_panel_menu(GdkEventButton *event,
 				Panel *panel,
 				PanelIcon *icon);
 static void open_home(gpointer data, guint action, GtkWidget *widget);
+static gint panel_button_release(GtkWidget *widget,
+			      GdkEventButton *event,
+			      Panel *panel);
 static gint panel_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
@@ -144,12 +148,18 @@ static void selection_get(GtkWidget *widget,
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      PanelIcon *icon);
+static gint panel_motion_event(GtkWidget *widget,
+			      GdkEventMotion *event,
+			      Panel *panel);
 static void reposition_icon(PanelIcon *icon, int index);
 static void start_drag(PanelIcon *icon, GdkEventMotion *event);
 static guchar *create_uri_list(GList *list);
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     PanelIcon *icon);
+static void perform_action(Panel *panel,
+			   PanelIcon *icon,
+			   GdkEventButton *event);
 
 
 static GtkItemFactoryEntry menu_def[] = {
@@ -173,6 +183,9 @@ static GList *panel_selection = NULL;
 static GHashTable *icons_hash = NULL;
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
+
+/* When sliding the panel, records where the panel was before */
+static gint slide_from_value = 0;
 
 
 /****************************************************************
@@ -241,7 +254,10 @@ Panel *panel_new(guchar *name, PanelSide side)
 	panel->side = side;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
-	gtk_widget_set_events(panel->window, GDK_BUTTON_PRESS_MASK);
+	gtk_widget_set_events(panel->window,
+			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+			GDK_BUTTON2_MOTION_MASK);
 
 	gtk_signal_connect(GTK_OBJECT(panel->window), "delete-event",
 			GTK_SIGNAL_FUNC(panel_delete), panel);
@@ -249,6 +265,10 @@ Panel *panel_new(guchar *name, PanelSide side)
 			GTK_SIGNAL_FUNC(panel_destroyed), panel);
 	gtk_signal_connect(GTK_OBJECT(panel->window), "button_press_event",
 			GTK_SIGNAL_FUNC(panel_button_press), panel);
+	gtk_signal_connect(GTK_OBJECT(panel->window), "button_release_event",
+			GTK_SIGNAL_FUNC(panel_button_release), panel);
+	gtk_signal_connect(GTK_OBJECT(panel->window), "motion-notify-event",
+			GTK_SIGNAL_FUNC(panel_motion_event), panel);
 
 	if (strchr(name, '/'))
 	{
@@ -272,12 +292,14 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 	if (side == PANEL_TOP || side == PANEL_BOTTOM)
 	{
+		panel->adj = gtk_viewport_get_hadjustment(GTK_VIEWPORT(vp));
 		box = gtk_hbox_new(FALSE, 0);
 		panel->before = gtk_hbox_new(FALSE, 0);
 		panel->after = gtk_hbox_new(FALSE, 0);
 	}
 	else
 	{
+		panel->adj = gtk_viewport_get_vadjustment(GTK_VIEWPORT(vp));
 		box = gtk_vbox_new(FALSE, 0);
 		panel->before = gtk_vbox_new(FALSE, 0);
 		panel->after = gtk_vbox_new(FALSE, 0);
@@ -604,39 +626,13 @@ static void icon_set_selected(PanelIcon *icon, gboolean selected)
 		panel_clear_selection(icon);
 }
 
-static gint panel_button_press(GtkWidget *widget,
-			      GdkEventButton *event,
-			      Panel *panel)
+/* icon may be NULL if the event is on the background */
+static void perform_action(Panel *panel, PanelIcon *icon, GdkEventButton *event)
 {
-	BindAction	action;
-
-	action = bind_lookup_bev(BIND_PANEL, event);
-
-	switch (action)
-	{
-		case ACT_CLEAR_SELECTION:
-			panel_clear_selection(NULL);
-			break;
-		case ACT_POPUP_MENU:
-			dnd_motion_ungrab();
-			popup_panel_menu(event, panel, NULL);
-			break;
-		case ACT_IGNORE:
-			break;
-		default:
-			g_warning("Unsupported action : %d\n", action);
-			break;
-	}
-
-	return TRUE;
-}
-
-static void perform_action(PanelIcon *icon, GdkEventButton *event)
-{
-	GtkWidget	*widget = icon->widget;
+	GtkWidget	*widget = icon ? icon->widget : NULL;
 	BindAction	action;
 	
-	action = bind_lookup_bev(BIND_PANEL_ICON, event);
+	action = bind_lookup_bev(icon ? BIND_PANEL_ICON : BIND_PANEL, event);
 
 	switch (action)
 	{
@@ -652,7 +648,7 @@ static void perform_action(PanelIcon *icon, GdkEventButton *event)
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
-			popup_panel_menu(event, icon->panel, icon);
+			popup_panel_menu(event, panel, icon);
 			break;
 		case ACT_MOVE_ICON:
 			dnd_motion_start(MOTION_REPOSITION);
@@ -676,12 +672,42 @@ static void perform_action(PanelIcon *icon, GdkEventButton *event)
 		case ACT_SELECT_EXCL:
 			icon_set_selected(icon, TRUE);
 			break;
+		case ACT_SLIDE_PANEL:
+			dnd_motion_grab_pointer();
+			slide_from_value = panel->adj->value;
+			dnd_motion_start(MOTION_REPOSITION);
+			break;
 		case ACT_IGNORE:
+			break;
+		case ACT_CLEAR_SELECTION:
+			panel_clear_selection(NULL);
 			break;
 		default:
 			g_warning("Unsupported action : %d\n", action);
 			break;
 	}
+}
+
+static gint panel_button_release(GtkWidget *widget,
+			      GdkEventButton *event,
+			      Panel *panel)
+{
+	if (dnd_motion_release(event))
+		return TRUE;
+
+	perform_action(panel, NULL, event);
+	
+	return TRUE;
+}
+
+static gint panel_button_press(GtkWidget *widget,
+			      GdkEventButton *event,
+			      Panel *panel)
+{
+	if (dnd_motion_press(panel->window, event))
+		perform_action(panel, NULL, event);
+
+	return TRUE;
 }
 
 static gint icon_button_release(GtkWidget *widget,
@@ -691,7 +717,7 @@ static gint icon_button_release(GtkWidget *widget,
 	if (dnd_motion_release(event))
 		return TRUE;
 
-	perform_action(icon, event);
+	perform_action(icon->panel, icon, event);
 	
 	return TRUE;
 }
@@ -701,7 +727,7 @@ static gint icon_button_press(GtkWidget *widget,
 			      PanelIcon *icon)
 {
 	if (dnd_motion_press(widget, event))
-		perform_action(icon, event);
+		perform_action(icon->panel, icon, event);
 
 	return TRUE;
 }
@@ -1228,6 +1254,29 @@ static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
 	losing_selection++;
 	panel_clear_selection(NULL);
 	losing_selection--;
+
+	return TRUE;
+}
+
+static gint panel_motion_event(GtkWidget *widget,
+			      GdkEventMotion *event,
+			      Panel *panel)
+{
+	gint	delta, new;
+	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
+
+	if (motion_state != MOTION_REPOSITION)
+		return FALSE;
+
+	if (horz)
+		delta = event->x_root - drag_start_x;
+	else
+		delta = event->y_root - drag_start_y;
+
+	new = slide_from_value - delta;
+	new = CLAMP(new, 0, panel->adj->upper - panel->adj->page_size);
+
+	gtk_adjustment_set_value(panel->adj, new);
 
 	return TRUE;
 }

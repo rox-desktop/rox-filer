@@ -116,6 +116,10 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 
 		if (context == BIND_DIRECTORY)
 			return clear ? ACT_LASSO_CLEAR : ACT_LASSO_MODIFY;
+
+		if (context == BIND_PANEL)
+			return ACT_SLIDE_PANEL;
+				
 		return clear ? ACT_CLEAR_SELECTION : ACT_IGNORE;
 	}
 

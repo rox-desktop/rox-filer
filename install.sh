@@ -116,7 +116,7 @@ endir "$CHOICES/MIME-info"
 endir "$CHOICES/MIME-types"
 
 echo "Installing icons..."
-cp Choices/MIME-icons/* "$CHOICES/MIME-icons"
+install -m 644 Choices/MIME-icons/* "$CHOICES/MIME-icons"
 
 echo
 echo "Installing handlers..."

@@ -35,6 +35,7 @@ typedef enum {
 	ACT_PRIME_AND_TOGGLE,	/* As above, but toggle the item instead */
 	ACT_LASSO_CLEAR,	/* Clear selection, and start lasso drag */
 	ACT_LASSO_MODIFY,	/* Start lasso drag without clearing */
+	ACT_SLIDE_PANEL,	/* Start scrolling the panel */
 } BindAction;
 
 void bind_init(void);
