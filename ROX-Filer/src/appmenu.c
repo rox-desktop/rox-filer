@@ -327,7 +327,7 @@ static void build_menu_for_type(MIME_type *type)
 	g_free(path);
 
 out:
-	item = gtk_menu_item_new_with_label(_("Customise menu..."));
+	item = gtk_menu_item_new_with_label(_("Customise Menu..."));
 	current_items = g_list_prepend(current_items, item);
 	g_signal_connect(item, "activate", G_CALLBACK(customise_type), type);
 	gtk_widget_show(item);
