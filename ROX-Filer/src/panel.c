@@ -23,8 +23,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
@@ -239,8 +237,8 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_viewport_set_shadow_type(GTK_VIEWPORT(vp), GTK_SHADOW_NONE);
 	gtk_container_add(GTK_CONTAINER(align), vp);
 
-	gtk_signal_connect(GTK_OBJECT(align), "expose-event",
-			GTK_SIGNAL_FUNC(draw_panel_edge), panel);
+	g_signal_connect(align, "expose-event",
+			 G_CALLBACK(draw_panel_edge), panel);
 
 	if (side == PANEL_TOP || side == PANEL_BOTTOM)
 	{
@@ -514,7 +512,7 @@ static void panel_add_item(Panel *panel,
 	icon->label = NULL;
 	icon->layout = NULL;
 
-	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
+	g_object_set_data(G_OBJECT(widget), "icon", icon);
 	
 	icon_hash_path(icon);
 	
@@ -553,16 +551,15 @@ static void panel_add_item(Panel *panel,
 
 	if (!icon->socket)
 	{
-		gtk_signal_connect_after(GTK_OBJECT(widget),
-				"enter-notify-event",
-				GTK_SIGNAL_FUNC(enter_icon), icon);
-		gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
-				GTK_SIGNAL_FUNC(expose_icon), icon);
-		gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
-				GTK_SIGNAL_FUNC(drag_data_get), NULL);
+		g_signal_connect(widget, "enter-notify-event",
+				G_CALLBACK(enter_icon), icon);
+		g_signal_connect_after(widget, "expose_event",
+				G_CALLBACK(expose_icon), icon);
+		g_signal_connect(widget, "drag_data_get",
+				G_CALLBACK(drag_data_get), NULL);
 
-		gtk_signal_connect(GTK_OBJECT(widget), "size_request",
-				GTK_SIGNAL_FUNC(size_request), icon);
+		g_signal_connect(widget, "size_request",
+				G_CALLBACK(size_request), icon);
 
 		drag_set_panel_dest(icon);
 
@@ -790,16 +787,13 @@ static void reposition_panel(GtkWidget *window,
 /* Same as drag_set_dest(), but for panel icons */
 static void drag_set_panel_dest(Icon *icon)
 {
-	GtkObject	*obj = GTK_OBJECT(icon->widget);
+	GtkWidget	*obj = icon->widget;
 
 	make_drop_target(icon->widget, 0);
 
-	gtk_signal_connect(obj, "drag_motion",
-			GTK_SIGNAL_FUNC(drag_motion), icon);
-	gtk_signal_connect(obj, "drag_leave",
-			GTK_SIGNAL_FUNC(drag_leave), icon);
-	gtk_signal_connect(obj, "drag_end",
-			GTK_SIGNAL_FUNC(drag_end), icon);
+	g_signal_connect(obj, "drag_motion", G_CALLBACK(drag_motion), icon);
+	g_signal_connect(obj, "drag_leave", G_CALLBACK(drag_leave), icon);
+	g_signal_connect(obj, "drag_end", G_CALLBACK(drag_end), icon);
 }
 
 static gboolean drag_motion(GtkWidget		*widget,
@@ -977,10 +971,10 @@ void panel_save(Panel *panel)
 
 	root = xmlDocGetRootElement(doc);
 	make_widgets(xmlNewChild(root, NULL, "start", NULL),
-			gtk_container_children(GTK_CONTAINER(panel->before)));
+		gtk_container_get_children(GTK_CONTAINER(panel->before)));
 
 	make_widgets(xmlNewChild(root, NULL, "end", NULL),
-			g_list_reverse(gtk_container_children(
+			g_list_reverse(gtk_container_get_children(
 					GTK_CONTAINER(panel->after))));
 
 	save_new = g_strconcat(save, ".new", NULL);
@@ -1004,10 +998,10 @@ static GtkWidget *make_insert_frame(Panel *panel)
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
-	gtk_widget_set_usize(frame, 16, 16);
+	gtk_widget_set_size_request(frame, 16, 16);
 
-	gtk_signal_connect(GTK_OBJECT(frame), "drag-data-received",
-			GTK_SIGNAL_FUNC(add_uri_list), panel);
+	g_signal_connect(frame, "drag-data-received",
+			G_CALLBACK(add_uri_list), panel);
 	gtk_drag_dest_set(frame,
 			GTK_DEST_DEFAULT_ALL,
 			target_table,
@@ -1068,10 +1062,10 @@ static gint icon_motion_event(GtkWidget *widget,
 	else if (motion_state != MOTION_REPOSITION)
 		return FALSE;
 
-	list = gtk_container_children(GTK_CONTAINER(panel->before));
+	list = gtk_container_get_children(GTK_CONTAINER(panel->before));
 	list = g_list_append(list, NULL);	/* The gap in the middle */
 	list = g_list_concat(list,
-			gtk_container_children(GTK_CONTAINER(panel->after)));
+		gtk_container_get_children(GTK_CONTAINER(panel->after)));
 	me = g_list_find(list, widget);
 
 	g_return_val_if_fail(me != NULL, TRUE);
@@ -1138,7 +1132,7 @@ static void reposition_icon(Icon *icon, int index)
 	GList	  *list;
 	int	  before_len;
 
-	list = gtk_container_children(GTK_CONTAINER(panel->before));
+	list = gtk_container_get_children(GTK_CONTAINER(panel->before));
 	before_len = g_list_length(list);
 
 	if (index <= before_len)
@@ -1166,7 +1160,7 @@ static void reposition_icon(Icon *icon, int index)
 
 		g_list_free(list);
 
-		list = gtk_container_children(GTK_CONTAINER(panel->after));
+		list = gtk_container_get_children(GTK_CONTAINER(panel->after));
 
 		if (!g_list_find(list, widget))
 		{
@@ -1245,7 +1239,7 @@ static void applet_died(GtkWidget *socket)
 {
 	gboolean never_plugged;
 
-	never_plugged = (!gtk_object_get_data(GTK_OBJECT(socket), "lost_plug"))
+	never_plugged = (!g_object_get_data(G_OBJECT(socket), "lost_plug"))
 		      && !GTK_SOCKET(socket)->plug_window;
 
 	if (never_plugged)
@@ -1260,14 +1254,14 @@ static void applet_died(GtkWidget *socket)
 
 static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
 {
-	gtk_object_set_data(GTK_OBJECT(socket), "lost_plug", "yes");
+	g_object_set_data(G_OBJECT(socket), "lost_plug", "yes");
 
 	gtk_widget_unref(socket);
 
 	gtk_widget_destroy(widget);	/* Remove from panel */
 
 	if (!closing_panel)
-		panel_save(gtk_object_get_data(GTK_OBJECT(socket), "panel"));
+		panel_save(g_object_get_data(G_OBJECT(socket), "panel"));
 }
 
 /* Try to run this applet.
@@ -1327,11 +1321,11 @@ static void run_applet(Icon *icon)
 		g_free(pos);
 	}
 
-	gtk_object_set_data(GTK_OBJECT(icon->widget), "icon", icon);
-	gtk_object_set_data(GTK_OBJECT(icon->socket), "panel", icon->panel);
+	g_object_set_data(G_OBJECT(icon->widget), "icon", icon);
+	g_object_set_data(G_OBJECT(icon->socket), "panel", icon->panel);
 
-	gtk_signal_connect(GTK_OBJECT(icon->socket), "destroy",
-			GTK_SIGNAL_FUNC(socket_destroyed), icon->widget);
+	g_signal_connect(icon->socket, "destroy",
+			G_CALLBACK(socket_destroyed), icon->widget);
 	
 	argv[1] = g_strdup_printf("%ld",
 			GDK_WINDOW_XWINDOW(icon->socket->window));

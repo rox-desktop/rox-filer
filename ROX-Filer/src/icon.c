@@ -143,28 +143,25 @@ void icon_init(void)
 	g_free(tmp);
 
 	/* File '' label... */
-	items = gtk_container_children(GTK_CONTAINER(icon_menu));
+	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
 	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
 	g_list_free(items);
 
 	/* Shift Open... label */
-	items = gtk_container_children(GTK_CONTAINER(icon_file_menu));
+	items = gtk_container_get_children(GTK_CONTAINER(icon_file_menu));
 	file_shift_item = GTK_BIN(items->data)->child;
 	g_list_free(items);
 
-	gtk_signal_connect(GTK_OBJECT(icon_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	g_signal_connect(icon_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
 
 	selection_invisible = gtk_invisible_new();
 
-	gtk_signal_connect(GTK_OBJECT(selection_invisible),
-			"selection_clear_event",
-			GTK_SIGNAL_FUNC(lose_selection),
-			NULL);
+	g_signal_connect(selection_invisible, "selection_clear_event",
+			G_CALLBACK(lose_selection), NULL);
 
-	gtk_signal_connect(GTK_OBJECT(selection_invisible),
-			"selection_get",
-			GTK_SIGNAL_FUNC(selection_get), NULL);
+	g_signal_connect(selection_invisible, "selection_get",
+			G_CALLBACK(selection_get), NULL);
 
 	gtk_selection_add_targets(selection_invisible,
 			GDK_SELECTION_PRIMARY,
@@ -231,7 +228,7 @@ void icon_may_update(Icon *icon)
 	{
 		/* Appearance changed; need to redraw */
 		if (icon->panel)
-			gtk_widget_queue_clear(icon->widget);
+			gtk_widget_queue_draw(icon->widget);
 		else
 			pinboard_reshape_icon(icon);
 	}
@@ -434,7 +431,7 @@ void icon_set_selected(Icon *icon, gboolean selected)
 
 	icon->selected = selected;
 
-	gtk_widget_queue_clear(icon->widget);
+	gtk_widget_queue_draw(icon->widget);
 
 	if (selected)
 	{
@@ -579,10 +576,10 @@ static void rename_activate(GtkWidget *dialog)
 	Icon	*icon;
 	const guchar	*new_name, *new_src;
 	
-	entry = gtk_object_get_data(GTK_OBJECT(dialog), "new_name");
-	icon = gtk_object_get_data(GTK_OBJECT(dialog), "callback_icon");
-	callback = gtk_object_get_data(GTK_OBJECT(dialog), "callback_fn");
-	src = gtk_object_get_data(GTK_OBJECT(dialog), "new_path");
+	entry = g_object_get_data(G_OBJECT(dialog), "new_name");
+	icon = g_object_get_data(G_OBJECT(dialog), "callback_icon");
+	callback = g_object_get_data(G_OBJECT(dialog), "callback_fn");
+	src = g_object_get_data(G_OBJECT(dialog), "new_path");
 
 	g_return_if_fail(callback != NULL &&
 			 entry != NULL &&
@@ -835,9 +832,9 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	entry = gtk_entry_new();
 	gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, FALSE, 2);
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->src_path);
-	gtk_object_set_data(GTK_OBJECT(dialog), "new_path", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(rename_activate), GTK_OBJECT(dialog));
+	g_object_set_data(G_OBJECT(dialog), "new_path", entry);
+	g_signal_connect_swapped(entry, "activate",
+			G_CALLBACK(rename_activate), dialog);
 
 	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), TRUE, TRUE, 2);
 
@@ -848,9 +845,9 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->item->leafname);
 	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
 	gtk_widget_grab_focus(entry);
-	gtk_object_set_data(GTK_OBJECT(dialog), "new_name", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(rename_activate), GTK_OBJECT(dialog));
+	g_object_set_data(G_OBJECT(dialog), "new_name", entry);
+	g_signal_connect_swapped(entry, "activate",
+			G_CALLBACK(rename_activate), dialog);
 	
 	gtk_signal_connect_object_while_alive(GTK_OBJECT(widget),
 			"destroy",
