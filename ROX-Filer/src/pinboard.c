@@ -640,8 +640,9 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 {
+#ifndef GTK2
 	GdkFont		*font = icon->widget->style->font;
-	int		font_height;
+#endif
 	int		width, height;
 	int		text_x, text_y;
 	DirItem		*item = &icon->item;
@@ -652,8 +653,6 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	GdkGC		*gc = widget->style->black_gc;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 					       : GTK_STATE_NORMAL;
-
-	font_height = font->ascent + font->descent;
 
 	gdk_window_get_size(widget->window, &width, &height);
 	image_x = (width - iwidth) >> 1;
@@ -703,6 +702,16 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 
 	if (o_text_bg != TEXT_BG_NONE)
 	{
+#ifdef GTK2
+		PangoRectangle logical;
+		int		font_height;
+
+		pango_layout_get_pixel_extents(icon->layout, NULL, &logical);
+		font_height = logical.height - logical.y;
+#else
+		int		font_height = font->ascent + font->descent;
+#endif
+
 		gtk_paint_flat_box(widget->style, widget->window,
 				state,
 				GTK_SHADOW_NONE,
