@@ -86,6 +86,7 @@ static GtkWidget *create_options();
 static void update_options();
 static void set_options();
 static void save_options();
+static char *filer_sort_nocase(char *data);
 static char *filer_single_click(char *data);
 static char *filer_unique_windows(char *data);
 static char *filer_menu_on_2(char *data);
@@ -114,13 +115,15 @@ static GtkWidget *menu_toolbar;
 
 static GtkWidget *display_label;
 
+static gboolean o_sort_nocase = FALSE;
 static gboolean o_single_click = FALSE;
-static GtkWidget *toggle_single_click;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
+gboolean o_unique_filer_windows = FALSE;
+static GtkWidget *toggle_sort_nocase;
+static GtkWidget *toggle_single_click;
 static GtkWidget *toggle_new_window_on_1;
 static GtkWidget *toggle_menu_on_2;
 static GtkWidget *toggle_unique_filer_windows;
-gboolean o_unique_filer_windows = FALSE;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -206,6 +209,7 @@ void filer_init()
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
 	options_sections = g_slist_prepend(options_sections, &options);
+	option_register("filer_sort_nocase", filer_sort_nocase);
 	option_register("filer_new_window_on_1", filer_new_window_on_1);
 	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
@@ -905,6 +909,9 @@ static void gain_selection(Collection 	*collection,
 
 int sort_by_name(const void *item1, const void *item2)
 {
+	if (o_sort_nocase)
+		return g_strcasecmp((*((DirItem **)item1))->leafname,
+			      	    (*((DirItem **)item2))->leafname);
 	return strcmp((*((DirItem **)item1))->leafname,
 		      (*((DirItem **)item2))->leafname);
 }
@@ -1750,6 +1757,10 @@ static GtkWidget *create_options()
 	gtk_label_set_line_wrap(GTK_LABEL(display_label), TRUE);
 	gtk_box_pack_start(GTK_BOX(vbox), display_label, FALSE, TRUE, 0);
 
+	toggle_sort_nocase =
+		gtk_check_button_new_with_label(_("Ignore case when sorting"));
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_sort_nocase, FALSE, TRUE, 0);
+
 	toggle_new_window_on_1 =
 		gtk_check_button_new_with_label(
 			_("New window on button 1 (RISC OS style)"));
@@ -1804,13 +1815,16 @@ static void update_options_label(void)
 /* Reflect current state by changing the widgets in the options box */
 static void update_options()
 {
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_sort_nocase),
+			o_sort_nocase);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_new_window_on_1),
 			o_new_window_on_1);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_menu_on_2),
 			collection_menu_button == 2 ? 1 : 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
 			o_single_click);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
+	gtk_toggle_button_set_active(
+			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
 			o_unique_filer_windows);
 	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
 
@@ -1822,7 +1836,11 @@ static void set_options()
 {
 	GtkWidget 	*item, *menu;
 	GList		*list;
+	gboolean	old_case = o_sort_nocase;
 	
+	o_sort_nocase = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_sort_nocase));
+
 	o_new_window_on_1 = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_new_window_on_1));
 
@@ -1842,7 +1860,21 @@ static void set_options()
 	list = gtk_container_children(GTK_CONTAINER(menu));
 	o_toolbar = (ToolbarType) g_list_index(list, item);
 	g_list_free(list);
-	
+
+	if (o_sort_nocase != old_case)
+	{
+		GList		*next = all_filer_windows;
+
+		while (next)
+		{
+			FilerWindow *filer_window = (FilerWindow *) next->data;
+
+			collection_qsort(filer_window->collection,
+					 filer_window->sort_fn);
+
+			next = next->next;
+		}
+	}
 }
 
 static guchar *style_to_name(void)
@@ -1862,6 +1894,7 @@ static guchar *sort_fn_to_name(void)
 
 static void save_options()
 {
+	option_write("filer_sort_nocase", o_sort_nocase ? "1" : "0");
 	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
@@ -1881,6 +1914,12 @@ static void save_options()
 				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
 				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
 				      "Unknown");
+}
+
+static char *filer_sort_nocase(char *data)
+{
+	o_sort_nocase = atoi(data) != 0;
+	return NULL;
 }
 
 static char *filer_new_window_on_1(char *data)

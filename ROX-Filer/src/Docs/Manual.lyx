@@ -1,4 +1,4 @@
-#This file was created by <tal197> Sun Apr 16 21:30:46 2000
+#This file was created by <tal197> Mon Apr 17 13:12:30 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -438,7 +438,7 @@ You can simulate a click of the middle mouse button by clicking with Ctrl
  and click on Save.
 \layout Subsection
 
-The Selection
+The selection
 \layout Standard
 
 While items are selected in a ROX-Filer window the filer has the global
@@ -470,7 +470,7 @@ Press Return in the xterm to execute the command.
 
 \end_inset 
 
-The Toolbar
+The toolbar
 \layout Standard
 
 By default, each window has a toolbar along the top.
@@ -512,7 +512,7 @@ Looping arrows
 Reread the directory contents
 \layout Subsection
 
-The Menus
+The menus
 \layout Standard
 
 You can open a menu by right clicking
@@ -574,7 +574,7 @@ Xterm Here
 Open an xterm with its current directory set to this directory.
 \layout Subsubsection
 
-The Display Menu
+The display menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
@@ -786,7 +786,7 @@ real group ID
  IDs).
 \layout Subsubsection
 
-The Selection Menu
+The selection menu
 \layout Standard
 
 All of these work in the same way - if you open the menu with some items
@@ -961,7 +961,7 @@ Search for files by specifying various conditions --- see section
 .
 \layout Subsubsection
 
-The Window Menu
+The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
@@ -1036,7 +1036,7 @@ Show ROX-Filer help
 Same as selecting ROX-Filer and choosing `Help' from the menu.
 \layout Subsubsection
 
-The Panel menu
+The panel menu
 \layout Standard
 
 This is just a cut-down version of the window menu.
@@ -1053,7 +1053,7 @@ This is just a cut-down version of the window menu.
 
 \end_inset 
 
-Virtual File Systems
+Virtual file systems
 \layout Standard
 
 Some types of file can be represented as a directory.
@@ -1442,7 +1442,7 @@ You can control which actions get started automatically (without you having
  to click on Quiet at the start) from the Options window.
 \layout Subsubsection
 
-Action Window Options
+Action window options
 \layout Standard
 
 Some actions have options, which appear as option boxes at the bottom of
@@ -1452,8 +1452,8 @@ Some actions have options, which appear as option boxes at the bottom of
 
 `Force' means that the filer won't treat non-writeable files as special.
  Normally, it confirms the deletion even if Quiet is pressed.
- Note that you still can't removed files from non-writeable directories
- because in that case you really don't have permission.
+ Note that you still can't remove files from non-writeable directories because
+ in that case you really don't have permission.
 \layout Itemize
 
 `Brief' prevents the filer logging a message every time it does something.
@@ -1842,7 +1842,7 @@ atime = 1 day ago
 exactly
 \emph toggle 
  86400 seconds ago...
-\layout Subsection
+\layout Subsubsection
 
 Specials
 \layout Description
@@ -1975,6 +1975,11 @@ You can choose to start some operations automatically, without waiting for
 Filer window options
 \layout Itemize
 
+`Ignore case when sorting' treats upper and lower case letters as equivalent
+ when sorting.
+ If this is off then `Zoo' comes before `animal', for example.
+\layout Itemize
+
 `New window on button 1' swaps the actions of the two non-menu buttons when
  opening directories.
  This is provided for people who are used to the RISC OS mouse bindings.
@@ -2018,7 +2023,7 @@ The last display style and sort type you chose will also be saved as the
  defaults for next time.
 \layout Subsubsection
 
-Drag and Drop options
+Drag-And-Drop options
 \layout Standard
 
 ROX-Filer uses the standard XDND protocol for drag-and-drop.
@@ -2140,6 +2145,14 @@ To make a directory executable all you need to do is create a executable
 \layout Section
 
 Internationalisation
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: LANG}
+
+\end_inset 
+
+Selecting a translation
 \layout Standard
 
 ROX-Filer is able to translate many of its messages, provided suitable translati
@@ -2216,7 +2229,7 @@ Fill in the translations, which are all blank to start with.
 
 Run the `
 \family typewriter 
-update-gmo
+make-mo
 \family default 
 ' script to create the binary file which ROX-Filer can use.
 \begin_deeper 
@@ -2232,11 +2245,16 @@ Created file ../../po/ml/LC_MESSAGES/ROX-Filer.mo OK
 \end_deeper 
 \layout Enumerate
 
-Set the locale to `
+Set the LANG variable to `
 \family typewriter 
 ml
 \family default 
-' in the Options box and restart the filer.
+' and restart the filer (see section 
+\begin_inset LatexCommand \ref{sec: LANG}
+
+\end_inset 
+
+).
 \layout Enumerate
 
 Submit the 
@@ -2272,11 +2290,16 @@ $ ./update-po
 
 Edit the file by hand as before, filling in the new blanks and updating
  out-of-date translations.
+ Look out for `fuzzy' entries where 
+\family typewriter 
+update-po
+\family default 
+ has made a guess; check it's correct and remove the `fuzzy' line.
 \layout Enumerate
 
 Run 
 \family typewriter 
-update-gmo
+make-mo
 \family default 
  as before.
 \layout Enumerate
