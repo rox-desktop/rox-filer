@@ -36,6 +36,8 @@
 #include "support.h"
 #include "gui_support.h"
 #include "main.h"
+#include "mount.h"
+#include "action.h"
 
 static GList *history = NULL;		/* Most recent first */
 static GList *history_tail = NULL;	/* Oldest item */
@@ -407,7 +409,7 @@ static void bookmarks_add_dir(const guchar *dir)
 		gtk_widget_destroy(bookmarks_window);
 }
 
-/* Called when a bookmark has been selected (right or left click) */
+/* Called when a bookmark has been chosen */
 static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 {
 	const gchar *mark;
@@ -418,6 +420,15 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 
 	if (strcmp(mark, filer_window->sym_path) != 0)
 		filer_change_to(filer_window, mark, NULL);
+	if (g_hash_table_lookup(fstab_mounts, filer_window->real_path) &&
+		!mount_is_mounted(filer_window->real_path, NULL, NULL))
+	{
+		GList	*paths;
+
+		paths = g_list_prepend(NULL, filer_window->real_path);
+		action_mount(paths, FALSE, -1);
+		g_list_free(paths);
+	}
 }
 
 static void edit_delete(GtkButton *button, GtkTreeView *view)
