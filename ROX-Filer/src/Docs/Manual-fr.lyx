@@ -1,0 +1,5578 @@
+#LyX 1.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 218
+\textclass article
+\begin_preamble
+\def \Tab {\thinspace$\langle\hbox{Tab}\rangle$\thinspace}
+\end_preamble
+\language english
+\inputencoding latin1
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage widemarginsa4
+\use_geometry 0
+\use_amsmath 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+ROX-Filer - Manuel de l'utilisateur
+\newline 
+
+\latex latex 
+
+\backslash 
+medskip
+\backslash 
+large{<http://rox.sourceforge.net>}
+\layout Author
+
+Thomas Leonard,
+\newline 
+tal197@users.sourceforge.net
+\layout Date
+
+
+\latex latex 
+
+\backslash 
+today
+\newline 
+
+\layout Standard
+\align center 
+Traduction française : Arnaud Calvo <arnaud@calvo-france.com>
+\newline 
+Notes du traducteur :
+\newline 
+Cette version a été traduite à partir du manuel ROX-Filer version 1.1.6.
+\newline 
+Le point 4 de la section 9.2, ainsi que le point 18.4 n'ont pas été traduits.
+\newline 
+Je ne suis pas programmeur et il vaut donc mieux que ne le fasse pas ;-)
+\layout Abstract
+
+ROX-Filer est un gestionnaire de fichiers graphique pour le système X Window.
+ Son interface utilsateur est basée sur le logiciel 
+\begin_inset Quotes eld
+\end_inset 
+
+RISC OS filer
+\begin_inset Quotes erd
+\end_inset 
+
+ et apporte des fonctionnalités similaires, telles que les 
+\begin_inset Quotes eld
+\end_inset 
+
+dossiers-applications
+\begin_inset Quotes erd
+\end_inset 
+
+ et le chargement/enregistrement de fichiers par glisser/déposer.
+ Le 
+\shape italic 
+filer
+\shape default 
+ peut aussi se comporter comme un 
+\begin_inset Quotes eld
+\end_inset 
+
+punaiseur
+\begin_inset Quotes erd
+\end_inset 
+
+, ce qui vous permettra d'accrocher à votre bureau les fichiers que vous
+ utilisez le plus souvent.
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents{}
+
+\end_inset 
+
+
+\layout Section
+
+Introduction
+\layout Standard
+
+ROX-Filer est un gestionnaire de fichiers simple et pratique pour X11 ---
+ l'interface graphique à base de fen\i \^{e}
+tres utilisé sur les systèmes d'exploitation
+ Unix et dérivés.
+ C'est aussi le coeur du ROX Desktop
+\begin_inset LatexCommand \cite{ROX}
+
+\end_inset 
+
+.
+ Beaucoup de fonctionnalités du 
+\shape italic 
+filer
+\shape default 
+ ont été inspiréespar RISC OS
+\begin_inset LatexCommand \cite{RISC OS}
+
+\end_inset 
+
+.
+ `ROX' est un accronyme de `RISC OS--On--X'.
+\layout Subsection
+
+Fonctionnalités
+\layout Description
+
+XDND Un protocole pour le glisser/déposer utilisé, par exemple, par GNOME
+ desktop
+\begin_inset LatexCommand \cite{GNOME}
+
+\end_inset 
+
+.
+ Cela permet à des données d'\i \^{e}
+tre chargées dans une application par simple
+ glisser/déposer depuis une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+ .
+ Les spécifications complètes sont données en 
+\begin_inset LatexCommand \cite{DND}
+
+\end_inset 
+
+.
+\layout Description
+
+XDS Une extension de XDND qui permet aux applications d'enregistrer des
+ données par glisser/déposer vers une fen\i \^{e}
+tre du filer.
+ Les spécifications complètes sont données en 
+\begin_inset LatexCommand \cite{XDS}
+
+\end_inset 
+
+.
+\layout Description
+
+Choices Une façon simple, mais souple, de gérer les préférences des utilisateurs.
+ Voir 
+\begin_inset LatexCommand \cite{Choices}
+
+\end_inset 
+
+ pour plus de détails.
+\layout Description
+
+Dossiers-applications Applications entièrement contenues dans un dossier,
+ pour lesquelles l'installation consiste en la simple copie d'un dossier
+ et la désinstallation, en la suppression de ce dossier.
+ Une description plus détaillée est fournie plus loin.
+\layout Description
+
+Imagettes Le 
+\shape italic 
+filer
+\shape default 
+ peut afficher les fichiers images avec une ic\i \^{o}
+ne représentant le contenu
+ de ceux-ci, au lieu d'une ic\i \^{o}
+ne générique.
+ Très utile pour organiser un dossier rempli de photos !
+\layout Section
+
+Conditions
+\layout Standard
+
+Ce logiciel est un logiciel libre ; vous pouvez le redisitribuer et/ou le
+ modifier si vous respectez les termes de la license `GNU General Public
+ License', publiée par la `Free Software Foundation' ; soit la version 2
+ de cette License, soit (comme vous le souhaitez) toute autre version postérieur
+e.
+\layout Standard
+
+Ce logiciel est distribué en espérant qu'il soit utile, mais SANS AUCUNE
+ GARANTIE ; sans m\i \^{e}
+me la garantie implicite de sa VALEUR INTRINSEQUE ou de
+ son ADEQUATION POUR QUELQUE USAGE QUE CE SOIT.
+ Voir la license `GNU General Public License' pour plus de détails.
+\layout Standard
+
+Vous devriez avoir reçu une copie de la licence `GNU General Public License'
+ avec ce logiciel ; si ce n'est pas le cas, écrivez à : Free Software Foundation
+, Inc., 59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
+\layout Section
+
+Compilation
+\layout Standard
+
+Si vous venez d'obtenir le 
+\shape italic 
+filer
+\shape default 
+ en téléchargeant l'archive de ses sources, vous devez donc les compiler
+ pour vous en servir.
+ Si vous avez téléchargé et installé les binaires (le logiciel est donc
+ déjà compilé), ou si ROX-Filer était déjà installé sur votre système, vous
+ pouvez passer directement à la section suivante.
+ Si vous \i \^{e}
+tes arrivés ici en cliquant sur le symbole `i' d'une fen\i \^{e}
+tre du
+ 
+\shape italic 
+filer
+\shape default 
+, ou si taper `rox' dans un XTerm fonctionne, vous n'avez pas besoin de
+ compiler.
+\layout Standard
+
+Pour compiler, vous aurez besoin de ce qui suit :
+\layout Itemize
+
+Unix or Linux (le mot de passe root n'est pas nécessaire),
+\layout Itemize
+
+Le système `X Window' (fourni en standard sur tous les systèmes modernes),
+\layout Itemize
+
+GTK+ 1.2.0 ou postérieure (librairies et en-t\i \^{e}
+tes) --- dernière version téléchargea
+ble depuis 
+\begin_inset LatexCommand \cite{GTK+}
+
+\end_inset 
+
+,
+\layout Itemize
+
+Un compilateur C, comme `gcc' (standard sur la plupart des systèmes).
+\layout Standard
+
+Tout ceci est standard sur la plupart des distributions Linux modernes.
+ Pour vérifier quelle version de GTK+ est installée, utilisez la commande
+ 
+\family typewriter 
+gtk-config
+\family default 
+, comme ceci (
+\family typewriter 
+$
+\family default 
+ est le prompt) :
+\layout LyX-Code
+
+$ gtk-config --version
+\layout LyX-Code
+
+1.2.8
+\layout Standard
+
+A cause de bugs dans de précédentes versions, GTK+ 1.2.8 est hautement recommandé.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\latex default 
+ Pour compiler :
+\layout Enumerate
+
+Le 
+\shape italic 
+filer
+\shape default 
+ a besoin de quelques fichiers partagés pour fonctionner --- des ic\i \^{o}
+nes pour
+ les différents types de fichiers, des règles pour déterminer le type des
+ fichiers et quelques commandes par défaut pour certains types de fichiers.
+ Tout ceci est installé avec le paquetage `rox-base'.
+ Installez rox-base maintenant (depuis 
+\family typewriter 
+http://rox.sourceforge.net
+\family default 
+) si vous ne l'avez pas encore fait.
+\layout Enumerate
+
+Allez dans le dossier qui contient le sous-répertoire ROX-Filer.
+\layout Enumerate
+
+Exécutez le script d'installation `
+\family typewriter 
+install.sh
+\family default 
+' , comme ceci :
+\begin_deeper 
+\layout LyX-Code
+
+$ ./install.sh
+\end_deeper 
+\layout Enumerate
+
+ROX-Filer va effectuer quelques tests pour trouver sur quel type de système
+ vous travaillez, puis va commencer la compilation.
+ Si ça ne fonctionne pas, envoyez-moi un e-mail et plaignez-vous ! (ndt
+ : plaignez-vous -en anglais- à l'auteur de ce manuel, pas à moi ;-) Dites-moi
+ quel type de système vous avez et quels sont les messages d'erreur affichés.
+ Si vous réussissez à régler le problème vous-m\i \^{e}
+me, envoyez-moi SVP un e-mail
+ avec le correctif.
+\begin_deeper 
+\layout Standard
+
+Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans
+ un sous-répertoire différent pour chaque plate-forme.
+ Ainsi, vous pouvez compiler la m\i \^{e}
+me application sur plusieurs types de machines
+ differents et l'exécuter depuis n'importe laquelle en utilisant le script
+ `AppRun'.
+ C'est particulièrement utile dans un environnement réseau.
+\end_deeper 
+\layout Enumerate
+
+Une fois que le 
+\shape italic 
+filer
+\shape default 
+ est compilé, vous allez devoir préciser où vous voulez l'installer.
+ Si vous voulez effectuer une installation standard en root, vous devriez
+ arr\i \^{e}
+ter ici, passer en root (un 
+\begin_inset Quotes eld
+\end_inset 
+
+su
+\begin_inset Quotes eld
+\end_inset 
+
+ suffit), et relancer le script d'installation.
+\begin_deeper 
+\layout Standard
+
+Si vous n'avez pas le mot de passe root, ne vous inquiétez pas --- suivez
+ simplement les instructions, pour installer le 
+\shape italic 
+filer
+\shape default 
+ dans votre dossier personnel (home).
+ 
+\end_deeper 
+\layout Standard
+
+Vous pouvez maintenant lancer le 
+\shape italic 
+filer
+\shape default 
+ en exécutant la commande `rox' sans aucune option, comme ceci :
+\layout LyX-Code
+
+$ rox
+\layout Standard
+
+Une fen\i \^{e}
+tre devrait appara\i \^{\i}
+tre et afficher le contenu du dossier courant.
+\layout Standard
+
+Si vous avez installé le script dans votre home, vous devrez s\i \^{u}
+rement mettre
+ à jour votre variable d'environnement PATH pour que le shell puisse le
+ trouver.
+ Par exemple, si vous l'avez installé dans un dossier nommé `
+\family typewriter 
+bin
+\family default 
+' dans votre home, tapez ceci :
+\layout LyX-Code
+
+$ PATH=${HOME}/bin:${PATH}; export PATH
+\layout Standard
+
+ou (si vous utilisez le shell 
+\noun on 
+csh(1)
+\noun default 
+) :
+\layout LyX-Code
+
+$ setenv PATH ${HOME}/bin:${PATH}
+\layout LyX-Code
+
+$ rehash
+\layout Section
+
+Arguments
+\layout Standard
+
+Par défaut, ROX-Filer démarre en affichant le dossier courant.
+ Vous pouvez lui spécifier d'ouvrir d'autres dossiers à la place en les
+ passant en arguments :
+\layout LyX-Code
+
+$ rox /home /usr /usr/local
+\layout Standard
+
+Vous pouvez aussi l'utiliser pour ouvrir des fichiers, comme ceci :
+\layout LyX-Code
+
+$ rox README
+\layout Standard
+
+Le 
+\shape italic 
+filer
+\shape default 
+ accepte beaucoup d'options ; utilisez `
+\family typewriter 
+-h
+\family default 
+' pour en obtenir la liste.
+ Toutes les options ont une forme courte et une forme longue (ex : `
+\family typewriter 
+-h
+\family default 
+' et `
+\family typewriter 
+--help
+\family default 
+') --- bien que sur certains systèmes vous ne pouvez utiliser que les options
+ courtes.
+\layout Standard
+
+Notez que si la m\i \^{e}
+me version du 
+\shape italic 
+filer
+\shape default 
+ est déjà lancée sur votre machine, alors, par défaut, elle sera utilisée
+ pour ouvrir les dossiers et la nouvelle copie s'arr\i \^{e}
+tera immédiatement.
+ Vous pouvez passer outre se comportement (peut-\i \^{e}
+tre parce que l'ancienne
+ copie a cessé de répondre) en utilisant l'option `
+\family typewriter 
+--new
+\family default 
+'.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{run_pin}
+
+\end_inset 
+
+Punaiseur
+\layout Standard
+
+Si vous voulez que le 
+\shape italic 
+filer
+\shape default 
+ gère votre bureau vous utiliserez l'option 
+\family typewriter 
+--pinboard
+\family default 
+ et fournirez un nom pour le punaiseur, ex :
+\layout LyX-Code
+
+$ rox --pinboard=MonPunaiseur
+\layout Standard
+
+La configuration du punaiseur est sauvée dans `
+\emph on 
+<Choices>/ROX-Filer/pb_MonPunaiseur
+\emph default 
+' dès que vous le modifiez (par exemple, en glissant/déposant un fichier
+ sur votre bureau).
+ Vous pouvez avoir autant de punaiseurs que vous le souhaitez et basculer
+ de l'un à l'autre en lançant rox de nouveau, ex :
+\layout LyX-Code
+
+$ rox --pinboard=MonAutrePunaiseur
+\layout Standard
+
+Pour arr\i \^{e}
+ter la fonction punaiseur, donnez au nom une cha\i \^{\i}
+ne vide :
+\layout LyX-Code
+
+$ rox --pinboard=
+\layout Standard
+
+Allez voir la section 
+\begin_inset LatexCommand \ref{winman}
+
+\end_inset 
+
+ si vous avez des problèmes d'affichage avec les ic\i \^{o}
+nes.
+ Le punaiseur peut aussi \i \^{e}
+tre activé/désactivé en se plaçant dans le répertoire
+ d'installation de `ROX-Filer' dans une fen\i \^{e}
+tre du 
+\shape italic 
+filer,
+\shape default 
+ et en choisissant `Enable pinboard' ou `Disable pinboard' dans le menu
+ (clic droit).
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{run_pan}
+
+\end_inset 
+
+Panneaux
+\layout Standard
+
+Les panneaux fonctionnent exactement de la m\i \^{e}
+me façon que les punaiseurs.
+ Vous pouvez créer un panneau sur n'importe quel c\i \^{o}
+té de l'écran en utilisant
+ les options 
+\family typewriter 
+--left
+\family default 
+, 
+\family typewriter 
+--right,
+\family default 
+ 
+\family typewriter 
+--top
+\family default 
+ et 
+\family typewriter 
+--bottom
+\family default 
+ (respectivement pour les non-anglophones `gauche', `droite', `haut' et
+ `bas'), en fonction du c\i \^{o}
+té sur lequel vous souhaitez voir appara\i \^{\i}
+tre votre
+ panneau.
+ Sur certains systèmes, vous devrez utiliser l'option courte (une lettre).
+ Par exemple, pour créer un panneau en bas de votre écran :
+\layout LyX-Code
+
+$ rox -b=MonPanneau
+\layout Standard
+
+Le panneau devrait être affiché dans une fenêtre sans barre de titre.
+ Si ça ne fonctionne pas, lisez la section 
+\begin_inset LatexCommand \ref{winman}
+
+\end_inset 
+
+ pour avoir quelques idées.
+ Vous pouvez déposer des fichiers sur les 2 c\i \^{o}
+tés du panneau, ils s'aligneront
+ sur un c\i \^{o}
+té ou sur l'autre.
+ Les ic\i \^{o}
+nes peuvent \i \^{e}
+tre repositionnées en les glissant avec le bouton du
+ milieu.
+ Les changements apportés au panneau sont automatiquement sauvegardés dans
+ '
+\emph on 
+<Choices>/ROX-Filer/pan_MonPanneau
+\emph default 
+'.
+ Comme pour le punaiseur, vous pouvez basculer entre plusieurs configurations
+ de panneaux en relançant rox avec un nom de panneau différent.
+ Spécifiez un nom vide pour \i \^{o}
+ter le panneau.
+\layout LyX-Code
+
+$ rox --bottom=MonAutrePanneau
+\layout LyX-Code
+
+$ rox --bottom=
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{winman}
+
+\end_inset 
+
+Notes sur les gestionnaires de fen\i \^{e}
+tres
+\layout Standard
+
+Vous allez peut \i \^{e}
+tre avoir à configurer un peu votre gestionnaire de fen\i \^{e}
+tre
+ pour que les ic\i \^{o}
+nes des punaiseurs et les panneaux s'affichent correctement
+ (c'est-à-dire sans les bordures et sous les autres fen\i \^{e}
+tres).
+ En particulier, vérifiez les options concernant les différentes 
+\begin_inset Quotes eld
+\end_inset 
+
+couches
+\begin_inset Quotes erd
+\end_inset 
+
+ (au-dessus, en dessous, premier, dernier, etc...) et affectez le punaiseur
+ aux couches les plus basses.
+\layout Standard
+
+Pour que le 
+\shape italic 
+filer
+\shape default 
+ reçoive les clics de la souris sur le bureau (dans le cas du punaiseur),
+ vous devez avoir un gestionnaire de fen\i \^{e}
+tres compatible GNOME.
+ Pour savoir si votre gestionnaire de fen\i \^{e}
+tres est compatible, essayez de
+ cliquer avec le bouton droit de la souris sur une partie vide du bureau.
+ Si le menu du punaiseur s'affiche, tout fonctionne !
+\layout Subsubsection
+
+Sawfish / sawmill
+\layout Standard
+
+Sawfish essaie de deviner si vous utilisez GNOME au démarrage et désactive
+ certaines fonctions si c'est le cas.
+ Vous devrez donc ajouter la ligne `
+\family typewriter 
+(require 'gnome)
+\family default 
+' à votre fichier 
+\family typewriter 
+.sawfishrc
+\family default 
+ (lisez le manuel sawfish pour plus de détails).
+\layout Subsubsection
+
+IceWM
+\layout Standard
+
+Collez ces paramètres de configuration dans `~/.icewm/preferences' :
+\layout LyX-Code
+
+# Manage root window (EXPERIMENTAL - normally enabled!)
+\layout LyX-Code
+
+GrabRootWindow=1 # 0/1
+\layout LyX-Code
+
+# Bitmask of root window button click to use in window manager
+\layout LyX-Code
+
+UseRootButtons=3 # [0-255]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the menu
+\layout LyX-Code
+
+DesktopWinMenuButton=1 # [0-20]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the window list
+\layout LyX-Code
+
+DesktopWinListButton=2 # [0-5]
+\layout LyX-Code
+
+# Desktop mouse-button click to show the window list menu
+\layout LyX-Code
+
+DesktopMenuButton=0 # [0-20] 
+\layout Standard
+
+Et collez ceux-ci dans `~/.icewm/winoptions' :
+\layout LyX-Code
+
+# ROX-Filer pinboard and panel
+\layout LyX-Code
+
+ROX-Filer.icon: folder
+\layout LyX-Code
+
+ROX-Panel.layer: Dock
+\layout LyX-Code
+
+ROX-Panel.doNotCover: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreWinList: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreTaskBar: 1
+\layout LyX-Code
+
+ROX-Panel.ignoreQuickSwitch: 1
+\layout LyX-Code
+
+ROX-Pinboard.layer: Below
+\layout LyX-Code
+
+ROX-Pinboard.ignoreWinList: 1
+\layout LyX-Code
+
+ROX-Pinboard.ignoreTaskBar: 1
+\layout LyX-Code
+
+ROX-Pinboard.ignoreQuickSwitch: 1
+\layout LyX-Code
+
+ROX-Filer.layer: Normal
+\layout Standard
+
+Redémarrez IceWM et le 
+\shape italic 
+filer
+\shape default 
+ pour que les changements prennent effet.
+\layout Subsubsection
+
+Autres
+\layout Standard
+
+Si rien ne fonctionne, essayez de lancer rox avec les options `
+\family typewriter 
+-no
+\family default 
+' (ndt : -n et -o) ; cela devrait outrepasser le contr\i \^{o}
+le des ic\i \^{o}
+nes par le
+ gestionnaire de fen\i \^{e}
+tres.
+\layout Subsection
+
+Exécution en tant que root
+\layout Standard
+
+Si vous utilisez le 
+\shape italic 
+filer
+\shape default 
+ en tant qu'utilisateur `root', le 
+\shape italic 
+filer
+\shape default 
+ affiche un message en haut de chaque fen\i \^{e}
+tre pour vous le rappeler.
+ L'utilisateur root a le droit d'accéder à tous les fichiers du systèmes,
+ ainsi que de les modifier, soyez donc très vigilant quand vous utilisez
+ le 
+\shape italic 
+filer
+\shape default 
+ dans ces conditions.
+\layout Standard
+
+Normalement, vous devriez vous loguer en utilisateur ordinaire et vous changer
+ en root que lorsque vous en avez besoin.
+ Vous pouvez créer un simple script qui vous changera en root et exécutera
+ rox --- quelque chose du genre :
+\layout LyX-Code
+
+#!/bin/sh
+\layout LyX-Code
+
+su -m -c "rox $*"
+\layout Standard
+
+Vous pourrez donc ensuite avoir une fen\i \^{e}
+tre de 
+\shape italic 
+filer
+\shape default 
+ `root' simplement en exécutant ce script et en entrant son mot de passe.
+ Attention, souvenez-vous que tout ce que vous ferez sur n'importe quel
+ fichier (y compris les applications que vous exécuterez depuis ces fen\i \^{e}
+tres)
+ sera effectué avec les droits de root ! Soyez très prudent !
+\layout Standard
+
+Vous aurez peut-\i \^{e}
+tre un message du serveur X window qui vous dira que root
+ (ou d'autres utilisateurs) ne peut pas se connecter (ndt : 
+\begin_inset Quotes eld
+\end_inset 
+
+se connecter à X
+\begin_inset Quotes erd
+\end_inset 
+
+, ce qui veut dire que l'utilisateur root, par exemple, ne pourra lancer
+ aucune commande qui utiliserait X).
+ Une lecture des pages man pour `
+\family typewriter 
+xauth
+\family default 
+' et `
+\family typewriter 
+xhost
+\family default 
+' sera donc conseillée, mais ce méchanisme varie selon les systèmes (c'est
+ pourquoi ça n'est pas implémenté dans le 
+\shape italic 
+filer
+\shape default 
+ !).
+\layout Subsection
+
+Liste complète des options de la ligne de commande
+\layout Standard
+
+Voici la liste complète :
+\layout Description
+
+-b, 
+\series bold 
+--bottom=PANEL
+\series default 
+ crée un panneau en bas de votre écran 
+\layout Description
+
+-d, 
+\series bold 
+--dir=DIR
+\series default 
+ ouvre le dossier DIR
+\layout Description
+
+-h, 
+\series bold 
+--help
+\series default 
+ affiche l'aide et une description des options
+\layout Description
+
+-l, 
+\series bold 
+--left=PANEL
+\series default 
+ crée un panneau à gauche de votre écran m\i \^{e}
+me si un autre semble \i \^{e}
+tre déjà
+ ouvert
+\layout Description
+
+-o, 
+\series bold 
+--override
+\series default 
+ outrepasse le contr\i \^{o}
+le des panneaux par le window manager
+\layout Description
+
+-p, 
+\series bold 
+--pinboard=PIN
+\series default 
+ utilise le punaiseur PIN
+\layout Description
+
+-r, 
+\series bold 
+--right=PANEL
+\series default 
+ crée un panneau à droite de votre écran
+\layout Description
+
+-s, 
+\series bold 
+--show=FILE
+\series default 
+ Ouvre une fen\i \^{e}
+tre et affiche le dossier où se trouve FILE
+\layout Description
+
+-t, 
+\series bold 
+--top=PANEL
+\series default 
+ crée un panneau en haut de votre écran
+\layout Description
+
+-u, 
+\series bold 
+--user
+\series default 
+ affiche le nom de l'utilisateur dans chaque fen\i \^{e}
+tre
+\layout Description
+
+-x, 
+\series bold 
+--examine=FILE
+\series default 
+ Le fichier FILE a changé.
+ Il faut le ré-examiner.
+\layout Description
+
+-v, 
+\series bold 
+--version
+\series default 
+ Affiche les informations sur la version et s'arr\i \^{e}
+te.
+\layout Section
+
+Boutons de la souris et touches du clavier
+\layout Standard
+
+Premier aperçu succinct :
+\layout Itemize
+
+Faites un clic gauche
+\begin_float footnote 
+\layout Standard
+
+Cette documentation suppose que le bouton 1 est le bouton gauche, le bouton
+ 2 est le bouton du milieu et le bouton 3 est le bouton droit.
+ Ce n'est pas toujours le cas --- par exemple, dans une configuration pour
+ gaucher.
+\end_float 
+ pour ouvrir fichiers & dossiers.
+\layout Itemize
+
+Faites un clic droit pour obtenir un menu.
+ Clic droit sur un fichier/dossier pour opérer une action sur celui-ci.
+\layout Itemize
+
+Glissez-déposez des fichiers entre des fen\i \^{e}
+tres pour les copier (bouton gauche)
+ ou pour les déplacer (bouton du milieu).
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
+Par défaut, l'affectation des boutons de la souris correspond aux conventions
+ de l'environnement X.
+ Ce comportement est toutefois hautement configurable --- n'hésitez pas
+ à essayer les différentes options possibles, dans l'espace de configuration
+ du 
+\shape italic 
+filer
+\shape default 
+ si vous n'aimez pas les options par défaut.
+ Ces options induisent les comportements suivants :
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+medskip
+\layout Standard
+
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="15" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="left" valignment="top" leftline="true" rightline="false" width="3.8cm" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="9.5cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touche ou bouton de la souris
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Clic gauche   
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre le fichier ou le dossier cliqué.Maintenez enfoncé Ctrl pour sélectionner
+ les objets au lieu de les ouvrir.Maintenez enfoncé Shift pour voir à l'intérieur
+ des dossiers-application, pour ouvrir les fichiers avec l'éditeur de texte,.pour
+ suivre les liens symboliques ou pour monter des périphériques.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Clic sur le bouton du milieu
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme le bouton gauche, mais ouvre un dossier dans une nouvelle fen\i \^{e}
+tre ou
+ ferme la fen\i \^{e}
+tre du filer en ouvrant un fichier.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Clic droit
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre le menu principal.
+ Maintenez enfoncé Ctrl en cliquant pour avoir directement le sous-menu
+ de sélection.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Glissé-déposé d'un objet  (bouton gauche)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Copie le(s) fichier(s) dans la fen\i \^{e}
+tre de destination (un dossier-application
+ ou une autre fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+).Maintenez enfoncé Shift pour déplacer le fichier, ou Ctrl+Shift pour créer
+ un lien symbolique.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Glissé-déposé d'un objet (bouton du milieu)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme ci-dessus, mais déplace toujours au lieu de copier ou de créer un
+ lien symbolique.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Glisser avec le bouton gauche (pas au-dessus d'un objet) 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Sélectionne un groupe d'objets en les entourant avec un bouton de la souris
+ enfoncé.
+ Avec le bouton gauche, seulsles fichiers entourés seront sélectionnés.
+ Si vous maintenez enfoncé Ctrl, les objets entourés seront ajoutés à la
+ sélection.Si vous utilisez le bouton du milieu, alors les objets entourés
+ seront désélectionnés s'ils étaient sélectionnés, et vice-versa.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Double-clic sur le fond d'une fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Redimensionne la fen\i \^{e}
+tre correctement.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Backspace  (touche `retour en arrière') (ndt : quel pléonasme !)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le dossier père.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touches de déplacement
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Entoure les objets l'un après l'autre au fur et à mesure du déplacement.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touche `Page Haut', `Page Bas'
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche les objets se trouvant 10 lignes plus haut ou plus bas.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touche `Début', `End'
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le premier/dernier objet du dossier.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touche `Entrée'
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme un clic gauche sur l'objet.
+ Vous pouvez maintenir enfoncé Shift pour modifier l'action, comme en cliquant.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Barre d'espace
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Bascule l'objet actuellement entouré de l'état sélectionné à non-sélectionné
+ (et vice-versa) et déplace le contour autour de l'objet suivant..
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Tabulation, Shift+Tabulation
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Déplace le contour vers l'objet sélectionné suivant/précédent.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+medskip
+\backslash 
+noindent 
+\latex default 
+D'autres touches peuvent facilement \i \^{e}
+tre définies comme raccourcis-clavier
+ en ouvrant le menu (ndt : le menu qui contient la commande qui doit \i \^{e}
+tre
+ exécutée lorsque vous utiliserez le raccourci-clavier), en positionnant
+ le pointeur de la souris au-dessus de la commande désirée, et en pressant
+ la (les) touche(s) devant servir de raccourci.
+ La (les) touches apparaissent maintenant dans le menu et peuvent désormais
+ \i \^{e}
+tre utilisées comme raccourci.
+ Les touches de raccourcis sont automatiquement sauvées are automatically
+ sauvées quand le 
+\shape italic 
+filer
+\shape default 
+ est quitté.
+\layout Section
+
+La sélection
+\layout Standard
+
+Quand des objets sont sélectionnés dans une fen\i \^{e}
+tre ROX-Filer, le 
+\shape italic 
+filer
+\shape default 
+ les 
+\begin_inset Quotes eld
+\end_inset 
+
+copie
+\begin_inset Quotes erd
+\end_inset 
+
+.
+ Vous pouvez alors les coller dans une autre fen\i \^{e}
+tre pour obtenir le chemin
+ des objets sélectionnés.
+ Par exemple, si vous voulez charger un fichier dans une application qui
+ ne supporte pas le glisser-déposer :
+\layout Enumerate
+
+Ouvrez la bo\i \^{\i}
+te `Ouvrir un fichier' de l'application.
+\layout Enumerate
+
+Utilisez Ctrl et cliquez sur les fichiers dans une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+ pour les sélectionner.
+\layout Enumerate
+
+Cliquez avec le bouton du milieu dans la bo\i \^{\i}
+te `Ouvrir un fichier' pour y
+ coller les noms.
+\layout Standard
+
+NDT : ça fonctionne aussi avec un XTerm...
+\layout Section
+
+
+\begin_inset LatexCommand \label{sec: Toolbar}
+
+\end_inset 
+
+La barre d'outils
+\layout Standard
+
+Par défaut, chaque fen\i \^{e}
+tre affiche en haut une barre d'outils.
+ Vous pouvez désactiver ceci (ou la rendre plus grande) dans l'espace configurat
+ion (`Options...'), et vous pouvez sélectionner les outils devant y appara\i \^{\i}
+tre.
+ Normalement, vous devriez cliquer avec le bouton gauche (1).
+ Mais beaucoup d'outils peuvent accomplir une fonction différente s'ils
+ sont sollicités avec le bouton du milieu ou le bouton droit.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="8" columns="3">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="4.5cm" special="">
+<column alignment="left" valignment="top" leftline="false" rightline="true" width="5.5cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ic\i \^{o}
+ne
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Bouton gauche
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Autre bouton
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Croix
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fermer la fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvrir une nouvelle fen\i \^{e}
+tre
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fl\i \^{e}
+che vers le haut
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le dossier père
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+...
+ dans une nouvelle fen\i \^{e}
+tre
+\latex latex 
+
+\backslash 
+dag
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Maison
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le dossier 
+\begin_inset Quotes eld
+\end_inset 
+
+Home
+\begin_inset Quotes erd
+\end_inset 
+
+
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+...
+ dans une nouvelle fen\i \^{e}
+tre
+\latex latex 
+
+\backslash 
+dag
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fl\i \^{e}
+ches tournantes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Rafra\i \^{\i}
+chir
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvrir une nouvelle fen\i \^{e}
+tre
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Loupe
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Afficher de plus grandes ic\i \^{o}
+nes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Afficher de plus petites ic\i \^{o}
+nes
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Liste
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche/Masque le détail des objets
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Idem
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Information
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche les fichiers d'aide de ROX-Filer
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="false" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Idem
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+dag{}
+\latex default 
+Si l'option 'Fen\i \^{e}
+tres uniques' est activée, l'action par défaut est d'ouvrir
+ une nouvelle fen\i \^{e}
+tre
+\latex latex 
+~
+\latex default 
+--- et cliquer avec l'autre bouton utilise la m\i \^{e}
+me fen\i \^{e}
+tre (le comportement
+ du 
+\shape italic 
+filer
+\shape default 
+ est inversé).
+\layout Standard
+
+Glisser-déposer des objets sur les outils `Fl\i \^{e}
+che vers le haut' ou `Maison',
+ produit le m\i \^{e}
+me effet que de les glisser-déposer vers les dossiers auxquels
+ ces outils mènent.
+\layout Standard
+
+La barre d'outils peut aussi montrer le nombre de fichiers dans un dossier,
+ et quelques informations sur la sélection.
+ Ceci peut \i \^{e}
+tre activé/désactivé dans l'espace configuration (`Options...').
+\layout Section
+
+Les menus
+\layout Standard
+
+Vous pouvez ouvrir un menu en faisant un clic droit
+\begin_float footnote 
+\layout Standard
+
+Si vous avez choisi d'utiliser l'option `style RISC OS', utilisez le bouton
+ du milieu à la place.
+\end_float 
+ sur un punaiseur, un panneau ou une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+.
+ Dans les fen\i \^{e}
+tres du 
+\shape italic 
+filer
+\shape default 
+, vous pouvez aussi utiliser `
+\backslash 
+' pour ouvrir le menu.
+ Il existe un raccourci pour afficher le sous-menu `Fichier' directement
+ : maintenez enfoncé 
+\family typewriter 
+Ctrl
+\family default 
+ en ouvrant le menu.
+ Voici une description complète de toutes les commandes :
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="6" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="10cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Tout sélectionner
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Sélectionne tous les objets de la fen\i \^{e}
+tre.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Effacer la sélection
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Dé-sélectionne tous les objets de la fen\i \^{e}
+tre.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Options...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Configure ROX-Filer.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Nouveau
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Crée un nouveau fichier ou dossier à l'intérieur de ce dossier.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Xterm ici
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre un xterm avec ce dossier comme dossier courant.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Subsection
+
+Le menu Affichage
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="14" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="10cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Enormes ic\i \^{o}
+nes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Vous voyez quelle taille ont les grandes ic\i \^{o}
+nes ? Celles-ci sont plus grandes
+ ! (cf.
+ imagettes, ci-dessous)
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Grandes ic\i \^{o}
+nes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Chaque objet est affiché avec une grande ic\i \^{o}
+ne et son nom en-dessous.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Petites ic\i \^{o}
+nes
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les objets sont affichés avec une ic\i \^{o}
+ne toute petite, et leur nom à c\i \^{o}
+té.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Enorme, avec...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme pour `Grand, avec...', mais avec des ic\i \^{o}
+nes énormes.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Grand, avec...
+      
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les objets sont affichés avec des détails supplémentaires :
+\series bold 
+Résumé
+\series default 
+ affiche les permissions, le propriétaire, le groupe, la taille,et l'heure
+ de modification de l'objet.
+\series bold 
+Tailles
+\series default 
+ n'affiche que la taille de tous les fichiers (pas des dossiers).
+\series bold 
+Permissions
+\series default 
+ n'affiche que les permissions et le propriétaire/groupe.
+\series bold 
+Type
+\series default 
+ affiche le type MIME de chaque fichier.
+\series bold 
+Heures
+\series default 
+ affiche l'heure du dernier accès, de la dernière modification, et du dernier
+ changement.
+\latex latex 
+
+\backslash 
+dag
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Petit, avec...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme ci-dessus, mais avec une petite ic\i \^{o}
+ne et tout sur une seule ligne.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trier par nom
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les objets sont triés par nom.
+ Il y a une option pour respecter la casse.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trier par type
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les objets sont triés par type, et ensuite par nom pour chaque type.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trier par date
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les plus récemment modifiés au début.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Trier par taille
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Les plus gros fichiers au début.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Montrer les fichiers cachés
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Si cette option est activée, les objets commençant par un point sont affichés,si
+non, ils sont cachés.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Rafra\i \^{\i}
+chir 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Relit le contenu du dossier et les détails de tous les fichiers s'y trouvant.Util
+isez cette commande si l'affichage n'est plus à jour.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Créer les imagettes 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Essaie de remplacer l'ic\i \^{o}
+ne d'un fichier image par l'image du fichier lui-m\i \^{e}
+me.Très
+ utile pour trier un dossier rempli de photos dont le nom vous échappe !
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+dag
+\backslash 
+thinspace{} 
+\latex default 
+Lire le contenu d'un fichier ou d'un dossier met à jour 
+\emph on 
+l'heure d'accès
+\emph default 
+ ; modifier le contenu d'un fichier ou la liste des fichiers dans un dossier
+ met à jour 
+\emph on 
+l'heure de modification
+\emph default 
+ ; changer le propriétaire d'un fichier ou ses permissions met à jour 
+\emph on 
+l'heure de changement
+\emph default 
+.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sec: Permissions}
+
+\end_inset 
+
+Permissions
+\layout Standard
+
+Le champ permissions, quand il est affiché, est composé de quatre groupes
+ de trois caractères.
+ Chaque caractère est une lettre, si la permission à laquelle le caractère
+ réfère est attribuée, sinon, ce caractère est un tiret (--).
+ Les trois premiers caractères montrent les permissions pour le propriétaire
+ du fichier, les trois suivants, pour les autres utilisateurs appartenant
+ au groupe du fichier, les trois suivants, pour le reste du monde.
+ L'utilisateur ayant démarré rox se voit situé dans les permissions par
+ leur soulignement.
+ Les trois derniers caractères montrent les permissions spéciales.
+\layout Standard
+
+Les lettres représentant les permissions ont la signification suivante :
+\layout Description
+
+r Permission de lire le contenu d'un fichier, ou le nom des fichiers d'un
+ dossier.
+\layout Description
+
+w Permission de modifier le contenu d'un fichier, ou de changer le contenu
+ d'un dossier (renommer un fichier, par exemple).
+\layout Description
+
+x Permission d'exécuter un fichier (un programme), ou de référer aux fichiers
+ d'un dossier (nécessaire pour voir son contenu).
+\layout Description
+
+U Ce programme s'exécute avec l'identification de son propriétaire 
+\shape italic 
+(user ID)
+\shape default 
+ plut\i \^{o}
+t qu'avec celle de l'utilisateur qui l'exécute.
+\layout Description
+
+G Ce programme s'exécute avec l'identification de son groupe
+\emph on 
+ (group ID),
+\emph toggle 
+ peut importe qui l'exécute.
+\layout Description
+
+T Les objets d'un tel dossier ne peuvent \i \^{e}
+tre supprimés que par les utilisateurs
+ qui sont les propriétaires de ceux-ci, m\i \^{e}
+me si une permission d'écriture
+ (w) existe sur le dossier.
+\layout Standard
+
+Par exemple, `
+\family typewriter 
+\bar under 
+rwx
+\bar default 
+,rwx,r-x/---
+\family default 
+' signifie que le propriétaire de ce fichier est le m\i \^{e}
+me utilisateur que
+ celui qui se sert de ROX-Filer (autrement dit, *vous* \i \^{e}
+tes le propriétaire
+ de ce fichier), vous et tous les utilisateurs du groupe avez les droits
+ de lecture, d'écriture et d'exécution ; quant au reste du monde, il peut
+ lire et exécuter ce fichier.
+ Il n'y a pas de `permissions' spéciales.
+\layout Standard
+
+Les règles qui régissent l'application des permissions peuvent varier d'un
+ système d'exploitation à un autre, mais elles peuvent \i \^{e}
+tre considérées comme
+ suit :
+\layout Itemize
+
+Si l'identité de l'utilisateur (
+\emph on 
+user ID
+\emph toggle 
+) qui utilise rox est la m\i \^{e}
+me que celle du propriétaire du fichier, les permissio
+ns du propriétaire s'appliquent.
+\layout Itemize
+
+Si l'identité du groupe (
+\emph on 
+group ID
+\emph toggle 
+) de l'utilisateur est la m\i \^{e}
+me que celle du groupe du fichier, OU si le groupe
+ du fichier est le m\i \^{e}
+me qu'un des groupes auxquels l'utilisateur appartient,
+ les permissions du groupe s'appliquent.
+\layout Itemize
+
+Autrement, les `autres' permissions s'appliquent.
+\layout Subsection
+
+Le menu sélection
+\layout Standard
+
+Si vous ouvrez le menu alors que plusieurs objets sont sélectionnés, l'opération
+ s'applique alors à tous ces objets.
+ Si vous ouvrez le menu en cliquant droit sur un objet, alors qu'il n'y
+ a pas de sélection, l'objet cliqué est alors temporairement sélectionné.
+ Si vous choisissez une commande du menu sélection sans qu'il n'y ait de
+ sélection, vous entrez en mode `cible' ; l'opération choisie s'appliquera
+ au prochain objet choisi.
+ Cliquez sur le fond de la fen\i \^{e}
+tre, appuyez sur `Echap' ou faites un clic
+ droit pour sortir du mode `cible'.
+ Le mode `cible' est surtout utile si vous utilisez l'option `Navigation
+ en simple clic' ou pour utiliser avec des raccourcis claviers.
+\layout Standard
+
+Notez que pour les dossiers-application, il peut y avoir quelques commandes
+ qui sont ajoutées au début de ce sous-menu quand vous cliquez sur ceux-ci
+ --- voir la section 
+\begin_inset LatexCommand \ref{AppDir}
+
+\end_inset 
+
+ pour plus de détails.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="14" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="10cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Copier...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Copie cet objet.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Renommer...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Change le nom de cet object, ou le déplace vers un autre dossier.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Lier...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Crée un lien symbolique vers cet objet.
+ 
+\latex latex 
+
+\backslash 
+dag
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Shift Ouvrir     
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre les dossiers-application comme s'il s'agissait de simples dossiers,ouvre
+ les fichiers comme s'il s'agissait de simple texte brut, monte/démonteun
+ point de montage, ou ouvre le dossier contenant la cible du lien symboliquesur
+ lequel vous 
+\begin_inset Quotes eld
+\end_inset 
+
+shift-cliquez
+\begin_inset Quotes erd
+\end_inset 
+
+.C'est la m\i \^{e}
+me chose que de cliquer en maintenant Shift enfoncé.
+ La commandedu menu sélection prend alors le nom de la commande a effectuer.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Aide 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le type de l'objet sélectionné.
+ Pour les dossiers-application,montre leurs fichiers d'aide.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Info
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche plus de détails sur l'objet.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fixer laction d'exécution...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Cette commande vous permet de choisir l'application qui sera utilisée pour
+ ouvirles fichiers de ce type.
+ Lire la section 
+\begin_inset LatexCommand \ref{sec: RunAction}
+
+\end_inset 
+
+ pour plus de détails.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fixer l'ic\i \^{o}
+ne...
+  
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Vous pouvez affecter une ic\i \^{o}
+ne différente pour chaque fichier/dossier en
+ utilisantcette commande --- glissez-déposez simplement une ic\i \^{o}
+ne sur la
+ bo\i \^{\i}
+te qui s'ouvrealors.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvrir (A)VFS
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre le fichier comme s'il s'agissait d'un dossier --- voir la section
+ 
+\begin_inset LatexCommand \ref{sec: vfs}
+
+\end_inset 
+
+.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Supprimer  
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Supprime tous les objets sélectionnés du dossier courant.Le contenu des sous-doss
+iers sera supprimé en premier.Supprimer un lien symbolique ne supprime que
+ le lien, pas la cible de ce lien.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Occupation du disque 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fait le total de l'espace occupé par les objets sélectionnés.
+ Le contenu des dossierssélectionnés est aussi compté.
+ Les liens symboliques sont comptés, mais pas leur cible.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Permissions
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Cette commande vous permet de changer les permissions des objets sélectionnés.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Chercher
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Cherche des fichiers en spécifiant différentes conditions --- voir la section
+ 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+dag
+\backslash 
+thinspace{}
+\latex default 
+Un lien symbolique enregistre l'emplacement d'un autre fichier.
+ Supprimer un lien symbolique n'affecte en rien la cible vers laquelle celui-ci
+ pointe.
+ Supprimer la cible rendra le lien symbolique inutile.
+ Il y a deux types de liens symboliques --- Relatif et Absolu.
+ Un lien absolu enregistre le chemin complet de la cible (ex `/home/fred/MonFich
+ier').
+ Un lien relatif enregistre le chemin relatif menant jusqu'à la cible (ex
+ `../fred/MonFichier').
+ Si la cible est censée ne jamais \i \^{e}
+tre déplacée, utilisez un lien absolu
+ (vous pourrez déplacer celui-ci), mais si vous pensez que la cible pourra
+ \i \^{e}
+tre déplacée (le lien devra l'\i \^{e}
+tre aussi...), alors optez pour un lien relatif.
+\layout Subsection
+
+Le menu Nouveau
+\layout Standard
+
+Chaque commande de ce sous-menu ouvre une bo\i \^{\i}
+te pour créer un nouveau fichier
+ ou un nouveau dossier.
+ Il y a deux commandes de base ; les autres reflètent le contenu de votre
+ dossier `
+\family typewriter 
+<Choices>/Templates
+\family default 
+', s'il existe.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="4" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="9cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Répertoire
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Crée un nouveau répertoire.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fichier vide
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Crée un fichier vide.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+<commandes supplémentaires>
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Copie un fichier depuis votre dossier Templates.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Pour ajouter vos propres commandes, créez un nouveau dossier `
+\family typewriter 
+~/Choices/Templates
+\family default 
+' (si la variable CHOICESPATH est celle par défaut) et enregistrez-y tous
+ les fichiers que vous souhaitez.
+ Chaque fichier de ce dossier appara\i \^{\i}
+tra dans le menu et la bo\i \^{\i}
+te qui s'ouvrira
+ le copiera.
+ Par exemple, vous pourriez créer une base pour un fichier HTML :
+\layout LyX-Code
+
+<html>
+\layout LyX-Code
+
+<head>
+\layout LyX-Code
+
+<title>Ma Page</title>
+\layout LyX-Code
+
+</head>
+\layout LyX-Code
+
+<body>
+\layout LyX-Code
+
+Le contenu.
+\layout LyX-Code
+
+</body>
+\layout LyX-Code
+
+</html>
+\layout Standard
+
+Enregistrez ceci sous le nom `
+\family typewriter 
+index.html
+\family default 
+' dans le dossier 
+\family typewriter 
+Templates
+\family default 
+ et vous pourrez ainsi facilement créer de nouveaux fichiers HTML.
+ Vous pouvez aussi y enregistrer des documents vides de toutes sortes d'applicat
+ions (ex : une feuille de calcul, une lettre ou un fax, etc...).
+\layout Standard
+
+Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier
+ pour ces commandes personnalisées.
+\layout Subsection
+
+Le menu fen\i \^{e}
+tre
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="11" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="9cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Père, nouvelle fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre une nouvelle fen\i \^{e}
+tre pour afficher le contenu du dossier père.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Père, m\i \^{e}
+me fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme ci-dessus, mais utilise la m\i \^{e}
+me fen\i \^{e}
+tre.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Nouvelle fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre une nouvelle fen\i \^{e}
+tre avec le m\i \^{e}
+me dossier courant.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Répertoire Home
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche le contenu de votre répertoire personnel.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Changer taille de la fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ajuste la taille de la fen\i \^{e}
+tre à son contenu.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fermer la fen\i \^{e}
+tre
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ferme la fen\i \^{e}
+tre.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Entrer un chemin...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre un `espace de saisie' pour ouvrir un autre dossier (voir section 
+\begin_inset LatexCommand \ref{sec: mini}
+
+\end_inset 
+
+).
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande shell...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre un `espace de saisie' pour exécuter une commande shell (voir section
+ 
+\begin_inset LatexCommand \ref{sec: mini}
+
+\end_inset 
+
+).
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Sélectionner si...
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Sélectionner des fichiers qui correspondent à certains critères
+\latex latex 
+~
+\latex default 
+---voir section 
+\begin_inset LatexCommand \ref{sec: SelectIf}
+
+\end_inset 
+
+.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Voir l'aide de ROX-Filer 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Comme si vous affichiez le dossier-application ROX-Filer,et que vous choisissiez
+ `Aide' dans le menu sélection.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Section
+
+Le punaiseur et les panneaux
+\layout Standard
+
+Les sections 
+\begin_inset LatexCommand \ref{run_pin}
+
+\end_inset 
+
+ et 
+\begin_inset LatexCommand \ref{run_pan}
+
+\end_inset 
+
+ expliquent comment activer/désactiver le punaiseur et les panneaux.
+ Quand ils sont activés, vous pouvez déposer des objets dessus en les glissant
+ depuis une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+.
+ Cliquer sur un objet du punaiseur ou d'un panneau revient à cliquer sur
+ l'objet auxquel le premier fait référence (ndt : comme un lien).
+ Vous pouvez aussi glisser-déposer les ic\i \^{o}
+nes du punaiseur et des panneaux
+ comme des objets normaux, et pour les modifier, faites un clic droit dessus.
+\layout Standard
+
+Vous pouvez arranger les ic\i \^{o}
+nes du punaiseur et des panneaux en les faisant
+ glisser avec le bouton du milieu ; elles se positionnent sur une grille
+ (pour le punaiseur).
+ Tout changement apporté au punaiseur et aux panneaux est automatiquement
+ et immédiatement enregistré.
+ Si vous cliquez sur ces ic\i \^{o}
+nes en maintenant Ctrl enfoncé, vous les sélectionner
+ez/dé-sélectionnerez.
+ Clicquez ailleurs sur le bureau pour tout dé-sélectionner.
+\layout Standard
+
+Si il y a trop d'ic\i \^{o}
+nes dans un panneau au point que vous ne puissiez plus
+ les voir toutes, vous pouvez voir celles qui sont cachées en cliquant avec
+ le bouton gauche sur un espace 
+\begin_inset Quotes eld
+\end_inset 
+
+inter-ic\i \^{o}
+nes
+\begin_inset Quotes erd
+\end_inset 
+
+ et en le faisant glisser.
+\layout Standard
+
+
+\series bold 
+IMPORTANT: 
+\series default 
+Déposer des objets sur le punaiseur ou les panneaux NE LES COPIE PAS, cela
+ crée seulement un raccourci vers l'objet original.
+ Si vous effacez l'objet original, vous le perdez ! Supprimer une ic\i \^{o}
+ne du
+ punaiseur ou d'un panneau ne supprime que celui-ci.
+ Ce comportement diffère de celui des autres gestionnaires de fichiers,
+ en général...
+\layout Subsection
+
+Les menus du punaiseur et des panneaux
+\layout Standard
+
+Ces menus sont les m\i \^{e}
+mes.
+ Ils sont très simples :
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="6" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="10cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Commande
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+ROX-Filer
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Affiche l'aide, la bo\i \^{\i}
+te des options, ou votre dossier personnel.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Fichier `fichier'
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre le m\i \^{e}
+me menu que le menu `Fichier' du 
+\shape italic 
+filer
+\shape default 
+, mais en simplifié.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Editer l'objet 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="left" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Modifier le nom qui est affiché sous l'ic\i \^{o}
+ne, ou le chemin vers lequell'ic\i \^{o}
+ne
+ pointe.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="false" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Voir l'emplacement
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre une fen\i \^{e}
+tre montrant le dossier où est enregistré l'objet original.
+\end_inset 
+</cell>
+</row>
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Enlever le(s) objet(s)
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="true" bottomline="false" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Supprime du punaiseur ou des panneaux les objets sélectionnés.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
+Si vous mettez en place les ic\i \^{o}
+nes par défaut pour plusieurs utilisateurs
+ et que vous souhaitez créer une ic\i \^{o}
+ne `Home' qui pointe vers le dossier
+ personnel de chaque utilisateur, créez une ic\i \^{o}
+ne, choisissez `Editer l'ic\i \^{o}
+ne'
+ et mettez `~' pour le chemin.
+\layout Standard
+
+Notez que des applications peuvent ajouter des commandes au début de ce
+ menu quand vous cliquez dessus --- voir la section 
+\begin_inset LatexCommand \ref{AppDir}
+
+\end_inset 
+
+ pour plus de détails.
+\layout Subsection
+
+`Appliquettes' pour les panneaux
+\layout Standard
+
+ROX-Filer vous permet d'exécuter de petits programmes à l'intérieur des
+ panneaux --- ces programmes sont appelés 
+\emph on 
+appliquettes
+\emph default 
+.
+ Pour démarrer une appliquette, glissez-déposez-la sur un panneau, depuis
+ une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+, et au lieu de voir l'ic\i \^{o}
+ne appara\i \^{\i}
+tre, vous verrez l'appliquette démarrer.
+\layout Standard
+
+Pour créer vos propres appliquettes (pour les programmeurs !) :
+\layout Enumerate
+
+Créez un dossier pour l'appliquette (ex `
+\family typewriter 
+MonAppliquette
+\family default 
+').
+\layout Enumerate
+
+Créez-y une ic\i \^{o}
+ne appelée `
+\family typewriter 
+.DirIcon.png
+\family default 
+' (le dossier appara\i \^{\i}
+tra avec une ic\i \^{o}
+ne).
+\layout Enumerate
+
+Créez-y un dossier `
+\family typewriter 
+Help
+\family default 
+' pour le cas où les utilisateurs choisiront `Aide' dans le menu.
+\layout Enumerate
+
+Créez un exécutable appelé `
+\family typewriter 
+AppletRun
+\family default 
+'.
+ This will be passed the XID of the panel socket window when the directory
+ is dragged onto the panel.
+ You can use this to create a GtkSocket widget.
+ An example applet (written in python) is available at:
+\begin_deeper 
+\layout LyX-Code
+
+http://rox.sourceforge.net/applets.php3
+\end_deeper 
+\layout Section
+
+
+\begin_inset LatexCommand \label{sec: vfs}
+
+\end_inset 
+
+Systèmes de fichier virtuel (VFS)
+\layout Standard
+
+Certains types de fichier peuvent \i \^{e}
+tre représentés sous forme de dossier.
+ Un exemple typique est le fichier zip, qui contient une structure complète
+ et compressée d'un dossier.
+ Il peut \i \^{e}
+tre très pratique d'ouvrir un tel fichier comme s'il s'agissait
+ d'un vrai dossier ; c'est ce que vous permet de faire le système VFS.
+\layout Standard
+
+Pour utiliser cette fonctionnalité, vous devez disposer de (au choix ou
+ les deux) :
+\layout Itemize
+
+Un système du genre AVFS
+\begin_inset LatexCommand \cite{AVFS}
+
+\end_inset 
+
+ qui permet au noyau d'intégrer directement le support de différents systèmes
+ de fichiers virtuels.
+ C'est la meilleure des solutions, puisqu'elle autorise tous les programmes
+ à accéder à cette fonctionnalité.
+ Vous devrez probablement avoir le mot de passe root pour installer cette
+ fonctionnalité.
+ De plus, toutes les plate-formes ne sont pas supportées.
+\layout Itemize
+
+Le support des librairies VFS de Midnight Commander, compilé dans ROX-Filer.
+ C'est automatique quand vous compilez ROX-Filer et qu'il peut trouver les
+ librairies VFS --- il suffit d'avoir 
+\family typewriter 
+libvfs.so
+\family default 
+ (ou 
+\family typewriter 
+libvfs.a
+\family default 
+) dans un dossier de librairies du système ou dans le dossier défini par
+ la variable d'environment 
+\family typewriter 
+LD_LIBRARY_PATH
+\family default 
+.
+ Dans ce cas, vous pourrez voir la structure interne du fichier sous forme
+ de dossier et en extraire des fichiers, mais pas la modifier pour l'instant.
+ Midnight Commander fait partie du projet GNOME.
+\begin_deeper 
+\layout Standard
+
+Quand vous utilisez libvfs, la commande `Ouvrir AVFS' est remplacée par
+ un sous-menu `Ouvrir VFS'.
+ C'est simplement un raccourci de l'utilisation de la commande `Entrer un
+ chemin...' (explication ci-dessous), donc si vous voulez voir le contenu d'un
+ fichier zip, par exemple, vous pouvez taper le chemin directement :
+\layout Standard
+
+
+\family typewriter 
+/home/fred/archive.zip#uzip/
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
+N'oubliez pas le slash final !
+\end_deeper 
+\layout Subsection
+
+Méthode `pas à pas' pour ajouter le support VFS
+\layout Standard
+
+Copiez les sources de Midnight Commander dans un dossier appelé `mc'.
+ Vous devrez peut-\i \^{e}
+tre remplacer 
+\family typewriter 
+libvfs.so 
+\family default 
+par 
+\family typewriter 
+libvfs.a
+\family default 
+.
+\layout LyX-Code
+
+$ cd mc
+\layout LyX-Code
+
+$ ./configure
+\layout LyX-Code
+
+$ cd vfs
+\layout LyX-Code
+
+$ make libvfs.so
+\layout Itemize
+
+Si vous avez le mot de passe root, installez la librairie dans un dossier
+ adéquat.
+\layout Itemize
+
+Sinon,
+\begin_deeper 
+\layout LyX-Code
+
+$ mkdir ~/lib
+\layout LyX-Code
+
+$ cp libvfs.so ~/lib
+\layout LyX-Code
+
+$ cd ~/Apps/ROX-Filer
+\layout Standard
+
+Editez le fichier 
+\family typewriter 
+AppRun
+\family default 
+ en ajoutant cette ligne (mettez-la ligne n°2 !) :
+\layout LyX-Code
+
+LD_LIBRARY_PATH=${HOME}/lib; export LD_LIBRARY_PATH
+\layout Standard
+
+Ceci va obliger ROX-Filer à chercher la librairie dans le nouveau dossier
+ 
+\family typewriter 
+~/lib
+\family default 
+.
+ Pour terminer, recompilez :
+\layout LyX-Code
+
+$ ./AppRun --compile
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+checking for mc_stat in -lvfs...
+ yes
+\layout Standard
+
+Si vous voyez cette ligne, c'est que tout a fonctionné ! Bravo !
+\end_deeper 
+\layout Section
+
+
+\begin_inset LatexCommand \label{sec: mini}
+
+\end_inset 
+
+Le mini-buffer
+\layout Standard
+
+Le mini-buffer est une barre blanche qui appara\i \^{\i}
+t le long de la fen\i \^{e}
+tre du
+ 
+\shape italic 
+filer
+\shape default 
+, en bas, et qui vous permet d'entrer du texte.
+ Pressez `Echap' pour vous en débarrasser.
+ Le mini-buffer se comporte différemment, selon la manière dont il a été
+ appelé :
+\layout Subsection
+
+`Entrer un chemin...'
+\layout Standard
+
+Vous pouvez taper un chemin, directement.
+ Au fur et à mesure que vous tapez, l'affichage de la fen\i \^{e}
+tre est mis à jour
+ pour vous montrer l'objet qui correspond à ce que vous \i \^{e}
+tes en train de
+ taper.
+ L'utilité de cette commande réside dans la recherche d'un fichier dans
+ un dossier très fourni, mais vous pouvez vous en servir pour passer directement
+ à un autre dossier, ou pour coller un chemin complet que vous aurez copié
+ depuis une autre fen\i \^{e}
+tre.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset  Tabular
+<lyxtabular version="2" rows="4" columns="2">
+<features rotate="false" islongtable="false" endhead="0" endfirsthead="0" endfoot="0" endlastfoot="0">
+<column alignment="center" valignment="top" leftline="true" rightline="false" width="" special="">
+<column alignment="left" valignment="top" leftline="true" rightline="true" width="8cm" special="">
+<row topline="true" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Touche
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Action
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Entrée
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Ouvre l'objet sélectionné.
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Tabulation
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Complétion `à la méthode' shell (comme dans xterm).
+\end_inset 
+</cell>
+</row>
+<row topline="false" bottomline="true" newpage="false">
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="false" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Haut, Bas 
+\end_inset 
+</cell>
+<cell multicolumn="0" alignment="center" valignment="top" topline="false" bottomline="true" leftline="true" rightline="true" rotate="false" usebox="none" width="" special="">
+\begin_inset Text
+
+\layout Standard
+
+Sélectionne graphiquement la correspondanceprécédente/suivante.
+\end_inset 
+</cell>
+</row>
+</lyxtabular>
+
+\end_inset 
+
+
+\layout Standard
+
+Si vous commencez à taper un nom commençant par un `.', la commande `Montrer
+ les fichiers cachés' est temporairement activée pour que les fichiers puissent
+ \i \^{e}
+tre affichés.
+\layout Standard
+
+La complétion essaie de trouver le maximum de caractères possibles.
+ Par exemple, si il y a deux fichiers dans un m\i \^{e}
+me dossier qui s'appellent
+ `sauvegarde-mail-nov-1999' et `sauvegarde-mail-dec-1999', alors le simple
+ fait de taper 'sauve' et de presser la touche Tab développera `sauve' en
+ `sauvegarde-mail-' et bipera pour indiquer que la correspondance n'est
+ pas complète.
+ Si vous utilisez la complétion sur un dossier et qu'il est unique, le 
+\shape italic 
+filer
+\shape default 
+ va automatiquement afficher celui-ci.
+ Ce comportement doit rappeler quelque chose aux utilsateurs du shell.
+\layout Subsubsection*
+
+Exemple
+\layout Standard
+
+Admettons que vous vouliez trouver la documentation de Wine dans le dossier
+ /usr/doc (qui est habituellement très chargé).
+ Voici comment vous pourriez faire :
+\layout Enumerate
+
+Ouvrez le mini-buffer en choisissant la commande `Entrer un chemin...' du menu
+ `Fen\i \^{e}
+tre'.
+ J'utilise généralement le raccourci `/' pour cette commande.
+\layout Enumerate
+
+Pressez CTRL-U pour effacer l'entrée par défaut --- cela vous amène à la
+ racine (/).
+\layout Enumerate
+
+Tapez `u
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+do
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+wi
+\latex latex 
+
+\backslash 
+Tab{}
+\latex default 
+'.
+ Au fur et à mesure que vous tapez, les dossiers seront ouverts automatiquements.
+ Si un bip retentit quand vous pressez la touche Tab vous devez taper une
+ lettre de plus, car il y a plusieurs correspondances.
+\layout Subsection
+
+La command shell
+\layout Standard
+
+Cette fonction vous permet d'entrer rapidement des commandes shell si vous
+ ne voulez pas ouvrir d'xterm.
+ Si vous ne savez pas ce que sont des `commandes shell', passez à la section
+ suivante !
+\layout Standard
+
+Tapez simplement la commande et pressez Entrée pour l'exécuter.
+ Les touches Haut et Bas rappellent les commandes précédentes.
+ Tab effectue toujours la complétion.
+ Cliquer sur un objet insère son nom dans le mini-buffer.
+ Si plusieurs objets sont sélectionnés, ils sont assignés aux paramètres
+ 
+\family typewriter 
+$1
+\family default 
+, 
+\family typewriter 
+$2
+\family default 
+, etc.
+\layout Standard
+
+Ouvrir le mini-buffer alors que des objets sont sélectionnés ajoute 
+\family typewriter 
+
+\begin_inset Quotes eld
+\end_inset 
+
+$@
+\begin_inset Quotes erd
+\end_inset 
+
+
+\family default 
+ à la fin de la commande --- ce qui remplace le nom des objets sélectionnés.
+ S'il n'y a pas de sélection mais qu'un fichier est `entouré', le nom de
+ celui-ci est inséré.
+\layout Subsubsection*
+
+Exemples
+\layout Standard
+
+Pour `détarer' une archive 
+\family typewriter 
+.tgz
+\family default 
+ :
+\layout Enumerate
+
+Ouvrez le mini-buffer en choisissant la commande `Commande shell' du menu
+ `Fen\i \^{e}
+tre'.
+ J'utilise habituellement le raccourci `!' pour cette commande.
+\layout Enumerate
+
+Tapez `
+\family typewriter 
+tar xzf
+\family default 
+' et cliquez sur le fichier.
+ L'espace entre les options de tar et le nom du fichier est automatiquement
+ inséré.
+\layout Enumerate
+
+Pressez Entrée pour exécuter.
+\layout Standard
+
+Pour imprimer tous les fichiers sélectionnés :
+\layout Enumerate
+
+Choisissez la commande `Commande shell'.
+\layout Enumerate
+
+Tapez 
+\family typewriter 
+`lpr
+\family default 
+' au début de la ligne et pressez Entrée.
+\layout Subsubsection*
+
+Notes
+\layout Itemize
+
+Attention : aucune confirmation n'est demandée ! Si vous doutez, commencez
+ votre commande par `
+\family typewriter 
+echo
+\family default 
+', ce qui provoquera un affichage, plut\i \^{o}
+t qu'une exécution.
+\layout Itemize
+
+C'est `sh' est toujours utilisé (principalement à cause de la façon dont
+ bash et csh traitent les paramètres positionnels).
+ De toute façon, PATH est cherché, donc vous pouvez toujours utiliser un
+ autre shell si vous le voulez, en le nommant sh et en le mettant dans votre
+ PATH.
+\layout Itemize
+
+Les commandes sont exécutées en arrière-plan, donc vous pouvez faire :
+\begin_deeper 
+\layout LyX-Code
+
+sleep 240; xmessage Time to go!
+\end_deeper 
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: SelectIf}
+
+\end_inset 
+
+Sélectionner si...
+\layout Standard
+
+Utilisez cette commande si vous voulez sélectionner des objets correspondant
+ à certains critères.
+ La syntaxe des conditions est détaillée à la section 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+.
+ Par exemple, pour sélectionner tous les fichiers `pesant' plus de 5 Mb
+ :
+\layout Enumerate
+
+Choisissez la commande `Sélectionner si...'.
+\layout Enumerate
+
+Tapez `
+\family typewriter 
+Size > 5Mb
+\family default 
+' et pressez la touche Entrée.
+\layout Standard
+
+Tous les fichiers (et seulement eux) plus gros que 5 Mb seront sélectionnés.
+ Les expressions que vous pouvez utiliser ici sont du m\i \^{e}
+me style que celles
+ décrites à la section 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+, sauf que `
+\family typewriter 
+prune
+\family default 
+' n'a aucun effet, puisque le contenu des dossiers n'est jamais vérifié.
+\layout Section
+
+Les fen\i \^{e}
+tres action
+\layout Standard
+
+Les fen\i \^{e}
+tres action sont ces fen\i \^{e}
+tres qui apparaissent quand vous \i \^{e}
+tes en train
+ d'accomplir une opération de Copie/Déplacement/Lien/etc...
+ La ligne de statut en haut de la fen\i \^{e}
+tre affiche le nom du dossier courant
+ ou l'objet en train d'\i \^{e}
+tre traité.
+ L'espace qui se trouve en-dessous est là pour afficher les messages ---
+ ce qui a été fait, et éventuellement des questions.
+\layout Standard
+
+En bas, il y a quatre boutons, et, parfois, quelques options.
+ Les boutons fonctionnent de cette manière :
+\layout Description
+
+Silencieux réalisera des opérations simples sans vous demander de confirmer
+ à chaque fois.
+ Vous pouvez utilisez ce bouton pendant une opération pour faire une pause.
+\layout Description
+
+Oui répond oui à la question affichée.
+\layout Description
+
+Non répond non à la question affichée.
+\layout Description
+
+Abandonner Stoppe l'opération en cours et ferme la fen\i \^{e}
+tre action.
+\layout Standard
+
+Vous pouvez préciser quelle(s) action(s) peut (peuvent) \i \^{e}
+tre démarrée(s)
+ automatiquement (sans avoir à cliquer sur Silencieux au début) avec la
+ commande `Options...'.
+\layout Subsection
+
+Options des fen\i \^{e}
+tres action
+\layout Standard
+
+Certaines actions ont des options, qui apparaissent sous forme de petits
+ `boutons à cocher' en bas de la fen\i \^{e}
+tre :
+\layout Itemize
+
+`Forcer' signifie que le 
+\shape italic 
+filer
+\shape default 
+ ne va pas traiter différemment les fichiers spécifiés `protégés en écriture'.
+ Normalement, la suppression est confirmée m\i \^{e}
+me si Silencieux est enclenché.
+ Notez que vous ne pouvez pas supprimer des fichiers présents dans des dossiers
+ protégés en écriture car dans ce cas vous n'en avez pas la permission.
+\layout Itemize
+
+`Bref' évite au 
+\shape italic 
+filer
+\shape default 
+ d'afficher un message à chaque fois qu'il fait quelque chose.
+ Utilisez cette option si vous voulez augmenter la vitesse d'exécution de
+ l'opération, si beaucoup de messages sont affichés.
+\layout Itemize
+
+`Récursif' signifie que l'action appliquée à un dossier sera aussi appliquée
+ à tout son contenu, ainsi qu'au contenu de ses sous-dossiers, et ainsi
+ de suite.
+\layout Section
+
+
+\begin_inset LatexCommand \label{sec: Searching}
+
+\end_inset 
+
+Chercher
+\layout Standard
+
+La fonction Chercher recherche à travers tous les fichiers et les dossiers
+ sélectionnés ainsi que tous les sous-dossiers (récursivement), les objets
+ qui correspondent à une expression particulière.
+\layout Standard
+
+Si vous connaissez le nom d'un fichier, entrez-le simplement dans l'espace
+ `Expression :', entouré par des apostrophes.
+ Par exemple, pour chercher un fichier nommé `log' vous entreriez :
+\layout LyX-Code
+
+'log'
+\layout Standard
+
+Souvenez-vous qu'il faut utiliser des apostrophes, et pas des guillemets
+ (
+\begin_inset Quotes eld
+\end_inset 
+
+) ni des apostrophes inversées (
+\family typewriter 
+`
+\family default 
+) !
+\layout Standard
+
+Au fur et à mesure que le 
+\shape italic 
+filer
+\shape default 
+ trouve des objets qui correspondent, ils sont ajoutés à la liste des résultats.
+ Si vous cliquez sur un des résultats, une fen\i \^{e}
+tre s'ouvrira pour vous montrer
+ le dossier dans lequel celui-ci est enregistré.
+ Le 
+\shape italic 
+filer
+\shape default 
+ utilisera la m\i \^{e}
+me fen\i \^{e}
+tre pour afficher les dossiers qui correspondent aux
+ autres résultats (donc si vous voulez garder des fen\i \^{e}
+tres différentes pour
+ chaque résultat, vous devrez explicitement créer une nouvelle fen\i \^{e}
+tre (menu
+ Fen\i \^{e}
+tre).
+\layout Subsection
+
+Wildcards (les motifs génériques)
+\layout Standard
+
+Vous pouvez aussi entrer des wildcards entre les apostrophes, par exemple:
+\layout LyX-Code
+
+'*.html'
+\layout LyX-Code
+
+'Report.*'
+\layout LyX-Code
+
+'Draft[1-5]'
+\layout LyX-Code
+
+'main.[ch]'
+\layout Standard
+
+Lisez la page man de 
+\family typewriter 
+glob(7)
+\family default 
+ (ndt : `man 7 glob') si vous voulez en savoir plus sur les motifs génériques.
+\layout Standard
+
+Si l'expression que vous entrez contient un slash (`/'), la recherche porte
+ sur le chemin complet des objets, au lieu de ne porter que sur le nom du
+ fichier seulement.
+ Donc, 
+\family typewriter 
+'*tmp*'
+\family default 
+ trouvera `tmp' et `tmpfile' mais pas `/tmp/file' --- 
+\family typewriter 
+'/*tmp*'
+\family default 
+ trouvera les trois.
+\layout Subsection
+
+Tests simples
+\layout Standard
+
+Le 
+\shape italic 
+filer
+\shape default 
+ propose d'autres types de recherche (pas seulement par le nom).
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+smallskip
+\backslash 
+noindent 
+\latex default 
+Ces expressions recherchent les objets par leur type :
+\layout Description
+
+IsReg correspond à un fichier normal.
+\layout Description
+
+IsLink correspond à un lien symbolique.
+\layout Description
+
+IsDir correspond à un dossier.
+\layout Description
+
+IsChar correspond à un `character device'.
+\layout Description
+
+IsBlock correspond à un `block device'.
+\layout Description
+
+IsDev correspond à un `block device' ou à un `character device'.
+\layout Description
+
+IsPipe correspond à un tube.
+\layout Description
+
+IsSocket correspond à un point de communication.
+\layout Standard
+
+Celles-ci, par leurs permissions --- voir la section 
+\begin_inset LatexCommand \ref{sec: Permissions}
+
+\end_inset 
+
+.
+\layout Description
+
+IsSUID correspond aux fichiers qui ont le bit `Set-UID' activé.
+\layout Description
+
+IsSGID correspond aux fichiers qui ont le bit `Set-GID' activé.
+\layout Description
+
+IsSticky correspond aux fichiers qui ont le bit `sticky bit' activé.
+\layout Description
+
+IsReadable correspond aux fichiers que vous pouvez lire.
+\layout Description
+
+IsWriteable correspond aux fichiers dans lesquels vout pouvez écrire.
+\layout Description
+
+IsExecutable correspond aux fichiers que vous pouvez exécuter.
+\layout Standard
+
+Deux autres très utiles :
+\layout Description
+
+IsEmpty trouve les fichiers vides (en fait, ceux dont la taille est de is
+ 0 octet).
+\layout Description
+
+IsMine trouve les fichiers dont vous êtes le propriétaire.
+\layout Subsection
+
+Opérateurs logiques
+\layout Standard
+
+Vous pouvez combiner les tests précédents pour effectuer des recherches
+ avancées.
+ Une expression est actuellement faite d'une liste de 
+\emph on 
+cas
+\emph toggle 
+, séparés par des virgules.
+ Le 
+\shape italic 
+filer
+\shape default 
+ essaiera de trouver les correspondances pour chaque cas jusqu'à ce qu'un
+ de ceux-ci fonctionne, ou jusqu'à ce qu'il n'y ait plus de cas.
+ Par exemple, pour chercher des fichiers dont les extensions peuvent \i \^{e}
+tre
+ .gif, .htm ou .html :
+\layout LyX-Code
+
+'*.gif', '*.htm', '*.html'
+\layout Standard
+
+Plus fort : chaque cas peut \i \^{e}
+tre une liste de conditions.
+ Le cas ne fonctionne que si toutes les conditions sont respectées.
+ Pour trouver un dossier nommé 
+\family typewriter 
+lib
+\family default 
+ ou un fichier normal se terminant par 
+\family typewriter 
+.so
+\family default 
+ :
+\layout LyX-Code
+
+IsDir 'lib', IsReg '*.so'
+\layout Standard
+
+Vous pouvez inverser une condition en ajoutant un 
+\family typewriter 
+`!'
+\family default 
+ devant, et vous pouvez utiliser une sous-expression comme expression, en
+ l'entourant de parenthèses, comme ceci :
+\layout LyX-Code
+
+! (IsDir, IsReg)
+\layout LyX-Code
+
+!IsDir !IsReg
+\layout LyX-Code
+
+Not isdir and not isreg
+\layout Standard
+
+Ces 3 expressions signifient la m\i \^{e}
+me chose.
+\layout Subsection
+
+Comparaisons
+\layout Standard
+
+Vous pouvez aussi comparez des valeurs en utilisant les opérateurs 
+\family typewriter 
+<, <=, =, !=, >, >=
+\family default 
+ (inférieur à, inférieur ou égal à, égal à, différent de, supérieur à, supérieur
+ ou égal à).
+ Quand vous comparerez des heures, vous trouverez certainement plus pratique
+ d'utiliser 
+\family typewriter 
+after 
+\family default 
+(ndt : après) et 
+\family typewriter 
+before
+\family default 
+ (ndt : avant) au lieu de 
+\family typewriter 
+>
+\family default 
+ et
+\family typewriter 
+ <
+\family default 
+.
+\layout Standard
+
+Ce qui suit peut \i \^{e}
+tre utilisé dans les comparaisons :
+\layout Description
+
+atime L'heure du dernier accès au fichier.
+\layout Description
+
+ctime L'heure du dernier changement du fichier.
+\layout Description
+
+mtime L'heure de la dernière modification du fichier.
+\layout Description
+
+size La taille du fichier.
+\layout Description
+
+inode Le numéro d'index (i-noeud) du fichier.
+\layout Description
+
+nlinks Le nombre de liens physiques (et pas symboliques).
+\layout Description
+
+uid L' `User ID' du fichier.
+\layout Description
+
+gid Le `Group ID' du fichier.
+\layout Description
+
+blocks Le nombre de blocs d'octets utilisés par le fichier.
+\layout Standard
+
+Les heures sont mesurées en secondes, avec un point de départ correspondant
+ à `Unix Epoch' (00:00:00 UTC, 
+\begin_inset Formula \( \left. 1^{er}\right.  \)
+\end_inset 
+
+ Janvier 1970).
+ Les tailles sont en octets.
+ Quand vous utilisez des constantes pour comparer les valeurs, vous pouvez
+ utiliser plusieurs mots-clé pour ajuster l'échelle de la valeur :
+\layout Description
+
+Byte(s) Sans effet, mais `ça fait mieux' (ndt : byte signifie octet).
+\layout Description
+
+Kb multiplie par 1024, donc 2 Kb = 2048.
+\layout Description
+
+Mb multiplie par 
+\begin_inset Formula \( 1024^{2} \)
+\end_inset 
+
+, soit 1024 Kb.
+\layout Description
+
+Sec(s) Sans effet, mais ça fait mieux aussi !
+\layout Description
+
+Min(s) multiplie par 60 pour obtenir des minutes.
+\layout Description
+
+Hour(s), Day(s), Week(s), Year(s) convertit dans l'unité précisée (ndt :
+ heure(s), jour(s), semaine(s), année(s)).
+\layout Description
+
+Ago rend le temps passé relatif à l'heure à laquelle est effectué le test
+\layout Description
+
+Hence rend le temps futur à l'heure à laquelle est effectué le test
+\layout Description
+
+Now est un raccourci pour '0 Secs Hence'
+\layout Description
+
+
+\series medium 
+Quelques 
+\series default 
+exemples rendront ceci plus clair !
+\layout LyX-Code
+
+mtime after 1 day ago
+\layout LyX-Code
+
+size > 10 Mb
+\layout LyX-Code
+
+IsReg and nlinks > 1
+\layout Standard
+
+La première expression trouve les fichiers modifiés au cours des dernières
+ 24 heures (ndt : `after 1 day ago', littéralement, veut dire `après il
+ y a un jour').
+ Vous pourriez utiliser 
+\family typewriter 
+>
+\family default 
+ au lieu de 
+\family typewriter 
+after,
+\family default 
+mais ce serait moins clair.
+ La deuxième trouve les fichiers pesant plus de 10 Mb et la dernière trouve
+ les fichiers normaux qui ont plus qu'1 lien physique sur eux.
+\layout Standard
+
+Attention --- le 
+\shape italic 
+filer
+\shape default 
+ ne vérifie pas le contexte des opérateurs, donc 
+\family typewriter 
+size > 1 day ago
+\family default 
+ est admis (ndt : taille > 1 jour avant), m\i \^{e}
+me si ça n'a pas de sens ! Pensez
+ aussi aux mots-clé 
+\family typewriter 
+ago
+\family default 
+ et 
+\family typewriter 
+hence
+\family default 
+ (ndt : `il y a' et `désormais'), car un oubli de ceux-ci pourrait causer
+ des problèmes conséquents (le temps serait alors mesuré par rapport à l'Epoch
+ au lieu de l'heure courante).
+ Enfin, n'utilisez pas `=' avec les heures --- 
+\family typewriter 
+atime = 1 day ago
+\family default 
+ recherche un fichier accédé il y a 
+\emph on 
+exactement
+\emph toggle 
+ 86400 secondes
+\latex latex 
+$
+\backslash 
+ldots$
+\layout Subsection
+
+Divers
+\layout Description
+
+System(commande) exécute `commande' sur le fichier.
+ Le test réussit si la commande renvoie un code de retour 0 (zéro).
+ Un caractère `%' dans `commande' est remplacé par le chemin complet du
+ fichier traité.
+ System est un test très lent, donc utilisez le en dernier dans vos expressions,
+ si possible.
+ Par exemple, si vous cherchez un fichier dont l'extension est .c et qui
+ contient le mot `main', utilisez :
+\begin_deeper 
+\layout LyX-Code
+
+'*.c' system(grep -q main
+\latex latex 
+ "
+\backslash 
+thinspace{}
+\latex default 
+%
+\latex latex 
+
+\backslash 
+thinspace{}"
+\latex default 
+)
+\layout Standard
+
+pour que grep ne soit exécuté que pour les fichiers ayant pour extension
+ .c (à l'opposé d'une recherche des fichiers qui contiendraient le mot `main',
+ puis qui seraient du type `.c').
+\end_deeper 
+\layout Description
+
+Prune Ne réussit jamais !
+\begin_float footnote 
+\layout Standard
+
+Notez que c'est l'opposé de la commande 
+\noun on 
+find(1)
+\noun toggle 
+.
+\end_float 
+ Ce mot-clé peut empêcher la recherche à l'intérieur du dossier courant.
+ Souvenez-vous de l'ordre dans lequel le 
+\shape italic 
+filer
+\shape default 
+ teste l'expression !
+\layout Standard
+
+Exemples:
+\layout LyX-Code
+
+'*.old' system(rm %)
+\layout LyX-Code
+
+'src' prune, '*.c'
+\layout Standard
+
+La première expression supprime chaque fichier ayant pour extension 
+\family typewriter 
+.old
+\family default 
+.
+ La seconde cherche les fichiers ayant pour extension 
+\family typewriter 
+.c
+\family default 
+, mais ne prend pas la peine de vérifier le contenu des dossiers nommés
+ 
+\family typewriter 
+src
+\family default 
+.
+ L'expression est évaluée comme suit :
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset Figure size 193 180
+file Prune.eps
+height 2 2.5
+flags 9
+
+\end_inset 
+
+
+\layout Section
+
+Options
+\layout Standard
+
+Vous pouvez configurer beaucoup de comportements de ROX-Filer.
+ Choisissez pour cela `Options...' dans le menu d'une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+.
+ 
+\layout Standard
+
+Il y a quatre boutons en bas de la bo\i \^{\i}
+te de configuration :
+\layout Description
+
+Sauver applique vos choix et les sauve dans votre dossier Choices, pour
+ que ROX-Filer les retrouve la prochaine fois qu'il sera exécuté.
+ ROX-Filer ne sauvera jamais aucune des préférences à moins que vous ne
+ cliquiez sur ce bouton.
+ L'endroit exact où les choix sont sauvegardés est défini par la variable
+ d'environnement 
+\family typewriter 
+CHOICESPATH
+\family default 
+ --- voir 
+\begin_inset LatexCommand \cite{Choices}
+
+\end_inset 
+
+ pour plus de détails.
+\layout Description
+
+OK applique vos choix, mais ne les sauve pas.
+\layout Description
+
+Appliquer fonctionne comme OK, mais ne ferme pas la fenêtre Options.
+\layout Description
+
+Annuler ferme la fenêtre Options et oublie toutes les modifications que
+ vous avez effectuées.
+\layout Standard
+
+Beaucoup d'options ont des bulles d'aide --- maintenez votre pointeur de
+ souris au-dessus d'une option pour voir ce qu'elle fait.
+\layout Subsection
+
+Options de traduction
+\layout Standard
+
+Vous pouvez choisir ici dans quelle langue le 
+\shape italic 
+filer
+\shape default 
+ affiche les messages.
+ Il y a aussi deux choix spéciaux :
+\layout Description
+
+Aucune utilise les messages non-traduits, en anglais
+\layout Description
+
+D'après 
+\series bold 
+LANG
+\series default 
+ utilise la valeur de la variable d'environnement LANG en tant que nom de
+ fichier à ouvrir depuis ROX-Filer/Messages
+\layout Subsection
+
+Options d'affichage
+\layout Itemize
+
+`Ignorer la casse lors d'un tri' permet de ne pas considérer une lettre
+ majuscule comme différente d'une lettre minuscule lors d'un tri.
+ Si cette option st désactivée, alors `Zoo' sera affiché avant `animal',
+ par exemple.
+\layout Itemize
+
+`Les répertoires viennent toujours en premier' signifie que les répertoires
+ sont triés et affichés au début, et ensuite seulement tous les autres objets
+ sont triés et affichés.
+ Si cette option est désactivée, les répertoires sont mélangés avec les
+ fichiers.
+\layout Itemize
+
+`Largeur du texte replié' permet de spécifier une longueur maximum pour
+ l'affichage du nom de l'objet sur une seule ligne, dans le mode `Grandes
+ Ic\i \^{o}
+nes'.
+ Au-delà de cette valeur, le nom sera affiché sur deux lignes.
+ En mode `Enormes Ic\i \^{o}
+nes', la coupure intervient à 50 % de cette valeur.
+\layout Itemize
+
+`Largeur max des petites ic\i \^{o}
+nes' --- comme pour l'option précédente, mais
+ lorsque l'affichage est en mode `Petites Ic\i \^{o}
+nes'
+\layout Standard
+
+Les options restantes définissent l'affichage par défaut pour toute nouvelle
+ fen\i \^{e}
+tre --- elles correspondent au choix proposé dans le menu Affichage.
+ La taille d'ic\i \^{o}
+ne est aussi utilisée quand vous désactivez l'affichage des
+ détails dans la barre d'outils.
+\layout Subsection
+
+Options du punaiseur
+\layout Standard
+
+Si vous utilisez la fonction punaiseur (voir section 
+\begin_inset LatexCommand \ref{run_pin}
+
+\end_inset 
+
+) vous pouvez choisir le style du texte qui est affiché sous chaque ic\i \^{o}
+ne.
+ Si vous avez un fond d'écran plut\i \^{o}
+t simple, vous pourriez choisir `Pas de
+ fond', ce qui affichera simplement le texte directement sur le fond d'écran.
+ Mais les utilisateurs avec des fonds d'écran chargés peuvent avoir des
+ difficultés à lire le texte ; pour cette raison, ils pourront choisir l'option
+ `Plaque rectangulaire de fond', qui affichera le texte sur un fond de couleur.
+\layout Standard
+
+Vous pouvez changer la couleur du texte et de ce fond en cliquant sur les
+ pavés de couleur.
+\layout Itemize
+
+`Garder les ic\i \^{o}
+nes à l'intérieur des limites de l'écran' évite que les ic\i \^{o}
+nes
+ soient affichées à moitié en-dehors de l'écran.
+\layout Itemize
+
+`Pas de la grille pour les ic\i \^{o}
+nes' contr\i \^{o}
+le la finesse du positionnement des
+ ic\i \^{o}
+nes.
+\layout Subsection
+
+Options des panneaux
+\layout Standard
+
+Si vous utilisez des panneaux (voir la section 
+\begin_inset LatexCommand \ref{run_pan}
+
+\end_inset 
+
+), vous pouvez choisir ici quelles ic\i \^{o}
+nes auront un texte affiché sous elles.
+ Vous pouvez choisir d'afficher du texte sous toutes les ic\i \^{o}
+nes, sous aucune
+ ic\i \^{o}
+ne, ou sous toutes sauf les applications.
+\layout Subsection
+
+Options des fen\i \^{e}
+tres action
+\layout Standard
+
+Vous pouvez choisir le démarrage automatique de certaines opérations, c'est-à-di
+re sans que vous ne deviez cliquer sur Silencieux.
+ Sélectionnez les opérations que vous voulez voir démarrer automatiquement.
+\layout Subsection
+
+Options de la barre d'outils
+\layout Itemize
+
+`Activez les outils que vous voulez :' vous permet d'activer /désactiver
+ les outils que vous voulez voir appara\i \^{\i}
+tre/dispara\i \^{\i}
+tre de la barre d'outils.
+ Cliquez simplement dessus pour les activer/désactiver --- les outils en
+ grisé seront désactivés, et ne seront pas affichés sur la barre d'outils
+ des fen\i \^{e}
+tres du 
+\shape italic 
+filer
+\shape default 
+.
+\layout Itemize
+
+`Type de barre d'outils' vous permet de choisir quel type de barre d'outils
+ vous voulez.
+ 
+\series bold 
+Aucune
+\series default 
+ désactive l'affichage de la barre d'outils, 
+\series bold 
+Petit
+\series default 
+ affiche une petite barre d'ic\i \^{o}
+nes, et 
+\series bold 
+Grand
+\series default 
+ affiche de plus grands boutons, avec des labels textuels.
+\layout Itemize
+
+`Afficher le nombre d'objets' montre dans la barre d'outils le nombre d'objets
+ affichés dans la fen\i \^{e}
+tre, ainsi que le nombre d'objets cachés (s'il y en
+ a).
+ Quand il y a une sélection, le nombre d'objets sélectionnés est affiché
+ ainsi que la taille totale de la sélection (les dossiers ne sont pas pris
+ en compte).
+\layout Standard
+
+Voir la section 
+\begin_inset LatexCommand \ref{sec: Toolbar}
+
+\end_inset 
+
+ pour plus de détails.
+\layout Subsection
+
+Options des fen\i \^{e}
+tres du filer
+\layout Itemize
+
+`Changement de taille automatique des fen\i \^{e}
+tres du filer' peut \i \^{e}
+tre utilisée
+ pour contr\i \^{o}
+ler quand les fen\i \^{e}
+tres seront automatiquement redismensionnées
+ :
+\begin_deeper 
+\layout Itemize
+
+`...jamais' désactive l'auto-redimensionnement.
+ Les fen\i \^{e}
+tres peuvent/doivent \i \^{e}
+tre redimensionnées manuellement.
+\layout Itemize
+
+`...en changeant le style d'affichage' redimensionnera la fen\i \^{e}
+tre lorsque vous
+ changerez la taille des ic\i \^{o}
+nes ou le type de détails à afficher.
+\layout Itemize
+
+`...toujours' provoque l'auto-redimensionnement des fen\i \^{e}
+tres, chaque fois que
+ c'est nécessaire (c'est-à-dire quand vous changez de dossier ou quand vous
+ changez de style d'affichage).
+\end_deeper 
+\layout Itemize
+
+`Fen\i \^{e}
+tres uniques' évite que deux fen\i \^{e}
+tres puissent afficher le m\i \^{e}
+me dossier.
+ Si vous ouvrez une deuxième fen\i \^{e}
+tre du m\i \^{e}
+me dossier, la première se fermera
+ automatiquement.
+\layout Standard
+
+Les deux options suivantes contr\i \^{o}
+lent le bip lorsque vous pressez la touche
+ tab dans le mini-buffer (commande `Entrer un chemin...') :
+\layout Itemize
+
+`Bip si la complétion par Tab échoue' --- bipe si Tab ne trouve pas de correspon
+dance ou si il y a plusieurs correspondances possibles.
+\layout Itemize
+
+`Bip s'il y a plusieurs complétions' --- bipe s'il y a plusieurs correspondances
+ possibles, m\i \^{e}
+me si des lettres ont été ajoutées.
+\layout Subsection
+
+Options du Drag-And-Drop (ie Glisser-Déposer)
+\layout Itemize
+
+ROX-Filer utilise le protocole standard XDND pour le glisser-déposer.
+ Ce protocole recommande : ``les URI doivent \i \^{e}
+tre accompagnées du nom de
+ l'h\i \^{o}
+te de l'ordinateur où se trouve la ressource pour que le programme qui
+ reçoit les données puisse déterminer s'il peut les recevoir directement
+ ou s'il doit le faire via le serveur X''.
+ Cependant, beaucoup d'anciens programmes (particulièrement des applications
+ GNOME) sont perturbés par le nom de l'h\i \^{o}
+te et ne réussissent pas à charger
+ les données correctement.
+ Si `Ne pas utiliser le nom de machine' est activée, celui-ci est donc omis
+ et ROX-Filer fonctionnera avec ces applications MAIS vous ne pourrez pas
+ glisser-déposer des données sur un programme tournant sur une autre machine.
+\layout Itemize
+
+`Permettre de faire glisser vers des ic\i \^{o}
+nes dans les fen\i \^{e}
+tres du filer' gère
+ ce qui se passe quand vous déposez des fichiers sur des ic\i \^{o}
+nes dans une
+ fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+.
+ Si cette option est activée, déposer sur un dossier sauvera les données
+ à l'intérieur de celui-ci, et déposer sur un programme démarrera le programme,
+ qui chargera les données.
+ Si c'est désactivé, vous pouvez déposer n'importe où dans la fen\i \^{e}
+tre (au-dessus
+ d'un dossier ou au-dessus du vide) --- les données seront sauvées dans
+ le dossier affiché.
+\layout Itemize
+
+`Les répertoires surgissent' définit le comportement du 
+\shape italic 
+filer
+\shape default 
+ quand vous glissez et maintenez un objet au-dessus d'un dossier.
+ Active, l'option provoquera le surgissement du dossier après un délai fixé
+ par l'option suivante, vous permettant ainsi de naviguer dans n'importe
+ quel dossier pendant un glissé.
+ Vous pouvez aussi maintenir le pointeur au-dessus des boutons `Home' et
+ `Dossier père' de la barre d'outils pour obtenir un comportement similaire.
+ L'option précédente doit \i \^{e}
+tre active pour que cela ait un effet sur les
+ objets affichés dans un dossier.
+\layout Itemize
+
+`Délai de surgissement' définit le temps, en millièmes de seconde, que le
+ 
+\shape italic 
+filer
+\shape default 
+ attendra avant d'ouvrir le dossier (comme décrit ci-dessus).
+ Si l'option précédente est désactivée, celle-ci n'aura aucun effet.
+\layout Subsection
+
+Options du menu
+\layout Standard
+
+Le `Programme Xterm ici' est la commande utilisée quand vous choisissez
+ `Xterm ici' dans le menu.
+ Vous pouvez la remplacer par la commande que vous voulez, comme `gnome-terminal
+', `konsole', ou n'importe quoi d'autre.
+\layout Subsection
+
+Affectation des boutons de la souris
+\layout Itemize
+
+`Nouvelle fen\i \^{e}
+tre avec le bouton 1' échange le r\i \^{o}
+le par défaut des deux boutons
+ qui n'affichent pas le menu, quand vous voulez ouvrir un dossier (généralement
+ le bouton de gauche et celui du milieu).
+ Cette option est faite pour les personnes qui ont l'habitude d'utiliser
+ RISC OS.
+\layout Itemize
+
+`Menu avec le bouton 2' échange le r\i \^{o}
+le par défaut des boutons 2 et 3 afin
+ que le bouton du milieu affiche le menu.
+ Cette option est faite pour les personnes qui ont l'habitude d'utiliser
+ RISC OS.
+\layout Itemize
+
+`Navigation en simple clic' permet d'ouvrir un fichier ou un dossier avec
+ un seul clic.
+ Si cette option est désactivée, vous devrez double-cliquer pour ouvrir,
+ car un simple clic ne fera que sélectionner l'objet.
+\layout Standard
+
+Il y a une autre façon d'affecter l'affichage du menu au bouton du milieu
+ : certaines personnes préfèrent utiliser la commande `
+\family typewriter 
+xmodmap -e "pointer = 1 3 2"
+\family default 
+', ce qui intervertit les boutons du milieu et celui de droite (TOUS les
+ programmes sont affectés par cette manipulation, pas seulement ROX-Filer).
+\layout Section
+
+Types de fichier
+\layout Standard
+
+Tous les fichiers ont un type MIME sous une forme `
+\family typewriter 
+text/plain
+\family default 
+'.
+ Ici, `
+\family typewriter 
+text
+\family default 
+' est le
+\emph on 
+ type de media
+\emph toggle 
+ et `
+\family typewriter 
+plain
+\family default 
+' est le 
+\emph on 
+sous-type
+\emph toggle 
+.
+ ROX-Filer utilise le nom d'un fichier pour décider si un fichier est d'un
+ type MIME ou d'un autre, puis utilise le type MIME pour associer une ic\i \^{o}
+ne
+ et savoir quel programme exécuter quand vous ouvrez le fichier.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: RunAction}
+
+\end_inset 
+
+Fixer l'action d'exécution...
+\layout Standard
+
+Cette commande du menu Fichier est utilisée pour définir l'application à
+ exécuter quand vous cliquez sur un fichier.
+\layout Standard
+
+Par exemple, admettons que vous vouliez que les `.gif' s'ouvrent automatiquement
+ avec `The Gimp'.
+ D'abord, faites un clic droit sur une image gif pour ouvrir le menu, et
+ choisissez la commande `Fixer l'action d'exécution' dans le sous-menu Fichier
+ (celui qui prend le nom du fichier sur lequel vous avez cliqué).
+ Ensuite, vous pouvez fixer l'action d'exécution de deux façons différentes
+ :
+\layout Subsubsection*
+
+Par glisser-déposer
+\layout Standard
+
+Déposez `The Gimp' (depuis une fen\i \^{e}
+tre du 
+\shape italic 
+filer
+\shape default 
+, un panneau ou le punaiseur) sur l'aire où est inscrit `Faites glisser
+ ici une application appropriée'.
+ Maintenant, si vous cliquez sur une image gif, `The Gimp' sera lancé automatiqu
+ement et ouvrira cette image.
+\layout Subsubsection*
+
+En entrant une commande shell
+\layout Standard
+
+Tapez :
+\layout LyX-Code
+
+gimp ''$1
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+dans l'endroit `Entrez une commande shell' et appuyez sur Entrée.
+ 
+\family typewriter 
+''$1''
+\family default 
+ sera remplacé par le nom du fichier sur lequel vous cliquerez.
+ Comme ci-dessus, `The Gimp' sera lancé automatiquement et ouvrira cette
+ image.
+\layout Subsubsection
+
+Définir les types de média par défaut
+\layout Standard
+
+Quelque soit la méthode que vous utilisez pour fixer l'action d'exécution,
+ vous avez le choix de fixer celle-ci juste pour le type MIME du fichier,
+ ou pour tous les fichiers ayant ce type et un sous-type différent et qui
+ n'ont pas encore d'action par défaut.
+ Puisque `The Gimp' peut lire beaucoup de types d'images, il peut \i \^{e}
+tre intéressan
+t de choisir l'option `Mettre la valeur par défaut pour tout `image/<quelconque>
+'' et ainsi vous n'aurez pas à le faire pour les fichiers image/jpeg et
+ les autres...
+ Cette option n'a d'effet que sur les types qui n'ont pas déjà une action
+ définie (ie, ceux qui vous affichent un message d'erreur quand vous essayez
+ de les ouvrir).
+\layout Subsection
+
+Comment les types de fichier sont enregistrés
+\layout Standard
+
+ROX-Filer utilise trois sous-dossiers dans votre dossier Choices pour gérer
+ les types de fichier :
+\layout Description
+
+MIME-info héberge un fichier `Standard' qui définit le type MIME des fichiers
+ en fonction de leur extension.
+ ROX-Filer est installé avec beaucoup de ces règles déjà configurées ---
+ celles-ci sont installées par le paquetage `rox-base'.
+\begin_deeper 
+\layout Standard
+
+Beaucoup d'applications sont maintenant distribuées avec un fichier nommé
+ `quelquechose.mime' ; copiez leur contenu dans le fichier `Standard' pour
+ que ROX-Filer reconnaisse automatiquement les nouvelles extensions.
+\end_deeper 
+\layout Description
+
+MIME-types contient des liens symboliques, un par type MIME, qui pointent
+ vers des programmes qui connaissent ce type de fichiers.
+ Pour définir quel programme est exécuté quand vous cliquez sur un fichier,
+ vous utilisez normalement la commande `Fixer l'action d'exécution' (voir
+ la section 
+\begin_inset LatexCommand \ref{sec: RunAction}
+
+\end_inset 
+
+).
+ Cependant, vous pouvez définir ces actions manuellement --- par exemple,
+ pour ouvrir un fichier HTML avec Netscape :
+\begin_deeper 
+\layout Enumerate
+
+Trouvez l'application Netscape et choisissez la commande `Lier...' dans le
+ menu.
+\layout Enumerate
+
+Entrez `text_html' comme nom pour le lien et glissez l'ic\i \^{o}
+ne du haut de la
+ bo\i \^{\i}
+te `Lier' vers le dossier MIME-types.
+\end_deeper 
+\layout Description
+
+MIME-icons contient les images utilisées pour afficher chaque type de fichier.
+ Donc le 
+\shape italic 
+filer
+\shape default 
+ essaiera d'afficher un fichier HTML en utilisant l'ic\i \^{o}
+ne nommée `MIME-icons/text
+_html.xpm'.
+\layout Standard
+
+Dans les dossiers MIME-types et MIME-icons, vous pouvez définir les actions/imag
+es par défaut pour chaque type de média.
+ Par exemple, si `text_html' n'est pas trouvé le 
+\shape italic 
+filer
+\shape default 
+ essaiera simplement d'utiliser `text'.
+\layout Section
+
+
+\begin_inset LatexCommand \label{AppDir}
+
+\end_inset 
+
+Dossiers-application
+\layout Standard
+
+Un dossier-application est un dossier qui peut \i \^{e}
+tre exécuté comme une application.
+ Il contient toutes les ressources d'une application --- code source, binaires,
+ documentation et autres.
+ Tout enregistrer au m\i \^{e}
+me endroit rend l'installation et la désinstallation
+ plus faciles pour les utilisateurs.
+ Vous pouvez aussi garder plusieurs versions différentes d'un m\i \^{e}
+me programme
+ en les enregistrant dans des dossiers-application différents.
+ Vous pouvez les déplacer et les renommer comme vous le voulez.
+ Les dossiers-application sont plus faciles à utiliser et à installer et
+ sont plus sécures
+\begin_float footnote 
+\layout Standard
+
+Parce que vous pouvez compiler une application en tant qu'utilisateur et
+ ensuite simplement la copier en tant que root plut\i \^{o}
+t que de lancer en tant
+ que root un script d'installation dans lequel vous n'avez pas confiance.
+ Tout ce que vous avez à vérifier, ce sont les binaires avec le bit setuid.
+\end_float 
+.
+\layout Standard
+
+Les fichiers suivants ont une signification particulière pour ROX-Filer
+ :
+\layout Description
+
+AppRun est exécuté quand vous cliquez sur le dossier --- vérifiez qu'il
+ est bien exécutable (utilisez la bo\i \^{\i}
+te pour changer les permissions) !
+\layout Description
+
+.DirIcon.png est l'image utilisée pour représenter le dossier (ceci fonctionne
+ m\i \^{e}
+me s'il n'y a pas de fichier AppRun).
+\layout Description
+
+Help est le dossier qui s'ouvre quand vous choisissez `Aide' dans le menu
+ Fichier.
+\layout Description
+
+AppInfo.xml contient des informations complémentaires sur l'application (voir
+ ci-dessous).
+\layout Description
+
+AppIcon.xpm est utilisée si 
+\family typewriter 
+.DirIcon.png
+\family default 
+ est manquant (dans un but de compatibilité avec les anciennes versions).
+\layout Standard
+
+Jetez un oeil au dossier-application de ROX-Filer pour avoir un exemple
+ détaillé et complet.
+\layout Standard
+
+Note : pour des raisons de sécurité, un dossier-application doit avoir le
+ m\i \^{e}
+me propriétaire que le fichier AppRun qu'il contient.
+\layout Subsection
+
+Le fichier AppInfo
+\layout Standard
+
+`
+\family typewriter 
+AppInfo.xml
+\family default 
+' est un fichier XML avec la structure suivante (chaque élément est facultatif,
+ ainsi que le fichier lui-m\i \^{e}
+me) :
+\layout LyX-Code
+
+<?xml version="1.0"?>
+\layout LyX-Code
+
+<AppInfo>
+\layout LyX-Code
+
+<Summary>A graphical file manager</Summary>
+\layout LyX-Code
+
+<About>
+\layout LyX-Code
+
+<Purpose>File manager</Purpose>
+\layout LyX-Code
+
+<Version>1.1.3 (07-May-2001)</Version>
+\layout LyX-Code
+
+<Authors>Thomas Leonard and others</Authors>
+\layout LyX-Code
+
+<License>GNU General Public License</License>
+\layout LyX-Code
+
+<Homepage>http://rox.sourceforge.net</Homepage>
+\layout LyX-Code
+
+</About>
+\layout LyX-Code
+
+<AppMenu>
+\layout LyX-Code
+
+<Item label="Enable pinboard" option="-p=Default"/>
+\layout LyX-Code
+
+<Item label="Disable pinboard" option="-p="/>
+\layout LyX-Code
+
+</AppMenu>
+\layout LyX-Code
+
+</AppInfo>
+\layout Description
+
+Summary est affiché dans une bulle d'aide quand la souris est maintenue
+ au-dessus du dossier.
+\layout Description
+
+About contient une liste de champs qui sont affichés dans la bo\i \^{\i}
+te `Info
+ fichier' du dossier-application (n'importe quel nom peut \i \^{e}
+tre utilisé comme
+ élément, mais ceux de l'exemple sont suggérés).
+\layout Description
+
+AppMenu est une liste de commandes supplémentaires qui s'insèreront dans
+ le menu du dossier-application.
+ Quand une de ces commandes est choisie, 
+\family typewriter 
+AppRun
+\family default 
+ est exécuté avec le nom de la commande passé en argument.
+\layout Section
+
+Internationalisation
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: LANG}
+
+\end_inset 
+
+Choisir une traduction
+\layout Standard
+
+ROX-Filer est capable de traduire beaucoup de ses messages, pourvu que des
+ fichiers de traduction corrects soient fournis : 
+\layout Enumerate
+
+Ouvrez la bo\i \^{\i}
+te d'options via le menu
+\layout Enumerate
+
+Sélectionnez une langue
+\layout Enumerate
+
+Cliquez sur Sauver et redémarrez le 
+\shape italic 
+filer
+\shape default 
+ pour que les changements soient pris en compte.
+\layout Subsection
+
+Créer une nouvelle traduction
+\layout Enumerate
+
+Allez dans le dossier 
+\family typewriter 
+src
+\family default 
+ et créez le fichier `
+\family typewriter 
+messages.pot
+\family default 
+':
+\begin_deeper 
+\layout LyX-Code
+
+$ cd ROX-Filer/src
+\layout LyX-Code
+
+$ make messages.pot
+\end_deeper 
+\layout Enumerate
+
+Copiez le fichier dans le sous-dossier `
+\family typewriter 
+po
+\family default 
+' (du dossier 
+\family typewriter 
+src
+\family default 
+ ) en le nommant 
+\begin_inset Formula \( \langle \hbox {name}\rangle \hbox {\tt .po} \)
+\end_inset 
+
+.
+ Ex : si votre langue est `ml' (`ma langue') :
+\begin_deeper 
+\layout LyX-Code
+
+$ cp messages.pot po/ml.po
+\end_deeper 
+\layout Enumerate
+
+Ouvrez la copie dans un éditeur de texte.
+\layout Enumerate
+
+Remplissez les traductions, qui sont toutes vierges au début.
+\layout Enumerate
+
+Exécutez le script `
+\family typewriter 
+make-mo
+\family default 
+' pour créer le fichier binaire que ROX-Filer pourra utiliser.
+ Vous aurez besoin du paquetage GNU gettext.
+ Si vous ne l'avez pas, envoyez-moi (ndt : pas à moi, à l'auteur du manuel
+ !) simplement le fichier 
+\family typewriter 
+.po
+\family default 
+ et je le convertirai pour vous.
+\begin_deeper 
+\layout LyX-Code
+
+$ cd ROX-Filer/src/po
+\layout LyX-Code
+
+$ ./make-mo ml
+\layout LyX-Code
+
+Created file ../../Messages/ml.gmo OK
+\end_deeper 
+\layout Enumerate
+
+Editez `
+\family typewriter 
+ROX-Filer/Options.xml
+\family default 
+' pour que votre langue soit listée, redémarrez le 
+\shape italic 
+filer
+\shape default 
+ et sélectionnez-la dans la bo\i \^{\i}
+te d'options (voir la section 
+\begin_inset LatexCommand \ref{sec: LANG}
+
+\end_inset 
+
+).
+\layout Enumerate
+
+Envoyez-moi le fichier 
+\family typewriter 
+.po
+\family default 
+ pour que je puisse l'inclure dans les prochaines versions du 
+\shape italic 
+filer
+\shape default 
+.
+\layout Subsection
+
+Mettre à jour une traduction existante
+\layout Enumerate
+
+Allez dans le dossier contenant les fichiers 
+\family typewriter 
+.po
+\family default 
+ et exécutez le script 
+\family typewriter 
+update-po
+\family default 
+.
+ Celui-ci vérifie dans le code source s'il y a des phrases nouvelles ou
+ modifiées et met à jour tous les fichiers de traduction.
+\begin_deeper 
+\layout LyX-Code
+
+$ cd ROX-Filer/src/po
+\layout LyX-Code
+
+$ ./update-po
+\end_deeper 
+\layout Enumerate
+
+Editez le fichier à la main, comme pour une nouvelle traduction, en traduisant
+ les nouveaux messages et en mettant à jour les autres.
+ Regardez bien les entrées `fuzzy' que 
+\family typewriter 
+update-po
+\family default 
+ a créées ; vérifiez que la traduction est correcte et supprimez la ligne
+ `fuzzy'.
+\layout Enumerate
+
+Exécutez 
+\family typewriter 
+make-mo
+\family default 
+ comme la fois d'avant.
+\layout Enumerate
+
+Soumettez-moi le fichier mis à jour.
+\layout Standard
+
+Lisez la page info de 
+\family typewriter 
+gettext
+\family default 
+ pour de plus amples instructions sur la création de traductions.
+\layout Section
+
+Hacking
+\layout Standard
+
+Ceci est un guide de base pour les personnes qui veulent modifier le code
+ source.
+ Si vous faites des changement utiles ou si vous corrigez des bugs, envoyez-moi
+ les patches (Thomas Leonard) ou envoyez-les à la liste de diffusion.
+ Dites-moi quelle version vous utilisez !
+\layout Subsection
+
+Compiler
+\layout Standard
+
+La première fois que vous compilerez, vous devrez exécuter `
+\family typewriter 
+AppRun --compile
+\family default 
+', mais les fois suivantes, un `
+\family typewriter 
+make
+\family default 
+' dans le dossier `
+\family typewriter 
+src
+\family default 
+' quand vous changerez les fichiers 
+\family typewriter 
+.c
+\family default 
+ et 
+\family typewriter 
+.h
+\family default 
+ suffira.
+ Vous voudrez peut-\i \^{e}
+tre exécuter aussi un `
+\family typewriter 
+make depend
+\family default 
+'...
+\layout Subsection
+
+Créer et appliquer des patches
+\layout Standard
+
+Quand les développeurs apportent de petites modifications aux sources, ils
+ les distribuent souvent sous forme de patches --- souvent sur la liste
+ de diffusion.
+ Pour appliquer un patch, allez dans le dossier 'src' et exécutez la commande
+ patch avec le nouveau patch.
+ Recompilez ensuite.
+\layout LyX-Code
+
+$ cd ROX-Filer/src
+\layout LyX-Code
+
+$ patch < patchfile
+\layout LyX-Code
+
+$ ../AppRun --compile
+\layout Standard
+
+Vous pouvez retirer le patch en répétant simplement la séquence ci-dessus
+ --- patch détectera que le patch est déjà appliqué, et proposera de l'enlever.
+\layout Standard
+
+Pour créer un patch vous devrez d'abord vous procurer la dernière version
+ du 
+\shape italic 
+filer
+\shape default 
+ sur CVS (les instructions pour l'utilisation de CVS peuvent \i \^{e}
+tre trouvées
+ sur le site web).
+ Modifiez le programme comme bon vous semble.
+ Créez le patch en utilisant `
+\family typewriter 
+cvs diff
+\family default 
+' depuis le dossier approprié :
+\layout LyX-Code
+
+$ cvs diff -c > my_patch
+\layout Standard
+
+Ceci crée un patch lisible par l'homme et la machine.
+ Soumettez-le à la liste de diffusion.
+ Il est recommandé de poster des patches plut\i \^{o}
+t que les fichiers modifiés,
+ pour plusieurs raisons :
+\layout Itemize
+
+Ils sont plus petits.
+ Ils sont donc plus rapides à télécharger par les gens qui n'ont pas de
+ connection à haut-débit.
+\layout Itemize
+
+On peut voir ce qu'il y a dedans avant de les appliquer !
+\layout Itemize
+
+Les patches peuvent (souvent) \i \^{e}
+tre appliqués sur des versions légèrement
+ modifiées des sources.
+ Cela veut dire que plusieurs patches peuvent \i \^{e}
+tre appliqués sans que chaque
+ nouveau n'écrase les autres.
+\layout Subsection
+
+Autoconf
+\layout Standard
+
+Voici une explication rapide du système autoconf au cas où vous ne l'auriez
+ pas déjà utilisé.
+ Voir `info autoconf' pour plus de détails.
+\layout Standard
+
+Un fichier nommé 'configure.in' est fourni et contient plusieurs tests (`info
+ autoconf').
+ Vous n'avez qu'à exécuter `autoconf', il lira ce fichier et génèrera un
+ script shell pour effectuer les tests, en le sauvant sous le nom de `configure'.
+ `configure' est normalement distribué avec le programme car tout le monde
+ n'a pas autoconf.
+\layout Standard
+
+Vous exécutez ensuite `configure' (en fait, laissez le script `AppRun' le
+ faire car il lui passe quelques arguments), qui effectue tous les tests.
+ Il lit `Makefile.in' et `config.h.in' et complète les valeurs manquantes avec
+ les résultats des tests pour produire `Makefile' et `config.h'.
+\layout Standard
+
+Exécutez `make', qui créera les fichiers .o à partir des fichiers .c et les
+ liens pour créer ROX-Filer.
+\layout Subsection
+
+Data-structures
+\layout Standard
+
+The diagram below shows some of the major structures found in the filer
+ and the relationships between them.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset Figure size 595 344
+file Structs.eps
+width 3 100
+flags 9
+
+\end_inset 
+
+
+\layout Standard
+
+To summarise, each window has its own 
+\series bold 
+FilerWindow
+\series default 
+ structure.
+ This structure has pointers to a 
+\series bold 
+Collection
+\series default 
+ (which is the widget which actually displays the files) and to a 
+\series bold 
+Directory
+\series default 
+, which is used to cache the directory contents.
+ Both 
+\series bold 
+Collection
+\series default 
+ and 
+\series bold 
+Directory
+\series default 
+ have pointers to (the same) 
+\series bold 
+DirItem
+\series default 
+s, each of which corresponds to one filesystem object.
+ Several 
+\series bold 
+FilerWindow
+\series default 
+s may share the same 
+\series bold 
+Directory
+\series default 
+.
+ While scanning is in progress the 
+\series bold 
+Directory
+\series default 
+ keeps a list of the new items it has found (
+\emph on 
+new_items
+\emph toggle 
+) and the items which have changed in some way (
+\emph on 
+up_items
+\emph toggle 
+).
+ It periodically notifies the filer window of the changes-so-far by calling
+ all the functions in the 
+\emph on 
+users
+\emph toggle 
+ list (use 
+\emph on 
+attach()
+\emph toggle 
+ and 
+\emph on 
+detach()
+\emph toggle 
+ to add and remove functions to or from the list).
+\layout Bibliography
+\bibitem {ROX}
+
+
+\emph on 
+The ROX desktop
+\emph toggle 
+, <http://rox.sourceforge.net>
+\layout Bibliography
+\bibitem {RISC OS}
+
+
+\emph on 
+RISC OS
+\emph default 
+, <http://www.riscos.com>
+\layout Bibliography
+\bibitem {GTK+}
+
+
+\emph on 
+GTK+ Toolkit
+\emph toggle 
+, <http://www.gtk.org>
+\layout Bibliography
+\bibitem {GNOME}
+
+
+\emph on 
+The GNOME desktop
+\emph toggle 
+, <http://www.gnome.org>
+\layout Bibliography
+\bibitem {DND}
+
+
+\emph on 
+The Drag and Drop protocol
+\emph toggle 
+, <http://www.newplanetsoftware.com/xdnd/>
+\layout Bibliography
+\bibitem {XDS}
+
+
+\emph on 
+The X Direct Save protocol
+\emph toggle 
+, <http://www.newplanetsoftware.com/xds/>
+\layout Bibliography
+\bibitem {Choices}
+
+
+\emph on 
+The ROX Choices system
+\emph toggle 
+, <http://rox.sourceforge.net/choices.php3>
+\layout Bibliography
+\bibitem {enlightenment}
+
+
+\emph on 
+Enlightenment,
+\emph toggle 
+ <http://www.enlightenment.org>
+\layout Bibliography
+\bibitem {AVFS}
+
+
+\emph on 
+AVFS - A Virtual File System, <
+\emph default 
+http://sourceforge.net/projects/avf/>
+\the_end

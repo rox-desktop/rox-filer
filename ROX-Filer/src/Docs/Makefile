@@ -1,4 +1,4 @@
-all: Manual/index.html
+all: Manual/index.html Manual-fr/index.html
 
 %.eps: %.dia
 	dia -e $@ $<
@@ -7,6 +7,11 @@ Manual/index.html: Manual.tex Prune.eps Structs.eps
 	latex Manual.tex
 	latex2html -split +1 -antialias -local_icon -show_section_numbers \
 	-up_url='http://rox.sourceforge.net' Manual.tex -up_title='ROX website'
+
+Manual-fr/index.html: Manual-fr.tex Prune.eps Structs.eps
+	latex Manual-fr.tex
+	latex2html -split +1 -antialias -local_icon -show_section_numbers \
+	-up_url='http://rox.sourceforge.net' Manual-fr.tex -up_title='ROX website'
 
 %.tex: %.lyx
 	echo Manual.tex not up-to-date...

@@ -16,10 +16,12 @@ Note: Currently in the middle of upgrading the dir scanning code.
 
 BUGS
 
+Quits if only an Info window is open.
+
 Gtk+ 2.0:
 	- Deleting a symlink to a pinboard icon shows a warning
 	- Clicking on the scrollbar when you can't scroll blanks the window!
-	- Menu appears, but item under cursor isn't opened
+	- Menu appears, but menu item under cursor isn't opened
 	- Savebox doesn't highlight leafname
 	- Pinboard text background types none/outline don't work
 	- Can't set menu shortcuts to a single key (eg, 'L')
@@ -28,10 +30,16 @@ Return for 'Do another search' toggles Quiet...
 
 'Edit Item' doesn't make much sense for applets...
 
-Root click with sawfish 0.99 doesn't work.
+Root click with sawfish 0.99 doesn't work (bug in sawfish).
+
+Rescanning sometimes causes the display to scroll (unrepeatable).
 
 
 FEATURES FOR 1.1
+
+Remove panel applets if they quit normally.
+
+Set a property giving the panel side (for applet menus).
 
 Way to reopen last closed directory.
 
@@ -60,6 +68,8 @@ Right-most icon in the last row should extend to the far right of the window,
 even if it isn't in the last column.
 
 Allow find expression with Permissions command...
+
+Use AA fonts in main window.
 
 
 OTHERS
