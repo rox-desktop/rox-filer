@@ -488,8 +488,16 @@ static gboolean drag_motion(GtkWidget		*widget,
 		? (DirItem *) filer_window->collection->items[item_number].data
 		: NULL;
 
-	if (item && !(item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE)))
-		item = NULL;	/* Drop onto non-executable == no item */
+	if (item)
+	{
+		/* If we didn't drop onto a directory, application or
+		 * executable file then act as though the drop is to the
+		 * window background.
+		 */
+		if (item->base_type != TYPE_DIRECTORY
+				&& !(item->flags & ITEM_FLAG_EXEC_FILE))
+			item = NULL;
+	}
 	
 	if (!item)
 	{
@@ -519,10 +527,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 	}
 	else
 	{
-		/* Drop onto a program of some sort */
+		/* Drop onto a program/directory of some sort */
 		if (!(provides(context, text_uri_list) ||
 			 provides(context, application_octet_stream)))
 			goto out;
+		/* (actually, we should probably allow any data type) */
 
 		if (gtk_drag_get_source_widget(context) == widget)
 		{
@@ -532,8 +541,12 @@ static gboolean drag_motion(GtkWidget		*widget,
 				goto out;
 		}
 		
-		/* Actually, we should probably allow any data type */
-		type = drop_dest_prog;
+		if (item->base_type == TYPE_DIRECTORY &&
+				!(item->flags & ITEM_FLAG_APPDIR))
+			type = drop_dest_dir;
+		else
+			type = drop_dest_prog;
+
 		new_path = make_path(filer_window->path,
 				item->leafname)->str;
 		collection_set_cursor_item(filer_window->collection,

@@ -59,7 +59,7 @@ gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
 
-#define VERSION "ROX-Filer 0.1.15\n"					\
+#define VERSION "ROX-Filer 0.1.16\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
 		"to the extent permitted by law.\n"			\
