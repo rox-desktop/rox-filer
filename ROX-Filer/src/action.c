@@ -1930,7 +1930,7 @@ static GtkWidget *add_toggle(GUIside *gui_side,
 void action_find(GList *paths)
 {
 	GUIside		*gui_side;
-	GtkWidget	*hbox, *label, *scroller;
+	GtkWidget	*hbox, *label, *scroller, *frame;
 	GtkListStore	*model;
 	GtkCellRenderer	*cell_renderer;
 	GtkTreeViewColumn	*column;
@@ -1956,10 +1956,16 @@ void action_find(GList *paths)
 	scroller = gtk_scrolled_window_new(NULL, NULL);
 	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
 			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), scroller, TRUE, TRUE, 4);
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_box_pack_start(GTK_BOX(gui_side->vbox), frame, TRUE, TRUE, 4);
+
+	gtk_container_add(GTK_CONTAINER(frame), scroller);
 
 	model = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 	gui_side->results = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	g_object_unref(G_OBJECT(model));
 	cell_renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(
 				_("Name"), cell_renderer, "text", 0, NULL);
