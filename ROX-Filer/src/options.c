@@ -552,7 +552,7 @@ static void may_add_tip(GtkWidget *widget, guchar *tip)
 {
 	tip = g_strstrip(g_strdup(tip));
 	if (*tip)
-		OPTION_TIP(widget, tip);
+		OPTION_TIP(widget, _(tip));
 	g_free(tip);
 }
 
