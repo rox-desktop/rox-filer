@@ -80,6 +80,7 @@ static gboolean can_set_run_action(DirItem *item);
 /* Note that for most of these callbacks none of the arguments are used. */
 
 /* (action used in these two - DetailsType) */
+static void huge_icons(gpointer data, guint action, GtkWidget *widget);
 static void large_with(gpointer data, guint action, GtkWidget *widget);
 static void small_with(gpointer data, guint action, GtkWidget *widget);
 
@@ -148,6 +149,7 @@ static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Huge Icons"),   	NULL, huge_icons, 0, NULL},
 {">" N_("Large Icons"),   	NULL, large_with, DETAILS_NONE, NULL},
 {">" N_("Small Icons"),   	NULL, small_with, DETAILS_NONE, NULL},
 {">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
@@ -545,6 +547,11 @@ void target_callback(FilerWindow *filer_window,
 }
 
 /* Actions */
+
+static void huge_icons(gpointer data, guint action, GtkWidget *widget)
+{
+	display_set_layout(window_with_focus, HUGE_ICONS, DETAILS_NONE);
+}
 
 static void large_with(gpointer data, guint action, GtkWidget *widget)
 {

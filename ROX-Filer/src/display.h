@@ -8,8 +8,6 @@
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 
-#define MAX_ICON_HEIGHT 48
-#define MAX_ICON_WIDTH 48
 #define ROW_HEIGHT_LARGE 64
 
 #include <gtk/gtk.h>
@@ -20,6 +18,7 @@
 typedef enum {
 	LARGE_ICONS = 0,
 	SMALL_ICONS = 1,
+	HUGE_ICONS = 2,
 	LARGE_FULL_INFO,
 	SMALL_FULL_INFO,
 	UNKNOWN_STYLE,
@@ -51,8 +50,9 @@ int sort_by_size(const void *item1, const void *item2);
 void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void display_set_autoselect(FilerWindow *filer_window, guchar *leaf);
-void shrink_width(FilerWindow *filer_window);
-int calc_width(FilerWindow *filer_window, DirItem *item);
+void shrink_grid(FilerWindow *filer_window);
+void calc_size(FilerWindow *filer_window, DirItem *item,
+		int *width, int *height);
 
 void draw_large_icon(GtkWidget *widget,
 		     GdkRectangle *area,

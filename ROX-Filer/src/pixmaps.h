@@ -15,14 +15,11 @@
 #define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
 #define PIXMAP_HEIGHT(p) (((GdkPixmapPrivate *) (p))->height)
 
-#define THUMB_WIDTH 48
-#define THUMB_HEIGHT 48
-
 #ifndef PIXMAPS_C
   typedef struct _GdkPixbuf GdkPixbuf;
 #endif
 
-extern GFSCache *pixmap_cache, *thumb_cache;
+extern GFSCache *pixmap_cache;
 
 extern MaskedPixmap *im_error;
 extern MaskedPixmap *im_unknown;
@@ -36,22 +33,44 @@ extern MaskedPixmap *im_appdir;
 
 extern MaskedPixmap *im_help;
 
+#define HUGE_WIDTH 96
+#define HUGE_HEIGHT 96
+
+#define ICON_HEIGHT 48
+#define ICON_WIDTH 48
+
+#define SMALL_HEIGHT 18
+#define SMALL_WIDTH 22
+
+/* When a MaskedPixmap is created we load the image from disk and
+ * scale the pixbuf down to the 'huge' size (if it's bigger).
+ * The 'normal' pixmap and mask are created automatically - you have
+ * to request the other sizes.
+ *
+ * Note that any of the masks be also be NULL if the image has no
+ * mask.
+ */
 struct _MaskedPixmap
 {
 	int		ref;
-	GdkPixbuf	*pixbuf;
+	GdkPixbuf	*huge_pixbuf;	/* 'Huge' source image */
 
-	GdkPixmap	*pixmap;	/* Full size image */
+	/* If huge_pixmap is NULL then call pixmap_make_huge() */
+	GdkPixmap	*huge_pixmap;	/* Huge image */
+	GdkBitmap	*huge_mask;
+
+	GdkPixmap	*pixmap;	/* Normal size image (always valid) */
 	GdkBitmap	*mask;
 
 	/* If sm_pixmap is NULL then call pixmap_make_small() */
-	GdkPixmap	*sm_pixmap;	/* Half-size (hopefully!) image */
+	GdkPixmap	*sm_pixmap;	/* Small image */
 	GdkBitmap	*sm_mask;
 };
 
 void pixmaps_init(void);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
+void pixmap_make_huge(MaskedPixmap *mp);
 void pixmap_make_small(MaskedPixmap *mp);
 MaskedPixmap *load_pixmap(char *name);
 

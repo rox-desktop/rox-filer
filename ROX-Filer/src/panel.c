@@ -545,7 +545,7 @@ static void size_icon(Icon *icon)
 		return;
 
 	im_height = MIN(PIXMAP_HEIGHT(icon->item.image->pixmap),
-					MAX_ICON_HEIGHT);
+					ICON_HEIGHT);
 
 	width = PIXMAP_WIDTH(icon->item.image->pixmap);
 	width = MAX(width, icon->item.name_width);

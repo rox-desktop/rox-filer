@@ -144,9 +144,18 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 {
 	int	i;
 	char	*leafname = item->leafname;
-
+	int	old_w = filer_window->collection->item_width;
+	int	old_h = filer_window->collection->item_height;
+	int	w, h;
+	
 	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
+
+	calc_size(filer_window, item, &w, &h); 
+	if (w > old_w || h > old_h)
+		collection_set_item_size(filer_window->collection,
+					 MAX(old_w, w),
+					 MAX(old_h, h));
 
 	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
 
@@ -406,7 +415,7 @@ static void update_display(Directory *dir,
 				gdk_window_set_cursor(
 						filer_window->window->window,
 						NULL);
-			shrink_width(filer_window);
+			shrink_grid(filer_window);
 			if (filer_window->had_cursor &&
 					collection->cursor_item == -1)
 			{
@@ -486,7 +495,9 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 static void add_item(FilerWindow *filer_window, DirItem *item)
 {
 	char		*leafname = item->leafname;
-	int		item_width;
+	int		old_w = filer_window->collection->item_width;
+	int		old_h = filer_window->collection->item_height;
+	int		w, h;
 
 	if (leafname[0] == '.')
 	{
@@ -495,11 +506,12 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 		return;
 	}
 
-	item_width = calc_width(filer_window, item); 
-	if (item_width > filer_window->collection->item_width)
+	calc_size(filer_window, item, &w, &h); 
+	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,
-					 item_width,
-					 filer_window->collection->item_height);
+					 MAX(old_w, w),
+					 MAX(old_h, h));
+
 	collection_insert(filer_window->collection, item);
 }
 

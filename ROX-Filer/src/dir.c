@@ -312,9 +312,9 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 						: &text_plain;
 
 		if (make_thumb)
-			item->image = g_fscache_lookup(thumb_cache, path);
+			item->image = g_fscache_lookup(pixmap_cache, path);
 		else
-			item->image = g_fscache_lookup_full(thumb_cache,
+			item->image = g_fscache_lookup_full(pixmap_cache,
 								path, FALSE);
 		if (!item->image)
 			check_globicon(path, item);
