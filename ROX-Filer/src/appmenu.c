@@ -152,6 +152,7 @@ static GtkWidget *create_menu_item(char *label, char *option)
 
 	/* Create the new item and tie it to the appropriate callback */
 	item = gtk_menu_item_new_with_label(label);
+	gtk_widget_lock_accelerators(item);
 
 	if (option)
 		gtk_object_set_data_full(GTK_OBJECT(item), "option",
