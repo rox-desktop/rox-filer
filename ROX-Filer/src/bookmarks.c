@@ -47,6 +47,8 @@ static void bookmarks_show_submenu(const gchar *mark, GdkEventButton *event);
 static void bookmarks_activate(GtkMenuShell *menushell,
 			       FilerWindow *filer_window);
 static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window);
+static void position_menu(GtkMenu *menu, gint *x, gint *y,
+		   	  gboolean *push_in, gpointer data);
 
 
 /****************************************************************
@@ -66,7 +68,7 @@ void bookmarks_show_menu(FilerWindow *filer_window)
 		button = ((GdkEventButton *) event)->button;
 
 	menu = GTK_MENU(bookmarks_build_menu(filer_window));
-	gtk_menu_popup(menu, NULL, NULL, NULL, NULL,
+	gtk_menu_popup(menu, NULL, NULL, position_menu, filer_window,
 			button, gtk_get_current_event_time());
 }
 
@@ -74,6 +76,14 @@ void bookmarks_show_menu(FilerWindow *filer_window)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void position_menu(GtkMenu *menu, gint *x, gint *y,
+		   	  gboolean *push_in, gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
+	
+	gdk_window_get_origin(GTK_WIDGET(filer_window->view)->window, x, y);
+}
 
 /* Makes sure that 'bookmarks' is up-to-date, reloading from file if it has
  * changed. If no bookmarks were loaded and there is no file then initialise
