@@ -68,7 +68,7 @@
 #define HUGE_WRAP (1.5 * o_large_truncate)
 
 /* Options bits */
-static gboolean o_sort_nocase = TRUE;
+static gboolean o_intelligent_sort = TRUE;
 static gboolean o_dirs_first = FALSE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
@@ -148,7 +148,7 @@ enum {
 
 void display_init()
 {
-	option_add_int("display_sort_nocase", o_sort_nocase, NULL);
+	option_add_int("display_sort_nocase", o_intelligent_sort, NULL);
 	option_add_int("display_dirs_first", o_dirs_first, NULL);
 	option_add_int("display_size", LARGE_ICONS, NULL);
 	option_add_int("display_details", DETAILS_NONE, NULL);
@@ -433,11 +433,72 @@ int sort_by_name(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
 	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
+	char *n1 = i1->leafname;
+	char *n2 = i2->leafname;
 
 	SORT_DIRS;
 		
-	if (o_sort_nocase)
-		return g_strcasecmp(i1->leafname, i2->leafname);
+	if (!o_intelligent_sort)
+		return strcmp(i1->leafname, i2->leafname);
+	
+	/* The following code was copied from PicoGUI (was LGPL) */
+
+	/* Sort the files, in a way that should make sense to users.
+	 * Case is ignored, punctuation is ignored. If the file contains
+	 * numbers, the numbers are sorted numerically.
+	 */
+	while (*n1 && *n2)
+	{
+		char c1 = *n1, c2 = *n2;
+
+		/* Skip punctuation */
+		if (!isalnum(c1))
+		{
+			n1++;
+			continue;
+		}
+		if (!isalnum(c2))
+		{
+			n2++;
+			continue;
+		}
+
+		/* If they are both numbers, sort them numerically */
+		if (isdigit(c1) && isdigit(c2))
+		{
+			char *p;
+			unsigned long u1,u2;
+			u1 = strtoul(n1, &p, 10);
+			n1 = p;
+			u2 = strtoul(n2, &p, 10);
+			n2 = p;
+			if (u1 < u2)
+				return -1;
+			else if (u1 > u2)
+				return 1;
+			continue;
+		}
+
+		/* Otherwise, do a case-insensitive asciibetical sort */
+		c1 = tolower(c1);
+		c2 = tolower(c2);
+		if (c1 < c2)
+			return -1;
+		else if (c1 > c2)
+			return 1;
+		n1++;
+		n2++;
+	}
+
+	/* Compare length */
+	if (*n1)
+		return 1;	/* First string is longer, so comes after */
+	if (*n2)
+		return -1;
+
+	/* If the strings are equal at the end of this, fallback to a straight
+	 * ASCII sort so at least it's deterministic.
+	 */
 	return strcmp(i1->leafname, i2->leafname);
 }
 
@@ -720,7 +781,7 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 
 static void options_changed(void)
 {
-	gboolean	old_case = o_sort_nocase;
+	gboolean	old_intel = o_intelligent_sort;
 	gboolean	old_dirs = o_dirs_first;
 #ifdef GTK2
 	gboolean	old_large_wrap = o_large_truncate;
@@ -728,7 +789,7 @@ static void options_changed(void)
 #endif
 	GList		*next = all_filer_windows;
 
-	o_sort_nocase = option_get_int("display_sort_nocase");
+	o_intelligent_sort = option_get_int("display_sort_nocase");
 	o_dirs_first = option_get_int("display_dirs_first");
 	o_large_truncate = option_get_int("display_large_width");
 	o_small_truncate = option_get_int("display_small_width");
@@ -746,7 +807,7 @@ static void options_changed(void)
 		}
 #endif
 
-		if (o_sort_nocase != old_case || o_dirs_first != old_dirs)
+		if (o_intelligent_sort != old_intel || o_dirs_first != old_dirs)
 		{
 			collection_qsort(filer_window->collection,
 					filer_window->sort_fn);
