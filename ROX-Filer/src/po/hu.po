@@ -10,8 +10,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.2\n"
-"POT-Creation-Date: 2001-04-08 13:57+0100\n"
-"PO-Revision-Date: 2001-04-02 11:14+0200\n"
+"POT-Creation-Date: 2001-04-09 12:14+0100\n"
+"PO-Revision-Date: 2001-04-08 19:35+0200\n"
 "Last-Translator: Andras Mohari <mayday@freemail.hu>\n"
 "Language-Team: Hungarian <out of team>\n"
 "MIME-Version: 1.0\n"
@@ -273,114 +273,117 @@ msgstr "'%s' engedélyeinek módosítása\n"
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Érvénytelen módosítási parancs - javítsd ki és próbáld újra\n"
 
-#: action.c:1252
+#: action.c:1278
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' már létezik - %s?"
 
-#: action.c:1254
+#: action.c:1280
 msgid "merge contents"
 msgstr "összefésülöd a tartalmukat"
 
-#: action.c:1254
+#: action.c:1280
 msgid "overwrite"
 msgstr "felülírod"
 
-#: action.c:1272
+#: action.c:1298
 msgid "'Trying copy anyway...\n"
 msgstr "'Megpróbálom másolni...\n"
 
 # Ez nehéz ügy...
-#: action.c:1280
+#: action.c:1306
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?Másolod? %s -> %s"
 
-#: action.c:1286
+#: action.c:1312
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'%s másolása %s néven\n"
 
-#: action.c:1311
+#: action.c:1337
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!HIBA: A cél már létezik, de nem könyvtár\n"
 
-#: action.c:1384
+#: action.c:1410
 #, c-format
 msgid "!ERROR: %s\n"
 msgstr "!HIBA: %s\n"
 
-#: action.c:1414
+#: action.c:1440
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' már létezik - felülírod?"
 
-#: action.c:1436
+#: action.c:1462
 msgid "'Trying move anyway...\n"
 msgstr "'Megpróbálom mozgatni...\n"
 
 # Ez is nehéz ügy...
-#: action.c:1443
+#: action.c:1469
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?Mozgatod? %s -> %s"
 
-#: action.c:1449
+#: action.c:1475
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'%s mozgatása %s néven\n"
 
-#: action.c:1478
+#: action.c:1504
 #, c-format
 msgid "!ERROR: Failed to move %s as %s\n"
 msgstr "!HIBA: Nem sikerült %s mozgatása %s néven\n"
 
-#: action.c:1495
+#: action.c:1521
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!HIBA: Nem lehet önmagára másolni\n"
 
-#: action.c:1510
+#: action.c:1536
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!HIBA: Nem lehet önmagába mozgatni/átnevezni\n"
 
 # Ez így túl hosszú.
-#: action.c:1534
+#: action.c:1560
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'Link készítése %s fájlra/könyvtárra %s néven\n"
 
 # Ez is túl hosszú.
-#: action.c:1541
+#: action.c:1567
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?Linket készítesz a(z) %s fájlra/könyvtárra %s néven?"
 
-#: action.c:1568
+#: action.c:1594
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'%s csatolása\n"
 
-#: action.c:1569
+#: action.c:1595
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'%s lecsatolása\n"
 
-#: action.c:1576
+#: action.c:1602
 #, c-format
 msgid "?Mount %s?\n"
 msgstr "?Csatolod? -> %s\n"
 
-#: action.c:1577
+#: action.c:1603
 #, c-format
 msgid "?Unmount %s?\n"
 msgstr "?Lecsatolod? -> %s\n"
 
-# Lecsatoláskor is ezt az üzenetet adja... Ejnye! :)
-#: action.c:1595
+#: action.c:1622
 msgid "!ERROR: Mount failed\n"
-msgstr "!HIBA: sikertelen csatolás/lecsatolás\n"
+msgstr "!HIBA: sikertelen csatolás\n"
 
-#: action.c:1633
+#: action.c:1623
+msgid "!ERROR: Unmount failed\n"
+msgstr "!HIBA: sikertelen lecsatolás\n"
+
+#: action.c:1661
 #, c-format
 msgid ""
 "'\n"
@@ -389,7 +392,7 @@ msgstr ""
 "'\n"
 "Összesen: %s\n"
 
-#: action.c:1659 action.c:1699 action.c:1737 action.c:1773 action.c:1794
+#: action.c:1687 action.c:1727 action.c:1765 action.c:1801 action.c:1822
 msgid ""
 "'\n"
 "Done\n"
@@ -397,149 +400,157 @@ msgstr ""
 "'\n"
 "Kész\n"
 
-#: action.c:1660
+#: action.c:1688
 msgid "!No mount points selected!\n"
 msgstr "!Nincs kijelölve csatolási pont!\n"
 
-#: action.c:1730
+#: action.c:1758
 msgid "?Another search?"
 msgstr "?Újabb keresés?"
 
-#: action.c:1760
+#: action.c:1788
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' egy szimbolikus link\n"
 
-#: action.c:1819 tips:63
+#: action.c:1847 tips:63
 msgid "Name"
 msgstr "Név"
 
-#: action.c:1820 run.c:598
+#: action.c:1848 run.c:598
 msgid "Directory"
 msgstr "Könyvtár"
 
-#: action.c:1826
+#: action.c:1854
 msgid "You need to select some items to search through"
 msgstr "Ki kell jelölni néhány elemet a kereséshez"
 
-#: action.c:1860
+#: action.c:1888
 msgid "Expression:"
 msgstr "Kifejezés:"
 
-#: action.c:1877 menu.c:194
+#: action.c:1905 menu.c:194
 msgid "Find"
 msgstr "Keresés"
 
-#: action.c:1896
+#: action.c:1924
 msgid "You need to select some items to count"
 msgstr "Ki kell jelölnöd az elemeket a méretük megállapításához"
 
-#: action.c:1906 menu.c:192
+#: action.c:1934 menu.c:192
 msgid "Disk Usage"
 msgstr "Felhasznált lemezterület"
 
-#: action.c:1927
+#: action.c:1955
 msgid "Mount / Unmount"
 msgstr "Csatolás / Lecsatolás"
 
-#: action.c:1932
+#: action.c:1960
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr ""
 "Sajnos a ROX-Filer még nem támogatja csatolási pontokat ezen a rendszeren."
 
-#: action.c:1953 menu.c:191 tips:39
+#: action.c:1981 menu.c:191 tips:39
 msgid "Delete"
 msgstr "Törlés"
 
-#: action.c:1955
+#: action.c:1983
 msgid "Force - don't confirm deletion of non-writeable items"
-msgstr "Felülbírál - ne legyen megerõsítés a nem írható elemek törléséhez"
+msgstr "Kényszerít - nem kér megerõsítést a nem írható elemek törléséhez"
 
-#: action.c:1958
+#: action.c:1986
 msgid "Brief - only log directories being deleted"
-msgstr "Tömör - csak a törölt könyvtárakat naplózza"
+msgstr "Tömör - csak a könyvtárak törlését listázza"
 
-#: action.c:1982
+#: action.c:2010
 msgid "You need to select the items whose permissions you want to change"
 msgstr "Ki kell jelölnöd az elemeket, amiknek az engedélyeit módosítani akarod"
 
-#: action.c:1990
+#: action.c:2018
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (Engedélyezi a végrehajást/elérést)"
 
-#: action.c:1992
+#: action.c:2020
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (Tiltja a végrehajtást/elérést)"
 
-#: action.c:1994
+#: action.c:2022
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (Olvasási+írási engedély a tulajdonosnak)"
 
-#: action.c:1996
+#: action.c:2024
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (Privát elérés)"
 
-#: action.c:1998
+#: action.c:2026
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Nyilvános elérés, írás tiltva)"
 
-#: action.c:2009
+#: action.c:2037
 msgid "Brief - don't list processed files"
 msgstr "Tömör - ne listázza a feldolgozott fájlokat"
 
-#: action.c:2011
+#: action.c:2039
+msgid "Force - make directories u+rx before entering them"
+msgstr "Kényszerít - u+rx engedélyt ad a könyvtáraknak mielõtt beléjük lép"
+
+#: action.c:2041
 msgid "Recurse - also change contents of subdirectories"
 msgstr "Rekurzív - az alkönyvtárak tartalmát is feldolgozza"
 
-#: action.c:2014
+#: action.c:2044
 msgid "Command:"
 msgstr "Parancs:"
 
-#: action.c:2036 menu.c:158 menu.c:164 menu.c:193 tips:59
+#: action.c:2066 menu.c:158 menu.c:164 menu.c:193 tips:59
 msgid "Permissions"
 msgstr "Engedélyek"
 
-#: action.c:2056 menu.c:767 tips:36
+#: action.c:2086 menu.c:767 tips:36
 msgid "Copy"
 msgstr "Másolás"
 
-#: action.c:2073 tips:37
+#: action.c:2103 tips:37
 msgid "Move"
 msgstr "Mozgatás"
 
-#: action.c:2088 tips:38
+#: action.c:2118 tips:38
 msgid "Link"
 msgstr "Link készítés"
 
-#: action.c:2135
+#: action.c:2165
 msgid "Deleting items such as "
 msgstr "Az ehhez hasonló elemeknek ("
 
-#: action.c:2139
+#: action.c:2169
 msgid "Deleting the item "
 msgstr "Ennek az elemnek ("
 
-#: action.c:2141
+#: action.c:2171
 msgid "Deleting the items "
 msgstr "Ezeknek az elemeknek ("
 
-#: action.c:2169
+#: action.c:2190
+msgid " and "
+msgstr " és "
+
+#: action.c:2199
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
 ") a törlése hatással van a munkaasztal vagy panel ikonjaira. Tényleg törlöd?"
 
-#: action.c:2176
+#: action.c:2206
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 ") a törlése hatással van a munkaasztal vagy panel ikonjaira. Tényleg törlöd "
 "õket?"
 
-#: action.c:2181 gtksavebox.c:226 gtksavebox.c:498 icon.c:112 menu.c:1111
+#: action.c:2211 gtksavebox.c:226 gtksavebox.c:498 icon.c:112 menu.c:1111
 #: menu.c:1452 options.c:805 type.c:605 usericons.c:476
 msgid "OK"
 msgstr "OK"
 
-#: action.c:2181 gtksavebox.c:233 icon.c:119 menu.c:1459 options.c:817
+#: action.c:2211 gtksavebox.c:233 icon.c:119 menu.c:1459 options.c:817
 #: panel.c:391 type.c:612 usericons.c:484
 msgid "Cancel"
 msgstr "Mégsem"
@@ -574,8 +585,8 @@ msgstr "XDS protokoll hiba: a fájlnévben nem lehet '/'\n"
 # leafname = ???
 #: dnd.c:682
 msgid ""
-"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type "
-"text/plain) did not contain a leafname\n"
+"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
+"plain) did not contain a leafname\n"
 msgstr ""
 "Az XdndDirectSave0 cél meg van adva, de a text/plain típusú XdndDirectSave0 "
 "atom nem tartalmaz fájlnevet\n"
@@ -937,6 +948,58 @@ msgstr "Az elérési út nem maradhat üresen!"
 #: icon.c:294
 msgid "Sorry, but the name must not contain < or >"
 msgstr "Sajnálom, a névben nem lehet < vagy > karakter"
+
+#: main.c:87
+msgid ""
+"Copyright (C) 2001 Thomas Leonard.\n"
+"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
+"to the extent permitted by law.\n"
+"You may redistribute copies of ROX-Filer\n"
+"under the terms of the GNU General Public License.\n"
+"For more information about these matters, see the file named COPYING.\n"
+msgstr ""
+
+#: main.c:96
+msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
+msgstr ""
+
+#: main.c:99
+msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
+msgstr ""
+
+#: main.c:101
+msgid ""
+"NOTE: Your system does not support long options - \n"
+"you must use the short versions instead.\n"
+"\n"
+msgstr ""
+
+#: main.c:105
+msgid ""
+"Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
+"Open each directory or file listed, or the current working\n"
+"directory if no arguments are given.\n"
+"\n"
+"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
+"  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
+"  -h, --help\t\tdisplay this help and exit\n"
+"  -l, --left=PANEL\topen PAN as a left-edge panel\n"
+"  -m, --mime-type=FILE\tprint MIME type of FILE and exit\n"
+"  -n, --new\t\tstart a new filer, even if already running\n"
+"  -o, --override\toverride window manager control of panels\n"
+"  -p, --pinboard=PIN\tuse pinboard PIN as the pinboard\n"
+"  -r, --right=PANEL\topen PAN as a right-edge panel\n"
+"  -s, --show=FILE\topen a directory showing FILE\n"
+"  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
+"  -u, --user\t\tshow user name in each window \n"
+"  -v, --version\t\tdisplay the version information and exit\n"
+"  -x, --examine=FILE\tFILE has changed - re-examine it\n"
+"\n"
+"The latest version can be found at:\n"
+"\thttp://rox.sourceforge.net\n"
+"\n"
+"Report bugs to <tal197@users.sourceforge.net>.\n"
+msgstr ""
 
 #: main.c:367
 #, c-format
@@ -1313,6 +1376,11 @@ msgstr "<még nincs kész>"
 #: menu.c:1190
 msgid "Help about ... ?"
 msgstr "Mihez kérsz segítséget?"
+
+#: menu.c:1210
+#, fuzzy
+msgid "Look inside ... ?"
+msgstr "Hol akarsz keresni?"
 
 #: menu.c:1222
 msgid "You must select a single file to open as a Virtual File System"
@@ -1789,6 +1857,16 @@ msgstr "Ez nem program. Adj meg egy futtatható programot!"
 msgid "Set run action"
 msgstr "Program hozzárendelése"
 
+#: type.c:547
+#, c-format
+msgid "Set default for all `%s/<anything>'"
+msgstr "Minden ilyen típushoz: %s/<akármi>"
+
+#: type.c:553
+#, c-format
+msgid "Only for the type `%s/%s'"
+msgstr "Csak ehhez a típushoz: %s/%s"
+
 #: type.c:574
 msgid ""
 "Drop a suitable\n"
@@ -2004,10 +2082,9 @@ msgstr "Nézet beállításai"
 msgid "Ignore case when sorting"
 msgstr "Kis- és nagybetûk azonosnak számítanak rendezéskor"
 
-# [A-Z] < [a-z], így az eredeti "animal, zoo, Ben" rossz sorrend.
 #: tips:43
 msgid ""
-"If off: animal, zoo, Ben.\n"
+"If off: Ben, animal, zoo.\n"
 "If on: animal, Ben, zoo."
 msgstr ""
 "Ha tiltva van: Ben, animal, zoo.\n"

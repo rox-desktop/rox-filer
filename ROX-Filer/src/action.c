@@ -1592,7 +1592,9 @@ static void do_mount(guchar *path, gboolean mount)
 	}
 	else
 	{
-		g_string_sprintf(message, _("!ERROR: Mount failed\n"));
+		g_string_sprintf(message, mount ?
+			_("!ERROR: Mount failed\n") :
+			_("!ERROR: Unmount failed\n"));
 		send();
 	}
 }
@@ -2157,7 +2159,7 @@ static gboolean remove_pinned_ok(GList *paths)
 		g_string_append_c(message, '\'');
 		i++;
 		if (i == ask_n - 1 && i > 0)
-			g_string_append(message, " and ");
+			g_string_append(message, _(" and "));
 		else if (i < ask_n)
 			g_string_append(message, ", ");
 	}

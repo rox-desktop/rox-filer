@@ -544,14 +544,14 @@ void type_set_handler_dialog(MIME_type *type)
 	vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(dialog), vbox);
 
-	tmp = g_strconcat("Set default for all `", type->media_type,
-				"/<anything>'", NULL);
+	tmp = g_strdup_printf(_("Set default for all `%s/<anything>'"),
+				type->media_type);
 	radio = gtk_radio_button_new_with_label(NULL, tmp);
 	g_free(tmp);
 	gtk_object_set_data(GTK_OBJECT(dialog), "set_for_all", radio);
 
-	tmp = g_strconcat("Only for the type `", type->media_type, "/",
-			type->subtype, "'", NULL);
+	tmp = g_strdup_printf(_("Only for the type `%s/%s'"), type->media_type,
+			type->subtype);
 	gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, TRUE, 0);
 	radio = gtk_radio_button_new_with_label(
 			gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
