@@ -177,7 +177,7 @@ int xtype_supported(const char *path)
 int xtype_have_attr(const char *path)
 {
 #ifdef _PC_XATTR_EXISTS
-	return pathconf(path, _PC_XATTR_EXISTS);
+	return pathconf(path, _PC_XATTR_EXISTS)>0;
 #else
 	return FALSE;
 #endif
