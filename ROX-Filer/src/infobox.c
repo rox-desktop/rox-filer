@@ -50,7 +50,7 @@ struct _FileStatus
 	int	fd;	/* FD to read from, -1 if closed */
 	int	input;	/* Input watcher tag if fd valid */
 	GtkLabel *label;	/* Widget to output to */
-	gboolean	start;	/* No output yet */
+	gchar	*text;	/* String so far */
 };
 
 /* Static prototypes */
@@ -401,7 +401,7 @@ static GtkWidget *make_file_says(guchar *path)
 			fs = g_new(FileStatus, 1);
 			fs->label = GTK_LABEL(file_label);
 			fs->fd = file_data[0];
-			fs->start = TRUE;
+			fs->text = g_strdup("");
 			fs->input = gdk_input_add(fs->fd, GDK_INPUT_READ,
 				(GdkInputFunction) add_file_output, fs);
 			gtk_signal_connect(GTK_OBJECT(frame), "destroy",
@@ -434,15 +434,12 @@ static void add_file_output(FileStatus *fs,
 	}
 	buffer[got] = '\0';
 
-	if (fs->start)
-	{
-		str = "";
-		fs->start = FALSE;
-	}
-	else
-		gtk_label_get(fs->label, &str);
-
-	str = g_strconcat(str, buffer, NULL);
+	str = g_strconcat(fs->text, buffer, NULL);
+	g_free(fs->text);
+	fs->text = str;
+	
+	str = g_strdup(fs->text);
+	g_strstrip(str);
 	gtk_label_set_text(fs->label, str);
 	g_free(str);
 }
@@ -455,6 +452,7 @@ static void file_info_destroyed(GtkWidget *widget, FileStatus *fs)
 		close(fs->fd);
 	}
 
+	g_free(fs->text);
 	g_free(fs);
 }
 
