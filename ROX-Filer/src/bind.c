@@ -31,7 +31,6 @@
 #include "bind.h"
 
 Option o_new_button_1, o_single_click;
-static Option o_menu_button_2;
 static Option o_single_pinboard;
 
 /****************************************************************
@@ -41,7 +40,6 @@ static Option o_single_pinboard;
 void bind_init(void)
 {
 	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE);
-	option_add_int(&o_menu_button_2, "bind_menu_button_2", FALSE);
 	option_add_int(&o_single_click, "bind_single_click", TRUE);
 	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE);
 }
@@ -52,7 +50,7 @@ void bind_init(void)
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 {
 	gint	b = event->button;
-	gint	menu_button = o_menu_button_2.int_value ? 2 : 3;
+	gint	menu_button = 3; /* o_menu_button_2.int_value ? 2 : 3; */
 	gboolean shift = (event->state & GDK_SHIFT_MASK) != 0;
 	gboolean ctrl = (event->state & GDK_CONTROL_MASK) != 0;
 	gboolean icon  = context == BIND_PINBOARD_ICON ||
