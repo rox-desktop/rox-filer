@@ -17,6 +17,7 @@ typedef enum {
 
 #include <gtk/gtk.h>
 
+void minibuffer_init(void);
 void create_minibuffer(FilerWindow *filer_window);
 void minibuffer_show(FilerWindow *filer_window, MiniType mini_type);
 void minibuffer_hide(FilerWindow *filer_window);

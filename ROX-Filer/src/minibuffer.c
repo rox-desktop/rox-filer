@@ -34,6 +34,7 @@
 
 #include "global.h"
 
+#include "options.h"
 #include "collection.h"
 #include "find.h"
 #include "gui_support.h"
@@ -66,6 +67,11 @@ static void show_help(FilerWindow *filer_window);
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
+void minibuffer_init(void)
+{
+	option_add_int("filer_beep_fail", 1, NULL);
+	option_add_int("filer_beep_multi", 1, NULL);
+}
 
 /* Creates the minibuffer widgets, setting the appropriate fields
  * in filer_window.
@@ -253,7 +259,8 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 }
 
 /* Use the cursor item to fill in the minibuffer.
- * If there are multiple matches the fill in as much as possible and beep.
+ * If there are multiple matches the fill in as much as possible and
+ * (possibly) beep.
  */
 static void complete(FilerWindow *filer_window)
 {
@@ -318,7 +325,11 @@ static void complete(FilerWindow *filer_window)
 	}
 
 	if (current_stem == shortest_stem)
-		gdk_beep();
+	{
+		/* We didn't add anything... */
+		if (option_get_int("filer_beep_fail"))
+			gdk_beep();
+	}
 	else if (current_stem < shortest_stem)
 	{
 		guchar	*extra;
@@ -327,7 +338,9 @@ static void complete(FilerWindow *filer_window)
 				shortest_stem - current_stem);
 		gtk_entry_append_text(entry, extra);
 		g_free(extra);
-		gdk_beep();
+
+		if (option_get_int("filer_beep_multi"))
+			gdk_beep();
 	}
 	else
 	{

@@ -387,6 +387,7 @@ int main(int argc, char **argv)
 	bind_init();
 	dir_init();
 	menu_init();
+	minibuffer_init();
 	filer_init();
 	toolbar_init();
 	display_init();

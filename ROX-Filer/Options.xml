@@ -121,6 +121,13 @@ Maximum width for the text beside a Small Icon.
 If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.
 </toggle>
 
+<toggle label="Beep if Tab-completion fails" name="beep_fail">
+When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).
+</toggle>
+<toggle label="Beep if there are several matches" name="beep_multi">
+When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.
+</toggle>
+
 </section>
 
 <section name="dnd" title="Drag and Drop options">

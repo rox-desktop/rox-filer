@@ -9,26 +9,17 @@ BUGS
 
 Return for 'Do another search' toggles Quiet...
 
-When we perform any action on a FAT file, the is_sub_dir() function compare
-names in a case-sensible fashion so rename/copy/move of a file such as
-"tmp" into "Tmp" (that is a "file into itself" error) erase the file
-itself.
-
-Essentially, this is a is_sub_dir() bug, but it could be found in every
-pathname comparision so I have no idea for a good solution to solve it.
-
 
 FEATURES FOR 1.1
+
+Allow mounting of mount points on the pinboard/panel via the right-click
+menu. I know that shift-click works, but it's a minor inconsistency. This
+doesn't bother me, but it's a newbie-friendliness feature.
 
 Lasso box with the middle button should toggle their selected state.
 
 On Shift-Menu-click, send the filename to a script and parse the results
 as a menu of commands to execute.
-
-User-definable icons for the different mount points.
-
-Highlight Find expressions in red while they're invalid. Also, do this
-in the minibuffer.
 
 Long leafnames wrap onto multiple lines.
 
@@ -48,10 +39,12 @@ even if it isn't in the last column.
 
 Allow find expression with Permissions command...
 
+Allow applets inside the panel.
+
 
 OTHERS
 
-Have a 'Templates' directory in Choices. Make 'New Directory' a submenu
+Have a 'Templates' directory in Choices. Make 'New File' a submenu
 which list these files or directories?
 
 Close Panel menu item?
@@ -59,14 +52,11 @@ Close Panel menu item?
 Toolbar buttons for sort type?
 
 Highlighting of icons as you drag a box around them, so it's clear what you
-have caught in the box.
+have caught in the box?
 
 Control setup of pinboard and panels from the GUI?
 
-Allow applets inside the panel? Allow the filer to go inside GNOME-panel
-and similar?
-
-Back/Forwards browser style navigation?
+Allow the filer to go inside GNOME-panel and similar?
 
 More permissions checking in Find?
 
@@ -75,7 +65,7 @@ is pressed?
 
 In single click mode, beep when the user tries to double click?
 
-Options to set where the toolbar appears.
+Options to set where the toolbar appears?
 
 Display extra info in the toolbar (file under cursor, size, etc).
 

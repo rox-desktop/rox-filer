@@ -177,6 +177,7 @@ int calc_width(FilerWindow *filer_window, DirItem *item)
 			return SMALL_ICON_WIDTH + 12 + w;
                 default:
 			w = MIN(item->name_width, o_large_truncate);
+			pix_width = MIN(MAX_ICON_WIDTH, pix_width);
                         return MAX(pix_width, w) + 4;
         }
 }
