@@ -31,6 +31,7 @@
 #include <ctype.h>
 #include <math.h>
 #include <netdb.h>
+#include <sys/param.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -1814,6 +1815,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	gint 	x, y;
 	int	i;
 	GString	*tip = NULL;
+	guchar	*fullpath = NULL;
 
 	g_return_val_if_fail(tip_item != NULL, 0);
 
@@ -1842,13 +1844,29 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 		g_string_append_c(tip, '\n');
 	}
 	
+	fullpath = make_path(filer_window->path, tip_item->leafname)->str;
+
+	if (tip_item->flags & ITEM_FLAG_SYMLINK)
+	{
+		char target[MAXPATHLEN + 1];
+		int l;
+
+		l = readlink(fullpath, target, sizeof(target) - 1);
+		if (l > 0)
+		{
+			target[l] = '\0';
+			g_string_append(tip, _("Symbolic link to "));
+			g_string_append(tip, target);
+			g_string_append_c(tip, '\n');
+		}
+	}
+	
 	if (tip_item->flags & ITEM_FLAG_APPDIR)
 	{
 		AppInfo *info;
 		xmlNode *node;
 
-		info = appinfo_get(make_path(filer_window->path,
-					tip_item->leafname)->str, tip_item);
+		info = appinfo_get(fullpath, tip_item);
 		if (info && ((node = appinfo_get_section(info, "Summary"))))
 		{
 			guchar *str;

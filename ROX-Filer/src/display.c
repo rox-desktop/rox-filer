@@ -756,6 +756,10 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i)
 	int	scroll = collection->vadj->value;	/* (round to int) */
 	GdkRectangle area;
 
+	if (filer_window->display_style == LARGE_ICONS ||
+	    filer_window->display_style == HUGE_ICONS)
+		return FALSE;	/* These wrap rather than truncate */
+
 	area.x = col * collection->item_width;
 	area.y = row * collection->item_height - scroll;
 	area.height = collection->item_height;
