@@ -408,6 +408,7 @@ static void update_display(Directory *dir,
 			break;
 		case DIR_START_SCAN:
 			set_scanning_display(filer_window, TRUE);
+			toolbar_update_info(filer_window);
 			break;
 		case DIR_END_SCAN:
 			if (filer_window->window->window)
@@ -422,6 +423,7 @@ static void update_display(Directory *dir,
 				filer_window->had_cursor = FALSE;
 			}
 			set_scanning_display(filer_window, FALSE);
+			toolbar_update_info(filer_window);
 			open_filer_window(filer_window);
 			break;
 		case DIR_UPDATE:
@@ -1649,7 +1651,9 @@ void filer_target_mode(FilerWindow *filer_window,
 			gpointer data,
 			char	 *reason)
 {
-	if (fn != filer_window->target_cb)
+	TargetFunc old_fn = filer_window->target_cb;
+
+	if (fn != old_fn)
 		gdk_window_set_cursor(
 				GTK_WIDGET(filer_window->collection)->window,
 				fn ? crosshair : NULL);
@@ -1657,9 +1661,20 @@ void filer_target_mode(FilerWindow *filer_window,
 	filer_window->target_cb = fn;
 	filer_window->target_data = data;
 
-	if (filer_window->toolbar_text)
-		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text),
-				fn ? reason : "");
+	if (filer_window->toolbar_text == NULL)
+		return;
+
+	if (fn)
+		gtk_label_set_text(
+			GTK_LABEL(filer_window->toolbar_text), reason);
+	else if (o_toolbar_info)
+	{
+		if (old_fn)
+			toolbar_update_info(filer_window);
+	}
+	else
+		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), "");
+
 }
 
 /* Draw the black border */

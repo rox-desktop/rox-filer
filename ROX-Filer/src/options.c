@@ -398,7 +398,7 @@ static void build_menu_item(Node *node, GtkWidget *option_menu)
 
 static void build_widget(Node *widget, GtkWidget *box)
 {
-	const CHAR *name = widget->name;
+	const char *name = widget->name;
 	guchar	*oname;
 	Option	*option;
 	guchar	*label;

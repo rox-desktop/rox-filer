@@ -280,6 +280,49 @@ char *format_size_aligned(unsigned long size)
 	return buffer;
 }
 
+/*
+ * Similar to format_size(), but this one uses a double argument since
+ * unsigned long isn't wide enough on all platforms and we must be able to
+ * sum sizes above 4 GB. At most 2 digits are shown after the decimal
+ * point.
+ */
+gchar *format_double_size_brief(double size)
+{
+	static gchar	*buf = NULL;
+	char		*units;
+	int		prec = 0;
+
+	if (size >= PRETTY_SIZE_LIMIT)
+	{
+		prec = 2;
+		size /= 1024;
+		if (size >= PRETTY_SIZE_LIMIT)
+		{
+			size /= 1024;
+			if (size >= PRETTY_SIZE_LIMIT)
+			{
+				size /= 1024;
+				units = "Gb";
+			}
+			else
+				units = "Mb";
+		}
+		else
+			units = "K";
+
+	}
+	else if (size != 1)
+		units = "bytes";
+	else
+		units = "byte";
+
+	if (buf)
+		g_free(buf);
+	buf = g_strdup_printf("%.*f %s", prec, size, units);
+
+	return buf;
+}
+
 /* Fork and exec argv. Wait and return the child's exit status.
  * -1 if spawn fails.
  */

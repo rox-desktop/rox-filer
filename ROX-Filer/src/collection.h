@@ -88,6 +88,8 @@ struct _Collection
 	guint		array_size;
 
 	gint		auto_scroll;	/* Timer */
+
+	gint		block_selection_changed;
 };
 
 struct _CollectionClass
@@ -95,9 +97,11 @@ struct _CollectionClass
 	GtkWidgetClass 	parent_class;
 
 	void 		(*gain_selection)(Collection 	*collection,
-				     guint		time);
+					guint		time);
 	void 		(*lose_selection)(Collection 	*collection,
-				     guint		time);
+					guint		time);
+	void		(*selection_changed)(Collection	*collection,
+					guint		time);
 };
 
 guint   collection_get_type   		(void);
@@ -142,6 +146,10 @@ void	collection_end_lasso		(Collection *collection,
 					 GdkFunction fn);
 void	collection_snap_size		(Collection *collection,
 					 int rows, int cols);
+/* XXX: Why? */
+void	collection_unblock_selection_changed(Collection *collection,
+					   guint time,
+					   gboolean emit);
 
 #ifdef __cplusplus
 }

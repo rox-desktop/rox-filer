@@ -35,6 +35,12 @@
 #define MINIMUM_ITEMS 16
 #define AUTOSCROLL_STEP 20
 
+/* Macro to emit the "selection_changed" signal only if allowed */
+#define EMIT_SELECTION_CHANGED(collection, time) \
+	if (!collection->block_selection_changed) \
+		gtk_signal_emit(GTK_OBJECT(collection), \
+				collection_signals[SELECTION_CHANGED], time)
+
 enum
 {
 	ARG_0,
@@ -52,11 +58,17 @@ enum
  * 	We've dropped to having no selected items.
  * 	Time is the time of the event that caused the change, or
  * 	GDK_CURRENT_TIME if not known.
+ *
+ * void selection_changed(collection, user_data)
+ * 	The set of selected items has changed.
+ * 	Time is the time of the event that caused the change, or
+ * 	GDK_CURRENT_TIME if not known.
  */
 enum
 {
 	GAIN_SELECTION,
 	LOSE_SELECTION,
+	SELECTION_CHANGED,
 	LAST_SIGNAL
 };
 
@@ -234,6 +246,7 @@ static void collection_class_init(CollectionClass *class)
 
 	class->gain_selection = NULL;
 	class->lose_selection = NULL;
+	class->selection_changed = NULL;
 
 	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
 				     GTK_RUN_LAST,
@@ -251,6 +264,14 @@ static void collection_class_init(CollectionClass *class)
 				     gtk_marshal_NONE__UINT,
 				     GTK_TYPE_NONE, 1,
 				     GTK_TYPE_UINT);
+	collection_signals[SELECTION_CHANGED] = gtk_signal_new(
+				     "selection_changed",
+				     GTK_RUN_LAST,
+				     object_class->type,
+				     GTK_SIGNAL_OFFSET(CollectionClass,
+						     selection_changed),
+				     gtk_marshal_NONE__UINT,
+				     GTK_TYPE_NONE, 1);
 
 	gtk_object_class_add_signals(object_class,
 				collection_signals, LAST_SIGNAL);
@@ -265,6 +286,7 @@ static void collection_init(Collection *object)
 
 	object->number_of_items = 0;
 	object->number_selected = 0;
+	object->block_selection_changed = 0;
 	object->columns = 1;
 	object->item_width = 64;
 	object->item_height = 64;
@@ -1171,11 +1193,14 @@ static void collection_process_area(Collection	 *collection,
 	int		x, y;
 	guint32		stacked_time;
 	int		item;
+	gboolean	changed = FALSE;
 
 	g_return_if_fail(fn == GDK_SET || fn == GDK_INVERT);
 
 	stacked_time = current_event_time;
 	current_event_time = time;
+
+	collection->block_selection_changed++;
 
 	for (y = area->y; y < area->y + area->height; y++)
 	{
@@ -1191,11 +1216,14 @@ static void collection_process_area(Collection	 *collection,
 			else
 				collection_select_item(collection, item);
 
+			changed = TRUE;
 			item++;
 		}
 	}
 
 out:
+	collection_unblock_selection_changed(collection,
+					current_event_time, changed);
 	current_event_time = stacked_time;
 }
 
@@ -1485,6 +1513,8 @@ static void collection_item_set_selected(Collection *collection,
 					collection_signals[LOSE_SELECTION],
 					current_event_time);
 	}
+
+	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
 
 /* Functions for managing collections */
@@ -1598,6 +1628,7 @@ void collection_select_all(Collection *collection)
 	gtk_signal_emit(GTK_OBJECT(collection),
 			collection_signals[GAIN_SELECTION],
 			current_event_time);
+	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
 
 /* Unselect all items except number item, which is selected (-1 to unselect
@@ -1642,6 +1673,7 @@ void collection_clear_except(Collection *collection, gint item)
 		gtk_signal_emit(GTK_OBJECT(collection),
 				collection_signals[LOSE_SELECTION],
 				current_event_time);
+	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
 
 /* Unselect all items in the collection */
@@ -2088,4 +2120,22 @@ void collection_end_lasso(Collection *collection, GdkFunction fn)
 
 	abort_lasso(collection);
 
+}
+
+/* Unblock the selection_changed signal, emitting the signal if the
+ * block counter reaches zero and emit is TRUE.
+ */
+void collection_unblock_selection_changed(Collection	*collection,
+					  guint		time,
+					  gboolean	emit)
+{
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(collection->block_selection_changed > 0);
+
+	collection->block_selection_changed--;
+
+	if (emit && !collection->block_selection_changed)
+		gtk_signal_emit(GTK_OBJECT(collection),
+				collection_signals[SELECTION_CHANGED], time);
 }

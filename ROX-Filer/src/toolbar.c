@@ -36,6 +36,8 @@
 #include "filer.h"
 #include "pixmaps.h"
 #include "bind.h"
+#include "type.h"
+#include "dir.h"
 
 typedef struct _Tool Tool;
 
@@ -53,6 +55,7 @@ struct _Tool {
 };
 
 ToolbarType o_toolbar = TOOLBAR_NORMAL;
+gint o_toolbar_info = TRUE;
 
 static GtkTooltips *tooltips = NULL;
 
@@ -88,6 +91,8 @@ static void drag_leave(GtkWidget	*widget,
 static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
+static void coll_selection_changed(Collection *collection, guint time,
+					gpointer user_data);
 static void recreate_toolbar(FilerWindow *filer_window);
 static void toggle_shaded(GtkWidget *widget);
 static void option_notify(void);
@@ -132,6 +137,7 @@ void toolbar_init(void)
 	int	i;
 	
 	option_add_int("toolbar_type", o_toolbar, NULL);
+	option_add_int("toolbar_show_info", o_toolbar_info, NULL);
 	option_add_string("toolbar_disable", "close", NULL);
 	option_add_notify(option_notify);
 	
@@ -203,6 +209,13 @@ GtkWidget *toolbar_new(FilerWindow *filer_window)
 	g_return_val_if_fail(o_toolbar != TOOLBAR_NONE, NULL);
 
 	return create_toolbar(filer_window);
+}
+
+void toolbar_update_info(FilerWindow *filer_window)
+{
+	if (o_toolbar != TOOLBAR_NONE && o_toolbar_info)
+		coll_selection_changed(filer_window->collection,
+				GDK_CURRENT_TIME, filer_window);
 }
 
 
@@ -310,6 +323,12 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	gtk_widget_set_usize(filer_window->toolbar_text, 8, 1);
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
 			TRUE, TRUE, 4);
+
+	if (o_toolbar_info)
+		gtk_signal_connect(GTK_OBJECT(filer_window->collection),
+				"selection_changed",
+				GTK_SIGNAL_FUNC(coll_selection_changed),
+				(gpointer) filer_window);
 
 	return box;
 }
@@ -488,6 +507,69 @@ static void handle_drops(FilerWindow *filer_window,
 			(gpointer) dest);
 }
 
+static void coll_selection_changed(Collection *collection, guint time,
+					gpointer user_data)
+{
+	FilerWindow	*filer_window = (FilerWindow *) user_data;
+	gchar		*label;
+
+	if (filer_window->target_cb)
+		return;
+
+	if (collection->number_selected == 0)
+	{
+		guint num_hidden = 0;
+		gchar *s = NULL;
+
+		if (filer_window->scanning)
+		{
+			gtk_label_set_text(
+				GTK_LABEL(filer_window->toolbar_text), "");
+			return;
+		}
+
+		if (!filer_window->show_hidden)
+		{
+			guint	i = filer_window->directory->items->len;
+			DirItem	**items = (DirItem **)
+				filer_window->directory->items->pdata;
+
+			while (i--)
+				if (items[i]->leafname[0] == '.')
+					num_hidden++;
+			if (num_hidden)
+				s = g_strdup_printf(_(" (%u hidden)"),
+						num_hidden);
+		}
+		label = g_strdup_printf("%d %s%s",
+				collection->number_of_items,
+				collection->number_of_items != 1
+					? _("items") : _("item"),
+					s ? s : "");
+		g_free(s);
+	}
+	else
+	{
+		gint	i = collection->number_of_items;
+		double	size = 0;
+
+		while (i--)
+		{
+			DirItem *item = (DirItem *) collection->items[i].data;
+			
+			if (collection->items[i].selected 
+			    && item->base_type != TYPE_DIRECTORY)
+					size += (double) item->size;
+		}
+		label = g_strdup_printf(_("%u selected (%s)"),
+				collection->number_selected,
+				format_double_size_brief(size));
+	}
+
+	gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), label);
+	g_free(label);
+}
+
 static void recreate_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*frame = filer_window->toolbar_frame;
@@ -511,11 +593,13 @@ static void recreate_toolbar(FilerWindow *filer_window)
 	}
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
+	toolbar_update_info(filer_window);
 }
 
 static void option_notify(void)
 {
 	ToolbarType	old_type = o_toolbar;
+	gint		old_info = o_toolbar_info;
 	guchar		*list;
 	int		i;
 	gboolean	changed = FALSE;
@@ -534,14 +618,21 @@ static void option_notify(void)
 	}
 	
 	o_toolbar = option_get_int("toolbar_type");
+	o_toolbar_info = option_get_int("toolbar_show_info");
 
-	if (changed || old_type != o_toolbar)
+	if (changed || old_type != o_toolbar || old_info != o_toolbar_info)
 	{
 		GList	*next;
 
 		for (next = all_filer_windows; next; next = next->next)
 		{
 			FilerWindow *filer_window = (FilerWindow *) next->data;
+			
+			if (old_info && old_type != TOOLBAR_NONE)
+				gtk_signal_disconnect_by_func(
+					GTK_OBJECT(filer_window->collection),
+					GTK_SIGNAL_FUNC(coll_selection_changed),
+					(gpointer) filer_window);
 
 			recreate_toolbar(filer_window);
 		}

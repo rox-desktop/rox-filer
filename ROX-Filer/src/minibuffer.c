@@ -768,7 +768,7 @@ static void shell_recall(FilerWindow *filer_window, int dir)
 
 /*			SELECT IF			*/
 
-static void select_return_pressed(FilerWindow *filer_window)
+static void select_return_pressed(FilerWindow *filer_window, guint etime)
 {
 	FindCondition	*cond;
 	int		i, n;
@@ -793,6 +793,8 @@ static void select_return_pressed(FilerWindow *filer_window)
 	info.now = time(NULL);
 	info.prune = FALSE;	/* (don't care) */
 	n = collection->number_of_items;
+
+	collection->block_selection_changed++;
 
 	/* If an item at the start is selected then we could lose the
 	 * primary selection after checking that item and then need to
@@ -820,6 +822,7 @@ static void select_return_pressed(FilerWindow *filer_window)
 
 out:
 	minibuffer_hide(filer_window);
+	collection_unblock_selection_changed(collection, etime, TRUE);
 }
 
 
@@ -898,7 +901,8 @@ static gint key_press_event(GtkWidget	*widget,
 				case GDK_Tab:
 					break;
 				case GDK_Return:
-					select_return_pressed(filer_window);
+					select_return_pressed(filer_window,
+								event->time);
 					break;
 				default:
 					return FALSE;

@@ -674,6 +674,7 @@ static gint idle_callback(Directory *dir)
 	do
 	{
 		ent = mc_readdir(dir->dir_handle);
+		/* usleep(100000); */
 
 		if (!ent)
 		{
