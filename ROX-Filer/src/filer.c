@@ -335,7 +335,7 @@ static void filer_size_for(FilerWindow *filer_window,
  */
 static gint open_filer_window(FilerWindow *filer_window)
 {
-	view_style_changed(VIEW(filer_window->view), 0);
+	view_style_changed(filer_window->view, 0);
 
 	if (filer_window->open_timeout)
 	{
@@ -410,7 +410,7 @@ static void update_display(Directory *dir,
 static void attach(FilerWindow *filer_window)
 {
 	gdk_window_set_cursor(filer_window->window->window, busy_cursor);
-	view_clear(VIEW(filer_window->view));
+	view_clear(filer_window->view);
 	filer_window->scanning = TRUE;
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
@@ -550,7 +550,7 @@ static void selection_get(GtkWidget *widget,
 			break;
 	}
 
-	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
+	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 
 	while ((item = iter.next(&iter)))
 	{
@@ -809,7 +809,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 
 	xmlNewChild(group, NULL, "directory", filer_window->sym_path);
 
-	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
+	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 
 	while ((item = iter.next(&iter)))
 		xmlNewChild(group, NULL, "item", item->leafname);
@@ -1078,7 +1078,7 @@ GList *filer_selected_items(FilerWindow *filer_window)
 	ViewIter iter;
 	DirItem *item;
 
-	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_SELECTED);
+	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 	while ((item = iter.next(&iter)))
 	{
 		retval = g_list_prepend(retval,
@@ -1253,8 +1253,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 			"filer_window", filer_window);
 	
 	/* The view is the area that actually displays the files */
-	filer_window->view = view_collection_new(filer_window);
-	gtk_widget_show(filer_window->view);
+	filer_window->view = VIEW(view_collection_new(filer_window));
+	gtk_widget_show(GTK_WIDGET(filer_window->view));
 	collection = GTK_WIDGET(filer_window->collection);	/* XXX */
 	g_object_set_data(G_OBJECT(collection), "filer_window", filer_window);
 
@@ -1283,7 +1283,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	/* Now add the area for displaying the files.
 	 * The collection is one huge window that goes in a Viewport.
 	 */
-	gtk_box_pack_start_defaults(GTK_BOX(vbox), filer_window->view);
+	gtk_box_pack_start_defaults(GTK_BOX(vbox),
+				    GTK_WIDGET(filer_window->view));
 	filer_window->scrollbar =
 		gtk_vscrollbar_new(filer_window->collection->vadj);
 
@@ -1743,7 +1744,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 	if (!filer_window->show_thumbs)
 		return;
 
-	view_get_iter(VIEW(filer_window->view), &iter, VIEW_FOREACH_ALL);
+	view_get_iter(filer_window->view, &iter, 0);
 
 	while ((item = iter.next(&iter)))
 	{

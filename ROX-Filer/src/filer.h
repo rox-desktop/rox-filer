@@ -41,7 +41,7 @@ struct _FilerWindow
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
 	Collection	*collection;
-	GtkWidget	*view;
+	ViewIface	*view;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;

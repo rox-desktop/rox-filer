@@ -373,7 +373,7 @@ static void drag_end(GtkWidget *widget,
 {
 	if (filer_window->temp_item_selected)
 	{
-		view_clear_selection(VIEW(filer_window->view));
+		view_clear_selection(filer_window->view);
 		filer_window->temp_item_selected = FALSE;
 	}
 }

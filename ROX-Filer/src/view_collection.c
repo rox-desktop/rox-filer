@@ -162,8 +162,7 @@ static void view_collection_clear_selection(ViewIface *view);
 static int view_collection_count_items(ViewIface *view);
 static int view_collection_count_selected(ViewIface *view);
 static void view_collection_show_cursor(ViewIface *view);
-static void view_collection_get_iter(ViewIface *view, ViewIter *iter,
-				    ViewForeach type);
+static void view_collection_get_iter(ViewIface *view, ViewIter *iter);
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter);
 
 
@@ -1476,36 +1475,42 @@ static DirItem *iter_next(ViewIter *iter)
 	int n = collection->number_of_items;
 	int i = iter->i;
 
-	g_return_val_if_fail(i >= 0 || i <= n, NULL);
-	
-	/* iter->i is the first item to consider returning */
-	i = iter->i;
+	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
 
-	if (iter->type == VIEW_FOREACH_SELECTED)
+	/* i is the last item returned (or -1 on the first call) */
+
+	g_return_val_if_fail(i >= -1 && i < n, NULL);
+
+	while (iter->n_remaining)
 	{
-		/* As long as i is an unselected item, move on */
-		while (i < n && !collection->items[i].selected)
-			i++;
+		i++;
+		iter->n_remaining--;
+
+		if (i == n)
+			i = 0;
+
+		g_return_val_if_fail(i >= 0 && i < n, NULL);
+
+		if (iter->flags & VIEW_ITER_SELECTED &&
+		    !collection->items[i].selected)
+			continue;
+
+		iter->i = i;
+		return collection->items[i].data;
 	}
 	
-	iter->i = i + 1;
-
-	if (i < n)
-		return collection->items[i].data;
-
 	return NULL;
 }
 
-static void view_collection_get_iter(ViewIface *view, ViewIter *iter,
-				    ViewForeach type)
+static void view_collection_get_iter(ViewIface *view, ViewIter *iter)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 
-	iter->i = 0;
+	iter->i = -1;
 	iter->collection = collection;
 	iter->next = iter_next;
-	iter->type = type;
+	iter->n_remaining = collection->number_of_items;
 }
 
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
@@ -1515,5 +1520,5 @@ static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
 	
 	g_return_if_fail(iter->collection == collection);
 
-	collection_set_cursor_item(collection, iter->i - 1);
+	collection_set_cursor_item(collection, iter->i);
 }

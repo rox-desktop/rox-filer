@@ -674,7 +674,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	GdkModifierType	state = 0;
 	int		n_selected;
 
-	n_selected = view_count_selected(VIEW(filer_window->view));
+	n_selected = view_count_selected(filer_window->view);
 
 	ensure_filer_menu();
 
@@ -694,7 +694,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	{
 		filer_window->temp_item_selected = TRUE;
 		collection_select_item(filer_window->collection, item);
-		n_selected = view_count_selected(VIEW(filer_window->view));
+		n_selected = view_count_selected(filer_window->view);
 	}
 	else
 	{
@@ -801,7 +801,7 @@ static void menu_closed(GtkWidget *widget)
 
 	if (window_with_focus->temp_item_selected)
 	{
-		view_clear_selection(VIEW(window_with_focus->view));
+		view_clear_selection(window_with_focus->view);
 		window_with_focus->temp_item_selected = FALSE;
 	}
 }
@@ -1201,7 +1201,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	window_with_focus->temp_item_selected = FALSE;
-	view_clear_selection(VIEW(window_with_focus->view));
+	view_clear_selection(window_with_focus->view);
 }
 
 static void invert_selection(gpointer data, guint action, GtkWidget *widget)
@@ -1736,7 +1736,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	n_selected = view_count_selected(VIEW(window_with_focus->view));
+	n_selected = view_count_selected(window_with_focus->view);
 
 	if (n_selected < 1)
 	{

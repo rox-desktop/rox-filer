@@ -572,7 +572,7 @@ static void coll_selection_changed(Collection *collection, guint time,
 	filer_window = g_object_get_data(G_OBJECT(collection), "filer_window");
 	g_return_if_fail(filer_window != NULL);
 
-	view = VIEW(filer_window->view);
+	view = filer_window->view;
 
 	if (filer_window->target_cb)
 		return;
@@ -620,8 +620,7 @@ static void coll_selection_changed(Collection *collection, guint time,
 		ViewIter iter;
 		DirItem *item;
 
-		view_get_iter(VIEW(filer_window->view), &iter,
-				VIEW_FOREACH_SELECTED);
+		view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 
 		while ((item = iter.next(&iter)))
 			if (item->base_type != TYPE_DIRECTORY)

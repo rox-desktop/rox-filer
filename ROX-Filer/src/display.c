@@ -305,7 +305,7 @@ void display_set_sort_fn(FilerWindow *filer_window,
 
 	filer_window->sort_fn = fn;
 
-	view_sort(VIEW(filer_window->view));
+	view_sort(filer_window->view);
 }
 
 void display_set_layout(FilerWindow  *filer_window,
@@ -318,7 +318,7 @@ void display_set_layout(FilerWindow  *filer_window,
 	display_details_set(filer_window, details);
 
 	/* Recreate layouts because wrapping may have changed */
-	view_style_changed(VIEW(filer_window->view), VIEW_UPDATE_NAME);
+	view_style_changed(filer_window->view, VIEW_UPDATE_NAME);
 
 	if (o_filer_auto_resize.int_value != RESIZE_NEVER)
 		filer_window_autosize(filer_window, TRUE);
@@ -332,7 +332,7 @@ void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
 
 	filer_window->show_thumbs = thumbs;
 
-	view_style_changed(VIEW(filer_window->view), VIEW_UPDATE_VIEWDATA);
+	view_style_changed(filer_window->view, VIEW_UPDATE_VIEWDATA);
 
 	if (!thumbs)
 		filer_cancel_thumbnails(filer_window);
@@ -369,7 +369,7 @@ void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf)
 	g_free(filer_window->auto_select);
 	filer_window->auto_select = NULL;
 
-	if (view_autoselect(VIEW(filer_window->view), new))
+	if (view_autoselect(filer_window->view, new))
 		g_free(new);
 	else
 		filer_window->auto_select = new;
@@ -433,7 +433,7 @@ static void options_changed(void)
 		if (o_large_width.has_changed || o_small_width.has_changed)
 			flags |= VIEW_UPDATE_NAME; /* Recreate PangoLayout */
 
-		view_style_changed(VIEW(filer_window->view), flags);
+		view_style_changed(filer_window->view, flags);
 	}
 }
 

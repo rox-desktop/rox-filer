@@ -133,7 +133,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 	switch (mini_type)
 	{
 		case MINI_PATH:
-			view_show_cursor(VIEW(filer_window->view));
+			view_show_cursor(filer_window->view);
 			filer_window->mini_cursor_base =
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,
@@ -151,7 +151,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 		case MINI_SHELL:
 			pos = 0;
 			i = collection->cursor_item;
-			if (view_count_selected(VIEW(filer_window->view)) > 0)
+			if (view_count_selected(filer_window->view) > 0)
 				gtk_entry_set_text(mini, " \"$@\"");
 			else if (i > -1 && i < collection->number_of_items)
 			{
@@ -459,9 +459,9 @@ static gboolean find_exact_match(FilerWindow *filer_window,
 {
 	DirItem		*item;
 	ViewIter	iter;
-	ViewIface	*view = VIEW(filer_window->view);
+	ViewIface	*view = filer_window->view;
 
-	view_get_iter(view, &iter, VIEW_FOREACH_ALL);
+	view_get_iter(view, &iter, 0);
 
 	while ((item = iter.next(&iter)))
 	{

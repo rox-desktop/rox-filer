@@ -33,6 +33,12 @@ typedef struct _Directory Directory;
  */
 typedef struct _DirItem DirItem;
 
+/* Widgets which can display directories implement the View interface.
+ * This should be used in preference to the old collection interface because
+ * it isn't specific to a particular type of display.
+ */
+typedef struct _ViewIface ViewIface;
+
 /* A Collection is a GtkWidget used to arrange a grid of items.
  * Each filer window has its own one of these; the data field
  * of each item is the corresponding DirItem, shared with the

@@ -173,11 +173,13 @@ void view_show_cursor(ViewIface *obj)
  * The iterator does not need to be freed. It becomes invalid if the
  * view is changed in any way.
  */
-void view_get_iter(ViewIface *obj, ViewIter *iter, ViewForeach type)
+void view_get_iter(ViewIface *obj, ViewIter *iter, int flags)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 
-	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter, type);
+	iter->flags = flags;
+
+	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter);
 }
 
 /* Position cursor on the last item returned by iter.next() */

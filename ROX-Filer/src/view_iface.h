@@ -11,12 +11,10 @@
 
 #include <glib-object.h>
 
-typedef enum {
-	VIEW_FOREACH_ALL,	/* Start to finish */
-	VIEW_FOREACH_SELECTED	/* Start to finish, selected items only */
-} ViewForeach;
+enum {
+	VIEW_ITER_SELECTED = 1 << 0,
+};
 
-typedef struct _ViewIface	ViewIface;
 typedef struct _ViewIfaceClass	ViewIfaceClass;
 typedef struct _ViewIter	ViewIter;
 
@@ -25,8 +23,8 @@ struct _ViewIter {
 
 	/* private fields */
 	Collection *collection;
-	int	   i;
-	ViewForeach type;
+	int	   i, n_remaining;
+	int	   flags;
 };
 
 struct _ViewIfaceClass {
@@ -46,7 +44,7 @@ struct _ViewIfaceClass {
 	int (*count_selected)(ViewIface *obj);
 	void (*show_cursor)(ViewIface *obj);
 
-	void (*get_iter)(ViewIface *obj, ViewIter *iter, ViewForeach type);
+	void (*get_iter)(ViewIface *obj, ViewIter *iter);
 	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
 };
 
@@ -82,7 +80,7 @@ int view_count_items(ViewIface *obj);
 int view_count_selected(ViewIface *obj);
 void view_show_cursor(ViewIface *obj);
 
-void view_get_iter(ViewIface *obj, ViewIter *iter, ViewForeach type);
+void view_get_iter(ViewIface *obj, ViewIter *iter, int flags);
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
 
 #endif /* __VIEW_IFACE_H__ */
