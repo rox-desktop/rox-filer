@@ -185,7 +185,7 @@ static void open_item(Collection *collection,
 		gpointer user_data);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static void set_autoselect(FilerWindow *filer_window, guchar *leaf);
-static FilerWindow *find_filer_window(char *path);
+static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
 static void filer_set_title(FilerWindow *filer_window);
 static gboolean exists(FilerWindow *filer_window);
 
@@ -644,8 +644,8 @@ char *details(DirItem *item)
 	if (!buf)
 		buf = g_string_new(NULL);
 
-	g_string_sprintf(buf, "%s %s %8s %8s %s %s",
-				item->flags & ITEM_FLAG_APPDIR? "App  " :
+	g_string_sprintf(buf, "%s %s %-8.8s %-8.8s %s %s",
+				item->flags & ITEM_FLAG_APPDIR? "App " :
 			        S_ISDIR(m) ? "Dir " :
 				S_ISCHR(m) ? "Char" :
 				S_ISBLK(m) ? "Blck" :
@@ -751,7 +751,7 @@ static void show_menu(Collection *collection, GdkEventButton *event,
 	show_filer_menu((FilerWindow *) user_data, event, item);
 }
 
-/* Returns TRUE iff the directory still exits. */
+/* Returns TRUE iff the directory still exists. */
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 {
 	Directory *dir;
@@ -1254,8 +1254,8 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	{
 		FilerWindow *fw;
 		
-		fw = find_filer_window(real_path);
-		if (fw && fw != filer_window)
+		fw = find_filer_window(real_path, filer_window);
+		if (fw)
 			gtk_widget_destroy(fw->window);
 	}
 
@@ -1427,7 +1427,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	{
 		FilerWindow *fw;
 		
-		fw = find_filer_window(real_path);
+		fw = find_filer_window(real_path, NULL);
 		
 		if (fw)
 		{
@@ -1509,7 +1509,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 			sizeof(target_table) / sizeof(*target_table));
 
 	filer_style_set(filer_window, last_display_style);
-	drag_set_dest(collection);
+	drag_set_dest(filer_window);
 
 	if (panel_type)
 	{
@@ -1940,8 +1940,10 @@ void full_refresh(void)
 	mount_update(TRUE);
 }
 
-/* See whether a filer window with a given path already exists */
-static FilerWindow *find_filer_window(char *path)
+/* See whether a filer window with a given path already exists
+ * and is different from diff.
+ */
+static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 {
 	GList	*next = all_filer_windows;
 
@@ -1949,8 +1951,9 @@ static FilerWindow *find_filer_window(char *path)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
-		if (filer_window->panel_type == PANEL_NO
-		    && strcmp(path, filer_window->path) == 0)
+		if (filer_window->panel_type == PANEL_NO &&
+			filer_window != diff &&
+		    	strcmp(path, filer_window->path) == 0)
 		{
 			return filer_window;
 		}
@@ -1961,7 +1964,7 @@ static FilerWindow *find_filer_window(char *path)
 	return NULL;
 }
 
-/* This path has been mounted/umounted - update all dirs */
+/* This path has been mounted/umounted/deleted some files - update all dirs */
 void filer_check_mounted(char *path)
 {
 	GList	*next = all_filer_windows;

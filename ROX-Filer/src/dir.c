@@ -24,6 +24,7 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 
+#include "main.h"
 #include "support.h"
 #include "gui_support.h"
 #include "dir.h"
@@ -341,14 +342,18 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	new.flags = 0;
 	new.mime_type = NULL;
 	new.image = NULL;
-	new.size = 0;
-	new.mode = 0;
-	new.mtime = 0;
 
 	tmp = make_path(dir->pathname, ent->d_name);
 	
 	if (mc_lstat(tmp->str, &info) == -1)
+	{
 		new.base_type = TYPE_ERROR;
+		new.size = 0;
+		new.mode = 0;
+		new.mtime = 0;
+		new.uid = noaccess_uid;
+		new.gid = noaccess_gid;
+	}
 	else
 	{
 		new.size = info.st_size;

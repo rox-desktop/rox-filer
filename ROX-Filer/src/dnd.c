@@ -36,6 +36,7 @@
 #include <gtk/gtk.h>
 #include "collection.h"
 
+#include "dnd.h"
 #include "filer.h"
 #include "action.h"
 #include "pixmaps.h"
@@ -90,6 +91,7 @@ static void update_options();
 static void set_options();
 static void save_options();
 static char *load_no_hostnames(char *data);
+static char *drag_to_icons(char *data);
 
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
@@ -128,12 +130,15 @@ void dnd_init()
 
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("dnd_no_hostnames", load_no_hostnames);
+	option_register("dnd_drag_to_icons", drag_to_icons);
 }
 
 /*				OPTIONS				*/
 
 static gboolean o_no_hostnames = FALSE;
+static gboolean o_drag_to_icons = TRUE;
 static GtkWidget *toggle_no_hostnames;
+static GtkWidget *toggle_drag_to_icons;
 
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
@@ -156,6 +161,11 @@ static GtkWidget *create_options()
 		gtk_check_button_new_with_label("Don't use hostnames");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_no_hostnames, FALSE, TRUE, 0);
 
+	toggle_drag_to_icons =
+		gtk_check_button_new_with_label("Allow dragging to icons in "
+						"filer windows");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_drag_to_icons, FALSE, TRUE, 0);
+
 	return vbox;
 }
 
@@ -163,22 +173,33 @@ static void update_options()
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_no_hostnames),
 			o_no_hostnames);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_drag_to_icons),
+			o_drag_to_icons);
 }
 
 static void set_options()
 {
 	o_no_hostnames = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_no_hostnames));
+	o_drag_to_icons = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_drag_to_icons));
 }
 
 static void save_options()
 {
 	option_write("dnd_no_hostnames", o_no_hostnames ? "1" : "0");
+	option_write("dnd_drag_to_icons", o_drag_to_icons ? "1" : "0");
 }
 
 static char *load_no_hostnames(char *data)
 {
 	o_no_hostnames = atoi(data) != 0;
+	return NULL;
+}
+
+static char *drag_to_icons(char *data)
+{
+	o_drag_to_icons = atoi(data) != 0;
 	return NULL;
 }
 
@@ -439,8 +460,9 @@ void drag_data_get(GtkWidget          		*widget,
 /* Set up this filer window as a drop target. Called once, when the
  * filer window is first created.
  */
-void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
+void drag_set_dest(FilerWindow *filer_window)
 {
+	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
@@ -484,7 +506,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_val_if_fail(filer_window != NULL, TRUE);
 
-	item_number = collection_get_item(filer_window->collection, x, y);
+	if (o_drag_to_icons || filer_window->panel_type != PANEL_NO)
+		item_number = collection_get_item(filer_window->collection,
+							x, y);
+	else
+		item_number = -1;
 
 	item = item_number >= 0
 		? (DirItem *) filer_window->collection->items[item_number].data
@@ -911,7 +937,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		else if (context->action == GDK_ACTION_MOVE)
 			action_move(local_paths, dest_path);
 		else if (context->action == GDK_ACTION_COPY)
-			action_copy(local_paths, dest_path);
+			action_copy(local_paths, dest_path, NULL);
 		else if (context->action == GDK_ACTION_LINK)
 			action_link(local_paths, dest_path);
 		else

@@ -120,6 +120,7 @@ static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
 static GString  *message = NULL;
 static char     *action_dest = NULL;
+static char     *action_leaf = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
 static DirItem 	*mount_item;
@@ -357,8 +358,8 @@ static gboolean is_sub_dir(char *sub, char *parent)
 		 * characters upto real_parent's length match.
 		 */
 
-		retval = real_sub[parent_len] == 0
-			|| real_sub[parent_len] == '/';
+		retval = real_sub[parent_len] == '\0' ||
+			 real_sub[parent_len] == '/';
 	}
 
 	g_free(real_sub);
@@ -925,7 +926,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	}
 	else if (!o_brief)
 	{
-		g_string_sprintf(message, "'Removing '%s'\n", src_path);
+		g_string_sprintf(message, "'Deleting '%s'\n", src_path);
 		send();
 	}
 
@@ -942,6 +943,8 @@ static gboolean do_delete(char *src_path, char *dest_path)
 		}
 		g_string_sprintf(message, "'Directory '%s' deleted\n",
 				safe_path);
+		send();
+		g_string_sprintf(message, "m%s", safe_path);
 		send();
 		g_free(safe_path);
 	}
@@ -1021,23 +1024,40 @@ static gboolean do_chmod(char *path, char *dummy)
 	return TRUE;
 }
 
+/* We want to copy 'object' into directory 'dir'. If 'action_leaf'
+ * is set then that is the new leafname, otherwise the leafname stays
+ * the same.
+ */
+static char *make_dest_path(char *object, char *dir)
+{
+	char *leaf;
+
+	if (action_leaf)
+		leaf = action_leaf;
+	else
+	{
+		leaf = strrchr(object, '/');
+		if (!leaf)
+			leaf = object;		/* Error? */
+		else
+			leaf++;
+	}
+
+	return make_path(dir, leaf)->str;
+}
+
+/* If action_leaf is not NULL it specifies the new leaf name
+ */
 static gboolean do_copy2(char *path, char *dest)
 {
 	char		*dest_path;
-	char		*leaf;
 	struct stat 	info;
 	struct stat 	dest_info;
 	gboolean	retval = TRUE;
 
 	check_flags();
 
-	leaf = strrchr(path, '/');
-	if (!leaf)
-		leaf = path;		/* Error? */
-	else
-		leaf++;
-
-	dest_path = make_path(dest, leaf)->str;
+	dest_path = make_dest_path(path, dest);
 
 	if (lstat(path, &info))
 	{
@@ -1122,7 +1142,8 @@ static gboolean do_copy2(char *path, char *dest)
 				g_string_sprintf(message, "+%s", dest);
 				send();
 			}
-			
+
+			action_leaf = NULL;
 			for_dir_contents(do_copy2, safe_path, safe_dest);
 			/* Note: dest_path now invalid... */
 		}
@@ -1178,7 +1199,7 @@ static gboolean do_copy2(char *path, char *dest)
  */
 static gboolean do_copy(char *path, char *dest)
 {
-	if (is_sub_dir(dest, path))
+	if (is_sub_dir(make_dest_path(path, dest), path))
 	{
 		g_string_sprintf(message,
 				"!ERROR: Can't copy directory into itself\n");
@@ -1197,6 +1218,8 @@ static gboolean do_move(char *path, char *dest)
 	char		*leaf;
 	gboolean	retval = TRUE;
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
+	struct stat	info2;
+	gboolean	is_dir;
 
 	if (is_sub_dir(dest, path))
 	{
@@ -1215,6 +1238,8 @@ static gboolean do_move(char *path, char *dest)
 		leaf++;
 
 	dest_path = make_path(dest, leaf)->str;
+
+	is_dir = lstat(path, &info2) == 0 && S_ISDIR(info2.st_mode);
 
 	if (access(dest_path, F_OK) == 0)
 	{
@@ -1268,14 +1293,18 @@ static gboolean do_move(char *path, char *dest)
 		g_string_sprintf(message, "+%s", path);
 		g_string_truncate(message, leaf - path);
 		send();
+		if (is_dir) {
+			g_string_sprintf(message, "m%s", path);
+			send();
+		}
 	}
 	else
 	{
 		g_string_sprintf(message, "!ERROR: Failed to move %s as %s\n",
 				path, dest_path);
+		send();
 		retval = FALSE;
 	}
-	send();
 
 	return retval;
 }
@@ -1321,20 +1350,22 @@ static gboolean do_link(char *path, char *dest)
 static void do_mount(FilerWindow *filer_window, DirItem *item)
 {
 	char		*argv[3] = {NULL, NULL, NULL};
+	char		*action;
 
 	check_flags();
 
 	argv[0] = item->flags & ITEM_FLAG_MOUNTED ? "umount" : "mount";
+	action = item->flags & ITEM_FLAG_MOUNTED ? "Unmount" : "Mount";
 	argv[1] = make_path(filer_window->path, item->leafname)->str;
 
 	if (quiet)
 	{
-		g_string_sprintf(message, "'%sing %s\n", argv[0], argv[1]);
+		g_string_sprintf(message, "'%sing %s\n", action, argv[1]);
 		send();
 	}
 	else
 	{
-		g_string_sprintf(message, "?%s %s?", argv[0], argv[1]);
+		g_string_sprintf(message, "?%s %s?", action, argv[1]);
 		if (!reply(from_parent, FALSE))
 			return;
 	}
@@ -1348,7 +1379,7 @@ static void do_mount(FilerWindow *filer_window, DirItem *item)
 	}
 	else
 	{
-		g_string_sprintf(message, "!ERROR: %s failed\n", argv[0]);
+		g_string_sprintf(message, "!ERROR: %s failed\n", action);
 		send();
 	}
 }
@@ -1665,11 +1696,12 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
-void action_copy(GSList *paths, char *dest)
+void action_copy(GSList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
 
 	action_dest = dest;
+	action_leaf = leaf;
 	action_do_func = do_copy;
 	gui_side = start_action(paths, list_cb, o_auto_copy);
 	if (!gui_side)

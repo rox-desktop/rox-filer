@@ -28,6 +28,8 @@
 #include <sys/wait.h>
 #include <unistd.h>
 #include <fcntl.h>
+#include <pwd.h>
+#include <grp.h>
 
 #ifdef HAVE_GETOPT_LONG
 #  include <getopt.h>
@@ -59,6 +61,8 @@ gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
 char *home_dir;
+uid_t noaccess_uid;	/* Used when stat() fails */
+gid_t noaccess_gid;	/* Used when stat() fails */
 
 #define VERSION "ROX-Filer 0.1.16\n"					\
 		"Copyright (C) 1999 Thomas Leonard.\n"			\
@@ -159,8 +163,16 @@ int main(int argc, char **argv)
 	struct sigaction act;
 	GList		*panel_dirs = NULL;
 	GList		*panel_sides = NULL;
+	struct passwd	*pw;
+	struct group	*gr;
 
 	home_dir = g_get_home_dir();
+
+	pw = getpwnam("noaccess");
+	noaccess_uid = pw? pw->pw_uid : 0;
+
+	gr = getgrnam("noaccess");
+	noaccess_gid = gr? gr->gr_gid : 0;
 
 #ifdef HAVE_LIBVFS
 	mc_vfs_init();

@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <sys/types.h>
 #include <sys/wait.h>
+#include <sys/param.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <errno.h>
@@ -636,45 +637,36 @@ static void chmod_items(gpointer data, guint action, GtkWidget *widget)
 
 static gboolean copy_cb(char *initial, char *path)
 {
-	char	*new_dir, *slash;
-	int	len;
-	GString	*command;
-	gboolean retval = TRUE;
+	char	*new_dir, *leaf;
+	GSList	*local_paths;
 
-	slash = strrchr(path, '/');
-	if (!slash)
+	if (path[0] != '/')
 	{
-		report_error("ROX-Filer", "Missing '/' in new pathname");
+		report_error("ROX-Filer", "New pathname is not absolute");
 		return FALSE;
 	}
 
-	if (access(path, F_OK) == 0)
+	if (path[strlen(path) - 1] == '/')
 	{
-		report_error("ROX-Filer",
-				"An item with this name already exists");
-		return FALSE;
+		new_dir = g_strdup(path);
+		leaf = NULL;
+	}
+	else
+	{
+		char *slash;
+		
+		slash = strrchr(path, '/');
+		new_dir = g_strndup(path, slash - path);
+		leaf = slash + 1;
 	}
 
-	len = slash - path;
-	new_dir = g_malloc(len + 1);
-	memcpy(new_dir, path, len);
-	new_dir[len] = '\0';
+	local_paths = g_slist_append(NULL, initial);
+	action_copy(local_paths, new_dir, leaf);
+	g_slist_free(local_paths);
 
-	command = g_string_new(NULL);
-	g_string_sprintf(command, "cp -a %s %s", initial, path);
-	/* XXX: Use system. In fact, use action! */
+	g_free(new_dir);
 
-	if (system(command->str))
-	{
-		g_string_append(command, " failed!");
-		report_error("ROX-Filer", command->str);
-		retval = FALSE;
-	}
-
-	g_string_free(command, TRUE);
-
-	refresh_dirs(new_dir);
-	return retval;
+	return TRUE;
 }
 
 static void copy_item(gpointer data, guint action, GtkWidget *widget)
@@ -887,7 +879,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	table = gtk_table_new(9, 2, FALSE);
+	table = gtk_table_new(10, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
@@ -913,8 +905,9 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	}
 	else
 	{
-		g_string_sprintf(gstring, "%ld bytes",
-				(unsigned long) info.st_size);
+		g_string_sprintf(gstring, "%ld byte%s",
+				(unsigned long) info.st_size,
+				info.st_size == 1 ? "" : "s");
 	}
 	label = gtk_label_new(gstring->str);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
@@ -969,8 +962,45 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 6, 7);
 
+	label = gtk_label_new("Special:");
+	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 7, 8);
+	if (file->flags & ITEM_FLAG_APPDIR)
+		string = g_strdup("ROX application");
+	else if (file->flags & ITEM_FLAG_SYMLINK)
+	{
+		char	p[MAXPATHLEN + 1];
+		int	got;
+		got = readlink(path, p, MAXPATHLEN);
+		if (got > 0 && got <= MAXPATHLEN)
+		{
+			p[got] = '\0';
+			string = g_strconcat("Symbolic link to ", p, NULL);
+		}
+		else
+			string = g_strdup("Symbolic link");
+	}
+	else if (file->flags & ITEM_FLAG_MOUNT_POINT)
+	{
+		MountPoint *mp;
+		if ((file->flags & ITEM_FLAG_MOUNTED) &&
+			(mp = g_hash_table_lookup(mtab_mounts, path)))
+			string = g_strconcat("Mount point for ",
+						mp->name, NULL);
+		else
+			string = g_strdup("Mount point");
+	}
+	else
+	{
+		string = g_strdup("-");
+	}
+	label = gtk_label_new(string);
+	g_free(string);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 7, 8);
+
 	frame = gtk_frame_new("file(1) says...");
-	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 7, 8);
+	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 8, 9);
 	file_label = gtk_label_new("<nothing yet>");
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
 	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
@@ -978,7 +1008,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	
 	button = gtk_button_new_with_label("OK");
 	gtk_window_set_focus(GTK_WINDOW(window), button);
-	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 8, 9,
+	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 9, 10,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(window));

@@ -10,6 +10,7 @@
 
 #include <gtk/gtk.h>
 #include "collection.h"
+#include "filer.h"
 
 void drag_selection(Collection 		*collection,
 		    GdkEventMotion 	*event,
@@ -20,7 +21,7 @@ void drag_data_get(GtkWidget          *widget,
 		   GtkSelectionData   *selection_data,
 		   guint               info,
 		   guint32             time);
-void drag_set_dest(GtkWidget *widget);
+void drag_set_dest(FilerWindow *filer_window);
 void dnd_init();
 GtkWidget *create_dnd_options();
 
