@@ -902,6 +902,13 @@ static void group_restore(FilerWindow *filer_window, char *name)
 	g_hash_table_destroy(in_group);
 }
 
+static gboolean popup_menu(GtkWidget *widget, FilerWindow *filer_window)
+{
+	show_filer_menu(filer_window, NULL,
+			filer_window->collection->cursor_item);
+	return TRUE;
+}
+
 /* Handle keys that can't be bound with the menu */
 static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
@@ -1374,6 +1381,8 @@ static void filer_add_signals(FilerWindow *filer_window)
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
 
+	g_signal_connect(filer_window->window, "popup-menu",
+			G_CALLBACK(popup_menu), filer_window);
 	g_signal_connect(filer_window->window, "key_press_event",
 			G_CALLBACK(key_press_event), filer_window);
 }

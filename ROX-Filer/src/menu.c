@@ -690,6 +690,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	window_with_focus = filer_window;
 
+	if (!event)
+		event = gtk_get_current_event();
+
 	if (event->type == GDK_BUTTON_PRESS)
 		state = ((GdkEventButton *) event)->state;
 	else if (event->type == GDK_KEY_PRESS)
