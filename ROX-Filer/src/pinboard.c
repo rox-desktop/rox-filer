@@ -221,6 +221,7 @@ static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
 static void clear_backdrop(GtkWidget *drop_box, gpointer data);
 static void radios_changed(gpointer data);
+static void update_radios(GtkWidget *dialog);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -583,7 +584,7 @@ void pinboard_set_backdrop(void)
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-	label = gtk_label_new(_("Choose a style, then drag an image in:"));
+	label = gtk_label_new(_("Choose a style and drag an image in:"));
 	gtk_misc_set_padding(GTK_MISC(label), 4, 0);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
 	gtk_box_pack_start(vbox, label, TRUE, TRUE, 4);
@@ -594,6 +595,7 @@ void pinboard_set_backdrop(void)
 
 	radios = radios_new(radios_changed, dialog);
 	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
+	g_object_set_data(G_OBJECT(dialog), "rox-radios-hbox", hbox);
 
 	radios_add(radios, _("Centre the image without scaling it"),
 			BACKDROP_CENTRE, _("Centre"));
@@ -605,19 +607,7 @@ void pinboard_set_backdrop(void)
 	radios_add(radios, _("Tile the image over the backdrop area"),
 			BACKDROP_TILE, _("Tile"));
 
-	switch (current_pinboard->backdrop_style)
-	{
-		case BACKDROP_TILE:
-		case BACKDROP_STRETCH:
-		case BACKDROP_SCALE:
-		case BACKDROP_CENTRE:
-			radios_set_value(radios,
-					 current_pinboard->backdrop_style);
-			break;
-		default:
-			radios_set_value(radios, BACKDROP_TILE);
-			break;
-	}
+	update_radios(dialog);
 	
 	/* The drop area... */
 	frame = drop_box_new(_("Drop an image here"));
@@ -764,10 +754,9 @@ static void pinboard_check_options(void)
 			gdk_gc_set_rgb_fg_color(current_pinboard->shadow_gc,
 					&n_shadow);
 
-			/* Only redraw the background if there is no image */
-			if (!current_pinboard->backdrop)
-				reload_backdrop(current_pinboard,
-						NULL, BACKDROP_NONE);
+			reload_backdrop(current_pinboard,
+					current_pinboard->backdrop,
+					current_pinboard->backdrop_style);
 			
 			reshape_all();
 		}
@@ -2022,7 +2011,9 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 		pixbuf = gdk_pixbuf_new(
 				gdk_pixbuf_get_colorspace(pixbuf), FALSE,
 				8, screen_width, screen_height);
-		gdk_pixbuf_fill(pixbuf, 0);
+		gdk_pixbuf_fill(pixbuf, ((pin_text_bg_col.red & 0xff00) << 16) |
+					((pin_text_bg_col.green & 0xff00) << 8) |
+					((pin_text_bg_col.blue & 0xff00)));
 
 		x = (screen_width - width * scale) / 2;
 		y = (screen_height - height * scale) / 2;
@@ -2286,7 +2277,7 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 							  "rox-dropbox");
 		g_return_if_fail(box != NULL);
 		drop_box_set_path(box, current_pinboard->backdrop);
-		/* TODO set style too? */
+		update_radios(set_backdrop_dialog);
 	}
 }
 
@@ -2431,5 +2422,36 @@ static void radios_changed(gpointer data)
 		path = drop_box_get_path(drop_box);
 		if (path)
 			set_backdrop(path, radios_get_value(radios));
+	}
+}
+
+static void update_radios(GtkWidget *dialog)
+{
+	Radios *radios;
+	GtkWidget *hbox;
+
+	g_return_if_fail(dialog != NULL);
+
+	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
+	hbox = g_object_get_data(G_OBJECT(dialog), "rox-radios-hbox");
+
+	g_return_if_fail(current_pinboard != NULL);
+	g_return_if_fail(radios != NULL);
+	g_return_if_fail(hbox != NULL);
+
+	switch (current_pinboard->backdrop_style)
+	{
+		case BACKDROP_TILE:
+		case BACKDROP_STRETCH:
+		case BACKDROP_SCALE:
+		case BACKDROP_CENTRE:
+			radios_set_value(radios,
+					 current_pinboard->backdrop_style);
+			gtk_widget_set_sensitive(hbox, TRUE);
+			break;
+		default:
+			gtk_widget_set_sensitive(hbox, FALSE);
+			radios_set_value(radios, BACKDROP_TILE);
+			break;
 	}
 }
