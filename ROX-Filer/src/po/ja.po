@@ -1,15 +1,18 @@
+# translation of rox-0529-ja.po to
 # translation of rox-ja.po to Japanese
 # UTUMI Hirosi, 2003
+# UTUMI Hirosi <utuhiro@mx12.freecom.ne.jp>, 2003
 msgid ""
 msgstr ""
 "Project-Id-Version: rox-ja\n"
-"POT-Creation-Date: 2003-05-22 14:04+0100\n"
-"PO-Revision-Date: 2003-05-06 23:15--900\n"
+"POT-Creation-Date: 2003-05-24 11:46+0200\n"
+"PO-Revision-Date: 2003-05-30 01:13+0900\n"
 "Last-Translator: UTUMI Hirosi <*>\n"
 "Language-Team: Japanese <ja@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"X-Generator: KBabel 1.0.1\n"
 
 #: abox.c:124
 msgid "<dir>"
@@ -189,12 +192,12 @@ msgstr ""
 
 #: action.c:367
 msgid "There was one error.\n"
-msgstr "There was one error.\n"
+msgstr "1 個のエラーが発生しました\n"
 
 #: action.c:369
 #, c-format
 msgid "There were %d errors.\n"
-msgstr "There were %d errors.\n"
+msgstr "%d 個のエラーが発生しました\n"
 
 #: action.c:393
 msgid "ERROR reading"
@@ -267,7 +270,7 @@ msgstr "?'%s'を調べますか?"
 
 #: action.c:924
 msgid "!Invalid find condition - change it and try again\n"
-msgstr "!Invalid find condition - change it and try again\n"
+msgstr "!不正な設定の検索です - 変更してやりなおしてください\n"
 
 #: action.c:934
 #, c-format
@@ -286,7 +289,7 @@ msgstr "''%s'の権限を変更\n"
 
 #: action.c:1026
 msgid "!Invalid mode command - change it and try again\n"
-msgstr "!Invalid mode command - change it and try again\n"
+msgstr "!不正なモードのコマンドです - 変更してやりなおしてください\n"
 
 #: action.c:1116
 #, c-format
@@ -326,7 +329,7 @@ msgid ""
 "Failed to copy '%s'\n"
 msgstr ""
 "!%s\n"
-"Failed to copy '%s'\n"
+"'%s'のコピーに失敗しました\n"
 
 #: action.c:1273
 #, c-format
@@ -358,11 +361,11 @@ msgstr ""
 
 #: action.c:1326
 msgid "!ERROR: Can't copy object into itself\n"
-msgstr "!ERROR: Can't copy object into itself\n"
+msgstr "エラー: 対象そのものにコピーすることはできません\n"
 
 #: action.c:1341
 msgid "!ERROR: Can't move/rename object into itself\n"
-msgstr "!ERROR: Can't move/rename object into itself\n"
+msgstr "!エラー: 対象そのものに移動/リネームすることはできません\n"
 
 #: action.c:1358
 #, c-format
@@ -401,7 +404,7 @@ msgid ""
 "Mount failed\n"
 msgstr ""
 "!%s\n"
-"Mount failed\n"
+"マウントに失敗しました\n"
 
 #: action.c:1407
 #, c-format
@@ -410,7 +413,7 @@ msgid ""
 "Unmount failed\n"
 msgstr ""
 "!%s\n"
-"Unmount failed\n"
+"アンマウントに失敗しました\n"
 
 #: action.c:1446
 #, c-format
@@ -443,7 +446,7 @@ msgstr "ディレクトリ"
 
 #: action.c:1499
 msgid "!No mount points selected!\n"
-msgstr "!No mount points selected!\n"
+msgstr "!マウントポイントを選んでいません\n"
 
 #: action.c:1553
 msgid "?Another search?"
@@ -452,7 +455,7 @@ msgstr "?別の検索を行いますか?"
 #: action.c:1575
 #, c-format
 msgid "!'%s' is a symbolic link\n"
-msgstr "!'%s' is a symbolic link\n"
+msgstr "!'%s'はシンボリックリンクです\n"
 
 #: action.c:1607
 msgid "You need to select some items to search through"
@@ -476,7 +479,7 @@ msgstr "マウント/アンマウント"
 
 #: action.c:1700
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Filer does not yet support mount points on your system. Sorry."
+msgstr "ROX-Filerはお使いのシステムのマウントポイントをサポートしていません"
 
 #: action.c:1714 menu.c:209 tips:189
 msgid "Delete"
@@ -665,10 +668,8 @@ msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 
 #: dnd.c:601
-msgid ""
-"Sorry - I require a target type of text/uri-list or application/octet-stream."
-msgstr ""
-"Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgid "Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgstr "Sorry - I require a target type of text/uri-list or application/octet-stream."
 
 #: dnd.c:700
 msgid "Unknown target"
@@ -693,24 +694,21 @@ msgstr "UntitledData"
 #: dnd.c:822
 #, c-format
 msgid "Error saving file: %s"
-msgstr "Error saving file: %s"
+msgstr "ファイルを保存中にエラー: %s"
 
 #: dnd.c:863
 msgid "No URIs in the text/uri-list (nothing to do!)"
-msgstr "No URIs in the text/uri-list (nothing to do!)"
+msgstr "text/uri-listにURIがありません(することがありません)"
 
 #: dnd.c:887
-msgid ""
-"Can't get data from remote machine (application/octet-stream not provided)"
+msgid "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "リモートマシンからデータを取得できません(application/octet-stream not "
 "provided)"
 
 #: dnd.c:908
-msgid ""
-"Some of these files are on a different machine - they will be ignored - sorry"
-msgstr ""
-"Some of these files are on a different machine - they will be ignored - sorry"
+msgid "Some of these files are on a different machine - they will be ignored - sorry"
+msgstr "Some of these files are on a different machine - they will be ignored - sorry"
 
 #: dnd.c:915
 msgid ""
@@ -751,12 +749,12 @@ msgstr ""
 
 #: dropbox.c:266
 msgid "Sorry, you need to drop exactly one file onto the drop area."
-msgstr "Sorry, you need to drop exactly one file onto the drop area."
+msgstr "正しく１つのファイルをドロップエリアにドロップしてください"
 
 #: dropbox.c:276
 #, c-format
 msgid "Sorry, I can't use '%s' because it's not a local file."
-msgstr "Sorry, I can't use '%s' because it's not a local file."
+msgstr "ローカルファイルではないので'%s'を使えません。"
 
 #: dropbox.c:283 pinboard.c:690
 #, c-format
@@ -791,9 +789,9 @@ msgid ""
 "\n"
 "Unmounting a device makes it safe to remove the disk."
 msgstr ""
-"Do you want to unmount this device?\n"
+"このデバイスをアンマウントしますか？\n"
 "\n"
-"Unmounting a device makes it safe to remove the disk."
+"デバイスをアンマウントすると安全にディスクを取り出すことができます"
 
 #: filer.c:383 menu.c:831
 msgid "Unmount"
@@ -838,7 +836,7 @@ msgstr "A"
 
 #: filer.c:1673
 msgid "T"
-msgstr "I"
+msgstr "T"
 
 #: filer.c:1679
 msgid "Scanning, "
@@ -858,7 +856,7 @@ msgstr "以下へのシンボリックリンク "
 
 #: filer.c:1981
 msgid "This filename is not valid UTF-8. You should rename it.\n"
-msgstr "This filename is not valid UTF-8. You should rename it.\n"
+msgstr "不正なUTF-8のファイル名です。リネームしてください\n"
 
 #: filer.c:2285 menu.c:1822
 msgid "Item no longer exists!"
@@ -1081,8 +1079,8 @@ msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
 msgstr ""
-"Drag the icon to a directory viewer\n"
-"(or enter a full pathname)"
+"ディレクトリビューアにアイコンをドラッグ\n"
+"(もしくはフルパスを入力)"
 
 #: gui_support.c:292
 msgid ""
@@ -1095,8 +1093,7 @@ msgstr ""
 #: gui_support.c:361
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
-msgstr ""
-"Attempt to read an XML file as a text file. File '%s' may be corrupted."
+msgstr "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 
 #: gui_support.c:378
 #, c-format
@@ -1122,6 +1119,8 @@ msgid ""
 "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
 "2.0 but is running with GTK+-2.2. Please recompile it."
 msgstr ""
+"Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK+-"
+"2.0 but is running with GTK+-2.2. Please recompile it."
 
 #: i18n.c:38
 msgid ""
@@ -1216,11 +1215,11 @@ msgstr "まず削除するアイテムを選んでください"
 
 #: icon.c:591
 msgid "You must open the menu over an item"
-msgstr "You must open the menu over an item"
+msgstr "メニューはアイテムの上で開いてください"
 
 #: icon.c:619 menu.c:1193
 msgid "You can only set the run action for a regular file"
-msgstr "You can only set the run action for a regular file"
+msgstr "「実行」はレギュラーファイルにのみ設定できます"
 
 #: icon.c:705
 msgid "Press the desired shortcut (eg, Control+F1)"
@@ -1228,7 +1227,7 @@ msgstr "ショートカットを入力してください(例: Control+F1)"
 
 #: icon.c:727
 msgid "Failed to get keyboard grab!"
-msgstr "Failed to get keyboard grab!"
+msgstr "キー入力の取得に失敗"
 
 #: icon.c:776
 msgid "Clicking the icon opens:"
@@ -1245,7 +1244,7 @@ msgstr "キーボードのショートカット:"
 #: infobox.c:91
 #, c-format
 msgid "Are you sure you want to open %d windows?"
-msgstr "Are you sure you want to open %d windows?"
+msgstr "本当に %d 個のウィンドウを開きますか？"
 
 #: infobox.c:92
 msgid "Show Info"
@@ -1345,7 +1344,7 @@ msgstr "%s (%s)のマウントポイント"
 #: infobox.c:646
 #, c-format
 msgid "Mount point (%s)"
-msgstr "Point de montage (%s)"
+msgstr "マウントポイント(%s)"
 
 #: main.c:93
 msgid ""
@@ -1377,8 +1376,8 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
-"NOTE: Your system does not support long options - \n"
-"you must use the short versions instead.\n"
+"注意: お使いのシステムはロングオプションをサポートしていません - \n"
+"ショートバージョンを使ってください\n"
 "\n"
 
 #: main.c:111
@@ -1447,12 +1446,12 @@ msgstr "ユーザ'%s'で実行"
 #: main.c:571
 #, c-format
 msgid "Compiled with GTK version %s\n"
-msgstr "Compiled with GTK version %s\n"
+msgstr "GTKバージョン %s でコンパイル\n"
 
 #: main.c:572
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
-msgstr "Running with GTK version %d.%d.%d\n"
+msgstr "GTKバージョン %d.%d.%d で実行\n"
 
 #: main.c:576
 msgid "features set at compile time"
@@ -1845,11 +1844,11 @@ msgstr "検索する"
 
 #: menu.c:1760
 msgid "Look inside ... ?"
-msgstr "Look inside ... ?"
+msgstr "中を見る"
 
 #: menu.c:1805
 msgid "You cannot do this to more than one item at a time"
-msgstr "You cannot do this to more than one item at a time"
+msgstr "複数アイテムを同時に処理することはできません"
 
 #: menu.c:1837
 msgid "Rename"
@@ -1919,10 +1918,8 @@ msgstr ""
 "the longest match. Escape to close the minibuffer."
 
 #: minibuffer.c:250
-msgid ""
-"Enter a shell command to execute. Click on a file to add it to the buffer."
-msgstr ""
-"Enter a shell command to execute. Click on a file to add it to the buffer."
+msgid "Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr "Enter a shell command to execute. Click on a file to add it to the buffer."
 
 #: minibuffer.c:820
 msgid "Invalid Find condition"
@@ -2305,7 +2302,7 @@ msgstr ""
 
 #: support.c:272
 msgid "B"
-msgstr ""
+msgstr "B"
 
 #: support.c:351
 msgid "byte"
@@ -2432,11 +2429,11 @@ msgstr "Block dev"
 
 #: type.c:219
 msgid "Pipe"
-msgstr "Pipe"
+msgstr "パイプ"
 
 #: type.c:221
 msgid "Socket"
-msgstr "Socket"
+msgstr "ソケット"
 
 #: type.c:223
 msgid "Door"
@@ -2517,10 +2514,8 @@ msgid "Set run action"
 msgstr "関連づけを設定"
 
 #: type.c:816
-msgid ""
-"If a handler for the specific type isn't set up, use this as the default."
-msgstr ""
-"If a handler for the specific type isn't set up, use this as the default."
+msgid "If a handler for the specific type isn't set up, use this as the default."
+msgstr "If a handler for the specific type isn't set up, use this as the default."
 
 #: type.c:818
 #, c-format
@@ -2585,6 +2580,9 @@ msgid ""
 "should move it there (and make a symlink from ~/.mime to it for older "
 "applications)."
 msgstr ""
+"The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
+"should move it there (and make a symlink from ~/.mime to it for older "
+"applications)."
 
 #: type.c:1286
 msgid ""
@@ -2643,10 +2641,8 @@ msgid "Set icon"
 msgstr "アイコンを設定"
 
 #: usericons.c:277
-msgid ""
-"Use a copy of the image as the default for all files of these MIME types."
-msgstr ""
-"Use a copy of the image as the default for all files of these MIME types."
+msgid "Use a copy of the image as the default for all files of these MIME types."
+msgstr "Use a copy of the image as the default for all files of these MIME types."
 
 #: usericons.c:279
 #, c-format
@@ -2775,7 +2771,7 @@ msgstr "Hungarian"
 
 #: tips:12
 msgid "Japanese"
-msgstr ""
+msgstr "日本語"
 
 #: tips:13
 msgid "Norwegian"
@@ -2891,7 +2887,7 @@ msgstr ""
 
 #: tips:38
 msgid "New window on button 1"
-msgstr "第１ボタンで新しいウィンドウを開く"
+msgstr "左ボタンで新しいウィンドウを開く"
 
 #: tips:39
 msgid ""
@@ -2899,8 +2895,8 @@ msgid ""
 "a new window with this turned on. Clicking with the button-2 (middle) will "
 "reuse the current window."
 msgstr ""
-"第１ボタン(たいてい左ボタン)をクリックすると、ディレクトリを新しいウィンドウ"
-"で開く。第２ボタン(中ボタン)をクリックすると現在のウィンドウで開く。"
+"左ボタンをクリックすると、ディレクトリを新しいウィンドウで開く。"
+"中ボタンをクリックすると現在のウィンドウで開く。"
 
 #: tips:40
 msgid "Single-click navigation"
@@ -3150,8 +3146,8 @@ msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
 msgstr ""
-"When thumbnails are turned on, each image file in a directory is loaded and "
-"a small thumbnail of it is shown."
+"サムネールを有効にすると、ディレクトリ内の画像ファイルが小さなサムネールで"
+"表示されます。"
 
 #: tips:120
 msgid "Show image thumbnails"
@@ -3175,9 +3171,8 @@ msgid ""
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
 "will be created again as needed."
 msgstr ""
-"To speed things up, the generated thumbnails are stored in the hidden ~/."
-"thumbnails directory. Click here to remove all the cached thumbnails. They "
-"will be created again as needed."
+"速度を上げるため、生成したサムネールは隠しディレクトリ ~/.thumbnails に"
+"保存されます。ここをクリックすると保存したサムネールを削除します。"
 
 #: tips:125
 msgid "Pinboard"
@@ -3240,8 +3235,8 @@ msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
 msgstr ""
-"If this is set, pinboard icons are always kept completely within screen "
-"limits, including the label."
+"これを指定すると、デスクトップのアイコンがラベルも含めて常に画面内に収まるように"
+"なります。"
 
 #: tips:142
 msgid "Icon grid step:"
@@ -3359,10 +3354,8 @@ msgid "Image only for applications"
 msgstr "アプリケーションの場合はアイコンのみ"
 
 #: tips:171
-msgid ""
-"Applications have just an image, everything else has both an image and text."
-msgstr ""
-"Applications have just an image, everything else has both an image and text."
+msgid "Applications have just an image, everything else has both an image and text."
+msgstr "アプリケーションの場合はアイコンのみ。その他の場合はアイコンと文字の両方を表示。"
 
 #: tips:172
 msgid "Image only"
@@ -3553,15 +3546,15 @@ msgstr "動作"
 
 #: tips:238
 msgid "Menu on button 2 (RISC OS style)"
-msgstr "第２ボタン(中ボタン)でメニューを表示(RISC OS style)"
+msgstr "中ボタンでメニューを表示(RISC OS風)"
 
 #: tips:239
 msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
 msgstr ""
-"Use button 2, the middle button (click both buttons at once on two button "
-"mice), to pop up the menu. If off, use button 3 (right) instead."
+"中ボタンでポップアップメニューを表示する。オフにしている場合は右ボタンで"
+"ポップアップ。"
 
 #: tips:240
 msgid "`Xterm Here' program"
@@ -3598,7 +3591,6 @@ msgid "MIME types"
 msgstr "MIME types"
 
 #: tips:250
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. Use the MIME-"
@@ -3607,9 +3599,10 @@ msgid ""
 "http://rox.sourceforge.net/mime_editor.html"
 msgstr ""
 "The filer uses a set of rules to work out the correct MIME type for each "
-"regular file, and then chooses a suitable icon for that type. After editing "
-"the files, you must run the 'update-mime-database' command. Use the Refresh "
-"toolbar button to reload the new types."
+"regular file, and then chooses a suitable icon for that type. Use the MIME-"
+"Editor application to change the file-to-type guessing rules:\n"
+"\n"
+"http://rox.sourceforge.net/mime_editor.html"
 
 #: tips:251 tips:252
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
@@ -3641,11 +3634,11 @@ msgstr "一般ファイル:"
 
 #: tips:259
 msgid "Pipe:"
-msgstr "Pipe:"
+msgstr "パイプ:"
 
 #: tips:260
 msgid "Socket:"
-msgstr "Socket :"
+msgstr "ソケット:"
 
 #: tips:262 tips:263
 msgid ""
@@ -3727,7 +3720,7 @@ msgstr ""
 
 #: tips:277
 msgid "Blackbox root menus hack"
-msgstr ""
+msgstr "Blackboxのrootメニューの改善"
 
 #: tips:278 tips:279
 msgid ""
@@ -3736,6 +3729,10 @@ msgid ""
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
 msgstr ""
+"Blackbox系のウィンドウマネージャ(Fluxboxなど)ではROX-Filerのデスクトップが"
+"うまく動作しません。このオプションを有効にするといくらか改善されます。"
+"新版のウィンドウマネージャでは修正されるはずですので、そのときは"
+"不要になるでしょう。"
 
 #: tips:280
 msgid "Drag and drop"
@@ -3755,5 +3752,106 @@ msgstr ""
 "option turned on. Use this if dragging files to an application shows a + "
 "sign on the pointer but the drop doesn't work."
 
-#~ msgid "Show name-to-type rules"
-#~ msgstr "名前->種類 の順で表示"
+msgid "Show name-to-type rules"
+msgstr "名前->種類 の順で表示"
+
+msgid "DirItem"
+msgstr "Dirアイテム"
+
+msgid "Background color"
+msgstr "背景の色"
+
+msgid "Background color as a GdkColor"
+msgstr "Background color as a GdkColor"
+
+msgid "Vertical Adjustment"
+msgstr "Vertical Adjustment"
+
+msgid "The GtkAdjustment for the vertical position."
+msgstr "The GtkAdjustment for the vertical position."
+
+msgid "Has Discard"
+msgstr "Has Discard"
+
+msgid "The dialog has a Discard button"
+msgstr "The dialog has a Discard button"
+
+msgid "Huge"
+msgstr "巨大なアイコン"
+
+msgid "Large"
+msgstr "大きなアイコン"
+
+msgid "Small"
+msgstr "小さいアイコン"
+
+msgid "Set Icon"
+msgstr "アイコンを設定"
+
+msgid "You can't use multiple files with Set Icon!"
+msgstr "You can't use multiple files with Set Icon!"
+
+msgid "Display backdrop image:"
+msgstr "背景の画像を表示:"
+
+msgid ""
+"You should drop a single (local) image file onto the drop box - that image "
+"will be used for the desktop background. You can also drag certain "
+"applications onto this box."
+msgstr ""
+"You should drop a single (local) image file onto the drop box - that image "
+"will be used for the desktop background. You can also drag certain "
+"applications onto this box."
+
+msgid ""
+"You should drop a single (local) application onto the drop box - that "
+"application will be used to load files of this type in future"
+msgstr ""
+"You should drop a single (local) application onto the drop box - that "
+"application will be used to load files of this type in future"
+
+msgid "Currently %s"
+msgstr "Currently %s"
+
+msgid "Menu of directories previously used for icons"
+msgstr "Menu of directories previously used for icons"
+
+msgid "Enter the path of an icon file:"
+msgstr "アイコンファイルのパスを入力:"
+
+msgid "_Remove"
+msgstr "削除(_R)"
+
+msgid ""
+"You should drop a single local icon file onto the drop box - that icon will "
+"be used for this file from now on."
+msgstr ""
+"You should drop a single local icon file onto the drop box - that icon will "
+"be used for this file from now on."
+
+msgid ""
+"Enter the full path of a file that contains a valid image to be used as the "
+"icon for this file or directory."
+msgstr ""
+"Enter the full path of a file that contains a valid image to be used as the "
+"icon for this file or directory."
+
+msgid ""
+"You have not yet set any special icons; therefore, I have no directories to "
+"show you"
+msgstr ""
+"You have not yet set any special icons; therefore, I have no directories to "
+"show you"
+
+msgid "Large wrap width:"
+msgstr "Large wrap width:"
+
+msgid "Max Small Icons width:"
+msgstr "小さいアイコンの最大幅:"
+
+msgid "Name:"
+msgstr "名前:"
+
+msgid "Summary"
+msgstr "概要"
+
