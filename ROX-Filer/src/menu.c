@@ -754,6 +754,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	{
 		GList *paths;
 
+		updating_menu--;
+
 		if (filer_window->collection->number_selected == 0)
 		{
 			report_error(
@@ -763,8 +765,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		}
 
 		paths = filer_selected_items(filer_window);
-
-		updating_menu--;
 
 		show_send_to_menu(paths, event); /* (paths eaten) */
 
