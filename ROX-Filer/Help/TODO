@@ -10,7 +10,9 @@ BUGS
 
 Rename box - use action window (currently doesn't work across file systems)
 
-GNOME toolbar doesn't work properly when detached. Is this a GTK+ problem?
+GNOME toolbar
+	- doesn't work properly when detached. Is this a GTK+ problem?
+	- 'Other Action' doesn't work
 
 
 MISSING FEATURES
@@ -30,6 +32,21 @@ Can't create a panel if the filer is already running.
 Use an environment variable to override the platform-name guessing in AppRun.
 
 People sometimes forget to save the key bindings - remind them somehow?
+
+Enable (temporarily) single-click navigation when a special key (e.g. Alt) is
+pressed?
+
+'Other Action' should work on either 'other' button.
+
+Improve MIME-type guessing:
+	- Try to find longest extension match (eg .ps.gz, then .gz)
+	- Try again ignoring case (so .BMP matches .bmp) (.C must still work!)
+	- Use regexp rules on whole name (eg for 'Makefile' and 'core')
+
+Make the run-actions easier to set up (ie, from a dialog box).
+
+Provide a way to set the display style on a per-directory basis
+(shell glob patterns?)
 
 
 RISC OS COMPATIBILITY

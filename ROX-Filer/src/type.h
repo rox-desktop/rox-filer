@@ -30,5 +30,6 @@ MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);
 MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);
+void show_set_run_action(MIME_type *type);
 
 #endif /* _TYPE_H */

@@ -23,13 +23,15 @@
 
 #include "config.h"
 
-#include <glib.h>
 #include <sys/stat.h>
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
 #include <ctype.h>
 #include <time.h>
+#include <sys/param.h>
+
+#include <glib.h>
 
 #include "string.h"
 #include "main.h"
@@ -332,3 +334,133 @@ GdkAtom type_to_atom(MIME_type *type)
 	return retval;
 }
 
+/* Display a box allowing the user to set the run action for this type */
+void show_set_run_action(MIME_type *type)
+{
+	static GtkWidget	*box = NULL;
+	static GtkWidget	*pixmap = NULL, *link_path, *explain_label;
+	guchar	*type_name, *path;
+	struct stat 		info;
+	static MaskedPixmap	*drop = NULL;
+	MaskedPixmap		*pic;
+	guchar			*tmp;
+
+	if (!box)
+	{
+		GtkWidget	*vbox, *event, *hbox, *button, *frame;
+		GtkWidget	*link_box;
+		GtkTargetEntry	targets[] = {
+			{"text/uri-list", 0, 0},
+		};
+		
+		box = gtk_window_new(GTK_WINDOW_DIALOG);
+		gtk_container_set_border_width(GTK_CONTAINER(box), 4);
+		
+		vbox = gtk_vbox_new(FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(box), vbox);
+
+		explain_label = gtk_label_new("");
+		gtk_box_pack_start(GTK_BOX(vbox), explain_label,
+						FALSE, TRUE, 4);
+
+		frame = gtk_frame_new(NULL);
+		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+		gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
+		event = gtk_event_box_new();
+		gtk_container_add(GTK_CONTAINER(frame), event);
+		gtk_drag_dest_set(event, GTK_DEST_DEFAULT_ALL, targets,
+				sizeof(targets) / sizeof(*targets),
+				GDK_ACTION_COPY | GDK_ACTION_PRIVATE);
+
+		tmp = g_strconcat(getenv("APP_DIR"), "/pixmaps/drop.xpm", NULL);
+		drop = g_fscache_lookup(pixmap_cache, tmp);
+		g_free(tmp);
+		
+		link_box = gtk_vbox_new(FALSE, 4);
+		gtk_container_add(GTK_CONTAINER(event), link_box);
+
+		pixmap = gtk_pixmap_new(drop->pixmap, drop->mask);
+		gtk_box_pack_start(GTK_BOX(link_box), pixmap, FALSE, TRUE, 4);
+		link_path = gtk_label_new("<path>");
+		gtk_misc_set_padding(GTK_MISC(link_path), 4, 0);
+		gtk_box_pack_start(GTK_BOX(link_box),
+					link_path, FALSE, TRUE, 4);
+
+		hbox = gtk_hbox_new(TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+
+		button = gtk_button_new_with_label(_("Save"));
+		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 4);
+		button = gtk_button_new_with_label(_("Cancel"));
+		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(box));
+		gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 4);
+	}
+
+	if (GTK_WIDGET_VISIBLE(box))
+		gtk_widget_hide(box);
+
+	type_name = g_strconcat(type->media_type, "/", type->subtype, NULL);
+	gtk_window_set_title(GTK_WINDOW(box), type_name);
+	tmp = g_strdup_printf(
+		_("Default run action for files of type '%s':"),
+		type_name);
+	gtk_label_set_text(GTK_LABEL(explain_label), tmp);
+	g_free(tmp);
+	g_free(type_name);
+
+	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
+	path = choices_find_path_load(type_name, "MIME-types");
+	if (!path)
+		path = choices_find_path_load(type->media_type, "MIME-types");
+
+	pic = NULL;
+	if (path && stat(path, &info) == 0)
+	{
+		if (S_ISDIR(info.st_mode))
+		{
+			tmp = g_strconcat(path, "/AppIcon.xpm", NULL);
+			pic = g_fscache_lookup(pixmap_cache, tmp);
+			g_free(tmp);
+			if (!pic)
+			{
+				pic = default_pixmap[TYPE_APPDIR];
+				pixmap_ref(pic);
+			}
+		}
+		else
+		{
+			pic = default_pixmap[TYPE_EXEC_FILE];
+			pixmap_ref(pic);
+		}
+	}
+
+	if (!pic)
+	{
+		pic = drop;
+		gtk_label_set_text(GTK_LABEL(link_path),
+				_("No run action set"));
+	}
+	else
+	{
+		char	buffer[MAXPATHLEN + 1];
+		int	got;
+
+		got = readlink(path, buffer, sizeof(buffer) - 1);
+		if (got > 0)
+		{
+			buffer[got] = '\0';
+			gtk_label_set_text(GTK_LABEL(link_path), buffer);
+		}
+		else
+			gtk_label_set_text(GTK_LABEL(link_path), path);
+	}
+
+	gtk_pixmap_set(GTK_PIXMAP(pixmap), pic->pixmap, pic->mask);
+	if (pic != drop)
+		g_fscache_data_unref(pixmap_cache, pic);
+
+	g_free(path);
+	
+	gtk_widget_show_all(box);
+}

@@ -90,6 +90,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void link_item(gpointer data, guint action, GtkWidget *widget);
+static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void open_file(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
@@ -172,6 +173,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Copy..."),	NULL,  	copy_item, 0, NULL},
 {">" N_("Rename..."),	NULL,  	rename_item, 0, NULL},
 {">" N_("Link..."),	NULL,  	link_item, 0, NULL},
+{">" N_("Run Action..."),	NULL,  	run_action, 0, NULL},
 {">" N_("Shift Open"),   	NULL,  	open_file, 0, NULL},
 {">" N_("Help"),		NULL,  	help, 0, NULL},
 {">" N_("Info"),		NULL,  	show_file_info, 0, NULL},
@@ -863,6 +865,32 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 		collection_target(collection, target_callback, link_item);
 	else
 		SHOW_SAVEBOX(_("Symlink"), link_cb);
+}
+
+static void run_action(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected > 1)
+	{
+		report_error(PROJECT, _("You cannot do this to more than "
+				"one item at a time"));
+		return;
+	}
+	else if (collection->number_selected != 1)
+		collection_target(collection, target_callback, run_action);
+	else
+	{
+		DirItem		*item;
+
+		item = selected_item(collection);
+		g_return_if_fail(item->mime_type != NULL);
+
+		show_set_run_action(item->mime_type);
+	}
 }
 
 static void open_file(gpointer data, guint action, GtkWidget *widget)

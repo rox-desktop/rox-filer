@@ -2,6 +2,15 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+
+12-May-2000
+~~~~~~~~~~~
+Applied Bernard's patch (a couple of cosmetic changes to the action windows).
+Applied Vincent's patch (minor updates to the Frech translation).
+Fixed a problem with the pixmap caching - the filer would detect that the
+file had changed and try to reload it, but ImLib would simply return its
+cached copy!
+
 28-Apr-2000
 ~~~~~~~~~~~
 Removed a debugging message that had somehow got into the release version :-(
