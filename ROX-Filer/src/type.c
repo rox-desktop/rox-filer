@@ -310,6 +310,8 @@ gboolean type_open(char *path, MIME_type *type)
 	argv[1] = path;
 
 	open = handler_for(type);
+	if (!open)
+		return FALSE;
 
 	if (stat(open, &info))
 	{
