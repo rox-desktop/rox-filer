@@ -1342,7 +1342,7 @@ All of these work in the same way --- if you open the menu with some items
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-21 2 0 0 -1 -1 -1 -1
+23 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -1355,6 +1355,8 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 0 0 0
+0 1 1 0
+0 1 0 0
 0 1 1 0
 0 1 0 0
 0 1 0 0
@@ -1386,6 +1388,10 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1468,6 +1474,15 @@ See section
 \end_inset 
 
  for details.
+\newline 
+Set Icon...
+\newline 
+You can give each file or directory its own special icon using this feature
+ --- simply
+\newline 
+
+\newline 
+drag a suitable image onto the Set Icon dialog box.
 \newline 
 Open VFS
 \newline 
@@ -2718,6 +2733,21 @@ Many of the options in the Options window have tooltips --- hold the mouse
  pointer over the option to find out what it does.
 \layout Subsubsection
 
+Translation options
+\layout Standard
+
+You can choose which language the filer will display messages in from here.
+ There are also two special choices:
+\layout Description
+
+None causes the untranslated English messages to be used;
+\layout Description
+
+From\SpecialChar ~
+LANG will use the value of the LANG environment variable as the name
+ of the file to load from ROX-Filer/Messages.
+\layout Subsubsection
+
 Pinboard options
 \layout Standard
 
@@ -2736,6 +2766,13 @@ If you are using the pinboard features (see section
 
 You may also change the foreground and background colours used for the text
  by clicking on the colour slabs in the Options window.
+\layout Itemize
+
+`Keep icons within screen limits' prevents icons from going partly off the
+ side of the screen.
+\layout Itemize
+
+`Icon grid step' controls how finely the icons may be positioned.
 \layout Subsubsection
 
 Action window options
@@ -2764,8 +2801,8 @@ Display options
  `Small Icons' display mode.
 \layout Standard
 
-The last display style and sort type you chose will also be saved as the
- defaults for next time if you click on Save.
+The remaining options provide the default settings for newly opened windows
+ --- they correspond to choosing styles from the Display menu.
 \layout Subsubsection
 
 Toolbar options
@@ -3066,15 +3103,33 @@ Because you can compile an application as a user and then simply copy it
 .
 \layout Standard
 
-To make a directory executable all you need to do is create a executable
- file called `AppRun' inside it.
- This file is run when the user clicks on the application.
- You should also provide `AppIcon.xpm' (which will be used as the image for
- the application) and `Help' (which is a directory that is opened when the
- user asks for help).
- Finally (for security reasons), an application directory must have the
- same owner as the AppRun file inside.
- Have a look at the ROX-Filer application directory for a full example.
+The following files are treated as special by ROX-Filer:
+\layout Description
+
+AppRun is executed when you click on the directory --- make sure it is executabl
+e (use the Permissions box)!
+\layout Description
+
+.DirIcon.png is the image used to represent the directory (this works even
+ if there is no AppRun).
+\layout Description
+
+Help is the directory to be opened when you choose `Help' from the File
+ menu.
+\layout Description
+
+AppMenu lists additional menu items to display in the popup menu (this is
+ new and the format is likely to change soon).
+\layout Description
+
+AppIcon.xpm is used if .DirIcon.png is missing (for backwards compatibility).
+\layout Standard
+
+Have a look at the ROX-Filer application directory for a full example.
+\layout Standard
+
+Note: For security reasons, an application directory must have the same
+ owner as the AppRun file inside.
 \layout Section
 
 Internationalisation
@@ -3089,32 +3144,16 @@ Selecting a translation
 \layout Standard
 
 ROX-Filer is able to translate many of its messages, provided suitable translati
-on files are provided.
- If you know that your language is supported then simply set the 
-\family typewriter 
-LANG
-\family default 
- environment variable to the appropriate code for your country before starting
- the filer, eg:
-\layout LyX-Code
+on files are provided: 
+\layout Enumerate
 
-$ LANG=fr; export LANG
-\layout LyX-Code
+Open the Options box from the menu, 
+\layout Enumerate
 
-$ rox
-\layout Standard
+Select a language from the menu at the top,
+\layout Enumerate
 
-The `
-\family typewriter 
---new
-\family default 
-' option is needed if the filer is already running.
- To see which translations are currently provided, open the ROX-Filer applicatio
-n directory (hold down Shift when you click) and look inside the `
-\family typewriter 
-Messages
-\family default 
-' subdirectory.
+Click on Save and restart the filer for the new setting to take full effect.
 \layout Subsection
 
 Creating a new translation
@@ -3190,11 +3229,12 @@ Created file ../../Messages/ml.gmo OK
 \end_deeper 
 \layout Enumerate
 
-Set the LANG variable to `
+Edit `
 \family typewriter 
-ml
+ROX-Filer/Options.xml
 \family default 
-' and restart the filer (see section 
+' so that your language is listed, restart the filer and select it from
+ the Options box (see section 
 \begin_inset LatexCommand \ref{sec: LANG}
 
 \end_inset 
