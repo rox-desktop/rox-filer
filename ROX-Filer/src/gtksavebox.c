@@ -347,13 +347,6 @@ gtk_savebox_set_pathname (GtkSavebox *savebox, const gchar *pathname)
   leaf = slash ? slash - pathname + 1 : 0;
   dot = strchr(pathname + leaf, '.');
   
-#if 0
-  /* Gtk+ doesn't seem to scroll the entry properly without this... */
-  /* XXX: Still needed? */
-  gtk_widget_realize (savebox->entry);
-  gtk_entry_set_position (GTK_ENTRY (savebox->entry), -1);
-#endif
-
   gtk_editable_select_region (GTK_EDITABLE (savebox->entry), leaf,
 			      dot ? dot - pathname : -1);
 }

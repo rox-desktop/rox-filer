@@ -1268,14 +1268,14 @@ static void bg_expose(GdkRectangle *area)
 	static GdkGC *shadow_gc = NULL;
 	static GdkColor white, black;
 
-	root = gdk_get_default_root_window();	 /* XXX */
-
 	if (!pinboard_shadow)
 	{
 		/* XXX: Should just disable the events */
 		return;
 	}
 	
+	root = gdk_get_default_root_window();	 /* XXX */
+
 	if (!shadow_gc)
 	{
 		GdkColormap *cm;
