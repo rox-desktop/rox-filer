@@ -448,8 +448,13 @@ void pinboard_reshape_icon(Icon *icon)
 
 	set_size_and_style(pi);
 	offset_from_centre(pi, &x, &y);
-	gtk_fixed_move(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
-	gtk_widget_queue_draw(current_pinboard->fixed);
+
+	if (pi->win->allocation.x != x || pi->win->allocation.y != y)
+	{
+		/* Expensive - this redraws the whole pinboard! */
+		gtk_fixed_move(GTK_FIXED(current_pinboard->fixed),
+				pi->win, x, y);
+	}
 }
 
 /* 'app' is saved as the new application to set the backdrop. It will then be
@@ -831,7 +836,7 @@ static void start_drag(PinIcon *pi, GdkEventMotion *event)
 	}
 	
 	g_return_if_fail(icon_selection != NULL);
-
+	
 	pinboard_drag_in_progress = icon;
 
 	if (icon_selection->next == NULL)
