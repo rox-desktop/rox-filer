@@ -984,7 +984,7 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 	template->leafname.width = MIN(max_text_width, view->name_width);
 	template->leafname.height = view->name_height;
 
-	if (!view->image)
+	if (!image)
 		return;		/* Not scanned yet */
 
 	template->details.x = template->leafname.x;
@@ -1009,7 +1009,7 @@ static void small_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 #define INSIDE(px, py, area)	\
 	(px >= area.x && py >= area.y && \
-	 px < area.x + area.width && py < area.y + area.height)
+	 px <= area.x + area.width && py <= area.y + area.height)
 
 static gboolean test_point(Collection *collection,
 				int point_x, int point_y,
