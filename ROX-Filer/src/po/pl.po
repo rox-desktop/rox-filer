@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.0\n"
-"POT-Creation-Date: 2001-12-14 12:03+0000\n"
+"POT-Creation-Date: 2001-12-29 15:10+0000\n"
 "PO-Revision-Date: 2001-12-23 17:20+0200\n"
 "Last-Translator: Krzysztof Krzy¿aniak <eloy@debian.org>\n"
 "Language-Team: Polish <eloy@debian.org>\n"
@@ -13,15 +13,15 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: action.c:218
+#: action.c:227
 msgid "Find expression reference"
 msgstr "Wyszukiwanie na podstawie wyra¿enia"
 
-#: action.c:223
+#: action.c:232
 msgid "Quick Start"
 msgstr "Szybki start"
 
-#: action.c:225
+#: action.c:234
 msgid ""
 "Just put the name of the file you're looking for in single quotes:\n"
 "'index.html'\t(to find a file called 'index.html')"
@@ -29,11 +29,11 @@ msgstr ""
 "Napisz nazwê szukanego pliku w pojedyñczym cudzys³owiu:\n"
 "'index.html'\t(aby znale¶æ plik pod nazw± 'index.html')"
 
-#: action.c:232
+#: action.c:241
 msgid "Examples"
 msgstr "Przyk³ady"
 
-#: action.c:234
+#: action.c:243
 msgid ""
 "'*.htm', '*.html'      (finds HTML files)\n"
 "IsDir 'lib'            (finds directories called 'lib')\n"
@@ -51,11 +51,11 @@ msgstr ""
 "'CVS' pomiñ, plik?                          (zwyk³y plik nie w CVS)\n"
 "plik? system(grep -q fred \"%\")              (zawieraj±ce s³owo 'fred')"
 
-#: action.c:247
+#: action.c:256
 msgid "Simple Tests"
 msgstr "Proste Testy"
 
-#: action.c:249
+#: action.c:258
 msgid ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
@@ -77,11 +77,11 @@ msgstr ""
 "Je¿eli wzorzec zawiera znaki uko¶nika, okre¶la on pe³n± ¶cie¿kê dostêpu\n"
 "w przeciwnym przypadku dotyczy jedynie nazwy pliku."
 
-#: action.c:262
+#: action.c:271
 msgid "Comparisons"
 msgstr "Porównania"
 
-#: action.c:264
+#: action.c:273
 msgid ""
 "<, <=, =, !=, >, >=, After, Before (compare two values)\n"
 "5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
@@ -94,11 +94,11 @@ msgstr ""
 "dostêp, utworzenie, modyfikacja, teraz, rozmiar, i-wêze³, dowi±zania, uid, "
 "gid, bloki (warto¶ci)"
 
-#: action.c:273
+#: action.c:282
 msgid "Specials"
 msgstr "Specjalne"
 
-#: action.c:275
+#: action.c:284
 msgid ""
 "system(command) (true if 'command' returns with a zero exit status; a % \n"
 "in 'command' is replaced with the path of the current file)\n"
@@ -110,19 +110,19 @@ msgstr ""
 "pliku\n"
 "pomiñ (fa³sz, zapobiega przeszukiwaniu zawarto¶ci katalogu)."
 
-#: action.c:288
+#: action.c:297
 msgid "See the ROX-Filer manual for full details."
 msgstr "Zajrzyj do dokumentacji by przeczytaæ pe³ny opis"
 
-#: action.c:290 action.c:356 toolbar.c:107
+#: action.c:299 action.c:369 toolbar.c:108
 msgid "Close"
 msgstr "Zamknij"
 
-#: action.c:315
+#: action.c:328
 msgid "Permissions command reference"
 msgstr "Uprawnienia (lista poleceñ ?)"
 
-#: action.c:321
+#: action.c:334
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -182,202 +182,216 @@ msgstr ""
 "\n"
 "Zobacz równie¿ do strony podrêcznikowej dla chmod(1)."
 
-#: action.c:507
+#: action.c:538
 msgid "There was one error.\n"
 msgstr "Wyst±pi³ b³±d.\n"
 
-#: action.c:509
+#: action.c:540
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "Wyst±pi³y b³êdy. (dok³adnie %d)\n"
 
-#: action.c:533
+#: action.c:568
 msgid "ERROR reading"
 msgstr "B£¡D odczytu"
 
-#: action.c:610
+#: action.c:645
 msgid "ERROR"
 msgstr "B£¡D"
 
-#: action.c:749 action.c:916 main.c:546 main.c:553
+#: action.c:812 action.c:995 main.c:545 main.c:556
 msgid "Yes"
 msgstr "Tak"
 
-#: action.c:753 action.c:921
+#: action.c:816 action.c:1000
 msgid "No"
 msgstr "Nie"
 
-#: action.c:767 action.c:910
-msgid "Quiet"
-msgstr "Cicho"
-
-#: action.c:890
+#: action.c:946
 msgid "<dir>"
 msgstr "<katalog>"
 
-#: action.c:928
+#: action.c:989 action.c:1019
+msgid "Quiet"
+msgstr "Cicho"
+
+#: action.c:1007
 msgid "Abort"
 msgstr "Przerwij"
 
-#: action.c:979
+#: action.c:1019
+msgid "Don't confirm every operation"
+msgstr ""
+
+#: action.c:1063
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?Zliczyæ zawarto¶æ %s?"
 
-#: action.c:1013
+#: action.c:1097
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?Skasowaæ %s'%s'?"
 
-#: action.c:1014
+#: action.c:1098
 msgid "WRITE-PROTECTED "
 msgstr "PROTEKCJA-ZAPISU"
 
-#: action.c:1021
+#: action.c:1105
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "'Kasowanie '%s'\n"
 
-#: action.c:1036
+#: action.c:1120
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'Katalog '%s' skasowany\n"
 
-#: action.c:1064 action.c:1086
+#: action.c:1148 action.c:1170
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?Sprawdziæ '%s'?"
 
-#: action.c:1083
+#: action.c:1167
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "!Niew³a¶ciwe wyra¿enie wyszkiwania - zmieñ je i spróbuj ponownie\n"
 
-#: action.c:1094
+#: action.c:1178
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'(podczas sprawdzania '%s')\n"
 
-#: action.c:1172 action.c:1203
+#: action.c:1256 action.c:1287
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?Zmieniæ uprawnienia do '%s'?"
 
-#: action.c:1179
+#: action.c:1263
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "'Zmieniam oprawnienia do '%s'\n"
 
-#: action.c:1200
+#: action.c:1284
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Niew³a¶ciwe polecenie (tryb) - zmieñ i spróbuj ponownie\n"
 
-#: action.c:1281
+#: action.c:1365
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' ju¿ istnieje - %s?"
 
-#: action.c:1283
+#: action.c:1367
 msgid "merge contents"
 msgstr "po³±czenie zawarto¶ci"
 
-#: action.c:1283
+#: action.c:1367
 msgid "overwrite"
 msgstr "nadpisanie"
 
-#: action.c:1301
+#: action.c:1385
 msgid "'Trying copy anyway...\n"
 msgstr "'Mimo wszystko próbujê kopiowaæ...\n"
 
-#: action.c:1309
+#: action.c:1393
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?Kopiowaæ %s na %s?"
 
-#: action.c:1315
+#: action.c:1399
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'Kopiowanie %s na %s\n"
 
-#: action.c:1340
+#: action.c:1424
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!B£¡D: Docelowy plik ju¿ istnieje, lecz nie jest katalogiem\n"
 
-#: action.c:1413
+#: action.c:1497
 #, c-format
-msgid "!ERROR: %s\n"
-msgstr "!B£¡D: %s\n"
+msgid ""
+"!%s\n"
+"Failed to copy '%s'"
+msgstr ""
 
-#: action.c:1443
+#: action.c:1530
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s' ju¿ istnieje - nadpisaæ?"
 
-#: action.c:1465
+#: action.c:1552
 msgid "'Trying move anyway...\n"
 msgstr "'Mimo wszystko próbujê przenie¶æ...\n"
 
-#: action.c:1472
+#: action.c:1559
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "?Przenie¶æ %s na %s?"
 
-#: action.c:1478
+#: action.c:1565
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'Przenoszê %s na %s\n"
 
-#: action.c:1507
-#, c-format
-msgid "!ERROR: Failed to move %s as %s\n"
+#: action.c:1577
+#, fuzzy, c-format
+msgid ""
+"!%s\n"
+"Failed to move %s as %s\n"
 msgstr "!B£¡D: Nie uda³o siê przenie¶æ %s na %s\n"
 
-#: action.c:1524
+#: action.c:1614
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!B£¡D: Nie moge skopiowaæ pliku samgo na siebie\n"
 
-#: action.c:1539
+#: action.c:1629
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!B£¡D: Nie mogê przenie¶æ pliku samgo na siebie\n"
 
-#: action.c:1556
+#: action.c:1646
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'Tworzê dowi±zanie %s jako %s\n"
 
-#: action.c:1563
+#: action.c:1653
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "?Utworzyæ dowi±zanie %s jako %s?"
 
-#: action.c:1590
+#: action.c:1681
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'Montujê %s\n"
 
-#: action.c:1591
+#: action.c:1682
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'Odmontowywujê %s\n"
 
-#: action.c:1598
+#: action.c:1689
 #, c-format
 msgid "?Mount %s?\n"
 msgstr "?Zamontowaæ %s?\n"
 
-#: action.c:1599
+#: action.c:1690
 #, c-format
 msgid "?Unmount %s?\n"
 msgstr "?Odmontowaæ %s?\n"
 
-#: action.c:1618
-msgid "!ERROR: Mount failed\n"
+#: action.c:1700
+#, fuzzy, c-format
+msgid ""
+"!%s\n"
+"Mount failed\n"
 msgstr "!B£¡D: Montowanie nie powiod³o siê\n"
 
-#: action.c:1619
-msgid "!ERROR: Unmount failed\n"
+#: action.c:1701
+#, fuzzy, c-format
+msgid ""
+"!%s\n"
+"Unmount failed\n"
 msgstr "!B£¡D: Odmontowanie nie powiod³o siê\n"
 
-#: action.c:1654
+#: action.c:1747
 #, c-format
 msgid ""
 "'\n"
@@ -386,27 +400,27 @@ msgstr ""
 "'\n"
 "Ca³kowicie: %s("
 
-#: action.c:1661
+#: action.c:1754
 msgid "file"
 msgstr "plik"
 
-#: action.c:1661
+#: action.c:1754
 msgid "files"
 msgstr "plików"
 
-#: action.c:1668
+#: action.c:1761
 msgid "no directories)\n"
 msgstr "brak katalogów)\n"
 
-#: action.c:1673
+#: action.c:1766
 msgid "directory"
 msgstr "katalog"
 
-#: action.c:1674
+#: action.c:1767
 msgid "directories"
 msgstr "katalogów"
 
-#: action.c:1703 action.c:1743 action.c:1770 action.c:1801 action.c:1822
+#: action.c:1796 action.c:1836 action.c:1863 action.c:1894 action.c:1915
 msgid ""
 "'\n"
 "Done\n"
@@ -414,154 +428,170 @@ msgstr ""
 "'\n"
 "Zrobione\n"
 
-#: action.c:1704
+#: action.c:1797
 msgid "!No mount points selected!\n"
 msgstr "!Nie okre¶lono punktu montownia!\n"
 
-#: action.c:1763
+#: action.c:1856
 msgid "?Another search?"
 msgstr "?Nastêpne wyszukiwanie?"
 
-#: action.c:1790
+#: action.c:1883
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' jest symbolicznym dowi±zaniem\n"
 
-#: action.c:1848 tips:39
+#: action.c:1946 tips:38
 msgid "Name"
 msgstr "Nazwa"
 
-#: action.c:1849 menu.c:249 tips:47
+#: action.c:1947 menu.c:250 tips:170
 msgid "Directory"
 msgstr "Katalog"
 
-#: action.c:1853
+#: action.c:1951
 msgid "You need to select some items to search through"
 msgstr "Musisz wybraæ obiekty, w których wyszukiwaæ"
 
-#: action.c:1887
+#: action.c:1985
 msgid "Expression:"
 msgstr "Wyra¿enie:"
 
-#: action.c:1904 menu.c:241
+#: action.c:2002 menu.c:242
 msgid "Find"
 msgstr "Szukaj"
 
-#: action.c:1920
+#: action.c:2017
 msgid "You need to select some items to count"
 msgstr "Musisz wybraæ obiekty, które zliczyæ"
 
-#: action.c:1930 menu.c:239
+#: action.c:2027 menu.c:240
 msgid "Disk Usage"
 msgstr "Zajêto¶æ dysku"
 
-#: action.c:1954
+#: action.c:2051
 msgid "Mount / Unmount"
 msgstr "Zamontuj / Odmontuj"
 
-#: action.c:1959
+#: action.c:2056
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr ""
 "ROX-Filer jeszcze nie posiada wsparcia dla punktów montowania w Twoim "
 "systemie.."
 
-#: action.c:1977 menu.c:238 tips:105
+#: action.c:2074 menu.c:239 tips:93
 msgid "Delete"
 msgstr "Skasuj"
 
-#: action.c:1979
-msgid "Force - don't confirm deletion of non-writeable items"
-msgstr "Wymu¶ - nie pytaj o kasowanie nie-zapisywalnych plików"
+#: action.c:2076 tips:98
+msgid "Force"
+msgstr "Wymu¶"
 
-#: action.c:1982
-msgid "Brief - only log directories being deleted"
+#: action.c:2076
+#, fuzzy
+msgid "Don't confirm deletion of non-writeable items"
+msgstr "Nie zgadzaj siê na kasowanie niezapisywalnych plików"
+
+#: action.c:2079 action.c:2122 tips:100
+msgid "Brief"
+msgstr "Zwiê¼le"
+
+#: action.c:2079
+#, fuzzy
+msgid "Only log directories being deleted"
 msgstr "Pobie¿nie - wy¶wietlaj jedynie kasowane katalogi"
 
-#: action.c:1998
+#: action.c:2095
 msgid "You need to select the items whose permissions you want to change"
 msgstr "Musisz wybraæ pliki, których uprawnienia chcesz zmieniæ"
 
-#: action.c:2006
+#: action.c:2103
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (Uczyñ wykonywalnym/do przegl±dania)"
 
-#: action.c:2008
+#: action.c:2105
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (Uczyñ nie wykonywalnym/zabroñ przegl±dania)"
 
-#: action.c:2010
+#: action.c:2107
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (Nadaj u¿ytkownikowi prawo odczytu i zapisu)"
 
-#: action.c:2012
+#: action.c:2109
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (Prywatne - tylko dla w³a¶ciciela)"
 
-#: action.c:2014
+#: action.c:2111
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Dostêp publiczny, bez zapisu)"
 
-#: action.c:2025
-msgid "Brief - don't list processed files"
+#: action.c:2122
+#, fuzzy
+msgid "Don't list processed files"
 msgstr "Pobie¿nie - nie wy¶wietlaj przetwarzanych plików"
 
-#: action.c:2028
-msgid "Recurse - also change contents of subdirectories"
-msgstr "Rekursywnie - zmieñ równie¿ w podkatalogach"
+#: action.c:2125 tips:102
+msgid "Recurse"
+msgstr "Rekursywnie"
 
-#: action.c:2032
+#: action.c:2125
+#, fuzzy
+msgid "Also change contents of subdirectories"
+msgstr "Zmieniaj zawarto¶æ w podkatalogach"
+
+#: action.c:2129
 msgid "Command:"
 msgstr "Polecenie:"
 
-#: action.c:2054 menu.c:194 menu.c:200 menu.c:206 menu.c:240 tips:35
+#: action.c:2151 menu.c:195 menu.c:201 menu.c:207 menu.c:241 tips:34
 msgid "Permissions"
 msgstr "Uprawnienia"
 
-#: action.c:2080 dnd.c:135 menu.c:1822 tips:99
+#: action.c:2177 dnd.c:135 menu.c:1830 tips:87
 msgid "Copy"
 msgstr "Kopiuj"
 
-#: action.c:2102 dnd.c:136 tips:101
+#: action.c:2199 dnd.c:136 tips:89
 msgid "Move"
 msgstr "Przenie¶"
 
-#: action.c:2120 dnd.c:137 tips:103
+#: action.c:2217 dnd.c:137 tips:91
 msgid "Link"
 msgstr "Dowi±zanie"
 
-#: action.c:2170
+#: action.c:2267
 msgid "Deleting items such as "
 msgstr "Kasowanie obiektów takich jak "
 
-#: action.c:2174
+#: action.c:2271
 msgid "Deleting the item "
 msgstr "Kasujê obiekt "
 
-#: action.c:2176
+#: action.c:2273
 msgid "Deleting the items "
 msgstr "Kasujê obiekty "
 
-#: action.c:2195
+#: action.c:2292
 msgid " and "
 msgstr " oraz "
 
-#: action.c:2204
+#: action.c:2301
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
 " wp³ynie na niektóre obiekty na pulpicie lub panelu - napewno skasowaæ?"
 
-#: action.c:2211
+#: action.c:2308
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
 " wp³ynie na niektóre obiekty na pulpicie lub panelu - napewno je skasowaæ?"
 
-#: action.c:2216 gtksavebox.c:239 icon.c:889 infobox.c:102 menu.c:1562
-#: options.c:885 panel.c:318 type.c:947 usericons.c:339
+#: action.c:2313 filer.c:1539 gtksavebox.c:243 icon.c:893 infobox.c:106
+#: menu.c:1570 options.c:742 panel.c:318 type.c:981 usericons.c:344
 msgid "Cancel"
 msgstr "Anuluj"
 
-#: action.c:2216 gtksavebox.c:232 gtksavebox.c:506 gui_support.c:255
-#: icon.c:882 menu.c:1555 options.c:873 type.c:940 usericons.c:331
+#: action.c:2313 gtksavebox.c:236 gtksavebox.c:510 gui_support.c:252
+#: icon.c:886 menu.c:1563 options.c:730 type.c:974 usericons.c:336
 msgid "OK"
 msgstr "OK"
 
@@ -569,7 +599,7 @@ msgstr "OK"
 msgid "<missing label>"
 msgstr "<brakuj±ca etykieta>"
 
-#: dir.c:136 dir.c:721
+#: dir.c:137 dir.c:730
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -578,12 +608,12 @@ msgstr ""
 "B³±d skanowania '%s':\n"
 "%s"
 
-#: dir.c:347
+#: dir.c:359
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Nie mogê otworzyæ katalogu: %s"
 
-#: display.c:1174
+#: display.c:1094
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) b³±d: %s"
@@ -596,69 +626,71 @@ msgstr "Ustaw ikonê"
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "Niew³a¶ciwy lub brakuj±cy znak koñca linii w danych text/uri-list"
 
-#: dnd.c:429
+#: dnd.c:430
 msgid "Internal error - bad info type"
 msgstr "Wewnêtrzny b³±d - niew³a¶ciwy typ informacji"
 
-#: dnd.c:715
+#: dnd.c:716
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "B³±d protoko³u XDS: nazwa li¶cia nie mo¿e zawieraæ '/'\n"
 
-#: dnd.c:740
+#: dnd.c:741
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
-msgstr "Okre¶lono cel XdndDirectSave0, lecz atm XdndDirectSave0 (typ text/plain) nie zawiera nazwy li¶cia\n"
+msgstr ""
+"Okre¶lono cel XdndDirectSave0, lecz atm XdndDirectSave0 (typ text/plain) nie "
+"zawiera nazwy li¶cia\n"
 
-#: dnd.c:751
+#: dnd.c:752
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Wymagany jest docelowy typ  text/uri-list lub XdndDirectSave0."
 
-#: dnd.c:754
+#: dnd.c:755
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr "Wymagany jest typ text/uri-list lub application/octet-stream."
 
-#: dnd.c:853
+#: dnd.c:854
 msgid "Unknown target"
 msgstr "Nieznany cel"
 
-#: dnd.c:886
+#: dnd.c:887
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "Zdalna aplikacja nie mo¿e lub nie chce przes³aæ danych - przepraszam"
 
-#: dnd.c:899
+#: dnd.c:900
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr "B³±d protoko³u XDS: zwrócony kod powinien byæ 'S', 'F' lub 'E'\n"
 
-#: dnd.c:940
+#: dnd.c:941
 msgid "UntitledData"
 msgstr "DaneBezNazwy"
 
-#: dnd.c:967
+#: dnd.c:968
 #, c-format
 msgid "Error saving file: %s"
 msgstr "B³±d zapisu pliku: %s"
 
-#: dnd.c:998
+#: dnd.c:999
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Ne podano URI w text/uri-list (nic do zrobienia!)"
 
-#: dnd.c:1023
+#: dnd.c:1024
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Nie mogê otrzymaæ danych ze zdalnej maszyny (application/octet-stream nie "
 "podany)"
 
-#: dnd.c:1045
+#: dnd.c:1046
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "Niektóre z tych plików znajduj± sie na innej maszynie - zostan± one "
 "zignorowane"
 
-#: dnd.c:1052
+#: dnd.c:1053
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -666,49 +698,60 @@ msgstr ""
 "¯aden z podanych plików nie znajduje siê na lokalnej maszynie - nie mogê "
 "operowaæ na wielu zdalnych plikach."
 
-#: dnd.c:1065
+#: dnd.c:1066
 msgid "Unknown action requested"
 msgstr "Zarz±dano nieznanej akcji"
 
-#: dnd.c:1075
+#: dnd.c:1076
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "B³±d pobierania listy plików: %s"
 
-#: dnd.c:1105
+#: dnd.c:1106
 msgid "You can't use multiple files with Set Icon!"
 msgstr "Nie mo¿na u¿ywaæ wielu plików w opcji Ustaw Ikonê"
 
-#: filer.c:582
+#: filer.c:593
 msgid "Directory missing/deleted"
 msgstr "Brakuj±cy/skasowany kalalog"
 
-#: filer.c:893
-#, c-format
+#: filer.c:971
+#, fuzzy, c-format
 msgid ""
-"Group %d is not set. Select some files and press Ctrl+%d to set the group. "
-"Press %d on its own to reselect the files later."
-msgstr "Grupa %d nie jest ustawiona. Zaznacz kilka plików, nastêpnie naci¶nij Ctrl+%d aby ustawiæ grupê. Wci¶nij samo %d aby wybraæ pliki pó¼niej."
+"Group %s is not set. Select some files and press Ctrl+%s to set the group. "
+"Press %s on its own to reselect the files later."
+msgstr ""
+"Grupa %d nie jest ustawiona. Zaznacz kilka plików, nastêpnie naci¶nij Ctrl+%"
+"d aby ustawiæ grupê. Wci¶nij samo %d aby wybraæ pliki pó¼niej."
 
-#: filer.c:1041
+#: filer.c:1143
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Katalog '%s' nie jest dostêpny"
 
-#: filer.c:1238
+#: filer.c:1340
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Katalog '%s' nie znaleziony"
 
-#: filer.c:1649
-msgid " (Scanning)"
+#: filer.c:1793
+#, fuzzy
+msgid "Scanning, "
 msgstr " (Skanowanie)"
 
-#: filer.c:1890 menu.c:1812
+#: filer.c:1794
+msgid "All, "
+msgstr ""
+
+#: filer.c:1795
+msgid "Thumbs, "
+msgstr ""
+
+#: filer.c:2044 menu.c:1820
 msgid "Item no longer exists!"
 msgstr "Sk³adnij ju¿ nie istnieje!"
 
-#: filer.c:2012
+#: filer.c:2166
 msgid "Symbolic link to "
 msgstr "Symboliczne dowi±zanie do "
 
@@ -904,15 +947,15 @@ msgstr "gid"
 msgid "blocks"
 msgstr "bloki"
 
-#: gtksavebox.c:202
+#: gtksavebox.c:206
 msgid "Save As:"
 msgstr "Zapisz jako:"
 
-#: gtksavebox.c:331
+#: gtksavebox.c:335
 msgid "Unnamed"
 msgstr "BezNazwy"
 
-#: gtksavebox.c:401
+#: gtksavebox.c:405
 msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
@@ -920,7 +963,7 @@ msgstr ""
 "Zdalna aplikacja chce u¿yæ funkcji bezpo¶redniego zapisu, ale nie mogê "
 "odczytaæ w³a¶ciwo¶ci XdndDirectSave0 (typ text/plain).\n"
 
-#: gtksavebox.c:499
+#: gtksavebox.c:503
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
@@ -928,16 +971,22 @@ msgstr ""
 "Przeci±gnij ikonê do katalogu\n"
 "(lub wpisz pe³n± ¶cie¿kê dostêpu)"
 
-#: gui_support.c:420
+#: gui_support.c:372
+msgid ""
+"\n"
+"--- next error ---\n"
+msgstr ""
+
+#: gui_support.c:430
 #, c-format
 msgid "Error reading file %s: %s"
 msgstr "B³±d odczytu pliku %s: %s"
 
-#: gui_support.c:433
+#: gui_support.c:443
 msgid "Can't allocate memory for buffer to load this file"
 msgstr "Nie mogê zarezerwowaæ pamiêci dla bufora, aby za³adowaæ ten plik"
 
-#: gui_support.c:485
+#: gui_support.c:495
 #, c-format
 msgid ""
 "Error in '%s' file at line %d: \n"
@@ -952,7 +1001,7 @@ msgstr ""
 "Otwórz okno opcji i kliknij Zapisz.\n"
 "Nastêpne b³êdy zostan± zignorowane."
 
-#: i18n.c:160
+#: i18n.c:154
 msgid ""
 "You must restart the filer for the new language setting to take full effect"
 msgstr "Musisz zrestartowaæ program, aby w pe³ni uwzglêdniæ wybór jêzyka"
@@ -961,39 +1010,39 @@ msgstr "Musisz zrestartowaæ program, aby w pe³ni uwzglêdniæ wybór jêzyka"
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:106 icon.c:111 menu.c:223 toolbar.c:135
+#: icon.c:106 icon.c:111 menu.c:224 toolbar.c:136
 msgid "Help"
 msgstr "Pomoc"
 
-#: icon.c:107 menu.c:247
+#: icon.c:107 menu.c:248
 msgid "Options..."
 msgstr "Opcje..."
 
-#: icon.c:108 menu.c:256
+#: icon.c:108 menu.c:257
 msgid "Home Directory"
 msgstr "Katalog Domowy"
 
-#: icon.c:109 icon.c:141 menu.c:218 type.c:349
+#: icon.c:109 icon.c:141 menu.c:219 type.c:380
 msgid "File"
 msgstr "Plik"
 
-#: icon.c:110 menu.c:222 menu.c:900
+#: icon.c:110 menu.c:223 menu.c:906
 msgid "Shift Open"
 msgstr "Otwórz (shift)"
 
-#: icon.c:112 menu.c:224
+#: icon.c:112 menu.c:225
 msgid "Info"
 msgstr "Informacja"
 
-#: icon.c:113 menu.c:225
+#: icon.c:113 menu.c:226
 msgid "Set Run Action..."
 msgstr "Okre¶l akcjê..."
 
-#: icon.c:114 menu.c:226
+#: icon.c:114 menu.c:227
 msgid "Set Icon..."
 msgstr "Okre¶l Ikonê..."
 
-#: icon.c:115 icon.c:840
+#: icon.c:115 icon.c:844
 msgid "Edit Item"
 msgstr "Edycja pliku"
 
@@ -1029,93 +1078,93 @@ msgstr "Musisz najpierw zaznaczyæ ikony, ¿eby je usun±æ"
 msgid "You must open the menu over an item"
 msgstr "Nale¿y otworzyæ menu nad sk³adnikiem"
 
-#: icon.c:819 menu.c:1137
+#: icon.c:819 menu.c:1145
 msgid "You can only set the run action for a regular file"
 msgstr "Mo¿esz okre¶liæ akcjê jedynie dla zwyk³ego pliku"
 
-#: icon.c:846
+#: icon.c:850
 msgid "Clicking the icon opens:"
 msgstr "Klikniêcie na ikonê otwiera:"
 
-#: icon.c:858
+#: icon.c:862
 msgid "The text displayed under the icon is:"
 msgstr "Tekst wy¶wietlany pod ikon±:"
 
-#: infobox.c:95 menu.c:216
+#: infobox.c:99 menu.c:218
 msgid "Refresh"
 msgstr "Od¶wierz"
 
-#: infobox.c:249
+#: infobox.c:253
 msgid "Name:"
 msgstr "Nazwa:"
 
-#: infobox.c:255
+#: infobox.c:259
 msgid "Error:"
 msgstr "B³±d:"
 
-#: infobox.c:265
+#: infobox.c:269
 msgid "Owner, Group:"
 msgstr "W³a¶ciciel, Grupa:"
 
-#: infobox.c:273 support.c:237 support.c:317
+#: infobox.c:277 support.c:366 support.c:446
 msgid "bytes"
 msgstr "bajty"
 
-#: infobox.c:280
+#: infobox.c:284
 msgid "Size:"
 msgstr "Rozmiar:"
 
-#: infobox.c:284
+#: infobox.c:288
 msgid "Change time:"
 msgstr "Data zmiany:"
 
-#: infobox.c:288
+#: infobox.c:292
 msgid "Modify time:"
 msgstr "Data modyfikacji:"
 
-#: infobox.c:292
+#: infobox.c:296
 msgid "Access time:"
 msgstr "Data dostêpu:"
 
-#: infobox.c:298
+#: infobox.c:302
 msgid "Permissions:"
 msgstr "Uprawnienia:"
 
-#: infobox.c:302
+#: infobox.c:306
 msgid "Type:"
 msgstr "Typ:"
 
-#: infobox.c:309
+#: infobox.c:313
 msgid "Run action:"
 msgstr "Uruchom akcjê:"
 
-#: infobox.c:349
+#: infobox.c:353
 msgid "file(1) says..."
 msgstr "file(1) powiedzia³o..."
 
-#: infobox.c:350
+#: infobox.c:354
 msgid "<nothing yet>"
 msgstr "<jeszcze nic>"
 
-#: infobox.c:424
+#: infobox.c:428
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) okre¶li³o... %s"
 
-#: infobox.c:466
+#: infobox.c:470
 #, c-format
 msgid "Symbolic link to %s"
 msgstr "Symboliczne dowi±zanie do %s"
 
-#: infobox.c:472
+#: infobox.c:476
 msgid "Symbolic link"
 msgstr "Symboliczne dow±zanie"
 
-#: infobox.c:476
+#: infobox.c:480
 msgid "ROX application"
 msgstr "Aplikacja ROX"
 
-#: infobox.c:479 type.c:342
+#: infobox.c:483 type.c:373
 msgid "Mount point"
 msgstr "Munkt zamontowania"
 
@@ -1211,285 +1260,295 @@ msgstr ""
 "Wykryte b³êdy mo¿na wysy³aæ na adres <tal197@users.sourceforge.net>.\n"
 " \n"
 
-#: main.c:375
+#: main.c:376
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Uruchomiony na prawach u¿ytkownika '%s'"
 
-#: main.c:543
+#: main.c:542
 msgid "features set at compile time"
 msgstr "w³a¶ciwo¶ci ustawione podczas kompilacji"
 
-#: main.c:544
-msgid "VFS support"
+#: main.c:543
+#, fuzzy
+msgid "Old VFS support"
 msgstr "Wsparcie VFS"
 
 #: main.c:548
+msgid "No (incompatible with Large File Support)"
+msgstr ""
+
+#: main.c:550
 msgid "No (couldn't find a valid libvfs)"
 msgstr "Nie (nie mogê znale¶æ biblioteki libvfs)"
 
-#: main.c:551
+#: main.c:554
 msgid "GTK+-2.0 support"
 msgstr "Obs³uga GTK+-2.0"
 
-#: main.c:555
+#: main.c:558
 msgid "No (using Gtk+-1.2 instead)"
 msgstr "Nie (u¿ycie Gtk+-1.2)"
 
-#: menu.c:187 tips:13
+#: menu.c:188 tips:14
 msgid "Display"
 msgstr "Wy¶wietlanie"
 
-#: menu.c:188 tips:28
+#: menu.c:189 tips:27
 msgid "Huge Icons"
 msgstr "Wielkie ikony"
 
-#: menu.c:189 tips:29 tips:167
+#: menu.c:190 tips:28 tips:159
 msgid "Large Icons"
 msgstr "Du¿e ikony"
 
-#: menu.c:190 tips:30 tips:166
+#: menu.c:191 tips:29 tips:158
 msgid "Small Icons"
 msgstr "Ma³e ikony"
 
-#: menu.c:191
+#: menu.c:192
 msgid "Huge, With..."
 msgstr "Wielkie, z..."
 
-#: menu.c:192 menu.c:198 menu.c:204 tips:33
+#: menu.c:193 menu.c:199 menu.c:205 tips:32
 msgid "Summary"
 msgstr "Podsumowanie"
 
-#: menu.c:193 menu.c:199 menu.c:205 tips:34
+#: menu.c:194 menu.c:200 menu.c:206 tips:33
 msgid "Sizes"
 msgstr "Rozmiar"
 
-#: menu.c:195 menu.c:201 menu.c:207 tips:36 tips:40
+#: menu.c:196 menu.c:202 menu.c:208 tips:35 tips:39
 msgid "Type"
 msgstr "Typ"
 
-#: menu.c:196 menu.c:202 menu.c:208 tips:37
+#: menu.c:197 menu.c:203 menu.c:209 tips:36
 msgid "Times"
 msgstr "Czas"
 
-#: menu.c:197
+#: menu.c:198
 msgid "Large, With..."
 msgstr "Du¿e, oraz..."
 
-#: menu.c:203
+#: menu.c:204
 msgid "Small, With..."
 msgstr "Ma³e, oraz..."
 
-#: menu.c:210
+#: menu.c:211
 msgid "Sort by Name"
 msgstr "Posortowane wg Nazw"
 
-#: menu.c:211
+#: menu.c:212
 msgid "Sort by Type"
 msgstr "Posortowane wg Typów"
 
-#: menu.c:212
+#: menu.c:213
 msgid "Sort by Date"
 msgstr "Posortowane wg Dat"
 
-#: menu.c:213
+#: menu.c:214
 msgid "Sort by Size"
 msgstr "Posortowane wg Rozmiaru"
 
-#: menu.c:215
+#: menu.c:216
 msgid "Show Hidden"
 msgstr "Poka¿ ukryte"
 
 #: menu.c:217
-msgid "Create Thumbs"
-msgstr "Utwórz miniatury"
+#, fuzzy
+msgid "Show Thumbnails"
+msgstr "Poka¿ ukryte pliki"
 
-#: menu.c:219
+#: menu.c:220
 msgid "Copy..."
 msgstr "Kopiuj..."
 
-#: menu.c:220
+#: menu.c:221
 msgid "Rename..."
 msgstr "Przenie¶..."
 
-#: menu.c:221
+#: menu.c:222
 msgid "Link..."
 msgstr "Utwórz dowi±zanie"
 
-#: menu.c:228
+#: menu.c:229
 msgid "Open VFS"
 msgstr "Otwórz VFS"
 
-#: menu.c:229
+#: menu.c:230
 msgid "Unzip"
 msgstr "Unzip"
 
-#: menu.c:230
+#: menu.c:231
 msgid "Untar"
 msgstr "Untar"
 
-#: menu.c:231
+#: menu.c:232
 msgid "Deb"
 msgstr "Deb"
 
-#: menu.c:232
+#: menu.c:233
 msgid "RPM"
 msgstr "RPM"
 
-#: menu.c:234
+#: menu.c:235
 msgid "Open AVFS"
 msgstr "Otwórz AVFS"
 
-#: menu.c:237
+#: menu.c:238
 msgid "Send To..."
 msgstr "Wy¶lij do..."
 
-#: menu.c:242
+#: menu.c:243
 msgid "Select"
 msgstr "Wybierz"
 
-#: menu.c:243
+#: menu.c:244
 msgid "Select All"
 msgstr "Wybierz wszystkie"
 
-#: menu.c:244
+#: menu.c:245
 msgid "Clear Selection"
 msgstr "Wyczy¶æ zaznaczenie"
 
-#: menu.c:245
+#: menu.c:246
 msgid "Invert Selection"
 msgstr "Odwróæ zaznaczenie"
 
-#: menu.c:246
+#: menu.c:247
 msgid "Select If..."
 msgstr "Zaznacz gdy..."
 
-#: menu.c:248
+#: menu.c:249
 msgid "New"
 msgstr "Nowy"
 
-#: menu.c:250
+#: menu.c:251
 msgid "Blank file"
 msgstr "Pusty plik"
 
-#: menu.c:251
+#: menu.c:252
 msgid "Xterm Here"
 msgstr "Terminal"
 
-#: menu.c:252
+#: menu.c:253
 msgid "Window"
 msgstr "Okno"
 
-#: menu.c:253
+#: menu.c:254
 msgid "Parent, New Window"
 msgstr "Poprzedni katalog, nowe okno"
 
-#: menu.c:254
+#: menu.c:255
 msgid "Parent, Same Window"
 msgstr "Poprzedni katalog, to samo okno"
 
-#: menu.c:255
+#: menu.c:256
 msgid "New Window"
 msgstr "Nowe okno"
 
-#: menu.c:257
+#: menu.c:258
 msgid "Resize Window"
 msgstr "Zmieñ rozmiar okna"
 
-#: menu.c:260
+#: menu.c:261
 msgid "Close Window"
 msgstr "Zamknij okno"
 
-#: menu.c:262
+#: menu.c:263
 msgid "Enter Path..."
 msgstr "Wpisz Scie¿kê..."
 
-#: menu.c:263
+#: menu.c:264
 msgid "Shell Command..."
 msgstr "Polecenie..."
 
-#: menu.c:265
+#: menu.c:266
 msgid "Show ROX-Filer Help"
 msgstr "Poka¿ pomoc dla ROX-Filer'a"
 
-#: menu.c:349
+#: menu.c:352
 msgid "Relative link"
 msgstr "Relatywny odno¶nik"
 
-#: menu.c:353
+#: menu.c:356
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
 "If off, the path from the root directory is stored - use this if the symlink "
 "may move but the target will stay put."
 msgstr ""
-"Przy w³±czonej opcji, symboliczny odno¶nik zapisze ¶cie¿kê z odno¶nika do pliku docelowego. U¿yj tego, je¶li link symboliczny oraz plik dowi±zany bêd± przenoszone razem.\n"
-"Przy wy³±czonej opcji, zapamiêtywana jest ¶cie¿ka z katalogu nadrzêdnego - u¿yj tego, je¶li odno¶nik symboliczny ma byæ przeniesiony, ale plik dowi±zany ma zostaæ na miejscu."
+"Przy w³±czonej opcji, symboliczny odno¶nik zapisze ¶cie¿kê z odno¶nika do "
+"pliku docelowego. U¿yj tego, je¶li link symboliczny oraz plik dowi±zany bêd± "
+"przenoszone razem.\n"
+"Przy wy³±czonej opcji, zapamiêtywana jest ¶cie¿ka z katalogu nadrzêdnego - "
+"u¿yj tego, je¶li odno¶nik symboliczny ma byæ przeniesiony, ale plik "
+"dowi±zany ma zostaæ na miejscu."
 
-#: menu.c:757
+#: menu.c:762
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "Aby wys³aæ gdziekolwiek plik, nale¿y u¿yæ Shift+Menu nad plikiem"
 
-#: menu.c:795
+#: menu.c:801
 msgid "Next Click"
 msgstr "Nastêpne klikniêcie"
 
-#: menu.c:811
+#: menu.c:817
 #, c-format
 msgid "%d items"
 msgstr "zaznaczono plików %d"
 
-#: menu.c:887
+#: menu.c:893
 msgid "Unmount"
 msgstr "Odmontuj"
 
-#: menu.c:889 tips:107
+#: menu.c:895 tips:95
 msgid "Mount"
 msgstr "Zamontuj"
 
-#: menu.c:892
+#: menu.c:898
 msgid "Show Target"
 msgstr "Poka¿ cel"
 
-#: menu.c:894
+#: menu.c:900
 msgid "Look Inside"
 msgstr "Zajrzyj do ¶rodka"
 
-#: menu.c:896
+#: menu.c:902
 msgid "Open As Text"
 msgstr "Otwórz jako tekst"
 
-#: menu.c:1064
+#: menu.c:1072
 msgid "New pathname is not absolute"
 msgstr "Nowa ¶cie¿ka nie jest absolutna"
 
-#: menu.c:1226
+#: menu.c:1234
 msgid "New Directory"
 msgstr "Nowy Katalog"
 
-#: menu.c:1227
+#: menu.c:1235
 msgid "NewDir"
 msgstr "NowyKatalog"
 
-#: menu.c:1240 menu.c:1246
+#: menu.c:1248 menu.c:1254
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "B³±d tworzenia '%s': %s"
 
-#: menu.c:1266 menu.c:1324
+#: menu.c:1274 menu.c:1332
 msgid "New File"
 msgstr "Nowy plik"
 
-#: menu.c:1267
+#: menu.c:1275
 msgid "NewFile"
 msgstr "NowyPlik"
 
-#: menu.c:1283
+#: menu.c:1291
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "B³±d tworzenia pliku: nie mo¿na znale¼æ szablonu dla %s"
 
-#: menu.c:1354
+#: menu.c:1362
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -1500,130 +1559,137 @@ msgid ""
 "%s\n"
 "The `Send To' menu may be opened by Shift+Menu clicking over a file."
 msgstr ""
-"Menu 'Wy¶lij do' zapewnia szybki sposób wysy³ania wybranych plików do aplikacji. Aplikacje wymienione s± w nastêpuj±cych katalogach:\n"
+"Menu 'Wy¶lij do' zapewnia szybki sposób wysy³ania wybranych plików do "
+"aplikacji. Aplikacje wymienione s± w nastêpuj±cych katalogach:\n"
 "\n"
 "%s\n"
 "%s\n"
 "Menu 'Wy¶lij do' mo¿e byæ aktywowane przez klikniêcie nad plikiem Shift+Menu."
 
-#: menu.c:1360
+#: menu.c:1368
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
-msgstr "Teraz zostanie wy¶wietlony katalog Wy¶lijDo; aby umie¶ciæ w nim aplikacje stwórz w nim odno¶niki (np. przez przeci±ganie z jednocze¶nym wci¶niêciem Ctrl+Shift) "
+msgstr ""
+"Teraz zostanie wy¶wietlony katalog Wy¶lijDo; aby umie¶ciæ w nim aplikacje "
+"stwórz w nim odno¶niki (np. przez przeci±ganie z jednocze¶nym wci¶niêciem "
+"Ctrl+Shift) "
 
-#: menu.c:1363
+#: menu.c:1371
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
-msgstr "Ustawienie zmiennej CHOICEPATH wy³±cza mo¿liwo¶æ dostosowywania ustawieñ."
+msgstr ""
+"Ustawienie zmiennej CHOICEPATH wy³±cza mo¿liwo¶æ dostosowywania ustawieñ."
 
-#: menu.c:1404
+#: menu.c:1412
 msgid "Customise"
 msgstr "Dostosuj"
 
-#: menu.c:1482
+#: menu.c:1490
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
-msgstr "Nie mo¿esz otworzyæ drugiego okna dla tego katalogu, poniewa¿ jest w³±czona opcja 'Unikalnych okien' w konfiguracji."
+msgstr ""
+"Nie mo¿esz otworzyæ drugiego okna dla tego katalogu, poniewa¿ jest w³±czona "
+"opcja 'Unikalnych okien' w konfiguracji."
 
-#: menu.c:1511
+#: menu.c:1519
 #, c-format
 msgid "fork: %s"
 msgstr "rozwidlenie: %s"
 
-#: menu.c:1526
+#: menu.c:1534
 msgid "New window, as user..."
 msgstr "Nowe okno, jako u¿ytkownik..."
 
-#: menu.c:1534
+#: menu.c:1542
 msgid "Browse as which user?"
 msgstr "Przegl±daj jako u¿ytkownik?"
 
-#: menu.c:1541
+#: menu.c:1549
 msgid "User:"
 msgstr "U¿ytkownik:"
 
-#: menu.c:1717
+#: menu.c:1725
 msgid "Copy ... ?"
 msgstr "Kopiuj ... ?"
 
-#: menu.c:1720
+#: menu.c:1728
 msgid "Rename ... ?"
 msgstr "Przenie¶ ... ?"
 
-#: menu.c:1723
+#: menu.c:1731
 msgid "Symlink ... ?"
 msgstr "Powi±zanie symboliczne ... ?"
 
-#: menu.c:1726
+#: menu.c:1734
 msgid "Shift Open ... ?"
 msgstr "Otwarcie (shift) ... ?"
 
-#: menu.c:1729
+#: menu.c:1737
 msgid "Help about ... ?"
 msgstr "Pomoc na temat ...?"
 
-#: menu.c:1732
+#: menu.c:1740
 msgid "Examine ... ?"
 msgstr "Sprawdziæ ... ?"
 
-#: menu.c:1735
+#: menu.c:1743
 msgid "Set run action for ... ?"
 msgstr "Okre¶l akcjê dla ... ?"
 
-#: menu.c:1738
+#: menu.c:1746
 msgid "Set icon for ... ?"
 msgstr "Okre¶l ikonê dla ... ?"
 
-#: menu.c:1741
+#: menu.c:1749
 msgid "Send ... to ... ?"
 msgstr "Wy¶lij do ... ?"
 
-#: menu.c:1744
+#: menu.c:1752
 msgid "DELETE ... ?"
 msgstr "SKASOWAC ... ?"
 
-#: menu.c:1747
+#: menu.c:1755
 msgid "Count the size of ... ?"
 msgstr "Zlicz rozmiary ... ?"
 
-#: menu.c:1750
+#: menu.c:1758
 msgid "Set permissions on ... ?"
 msgstr "Ustaw uprawnienia ... ?"
 
-#: menu.c:1753
+#: menu.c:1761
 msgid "Search inside ... ?"
 msgstr "Szukaj wewn±trz ... ?"
 
-#: menu.c:1763
+#: menu.c:1771
 msgid "Look inside ... ?"
 msgstr "Szukaj wewn±trz ... ?"
 
-#: menu.c:1799
+#: menu.c:1807
 msgid "You cannot do this to more than one item at a time"
 msgstr "Nie mo¿esz tego zrobiæ dla wiêcej ni¿ jednego pliku"
 
-#: menu.c:1826
+#: menu.c:1834
 msgid "Rename"
 msgstr "Przenie¶"
 
-#: menu.c:1830
+#: menu.c:1838
 msgid "Symlink"
 msgstr "Powi±zanie symboliczne"
 
-#: minibuffer.c:129
+#: minibuffer.c:128
 msgid "Goto:"
 msgstr "Id¼ do:"
 
-#: minibuffer.c:130
+#: minibuffer.c:129
 msgid "Shell:"
 msgstr "Polecenie:"
 
-#: minibuffer.c:131
+#: minibuffer.c:130
 msgid "Select If:"
 msgstr "Zaznacz Gdy:"
 
-#: minibuffer.c:250
+#: minibuffer.c:249
 msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
@@ -1631,47 +1697,47 @@ msgstr ""
 "Wprowad¼ nazwê pliku, aby go pod¶wietliæ. Naci¶nij \"Tab\", aby uzupe³niæ do "
 "najd³u¿szej zgadzaj±cej siê nazwy. \"Escape\" zamknie minibufor."
 
-#: minibuffer.c:255
+#: minibuffer.c:254
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
 "Wprowad¼ polecenie do wykonania. Kliknij na plik, aby dodaæ jego nazwê do "
 "bufora."
 
-#: minibuffer.c:743
+#: minibuffer.c:742
 msgid "Failed to create child process"
 msgstr "Niepowodzenie przy tworzeniu procesu potomnego"
 
-#: minibuffer.c:814
+#: minibuffer.c:813
 msgid "Invalid Find condition"
 msgstr "Nieprawid³owy warunek Szukaj"
 
-#: options.c:832
+#: options.c:689
 msgid "ROX-Filer options"
 msgstr "Opcje"
 
-#: options.c:849
+#: options.c:706
 #, c-format
 msgid "Choices will be saved as %s"
 msgstr "Wybór zostanie zapisany jako %s"
 
-#: options.c:856 options.c:1140 type.c:984
+#: options.c:713 options.c:949 type.c:1018
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Zapis Wybranych Opcji wy³±czony przez zmienn± CHOICESPATH"
 
-#: options.c:863
+#: options.c:720
 msgid "Save"
 msgstr "Zapisz"
 
-#: options.c:879
+#: options.c:736
 msgid "Apply"
 msgstr "Zastosuj"
 
-#: options.c:907
+#: options.c:764
 msgid "Missing '='"
 msgstr "Brakuje '='"
 
-#: options.c:1111 options.c:1139 options.c:1151
+#: options.c:925 options.c:948 options.c:960
 #, c-format
 msgid "Could not save options: %s"
 msgstr "Nie mo¿na zapisaæ opcji: %s"
@@ -1696,12 +1762,12 @@ msgstr "Usun±æ"
 msgid "Missing < or > in panel config file"
 msgstr "Brakuj±ce < lub > w pliku konfiguracyjnym panela"
 
-#: panel.c:901
+#: panel.c:903
 #, c-format
 msgid "Could not save panel: %s"
 msgstr "Nie mo¿na zapisaæ panelu: %s"
 
-#: panel.c:1166
+#: panel.c:1168
 msgid "Applet quit without ever creating a widget!"
 msgstr "Aplet zakoñczy³ dzia³anie bez utworzenia wid¿eta."
 
@@ -1709,29 +1775,34 @@ msgstr "Aplet zakoñczy³ dzia³anie bez utworzenia wid¿eta."
 msgid "Another application is already managing the pinboard!"
 msgstr "Inna aplikacja ju¿ zarz±dza biurkiem"
 
-#: pinboard.c:1006
+#: pinboard.c:1010
 msgid "Missing '>' in icon label"
 msgstr "Brakuj±cy znak '>' w etykiecie ikony"
 
-#: pinboard.c:1015
+#: pinboard.c:1019
 msgid "Missing ',' after icon label"
 msgstr "Brakuj±cy przecinek za etykiet± ikony"
 
-#: pinboard.c:1163
+#: pinboard.c:1167
 #, c-format
 msgid "Could not save pinboard: %s"
 msgstr "Nie mo¿na zapisaæ biurka: %s"
 
-#: pixmaps.c:351
+#: pixmaps.c:442
 msgid "Unknown error"
 msgstr "Nieznany b³±d"
 
-#: rox_gettext.c:88
+#: remote.c:767
+#, c-format
+msgid "Attempt to invoke unknown SOAP method '%s'"
+msgstr ""
+
+#: rox_gettext.c:93
 #, c-format
 msgid "Invalid .gmo translation file (too short): %s"
 msgstr "Niew³a¶ciwy plik translacji .gmo (zbyt krótki): %s"
 
-#: rox_gettext.c:101
+#: rox_gettext.c:106
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr "Niew³a¶ciwy plik translacji .gmo (Brak magicznego numeru GNU): %s"
@@ -1757,7 +1828,8 @@ msgid ""
 "This is a file with an eXecute bit set - it can be run as a program."
 msgstr ""
 "Plik wykonywalny:\n"
-"To jest plik z ustawionym atrybutem X (wykonywalny) - mo¿e zostaæ on uruchomiony jako program."
+"To jest plik z ustawionym atrybutem X (wykonywalny) - mo¿e zostaæ on "
+"uruchomiony jako program."
 
 #: run.c:284
 msgid ""
@@ -1765,7 +1837,8 @@ msgid ""
 "This is a data file. Try using the Info menu item to find out more..."
 msgstr ""
 "Plik:\n"
-"To jest plik danych. Spróbuj skorzystaæ z polecenia \"Informacja\" z menu, aby uzyskaæ wiêcej informacji..."
+"To jest plik danych. Spróbuj skorzystaæ z polecenia \"Informacja\" z menu, "
+"aby uzyskaæ wiêcej informacji..."
 
 #: run.c:291
 msgid ""
@@ -1774,7 +1847,9 @@ msgid ""
 "Everything on the mounted filesystem then appears to be inside the directory."
 msgstr ""
 "Punkt montowania:\n"
-"Punkt zamontowania jest katalogiem, do którego mo¿e zostaæ zamontowany inny system plików. Wszystkie pliki znajduj±ce sie w tym systemie plików pojawi± siê wewn±trz tego katalogu."
+"Punkt zamontowania jest katalogiem, do którego mo¿e zostaæ zamontowany inny "
+"system plików. Wszystkie pliki znajduj±ce sie w tym systemie plików pojawi± "
+"siê wewn±trz tego katalogu."
 
 #: run.c:302
 msgid ""
@@ -1783,7 +1858,8 @@ msgid ""
 "was an ordinary file."
 msgstr ""
 "Plik urz±dzenia:\n"
-"Pliki urz±dzeñ pozwalaj± na odczyt lub zapis do sterownika urz±dzenia tak, jakby by³ zwyk³y plik."
+"Pliki urz±dzeñ pozwalaj± na odczyt lub zapis do sterownika urz±dzenia tak, "
+"jakby by³ zwyk³y plik."
 
 #: run.c:309
 msgid ""
@@ -1792,7 +1868,8 @@ msgid ""
 "the pipe while another one reads it out again."
 msgstr ""
 "Potok nazwany:\n"
-"Potoki pozwalaj± na wzajemn± komunikacjê ró¿nych programów. Jeden program zapisuje dane do potoku, podczas gdy drugi odczytuje je z niego."
+"Potoki pozwalaj± na wzajemn± komunikacjê ró¿nych programów. Jeden program "
+"zapisuje dane do potoku, podczas gdy drugi odczytuje je z niego."
 
 #: run.c:316
 msgid ""
@@ -1809,7 +1886,8 @@ msgid ""
 "anymore or you don't have search permission on the directory it's in?"
 msgstr ""
 "Nieznany typ:\n"
-"Nie mo¿na ustaliæ typu tego pliku. Byæ mo¿e plik zosta³ ju¿ skasowany, lub nie ma prawa przegl±dania tego katalogu?"
+"Nie mo¿na ustaliæ typu tego pliku. Byæ mo¿e plik zosta³ ju¿ skasowany, lub "
+"nie ma prawa przegl±dania tego katalogu?"
 
 #: run.c:409
 #, c-format
@@ -1845,7 +1923,9 @@ msgid ""
 "help here, but this one doesn't."
 msgstr ""
 "Aplikacja:\n"
-"To jest katalog aplikacji - mo¿esz uruchomiæ ten program, lub otworzyæ ten katalog (przytrzymuj±c Shift). Wiêkszo¶æ aplikacji udostêpnia w³asn± pomoc, ale nie ten..."
+"To jest katalog aplikacji - mo¿esz uruchomiæ ten program, lub otworzyæ ten "
+"katalog (przytrzymuj±c Shift). Wiêkszo¶æ aplikacji udostêpnia w³asn± pomoc, "
+"ale nie ten..."
 
 #: run.c:533
 msgid ""
@@ -1854,140 +1934,137 @@ msgid ""
 "the list."
 msgstr ""
 "Katalog:\n"
-"To jest katalog. Zawiera spis innych plików - otwórz go, aby zobaczyæ ich listê"
+"To jest katalog. Zawiera spis innych plików - otwórz go, aby zobaczyæ ich "
+"listê"
 
-#: support.c:235 support.c:319
+#: support.c:364 support.c:448
 msgid "byte"
 msgstr "bajt"
 
-#: support.c:575
+#: support.c:777
 msgid "Copy error"
 msgstr "B³±d podczas kopiowania"
 
-#: support.c:583
-msgid "Copy failed"
-msgstr "Kopiowanie zakoñczone niepowodzniem"
-
-#: toolbar.c:107
+#: toolbar.c:108
 msgid "Close filer window"
 msgstr "Zamknij okno"
 
-#: toolbar.c:111
+#: toolbar.c:112
 msgid "Up"
 msgstr "W górê"
 
-#: toolbar.c:111
+#: toolbar.c:112
 msgid "Change to parent directory"
 msgstr "Przejd¼ do poprzedniego katalogu"
 
-#: toolbar.c:115
+#: toolbar.c:116
 msgid "Home"
 msgstr "Dom"
 
-#: toolbar.c:115
+#: toolbar.c:116
 msgid "Change to home directory"
 msgstr "Przejd¼ do Katalogu domowego"
 
-#: toolbar.c:119
+#: toolbar.c:120
 msgid "Scan"
 msgstr "Sprawd¼"
 
-#: toolbar.c:119
+#: toolbar.c:120
 msgid "Rescan directory contents"
 msgstr "Odczytaj ponownie zawarto¶æ katalogu"
 
-#: tips:42 toolbar.c:123
+#: tips:41 toolbar.c:124
 msgid "Size"
 msgstr "Rozmiar"
 
-#: toolbar.c:123
+#: toolbar.c:124
 msgid "Change icon size"
 msgstr "Zmieñ rozmiar ikony"
 
-#: tips:31 toolbar.c:127
+#: tips:30 toolbar.c:128
 msgid "Details"
 msgstr "Szczegó³y"
 
-#: toolbar.c:127
+#: toolbar.c:128
 msgid "Show extra details"
 msgstr "Poka¿ szczegó³y"
 
-#: toolbar.c:131
+#: toolbar.c:132
 msgid "Hidden"
 msgstr "Ukryte"
 
-#: toolbar.c:131
+#: toolbar.c:132
 msgid "Show/hide hidden files"
 msgstr "Poka¿/ukryj ukryte pliki"
 
-#: toolbar.c:135
+#: toolbar.c:136
 msgid "Show ROX-Filer help"
 msgstr "Poka¿ pomoc ROX-Filer'a"
 
-#: toolbar.c:593
+#: toolbar.c:596
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u ukrytych)"
 
-#: toolbar.c:600
+#: toolbar.c:603
 msgid "items"
 msgstr "plików"
 
-#: toolbar.c:600
+#: toolbar.c:603
 msgid "item"
 msgstr "plik"
 
-#: toolbar.c:603
+#: toolbar.c:606
 #, c-format
 msgid "No items%s"
 msgstr "Brak plików %d"
 
-#: toolbar.c:620
+#: toolbar.c:623
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u zaznaczonych (%s)"
 
-#: type.c:287
+#: type.c:318
 msgid "Missing MIME-type"
 msgstr "Brak typu MIME"
 
-#: type.c:331
+#: type.c:362
 msgid "Trailing chars after MIME-type"
 msgstr "Znaleziono tekst za okre¶leniem typu MIME"
 
-#: type.c:340
+#: type.c:371
 msgid "Sym link"
 msgstr "Dowi±zanie symboliczne"
 
-#: type.c:344
+#: type.c:375
 msgid "App dir"
 msgstr "Katalog aplikacji"
 
-#: type.c:351
+#: type.c:382
 msgid "Dir"
 msgstr "Katalog"
 
-#: type.c:353
+#: type.c:384
 msgid "Char dev"
 msgstr "Urz±dzenie znakowe"
 
-#: type.c:355
+#: type.c:386
 msgid "Block dev"
 msgstr "Urz±dzenie blokowe"
 
-#: tips:49 type.c:357
+#: tips:172 type.c:388
 msgid "Pipe"
 msgstr "Potok"
 
-#: tips:50 type.c:359
+#: tips:173 type.c:390
 msgid "Socket"
 msgstr "Gniazdo"
 
-#: type.c:362
+#: type.c:393
 msgid "Unknown"
 msgstr "Nieznane"
 
-#: type.c:587
+#: type.c:617
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -1998,7 +2075,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:666
+#: type.c:696
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2006,53 +2083,53 @@ msgstr ""
 "Powiniene¶ przenie¶æ pojedyñcz± aplikacjê do skrzynki (drop box) - ta "
 "aplikacja bêdzie u¿ywana do za³adowania plików tego typu w przysz³o¶ci"
 
-#: type.c:693
+#: type.c:723
 msgid "This is not a program! Give me an application instead!"
 msgstr "To nie jest program!. Daj mi program!"
 
-#: type.c:751
+#: type.c:781
 msgid "Execute file"
 msgstr "Uruchom plik"
 
-#: type.c:756
+#: type.c:786
 msgid "No run action defined"
 msgstr "Brak okre¶lonej akcji"
 
-#: type.c:782
+#: type.c:812
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "B³±d w obs³udze %s: %s"
 
-#: type.c:797
+#: type.c:827
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Niew³a¶ciwa aplikacja %s (niew³a¶ciwy AppRun)"
 
-#: type.c:808
+#: type.c:838
 #, c-format
 msgid "Non-executable %s"
 msgstr "Niewykonywalny %s"
 
-#: type.c:841
+#: type.c:875
 msgid "Set run action"
 msgstr "Okre¶l akcjê"
 
-#: type.c:847
+#: type.c:881
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Ustaw domy¶lnie dla wszystkich '%s/<cokolwiek>'"
 
-#: type.c:853 usericons.c:233
+#: type.c:887 usericons.c:238
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Tylko dla typu '%s/%s'"
 
-#: type.c:881
+#: type.c:915
 #, c-format
 msgid "Currently %s"
 msgstr "Aktualnie %s"
 
-#: type.c:895
+#: type.c:929
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2060,15 +2137,15 @@ msgstr ""
 "Upu¶æ tutaj w³a¶ciw±\n"
 "aplikacjê"
 
-#: type.c:902 usericons.c:286 usericons.c:315
+#: type.c:936 usericons.c:291 usericons.c:320
 msgid "OR"
 msgstr "LUB"
 
-#: type.c:909
+#: type.c:943
 msgid "Enter a shell command:"
 msgstr "Wprowad¼ polecenia shell'a:"
 
-#: type.c:997
+#: type.c:1031
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2076,60 +2153,61 @@ msgstr ""
 "Akcja 'uruchom' ju¿ istnieje i jest do¶æ sporym programem - czy napewno "
 "chcesz j± skasowaæ?"
 
-#: type.c:1009
+#: type.c:1043
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Nie mogê usun±æ %s: %s"
 
-#: usericons.c:171
+#: usericons.c:172
 msgid "The pathname you gave does not exist. The icon has not been changed."
 msgstr "Podana ¶cie¿ka nie istnieje. Ikona nie zosta³a zmieniona"
 
-#: usericons.c:181
+#: usericons.c:182
 msgid ""
 "Unable to load image file -- maybe it's not in a format I understand, or "
 "maybe the permissions are wrong?\n"
 "The icon has not been changed."
 msgstr ""
-"Nie mo¿na wczytaæ obrazu - byæ mo¿e jest w niezrozumia³ym formacie, lub brak uprawnieñ do odczytu?\n"
+"Nie mo¿na wczytaæ obrazu - byæ mo¿e jest w niezrozumia³ym formacie, lub brak "
+"uprawnieñ do odczytu?\n"
 "Ikona nie bêdzie zmieniona."
 
-#: usericons.c:219
+#: usericons.c:224
 msgid "Set icon"
 msgstr "Ustaw ikonê"
 
-#: usericons.c:227
+#: usericons.c:232
 #, c-format
 msgid "Set icon for all `%s/<anything>'"
 msgstr "Ustaw ikonê dla wszystkich '%s/<cokolwiek>'"
 
-#: usericons.c:241
+#: usericons.c:246
 #, c-format
 msgid "Only for the file `%s'"
 msgstr "Tylko dla pliku '%s'"
 
-#: usericons.c:268
+#: usericons.c:273
 msgid "Drop an icon file here"
 msgstr "Przeci±gnij tutaj plik z ikon±"
 
-#: usericons.c:278
+#: usericons.c:283
 msgid "Menu of directories previously used for icons"
 msgstr "Menu katalogów u¿ywanych poprzednio przy ikonach"
 
-#: usericons.c:293
+#: usericons.c:298
 msgid "Enter the path of an icon file:"
 msgstr "Wprowad¼ ¶cie¿kê dotêpu do pliku zawieraj±cego ikonê:"
 
-#: usericons.c:322
+#: usericons.c:327
 msgid "Remove custom icon"
 msgstr "Usuñ ikonê"
 
-#: usericons.c:393
+#: usericons.c:398
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "B³±d zapisu %s: %s"
 
-#: usericons.c:524
+#: usericons.c:529
 msgid ""
 "You should drop a single local icon file onto the drop box - that icon will "
 "be used for this file from now on."
@@ -2137,7 +2215,7 @@ msgstr ""
 "Powiniene¶ przenie¶æ pojedyñczy plik ikony do skrzynki (drop box) - podana "
 "ikona bêdzie wy¶wietlana dla tego pliku"
 
-#: usericons.c:567
+#: usericons.c:572
 msgid ""
 "Enter the full path of a file that contains a valid image to be used as the "
 "icon for this file or directory."
@@ -2145,31 +2223,34 @@ msgstr ""
 "Wprowad¼ pe³n± ¶cie¿kê dostêpu do pliku zawieraj±cego rysunek który ma "
 "zostaæ wykorzystany jako ikona."
 
-#: usericons.c:591
+#: usericons.c:596
 msgid "Setting icon disabled by CHOICESPATH"
 msgstr "Ustawienia ikony wy³±czone przez zmienn± CHOICESPATH"
 
-#: usericons.c:660
+#: usericons.c:665
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
-msgstr "Opcja ta zabrania ustawiania ikon specjalnych: jednak¿e brak katalogów do pokazania"
+msgstr ""
+"Opcja ta zabrania ustawiania ikon specjalnych: jednak¿e brak katalogów do "
+"pokazania"
 
-#: tips:1 tips:2
+#: tips:1 tips:3
 msgid "Translation"
 msgstr "Jêzyk"
 
-#: tips:3 tips:120
-msgid "None"
-msgstr "Brak"
+#: tips:2
+#, fuzzy
+msgid "Display messages in..."
+msgstr "Wy¶wietlaj du¿e ikony"
 
 #: tips:4
-msgid "From LANG"
-msgstr "Na podstawie zmiennej LANG"
-
-#: tips:5
 msgid "Dutch"
 msgstr "Niemiecki"
+
+#: tips:5
+msgid "English (no translation)"
+msgstr ""
 
 #: tips:6
 msgid "French"
@@ -2199,11 +2280,15 @@ msgstr "Rosyjski"
 msgid "Spanish"
 msgstr "Hiszpañski"
 
-#: tips:14
+#: tips:13
+msgid "Use the LANG environment variable"
+msgstr ""
+
+#: tips:15
 msgid "Ignore case when sorting"
 msgstr "Ignoruj rozmiar znaków przy sortowaniu"
 
-#: tips:15
+#: tips:16
 msgid ""
 "If off: Ben, animal, zoo.\n"
 "If on: animal, Ben, zoo."
@@ -2211,132 +2296,100 @@ msgstr ""
 "Wy³±czone: Ben, apteka, zoo.\n"
 "W³aczone: apteka, Ben, zoo."
 
-#: tips:16
-msgid "Ignore eXecutable bit for known extensions"
-msgstr "Ignuruj bit wykonywania dla znanych rozszerzeñ"
-
 #: tips:17
-msgid ""
-"If a file has a known extension (eg '.gif') then ignore the executable bit. "
-"This is useful if you have files on a Windows-type filesystem which are "
-"being shown as executable programs."
-msgstr "Je¶li plik ma znane rozszerzenie (np. '.gif') wtedy ignoruje bit wykonywalno¶ci. Jest to przydatne przy przegl±daniu plików na systemach plików MS Windows, które zwykle pokazywane s± jako wykonywalne programy."
-
-#: tips:18
 msgid "Directories always come first"
 msgstr "Najpierw katalogi"
 
-#: tips:19
+#: tips:18
 msgid ""
 "If this is on then directories will always appear before anything else, "
 "regardless of the sort type."
-msgstr "Przy tej opcji katalogi bêd± umieszczane przed wszystkimi plikami, niezale¿nie od wybranego typu sortowania."
+msgstr ""
+"Przy tej opcji katalogi bêd± umieszczane przed wszystkimi plikami, "
+"niezale¿nie od wybranego typu sortowania."
 
-#: tips:20
+#: tips:19
 msgid "Large wrap width"
 msgstr "Du¿a szeroko¶æ zawijania"
 
-#: tips:21
+#: tips:20
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
-msgstr "Tekst o wiêkszej szeroko¶ci zostanie z³amany na dwie linie w trybie Du¿ych Ikon. W trybie Wielkich Ikon, tekst jest zawiniêty kiedy bêdzie o 50% szerszy ni¿ ten."
+msgstr ""
+"Tekst o wiêkszej szeroko¶ci zostanie z³amany na dwie linie w trybie Du¿ych "
+"Ikon. W trybie Wielkich Ikon, tekst jest zawiniêty kiedy bêdzie o 50% "
+"szerszy ni¿ ten."
 
-#: tips:22
+#: tips:21
 msgid "Max Small Icons width"
 msgstr "Maksymalny rozmiar ma³ych ikon"
 
-#: tips:23
+#: tips:22
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maksymalny rozmiar pola tekstowego obok ma³ej ikony."
 
-#: tips:24
+#: tips:23
 msgid "Inherit options from source window"
 msgstr "Odziedziæ opcje z okna ¼ród³owego"
 
-#: tips:25
+#: tips:24
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
-msgstr "Przy w³aczonej opcji, opcje wy¶wietlania dla nowych okien s± dziedziczone, je¶li to mo¿liwe, z okna ¼ród³owego. W przeciwnym przypadku s± ustawiane wed³ug poni¿szych opcji."
+msgstr ""
+"Przy w³aczonej opcji, opcje wy¶wietlania dla nowych okien s± dziedziczone, "
+"je¶li to mo¿liwe, z okna ¼ród³owego. W przeciwnym przypadku s± ustawiane "
+"wed³ug poni¿szych opcji."
 
-#: tips:26
+#: tips:25
 msgid "Default settings for new windows:"
 msgstr "Domy¶lne ustawienia dla nowych okien"
 
-#: tips:27
+#: tips:26
 msgid "Icon size"
 msgstr "Rozmiar ikony"
 
-#: tips:32
+#: tips:31
 msgid "No details"
 msgstr "Bez szczegó³ów"
 
-#: tips:38
+#: tips:37
 msgid "Sort by"
 msgstr "Sortowanie wg"
 
-#: tips:41
+#: tips:40
 msgid "Date"
 msgstr "Data"
 
-#: tips:43
+#: tips:42
 msgid "Show hidden files"
 msgstr "Poka¿ ukryte pliki"
 
-#: tips:44
+#: tips:43
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
-msgstr "Przy w³±czonej opcji, pliki których nazwy zaczynaj± siê od kropki s± równie¿ pokazywane. W przeciwnym wypadku zostan± ukryte."
+msgstr ""
+"Przy w³±czonej opcji, pliki których nazwy zaczynaj± siê od kropki s± równie¿ "
+"pokazywane. W przeciwnym wypadku zostan± ukryte."
 
-#: tips:45
-msgid "Colour files based on their types"
-msgstr "Kolory plików bazuj± na ich typach"
+#: tips:44
+#, fuzzy
+msgid "Show image thumbnails"
+msgstr "Poka¿ szczegó³y"
 
-#: tips:46
-msgid "Filenames (and details) are coloured according to the file's type."
-msgstr "Nazwy plików (oraz szczegó³ów) s± kolorowane wed³ug typów plików."
-
-#: tips:48
-msgid "Regular file"
-msgstr "Zwyk³y plik"
-
-#: tips:51
-msgid "Character device"
-msgstr "Urz±dzenie znakowe"
-
-#: tips:52
-msgid "Block device"
-msgstr "Urz±dzenie blokowe"
-
-#: tips:53
-msgid "Executable file"
-msgstr "Plik wykonywalny"
-
-#: tips:54
-msgid "Application directory"
-msgstr "Katalok aplikacji"
-
-#: tips:55
-msgid "Unknown type"
-msgstr "Nieznany typ"
-
-#: tips:56
-msgid "Error"
-msgstr "B³±d"
-
-#: tips:57 tips:58 tips:59 tips:60
+#: tips:45 tips:46
 msgid ""
-"Error, such as a symlink which points to a non-existant file, or a file "
-"which the filer does not have permission to examine."
-msgstr "B³±d. Wskazuje, ¿e link symboliczny prowadzi do nieistniej±cego pliku, lub filtr nie ma mo¿liwo¶ci odczytu pliku."
+"Load every image file and display it, scaled-down, in the filer window "
+"instead of the normal icon."
+msgstr ""
 
-#: tips:61
+#: tips:47
 msgid "Pinboard"
 msgstr "Biurko"
 
-#: tips:62
+#: tips:48
 msgid ""
 "The pinboard is the desktop background.\n"
 "When the pinboard is turned on, you can drag files\n"
@@ -2348,51 +2401,66 @@ msgstr ""
 "i aplikacje tworz±c skróty. Poszukaj w podrêczniku informacji\n"
 "na temat u¿ywania biurka."
 
-#: tips:63
+#: tips:49
 msgid "Text style:"
 msgstr "Styl tekstu:"
 
-#: tips:64
+#: tips:50
 msgid "No background"
 msgstr "Brak t³a"
 
-#: tips:65
+#: tips:51
 msgid "The text is drawn directly on the desktop background."
 msgstr "Tekst jest wy¶wietlany bezpo¶rednio na pulpicie"
 
-#: tips:66
+#: tips:52
 msgid "Outlined text"
 msgstr "Obramowany tekst"
 
-#: tips:67
+#: tips:53
 msgid "The text has a thin outline around each letter."
 msgstr "Tekst ma cienk± obwódkê wokó³ ka¿dej litery"
 
-#: tips:68
+#: tips:54
 msgid "Rectangular background slab"
 msgstr "Prostok±tny obszar t³a"
 
-#: tips:69 tips:70
+#: tips:55 tips:56
 msgid "The text is drawn on a solid rectangle."
 msgstr "Tekst jest wy¶wietlany wewn±trz prostok±tnej ramki"
 
-#: tips:71
+#: tips:57
 msgid "Text colours:"
 msgstr "Kolory tekstu: "
 
-#: tips:72
+#: tips:58
 msgid "Foreground"
 msgstr "Kolor znaków"
 
-#: tips:73
+#: tips:59
 msgid "Background"
 msgstr "T³o"
 
-#: tips:74
+#: tips:60
+#, fuzzy
+msgid "Single-click to open"
+msgstr "Nawigacja za pomoc± pojedyñczego klikniêcia"
+
+#: tips:61 tips:130
+msgid ""
+"Clicking on an item opens it with this on. Hold down Control to select the "
+"item instead. If off, clicking once selects an item; double click to open "
+"things."
+msgstr ""
+"Klikniêcie na plik otwiera go. Je¿eli chcesz zaznaczyæ plik - przytrzymaj "
+"\"Control\". Je¿eli opcja ta pozostanie wy³±czona pojedyñcze klikniêcie "
+"zaznacza plik, natomiast podwójne otwiera go"
+
+#: tips:62
 msgid "Keep icons within screen limits"
 msgstr "Trzymaj ikony w obrêbie ekranu"
 
-#: tips:75
+#: tips:63
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -2400,39 +2468,39 @@ msgstr ""
 "Po w³±czeniu tej opcji, ikony na pulpicie bêd± zawsze trzymane ca³kowiæie w "
 "ramach ekranu, w³±czaj±c etykietê."
 
-#: tips:76
+#: tips:64
 msgid "Icon grid step:"
 msgstr "Rozmiar siatki dla ikon: "
 
-#: tips:77
+#: tips:65
 msgid "Fine"
 msgstr "Ma³y"
 
-#: tips:78
+#: tips:66
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "U¿yj siatki o rozmiarze 2 pikseli do rozmieszczenia ikon na pulpicie"
 
-#: tips:79
+#: tips:67
 msgid "Medium"
 msgstr "¦redni"
 
-#: tips:80
+#: tips:68
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "U¿yj siatki o rozmiarze 16 pikseli do rozmieszczenia ikon na pulpicie"
 
-#: tips:81
+#: tips:69
 msgid "Coarse"
 msgstr "Du¿y"
 
-#: tips:82 tips:83 tips:84 tips:85
+#: tips:70 tips:71 tips:72 tips:73
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "U¿yj siatki o rozmiarze 32 pikseli do rozmieszczenia ikon na pulpicie"
 
-#: tips:86
+#: tips:74
 msgid "Panels"
 msgstr "Penele"
 
-#: tips:87
+#: tips:75
 msgid ""
 "Panels are bars of icons that run along the side of the screen.\n"
 "See the manual for information about using panels."
@@ -2440,36 +2508,38 @@ msgstr ""
 "Panele s± belkami ikon które s± wy¶wietlane wzd³u¿ boków ekranu.\n"
 "Poszukaj w podrêczniku informacji na temat u¿ywania paneli."
 
-#: tips:88
+#: tips:76
 msgid "Image and text"
 msgstr "Obrazy i tekst"
 
-#: tips:89
+#: tips:77
 msgid "Every panel icon is shown with an image and some text."
 msgstr "Ka¿dy panel z ikonami jest wy¶wietlany jako obraz i podpis."
 
-#: tips:90
+#: tips:78
 msgid "Image only for applications"
 msgstr "Obrazy tylko przy aplikacjach"
 
-#: tips:91
+#: tips:79
 msgid ""
 "Applications have just an image, everything else has both an image and text."
-msgstr "Aplikacje s± przedstawiany tylko za pomoc± obrazów, wszystko inne jako obrazy i podpis."
+msgstr ""
+"Aplikacje s± przedstawiany tylko za pomoc± obrazów, wszystko inne jako "
+"obrazy i podpis."
 
-#: tips:92
+#: tips:80
 msgid "Image only"
 msgstr "Tylko obrazy"
 
-#: tips:93 tips:94 tips:95
+#: tips:81 tips:82 tips:83
 msgid "Only the image is shown."
 msgstr "Pokazywane s± tylko obrazy"
 
-#: tips:96
+#: tips:84
 msgid "Action windows"
 msgstr "Okno akcji"
 
-#: tips:97
+#: tips:85
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -2477,142 +2547,146 @@ msgstr ""
 "Okno z akcjami pokazuje siê kiedy uruchomiasz operacje w tle\n"
 " (np. kopiowanie lub kasowanie plików)"
 
-#: tips:98
+#: tips:86
 msgid "Auto-start (Quiet) these actions:"
 msgstr "Natychmiastowy start (cichy)"
 
-#: tips:100
+#: tips:88
 msgid "Copy files without confirming first."
 msgstr "Kopiuj pliki bez uprzedniego potwierdzania."
 
-#: tips:102
+#: tips:90
 msgid "Move files without confirming first."
 msgstr "Przenie¶ pliki bez uprzedniego potwierdzania."
 
-#: tips:104
+#: tips:92
 msgid "Create links to files without confirming first."
 msgstr "Twórz odno¶niki bez uprzedniego potwierdzania."
 
-#: tips:106
+#: tips:94
 msgid "Delete files without confirming first."
 msgstr "Kasuj pliki bez poprzedniego potwierdzania."
 
-#: tips:108
+#: tips:96
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "Zamontuj i odmontuj bez uprzedniego potwierdzania"
 
-#: tips:109
+#: tips:97
 msgid "Default settings:"
 msgstr "Domy¶lne ustawienia:"
 
-#: tips:110
-msgid "Force"
-msgstr "Wymu¶"
-
-#: tips:111
+#: tips:99
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "Nie zgadzaj siê na kasowanie niezapisywalnych plików"
 
-#: tips:112
-msgid "Brief"
-msgstr "Zwiê¼le"
-
-#: tips:113
+#: tips:101
 msgid "Don't display so much information in the message area."
 msgstr "Nie wy¶wietlaj zbyt wielu informacji w obszarze wiadomo¶ci."
 
-#: tips:114
-msgid "Recurse"
-msgstr "Rekursywnie"
-
-#: tips:115 tips:116
+#: tips:103 tips:104
 msgid "Also change contents of subdirectories."
 msgstr "Zmieniaj zawarto¶æ w podkatalogach"
 
-#: tips:117
+#: tips:105
 msgid "Toolbar"
 msgstr "Pasek narzêdzi"
 
-#: tips:118
+#: tips:106
 msgid "Unshade the tools you want:"
 msgstr "Zaznacz narzêdzia, które chcesz widzieæ:"
 
-#: tips:119
+#: tips:107
 msgid "Toolbar type"
 msgstr "Typ paska narzêdzi"
 
-#: tips:121
+#: tips:108
+msgid "None"
+msgstr "Brak"
+
+#: tips:109
 msgid "Small"
 msgstr "Ma³e"
 
-#: tips:122
+#: tips:110
 msgid "Large"
 msgstr "Du¿e"
 
-#: tips:123
+#: tips:111
 msgid "Show totals of items"
 msgstr "Poka¿ wszystkie pliki"
 
-#: tips:124 tips:125
+#: tips:112 tips:113
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
 "selected items and their combined size."
-msgstr "Pokazuje liczbê plików wy¶wietlanych w oknie z plikami wraz z plikami ukrytymi (o ile takie istniej±). Po zaznaczeniu plików wye¶wietla liczbê zaznaczonych plików oraz ich sumaryczny rozmiar."
+msgstr ""
+"Pokazuje liczbê plików wy¶wietlanych w oknie z plikami wraz z plikami "
+"ukrytymi (o ile takie istniej±). Po zaznaczeniu plików wye¶wietla liczbê "
+"zaznaczonych plików oraz ich sumaryczny rozmiar."
 
-#: tips:126
+#: tips:114
 msgid "Filer windows"
 msgstr "Okno plików"
 
-#: tips:127
+#: tips:115
 msgid "Automatically resize filer windows..."
 msgstr "Automatycznie zmieniaj rozmiar okna..."
 
-#: tips:128
+#: tips:116
 msgid "...never"
 msgstr "...nigdy"
 
-#: tips:129
+#: tips:117
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
-msgstr "Opcja ta wymusza \"rêczn±\" zmianê rozmiaru okien: przy pomocy menad¿era okien, opcji menu 'Zmieñ rozmiar okna' lub przez podwójne klikniêcie na t³o okna."
+msgstr ""
+"Opcja ta wymusza \"rêczn±\" zmianê rozmiaru okien: przy pomocy menad¿era "
+"okien, opcji menu 'Zmieñ rozmiar okna' lub przez podwójne klikniêcie na t³o "
+"okna."
 
-#: tips:130
+#: tips:118
 msgid "...when changing the display style"
 msgstr "... przy zmianie stylu wy¶wietlania"
 
-#: tips:131
+#: tips:119
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
-msgstr "Zmiana rozmiaru ikon oraz oraz ilo¶æ wy¶wietlanych szczegó³ów powoduje automatyczn± zmianê wielko¶ci okna."
+msgstr ""
+"Zmiana rozmiaru ikon oraz oraz ilo¶æ wy¶wietlanych szczegó³ów powoduje "
+"automatyczn± zmianê wielko¶ci okna."
 
-#: tips:132
+#: tips:120
 msgid "...always"
 msgstr "... zawsze"
 
-#: tips:133 tips:134
+#: tips:121 tips:122
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
-msgstr "Okno z plikami bêdzie zmieniaæ rozmiar wtedy kiedy program uzna to za stosowne (np. przy zmianie katalogu lub zmianie stylu wy¶wietlania)."
+msgstr ""
+"Okno z plikami bêdzie zmieniaæ rozmiar wtedy kiedy program uzna to za "
+"stosowne (np. przy zmianie katalogu lub zmianie stylu wy¶wietlania)."
 
-#: tips:135
+#: tips:123
 msgid "Window size limit"
 msgstr "Ograniczenie rozmiaru okna"
 
-#: tips:136
+#: tips:124
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
-msgstr "Najwiêkszy (okre¶lony procentowo) rozmiaru, które mo¿e osi±gn±æ okno przy automatycznej zmianie rozmiaru."
+msgstr ""
+"Najwiêkszy (okre¶lony procentowo) rozmiaru, które mo¿e osi±gn±æ okno przy "
+"automatycznej zmianie rozmiaru."
 
-#: tips:137
+#: tips:125
 msgid "Unique windows"
 msgstr "Unikalne okna"
 
-#: tips:138
+#: tips:126
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -2620,36 +2694,61 @@ msgstr ""
 "Je¿eli otworzysz katalog, który ju¿ jest wy¶wietlany przez inne okno, "
 "spowoduje to zamkniêcie tego okna"
 
-#: tips:139
+#: tips:127
+msgid "New window on button 1 (RISC OS style)"
+msgstr "Nowe okno na przycisku 1 (RISC OS)"
+
+#: tips:128
+msgid ""
+"Clicking with mouse button 1 (usually the left button) opens a directory in "
+"a new window with this turned on. Clicking with the button-2 (middle) will "
+"reuse the current window."
+msgstr ""
+"Klikniêcie pierwszym przyciskiem myszy (lewym) otwiera katalog w nowym "
+"oknie. Klikniêcie drugim przyciskiem (¶rodkowym) spowoduje otwarcie w tym "
+"samym oknie"
+
+#: tips:129
+#, fuzzy
+msgid "Single-click navigation in filer windows"
+msgstr "Nawigacja za pomoc± pojedyñczego klikniêcia"
+
+#: tips:131
 msgid "Beep if Tab-completion fails"
 msgstr "U¿yj sygna³u d¼wiêkowego gdy zawiedzie dope³nianie"
 
-#: tips:140
+#: tips:132
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
 "letter varies)."
-msgstr "Je¶li u¿ywasz okna dialogowego 'Wprowad¼ ¶cie¿kê' i po naci¶niêciu klawisza 'Tab' nic nie zostanie dopasowane (np. jest kilka mo¿liwo¶ci do wyboru) zostanie wygenerowany sygna³ d¼wiêkowy."
+msgstr ""
+"Je¶li u¿ywasz okna dialogowego 'Wprowad¼ ¶cie¿kê' i po naci¶niêciu klawisza "
+"'Tab' nic nie zostanie dopasowane (np. jest kilka mo¿liwo¶ci do wyboru) "
+"zostanie wygenerowany sygna³ d¼wiêkowy."
 
-#: tips:141
+#: tips:133
 msgid "Beep if there are several matches"
 msgstr "U¿yj sygna³u d¼wiêkowego przy wieloznacznym dopasowaniu"
 
-#: tips:142 tips:143
+#: tips:134 tips:135
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
-msgstr "Je¶li u¿ywasz okna dialogowego 'Wprowad¼ ¶cie¿kê' i po naci¶niêciu klawisza 'Tab' istnieje wiêcej dopasowañ ni¿ jedno, zostanie wygenerowany sygna³ d¼wiêkowy, nawet po dodaniu kliku nastêpnych liter."
+msgstr ""
+"Je¶li u¿ywasz okna dialogowego 'Wprowad¼ ¶cie¿kê' i po naci¶niêciu klawisza "
+"'Tab' istnieje wiêcej dopasowañ ni¿ jedno, zostanie wygenerowany sygna³ "
+"d¼wiêkowy, nawet po dodaniu kliku nastêpnych liter."
 
-#: tips:144
+#: tips:136
 msgid "Drag and Drop"
 msgstr "Przeci±gnij i Upu¶æ"
 
-#: tips:145
+#: tips:137
 msgid "Don't use hostnames"
 msgstr "Nie u¿ywaj nazwy hosta"
 
-#: tips:146
+#: tips:138
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -2660,11 +2759,11 @@ msgstr ""
 "wska¼niku myszy pokazuje znak '+' lecz funkcja \"przenie¶ i upu¶æ\" nie "
 "dzia³a poprawnie."
 
-#: tips:147
+#: tips:139
 msgid "Allow dragging to icons in filer windows"
 msgstr "Pozwala przenosiæ ikony w obrêbie tego samego okna"
 
-#: tips:148
+#: tips:140
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -2675,11 +2774,11 @@ msgstr ""
 "mysz±. Puszczenie przycisku myszy spowoduje skopiowanie pliku do katalogu "
 "lub uruchomienie aplikacji."
 
-#: tips:149
+#: tips:141
 msgid "Directories spring open"
 msgstr "Otwieranie wybranych katalogów"
 
-#: tips:150
+#: tips:142
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -2689,11 +2788,11 @@ msgstr ""
 "okna. Je¿eli w trakcie przeci±gania pliku myszk± zatrzymamy kursor nad "
 "katalogiem na pewien czas, zostanie on otwarty w nowym oknie."
 
-#: tips:151
+#: tips:143
 msgid "Spring delay"
 msgstr "Opó¼nienie otwarcia"
 
-#: tips:152
+#: tips:144
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -2702,43 +2801,45 @@ msgstr ""
 "Ta opcja okre¶la jak d³ugo czekaæ (w ms), aby pod¶wietlony katalog zosta³ "
 "otwarty"
 
-#: tips:153
+#: tips:145
 msgid "Dragging files with the middle mouse button..."
 msgstr "Przeci±ganie plików ¶rodkowym klawiszem myszy..."
 
-#: tips:154
+#: tips:146
 msgid "... shows a menu of possible actions"
 msgstr "... pokazuje menu mo¿liwych akcji"
 
-#: tips:155
+#: tips:147
 msgid "... moves the files"
 msgstr "... przenosi pliki"
 
-#: tips:156 tips:157 tips:158
+#: tips:148 tips:149 tips:150
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key"
-msgstr "Zauwa¿, ¿e ca³y czas masz dostêp do menu, przez przeci±ganie lewym klawiszem myszy z przytrzymanym klawiszem Alt."
+msgstr ""
+"Zauwa¿, ¿e ca³y czas masz dostêp do menu, przez przeci±ganie lewym klawiszem "
+"myszy z przytrzymanym klawiszem Alt."
 
-#: tips:159
+#: tips:151
 msgid "Menus"
 msgstr "Menu"
 
-#: tips:160
+#: tips:152
 msgid "`Xterm Here' program:"
 msgstr "Program terminala:"
 
-#: tips:161
+#: tips:153
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr ""
 "Program który ma zostaæ uruchomiony kiedy wybierzesz z menu polecenie "
 "\"Terminal\""
 
-#: tips:162
+#: tips:154
 msgid "Set keyboard shortcuts"
 msgstr "Ustaw skrót klawiszowy"
 
-#: tips:163
+#: tips:155
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2755,47 +2856,30 @@ msgstr ""
 "- Wska¿ wska¼nikiem myszy plik, który chcesz u¿yæ,\n"
 "- Wci¶nij kombinacjê klawiszy, któr± chcesz przyporz±dkowaæ.\n"
 "\n"
-"Zdefiniowana kombinacja poka¿e siê w menu. Od tej chwili wystarczy nacisn±æ tê kombinacje, aby wybraæ funkcjê bez korzystania z menu."
+"Zdefiniowana kombinacja poka¿e siê w menu. Od tej chwili wystarczy nacisn±æ "
+"tê kombinacje, aby wybraæ funkcjê bez korzystania z menu."
 
-#: tips:164
+#: tips:156
 msgid "Size of icons in menus"
 msgstr "Rozmiar ikon w menu"
 
-#: tips:165
+#: tips:157
 msgid "No Icons"
 msgstr "Brak ikon"
 
-#: tips:168
+#: tips:160
 msgid "Same as current window"
 msgstr "Takie same jak w bie¿±cym oknie"
 
-#: tips:169
+#: tips:161
 msgid "Same as default"
 msgstr "Takie same jak domy¶lne"
 
-#: tips:170
-msgid "Mouse bindings"
-msgstr "Skojarzenia myszy"
-
-#: tips:171
-msgid "New window on button 1 (RISC OS style)"
-msgstr "Nowe okno na przycisku 1 (RISC OS)"
-
-#: tips:172
-msgid ""
-"Clicking with mouse button 1 (usually the left button) opens a directory in "
-"a new window with this turned on. Clicking with the button-2 (middle) will "
-"reuse the current window."
-msgstr ""
-"Klikniêcie pierwszym przyciskiem myszy (lewym) otwiera katalog w nowym "
-"oknie. Klikniêcie drugim przyciskiem (¶rodkowym) spowoduje otwarcie w tym "
-"samym oknie"
-
-#: tips:173
+#: tips:162
 msgid "Menu on button 2 (RISC OS style)"
 msgstr "Menu na 2 przycisku (RISC OS)"
 
-#: tips:174
+#: tips:163 tips:164
 msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
@@ -2803,51 +2887,120 @@ msgstr ""
 "Drugi przycisk myszy otwiera menu kontekstowe, je¿eli opcja pozostanie "
 "nieaktywna menu przypisane bêdzie do 3 przycisku myszy (prawego)."
 
-#: tips:175
-msgid "Single-click navigation"
-msgstr "Nawigacja za pomoc± pojedyñczego klikniêcia"
-
-#: tips:176 tips:177
-msgid ""
-"Clicking on an item opens it with this on. Hold down Control to select the "
-"item instead. If off, clicking once selects an item; double click to open "
-"things."
-msgstr ""
-"Klikniêcie na plik otwiera go. Je¿eli chcesz zaznaczyæ plik - przytrzymaj "
-"\"Control\". Je¿eli opcja ta pozostanie wy³±czona pojedyñcze klikniêcie "
-"zaznacza plik, natomiast podwójne otwiera go"
-
-#: tips:178
+#: tips:165
 msgid "Types"
 msgstr "Typy"
 
+#: tips:166
+msgid "Ignore eXecutable bit for known extensions"
+msgstr "Ignuruj bit wykonywania dla znanych rozszerzeñ"
+
+#: tips:167
+msgid ""
+"If a file has a known extension (eg '.gif') then ignore the executable bit. "
+"This is useful if you have files on a Windows-type filesystem which are "
+"being shown as executable programs."
+msgstr ""
+"Je¶li plik ma znane rozszerzenie (np. '.gif') wtedy ignoruje bit "
+"wykonywalno¶ci. Jest to przydatne przy przegl±daniu plików na systemach "
+"plików MS Windows, które zwykle pokazywane s± jako wykonywalne programy."
+
+#: tips:168
+msgid "Colour files based on their types"
+msgstr "Kolory plików bazuj± na ich typach"
+
+#: tips:169
+msgid "Filenames (and details) are coloured according to the file's type."
+msgstr "Nazwy plików (oraz szczegó³ów) s± kolorowane wed³ug typów plików."
+
+#: tips:171
+msgid "Regular file"
+msgstr "Zwyk³y plik"
+
+#: tips:174
+msgid "Character device"
+msgstr "Urz±dzenie znakowe"
+
+#: tips:175
+msgid "Block device"
+msgstr "Urz±dzenie blokowe"
+
+#: tips:176
+msgid "Executable file"
+msgstr "Plik wykonywalny"
+
+#: tips:177
+msgid "Application directory"
+msgstr "Katalok aplikacji"
+
+#: tips:178
+msgid "Unknown type"
+msgstr "Nieznany typ"
+
 #: tips:179
+msgid "Error"
+msgstr "B³±d"
+
+#: tips:180 tips:181 tips:182
+msgid ""
+"Error, such as a symlink which points to a non-existant file, or a file "
+"which the filer does not have permission to examine."
+msgstr ""
+"B³±d. Wskazuje, ¿e link symboliczny prowadzi do nieistniej±cego pliku, lub "
+"filtr nie ma mo¿liwo¶ci odczytu pliku."
+
+#: tips:183
+#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type\n"
-"for each file, and then chooses a suitable icon for that type."
-msgstr "Okno z plikami u¿ywa do ka¿dego pliku zestawu regu³\n"
+"for each regular file, and then chooses a suitable icon for that type.\n"
+"After editing the files, click the re-read button below, or restart the "
+"filer."
+msgstr ""
+"Okno z plikami u¿ywa do ka¿dego pliku zestawu regu³\n"
 "sprawdzaj±cych typ MIME i w zale¿no¶ci od wykrytego typu ustawia\n"
 "w³a¶ciw± ikonê."
 
-#: tips:180
+#: tips:184
 msgid "Show name-to-type rules"
 msgstr "Poka¿ regu³y nazwa-do-wprowadzenia"
 
-#: tips:181
-msgid ""
-"After editing the files, click the reload button below, or\n"
-"restart the filer."
-msgstr ""
-"Po edycji plików, kliknij przycisk 'Prze³aduj' \n"
-"lub zrestartuj okno z plikami."
-
-#: tips:182
+#: tips:185
 msgid "Re-read files"
 msgstr "Powtórnie czytaj pliki"
 
-#: tips:183 tips:184 tips:185
+#: tips:186 tips:187 tips:188
 msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
-msgstr "U¿yj okna dialogowego 'Ustaw ikonê... ' aby okre¶liæ ikonê dla ka¿dego typu."
+msgstr ""
+"U¿yj okna dialogowego 'Ustaw ikonê... ' aby okre¶liæ ikonê dla ka¿dego typu."
+
+#~ msgid "!ERROR: %s\n"
+#~ msgstr "!B£¡D: %s\n"
+
+#~ msgid "Force - don't confirm deletion of non-writeable items"
+#~ msgstr "Wymu¶ - nie pytaj o kasowanie nie-zapisywalnych plików"
+
+#~ msgid "Recurse - also change contents of subdirectories"
+#~ msgstr "Rekursywnie - zmieñ równie¿ w podkatalogach"
+
+#~ msgid "Create Thumbs"
+#~ msgstr "Utwórz miniatury"
+
+#~ msgid "Copy failed"
+#~ msgstr "Kopiowanie zakoñczone niepowodzniem"
+
+#~ msgid "From LANG"
+#~ msgstr "Na podstawie zmiennej LANG"
+
+#~ msgid "Mouse bindings"
+#~ msgstr "Skojarzenia myszy"
+
+#~ msgid ""
+#~ "After editing the files, click the reload button below, or\n"
+#~ "restart the filer."
+#~ msgstr ""
+#~ "Po edycji plików, kliknij przycisk 'Prze³aduj' \n"
+#~ "lub zrestartuj okno z plikami."
 
 #, fuzzy
 #~ msgid "%s: You cannot do this to more than one item at a time"
@@ -2937,9 +3090,6 @@ msgstr "U¿yj okna dialogowego 'Ustaw ikonê... ' aby okre¶liæ ikonê dla ka¿dego t
 #~ msgstr ""
 #~ "Musisz najpierw wybraæ pojedyñcz± ikonê z pulpitu aby uzyskaæ pomoc na "
 #~ "jej temat"
-
-#~ msgid "Display using large icons"
-#~ msgstr "Wy¶wietlaj du¿e ikony"
 
 #~ msgid "Display using small icons"
 #~ msgstr "Wy¶wietlaj ma³e ikony"
