@@ -81,13 +81,13 @@ void rox_add_translations(char *path)
 	int		n, n_total;
 
 	if (load_file(path, &data, &size) == FALSE)
-		return;
+		goto out;
 
 	if (size < 20)
 	{
 		delayed_error(_("Invalid .gmo translation file "
 					"(too short): %s"), path);
-		return;
+		goto out;
 	}
 
 	magic = *((guint *) data);
@@ -101,14 +101,15 @@ void rox_add_translations(char *path)
 		delayed_error(_("Invalid .gmo translation file "
 					"(GNU magic number not found): %s"),
 				  path);
-		return;
+		goto out;
 	}
 
 	if (WORD(data + 4) != 0)
 		g_warning("rox_add_translations: expected format revision 0");
 
 	if (!translate)
-		translate = g_hash_table_new(g_str_hash, g_str_equal);
+		translate = g_hash_table_new_full(g_str_hash, g_str_equal,
+						  g_free, g_free);
 
 	n_total = WORD(data + 8);
 	from_base = data + WORD(data + 12);
@@ -117,12 +118,23 @@ void rox_add_translations(char *path)
 	for (n = 0; n < n_total; n++)
 	{
 		char	*from = data + WORD(from_base + (n << 3) + 4);
-		char	*to   = data + WORD(to_base + (n << 3) + 4);
+		char	*to_raw   = data + WORD(to_base + (n << 3) + 4);
+		char	*to;
+#ifdef GTK2
+		to = g_convert_with_fallback(to_raw, -1,
+					"UTF-8",
+					"iso-8859-1", /* XXX: Don't guess */
+					"#",
+					NULL, NULL, NULL);
+		if (!to)
+#endif
+			to = g_strdup(to_raw);
 
-		g_hash_table_insert(translate, from, to);
+		g_hash_table_insert(translate, g_strdup(from), to);
 	}
 
-	/* Note: Do not free the file data! */
+out:
+	g_free(data);
 }
 
 /****************************************************************
