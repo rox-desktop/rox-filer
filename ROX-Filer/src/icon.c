@@ -569,7 +569,7 @@ static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
-			_("First, select a single item to edit"));
+			_("You must open the menu over an icon"));
 		return;
 	}
 
@@ -628,8 +628,7 @@ static void show_location(gpointer data, guint action, GtkWidget *widget)
 	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
-			_("Select a single item, then use this to find out "
-			  "where it is in the filesystem."));
+			_("You must open the menu over an icon"));
 		return;
 	}
 
@@ -641,7 +640,7 @@ static void show_help(gpointer data, guint action, GtkWidget *widget)
 	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
-			_("You must select a single item to get help on"));
+			_("You must open the menu over an icon"));
 		return;
 	}
 
