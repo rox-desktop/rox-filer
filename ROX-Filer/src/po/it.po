@@ -3,18 +3,17 @@
 # Current translator: Yuri Bongiorno http://yuri.webhop.org, 2005.
 # 
 # 
-#: tips:203
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.1.4\n"
+"Project-Id-Version: ROX-Filer 2.1.6\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-15 14:10+0000\n"
-"PO-Revision-Date: 2005-01-13 22:20+0100\n"
-"Last-Translator: Yuri Bongiorno http://yuri.webhop.org\n"
+"POT-Creation-Date: 2005-01-24 17:21+0100\n"
+"PO-Revision-Date: 2005-01-24 17:55+0100\n"
+"Last-Translator: Yuri Bongiorno http://yuri.webhop.org <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Content-Transfer-Encoding: 8bit"
 
 #: abox.c:127
 msgid "<dir>"
@@ -30,7 +29,7 @@ msgstr "Tutti"
 
 #: abox.c:228
 msgid "Don't confirm every operation"
-msgstr "Non confermare ogni operazione"
+msgstr "Non chiede conferma ad ogni operazione"
 
 #: abox.c:455 tips:64
 msgid "Name"
@@ -44,7 +43,7 @@ msgstr "Directory"
 msgid "Expression:"
 msgstr "Espressione:"
 
-#: action.c:179 action.c:237
+#: action.c:179
 msgid "Find expression reference"
 msgstr "Guida alle espressioni di ricerca"
 
@@ -124,6 +123,10 @@ msgstr ""
 "<b>system(comando)</b> (vero se lo stato di uscita di «comando» è zero;\n"
 "un % in «comando» viene sostituito dal percorso del file corrente)\n"
 "<b>prune</b> (impedisce la ricerca del contenuto di una directory)."
+
+#: action.c:237
+msgid "Change permissions reference"
+msgstr "Guida alla modifica dei permessi"
 
 #: action.c:248
 msgid ""
@@ -214,9 +217,9 @@ msgstr ""
 "Per cambiarne il tipo, si deve rinominare il file.\n"
 "\n"
 "I file system più moderni hanno una proprietà chiamata «Attributi estesi»\n"
-"e può essere usata per memorizzare informazioni addizionali\n"
-"in ogni file come parametri. ROX-Filer usa l'attributo\n"
-"«user.mime_type» per memorizzare i tipi di file.\n"
+"che può essere usata per memorizzare in ogni file informazioni addizionali\n"
+"come parametri di un certo nome.\n"
+"ROX-Filer usa l'attributo «user.mime_type» per memorizzare i tipi di file.\n"
 "\n"
 "Sono supportati solo i file regolari, non le directory, i device,\n"
 "le pipe o i socket, e funzionano solo su certi tipi di file system\n"
@@ -270,7 +273,7 @@ msgid ""
 "Asking child process to terminate...\n"
 msgstr ""
 "\n"
-"Si sta chiedendo al processo figlio di terminare...\n"
+"Chiedo al processo figlio di terminare...\n"
 
 #: action.c:728
 msgid ""
@@ -278,7 +281,7 @@ msgid ""
 "Trying to KILL run-away process...\n"
 msgstr ""
 "\n"
-"Si sta inviando il segnale KILL al processo fuori controllo...\n"
+"Invio il segnale KILL al processo fuori controllo...\n"
 
 #: action.c:881
 #, c-format
@@ -380,7 +383,7 @@ msgstr "sovrascrivere"
 
 #: action.c:1333
 msgid "'Trying copy anyway...\n"
-msgstr "'Si prova comunque a copiare...\n"
+msgstr "'Provo comunque a copiare...\n"
 
 #: action.c:1342
 #, c-format
@@ -412,7 +415,7 @@ msgstr "?«%s» esiste già: sovrascrivere?"
 
 #: action.c:1492
 msgid "'Trying move anyway...\n"
-msgstr "'Si prova comunque a spostare...\n"
+msgstr "'Provo comunque a spostare...\n"
 
 #: action.c:1500
 #, c-format
@@ -559,20 +562,21 @@ msgstr "Monta / Smonta"
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer non supporta ancora i punti di mount su questo sistema."
 
-#: action.c:2024 menu.c:209 tips:217
+#: action.c:2024 menu.c:209 tips:216
 msgid "Delete"
 msgstr "Elimina"
 
-#: action.c:2034 tips:223
+#: action.c:2034 tips:222
 msgid "Force"
 msgstr "Forza"
 
 #: action.c:2034
 msgid "Don't confirm deletion of non-writeable items"
-msgstr "Non confermare l'eliminazione degli oggetti protetti da scrittura"
+msgstr ""
+"Non chiede conferma dell'eliminazione degli oggetti protetti da scrittura"
 
 #: action.c:2037 action.c:2092 action.c:2151 action.c:2204 action.c:2240
-#: tips:225
+#: tips:224
 msgid "Brief"
 msgstr "Breve"
 
@@ -610,9 +614,9 @@ msgstr "Permessi"
 
 #: action.c:2092 action.c:2151
 msgid "Don't list processed files"
-msgstr "Non elencare i file elaborati"
+msgstr "Non elenca i file elaborati"
 
-#: action.c:2095 action.c:2154 tips:227
+#: action.c:2095 action.c:2154 tips:226
 msgid "Recurse"
 msgstr "Ricorsivo"
 
@@ -636,19 +640,19 @@ msgstr "Imposta il tipo"
 msgid "Change contents of subdirectories"
 msgstr "Cambia anche il contenuto delle sottodirectory"
 
-#: action.c:2161 infobox.c:629
+#: action.c:2161 infobox.c:633
 msgid "Type:"
 msgstr "Tipo:"
 
-#: action.c:2190 dnd.c:123 menu.c:1956 tips:211
+#: action.c:2190 dnd.c:123 menu.c:1956 tips:210
 msgid "Copy"
 msgstr "Copia"
 
-#: action.c:2200 action.c:2236 tips:229
+#: action.c:2200 action.c:2236 tips:228
 msgid "Newer"
 msgstr "Più recente"
 
-#: action.c:2201 action.c:2237 tips:230 tips:231 tips:232 tips:233
+#: action.c:2201 action.c:2237 tips:229 tips:230 tips:231 tips:232
 msgid "Only over-write if source is newer than destination."
 msgstr "Sovrascrive solo se l'origine è più recente della destinazione."
 
@@ -656,7 +660,7 @@ msgstr "Sovrascrive solo se l'origine è più recente della destinazione."
 msgid "Only log directories as they are copied"
 msgstr "Elenca solo le directory che sono copiate"
 
-#: action.c:2226 dnd.c:124 tips:213
+#: action.c:2226 dnd.c:124 tips:212
 msgid "Move"
 msgstr "Sposta"
 
@@ -664,7 +668,7 @@ msgstr "Sposta"
 msgid "Don't log each file as it is moved"
 msgstr "Non elencare ogni file che viene spostato"
 
-#: action.c:2257 dnd.c:125 tips:215
+#: action.c:2257 dnd.c:125 tips:214
 msgid "Link"
 msgstr "Collegamento"
 
@@ -797,10 +801,10 @@ msgid ""
 "\\.htm$ matches the '.htm' in 'index.html', etc"
 msgstr ""
 "È un'espressione regolare di ricerca.\n"
-"^·corrisponde all'inizio del nome\n"
-"$·corrisponde alla fine del nome\n"
-"\\.·corrisponde a un punto\n"
-"\\.htm$·corrisponde a·«.htm»·in·«index.html»,·ecc."
+"^ corrisponde all'inizio del nome\n"
+"$ corrisponde alla fine del nome\n"
+"\\. corrisponde a un punto\n"
+"\\.htm$ corrisponde a «.htm» in «index.html», ecc."
 
 #: bulk_rename.c:109
 msgid "With:"
@@ -823,7 +827,7 @@ msgid ""
 "Do a search-and-replace in the After column.The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr ""
-"Fa un «Cerca & sostituisci» nella colonna «Dopo». I file non vengono "
+"Fa un «Cerca e sostituisci» nella colonna «Dopo». I file non vengono "
 "rinominati fino a quando si clicca sul pulsante «Rinomina» che c'è sotto."
 
 #: bulk_rename.c:142 find.c:652
@@ -909,19 +913,19 @@ msgstr "Impossibile aprire la directory: %s"
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) fallito: %s"
 
-#: dnd.c:426
+#: dnd.c:424
 msgid "Internal error - bad info type"
 msgstr "Errore interno: tipo di informazione errato"
 
-#: dnd.c:566
+#: dnd.c:564
 msgid "Drag a directory here to bookmark it."
 msgstr "Trascinare qui una directory per aggiungerla nei segnalibri."
 
-#: dnd.c:581
+#: dnd.c:579
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "Errore di protocollo XDS: il nome potrebbe non contenere «/»\n"
 
-#: dnd.c:606
+#: dnd.c:604
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
@@ -929,18 +933,18 @@ msgstr ""
 "Target XdndDirectSave0 fornito, ma l'atom XdndDirectSave0 (tipo text/plain) "
 "non contiene un nome\n"
 
-#: dnd.c:619
+#: dnd.c:617
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
-msgstr "È necessario un destinatario di tipo text/uri-list o XdndDirectSave0."
+msgstr "È necessario una destinazione di tipo text/uri-list o XdndDirectSave0."
 
-#: dnd.c:622
+#: dnd.c:620
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
-"È necessario un destinatario di tipo text/uri-list o application/octet-"
+"È necessario una destinazione di tipo text/uri-list o application/octet-"
 "stream."
 
-#: dnd.c:692
+#: dnd.c:690
 #, c-format
 msgid ""
 "Failed to add some items to the pinboard, because they are on a remote "
@@ -953,52 +957,52 @@ msgstr ""
 "\n"
 "%s"
 
-#: dnd.c:767
+#: dnd.c:765
 msgid "Unknown target"
-msgstr "Destinatario sconosciuto"
+msgstr "Destinazione sconosciuta"
 
-#: dnd.c:800
+#: dnd.c:798
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "L'applicazione remota non può o non vuole inviare i dati"
 
-#: dnd.c:813
+#: dnd.c:811
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "Errore di protocollo XDS: il codice restituito dovrebbe essere «S», «F» o "
 "«E»\n"
 
-#: dnd.c:846
+#: dnd.c:844
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
 "Non è possibile visualizzare un menù di azioni per un file remoto o di dati "
 "raw."
 
-#: dnd.c:862
+#: dnd.c:860
 msgid "UntitledData"
 msgstr "DatiSenzaNome"
 
-#: dnd.c:889
+#: dnd.c:887
 #, c-format
 msgid "Error saving file: %s"
 msgstr "Errore nel salvare il file: %s"
 
-#: dnd.c:962
+#: dnd.c:960
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "Nessun URI nel text/uri-list (niente da fare)"
 
-#: dnd.c:994
+#: dnd.c:992
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "Impossibile ottenere i dati dalla macchina remota (application/octet-stream "
 "non fornito)"
 
-#: dnd.c:1017
+#: dnd.c:1015
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr "Alcuni di questi file sono su un'altra macchina e vengono ignorati"
 
-#: dnd.c:1024
+#: dnd.c:1022
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -1006,11 +1010,11 @@ msgstr ""
 "Nessuno di questi file si trova sulla macchina locale. Non è possibile "
 "operare su file remoti multipli."
 
-#: dnd.c:1037
+#: dnd.c:1035
 msgid "Unknown action requested"
 msgstr "Azione sconosciuta richiesta"
 
-#: dnd.c:1045
+#: dnd.c:1043
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "Errore nell'ottenere la lista dei file: %s"
@@ -1086,8 +1090,8 @@ msgstr ""
 msgid "No change"
 msgstr "Nessun cambiamento"
 
-#: filer.c:561
-msgid "Umount"
+#: filer.c:561 menu.c:860
+msgid "Unmount"
 msgstr "Smonta"
 
 #: filer.c:658
@@ -1282,6 +1286,30 @@ msgstr "Byte"
 msgid "Bytes"
 msgstr "Bytes"
 
+#: find.c:921
+msgid "Kb"
+msgstr "Kb"
+
+#: find.c:921
+msgid "K"
+msgstr "K"
+
+#: find.c:923
+msgid "Mb"
+msgstr "Mb"
+
+#: find.c:923
+msgid "M"
+msgstr "M"
+
+#: find.c:925
+msgid "Gb"
+msgstr "Gb"
+
+#: find.c:925
+msgid "G"
+msgstr "G"
+
 #: find.c:927
 msgid "Sec"
 msgstr "Sec"
@@ -1392,7 +1420,7 @@ msgid ""
 "Remote application wants to use Direct Save, but I can't read the "
 "XdndDirectSave0 (type text/plain) property.\n"
 msgstr ""
-"L'applicazione remota vuole usare Direct Save, ma non è possibile leggere le "
+"L'applicazione remota vuole usare Direct Save, ma non è possibile leggere la "
 "proprietà di XdndDirectSave0 (tipo text/plain).\n"
 
 #: gtksavebox.c:598
@@ -1447,7 +1475,7 @@ msgstr "Apertura del file «%s» fallita: %s"
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
 msgstr ""
-"Caricamento dell'immagine «%s» fallita: motivo sconosciuto, probabilmente il "
+"Caricamento dell'immagine «%s» fallito: motivo sconosciuto, probabilmente il "
 "file è corrotto."
 
 #: i18n.c:38
@@ -1484,7 +1512,7 @@ msgstr "Opzioni"
 
 #: icon.c:140 menu.c:237
 msgid "Home Directory"
-msgstr "Directory Home"
+msgstr "Directory home"
 
 #: icon.c:141 icon.c:1350 menu.c:205 type.c:244
 msgid "File"
@@ -1588,28 +1616,28 @@ msgstr "(errato utf-8)"
 msgid "Show _Help Files"
 msgstr "Mostra i file di _aiuto"
 
-#: infobox.c:287
+#: infobox.c:290
 msgid "<b>Permissions</b>"
 msgstr "<b>Permessi</b>"
 
-#: infobox.c:300
+#: infobox.c:304
 msgid "<b>Contents indicate...</b>"
 msgstr "<b>Il contenuto sembra essere:</b>"
 
-#: infobox.c:437 infobox.c:574 support.c:349
+#: infobox.c:441 infobox.c:578 support.c:349
 msgid "bytes"
 msgstr "byte"
 
-#: infobox.c:460
+#: infobox.c:464
 msgid "Failed to read size"
 msgstr "Fallita la lettura della dimensione"
 
-#: infobox.c:518
+#: infobox.c:522
 #, c-format
 msgid "'%s' is no longer a symlink"
 msgstr "«%s» non è più un collegamento simbolico"
 
-#: infobox.c:525
+#: infobox.c:529
 #, c-format
 msgid ""
 "Failed to unlink '%s':\n"
@@ -1618,7 +1646,7 @@ msgstr ""
 "Scollegamento di «%s» fallito:\n"
 "%s"
 
-#: infobox.c:530
+#: infobox.c:534
 #, c-format
 msgid ""
 "Failed to create symlink from '%s':\n"
@@ -1629,152 +1657,152 @@ msgstr ""
 "%s\n"
 "(nota: il vecchio collegamento è stato eliminato)"
 
-#: infobox.c:553 tips:294
+#: infobox.c:557 tips:293
 msgid "Error:"
 msgstr "Errore:"
 
-#: infobox.c:560
+#: infobox.c:564
 msgid "Real directory:"
 msgstr "Directory effettiva:"
 
-#: infobox.c:563
+#: infobox.c:567
 msgid "Owner, Group:"
 msgstr "Proprietario, gruppo:"
 
-#: infobox.c:570 infobox.c:585 infobox.c:594
+#: infobox.c:574 infobox.c:589 infobox.c:598
 msgid "Size:"
 msgstr "Dimensione:"
 
-#: infobox.c:595
+#: infobox.c:599
 msgid "Scanning"
 msgstr "Scansione in corso."
 
-#: infobox.c:616
+#: infobox.c:620
 msgid "Failed to scan"
 msgstr "Scansione fallita"
 
-#: infobox.c:623
+#: infobox.c:627
 msgid "Change time:"
 msgstr "Ultimo cambiamento:"
 
-#: infobox.c:625
+#: infobox.c:629
 msgid "Modify time:"
 msgstr "Ultima modifica:"
 
-#: infobox.c:627
+#: infobox.c:631
 msgid "Access time:"
 msgstr "Ultimo accesso:"
 
-#: infobox.c:635
+#: infobox.c:639
 msgid "Extended attributes:"
 msgstr "Attributi estesi:"
 
-#: infobox.c:637
+#: infobox.c:641
 msgid "Present"
 msgstr "Presente"
 
-#: infobox.c:638 tips:107 tips:139
+#: infobox.c:642
 msgid "None"
-msgstr "Nessuna"
+msgstr "Nessuno"
 
-#: infobox.c:639
+#: infobox.c:643
 msgid "Not supported"
 msgstr "Non supportato"
 
-#: infobox.c:651
+#: infobox.c:655
 msgid "Link target:"
 msgstr "Il collegamento punta a:"
 
-#: infobox.c:661
+#: infobox.c:665
 msgid "Run action:"
 msgstr "Azione:"
 
-#: infobox.c:751
+#: infobox.c:755
 msgid "<nothing yet>"
 msgstr "<ancora nulla>"
 
-#: infobox.c:821
+#: infobox.c:825
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) dice: %s"
 
-#: infobox.c:878
+#: infobox.c:882
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "Impossibile cambiare i permessi: %s"
 
-#: infobox.c:896
+#: infobox.c:900
 msgid "Owner"
 msgstr "Proprietario"
 
-#: infobox.c:898
+#: infobox.c:902
 msgid "Group"
 msgstr "Gruppo"
 
-#: infobox.c:900
+#: infobox.c:904
 msgid "World"
 msgstr "Altri"
 
-#: infobox.c:903
+#: infobox.c:907
 msgid "Read"
 msgstr "Lettura"
 
-#: infobox.c:905
+#: infobox.c:909
 msgid "Write"
 msgstr "Scrittura"
 
-#: infobox.c:907
+#: infobox.c:911
 msgid "Exec"
 msgstr "Esecuzione"
 
-#: infobox.c:924
+#: infobox.c:928
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:931
+#: infobox.c:935
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:938
+#: infobox.c:942
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:960
+#: infobox.c:964
 msgid "Symbolic link"
 msgstr "Collegamento simbolico"
 
-#: infobox.c:963
+#: infobox.c:967
 msgid "ROX application"
 msgstr "Applicazione ROX"
 
-#: infobox.c:971
+#: infobox.c:975
 msgid "mounted"
 msgstr "montato"
 
-#: infobox.c:971
+#: infobox.c:975
 msgid "unmounted"
 msgstr "smontato"
 
-#: infobox.c:975
+#: infobox.c:979
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Punto di mount per %s (%s)"
 
-#: infobox.c:978
+#: infobox.c:982
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Punto di mount (%s)"
 
 #: main.c:95
 msgid ""
-"Copyright (C) 2003 Thomas Leonard.\n"
+"Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
-"Copyright @ 2003 Thomas Leonard.\n"
+"Copyright @ 2005 Thomas Leonard.\n"
 "ROX-Filer non fornisce ALCUNA GARANZIA,\n"
 "nei limiti permessi dalla legge.\n"
 "È possibile ridistribuire copie di ROX-Filer\n"
@@ -1795,8 +1823,8 @@ msgid ""
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
-"NOTA: questo sistema non supporta le opzioni lunghe, \n"
-"si devono usare quelle corte.\n"
+"NOTA: questo sistema non supporta le opzioni lunghe.\n"
+"Si devono usare quelle corte.\n"
 
 #: main.c:115
 msgid ""
@@ -1925,7 +1953,7 @@ msgstr "Icone, con..."
 msgid "Sizes"
 msgstr "Dimensioni"
 
-#: menu.c:184 tips:275
+#: menu.c:184 tips:274
 msgid "Types"
 msgstr "Tipi"
 
@@ -2079,7 +2107,7 @@ msgstr "Mostra i segnalibri"
 
 #: menu.c:239
 msgid "Follow Symbolic Links"
-msgstr "Segue i collegamenti simbolici"
+msgstr "Segui i collegamenti simbolici"
 
 #: menu.c:240
 msgid "Resize Window"
@@ -2118,10 +2146,6 @@ msgstr "Prossimo clic"
 #, c-format
 msgid "%d items"
 msgstr "%d oggetti"
-
-#: menu.c:860
-msgid "Unmount"
-msgstr "Smonta"
 
 #: menu.c:862
 msgid "Open unmounted"
@@ -2172,7 +2196,7 @@ msgstr ""
 "destinazione. Da usare se il collegamento e la destinazione vengono spostati "
 "assieme.\n"
 "Se disattivato, memorizza il percorso assoluto. Da usare se il collegamento "
-"simbolico viene spostato, ma il destinatario no."
+"simbolico viene spostato, ma la destinazione no."
 
 #: menu.c:1146
 msgid "New pathname is not absolute"
@@ -2483,7 +2507,7 @@ msgid ""
 "Choices will be saved as:\n"
 "%s"
 msgstr ""
-"Le preferenze vengono salvate come:\n"
+"Le preferenze vengono salvate in:\n"
 "%s"
 
 #: options.c:991
@@ -2712,7 +2736,7 @@ msgstr "Il file non esiste o non è accessibile: %s"
 #: run.c:292
 #, c-format
 msgid "I don't know how to open '%s'"
-msgstr "Non si sa come aprire «%s»"
+msgstr "Non so come aprire «%s»"
 
 #: run.c:323
 msgid ""
@@ -3008,14 +3032,14 @@ msgstr "Imposta azione"
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
-"Se il gestore di un tipo specifico non è impostato, usare questo come "
+"Se il gestore di un tipo specifico non è impostato, usa questo come "
 "predefinito."
 
 #: type.c:891
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr ""
-"Imposta come azione predefinita per tutti i file di tipo «%s/<anything>»"
+"Impostare come azione predefinita per tutti i file di tipo «%s/<anything>»"
 
 #: type.c:895
 msgid "Use this application for all files with this MIME type."
@@ -3040,7 +3064,7 @@ msgstr "Inserire un comando di shell:"
 
 #: type.c:954
 msgid "_Use Command"
-msgstr "Usa il comando"
+msgstr "_Usa il comando"
 
 #: type.c:984
 msgid ""
@@ -3106,8 +3130,8 @@ msgstr ""
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
 msgstr ""
-"Il tema icone «%s» non contiene le icone di MIME. Usare il tema predefinito "
-"ROX."
+"Il tema icone «%s» non contiene le icone di MIME. Si usi invece il tema "
+"predefinito ROX."
 
 #: type.c:1506
 #, c-format
@@ -3203,7 +3227,7 @@ msgstr ""
 
 #: usericons.c:311
 msgid "Copy image into directory"
-msgstr "Copia l'immagine nella directory"
+msgstr "Copiare l'immagine nella directory"
 
 #: usericons.c:317
 msgid "Drop an icon file here"
@@ -3260,7 +3284,7 @@ msgstr "Lingua"
 
 #: tips:3
 msgid "Use the LANG environment variable"
-msgstr "Usa la variabile d'ambiente LANG"
+msgstr "Usare la variabile d'ambiente LANG"
 
 #: tips:4
 msgid "Chinese (traditional)"
@@ -3344,7 +3368,7 @@ msgstr "Ridimensionamento automatico delle finestre"
 
 #: tips:24
 msgid "Never automatically resize"
-msgstr "Non ridimensiona mai automaticamente le finestre"
+msgstr "Non ridimensionare mai automaticamente le finestre"
 
 #: tips:25
 msgid ""
@@ -3357,7 +3381,7 @@ msgstr ""
 
 #: tips:26
 msgid "Resize when changing the display style"
-msgstr "Ridimensiona al cambio dello stile di visualizzazione"
+msgstr "Ridimensionare al cambio dello stile di visualizzazione"
 
 #: tips:27
 msgid ""
@@ -3369,7 +3393,7 @@ msgstr ""
 
 #: tips:28
 msgid "Always resize"
-msgstr "Ridimensiona sempre"
+msgstr "Ridimensionare sempre"
 
 #: tips:29 tips:30
 msgid ""
@@ -3453,7 +3477,7 @@ msgstr ""
 
 #: tips:45
 msgid "Double-click on background resizes"
-msgstr "Ridimensiona con un doppio clic sullo sfondo"
+msgstr "Ridimensionare con un doppio clic sullo sfondo"
 
 #: tips:46 tips:47 tips:48 tips:49
 msgid ""
@@ -3498,7 +3522,7 @@ msgstr "Impostazioni predefinite per le nuove finestre"
 
 #: tips:58
 msgid "Inherit options from source window"
-msgstr "Eredita le opzioni dalla finestra d'origine"
+msgstr "Ereditare le opzioni dalla finestra d'origine"
 
 #: tips:59
 msgid ""
@@ -3511,7 +3535,7 @@ msgstr ""
 
 #: tips:60
 msgid "View type:"
-msgstr "Mostra tipo:"
+msgstr "Tipo di vista:"
 
 #: tips:63
 msgid "Sort by:"
@@ -3527,7 +3551,7 @@ msgstr "Data"
 
 #: tips:68
 msgid "Show hidden files"
-msgstr "Mostra i file nascosti"
+msgstr "Mostrare i file nascosti"
 
 #: tips:69 tips:70 tips:71 tips:72
 msgid ""
@@ -3549,11 +3573,11 @@ msgstr "Dimensioni predefinite:"
 msgid "Huge Icons"
 msgstr "Icone enormi"
 
-#: tips:76 tips:265
+#: tips:76 tips:264
 msgid "Large Icons"
 msgstr "Icone grandi"
 
-#: tips:77 tips:264
+#: tips:77 tips:263
 msgid "Small Icons"
 msgstr "Icone piccole"
 
@@ -3571,7 +3595,7 @@ msgstr "Icone automaticamente piccole:"
 
 #: tips:86
 msgid "Change at:"
-msgstr "Cambia in:"
+msgstr "Cambiare con:"
 
 #: tips:88 tips:89 tips:90
 msgid ""
@@ -3610,7 +3634,7 @@ msgstr "Larghezza massima per il testo accanto alle icone piccole."
 
 #: tips:100
 msgid "Show column headings"
-msgstr "Mostra le intestazioni delle colonne"
+msgstr "Mostrare le intestazioni delle colonne"
 
 #: tips:101 tips:102 tips:103
 msgid "If this is on then column headings will be shown in the list view."
@@ -3629,6 +3653,10 @@ msgstr "Barra degli strumenti"
 msgid "Toolbar type:"
 msgstr "Tipo di barra degli strumenti:"
 
+#: tips:107
+msgid "No toolbar"
+msgstr "Nessuna"
+
 #: tips:108
 msgid "Icons only"
 msgstr "Solo icone"
@@ -3643,7 +3671,7 @@ msgstr "Testo accanto alle icone"
 
 #: tips:111
 msgid "Show totals of items"
-msgstr "Mostra il numero di oggetti"
+msgstr "Mostrare il numero di oggetti"
 
 #: tips:112 tips:113
 msgid ""
@@ -3657,7 +3685,7 @@ msgstr ""
 
 #: tips:114
 msgid "Select the buttons you want on the bar:"
-msgstr "Seleziona i pulsanti da mettere sulla barra:"
+msgstr "Selezionare i pulsanti da mettere sulla barra:"
 
 #: tips:115
 msgid "Width of toolbar sets minimum width of window"
@@ -3712,7 +3740,7 @@ msgstr ""
 
 #: tips:128
 msgid "Show image thumbnails"
-msgstr "Mostra le miniature delle immagini"
+msgstr "Mostrare le miniature delle immagini"
 
 #: tips:129 tips:130
 msgid ""
@@ -3749,7 +3777,7 @@ msgstr ""
 "Se si attiva la bacheca, è possibile trascinare file e applicazioni sul "
 "desktop per creare scorciatoie."
 
-#: tips:135 tips:261
+#: tips:135 tips:260
 msgid "Appearance"
 msgstr "Aspetto"
 
@@ -3765,6 +3793,10 @@ msgstr "Ombra del testo:"
 msgid "Background:"
 msgstr "Sfondo:"
 
+#: tips:139
+msgid "No shadow"
+msgstr "Nessuna ombra"
+
 #: tips:140
 msgid "Thin"
 msgstr "Sottile"
@@ -3775,7 +3807,7 @@ msgstr "Spessa"
 
 #: tips:142
 msgid "Use custom font:"
-msgstr "Usa il carattere personalizzato:"
+msgstr "Usare il carattere personalizzato:"
 
 #: tips:143
 msgid "The font used for the text displayed under the icons"
@@ -3783,14 +3815,14 @@ msgstr "Il carattere usato per visualizzare il testo sotto le icone"
 
 #: tips:144
 msgid "Fast scaling of images"
-msgstr "Scala velocemente le immagini"
+msgstr "Scalare velocemente le immagini"
 
 #: tips:145 tips:146
 msgid ""
 "Choose between the fast or slow method of scaling backdrop images.  The slow "
 "method can give better results."
 msgstr ""
-"Scegliere tra il metodo veloce e lento per scalare le immagini. Quello lento "
+"Sceglie tra il metodo veloce e lento per scalare le immagini. Quello lento "
 "dà risultati migliori."
 
 #: tips:147
@@ -3803,7 +3835,7 @@ msgstr "Singolo clic per aprire"
 
 #: tips:150
 msgid "Keep icons within screen limits"
-msgstr "Mantiene le icone dentro i limiti dello schermo"
+msgstr "Mantenere le icone dentro i limiti dello schermo"
 
 #: tips:151
 msgid ""
@@ -3857,7 +3889,7 @@ msgstr ""
 
 #: tips:165
 msgid "Show iconified windows"
-msgstr "Mostra le finestre ridotte ad icona"
+msgstr "Mostrare le finestre ridotte ad icona"
 
 #: tips:166
 msgid ""
@@ -3871,7 +3903,7 @@ msgstr ""
 
 #: tips:167
 msgid "Iconify to the"
-msgstr "Riduce ad icona in"
+msgstr "Ridurre ad icona in"
 
 #: tips:168
 msgid "top-left"
@@ -4004,7 +4036,7 @@ msgstr "Xinerama"
 
 #: tips:201
 msgid "Confine to Xinerama monitor"
-msgstr "Limita il monitor di Xinerama"
+msgstr "Limitare il monitor di Xinerama"
 
 #: tips:202
 msgid ""
@@ -4014,16 +4046,16 @@ msgstr ""
 "Se è attiva l'impostazione multimonitor di Xinerama, usare questa opzione "
 "per limitare i pannelli a un monitor invece di attraversarli."
 
-#: tips:204 tips:205 tips:206 tips:207
+#: tips:203 tips:204 tips:205 tips:206
 msgid ""
 "The monitor the panels are confined to in Xinerama mode (numbered from 0)."
 msgstr "I pannelli sono limitati nella modalità Xinerama (conteggiata da 0)."
 
-#: tips:208
+#: tips:207
 msgid "Action windows"
 msgstr "Finestre d'azione"
 
-#: tips:209
+#: tips:208
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -4031,63 +4063,64 @@ msgstr ""
 "Le finestre d'azione appaiono quando inizia un'operazione in background,\n"
 "come la copia o l'eliminazione dei file."
 
-#: tips:210
+#: tips:209
 msgid "Auto-start (Quiet) these actions"
-msgstr "Esegue automaticamente queste azioni"
+msgstr "Eseguire automaticamente queste azioni"
 
-#: tips:212
+#: tips:211
 msgid "Copy files without confirming first."
 msgstr "Copia i file senza chiedere conferma."
 
-#: tips:214
+#: tips:213
 msgid "Move files without confirming first."
 msgstr "Sposta i file senza chiedere conferma."
 
-#: tips:216
+#: tips:215
 msgid "Create links to files without confirming first."
 msgstr "Crea i collegamenti senza chiedere conferma."
 
-#: tips:218
+#: tips:217
 msgid "Delete files without confirming first."
 msgstr "Elimina i file senza chiedere conferma."
 
-#: tips:219
+#: tips:218
 msgid "Mount"
 msgstr "Monta"
 
-#: tips:220 tips:221
+#: tips:219 tips:220
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "Monta e smonta i file system senza chiedere conferma."
 
-#: tips:222
+#: tips:221
 msgid "Default settings"
 msgstr "Impostazioni predefinite"
 
-#: tips:224
+#: tips:223
 msgid "Don't confirm deletion of non-writeable items."
-msgstr "Non confermare l'eliminazione di oggetti protetti da scrittura."
+msgstr ""
+"Non chiede conferma dell'eliminazione di oggetti protetti da scrittura."
 
-#: tips:226
+#: tips:225
 msgid "Don't display so much information in the message area."
-msgstr "Non visualizzare troppe informazioni nell'area messaggi."
+msgstr "Non visualizza troppe informazioni nell'area messaggi."
 
-#: tips:228
+#: tips:227
 msgid "Also change contents of subdirectories."
 msgstr "Cambia anche il contenuto delle sottodirectory."
 
-#: tips:234
+#: tips:233
 msgid "Drag and Drop"
 msgstr "Trascinamento"
 
-#: tips:235
+#: tips:234
 msgid "Dragging to icons"
 msgstr "Trascinamento icone"
 
-#: tips:236
+#: tips:235
 msgid "Allow dragging to icons in filer windows"
-msgstr "Permette il trascinamento delle icone del filer"
+msgstr "Permettere il trascinamento delle icone del filer"
 
-#: tips:237
+#: tips:236
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -4098,11 +4131,11 @@ msgstr ""
 "rilasciandolo viene messo in quella directory, oppure viene caricato dal "
 "programma scelto."
 
-#: tips:238
+#: tips:237
 msgid "Directories spring open"
 msgstr "Apertura automatica directory"
 
-#: tips:239
+#: tips:238
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -4112,15 +4145,15 @@ msgstr ""
 "attiva l'apertura automatica della directory dopo che il file viene "
 "mantenuto sopra l'icona per un breve periodo di tempo."
 
-#: tips:240
+#: tips:239
 msgid "Spring delay:"
 msgstr "Ritardo apertura automatica:"
 
-#: tips:241
+#: tips:240
 msgid "ms"
 msgstr "ms"
 
-#: tips:242 tips:243
+#: tips:241 tips:242
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -4128,21 +4161,21 @@ msgid ""
 msgstr ""
 "Questa opzione imposta per quanto tempo, in ms, si deve tenere un file sopra "
 "una directory prima che questa venga aperta automaticamente. Per avere "
-"effetto deve essere stata attivata anche l'opzione sopra."
+"effetto, deve essere stata attivata anche l'opzione sopra."
 
-#: tips:244
+#: tips:243
 msgid "When dragging files with the left mouse button"
 msgstr "Quando si trascinano i file con il pulsante sinistro del mouse"
 
-#: tips:245 tips:251
+#: tips:244 tips:250
 msgid "Show a menu of possible actions"
-msgstr "Mostra un menù di azioni possibili"
+msgstr "Mostrare un menù di azioni possibili"
 
-#: tips:246
+#: tips:245
 msgid "Copy the files"
-msgstr "Copia i file"
+msgstr "Copiare i file"
 
-#: tips:247 tips:248 tips:249
+#: tips:246 tips:247 tips:248
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
@@ -4150,15 +4183,15 @@ msgstr ""
 "Notare che è ancora possibile far apparire il menù, trascinando e tenendo "
 "premuto il tasto «Alt»."
 
-#: tips:250
+#: tips:249
 msgid "When dragging files with the middle mouse button"
 msgstr "Quando si trascinano i file con il pulsante centrale del mouse"
 
-#: tips:252
+#: tips:251
 msgid "Move the files"
-msgstr "Sposta i file"
+msgstr "Spostare i file"
 
-#: tips:253 tips:254 tips:255
+#: tips:252 tips:253 tips:254
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
@@ -4166,11 +4199,11 @@ msgstr ""
 "Notare che è ancora possibile far apparire il menù, trascinando i file con "
 "il pulsante sinistro e tenendo premuto il tasto «Alt»."
 
-#: tips:256
+#: tips:255
 msgid "Download handler"
 msgstr "Gestore degli scaricamenti"
 
-#: tips:257 tips:258 tips:259
+#: tips:256 tips:257 tips:258
 msgid ""
 "When you drag a file from a web browser or other remote source, this program "
 "will be run to download it. $1 is the URI dragged to the filer, and the "
@@ -4178,39 +4211,39 @@ msgid ""
 "xterm -e wget $1"
 msgstr ""
 "Quando si trascina un file da un browser web o da un'altra sorgente remota, "
-"per scaricarlo viene eseguito questo programma. $1 è l'URI\n"
-"trascinato sul filer e la directory attuale è la destinazione. Es:\n"
+"per scaricarlo viene eseguito questo programma. $1 è l'URI trascinato sul "
+"filer e la directory attuale è la destinazione. Es:\n"
 "xterm -e wget $1"
 
-#: tips:260
+#: tips:259
 msgid "Menus"
 msgstr "Menù"
 
-#: tips:262
+#: tips:261
 msgid "Size of icons in menus:"
 msgstr "Dimensione delle icone nei menù:"
 
-#: tips:263
+#: tips:262
 msgid "No Icons"
 msgstr "Nessuna icona"
 
-#: tips:266
+#: tips:265
 msgid "Same as current window"
 msgstr "Le stesse della finestra attuale"
 
-#: tips:267
+#: tips:266
 msgid "Same as default"
 msgstr "Quelle predefinite"
 
-#: tips:268
+#: tips:267
 msgid "Behaviour"
 msgstr "Comportamento"
 
-#: tips:269
+#: tips:268
 msgid "File menu on right-click"
 msgstr "Menù file col clic destro"
 
-#: tips:270
+#: tips:269
 msgid ""
 "Show the File menu instead of the main menu when right-clicking with files "
 "selected (the main menu can be accessed by holding down Control)."
@@ -4218,28 +4251,28 @@ msgstr ""
 "Mostra il menù «File» invece del menù principale col clic destro dei file "
 "selezionati (per avere il menù principale tenere premuto il tasto «Ctrl»)."
 
-#: tips:271
+#: tips:270
 msgid "`Xterm Here' program"
 msgstr "Programma per «Xterm qui»"
 
-#: tips:272 tips:273
+#: tips:271 tips:272
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr ""
 "Il programma da lanciare quando si sceglie la voce «Xterm qui» dal menù."
 
-#: tips:274
+#: tips:273
 msgid "Keyboard shortcuts"
 msgstr "Scorciatoie da tastiera"
 
-#: tips:276
+#: tips:275
 msgid "Executable files"
 msgstr "File eseguibili"
 
-#: tips:277
+#: tips:276
 msgid "Ignore eXecutable bit for known extensions"
-msgstr "Ignora il bit eseguibile per le estensioni conosciute"
+msgstr "Ignorare il bit eseguibile per le estensioni conosciute"
 
-#: tips:278 tips:279
+#: tips:277 tips:278
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -4249,11 +4282,11 @@ msgstr ""
 "eseguibile. È utile sui file system tipo Windows nei quali tutti i file sono "
 "visti come eseguibili."
 
-#: tips:280
+#: tips:279
 msgid "MIME types"
 msgstr "Tipi di MIME"
 
-#: tips:281
+#: tips:280
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. Use the MIME-"
@@ -4267,15 +4300,15 @@ msgstr ""
 "\n"
 "http://rox.sourceforge.net/mime_editor.html"
 
-#: tips:282
+#: tips:281
 msgid "Icon theme"
 msgstr "Tema icone"
 
-#: tips:283
+#: tips:282
 msgid "Themes should be placed inside the ~/.icons directory."
 msgstr "I temi vanno messi nella directory «~/.icons»."
 
-#: tips:284 tips:285
+#: tips:283 tips:284
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set this way override those from the selected theme."
@@ -4284,40 +4317,40 @@ msgstr ""
 "ogni tipo di MIME. Notare che le icone definite in questo modo prevalgono su "
 "quelle del tema selezionato."
 
-#: tips:286
+#: tips:285
 msgid "Colours"
 msgstr "Colori"
 
-#: tips:287
+#: tips:286
 msgid "File type colours"
 msgstr "Colori per i tipi di file"
 
-#: tips:288
+#: tips:287
 msgid "Colour files based on their types"
-msgstr "Colora i file in base al tipo"
+msgstr "Colorare i file in base al tipo"
 
-#: tips:289
+#: tips:288
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr ""
 "I nomi dei file (e i dettagli) vengono colorati in base al tipo di file."
 
-#: tips:290
+#: tips:289
 msgid "Directory:"
 msgstr "Directory:"
 
-#: tips:291
+#: tips:290
 msgid "Regular file:"
 msgstr "File regolare:"
 
-#: tips:292
+#: tips:291
 msgid "Pipe:"
 msgstr "Pipe:"
 
-#: tips:293
+#: tips:292
 msgid "Socket:"
 msgstr "Socket:"
 
-#: tips:295 tips:296
+#: tips:294 tips:295
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
@@ -4325,50 +4358,50 @@ msgstr ""
 "Errore, come un collegamento simbolico che punta ad un file inesistente, o "
 "ad un file per il quale non si hanno i permessi."
 
-#: tips:297
+#: tips:296
 msgid "Character device:"
 msgstr "Device a caratteri:"
 
-#: tips:298
+#: tips:297
 msgid "Block device:"
 msgstr "Device a blocchi:"
 
-#: tips:299
+#: tips:298
 msgid "Door:"
 msgstr "Door:"
 
-#: tips:300
+#: tips:299
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
 "I file door sono simili a socket o pipe e sono utilizzati solo in Solaris."
 
-#: tips:301
+#: tips:300
 msgid "Executable file:"
 msgstr "File eseguibile:"
 
-#: tips:302
+#: tips:301
 msgid "Application directory:"
 msgstr "Directory applicativa:"
 
-#: tips:303
+#: tips:302
 msgid "Unknown type:"
 msgstr "Tipo sconosciuto:"
 
-#: tips:304
+#: tips:303
 msgid "Compatibility"
 msgstr "Compatibilità"
 
-#: tips:305
+#: tips:304
 msgid "Window manager problems"
 msgstr "Problemi del window manager"
 
-#: tips:306
+#: tips:305
 msgid "Override window manager control of the pinboard and panels"
-msgstr "Ignora il controllo del window manager sulla bacheca e sui pannelli"
+msgstr "Ignorare il controllo del window manager sulla bacheca e sui pannelli"
 
-#: tips:307
+#: tips:306
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -4382,11 +4415,11 @@ msgstr ""
 "quando ci si fa clic sopra, le barre dei titoli e le altre decorazioni "
 "attorno alle finestre, o se queste appaiono nell'elenco delle finestre."
 
-#: tips:308
+#: tips:307
 msgid "Pass all backdrop mouse clicks to window manager"
-msgstr "Invia al window manager tutti i clic del mouse fatti sullo sfondo"
+msgstr "Inviare al window manager tutti i clic del mouse fatti sullo sfondo"
 
-#: tips:309
+#: tips:308
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
@@ -4397,11 +4430,11 @@ msgstr ""
 "selezione. Attivare questa opzione per inviare gli eventi al window manager. "
 "I clic sulle icone non vengono inviati."
 
-#: tips:310
+#: tips:309
 msgid "Blackbox root menus hack"
 msgstr "Compatibilità con Blackbox"
 
-#: tips:311
+#: tips:310
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -4414,11 +4447,11 @@ msgstr ""
 "comportamento nella prossima versione e così questa opzione non sarà più "
 "necessaria."
 
-#: tips:312
+#: tips:311
 msgid "Panel is a 'dock'"
 msgstr "Il pannello è un \"dock\""
 
-#: tips:313 tips:314
+#: tips:312 tips:313
 msgid ""
 "Disable this option if the panel stays above other windows against your "
 "wishes. Requires a restart to take effect."
@@ -4427,15 +4460,15 @@ msgstr ""
 "altre finestre. È necessario riavviare rox affinché la modifica abbia "
 "effetto."
 
-#: tips:315
+#: tips:314
 msgid "Drag and drop"
 msgstr "Trascinamento"
 
-#: tips:316
+#: tips:315
 msgid "Don't use hostnames"
 msgstr "Non usare i nomi di rete"
 
-#: tips:317 tips:318
+#: tips:316 tips:317
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -4445,15 +4478,15 @@ msgstr ""
 "bisogno di questa opzione. Usarla se il trascinamento dei file su "
 "un'applicazione mostra il segno + sul puntatore, ma non funziona."
 
-#: tips:319
+#: tips:318
 msgid "Extended attributes"
 msgstr "Attributi estesi"
 
-#: tips:320
+#: tips:319
 msgid "Don't use extended attributes"
 msgstr "Non usare gli attributi estesi"
 
-#: tips:321 tips:322 tips:323 tips:324
+#: tips:320 tips:321 tips:322 tips:323
 msgid ""
 "This disables the use of extended attributes available in newer operating "
 "systems and file systems.  With this option set the 'Set Type' menu entry is "
@@ -4465,3 +4498,4 @@ msgstr ""
 "menù «Tipo di file...» viene disabilitata, il tipo di MIME del file viene "
 "dedotto solo dal nome del file e la finestra «Proprietà» non riporta gli "
 "attributi estesi."
+
