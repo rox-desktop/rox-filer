@@ -2199,14 +2199,14 @@ void action_link(GList *paths, char *dest, char *leaf)
 
 void action_init(void)
 {
-	option_add_int(&o_action_copy, "action_copy", 1, NULL);
-	option_add_int(&o_action_move, "action_move", 1, NULL);
-	option_add_int(&o_action_link, "action_link", 1, NULL);
-	option_add_int(&o_action_delete, "action_delete", 0, NULL);
-	option_add_int(&o_action_mount, "action_mount", 1, NULL);
-	option_add_int(&o_action_force, "action_force", o_force, NULL);
-	option_add_int(&o_action_brief, "action_brief", o_brief, NULL);
-	option_add_int(&o_action_recurse, "action_recurse", o_recurse, NULL);
+	option_add_int(&o_action_copy, "action_copy", 1);
+	option_add_int(&o_action_move, "action_move", 1);
+	option_add_int(&o_action_link, "action_link", 1);
+	option_add_int(&o_action_delete, "action_delete", 0);
+	option_add_int(&o_action_mount, "action_mount", 1);
+	option_add_int(&o_action_force, "action_force", o_force);
+	option_add_int(&o_action_brief, "action_brief", o_brief);
+	option_add_int(&o_action_recurse, "action_recurse", o_recurse);
 }
 
 #define MAX_ASK 4

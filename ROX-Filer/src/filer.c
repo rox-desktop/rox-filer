@@ -130,11 +130,10 @@ void filer_init(void)
 	gchar *dpyhost, *dpy;
 	gchar *tmp;
   
-	option_add_int(&o_filer_size_limit, "filer_size_limit", 75, NULL);
+	option_add_int(&o_filer_size_limit, "filer_size_limit", 75);
 	option_add_int(&o_filer_auto_resize, "filer_auto_resize",
-						RESIZE_ALWAYS, NULL);
-	option_add_int(&o_unique_filer_windows, "filer_unique_windows",
-					0, NULL);
+							RESIZE_ALWAYS);
+	option_add_int(&o_unique_filer_windows, "filer_unique_windows", 0);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);

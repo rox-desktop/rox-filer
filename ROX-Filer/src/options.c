@@ -31,13 +31,16 @@
  * - Each part of the filer then calls option_add_int(), or a related function,
  *   supplying the name for the option and a default value. Once an option is
  *   registered, it is removed from the loading table.
- *   Update callbacks are called if the default value isn't used.
+ *
+ * - If things need to happen when values change, modules register with
+ *   option_add_notify().
  *
  * - option_register_widget() can be used during initialisation (any time
  *   before the Options box is displayed) to tell the system how to render a
  *   particular type of option.
  *
- * - All notify callbacks are called.
+ * - All notify callbacks are called. Use the Option->has_changed field
+ *   to work out what has changed from the defaults.
  *
  * When the user opens the Options box:
  *
@@ -52,7 +55,8 @@
  *
  * - The state of each widget is copied to the options values.
  *
- * - The update callbacks are called for those values which have changed.
+ * - All notify callbacks are called. Use the Option->has_changed field
+ *   to see what changed.
  *
  * - If Save or OK was clicked then the box is also closed.
  *
@@ -114,9 +118,8 @@ static char *process_option_line(guchar *line);
 static void build_options_window(void);
 static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
-static Option *new_option(guchar *key, OptionChanged *changed, guchar *def);
 static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
-static void option_add(Option *option, guchar *key, OptionChanged *changed);
+static void option_add(Option *option, guchar *key);
 
 static GList *build_toggle(OptionUI *ui, xmlNode *node, guchar *label);
 static GList *build_slider(OptionUI *ui, xmlNode *node, guchar *label);
@@ -207,74 +210,19 @@ void options_show(void)
 	gtk_widget_show_all(window);
 }
 
-/* Option should contain the default value.
- * It must never be destroyed after being registered (Options are typically
- * statically allocated).
- * The key corresponds to the option's name in Options.xml, and to the key
- * in the saved options file.
- * 'changed' is called whenever the value changes.
- *
- * On exit, the value will have been updated to the loaded value, if
- * different to the default.
- * XXX: Still call changed?
- */
-static void option_add(Option *option, guchar *key, OptionChanged *changed)
-{
-	gpointer okey, value;
-
-	g_return_if_fail(option_hash != NULL);
-	g_return_if_fail(g_hash_table_lookup(option_hash, key) == NULL);
-	g_return_if_fail(option->value != NULL);
-	
-	option->save = TRUE;	/* Save by default */
-	option->ui = NULL;
-	option->changed_cb = changed;
-	option->has_changed = FALSE;
-
-	g_hash_table_insert(option_hash, key, option);
-
-	/* Use the value loaded from the file, if any */
-	if (g_hash_table_lookup_extended(loading, key, &okey, &value))
-	{
-		option->has_changed = strcmp(option->value, value) != 0;
-			
-		g_free(option->value);
-		option->value = value;
-		option->int_value = atoi(value);
-		g_hash_table_remove(loading, key);
-		g_free(okey);
-
-		if (changed && option->has_changed)
-			changed(option->value);
-	}
-}
-
 /* Initialise and register a new integer option */
-void option_add_int(Option *option, guchar *key,
-		    int value, OptionChanged *changed)
+void option_add_int(Option *option, guchar *key, int value)
 {
 	option->value = g_strdup_printf("%d", value);
 	option->int_value = value;
-	option_add(option, key, changed);
+	option_add(option, key);
 }
 
-void option_add_string(guchar *key, guchar *value, OptionChanged *changed)
+void option_add_string(Option *option, guchar *key, guchar *value)
 {
-	new_option(key, changed, g_strdup(value));
-}
-
-/* The string returned is only valid until the option value changes.
- * Do not free it!
- */
-guchar *option_get_static_string(guchar *key)
-{
-	Option	*option;
-
-	option = g_hash_table_lookup(option_hash, key);
-
-	g_return_val_if_fail(option != NULL, NULL);
-
-	return option->value;
+	option->value = g_strdup(value);
+	option->int_value = atoi(value);
+	option_add(option, key);
 }
 
 /* Add a callback which will be called after all the options have
@@ -300,42 +248,40 @@ void option_add_saver(OptionNotify *callback)
  *                      INTERNAL FUNCTIONS                      *
  ****************************************************************/
 
-/* 'def' is placed directly into the new Option. It will be g_free()d
- * automatically.
+/* Option should contain the default value.
+ * It must never be destroyed after being registered (Options are typically
+ * statically allocated).
+ * The key corresponds to the option's name in Options.xml, and to the key
+ * in the saved options file.
+ *
+ * On exit, the value will have been updated to the loaded value, if
+ * different to the default.
  */
-static Option *new_option(guchar *key, OptionChanged *changed, guchar *def)
+static void option_add(Option *option, guchar *key)
 {
-	Option	*option;
 	gpointer okey, value;
 
-	g_return_val_if_fail(option_hash != NULL, NULL);
-	g_return_val_if_fail(g_hash_table_lookup(option_hash, key) == NULL,
-									NULL);
+	g_return_if_fail(option_hash != NULL);
+	g_return_if_fail(g_hash_table_lookup(option_hash, key) == NULL);
+	g_return_if_fail(option->value != NULL);
 	
-	option = g_new(Option, 1);
-
 	option->save = TRUE;	/* Save by default */
 	option->ui = NULL;
-	option->changed_cb = changed;
+	option->has_changed = FALSE;
 
 	g_hash_table_insert(option_hash, key, option);
 
 	/* Use the value loaded from the file, if any */
 	if (g_hash_table_lookup_extended(loading, key, &okey, &value))
 	{
+		option->has_changed = strcmp(option->value, value) != 0;
+			
+		g_free(option->value);
 		option->value = value;
+		option->int_value = atoi(value);
 		g_hash_table_remove(loading, key);
 		g_free(okey);
-
-		if (changed && strcmp(def, option->value) != 0)
-			changed(option->value);
-
-		g_free(def);	/* Don't need the default */
 	}
-	else
-		option->value = def;
-
-	return option;
 }
 
 static GtkColorSelectionDialog *current_csel_box = NULL;
@@ -932,9 +878,6 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 	g_free(option->value);
 	option->value = new;
 	option->int_value = atoi(new);
-
-	if (option->changed_cb)
-		option->changed_cb(option->value);
 }
 
 static void save_cb(gpointer key, gpointer value, gpointer data)

@@ -37,12 +37,11 @@
 
 char *current_lang = NULL;	/* Two-char country code, or NULL */
 
-/* Used to stop the translation-changed message on startup */
-static gboolean doing_init;
+static Option o_translation;
 
 /* Static Prototypes */
 static void set_trans(guchar *lang);
-static void trans_changed(guchar *lang);
+static void trans_changed(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -54,10 +53,10 @@ void i18n_init(void)
 {
 	gtk_set_locale();
 
-	doing_init = TRUE;
-	option_add_string("i18n_translation", "From LANG", trans_changed);
-	doing_init = FALSE;
-	set_trans(option_get_static_string("i18n_translation"));
+	option_add_string(&o_translation, "i18n_translation", "From LANG");
+	set_trans(o_translation.value);
+
+	option_add_notify(trans_changed);
 }
 
 /* These two stolen from dia :-).
@@ -149,12 +148,12 @@ void free_translated_entries(GtkItemFactoryEntry *entries, gint n)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void trans_changed(guchar *lang)
+static void trans_changed(void)
 {
-	if (doing_init)
+	if (!o_translation.has_changed)
 		return;
 
-	set_trans(lang);
+	set_trans(o_translation.value);
 	delayed_error(
 		_("You must restart the filer for the new language "
 		  "setting to take full effect"));

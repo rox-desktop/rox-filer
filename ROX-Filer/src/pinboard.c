@@ -103,6 +103,7 @@ static int old_x, old_y;		/* For dragging (mouse start) */
 static int icon_old_x, icon_old_y;	/* For dragging (icon start) */
 
 static Option o_pinboard_text_bg, o_pinboard_clamp_icons, o_pinboard_grid_step;
+static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 
 /* Static prototypes */
 static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight);
@@ -175,22 +176,17 @@ static void pinboard_load_from_xml(xmlDocPtr doc);
 
 void pinboard_init(void)
 {
-	option_add_string("pinboard_fg_colour", "#000", NULL);
-	option_add_string("pinboard_bg_colour", "#ddd", NULL);
+	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#000");
+	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#ddd");
 
-	option_add_int(&o_pinboard_text_bg, "pinboard_text_bg",
-					TEXT_BG_SOLID, NULL);
-	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons",
-					1, NULL);
+	option_add_int(&o_pinboard_text_bg, "pinboard_text_bg", TEXT_BG_SOLID);
+	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
-						GRID_STEP_COARSE, NULL);
+							GRID_STEP_COARSE);
 	option_add_notify(pinboard_check_options);
 
-	gdk_color_parse(option_get_static_string("pinboard_fg_colour"),
-			&text_fg_col);
-	gdk_color_parse(option_get_static_string("pinboard_bg_colour"),
-			&text_bg_col);
-
+	gdk_color_parse(o_pinboard_fg_colour.value, &text_fg_col);
+	gdk_color_parse(o_pinboard_bg_colour.value, &text_bg_col);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -474,8 +470,8 @@ static void pinboard_check_options(void)
 {
 	GdkColor	n_fg, n_bg;
 
-	gdk_color_parse(option_get_static_string("pinboard_fg_colour"), &n_fg);
-	gdk_color_parse(option_get_static_string("pinboard_bg_colour"), &n_bg);
+	gdk_color_parse(o_pinboard_fg_colour.value, &n_fg);
+	gdk_color_parse(o_pinboard_bg_colour.value, &n_bg);
 
 	if (o_pinboard_text_bg.has_changed ||
 		gdk_color_equal(&n_fg, &text_fg_col) == 0 ||

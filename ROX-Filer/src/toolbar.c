@@ -57,7 +57,7 @@ struct _Tool {
 	GtkWidget	**menu;		/* Right-click menu widget addr */
 };
 
-Option o_toolbar, o_toolbar_info;
+Option o_toolbar, o_toolbar_info, o_toolbar_disable;
 
 static GtkTooltips *tooltips = NULL;
 
@@ -147,9 +147,9 @@ void toolbar_init(void)
 {
 	int	i;
 	
-	option_add_int(&o_toolbar, "toolbar_type", TOOLBAR_NORMAL, NULL);
-	option_add_int(&o_toolbar_info, "toolbar_show_info", 1, NULL);
-	option_add_string("toolbar_disable", "close", NULL);
+	option_add_int(&o_toolbar, "toolbar_type", TOOLBAR_NORMAL);
+	option_add_int(&o_toolbar_info, "toolbar_show_info", 1);
+	option_add_string(&o_toolbar_disable, "toolbar_disable", "close");
 	option_add_notify(option_notify);
 	
 	tooltips = gtk_tooltips_new();
@@ -663,7 +663,7 @@ static void option_notify(void)
 	int		i;
 	gboolean	changed = FALSE;
 
-	list = option_get_static_string("toolbar_disable");
+	list = o_toolbar_disable.value;
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{

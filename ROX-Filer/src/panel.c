@@ -125,7 +125,7 @@ static void perform_action(Panel *panel,
 			   Icon *icon,
 			   GdkEventButton *event);
 static void run_applet(Icon *icon);
-static void panel_set_style(guchar *new);
+static void panel_set_style(void);
 static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon);
 static void panel_load_from_xml(Panel *panel, xmlDocPtr doc);
 
@@ -148,8 +148,9 @@ static int closing_panel = 0;	/* Don't panel_save; destroying! */
 
 void panel_init(void)
 {
-	option_add_int(&o_panel_style, "panel_style",
-				SHOW_APPS_SMALL, panel_set_style);
+	option_add_int(&o_panel_style, "panel_style", SHOW_APPS_SMALL);
+
+	option_add_notify(panel_set_style);
 }
 
 /* 'name' may be NULL or "" to remove the panel */
@@ -1340,7 +1341,7 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 }
 
 /* The style setting has been changed -- update all panels */
-static void panel_set_style(guchar *new)
+static void panel_set_style(void)
 {
 	if (o_panel_style.has_changed)
 	{

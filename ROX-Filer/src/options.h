@@ -19,7 +19,6 @@ struct _Option {
 	OptionUI	*ui;		/* NULL => No UI yet */
 	guchar		*value;
 	long		int_value;
-	OptionChanged	*changed_cb;
 	gboolean	save;		/* Save to options file */
 	gboolean	has_changed;
 };
@@ -35,10 +34,8 @@ struct _OptionUI {
 void options_init(void);
 void option_register_widget(char *name, OptionBuildFn builder);
 
-void option_add_int(Option *option, guchar *key,
-		    int value, OptionChanged *changed);
-void option_add_string(guchar *key, guchar *value, OptionChanged *changed);
-guchar *option_get_static_string(guchar *key);
+void option_add_int(Option *option, guchar *key, int value);
+void option_add_string(Option *option, guchar *key, guchar *value);
 
 void options_notify(void);
 void option_add_notify(OptionNotify *callback);

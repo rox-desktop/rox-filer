@@ -81,6 +81,7 @@ static gchar *opt_type_colours[][2] = {
 		(sizeof(opt_type_colours) / sizeof(opt_type_colours[0]))
 
 /* Parsed colours for file types */
+static Option o_type_colours[NUM_TYPE_COLOURS];
 static GdkColor	type_colours[NUM_TYPE_COLOURS];
 
 /* Static prototypes */
@@ -149,13 +150,12 @@ void type_init(void)
 	option_register_widget("type-edit", build_type_edit);
 	option_register_widget("type-reread", build_type_reread);
 	
-	option_add_int(&o_display_colour_types, "display_colour_types",
-					TRUE, NULL);
+	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
 	
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
-		option_add_string(opt_type_colours[i][0],
-				  opt_type_colours[i][1],
-				  NULL);
+		option_add_string(&o_type_colours[i],
+				  opt_type_colours[i][0],
+				  opt_type_colours[i][1]);
 	alloc_type_colours();
 
 	option_add_notify(alloc_type_colours);
@@ -1174,9 +1174,7 @@ static void alloc_type_colours(void)
 		gushort g = c->green;
 		gushort b = c->blue;
 
-		gdk_color_parse(
-			option_get_static_string(opt_type_colours[i][0]),
-			&type_colours[i]);
+		gdk_color_parse(o_type_colours[i].value, &type_colours[i]);
 
 		if (allocated && (c->red != r || c->green != g || c->blue != b))
 			change_count++;

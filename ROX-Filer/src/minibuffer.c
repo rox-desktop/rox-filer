@@ -74,8 +74,8 @@ static Option o_filer_beep_fail, o_filer_beep_multi;
 
 void minibuffer_init(void)
 {
-	option_add_int(&o_filer_beep_fail, "filer_beep_fail", 1, NULL);
-	option_add_int(&o_filer_beep_multi, "filer_beep_multi", 1, NULL);
+	option_add_int(&o_filer_beep_fail, "filer_beep_fail", 1);
+	option_add_int(&o_filer_beep_multi, "filer_beep_multi", 1);
 }
 
 /* Creates the minibuffer widgets, setting the appropriate fields

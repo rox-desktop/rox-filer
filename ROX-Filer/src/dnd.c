@@ -174,10 +174,10 @@ void dnd_init()
 			FALSE);
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
-	option_add_int(&o_dnd_drag_to_icons, "dnd_drag_to_icons", 1, NULL);
-	option_add_int(&o_dnd_spring_open, "dnd_spring_open", 0, NULL);
-	option_add_int(&o_dnd_spring_delay, "dnd_spring_delay", 400, NULL);
-	option_add_int(&o_dnd_middle_menu, "dnd_middle_menu", TRUE, NULL);
+	option_add_int(&o_dnd_drag_to_icons, "dnd_drag_to_icons", 1);
+	option_add_int(&o_dnd_spring_open, "dnd_spring_open", 0);
+	option_add_int(&o_dnd_spring_delay, "dnd_spring_delay", 400);
+	option_add_int(&o_dnd_middle_menu, "dnd_middle_menu", TRUE);
 
 	item_factory = menu_create(menu_def,
 				sizeof(menu_def) / sizeof(*menu_def),

@@ -40,10 +40,10 @@ static Option o_single_click, o_single_pinboard;
 
 void bind_init(void)
 {
-	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE, NULL);
-	option_add_int(&o_menu_button_2, "bind_menu_button_2", FALSE, NULL);
-	option_add_int(&o_single_click, "bind_single_click", TRUE, NULL);
-	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE, NULL);
+	option_add_int(&o_new_button_1, "bind_new_button_1", FALSE);
+	option_add_int(&o_menu_button_2, "bind_menu_button_2", FALSE);
+	option_add_int(&o_single_click, "bind_single_click", TRUE);
+	option_add_int(&o_single_pinboard, "bind_single_pinboard", TRUE);
 }
 
 /* Call this when a button event occurs and you want to know what

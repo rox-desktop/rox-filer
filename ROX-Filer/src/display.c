@@ -155,26 +155,17 @@ enum {
 
 void display_init()
 {
-	option_add_int(&o_intelligent_sort, "display_intelligent_sort",
-			1, NULL);
-	option_add_int(&o_display_dirs_first, "display_dirs_first",
-			FALSE, NULL);
-	option_add_int(&o_display_size, "display_size",
-			LARGE_ICONS,
-			NULL);
-	option_add_int(&o_display_details, "display_details",
-			DETAILS_NONE, NULL);
-	option_add_int(&o_display_sort_by, "display_sort_by",
-			SORT_BY_NAME, NULL);
-	option_add_int(&o_large_width, "display_large_width", 89, NULL);
-	option_add_int(&o_small_width, "display_small_width", 250, NULL);
-	option_add_int(&o_display_show_hidden, "display_show_hidden",
-			FALSE, NULL);
-	option_add_int(&o_display_show_thumbs, "display_show_thumbs",
-			FALSE, NULL);
+	option_add_int(&o_intelligent_sort, "display_intelligent_sort", 1);
+	option_add_int(&o_display_dirs_first, "display_dirs_first", FALSE);
+	option_add_int(&o_display_size, "display_size", LARGE_ICONS);
+	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
+	option_add_int(&o_display_sort_by, "display_sort_by", SORT_BY_NAME);
+	option_add_int(&o_large_width, "display_large_width", 89);
+	option_add_int(&o_small_width, "display_small_width", 250);
+	option_add_int(&o_display_show_hidden, "display_show_hidden", FALSE);
+	option_add_int(&o_display_show_thumbs, "display_show_thumbs", FALSE);
 	option_add_int(&o_display_inherit_options,"display_inherit_options",
-			FALSE, NULL);
-
+								FALSE); 
 	option_add_notify(options_changed);
 }
 

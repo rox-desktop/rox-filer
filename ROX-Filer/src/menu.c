@@ -102,7 +102,7 @@ GtkWidget *popup_menu = NULL;		/* Currently open menu */
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
 
-static Option o_menu_iconsize;
+static Option o_menu_iconsize, o_menu_xterm;
 
 /* Static prototypes */
 
@@ -346,8 +346,8 @@ void menu_init(void)
 	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
-	option_add_string("menu_xterm", "xterm", NULL);
-	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL, NULL);
+	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
+	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
 	option_add_saver(save_menus);
 
 	tips = gtk_tooltips_new();
@@ -1448,7 +1448,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
 	char	*argv[] = {"sh", "-c", NULL, NULL};
 
-	argv[2] = option_get_static_string("menu_xterm");
+	argv[2] = o_menu_xterm.value;
 
 	g_return_if_fail(window_with_focus != NULL);
 

@@ -423,7 +423,7 @@ int main(int argc, char **argv)
 		g_free(dir);
 	}
 
-	option_add_int(&o_dnd_no_hostnames, "dnd_no_hostnames", 1, NULL);
+	option_add_int(&o_dnd_no_hostnames, "dnd_no_hostnames", 1);
 
 	/* Try to send the request to an already-running copy of the filer */
 	gui_support_init();
