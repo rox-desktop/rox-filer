@@ -1,4 +1,4 @@
-#This file was created by <tal197> Mon May  8 14:57:14 2000
+#This file was created by <tal197> Tue May 16 11:38:42 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1040,7 +1040,7 @@ The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-8 2 0 0 -1 -1 -1 -1
+10 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -1048,6 +1048,8 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 1 0 0
+0 1 0 0
+0 1 1 0
 0 1 0 0
 8 1 0 "" ""
 2 1 1 "8cm" ""
@@ -1063,6 +1065,10 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1105,6 +1111,19 @@ Open the shell command box (see section
 \end_inset 
 
 ).
+\newline 
+Set Run Action
+\newline 
+Allows you to set the program to use when double-clicking on a file.
+\newline 
+
+\newline 
+See section 
+\begin_inset LatexCommand \ref{sec: RunAction}
+
+\end_inset 
+
+ for details.
 \newline 
 Show ROX-Filer help
 \newline 
@@ -1380,6 +1399,86 @@ Tab{}
 '.
  As you type, the cursor will move to the correct subdirectory.
  If it beeps when you press Tab then you need to supply more letters.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sec: RunAction}
+
+\end_inset 
+
+The run action box
+\layout Standard
+
+This box appears when you choose `Set Run Action' from the Window menu.
+ You can now either drag a file onto an application, or you can enter a
+ shell command.
+ In either case, the action is not actually performed but instead becomes
+ the default action for files of that type.
+\layout Standard
+
+All files have a MIME type in the form `
+\family typewriter 
+text/plain
+\family default 
+'.
+ Here, `
+\family typewriter 
+text
+\family default 
+' is the 
+\emph on 
+media type
+\emph toggle 
+ and `
+\family typewriter 
+plain
+\family default 
+' is the 
+\emph on 
+sub-type
+\emph toggle 
+.
+ Whichever method you use to set the action you will be given the choice
+ of setting the run action just for that type, or setting the default for
+ all files with that media-type which don't already have a specific action.
+\layout Standard
+
+For example, let's say you want to set things up so that double-clicking
+ on a `.gif' file loads it into the Gimp:
+\layout Paragraph
+
+Setting the run action by drag-and-drop
+\newline 
+
+\layout Standard
+
+Choose `Set Run Action' from the Window menu and, while the minibuffer is
+ still open, drag a GIF file from the filer window onto the Gimp's application
+ directory (probably in another filer window).
+\layout Paragraph
+
+Setting the run action by entering a shell command
+\newline 
+
+\layout Standard
+
+Type:
+\layout LyX-Code
+
+gimp 
+\begin_inset Quotes erd
+\end_inset 
+
+$1
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+and press Return.
+ Note that the cursor (the black box) must be on the GIF file when you press
+ Return.
 \layout Subsubsection
 
 The shell command box
