@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 1.3.2 - Manuel de l'utilisateur
+   ROX-Filer 1.3.3 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -681,7 +681,10 @@ Affiche le premier/dernier objet du dossier.
 
 <row><entry><keycap>Entrée</keycap></entry><entry>
 		Comme un clic gauche sur l'objet.
-		Vous pouvez maintenir enfoncé Shift pour modifier l'action, comme en cliquant.
+		Vous pouvez maintenir enfoncé <keycap>Shift</keycap> pour modifier l'action, comme en cliquant.
+		En maintenant <keycap>Alt</keycap> enfoncée, l'effet sera identique à un clic avec
+		le bouton du milieu ; les dossiers s'ouvrent dans une nouvelle fenêtre, et l'ouverture d'un fichier
+		provoque la fermeture immédiate du dossier.
 </entry></row>
 
 <row><entry><keycap>Barre d'espace</keycap></entry><entry>
@@ -839,11 +842,11 @@ Liste</entry><entry>
 Affiche/Masque le détail des objets</entry><entry>
 Idem
 </entry></row><row><entry>
-Fichiers cachés</entry><entry>
+Texte rayé</entry><entry>
 Bascule entre l'affichage et le masquage des fichiers cachés (ceux dont le nom commence par un point)</entry><entry>
 Same
 </entry></row><row><entry>
-Information</entry>
+Bouée</entry>
  <entry>
  Affiche les fichiers d'aide de <application>ROX-Filer</application>
  </entry>
@@ -908,6 +911,10 @@ Crée un nouveau fichier ou dossier à l'intérieur de ce dossier.
 
 <row><entry><guimenuitem>Fenêtre</guimenuitem></entry><entry>
 Opérations diverses agissant sur la fenêtre.
+</entry></row>
+
+<row><entry><guimenuitem>Aide</guimenuitem></entry><entry>
+  Information sur le filer.
 </entry></row>
 
 </tbody></tgroup></informaltable>
@@ -1173,6 +1180,18 @@ Crée un lien symbolique vers cet objet.
 </entry></row>
 
 <row><entry>
+<guimenuitem>Supprimer</guimenuitem></entry><entry>
+Supprime tous les objets sélectionnés du dossier courant. Le contenu des sous-dossiers
+sera supprimé en premier. Supprimer un lien symbolique ne supprime que le lien, pas la
+cible de ce lien.
+</entry></row>
+
+<row><entry>
+<guimenuitem>Aide</guimenuitem></entry><entry>
+Affiche le type de l'objet sélectionné. Pour les dossiers-applications, montre leurs fichiers d'aide.
+</entry></row>
+
+<row><entry>
 <guimenuitem>Shift Ouvrir</guimenuitem></entry><entry>
 Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers,
 ouvre les fichiers comme s'il s'agissait de simple texte brut, monte/démonte
@@ -1183,13 +1202,14 @@ la commande a effectuer.
 </entry></row>
 
 <row><entry>
-<guimenuitem>Aide</guimenuitem></entry><entry>
-Affiche le type de l'objet sélectionné. Pour les dossiers-applications, montre leurs fichiers d'aide.
+<guimenuitem>Ouvrir AVFS</guimenuitem></entry><entry>
+Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
 </entry></row>
 
 <row><entry>
-<guimenuitem>Info</guimenuitem></entry><entry>
-Affiche plus de détails sur l'objet.
+<guimenuitem>Envoyer à...</guimenuitem></entry><entry>
+Ouvre le menu 'Envoyer à...', ce qui permet d'envoyer les objets à une application.
+Voir la section <xref linkend="SendTo"/>.
 </entry></row>
 
 <row><entry>
@@ -1206,25 +1226,12 @@ utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xref 
 </entry></row>
 
 <row><entry>
-<guimenuitem>Ouvrir AVFS</guimenuitem></entry><entry>
-Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
+<guimenuitem>Info</guimenuitem></entry><entry>
+Affiche plus de détails sur l'objet.
 </entry></row>
 
 <row><entry>
-<guimenuitem>Envoyer à...</guimenuitem></entry><entry>
-Ouvre le menu 'Envoyer à...', ce qui permet d'envoyer les objets à une application.
-Voir la section <xref linkend="SendTo"/>.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Supprimer</guimenuitem></entry><entry>
-Supprime tous les objets sélectionnés du dossier courant. Le contenu des sous-dossiers
-sera supprimé en premier. Supprimer un lien symbolique ne supprime que le lien, pas la
-cible de ce lien.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Occupation du disque</guimenuitem></entry><entry>
+<guimenuitem>Compter</guimenuitem></entry><entry>
 Fait le total de l'espace occupé par les objets sélectionnés. Le contenu des dossiers
 sélectionnés est aussi compté. Les liens symboliques sont comptés, mais pas leur cible.
 </entry></row>
@@ -1450,6 +1457,51 @@ Ouvre un "espace de saisie" pour exécuter une commande shell (voir section <xref
 
 </tbody></tgroup></informaltable>
   </para>
+</sect1>
+
+<sect1>
+ <title>Le menu Aide</title>
+ <para>
+  <informaltable>
+   <tgroup cols="2">
+	<thead>
+	 <row>
+	  <entry>Commande</entry>
+	  <entry>Action</entry>
+	 </row>
+	</thead>
+	<tbody>
+	 <row>
+	  <entry>
+	   <guimenuitem>About ROX-Filer...</guimenuitem>
+	  </entry>
+	  <entry>
+	   Affiche des informations sur le fichier. C'est la même chose que de localiser ROX-Filer
+	   dans une fenêtre du filer et de sélectionner <guimenuitem>Info</guimenuitem> dans le menu
+	   Fichier.
+	  </entry>
+	 </row>
+	 <row>
+	  <entry>
+	   <guimenuitem>Montrer les fichiers d'aide</guimenuitem></entry><entry>
+	   Même chose que de localiser ROX-Filer et de sélectionner <guimenuitem>Aide</guimenuitem> dans
+	   le menu Fichier.
+	  </entry>
+	 </row>
+	 <row>
+	  <entry>
+	   <guimenuitem>Manuel</guimenuitem>
+	  </entry>
+	  <entry>
+	   Ouvre le manuel HTML correspondant à votre langue, ou la version anglaise si la traduction n'a
+	   pas été réalisée.
+	  </entry>
+	 </row>
+	</tbody>
+   </tgroup>
+  </informaltable>
+
+ </para>
 </sect1>
 
 <sect1>
@@ -1791,7 +1843,7 @@ while 1:
 
 Le mini-buffer est une barre blanche qui apparaît le long de la fenêtre du filer,
 en bas, et qui vous permet d'entrer du texte.
-Pressez <keycap>Echap</keycap> pour vous en débarrasser. Le mini-buffer se comporte différemment,
+Pressez <keycap>Echap<keycap> pour vous en débarrasser. Le mini-buffer se comporte différemment,
 selon la manière dont il a été appelé :
   </para>
 
@@ -3140,8 +3192,9 @@ essaiera simplement d'utiliser <filename>text</filename>.
 
   </para>
   <para>
-   Le filer cherche le type d'un fichier en fonction de son nom. Ces types sont définis par 
-   des fichiers `.mimeinfo' &mdash; voir <citation>SharedMIME</citation> pour plus de détails.
+   Le filer cherche le type d'un fichier en fonction de son nom. Les règles sont définies dans
+   plusieurs fichiers <filename>globs</filename> &mdash; voir <citation>SharedMIME</citation> pour
+   plus de détails.
   </para>
  </sect1>
 </chapter>
@@ -3982,7 +4035,7 @@ Les méthodes suivantes sont reconnues :</para>
 </bibliomixed>
 
 <bibliomixed>
- <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.7)
+ <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
   <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
 </bibliomixed>
 
