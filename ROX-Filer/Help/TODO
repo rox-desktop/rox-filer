@@ -7,11 +7,13 @@ when someone sends patches!).
 
 BUGS
 
+Clicking an unscanned item should scan it (as menu clicking does).
+
 Allow ~ in globicons.
 
-qsorting a sorted collection shouldn't cause flicker.
-
 Think about XXXs in dnd menu.
+
+Cancelling thumbnail creation doesn't allow it to be restarted.
 
 Deleting a symlink to a pinboard icon shows a warning
 
@@ -28,15 +30,29 @@ Gtk+ 2.0:
 	- Spawning shell scripts sometimes gives Bad Address (glib bug)
 
 Rescanning sometimes causes the display to scroll (automounter problem).
+<<<<<<< TODO
+
+Panel sometimes won't accept drops (window frame problem?).
+
+Deleting / moving files should update the globicons.
+=======
 
 Panel sometimes won't accept drops:
 	- Create panel without a window manager running
 	- Start sawfish. Panel no longer accepts drops.
 	- Same thing happens with gnome-terminal => sawfish bug (WM_STATE)?
 
+>>>>>>> 1.171
 
+<<<<<<< TODO
+=======
 FEATURES FOR 1.3
+>>>>>>> 1.171
 
+<<<<<<< TODO
+FEATURES FOR 1.1
+
+=======
 Deleting / moving files should update the globicons?
 
 Pinboard icons can only be dragged one at a time.
@@ -45,6 +61,7 @@ Remove icon should work with MIME stuff.
 
 'Edit Item' doesn't make much sense for applets...
 
+>>>>>>> 1.171
 Option to mount on click, Shift+Click to open without mounting.
 
 When following symlinks, don't convert to the 'real' path. Up should

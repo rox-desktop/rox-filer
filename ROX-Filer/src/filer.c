@@ -521,6 +521,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		g_list_free(filer_window->thumb_queue);
 	}
 
+	filer_tooltip_prime(NULL, NULL);
+
 	g_free(filer_window->auto_select);
 	g_free(filer_window->path);
 	g_free(filer_window);
