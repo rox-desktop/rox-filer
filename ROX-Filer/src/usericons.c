@@ -172,6 +172,7 @@ gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 {
 	MaskedPixmap *pic;
 	gchar	*icon_path;
+	GError	*error = NULL;
 
 	pic = g_fscache_lookup(pixmap_cache, iconpath);
 	if (!pic)
@@ -186,10 +187,18 @@ gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 
 	icon_path = make_path(filepath, ".DirIcon")->str;
 	gdk_pixbuf_save(pic->huge_pixbuf, icon_path,
-			"png", NULL,
+			"png", &error,
 			"tEXt::Software", PROJECT,
 			NULL);
 	g_object_unref(pic);
+
+	if (error)
+	{
+		delayed_error(_("Error creating image '%s':\n%s"),
+				icon_path, error->message);
+		g_error_free(error);
+		return FALSE;
+	}
 
 	dir_check_this(filepath);
 
