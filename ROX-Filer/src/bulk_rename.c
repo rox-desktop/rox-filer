@@ -73,7 +73,7 @@ void bulk_rename(const char *dir, GList *items)
 	gtk_dialog_add_action_widget(GTK_DIALOG(box), button, RESPONSE_RESET);
 	gtk_dialog_set_default_response(GTK_DIALOG(box), RESPONSE_RESET);
 	gtk_tooltips_set_tip(tooltips, button,
-			_("Make the After column a copy of Before"), NULL);
+			_("Make the New column a copy of Old"), NULL);
 
 	gtk_dialog_add_button(GTK_DIALOG(box),
 				GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
@@ -120,7 +120,7 @@ void bulk_rename(const char *dir, GList *items)
 	button = gtk_button_new_with_label(_("Apply"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 	gtk_tooltips_set_tip(tooltips, button,
-			_("Do a search-and-replace in the After column."
+			_("Do a search-and-replace in the New column."
 			"The files are not actually renamed until you click "
 			"on the Rename button below."), NULL);
 
@@ -139,7 +139,7 @@ void bulk_rename(const char *dir, GList *items)
 
 	cell_renderer = gtk_cell_renderer_text_new();
 	column = gtk_tree_view_column_new_with_attributes(
-				_("Before"), cell_renderer, "text", 0, NULL);
+				_("Old name"), cell_renderer, "text", 0, NULL);
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
@@ -148,7 +148,7 @@ void bulk_rename(const char *dir, GList *items)
 	g_signal_connect(G_OBJECT(cell_renderer), "edited",
 			G_CALLBACK(cell_edited), model);
 	column = gtk_tree_view_column_new_with_attributes(
-				_("After"), cell_renderer, "text", 1, NULL);
+				_("New name"), cell_renderer, "text", 1, NULL);
 	gtk_tree_view_append_column(GTK_TREE_VIEW(tree), column);
 
 	swin = gtk_scrolled_window_new(NULL, NULL);
@@ -256,7 +256,7 @@ static void update_model(GtkListStore *list, regex_t *replace, const char *with)
 	} while (gtk_tree_model_iter_next(model, &iter));
 
 	if (n_matched == 0)
-		report_error(_("No strings (in the After column) matched "
+		report_error(_("No strings (in the New column) matched "
 				"the given expression"));
 	else if (n_changed == 0)
 	{
@@ -418,7 +418,7 @@ static gboolean rename_items(const char *dir, GtkListStore *list)
 	if (slash_example)
 	{
 		char *message;
-		message = g_strdup_printf(_("Some of the After names contain "
+		message = g_strdup_printf(_("Some of the New names contain "
 				"/ characters (eg '%s'). "
 				"This will cause the files to end up in "
 				"different directories. "
