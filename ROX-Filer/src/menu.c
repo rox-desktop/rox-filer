@@ -68,6 +68,21 @@ static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
 static void close_panel(gpointer data, guint action, GtkWidget *widget);
 
+static GtkWidget *create_options();
+static void update_options();
+static void set_options();
+static void save_options();
+
+static OptionsSection options =
+{
+	"Menu options",
+	create_options,
+	update_options,
+	set_options,
+	save_options
+};
+
+
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
@@ -179,6 +194,7 @@ void menu_init()
 
 	gtk_accel_group_lock(panel_keys);
 
+	options_sections = g_slist_prepend(options_sections, &options);
 	xterm_here_value = g_strdup("xterm");
 	option_register("xterm_here", load_xterm_here);
 }
@@ -186,7 +202,7 @@ void menu_init()
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
  */
-GtkWidget *create_menu_options()
+static GtkWidget *create_options()
 {
 	GtkWidget	*table, *label;
 
@@ -219,19 +235,19 @@ static char *load_xterm_here(char *data)
 	return NULL;
 }
 
-void menu_update_options()
+static void update_options()
 {
 	gtk_entry_set_text(GTK_ENTRY(xterm_here_entry), xterm_here_value);
 }
 
-void menu_set_options()
+static void set_options()
 {
 	g_free(xterm_here_value);
 	xterm_here_value = g_strdup(gtk_entry_get_text(
 				GTK_ENTRY(xterm_here_entry)));
 }
 
-void menu_save_options()
+static void save_options()
 {
 	char	*menurc;
 

@@ -22,5 +22,6 @@ void drag_data_get(GtkWidget          *widget,
 		   guint32             time);
 void drag_set_dest(GtkWidget *widget);
 void dnd_init();
+GtkWidget *create_dnd_options();
 
 #endif /* _DND_H */

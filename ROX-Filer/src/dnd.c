@@ -25,26 +25,9 @@
 #include "pixmaps.h"
 #include "gui_support.h"
 #include "support.h"
+#include "options.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
-
-/* Possible values for drop_dest_type (can also be NULL).
- * In either case, drop_dest_path is the app/file/dir to use.
- */
-static char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
-static char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
-
-enum
-{
-	TARGET_RAW,
-	TARGET_URI_LIST,
-	TARGET_XDS,
-};
-
-GdkAtom XdndDirectSave0;
-GdkAtom text_plain;
-GdkAtom text_uri_list;
-GdkAtom application_octet_stream;
 
 /* Static prototypes */
 static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context);
@@ -85,8 +68,40 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time);
-char *get_local_path(char *uri);
+static char *get_local_path(char *uri);
 static void run_with_files(char *path, GSList *uri_list);
+static GtkWidget *create_options();
+static void update_options();
+static void set_options();
+static void save_options();
+static char *load_no_hostnames(char *data);
+
+/* Possible values for drop_dest_type (can also be NULL).
+ * In either case, drop_dest_path is the app/file/dir to use.
+ */
+static char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
+static char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
+
+static OptionsSection options =
+{
+	"Drag and Drop options",
+	create_options,
+	update_options,
+	set_options,
+	save_options
+};
+
+enum
+{
+	TARGET_RAW,
+	TARGET_URI_LIST,
+	TARGET_XDS,
+};
+
+GdkAtom XdndDirectSave0;
+GdkAtom text_plain;
+GdkAtom text_uri_list;
+GdkAtom application_octet_stream;
 
 void dnd_init()
 {
@@ -95,7 +110,64 @@ void dnd_init()
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
+
+	options_sections = g_slist_prepend(options_sections, &options);
+	option_register("dnd_no_hostnames", load_no_hostnames);
 }
+
+/*				OPTIONS				*/
+
+static gboolean o_no_hostnames = FALSE;
+static GtkWidget *toggle_no_hostnames;
+
+/* Build up some option widgets to go in the options dialog, but don't
+ * fill them in yet.
+ */
+static GtkWidget *create_options()
+{
+	GtkWidget	*vbox, *label;
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
+
+	label = gtk_label_new("Some older applications don't support XDND "
+			"fully and may need to have this option turned on. "
+			"Use this if dragging files to an application shows "
+			"a + sign on the pointer but the drop doesn't work.");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+
+	toggle_no_hostnames =
+		gtk_check_button_new_with_label("Don't use hostnames");
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_no_hostnames, FALSE, TRUE, 0);
+
+	return vbox;
+}
+
+static void update_options()
+{
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_no_hostnames),
+			o_no_hostnames);
+}
+
+static void set_options()
+{
+	o_no_hostnames = gtk_toggle_button_get_active(
+			GTK_TOGGLE_BUTTON(toggle_no_hostnames));
+}
+
+static void save_options()
+{
+	option_write("dnd_no_hostnames", o_no_hostnames ? "1" : "0");
+}
+
+static char *load_no_hostnames(char *data)
+{
+	o_no_hostnames = atoi(data) != 0;
+	return NULL;
+}
+
+/*			SUPPORT FUNCTIONS			*/
 
 static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context)
 {
@@ -158,7 +230,7 @@ static gboolean provides(GdkDragContext *context, GdkAtom target)
  *	//host/path
  *	file://host/path
  */
-char *get_local_path(char *uri)
+static char *get_local_path(char *uri)
 {
 	char	*host;
 
@@ -246,7 +318,8 @@ static void create_uri_list(GString *string,
 	int i, num_selected;
 
 	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name());
+	if (!o_no_hostnames)
+		g_string_append(leader, our_host_name());
 	g_string_append(leader, filer_window->path);
 	if (leader->str[leader->len - 1] != '/')
 		g_string_append_c(leader, '/');

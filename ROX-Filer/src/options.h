@@ -15,7 +15,20 @@ typedef char *OptionFunc(char *value);
  */
 typedef char *ParseFunc(char *line);
 
+typedef struct _OptionsSection OptionsSection;
+
 #include "filer.h"
+
+struct _OptionsSection
+{
+	char 	*name;
+	GtkWidget *(*create)(void);	/* Create widgets */
+	void 	(*update)(void);	/* Update widgets */
+	void 	(*set)(void);		/* Read values from widgets */
+	void 	(*save)(void);		/* Save values to Choices */
+};
+
+extern GSList *options_sections;
 
 /* Prototypes */
 

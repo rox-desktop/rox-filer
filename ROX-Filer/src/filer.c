@@ -88,6 +88,7 @@ void filer_init()
 	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
+
 /* When a filer window shows a directory, use this function to add
  * it to the list of directories to be updated when the contents
  * change.

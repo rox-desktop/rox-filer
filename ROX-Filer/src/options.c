@@ -15,11 +15,12 @@
 
 #include "gui_support.h"
 #include "choices.h"
-#include "menu.h"
 #include "options.h"
 
+/* Add OptionsSection structs to this list in your _init() functions */
+GSList *options_sections = NULL;
 
-static GtkWidget *window;
+static GtkWidget *window, *sections_vbox;
 static FILE *save_file = NULL;
 static GHashTable *option_hash = NULL;
 
@@ -29,8 +30,8 @@ static char *process_option_line(char *line);
 
 void options_init()
 {
-	GtkWidget	*tl_vbox, *scrolled_area, *vbox;
-	GtkWidget	*group, *border, *label;
+	GtkWidget	*tl_vbox, *scrolled_area;
+	GtkWidget	*border, *label;
 	GtkWidget	*actions, *button;
 	char		*string, *save_path;
 	
@@ -56,19 +57,9 @@ void options_init()
 	gtk_scrolled_window_add_with_viewport(
 			GTK_SCROLLED_WINDOW(scrolled_area), border);
 
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(border), vbox);
+	sections_vbox = gtk_vbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(border), sections_vbox);
 	
-	group = gtk_frame_new("Copy options");
-	gtk_box_pack_start(GTK_BOX(vbox), group, FALSE, TRUE, 0);
-	label = gtk_label_new("There are no copy options yet...");
-	gtk_container_add(GTK_CONTAINER(group), label);
-
-
-	group = gtk_frame_new("Menu options");
-	gtk_box_pack_start(GTK_BOX(vbox), group, FALSE, TRUE, 0);
-	gtk_container_add(GTK_CONTAINER(group), create_menu_options());
-
 	save_path = choices_find_path_save("...");
 	if (save_path)
 	{
@@ -106,7 +97,28 @@ void options_init()
 
 void options_load(void)
 {
+	static gboolean need_init = TRUE;
 	char	*path;
+
+	if (need_init)
+	{
+		GtkWidget	*group;
+		GSList		*next = options_sections;
+
+		while (next)
+		{
+			OptionsSection *section = (OptionsSection *) next->data;
+
+			group = gtk_frame_new(section->name);
+			gtk_box_pack_start(GTK_BOX(sections_vbox), group,
+					FALSE, TRUE, 0);
+			gtk_container_add(GTK_CONTAINER(group),
+					section->create());
+			next = next->next;
+		}
+
+		need_init = FALSE;
+	}
 
 	path = choices_find_path_load("options");
 	if (!path)
@@ -201,12 +213,18 @@ static char *process_option_line(char *line)
 static void save_options(GtkWidget *widget, gpointer data)
 {
 	gboolean	save = (gboolean) data;
+	GSList		*next = options_sections;
 	
-	menu_set_options();
+	while (next)
+	{
+		OptionsSection *section = (OptionsSection *) next->data;
+		section->set();
+		next = next->next;
+	}
 	
 	if (save)
 	{
-		char *path;
+		char 		*path;
 		
 		path = choices_find_path_save("options");
 		g_return_if_fail(path != NULL);
@@ -224,7 +242,13 @@ static void save_options(GtkWidget *widget, gpointer data)
 			return;
 		}
 
-		menu_save_options();
+		next = options_sections;
+		while (next)
+		{
+			OptionsSection *section = (OptionsSection *) next->data;
+			section->save();
+			next = next->next;
+		}
 
 		if (save_file && fclose(save_file) == EOF)
 		{
@@ -238,9 +262,18 @@ static void save_options(GtkWidget *widget, gpointer data)
 
 void options_show(FilerWindow *filer_window)
 {
+	GSList		*next = options_sections;
+	
 	if (GTK_WIDGET_MAPPED(window))
 		gtk_widget_hide(window);
-	menu_update_options();
+
+	while (next)
+	{
+		OptionsSection *section = (OptionsSection *) next->data;
+		section->update();
+		next = next->next;
+	}
+
 	gtk_widget_show_all(window);
 }
 
