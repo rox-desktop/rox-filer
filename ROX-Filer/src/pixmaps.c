@@ -518,9 +518,9 @@ static gchar *thumbnail_program(MIME_type *type)
 
 	leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
 	path = choices_find_path_load(leaf, "MIME-thumb");
+	g_free(leaf);
 	if (path)
 	{
-		g_free(leaf);
 		return path;
 	}
 
