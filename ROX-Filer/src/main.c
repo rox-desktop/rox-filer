@@ -239,11 +239,12 @@ int main(int argc, char **argv)
 
 	to_open = g_string_new(NULL);
 
+	home_dir = g_get_home_dir();
+	app_dir = g_strdup(getenv("APP_DIR"));
+
 	choices_init();
 	i18n_init();
 
-	home_dir = g_get_home_dir();
-	app_dir = g_strdup(getenv("APP_DIR"));
 	if (app_dir)
 		unsetenv("APP_DIR");
 	else
