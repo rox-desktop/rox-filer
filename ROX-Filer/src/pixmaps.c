@@ -156,7 +156,7 @@ static void load_default_pixmaps(void)
 	im_dirs = load_pixmap("images/dirs.png");
 
 	pixbuf = gdk_pixbuf_new_from_file(
-			make_path(app_dir, "images/rox-icon.png")->str, &error);
+			make_path(app_dir, ".DirIcon")->str, &error);
 	if (pixbuf)
 	{
 		GList *icon_list;
