@@ -51,6 +51,8 @@
 #include "dir.h"
 #include "icon.h"
 #include "mount.h"
+#include "type.h"
+#include "xtypes.h"
 
 /* Parent->Child messages are one character each:
  *
@@ -100,6 +102,7 @@ static unsigned long file_counter;	/* For Disk Usage */
 
 static struct mode_change *mode_change = NULL;	/* For Permissions */
 static FindCondition *find_condition = NULL;	/* For Find */
+static MIME_type *type_change=NULL;
 
 /* Only used by child */
 static gboolean o_force = FALSE;
@@ -117,6 +120,7 @@ static Option o_action_newer;
  */
 static guchar	*last_chmod_string = NULL;
 static guchar	*last_find_string = NULL;
+static guchar	*last_settype_string = NULL;
 
 /* Set to one of the above before forking. This may change over a call to
  * reply(). It is reset to NULL once the text is parsed.
@@ -268,6 +272,45 @@ static void show_chmod_help(gpointer data)
 "<b>755</b>: set the permissions directly\n"
 "\n"
 "See the chmod(1) man page for full details."));
+
+	g_signal_connect(help, "response",
+			G_CALLBACK(gtk_widget_destroy), NULL);
+
+	gtk_widget_show_all(help);
+}
+
+
+static void show_settype_help(gpointer data)
+{
+	GtkWidget *help;
+	GtkWidget *text;
+
+	help = gtk_dialog_new_with_buttons(
+			_("Set type reference"),
+			NULL, 0,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL,
+			NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(help), GTK_RESPONSE_CANCEL);
+
+	text = gtk_label_new(NULL);
+	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(help)->vbox), text);
+	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
+	gtk_label_set_markup(GTK_LABEL(text), _(
+"Normally ROX-Filer determines the type of a regular file\n"
+"by matching it's name against a pattern.  To change the\n"
+"type of the file you must rename it.\n" 
+"\n"
+"Newer file systems can support something called 'Extended\n"
+"Attributes' which can be used to store additional data with\n"
+"each file as named parameters.  ROX-Filer uses the\n"
+"'user.mime_type' attribute to store file types.\n" 
+"\n"
+"File types are only supported for regular files, not\n"
+"directories, devices, pipes or sockets, and then only\n"
+"on certain file systems and where the OS implements them.\n" 
+"\n"
+ATTR_MAN_PAGE ));
 
 	g_signal_connect(help, "response",
 			G_CALLBACK(gtk_widget_destroy), NULL);
@@ -1116,6 +1159,85 @@ static void do_chmod(const char *path, const char *unused)
 	}
 }
 
+static void do_settype(const char *path, const char *unused)
+{
+	struct stat 	info;
+	const char     *comment;
+
+	check_flags();
+
+	if (mc_lstat(path, &info))
+	{
+		send_error();
+		return;
+	}
+	if (S_ISLNK(info.st_mode))
+		return;
+
+	if (!quiet)
+	{
+		printf_send("<%s", path);
+		printf_send(">");
+		if (!printf_reply(from_parent, FALSE,
+				  _("?Change type of '%s'?"), path))
+			return;
+	}
+	for (;;)
+	{
+		if (new_entry_string)
+		{
+			type_change=mime_type_lookup(new_entry_string);
+			null_g_free(&new_entry_string);
+		}
+
+		if (type_change)
+			break;
+
+		printf_send(_("!Invalid type - "
+			      "change it and try again\n"));
+		if (!printf_reply(from_parent, TRUE,
+				  _("?Change type of '%s'?"), path))
+			return;
+	}
+	comment=mime_type_comment(type_change);
+
+	if (!o_brief)
+		printf_send(_("'Changing type of '%s' to '%s'\n"), path,
+			    comment);
+
+	if (mc_lstat(path, &info))
+	{
+		send_error();
+		return;
+	}
+	if (S_ISLNK(info.st_mode))
+		return;
+
+	if(S_ISREG(info.st_mode))
+	{
+		if (xtype_set(path, type_change))
+		{
+			send_error();
+			return;
+		}
+
+		send_check_path(path);
+
+	}
+	else if(!S_ISDIR(info.st_mode))
+	{
+		send_mount_path(path);
+
+		if (o_recurse)
+		{
+			guchar *safe_path;
+			safe_path = g_strdup(path);
+			for_dir_contents(do_settype, safe_path, unused);
+			g_free(safe_path);
+		}
+	}
+}
+
 /* We want to copy 'object' into directory 'dir'. If 'action_leaf'
  * is set then that is the new leafname, otherwise the leafname stays
  * the same.
@@ -1675,6 +1797,29 @@ static void chmod_cb(gpointer data)
 	send_done();
 }
 
+static void settype_cb(gpointer data)
+{
+	GList *paths = (GList *) data;
+
+	for (; paths; paths = paths->next)
+	{
+		guchar	*path = (guchar *) paths->data;
+		struct stat info;
+
+		send_dir(path);
+
+		if (mc_stat(path, &info) != 0)
+			send_error();
+		else if (S_ISLNK(info.st_mode))
+			printf_send(_("!'%s' is a symbolic link\n"),
+				    g_basename(path));
+		else
+			do_settype(path, NULL);
+	}
+	
+	send_done();
+}
+
 static void list_cb(gpointer data)
 {
 	GList	*paths = (GList *) data;
@@ -1890,6 +2035,65 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 			G_CALLBACK(gtk_button_clicked),
 			gui_side->yes);
 #endif
+
+	number_of_windows++;
+	gtk_widget_show(abox);
+
+out:
+	null_g_free(&new_entry_string);
+}
+
+/* Set the MIME type of the selected items */
+void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
+{
+	GtkWidget	*abox;
+	GUIside		*gui_side;
+	static GList	*presets = NULL;
+	gboolean	recurse = force_recurse || o_action_recurse.int_value;
+
+	if (!paths)
+	{
+		report_error(_("You need to select the items "
+				"whose type you want to change"));
+		return;
+	}
+
+	if (!presets)
+	{
+		presets = mime_type_name_list();
+	}
+
+	if (!last_settype_string)
+		last_settype_string = g_strdup("text/plain");
+
+	if (oldtype)
+		new_entry_string = g_strdup(oldtype);
+	else
+		new_entry_string = g_strdup(last_settype_string);
+
+	abox = abox_new(_("Set type"), FALSE);
+	gui_side = start_action(abox, settype_cb, paths,
+				o_action_force.int_value,
+				o_action_brief.int_value,
+				recurse,
+				o_action_newer.int_value);
+	
+	if (!gui_side)
+		goto out;
+
+	abox_add_flag(ABOX(abox),
+		_("Brief"), _("Don't list processed files"),
+		'B', o_action_brief.int_value);
+	abox_add_flag(ABOX(abox),
+		_("Recurse"), _("Change contents of subdirectories"),
+		'R', recurse);
+
+	gui_side->default_string = &last_settype_string;
+	abox_add_combo(ABOX(abox), presets, new_entry_string,
+				new_help_button(show_settype_help, NULL));
+
+	g_signal_connect(ABOX(abox)->entry, "changed",
+			G_CALLBACK(entry_changed), gui_side);
 
 	number_of_windows++;
 	gtk_widget_show(abox);

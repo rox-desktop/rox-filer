@@ -75,6 +75,7 @@ typedef enum {
 	FILE_CHMOD_ITEMS,
 	FILE_FIND,
 	FILE_OPEN_VFS_AVFS,
+	FILE_SET_TYPE,
 } FileOp;
 
 typedef void (*ActionFn)(GList *paths,
@@ -208,6 +209,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
 {">" N_("Properties"),		NULL, file_op, FILE_PROPERTIES, "<StockItem>", GTK_STOCK_PROPERTIES},
 {">" N_("Count"),		NULL, file_op, FILE_USAGE, NULL},
+{">" N_("Set type..."),		NULL, file_op, FILE_SET_TYPE, NULL},
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Find"),		NULL, file_op, FILE_FIND, "<StockItem>", GTK_STOCK_FIND},
@@ -980,6 +982,14 @@ static void chmod_items(FilerWindow *filer_window)
 	destroy_glist(&paths);
 }
 
+static void set_type_items(FilerWindow *filer_window)
+{
+	GList *paths;
+	paths = filer_selected_items(filer_window);
+	action_settype(paths, FALSE, NULL);
+	destroy_glist(&paths);
+}
+
 static void find(FilerWindow *filer_window)
 {
 	GList *paths;
@@ -1741,6 +1751,9 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			case FILE_PROPERTIES:
 				prompt = _("Properties of ... ?");
 				break;
+			case FILE_SET_TYPE:
+				prompt = _("Set type of ... ?");
+				break;
 			case FILE_RUN_ACTION:
 				prompt = _("Set run action for ... ?");
 				break;
@@ -1787,6 +1800,9 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			return;
 		case FILE_CHMOD_ITEMS:
 			chmod_items(window_with_focus);
+			return;
+		case FILE_SET_TYPE:
+			set_type_items(window_with_focus);
 			return;
 		case FILE_FIND:
 			find(window_with_focus);

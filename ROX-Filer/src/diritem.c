@@ -44,6 +44,7 @@
 #include "options.h"
 #include "fscache.h"
 #include "pixmaps.h"
+#include "xtypes.h"
 
 static Option o_ignore_exec;
 
@@ -167,7 +168,7 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 			g_free(link_path);
 		}
 		else
-			item->mime_type = type_from_path(path);
+			item->mime_type = xtype_get(path);
 
 		/* Note: for symlinks we need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))

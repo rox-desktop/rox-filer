@@ -142,6 +142,9 @@ AC_TYPE_SIZE_T
 dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
 
+dnl Check for extended attribute support
+AC_CHECK_FUNCS(attropen getxattr)
+
 dnl Extract version info from AppInfo.xml
 AC_MSG_CHECKING(extracting version information)
 [

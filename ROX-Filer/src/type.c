@@ -242,6 +242,24 @@ const char *basetype_name(DirItem *item)
 	return _("Unknown");
 }
 
+static void append_names(gpointer key, gpointer value, gpointer udata)
+{
+	GList **list=(GList **) udata;
+
+	*list=g_list_prepend(*list, key);
+}
+
+/* Return list of all mime type names */
+GList *mime_type_name_list(void)
+{
+	GList *list=NULL;
+
+	g_hash_table_foreach(type_hash, append_names, &list);
+	list=g_list_sort(list, (GCompareFunc) strcmp);
+
+	return list;
+}
+
 /*			MIME-type guessing 			*/
 
 /* Get the type of this file - stats the file and uses that if
@@ -347,6 +365,11 @@ static char *handler_for(MIME_type *type)
 		open = choices_find_path_load(type->media_type, "MIME-types");
 
 	return open;
+}
+
+MIME_type *mime_type_lookup(const char *type)
+{
+  return get_mime_type(type, FALSE);
 }
 
 /*			Actions for types 			*/
@@ -1406,7 +1429,8 @@ static void find_comment(MIME_type *type)
 	}
 
 	if (!type->comment)
-		type->comment = g_strdup(_("No description"));
+		type->comment = g_strdup_printf("%s/%s", type->media_type,
+						type->subtype);
 
 	for (i = 0; i < n_dirs; i++)
 		g_free(dirs[i]);

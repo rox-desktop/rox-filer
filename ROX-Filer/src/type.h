@@ -65,5 +65,7 @@ gchar *describe_current_command(MIME_type *type);
 GdkColor *type_get_colour(DirItem *item, GdkColor *normal);
 void reread_mime_files(void);
 extern const char *mime_type_comment(MIME_type *type);
+extern MIME_type *mime_type_lookup(const char *type);
+extern GList *mime_type_name_list(void);
 
 #endif /* _TYPE_H */
