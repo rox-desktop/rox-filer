@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+25-Apr-2003
+~~~~~~~~~~~
+Close stdout when running child processes for users running startx from the
+console, since some terminal applications try to read from the console,
+freezing X (Keith R. John Warno).
+
 24-Apr-2003
 ~~~~~~~~~~~
 Using the bookmarks menu to open an unmounted mount point will mount it

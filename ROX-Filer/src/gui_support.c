@@ -518,7 +518,7 @@ gboolean rox_spawn(const gchar *dir, const gchar **argv)
 	GError	*error = NULL;
 
 	if (!g_spawn_async_with_pipes(dir, (gchar **) argv, NULL,
-			G_SPAWN_DO_NOT_REAP_CHILD |
+			G_SPAWN_DO_NOT_REAP_CHILD | G_SPAWN_STDOUT_TO_DEV_NULL |
 			G_SPAWN_SEARCH_PATH,
 			NULL, NULL,		/* Child setup fn */
 			NULL,			/* Child PID */
