@@ -191,8 +191,7 @@ void icon_unhash_path(Icon *icon)
 				((Icon *) list->data)->path, list);
 }
 
-/* If path is on an icon then it may have changed... check!
- */
+/* If path is on an icon then it may have changed... check! */
 void icons_may_update(guchar *path)
 {
 	GList	*affected;
@@ -246,6 +245,18 @@ gboolean icons_require(guchar *path)
 	g_hash_table_foreach(icons_hash, (GHFunc) check_has, &check);
 
 	return check.found;
+}
+
+/* Callback to update icons of a certain path */
+static void update_icons(gpointer key, GList *icons, gpointer data)
+{
+	icons_may_update((guchar *) key);
+}
+
+/* Check all icons to see if they have been updated */
+void update_all_icons(void)
+{
+	g_hash_table_foreach(icons_hash, (GHFunc) update_icons, NULL);
 }
 
 /****************************************************************

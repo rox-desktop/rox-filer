@@ -39,6 +39,7 @@
 #include "action.h"
 #include "pinboard.h"
 #include "panel.h"
+#include "icon.h"
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
@@ -380,6 +381,15 @@ void run_list(guchar *to_open)
 				break;
 			case 'r':
 				panel_new(value, PANEL_RIGHT);
+				break;
+		        case 'i':
+			        update_all_icons();
+				break;
+		        case 'w':
+			        filer_check_mounted(value);
+				break;
+		        case 'W':
+			        filer_update_all();
 				break;
 			default:
 				g_warning("Don't know how to handle '%s'",

@@ -152,6 +152,7 @@ int dir_item_cmp(const void *a, const void *b)
 	return strcmp(aa->leafname, bb->leafname);
 }
 
+/* Rescan this directory */
 void refresh_dirs(char *path)
 {
 	g_fscache_update(dir_cache, path);

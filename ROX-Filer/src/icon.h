@@ -43,5 +43,6 @@ void icon_hash_path(Icon *icon);
 void icon_unhash_path(Icon *icon);
 gboolean icons_require(guchar *path);
 void icons_may_update(guchar *path);
+void update_all_icons(void);
 
 #endif /* _ICON_H */

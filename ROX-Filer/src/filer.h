@@ -77,6 +77,7 @@ extern gboolean 	o_unique_filer_windows;
 void filer_init(void);
 FilerWindow *filer_opendir(char *path);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
+void filer_update_all(void);
 int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);
