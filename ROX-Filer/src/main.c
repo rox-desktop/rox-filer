@@ -558,7 +558,7 @@ static void show_features(void)
 # endif
 #endif
 		);
-	g_printerr("%s... %s\n", _("GTK+-2.0 support"),
+	g_printerr("%s... %s\n", _("Gtk+-2.0 support"),
 #ifdef GTK2
 		_("Yes")
 #else
@@ -571,7 +571,7 @@ static void show_features(void)
 #elif defined(HAVE_LIBPNG)
 		_("Yes (using libpng)")
 #else
-		_("No (needs libpng or gtk+-2.0)")
+		_("No (needs libpng or Gtk+-2.0)")
 #endif
 		);
 }

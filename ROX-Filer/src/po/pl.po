@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.0\n"
-"POT-Creation-Date: 2001-12-29 15:10+0000\n"
+"POT-Creation-Date: 2002-01-08 14:56+0000\n"
 "PO-Revision-Date: 2002-01-01 17:20+0100\n"
 "Last-Translator: Krzysztof Krzy¿aniak <eloy@debian.org>\n"
 "Language-Team: Polish <eloy@debian.org>\n"
@@ -199,11 +199,11 @@ msgstr "B£¡D odczytu"
 msgid "ERROR"
 msgstr "B£¡D"
 
-#: action.c:812 action.c:995 main.c:545 main.c:556
+#: action.c:812 action.c:995 main.c:545 main.c:552 main.c:563
 msgid "Yes"
 msgstr "Tak"
 
-#: action.c:816 action.c:1000
+#: action.c:816 action.c:1000 main.c:547
 msgid "No"
 msgstr "Nie"
 
@@ -483,7 +483,9 @@ msgstr "Zamontuj / Odmontuj"
 
 #: action.c:2056
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr "ROX-Filer nie posiada jeszcze wsparcia dla punktów montowania w Twoim systemie.."
+msgstr ""
+"ROX-Filer nie posiada jeszcze wsparcia dla punktów montowania w Twoim "
+"systemie.."
 
 #: action.c:2074 menu.c:239 tips:93
 msgid "Delete"
@@ -585,13 +587,13 @@ msgstr " wp³ynie na elementy na pulpicie lub panelu - na pewno kasowaæ?"
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr " wp³ynie na elementy na pulpicie lub panelu - na pewno je kasowaæ?"
 
-#: action.c:2313 filer.c:1539 gtksavebox.c:243 icon.c:893 infobox.c:106
-#: menu.c:1570 options.c:742 panel.c:318 type.c:981 usericons.c:344
+#: action.c:2313 filer.c:1525 gtksavebox.c:243 icon.c:890 infobox.c:106
+#: menu.c:1570 options.c:742 panel.c:350 type.c:981 usericons.c:344
 msgid "Cancel"
 msgstr "Anuluj"
 
 #: action.c:2313 gtksavebox.c:236 gtksavebox.c:510 gui_support.c:252
-#: icon.c:886 menu.c:1563 options.c:730 type.c:974 usericons.c:336
+#: icon.c:883 menu.c:1563 options.c:730 type.c:974 usericons.c:336
 msgid "OK"
 msgstr "OK"
 
@@ -613,7 +615,7 @@ msgstr ""
 msgid "Can't open directory: %s"
 msgstr "Nie mo¿na otworzyæ katalogu: %s"
 
-#: display.c:1094
+#: display.c:1096
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "b³±d lstat(2): %s"
@@ -679,12 +681,16 @@ msgstr "Nie podano URI w text/uri-list (nic do zrobienia!)"
 #: dnd.c:1024
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
-msgstr "Nie mo¿na otrzymaæ danych ze zdalnego komputera (nie podani application/octet-stream)"
+msgstr ""
+"Nie mo¿na otrzymaæ danych ze zdalnego komputera (nie podani application/"
+"octet-stream)"
 
 #: dnd.c:1046
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
-msgstr "Niektóre z tych plików znajduj± sie na innym komputerze - zostan± one zignorowane"
+msgstr ""
+"Niektóre z tych plików znajduj± sie na innym komputerze - zostan± one "
+"zignorowane"
 
 #: dnd.c:1053
 msgid ""
@@ -707,44 +713,46 @@ msgstr "B³±d pobierania listy plików: %s"
 msgid "You can't use multiple files with Set Icon!"
 msgstr "Nie mo¿na u¿ywaæ wielu plików w opcji Ustaw Ikonê"
 
-#: filer.c:593
+#: filer.c:576
 msgid "Directory missing/deleted"
 msgstr "Brakuj±cy/skasowany katalog"
 
-#: filer.c:971
+#: filer.c:954
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later."
-msgstr "Grupa %s nie jest ustawiona. Zaznacz kilka plików, nastêpnie naci¶nij Ctrl+%d aby ustawiæ grupê. Wci¶nij samo %s aby wybraæ pliki pó¼niej."
+msgstr ""
+"Grupa %s nie jest ustawiona. Zaznacz kilka plików, nastêpnie naci¶nij Ctrl+%"
+"d aby ustawiæ grupê. Wci¶nij samo %s aby wybraæ pliki pó¼niej."
 
-#: filer.c:1143
+#: filer.c:1126
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Katalog '%s' nie jest dostêpny"
 
-#: filer.c:1340
+#: filer.c:1323
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Katalog '%s' nie znaleziony"
 
-#: filer.c:1793
+#: filer.c:1779
 msgid "Scanning, "
 msgstr "Skanowanie, "
 
-#: filer.c:1794
+#: filer.c:1780
 msgid "All, "
 msgstr "Wszystkie, "
 
-#: filer.c:1795
+#: filer.c:1781
 msgid "Thumbs, "
 msgstr "Miniatury, "
 
-#: filer.c:2044 menu.c:1820
+#: filer.c:2030 menu.c:1820
 msgid "Item no longer exists!"
 msgstr "Element ju¿ nie istnieje!"
 
-#: filer.c:2166
+#: filer.c:2152
 msgid "Symbolic link to "
 msgstr "Symboliczne dowi±zanie do "
 
@@ -967,8 +975,8 @@ msgstr ""
 #: gui_support.c:372
 msgid ""
 "\n"
-"--- next error ---\n"
-msgstr "\n--- nastêpny b³±d ---\n"
+"---\n"
+msgstr ""
 
 #: gui_support.c:430
 #, c-format
@@ -990,10 +998,11 @@ msgid ""
 msgstr ""
 "B³±d w pliku '%s' w linii %s: \n"
 "\"%s\"\n"
-"B³±d ten mo¿e pojawiæ siê w skutek aktualizacji programu do nowszej wersji. Otwórz okno opcji i kliknij Zapisz.\n"
+"B³±d ten mo¿e pojawiæ siê w skutek aktualizacji programu do nowszej wersji. "
+"Otwórz okno opcji i kliknij Zapisz.\n"
 "Nastêpne b³êdy zostan± zignorowane."
 
-#: i18n.c:154
+#: i18n.c:157
 msgid ""
 "You must restart the filer for the new language setting to take full effect"
 msgstr "Musisz zrestartowaæ program, aby w pe³ni uwzglêdniæ wybór jêzyka"
@@ -1034,7 +1043,7 @@ msgstr "Okre¶l akcjê..."
 msgid "Set Icon..."
 msgstr "Okre¶l Ikonê..."
 
-#: icon.c:115 icon.c:844
+#: icon.c:115 icon.c:841
 msgid "Edit Item"
 msgstr "Edycja pliku"
 
@@ -1058,27 +1067,23 @@ msgstr "Etykieta musi zawieraæ przynajmniej jeden znak!"
 msgid "The location must contain at least one character!"
 msgstr "Lokalizacja musi zawieraæ przynajmniej jeden znak!"
 
-#: icon.c:606
-msgid "Sorry, but the name must not contain < or >"
-msgstr "Nazwa nie mo¿e zawieraæ < lub >"
-
-#: icon.c:752
+#: icon.c:749
 msgid "You must first select some items to remove"
 msgstr "Musisz najpierw zaznaczyæ ikony, ¿eby je usun±æ"
 
-#: icon.c:790
+#: icon.c:787
 msgid "You must open the menu over an item"
 msgstr "Nale¿y otworzyæ menu nad sk³adnikiem"
 
-#: icon.c:819 menu.c:1145
+#: icon.c:816 menu.c:1145
 msgid "You can only set the run action for a regular file"
 msgstr "Mo¿esz okre¶liæ akcjê jedynie dla zwyk³ego pliku"
 
-#: icon.c:850
+#: icon.c:847
 msgid "Clicking the icon opens:"
 msgstr "Klikniêcie na ikonê otwiera:"
 
-#: icon.c:862
+#: icon.c:859
 msgid "The text displayed under the icon is:"
 msgstr "Tekst wy¶wietlany pod ikon±:"
 
@@ -1161,8 +1166,9 @@ msgid "Mount point"
 msgstr "Munkt zamontowania"
 
 #: main.c:94
+#, fuzzy
 msgid ""
-"Copyright (C) 2001 Thomas Leonard.\n"
+"Copyright (C) 2002 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
@@ -1262,24 +1268,48 @@ msgid "features set at compile time"
 msgstr "w³a¶ciwo¶ci ustawione podczas kompilacji"
 
 #: main.c:543
-msgid "Old VFS support"
-msgstr "Stara obs³uga VFS"
-
-#: main.c:548
-msgid "No (incompatible with Large File Support)"
+#, fuzzy
+msgid "Large File Support"
 msgstr "Nie (niekompatybilne z Obs³ug± Du¿ych Plików)"
 
 #: main.c:550
+msgid "Old VFS support"
+msgstr "Stara obs³uga VFS"
+
+#: main.c:555
+msgid "No (incompatible with Large File Support)"
+msgstr "Nie (niekompatybilne z Obs³ug± Du¿ych Plików)"
+
+#: main.c:557
 msgid "No (couldn't find a valid libvfs)"
 msgstr "Nie (nie mogê znale¶æ biblioteki libvfs)"
 
-#: main.c:554
-msgid "GTK+-2.0 support"
+#: main.c:561
+#, fuzzy
+msgid "Gtk+-2.0 support"
 msgstr "Obs³uga GTK+-2.0"
 
-#: main.c:558
+#: main.c:565
 msgid "No (using Gtk+-1.2 instead)"
 msgstr "Nie (u¿ycie Gtk+-1.2)"
+
+#: main.c:568
+#, fuzzy
+msgid "Save thumbnails"
+msgstr "Pokazuj miniatury"
+
+#: main.c:570
+#, fuzzy
+msgid "Yes (using Gtk+-2.0)"
+msgstr "Nie (u¿ycie Gtk+-1.2)"
+
+#: main.c:572
+msgid "Yes (using libpng)"
+msgstr ""
+
+#: main.c:574
+msgid "No (needs libpng or Gtk+-2.0)"
+msgstr ""
 
 #: menu.c:188 tips:14
 msgid "Display"
@@ -1732,11 +1762,15 @@ msgstr "Brakuje '='"
 msgid "Could not save options: %s"
 msgstr "Nie mo¿na zapisaæ opcji: %s"
 
-#: panel.c:314
+#: panel.c:282
+msgid "Your old panel file has been converted to the new XML format."
+msgstr ""
+
+#: panel.c:346
 msgid "Close panel?"
 msgstr "Zamkn±æ panel?"
 
-#: panel.c:315
+#: panel.c:347
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -1744,41 +1778,45 @@ msgstr ""
 "Chcia³e¶ zamkn±æ panel z poziomu managera okien - zazwyczaj co¶ takiego jest "
 "wynikiem przypadkowego dzia³ania... napewno zamkn±æ?"
 
-#: panel.c:318
+#: panel.c:350
 msgid "Remove"
 msgstr "Usun±æ"
 
-#: panel.c:356
+#: panel.c:424
 msgid "Missing < or > in panel config file"
 msgstr "Brakuj±ce < lub > w pliku konfiguracyjnym panela"
 
-#: panel.c:903
-#, c-format
-msgid "Could not save panel: %s"
-msgstr "Nie mo¿na zapisaæ panelu: %s"
+#: panel.c:944
+#, fuzzy, c-format
+msgid "Error saving panel %s: %s"
+msgstr "B³±d zapisu %s: %s"
 
-#: panel.c:1168
+#: panel.c:1210
 msgid "Applet quit without ever creating a widget!"
 msgstr "Aplet zakoñczy³ dzia³anie bez utworzenia wid¿eta."
 
-#: pinboard.c:221
+#: pinboard.c:224
 msgid "Another application is already managing the pinboard!"
 msgstr "Inna aplikacja ju¿ zarz±dza biurkiem"
 
-#: pinboard.c:1010
+#: pinboard.c:265
+msgid "Your old pinboard file has been converted to the new XML format."
+msgstr ""
+
+#: pinboard.c:1070
 msgid "Missing '>' in icon label"
 msgstr "Brakuj±cy znak '>' w etykiecie ikony"
 
-#: pinboard.c:1019
+#: pinboard.c:1079
 msgid "Missing ',' after icon label"
 msgstr "Brakuj±cy przecinek za etykiet± ikony"
 
-#: pinboard.c:1167
-#, c-format
-msgid "Could not save pinboard: %s"
-msgstr "Nie mo¿na zapisaæ biurka: %s"
+#: pinboard.c:1224
+#, fuzzy, c-format
+msgid "Error saving pinboard %s: %s"
+msgstr "B³±d przy zapisywaniu pulpitu"
 
-#: pixmaps.c:442
+#: pixmaps.c:787
 msgid "Unknown error"
 msgstr "Nieznany b³±d"
 
@@ -2371,7 +2409,9 @@ msgstr "Pokazuj miniatury"
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
-msgstr "Wczytuje ka¿dy obraz i pokazuje jego miniaturê w oknie z plikami, zamiast zwyk³ej ikony."
+msgstr ""
+"Wczytuje ka¿dy obraz i pokazuje jego miniaturê w oknie z plikami, zamiast "
+"zwyk³ej ikony."
 
 #: tips:47
 msgid "Pinboard"
@@ -2944,7 +2984,8 @@ msgid ""
 msgstr ""
 "Okno z plikami u¿ywa do ka¿dego pliku zestawu regu³ sprawdzaj±cych\n"
 "typ MIME, nastêpnie system wybiera odpowiedni± dla tego typu ikonê. \n"
-"Po edycji plików, kliknij przycisk Czytaj ponownie lub zrestartuj okno z plikami."
+"Po edycji plików, kliknij przycisk Czytaj ponownie lub zrestartuj okno z "
+"plikami."
 
 #: tips:184
 msgid "Show name-to-type rules"
@@ -2958,6 +2999,22 @@ msgstr "Czytaj ponownie"
 msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
 "U¿yj okna dialogowego 'Ustaw ikonê... ' aby okre¶liæ ikonê dla ka¿dego typu."
+
+#~ msgid ""
+#~ "\n"
+#~ "--- next error ---\n"
+#~ msgstr ""
+#~ "\n"
+#~ "--- nastêpny b³±d ---\n"
+
+#~ msgid "Sorry, but the name must not contain < or >"
+#~ msgstr "Nazwa nie mo¿e zawieraæ < lub >"
+
+#~ msgid "Could not save panel: %s"
+#~ msgstr "Nie mo¿na zapisaæ panelu: %s"
+
+#~ msgid "Could not save pinboard: %s"
+#~ msgstr "Nie mo¿na zapisaæ biurka: %s"
 
 #~ msgid "!ERROR: %s\n"
 #~ msgstr "!B£¡D: %s\n"
@@ -3025,9 +3082,6 @@ msgstr ""
 
 #~ msgid "Error saving panel"
 #~ msgstr "B³±d w trakcie zapisywania panelu"
-
-#~ msgid "Error saving pinboard"
-#~ msgstr "B³±d przy zapisywaniu pulpitu"
 
 #~ msgid "Error saving globicons"
 #~ msgstr "B³±d przy zapisywaniu pliku z ustawieniami ikon"

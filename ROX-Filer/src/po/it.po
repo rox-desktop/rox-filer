@@ -4,7 +4,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 0.1.28\n"
-"POT-Creation-Date: 2001-12-29 15:10+0000\n"
+"POT-Creation-Date: 2002-01-08 14:56+0000\n"
 "PO-Revision-Date: 2000-10-03 HO:MI+ZONE\n"
 "Last-Translator: Denis Manente <denis72@libero.it>\n"
 "Language-Team: ROX Mailing list <rox-devel@lists.sourceforge.net>\n"
@@ -217,12 +217,12 @@ msgid "ERROR"
 msgstr "ERRORE"
 
 # action.c:855 action.c:1019 main.c:430 main.c:437
-#: action.c:812 action.c:995 main.c:545 main.c:556
+#: action.c:812 action.c:995 main.c:545 main.c:552 main.c:563
 msgid "Yes"
 msgstr "Si"
 
 # action.c:859 action.c:1024
-#: action.c:816 action.c:1000
+#: action.c:816 action.c:1000 main.c:547
 msgid "No"
 msgstr ""
 
@@ -683,15 +683,15 @@ msgstr ""
 
 # action.c:2250 gtksavebox.c:233 icon.c:105 menu.c:1435 options.c:122
 # panel.c:406 type.c:546
-#: action.c:2313 filer.c:1539 gtksavebox.c:243 icon.c:893 infobox.c:106
-#: menu.c:1570 options.c:742 panel.c:318 type.c:981 usericons.c:344
+#: action.c:2313 filer.c:1525 gtksavebox.c:243 icon.c:890 infobox.c:106
+#: menu.c:1570 options.c:742 panel.c:350 type.c:981 usericons.c:344
 msgid "Cancel"
 msgstr "Cancella"
 
 # action.c:2250 gtksavebox.c:226 gtksavebox.c:565 icon.c:98 menu.c:1151
 # menu.c:1428 options.c:112 type.c:539
 #: action.c:2313 gtksavebox.c:236 gtksavebox.c:510 gui_support.c:252
-#: icon.c:886 menu.c:1563 options.c:730 type.c:974 usericons.c:336
+#: icon.c:883 menu.c:1563 options.c:730 type.c:974 usericons.c:336
 msgid "OK"
 msgstr ""
 
@@ -716,7 +716,7 @@ msgid "Can't open directory: %s"
 msgstr "Non e' possibile aprire la directory: %s"
 
 # display.c:527
-#: display.c:1094
+#: display.c:1096
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) fallita: %s"
@@ -832,11 +832,11 @@ msgid "You can't use multiple files with Set Icon!"
 msgstr ""
 
 # filer.c:332
-#: filer.c:593
+#: filer.c:576
 msgid "Directory missing/deleted"
 msgstr "Directory cancellata/mancante"
 
-#: filer.c:971
+#: filer.c:954
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -844,37 +844,37 @@ msgid ""
 msgstr ""
 
 # filer.c:659
-#: filer.c:1143
+#: filer.c:1126
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "La directory '%s' non e' accessibile"
 
 # filer.c:827
-#: filer.c:1340
+#: filer.c:1323
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Directory '%s' non trovata."
 
 # filer.c:1222
-#: filer.c:1793
+#: filer.c:1779
 #, fuzzy
 msgid "Scanning, "
 msgstr " (Scansione)"
 
-#: filer.c:1794
+#: filer.c:1780
 msgid "All, "
 msgstr ""
 
-#: filer.c:1795
+#: filer.c:1781
 msgid "Thumbs, "
 msgstr ""
 
-#: filer.c:2044 menu.c:1820
+#: filer.c:2030 menu.c:1820
 msgid "Item no longer exists!"
 msgstr ""
 
 # menu.c:1003
-#: filer.c:2166
+#: filer.c:2152
 msgid "Symbolic link to "
 msgstr "Collegamento in "
 
@@ -1147,7 +1147,7 @@ msgstr ""
 #: gui_support.c:372
 msgid ""
 "\n"
-"--- next error ---\n"
+"---\n"
 msgstr ""
 
 # gui_support.c:317
@@ -1177,7 +1177,7 @@ msgstr ""
 "Filer Apri la finestra delle Opzioni e clicca su Save.\n"
 "Ulteriori errori verranno ignorati."
 
-#: i18n.c:154
+#: i18n.c:157
 msgid ""
 "You must restart the filer for the new language setting to take full effect"
 msgstr ""
@@ -1231,7 +1231,7 @@ msgid "Set Icon..."
 msgstr "Imposta Azione..."
 
 # icon.c:56 panel.c:166 pinboard.c:197
-#: icon.c:115 icon.c:844
+#: icon.c:115 icon.c:841
 #, fuzzy
 msgid "Edit Item"
 msgstr "Modifica l'Icona"
@@ -1262,33 +1262,28 @@ msgstr "L'eticchetta deve contenere al meno un carattere!"
 msgid "The location must contain at least one character!"
 msgstr "La locazione deve contenere al meno un carattere!"
 
-# icon.c:175
-#: icon.c:606
-msgid "Sorry, but the name must not contain < or >"
-msgstr "Spiacente, ma il nome non puo' contenere '<' o '>'"
-
 # panel.c:1030
-#: icon.c:752
+#: icon.c:749
 #, fuzzy
 msgid "You must first select some items to remove"
 msgstr "Devi prima selezionare alcune icone da rimuovere"
 
-#: icon.c:790
+#: icon.c:787
 msgid "You must open the menu over an item"
 msgstr ""
 
 # menu.c:941
-#: icon.c:819 menu.c:1145
+#: icon.c:816 menu.c:1145
 msgid "You can only set the run action for a regular file"
 msgstr "Puoi impostare l'esecuzione solo per normali file"
 
 # icon.c:62
-#: icon.c:850
+#: icon.c:847
 msgid "Clicking the icon opens:"
 msgstr "Cliccando l'icona verra' aperto:"
 
 # icon.c:74
-#: icon.c:862
+#: icon.c:859
 msgid "The text displayed under the icon is:"
 msgstr "Il testo visualizzato sotto l'icona e':"
 
@@ -1393,7 +1388,7 @@ msgstr "Punto di Mount"
 
 #: main.c:94
 msgid ""
-"Copyright (C) 2001 Thomas Leonard.\n"
+"Copyright (C) 2002 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
@@ -1457,27 +1452,49 @@ msgstr "Esecuzione come utente '%s'"
 msgid "features set at compile time"
 msgstr "caratteristiche impostate alla compilazione"
 
-# main.c:428
 #: main.c:543
+msgid "Large File Support"
+msgstr ""
+
+# main.c:428
+#: main.c:550
 #, fuzzy
 msgid "Old VFS support"
 msgstr "Supporto per il VFS"
 
-#: main.c:548
+#: main.c:555
 msgid "No (incompatible with Large File Support)"
 msgstr ""
 
 # main.c:432
-#: main.c:550
+#: main.c:557
 msgid "No (couldn't find a valid libvfs)"
 msgstr "No (non trovo una libvfs valida)"
 
-#: main.c:554
-msgid "GTK+-2.0 support"
+#: main.c:561
+msgid "Gtk+-2.0 support"
 msgstr ""
 
-#: main.c:558
+#: main.c:565
 msgid "No (using Gtk+-1.2 instead)"
+msgstr ""
+
+# menu.c:184
+#: main.c:568
+#, fuzzy
+msgid "Save thumbnails"
+msgstr "File Nascosti"
+
+#: main.c:570
+msgid "Yes (using Gtk+-2.0)"
+msgstr ""
+
+#: main.c:572
+msgid "Yes (using libpng)"
+msgstr ""
+
+#: main.c:574
+msgid "No (needs libpng or Gtk+-2.0)"
 msgstr ""
 
 # menu.c:163
@@ -2017,13 +2034,17 @@ msgstr "Manca '='"
 msgid "Could not save options: %s"
 msgstr ""
 
+#: panel.c:282
+msgid "Your old panel file has been converted to the new XML format."
+msgstr ""
+
 # panel.c:402
-#: panel.c:314
+#: panel.c:346
 msgid "Close panel?"
 msgstr "Chiudi il pannello?"
 
 # panel.c:403
-#: panel.c:315
+#: panel.c:347
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2032,47 +2053,52 @@ msgstr ""
 "Solitamente cio' avviene in maniera accidentale...chiuderlo veramente?"
 
 # panel.c:406
-#: panel.c:318
+#: panel.c:350
 msgid "Remove"
 msgstr "Rimuovi"
 
 # panel.c:442
-#: panel.c:356
+#: panel.c:424
 msgid "Missing < or > in panel config file"
 msgstr "Mancanti '<' o '>' nel file di configurazione del pannello"
 
-# panel.c:402
-#: panel.c:903
+# dnd.c:1053
+#: panel.c:944
 #, fuzzy, c-format
-msgid "Could not save panel: %s"
-msgstr "Chiudi il pannello?"
+msgid "Error saving panel %s: %s"
+msgstr "Errore durante il salvataggio"
 
-#: panel.c:1168
+#: panel.c:1210
 msgid "Applet quit without ever creating a widget!"
 msgstr ""
 
 # pinboard.c:261
-#: pinboard.c:221
+#: pinboard.c:224
 msgid "Another application is already managing the pinboard!"
 msgstr "Un'altra applicazione sta' gestendo la scrivania!"
 
+#: pinboard.c:265
+msgid "Your old pinboard file has been converted to the new XML format."
+msgstr ""
+
 # pinboard.c:1108
-#: pinboard.c:1010
+#: pinboard.c:1070
 msgid "Missing '>' in icon label"
 msgstr "Manca '>' nell'etichetta dell'icona"
 
 # pinboard.c:1117
-#: pinboard.c:1019
+#: pinboard.c:1079
 msgid "Missing ',' after icon label"
 msgstr "Manca ',' dopo l'etichetta dell'icona"
 
-#: pinboard.c:1167
-#, c-format
-msgid "Could not save pinboard: %s"
-msgstr ""
+# pinboard.c:1284
+#: pinboard.c:1224
+#, fuzzy, c-format
+msgid "Error saving pinboard %s: %s"
+msgstr "Errore nel salvataggio della scrivania"
 
 # run.c:318
-#: pixmaps.c:442
+#: pixmaps.c:787
 #, fuzzy
 msgid "Unknown error"
 msgstr "Tipo sconosciuto"
@@ -3352,6 +3378,15 @@ msgstr ""
 msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
 
+# icon.c:175
+#~ msgid "Sorry, but the name must not contain < or >"
+#~ msgstr "Spiacente, ma il nome non puo' contenere '<' o '>'"
+
+# panel.c:402
+#, fuzzy
+#~ msgid "Could not save panel: %s"
+#~ msgstr "Chiudi il pannello?"
+
 # action.c:1484
 #~ msgid "!ERROR: %s\n"
 #~ msgstr "!ERRORE: %s\n"
@@ -3425,10 +3460,6 @@ msgstr ""
 # panel.c:1304
 #~ msgid "Error saving panel"
 #~ msgstr "Errore nel salvataggio del pannello"
-
-# pinboard.c:1284
-#~ msgid "Error saving pinboard"
-#~ msgstr "Errore nel salvataggio della scrivania"
 
 # dnd.c:1053
 #, fuzzy

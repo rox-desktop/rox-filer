@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.10-20020103\n"
-"POT-Creation-Date: 2002-01-04 06:10+0100\n"
-"PO-Revision-Date: 2002-01-04 06:15+0100\n"
+"Project-Id-Version: ROX-Filer 1.1.11-20020108\n"
+"POT-Creation-Date: 2002-01-08 14:56+0000\n"
+"PO-Revision-Date: 2002-01-08 15:23+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -201,11 +201,11 @@ msgstr "ERREUR de lecture"
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: action.c:812 action.c:995 main.c:545 main.c:556
+#: action.c:812 action.c:995 main.c:545 main.c:552 main.c:563
 msgid "Yes"
 msgstr "Oui"
 
-#: action.c:816 action.c:1000
+#: action.c:816 action.c:1000 main.c:547
 msgid "No"
 msgstr "Non"
 
@@ -594,7 +594,7 @@ msgstr ""
 " affectera des objets sur le punaiseur ou le panneau - voulez-vous vraiment "
 "les supprimer ?"
 
-#: action.c:2313 filer.c:1523 gtksavebox.c:243 icon.c:890 infobox.c:106
+#: action.c:2313 filer.c:1525 gtksavebox.c:243 icon.c:890 infobox.c:106
 #: menu.c:1570 options.c:742 panel.c:350 type.c:981 usericons.c:344
 msgid "Cancel"
 msgstr "Annuler"
@@ -726,11 +726,11 @@ msgid "You can't use multiple files with Set Icon!"
 msgstr ""
 "Vous ne pouvez pas utiliser plusieurs fichiers avec « Fixer l'icône » !"
 
-#: filer.c:574
+#: filer.c:576
 msgid "Directory missing/deleted"
 msgstr "Répertoire manquant/supprimé"
 
-#: filer.c:952
+#: filer.c:954
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -740,33 +740,33 @@ msgstr ""
 "<Ctrl>+%s pour le définir. Appuyez seulement sur %s pour resélectionner ces "
 "fichiers à l'avenir."
 
-#: filer.c:1124
+#: filer.c:1126
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Le répertoire '%s' n'est pas accessible"
 
-#: filer.c:1321
+#: filer.c:1323
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
-#: filer.c:1777
+#: filer.c:1779
 msgid "Scanning, "
 msgstr "Lecture, "
 
-#: filer.c:1778
+#: filer.c:1780
 msgid "All, "
 msgstr "Tous, "
 
-#: filer.c:1779
+#: filer.c:1781
 msgid "Thumbs, "
 msgstr "Imagettes, "
 
-#: filer.c:2028 menu.c:1820
+#: filer.c:2030 menu.c:1820
 msgid "Item no longer exists!"
 msgstr "L'objet n'existe plus !"
 
-#: filer.c:2150
+#: filer.c:2152
 msgid "Symbolic link to "
 msgstr "Lien symbolique vers "
 
@@ -1283,24 +1283,44 @@ msgid "features set at compile time"
 msgstr "fonctionnalités fixées à la compilation"
 
 #: main.c:543
+msgid "Large File Support"
+msgstr "Support des fichiers longs"
+
+#: main.c:550
 msgid "Old VFS support"
 msgstr "Ancien support VFS"
 
-#: main.c:548
+#: main.c:555
 msgid "No (incompatible with Large File Support)"
-msgstr "non (incompatible avec le support des fichiers longs)"
+msgstr "Non (incompatible avec le support des fichiers longs)"
 
-#: main.c:550
+#: main.c:557
 msgid "No (couldn't find a valid libvfs)"
-msgstr "non (pas de bibliothèque libvfs valide trouvée)"
+msgstr "Non (pas de bibliothèque libvfs valide trouvée)"
 
-#: main.c:554
-msgid "GTK+-2.0 support"
-msgstr "Support GTK+-2.0"
+#: main.c:561
+msgid "Gtk+-2.0 support"
+msgstr "Support Gtk+-2.0"
 
-#: main.c:558
+#: main.c:565
 msgid "No (using Gtk+-1.2 instead)"
-msgstr "non (utilisation de Gtk+-1.2 seulement)"
+msgstr "Non (utilisation de Gtk+-1.2 seulement)"
+
+#: main.c:568
+msgid "Save thumbnails"
+msgstr "Sauver les imagettes"
+
+#: main.c:570
+msgid "Yes (using Gtk+-2.0)"
+msgstr "Oui (utilisation de Gtk+-2.0)"
+
+#: main.c:572
+msgid "Yes (using libpng)"
+msgstr "Oui (utilisation de libpng)"
+
+#: main.c:574
+msgid "No (needs libpng or Gtk+-2.0)"
+msgstr "Non (libpng ou Gtk+-2.0 est nécessaire)"
 
 #: menu.c:188 tips:14
 msgid "Display"
@@ -1792,28 +1812,28 @@ msgstr "Erreur lors de la sauvegarde du panneau %s : %s"
 msgid "Applet quit without ever creating a widget!"
 msgstr "L'appliquette a quitté sans avoir créé de widget !"
 
-#: pinboard.c:223
+#: pinboard.c:224
 msgid "Another application is already managing the pinboard!"
 msgstr "Une autre application gère déjà le punaiseur !"
 
-#: pinboard.c:264
+#: pinboard.c:265
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "Votre vieux fichier de punaiseur a été converti au nouveau format XML."
 
-#: pinboard.c:1069
+#: pinboard.c:1070
 msgid "Missing '>' in icon label"
 msgstr "'>' manquant dans l'étiquette de l'icône"
 
-#: pinboard.c:1078
+#: pinboard.c:1079
 msgid "Missing ',' after icon label"
 msgstr "',' manquant après l'étiquette de l'icône"
 
-#: pinboard.c:1223
+#: pinboard.c:1224
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "Erreur lors de la sauvegarde du punaiseur %s : %s"
 
-#: pixmaps.c:442
+#: pixmaps.c:787
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
@@ -2272,7 +2292,7 @@ msgstr "Traduction"
 
 #: tips:2
 msgid "Display messages in..."
-msgstr "Afficher les messages dans..."
+msgstr "Afficher les messages en..."
 
 #: tips:4
 msgid "Dutch"
