@@ -148,9 +148,9 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
 			/* Note that the flag is set for ALL executable
-			 * files, but the mime_type is only
-			 * application_executable if the file doesn't have a
-			 * known extension when that option is in force.
+			 * files, but the mime_type is only application_executable
+			 * if the file doesn't have a known extension when
+			 * that option is in force.
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
@@ -197,7 +197,58 @@ DirItem *diritem_new(const guchar *leafname)
 	item->base_type = TYPE_UNKNOWN;
 	item->flags = 0;
 	item->mime_type = NULL;
-	item->leafname_collate = make_leafname_collate(leafname);
+
+	for (i = leafname; *i; i++)
+	{
+		if (!isalnum(*i))
+		{
+			all_alpha = FALSE;
+			break;
+		}
+	}
+
+	if (all_alpha)
+		item->leafname_collate = item->leafname;
+	else
+	{
+		gchar	*o;
+		gboolean need_digit_spacer = FALSE;
+		gboolean may_need_digit_spacer = FALSE;
+
+		item->leafname_collate = g_malloc(strlen(item->leafname) + 1);
+		o = item->leafname_collate;
+
+		/* TODO: Fix for UTF-8 */
+
+		for (i = leafname; *i; i++)
+		{
+			if (isdigit(*i))
+			{
+				if (need_digit_spacer)
+				{
+					need_digit_spacer = FALSE;
+					*(o++) = '-';
+				}
+				may_need_digit_spacer = TRUE;
+				*(o++) = *i;
+			}
+			else if (isalpha(*i))
+			{
+				need_digit_spacer = FALSE;
+				may_need_digit_spacer = FALSE;
+				*(o++) = *i;
+			}
+			else if (may_need_digit_spacer)
+			{
+				/* We had a digit more recently than
+				 * an alpha. If this thing following this
+				 * punctuation is another digit, add a spacer.
+				 */
+				need_digit_spacer = TRUE;
+			}
+		}
+		*o = '\0';
+	}
 
 	return item;
 }
