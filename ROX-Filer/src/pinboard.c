@@ -343,11 +343,11 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	gtk_widget_realize(icon->win);
 	gtk_widget_realize(icon->widget);
-	make_panel_window(icon->win->window);
 
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 	gtk_widget_set_uposition(icon->win, x, y);
+	make_panel_window(icon->win->window);
 
 	gtk_widget_add_events(icon->widget,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
@@ -369,6 +369,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons,
 						 icon);
 	gtk_widget_show_all(icon->win);
+	gdk_window_lower(icon->win->window);
 
 	if (!loading_pinboard)
 		pinboard_save();
