@@ -659,6 +659,9 @@ static int get_lasso_index(ViewDetails *view_details, int y)
 	gint cell_y;
 	int i;
 
+	if (y < 0)
+		y = 0;	/* gtk_tree_view_get_path_at_pos can't handle negatives */
+
 	if (gtk_tree_view_get_path_at_pos(tree, 4, y, &path,
 				&column, NULL, &cell_y))
 	{
