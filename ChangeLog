@@ -1,3 +1,8 @@
+2004-12-08  Christophe Fergeau  <teuf@gnome.org>
+
+	* src/xdgmimeglob.c: (_xdg_mime_glob_read_from_file): backing out
+	"fix" for bug #1048 since it frees memory that shouldn't be freed.
+
 2004-12-08  Marco Pesenti Gritti  <marco@gnome.org>
 
 	* src/xdgmimemagic.c: (_xdg_mime_magic_read_from_file):
