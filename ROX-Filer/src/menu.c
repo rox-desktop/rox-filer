@@ -95,5 +95,5 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(menu_owner->dir->path, "/..")->str);
+	filer_opendir(make_path(menu_owner->path, "/..")->str);
 }

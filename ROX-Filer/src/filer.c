@@ -18,7 +18,6 @@
 #include <collection.h>
 
 #include "support.h"
-#include "directory.h"
 #include "gui_support.h"
 #include "filer.h"
 #include "pixmaps.h"
@@ -29,7 +28,7 @@ static int number_of_windows = 0;
 /* Static prototypes */
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-static void scan_callback(char *leafname, gpointer data);
+static gboolean idle_scan_dir(gpointer data);
 static void draw_item(GtkWidget *widget,
 			gpointer data,
 			gboolean selected,
@@ -37,20 +36,50 @@ static void draw_item(GtkWidget *widget,
 void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static int sort_by_name(const void *item1, const void *item2);
+static void scan_dir(FilerWindow *filer_window);
+static void add_item(FilerWindow *filer_window, char *leafname);
+
 
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
-	directory_destroy(filer_window->dir);
+	if (filer_window->dir)
+	{
+		closedir(filer_window->dir);
+		gtk_idle_remove(filer_window->idle_scan_id);
+	}
+	g_free(filer_window->path);
 	g_free(filer_window);
 
 	if (--number_of_windows < 1)
 		gtk_main_quit();
 }
 
-static void scan_callback(char *leafname, gpointer data)
+/* This is called while we are scanning the directory */
+static gboolean idle_scan_dir(gpointer data)
 {
+	struct dirent	*next;
 	FilerWindow 	*filer_window = (FilerWindow *) data;
+
+	do
+	{
+		next = readdir(filer_window->dir);
+		if (!next)
+		{
+			closedir(filer_window->dir);
+			filer_window->dir = NULL;
+			return FALSE;		/* Finished */
+		}
+
+		add_item(filer_window, next->d_name);
+	} while (!gtk_events_pending());
+
+	return TRUE;
+}
+	
+/* Add a single object to a directory display */
+static void add_item(FilerWindow *filer_window, char *leafname)
+{
 	FileItem	*item;
 	int		item_width;
 	struct stat	info;
@@ -65,7 +94,7 @@ static void scan_callback(char *leafname, gpointer data)
 	item->leafname = g_strdup(leafname);
 	item->flags = 0;
 
-	path = make_path(filer_window->dir->path, leafname)->str;
+	path = make_path(filer_window->path, leafname)->str;
 	if (lstat(path, &info))
 		base_type = TYPE_ERROR;
 	else
@@ -127,9 +156,6 @@ static void scan_callback(char *leafname, gpointer data)
 					 filer_window->collection->item_height);
 
 	collection_insert(filer_window->collection, item);
-
-	/* XXX: Think about this */
-	g_main_iteration(FALSE);
 }
 
 static void draw_item(GtkWidget *widget,
@@ -214,7 +240,7 @@ void open_item(Collection *collection,
 	FilerWindow	*filer_window = (FilerWindow *) user_data;
 	FileItem	*item = (FileItem *) item_data;
 
-	filer_opendir(make_path(filer_window->dir->path, item->leafname)->str);
+	filer_opendir(make_path(filer_window->path, item->leafname)->str);
 }
 
 void filer_opendir(char *path)
@@ -223,7 +249,8 @@ void filer_opendir(char *path)
 	FilerWindow	*filer_window;
 
 	filer_window = g_malloc(sizeof(FilerWindow));
-	filer_window->dir = directory_new(path);
+	filer_window->path = pathdup(path);
+	filer_window->dir = NULL;	/* Not scanning */
 
 	collection = collection_new(NULL);
 	filer_window->collection = COLLECTION(collection);
@@ -232,7 +259,7 @@ void filer_opendir(char *path)
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
-				filer_window->dir->path);
+				filer_window->path);
 	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 				400, 200);
 
@@ -256,9 +283,21 @@ void filer_opendir(char *path)
 
 	load_default_pixmaps(collection->window);
 
-	/* Note - scan may call g_main_iteration */
-	if (!directory_scan(filer_window->dir, scan_callback, filer_window))
-		report_error("Error opening directory", g_strerror(errno));
+	scan_dir(filer_window);
 
 	collection_qsort(filer_window->collection, sort_by_name);
+}
+
+static void scan_dir(FilerWindow *filer_window)
+{
+	g_return_if_fail(filer_window->dir == NULL);	/* XXX */
+	
+	filer_window->dir = opendir(filer_window->path);
+	if (!filer_window->dir)
+	{
+		report_error("Error scanning directory:", g_strerror(errno));
+		return;
+	}
+
+	filer_window->idle_scan_id = gtk_idle_add(idle_scan_dir, filer_window);
 }

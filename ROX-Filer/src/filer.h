@@ -7,8 +7,9 @@
 
 #include <gtk/gtk.h>
 #include <collection.h>
-#include "directory.h"
 #include "pixmaps.h"
+#include <sys/types.h>
+#include <dirent.h>
 
 typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
@@ -21,8 +22,12 @@ enum
 struct _FilerWindow
 {
 	GtkWidget	*window;
+	char		*path;		/* pathname */
 	Collection	*collection;
-	Directory	*dir;
+
+	/* Scanning */
+	DIR		*dir;
+	gint		idle_scan_id;	/* (only if dir != NULL) */
 };
 
 struct _FileItem
