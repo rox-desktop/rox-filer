@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 1.3.4 - Manuel de l'utilisateur
+   ROX-Filer 1.3.5 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -326,9 +326,7 @@ courtes.
 <para>
 Notez que si la même version du filer est déjà lancée sur votre machine,
 alors, par défaut, elle sera utilisée pour ouvrir les dossiers et la nouvelle
-copie s'arrêtera immédiatement. Vous pouvez passer outre se comportement
-(peut-être parce que l'ancienne copie a cessé de répondre) en utilisant
-l'option <option>--new</option>.
+copie s'arrêtera immédiatement.
 </para>
 <para>
 Pour obtenir la liste complète des options, voir <xref linkend="manpage"/>.
@@ -394,7 +392,7 @@ $ rox --bottom=</screen>
 </sect1>
 
 <sect1>
-  <title id="winman" xreflabel="window manager notes">Notes sur les gestionnaires de fenêtres</title>
+ <title><anchor id="winman" xreflabel="window manager notes"/>Notes sur les gestionnaires de fenêtres</title>
   <para>
 
 	  Vous allez peut être avoir à configurer un peu votre gestionnaire de fenêtre
@@ -612,20 +610,34 @@ pour ouvrir fichiers et dossiers.</para></listitem>
 
 <tbody>
 
-<row><entry>Clic gauche</entry><entry>
-		Ouvre le fichier ou le dossier cliqué. Maintenez enfoncé <keycap>Ctrl</keycap> pour sélectionner les objets au lieu de les ouvrir.
-		Maintenez enfoncé <keycap>Shift</keycap> pour voir à l'intérieur des dossiers-applications,
-		pour ouvrir les fichiers avec l'éditeur de texte, pour suivre les liens symboliques ou pour monter des périphériques.
-</entry></row>
+ <row>
+  <entry>Clic gauche</entry>
+  <entry>
+   Ouvre le fichier ou le dossier cliqué. Maintenez enfoncé <keycap>Ctrl</keycap> pour 
+   sélectionner les objets au lieu de les ouvrir.
+   Maintenez enfoncé <keycap>Shift</keycap> pour voir à l'intérieur des dossiers-applications, 
+   pour ouvrir les fichiers avec l'éditeur de texte, pour suivre les liens symboliques ou pour 
+   mieux gérer les points de montage (voir <xref linkend="media"/>).
+  </entry>
+ </row>
 
-<row><entry>Clic sur le bouton du milieu</entry><entry>
-		Comme le bouton gauche, mais ouvre un dossier dans une nouvelle fenêtre ou ferme la fenêtre du filer en ouvrant un fichier.
-</entry></row>
+ <row>
+  <entry>Clic sur le bouton du milieu</entry>
+  <entry>
+   Comme le bouton gauche, mais ouvre un dossier dans une nouvelle fenêtre ou ferme la fenêtre 
+   du filer en ouvrant un fichier.
+  </entry>
+ </row>
 
-<row><entry>Clic droit</entry><entry>
-	    Ouvre le menu principal. Maintenez enfoncé <keycap>Ctrl</keycap> en cliquant pour avoir directement le sous-menu de sélection.
-	    Maintenez enfoncé <keycap>Shift</keycap> pour accéder au menu <guimenu>Envoyer à...</guimenu> (voir la section <xref linkend="SendTo"/>).
-</entry></row>
+ <row>
+  <entry>Clic droit</entry>
+  <entry>
+   Ouvre le menu principal. Maintenez enfoncé <keycap>Ctrl</keycap> en cliquant pour avoir 
+   directement le sous-menu de sélection.
+   Maintenez enfoncé <keycap>Shift</keycap> pour accéder au menu <guimenu>Envoyer à...</guimenu> 
+   (voir la section <xref linkend="SendTo"/>).
+  </entry>
+ </row>
 
 <row>
  <entry>Drag and drop d'un objet (bouton gauche)</entry>
@@ -813,43 +825,51 @@ Autre bouton
 </thead>
 <tbody>
 
-<row><entry>
-Croix</entry><entry>
-Fermer la fenêtre</entry><entry>
-Ouvrir une nouvelle fenêtre
-</entry></row><row><entry>
-Flèche vers le haut</entry><entry>
-Affiche le dossier père</entry><entry>
-... dans une nouvelle fenêtre<xref linkend="newwin_fn"/>
-</entry></row><row><entry>
-Maison</entry><entry>
-Affiche le dossier "Home"</entry><entry>
-... dans une nouvelle fenêtre<xref linkend="newwin_fn"/>
-</entry></row><row><entry>
-Flèches tournantes</entry><entry>
-Rafraîchir</entry><entry>
-Ouvrir une nouvelle fenêtre
-</entry></row><row><entry>
-Loupe</entry><entry>
-Afficher de plus grandes icônes</entry><entry>
-Afficher de plus petites icônes
-</entry></row><row><entry>
-Liste</entry><entry>
-Affiche/Masque le détail des objets</entry><entry>
-Idem
-</entry></row><row><entry>
-Texte rayé</entry><entry>
-Bascule entre l'affichage et le masquage des fichiers cachés (ceux dont le nom commence par un point)</entry><entry>
-Same
-</entry></row><row><entry>
-Bouée</entry>
- <entry>
- Affiche les fichiers d'aide de <application>ROX-Filer</application>
- </entry>
- <entry>
- Affiche les fichiers d'aide et ferme la fenêtre
- </entry>
-</row>
+ <row>
+  <entry>Croix</entry>
+  <entry>Fermer la fenêtre</entry>
+  <entry>Ouvrir une nouvelle fenêtre</entry>
+ </row>
+ <row>
+  <entry>Flèche vers le haut</entry>
+  <entry>Affiche le dossier père</entry>
+  <entry>... dans une nouvelle fenêtre<xref linkend="newwin_fn"/></entry>
+ </row>
+ <row>
+  <entry>Maison</entry>
+  <entry>Affiche le dossier "Home"</entry>
+  <entry>... dans une nouvelle fenêtre<xref linkend="newwin_fn"/></entry>
+ </row>
+ <row>
+  <entry>Aller à</entry>
+  <entry>Affiche le <xref linkend="bookmarks"/></entry>
+  <entry>Édite les marque-pages</entry>
+ </row>
+ <row>
+  <entry>Flèches tournantes</entry>
+  <entry>Rafraîchir</entry>
+  <entry>Ouvrir une nouvelle fenêtre</entry>
+ </row>
+ <row>
+  <entry>Loupe</entry>
+  <entry>Afficher de plus grandes icônes</entry>
+  <entry>Afficher de plus petites icônes</entry>
+ </row>
+ <row>
+  <entry>Liste</entry>
+  <entry>Affiche/Masque le détail des objets</entry>
+  <entry>Idem</entry>
+ </row>
+ <row>
+  <entry>Texte rayé</entry>
+  <entry>Bascule entre l'affichage et le masquage des fichiers cachés (ceux dont le nom commence par un point)</entry>
+  <entry>Same</entry>
+ </row>
+ <row>
+  <entry>Bouée</entry>
+  <entry>Affiche les fichiers d'aide de <application>ROX-Filer</application></entry>
+  <entry>Ouvre directement le manuel</entry>
+ </row>
 </tbody></tgroup></informaltable>
 
 <para>
@@ -990,7 +1010,7 @@ Comme pour <guimenuitem>Grand, avec...</guimenuitem>, mais avec des icônes énorm
 	 </entry>
 	 <entry>
 	  Les objets sont triés par nom. Le mode de tri par défaut ne respecte pas la casse mais 
-	  gère correctement les nombres. Il existe une option pour forcer le tri en ASCII.
+	  gère correctement les nombres.
 	 </entry>
 	</row>
 
@@ -1189,12 +1209,12 @@ Affiche le type de l'objet sélectionné. Pour les dossiers-applications, montre l
 
 <row><entry>
 <guimenuitem>Shift Ouvrir</guimenuitem></entry><entry>
-Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers,
-ouvre les fichiers comme s'il s'agissait de simple texte brut, monte/démonte
-un point de montage, ou ouvre le dossier contenant la cible du lien symbolique
-sur lequel vous "shift-cliquez". C'est la même chose que de cliquer en
-maintenant <keycap>Shift</keycap> enfoncé. La commande du menu sélection prend alors le nom de
-la commande a effectuer.
+Ouvre les dossiers-applications comme s'il s'agissait de simples dossiers, 
+ouvre les fichiers comme s'il s'agissait de simple texte brut, ou ouvre le 
+dossier contenant la cible du lien symbolique sur lequel vous "shift-cliquez". 
+Sur des points de montage, on peut noter des effets intéressants (voir <xref linkend="media"/>). 
+C'est la même chose que de cliquer en maintenant <keycap>Shift</keycap> enfoncé. 
+La commande du menu sélection prend alors le nom de la commande a effectuer.
 </entry></row>
 
 <row><entry>
@@ -1365,91 +1385,82 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ce
 <informaltable><tgroup cols="2">
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
-<row><entry>
-<guimenuitem>Père, nouvelle fenêtre</guimenuitem></entry><entry>
-Ouvre une nouvelle fenêtre pour afficher le contenu du dossier père.
-</entry></row>
+ 
+ <row>
+  <entry><guimenuitem>Père, nouvelle fenêtre</guimenuitem></entry>
+  <entry>Ouvre une nouvelle fenêtre pour afficher le contenu du dossier père.</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Père, même fenêtre</guimenuitem></entry><entry>
-Comme ci-dessus, mais utilise la même fenêtre.
-</entry></row>
+ <row>
+  <entry><guimenuitem>Père, même fenêtre</guimenuitem></entry>
+  <entry>Comme ci-dessus, mais utilise la même fenêtre.</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Nouvelle fenêtre</guimenuitem></entry><entry>
-Ouvre une nouvelle fenêtre avec le même dossier courant.
-</entry></row>
+ <row>
+  <entry><guimenuitem>Nouvelle fenêtre</guimenuitem></entry>
+  <entry>Ouvre une nouvelle fenêtre avec le même dossier courant.</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Répertoire Home</guimenuitem></entry><entry>
-Affiche le contenu de votre répertoire personnel.
-</entry></row>
+ <row>
+  <entry><guimenuitem>Répertoire Home</guimenuitem></entry>
+  <entry>Affiche le contenu de votre répertoire personnel.</entry>
+ </row>
 
-<row>
- <entry>
-  <guimenuitem>Suivre les liens symboliques</guimenuitem>
- </entry>
- <entry>
-  Convertit le chemin affiché dans la barre de titre en son nom canonique.
-  Par exemple, si <filename>/home/fred/lien</filename> est un lien symbolique 
-  pointant sur <filename>/usr/share/doc/</filename>, cliquer le lien vous 
-  amènera dans ce dossier, et remonter avec la flèche vous ramènera dans 
-  <filename>/home/fred</filename>.
-  Si vous aviez utilisé <guimenuitem>Suivre les liens symboliques</guimenuitem>, 
-  vous seriez revenu dans <filename>/usr/share</filename>.
- </entry>
-</row>
+ <row>
+  <entry><guimenuitem>Afficher les marque-pages</guimenuitem></entry>
+  <entry>Ouvre le menu des marque-pages (voir <xref linkend="bookmarks"/>).</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Changer taille de la fenêtre</guimenuitem></entry><entry>
-Ajuste la taille de la fenêtre à son contenu.
-</entry></row>
+ <row>
+  <entry><guimenuitem>Suivre les liens symboliques</guimenuitem></entry>
+  <entry>
+   Convertit le chemin affiché dans la barre de titre en son nom canonique. 
+   Par exemple, si <filename>/home/fred/lien</filename> est un lien symbolique 
+   pointant sur <filename>/usr/share/doc/</filename>, cliquer le lien vous 
+   amènera dans ce dossier, et remonter avec la flèche vous ramènera dans 
+   <filename>/home/fred</filename>. 
+   Si vous aviez utilisé <guimenuitem>Suivre les liens symboliques</guimenuitem>, 
+   vous seriez revenu dans <filename>/usr/share</filename>.
+  </entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Fermer la fenêtre</guimenuitem></entry><entry>
-Ferme la fenêtre.
-</entry></row>
+ <row>
+  <entry><guimenuitem>Changer taille de la fenêtre</guimenuitem></entry>
+  <entry>Ajuste la taille de la fenêtre à son contenu.</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Entrer un chemin...</guimenuitem></entry><entry>
-Ouvre un "espace de saisie" pour ouvrir un autre dossier (voir section <xref linkend="mini"/>).
-</entry></row>
+ <row>
+  <entry><guimenuitem>Fermer la fenêtre</guimenuitem></entry>
+  <entry>Ferme la fenêtre.</entry>
+ </row>
 
-<row><entry>
-<guimenuitem>Commande shell...</guimenuitem></entry><entry>
-Ouvre un "espace de saisie" pour exécuter une commande shell (voir section <xref linkend="mini"/>).
-</entry></row>
+ <row>
+  <entry><guimenuitem>Entrer un chemin...</guimenuitem></entry>
+  <entry>Ouvre un "espace de saisie" pour ouvrir un autre dossier (voir section <xref linkend="mini"/>).</entry>
+ </row>
 
-<row>
- <entry>
-  <guimenuitem>Xterm ici</guimenuitem>
- </entry>
- <entry>
-  Ouvre un xterm avec ce dossier comme dossier courant.
- </entry>
-</row>
+ <row>
+  <entry><guimenuitem>Commande shell...</guimenuitem></entry>
+  <entry>Ouvre un "espace de saisie" pour exécuter une commande shell (voir section <xref linkend="mini"/>).</entry>
+ </row>
 
-<row>
- <entry>
-  <guimenuitem>Remplacer par un xterm</guimenuitem>
- </entry>
- <entry>
-  Ouvre un xterm avec ce dossier comme dossier courant, et ferme la fenêtre du filer 
-  automatiquement.
- </entry>
-</row>
+ <row>
+  <entry><guimenuitem>Xterm ici</guimenuitem></entry>
+  <entry>Ouvre un xterm avec ce dossier comme dossier courant.</entry>
+ </row>
 
-<row>
- <entry>
-  <guimenuitem>
-   Voir l'aide de ROX-Filer
-  </guimenuitem>
- </entry>
- <entry>
-  Comme si vous affichiez le dossier-application ROX-Filer, et que vous choisissiez 
-  <guimenuitem>Aide</guimenuitem> dans le menu sélection.
- </entry>
-</row>
+ <row>
+  <entry><guimenuitem>Remplacer par un xterm</guimenuitem></entry>
+  <entry>Ouvre un xterm avec ce dossier comme dossier courant, et ferme la fenêtre du filer automatiquement.</entry>
+ </row>
+
+ <row>
+  <entry><guimenuitem>Voir l'aide de ROX-Filer</guimenuitem></entry>
+  <entry>
+   Comme si vous affichiez le dossier-application ROX-Filer, et que vous 
+   choisissiez <guimenuitem>Aide</guimenuitem> dans le menu sélection.
+  </entry>
+ </row>
 
 </tbody></tgroup></informaltable>
   </para>
@@ -1537,6 +1548,21 @@ Ouvre un "espace de saisie" pour exécuter une commande shell (voir section <xref
    <filename>.group</filename> est alors utilisé.
   </para>
  </sect2>
+</sect1>
+
+<sect1>
+ <title><anchor id="bookmarks" xreflabel="Bookmarks menu"/>Le menu marque-pages</title>
+ <para>
+  Le menu marque-pages trouve son utilité dans la mémorisation de chemins de dossiers 
+  souvent utilisés. Vous pouvez aussi ouvrir ce menu depuis le menu principal 
+  (dans le sous-menu <guimenuitem>Fenêtre</guimenuitem>) et vous pouvez donc y affecter 
+  un raccourci-clavier. 
+  Dans ce menu, vous pouvez choisir d'ajouter à la liste le dossier actuellement affiché, 
+  d'aller directement dans un des dossiers enregistrés, ou bien d'ouvrir une boîte de 
+  dialogue vous permettant de modifier cette liste. 
+  Dans cette boîte, vous pouvez retirer des dossiers de la liste, les classer (en utilisant 
+  les flèches ou en les faisant glisser) et modifier les chemins directement si vous le souhaitez.
+ </para>
 </sect1>
 
 </chapter>
@@ -1714,7 +1740,12 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
    <guilabel>Pavée</guilabel> pour le style, puis faites glisser une image dans l'emplacement prévu.
    Pour retrouver un bureau avec une simple couleur (définie dans la boîte Options), cliquez sur 
    <guibutton>Effacer</guibutton>.
- </para>
+   </para>
+   <para>
+	L'application <citation>Wallpaper</citation> peut être utilisée pour appliquer des 
+	effets avancés, comme choisir une nouvelle image aléatoirement toutes les heures, ou 
+	afficher une image de la Terre grâce au programme xearth, par exemple.
+   </para>
  <formalpara>
   <title>Pour les programmeurs...</title>
   <para>
@@ -1751,77 +1782,64 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   des fichiers temporaires.
  </para>
  <para>
-  Cet exemple affiche une image de la Terre en fond d'écran, en l'actualisant toutes les minutes.
-  Notez les trois endroits qui gèrent le test de la connexion avec le filer : en envoyant l'image, 
-  en attendant des infos, et en étant en veille. 
-  Ce fichier devrait être enregistré sous le nom <filename>AppRun</filename> à l'intérieur de votre 
-  nouveau dossier-application. Pour changer le fond d'écran, exécutez l'application (ie : cliquez dessus).
-  <programlisting><![CDATA[
-#!/usr/bin/env python
+  Voyez l'application <citation>Wallpaper</citation> pour un exemple détaillé (écrit en python).
+ </para>
+</sect1>
+</chapter>
 
-import sys, os
-
-if len(sys.argv) == 1:
-    # Become the backdrop application
-	app = os.path.abspath(os.path.dirname(sys.argv[0]))
-	cin = os.popen('rox -R', 'w')
-	cin.write("""<?xml version="1.0"?>
-<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
-  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
-   <SetBackdropApp><App>""" + app + """</App></SetBackdropApp>
-  </env:Body>
-</env:Envelope>
-""")
-    sys.exit(0)
-elif len(sys.argv) != 2 or sys.argv[1] != '--backdrop':
-	sys.stderr.write("Usage: %s [--backdrop]\n" % sys.argv[0])
-	sys.exit(1)
-
-# If we get here, we've been run by the filer.
-# Generate a sequence of images, sending them to the filer one by one.
-
-import tempfile, time, signal
-from select import select
-
-time_between_updates = 60
-
-while 1:
-    # Write image to a temporary file
-	path = tempfile.mktemp('.ppm')
-	child = os.fork()
-	if child == 0:
-		fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0600)
-		os.dup2(fd, 1)
-		os.execvp("xearth", ["xearth", "-ppm"])
-		os._exit(1)
-	pid, status = os.waitpid(child, 0)
-	if status:
-		break       # xearth didn't work
-
-	# Send message to filer
-	quit = 0
-	try:
-		print "centre " + path
-		sys.stdout.flush()
-		if sys.stdin.readline() != 'ok\n':
-			quit = 1        # filer closed connection
-	except:
-		quit = 1            # filer closed connection
-	# Delete temporary file
-	os.unlink(path)
-	if quit:
-		break
-
-    # Wait until the next image is due, or the filer tells us to quit
-	ready = select([sys.stdin], [], [], time_between_updates)[0]
-    if ready:
-		# filer closed connection while we were waiting
-		break
-]]>
-	</programlisting>
-   </para>
-  </sect1>
- </chapter>
+<chapter>
+ <title>
+  <anchor id="media" xreflabel="Removable devices"/>Périphériques amovibles</title>
+  <para>
+   L'utilisation de périphériques amovibles avec ROX-Filer (tels que les lecteurs de disquettes 
+   et de CD-ROM) est relativement simple, mais il est toutefois important de bien comprendre 
+   ce que sont le <emphasis>montage</emphasis> et le <emphasis>démontage</emphasis> de périphériques.
+  </para>
+  <para>
+   Monter un périphérique implique l'affichage de son contenu dans le système de fichiers. 
+   Dans une installation courante, le dossier <filename>/floppy</filename> (NDT : le dossier 
+   <filename>/mnt/floppy</filename> est peut-être plus courant dans les distributions "grand public") 
+   est un dossier vide du disque dur. 
+   Le lecteur de disquettes est ensuite monté sur ce dossier, ce qui a pour effet d'afficher son 
+   contenu à l'intérieur de celui-ci. Par exemple, un fichier nommé <filename>Letter</filename> sur 
+   la disquette apparaîtra comme <filename>/floppy/Letter</filename>.
+  </para>
+  <para>
+   Les périphériques doivent être démontés avant d'être éjectés. Les démonter oblige le système à 
+   y écrire les données qui peuvent être encore en zone tampon. Si vous retirez un périphérique 
+   amovible sans le démonter, il pourra être endommagé. Les lecteurs de CD-ROM et de disquettes Zip 
+   bloquent généralement l'éjection quand le périphérique est monté afin que vous ne puissiez pas 
+   les éjecter accidentellement.
+  </para>
+  <para>
+   Afin de ne pas avoir à préciser à chaque fois quel périphérique doit être monté à quel endroit 
+   du système de fichiers, une liste est déjà établie et peut généralement être trouvée dans le 
+   fichier <filename>/etc/fstab</filename>. ROX-Filer affiche les points de montage qui y sont 
+   décrits (tel que <filename>/floppy</filename>) mais non montés, avec des cercles gris 
+   translucides par-dessus leur icône.
+  </para>
+  <para>
+   Cliquer sur un de ces points de montage provoquera le montage du périphérique associé. 
+   Le cercle deviendra alors vert pour indiquer que le périphérique est monté. 
+   <emphasis>N'enlevez pas</emphasis> le périphérique si le cercle est vert ! Vous pouvez 
+   le démonter en cliquant (avec la touche <keycap>Shift</keycap> enfoncée) sur l'icône du 
+   dossier <filename>/floppy</filename>.
+  </para>
+  <para>
+   Vous pouvez aussi démonter un périphérique en fermant la fenêtre du dossier qui affiche 
+   son contenu (i.e., en fermant la fenêtre <filename>/floppy</filename>) et en choisissant 
+   Démonter dans la boîte de dialogue qui s'affichera. Le filer ne vous proposera un tel 
+   démontage que s'il a aussi réalisé le montage.
+  </para>
+  <para>
+   Si vous voulez ouvrir un dossier sans monter le périphérique qui lui est normalement 
+   associé, (i.e., si vous voulez voir le contenu de <filename>/floppy</filename> sur le 
+   disque dur), vous pouvez cliquer sur le point de montage non monté avec la touche 
+   <keycap>Shift</keycap> enfoncée. 
+   Ce n'est généralement pas très utile, puisque ces dossiers sont souvent vides.
+  </para>
+ 
+</chapter>
 
 <chapter id="virtual">
   <title>
@@ -2494,7 +2512,7 @@ pour que grep ne soit exécuté que pour les fichiers ayant pour extension <filena
 
 <listitem><para>
 <userinput>Prune</userinput> Ne réussit jamais !
-<footnote><para>Notez que c'est l'inverse de la commande<citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
+<footnote><para>Notez que c'est l'inverse de la commande <citerefentry><refentrytitle>find</refentrytitle><manvolnum>1</manvolnum>
 </citerefentry>.</para></footnote>
 
 Ce mot-clé peut empêcher la recherche à l'intérieur du dossier courant.
@@ -2669,18 +2687,7 @@ obtenir la langue désirée.
  <title>Options d'affichage</title>
  <para>
 
-  <itemizedlist>
-   <listitem>
-	<para>
-	 <guilabel>Tri intelligent</guilabel>
-	 Effectuer un tri sans tenir compte de la casse (majuscules/minuscules), en 
-	 ignorant la ponctuation, et en triant correctement les nombres 
-	 (<filename>Fichier9</filename> apparaîtra bien avant <filename>Fichier10</filename>). 
-	 Si cette option est désactivée, alors <filename>Zoo</filename> sera affiché 
-	 avant <filename>animal</filename>, par exemple.
-  </para>
- </listitem>
-
+ <itemizedlist>
  <listitem>
   <para>
    <guilabel>Les répertoires viennent toujours en premier</guilabel> signifie que 
@@ -2817,7 +2824,8 @@ obtenir la langue désirée.
 	 <para>
 	  <guilabel>Couleurs</guilabel>
 	  permet de définir les couleurs à appliquer pour le texte des icônes et pour le fond d'écran 
-	  (si aucune image n'est utilisée).
+	  (si aucune image n'est utilisée). Vous pouvez aussi choisir d'afficher une ombre au texte, 
+	  ce qui peut aider avec certains fonds d'écran.
 	 </para>
 	</listitem>
 
@@ -3306,24 +3314,26 @@ ainsi que le fichier lui-même) :
  &lt;Summary xml:lang="en"&gt;A graphical file manager&lt;/Summary&gt;
  &lt;Summary xml:lang="de"&gt;Ein grafische Datei-Manager&lt;/Summary&gt;
  &lt;Summary xml:lang="nl"&gt;Een grafisch bestandsbeheerprogramma&lt;/Summary&gt;
- &lt;Summary xml:lang="sp"&gt;Un manejador de archivos gr&#xE1;afico&lt;/Summary&gt;	 
+ &lt;Summary xml:lang="es"&gt;Un manejador de archivos gr&#xE1;afico&lt;/Summary&gt;	 
  &lt;About xml:lang="en"&gt;
     &lt;Purpose&gt;File manager&lt;/Purpose&gt;
-    &lt;Version&gt;1.3.3 (25-Jul-2002)&lt;/Version&gt;
+    &lt;Version&gt;1.3.5 PREVIEW&lt;/Version&gt;
     &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
     &lt;License&gt;GNU General Public License&lt;/License&gt;
     &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
-  &lt;/About&gt;
-  &lt;AppMenu&gt;
+ &lt;/About&gt;
+ &lt;About xml:lang="es"&gt;
+	&lt;Purpose&gt;Manejador de Archivos&lt;/Purpose&gt;
+	&lt;Authors&gt;Thomas Leonard y otros&lt;/Authors&gt;
+ &lt;/About&gt;
+ &lt;AppMenu&gt;
 	&lt;Item option="-p=Default"&gt;
 	  &lt;Label&gt;Enable pinboard&lt;/Label&gt;
-	  &lt;Label xml:lang="hu"&gt;Pinboard engedÃ©lyezÃ©se&lt;/Label&gt;
-	  &lt;Label xml:lang="sp"&gt;Habilitar el pinboard&lt;/Label&gt;
+	  &lt;Label xml:lang="es"&gt;Habilitar el pinboard&lt;/Label&gt;
     &lt;/Item&gt;
 	&lt;Item option="-p="&gt;
 	  &lt;Label&gt;Disable pinboard&lt;/Label&gt;
-	  &lt;Label xml:lang="hu"&gt;Pinboard tiltÃ¡sa&lt;/Label&gt;
-	  &lt;Label xml:lang="sp"&gt;Deshabilitar el pinboard&lt;/Label&gt;
+	  &lt;Label xml:lang="es"&gt;Deshabilitar el pinboard&lt;/Label&gt;
 	&lt;/Item&gt;
   &lt;/AppMenu&gt;
 &lt;/AppInfo&gt;
@@ -3346,7 +3356,8 @@ ceux de l'exemple sont seulement suggérés).
 <listitem><para>
 <userinput>AppMenu</userinput>
 est une liste de commandes supplémentaires qui s'insèreront dans le menu du dossier-application.
-Quand une de ces commandes est choisie, <filename>AppRun</filename> est exécuté avec le nom de la commande <userinput>option</userinput>
+Quand une de ces commandes est choisie, <filename>AppRun</filename> est exécuté avec le nom de 
+la commande <userinput>option</userinput>
 comme seul argument. Vous pouvez intégrer des menus 'AppMenu' à d'autres menus 'AppMenu'.
 </para></listitem>
 
@@ -3678,7 +3689,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 
   <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
    <listitem><para>démarre un nouveau filer, même s'il y en a déjà un. Cette option interdit au filer
-	 de forker (s'exécuter en arrière plan), ce qui est utile pour débugger.
+	 de forker (s'exécuter en arrière plan), et n'est utile que pour débugger.
   </para></listitem></varlistentry>
 
   <varlistentry><term><option>-o</option></term><term><option>--override</option></term>
@@ -3775,6 +3786,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Olli Helenius</member>
 	 <member>Alex Holden</member>
 	 <member>Jasper Huijsmans</member>
+	 <member>Sigve Indregard</member>
 	 <member>Bernard Jungen</member>
 	 <member>Marcin Juszkiewicz</member>
 	 <member>James Kermode</member>
@@ -3785,6 +3797,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Vincent Lefèvre</member>
 	 <member>Victor Liu See-le</member>
 	 <member>Krzysztof Luks</member>
+	 <member>Marcus Lundblad</member>
 	 <member>Anders Lundmark</member>
 	 <member>Jose Romildo Malaquias</member>
 	 <member>Denis Manente</member>
@@ -3792,6 +3805,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Andras Mohari</member>
 	 <member>Christiansen Merel</member>
 	 <member>Jimmy Olgeni</member>
+	 <member>Richard Olsson</member>
 	 <member>Daniele Peri</member>
 	 <member>Andy Piper</member>
 	 <member>Marcelo Ramos</member>
@@ -4077,8 +4091,13 @@ Les méthodes suivantes sont reconnues :</para>
 </bibliomixed>
 
 <bibliomixed>
- <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
+ <abbrev>Imagettes</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
   <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+ <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
+  <ulink url="http://rox.sf.net/wallpaper.php3"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>

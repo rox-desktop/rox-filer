@@ -44,7 +44,8 @@
 #define COL_SIZE 5
 #define COL_MTIME 6
 #define COL_ITEM 7
-#define N_COLUMNS 8
+#define COL_COLOUR 8
+#define N_COLUMNS 9
 
 static gpointer parent_class = NULL;
 
@@ -174,17 +175,17 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	GTK_OBJECT_CLASS(object)->destroy = view_details_destroy;
 }
 
-static gint list_sort_by_name(GtkTreeModel *list,
+static gint list_wrap_sort(GtkTreeModel *list,
 			      GtkTreeIter *a,
 			      GtkTreeIter *b,
-			      gpointer user_data)
+			      gint (*fn)(DirItem *a, DirItem *b))
 {
 	DirItem *i_a, *i_b;
 
 	gtk_tree_model_get(list, a, COL_ITEM, &i_a, -1);
 	gtk_tree_model_get(list, b, COL_ITEM, &i_b, -1);
 
-	return sort_by_name(i_a, i_b);
+	return fn(i_a, i_b);
 }
 
 static void view_details_init(GTypeInstance *object, gpointer gclass)
@@ -198,14 +199,24 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	model = gtk_list_store_new(N_COLUMNS,
 				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
 				   G_TYPE_STRING, G_TYPE_STRING, G_TYPE_STRING,
-				   G_TYPE_STRING, G_TYPE_POINTER);
+				   G_TYPE_STRING, G_TYPE_POINTER,
+				   GDK_TYPE_COLOR);
 
+	/* Sort functions */
 	sortable_list = GTK_TREE_SORTABLE(model);
 	gtk_tree_sortable_set_sort_func(sortable_list, COL_LEAF,
-					list_sort_by_name,
-					NULL, NULL);
+					(GtkTreeIterCompareFunc) list_wrap_sort,
+					sort_by_name, NULL);
 	gtk_tree_sortable_set_sort_column_id(sortable_list, COL_LEAF,
 			GTK_SORT_ASCENDING);
+
+	gtk_tree_sortable_set_sort_func(sortable_list, COL_SIZE,
+					(GtkTreeIterCompareFunc) list_wrap_sort,
+					sort_by_size, NULL);
+
+	gtk_tree_sortable_set_sort_func(sortable_list, COL_MTIME,
+					(GtkTreeIterCompareFunc) list_wrap_sort,
+					sort_by_date, NULL);
 
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(model));
 
@@ -213,7 +224,8 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Name */
 	column = gtk_tree_view_column_new_with_attributes(_("Name"), cell,
-					    "text", COL_LEAF, NULL);
+					    "text", COL_LEAF,
+					    "foreground-gdk", COL_COLOUR, NULL);
 	gtk_tree_view_append_column(treeview, column);
 	gtk_tree_view_column_set_sort_column_id(column, COL_LEAF);
 
@@ -318,6 +330,7 @@ static void resort_list(GtkListStore *list)
 static void update_item(GtkListStore *list, GtkTreeIter *iter, DirItem *item)
 {
 	char *time;
+	const char *size = "";
 	mode_t m = item->mode;
 	const char *type =
 		item->flags & ITEM_FLAG_APPDIR? "App" :
@@ -332,15 +345,19 @@ static void update_item(GtkListStore *list, GtkTreeIter *iter, DirItem *item)
 
 	time = pretty_time(&item->mtime);
 
+	if (item->base_type != TYPE_DIRECTORY)
+		size = format_size(item->size);
+
 	gtk_list_store_set(list, iter,
 			COL_LEAF, item->leafname,
 			COL_TYPE, type,
-			COL_SIZE, format_size(item->size),
+			COL_SIZE, size,
 			COL_PERM, pretty_permissions(item->mode),
 			COL_OWNER, user_name(item->uid),
 			COL_GROUP, group_name(item->gid),
 			COL_MTIME, time,
 			COL_ITEM, item,
+			COL_COLOUR, type_get_colour(item, NULL),
 			-1);
 	g_free(time);
 }

@@ -800,6 +800,9 @@ static gboolean draw_label_shadow(GtkWidget *widget, GdkEventExpose *event,
 	WrappedLabel	*wrap = WRAPPED_LABEL(widget);
 	IconWindow	*win = (IconWindow *) data;
 	GdkGC		*gc;
+
+	/* Should we return silently? It seems that this can happen... */
+	g_return_val_if_fail(win->widget != NULL, FALSE);
 	
 	gc = pinboard_get_shadow_gc();
 

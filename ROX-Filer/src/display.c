@@ -230,10 +230,10 @@ int sort_by_date(const void *item1, const void *item2)
 	const DirItem *i1 = (DirItem *) item1;
 	const DirItem *i2 = (DirItem *) item2;
 
-	SORT_DIRS;
+	/* SORT_DIRS; -- too confusing! */
 
-	return i1->mtime > i2->mtime ? -1 :
-		i1->mtime < i2->mtime ? 1 :
+	return i1->mtime < i2->mtime ? -1 :
+		i1->mtime > i2->mtime ? 1 :
 		sort_by_name(item1, item2);
 }
 
@@ -244,8 +244,8 @@ int sort_by_size(const void *item1, const void *item2)
 
 	SORT_DIRS;
 
-	return i1->size > i2->size ? -1 :
-		i1->size < i2->size ? 1 :
+	return i1->size < i2->size ? -1 :
+		i1->size > i2->size ? 1 :
 		sort_by_name(item1, item2);
 }
 
