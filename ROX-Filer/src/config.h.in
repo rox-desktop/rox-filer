@@ -1,5 +1,7 @@
 /* The configure script will auto-generate config.h from config.h.in */
 
+#define PROJECT "ROX-Filer"
+
 #undef STDC_HEADERS
 #undef HAVE_SYS_UCRED_H
 #undef HAVE_MNTENT_H
@@ -10,5 +12,18 @@
 #undef HAVE_LIBVFS
 #undef HAVE_VFS_H
 #undef HAVE_IMLIB
+#undef HAVE_GETTEXT
 
 #include "my_vfs.h"
+
+#ifdef HAVE_GETTEXT
+#  include <libintl.h>
+#  define _(String) gettext(String)
+#else
+#  define _(String) (String)
+#endif
+
+/* Short for gettext_noop() - marks a string as translatable without
+ * actually translating it at that point. Used by xgettext.
+ */
+#define N_(String) (String)

@@ -207,6 +207,8 @@ int main(int argc, char **argv)
 	GList		*panel_dirs = NULL;
 	GList		*panel_sides = NULL;
 
+	i18n_init();
+
 	home_dir = g_get_home_dir();
 	death_callbacks = g_hash_table_new(NULL, NULL);
 
@@ -341,27 +343,36 @@ int main(int argc, char **argv)
 
 static void show_features(void)
 {
-	g_printerr("\n-- features set at compile time --\n\n");
-	g_printerr("VFS support... "
+	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
+	g_printerr("%s... %s\n", _("VFS support"),
 #ifdef HAVE_LIBVFS
-		"Yes"
+		_("Yes")
 #else
-		"No (couldn't find a valid libvfs)"
+		_("No (couldn't find a valid libvfs)")
 #endif
-		"\n");
-	g_printerr("ImLib support... "
+		);
+	g_printerr("%s... %s\n", _("ImLib support"),
 #ifdef HAVE_IMLIB
-		"Yes"
+		_("Yes")
 #else
-		"No (the imlib-config command didn't work)"
+		_("No (the imlib-config command didn't work)")
 #endif
-		"\n");
+		);
+	g_printerr("%s... %s\n", _("Internationalisation support"),
+#ifdef HAVE_GETTEXT
+		_("Yes")
+#else
+		_("No (could not find gettext() function)")
+#endif
+		);
 }
 
 /* Register a function to be called when process number 'child' dies. */
 void on_child_death(int child, CallbackFn callback, gpointer data)
 {
 	Callback	*cb;
+
+	g_return_if_fail(callback != NULL);
 
 	cb = g_new(Callback, 1);
 

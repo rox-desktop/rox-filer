@@ -24,15 +24,11 @@
  * GTK+ at ftp://ftp.gtk.org/pub/gtk/. 
  */
 
+#include "config.h"
+
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
-
-#if 0
-#  include "gtkintl.h"
-#else
-#  define _(x) (x)
-#endif
 
 #include "gdk/gdkkeysyms.h"
 

@@ -96,7 +96,7 @@ static char *filer_sort_by(char *data);
 
 static OptionsSection options =
 {
-	"Filer window options",
+	N_("Filer window options"),
 	create_options,
 	update_options,
 	set_options,
@@ -658,7 +658,7 @@ char *details(DirItem *item)
 		g_free(buf);
 
 	if (item->lstat_errno)
-		buf = g_strdup_printf("lstat(2) failed: %s",
+		buf = g_strdup_printf(_("lstat(2) failed: %s"),
 				g_strerror(item->lstat_errno));
 	else
 		buf = g_strdup_printf("%s %s %-8.8s %-8.8s %s %s",
@@ -787,7 +787,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	if (!dir)
 	{
 		if (warning)
-			delayed_error("ROX-Filer", "Directory missing/deleted");
+			delayed_error(PROJECT, _("Directory missing/deleted"));
 		gtk_widget_destroy(filer_window->window);
 		return FALSE;
 	}
@@ -1025,9 +1025,9 @@ static void follow_symlink(FilerWindow *filer_window, char *path,
 	if (!slash)
 	{
 		g_free(real);
-		delayed_error("ROX-Filer",
-				"Broken symlink (or you don't have permission "
-				"to follow it).");
+		delayed_error(PROJECT,
+			_("Broken symlink (or you don't have permission "
+			  "to follow it)."));
 		return;
 	}
 
@@ -1085,7 +1085,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 					item->leafname)->str,
 				path, MAXPATHLEN);
 		if (got < 0)
-			delayed_error("ROX-Filer", g_strerror(errno));
+			delayed_error(PROJECT, g_strerror(errno));
 		else
 		{
 			g_return_if_fail(got <= MAXPATHLEN);
@@ -1138,8 +1138,8 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 						destroy = TRUE;
 				}
 				else
-					report_error("ROX-Filer",
-						"Failed to fork() child");
+					report_error(PROJECT,
+						_("Failed to fork() child"));
 			}
 			else
 			{
@@ -1157,12 +1157,11 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				else
 				{
 					message = g_string_new(NULL);
-					g_string_sprintf(message, "No open "
-						"action specified for files of "
-						"this type (%s/%s)",
+					g_string_sprintf(message,
+		_("No open action specified for files of this type (%s/%s)"),
 						type->media_type,
 						type->subtype);
-					report_error("ROX-Filer", message->str);
+					report_error(PROJECT, message->str);
 					g_string_free(message, TRUE);
 				}
 			}
@@ -1317,9 +1316,9 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 		char	*error;
 
 		g_free(from_dup);
-		error = g_strdup_printf("Directory '%s' is not accessible.",
+		error = g_strdup_printf(_("Directory '%s' is not accessible"),
 				path);
-		delayed_error("ROX-Filer", error);
+		delayed_error(PROJECT, error);
 		g_free(error);
 		gtk_widget_destroy(filer_window->window);
 	}
@@ -1357,11 +1356,11 @@ static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window)
 {
 	/* TODO: We can open lots of these - very irritating! */
-	return get_choice("Close panel?",
-			"You have tried to close a panel via the window "
+	return get_choice(_("Close panel?"),
+		      _("You have tried to close a panel via the window "
 			"manager - I usually find that this is accidental... "
-			"really close?",
-			2, "Remove", "Cancel") != 0;
+			"really close?"),
+			2, _("Remove"), _("Cancel")) != 0;
 }
 
 /* Make the items as narrow as possible */
@@ -1484,8 +1483,8 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	{
 		char	*error;
 
-		error = g_strdup_printf("Directory '%s' not found.", path);
-		delayed_error("ROX-Filer", error);
+		error = g_strdup_printf(_("Directory '%s' not found."), path);
+		delayed_error(PROJECT, error);
 		g_free(error);
 		g_free(filer_window->path);
 		g_free(filer_window);
@@ -1547,7 +1546,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 		GtkWidget	*frame, *win = filer_window->window;
 
 		gtk_window_set_wmclass(GTK_WINDOW(win), "ROX-Panel",
-				"ROX-Filer");
+				PROJECT);
 		collection_set_panel(filer_window->collection, TRUE);
 		gtk_signal_connect(GTK_OBJECT(filer_window->window),
 				"delete_event",
@@ -1690,15 +1689,15 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	add_button(box, TOOLBAR_UP_ICON,
 			GTK_SIGNAL_FUNC(toolbar_up_clicked),
 			filer_window,
-			"Up", "Change to parent directory");
+			_("Up"), _("Change to parent directory"));
 	add_button(box, TOOLBAR_HOME_ICON,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
 			filer_window,
-			"Home", "Change to home directory");
+			_("Home"), _("Change to home directory"));
 	add_button(box, TOOLBAR_REFRESH_ICON,
 			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
 			filer_window,
-			"Rescan", "Rescan directory contents");
+			_("Rescan"), _("Rescan directory contents"));
 
 	return frame;
 }
@@ -1752,35 +1751,39 @@ static GtkWidget *create_options()
 	gtk_box_pack_start(GTK_BOX(vbox), display_label, FALSE, TRUE, 0);
 
 	toggle_new_window_on_1 =
-		gtk_check_button_new_with_label("New window on button 1 "
-				"(RISC OS style)");
+		gtk_check_button_new_with_label(
+			_("New window on button 1 (RISC OS style)"));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_new_window_on_1,
 			FALSE, TRUE, 0);
 
 	toggle_menu_on_2 =
-		gtk_check_button_new_with_label("Menu on button 2 "
-				"(RISC OS style)");
+		gtk_check_button_new_with_label(
+			_("Menu on button 2 (RISC OS style)"));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
 
 	toggle_single_click =
-		gtk_check_button_new_with_label("Single-click nagivation");
+		gtk_check_button_new_with_label(_("Single-click nagivation"));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
 	toggle_unique_filer_windows =
-		gtk_check_button_new_with_label("Unique windows");
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows, FALSE, TRUE, 0);
+		gtk_check_button_new_with_label(_("Unique windows"));
+	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
+			FALSE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
 
 	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new("Toolbar type for new windows"),
+			gtk_label_new(_("Toolbar type for new windows")),
 			FALSE, TRUE, 0);
 	menu_toolbar = gtk_option_menu_new();
 	menu = gtk_menu_new();
-	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("None"));
-	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("Normal"));
-	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("GNOME"));
+	gtk_menu_append(GTK_MENU(menu),
+			gtk_menu_item_new_with_label(_("None")));
+	gtk_menu_append(GTK_MENU(menu),
+			gtk_menu_item_new_with_label(_("Normal")));
+	gtk_menu_append(GTK_MENU(menu),
+			gtk_menu_item_new_with_label(_("GNOME")));
 	gtk_option_menu_set_menu(GTK_OPTION_MENU(menu_toolbar), menu);
 	gtk_box_pack_start(GTK_BOX(hbox), menu_toolbar, TRUE, TRUE, 0);
 
@@ -1791,9 +1794,9 @@ static void update_options_label(void)
 {
 	guchar	*str;
 	
-	str = g_strdup_printf("The last used display style (%s) and sort "
+	str = g_strdup_printf(_("The last used display style (%s) and sort "
 			"function (Sort By %s) will be saved if you click on "
-			"Save.", style_to_name(), sort_fn_to_name());
+			"Save."), style_to_name(), sort_fn_to_name());
 	gtk_label_set_text(GTK_LABEL(display_label), str);
 	g_free(str);
 }
@@ -1844,17 +1847,17 @@ static void set_options()
 
 static guchar *style_to_name(void)
 {
-	return last_display_style == LARGE_ICONS ? "Large Icons" :
-		last_display_style == SMALL_ICONS ? "Small Icons" :
-		"Full Info";
+	return last_display_style == LARGE_ICONS ? _("Large Icons") :
+		last_display_style == SMALL_ICONS ? _("Small Icons") :
+		_("Full Info");
 }
 
 static guchar *sort_fn_to_name(void)
 {
-	return last_sort_fn == sort_by_name ? "Name" :
-		last_sort_fn == sort_by_type ? "Type" :
-		last_sort_fn == sort_by_date ? "Date" :
-		"Size";
+	return last_sort_fn == sort_by_name ? _("Name") :
+		last_sort_fn == sort_by_type ? _("Type") :
+		last_sort_fn == sort_by_date ? _("Date") :
+		_("Size");
 }
 
 static void save_options()
@@ -1863,9 +1866,17 @@ static void save_options()
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
-	option_write("filer_unique_windows", o_unique_filer_windows ? "1" : "0");
-	option_write("filer_display_style", style_to_name());
-	option_write("filer_sort_by", sort_fn_to_name());
+	option_write("filer_unique_windows",
+			o_unique_filer_windows ? "1" : "0");
+	option_write("filer_display_style",
+		last_display_style == LARGE_ICONS ? "Large Icons" :
+		last_display_style == SMALL_ICONS ? "Small Icons" :
+		"Full Info");
+	option_write("filer_sort_by",
+		last_sort_fn == sort_by_name ? "Name" :
+		last_sort_fn == sort_by_type ? "Type" :
+		last_sort_fn == sort_by_date ? "Date" :
+		"Size");
 	option_write("filer_toolbar", o_toolbar == TOOLBAR_NONE ? "None" :
 				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
 				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
@@ -1906,7 +1917,7 @@ static char *filer_display_style(char *data)
 	else if (g_strcasecmp(data, "Full Info") == 0)
 		last_display_style = FULL_INFO;
 	else
-		return "Unknown display style";
+		return _("Unknown display style");
 
 	return NULL;
 }
@@ -1922,7 +1933,7 @@ static char *filer_sort_by(char *data)
 	else if (g_strcasecmp(data, "Size") == 0)
 		last_sort_fn = sort_by_size;
 	else
-		return "Unknown sort type";
+		return _("Unknown sort type");
 
 	return NULL;
 }
@@ -1936,7 +1947,7 @@ static char *filer_toolbar(char *data)
 	else if (g_strcasecmp(data, "GNOME") == 0)
 		o_toolbar = TOOLBAR_GNOME;
 	else
-		return "Unknown toolbar type";
+		return _("Unknown toolbar type");
 
 	return NULL;
 }
@@ -2079,7 +2090,7 @@ static void filer_set_title(FilerWindow *filer_window)
 	{
 		guchar	*title;
 
-		title = g_strdup_printf("%s (Scanning)", filer_window->path);
+		title = g_strdup_printf(_("%s (Scanning)"), filer_window->path);
 		gtk_window_set_title(GTK_WINDOW(filer_window->window),
 				title);
 		g_free(title);

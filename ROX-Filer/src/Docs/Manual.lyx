@@ -1,4 +1,4 @@
-#This file was created by <tal197> Fri Apr 14 15:40:53 2000
+#This file was created by <tal197> Sun Apr 16 15:59:46 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1317,6 +1317,7 @@ This provides a quick way of entering shell commands if you don't want to
 
 Just type in the command and press Return to execute it.
  Up and Down arrows move through previously entered commands.
+ Tab does shell-style completion.
  Clicking on an item inserts its name into the minibuffer.
  If some items are selected then they are assigned to the positional parameters
  
@@ -2138,6 +2139,127 @@ To make a directory executable all you need to do is create a executable
  Have a look at the ROX-Filer application directory for a full example.
 \layout Section
 
+Internationalisation
+\layout Standard
+
+ROX-Filer is able to translate many of its messages, provided suitable translati
+on files are provided.
+ If you know that your language is supported then simply set the 
+\family typewriter 
+LANG
+\family default 
+ environment variable to the appropriate code for your country before starting
+ the filer, eg:
+\layout LyX-Code
+
+LANG=fr; export LANG
+\layout LyX-Code
+
+ROX-Filer/AppRun
+\layout Standard
+
+Note that 
+\series bold 
+no translations currently exist
+\series default 
+ --- if you want to help with a translation then please get in touch.
+\layout Paragraph
+
+Creating a new translation
+\layout Enumerate
+
+Go into the 
+\family typewriter 
+src
+\family default 
+ directory and create the file `
+\family typewriter 
+messages.po
+\family default 
+':
+\begin_deeper 
+\layout LyX-Code
+
+$ cd ROX-Filer/src
+\layout LyX-Code
+
+$ make messages.po
+\end_deeper 
+\layout Enumerate
+
+Create a new directory `
+\family typewriter 
+po
+\family default 
+/
+\begin_inset Formula \( \langle \hbox {language}\rangle  \)
+\end_inset 
+
+
+\family typewriter 
+/LC_MESSAGES
+\family default 
+/' with the name of the new language, eg:
+\begin_deeper 
+\layout LyX-Code
+
+$ cd ROX-Filer/po
+\layout LyX-Code
+
+$ mkdir fr; mkdir LC_MESSAGES; cd fr/LC_MESSAGES
+\end_deeper 
+\layout Enumerate
+
+Copy 
+\family typewriter 
+messages.po
+\family default 
+ into the new 
+\family typewriter 
+LC_MESSAGES
+\family default 
+ directory and load it into a text editor.
+\layout Enumerate
+
+Fill in the translations, which are all blank to start with.
+\layout Enumerate
+
+Run 
+\family typewriter 
+msgfmt
+\family default 
+ on the file to produce a 
+\family typewriter 
+.mo
+\family default 
+ file --- rename this as `
+\family typewriter 
+ROX-Filer.mo
+\family default 
+'.
+\layout Enumerate
+
+Set the 
+\family typewriter 
+LANG
+\family default 
+ environment variable and rerun the filer to test the translation.
+\layout Enumerate
+
+Submit the 
+\family typewriter 
+.po
+\family default 
+ file to me so that I can include it in future releases of the filer.
+\layout Standard
+
+See the 
+\family typewriter 
+gettext
+\family default 
+ info page for more instructions on creating a translation.
+\layout Section
+
 Hacking
 \layout Standard
 
@@ -2321,7 +2443,7 @@ detach()
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
 
-\begin_inset Figure size 595 585
+\begin_inset Figure size 595 604
 file Structs.eps
 width 3 100
 flags 9

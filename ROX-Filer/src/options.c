@@ -133,7 +133,7 @@ void options_load(void)
 		{
 			OptionsSection *section = (OptionsSection *) next->data;
 
-			group = gtk_frame_new(section->name);
+			group = gtk_frame_new(_(section->name));
 			gtk_box_pack_start(GTK_BOX(sections_vbox), group,
 					FALSE, TRUE, 0);
 			gtk_container_add(GTK_CONTAINER(group),

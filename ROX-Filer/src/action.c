@@ -56,7 +56,7 @@ static char *action_auto_quiet(char *data);
 
 static OptionsSection options =
 {
-	"Action window options",
+	N_("Action window options"),
 	create_options,
 	update_options,
 	set_options,

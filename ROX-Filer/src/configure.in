@@ -58,7 +58,7 @@ AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h)
-AC_CHECK_HEADERS(vfs.h)
+AC_CHECK_HEADERS(vfs.h libintl.h)
 
 dnl Checks for typedefs, structures, and compiler characteristics.
 AC_C_CONST
@@ -66,7 +66,7 @@ AC_TYPE_UID_T
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gethostname mkdir rmdir strdup strtol getopt_long)
+AC_CHECK_FUNCS(gethostname mkdir rmdir strdup strtol getopt_long gettext)
 
 dnl Check for the Midnight Commander VFS library
 AC_CHECK_LIB(vfs, mc_stat, , , $GLIB_LIBS)

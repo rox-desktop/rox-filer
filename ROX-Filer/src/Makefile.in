@@ -38,6 +38,12 @@ clean:
 depend:
 	makedepend -- $(CFLAGS) -- $(SRCS)
 
+ROX-Filer.po: ${SRCS}
+	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
+
+dist:
+	./update-trans
+
 ############ Special case
 
 pixmaps.o: pixmaps.c
