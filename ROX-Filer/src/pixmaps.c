@@ -379,7 +379,7 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	swidth = g_strdup_printf("%d", original_width);
 	sheight = g_strdup_printf("%d", original_height);
 	ssize = g_strdup_printf("%" SIZE_FMT, info.st_size);
-	smtime = g_strdup_printf("%ld", info.st_mtime);
+	smtime = g_strdup_printf("%ld", (long) info.st_mtime);
 
 	path = pathdup(pathname);
 	uri = g_strconcat("file://", path, NULL);

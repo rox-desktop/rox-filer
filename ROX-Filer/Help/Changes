@@ -7,6 +7,7 @@
 Change 'Type' to 'Types' (Vincent Lefèvre).
 Don't resize when changing the view type if auto-resizing is off (Keith R. John
 Warno).
+Added missing cast (Damien Couderc).
 
 10-Jan-2003
 ~~~~~~~~~~~
@@ -1221,7 +1222,7 @@ check box and does 'Yes'.
 ~~~~~~~~~~~
 Gtk+-2.0 uses UTF-8 for strings. Translation files are now converted to
 UTF-8 as they are loaded.
-Added a missing #ifdef for the regex code (Couderc Damien).
+Added a missing #ifdef for the regex code (Damien Couderc).
 All file leafnames now use AA fonts with Gtk+-2.0 (details are still
 fixed, though).
 
@@ -1407,7 +1408,7 @@ saved yet.
 08-Nov-2001
 ~~~~~~~~~~~
 Don't use re_set_syntax() on systems that don't have it (reported by
-Couderc Damien).
+Damien Couderc).
 In action windows, the a long filename no longer makes the window get wider
 (requested by Graham Borland).
 Added 'Types' section to the Options window, allowing easy(ish) access
