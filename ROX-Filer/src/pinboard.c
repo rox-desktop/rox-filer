@@ -150,6 +150,7 @@ static Option o_pinboard_shadow_labels;
 static Option o_blackbox_hack;
 
 static Option o_top_margin, o_bottom_margin;
+static Option o_pinboard_image_scaling;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -258,6 +259,8 @@ void pinboard_init(void)
 
 	option_add_int(&o_top_margin, "pinboard_top_margin", 0);
 	option_add_int(&o_bottom_margin, "pinboard_bottom_margin", 0);
+
+	option_add_int(&o_pinboard_image_scaling, "pinboard_image_scaling", 0);
 
 	option_add_notify(pinboard_check_options);
 
@@ -2240,7 +2243,9 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 				MIN(screen_width, width * scale),
 				MIN(screen_height, height * scale),
 				x, y, scale, scale,
-				GDK_INTERP_HYPER, 255);
+				o_pinboard_image_scaling.int_value?
+				     GDK_INTERP_BILINEAR: GDK_INTERP_HYPER,
+				255);
 		g_object_unref(old);
 	}
 
