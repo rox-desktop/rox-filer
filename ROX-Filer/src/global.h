@@ -39,6 +39,13 @@ typedef struct _DirItem DirItem;
  */
 typedef struct _ViewIface ViewIface;
 
+/* A ViewIter specifies a single item in a View, rather like an index.
+ * They can be used to iterate over all the items in a View and remain
+ * valid until the View is changed. If allocated on the stack, they do not need
+ * to be freed.
+ */
+typedef struct _ViewIter ViewIter;
+
 /* A Collection is a GtkWidget used to arrange a grid of items.
  * Each filer window has its own one of these; the data field
  * of each item is the corresponding DirItem, shared with the

@@ -23,7 +23,9 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 void show_popup_menu(GtkWidget *menu, GdkEvent *event, int item);
 
 void ensure_filer_menu(void);
-void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
+void show_filer_menu(FilerWindow *filer_window,
+		     GdkEvent *event,
+		     ViewIter *item);
 void menu_popdown(void);
 
 /* Public menu handlers */

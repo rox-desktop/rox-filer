@@ -580,11 +580,14 @@ static void selection_get(GtkWidget *widget,
 /* Selection has been changed -- try to grab the primary selection
  * if we don't have it. Also called when clicking on an insensitive selection
  * to regain primary.
+ * Also updates toolbar info.
  */
 void filer_selection_changed(FilerWindow *filer_window, gint time)
 {
+	toolbar_update_info(filer_window);
+
 	if (window_with_primary == filer_window)
-		return;		/* Already got it */
+		return;		/* Already got primary */
 
 	if (!filer_window->collection->number_selected)
 		return;		/* Nothing selected */
@@ -602,16 +605,21 @@ void filer_selection_changed(FilerWindow *filer_window, gint time)
 }
 
 /* Open the item (or add it to the shell command minibuffer) */
-void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
+void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags)
 {
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
 	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0;
-	DirItem		*item = (DirItem *)
-			filer_window->collection->items[item_number].data;
+	DirItem		*item;
 	guchar		*full_path;
 	gboolean	wink = TRUE;
 	Directory	*old_dir;
+
+	g_return_if_fail(filer_window != NULL && iter != NULL);
+
+	item = iter->peek(iter);
+
+	g_return_if_fail(item != NULL);
 
 	if (filer_window->mini_type == MINI_SHELL)
 	{
@@ -649,8 +657,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 		else
 		{
 			if (wink)
-				collection_wink_item(filer_window->collection,
-						item_number);
+				view_wink_item(filer_window->view, iter);
 			if (close_mini)
 				minibuffer_hide(filer_window);
 		}
@@ -717,19 +724,20 @@ found:
 
 static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
-	Collection		*collection = filer_window->collection;
-	int			item = collection->cursor_item;
 	TargetFunc 		cb = filer_window->target_cb;
 	gpointer		data = filer_window->target_data;
 	OpenFlags		flags = 0;
+	ViewIter		iter;
 
 	filer_target_mode(filer_window, NULL, NULL, NULL);
-	if (item < 0 || item >= collection->number_of_items)
+
+	view_get_cursor(filer_window->view, &iter);
+	if (!iter.peek(&iter))
 		return;
 
 	if (cb)
 	{
-		cb(filer_window, item, data);
+		cb(filer_window, &iter, data);
 		return;
 	}
 
@@ -740,7 +748,7 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	else
 		flags |= OPEN_SAME_WINDOW;
 
-	filer_openitem(filer_window, item, flags);
+	filer_openitem(filer_window, &iter, flags);
 }
 
 /* Makes sure that 'groups' is up-to-date, reloading from file if it has
@@ -904,8 +912,12 @@ static void group_restore(FilerWindow *filer_window, char *name)
 
 static gboolean popup_menu(GtkWidget *widget, FilerWindow *filer_window)
 {
-	show_filer_menu(filer_window, NULL,
-			filer_window->collection->cursor_item);
+	ViewIter iter;
+
+	view_get_cursor(filer_window->view, &iter);
+
+	show_filer_menu(filer_window, NULL, &iter);
+
 	return TRUE;
 }
 
@@ -951,10 +963,16 @@ static gint key_press_event(GtkWidget	*widget,
 			change_to_parent(filer_window);
 			break;
 		case GDK_backslash:
+		{
+			ViewIter iter;
+
 			tooltip_show(NULL);
-			show_filer_menu(filer_window, (GdkEvent *) event,
-					filer_window->collection->cursor_item);
+
+			view_get_cursor(filer_window->view, &iter);
+			show_filer_menu(filer_window,
+					(GdkEvent *) event, &iter);
 			break;
+		}
 		default:
 			if (key >= GDK_0 && key <= GDK_9)
 				group[0] = key - GDK_0 + '0';
@@ -1610,7 +1628,7 @@ void filer_detach_rescan(FilerWindow *filer_window)
 }
 
 /* Puts the filer window into target mode. When an item is chosen,
- * fn(filer_window, item, data) is called. 'reason' will be displayed
+ * fn(filer_window, iter, data) is called. 'reason' will be displayed
  * on the toolbar while target mode is active.
  *
  * Use fn == NULL to cancel target mode.

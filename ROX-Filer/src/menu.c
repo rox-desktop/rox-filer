@@ -58,7 +58,6 @@
 #include "usericons.h"
 #include "infobox.h"
 #include "view_iface.h"
-#include "collection.h"
 #include "display.h"
 
 typedef enum {
@@ -673,7 +672,8 @@ static MenuIconStyle get_menu_icon_style(void)
 	return MIS_SMALL;
 }
 
-void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
+/* iter->peek() is the clicked item, or NULL if none */
+void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 {
 	DirItem		*file_item = NULL;
 	GdkModifierType	state = 0;
@@ -698,10 +698,10 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 	else if (event->type == GDK_KEY_PRESS)
 		state = ((GdkEventKey *) event)->state;
 
-	if (n_selected == 0 && item >= 0)
+	if (n_selected == 0 && iter && iter->peek(iter) != NULL)
 	{
 		filer_window->temp_item_selected = TRUE;
-		collection_select_item(filer_window->collection, item);
+		view_set_selected(filer_window->view, iter, TRUE);
 		n_selected = view_count_selected(filer_window->view);
 	}
 	else
@@ -815,26 +815,21 @@ static void menu_closed(GtkWidget *widget)
 }
 
 static void target_callback(FilerWindow *filer_window,
-			gint item,
+			ViewIter *iter,
 			gpointer action)
 {
-	Collection	*collection;
-
 	g_return_if_fail(filer_window != NULL);
-
-	collection = filer_window->collection;
 
 	window_with_focus = filer_window;
 	
 	/* Don't grab the primary selection */
 	filer_window->temp_item_selected = TRUE;
 	
-	collection_wink_item(collection, item);
-	collection_clear_except(collection, item);
-	file_op(NULL, GPOINTER_TO_INT(action), GTK_WIDGET(collection));
+	view_wink_item(filer_window->view, iter);
+	view_select_only(filer_window->view, iter);
+	file_op(NULL, GPOINTER_TO_INT(action), NULL);
 
-	if (item < collection->number_of_items)
-		collection_unselect_item(collection, item);
+	view_clear_selection(filer_window->view);
 	filer_window->temp_item_selected = FALSE;
 }
 
@@ -1204,7 +1199,7 @@ static void select_all(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	window_with_focus->temp_item_selected = FALSE;
-	collection_select_all(window_with_focus->collection);
+	view_select_all(window_with_focus->view);
 }
 
 static void clear_selection(gpointer data, guint action, GtkWidget *widget)
@@ -1215,12 +1210,19 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	view_clear_selection(window_with_focus->view);
 }
 
+static gboolean invert_cb(ViewIter *iter, gpointer data)
+{
+	return !view_get_selected((ViewIface *) data, iter);
+}
+
 static void invert_selection(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
 	window_with_focus->temp_item_selected = FALSE;
-	collection_invert_selection(window_with_focus->collection);
+
+	view_select_if(window_with_focus->view, invert_cb,
+		       window_with_focus->view);
 }
 
 void menu_show_options(gpointer data, guint action, GtkWidget *widget)
@@ -1762,11 +1764,12 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 	gtk_menu_shell_select_item(shell, item);
 }
 
-static void file_op(gpointer data, FileOp action, GtkWidget *widget)
+static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 {
 	DirItem	*item;
 	gchar	*path;
 	int	n_selected;
+	ViewIter iter;
 
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -1869,8 +1872,12 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		return;
 	}
 
-	item = filer_selected_item(window_with_focus);
+	view_get_iter(window_with_focus->view, &iter, VIEW_ITER_SELECTED);
+		
+	item = iter.next(&iter);
 	g_return_if_fail(item != NULL);
+	g_return_if_fail(iter.next(&iter) == NULL);
+
 	if (!item->image)
 		item = dir_update_item(window_with_focus->directory,
 					item->leafname);
@@ -1898,9 +1905,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 					_("Symlink"), link_cb);
 			break;
 		case FILE_OPEN_FILE:
-			filer_openitem(window_with_focus,
-				collection_selected_item_number(
-					window_with_focus->collection),
+			filer_openitem(window_with_focus, &iter,
 				OPEN_SAME_WINDOW | OPEN_SHIFT);
 			break;
 		case FILE_HELP:

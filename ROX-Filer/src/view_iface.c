@@ -135,6 +135,14 @@ void view_clear(ViewIface *obj)
 	VIEW_IFACE_GET_CLASS(obj)->clear(obj);
 }
 
+/* Select all items */
+void view_select_all(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->select_all(obj);
+}
+
 /* Unselect all items */
 void view_clear_selection(ViewIface *obj)
 {
@@ -166,7 +174,7 @@ void view_show_cursor(ViewIface *obj)
 	VIEW_IFACE_GET_CLASS(obj)->show_cursor(obj);
 }
 
-/* Create an iterator which will return each element selected by 'type'
+/* Create an iterator which will return each element selected by 'flags'
  * from successive calls to iter.next(&iter). NULL indicates the end
  * of the sequence.
  *
@@ -176,10 +184,20 @@ void view_show_cursor(ViewIface *obj)
 void view_get_iter(ViewIface *obj, ViewIter *iter, int flags)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));
-
-	iter->flags = flags;
+	g_return_if_fail(iter != NULL);
 
 	VIEW_IFACE_GET_CLASS(obj)->get_iter(obj, iter);
+
+	iter->flags = flags;
+}
+
+/* Make an 'iter' whose next method will return the cursor item, if any */
+void view_get_cursor(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+	g_return_if_fail(iter != NULL);
+
+	VIEW_IFACE_GET_CLASS(obj)->get_cursor(obj, iter);
 }
 
 /* Position cursor on the last item returned by iter.next().
@@ -190,4 +208,85 @@ void view_cursor_to_iter(ViewIface *obj, ViewIter *iter)
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 
 	VIEW_IFACE_GET_CLASS(obj)->cursor_to_iter(obj, iter);
+}
+
+/* Select the item at this iter */
+void view_set_selected(ViewIface *obj, ViewIter *iter, gboolean selected)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->set_selected(obj, iter, selected);
+}
+
+gboolean view_get_selected(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	return VIEW_IFACE_GET_CLASS(obj)->get_selected(obj, iter);
+}
+
+/* Flash / draw attention to this item */
+void view_wink_item(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->wink_item(obj, iter);
+}
+
+/* Clear the selection, then select this item. Does it atomically to avoid
+ * problems with giving up and quickly reclaiming the primary selection.
+ */
+void view_select_only(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->select_only(obj, iter);
+}
+
+void view_select_if(ViewIface *obj,
+		    gboolean (*test)(ViewIter *iter, gpointer data),
+		    gpointer data)
+{
+	ViewIter iter;
+
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	view_get_iter(obj, &iter, 0);
+
+	if (!iter.next(&iter))
+		return;		/* No items */
+
+	view_freeze(obj);
+
+	/* If anything is currently selected then select the first item now
+	 * and set it to its correct value at the end (avoids losing the
+	 * primary and regaining it quickly).
+	 */
+	if (view_count_selected(obj))
+		view_set_selected(obj, &iter, TRUE);
+
+	while (iter.next(&iter))
+		view_set_selected(obj, &iter, test(&iter, data));
+
+	view_get_iter(obj, &iter, 0);
+	iter.next(&iter);
+	view_set_selected(obj, &iter, test(&iter, data));
+
+	view_thaw(obj);
+}
+
+/* Prevent selection_changed events from being emitted */
+void view_freeze(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->set_frozen(obj, TRUE);
+}
+
+/* Undo a view_freeze (and emit the changed signal) */
+void view_thaw(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->set_frozen(obj, FALSE);
 }

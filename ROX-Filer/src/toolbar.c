@@ -27,7 +27,6 @@
 
 #include "global.h"
 
-#include "collection.h"
 #include "toolbar.h"
 #include "options.h"
 #include "support.h"
@@ -97,11 +96,10 @@ static void drag_leave(GtkWidget	*widget,
 static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
-static void coll_selection_changed(Collection *collection, guint time,
-					gpointer user_data);
 static void toggle_shaded(GtkWidget *widget);
 static void option_notify(void);
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label);
+static void tally_items(gpointer key, gpointer value, gpointer data);
 
 static Tool all_tools[] = {
 	{N_("Close"), GTK_STOCK_CLOSE, N_("Close filer window"),
@@ -197,9 +195,73 @@ GtkWidget *toolbar_tool_option(int i)
 
 void toolbar_update_info(FilerWindow *filer_window)
 {
-	if (o_toolbar.int_value != TOOLBAR_NONE && o_toolbar_info.int_value)
-		coll_selection_changed(filer_window->collection,
-				GDK_CURRENT_TIME, NULL);
+	gchar		*label;
+	ViewIface	*view;
+	int		n_selected;
+
+	if (o_toolbar.int_value == TOOLBAR_NONE || !o_toolbar_info.int_value)
+		return;		/* Not showing info */
+
+	if (filer_window->target_cb)
+		return;
+
+	view = filer_window->view;
+
+	n_selected = view_count_selected(view);
+
+	if (n_selected == 0)
+	{
+		gchar *s = NULL;
+		int   n_items;
+
+		if (filer_window->scanning)
+		{
+			gtk_label_set_text(
+				GTK_LABEL(filer_window->toolbar_text), "");
+			return;
+		}
+
+		if (!filer_window->show_hidden)
+		{
+			GHashTable *hash = filer_window->directory->known_items;
+			int	   tally = 0;
+
+			g_hash_table_foreach(hash, tally_items, &tally);
+
+			if (tally)
+				s = g_strdup_printf(_(" (%u hidden)"), tally);
+		}
+
+		n_items = view_count_items(view);
+
+		if (n_items)
+			label = g_strdup_printf("%d %s%s",
+					n_items,
+					n_items != 1 ? _("items") : _("item"),
+					s ? s : "");
+		else /* (French plurals work differently for zero) */
+			label = g_strdup_printf(_("No items%s"),
+					s ? s : "");
+		g_free(s);
+	}
+	else
+	{
+		double	size = 0;
+		ViewIter iter;
+		DirItem *item;
+
+		view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
+
+		while ((item = iter.next(&iter)))
+			if (item->base_type != TYPE_DIRECTORY)
+				size += (double) item->size;
+
+		label = g_strdup_printf(_("%u selected (%s)"),
+				n_selected, format_double_size(size));
+	}
+
+	gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), label);
+	g_free(label);
 }
 
 /* Create, destroy or recreate toolbar for this window so that it
@@ -369,11 +431,6 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	gtk_toolbar_append_widget(GTK_TOOLBAR(bar),
 				  filer_window->toolbar_text, NULL, NULL);
 
-	if (o_toolbar_info.int_value)
-		g_signal_connect_object(filer_window->collection,
-				"selection_changed",
-				G_CALLBACK(coll_selection_changed), bar, 0);
-
 	return bar;
 }
 
@@ -525,79 +582,6 @@ static void tally_items(gpointer key, gpointer value, gpointer data)
 
 	if (leafname[0] == '.')
 		(*tally)++;
-}
-
-static void coll_selection_changed(Collection *collection, guint time,
-					gpointer user_data)
-{
-	FilerWindow	*filer_window;
-	gchar		*label;
-	ViewIface	*view;
-	int		n_selected;
-
-	filer_window = g_object_get_data(G_OBJECT(collection), "filer_window");
-	g_return_if_fail(filer_window != NULL);
-
-	view = filer_window->view;
-
-	if (filer_window->target_cb)
-		return;
-
-	n_selected = view_count_selected(view);
-
-	if (n_selected == 0)
-	{
-		gchar *s = NULL;
-		int   n_items;
-
-		if (filer_window->scanning)
-		{
-			gtk_label_set_text(
-				GTK_LABEL(filer_window->toolbar_text), "");
-			return;
-		}
-
-		if (!filer_window->show_hidden)
-		{
-			GHashTable *hash = filer_window->directory->known_items;
-			int	   tally = 0;
-
-			g_hash_table_foreach(hash, tally_items, &tally);
-
-			if (tally)
-				s = g_strdup_printf(_(" (%u hidden)"), tally);
-		}
-
-		n_items = view_count_items(view);
-
-		if (n_items)
-			label = g_strdup_printf("%d %s%s",
-					n_items,
-					n_items != 1 ? _("items") : _("item"),
-					s ? s : "");
-		else /* (French plurals work differently for zero) */
-			label = g_strdup_printf(_("No items%s"),
-					s ? s : "");
-		g_free(s);
-	}
-	else
-	{
-		double	size = 0;
-		ViewIter iter;
-		DirItem *item;
-
-		view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
-
-		while ((item = iter.next(&iter)))
-			if (item->base_type != TYPE_DIRECTORY)
-				size += (double) item->size;
-
-		label = g_strdup_printf(_("%u selected (%s)"),
-				n_selected, format_double_size(size));
-	}
-
-	gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), label);
-	g_free(label);
 }
 
 static void option_notify(void)

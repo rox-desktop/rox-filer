@@ -266,15 +266,18 @@ static void show_help(FilerWindow *filer_window)
 static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	Collection 	*collection = filer_window->collection;
-	int		item = collection->cursor_item;
 	const gchar	*path, *pattern;
 	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
+	ViewIter	iter;
+	DirItem		*item;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 	pattern = g_basename(path);
 
-	if (item == -1 || item >= collection->number_of_items ||
-			!matches(collection, item, pattern))
+	view_get_cursor(filer_window->view, &iter);
+
+	item = iter.peek(&iter);
+	if (item == NULL || !matches(collection, iter.i, pattern)) /* XXX */
 	{
 		gdk_beep();
 		return;
@@ -283,7 +286,7 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	if ((event->state & GDK_SHIFT_MASK) != 0)
 		flags |= OPEN_SHIFT;
 
-	filer_openitem(filer_window, item, flags);
+	filer_openitem(filer_window, &iter, flags);
 }
 
 /* Use the cursor item to fill in the minibuffer.
@@ -779,13 +782,32 @@ static void shell_recall(FilerWindow *filer_window, int dir)
 
 /*			SELECT IF			*/
 
+typedef struct {
+	FindInfo info;
+	FilerWindow *filer_window;
+	FindCondition *cond;
+} SelectData;
+
+static gboolean select_if_test(ViewIter *iter, gpointer user_data)
+{
+	DirItem *item;
+	SelectData *data = user_data;
+
+	item = iter->peek(iter);
+	g_return_val_if_fail(item != NULL, FALSE);
+
+	data->info.leaf = item->leafname;
+	data->info.fullpath = make_path(data->filer_window->sym_path,
+					data->info.leaf)->str;
+
+	return lstat(data->info.fullpath, &data->info.stats) == 0 &&
+			find_test_condition(data->cond, &data->info);
+}
+
 static void select_return_pressed(FilerWindow *filer_window, guint etime)
 {
-	FindCondition	*cond;
-	int		i, n;
 	const gchar	*entry;
-	Collection	*collection = filer_window->collection;
-	FindInfo	info;
+	SelectData	data;
 
 	entry = mini_contents(filer_window);
 
@@ -794,45 +816,20 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 
 	add_to_history(entry);
 
-	cond = find_compile(entry);
-	if (!cond)
+	data.cond = find_compile(entry);
+	if (!data.cond)
 	{
 		delayed_error(_("Invalid Find condition"));
 		return;
 	}
 
-	info.now = time(NULL);
-	info.prune = FALSE;	/* (don't care) */
-	n = collection->number_of_items;
+	data.info.now = time(NULL);
+	data.info.prune = FALSE;	/* (don't care) */
+	data.filer_window = filer_window;
 
-	collection->block_selection_changed++;
+	view_select_if(filer_window->view, select_if_test, &data);
 
-	/* If an item at the start is selected then we could lose the
-	 * primary selection after checking that item and then need to
-	 * gain it again at the end. Therefore, if anything is selected
-	 * then select the last item until the end of the search.
-	 */
-	if (collection->number_selected)
-		collection_select_item(collection, n - 1);
-	
-	for (i = 0; i < n; i++)
-	{
-		DirItem *item = (DirItem *) collection->items[i].data;
-
-		info.leaf = item->leafname;
-		info.fullpath =
-			make_path(filer_window->sym_path, info.leaf)->str;
-
-		if (lstat(info.fullpath, &info.stats) == 0 &&
-				find_test_condition(cond, &info))
-			collection_select_item(collection, i);
-		else
-			collection_unselect_item(collection, i);
-	}
-
-	find_condition_free(cond);
-
-	collection_unblock_selection_changed(collection, etime, TRUE);
+	find_condition_free(data.cond);
 out:
 	minibuffer_hide(filer_window);
 }

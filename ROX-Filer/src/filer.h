@@ -31,7 +31,10 @@ typedef enum
 	FILER_CREATE_THUMBS	= 0x04, /* Create thumbs when scan ends */
 } FilerFlags;
 
-typedef void (*TargetFunc)(FilerWindow *filer_window, int item, gpointer data);
+/* iter's next method has just returned the clicked item... */
+typedef void (*TargetFunc)(FilerWindow *filer_window,
+			   ViewIter *iter,
+			   gpointer data);
 
 struct _FilerWindow
 {
@@ -98,8 +101,7 @@ void filer_update_all(void);
 DirItem *filer_selected_item(FilerWindow *filer_window);
 void change_to_parent(FilerWindow *filer_window);
 void full_refresh(void);
-void filer_openitem(FilerWindow *filer_window, int item_number,
-		OpenFlags flags);
+void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags);
 void filer_check_mounted(const char *real_path);
 void filer_close_recursive(const char *path);
 void filer_change_to(FilerWindow *filer_window,

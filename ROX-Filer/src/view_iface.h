@@ -16,9 +16,11 @@ enum {
 };
 
 typedef struct _ViewIfaceClass	ViewIfaceClass;
-typedef struct _ViewIter	ViewIter;
 
 struct _ViewIter {
+	/* Returns the value last returned by next() */
+	DirItem	   *(*peek)(ViewIter *iter);
+
 	DirItem	   *(*next)(ViewIter *iter);
 
 	/* private fields */
@@ -39,13 +41,21 @@ struct _ViewIfaceClass {
 			gboolean (*test)(gpointer item, gpointer data),
 			gpointer data);
 	void (*clear)(ViewIface *obj);
+	void (*select_all)(ViewIface *obj);
 	void (*clear_selection)(ViewIface *obj);
 	int (*count_items)(ViewIface *obj);
 	int (*count_selected)(ViewIface *obj);
 	void (*show_cursor)(ViewIface *obj);
 
 	void (*get_iter)(ViewIface *obj, ViewIter *iter);
+	void (*get_cursor)(ViewIface *obj, ViewIter *iter);
 	void (*cursor_to_iter)(ViewIface *obj, ViewIter *iter);
+
+	void (*set_selected)(ViewIface *obj, ViewIter *iter, gboolean selected);
+	gboolean (*get_selected)(ViewIface *obj, ViewIter *iter);
+	void (*set_frozen)(ViewIface *obj, gboolean frozen);
+	void (*select_only)(ViewIface *obj, ViewIter *iter);
+	void (*wink_item)(ViewIface *obj, ViewIter *iter);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -75,12 +85,25 @@ void view_delete_if(ViewIface *obj,
 		    gboolean (*test)(gpointer item, gpointer data),
 		    gpointer data);
 void view_clear(ViewIface *obj);
+void view_select_all(ViewIface *obj);
 void view_clear_selection(ViewIface *obj);
 int view_count_items(ViewIface *obj);
 int view_count_selected(ViewIface *obj);
 void view_show_cursor(ViewIface *obj);
 
 void view_get_iter(ViewIface *obj, ViewIter *iter, int flags);
+void view_get_cursor(ViewIface *obj, ViewIter *iter);
 void view_cursor_to_iter(ViewIface *obj, ViewIter *iter);
+
+void view_set_selected(ViewIface *obj, ViewIter *iter, gboolean selected);
+gboolean view_get_selected(ViewIface *obj, ViewIter *iter);
+void view_select_only(ViewIface *obj, ViewIter *iter);
+void view_freeze(ViewIface *obj);
+void view_thaw(ViewIface *obj);
+void view_select_if(ViewIface *obj,
+		    gboolean (*test)(ViewIter *iter, gpointer data),
+		    gpointer data);
+
+void view_wink_item(ViewIface *obj, ViewIter *iter);
 
 #endif /* __VIEW_IFACE_H__ */
