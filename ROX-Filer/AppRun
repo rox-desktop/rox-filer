@@ -15,7 +15,12 @@ PLATFORM=`uname -s`-$ARCH
 DEBUGGER=""
 
 case $1 in
-	--debug) shift ; DEBUGGER="gdb --args" ; DEBUG_OPTIONS="-n --g-fatal-warnings";;
+	--debug) shift ;
+		if [ "$#" == 0 ] ; then
+		  DEBUGGER="gdb --args" ; DEBUG_OPTIONS="-n --g-fatal-warnings"
+		else
+		  DEBUGGER="gdb"
+		fi ;;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
 	--compile)
 		shift
