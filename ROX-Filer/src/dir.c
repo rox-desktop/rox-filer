@@ -250,7 +250,7 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid)
 		{
 			if (info.st_size > MAX_ICON_SIZE ||
-						!S_ISREG(icon.st_mode))
+						!S_ISREG(info.st_mode))
 			{
 				/* Don't let nasty files cause us trouble */
 				/* (Note: slight race here) */
