@@ -9,7 +9,7 @@
 #define _DND_H
 
 #include <gtk/gtk.h>
-#include <collection.h>
+#include "collection.h"
 
 void drag_selection(Collection 		*collection,
 		    GdkEventMotion 	*event,

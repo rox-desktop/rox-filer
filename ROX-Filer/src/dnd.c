@@ -18,7 +18,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gtk/gtk.h>
-#include <collection.h>
+#include "collection.h"
 
 #include "filer.h"
 #include "action.h"

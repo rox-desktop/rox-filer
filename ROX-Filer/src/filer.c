@@ -18,7 +18,7 @@
 #include <gdk/gdkx.h>
 #include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include <gdk/gdkkeysyms.h>
-#include <collection.h>
+#include "collection.h"
 
 #include "main.h"
 #include "support.h"

@@ -12,7 +12,7 @@
 #include <errno.h>
 
 #include <gtk/gtk.h>
-#include <collection.h>
+#include "collection.h"
 
 #include "support.h"
 #include "gui_support.h"

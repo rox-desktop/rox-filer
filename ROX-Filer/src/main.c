@@ -14,7 +14,7 @@
 #include <fcntl.h>
 
 #include <gtk/gtk.h>
-#include <collection.h>
+#include "collection.h"
 
 #include "main.h"
 #include "gui_support.h"

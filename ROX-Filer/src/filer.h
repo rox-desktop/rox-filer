@@ -9,7 +9,7 @@
 #define _FILER_H
 
 #include <gtk/gtk.h>
-#include <collection.h>
+#include "collection.h"
 #include "pixmaps.h"
 #include <sys/types.h>
 #include <dirent.h>
