@@ -4,12 +4,9 @@
                 version='1.0'>
 
 		<xsl:import href="/usr/share/sgml/docbook/stylesheet/xsl/nwalsh/html/docbook.xsl"/>
-
+<!--
   <xsl:param name="generate.component.toc">0</xsl:param>
-
-  <!-- Try to stop Netscape mucking things up using media.
-  <xsl:param name="html.stylesheet">../style.css</xsl:param>
-  -->
+-->
   <xsl:template name="head.content">
     <link rel="stylesheet" href="../style.css" type="text/css" media="all"/>
     <title><xsl:value-of select='/book/bookinfo/title'/></title>
@@ -44,19 +41,11 @@
   </xsl:template>
 
   <xsl:template match="book">
-    <xsl:variable name="id">
-      <xsl:call-template name="object.id"/>
-    </xsl:variable>
-    <div class="{name(.)}" id="{$id}">
-      <div class="chapter">
-        <xsl:call-template name="book.titlepage"/>
-        <xsl:apply-templates select="dedication" mode="dedication"/>
-        <xsl:if test="$generate.book.toc != '0'">
-          <xsl:call-template name="division.toc"/>
-        </xsl:if>
-      </div>
-      <xsl:apply-templates/>
+    <div class='chapter'>
+      <xsl:call-template name="book.titlepage"/>
+      <xsl:call-template name="division.toc"/>
     </div>
+    <xsl:apply-templates/>
   </xsl:template>
 
   <xsl:template match="othercredit" mode="titlepage.mode">
