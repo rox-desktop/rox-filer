@@ -111,7 +111,7 @@ void read_globicons()
 		/* Handle the new XML file format */
 		for (node = root->xmlChildrenNode; node; node = node->next)
 		{
-			gchar *path;
+			gchar *path, *icon_path;
 
 			if (node->type != XML_ELEMENT_NODE)
 				continue;
@@ -124,11 +124,22 @@ void read_globicons()
 			if (!match)
 				continue;
 
+			icon_path = xmlNodeGetContent(icon);
+#ifndef GTK2
+			{
+				gchar *loc_match, *loc_icon;
+				
+				loc_match = from_utf8(match);
+				path = icon_convert_path(loc_match);
+				g_free(loc_match);
+				loc_icon = from_utf8(icon_path);
+				g_hash_table_insert(glob_icons, path, loc_icon);
+			}
+#else
 			path = icon_convert_path(match);
+			g_hash_table_insert(glob_icons, path, icon_path);
+#endif
 			g_free(match);
-
-			g_hash_table_insert(glob_icons, path,
-					xmlNodeGetContent(icon));
 		}
 
 		xmlFreeDoc(doc);
@@ -367,10 +378,20 @@ static void write_globicon(gpointer key, gpointer value, gpointer data)
 {
 	xmlNodePtr doc = (xmlNodePtr) data;
 	xmlNodePtr tree;
+#ifndef GTK2
+	gchar	   *u8_path, *u8_icon;
 
+	u8_path = to_utf8((gchar *) key);
+	u8_icon = to_utf8((gchar *) value);
+
+	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
+	xmlSetProp(tree, "match", u8_path);
+	xmlNewChild(tree, NULL, "icon", u8_icon);
+#else
 	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
 	xmlSetProp(tree, "match", key);
 	xmlNewChild(tree, NULL, "icon", value);
+#endif
 }
 
 /* Write globicons file */
