@@ -1077,10 +1077,13 @@ static void savebox_show(const gchar *action, const gchar *path,
 		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
 	else
 	{
-		gchar *u8;
-		u8 = to_utf8(path);
-		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), u8);
+		gchar *u8, *dir;
+		dir = g_path_get_dirname(path);
+		u8 = to_utf8(g_basename(path));
+		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox),
+				make_path(dir, u8));
 		g_free(u8);
+		g_free(dir);
 	}
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixbuf);
 	g_object_unref(image);
