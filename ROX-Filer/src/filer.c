@@ -197,6 +197,10 @@ void filer_window_autosize(FilerWindow *filer_window)
 	int 		nx, ny;
 	int 		maxw, maxh;
 
+	/* Include items that are about to be added... */
+	if (filer_window->scanning)
+		n += filer_window->directory->new_items->len;
+
 	maxw = (2 * screen_width) / (collection->item_width * 3);
 	maxh = (2 * screen_height) / (collection->item_height * 3);
 
