@@ -46,10 +46,15 @@
 #include "pixmaps.h"
 #include "mount.h"
 #include "appinfo.h"
+#include "type.h"
+#include "usericons.h"
 
 typedef void (*RenameFn)(Icon *icon);
 
 static GtkWidget	*icon_menu;		/* The popup icon menu */
+static GtkWidget	*icon_file_menu;	/* The file submenu */
+static GtkWidget	*icon_file_item;	/* 'File' label */
+static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
 
 static GtkTooltips	*tooltips = NULL;
 
@@ -79,20 +84,34 @@ static void selection_get(GtkWidget *widget,
 		       guint      time,
 		       gpointer   data);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
-static void show(gpointer data, guint action, GtkWidget *widget);
+static void file_op(gpointer data, guint action, GtkWidget *widget);
 static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback);
 
-enum {ACTION_EDIT, ACTION_LOCATION, ACTION_INFO, ACTION_HELP};
+enum {
+	ACTION_SHIFT,
+	ACTION_HELP,
+	ACTION_INFO,
+	ACTION_RUN_ACTION,
+	ACTION_SET_ICON,
+	ACTION_EDIT,
+	ACTION_LOCATION,
+};
 
+#undef N_
+#define N_(x) x
 static GtkItemFactoryEntry menu_def[] = {
-{N_("ROX-Filer Help"),		NULL, menu_rox_help, 0, NULL},
-{N_("ROX-Filer Options..."),	NULL, menu_show_options, 0, NULL},
-{N_("Open Home Directory"),	NULL, open_home, 0, NULL},
-{"",				NULL, NULL, 0, "<Separator>"},
-{N_("Edit Icon"),  		NULL, show, ACTION_EDIT, NULL},
-{N_("Show Location"),  		NULL, show, ACTION_LOCATION, NULL},
-{N_("Show Info"),    		NULL, show, ACTION_INFO, NULL},
-{N_("Show Help"),    		NULL, show, ACTION_HELP, NULL},
+{N_("ROX-Filer"),		NULL, NULL, 0, "<Branch>"},
+{">" N_("Help"),		NULL, menu_rox_help, 0, NULL},
+{">" N_("Options..."),		NULL, menu_show_options, 0, NULL},
+{">" N_("Home Directory"),	NULL, open_home, 0, NULL},
+{N_("File"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Shift Open"),   	NULL, file_op, ACTION_SHIFT, NULL},
+{">" N_("Help"),    		NULL, file_op, ACTION_HELP, NULL},
+{">" N_("Info"),    		NULL, file_op, ACTION_INFO, NULL},
+{">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, NULL},
+{">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
+{N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, NULL},
+{N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, NULL},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
 };
 
@@ -102,6 +121,8 @@ static GtkItemFactoryEntry menu_def[] = {
 
 void icon_init(void)
 {
+	GList		*items;
+	GtkItemFactory	*item_factory;
 	GtkTargetEntry 	target_table[] =
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
@@ -110,8 +131,23 @@ void icon_init(void)
 
 	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-	icon_menu = menu_create(menu_def, sizeof(menu_def) / sizeof(*menu_def),
+	item_factory = menu_create(menu_def,
+				sizeof(menu_def) / sizeof(*menu_def),
 				 "<icon>");
+	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
+	icon_file_menu = gtk_item_factory_get_widget(item_factory,
+					"<icon>/File");
+
+	/* File '' label... */
+	items = gtk_container_children(GTK_CONTAINER(icon_menu));
+	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
+
+	/* Shift Open... label */
+	items = gtk_container_children(GTK_CONTAINER(icon_file_menu));
+	file_shift_item = GTK_BIN(items->data)->child;
+	g_list_free(items);
+
 	gtk_signal_connect(GTK_OBJECT(icon_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
@@ -335,18 +371,36 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
 		(icon_selection || menu_icon) ? FALSE : TRUE,
-		8, 1);
+		4, 1);
 
-	/* Shade the Rename/Location/Help items an item was clicked */
+	menu_show_shift_action(file_shift_item, icon ? &icon->item : NULL,
+			FALSE);
+
+	/* Shade the File/Edit/Show items unless an item was clicked */
 	if (icon)
 	{
-		menu_set_items_shaded(icon_menu, FALSE, 4, 4);
+		guchar *tmp;
+
+		menu_set_items_shaded(icon_menu, FALSE, 1, 3);
+		menu_set_items_shaded(icon_file_menu, FALSE, 0, 5);
+		if (!can_set_run_action(&icon->item))
+			menu_set_items_shaded(icon_file_menu, TRUE, 3, 1);
+
+		tmp = g_strdup_printf("%s '%s'",
+				basetype_name(&icon->item),
+				icon->item.leafname);
+		gtk_label_set_text(GTK_LABEL(icon_file_item), tmp);
+		g_free(tmp);
 
 		/* Check for app-specific menu */
 		appmenu_add(icon->path, &icon->item, icon_menu);
 	}
 	else
-		menu_set_items_shaded(icon_menu, TRUE, 4, 4);
+	{
+		menu_set_items_shaded(icon_menu, TRUE, 1, 3);
+		menu_set_items_shaded(icon_file_menu, TRUE, 0, 5);
+		gtk_label_set_text(GTK_LABEL(icon_file_item), _("Nothing"));
+	}
 
 	if (panel)
 	{
@@ -654,7 +708,7 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	if (!next)
 	{
 		delayed_error(PROJECT,
-			_("You must first select some icons to remove"));
+			_("You must first select some items to remove"));
 		return;
 	}
 
@@ -688,17 +742,21 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-static void show(gpointer data, guint action, GtkWidget *widget)
+static void file_op(gpointer data, guint action, GtkWidget *widget)
 {
 	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
-			_("You must open the menu over an icon"));
+			_("You must open the menu over an item"));
 		return;
 	}
 
 	switch (action)
 	{
+		case ACTION_SHIFT:
+			run_diritem(menu_icon->path, &menu_icon->item,
+					NULL, TRUE);
+			break;
 		case ACTION_EDIT:
 			show_rename_box(menu_icon->widget,
 					menu_icon, rename_cb);
@@ -711,6 +769,19 @@ static void show(gpointer data, guint action, GtkWidget *widget)
 			break;
 		case ACTION_INFO:
 			infobox_new(menu_icon->path);
+			break;
+		case ACTION_RUN_ACTION:
+			if (can_set_run_action(&menu_icon->item))
+				type_set_handler_dialog(
+						menu_icon->item.mime_type);
+			else
+				report_error(PROJECT,
+				_("You can only set the run action for a "
+				"regular file"));
+			break;
+		case ACTION_SET_ICON:
+			icon_set_handler_dialog(&menu_icon->item,
+						menu_icon->path);
 			break;
 	}
 }
@@ -726,7 +797,7 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	GtkWidget	*dialog, *hbox, *vbox, *label, *entry, *button;
 
 	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Icon"));
+	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
 	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
 
 	vbox = gtk_vbox_new(FALSE, 4);

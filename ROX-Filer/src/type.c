@@ -726,3 +726,15 @@ int mode_to_base_type(int st_mode)
 
 	return TYPE_UNKNOWN;
 }
+
+/* Returns TRUE is this is something that is run by looking up its type
+ * in MIME-types and, hence, can have its run action set.
+ */
+gboolean can_set_run_action(DirItem *item)
+{
+	g_return_val_if_fail(item != NULL, FALSE);
+
+	return item->base_type == TYPE_FILE &&
+		!(item->mime_type == &special_exec);
+}
+

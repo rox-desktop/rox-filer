@@ -76,7 +76,6 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 static void mark_menus_modified(gboolean mod);
 static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new);
-static gboolean can_set_run_action(DirItem *item);
 static gboolean link_cb(guchar *initial, guchar *path);
 static void select_nth_item(GtkMenuShell *shell, int n);
 
@@ -340,12 +339,12 @@ void menu_init(void)
 }
 
 /* Name is in the form "<panel>" */
-GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
+GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
+			    guchar *name)
 {
 	GtkItemFactory  	*item_factory;
 	GtkItemFactoryEntry	*translated;
 	GtkAccelGroup		*keys;
-	GtkWidget		*menu;
 
 	keys = gtk_accel_group_new();
 
@@ -356,11 +355,9 @@ GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
 					translated, NULL);
 	free_translated_entries(translated, n_entries);
 
-	menu = gtk_item_factory_get_widget(item_factory, name);
-
 	gtk_accel_group_lock(keys);
 
-	return menu;
+	return item_factory;
 }
  
 static void items_sensitive(gboolean state)
@@ -421,7 +418,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 {
 	DirItem		*file_item = NULL;
 	int		pos[2];
-	guchar		*shift_action;
 	int		button;
 	GdkModifierType	state = 0;
 	guint32		time = 0;
@@ -504,41 +500,12 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 		g_string_free(buffer, TRUE);
 
-		shift_action = NULL;
-		if (collection->number_selected == 1)
-		{
-			if (file_item->flags & ITEM_FLAG_MOUNT_POINT)
-			{
-				if (file_item->flags & ITEM_FLAG_MOUNTED)
-					shift_action = N_("Unmount");
-				else
-					shift_action = N_("Mount");
-			}
-			else if (file_item->flags & ITEM_FLAG_SYMLINK)
-			{
-				shift_action = N_("Show Target");
-				appmenu_add(make_path(filer_window->path,
-						    file_item->leafname)->str,
-						 file_item,
-						 filer_file_menu);
-			}
-			else if (file_item->base_type == TYPE_DIRECTORY)
-			{
-				shift_action = N_("Look Inside");
-				appmenu_add(make_path(filer_window->path,
-						    file_item->leafname)->str,
-						 file_item,
-						 filer_file_menu);
-			}
-			else if (file_item->base_type == TYPE_FILE)
-				shift_action = N_("Open As Text");
-		}
-		gtk_widget_set_sensitive(file_shift_item,
-					 shift_action != NULL ||
-					 collection->number_selected == 0);
-		gtk_label_set_text(GTK_LABEL(file_shift_item),
-				shift_action ? _(shift_action)
-					     : _("Shift Open"));
+		menu_show_shift_action(file_shift_item, file_item,
+				collection->number_selected == 0);
+		if (file_item)
+			appmenu_add(make_path(filer_window->path,
+						file_item->leafname)->str,
+					file_item, filer_file_menu);
 	}
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
@@ -591,6 +558,35 @@ void target_callback(FilerWindow *filer_window,
 	((GtkItemFactoryCallback1) real_fn)(NULL, 0, GTK_WIDGET(collection));
 	if (item < collection->number_of_items)
 		collection_unselect_item(collection, item);
+}
+
+/* Set the text of the 'Shift Open...' menu item.
+ * If icon is NULL, reset the text and also shade it, unless 'next'.
+ */
+void menu_show_shift_action(GtkWidget *menu_item, DirItem *item, gboolean next)
+{
+	guchar		*shift_action = NULL;
+
+	if (item)
+	{
+		if (item->flags & ITEM_FLAG_MOUNT_POINT)
+		{
+			if (item->flags & ITEM_FLAG_MOUNTED)
+				shift_action = N_("Unmount");
+			else
+				shift_action = N_("Mount");
+		}
+		else if (item->flags & ITEM_FLAG_SYMLINK)
+			shift_action = N_("Show Target");
+		else if (item->base_type == TYPE_DIRECTORY)
+			shift_action = N_("Look Inside");
+		else if (item->base_type == TYPE_FILE)
+			shift_action = N_("Open As Text");
+	}
+	gtk_label_set_text(GTK_LABEL(menu_item),
+			shift_action ? _(shift_action)
+				     : _("Shift Open"));
+	gtk_widget_set_sensitive(menu_item, shift_action != NULL || next);
 }
 
 /* Actions */
@@ -1409,18 +1405,6 @@ static void mark_menus_modified(gboolean mod)
 
 	g_hash_table_foreach(class->item_ht, mark_modified,
 			GINT_TO_POINTER(mod));
-}
-
-
-/* Returns TRUE is this is something that is run by looking up its type
- * in MIME-types and, hence, can have its run action set.
- */
-static gboolean can_set_run_action(DirItem *item)
-{
-	g_return_val_if_fail(item != NULL, FALSE);
-
-	return item->base_type == TYPE_FILE &&
-		!(item->mime_type == &special_exec);
 }
 
 static void select_nth_item(GtkMenuShell *shell, int n)

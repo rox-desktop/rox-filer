@@ -165,6 +165,9 @@ If you've just got hold of the filer by downloading the source archive then
  with your system, then you can skip this section.
  If you got here by clicking on the `i' symbol in a filer window, or if
  typing `rox' at a shell prompt works, then you don't need to compile.
+\layout Standard
+
+To compile, you will need the following:
 \layout Itemize
 
 Unix or Linux (root access is not required),
@@ -182,7 +185,7 @@ GTK+ 1.2.0 or later (libraries and headers) --- get the latest version from
 ,
 \layout Itemize
 
-A C compiler (standard on most systems).
+A C compiler, such as `gcc' (standard on most systems).
 \layout Standard
 
 All of the above are standard on most modern Linux distributions.
@@ -248,7 +251,7 @@ ROX-Filer will perform various checks to find out what kind of system it
 \begin_deeper 
 \layout Standard
 
-The executables files are stored inside the ROX-Filer directory in a different
+The executable file is stored inside the ROX-Filer directory in a different
  subdirectory for each platform.
  Therefore, you can compile the same application on several different types
  of machine and then run it from any of them using the AppRun script.
@@ -679,7 +682,7 @@ The full list of options is:
 \layout Description
 
 -x,\SpecialChar ~
---examine=FILE FILE has changed - re-examine it
+--examine=FILE FILE has changed --- re-examine it
 \layout Description
 
 -v,\SpecialChar ~
