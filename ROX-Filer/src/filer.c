@@ -25,7 +25,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <sys/stat.h>
 #include <sys/param.h>
 #include <unistd.h>
 #include <time.h>
@@ -64,8 +63,7 @@ extern int collection_menu_button;
 extern gboolean collection_single_click;
 
 FilerWindow 	*window_with_focus = NULL;
-GdkFont	   *fixed_font = NULL;
-GList	*all_filer_windows = NULL;
+GList		*all_filer_windows = NULL;
 
 static FilerWindow *window_with_selection = NULL;
 
@@ -189,8 +187,6 @@ void filer_init()
 	option_register("filer_menu_on_2", filer_menu_on_2);
 	option_register("filer_single_click", filer_single_click);
 	option_register("filer_toolbar", filer_toolbar);
-
-	fixed_font = gdk_font_load("fixed");
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 
@@ -621,37 +617,15 @@ char *details(DirItem *item)
 	if (!buf)
 		buf = g_string_new(NULL);
 
-	g_string_sprintf(buf, "%s, %c%c%c:%c%c%c:%c%c%c:%c%c"
-#ifdef S_ISVTX
-			"%c"
-#endif
-			", %s",
+	g_string_sprintf(buf, "%s, %s, %s",
 			S_ISDIR(m) ? "Dir" :
 				S_ISCHR(m) ? "Char" :
 				S_ISBLK(m) ? "Blck" :
 				S_ISLNK(m) ? "Link" :
 				S_ISSOCK(m) ? "Sock" :
 				S_ISFIFO(m) ? "Pipe" : "File",
-
-			m & S_IRUSR ? 'r' : '-',
-			m & S_IWUSR ? 'w' : '-',
-			m & S_IXUSR ? 'x' : '-',
-
-			m & S_IRGRP ? 'r' : '-',
-			m & S_IWGRP ? 'w' : '-',
-			m & S_IXGRP ? 'x' : '-',
-
-			m & S_IROTH ? 'r' : '-',
-			m & S_IWOTH ? 'w' : '-',
-			m & S_IXOTH ? 'x' : '-',
-
-			m & S_ISUID ? 'U' : '-',
-			m & S_ISGID ? 'G' : '-',
-#ifdef S_ISVTX
-			m & S_ISVTX ? 'T' : '-',
-#endif
+			pretty_permissions(m),
 			format_size(item->size));
-
 	return buf->str;
 }
 

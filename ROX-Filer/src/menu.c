@@ -918,8 +918,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 5, 6);
-	g_string_sprintf(gstring, "%o", (unsigned int) info.st_mode);
-	label = gtk_label_new(gstring->str);
+	label = gtk_label_new(pretty_permissions(info.st_mode));
+	gtk_widget_set_style(label, fixed_style);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);
 	

@@ -30,6 +30,7 @@
 #include <grp.h>
 #include <fcntl.h>
 #include <sys/wait.h>
+#include <sys/stat.h>
 
 #include <glib.h>
 
@@ -225,5 +226,39 @@ int fork_exec_wait(char **argv)
 	};
 
 	return status;
+}
+
+/* Converts a file's mode to a string. Result is a pointer
+ * to a static buffer, valid until the next call.
+ */
+char *pretty_permissions(mode_t m)
+{
+	static char buffer[] = "rwx:rwx:rwx:UGT";
+	
+	sprintf(buffer, "%c%c%c:%c%c%c:%c%c%c:%c%c"
+#ifdef S_ISVTX
+			"%c"
+#endif
+			,
+
+			m & S_IRUSR ? 'r' : '-',
+			m & S_IWUSR ? 'w' : '-',
+			m & S_IXUSR ? 'x' : '-',
+
+			m & S_IRGRP ? 'r' : '-',
+			m & S_IWGRP ? 'w' : '-',
+			m & S_IXGRP ? 'x' : '-',
+
+			m & S_IROTH ? 'r' : '-',
+			m & S_IWOTH ? 'w' : '-',
+			m & S_IXOTH ? 'x' : '-',
+
+			m & S_ISUID ? 'U' : '-',
+			m & S_ISGID ? 'G' : '-'
+#ifdef S_ISVTX
+			, m & S_ISVTX ? 'T' : '-'
+#endif
+			);
+	return buffer;
 }
 

@@ -16,8 +16,6 @@
 #include "mount.h"
 #include "dir.h"
 
-extern GdkFont	   *fixed_font;
-
 typedef struct _FilerWindow FilerWindow;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 typedef enum {UNKNOWN_STYLE, LARGE_ICONS, SMALL_ICONS, FULL_INFO} DisplayStyle;

@@ -27,7 +27,7 @@ esac
 BIN=$APP_DIR/$PLATFORM/$PROG
 
 if [ -x $BIN ] ; then
-  exec $DEBUGGER $BIN $*
+  exec $DEBUGGER $BIN "$@"
 else
   echo "ERROR from $0:" >&2
   echo "I cannot find an executable file for your host type ($PLATFORM)." >&2

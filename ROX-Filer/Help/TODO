@@ -1,0 +1,62 @@
+			ROX-Filer
+			A RISCOS-like filer for X
+			by Thomas Leonard
+
+This is a list of features that should/will be added when I have time (or when
+someone sends patches!).
+
+
+BUGS
+
+Fix the Display menu so the indicators always show the current options.
+
+Copy/Rename/Link - use exec() instead of system() like the action windows do.
+		(prevents problems with shell special characters).
+
+Left/Right panels don't size correctly. Remove them altogether?
+
+GNOME toolbar doesn't work properly when detached. Is this a GTK+ problem?
+
+Cursor should be displayed shaded when the collection widget doesn't have
+the focus.
+
+
+MISSING FEATURES
+
+Permissions/Touch/Find
+
+Options for controlling the behaviour of filer action windows (eg force
+deletion of write-protected files).
+
+Open new windows with the same options as their parent and/or default values
+in the Options dialog.
+
+Drag and drop in the Copy/Rename/Link dialogs.
+
+Drop apps onto the iconbar to add them automatically.
+
+Allow data to be saved from an application via XDS directly into a panel
+application (and maybe apps in normal filer windows too).
+
+Disallow copying a directory into itself?
+
+Some visual indication that a directory is being rescanned?
+
+Back/Forwards browser style navigation?
+
+Textured window backgrounds (themes?)
+
+
+RISC OS COMPATIBILITY
+
+The menu opens with `File 'file'' under the pointer. Under RO it was the
+Display menu.
+
+Performing an action on the selection also cleared the selection.
+
+
+OTHERS
+
+Holding a file being saved over a directory should open the directory (Mac
+style)?  Make it optional?
+

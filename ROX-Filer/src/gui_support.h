@@ -15,6 +15,9 @@
 #define WIN_STATE_FIXED_POSITION  (1<<8) /* Window is fixed in position even */
 #define WIN_STATE_ARRANGE_IGNORE  (1<<9) /* Ignore for auto arranging */
 
+extern GdkFont	   	*fixed_font;
+extern GtkStyle   	*fixed_style;
+
 void gui_support_init();
 int get_choice(char *title,
 	       char *message,

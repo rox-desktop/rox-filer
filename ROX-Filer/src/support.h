@@ -23,5 +23,6 @@ char *user_name(uid_t uid);
 char *group_name(gid_t gid);
 char *format_size(unsigned long size);
 int fork_exec_wait(char **argv);
+char *pretty_permissions(mode_t m);
 
 #endif /* _SUPPORT_H */

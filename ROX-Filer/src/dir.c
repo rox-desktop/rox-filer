@@ -28,7 +28,6 @@
 #include "fscache.h"
 #include "mount.h"
 #include "pixmaps.h"
-#include "filer.h"
 
 GFSCache *dir_cache = NULL;
 
