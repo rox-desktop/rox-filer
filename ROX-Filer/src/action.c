@@ -24,7 +24,7 @@
  */
 
 /* Allow use of GtkText widget */
-#define GTK_ENABLE_BROKEN
+/* #define GTK_ENABLE_BROKEN */
 
 #include "config.h"
 
@@ -78,7 +78,13 @@ struct _GUIside
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-	GtkWidget 	*vbox, *log, *window, *dir, *log_hbox;
+#ifdef GTK2
+	GtkTextBuffer	*log;
+	GtkWidget	*log_view;
+#else
+	GtkWidget 	*log;
+#endif
+	GtkWidget 	*vbox, *window, *dir, *log_hbox;
 	GtkWidget	*quiet, *yes, *no, *quiet_flag;
 	int		child;		/* Process ID */
 	int		errors;
@@ -413,7 +419,9 @@ static void message_from_child(gpointer 	 data,
 {
 	char buf[5];
 	GUIside	*gui_side = (GUIside *) data;
-	GtkWidget *log = gui_side->log;
+#ifdef GTK2
+	GtkTextIter end;
+#endif
 
 	if (read_exact(source, buf, 4))
 	{
@@ -489,11 +497,22 @@ static void message_from_child(gpointer 	 data,
 			else if (*buffer == '!')
 				gui_side->errors++;
 
-			gtk_text_insert(GTK_TEXT(log),
+#ifdef GTK2
+			gtk_text_buffer_get_end_iter(gui_side->log, &end);
+			gtk_text_buffer_insert_with_tags_by_name(gui_side->log,
+					&end, buffer + 1, message_len - 1,
+					*buffer == '!' ? "red" : NULL, NULL);
+			gtk_text_view_scroll_to_iter(
+				GTK_TEXT_VIEW(gui_side->log_view),
+				&end,
+				0.0, FALSE, 0, 0);
+#else
+			gtk_text_insert(GTK_TEXT(gui_side->log),
 					NULL,
 					*buffer == '!' ? &red : NULL,
 					NULL,
 					buffer + 1, message_len - 1);
+#endif
 			g_free(buffer);
 			return;
 		}
@@ -519,8 +538,12 @@ static void message_from_child(gpointer 	 data,
 			report = g_strdup_printf(_("There were %d errors.\n"),
 							gui_side->errors);
 
+#ifdef GTK2
+		gtk_text_buffer_insert_at_cursor(gui_side->log, report, -1);
+#else
 		gtk_text_insert(GTK_TEXT(log), NULL, &red, NULL,
 				report, -1);
+#endif
 
 		g_free(report);
 	}
@@ -842,7 +865,7 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
 	int		child;
-	GtkWidget	*vbox, *button, *scrollbar, *actions;
+	GtkWidget	*vbox, *button, *scrollbar, *actions, *text;
 	struct sigaction act;
 
 	if (pipe(filedes))
@@ -924,11 +947,24 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gui_side->log_hbox = gtk_hbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->log_hbox, TRUE, TRUE, 4);
 
-	gui_side->log = gtk_text_new(NULL, NULL);
-	gtk_widget_set_usize(gui_side->log, 400, 100);
-	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
-				gui_side->log, TRUE, TRUE, 0);
-	scrollbar = gtk_vscrollbar_new(GTK_TEXT(gui_side->log)->vadj);
+#ifdef GTK2
+	text = gtk_text_view_new();
+	gui_side->log_view = text;
+	gui_side->log = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+	scrollbar = gtk_vscrollbar_new(NULL);
+	gtk_widget_set_scroll_adjustments(text, NULL,
+			gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
+	gtk_text_buffer_create_tag(gui_side->log, "red", "foreground", "red",
+			NULL);
+	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
+	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);
+#else
+	text = gui_side->log = gtk_text_new(NULL, NULL);
+	scrollbar = gtk_vscrollbar_new(GTK_TEXT(text)->vadj);
+#endif
+	gtk_widget_set_usize(text, 400, 100);
+	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox), text, TRUE, TRUE, 0);
+
 	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
 				scrollbar, FALSE, TRUE, 0);
 
