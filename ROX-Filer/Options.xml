@@ -21,7 +21,6 @@ If on: animal, Ben, zoo.</toggle>
     <slider name='small_width' label='Max Small Icons width' min='0' max='250' fixed='1'>Maximum width for the text beside a Small Icon.</slider>
     <spacer/>
     <label>Default settings for new windows:</label>
-    <spacer/>
     <menu name='size' label='Icon size'>
       <item label='Huge Icons' value='2'/>
       <item label='Large Icons' value='0'/>
@@ -82,12 +81,20 @@ See the manual for information about using panels.</label>
   </section>
   
   <section name='action' title='Action windows'>
+    <label>Action windows appear when you start a background
+operation, such as copying or deleting some files.</label>
+    <spacer/>
     <label>Auto-start (Quiet) these actions:</label>
-    <toggle name='copy' label='Copy'/>
-    <toggle name='move' label='Move'/>
-    <toggle name='link' label='Link'/>
-    <toggle name='delete' label='Delete'/>
-    <toggle name='mount' label='Mount'/>
+    <toggle name='copy' label='Copy'>Copy files without confirming first.</toggle>
+    <toggle name='move' label='Move'>Move files without confirming first.</toggle>
+    <toggle name='link' label='Link'>Create links to files without confirming first.</toggle>
+    <toggle name='delete' label='Delete'>Delete files without confirming first.</toggle>
+    <toggle name='mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
+    <spacer/>
+    <label>Default settings:</label>
+    <toggle name='force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
+    <toggle name='brief' label='Brief'>Don't display so much information in the message area.</toggle>
+    <toggle name='recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
   </section>
   <section name='toolbar' title='Toolbar'>
     <label>Unshade the tools you want:</label>

@@ -279,7 +279,8 @@ void dir_restat(guchar *path, DirItem *item, gboolean make_thumb)
 				item->image = g_fscache_lookup(pixmap_cache,
 								 tmp);
 			}
-			else
+
+			if (!item->image)
 			{
 				item->image = im_appdir;
 				pixmap_ref(item->image);

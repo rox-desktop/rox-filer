@@ -108,6 +108,7 @@ static size_t	size_tally;	/* For Disk Usage */
 static struct mode_change *mode_change = NULL;	/* For Permissions */
 static FindCondition *find_condition = NULL;	/* For Find */
 
+/* Only used by child */
 static gboolean o_force = FALSE;
 static gboolean o_brief = FALSE;
 static gboolean o_recurse = FALSE;
@@ -129,7 +130,8 @@ static gboolean send_error();
 static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
-static void add_toggle(GUIside *gui_side, guchar *label, guchar *code);
+static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
+			gboolean active);
 static gboolean reply(int fd, gboolean ignore_quiet);
 static gboolean remove_pinned_ok(GList *paths);
 
@@ -822,6 +824,10 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 		report_error(PROJECT, g_strerror(errno));
 		return NULL;
 	}
+
+	o_force = option_get_int("action_force");
+	o_brief = option_get_int("action_brief");
+	o_recurse = option_get_int("action_recurse");
 
 	child = fork();
 	switch (child)
@@ -1801,12 +1807,14 @@ static void list_cb(gpointer data)
 	send();
 }
 
-static void add_toggle(GUIside *gui_side, guchar *label, guchar *code)
+static void add_toggle(GUIside *gui_side, guchar *label, guchar *code,
+			gboolean active)
 {
 	GtkWidget	*check;
 
 	check = gtk_check_button_new_with_label(label);
 	gtk_object_set_data(GTK_OBJECT(check), "send-code", code);
+	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), active);
 	gtk_signal_connect(GTK_OBJECT(check), "clicked",
 			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), check, FALSE, TRUE, 0);
@@ -1960,10 +1968,10 @@ void action_delete(FilerWindow *filer_window)
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Delete"));
 	add_toggle(gui_side,
 		_("Force - don't confirm deletion of non-writeable items"),
-		"F");
+		"F", option_get_int("action_force"));
 	add_toggle(gui_side,
 		_("Brief - only log directories being deleted"),
-		"B");
+		"B", option_get_int("action_brief"));
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
@@ -2013,9 +2021,11 @@ void action_chmod(FilerWindow *filer_window)
 		return;
 
 	add_toggle(gui_side,
-		_("Brief - don't list processed files"), "B");
+		_("Brief - don't list processed files"),
+		"B", option_get_int("action_brief"));
 	add_toggle(gui_side,
-		_("Recurse - also change contents of subdirectories"), "R");
+		_("Recurse - also change contents of subdirectories"),
+		"R", option_get_int("action_recurse"));
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new(_("Command:"));
@@ -2105,6 +2115,9 @@ void action_init(void)
 	option_add_int("action_link", 1, NULL);
 	option_add_int("action_delete", 0, NULL);
 	option_add_int("action_mount", 1, NULL);
+	option_add_int("action_force", o_force, NULL);
+	option_add_int("action_brief", o_brief, NULL);
+	option_add_int("action_recurse", o_recurse, NULL);
 }
 
 #define MAX_ASK 4

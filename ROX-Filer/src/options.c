@@ -422,7 +422,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 		GtkWidget *eb;
 
 		eb = gtk_event_box_new();
-		gtk_widget_set_usize(eb, 8, 8);
+		gtk_widget_set_usize(eb, 12, 12);
 		gtk_box_pack_start(GTK_BOX(box), eb, FALSE, TRUE, 0);
 		return;
 	}
