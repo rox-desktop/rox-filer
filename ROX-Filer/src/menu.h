@@ -12,10 +12,6 @@
 
 extern GtkAccelGroup	*filer_keys;
 extern GtkWidget 	*popup_menu;
-extern char		*xterm_here_value;
-
-extern GtkWidget	*display_large_menu;	/* Display->Large With... */
-extern GtkWidget	*display_small_menu;	/* Display->Small With... */
 
 void menu_init(void);
 

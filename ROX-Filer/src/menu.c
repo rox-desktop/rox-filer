@@ -93,7 +93,7 @@ static void show_send_to_menu(GList *paths, GdkEvent *event);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
-/* (action used in these two - DetailsType) */
+/* (action used in these three - DetailsType) */
 static void huge_with(gpointer data, guint action, GtkWidget *widget);
 static void large_with(gpointer data, guint action, GtkWidget *widget);
 static void small_with(gpointer data, guint action, GtkWidget *widget);
@@ -140,11 +140,11 @@ static void home_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 /* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
-static void enter_path(gpointer data, guint action, GtkWidget *widget);
-static void shell_command(gpointer data, guint action, GtkWidget *widget);
+
+/* (action used in this - MiniType) */
+static void mini_buffer(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void set_icon(gpointer data, guint action, GtkWidget *widget);
-static void select_if(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
 
@@ -243,9 +243,9 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 {">" N_("Close Window"),	NULL, close_window, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
-{">" N_("Enter Path..."),	NULL, enter_path, 0, NULL},
-{">" N_("Shell Command..."),	NULL, shell_command, 0, NULL},
-{">" N_("Select If..."),	NULL, select_if, 0, NULL},
+{">" N_("Enter Path..."),	NULL, mini_buffer, MINI_PATH, NULL},
+{">" N_("Shell Command..."),	NULL, mini_buffer, MINI_SHELL, NULL},
+{">" N_("Select If..."),	NULL, mini_buffer, MINI_SELECT_IF, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show ROX-Filer Help"), NULL, menu_rox_help, 0, NULL},
 };
@@ -1062,17 +1062,14 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 	return TRUE;
 }
 
-#define SHOW_SAVEBOX(title, callback)	\
-{	\
-	DirItem	*item;	\
-	guchar	*path;	\
-	item = selected_item(collection);	\
-	path = make_path(window_with_focus->path, item->leafname)->str;	\
-	pixmap_ref(item->image);	\
-	savebox_show(title, path, item->image, callback);	\
-}
-
-static void copy_item(gpointer data, guint action, GtkWidget *widget)
+/* Open a savebox to act on the selected file. Error if multiple files
+ * are selected. If no files are selected, get one and call 'again'.
+ * Otherwise, call 'callback' later to perform the operation.
+ */
+static void src_dest_action_item(guchar *prompt,
+				 guchar *title,
+				 void (*again)(gpointer, guint, GtkWidget *),
+				 gboolean (*callback)(guchar *, guchar *))
 {
 	Collection *collection;
 	
@@ -1081,16 +1078,29 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_rox_error(_("You cannot do this to more than "
-						"one item at a time"));
-		return;
+		report_rox_error(_("%s: You cannot do this to more than "
+						"one item at a time"), title);
 	}
 	else if (collection->number_selected != 1)
+	{
 		filer_target_mode(window_with_focus,
-				target_callback, copy_item,
-				_("Copy ... ?"));
+				target_callback, again, prompt);
+	}
 	else
-		SHOW_SAVEBOX(_("Copy"), copy_cb);
+	{
+	        DirItem	*item;
+		guchar	*path;
+
+		item = selected_item(collection);
+		path = make_path(window_with_focus->path, item->leafname)->str;
+		pixmap_ref(item->image);
+		savebox_show(title, path, item->image, callback);
+	}
+}
+
+static void copy_item(gpointer data, guint action, GtkWidget *widget)
+{
+	src_dest_action_item(_("Copy ... ?"), _("Copy"), copy_item, copy_cb);
 }
 
 static gboolean rename_cb(guchar *current, guchar *new)
@@ -1100,23 +1110,8 @@ static gboolean rename_cb(guchar *current, guchar *new)
 
 static void rename_item(gpointer data, guint action, GtkWidget *widget)
 {
-	Collection *collection;
-	
-	g_return_if_fail(window_with_focus != NULL);
-
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_rox_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-		filer_target_mode(window_with_focus,
-				target_callback, rename_item,
-				_("Rename ... ?"));
-	else
-		SHOW_SAVEBOX(_("Rename"), rename_cb);
+	src_dest_action_item(_("Rename ... ?"), _("Rename"),
+				rename_item, rename_cb);
 }
 
 static gboolean link_cb(guchar *initial, guchar *path)
@@ -1145,23 +1140,9 @@ static gboolean link_cb(guchar *initial, guchar *path)
 
 static void link_item(gpointer data, guint action, GtkWidget *widget)
 {
-	Collection *collection;
-	
-	g_return_if_fail(window_with_focus != NULL);
+	src_dest_action_item(_("Symlink ... ?"), _("Symlink"),
+				link_item, link_cb);
 
-	collection = window_with_focus->collection;
-	if (collection->number_selected > 1)
-	{
-		report_rox_error(_("You cannot do this to more than "
-				"one item at a time"));
-		return;
-	}
-	else if (collection->number_selected != 1)
-		filer_target_mode(window_with_focus,
-				target_callback, link_item,
-				_("Symlink ... ?"));
-	else
-		SHOW_SAVEBOX(_("Symlink"), link_cb);
 }
 
 static void open_file(gpointer data, guint action, GtkWidget *widget)
@@ -1799,25 +1780,11 @@ static void close_window(gpointer data, guint action, GtkWidget *widget)
 	gtk_widget_destroy(window_with_focus->window);
 }
 
-static void enter_path(gpointer data, guint action, GtkWidget *widget)
+static void mini_buffer(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	minibuffer_show(window_with_focus, MINI_PATH);
-}
-
-static void shell_command(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	minibuffer_show(window_with_focus, MINI_SHELL);
-}
-
-static void select_if(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	minibuffer_show(window_with_focus, MINI_SELECT_IF);
+	minibuffer_show(window_with_focus, (MiniType) action);
 }
 
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
