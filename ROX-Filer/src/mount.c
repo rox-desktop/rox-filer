@@ -21,7 +21,7 @@
 
 /* mount.c - code for handling mount points */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <string.h>
 #ifdef HAVE_FCNTL_H

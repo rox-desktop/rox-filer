@@ -21,7 +21,7 @@
 
 /* menu.c - code for handling the popup menu */
 
-#include <config.h>
+#include "config.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/wait.h>

@@ -21,7 +21,7 @@
 
 /* infobox.c - code for showing a file's attributes */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <stdio.h>

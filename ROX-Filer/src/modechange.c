@@ -34,7 +34,7 @@
    changing the mode of many files, this probably results in a
    performance gain. */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>

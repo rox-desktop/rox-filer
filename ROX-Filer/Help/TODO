@@ -16,6 +16,10 @@ Note: Currently in the middle of upgrading the dir scanning code.
 
 BUGS
 
+Translated text doesn't always display. Converting to UTF-8 fixes it, but
+does this work everywhere? Should convert from translator's encoding when
+creating the .gmo files?
+
 Quits if only an Info window is open.
 
 Gtk+ 2.0:
@@ -36,6 +40,8 @@ Rescanning sometimes causes the display to scroll (unrepeatable).
 
 
 FEATURES FOR 1.1
+
+Details toolbar button should return to previous size, not default size.
 
 Remove panel applets if they quit normally.
 
