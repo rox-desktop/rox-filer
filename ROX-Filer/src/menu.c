@@ -499,6 +499,8 @@ static GtkWidget *get_new_files_menu(void)
 			label = gtk_label_new(leaf);
 			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
+
+			dir_item_clear(&ditem);
 		}
 		else
 			item = gtk_menu_item_new_with_label(leaf);
