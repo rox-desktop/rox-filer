@@ -244,7 +244,7 @@ the <option>--new</option> option.
   </para>
 
 <sect1>
-  <title><anchor id="run_pin"/>Pinboard support</title>
+  <title><anchor id="run_pin" xreflabel="Pinboard support"/>Pinboard support</title>
   <para>
 
 If you want the filer to manage your desktop background then you use
@@ -273,7 +273,7 @@ display correctly. The pinboard may also be turned on and off by locating
 </sect1>
 
 <sect1>
-  <title><anchor id="run_pan"/>Panels</title>
+  <title><anchor id="run_pan" xreflabel="Panel support"/>Panels</title>
   <para>
 
 Panels work just like the pinboard. You can create a panel on any
@@ -616,7 +616,7 @@ paste the name in.
 </chapter>
 
 <chapter>
-  <title><anchor id="Toolbar"/>The toolbar</title>
+  <title><anchor id="Toolbar" xreflabel="Toolbar"/>The toolbar</title>
   <para>
 
 By default, each window has a toolbar along the top. You can disable
@@ -916,8 +916,8 @@ mode. Target mode is mainly useful with the `Single click navigation'
 option and keys bound to the various menu entries.
 
 Note that individual applications may add extra menu items to the
-top of this submenu when you click over them &mdash; see <xref linkend="AppDir"/>
-for details.
+top of this submenu when you click over them &mdash; see
+<xref linkend="AppDir"/> for details.
 
 
 <informaltable><tgroup cols="2">
@@ -962,7 +962,7 @@ Display extra information about this object.
 <row><entry>
 <guimenuitem>Set Run Action...</guimenuitem></entry><entry>
 Allows you to set the default program to use when opening files of
-this type. See section \ref{sec: RunAction} for details.
+this type. See <xref linkend="RunAction"/> section for details.
 </entry></row>
 
 <row><entry>
@@ -973,13 +973,15 @@ feature &mdash; simply drag a suitable image onto the Set Icon dialog box.
 
 <row><entry>
 <guimenuitem>Open (A)VFS</guimenuitem></entry><entry>
-Open the file as if it was a directory &mdash; see section \ref{sec: vfs}.
+Open the file as if it was a directory &mdash; see the
+<xref linkend="vfs"/> section.
 </entry></row>
 
 <row><entry>
 <guimenuitem>Send To...</guimenuitem></entry><entry>
 Opens the `Send To' menu, allowing you to send the selected files
-to one of a list of applications. See section \ref{SendTo}.
+to one of a list of applications. See the
+<xref linkend="SendTo"/> section.
 </entry></row>
 
 <row><entry>
@@ -1002,8 +1004,8 @@ Allows you to change the permissions for the selected files.
 
 <row><entry>
 <guimenuitem>Find</guimenuitem></entry><entry>
-Search for files by specifying various conditions &mdash; see section
-\ref{sec: Searching}.
+Search for files by specifying various conditions &mdash; see the
+<xref linkend="Searching"/> section.
 </entry></row>
 
 </tbody></tgroup></informaltable>
@@ -1070,11 +1072,11 @@ HTML file:
 &lt;/html&gt;
 </programlisting>
 
-Save this as `\texttt{index.html}' inside the \texttt{Templates} directory
-and you can easily create new HTML files. You can also save blank
-documents from various applications into here (eg, a blank spreadsheet,
-a blank letter, etc).
-
+Save this as <filename>index.html</filename> inside the
+<filename>Templates</filename> directory and you can easily create new
+HTML files. You can also save blank documents from various applications
+into here (eg, a blank spreadsheet, a blank letter, etc).
+  </para><para>
 Note that you cannot set keyboard shortcuts for these user-defined
 entries at present.
 
@@ -1121,18 +1123,18 @@ Close this window.
 
 <row><entry>
 <guimenuitem>Enter Path...</guimenuitem></entry><entry>
-Open the path-entry box (see section \ref{sec: mini}).
+Open the path-entry box (see the the <xref linkend="mini"/> section).
 </entry></row>
 
 <row><entry>
 <guimenuitem>Shell Command...</guimenuitem></entry><entry>
-Open the shell command box (see section \ref{sec: mini}).
+Open the shell command box (see the <xref linkend="mini"/> section).
 </entry></row>
 
 <row><entry>
 <guimenuitem>Select If...</guimenuitem></entry><entry>
-Select just those files that match the given pattern &mdash; see section
-\ref{sec: SelectIf}.
+Select just those files that match the given pattern &mdash;
+see the <xref linkend="SelectIf"/> section).
 </entry></row>
 
 <row><entry>
@@ -1147,7 +1149,7 @@ Same as selecting ROX-Filer and choosing `Help' from the menu.
 </sect1>
 
 <sect1>
-  <title><anchor id="SendTo"/>The send to menu</title>
+  <title><anchor id="SendTo" xreflabel="Send To menu"/>The send to menu</title>
   <para>
 
 The `Send To' menu provides a quick way to send some files to an application.
@@ -1173,12 +1175,11 @@ holding the <keycap>Shift</keycap> key down.
   <title>The pinboard and panels</title>
   <para>
 
-Sections \ref{run_pin} and \ref{run_pan} explain how to turn the
-pinboard and panels on. Once on, you may drop items from filer windows
-onto the them to pin them up. Clicking on a pinned item acts just
-like clicking on it in a filer window. You can drag pinned icons just
-like normal icons and you can right-click on one to see the popup
-menu.
+The <xref linkend="run_pin"/> and <xref linkend="run_pan"/> sections explain
+how to turn the pinboard and panels on. Once on, you may drop items from filer
+windows onto the them to pin them up. Clicking on a pinned item acts just like
+clicking on it in a filer window. You can drag pinned icons just like normal
+icons and you can right-click on one to see the popup menu.
   </para><para>
 Drag pinned icons with the middle mouse button to move them around
 (they snap to a grid on the pinboard). Changes to the pinboard and
@@ -1188,12 +1189,14 @@ them all.
   </para><para>
 If the panel has so many icons that they can't all be shown at once
 then you can scroll it by dragging the blank area in the middle.
-  </para><para>
-\textbf{IMPORTANT:} Pinning a file does \textbf{not} copy it, it merely
+  </para>
+
+  <important><para>
+Pinning a file does <emphasis>not</emphasis> copy it, it merely
 creates a shortcut to the original file. If you delete the file, then
 you've lost it! Removing a pinned file from its pinboard or panel
 only removes the link. This is different to most other filers...
-  </para>
+  </para></important>
 
 <sect1>
   <title>The pinboard and panel menus</title>
@@ -1234,10 +1237,11 @@ Remove the selected items from the pinboard or panel.
 
 </tbody></tgroup></informaltable>
 
-\noindent If you are setting up the defaults for multiple users and
+If you are setting up the defaults for multiple users and
 you wish to create a `Home' icon that leads to each user's home directory
-then you should first create a new icon and then use `Edit Icon' to
-change the location to `~' and the name to `Home'.
+then you should first create a new icon and then use
+<guimenuitem>Edit Icon</guimenuitem> to change the location to
+<filename>~</filename> and the name to `Home'.
   </para><para>
 Note that individual applications may add extra menu items to the
 top of this menu when you click over them &mdash; see <xref linkend="AppDir"/>
@@ -1284,7 +1288,9 @@ example applet (written in python) is available at
 </chapter>
 
 <chapter>
-  <title><anchor id="vfs"/>Virtual file systems</title>
+  <title>
+    <anchor id="vfs" xreflabel="Virtual file systems"/>Virtual file systems
+  </title>
   <para>
 
 Some types of file can be represented as a directory. A typical example
@@ -1386,7 +1392,7 @@ If you saw that line then it's worked! Well done!
 </chapter>
 
 <chapter>
-  <title><anchor id="mini"/>The mini-buffer</title>
+  <title><anchor id="mini" xreflabel="Minibuffer"/>The mini-buffer</title>
   <para>
 
 The mini-buffer is a white bar that appears along the bottom of the
@@ -1558,7 +1564,7 @@ Commands execute in the background, so you can say:
 </sect1>
 
 <sect1>
-  <title><anchor id="SelectIf"/>The conditional selection box</title>
+  <title><anchor id="SelectIf" xreflabel="Select If"/>The conditional selection box</title>
   <para>
 
 Use this if you want to automatically select all files in the directory
@@ -1602,21 +1608,21 @@ work as follows:
 
 <variablelist>
 
-<varlistentry><term>Quiet</term><listitem><para>
+<varlistentry><term><guibutton>Quiet</guibutton></term><listitem><para>
 will do simple operations without asking you to confirm each
 one. By turning this on and off during an operation you can use it
 like a pause button.
 </para></listitem></varlistentry>
 
-<varlistentry><term>Yes</term><listitem><para>
+<varlistentry><term><guibutton>Yes</guibutton></term><listitem><para>
 answers yes to the question displayed in the log area.
 </para></listitem></varlistentry>
 
-<varlistentry><term>No</term><listitem><para>
+<varlistentry><term><guibutton>No</guibutton></term><listitem><para>
 answers no to the question displayed in the log area.
 </para></listitem></varlistentry>
 
-<varlistentry><term>Abort</term><listitem><para>
+<varlistentry><term><guibutton>Abort</guibutton></term><listitem><para>
 kills the current operation (if any) and closes the action
 window.
 </para></listitem></varlistentry>
@@ -1624,7 +1630,8 @@ window.
 </variablelist>
 
 You can control which actions get started automatically (without you
-having to click on Quiet at the start) from the Options window.
+having to click on <guibutton>Quiet</guibutton> at the start) from the
+Options window.
   </para>
 
 <sect1>
@@ -1637,22 +1644,23 @@ of the window. They are:
 <itemizedlist>
 
 <listitem><para>
-`Force' means that the filer won't treat non-writeable files as special.
-Normally, it confirms the deletion even if Quiet is pressed. Note
-that you still can't remove files from non-writeable directories because
+<guibutton>Force</guibutton> means that the filer won't treat non-writeable
+files as special.  Normally, it confirms the deletion even if
+<guibutton>Quiet</guibutton> is pressed.
+Note that you still can't remove files from non-writeable directories because
 in that case you really don't have permission.
 </para></listitem>
 
 <listitem><para>
-`Brief' prevents the filer logging a message every time it does something.
-Use this to speed things up if large numbers of messages are being
-logged.
+<guibutton>Brief</guibutton> prevents the filer logging a message every time it
+does something.  Use this to speed things up if large numbers of messages are
+being logged.
 </para></listitem>
 
 <listitem><para>
-`Recurse' means that doing something to a directory will also do the
-same thing to all its contents, and the contents of any subdirectories,
-and so on.
+<guibutton>Recurse</guibutton> means that doing something to a directory will
+also do the same thing to all its contents, and the contents of any
+subdirectories, and so on.
 </para></listitem>
 
 </itemizedlist>
@@ -2081,11 +2089,20 @@ mouse pointer over the option to find out what it does.
 You can choose which language the filer will display messages in from
 here. There are also two special choices:
 
-\begin{description}
-\item [None]causes the untranslated English messages to be used;
-\item [From LANG]will use the value of the LANG environment variable as
-the name of the file to load from ROX-Filer/Messages.
-\end{description}
+<itemizedlist>
+
+<listitem><para>
+<guimenuitem>None</guimenuitem> causes the untranslated English messages to be
+used;
+</para></listitem>
+
+<listitem><para>
+<guimenuitem>From LANG</guimenuitem> will use the value of the
+<envar>LANG</envar> environment variable as the name of the file to load
+from <filename>ROX-Filer/Messages</filename>.
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2094,25 +2111,37 @@ the name of the file to load from ROX-Filer/Messages.
   <title>Display options</title>
   <para>
 
-\begin{itemize}
-\item `Ignore case when sorting' treats upper and lower case letters as
-equivalent when sorting. If this is off then `Zoo' comes before `animal',
-for example.
-\item `Ignore eXecutable bit for known extensions' means that when a file
-has a known extension (eg `.gif') the executable bit is ignored. This
-is useful if you have files on a Windows-type filesystem which are
+<itemizedlist>
+<listitem><para><guilabel>Ignore case when sorting</guilabel>
+treats upper and lower case letters as
+equivalent when sorting. If this is off then <filename>Zoo</filename> comes
+before <filename>animal</filename>, for example.
+</para></listitem>
+
+<listitem><para><guilabel>Ignore eXecutable bit for known extensions</guilabel> means that when a file
+has a known extension (eg <filename>.gif</filename>) the executable bit is
+ignored. This is useful if you have files on a Windows-type filesystem which are
 being shown as executable programs. However, it prevents a file such
-as `script.sh' from being treated as a program.
-\item `Directories always come first' means that all directories are sorted
-and displayed at the top, then all the other items are sorted and
-displayed below. With this option off, directories are mixed in with
-the other files.
-\item `Large wrap width' sets the maximum width for a file's name in `Large
-Icons' display mode before the text will wrap onto two lines. In Huge
-Icons mode, the wrap width is 50\% larger than this value.
-\item `Max Small Icons width' &mdash; as above, but applies when the display
-is in `Small Icons' display mode.
-\end{itemize}
+as <filename>script.sh</filename> from being treated as a program.
+</para></listitem>
+
+<listitem><para><guilabel>Directories always come first</guilabel> means that
+all directories are sorted and displayed at the top, then all the other items
+are sorted and displayed below. With this option off, directories are mixed in
+with the other files.
+</para></listitem>
+
+<listitem><para><guilabel>Large wrap width</guilabel> sets the maximum width
+for a file's name in `Large Icons' display mode before the text will wrap onto
+two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
+</para></listitem>
+
+<listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; as above,
+but applies when the display is in `Small Icons' display mode.
+</para></listitem>
+
+</itemizedlist>
+
 The remaining options provide the default settings for newly opened
 windows &mdash; they correspond to choosing styles from the Display menu.
 Icon size is also used when switching off the details display from
@@ -2125,22 +2154,26 @@ the toolbar.
   <title>Pinboard options</title>
   <para>
 
-If you are using the pinboard features (see section \ref{run_pin})
-then you can choose how the text under each icon is displayed. If
-you have a fairly uniform background then you may like to choose `No
-background', which simply draws the text directly over the desktop
+If you are using the pinboard features (see the <xref linkend="run_pin"/>
+section) then you can choose how the text under each icon is displayed. If
+you have a fairly uniform background then you may like to choose <guilabel>No
+background</guilabel>, which simply draws the text directly over the desktop
 background. However, users with more `noisy' backdrops may find such
-text hard to read; selecting `Rectangular background slab' will draw
-a solid rectangle behind the text to make it easier to read.
+text hard to read; selecting <guilabel>Rectangular background slab</guilabel>
+will draw a solid rectangle behind the text to make it easier to read.
 
 You may also change the foreground and background colours used for
 the text by clicking on the colour slabs in the Options window.
 
-\begin{itemize}
-\item `Keep icons within screen limits' prevents icons from going partly
+<itemizedlist>
+<listitem><para> <guilabel>Keep icons within screen limits</guilabel> prevents icons from going partly
 off the side of the screen.
-\item `Icon grid step' controls how finely the icons may be positioned.
-\end{itemize}
+</para></listitem>
+
+<listitem><para> <guilabel>Icon grid step</guilabel> controls how finely the icons may be positioned.
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2149,8 +2182,9 @@ off the side of the screen.
   <title>Panel options</title>
   <para>
 
-If you are using panels (see section \ref{run_pan}) then this section
-lets you choose which icons will have textual labels underneath them.
+If you are using panels (see the <xref linkend="run_pan"/> section)
+then this section lets you choose which icons will have textual labels
+underneath them.
 You can have labels on all icons, on no icons, or on all icons except
 applications.
 
@@ -2162,7 +2196,8 @@ applications.
   <para>
 
 You can choose to start some operations automatically, without waiting
-for you to click on Quiet. Select each operation that you want to
+for you to click on <guibutton>Quiet</guibutton>.
+Select each operation that you want to
 auto-start here. You can also set the default state for each of the
 options that appear inside action windows.
 
@@ -2173,20 +2208,29 @@ options that appear inside action windows.
   <title>Toolbar options</title>
   <para>
 
-\begin{itemize}
-\item `Unshade the tools you want:' allows you to set which tools should
-appear on the toolbar. Click on the buttons below to shade and unshade
+<itemizedlist>
+<listitem><para> <guilabel>Unshade the tools you want:</guilabel> allows you to set which tools
+should appear on the toolbar. Click on the buttons below to shade and unshade
 them &mdash; shaded tools will not be shown on filer window toolbars.
-\item `Toolbar type' allows you to choose what kind of toolbars you want.
-\textbf{None} means that windows will not have a toolbar, \textbf{Normal}
-provides a small bar of icons, and \textbf{Large} displays larger
-buttons, with textual labels.
-\item `Show totals of items' shows the number of items displayed in a filer
+</para></listitem>
+
+<listitem><para> <guilabel>Toolbar type</guilabel> allows you to choose what
+kind of toolbars you want.
+<guimenuitem>None</guimenuitem> means that windows will not have a
+toolbar,
+<guimenuitem>Normal</guimenuitem> provides a small bar of icons, and
+<guimenuitem>Large</guimenuitem> displays larger buttons, with textual labels.
+</para></listitem>
+
+<listitem><para> <guilabel>Show totals of items</guilabel> shows the number of items displayed in a filer
 window, as well as the number of hidden items (if any) on the toolbar.
 When there's a selection, it shows the number of selected items and
 their combined size (excluding directories).
-\end{itemize}
-See section \ref{sec: Toolbar} for details.
+</para></listitem>
+
+</itemizedlist>
+
+See the <xref linkend="Toolbar"/> section for details.
 
   </para>
 </sect1>
@@ -2195,33 +2239,58 @@ See section \ref{sec: Toolbar} for details.
   <title>Filer window options</title>
   <para>
 
-\begin{itemize}
-\item `Automatically resize filer windows' can be used to control when windows
-are automatically resized:
+<itemizedlist>
+<listitem><para><guilabel>Automatically resize filer windows</guilabel> can be
+used to control when windows are automatically resized:
 
-\begin{itemize}
-\item `...never' turns off auto-resizing. Windows must be resized manually.
-\item `...when changing the display style' will resize the window automatically
-when you change the icon size or the type of details to be displayed.
-\item `...always' causes the window to resize whenever it seems useful (that
-is, when changing to a different directory or when switching between
-display styles).
-\end{itemize}
-\item `Window size limit' sets the largest size (as a percentage of the
-screen size) that the auto-resizer will resize windows to.
-\item `Unique windows' prevents you from having two windows showing the
-same directory. Opening a second view onto a directory closes the
-first.
-\end{itemize}
-The next two options control what happens when you press tab in the
-path entry minibuffer:
+	<itemizedlist>
+	<listitem><para><guilabel>...never</guilabel>
+	turns off auto-resizing. Windows must be
+	resized manually.
+	</para></listitem>
 
-\begin{itemize}
-\item `Beep if Tab-completion fails' &mdash; beep if there is no match, or there
-are several possible completions, each starting differently.
-\item `Beep if there are several matches' &mdash; beep if there are several
-matches, even though some letters were added.
-\end{itemize}
+	<listitem><para><guilabel>...when changing the display style</guilabel>
+	will resize the
+	window automatically when you change the icon size or the type of
+	details to be displayed.
+	</para></listitem>
+
+	<listitem><para><guilabel>...always</guilabel>
+	causes the window to resize whenever it
+	seems useful (that is, when changing to a different directory or when
+	switching between display styles).
+	</para></listitem>
+	</itemizedlist>
+
+</para></listitem>
+
+<listitem><para> <guilabel>Window size limit</guilabel> sets the largest size
+(as a percentage of the screen size) that the auto-resizer will resize windows
+to.
+</para></listitem>
+
+<listitem><para> <guilabel>Unique windows</guilabel> prevents you from having
+two windows showing the same directory. Opening a second view onto a directory
+closes the first.
+</para></listitem>
+
+</itemizedlist>
+
+The next two options control what happens when you press <keycap>Tab</keycap>
+in the path entry minibuffer:
+
+<itemizedlist>
+
+<listitem><para> <guilabel>Beep if Tab-completion fails</guilabel> &mdash; beep
+if there is no match, or there are several possible completions, each starting
+differently.
+</para></listitem>
+
+<listitem><para> <guilabel>Beep if there are several matches</guilabel> &mdash;
+beep if there are several matches, even though some letters were added.
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2230,33 +2299,41 @@ matches, even though some letters were added.
   <title>Drag-And-Drop options</title>
   <para>
 
-\begin{itemize}
-\item <application>ROX-Filer</application> uses the standard XDND protocol for drag-and-drop. This
+<itemizedlist>
+<listitem><para> <application>ROX-Filer</application> uses the standard XDND protocol for drag-and-drop. This
 protocol recommends that URIs should contain the hostname of the computer
 that the resource is on so that the program receiving the data can
 determine whether it can get the data directly or whether it must
 go via the X-server. However, many older programs (particularly GNOME
 applications) get confused by the hostname and fail to load the data
-correctly. If `Don't use hostnames' is on then the hostname part is
+correctly. If <guilabel>Don't use hostnames</guilabel> is on then the hostname part is
 omitted and <application>ROX-Filer</application> will work with these applications BUT you can't
 drag data to a program running on a different machine.
-\item `Allow dragging to icons in filer windows' controls what happens when
+</para></listitem>
+
+<listitem><para> <guilabel>Allow dragging to icons in filer windows</guilabel> controls what happens when
 you drop files onto icons in filer windows. If on then drops onto
 directories will save the data inside the directory, while dropping
 onto programs will invoke the program on that data. If off then drops
 anywhere inside a filer window act like drops onto the window background
 &mdash; that is, the data will be saved into the directory being displayed.
-\item `Directories spring open' controls what happens when you hold a file
+</para></listitem>
+
+<listitem><para> <guilabel>Directories spring open</guilabel> controls what happens when you hold a file
 over a directory while dragging it. If on, the directory will `spring
 open' after a short pause, allowing you to navigate to any directory
 during a drag. You can also hold the pointer over the Home and Up
 buttons on the toolbar for a similar effect. You need to have the
 previous option enabled for this to have any effect on files displayed
 in a directory.
-\item `Spring delay' sets how long, in thousanths of a second, the filer
+</para></listitem>
+
+<listitem><para> <guilabel>Spring delay</guilabel> sets how long, in thousanths of a second, the filer
 will wait before spring opening a directory as described above. If
 the above option is turned off, then this has no effect.
-\end{itemize}
+</para></listitem>
+
+</itemizedlist>
 
   </para>
 </sect1>
@@ -2265,9 +2342,11 @@ the above option is turned off, then this has no effect.
   <title>Menu options</title>
   <para>
 
-The `Xterm here' program is the command used when you choose `Xterm
-here' from the menu. You can replace it with another command such
-as `gnome-terminal', `konsole', or anything else.
+The <guilabel>Xterm here</guilabel> program is the command used when you choose
+<guimenuitem>Xterm here</guimenuitem> from the menu.
+You can replace it with another command such
+as <command>gnome-terminal</command>, <command>konsole</command>,
+or anything else.
 
   </para>
 </sect1>
@@ -2276,22 +2355,28 @@ as `gnome-terminal', `konsole', or anything else.
   <title>Mouse bindings</title>
   <para>
 
-\begin{itemize}
-\item `New window on button 1' swaps the actions of the two non-menu buttons
+<itemizedlist>
+<listitem><para> <guilabel>New window on button 1</guilabel> swaps the actions of the two non-menu buttons
 when opening directories. This is provided for people who are used
 to the RISC OS mouse bindings.
-\item `Menu on button 2' swaps the actions of buttons 2 and 3 so that the
+</para></listitem>
+
+<listitem><para> <guilabel>Menu on button 2</guilabel> swaps the actions of buttons 2 and 3 so that the
 middle button brings up the menus. This is provided for people who
 are used to the RISC OS mouse bindings.
-\item `Single-click navigation' means that clicking on a file or directory
+</para></listitem>
+
+<listitem><para> <guilabel>Single-click navigation</guilabel> means that clicking on a file or directory
 will open it. If off, clicking on files selects them instead &mdash; you
 must double click on a file to open it.
-\end{itemize}
-As an alternative to using the options window to put menu on button-2,
-some people prefer to use the command `\texttt{xmodmap -e \char`\"{}pointer
-= 1 3 2\char`\"{}}', which makes the right mouse button button-2 and
-the middle one button-3 (this affects all programs, not just <application>ROX-Filer</application>).
+</para></listitem>
+</itemizedlist>
 
+As an alternative to using the options window to put menu on button-2,
+some people prefer to use the command <command>xmodmap -e "pointer
+= 1 3 2"</command>, which makes the right mouse button button-2 and
+the middle one button-3 (this affects all programs, not just
+<application>ROX-Filer</application>).
 
   </para>
 </sect1>
@@ -2301,12 +2386,13 @@ the middle one button-3 (this affects all programs, not just <application>ROX-Fi
   <title>Filetypes</title>
   <para>
 
-All files have a MIME type in the form `\texttt{text/plain}'. Here,
-`\texttt{text}' is the <emphasis>media type</emphasis> and `\texttt{plain}' is the
-<emphasis>sub-type</emphasis>. <application>ROX-Filer</application> uses a file's name to decide what its MIME
-type is, and then uses the MIME type to decide what icon to give it
-and what program to use when you open the file.
-
+All files have a MIME type in the form <emphasis>text/plain</emphasis>. Here,
+<emphasis>text</emphasis> is the <emphasis>media type</emphasis> and
+<emphasis>plain</emphasis> is the <emphasis>sub-type</emphasis>.
+  </para><para>
+<application>ROX-Filer</application> uses a file's name to decide what its MIME
+type is, and then uses the MIME type to decide what icon to give it and what
+program to use when you open the file.
   </para>
 
 <sect1>
@@ -2315,43 +2401,47 @@ and what program to use when you open the file.
   </title>
   <para>
 
-This box appears when you choose `Set Run Action...' from the File
-menu, and is used to set which application is loaded when you click
+This box appears when you choose <guimenuitem>Set Run Action...</guimenuitem>
+from the File menu, and is used to set which application is loaded when you click
 on a file.
-
+  </para><para>
 For example, let's say you want to set things up so that opening a
-`.gif' file loads it into the Gimp. First, right-click over a gif
-image to open the menu and choose `Set Run Action...' from the File
-submenu. Then, you have a choice of two methods to set the run action:
+<filename>.gif</filename> file loads it into the Gimp.
+First, right-click over a gif image to open the menu and choose
+<guimenuitem>Set Run Action...</guimenuitem> from the
+<guimenuitem>File</guimenuitem> submenu.
+Then, you have a choice of two methods to set the run action:
+  </para>
 
-
-\subsubsection*{Setting the run action by drag-and-drop}
-
+  <sect2><title>Setting the run action by drag-and-drop</title>
+    <para>
 Drag the Gimp (from a filer window, a panel or the pinboard) onto
-the area marked `Drop a suitable application here'. From now on, clicking
-on a GIF file will load it into the Gimp.
+the area marked <guilabel>Drop a suitable application here</guilabel>.
+From now on, clicking on a GIF file will load it into the Gimp.
+    </para>
+  </sect2>
 
-
-\subsubsection*{Setting the run action by entering a shell command}
-
-Type:
-
-<screen>gimp "$1"</screen>
-
-into the box labelled `Enter a shell command' and press Return. `\texttt{\$1}'
+  <sect2><title>Setting the run action by entering a shell command</title>
+    <para>
+Type: <userinput>gimp "$1"</userinput>
+into the box labelled <guilabel>Enter a shell command</guilabel> and press
+<keycap>Return</keycap>. <userinput>$1</userinput>
 will be replaced by the name of the file you click on when this command
 is used. As before, clicking on any GIF image will now load it into
 the Gimp.
-  </para>
+    </para>
+  </sect2>
 
   <sect2><title>Setting the default media-type handlers</title>
     <para>
 Whichever method you use to set the action you have the choice of
 setting the run action just for that type, or setting the default
 for all files with that media-type which don't already have a specific
-action. Since the Gimp can load many types of image, it makes sense
-to select the `Set default for all `image/&lt;anything&gt;'' option so you
-don't have to do it again for image/jpeg files and so on. However,
+action.
+    </para><para>
+Since the Gimp can load many types of image, it makes sense
+to select the <guilabel>Set default for all `image/&lt;anything&gt;'</guilabel>
+option so you don't have to do it again for image/jpeg files and so on. However,
 this only affects types that don't already have a specific action
 (ie, those that would have brought up an error box if you tried to
 open them).
@@ -2491,7 +2581,7 @@ its only argument.
   </para>
 
 <sect1>
-  <title><anchor id="LANG"/>Selecting a translation</title>
+  <title><anchor id="LANG" xreflabel="Translations"/>Selecting a translation</title>
   <para>
 
 <application>ROX-Filer</application> is able to translate many of its messages, provided suitable

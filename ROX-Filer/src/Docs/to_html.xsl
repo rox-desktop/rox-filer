@@ -72,6 +72,20 @@ span.guimenuitem {
   white-space: nowrap;
 }
 
+span.guibutton {
+  background: #ddd;
+  padding: 1px;
+  border-top: 1px solid #eee;
+  border-left: 1px solid #eee;
+  border-right: 1px solid #444;
+  border-bottom: 1px solid #444;
+  white-space: nowrap;
+}
+
+span.guilabel {
+  color: #55e;
+}
+
 div.chapter {
   padding-top: 3em;
 }
@@ -93,6 +107,16 @@ span.keycap {
     <span class="guimenuitem">
       <xsl:call-template name="inline.charseq"/>
     </span>
+  </xsl:template>
+
+  <xsl:template match="guibutton">
+    <span class="guibutton">
+      <xsl:call-template name="inline.charseq"/>
+    </span>
+  </xsl:template>
+
+  <xsl:template match="guilabel">
+    `<span class="guilabel"><xsl:call-template name="inline.charseq"/></span>'
   </xsl:template>
 
   <xsl:template match="filename">
