@@ -1495,7 +1495,7 @@ void display_update_view(FilerWindow *filer_window,
 		if (style == HUGE_ICONS)
 			wrap_width = HUGE_WRAP;
 		else if (style == LARGE_ICONS)
-			wrap_width = o_large_truncate;
+			wrap_width = o_large_width.int_value;
 	}
 
 	if (wrap_width == -1 || view->name_width < wrap_width)
