@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+29-Apr-2004
+~~~~~~~~~~~
+Added 'Download handler' to drag and drop options. This program is invoked
+when a URI is dragged to the filer (eg, from a web-browser). The default
+command runs wget to download the file (Andrew Flegg).
+
 27-Apr-2004
 ~~~~~~~~~~~
 Bugfix: URIs received through drag-and-drop were unescaped twice, causing

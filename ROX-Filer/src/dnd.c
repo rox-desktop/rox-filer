@@ -148,6 +148,7 @@ Option o_dnd_spring_open;
 static Option o_dnd_spring_delay;
 static Option o_dnd_middle_menu;
 Option o_dnd_left_menu;
+static Option o_dnd_uri_handler;
 
 void dnd_init(void)
 {
@@ -164,6 +165,9 @@ void dnd_init(void)
 	option_add_int(&o_dnd_spring_delay, "dnd_spring_delay", 400);
 	option_add_int(&o_dnd_left_menu, "dnd_left_menu", TRUE);
 	option_add_int(&o_dnd_middle_menu, "dnd_middle_menu", TRUE);
+
+	option_add_string(&o_dnd_uri_handler, "dnd_uri_handler",
+			"xterm -e wget $1");
 }
 
 /*			SUPPORT FUNCTIONS			*/
@@ -881,10 +885,32 @@ static gboolean uri_is_local(const char *uri)
 	return TRUE;
 }
 
+/* Run the shell command 'command', replacing $1 with 'arg' */
+static void run_with_argument(const char *dir,
+				const char *command,
+				const char *arg)
+{
+	GPtrArray	*argv;
+
+	argv = g_ptr_array_new();
+
+	g_ptr_array_add(argv, "sh");
+	g_ptr_array_add(argv, "-c");
+	g_ptr_array_add(argv, (char *) command);
+	g_ptr_array_add(argv, "sh");
+	g_ptr_array_add(argv, (char *) arg);
+	g_ptr_array_add(argv, NULL);
+
+	rox_spawn(dir, (const gchar **) argv->pdata);
+
+	g_ptr_array_free(argv, TRUE);
+}
+
 /* We've got a list of URIs from somewhere (probably another filer window).
  * If the files are on the local machine then try to copy them ourselves,
  * otherwise, if there was only one file and application/octet-stream was
  * provided, get the data via the X server.
+ * For http:, https: or ftp: schemes, use the download handler.
  */
 static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
@@ -939,7 +965,15 @@ static void got_uri_list(GtkWidget 		*widget,
 					application_octet_stream, time);
 			send_reply = FALSE;
 		}
-		else
+		else if ((strncasecmp(uri_list->data, "http:", 5) == 0) ||
+			 (strncasecmp(uri_list->data, "https:", 6) == 0) ||
+                         (strncasecmp(uri_list->data, "ftp:", 4) == 0))
+		{
+			run_with_argument(dest_path,
+					o_dnd_uri_handler.value,
+					uri_list->data);
+                }
+                else
 			error = _("Can't get data from remote machine "
 				"(application/octet-stream not provided)");
 	}

@@ -252,6 +252,11 @@ operation, such as copying or deleting some files.</label>
         <radio value='0' label='Move the files'>Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key.</radio>
       </radio-group>
     </frame>
+    <frame label='Download handler'>
+      <entry name='dnd_uri_handler'>When you drag a file from a web browser or other remote source, this program will be run to download it. $1 is the URI
+dragged to the filer, and the current directory is the destination. Eg:
+xterm -e wget $1</entry>
+    </frame>
   </section>
   <section title='Menus'>
     <frame label='Appearance'>
