@@ -1,3 +1,10 @@
+/*
+ * $Id$
+ *
+ * ROX-Filer, filer for the ROX desktop project
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
+ */
+
 /* session.h - XSMP client support */
 #ifndef _SESSION_H_
 #define _SESSION_H_

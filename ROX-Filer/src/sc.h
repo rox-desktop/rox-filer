@@ -1,3 +1,10 @@
+/*
+ * $Id$
+ *
+ * ROX-Filer, filer for the ROX desktop project
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
+ */
+
 /* sc.h - XSMP client support */
 
 #ifndef _SC_ALU_H_

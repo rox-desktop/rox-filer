@@ -576,8 +576,8 @@ static void pinboard_check_options(void)
 	if (gdk_color_equal(&n_fg, &pin_text_fg_col) == 0 ||
 		gdk_color_equal(&n_bg, &pin_text_bg_col) == 0)
 	{
-		memcpy(&pin_text_fg_col, &n_fg, sizeof(GdkColor));
-		memcpy(&pin_text_bg_col, &n_bg, sizeof(GdkColor));
+		pin_text_fg_col = n_fg;
+		pin_text_bg_col = n_bg;
 
 		if (pinicon_style)
 		{

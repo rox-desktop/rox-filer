@@ -687,7 +687,7 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	gboolean	autoq;
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
-	int		child;
+	pid_t		child;
 	struct sigaction act;
 
 	if (pipe(filedes))

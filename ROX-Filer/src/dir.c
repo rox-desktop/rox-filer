@@ -589,7 +589,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		if (item->base_type != TYPE_UNKNOWN)
 		{
 			/* Preserve the old details so we can compare */
-			memcpy(&old, item, sizeof(DirItem));
+			old = *item;
 			if (old.image)
 				g_object_ref(old.image);
 			do_compare = TRUE;

@@ -607,7 +607,6 @@ static void shell_tab(FilerWindow *filer_window)
 {
 	const gchar	*entry;
 	int	i;
-	gchar	quote;
 	int	pos;
 	GString	*leaf;
 	glob_t	matches;
@@ -617,7 +616,6 @@ static void shell_tab(FilerWindow *filer_window)
 	pos = gtk_editable_get_position(GTK_EDITABLE(filer_window->minibuffer));
 	leaf = g_string_new(NULL);
 
-	quote = '\0';
 	for (i = 0; i < pos; i++)
 	{
 		guchar	c = entry[i];
@@ -634,17 +632,15 @@ static void shell_tab(FilerWindow *filer_window)
 			c = entry[++i];
 		else if (c == '"' || c == '\'')
 		{
-			guchar	cc;
-
 			for (++i; i < pos; i++)
 			{
-				cc = entry[i];
+				guchar cc = entry[i];
 
 				if (cc == '\\' && i + 1 < pos)
 					cc = entry[++i];
-				else if (entry[i] == c)
+				else if (cc == c)
 					break;
-				g_string_append_c(leaf, entry[i]);
+				g_string_append_c(leaf, cc);
 			}
 			continue;
 		}

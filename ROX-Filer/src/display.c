@@ -534,7 +534,7 @@ void shrink_grid(FilerWindow *filer_window)
 			height = h;
 	}
 
-	collection_set_item_size(filer_window->collection, width, height);
+	collection_set_item_size(col, width, height);
 }
 
 void display_set_sort_fn(FilerWindow *filer_window,
