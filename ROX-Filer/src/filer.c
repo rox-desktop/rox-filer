@@ -1513,13 +1513,16 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 	else
 	{
 		GtkWidget	*vbox;
+		int		col_height = ROW_HEIGHT_LARGE * 3;
 
 		gtk_signal_connect(GTK_OBJECT(collection),
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 			filer_window->display_style == LARGE_ICONS ? 400 : 512,
-			o_toolbar != TOOLBAR_NONE ? 220 : 200);
+			o_toolbar == TOOLBAR_NONE ? col_height:
+			o_toolbar == TOOLBAR_NORMAL ? col_height + 24 :
+			col_height + 38);
 
 		hbox = gtk_hbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(filer_window->window),
@@ -1574,7 +1577,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	{
 		frame = gtk_handle_box_new();
 		box = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
-				GTK_TOOLBAR_ICONS);
+				GTK_TOOLBAR_BOTH);
 		gtk_container_set_border_width(GTK_CONTAINER(box), 2);
 		gtk_toolbar_set_space_style(GTK_TOOLBAR(box),
 					GTK_TOOLBAR_SPACE_LINE);
