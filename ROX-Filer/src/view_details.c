@@ -1863,7 +1863,7 @@ static gboolean view_details_auto_scroll_callback(ViewIface *view)
 	adj = gtk_range_get_adjustment(scrollbar);
 	h = adj->page_size;
 
-	if ((x < 0 || x > w || y < 0 || y > h)) /* && !view->lasso_box) */
+	if ((x < 0 || x > w || y < 0 || y > h) && !view_details->lasso_box)
 		return FALSE;		/* Out of window - stop */
 
 	if (y < AUTOSCROLL_STEP)

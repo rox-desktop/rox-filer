@@ -339,25 +339,6 @@ static void collection_finalize(GObject *object)
 		G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
-#if 0
-static void collection_drag_leave(GtkWidget *widget, GdkDragContext *context,
-				  guint time)
-{
-	Collection *collection = COLLECTION(widget);
-
-	/* Note that this isn't always called when the pointer leaves the
-	 * widget; only if we highlighted an item at some point. 
-	 */
-
-	/* collection_set_autoscroll(collection, FALSE); - not needed? */
-	collection_set_cursor_item(collection, -1);
-
-	if (GTK_WIDGET_CLASS(parent_class)->drag_leave)
-		(*GTK_WIDGET_CLASS(parent_class)->drag_leave)(widget, context,
-							      time);
-}
-#endif
-
 static void collection_map(GtkWidget *widget)
 {
 	Collection *collection = COLLECTION(widget);
