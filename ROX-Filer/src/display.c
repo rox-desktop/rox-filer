@@ -127,7 +127,6 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details);
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
-static void update_views(FilerWindow *filer_window);
 static void draw_string(GtkWidget *widget,
 		PangoLayout *layout,
 		GdkRectangle *area,	/* Area available on screen */
@@ -596,7 +595,7 @@ void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
 
 	filer_window->show_thumbs = thumbs;
 
-	update_views(filer_window);
+	display_update_views(filer_window);
 
 	gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 
@@ -743,6 +742,23 @@ void display_free_colitem(Collection *collection, CollectionItem *colitem)
 	g_free(view);
 }
 
+/* Recalculate all the ViewData structs for this window.
+ * Useful when the display style has changed.
+ */
+void display_update_views(FilerWindow *filer_window)
+{
+	Collection *collection = filer_window->collection;
+	int	i;
+	
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		CollectionItem *ci = &collection->items[i];
+
+		display_update_view(filer_window, (DirItem *) ci->data,
+					(ViewData *) ci->view_data, TRUE);
+	}
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -758,7 +774,7 @@ static void options_changed(void)
 		if (o_large_width.has_changed || o_small_width.has_changed)
 		{
 			/* Recreate PangoLayout */
-			update_views(filer_window);
+			display_update_views(filer_window);
 		}
 
 		if (o_intelligent_sort.has_changed ||
@@ -1205,30 +1221,13 @@ static void draw_item(GtkWidget *widget,
 				selected, TRUE);
 }
 
-/* Recalculate all the ViewData structs for this window.
- * Useful when the display style has changed.
- */
-static void update_views(FilerWindow *filer_window)
-{
-	Collection *collection = filer_window->collection;
-	int	i;
-	
-	for (i = 0; i < collection->number_of_items; i++)
-	{
-		CollectionItem *ci = &collection->items[i];
-
-		display_update_view(filer_window, (DirItem *) ci->data,
-					(ViewData *) ci->view_data, TRUE);
-	}
-}
-
 /* Note: Call shrink_grid after this */
 static void display_details_set(FilerWindow *filer_window, DetailsType details)
 {
 	if (filer_window->details_type == details)
 		return;
 	filer_window->details_type = details;
-	update_views(filer_window);
+	display_update_views(filer_window);
 
 	gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 }
@@ -1241,7 +1240,7 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 
 	filer_window->display_style = style;
 
-	update_views(filer_window);
+	display_update_views(filer_window);
 
 	collection_set_functions(filer_window->collection,
 			(CollectionDrawFunc) draw_item,

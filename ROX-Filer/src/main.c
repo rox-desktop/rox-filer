@@ -565,13 +565,15 @@ static void show_features(void)
 		_("No")
 #endif
 		);
+#if 0
 	g_printerr("%s... %s\n", _("GNOME-VFS library"),
-#ifdef WITH_GNOMEVFS
+# ifdef WITH_GNOMEVFS
 			_("Yes")
-#else
+# else
 			_("No (gnome-vfs-config not found)")
-#endif
+# endif
 		  );
+#endif
 }
 
 static void soap_add(xmlNodePtr body,

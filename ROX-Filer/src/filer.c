@@ -1561,6 +1561,8 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
+	g_signal_connect_swapped(collection, "style_set",
+			G_CALLBACK(display_update_views), filer_window);
 	g_signal_connect(collection, "lose_selection",
 			G_CALLBACK(lose_selection), filer_window);
 	g_signal_connect(collection, "selection_changed",
