@@ -27,6 +27,7 @@ extern uid_t euid;
 extern gid_t egid;
 extern int ngroups;			/* Number of supplemental groups */
 extern gid_t *supplemental_groups;
+extern guchar *show_user_message;
 extern int home_dir_len;
 extern char *home_dir, *app_dir;
 

@@ -66,7 +66,7 @@ In single click mode, beep when the user tries to double click.
 
 Options to set where the toolbar appears.
 
-Display extra info in the toolbar (file under cursor, size, target mode, etc).
+Display extra info in the toolbar (file under cursor, size, etc).
 
 More display styles.
 
@@ -86,8 +86,6 @@ Copying a relative symlink should make it absolute? Ask during the copy?
 Recursive 'a-x' acts on the directory first and so can't then change the
 permissions on the contents. chmod(1) has the same problem.
 
-Set Run Action should be on the 'File' menu, not in the minibuffer.
-
 
 LONG TERM
 
@@ -95,4 +93,4 @@ Use a separate process to access the filesystem. Prevents hanging when you
 try to access a dead filesystem.
 
 Allow user to change permissions to another user on the fly, by entering a
-password.
+password. 'su' requires a tty - do we need an SUID binary?

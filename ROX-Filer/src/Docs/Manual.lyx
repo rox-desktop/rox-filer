@@ -492,6 +492,46 @@ If all else fails, try running rox with the `
 -no
 \family default 
 ' options; this overrides window manager control of the icons altogether.
+\layout Subsubsection
+
+Running as root
+\layout Standard
+
+If you pass the `
+\family typewriter 
+-u
+\family default 
+' option to rox then the filer will display a message at the top of each
+ window saying which user the filer is running as.
+ This also disables the normal warning box you get when you try to run the
+ filer as root.
+ The idea here is that you create a simple script which runs the filer as
+ root --- something like:
+\layout LyX-Code
+
+#!/bin/sh
+\layout LyX-Code
+
+su -m -c "rox -u $*"
+\layout Standard
+
+Then, you can get a root filer window by simply running the script and entering
+ the root password.
+ Remember, any file operations you perform and any programs you run from
+ these windows will run as root too! Be careful!
+\layout Standard
+
+You may find that the X server won't allow root (or other users) to connect.
+ Reading the manual pages for `
+\family typewriter 
+xauth
+\family default 
+' and `
+\family typewriter 
+xhost
+\family default 
+' may give you some hints, but it varies between systems (which is why this
+ isn't built in to the filer!).
 \layout Subsection
 
 Mouse button and key bindings
@@ -1151,7 +1191,7 @@ All of these work in the same way --- if you open the menu with some items
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-19 2 0 0 -1 -1 -1 -1
+21 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -1162,6 +1202,8 @@ multicol5
 0 1 1 0
 0 1 0 0
 0 1 0 0
+0 0 0 0
+0 1 1 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -1191,6 +1233,10 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1252,6 +1298,20 @@ Explain what kind of thing is selected.
 Info
 \newline 
 Display extra information about this object.
+\newline 
+Set Run Action...
+\newline 
+Allows you to set the default program to use when opening files of this
+ type.
+\newline 
+
+\newline 
+See section 
+\begin_inset LatexCommand \ref{sec: RunAction}
+
+\end_inset 
+
+ for details.
 \newline 
 Open VFS
 \newline 
@@ -1381,18 +1441,13 @@ Open the shell command box (see section
 
 ).
 \newline 
-Set Run Action...
-\newline 
-Allows you to set the program to use when double-clicking on a file.
+
 \newline 
 
 \newline 
-See section 
-\begin_inset LatexCommand \ref{sec: RunAction}
 
-\end_inset 
+\newline 
 
- for details.
 \newline 
 Select If...
 \newline 
@@ -1769,86 +1824,6 @@ Tab{}
 '.
  As you type, the cursor will move to the correct subdirectory.
  If it beeps when you press Tab then you need to supply more letters.
-\layout Subsubsection
-
-
-\begin_inset LatexCommand \label{sec: RunAction}
-
-\end_inset 
-
-The run action box
-\layout Standard
-
-This box appears when you choose `Set Run Action' from the Window menu.
- You can now either drag a file onto an application, or you can enter a
- shell command.
- In either case, the action is not actually performed but instead becomes
- the default action for files of that type.
-\layout Standard
-
-All files have a MIME type in the form `
-\family typewriter 
-text/plain
-\family default 
-'.
- Here, `
-\family typewriter 
-text
-\family default 
-' is the 
-\emph on 
-media type
-\emph toggle 
- and `
-\family typewriter 
-plain
-\family default 
-' is the 
-\emph on 
-sub-type
-\emph toggle 
-.
- Whichever method you use to set the action you will be given the choice
- of setting the run action just for that type, or setting the default for
- all files with that media-type which don't already have a specific action.
-\layout Standard
-
-For example, let's say you want to set things up so that double-clicking
- on a `.gif' file loads it into the Gimp:
-\layout Paragraph
-
-Setting the run action by drag-and-drop
-\newline 
-
-\layout Standard
-
-Choose `Set Run Action' from the Window menu and, while the minibuffer is
- still open, drag a GIF file from the filer window onto the Gimp's application
- directory (probably in another filer window).
-\layout Paragraph
-
-Setting the run action by entering a shell command
-\newline 
-
-\layout Standard
-
-Type:
-\layout LyX-Code
-
-gimp 
-\begin_inset Quotes erd
-\end_inset 
-
-$1
-\begin_inset Quotes erd
-\end_inset 
-
-
-\layout Standard
-
-and press Return.
- Note that the cursor (the black box) must be on the GIF file when you press
- Return.
 \layout Subsubsection
 
 The shell command box
@@ -2726,6 +2701,106 @@ without
 \layout Section
 
 Filetypes
+\layout Standard
+
+All files have a MIME type in the form `
+\family typewriter 
+text/plain
+\family default 
+'.
+ Here, `
+\family typewriter 
+text
+\family default 
+' is the 
+\emph on 
+media type
+\emph toggle 
+ and `
+\family typewriter 
+plain
+\family default 
+' is the 
+\emph on 
+sub-type
+\emph toggle 
+.
+ ROX-Filer uses a file's name to decide what its MIME type is, and then
+ uses the MIME type to decide what icon to give it and what program to use
+ when you open the file.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: RunAction}
+
+\end_inset 
+
+The run action box
+\layout Standard
+
+This box appears when you choose `Set Run Action...' from the File menu, and
+ is used to set which application is loaded when you click on a file.
+\layout Standard
+
+For example, let's say you want to set things up so that opening a `.gif'
+ file loads it into the Gimp.
+ First, right-click over a gif image to open the menu and choose `Set Run
+ Action...' from the File submenu.
+ Then, you have a choice of two methods to set the run action:
+\layout Subsubsection*
+
+Setting the run action by drag-and-drop
+\layout Standard
+
+Drag the Gimp (from a filer window, a panel or the pinboard) onto the area
+ marked `Drop a suitable application here'.
+ From now on, clicking on a GIF file will load it into the Gimp.
+\layout Subsubsection*
+
+Setting the run action by entering a shell command
+\layout Standard
+
+Type:
+\layout LyX-Code
+
+gimp 
+\begin_inset Quotes eld
+\end_inset 
+
+$1
+\begin_inset Quotes erd
+\end_inset 
+
+
+\layout Standard
+
+into the box labelled `Enter a shell command' and press Return.
+ `
+\family typewriter 
+$1
+\family default 
+' will be replaced by the name of the file you click on when this command
+ is used.
+ As before, clicking on any GIF image will now load it into the Gimp.
+\layout Subsubsection
+
+Setting the default media-type handlers
+\layout Standard
+
+
+\emph toggle 
+Whichever method you use to set the action you have the choice of setting
+ the run action just for that type, or setting the default for all files
+ with that media-type which don't already have a specific action.
+ Since the Gimp can load many types of image, it makes sense to select the
+ `Set default for all `image/<anything>'' option so you don't have to do
+ it again for image/jpeg files and so on.
+ However, this only affects types that don't already have a specific action
+ (ie, those that would have brought up an error box if you tried to open
+ them).
+\layout Subsection
+
+How filetypes are stored
 \layout Standard
 
 ROX-Filer uses three sub-directories in your Choices directory for filetypes:

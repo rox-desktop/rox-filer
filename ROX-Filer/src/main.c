@@ -70,6 +70,9 @@ gid_t egid;
 int ngroups;			/* Number of supplemental groups */
 gid_t *supplemental_groups = NULL;
 
+/* Message to display at the top of each filer window */
+guchar *show_user_message = NULL;
+
 int home_dir_len;
 char *home_dir, *app_dir;
 
@@ -100,6 +103,7 @@ static void show_features(void);
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
        "  -b, --bottom=PANEL	open PAN as a bottom-edge panel\n"	\
+       "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -h, --help		display this help and exit\n"		\
        "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
        "  -n, --new		start a new filer, even if already running\n"  \
@@ -107,16 +111,18 @@ static void show_features(void);
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
        "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
+       "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
        "\nThe latest version can be found at:\n"			\
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "t:b:l:r:op:hvn"
+#define SHORT_OPS "d:t:b:l:r:op:hvnu"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
 {
+	{"dir", 1, NULL, 'd'},
 	{"top", 1, NULL, 't'},
 	{"bottom", 1, NULL, 'b'},
 	{"left", 1, NULL, 'l'},
@@ -125,6 +131,7 @@ static struct option long_opts[] =
 	{"right", 1, NULL, 'r'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
+	{"user", 0, NULL, 'u'},
 	{"new", 0, NULL, 'n'},
 	{NULL, 0, NULL, 0},
 };
@@ -238,7 +245,7 @@ int main(int argc, char **argv)
 	 * character indicating what kind of operation to perform:
 	 *
 	 * fFILE	open this file (or directory)
-	 * dDIR		open this dir (even if it looks like an app)
+	 * eDIR		shift-open this file (edit)
 	 * pPIN		display this pinboard
 	 * tDIR		open DIR as a top-panel
 	 * bDIR		open DIR as a bottom-panel
@@ -275,6 +282,17 @@ int main(int argc, char **argv)
 #endif
 	gtk_init(&argc, &argv);
 
+	euid = geteuid();
+	egid = getegid();
+	ngroups = getgroups(0, NULL);
+	if (ngroups < 0)
+		ngroups = 0;
+	else if (ngroups > 0)
+	{
+		supplemental_groups = g_malloc(sizeof(gid_t) * ngroups);
+		getgroups(ngroups, supplemental_groups);
+	}
+
 	while (1)
 	{
 		int	c;
@@ -310,14 +328,17 @@ int main(int argc, char **argv)
 			case 'r':
 			case 't':
 			case 'b':
+			case 'd':
+			case 'p':
 				g_string_append_c(to_open, '<');
 				g_string_append_c(to_open, c);
 				g_string_append_c(to_open, '>');
 				g_string_append(to_open, VALUE);
 				break;
-			case 'p':
-				g_string_append(to_open, "<p>");
-				g_string_append(to_open, VALUE);
+			case 'u':
+				show_user_message = g_strdup_printf(
+					_("Running as user '%s'"), 
+					user_name(euid));
 				break;
 			default:
 				printf(_(USAGE));
@@ -376,18 +397,7 @@ int main(int argc, char **argv)
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
 
-	euid = geteuid();
-	egid = getegid();
-	ngroups = getgroups(0, NULL);
-	if (ngroups < 0)
-		ngroups = 0;
-	else if (ngroups > 0)
-	{
-		supplemental_groups = g_malloc(sizeof(gid_t) * ngroups);
-		getgroups(ngroups, supplemental_groups);
-	}
-	
-	if (euid == 0)
+	if (euid == 0 && !show_user_message)
 	{
 		if (get_choice(_("!!!DANGER!!!"),
 			_("Running ROX-Filer as root is VERY dangerous. If I "

@@ -127,6 +127,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
+/* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
 static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void shell_command(gpointer data, guint action, GtkWidget *widget);
@@ -168,59 +169,61 @@ static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 #define N_(x) x
 
 static GtkItemFactoryEntry filer_menu_def[] = {
-{N_("Display"),			NULL,	NULL, 0, "<Branch>"},
-{">" N_("Large Icons"),   	NULL,  	large, 0, NULL},
-{">" N_("Small Icons"),   	NULL,  	small, 0, NULL},
-{">" N_("Large, With..."),	NULL,  	NULL, 0, "<Branch>"},
-{">>" N_("Summary"),	NULL,  	large_with, DETAILS_SUMMARY, NULL},
-{">>" N_("Sizes"),	NULL,  	large_with, DETAILS_SIZE, NULL},
-{">>" N_("Size Bars"),	NULL,  	large_with, DETAILS_SIZE_BARS, NULL},
-{">" N_("Small, With..."),	NULL,  	NULL, 0, "<Branch>"},
-{">>" N_("Summary"),	NULL,  	small_with, DETAILS_SUMMARY, NULL},
-{">>" N_("Sizes"),	NULL,  	small_with, DETAILS_SIZE, NULL},
-{">>" N_("Size Bars"),	NULL,  	small_with, DETAILS_SIZE_BARS, NULL},
-{">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Sort by Name"),	NULL,  	sort_name, 0, NULL},
-{">" N_("Sort by Type"),	NULL,  	sort_type, 0, NULL},
-{">" N_("Sort by Date"),	NULL,  	sort_date, 0, NULL},
-{">" N_("Sort by Size"),	NULL,  	sort_size, 0, NULL},
-{">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Show Hidden"),   	NULL, 	hidden, 0, "<ToggleItem>"},
-{">" N_("Refresh"),	NULL, 	refresh, 0,	NULL},
-{N_("File"),			NULL,  	NULL, 0, "<Branch>"},
-{">" N_("Copy..."),	NULL,  	copy_item, 0, NULL},
-{">" N_("Rename..."),	NULL,  	rename_item, 0, NULL},
-{">" N_("Link..."),	NULL,  	link_item, 0, NULL},
-{">" N_("Shift Open"),   	NULL,  	open_file, 0, NULL},
-{">" N_("Help"),		NULL,  	help, 0, NULL},
-{">" N_("Info"),		NULL,  	show_file_info, 0, NULL},
-{">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
-{">" N_("Open VFS"),	NULL,   NULL, 0, "<Branch>"},
-{">>" N_("Unzip"),	NULL,   open_vfs_uzip, 0, NULL},
-{">>" N_("Untar"),	NULL,   open_vfs_utar, 0, NULL},
-{">>" N_("RPM"),		NULL,   open_vfs_rpm, 0, NULL},
-{">",			NULL,   NULL, 0, "<Separator>"},
-{">" N_("Mount"),	    	NULL,  	mount, 0,	NULL},
-{">" N_("Delete"),	    	NULL, 	delete, 0,	NULL},
-{">" N_("Disk Usage"),	NULL, 	usage, 0, NULL},
-{">" N_("Permissions"),	NULL,   chmod_items, 0, NULL},
-{">" N_("Find"),		NULL,   find, 0, NULL},
-{N_("Select All"),	    	NULL,  	select_all, 0, NULL},
-{N_("Clear Selection"),		NULL,  	clear_selection, 0, NULL},
-{N_("Options..."),		NULL,   menu_show_options, 0, NULL},
-{N_("New Directory..."),	NULL,   new_directory, 0, NULL},
-{N_("Xterm Here"),		NULL,  	xterm_here, 0, NULL},
-{N_("Window"),			NULL,  	NULL, 0, "<Branch>"},
-{">" N_("Parent, New Window"), 	NULL,   open_parent, 0, NULL},
-{">" N_("Parent, Same Window"), NULL,  open_parent_same, 0, NULL},
-{">" N_("New Window"),	NULL,   new_window, 0, NULL},
-{">" N_("Close Window"),	NULL,  	close_window, 0, NULL},
-{">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Enter Path..."),	NULL,  	enter_path, 0, NULL},
-{">" N_("Shell Command..."),	NULL,  	shell_command, 0, NULL},
-{">" N_("Select If..."),	NULL,  	select_if, 0, NULL},
-{">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Show ROX-Filer Help"), NULL,  menu_rox_help, 0, NULL},
+{N_("Display"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Large Icons"),   	NULL, large, 0, NULL},
+{">" N_("Small Icons"),   	NULL, small, 0, NULL},
+{">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
+{">>" N_("Summary"),		NULL, large_with, DETAILS_SUMMARY, NULL},
+{">>" N_("Sizes"),		NULL, large_with, DETAILS_SIZE, NULL},
+{">>" N_("Size Bars"),		NULL, large_with, DETAILS_SIZE_BARS, NULL},
+{">" N_("Small, With..."),	NULL, NULL, 0, "<Branch>"},
+{">>" N_("Summary"),		NULL, small_with, DETAILS_SUMMARY, NULL},
+{">>" N_("Sizes"),		NULL, small_with, DETAILS_SIZE, NULL},
+{">>" N_("Size Bars"),		NULL, small_with, DETAILS_SIZE_BARS, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Sort by Name"),	NULL, sort_name, 0, NULL},
+{">" N_("Sort by Type"),	NULL, sort_type, 0, NULL},
+{">" N_("Sort by Date"),	NULL, sort_date, 0, NULL},
+{">" N_("Sort by Size"),	NULL, sort_size, 0, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
+{">" N_("Refresh"),		NULL, refresh, 0,	NULL},
+{N_("File"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Copy..."),		NULL, copy_item, 0, NULL},
+{">" N_("Rename..."),		NULL, rename_item, 0, NULL},
+{">" N_("Link..."),		NULL, link_item, 0, NULL},
+{">" N_("Shift Open"),   	NULL, open_file, 0, NULL},
+{">" N_("Help"),		NULL, help, 0, NULL},
+{">" N_("Info"),		NULL, show_file_info, 0, NULL},
+{">" N_("Set Run Action..."),	NULL, run_action, 0, NULL},
+{">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
+{">>" N_("Unzip"),		NULL, open_vfs_uzip, 0, NULL},
+{">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
+{">>" N_("RPM"),		NULL, open_vfs_rpm, 0, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Mount"),	    	NULL, mount, 0,	NULL},
+{">" N_("Delete"),	    	NULL, delete, 0,	NULL},
+{">" N_("Disk Usage"),		NULL, usage, 0, NULL},
+{">" N_("Permissions"),		NULL, chmod_items, 0, NULL},
+{">" N_("Find"),		NULL, find, 0, NULL},
+{N_("Select All"),	    	NULL, select_all, 0, NULL},
+{N_("Clear Selection"),		NULL, clear_selection, 0, NULL},
+{N_("Options..."),		NULL, menu_show_options, 0, NULL},
+{N_("New Directory..."),	NULL, new_directory, 0, NULL},
+{N_("Xterm Here"),		NULL, xterm_here, 0, NULL},
+{N_("Window"),			NULL, NULL, 0, "<Branch>"},
+{">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
+{">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
+{">" N_("New Window"),		NULL, new_window, 0, NULL},
+/* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
+
+{">" N_("Close Window"),	NULL, close_window, 0, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Enter Path..."),	NULL, enter_path, 0, NULL},
+{">" N_("Shell Command..."),	NULL, shell_command, 0, NULL},
+{">" N_("Select If..."),	NULL, select_if, 0, NULL},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Show ROX-Filer Help"), NULL, menu_rox_help, 0, NULL},
 };
 
 static GtkItemFactoryEntry pinboard_menu_def[] = {
@@ -1388,6 +1391,89 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 	else
 		filer_opendir(window_with_focus->path);
 }
+
+#if 0
+static void su_to_user(GtkWidget *dialog)
+{
+	char		*argv[] = {
+		"xterm", "-e", "su_rox", "USER", "APP_RUN", "DIR", NULL};
+	GtkEntry	*user;
+	guchar  	*path;
+	
+	g_return_if_fail(dialog != NULL);
+
+	path = gtk_object_get_data(GTK_OBJECT(dialog), "dir_path");
+	user = gtk_object_get_data(GTK_OBJECT(dialog), "user_name");
+
+	g_return_if_fail(user != NULL && path != NULL);
+
+	argv[2] = g_strconcat(app_dir, "/su_rox", NULL);
+	argv[3] = gtk_entry_get_text(user);
+	argv[4] = g_strconcat(app_dir, "/AppRun", NULL);
+	argv[5] = path;
+
+	if (!spawn(argv))
+		report_error(_("fork() failed"), g_strerror(errno));
+
+	g_free(argv[2]);
+	g_free(argv[4]);
+
+	gtk_widget_destroy(dialog);
+}
+
+static void new_user(gpointer data, guint action, GtkWidget *widget)
+{
+	GtkWidget	*dialog, *vbox, *hbox, *entry, *button;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
+	gtk_window_set_title(GTK_WINDOW(dialog), _("New window, as user..."));
+	gtk_container_set_border_width(GTK_CONTAINER(dialog), 4);
+	gtk_object_set_data_full(GTK_OBJECT(dialog), "dir_path",
+			g_strdup(window_with_focus->path), g_free);
+	
+	vbox = gtk_vbox_new(FALSE, 4);
+	gtk_container_add(GTK_CONTAINER(dialog), vbox);
+	gtk_box_pack_start(GTK_BOX(vbox),
+			gtk_label_new(_("Browse as which user?")),
+			TRUE, TRUE, 2);
+	
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 2);
+
+	gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_label_new(_("User:")), FALSE, TRUE, 2);
+
+	entry = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(entry), "root");
+	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
+	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 2);
+	gtk_widget_grab_focus(entry);
+	gtk_object_set_data(GTK_OBJECT(dialog), "user_name", entry);
+	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
+			GTK_SIGNAL_FUNC(su_to_user), GTK_OBJECT(dialog));
+
+	hbox = gtk_hbox_new(TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 2);
+
+	button = gtk_button_new_with_label(_("OK"));
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_window_set_default(GTK_WINDOW(dialog), button);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+		GTK_SIGNAL_FUNC(su_to_user), GTK_OBJECT(dialog));
+	
+	button = gtk_button_new_with_label(_("Cancel"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(dialog));
+
+	gtk_widget_show_all(dialog);
+}
+#endif
 
 static void close_window(gpointer data, guint action, GtkWidget *widget)
 {

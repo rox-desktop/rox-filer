@@ -503,7 +503,8 @@ static gboolean open_file(guchar *path, MIME_type *type)
 	g_string_sprintf(message,
 		_("No run action specified for files of this type (%s/%s) - "
 		"you can set a run action using by choosing `Set Run Action' "
-		"from the Window menu"),
+		"from the File menu, or you can just drag the file to an "
+		"application"),
 		type->media_type,
 		type->subtype);
 	report_error(PROJECT, message->str);

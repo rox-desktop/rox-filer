@@ -2,6 +2,18 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+07-Sep-2000
+~~~~~~~~~~~
+Running a second copy of the filer as another user will start a new copy
+instead of reusing the existing one. Added the '-u' option to display the
+name of the user running the filer in each window (also suppresses the
+normal don't-run-as-root warning).
+
+Added '-d', which opens a directory as a directory, even if it looks like
+an application.
+
+Updated the manual.
+
 06-Sep-2000
 ~~~~~~~~~~~
 Moved 'Set Run Action' to the file menu (suggested by Ewan Mac Mahon), and

@@ -69,8 +69,8 @@ gboolean remote_init(GString *to_open, gboolean new_copy)
 	GdkWindow		*existing_ipc_window;
 	GtkWidget		*ipc_window;
 
-	unique_id = g_strdup_printf("_ROX_FILER_%s_%s",
-				VERSION, our_host_name());
+	unique_id = g_strdup_printf("_ROX_FILER_%d_%s_%s",
+				euid, VERSION, our_host_name());
 	filer_atom = gdk_atom_intern(unique_id, FALSE);
 	g_free(unique_id);
 

@@ -916,6 +916,16 @@ FilerWindow *filer_opendir(char *path)
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 		
+		if (show_user_message)
+		{
+			GtkWidget *label;
+
+			label = gtk_label_new(show_user_message);
+			gtk_box_pack_start(GTK_BOX(vbox), label,
+					FALSE, TRUE, 0);
+			gtk_widget_show(label);
+		}
+
 		if (o_toolbar != TOOLBAR_NONE)
 		{
 			GtkWidget *toolbar;
