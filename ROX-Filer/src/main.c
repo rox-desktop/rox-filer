@@ -87,7 +87,8 @@ void stderr_cb(gpointer data, gint source, GdkInputCondition condition)
 
 int main(int argc, char **argv)
 {
-	int	stderr_pipe[2];
+	int		 stderr_pipe[2];
+	struct sigaction act = {};
 
 	gtk_init(&argc, &argv);
 	choices_init("ROX-Filer");
@@ -103,7 +104,10 @@ int main(int argc, char **argv)
 
 	options_load();
 
-	signal(SIGCHLD, child_died);
+	act.sa_handler = child_died;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGCHLD, &act, NULL);
 
 	if (argc < 2)
 		filer_opendir(getenv("HOME"), FALSE, BOTTOM);
