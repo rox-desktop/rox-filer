@@ -81,7 +81,6 @@ static gint panel_button_press(GtkWidget *widget,
 			      Panel *panel);
 static void panel_post_resize(GtkWidget *box,
 			GtkRequisition *req, Panel *panel);
-static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel);
 static void drag_set_panel_dest(Icon *icon);
 static void add_uri_list(GtkWidget          *widget,
                          GdkDragContext     *context,
@@ -180,8 +179,8 @@ Panel *panel_new(guchar *name, PanelSide side)
 	panel = g_new(Panel, 1);
 	panel->name = g_strdup(name);
 	panel->side = side;
-	panel->height = 0;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_policy(GTK_WINDOW(panel->window), FALSE, FALSE, TRUE);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_events(panel->window,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
@@ -211,6 +210,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 	}
 
 	vp = gtk_viewport_new(NULL, NULL);
+	gtk_container_set_resize_mode(GTK_CONTAINER(vp), GTK_RESIZE_PARENT);
 	gtk_viewport_set_shadow_type(GTK_VIEWPORT(vp), GTK_SHADOW_OUT);
 	gtk_container_add(GTK_CONTAINER(panel->window), vp);
 
@@ -276,12 +276,10 @@ Panel *panel_new(guchar *name, PanelSide side)
 		GTK_SIGNAL_FUNC(panel_post_resize), (GtkObject *) panel);
 	gtk_signal_connect_after(GTK_OBJECT(panel->window), "size-allocate",
 			GTK_SIGNAL_FUNC(reposition_panel), (GtkObject *) panel);
-	gtk_signal_connect_after(GTK_OBJECT(box), "size-allocate",
-			GTK_SIGNAL_FUNC(box_resized), (GtkObject *) panel);
 
 	number_of_windows++;
 	gtk_widget_show(panel->window);
-	
+
 	return panel;
 }
 
@@ -640,9 +638,6 @@ static gint icon_button_press(GtkWidget *widget,
 	return TRUE;
 }
 
-/* Difference between height of an icon and height of panel (or width) */
-#define MARGIN 8
-
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel)
 {
@@ -655,16 +650,17 @@ static void reposition_panel(GtkWidget *window,
 			x = screen_width - alloc->width;
 
 		if (current_panel[PANEL_TOP])
-			y += current_panel[PANEL_TOP]->height;
+		{
+			GtkWidget *win = current_panel[PANEL_TOP]->window;
+			y += win->allocation.height;
+		}
 	}
 
 	if (side == PANEL_BOTTOM)
 		y = screen_height - alloc->height;
 	
 	gtk_widget_set_uposition(panel->window, x, y);
-	panel->height = alloc->height;
-	gdk_window_move_resize(panel->window->window, x, y,
-				alloc->width, alloc->height);
+	gdk_window_move(panel->window->window, x, y);
 
 	if (side == PANEL_BOTTOM || side == PANEL_TOP)
 	{
@@ -1242,15 +1238,6 @@ static void run_applet(Icon *icon)
 	g_free(argv[1]);
 }
 
-/* When one of the panel icons resizes it will cause it's container box
- * to resize. This will cause the packing box inside the viewport to resize -
- * we get here right after that.
- */
-static void box_resized(GtkWidget *box, GtkAllocation *alloc, Panel *panel)
-{
-	gtk_widget_queue_resize(panel->window);
-}
-
 static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 {
 	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
@@ -1260,10 +1247,16 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 		int h = screen_height;
 
 		if (current_panel[PANEL_TOP])
-			h -= current_panel[PANEL_TOP]->height;
+		{
+			GtkWidget *win = current_panel[PANEL_TOP]->window;
+			h -= win->allocation.height;
+		}
 
 		if (current_panel[PANEL_BOTTOM])
-			h -= current_panel[PANEL_BOTTOM]->height;
+		{
+			GtkWidget *win = current_panel[PANEL_BOTTOM]->window;
+			h -= win->allocation.height;
+		}
 
 		req->height = h;
 	}

@@ -19,7 +19,6 @@ typedef enum {
 
 struct _Panel {
 	GtkWidget	*window;
-	int		height;
 	GtkAdjustment	*adj;		/* Scroll position of the bar */
 	PanelSide	side;
 	guchar		*name;		/* Leaf name */
