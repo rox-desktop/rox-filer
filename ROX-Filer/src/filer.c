@@ -443,6 +443,9 @@ static void update_display(Directory *dir,
 				else
 					collection_wink_item(collection,
 							cursor);
+
+				g_free(filer_window->auto_select);
+				filer_window->auto_select = NULL;
 			}
 
 			if (old_num != collection->number_of_items)
