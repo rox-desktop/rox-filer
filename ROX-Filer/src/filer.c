@@ -1214,7 +1214,13 @@ static void filer_add_widgets(FilerWindow *filer_window)
 			filer_window->scrollbar, FALSE, TRUE, 0);
 
 	/* Connect the menu's accelerator group to the window */
-	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
+	gtk_accel_group_attach(filer_keys,
+#ifdef GTK2
+			G_OBJECT(filer_window->window)
+#else
+			GTK_OBJECT(filer_window->window)
+#endif
+			);
 
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window), collection);
 
