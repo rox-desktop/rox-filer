@@ -595,6 +595,7 @@ static void select_all(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection_select_all(window_with_focus->collection);
+	window_with_focus->temp_item_selected = FALSE;
 }
 
 static void clear_selection(gpointer data, guint action, GtkWidget *widget)
@@ -602,6 +603,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	collection_clear_selection(window_with_focus->collection);
+	window_with_focus->temp_item_selected = FALSE;
 }
 
 static void show_options(gpointer data, guint action, GtkWidget *widget)

@@ -10,6 +10,7 @@
  */
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -21,8 +22,6 @@
 #include "gui_support.h"
 #include "filer.h"
 #include "main.h"
-
-#define BUFLEN 40
 
 typedef struct _GUIside GUIside;
 typedef void ActionChild(FilerWindow *filer_window);
@@ -43,9 +42,11 @@ struct _GUIside
 static int 	from_parent = 0;
 static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
+static GString  *message = NULL;
 
 /* Static prototypes */
-static gboolean send(FILE *file, char *string);
+static gboolean send();
+static gboolean send_error();
 
 static void for_dir_contents(char *dir, ForDirCB *cb)
 {
@@ -56,8 +57,7 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 	d = opendir(dir);
 	if (!d)
 	{
-		send(to_parent, g_strerror(errno));
-		send(to_parent, "\n");
+		send_error();
 		return;
 	}
 
@@ -86,13 +86,25 @@ static void for_dir_contents(char *dir, ForDirCB *cb)
 	return;
 }
 
-/* Send a string to fd. TRUE on success. */
-static gboolean send(FILE *file, char *string)
+/* Send 'message' to our parent process. TRUE on success. */
+static gboolean send()
 {
+	char len_buffer[5];
 	ssize_t len;
 
-	len = strlen(string);
-	return fwrite(string, sizeof(char), len, file) == len;
+	g_return_val_if_fail(message->len < 0xffff, FALSE);
+
+	sprintf(len_buffer, "%04x", message->len);
+	fwrite(len_buffer, 1, 4, to_parent);
+	len = fwrite(message->str, 1, message->len, to_parent);
+	fflush(to_parent);
+	return len == message->len;
+}
+
+static gboolean send_error()
+{
+	g_string_sprintf(message, "!ERROR: %s\n", g_strerror(errno));
+	return send();
 }
 
 static void button_reply(GtkWidget *button, GUIside *gui_side)
@@ -103,6 +115,8 @@ static void button_reply(GtkWidget *button, GUIside *gui_side)
 	g_return_if_fail(text != NULL);
 	fputc(*text, gui_side->to_child);
 	fflush(gui_side->to_child);
+
+	gtk_widget_set_sensitive(gui_side->actions, FALSE);
 }
 
 /* Get one char from fd. Quit on error. */
@@ -145,7 +159,7 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
 	int		child;
-	GtkWidget	*vbox, *button;
+	GtkWidget	*vbox, *button, *control;
 
 	if (pipe(filedes))
 	{
@@ -169,6 +183,7 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 			return NULL;
 		case 0:
 			/* We are the child */
+			message = g_string_new(NULL);
 			close(filedes[0]);
 			close(filedes[3]);
 			to_parent = fdopen(filedes[1], "wb");
@@ -199,9 +214,19 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 
 	gui_side->actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->actions, FALSE, TRUE, 0);
+
+	control = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), control, FALSE, TRUE, 0);
 	
+	button = gtk_button_new_with_label("Suspend");
+	gtk_box_pack_start(GTK_BOX(control), button, TRUE, TRUE, 0);
+
+	button = gtk_button_new_with_label("Resume");
+	gtk_widget_set_sensitive(button, FALSE);
+	gtk_box_pack_start(GTK_BOX(control), button, TRUE, TRUE, 0);
+
 	button = gtk_button_new_with_label("Abort");
-	gtk_box_pack_end(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(control), button, TRUE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(gui_side->window));
 
@@ -213,50 +238,53 @@ static GUIside *start_action(FilerWindow *filer_window, ActionChild *func)
 /* Delete one item - may need to recurse, or ask questions */
 static void do_delete(char *path)
 {
-	struct 	stat info;
-	char 	*error;
+	struct 		stat info;
+	gboolean	write_prot;
+	char		rep;
 
-	send(to_parent, path);
-	send(to_parent, ": ");
-	
-	if (stat(path, &info) == 0)
+	if (lstat(path, &info))
 	{
-		char	rep;
-		
-		if (!quiet)
+		send_error();
+		return;
+	}
+
+	write_prot = access(path, W_OK) != 0;
+	if (quiet == 0 || write_prot)
+	{
+		g_string_sprintf(message, "?Delete %s'%s'?\n",
+				write_prot ? "WRITE-PROTECTED " : " ",
+				path);
+		send();
+		rep = reply(from_parent);
+		if (rep == 'A')
+			quiet = TRUE;
+		else if (rep != 'Y')
+			return;
+	}
+	if (S_ISDIR(info.st_mode))
+	{
+		char *safe_path;
+		safe_path = g_strdup(path);
+		g_string_sprintf(message, "'Scanning in '%s'\n", safe_path);
+		send();
+		for_dir_contents(safe_path, do_delete);
+		if (rmdir(safe_path))
 		{
-			send(to_parent, "Delete?\n");
-			fflush(to_parent);
-			rep = reply(from_parent);
-			if (rep == 'Q')
-				quiet = TRUE;
-			else if (rep != 'Y')
-				return;
-		}
-		if (S_ISDIR(info.st_mode))
-		{
-			char *safe_path;
-			safe_path = g_strdup(path);
-			send(to_parent, "Scanning...\n");
-			fflush(to_parent);
-			for_dir_contents(safe_path, do_delete);
-			if (rmdir(safe_path))
-				error = g_strerror(errno);
-			else
-				error = "Directory deleted\n";
 			g_free(safe_path);
+			send_error();
+			return;
 		}
-		else if (unlink(path) == 0)
-			error = "OK";
-		else
-			error = g_strerror(errno);
+		g_free(safe_path);
+		g_string_assign(message, "'Directory deleted\n");
+		send();
+	}
+	else if (unlink(path) == 0)
+	{
+		g_string_sprintf(message, "'Deleted '%s'\n", path);
+		send();
 	}
 	else
-		error = g_strerror(errno);
-
-	send(to_parent, error);
-	send(to_parent, "\n");
-	fflush(to_parent);
+		send_error();
 }
 
 /* The child executes this... */
@@ -277,8 +305,8 @@ static void delete_cb(FilerWindow *filer_window)
 		left--;
 	}
 	
-	send(to_parent, "\nDone\n");
-	fflush(to_parent);
+	g_string_sprintf(message, "'\nDone\n");
+	send();
 	sleep(5);
 }
 
@@ -287,20 +315,39 @@ static void got_delete_data(gpointer 		data,
 			    gint     		source, 
 			    GdkInputCondition 	condition)
 {
-	char buf[BUFLEN];
+	char buf[5];
 	ssize_t len;
 	GUIside	*gui_side = (GUIside *) data;
 	GtkWidget *log = gui_side->log;
 
-	len = read(source, buf, BUFLEN);
-	if (len > 0)
-		gtk_text_insert(GTK_TEXT(log), NULL, NULL, NULL, buf, len);
-	else
+	len = read(source, buf, 4);
+	if (len == 4)
 	{
-		/* The child is dead */
-		gui_side->child = 0;
-		gtk_widget_destroy(gui_side->window);
+		ssize_t message_len;
+		char	*buffer;
+
+		buf[4] = '\0';
+		message_len = strtol(buf, NULL, 16);
+		buffer = g_malloc(message_len);
+		if (message_len > 0 &&
+			read(source, buffer, message_len) == message_len)
+		{
+			if (*buffer == '?')
+				gtk_widget_set_sensitive(gui_side->actions,
+							TRUE);
+			gtk_text_insert(GTK_TEXT(log),
+					NULL,
+					NULL, NULL,
+					buffer + 1, message_len - 1);
+			g_free(buffer);
+			return;
+		}
+		g_print("Child died in the middle of a message.\n");
 	}
+
+	/* The child is dead */
+	gui_side->child = 0;
+	gtk_widget_destroy(gui_side->window);
 }
 
 /* Called from outside - deletes all selected items */
@@ -329,8 +376,8 @@ void action_delete(FilerWindow *filer_window)
 
 	number_of_windows++;
 
-	button = gtk_button_new_with_label("Quiet");
-	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Q");
+	button = gtk_button_new_with_label("Always");
+	gtk_object_set_data(GTK_OBJECT(button), "send-code", "A");
 	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			button_reply, gui_side);
@@ -344,6 +391,7 @@ void action_delete(FilerWindow *filer_window)
 	gtk_box_pack_start(GTK_BOX(gui_side->actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			button_reply, gui_side);
+	gtk_widget_set_sensitive(gui_side->actions, FALSE);
 
 	gtk_widget_show_all(gui_side->window);
 }
