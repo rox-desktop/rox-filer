@@ -9,6 +9,7 @@
 #define _PIXMAP_H
 
 #include <gtk/gtk.h>
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include "fscache.h"
 
 extern GFSCache *pixmap_cache;
@@ -25,20 +26,11 @@ extern MaskedPixmap *im_appdir;
 
 extern MaskedPixmap *im_help;
 
-#ifdef HAVE_IMLIB
-#  ifdef PIXMAPS_C
-#    define IMLIB_T	GdkImlibImage
-#  else
-#    define IMLIB_T	gpointer
-#  endif
-#endif
-
 struct _MaskedPixmap
 {
 	int		ref;
-#ifdef HAVE_IMLIB
-	IMLIB_T		*image;
-#endif
+	GdkPixbuf	*pixbuf;
+
 	GdkPixmap	*pixmap;	/* Full size image */
 	GdkBitmap	*mask;
 	int		width;

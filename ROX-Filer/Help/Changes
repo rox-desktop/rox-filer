@@ -4,11 +4,14 @@
 
 19-Dec-2000
 ~~~~~~~~~~~
+Converted to use gdk-pixbuf instead of ImLib.
 Fixed a few compiler warnings and improved the error message displayed
 if you try to invoke rox on a missing file (reported by Vincent Lefèvre).
 
 18-Dec-2000
 ~~~~~~~~~~~
+AppIcon.xpm must be a regular file (stops people trying to crash the
+filer by symlinking to /dev/...).
 Fixed a missing translation in the pinboard options (Denis Manente).
 
 17-Dec-2000

@@ -70,8 +70,6 @@ void bind_init(void)
 
 /* Call this when a button event occurrs and you want to know what
  * to do.
- *
- * NOTE: Currently, this is only used for the panels.
  */
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 {

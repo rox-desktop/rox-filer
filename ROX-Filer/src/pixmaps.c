@@ -21,11 +21,6 @@
 
 /* pixmaps.c - code for handling pixmaps */
 
-/*
- * 2000/04/11 Imlib support added
- * Christiansen Merel <c.merel@wanadoo.fr>
- */
-
 #include "config.h"
 #define PIXMAPS_C
 
@@ -42,9 +37,6 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include "collection.h"
-#ifdef HAVE_IMLIB
-#  include <gdk_imlib.h>
-#endif
 
 #include "global.h"
 
@@ -96,9 +88,7 @@ static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
-#ifdef HAVE_IMLIB
-static GdkImlibImage *make_half_size(GdkImlibImage *big);
-#endif
+//static GdkPixbuf *make_half_size(GdkPixbuf *big);
 
 
 /****************************************************************
@@ -107,13 +97,6 @@ static GdkImlibImage *make_half_size(GdkImlibImage *big);
 
 void pixmaps_init(void)
 {
-#ifdef HAVE_IMLIB
-	gdk_imlib_init();
-
-	gtk_widget_push_visual(gdk_imlib_get_visual());
-	gtk_widget_push_colormap(gdk_imlib_get_colormap());
-#endif
-	
 	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
 					(GFSRefFunc) ref,
 					(GFSRefFunc) unref,
@@ -168,28 +151,32 @@ void pixmap_make_small(MaskedPixmap *mp)
 	if (mp->sm_pixmap)
 		return;
 
-#ifdef HAVE_IMLIB
-	if (mp->image)
+	if (mp->pixbuf)
 	{
-		GdkImlibImage	*small;
+		GdkPixbuf	*small;
 
-		small = make_half_size(mp->image);
-
-		if (small && gdk_imlib_render(small,
-					small->rgb_width, small->rgb_height))
-		{
-			mp->sm_pixmap = gdk_imlib_move_image(small);
-			mp->sm_mask = gdk_imlib_move_mask(small);
-			mp->sm_width = small->width;
-			mp->sm_height = small->height;
-		}
+		mp->sm_width = mp->width / 2;
+		mp->sm_height = mp->height / 2;
+			
+		small = gdk_pixbuf_scale_simple(
+				mp->pixbuf,
+				mp->sm_width,
+				mp->sm_height,
+				GDK_INTERP_BILINEAR);
 
 		if (small)
-			gdk_imlib_kill_image(small);
+		{
+			gdk_pixbuf_render_pixmap_and_mask(small,
+					&mp->sm_pixmap,
+					&mp->sm_mask,
+					128);
+			gdk_pixbuf_unref(small);
+		}
+
 		if (mp->sm_pixmap)
 			return;
 	}
-#endif
+
 	gdk_pixmap_ref(mp->pixmap);
 	if (mp->mask)
 		gdk_bitmap_ref(mp->mask);
@@ -213,38 +200,22 @@ static MaskedPixmap *image_from_file(char *path)
 	GdkBitmap	*mask;
 	int		width;
 	int		height;
-#ifdef HAVE_IMLIB
-	GdkImlibImage 	*image;
+	GdkPixbuf	*pixbuf;
 	
-	image = gdk_imlib_load_image(path);
-	if (!image)
+	pixbuf = gdk_pixbuf_new_from_file(path);
+	if (!pixbuf)
 		return NULL;
 
-	/* Avoid ImLib cache - ours is better! */
-	gdk_imlib_changed_image(image);
+	gdk_pixbuf_render_pixmap_and_mask(pixbuf, &pixmap, &mask, 128);
 
-	if (!gdk_imlib_render(image, image->rgb_width, image->rgb_height))
+	if (!pixmap)
 	{
-		gdk_imlib_kill_image(image);
+		gdk_pixbuf_unref(pixbuf);
 		return NULL;
 	}
 
-	pixmap = image->pixmap;
-	mask = image->shape_mask;
-	width = image->width;
-	height = image->height;
-#else
-	pixmap = gdk_pixmap_colormap_create_from_xpm(NULL,
-				gtk_widget_get_default_colormap(),
-				&mask,
-				0,
-				path);
-
-	if (!pixmap)
-		return NULL;
-	width = ((GdkPixmapPrivate *) pixmap)->width;
-	height = ((GdkPixmapPrivate *) pixmap)->height;
-#endif
+	width = gdk_pixbuf_get_width(pixbuf);
+	height = gdk_pixbuf_get_height(pixbuf);
 
 	mp = g_new(MaskedPixmap, 1);
 	mp->ref = 1;
@@ -252,9 +223,7 @@ static MaskedPixmap *image_from_file(char *path)
 	mp->mask = mask;
 	mp->width = width;
 	mp->height = height;
-#ifdef HAVE_IMLIB
-	mp->image = image;
-#endif
+	mp->pixbuf = pixbuf;
 	mp->sm_pixmap = NULL;
 	mp->sm_mask = NULL;
 
@@ -276,9 +245,7 @@ static MaskedPixmap *get_bad_image(void)
 		image->pixmap= gdk_pixmap_colormap_create_from_xpm_d(NULL,
 				gtk_widget_get_default_colormap(),
 				&image->mask, NULL, bad_xpm);
-#ifdef HAVE_IMLIB
-		image->image = NULL;
-#endif
+		image->pixbuf = NULL;
 
 		image->sm_pixmap = NULL;
 		image->sm_mask = NULL;
@@ -314,22 +281,21 @@ static void unref(MaskedPixmap *mp, gpointer data)
 	
 	if (mp && --mp->ref == 0)
 	{
-#ifdef HAVE_IMLIB
-		if (mp->image)
+		if (mp->pixbuf)
 		{
-			gdk_imlib_kill_image(mp->image);
+			gdk_pixbuf_unref(mp->pixbuf);
 		}
-		else
-#endif
-		{
+
+		if (mp->pixmap)
 			gdk_pixmap_unref(mp->pixmap);
-			if (mp->mask)
-				gdk_bitmap_unref(mp->mask);
-		}
+		if (mp->mask)
+			gdk_bitmap_unref(mp->mask);
+
 		if (mp->sm_pixmap)
 			gdk_pixmap_unref(mp->sm_pixmap);
 		if (mp->sm_mask)
 			gdk_bitmap_unref(mp->sm_mask);
+
 		g_free(mp);
 	}	
 }
@@ -347,93 +313,3 @@ static gint purge(gpointer data)
 	return TRUE;
 }
 
-#ifdef HAVE_IMLIB
-
-/* Returns data to make an 1/4 size image of 'big'. g_free() the result. */
-static GdkImlibImage *make_half_size(GdkImlibImage *big)
-{
-	int		line_size = big->width * 3;
-	int		sw = big->width >> 1;
-	int		sh = big->height >> 1;
-	GdkImlibColor	tr;		/* Mask colour */
-	unsigned char	*small_data, *in, *out;
-	GdkImlibImage	*small;
-	int		x, y;
-	GtkStyle	*style = gtk_widget_get_default_style();
-	GdkColor	*bg = &style->bg[GTK_STATE_INSENSITIVE];
-
-	gdk_imlib_get_image_shape(big, &tr);
-	small_data = g_malloc(sw * sh * 3);
-
-	out = small_data;
-
-	for (y = 0; y < sh; y++)
-	{
-		in = big->rgb_data + y * line_size * 2;
-
-		for (x = 0; x < sw; x++)
-		{
-			int	r1 = in[0], r2 = in[3];
-			int	r3 = in[0 + line_size], r4 = in[3 + line_size];
-			int	g1 = in[1], g2 = in[4];
-			int	g3 = in[1 + line_size], g4 = in[4 + line_size];
-			int	b1 = in[2], b2 = in[5];
-			int	b3 = in[2 + line_size], b4 = in[5 + line_size];
-			int	m = 0;		/* No. trans pixels */
-
-			if (r1 == tr.r && g1 == tr.g && b1 == tr.b)
-			{
-				r1 = bg->red;
-				g1 = bg->green;
-				b1 = bg->blue;
-				m++;
-			}
-			if (r2 == tr.r && g2 == tr.g && b2 == tr.b)
-			{
-				r2 = bg->red;
-				g2 = bg->green;
-				b2 = bg->blue;
-				m++;
-			}
-			if (r3 == tr.r && g3 == tr.g && b3 == tr.b)
-			{
-				r3 = bg->red;
-				g3 = bg->green;
-				b3 = bg->blue;
-				m++;
-			}
-			if (r4 == tr.r && g4 == tr.g && b4 == tr.b)
-			{
-				r4 = bg->red;
-				g4 = bg->green;
-				b4 = bg->blue;
-				m++;
-			}
-
-			if (m < 3)
-			{
-				out[0] = (r1 + r2 + r3 + r4) >> 2;
-				out[1] = (g1 + g2 + g3 + g4) >> 2;
-				out[2] = (b1 + b2 + b3 + b4) >> 2;
-			}
-			else
-			{
-				out[0] = tr.r;
-				out[1] = tr.g;
-				out[2] = tr.b;
-			}
-
-			in += 6;
-			out += 3;
-		}
-	}
-	
-	small = gdk_imlib_create_image_from_data(small_data, NULL, sw, sh);
-	g_free(small_data);
-
-	if (small)
-		gdk_imlib_set_image_shape(small, &tr);
-
-	return small;
-}
-#endif

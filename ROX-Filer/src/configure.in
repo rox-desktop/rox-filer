@@ -34,21 +34,9 @@ if test -z "$GTK_CONFIG"; then
 fi
 AC_SUBST(GTK_CONFIG)
 
-dnl Find ImLib
-AC_MSG_CHECKING(for ImLib library)
-IMLIB_LIBS=`imlib-config --libs-gdk 2> /dev/null`
-changequote(,)dnl
-if [ -n "$IMLIB_LIBS" ]; then
-changequote([,])dnl
-  AC_MSG_RESULT(yes - use '$IMLIB_LIBS')
-  AC_DEFINE(HAVE_IMLIB)
-  IMLIB_CFLAGS=`imlib-config --cflags-gdk`
-else
-  AC_MSG_RESULT(no - 'imlib-config --libs-gdk' failed)
-  IMLIB_CFLAGS=""
-fi
-AC_SUBST(IMLIB_CFLAGS)
-AC_SUBST(IMLIB_LIBS)
+dnl Make sure we have gdk-pixbuf
+AC_CHECK_LIB(gdk_pixbuf, gdk_pixbuf_new_from_file, ,
+	AC_MSG_ERROR("ROX-Filer now requires the gdk-pixbuf library"))
 
 dnl Does file(1) support '-b' ?
 AC_MSG_CHECKING(whether file -b works)

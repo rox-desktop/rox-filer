@@ -58,11 +58,7 @@
 #define ROW_HEIGHT_SMALL 20
 #define ROW_HEIGHT_FULL_INFO 44
 #define SMALL_ICON_HEIGHT 20
-#ifdef HAVE_IMLIB
-#  define SMALL_ICON_WIDTH 24
-#else
-#  define SMALL_ICON_WIDTH 48
-#endif
+#define SMALL_ICON_WIDTH 24
 #define MIN_ITEM_WIDTH 64
 
 #define MIN_TRUNCATE 0

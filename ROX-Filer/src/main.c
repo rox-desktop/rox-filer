@@ -481,13 +481,6 @@ static void show_features(void)
 		_("No (couldn't find a valid libvfs)")
 #endif
 		);
-	g_printerr("%s... %s\n", _("ImLib support"),
-#ifdef HAVE_IMLIB
-		_("Yes")
-#else
-		_("No (the imlib-config command didn't work)")
-#endif
-		);
 }
 
 /* Register a function to be called when process number 'child' dies. */

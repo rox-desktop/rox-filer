@@ -6,12 +6,10 @@ LIBS = @LIBS@
 .SUFFIXES: .c .o
 
 CC = @CC@
-IMLIB_CFLAGS = @IMLIB_CFLAGS@
-IMLIB_LIBS = @IMLIB_LIBS@
 
 GTK_CONFIG = @GTK_CONFIG@
 CFLAGS = @CFLAGS@ `${GTK_CONFIG} --cflags` -I.
-LDFLAGS = @LDFLAGS@ `${GTK_CONFIG} --libs` ${LIBS} ${IMLIB_LIBS}
+LDFLAGS = @LDFLAGS@ `${GTK_CONFIG} --libs` ${LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
@@ -59,13 +57,3 @@ configure: configure.in
 
 messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
-
-dist:
-	(cd po; ./dist)
-	echo "Don't forget the manual and version number!"
-
-############ Special case
-
-pixmaps.o: pixmaps.c
-	${CC} ${CFLAGS} ${IMLIB_CFLAGS} -c $< -o $@
-

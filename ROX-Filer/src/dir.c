@@ -244,6 +244,7 @@ void dir_restat(guchar *path, DirItem *item)
 			strcpy(tmp + path_len + 4, "Icon.xpm");
 
 			if (mc_stat(tmp, &icon) == 0 &&
+					S_ISREG(icon.st_mode) &&
 					icon.st_size <= MAX_ICON_SIZE)
 			{
 				item->image = g_fscache_lookup(pixmap_cache,
