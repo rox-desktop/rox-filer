@@ -414,7 +414,7 @@
 
  </chapter>
 
- <chapter id="keys">
+ <chapter id="keys" xreflabel="mouse and key bindings">
   <title>Mouse button and key bindings</title>
 
   <itemizedlist><title>Quick start:</title>
@@ -906,7 +906,7 @@
   </sect1>
 
   <sect1>
-   <title>The selection menu</title>
+   <title>The file menu</title>
    <para>
 
     All of these work in the same way &mdash; if you open the menu with some
@@ -1035,6 +1035,40 @@
   </sect1>
 
   <sect1>
+   <title>The select menu</title>
+   <para>
+    This menu allows you to select and unselect files in various ways. See the
+    <xref linkend="keys"/> section for other ways to select files.
+
+    <informaltable><tgroup cols="2">
+      <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+      <tbody>
+       <row><entry> 
+         <guimenuitem>Select All</guimenuitem></entry><entry>
+         Select every item in this window.
+       </entry></row>
+
+       <row><entry><guimenuitem>Clear Selection</guimenuitem></entry><entry>
+         Unselect every item in this window.
+       </entry></row>
+
+       <row><entry><guimenuitem>Invert Selection</guimenuitem></entry><entry>
+	 Every selected file becomes unselected, and every unselected file
+	 becomes selected.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Select If...</guimenuitem></entry><entry>
+         Select just those files that match the given pattern &mdash;
+         see the <xref linkend="SelectIf"/> section).
+       </entry></row>
+
+    </tbody></tgroup></informaltable>
+
+   </para>
+  </sect1>
+
+  <sect1>
    <title>The new menu</title>
    <para>
 
@@ -1085,32 +1119,6 @@
     </para><para>
     Note that you cannot set keyboard shortcuts for these user-defined
     entries at present.
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>The select menu</title>
-   <para>
-    <informaltable><tgroup cols="2">
-      <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
-      <tbody>
-       <row><entry> 
-         <guimenuitem>Select All</guimenuitem></entry><entry>
-         Select every item in this window.
-       </entry></row>
-
-       <row><entry><guimenuitem>Clear Selection</guimenuitem></entry><entry>
-         Unselect every item in this window.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Select If...</guimenuitem></entry><entry>
-         Select just those files that match the given pattern &mdash;
-         see the <xref linkend="SelectIf"/> section).
-       </entry></row>
-
-    </tbody></tgroup></informaltable>
 
    </para>
   </sect1>
