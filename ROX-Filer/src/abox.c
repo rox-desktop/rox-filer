@@ -105,6 +105,8 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 	ABox *abox = ABOX(object);
 	GtkDialog *dialog = GTK_DIALOG(object);
 
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+
 	abox->dir_label = gtk_label_new(_("<dir>"));
 	gtk_widget_set_size_request(abox->dir_label, 8, -1);
 	abox->results = NULL;
