@@ -1374,7 +1374,7 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	/* Add the main View widget */
 	filer_set_view_type(filer_window, filer_window->view_type);
 	/* Put the scrollbar next to the View */
-	gtk_box_pack_start(GTK_BOX(hbox),
+	gtk_box_pack_end(GTK_BOX(hbox),
 			filer_window->scrollbar, FALSE, TRUE, 0);
 	gtk_widget_show(hbox);
 	
