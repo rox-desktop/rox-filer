@@ -94,8 +94,6 @@ void rox_add_translations(char *path)
 		return;
 	}
 
-	g_print("[ swap = %d ]\n", swap);
-
 	if (WORD(data + 4) != 0)
 		g_warning("rox_add_translations: expected format revision 0");
 

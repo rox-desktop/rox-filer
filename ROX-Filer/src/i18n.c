@@ -91,10 +91,12 @@ GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n)
 		int	indent;
 
 		if (from[0] == '>')
+		{
 			if (from[1] == '>')
 				indent = 2;
 			else
 				indent = 1;
+		}
 		else
 			indent = 0;
 
