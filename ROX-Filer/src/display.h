@@ -31,10 +31,6 @@ typedef enum {
 	DETAILS_TIMES,
 } DetailsType;
 
-extern guchar *last_layout;
-extern gboolean last_show_hidden;
-extern int (*last_sort_fn)(const void *a, const void *b);
-
 /* Prototypes */
 void display_init();
 void display_set_layout(FilerWindow  *filer_window,

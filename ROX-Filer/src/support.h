@@ -8,12 +8,13 @@
 #ifndef _SUPPORT_H
 #define _SUPPORT_H
 
-#define PRETTY_SIZE_LIMIT 4096
+#define PRETTY_SIZE_LIMIT 10000
 #define TIME_FORMAT "%T %d %b %Y"
 
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
+char *our_host_name_for_dnd();
 pid_t spawn(char **argv);
 pid_t spawn_full(char **argv, char *dir);
 void debug_free_string(void *data);

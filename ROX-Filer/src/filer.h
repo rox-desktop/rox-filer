@@ -84,7 +84,7 @@ extern gboolean 	o_unique_filer_windows;
 
 /* Prototypes */
 void filer_init(void);
-FilerWindow *filer_opendir(char *path);
+FilerWindow *filer_opendir(char *path, FilerWindow *src_win);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 void filer_update_all(void);
 int selected_item_number(Collection *collection);
@@ -94,6 +94,7 @@ void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		OpenFlags flags);
 void filer_check_mounted(char *path);
+void filer_close_recursive(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 gboolean filer_exists(FilerWindow *filer_window);
 void filer_open_parent(FilerWindow *filer_window);

@@ -108,6 +108,7 @@ static void show_features(void);
        "directory if no arguments are given.\n\n"			\
        "  -b, --bottom=PANEL	open PAN as a bottom-edge panel\n"	\
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
+       "  -D, --close=DIR	close DIR and its subdirectories\n"     \
        "  -h, --help		display this help and exit\n"		\
        "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
        "  -m, --mime-type=FILE	print MIME type of FILE and exit\n" \
@@ -124,7 +125,7 @@ static void show_features(void);
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:c:"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:D:"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -142,6 +143,7 @@ static struct option long_opts[] =
 	{"new", 0, NULL, 'n'},
 	{"show", 1, NULL, 's'},
 	{"examine", 1, NULL, 'x'},
+	{"close", 1, NULL, 'D'},
 	{"mime-type", 1, NULL, 'm'},
 	{"client-id", 1, NULL, 'c'},
 	{NULL, 0, NULL, 0},
@@ -227,6 +229,7 @@ int main(int argc, char **argv)
 	 *
 	 * fFILE	open this file (or directory)
 	 * dDIR		open DIR as a directory (not as an application)
+	 * DDIR		close DIR and its subdirectories
 	 * eDIR		shift-open this file (edit)
 	 * pPIN		display this pinboard
 	 * [lrtb]PANEL	open PANEL as a {left, right, top, bottom} panel
@@ -306,6 +309,7 @@ int main(int argc, char **argv)
 				fprintf(stderr, _(HELP));
 				fprintf(stderr, _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
+			case 'D':
 			case 'd':
 		        case 'x':
 				/* Argument is a path */
@@ -466,7 +470,7 @@ int main(int argc, char **argv)
 		
 	run_list(to_open->str);
 	g_string_free(to_open, TRUE);
-	
+
 	if (number_of_windows > 0)
 		gtk_main();
 

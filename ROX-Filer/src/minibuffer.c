@@ -279,7 +279,7 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 }
 
 /* Use the cursor item to fill in the minibuffer.
- * If there are multiple matches the fill in as much as possible and
+ * If there are multiple matches then fill in as much as possible and
  * (possibly) beep.
  */
 static void complete(FilerWindow *filer_window)

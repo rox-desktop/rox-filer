@@ -179,6 +179,8 @@ void display_init()
 	option_add_int("display_sort_by", SORT_BY_NAME, NULL);
 	option_add_int("display_large_width", o_large_truncate, NULL);
 	option_add_int("display_small_width", o_small_truncate, NULL);
+	option_add_int("display_show_hidden", FALSE, NULL);
+	option_add_int("display_inherit_options", FALSE, NULL);
 
 	option_add_notify(options_changed);
 }

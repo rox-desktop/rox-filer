@@ -86,13 +86,18 @@ GString *make_path(char *dir, char *leaf)
 	return buffer;
 }
 
-/* Return our complete host name */
+/* Return our complete host name for DND */
+char *our_host_name_for_dnd(void)
+{
+	if (option_get_int("dnd_no_hostnames"))
+		return "";
+	return our_host_name();
+}
+
+/* Return our complete host name, unconditionally */
 char *our_host_name(void)
 {
 	static char *name = NULL;
-
-	if (option_get_int("dnd_no_hostnames"))
-		return "";
 
 	if (!name)
 	{
@@ -283,24 +288,24 @@ char *format_size_aligned(unsigned long size)
 /*
  * Similar to format_size(), but this one uses a double argument since
  * unsigned long isn't wide enough on all platforms and we must be able to
- * sum sizes above 4 GB. At most 2 digits are shown after the decimal
- * point.
+ * sum sizes above 4 GB.
  */
 gchar *format_double_size(double size)
 {
 	static gchar	*buf = NULL;
 	char		*units;
-	int		prec = 0;
 
 	if (size >= PRETTY_SIZE_LIMIT)
 	{
-		prec = 2;
+		size += 1023;
 		size /= 1024;
 		if (size >= PRETTY_SIZE_LIMIT)
 		{
+			size += 1023;
 			size /= 1024;
 			if (size >= PRETTY_SIZE_LIMIT)
 			{
+				size += 1023;
 				size /= 1024;
 				units = "Gb";
 			}
@@ -318,7 +323,7 @@ gchar *format_double_size(double size)
 
 	if (buf)
 		g_free(buf);
-	buf = g_strdup_printf("%.*f %s", prec, size, units);
+	buf = g_strdup_printf("%.0f %s", size, units);
 
 	return buf;
 }

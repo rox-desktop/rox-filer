@@ -533,12 +533,12 @@ static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, FALSE);
+			run_diritem(icon->path, &icon->item, NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, TRUE);
+			run_diritem(icon->path, &icon->item, NULL, NULL, TRUE);
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
@@ -757,7 +757,7 @@ out:
 		g_dataset_set_data_full(context, "drop_dest_path",
 				g_strdup(icon->path), g_free);
 		if (type == drop_dest_dir)
-			dnd_spring_load(context);
+			dnd_spring_load(context, NULL);
 
 		if (dnd_highlight && dnd_highlight != icon->widget)
 		{
@@ -1176,7 +1176,7 @@ static guchar *create_uri_list(GList *list)
 	guchar	*leader;
 
 	tmp = g_string_new(NULL);
-	leader = g_strdup_printf("file://%s", our_host_name());
+	leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
 
 	for (; list; list = list->next)
 	{

@@ -1278,7 +1278,7 @@ static void show_file_info(gpointer unused, guint action, GtkWidget *widget)
 	
 void open_home(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(home_dir);
+	filer_opendir(home_dir, NULL);
 }
 
 static void help(gpointer data, guint action, GtkWidget *widget)
@@ -1578,7 +1578,7 @@ static void customise_send_to(gpointer data)
 	report_error(PROJECT, msg);
 
 	if (save)
-		filer_opendir(save);
+		filer_opendir(save, NULL);
 
 	g_free(msg);
 }
@@ -1711,7 +1711,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 			"is turned on in the Options window."));
 	}
 	else
-		filer_opendir(window_with_focus->path);
+		filer_opendir(window_with_focus->path, NULL);
 }
 
 #if 0
@@ -1827,7 +1827,7 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(app_dir, "Help")->str);
+	filer_opendir(make_path(app_dir, "Help")->str, NULL);
 }
 
 /* Set n items from position 'from' in 'menu' to the 'shaded' state */

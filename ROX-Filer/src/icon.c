@@ -691,7 +691,7 @@ static void selection_get(GtkWidget *widget,
 	str = g_string_new(NULL);
 
 	if (info == TARGET_URI_LIST)
-		leader = g_strdup_printf("file://%s", our_host_name());
+		leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
 
 	for (next = icon_selection; next; next = next->next)
 	{
@@ -789,7 +789,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 	{
 		case ACTION_SHIFT:
 			run_diritem(menu_icon->path, &menu_icon->item,
-					NULL, TRUE);
+					NULL, NULL, TRUE);
 			break;
 		case ACTION_EDIT:
 			show_rename_box(menu_icon->widget,

@@ -58,7 +58,7 @@ static gboolean ipc_prop_changed(GtkWidget *window,
 
 /* Try to get an already-running filer to handle things (only if
  * new_copy is FALSE); TRUE if we succeed.
- * Create and IPC widget so that future filers can contact us.
+ * Create an IPC widget so that future filers can contact us.
  *
  * See main() for a description of 'to_open'.
  */

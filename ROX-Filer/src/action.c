@@ -103,7 +103,9 @@ static GString  *message = NULL;
 static char     *action_dest = NULL;
 static char     *action_leaf = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
-static size_t	size_tally;	/* For Disk Usage */
+static double	size_tally;		/* For Disk Usage */
+static unsigned long dir_counter;	/* For Disk Usage */
+static unsigned long file_counter;	/* For Disk Usage */
 
 static struct mode_change *mode_change = NULL;	/* For Permissions */
 static FindCondition *find_condition = NULL;	/* For Find */
@@ -163,7 +165,7 @@ static void select_row_callback(GtkWidget *widget,
 		return;
 	}
 
-	gui_side->preview = filer_opendir(dir);
+	gui_side->preview = filer_opendir(dir, NULL);
 	if (gui_side->preview)
 	{
 		display_set_autoselect(gui_side->preview, leaf);
@@ -468,7 +470,7 @@ static void message_from_child(gpointer 	 data,
 			else if (*buffer == 'o')
 			{
 				/* Open a filer window */
-				filer_opendir(buffer + 1);
+				filer_opendir(buffer + 1, NULL);
 				g_free(buffer);
 				return;
 			}
@@ -939,7 +941,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
  */
 
 /* dest_path is the dir containing src_path.
- * Updates the global size_tally.
+ * Updates the global size_tally, file_counter and dir_counter.
  */
 static gboolean do_usage(char *src_path, char *dest_path)
 {
@@ -956,9 +958,13 @@ static gboolean do_usage(char *src_path, char *dest_path)
 	}
 
 	if (S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
+	{
+	        file_counter++;
 		size_tally += info.st_size;
+	}
 	else if (S_ISDIR(info.st_mode))
 	{
+	        dir_counter++;
 		g_string_sprintf(message, _("?Count contents of %s?"),
 				src_path);
 		if (reply(from_parent, FALSE))
@@ -1613,6 +1619,7 @@ static void do_mount(guchar *path, gboolean mount)
 
 /* After forking, the child calls one of these functions */
 
+/* We use a double for total size in order to count beyond 4Gb */
 static void usage_cb(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
@@ -1620,7 +1627,10 @@ static void usage_cb(gpointer data)
 	DirItem   *item;
 	int	left = collection->number_selected;
 	int	i = -1;
-	off_t	total_size = 0;
+	double	total_size = 0;
+	gchar	*tmp;
+
+	dir_counter= file_counter= 0;
 
 	send_dir(filer_window->path);
 
@@ -1636,14 +1646,37 @@ static void usage_cb(gpointer data)
 					filer_window->path);
 		g_string_sprintf(message, "'%s: %s\n",
 				item->leafname,
-				format_size((unsigned long) size_tally));
+				format_double_size((unsigned long) size_tally));
 		send();
 		total_size += size_tally;
 		left--;
 	}
+
+	g_string_sprintf(message, _("'\nTotal: %s ("),
+			 format_double_size(total_size));
 	
-	g_string_sprintf(message, _("'\nTotal: %s\n"),
-			format_size((unsigned long) total_size));
+	if (file_counter)
+	{
+		tmp = g_strdup_printf("%ld %s%s",
+				file_counter,
+				file_counter == 1 ? _("file") : _("files"),
+				dir_counter ? ", " : ")\n");
+		g_string_append(message, tmp);
+		g_free(tmp);
+	}
+
+	if (file_counter == 0 && dir_counter == 0)
+		g_string_append(message, _("no directories)\n"));
+	else if (dir_counter)
+	{
+		tmp = g_strdup_printf("%ld %s)\n",
+				dir_counter,
+				dir_counter == 1 ? _("directory")
+						 : _("directories"));
+		g_string_append(message, tmp);
+		g_free(tmp);
+	}
+	
 	send();
 }
 

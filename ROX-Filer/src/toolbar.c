@@ -226,7 +226,7 @@ void toolbar_update_info(FilerWindow *filer_window)
 
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_opendir(make_path(app_dir, "Help")->str);
+	filer_opendir(make_path(app_dir, "Help")->str, NULL);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,
@@ -238,7 +238,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->path);
+		filer_opendir(filer_window->path, filer_window);
 	}
 	else
 	{
@@ -254,7 +254,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
-		filer_opendir(home_dir);
+		filer_opendir(home_dir, filer_window);
 	}
 	else
 		filer_change_to(filer_window, home_dir, NULL);
@@ -270,7 +270,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->path);
+		filer_opendir(filer_window->path, filer_window);
 	}
 	else
 		gtk_widget_destroy(filer_window->window);
@@ -500,7 +500,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	g_dataset_set_data(context, "drop_dest_type", drop_dest_dir);
 	gdk_drag_status(context, action, time);
 	
-	dnd_spring_load(context);
+	dnd_spring_load(context, filer_window);
 	gtk_button_set_relief(GTK_BUTTON(widget), GTK_RELIEF_NORMAL);
 
 	return TRUE;

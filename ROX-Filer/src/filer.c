@@ -592,7 +592,7 @@ static void selection_get(GtkWidget *widget,
 			break;
 		case TARGET_URI_LIST:
 			g_string_sprintf(header, " file://%s%s",
-					our_host_name(),
+					our_host_name_for_dnd(),
 					make_path(filer_window->path, "")->str);
 			break;
 	}
@@ -695,6 +695,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	old_dir = filer_window->directory;
 	if (run_diritem(full_path, item,
 			flags & OPEN_SAME_WINDOW ? filer_window : NULL,
+			filer_window,
 			shift))
 	{
 		if (old_dir != filer_window->directory)
@@ -946,7 +947,7 @@ void filer_open_parent(FilerWindow *filer_window)
 	if (slash)
 	{
 		*slash = '\0';
-		filer_opendir(*copy ? copy : "/");
+		filer_opendir(*copy ? copy : "/", filer_window);
 	}
 	else
 		g_warning("No / in directory path!\n");
@@ -1014,7 +1015,7 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 	int i, num_selected;
 
 	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name());
+	g_string_append(leader, our_host_name_for_dnd());
 	g_string_append(leader, filer_window->path);
 	if (leader->str[leader->len - 1] != '/')
 		g_string_append_c(leader, '/');
@@ -1038,13 +1039,15 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 }
 
 /* Creates and shows a new filer window.
+ * If src_win != NULL then display options can be taken from that source window.
  * Returns the new filer window, or NULL on error.
  */
-FilerWindow *filer_opendir(char *path)
+FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 {
 	FilerWindow	*filer_window;
 	char		*real_path;
-	int		i;
+	DisplayStyle    dstyle;
+	DetailsType     dtype;
 	
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -1080,18 +1083,31 @@ FilerWindow *filer_opendir(char *path)
 		return NULL;
 	}
 
-	filer_window->show_hidden = FALSE;
 	filer_window->temp_item_selected = FALSE;
-
-	i = option_get_int("display_sort_by");
-	filer_window->sort_fn = i == 0 ? sort_by_name :
-				i == 1 ? sort_by_type :
-				i == 2 ? sort_by_date :
-				sort_by_size;
-		
 	filer_window->flags = (FilerFlags) 0;
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
+
+	if (src_win && option_get_int("display_inherit_options"))
+	{
+	        filer_window->sort_fn = src_win->sort_fn;
+		dstyle = src_win->display_style;
+		dtype = src_win->details_type;
+		filer_window->show_hidden = src_win->show_hidden;
+	}
+	else
+	{
+	        int i = option_get_int("display_sort_by");
+		filer_window->sort_fn = i == 0 ? sort_by_name :
+		                        i == 1 ? sort_by_type :
+		                        i == 2 ? sort_by_date :
+		                        sort_by_size;
+		
+		dstyle = option_get_int("display_size");
+		dtype = option_get_int("display_details");
+		filer_window->show_hidden =
+			option_get_int("display_show_hidden");
+	}
 
 	/* Add all the user-interface elements & realise */
 	filer_add_widgets(filer_window);
@@ -1099,9 +1115,7 @@ FilerWindow *filer_opendir(char *path)
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
-	display_set_layout(filer_window,
-			option_get_int("display_size"),
-			option_get_int("display_details"));
+	display_set_layout(filer_window, dstyle, dtype);
 
 	/* Open the window after a timeout, or when scanning stops.
 	 * Do this before attaching, because attach() might tell us to
@@ -1396,6 +1410,31 @@ void filer_check_mounted(char *path)
 		refresh_dirs("/");
 
 	icons_may_update(path);
+}
+
+/* Close all windows displaying 'path' or subdirectories of 'path' */
+/* XXX: Dup code? */
+void filer_close_recursive(char *path)
+{
+	GList	*next = all_filer_windows;
+	int	len;
+
+	len = strlen(path);
+
+	while (next)
+	{
+		FilerWindow *filer_window = (FilerWindow *) next->data;
+
+		next = next->next;
+
+		if (strncmp(path, filer_window->path, len) == 0)
+		{
+			char s = filer_window->path[len];
+
+			if (s == '/' || s == '\0')
+				gtk_widget_destroy(filer_window->window);
+		}
+	}
 }
 
 /* Like minibuffer_show(), except that:

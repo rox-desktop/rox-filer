@@ -348,9 +348,9 @@ void drag_one_item(GtkWidget		*widget,
 
 	g_dataset_set_data_full(context, "full_path",
 			g_strdup(full_path), g_free);
-	uri = g_strconcat("file://", our_host_name(), full_path, "\r\n", NULL);
-	g_dataset_set_data_full(context, "uri_list",
-				uri, g_free);
+	uri = g_strconcat("file://", our_host_name_for_dnd(),
+			full_path, "\r\n", NULL);
+	g_dataset_set_data_full(context, "uri_list", uri, g_free);
 
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),
@@ -552,7 +552,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 						GTK_SIGNAL_FUNC(scrolled),
 						filer_window->collection);
 		}
-		dnd_spring_load(context);
+		dnd_spring_load(context, filer_window);
 	}
 	else
 		dnd_spring_abort();
@@ -701,7 +701,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 
 				uri = g_string_new(NULL);
 				g_string_sprintf(uri, "file://%s%s",
-						our_host_name(),
+						our_host_name_for_dnd(),
 						make_path(dest_path,
 							  leafname)->str);
 				set_xds_prop(context, uri->str);
@@ -1120,8 +1120,9 @@ static void prompt_action(GList *paths, gchar *dest)
 static gint spring_timeout = -1;
 static GdkDragContext *spring_context = NULL;
 static FilerWindow *spring_window = NULL;
+static FilerWindow *spring_src_window = NULL;
 
-void dnd_spring_load(GdkDragContext *context)
+void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win)
 {
 	g_return_if_fail(context != NULL);
 
@@ -1133,6 +1134,7 @@ void dnd_spring_load(GdkDragContext *context)
 	
 	spring_context = context;
 	gdk_drag_context_ref(spring_context);
+	spring_src_window = src_win;
 	spring_timeout = gtk_timeout_add(
 			option_get_int("dnd_spring_delay"), spring_now, NULL);
 }
@@ -1213,7 +1215,7 @@ static gboolean spring_now(gpointer data)
 	}
 	else
 	{
-		spring_window = filer_opendir(dest_path);
+		spring_window = filer_opendir(dest_path, spring_src_window);
 		gtk_timeout_add(500, spring_check_idle, NULL);
 		gtk_signal_connect(GTK_OBJECT(spring_window->window), "destroy",
 				GTK_SIGNAL_FUNC(spring_win_destroyed), NULL);

@@ -17,6 +17,7 @@ gboolean run_by_path(guchar *full_path);
 gboolean run_diritem(guchar *full_path,
 		     DirItem *item,
 		     FilerWindow *filer_window,
+		     FilerWindow *src_window,
 		     gboolean edit);
 void show_item_help(guchar *path, DirItem *item);
 void run_list(guchar *to_open);

@@ -43,7 +43,9 @@
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
-static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
+static gboolean follow_symlink(char *full_path,
+			       FilerWindow *filer_window,
+			       FilerWindow *src_window);
 static gboolean open_file(guchar *path, MIME_type *type);
 static void dir_show_help(DirItem *item, char *path);
 
@@ -190,16 +192,18 @@ void run_with_data(char *path, gpointer data, gulong length)
  *
  * filer_window is the window to use for displaying a directory.
  * NULL will always use a new directory when needed.
+ * src_window is the window to copy options from, or NULL.
  *
  * Returns TRUE on success.
  */
 gboolean run_diritem(guchar *full_path,
 		     DirItem *item,
 		     FilerWindow *filer_window,
+		     FilerWindow *src_window,
 		     gboolean edit)
 {
 	if (item->flags & ITEM_FLAG_SYMLINK && edit)
-		return follow_symlink(full_path, filer_window);
+		return follow_symlink(full_path, filer_window, src_window);
 
 	switch (item->base_type)
 	{
@@ -225,7 +229,7 @@ gboolean run_diritem(guchar *full_path,
 			if (filer_window)
 				filer_change_to(filer_window, full_path, NULL);
 			else
-				filer_opendir(full_path);
+				filer_opendir(full_path, src_window);
 			return TRUE;
 		case TYPE_FILE:
 			if ((item->mime_type == &special_exec) && !edit)
@@ -268,7 +272,7 @@ gboolean run_by_path(guchar *full_path)
 
 	/* XXX: Loads an image - wasteful */
 	diritem_stat(full_path, &item, FALSE);
-	retval = run_diritem(full_path, &item, NULL, FALSE);
+	retval = run_diritem(full_path, &item, NULL, NULL, FALSE);
 	diritem_clear(&item);
 	
 	return retval;
@@ -334,6 +338,11 @@ void run_list(guchar *to_open)
 {
 	guchar	*next;
 
+	/* Make sure we don't quit before doing the whole list
+	 * (there's a command that closes windows)
+	 */
+	number_of_windows++;
+
 	/* TODO: Should escape < characters in case one really does
 	 * appear in a filename!
 	 */
@@ -368,7 +377,10 @@ void run_list(guchar *to_open)
 				open_to_show(value);
 				break;
 			case 'd':
-				filer_opendir(value);
+				filer_opendir(value, NULL);
+				break;
+		        case 'D':
+				filer_close_recursive(value);
 				break;
 			case 't':
 				panel_new(value, PANEL_TOP);
@@ -394,6 +406,7 @@ void run_list(guchar *to_open)
 		g_free(value);
 	}
 
+	number_of_windows--;
 }
 
 /* Open a directory viewer showing this file, and wink it */
@@ -409,7 +422,7 @@ void open_to_show(guchar *path)
 	if (slash == dir || !slash)
 	{
 		/* Item in the root (or root itself!) */
-		new = filer_opendir("/");
+		new = filer_opendir("/", NULL);
 		if (new && dir[1])
 			display_set_autoselect(new, dir + 1);
 		
@@ -417,7 +430,7 @@ void open_to_show(guchar *path)
 	else
 	{
 		*slash = '\0';
-		new = filer_opendir(dir);
+		new = filer_opendir(dir, NULL);
 		if (new)
 			display_set_autoselect(new, slash + 1);
 	}
@@ -442,7 +455,7 @@ void examine(guchar *path)
 		/* Update directory containing this item... */
 		dir_check_this(path);
 
-		/* If this is itself directory then rescan its contents... */
+		/* If this is itself a directory then rescan its contents... */
 		if (S_ISDIR(info.st_mode))
 			refresh_dirs(path);
 
@@ -488,7 +501,9 @@ finish:
 /* Follow the link 'full_path' and display it in filer_window, or a
  * new window if that is NULL.
  */
-static gboolean follow_symlink(char *full_path, FilerWindow *filer_window)
+static gboolean follow_symlink(char *full_path,
+			       FilerWindow *filer_window,
+			       FilerWindow *src_window)
 {
 	char	*real, *slash;
 	char	*new_dir;
@@ -543,7 +558,7 @@ static gboolean follow_symlink(char *full_path, FilerWindow *filer_window)
 	{
 		FilerWindow *new;
 		
-		new = filer_opendir(new_dir);
+		new = filer_opendir(new_dir, src_window);
 		display_set_autoselect(new, slash + 1);
 	}
 
@@ -587,7 +602,7 @@ static void dir_show_help(DirItem *item, char *path)
 	help_dir = g_strconcat(path, "/Help", NULL);
 
 	if (mc_stat(help_dir, &info) == 0)
-		filer_opendir(help_dir);
+		filer_opendir(help_dir, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		delayed_error(_("Application"),
 			_("This is an application directory - you can "
