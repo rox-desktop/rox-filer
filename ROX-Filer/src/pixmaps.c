@@ -221,9 +221,11 @@ void pixmap_make_huge(MaskedPixmap *mp)
 
 	g_return_if_fail(mp->src_pixbuf != NULL);
 
+	/* Limit to small size now, otherwise they get scaled up in mixed mode.
+	 * Also looked ugly.
+	 */
 	mp->huge_pixbuf = scale_pixbuf_up(mp->src_pixbuf,
-					  HUGE_WIDTH * 0.7,
-					  HUGE_HEIGHT * 0.7);
+					  SMALL_WIDTH, SMALL_HEIGHT);
 
 	if (!mp->huge_pixbuf)
 	{
