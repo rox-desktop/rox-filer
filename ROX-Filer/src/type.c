@@ -249,8 +249,10 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 	g_return_val_if_fail(type != NULL, default_pixmap + TYPE_UNKNOWN);
 
 	/* Already got an image? TODO: Is it out-of-date? */
+	/*
 	if (type->image)
 		return type->image;
+	*/
 
 	type_name = g_strconcat(type->media_type, "_",
 				type->subtype, ".xpm", NULL);

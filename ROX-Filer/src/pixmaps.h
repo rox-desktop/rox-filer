@@ -39,14 +39,17 @@ struct _MaskedPixmap
 {
 	GdkPixmap	*pixmap;
 	GdkBitmap	*mask;
+	int		ref;
 };
 
 
 extern MaskedPixmap	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 
+void pixmaps_init(void);
 void load_default_pixmaps(GdkWindow *window);
 void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image);
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path);
+void pixmap_unref(MaskedPixmap *mp);
 
 #endif /* _PIXMAP_H */

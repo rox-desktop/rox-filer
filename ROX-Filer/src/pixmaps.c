@@ -28,9 +28,12 @@
 #include <gtk/gtk.h>
 #include "collection.h"
 
+#include "fscache.h"
 #include "support.h"
 #include "gui_support.h"
 #include "pixmaps.h"
+
+static GFSCache *pixmap_cache = NULL;
 
 static char * bad_xpm[] = {
 "12 12 3 1",
@@ -52,28 +55,36 @@ static char * bad_xpm[] = {
 
 MaskedPixmap 	default_pixmap[LAST_DEFAULT_PIXMAP];
 
+/* Static prototypes */
+
+static MaskedPixmap *load(char *pathname, gpointer data);
+static void ref(MaskedPixmap *mp, gpointer data);
+static void unref(MaskedPixmap *mp, gpointer data);
+
+
+/****************************************************************
+ *			EXTERNAL INTERFACE			*
+ ****************************************************************/
+
+void pixmaps_init(void)
+{
+	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
+					(GFSFunc) ref,
+					(GFSFunc) unref,
+					NULL);
+}
+
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
  * structure for it and return a pointer to the structure. NULL on failure.
+ * XXX: Unref it when you're done.
  */
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
 {
-	GdkPixmap	*pixmap;
-	GdkBitmap	*mask;
-	GtkStyle	*style;
 	MaskedPixmap	*masked_pixmap;
-
-	style = gtk_widget_get_style(window);
-
-	pixmap = gdk_pixmap_create_from_xpm(window->window,
-			&mask,
-			&style->bg[GTK_STATE_NORMAL],
-			path);
-	if (!pixmap)
-		return NULL;
-
-	masked_pixmap = g_malloc(sizeof(MaskedPixmap));
-	masked_pixmap->pixmap = pixmap;
-	masked_pixmap->mask = mask;
+	
+	pixmap_cache->user_data = window;
+	masked_pixmap = g_fscache_lookup(pixmap_cache, path);
+	pixmap_cache->user_data = NULL;
 
 	return masked_pixmap;
 }
@@ -131,4 +142,60 @@ void load_default_pixmaps(GdkWindow *window)
 			default_pixmap + TYPE_APPDIR);
 
 	loaded = TRUE;
+}
+
+void pixmap_unref(MaskedPixmap *mp)
+{
+	unref(mp, pixmap_cache->user_data);
+}
+
+/****************************************************************
+ *			INTERNAL FUNCTIONS			*
+ ****************************************************************/
+
+/* Try to load the pixmap from the given path, allocate a MaskedPixmap
+ * structure for it and return a pointer to the structure. NULL on failure.
+ */
+static MaskedPixmap *load(char *pathname, gpointer user_data)
+{
+	GtkWidget	*window = (GtkWidget *) user_data;
+	GdkPixmap	*pixmap;
+	GdkBitmap	*mask;
+	GtkStyle	*style;
+	MaskedPixmap	*masked_pixmap;
+
+	g_print("Load '%s'\n", pathname);
+	style = gtk_widget_get_style(window);
+
+	pixmap = gdk_pixmap_create_from_xpm(window->window,
+			&mask,
+			&style->bg[GTK_STATE_NORMAL],
+			pathname);
+	if (!pixmap)
+		return NULL;
+
+	masked_pixmap = g_new(MaskedPixmap, 1);
+	masked_pixmap->pixmap = pixmap;
+	masked_pixmap->mask = mask;
+	masked_pixmap->ref = 1;
+
+	return masked_pixmap;
+}
+
+static void ref(MaskedPixmap *mp, gpointer data)
+{
+	g_print("[ ref ]\n");
+	if (mp)
+		mp->ref++;
+}
+
+static void unref(MaskedPixmap *mp, gpointer data)
+{
+	g_print("[ unref ]\n");
+	if (mp && --mp->ref == 0)
+	{
+		gdk_pixmap_unref(mp->pixmap);
+		gdk_bitmap_unref(mp->mask);
+		g_free(mp);
+	}	
 }

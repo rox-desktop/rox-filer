@@ -172,9 +172,7 @@ static void free_item(FileItem *item)
 {
 	if (item->flags & ITEM_FLAG_TEMP_ICON)
 	{
-		gdk_pixmap_unref(item->image->pixmap);
-		gdk_pixmap_unref(item->image->mask);
-		g_free(item->image);
+		pixmap_unref(item->image);
 		item->image = default_pixmap + TYPE_ERROR;
 	}
 	g_free(item->leafname);
