@@ -330,13 +330,6 @@ static void save_thumbnail(const char *pathname, GdkPixbuf *full)
 	int name_len;
 	GdkPixbuf *thumb;
 
-	/* If the source image was very small, don't bother saving */
-#if 0
-	if (gdk_pixbuf_get_width(full) * gdk_pixbuf_get_height(full) <
-			   (HUGE_WIDTH * HUGE_HEIGHT * 3))
-		return;
-#endif /* XXX */
-
 	thumb = scale_pixbuf(full, HUGE_WIDTH, HUGE_HEIGHT);
 
 	original_width = gdk_pixbuf_get_width(full);
