@@ -245,6 +245,7 @@ static void clear_icon(DropBox *drop_box, GObject *dialog)
 		g_free(tmp);
 	}
 
+	full_refresh();
 	radios_changed(dialog);
 }
 
@@ -273,16 +274,18 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	g_object_set_data(G_OBJECT(dialog), "radios", radios);
 	g_object_set_data(G_OBJECT(dialog), "mime-type", item->mime_type);
 
+#if 0
 	radios_add(radios,
 			_("Use a copy of the image as the default for all "
 			  "files of these MIME types."), SET_MEDIA,
 			_("Set icon for all `%s/<anything>'"),
 			item->mime_type->media_type);
+#endif
 	
 	radios_add(radios,
 			_("Use a copy of the image for all files of this MIME "
 			  "type."), SET_TYPE,
-			_("Only for the type `%s' (%s/%s)"),
+			_("For all files of type `%s' (%s/%s)"),
 			mime_type_comment(item->mime_type),
 			item->mime_type->media_type,
 			item->mime_type->subtype);
@@ -592,7 +595,7 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 
 	g_free(target);
 
-	filer_update_all();
+	full_refresh();
 
 	return TRUE;
 }

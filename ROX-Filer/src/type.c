@@ -151,7 +151,7 @@ void type_init(void)
 				"icon theme..."));
 	
 		icon_home = g_build_filename(home_dir, ".icons", NULL);
-		if(!file_exists(icon_home))
+		if (!file_exists(icon_home))
 			mkdir(icon_home, 0755);
 		g_free(icon_home);	
 
@@ -435,16 +435,17 @@ gboolean type_open(const char *path, MIME_type *type)
 
 /* Return the image for this type, loading it if needed.
  * Places to check are: (eg type="text_plain", base="text")
- * 1. Choices:MIME-icons/<type>
- * 2. Choices:MIME-icons/<base>
- * 3. Unknown type icon.
+ * 1. <Choices>/MIME-icons/base_subtype
+ * 2. Icon theme 'mime-base:subtype'
+ * 3. Icon theme 'mime-base'
+ * 4. Unknown type icon.
  *
  * Note: You must g_object_unref() the image afterwards.
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
 {
 	GdkPixbuf *full;
-	char	*type_name;
+	char	*type_name, *path;
 	time_t	now;
 
 	if (type == NULL)
@@ -467,6 +468,19 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type->image = NULL;
 	}
 
+	type_name = g_strconcat(type->media_type, "_", type->subtype,
+				".png", NULL);
+	path = choices_find_path_load(type_name, "MIME-icons");
+	g_free(type_name);
+	if (path)
+	{
+		type->image = g_fscache_lookup(pixmap_cache, path);
+		g_free(path);
+	}
+
+	if (type->image)
+		goto out;
+
 	type_name = g_strconcat("mime-", type->media_type, ":",
 				type->subtype, NULL);
 	full = gtk_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
@@ -486,6 +500,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		g_object_unref(full);
 	}
 
+out:
 	if (!type->image)
 	{
 		/* One ref from the type structure, one returned */
