@@ -454,7 +454,7 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 	icon->widget = widget;
 	icon->selected = FALSE;
 	dir_stat(path, &icon->item);
-	icon->item.leafname = g_strdup(slash ? slash + 1 : path);
+	icon->item.leafname = g_strdup(slash && slash[1] ? slash + 1 : path);
 	icon->item.name_width = gdk_string_width(font,
 						 icon->item.leafname);
 

@@ -286,7 +286,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	g_return_if_fail(current_pinboard != NULL);
 
 	path_len = strlen(path);
-	while (path_len > 0 && path[path_len - 1] == '/')
+	while (path_len > 1 && path[path_len - 1] == '/')
 		path_len--;
 
 	icon = g_new(PinIcon, 1);
@@ -302,10 +302,10 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	if (!name)
 	{
 		name = strrchr(icon->path, '/');
-		if (name)
+		if (name && name[1])
 			name++;
 		else
-			name = icon->path;	/* Shouldn't happen */
+			name = icon->path;
 	}
 
 	icon->item.leafname = g_strdup(name);
