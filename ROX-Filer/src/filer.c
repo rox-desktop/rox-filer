@@ -1169,6 +1169,7 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 /* Creates and shows a new filer window.
  * If src_win != NULL then display options can be taken from that source window.
  * Returns the new filer window, or NULL on error.
+ * Note: if unique windows is in use, may return an existing window.
  */
 FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 {
@@ -1176,9 +1177,21 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	char		*real_path;
 	DisplayStyle    dstyle;
 	DetailsType     dtype;
+	FilerWindow	*same_dir_window = NULL;
 	
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
+
+	if (o_unique_filer_windows)
+		same_dir_window = find_filer_window(real_path, NULL);
+
+#ifdef GTK2
+	if (same_dir_window)
+	{
+		gtk_window_present(GTK_WINDOW(same_dir_window->window));
+		return same_dir_window;
+	}
+#endif
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->minibuffer = NULL;
@@ -1275,15 +1288,10 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 	 * for an existing one and close it if found.
 	 */
 
-	if (o_unique_filer_windows)
-	{
-		FilerWindow *fw;
-		
-		fw = find_filer_window(filer_window->path, NULL);
-
-		if (fw)
-			gtk_widget_destroy(fw->window);
-	}
+#ifndef GTK2
+	if (same_dir_window)
+		gtk_widget_destroy(same_dir_window->window);
+#endif
 
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
 	
