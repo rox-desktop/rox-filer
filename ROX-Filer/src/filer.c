@@ -240,6 +240,11 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 
 	item->base_type = base_type;
 
+	if (base_type == TYPE_FILE)
+		item->mime_type = type_from_path(path->str);
+	else
+		item->mime_type = NULL;
+
 	if (base_type == TYPE_DIRECTORY)
 	{
 		/* Might be an application directory - better check... */
@@ -274,7 +279,12 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 		}
 		else
-			item->image = default_pixmap + base_type;
+		{
+			item->image = type_to_icon(filer_window->window, 
+						   item->mime_type);
+			if (!item->image)
+				item->image = default_pixmap + base_type;
+		}
 	}
 
 	item->text_width = gdk_string_width(filer_window->window->style->font,
@@ -535,9 +545,7 @@ void open_item(Collection *collection,
 			else
 			{
 				GString		*message;
-				MIME_type	*type;
-
-				type = type_from_path(full_path);
+				MIME_type	*type = item->mime_type;
 
 				if ((!type) || !type_open(full_path, type))
 				{

@@ -27,6 +27,12 @@
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
+/* Possible values for drop_dest_type (can also be NULL).
+ * In either case, drop_dest_path is the app/file/dir to use.
+ */
+static char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
+static char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
+
 enum
 {
 	TARGET_RAW,
@@ -80,6 +86,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time);
 char *get_local_path(char *uri);
+static void run_with_files(char *path, GSList *uri_list);
 
 void dnd_init()
 {
@@ -92,11 +99,11 @@ void dnd_init()
 
 static char *get_dest_path(FilerWindow *filer_window, GdkDragContext *context)
 {
-	char	*dest_path;
+	char	*path;
 
-	dest_path = g_dataset_get_data(context, "drop_dest_path");
+	path = g_dataset_get_data(context, "drop_dest_path");
 
-	return dest_path ? dest_path : filer_window->path;
+	return path ? path : filer_window->path;
 }
 
 /* Set the XdndDirectSave0 property on the source window for this context */
@@ -452,6 +459,72 @@ void drag_set_dest(GtkWidget *widget, FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(drag_data_received), filer_window);
 }
 
+/* Decide if panel drag is OK, setting drop_dest_type and drop_dest_path
+ * on the context as needed.
+ */
+static gboolean panel_drag_ok(FilerWindow 	*filer_window,
+			      GdkDragContext 	*context,
+			      int	     	item)
+{
+	FileItem 	*fileitem = NULL;
+	char	 	*old_path;
+	char	 	*new_path;
+	char		*type;
+
+	panel_set_timeout(NULL, 0);
+
+	if (item >= 0)
+		fileitem = (FileItem *)
+			filer_window->collection->items[item].data;
+
+	if (item == -1)
+	{
+		new_path = NULL;
+	}
+	else if (fileitem->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	{
+		if (provides(context, text_uri_list))
+		{
+			type = drop_dest_prog;
+			new_path = make_path(filer_window->path,
+					fileitem->leafname)->str;
+		}
+		else
+			new_path = NULL;
+	}
+	else if (fileitem->base_type == TYPE_DIRECTORY)
+	{
+		type = drop_dest_dir;
+		new_path = make_path(filer_window->path,
+				fileitem->leafname)->str;
+	}
+	else
+		new_path = NULL;
+	
+	old_path = g_dataset_get_data(context, "drop_dest_path");
+	if (old_path == new_path ||
+		(old_path && new_path && strcmp(old_path, new_path) == 0))
+	{
+		return new_path != NULL;	/* Same as before */
+	}
+
+	if (new_path)
+	{
+		g_dataset_set_data(context, "drop_dest_type", type);
+		g_dataset_set_data_full(context, "drop_dest_path",
+					g_strdup(new_path), g_free);
+	}
+	else
+	{
+		item = -1;
+		g_dataset_set_data(context, "drop_dest_path", NULL);
+	}
+
+	collection_set_cursor_item(filer_window->collection, item);
+
+	return new_path != NULL;
+}
+
 /* Called during the drag when the mouse is in a widget registered
  * as a drop target. Returns TRUE if we can accept the drop.
  */
@@ -468,10 +541,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	g_return_val_if_fail(filer_window != NULL, TRUE);
 
 	if (gtk_drag_get_source_widget(context) == widget)
-	{
-		/* Ignore drags within a single window */
-		return FALSE;
-	}
+		return FALSE;	/* Not within a single widget! */
 
 	if (filer_window->panel == FALSE)
 	{
@@ -479,24 +549,18 @@ static gboolean drag_motion(GtkWidget		*widget,
 		return TRUE;
 	}
 
+	/* OK, this is a drag to a panel.
+	 * Allow drags to directories, applications and X bit files only.
+	 */
 	item = collection_get_item(filer_window->collection, x, y);
 
-	if (item != filer_window->collection->cursor_item && item != -1)
+	if (panel_drag_ok(filer_window, context, item))
 	{
-		FileItem *fileitem = (FileItem *)
-			filer_window->collection->items[item].data;
-			
-		panel_set_timeout(NULL, 0);
-
-		g_dataset_set_data_full(context, "drop_dest_path",
-				g_strdup(make_path(filer_window->path,
-						   fileitem->leafname)->str),
-				g_free);
+		gdk_drag_status(context, context->suggested_action, time);
+		return TRUE;
 	}
-	collection_set_cursor_item(filer_window->collection, item);
 	
-	gdk_drag_status(context, context->suggested_action, time);
-	return TRUE;
+	return FALSE;
 }
 
 /* Remove panel highlights */
@@ -526,25 +590,33 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	FilerWindow	*filer_window;
 	GdkAtom		target;
 	char		*dest_path;
+	char		*dest_type;
 	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_val_if_fail(filer_window != NULL, TRUE);
 
-	if (gtk_drag_get_source_widget(context) == widget)
-	{
-		/* Ignore drags within a single window */
-		gtk_drag_finish(context, FALSE,	FALSE, time);	/* Failure */
-		return TRUE;
-	}
-
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
-
-	if (((!dest_path) && filer_window->panel)
-		|| !((dest_path = filer_window->path)))
+	if (dest_path == NULL)
 	{
-		error = "Bad drop on panel";
+		if (filer_window->panel)
+			error = "Bad drop on panel";
+		else
+		{
+			dest_path = filer_window->path;
+			dest_type = drop_dest_dir;
+		}
 	}
-	else if (provides(context, XdndDirectSave0))
+	else
+	{
+		dest_type = g_dataset_get_data(context, "drop_dest_type");
+	}
+
+	if (error)
+	{
+		/* Do nothing */
+	}
+	else if (dest_type == drop_dest_dir
+			&& provides(context, XdndDirectSave0))
 	{
 		leafname = get_xds_prop(context);
 		if (leafname)
@@ -582,8 +654,14 @@ static gboolean drag_drop(GtkWidget 	*widget,
 	else if (provides(context, text_uri_list))
 		target = text_uri_list;
 	else
-		error = "Sorry - I require a target type of text/uri-list or "
-			"XdndDirectSave0.";
+	{
+		if (dest_type == drop_dest_dir)
+			error = "Sorry - I require a target type of "
+				"text/uri-list or XdndDirectSave0.";
+		else
+			error = "Sorry - I require a target type of "
+				"text/uri-list.";
+	}
 
 	if (error)
 	{
@@ -745,6 +823,48 @@ static void got_data_raw(GtkWidget 		*widget,
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 }
 
+/* Execute this program, passing all the URIs in the list as arguments.
+ * URIs that are files on the local machine will be passed as simple
+ * pathnames. The uri_list should be freed after this function returns.
+ */
+static void run_with_files(char *path, GSList *uri_list)
+{
+	char		**argv;
+	int		argc = 0;
+	struct stat 	info;
+
+	if (stat(path, &info))
+	{
+		delayed_error("ROX-Filer", "Program not found - deleted?");
+		return;
+	}
+
+	argv = g_malloc(sizeof(char *) * (g_slist_length(uri_list) + 2));
+
+	if (S_ISDIR(info.st_mode))
+		argv[argc++] = make_path(path, "AppRun")->str;
+	else
+		argv[argc++] = path;
+	
+	while (uri_list)
+	{
+		char *uri = (char *) uri_list->data;
+		char *local;
+
+		local = get_local_path(uri);
+		if (local)
+			argv[argc++] = local;
+		else
+			argv[argc++] = uri;
+		uri_list = uri_list->next;
+	}
+	
+	argv[argc++] = NULL;
+
+	if (!spawn(argv))
+		delayed_error("ROX-Filer", "Failed to fork() child process");
+}
+
 /* We've got a list of URIs from somewhere (probably another filer).
  * If the files are on the local machine then try to copy them ourselves,
  * otherwise, if there was only one file and application/octet-stream was
@@ -762,16 +882,20 @@ static void got_uri_list(GtkWidget 		*widget,
 	GSList		*next_uri;
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
+	char		*type;
 	
 	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
 	g_return_if_fail(filer_window != NULL);
 
 	dest_path = get_dest_path(filer_window, context);
+	type = g_dataset_get_data(context, "drop_dest_type");
 
 	uri_list = uri_list_to_gslist(selection_data->data);
 
 	if (!uri_list)
 		error = "No URIs in the text/uri-list (nothing to do!)";
+	else if (type == drop_dest_prog)
+		run_with_files(dest_path, uri_list);
 	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
 	{
 		/* There is one URI in the list, and it's not on the local

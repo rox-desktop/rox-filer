@@ -18,6 +18,8 @@ typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
 typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 
+#include "type.h"
+
 enum
 {
 	ITEM_FLAG_SYMLINK 	= 0x01,	/* Is a symlink */
@@ -49,6 +51,7 @@ struct _FileItem
 	char		*leafname;
 	
 	int		base_type;	/* (regular file, dir, pipe, etc) */
+	MIME_type	*mime_type;	/* May be NULL */
 	int		flags;
 	
 	int		text_width;

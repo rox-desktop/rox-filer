@@ -147,7 +147,7 @@ void menu_init()
 }
  
 /* Save the keybindings... */
-void menu_finish()
+void menu_save()
 {
 	char	*menurc;
 
@@ -188,6 +188,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item)
 {
 	GString		*buffer;
+	GtkWidget	*file_label;
 	FileItem	*file_item;
 	int		pos[] = {event->x_root, event->y_root};
 
@@ -204,6 +205,12 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		}
 	}
 
+	if (filer_window->panel)
+	{
+		collection_clear_selection(filer_window->collection);
+		panel_set_timeout(NULL, 0);
+	}
+
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
 		collection_select_item(filer_window->collection, item);
@@ -212,32 +219,33 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	else
 		filer_window->temp_item_selected = FALSE;
 
+	if (filer_window->panel)
+		file_label = panel_file_item;
+	else
+		file_label = filer_file_item;
+
 	buffer = g_string_new(NULL);
 	switch (filer_window->collection->number_selected)
 	{
 		case 0:
-			g_string_assign(buffer, "<nothing>");
+			g_string_assign(buffer, "<nothing selected>");
+			gtk_widget_set_sensitive(file_label, FALSE);
 			break;
 		case 1:
+			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
 					basetype_name(file_item),
 					file_item->leafname);
 			break;
 		default:
+			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
 			break;
 	}
 
-	if (filer_window->panel)
-	{
-		collection_clear_selection(filer_window->collection);
-		panel_set_timeout(NULL, 0);
-		gtk_label_set_text(GTK_LABEL(panel_file_item), buffer->str);
-	}
-	else
-		gtk_label_set_text(GTK_LABEL(filer_file_item), buffer->str);
+	gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
 
 	g_string_free(buffer, TRUE);
 

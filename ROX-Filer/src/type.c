@@ -24,6 +24,7 @@
 
 /* XXX: Just for testing... */
 static MIME_type text_plain = {"text/plain"};
+static MIME_type image_xpm = {"image/x-xpixmap"};
 
 void type_init()
 {
@@ -64,6 +65,8 @@ char *basetype_name(FileItem *item)
  */
 MIME_type *type_from_path(char *path)
 {
+	if (strstr(path, ".xpm"))
+		return &image_xpm;
 	return &text_plain;
 }
 
@@ -107,4 +110,24 @@ gboolean type_open(char *path, MIME_type *type)
 		g_free(argv[0]);
 	
 	return TRUE;
+}
+
+MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
+{
+	if (!type)
+		return NULL;
+
+	if (!type->image)
+	{
+		char	*path, *open;
+
+		path = g_strconcat(type->name, "/icon.xpm", NULL);
+		open = choices_find_path_load_shared(path, "MIME-types");
+		type->image = load_pixmap_from(window, open);
+		if (!type->image)
+			type->image = default_pixmap + TYPE_UNKNOWN;
+		g_free(path);
+	}
+		
+	return type->image;
 }

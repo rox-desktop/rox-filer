@@ -10,9 +10,13 @@
 
 typedef struct _MIME_type MIME_type;
 
+#include "pixmaps.h"
+#include "filer.h"
+
 struct _MIME_type
 {
-	char	*name;
+	char		*name;
+	MaskedPixmap 	*image;		/* NULL => not loaded yet */
 };
 
 /* Prototypes */
@@ -21,5 +25,6 @@ char *basetype_name(FileItem *item);
 
 MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);
+MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type);
 
 #endif /* _TYPE_H */

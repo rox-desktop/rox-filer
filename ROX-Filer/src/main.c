@@ -108,7 +108,5 @@ int main(int argc, char **argv)
 
 	gtk_main();
 
-	menu_finish();
-
 	return EXIT_SUCCESS;
 }
