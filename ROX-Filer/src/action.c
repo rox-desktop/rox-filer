@@ -1289,6 +1289,7 @@ static gboolean do_copy2(char *path, char *dest)
 
 	if (S_ISDIR(info.st_mode))
 	{
+		mode_t	mode = info.st_mode;
 		char *safe_path, *safe_dest;
 		struct stat 	dest_info;
 		gboolean	exists;
@@ -1309,7 +1310,7 @@ static gboolean do_copy2(char *path, char *dest)
 				_("!ERROR: Destination already exists, "
 					"but is not a directory\n"));
 		}
-		else if (exists == FALSE && mkdir(dest_path, info.st_mode))
+		else if (exists == FALSE && mkdir(dest_path, 0700 | mode))
 			send_error();
 		else
 		{
@@ -1323,6 +1324,16 @@ static gboolean do_copy2(char *path, char *dest)
 			action_leaf = NULL;
 			for_dir_contents(do_copy2, safe_path, safe_dest);
 			/* Note: dest_path now invalid... */
+
+			if (!exists)
+			{
+				/* We may have created the directory with
+				 * more permissions than the source so that
+				 * we could write to it... change it back now.
+				 */
+				if (chmod(safe_dest, mode))
+					send_error();
+			}
 		}
 
 		g_free(safe_path);
