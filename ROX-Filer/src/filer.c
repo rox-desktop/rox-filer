@@ -923,16 +923,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 			NULL, "group", NULL);
 	xmlSetProp(group, "name", name);
 
-#ifdef GTK2
 	xmlNewChild(group, NULL, "directory", filer_window->path);
-#else
-	{
-		gchar *u8_path;
-		u8_path = to_utf8(filer_window->path);
-		xmlNewChild(group, NULL, "directory", u8_path);
-		g_free(u8_path);
-	}
-#endif
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
@@ -942,13 +933,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 		if (!collection->items[i].selected)
 			continue;
 
-#ifdef GTK2
 		xmlNewChild(group, NULL, "item", u8_leaf);
-#else
-		u8_leaf = to_utf8(u8_leaf);
-		xmlNewChild(group, NULL, "item", u8_leaf);
-		g_free(u8_leaf);
-#endif
 	}
 
 	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
@@ -983,14 +968,6 @@ static void group_restore(FilerWindow *filer_window, char *name)
 	path = xmlNodeListGetString(groups->doc, node->xmlChildrenNode, 1);
 	g_return_if_fail(path != NULL);
 
-#ifndef GTK2
-	{
-		gchar *old = path;
-		path = from_utf8(old);
-		g_free(old);
-	}
-#endif
-
 	if (strcmp(path, filer_window->path) != 0)
 		filer_change_to(filer_window, path, NULL);
 	g_free(path);
@@ -1018,15 +995,7 @@ static void group_restore(FilerWindow *filer_window, char *name)
 		if (!leaf)
 			g_warning("Missing leafname!\n");
 		else
-		{
-#ifdef GTK2
 			g_hash_table_insert(in_group, leaf, filer_window);
-#else
-			g_hash_table_insert(in_group, from_utf8(leaf),
-								filer_window);
-			g_free(leaf);
-#endif
-		}
 	}
 	
 	for (j = 0; j < n; j++)
@@ -1059,13 +1028,8 @@ static gint key_press_event(GtkWidget	*widget,
 	 */
 	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
 						filer_keys);
-#ifdef GTK2
 	handled = gtk_accel_groups_activate(G_OBJECT(filer_window->window),
 				event->keyval, event->state);
-#else
-	handled = gtk_accel_groups_activate(GTK_OBJECT(filer_window->window),
-				event->keyval, event->state);
-#endif
 	if (window_with_focus)
 		gtk_window_remove_accel_group(GTK_WINDOW(filer_window->window),
 						filer_keys);
@@ -1111,9 +1075,6 @@ static gint key_press_event(GtkWidget	*widget,
 				group_restore(filer_window, group);
 	}
 
-#ifndef GTK2
-	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
-#endif
 	return TRUE;
 }
 
@@ -1331,13 +1292,11 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	if (o_unique_filer_windows.int_value)
 		same_dir_window = find_filer_window(real_path, NULL);
 
-#ifdef GTK2
 	if (same_dir_window)
 	{
 		gtk_window_present(GTK_WINDOW(same_dir_window->window));
 		return same_dir_window;
 	}
-#endif
 
 	filer_window = g_new(FilerWindow, 1);
 	filer_window->message = NULL;
@@ -1441,11 +1400,6 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	 * for an existing one and close it if found.
 	 */
 
-#ifndef GTK2
-	if (same_dir_window)
-		gtk_widget_destroy(same_dir_window->window);
-#endif
-
 	all_filer_windows = g_list_prepend(all_filer_windows, filer_window);
 	
 	return filer_window;
@@ -1518,11 +1472,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	}
 
 	/* Now add the area for displaying the files.
-	 * If we've got Gtk+-2.0 then the collection is one huge window
-	 * that goes in a Viewport. Otherwise, the collection handles
-	 * scrolling itself.
+	 * The collection is one huge window that goes in a Viewport.
 	 */
-#ifdef GTK2
 	{
 		GtkWidget *viewport;
 		GtkAdjustment *adj;
@@ -1540,11 +1491,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 		gtk_container_set_resize_mode(GTK_CONTAINER(viewport),
 						GTK_RESIZE_IMMEDIATE);
 	}
-#else
-	gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
-	filer_window->scrollbar =
-			gtk_vscrollbar_new(COLLECTION(collection)->vadj);
-#endif
 
 	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
@@ -2255,11 +2201,6 @@ static void show_tooltip(guchar *text)
 	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "expose_event",
 			GTK_SIGNAL_FUNC(filer_tooltip_draw),
 			(GtkObject *) tip_widget);
-#ifndef GTK2
-	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "draw",
-			GTK_SIGNAL_FUNC(filer_tooltip_draw),
-			(GtkObject *) tip_widget);
-#endif
 
 	label = gtk_label_new(text);
 	gtk_misc_set_padding(GTK_MISC(label), 4, 2);

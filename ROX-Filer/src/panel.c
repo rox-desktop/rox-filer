@@ -390,19 +390,7 @@ static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 		if (!path)
 			path = g_strdup("<missing path>");
 
-#ifdef GTK2
 		panel_add_item(panel, path, label, after);
-#else
-		{
-			gchar *loc_path, *loc_label;
-
-			loc_path = from_utf8(path);
-			loc_label = from_utf8(label);
-			panel_add_item(panel, loc_path, loc_label, after);
-			g_free(loc_label);
-			g_free(loc_path);
-		}
-#endif
 
 		g_free(path);
 		g_free(label);
@@ -484,9 +472,7 @@ static void panel_add_item(Panel *panel,
 	icon->path = icon_convert_path(path);
 	icon->socket = NULL;
 	icon->label = NULL;
-#ifdef GTK2
 	icon->layout = NULL;
-#endif
 
 	gtk_object_set_data(GTK_OBJECT(widget), "icon", icon);
 	
@@ -526,10 +512,6 @@ static void panel_add_item(Panel *panel,
 		gtk_signal_connect_after(GTK_OBJECT(widget),
 				"enter-notify-event",
 				GTK_SIGNAL_FUNC(enter_icon), icon);
-#ifndef GTK2
-		gtk_signal_connect_after(GTK_OBJECT(widget), "draw",
-				GTK_SIGNAL_FUNC(draw_icon), icon);
-#endif
 		gtk_signal_connect_after(GTK_OBJECT(widget), "expose_event",
 				GTK_SIGNAL_FUNC(expose_icon), icon);
 		gtk_signal_connect(GTK_OBJECT(widget), "drag_data_get",
@@ -909,27 +891,9 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 			continue;
 		}
 
-#ifdef GTK2
 		tree = xmlNewTextChild(side, NULL, "icon", icon->src_path);
-#else
-		{
-			gchar *u8;
-			u8 = to_utf8(icon->src_path);
-			tree = xmlNewTextChild(side, NULL, "icon", u8);
-			g_free(u8);
-		}
-#endif
 
-#ifndef GTK2
-		{
-			gchar *u8;
-			u8 = to_utf8(icon->item->leafname);
-			xmlSetProp(tree, "label", u8);
-			g_free(u8);
-		}
-#else
 		xmlSetProp(tree, "label", icon->item->leafname);
-#endif
 	}
 	
 	if (widgets)

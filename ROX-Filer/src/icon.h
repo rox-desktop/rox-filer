@@ -10,9 +10,7 @@
 
 #include <glib.h>
 
-#ifdef GTK2
-# include <pango/pango.h>
-#endif
+#include <pango/pango.h>
 
 extern GList *icon_selection;
 extern gboolean tmp_icon_selected;
@@ -31,9 +29,7 @@ struct _Icon {
 	int		x, y;
 	int		width, height;
 	int		name_width;
-#ifdef GTK2
 	PangoLayout	*layout;	/* The label */
-#endif
 
 	/* Only used on the panel... */
 	GtkWidget	*label;

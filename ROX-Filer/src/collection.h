@@ -65,10 +65,6 @@ struct _Collection
 	 * used only to force scrolling, etc.
 	 */
 	GtkAdjustment	*vadj;
-#ifndef GTK2
-	guint		last_scroll;	/* Current/previous scroll value */
-	int		paint_level;	/* Complete redraw on next paint? */
-#endif
 
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;

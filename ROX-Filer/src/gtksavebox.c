@@ -40,6 +40,7 @@
 #include "gtk/gtkhbox.h"
 #include "gtk/gtkeventbox.h"
 #include "gtk/gtkentry.h"
+#include "gtk/gtkmessagedialog.h"
 #include "gtk/gtkhseparator.h"
 #include "gtk/gtkvbox.h"
 #include "gtk/gtkdialog.h"
@@ -183,9 +184,7 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 					    gtk_marshal_NONE__NONE,
 					    GTK_TYPE_NONE, 0);
 
-#ifndef GTK2
-  gtk_object_class_add_signals (object_class, savebox_signals, LAST_SIGNAL);
-#endif
+  /* XXX: Still needed for Gtk+-2.0? */
 }
 
 static void
@@ -198,11 +197,8 @@ gtk_savebox_init (GtkSavebox *savebox)
 					  sizeof (targets) / sizeof (*targets));
   savebox->icon = NULL;
 
-#ifdef GTK2
+  /* XXX: Actually use a dialog box! */
   gtk_window_set_type_hint (GTK_WINDOW (savebox), GDK_WINDOW_TYPE_HINT_DIALOG);
-#else
-  GTK_WINDOW (savebox)->type = GTK_WINDOW_DIALOG;
-#endif
   gtk_window_set_title (GTK_WINDOW (savebox), _("Save As:"));
   gtk_window_set_position (GTK_WINDOW (savebox), GTK_WIN_POS_MOUSE);
   gtk_window_set_wmclass (GTK_WINDOW (savebox), "savebox", "Savebox");
@@ -497,31 +493,18 @@ static void do_save (GtkWidget *widget, GtkSavebox *savebox)
 
   if (!pathname)
     {
-      GtkWidget *dialog, *label, *button;
+      GtkWidget *dialog;
 
-      dialog = gtk_dialog_new ();
-      GTK_WINDOW (dialog)->type = GTK_WINDOW_DIALOG;
-
-      label = gtk_label_new (_("Drag the icon to a directory viewer\n"
-				  "(or enter a full pathname)"));
-      gtk_misc_set_padding (GTK_MISC (label), 8, 32);
-
-      gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->vbox),
-			  label, TRUE, TRUE, 4);
-
-      button = gtk_button_new_with_label (_("OK"));
-      GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-      gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-		  GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT (dialog));
-      gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->action_area),
-			  button, TRUE, TRUE, 32);
-      gtk_window_set_default (GTK_WINDOW (dialog), button);
+      dialog = gtk_message_dialog_new (GTK_WINDOW(savebox),
+			GTK_DIALOG_MODAL | GTK_DIALOG_DESTROY_WITH_PARENT,
+			GTK_MESSAGE_INFO, GTK_BUTTONS_OK,
+			_("Drag the icon to a directory viewer\n"
+				"(or enter a full pathname)"));
 
       gtk_window_set_position (GTK_WINDOW (dialog), GTK_WIN_POS_CENTER);
 
-      gtk_window_set_modal (GTK_WINDOW (dialog), TRUE);
-
-      gtk_widget_show_all (dialog);
+      gtk_dialog_run (GTK_DIALOG (dialog));
+      gtk_widget_destroy (dialog);
 
       return;
     }

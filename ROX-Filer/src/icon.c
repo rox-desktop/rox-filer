@@ -75,10 +75,7 @@ static Icon *menu_icon = NULL;	/* Item clicked if there is no selection */
 static void rename_activate(GtkWidget *dialog);
 static void menu_closed(GtkWidget *widget);
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
-#ifdef GTK2
-		gboolean  *push_in,
-#endif
-		gpointer data);
+		gboolean  *push_in, gpointer data);
 static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
 static void selection_get(GtkWidget *widget, 
 		       GtkSelectionData *selection_data,
@@ -493,13 +490,11 @@ void icon_destroyed(Icon *icon)
 	if (icon == menu_icon)
 		menu_icon = NULL;
 
-#ifdef GTK2
 	if (icon->layout)
 	{
 		g_object_unref(G_OBJECT(icon->layout));
 		icon->layout = NULL;
 	}
-#endif
 
 	icon_unhash_path(icon);
 
@@ -603,10 +598,6 @@ static void rename_activate(GtkWidget *dialog)
 			_("The location must contain at least one character!"));
 	else
 	{
-#ifndef GTK2
-		GdkFont	*font = icon->widget->style->font;
-#endif
-		
 		g_free(icon->item->leafname);
 		g_free(icon->src_path);
 
@@ -618,9 +609,6 @@ static void rename_activate(GtkWidget *dialog)
 		icon_hash_path(icon);
 		
 		icon->item->leafname = g_strdup(new_name);
-#ifndef GTK2
-		icon->name_width = gdk_string_measure(font, new_name);
-#endif
 		/* XXX: Set name_width in size_and_shape? */
 
 		diritem_restat(icon->path, icon->item);
@@ -637,10 +625,7 @@ static void menu_closed(GtkWidget *widget)
 }
 
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
-#ifdef GTK2
-		gboolean  *push_in,
-#endif
-		gpointer data)
+				gboolean  *push_in, gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -664,9 +649,7 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
 
-#ifdef GTK2
 	*push_in = FALSE;
-#endif
 }
 
 /* Called when another application takes the selection away from us */
@@ -833,11 +816,11 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 {
 	GtkWidget	*dialog, *hbox, *vbox, *label, *entry, *button;
 
-	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-#ifdef GTK2
+	/* XXX: Use a real dialog box! */
+	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_type_hint(GTK_WINDOW(dialog),
 			GDK_WINDOW_TYPE_HINT_DIALOG);
-#endif
+
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
 	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
 

@@ -1,7 +1,5 @@
 /* The configure script will auto-generate config.h from config.h.in */
 
-#define GTK2	/* XXX */
-
 #define PROJECT "ROX-Filer"
 #define VERSION "Unknown"
 
@@ -29,26 +27,11 @@
  */
 #define N_(String) (String)
 
-#ifdef GTK2
-# define GTK_WINDOW_DIALOG GTK_WINDOW_TOPLEVEL
-# define G_DISABLE_CONST_RETURNS
-#else
-# define gdk_x11_xatom_to_atom(x) (x)
-# define gdk_x11_atom_to_xatom(x) (x)
-#endif
-
 /* printf format string to print file sizes */
 #ifdef LARGE_FILE_SUPPORT
 # define SIZE_FMT "lld"
 #else
 # define SIZE_FMT "ld"
-#endif
-
-/* Undefine THUMBS_USE_LIBPNG if you want thumbnail saving support
- * under GTK+ 2.0 only.
- */
-#if !defined(GTK2) && defined(HAVE_LIBPNG)
-# define THUMBS_USE_LIBPNG
 #endif
 
 /* #define GTK_DISABLE_DEPRECATED */

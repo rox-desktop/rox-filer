@@ -81,9 +81,6 @@ void rox_add_translations(const char *path)
 	long		size;
 	gboolean	swap;		/* TRUE => reverse byte-order of ints */
 	int		n, n_total;
-#ifdef GTK2
-	char		*charset = NULL;
-#endif
 
 	if (load_file(path, &data, &size) == FALSE)
 		goto out;
@@ -114,75 +111,24 @@ void rox_add_translations(const char *path)
 
 	if (!translate)
 	{
-#ifdef GTK2
 		translate = g_hash_table_new_full(g_str_hash, g_str_equal,
 						  g_free, g_free);
-#else
-		translate = g_hash_table_new(g_str_hash, g_str_equal);
-#endif
 	}
 
 	n_total = WORD(data + 8);
 	from_base = data + WORD(data + 12);
 	to_base = data + WORD(data + 16);
 
-#ifdef GTK2
-	/* Find the charset used, so we can convert to UTF-8 */
 	for (n = 0; n < n_total; n++)
 	{
 		char	*from = data + WORD(from_base + (n << 3) + 4);
-		char	*to_raw   = data + WORD(to_base + (n << 3) + 4);
+		char	*to   = data + WORD(to_base + (n << 3) + 4);
 
-		if (*from)
-			continue;
-
-		charset = strstr(to_raw, "charset=");
-		if (charset)
-		{
-			char *tmp;
-
-			charset += 8;
-			tmp = strchr(charset, '\n');
-			if (tmp)
-				charset = g_strndup(charset, tmp - charset);
-			else
-				charset = g_strdup(charset);
-		}
-		break;
-	}
-	if (!charset)
-	{
-		g_warning("Missing charset=... in translation!");
-		charset = g_strdup("ISO8859-1");
-	}
-#endif
-	
-	for (n = 0; n < n_total; n++)
-	{
-		char	*from = data + WORD(from_base + (n << 3) + 4);
-		char	*to_raw   = data + WORD(to_base + (n << 3) + 4);
-#ifdef GTK2
-		char	*to;
-
-		to = g_convert_with_fallback(to_raw, -1,
-					"UTF-8",
-					charset,
-					"#",
-					NULL, NULL, NULL);
-		if (!to)
-			to = g_strdup(to_raw);
-
-		g_hash_table_insert(translate, g_strdup(from), to);
-#else
-		g_hash_table_insert(translate, from, to_raw);
-#endif
+		g_hash_table_insert(translate, g_strdup(from), g_strdup(to));
 	}
 
-out: ;			/* (some compilers complain otherwise) */
-#ifdef GTK2
+out:
 	g_free(data);
-	g_free(charset);
-#endif
 }
 
 /****************************************************************

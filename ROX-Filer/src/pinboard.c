@@ -313,15 +313,15 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	icon->item = diritem_new(name);
 	diritem_restat(icon->path, icon->item);
 
-	icon->win = gtk_window_new(GTK_WINDOW_DIALOG);
+	icon->win = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);
 
 	icon->widget = gtk_drawing_area_new();
 	gtk_widget_set_name(icon->widget, "pinboard-icon");
-#ifdef GTK2
+	
 	icon->layout = gtk_widget_create_pango_layout(icon->widget, NULL);
 	pango_layout_set_width(icon->layout, 140 * PANGO_SCALE);
-#endif
+
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->widget);
 	drag_set_pinicon_dest(icon);
 	gtk_signal_connect(GTK_OBJECT(icon->widget), "drag_data_get",
@@ -531,9 +531,6 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	int		iheight = image->height;
 	DirItem		*item = icon->item;
 	int		text_x, text_y;
-#ifndef GTK2
-	GdkFont		*font;
-#endif
 
 	if (!pinicon_style)
 	{
@@ -545,11 +542,6 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	}
 	gtk_widget_set_style(icon->widget, pinicon_style);
 
-#ifndef GTK2
-	font = pinicon_style->font;
-	font_height = font->ascent + font->descent;
-	icon->name_width = gdk_string_measure(font, item->leafname);
-#else
 	{
 		PangoRectangle logical;
 		pango_layout_set_text(icon->layout, icon->item->leafname, -1);
@@ -558,7 +550,6 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 		icon->name_width = logical.width - logical.x;
 		font_height = logical.height - logical.y;
 	}
-#endif
 
 	width = MAX(iwidth, icon->name_width + 2) + 2 * WINK_FRAME;
 	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
@@ -621,35 +612,10 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	text_x = (width - icon->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
-#ifndef GTK2
-	if (o_pinboard_text_bg.int_value == TEXT_BG_SOLID)
-	{
-#endif
-		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
-				(width - (icon->name_width + 2)) >> 1,
-				WINK_FRAME + iheight + GAP,
-				icon->name_width + 2, font_height + 2);
-#ifndef GTK2
-	}
-	else
-	{
-		int	y = text_y + font->ascent;
-
-		TEXT_AT(0, 0);
-
-		if (o_pinboard_text_bg.int_value == TEXT_BG_OUTLINE)
-		{
-			TEXT_AT(1, 0);
-			TEXT_AT(1, 1);
-			TEXT_AT(0, 1);
-			TEXT_AT(-1, 1);
-			TEXT_AT(-1, 0);
-			TEXT_AT(-1, -1);
-			TEXT_AT(0, -1);
-			TEXT_AT(1, -1);
-		}
-	}
-#endif
+	gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
+			(width - (icon->name_width + 2)) >> 1,
+			WINK_FRAME + iheight + GAP,
+			icon->name_width + 2, font_height + 2);
 	
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
@@ -659,9 +625,6 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 {
-#ifndef GTK2
-	GdkFont		*font = icon->widget->style->font;
-#endif
 	int		text_x, text_y;
 	DirItem		*item = icon->item;
 	MaskedPixmap	*image = item->image;
@@ -719,15 +682,11 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 
 	if (o_pinboard_text_bg.int_value != TEXT_BG_NONE)
 	{
-#ifdef GTK2
 		PangoRectangle logical;
 		int		font_height;
 
 		pango_layout_get_pixel_extents(icon->layout, NULL, &logical);
 		font_height = logical.height - logical.y;
-#else
-		int		font_height = font->ascent + font->descent;
-#endif
 
 		gtk_paint_flat_box(widget->style, widget->window,
 				state,
@@ -739,21 +698,12 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 				font_height + 2);
 	}
 
-#ifdef GTK2
 	gtk_paint_layout(widget->style, widget->window,
 			state,
 			FALSE, NULL, widget, "text",
 			text_x,
 			text_y,
 			icon->layout);
-#else
-	gtk_paint_string(widget->style, widget->window,
-			state,
-			NULL, widget, "text",
-			text_x,
-			text_y + font->ascent,
-			item->leafname);
-#endif
 
 	if (current_wink_icon == icon)
 	{
@@ -1040,19 +990,7 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 		if (!path)
 			path = g_strdup("<missing path>");
 
-#ifdef GTK2
 		pinboard_pin(path, label, x, y);
-#else
-		{
-			gchar *loc_path, *loc_label;
-
-			loc_path = from_utf8(path);
-			loc_label = from_utf8(label);
-			pinboard_pin(loc_path, loc_label, x, y);
-			g_free(loc_label);
-			g_free(loc_path);
-		}
-#endif
 
 		g_free(path);
 		g_free(label);
@@ -1212,16 +1150,7 @@ void pinboard_save(void)
 		Icon *icon = (Icon *) next->data;
 		char *tmp;
 
-#ifdef GTK2
 		tree = xmlNewTextChild(root, NULL, "icon", icon->src_path);
-#else
-		{
-			gchar *u8;
-			u8 = to_utf8(icon->src_path);
-			tree = xmlNewTextChild(root, NULL, "icon", u8);
-			g_free(u8);
-		}
-#endif
 
 		tmp = g_strdup_printf("%d", icon->x);
 		xmlSetProp(tree, "x", tmp);
@@ -1231,16 +1160,7 @@ void pinboard_save(void)
 		xmlSetProp(tree, "y", tmp);
 		g_free(tmp);
 
-#ifndef GTK2
-		{
-			gchar *u8;
-			u8 = to_utf8(icon->item->leafname);
-			xmlSetProp(tree, "label", u8);
-			g_free(u8);
-		}
-#else
 		xmlSetProp(tree, "label", icon->item->leafname);
-#endif
 	}
 
 	save_new = g_strconcat(save, ".new", NULL);
@@ -1293,9 +1213,7 @@ static GdkFilterReturn proxy_filter(GdkXEvent *xevent,
 			event->button.y = xev->xbutton.y;
 			event->button.state = xev->xbutton.state;
 			event->button.button = xev->xbutton.button;
-#ifdef GTK2
 			event->button.axes = NULL;
-#endif
 
 			return GDK_FILTER_TRANSLATE;
 

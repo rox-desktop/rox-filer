@@ -159,13 +159,8 @@ static void close_window(gpointer data, guint action, GtkWidget *widget);
 static void mini_buffer(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
-#ifdef GTK2
 #define MENUS_NAME "menus2"
 static void keys_changed(gpointer data);
-#else
-# define MENUS_NAME "menus"
-static void mark_menus_modified(gboolean mod);
-#endif
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
@@ -338,12 +333,7 @@ void menu_init(void)
 	menurc = choices_find_path_load(MENUS_NAME, PROJECT);
 	if (menurc)
 	{
-#ifdef GTK2
 		gtk_accel_map_load(menurc);
-#else
-		gtk_item_factory_parse_rc(menurc);
-		mark_menus_modified(FALSE);
-#endif
 		g_free(menurc);
 	}
 
@@ -379,12 +369,8 @@ void menu_init(void)
 				GTK_SIGNAL_FUNC(gtk_widget_hide),
 				GTK_OBJECT(savebox));
 
-#ifdef GTK2
 	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
 				  (GCallback) keys_changed, NULL, 0);
-#else
-	atexit(save_menus);
-#endif
 
 	option_register_widget("menu-set-keys", set_keys_button);
 }
@@ -415,16 +401,13 @@ GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
 /* Prevent the user from setting a short-cut on this item */
 void menuitem_no_shortcuts(GtkWidget *item)
 {
-#ifdef GTK2
-	/*
+	/* XXX */
+#if 0
 	GtkMenuItem *menuitem = GTK_MENU_ITEM(item);
 
 	_gtk_widget_set_accel_path(item, NULL, NULL);
 	g_free(menuitem->accel_path);
 	menuitem->accel_path = NULL;
-	*/
-#else
-	gtk_widget_lock_accelerators(item);
 #endif
 }
  
@@ -456,10 +439,7 @@ static void items_sensitive(gboolean state)
  * [ pointer_x, pointer_y, item_under_pointer ]
  */
 void position_menu(GtkMenu *menu, gint *x, gint *y,
-#ifdef GTK2
-		gboolean  *push_in,
-#endif
-		gpointer data)
+		   gboolean  *push_in, gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -492,9 +472,7 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
 
-#ifdef GTK2
 	*push_in = FALSE;
-#endif
 }
 
 #if 0
@@ -1334,7 +1312,7 @@ static void do_send_to(gchar *templ)
 
 static void new_file_type(gchar *templ)
 {
-	gchar *leaf;
+	const gchar *leaf;
 	MIME_type *type;
 
 	g_return_if_fail(window_with_focus != NULL);

@@ -18,19 +18,13 @@ typedef struct _ViewData ViewData;
 
 struct _ViewData
 {
-#ifdef GTK2
 	PangoLayout *layout;
 	PangoLayout *details;
-#endif
+
 	int	name_width;
 	int	name_height;
 	int	details_width;
 	int	details_height;
-#ifndef GTK2
-	int	split_pos;		/* 0 => No split */
-	int	split_width, split_height;
-	char	*details;
-#endif
 
 	MaskedPixmap *image;		/* Image; possibly thumbnail */
 };

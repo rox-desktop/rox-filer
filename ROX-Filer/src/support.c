@@ -49,17 +49,11 @@
 #include "i18n.h"
 #include "main.h"
 
-#ifndef GTK2
-# include "gconvert.h"
-#endif
-
 static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 
 /* Static prototypes */
-#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 static void MD5Transform(guint32 buf[4], guint32 const in[16]);
-#endif
 
 /* Static prototypes */
 static XMLwrapper *xml_load(char *pathname, gpointer data);
@@ -1080,7 +1074,6 @@ char *readlink_dup(const char *source)
 	return g_strndup(path, got);
 }
 
-#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 /*
  * This code implements the MD5 message-digest algorithm.
  * The algorithm is due to Ron Rivest. The original code was
@@ -1326,7 +1319,6 @@ char *md5_hash(const char *message)
 	MD5Update(&ctx, message, strlen(message));
 	return MD5Final(&ctx);
 }
-#endif /* GTK2 or THUMBS_USE_LIBPNG */
 
 /* Convert string 'src' from the current locale to UTF-8 */
 gchar *to_utf8(const gchar *src)

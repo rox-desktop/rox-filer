@@ -55,16 +55,15 @@ static gint key_press_event(GtkWidget	*widget,
 			FilerWindow	*filer_window);
 static void changed(GtkEditable *mini, FilerWindow *filer_window);
 static gboolean find_next_match(FilerWindow *filer_window,
-				char *pattern,
+				const char *pattern,
 				int dir);
-static gboolean find_exact_match(FilerWindow *filer_window, char *pattern);
-static gboolean matches(Collection *collection, int item, char *pattern);
+static gboolean find_exact_match(FilerWindow *filer_window,
+				 const gchar *pattern);
+static gboolean matches(Collection *collection, int item, const char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
-static guchar *mini_contents(FilerWindow *filer_window);
+static const gchar *mini_contents(FilerWindow *filer_window);
 static void show_help(FilerWindow *filer_window);
-#ifdef GTK2
 static gboolean grab_focus(GtkWidget *minibuffer);
-#endif
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -102,12 +101,9 @@ void create_minibuffer(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(mini), "changed",
 			GTK_SIGNAL_FUNC(changed), filer_window);
 
-#ifdef GTK2
 	/* Grabbing focus musn't select the text... */
 	gtk_signal_connect_object(GTK_OBJECT(mini), "grab-focus",
-		GTK_SIGNAL_FUNC(grab_focus),
-		GTK_OBJECT(mini));
-#endif
+		GTK_SIGNAL_FUNC(grab_focus), GTK_OBJECT(mini));
 
 	filer_window->minibuffer = mini;
 	filer_window->minibuffer_label = label;
@@ -274,7 +270,7 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	Collection 	*collection = filer_window->collection;
 	int		item = collection->cursor_item;
-	char		*path, *pattern;
+	const gchar	*path, *pattern;
 	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
@@ -310,7 +306,7 @@ static void complete(FilerWindow *filer_window)
 	int		shortest_stem = -1;
 	int		current_stem;
 	int		other;
-	guchar		*text, *leaf;
+	const gchar	*text, *leaf;
 
 	if (cursor < 0 || cursor >= collection->number_of_items)
 	{
@@ -377,9 +373,7 @@ static void complete(FilerWindow *filer_window)
 				shortest_stem - current_stem);
 		gtk_entry_append_text(entry, extra);
 		g_free(extra);
-#ifdef GTK2
 		gtk_entry_set_position(entry, -1);
-#endif
 
 		if (o_filer_beep_multi.int_value)
 			gdk_beep();
@@ -395,9 +389,7 @@ static void complete(FilerWindow *filer_window)
 			g_string_append_c(new, '/');
 
 		gtk_entry_set_text(entry, new->str);
-#ifdef GTK2
 		gtk_entry_set_position(entry, -1);
-#endif
 	}
 }
 
@@ -408,8 +400,8 @@ static gboolean path_changed(gpointer data)
 {
 	FilerWindow *filer_window = (FilerWindow *) data;
 	GtkWidget *mini = filer_window->minibuffer;
-	char	*new, *leaf;
-	char	*path, *real;
+	const char	*new, *leaf;
+	char		*path, *real;
 
 	new = gtk_entry_get_text(GTK_ENTRY(mini));
 
@@ -460,7 +452,8 @@ static gboolean path_changed(gpointer data)
 /* Look for an exact match, and move the cursor to it if found.
  * TRUE on success.
  */
-static gboolean find_exact_match(FilerWindow *filer_window, char *pattern)
+static gboolean find_exact_match(FilerWindow *filer_window,
+				 const gchar *pattern)
 {
 	Collection 	*collection = filer_window->collection;
 	int		i;
@@ -488,7 +481,7 @@ static gboolean find_exact_match(FilerWindow *filer_window, char *pattern)
  * Returns TRUE if a match is found.
  */
 static gboolean find_next_match(FilerWindow *filer_window,
-				char *pattern,
+				const char *pattern,
 				int dir)
 {
 	Collection *collection = filer_window->collection;
@@ -526,7 +519,8 @@ static gboolean find_next_match(FilerWindow *filer_window,
 	return retval;
 }
 
-static gboolean matches(Collection *collection, int item_number, char *pattern)
+static gboolean matches(Collection *collection,
+			int item_number, const char *pattern)
 {
 	DirItem *item = (DirItem *) collection->items[item_number].data;
 	
@@ -536,7 +530,7 @@ static gboolean matches(Collection *collection, int item_number, char *pattern)
 /* Find next match and set base for future matches. */
 static void search_in_dir(FilerWindow *filer_window, int dir)
 {
-	char	*path, *pattern;
+	const char *path, *pattern;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 	pattern = strrchr(path, '/');
@@ -552,7 +546,7 @@ static void search_in_dir(FilerWindow *filer_window, int dir)
 
 /*			SHELL COMMANDS			*/
 
-static void add_to_history(guchar *line)
+static void add_to_history(const gchar *line)
 {
 	guchar 	*last;
 	
@@ -617,9 +611,9 @@ static guchar *best_match(FilerWindow *filer_window, glob_t *matches)
 
 static void shell_tab(FilerWindow *filer_window)
 {
+	const gchar	*entry;
 	int	i;
-	guchar	*entry;
-	guchar	quote;
+	gchar	quote;
 	int	pos;
 	GString	*leaf;
 	glob_t	matches;
@@ -710,7 +704,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 {
 	GPtrArray	*argv;
 	int		i;
-	guchar		*entry;
+	const gchar	*entry;
 	Collection	*collection = filer_window->collection;
 	int		child;
 
@@ -724,7 +718,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	argv = g_ptr_array_new();
 	g_ptr_array_add(argv, "sh");
 	g_ptr_array_add(argv, "-c");
-	g_ptr_array_add(argv, entry);
+	g_ptr_array_add(argv, (gchar *) entry);
 	g_ptr_array_add(argv, "sh");
 
 	for (i = 0; i < collection->number_of_items; i++)
@@ -735,6 +729,8 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	}
 	
 	g_ptr_array_add(argv, NULL);
+
+	/* XXX: Use spawn */
 
 	child = fork();
 
@@ -798,7 +794,7 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 {
 	FindCondition	*cond;
 	int		i, n;
-	guchar		*entry;
+	const gchar	*entry;
 	Collection	*collection = filer_window->collection;
 	FindInfo	info;
 
@@ -862,7 +858,7 @@ static gint key_press_event(GtkWidget	*widget,
 	{
 		if (filer_window->mini_type == MINI_SHELL)
 		{
-			guchar	*line;
+			const gchar *line;
 			
 			line = mini_contents(filer_window);
 			if (line)
@@ -941,9 +937,6 @@ static gint key_press_event(GtkWidget	*widget,
 			break;
 	}
 
-#ifndef GTK2
-	gtk_signal_emit_stop_by_name(GTK_OBJECT(widget), "key_press_event");
-#endif
 	return TRUE;
 }
 
@@ -967,9 +960,9 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 /* Returns a string (which must NOT be freed), or NULL if the buffer
  * is blank (whitespace only).
  */
-static guchar *mini_contents(FilerWindow *filer_window)
+static const gchar *mini_contents(FilerWindow *filer_window)
 {
-	guchar	*entry, *c;
+	const gchar *entry, *c;
 
 	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 
@@ -980,7 +973,9 @@ static guchar *mini_contents(FilerWindow *filer_window)
 	return NULL;
 }
 
-#ifdef GTK2
+/* This is a really ugly hack to get around Gtk+-2.0's broken auto-select
+ * behaviour.
+ */
 static gboolean grab_focus(GtkWidget *minibuffer)
 {
 	GtkWidgetClass *class;
@@ -993,4 +988,3 @@ static gboolean grab_focus(GtkWidget *minibuffer)
 
 	return 1;
 }
-#endif

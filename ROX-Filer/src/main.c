@@ -572,33 +572,6 @@ static void show_features(void)
 # endif
 #endif
 		);
-	g_printerr("%s... %s\n", _("Gtk+-2.0 support"),
-#ifdef GTK2
-		_("Yes")
-#else
-		_("No (using Gtk+-1.2 instead)")
-#endif
-		);
-	g_printerr("%s... %s\n", _("Save thumbnails"),
-#ifdef GTK2
-		_("Yes (using Gtk+-2.0)")
-#elif defined(HAVE_LIBPNG)
-		_("Yes (using libpng)")
-#else
-		_("No (needs libpng or Gtk+-2.0)")
-#endif
-		);
-	g_printerr("%s... %s\n", _("Character set translations"),
-#ifdef GTK2
-			_("Yes (using Gtk+-2.0)")
-#else
-# ifdef HAVE_ICONV_H
-			_("Yes")
-# else
-			_("No (needs libiconv or Gtk+-2.0)")
-# endif
-#endif
-		  );
 	g_printerr("%s... %s\n", _("GNOME-VFS library"),
 #ifdef WITH_GNOMEVFS
 			_("Yes")

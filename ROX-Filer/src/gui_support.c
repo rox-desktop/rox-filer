@@ -44,12 +44,6 @@
 #include "pixmaps.h"
 #include "choices.h"
 
-#ifndef GTK2
-GdkFont	   	*item_font = NULL;
-GdkFont	   	*fixed_font = NULL;
-GtkStyle   	*fixed_style = NULL;
-gint		fixed_width;
-#endif
 GdkGC		*red_gc = NULL;	/* Not automatically initialised */
 GdkColor 	red = {0, 0xffff, 0, 0};
 gint		screen_width, screen_height;
@@ -60,27 +54,7 @@ static GtkWidget *current_dialog = NULL;
 
 void gui_support_init()
 {
-#ifndef GTK2
-	GtkWidget *tmp;
-
-	/* Create a window and get its font rather than using
-	 * the default style (allows customisation via .gtkrc)
-	 */
-	tmp = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_widget_realize(tmp);
-	item_font = gtk_widget_get_style(tmp)->font;
-	gdk_font_ref(item_font);
-	gtk_widget_destroy(tmp);
-
-	fixed_font = gdk_font_load("fixed");
-
-	fixed_style = gtk_style_copy(gtk_widget_get_default_style());
-	fixed_style->font = fixed_font;
-
-	fixed_width = gdk_string_width(fixed_font, "m");
-#endif
-
-	gdk_color_alloc(gtk_widget_get_default_colormap(), &red);
+	gdk_color_alloc(gtk_widget_get_default_colormap(), &red); /* XXX */
 
 	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
 
@@ -89,31 +63,6 @@ void gui_support_init()
 	 */
 	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
 }
-
-#ifndef GTK2
-static void choice_clicked(GtkWidget *widget, gpointer number)
-{
-	int	*choice_return;
-
-	choice_return = gtk_object_get_data(GTK_OBJECT(widget),
-			"choice_return");
-
-	if (choice_return)
-		*choice_return = GPOINTER_TO_INT(number);
-}
-
-static gboolean dialog_key_event(GtkWidget *dialog,
-				 GdkEventKey *kev,
-				 gpointer data)
-{
-	if (kev->keyval == GDK_Escape)
-	{
-		gtk_widget_destroy(dialog);
-		return TRUE;
-	}
-	return FALSE;
-}
-#endif
 
 /* Open a modal dialog box showing a message.
  * The user can choose from a selection of buttons at the bottom.
@@ -131,11 +80,6 @@ int get_choice(const char *title,
 	GtkWidget	*button = NULL;
 	int		i, retval;
 	va_list	ap;
-#ifndef GTK2
-	GtkWidget	*vbox, *action_area, *separator;
-	GtkWidget	*text, *text_container;
-	int		choice_return;
-#endif
 
 	if (current_dialog)
 	{
@@ -144,97 +88,30 @@ int get_choice(const char *title,
 		return -1;
 	}
 
-#ifdef GTK2
 	current_dialog = dialog = gtk_message_dialog_new(NULL,
 					GTK_DIALOG_MODAL,
 					GTK_MESSAGE_QUESTION,
 					GTK_BUTTONS_NONE,
 					"%s", message);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-#else
-	current_dialog = dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-	GTK_WIDGET_UNSET_FLAGS(dialog, GTK_CAN_FOCUS);
-	gtk_window_set_modal(GTK_WINDOW(dialog), TRUE);
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 2);
-
-	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
-
-	action_area = gtk_hbox_new(TRUE, 5);
-	gtk_container_set_border_width(GTK_CONTAINER(action_area), 2);
-	gtk_box_pack_end(GTK_BOX(vbox), action_area, FALSE, TRUE, 0);
-
-	separator = gtk_hseparator_new ();
-	gtk_box_pack_end(GTK_BOX(vbox), separator, FALSE, TRUE, 2);
-
-	text = gtk_label_new(message);
-	gtk_label_set_line_wrap(GTK_LABEL(text), TRUE);
-	text_container = gtk_event_box_new();
-	gtk_container_set_border_width(GTK_CONTAINER(text_container), 40);
-	gtk_container_add(GTK_CONTAINER(text_container), text);
-
-	gtk_box_pack_start(GTK_BOX(vbox),
-			text_container,
-			TRUE, TRUE, 0);
-#endif
 
 	va_start(ap, number_of_buttons);
 
 	for (i = 0; i < number_of_buttons; i++)
-	{
-#ifdef GTK2
 		button = gtk_dialog_add_button(GTK_DIALOG(current_dialog),
 				va_arg(ap, char *), i);
-#else
-		button = gtk_button_new_with_label(va_arg(ap, char *));
-		GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-		gtk_misc_set_padding(GTK_MISC(GTK_BIN(button)->child), 16, 2);
-		gtk_object_set_data(GTK_OBJECT(button), "choice_return",
-				&choice_return);
-		gtk_box_pack_start(GTK_BOX(action_area), button, TRUE, TRUE, 0);
-		gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(i));
-#endif
-	}
 
 	gtk_window_set_title(GTK_WINDOW(dialog), title);
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
 
-#ifdef GTK2
 	gtk_dialog_set_default_response(GTK_DIALOG(dialog), i - 1);
-#else
-	gtk_window_set_focus(GTK_WINDOW(dialog), button);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_container_set_focus_child(GTK_CONTAINER(action_area), button);
-#endif
 
 	va_end(ap);
 
-#ifdef GTK2
 	retval = gtk_dialog_run(GTK_DIALOG(dialog));
 	if (retval == GTK_RESPONSE_NONE)
 		retval = -1;
 	gtk_widget_destroy(dialog);
-#else
-	gtk_object_set_data(GTK_OBJECT(dialog), "choice_return",
-				&choice_return);
-	gtk_signal_connect(GTK_OBJECT(dialog), "destroy",
-			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(-1));
-	gtk_signal_connect(GTK_OBJECT(dialog), "key-press-event",
-			GTK_SIGNAL_FUNC(dialog_key_event), NULL);
-
-	choice_return = -2;
-
-	gtk_widget_show_all(dialog);
-
-	while (choice_return == -2)
-		g_main_iteration(TRUE);
-
-	retval = choice_return;
-
-	if (retval != -1)
-		gtk_widget_destroy(dialog);
-#endif
 
 	current_dialog = NULL;
 
@@ -253,7 +130,6 @@ void report_error(const char *message, ...)
 	s = g_strdup_vprintf(message, args);
 	va_end(args);
 
-#ifdef GTK2
 	{
 		GtkWidget *dialog;
 		dialog = gtk_message_dialog_new(NULL,
@@ -267,9 +143,7 @@ void report_error(const char *message, ...)
 		gtk_dialog_run(GTK_DIALOG(dialog));
 		gtk_widget_destroy(dialog);
 	}
-#else
-	get_choice(PROJECT, s, 1, _("OK"));
-#endif
+
 	g_free(s);
 }
 
@@ -407,7 +281,6 @@ void delayed_error(const char *error, ...)
  */
 gboolean load_file(const char *pathname, char **data_out, long *length_out)
 {
-#ifdef GTK2
 	gsize len;
 	GError *error;
 	
@@ -421,51 +294,6 @@ gboolean load_file(const char *pathname, char **data_out, long *length_out)
 	if (length_out)
 		*length_out = len;
 	return TRUE;
-#else
-	FILE		*file;
-	long		length;
-	char		*buffer;
-	gboolean 	retval = FALSE;
-
-	file = fopen(pathname, "r");
-
-	if (!file)
-	{
-		delayed_error("open(%s): %s", pathname, g_strerror(errno));
-		return FALSE;
-	}
-
-	fseek(file, 0, SEEK_END);
-	length = ftell(file);
-
-	buffer = malloc(length + 1);
-	if (buffer)
-	{
-		fseek(file, 0, SEEK_SET);
-		fread(buffer, 1, length, file);
-
-		if (ferror(file))
-		{
-			delayed_error(_("Error reading file %s: %s"),
-					pathname, g_strerror(errno));
-			g_free(buffer);
-		}
-		else
-		{
-			*data_out = buffer;
-			*length_out = length;
-			buffer[length] = '\0';
-			retval = TRUE;
-		}
-	}
-	else
-		delayed_error(_("Can't allocate memory for buffer to "
-				"load this file"));
-
-	fclose(file);
-
-	return retval;
-#endif
 }
 
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
@@ -552,9 +380,6 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	unsigned long nitems, after;
 	Window	*proxy_data;
 	Window	proxy;
-#ifndef GTK2
-	guint32	old_warnings;
-#endif
 
 	XGrabServer(GDK_DISPLAY());
 
@@ -563,13 +388,7 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	type = None;
 	proxy = None;
 
-#ifdef GTK2
 	gdk_error_trap_push();
-#else
-	old_warnings = gdk_error_warnings;
-	gdk_error_code = 0;
-	gdk_error_warnings = 0;
-#endif
 
 	/* Check if somebody else already owns drops on the root window */
 
@@ -592,9 +411,7 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	 */
 	if (proxy)
 	{
-#ifdef GTK2
 		gint	gdk_error_code;
-#endif
 
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
 				    gdk_x11_atom_to_xatom(xdnd_proxy_atom),
@@ -602,10 +419,8 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 				    &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
 
-#ifdef GTK2
 		gdk_error_code = gdk_error_trap_pop();
 		gdk_error_trap_push();
-#endif
 		
 		if (!gdk_error_code && type != None)
 		{
@@ -632,12 +447,7 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 				(guchar *) &proxy_xid, 1);
 	}
 
-#ifdef GTK2
 	gdk_error_trap_pop();
-#else
-	gdk_error_code = 0;
-	gdk_error_warnings = old_warnings;
-#endif
 
 	XUngrabServer(GDK_DISPLAY());
 	gdk_flush();
@@ -681,9 +491,6 @@ GdkWindow *find_click_proxy_window(void)
 	Window *proxy_data;
 	Window proxy;
 	GdkWindow *proxy_gdk_window;
-#ifndef GTK2
-	guint32 old_warnings;
-#endif
 
 	XGrabServer(GDK_DISPLAY());
 
@@ -691,13 +498,7 @@ GdkWindow *find_click_proxy_window(void)
 	type = None;
 	proxy = None;
 
-#ifdef GTK2
 	gdk_error_trap_push();
-#else
-	old_warnings = gdk_error_warnings;
-	gdk_error_code = 0;
-	gdk_error_warnings = 0;
-#endif
 
 	/* Check if the proxy window exists */
 
@@ -721,19 +522,15 @@ GdkWindow *find_click_proxy_window(void)
 
 	if (proxy)
 	{
-#ifdef GTK2
 		gint	gdk_error_code;
-#endif
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
 				   gdk_x11_atom_to_xatom(click_proxy_atom), 0,
 				   1, False, AnyPropertyType,
 				   &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
 
-#ifdef GTK2
 		gdk_error_code = gdk_error_trap_pop();
 		gdk_error_trap_push();
-#endif
 		
 		if (!gdk_error_code && type != None)
 		{
@@ -747,12 +544,7 @@ GdkWindow *find_click_proxy_window(void)
 			proxy = gdk_x11_atom_to_xatom(GDK_NONE);
 	}
 
-#ifdef GTK2
 	gdk_error_trap_pop();
-#else
-	gdk_error_code = 0;
-	gdk_error_warnings = old_warnings;
-#endif
 
 	XUngrabServer(GDK_DISPLAY());
 	gdk_flush();
