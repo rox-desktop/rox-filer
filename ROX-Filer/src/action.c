@@ -1155,7 +1155,7 @@ static void do_copy2(const char *path, const char *dest)
 
 	if (S_ISDIR(info.st_mode))
 	{
-		mode_t	mode = info.st_mode & 0777;
+		mode_t	mode = info.st_mode;
 		char *safe_path, *safe_dest;
 		struct stat 	dest_info;
 		gboolean	exists;
@@ -1196,7 +1196,14 @@ static void do_copy2(const char *path, const char *dest)
 				 * we could write to it... change it back now.
 				 */
 				if (chmod(safe_dest, mode))
-					send_error();
+				{
+					/* Some filesystems don't support
+					 * SetGID and SetUID bits. Ignore
+					 * these errors.
+					 */
+					if (errno != EPERM)
+						send_error();
+				}
 
 				/* Also, try to preserve the timestamps */
 				utb.actime = info.st_atime;

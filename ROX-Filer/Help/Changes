@@ -5,8 +5,8 @@
 30-Apr-2002
 ~~~~~~~~~~~
 Alpha-blending for Small icons, too.
-Bugfix: When copying directories, the new mode wasn't masked correctly,
-	causing an error to be reported on some filesystems.
+Bugfix: When copying directories, ignore an error caused by filesystems
+	that don't support chmod fully (eg, Samba shares).
 
 29-Apr-2002
 ~~~~~~~~~~~
