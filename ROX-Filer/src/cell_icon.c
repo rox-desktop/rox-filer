@@ -203,8 +203,7 @@ static DisplayStyle get_style(GtkCellRenderer *cell)
 	{
 		FilerWindow *filer_window = icon->view_details->filer_window;
 
-		if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
-			strcmp(item->mime_type->media_type, "image") == 0)
+		if (filer_window->show_thumbs && item->base_type == TYPE_FILE)
 		{
 			const guchar    *path;
 
