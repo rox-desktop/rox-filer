@@ -88,6 +88,7 @@ typedef enum {
 static ToolbarType o_toolbar = TOOLBAR_NORMAL;
 static GtkWidget *menu_toolbar;
 
+#define NEW_WIN_BUTTON() (o_new_window_on_1 ? 1 : 5 - collection_menu_button)
 static gboolean o_single_click = TRUE;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
@@ -623,7 +624,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button != 1)
+			((GdkEventButton *) event)->button != 1)
 	{
 		filer_opendir(filer_window->path, PANEL_NO);
 	}
@@ -640,7 +641,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button != 1)
+			((GdkEventButton *) event)->button == NEW_WIN_BUTTON())
 	{
 		filer_opendir(home_dir, PANEL_NO);
 	}
@@ -654,7 +655,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button != 1)
+			((GdkEventButton *) event)->button == NEW_WIN_BUTTON())
 	{
 		filer_open_parent(filer_window);
 	}
@@ -803,6 +804,67 @@ static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 			2, _("Remove"), _("Cancel")) != 0;
 }
 
+/* Append all the URIs in the selection to the string */
+static void create_uri_list(FilerWindow *filer_window, GString *string)
+{
+	Collection *collection = filer_window->collection;
+	GString	*leader;
+	int i, num_selected;
+
+	leader = g_string_new("file://");
+	if (!o_no_hostnames)
+		g_string_append(leader, our_host_name());
+	g_string_append(leader, filer_window->path);
+	if (leader->str[leader->len - 1] != '/')
+		g_string_append_c(leader, '/');
+
+	num_selected = collection->number_selected;
+
+	for (i = 0; num_selected > 0; i++)
+	{
+		if (collection->items[i].selected)
+		{
+			DirItem *item = (DirItem *) collection->items[i].data;
+			
+			g_string_append(string, leader->str);
+			g_string_append(string, item->leafname);
+			g_string_append(string, "\r\n");
+			num_selected--;
+		}
+	}
+
+	g_string_free(leader, TRUE);
+}
+
+static void start_drag_selection(Collection *collection,
+				 GdkEventMotion *event,
+				 int number_selected,
+				 FilerWindow *filer_window)
+{
+	GtkWidget	*widget = (GtkWidget *) collection;
+
+	if (number_selected == 1)
+	{
+		DirItem	*item;
+
+		item = selected_item(collection);
+
+		drag_one_item(widget, event,
+			make_path(filer_window->path, item->leafname)->str,
+			item,
+			filer_window->mini_type == MINI_RUN_ACTION);
+	}
+	else
+	{
+		GString *uris;
+	
+		uris = g_string_new(NULL);
+		create_uri_list(filer_window, uris);
+		drag_selection(widget, event, uris->str);
+		g_string_free(uris, TRUE);
+	}
+}
+
 FilerWindow *filer_opendir(char *path, PanelType panel_type)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
@@ -894,9 +956,9 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 	gtk_signal_connect(GTK_OBJECT(collection), "lose_selection",
 			lose_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_selection",
-			drag_selection, filer_window);
+			start_drag_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
-			drag_data_get, filer_window);
+			drag_data_get, NULL);
 	gtk_signal_connect(GTK_OBJECT(collection), "selection_clear_event",
 			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
 	gtk_signal_connect (GTK_OBJECT(collection), "selection_get",

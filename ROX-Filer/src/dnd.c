@@ -50,9 +50,6 @@
 #define MAXURILEN 4096		/* Longest URI to allow */
 
 /* Static prototypes */
-static void create_uri_list(GString *string,
-				Collection *collection,
-				FilerWindow *filer_window);
 static gboolean drag_drop(GtkWidget 	*widget,
 			GdkDragContext  *context,
 			gint            x,
@@ -156,7 +153,7 @@ void dnd_init()
 
 /*				OPTIONS				*/
 
-static gboolean o_no_hostnames = FALSE;
+gboolean o_no_hostnames = FALSE;
 static gboolean o_drag_to_icons = TRUE;
 static GtkWidget *toggle_no_hostnames;
 static GtkWidget *toggle_drag_to_icons;
@@ -310,87 +307,77 @@ static GSList *uri_list_to_gslist(char *uri_list)
 	return list;
 }
 
-/* Append all the URIs in the selection to the string */
-static void create_uri_list(GString *string,
-				Collection *collection,
-				FilerWindow *filer_window)
-{
-	GString	*leader;
-	int i, num_selected;
-
-	leader = g_string_new("file://");
-	if (!o_no_hostnames)
-		g_string_append(leader, our_host_name());
-	g_string_append(leader, filer_window->path);
-	if (leader->str[leader->len - 1] != '/')
-		g_string_append_c(leader, '/');
-
-	num_selected = collection->number_selected;
-
-	for (i = 0; num_selected > 0; i++)
-	{
-		if (collection->items[i].selected)
-		{
-			DirItem *item = (DirItem *) collection->items[i].data;
-			
-			g_string_append(string, leader->str);
-			g_string_append(string, item->leafname);
-			g_string_append(string, "\r\n");
-			num_selected--;
-		}
-	}
-
-	g_string_free(leader, TRUE);
-}
-
 /*			DRAGGING FROM US			*/
 
-/* The user has held the mouse button down over an item and moved - 
- * start a drag.
- *
- * We always provide text/uri-list. If we are dragging a single, regular file
- * then we also offer application/octet-stream and the type of the file.
- *
- * If the RUN_ACTION minibuffer is open then only drags to other executables
- * shown in our windows are allowed.
+/* The user has held the mouse button down over a group of item and moved - 
+ * start a drag. 'uri_list' is copied, so you can delete it straight away.
  */
-void drag_selection(Collection 		*collection,
-		    GdkEventMotion 	*event,
-		    gint		number_selected,
-		    FilerWindow		*filer_window)
+void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 {
-	GtkWidget	*widget;
-	MaskedPixmap	*image;
 	GdkDragContext 	*context;
+	GdkDragAction	actions;
 	GtkTargetList   *target_list;
-	GtkTargetEntry 	target_table[] =
-	{
+	GtkTargetEntry 	target_table[] = {
+		{"text/uri-list", 0, TARGET_URI_LIST},
+	};
+		
+	if (event->state & GDK_BUTTON1_MASK)
+		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK;
+	else
+		actions = GDK_ACTION_MOVE;
+	
+	target_list = gtk_target_list_new(target_table, 1);
+
+	context = gtk_drag_begin(widget,
+			target_list,
+			actions,
+			(event->state & GDK_BUTTON1_MASK) ? 1 :
+			(event->state & GDK_BUTTON2_MASK) ? 2 : 3,
+			(GdkEvent *) event);
+
+	g_dataset_set_data_full(context, "uri_list",
+				g_strdup(uri_list), g_free);
+
+	gtk_drag_set_icon_pixmap(context,
+			gtk_widget_get_colormap(widget),
+			im_multiple->pixmap,
+			im_multiple->mask,
+			0, 0);
+}
+
+/* Copy/Load this item into another directory/application.
+ *
+ * If set_run_action is TRUE then the user may drag this item to an exectuable
+ * and set the default run action for its type.
+ */
+void drag_one_item(GtkWidget		*widget,
+		   GdkEventMotion	*event,
+		   guchar		*full_path,
+		   DirItem		*item,
+		   gboolean		set_run_action)
+{
+	guchar		*uri;
+	GdkDragContext 	*context;
+	GdkDragAction	actions;
+	GtkTargetList   *target_list;
+	GtkTargetEntry 	target_table[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 		{"application/octet-stream", 0, TARGET_RAW},
 		{"", 0, TARGET_RAW},
 	};
-	DirItem	*item;
-	GdkDragAction	actions;
 
-	if (number_selected == 1)
-		item = selected_item(collection);
-	else
-		item = NULL;
-	
-	widget = GTK_WIDGET(collection);
-	
-	if (filer_window->mini_type == MINI_RUN_ACTION)
+	g_return_if_fail(full_path != NULL);
+	g_return_if_fail(item != NULL);
+
+	if (set_run_action)
 	{
 		GtkTargetEntry 	target_table[] = {
 			{"_ROX_RUN_ACTION", 0, TARGET_RUN_ACTION},
 		};
 
-		if (collection->number_selected != 1)
-			return;
-
 		target_list = gtk_target_list_new(target_table, 1);
 	}
-	else if (item && item->base_type == TYPE_FILE)
+	else if (item->base_type == TYPE_FILE)
 	{
 		MIME_type *t = item->mime_type;
 		
@@ -414,12 +401,30 @@ void drag_selection(Collection 		*collection,
 			(event->state & GDK_BUTTON2_MASK) ? 2 : 3,
 			(GdkEvent *) event);
 
-	image = item ? item->image : im_multiple;
-	
+	if (set_run_action)
+	{
+		MIME_type	*type = item->mime_type;
+
+		g_dataset_set_data_full(context, "mime_type",
+				g_strconcat(type->media_type, "/",
+					    type->subtype, NULL),
+				g_free);
+	}
+	else
+	{
+		g_dataset_set_data_full(context, "full_path",
+				g_strdup(full_path), g_free);
+		uri = g_strconcat("file://",
+				o_no_hostnames ? "" : our_host_name(),
+				full_path, "\r\n", NULL);
+		g_dataset_set_data_full(context, "uri_list",
+					uri, g_free);
+	}
+
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),
-			image->pixmap,
-			image->mask,
+			item->image->pixmap,
+			item->image->mask,
 			0, 0);
 }
 
@@ -441,52 +446,39 @@ void drag_data_get(GtkWidget          		*widget,
 			GtkSelectionData   	*selection_data,
 			guint               	info,
 			guint32             	time,
-			FilerWindow		*filer_window)
+			gpointer		data)
 {
 	char		*to_send = "E";	/* Default to sending an error */
 	long		to_send_length = 1;
 	gboolean	delete_once_sent = FALSE;
 	GdkAtom		type = XA_STRING;
-	GString		*string;
-	DirItem	*item;
+	guchar		*path;
 	
 	switch (info)
 	{
 		case	TARGET_RAW:
-			item = selected_item(filer_window->collection);
-			if (item && load_file(make_path(filer_window->path,
-						item->leafname)->str,
-						&to_send, &to_send_length))
+			path = g_dataset_get_data(context, "full_path");
+			if (path && load_file(path, &to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
 				type = selection_data->target;
 				break;
 			}
-			g_warning("drag_data_get: Can't find selected item\n");
+			g_warning("drag_data_get: Can't find path!\n");
 			return;
 		case	TARGET_URI_LIST:
-			string = g_string_new(NULL);
-			create_uri_list(string,
-					COLLECTION(widget),
-					filer_window);
-			to_send = string->str;
-			to_send_length = string->len;
-			delete_once_sent = TRUE;
-			g_string_free(string, FALSE);
+			to_send = g_dataset_get_data(context, "uri_list");
+			to_send_length = strlen(to_send);
+			delete_once_sent = FALSE;
 			break;
 		case	TARGET_RUN_ACTION:
-			item = selected_item(filer_window->collection);
-			if (item && item->mime_type)
-			{
-				MIME_type	*type = item->mime_type;
-				to_send = g_strconcat(type->media_type, "/",
-						type->subtype, NULL);
+			to_send = g_dataset_get_data(context, "mime_type");
+			if (to_send)
 				to_send_length = strlen(to_send);
-				delete_once_sent = TRUE;
-				break;
-			}
-			g_warning("drag_data_get: Can't find MIME-type\n");
-			return;
+			else
+				to_send = "E";
+			delete_once_sent = FALSE;
+			break;
 		default:
 			delayed_error("drag_data_get",
 					_("Internal error - bad info type"));

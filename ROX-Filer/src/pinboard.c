@@ -75,6 +75,15 @@ static  GdkGC	*mask_gc = NULL;
 static GtkWidget *proxy_invisible;
 
 static gint	drag_start_x, drag_start_y;
+/* If the drag type is not DRAG_NONE then there is a grab in progress */
+typedef enum {
+	DRAG_NONE,
+	DRAG_MOVE_ICON,	/* When you hold down Adjust on an icon */
+	DRAG_MAY_COPY,	/* When you hold down Select on an icon, but */
+			/* before the drag has actually started. */
+} PinDragType;
+static PinDragType pin_drag_type = DRAG_NONE;
+
 
 /* Static prototypes */
 static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight);
@@ -101,6 +110,7 @@ static void snap_to_grid(int *x, int *y);
 static void offset_from_centre(PinIcon *icon,
 			       int width, int height,
 			       int *x, int *y);
+
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -217,6 +227,8 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	icon->paper = gtk_drawing_area_new();
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->paper);
+	gtk_signal_connect(GTK_OBJECT(icon->paper), "drag_data_get",
+				drag_data_get, NULL);
 
 	gtk_widget_realize(icon->win);
 	gdk_window_set_decorations(icon->win->window, 0);
@@ -228,6 +240,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	gtk_widget_add_events(icon->paper,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
+			GDK_BUTTON1_MOTION_MASK |
 			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
 	gtk_signal_connect(GTK_OBJECT(icon->paper), "button-press-event",
 			GTK_SIGNAL_FUNC(button_press_event), icon);
@@ -295,6 +308,9 @@ void pinboard_clear(void)
 void pinboard_may_update(guchar *path)
 {
 	GList	*next;
+
+	if (!current_pinboard)
+		return;
 
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
@@ -498,20 +514,35 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 	return FALSE;
 }
 
+#define OTHER_BUTTONS (GDK_BUTTON2_MASK | GDK_BUTTON3_MASK | \
+		       GDK_BUTTON4_MASK | GDK_BUTTON5_MASK)
+
 static gboolean button_release_event(GtkWidget *widget,
 			    	     GdkEventButton *event,
                             	     PinIcon *icon)
 {
 	int	b = event->button;
+	DirItem	*item = &icon->item;
 
-	if (b == 1 || b > 3 || b == collection_menu_button)
-		return TRUE;
-
-	g_print("[ stop drag ]\n");
+	if (pin_drag_type == DRAG_NONE)
+		return TRUE;		/* Already done a drag? */
 
 	gtk_grab_remove(widget);
 
-	pinboard_save();
+	if (pin_drag_type == DRAG_MOVE_ICON)
+		pinboard_save();
+	else if (b == 1 && pin_drag_type == DRAG_MAY_COPY)
+	{
+		/* Could have been a copy, but the user didn't move
+		 * far enough. Open the item instead.
+		 */
+		pinboard_wink_item(icon);
+
+		run_diritem(icon->path, item, NULL,
+				(event->state & GDK_SHIFT_MASK) != 0);
+	}
+
+	pin_drag_type = DRAG_NONE;
 
 	return TRUE;
 }
@@ -521,23 +552,22 @@ static gboolean button_press_event(GtkWidget *widget,
                             	   PinIcon *icon)
 {
 	int	b = event->button;
-	DirItem	*item = &icon->item;
+
+	if (pin_drag_type != DRAG_NONE)
+		return TRUE;
 
 	if (b == collection_menu_button)
 		pinboard_unpin(icon);
-	else if (b == 1)
-	{
-		pinboard_wink_item(icon);
-
-		run_diritem(icon->path, item, NULL,
-				(event->state & GDK_SHIFT_MASK) != 0);
-	}
 	else if (b < 4)
 	{
 		drag_start_x = event->x_root;
 		drag_start_y = event->y_root;
-		g_print("[ start drag ]\n");
 		gtk_grab_add(widget);
+
+		if (b == 1)
+			pin_drag_type = DRAG_MAY_COPY;
+		else
+			pin_drag_type = DRAG_MOVE_ICON;
 	}
 
 	return TRUE;
@@ -550,15 +580,32 @@ static gint icon_motion_notify(GtkWidget *widget,
 {
 	int	x = event->x_root;
 	int	y = event->y_root;
-	int	width, height;
 
-	snap_to_grid(&x, &y);
-	icon->x = x;
-	icon->y = y;
-	gdk_window_get_size(icon->win->window, &width, &height);
-	offset_from_centre(icon, width, height, &x, &y);
-	
-	gdk_window_move(icon->win->window, x, y);
+	if (pin_drag_type == DRAG_MOVE_ICON)
+	{
+		int	width, height;
+
+		snap_to_grid(&x, &y);
+		icon->x = x;
+		icon->y = y;
+		gdk_window_get_size(icon->win->window, &width, &height);
+		offset_from_centre(icon, width, height, &x, &y);
+
+		gdk_window_move(icon->win->window, x, y);
+	}
+	else if (pin_drag_type == DRAG_MAY_COPY)
+	{
+		int	dx = x - drag_start_x;
+		int	dy = y - drag_start_y;
+
+		if (ABS(dx) > 3 || ABS(dy) > 3)
+		{
+			pin_drag_type = DRAG_NONE;
+			gtk_grab_remove(widget);
+			drag_one_item(widget, event, icon->path,
+					&icon->item, FALSE);
+		}
+	}
 
 	return TRUE;
 }

@@ -12,16 +12,19 @@
 #include "collection.h"
 #include "filer.h"
 
-void drag_selection(Collection 		*collection,
-		    GdkEventMotion 	*event,
-		    gint		number_selected,
-		    FilerWindow		*filer_window);
-void drag_data_get(GtkWidget          *widget,
-		   GdkDragContext     *context,
-		   GtkSelectionData   *selection_data,
-		   guint               info,
-		   guint32             time,
-		   FilerWindow	      *filer_window);
+extern gboolean o_no_hostnames;
+void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list);
+void drag_one_item(GtkWidget		*widget,
+		   GdkEventMotion	*event,
+		   guchar		*full_path,
+		   DirItem		*item,
+		   gboolean		set_run_action);
+void drag_data_get(GtkWidget      	*widget,
+		   GdkDragContext     	*context,
+		   GtkSelectionData   	*selection_data,
+		   guint               	info,
+		   guint32             	time,
+		   gpointer	       	data);
 void drag_set_dest(FilerWindow *filer_window);
 void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init();

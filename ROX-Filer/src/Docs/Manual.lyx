@@ -1,6 +1,5 @@
-#This file was created by <tal197> Wed Jun 21 22:42:45 2000
-#LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
-\lyxformat 2.15
+#LyX 1.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 2.16
 \textclass article
 \begin_preamble
 \def \Tab {\thinspace$\langle\hbox{Tab}\rangle$\thinspace}
@@ -48,7 +47,7 @@ ROX-Filer is a graphical file manger for the X Window System.
 \layout Standard
 
 
-\begin_inset LatexCommand \tableofcontents
+\begin_inset LatexCommand \tableofcontents{}
 
 \end_inset 
 
@@ -97,8 +96,7 @@ XDS An extension to XDND that allows applications to save data by dragging
 .
 \layout Description
 
-ROX
-\protected_separator 
+ROX\SpecialChar ~
 Choices A simple, but flexible, system for managing user choices.
  See 
 \begin_inset LatexCommand \cite{Choices}
@@ -108,10 +106,9 @@ Choices A simple, but flexible, system for managing user choices.
  for details.
 \layout Description
 
-Application
-\protected_separator 
-directories Self contained relocatable applications, where installation
- is as simple as copying it to where you want it and uninstalling it is
+Application\SpecialChar ~
+directories Self contained relocatable applications, where installati
+on is as simple as copying it to where you want it and uninstalling it is
  just a matter of deleting a directory.
  Described later in this documentation.
 \layout Section
@@ -273,6 +270,29 @@ By default, ROX-Filer will start by displaying your home directory.
 \layout LyX-Code
 
 $ ROX-Filer/AppRun /home /usr /usr/local
+\layout Standard
+
+If you want the filer to manage your desktop background then you use the
+ 
+\family typewriter 
+--pinboard
+\family default 
+ option and supply a name for the pinboard:
+\layout LyX-Code
+
+$ ROX-Filer/AppRun --pinboard MyPinboard
+\layout Standard
+
+The pinboard configuration is saved in `
+\emph on 
+<Choices>/ROX-Filer/pb_MyPinboard
+\emph default 
+'.
+ You may have to use the 
+\family typewriter 
+--new
+\family default 
+ option when creating a pinboard (this will be fixed in later versions).
 \layout Standard
 
 If you want one of the directories to be opened as a panel put 
@@ -637,6 +657,8 @@ noindent
 \latex default 
 If the toolbar is in Normal mode (ie, not GNOME mode) then you may also
  use either of the other buttons to perform the `Other action'.
+ If the 'New window on button 1' option is turned on then the `Action' and
+ `Other action' of the first two are swapped.
 \layout Subsection
 
 The menus
@@ -2086,12 +2108,9 @@ Sec(s) has no effect, but looks nice.
 Min(s) multiplies by 60 to get minutes.
 \layout Description
 
-Hour(s),
-\protected_separator 
-Day(s),
-\protected_separator 
-Week(s),
-\protected_separator 
+Hour(s),\SpecialChar ~
+Day(s),\SpecialChar ~
+Week(s),\SpecialChar ~
 Year(s) likewise convert to the relevant unit.
 \layout Description
 
@@ -2247,7 +2266,7 @@ src
 
 \begin_inset Figure size 216 180
 file Prune.eps
-height 2 2.5
+height 2 2.50
 flags 9
 
 \end_inset 
@@ -2856,7 +2875,7 @@ detach()
 
 \begin_inset Figure size 595 618
 file Structs.eps
-width 3 100
+width 3 100.00
 flags 9
 
 \end_inset 
