@@ -390,18 +390,23 @@ static void complete(FilerWindow *filer_window)
 	}
 }
 
-/* This is an idle function because Gtk+ 2.0 changes text in a entry
- * with two signals; one to blank it and one to put the new text in.
- */
-static gboolean path_changed(gpointer data)
+static void path_changed(FilerWindow *filer_window)
 {
-	FilerWindow *filer_window = (FilerWindow *) data;
 	GtkWidget *mini = filer_window->minibuffer;
 	const char	*new, *leaf;
 	char		*path;
 	gboolean	error = FALSE;
 
 	new = gtk_entry_get_text(GTK_ENTRY(mini));
+
+	if (!*new)
+	{
+		/* Entry may be blank because we're in the middle of changing
+		 * to something else...
+		 */
+		entry_set_error(mini, FALSE);
+		return;
+	}
 
 	leaf = g_basename(new);
 	if (leaf == new)
@@ -443,8 +448,6 @@ static gboolean path_changed(gpointer data)
 	g_free(path);
 
 	entry_set_error(mini, error);
-
-	return FALSE;
 }
 
 /* Look for an exact match, and move the cursor to it if found.
@@ -936,7 +939,7 @@ static void changed(GtkEditable *mini, FilerWindow *filer_window)
 	switch (filer_window->mini_type)
 	{
 		case MINI_PATH:
-			gtk_idle_add(path_changed, filer_window);
+			path_changed(filer_window);
 			return;
 		case MINI_SELECT_IF:
 			set_find_string_colour(GTK_WIDGET(mini), 
