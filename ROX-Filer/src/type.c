@@ -1491,8 +1491,10 @@ static void set_icon_theme(void)
 
 	icon_home = g_build_filename(home_dir, ".icons", "ROX", NULL);
 	if (symlink(make_path(app_dir, "ROX"), icon_home))
-		delayed_error(_("Failed to create symlink '%s':\n%s"),
-				icon_home, g_strerror(errno));
+		delayed_error(_("Failed to create symlink '%s':\n%s\n\n"
+		"(this may mean that the ROX theme already exists there, but "
+		"the 'mime-application:postscript' icon couldn't be loaded for "
+		"some reason)"), icon_home, g_strerror(errno));
 	g_free(icon_home);
 
 	rox_icon_theme_rescan_if_needed(icon_theme);
