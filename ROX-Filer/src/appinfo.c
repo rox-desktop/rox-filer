@@ -36,7 +36,9 @@
  *     ...
  *   </About>
  *   <AppMenu>
- *     <Item label="..." option="..."/>
+ *     <Item option="...">
+ *       <Label xml:lang='en'>...</Label>
+ *     </Item>
  *     ...
  *   </AppMenu>
  *   <ROX:CanSetBackdrop/>

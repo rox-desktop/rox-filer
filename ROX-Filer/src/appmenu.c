@@ -168,6 +168,7 @@ static GtkWidget *appmenu_add_submenu(xmlNode *subm_node)
 static GtkWidget *create_menu_item(xmlNode *node)
 {
 	GtkWidget *item;
+	xmlNode *label_node;
 	guchar	*label, *option = NULL;
 	gboolean is_submenu;
 
@@ -185,9 +186,18 @@ static GtkWidget *create_menu_item(xmlNode *node)
 		return NULL;
 			
 	/* Create the item */
-	label = xmlGetProp(node, "label");
-	if (!label)
-		label = g_strdup(_("<missing label>"));
+	label_node = get_subnode(node, NULL, "Label");
+	if (label_node)
+	{
+		label = xmlNodeListGetString(label_node->doc,
+					label_node->xmlChildrenNode, 1);
+	}
+	else
+	{
+		label = xmlGetProp(node, "label");
+		if (!label)
+			label = g_strdup(_("<missing label>"));
+	}
 	item = gtk_menu_item_new_with_label(label);
 
 	gtk_widget_set_accel_path(item, NULL, NULL);	/* XXX */
