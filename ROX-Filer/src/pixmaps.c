@@ -137,9 +137,12 @@ MaskedPixmap *load_pixmap(const char *name)
 	return retval;
 }
 
-/* Load all the standard pixmaps */
+/* Load all the standard pixmaps. Also sets the default window icon. */
 static void load_default_pixmaps(void)
 {
+	GdkPixbuf *pixbuf;
+	GError *error = NULL;
+
 	im_error = load_pixmap("images/error.png");
 	im_unknown = load_pixmap("images/unknown.png");
 	im_symlink = load_pixmap("images/symlink.png");
@@ -151,6 +154,24 @@ static void load_default_pixmaps(void)
 
 	im_help = load_pixmap("images/help.png");
 	im_dirs = load_pixmap("images/dirs.png");
+
+	pixbuf = gdk_pixbuf_new_from_file(
+			make_path(app_dir, "images/rox-icon.png")->str, &error);
+	if (pixbuf)
+	{
+		GList *icon_list;
+
+		icon_list = g_list_append(NULL, pixbuf);
+		gtk_window_set_default_icon_list(icon_list);
+		g_list_free(icon_list);
+
+		g_object_unref(G_OBJECT(pixbuf));
+	}
+	else
+	{
+		g_print("%s\n", error ? error->message : _("Unknown error"));
+		g_error_free(error);
+	}
 }
 
 void pixmap_make_huge(MaskedPixmap *mp)
