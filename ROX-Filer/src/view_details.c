@@ -1537,14 +1537,23 @@ static gboolean wink_timeout(ViewDetails *view_details)
 static void view_details_wink_item(ViewIface *view, ViewIter *iter)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
+	GtkTreePath *path;
 
 	cancel_wink(view_details);
+	if (!iter)
+		return;
 
 	view_details->wink_item = iter->i;
 	view_details->wink_timeout = g_timeout_add(70,
 			(GSourceFunc) wink_timeout, view_details);
 	view_details->wink_step = 7;
 	redraw_wink_area(view_details);
+
+	path = gtk_tree_path_new();
+	gtk_tree_path_append_index(path, iter->i);
+	gtk_tree_view_scroll_to_cell(GTK_TREE_VIEW(view),
+			path, NULL, FALSE, 0, 0);
+	gtk_tree_path_free(path);
 }
 
 static void view_details_autosize(ViewIface *view)
