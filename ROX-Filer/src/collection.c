@@ -116,8 +116,11 @@ static void collection_disconnect(GtkAdjustment *adjustment,
 static void set_vadjustment(Collection *collection);
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
 static void scroll_by(Collection *collection, gint diff);
-static gint collection_button_press(GtkWidget      *widget,
-				    GdkEventButton *event);
+#ifdef GTK2
+static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
+#else
+static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event);
+#endif
 static void default_draw_item(GtkWidget *widget,
 				CollectionItem *data,
 				GdkRectangle *area,
@@ -259,7 +262,13 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->style_set = collection_set_style;
 
 	widget_class->key_press_event = collection_key_press;
-	widget_class->button_press_event = collection_button_press;
+	
+#ifdef GTK2
+	widget_class->scroll_event = collection_scroll_event;
+#else
+	widget_class->button_press_event = collection_scroll_event;
+#endif
+
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->map = collection_map;
 #ifndef GTK2
@@ -1150,11 +1159,14 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 	return TRUE;
 }
 
-static gint collection_button_press(GtkWidget      *widget,
-				    GdkEventButton *event)
+#ifdef GTK2
+static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event)
+#else
+static gint collection_scroll_event(GtkWidget *widget, GdkEventButton *event)
+#endif
 {
 	Collection    	*collection;
-	int		diff;
+	int		diff = 0;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -1162,6 +1174,14 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	collection = COLLECTION(widget);
 
+#ifdef GTK2
+	if (event->direction == GDK_SCROLL_UP)
+		diff = -32;
+	else if (event->direction == GDK_SCROLL_DOWN)
+		diff = 32;
+	else
+		return FALSE;
+#else
 	if (event->button <= 3 || event->type != GDK_BUTTON_PRESS)
 		return FALSE;		/* Only deal with wheel events here */
 		
@@ -1172,6 +1192,7 @@ static gint collection_button_press(GtkWidget      *widget,
 		diff = -diff;
 	else if (event->button != 5)
 		return FALSE;
+#endif
 
 	if (diff)
 	{

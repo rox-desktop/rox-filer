@@ -251,7 +251,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 
 	swidth = g_strdup_printf("%d", original_width);
 	sheight = g_strdup_printf("%d", original_height);
-	ssize = g_strdup_printf("%ld", info.st_size);
+	ssize = g_strdup_printf("%" SIZE_FMT, info.st_size);
 	smtime = g_strdup_printf("%ld", info.st_mtime);
 
 	to = g_string_new(home_dir);
