@@ -62,6 +62,12 @@ struct _MaskedPixmap
 	GdkBitmap	*mask;
 	int		width;
 	int		height;
+
+	/* If sm_pixmap is NULL then call pixmap_make_small() */
+	GdkPixmap	*sm_pixmap;	/* Half-size (hopefully!) image */
+	GdkBitmap	*sm_mask;
+	int		sm_width;
+	int		sm_height;
 };
 
 extern MaskedPixmap *default_pixmap[LAST_DEFAULT_PIXMAP];
@@ -69,5 +75,6 @@ extern MaskedPixmap *default_pixmap[LAST_DEFAULT_PIXMAP];
 void pixmaps_init(void);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
+void pixmap_make_small(MaskedPixmap *mp);
 
 #endif /* _PIXMAP_H */

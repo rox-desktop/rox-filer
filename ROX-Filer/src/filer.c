@@ -52,10 +52,14 @@
 #include "minibuffer.h"
 
 #define ROW_HEIGHT_LARGE 64
-#define ROW_HEIGHT_SMALL 32
+#define ROW_HEIGHT_SMALL 28
 #define ROW_HEIGHT_FULL_INFO 44
 #define SMALL_ICON_HEIGHT 20
-#define SMALL_ICON_WIDTH 48
+#ifdef HAVE_IMLIB
+#  define SMALL_ICON_WIDTH 32
+#else
+#  define SMALL_ICON_WIDTH 48
+#endif
 #define MAX_ICON_HEIGHT 42
 #define MAX_ICON_WIDTH 48
 #define PANEL_BORDER 2
@@ -486,22 +490,27 @@ static void draw_small_icon(GtkWidget *widget,
 			    DirItem  *item,
 			    gboolean selected)
 {
-	MaskedPixmap	*image = item->image;
-	int	width = MIN(image->width, SMALL_ICON_WIDTH);
-	int	height = MIN(image->height, SMALL_ICON_HEIGHT);
-	int	image_x = area->x + ((area->width - width) >> 1);
-	int	image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
-						: widget->style->black_gc;
-	if (!item->image)
+			       : widget->style->black_gc;
+	MaskedPixmap	*image = item->image;
+	int		width, height, image_x, image_y;
+	
+	if (!image)
 		return;
-		
-	gdk_gc_set_clip_mask(gc, item->image->mask);
 
-	image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
+	if (!image->sm_pixmap)
+		pixmap_make_small(image);
+
+	width = MIN(image->sm_width, SMALL_ICON_WIDTH);
+	height = MIN(image->sm_height, SMALL_ICON_HEIGHT);
+	image_x = area->x + ((area->width - width) >> 1);
+		
+	gdk_gc_set_clip_mask(gc, item->image->sm_mask);
+
+	image_y = MAX(0, SMALL_ICON_HEIGHT - image->sm_height);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
-			item->image->pixmap,
+			item->image->sm_pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
 			width, height);

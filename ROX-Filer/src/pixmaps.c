@@ -84,6 +84,7 @@ static int getref(MaskedPixmap *mp);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
+static GdkImlibImage *make_half_size(GdkImlibImage *big);
 
 
 /****************************************************************
@@ -154,6 +155,39 @@ void pixmap_unref(MaskedPixmap *mp)
 	unref(mp, pixmap_cache->user_data);
 }
 
+void pixmap_make_small(MaskedPixmap *mp)
+{
+	if (mp->sm_pixmap)
+		return;
+
+#ifdef HAVE_IMLIB
+	if (mp->image)
+	{
+		GdkImlibImage	*small;
+
+		small = make_half_size(mp->image);
+
+		if (small && gdk_imlib_render(small,
+					small->rgb_width, small->rgb_height))
+		{
+			mp->sm_pixmap = gdk_imlib_move_image(small);
+			mp->sm_mask = gdk_imlib_move_mask(small);
+			mp->sm_width = small->width;
+			mp->sm_height = small->height;
+		}
+
+		if (small)
+			gdk_imlib_kill_image(small);
+		if (mp->sm_pixmap)
+			return;
+	}
+#endif
+	mp->sm_pixmap = mp->pixmap;
+	mp->sm_mask = mp->mask;
+	mp->sm_width = mp->width;
+	mp->sm_height = mp->height;
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -200,13 +234,20 @@ static MaskedPixmap *image_from_file(char *path)
 
 	mp = g_new(MaskedPixmap, 1);
 	mp->ref = 1;
-#ifdef HAVE_IMLIB
-	mp->image = image;
-#endif
 	mp->pixmap = pixmap;
 	mp->mask = mask;
 	mp->width = width;
 	mp->height = height;
+#ifdef HAVE_IMLIB
+	mp->image = image;
+	mp->sm_pixmap = NULL;
+	mp->sm_mask = NULL;
+#else
+	mp->sm_pixmap = mp->pixmap;
+	mp->sm_mask = mp->mask;
+	mp->sm_width = mp->width;
+	mp->sm_height = mp->height;
+#endif
 
 	return mp;
 }
@@ -282,3 +323,74 @@ static gint purge(gpointer data)
 
 	return TRUE;
 }
+
+#ifdef HAVE_IMLIB
+
+#define GREY_BG 0xd8
+
+/* Returns data to make an 1/4 size image of 'big'. g_free() the result. */
+static GdkImlibImage *make_half_size(GdkImlibImage *big)
+{
+	int		line_size = big->width * 3;
+	int		sw = big->width >> 1;
+	int		sh = big->height >> 1;
+	GdkImlibColor	tr;		/* Mask colour */
+	unsigned char	*small_data, *in, *out;
+	GdkImlibImage	*small;
+	int		x, y;
+
+	gdk_imlib_get_image_shape(big, &tr);
+	small_data = g_malloc(sw * sh * 3);
+
+	out = small_data;
+
+	for (y = 0; y < sh; y++)
+	{
+		in = big->rgb_data + y * line_size * 2;
+
+		for (x = 0; x < sw; x++)
+		{
+			int	r1 = in[0], r2 = in[3];
+			int	r3 = in[0 + line_size], r4 = in[3 + line_size];
+			int	g1 = in[1], g2 = in[4];
+			int	g3 = in[1 + line_size], g4 = in[4 + line_size];
+			int	b1 = in[2], b2 = in[5];
+			int	b3 = in[2 + line_size], b4 = in[5 + line_size];
+			int	m = 0;		/* No. trans pixels */
+
+			if (r1 == tr.r && g1 == tr.g && b1 == tr.b)
+				r1 = g1 = b1 = GREY_BG, m++;
+			if (r2 == tr.r && g2 == tr.g && b2 == tr.b)
+				r2 = g2 = b2 = GREY_BG, m++;
+			if (r3 == tr.r && g3 == tr.g && b3 == tr.b)
+				r3 = g3 = b3 = GREY_BG, m++;
+			if (r4 == tr.r && g4 == tr.g && b4 == tr.b)
+				r4 = g4 = b4 = GREY_BG, m++;
+
+			if (m < 3)
+			{
+				out[0] = (r1 + r2 + r3 + r4) >> 2;
+				out[1] = (g1 + g2 + g3 + g4) >> 2;
+				out[2] = (b1 + b2 + b3 + b4) >> 2;
+			}
+			else
+			{
+				out[0] = tr.r;
+				out[1] = tr.g;
+				out[2] = tr.b;
+			}
+
+			in += 6;
+			out += 3;
+		}
+	}
+	
+	small = gdk_imlib_create_image_from_data(small_data, NULL, sw, sh);
+	g_free(small_data);
+
+	if (small)
+		gdk_imlib_set_image_shape(small, &tr);
+
+	return small;
+}
+#endif
