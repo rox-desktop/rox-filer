@@ -27,6 +27,7 @@
 #include <sys/stat.h>
 #include <unistd.h>
 #include <time.h>
+#include <ctype.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -48,6 +49,7 @@
 #define ROW_HEIGHT_LARGE 64
 #define ROW_HEIGHT_FULL_INFO 44
 #define MAX_ICON_HEIGHT 42
+#define MAX_ICON_WIDTH 48
 #define PANEL_BORDER 2
 #define MIN_ITEM_WIDTH 64
 
@@ -250,7 +252,8 @@ static int calc_width(FilerWindow *filer_window, DirItem *item)
         switch (filer_window->display_style)
         {
                 case FULL_INFO:
-                        return pix_width + item->details_width + 12;
+                        return MAX_ICON_WIDTH + 12 + 
+				MAX(item->details_width, item->name_width);
                         break;
                 default:
                         return MAX(pix_width, item->name_width) + 4;
@@ -316,13 +319,19 @@ static gboolean test_point_full_info(Collection *collection,
 	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	MaskedPixmap	*image = item->image;
 	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
+	int		low_top = height
+				- fixed_font->descent - 2 - fixed_font->ascent;
 
 	if (point_x < image->width + 2)
 		return point_x > 2 && point_y > image_y;
 	
-	return point_x > image->width + 2 &&
-	point_y > (height >> 1) - font->ascent - font->descent &&
-	point_y < (height >> 1) + fixed_font->ascent + fixed_font->descent;
+	point_x -= MAX_ICON_WIDTH + 8;
+
+	if (point_y >= low_top)
+		return point_x < item->details_width;
+	if (point_y >= low_top - font->ascent - font->descent)
+		return point_x < item->name_width;
+	return FALSE;
 }
 
 static void draw_large_icon(GtkWidget *widget,
@@ -346,7 +355,8 @@ static void draw_large_icon(GtkWidget *widget,
 			item->image->pixmap,
 			0, 0,			/* Source x,y */
 			image_x, area->y + image_y, /* Dest x,y */
-			-1, MIN(image->height, MAX_ICON_HEIGHT));
+			MIN(image->width, MAX_ICON_WIDTH),
+			MIN(image->height, MAX_ICON_HEIGHT));
 
 	if (selected)
 	{
@@ -425,7 +435,11 @@ char *details(DirItem *item)
 	if (!buf)
 		buf = g_string_new(NULL);
 
-	g_string_sprintf(buf, "%s, %c%c%c:%c%c%c:%c%c%c, %s",
+	g_string_sprintf(buf, "%s, %c%c%c:%c%c%c:%c%c%c:%c%c"
+#ifdef S_ISVTX
+			"%c"
+#endif
+			", %s",
 			S_ISDIR(m) ? "Dir" :
 				S_ISCHR(m) ? "Char" :
 				S_ISBLK(m) ? "Blck" :
@@ -435,16 +449,21 @@ char *details(DirItem *item)
 
 			m & S_IRUSR ? 'r' : '-',
 			m & S_IWUSR ? 'w' : '-',
-			'-',
+			m & S_IXUSR ? 'x' : '-',
 
 			m & S_IRGRP ? 'r' : '-',
 			m & S_IWGRP ? 'w' : '-',
-			'-',
+			m & S_IXGRP ? 'x' : '-',
 
 			m & S_IROTH ? 'r' : '-',
 			m & S_IWOTH ? 'w' : '-',
-			'-',
-			
+			m & S_IXOTH ? 'x' : '-',
+
+			m & S_ISUID ? 'U' : '-',
+			m & S_ISGID ? 'G' : '-',
+#ifdef S_ISVTX
+			m & S_ISVTX ? 'T' : '-',
+#endif
 			format_size(item->size));
 
 	return buf->str;
@@ -457,8 +476,8 @@ static void draw_item_full_info(GtkWidget *widget,
 	DirItem	*item = (DirItem *) colitem->data;
 	MaskedPixmap	*image = item->image;
 	GdkFont	*font = widget->style->font;
-	int	text_x = area->x + image->width + 8;
-	int	mid_y = area->y + (area->height >> 1);
+	int	text_x = area->x + MAX_ICON_WIDTH + 8;
+	int	low_text_y = area->y + area->height - fixed_font->descent - 2;
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
 
@@ -472,14 +491,15 @@ static void draw_item_full_info(GtkWidget *widget,
 	draw_string(widget,
 			widget->style->font,
 			item->leafname, 
-			text_x, mid_y - font->descent,
+			text_x,
+			low_text_y - font->descent - fixed_font->ascent,
 			item->name_width,
 			selected);
 	draw_string(widget,
 			fixed_font,
 			details(item),
-			text_x,	mid_y + font->ascent,
-			item->name_width,
+			text_x, low_text_y,
+			item->details_width,
 			selected);
 }
 
@@ -512,7 +532,7 @@ static void may_rescan(FilerWindow *filer_window)
 {
 	g_return_if_fail(filer_window != NULL);
 
-	// XXX: g_fscache_data_update(dir_cache, filer_window->directory);
+	g_fscache_may_update(dir_cache, filer_window->path);
 }
 
 /* Callback to collection_delete_if() */

@@ -69,6 +69,7 @@ struct _Directory
 	char	*pathname;	/* Internal use only */
 	int	ref;
 	GList	*users;		/* Functions to call on update */
+	char	*error;		/* NULL => no error */
 
 	gboolean	needs_update;	/* When scan is finished, rescan */
 	gint		idle;		/* Idle callback ID */

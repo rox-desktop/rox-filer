@@ -30,6 +30,11 @@
 
 #include "fscache.h"
 
+#define UPTODATE(data, info)				\
+		(data->m_time == info.st_mtime		\
+		 && data->length == info.st_size	\
+		 && data->mode == info.st_mode)		\
+
 
 /* Static prototypes */
 
@@ -150,9 +155,7 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 	{
 		/* We've cached this file already - is it up-to-date? */
 
-		if (data->m_time == info.st_mtime
-		 && data->length == info.st_size
-		 && data->mode == info.st_mode)
+		if (UPTODATE(data, info))
 			goto out;
 
 		/* Out-of-date */
@@ -194,6 +197,36 @@ out:
 	return data->data;
 }
 
+/* Call the update() function on this item if it's in the cache
+ * AND it's out-of-date.
+ */
+void g_fscache_may_update(GFSCache *cache, char *pathname)
+{
+	GFSCacheKey	key;
+	GFSCacheData	*data;
+	struct stat 	info;
+
+	g_return_if_fail(cache != NULL);
+	g_return_if_fail(pathname != NULL);
+	g_return_if_fail(cache->update != NULL);
+
+	if (stat(pathname, &info))
+		return;
+
+	key.device = info.st_dev;
+	key.inode = info.st_ino;
+
+	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+
+	if (data && !UPTODATE(data, info))
+	{
+		cache->update(data->data, pathname, cache->user_data);
+		data->m_time = info.st_mtime;
+		data->length = info.st_size;
+		data->mode = info.st_mode;
+	}
+}
+
 /* Call the update() function on this item iff it's in the cache. */
 void g_fscache_update(GFSCache *cache, char *pathname)
 {
@@ -214,7 +247,12 @@ void g_fscache_update(GFSCache *cache, char *pathname)
 	data = g_hash_table_lookup(cache->inode_to_stats, &key);
 
 	if (data)
+	{
 		cache->update(data->data, pathname, cache->user_data);
+		data->m_time = info.st_mtime;
+		data->length = info.st_size;
+		data->mode = info.st_mode;
+	}
 }
 
 /* Remove all cache entries last accessed more than 'age' seconds

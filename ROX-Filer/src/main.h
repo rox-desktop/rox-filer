@@ -8,6 +8,8 @@
 #ifndef _MAIN_H
 #define _MAIN_H
 
+#include <sys/types.h>
+
 extern int number_of_windows;
 extern int to_error_log;	/* Send messages here to log them */
 extern gboolean override_redirect;

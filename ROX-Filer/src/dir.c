@@ -77,6 +77,9 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 
 	ref(dir, NULL);
 
+	if (dir->error)
+		delayed_error("ROX-Filer", dir->error);
+
 	if (dir->items->len)
 		callback(dir, DIR_ADD, dir->items, data);
 	if (!dir->dir_handle)
@@ -228,13 +231,19 @@ static void start_scanning(Directory *dir, char *pathname)
 
 	mount_update();
 
+	if (dir->error)
+	{
+		g_free(dir->error);
+		dir->error = NULL;
+	}
+
 	dir->dir_handle = opendir(pathname);
 
 	if (!dir->dir_handle)
 	{
-		report_error("ROX-Filer: start_scanning",
+		dir->error = g_strdup_printf("Can't open directory: %s",
 				g_strerror(errno));
-		return;
+		return;		/* Report on attach */
 	}
 
 	init_for_scan(dir);
@@ -257,6 +266,8 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	new.flags = 0;
 	new.mime_type = NULL;
 	new.image = NULL;
+	new.size = 0;
+	new.mode = 0;
 
 	if (!tmp)
 		tmp = g_string_new(NULL);
@@ -452,6 +463,7 @@ static Directory *load(char *pathname, gpointer data)
 	dir->dir_handle = NULL;
 	dir->needs_update = FALSE;
 	dir->pathname = g_strdup(pathname);
+	dir->error = NULL;
 
 	start_scanning(dir, pathname);
 	
@@ -471,6 +483,7 @@ static void destroy(Directory *dir)
 	g_ptr_array_free(dir->up_items, TRUE);
 	free_items_array(dir->items);
 	free_items_array(dir->new_items);
+	g_free(dir->error);
 	g_free(dir->pathname);
 	g_free(dir);
 }
@@ -497,4 +510,7 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 	dir->pathname = g_strdup(pathname);
 
 	start_scanning(dir, pathname);
+
+	if (dir->error)
+		delayed_error("ROX-Filer", dir->error);
 }
