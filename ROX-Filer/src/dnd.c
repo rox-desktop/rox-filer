@@ -584,10 +584,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (type)
 	{
 		if (item)
-			new_path = make_path(filer_window->path,
+			new_path = make_path(filer_window->sym_path,
 					item->leafname)->str;
 		else
-			new_path = filer_window->path;
+			new_path = filer_window->sym_path;
 	}
 
 	g_dataset_set_data(context, "drop_dest_type", type);

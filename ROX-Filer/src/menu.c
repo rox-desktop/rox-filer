@@ -777,7 +777,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		menu_show_shift_action(file_shift_item, file_item,
 				collection->number_selected == 0);
 		if (file_item)
-			appmenu_add(make_path(filer_window->path,
+			appmenu_add(make_path(filer_window->sym_path,
 						file_item->leafname)->str,
 					file_item, filer_file_menu);
 	}
@@ -1155,7 +1155,7 @@ static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
 {
 	gchar		*path;
 
-	path = g_strconcat(filer_window->path,
+	path = g_strconcat(filer_window->sym_path,
 			"/", item->leafname, "#", NULL);
 
 	filer_change_to(filer_window, path, NULL);
@@ -1218,8 +1218,8 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	savebox_show(_("Create"),
-			make_path(window_with_focus->path, _("NewDir"))->str,
-			type_to_icon(special_directory),
+		make_path(window_with_focus->sym_path, _("NewDir"))->str,
+		type_to_icon(special_directory),
 			new_directory_cb);
 }
 
@@ -1259,9 +1259,9 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 	
 	savebox_show(_("Create"),
-			make_path(window_with_focus->path, _("NewFile"))->str,
-			type_to_icon(text_plain),
-			new_file_cb);
+		make_path(window_with_focus->sym_path, _("NewFile"))->str,
+		type_to_icon(text_plain),
+		new_file_cb);
 }
 
 static gboolean new_file_type_cb(GObject *savebox,
@@ -1319,9 +1319,9 @@ static void new_file_type(gchar *templ)
 	type = type_get_type(templ);
 
 	savebox_show(_("Create"),
-			make_path(window_with_focus->path, leaf)->str,
-			type_to_icon(type),
-			new_file_type_cb);
+		make_path(window_with_focus->sym_path, leaf)->str,
+		type_to_icon(type),
+		new_file_type_cb);
 }
 
 static void customise_send_to(gpointer data)
@@ -1438,7 +1438,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	rox_spawn(window_with_focus->path, argv);
+	rox_spawn(window_with_focus->sym_path, argv);
 }
 
 static void home_directory(gpointer data, guint action, GtkWidget *widget)
@@ -1480,7 +1480,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 			"is turned on in the Options window."));
 	}
 	else
-		filer_opendir(window_with_focus->path, window_with_focus);
+		filer_opendir(window_with_focus->sym_path, window_with_focus);
 }
 
 #if 0
@@ -1749,7 +1749,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		return;
 	}
 
-	path = make_path(window_with_focus->path, item->leafname)->str;
+	path = make_path(window_with_focus->sym_path, item->leafname)->str;
 
 	switch (action)
 	{

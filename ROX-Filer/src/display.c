@@ -1314,7 +1314,7 @@ void display_update_view(FilerWindow *filer_window,
 	{
 		gchar    *path;
 
-		path = make_path(filer_window->path, item->leafname)->str;
+		path = make_path(filer_window->real_path, item->leafname)->str;
 
 		view->image = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, NULL);

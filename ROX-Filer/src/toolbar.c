@@ -257,7 +257,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->path, filer_window);
+		filer_opendir(filer_window->sym_path, filer_window);
 	}
 	else
 	{
@@ -289,7 +289,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->path, filer_window);
+		filer_opendir(filer_window->sym_path, filer_window);
 	}
 	else
 		gtk_widget_destroy(filer_window->window);
@@ -511,18 +511,8 @@ static gboolean drag_motion(GtkWidget		*widget,
 		g_dataset_set_data(context, "drop_dest_path",
 				   (gchar *) home_dir);
 	else
-	{
-		gchar	*slash, *path;
-
-		slash = strrchr(filer_window->path, '/');
-		if (slash == NULL || slash == filer_window->path)
-			path = g_strdup("/");
-		else
-			path = g_strndup(filer_window->path,
-					slash - filer_window->path);
 		g_dataset_set_data_full(context, "drop_dest_path",
-						path, g_free);
-	}
+				g_dirname(filer_window->sym_path), g_free);
 	
 	g_dataset_set_data(context, "drop_dest_type", drop_dest_dir);
 	gdk_drag_status(context, action, time);

@@ -336,7 +336,7 @@ static void select_row_callback(GtkTreeView *treeview,
 
 	if (abox->preview)
 	{
-		if (strcmp(abox->preview->path, dir) == 0)
+		if (strcmp(abox->preview->real_path, dir) == 0)
 			display_set_autoselect(abox->preview, leaf);
 		else
 			filer_change_to(abox->preview, dir, leaf);

@@ -2,6 +2,11 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+25-Apr-2002
+~~~~~~~~~~~
+Don't convert to `real' path when following symlinks (Up returns to the
+directory containing the symlink, not the thing it linked to).
+
 21-Apr-2002
 ~~~~~~~~~~~
 Allow panel style to be set from ~/.gtkrc-2.0, using 'rox-panel' to identify

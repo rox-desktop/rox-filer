@@ -89,7 +89,7 @@ static void update_display(Directory *dir,
 static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
-static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
+static FilerWindow *find_filer_window(char *real_path, FilerWindow *diff);
 static gint coll_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        FilerWindow *filer_window);
@@ -529,7 +529,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	filer_tooltip_prime(NULL, NULL);
 
 	g_free(filer_window->auto_select);
-	g_free(filer_window->path);
+	g_free(filer_window->real_path);
+	g_free(filer_window->sym_path);
 	g_free(filer_window);
 
 	if (--number_of_windows < 1)
@@ -574,7 +575,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	/* We do a fresh lookup (rather than update) because the inode may
 	 * have changed.
 	 */
-	dir = g_fscache_lookup(dir_cache, filer_window->path);
+	dir = g_fscache_lookup(dir_cache, filer_window->real_path);
 	if (!dir)
 	{
 		if (warning)
@@ -630,12 +631,12 @@ static void selection_get(GtkWidget *widget,
 	{
 		case TARGET_STRING:
 			g_string_sprintf(header, " %s",
-					make_path(filer_window->path, "")->str);
+				make_path(filer_window->sym_path, "")->str);
 			break;
 		case TARGET_URI_LIST:
 			g_string_sprintf(header, " file://%s%s",
-					our_host_name_for_dnd(),
-					make_path(filer_window->path, "")->str);
+				our_host_name_for_dnd(),
+				make_path(filer_window->sym_path, "")->str);
 			break;
 	}
 
@@ -744,7 +745,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 			close_window = FALSE;
 	}
 
-	full_path = make_path(filer_window->path, item->leafname)->str;
+	full_path = make_path(filer_window->sym_path, item->leafname)->str;
 	if (shift && (item->flags & ITEM_FLAG_SYMLINK))
 		wink = FALSE;
 
@@ -927,7 +928,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 			NULL, "group", NULL);
 	xmlSetProp(group, "name", name);
 
-	xmlNewChild(group, NULL, "directory", filer_window->path);
+	xmlNewChild(group, NULL, "directory", filer_window->sym_path);
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
@@ -972,7 +973,7 @@ static void group_restore(FilerWindow *filer_window, char *name)
 	path = xmlNodeListGetString(groups->doc, node->xmlChildrenNode, 1);
 	g_return_if_fail(path != NULL);
 
-	if (strcmp(path, filer_window->path) != 0)
+	if (strcmp(path, filer_window->sym_path) != 0)
 		filer_change_to(filer_window, path, NULL);
 	g_free(path);
 
@@ -1084,29 +1085,30 @@ static gint key_press_event(GtkWidget	*widget,
 	return TRUE;
 }
 
-void change_to_parent(FilerWindow *filer_window)
+void filer_open_parent(FilerWindow *filer_window)
 {
-	char	*copy;
-	char	*slash;
+	char	*dir;
+	const char *current = filer_window->sym_path;
 
-	if (filer_window->path[0] == '/' && filer_window->path[1] == '\0')
+	if (current[0] == '/' && current[1] == '\0')
 		return;		/* Already in the root */
 	
-	copy = g_strdup(filer_window->path);
-	slash = strrchr(copy, '/');
+	dir = g_dirname(current);
+	filer_opendir(dir, filer_window);
+	g_free(dir);
+}
 
-	if (slash)
-	{
-		*slash = '\0';
-		filer_change_to(filer_window,
-				*copy ? copy : "/",
-				slash + 1);
-	}
-	else
-		g_warning("No / in directory path!\n");
+void change_to_parent(FilerWindow *filer_window)
+{
+	char	*dir;
+	const char *current = filer_window->sym_path;
 
-	g_free(copy);
-
+	if (current[0] == '/' && current[1] == '\0')
+		return;		/* Already in the root */
+	
+	dir = g_dirname(current);
+	filer_change_to(filer_window, dir, g_basename(current));
+	g_free(dir);
 }
 
 /* Make filer_window display path. When finished, highlight item 'from', or
@@ -1117,7 +1119,7 @@ void filer_change_to(FilerWindow *filer_window,
 			const char *path, const char *from)
 {
 	char	*from_dup;
-	char	*real_path;
+	char	*sym_path, *real_path;
 	Directory *new_dir;
 
 	g_return_if_fail(filer_window != NULL);
@@ -1126,14 +1128,16 @@ void filer_change_to(FilerWindow *filer_window,
 
 	filer_tooltip_prime(NULL, NULL);
 
+	sym_path = g_strdup(path);
 	real_path = pathdup(path);
 	new_dir  = g_fscache_lookup(dir_cache, real_path);
 
 	if (!new_dir)
 	{
 		delayed_error(_("Directory '%s' is not accessible"),
-				real_path);
+				sym_path);
 		g_free(real_path);
+		g_free(sym_path);
 		return;
 	}
 	
@@ -1149,8 +1153,10 @@ void filer_change_to(FilerWindow *filer_window,
 	from_dup = from && *from ? g_strdup(from) : NULL;
 
 	detach(filer_window);
-	g_free(filer_window->path);
-	filer_window->path = real_path;
+	g_free(filer_window->real_path);
+	g_free(filer_window->sym_path);
+	filer_window->real_path = real_path;
+	filer_window->sym_path = sym_path;
 
 	filer_window->directory = new_dir;
 
@@ -1162,7 +1168,7 @@ void filer_change_to(FilerWindow *filer_window,
 	filer_set_title(filer_window);
 	if (filer_window->window->window)
 		gdk_window_set_role(filer_window->window->window,
-				    filer_window->path);
+				    filer_window->sym_path);
 	collection_set_cursor_item(filer_window->collection, -1);
 
 	attach(filer_window);
@@ -1174,36 +1180,14 @@ void filer_change_to(FilerWindow *filer_window,
 				filer_window);
 }
 
-void filer_open_parent(FilerWindow *filer_window)
-{
-	char	*copy;
-	char	*slash;
-
-	if (filer_window->path[0] == '/' && filer_window->path[1] == '\0')
-		return;		/* Already in the root */
-	
-	copy = g_strdup(filer_window->path);
-	slash = strrchr(copy, '/');
-
-	if (slash)
-	{
-		*slash = '\0';
-		filer_opendir(*copy ? copy : "/", filer_window);
-	}
-	else
-		g_warning("No / in directory path!\n");
-
-	g_free(copy);
-}
-
-/* Returns a list containing the full pathname of every selected item.
+/* Returns a list containing the full (sym) pathname of every selected item.
  * You must g_free() each item in the list.
  */
 GList *filer_selected_items(FilerWindow *filer_window)
 {
 	Collection	*collection = filer_window->collection;
 	GList		*retval = NULL;
-	guchar		*dir = filer_window->path;
+	guchar		*dir = filer_window->sym_path;
 	int		i;
 
 	for (i = 0; i < collection->number_of_items; i++)
@@ -1257,7 +1241,7 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 
 	leader = g_string_new("file://");
 	g_string_append(leader, our_host_name_for_dnd());
-	g_string_append(leader, filer_window->path);
+	g_string_append(leader, filer_window->sym_path);
 	if (leader->str[leader->len - 1] != '/')
 		g_string_append_c(leader, '/');
 
@@ -1290,18 +1274,21 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	char		*real_path;
 	DisplayStyle    dstyle;
 	DetailsType     dtype;
-	FilerWindow	*same_dir_window = NULL;
 
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
 	if (o_unique_filer_windows.int_value)
+	{
+		FilerWindow	*same_dir_window;
+		
 		same_dir_window = find_filer_window(real_path, NULL);
 
-	if (same_dir_window)
-	{
-		gtk_window_present(GTK_WINDOW(same_dir_window->window));
-		return same_dir_window;
+		if (same_dir_window)
+		{
+			gtk_window_present(GTK_WINDOW(same_dir_window->window));
+			return same_dir_window;
+		}
 	}
 
 	filer_window = g_new(FilerWindow, 1);
@@ -1310,7 +1297,8 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	filer_window->minibuffer_label = NULL;
 	filer_window->minibuffer_area = NULL;
 	filer_window->temp_show_hidden = FALSE;
-	filer_window->path = real_path;
+	filer_window->sym_path = g_strdup(path);
+	filer_window->real_path = real_path;
 	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
 	filer_window->auto_select = NULL;
@@ -1323,12 +1311,12 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	 * a new one if needed. This does not cause a scan to start,
 	 * so if a new entry is created then it will be empty.
 	 */
-	filer_window->directory = g_fscache_lookup(dir_cache,
-						   filer_window->path);
+	filer_window->directory = g_fscache_lookup(dir_cache, real_path);
 	if (!filer_window->directory)
 	{
 		delayed_error(_("Directory '%s' not found."), path);
-		g_free(filer_window->path);
+		g_free(filer_window->real_path);
+		g_free(filer_window->sym_path);
 		g_free(filer_window);
 		return NULL;
 	}
@@ -1531,7 +1519,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	gtk_widget_realize(filer_window->window);
 	
-	gdk_window_set_role(filer_window->window->window, filer_window->path);
+	gdk_window_set_role(filer_window->window->window,
+			    filer_window->sym_path);
 
 	filer_window_set_size(filer_window, 4, 4, TRUE);
 }
@@ -1614,7 +1603,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
 void filer_update_dir(FilerWindow *filer_window, gboolean warning)
 {
 	if (may_rescan(filer_window, warning))
-		dir_update(filer_window->directory, filer_window->path);
+		dir_update(filer_window->directory, filer_window->sym_path);
 }
 
 void filer_update_all(void)
@@ -1639,8 +1628,9 @@ void full_refresh(void)
 
 /* See whether a filer window with a given path already exists
  * and is different from diff.
+ * XXX: real_path or sym_path?
  */
-static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
+static FilerWindow *find_filer_window(char *real_path, FilerWindow *diff)
 {
 	GList	*next = all_filer_windows;
 
@@ -1649,7 +1639,7 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
 		if (filer_window != diff &&
-		    	strcmp(path, filer_window->path) == 0)
+		    	strcmp(real_path, filer_window->real_path) == 0)
 		{
 			return filer_window;
 		}
@@ -1661,13 +1651,13 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 }
 
 /* This path has been mounted/umounted/deleted some files - update all dirs */
-void filer_check_mounted(const char *path)
+void filer_check_mounted(const char *real_path)
 {
 	GList	*next = all_filer_windows;
 	char	*slash;
 	int	len;
 
-	len = strlen(path);
+	len = strlen(real_path);
 
 	while (next)
 	{
@@ -1675,21 +1665,21 @@ void filer_check_mounted(const char *path)
 
 		next = next->next;
 
-		if (strncmp(path, filer_window->path, len) == 0)
+		if (strncmp(real_path, filer_window->real_path, len) == 0)
 		{
-			char	s = filer_window->path[len];
+			char	s = filer_window->real_path[len];
 
 			if (s == '/' || s == '\0')
 				filer_update_dir(filer_window, FALSE);
 		}
 	}
 
-	slash = strrchr(path, '/');
-	if (slash && slash != path)
+	slash = strrchr(real_path, '/');
+	if (slash && slash != real_path)
 	{
 		guchar	*parent;
 
-		parent = g_strndup(path, slash - path);
+		parent = g_strndup(real_path, slash - real_path);
 
 		refresh_dirs(parent);
 
@@ -1698,16 +1688,18 @@ void filer_check_mounted(const char *path)
 	else
 		refresh_dirs("/");
 
-	icons_may_update(path);
+	icons_may_update(real_path);
 }
 
 /* Close all windows displaying 'path' or subdirectories of 'path' */
 void filer_close_recursive(const char *path)
 {
 	GList	*next = all_filer_windows;
+	gchar	*real;
 	int	len;
 
-	len = strlen(path);
+	real = pathdup(path);
+	len = strlen(real);
 
 	while (next)
 	{
@@ -1715,9 +1707,9 @@ void filer_close_recursive(const char *path)
 
 		next = next->next;
 
-		if (strncmp(path, filer_window->path, len) == 0)
+		if (strncmp(real, filer_window->real_path, len) == 0)
 		{
-			char s = filer_window->path[len];
+			char s = filer_window->real_path[len];
 
 			if (len == 1 || s == '/' || s == '\0')
 				gtk_widget_destroy(filer_window->window);
@@ -1783,25 +1775,23 @@ void filer_set_title(FilerWindow *filer_window)
 	}
 
 	if (not_local)
-	{
 	        title = g_strconcat("//", our_host_name(),
-			    filer_window->path, flags, NULL);
-	}
+			    filer_window->sym_path, flags, NULL);
 	
 	if (!title && home_dir_len > 1 &&
-		strncmp(filer_window->path, home_dir, home_dir_len) == 0)
+		strncmp(filer_window->sym_path, home_dir, home_dir_len) == 0)
 	{
-		guchar 	sep = filer_window->path[home_dir_len];
+		guchar 	sep = filer_window->sym_path[home_dir_len];
 
 		if (sep == '\0' || sep == '/')
 			title = g_strconcat("~",
-					filer_window->path + home_dir_len,
+					filer_window->sym_path + home_dir_len,
 					flags,
 					NULL);
 	}
 	
 	if (!title)
-		title = g_strconcat(filer_window->path, flags, NULL);
+		title = g_strconcat(filer_window->sym_path, flags, NULL);
 
 	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
 	g_free(title);
@@ -2031,7 +2021,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 		}
 
 		drag_one_item(widget, event,
-			make_path(filer_window->path, item->leafname)->str,
+			make_path(filer_window->sym_path, item->leafname)->str,
 			item, view ? view->image : NULL);
 	}
 	else
@@ -2139,7 +2129,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 		g_string_append_c(tip, '\n');
 	}
 	
-	fullpath = make_path(filer_window->path, tip_item->leafname)->str;
+	fullpath = make_path(filer_window->real_path, tip_item->leafname)->str;
 
 	if (tip_item->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -2408,7 +2398,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 		 if (strcmp(item->mime_type->media_type, "image") != 0)
 			 continue;
 
-		path = make_path(filer_window->path, item->leafname)->str;
+		path = make_path(filer_window->real_path, item->leafname)->str;
 
 		pixmap = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, &found);

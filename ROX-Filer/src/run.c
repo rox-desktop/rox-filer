@@ -234,8 +234,9 @@ gboolean run_diritem(const guchar *full_path,
 			if ((item->mime_type == special_exec) && !edit)
 			{
 				const char *argv[] = {NULL, NULL};
-				guchar	*dir = filer_window ? filer_window->path
-							    : NULL;
+				guchar	*dir = filer_window
+						? filer_window->sym_path
+						: NULL;
 
 				argv[0] = full_path;
 

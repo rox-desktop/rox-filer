@@ -136,7 +136,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			filer_window->mini_cursor_base =
 					MAX(collection->cursor_item, 0);
 			gtk_entry_set_text(mini,
-					make_path(filer_window->path, "")->str);
+				make_path(filer_window->sym_path, "")->str);
 			if (filer_window->temp_show_hidden)
 			{
 				display_set_hidden(filer_window, FALSE);
@@ -379,7 +379,7 @@ static void complete(FilerWindow *filer_window)
 	{
 		GString	*new;
 
-		new = make_path(filer_window->path, item->leafname);
+		new = make_path(filer_window->sym_path, item->leafname);
 
 		if (item->base_type == TYPE_DIRECTORY &&
 				(item->flags & ITEM_FLAG_APPDIR) == 0)
@@ -398,7 +398,7 @@ static gboolean path_changed(gpointer data)
 	FilerWindow *filer_window = (FilerWindow *) data;
 	GtkWidget *mini = filer_window->minibuffer;
 	const char	*new, *leaf;
-	char		*path, *real;
+	char		*path;
 	gboolean	error = FALSE;
 
 	new = gtk_entry_get_text(GTK_ENTRY(mini));
@@ -408,16 +408,14 @@ static gboolean path_changed(gpointer data)
 		path = g_strdup("/");
 	else
 		path = g_dirname(new);
-	real = pathdup(path);
-	g_free(path);
 
-	if (strcmp(real, filer_window->path) != 0)
+	if (strcmp(path, filer_window->sym_path) != 0)
 	{
 		/* The new path is in a different directory */
 		struct stat info;
 
-		if (mc_stat(real, &info) == 0 && S_ISDIR(info.st_mode))
-			filer_change_to(filer_window, real, leaf);
+		if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
+			filer_change_to(filer_window, path, leaf);
 		else
 			error = TRUE;
 	}
@@ -442,7 +440,7 @@ static gboolean path_changed(gpointer data)
 			error = TRUE;
 	}
 		
-	g_free(real);
+	g_free(path);
 
 	entry_set_error(mini, error);
 
@@ -583,8 +581,8 @@ static guchar *best_match(FilerWindow *filer_window, glob_t *matches)
 				longest = j;
 	}
 
-	path_len = strlen(filer_window->path);
-	if (strncmp(filer_window->path, first, path_len) == 0 &&
+	path_len = strlen(filer_window->sym_path);
+	if (strncmp(filer_window->sym_path, first, path_len) == 0 &&
 			first[path_len] == '/' && first[path_len + 1])
 	{
 		path = g_strndup(first + path_len + 1, longest - path_len - 1);
@@ -660,7 +658,7 @@ static void shell_tab(FilerWindow *filer_window)
 	if (leaf->str[0] != '/' && leaf->str[0] != '~')
 	{
 		g_string_prepend_c(leaf, '/');
-		g_string_prepend(leaf, filer_window->path);
+		g_string_prepend(leaf, filer_window->sym_path);
 	}
 
 	g_string_append_c(leaf, '*');
@@ -739,9 +737,9 @@ static void shell_return_pressed(FilerWindow *filer_window)
 			/* Ensure output is noticed - send stdout to stderr */
 			dup2(STDERR_FILENO, STDOUT_FILENO);
 			close_on_exec(STDOUT_FILENO, FALSE);
-			if (chdir(filer_window->path))
+			if (chdir(filer_window->sym_path))
 				g_printerr("chdir(%s) failed: %s\n",
-						filer_window->path,
+						filer_window->sym_path,
 						g_strerror(errno));
 			execvp((char *) argv->pdata[0],
 				(char **) argv->pdata);
@@ -827,7 +825,8 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 		DirItem *item = (DirItem *) collection->items[i].data;
 
 		info.leaf = item->leafname;
-		info.fullpath = make_path(filer_window->path, info.leaf)->str;
+		info.fullpath =
+			make_path(filer_window->sym_path, info.leaf)->str;
 
 		if (lstat(info.fullpath, &info.stats) == 0 &&
 				find_test_condition(cond, &info))

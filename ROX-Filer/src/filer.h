@@ -37,7 +37,8 @@ struct _FilerWindow
 {
 	GtkWidget	*window;
 	gboolean	scanning;	/* State of the 'scanning' indicator */
-	gchar		*path;		/* pathname */
+	gchar		*sym_path;		/* Path the user sees */
+	gchar		*real_path;		/* realpath(sym_path) */
 	Collection	*collection;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
@@ -98,7 +99,7 @@ void change_to_parent(FilerWindow *filer_window);
 void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		OpenFlags flags);
-void filer_check_mounted(const char *path);
+void filer_check_mounted(const char *real_path);
 void filer_close_recursive(const char *path);
 void filer_change_to(FilerWindow *filer_window,
 			const char *path, const char *from);

@@ -56,9 +56,9 @@ void save_state(SmClient *client)
 	{
 		filer_window = (FilerWindow *)list->data;
 		gdk_window_set_role(filer_window->window->window,
-				    filer_window->path);
+				    filer_window->sym_path);
 		g_ptr_array_add(restart_cmd, "-d");
-		g_ptr_array_add(restart_cmd, filer_window->path);
+		g_ptr_array_add(restart_cmd, filer_window->sym_path);
 	}
 	
 	for(i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
