@@ -84,6 +84,7 @@ void pixmaps_init(void)
 
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
  * structure for it and return a pointer to the structure. NULL on failure.
+ * Remember to pixmap_unref() the result afterwards.
  */
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path)
 {
@@ -108,6 +109,8 @@ void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image)
 		image->pixmap= gdk_pixmap_create_from_xpm_d(window,
 				&image->mask, NULL, bad_xpm);
 	}
+
+	image->ref = 1;
 }
 
 /* Load all the standard pixmaps */
@@ -151,6 +154,11 @@ void load_default_pixmaps(GdkWindow *window)
 	loaded = TRUE;
 }
 
+void pixmap_ref(MaskedPixmap *mp)
+{
+	ref(mp, pixmap_cache->user_data);
+}
+
 void pixmap_unref(MaskedPixmap *mp)
 {
 	unref(mp, pixmap_cache->user_data);
@@ -190,6 +198,8 @@ static MaskedPixmap *load(char *pathname, gpointer user_data)
 
 static void ref(MaskedPixmap *mp, gpointer data)
 {
+	/* printf("[ ref %p %d->%d ]\n", mp, mp->ref, mp->ref + 1); */
+	
 	if (mp)
 	{
 		gdk_pixmap_ref(mp->pixmap);
@@ -200,6 +210,8 @@ static void ref(MaskedPixmap *mp, gpointer data)
 
 static void unref(MaskedPixmap *mp, gpointer data)
 {
+	/* printf("[ unref %p %d->%d ]\n", mp, mp->ref, mp->ref - 1); */
+	
 	if (mp && --mp->ref == 0)
 	{
 		gdk_pixmap_unref(mp->pixmap);

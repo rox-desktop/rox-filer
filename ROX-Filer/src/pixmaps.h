@@ -50,6 +50,7 @@ void pixmaps_init(void);
 void load_default_pixmaps(GdkWindow *window);
 void load_pixmap(GdkWindow *window, char *name, MaskedPixmap *image);
 MaskedPixmap *load_pixmap_from(GtkWidget *window, char *path);
+void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
 
 #endif /* _PIXMAP_H */

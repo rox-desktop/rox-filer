@@ -47,7 +47,7 @@ static GHashTable *extension_hash = NULL;
 static char *current_type = NULL;	/* (used while reading file) */
 
 /* Most things on Unix are text files, so this is the default type */
-MIME_type text_plain = {"text", "plain"};
+MIME_type text_plain = {"text", "plain", NULL};
 
 void type_init()
 {
@@ -241,6 +241,8 @@ gboolean type_open(char *path, MIME_type *type)
  * 1. Choices:MIME-icons/<type>
  * 2. Choices:MIME-icons/<base>
  * 3. Unknown type icon.
+ *
+ * Note: You must pixmap_unref() the image afterwards.
  */
 MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 {
@@ -256,7 +258,10 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 	{
 		/* Yes - don't recheck too often */
 		if (abs(now - type->image_time) < 2)
+		{
+			pixmap_ref(type->image);
 			return type->image;
+		}
 		pixmap_unref(type->image);
 		type->image = NULL;
 	}
@@ -276,10 +281,14 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 		type->image = load_pixmap_from(window, path);
 
 	if (!type->image)
+	{
 		type->image = default_pixmap + TYPE_UNKNOWN;
+		pixmap_ref(type->image);
+	}
 
 	type->image_time = now;
 	
+	pixmap_ref(type->image);
 	return type->image;
 }
 

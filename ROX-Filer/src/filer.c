@@ -371,6 +371,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 			item->mime_type = type_from_path(path->str);
 			item->image = type_to_icon(filer_window->window, 
 						   item->mime_type);
+			item->flags |= ITEM_FLAG_TEMP_ICON;
 		}
 		else
 			item->image = default_pixmap + base_type;
