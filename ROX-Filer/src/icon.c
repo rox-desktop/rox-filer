@@ -40,6 +40,7 @@
 #include "appmenu.h"
 #include "dnd.h"
 #include "run.h"
+#include "infobox.h"
 
 typedef void (*RenameFn)(Icon *icon);
 
@@ -71,19 +72,20 @@ static void selection_get(GtkWidget *widget,
 		       guint      time,
 		       gpointer   data);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
-static void edit_icon(gpointer data, guint action, GtkWidget *widget);
-static void show_location(gpointer data, guint action, GtkWidget *widget);
-static void show_help(gpointer data, guint action, GtkWidget *widget);
+static void show(gpointer data, guint action, GtkWidget *widget);
 static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback);
+
+enum {ACTION_EDIT, ACTION_LOCATION, ACTION_INFO, ACTION_HELP};
 
 static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Help"),		NULL, menu_rox_help, 0, NULL},
 {N_("ROX-Filer Options..."),	NULL, menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL, open_home, 0, NULL},
 {"",				NULL, NULL, 0, "<Separator>"},
-{N_("Edit Icon"),  		NULL, edit_icon, 0, NULL},
-{N_("Show Location"),  		NULL, show_location, 0, NULL},
-{N_("Show Help"),    		NULL, show_help, 0, NULL},
+{N_("Edit Icon"),  		NULL, show, ACTION_EDIT, NULL},
+{N_("Show Location"),  		NULL, show, ACTION_LOCATION, NULL},
+{N_("Show Info"),    		NULL, show, ACTION_INFO, NULL},
+{N_("Show Help"),    		NULL, show, ACTION_HELP, NULL},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, NULL},
 };
 
@@ -273,18 +275,18 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
 		(icon_selection || menu_icon) ? FALSE : TRUE,
-		7, 1);
+		8, 1);
 
 	/* Shade the Rename/Location/Help items an item was clicked */
 	if (icon)
 	{
-		menu_set_items_shaded(icon_menu, FALSE, 4, 3);
+		menu_set_items_shaded(icon_menu, FALSE, 4, 4);
 
 		/* Check for app-specific menu */
 		appmenu_add(icon->path, &icon->item, icon_menu);
 	}
 	else
-		menu_set_items_shaded(icon_menu, TRUE, 4, 3);
+		menu_set_items_shaded(icon_menu, TRUE, 4, 4);
 
 	if (panel)
 	{
@@ -564,18 +566,6 @@ static void rename_cb(Icon *icon)
 	}
 }
 
-static void edit_icon(gpointer data, guint action, GtkWidget *widget)
-{
-	if (!menu_icon)
-	{
-		delayed_error(PROJECT,
-			_("You must open the menu over an icon"));
-		return;
-	}
-
-	show_rename_box(menu_icon->widget, menu_icon, rename_cb);
-}
-
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
 {
 	Panel	*panel;
@@ -623,7 +613,7 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-static void show_location(gpointer data, guint action, GtkWidget *widget)
+static void show(gpointer data, guint action, GtkWidget *widget)
 {
 	if (!menu_icon)
 	{
@@ -632,19 +622,22 @@ static void show_location(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 
-	open_to_show(menu_icon->path);
-}
-	
-static void show_help(gpointer data, guint action, GtkWidget *widget)
-{
-	if (!menu_icon)
+	switch (action)
 	{
-		delayed_error(PROJECT,
-			_("You must open the menu over an icon"));
-		return;
+		case ACTION_EDIT:
+			show_rename_box(menu_icon->widget,
+					menu_icon, rename_cb);
+			break;
+		case ACTION_LOCATION:
+			open_to_show(menu_icon->path);
+			break;
+		case ACTION_HELP:
+			show_item_help(menu_icon->path, &menu_icon->item);
+			break;
+		case ACTION_INFO:
+			infobox_new(menu_icon->path);
+			break;
 	}
-
-	show_item_help(menu_icon->path, &menu_icon->item);
 }
 
 /* Opens a box allowing the user to change the name of a pinned icon.
