@@ -754,6 +754,7 @@ static void pinboard_check_options(void)
 			gdk_gc_set_rgb_fg_color(current_pinboard->shadow_gc,
 					&n_shadow);
 
+			abandon_backdrop_app(current_pinboard);
 			reload_backdrop(current_pinboard,
 					current_pinboard->backdrop,
 					current_pinboard->backdrop_style);
