@@ -201,11 +201,7 @@ static void write_globicons(void)
 		out = fopen(save_new, "w");
 		if (!out)
 			goto err;
-		if (xmlDocDump(out, doc) < 0)
-		{
-			fclose(out);
-			goto err;
-		}
+		xmlDocDump(out, doc);  /* Some versions return void */
 		if (fclose(out))
 			goto err;
 	}
