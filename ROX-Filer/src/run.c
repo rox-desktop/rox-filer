@@ -48,6 +48,9 @@ static gboolean follow_symlink(const char *full_path,
 			       FilerWindow *src_window);
 static gboolean open_file(const guchar *path, MIME_type *type);
 static void dir_show_help(DirItem *item, const char *path);
+static void open_mountpoint(const guchar *full_path, DirItem *item,
+			    FilerWindow *filer_window, FilerWindow *src_window,
+			    gboolean edit);
 
 typedef struct _PipedData PipedData;
 
@@ -212,20 +215,12 @@ gboolean run_diritem(const guchar *full_path,
 				return TRUE;
 			}
 
-			if (item->flags & ITEM_FLAG_MOUNT_POINT && edit)
+			if (item->flags & ITEM_FLAG_MOUNT_POINT)
 			{
-				GList	*paths;
-
-				paths = g_list_prepend(NULL,
-							(gpointer) full_path);
-				action_mount(paths, filer_window == NULL, -1);
-				g_list_free(paths);
-				if (item->flags & ITEM_FLAG_MOUNTED ||
-						!filer_window)
-					return TRUE;
+				open_mountpoint(full_path, item,
+						filer_window, src_window, edit);
 			}
-
-			if (filer_window)
+			else if (filer_window)
 				filer_change_to(filer_window, full_path, NULL);
 			else
 				filer_opendir(full_path, src_window, NULL);
@@ -540,4 +535,27 @@ static void dir_show_help(DirItem *item, const char *path)
 		info_message(_("Directory:\n"
 				"This is a directory. It contains an index to "
 				"other items - open it to see the list."));
+}
+
+/* Called like run_diritem, when a mount-point is opened */
+static void open_mountpoint(const guchar *full_path, DirItem *item,
+			    FilerWindow *filer_window, FilerWindow *src_window,
+			    gboolean edit)
+{
+	GList	*paths;
+
+	if (edit)
+	{
+		paths = g_list_prepend(NULL, (gpointer) full_path);
+		action_mount(paths, filer_window == NULL, -1);
+		g_list_free(paths);
+		if (item->flags & ITEM_FLAG_MOUNTED ||
+				!filer_window)
+			return;
+	}
+
+	if (filer_window)
+		filer_change_to(filer_window, full_path, NULL);
+	else
+		filer_opendir(full_path, src_window, NULL);
 }
