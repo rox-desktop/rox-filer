@@ -852,8 +852,8 @@ static void tree_cursor_changed(GtkTreeView *tv, gpointer data)
 static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 {
 	GtkWidget	*notebook;
-	GtkWidget	*tl_vbox, *hbox, *sw, *tv;
-	GtkWidget	*actions, *button, *frame;
+	GtkWidget	*tl_vbox, *hbox, *frame, *tv;
+	GtkWidget	*actions, *button;
 	GtkTreeStore	*model;
 	char		*string, *save_path;
 
@@ -880,13 +880,9 @@ static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 	gtk_notebook_set_show_border(GTK_NOTEBOOK(notebook), FALSE);
 	gtk_container_add(GTK_CONTAINER(frame), notebook);
 
-	/* scrolled window for the tree view */
-	sw = gtk_scrolled_window_new(NULL, NULL);
-	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(sw),
-			GTK_SHADOW_IN);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(sw),
-			GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-	gtk_box_pack_start(GTK_BOX(hbox), sw, FALSE, TRUE, 0);
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_box_pack_start(GTK_BOX(hbox), frame, FALSE, TRUE, 0);
 
 	/* tree view */
 	model = gtk_tree_store_new(2, G_TYPE_STRING, GTK_TYPE_WIDGET);
@@ -898,7 +894,7 @@ static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(tv), FALSE);
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(tv), -1,
 			NULL, gtk_cell_renderer_text_new(), "text", 0, NULL);
-	gtk_container_add(GTK_CONTAINER(sw), tv);
+	gtk_container_add(GTK_CONTAINER(frame), tv);
 	g_signal_connect(tv, "cursor_changed",
 			G_CALLBACK(tree_cursor_changed), notebook);
 

@@ -102,7 +102,6 @@ static void set_selection_state(FilerWindow *filer_window, gboolean normal);
 static void filer_next_thumb(GObject *window, const gchar *path);
 static void start_thumb_scanning(FilerWindow *filer_window);
 static void filer_options_changed(void);
-static void set_style_by_number_of_items(FilerWindow *filer_window);
 static void drag_end(GtkWidget *widget, GdkDragContext *context,
 		     FilerWindow *filer_window);
 static void drag_leave(GtkWidget	*widget,
@@ -124,8 +123,8 @@ static GdkCursor *crosshair = NULL;
  */
 static gboolean not_local = FALSE;
 
-static Option o_filer_change_size, o_filer_change_size_num;
 static Option o_short_flag_names;
+static Option o_filer_view_type;
 Option o_filer_auto_resize, o_unique_filer_windows;
 Option o_filer_size_limit;
 
@@ -142,8 +141,8 @@ void filer_init(void)
 
 	option_add_int(&o_short_flag_names, "filer_short_flag_names", FALSE);
 
-	option_add_int(&o_filer_change_size, "filer_change_size", TRUE);
-	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 
+	option_add_int(&o_filer_view_type, "filer_view_type",
+			VIEW_TYPE_COLLECTION); 
 
 	option_add_notify(filer_options_changed);
 
@@ -247,15 +246,6 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 	}
 }
 
-/* Resize the window to fit the items currently in the Directory.
- * When opening a directory for the first time, the names will be known but not
- * the types and images. We can still make a good estimate of the size.
- */
-void filer_window_autosize(FilerWindow *filer_window)
-{
-	view_autosize(filer_window->view);
-}
-
 /* Called on a timeout while scanning or when scanning ends
  * (whichever happens first).
  */
@@ -271,8 +261,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
-		set_style_by_number_of_items(filer_window);
-		filer_window_autosize(filer_window);
+		display_set_actual_size(filer_window);
 		gtk_widget_show(filer_window->window);
 	}
 
@@ -1053,10 +1042,10 @@ void filer_change_to(FilerWindow *filer_window,
 
 	attach(filer_window);
 	
-	set_style_by_number_of_items(filer_window);
+	display_set_actual_size(filer_window);
 
 	if (o_filer_auto_resize.int_value == RESIZE_ALWAYS)
-		filer_window_autosize(filer_window);
+		view_autosize(filer_window->view);
 
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
@@ -1173,10 +1162,11 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	if (src_win && o_display_inherit_options.int_value)
 	{
 	        filer_window->sort_fn = src_win->sort_fn;
-		dstyle = src_win->display_style;
+		dstyle = src_win->display_style_wanted;
 		dtype = src_win->details_type;
 		filer_window->show_hidden = src_win->show_hidden;
 		filer_window->show_thumbs = src_win->show_thumbs;
+		filer_window->view_type = src_win->view_type;
 	}
 	else
 	{
@@ -1188,10 +1178,9 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 		
 		dstyle = o_display_size.int_value;
 		dtype = o_display_details.int_value;
-		filer_window->show_hidden =
-			o_display_show_hidden.int_value;
-		filer_window->show_thumbs =
-			o_display_show_thumbs.int_value;
+		filer_window->show_hidden = o_display_show_hidden.int_value;
+		filer_window->show_thumbs = o_display_show_thumbs.int_value;
+		filer_window->view_type = o_filer_view_type.int_value;
 	}
 
 	/* Add all the user-interface elements & realise */
@@ -1286,6 +1275,8 @@ void filer_set_view_type(FilerWindow *filer_window, ViewType type)
 		/* Only when changing type. Otherwise, will attach later. */
 		filer_window->directory = dir;
 		attach(filer_window);
+
+		view_autosize(filer_window->view);
 	}
 }
 
@@ -1321,7 +1312,7 @@ static void filer_add_widgets(FilerWindow *filer_window, const gchar *wm_class)
 	gtk_box_pack_start_defaults(GTK_BOX(hbox), vbox);
 	filer_window->toplevel_vbox = GTK_BOX(vbox);
 
-	filer_set_view_type(filer_window, VIEW_TYPE_COLLECTION);
+	filer_set_view_type(filer_window, filer_window->view_type);
 	
 	/* If we want a toolbar, create it now */
 	toolbar_update_toolbar(filer_window);
@@ -1838,32 +1829,6 @@ static void filer_options_changed(void)
 	}
 }
 
-/* Change to Large or Small icons depending on the number of items
- * in the directory, subject to options.
- */
-static void set_style_by_number_of_items(FilerWindow *filer_window)
-{
-	int n;
-	
-	g_return_if_fail(filer_window != NULL);
-
-	if (!o_filer_change_size.int_value)
-		return;		/* Don't auto-set style */
-	
-	if (filer_window->display_style != LARGE_ICONS &&
-	    filer_window->display_style != SMALL_ICONS)
-		return;		/* Only change between these two styles */
-
-	n = view_count_items(filer_window->view);
-
-	if (n >= o_filer_change_size_num.int_value)
-		display_set_layout(filer_window, SMALL_ICONS,
-				   filer_window->details_type);
-	else
-		display_set_layout(filer_window, LARGE_ICONS,
-				   filer_window->details_type);
-}
-
 /* Append interesting information to this GString */
 void filer_add_tip_details(FilerWindow *filer_window,
 			   GString *tip, DirItem *item)
@@ -2056,7 +2021,7 @@ void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event)
 			view_start_lasso_box(view, event);
 			break;
 		case ACT_RESIZE:
-			filer_window_autosize(filer_window);
+			view_autosize(filer_window->view);
 			break;
 		default:
 			g_warning("Unsupported action : %d\n", action);

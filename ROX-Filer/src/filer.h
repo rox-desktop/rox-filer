@@ -31,10 +31,11 @@ typedef enum
 	FILER_CREATE_THUMBS	= 0x04, /* Create thumbs when scan ends */
 } FilerFlags;
 
+/* Numbers used in options */
 typedef enum
 {
-	VIEW_TYPE_COLLECTION,		/* Icons view */
-	VIEW_TYPE_DETAILS		/* TreeView details list */
+	VIEW_TYPE_COLLECTION = 0,	/* Icons view */
+	VIEW_TYPE_DETAILS = 1		/* TreeView details list */
 } ViewType;
 
 /* iter's next method has just returned the clicked item... */
@@ -58,6 +59,7 @@ struct _FilerWindow
 
 	DetailsType	details_type;
 	DisplayStyle	display_style;
+	DisplayStyle	display_style_wanted;
 
 	Directory	*directory;
 

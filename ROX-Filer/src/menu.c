@@ -126,6 +126,7 @@ static void view_type(gpointer data, guint action, GtkWidget *widget);
 
 /* (action used in these three - DetailsType) */
 static void change_size(gpointer data, guint action, GtkWidget *widget);
+static void change_size_auto(gpointer data, guint action, GtkWidget *widget);
 static void set_with(gpointer data, guint action, GtkWidget *widget);
 
 static void sort_name(gpointer data, guint action, GtkWidget *widget);
@@ -165,6 +166,7 @@ static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
+static GtkWidget	*filer_auto_size_menu;	/* The Automatic item */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
@@ -182,10 +184,11 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">>" N_("Permissions"),	NULL, set_with, DETAILS_PERMISSIONS, NULL},
 {">>" N_("Type"),		NULL, set_with, DETAILS_TYPE, NULL},
 {">>" N_("Times"),		NULL, set_with, DETAILS_TIMES, NULL},
-{">" N_("Details View"),   	NULL, view_type, VIEW_TYPE_DETAILS, NULL},
+{">" N_("List View"),   	NULL, view_type, VIEW_TYPE_DETAILS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Bigger Icons"),   	NULL, change_size, 1, NULL},
 {">" N_("Smaller Icons"),   	NULL, change_size, -1, NULL},
+{">" N_("Automatic"),   	NULL, change_size_auto, 0, "<ToggleItem>"},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Sort by Name"),	NULL, sort_name, 0, NULL},
 {">" N_("Sort by Type"),	NULL, sort_type, 0, NULL},
@@ -280,6 +283,7 @@ void ensure_filer_menu(void)
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
+	GET_SSMENU_ITEM(filer_auto_size_menu, "filer", "Display", "Automatic");
 	GET_SSMENU_ITEM(filer_thumb_menu, "filer", "Display",
 							"Show Thumbnails");
 
@@ -736,6 +740,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
+		gtk_check_menu_item_set_active(
+			GTK_CHECK_MENU_ITEM(filer_auto_size_menu),
+			filer_window->display_style_wanted == AUTO_SIZE_ICONS);
 		buffer = g_string_new(NULL);
 
 		switch (n_selected)
@@ -867,41 +874,33 @@ static void view_type(gpointer data, guint action, GtkWidget *widget)
 
 	if (view_type == VIEW_TYPE_COLLECTION)
 		display_set_layout(window_with_focus,
-				window_with_focus->display_style, DETAILS_NONE);
+				window_with_focus->display_style_wanted,
+				DETAILS_NONE);
 
 	filer_set_view_type(window_with_focus, (ViewType) action);
 }
 
 static void change_size(gpointer data, guint action, GtkWidget *widget)
 {
-	DisplayStyle size;
-	DetailsType type;
-
 	g_return_if_fail(window_with_focus != NULL);
 
-	type = window_with_focus->details_type;
-	size = window_with_focus->display_style;
+	display_change_size(window_with_focus, action == 1);
+}
 
-	if (action == 1)
-	{
-		if (size == SMALL_ICONS)
-			size = LARGE_ICONS;
-		else if (size == LARGE_ICONS)
-			size = HUGE_ICONS;
-		else
-			return;
-	}
-	else if (action == -1)
-	{
-		if (size == LARGE_ICONS)
-			size = SMALL_ICONS;
-		else if (size == HUGE_ICONS)
-			size = LARGE_ICONS;
-		else
-			return;
-	}
+static void change_size_auto(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
 
-	display_set_layout(window_with_focus, size, type);
+	if (updating_menu)
+		return;
+
+	if (window_with_focus->display_style_wanted == AUTO_SIZE_ICONS)
+		display_set_layout(window_with_focus,
+				   window_with_focus->display_style,
+				   window_with_focus->details_type);
+	else
+		display_set_layout(window_with_focus, AUTO_SIZE_ICONS,
+				   window_with_focus->details_type);
 }
 
 static void set_with(gpointer data, guint action, GtkWidget *widget)
@@ -910,7 +909,7 @@ static void set_with(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	size = window_with_focus->display_style;
+	size = window_with_focus->display_style_wanted;
 
 	filer_set_view_type(window_with_focus, VIEW_TYPE_COLLECTION);
 	display_set_layout(window_with_focus, size, action);
@@ -1606,7 +1605,7 @@ static void resize(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_window_autosize(window_with_focus);
+	view_autosize(window_with_focus->view);
 }
 
 static void new_window(gpointer data, guint action, GtkWidget *widget)

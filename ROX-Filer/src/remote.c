@@ -585,6 +585,7 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		ds = !g_strcasecmp(style, "Large") ? LARGE_ICONS :
 		     !g_strcasecmp(style, "Small") ? SMALL_ICONS :
 		     !g_strcasecmp(style, "Huge")  ? HUGE_ICONS :
+		     !g_strcasecmp(style, "Automatic")  ? AUTO_SIZE_ICONS :
 		     				     UNKNOWN_STYLE;
 		if (ds == UNKNOWN_STYLE)
 			g_warning("Unknown style '%s'\n", style);
@@ -610,7 +611,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 		if (dt == DETAILS_UNKNOWN)
 			g_warning("Unknown details type '%s'\n", details);
 		else
-			display_set_layout(fwin, fwin->display_style, dt);
+			display_set_layout(fwin,
+					   fwin->display_style_wanted, dt);
 		
 		g_free(details);
 	}

@@ -116,6 +116,7 @@ void view_sort(ViewIface *obj)
 void view_style_changed(ViewIface *obj, int flags)
 {
 	g_return_if_fail(VIEW_IS_IFACE(obj));
+	
 	VIEW_IFACE_GET_CLASS(obj)->style_changed(obj, flags);
 }
 

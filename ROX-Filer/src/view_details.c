@@ -299,8 +299,6 @@ static void details_get_value(GtkTreeModel *tree_model,
 	view_item = (ViewItem *) items->pdata[i];
 	item = view_item->item;
 
-	/* g_print("[ get %d ]\n", column); */
-
 	if (column == COL_LEAF)
 	{
 		g_value_init(value, G_TYPE_STRING);
@@ -750,7 +748,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Name */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Name"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_Name"), cell,
 					    "text", COL_LEAF,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -760,7 +758,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Type */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Type"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_Type"), cell,
 					    "text", COL_TYPE,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -770,7 +768,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Perm */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Permissions"),
+	column = gtk_tree_view_column_new_with_attributes(_("_Permissions"),
 					cell, "text", COL_PERM,
 					"foreground-gdk", COL_COLOUR,
 					"background-gdk", COL_BG_COLOUR,
@@ -779,7 +777,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Owner */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Owner"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_Owner"), cell,
 					    "text", COL_OWNER,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -789,7 +787,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Group */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Group"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_Group"), cell,
 					    "text", COL_GROUP,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -799,7 +797,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* Size */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("Size"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_Size"), cell,
 					    "text", COL_SIZE,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -809,7 +807,7 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 
 	/* MTime */
 	cell = gtk_cell_renderer_text_new();
-	column = gtk_tree_view_column_new_with_attributes(_("M-Time"), cell,
+	column = gtk_tree_view_column_new_with_attributes(_("_M-Time"), cell,
 					    "text", COL_MTIME,
 					    "foreground-gdk", COL_COLOUR,
 					    "background-gdk", COL_BG_COLOUR,
@@ -1266,6 +1264,30 @@ static void view_details_wink_item(ViewIface *view, ViewIter *iter)
 
 static void view_details_autosize(ViewIface *view)
 {
+	ViewDetails *view_details = (ViewDetails *) view;
+	FilerWindow *filer_window = view_details->filer_window;
+	GdkWindow *bin;
+	int max_height = (o_filer_size_limit.int_value * screen_height) / 100;
+	int h, y;
+	GtkTreeView *tree = (GtkTreeView *) view;
+	GtkTreeViewColumn *column;
+	GtkRequisition req;
+
+	gtk_widget_size_request(GTK_WIDGET(view), &req);
+	column = gtk_tree_view_get_column(tree, 1);
+	gtk_tree_view_column_cell_get_size(column, NULL, NULL, NULL, NULL, &h);
+
+	bin = gtk_tree_view_get_bin_window(GTK_TREE_VIEW(view));
+
+	gdk_window_get_position(bin, NULL, &y);
+
+	h = MAX(h, SMALL_HEIGHT);
+
+	h = (view_details->items->len + 2) * h + y;
+
+	h = MIN(h, max_height);
+
+	filer_window_set_size(filer_window, 5, h);
 }
 
 static gboolean view_details_cursor_visible(ViewIface *view)
@@ -1282,7 +1304,6 @@ static void view_details_set_base(ViewIface *view, ViewIter *iter)
 
 static void view_details_start_lasso_box(ViewIface *view, GdkEventButton *event)
 {
-	g_print("TODO: lasso drag\n");
 }
 
 static void view_details_extend_tip(ViewIface *view,

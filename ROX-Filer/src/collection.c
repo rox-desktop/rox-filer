@@ -142,19 +142,24 @@ static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
 {
 	GtkWidget    	*widget;
-	GdkGC		*gc;
+	GtkStateType	state;
 
 	widget = GTK_WIDGET(collection);
 
 	if (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS)
-		gc = widget->style->fg_gc[GTK_STATE_ACTIVE];
+		state = GTK_STATE_ACTIVE;
 	else
-		gc = widget->style->fg_gc[GTK_STATE_INSENSITIVE];
+		state = GTK_STATE_INSENSITIVE;
 
-	gdk_draw_rectangle(widget->window, gc, FALSE,
-				area->x, area->y,
-				collection->item_width - 1,
-				area->height - 1);
+	gtk_paint_focus(widget->style,
+			widget->window,
+			state,
+			NULL,
+			widget,
+			"collection",
+			area->x, area->y,
+			collection->item_width,
+			area->height);
 }
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)

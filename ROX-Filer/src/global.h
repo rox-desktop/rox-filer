@@ -111,6 +111,7 @@ typedef enum {		/* Values used in options, must start at 0 */
 	LARGE_ICONS	= 0,
 	SMALL_ICONS	= 1,
 	HUGE_ICONS	= 2,
+	AUTO_SIZE_ICONS	= 3,
 	UNKNOWN_STYLE
 } DisplayStyle;
 

@@ -70,12 +70,14 @@ Option o_small_width;
 Option o_display_show_hidden;
 Option o_display_show_thumbs;
 Option o_display_inherit_options;
+static Option o_filer_change_size_num;
 
 /* Static prototypes */
 static void display_details_set(FilerWindow *filer_window, DetailsType details);
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
+static void display_set_actual_size_real(FilerWindow *filer_window);
 
 enum {
 	SORT_BY_NAME = 0,
@@ -91,7 +93,7 @@ enum {
 void display_init()
 {
 	option_add_int(&o_display_dirs_first, "display_dirs_first", FALSE);
-	option_add_int(&o_display_size, "display_size", LARGE_ICONS);
+	option_add_int(&o_display_size, "display_icon_size", AUTO_SIZE_ICONS);
 	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
 	option_add_int(&o_display_sort_by, "display_sort_by", SORT_BY_NAME);
 	option_add_int(&o_large_width, "display_large_width", 89);
@@ -100,6 +102,7 @@ void display_init()
 	option_add_int(&o_display_show_thumbs, "display_show_thumbs", FALSE);
 	option_add_int(&o_display_inherit_options,
 		       "display_inherit_options", FALSE); 
+	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 
 
 	option_add_notify(options_changed);
 }
@@ -344,7 +347,7 @@ void display_set_layout(FilerWindow  *filer_window,
 	view_style_changed(filer_window->view, VIEW_UPDATE_NAME);
 
 	if (o_filer_auto_resize.int_value != RESIZE_NEVER)
-		filer_window_autosize(filer_window);
+		view_autosize(filer_window->view);
 }
 
 /* Set the 'Show Thumbnails' flag for this window */
@@ -434,6 +437,17 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
 
 	return view;
 }
+
+/* Set the display style to the desired style. If the desired style
+ * is AUTO_SIZE_ICONS, choose an appropriate size. Also resizes filer
+ * window, if requested.
+ */
+void display_set_actual_size(FilerWindow *filer_window)
+{
+	display_set_layout(filer_window, filer_window->display_style_wanted,
+					 filer_window->details_type);
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -538,18 +552,14 @@ static char *details(FilerWindow *filer_window, DirItem *item)
 /* Note: Call style_changed after this */
 static void display_details_set(FilerWindow *filer_window, DetailsType details)
 {
-	if (filer_window->details_type == details)
-		return;
 	filer_window->details_type = details;
 }
 
 /* Note: Call style_changed after this */
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 {
-	if (filer_window->display_style == style)
-		return;
-
-	filer_window->display_style = style;
+	filer_window->display_style_wanted = style;
+	display_set_actual_size_real(filer_window);
 }
 
 /* Each displayed item has a ViewData structure with some cached information
@@ -686,3 +696,25 @@ void display_update_view(FilerWindow *filer_window,
 	view->name_height = h / PANGO_SCALE;
 }
 
+/* Sets display_style from display_style_wanted.
+ * See also display_set_actual_size().
+ */
+static void display_set_actual_size_real(FilerWindow *filer_window)
+{
+	DisplayStyle size = filer_window->display_style_wanted;
+	int n;
+	
+	g_return_if_fail(filer_window != NULL);
+
+	if (size == AUTO_SIZE_ICONS)
+	{
+		n = view_count_items(filer_window->view);
+
+		if (n >= o_filer_change_size_num.int_value)
+			size = SMALL_ICONS;
+		else
+			size = LARGE_ICONS;
+	}
+	
+	filer_window->display_style = size;
+}

@@ -67,5 +67,6 @@ void display_update_view(FilerWindow *filer_window,
 void display_update_views(FilerWindow *filer_window);
 void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 		     DirItem  *item, MaskedPixmap *image, gboolean selected);
+void display_set_actual_size(FilerWindow *filer_window);
 
 #endif /* _DISPLAY_H */

@@ -31,50 +31,66 @@
         <radio label='Always resize' value='1'>The filer will resize windows whenever it seems useful (that is, when changing directory or display style).</radio>
       </radio-group>
       <numentry name='filer_size_limit' label='Largest window size:' unit='%' min='1' max='100' width='3'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</numentry>
-      <toggle name='filer_change_size' label='Change from Large icons to Small automatically:'>If this is on then filer windows will change from Large icons to Small when showing a new directory with lots of files.</toggle>
-      <numentry name='filer_change_size_num' label='Small Icons if at least:' unit='items' min='1' max='1000' width='4'>If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used.</numentry>
     </frame>
     <frame label='Window behaviour'>
-      <toggle name='filer_short_flag_names' label='Short titlebar flags'>Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar.</toggle>
-      <toggle name='filer_unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
-      <toggle name='bind_new_button_1' label='New window on button 1 (RISC OS style)'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
-      <toggle name='bind_single_click' label='Single-click navigation in filer windows'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
+      <hbox>
+        <vbox>
+          <toggle name='filer_short_flag_names' label='Short titlebar flags'>Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar.</toggle>
+          <toggle name='filer_unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
+        </vbox>
+        <vbox>
+          <toggle name='bind_new_button_1' label='New window on button 1'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
+          <toggle name='bind_single_click' label='Single-click navigation'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
+        </vbox>
+      </hbox>
+    </frame>
+    <frame label='Sorting'>
+      <toggle name='display_dirs_first' label='Directories come first (for sort by name)'>If this is on then directories will always appear before anything else when sorting by name.</toggle>
     </frame>
     <section title='Display'>
-      <frame label='Sorting'>
-        <toggle name='display_dirs_first' label='Directories come first (for sort by name)'>If this is on then directories will always appear before anything else when sorting by name.</toggle>
-      </frame>
-      <frame label='Icon text width'>
-        <numentry name='display_large_width' label='Large wrap width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
-        <numentry name='display_small_width' label='Max Small Icons width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
-      </frame>
       <frame label='Default settings for new windows'>
         <toggle name='display_inherit_options' label='Inherit options from source window'>If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below.</toggle>
-	<hbox>
-	  <vbox>
-            <menu name='display_size' label='Icon size:' sizegroup='disp-def'>
-              <item label='Huge Icons' value='2'/>
-              <item label='Large Icons' value='0'/>
-              <item label='Small Icons' value='1'/>
-            </menu>
-            <menu name='display_details' label='Details:' sizegroup='disp-def'>
-              <item label='No details' value='0'/>
-              <item label='Sizes' value='2'/>
-              <item label='Permissions' value='3'/>
-              <item label='Type' value='4'/>
-              <item label='Times' value='5'/>
-            </menu>
+	<spacer/>
+        <hbox>
+          <vbox>
+	    <menu name='filer_view_type' label='View type:' sizegroup='disp-def'>
+	      <item label='Icons View' value='0'/>
+	      <item label='List View' value='1'/>
+	    </menu>
             <menu name='display_sort_by' label='Sort by:' sizegroup='disp-def'>
               <item label='Name' value='0'/>
               <item label='Type' value='1'/>
               <item label='Date' value='2'/>
               <item label='Size' value='3'/>
             </menu>
-  	  </vbox><vbox>
+          </vbox><vbox>
             <toggle name='display_show_hidden' label='Show hidden files'>If this is on then files whose names start with a dot are shown too, otherwise they are hidden.</toggle>
             <toggle name='display_show_thumbs' label='Show image thumbnails'>Load every image file and display it, scaled-down, in the filer window instead of the normal icon.</toggle>
+          </vbox>
+        </hbox>
+      </frame>
+      <frame label='Icon View'>
+        <hbox>
+	  <vbox>
+            <menu name='display_icon_size' label='Default size:' sizegroup='disp2-def'>
+              <item label='Huge Icons' value='2'/>
+              <item label='Large Icons' value='0'/>
+              <item label='Small Icons' value='1'/>
+              <item label='Automatic' value='3'/>
+            </menu>
+            <menu name='display_details' label='Default details:' sizegroup='disp2-def'>
+              <item label='No details' value='0'/>
+              <item label='Sizes' value='2'/>
+              <item label='Permissions' value='3'/>
+              <item label='Type' value='4'/>
+              <item label='Times' value='5'/>
+            </menu>
 	  </vbox>
-	</hbox>
+          <numentry name='filer_change_size_num' label='Automatic small icons at:' unit='items' min='1' max='1000' width='4'>When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used.</numentry>
+        </hbox>
+	<spacer/>
+        <numentry name='display_large_width' label='Large wrap width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
+        <numentry name='display_small_width' label='Max Small Icons width:' unit='pixels' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
       </frame>
     </section>
     <section title='Toolbar'>
