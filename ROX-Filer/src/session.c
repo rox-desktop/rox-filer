@@ -107,13 +107,15 @@ void session_init(gchar *client_id)
 	SmClient *client;
 	struct passwd *pw;
 	gchar *bin_path;
-	gchar *clone_cmd[] = { bin_path, "-n" };
+	gchar *clone_cmd[2];
 
 	if (!sc_session_up())
 		return;
 
 	pw = getpwuid(euid);
 	bin_path = g_strconcat(app_dir, "/AppRun", NULL);
+	clone_cmd[0] = bin_path,
+	clone_cmd[1] = "-n";
 
 	client = sc_new(client_id);
 	

@@ -659,6 +659,8 @@ static MenuIconStyle get_menu_icon_style(void)
 	{
 		case MIS_NONE: case MIS_SMALL: case MIS_LARGE: case MIS_HUGE:
 			return mis;
+		default:
+			break;
 	}
 
 	if (mis == MIS_CURRENT && window_with_focus)
