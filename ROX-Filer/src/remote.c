@@ -48,6 +48,7 @@
 #include "panel.h"
 #include "action.h"
 #include "type.h"
+#include "display.h"
 
 static GdkAtom filer_atom;	/* _ROX_FILER_EUID_VERSION_HOST */
 static GdkAtom filer_atom_any;	/* _ROX_FILER_EUID_HOST */
@@ -114,7 +115,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Version", rpc_Version, NULL, NULL);
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
-	soap_register("OpenDir", rpc_OpenDir, "Filename", NULL);
+	soap_register("OpenDir", rpc_OpenDir, "Filename", "Style,Details");
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
@@ -517,13 +518,56 @@ static xmlNodePtr rpc_Version(GList *args)
 	return reply;
 }
 
+/* Args: Path, [Style, Details] */
 static xmlNodePtr rpc_OpenDir(GList *args)
 {
 	char	   *path;
+	char       *style, *details;
+	FilerWindow *fwin;
 
 	path = string_value(ARG(0));
-	filer_opendir(path, NULL);
+	style = string_value(ARG(1));
+	details = string_value(ARG(2));
+
+	fwin = filer_opendir(path, NULL);
 	g_free(path);
+
+	if (style)
+	{
+		DisplayStyle ds;
+
+		ds = !g_strcasecmp(style, "Large") ? LARGE_ICONS :
+		     !g_strcasecmp(style, "Small") ? SMALL_ICONS :
+		     !g_strcasecmp(style, "Huge")  ? HUGE_ICONS :
+		     				     UNKNOWN_STYLE;
+		if (ds == UNKNOWN_STYLE)
+			g_warning("Unknown style '%s'\n", style);
+		else
+			display_set_layout(fwin, ds, fwin->details_type);
+
+		g_free(style);
+	}
+
+	if (details)
+	{
+		DetailsType dt;
+		
+		dt = !g_strcasecmp(details, "None") ? DETAILS_NONE :
+		     !g_strcasecmp(details, "Summary") ? DETAILS_SUMMARY :
+		     !g_strcasecmp(details, "Size") ? DETAILS_SIZE :
+		     !g_strcasecmp(details, "Type") ? DETAILS_TYPE :
+		     !g_strcasecmp(details, "Times") ? DETAILS_TIMES :
+		     !g_strcasecmp(details, "Permissions")
+		     				? DETAILS_PERMISSIONS :
+						  DETAILS_UNKNOWN;
+
+		if (dt == DETAILS_UNKNOWN)
+			g_warning("Unknown details type '%s'\n", details);
+		else
+			display_set_layout(fwin, fwin->display_style, dt);
+		
+		g_free(details);
+	}
 
 	return NULL;
 }

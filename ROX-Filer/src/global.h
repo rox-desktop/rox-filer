@@ -113,6 +113,7 @@ typedef enum {		/* Values used in options, must start at 0 */
 	DETAILS_PERMISSIONS	= 3,
 	DETAILS_TYPE		= 4,
 	DETAILS_TIMES		= 5,
+	DETAILS_UNKNOWN		= -1,
 } DetailsType;
 
 /* The namespaces for the SOAP messages */
