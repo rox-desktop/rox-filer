@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.1.1 - Manuel de l'utilisateur
+   ROX-Filer 2.1.2 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -28,7 +28,7 @@
 	<contrib>Traduction française</contrib>
     <affiliation>
 	 <address>
-	  <email>arnaud at calvo-france.com</email>
+	  <email>arnaud at (oter_ceci)calvo-france.com</email>
 	 </address>
     </affiliation>
    </othercredit>
@@ -79,7 +79,7 @@
   <para>
    <application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11 &mdash;
    l'interface graphique à base de fenêtres très utilisé sur les systèmes d'exploitation Unix et dérivés.
-   C'est aussi le coeur du ROX Desktop <citation>ROX</citation>. Beaucoup de fonctionnalités du filer ont
+   C'est aussi le cœur du ROX Desktop <citation>ROX</citation>. Beaucoup de fonctionnalités du filer ont
    été inspirées par RISC OS <citation>RISC OS</citation>. 'ROX' est un acronyme de 'RISC OS&ndash;On&ndash;X'.
   </para>
 
@@ -905,10 +905,21 @@ Opérations diverses agissant sur la fenêtre.
  <row>
   <entry><guimenuitem>Inversé</guimenuitem></entry>
   <entry>
-   Inverse l'ordre de tri (du plus récent au plus ancien, du plus lourd au plus 
-   léger, etc...).
+   Inverse l'ordre de tri (du plus récent au plus ancien, du plus gros au plus 
+   petit, etc...).
   </entry>
  </row>
+
+<row>
+  <entry>
+    <guimenuitem>Filtrer des fichiers...</guimenuitem>
+  </entry>
+  <entry>
+    Contraint ROX à n'afficher que les fichiers dont les noms correspondent 
+    à un certain motif.
+    La barre de titre affichera <guilabel>(Glob (motif))</guilabel> si un filtre est utilisé.
+  </entry>
+</row>
 
  <row>
   <entry><guimenuitem>Montrer les fichiers cachés</guimenuitem></entry>
@@ -934,6 +945,16 @@ Opérations diverses agissant sur la fenêtre.
   <entry>
    Relit le contenu du dossier et les détails de tous les fichiers s'y trouvant. 
    Utilisez cette commande si l'affichage n'est plus à jour.
+  </entry>
+ </row>
+
+ <row>
+  <entry>
+   <guimenuitem>Sauver les options d'affichage...</guimenuitem>
+  </entry>
+  <entry>
+   Sauve les options d'affichage du dossier courant. Chaque fois que vous 
+   ouvrirez ce dossier, ces options seront utilisées.
   </entry>
  </row>
 
@@ -1185,6 +1206,23 @@ l'être aussi...), alors optez pour un lien relatif.
 	   les objets non sélectionnés.
 	  </entry>
 	 </row>
+
+         <row>
+          <entry>
+           <guimenuitem>Sélectionner par nom...</guimenuitem>
+          </entry>
+          <entry>
+           Ne sélectionner que les objets dont le nom correspond à un 
+           certain motif. Cette commande n'est pas aussi puissante que
+           <guimenuitem>Sélectionner si...</guimenuitem> (cf. ci-dessous), 
+           mais elle est plus rapide à utiliser. Les fichiers sont sélectionnés 
+           automatiquement au fur et à mesure de la saisie.  
+           Le raccourci-clavier par défaut est <keycap>.</keycap>, ce qui 
+           vous permet de ne saisir que <userinput>.png</userinput> pour 
+           sélectionner tous les fichiers <filename>.png</filename>, par exemple.
+          </entry>
+         </row>
+
 	 <row>
 	  <entry>
 	   <guimenuitem>Sélectionner si...</guimenuitem>
@@ -2721,7 +2759,7 @@ contient des informations complémentaires sur l'application (voir ci-dessous).
 
 </itemizedlist>
 
-Jetez un oeil au dossier-application de <filename>ROX-Filer</filename> pour avoir un exemple détaillé et complet.
+Jetez un œil au dossier-application de <filename>ROX-Filer</filename> pour avoir un exemple détaillé et complet.
   </para>
 
 <note><para>Note : pour des raisons de sécurité, un dossier-application doit avoir le
@@ -3428,7 +3466,8 @@ Les méthodes suivantes sont reconnues :</para>
  <listitem>
   <para>
    <function>OpenDir</function>(<parameter>Filename</parameter>,
-   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>, <parameter>ID</parameter>])
+   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>, <parameter>ID</parameter>],
+<parameter>Hidden</parameter>, <parameter>Filter</parameter>)
    Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
    <parameter>Style</parameter> peut prendre la valeur <userinput>Large</userinput>, 
    <userinput>Small</userinput>, <userinput>Huge</userinput> ou <userinput>Automatic</userinput>. 
@@ -3446,6 +3485,12 @@ Si une fenêtre existe déjà avec cette ID, celle-ci est modifiée pour le nom 
 sinon, une nouvelle fenêtre est créée et son ID lui est rattachée.
 Assurez-vous que les ID que vous générez sont uniques lorsque vous utilisez des scripts,
 en concaténant par exemple le nom du script, le PID et un horodatage pour former l'ID.
+   <parameter>Hidden</parameter> Pour afficher les fichiers cachés (ceux dont le nom commence 
+par un point), utilisez la valeur <userinput>true</userinput> ; pour ne pas les afficher, préférez 
+<userinput>false</userinput>. Si vous omettez ce paramètre, l'option de configuration est utilisée.
+   <parameter>Filter</parameter> peut être utilisé pour appliquer un filtre 
+pour n'afficher que certains noms de fichiers. Par exemple, utilisez le filtre <userinput>*.c</userinput> 
+pour n'afficher que les fichiers se terminant par .c.
   </para>
  </listitem>
 
