@@ -125,57 +125,60 @@ void xtype_init(void)
 
 MIME_type *xtype_get(const char *path)
 {
-  int fd;
-  char buf[1024];
-  int nb;
-  MIME_type *type=NULL;
+	int fd;
+	char buf[1024];
+	int nb;
+	MIME_type *type=NULL;
 
-  fd=attropen(path, XTYPE_ATTR, O_RDONLY);
+#ifdef _PC_XATTR_EXISTS
+	if(!pathconf(path, _PC_XATTR_EXISTS))
+		return type_from_path(path);
+#endif
+
+	fd=attropen(path, XTYPE_ATTR, O_RDONLY);
   
-  /*printf("%s: fd=%d ", path, fd);*/
-  if(fd>0) {
-    nb=read(fd, buf, sizeof(buf));
-    /*printf("nb=%d ", nb);*/
-    if(nb>0) {
-      buf[nb]=0;
-      /*printf("buf=%s ", buf);*/
-      type=mime_type_lookup(buf);
-    }
-    close(fd);
-  }
-  /*printf("%s -> %s\n", path, type? mime_type_comment(type): "Unknown");*/
-  if(type)
-    return type;
+	if(fd>=0) {
+		nb=read(fd, buf, sizeof(buf));
+		if(nb>0) {
+			buf[nb]=0;
+			type=mime_type_lookup(buf);
+		}
+		close(fd);
+	}
+
+	if(type)
+		return type;
   
-  /* Fall back to non-extended */
-  return type_from_path(path);
+	/* Fall back to non-extended */
+	return type_from_path(path);
 }
 
 int xtype_set(const char *path, const MIME_type *type)
 {
-  int fd;
-  gchar *ttext;
-  int nb;
+	int fd;
+	gchar *ttext;
+	int nb;
 
-  fd=attropen(path, XTYPE_ATTR, O_WRONLY|O_CREAT, 0644);
-  if(fd>0) {
-    ttext=g_strdup_printf("%s/%s", type->media_type, type->subtype);
-    nb=write(fd, ttext, strlen(ttext));
-    if(nb==strlen(ttext))
-      ftruncate(fd, (off_t) nb);
-    g_free(ttext);
+	fd=attropen(path, XTYPE_ATTR, O_WRONLY|O_CREAT, 0644);
+	if(fd>0) {
+		ttext=g_strdup_printf("%s/%s",
+				      type->media_type, type->subtype);
+		nb=write(fd, ttext, strlen(ttext));
+		if(nb==strlen(ttext))
+			ftruncate(fd, (off_t) nb);
+		g_free(ttext);
 
-    close(fd);
+		close(fd);
 
-    if(nb>0)
-      return 0;
-  }
+		if(nb>0)
+			return 0;
+	}
   
-  return 1; /* Set type failed */
+	return 1; /* Set type failed */
 }
 
 #else
-/* No extended attricutes available */
+/* No extended attributes available */
 
 void xtype_init(void)
 {
