@@ -1518,7 +1518,7 @@ static gboolean bg_expose(GtkWidget *widget,
 	/* Clear the area to the background image */
 	{
 		GtkStyle *style = current_pinboard->window->style;
-		GdkGC *gc = style->base_gc[GTK_STATE_NORMAL];
+		GdkGC *gc = style->bg_gc[GTK_STATE_NORMAL];
 		
 		gdk_gc_set_clip_region(gc, event->region);
 		if (style->bg_pixmap[GTK_STATE_NORMAL])
