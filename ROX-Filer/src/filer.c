@@ -942,7 +942,7 @@ static gint key_press_event(GtkWidget	*widget,
 	 * to be used...
 	 */
 	gtk_window_add_accel_group(GTK_WINDOW(filer_window->window),
-					filer_keys);
+						filer_keys);
 #ifdef GTK2
 	handled = gtk_accel_groups_activate(G_OBJECT(filer_window->window),
 				event->keyval, event->state);
@@ -950,8 +950,11 @@ static gint key_press_event(GtkWidget	*widget,
 	handled = gtk_accel_groups_activate(GTK_OBJECT(filer_window->window),
 				event->keyval, event->state);
 #endif
-	gtk_window_remove_accel_group(GTK_WINDOW(filer_window->window),
-				filer_keys);
+	if (window_with_focus)
+		gtk_window_remove_accel_group(GTK_WINDOW(filer_window->window),
+						filer_keys);
+	else
+		return TRUE;	/* Window no longer exists */
 	if (handled)
 		return TRUE;
 
