@@ -243,6 +243,7 @@ int main(int argc, char **argv)
 	int		 i;
 	struct sigaction act;
 	guchar		*tmp, *dir, *slash;
+	gboolean	show_user = FALSE;
 
 	/* This is a list of \0 separated strings. Each string starts with a
 	 * character indicating what kind of operation to perform:
@@ -364,15 +365,17 @@ int main(int argc, char **argv)
 				g_string_append(to_open, VALUE);
 				break;
 			case 'u':
-				show_user_message = g_strdup_printf(
-					_("Running as user '%s'"), 
-					user_name(euid));
+				show_user = TRUE;
 				break;
 			default:
 				printf(_(USAGE));
 				return EXIT_FAILURE;
 		}
 	}
+
+	if (euid == 0 || show_user)
+		show_user_message = g_strdup_printf( _("Running as user '%s'"), 
+				user_name(euid));
 	
 	i = optind;
 	while (i < argc)
@@ -426,16 +429,6 @@ int main(int argc, char **argv)
 	sigemptyset(&act.sa_mask);
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
-
-	if (euid == 0 && !show_user_message)
-	{
-		if (get_choice(_("!!!DANGER!!!"),
-			_("Running ROX-Filer as root is VERY dangerous. If I "
-			"had a warranty (I don't) then doing this would "
-			"void it"), 2,
-			_("Don't click here"), _("Quit")) != 0)
-			exit(EXIT_SUCCESS);
-	}
 
 	run_list(to_open->str);
 	g_string_free(to_open, TRUE);

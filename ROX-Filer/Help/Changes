@@ -2,6 +2,17 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+26-Sep-2000
+~~~~~~~~~~~
+Running as root now simply turns on the -u flag, rather than displaying
+a warning box.
+
+The toolbar height is now correctly taken into account when sizing a new filer
+window (Denis Manente).
+
+When guessing file types from extensions, the filer now tries to find the
+longest extension that matches (eg .ps.gz, then .gz).
+
 25-Sep-2000
 ~~~~~~~~~~~
 The lasso box is now drawn so that the box will be in the foreground colour

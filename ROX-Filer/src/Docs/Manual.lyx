@@ -510,22 +510,22 @@ If all else fails, try running rox with the `
 Running as root
 \layout Standard
 
-If you pass the `
-\family typewriter 
--u
-\family default 
-' option to rox then the filer will display a message at the top of each
- window saying which user the filer is running as.
- This also disables the normal warning box you get when you try to run the
- filer as root.
- The idea here is that you create a simple script which runs the filer as
- root --- something like:
+If you run the filer as the `root' user then the filer will display a message
+ at the top of each window to remind you.
+ The root user has permission to access or change any file in the system,
+ so be very careful when using the filer like this.
+\layout Standard
+
+Normally, you should log in as an ordinary user and only change to root
+ when you need to.
+ You can create a simple script which runs the filer as root --- something
+ like this:
 \layout LyX-Code
 
 #!/bin/sh
 \layout LyX-Code
 
-su -m -c "rox -u $*"
+su -m -c "rox $*"
 \layout Standard
 
 Then, you can get a root filer window by simply running the script and entering

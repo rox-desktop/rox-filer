@@ -48,7 +48,11 @@ static char *import_extensions(guchar *line);
 static void import_for_dir(guchar *path);
 char *get_action_save_path(GtkWidget *dialog);
 
-/* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
+/* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
+ * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
+ * The hash table is consulted from each dot in the string in turn
+ * (First .ps.gz, then try .gz)
+ */
 static GHashTable *extension_hash = NULL;
 static char *current_type = NULL;	/* (used while reading file) */
 
@@ -211,13 +215,16 @@ MIME_type *type_from_path(char *path)
 {
 	char	*dot;
 
-	dot = strrchr(path, '.');
-	if (dot)
+	while ((dot = strchr(path, '.')))
 	{
 		MIME_type *type;
+
 		type = g_hash_table_lookup(extension_hash, dot + 1);
+
 		if (type)
 			return type;
+
+		path = dot + 1;
 	}
 
 	return &text_plain;

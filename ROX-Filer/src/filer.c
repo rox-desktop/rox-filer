@@ -839,15 +839,13 @@ FilerWindow *filer_opendir(char *path)
 	filer_window->details_type = DETAILS_SUMMARY;
 	filer_window->display_style = UNKNOWN_STYLE;
 
-	/* Add all the user-interface elements */
+	/* Add all the user-interface elements & realise */
 	filer_add_widgets(filer_window);
 
 	/* Connect to all the signal handlers */
 	filer_add_signals(filer_window);
 
 	display_set_layout(filer_window, last_layout);
-
-	gtk_widget_realize(filer_window->window);
 
 	/* The collection is created empty and then attach() is called, which
 	 * links the filer window to the entry in the directory cache we
@@ -891,12 +889,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
-
-	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-		filer_window->display_style == LARGE_ICONS ? 400 : 512,
-		o_toolbar == TOOLBAR_NONE ? col_height:
-		o_toolbar == TOOLBAR_NORMAL ? col_height + 24 :
-		col_height + 38);
 
 	/* Scrollbar on the right, everything else on the left */
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -959,6 +951,15 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_widget_show(vbox);
 	gtk_widget_show(scrollbar);
 	gtk_widget_show(collection);
+
+	gtk_widget_realize(filer_window->window);
+
+	if (o_toolbar != TOOLBAR_NONE)
+		col_height += filer_window->toolbar_frame->allocation.height;
+	
+	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
+		filer_window->display_style == LARGE_ICONS ? 400 : 512,
+		col_height);
 }
 
 static void filer_add_signals(FilerWindow *filer_window)
