@@ -25,6 +25,8 @@
 
 #include "config.h"
 
+#include <string.h>
+
 #include "global.h"
 
 #include "gui_support.h"
@@ -79,6 +81,9 @@ void rox_add_translations(char *path)
 	long		size;
 	gboolean	swap;		/* TRUE => reverse byte-order of ints */
 	int		n, n_total;
+#ifdef GTK2
+	char		*charset = NULL;
+#endif
 
 	if (load_file(path, &data, &size) == FALSE)
 		goto out;
@@ -121,6 +126,37 @@ void rox_add_translations(char *path)
 	from_base = data + WORD(data + 12);
 	to_base = data + WORD(data + 16);
 
+#ifdef GTK2
+	/* Find the charset used, so we can convert to UTF-8 */
+	for (n = 0; n < n_total; n++)
+	{
+		char	*from = data + WORD(from_base + (n << 3) + 4);
+		char	*to_raw   = data + WORD(to_base + (n << 3) + 4);
+
+		if (*from)
+			continue;
+
+		charset = strstr(to_raw, "charset=");
+		if (charset)
+		{
+			char *tmp;
+
+			charset += 8;
+			tmp = strchr(charset, '\n');
+			if (tmp)
+				charset = g_strndup(charset, tmp - charset);
+			else
+				charset = g_strdup(charset);
+		}
+		break;
+	}
+	if (!charset)
+	{
+		g_warning("Missing charset=... in translation!");
+		charset = g_strdup("iso-8859-1");
+	}
+#endif
+	
 	for (n = 0; n < n_total; n++)
 	{
 		char	*from = data + WORD(from_base + (n << 3) + 4);
@@ -130,7 +166,7 @@ void rox_add_translations(char *path)
 
 		to = g_convert_with_fallback(to_raw, -1,
 					"UTF-8",
-					"iso-8859-1", /* XXX: Don't guess */
+					charset,
 					"#",
 					NULL, NULL, NULL);
 		if (!to)
@@ -145,6 +181,7 @@ void rox_add_translations(char *path)
 out:
 #ifdef GTK2
 	g_free(data);
+	g_free(charset);
 #endif
 }
 

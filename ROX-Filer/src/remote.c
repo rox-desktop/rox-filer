@@ -73,6 +73,8 @@ static gboolean client_event(GtkWidget *window,
 				 gpointer data);
 static void soap_register(char *name, SOAP_func func, char *req, char *opt);
 static xmlNodePtr soap_invoke(xmlNode *method);
+
+static xmlNodePtr rpc_Version(GList *args);
 static xmlNodePtr rpc_OpenDir(GList *args);
 static xmlNodePtr rpc_CloseDir(GList *args);
 static xmlNodePtr rpc_Examine(GList *args);
@@ -105,6 +107,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	/* xmlDocDump(stdout, rpc); */
 
 	rpc_calls = g_hash_table_new(g_str_hash, g_str_equal);
+
+	soap_register("Version", rpc_Version, NULL, NULL);
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
 	soap_register("OpenDir", rpc_OpenDir, "Filename", NULL);
@@ -469,6 +473,17 @@ static GList *list_value(xmlNode *arg)
  * xmlNode arguments from the RPC call and they return the result node, or
  * NULL if there isn't a result.
  */
+
+static xmlNodePtr rpc_Version(GList *args)
+{
+	xmlNodePtr reply;
+
+	reply = xmlNewNode(NULL, "rox:VersionResponse");
+	xmlNewNs(reply, "http://www.w3.org/2001/09/soap-rpc", "soap");
+	xmlNewChild(reply, NULL, "soap:result", VERSION);
+
+	return reply;
+}
 
 static xmlNodePtr rpc_OpenDir(GList *args)
 {
