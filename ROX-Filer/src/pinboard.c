@@ -111,6 +111,8 @@ typedef enum {
 TextBgType o_text_bg = TEXT_BG_SOLID;
 gboolean o_clamp_icons = TRUE;
 static int o_grid_step = GRID_STEP_COARSE;
+static int old_x, old_y;		/* For dragging (mouse start) */
+static int icon_old_x, icon_old_y;	/* For dragging (icon start) */
 
 /* Static prototypes */
 static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight);
@@ -951,6 +953,10 @@ static void perform_action(Icon *icon, GdkEventButton *event)
 			show_pinboard_menu(event, icon);
 			break;
 		case ACT_MOVE_ICON:
+			old_x = event->x_root;
+			old_y = event->y_root;
+			icon_old_x = icon->x;
+			icon_old_y = icon->y;
 			dnd_motion_start(MOTION_REPOSITION);
 			break;
 		case ACT_PRIME_AND_SELECT:
@@ -1068,9 +1074,7 @@ static gint icon_motion_notify(GtkWidget *widget,
 {
 	int	x, y;
 	int	width, height;
-
-	x = event->x_root;
-	y = event->y_root;
+	int	dx,dy;
 
 	if (motion_state == MOTION_READY_FOR_DND)
 	{
@@ -1081,7 +1085,15 @@ static gint icon_motion_notify(GtkWidget *widget,
 	else if (motion_state != MOTION_REPOSITION)
 		return FALSE;
 
+	/* How far the pointer has moved since the drag started */
+	dx = event->x_root - old_x;
+	dy = event->y_root - old_y;
+
+	x = icon_old_x + dx;
+	y = icon_old_y + dy;
+
 	snap_to_grid(&x, &y);
+
 	if (icon->x == x && icon->y == y)
 		return TRUE;
 
