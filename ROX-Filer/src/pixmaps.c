@@ -131,6 +131,8 @@ static void load_default_pixmaps(void)
 
 	load_pixmap("pixmaps/up.xpm", default_pixmap + TOOLBAR_UP_ICON);
 	load_pixmap("pixmaps/home.xpm", default_pixmap + TOOLBAR_HOME_ICON);
+	load_pixmap("pixmaps/refresh.xpm", default_pixmap +
+						TOOLBAR_REFRESH_ICON);
 }
 
 void pixmap_ref(MaskedPixmap *mp)

@@ -1034,6 +1034,12 @@ static gint key_press_event(GtkWidget	*widget,
 	return FALSE;
 }
 
+static void toolbar_refresh_clicked(GtkWidget *widget,
+				    FilerWindow *filer_window)
+{
+	update_dir(filer_window);
+}
+
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
 	filer_change_to(filer_window, getenv("HOME"));
@@ -1352,6 +1358,9 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 			filer_window);
 	add_button(GTK_CONTAINER(box), TOOLBAR_HOME_ICON,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
+			filer_window);
+	add_button(GTK_CONTAINER(box), TOOLBAR_REFRESH_ICON,
+			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
 			filer_window);
 
 	return frame;

@@ -36,6 +36,7 @@ enum
 	/* Toolbar */
 	TOOLBAR_UP_ICON,
 	TOOLBAR_HOME_ICON,
+	TOOLBAR_REFRESH_ICON,
 	
 	/* End of list */
 	LAST_DEFAULT_PIXMAP
