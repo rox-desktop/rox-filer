@@ -555,7 +555,7 @@ gboolean pinboard_remove(const gchar *path, const gchar *name)
 	PinIcon		*pi;
 	Icon		*icon;
 
-	g_return_if_fail(current_pinboard != NULL);
+	g_return_val_if_fail(current_pinboard != NULL, FALSE);
 
 	for(item=current_pinboard->icons; item; item=g_list_next(item)) {
 		pi=(PinIcon *) item->data;

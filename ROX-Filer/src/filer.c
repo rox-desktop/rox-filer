@@ -459,6 +459,121 @@ static void detach(FilerWindow *filer_window)
 	filer_window->directory = NULL;
 }
 
+/* If 'start' was mounted by ROX-Filer, return it. Otherwise, try the
+ * parents up the tree.
+ * NULL if we're not in a user mount point.
+ * g_free() the result.
+ */
+static char *get_ancestor_user_mount_point(const char *start)
+{
+	char *path;
+
+	path = strdup(start);
+
+	while (1)
+	{
+		char *slash;
+
+		if (mount_is_user_mounted(path))
+			return path;
+
+		if (!path[1])
+		{
+			g_free(path);
+			return NULL;
+		}
+
+		slash = strrchr(path + 1, '/');
+		if (!slash)
+			slash = path + 1;
+		*slash = '\0';
+	}
+}
+
+static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
+{
+	if (response == GTK_RESPONSE_OK)
+	{
+		GList *list; 
+
+		list = g_list_prepend(NULL, mount);
+		action_mount(list, FALSE, TRUE);
+		g_list_free(list);
+	}
+
+	g_free(mount);
+
+	gtk_widget_destroy(dialog);
+
+	one_less_window();
+}
+
+/* 'filer_window' shows a directory under 'mount'. If no other window also
+ * shows a directory under it, display a non-modal dialog offering to
+ * unmount the directory.
+ * 'mount' is freed by this function, either directly, or after the dialog
+ * closes.
+ */
+static void may_offer_unmount(FilerWindow *filer_window, char *mount)
+{
+	GtkWidget *dialog, *button;
+	GList	*next;
+	int len;
+	
+	len = strlen(mount);
+
+	for (next = all_filer_windows; next; next = next->next)
+	{
+		FilerWindow *other = (FilerWindow *) next->data;
+
+		if (other == filer_window)
+			continue;
+
+		if (strncmp(filer_window->real_path, other->real_path,
+			    len) != 0)
+			continue;
+
+		g_return_if_fail(
+			filer_window->real_path[len] != '/' ||
+			filer_window->real_path[len] != '\0');
+
+		if (other->real_path[len] != '/' &&
+		    other->real_path[len] != '\0')
+			continue;
+
+		/* Found another window. Don't offer to unmount. */
+		g_free(mount);
+		return;
+	}
+
+	dialog = gtk_message_dialog_new(NULL, 0, GTK_MESSAGE_QUESTION,
+			GTK_BUTTONS_NONE, 
+			_("Do you want to unmount this device?\n\n"
+			"Unmounting a device makes it safe to remove "
+			"the disk."), mount);
+
+	button = button_new_mixed(ROX_STOCK_MOUNTED, _("No change"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button,
+					GTK_RESPONSE_CANCEL);
+	gtk_widget_show(button);
+
+	button = button_new_mixed(ROX_STOCK_MOUNT, _("Umount"));
+	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+	gtk_dialog_add_action_widget(GTK_DIALOG(dialog), button,
+					GTK_RESPONSE_OK);
+	gtk_widget_show(button);
+
+	g_signal_connect(G_OBJECT(dialog), "response",
+			G_CALLBACK(umount_dialog_response), mount);
+
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog),
+			GTK_RESPONSE_OK);
+
+	number_of_windows++;
+	gtk_widget_show(dialog);
+}
+
 /* Returns TRUE to prevent closing the window. May offer to unmount a
  * device.
  */
@@ -466,32 +581,12 @@ gboolean filer_window_delete(GtkWidget *window,
 			     GdkEvent *unused, /* (may be NULL) */
 			     FilerWindow *filer_window)
 {
-	if (mount_is_user_mounted(filer_window->real_path))
-	{
-		int action;
+	char *mount;
 
-		action = get_choice(PROJECT,
-			_("Do you want to unmount this device?\n\n"
-			"Unmounting a device makes it safe to remove "
-			"the disk."), 3,
-			GTK_STOCK_CANCEL, NULL,
-			GTK_STOCK_CLOSE, NULL,
-			ROX_STOCK_MOUNT, _("Unmount"));
+	mount = get_ancestor_user_mount_point(filer_window->real_path);
 
-		if (action == 0)
-			return TRUE;	/* Cancel close operation */
-
-		if (action == 2)
-		{
-			GList *list; 
-
-			list = g_list_prepend(NULL, filer_window->sym_path);
-			action_mount(list, FALSE, TRUE);
-			g_list_free(list);
-
-			return TRUE;
-		}
-	}
+	if (mount)
+		may_offer_unmount(filer_window, mount);
 
 	return FALSE;
 }
@@ -1104,6 +1199,10 @@ void change_to_parent(FilerWindow *filer_window)
 
 	if (current[0] == '/' && current[1] == '\0')
 		return;		/* Already in the root */
+
+	if (mount_is_user_mounted(filer_window->real_path))
+		may_offer_unmount(filer_window,
+				g_strdup(filer_window->real_path));
 	
 	dir = g_path_get_dirname(current);
 	filer_change_to(filer_window, dir, g_basename(current));
