@@ -6,7 +6,8 @@ This is a list of features that should/will be added when I have time (or
 when someone sends patches!).
 
 
-BUGS
+			BUGS
+
 
 GtkTreeView bindings (eg, ^N) override menu bindings.
 
@@ -41,18 +42,27 @@ Keep the title up-to-date for iconified windows.
 
 Symlinks to mount points work strangely (Daniele Peri).
 
-FEATURES FOR 1.3
-
 Huge icons shouldn't scale up smaller icons (especially in List View!).
+
+
+			FEATURES FOR 1.3
+
+Bookmarks:
+- Drag to Edit window or toolbar icon. Spring loading (Stephen Watson)?
+- Scrollbar in edit window if there are many bookmarks.
+- Short name for bookmarks.
+
+Set size of panel icons.
+
+Stretch / scale pinboard options.
+
+Option to show DnD menu on button-1 drags (for pen users).
+
+			FEATURES FOR 2.1
 
 Bookmarks:
 - Show selection groups?
 - Auto-add recent operations
-- Drag to Edit window or toolbar icon. Spring loading (Stephen Watson)?
-- Scrollbar in edit window if there are many bookmarks
-- Short name for bookmarks?
-
-Set size of panel icons.
 
 Some way to process the files found by Find.
 
@@ -70,15 +80,9 @@ Allow changing the pinboard style without having to drag the image back in
 
 Use dnotify on Linux to find out when directories change.
 
-Put groups on Select/Bookmarks menu.
-
 Use XFS extended attribute to store MIME types.
 
-Clean out thumbnails cache (memory and disk) from time to time.
-
 More options to set fonts?
-
-Option to show DnD menu on button-1 drags (for pen users).
 
 Put Disk Usage in the Info box?
 
@@ -132,7 +136,8 @@ Allow filtering on any expression (not just Show Hidden).
 Allow find expression with Permissions command...
 
 
-OTHERS
+			OTHERS
+
 
 Fully configurable toolbar?
 
@@ -170,7 +175,8 @@ AppInfo.xml (Christopher Arndt):
 
 
 
-LONG TERM
+			LONG TERM
+
 
 Use a separate process to access the filesystem. Prevents hanging when you
 try to access a dead filesystem. Do this via gnome-vfs?
