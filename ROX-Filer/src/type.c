@@ -1298,16 +1298,13 @@ static void load_mime_types(void)
 	filer_update_all();
 }
 
-/* Try to fill in 'type->comment' from this document.
- * Frees 'path'.
- */
-static void get_comment(MIME_type *type, guchar *path)
+/* Try to fill in 'type->comment' from this document */
+static void get_comment(MIME_type *type, const guchar *path)
 {
 	xmlNode *node;
 	XMLwrapper *doc;
 	
 	doc = xml_cache_load(path);
-	g_free(path);
 	if (!doc)
 		return;
 
@@ -1325,13 +1322,11 @@ static void get_comment(MIME_type *type, guchar *path)
 	g_object_unref(doc);
 }
 
-/* Fill in the comment field for this MIME type.
- *
- * g_object_unref() the result.
- */
+/* Fill in the comment field for this MIME type */
 static void find_comment(MIME_type *type)
 {
-	guchar *path;
+	char **dirs;
+	int i, n_dirs;
 
 	if (type->comment)
 	{
@@ -1339,25 +1334,27 @@ static void find_comment(MIME_type *type)
 		type->comment = NULL;
 	}
 
-	path = g_strdup_printf("%s/.mime/%s/%s.xml", home_dir,
-			type->media_type, type->subtype);
-	get_comment(type, path);
-	if (type->comment)
-		return;
+	dirs = get_xdg_data_dirs(&n_dirs);
+	g_return_if_fail(dirs != NULL);
 
-	path = g_strdup_printf("/usr/local/share/mime/%s/%s.xml",
-			type->media_type, type->subtype);
-	get_comment(type, path);
-	if (type->comment)
-		return;
+	for (i = 0; i < n_dirs; i++)
+	{
+		guchar *path;
+		
+		path = g_strdup_printf("%s/mime/%s/%s.xml", dirs[i],
+				type->media_type, type->subtype);
+		get_comment(type, path);
+		g_free(path);
+		if (type->comment)
+			break;
+	}
 
-	path = g_strdup_printf("/usr/share/mime/%s/%s.xml",
-			type->media_type, type->subtype);
-	get_comment(type, path);
-	if (type->comment)
-		return;
+	if (!type->comment)
+		type->comment = g_strdup(_("No description"));
 
-	type->comment = g_strdup(_("No description"));
+	for (i = 0; i < n_dirs; i++)
+		g_free(dirs[i]);
+	g_free(dirs);
 }
 
 const char *mime_type_comment(MIME_type *type)
