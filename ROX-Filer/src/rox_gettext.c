@@ -78,12 +78,17 @@ void rox_add_translations(const char *path)
 {
 	guint32		magic;
 	char		*data, *from_base, *to_base;
-	long		size;
+	gsize		size;
 	gboolean	swap;		/* TRUE => reverse byte-order of ints */
 	int		n, n_total;
+	GError		*error = NULL;
 
-	if (load_file(path, &data, &size) == FALSE)
-		goto out;
+	if (!g_file_get_contents(path, &data, &size, &error))
+	{
+		delayed_error("%s", error ? error->message : path);
+		g_error_free(error);
+		return;
+	}
 
 	if (size < 20)
 	{
