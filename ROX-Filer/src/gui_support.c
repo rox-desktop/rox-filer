@@ -1232,9 +1232,11 @@ void keep_below(GdkWindow *window, gboolean setting)
 	}
 	else
 	{
-		gdk_synthesize_window_state(window,
+#if GTK_CHECK_VERSION(2,4,0)
+	  gdk_synthesize_window_state(window,
 				setting ? GDK_WINDOW_STATE_ABOVE :
 					GDK_WINDOW_STATE_BELOW,
 				setting ? GDK_WINDOW_STATE_BELOW : 0);
+#endif
 	}
 }
