@@ -262,7 +262,7 @@ void icon_prepare_menu(Icon *icon, gboolean pinboard)
 		if (!can_set_run_action(icon->item))
 			menu_set_items_shaded(icon_file_menu, TRUE, 2, 1);
 
-		tmp = g_strdup_printf("%s '%s'",
+		tmp = g_strdup_printf(_("%s '%s'"),
 				basetype_name(icon->item),
 				icon->item->leafname);
 		gtk_label_set_text(GTK_LABEL(icon_file_item), tmp);
