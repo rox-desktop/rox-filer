@@ -2,13 +2,11 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _ACTION_H
 #define _ACTION_H
-
-#include "filer.h"
 
 void action_init(void);
 

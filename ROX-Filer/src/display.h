@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _DISPLAY_H
@@ -12,7 +12,6 @@
 
 #include <gtk/gtk.h>
 #include "collection.h"
-#include "pixmaps.h"
 #include <sys/types.h>
 #include <dirent.h>
 
@@ -33,8 +32,6 @@ typedef enum {
 extern guchar *last_layout;
 extern gboolean last_show_hidden;
 extern int (*last_sort_fn)(const void *a, const void *b);
-
-#include "filer.h"
 
 /* Prototypes */
 void display_init();

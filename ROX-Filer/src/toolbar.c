@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -25,11 +25,15 @@
 
 #include <string.h>
 
+#include "global.h"
+
 #include "toolbar.h"
 #include "options.h"
 #include "support.h"
 #include "main.h"
 #include "dnd.h"
+#include "filer.h"
+#include "pixmaps.h"
 
 extern int collection_menu_button;
 
@@ -116,7 +120,7 @@ GtkWidget *toolbar_new(FilerWindow *filer_window)
 
 static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_opendir(make_path(app_dir, "Help")->str, PANEL_NO);
+	filer_opendir(make_path(app_dir, "Help")->str);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,
@@ -128,7 +132,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 	if (event->type == GDK_BUTTON_RELEASE &&
 			((GdkEventButton *) event)->button != 1)
 	{
-		filer_opendir(filer_window->path, PANEL_NO);
+		filer_opendir(filer_window->path);
 	}
 	else
 	{
@@ -144,7 +148,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE && NEW_WIN_BUTTON(event))
 	{
-		filer_opendir(home_dir, PANEL_NO);
+		filer_opendir(home_dir);
 	}
 	else
 		filer_change_to(filer_window, home_dir, NULL);

@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -24,21 +24,21 @@
 #include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/wait.h>
 #include <sys/param.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
 #include <string.h>
 
 #include <gtk/gtk.h>
 
+#include "global.h"
+
 #include "menu.h"
 #include "run.h"
 #include "action.h"
 #include "filer.h"
+#include "pixmaps.h"
 #include "type.h"
 #include "support.h"
 #include "gui_support.h"
@@ -49,6 +49,8 @@
 #include "minibuffer.h"
 #include "i18n.h"
 #include "main.h"
+#include "pinboard.h"
+#include "dir.h"
 
 #define C_ "<control>"
 
@@ -82,6 +84,7 @@ static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 static gint save_to_file(GtkSavebox *savebox, guchar *pathname);
 static GList *list_paths(FilerWindow *filer_window);
 static void free_paths(GList *paths);
+static void mark_menus_unmodified(void);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 static void large(gpointer data, guint action, GtkWidget *widget);
@@ -335,7 +338,10 @@ void menu_init()
 
 	menurc = choices_find_path_load("menus", PROJECT);
 	if (menurc)
+	{
 		gtk_item_factory_parse_rc(menurc);
+		mark_menus_unmodified();
+	}
 
 	gtk_accel_group_lock(panel_keys);
 	
@@ -1401,7 +1407,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 			"this directory because the `Unique Windows' option "
 			"is turned on in the Options window."));
 	else
-		filer_opendir(window_with_focus->path, PANEL_NO);
+		filer_opendir(window_with_focus->path);
 }
 
 static void close_window(gpointer data, guint action, GtkWidget *widget)
@@ -1441,14 +1447,14 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 
 void rox_help(gpointer data, guint action, GtkWidget *widget)
 {
-	filer_opendir(make_path(app_dir, "Help")->str, PANEL_NO);
+	filer_opendir(make_path(app_dir, "Help")->str);
 }
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 	
-	filer_opendir(window_with_focus->path, PANEL_NO);
+	filer_opendir(window_with_focus->path);
 }
 
 static void close_panel(gpointer data, guint action, GtkWidget *widget)
@@ -1530,11 +1536,49 @@ static void set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n)
 	g_list_free(items);
 }
 
+/* This is called for every modified menu entry. We just use it to
+ * find out if the menu has changed at all.
+ */
+static void set_mod(gboolean *mod, guchar *str)
+{
+	if (str && str[0] == '(')
+		*mod = TRUE;
+}
+
 static void save_menus(void)
 {
 	char	*menurc;
 	
 	menurc = choices_find_path_save("menus", PROJECT, TRUE);
 	if (menurc)
-		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
+	{
+		gboolean	mod = FALSE;
+
+		/* Find out if anything changed... */
+		gtk_item_factory_dump_items(NULL, TRUE,
+				(GtkPrintFunc) set_mod, &mod);
+
+		/* Dump out if so... */
+		if (mod)
+			gtk_item_factory_dump_rc(menurc, NULL, TRUE);
+	}
+}
+
+static void mark_unmodified(gpointer hash_key,
+			    gpointer value,
+			    gpointer user_data)
+{
+	GtkItemFactoryItem *item = (GtkItemFactoryItem *) value;
+
+	item->modified = FALSE;
+}
+
+/* Clear the 'modified' flag in all menu items. Messy... */
+static void mark_menus_unmodified(void)
+{
+	GtkItemFactoryClass	*class;
+
+	class = gtk_type_class(GTK_TYPE_ITEM_FACTORY);
+
+	g_hash_table_foreach(class->item_ht, mark_unmodified, NULL);
 }

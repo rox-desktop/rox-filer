@@ -6,7 +6,7 @@
  * them and provides signals to allow popping up menus, detecting double-clicks
  * etc.
  *
- * Thomas Leonard, <tal197@ecs.soton.ac.uk>
+ * Thomas Leonard, <tal197@users.sourceforge.net>
  */
 
 

@@ -2,14 +2,11 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _MENU_H
 #define _MENU_H
-
-#include "filer.h"
-#include "pinboard.h"
 
 extern GtkAccelGroup	*filer_keys;
 extern GtkWidget 	*popup_menu;

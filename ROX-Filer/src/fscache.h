@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Thomas Leonard, <tal197@ecs.soton.ac.uk>
+ * Thomas Leonard, <tal197@users.sourceforge.net>
  */
 
 
@@ -12,7 +12,6 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <time.h>
-
 #include <glib.h>
 
 typedef struct _GFSCache GFSCache;

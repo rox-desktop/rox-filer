@@ -2,16 +2,11 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _PINBOARD_H
 #define _PINBOARD_H
-
-#include <glib.h>
-
-typedef struct _Pinboard Pinboard;
-typedef struct _PinIcon PinIcon;
 
 void pinboard_init(void);
 void pinboard_activate(guchar *name);

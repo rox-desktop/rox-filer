@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -20,14 +20,15 @@
  */
 /* choices.c - code for handling loading and saving of user choices */
 
+#include "config.h"
+
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/stat.h>
-#include <sys/types.h>
 #include <sys/param.h>
 #include <fcntl.h>
-#include <unistd.h>
 #include <errno.h>
+
+#include "global.h"
 
 #include "choices.h"
 

@@ -2,15 +2,13 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _RUN_H
 #define _RUN_H
 
 #include <gtk/gtk.h>
-
-#include <dir.h>
 
 void run_app(char *path);
 void run_with_files(char *path, GSList *uri_list);

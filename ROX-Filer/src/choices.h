@@ -1,13 +1,11 @@
 /*
  * $Id$
  *
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _CHOICES_H
 #define _CHOICES_H
-
-#include <glib.h>
 
 void 		choices_init	       (void);
 GPtrArray	*choices_list_dirs     (char *dir);

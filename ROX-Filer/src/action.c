@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -29,13 +29,11 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include <sys/param.h>
-#include <unistd.h>
 #include <errno.h>
-#include <sys/types.h>
-#include <sys/stat.h>
 #include <signal.h>
-#include <dirent.h>
 #include <sys/time.h>
+
+#include "global.h"
 
 #include "action.h"
 #include "string.h"
@@ -46,6 +44,7 @@
 #include "options.h"
 #include "modechange.h"
 #include "find.h"
+#include "dir.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -296,7 +295,7 @@ static void select_row_callback(GtkWidget *widget,
 		return;
 	}
 
-	gui_side->preview = filer_opendir(dir, PANEL_NO);
+	gui_side->preview = filer_opendir(dir);
 	if (gui_side->preview)
 	{
 		display_set_autoselect(gui_side->preview, leaf);

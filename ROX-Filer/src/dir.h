@@ -1,14 +1,13 @@
 /*
  * $Id$
  *
- * Thomas Leonard, <tal197@ecs.soton.ac.uk>
+ * Thomas Leonard, <tal197@users.sourceforge.net>
  */
 
 
 #ifndef _DIR_H
 #define _DIR_H
 
-#include <glib.h>
 #include <sys/types.h>
 #include <dirent.h>
 
@@ -20,8 +19,6 @@ typedef enum {
 	DIR_UPDATE,	/* Redraw these items */
 } DirAction;
 
-typedef struct _Directory Directory;
-typedef struct _DirItem DirItem;
 typedef struct _DirUser DirUser;
 typedef void (*DirCallback)(Directory *dir,
 			DirAction action,
@@ -40,8 +37,6 @@ typedef enum
 } ItemFlags;
 
 #include "fscache.h"
-#include "pixmaps.h"
-#include "type.h"
 
 extern GFSCache *dir_cache;
 

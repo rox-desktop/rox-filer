@@ -2,13 +2,12 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _TYPE_H
 #define _TYPE_H
 
-typedef struct _MIME_type MIME_type;
 extern MIME_type text_plain;		/* Often used as a default type */
 extern MIME_type special_directory;
 extern MIME_type special_pipe;
@@ -16,9 +15,6 @@ extern MIME_type special_socket;
 extern MIME_type special_block_dev;
 extern MIME_type special_char_dev;
 extern MIME_type special_unknown;
-
-#include "pixmaps.h"
-#include "filer.h"
 
 enum
 {

@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _DND_H
@@ -10,7 +10,6 @@
 
 #include <gtk/gtk.h>
 #include "collection.h"
-#include "filer.h"
 
 extern gboolean o_no_hostnames;
 extern char *drop_dest_prog;

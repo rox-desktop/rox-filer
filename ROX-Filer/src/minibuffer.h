@@ -2,7 +2,7 @@
  * $Id*
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _MINIBUFFER_H
@@ -17,7 +17,6 @@ typedef enum {
 } MiniType;
 
 #include <gtk/gtk.h>
-#include "filer.h"
 
 void create_minibuffer(FilerWindow *filer_window);
 void minibuffer_show(FilerWindow *filer_window, MiniType mini_type);

@@ -2,13 +2,12 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _MAIN_H
 #define _MAIN_H
 
-#include <glib.h>
 #include <sys/types.h>
 
 typedef struct _Callback Callback;

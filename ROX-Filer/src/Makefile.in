@@ -43,6 +43,9 @@ depend:
 Makefile: Makefile.in config.status
 	./config.status
 
+config.h: config.h.in
+	./config.status
+
 config.status: configure
 	./configure --bindir=${PLATFORM_DIR}
 

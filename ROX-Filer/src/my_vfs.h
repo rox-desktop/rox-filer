@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _MY_VFS_H
@@ -42,6 +42,14 @@ int mc_fstat (int fd, struct stat *buf);
 #else	/* HAVE_LIBVFS */
 
 /* We don't have VFS installed. Just use the normal functions instead. */
+
+/* Include these here so that we don't get code that compiles with
+ * VFS but not without.
+ */
+#  include <sys/stat.h>
+#  include <unistd.h>
+#  include <sys/types.h>
+#  include <dirent.h>
 
 #  define mc_open open
 #  define mc_close close

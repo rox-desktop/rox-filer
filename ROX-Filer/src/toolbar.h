@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _TOOLBAR_H
@@ -16,8 +16,6 @@ typedef enum {
 	TOOLBAR_NORMAL 	= 1,
 	TOOLBAR_LARGE 	= 2,
 } ToolbarType;
-
-#include "filer.h"
 
 extern ToolbarType o_toolbar;
 

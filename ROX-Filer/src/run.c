@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -23,10 +23,11 @@
 
 #include "config.h"
 
-#include <sys/stat.h>
 #include <errno.h>
 #include <string.h>
 #include <sys/param.h>
+
+#include "global.h"
 
 #include "stdlib.h"
 #include "support.h"
@@ -34,7 +35,10 @@
 #include "filer.h"
 #include "menu.h"
 #include "main.h"
+#include "type.h"
+#include "dir.h"
 #include "action.h"
+#include "pinboard.h"
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
@@ -224,7 +228,7 @@ gboolean run_diritem(guchar *full_path,
 			if (filer_window)
 				filer_change_to(filer_window, full_path, NULL);
 			else
-				filer_opendir(full_path, PANEL_NO);
+				filer_opendir(full_path);
 			return TRUE;
 		case TYPE_FILE:
 			if ((item->flags & ITEM_FLAG_EXEC_FILE) && !edit)
@@ -363,13 +367,13 @@ void run_list(guchar *to_open)
 				pinboard_activate(value);
 				break;
 			case 'd':
-				filer_opendir(value, PANEL_NO);
+				filer_opendir(value);
 				break;
 			case 't':
-				filer_opendir(value, PANEL_TOP);
+				filer_openpanel(value, PANEL_TOP);
 				break;
 			case 'b':
-				filer_opendir(value, PANEL_BOTTOM);
+				filer_openpanel(value, PANEL_BOTTOM);
 				break;
 			default:
 				g_warning("Don't know how to handle '%s'",
@@ -473,7 +477,7 @@ static gboolean follow_symlink(char *full_path, FilerWindow *filer_window)
 	{
 		FilerWindow *new;
 		
-		new = filer_opendir(new_dir, PANEL_NO);
+		new = filer_opendir(new_dir);
 		display_set_autoselect(new, slash + 1);
 	}
 
@@ -519,6 +523,6 @@ static void app_show_help(char *path)
 			"Shift while you open it). Most applications provide "
 			"their own help here, but this one doesn't."));
 	else
-		filer_opendir(help_dir, PANEL_NO);
+		filer_opendir(help_dir);
 }
 

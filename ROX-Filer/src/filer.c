@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -35,6 +35,8 @@
 #include <gdk/gdkkeysyms.h>
 #include "collection.h"
 
+#include "global.h"
+
 #include "main.h"
 #include "support.h"
 #include "gui_support.h"
@@ -42,6 +44,7 @@
 #include "pixmaps.h"
 #include "menu.h"
 #include "dnd.h"
+#include "dir.h"
 #include "run.h"
 #include "mount.h"
 #include "type.h"
@@ -742,7 +745,7 @@ void filer_open_parent(FilerWindow *filer_window)
 	if (slash)
 	{
 		*slash = '\0';
-		filer_opendir(*copy ? copy : "/", PANEL_NO);
+		filer_opendir(*copy ? copy : "/");
 	}
 	else
 		g_warning("No / in directory path!\n");
@@ -850,10 +853,16 @@ static void start_drag_selection(Collection *collection,
 	}
 }
 
+/* Creates and shows a new filer window */
+FilerWindow *filer_opendir(char *path)
+{
+	return filer_openpanel(path, PANEL_NO);
+}
+
 /* Creates and shows a new filer window.
- * panel_type should normally be PANEL_NO (for a normal window).
+ * panel_type may be PANEL_NO for a normal window.
  */
-FilerWindow *filer_opendir(char *path, PanelType panel_type)
+FilerWindow *filer_openpanel(char *path, PanelType panel_type)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;

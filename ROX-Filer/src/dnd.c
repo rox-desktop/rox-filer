@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -25,8 +25,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <unistd.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
@@ -37,7 +35,10 @@
 #include <gtk/gtk.h>
 #include "collection.h"
 
+#include "global.h"
+
 #include "dnd.h"
+#include "type.h"
 #include "filer.h"
 #include "action.h"
 #include "pixmaps.h"
@@ -46,6 +47,7 @@
 #include "options.h"
 #include "run.h"
 #include "pinboard.h"
+#include "dir.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
@@ -1315,7 +1317,7 @@ static gboolean spring_now(gpointer data)
 	}
 	else
 	{
-		spring_window = filer_opendir(dest_path, PANEL_NO);
+		spring_window = filer_opendir(dest_path);
 		gtk_timeout_add(500, spring_check_idle, NULL);
 		gtk_signal_connect(GTK_OBJECT(spring_window->window), "destroy",
 				GTK_SIGNAL_FUNC(spring_win_destroyed), NULL);

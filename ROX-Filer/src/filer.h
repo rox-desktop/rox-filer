@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _FILER_H
@@ -10,11 +10,7 @@
 
 #include <gtk/gtk.h>
 #include "collection.h"
-#include "pixmaps.h"
-#include <sys/types.h>
-#include <dirent.h>
 
-typedef struct _FilerWindow FilerWindow;
 typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
 
 typedef enum
@@ -33,8 +29,6 @@ typedef enum
 
 #include "mount.h"
 #include "minibuffer.h"
-#include "dir.h"
-#include "type.h"
 #include "display.h"
 
 struct _FilerWindow
@@ -78,7 +72,8 @@ extern gboolean 	o_new_window_on_1;
 
 /* Prototypes */
 void filer_init(void);
-FilerWindow *filer_opendir(char *path, PanelType panel_type);
+FilerWindow *filer_opendir(char *path);
+FilerWindow *filer_openpanel(char *path, PanelType panel_type);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);

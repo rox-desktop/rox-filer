@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _PIXMAP_H
@@ -12,8 +12,6 @@
 #include "fscache.h"
 
 extern GFSCache *pixmap_cache;
-
-typedef struct _MaskedPixmap MaskedPixmap;
 
 extern MaskedPixmap *im_error;
 extern MaskedPixmap *im_unknown;

@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -33,9 +33,10 @@
 #include <gtk/gtk.h>
 #include <gtk/gtkinvisible.h>
 
+#include "global.h"
+
 #include "main.h"
 #include "support.h"
-#include "filer.h"
 #include "gui_support.h"
 #include "run.h"
 #include "remote.h"

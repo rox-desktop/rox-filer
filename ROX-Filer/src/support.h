@@ -2,14 +2,11 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 
 #ifndef _SUPPORT_H
 #define _SUPPORT_H
-
-#include <glib.h>
-#include <sys/types.h>
 
 #define PRETTY_SIZE_LIMIT 4096
 #define TIME_FORMAT "%T %d %b %Y"
