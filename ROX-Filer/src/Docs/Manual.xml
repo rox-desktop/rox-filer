@@ -354,8 +354,7 @@
       # Desktop mouse-button click to show the window list
       DesktopWinListButton=2 # [0-5]
       # Desktop mouse-button click to show the window list menu
-      DesktopMenuButton=0 # [0-20]
-     </programlisting>
+      DesktopMenuButton=0 # [0-20]</programlisting>
      Paste these into <filename>~/.icewm/winoptions</filename>:
 
      <programlisting>
@@ -370,8 +369,7 @@
       ROX-Pinboard.ignoreWinList: 1
       ROX-Pinboard.ignoreTaskBar: 1
       ROX-Pinboard.ignoreQuickSwitch: 1
-      ROX-Filer.layer: Normal
-     </programlisting>
+      ROX-Filer.layer: Normal</programlisting>
      Restart IceWM and the filer for the new settings to take effect.
 
     </para>
@@ -406,15 +404,15 @@
        menu. In the <guilabel>Attributes</guilabel> frame, choose the
        features you want the pinboard icons to have; I recommend the
        following:
+	<itemizedlist>
+	 <listitem><para>Disable titlebar</para></listitem>
+	 <listitem><para>Disable resizebar</para></listitem>
+	 <listitem><para>Disable close button</para></listitem>
+	 <listitem><para>Disable miniaturize button</para></listitem>
+	 <listitem><para>Keep at bottom (sunken)</para></listitem>
+	 <listitem><para>Omnipresent</para></listitem>
+	</itemizedlist>
        </para>
-       <simplelist>
-	<member>Disable titlebar</member>
-	<member>Disable resizebar</member>
-	<member>Disable close button</member>
-	<member>Disable miniaturize button</member>
-	<member>Keep at bottom (sunken)</member>
-	<member>Omnipresent</member>
-       </simplelist>
       </step>
 
       <step><para>
@@ -422,11 +420,11 @@
        menu. In the <guilabel>Advanced</guilabel> frame, choose the advanced
        features you wish; I recommend the following:
 
-       <simplelist>
-	<member>Do not show in the window list</member>
-	<member>Ignore 'Hide Others'</member>
-	<member>Ignore 'Save Session' (possibly)</member>
-       </simplelist>
+       <itemizedlist>
+	<listitem><para>Do not show in the window list</para></listitem>
+	<listitem><para>Ignore 'Hide Others'</para></listitem>
+	<listitem><para>Ignore 'Save Session' (possibly)</para></listitem>
+       </itemizedlist>
       </para></step>
 
       <step><para>
@@ -534,7 +532,7 @@
      <row><entry>Right button click</entry><entry>
        Open the main menu. Hold down <keycap>Control</keycap> while clicking to go
        directly to the Selection submenu. Hold down <keycap>Shift</keycap> to get the
-       <guimenu>Send To</guimenu> menu. See the <xref linkend="SendTo"/> section.
+       <guimenu>Send To</guimenu> menu (see the <xref linkend="SendTo"/> section).
      </entry></row>
 
      <row><entry>Drag an item  (left mouse button)</entry><entry>
@@ -978,21 +976,21 @@
   <sect1>
    <title>The file menu</title>
    <para>
-
     All of these work in the same way &mdash; if you open the menu with some
     items selected then the operation applies to those items. If you open
     then menu over an item while there is no selection then that item
-    is temporarily selected. If you choose one of these while there is
-    no selection at all then the window goes into `target mode'; the operation
-    happens to the next item you click on. Click on the window background,
-    press Escape, or click with the right mouse button to cancel target
-    mode. Target mode is mainly useful with the `Single click navigation'
-    option and keys bound to the various menu entries.
-
+    is temporarily selected.
+    </para><para>
+    If you choose one of these while there is no selection at all then the
+    window goes into `target mode'; the operation happens to the next item you
+    click on. Click on the window background, press <keycap>Escape</keycap>, or
+    click with the right mouse button to cancel target mode. Target mode is
+    mainly useful with the <guilabel>Single-click navigation in filer
+    windows</guilabel> option and keys bound to the various menu entries.
+    </para><para>
     Note that individual applications may add extra menu items to the
     top of this submenu when you click over them &mdash; see
     <xref linkend="AppDir"/> for details.
-
 
     <informaltable><tgroup cols="2">
       <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
@@ -1017,9 +1015,9 @@
          <guimenuitem>Shift Open</guimenuitem></entry><entry>
          Opens applications as directories, files as text/plain, mount points by
          mounting or unmounting them and symlinks by opening the directory containing
-         the thing they point to. This is the same effect as clicking with Shift
-         held down. The text of the menu entry changes to show which action
-         will be performed.
+         the thing they point to. This is the same effect as clicking with
+	 <keycap>Shift</keycap> held down. The text of the menu entry changes
+	 to show which action will be performed.
        </entry></row>
 
        <row><entry>
@@ -1130,7 +1128,7 @@
        <row><entry>
          <guimenuitem>Select If...</guimenuitem></entry><entry>
          Select just those files that match the given pattern &mdash;
-         see the <xref linkend="SelectIf"/> section).
+         see the <xref linkend="SelectIf"/> section.
        </entry></row>
 
     </tbody></tgroup></informaltable>
@@ -1179,8 +1177,7 @@
  &lt;body&gt;
   The contents.
  &lt;/body&gt;
-&lt;/html&gt;
-    </programlisting>
+&lt;/html&gt;</programlisting>
 
     Save this as <filename>index.html</filename> inside the
     <filename>Templates</filename> directory and you can easily create new
@@ -1243,7 +1240,8 @@
 
        <row><entry>
          <guimenuitem>Show ROX-Filer Help</guimenuitem></entry><entry>
-         Same as selecting ROX-Filer and choosing `Help' from the menu.
+	 Same as selecting ROX-Filer and choosing
+	 <guimenuitem>Help</guimenuitem> from the menu.
        </entry></row>
 
     </tbody></tgroup></informaltable>
@@ -1454,9 +1452,9 @@
   <para>
 
    The mini-buffer is a white bar that appears along the bottom of the
-   window and allows you to enter some text. Press Escape to get rid
-   of it again. It behaves in different ways depending on how you invoked
-   it:
+   window and allows you to enter some text. Press <keycap>Escape</keycap> to
+   get rid of it again. It behaves in different ways depending on how you
+   invoked it:
   </para>
 
   <sect1>
@@ -1500,11 +1498,11 @@
    <para>
     Tab completion tries to fill in as many characters for you as it can.
     For example, if there are two files in a directory called `save-mail-nov-1999'
-    and `save-mail-dec-1999' then typing 'save' and pressing Tab will
-    expand `save' to `save-mail-' and beep to indicate that the match
-    is not complete. If you use tab completion on a directory and it is
-    unique then the filer will automatically change into the directory.
-    This behavior should be familiar to shell users.
+    and `save-mail-dec-1999' then typing 'save' and pressing
+    <keycap>Tab</keycap> will expand `save' to `save-mail-' and beep to
+    indicate that the match is not complete. If you use tab completion on a
+    directory and it is unique then the filer will automatically change into
+    the directory. This behavior should be familiar to shell users.
    </para>
 
    <informalexample><para>
@@ -1554,8 +1552,6 @@
     </para><para>
     Opening the minibuffer with a selection adds <computeroutput>$@</computeroutput>
     to the end of the command &mdash; this expands to all the selected files.
-    If there is no selection, but a file is under the cursor, the name
-    of that file is inserted.
    </para>
 
    <informalexample><para>Examples:
@@ -1910,8 +1906,7 @@
 
      Not isdir and not isreg
 
-     !-d !-f
-    </screen>
+     !-d !-f</screen>
     All four do the same thing.
    </para>
   </sect1>
@@ -2036,14 +2031,13 @@
 
      size &gt; 10 Mb
 
-     IsReg and nlinks &gt; 1
-    </screen>
+     IsReg and nlinks &gt; 1</screen>
     The first finds files modified within the last 24 hours. You could
     use <userinput>&gt;</userinput> instead of <userinput>after</userinput>,
     but it's not so clear what is meant.
     </para><para>
-    The second finds files larger than 10 Mb and the last finds
-    regular files with more than one directory entry.
+    The second finds files larger than 10 Mb. The last finds regular files with
+    more than one directory entry.
     </para><para>
     Be careful though &mdash; the filer doesn't check the context of the
     modifiers, so <userinput>size &gt; 1 day ago</userinput> is allowed,
@@ -2073,9 +2067,7 @@
        so do it last if possible.  For example, if you're looking for a
        <filename>.c</filename> file containing the word `main', do:
 
-       <screen>
-        '*.c' system(grep -q main "%")
-       </screen>
+       <screen>'*.c' system(grep -q main "%")</screen>
        so that the grep is only performed for files ending in <filename>.c</filename>
        (as opposed to only checking that the file ends in <filename>.c</filename> if
        it contains the word `main').
@@ -2099,8 +2091,7 @@
     <screen>
      '*.old' system(rm '%')
 
-     'src' prune, '*.c'
-    </screen>
+     'src' prune, '*.c'</screen>
     The first deletes each file ending in <filename>.old</filename>.
     The second looks for <filename>.c</filename> files, but does not bother
     checking inside directories called <filename>src</filename>.
@@ -2735,8 +2726,7 @@
    &lt;Item label="Enable pinboard" option="-p=Default"/&gt;
    &lt;Item label="Disable pinboard" option="-p="/&gt;
   &lt;/AppMenu&gt;
-&lt;/AppInfo&gt;
-    </screen>
+&lt;/AppInfo&gt;</screen>
 
     <itemizedlist>
 
@@ -2801,8 +2791,7 @@
 
        <screen>
         $ cd ROX-Filer/src
-        $ make messages.pot
-       </screen>
+        $ make messages.pot</screen>
 
      </para></listitem>
 
@@ -2828,8 +2817,7 @@
        <screen>
         $ cd ROX-Filer/src/po
         $ ./make-mo ml
-        Created file ../../Messages/ml.gmo OK
-       </screen>
+        Created file ../../Messages/ml.gmo OK</screen>
      </para></listitem>
 
      <listitem><para>Edit <filename>ROX-Filer/Options.xml</filename> so that
@@ -2857,8 +2845,7 @@
 
        <screen>
         $ cd ROX-Filer/src/po
-        $ ./update-po
-       </screen>
+        $ ./update-po</screen>
      </para></listitem>
 
      <listitem><para>Edit the file by hand as before, filling in the new blanks
@@ -2913,8 +2900,7 @@
     <screen>
      $ cd ROX-Filer/src
      $ patch &lt; patchfile
-     $ ../AppRun --compile
-    </screen>
+     $ ../AppRun --compile</screen>
 
     You can remove the patch by simply repeating the above sequence &mdash;
     <command>patch</command> will detect that the patch is already applied
@@ -2925,9 +2911,7 @@
     Modify the program as you please. Create the patch using
     <command>cvs diff</command> from the appropriate directory:
 
-    <screen>
-     $ cvs diff -c &gt; my_patch
-    </screen>
+    <screen>$ cvs diff -u &gt; my_patch</screen>
 
     This creates a human&ndash; and machine-readable patch file. Submit this
     to the mailing list. The are many reasons for posting patches rather
@@ -3227,8 +3211,7 @@
     &lt;/Panel&gt;
     &lt;/env:Body&gt;
     &lt;/env:Envelope&gt;
-    EOF
-   </screen>
+    EOF</screen>
 
    The following methods are recognised:</para>
 
