@@ -166,8 +166,8 @@ void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
 
 /* As g_fscache_lookup, but 'lookup_type' controls what happens if the data
  * is out-of-date.
- * If found is not NULL, use it to indicate whether the cache has an entry
- * for this file (a NULL return could indicate that the data is cached, but
+ * If found is not NULL, use it to indicate whether something is being
+ * returned (a NULL return could indicate that the data is cached, but
  * the data is NULL).
  */
 gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
@@ -181,28 +181,26 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 	g_return_val_if_fail(cache != NULL, NULL);
 	g_return_val_if_fail(pathname != NULL, NULL);
 
+	if (found)
+		*found = FALSE;
+
 	if (mc_stat(pathname, &info))
-	{
-		if (found)
-			*found = FALSE;
 		return NULL;
-	}
 
 	key.device = info.st_dev;
 	key.inode = info.st_ino;
 
 	data = g_hash_table_lookup(cache->inode_to_stats, &key);
 
-	if (found)
-		*found = (data != NULL);
-
 	if (data)
 	{
 		/* We've cached this file already */
 
-		if (lookup_type == FSCACHE_LOOKUP_PEEK ||
-		    lookup_type == FSCACHE_LOOKUP_INIT)
+		if (lookup_type == FSCACHE_LOOKUP_PEEK)
 			goto out;	/* Never update on peeks */
+
+		if (lookup_type == FSCACHE_LOOKUP_INIT)
+			goto init;
 		
 		/* Is it up-to-date? */
 
@@ -238,6 +236,7 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 		g_hash_table_insert(cache->inode_to_stats, new_key, data);
 	}
 
+init:
 	data->m_time = info.st_mtime;
 	data->length = info.st_size;
 	data->mode = info.st_mode;
@@ -249,6 +248,9 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 			data->data = cache->load(pathname, cache->user_data);
 	}
 out:
+	if (found)
+		*found = TRUE;
+
 	data->last_lookup = time(NULL);
 	if (lookup_type == FSCACHE_LOOKUP_INIT)
 		return data;

@@ -253,7 +253,7 @@ void pixmap_make_small(MaskedPixmap *mp)
 #endif
 
 /* Load image 'path' in the background and insert into pixmap_cache.
- * Call callback(data, path) when done (PATH is NULL error).
+ * Call callback(data, path) when done (path is NULL => error).
  * If the image is already uptodate, or being created already, calls the
  * callback right away.
  */
@@ -268,7 +268,7 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 	image = g_fscache_lookup_full(pixmap_cache, path,
 					FSCACHE_LOOKUP_ONLY_NEW, &found);
 
-	if (image || found)
+	if (found)
 	{
 		/* Thumbnail is known, or being created */
 		callback(data, NULL);

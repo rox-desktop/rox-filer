@@ -567,6 +567,8 @@ void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
 		filer_cancel_thumbnails(filer_window);
 
 	filer_set_title(filer_window);
+
+	filer_create_thumbs(filer_window);
 }
 
 /* Set the 'Show Hidden' flag for this window */
@@ -1390,25 +1392,12 @@ void display_update_view(FilerWindow *filer_window,
 	if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
 		strcmp(item->mime_type->media_type, "image") == 0)
 	{
-		gboolean found;
 		gchar    *path;
 
 		path = make_path(filer_window->path, item->leafname)->str;
 
 		view->image = g_fscache_lookup_full(pixmap_cache, path,
-			FSCACHE_LOOKUP_ONLY_NEW, &found);
-
-		/* If we didn't get an image, it could be because:
-		 *
-		 * - We're loading the image now. found is TRUE,
-		 *   and we'll update the item later.
-		 * - We tried to load the image and failed. found
-		 *   is TRUE.
-		 * - We haven't tried loading the image. found is
-		 *   FALSE, and we start creating the thumb here.
-		 */
-		if (view->image == NULL && !found)
-			filer_create_thumb(filer_window, path);
+				FSCACHE_LOOKUP_ONLY_NEW, NULL);
 	}
 
 	if (!view->image)

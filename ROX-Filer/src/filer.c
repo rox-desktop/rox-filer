@@ -453,6 +453,8 @@ static void update_display(Directory *dir,
 			g_free(filer_window->auto_select);
 			filer_window->auto_select = NULL;
 
+			filer_create_thumbs(filer_window);
+
 			if (filer_window->thumb_queue)
 				start_thumb_scanning(filer_window);
 			break;
@@ -2388,4 +2390,46 @@ void filer_create_thumb(FilerWindow *filer_window, gchar *path)
 		return;			/* Will start when scan ends */
 
 	start_thumb_scanning(filer_window);
+}
+
+/* If thumbnail display is on, look through all the items in this directory
+ * and start creating or updating the thumbnails as needed.
+ */
+void filer_create_thumbs(FilerWindow *filer_window)
+{
+	Collection *collection = filer_window->collection;
+	int i;
+
+	if (!filer_window->show_thumbs)
+		return;
+
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		DirItem	 *item = (DirItem *) collection->items[i].data;
+		gchar    *path;
+		gboolean found;
+
+		 if (item->base_type != TYPE_FILE)
+			 continue;
+
+		 if (strcmp(item->mime_type->media_type, "image") != 0)
+			 continue;
+
+		path = make_path(filer_window->path, item->leafname)->str;
+
+		g_fscache_lookup_full(pixmap_cache, path,
+				FSCACHE_LOOKUP_ONLY_NEW, &found);
+
+		/* If we didn't get an image, it could be because:
+		 *
+		 * - We're loading the image now. found is TRUE,
+		 *   and we'll update the item later.
+		 * - We tried to load the image and failed. found
+		 *   is TRUE.
+		 * - We haven't tried loading the image. found is
+		 *   FALSE, and we start creating the thumb here.
+		 */
+		if (!found)
+			filer_create_thumb(filer_window, path);
+	}
 }

@@ -111,5 +111,6 @@ GList *filer_selected_items(FilerWindow *filer_window);
 void filer_create_thumb(FilerWindow *filer_window, gchar *pathname);
 void filer_cancel_thumbnails(FilerWindow *filer_window);
 void filer_set_title(FilerWindow *filer_window);
+void filer_create_thumbs(FilerWindow *filer_window);
 
 #endif /* _FILER_H */
