@@ -1039,6 +1039,8 @@ static void find(gpointer data, guint action, GtkWidget *widget)
 static void savebox_show(guchar *title, guchar *path, MaskedPixmap *image,
 		gboolean (*callback)(guchar *current, guchar *new))
 {
+	g_return_if_fail(image != NULL);
+	
 	if (GTK_WIDGET_VISIBLE(savebox))
 		gtk_widget_hide(savebox);
 
@@ -1138,6 +1140,9 @@ static void src_dest_action_item(guchar *prompt,
 		guchar	*path;
 
 		item = selected_item(collection);
+
+		g_return_if_fail(item->image != NULL);	/* XXX */
+
 		path = make_path(window_with_focus->path, item->leafname)->str;
 		pixmap_ref(item->image);
 		savebox_show(title, path, item->image, callback);

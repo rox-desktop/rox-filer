@@ -276,6 +276,8 @@ static gboolean recheck_callback(gpointer data)
 	leaf = (guchar *) next->data;
 	g_list_free_1(next);
 
+	/* usleep(800); */
+
 	insert_item(dir, leaf);
 
 	g_free(leaf);

@@ -365,6 +365,8 @@ void drag_one_item(GtkWidget		*widget,
 			full_path, "\r\n", NULL);
 	g_dataset_set_data_full(context, "uri_list", uri, g_free);
 
+	g_return_if_fail(item->image != NULL);
+
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),
 			item->image->pixmap,
