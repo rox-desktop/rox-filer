@@ -1511,12 +1511,46 @@ static void panel_set_style(Panel *panel)
 	gtk_widget_queue_resize(panel->window);
 }
 
+static gboolean recreate_panels(char **names)
+{
+	int i;
+
+	for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+	{
+		if (names[i])
+		{
+			panel_new(names[i], i);
+			g_free(names[i]);
+		}
+	}
+
+	g_free(names);
+	
+	return FALSE;
+}
+
 static void panel_style_changed(void)
 {
+	int i;
+
+	if (o_override_redirect.has_changed)
+	{
+		gchar **names;
+		
+		names = g_new(char *, PANEL_NUMBER_OF_SIDES);
+
+		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+		{
+			Panel *panel = current_panel[i];
+			names[i] = panel ? g_strdup(panel->name) : NULL;
+			panel_new(NULL, i);
+		}
+
+		g_idle_add((GtkFunction) recreate_panels, names);
+	}
+	
 	if (o_panel_style.has_changed)
 	{
-		int i;
-
 		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 		{
 			if (current_panel[i])

@@ -685,12 +685,31 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 				"used to set the background image."));
 }
 
+/* Do this in the idle loop so that we don't try to put an unmanaged
+ * pinboard behind a managed panel (crashes some WMs).
+ */
+static gboolean recreate_pinboard(gchar *name)
+{
+	pinboard_activate(name);
+	g_free(name);
+
+	return FALSE;
+}
+
 static void pinboard_check_options(void)
 {
 	GdkColor	n_fg, n_bg;
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &n_fg);
 	gdk_color_parse(o_pinboard_bg_colour.value, &n_bg);
+
+	if (o_override_redirect.has_changed && current_pinboard)
+	{
+		gchar *name;
+		name = g_strdup(current_pinboard->name);
+		pinboard_activate(NULL);
+		gtk_idle_add((GtkFunction) recreate_pinboard, name);
+	}
 
 	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
 

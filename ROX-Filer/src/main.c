@@ -159,7 +159,7 @@ static struct option long_opts[] =
 #endif
 
 /* Take control of panels away from WM? */
-gboolean override_redirect = FALSE;
+Option o_override_redirect;
 
 /* Always start a new filer, even if one seems to be already running */
 gboolean new_copy = FALSE;
@@ -258,6 +258,8 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;
 	}
 
+	option_add_int(&o_override_redirect, "override_redirect", FALSE);
+
 	/* The idea here is to convert the command-line arguments
 	 * into a SOAP RPC.
 	 * We attempt to invoke the call on an already-running copy of
@@ -306,7 +308,10 @@ int main(int argc, char **argv)
 				new_copy = TRUE;
 				break;
 			case 'o':
-				override_redirect = TRUE;
+				info_message(_("The -o argument is no longer "
+					"used. You can turn on override "
+					"redirect from the Options box "
+					"instead."));
 				break;
 			case 'v':
 				g_printerr("ROX-Filer %s\n", VERSION);

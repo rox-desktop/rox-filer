@@ -44,8 +44,10 @@
 #include "support.h"
 #include "pixmaps.h"
 #include "choices.h"
+#include "options.h"
 
-gint		screen_width, screen_height;
+/* XXX: RandR will break this! */
+gint	screen_width, screen_height;
 
 static GdkAtom xa_cardinal;
 
@@ -191,7 +193,7 @@ void make_panel_window(GtkWidget *widget)
 
 	g_return_if_fail(window != NULL);
 
-	if (override_redirect)
+	if (o_override_redirect.int_value)
 	{
 		gdk_window_set_override_redirect(window, TRUE);
 		return;
@@ -738,7 +740,7 @@ void entry_set_error(GtkWidget *entry, gboolean error)
 /* Change stacking position of higher to be just above lower */
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower)
 {
-	if (override_redirect && lower)
+	if (o_override_redirect.int_value && lower)
 	{
 		XWindowChanges restack;
 

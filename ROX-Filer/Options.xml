@@ -114,7 +114,6 @@ If on, ignores case and punctuation and handles numbers properly: file8, File9, 
     </frame>
     <frame label='Pinboard behaviour'>
       <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-      <toggle name='pinboard_forward_buttons_13' label='Pass all backdrop mouse clicks to window manager'>Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded.</toggle>
       <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
       <hbox label='Icon grid step:'>
         <radio-group name='pinboard_grid_step'>
@@ -173,7 +172,6 @@ operation, such as copying or deleting some files.</label>
   </section>
   <section title='Drag and Drop'>
     <frame label='General'>
-      <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
       <toggle name='dnd_drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
       <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
       <numentry name='dnd_spring_delay' label='Spring delay:' unit='ms' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
@@ -238,5 +236,14 @@ operation, such as copying or deleting some files.</label>
         </hbox>
       </frame>
     </section>
+  </section>
+  <section title='Compatibility'>
+    <frame label='Window manager problems'>
+      <toggle name='override_redirect' label='Override window manager control of the pinboard and panels'>Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists.</toggle>
+      <toggle name='pinboard_forward_buttons_13' label='Pass all backdrop mouse clicks to window manager'>Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded.</toggle>
+    </frame>
+    <frame label='Drag and drop'>
+      <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
+    </frame>
   </section>
 </options>

@@ -23,7 +23,7 @@ struct _Callback
 };
 
 extern int number_of_windows;
-extern gboolean override_redirect;
+extern Option o_override_redirect;
 
 extern uid_t euid;
 extern gid_t egid;
