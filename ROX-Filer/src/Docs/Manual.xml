@@ -3217,11 +3217,14 @@ means that only files ending in .c are shown.
 
    <listitem><para><function>PanelAdd</function>(<parameter>Side</parameter>,
      <parameter>Path</parameter>, [<parameter>Label</parameter>,
-     <parameter>After</parameter>])
+     <parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>]])
      Add <parameter>Path</parameter> to the panel on side <parameter>Side</parameter>,
      with label <parameter>Label</parameter>. If <parameter>After</parameter> is
      <userinput>true</userinput> the icon goes on the right/bottom side of the panel,
-     otherwise on the left/top side.
+     otherwise on the left/top side.  If <parameter>Shortcut</parameter>
+is given it is the keyboard shortcut to trigger this item.  If
+<parameter>Args</parameter> is given it is the argument string to
+append to the item when run if it is a program.
    </para></listitem>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
@@ -3239,10 +3242,15 @@ then this must match the label of the item.  If more than one item matches, only
    </para></listitem>
 
    <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
-     <parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
+     <parameter>X</parameter>, <parameter>Y</parameter>,
+[<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
      Add <parameter>Path</parameter> to the pinboard at position
-     (<parameter>X</parameter>, <parameter>Y</parameter>), giving it the label
-     <parameter>Label</parameter>.
+     (<parameter>X</parameter>, <parameter>Y</parameter>), giving it
+the (optional) label
+     <parameter>Label</parameter>.  If <parameter>Shortcut</parameter>
+is given it is the keyboard shortcut to trigger this item.  If
+<parameter>Args</parameter> is given it is the argument string to
+append to the item when run if it is a program.
    </para></listitem>
 
    <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
