@@ -5,33 +5,43 @@
 "/usr/share/sgml/docbook/dtd/xml/4.1.2/docbookx.dtd">
 
 <book lang="fr">
-<bookinfo>
+ <bookinfo>
   <title>
-	  ROX-Filer - Manuel de l'utilisateur
-    <ulink url="http://rox.sourceforge.net"/>
+   ROX-Filer - Manuel de l'utilisateur
+   <ulink url="http://rox.sourceforge.net"/>
   </title>
 
   <authorgroup>
    <author>
-    <firstname>Thomas</firstname><surname>Leonard</surname>
-    <affiliation>
-      <address><email>tal197@users.sourceforge.net</email></address>
+	<firstname>Thomas</firstname>
+	<surname>Leonard</surname>
+	<affiliation>
+	 <address>
+	  <email>tal197@users.sourceforge.net</email>
+	 </address>
     </affiliation>
    </author>
 
    <othercredit role="translator">
-    <firstname>Arnaud</firstname><surname>Calvo</surname>
-    <contrib>Traduction française</contrib>
+	<firstname>Arnaud</firstname>
+	<surname>Calvo</surname>
+	<contrib>Traduction française</contrib>
     <affiliation>
-     <address><email>arnaud@calvo-france.com</email></address>
+	 <address>
+	  <email>arnaud@calvo-france.com</email>
+	 </address>
     </affiliation>
-    </othercredit>
-   </authorgroup>
-   
-  <copyright><year>2002</year><holder>Thomas Leonard</holder></copyright>
+   </othercredit>
+  </authorgroup>
+
+  <copyright>
+   <year>2002</year>
+   <holder>Thomas Leonard</holder>
+  </copyright>
+
   <legalnotice>
-    <title>Conditions</title>
-    <para>
+   <title>Conditions</title>
+   <para>
 	Ce logiciel est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier
 	si vous respectez les termes de la licence 'GNU General Public License', publiée par
 	la 'Free Software Foundation' ; soit la version 2 de cette licence, soit (comme vous
@@ -43,7 +53,8 @@
 	Vous devriez avoir reçu une copie de la licence 'GNU General Public License'
 	avec ce logiciel ; si ce n'est pas le cas, écrivez à : Free Software Foundation, Inc.,
 	59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
-	</para><para>
+   </para>
+   <para>
 	NDT : Vous pouvez consulter une traduction non officielle de la licence 'GNU General
 	Public License' à cette adresse : <ulink url="http://www.april.org/gnu/gpl_french.html"/>.
    </para>
@@ -51,193 +62,254 @@
 
   <abstract>
    <para>
-		Note du traducteur :
-		Cette version a été traduite à partir du manuel <application>ROX-Filer</application> version 1.1.11.
-		Je ne suis pas programmeur, le point 4 du paragraphe 'Appliquettes pour les panneaux', ainsi que le
-		paragraphe 'Data-Structures' n'ont donc pas été traduits, mais si vous voulez me donner un petit
-		coup de main, c'est possible !
-   </para><para>
-		<application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11.
-		Son interface utilisateur est basée sur le gestionnaire de fichiers de RISC OS et ses caractéristiques
-		sont similaires ("dossiers-applications" et ouverture/enregistrement de fichiers par drag-and-drop). Le
-		filer peut aussi jouer le rôle d'un punaiseur, vous permettant alors d'accrocher sur votre bureau les
-		fichiers/répertoires/applications que vous utilisez fréquemment.
-    </para>
+	Note du traducteur :
+	Je ne suis pas programmeur, le point 4 du paragraphe 'Appliquettes pour les panneaux', ainsi que le
+	paragraphe 'Data-Structures' n'ont donc pas été traduits, mais si vous voulez me donner un petit
+	coup de main, c'est possible !
+   </para>
+   <para>
+	<application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11.
+	Son interface utilisateur est basée sur le gestionnaire de fichiers de RISC OS et ses caractéristiques
+	sont similaires ("dossiers-applications" et ouverture/enregistrement de fichiers par drag-and-drop). Le
+	filer peut aussi jouer le rôle d'un punaiseur, vous permettant alors d'accrocher sur votre bureau les
+	fichiers/répertoires/applications que vous utilisez fréquemment.
+   </para>
   </abstract>
-</bookinfo>
+ </bookinfo>
 
-<chapter id="intro">
+ <chapter id="intro">
+
   <title>Introduction</title>
   <para>
-	  <application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11 &mdash;
-	  l'interface graphique à base de fenêtres très utilisé sur les systèmes d'exploitation
-	  Unix et dérivés. C'est aussi le coeur du ROX Desktop <citation>ROX</citation>. Beaucoup de
-	  fonctionnalités du filer ont été inspirées par RISC OS <citation>RISC OS</citation>. 'ROX' est un acronyme de
-'RISC OS&ndash;On&ndash;X'.
+   <application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11 &mdash;
+   l'interface graphique à base de fenêtres très utilisé sur les systèmes d'exploitation Unix et dérivés.
+   C'est aussi le coeur du ROX Desktop <citation>ROX</citation>. Beaucoup de fonctionnalités du filer ont
+   été inspirées par RISC OS <citation>RISC OS</citation>. 'ROX' est un acronyme de 'RISC OS&ndash;On&ndash;X'.
   </para>
 
-<sect1>
-	<title>Fonctionnalités</title>
-    <para>
-
-<variablelist>
-
-<varlistentry><term>XDND</term>
-<listitem><para>
+  <sect1>
+   <title>Fonctionnalités</title>
+   <para>
+	<variablelist>
+	 <varlistentry>
+	  <term>XDND</term>
+	  <listitem>
+	   <para>
 		Un protocole pour le drag-and-drop utilisé, par exemple, par le desktop
 		GNOME <citation>GNOME</citation>. Cela permet à des données d'être chargées
 		dans une application par simple drag-and-drop depuis une fenêtre du filer.
 		Les spécifications complètes sont données en <citation>DND</citation>.
-</para></listitem></varlistentry>
+	   </para>
+	  </listitem>
+	 </varlistentry>
 
-<varlistentry><term>XDS</term>
-<listitem><para>
+	 <varlistentry>
+	  <term>XDS</term>
+	  <listitem>
+	   <para>
 		Une extension de XDND qui permet aux applications d'enregistrer des données
 		par drag-and-drop vers une fenêtre du filer.
 		Les spécifications complètes sont données en <citation>XDS</citation>.
-</para></listitem></varlistentry>
+	   </para>
+	  </listitem>
+	 </varlistentry>
 
-<varlistentry><term>Choices</term>
-<listitem><para>
+	 <varlistentry>
+	  <term>Choices</term>
+	  <listitem>
+	   <para>
 		Une façon simple, mais souple, de gérer les préférences des utilisateurs.
 		Voir <citation>Choices</citation> pour plus de détails.
-</para></listitem></varlistentry>
+	   </para>
+	  </listitem>
+	 </varlistentry>
 
-<varlistentry><term>Dossiers-applications</term>
-<listitem><para>
-Applications entièrement contenues dans un dossier, pour lesquelles l'installation consiste en la simple copie d'un dossier et la désinstallation, en la suppression de ce dossier. Une description plus détaillée est fournie plus loin.
-</para></listitem></varlistentry>
+	 <varlistentry>
+	  <term>Dossiers-applications</term>
+	  <listitem>
+	   <para>
+		Applications entièrement contenues dans un dossier, pour lesquelles l'installation
+		consiste en la simple copie d'un dossier et la désinstallation, en la suppression
+		de ce dossier. Une description plus détaillée est fournie plus loin.
+	   </para>
+	  </listitem>
+	 </varlistentry>
 
-<varlistentry><term>Imagettes</term>
-<listitem><para>
+	 <varlistentry>
+	  <term>Imagettes</term>
+	  <listitem>
+	   <para>
 		Le filer peut afficher les fichiers images avec une icône représentant le contenu
 		de ceux-ci, au lieu d'une icône générique.
 		Très utile pour organiser un dossier rempli de photos ! Voir <citation>Imagettes</citation>
 		pour plus de détails (l'établissement de normes est en cours).
-</para></listitem></varlistentry>
+	   </para>
+	  </listitem>
+	 </varlistentry>
+	</variablelist>
+   </para>
+  </sect1>
 
-</variablelist>
+ </chapter>
 
-  </para>
-</sect1>
-
-</chapter>
-
-<chapter id="compiling">
+ <chapter id="compiling">
   <title>Compilation</title>
   <para>
+   Si vous venez d'obtenir le filer en téléchargeant l'archive de ses sources,
+   vous devez donc les compiler pour vous en servir. Si vous avez téléchargé et
+   installé les binaires (le logiciel est donc déjà compilé), ou si <application>ROX-Filer</application>
+   était déjà installé sur votre système, vous pouvez passer directement à la
+   section suivante. Si vous êtes arrivés ici en cliquant sur le symbole 'i' d'une
+   fenêtre du filer, ou si taper <command>rox</command> dans un XTerm fonctionne,
+   vous n'avez pas besoin de compiler.
 
-	  Si vous venez d'obtenir le filer en téléchargeant l'archive de ses sources,
-	  vous devez donc les compiler pour vous en servir. Si vous avez téléchargé et
-	  installé les binaires (le logiciel est donc déjà compilé), ou si <application>ROX-Filer</application>
-	  était déjà installé sur votre système, vous pouvez passer directement à la
-	  section suivante. Si vous êtes arrivés ici en cliquant sur le symbole 'i' d'une
-	  fenêtre du filer, ou si taper <command>rox</command> dans un XTerm fonctionne,
-	  vous n'avez pas besoin de compiler.
+   <itemizedlist>
+	<title>Pour compiler, vous aurez besoin de ce qui suit :</title>
+	<listitem>
+	 <para>
+	  Unix ou Linux (le mot de passe root n'est pas nécessaire),
+	 </para>
+	</listitem>
 
-  <itemizedlist><title>Pour compiler, vous aurez besoin de ce qui suit :</title>
+	<listitem>
+	 <para>
+	  Le système 'X Window' (fourni en standard sur tous les systèmes modernes),
+	 </para>
+	</listitem>
 
-    <listitem><para>
-Unix ou Linux (le mot de passe root n'est pas nécessaire),
-    </para></listitem>
+	<listitem>
+	 <para>
+	  GTK+ 1.2.0 ou postérieure (librairies et en-têtes) &mdash; dernière
+	  version téléchargeable depuis <citation>GTK+</citation>,
+	 </para>
+	</listitem>
 
-    <listitem><para>
-Le système 'X Window' (fourni en standard sur tous les systèmes modernes),
-    </para></listitem>
+	<listitem>
+	 <para>
+	  Un compilateur C, comme 'gcc' (standard sur la plupart des systèmes).
+	 </para>
+	</listitem>
+   </itemizedlist>
 
-    <listitem><para>
-			GTK+ 1.2.0 ou postérieure (librairies et en-têtes) &mdash; dernière
-			version téléchargeable depuis <citation>GTK+</citation>,
-    </para></listitem>
+   Tout ceci est standard sur la plupart des distributions Linux modernes.
+   Pour vérifier quelle version de GTK+ est installée, utilisez la commande
+   <command>gtk-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
 
-    <listitem><para>
-Un compilateur C, comme 'gcc' (standard sur la plupart des systèmes).
-    </para></listitem>
+   <screen>
+	$ gtk-config --version
+	1.2.8
+   </screen>
 
-  </itemizedlist>
-
-Tout ceci est standard sur la plupart des distributions Linux modernes.
-Pour vérifier quelle version de GTK+ est installée, utilisez la commande
-<command>gtk-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
-
-  <screen>$ gtk-config --version
-1.2.8</screen>
-À cause de bugs dans de précédentes versions, GTK+ 1.2.8 est hautement recommandé.
+   À cause de bugs dans de précédentes versions, GTK+ 1.2.8 est hautement recommandé.
   </para>
 
-  <procedure><title>Pour compiler :</title>
+  <procedure>
+   <title>Pour compiler :</title>
 
-    <step><para>
-			Le filer a besoin de quelques fichiers partagés pour fonctionner
-			&mdash; des icônes pour les différents types de fichiers, des règles
-			pour déterminer le type des fichiers et quelques commandes par défaut
-			pour certains types de fichiers.
-			Tout ceci est installé avec le paquetage 'rox-base'.
-			Installez rox-base maintenant (depuis <ulink url="http://rox.sourceforge.net"/>
-			si vous ne l'avez pas encore fait.
-    </para></step>
+   <step>
+	<para>
+	 Le filer a besoin de quelques fichiers partagés pour fonctionner
+	 &mdash; des icônes pour les différents types de fichiers, des règles
+	 pour déterminer le type des fichiers et quelques commandes par défaut
+	 pour certains types de fichiers.
+	 Tout ceci est installé avec le paquetage 'rox-base'.
+	 Installez rox-base maintenant (depuis <ulink url="http://rox.sourceforge.net"/>
+	 si vous ne l'avez pas encore fait.
+	</para>
+   </step>
 
-    <step><para>
-			Allez dans le répertoire qui contient le sous-répertoire ROX-Filer.
-    </para></step>
+   <step>
+	<para>
+	 Allez dans le répertoire qui contient le sous-répertoire ROX-Filer.
+	</para>
+   </step>
 
-    <step><para>
-Exécutez le script d'installation <command>install.sh</command>, comme ceci :
+   <step>
+	<para>
+	 Exécutez le script d'installation <command>install.sh</command>, comme ceci :
 
-      <screen>$ ./install.sh</screen>
+	 <screen>
+	  $ ./install.sh
+	 </screen>
 
-    </para></step>
+	</para>
+   </step>
 
-    <step><para>
-			<application>ROX-Filer</application> va effectuer quelques tests pour trouver sur quel type de système
-			vous travaillez, puis va commencer la compilation.
-			Si ça ne fonctionne pas, envoyez-moi un e-mail et
-			plaignez-vous ! (ndt : plaignez-vous -en anglais- à l'auteur de ce manuel, pas à moi ;-)
-			Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés.
-			Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
+   <step>
+	<para>
+	 <application>ROX-Filer</application> va effectuer quelques tests pour trouver sur quel type de système
+	 vous travaillez, puis va commencer la compilation.
+	 Si ça ne fonctionne pas, envoyez-moi un e-mail et plaignez-vous ! (ndt : plaignez-vous -en anglais- à
+	 l'auteur de ce manuel, pas à moi ;-)
+	 Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés.
+	 Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
 
-			Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans
-			un sous-répertoire différent pour chaque plate-forme. Ainsi, vous pouvez
-			compiler la même application sur plusieurs types de machines différents et
-			l'exécuter depuis n'importe laquelle en utilisant le script 'AppRun'.
-			C'est particulièrement utile dans un environnement réseau.
-    </para></step>
+	 Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans un sous-répertoire différent
+	 pour chaque plate-forme. Ainsi, vous pouvez compiler la même application sur plusieurs types de machines
+	 différents et l'exécuter depuis n'importe laquelle en utilisant le script 'AppRun'.
+	 C'est particulièrement utile dans un environnement réseau.
+    </para>
+   </step>
 
-    <step><para>
-			Une fois que le filer est compilé, vous allez devoir préciser où vous voulez l'installer.
-			Si vous voulez effectuer une installation standard en root, vous devriez
-			arrêter ici, passer en root (un <command>su</command> suffit), et relancer le script
-			d'installation.
+   <step>
+	<para>
+	 Une fois que le filer est compilé, vous allez devoir préciser où vous voulez l'installer.
+	 Si vous voulez effectuer une installation standard en root, vous devriez
+	 arrêter ici, passer en root (un <command>su</command> suffit), et relancer le script
+	 d'installation.
 
-			Si vous n'avez pas le mot de passe root, ne vous inquiétez pas &mdash; suivez simplement
-			les instructions, pour installer le filer dans votre dossier personnel (home).
-    </para></step>
+	 Si vous n'avez pas le mot de passe root, ne vous inquiétez pas &mdash; suivez simplement
+	 les instructions, pour installer le filer dans votre dossier personnel (home).
+    </para>
+   </step>
+
   </procedure>
 
   <para>
+   Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command>
+   sans aucune option, comme ceci :
 
-	  Vous pouvez maintenant lancer le filer en exécutant la commande <command>rox</command>
-	  sans aucune option, comme ceci :
+   <screen>
+	$ rox
+   </screen>
 
-  <screen>$ rox</screen>
+   Une fenêtre devrait apparaître et afficher le contenu du dossier courant.
+   Si vous avez installé le script dans votre home, vous devrez sûrement mettre
+   à jour votre variable d'environnement <envar>PATH</envar> pour que le shell
+   puisse le trouver.
+   Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename>
+   dans votre home, tapez ceci :
 
-	Une fenêtre devrait apparaître et afficher le contenu du dossier courant.
-	Si vous avez installé le script dans votre home, vous devrez sûrement mettre
-	à jour votre variable d'environnement <envar>PATH</envar> pour que le shell
-	puisse le trouver.
-	Par exemple, si vous l'avez installé dans un dossier nommé <filename>bin</filename> dans votre home,
-	tapez ceci :
+   <screen>
+	$ PATH=$HOME/bin:$PATH; export PATH
+   </screen>
 
-  <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
+   ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
+   <manvolnum>1</manvolnum></citerefentry>) :
 
-ou (si vous utilisez le shell <citerefentry><refentrytitle>csh</refentrytitle>
-<manvolnum>1</manvolnum></citerefentry>) :
-
-  <screen>$ setenv PATH $HOME/bin:$PATH
-$ rehash</screen>
+   <screen>
+	$ setenv PATH $HOME/bin:$PATH
+	$ rehash
+   </screen>
 
   </para>
-</chapter>
+
+  <note>
+   <para>
+	Par défaut, ROX-Filer est compilé en utilisant la verion stable Gtk+-1.2.
+	Cependant, vous pouvez le compiler avec la version 2.0. Mais sachez que cela
+	n'a pas été testé suffisamment, puisqu'au moment où ce manuel est écrit, Gtk+-2.0
+	n'est pas encore sorti.
+	Pour compiler avec Gtk+-2.0 :
+
+	<screen>
+	 $ ROX-Filer/AppRun --compile --with-gtk2
+	</screen>
+
+   </para>
+  </note>
+
+ </chapter>
 
 <chapter id="invoking">
 	<title>Arguments</title>
@@ -515,9 +587,14 @@ Glissez-déposez des fichiers entre des fenêtres pour les copier (bouton gauche) 
 Redimensionne la fenêtre correctement.
 </entry></row>
 
-<row><entry><keycap>Backspace</keycap> (touche 'retour en arrière') (ndt : quel pléonasme !)</entry><entry>
-Affiche le dossier père.
-</entry></row>
+<row>
+ <entry>
+  <keycap>Backspace</keycap> (touche 'retour en arrière') (ndt : quel pléonasme !)
+ </entry>
+ <entry>
+  Affiche le dossier père.
+ </entry>
+</row>
 
 <row><entry>Touches de déplacement</entry><entry>
 Entoure les objets l'un après l'autre au fur et à mesure du déplacement.
@@ -542,14 +619,25 @@ Affiche le premier/dernier objet du dossier.
 		et déplace le contour autour de l'objet suivant.
 </entry></row>
 
-<row><entry><keycap>Tabulation</keycap>, <keycap>Shift+Tabulation</keycap></entry><entry>
-		Déplace le contour vers l'objet sélectionné suivant/précédent.
-</entry></row>
+<row>
+ <entry>
+  <keycap>Tabulation</keycap>, <keycap>Shift</keycap>+<keycap>Tabulation</keycap>
+ </entry>
+ <entry>
+  Déplace le contour vers l'objet sélectionné suivant/précédent.
+ </entry>
+</row>
 
-<row><entry>Immobiliser la souris au-dessus d'un objet</entry><entry>
-		Affiche une bulle d'aide avec une description rapide de l'application (si une description est fournie),
-		avec la cible d'un lien symbolique, ou avec le nom complet d'un objet, si celui-ci est trop long pour être affiché en entier.
-</entry></row>
+<row>
+ <entry>
+  Immobiliser la souris au-dessus d'un objet
+ </entry>
+ <entry>
+  Affiche une bulle d'aide avec une description rapide de l'application (si une description est fournie),
+  avec la cible d'un lien symbolique, ou avec le nom complet d'un objet, si celui-ci est trop long pour
+  être affiché en entier.
+ </entry>
+</row>
 
 </tbody></tgroup></informaltable>
 
@@ -1338,7 +1426,7 @@ dans le menu.
     <step><para>
 Créez un exécutable appelé <filename>AppletRun</filename>.
 This will be passed the XID of the panel socket window when the directory is dragged
-onto the panel. You can use this to create a GtkSocket widget. An example applet
+onto the panel. You can use this to create a GtkPlug widget. An example applet
 (written in python) is available at <ulink url="http://rox.sourceforge.net/applets.php3"/>
     </para></step>
 
@@ -3170,91 +3258,130 @@ Les méthodes suivantes sont reconnues :</para>
 
  <listitem>
   <para>
-   <function>Version()</function>
+   <function>Version</function>()
    Returns the filer's version.
   </para>
  </listitem>
 
-<listitem><para><function>CloseDir(Filename)</function>
-  Ferme le dossier <filename>Filename</filename> et tous ses sous-dossiers.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>CloseDir</function>(<parameter>Filename</parameter>)
+   Ferme le dossier <parameter>Filename</parameter> et tous ses sous-dossiers.
+  </para>
+ </listitem>
 
-<listitem><para><function>Examine(Filename)</function>
-  L'objet <filename>Filename</filename> a peut-être changé &mdash; vérifier et mettre à jour l'affichage.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>Examine</function>(<parameter>Filename</parameter>)
+   L'objet <parameter>Filename</parameter> a peut-être changé &mdash; vérifier
+   et mettre à jour l'affichage.
+  </para>
+ </listitem>
 
-<listitem><para><function>OpenDir(Filename)</function>
-  Ouvre une fenêtre et y affiche le dossier <filename>Filename</filename>.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>OpenDir</function>(<parameter>Filename</parameter>)
+   Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
+  </para>
+ </listitem>
 
-<listitem><para><function>Panel(Name, Side)</function>
-  Ouvre le panneau nommé 'Name' sur le côté de l'écran précisé en 'Side' (Top|Bottom|Left|Right &mdash; NDT : Haut|Bas|Gauche|Droite).
-  'Name' peut être un nom stocké dans <filename>Choices</filename> (par exemple 'MonPanneau'), ou un chemin complet.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>Panel</function>(<parameter>Name</parameter>, <parameter>Side</parameter>)
+   Ouvre le panneau nommé <parameter>Name</parameter> sur le côté de l'écran précisé en
+   <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|
+   <userinput>Left</userinput>|<userinput>Right</userinput> &mdash; NDT : Haut|Bas|Gauche|Droite).
+   <parameter>Name</parameter> peut être un nom stocké dans <filename>Choices</filename>
+   (par exemple <userinput>MonPanneau</userinput>), ou un chemin complet.
+  </para>
+ </listitem>
 
-<listitem><para><function>Pinboard(Name)</function>
-  Affiche sur le bureau le punaiseur nommé 'Name'.
-  'Name' peut être un nom stocké dans <filename>Choices</filename> (par exemple 'MonPunaiseur'), ou un chemin complet..
-</para></listitem>
+ <listitem>
+  <para>
+   <function>Pinboard</function>([<parameter>Name</parameter>])
+   Affiche sur le bureau le punaiseur nommé <parameter>Name</parameter>.
+   <parameter>Name</parameter> peut être un nom stocké dans <filename>Choices</filename>
+   (par exemple <userinput>MonPunaiseur</userinput>), ou un chemin complet.. S'il est
+   omis, la fonction punaiseur est désactivée.
+  </para>
+ </listitem>
 
-<listitem><para><function>Run(Filename)</function>
-  Exécute le fichier <filename>Filename</filename> comme s'il était cliqué dans une fenêtre du filer.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>Run</function>(<parameter>Filename</parameter>)
+   Exécute le fichier <parameter>Filename</parameter> comme s'il était cliqué dans une fenêtre du filer.
+  </para>
+ </listitem>
 
-<listitem><para><function>Show(Directory, Leafname)</function>
-  Ouvre le dossier <filename>Directory</filename> et met en évidence le fichier dont le nom est <filename>Leafname</filename>.
-</para></listitem>
+ <listitem>
+  <para>
+   <function>Show</function>(<parameter>Directory</parameter>, <parameter>Leafname</parameter>)
+   Ouvre le dossier <parameter>Directory</parameter> et met en évidence le fichier dont le nom
+   est <parameter>Leafname</parameter>.
+  </para>
+ </listitem>
 
-<listitem><para><function>FileType(Filename)</function>
-  affiche le type MIME du fichier "Filename" (en écrivant la réponse SOAP sur la sortie standard).
-</para></listitem>
+ <listitem>
+  <para>
+   <function>FileType</function>(<parameter>Filename</parameter>)
+   Affiche le type MIME du fichier <parameter>Filename</parameter> (en écrivant la
+   réponse SOAP sur la sortie standard).
+  </para>
+ </listitem>
 </itemizedlist>
 
 <para>
  Les appels suivants peuvent être utilisés pour commencer de nouvelles actions
  sur objets.
- Quiet (NDT : "Silencieux") est un booléen et peut prendre la valeur "vrai"
- (via "yes", "true" ou 1) si l'opération doit commencer immédiatement plutôt
- que d'attendre la confirmation de l'utilisateur.
- S'il prend la valeur "faux" (via "no", "false" ou 0), l'utilisateur doit
- toujours confirmer.
+ <parameter>Quiet</parameter> (NDT : "Silencieux") est un booléen et peut prendre la valeur "vrai"
+ (via <userinput>yes</userinput>, <userinput>true</userinput> ou <userinput>1</userinput>) si
+ l'opération doit commencer immédiatement plutôt  que d'attendre la confirmation de l'utilisateur.
+ S'il prend la valeur "faux" (via <userinput>no</userinput>, <userinput>false</userinput> ou 
+ <userinput>0</userinput>), l'utilisateur doit toujours confirmer.
  S'il est omis, la valeur par défaut est utilisée.
 </para>
 
 <itemizedlist>
  <listitem>
   <para>
-   <function>Copy(From, To, [Leafname, Quiet])</function>
-   Copie tous les fichiers spécifiés en "From" vers le dossier spécifié en "To". Si "Leafname"
-   est précisé, "From" ne devra fournir qu'une seule entrée ; "Leafname" donnera alors le nouveau
-   nom du fichier.
+   <function>Copy</function>(<parameter>From</parameter>, <parameter>To</parameter>, 
+   [<parameter>Leafname</parameter>, <parameter>Quiet</parameter>])
+   Copie tous les fichiers spécifiés en <parameter>From</parameter> vers le dossier spécifié
+   en <parameter>To</parameter>. Si <parameter>Leafname</parameter> est précisé, <parameter>From</parameter>
+   ne devra fournir qu'une seule entrée ; <parameter>Leafname</parameter> donnera alors le nouveau nom du fichier.
   </para>
  </listitem>
 
  <listitem>
   <para>
-   <function>Move(From, To, [Leafname, Quiet])</function>
-   Déplace tous les fichiers spécifiés en "From" vers le dossier spécifié en "To". Si "Leafname"
-   est précisé, "From" ne devra fournir qu'une seule entrée ; "Leafname" donnera alors le nouveau
-   nom du fichier.
+   <function>Move</function>(<parameter>From</parameter>, <parameter>To</parameter>, 
+   [<parameter>Leafname</parameter>, <parameter>Quiet</parameter>])
+   Déplace tous les fichiers spécifiés en <parameter>From</parameter> vers le dossier
+   spécifié en <parameter>To</parameter>. Si <parameter>Leafname</parameter> est précisé,
+   <parameter>From</parameter> ne devra fournir qu'une seule entrée ; <parameter>Leafname</parameter>
+   donnera alors le nouveau nom du fichier.
   </para>
  </listitem>
 
  <listitem>
   <para>
-   <function>Link(From, To, [Leafname])</function>
-   Crée un lien symbolique pour tous les fichiers spécifiés en "From" dans le dossier spécifié en "To".
-   Si "Leafname" est précisé, "From" ne devra fournir qu'une seule entrée ; "Leafname" donnera alors le
-   nouveau nom du fichier.
+   <function>Link</function>(<parameter>From</parameter>, <parameter>To</parameter>, [<parameter>Leafname</parameter>])
+   Crée un lien symbolique pour tous les fichiers spécifiés en <parameter>From</parameter>
+   dans le dossier spécifié en <parameter>To</parameter>. Si <parameter>Leafname</parameter>
+   est précisé, <parameter>From</parameter> ne devra fournir qu'une seule entrée ; <parameter>Leafname</parameter>
+   donnera alors le nouveau nom du fichier.
   </para>
  </listitem>
 
  <listitem>
   <para>
-   <function>Mount(MountPoints, [OpenDir, Quiet])</function>
-   Monte tous les dossiers spécifiés par "MountPoints".
-   Si "OpenDir" a la valeur "true", tous les dossiers seront ouverts après leur montage.
-</para></listitem>
+   <function>Mount</function>(<parameter>MountPoints</parameter>, [<parameter>OpenDir</parameter>, 
+   <parameter>Quiet</parameter>])
+   Monte tous les dossiers spécifiés par <parameter>MountPoints</parameter>.
+   Si <parameter>OpenDir</parameter> a la valeur <userinput>true</userinput>, tous les dossiers
+   seront ouverts après leur montage.
+  </para>
+ </listitem>
 </itemizedlist>
 </appendix>
 
