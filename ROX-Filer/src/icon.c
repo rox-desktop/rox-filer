@@ -58,6 +58,8 @@ GList *icon_selection = NULL;
  */
 static GHashTable *icons_hash = NULL;
 
+static Icon *menu_icon = NULL;	/* Item clicked if there is no selection */
+
 /* Static prototypes */
 static void rename_activate(GtkWidget *dialog);
 static void menu_closed(GtkWidget *widget);
@@ -266,31 +268,23 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 
 	appmenu_remove();
 
-	if (icon && icon_selection == NULL)
-	{
-		icon_select_only(icon);
-		tmp_icon_selected = TRUE;
-	}
+	menu_icon = icon;
 
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
-		icon_selection ? FALSE : TRUE,
+		(icon_selection || menu_icon) ? FALSE : TRUE,
 		7, 1);
 
-	/* Shade the Rename/Location/Help items unless exactly one item is
-	 * selected.
-	 */
-	if (icon_selection == NULL || icon_selection->next)
-		menu_set_items_shaded(icon_menu, TRUE, 4, 3);
-	else
+	/* Shade the Rename/Location/Help items an item was clicked */
+	if (icon)
 	{
-		Icon	*icon = (Icon *) icon_selection->data;
-
 		menu_set_items_shaded(icon_menu, FALSE, 4, 3);
 
 		/* Check for app-specific menu */
 		appmenu_add(icon->path, &icon->item, icon_menu);
 	}
+	else
+		menu_set_items_shaded(icon_menu, TRUE, 4, 3);
 
 	if (panel)
 	{
@@ -334,7 +328,6 @@ void icon_set_selected(Icon *icon, gboolean selected)
 
 	icon->selected = selected;
 
-	/* XXX: panel only? */
 	gtk_widget_queue_clear(icon->widget);
 
 	if (selected)
@@ -388,6 +381,9 @@ void icon_select_only(Icon *select)
 void icon_destroyed(Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
+
+	if (icon == menu_icon)
+		menu_icon = NULL;
 
 	icon_unhash_path(icon);
 
@@ -476,12 +472,7 @@ static void rename_activate(GtkWidget *dialog)
 static void menu_closed(GtkWidget *widget)
 {
 	appmenu_remove();
-
-	if (tmp_icon_selected)
-	{
-		icon_select_only(NULL);
-		tmp_icon_selected = FALSE;
-	}
+	menu_icon = NULL;
 }
 
 static void panel_position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
@@ -575,23 +566,25 @@ static void rename_cb(Icon *icon)
 
 static void edit_icon(gpointer data, guint action, GtkWidget *widget)
 {
-	Icon	*icon;
-
-	if (icon_selection == NULL || icon_selection->next)
+	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
 			_("First, select a single item to edit"));
 		return;
 	}
 
-	icon = (Icon *) icon_selection->data;
-	show_rename_box(icon->widget, icon, rename_cb);
+	show_rename_box(menu_icon->widget, menu_icon, rename_cb);
 }
 
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
 {
 	Panel	*panel;
-	GList	*next = icon_selection;
+	GList	*next;
+
+	if (menu_icon)
+		icon_set_selected(menu_icon, TRUE);
+	
+	next = icon_selection;
 	
 	if (!next)
 	{
@@ -632,9 +625,7 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 
 static void show_location(gpointer data, guint action, GtkWidget *widget)
 {
-	Icon	*icon;
-
-	if (icon_selection == NULL || icon_selection->next)
+	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
 			_("Select a single item, then use this to find out "
@@ -642,24 +633,19 @@ static void show_location(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 
-	icon = (Icon *) icon_selection->data;
-
-	open_to_show(icon->path);
+	open_to_show(menu_icon->path);
 }
 	
 static void show_help(gpointer data, guint action, GtkWidget *widget)
 {
-	Icon	*icon;
-
-	if (icon_selection == NULL || icon_selection->next)
+	if (!menu_icon)
 	{
 		delayed_error(PROJECT,
 			_("You must select a single item to get help on"));
 		return;
 	}
 
-	icon = (Icon *) icon_selection->data;
-	show_item_help(icon->path, &icon->item);
+	show_item_help(menu_icon->path, &menu_icon->item);
 }
 
 /* Opens a box allowing the user to change the name of a pinned icon.

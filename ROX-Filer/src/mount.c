@@ -233,9 +233,7 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 	return mount_points;
 }
 
-#elif HAVE_SYS_UCRED_H	/* We don't have /etc/mtab */
-
-/* XXX: Don't use mtab anymore. Is this still needed? */
+#elif HAVE_SYS_UCRED_H	/* We don't have /etc/mtab (fstab?) */
 
 static GHashTable *read_table(GHashTable *mount_points, char *path)
 {
