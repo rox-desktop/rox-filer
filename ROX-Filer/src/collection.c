@@ -706,7 +706,7 @@ static gint collection_paint(Collection 	*collection,
 	scroll = collection->vadj->value;
 	gdk_window_get_size(widget->window, &width, NULL);
 	whole.x = 0;
-	whole.y = collection->vadj->value;
+	whole.y = 0;
 	whole.width = width;
 	whole.height = collection->vadj->page_size;
 	
@@ -1604,7 +1604,9 @@ static gboolean as_timeout(Collection *collection)
 	gdk_window_get_size(window, &w, NULL);
 
 	h = collection->vadj->page_size;
+#ifdef GTK2
 	y -= collection->vadj->value;
+#endif
 
 	if ((x < 0 || x > w || y < 0 || y > h) && !collection->lasso_box)
 	{
