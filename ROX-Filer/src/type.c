@@ -29,6 +29,7 @@ static char *import_extensions(char *line);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
 static GHashTable *extension_hash = NULL;
+static char *current_type = NULL;	/* (used while reading file) */
 
 /* Most things on Unix are text files, so this is the default type */
 static MIME_type text_plain = {"text", "plain"};
@@ -39,71 +40,86 @@ void type_init()
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-	path = choices_find_path_load_shared("mime.types", "MIME-types");
+	path = choices_find_path_load_shared("guess", "MIME-types");
 	if (path)
+	{
+		current_type = NULL;
 		parse_file(path, import_extensions);
+	}
 }
 
-/* Parse one line from the file and add entries to extension_hash.
- * Lines go like:
- * 	text/plain txt text
- */
+/* Add one entry to the extension_hash table */
+static void add_ext(char *type_name, char *ext)
+{
+	MIME_type *new;
+	char	  *slash;
+	int	  len;
+
+	slash = strchr(type_name, '/');
+	g_return_if_fail(slash != NULL);	/* XXX: Report nicely */
+	len = slash - type_name;
+
+	new = g_malloc(sizeof(MIME_type));
+	new->media_type = g_malloc(sizeof(char) * (len + 1));
+	memcpy(new->media_type, type_name, len);
+	new->media_type[len] = '\0';
+
+	new->subtype = g_strdup(slash + 1);
+	new->image = NULL;
+
+	printf("Type = '%s', subtype = '%s', ext = '%s'\n",
+			new->media_type, new->subtype, ext);
+	g_hash_table_insert(extension_hash, g_strdup(ext), new);
+}
+
+/* Parse one line from the file and add entries to extension_hash */
 static char *import_extensions(char *line)
 {
-	char	*media_type = line;
-	char	*subtype;
 
-	while (*line && isspace(*line))
-		line++;
 	if (*line == '\0' || *line == '#')
-		return NULL;		/* Blank, or comment */
+		return NULL;		/* Comment */
 
-	line = strchr(line, '/');
-	if (!line)
-		return "Missing / in MIME-type";
-	*line++ = '\0';
-	subtype = line;
-
-	while (*line && !isspace(*line))
+	if (isspace(*line))
 	{
-		line++;
+		if (!current_type)
+			return "Missing MIME-type";
+		while (*line && isspace(*line))
+			line++;
+
+		if (strncmp(line, "ext:", 4) == 0)
+		{
+			char *ext;
+			line += 4;
+
+			for (;;)
+			{
+				while (*line && isspace(*line))
+					line++;
+				if (*line == '\0')
+					break;
+				ext = line;
+				while (*line && !isspace(*line))
+					line++;
+				if (*line)
+					*line++ = '\0';
+				add_ext(current_type, ext);
+			}
+		}
+		/* else ignore */
 	}
-
-	if (*line)
-		*line++ = '\0';
-
-	while (*line && isspace(*line))
-		line++;
-	if (*line == '\0')
-		return NULL;		/* No extensions */
-
-	media_type = g_strdup(media_type);
-	subtype = g_strdup(subtype);
-	
-	for (;;)
+	else
 	{
-		char		*ext;
-		MIME_type	*new;
-		
-		ext = line;
-
+		char		*type = line;
 		while (*line && !isspace(*line))
 			line++;
 		if (*line)
 			*line++ = '\0';
-
-		new = g_malloc(sizeof(MIME_type));
-		new->media_type = media_type;
-		new->subtype = subtype;
-		new->image = NULL;
-		g_hash_table_insert(extension_hash, g_strdup(ext), new);
-
 		while (*line && isspace(*line))
 			line++;
-		if (*line == '\0')
-			break;		/* All types added */
+		if (*line)
+			return "Trailing chars after MIME-type";
+		current_type = g_strdup(type);
 	}
-
 	return NULL;
 }
 
