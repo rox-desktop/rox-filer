@@ -16,7 +16,7 @@ DEBUGGER=""
 
 case $1 in
 	--debug) shift ;
-		if [ "$#" == 0 ] ; then
+		if [ "$#" = 0 ] ; then
 		  DEBUGGER="gdb --args" ; DEBUG_OPTIONS="-n --g-fatal-warnings"
 		else
 		  DEBUGGER="gdb"
