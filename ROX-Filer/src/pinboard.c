@@ -125,6 +125,11 @@ static gint	loading_pinboard = 0;		/* Non-zero => loading */
 /* The Icon that was used to start the current drag, if any */
 Icon *pinboard_drag_in_progress = NULL;
 
+/* For selecting groups of icons */
+static gboolean lasso_in_progress = FALSE;
+static int lasso_rect_x1, lasso_rect_x2;
+static int lasso_rect_y1, lasso_rect_y2;
+
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
@@ -205,6 +210,8 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
 static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect);
 static void update_pinboard_font(void);
+static void draw_lasso(void);
+static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
 
 
 /****************************************************************
@@ -881,6 +888,79 @@ static gboolean enter_notify(GtkWidget *widget,
 	return FALSE;
 }
 
+static void select_lasso(void)
+{
+	GList *next;
+	int minx, miny, maxx, maxy;
+
+	g_return_if_fail(lasso_in_progress == TRUE);
+	
+	minx = MIN(lasso_rect_x1, lasso_rect_x2);
+	miny = MIN(lasso_rect_y1, lasso_rect_y2);
+	maxx = MAX(lasso_rect_x1, lasso_rect_x2);
+	maxy = MAX(lasso_rect_y1, lasso_rect_y2);
+
+	for (next = current_pinboard->icons; next; next = next->next)
+	{
+		PinIcon *pi = (PinIcon *) next->data;
+		int cx = pi->x;
+		int cy = pi->y;
+
+		if (cx > minx && cx < maxx && cy > miny && cy < maxy)
+			icon_set_selected((Icon *) pi, TRUE);
+	}
+}
+
+static void cancel_lasso(void)
+{
+	draw_lasso();
+	lasso_in_progress = FALSE;
+}
+
+static void pinboard_lasso_box(int start_x, int start_y)
+{
+	if (lasso_in_progress)
+		cancel_lasso();
+	lasso_in_progress = TRUE;
+	lasso_rect_x1 = lasso_rect_x2 = start_x;
+	lasso_rect_y1 = lasso_rect_y2 = start_y;
+
+	draw_lasso();
+}
+
+static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d)
+{
+	if (!lasso_in_progress)
+		return FALSE;
+
+	if (lasso_rect_x2 != event->x || lasso_rect_y2 != event->y)
+	{
+		draw_lasso();
+		lasso_rect_x2 = event->x;
+		lasso_rect_y2 = event->y;
+		draw_lasso();
+	}
+
+	return FALSE;
+}
+
+/* Mark the area of the screen covered by the lasso box for redraw */
+static void draw_lasso(void)
+{
+	GdkRectangle area;
+	
+	if (!lasso_in_progress)
+		return;
+
+	area.x = MIN(lasso_rect_x1, lasso_rect_x2);
+	area.y = MIN(lasso_rect_y1, lasso_rect_y2);
+	area.width = ABS(lasso_rect_x1 - lasso_rect_x2);
+	area.height = ABS(lasso_rect_y1 - lasso_rect_y2);
+
+	gdk_window_invalidate_rect(current_pinboard->window->window,
+				   &area, TRUE);
+}
+
 static void perform_action(PinIcon *pi, GdkEventButton *event)
 {
 	BindAction	action;
@@ -892,6 +972,12 @@ static void perform_action(PinIcon *pi, GdkEventButton *event)
 	/* Actions that can happen with or without an icon */
 	switch (action)
 	{
+		case ACT_LASSO_CLEAR:
+			icon_select_only(NULL);
+			/* (no break) */
+		case ACT_LASSO_MODIFY:
+			pinboard_lasso_box(event->x, event->y);
+			return;
 		case ACT_CLEAR_SELECTION:
 			icon_select_only(NULL);
 			return;
@@ -986,7 +1072,14 @@ static gboolean button_release_event(GtkWidget *widget,
 	if (FORWARDED_BUTTON(pi, event->button))
 		forward_to_root(event);
 	else if (dnd_motion_release(event))
-		return TRUE;
+	{
+		if (motion_buttons_pressed == 0 && lasso_in_progress)
+		{
+			select_lasso();
+			cancel_lasso();
+		}
+		return FALSE;
+	}
 
 	perform_action(pi, event);
 	
@@ -1351,6 +1444,28 @@ static gboolean bg_expose(GtkWidget *widget,
 				widget->style->black_gc, FALSE,
 				shadow_x + 1, shadow_y + 1,
 				SHADOW_SIZE - 2, SHADOW_SIZE - 2);
+	}
+
+	if (lasso_in_progress)
+	{
+		GdkRectangle area;
+		
+		area.x = MIN(lasso_rect_x1, lasso_rect_x2);
+		area.y = MIN(lasso_rect_y1, lasso_rect_y2);
+		area.width = ABS(lasso_rect_x1 - lasso_rect_x2);
+		area.height = ABS(lasso_rect_y1 - lasso_rect_y2);
+
+		if (area.width > 4 && area.height > 4)
+		{
+			gdk_draw_rectangle(widget->window,
+					widget->style->white_gc, FALSE,
+					area.x, area.y,
+					area.width - 1, area.height - 1);
+			gdk_draw_rectangle(widget->window,
+					widget->style->black_gc, FALSE,
+					area.x + 1, area.y + 1,
+					area.width - 3, area.height - 3);
+		}
 	}
 
 	((GtkWidgetClass *) gclass)->expose_event(widget, event);
@@ -1723,11 +1838,15 @@ static void create_pinboard_window(Pinboard *pinboard)
 
 	gtk_widget_add_events(win,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			GDK_EXPOSURE_MASK);
+			GDK_EXPOSURE_MASK |
+			GDK_BUTTON1_MOTION_MASK | 
+			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
 	g_signal_connect(win, "button-press-event",
 			G_CALLBACK(button_press_event), NULL);
 	g_signal_connect(win, "button-release-event",
 			G_CALLBACK(button_release_event), NULL);
+	g_signal_connect(win, "motion-notify-event",
+			G_CALLBACK(lasso_motion), NULL);
 	g_signal_connect(pinboard->fixed, "expose_event",
 			G_CALLBACK(bg_expose), NULL);
 
