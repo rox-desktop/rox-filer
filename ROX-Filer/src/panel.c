@@ -75,17 +75,6 @@ struct _PanelIcon {
 	DirItem		item;
 };
 
-/* The icon which holds the current pointer grab, if any */
-static PanelIcon *current_grab_icon = NULL;
-static gint drag_start_x, drag_start_y;
-typedef enum {
-	MOTION_NONE,		/* Ignore motion events */
-	MOTION_REPOSITION,	/* Motion events move current_grab_icon */
-	MOTION_READY_FOR_DND,	/* Moving much will start dnd */
-	MOTION_DISABLED,	/* Something (maybe a drag) as happened */
-} MotionType;
-static MotionType motion_state = MOTION_NONE;
-
 /* NULL => Not loading a panel */
 static Panel *loading_panel = NULL;
 
@@ -152,7 +141,6 @@ static void selection_get(GtkWidget *widget,
 		       guint      info,
 		       guint      time,
 		       gpointer   data);
-static void icon_start_move(PanelIcon *icon);
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      PanelIcon *icon);
@@ -404,6 +392,8 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+			GDK_BUTTON3_MOTION_MASK |
 			GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
 			GDK_BUTTON_RELEASE_MASK);
 	
@@ -517,9 +507,6 @@ static void icon_destroyed(PanelIcon *icon)
 {
 	GList		*list;
 
-	if (icon == current_grab_icon)
-		current_grab_icon = NULL;
-
 	list = g_hash_table_lookup(icons_hash, icon->path);
 	g_return_if_fail(list != NULL);
 
@@ -631,6 +618,7 @@ static gint panel_button_press(GtkWidget *widget,
 			panel_clear_selection(NULL);
 			break;
 		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
 			popup_panel_menu(event, panel, NULL);
 			break;
 		case ACT_IGNORE:
@@ -643,55 +631,50 @@ static gint panel_button_press(GtkWidget *widget,
 	return TRUE;
 }
 
-static gint icon_button_release(GtkWidget *widget,
-			        GdkEventButton *event,
-			        PanelIcon *icon)
+static void perform_action(PanelIcon *icon, GdkEventButton *event)
 {
+	GtkWidget	*widget = icon->widget;
 	BindAction	action;
-	gint		dx, dy;
-	MotionType	motion = motion_state;
-
-	motion_state = MOTION_NONE;
-
-	if (current_grab_icon)
-	{
-		gdk_pointer_ungrab(GDK_CURRENT_TIME);
-		gtk_grab_remove(current_grab_icon->widget);
-		current_grab_icon = NULL;
-		return TRUE;
-	}
-
-	if (motion == MOTION_REPOSITION || motion == MOTION_DISABLED)
-		return TRUE;
-
-	/* Ignore release events that happen too far from the click
-	 * source.
-	 */
-	dx = event->x_root - drag_start_x;
-	dy = event->y_root - drag_start_y;
-	if (ABS(dx) > 5 || ABS(dy) > 5)
-		return TRUE;
-
+	
 	action = bind_lookup_bev(BIND_PANEL_ICON, event);
 
 	switch (action)
 	{
+		case ACT_OPEN_ITEM:
+			dnd_motion_ungrab();
+			wink_widget(icon->widget);
+			run_diritem(icon->path, &icon->item, NULL, FALSE);
+			break;
+		case ACT_EDIT_ITEM:
+			dnd_motion_ungrab();
+			wink_widget(icon->widget);
+			run_diritem(icon->path, &icon->item, NULL, TRUE);
+			break;
+		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
+			popup_panel_menu(event, icon->panel, icon);
+			break;
+		case ACT_MOVE_ICON:
+			dnd_motion_start(MOTION_REPOSITION);
+			break;
+		case ACT_PRIME_AND_SELECT:
+			if (!icon->selected)
+				panel_clear_selection(icon);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_AND_TOGGLE:
+			icon_set_selected(icon, !icon->selected);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_FOR_DND:
+			wink_widget(widget);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
 		case ACT_TOGGLE_SELECTED:
 			icon_set_selected(icon, !icon->selected);
 			break;
 		case ACT_SELECT_EXCL:
 			icon_set_selected(icon, TRUE);
-			break;
-		case ACT_OPEN_ITEM:
-			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, FALSE);
-			break;
-		case ACT_EDIT_ITEM:
-			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, TRUE);
-			break;
-		case ACT_POPUP_MENU:
-			popup_panel_menu(event, icon->panel, icon);
 			break;
 		case ACT_IGNORE:
 			break;
@@ -699,7 +682,17 @@ static gint icon_button_release(GtkWidget *widget,
 			g_warning("Unsupported action : %d\n", action);
 			break;
 	}
+}
 
+static gint icon_button_release(GtkWidget *widget,
+			        GdkEventButton *event,
+			        PanelIcon *icon)
+{
+	if (dnd_motion_release(event))
+		return TRUE;
+
+	perform_action(icon, event);
+	
 	return TRUE;
 }
 
@@ -707,54 +700,8 @@ static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
 			      PanelIcon *icon)
 {
-	BindAction	action;
-
-	if (current_grab_icon)
-		return TRUE;
-
-	if (motion_state != MOTION_NONE)
-		return TRUE;		/* Ignore clicks - we're busy! */
-	
-	motion_state = MOTION_DISABLED;
-	drag_start_x = event->x_root;
-	drag_start_y = event->y_root;
-	
-	action = bind_lookup_bev(BIND_PANEL_ICON, event);
-
-	switch (action)
-	{
-		case ACT_TOGGLE_SELECTED:
-			icon_set_selected(icon, !icon->selected);
-			break;
-		case ACT_SELECT_EXCL:
-			icon_set_selected(icon, TRUE);
-			break;
-		case ACT_OPEN_ITEM:
-			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, FALSE);
-			break;
-		case ACT_EDIT_ITEM:
-			wink_widget(icon->widget);
-			run_diritem(icon->path, &icon->item, NULL, TRUE);
-			break;
-		case ACT_POPUP_MENU:
-			motion_state = MOTION_NONE;
-			popup_panel_menu(event, icon->panel, icon);
-			break;
-		case ACT_MOVE_ICON:
-			motion_state = MOTION_REPOSITION;
-			icon_start_move(icon);
-			break;
-		case ACT_PRIME_FOR_DND:
-			motion_state = MOTION_READY_FOR_DND;
-			break;
-		case ACT_IGNORE:
-			motion_state = MOTION_NONE;
-			break;
-		default:
-			g_warning("Unsupported action : %d\n", action);
-			break;
-	}
+	if (dnd_motion_press(widget, event))
+		perform_action(icon, event);
 
 	return TRUE;
 }
@@ -1285,15 +1232,6 @@ static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
 	return TRUE;
 }
 
-/* Allow the icon to be repositioned */
-static void icon_start_move(PanelIcon *icon)
-{
-	g_return_if_fail(current_grab_icon == NULL);
-
-	current_grab_icon = icon;
-	gtk_grab_add(icon->widget);
-}
-
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      PanelIcon *icon)
@@ -1306,17 +1244,8 @@ static gint icon_motion_event(GtkWidget *widget,
 
 	if (motion_state == MOTION_READY_FOR_DND)
 	{
-		int	dx, dy;
-
-		dx = event->x_root - drag_start_x;
-		dy = event->y_root - drag_start_y;
-		
-		if (ABS(dx) > 3 || ABS(dy) > 3)
-		{
-			motion_state = MOTION_DISABLED;
+		if (dnd_motion_moved(event))
 			start_drag(icon, event);
-		}
-
 		return TRUE;
 	}
 	else if (motion_state != MOTION_REPOSITION)
@@ -1381,11 +1310,10 @@ static void reposition_icon(PanelIcon *icon, int index)
 		if (!g_list_find(list, widget))
 		{
 			/* No, reparent */
+			gtk_grab_remove(widget);
 			gtk_widget_reparent(widget, panel->before);
-			gdk_pointer_grab(widget->window, FALSE,
-					GDK_POINTER_MOTION_MASK |
-					GDK_BUTTON_RELEASE_MASK,
-					FALSE, NULL, GDK_CURRENT_TIME);
+			dnd_motion_grab_pointer();
+			gtk_grab_add(widget);
 		}
 		
 		gtk_box_reorder_child(GTK_BOX(panel->before), widget, index);
@@ -1405,10 +1333,8 @@ static void reposition_icon(PanelIcon *icon, int index)
 			/* Not already there, reparent */
 			gtk_grab_remove(widget);
 			gtk_widget_reparent(widget, panel->after);
-			gdk_pointer_grab(widget->window, FALSE,
-					GDK_POINTER_MOTION_MASK |
-					GDK_BUTTON_RELEASE_MASK,
-					FALSE, NULL, GDK_CURRENT_TIME);
+			dnd_motion_grab_pointer();
+			gtk_grab_add(widget);
 		}
 
 		gtk_box_reorder_child(GTK_BOX(panel->after), widget, index);
@@ -1425,8 +1351,14 @@ static void start_drag(PanelIcon *icon, GdkEventMotion *event)
 
 	if (!icon->selected)
 	{
-		panel_clear_selection(icon);	/* Select just this one */
-		tmp_icon_selected = TRUE;
+		if (event->state & GDK_BUTTON1_MASK)
+		{
+			/* Select just this one */
+			panel_clear_selection(icon);
+			tmp_icon_selected = TRUE;
+		}
+		else
+			icon_set_selected(icon, TRUE);
 	}
 	
 	g_return_if_fail(panel_selection != NULL);

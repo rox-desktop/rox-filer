@@ -51,6 +51,17 @@
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
+gint drag_start_x, drag_start_y;
+MotionType motion_state = MOTION_NONE;
+
+/* This keeps track of how many mouse buttons are currently down.
+ * We add a grab when it does 0->1 and release it on 1<-0.
+ *
+ * It may also be set to zero to disable the motion system (eg,
+ * when popping up a menu).
+ */
+gint motion_buttons_pressed = 0;
+
 /* Static prototypes */
 static void set_xds_prop(GdkDragContext *context, char *text);
 static gboolean drag_motion(GtkWidget		*widget,
@@ -1387,4 +1398,168 @@ static gboolean spring_now(gpointer data)
 static void spring_win_destroyed(GtkWidget *widget, gpointer data)
 {
 	spring_window = NULL;
+}
+
+/*			HANDLING MOTION EVENTS				*/
+
+/* If not-NULL, then this widget has a grab */
+static GtkWidget *motion_widget = NULL;
+
+/* If TRUE, we must gdk_pointer_ungrab() too when finishing */
+static gboolean  motion_pointer_grab = FALSE;
+
+/* Call this on a button press event. It stores the mouse position
+ * as the start of the new drag and returns TRUE if all is well.
+ * Further motions events are disabled at this point - you must
+ * then call dnd_motion_start() to set the type of motion expected.
+ * Grabs the widget on the first press.
+ *
+ * If the system is not ready to handle a motion event (because a
+ * button is already held down?) it does nothing and returns FALSE.
+ *
+ * If the event is not a single click then it simply returns TRUE.
+ */
+gboolean dnd_motion_press(GtkWidget *widget, GdkEventButton *event)
+{
+	if (event->type != GDK_BUTTON_PRESS)
+		return TRUE;		/* Not a click event! */
+
+	motion_buttons_pressed++;
+	if (motion_buttons_pressed == 1)
+	{
+		/* g_print("[ grab! ]\n"); */
+		gtk_grab_add(widget);
+		motion_widget = widget;
+	}
+
+	if (motion_state != MOTION_NONE)
+		return FALSE;		/* Ignore clicks - we're busy! */
+	
+	motion_state = MOTION_DISABLED;
+	drag_start_x = event->x_root;
+	drag_start_y = event->y_root;
+
+	return TRUE;
+}
+
+/* After the button press event, decide what kind of motion is expected.
+ * If you don't call this then the motion system is disabled - call
+ * dnd_motion_release() to reset it.
+ *
+ * Note: If you open a popup menu or start DND call dnd_motion_ungrab()
+ * instead.
+ */
+void dnd_motion_start(MotionType motion)
+{
+	g_return_if_fail(motion_state == MOTION_DISABLED);
+
+	motion_state = motion;
+}
+
+/* Call this on a button release event. If some buttons are still pressed,
+ * returns TRUE and does nothing.
+ *
+ * Otherwise, it resets the motion system to be ready again and returns TRUE.
+ *
+ * If the motion system wasn't being used (MOTION_NONE) then it does nothing
+ * and returns FALSE - process the release event yourself as it isn't part
+ * of a motion. This also happens if a motion was primed but never happened.
+ */
+gboolean dnd_motion_release(GdkEventButton *event)
+{
+	MotionType	motion = motion_state;
+	int		dx, dy;
+
+	if (motion_buttons_pressed == 0)
+		return TRUE;		/* We were disabled */
+
+	if (motion_buttons_pressed == 1)
+		dnd_motion_ungrab();
+	else
+	{
+		motion_buttons_pressed--;
+		return TRUE;
+	}
+
+	if (motion == MOTION_REPOSITION || motion == MOTION_DISABLED)
+		return TRUE;	/* Already done something - eat the event */
+
+	/* Eat release events that happen too far from the click
+	 * source. Otherwise, allow the caller to treat this as a click
+	 * that never became a motion.
+	 */
+	dx = event->x_root - drag_start_x;
+	dy = event->y_root - drag_start_y;
+
+	return ABS(dx) > 5 || ABS(dy) > 5;
+}
+
+/* Use this to disable the motion system. The system will be reset once
+ * all mouse buttons are released.
+ */
+void dnd_motion_disable(void)
+{
+	g_return_if_fail(motion_state != MOTION_NONE &&
+			 motion_state != MOTION_DISABLED);
+
+	motion_state = MOTION_DISABLED;
+}
+
+/* Use this if something else is going to grab the pointer so that
+ * we won't get any more motion or release events.
+ */
+void dnd_motion_ungrab(void)
+{
+	if (motion_buttons_pressed > 0)
+	{
+		if (motion_pointer_grab)
+		{
+			gdk_pointer_ungrab(GDK_CURRENT_TIME);
+			motion_pointer_grab = FALSE;
+			/* g_print("[ ungrab_pointer ]\n"); */
+		}
+		gtk_grab_remove(motion_widget);
+		motion_widget = NULL;
+		motion_buttons_pressed = 0;
+		/* g_print("[ ungrab ]\n"); */
+	}
+
+	motion_state = MOTION_NONE;
+}
+
+/* Call this on motion events. If the mouse position is far enough
+ * from the click position, returns TRUE and does dnd_motion_ungrab().
+ * You should then start regular drag-and-drop.
+ * 
+ * Otherwise, returns FALSE.
+ */
+gboolean dnd_motion_moved(GdkEventMotion *event)
+{
+	int	dx, dy;
+
+	dx = event->x_root - drag_start_x;
+	dy = event->y_root - drag_start_y;
+
+	if (ABS(dx) <= 3 && ABS(dy) <= 3)
+		return FALSE;		/* Not far enough */
+
+	dnd_motion_ungrab();
+
+	return TRUE;
+}
+
+/* Normally, the X server will automatically grab the pointer on a
+ * button press and ungrab on release. However, if the grab widget
+ * is reparented then call this to re-aquire the grab.
+ */
+void dnd_motion_grab_pointer(void)
+{
+	g_return_if_fail(motion_widget != NULL);
+
+	gdk_pointer_grab(motion_widget->window, FALSE,
+			GDK_POINTER_MOTION_MASK |
+			GDK_BUTTON_RELEASE_MASK,
+			FALSE, NULL, GDK_CURRENT_TIME);
+
+	motion_pointer_grab = TRUE;
 }

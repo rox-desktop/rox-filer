@@ -34,9 +34,6 @@
 #define MIN_HEIGHT 60
 #define MINIMUM_ITEMS 16
 
-int collection_menu_button = 3;
-gboolean collection_single_click = TRUE;
-
 enum
 {
 	ARG_0,
@@ -44,16 +41,6 @@ enum
 };
 
 /* Signals:
- *
- * void open_item(collection, item, item_number, user_data)
- * 	User has double clicked on this item.
- *
- * void drag_selection(collection, motion_event, number_selected, user_data)
- * 	User has tried to drag the selection.
- * 
- * void show_menu(collection, button_event, item, user_data)
- * 	User has menu-clicked on the collection. 'item' is the number
- * 	of the item clicked, or -1 if the click was over the background.
  *
  * void gain_selection(collection, time, user_data)
  * 	We've gone from no selected items to having a selection.
@@ -67,9 +54,6 @@ enum
  */
 enum
 {
-	OPEN_ITEM,
-	DRAG_SELECTION,
-	SHOW_MENU,
 	GAIN_SELECTION,
 	LOSE_SELECTION,
 	LAST_SIGNAL
@@ -80,8 +64,6 @@ static guint collection_signals[LAST_SIGNAL] = { 0 };
 static guint32 current_event_time = GDK_CURRENT_TIME;
 
 static GtkWidgetClass *parent_class = NULL;
-
-static GdkCursor *crosshair = NULL;
 
 /* Static prototypes */
 static void draw_one_item(Collection 	*collection,
@@ -118,8 +100,6 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
 static void scroll_by(Collection *collection, gint diff);
 static gint collection_button_press(GtkWidget      *widget,
 				    GdkEventButton *event);
-static gint collection_button_release(GtkWidget      *widget,
-				      GdkEventButton *event);
 static void default_draw_item(GtkWidget *widget,
 				CollectionItem *data,
 				GdkRectangle *area,
@@ -135,8 +115,6 @@ static void add_lasso_box(Collection *collection);
 static void abort_lasso(Collection *collection);
 static void remove_lasso_box(Collection *collection);
 static void draw_lasso_box(Collection *collection);
-static int item_at_row_col(Collection *collection, int row, int col);
-static void collection_clear_except(Collection *collection, gint exception);
 static void cancel_wink(Collection *collection);
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event);
 static void get_visible_limits(Collection *collection, int *first, int *last);
@@ -152,9 +130,7 @@ static void draw_focus_at(Collection *collection, GdkRectangle *area)
 
 	widget = GTK_WIDGET(collection);
 
-	if (collection->target_cb)
-		gc = widget->style->white_gc;
-	else if (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS)
+	if (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS)
 		gc = widget->style->black_gc;
 	else
 		gc = widget->style->fg_gc[GTK_STATE_INSENSITIVE];
@@ -252,7 +228,6 @@ static void collection_class_init(CollectionClass *class)
 
 	widget_class->key_press_event = collection_key_press;
 	widget_class->button_press_event = collection_button_press;
-	widget_class->button_release_event = collection_button_release;
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
@@ -261,39 +236,9 @@ static void collection_class_init(CollectionClass *class)
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
 
-	class->open_item = NULL;
-	class->drag_selection = NULL;
-	class->show_menu = NULL;
 	class->gain_selection = NULL;
 	class->lose_selection = NULL;
 
-	collection_signals[OPEN_ITEM] = gtk_signal_new("open_item",
-				     GTK_RUN_LAST,
-				     object_class->type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     open_item),
-				     gtk_marshal_NONE__POINTER_UINT,
-				     GTK_TYPE_NONE, 2,
-				     GTK_TYPE_POINTER,
-				     GTK_TYPE_UINT);
-	collection_signals[DRAG_SELECTION] = gtk_signal_new("drag_selection",
-				     GTK_RUN_LAST,
-				     object_class->type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     drag_selection),
-				     gtk_marshal_NONE__POINTER_UINT,
-				     GTK_TYPE_NONE, 2,
-				     GTK_TYPE_POINTER,
-				     GTK_TYPE_UINT);
-	collection_signals[SHOW_MENU] = gtk_signal_new("show_menu",
-				     GTK_RUN_LAST,
-				     object_class->type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     show_menu),
-				     gtk_marshal_NONE__POINTER_INT,
-				     GTK_TYPE_NONE, 2,
-				     GTK_TYPE_POINTER,
-				     GTK_TYPE_INT);
 	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
 				     GTK_RUN_LAST,
 				     object_class->type,
@@ -320,9 +265,6 @@ static void collection_init(Collection *object)
 	g_return_if_fail(object != NULL);
 	g_return_if_fail(IS_COLLECTION(object));
 
-	if (!crosshair)
-		crosshair = gdk_cursor_new(GDK_CROSSHAIR);
-
 	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(object), GTK_CAN_FOCUS);
 
 	object->number_of_items = 0;
@@ -342,9 +284,6 @@ static void collection_init(Collection *object)
 	object->array_size = MINIMUM_ITEMS;
 	object->draw_item = default_draw_item;
 	object->test_point = default_test_point;
-
-	object->buttons_pressed = 0;
-	object->may_drag = FALSE;
 
 	object->auto_scroll = -1;
 	
@@ -1012,28 +951,6 @@ static void resize_arrays(Collection *collection, guint new_size)
 	collection->array_size = new_size;
 }
 
-static void return_pressed(Collection *collection)
-{
-	int			item = collection->cursor_item;
-	CollectionTargetFunc 	cb = collection->target_cb;
-	gpointer		data = collection->target_data;
-
-	collection_target(collection, NULL, NULL);
-	if (item < 0 || item >= collection->number_of_items)
-		return;
-
-	if (cb)
-	{
-		cb(collection, item, data);
-		return;
-	}
-
-	gtk_signal_emit(GTK_OBJECT(collection), 
-			collection_signals[OPEN_ITEM],
-			collection->items[item].data,
-			item);
-}
-
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 {
 	Collection *collection;
@@ -1073,18 +990,10 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 		case GDK_Page_Down:
 			collection_move_cursor(collection, 10, 0);
 			break;
-		case GDK_Return:
-			return_pressed(collection);
-			break;
 		case GDK_Escape:
-			if (!collection->target_cb)
-			{
-				collection_set_cursor_item(collection, -1);
-				collection_clear_selection(collection);
-				return FALSE;		/* Pass it on */
-			}
-			collection_target(collection, NULL, NULL);
-			break;
+			collection_set_cursor_item(collection, -1);
+			collection_clear_selection(collection);
+			return FALSE;		/* Pass it on */
 		case ' ':
 			if (item >=0 && item < collection->number_of_items)
 				collection_toggle_item(collection, item);
@@ -1100,11 +1009,7 @@ static gint collection_button_press(GtkWidget      *widget,
 				    GdkEventButton *event)
 {
 	Collection    	*collection;
-	int		row, col;
-	int		item;
-	int		action;
-	int		scroll;
-	guint		stacked_time;
+	int		diff;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -1112,294 +1017,138 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	collection = COLLECTION(widget);
 
-	collection->item_clicked = -1;
-
-	if (event->button > 3)
-	{
-		int	diff;
+	if (event->button <= 3)
+		return FALSE;		/* Only deal with wheel events here */
 		
-		/* Wheel mouse scrolling */
-		if (event->button == 4)
-			diff = -((signed int) collection->item_height) / 4;
-		else if (event->button == 5)
-			diff = collection->item_height / 4;
-		else
-			diff = 0;
+	/* Wheel mouse scrolling */
+	if (event->button == 4)
+		diff = -((signed int) collection->item_height) / 4;
+	else if (event->button == 5)
+		diff = collection->item_height / 4;
+	else
+		diff = 0;
 
+	if (diff)
+	{
+		int	old_value = collection->vadj->value;
+		int	new_value = 0;
+		gboolean box = collection->lasso_box;
+
+		new_value = CLAMP(old_value + diff, 0.0, 
+				collection->vadj->upper
+				- collection->vadj->page_size);
+		diff = new_value - old_value;
 		if (diff)
 		{
-			int	old_value = collection->vadj->value;
-			int	new_value = 0;
-			gboolean box = collection->lasso_box;
-
-			new_value = CLAMP(old_value + diff, 0.0, 
-					 collection->vadj->upper
-						- collection->vadj->page_size);
-			diff = new_value - old_value;
-			if (diff)
+			if (box)
 			{
-				if (box)
-				{
-					remove_lasso_box(collection);
-					collection->drag_box_y[0] -= diff;
-				}
-				collection->vadj->value = new_value;
-				gtk_signal_emit_by_name(
-						GTK_OBJECT(collection->vadj),
-						"changed");
-				if (box)
-					add_lasso_box(collection);
+				remove_lasso_box(collection);
+				collection->drag_box_y[0] -= diff;
 			}
-		}
-		return FALSE;
-	}
-
-	if (collection->cursor_item != -1)
-		collection_set_cursor_item(collection, -1);
-
-	scroll = collection->vadj->value;
-
-	if (event->type == GDK_BUTTON_PRESS &&
-			event->button != collection_menu_button)
-	{
-		if (collection->buttons_pressed++ == 0)
-			gtk_grab_add(widget);
-		else
-			return FALSE;	/* Ignore extra presses */
-	}
-
-	if (event->state & GDK_CONTROL_MASK)
-		action = 2;
-	else
-		action = event->button;
-
-	/* Ignore all clicks while we are dragging a lasso box */
-	if (collection->lasso_box)
-		return TRUE;
-
-	col = event->x / collection->item_width;
-	row = (event->y + scroll) / collection->item_height;
-
-	if (col < 0 || row < 0 || col >= collection->columns)
-		item = -1;
-	else
-	{
-		item = col + row * collection->columns;
-		if (item >= collection->number_of_items
-				|| 
-			!collection->test_point(collection,
-				event->x - col * collection->item_width,
-				event->y - row * collection->item_height
-					+ scroll,
-				&collection->items[item],
-				collection->item_width,
-				collection->item_height,
-				collection->cb_user_data))
-		{
-			item = -1;
+			collection->vadj->value = new_value;
+			gtk_signal_emit_by_name(
+					GTK_OBJECT(collection->vadj),
+					"changed");
+			if (box)
+				add_lasso_box(collection);
 		}
 	}
 
-	if (collection->target_cb)
-	{
-		CollectionTargetFunc cb = collection->target_cb;
-		gpointer	data = collection->target_data;
-		
-		collection_target(collection, NULL, NULL);
-		if (collection->buttons_pressed)
-		{
-			gtk_grab_remove(widget);
-			collection->buttons_pressed = 0;
-		}
-		if (item > -1 && event->button != collection_menu_button)
-			cb(collection, item, data);
-		return TRUE;
-	}
-	
-	collection->drag_box_x[0] = event->x;
-	collection->drag_box_y[0] = event->y;
-	collection->item_clicked = item;
-	
-	stacked_time = current_event_time;
-	current_event_time = event->time;
-	
-	if (event->button == collection_menu_button)
-	{
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[SHOW_MENU],
-				event,
-				item);
-	}
-	else if (event->type == GDK_2BUTTON_PRESS && !collection_single_click)
-	{
-		if (item >= 0)
-		{
-			if (collection->buttons_pressed)
-			{
-				gtk_grab_remove(widget);
-				collection->buttons_pressed = 0;
-			}
-			collection_unselect_item(collection, item);
-			gtk_signal_emit(GTK_OBJECT(collection), 
-					collection_signals[OPEN_ITEM],
-					collection->items[item].data,
-					item);
-		}
-	}
-	else if (event->type == GDK_BUTTON_PRESS)
-	{
-		collection->may_drag = event->button != collection_menu_button;
-
-		if (item >= 0)
-		{
-			if (action == 1)
-			{
-				if (!collection->items[item].selected)
-				{
-					collection_select_item(collection,
-							item);
-					collection_clear_except(collection,
-							item);
-				}
-			}
-			else
-				collection_toggle_item(collection, item);
-		}
-		else if (action == 1)
-			collection_clear_selection(collection);
-	}
-
-	current_event_time = stacked_time;
-	return FALSE;
+	return TRUE;
 }
 
-static gint collection_button_release(GtkWidget      *widget,
-				      GdkEventButton *event)
+/* 'from' and 'to' are pixel positions. 'step' is the size of each item.
+ * Returns the index of the first item covered, and the number of items.
+ */
+static void get_range(int from, int to, int step, short *pos, short *len)
 {
-	Collection    	*collection;
-	int		top, bottom;
-	int		row, last_row;
-	int		w, h;
-	int		col, start_col, last_col;
-	int		scroll;
-	int		item;
-	guint		stacked_time;
-	int		button;
+	if (from > to)
+		from ^= to ^= from ^= to;
 
-	g_return_val_if_fail(widget != NULL, FALSE);
-	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
-	g_return_val_if_fail(event != NULL, FALSE);
+	from = (from + step / 4) / step;	/* First item */
+	to = (to + step - step / 4) / step;	/* Last item (inclusive) */
 
-	collection = COLLECTION(widget);
-	button = event->button;
-	
+	*pos = MAX(from, 0);
+	*len = to - *pos;
+}
+
+/* Fills in the area with a rectangle corresponding to the current
+ * size of the lasso box (units of items, not pixels).
+ *
+ * The box will only span valid columns, but the total number
+ * of items is not taken into account (rows or cols).
+ */
+static void find_lasso_area(Collection *collection, GdkRectangle *area)
+{
+	int	scroll;
+	int	cols = collection->columns;
+	int	dx = collection->drag_box_x[0] - collection->drag_box_x[1];
+	int	dy = collection->drag_box_y[0] - collection->drag_box_y[1];
+
+	if (ABS(dx) < 8 && ABS(dy) < 8)
+	{
+		/* Didn't move far enough - ignore */
+		area->x = area->y = 0;
+		area->width = 0;
+		area->height = 0;
+		return;
+	}
+
 	scroll = collection->vadj->value;
 
-	if (event->button > 3 || event->button == collection_menu_button)
-		return FALSE;
-	if (collection->buttons_pressed == 0)
-		return FALSE;
-	if (--collection->buttons_pressed == 0)
-		gtk_grab_remove(widget);
-	else
-		return FALSE;		/* Wait until ALL buttons are up */
-	
-	if (!collection->lasso_box)
-	{
-		int	item = collection->item_clicked;
-			
-		if (collection_single_click && item > -1
-			&& item < collection->number_of_items
-			&& (event->state & GDK_CONTROL_MASK) == 0)
-		{
-			int	dx = event->x - collection->drag_box_x[0];
-			int	dy = event->y - collection->drag_box_y[0];
+	get_range(collection->drag_box_x[0],
+		  collection->drag_box_x[1],
+		  collection->item_width,
+		  &area->x,
+		  &area->width);
 
-			if (ABS(dx) + ABS(dy) > 9)
-				return FALSE;
+	if (area->x >= cols)
+		area->width = 0;
+	else if (area->x + area->width > cols)
+			area->width = cols - area->x;
 
-			collection_unselect_item(collection, item);
-			gtk_signal_emit(GTK_OBJECT(collection), 
-					collection_signals[OPEN_ITEM],
-					collection->items[item].data,
-					item);
-		}
+	get_range(collection->drag_box_y[0] + scroll,
+		  collection->drag_box_y[1] + scroll,
+		  collection->item_height,
+		  &area->y,
+		  &area->height);
+}
 
-		return FALSE;
-	}
-			
-	abort_lasso(collection);
-
-	w = collection->item_width;
-	h = collection->item_height;
-
-	top = collection->drag_box_y[0] + scroll;
-	bottom = collection->drag_box_y[1] + scroll;
-	if (top > bottom)
-	{
-		int	tmp;
-		tmp = top;
-		top = bottom;
-		bottom = tmp;
-	}
-	top += h / 4;
-	bottom -= h / 4;
-	
-	row = MAX(top / h, 0);
-	last_row = bottom / h;
-
-	top = collection->drag_box_x[0];	/* (left) */
-	bottom = collection->drag_box_x[1];
-	if (top > bottom)
-	{
-		int	tmp;
-		tmp = top;
-		top = bottom;
-		bottom = tmp;
-	}
-	top += w / 4;
-	bottom -= w / 4;
-	start_col = MAX(top / w, 0);
-	last_col = bottom / w;
-	if (last_col >= collection->columns)
-		last_col = collection->columns - 1;
+static void collection_process_area(Collection	 *collection,
+				    GdkRectangle *area,
+				    GdkFunction  fn,
+				    guint32	 time)
+{
+	int		x, y;
+	guint32		stacked_time;
+	int		item;
 
 	stacked_time = current_event_time;
-	current_event_time = event->time;
+	current_event_time = time;
 
-	while (row <= last_row)
+	for (y = area->y; y < area->y + area->height; y++)
 	{
-		col = start_col;
-		item = row * collection->columns + col;
-		while (col <= last_col)
+		item = y * collection->columns + area->x;
+		
+		for (x = area->x; x < area->x + area->width; x++)
 		{
 			if (item >= collection->number_of_items)
-			{
-				current_event_time = stacked_time;
-				return FALSE;
-			}
+				goto out;
 
-			if (button == 1)
-				collection_select_item(collection, item);
-			else
-				collection_toggle_item(collection, item);
-			col++;
+			collection_select_item(collection, item);
+
 			item++;
 		}
-		row++;
 	}
 
+out:
 	current_event_time = stacked_time;
-
-	return FALSE;
 }
 
 static gint collection_motion_notify(GtkWidget *widget,
 				     GdkEventMotion *event)
 {
 	Collection    	*collection;
-	int		x, y;
-	guint		stacked_time;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -1407,75 +1156,15 @@ static gint collection_motion_notify(GtkWidget *widget,
 
 	collection = COLLECTION(widget);
 
-	if (collection->buttons_pressed == 0)
-		return FALSE;
-
-	stacked_time = current_event_time;
-	current_event_time = event->time;
-
-	if (event->window != widget->window)
-		gdk_window_get_pointer(widget->window, &x, &y, NULL);
-	else
-	{
-		x = event->x;
-		y = event->y;
-	}
-
 	if (collection->lasso_box)
 	{
 		remove_lasso_box(collection);
-		collection->drag_box_x[1] = x;
-		collection->drag_box_y[1] = y;
+		collection->drag_box_x[1] = event->x;
+		collection->drag_box_y[1] = event->y;
 		add_lasso_box(collection);
+		return TRUE;
 	}
-	else if (collection->may_drag)
-	{
-		int	dx = x - collection->drag_box_x[0];
-		int	dy = y - collection->drag_box_y[0];
-
-		if (abs(dx) > 9 || abs(dy) > 9)
-		{
-			int	row, col, item;
-			int	scroll = collection->vadj->value;
-
-			collection->may_drag = FALSE;
-
-			col = collection->drag_box_x[0]
-					/ collection->item_width;
-			row = (collection->drag_box_y[0] + scroll)
-					/ collection->item_height;
-			item = item_at_row_col(collection, row, col);
-			
-			if (item != -1 && collection->test_point(collection,
-				collection->drag_box_x[0] -
-					col * collection->item_width,
-				collection->drag_box_y[0]
-					- row * collection->item_height
-					+ scroll,
-				&collection->items[item],
-				collection->item_width,
-				collection->item_height,
-				collection->cb_user_data))
-			{
-				collection->buttons_pressed = 0;
-				gtk_grab_remove(widget);
-				collection_select_item(collection, item);
-				gtk_signal_emit(GTK_OBJECT(collection), 
-					collection_signals[DRAG_SELECTION],
-					event,
-					collection->number_selected);
-			}
-			else
-			{
-				collection->drag_box_x[1] = x;
-				collection->drag_box_y[1] = y;
-				collection_set_autoscroll(collection, TRUE);
-				add_lasso_box(collection);
-			}
-		}
-	}
-
-	current_event_time = stacked_time;
+	
 	return FALSE;
 }
 
@@ -1525,21 +1214,6 @@ static void remove_lasso_box(Collection *collection)
 	collection->lasso_box = FALSE;
 
 	return;
-}
-
-/* Convert a row,col address to an item number, or -1 if none */
-static int item_at_row_col(Collection *collection, int row, int col)
-{
-	int	item;
-	
-	if (row < 0 || col < 0 || col >= collection->columns)
-		return -1;
-
-	item = col + row * collection->columns;
-
-	if (item >= collection->number_of_items)
-		return -1;
-	return item;
 }
 
 /* Make sure that 'item' is fully visible (vertically), scrolling if not. */
@@ -1600,49 +1274,6 @@ static void get_visible_limits(Collection *collection, int *first, int *last)
 		if (*last < *first)
 			*last = *first;
 	}
-}
-
-/* Unselect all items except number item (-1 to unselect everything) */
-static void collection_clear_except(Collection *collection, gint exception)
-{
-	GtkWidget	*widget;
-	GdkRectangle	area;
-	int		item = 0;
-	int		scroll;
-	int		end;		/* Selected items to end up with */
-	
-	widget = GTK_WIDGET(collection);
-	scroll = collection->vadj->value;
-
-	end = exception >= 0 && exception < collection->number_of_items
-		? collection->items[exception].selected != 0 : 0;
-
-	area.width = collection->item_width;
-	area.height = collection->item_height;
-	
-	if (collection->number_selected == 0)
-		return;
-
-	while (collection->number_selected > end)
-	{
-		while (item == exception || !collection->items[item].selected)
-			item++;
-
-		area.x = (item % collection->columns) * area.width;
-		area.y = (item / collection->columns) * area.height
-				- scroll;
-
-		collection->items[item++].selected = FALSE;
-		clear_area(collection, &area);
-		collection_paint(collection, &area);
-		
-		collection->number_selected--;
-	}
-
-	if (end == 0)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[LOSE_SELECTION],
-				current_event_time);
 }
 
 /* Cancel the current wink effect. */
@@ -1903,6 +1534,59 @@ void collection_select_all(Collection *collection)
 	gtk_signal_emit(GTK_OBJECT(collection),
 			collection_signals[GAIN_SELECTION],
 			current_event_time);
+}
+
+/* Unselect all items except number item, which is selected (-1 to unselect
+ * everything).
+ */
+void collection_clear_except(Collection *collection, gint item)
+{
+	GtkWidget	*widget;
+	GdkRectangle	area;
+	int		i = 0;
+	int		scroll;
+	int		end;		/* Selected items to end up with */
+
+	g_return_if_fail(collection != NULL);
+	g_return_if_fail(IS_COLLECTION(collection));
+	g_return_if_fail(item >= -1 && item < collection->number_of_items);
+	
+	widget = GTK_WIDGET(collection);
+	scroll = collection->vadj->value;
+
+	if (item == -1)
+		end = 0;
+	else
+	{
+		collection_select_item(collection, item);
+		end = 1;
+	}
+
+	area.width = collection->item_width;
+	area.height = collection->item_height;
+	
+	if (collection->number_selected == 0)
+		return;
+
+	while (collection->number_selected > end)
+	{
+		while (i == item || !collection->items[i].selected)
+			i++;
+
+		area.x = (i % collection->columns) * area.width;
+		area.y = (i / collection->columns) * area.height - scroll;
+
+		collection->items[i++].selected = FALSE;
+		clear_area(collection, &area);
+		collection_paint(collection, &area);
+		
+		collection->number_selected--;
+	}
+
+	if (end == 0)
+		gtk_signal_emit(GTK_OBJECT(collection),
+				collection_signals[LOSE_SELECTION],
+				current_event_time);
 }
 
 /* Unselect all items in the collection */
@@ -2231,29 +1915,6 @@ void collection_delete_if(Collection *collection,
 	}
 }
 
-/* Display a cross-hair pointer and the next time an item is clicked,
- * call the callback function. If the background is clicked or NULL
- * is passed as the callback then revert to normal operation.
- */
-void collection_target(Collection *collection,
-			CollectionTargetFunc callback,
-			gpointer user_data)
-{
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-
-	if (callback != collection->target_cb)
-		gdk_window_set_cursor(GTK_WIDGET(collection)->window,
-				callback ? crosshair : NULL);
-
-	collection->target_cb = callback;
-	collection->target_data = user_data;
-
-	if (collection->cursor_item != -1)
-		collection_draw_item(collection, collection->cursor_item,
-				FALSE);
-}
-
 /* Move the cursor by the given row and column offsets.
  * Moving by (0,0) can be used to simply make the cursor appear.
  */
@@ -2342,4 +2003,35 @@ void collection_set_autoscroll(Collection *collection, gboolean auto_scroll)
 		gtk_timeout_remove(collection->auto_scroll);
 		collection->auto_scroll = -1;
 	}
+}
+
+/* Start a lasso box drag */
+void collection_lasso_box(Collection *collection, int x, int y)
+{
+	collection->drag_box_x[0] = x;
+	collection->drag_box_y[0] = y;
+	collection->drag_box_x[1] = x;
+	collection->drag_box_y[1] = y;
+
+	collection_set_autoscroll(collection, TRUE);
+	add_lasso_box(collection);
+}
+
+/* Remove the lasso box. Applies fn to each item inside the box.
+ * fn may be GDK_INVERT, GDK_SET, GDK_NOOP or GDK_CLEAR.
+ */
+void collection_end_lasso(Collection *collection, GdkFunction fn)
+{
+	if (fn != GDK_CLEAR)
+	{
+		GdkRectangle	region;
+
+		find_lasso_area(collection, &region);
+
+		collection_process_area(collection, &region, fn,
+				GDK_CURRENT_TIME);
+	}
+
+	abort_lasso(collection);
+
 }

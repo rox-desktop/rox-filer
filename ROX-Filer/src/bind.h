@@ -10,6 +10,8 @@
 
 #include <gtk/gtk.h>
 
+extern gboolean 	o_new_window_on_1;
+
 typedef enum {
 	BIND_DIRECTORY,
 	BIND_DIRECTORY_ICON,
@@ -29,8 +31,13 @@ typedef enum {
 	ACT_CLEAR_SELECTION,	/* Unselect all icons in this area */
 	ACT_MOVE_ICON,		/* Reposition a pinboard/panel icon */
 	ACT_PRIME_FOR_DND,	/* Significant motion will start dnd */
+	ACT_PRIME_AND_SELECT,	/* As above, but select the item too */
+	ACT_PRIME_AND_TOGGLE,	/* As above, but toggle the item instead */
+	ACT_LASSO_CLEAR,	/* Clear selection, and start lasso drag */
+	ACT_LASSO_MODIFY,	/* Start lasso drag without clearing */
 } BindAction;
 
+void bind_init(void);
 BindAction bind_lookup_bev(BindContext context, GdkEventButton *event);
 
 #endif /* _BIND_H */

@@ -60,6 +60,7 @@
 #include "panel.h"
 #include "run.h"
 #include "toolbar.h"
+#include "bind.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_error_log = -1;		/* Write here to log errors */
@@ -349,6 +350,7 @@ int main(int argc, char **argv)
 		return EXIT_SUCCESS;	/* Already running */
 	pixmaps_init();
 
+	bind_init();
 	dir_init();
 	menu_init();
 	dnd_init();

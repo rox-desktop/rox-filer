@@ -48,9 +48,6 @@ typedef gboolean (*CollectionTestFunc)( Collection *collection,
 			       		CollectionItem *item,
 			       		int width, int height,
 					gpointer user_data);
-typedef void (*CollectionTargetFunc)(Collection *collection,
-					gint item,
-					gpointer user_data);
 
 struct _CollectionItem
 {
@@ -75,8 +72,6 @@ struct _Collection
 	int		drag_box_x[2];	/* Index 0 is the fixed corner */
 	int		drag_box_y[2];
 	GdkGC		*xor_gc;
-	int		buttons_pressed;	/* Number of buttons down */
-	gboolean	may_drag;	/* Tried to drag since first press? */
 
 	CollectionItem	*items;
 	gint		cursor_item;		/* -1 if not shown */
@@ -88,12 +83,8 @@ struct _Collection
 	guint		item_width, item_height;
 
 	guint		number_selected;
-	int		item_clicked;	/* For collection_single_click */
 
 	guint		array_size;
-
-	CollectionTargetFunc target_cb;
-	gpointer	target_data;
 
 	gint		auto_scroll;	/* Timer */
 };
@@ -102,15 +93,6 @@ struct _CollectionClass
 {
 	GtkWidgetClass 	parent_class;
 
-	void 		(*open_item)(Collection *collection,
-				     CollectionItem *item,
-				     guint	item_number);
-	void 		(*drag_selection)(Collection 		*collection,
-				     	  GdkEventMotion	*motion_event,
-				     	  guint			items_selected);
-	void 		(*show_menu)(Collection 	*collection,
-				     GdkEventButton	*button_event,
-				     guint		items_selected);
 	void 		(*gain_selection)(Collection 	*collection,
 				     guint		time);
 	void 		(*lose_selection)(Collection 	*collection,
@@ -120,6 +102,7 @@ struct _CollectionClass
 guint   collection_get_type   		(void);
 GtkWidget *collection_new          	(GtkAdjustment *vadj);
 void    collection_clear           	(Collection *collection);
+void	collection_clear_except		(Collection *collection, gint item);
 gint    collection_insert          	(Collection *collection, gpointer data);
 void    collection_remove          	(Collection *collection, gint item);
 void    collection_unselect_item	(Collection *collection, gint item);
@@ -149,13 +132,13 @@ void 	collection_delete_if		(Collection *collection,
 			  		 gboolean (*test)(gpointer item,
 						          gpointer data),
 			  		 gpointer data);
-void	collection_target		(Collection *collection,
-					 CollectionTargetFunc callback,
-					 gpointer user_data);
 void 	collection_move_cursor		(Collection *collection,
 					 int drow, int dcol);
 void	collection_set_autoscroll	(Collection *collection,
 					 gboolean auto_scroll);
+void	collection_lasso_box		(Collection *collection, int x, int y);
+void	collection_end_lasso		(Collection *collection,
+					 GdkFunction fn);
 
 #ifdef __cplusplus
 }

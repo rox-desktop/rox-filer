@@ -53,11 +53,9 @@
 #include "pinboard.h"
 #include "panel.h"
 #include "toolbar.h"
+#include "bind.h"
 
 #define PANEL_BORDER 2
-
-extern int collection_menu_button;
-extern gboolean collection_single_click;
 
 FilerWindow 	*window_with_focus = NULL;
 GList		*all_filer_windows = NULL;
@@ -69,10 +67,7 @@ static GtkWidget *create_options();
 static void update_options();
 static void set_options();
 static void save_options();
-static char *filer_single_click(char *data);
 static char *filer_unique_windows(char *data);
-static char *filer_menu_on_2(char *data);
-static char *filer_new_window_on_1(char *data);
 static char *filer_initial_window_height(char *data);
 
 static OptionsSection options =
@@ -84,13 +79,8 @@ static OptionsSection options =
 	save_options
 };
 
-gboolean o_single_click = TRUE;
-gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
 static gint o_initial_window_height = 3;
-static GtkWidget *toggle_single_click;
-static GtkWidget *toggle_new_window_on_1;
-static GtkWidget *toggle_menu_on_2;
 static GtkWidget *toggle_unique_filer_windows;
 static GtkAdjustment *adj_initial_window_height;
 
@@ -99,12 +89,7 @@ static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-static void show_menu(Collection *collection, GdkEventButton *event,
-		int number_selected, gpointer user_data);
 static gint focus_in(GtkWidget *widget,
-			GdkEventFocus *event,
-			FilerWindow *filer_window);
-static gint focus_out(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
 static void add_item(FilerWindow *filer_window, DirItem *item);
@@ -114,30 +99,36 @@ static void update_display(Directory *dir,
 			FilerWindow *filer_window);
 static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
-static void open_item(Collection *collection,
-		gpointer item_data, int item_number,
-		gpointer user_data);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
 static void filer_set_title(FilerWindow *filer_window);
+static gint coll_button_release(GtkWidget *widget,
+			        GdkEventButton *event,
+			        FilerWindow *filer_window);
+static gint coll_button_press(GtkWidget *widget,
+			      GdkEventButton *event,
+			      FilerWindow *filer_window);
+static gint coll_motion_notify(GtkWidget *widget,
+			       GdkEventMotion *event,
+			       FilerWindow *filer_window);
+static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
 
 static GdkAtom xa_string;
 
 static GdkCursor *busy_cursor = NULL;
+static GdkCursor *crosshair = NULL;
 
-void filer_init()
+void filer_init(void)
 {
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
 	options_sections = g_slist_prepend(options_sections, &options);
-	option_register("filer_new_window_on_1", filer_new_window_on_1);
-	option_register("filer_menu_on_2", filer_menu_on_2);
-	option_register("filer_single_click", filer_single_click);
 	option_register("filer_unique_windows", filer_unique_windows);
 	option_register("filer_initial_window_height",
 						filer_initial_window_height);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
+	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
 }
 
 static gboolean if_deleted(gpointer item, gpointer removed)
@@ -300,7 +291,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	if (--number_of_windows < 1)
 		gtk_main_quit();
 }
-	
+
 /* Add a single object to a directory display */
 static void add_item(FilerWindow *filer_window, DirItem *item)
 {
@@ -320,12 +311,6 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 					 item_width,
 					 filer_window->collection->item_height);
 	collection_insert(filer_window->collection, item);
-}
-
-static void show_menu(Collection *collection, GdkEventButton *event,
-		int item, gpointer user_data)
-{
-	show_filer_menu((FilerWindow *) user_data, event, item);
 }
 
 /* Returns TRUE iff the directory still exists. */
@@ -458,51 +443,6 @@ static void gain_selection(Collection 	*collection,
 		collection_clear_selection(filer_window->collection);
 }
 
-static void open_item(Collection *collection,
-		gpointer item_data, int item_number,
-		gpointer user_data)
-{
-	FilerWindow	*filer_window = (FilerWindow *) user_data;
-	GdkEvent 	*event;
-	GdkEventButton 	*bevent;
-	GdkEventKey 	*kevent;
-	OpenFlags	flags = 0;
-
-	event = (GdkEvent *) gtk_get_current_event();
-
-	bevent = (GdkEventButton *) event;
-	kevent = (GdkEventKey *) event;
-
-	switch (event->type)
-	{
-		case GDK_2BUTTON_PRESS:
-		case GDK_BUTTON_PRESS:
-		case GDK_BUTTON_RELEASE:
-			if (bevent->state & GDK_SHIFT_MASK)
-				flags |= OPEN_SHIFT;
-
-			if (o_new_window_on_1 ^ (bevent->button == 1))
-				flags |= OPEN_SAME_WINDOW;
-			
-			if (bevent->button != 1)
-				flags |= OPEN_CLOSE_WINDOW;
-			
-			if (o_single_click == FALSE &&
-				(bevent->state & GDK_CONTROL_MASK) != 0)
-				flags ^= OPEN_SAME_WINDOW | OPEN_CLOSE_WINDOW;
-			break;
-		case GDK_KEY_PRESS:
-			flags |= OPEN_SAME_WINDOW;
-			if (kevent->state & GDK_SHIFT_MASK)
-				flags |= OPEN_SHIFT;
-			break;
-		default:
-			break;
-	}
-
-	filer_openitem(filer_window, item_number, flags);
-}
-
 /* Open the item (or add it to the shell command minibuffer) */
 void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 {
@@ -572,15 +512,6 @@ static gint focus_in(GtkWidget *widget,
 	return FALSE;
 }
 
-static gint focus_out(GtkWidget *widget,
-			GdkEventFocus *event,
-			FilerWindow *filer_window)
-{
-	/* TODO: Shade the cursor */
-
-	return FALSE;
-}
-
 /* Move the cursor to the next selected item in direction 'dir'
  * (+1 or -1).
  */
@@ -623,6 +554,30 @@ found:
 	collection_set_cursor_item(collection, item);
 }
 
+static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
+{
+	Collection		*collection = filer_window->collection;
+	int			item = collection->cursor_item;
+	TargetFunc 		cb = filer_window->target_cb;
+	gpointer		data = filer_window->target_data;
+	OpenFlags		flags = OPEN_SAME_WINDOW;
+
+	filer_target_mode(filer_window, NULL, NULL, NULL);
+	if (item < 0 || item >= collection->number_of_items)
+		return;
+
+	if (cb)
+	{
+		cb(filer_window, item, data);
+		return;
+	}
+
+	if (event->state & GDK_SHIFT_MASK)
+		flags |= OPEN_SHIFT;
+
+	filer_openitem(filer_window, item, flags);
+}
+
 /* Handle keys that can't be bound with the menu */
 static gint key_press_event(GtkWidget	*widget,
 			GdkEventKey	*event,
@@ -630,6 +585,12 @@ static gint key_press_event(GtkWidget	*widget,
 {
 	switch (event->keyval)
 	{
+		case GDK_Escape:
+			filer_target_mode(filer_window, NULL, NULL, NULL);
+			break;
+		case GDK_Return:
+			return_pressed(filer_window, event);
+			break;
 		case GDK_ISO_Left_Tab:
 			next_selected(filer_window, -1);
 			break;
@@ -679,9 +640,25 @@ void change_to_parent(FilerWindow *filer_window)
 void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 {
 	char	*from_dup;
-	char	*real_path = pathdup(path);
+	char	*real_path;
+	Directory *new_dir;
 
 	g_return_if_fail(filer_window != NULL);
+
+	real_path = pathdup(path);
+	new_dir  = g_fscache_lookup(dir_cache, real_path);
+
+	if (!new_dir)
+	{
+		char	*error;
+
+		error = g_strdup_printf(_("Directory '%s' is not accessible"),
+				real_path);
+		g_free(real_path);
+		delayed_error(PROJECT, error);
+		g_free(error);
+		return;
+	}
 	
 	if (o_unique_filer_windows)
 	{
@@ -698,35 +675,20 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	g_free(filer_window->path);
 	filer_window->path = real_path;
 
-	filer_window->directory = g_fscache_lookup(dir_cache,
-						   filer_window->path);
-	if (filer_window->directory)
-	{
-		g_free(filer_window->auto_select);
-		filer_window->had_cursor =
-			filer_window->collection->cursor_item != -1
-			|| filer_window->had_cursor;
-		filer_window->auto_select = from_dup;
+	filer_window->directory = new_dir;
 
-		filer_set_title(filer_window);
-		collection_set_cursor_item(filer_window->collection, -1);
-		attach(filer_window);
+	g_free(filer_window->auto_select);
+	filer_window->had_cursor = filer_window->collection->cursor_item != -1
+				   || filer_window->had_cursor;
+	filer_window->auto_select = from_dup;
 
-		if (filer_window->mini_type == MINI_PATH)
-			gtk_idle_add((GtkFunction) minibuffer_show_cb,
-					filer_window);
-	}
-	else
-	{
-		char	*error;
+	filer_set_title(filer_window);
+	collection_set_cursor_item(filer_window->collection, -1);
+	attach(filer_window);
 
-		g_free(from_dup);
-		error = g_strdup_printf(_("Directory '%s' is not accessible"),
-				path);
-		delayed_error(PROJECT, error);
-		g_free(error);
-		gtk_widget_destroy(filer_window->window);
-	}
+	if (filer_window->mini_type == MINI_PATH)
+		gtk_idle_add((GtkFunction) minibuffer_show_cb,
+				filer_window);
 }
 
 void filer_open_parent(FilerWindow *filer_window)
@@ -811,35 +773,6 @@ static void create_uri_list(FilerWindow *filer_window, GString *string)
 	g_string_free(leader, TRUE);
 }
 
-static void start_drag_selection(Collection *collection,
-				 GdkEventMotion *event,
-				 int number_selected,
-				 FilerWindow *filer_window)
-{
-	GtkWidget	*widget = (GtkWidget *) collection;
-
-	if (number_selected == 1)
-	{
-		DirItem	*item;
-
-		item = selected_item(collection);
-
-		drag_one_item(widget, event,
-			make_path(filer_window->path, item->leafname)->str,
-			item,
-			filer_window->mini_type == MINI_RUN_ACTION);
-	}
-	else
-	{
-		GString *uris;
-	
-		uris = g_string_new(NULL);
-		create_uri_list(filer_window, uris);
-		drag_selection(widget, event, uris->str);
-		g_string_free(uris, TRUE);
-	}
-}
-
 /* Creates and shows a new filer window */
 FilerWindow *filer_opendir(char *path)
 {
@@ -885,6 +818,8 @@ FilerWindow *filer_opendir(char *path)
 	filer_window->scanning = FALSE;
 	filer_window->had_cursor = FALSE;
 	filer_window->auto_select = NULL;
+	filer_window->toolbar_text = NULL;
+	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
 
 	/* Finds the entry for this directory in the dir cache, creating
@@ -918,6 +853,11 @@ FilerWindow *filer_opendir(char *path)
 
 	/* The collection is the area that actually displays the files */
 	collection = collection_new(NULL);
+	gtk_widget_set_events(collection,
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+			GDK_BUTTON3_MOTION_MASK |
+			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
+
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
@@ -928,21 +868,13 @@ FilerWindow *filer_opendir(char *path)
 			GTK_SIGNAL_FUNC(pointer_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_out_event",
-			GTK_SIGNAL_FUNC(focus_out), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			filer_window_destroyed, filer_window);
 
-	gtk_signal_connect(GTK_OBJECT(filer_window->collection), "open_item",
-			open_item, filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "show_menu",
-			show_menu, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
 			gain_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "lose_selection",
 			lose_selection, filer_window);
-	gtk_signal_connect(GTK_OBJECT(collection), "drag_selection",
-			start_drag_selection, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
 			drag_data_get, NULL);
 	gtk_signal_connect(GTK_OBJECT(collection), "selection_clear_event",
@@ -952,6 +884,13 @@ FilerWindow *filer_opendir(char *path)
 	gtk_selection_add_targets(collection, GDK_SELECTION_PRIMARY,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
+
+	gtk_signal_connect(GTK_OBJECT(collection), "button-release-event",
+			GTK_SIGNAL_FUNC(coll_button_release), filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "button-press-event",
+			GTK_SIGNAL_FUNC(coll_button_press), filer_window);
+	gtk_signal_connect(GTK_OBJECT(collection), "motion-notify-event",
+			GTK_SIGNAL_FUNC(coll_motion_notify), filer_window);
 
 	display_set_layout(filer_window, last_layout);
 	drag_set_dest(filer_window);
@@ -1062,35 +1001,6 @@ static GtkWidget *create_options(void)
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
 
-	toggle_new_window_on_1 =
-		gtk_check_button_new_with_label(
-			_("New window on button 1 (RISC OS style)"));
-	OPTION_TIP(toggle_new_window_on_1,
-			_("Clicking with mouse button 1 (usually the "
-			"left button) opens a directory in a new window "
-			"with this turned on. Clicking with the button-2 "
-			"(middle) will reuse the current window."));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_new_window_on_1,
-			FALSE, TRUE, 0);
-
-	toggle_menu_on_2 =
-		gtk_check_button_new_with_label(
-			_("Menu on button 2 (RISC OS style)"));
-	OPTION_TIP(toggle_menu_on_2,
-			_("Use button 2, the middle button (click both buttons "
-			"at once on two button mice), to pop up the menu. "
-			"If off, use button 3 (right) instead."));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_menu_on_2, FALSE, TRUE, 0);
-
-	toggle_single_click =
-		gtk_check_button_new_with_label(_("Single-click nagivation"));
-	OPTION_TIP(toggle_single_click,
-			_("Clicking on an item opens it with this on. Hold "
-			"down Control to select the item instead. If off, "
-			"clicking once selects an item; double click to open "
-			"things."));
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
-
 	toggle_unique_filer_windows =
 		gtk_check_button_new_with_label(_("Unique windows"));
 	OPTION_TIP(toggle_unique_filer_windows,
@@ -1121,12 +1031,6 @@ static GtkWidget *create_options(void)
 /* Reflect current state by changing the widgets in the options box */
 static void update_options()
 {
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_new_window_on_1),
-			o_new_window_on_1);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_menu_on_2),
-			collection_menu_button == 2 ? 1 : 0);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
-			o_single_click);
 	gtk_toggle_button_set_active(
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
 			o_unique_filer_windows);
@@ -1137,20 +1041,9 @@ static void update_options()
 /* Set current values by reading the states of the widgets in the options box */
 static void set_options()
 {
-	o_new_window_on_1 = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_new_window_on_1));
-
-	collection_menu_button = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_menu_on_2)) ? 2 : 3;
-
-	o_single_click = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_single_click));
-
 	o_unique_filer_windows = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows));
 
-	collection_single_click = o_single_click ? TRUE : FALSE;
-	
 	o_initial_window_height = adj_initial_window_height->value;
 }
 
@@ -1158,35 +1051,12 @@ static void save_options()
 {
 	guchar *str;
 	
-	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
-	option_write("filer_menu_on_2",
-			collection_menu_button == 2 ? "1" : "0");
-	option_write("filer_single_click", o_single_click ? "1" : "0");
 	option_write("filer_unique_windows",
 			o_unique_filer_windows ? "1" : "0");
 			
 	str = g_strdup_printf("%d", o_initial_window_height);
 	option_write("filer_initial_window_height", str);
 	g_free(str);
-}
-
-static char *filer_new_window_on_1(char *data)
-{
-	o_new_window_on_1 = atoi(data) != 0;
-	return NULL;
-}
-
-static char *filer_menu_on_2(char *data)
-{
-	collection_menu_button = atoi(data) != 0 ? 2 : 3;
-	return NULL;
-}
-
-static char *filer_single_click(char *data)
-{
-	o_single_click = atoi(data) != 0;
-	collection_single_click = o_single_click ? TRUE : FALSE;
-	return NULL;
 }
 
 static char *filer_unique_windows(char *data)
@@ -1337,4 +1207,212 @@ void filer_detach_rescan(FilerWindow *filer_window)
 	detach(filer_window);
 	filer_window->directory = dir;
 	attach(filer_window);
+}
+
+static gint coll_button_release(GtkWidget *widget,
+			        GdkEventButton *event,
+			        FilerWindow *filer_window)
+{
+	if (dnd_motion_release(event))
+	{
+		if (motion_buttons_pressed == 0 &&
+					filer_window->collection->lasso_box)
+			collection_end_lasso(filer_window->collection, TRUE);
+		return TRUE;
+	}
+
+	perform_action(filer_window, event);
+
+	return TRUE;
+}
+
+static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
+{
+	Collection	*collection = filer_window->collection;
+	DirItem		*dir_item;
+	int		item;
+	BindAction	action;
+	gboolean	press = event->type == GDK_BUTTON_PRESS;
+	gboolean	selected = FALSE;
+	OpenFlags	flags = 0;
+
+	if (event->button > 3)
+		return;
+
+	item = collection_get_item(collection, event->x, event->y);
+
+	if (filer_window->target_cb)
+	{
+		dnd_motion_ungrab();
+		if (item != -1 && press && event->button == 1)
+			filer_window->target_cb(filer_window, item,
+					filer_window->target_data);
+		filer_target_mode(filer_window, NULL, NULL, NULL);
+
+		return;
+	}
+
+	action = bind_lookup_bev(
+			item == -1 ? BIND_DIRECTORY : BIND_DIRECTORY_ICON,
+			event);
+
+	if (item != -1)
+	{
+		dir_item = (DirItem *) collection->items[item].data;
+		selected = collection->items[item].selected;
+	}
+	else
+		dir_item = NULL;
+
+	switch (action)
+	{
+		case ACT_CLEAR_SELECTION:
+			collection_clear_selection(collection);
+			break;
+		case ACT_TOGGLE_SELECTED:
+			collection_toggle_item(collection, item);
+			break;
+		case ACT_SELECT_EXCL:
+			collection_clear_except(collection, item);
+			break;
+		case ACT_EDIT_ITEM:
+			flags |= OPEN_SHIFT;
+			/* (no break) */
+		case ACT_OPEN_ITEM:
+			if (event->button != 1)
+				flags |= OPEN_CLOSE_WINDOW;
+			else
+				flags |= OPEN_SAME_WINDOW;
+			if (event->type == GDK_2BUTTON_PRESS)
+				collection_unselect_item(collection, item);
+			dnd_motion_ungrab();
+			filer_openitem(filer_window, item, flags);
+			break;
+		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
+			show_filer_menu(filer_window, event, item);
+			break;
+		case ACT_PRIME_AND_SELECT:
+			if (!selected)
+				collection_clear_except(collection, item);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_AND_TOGGLE:
+			collection_toggle_item(collection, item);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_FOR_DND:
+			collection_wink_item(collection, item);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_IGNORE:
+			if (press && event->button < 4)
+			{
+				if (item)
+					collection_wink_item(collection, item);
+				dnd_motion_start(MOTION_NONE);
+			}
+			break;
+		case ACT_LASSO_CLEAR:
+			collection_clear_selection(collection);
+			/* (no break) */
+		case ACT_LASSO_MODIFY:
+			collection_lasso_box(collection, event->x, event->y);
+			break;
+		default:
+			g_warning("Unsupported action : %d\n", action);
+			break;
+	}
+}
+
+static gint coll_button_press(GtkWidget *widget,
+			      GdkEventButton *event,
+			      FilerWindow *filer_window)
+{
+	collection_set_cursor_item(filer_window->collection, -1);
+
+	if (dnd_motion_press(widget, event))
+		perform_action(filer_window, event);
+
+	return TRUE;
+}
+
+static gint coll_motion_notify(GtkWidget *widget,
+			       GdkEventMotion *event,
+			       FilerWindow *filer_window)
+{
+	Collection	*collection = filer_window->collection;
+	int		i;
+
+	if (motion_state != MOTION_READY_FOR_DND)
+		return TRUE;
+
+	if (!dnd_motion_moved(event))
+		return TRUE;
+
+	i = collection_get_item(collection,
+			event->x - (event->x_root - drag_start_x),
+			event->y - (event->y_root - drag_start_y));
+	if (i == -1)
+		return TRUE;
+
+	collection_wink_item(collection, -1);
+	
+	if (!collection->items[i].selected)
+	{
+		if (event->state & GDK_BUTTON1_MASK)
+		{
+			/* Select just this one */
+			collection_clear_except(collection, i);
+			/* tmp_icon_selected = TRUE; */
+		}
+		else
+			collection_select_item(collection, i);
+	}
+
+	g_return_val_if_fail(collection->number_selected > 0, TRUE);
+
+	if (collection->number_selected == 1)
+	{
+		DirItem	*item = (DirItem *) collection->items[i].data;
+
+		drag_one_item(widget, event,
+			make_path(filer_window->path, item->leafname)->str,
+			item, FALSE);
+	}
+	else
+	{
+		GString *uris;
+	
+		uris = g_string_new(NULL);
+		create_uri_list(filer_window, uris);
+		drag_selection(widget, event, uris->str);
+		g_string_free(uris, TRUE);
+	}
+
+	return TRUE;
+}
+
+/* Puts the filer window into target mode. When an item is chosen,
+ * fn(filer_window, item, data) is called. 'reason' will be displayed
+ * on the toolbar while target mode is active.
+ *
+ * Use fn == NULL to cancel target mode.
+ */
+void filer_target_mode(FilerWindow *filer_window,
+			TargetFunc fn,
+			gpointer data,
+			char	 *reason)
+{
+	if (fn != filer_window->target_cb)
+		gdk_window_set_cursor(
+				GTK_WIDGET(filer_window->collection)->window,
+				fn ? crosshair : NULL);
+
+	filer_window->target_cb = fn;
+	filer_window->target_data = data;
+
+	if (filer_window->toolbar_text)
+		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text),
+				fn ? reason : "");
 }

@@ -45,6 +45,7 @@
 #include "options.h"
 #include "dir.h"
 #include "mount.h"
+#include "bind.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -61,7 +62,7 @@ GdkColor text_fg_col, text_bg_col;
 GtkStyle *pinicon_style = NULL;
 
 struct _PinIcon {
-	GtkWidget	*win, *paper;
+	GtkWidget	*win, *widget;
 	GdkBitmap	*mask;
 	guchar		*path;
 	DirItem		item;
@@ -74,8 +75,6 @@ struct _Pinboard {
 	GList		*icons;
 };
 
-extern int collection_menu_button;
-
 static Pinboard	*current_pinboard = NULL;
 static gint	loading_pinboard = 0;	/* Non-zero => loading */
 
@@ -84,9 +83,9 @@ static gint	wink_timeout;
 
 static gint	number_selected = 0;
 
-static GdkColor		mask_solid = {1, 1, 1, 1};
-static GdkColor		mask_transp = {0, 0, 0, 0};
-static  GdkGC	*mask_gc = NULL;
+static GdkColor	mask_solid = {1, 1, 1, 1};
+static GdkColor	mask_transp = {0, 0, 0, 0};
+static GdkGC	*mask_gc = NULL;
 
 /* Proxy window for DnD and clicks on the desktop */
 static GtkWidget *proxy_invisible;
@@ -97,19 +96,6 @@ static GtkWidget *proxy_invisible;
 static GdkWindow *click_proxy_gdk_window = NULL;
 static GdkAtom   win_button_proxy; /* _WIN_DESKTOP_BUTTON_PROXY */
 
-static gint	drag_start_x, drag_start_y;
-/* If the drag type is not DRAG_NONE then there is a grab in progress */
-typedef enum {
-	DRAG_NONE,
-	DRAG_MOVE_ICON,	/* When you hold down Adjust on an icon */
-	DRAG_MAY_COPY,	/* When you hold down Select on an icon, but */
-			/* before the drag has actually started. */
-} PinDragType;
-static PinDragType pin_drag_type = DRAG_NONE;
-
-/* This is TRUE while the user is dragging from a pinned icon.
- * We use it to prevent dragging from the pinboard to itself.
- */
 static gboolean pinboard_drag_in_progress = FALSE;
 
 /* Options bits */
@@ -327,33 +313,33 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 	icon->win = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_wmclass(GTK_WINDOW(icon->win), "ROX-Pinboard", PROJECT);
 
-	icon->paper = gtk_drawing_area_new();
-	gtk_container_add(GTK_CONTAINER(icon->win), icon->paper);
+	icon->widget = gtk_drawing_area_new();
+	gtk_container_add(GTK_CONTAINER(icon->win), icon->widget);
 	drag_set_pinicon_dest(icon);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "drag_data_get",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "drag_data_get",
 				drag_data_get, NULL);
 
 	gtk_widget_realize(icon->win);
-	gtk_widget_realize(icon->paper);
+	gtk_widget_realize(icon->widget);
 	make_panel_window(icon->win->window);
 
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
 	gtk_widget_set_uposition(icon->win, x, y);
 
-	gtk_widget_add_events(icon->paper,
+	gtk_widget_add_events(icon->widget,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
 			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "enter-notify-event",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "enter-notify-event",
 			GTK_SIGNAL_FUNC(enter_notify), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "button-press-event",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "button-press-event",
 			GTK_SIGNAL_FUNC(button_press_event), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "button-release-event",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "button-release-event",
 			GTK_SIGNAL_FUNC(button_release_event), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "motion-notify-event",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "motion-notify-event",
 			GTK_SIGNAL_FUNC(icon_motion_notify), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->paper), "expose-event",
+	gtk_signal_connect(GTK_OBJECT(icon->widget), "expose-event",
 			GTK_SIGNAL_FUNC(draw_icon), icon);
 	gtk_signal_connect(GTK_OBJECT(icon->win), "destroy",
 			GTK_SIGNAL_FUNC(icon_destroyed), icon);
@@ -628,7 +614,7 @@ static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
 {
 	int	width, height;
 	
-	gdk_window_get_size(icon->paper->window, &width, &height);
+	gdk_window_get_size(icon->widget->window, &width, &height);
 
 	gdk_gc_set_foreground(mask_gc, alpha);
 	gdk_draw_rectangle(icon->mask, mask_gc, FALSE,
@@ -638,7 +624,7 @@ static void mask_wink_border(PinIcon *icon, GdkColor *alpha)
 
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
-	gtk_widget_draw(icon->paper, NULL);
+	gtk_widget_draw(icon->widget, NULL);
 }
 
 #define TEXT_AT(dx, dy)		\
@@ -661,13 +647,13 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 
 	if (!pinicon_style)
 	{
-		pinicon_style = gtk_style_copy(icon->paper->style);
+		pinicon_style = gtk_style_copy(icon->widget->style);
 		memcpy(&pinicon_style->fg[GTK_STATE_NORMAL],
 			&text_fg_col, sizeof(GdkColor));
 		memcpy(&pinicon_style->bg[GTK_STATE_NORMAL],
 			&text_bg_col, sizeof(GdkColor));
 	}
-	gtk_widget_set_style(icon->paper, pinicon_style);
+	gtk_widget_set_style(icon->widget, pinicon_style);
 
 	font = pinicon_style->font;
 	font_height = font->ascent + font->descent;
@@ -767,7 +753,7 @@ static void set_size_and_shape(PinIcon *icon, int *rwidth, int *rheight)
 
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 {
-	GdkFont		*font = icon->paper->style->font;
+	GdkFont		*font = icon->widget->style->font;
 	int		font_height;
 	int		width, height;
 	int		text_x, text_y;
@@ -847,50 +833,17 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *icon)
 
 	if (current_wink_icon == icon)
 	{
-		gdk_draw_rectangle(icon->paper->window,
-				icon->paper->style->white_gc,
+		gdk_draw_rectangle(icon->widget->window,
+				icon->widget->style->white_gc,
 				FALSE,
 				0, 0, width - 1, height - 1);
-		gdk_draw_rectangle(icon->paper->window,
-				icon->paper->style->black_gc,
+		gdk_draw_rectangle(icon->widget->window,
+				icon->widget->style->black_gc,
 				FALSE,
 				1, 1, width - 3, height - 3);
 	}
 
 	return FALSE;
-}
-
-#define OTHER_BUTTONS (GDK_BUTTON2_MASK | GDK_BUTTON3_MASK | \
-		       GDK_BUTTON4_MASK | GDK_BUTTON5_MASK)
-
-static gboolean button_release_event(GtkWidget *widget,
-			    	     GdkEventButton *event,
-                            	     PinIcon *icon)
-{
-	int	b = event->button;
-	DirItem	*item = &icon->item;
-
-	if (pin_drag_type == DRAG_NONE)
-		return TRUE;		/* Already done a drag? */
-
-	gtk_grab_remove(widget);
-
-	if (pin_drag_type == DRAG_MOVE_ICON)
-		pinboard_save();
-	else if (b == 1 && pin_drag_type == DRAG_MAY_COPY)
-	{
-		/* Could have been a copy, but the user didn't move
-		 * far enough. Open the item instead.
-		 */
-		pinboard_wink_item(icon, TRUE);
-
-		run_diritem(icon->path, item, NULL,
-				(event->state & GDK_SHIFT_MASK) != 0);
-	}
-
-	pin_drag_type = DRAG_NONE;
-
-	return TRUE;
 }
 
 static gboolean root_property_event(GtkWidget *widget,
@@ -911,10 +864,25 @@ static gboolean root_button_press(GtkWidget *widget,
 			    	  GdkEventButton *event,
                             	  gpointer data)
 {
-	if (event->button == collection_menu_button)
-		show_pinboard_menu(event, NULL);
-	else
-		pinboard_clear_selection();
+	BindAction	action;
+
+	action = bind_lookup_bev(BIND_PINBOARD, event);
+
+	switch (action)
+	{
+		case ACT_CLEAR_SELECTION:
+			pinboard_clear_selection();
+			break;
+		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
+			show_pinboard_menu(event, NULL);
+			break;
+		case ACT_IGNORE:
+			break;
+		default:
+			g_warning("Unsupported action : %d\n", action);
+			break;
+	}
 
 	return TRUE;
 }
@@ -928,36 +896,76 @@ static gboolean enter_notify(GtkWidget *widget,
 	return FALSE;
 }
 
+static void perform_action(PinIcon *icon, GdkEventButton *event)
+{
+	BindAction	action;
+	
+	action = bind_lookup_bev(BIND_PINBOARD_ICON, event);
+
+	switch (action)
+	{
+		case ACT_OPEN_ITEM:
+			dnd_motion_ungrab();
+			pinboard_wink_item(icon, TRUE);
+			run_diritem(icon->path, &icon->item, NULL, FALSE);
+			break;
+		case ACT_EDIT_ITEM:
+			dnd_motion_ungrab();
+			pinboard_wink_item(icon, TRUE);
+			run_diritem(icon->path, &icon->item, NULL, TRUE);
+			break;
+		case ACT_POPUP_MENU:
+			dnd_motion_ungrab();
+			show_pinboard_menu(event, icon);
+			break;
+		case ACT_MOVE_ICON:
+			dnd_motion_start(MOTION_REPOSITION);
+			break;
+		case ACT_PRIME_AND_SELECT:
+			if (!icon->selected)
+				pinboard_select_only(icon);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_AND_TOGGLE:
+			pinboard_set_selected(icon, !icon->selected);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_PRIME_FOR_DND:
+			pinboard_wink_item(icon, TRUE);
+			dnd_motion_start(MOTION_READY_FOR_DND);
+			break;
+		case ACT_TOGGLE_SELECTED:
+			pinboard_set_selected(icon, !icon->selected);
+			break;
+		case ACT_SELECT_EXCL:
+			pinboard_select_only(icon);
+			break;
+		case ACT_IGNORE:
+			break;
+		default:
+			g_warning("Unsupported action : %d\n", action);
+			break;
+	}
+}
+
+static gboolean button_release_event(GtkWidget *widget,
+			    	     GdkEventButton *event,
+                            	     PinIcon *icon)
+{
+	if (dnd_motion_release(event))
+		return TRUE;
+
+	perform_action(icon, event);
+	
+	return TRUE;
+}
+
 static gboolean button_press_event(GtkWidget *widget,
 			    	   GdkEventButton *event,
                             	   PinIcon *icon)
 {
-	int	b = event->button;
-
-	if (pin_drag_type != DRAG_NONE)
-		return TRUE;
-
-	if (b == collection_menu_button)
-		show_pinboard_menu(event, icon);
-	else if (b < 4)
-	{
-		if (event->state & GDK_CONTROL_MASK)
-		{
-			pin_drag_type = DRAG_NONE;
-			pinboard_set_selected(icon, !icon->selected);
-		}
-		else
-		{
-			drag_start_x = event->x_root;
-			drag_start_y = event->y_root;
-			gtk_grab_add(widget);
-
-			if (b == 1)
-				pin_drag_type = DRAG_MAY_COPY;
-			else
-				pin_drag_type = DRAG_MOVE_ICON;
-		}
-	}
+	if (dnd_motion_press(widget, event))
+		perform_action(icon, event);
 
 	return TRUE;
 }
@@ -992,7 +1000,7 @@ static guchar *create_uri_list(GList *list)
 
 static void start_drag(PinIcon *icon, GdkEventMotion *event)
 {
-	GtkWidget *widget = icon->paper;
+	GtkWidget *widget = icon->widget;
 	GList	*selected;
 
 	if (!icon->selected)
@@ -1022,33 +1030,28 @@ static gint icon_motion_notify(GtkWidget *widget,
 			       GdkEventMotion *event,
 			       PinIcon *icon)
 {
-	int	x = event->x_root;
-	int	y = event->y_root;
+	int	x, y;
+	int	width, height;
 
-	if (pin_drag_type == DRAG_MOVE_ICON)
+	x = event->x_root;
+	y = event->y_root;
+
+	if (motion_state == MOTION_READY_FOR_DND)
 	{
-		int	width, height;
-
-		snap_to_grid(&x, &y);
-		icon->x = x;
-		icon->y = y;
-		gdk_window_get_size(icon->win->window, &width, &height);
-		offset_from_centre(icon, width, height, &x, &y);
-
-		gdk_window_move(icon->win->window, x, y);
-	}
-	else if (pin_drag_type == DRAG_MAY_COPY)
-	{
-		int	dx = x - drag_start_x;
-		int	dy = y - drag_start_y;
-
-		if (ABS(dx) > 3 || ABS(dy) > 3)
-		{
-			pin_drag_type = DRAG_NONE;
-			gtk_grab_remove(widget);
+		if (dnd_motion_moved(event))
 			start_drag(icon, event);
-		}
+		return TRUE;
 	}
+	else if (motion_state != MOTION_REPOSITION)
+		return FALSE;
+
+	snap_to_grid(&x, &y);
+	icon->x = x;
+	icon->y = y;
+	gdk_window_get_size(icon->win->window, &width, &height);
+	offset_from_centre(icon, width, height, &x, &y);
+
+	gdk_window_move(icon->win->window, x, y);
 
 	return TRUE;
 }
@@ -1314,7 +1317,7 @@ static void offset_from_centre(PinIcon *icon,
 			       int *x, int *y)
 {
 	*x -= width >> 1;
-	*y -= height - (icon->paper->style->font->descent >> 1);
+	*y -= height - (icon->widget->style->font->descent >> 1);
 	*x = CLAMP(*x, 0, screen_width - width);
 	*y = CLAMP(*y, 0, screen_height - height);
 }
@@ -1322,9 +1325,9 @@ static void offset_from_centre(PinIcon *icon,
 /* Same as drag_set_dest(), but for pinboard icons */
 static void drag_set_pinicon_dest(PinIcon *icon)
 {
-	GtkObject	*obj = GTK_OBJECT(icon->paper);
+	GtkObject	*obj = GTK_OBJECT(icon->widget);
 
-	make_drop_target(icon->paper, 0);
+	make_drop_target(icon->widget, 0);
 
 	gtk_signal_connect(obj, "drag_motion",
 			GTK_SIGNAL_FUNC(drag_motion), icon);

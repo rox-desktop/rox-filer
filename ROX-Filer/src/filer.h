@@ -29,6 +29,8 @@ typedef enum
 #include "minibuffer.h"
 #include "display.h"
 
+typedef void (*TargetFunc)(FilerWindow *filer_window, int item, gpointer data);
+
 struct _FilerWindow
 {
 	GtkWidget	*window;
@@ -58,14 +60,17 @@ struct _FilerWindow
 	 * starts with a dot.
 	 */
 	gboolean 	temp_show_hidden;
+
+	TargetFunc	target_cb;
+	gpointer	target_data;
+
+	GtkWidget	*toolbar_text;
 };
 
 extern FilerWindow 	*window_with_focus;
 extern GList		*all_filer_windows;
 extern GHashTable	*child_to_filer;
 extern gboolean 	o_unique_filer_windows;
-extern gboolean		o_single_click;
-extern gboolean 	o_new_window_on_1;
 
 /* Prototypes */
 void filer_init(void);
@@ -82,5 +87,9 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 gboolean filer_exists(FilerWindow *filer_window);
 void filer_open_parent(FilerWindow *filer_window);
 void filer_detach_rescan(FilerWindow *filer_window);
+void filer_target_mode(FilerWindow	*filer_window,
+			TargetFunc	fn,
+			gpointer	data,
+			char		*reason);
 
 #endif /* _FILER_H */

@@ -110,7 +110,6 @@ static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
-static void remove_link(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
 static void find(gpointer data, guint action, GtkWidget *widget);
@@ -579,16 +578,20 @@ static void menu_closed(GtkWidget *widget)
 	}
 }
 
-void target_callback(Collection *collection, gint item, gpointer real_fn)
+void target_callback(FilerWindow *filer_window,
+			gint item,
+			gpointer real_fn)
 {
+	Collection	*collection = filer_window->collection;
+
 	g_return_if_fail(window_with_focus != NULL);
-	g_return_if_fail(window_with_focus->collection == collection);
+	g_return_if_fail(window_with_focus == filer_window);
 	g_return_if_fail(real_fn != NULL);
 	
 	collection_wink_item(collection, item);
 	collection_clear_selection(collection);
 	collection_select_item(collection, item);
-	((CollectionTargetFunc)real_fn)(NULL, 0, collection);
+	((GtkItemFactoryCallback1) real_fn)(NULL, 0, GTK_WIDGET(collection));
 	if (item < collection->number_of_items)
 		collection_unselect_item(collection, item);
 }
@@ -686,8 +689,9 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, mount);
+		filer_target_mode(window_with_focus,
+				target_callback, mount,
+				_("Mount ... ?"));
 	else
 	{
 		GList	*paths;
@@ -703,45 +707,11 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, delete);
+		filer_target_mode(window_with_focus,
+				target_callback, delete,
+				_("DELETE ... ?"));
 	else
 		action_delete(window_with_focus);
-}
-
-static void remove_link(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-
-	if (window_with_focus->collection->number_selected > 1)
-	{
-		report_error(PROJECT,
-				_("You can only remove one link at a time"));
-		return;
-	}
-	else if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, remove_link);
-	else
-	{
-		struct stat info;
-		DirItem *item;
-		guchar	*path;
-		
-		item = selected_item(window_with_focus->collection);
-
-		path = make_path(window_with_focus->path, item->leafname)->str;
-		if (lstat(path, &info))
-			report_error(PROJECT, g_strerror(errno));
-		else if (!S_ISLNK(info.st_mode))
-			report_error(PROJECT,
-			      _("You can only remove symbolic links this way - "
-				"try the 'Open Panel as Directory' item."));
-		else if (unlink(path))
-			report_error(PROJECT, g_strerror(errno));
-		else
-			filer_update_dir(window_with_focus, TRUE);
-	}
 }
 
 static void usage(gpointer data, guint action, GtkWidget *widget)
@@ -749,8 +719,9 @@ static void usage(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, usage);
+		filer_target_mode(window_with_focus,
+				target_callback, usage,
+				_("Count the size of ... ?"));
 	else
 		action_usage(window_with_focus);
 }
@@ -760,8 +731,9 @@ static void chmod_items(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, chmod_items);
+		filer_target_mode(window_with_focus,
+				target_callback, chmod_items,
+				_("Set permissions on ... ?"));
 	else
 		action_chmod(window_with_focus);
 }
@@ -771,8 +743,9 @@ static void find(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (window_with_focus->collection->number_selected == 0)
-		collection_target(window_with_focus->collection,
-				target_callback, find);
+		filer_target_mode(window_with_focus,
+				target_callback, find,
+				_("Search inside ... ?"));
 	else
 		action_find(window_with_focus);
 }
@@ -872,7 +845,9 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	else if (collection->number_selected != 1)
-		collection_target(collection, target_callback, copy_item);
+		filer_target_mode(window_with_focus,
+				target_callback, copy_item,
+				_("Copy ... ?"));
 	else
 		SHOW_SAVEBOX(_("Copy"), copy_cb);
 }
@@ -896,7 +871,9 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	else if (collection->number_selected != 1)
-		collection_target(collection, target_callback, rename_item);
+		filer_target_mode(window_with_focus,
+				target_callback, rename_item,
+				_("Rename ... ?"));
 	else
 		SHOW_SAVEBOX(_("Rename"), rename_cb);
 }
@@ -925,7 +902,9 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	else if (collection->number_selected != 1)
-		collection_target(collection, target_callback, link_item);
+		filer_target_mode(window_with_focus,
+				target_callback, link_item,
+				_("Symlink ... ?"));
 	else
 		SHOW_SAVEBOX(_("Symlink"), link_cb);
 }
@@ -944,7 +923,9 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	else if (collection->number_selected != 1)
-		collection_target(collection, target_callback, open_file);
+		filer_target_mode(window_with_focus,
+				target_callback, open_file,
+				_("Shift open ... ?"));
 	else
 		filer_openitem(window_with_focus,
 				selected_item_number(collection),
@@ -1073,7 +1054,9 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	}
 	else if (collection->number_selected != 1)
 	{
-		collection_target(collection, target_callback, show_file_info);
+		filer_target_mode(window_with_focus,
+				target_callback, show_file_info,
+				_("Examine ... ?"));
 		return;
 	}
 	file = selected_item(collection);
@@ -1230,7 +1213,8 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	}
 	else if (collection->number_selected != 1)
 	{
-		collection_target(collection, target_callback, help);
+		filer_target_mode(window_with_focus, target_callback, help,
+				_("Help about ... ?"));
 		return;
 	}
 	item = selected_item(collection);
@@ -1248,8 +1232,9 @@ static void open_vfs_ ## fs (gpointer data, guint action, GtkWidget *widget) \
 							\
 	collection = window_with_focus->collection;	\
 	if (collection->number_selected < 1)			\
-		collection_target(collection, target_callback,	\
-						open_vfs_ ## fs);	\
+		filer_target_mode(window_with_focus, target_callback,	\
+					open_vfs_ ## fs,		\
+					_("Look inside ... ?"));	\
 	else								\
 		real_vfs_open(#fs);			\
 }

@@ -34,8 +34,7 @@
 #include "dnd.h"
 #include "filer.h"
 #include "pixmaps.h"
-
-extern int collection_menu_button;
+#include "bind.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -175,10 +174,12 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
 
-	box = gtk_hbutton_box_new();
+	box = gtk_hbox_new(FALSE, 0);
+#if 0
 	gtk_button_box_set_child_size_default(16, 16);
 	gtk_hbutton_box_set_spacing_default(0);
 	gtk_button_box_set_layout(GTK_BUTTON_BOX(box), GTK_BUTTONBOX_START);
+#endif
 
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
@@ -202,6 +203,10 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(toolbar_help_clicked),
 			filer_window,
 			_("Help"), _("Show ROX-Filer help"));
+
+	filer_window->toolbar_text = gtk_label_new("");
+	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
+			TRUE, TRUE, 4);
 
 	return frame;
 }
@@ -277,7 +282,10 @@ static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
 	else
 		gtk_container_add(GTK_CONTAINER(button), icon_widget);
 
-	gtk_container_add(GTK_CONTAINER(box), button);
+	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
+	gtk_misc_set_padding(GTK_MISC(icon_widget),
+			o_toolbar == TOOLBAR_LARGE ? 16 : 8, 1);
+	gtk_box_pack_start(GTK_BOX(box), button, FALSE, TRUE, 0);
 
 	return button;
 }
