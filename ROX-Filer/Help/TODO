@@ -14,18 +14,34 @@ GNOME toolbar
 	- doesn't work properly when detached. Is this a GTK+ problem?
 	- 'Other Action' doesn't work
 
+Set Run Action: deref symlinks
+
+Moving a directory (outside of the filer) causes an error when you try
+to access it (OK), but the error is still reported when you open the
+directory in its new location until you click refresh.
+
 
 MISSING FEATURES
 
+Allow applets inside the panel? Allow the filer to go inside GNOME-panel
+and similar?
+
+Scrollable panel (already works with wheel-mice).
+
 Back/Forwards browser style navigation?
+
+Better installation (eg, install in /usr/local/*; but keep the app dir
+structure).
 
 Textured window backgrounds (themes?)
 
 Long leafnames get truncated / wrap onto multiple lines.
 
+Better icon arrangement (different column widths?)
+
 More permissions checking in Find?
 
-Fully configurable toolbar.
+Fully configurable toolbar. Allow clicking button 2 on buttons.
 
 Can't create a panel if the filer is already running.
 
@@ -42,8 +58,6 @@ Improve MIME-type guessing:
 	- Try to find longest extension match (eg .ps.gz, then .gz)
 	- Try again ignoring case (so .BMP matches .bmp) (.C must still work!)
 	- Use regexp rules on whole name (eg for 'Makefile' and 'core')
-
-Make the run-actions easier to set up (ie, from a dialog box).
 
 Provide a way to set the display style on a per-directory basis
 (shell glob patterns?)
@@ -64,3 +78,5 @@ Copying a relative symlink should make it absolute? Ask during the copy?
 
 Recursive 'a-x' acts on the directory first and so can't then change the
 permissions on the contents. chmod(1) has the same problem.
+
+Set Run Action should be on the 'File' menu, not in the minibuffer.
