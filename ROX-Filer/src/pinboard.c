@@ -1525,6 +1525,8 @@ void pinboard_move_icons(void)
 	int	x = shadow_x, y = shadow_y;
 	PinIcon	*pi = (PinIcon *) pinboard_drag_in_progress;
 	int	width, height;
+	int	dx, dy;
+	GList	*next;
 
 	g_return_if_fail(pi != NULL);
 
@@ -1535,12 +1537,33 @@ void pinboard_move_icons(void)
 	if (pi->x == x && pi->y == y)
 		return;
 
-	pi->x = x;
-	pi->y = y;
-	gdk_drawable_get_size(pi->win->window, &width, &height);
-	offset_from_centre(pi, &x, &y);
+	/* Find out how much the dragged icon moved (after snapping).
+	 * Move all selected icons by the same amount.
+	 */
+	dx = x - pi->x;
+	dy = y - pi->y;
 
-	fixed_move_fast(GTK_FIXED(current_pinboard->fixed), pi->win, x, y);
+	/* Move the other selected icons to keep the same relative
+	 * position.
+	 */
+	for (next = icon_selection; next; next = next->next)
+	{
+		PinIcon *pi = (PinIcon *) next->data;
+		int	nx, ny;
+
+		g_return_if_fail(IS_PIN_ICON(pi));
+
+		pi->x += dx;
+		pi->y += dy;
+		nx = pi->x;
+		ny = pi->y;
+
+		gdk_drawable_get_size(pi->win->window, &width, &height);
+		offset_from_centre(pi, &nx, &ny);
+
+		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
+				pi->win, nx, ny);
+	}
 
 	pinboard_save();
 }
