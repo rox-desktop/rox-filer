@@ -951,7 +951,7 @@ static void chmod_items(FilerWindow *filer_window)
 {
 	GList *paths;
 	paths = filer_selected_items(filer_window);
-	action_chmod(paths);
+	action_chmod(paths, FALSE, NULL);
 	g_list_foreach(paths, (GFunc) g_free, NULL);
 	g_list_free(paths);
 }

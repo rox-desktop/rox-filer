@@ -1795,11 +1795,12 @@ void action_delete(GList *paths)
 }
 
 /* Change the permissions of the selected items */
-void action_chmod(GList *paths)
+void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 {
 	GtkWidget	*abox;
 	GUIside		*gui_side;
 	static GList	*presets = NULL;
+	gboolean	recurse = force_recurse || o_action_recurse.int_value;
 
 	if (!paths)
 	{
@@ -1824,26 +1825,31 @@ void action_chmod(GList *paths)
 
 	if (!last_chmod_string)
 		last_chmod_string = g_strdup((guchar *) presets->data);
-	new_entry_string = last_chmod_string;
+
+	if (action)
+		new_entry_string = g_strdup(action);
+	else
+		new_entry_string = g_strdup(last_chmod_string);
 
 	abox = abox_new(_("Permissions"), FALSE);
 	gui_side = start_action(abox, chmod_cb, paths,
-					 o_action_force.int_value,
-					 o_action_brief.int_value,
-					 o_action_recurse.int_value,
-					 o_action_newer.int_value);
+				o_action_force.int_value,
+				o_action_brief.int_value,
+				recurse,
+				o_action_newer.int_value);
+	
 	if (!gui_side)
-		return;
+		goto out;
 
 	abox_add_flag(ABOX(abox),
 		_("Brief"), _("Don't list processed files"),
 		'B', o_action_brief.int_value);
 	abox_add_flag(ABOX(abox),
 		_("Recurse"), _("Also change contents of subdirectories"),
-		'R', o_action_recurse.int_value);
+		'R', recurse);
 
 	gui_side->default_string = &last_chmod_string;
-	abox_add_combo(ABOX(abox), presets, last_chmod_string,
+	abox_add_combo(ABOX(abox), presets, new_entry_string,
 				new_help_button(show_chmod_help, NULL));
 
 	g_signal_connect(ABOX(abox)->entry, "changed",
@@ -1856,6 +1862,10 @@ void action_chmod(GList *paths)
 
 	number_of_windows++;
 	gtk_widget_show(abox);
+
+out:
+	g_free(new_entry_string);
+	new_entry_string = NULL;
 }
 
 /* If leaf is NULL then the copy has the same name as the original.

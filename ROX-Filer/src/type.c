@@ -30,6 +30,8 @@
 #include <time.h>
 #include <sys/param.h>
 #include <fnmatch.h>
+#include <sys/types.h>
+#include <fcntl.h>
 
 #ifdef WITH_GNOMEVFS
 # include <libgnomevfs/gnome-vfs.h>
@@ -53,6 +55,7 @@
 #include "dnd.h"
 #include "options.h"
 #include "filer.h"
+#include "action.h"		/* (for action_chmod) */
 
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
@@ -345,6 +348,24 @@ gboolean type_open(const char *path, MIME_type *type)
 		return FALSE;
 	}
 
+	if (info.st_mode & S_IWOTH)
+	{
+		gchar *choices_dir;
+		GList *paths;
+
+		report_error(_("Executable '%s' is world-writeable! Refusing "
+			"to run. Please change the permissions now (this "
+			"problem may have been caused by a bug in earlier "
+			"versions of the filer)."), open);
+		choices_dir = g_dirname(open);
+		paths = g_list_append(NULL, choices_dir);
+		action_chmod(paths, TRUE, "go-w (Fix security problem)");
+		g_free(choices_dir);
+		g_list_free(paths);
+		g_free(open);
+		return TRUE;
+	}
+
 	if (S_ISDIR(info.st_mode))
 		argv[0] = g_strconcat(open, "/AppRun", NULL);
 	else
@@ -453,7 +474,7 @@ static void set_shell_action(GtkWidget *dialog)
 	const guchar *command;
 	gchar	*tmp, *path;
 	int	error = 0, len;
-	FILE	*file;
+	int	fd;
 
 	entry = g_object_get_data(G_OBJECT(dialog), "shell_command");
 	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
@@ -474,16 +495,27 @@ static void set_shell_action(GtkWidget *dialog)
 	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
 	len = strlen(tmp);
 	
-	file = fopen(path, "wb");
-	if (fwrite(tmp, 1, len, file) < len)
+	fd = open(path, O_CREAT | O_WRONLY, 0755);
+	if (fd == -1)
 		error = errno;
-	if (fclose(file) && error == 0)
-		error = errno;
-	if (chmod(path, 0755))
-		error = errno;
+	else
+	{
+		FILE *file;
+
+		file = fdopen(fd, "w");
+		if (file)
+		{
+			if (fwrite(tmp, 1, len, file) < len)
+				error = errno;
+			if (fclose(file) && error == 0)
+				error = errno;
+		}
+		else
+			error = errno;
+	}
 
 	if (error)
-		report_error(g_strerror(errno));
+		report_error(g_strerror(error));
 
 	g_free(tmp);
 	g_free(path);
