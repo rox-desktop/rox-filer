@@ -38,7 +38,7 @@ Inc., 59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
 
   <abstract>
     <para>
-ROX-Filer is a graphical file manger for the X Window System. Its user
+<application>ROX-Filer</application> is a graphical file manger for the X Window System. Its user
 interface is based on the RISC OS filer and it supports similar features such
 as application directories and drag-and-drop loading and saving of files. The
 filer can also act as a pinboard, allowing you to pin frequently used files
@@ -50,10 +50,10 @@ onto the desktop background.
 <chapter>
   <title>Introduction</title>
   <para>
-ROX-Filer is a simple and easy to use graphical file manager for X11 --- the
+<application>ROX-Filer</application> is a simple and easy to use graphical file manager for X11 --- the
 windowing system used on Unix and Unix-like operating systems.  It is also the
-core component of the ROX Desktop<citation>ROX</citation>. Many of the filer's
-features were inspired by RISC OS<citation>RISC OS</citation>. `ROX' stands for
+core component of the ROX Desktop <citation>ROX</citation>. Many of the filer's
+features were inspired by RISC OS <citation>RISC OS</citation>. `ROX' stands for
 `RISC OS--On--X'.
   </para>
 
@@ -111,7 +111,7 @@ a directory full of photos!
 
 If you've just got hold of the filer by downloading the source archive
 then you'll need to compile it before you can use it. If you downloaded
-and installed a binary package, or if ROX-Filer was included with
+and installed a binary package, or if <application>ROX-Filer</application> was included with
 your system, then you can skip this section. If you got here by clicking
 on the `i' symbol in a filer window, or if typing <command>rox</command> at a
 shell prompt works, then you don't need to compile.
@@ -169,7 +169,7 @@ Run the <command>install.sh</command> script, like this:
     </para></step>
 
     <step><para>
-ROX-Filer will perform various checks to find out what kind of system
+<application>ROX-Filer</application> will perform various checks to find out what kind of system
 it is being run on and will then compile. If it doesn't work then
 please e-mail me and complain! Tell me what kind of system you have
 and what errors were reported. If you manage to fix the problem yourself
@@ -221,7 +221,7 @@ $ rehash</screen>
   <title>Invoking</title>
   <para>
 
-By default, ROX-Filer will start by displaying the current directory.
+By default, <application>ROX-Filer</application> will start by displaying the current directory.
 You can get it to display other directories instead by listing them
 after the command:
 
@@ -231,15 +231,16 @@ You can also use it to open files, like this:
 
 <screen>$ rox README</screen>
 
-The filer supports various options; use `\texttt{-h}' for a list.
-All options have long and short forms (eg `\texttt{-h}' and `\texttt{-{}-help}')
---- although on some systems you can only use the short versions.
+The filer supports various options; use <option>-h</option> for a list.
+All options have long and short forms (eg <option>-h</option> and
+<option>--help</option>) --- although on some systems you can only use the
+short versions.
 
 Note that if the same version of the filer is already running on this
 machine then, by default, it will be used to open the directories
 and the new copy will exit immediately. You can override this (perhaps
 because the old copy has stopped responding for some reason) using
-the `\texttt{-{}-new}' option.
+the <option>--new</option> option.
   </para>
 
 <section>
@@ -247,12 +248,13 @@ the `\texttt{-{}-new}' option.
   <para>
 
 If you want the filer to manage your desktop background then you use
-the \texttt{-{}-pinboard} option and supply a name for the pinboard,
+the <option>--pinboard</option> option and supply a name for the pinboard,
 eg:
 
 <screen>$ rox --pinboard=MyPinboard</screen>
 
-The pinboard configuration is saved in `\emph{&lt;Choices&gt;/ROX-Filer/pb\_MyPinboard}'
+The pinboard configuration is saved in
+<filename>&lt;Choices&gt;/ROX-Filer/pb_MyPinboard</filename>
 as soon as you change it in some way (for example, by dropping a file
 onto the background). You can have as many pinboards as you like and
 switch between them by running rox again, eg:
@@ -265,8 +267,7 @@ To turn off the pinboard again, set the name to an empty string:
 
 See section \ref{winman} if you have trouble getting the icons to
 display correctly. The pinboard may also be turned on and off by locating
-`ROX-Filer' in a filer window and choosing `Enable pinboard' or `Disable
-pinboard' from the menu.
+<filename>ROX-Filer</filename> in a filer window and choosing `Enable pinboard' or `Disable pinboard' from the menu.
 
   </para>
 </section>
@@ -276,8 +277,8 @@ pinboard' from the menu.
   <para>
 
 Panels work just like the pinboard. You can create a panel on any
-side of the screen by using the options \texttt{-{}-left}, \texttt{-{}-right,}
-\texttt{-{}-top} and \texttt{-{}-bottom}, depending on which side
+side of the screen by using the options <option>--left</option>, <option>--right,</option>
+<option>--top</option> and <option>--bottom</option>, depending on which side
 of the screen the panel should appear on. On some systems, the short
 (one letter) form of the options must be used. For example, to create
 a panel along the bottom edge of the screen:
@@ -288,7 +289,8 @@ The panel should be displayed in a window without a title bar. If
 this does not work then see section \ref{winman} for some ideas.
 You can drag files onto either side of the panel to add them. Icons
 can be repositioned by dragging them with the middle mouse button.
-Changes to the panel are automatically saved to '\emph{&lt;Choices&gt;/ROX-Filer/pan\_MyPanel}'.
+Changes to the panel are automatically saved to
+<filename>&lt;Choices&gt;/ROX-Filer/pan_MyPanel</filename>.
 As with the pinboard, you can switch between panel configurations
 simply by running rox again with a different panel name. Specify a
 blank name to remove the panel.
@@ -526,14 +528,14 @@ Key bindings are automatically saved when the filer quits.
   <title>The selection</title>
   <para>
 
-While items are selected in a ROX-Filer window the filer has the global
+While items are selected in a <application>ROX-Filer</application> window the filer has the global
 selection. You can then paste into another window to get the pathnames
 of the selected files. For example, if you want to load a file into
 an application that doesn't support drag-and-drop:
 
 \begin{enumerate}
 \item Open the application's `Open' dialog box.
-\item Ctrl-click on the file in ROX-Filer to select it.
+\item Ctrl-click on the file in <application>ROX-Filer</application> to select it.
 \item Click the middle button in the filename box in the application to
 paste the name in.
 \end{enumerate}
@@ -584,7 +586,7 @@ Hide or show extra details&amp;
 Same\\
 \hline
 Information&amp;
-Show ROX-Filer's help files&amp;
+Show <application>ROX-Filer</application>'s help files&amp;
 Same\\
 \hline
 \end{tabular}\par}
@@ -632,7 +634,7 @@ Clear Selection&amp;
 Unselect every item in this window.\\
 \hline
 Options...&amp;
-Configure ROX-Filer.\\
+Configure <application>ROX-Filer</application>.\\
 \hline
 New&amp;
 Create a new file or subdirectory inside this directory.\\
@@ -721,7 +723,7 @@ The permissions field, when shown, is made up of four groups of three
 flags. Each flag is displayed as a letter if it is on and a dash (--)
 if not. The first three characters show the permissions for the owner
 of the file, the second for other members of the file's group and
-the third for everyone else. Whichever group applies to the ROX-Filer
+the third for everyone else. Whichever group applies to the <application>ROX-Filer</application>
 process itself is shown underlined. The fourth group shows any special
 flags.
 
@@ -742,8 +744,8 @@ group, regardless of who ran it.
 people who own the files even if they have write permission on the
 directory itself.
 \end{description}
-For example, `\texttt{\underbar{rwx}}\texttt{,rwx,r-x/-{}-{}-}' means
-that the owner of the file is the same as the effective user of ROX-Filer
+For example, `\texttt{\underbar{rwx}}\texttt{,rwx,r-x/---}' means
+that the owner of the file is the same as the effective user of <application>ROX-Filer</application>
 (basically, you own the file), you and members of the file's group
 have read, write and execute permission and other people have only
 read and execute permission. There are no special flags set.
@@ -865,7 +867,7 @@ to move then you want an absolute link, but if the target may move
 
 Each entry in this submenu opens a savebox for creating a new file
 or directory. There are two standard entries; the others are the contents
-of your `\texttt{&lt;Choices&gt;/Templates}' directory, if it exists.
+of your <filename>&lt;Choices&gt;/Templates</filename> directory, if it exists.
 
 \vspace{0.3cm}
 {\centering \begin{tabular}{|c|p{9cm}|}
@@ -886,7 +888,8 @@ Copy a file from your Templates directory.\\
 \end{tabular}\par}
 \vspace{0.3cm}
 
-To add your own entries, create a new directory called `\texttt{\textasciitilde{}/Choices/Templates}'
+To add your own entries, create a new directory called
+<filename>~/Choices/Templates</filename>
 (if you have the default CHOICESPATH) and put any files you want in
 there. Each file in the directory will appear on the menu and the
 box that appears will copy it. For example, you could create a blank
@@ -1056,7 +1059,7 @@ for details.
   <title>Panel applets</title>
   <para>
 
-ROX-Filer allows you to run small programs inside the panel --- such
+<application>ROX-Filer</application> allows you to run small programs inside the panel --- such
 programs are called \emph{applets}. To run an applet, drag it onto
 the panel from a filer window and instead of the applet's icon being
 shown, the applet will run.
@@ -1107,8 +1110,8 @@ various Virtual File Systems directly. This is the best option since
 all programs will be able to access the contents of the VFS. You may
 require root access to install such a system, however, and it is not
 available on all platforms.
-\item Support for the Midnight Commander VFS library compiled into ROX-Filer.
-This happens automatically when you compile ROX-Filer if it can find
+\item Support for the Midnight Commander VFS library compiled into <application>ROX-Filer</application>.
+This happens automatically when you compile <application>ROX-Filer</application> if it can find
 the VFS library --- this means having \texttt{libvfs.so} (or \texttt{libvfs.a})
 in a system library directory or in the directory in the environment
 variable \texttt{LD\_LIBRARY\_PATH}. In this case, you will be able
@@ -1157,9 +1160,9 @@ $ cd ~/Apps/ROX-Filer
 Edit the \texttt{AppRun} file to include this as the \emph{second}
 line:
 
-<command>LD_LIBRARY_PATH=$HOME/lib; export LD_LIBRARY_PATH</command>
+<programlisting>LD_LIBRARY_PATH=$HOME/lib; export LD_LIBRARY_PATH</programlisting>
 
-This will ensure that ROX-Filer will look for the library in the new
+This will ensure that <application>ROX-Filer</application> will look for the library in the new
 \texttt{\textasciitilde{}/lib} directory. Finally, recompile:
 
 <screen>
@@ -1614,14 +1617,14 @@ called \texttt{src}. The expression is evaluated like this:
   <title>Options</title>
   <para>
 
-You can configure various aspects of ROX-Filer from the Options box.
+You can configure various aspects of <application>ROX-Filer</application> from the Options box.
 Choose `Options...' from a filer window menu to open it. 
 
 At the bottom of the window are four buttons:
 
 \begin{description}
 \item [Save]puts all your choices into effect, and also saves them into
-your Choices directory for next time ROX-Filer is loaded. ROX-Filer
+your Choices directory for next time <application>ROX-Filer</application> is loaded. <application>ROX-Filer</application>
 will never save any preferences to disk unless you click on the `Save'
 button in the options window. Exactly where choices are loaded from
 and saved to is controlled by the \texttt{CHOICESPATH} environment
@@ -1792,14 +1795,14 @@ matches, even though some letters were added.
   <para>
 
 \begin{itemize}
-\item ROX-Filer uses the standard XDND protocol for drag-and-drop. This
+\item <application>ROX-Filer</application> uses the standard XDND protocol for drag-and-drop. This
 protocol recommends that URIs should contain the hostname of the computer
 that the resource is on so that the program receiving the data can
 determine whether it can get the data directly or whether it must
 go via the X-server. However, many older programs (particularly GNOME
 applications) get confused by the hostname and fail to load the data
 correctly. If `Don't use hostnames' is on then the hostname part is
-omitted and ROX-Filer will work with these applications BUT you can't
+omitted and <application>ROX-Filer</application> will work with these applications BUT you can't
 drag data to a program running on a different machine.
 \item `Allow dragging to icons in filer windows' controls what happens when
 you drop files onto icons in filer windows. If on then drops onto
@@ -1851,7 +1854,7 @@ must double click on a file to open it.
 As an alternative to using the options window to put menu on button-2,
 some people prefer to use the command `\texttt{xmodmap -e \char`\"{}pointer
 = 1 3 2\char`\"{}}', which makes the right mouse button button-2 and
-the middle one button-3 (this affects all programs, not just ROX-Filer).
+the middle one button-3 (this affects all programs, not just <application>ROX-Filer</application>).
 
 
   </para>
@@ -1864,7 +1867,7 @@ the middle one button-3 (this affects all programs, not just ROX-Filer).
 
 All files have a MIME type in the form `\texttt{text/plain}'. Here,
 `\texttt{text}' is the \emph{media type} and `\texttt{plain}' is the
-\emph{sub-type}. ROX-Filer uses a file's name to decide what its MIME
+\emph{sub-type}. <application>ROX-Filer</application> uses a file's name to decide what its MIME
 type is, and then uses the MIME type to decide what icon to give it
 and what program to use when you open the file.
 
@@ -1923,19 +1926,19 @@ open them).
   <title>How filetypes are stored</title>
   <para>
 
-ROX-Filer uses three sub-directories in your Choices directory for
+<application>ROX-Filer</application> uses three sub-directories in your Choices directory for
 filetypes:
 
 \begin{description}
 \item [MIME-info]contains files which specify what the MIME types for files
 should be, based on their extentions. All the files in all the MIME-info
-directories are scanned when the filer loads. ROX-Filer comes with
+directories are scanned when the filer loads. <application>ROX-Filer</application> comes with
 a file containing many such rules --- this is installed into the MIME-info
 directory by the rox-base package.
 
 
 Many applications now come with a file called `something.mime'; copy
-these files into your MIME-info directory to make ROX-Filer automatically
+these files into your MIME-info directory to make <application>ROX-Filer</application> automatically
 recognise the new extensions.
 
 \item [MIME-types]contains symlinks, one for each MIME type, which point
@@ -1982,7 +1985,7 @@ from the danger of running untrusted code as root. All you have to
 watch out for is setuid binaries.
 }.
 
-The following files are treated as special by ROX-Filer:
+The following files are treated as special by <application>ROX-Filer</application>:
 
 \begin{description}
 \item [AppRun]is executed when you click on the directory --- make sure
@@ -1996,7 +1999,7 @@ below).
 \item [AppIcon.xpm]is used if \texttt{.DirIcon.png} is missing (for backwards
 compatibility).
 \end{description}
-Have a look at the ROX-Filer application directory for a full example.
+Have a look at the <filename>ROX-Filer</filename> application directory for a full example.
 
 Note: For security reasons, an application directory must have the
 same owner as the AppRun file inside.
@@ -2011,34 +2014,20 @@ same owner as the AppRun file inside.
 (any elements may be omitted, and the file itself is optional):
 
 <screen>
-&lt;?xml version=\char`\"{}1.0\char`\"{}?&gt;
-
+&lt;?xml version="1.0"?&gt;
 &lt;AppInfo&gt;
-
   &lt;Summary&gt;A graphical file manager&lt;/Summary&gt;
-
   &lt;About&gt;
-
     &lt;Purpose&gt;File manager&lt;/Purpose&gt;
-
     &lt;Version&gt;1.1.3 (07-May-2001)&lt;/Version&gt;
-
     &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
-
     &lt;License&gt;GNU General Public License&lt;/License&gt;
-
     &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
-
   &lt;/About&gt;
-
   &lt;AppMenu&gt;
-
-    &lt;Item label=\char`\"{}Enable pinboard\char`\"{} option=\char`\"{}-p=Default\char`\"{}/&gt;
-
-    &lt;Item label=\char`\"{}Disable pinboard\char`\"{} option=\char`\"{}-p=\char`\"{}/&gt;
-
+    &lt;Item label="Enable pinboard" option="-p=Default"/&gt;
+    &lt;Item label="Disable pinboard" option="-p="/&gt;
   &lt;/AppMenu&gt;
-
 &lt;/AppInfo&gt;
 </screen>
 \begin{description}
@@ -2066,7 +2055,7 @@ its only argument.
   <title><anchor id="LANG"/>Selecting a translation</title>
   <para>
 
-ROX-Filer is able to translate many of its messages, provided suitable
+<application>ROX-Filer</application> is able to translate many of its messages, provided suitable
 translation files are provided: 
 
 \begin{enumerate}
@@ -2099,15 +2088,13 @@ language is referred to as `ml' (`my language'):
 \item Load the copy into a text editor.
 \item Fill in the translations, which are all blank to start with.
 \item Run the `\texttt{make-mo}' script to create the binary file which
-ROX-Filer can use. You will need the GNU gettext package for this.
+<application>ROX-Filer</application> can use. You will need the GNU gettext package for this.
 If you don't have it then just send me the \texttt{.po} file and I'll
 convert it for you.
 
 <screen>
 $ cd ROX-Filer/src/po
-
 $ ./make-mo ml
-
 Created file ../../Messages/ml.gmo OK
 </screen>
 
@@ -2131,7 +2118,6 @@ changed strings and updates all the translation files.
 
 <screen>
 $ cd ROX-Filer/src/po
-
 $ ./update-po
 </screen>
 \item Edit the file by hand as before, filling in the new blanks and updating
@@ -2163,7 +2149,7 @@ to me or to the mailing list. Tell me which version you're using!
   <para>
 
 The first time you compile the program you need to do `\texttt{AppRun
--{}-compile}', but in future you only need to run `\texttt{make}'
+--compile}', but in future you only need to run `\texttt{make}'
 in the `\texttt{src}' directory when you change the \texttt{.c} and
 \texttt{.h} files. You might want to run `\texttt{make depend}' too.
 
@@ -2182,7 +2168,7 @@ patch file. Then recompile, like this:
 <screen>
 $ cd ROX-Filer/src
 $ patch &lt; patchfile
-$ ../AppRun -{}-compile
+$ ../AppRun --compile
 </screen>
 
 You can remove the patch by simply repeating the above sequence ---
@@ -2232,7 +2218,7 @@ in `Makefile.in' and `config.h.in' and fills in the missing values
 with the test results to produce `Makefile' and `config.h'.
 
 You run `make', which creates .o files from the .c files and links
-to produce ROX-Filer.
+to produce <application>ROX-Filer</application>.
   </para>
 </section>
 

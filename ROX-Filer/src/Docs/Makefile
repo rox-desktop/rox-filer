@@ -1,24 +1,9 @@
-all: Manual/index.html Manual-fr/index.html
+all: Manual.valid Manual.html
 
-%.eps: %.dia
-	dia -e $@ $<
+style=/usr/share/sgml/docbook/xsl-stylesheets-1.29/html/docbook.xsl
 
-Manual/index.html: Manual.tex Prune.eps Structs.eps
-	latex Manual.tex
-	latex2html -split +1 -antialias -local_icon -show_section_numbers \
-	-up_url='http://rox.sourceforge.net' Manual.tex -up_title='ROX website'
+%.valid: %.xml
+	nsgmls -s -wxml /usr/lib/sgml/declaration/xml.decl $<
 
-Manual-fr/index.html: Manual-fr.tex Prune.eps Structs.eps
-	latex Manual-fr.tex
-	latex2html -split +1 -antialias -local_icon -show_section_numbers \
-	-up_url='http://rox.sourceforge.net' Manual-fr.tex -up_title='ROX website'
-
-%.tex: %.lyx
-	echo Manual.tex not up-to-date...
-	echo Use lyx to create $@ and try again.
-	exit 1
-
-clean:
-	rm -f *.eps
-	rm -f Manual.tex
-	rm -rf Manual
+%.html: %.xml
+	xsltproc -o $@ ${style} $<
