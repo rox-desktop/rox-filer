@@ -5,7 +5,12 @@ PROG=ROX-Filer
 APP_DIR=`dirname $0`
 APP_DIR=`cd $APP_DIR;pwd`; export APP_DIR
 
-PLATFORM=`uname -s`-`uname -m`
+ARCH=`uname -m`
+case $ARCH in
+	i?86) ARCH=ix86 ;;
+esac
+
+PLATFORM=`uname -s`-$ARCH
 
 DEBUGGER=""
 case $1 in
