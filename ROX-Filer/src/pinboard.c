@@ -110,6 +110,17 @@ static void snap_to_grid(int *x, int *y);
 static void offset_from_centre(PinIcon *icon,
 			       int width, int height,
 			       int *x, int *y);
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    PinIcon		*icon);
+static void drag_set_pinicon_dest(PinIcon *icon);
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       PinIcon		*icon);
 
 
 /****************************************************************
@@ -227,12 +238,18 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	icon->paper = gtk_drawing_area_new();
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->paper);
+	drag_set_pinicon_dest(icon);
 	gtk_signal_connect(GTK_OBJECT(icon->paper), "drag_data_get",
 				drag_data_get, NULL);
 
 	gtk_widget_realize(icon->win);
 	gdk_window_set_decorations(icon->win->window, 0);
 	gdk_window_set_functions(icon->win->window, 0);
+	if (override_redirect)
+	{
+		gdk_window_lower(icon->win->window);
+		gdk_window_set_override_redirect(icon->win->window, TRUE);
+	}
 
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
@@ -272,13 +289,20 @@ void pinboard_unpin(PinIcon *icon)
 
 /* Put a border around the icon, briefly.
  * If icon is NULL then cancel any existing wink.
+ * The icon will automatically unhighlight unless timeout is FALSE,
+ * in which case you must call this function again (with NULL or another
+ * icon) to remove the highlight.
  */
-void pinboard_wink_item(PinIcon *icon)
+void pinboard_wink_item(PinIcon *icon, gboolean timeout)
 {
+	if (current_wink_icon == icon)
+		return;
+
 	if (current_wink_icon)
 	{
 		mask_wink_border(current_wink_icon, &mask_transp);
-		gtk_timeout_remove(wink_timeout);
+		if (wink_timeout != -1)
+			gtk_timeout_remove(wink_timeout);
 	}
 
 	current_wink_icon = icon;
@@ -286,7 +310,10 @@ void pinboard_wink_item(PinIcon *icon)
 	if (current_wink_icon)
 	{
 		mask_wink_border(current_wink_icon, &mask_solid);
-		wink_timeout = gtk_timeout_add(300, end_wink, NULL);
+		if (timeout)
+			wink_timeout = gtk_timeout_add(300, end_wink, NULL);
+		else
+			wink_timeout = -1;
 	}
 }
 
@@ -330,7 +357,7 @@ void pinboard_may_update(guchar *path)
 
 static gint end_wink(gpointer data)
 {
-	pinboard_wink_item(NULL);
+	pinboard_wink_item(NULL, FALSE);
 	return FALSE;
 }
 
@@ -536,7 +563,7 @@ static gboolean button_release_event(GtkWidget *widget,
 		/* Could have been a copy, but the user didn't move
 		 * far enough. Open the item instead.
 		 */
-		pinboard_wink_item(icon);
+		pinboard_wink_item(icon, TRUE);
 
 		run_diritem(icon->path, item, NULL,
 				(event->state & GDK_SHIFT_MASK) != 0);
@@ -788,4 +815,102 @@ static void offset_from_centre(PinIcon *icon,
 	*y -= height - (icon->paper->style->font->descent >> 1);
 	*x = CLAMP(*x, 0, screen_width - width);
 	*y = CLAMP(*y, 0, screen_height - height);
+}
+
+/* Same as drag_set_dest(), but for pinboard icons */
+static void drag_set_pinicon_dest(PinIcon *icon)
+{
+	GtkObject	*obj = GTK_OBJECT(icon->paper);
+
+	make_drop_target(icon->paper);
+
+	gtk_signal_connect(obj, "drag_motion",
+			GTK_SIGNAL_FUNC(drag_motion), icon);
+	gtk_signal_connect(obj, "drag_leave",
+			GTK_SIGNAL_FUNC(drag_leave), icon);
+
+	/*
+	gtk_signal_connect(obj, "drag_end",
+			GTK_SIGNAL_FUNC(drag_end), filer_window);
+			*/
+}
+
+/* Called during the drag when the mouse is in a widget registered
+ * as a drop target. Returns TRUE if we can accept the drop.
+ */
+static gboolean drag_motion(GtkWidget		*widget,
+                            GdkDragContext	*context,
+                            gint		x,
+                            gint		y,
+                            guint		time,
+			    PinIcon		*icon)
+{
+	GdkDragAction	action = context->suggested_action;
+	char		*type = NULL;
+	DirItem		*item = &icon->item;
+
+	if (provides(context, _rox_run_action))
+	{
+		/* This is a special internal type. The user is dragging
+		 * to an executable item to set the run action.
+		 */
+
+		if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+			type = drop_dest_prog;
+		else
+			goto out;
+
+	}
+	else
+	{
+		/* If we didn't drop onto a directory, application or
+		 * executable file then give up.
+		 */
+		if (item->base_type != TYPE_DIRECTORY
+				&& !(item->flags & ITEM_FLAG_EXEC_FILE))
+			goto out;
+	}
+	
+	if (gtk_drag_get_source_widget(context) == widget)
+		goto out;	/* Can't drag something to itself! */
+
+	if (item->base_type == TYPE_DIRECTORY &&
+			!(item->flags & ITEM_FLAG_APPDIR))
+	{
+		if (provides(context, text_uri_list) ||
+				provides(context, XdndDirectSave0))
+			type = drop_dest_dir;
+	}
+	else
+	{
+		if (provides(context, text_uri_list) ||
+				provides(context, application_octet_stream))
+			type = drop_dest_prog;
+	}
+
+out:
+	/* Don't allow drops to non-writeable directories */
+	if (type == drop_dest_dir && access(icon->path, W_OK) != 0)
+		type = NULL;
+
+	if (type)
+		pinboard_wink_item(icon, FALSE);
+
+	g_dataset_set_data(context, "drop_dest_type", type);
+	if (type)
+	{
+		gdk_drag_status(context, action, time);
+		g_dataset_set_data_full(context, "drop_dest_path",
+				g_strdup(icon->path), g_free);
+	}
+
+	return type != NULL;
+}
+
+static void drag_leave(GtkWidget	*widget,
+                       GdkDragContext	*context,
+		       guint32		time,
+		       PinIcon		*icon)
+{
+	pinboard_wink_item(NULL, FALSE);
 }

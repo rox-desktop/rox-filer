@@ -13,6 +13,13 @@
 #include "filer.h"
 
 extern gboolean o_no_hostnames;
+extern char *drop_dest_prog;
+extern char *drop_dest_dir;
+extern GdkAtom XdndDirectSave0;
+extern GdkAtom text_uri_list;
+extern GdkAtom _rox_run_action;
+extern GdkAtom application_octet_stream;
+
 void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list);
 void drag_one_item(GtkWidget		*widget,
 		   GdkEventMotion	*event,
@@ -25,9 +32,11 @@ void drag_data_get(GtkWidget      	*widget,
 		   guint               	info,
 		   guint32             	time,
 		   gpointer	       	data);
+void make_drop_target(GtkWidget *widget);
 void drag_set_dest(FilerWindow *filer_window);
 void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init();
 GtkWidget *create_dnd_options();
+gboolean provides(GdkDragContext *context, GdkAtom target);
 
 #endif /* _DND_H */
