@@ -553,10 +553,14 @@ static void coll_selection_changed(Collection *collection, guint time,
 				s = g_strdup_printf(_(" (%u hidden)"),
 						num_hidden);
 		}
-		label = g_strdup_printf("%d %s%s",
-				collection->number_of_items,
-				collection->number_of_items != 1
-					? _("items") : _("item"),
+		if (collection->number_of_items)
+			label = g_strdup_printf("%d %s%s",
+					collection->number_of_items,
+					collection->number_of_items != 1
+						? _("items") : _("item"),
+						s ? s : "");
+		else /* (French plurals work differently for zero) */
+			label = g_strdup_printf(_("No items%s"),
 					s ? s : "");
 		g_free(s);
 	}
