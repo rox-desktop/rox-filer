@@ -7,6 +7,7 @@
 
 /* menu.c - code for handling the popup menu */
 
+#include <config.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <sys/stat.h>
@@ -30,6 +31,7 @@
 #include "options.h"
 #include "choices.h"
 #include "savebox.h"
+#include "mount.h"
 
 #define C_ "<control>"
 
@@ -792,6 +794,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 
 static void mount(gpointer data, guint action, GtkWidget *widget)
 {
+#ifdef DO_MOUNT_POINTS
 	FileItem	*item;
 	int		i;
 	Collection	*collection;
@@ -830,6 +833,11 @@ static void mount(gpointer data, guint action, GtkWidget *widget)
 
 	if (error)
 		report_error("ROX-Filer", error);
+#else
+	report_error("ROX-Filer",
+			"ROX-Filer does not yet support mount points on your "
+			"system. Sorry.");
+#endif /* DO_MOUNT_POINTS */
 }
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)

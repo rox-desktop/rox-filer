@@ -8,7 +8,7 @@ GTK_LIBS = @GTK_LIBS@
 .SUFFIXES: .c .o
 
 CC = @CC@
-CFLAGS = @CFLAGS@ `gtk-config --cflags`
+CFLAGS = @CFLAGS@ `gtk-config --cflags` -I.
 LDFLAGS = @LDFLAGS@ `gtk-config --libs`
 EXEC = ${PLATFORM_DIR}/${PROG}
 

@@ -7,19 +7,13 @@
 
 /* mount.c - code for handling mount points */
 
-/* Note: changes for NetBSD may also apply to Solaris... */
-
-/* mtab_time not needed under NetBSD as there is no mtab file to
- * check the only solution is to ask the kernel.
- */
-#ifndef __NetBSD__
-# define HAVE_MTAB
-#endif
-
+#include <config.h>
 #include <stdio.h>
-#ifdef HAVE_MTAB
+#ifdef HAVE_MNTENT_H
+  /* Linux, etc */
 # include <mntent.h>
-#else
+#elif HAVE_SYS_UCRED_H
+  /* NetBSD, etc */
 # include <fstab.h>
 # include <sys/param.h>
 # include <sys/ucred.h>
@@ -39,38 +33,42 @@
 GHashTable *fstab_mounts = NULL;
 GHashTable *mtab_mounts = NULL;
 time_t fstab_time;
-#ifdef HAVE_MTAB
+#ifdef HAVE_MNTENT_H
 time_t mtab_time;
 #endif
 
 /* Static prototypes */
-#ifndef HAVE_MTAB
+#ifdef HAVE_SYS_UCRED_H
 static GHashTable *build_mtab_table(GHashTable *mount_points);
 #endif
+#ifdef DO_MOUNT_POINTS
 static GHashTable *read_table(GHashTable *mount_points, char *path);
-static time_t read_time(char *path);
-static gboolean free_mp(gpointer key, gpointer value, gpointer data);
 static void clear_table(GHashTable *table);
 static time_t read_time(char *path);
+static gboolean free_mp(gpointer key, gpointer value, gpointer data);
+#endif
 
 void mount_init()
 {
 	fstab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
 	mtab_mounts = g_hash_table_new(g_str_hash, g_str_equal);
 
+#ifdef DO_MOUNT_POINTS
 	fstab_time = read_time("/etc/fstab");
 	read_table(fstab_mounts, "/etc/fstab");
-#ifdef HAVE_MTAB
+#  ifdef HAVE_MNTENT_H
 	mtab_time = read_time("/etc/mtab");
 	read_table(mtab_mounts, "/etc/mtab");
-#else
+#  elif HAVE_SYS_UCRED_H
 	/* mtab_time not used */
 	build_mtab_table(mtab_mounts);
-#endif
+#  endif
+#endif /* DO_MOUNT_POINTS */
 }
 
 void mount_update()
 {
+#ifdef DO_MOUNT_POINTS
 	time_t	time;
 	/* Ensure everything is uptodate */
 
@@ -80,18 +78,21 @@ void mount_update()
 		fstab_time = time;
 		read_table(fstab_mounts, "/etc/fstab");
 	}
-#ifdef HAVE_MTAB
+#  ifdef HAVE_MNTENT_H
 	time = read_time("/etc/mtab");
 	if (time != mtab_time)
 	{
 		mtab_time = time;
 		read_table(mtab_mounts, "/etc/mtab");
 	}
-#else
+#  else
 	build_mtab_table(mtab_mounts);
-#endif
+#  endif
+#endif /* DO_MOUNT_POINTS */
 }
 
+
+#ifdef DO_MOUNT_POINTS
 
 static gboolean free_mp(gpointer key, gpointer value, gpointer data)
 {
@@ -120,7 +121,9 @@ static time_t read_time(char *path)
 	return info.st_mtime;
 }
 
-#ifdef HAVE_MTAB
+#endif
+
+#ifdef HAVE_MNTENT_H
 static GHashTable *read_table(GHashTable *mount_points, char *path)
 {
 	FILE		*tab;
@@ -149,7 +152,7 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 	return mount_points;
 }
 
-#else	/* We don't have /etc/mtab */
+#elif HAVE_SYS_UCRED_H	/* We don't have /etc/mtab */
 
 static GHashTable *read_table(GHashTable *mount_points, char *path)
 {
@@ -222,4 +225,4 @@ static GHashTable *build_mtab_table(GHashTable *mount_points)
 	return mount_points;
 }
 
-#endif /* HAVE_MTAB */
+#endif
