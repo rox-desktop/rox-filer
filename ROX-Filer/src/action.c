@@ -71,7 +71,7 @@
 
 typedef struct _GUIside GUIside;
 typedef void ActionChild(gpointer data);
-typedef gboolean ForDirCB(char *path, char *dest_path);
+typedef void ForDirCB(char *path, char *dest_path);
 
 struct _GUIside
 {
@@ -107,7 +107,7 @@ static gboolean	quiet = FALSE;
 static GString  *message = NULL;
 static char     *action_dest = NULL;
 static char     *action_leaf = NULL;
-static gboolean (*action_do_func)(char *source, char *dest);
+static void (*action_do_func)(char *source, char *dest);
 static double	size_tally;		/* For Disk Usage */
 static unsigned long dir_counter;	/* For Disk Usage */
 static unsigned long file_counter;	/* For Disk Usage */
@@ -443,10 +443,11 @@ static void message_from_child(gpointer 	 data,
 					gui_side->entry ? gui_side->entry
 							: gui_side->yes);
 			}
-			else if (*buffer == '+')
+			else if (*buffer == 's')
 			{
-				/* Update/rescan this item */
-				refresh_dirs(buffer + 1);
+				/* Update this item */
+				/* refresh_dirs(buffer + 1); */
+				dir_check_this(buffer + 1);
 				g_free(buffer);
 				return;
 			}
@@ -553,7 +554,7 @@ static void message_from_child(gpointer 	 data,
 		gtk_widget_destroy(gui_side->window);
 }
 
-/* Scans src_dir, updating dest_path whenever cb returns TRUE */
+/* Scans src_dir, calling cb(item, dest_path) for each item */
 static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 {
 	DIR	*d;
@@ -590,17 +591,12 @@ static void for_dir_contents(ForDirCB *cb, char *src_dir, char *dest_path)
 
 	while (next)
 	{
-		if (cb((char *) next->data, dest_path))
-		{
-			g_string_sprintf(message, "+%s", dest_path);
-			send();
-		}
+		cb((char *) next->data, dest_path);
 
 		g_free(next->data);
 		next = next->next;
 	}
 	g_list_free(list);
-	return;
 }
 
 /* Read this many bytes into the buffer. TRUE on success. */
@@ -1037,12 +1033,10 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 
 /* 			ACTIONS ON ONE ITEM 			*/
 
-/* These may call themselves recursively, or ask questions, etc.
- * TRUE iff the directory containing dest_path needs to be rescanned.
- */
+/* These may call themselves recursively, or ask questions, etc */
 
 /* Updates the global size_tally, file_counter and dir_counter */
-static gboolean do_usage(char *src_path, char *unused)
+static void do_usage(char *src_path, char *unused)
 {
 	struct 		stat info;
 
@@ -1053,10 +1047,8 @@ static gboolean do_usage(char *src_path, char *unused)
 		g_string_sprintf(message, "'%s:\n", src_path);
 		send();
 		send_error();
-		return FALSE;
 	}
-
-	if (S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
+	else if (S_ISREG(info.st_mode) || S_ISLNK(info.st_mode))
 	{
 	        file_counter++;
 		size_tally += info.st_size;
@@ -1076,22 +1068,21 @@ static gboolean do_usage(char *src_path, char *unused)
 	}
 	else
 		file_counter++;
-
-	return FALSE;
 }
 
 /* dest_path is the dir containing src_path */
-static gboolean do_delete(char *src_path, char *dest_path)
+static void do_delete(char *src_path, char *unused)
 {
 	struct stat 	info;
 	gboolean	write_prot;
+	char		*safe_path;
 
 	check_flags();
 
 	if (mc_lstat(src_path, &info))
 	{
 		send_error();
-		return FALSE;
+		return;
 	}
 
 	write_prot = S_ISLNK(info.st_mode) ? FALSE
@@ -1099,10 +1090,10 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	if (write_prot || !quiet)
 	{
 		g_string_sprintf(message, _("?Delete %s'%s'?"),
-				write_prot ? _("WRITE-PROTECTED ") : " ",
+				write_prot ? _("WRITE-PROTECTED ") : "",
 				src_path);
 		if (!reply(from_parent, write_prot && !o_force))
-			return FALSE;
+			return;
 	}
 	else if (!o_brief)
 	{
@@ -1110,37 +1101,38 @@ static gboolean do_delete(char *src_path, char *dest_path)
 		send();
 	}
 
+	safe_path = g_strdup(src_path);
+
 	if (S_ISDIR(info.st_mode))
 	{
-		char *safe_path;
-		safe_path = g_strdup(src_path);
 		for_dir_contents(do_delete, safe_path, safe_path);
 		if (rmdir(safe_path))
 		{
 			g_free(safe_path);
 			send_error();
-			return FALSE;
+			return;
 		}
 		g_string_sprintf(message, _("'Directory '%s' deleted\n"),
 				safe_path);
 		send();
 		g_string_sprintf(message, "m%s", safe_path);
 		send();
-		g_free(safe_path);
 	}
 	else if (unlink(src_path))
-	{
 		send_error();
-		return FALSE;
+	else
+	{
+		g_string_sprintf(message, "s%s", safe_path);
+		send();
 	}
 
-	return TRUE;
+	g_free(safe_path);
 }
 
 /* path is the item to check. If is is a directory then we may recurse
  * (unless prune is used).
  */
-static gboolean do_find(char *path, char *dummy)
+static void do_find(char *path, char *unused)
 {
 	FindInfo	info;
 	char		*slash;
@@ -1151,7 +1143,7 @@ static gboolean do_find(char *path, char *dummy)
 	{
 		g_string_sprintf(message, _("?Check '%s'?"), path);
 		if (!reply(from_parent, FALSE))
-			return FALSE;
+			return;
 	}
 
 	for (;;)
@@ -1173,7 +1165,7 @@ static gboolean do_find(char *path, char *dummy)
 		send();
 		g_string_sprintf(message, _("?Check '%s'?"), path);
 		if (!reply(from_parent, TRUE))
-			return FALSE;
+			return;
 	}
 
 	if (mc_lstat(path, &info.stats))
@@ -1181,7 +1173,7 @@ static gboolean do_find(char *path, char *dummy)
 		send_error();
 		g_string_sprintf(message, _("'(while checking '%s')\n"), path);
 		send();
-		return FALSE;
+		return;
 	}
 
 	info.fullpath = path;
@@ -1203,8 +1195,6 @@ static gboolean do_find(char *path, char *dummy)
 		for_dir_contents(do_find, safe_path, safe_path);
 		g_free(safe_path);
 	}
-
-	return FALSE;
 }
 
 /* Like mode_compile(), but ignores spaces and bracketed bits */
@@ -1239,7 +1229,7 @@ struct mode_change *nice_mode_compile(const char *mode_string,
 	return retval;
 }
 
-static gboolean do_chmod(char *path, char *dummy)
+static void do_chmod(char *path, char *unused)
 {
 	struct stat 	info;
 	mode_t		new_mode;
@@ -1249,17 +1239,17 @@ static gboolean do_chmod(char *path, char *dummy)
 	if (mc_lstat(path, &info))
 	{
 		send_error();
-		return FALSE;
+		return;
 	}
 	if (S_ISLNK(info.st_mode))
-		return FALSE;
+		return;
 
 	if (!quiet)
 	{
 		g_string_sprintf(message,
 				_("?Change permissions of '%s'?"), path);
 		if (!reply(from_parent, FALSE))
-			return FALSE;
+			return;
 	}
 	else if (!o_brief)
 	{
@@ -1290,33 +1280,40 @@ static gboolean do_chmod(char *path, char *dummy)
 		g_string_sprintf(message,
 				_("?Change permissions of '%s'?"), path);
 		if (!reply(from_parent, TRUE))
-			return FALSE;
+			return;
 	}
 
 	if (mc_lstat(path, &info))
 	{
 		send_error();
-		return FALSE;
+		return;
 	}
 	if (S_ISLNK(info.st_mode))
-		return FALSE;
+		return;
 
 	new_mode = mode_adjust(info.st_mode, mode_change);
 	if (chmod(path, new_mode))
 	{
 		send_error();
-		return FALSE;
+		return;
 	}
 
-	if (o_recurse && S_ISDIR(info.st_mode))
+	g_string_sprintf(message, "s%s", path);
+	send();
+
+	if (S_ISDIR(info.st_mode))
 	{
-		guchar *safe_path;
-		safe_path = g_strdup(path);
-		for_dir_contents(do_chmod, safe_path, safe_path);
-		g_free(safe_path);
-	}
+		g_string_sprintf(message, "m%s", path);
+		send();
 
-	return TRUE;
+		if (o_recurse)
+		{
+			guchar *safe_path;
+			safe_path = g_strdup(path);
+			for_dir_contents(do_chmod, safe_path, safe_path);
+			g_free(safe_path);
+		}
+	}
 }
 
 /* We want to copy 'object' into directory 'dir'. If 'action_leaf'
@@ -1342,12 +1339,11 @@ static char *make_dest_path(char *object, char *dir)
 }
 
 /* If action_leaf is not NULL it specifies the new leaf name */
-static gboolean do_copy2(char *path, char *dest)
+static void do_copy2(char *path, char *dest)
 {
 	char		*dest_path;
 	struct stat 	info;
 	struct stat 	dest_info;
-	gboolean	retval = TRUE;
 
 	check_flags();
 
@@ -1356,7 +1352,7 @@ static gboolean do_copy2(char *path, char *dest)
 	if (mc_lstat(path, &info))
 	{
 		send_error();
-		return FALSE;
+		return;
 	}
 
 	if (mc_lstat(dest_path, &dest_info) == 0)
@@ -1371,7 +1367,7 @@ static gboolean do_copy2(char *path, char *dest)
 				merge ? _("merge contents") : _("overwrite"));
 		
 		if (!reply(from_parent, TRUE))
-			return FALSE;
+			return;
 
 		if (!merge)
 		{
@@ -1384,7 +1380,7 @@ static gboolean do_copy2(char *path, char *dest)
 			{
 				send_error();
 				if (errno != ENOENT)
-					return FALSE;
+					return;
 				g_string_sprintf(message,
 						_("'Trying copy anyway...\n"));
 				send();
@@ -1396,7 +1392,7 @@ static gboolean do_copy2(char *path, char *dest)
 		g_string_sprintf(message,
 				_("?Copy %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
-			return FALSE;
+			return;
 	}
 	else
 	{
@@ -1412,11 +1408,6 @@ static gboolean do_copy2(char *path, char *dest)
 		struct stat 	dest_info;
 		gboolean	exists;
 
-		/* (we will do the update ourselves now, rather than
-		 * afterwards)
-		 */
-		retval = FALSE;
-		
 		safe_path = g_strdup(path);
 		safe_dest = g_strdup(dest_path);
 
@@ -1427,6 +1418,7 @@ static gboolean do_copy2(char *path, char *dest)
 			g_string_sprintf(message,
 				_("!ERROR: Destination already exists, "
 					"but is not a directory\n"));
+			send();
 		}
 		else if (exists == FALSE && mkdir(dest_path, 0700 | mode))
 			send_error();
@@ -1435,7 +1427,7 @@ static gboolean do_copy2(char *path, char *dest)
 			if (!exists)
 			{
 				/* (just been created then) */
-				g_string_sprintf(message, "+%s", dest);
+				g_string_sprintf(message, "s%s", dest_path);
 				send();
 			}
 
@@ -1477,18 +1469,17 @@ static gboolean do_copy2(char *path, char *dest)
 		if (target)
 		{
 			if (symlink(target, dest_path))
-			{
 				send_error();
-				retval = FALSE;
+			else
+			{
+				g_string_sprintf(message, "s%s", dest_path);
+				send();
 			}
 
 			g_free(target);
 		}
 		else
-		{
 			send_error();
-			retval = FALSE;
-		}
 	}
 	else
 	{
@@ -1502,18 +1493,19 @@ static gboolean do_copy2(char *path, char *dest)
 					error, path);
 			g_free(error);
 			send();
-			retval = FALSE;
+		}
+		else
+		{
+			g_string_sprintf(message, "s%s", dest_path);
+			send();
 		}
 	}
-
-	return retval;
 }
 
 /* If action_leaf is not NULL it specifies the new leaf name */
-static gboolean do_move2(char *path, char *dest)
+static void do_move2(char *path, char *dest)
 {
 	char		*dest_path;
-	gboolean	retval = TRUE;
 	char		*argv[] = {"mv", "-f", NULL, NULL, NULL};
 	struct stat	info2;
 	gboolean	is_dir;
@@ -1534,12 +1526,12 @@ static gboolean do_move2(char *path, char *dest)
 				_("?'%s' already exists - overwrite?"),
 				dest_path);
 		if (!reply(from_parent, TRUE))
-			return FALSE;
+			return;
 
 		if (mc_lstat(dest_path, &info))
 		{
 			send_error();
-			return FALSE;
+			return;
 		}
 
 		if (S_ISDIR(info.st_mode))
@@ -1551,7 +1543,7 @@ static gboolean do_move2(char *path, char *dest)
 		{
 			send_error();
 			if (errno != ENOENT)
-				return FALSE;
+				return;
 			g_string_sprintf(message,
 					_("'Trying move anyway...\n"));
 			send();
@@ -1562,7 +1554,7 @@ static gboolean do_move2(char *path, char *dest)
 		g_string_sprintf(message,
 				_("?Move %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
-			return FALSE;
+			return;
 	}
 	else
 	{
@@ -1581,63 +1573,54 @@ static gboolean do_move2(char *path, char *dest)
 				_("!%s\nFailed to move %s as %s\n"),
 				err, path, dest_path);
 		send();
-		retval = FALSE;
+
 		g_free(err);
 	}
 	else
 	{
-		char	*leaf;
-
-		leaf = strrchr(path, '/');
-		if (!leaf)
-			leaf = path;		/* Error? */
-		else
-			leaf++;
-
-		g_string_sprintf(message, "+%s", path);
-		g_string_truncate(message, leaf - path + 1);
+		g_string_sprintf(message, "s%s", dest_path);
 		send();
-		if (is_dir)
-		{
-			g_string_sprintf(message, "m%s", path);
-			send();
-		}
-	}
 
-	return retval;
+		if (is_dir)
+			g_string_sprintf(message, "m%s", path);
+		else
+			g_string_sprintf(message, "s%s", path);
+
+		send();
+	}
 }
 
 /* Copy path to dest.
  * Check that path not copied into itself.
  */
-static gboolean do_copy(char *path, char *dest)
+static void do_copy(char *path, char *dest)
 {
 	if (is_sub_dir(make_dest_path(path, dest), path))
 	{
 		g_string_sprintf(message,
 			_("!ERROR: Can't copy object into itself\n"));
 		send();
-		return FALSE;
 	}
-	return do_copy2(path, dest);
+	else
+		do_copy2(path, dest);
 }
 
 /* Move path to dest.
  * Check that path not moved into itself.
  */
-static gboolean do_move(char *path, char *dest)
+static void do_move(char *path, char *dest)
 {
 	if (is_sub_dir(make_dest_path(path, dest), path))
 	{
 		g_string_sprintf(message,
 			_("!ERROR: Can't move/rename object into itself\n"));
 		send();
-		return FALSE;
 	}
-	return do_move2(path, dest);
+	else
+		do_move2(path, dest);
 }
 
-static gboolean do_link(char *path, char *dest)
+static void do_link(char *path, char *dest)
 {
 	char		*dest_path;
 
@@ -1656,16 +1639,16 @@ static gboolean do_link(char *path, char *dest)
 		g_string_sprintf(message,
 				_("?Link %s as %s?"), path, dest_path);
 		if (!reply(from_parent, FALSE))
-			return FALSE;
+			return;
 	}
 
 	if (symlink(path, dest_path))
-	{
 		send_error();
-		return FALSE;
+	else
+	{
+		g_string_sprintf(message, "s%s", dest_path);
+		send();
 	}
-
-	return TRUE;
 }
 
 /* Mount/umount this item (depending on 'mount') */
@@ -1803,6 +1786,7 @@ static void mount_cb(gpointer data)
 }
 #endif
 
+/* (use g_dirname() instead?) */
 static guchar *dirname(guchar *path)
 {
 	guchar	*slash;
@@ -1827,11 +1811,7 @@ static void delete_cb(gpointer data)
 		dir = dirname(path);
 		send_dir(dir);
 
-		if (do_delete(path, dir))
-		{
-			g_string_sprintf(message, "+%s", dir);
-			send();
-		}
+		do_delete(path, dir);
 
 		g_free(dir);
 		paths = paths->next;
@@ -1888,11 +1868,8 @@ static void chmod_cb(gpointer data)
 					g_basename(path));
 			send();
 		}
-		else if (do_chmod(path, NULL))
-		{
-			g_string_sprintf(message, "+%s", path); /* XXX */
-			send();
-		}
+		else
+			do_chmod(path, NULL);
 	}
 	
 	g_string_sprintf(message, _("'\nDone\n"));
@@ -1907,11 +1884,7 @@ static void list_cb(gpointer data)
 	{
 		send_dir((char *) paths->data);
 
-		if (action_do_func((char *) paths->data, action_dest))
-		{
-			g_string_sprintf(message, "+%s", action_dest);
-			send();
-		}
+		action_do_func((char *) paths->data, action_dest);
 
 		paths = paths->next;
 	}

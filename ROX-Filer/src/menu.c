@@ -1133,6 +1133,9 @@ static gboolean link_cb(guchar *initial, guchar *path)
 		report_error("symlink: %s", g_strerror(errno));
 		return FALSE;
 	}
+
+	dir_check_this(path);
+
 	return TRUE;
 }
 

@@ -191,24 +191,18 @@ void refresh_dirs(char *path)
  */
 void dir_check_this(guchar *path)
 {
-	guchar	*slash;
 	guchar	*real_path;
+	guchar	*dir_path;
+	Directory *dir;
 
-	real_path = pathdup(path);
+	dir_path = g_dirname(path);
+	real_path = pathdup(dir_path);
+	g_free(dir_path);
 
-	slash = strrchr(real_path, '/');
-
-	if (slash)
-	{
-		Directory *dir;
-
-		*slash = '\0';
-
-		dir = g_fscache_lookup_full(dir_cache, real_path,
-						FSCACHE_LOOKUP_PEEK, NULL);
-		if (dir)
-			dir_recheck(dir, real_path, slash + 1);
-	}
+	dir = g_fscache_lookup_full(dir_cache, real_path,
+					FSCACHE_LOOKUP_PEEK, NULL);
+	if (dir)
+		dir_recheck(dir, real_path, g_basename(path));
 	
 	g_free(real_path);
 }
