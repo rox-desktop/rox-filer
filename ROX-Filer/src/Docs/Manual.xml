@@ -57,7 +57,7 @@ features were inspired by RISC OS <citation>RISC OS</citation>. `ROX' stands for
 `RISC OS--On--X'.
   </para>
 
-<section>
+<sect1>
   <title>Features</title>
     <para>
 
@@ -101,7 +101,7 @@ a directory full of photos!
 </variablelist>
 
   </para>
-</section>
+</sect1>
 
 </chapter>
 
@@ -243,7 +243,7 @@ because the old copy has stopped responding for some reason) using
 the <option>--new</option> option.
   </para>
 
-<section>
+<sect1>
   <title><anchor id="run_pin"/>Pinboard support</title>
   <para>
 
@@ -270,9 +270,9 @@ display correctly. The pinboard may also be turned on and off by locating
 <filename>ROX-Filer</filename> in a filer window and choosing `Enable pinboard' or `Disable pinboard' from the menu.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title><anchor id="run_pan"/>Panels</title>
   <para>
 
@@ -299,9 +299,9 @@ blank name to remove the panel.
 $ rox --bottom=</screen>
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title><anchor id="winman"/>Window manager notes</title>
   <para>
 
@@ -316,19 +316,22 @@ for the pinboard support) you need a GNOME-compliant window manager.
 To see if your window manager supports this, try clicking the right
 mouse button on an unused area of the background. If you get the pinboard
 menu, all is well.
+  </para>
 
-
-\subsubsection{Sawfish / sawmill}
-
+<sect2><title>Sawfish / sawmill</title>
+  <para>
 Sawfish trys to guess whether you are using GNOME at start-up and
 only provides support if so. You need to add the line `\texttt{(require
 'gnome)}' to your \texttt{.sawfishrc} file (see the sawfish manual
 for more details).
+  </para>
+</sect2>
 
+<sect2><title>IceWM</title>
+  <para>
 
-\subsubsection{IceWM}
-
-Paste these configuration settings into `\textasciitilde{}/.icewm/preferences':
+Paste these configuration settings into
+<filename>~/.icewm/preferences</filename>:
 
 <programlisting>
 # Manage root window (EXPERIMENTAL - normally enabled!)
@@ -342,7 +345,7 @@ DesktopWinListButton=2 # [0-5]
 # Desktop mouse-button click to show the window list menu
 DesktopMenuButton=0 # [0-20] 
 </programlisting>
-Paste these into `\textasciitilde{}/.icewm/winoptions':
+Paste these into `~/.icewm/winoptions':
 
 <programlisting>
 # ROX-Filer pinboard and panel
@@ -360,17 +363,21 @@ ROX-Filer.layer: Normal
 </programlisting>
 Restart IceWM and the filer for the new settings to take effect.
 
+  </para>
+</sect2>
 
-\subsubsection{Others}
+<sect2><title>Others</title>
+  <para>
 
 If all else fails, try running rox with the `\texttt{-n}' and `\texttt{-o}'
 options; this overrides window manager control of the icons altogether
 (\texttt{-n} forces the filer to start a new copy).
 
   </para>
-</section>
+</sect2>
+</sect1>
 
-<section>
+<sect1>
   <title>Running as root</title>
   <para>
 
@@ -399,9 +406,9 @@ may give you some hints, but it varies between systems (which is why
 this isn't built in to the filer!).
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Full list of command-line options</title>
 
   <variablelist><title>The full list of options is:</title>
@@ -465,7 +472,7 @@ like one).
 
   </variablelist>
 
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -496,7 +503,7 @@ the Options window if you don't like the normal settings. The normal settings
 behave as follows:
   </para>
 
-<table><title>Mouse button and key bindings</title>
+<informaltable>
 <tgroup cols="2">
 <thead><row><entry>Key or mouse button</entry><entry>Action</entry></row></thead>
 
@@ -571,7 +578,7 @@ and moves to the next item.
 Moves the cursor to the next/previous selected item.
 </entry></row>
 
-</tbody></tgroup></table>
+</tbody></tgroup></informaltable>
 
   <para>
 Other keys can easily be defined by opening the
@@ -616,9 +623,9 @@ this (or make it larger) from the Options window, as well as set which
 tools appear on the toolbar. Normally, you should click with the left
 mouse button (1). However, many tools can perform a related function
 if clicked on with buttons 2 or 3 (middle or right).
+  </para>
 
-\vspace{0.3cm}
-<table><title>The toolbar</title><tgroup cols="3">
+<informaltable><tgroup cols="3">
 
 <thead>
 <row><entry> 
@@ -637,11 +644,11 @@ Open a new window
 </entry></row><row><entry> 
 Up arrow</entry><entry>
 Change to parent directory</entry><entry>
-Show parent in a new window\dag
+Show parent in a new window <xref linkend="newwin_fn"/>
 </entry></row><row><entry>
 House</entry><entry>
 Change to home directory</entry><entry>
-Show home in a new window\dag
+Show home in a new window <xref linkend="newwin_fn"/>
 </entry></row><row><entry>
 Looping arrows</entry><entry>
 Reread the directory contents</entry><entry>
@@ -659,13 +666,16 @@ Information</entry><entry>
 Show <application>ROX-Filer</application>'s help files</entry><entry>
 Same
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
 
-\noindent\dag{}If the 'New window on button 1' option is turned on
+<para>
+<anchor id="newwin_fn" xreflabel="[1]"/>[1]
+If the 'New window on button 1' option is turned on
 then the default is to open a new window --- clicking with the other
 button reuses the same window instead.
+</para>
 
+  <para>
 Dragging files to the Up or Home icons acts just like dragging them
 into the directory which the button leads to.
 
@@ -680,22 +690,19 @@ Options box.
 <chapter>
   <title>The menus</title>
   <para>
+By default, you can open a menu by right clicking over a pinboard, panel or filer window.
 
-You can open a menu by right clicking%
-\footnote{If the Use `RISC OS mouse bindings' option is on then use the middle
-button instead.
-} over a pinboard, panel or filer window. In filer windows, you may
-also press `\textbackslash{}' to open the menu. As a shortcut, you
-can open the File submenu directly by holding down the \texttt{Control}
-key when opening the menu. Here is a full description of each menu
-item:
+In filer windows, you may also press <keycap>\</keycap> to open the menu. As a
+shortcut, you can open the File submenu directly by holding down the
+<keycap>Control</keycap> key when opening the menu. Here is a full description
+of each menu item:
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+<informaltable><tgroup cols="2">
+
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+
+<tbody>
 <row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
 Select All</entry><entry>
 Select every item in this window.
 </entry></row><row><entry>
@@ -711,35 +718,36 @@ Create a new file or subdirectory inside this directory.
 Xterm Here</entry><entry>
 Open an xterm with its current directory set to this directory.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
-  
+</tbody></tgroup></informaltable>
   </para>
 
-<section>
+<sect1>
   <title>The display menu</title>
   <para>
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
-<row><entry> 
-Entry</entry><entry>
-Action
-</entry></row><row><entry> 
-Huge Icons</entry><entry>
+<informaltable><tgroup cols="2">
+
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+
+<tbody>
+<row><entry>Huge Icons</entry><entry>
 Extra large icons (mainly useful with thumbnails, see below).
 </entry></row><row><entry> 
+
 Large Icons</entry><entry>
 Each object in the directory is shown as a large icon with its name
 below.
 </entry></row><row><entry>
+
 Small Icons</entry><entry>
 Items are drawn smaller than usual, allowing you to see more files
 at once.
 </entry></row><row><entry>
+
 Huge, With...</entry><entry>
 As for `Large, With...', but with extra large icons.
 </entry></row><row><entry>
+
 Large, With...     </entry><entry>
 Entries are displayed along with some extra details:\textbf{Summary}
 shows the file permissions, owner, group, size and modification time.\textbf{Sizes}
@@ -748,44 +756,52 @@ shows just the permissions and owner.\textbf{Type} shows the MIME
 type of each file.\textbf{Times} shows the times the file was last
 accessed, modifed and changed.\dag
 </entry></row><row><entry>
+
 Small, With...</entry><entry>
 As above, but with a smaller icon and all on one line.
 </entry></row><row><entry>
+
 Sort by Name</entry><entry>
 Items are arranged by name. There is an option to make this case-sensitive.
 </entry></row><row><entry>
+
 Sort by Type</entry><entry>
 Items are grouped by their types and then sorted by name within the
 groups.
 </entry></row><row><entry>
+
 Sort by Date</entry><entry>
 Most recently modified first.
 </entry></row><row><entry>
+
 Sort by Size</entry><entry>
 Largest first.
 </entry></row><row><entry>
+
 Show Hidden</entry><entry>
 If on, files beginning with a dot are shown, otherwise they are hidden.
 </entry></row><row><entry>
+
 Refresh </entry><entry>
 Rereads the contents of the directory and details of all the files
 in it.Use this if the display becomes out-of-date.
 </entry></row><row><entry>
+
 Create Thumbs </entry><entry>
 Tries to load every file as an image and use that image as the file's
 icon. Usefulif you have a directory full of photos and can't remember
 which is which!
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
 
 \noindent\dag\thinspace{} Reading a file's contents or listing a directory
 updates the \emph{access time}; modifying the contents of a file or
 the list of files in a directory updates the \emph{modification time};
 changing a file's owner or permissions updates the \emph{change time}.
+  </para>
 
-
-\subsubsection{<anchor id="Permissions"/>Permissions}
+<sect2><title><anchor id="Permissions"/>Permissions</title>
+  <para>
 
 The permissions field, when shown, is made up of four groups of three
 flags. Each flag is displayed as a letter if it is on and a dash (--)
@@ -833,9 +849,10 @@ set its real IDs to its effective IDs).
 \end{itemize}
 
   </para>
-</section>
+</sect2>
+</sect1>
 
-<section>
+<sect1>
   <title>The selection menu</title>
   <para>
 
@@ -853,8 +870,8 @@ Note that individual applications may add extra menu items to the
 top of this submenu when you click over them --- see section \ref{AppDir}
 for details.
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+
+<informaltable><tgroup cols="2"><tbody>
 <row><entry> 
 Entry</entry><entry>
 Action
@@ -885,7 +902,7 @@ Display extra information about this object.
 Set Run Action... </entry><entry>
 Allows you to set the default program to use when opening files of
 this type.See section \ref{sec: RunAction} for details.
-Set Icon... </entry><entry>
+Set Icon...
 You can give each file or directory its own special icon using this
 feature --- simplydrag a suitable image onto the Set Icon dialog box.
 </entry></row><row><entry>
@@ -912,8 +929,8 @@ Find</entry><entry>
 Search for files by specifying various conditions --- see section
 \ref{sec: Searching}.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
+
 
 \noindent\dag\thinspace{}A symbolic link stores the \emph{location}
 of another file. Deleting the symlink doesn't affect the other file.
@@ -926,9 +943,9 @@ to move then you want an absolute link, but if the target may move
 (and the symlink will be moved with it) then you want a relative link.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>The new menu</title>
   <para>
 
@@ -936,8 +953,8 @@ Each entry in this submenu opens a savebox for creating a new file
 or directory. There are two standard entries; the others are the contents
 of your <filename>&lt;Choices&gt;/Templates</filename> directory, if it exists.
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+
+<informaltable><tgroup cols="2"><tbody>
 <row><entry> 
 Entry</entry><entry>
 Action
@@ -951,8 +968,8 @@ Create a blank file.
 &lt;user entries&gt;</entry><entry>
 Copy a file from your Templates directory.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
+
 
 To add your own entries, create a new directory called
 <filename>~/Choices/Templates</filename>
@@ -981,14 +998,14 @@ Note that you cannot set keyboard shortcuts for these user-defined
 entries at present.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>The window menu</title>
   <para>
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+
+<informaltable><tgroup cols="2"><tbody>
 <row><entry> 
 Entry</entry><entry>
 Action
@@ -1024,13 +1041,13 @@ Select just those files that match the given pattern --- see section
 Show ROX-Filer Help</entry><entry>
 Same as selecting ROX-Filer and choosing `Help' from the menu.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
+
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title><anchor id="SendTo"/>The send to menu</title>
   <para>
 
@@ -1047,7 +1064,7 @@ normally opened by clicking the Menu mouse button over a file while
 holding the Shift key down.
 
   </para>
-</section>
+</sect1>
 
 </chapter>
 
@@ -1077,14 +1094,14 @@ you've lost it! Removing a pinned file from its pinboard or panel
 only removes the link. This is different to most other filers...
   </para>
 
-<section>
+<sect1>
   <title>The pinboard and panel menus</title>
   <para>
 
 These menus are both the same, and very simple:
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+
+<informaltable><tgroup cols="2"><tbody>
 <row><entry> 
 Entry</entry><entry>
 Action
@@ -1105,21 +1122,21 @@ Open a directory viewer showing where the file is stored.
 Remove Item(s)</entry><entry>
 Remove the selected items from the pinboard or panel.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
+
 
 \noindent If you are setting up the defaults for multiple users and
 you wish to create a `Home' icon that leads to each user's home directory
 then you should first create a new icon and then use `Edit Icon' to
-change the location to `\textasciitilde{}' and the name to `Home'.
+change the location to `~' and the name to `Home'.
 
 Note that individual applications may add extra menu items to the
 top of this menu when you click over them --- see section \ref{AppDir}
 for details.
 </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Panel applets</title>
   <para>
 
@@ -1132,21 +1149,21 @@ shown, the applet will run.
   <procedure><title>To create your own applets (programmers only!):</title>
 
     <step><para>
-Create a directory for the applet (eg `\texttt{MyApplet}').
+Create a directory for the applet (eg <filename>MyApplet</filename>).
     </para></step>
 
     <step><para>
-Put an icon called `\texttt{.DirIcon.png}' inside it (so the directory
+Put an icon called <filename>.DirIcon.png</filename> inside it (so the directory
 appears with an icon).
     </para></step>
 
     <step><para>
-Make a `\texttt{Help}' directory inside it for when the user chooses
-`Help' from the menu.
+Make a <filename>Help</filename> directory inside it for when the user chooses
+<guimenuitem>Help</guimenuitem> from the menu.
     </para></step>
 
     <step><para>
-Create an executable file called `\texttt{AppletRun}'. This will be
+Create an executable file called <filename>AppletRun</filename>. This will be
 passed the XID of the panel socket window when the directory is dragged
 onto the panel. You can use this to create a GtkSocket widget. An
 example applet (written in python) is available at 
@@ -1154,7 +1171,7 @@ example applet (written in python) is available at
     </para></step>
 
   </procedure>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -1166,43 +1183,51 @@ is a zip file, which contains an entire directory structure in compressed
 form. It is often useful to be able to open up such a file as if it
 was a real directory, and the VFS system allows you to do this.
 
-To use this feature you must have one or both of the following:
+<itemizedlist><title>To use this feature you must have one or both of the following:</title>
 
-\begin{itemize}
-\item A system such as AVFS<citation>AVFS</citation> which causes the kernel to support
+<listitem><para>
+A system such as AVFS<citation>AVFS</citation> which causes the kernel to support
 various Virtual File Systems directly. This is the best option since
 all programs will be able to access the contents of the VFS. You may
 require root access to install such a system, however, and it is not
 available on all platforms.
-\item Support for the Midnight Commander VFS library compiled into <application>ROX-Filer</application>.
-This happens automatically when you compile <application>ROX-Filer</application> if it can find
-the VFS library --- this means having \texttt{libvfs.so} (or \texttt{libvfs.a})
-in a system library directory or in the directory in the environment
-variable \texttt{LD\_LIBRARY\_PATH}. In this case, you will be able
-to view the directory structure and copy files out of it, but not
-change it. Support for this may be added later. Midnight Commander
-is part of the GNOME project.
+</para></listitem>
 
-
-When using libvfs, the menu structure is slightly different --- `Open
-AVFS' is replaced by the `Open VFS' submenu. This is simply a short-cut
-for using the path-entry box (explained below), so if you want to
-use a VFS not listed on the menu you can type in the path directly,
-eg:
-
-\texttt{/home/fred/archive.zip\#uzip/}
-
-\noindent Don't forget the final slash!
-
-\end{itemize}
+<listitem><para>
+Support for the Midnight Commander VFS library compiled into
+<application>ROX-Filer</application>. This happens automatically when you
+compile <application>ROX-Filer</application> if it can find
+the VFS library --- this means having <filename>libvfs.so</filename>
+(or <filename>libvfs.a</filename>) in a system library directory or in the
+directory in the environment variable <envar>LD_LIBRARY_PATH</envar>. In this case,
+you will be able to view the directory structure and copy files out of it, but
+not change it. Support for this may be added later.
+<application>Midnight Commander</application> is part of the GNOME project.
 </para>
 
-<section>
-  <title>Step by step example of adding VFS support</title>
-  <para>
+<para>
+When using libvfs, the menu structure is slightly different --- <guimenuitem>Open
+AVFS</guimenuitem> is replaced by the <guisubmenu>Open VFS</guisubmenu> submenu.
+This is simply a short-cut for using the path-entry box (explained below), so
+if you want to use a VFS not listed on the menu you can type in the path
+directly, eg:
+
+<screen><filename>/home/fred/archive.zip#uzip/</filename></screen>
+
+Don't forget the final slash!
+
+</para></listitem>
+</itemizedlist>
+
+</para>
+
+<procedure><title>Step by step example of adding VFS support</title>
+  <step><para>
 
 This assumes that you have the Midnight Commander source in a directory
-called `mc'. You might need to replace \texttt{libvfs.so} with \texttt{libvfs.a}.
+called <filename>mc</filename>.
+You might need to replace <filename>libvfs.so</filename> with
+<filename>libvfs.a</filename>.
 
 <screen>
 $ cd mc
@@ -1211,23 +1236,31 @@ $ cd vfs
 $ make libvfs.so
 </screen>
 
-\begin{itemize}
-\item If you have the root password then install the library in a system
-library directory as normal.
-\item If not,
+  </para></step><step><para>
+
+If you have the root password then install the library in a system library
+directory as normal.
+
+  </para></step><step><para>
+
+If not,
 
 <screen>
 $ mkdir ~/lib
 $ cp libvfs.so ~/lib
 $ cd ~/Apps/ROX-Filer
 </screen>
-Edit the \texttt{AppRun} file to include this as the \emph{second}
+Edit the <filename>AppRun</filename> file to include this as the <emphasis>second</emphasis>
 line:
 
 <programlisting>LD_LIBRARY_PATH=$HOME/lib; export LD_LIBRARY_PATH</programlisting>
 
-This will ensure that <application>ROX-Filer</application> will look for the library in the new
-\texttt{\textasciitilde{}/lib} directory. Finally, recompile:
+This will ensure that <application>ROX-Filer</application> will look for the
+library in the new <filename>~/lib</filename> directory.
+
+  </para></step><step><para>
+
+Finally, recompile:
 
 <screen>
 $ ./AppRun --compile
@@ -1239,10 +1272,10 @@ checking for mc_stat in -lvfs... yes
 
 If you saw that line then it's worked! Well done!
 
-\end{itemize}
+  </para></step>
 
-  </para>
-  </section>
+</procedure>
+
 </chapter>
 
 <chapter>
@@ -1255,7 +1288,7 @@ of it again. It behaves in different ways depending on how you invoked
 it:
   </para>
 
-<section>
+<sect1>
   <title>The path-entry box</title>
   <para>
 
@@ -1265,8 +1298,8 @@ a file in a large directory quickly, but you can also use it for navigating
 between directories, or for selecting a full pathname from somewhere
 else and pasting it directly into the path-entry box.
 
-\vspace{0.3cm}
-<table><title>Title</title><tgroup cols="2"><tbody>
+
+<informaltable><tgroup cols="2"><tbody>
 <row><entry> 
 Key</entry><entry>
 Action
@@ -1280,8 +1313,8 @@ Shell-style tab completion.
 Up, Down</entry><entry>
 Select the previous/next matching entry.
 </entry></row>
-</tbody></tgroup></table>
-\vspace{0.3cm}
+</tbody></tgroup></informaltable>
+
 
 If you start entering a name beginning with a `.' then the `Show Hidden'
 feature is temporarily turned on so that the file can be shown.
@@ -1310,9 +1343,9 @@ to the correct subdirectory. If it beeps when you press Tab then you
 need to supply more letters.
 \end{enumerate}
 </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>The shell command box</title>
   <para>
 
@@ -1365,9 +1398,9 @@ by naming it sh and putting it in your path.
 <command>sleep 240; xmessage Time to go!</command>
 \end{itemize}
 </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title><anchor id="SelectIf"/>The conditional selection box</title>
   <para>
 
@@ -1387,7 +1420,7 @@ are never checked anyway.
 
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -1416,7 +1449,7 @@ You can control which actions get started automatically (without you
 having to click on Quiet at the start) from the Options window.
   </para>
 
-<section>
+<sect1>
   <title>Action window options</title>
   <para>
 
@@ -1437,7 +1470,7 @@ and so on.
 \end{itemize}
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -1464,7 +1497,7 @@ clicked on. The filer will use the same window to view other results
 create a new window from the Window menu).
   </para>
 
-<section>
+<sect1>
   <title>Wildcards</title>
   <para>
 
@@ -1489,9 +1522,9 @@ leafname is used. That is, \texttt{'{*}tmp{*}'} will find `tmp' and
 `tmpfile' but not `/tmp/file' --- \texttt{'/{*}tmp{*}'} will find
 all three.
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Simple tests</title>
   <para>
 
@@ -1529,9 +1562,9 @@ And a couple of other useful ones:
 \item [IsMine]finds files which you own.
 \end{description}
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Logic operators</title>
   <para>
 
@@ -1562,9 +1595,9 @@ Not isdir and not isreg
 </screen>
 All three do the same thing.
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Comparisons</title>
   <para>
 
@@ -1630,9 +1663,9 @@ Epoch rather than the current time). Finally, don't use = with times
 86400 seconds ago$\ldots$
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Specials</title>
   <para>
 
@@ -1668,13 +1701,13 @@ The first deletes each file ending in \texttt{.old}. The second looks
 for \texttt{.c} files, but does not bother checking inside directories
 called \texttt{src}. The expression is evaluated like this:
 
-\vspace{0.3cm}
+
 {\centering \resizebox*{!}{2.5in}{\includegraphics{Prune.eps}} \par}
-\vspace{0.3cm}
+
 
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -1702,7 +1735,7 @@ mouse pointer over the option to find out what it does.
 
   </para>
 
-<section>
+<sect1>
   <title>Translation options</title>
   <para>
 
@@ -1716,9 +1749,9 @@ the name of the file to load from ROX-Filer/Messages.
 \end{description}
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Display options</title>
   <para>
 
@@ -1747,9 +1780,9 @@ Icon size is also used when switching off the details display from
 the toolbar.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Pinboard options</title>
   <para>
 
@@ -1771,9 +1804,9 @@ off the side of the screen.
 \end{itemize}
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Panel options</title>
   <para>
 
@@ -1783,9 +1816,9 @@ You can have labels on all icons, on no icons, or on all icons except
 applications.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Action window options</title>
   <para>
 
@@ -1795,9 +1828,9 @@ auto-start here. You can also set the default state for each of the
 options that appear inside action windows.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Toolbar options</title>
   <para>
 
@@ -1817,9 +1850,9 @@ their combined size (excluding directories).
 See section \ref{sec: Toolbar} for details.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Filer window options</title>
   <para>
 
@@ -1852,9 +1885,9 @@ matches, even though some letters were added.
 \end{itemize}
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Drag-And-Drop options</title>
   <para>
 
@@ -1887,9 +1920,9 @@ the above option is turned off, then this has no effect.
 \end{itemize}
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Menu options</title>
   <para>
 
@@ -1898,9 +1931,9 @@ here' from the menu. You can replace it with another command such
 as `gnome-terminal', `konsole', or anything else.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Mouse bindings</title>
   <para>
 
@@ -1922,7 +1955,7 @@ the middle one button-3 (this affects all programs, not just <application>ROX-Fi
 
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -1937,7 +1970,7 @@ and what program to use when you open the file.
 
   </para>
 
-<section>
+<sect1>
   <title><anchor id="RunAction"/>The run action box</title>
   <para>
 
@@ -1969,10 +2002,10 @@ into the box labelled `Enter a shell command' and press Return. `\texttt{\$1}'
 will be replaced by the name of the file you click on when this command
 is used. As before, clicking on any GIF image will now load it into
 the Gimp.
+  </para>
 
-
-\subsubsection{Setting the default media-type handlers}
-
+  <sect2><title>Setting the default media-type handlers</title>
+    <para>
 Whichever method you use to set the action you have the choice of
 setting the run action just for that type, or setting the default
 for all files with that media-type which don't already have a specific
@@ -1982,11 +2015,11 @@ don't have to do it again for image/jpeg files and so on. However,
 this only affects types that don't already have a specific action
 (ie, those that would have brought up an error box if you tried to
 open them).
+    </para>
+  </sect2>
+</sect1>
 
-  </para>
-</section>
-
-<section>
+<sect1>
   <title>How filetypes are stored</title>
   <para>
 
@@ -2029,7 +2062,7 @@ isn't found then the filer will try simply using `text'.
 
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -2070,7 +2103,7 @@ same owner as the AppRun file inside.
 
   </para>
 
-<section>
+<sect1>
   <title>The AppInfo file</title>
   <para>
 
@@ -2106,7 +2139,7 @@ its only argument.
 \end{description}
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -2115,7 +2148,7 @@ its only argument.
 
   </para>
 
-<section>
+<sect1>
   <title><anchor id="LANG"/>Selecting a translation</title>
   <para>
 
@@ -2129,9 +2162,9 @@ translation files are provided:
 effect.
 \end{enumerate}
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Creating a new translation</title>
   <para>
 
@@ -2169,9 +2202,9 @@ restart the filer and select it from the Options box (see section
 releases of the filer.
 \end{enumerate}
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Updating an existing translation</title>
   <para>
 
@@ -2195,7 +2228,7 @@ a translation.
 
 
   </para>
-</section>
+</sect1>
 </chapter>
 
 <chapter>
@@ -2208,7 +2241,7 @@ to me or to the mailing list. Tell me which version you're using!
 
   </para>
 
-<section>
+<sect1>
   <title>Compiling</title>
   <para>
 
@@ -2218,9 +2251,9 @@ in the `\texttt{src}' directory when you change the \texttt{.c} and
 \texttt{.h} files. You might want to run `\texttt{make depend}' too.
 
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Creating and applying patches</title>
   <para>
 
@@ -2261,9 +2294,9 @@ the sources. This means that people can apply several patches without
 each new one overwriting the others.
 \end{itemize}
   </para>
-</section>
+</sect1>
 
-<section>
+<sect1>
   <title>Autoconf</title>
   <para>
 
@@ -2284,17 +2317,17 @@ with the test results to produce `Makefile' and `config.h'.
 You run `make', which creates .o files from the .c files and links
 to produce <application>ROX-Filer</application>.
   </para>
-</section>
+</sect1>
 
-<section><title>Data-structures</title>
+<sect1><title>Data-structures</title>
   <para>
 
 The diagram below shows some of the major structures found in the
 filer and the relationships between them.
 
-\vspace{0.3cm}
+
 {\centering \resizebox*{1\textwidth}{!}{\includegraphics{Structs.eps}} \par}
-\vspace{0.3cm}
+
 
 To summarise, each window has its own \textbf{FilerWindow} structure.
 This structure has pointers to a \textbf{Collection} (which is the
@@ -2309,7 +2342,7 @@ It periodically notifies the filer window of the changes-so-far by
 calling all the functions in the \emph{users} list (use \emph{attach()}
 and \emph{detach()} to add and remove functions to or from the list).
   </para>
-</section>
+</sect1>
 </chapter>
 
 <bibliography>
