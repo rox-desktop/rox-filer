@@ -214,6 +214,9 @@ static MaskedPixmap *image_from_file(char *path)
 	if (!image)
 		return NULL;
 
+	/* Avoid ImLib cache - ours is better! */
+	gdk_imlib_changed_image(image);
+
 	if (!gdk_imlib_render(image, image->rgb_width, image->rgb_height))
 	{
 		gdk_imlib_kill_image(image);
@@ -300,7 +303,9 @@ static void unref(MaskedPixmap *mp, gpointer data)
 	{
 #ifdef HAVE_IMLIB
 		if (mp->image)
-			gdk_imlib_destroy_image(mp->image);
+		{
+			gdk_imlib_kill_image(mp->image);
+		}
 		else
 #endif
 		{
