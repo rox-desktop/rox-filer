@@ -1590,7 +1590,7 @@ static GtkWidget *create_options(void)
 			gtk_radio_button_group(GTK_RADIO_BUTTON(tog)),
 			_("Outlined text"));
 	radio_bg_outline = GTK_TOGGLE_BUTTON(tog);
-	OPTION_TIP(tog, "The text has a thin outline around each letter.");
+	OPTION_TIP(tog, _("The text has a thin outline around each letter."));
 	gtk_box_pack_start(GTK_BOX(vbox), tog, FALSE, TRUE, 0);
 
 	tog = gtk_radio_button_new_with_label(
