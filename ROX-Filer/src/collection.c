@@ -1993,10 +1993,11 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	{
 		row = total_rows - 1;
 		item = col + row * collection->columns;
-		if (item >= collection->number_of_items)
+		if (item >= collection->number_of_items - 1)
 		{
-			row--;
-			scroll_to_show(collection, item);
+			collection_set_cursor_item(collection,
+					collection->number_of_items - 1);
+			return;
 		}
 	}
 	if (row < 0)
