@@ -432,12 +432,7 @@ $ rox --bottom=</screen>
 
    <sect2><title>Others</title>
     <para>
-
-     If all else fails, try running rox with the <option>-n</option> and
-     <option>-o</option> options; this overrides window manager control of the
-     icons altogether (<option>-n</option> forces the filer to start a new
-     copy).
-
+     If all else fails, try the Compatibility section of the Options window.
     </para>
    </sect2>
   </sect1>
@@ -1346,8 +1341,12 @@ $ rox --bottom=</screen>
    </para><para>
    Drag panel icons with the middle mouse button to move them around.
    In previous versions of the filer, pinboard icons were also moved using the
-   middle mouse button. This may still work (depending on your window manager),
-   but using the left mouse button is now preferred.
+   middle mouse button, but this is no longer supported (as the middle button
+   is reserved for the window manager's use).
+   </para><para>
+   You can assign keyboard shortcuts to pinboard and panel icons. These can be
+   used to open directories, files or applications quickly, even if another
+   window has the focus.
    </para><para>
    Changes to the pinboard and panel are automatically saved. Clicking on pinned
    icons with <keycap>Control</keycap> held down selects and unselects them.
@@ -1385,7 +1384,7 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Edit Item</guimenuitem></entry><entry>
          Change the name displayed under the icon, or the pathname the item
-         points to.
+         points to. You can also set a keyboard shortcut for the icon here.
        </entry></row>
 
        <row><entry>
@@ -2494,16 +2493,15 @@ while 1:
        (if no background image is set).
      </para></listitem>
 
+     <listitem><para><guilabel>Use custom font</guilabel> can be used to set a
+     different font for pinboard icons. If unset, the global default font, as set
+     by your session manager (eg ROX-Session) is used.
+     </para></listitem>
+
      <listitem><para><guilabel>Single-click to open</guilabel>
        allows you to open a file or directory just by clicking on it. Hold down
        <keycap>Control</keycap> to select things. If this is off, clicking selects
        and double-clicking opens.
-     </para></listitem>
-
-     <listitem><para><guilabel>Pass button-3 clicks to window manager</guilabel>
-       may be needed if your window manager uses button-3 clicks on the desktop
-       for an important function. Normally, clicking button-3 will display
-       the filer's pinboard menu.
      </para></listitem>
 
      <listitem><para><guilabel>Keep icons within screen limits</guilabel>
@@ -2558,18 +2556,6 @@ while 1:
    <para>
 
     <itemizedlist>
-     <listitem><para><application>ROX-Filer</application> uses the standard
-       XDND protocol for drag-and-drop. This protocol recommends that URIs
-       should contain the hostname of the computer that the resource is on so
-       that the program receiving the data can determine whether it can get the
-       data directly or whether it must go via the X-server. However, many
-       older programs (particularly GNOME applications) get confused by the
-       hostname and fail to load the data correctly. If <guilabel>Don't use
-        hostnames</guilabel> is on then the hostname part is omitted and
-       <application>ROX-Filer</application> will work with these applications
-       BUT you can't drag data to a program running on a different machine.
-     </para></listitem>
-
      <listitem><para><guilabel>Allow dragging to icons in filer
         windows</guilabel> controls what happens when you drop files onto icons
        in filer windows. If on then drops onto directories will save the data
@@ -2651,11 +2637,10 @@ while 1:
       <listitem><para><guibutton>Show name-to-type rules</guibutton>
         opens the directories containing the files which tell the filer what
         type to give each file.</para></listitem>
-
-      <listitem><para><guibutton>Re-read files</guibutton> causes the filer to
-        reread these files after you've finished changing them.
-      </para></listitem>
      </itemizedlist>
+     Make sure you run the `update-mime-database' command after editing the files,
+     and click on the Refresh toolbar button to make the filer read the new
+     settings.
    </para>
 
    <sect2><title>Colours</title>
@@ -2666,6 +2651,36 @@ while 1:
        list below.
       </para>
    </sect2>
+
+  </sect1>
+
+  <sect1><title>Compatibility</title>
+   <para>
+    <itemizedlist>
+     <listitem><para><guilabel>Override window manager control of the pinboard
+and panels</guilabel> may need to be turned on to stop older window managers from
+trying to display the pinboard and panels in a normal window, or from raising them
+when clicked and from doing other odd things.
+     </para></listitem>
+     <listitem><para><guilabel>Pass all backdrop mouse clicks to window manager</guilabel>
+      may be needed if your window manager has important functions on these buttons.
+      Normally, clicking button-3 will display the filer's pinboard menu, and
+      button-1 dragging allows you to select multiple icons.
+     </para></listitem>
+     <listitem><para><application>ROX-Filer</application> uses the standard
+       XDND protocol for drag-and-drop. This protocol recommends that URIs
+       should contain the hostname of the computer that the resource is on so
+       that the program receiving the data can determine whether it can get the
+       data directly or whether it must go via the X-server. However, many
+       older programs (particularly GNOME applications) get confused by the
+       hostname and fail to load the data correctly. If <guilabel>Don't use
+        hostnames</guilabel> is on then the hostname part is omitted and
+       <application>ROX-Filer</application> will work with these applications
+       BUT you can't drag data to a program running on a different machine.
+     </para></listitem>
+
+    </itemizedlist>
+   </para>
   </sect1>
  </chapter>
 
@@ -2710,9 +2725,9 @@ while 1:
 
    <sect2><title>Setting the run action by entering a shell command</title>
     <para>
-     Type: <userinput>gimp "$1"</userinput>
+     Type: <userinput>gimp "$@"</userinput>
      into the box labelled <guilabel>Enter a shell command</guilabel> and press
-     <keycap>Return</keycap>. <userinput>$1</userinput>
+     <keycap>Return</keycap>. <userinput>$@</userinput>
      will be replaced by the name of the file you click on when this command
      is used. As before, clicking on any GIF image will now load it into
      the Gimp.
