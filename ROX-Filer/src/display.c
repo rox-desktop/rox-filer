@@ -606,7 +606,8 @@ static void draw_item_large_full(GtkWidget *widget,
 	int	low_text_y = area->y + area->height - fixed_font->descent - 2;
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
-	int		text_area_width = area->width - (text_x - area->x);
+	int		text_area_width = filer_window->collection->item_width -
+						(text_x - area->x);
 
 	pic_area.x = area->x;
 	pic_area.y = area->y;
@@ -643,6 +644,7 @@ static void draw_item_small_full(GtkWidget *widget,
 	int		fixed_height = fixed_font->ascent + fixed_font->descent;
 	int		box_height = MAX(text_height, fixed_height) + 2;
 	int		w;
+	int		width = filer_window->collection->item_width;
 
 	pic_area.x = area->x;
 	pic_area.y = area->y;
@@ -656,7 +658,7 @@ static void draw_item_small_full(GtkWidget *widget,
 				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
 				NULL, widget, "text",
 				text_x, bottom - 1 - box_height,
-				area->width - (text_x - area->x) - 1,
+				width - (text_x - area->x) - 1,
 				box_height);
 	draw_string(widget,
 			item_font,
@@ -664,11 +666,11 @@ static void draw_item_small_full(GtkWidget *widget,
 			text_x,
 			low_text_y,
 			item->name_width,
-			area->width - (text_x - area->x),
+			width - (text_x - area->x),
 			selected, FALSE);
 
 	w = details_width(filer_window, item);
-	text_x = area->width - w - 4 + area->x;
+	text_x = width - w - 4 + area->x;
 	draw_details(filer_window,
 			item, text_x, bottom - fixed_font->descent - 2,
 			w + 2, selected, FALSE);
@@ -709,14 +711,15 @@ static void draw_item_large(GtkWidget *widget,
 {
 	DirItem		*item = (DirItem *) colitem->data;
 	int		text_width = item->name_width;
-	int	text_x = area->x + ((area->width - text_width) >> 1);
+	int		width = filer_window->collection->item_width;
+	int	text_x = area->x + ((width - text_width) >> 1);
 	int	text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
 
 	pic_area.x = area->x;
 	pic_area.y = area->y;
-	pic_area.width = area->width;
+	pic_area.width = width;
 	pic_area.height = area->height -
 			(item_font->ascent + item_font->descent);
 

@@ -577,6 +577,9 @@ void pinboard_select_only(PinIcon *icon)
 gboolean pinboard_has(guchar *path)
 {
 	GList	*next;
+
+	if (!current_pinboard)
+		return FALSE;
 	
 	for (next = current_pinboard->icons; next; next = next->next)
 	{

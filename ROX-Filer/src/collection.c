@@ -137,7 +137,7 @@ static void draw_focus_at(Collection *collection, GdkRectangle *area)
 
 	gdk_draw_rectangle(widget->window, gc, FALSE,
 				area->x + 1, area->y + 1,
-				area->width - 3,
+				collection->item_width - 3,
 				area->height - 3);
 }
 
@@ -300,6 +300,11 @@ GtkWidget* collection_new(GtkAdjustment *vadj)
 				NULL));
 }
 
+/* Note: The draw_item call gives the maximum area that can be
+ * drawn to. For the column on the far right, this extends to the
+ * edge of the window. Normally, use collection->item_width instead
+ * of area->width to calculate the position.
+ */
 void collection_set_functions(Collection *collection,
 				CollectionDrawFunc draw_item,
 				CollectionTestFunc test_point,
@@ -558,21 +563,21 @@ static gint collection_paint(Collection 	*collection,
 	int		start_col, last_col;
 	int		phys_last_col;
 	GdkRectangle 	clip;
+	guint		width, height;
 
 	scroll = collection->vadj->value;
 
 	widget = GTK_WIDGET(collection);
 
+	gdk_window_get_size(widget->window, &width, &height);
+	
+	whole.x = 0;
+	whole.y = 0;
+	whole.width = width;
+	whole.height = height;
+	
 	if (collection->paint_level > PAINT_NORMAL || area == NULL)
 	{
-		guint	width, height;
-		gdk_window_get_size(widget->window, &width, &height);
-		
-		whole.x = 0;
-		whole.y = 0;
-		whole.width = width;
-		whole.height = height;
-		
 		area = &whole;
 
 		if (collection->paint_level == PAINT_CLEAR
@@ -609,37 +614,44 @@ static gint collection_paint(Collection 	*collection,
 		clear_area(collection, &clip);
 	}
 
-	if (start_col < collection->columns)
+	/* The right-most column may be wider than the others.
+	 * Therefore, to redraw the area after the last 'real' column
+	 * we may have to draw the right-most column.
+	 */
+	if (start_col >= collection->columns)
+		start_col = collection->columns - 1;
+
+	if (phys_last_col >= collection->columns)
+		last_col = collection->columns - 1;
+	else
+		last_col = phys_last_col;
+
+	col = start_col;
+
+	item = row * collection->columns + col;
+	item_area.height = collection->item_height;
+
+	while ((item == 0 || item < collection->number_of_items)
+			&& row <= last_row)
 	{
-		if (phys_last_col >= collection->columns)
-			last_col = collection->columns - 1;
-		else
-			last_col = phys_last_col;
+		item_area.x = col * collection->item_width;
+		item_area.y = row * collection->item_height - scroll;
 
-		col = start_col;
-
-		item = row * collection->columns + col;
 		item_area.width = collection->item_width;
-		item_area.height = collection->item_height;
+		if (col == collection->columns - 1)
+			item_area.width <<= 1;
+				
+		draw_one_item(collection, item, &item_area);
+		col++;
 
-		while ((item == 0 || item < collection->number_of_items)
-				&& row <= last_row)
+		if (col > last_col)
 		{
-			item_area.x = col * collection->item_width;
-			item_area.y = row * collection->item_height - scroll;
-
-			draw_one_item(collection, item, &item_area);
-			col++;
-
-			if (col > last_col)
-			{
-				col = start_col;
-				row++;
-				item = row * collection->columns + col;
-			}
-			else
-				item++;
+			col = start_col;
+			row++;
+			item = row * collection->columns + col;
 		}
+		else
+			item++;
 	}
 
 	if (collection->lasso_box)
@@ -1506,7 +1518,6 @@ void collection_toggle_item(Collection *collection, gint item)
 void collection_select_all(Collection *collection)
 {
 	GtkWidget	*widget;
-	GdkRectangle	area;
 	int		item = 0;
 	int		scroll;
 	
@@ -1516,9 +1527,6 @@ void collection_select_all(Collection *collection)
 	widget = GTK_WIDGET(collection);
 	scroll = collection->vadj->value;
 
-	area.width = collection->item_width;
-	area.height = collection->item_height;
-
 	if (collection->number_selected == collection->number_of_items)
 		return;		/* Nothing to do */
 
@@ -1527,13 +1535,9 @@ void collection_select_all(Collection *collection)
 		while (collection->items[item].selected)
 			item++;
 
-		area.x = (item % collection->columns) * area.width;
-		area.y = (item / collection->columns) * area.height
-				- scroll;
-
-		collection->items[item++].selected = TRUE;
-		clear_area(collection, &area);
-		collection_paint(collection, &area);
+		collection->items[item].selected = TRUE;
+		collection_draw_item(collection, item, TRUE);
+		item++;
 		
 		collection->number_selected++;
 	}
@@ -1549,7 +1553,6 @@ void collection_select_all(Collection *collection)
 void collection_clear_except(Collection *collection, gint item)
 {
 	GtkWidget	*widget;
-	GdkRectangle	area;
 	int		i = 0;
 	int		scroll;
 	int		end;		/* Selected items to end up with */
@@ -1569,9 +1572,6 @@ void collection_clear_except(Collection *collection, gint item)
 		end = 1;
 	}
 
-	area.width = collection->item_width;
-	area.height = collection->item_height;
-	
 	if (collection->number_selected == 0)
 		return;
 
@@ -1580,12 +1580,9 @@ void collection_clear_except(Collection *collection, gint item)
 		while (i == item || !collection->items[i].selected)
 			i++;
 
-		area.x = (i % collection->columns) * area.width;
-		area.y = (i / collection->columns) * area.height - scroll;
-
-		collection->items[i++].selected = FALSE;
-		clear_area(collection, &area);
-		collection_paint(collection, &area);
+		collection->items[i].selected = FALSE;
+		collection_draw_item(collection, i, TRUE);
+		i++;
 		
 		collection->number_selected--;
 	}
@@ -1608,7 +1605,7 @@ void collection_clear_selection(Collection *collection)
 /* Force a redraw of the specified item, if it is visible */
 void collection_draw_item(Collection *collection, gint item, gboolean blank)
 {
-	int		height;
+	int		width, height;
 	GdkRectangle	area;
 	GtkWidget	*widget;
 	int		row, col;
@@ -1630,19 +1627,22 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 
 	area.x = col * collection->item_width;
 	area_y = row * collection->item_height - scroll;
-	area.width = collection->item_width;
 	area_height = collection->item_height;
 
 	if (area_y + area_height < 0)
 		return;
 
-	gdk_window_get_size(widget->window, NULL, &height);
+	gdk_window_get_size(widget->window, &width, &height);
 
 	if (area_y > height)
 		return;
 
 	area.y = area_y;
 	area.height = area_height;
+
+	area.width = collection->item_width;
+	if (col == collection->columns - 1)
+		area.width <<= 1;
 			
 	if (blank || collection->lasso_box)
 		clear_area(collection, &area);
