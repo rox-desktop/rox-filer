@@ -1373,7 +1373,7 @@ gchar *unescape_uri(const char *uri)
 }
 
 /* Used as the sort function for sorting GPtrArrays */
-static gint strcmp2(gconstpointer a, gconstpointer b)
+gint strcmp2(gconstpointer a, gconstpointer b)
 {
 	const char *aa = *(char **) a;
 	const char *bb = *(char **) b;
@@ -1390,8 +1390,8 @@ GPtrArray *list_dir(const guchar *path)
 {
 	GDir *dir;
 	GError *error = NULL;
-	GPtrArray *names;
 	const char *leaf;
+	GPtrArray *names;
 	
 	dir = g_dir_open(path, 0, &error);
 	if (error)
