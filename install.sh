@@ -191,7 +191,7 @@ for DIR in $CHOICESPATH; do
   
   echo Looking for files in $DIR...
 
-  if [ -f "$DIR/MIME-icons/special_executable.xpm" ]; then
+  if [ -f "$DIR/MIME-icons/application_x-executable.png" ]; then
     REPORT=""
     echo "Found them!"
     break

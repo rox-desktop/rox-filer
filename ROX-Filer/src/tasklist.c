@@ -349,8 +349,13 @@ static void add_window(Window win)
 
 		XGetWindowAttributes(gdk_display, win, &attr);
 
+		if (gdk_error_trap_pop() != Success)
+			return;
+		gdk_error_trap_push();
+
 		XSelectInput(gdk_display, win, attr.your_event_mask |
 			PropertyChangeMask);
+		gdk_flush();
 
 		if (gdk_error_trap_pop() != Success)
 			return;
@@ -693,6 +698,8 @@ static GdkPixbuf *get_image_for(IconWindow *win)
 			}
 		}
 	}
+
+	gdk_flush();
 
 	gdk_error_trap_pop();
 	
