@@ -334,7 +334,7 @@ $ rox --bottom=</screen>
 
    <sect2><title>Altri</title>
     <para>
-     Se ancora non funzionano le cose, si vada nella sezione «Compatibilità» della 
+     Se ancora non funzionano le cose, andare nella sezione «Compatibilità» della 
      finestra «Opzioni».
     </para>
    </sect2>
@@ -445,7 +445,7 @@ $ rox --bottom=</screen>
      </entry></row>
 
      <row><entry>Doppio clic sullo sfondo del filer</entry><entry>
-       Ridimensiona la finestra in modo opportuno.
+       Ridimensiona la finestra in modo opportuno (si può disattivare nella finestra «Opzioni»).
      </entry></row>
 
      <row><entry><keycap>Backspace</keycap></entry><entry>
@@ -921,10 +921,11 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Informazioni</guimenuitem></entry><entry>
+         <guimenuitem>Proprietà</guimenuitem></entry><entry>
          Mostra ulteriori informazioni dell'oggetto selezionato. Qui è anche possibile 
          cambiare i permessi (ma il menù <guimenuitem>Permessi</guimenuitem> che è più in 
-	 basso, permette di cambiarli a più file contemporaneamente).
+	 basso, permette di cambiarli a più file contemporaneamente) e la destinazione di un 
+	 collegamento simbolico.
        </entry></row>
 
        <row><entry>
@@ -935,10 +936,16 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
+         <guimenuitem>Tipo di file...</guimenuitem></entry><entry>
+         Imposta il tipo di MIME di un file. Funziona solo sui file system che hanno il supporto
+         esteso degli attributi. Nei vecchi file system, per cambiare il tipo di MIME, si deve rinominare il file.
+       </entry></row>
+
+       <row><entry>
          <guimenuitem>Permessi</guimenuitem></entry><entry>
          Permette di cambiare i permessi ai file selezionati. Se è selezionato solo un
 	 file, è meglio usare l'interfaccia più semplice del menù 
-	 <guimenuitem>Informazioni</guimenuitem>
+	 <guimenuitem>Proprietà</guimenuitem>
        </entry></row>
 
        <row><entry>
@@ -1140,7 +1147,7 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>Informazioni su ROX-Filer</guimenuitem></entry><entry>
          Mostra le informazioni del filer. È equivalente a cercare «ROX-Filer» 
-	 in una finestra del filer e selezionare <guimenuitem>Informazioni</guimenuitem>
+	 in una finestra del filer e selezionare <guimenuitem>Proprietà</guimenuitem>
 	 dal menù.
        </entry></row>
 
@@ -1187,7 +1194,7 @@ $ rox --bottom=</screen>
      nascosta dentro <filename>SendTo</filename> di nome <filename>.image</filename> (o
      di qualsiasi altro tipo di file si desidera). È anche possibile usare il tipo
      completo, come ad esempio <filename>.image_png</filename>. Usare il menù 
-     <guimenuitem>Informazioni</guimenuitem> su un file per conoscere il tipo di MIME.
+     <guimenuitem>Proprietà</guimenuitem> su un file per conoscere il tipo di MIME.
     </para>
     <para>
      Le voci di queste directory nascoste sono mostrate solo per i file di tipo appropriato.
@@ -2414,7 +2421,7 @@ $ rox --bottom=</screen>
   </para>
 
   <note><para>Per ragioni di sicurezza, una directory applicativa deve avere lo 
-    stesso proprietario del file <filename>AppRun</filename> che ha dentro.</para></note>
+    stesso proprietario del file <filename>AppRun</filename> in essa contenuto.</para></note>
 
   <sect1>
    <title>Il file «AppInfo»</title>
@@ -2466,7 +2473,7 @@ $ rox --bottom=</screen>
 
      <listitem><para>
        <userinput>About</userinput>
-       contiene un elenco di campi che sono mostrati nel menù «Informazioni»
+       contiene un elenco di campi che sono mostrati nel menù «Proprietà»
        dell'applicazione (si può usare qualunque nome per l'elemento, ma sono consigliati 
        quelli mostrati sopra).
      </para></listitem>
