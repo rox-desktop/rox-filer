@@ -454,6 +454,7 @@ void abox_add_combo(ABox *abox, GList *presets,
 	gtk_combo_set_use_arrows_always(GTK_COMBO(combo), TRUE);
 	gtk_combo_set_popdown_strings(GTK_COMBO(combo), presets);
 	abox->entry = GTK_COMBO(combo)->entry;
+	gtk_entry_set_activates_default(GTK_ENTRY(abox->entry), TRUE);
 
 	gtk_entry_set_text(GTK_ENTRY(abox->entry), text);
 	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
