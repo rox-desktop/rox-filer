@@ -218,8 +218,14 @@ gpointer g_fscache_lookup_cached(GFSCache *cache, char *pathname)
 	key.inode = info.st_ino;
 
 	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+	if (!data)
+		return NULL;
 
-	return data ? data->data : NULL;
+	if (cache->ref)
+		cache->ref(data->data, cache->user_data);
+	data->last_lookup = time(NULL);
+
+	return data->data;
 }
 
 /* Call the update() function on this item if it's in the cache
