@@ -820,14 +820,14 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	gdk_gc_set_clip_region(pi->widget->style->black_gc, event->region);
 
-	render_pixmap(icon->selected ? image->pixbuf_lit : image->pixbuf,
+	render_pixbuf(icon->selected ? image->pixbuf_lit : image->pixbuf,
 			pi->widget->window,
 			pi->widget->style->black_gc,
 			x, y, iwidth, iheight);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		render_pixmap(im_symlink->pixbuf, pi->widget->window,
+		render_pixbuf(im_symlink->pixbuf, pi->widget->window,
 				pi->widget->style->black_gc,
 				x, y, -1, -1);
 	}
@@ -837,7 +837,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 					? im_mounted
 					: im_unmounted;
 					
-		render_pixmap(mp->pixbuf, pi->widget->window,
+		render_pixbuf(mp->pixbuf, pi->widget->window,
 				pi->widget->style->black_gc,
 				x, y, -1, -1);
 	}

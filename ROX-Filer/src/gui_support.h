@@ -60,7 +60,7 @@ void radios_set_value(Radios *radios, gint value);
 gint radios_get_value(Radios *radios);
 GList *uri_list_to_glist(const char *uri_list);
 GtkWidget *simple_image_new(GdkPixbuf *pixbuf);
-void render_pixmap(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
+void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		   int x, int y, int width, int height);
 
 #endif /* _GUI_SUPPORT_H */

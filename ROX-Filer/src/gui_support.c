@@ -1001,7 +1001,8 @@ static void simple_image_size_request(GtkWidget      *widget,
 	requisition->height = image->height;
 }
 
-void render_pixmap(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
+/* Render a pixbuf without messing up the clipping */
+void render_pixbuf(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		   int x, int y, int width, int height)
 {
 #if GTK_MAJOR_VERSION == 2 && GTK_MINOR_VERSION > 1
@@ -1009,11 +1010,9 @@ void render_pixmap(GdkPixbuf *pixbuf, GdkDrawable *target, GdkGC *gc,
 		        GDK_RGB_DITHER_NORMAL, 0, 0);
 
 #else
-	gdk_pixbuf_render_to_drawable_alpha(pixbuf, target,
-			0, 0,			/* src */
-			x, y, width, height,
-			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
-			GDK_RGB_DITHER_NORMAL, 0, 0);
+	GDK_DRAWABLE_GET_CLASS(target)->_draw_pixbuf(target, gc, pixbuf,
+				   0, 0, x, y, width, height,
+				   GDK_RGB_DITHER_NORMAL, 0, 0);
 #endif
 }
 
@@ -1023,7 +1022,7 @@ static gint simple_image_expose(GtkWidget *widget, GdkEventExpose *event)
 	
 	gdk_gc_set_clip_region(widget->style->black_gc, event->region);
 	
-	render_pixmap(image->pixbuf, widget->window, widget->style->black_gc,
+	render_pixbuf(image->pixbuf, widget->window, widget->style->black_gc,
 			widget->allocation.x, widget->allocation.y,
 			image->width, image->height);
 			
