@@ -395,6 +395,16 @@ static void build_menu_item(xmlNode *node, GtkWidget *option_menu)
 				"value", xmlGetProp(node, "value"));
 }
 
+static void show_notice(GtkObject *button)
+{
+	guchar *text;
+
+	text = gtk_object_get_data(button, "notice_text");
+	g_return_if_fail(text != NULL);
+
+	report_error("Notice", _(text));
+}
+
 static void build_widget(xmlNode *widget, GtkWidget *box)
 {
 	const char *name = widget->name;
@@ -427,6 +437,28 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 	}
 
 	label = xmlGetProp(widget, "label");
+
+	if (strcmp(name, "notice") == 0)
+	{
+		GtkWidget *button, *align;
+		guchar *text;
+
+		align = gtk_alignment_new(0.1, 0, 0.1, 0);
+		gtk_box_pack_start(GTK_BOX(box), align, FALSE, TRUE, 0);
+		button = gtk_button_new_with_label(_(label));
+		gtk_container_add(GTK_CONTAINER(align), button);
+
+		text = DATA(widget);
+
+		gtk_object_set_data_full(GTK_OBJECT(button),
+					"notice_text", text, g_free);
+		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(show_notice), GTK_OBJECT(button));
+
+
+		g_free(label);
+		return;
+	}
 
 	if (strcmp(name, "hbox") == 0)
 	{

@@ -128,13 +128,15 @@ operation, such as copying or deleting some files.</label>
     <slider name='spring_delay' label='Spring delay' min='100' max='2000' showvalue='1'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</slider>
   </section>
   <section name='menu' title='Menus'>
-    <label>To set the keyboard short-cuts, simply
-open the menu over a filer window, move the pointer
-over the item you want to use and press a key. The
-key will appear next to the menu item and you can just
-press that key without opening the menu in future.</label>
-    <spacer/>
     <entry name='xterm' label="`Xterm Here' program:">The program to launch when you choose `Xterm Here' from the menu.</entry>
+    <spacer/>
+    <notice label='Set keyboard shortcuts'>To set a keyboard short-cut for a menu item:
+
+- Open the menu over a filer window,
+- Move the pointer over the item you want to use,
+- Press the key you want attached to it.
+
+The key will appear next to the menu item and you can just press that key without opening the menu in future.</notice>
   </section>
   <section name='bind' title='Mouse bindings'>
     <toggle name='new_button_1' label='New window on button 1 (RISC OS style)'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
