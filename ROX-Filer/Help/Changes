@@ -2,16 +2,22 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
-25-Jan-2001
+28-Jan-2002
+~~~~~~~~~~~
+OK and Cancel buttons in savebox can no longer be focussed. Fixes problem
+where opening a savebox put the focus on the last used button instead of
+the entry (reported by Karol Krenski).
+
+25-Jan-2002
 ~~~~~~~~~~~
 If conversion to 'ISO8859-1' doesn't work, try 'iso-8859-1' and 'UTF-8' instead
 of giving a warning (reported by Gregory Spath).
 
-24-Jan-2001 (Release 1.1.12)
+24-Jan-2002 (Release 1.1.12)
 ~~~~~~~~~~~
 Updated Hungarian translation (Andras Mohari).
 
-23-Jan-2001
+23-Jan-2002
 ~~~~~~~~~~~
 Only check for thumbnails in the thumbnail scanning code, not when loading
 any image (saves time).
@@ -23,7 +29,7 @@ the menu, the item now remains selected when you enter the command.
 Updated French translation (Vincent Lefèvre).
 Updated Dutch translation (Wilbert Berendsen).
 
-22-Jan-2001
+22-Jan-2002
 ~~~~~~~~~~~
 _ROX_PANEL_MENU_POS property is now set on each GtkSocket window, rather than
 the panel, so that applets can find it more easiliy (requested by Stephen
@@ -34,24 +40,24 @@ when it finished.
 Bugfix: Under Gtk+-2.0, the savebox focussed the OK button rather than the
 	text entry.
 
-21-Jan-2001
+21-Jan-2002
 ~~~~~~~~~~~
 Changing the permission on a file failed to update the display (reported by
 Karol Krenski). Also made other updates more efficient.
 Allow COMPOUND_TEXT selection type (same as STRING for now), as gnome-terminal
 has stopped accepting STRING.
 
-20-Jan-2001
+20-Jan-2002
 ~~~~~~~~~~~
 Added a configure check for iconv.h.
 Use double instead of long for file sizes in find.c (Bernard Jungen).
 
-19-Jan-2001
+19-Jan-2002
 ~~~~~~~~~~~
 Thumbnails code failed to update images when they changed (reported by
 Andreas).
 
-18-Jan-2001
+18-Jan-2002
 ~~~~~~~~~~~
 Use 'ISO8859-1' instead of 'iso-8859-1' and fallback to strdup if charset
 conversion fails (Stephen Watson).
@@ -60,7 +66,7 @@ Deleting a symlink to a pinboard or panel icon showed a warning, even though
 there was no danger, because it followed the symlink. Trying to copy a symlink
 inside the directory it pointed to failed for the same reason.
 
-17-Jan-2001
+17-Jan-2002
 ~~~~~~~~~~~
 Big changes to internationalisation for pinboards and panels to fix problems
 with incompatible character sets (reported by Arnaud Calvo).
@@ -69,7 +75,7 @@ program tries to write the save thumbnail at the same time.
 As a special case, running with just '-v' doesn't call gtk_init, allowing
 installing without an X server (requested by Michael Duelli).
 
-16-Jan-2001
+16-Jan-2002
 ~~~~~~~~~~~
 Converter for old-format config files now stops if the file looks like
 XML (probably from a failed conversion).
@@ -79,7 +85,7 @@ Bugfix: When using spring-opening or following symlinks, trying to open
 Bugfix: The pinboard would highlight to accept any type of drop (not just
 	files).
 
-13-Jan-2001
+13-Jan-2002
 ~~~~~~~~~~~
 Fixed some compile problems on Solaris (Andreas Dehmel).
 Clicking an unscanned item now scans it (instead of reporting an error).
@@ -87,58 +93,58 @@ Dialog boxes in Gtk+-2.0 now set a default button.
 Number keys on the keypad couldn't be used for groups (reported by Arnaud
 Calvo).
 
-11-Jan-2001
+11-Jan-2002
 ~~~~~~~~~~~
 Updated Spanish translation (Marcelo Ramos).
 Updated the French manual translation (Arnaud Calvo and Vincent Lefèvre).
 
-09-Jan-2001
+09-Jan-2002
 ~~~~~~~~~~~
 Converted French manual to DocBook (Arnaud Calvo).
 Fixed some compiler warnings (Vincent Lefèvre).
 
-09-Jan-2001 (Release-1.1.11)
+09-Jan-2002 (Release-1.1.11)
 ~~~~~~~~~~~
 Mark action windows as dialogs (requested by Daniel Pittman).
 Reset the background colour when drawing, as the Xenophilia keeps changing
 it (reported by Wilbert Berendsen).
 
-08-Jan-2001
+08-Jan-2002
 ~~~~~~~~~~~
 Changed == to = in make-mo script (Vincent Lefèvre).
 Added -lm to libpng linker flags (reported by Stephen Watson).
 Updated the French translation (Vincent Lefèvre).
 
-07-Jan-2001
+07-Jan-2002
 ~~~~~~~~~~~
 Bugfix: Closing a filer window with a tooltip removes the tip now (before, the
 	tooltip could get stuck on the screen).
 
-06-Jan-2001
+06-Jan-2002
 ~~~~~~~~~~~
 Bugfix: Options box didn't work unless options had already been saved
 	(reported by Iain Stevenson).
 
-05-Jan-2001
+05-Jan-2002
 ~~~~~~~~~~~
 Stopped unnecessary redrawing of the display (when sorting an already-sorted
 list).
 Thumbnails can now also be saved using Gtk+-1.2, if libpng is available
 (Andras Mohari).
 
-04-Jan-2001
+04-Jan-2002
 ~~~~~~~~~~~
 Fixed compile problem (reported by Vincent Lefèvre).
 Updated French translation (Vincent Lefèvre).
 
-03-Jan-2001
+03-Jan-2002
 ~~~~~~~~~~~
 Added _ROX_PANEL_MENU_POS property on panel windows to help applets position
 their menus correctly.
 Bugfix: 'From LANG' translation setting had stopped working (reported by
 	Vincent Lefèvre).
 
-02-Jan-2001
+02-Jan-2002
 ~~~~~~~~~~~
 Saved pinboards and panels are now stored in an XML format. Old files should
 be converted automatically. Icon names may now contain the < and > characters

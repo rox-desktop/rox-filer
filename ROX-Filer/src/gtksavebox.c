@@ -238,17 +238,15 @@ gtk_savebox_init (GtkSavebox *savebox)
 		      GTK_SIGNAL_FUNC (do_save), savebox);
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, TRUE, 0);
   GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
-#ifdef GTK2
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   gtk_widget_grab_default (button);
-#else
-  gtk_window_set_default (GTK_WINDOW (savebox), button);
-#endif
 
   button = gtk_button_new_with_label (_("Cancel"));
   gtk_signal_connect (GTK_OBJECT (button), "clicked",
 		      GTK_SIGNAL_FUNC (cancel_clicked), savebox);
   gtk_box_pack_start (GTK_BOX (hbox), button, FALSE, TRUE, 0);
   GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
+  GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
 
   gtk_widget_show_all (savebox->vbox);
 
