@@ -19,8 +19,6 @@ Trying to show a half-written thumbnail prevents updating it later.
 
 Think about XXXs in dnd menu.
 
-Deleting a symlink to a pinboard icon shows a warning
-
 Gtk+ 2.0:
 	- Panel menu appears, but menu item under cursor doesn't highlight
 		(GTK bug?)
@@ -32,6 +30,13 @@ Gtk+ 2.0:
 	- Spawning shell scripts sometimes gives Bad Address (glib bug)
 
 FEATURES FOR 1.3
+
+User icons for mounted/unmounted?
+
+When setting the icon for a directory, offer to create a .DirIcon instead of
+adding a path to globicons.
+
+Order icons vertically or horizontally (option).
 
 Rescanning sometimes causes the display to scroll (automounter problem).
 
@@ -54,7 +59,6 @@ Remove icon should work with MIME stuff.
 
 'Edit Item' doesn't make much sense for applets...
 
->>>>>>> 1.171
 Option to mount on click, Shift+Click to open without mounting.
 
 When following symlinks, don't convert to the 'real' path. Up should

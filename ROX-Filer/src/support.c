@@ -818,23 +818,27 @@ guchar *shell_escape(guchar *word)
  */
 gboolean is_sub_dir(char *sub, char *parent)
 {
-	struct stat	parent_info;
+	struct stat parent_info;
 
-	/* These were pathdup()s, but that follows symlinks!
-	 * I guess they were here for a reason - something is probably
-	 * broken now...
-	 */
-	sub = g_strdup(sub);
-	
-	if (mc_stat(parent, &parent_info))
+	if (mc_lstat(parent, &parent_info))
 		return FALSE;		/* Parent doesn't exist */
 
+	/* For checking Copy/Move operations do a realpath first on sub
+	 * (the destination), since copying into a symlink is the same as
+	 * copying into the thing it points to. Don't realpath 'parent' though;
+	 * copying a symlink just makes a new symlink.
+	 * 
+	 * When checking if an icon depends on a file (parent), use realpath on
+	 * sub (the icon) too.
+	 */
+	sub = pathdup(sub);
+	
 	while (1)
 	{
 		char	    *slash;
 		struct stat info;
 		
-		if (mc_stat(sub, &info) == 0)
+		if (mc_lstat(sub, &info) == 0)
 		{
 			if (info.st_dev == parent_info.st_dev &&
 				info.st_ino == parent_info.st_ino)
