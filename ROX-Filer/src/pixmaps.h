@@ -9,11 +9,14 @@
 #define _PIXMAP_H
 
 #include <gtk/gtk.h>
-#include <gdk-pixbuf/gdk-pixbuf.h>
 #include "fscache.h"
 
 #define THUMB_WIDTH 48
 #define THUMB_HEIGHT 48
+
+#ifndef PIXMAPS_C
+  typedef struct _GdkPixbuf GdkPixbuf;
+#endif
 
 extern GFSCache *pixmap_cache, *thumb_cache;
 

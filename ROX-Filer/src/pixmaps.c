@@ -36,6 +36,7 @@
 
 #include <gtk/gtk.h>
 #include <gdk/gdkprivate.h> /* XXX - find another way to do this */
+#include <gdk-pixbuf/gdk-pixbuf.h>
 #include "collection.h"
 
 #include "global.h"
