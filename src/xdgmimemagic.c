@@ -25,12 +25,12 @@
  *
  */
 
+#include <assert.h>
 #include "xdgmimemagic.h"
 #include "xdgmimeint.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <assert.h>
 #include <ctype.h>
 #include <errno.h>
 #include <limits.h>
@@ -188,7 +188,7 @@ _xdg_mime_magic_read_a_number (FILE *magic_file,
   char number_string[MAX_NUMBER_SIZE];
   int pos = 0;
   int c;
-  int retval = -1;
+  long retval = -1;
 
   while (TRUE)
     {
@@ -212,9 +212,10 @@ _xdg_mime_magic_read_a_number (FILE *magic_file,
   if (pos > 0)
     {
       number_string[pos] = '\000';
+      errno = 0;
       retval = strtol (number_string, NULL, 10);
-      if ((retval == LONG_MIN || retval == LONG_MAX) &&
-	  (errno == ERANGE))
+
+      if ((retval < INT_MIN) || (retval > INT_MAX) || (errno != 0))
 	return -1;
     }
 
@@ -232,8 +233,8 @@ _xdg_mime_magic_parse_header (FILE *magic_file, XdgMimeMagicMatch *match)
   char *end_ptr;
   int end_of_file = 0;
 
-  assert (magic_file);
-  assert (match);
+  assert (magic_file != NULL);
+  assert (match != NULL);
 
   c = fgetc (magic_file);
   if (c == EOF)
@@ -302,7 +303,7 @@ _xdg_mime_magic_parse_magic_line (FILE              *magic_file,
   int indent = 0;
   int bytes_read;
 
-  assert (magic_file);
+  assert (magic_file != NULL);
 
   /* Sniff the buffer to make sure it's a valid line */
   c = fgetc (magic_file);
