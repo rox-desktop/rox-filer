@@ -581,9 +581,18 @@ Others
 
 If all else fails, try running rox with the `
 \family typewriter 
--no
+-n
 \family default 
-' options; this overrides window manager control of the icons altogether.
+' and `
+\family typewriter 
+-o
+\family default 
+' options; this overrides window manager control of the icons altogether
+ (
+\family typewriter 
+-n
+\family default 
+ forces the filer to start a new copy).
 \layout Subsection
 
 Running as root
@@ -3401,12 +3410,12 @@ How filetypes are stored
 ROX-Filer uses three sub-directories in your Choices directory for filetypes:
 \layout Description
 
-MIME-info contains files which specify what the MIME type for a file should
- be, based on its extention.
+MIME-info contains files which specify what the MIME types for files should
+ be, based on their extentions.
  All the files in all the MIME-info directories are scanned when the filer
  loads.
- ROX-Filer comes with many such rules --- these are installed into the MIME-info
- directory by the rox-base package.
+ ROX-Filer comes with a file containing many such rules --- this is installed
+ into the MIME-info directory by the rox-base package.
 \begin_deeper 
 \layout Standard
 
