@@ -14,6 +14,9 @@
 #include <stdarg.h>
 
 #include <glib.h>
+#include <X11/Xlib.h>
+#include <X11/Xatom.h>
+#include <gdk/gdk.h>
 
 #include "gui_support.h"
 
@@ -138,15 +141,21 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 				GDK_PROP_MODE_REPLACE, (gchar *) &value, 1);
 }
 
-/* Make this window behave as a panel (if possible).
- * TODO: Detect GNOME-style window managers and use their features
- * 	 if possible.
- */
-void add_panel_properties(GtkWidget *window)
+void make_panel_window(GdkWindow *window)
 {
-	GdkWindow *win = window->window;
+	static gboolean need_init = TRUE;
+	static GdkAtom	xa_state;
 
-	set_cardinal_property(win, xa_win_layer, 2);
+	if (need_init)
+	{
+		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
+		need_init = FALSE;
+	}
+	
+	gdk_window_set_decorations(window, 0);
+	gdk_window_set_functions(window, 0);
 
-	gdk_window_set_override_redirect(win, TRUE);
+	set_cardinal_property(window, xa_state,
+			WIN_STATE_STICKY | WIN_STATE_HIDDEN |
+			WIN_STATE_FIXED_POSITION | WIN_STATE_ARRANGE_IGNORE);
 }

@@ -12,6 +12,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#include <time.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -39,6 +40,8 @@ GHashTable	*child_to_filer = NULL;
 
 static int number_of_windows = 0;
 static FilerWindow *window_with_selection = NULL;
+static FilerWindow *panel_with_timeout = NULL;
+static gint panel_timeout;
 
 /* Static prototypes */
 static void filer_window_destroyed(GtkWidget    *widget,
@@ -62,7 +65,6 @@ static gint focus_in(GtkWidget *widget,
 static gint focus_out(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
-
 
 void filer_init()
 {
@@ -106,6 +108,12 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		window_with_selection = NULL;
 	if (window_with_focus == filer_window)
 		window_with_focus = NULL;
+	if (panel_with_timeout == filer_window)
+	{
+		/* Can this happen? */
+		panel_with_timeout = NULL;
+		gtk_timeout_remove(panel_timeout);
+	}
 
 	g_hash_table_foreach_remove(child_to_filer, child_eq, filer_window);
 
@@ -375,8 +383,15 @@ void show_menu(Collection *collection, GdkEventButton *event,
 
 void scan_dir(FilerWindow *filer_window)
 {
+	struct stat info;
+
 	if (filer_window->dir)
 		stop_scanning(filer_window);
+	if (panel_with_timeout == filer_window)
+	{
+		panel_with_timeout = NULL;
+		gtk_timeout_remove(panel_timeout);
+	}
 
 	mount_update();
 	
@@ -386,10 +401,17 @@ void scan_dir(FilerWindow *filer_window)
 	gtk_window_set_title(GTK_WINDOW(filer_window->window),
 			filer_window->path);
 
+	if (stat(filer_window->path, &info))
+	{
+		report_error("Error statting directory", g_strerror(errno));
+		return;
+	}
+	filer_window->m_time = info.st_mtime;
+
 	filer_window->dir = opendir(filer_window->path);
 	if (!filer_window->dir)
 	{
-		report_error("Error scanning directory:", g_strerror(errno));
+		report_error("Error scanning directory", g_strerror(errno));
 		return;
 	}
 
@@ -414,6 +436,35 @@ static int sort_by_name(const void *item1, const void *item2)
 		      (*((FileItem **)item2))->leafname);
 }
 
+static gint clear_panel_hilight(gpointer data)
+{
+	collection_clear_selection(panel_with_timeout->collection);
+	panel_with_timeout = NULL;
+
+	return FALSE;
+}
+
+/* It is possible to highlight an item briefly on a panel by calling this
+ * function. If anything happens to the selection state of the panel you
+ * should call this with filer_window set to NULL to remove the timeout.
+ */
+void panel_set_timeout(FilerWindow *filer_window, gulong msec)
+{
+	if (panel_with_timeout)
+	{
+		/* Can't have two timeouts at once */
+		gtk_timeout_remove(panel_timeout);
+		clear_panel_hilight(NULL);
+	}
+
+	if (filer_window)
+	{
+		panel_with_timeout = filer_window;
+		panel_timeout = gtk_timeout_add(msec,
+				clear_panel_hilight, NULL);
+	}
+}
+
 void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data)
@@ -425,6 +476,14 @@ void open_item(Collection *collection,
 
 	event = (GdkEventButton *) gtk_get_current_event();
 	full_path = make_path(filer_window->path, item->leafname)->str;
+
+	if (filer_window->panel)
+	{
+		panel_set_timeout(NULL, 0);
+		collection_select_item(collection, item_number);
+		gdk_flush();
+		panel_set_timeout(filer_window, 300);
+	}
 
 	switch (item->base_type)
 	{
@@ -452,6 +511,31 @@ void open_item(Collection *collection,
 					"I don't know how to open that");
 			break;
 	}
+}
+
+static gint pointer_in(GtkWidget *widget,
+			GdkEventCrossing *event,
+			FilerWindow *filer_window)
+{
+	static time_t last_stat_time = 0;
+	static FilerWindow *last_stat_filer = NULL;
+	time_t now;
+
+	now = time(NULL);
+	if (now > last_stat_time + 1 || filer_window != last_stat_filer)
+	{
+		struct stat info;
+		
+		last_stat_time = now;
+		last_stat_filer = filer_window;
+
+		if (stat(filer_window->path, &info))
+			gtk_widget_destroy(filer_window->window);
+		else if (info.st_mtime > filer_window->m_time)
+			scan_dir(filer_window);
+	}
+
+	return FALSE;
 }
 
 static gint focus_in(GtkWidget *widget,
@@ -527,16 +611,21 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	collection_set_functions(filer_window->collection,
 			draw_item, test_point);
 
+	gtk_widget_add_events(filer_window->window, GDK_ENTER_NOTIFY);
+	gtk_signal_connect(GTK_OBJECT(filer_window->window),
+			"enter-notify-event",
+			GTK_SIGNAL_FUNC(pointer_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_out_event",
 			GTK_SIGNAL_FUNC(focus_out), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "key_press_event",
 			GTK_SIGNAL_FUNC(key_press_event), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->collection), "open_item",
-			open_item, filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			filer_window_destroyed, filer_window);
+
+	gtk_signal_connect(GTK_OBJECT(filer_window->collection), "open_item",
+			open_item, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "show_menu",
 			show_menu, filer_window);
 	gtk_signal_connect(GTK_OBJECT(collection), "gain_selection",
@@ -579,7 +668,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 		gtk_container_add(GTK_CONTAINER(win), frame);
 
 		gtk_widget_realize(win);
-		add_panel_properties(win);
+		make_panel_window(win->window);
 	}
 	else
 	{

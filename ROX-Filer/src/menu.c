@@ -189,7 +189,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	}
 
 	if (filer_window->panel)
+	{
 		collection_clear_selection(filer_window->collection);
+		panel_set_timeout(NULL, 0);
+	}
+
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
 		collection_select_item(filer_window->collection, item);
@@ -206,7 +210,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 static void menu_closed(GtkWidget *widget)
 {
-	g_return_if_fail(window_with_focus != NULL);
+	if (window_with_focus == NULL)
+		return;			/* Close panel item chosen? */
 
 	if (window_with_focus->temp_item_selected)
 	{

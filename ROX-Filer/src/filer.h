@@ -35,6 +35,7 @@ struct _FilerWindow
 	gboolean	panel;
 	gboolean	temp_item_selected;
 	Side		panel_side;
+	time_t		m_time;		/* m-time at last scan */
 
 	/* Scanning */
 	DIR		*dir;
@@ -61,5 +62,6 @@ extern GHashTable	*child_to_filer;
 void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
 void scan_dir(FilerWindow *filer_window);
+void panel_set_timeout(FilerWindow *filer_window, gulong msec);
 
 #endif /* _FILER_H */
