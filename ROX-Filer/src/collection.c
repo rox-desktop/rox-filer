@@ -506,14 +506,9 @@ static void collection_size_allocate(GtkWidget *widget,
 	
 	if (GTK_WIDGET_REALIZED(widget))
 	{
-		GtkAdjustment 	*vadj = collection->vadj;
-
 		gdk_window_move_resize(widget->window,
 				allocation->x, allocation->y,
 				allocation->width, allocation->height);
-
-		if (vadj)
-			vadj->page_increment = vadj->page_size;
 
 		if (cursor_visible)
 			scroll_to_show(collection, collection->cursor_item);
@@ -678,11 +673,8 @@ static void collection_set_adjustment(Collection    *collection,
 		g_return_if_fail(GTK_IS_ADJUSTMENT(vadj));
 	else
 		vadj = GTK_ADJUSTMENT(gtk_adjustment_new(0.0,
-  							 0.0, 0.0,
-  							 0.0, 0.0, 0.0));
-
-	vadj->step_increment = collection->item_height;
-	vadj->page_increment = vadj->page_size;
+							 0.0, 0.0,
+							 0.0, 0.0, 0.0));
 
 	if (collection->vadj == vadj)
 		return;
@@ -1456,9 +1448,6 @@ void collection_set_item_size(Collection *collection, int width, int height)
 
 	collection->item_width = width;
 	collection->item_height = height;
-
-	if (collection->vadj)
-		collection->vadj->step_increment = height;
 
 	if (GTK_WIDGET_REALIZED(widget))
 	{
