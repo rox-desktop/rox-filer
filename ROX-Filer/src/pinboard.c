@@ -129,7 +129,7 @@ Icon *pinboard_drag_in_progress = NULL;
 
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
-static Option o_pinboard_tasklist, o_forward_button_3;
+static Option o_pinboard_tasklist, o_forward_buttons_13;
 static Option o_iconify_start, o_iconify_dir;
 
 /* Static prototypes */
@@ -220,7 +220,8 @@ void pinboard_init(void)
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
 							GRID_STEP_COARSE);
 	option_add_int(&o_pinboard_tasklist, "pinboard_tasklist", TRUE);
-	option_add_int(&o_forward_button_3, "pinboard_forward_button_3", FALSE);
+	option_add_int(&o_forward_buttons_13, "pinboard_forward_buttons_13",
+			FALSE);
 
 	option_add_int(&o_iconify_start, "iconify_start", CORNER_TOP_RIGHT);
 	option_add_int(&o_iconify_dir, "iconify_dir", DIR_VERT);
@@ -952,8 +953,8 @@ static void forward_to_root(GdkEventButton *event)
 		ButtonPressMask | ButtonReleaseMask, (XEvent *) &xev);
 }
 
-#define FORWARDED_BUTTON(pi, button) ((button) == 2 || \
-			((button) == 3 && o_forward_button_3.int_value && !pi))
+#define FORWARDED_BUTTON(pi, b) ((b) == 2 || \
+	(((b) == 3 || (b) == 1) && o_forward_buttons_13.int_value && !pi))
 
 /* pi is NULL if this is a root event */
 static gboolean button_release_event(GtkWidget *widget,
