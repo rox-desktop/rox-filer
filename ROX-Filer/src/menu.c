@@ -1270,6 +1270,15 @@ static gboolean new_directory_cb(guchar *initial, guchar *path)
 	}
 
 	dir_check_this(path);
+
+	if (filer_exists(window_with_focus))
+	{
+		guchar	*leaf;
+		leaf = strrchr(path, '/');
+		if (leaf)
+			display_set_autoselect(window_with_focus, leaf + 1);
+	}
+	
 	return TRUE;
 }
 
@@ -1299,6 +1308,14 @@ static gboolean new_file_cb(guchar *initial, guchar *path)
 		report_error(_("Error creating file"), g_strerror(errno));
 
 	dir_check_this(path);
+
+	if (filer_exists(window_with_focus))
+	{
+		guchar	*leaf;
+		leaf = strrchr(path, '/');
+		if (leaf)
+			display_set_autoselect(window_with_focus, leaf + 1);
+	}
 
 	return TRUE;
 }

@@ -151,13 +151,6 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 				&collection->items[item],
 				area,
 				collection->cb_user_data);
-		if (item == collection->wink_item)
-			gdk_draw_rectangle(((GtkWidget *) collection)->window,
-				   ((GtkWidget *) collection)->style->black_gc,
-				   FALSE,
-				   area->x, area->y,
-				   collection->item_width - 1,
-				   area->height - 1);
 	}
 	
 	if (item == collection->cursor_item)
@@ -1361,7 +1354,24 @@ static void cancel_wink(Collection *collection)
 	collection_draw_item(collection, item, TRUE);
 }
 
-static gboolean cancel_wink_timeout(Collection *collection)
+/* Draw/undraw a box around collection->wink_item */
+static void invert_wink(Collection *collection)
+{
+	gint	w = collection->item_width;
+	gint	h = collection->item_height;
+	gint	row, col;
+
+	g_return_if_fail(collection->wink_item >= 0);
+	
+	col = collection->wink_item % collection->columns;
+	row = collection->wink_item / collection->columns;
+
+	gdk_draw_rectangle(((GtkWidget *) collection)->window,
+			collection->xor_gc, FALSE,
+			col * w, row * h, w - 1, h - 1);
+}
+
+static gboolean wink_timeout(Collection *collection)
 {
 	gint	item;
 	
@@ -1370,6 +1380,12 @@ static gboolean cancel_wink_timeout(Collection *collection)
 	g_return_val_if_fail(collection->wink_item != -1, FALSE);
 
 	item = collection->wink_item;
+
+	if (collection->winks_left-- > 0)
+	{
+		invert_wink(collection);
+		return TRUE;
+	}
 
 	collection->wink_item = -1;
 
@@ -1877,11 +1893,12 @@ void collection_wink_item(Collection *collection, gint item)
 		return;
 
 	collection->cursor_item_old = collection->wink_item = item;
-	collection->wink_timeout = gtk_timeout_add(300,
-					   (GtkFunction) cancel_wink_timeout,
+	collection->winks_left = 3;
+	collection->wink_timeout = gtk_timeout_add(70,
+					   (GtkFunction) wink_timeout,
 					   collection);
-	collection_draw_item(collection, item, TRUE);
 	scroll_to_show(collection, item);
+	invert_wink(collection);
 
 	gdk_flush();
 }
