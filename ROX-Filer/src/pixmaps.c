@@ -73,7 +73,6 @@ MaskedPixmap *im_symlink;
 MaskedPixmap *im_unmounted;
 MaskedPixmap *im_mounted;
 MaskedPixmap *im_multiple;
-MaskedPixmap *im_exec_file;
 MaskedPixmap *im_appdir;
 
 MaskedPixmap *im_help;
@@ -139,7 +138,6 @@ static void load_default_pixmaps(void)
 	im_unmounted = load_pixmap("pixmaps/mount.xpm");
 	im_mounted = load_pixmap("pixmaps/mounted.xpm");
 	im_multiple = load_pixmap("pixmaps/multiple.xpm");
-	im_exec_file = load_pixmap("pixmaps/exec.xpm");
 	im_appdir = load_pixmap("pixmaps/application.xpm");
 
 	im_help = load_pixmap("pixmaps/help.xpm");
@@ -237,14 +235,21 @@ static MaskedPixmap *image_from_file(char *path)
 {
 	GdkPixbuf	*pixbuf;
 	MaskedPixmap	*image;
-	
-	pixbuf = gdk_pixbuf_new_from_file(path
 #ifdef GTK2
-			, NULL	/* XXX: Maybe something should go here? */
-#endif
-			);
+	GError		*error = NULL;
+	
+	pixbuf = gdk_pixbuf_new_from_file(path, &error);
+	if (!pixbuf)
+	{
+		g_print("%s\n", error ? error->message : _("Unknown error"));
+		g_error_free(error);
+		return NULL;
+	}
+#else
+	pixbuf = gdk_pixbuf_new_from_file(path);
 	if (!pixbuf)
 		return NULL;
+#endif
 
 	image = image_from_pixbuf(pixbuf);
 	gdk_pixbuf_unref(pixbuf);
