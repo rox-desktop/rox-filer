@@ -406,6 +406,7 @@ static void collection_realize(GtkWidget *widget)
 	GdkWindowAttr 	attributes;
 	gint 		attributes_mask;
 	GdkGCValues	xor_values;
+	GdkColor	*bg, *fg;
 
 	g_return_if_fail(widget != NULL);
 	g_return_if_fail(IS_COLLECTION(widget));
@@ -447,12 +448,10 @@ static void collection_realize(GtkWidget *widget)
 
 	set_vadjustment(collection);
 
+	bg = &widget->style->base[GTK_STATE_INSENSITIVE];
+	fg = &widget->style->fg[GTK_STATE_NORMAL];
 	xor_values.function = GDK_XOR;
-	xor_values.foreground.red = 0xffff;
-	xor_values.foreground.green = 0xffff;
-	xor_values.foreground.blue = 0xffff;
-	gdk_color_alloc(gtk_widget_get_colormap(widget),
-			&xor_values.foreground);
+	xor_values.foreground.pixel = fg->pixel ^ bg->pixel;
 	collection->xor_gc = gdk_gc_new_with_values(widget->window,
 					&xor_values,
 					GDK_GC_FOREGROUND
