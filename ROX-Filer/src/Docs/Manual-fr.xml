@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.1.0 - Manuel de l'utilisateur
+   ROX-Filer 2.1.1 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -547,12 +547,12 @@ pour ouvrir fichiers et dossiers.</para></listitem>
 </entry></row>
 
 <row><entry>Double-clic sur le fond d'une fenêtre</entry><entry>
-Redimensionne la fenêtre correctement.
+Redimensionne la fenêtre correctement (cette fonctionnalité peut être désactivée dans l'espace de configuration).
 </entry></row>
 
 <row>
  <entry>
-  <keycap>Backspace</keycap> (touche 'retour en arrière') (ndt : quel pléonasme !)
+  <keycap>Backspace</keycap> (touche 'retour en arrière')
  </entry>
  <entry>
   Affiche le dossier père.
@@ -1098,11 +1098,11 @@ utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xre
 </entry></row>
 
 <row>
- <entry><guimenuitem>Info</guimenuitem></entry>
+ <entry><guimenuitem>Propriétés</guimenuitem></entry>
  <entry>
- Affiche plus de détails sur l'objet. Vous pouvez aussi modifier les permissions
- d'accès à partir de cette boîte (la commande <guimenuitem>Permissions</guimenuitem>
- vous permet quant à elle d'appliquer des modifications sur plusieurs fichiers simultanément).
+ Affiche plus de détails sur l'objet.
+ Vous pouvez aussi modifier les permissions d'accès à partir de cette boîte (la commande  <guimenuitem>Permissions</guimenuitem> vous permet quant à elle d'appliquer des 
+modifications sur plusieurs fichiers simultanément), ainsi que la cible d'un lien symbolique.
  </entry>
 </row>
 
@@ -1113,11 +1113,21 @@ sélectionnés est aussi compté. Les liens symboliques sont comptés, mais pas 
 </entry></row>
 
 <row>
+ <entry><guimenuitem>Fixer le type...</guimenuitem></entry>
+ <entry>
+ Cette commande vous permet de changer le type MIME d'un fichier, seulement sur les sytèmes 
+ de fichiers qui bénéficient des "attributs étendus".
+ Si vous utilisez un système de fichiers plus ancien, vous devrez renommer le fichier (ndt : son 
+ extension) pour changer son type MIME.
+ </entry>
+</row>
+
+<row>
  <entry><guimenuitem>Permissions</guimenuitem></entry>
  <entry>
  Cette commande vous permet de changer les permissions des objets sélectionnés.
  Si vous ne devez changer les permissions que pour un fichier, vous pouvez utiliser
- la commande <guimenuitem>Info</guimenuitem>, qui est plus simple.
+ la commande <guimenuitem>Propriétés</guimenuitem>, qui est plus simple.
  </entry>
 </row>
 
@@ -1336,12 +1346,12 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour c
 	<tbody>
 	 <row>
 	  <entry>
-	   <guimenuitem>About ROX-Filer...</guimenuitem>
+	   <guimenuitem>Au sujet de ROX-Filer...</guimenuitem>
 	  </entry>
 	  <entry>
 	   Affiche des informations sur le fichier. C'est la même chose que de localiser ROX-Filer
-	   dans une fenêtre du filer et de sélectionner <guimenuitem>Info</guimenuitem> dans le menu
-	   Fichier.
+	   dans une fenêtre du filer et de sélectionner <guimenuitem>Propriétés</guimenuitem> 
+	   dans le menu Fichier.
 	  </entry>
 	 </row>
 	 <row>
@@ -1391,11 +1401,11 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour c
   <title>Afficher différentes applications selon les types MIME</title>
   <para>
    Vous pouvez personnaliser votre environnement pour que, par exemple, 
-   seule "the Gimp" soit affichée quand une image est sélectionnée.
+   seul "The Gimp" soit affiché quand une image est sélectionnée.
    Pour cela, créez un dossier caché dans <filename>SendTo</filename> nommé 
    <filename>.image</filename>, ou portant le nom d'un autre type MIME. 
    Vous pouvez utiliser le nom complet d'un type MIME (par ex <filename>.image_png</filename>) 
-   ou juste le "media type". Utilisez <guimenuitem>Info</guimenuitem> sur un fichier pour 
+   ou juste le "media type". Utilisez <guimenuitem>Propriétés</guimenuitem> sur un fichier pour 
    connaître son type MIME.
   </para>
   <para>

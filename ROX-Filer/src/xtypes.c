@@ -107,7 +107,6 @@ MIME_type *xtype_get(const char *path)
   int nb;
   MIME_type *type=NULL;
 
-  errno=0;
   fd=attropen(path, XTYPE_ATTR, O_RDONLY);
   
   /*printf("%s: fd=%d ", path, fd);*/
@@ -135,7 +134,6 @@ int xtype_set(const char *path, const MIME_type *type)
   gchar *ttext;
   int nb;
 
-  errno=0;
   fd=attropen(path, XTYPE_ATTR, O_WRONLY|O_CREAT, 0644);
   if(fd>0) {
     ttext=g_strdup_printf("%s/%s", type->media_type, type->subtype);
