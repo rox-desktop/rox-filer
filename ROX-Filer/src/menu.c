@@ -1523,8 +1523,8 @@ static void customise_send_to(gpointer data)
 		save ? _("I'll show you your SendTo directory now; you should "
 			"symlink (Ctrl+Shift drag) any applications you want "
 			"into it.")
-		     : _("You're CHOICESPATH variable setting prevents "
-			 "customisations. Sorry."));
+		     : _("Your CHOICESPATH variable setting prevents "
+			 "customisations - sorry."));
 
 	g_string_free(dirs, TRUE);
 	
