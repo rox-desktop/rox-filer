@@ -10,7 +10,7 @@ msgstr ""
 "Last-Translator: Christian Storgaard <cybolic@goth.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-1\n"
+"Content-Type: text/plain; charset=ISO-8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
 #: abox.c:108
@@ -55,7 +55,6 @@ msgid "Quick Start"
 msgstr "Hurtig Start"
 
 #: action.c:181
-#, fuzzy
 msgid ""
 "Just put the name of the file you're looking for in single quotes:\n"
 "'index.html' (to find a file called 'index.html')"
@@ -329,6 +328,8 @@ msgid ""
 "!%s\n"
 "Failed to copy '%s'"
 msgstr ""
+"!%s\n"
+"Kopiering af '%s' mislykkedes"
 
 #: action.c:1295
 #, c-format
@@ -350,11 +351,13 @@ msgid "'Moving %s as %s\n"
 msgstr "'Flytter %s som %s\n"
 
 #: action.c:1337
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Failed to move %s as %s\n"
-msgstr "!FEJL: Mislykkedes i at flytte %s som %s\n"
+msgstr ""
+"!%s\n"
+"Mislykkedes i at flytte %s som %s\n"
 
 #: action.c:1365
 msgid "!ERROR: Can't copy object into itself\n"
@@ -395,18 +398,22 @@ msgid "?Unmount %s?"
 msgstr "?Umount %s?\n"
 
 #: action.c:1451
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Mount failed\n"
-msgstr "!FEJL: Mount mislykkedes\n"
+msgstr ""
+"!%s\n"
+"Mount mislykkedes\n"
 
 #: action.c:1452
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Unmount failed\n"
-msgstr "!FEJL: Umount mislykkedes\n"
+msgstr ""
+"!%s\n"
+"Umount mislykkedes\n"
 
 #: action.c:1498
 #, c-format
@@ -492,7 +499,6 @@ msgid "Force"
 msgstr "Tving"
 
 #: action.c:1786
-#, fuzzy
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Spørg ikke igen omkring sletning af ikke-skrivbare objekter."
 
@@ -501,9 +507,8 @@ msgid "Brief"
 msgstr "Kort"
 
 #: action.c:1789
-#, fuzzy
 msgid "Only log directories being deleted"
-msgstr "Kort - lav kun log over slettede mapper"
+msgstr "Lav kun log over sletning af mapper"
 
 #: action.c:1805
 msgid "You need to select the items whose permissions you want to change"
@@ -534,16 +539,14 @@ msgid "Permissions"
 msgstr "Tilladdelser"
 
 #: action.c:1838
-#, fuzzy
 msgid "Don't list processed files"
-msgstr "Kort - oprems ikke bearbejdede filer "
+msgstr "Oprems ikke bearbejdede filer "
 
 #: action.c:1841 tips:75
 msgid "Recurse"
 msgstr "Rekursivt"
 
 #: action.c:1841
-#, fuzzy
 msgid "Also change contents of subdirectories"
 msgstr "Indholdet af undermapper skal også ændres."
 
@@ -613,11 +616,13 @@ msgid "The GtkAdjustment for the vertical position."
 msgstr ""
 
 #: dir.c:131 dir.c:668
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Error scanning '%s':\n"
 "%s"
-msgstr "Fejl under gemning af fil"
+msgstr ""
+"Fejl under scanning af '%s:\n"
+"%s"
 
 #: dir.c:345
 #, fuzzy, c-format
@@ -692,9 +697,9 @@ msgid "UntitledData"
 msgstr "Utitlet Data"
 
 #: dnd.c:961
-#, fuzzy, c-format
+#, c-format
 msgid "Error saving file: %s"
-msgstr "Fejl under gemning af fil"
+msgstr "Fejl under gemning af fil: %s"
 
 #: dnd.c:992
 msgid "No URIs in the text/uri-list (nothing to do!)"
@@ -726,9 +731,9 @@ msgid "Unknown action requested"
 msgstr "Ukendt handling anmodet"
 
 #: dnd.c:1068
-#, fuzzy, c-format
+#, c-format
 msgid "Error getting file list: %s"
-msgstr "Fejl uder hentning af fil-liste"
+msgstr "Fejl uder hentning af fil-liste: %s"
 
 #: dnd.c:1098
 msgid "You can't use multiple files with Set Icon!"
@@ -744,6 +749,8 @@ msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later."
 msgstr ""
+"Gruppe %s er ikke sat. Vælg nogle filer og tryk Ctrl+%s for at huske "
+"gruppen. Tryk %s alene for at genvælge filerne senere."
 
 #: filer.c:1134
 #, c-format
@@ -768,21 +775,20 @@ msgid "T"
 msgstr ""
 
 #: filer.c:1775
-#, fuzzy
 msgid "Scanning, "
-msgstr " (Scanner)"
+msgstr "Scanner, "
 
 #: filer.c:1776
 msgid "All, "
-msgstr ""
+msgstr "Alle, "
 
 #: filer.c:1777
 msgid "Thumbs, "
-msgstr ""
+msgstr "Thumbs, "
 
 #: filer.c:2027 menu.c:1748
 msgid "Item no longer exists!"
-msgstr ""
+msgstr "Objektet eksisterer ikke længere!"
 
 #: filer.c:2149
 msgid "Symbolic link to "
@@ -865,7 +871,6 @@ msgid "IsReadable"
 msgstr "ErLæsbar"
 
 #: find.c:768
-#, fuzzy
 msgid "IsWriteable"
 msgstr "ErSkrivbar"
 
@@ -883,7 +888,7 @@ msgstr "ErMin"
 
 #: find.c:902
 msgid "Now"
-msgstr "Ny"
+msgstr "Nu"
 
 #: find.c:915
 msgid "Byte"
@@ -1022,11 +1027,15 @@ msgid ""
 "\n"
 "---\n"
 msgstr ""
+"\n"
+"---\n"
 
 #: gui_support.c:355
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr ""
+"Forsøg på at læse en XML fil som en tekst fil. Filen '%s' er måske blevet "
+"ødelagt."
 
 #: gui_support.c:372
 #, c-format
@@ -1164,9 +1173,8 @@ msgid "Type:"
 msgstr "Type:"
 
 #: infobox.c:291
-#, fuzzy
 msgid "Run action:"
-msgstr "Sæt kør handling"
+msgstr "Kør handling:"
 
 #: infobox.c:329
 msgid "file(1) says..."
@@ -1177,14 +1185,14 @@ msgid "<nothing yet>"
 msgstr "<intet endnu>"
 
 #: infobox.c:405
-#, fuzzy, c-format
+#, c-format
 msgid "file(1) says... %s"
-msgstr "fil(1) siger..."
+msgstr "fil(1) siger... %s"
 
 #: infobox.c:445
-#, fuzzy, c-format
+#, c-format
 msgid "Symbolic link to %s"
-msgstr "Symbolsk genvej til "
+msgstr "Symbolsk genvej til %s"
 
 #: infobox.c:451
 msgid "Symbolic link"
@@ -1199,7 +1207,6 @@ msgid "Mount point"
 msgstr "Mount punkt"
 
 #: main.c:93
-#, fuzzy
 msgid ""
 "Copyright (C) 2002 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1299,7 +1306,7 @@ msgstr "funktioner sat ved kompilerings tid"
 
 #: main.c:552
 msgid "Large File Support"
-msgstr ""
+msgstr "Understøttelse af Store Filer"
 
 #: main.c:559
 msgid "GNOME-VFS library"
@@ -1374,9 +1381,8 @@ msgid "Show Hidden"
 msgstr "Vis Skjulte"
 
 #: menu.c:202
-#, fuzzy
 msgid "Show Thumbnails"
-msgstr "Vis skjulte filer"
+msgstr "Vis thumbnails"
 
 #: menu.c:203
 msgid "Refresh"
@@ -1403,9 +1409,8 @@ msgid "Send To..."
 msgstr "Send til..."
 
 #: menu.c:220
-#, fuzzy
 msgid "Select"
-msgstr "Vælg Alle"
+msgstr "Vælg"
 
 #: menu.c:221
 msgid "Select All"
@@ -1416,9 +1421,8 @@ msgid "Clear Selection"
 msgstr "Vælg Ingen"
 
 #: menu.c:223
-#, fuzzy
 msgid "Invert Selection"
-msgstr "Vælg Ingen"
+msgstr "Omvend Valg"
 
 #: menu.c:224
 msgid "Select If..."
@@ -1536,18 +1540,18 @@ msgid "NewDir"
 msgstr "Ny Mappe"
 
 #: menu.c:1235 menu.c:1241
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating '%s': %s"
-msgstr "Fejl under skabning af fil"
+msgstr "Fejl under skabning af: '%s': %s"
 
 #: menu.c:1262
 msgid "NewFile"
 msgstr "Ny Fil"
 
 #: menu.c:1280
-#, fuzzy, c-format
+#, c-format
 msgid "Error creating file: could not find the template for %s"
-msgstr "Kunne ikke finde skabelonen for "
+msgstr "Fejl under skabning af fil: kunne ikke finde skabelonen for %s"
 
 #: menu.c:1351
 #, c-format
@@ -1594,7 +1598,7 @@ msgstr ""
 #: menu.c:1507
 #, c-format
 msgid "fork: %s"
-msgstr ""
+msgstr "fork: %s"
 
 #: menu.c:1522
 msgid "New window, as user..."
@@ -1737,11 +1741,12 @@ msgstr "Mislykkedes i at skabe en børne-process"
 
 #: minibuffer.c:807
 msgid "Invalid Find condition"
-msgstr ""
+msgstr "Ugyldinge find parametre"
 
 #: options.c:267
+#, fuzzy
 msgid "ROX-Filer has converted your Options file to the new XML format"
-msgstr ""
+msgstr "Din gamle panel-fil er blevet konverteret til det nye XML format."
 
 #: options.c:828
 #, fuzzy
@@ -1751,7 +1756,7 @@ msgstr "Indstillinger..."
 #: options.c:885
 #, fuzzy
 msgid "(saving disabled by CHOICESPATH)"
-msgstr "Gemning af 'Choices' er slået fra af CHOICESPATH variablen"
+msgstr "Definering af ikon er slået fra af CHOICESPATH"
 
 #: options.c:890
 #, fuzzy
@@ -1772,21 +1777,21 @@ msgstr "OK"
 msgid ""
 "Choices will be saved as:\n"
 "%s"
-msgstr "'Choices' vil blive gemt som "
+msgstr "'Choices' vil blive gemt som %s"
 
 #: options.c:1081
 #, c-format
 msgid "Could not save options: %s"
-msgstr ""
+msgstr "Kunne ikke gemme indstillinger: %s"
 
 #: options.c:1082 type.c:1021
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Gemning af 'Choices' er slået fra af CHOICESPATH variablen"
 
 #: options.c:1096 usericons.c:383
-#, fuzzy, c-format
+#, c-format
 msgid "Error saving %s: %s"
-msgstr "Fejl under gemning af fil"
+msgstr "Fejl under gemning af %s: %s"
 
 #: options.c:1665
 msgid "Missing '='"
@@ -1794,7 +1799,7 @@ msgstr "Mangler '='"
 
 #: panel.c:323
 msgid "Your old panel file has been converted to the new XML format."
-msgstr ""
+msgstr "Din gamle panel-fil er blevet konverteret til det nye XML format."
 
 #: panel.c:403
 msgid "Close panel?"
@@ -1817,20 +1822,22 @@ msgid "Missing < or > in panel config file"
 msgstr "Mangler < eller > i panel configurations filen"
 
 #: panel.c:1060
-#, fuzzy, c-format
+#, c-format
 msgid "Error saving panel %s: %s"
-msgstr "Fejl under gemning af panel"
+msgstr "Fejl under gemning af panel %s: %s"
 
 #: panel.c:1323
 msgid "Applet quit without ever creating a widget!"
-msgstr ""
+msgstr "Applet afsluttede uden overhovedet at lave et widget!"
 
 #: panel.c:1408
 #, fuzzy, c-format
 msgid ""
 "Error running applet:\n"
 "%s"
-msgstr "Fejl under læsning af fil"
+msgstr ""
+"Fejl under scanning af '%s:\n"
+"%s"
 
 #: pinboard.c:253
 msgid "Another application is already managing the pinboard!"
@@ -1839,6 +1846,7 @@ msgstr "Et andet program kontrollerer allerede opslagstavlen!"
 #: pinboard.c:294
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr ""
+"Din gamle opslagstavle-fil er blevet konverteret til det nye XML format."
 
 #: pinboard.c:943
 msgid "Missing '>' in icon label"
@@ -1849,122 +1857,124 @@ msgid "Missing ',' after icon label"
 msgstr "Mangler ',' efter ikon titlen"
 
 #: pinboard.c:1096
-#, fuzzy, c-format
+#, c-format
 msgid "Error saving pinboard %s: %s"
-msgstr "Fejl under gemning af opslagstavlen"
+msgstr "Fejl under gemning af opslagstavle %s: %s"
 
 #: pixmaps.c:505
-#, fuzzy
 msgid "Unknown error"
-msgstr "Ukendt type"
+msgstr "Ukendt fejl"
 
 #: remote.c:850
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr ""
+msgstr "Forsøg på at starte ukendt SOAP metode '%s'"
 
 #: rox_gettext.c:90
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid .gmo translation file (too short): %s"
-msgstr "Ugyldig .gmo oversættelses-fil (for kort)"
+msgstr "Ugyldig .gmo oversættelses-fil (for kort): %s"
 
 #: rox_gettext.c:103
-#, fuzzy, c-format
+#, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-msgstr "Ugyldig .gmo oversættelses-fil (GNU magic number ikke fundet)\n"
+msgstr "Ugyldig .gmo oversættelses-fil (GNU magic number ikke fundet): %s"
 
 #: run.c:94 run.c:135
-#, fuzzy, c-format
+#, c-format
 msgid "Program %s not found - deleted?"
-msgstr "Program ikke fundet - slettet?"
+msgstr "Programmet %s ikke fundet - slettet?"
 
 #: run.c:248
-#, fuzzy, c-format
+#, c-format
 msgid "File doesn't exist, or I can't access it: %s"
-msgstr "Filen eksisterer ikke, eller jeg har ikke adgang til den"
+msgstr "Filen eksisterer ikke, eller jeg har ikke adgang til den: %s"
 
 #: run.c:253
-#, fuzzy, c-format
+#, c-format
 msgid "I don't know how to open '%s'"
-msgstr "Jeg ved ikke hvordan man åbner det"
+msgstr "Jeg ved ikke hvordan man åbner'%s'"
 
 #: run.c:280
-#, fuzzy
 msgid ""
 "Executable file:\n"
 "This is a file with an eXecute bit set - it can be run as a program."
-msgstr "Dette er en fil sat til at være kørbar - den kan køres som et program."
+msgstr ""
+"Kørbar fil:\n"
+"Dette er en fil sat til at være kørbar - den kan køres som et program."
 
 #: run.c:285
-#, fuzzy
 msgid ""
 "File:\n"
 "This is a data file. Try using the Info menu item to find out more..."
 msgstr ""
+"Fil:\n"
 "Dette er en data fil. Prøv at bruge 'Info' i menuen for finde ud af mere... "
 
 #: run.c:292
-#, fuzzy
 msgid ""
 "Mount point:\n"
 "A mount point is a directory which another filing system can be mounted on. "
 "Everything on the mounted filesystem then appears to be inside the directory."
 msgstr ""
-"Et mount-punkt er en mappe hvor et andet filsystem kan sættes på.Alt på det "
+"Mount punkt:\n"
+"Et mount punkt er en mappe hvor et andet filsystem kan sættes på.Alt på det "
 "mountede filsystem optræder derefter som om det er indeni mappen."
 
 #: run.c:303
-#, fuzzy
 msgid ""
 "Device file:\n"
 "Device files allow you to read from or write to a device driver as though it "
 "was an ordinary file."
 msgstr ""
+"Device fil:\n"
 "Device filer gør at du kan skrive til eller fra en device driver fuldstændig "
 "som var det en normal fil."
 
 #: run.c:310
-#, fuzzy
 msgid ""
 "Named pipe:\n"
 "Pipes allow different programs to communicate. One program writes data to "
 "the pipe while another one reads it out again."
 msgstr ""
+"Navngivet pipe:\n"
 "Pipes gør at forskellige programmer kan kommunikere. Et program skriver data "
 "til pipen mens et andet program læser det fra den igen."
 
 #: run.c:317
-#, fuzzy
 msgid ""
 "Socket:\n"
 "Sockets allow processes to communicate."
-msgstr "Sockets sørger for at processer kan kommunikere."
+msgstr ""
+"Socket:\n"
+"Sockets sørger for at processer kan kommunikere."
 
 #: run.c:322
-#, fuzzy
 msgid ""
 "Unknown type:\n"
 "I couldn't find out what kind of file this is. Maybe it doesn't exist "
 "anymore or you don't have search permission on the directory it's in?"
 msgstr ""
+"Ukendt type:\n"
 "Jeg kunne ikke finde ud af hvilken type fil dette er. Måske findes den ikke "
 "mere eller måske har du ikke søge-tilladelser i mappen den ligger i?"
 
 #: run.c:408
-#, fuzzy, c-format
+#, c-format
 msgid "Could not send data to program: %s"
-msgstr "ROX-Filer - Sender data til et program"
+msgstr "Kunne ikke sende data til programmet %s"
 
 #: run.c:438
 #, c-format
 msgid "Could not read link: %s"
-msgstr ""
+msgstr "Kunne ikke læse genvejen: %s"
 
 #: run.c:466
-#, fuzzy, c-format
+#, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr ""
-"Knækket symbolsk genvej (eller også har du ikke tilladelse til at følge den)"
+"Knækket symbolsk genvej (eller også har du ikke tilladelse til at følge "
+"den): %s"
 
 #: run.c:503
 #, c-format
@@ -1978,24 +1988,24 @@ msgstr ""
 "også bare trække filen til et program"
 
 #: run.c:527
-#, fuzzy
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
 "(hold down Shift while you open it). Most applications provide their own "
 "help here, but this one doesn't."
 msgstr ""
+"Program:\n"
 "Dette er en program mappe - du kan åbne den som et program, eller åbne den "
 "(hold Shift nede mens du åbner den). De fleste programmer har deres egen "
 "hjælp der, men denne har ikke."
 
 #: run.c:533
-#, fuzzy
 msgid ""
 "Directory:\n"
 "This is a directory. It contains an index to other items - open it to see "
 "the list."
 msgstr ""
+"Mappe:\n"
 "Dette er en mappe. Den indeholder et index til andre objekter - åben den for "
 "at se listen."
 
@@ -2048,14 +2058,12 @@ msgid "Show extra details"
 msgstr "Vis ekstra detaljer"
 
 #: toolbar.c:132
-#, fuzzy
 msgid "Hidden"
-msgstr "Vis Skjulte"
+msgstr "Skjulte"
 
 #: toolbar.c:132
-#, fuzzy
 msgid "Show/hide hidden files"
-msgstr "Vis skjulte filer"
+msgstr "Vis/Gem skjulte filer"
 
 #: toolbar.c:136
 msgid "Show ROX-Filer help"
@@ -2077,7 +2085,7 @@ msgstr "objekt"
 #: toolbar.c:609
 #, c-format
 msgid "No items%s"
-msgstr "Ingen objekter"
+msgstr "Ingen objekter%s"
 
 #: toolbar.c:626
 #, c-format
@@ -2147,29 +2155,27 @@ msgid "This is not a program! Give me an application instead!"
 msgstr "Dette er ikke et prgram! Giv mig et program istedet!"
 
 #: type.c:794
-#, fuzzy
 msgid "Execute file"
 msgstr "Kørbar fil"
 
 #: type.c:799
-#, fuzzy
 msgid "No run action defined"
-msgstr "Sæt kør handling"
+msgstr "Ingen kør handling defineret"
 
 #: type.c:825
 #, c-format
 msgid "Error in handler %s: %s"
-msgstr ""
+msgstr "Fejl i behandler %s: %s"
 
 #: type.c:840
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
-msgstr ""
+msgstr "Ugyldingt program %s (dårlig AppRun)"
 
 #: type.c:851
-#, fuzzy, c-format
+#, c-format
 msgid "Non-executable %s"
-msgstr "Kørbar fil"
+msgstr "Ikke-kørbar %s"
 
 #: type.c:887
 msgid "Set run action"
@@ -2188,7 +2194,7 @@ msgstr "Kun for typen `%s/%s'"
 #: type.c:923
 #, c-format
 msgid "Currently %s"
-msgstr ""
+msgstr "Lige nu %s"
 
 #: type.c:937
 msgid ""
@@ -2238,14 +2244,14 @@ msgid "Set icon"
 msgstr "Definer ikon"
 
 #: usericons.c:245
-#, fuzzy, c-format
+#, c-format
 msgid "Set icon for all `%s/<anything>'"
-msgstr "Sæt som normalt for alle `%s/<alting>'"
+msgstr "Definer som ikon for alle `%s/<alting>'"
 
 #: usericons.c:259
-#, fuzzy, c-format
+#, c-format
 msgid "Only for the file `%s'"
-msgstr "Kun for typen `%s/%s'"
+msgstr "Kun for filen `%s'"
 
 #: usericons.c:284
 msgid "Drop an icon file here"
@@ -2253,7 +2259,7 @@ msgstr "Træk en ikon-fil her hen"
 
 #: usericons.c:294
 msgid "Menu of directories previously used for icons"
-msgstr ""
+msgstr "Menu af mapper tidligere brugt til ikoner"
 
 #: usericons.c:309
 msgid "Enter the path of an icon file:"
@@ -2281,15 +2287,16 @@ msgstr ""
 "som ikon for denne fil eller mappe."
 
 #: usericons.c:566
-#, fuzzy
 msgid "Setting icon disabled by CHOICESPATH"
-msgstr "Gemning af 'Choices' er slået fra af CHOICESPATH variablen"
+msgstr "Definering af ikon er slået fra af CHOICESPATH"
 
 #: usericons.c:631
 msgid ""
 "You have not yet set any special icons; therefore, I have no directories to "
 "show you"
 msgstr ""
+"Du har ikke defineret nogle specielle ikoner; derfor har jeg ingen mapper "
+"vise dig"
 
 #: tips:1
 msgid "Translation"
@@ -2300,10 +2307,10 @@ msgstr "Oversættelse"
 msgid "Language"
 msgstr "Stor"
 
+# tips=x
 #: tips:3
-#, fuzzy
 msgid "Danish"
-msgstr "Detaljer"
+msgstr "Dansk"
 
 #: tips:4
 msgid "Dutch"
@@ -2311,7 +2318,7 @@ msgstr "Hollandsk"
 
 #: tips:5
 msgid "English (no translation)"
-msgstr ""
+msgstr "Engelsk (ingen oversættelse)"
 
 #: tips:6
 msgid "French"
@@ -2339,11 +2346,11 @@ msgstr "Russisk"
 
 #: tips:12
 msgid "Spanish"
-msgstr ""
+msgstr "Spansk"
 
 #: tips:13
 msgid "Use the LANG environment variable"
-msgstr ""
+msgstr "Brug LANG miljø variabel"
 
 #: tips:14 tips:15
 #, fuzzy
@@ -2416,9 +2423,8 @@ msgid "Pinboard behaviour"
 msgstr "Opslagstavle"
 
 #: tips:29
-#, fuzzy
 msgid "Single-click to open"
-msgstr "Et-klik navigation"
+msgstr "Enkelt-klik for at åbne"
 
 #: tips:30 tips:101 tips:102
 msgid ""
@@ -2668,9 +2674,8 @@ msgstr ""
 "det nuværende vindue."
 
 #: tips:100
-#, fuzzy
 msgid "Single-click navigation in filer windows"
-msgstr "Et-klik navigation"
+msgstr "Et-kliks navigation i 'filer' vinduer"
 
 #: tips:103
 msgid "Beeping"
@@ -2678,7 +2683,7 @@ msgstr ""
 
 #: tips:104
 msgid "Beep if Tab-completion fails"
-msgstr "Bip hvis Tab-fuldførelse slå fejl"
+msgstr "Bip hvis Tab-fuldførelse slår fejl"
 
 #: tips:105
 msgid ""
@@ -2813,15 +2818,16 @@ msgstr ""
 "punktum også vist, ellers er de skjult."
 
 #: tips:143
-#, fuzzy
 msgid "Show image thumbnails"
-msgstr "Vis ekstra detaljer"
+msgstr "Vis thumbnails af billeder"
 
 #: tips:144 tips:145 tips:146 tips:147 tips:148
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
 msgstr ""
+"Læs hvert billede-fil og vis den, i lille format, i vinduet istedet for et "
+"normalt ikon."
 
 #: tips:149
 msgid "Toolbar"
@@ -2947,7 +2953,7 @@ msgstr "... viser en menu af mulige handlinger"
 #: tips:176
 #, fuzzy
 msgid "Moves the files"
-msgstr ".... flytter filen"
+msgstr "... flytter filerne"
 
 #: tips:177 tips:178 tips:179 tips:180
 msgid ""
@@ -2998,9 +3004,8 @@ msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "Programmet der bliver startet når du vælger 'Xterm Her' fra menuen."
 
 #: tips:194
-#, fuzzy
 msgid "Types"
-msgstr "Type"
+msgstr "Typer"
 
 #: tips:196
 msgid "Ignore eXecutable bit for known extensions"
@@ -3021,24 +3026,29 @@ msgid "MIME types"
 msgstr ""
 
 #: tips:200
+#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type. After editing "
 "the files, click the re-read button below, or restart the filer."
 msgstr ""
+"'Fileren' bruger et sæt regler til at finde ud af den korrekte MIME type\n"
+"for hver normale fil, og vælger derefter et passende ikon til den type.\n"
+"Efter at have editeret filerne, klik på genlæs knappen nedenunder, eller "
+"genstart 'fileren'."
 
 #: tips:201
 msgid "Show name-to-type rules"
-msgstr ""
+msgstr "Vis navn-til-type regler"
 
 #: tips:202
-#, fuzzy
 msgid "Re-read files"
-msgstr "Normal fil"
+msgstr "Genlæs filer"
 
 #: tips:203 tips:204
 msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
+"Brug 'Definer Ikon...' dialog boksen til at definere ikonet for hver type."
 
 #: tips:205
 #, fuzzy
@@ -3083,6 +3093,8 @@ msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr ""
+"Fejl, som f.eks. en symbolsk genvej der peger mod en ikke-eksisterende fil, "
+"eller en fil som der er problemer med at undersøge."
 
 #: tips:216
 #, fuzzy
@@ -3112,35 +3124,44 @@ msgstr "Ukendt type"
 #~ msgid "Abort"
 #~ msgstr "Afbryd"
 
-#~ msgid "!ERROR: %s\n"
-#~ msgstr "!FEJL: %s\n"
-
-#~ msgid "Force - don't confirm deletion of non-writeable items"
-#~ msgstr "Tving - bekræft ikke sletning af ikke-skrivbare objekter"
-
-#~ msgid "Recurse - also change contents of subdirectories"
-#~ msgstr "Recursivt - under-mappers indhold ændres også"
-
-#~ msgid "fork() failed"
-#~ msgstr "fork() mislykkedes"
-
-#~ msgid "Error"
-#~ msgstr "Fejl"
+#~ msgid "Error reading file %s: %s"
+#~ msgstr "Fejl under læsning af fil: %s: %s"
 
 #~ msgid "Can't allocate memory for buffer to load this file"
 #~ msgstr "Kan ikke allokere hukommelse til bufferen til at læse denne fil"
 
-#~ msgid "Sorry, but the name must not contain < or >"
-#~ msgstr "Desværre, men navnet må hverken indeholde < eller >"
+#~ msgid "Old VFS support"
+#~ msgstr "Gammel VFS understøttelse"
 
-#~ msgid "ROX-Filer: file(1) says..."
-#~ msgstr "ROX-Filer: fil(1) siger..."
-
-#~ msgid "VFS support"
-#~ msgstr "VFS understøttelse"
+#~ msgid "No (incompatible with Large File Support)"
+#~ msgstr "Nej (inkompatibel med Understøttelse af Store Filer)"
 
 #~ msgid "No (couldn't find a valid libvfs)"
 #~ msgstr "Nej (kunne ikke finde en gyldig libvfs)"
+
+#~ msgid "Gtk+-2.0 support"
+#~ msgstr "Gtk+-2.0 understøttelse"
+
+#~ msgid "No (using Gtk+-1.2 instead)"
+#~ msgstr "Nej (bruger Gtk+-1.2 istedet)"
+
+#~ msgid "Save thumbnails"
+#~ msgstr "Gem thumbnails"
+
+#~ msgid "Yes (using Gtk+-2.0)"
+#~ msgstr "Ja (bruger Gtk+-2.0)"
+
+#~ msgid "Yes (using libpng)"
+#~ msgstr "Ja (bruger libpng)"
+
+#~ msgid "No (needs libpng or Gtk+-2.0)"
+#~ msgstr "Nej (kræver libpng eller Gtk+-2.0)"
+
+#~ msgid "Character set translations"
+#~ msgstr "Tegnsæt oversættelser"
+
+#~ msgid "No (needs libiconv or Gtk+-2.0)"
+#~ msgstr "Nej (jræver libiconv eller Gtk+-2.0)"
 
 #~ msgid "Open VFS"
 #~ msgstr "Åben med VFS"
@@ -3157,20 +3178,11 @@ msgstr "Ukendt type"
 #~ msgid "RPM"
 #~ msgstr "RPM"
 
-#~ msgid "You must select a single file to open as a Virtual File System"
-#~ msgstr "Du må kun vælge en fil som skal åbnes som et Virtuelt Fil System"
-
 #~ msgid "New Directory"
 #~ msgstr "Ny Mappe"
 
 #~ msgid "New File"
 #~ msgstr "Ny Fil"
-
-#~ msgid "Failed to fork() child process"
-#~ msgstr "fork() af børne-process mislykkedes"
-
-#~ msgid "Notice"
-#~ msgstr "Bemærk"
 
 #~ msgid "ROX-Filer options"
 #~ msgstr "ROX-Filer indstillinger"
@@ -3179,7 +3191,62 @@ msgstr "Ukendt type"
 #~ msgstr "Gem"
 
 #~ msgid "Apply"
-#~ msgstr "Slå til"
+#~ msgstr "Påfør"
+
+#~ msgid "Copy error"
+#~ msgstr "Kopi fejl"
+
+#~ msgid "Remove custom icon"
+#~ msgstr "Fjern specielt ikon"
+
+#~ msgid "Display messages in..."
+#~ msgstr "Vis meddelelser i..."
+
+#~ msgid ""
+#~ "If off: Ben, animal, zoo.\n"
+#~ "If on: animal, Ben, zoo."
+#~ msgstr ""
+#~ "Hvis fra: Bøffel, and, zebra.\n"
+#~ "Hvis til: and, Bøffel, zebra."
+
+#~ msgid "...never"
+#~ msgstr "... aldrig"
+
+#~ msgid "...always"
+#~ msgstr "...altid"
+
+#~ msgid "Window size limit"
+#~ msgstr "Vindues-størrelse grænse"
+
+#~ msgid "Error"
+#~ msgstr "Fejl"
+
+#~ msgid "!ERROR: %s\n"
+#~ msgstr "!FEJL: %s\n"
+
+#~ msgid "Force - don't confirm deletion of non-writeable items"
+#~ msgstr "Tving - bekræft ikke sletning af ikke-skrivbare objekter"
+
+#~ msgid "Recurse - also change contents of subdirectories"
+#~ msgstr "Recursivt - under-mappers indhold ændres også"
+
+#~ msgid "fork() failed"
+#~ msgstr "fork() mislykkedes"
+
+#~ msgid "Sorry, but the name must not contain < or >"
+#~ msgstr "Desværre, men navnet må hverken indeholde < eller >"
+
+#~ msgid "ROX-Filer: file(1) says..."
+#~ msgstr "ROX-Filer: fil(1) siger..."
+
+#~ msgid "You must select a single file to open as a Virtual File System"
+#~ msgstr "Du må kun vælge en fil som skal åbnes som et Virtuelt Fil System"
+
+#~ msgid "Failed to fork() child process"
+#~ msgstr "fork() af børne-process mislykkedes"
+
+#~ msgid "Notice"
+#~ msgstr "Bemærk"
 
 #~ msgid "Saving options"
 #~ msgstr "Gemmer indstillinger"
@@ -3203,9 +3270,6 @@ msgstr "Ukendt type"
 #~ msgid "Application"
 #~ msgstr "Program"
 
-#~ msgid "Copy error"
-#~ msgstr "Kopi fejl"
-
 #~ msgid "Copy failed"
 #~ msgstr "Kopiering mislykkedes"
 
@@ -3215,30 +3279,11 @@ msgstr "Ukendt type"
 #~ msgid "Path: "
 #~ msgstr "Sti: "
 
-#~ msgid "Remove custom icon"
-#~ msgstr "Fjern specielt ikon"
-
 #~ msgid "From LANG"
 #~ msgstr "Fra LANG"
 
-#~ msgid ""
-#~ "If off: Ben, animal, zoo.\n"
-#~ "If on: animal, Ben, zoo."
-#~ msgstr ""
-#~ "Hvis fra: Bøffel, and, zebra.\n"
-#~ "Hvis til: and, Bøffel, zebra."
-
 #~ msgid "Error (eg. orphan symlink)"
 #~ msgstr "Fejl (f.eks. efterladt symbolsk genvej)"
-
-#~ msgid "...never"
-#~ msgstr "... aldrig"
-
-#~ msgid "...always"
-#~ msgstr "...altid"
-
-#~ msgid "Window size limit"
-#~ msgstr "Vindues-størrelse grænse"
 
 #~ msgid "Mouse bindings"
 #~ msgstr "Muse-funktioner"
