@@ -1413,7 +1413,6 @@ void filer_check_mounted(char *path)
 }
 
 /* Close all windows displaying 'path' or subdirectories of 'path' */
-/* XXX: Dup code? */
 void filer_close_recursive(char *path)
 {
 	GList	*next = all_filer_windows;
