@@ -1761,6 +1761,11 @@ static void run_applet(PanelIcon *pi)
 				8, GDK_PROP_MODE_REPLACE,
 				pos, strlen(pos));
 		g_free(pos);
+
+		/* Ensure that the properties are set before starting the
+		 * applet.
+		 */
+		gdk_flush();
 	}
 
 	g_object_set_data(G_OBJECT(pi->widget), "icon", pi);
