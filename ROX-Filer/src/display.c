@@ -226,16 +226,8 @@ static void fill_template(GdkRectangle *area, CollectionItem *colitem,
 
 	if (view->details)
 	{
-#ifdef GTK2
 		template->details.width = view->details_width;
 		template->details.height = view->details_height;
-#else
-		int	fixed_height = fixed_font->ascent + fixed_font->descent;
-
-		template->details.width = fixed_width *
-					strlen(view->details);
-		template->details.height = fixed_height;
-#endif
 
 		if (style == SMALL_ICONS)
 			small_full_template(area, colitem,
@@ -1478,6 +1470,11 @@ void display_update_view(FilerWindow *filer_window,
 
 	g_free(view->details);
 	view->details = details(filer_window, item);
+	if (view->details)
+	{
+		view->details_width = fixed_width * strlen(view->details);
+		view->details_height = fixed_font->ascent + fixed_font->descent;
+	}
 #endif
 
 	if (view->image)
