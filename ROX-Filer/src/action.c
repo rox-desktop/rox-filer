@@ -71,7 +71,7 @@ struct _GUIside
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-	int		child;		/* Process ID */
+	pid_t		child;		/* Process ID */
 	int		errors;		/* Number of errors so far */
 	gboolean	show_info;	/* For Disk Usage */
 
@@ -394,7 +394,7 @@ static void message_from_child(gpointer 	  data,
 	gui_side->to_child = NULL;
 	close(gui_side->from_child);
 	g_source_remove(gui_side->input_tag);
-	/* XXX: gtk_widget_set_sensitive(gui_side->quiet, FALSE); */
+	abox_cancel_ask(gui_side->abox);
 
 	if (gui_side->errors)
 	{
@@ -887,7 +887,6 @@ static void do_delete(const char *src_path, const char *unused)
 static void do_find(const char *path, const char *unused)
 {
 	FindInfo	info;
-	char		*slash;
 
 	check_flags();
 
@@ -931,8 +930,7 @@ static void do_find(const char *path, const char *unused)
 	info.fullpath = path;
 	time(&info.now);	/* XXX: Not for each check! */
 
-	slash = strrchr(path, '/');
-	info.leaf = slash ? slash + 1 : path;
+	info.leaf = g_basename(path);
 	info.prune = FALSE;
 	if (find_test_condition(find_condition, &info))
 	{

@@ -64,7 +64,7 @@ time_t fstab_time;
 /* Static prototypes */
 #ifdef DO_MOUNT_POINTS
 static void read_table(void);
-static void clear_table(GHashTable *table);
+static void clear_table(void);
 static time_t read_time(char *path);
 static gboolean free_mp(gpointer key, gpointer value, gpointer data);
 #endif
@@ -159,10 +159,10 @@ static gboolean free_mp(gpointer key, gpointer value, gpointer data)
 	return TRUE;
 }
 
-/* Remove all entries from a hash table, freeing them as we go */
-static void clear_table(GHashTable *table)
+/* Remove all entries from mounts table, freeing them as we go */
+static void clear_table(void)
 {
-	g_hash_table_foreach_remove(table, free_mp, NULL);
+	g_hash_table_foreach_remove(fstab_mounts, free_mp, NULL);
 }
 
 /* Return the mtime of a file */
@@ -182,7 +182,7 @@ static void read_table(void)
 	struct mntent	*ent;
 	MountPoint	*mp;
 
-	clear_table(fstab_mounts);
+	clear_table();
 
 	tab = setmntent(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
@@ -214,7 +214,7 @@ static void read_table(void)
 
 	tab = fopen(THE_FSTAB, "r");
 	g_return_if_fail(tab != NULL);
-	clear_table(fstab_mounts);
+	clear_table();
 
 #  ifdef HAVE_FCNTL_H
 	lb.l_type = F_RDLCK;
@@ -247,7 +247,7 @@ static void read_table(void)
 	struct fstab	*ent;
 	MountPoint	*mp;
 
-	clear_table(fstab_mounts);
+	clear_table();
 
 	tab = setfsent();
 	g_return_if_fail(tab != 0);

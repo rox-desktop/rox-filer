@@ -54,6 +54,7 @@ GtkWidget *abox_add_flag		(ABox *abox,
 					 gboolean default_value);
 void	abox_ask			(ABox *abox,
 					 const gchar *question);
+void	abox_cancel_ask			(ABox *abox);
 void	abox_set_current_object		(ABox *abox,
 					 const gchar *message);
 void	abox_log			(ABox *abox,

@@ -270,11 +270,7 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	pattern = strrchr(path, '/');
-	if (pattern)
-		pattern++;
-	else
-		pattern = path;
+	pattern = g_basename(path);
 
 	if (item == -1 || item >= collection->number_of_items ||
 			!matches(collection, item, pattern))
@@ -537,11 +533,7 @@ static void search_in_dir(FilerWindow *filer_window, int dir)
 	const char *path, *pattern;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	pattern = strrchr(path, '/');
-	if (pattern)
-		pattern++;
-	else
-		pattern = path;
+	pattern = g_basename(path);
 	
 	filer_window->mini_cursor_base = filer_window->collection->cursor_item;
 	find_next_match(filer_window, pattern, dir);
@@ -710,7 +702,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	int		i;
 	const gchar	*entry;
 	Collection	*collection = filer_window->collection;
-	int		child;
+	pid_t		child;
 
 	entry = mini_contents(filer_window);
 

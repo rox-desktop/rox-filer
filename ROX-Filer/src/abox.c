@@ -236,6 +236,15 @@ void abox_ask(ABox *abox, const gchar *question)
 	shade(abox);
 }
 
+void abox_cancel_ask(ABox *abox)
+{
+	g_return_if_fail(abox != NULL);
+	g_return_if_fail(IS_ABOX(abox));
+
+	abox->question = FALSE;
+	shade(abox);
+}
+
 void abox_log(ABox *abox, const gchar *message, const gchar *style)
 {
 	GtkTextIter end;

@@ -230,7 +230,8 @@ void option_check_widget(Option *option)
 }
 
 /* Call all the notify callbacks. This should happen after any options
- * have their values changed. Set each has_changed before calling.
+ * have their values changed.
+ * Set each option->has_changed flag before calling this function.
  */
 void options_notify(void)
 {
@@ -308,7 +309,7 @@ void option_add_string(Option *option, const gchar *key, const gchar *value)
 }
 
 /* Add a callback which will be called after any options have changed their
- * values. If serveral options change at once, this is called after all
+ * values. If several options change at once, this is called after all
  * changes.
  */
 void option_add_notify(OptionNotify *callback)
@@ -825,8 +826,7 @@ static void radio_group_set_value(GtkRadioButton *last, guchar *value)
 {	
 	GSList	*next;
 
-	next = gtk_radio_button_get_group(last);
-	while (next)
+	for (next = gtk_radio_button_get_group(last); next; next = next->next)
 	{
 		GtkToggleButton *button = (GtkToggleButton *) next->data;
 		guchar	*val;
@@ -839,8 +839,6 @@ static void radio_group_set_value(GtkRadioButton *last, guchar *value)
 			gtk_toggle_button_set_active(button, TRUE);
 			return;
 		}
-		
-		next = next->next;
 	}
 
 	g_warning("Can't find radio button with value %s\n", value);
@@ -853,8 +851,7 @@ static guchar *radio_group_get_value(GtkRadioButton *last)
 {
 	GSList	*next;
 
-	next = gtk_radio_button_get_group(last);
-	while (next)
+	for (next = gtk_radio_button_get_group(last); next; next = next->next)
 	{
 		GtkToggleButton *button = (GtkToggleButton *) next->data;
 
@@ -867,8 +864,6 @@ static guchar *radio_group_get_value(GtkRadioButton *last)
 
 			return g_strdup(val);
 		}
-		
-		next = next->next;
 	}
 
 	return NULL;

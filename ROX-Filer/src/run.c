@@ -344,7 +344,6 @@ void open_to_show(const guchar *path)
 		new = filer_opendir("/", NULL);
 		if (new && dir[1])
 			display_set_autoselect(new, dir + 1);
-		
 	}
 	else
 	{

@@ -37,6 +37,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <libxml/parser.h>
+#include <math.h>
 
 #include "global.h"
 
@@ -429,7 +430,7 @@ gchar *format_double_size(double size)
 
 	if (buf)
 		g_free(buf);
-	buf = g_strdup_printf("%.0f %s", size, units);
+	buf = g_strdup_printf("%.0f %s", floor(size), units);
 
 	return buf;
 }

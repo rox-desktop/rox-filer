@@ -446,11 +446,7 @@ MIME_type *type_from_path(const char *path)
 		return get_mime_type(gnome_vfs_mime_type_from_name(path), TRUE);
 #endif
 
-	leafname = strrchr(path, '/');
-	if (!leafname)
-		leafname = path;
-	else
-		leafname++;
+	leafname = g_basename(path);
 	ext = leafname;
 
 	while ((dot = strchr(ext, '.')))
