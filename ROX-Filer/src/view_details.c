@@ -54,10 +54,9 @@
 #define COL_MTIME 6
 #define COL_ITEM 7
 #define COL_COLOUR 8
-#define COL_BG_COLOUR 9
-#define COL_WEIGHT 10
-#define COL_VIEW_ITEM 11
-#define N_COLUMNS 12
+#define COL_WEIGHT 9
+#define COL_VIEW_ITEM 10
+#define N_COLUMNS 11
 
 static gpointer parent_class = NULL;
 
@@ -231,7 +230,7 @@ static GType details_get_column_type(GtkTreeModel *tree_model, gint index)
 {
 	g_return_val_if_fail(index < N_COLUMNS && index >= 0, G_TYPE_INVALID);
 
-	if (index == COL_COLOUR || index == COL_BG_COLOUR)
+	if (index == COL_COLOUR)
 		return GDK_TYPE_COLOR;
 	else if (index == COL_ITEM || index == COL_VIEW_ITEM)
 		return G_TYPE_POINTER;
@@ -347,19 +346,6 @@ static void details_get_value(GtkTreeModel *tree_model,
 			else
 				g_value_set_boxed(value,
 						  type_get_colour(item, NULL));
-			break;
-		case COL_BG_COLOUR:
-			g_value_init(value, GDK_TYPE_COLOR);
-#if 0
-			if (view_item->selected)
-			{
-				GtkStateType state = view_details->
-						filer_window->selection_state;
-				g_value_set_boxed(value, &style->base[state]);
-			}
-			else
-#endif
-				g_value_set_boxed(value, NULL);
 			break;
 		case COL_OWNER:
 			g_value_init(value, G_TYPE_STRING);
@@ -807,7 +793,6 @@ static gboolean test_can_change_selection(GtkTreeSelection *sel,
 	column = gtk_tree_view_column_new_with_attributes(name, cell, \
 					    "text", model_column,	\
 					    "foreground-gdk", COL_COLOUR, \
-					    "background-gdk", COL_BG_COLOUR, \
 					    "weight", COL_WEIGHT, 	\
 					    NULL);			\
 	gtk_tree_view_append_column(treeview, column);			\
@@ -844,7 +829,6 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	cell = cell_icon_new(view_details);
 	column = gtk_tree_view_column_new_with_attributes(NULL, cell,
 					    "item", COL_VIEW_ITEM,
-					    "background-gdk", COL_BG_COLOUR,
 					    NULL);
 	gtk_tree_view_append_column(treeview, column);
 
