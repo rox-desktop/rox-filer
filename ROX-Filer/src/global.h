@@ -125,4 +125,8 @@ typedef enum {		/* Values used in options, must start at 0 */
 #define SOAP_RPC_NS "http://www.w3.org/2001/12/soap-rpc"
 #define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
 
+/* Stock icons */
+#define ROX_STOCK_SHOW_DETAILS "rox-show-details"
+#define ROX_STOCK_SHOW_HIDDEN  "rox-show-hidden"
+
 #include <libxml/tree.h>

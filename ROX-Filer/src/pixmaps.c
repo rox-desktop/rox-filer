@@ -96,6 +96,11 @@ struct _ChildThumbnail {
 	gpointer data;
 };
 
+static const char *stocks[] = {
+	ROX_STOCK_SHOW_DETAILS,
+	ROX_STOCK_SHOW_HIDDEN,
+};
+
 /* Static prototypes */
 
 static void load_default_pixmaps(void);
@@ -116,6 +121,9 @@ static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
 
 void pixmaps_init(void)
 {
+	GtkIconFactory *factory;
+	int i;
+	
 	gtk_widget_push_colormap(gdk_rgb_get_colormap());
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
@@ -123,6 +131,32 @@ void pixmaps_init(void)
 	gtk_timeout_add(10000, purge, NULL);
 
 	load_default_pixmaps();
+
+	factory=gtk_icon_factory_new();
+	for (i = 0; i < G_N_ELEMENTS(stocks); i++)
+	{
+		GdkPixbuf *pixbuf;
+		GError *error = NULL;
+		gchar *path;
+		GtkIconSet *iset;
+		const gchar *name = stocks[i];
+
+		path = g_strconcat(app_dir, "/images/", name, ".png", NULL);
+		pixbuf = gdk_pixbuf_new_from_file(path, &error);
+		if (!pixbuf)
+		{
+			g_warning("%s", error->message);
+			g_error_free(error);
+			pixbuf = gdk_pixbuf_new_from_xpm_data(bad_xpm);
+		}
+		g_free(path);
+
+		iset = gtk_icon_set_new_from_pixbuf(pixbuf);
+		g_object_unref(G_OBJECT(pixbuf));
+		gtk_icon_factory_add(factory, name, iset);
+		gtk_icon_set_unref(iset);
+	}
+	gtk_icon_factory_add_default(factory);
 }
 
 /* Load image <appdir>/images/name.png.
@@ -488,7 +522,7 @@ static MaskedPixmap *image_from_file(const char *path)
 	pixbuf = gdk_pixbuf_new_from_file(path, &error);
 	if (!pixbuf)
 	{
-		g_print("%s\n", error ? error->message : _("Unknown error"));
+		g_warning("%s\n", error->message);
 		g_error_free(error);
 		return NULL;
 	}
@@ -803,7 +837,7 @@ static void load_default_pixmaps(void)
 	}
 	else
 	{
-		g_print("%s\n", error ? error->message : _("Unknown error"));
+		g_warning("%s\n", error->message);
 		g_error_free(error);
 	}
 }

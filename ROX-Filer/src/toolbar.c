@@ -122,11 +122,11 @@ static Tool all_tools[] = {
 	 toolbar_size_clicked, DROP_NONE, TRUE,
 	 NULL},
 	
-	{N_("Details"), GTK_STOCK_JUSTIFY_LEFT, N_("Show extra details"),
+	{N_("Details"), ROX_STOCK_SHOW_DETAILS, N_("Show extra details"),
 	 toolbar_details_clicked, DROP_NONE, TRUE,
 	 NULL},
 	
-	{N_("Hidden"), GTK_STOCK_STRIKETHROUGH, N_("Show/hide hidden files"),
+	{N_("Hidden"), ROX_STOCK_SHOW_HIDDEN, N_("Show/hide hidden files"),
 	 toolbar_hidden_clicked, DROP_NONE, TRUE,
 	 NULL},
 	
