@@ -1059,6 +1059,9 @@ gchar *to_utf8(const gchar *src)
 		return NULL;
 
 	retval = g_locale_to_utf8(src, -1, NULL, NULL, NULL);
+	if (!retval)
+		retval = g_convert_with_fallback(src, -1, "utf-8", "iso-8859-1",
+						"?", NULL, NULL, NULL);
 
 	return retval ? retval : g_strdup(src);
 }
