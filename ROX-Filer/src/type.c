@@ -351,7 +351,8 @@ MIME_type *type_from_path(char *path)
 	{
 		Pattern *pattern = (Pattern *) patt->data;
 
-		if (re_match(&pattern->buffer, leafname, len, 0, NULL) >= 0)
+		if (re_search(&pattern->buffer,
+					leafname, len, 0, len, NULL) >= 0)
 			return pattern->type;
 	}
 #endif
