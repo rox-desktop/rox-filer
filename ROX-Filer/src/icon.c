@@ -76,7 +76,11 @@ static Icon *menu_icon = NULL;	/* Item clicked if there is no selection */
 /* Static prototypes */
 static void rename_activate(GtkWidget *dialog);
 static void menu_closed(GtkWidget *widget);
-static void panel_position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
+static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
+#ifdef GTK2
+		gboolean  *push_in,
+#endif
+		gpointer data);
 static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
 static void selection_get(GtkWidget *widget, 
 		       GtkSelectionData *selection_data,
@@ -609,7 +613,11 @@ static void menu_closed(GtkWidget *widget)
 	menu_icon = NULL;
 }
 
-static void panel_position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
+static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
+#ifdef GTK2
+		gboolean  *push_in,
+#endif
+		gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -632,6 +640,10 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
+
+#ifdef GTK2
+	*push_in = FALSE;
+#endif
 }
 
 /* Called when another application takes the selection away from us */
@@ -814,7 +826,7 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->src_path);
 	gtk_object_set_data(GTK_OBJECT(dialog), "new_path", entry);
 	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			rename_activate, GTK_OBJECT(dialog));
+			GTK_SIGNAL_FUNC(rename_activate), GTK_OBJECT(dialog));
 
 	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), TRUE, TRUE, 2);
 
@@ -827,7 +839,7 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	gtk_widget_grab_focus(entry);
 	gtk_object_set_data(GTK_OBJECT(dialog), "new_name", entry);
 	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			rename_activate, GTK_OBJECT(dialog));
+			GTK_SIGNAL_FUNC(rename_activate), GTK_OBJECT(dialog));
 	
 	gtk_signal_connect_object_while_alive(GTK_OBJECT(widget),
 			"destroy",

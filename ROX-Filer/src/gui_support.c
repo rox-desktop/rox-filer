@@ -150,7 +150,7 @@ int get_choice(char *title,
 				&choice_return);
 		gtk_box_pack_start(GTK_BOX(action_area), button, TRUE, TRUE, 0);
 		gtk_signal_connect(GTK_OBJECT(button), "clicked",
-					choice_clicked, GINT_TO_POINTER(i));
+			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(i));
 		if (!default_button)
 			default_button = button;
 	}
@@ -164,8 +164,8 @@ int get_choice(char *title,
 
 	gtk_object_set_data(GTK_OBJECT(dialog), "choice_return",
 				&choice_return);
-	gtk_signal_connect(GTK_OBJECT(dialog), "destroy", choice_clicked,
-			(gpointer) -1);
+	gtk_signal_connect(GTK_OBJECT(dialog), "destroy",
+			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(-1));
 
 	choice_return = -2;
 
@@ -347,7 +347,8 @@ GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
 	gtk_button_set_relief(GTK_BUTTON(b), GTK_RELIEF_NONE);
 	icon = gtk_pixmap_new(im_help->pixmap, im_help->mask);
 	gtk_container_add(GTK_CONTAINER(b), icon);
-	gtk_signal_connect_object(GTK_OBJECT(b), "clicked", show_help, data);
+	gtk_signal_connect_object(GTK_OBJECT(b), "clicked",
+			GTK_SIGNAL_FUNC(show_help), data);
 
 	GTK_WIDGET_UNSET_FLAGS(b, GTK_CAN_FOCUS);
 

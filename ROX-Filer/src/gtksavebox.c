@@ -138,6 +138,10 @@ gtk_savebox_get_type (void)
   return savebox_type;
 }
 
+#ifndef GTK_CLASS_TYPE
+# define GTK_CLASS_TYPE(c) (c->type)
+#endif
+
 static void
 gtk_savebox_class_init (GtkSaveboxClass *class)
 {
@@ -156,7 +160,7 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 
   savebox_signals[SAVE_TO_FILE] = gtk_signal_new ("save_to_file",
 					    GTK_RUN_LAST,
-					    object_class->type,
+					    GTK_CLASS_TYPE(object_class),
 					    GTK_SIGNAL_OFFSET (GtkSaveboxClass,
 							       save_to_file),
 					    gtk_marshal_INT__POINTER,
@@ -165,7 +169,7 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 
   savebox_signals[SAVED_TO_URI] = gtk_signal_new ("saved_to_uri",
 					    GTK_RUN_LAST,
-					    object_class->type,
+					    GTK_CLASS_TYPE(object_class),
 					    GTK_SIGNAL_OFFSET (GtkSaveboxClass,
 							       saved_to_uri),
 					    gtk_marshal_NONE__POINTER,
@@ -174,13 +178,15 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 
   savebox_signals[SAVE_DONE] = gtk_signal_new ("save_done",
 					    GTK_RUN_LAST,
-					    object_class->type,
+					    GTK_CLASS_TYPE(object_class),
 					    GTK_SIGNAL_OFFSET (GtkSaveboxClass,
 							       save_done),
 					    gtk_marshal_NONE__NONE,
 					    GTK_TYPE_NONE, 0);
 
+#ifndef GTK2
   gtk_object_class_add_signals (object_class, savebox_signals, LAST_SIGNAL);
+#endif
 }
 
 static void
@@ -498,7 +504,7 @@ static void do_save (GtkWidget *widget, GtkSavebox *savebox)
       button = gtk_button_new_with_label (_("OK"));
       GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
       gtk_signal_connect_object (GTK_OBJECT (button), "clicked",
-			  gtk_widget_destroy, GTK_OBJECT (dialog));
+		  GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT (dialog));
       gtk_box_pack_start (GTK_BOX (GTK_DIALOG (dialog)->action_area),
 			  button, TRUE, TRUE, 32);
       gtk_window_set_default (GTK_WINDOW (dialog), button);

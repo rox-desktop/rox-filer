@@ -26,7 +26,11 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
 void show_style_menu(FilerWindow *filer_window,
 			GdkEventButton *event,
 			GtkWidget *menu);
-void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
+void position_menu(GtkMenu *menu, gint *x, gint *y,
+#ifdef GTK2
+		gboolean  *push_in,
+#endif
+		gpointer data);
 
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);

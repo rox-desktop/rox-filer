@@ -97,11 +97,11 @@ struct _CollectionClass
 	GtkWidgetClass 	parent_class;
 
 	void 		(*gain_selection)(Collection 	*collection,
-					guint		time);
+					gint		time);
 	void 		(*lose_selection)(Collection 	*collection,
-					guint		time);
+					gint		time);
 	void		(*selection_changed)(Collection	*collection,
-					guint		time);
+					gint		time);
 };
 
 guint   collection_get_type   		(void);

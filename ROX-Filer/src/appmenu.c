@@ -131,7 +131,8 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 	gtk_widget_show(sep);
 
 	for (next = current_items; next; next = next->next)
-		gtk_menu_prepend(GTK_MENU(menu), GTK_WIDGET(next->data));
+		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu),
+					GTK_WIDGET(next->data));
 
 	current_menu = menu;
 	current_app_path = g_strdup(app_dir);

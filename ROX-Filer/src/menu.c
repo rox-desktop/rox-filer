@@ -400,7 +400,11 @@ static void items_sensitive(gboolean state)
 #endif
 }
 
-void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
+void position_menu(GtkMenu *menu, gint *x, gint *y,
+#ifdef GTK2
+		gboolean  *push_in,
+#endif
+		gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -412,6 +416,10 @@ void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
+
+#ifdef GTK2
+	*push_in = FALSE;
+#endif
 }
 
 /* Used when you menu-click on the Large or Small toolbar tools */
@@ -448,7 +456,7 @@ static GtkWidget *get_new_files_menu(void)
 	gtk_signal_connect(GTK_OBJECT(item), "activate",
 			GTK_SIGNAL_FUNC(new_file), NULL);
 
-	gtk_menu_append(GTK_MENU(menu), item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	templ_dname = choices_find_path_load("Templates", "");
 	if (!templ_dname)
@@ -459,7 +467,7 @@ static GtkWidget *get_new_files_menu(void)
 		goto out;
 
 	item = gtk_menu_item_new();
-	gtk_menu_append(GTK_MENU(menu), item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	while ((ent = readdir(dir)))
 	{
@@ -509,7 +517,7 @@ static GtkWidget *get_new_files_menu(void)
 
 		gtk_signal_connect(GTK_OBJECT(item), "activate",
 				GTK_SIGNAL_FUNC(new_file_type), fname);
-		gtk_menu_append(GTK_MENU(menu), item);
+		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		gtk_signal_connect_object(GTK_OBJECT(item), "destroy",
 				GTK_SIGNAL_FUNC(g_free), (GtkObject *) fname);
 	}

@@ -389,7 +389,7 @@ static void build_menu_item(Node *node, GtkWidget *option_menu)
 	g_free(label);
 
 	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
-	gtk_menu_append(GTK_MENU(menu), item);
+	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	gtk_widget_show_all(menu);
 
 	gtk_object_set_data(GTK_OBJECT(item),

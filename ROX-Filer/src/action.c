@@ -175,19 +175,19 @@ static void select_row_callback(GtkWidget *widget,
 /* This is called whenever the user edits the entry box (if any) - send the
  * new string.
  */
-static void entry_changed(GtkEntry *entry, GUIside *gui_side)
+static void entry_changed(GtkEditable *entry, GUIside *gui_side)
 {
 	guchar	*text;
 
 	g_return_if_fail(gui_side->default_string != NULL);
 
-	text = gtk_entry_get_text(entry);
+	text = gtk_editable_get_chars(entry, 0, -1);
 
 	if (gui_side->entry_string_func)
 		gui_side->entry_string_func(GTK_WIDGET(gui_side->entry), text);
 
 	g_free(*(gui_side->default_string));
-	*(gui_side->default_string) = g_strdup(text);
+	*(gui_side->default_string) = text;	/* Gets text's ref */
 
 	if (!gui_side->to_child)
 		return;

@@ -230,7 +230,11 @@ static MaskedPixmap *image_from_file(char *path)
 	GdkPixbuf	*pixbuf;
 	MaskedPixmap	*image;
 	
-	pixbuf = gdk_pixbuf_new_from_file(path);
+	pixbuf = gdk_pixbuf_new_from_file(path
+#ifdef GTK2
+			, NULL	/* XXX: Maybe something should go here? */
+#endif
+			);
 	if (!pixbuf)
 		return NULL;
 

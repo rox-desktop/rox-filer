@@ -1242,7 +1242,7 @@ static void filer_add_signals(FilerWindow *filer_window)
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
-			filer_window_destroyed, filer_window);
+			GTK_SIGNAL_FUNC(filer_window_destroyed), filer_window);
 
 	/* Events on the collection widget */
 	gtk_widget_set_events(GTK_WIDGET(collection),
@@ -1251,9 +1251,9 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
 	gtk_signal_connect(collection, "gain_selection",
-			gain_selection, filer_window);
+			GTK_SIGNAL_FUNC(gain_selection), filer_window);
 	gtk_signal_connect(collection, "lose_selection",
-			lose_selection, filer_window);
+			GTK_SIGNAL_FUNC(lose_selection), filer_window);
 	gtk_signal_connect(collection, "selection_clear_event",
 			GTK_SIGNAL_FUNC(collection_lose_selection), NULL);
 	gtk_signal_connect(collection, "selection_get",
@@ -1272,7 +1272,8 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(coll_motion_notify), filer_window);
 
 	/* Drag and drop events */
-	gtk_signal_connect(collection, "drag_data_get", drag_data_get, NULL);
+	gtk_signal_connect(collection, "drag_data_get",
+			GTK_SIGNAL_FUNC(drag_data_get), NULL);
 	drag_set_dest(filer_window);
 }
 
@@ -1812,7 +1813,8 @@ static void show_tooltip(guchar *text)
 	/* And again test if pointer is over the tooltip window */
 	if (py >= y && py <= y + h)
 		y = py - h- 2;
-	gtk_widget_popup(tip_widget, x, y);
+	gtk_widget_set_uposition(tip_widget, x, y);
+	gtk_widget_show(tip_widget);
 
 	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "destroy",
 			GTK_SIGNAL_FUNC(tip_destroyed), NULL);

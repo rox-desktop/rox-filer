@@ -24,6 +24,8 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#include "config.h"
+
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
@@ -109,7 +111,6 @@ static void collection_adjustment(GtkAdjustment *adjustment,
 static void collection_disconnect(GtkAdjustment *adjustment,
 				  Collection    *collection);
 static void set_vadjustment(Collection *collection);
-static void collection_draw(GtkWidget *widget, GdkRectangle *area);
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
 static void scroll_by(Collection *collection, gint diff);
 static gint collection_button_press(GtkWidget      *widget,
@@ -133,9 +134,12 @@ static void cancel_wink(Collection *collection);
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event);
 static void get_visible_limits(Collection *collection, int *first, int *last);
 static void scroll_to_show(Collection *collection, int item);
+#ifndef GTK2
+static void draw_focus(GtkWidget *widget);
+static void collection_draw(GtkWidget *widget, GdkRectangle *area);
 static gint focus_in(GtkWidget *widget, GdkEventFocus *event);
 static gint focus_out(GtkWidget *widget, GdkEventFocus *event);
-static void draw_focus(GtkWidget *widget);
+#endif
 
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
 {
@@ -169,6 +173,7 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 		draw_focus_at(collection, area);
 }
 
+#ifndef GTK2
 static void draw_focus(GtkWidget *widget)
 {
 	Collection    	*collection;
@@ -183,6 +188,7 @@ static void draw_focus(GtkWidget *widget)
 
 	collection_draw_item(collection, collection->cursor_item, FALSE);
 }
+#endif
 		
 GtkType collection_get_type(void)
 {
@@ -209,10 +215,15 @@ GtkType collection_get_type(void)
 	return my_type;
 }
 
+#ifdef GTK2
+typedef void (*FinalizeFn)(GObject *object);
+#endif
+
 static void collection_class_init(CollectionClass *class)
 {
 	GtkObjectClass *object_class;
 	GtkWidgetClass *widget_class;
+	GtkType	       type;
 
 	object_class = (GtkObjectClass*) class;
 	widget_class = (GtkWidgetClass*) class;
@@ -225,10 +236,16 @@ static void collection_class_init(CollectionClass *class)
 			ARG_VADJUSTMENT);
 
 	object_class->destroy = collection_destroy;
+#ifdef GTK2
+	G_OBJECT_CLASS(object_class)->finalize =
+		(FinalizeFn) collection_finalize;
+	type = GTK_CLASS_TYPE(object_class);
+#else
 	object_class->finalize = collection_finalize;
+	type = object_class->type;
+#endif
 
 	widget_class->realize = collection_realize;
-	widget_class->draw = collection_draw;
 	widget_class->expose_event = collection_expose;
 	widget_class->size_request = collection_size_request;
 	widget_class->size_allocate = collection_size_allocate;
@@ -237,9 +254,12 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->key_press_event = collection_key_press;
 	widget_class->button_press_event = collection_button_press;
 	widget_class->motion_notify_event = collection_motion_notify;
+#ifndef GTK2
 	widget_class->focus_in_event = focus_in;
 	widget_class->focus_out_event = focus_out;
+	widget_class->draw = collection_draw;
 	widget_class->draw_focus = draw_focus;
+#endif
 
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
@@ -250,31 +270,33 @@ static void collection_class_init(CollectionClass *class)
 
 	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
 				     GTK_RUN_LAST,
-				     object_class->type,
+				     type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     gain_selection),
-				     gtk_marshal_NONE__UINT,
+				     gtk_marshal_NONE__INT,
 				     GTK_TYPE_NONE, 1,
 				     GTK_TYPE_UINT);
 	collection_signals[LOSE_SELECTION] = gtk_signal_new("lose_selection",
 				     GTK_RUN_LAST,
-				     object_class->type,
+				     type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     lose_selection),
-				     gtk_marshal_NONE__UINT,
+				     gtk_marshal_NONE__INT,
 				     GTK_TYPE_NONE, 1,
 				     GTK_TYPE_UINT);
 	collection_signals[SELECTION_CHANGED] = gtk_signal_new(
 				     "selection_changed",
 				     GTK_RUN_LAST,
-				     object_class->type,
+				     type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     selection_changed),
-				     gtk_marshal_NONE__UINT,
+				     gtk_marshal_NONE__INT,
 				     GTK_TYPE_NONE, 1);
 
+#ifndef GTK2
 	gtk_object_class_add_signals(object_class,
 				collection_signals, LAST_SIGNAL);
+#endif
 }
 
 static void collection_init(Collection *object)
@@ -381,11 +403,17 @@ static void collection_destroy(GtkObject *object)
 	gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
 			collection);
 
-	 if (collection->bg_gc)
-	 {
-		 gdk_gc_destroy(collection->bg_gc);
-		 collection->bg_gc = NULL;
-	 }
+	if (collection->bg_gc)
+	{
+		gdk_gc_destroy(collection->bg_gc);
+		collection->bg_gc = NULL;
+	}
+
+	if (collection->vadj)
+	{
+		gtk_object_unref(GTK_OBJECT(collection->vadj));
+		collection->vadj = NULL;
+	}
 
 	if (GTK_OBJECT_CLASS(parent_class)->destroy)
 		(*GTK_OBJECT_CLASS(parent_class)->destroy)(object);
@@ -397,9 +425,6 @@ static void collection_finalize(GtkObject *object)
 	Collection *collection;
 
 	collection = COLLECTION(object);
-
-	if (collection->vadj)
-		gtk_object_unref(GTK_OBJECT(collection->vadj));
 
 	g_free(collection->items);
 }
@@ -886,6 +911,7 @@ static void diff_vpos(Collection *collection, int diff)
 	gtk_adjustment_set_value(collection->vadj, value);
 }
 
+#ifndef GTK2
 static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 {
 	Collection    *collection;
@@ -904,6 +930,7 @@ static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 	*/
 		collection_paint(collection, area);
 }
+#endif
 
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 {
@@ -1129,7 +1156,11 @@ static gint collection_button_press(GtkWidget      *widget,
 /* 'from' and 'to' are pixel positions. 'step' is the size of each item.
  * Returns the index of the first item covered, and the number of items.
  */
+#ifdef GTK2
+static void get_range(int from, int to, int step, gint *pos, gint *len)
+#else
 static void get_range(int from, int to, int step, short *pos, short *len)
+#endif
 {
 	if (from > to)
 		from ^= to ^= from ^= to;
@@ -1425,6 +1456,7 @@ static gboolean wink_timeout(Collection *collection)
 	return FALSE;
 }
 
+#ifndef GTK2
 static gint focus_in(GtkWidget *widget, GdkEventFocus *event)
 {
 	g_return_val_if_fail(widget != NULL, FALSE);
@@ -1448,6 +1480,7 @@ static gint focus_out(GtkWidget *widget, GdkEventFocus *event)
 
 	return FALSE;
 }
+#endif
 
 /* This is called frequently while auto_scroll is on.
  * Checks the pointer position and scrolls the window if it's
