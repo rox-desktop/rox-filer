@@ -1362,6 +1362,9 @@ static void invert_wink(Collection *collection)
 
 	g_return_if_fail(collection->wink_item >= 0);
 
+	if (!GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
+		return;
+
 	col = collection->wink_item % collection->columns;
 	row = collection->wink_item / collection->columns;
 	collection_get_item_area(collection, row, col, &area);

@@ -219,5 +219,5 @@ cat << EOF
 
 Run ROX and click on the information icon on the toolbar:
 
-	\$ rox &
+	\$ rox
 EOF

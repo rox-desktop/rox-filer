@@ -117,8 +117,8 @@ static void show_features(void);
        "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
-       "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
        "  -v, --version		display the version information and exit\n"   \
+       "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
        "\nThe latest version can be found at:\n"			\
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
