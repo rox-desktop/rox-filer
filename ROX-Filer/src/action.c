@@ -102,7 +102,7 @@ static unsigned long file_counter;	/* For Disk Usage */
 
 static struct mode_change *mode_change = NULL;	/* For Permissions */
 static FindCondition *find_condition = NULL;	/* For Find */
-static MIME_type *type_change=NULL;
+static MIME_type *type_change = NULL;
 
 /* Only used by child */
 static gboolean o_force = FALSE;
@@ -298,19 +298,19 @@ static void show_settype_help(gpointer data)
 	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
 	gtk_label_set_markup(GTK_LABEL(text), _(
 "Normally ROX-Filer determines the type of a regular file\n"
-"by matching it's name against a pattern.  To change the\n"
+"by matching it's name against a pattern. To change the\n"
 "type of the file you must rename it.\n" 
 "\n"
 "Newer file systems can support something called 'Extended\n"
 "Attributes' which can be used to store additional data with\n"
-"each file as named parameters.  ROX-Filer uses the\n"
+"each file as named parameters. ROX-Filer uses the\n"
 "'user.mime_type' attribute to store file types.\n" 
 "\n"
 "File types are only supported for regular files, not\n"
 "directories, devices, pipes or sockets, and then only\n"
 "on certain file systems and where the OS implements them.\n" 
 "\n"
-ATTR_MAN_PAGE ));
+ATTR_MAN_PAGE));
 
 	g_signal_connect(help, "response",
 			G_CALLBACK(gtk_widget_destroy), NULL);
@@ -1162,7 +1162,6 @@ static void do_chmod(const char *path, const char *unused)
 static void do_settype(const char *path, const char *unused)
 {
 	struct stat 	info;
-	const char     *comment;
 
 	check_flags();
 
@@ -1182,11 +1181,12 @@ static void do_settype(const char *path, const char *unused)
 				  _("?Change type of '%s'?"), path))
 			return;
 	}
+
 	for (;;)
 	{
 		if (new_entry_string)
 		{
-			type_change=mime_type_lookup(new_entry_string);
+			type_change = mime_type_lookup(new_entry_string);
 			null_g_free(&new_entry_string);
 		}
 
@@ -1199,11 +1199,6 @@ static void do_settype(const char *path, const char *unused)
 				  _("?Change type of '%s'?"), path))
 			return;
 	}
-	comment=mime_type_comment(type_change);
-
-	if (!o_brief)
-		printf_send(_("'Changing type of '%s' to '%s'\n"), path,
-			    comment);
 
 	if (mc_lstat(path, &info))
 	{
@@ -1213,8 +1208,17 @@ static void do_settype(const char *path, const char *unused)
 	if (S_ISLNK(info.st_mode))
 		return;
 
-	if(S_ISREG(info.st_mode))
+	if (S_ISREG(info.st_mode))
 	{
+		if (!o_brief)
+		{
+			const char *comment;
+
+			comment = mime_type_comment(type_change);
+			printf_send(_("'Changing type of '%s' to '%s'\n"), path,
+				    comment);
+		}
+
 		if (xtype_set(path, type_change))
 		{
 			send_error();
@@ -1222,12 +1226,9 @@ static void do_settype(const char *path, const char *unused)
 		}
 
 		send_check_path(path);
-
 	}
-	else if(!S_ISDIR(info.st_mode))
+	else if (S_ISDIR(info.st_mode))
 	{
-		send_mount_path(path);
-
 		if (o_recurse)
 		{
 			guchar *safe_path;
@@ -2048,7 +2049,7 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 {
 	GtkWidget	*abox;
 	GUIside		*gui_side;
-	static GList	*presets = NULL;
+	GList		*presets = NULL;
 	gboolean	recurse = force_recurse || o_action_recurse.int_value;
 
 	if (!paths)
@@ -2056,11 +2057,6 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 		report_error(_("You need to select the items "
 				"whose type you want to change"));
 		return;
-	}
-
-	if (!presets)
-	{
-		presets = mime_type_name_list();
 	}
 
 	if (!last_settype_string)
@@ -2089,8 +2085,12 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 		'R', recurse);
 
 	gui_side->default_string = &last_settype_string;
+
+	/* Note: get the list again each time -- it can change */
+	presets = mime_type_name_list();
 	abox_add_combo(ABOX(abox), _("Type:"), presets, new_entry_string,
 				new_help_button(show_settype_help, NULL));
+	g_list_free(presets);
 
 	g_signal_connect(ABOX(abox)->entry, "changed",
 			G_CALLBACK(entry_changed), gui_side);

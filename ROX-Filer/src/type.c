@@ -244,18 +244,20 @@ const char *basetype_name(DirItem *item)
 
 static void append_names(gpointer key, gpointer value, gpointer udata)
 {
-	GList **list=(GList **) udata;
+	GList **list = (GList **) udata;
 
-	*list=g_list_prepend(*list, key);
+	*list = g_list_prepend(*list, key);
 }
 
-/* Return list of all mime type names */
+/* Return list of all mime type names. Caller must free the list
+ * but NOT the strings it contains (which are never freed).
+ */
 GList *mime_type_name_list(void)
 {
-	GList *list=NULL;
+	GList *list = NULL;
 
 	g_hash_table_foreach(type_hash, append_names, &list);
-	list=g_list_sort(list, (GCompareFunc) strcmp);
+	list = g_list_sort(list, (GCompareFunc) strcmp);
 
 	return list;
 }
@@ -369,7 +371,7 @@ static char *handler_for(MIME_type *type)
 
 MIME_type *mime_type_lookup(const char *type)
 {
-  return get_mime_type(type, FALSE);
+	return get_mime_type(type, TRUE);
 }
 
 /*			Actions for types 			*/

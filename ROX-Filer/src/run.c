@@ -121,7 +121,7 @@ void run_with_files(const char *path, GList *uri_list)
 
 	rox_spawn(home_dir, argv);
 
-	for(i=1; i<argc; i++)
+	for (i = 1; i < argc; i++)
 		g_free((gchar *) argv[i]);
 	g_free(argv);
 }

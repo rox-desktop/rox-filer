@@ -57,41 +57,44 @@
 
 MIME_type *xtype_get(const char *path)
 {
-  ssize_t size;
-  gchar *buf;
-  MIME_type *type=NULL;
+	ssize_t size;
+	gchar *buf;
+	MIME_type *type = NULL;
 
-  errno=0;
-  size=getxattr(path, XTYPE_ATTR, "", 0);
-  if(size>0) {
-    buf=g_new(gchar, size+1);
-    size=getxattr(path, XTYPE_ATTR, buf, size);
+	size = getxattr(path, XTYPE_ATTR, "", 0);
+	if (size > 0)
+	{
+		int new_size;
 
-    if(size>0) {
-      buf[size]=0;
-      type=mime_type_lookup(buf);
-    }
-    g_free(buf);
+		buf = g_new(gchar, size + 1);
+		new_size = getxattr(path, XTYPE_ATTR, buf, size);
 
-  }
-  if(type)
-    return type;
-  
-  /* Fall back to non-extended */
-  return type_from_path(path);
+		if (size == new_size)
+		{
+			buf[size] = '\0';
+			type = mime_type_lookup(buf);
+		}
+		g_free(buf);
+
+	}
+	if (type)
+		return type;
+
+	/* Fall back to non-extended */
+	return type_from_path(path);
 }
 
+/* 0 on success */
 int xtype_set(const char *path, const MIME_type *type)
 {
-  int res;
-  gchar *ttext;
-  
-  errno=0;
-  ttext=g_strdup_printf("%s/%s", type->media_type, type->subtype);
-  res=setxattr(path, XTYPE_ATTR, ttext, strlen(ttext), 0);
-  g_free(ttext);
-  
-  return res;
+	int res;
+	gchar *ttext;
+
+	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
+	res = setxattr(path, XTYPE_ATTR, ttext, strlen(ttext), 0);
+	g_free(ttext);
+
+	return res;
 }
 
 #elif defined(HAVE_ATTROPEN)
@@ -155,14 +158,14 @@ int xtype_set(const char *path, const MIME_type *type)
 
 MIME_type *xtype_get(const char *path)
 {
-  /* Fall back to non-extended */
-  return type_from_path(path);
+	/* Fall back to non-extended */
+	return type_from_path(path);
 }
 
 int xtype_set(const char *path, const MIME_type *type)
 {
-  errno=ENOSYS;
-  return 1; /* Set type failed */
+	errno = ENOSYS;
+	return 1; /* Set type failed */
 }
 
 #endif

@@ -2385,21 +2385,21 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 
 	/* Subtract the no-go areas... */
 
-	if(o_top_margin.int_value>0)
+	if (o_top_margin.int_value > 0)
 	{
-		used_rect.x=0;
-		used_rect.y=0;
-		used_rect.width=gdk_screen_width();
-		used_rect.height=o_top_margin.int_value;
+		used_rect.x = 0;
+		used_rect.y = 0;
+		used_rect.width = gdk_screen_width();
+		used_rect.height = o_top_margin.int_value;
 		gdk_region_union_with_rect(used, &used_rect);
 	}
 
-	if(o_bottom_margin.int_value>0)
+	if (o_bottom_margin.int_value > 0)
 	{
-		used_rect.x=0;
-		used_rect.y=gdk_screen_height()-o_bottom_margin.int_value;
-		used_rect.width=gdk_screen_width();
-		used_rect.height=gdk_screen_height();
+		used_rect.x = 0;
+		used_rect.y = gdk_screen_height() - o_bottom_margin.int_value;
+		used_rect.width = gdk_screen_width();
+		used_rect.height = o_bottom_margin.int_value;
 		gdk_region_union_with_rect(used, &used_rect);
 	}
 

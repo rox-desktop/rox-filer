@@ -445,7 +445,7 @@ drag_data_get (GtkWidget	*widget,
       {
 	g_signal_emit (widget, savebox_signals[SAVE_TO_FILE], 0,
 		       pathname, &result);
-	g_free(pathname);
+	g_free (pathname);
 
 	if (result == GTK_XDS_SAVED)
 	  {
@@ -523,8 +523,8 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 	  
 	  g_signal_emit (widget, savebox_signals[SAVED_TO_URI], 0,
 			 path ? path : (const gchar *) uri);
-	  if(path)
-	    g_free(path);
+	  if (path)
+	    g_free (path);
 	  g_free(uri);
 
 	  gtk_widget_destroy (widget);
@@ -589,6 +589,7 @@ static void do_save (GtkSavebox *savebox)
     }
   else if (result == GTK_XDS_NO_HANDLER)
     g_warning ("No handler for saving to a file.\n");
+
   g_free(pathname);
 }
 

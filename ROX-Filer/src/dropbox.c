@@ -289,7 +289,7 @@ static void drop_box_drag_data_received(GtkWidget *drop_box,
 
 	success = TRUE;
 err:
-	if(path)
+	if (path)
 		g_free(path);
 	
 	if (uris)

@@ -467,7 +467,7 @@ static gboolean is_local_address(char *address)
 
 /* Convert a URI to a local pathname (or NULL if it isn't local).
  * The returned pointer needs to be passed to g_free() when done (if not NULL).
- * THIS IS A CHANGE.  The return path has been processed by unescape_uri().
+ * THIS IS A CHANGE. The return path has been processed by unescape_uri().
  * Possible formats:
  *	/path
  *	///path
@@ -480,8 +480,9 @@ char *get_local_path(const char *uri)
 	{
 		char    *path, *uri_host;
 
+		/* Just a local path - no host part */
 		if (uri[1] != '/')
-			return unescape_uri(uri); /* Just a local path - no host part */
+			return unescape_uri(uri);
 		                    
 		path = strchr(uri + 2, '/');
 		if (!path)

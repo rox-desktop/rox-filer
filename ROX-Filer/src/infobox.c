@@ -467,7 +467,10 @@ static gboolean read_du_output(GIOChannel *source, GIOCondition cond, DU *du)
 	
 	return FALSE;
 }
-	
+
+/* XXX: possible race?: might still get output from process after freeing
+ * everything. Should wait for EOF / close channel?
+ */
 static void kill_du_output(GtkWidget *widget, DU *du)
 {
 	g_io_channel_unref(du->chan);

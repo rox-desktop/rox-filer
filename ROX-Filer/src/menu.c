@@ -209,7 +209,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
 {">" N_("Properties"),		NULL, file_op, FILE_PROPERTIES, "<StockItem>", GTK_STOCK_PROPERTIES},
 {">" N_("Count"),		NULL, file_op, FILE_USAGE, NULL},
-{">" N_("Set type..."),		NULL, file_op, FILE_SET_TYPE, NULL},
+{">" N_("Set Type..."),		NULL, file_op, FILE_SET_TYPE, NULL},
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Find"),		NULL, file_op, FILE_FIND, "<StockItem>", GTK_STOCK_FIND},

@@ -339,7 +339,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 
 	type = type_from_path(path);
 	if (!type)
-		type=text_plain;
+		type = text_plain;
 
 	/* Add an entry, set to NULL, so no-one else tries to load this
 	 * image.
@@ -371,11 +371,13 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		 memory, but since we go away very quickly, that's ok.) */
 		if (thumb_prog)
 		{
-			DirItem *item=diritem_new(g_basename(thumb_prog));
+			DirItem *item;
+			
+			item = diritem_new(g_basename(thumb_prog));
 
 			diritem_restat(thumb_prog, item, NULL);
-			if(item->flags & ITEM_FLAG_APPDIR)
-				thumb_prog=g_strconcat(thumb_prog, "/AppRun",
+			if (item->flags & ITEM_FLAG_APPDIR)
+				thumb_prog = g_strconcat(thumb_prog, "/AppRun",
 						       NULL);
 						  
 			execl(thumb_prog, thumb_prog, path,

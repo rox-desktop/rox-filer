@@ -442,7 +442,8 @@ $ rox --bottom=</screen>
      </entry></row>
 
      <row><entry>Double-click background</entry><entry>
-       Resize the window to a sensible size.
+       Resize the window to a sensible size (this can be turned off from
+       the Options window).
      </entry></row>
 
      <row><entry><keycap>Backspace</keycap></entry><entry>
@@ -922,10 +923,11 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Info</guimenuitem></entry><entry>
+         <guimenuitem>Properties</guimenuitem></entry><entry>
          Display extra information about this object. You can also change
 	 the access permissions from here (<guimenuitem>Permissions</guimenuitem>
-	 below allows you to change many files at once).
+	 below allows you to change many files at once), and change the target
+	 to which a symlink points.
        </entry></row>
 
        <row><entry>
@@ -936,10 +938,15 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
+         <guimenuitem>Set Type...</guimenuitem></entry><entry>
+         Set the MIME type for a file. This only works on filesystems with extended attribute support. For older filesystems, you will have to rename a file to change its type.
+       </entry></row>
+
+       <row><entry>
          <guimenuitem>Permissions</guimenuitem></entry><entry>
          Allows you to change the permissions for the selected files.
 	 If only one file is to be changed, you can use
-	 <guimenuitem>Info</guimenuitem> instead for a simpler interface.
+	 <guimenuitem>Properties</guimenuitem> instead for a simpler interface.
        </entry></row>
 
        <row><entry>
@@ -1146,7 +1153,7 @@ $ rox --bottom=</screen>
        <row><entry>
          <guimenuitem>About ROX-Filer...</guimenuitem></entry><entry>
          Display information about the file. This is the same as locating ROX-Filer
-	 itself in a filer window and selecting <guimenuitem>Info</guimenuitem> from
+	 itself in a filer window and selecting <guimenuitem>Properties</guimenuitem> from
 	 the file menu.
        </entry></row>
 
@@ -1193,8 +1200,8 @@ $ rox --bottom=</screen>
      hidden directory inside <filename>SendTo</filename> called
      <filename>.image</filename>, or whatever type you want to use.
      You can use either the complete type (eg <filename>.image_png</filename>)
-     or just the media type. Use <guimenuitem>Info</guimenuitem> over a file to
-     find out its MIME type.
+     or just the media type. Use <guimenuitem>Properties</guimenuitem> over a
+     file to find out its MIME type.
     </para>
     <para>
      Entries in these hidden directories are shown only for files of

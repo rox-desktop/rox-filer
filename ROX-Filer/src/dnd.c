@@ -344,12 +344,13 @@ static gchar *uri_list_to_utf8(const char *uri_list)
 		char *uri = (char *) next_uri->data;
 		char *local;
 
-		local=get_local_path(uri);
+		local = get_local_path(uri);
 
 		if (new->len)
 			g_string_append_c(new, ' ');
 
-		if (local) {
+		if (local)
+		{
 			g_string_append(new, local);
 			g_free(local);
 		}
@@ -870,6 +871,16 @@ static void got_data_raw(GtkWidget 		*widget,
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 }
 
+static gboolean uri_is_local(const char *uri)
+{
+	char *path;
+	path = get_local_path(uri);
+	if (!path)
+		return FALSE;
+	g_free(path);
+	return TRUE;
+}
+
 /* We've got a list of URIs from somewhere (probably another filer window).
  * If the files are on the local machine then try to copy them ourselves,
  * otherwise, if there was only one file and application/octet-stream was
@@ -886,7 +897,6 @@ static void got_uri_list(GtkWidget 		*widget,
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
 	char		*type;
-	gchar           *lpath = NULL;
 	
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
@@ -909,8 +919,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		error = _("No URIs in the text/uri-list (nothing to do!)");
 	else if (context->action != GDK_ACTION_ASK && type == drop_dest_prog)
 		run_with_files(dest_path, uri_list);
-	else if ((!uri_list->next) &&
-		 (!(lpath=get_local_path(uri_list->data))))
+	else if ((!uri_list->next) && !uri_is_local(uri_list->data))
 	{
 		/* There is one URI in the list, and it's not on the local
 		 * machine. Get it via the X server if possible.
@@ -936,7 +945,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	}
 	else
 	{
-		GList		*local_paths = NULL;
+		GList *local_paths = NULL;
 
 		/* Either one local URI, or a list. If everything in the list
 		 * isn't local then we are stuck.
@@ -978,8 +987,6 @@ static void got_uri_list(GtkWidget 		*widget,
 
 		destroy_glist(&local_paths);
 	}
-	if(lpath)
-		g_free(lpath);
 
 	if (error)
 	{

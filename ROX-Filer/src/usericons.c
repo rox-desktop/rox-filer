@@ -565,23 +565,25 @@ static void drag_icon_dropped(GtkWidget	*drop_box,
 	do_set_icon(dialog, path);
 }
 
-/* Set the thumbnail program for the given MIME type.  We make a link */
+/* Set the thumbnail program for the given MIME type. We make a link. */
 static gboolean set_thumbnail_for_type(MIME_type *type, const gchar *exepath,
 				  gboolean just_media)
 {
 	gchar *leaf;
 	gchar *path;
 
-	if(just_media)
-		leaf=g_strdup(type->media_type);
+	if (just_media)
+		leaf = g_strdup(type->media_type);
 	else
-		leaf=g_strconcat(type->media_type, "_", type->subtype, NULL);
+		leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
 
-	path=choices_find_path_save(leaf, "MIME-thumb", TRUE);
+	path = choices_find_path_save(leaf, "MIME-thumb", TRUE);
 	g_free(leaf);
 
-	if(path) {
-		if(symlink(exepath, path)) {
+	if (path)
+	{
+		if (symlink(exepath, path))
+		{
 			delayed_error("symlink: %s", g_strerror(errno));
 			g_free(path);
 			return FALSE;
@@ -600,9 +602,10 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 	gchar *leaf;
 	DirItem *item;
 
-	item=diritem_new("");
+	item = diritem_new("");
 	diritem_restat(iconpath, item, NULL);
-	if(item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE)) {
+	if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	{
 		diritem_free(item);
 		return set_thumbnail_for_type(type, iconpath, just_media);
 	}
