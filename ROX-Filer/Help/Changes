@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+04-Oct-2000
+~~~~~~~~~~~
+Bugfix: If AppRun was a symlink, then the owner of the file was checked, not
+	the owner of the symlink. Slight security risk, and also prevented
+	users symlinking AppRun to their binaries...
+
 29-Sep-2000
 ~~~~~~~~~~~
 Bugfix: Deleting a pinboard icon while it was highlighted caused a crash.

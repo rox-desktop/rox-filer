@@ -227,12 +227,14 @@ void dir_restat(guchar *path, DirItem *item)
 		/* Might be an application directory - better check...
 		 * AppRun must have the same owner as the directory
 		 * (to stop people putting an AppRun in, eg, /tmp)
+		 * If AppRun is a symlink, we want the symlink's owner.
 		 */
 		path_len = strlen(path);
 		/* (sizeof(string) includes \0) */
 		tmp = g_malloc(path_len + sizeof("/AppIcon.xpm"));
 		sprintf(tmp, "%s/%s", path, "AppRun");
-		if (!mc_stat(tmp, &info) && info.st_uid == uid)
+
+		if (mc_lstat(tmp, &info) == 0 && info.st_uid == uid)
 		{
 			struct stat	icon;
 
