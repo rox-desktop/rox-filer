@@ -24,7 +24,7 @@ chdir;
 mkdir "rox-$a.$b.$c", 0777;
 chdir "rox-$a.$b.$c";
 
-system "cvs export -r Release-$a-$b-$c rox";
+system "cvs -d:pserver:anonymous@cvs.rox.sourceforge.net:/cvsroot/rox export -r Release-$a-$b-$c rox";
 system "cd rox/ROX-Filer/src; autoconf";
 system "cp ~/Apps/ROX-Filer/Help/Manual.ps rox/ROX-Filer/Help";
 system "cp -r ~/Apps/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
