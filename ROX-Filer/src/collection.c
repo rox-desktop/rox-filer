@@ -136,6 +136,8 @@ static void cancel_wink(Collection *collection);
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event);
 static void get_visible_limits(Collection *collection, int *first, int *last);
 static void scroll_to_show(Collection *collection, int item);
+static gint focus_in(GtkWidget *widget, GdkEventFocus *event);
+static gint focus_out(GtkWidget *widget, GdkEventFocus *event);
 
 static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 {
@@ -216,6 +218,9 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->button_press_event = collection_button_press;
 	widget_class->button_release_event = collection_button_release;
 	widget_class->motion_notify_event = collection_motion_notify;
+	widget_class->focus_in_event = focus_in;
+	widget_class->focus_out_event = focus_out;
+
 	object_class->set_arg = collection_set_arg;
 	object_class->get_arg = collection_get_arg;
 
@@ -1550,6 +1555,30 @@ static gboolean cancel_wink_timeout(Collection *collection)
 	return FALSE;
 }
 
+static gint focus_in(GtkWidget *widget, GdkEventFocus *event)
+{
+	g_return_val_if_fail(widget != NULL, FALSE);
+	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
+	g_return_val_if_fail(event != NULL, FALSE);
+
+	GTK_WIDGET_SET_FLAGS(widget, GTK_HAS_FOCUS);
+	gtk_widget_draw_focus(widget);
+
+	return FALSE;
+}
+
+static gint focus_out(GtkWidget *widget, GdkEventFocus *event)
+{
+	g_return_val_if_fail(widget != NULL, FALSE);
+	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
+	g_return_val_if_fail(event != NULL, FALSE);
+
+	GTK_WIDGET_UNSET_FLAGS(widget, GTK_HAS_FOCUS);
+	gtk_widget_draw_focus(widget);
+
+	return FALSE;
+}
+
 /* Functions for managing collections */
 
 /* Remove all objects from the collection */
@@ -1953,7 +1982,7 @@ void collection_set_cursor_item(Collection *collection, gint item)
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(item >= -1 &&
-		(item < (int) collection->number_of_items || item == 0));
+		(item < collection->number_of_items || item == 0));
 
 	old_item = collection->cursor_item;
 

@@ -48,6 +48,7 @@
 #include "type.h"
 #include "options.h"
 #include "action.h"
+#include "minibuffer.h"
 
 #define ROW_HEIGHT_LARGE 64
 #define ROW_HEIGHT_SMALL 32
@@ -99,7 +100,7 @@ static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-void show_menu(Collection *collection, GdkEventButton *event,
+static void show_menu(Collection *collection, GdkEventButton *event,
 		int number_selected, gpointer user_data);
 static gint focus_in(GtkWidget *widget,
 			GdkEventFocus *event,
@@ -152,9 +153,11 @@ static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
 			FilerWindow *filer_window);
-static void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 static void shrink_width(FilerWindow *filer_window);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
+static void open_item(Collection *collection,
+		gpointer item_data, int item_number,
+		gpointer user_data);
 
 static GdkAtom xa_string;
 enum
@@ -247,8 +250,11 @@ static void update_display(Directory *dir,
 
 				cursor = collection->number_of_items - 1;
 				if (filer_window->had_cursor)
+				{
 					collection_set_cursor_item(collection,
 							cursor);
+					filer_window->mini_cursor_base = cursor;
+				}
 				else
 					collection_wink_item(collection,
 							cursor);
@@ -310,6 +316,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
+
+	gtk_idle_remove_by_data(filer_window);
 
 	if (window_with_selection == filer_window)
 		window_with_selection = NULL;
@@ -718,7 +726,7 @@ static void draw_item_large(GtkWidget *widget,
 			selected);
 }
 
-void show_menu(Collection *collection, GdkEventButton *event,
+static void show_menu(Collection *collection, GdkEventButton *event,
 		int item, gpointer user_data)
 {
 	show_filer_menu((FilerWindow *) user_data, event, item);
@@ -914,7 +922,7 @@ int sort_by_size(const void *item1, const void *item2)
 		sort_by_name(item1, item2);
 }
 
-void open_item(Collection *collection,
+static void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data)
 {
@@ -1198,7 +1206,7 @@ void change_to_parent(FilerWindow *filer_window)
  * the first item if from is NULL. If there is currently no cursor then
  * simply wink 'from' (if not NULL).
  */
-static void filer_change_to(FilerWindow *filer_window, char *path, char *from)
+void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 {
 	char	*from_dup;
 	
@@ -1222,6 +1230,10 @@ static void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 				filer_window->path);
 		collection_set_cursor_item(filer_window->collection, -1);
 		attach(filer_window);
+
+		if (GTK_WIDGET_VISIBLE(filer_window->minibuffer))
+			gtk_idle_add((GtkFunction) minibuffer_show,
+					filer_window);
 	}
 	else
 	{
@@ -1474,7 +1486,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	{
 		GtkWidget	*vbox;
 
-		gtk_signal_connect(GTK_OBJECT(filer_window->window),
+		gtk_signal_connect(GTK_OBJECT(collection),
 				"key_press_event",
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
@@ -1500,7 +1512,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 		gtk_box_pack_start(GTK_BOX(vbox), collection, TRUE, TRUE, 0);
 
-		filer_window->minibuffer = gtk_entry_new();
+		filer_window->minibuffer = create_minibuffer(filer_window);
 		gtk_box_pack_start(GTK_BOX(vbox), filer_window->minibuffer,
 				FALSE, TRUE, 0);
 
@@ -1715,17 +1727,3 @@ void filer_check_mounted(char *path)
 		}
 	}
 }
-
-/* Display the minibuffer and let the user edit the path */
-void filer_enter_path(FilerWindow *filer_window)
-{
-	g_return_if_fail(filer_window != NULL);
-	g_return_if_fail(filer_window->minibuffer != NULL);
-
-	gtk_entry_set_text(GTK_ENTRY(filer_window->minibuffer),
-			filer_window->path);
-
-	gtk_widget_show(filer_window->minibuffer);
-}
-
-

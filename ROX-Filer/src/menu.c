@@ -46,6 +46,7 @@
 #include "choices.h"
 #include "savebox.h"
 #include "mount.h"
+#include "minibuffer.h"
 
 #define C_ "<control>"
 
@@ -1178,7 +1179,7 @@ static void enter_path(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_enter_path(window_with_focus);
+	minibuffer_show(window_with_focus);
 }
 
 static void rox_help(gpointer data, guint action, GtkWidget *widget)

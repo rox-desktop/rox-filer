@@ -80,7 +80,7 @@ struct _Collection
 	gint		wink_item;	/* -1 if not active */
 	gint		wink_timeout;
 	guint		columns;
-	guint		number_of_items;
+	gint		number_of_items;	/* (often compared with -1) */
 	guint		item_width, item_height;
 
 	guint		number_selected;

@@ -33,7 +33,6 @@ typedef enum
 struct _FilerWindow
 {
 	GtkWidget	*window;
-	GtkWidget	*minibuffer;
 	char		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	panel;
@@ -49,6 +48,9 @@ struct _FilerWindow
 
 	gboolean	had_cursor;	/* (before changing directory) */
 	char		*auto_select;	/* If it we find while scanning */
+
+	GtkWidget	*minibuffer;
+	int		mini_cursor_base;
 };
 
 extern FilerWindow 	*window_with_focus;
@@ -75,6 +77,6 @@ void full_refresh(void);
 void filer_openitem(FilerWindow *filer_window, int item_number,
 		gboolean shift, gboolean adjust);
 void filer_check_mounted(char *path);
-void filer_enter_path(FilerWindow *filer_window);
+void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 
 #endif /* _FILER_H */
