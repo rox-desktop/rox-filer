@@ -2597,6 +2597,11 @@ static void pinboard_reshape_icon(Icon *icon)
 		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
 				pi->win, x, y);
 	}
+
+	/* Newer versions of GTK seem to need this, or the icon doesn't
+	 * get redrawn.
+	 */
+	gtk_widget_queue_draw(pi->win);
 }
 
 /* Sets the pinboard_font global from the option. Doesn't do anything else. */
