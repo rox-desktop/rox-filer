@@ -1093,10 +1093,9 @@ Control
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-7 2 0 0 -1 -1 -1 -1
+6 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
-0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -1111,8 +1110,6 @@ multicol5
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1134,13 +1131,9 @@ Options...
 \newline 
 Configure ROX-Filer.
 \newline 
-New Directory...
+New
 \newline 
-Create a new directory in this one.
-\newline 
-New File...
-\newline 
-Create an empty file.
+Create a new file or subdirectory inside this directory.
 \newline 
 Xterm Here
 \newline 
@@ -1703,6 +1696,102 @@ e').
  If the target file is never going to move then you want an absolute link,
  but if the target may move (and the symlink will be moved with it) then
  you want a relative link.
+\layout Subsection
+
+The new menu
+\layout Standard
+
+Each entry in this submenu opens a savebox for creating a new file or directory.
+ There are two standard entries; the others are the contents of your `
+\family typewriter 
+<Choices>/Templates
+\family default 
+' directory, if it exists.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+4 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "9cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+Directory
+\newline 
+Create a new directory.
+\newline 
+File
+\newline 
+Create a blank file.
+\newline 
+<user entries>
+\newline 
+Copy a file from your Templates directory.
+\layout Standard
+
+To add your own entries, create a new directory called `
+\family typewriter 
+~/Choices/Templates
+\family default 
+' (if you have the default CHOICESPATH) and put any files you want in there.
+ Each file in the directory will appear on the menu and the box that appears
+ will copy it.
+ For example, you could create a blank HTML file:
+\layout LyX-Code
+
+<html>
+\layout LyX-Code
+
+  <head>
+\layout LyX-Code
+
+    <title>My Page</title>
+\layout LyX-Code
+
+  </head>
+\layout LyX-Code
+
+  <body>
+\layout LyX-Code
+
+    The contents.
+\layout LyX-Code
+
+  </body>
+\layout LyX-Code
+
+</html>
+\layout Standard
+
+Save this as `
+\family typewriter 
+index.html
+\family default 
+' inside the 
+\family typewriter 
+Templates
+\family default 
+ directory and you can easily create new HTML files.
+ You can also save blank documents from various applications into here (eg,
+ a blank spreadsheet, a blank letter, etc).
+\layout Standard
+
+Note that you cannot set keyboard shortcuts for these user-defined entries
+ at present.
 \layout Subsection
 
 The window menu
@@ -3096,8 +3185,23 @@ See section
 Filer window options
 \layout Itemize
 
-`Automatic resize' causes the window to resize when you change directory
- if more space is useful.
+`Automatically resize filer windows' can be used to control when windows
+ are automatically resized:
+\begin_deeper 
+\layout Itemize
+
+`...never' turns off auto-resizing.
+ Windows must be resized manually.
+\layout Itemize
+
+`...when changing the display style' will resize the window automatically when
+ you change the icon size or the type of details to be displayed.
+\layout Itemize
+
+`...always' causes the window to resize whenever it seems useful (that is,
+ when changing to a different directory or when switching between display
+ styles).
+\end_deeper 
 \layout Itemize
 
 `Unique windows' prevents you from having two windows showing the same directory.
@@ -3157,12 +3261,10 @@ ROX-Filer uses the standard XDND protocol for drag-and-drop.
 Menu options
 \layout Standard
 
-The `Xterm here' program is the one used when you choose `Xterm here' from
- the menu.
- You can replace it with another program such as `gnome-terminal' or `konsole'
- if you like.
- In fact, any program will do, but note that you cannot pass any options
- to the program at present.
+The `Xterm here' program is the command used when you choose `Xterm here'
+ from the menu.
+ You can replace it with another command such as `gnome-terminal', `konsole',
+ or anything else.
 \layout Subsection
 
 Mouse bindings
