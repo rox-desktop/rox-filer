@@ -80,6 +80,8 @@ int main(int argc, char **argv)
 	int		 stderr_pipe[2];
 	struct sigaction act = {};
 
+	/* XXX: Set our process name to something sensible */
+
 	gtk_init(&argc, &argv);
 	choices_init("ROX-Filer");
 

@@ -791,7 +791,7 @@ static void scroll_by(Collection *collection, gint diff)
 	collection_paint(collection, NULL);
 }
 
-void resize_arrays(Collection *collection, guint new_size)
+static void resize_arrays(Collection *collection, guint new_size)
 {
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));

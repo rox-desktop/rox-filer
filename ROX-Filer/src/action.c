@@ -533,7 +533,6 @@ static void delete_cb(gpointer data)
 	
 	g_string_sprintf(message, "'\nDone\n");
 	send();
-	sleep(1);
 }
 
 static void list_cb(gpointer data)
@@ -551,7 +550,6 @@ static void list_cb(gpointer data)
 
 	g_string_sprintf(message, "'\nDone\n");
 	send();
-	sleep(1);
 }
 
 /*			EXTERNAL INTERFACE			*/
@@ -575,6 +573,7 @@ void action_delete(FilerWindow *filer_window)
 	if (!gui_side)
 		return;
 
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Delete");
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -589,6 +588,7 @@ void action_copy(GSList *paths, char *dest)
 	if (!gui_side)
 		return;
 
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Copy");
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -603,6 +603,7 @@ void action_move(GSList *paths, char *dest)
 	if (!gui_side)
 		return;
 
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Move");
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -617,6 +618,7 @@ void action_link(GSList *paths, char *dest)
 	if (!gui_side)
 		return;
 
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Link");
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }

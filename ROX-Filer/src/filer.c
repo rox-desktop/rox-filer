@@ -192,6 +192,9 @@ static gboolean idle_scan_dir(gpointer data)
 					filer_window->collection->item_height);
 			collection_qsort(filer_window->collection,
 					sort_by_name);
+			if (filer_window->flags & FILER_NEEDS_RESCAN)
+				scan_dir(filer_window);
+
 			return FALSE;		/* Finished */
 		}
 
@@ -279,7 +282,8 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	item->base_type = base_type;
 	item->mime_type = NULL;
 
-	if (base_type == TYPE_DIRECTORY)
+	if (base_type == TYPE_DIRECTORY &&
+			!(filer_window->flags & ITEM_FLAG_MOUNT_POINT))
 	{
 		/* Might be an application directory - better check... */
 		g_string_append(path, "/AppRun");
@@ -468,7 +472,13 @@ void scan_dir(FilerWindow *filer_window)
 	struct stat info;
 
 	if (filer_window->dir)
-		stop_scanning(filer_window);
+	{
+		/* Already scanning - start again when we finish */
+		filer_window->flags |= FILER_NEEDS_RESCAN;
+		return;
+	}
+	filer_window->flags &= ~FILER_NEEDS_RESCAN;
+
 	if (panel_with_timeout == filer_window)
 	{
 		panel_with_timeout = NULL;
@@ -827,7 +837,7 @@ void refresh_dirs(char *path)
 	while (list)
 	{
 		next = list->next;
-		may_rescan((FilerWindow *) list->data);
+		scan_dir((FilerWindow *) list->data);
 		list = next;
 	}
 }
