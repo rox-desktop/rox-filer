@@ -1,0 +1,2135 @@
+#This file was created by <tal197> Sat Apr  8 16:21:26 2000
+#LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
+\lyxformat 2.15
+\textclass article
+\language default
+\inputencoding latin1
+\fontscheme default
+\graphics default
+\paperfontsize default
+\spacing single 
+\papersize Default
+\paperpackage widemarginsa4
+\use_geometry 0
+\use_amsmath 0
+\paperorientation portrait
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\defskip medskip
+\quotes_language english
+\quotes_times 2
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+
+\layout Title
+
+ROX-Filer User Manual
+\layout Author
+
+Thomas Leonard, tal197@ecs.soton.ac.uk
+\layout Date
+
+
+\latex latex 
+
+\backslash 
+today
+\layout Abstract
+
+ROX-Filer is a graphical file manger for the X Window System.
+ Its user interface is based on the RISC OS filer and it supports similar
+ features such as application directories and drag-and-drop loading and
+ saving of files.
+\layout Standard
+
+
+\begin_inset LatexCommand \tableofcontents
+
+\end_inset 
+
+
+\layout Section
+
+Introduction
+\layout Standard
+
+ROX-Filer is a simple and easy to use graphical file manager for X11, the
+ windowing system used on Unix and Unix-like operating systems.
+ It is also the core component of the ROX Desktop
+\begin_inset LatexCommand \cite{ROX}
+
+\end_inset 
+
+.
+\layout Subsection
+
+Features
+\layout Description
+
+XDND A common drag-and-drop protocol used, for example, by the GNOME desktop
+\begin_inset LatexCommand \cite{GNOME}
+
+\end_inset 
+
+.
+ This allows data to be loaded into an application by dragging it from a
+ filer window to a program.
+ The full specification is given in 
+\begin_inset LatexCommand \cite{DND}
+
+\end_inset 
+
+.
+\layout Description
+
+XDS An extension to XDND that allows applications to save data by dragging
+ an icon back to a filer window.
+ The full specification is given in 
+\begin_inset LatexCommand \cite{XDS}
+
+\end_inset 
+
+.
+\layout Description
+
+ROX
+\protected_separator 
+Choices A simple, but flexible, system for managing user choices.
+ See 
+\begin_inset LatexCommand \cite{Choices}
+
+\end_inset 
+
+ for details.
+\layout Description
+
+Application
+\protected_separator 
+directories Self contained relocatable applications, where installation
+ is as simple as copying it to where you want it and uninstalling it is
+ just a matter of deleting a directory.
+ Described later in this documentation.
+\layout Section
+
+Conditions
+\layout Standard
+
+This program is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License as published by the Free
+ Software Foundation; either version 2 of the License, or (at your option)
+ any later version.
+\layout Standard
+
+This program is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS
+ FOR A PARTICULAR PURPOSE.
+ See the GNU General Public License for more details.
+\layout Standard
+
+You should have received a copy of the GNU General Public License along
+ with this program; if not, write to the Free Software Foundation, Inc.,
+ 59 Temple Place, Suite 330, Boston, MA, 02111-1307, USA.
+\layout Section
+
+Instructions
+\layout Subsection
+
+Compiling
+\layout Standard
+
+ROX-Filer is usually supplied in source-only form.
+ To compile and run it, you will require
+\layout Itemize
+
+Unix or Linux (root access is not required),
+\layout Itemize
+
+The X Window system (supplied as standard on all modern systems),
+\layout Itemize
+
+GTK+ 1.2.0 or later (libraries and headers) - get the latest version from
+ 
+\begin_inset LatexCommand \cite{GTK+}
+
+\end_inset 
+
+,
+\layout Itemize
+
+A C compiler (standard on most systems).
+\layout Standard
+
+All of the above are standard on most modern Linux distributions.
+ To check which version of GTK+ you have installed, run the gtk-config command,
+ like this ($ is the shell prompt):
+\layout LyX-Code
+
+$ gtk-config --version
+\layout LyX-Code
+
+1.2.3
+\layout Standard
+
+To compile:
+\layout Enumerate
+
+Change to the directory containing the ROX-Filer subdirectory.
+\layout Enumerate
+
+Run the AppRun script with the --compile option, like this:
+\begin_deeper 
+\layout LyX-Code
+
+$ ROX-Filer/AppRun --compile
+\end_deeper 
+\layout Enumerate
+
+ROX-Filer will perform various checks to find out what kind of system it
+ is being run on and will then compile.
+ If it doesn't work then please e-mail me and complain! Tell me what kind
+ of system you have and what errors were reported.
+ If you manage to fix the problem yourself then please e-mail me the fix.
+\layout Standard
+
+You can now run the filer by running the AppRun script without any options,
+ like this:
+\layout LyX-Code
+
+$ ROX-Filer/AppRun
+\layout Standard
+
+A window should appear and display the contents of your home directory.
+\layout Standard
+
+The executables files are stored inside the ROX-Filer directory in a different
+ subdirectory for each platform.
+ Therefore, you can compile the same application on several different types
+ of machine and then run it from any of them using the AppRun script.
+ This is particularly useful in a network environment.
+\layout Subsection
+
+Invoking
+\layout Standard
+
+By default, ROX-Filer will start by displaying your home directory.
+ You can get it to display other directories instead by listing them after
+ the command:
+\layout LyX-Code
+
+$ ROX-Filer/AppRun /home /usr /usr/local
+\layout Standard
+
+If you want one of the directories to be opened as a panel put 
+\family typewriter 
+-b
+\family default 
+ or 
+\family typewriter 
+-t
+\family default 
+ before the directory (for `bottom' or `top' panels).
+ If you don't know what a panel is, try it and see! To run the filer in
+ the background, put an & at the end of the line.
+\layout LyX-Code
+
+$ mkdir ~/Panel
+\layout LyX-Code
+
+$ ln -s $HOME ~/Panel/Home
+\layout LyX-Code
+
+$ ROX-Filer/AppRun -b ~/Panel &
+\layout Standard
+
+The panel should be displayed in a window without a title bar.
+ If this does not work then you may need to update your window manager.
+ The filer was designed and tested using the Enlightenment window manager
+\begin_inset LatexCommand \cite{enlightenment}
+
+\end_inset 
+
+.
+ You could also try using the -o option which bypasses the window manager
+ entirely (also use this if the panel appears in the wrong place):
+\layout LyX-Code
+
+$ ROX-Filer/AppRun -o -b ~/Panel &
+\layout Subsection
+
+Mouse button and key bindings
+\layout Standard
+
+By default, the mouse button bindings are different to fit in better with
+ X conventions.
+ You can get the old RISC OS bindings by opening the Options window and
+ clicking on a few toggle buttons.
+\layout Standard
+
+By default, the mouse buttons and key bindings for filer windows are as
+ follows:
+\layout Standard
+\LyXTable
+multicol5
+21 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "10cm" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Key or mouse button
+\newline 
+Action
+\newline 
+Left button click
+\newline 
+Select (only) the item clicked on, or clear the selection.
+\newline 
+Middle button click
+\newline 
+Toggle the item between being selected and unselected.
+\newline 
+Right button click
+\newline 
+Open the main menu.
+ Hold down Ctrl while clicking to go directly to
+\newline 
+
+\newline 
+the Selection submenu.
+\newline 
+Drag an item 
+\newline 
+Copy the file(s) to the destination (an application or another filer window)
+\newline 
+
+\newline 
+Hold down Shift to move the file, or Ctrl+Shift to create a symbolic link.
+\newline 
+Drag (not over an item)
+\newline 
+Select a group of items by dragging a box around them.
+\newline 
+
+\newline 
+If you use the left button then the boxed items only are selected, otherwise
+\newline 
+
+\newline 
+the boxes items are toggled between selected and unselected.
+\newline 
+Double click left button
+\newline 
+Open the file or directory or run the application.
+\newline 
+
+\newline 
+Holding down Shift while clicking does the same thing as choosing
+\newline 
+
+\newline 
+`Shift Open' from the menu.
+\newline 
+Double click middle button
+\newline 
+Open the file and close the directory viewer,
+\newline 
+
+\newline 
+or open the directory in a new window.
+\newline 
+Backspace
+\newline 
+Change to viewing the parent directory.
+\newline 
+Cursor keys
+\newline 
+Move the cursor around.
+\newline 
+Page Up, Page Down
+\newline 
+Move up and down in steps of ten rows at a time.
+\newline 
+Home, End
+\newline 
+Move to the first/last entry in the directory.
+\newline 
+Return
+\newline 
+Open the item under the cursor.
+ With Shift held down this acts like choosing 'Shift Open' from the menu.
+\newline 
+Spacebar
+\newline 
+Toggles the item under the cursor between being selected and unselected.
+\layout Standard
+
+You can simulate a click of the middle mouse button by clicking with Ctrl
+ held down.
+ Other keys can easily be defined by opening the menu, moving the pointer
+ over the item you want to use and pressing a key.
+ The key will appear in the menu and can be used from then on.
+ To make the new key bindings permanent, open the Options box from the menu
+ and click on Save.
+\layout Subsection
+
+The Selection
+\layout Standard
+
+While items are selected in a ROX-Filer window the filer has the global
+ selection.
+ You can then paste into another window to get the pathnames of the selected
+ files.
+ For example, to extract the files from a .tgz archive on a floppy disk into
+ your home directory:
+\layout Enumerate
+
+Choose `Xterm here' from the menu in your home directory.
+\layout Enumerate
+
+Type `tar xzf ' (but don't press Return)
+\layout Enumerate
+
+Click on the .tgz file to select it.
+\layout Enumerate
+
+Click the middle button in the xterm window to paste the name of the file
+ into the command.
+\layout Enumerate
+
+Press Return in the xterm to execute the command.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: Toolbar}
+
+\end_inset 
+
+The Toolbar
+\layout Standard
+
+By default, each window has a toolbar along the top.
+ You can disable this from the Options window.
+ The three buttons on the toolbar are:
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+4 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Icon
+\newline 
+Action
+\newline 
+Up arrow
+\newline 
+Change to parent directory
+\newline 
+House
+\newline 
+Change to home directory
+\newline 
+Looping arrows
+\newline 
+Reread the directory contents
+\layout Subsection
+
+The Menus
+\layout Standard
+
+You can open a menu by right clicking
+\begin_float footnote 
+\layout Standard
+
+If the Use `RISC OS mouse bindings' option is on then use the middle button
+ instead.
+\end_float 
+ over a panel or filer window.
+ Here is a full description of each choice and what it does:
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+6 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+Select All
+\newline 
+Select every item in this window.
+\newline 
+Clear Selection
+\newline 
+Unselect every item in this window.
+\newline 
+Options...
+\newline 
+Configure ROX-Filer.
+\newline 
+New Directory...
+\newline 
+Create a new directory in this one.
+\newline 
+Xterm Here
+\newline 
+Open an xterm with its current directory set to this directory.
+\layout Subsubsection
+
+The Display Menu
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+11 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 1 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 1 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+Large Icons
+\newline 
+Each object in the directory is shown as a large icon with its name below.
+\newline 
+Small Icons
+\newline 
+Each entry is shown as the top part of its icon with the name beside it.
+\newline 
+Full Info
+\newline 
+Entries are displayed with their icon, name, type, permissions, owner and
+ size.
+\newline 
+Sort by Name
+\newline 
+Items are arranged in ASCII order.
+ Note that `Z' is considered to come before `a'.
+\newline 
+Sort by Type
+\newline 
+Items are grouped by their MIME-types and sorted by name within the groups.
+\newline 
+Sort by Date
+\newline 
+Most recently modified first.
+\newline 
+Sort by Size
+\newline 
+Largest first.
+\newline 
+Show Hidden
+\newline 
+If on, files beginning with a dot are shown, otherwise they are hidden.
+\newline 
+Refresh
+\newline 
+Rereads the contents of the directory and details of all the files in it.
+\newline 
+
+\newline 
+Use this if the display becomes out-of-date.
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sec: Permissions}
+
+\end_inset 
+
+Permissions
+\layout Standard
+
+The permissions display is made up of four groups of three flags.
+ Each flag is displayed as a letter if it is on and a dash (-) if not.
+ The first three characters show the permissions for the owner of the file,
+ the second for other members of the file's group and the third for everyone
+ else.
+ Whichever group applies to the ROX-Filer process itself is shown underlined.
+ The fourth group shows any special flags.
+\layout Standard
+
+The meanings of the characters are:
+\layout Description
+
+r Permission to read the contents of a file, or the names of files in a
+ directory.
+\layout Description
+
+w Permission to alter the contents of a file, or change which names appear
+ in a directory.
+\layout Description
+
+x Permission to run the file as a program, or refer to the files listed
+ within the directory.
+\layout Description
+
+U This program executes with the 
+\emph on 
+effective user ID
+\emph toggle 
+ of its owner rather than the person who ran it.
+\layout Description
+
+G This program executes with the 
+\emph on 
+effective group ID
+\emph toggle 
+ of its group, regardless of who ran it.
+\layout Description
+
+T Entries in this directory can only be altered or removed by the people
+ who own the files even if they have write permission on the directory itself.
+\layout Standard
+
+For example, `
+\family typewriter 
+\bar under 
+rwx
+\bar default 
+,rwx,r-x/---
+\family default 
+' means that the owner of the file is the same as the effective user of
+ ROX-Filer (basically, you own the file), you and members of the file's
+ group have read, write and execute permission and other people have only
+ read and execute permission.
+ There are no special flags set.
+\layout Standard
+
+The rules which determine which permissions apply may vary slightly between
+ operating systems, but a rough guide is:
+\layout Itemize
+
+If the
+\emph on 
+ effective user ID
+\emph toggle 
+ of the process is equal to the file's owner, then the owner permissions
+ apply.
+\layout Itemize
+
+Otherwise, if the 
+\emph on 
+effective group ID
+\emph toggle 
+ of the process is equal to the file's group OR the file's group is one
+ of the process's 
+\emph on 
+supplemental groups
+\emph toggle 
+ then the group permissions apply.
+\layout Itemize
+
+Otherwise, the 'other' permissions apply.
+ The 
+\emph on 
+real user ID
+\emph toggle 
+ and 
+\emph on 
+real group ID
+\emph toggle 
+ have no effect (except that a process may set its real IDs to its effective
+ IDs).
+\layout Subsubsection
+
+The Selection Menu
+\layout Standard
+
+All of these work in the same way - if you open the menu with some items
+ selected then the operation applies to those items.
+ If you open then menu over an item while there is no selection then that
+ item is temporarily selected.
+ If you choose one of these while there is no selection at all then the
+ window goes into `target mode' - the operation happens to the next item
+ you click on.
+ Click on the window background, press Escape, or click with the right mouse
+ button to cancel target mode.
+ Target mode is mainly useful with the `Single click navigation' option
+ and keys bound to the various menu entries.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+21 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "10cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+Copy...
+\newline 
+Make a copy of this object in the same directory.
+\newline 
+Rename...
+\newline 
+Change the name used for this object.
+\newline 
+Link...
+\newline 
+Create a symbolic link to this name in the same directory.
+\newline 
+Shift Open
+\newline 
+Opens applications as directories, files as text/plain, mount points
+\newline 
+
+\newline 
+by mounting or unmounting them and symlinks by opening the directory
+\newline 
+
+\newline 
+containing the thing they point to.
+\newline 
+
+\newline 
+This is the same as double-clicking with Shift held down.
+\newline 
+Help
+\newline 
+Explain what kind of thing is selected.
+ For applications,
+\newline 
+
+\newline 
+display the help files.
+\newline 
+Info
+\newline 
+Display extra information about this object.
+\newline 
+Open VFS
+\newline 
+Open the file as if it was a directory --- see section 
+\begin_inset LatexCommand \ref{sec: vfs}
+
+\end_inset 
+
+.
+\newline 
+Mount
+\newline 
+Mount or unmount each mount point selected.
+\newline 
+Delete
+\newline 
+Remove all the selected entries from the directory.
+\newline 
+
+\newline 
+Subdirectories will have their contents deleted first.
+\newline 
+
+\newline 
+Deleting symlinks only removes the link, not the thing it points to.
+\newline 
+Disk Usage
+\newline 
+Count the sizes of all the selected items.
+ Directories also have their
+\newline 
+
+\newline 
+contents counted.
+ Symlinks count themselves, not the things they point to.
+\newline 
+Permissions
+\newline 
+Allows you to change the permissions for the selected files.
+\newline 
+Touch
+\newline 
+Not implemented.
+\newline 
+Find
+\newline 
+Search for files by specifying various conditions --- see section 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+.
+\layout Subsubsection
+
+The Window Menu
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+7 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+Parent, New Window
+\newline 
+Open a new window displaying this window's parent.
+\newline 
+Parent, Same Window
+\newline 
+As above, but reuse this window.
+\newline 
+New Window
+\newline 
+Open another window onto this directory.
+\newline 
+Close Window
+\newline 
+Close this window.
+\newline 
+Enter Path
+\newline 
+Open the path-entry box (see section 
+\begin_inset LatexCommand \ref{sec: mini}
+
+\end_inset 
+
+).
+\newline 
+Show ROX-Filer help
+\newline 
+Same as selecting ROX-Filer and choosing `Help' from the menu.
+\layout Subsubsection
+
+The Panel menu
+\layout Standard
+
+This is just a cut-down version of the window menu.
+ The only new entry is `Open Panel as Directory', which displays the panel
+ in a new, non-panel, window.
+ `Remove Item' is a cut-down version of `Delete'; it only works for symbolic
+ links and never asks for confirmation.
+ Since dragging applications and directories to the panel creates symlinks
+ it is very easy to change the panel contents to suit your needs.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: vfs}
+
+\end_inset 
+
+Virtual File Systems
+\layout Standard
+
+Some types of file can be represented as a directory.
+ A typical example is a zip file, which contains an entire directory structure
+ in compressed form.
+ It is often useful to be able to open up such a file as if it was a real
+ directory, and the VFS system allows you to do this.
+\layout Standard
+
+To use this feature you must have one or both of the following:
+\layout Itemize
+
+A system (such as PODFUK
+\begin_inset LatexCommand \cite{PODFUK}
+
+\end_inset 
+
+) which causes the kernel to support various Virtual File Systems directly.
+ This is the best option since all programs will be able to access the contents
+ of the VFS.
+ You will require root access to install such a system, however, and it
+ is not available on all platforms.
+\layout Itemize
+
+Support for the Midnight Commander VFS library compiled into ROX-Filer.
+ This happens automatically when you compile ROX-Filer if it can find the
+ VFS library --- this means having 
+\family typewriter 
+libvfs.so
+\family default 
+ (or 
+\family typewriter 
+libvfs.a
+\family default 
+) in a system library directory or in the directory in the environment variable
+ 
+\family typewriter 
+LD_LIBRARY_PATH
+\family default 
+.
+ In this case, you will be able to view the directory structure but not
+ change it or access individual files.
+ Support for this may be added later.
+ Midnight Commander is part of the GNOME project.
+\layout Standard
+
+Note that using the `Open VFS' menu is simply a short-cut for using the
+ path-entry box (explained below), so if you want to use a VFS not listed
+ on the menu you can type in the path directly, eg:
+\layout Standard
+
+
+\family typewriter 
+/home/fred/archive.zip#uzip/
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
+Don't forget the final slash!
+\layout Subsubsection
+
+Step by step example of adding VFS support
+\layout Standard
+
+This assumes that you have the Midnight Commander source in a directory
+ called `mc'.
+ You might need to replace 
+\family typewriter 
+libvfs.so 
+\family default 
+with 
+\family typewriter 
+libvfs.a
+\family default 
+.
+\layout LyX-Code
+
+$ cd mc
+\layout LyX-Code
+
+$ ./configure
+\layout LyX-Code
+
+$ cd vfs
+\layout LyX-Code
+
+$ make libvfs.so
+\layout Itemize
+
+If you have the root password then install the library in a system library
+ directory as normal.
+\layout Itemize
+
+If not,
+\begin_deeper 
+\layout LyX-Code
+
+$ mkdir ~/lib
+\layout LyX-Code
+
+$ cp libvfs.so ~/lib
+\layout LyX-Code
+
+$ cd ~/Apps/ROX-Filer
+\layout Standard
+
+Edit the 
+\family typewriter 
+AppRun
+\family default 
+ file to include this as the 
+\emph on 
+second
+\emph toggle 
+ line:
+\layout LyX-Code
+
+LD_LIBRARY_PATH=${HOME}/lib; export LD_LIBRARY_PATH
+\layout Standard
+
+This will ensure that ROX-Filer will look for the library in the new 
+\family typewriter 
+~/lib
+\family default 
+ directory.
+ Finally, recompile:
+\layout LyX-Code
+
+$ ./AppRun --compile
+\layout LyX-Code
+
+...
+\layout LyX-Code
+
+checking for mc_stat in -lvfs...
+ yes
+\layout Standard
+
+If you saw that line then it's worked! Well done!
+\end_deeper 
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: mini}
+
+\end_inset 
+
+The path-entry box
+\layout Standard
+
+The path-entry box is a white bar that appears along the bottom of the window.
+ It allows you to type in a path directly.
+ As you type the display is updated to show the item entered visually.
+ The main use is to find a file in a large directory quickly, but you can
+ also use it for navigating between directories, or for selecting a full
+ pathname from somewhere else and pasting it directly into the path-entry
+ box.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+5 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 1 0 0
+0 1 0 0
+0 1 0 0
+0 1 0 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+
+Key
+\newline 
+Action
+\newline 
+Escape
+\newline 
+Close the path-entry box.
+\newline 
+Return
+\newline 
+Open the currently selected item.
+\newline 
+Tab
+\newline 
+Shell-style tab completion.
+\newline 
+Up, Down
+\newline 
+Select the previous/next matching entry.
+\layout Standard
+
+Tab completion tries to fill in as many characters for you as it can.
+ For example, if there are two files in a directory called `save-mail-nov-1999'
+ and `save-mail-dec-1999' then typing 'save' and pressing Tab will expand
+ `save' to `save-mail-' and beep to indicate that the match is not complete.
+ If you use tab completion on a directory and it is unique then the filer
+ will automatically change into the directory.
+ This behavior should be familiar to shell users.
+\layout Subsubsection
+
+Example
+\layout Standard
+
+Let's say you want to locate the documentation for Wine in the directory
+ /usr/doc (which is usually very large).
+ Here's how you could do it:
+\layout Enumerate
+
+Open the minibuffer by choosing 'Enter Path' from the Window menu.
+ I usually bind this function to the slash (`/') key.
+\layout Enumerate
+
+Press CTRL-U to delete the existing contents - this moves you to the root
+ directory.
+\layout Enumerate
+
+Type `u<Tab>do<Tab>wi<Tab>'.
+ As you type, the cursor will move to the correct subdirectory.
+ If it beeps when you press Tab then you need to supply more letters.
+\layout Subsection
+
+Action windows
+\layout Standard
+
+Action windows are those boxes that appear while you're doing a Copy/Move/Link/e
+tc operation.
+ The status line at the top of the window shows the current directory or
+ object that the window is processing.
+ The scrolling area below is the log area - it shows what has been done
+ and may display questions here.
+\layout Standard
+
+At the bottom are four buttons and, sometimes, some options.
+ The buttons work as follows:
+\layout Description
+
+Quiet will do simple operations without asking you to confirm each one.
+ By turning this on and off during an operation you can use it like a pause
+ button.
+\layout Description
+
+Yes answers yes to the question displayed in the log area.
+\layout Description
+
+No answers no to the question displayed in the log area.
+\layout Description
+
+Abort kills the current operation (if any) and closes the action window.
+\layout Standard
+
+You can control which actions get started automatically (without you having
+ to click on Quiet at the start) from the Options window.
+\layout Subsubsection
+
+Action Window Options
+\layout Standard
+
+Some actions have options, which appear as option boxes at the bottom of
+ the window.
+ They are:
+\layout Itemize
+
+`Force' means that the filer won't treat non-writeable files as special.
+ Normally, it confirms the deletion even if Quiet is pressed.
+ Note that you still can't removed files from non-writeable directories
+ because in that case you really don't have permission.
+\layout Itemize
+
+`Brief' prevents the filer logging a message every time it does something.
+ Use this to speed things up if large numbers of messages are being logged.
+\layout Itemize
+
+`Recurse' means that doing something to a directory will also do the same
+ thing to all its contents, and the contents of any subdirectories, and
+ so on.
+\layout Subsection
+
+
+\begin_inset LatexCommand \label{sec: Searching}
+
+\end_inset 
+
+Searching
+\layout Standard
+
+The Find feature looks through all the selected files and directories and
+ any subdirectories (recursively) looking for items that match a particular
+ expression.
+\layout Standard
+
+If you know the name of a file then just enter it in the `Expression:' box,
+ enclosed in single quotes.
+ For example, to find a file called `log' you would enter:
+\layout LyX-Code
+
+'log'
+\layout Standard
+
+Remember to use normal quotes, not double quotes (
+\family typewriter 
+
+\begin_inset Quotes eld
+\end_inset 
+
+
+\family default 
+) or back-quotes (
+\family typewriter 
+`
+\family default 
+)!
+\layout Standard
+
+As the filer finds matching files they are added to the results list.
+ Clicking on an entry in the list opens a viewer showing the file you clicked
+ on.
+ The filer will use the same window to view other results (so, if you want
+ the results shown in separate windows you must explicitly create a new
+ window from the Window menu).
+\layout Subsubsection
+
+Wildcards
+\layout Standard
+
+You can also put shell-style wildcard characters inside the quotes, for
+ example:
+\layout LyX-Code
+
+'*.html'
+\layout LyX-Code
+
+'Report.*'
+\layout LyX-Code
+
+'Draft[1-5]'
+\layout LyX-Code
+
+'main.[ch]'
+\layout Standard
+
+Look at the 
+\family typewriter 
+glob(7)
+\family default 
+ manpage if you want to know more about shell wildcards.
+\layout Standard
+
+If the pattern you enter contains a slash ('/') character then the pattern
+ is matched against the file's full path, otherwise only the leafname is
+ used.
+ That is, 
+\family typewriter 
+'*tmp*'
+\family default 
+ will find 'tmp' and 'tmpfile' but not '/tmp/file' --- 
+\family typewriter 
+'/*tmp*'
+\family default 
+ will find all three.
+\layout Subsubsection
+
+Simple tests
+\layout Standard
+
+As well as finding files by their names you can also find them by various
+ other attributes.
+ Note that `file' is used here to mean anything that can appear in the filesyste
+m --- including directories, devices and so on.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+smallskip
+\backslash 
+noindent 
+\latex default 
+These look at the type of the item being checked:
+\layout Description
+
+IsReg matches any regular (ie, normal) file.
+\layout Description
+
+IsLink matches symlinks.
+\layout Description
+
+IsDir matches directories.
+\layout Description
+
+IsChar matches character device files.
+\layout Description
+
+IsBlock matches block device files.
+\layout Description
+
+IsDev matches block or character device files.
+\layout Description
+
+IsPipe matches pipes.
+\layout Description
+
+IsSocket matches sockets.
+\layout Standard
+
+These look at the permissions set on the file - see section 
+\begin_inset LatexCommand \ref{sec: Permissions}
+
+\end_inset 
+
+.
+\layout Description
+
+IsSUID matches files which have the Set-UID bit set.
+\layout Description
+
+IsSGID matches files which have the Set-GID bit set.
+\layout Description
+
+IsSticky matches files with the sticky bit set,
+\layout Description
+
+IsReadable matches files which you can read from.
+\layout Description
+
+IsWriteable matches files which you can write to.
+\layout Description
+
+IsExecutable matches files which you can execute.
+\layout Standard
+
+And a couple of other useful ones:
+\layout Description
+
+IsEmpty finds empty files (ie, those whose length is 0 bytes).
+\layout Description
+
+IsMine finds files which you own.
+\layout Subsubsection
+
+Logic operators
+\layout Standard
+
+You can combine the above tests in various ways to perform more advanced
+ searches.
+ An expression is actually made up of a list of 
+\emph on 
+cases
+\emph toggle 
+, separated by commas.
+ The filer will try to match each case in turn until one matches or there
+ are no more cases left.
+ For example, to search for files with several possible endings:
+\layout LyX-Code
+
+'*.gif', '*.htm', '*.html'
+\layout Standard
+
+Further, each of the cases is actually a list of conditions.
+ The case only matches if all of its conditions are met.
+ So, to find a directory called 
+\family typewriter 
+lib
+\family default 
+ or a regular file ending in 
+\family typewriter 
+.so
+\family default 
+:
+\layout LyX-Code
+
+IsDir 'lib', IsReg '*.so'
+\layout Standard
+
+You can negate a condition by putting a 
+\family typewriter 
+!
+\family default 
+ in front of it and you can use a sub-expression as a condition by bracketing
+ it, like this:
+\layout LyX-Code
+
+! (IsDir, IsReg)
+\layout LyX-Code
+
+!IsDir !IsReg
+\layout LyX-Code
+
+Not isdir and not isreg
+\layout Standard
+
+All three do the same thing.
+\layout Subsubsection
+
+Comparisons
+\layout Standard
+
+You can also compare various values using the operators 
+\family typewriter 
+<, <=, =, !=, >, >=
+\family default 
+ (for less-than, less-than-or-equal-to, equal-to, not-equal-to, greater-than
+ and greater-than-or-equal-to).
+ When comparing times, you may find it helpful to use 
+\family typewriter 
+after 
+\family default 
+and 
+\family typewriter 
+before
+\family default 
+ instead of 
+\family typewriter 
+>
+\family default 
+ and 
+\family typewriter 
+<
+\family default 
+ to make things clearer.
+\layout Standard
+
+The following are read from the file being checked and may be used for the
+ values being compared:
+\layout Description
+
+atime The time that the file was last accessed.
+\layout Description
+
+ctime The time that the file's status was last changed.
+\layout Description
+
+mtime The time that the file's contents were last modified.
+\layout Description
+
+size The size of the file.
+\layout Description
+
+inode The file's inode (index) number
+\layout Description
+
+nlinks The number of links to this file (that is, the number of directory
+ entries which refer to this file.
+ Note that symlinks don't count as references).
+\layout Description
+
+uid The User ID of the file.
+\layout Description
+
+gid The Group ID of the file.
+\layout Description
+
+blocks The number of disk blocks being used by the file.
+\layout Standard
+
+Times are measured as seconds since the Unix Epoch (00:00:00 UTC, January
+ 1, 1970).
+ Sizes are in bytes.
+ When specifying constants to compare these values with you may use various
+ keywords to scale the value:
+\layout Description
+
+Byte(s) has no effect, but looks better.
+\layout Description
+
+Kb multiplies by 1024, so 2Kb is the same as 2048.
+\layout Description
+
+Mb multiplies by 
+\begin_inset Formula \( 1024^{2} \)
+\end_inset 
+
+, ie 1024 Kb.
+\layout Description
+
+Sec(s) has no effect, but looks nice.
+\layout Description
+
+Min(s) multiplies by 60 to get minutes.
+\layout Description
+
+Hour(s),
+\protected_separator 
+Day(s),
+\protected_separator 
+Week(s),
+\protected_separator 
+Year(s) likewise convert to the relevant unit.
+\layout Description
+
+Ago makes the time in the past relative to when the check is done.
+\layout Description
+
+Hence makes the time in the future.
+\layout Description
+
+Now is short for `
+\family typewriter 
+0 Secs Hence
+\family default 
+'.
+\layout Standard
+
+Some examples should make this all a bit clearer!
+\layout LyX-Code
+
+mtime after 1 day ago
+\layout LyX-Code
+
+size > 10 Mb
+\layout LyX-Code
+
+IsReg and nlinks > 1
+\layout Standard
+
+The first finds files modified within the last 24 hours.
+ You could use 
+\family typewriter 
+>
+\family default 
+ instead of 
+\family typewriter 
+after,
+\family default 
+but it's not so clear what is meant.
+ The second finds files larger than 10 Mb and the last finds regular files
+ with more than one directory entry.
+\layout Standard
+
+Be careful though --- the filer doesn't check the context of the modifiers,
+ so 
+\family typewriter 
+size > 1 day ago
+\family default 
+ is allowed, although it doesn't make much sense! Also, forgetting to use
+ 
+\family typewriter 
+ago
+\family default 
+ or 
+\family typewriter 
+hence
+\family default 
+ will cause odd effects (the time will be measured relative to the Epoch
+ rather than the current time).
+ Finally, don't use = with times --- 
+\family typewriter 
+atime = 1 day ago
+\family default 
+ looks for a file accessed 
+\emph on 
+exactly
+\emph toggle 
+ 86400 seconds ago...
+\layout Subsection
+
+Options
+\layout Standard
+
+You can configure various aspects of ROX-Filer from the Options box.
+ Choose `Options...' from a filer window menu to open it.
+ 
+\layout Standard
+
+At the bottom of the window are four buttons:
+\layout Description
+
+Save puts all your choices into effect, and also saves them into your Choices
+ directory for next time ROX-Filer is loaded.
+ ROX-Filer will never save any preferences to disk unless you click on the
+ `Save' button in the options window.
+\layout Description
+
+OK puts your choices into effect without writing anything to disk.
+\layout Description
+
+Apply works like OK, but without closing the Options window.
+\layout Description
+
+Cancel closes the options box and forgets any changes you made.
+\layout Subsubsection
+
+Action window options
+\layout Standard
+
+You can choose to start some operations automatically, without waiting for
+ you to click on Quiet.
+ Select each operation that you want to auto-start here.
+\layout Subsubsection
+
+Filer window options
+\layout Itemize
+
+`New window on button 1' swaps the actions of the two non-menu buttons when
+ opening directories.
+ This is provided for people who are used to the RISC OS mouse bindings.
+\layout Itemize
+
+`Menu on button 2' swaps the actions of buttons 2 and 3 so that the middle
+ button brings up the menus.
+ This is provided for people who are used to the RISC OS mouse bindings.
+\layout Itemize
+
+`Single-click navigation' treats a single click over an item as if it was
+ a double click.
+ This allows you to move around, run applications and open files without
+ double clicking.
+ To select a file 
+\emph on 
+without
+\emph toggle 
+ opening it you must hold down CTRL while you click.
+\layout Itemize
+
+`Unique windows' prevents you from having two windows showing the same directory.
+ Opening a second view onto a directory closes the first.
+\layout Itemize
+
+`Toolbar type for new windows' allows you to choose what kind of toolbar
+ will be used for future filer windows (the currently open windows are not
+ affected).
+ None means that new windows will not have a toolbar, Normal provides a
+ small bar of icons, and GNOME displays larger icons with textual labels
+ and allows the bar to be detached from the window by dragging it.
+ See section 
+\begin_inset LatexCommand \ref{sec: Toolbar}
+
+\end_inset 
+
+ for details.
+\layout Standard
+
+The last display style and sort type you chose will also be saved as the
+ defaults for next time.
+\layout Subsubsection
+
+Drag and Drop options
+\layout Standard
+
+ROX-Filer uses the standard XDND protocol for drag-and-drop.
+ This protocol recommends that URIs should contain the hostname of the computer
+ that the resource is on so that the program receiving the data can determine
+ whether it can get the data directly or whether it must go via the X-server.
+ However, many older programs (particularly GNOME applications) get confused
+ by the hostname and fail to load the data correctly.
+ If `Don't use hostnames' is on then the hostname part is omitted and ROX-Filer
+ will work with these applications BUT you can't drag data to a program
+ running on a different machine.
+\layout Standard
+
+`Allow dragging to icons in filer windows' controls what happens when you
+ drop files onto icons in filer windows.
+ If on then drops onto directories will save the data inside the directory
+ while dropping onto programs will invoke the program on that data.
+ If off then drops anywhere inside a filer window act like drops onto the
+ window background --- that is, the data will be saved into the directory
+ being displayed.
+\layout Subsubsection
+
+Menu options
+\layout Standard
+
+The `Xterm here' program is the one used when you choose `Xterm here' from
+ the menu.
+ You can replace it with another program such as `gnome-terminal' if you
+ like.
+ In fact, any program will do, but note that you cannot pass any options
+ to the program at present.
+\layout Section
+
+Filetypes
+\layout Standard
+
+The filer needs some files in your choices directory to allow it to determine
+ the MIME-types to give files and the images to display for them.
+ These files are supplied as part of the ROX desktop
+\begin_inset LatexCommand \cite{ROX}
+
+\end_inset 
+
+.
+ This should give you two directories in your Choices directory - `MIME-types'
+ and `MIME-icons'.
+\layout Standard
+
+The file `MIME-types/guess' allows the filer to work out MIME-types from
+ file extensions; the format is the same as the `gnome.mime' file from the
+ GNOME desktop.
+\layout Standard
+
+The other items in the `MIME-types' directory are links to programs which
+ are run when you double click on files.
+ For example, to run Netscape when you double click on an HTML file there
+ should be a file in this directory called `text_html' which is a symlink
+ to the netscape binary or application directory.
+\layout Standard
+
+The `MIME-icons' directory contains images to use for the various types.
+ For example, the filer will use the file `MIME-icons/text_html' for HTML
+ files.
+\layout Standard
+
+In both directories you can also provide default actions/images for each
+ media type.
+ For example, if `text_html' isn't found then the filer will try simply
+ using `text'.
+\layout Section
+
+Application directories
+\layout Standard
+
+An application directory is a directory which can be run as an application.
+ It contains all the resources of an application - source code, binaries,
+ documentation and so on.
+ Keeping everything in one place make installation and uninstallation much
+ easier for users.
+ You can also keep multiple versions of a program by simply having several
+ application directories.
+ You may move and rename them as you please.
+ Application directories are easier to use and install and are more secure
+ too
+\begin_float footnote 
+\layout Standard
+
+Because you can compile an application as a user and then simply copy it
+ as root rather than having to run an install script you are free from the
+ danger of running untrusted code as root.
+ All you have to watch out for is setuid binaries.
+\end_float 
+.
+\layout Standard
+
+To make a directory executable all you need to do is create a executable
+ file called `AppRun' inside it.
+ This file is run when the user double-clicks on the application.
+ You should also provide `AppIcon.xpm' (which will be used as the image for
+ the application) and `Help' (which is a directory that is opened when the
+ user asks for help).
+ Have a look at the ROX-Filer application directory for a full example.
+\layout Section
+
+Hacking
+\layout Standard
+
+This is a quick start guide for people who want to modify the source code.
+ If you make useful changes or fix bugs, please send patches to me or to
+ the mailing list.
+ Tell me which version you're using!
+\layout Subsection
+
+Compiling
+\layout Standard
+
+The first time you compile the program you need to do `AppRun --compile',
+ but in future you only need to run `make' in the `src' directory when you
+ change the .c and .h files.
+ You might want to run `make depend' too.
+\layout Subsection
+
+Creating and applying patches
+\layout Standard
+
+When people make small modifications to the sources they will often distribute
+ them as 
+\emph on 
+patch files
+\emph toggle 
+ --- usually on the mailing list.
+ To apply a patch, go into the 'src' directory and run patch with the patch
+ file.
+ Then recompile, like this:
+\layout LyX-Code
+
+$ cd ROX-Filer/src
+\layout LyX-Code
+
+$ patch < patchfile
+\layout LyX-Code
+
+$ ../AppRun --compile
+\layout Standard
+
+You can remove the patch by simply repeating the above sequence - patch
+ will detect that the patch is already applied and offer to remove it.
+ To create a patch you need to take a copy of the old 'src' directory before
+ you modify it (before you compile, even):
+\layout LyX-Code
+
+$ cd ROX-Filer
+\layout LyX-Code
+
+$ cp -r src old_src
+\layout Standard
+
+Now, modify and compile until it works they way you want it to.
+ To make the patch:
+\layout LyX-Code
+
+$ cd ROX-Filer
+\layout LyX-Code
+
+$ diff -cr old_src src > my_patch
+\layout Standard
+
+This creates a human- and machine-readable patch file.
+ Submit this to the mailing list.
+ The are many reasons for posting patches rather that the modified files:
+\layout Itemize
+
+They are smaller, and hence shouldn't bounce.
+ They are also quicker to download for people with slow connections.
+\layout Itemize
+
+People can see what they're getting into before applying them!
+\layout Itemize
+
+Patches can (usually) be applied to slightly modified versions of the sources.
+ This means that people can apply several patches without each new one overwriti
+ng the others.
+\layout Subsection
+
+Autoconf
+\layout Standard
+
+Here's a quick explanation of the autoconf system in case you haven't used
+ it before.
+ See `info autoconf' for full details.
+\layout Standard
+
+There's a file called 'configure.in' which contains various tests (`info
+ autoconf').
+ You run `autoconf' and it reads through the file and generates a shell
+ script to perform the tests, saving it as `configure'.
+ `configure' is normally distributed with the program because not everyone
+ has autoconf.
+\layout Standard
+
+You then run `configure' (in fact, let the `AppRun' script do it because
+ it passes it some arguments), which performs all the tests.
+ It reads in `Makefile.in' and `config.h.in' and fills in the missing values
+ with the test results to produce `Makefile' and `config.h'.
+\layout Standard
+
+You run `make', which creates .o files from the .c files and links to produce
+ ROX-Filer.
+\layout Subsection
+
+Data-structures
+\layout Standard
+
+The diagram below shows some of the major structures found in the filer
+ along with their most important attributes and methods.
+ Exactly which attributes have been included is a little hit-and-miss but
+ it might help you get the overall picture.
+ If you find it useful, please let me know and I'll try to keep it up-to-date
+ (or even extend it!).
+\layout Standard
+
+To summarise, each window (or panel) has its own 
+\series bold 
+FilerWindow
+\series default 
+ structure.
+ This structure has pointers to a 
+\series bold 
+Collection
+\series default 
+ (which is the widget which actually displays the files) and to a 
+\series bold 
+Directory
+\series default 
+, which is used to cache the directory contents.
+ Both 
+\series bold 
+Collection
+\series default 
+ and 
+\series bold 
+Directory
+\series default 
+ have pointers to (the same) 
+\series bold 
+DirItem
+\series default 
+s, each of which corresponds to one filesystem object.
+ Several 
+\series bold 
+FilerWindow
+\series default 
+s may share the same 
+\series bold 
+Directory
+\series default 
+.
+ While scanning is in progress the 
+\series bold 
+Directory
+\series default 
+ keeps a list of the new items it has found (
+\emph on 
+new_items
+\emph toggle 
+) and the items which have changed in some way (
+\emph on 
+up_items
+\emph toggle 
+).
+ It periodically notifies the filer window of the changes-so-far by calling
+ all the functions in the 
+\emph on 
+users
+\emph toggle 
+ list (use 
+\emph on 
+attach()
+\emph toggle 
+ and 
+\emph on 
+detach()
+\emph toggle 
+ to add and remove functions to or from the list).
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset Figure size 595 585
+file Structs.eps
+width 3 100
+flags 9
+
+\end_inset 
+
+
+\layout Bibliography
+\bibitem {ROX}
+
+
+\emph on 
+The ROX desktop
+\emph toggle 
+, <http://www.ecs.soton.ac.uk/~tal197/rox.php3>
+\layout Bibliography
+\bibitem {GTK+}
+
+
+\emph on 
+GTK+ Toolkit
+\emph toggle 
+, <http://www.gtk.org>
+\layout Bibliography
+\bibitem {GNOME}
+
+
+\emph on 
+The GNOME desktop
+\emph toggle 
+, <http://www.gnome.org>
+\layout Bibliography
+\bibitem {DND}
+
+
+\emph on 
+The Drag and Drop protocol
+\emph toggle 
+, <http://www.its.caltech.edu/~jafl/xdnd/>
+\layout Bibliography
+\bibitem {XDS}
+
+
+\emph on 
+The X Direct Save protocol
+\emph toggle 
+, <http://www.its.caltech.edu/~jafl/xds/>
+\layout Bibliography
+\bibitem {Choices}
+
+
+\emph on 
+The ROX Choices system
+\emph toggle 
+, <http://www.ecs.soton.ac.uk/~tal197/choices.php3>
+\layout Bibliography
+\bibitem {enlightenment}
+
+
+\emph on 
+Enlightenment,
+\emph toggle 
+ <http://www.enlightenment.org> 
+\layout Bibliography
+\bibitem {PODFUK}
+
+
+\emph on 
+POrtable Dodgy Filesystems in Userland (hacK), 
+\emph toggle 
+<http://atrey.karlin.mff.cuni.cz/~pavel/podfuk/podfuk.html>
+\the_end
