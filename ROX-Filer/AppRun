@@ -10,7 +10,7 @@ case $ARCH in
 	i?86) ARCH=ix86 ;;
 esac
 
-PLATFORM=`uname -s`-$ARCH export PLATFORM
+PLATFORM=`uname -s`-$ARCH
 
 DEBUGGER=""
 
@@ -39,6 +39,13 @@ case $1 in
 		read WAIT
 		exit 1
 esac
+
+if [ -z "$XDG_DATA_DIRS" -a -d /uri/0install/zero-install.sourceforge.net ]; then
+  # Try to get MIME database through Zero Install, if possible
+  0refresh zero-install.sourceforge.net/share/mime 2003-08-07
+  XDG_DATA_DIRS=/usr/local/share/:/usr/share/:/uri/0install/zero-install.sourceforge.net/share
+  export XDG_DATA_DIRS
+fi
 
 BIN="$APP_DIR/$PLATFORM/$PROG"
 
