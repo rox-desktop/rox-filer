@@ -601,7 +601,19 @@ void pinboard_set_backdrop(void)
 	radios_add(radios, _("Tile the image over the backdrop area"),
 			BACKDROP_TILE, _("Tile"));
 
-	radios_set_value(radios, BACKDROP_TILE);
+	switch (current_pinboard->backdrop_style)
+	{
+		case BACKDROP_TILE:
+		case BACKDROP_STRETCH:
+		case BACKDROP_SCALE:
+		case BACKDROP_CENTRE:
+			radios_set_value(radios,
+					 current_pinboard->backdrop_style);
+			break;
+		default:
+			radios_set_value(radios, BACKDROP_TILE);
+			break;
+	}
 	
 	/* The drop area... */
 	frame = drop_box_new(_("Drop an image here"));
