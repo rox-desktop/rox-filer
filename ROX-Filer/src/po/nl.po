@@ -15,14 +15,14 @@
 # Bijgewerkt Jan 2002 en Mei 2002
 # Copyright (C) 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
 # 
-# Bijgewerkt Dec 2002, Maa 2003 en Mei 2003
+# Bijgewerkt Dec 2002, Maa Mei Okt 2003
 # Copyright (C) 2002 Jan Wagemakers <janw@easynet.be>
 #  - Dank aan Jan Verhoeven (wisclub) voor zijn tips!
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.3.9\n"
+"Project-Id-Version: ROX-Filer 2.1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2003-10-07 15:03+0100\n"
+"POT-Creation-Date: 2003-10-25 14:06+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@easynet.be>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
@@ -284,23 +284,23 @@ msgid "'Directory '%s' deleted\n"
 msgstr "'Map '%s' verwijderd\n"
 
 #: action.c:919
-#, fuzzy, c-format
+#, c-format
 msgid "?Eject '%s'?"
-msgstr "?Controleer '%s'?"
+msgstr "?Uitwerpen '%s'?"
 
 #: action.c:924
-#, fuzzy, c-format
+#, c-format
 msgid "'Eject '%s'\n"
-msgstr "'Bezig met verwijderen '%s'\n"
+msgstr "'Uitwerpen '%s'\n"
 
 #: action.c:943
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "eject failed\n"
 msgstr ""
 "!%s\n"
-"Aankoppelen mislukt\n"
+"Uitwerpen mislukt\n"
 
 #: action.c:962 action.c:981
 #, c-format
@@ -456,7 +456,7 @@ msgstr ""
 
 #: action.c:1486
 msgid "'(seems to be mounted now anyway)\n"
-msgstr ""
+msgstr "'(lijkt nu in elk geval aangekoppeld te zijn)\n"
 
 #: action.c:1524
 #, c-format
@@ -606,7 +606,7 @@ msgstr "Symlink"
 
 #: action.c:1996 appmenu.c:111
 msgid "Eject"
-msgstr ""
+msgstr "Uitwerpen"
 
 #: action.c:2053
 msgid "Deleting items such as "
@@ -644,11 +644,12 @@ msgid ""
 "Symlink any programs you want into this directory. They will appear in the "
 "menu for all items of this type (%s/%s)."
 msgstr ""
+"Symlink eenders welk programma in deze map en het zal verschijnen in het "
+"menu voor elk item van het type (%s/%s)."
 
 #: appmenu.c:332
-#, fuzzy
 msgid "Customise Menu..."
-msgstr "Aanpassen"
+msgstr "Instellingen Menu..."
 
 #: appmenu.c:379 menu.c:239 toolbar.c:158
 msgid "Help"
@@ -1137,7 +1138,7 @@ msgstr "blokken"
 #: gtkicontheme.c:829
 #, c-format
 msgid "Icon '%s' not present in theme"
-msgstr ""
+msgstr "Icoon '%s' niet aanwezig in thema"
 
 #: gtksavebox.c:250
 msgid "Save As:"
@@ -1332,13 +1333,12 @@ msgid "Show _Help Files"
 msgstr "Toon _Help Bestanden"
 
 #: infobox.c:283
-#, fuzzy
 msgid "<b>Permissions</b>"
-msgstr "Toegangsrechten"
+msgstr "<b>Toegangsrechten</b>"
 
 #: infobox.c:296
 msgid "<b>Contents indicate...</b>"
-msgstr ""
+msgstr "<b>Inhoud geeft aan...</b>"
 
 #: infobox.c:425 infobox.c:499 support.c:349
 msgid "bytes"
@@ -1361,13 +1361,12 @@ msgid "Size:"
 msgstr "Grootte:"
 
 #: infobox.c:510
-#, fuzzy
 msgid "Scanning"
-msgstr "Scannen, "
+msgstr "Scannen"
 
 #: infobox.c:527
 msgid "Failed to scan"
-msgstr ""
+msgstr "Scannen mislukt"
 
 #: infobox.c:533
 msgid "Change time:"
@@ -1399,33 +1398,29 @@ msgid "file(1) says... %s"
 msgstr "file(1) zegt... %s"
 
 #: infobox.c:762
-#, fuzzy, c-format
+#, c-format
 msgid "Could not change permissions: %s"
-msgstr "?Verander de toegangsrechten van '%s'?"
+msgstr "Kan toegangsrechten niet aanpassen: %s"
 
 #: infobox.c:780
-#, fuzzy
 msgid "Owner"
-msgstr "_Eigenaar"
+msgstr "Eigenaar"
 
 #: infobox.c:782
-#, fuzzy
 msgid "Group"
-msgstr "_Groep"
+msgstr "Groep"
 
 #: infobox.c:784
 msgid "World"
-msgstr ""
+msgstr "Wereld"
 
 #: infobox.c:787
-#, fuzzy
 msgid "Read"
-msgstr "Hernoemen"
+msgstr "Lezen"
 
 #: infobox.c:789
-#, fuzzy
 msgid "Write"
-msgstr "item"
+msgstr "Schrijven"
 
 #: infobox.c:791
 msgid "Exec"
@@ -1440,9 +1435,8 @@ msgid "SGID"
 msgstr ""
 
 #: infobox.c:822
-#, fuzzy
 msgid "Sticky"
-msgstr "(groot)"
+msgstr "Sticky"
 
 #: infobox.c:852
 #, c-format
@@ -1992,7 +1986,6 @@ msgid "Symlink"
 msgstr "Symlink"
 
 #: menu.c:1880
-#, fuzzy
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -2005,11 +1998,13 @@ msgid ""
 "\t(this only works if NOT using XSETTINGS)"
 msgstr ""
 "Instelbare sneltoetsen zijn standaard uitgeschakeld in Gtk2, en u heeft ze "
-"niet ingeschakeld. U kunt deze mogelijk inschakelen door:\n"
-"1) een XSettings manager te gebruiken, zoals ROX-Session\n"
+"niet ingeschakeld. U kunt deze mogelijkheid inschakelen door:\n"
+"1) een XSettings manager te gebruiken, zoals ROX-Session of gnome-settings-daemon, "
 "of\n"
+"\n"
 "2) de volgende regel aan ~/.gtkrc-2.0 toe te voegen:\n"
-"\tgtk-can-change-accels = 1"
+"\tgtk-can-change-accels = 1\n"
+"\t(dit werkt alleen als XSETTINGS niet wordt gebruikt)"
 
 #: menu.c:1891
 msgid ""
@@ -2431,14 +2426,12 @@ msgid "Show extra details"
 msgstr "Extra details tonen"
 
 #: toolbar.c:146
-#, fuzzy
 msgid "Sort"
 msgstr "Sorteren"
 
 #: toolbar.c:146
-#, fuzzy
 msgid "Change sort criteria"
-msgstr "Laatst status veranderd:"
+msgstr "Pas sorteer criteria aan"
 
 #: toolbar.c:150
 msgid "Hidden"
@@ -2449,9 +2442,8 @@ msgid "Show/hide hidden files"
 msgstr "Toon/verberg verborgen bestanden"
 
 #: toolbar.c:154
-#, fuzzy
 msgid "Select all/invert selection"
-msgstr "Selectie inverteren"
+msgstr "Selecteer alles/inverteer selectie"
 
 #: toolbar.c:158
 msgid "Show ROX-Filer help"
@@ -2481,42 +2473,36 @@ msgid "%u selected (%s)"
 msgstr "%u geselecteerd (%s)"
 
 #: toolbar.c:410
-#, fuzzy
 msgid "Sort by name"
 msgstr "Sorteer op naam"
 
 #: toolbar.c:410
-#, fuzzy
 msgid "Sort by type"
 msgstr "Sorteer op type"
 
 #: toolbar.c:410
-#, fuzzy
 msgid "Sort by date"
 msgstr "Sorteer op datum"
 
 #: toolbar.c:411
-#, fuzzy
 msgid "Sort by size"
 msgstr "Sorteer op grootte"
 
 #: toolbar.c:411
-#, fuzzy
 msgid "Sort by owner"
 msgstr "Sorteer op eigenaar"
 
 #: toolbar.c:411
-#, fuzzy
 msgid "Sort by group"
 msgstr "Sorteer op groep"
 
 #: toolbar.c:444
 msgid "ascending"
-msgstr ""
+msgstr "stijgend"
 
 #: toolbar.c:444
 msgid "descending"
-msgstr ""
+msgstr "dalend"
 
 #: type.c:218
 msgid "Sym link"
@@ -2704,7 +2690,6 @@ msgstr ""
 "naar toe voor oudere toepassingen)."
 
 #: type.c:1342
-#, fuzzy
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -2719,9 +2704,10 @@ msgstr ""
 "filer zal waarschijnlijk niet de juiste types afbeelden voor verschillende "
 "bestanden. U kunt het 'Common types package' downloaden en het 'shared-mime-"
 "info-0.9' pakket installeren van:\n"
-"http://www.freedesktop.org/standards/shared-mime-info.html\n"
+"http://www.freedesktop.org/software/shared-mime-info\n"
+"\n"
 "Als dit pakket reeds geïnstalleerd is, controleer dan de lees-"
-"toegangsrechten (/usr/local/share/mime/globs or /usr/share/mime/globs)."
+"toegangsrechten (/usr/local/share/mime/globs of /usr/share/mime/globs)."
 
 #: type.c:1409
 msgid "No description"
@@ -2732,19 +2718,20 @@ msgstr "Geen omschrijving"
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
 msgstr ""
+"Iconen thema '%s' bevat geen MIME iconen. Zal gebruik maken van het standaard ROX theme."
 
 #: type.c:1461
 msgid "ROX icon theme not found... installing..."
-msgstr ""
+msgstr "ROX iconen thema niet gevonden... installeren..."
 
 #: type.c:1470
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
 "%s"
 msgstr ""
-"!%s\n"
-"Mislukt om '%s' te kopiëren\n"
+"Mislukt om een symlink te maken '%s':\n"
+"%s"
 
 #: usericons.c:181
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -2796,9 +2783,9 @@ msgstr ""
 "Gebruik een kopie van deze afbeelding voor alle bestanden met dit MIME type."
 
 #: usericons.c:288
-#, fuzzy, c-format
+#, c-format
 msgid "For all files of type `%s' (%s/%s)"
-msgstr "Alleen voor het type `%s' (%s/%s)"
+msgstr "Voor alle bestanden van het type `%s' (%s/%s)"
 
 #: usericons.c:294
 msgid ""
@@ -2896,7 +2883,7 @@ msgstr "Chinees (vereenvoudigd)"
 
 #: tips:6
 msgid "Czech"
-msgstr ""
+msgstr "Tsjechisch"
 
 #: tips:7
 msgid "Danish"
@@ -3759,18 +3746,16 @@ msgstr ""
 "http://rox.sourceforge.net/mime_editor.html"
 
 #: tips:250
-#, fuzzy
 msgid "Icon theme"
-msgstr "Minimaliseer naar"
+msgstr "Iconen thema"
 
 #: tips:251 tips:252
-#, fuzzy
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set in Choices override those from the selected theme."
 msgstr ""
-"Gebruik de 'Icoon instellen' dialoog om het icoon in te stellen voor elk "
-"individueel type."
+"Gebruik de 'Icoon instellen...' dialoog om het icoon in te stellen voor elk "
+"MIME type. Merk op dat iconen die in Choices gezet zijn voorang hebben op het geselecteerde thema"
 
 #: tips:253
 msgid "Colours"
@@ -3921,102 +3906,3 @@ msgstr ""
 "nodig kunnen hebben dat deze optie aanstaat. Gebruik dit wanneer het slepen "
 "van een applicatie een + teken toont op de aanwijzer maar het droppen niet "
 "werkt."
-
-#~ msgid "Permissions:"
-#~ msgstr "Toegangsrechten:"
-
-#~ msgid "file(1) says..."
-#~ msgstr "file(1) zegt..."
-
-#~ msgid "Help about ... ?"
-#~ msgstr "Help over ... ?"
-
-#~ msgid ""
-#~ "Executable file:\n"
-#~ "This is a file with an eXecute bit set - it can be run as a program."
-#~ msgstr ""
-#~ "Programmabestand:\n"
-#~ "Dit is een bestand waarvan een uitvoer-bit gezet is - het kan als een "
-#~ "programma gestart worden."
-
-#~ msgid ""
-#~ "File:\n"
-#~ "This is a data file. Try using the Info menu item to find out more..."
-#~ msgstr ""
-#~ "Databestand:\n"
-#~ "Dit is een data bestand. Gebruik het Informatie menu voor meer "
-#~ "informatie..."
-
-#~ msgid ""
-#~ "Mount point:\n"
-#~ "A mount point is a directory which another filing system can be mounted "
-#~ "on. Everything on the mounted filesystem then appears to be inside the "
-#~ "directory."
-#~ msgstr ""
-#~ "Aankoppelpunt (mount point):\n"
-#~ "Een aankoppelpunt is een map waarop een ander bestandssysteem kan "
-#~ "aangesloten worden. Alles op het aangesloten bestandssysteem zal dan "
-#~ "verschijnen in deze map."
-
-#~ msgid ""
-#~ "Device file:\n"
-#~ "Device files allow you to read from or write to a device driver as though "
-#~ "it was an ordinary file."
-#~ msgstr ""
-#~ "Apparaatbestand:\n"
-#~ "Apparaatbestanden laten toe om te schrijven/lezen van/naar een apparaat "
-#~ "alsof het een gewoon bestand is."
-
-#~ msgid ""
-#~ "Named pipe:\n"
-#~ "Pipes allow different programs to communicate. One program writes data to "
-#~ "the pipe while another one reads it out again."
-#~ msgstr ""
-#~ "Named pipe:\n"
-#~ "'Pipes' make communicatie tussen programma's mogelijk. Het ene programma "
-#~ "schrijft data naar de pipe terwijl een ander er uit leest."
-
-#~ msgid ""
-#~ "Socket:\n"
-#~ "Sockets allow processes to communicate."
-#~ msgstr ""
-#~ "Socket:\n"
-#~ "Sockets laten processen toe om met andere processen via het netwerk te "
-#~ "communiceren."
-
-#~ msgid ""
-#~ "Door:\n"
-#~ "Doors are a little-used Solaris method for processes to communicate."
-#~ msgstr ""
-#~ "Door:\n"
-#~ "Doors zijn een weinig gebruikte Solaris methode waarmee processen kunnen "
-#~ "communiceren."
-
-#~ msgid ""
-#~ "Unknown type:\n"
-#~ "I couldn't find out what kind of file this is. Maybe it doesn't exist "
-#~ "anymore or you don't have search permission on the directory it's in?"
-#~ msgstr ""
-#~ "Onbekend type:\n"
-#~ "Ik kan niet uitzoeken wat voor type dit bestand is. Misschien bestaat het "
-#~ "niet meer of heb je geen zoektoegang in de map waarin het zich bevind?"
-
-#~ msgid ""
-#~ "Directory:\n"
-#~ "This is a directory. It contains an index to other items - open it to see "
-#~ "the list."
-#~ msgstr ""
-#~ "Map:\n"
-#~ "Dit is een map. Het bevat een index naar andere items - open het om deze "
-#~ "lijst te zien."
-
-#~ msgid "Menu on button 2 (RISC OS style)"
-#~ msgstr "Menu op knop 2 (RISC OS stijl)"
-
-#~ msgid ""
-#~ "Use button 2, the middle button (click both buttons at once on two button "
-#~ "mice), to pop up the menu. If off, use button 3 (right) instead."
-#~ msgstr ""
-#~ "Gebruik knop 2, de middelste knop (klik met beide knoppen tegelijkertijd "
-#~ "op twee-knops muizen), om het menu tevoorschijn te halen. Indien 'af', "
-#~ "gebruik knop 3 (rechts) in de plaats."
