@@ -2,7 +2,7 @@
  * $Id$
  *
  * SaveBox widget for the ROX desktop project
- * Copyright (C) 2002 Thomas Leonard.
+ * Copyright (C) 2003 Thomas Leonard.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
