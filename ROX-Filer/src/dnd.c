@@ -348,7 +348,7 @@ static void create_uri_list(GString *string,
  * start a drag.
  *
  * We always provide text/uri-list. If we are dragging a single, regular file
- * then we also offer application/octet-stream.
+ * then we also offer application/octet-stream and the type of the file.
  */
 void drag_selection(Collection 		*collection,
 		    GdkEventMotion 	*event,
@@ -364,6 +364,7 @@ void drag_selection(Collection 		*collection,
 	{
 		{"text/uri-list", 0, TARGET_URI_LIST},
 		{"application/octet-stream", 0, TARGET_RAW},
+		{"", 0, TARGET_RAW},
 	};
 	FileItem	*item;
 
@@ -374,8 +375,17 @@ void drag_selection(Collection 		*collection,
 	
 	widget = GTK_WIDGET(collection);
 	
-	target_list = gtk_target_list_new(target_table,
-			item && item->base_type == TYPE_FILE ? 2 : 1);
+	if (item && item->mime_type)
+	{
+		MIME_type *t = item->mime_type;
+		
+		target_table[2].target = g_strconcat(t->media_type, "/",
+						     t->subtype, NULL);
+		target_list = gtk_target_list_new(target_table, 3);
+		g_free(target_table[2].target);
+	}
+	else
+		target_list = gtk_target_list_new(target_table, 1);
 
 	context = gtk_drag_begin(widget,
 			target_list,
@@ -423,7 +433,10 @@ void drag_data_get(GtkWidget          		*widget,
 						&to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
-				type = application_octet_stream;   /* XXX */
+				if (item->mime_type)
+					type = type_to_atom(item->mime_type);
+				else
+					type = application_octet_stream;
 				break;
 			}
 			return;
@@ -908,7 +921,6 @@ static void got_uri_list(GtkWidget 		*widget,
 	FilerWindow	*filer_window;
 	GSList		*uri_list;
 	char		*error = NULL;
-	char		**argv = NULL;	/* Command to exec, or NULL */
 	GSList		*next_uri;
 	gboolean	send_reply = TRUE;
 	char		*dest_path;
@@ -1000,22 +1012,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		delayed_error("Error getting file list", error);
 	}
 	else if (send_reply)
-	{
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
-		if (argv)
-		{
-			int	child;		/* Child process ID */
-			
-			child = spawn(argv);
-			if (child)
-				g_hash_table_insert(child_to_filer,
-						(gpointer) child, filer_window);
-			else
-				delayed_error("ROX-Filer",
-					"Failed to fork() child process");
-			g_free(argv);
-		}
-	}
 
 	next_uri = uri_list;
 	while (next_uri)

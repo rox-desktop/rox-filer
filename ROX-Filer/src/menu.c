@@ -47,6 +47,8 @@ static void menu_closed(GtkWidget *widget);
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 static char *load_xterm_here(char *data);
 
+static void not_yet(gpointer data, guint action, GtkWidget *widget);
+
 static void hidden(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -90,17 +92,19 @@ static GtkWidget	*panel_menu;		/* The popup panel menu */
 static GtkWidget	*panel_file_item;	/* The File '' label */
 static GtkWidget	*panel_file_menu;	/* The File '' menu */
 
+static gint		screen_width, screen_height;
+
 static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",   	NULL,  	NULL, 0, "<RadioItem>"},
-{"/Display/Small Icons",   	NULL,  	NULL, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,  	NULL, 0, "/Display/Large Icons"},
-{"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,  	NULL, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,  	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,  	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,  	NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Large Icons",   	NULL,  	not_yet, 0, "<RadioItem>"},
+{"/Display/Small Icons",   	NULL,  	not_yet, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,  	not_yet, 0, "/Display/Large Icons"},
+{"/Display/Separator",		NULL,  	not_yet, 0, "<Separator>"},
+{"/Display/Sort by Name",	NULL,  	not_yet, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Owner",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,  	NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	C_"H", 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
@@ -113,10 +117,10 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/File/Mount",	    		C_"M",  mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
-{"/File/Disk Usage",	    	C_"U", 	NULL, 0, NULL},
-{"/File/Permissions",		NULL,   NULL, 0, NULL},
-{"/File/Touch",    		NULL,   NULL, 0, NULL},
-{"/File/Find",			NULL,   NULL, 0, NULL},
+{"/File/Disk Usage",	    	C_"U", 	not_yet, 0, NULL},
+{"/File/Permissions",		NULL,   not_yet, 0, NULL},
+{"/File/Touch",    		NULL,   not_yet, 0, NULL},
+{"/File/Find",			NULL,   not_yet, 0, NULL},
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
 {"/Clear Selection",	    	C_"Z",  clear_selection, 0, NULL},
 {"/Options...",			NULL,   show_options, 0, NULL},
@@ -127,15 +131,15 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 
 static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display",			NULL,	NULL, 0, "<Branch>"},
-{"/Display/Large Icons",	NULL,   NULL, 0, "<RadioItem>"},
-{"/Display/Small Icons",	NULL,   NULL, 0, "/Display/Large Icons"},
-{"/Display/Full Info",		NULL,   NULL, 0, "/Display/Large Icons"},
+{"/Display/Large Icons",	NULL,   not_yet, 0, "<RadioItem>"},
+{"/Display/Small Icons",	NULL,   not_yet, 0, "/Display/Large Icons"},
+{"/Display/Full Info",		NULL,   not_yet, 0, "/Display/Large Icons"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/Display/Sort by Name",	NULL,   NULL, 0, "<RadioItem>"},
-{"/Display/Sort by Type",	NULL,   NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Date",	NULL,   NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Size",	NULL,   NULL, 0, "/Display/Sort by Name"},
-{"/Display/Sort by Owner",	NULL,  	NULL, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Name",	NULL,   not_yet, 0, "<RadioItem>"},
+{"/Display/Sort by Type",	NULL,   not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Date",	NULL,   not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Size",	NULL,   not_yet, 0, "/Display/Sort by Name"},
+{"/Display/Sort by Owner",	NULL,  	not_yet, 0, "/Display/Sort by Name"},
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
@@ -152,6 +156,11 @@ void menu_init()
 	GtkItemFactory  	*item_factory;
 	char			*menurc;
 	GList			*items;
+
+	/* This call starts returning strange values after a while, so get
+	 * the result here during init.
+	 */
+	gdk_window_get_size(GDK_ROOT_PARENT(), &screen_width, &screen_height);
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
@@ -278,36 +287,26 @@ static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 {
 	int		*pos = (int *) data;
-	int		swidth, sheight;
 	GtkRequisition 	requisition;
 
-	gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
-	/* XXX: GDK sometimes seems to get the height wrong... */
-	if (sheight < 2)
-	{
-		g_print("ROX-Filer: Root window height reported as %d\n",
-				sheight);
-		sheight = 768;
-	}
-	
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
 	if (pos[0] == -1)
-		*x = swidth - MENU_MARGIN - requisition.width;
+		*x = screen_width - MENU_MARGIN - requisition.width;
 	else if (pos[0] == -2)
 		*x = MENU_MARGIN;
 	else
 		*x = pos[0] - (requisition.width >> 2);
 		
 	if (pos[1] == -1)
-		*y = sheight - MENU_MARGIN - requisition.height;
+		*y = screen_height - MENU_MARGIN - requisition.height;
 	else if (pos[1] == -2)
 		*y = MENU_MARGIN;
 	else
 		*y = pos[1] - (requisition.height >> 2);
 
-	*x = CLAMP(*x, 0, swidth - requisition.width);
-	*y = CLAMP(*y, 0, sheight - requisition.height);
+	*x = CLAMP(*x, 0, screen_width - requisition.width);
+	*y = CLAMP(*y, 0, screen_height - requisition.height);
 }
 
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
@@ -406,6 +405,12 @@ static void menu_closed(GtkWidget *widget)
 }
 
 /* Actions */
+
+/* Fake action to warn when a menu item does nothing */
+static void not_yet(gpointer data, guint action, GtkWidget *widget)
+{
+	delayed_error("ROX-Filer", "Sorry, that feature isn't implemented yet");
+}
 
 static void hidden(gpointer data, guint action, GtkWidget *widget)
 {
@@ -614,8 +619,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	label = gtk_label_new("MIME type:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
-	if (file->base_type == TYPE_FILE &&
-			!(file->flags & ITEM_FLAG_EXEC_FILE))
+	if (file->mime_type)
 	{
 		string = g_strconcat(file->mime_type->media_type, "/",
 				file->mime_type->subtype, NULL);

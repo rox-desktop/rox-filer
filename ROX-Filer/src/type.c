@@ -253,3 +253,18 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 
 	return i;
 }
+
+GdkAtom type_to_atom(MIME_type *type)
+{
+	char	*str;
+	GdkAtom	retval;
+	
+	g_return_val_if_fail(type != NULL, GDK_NONE);
+
+	str = g_strconcat(type->media_type, "/", type->subtype, NULL);
+	retval = gdk_atom_intern(str, FALSE);
+	g_free(str);
+	
+	return retval;
+}
+

@@ -29,31 +29,20 @@
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 
-/* XXX: Maybe we shouldn't do so much work in a signal handler? */
 static void child_died(int signum)
 {
 	int	    	status;
 	int	    	child;
-	FilerWindow	*filer_window;
 
-	/* Find out which children exited. This also has the effect of
-	 * allowing the children to die.
-	 */
+	/* Find out which children exited and allow them to die */
 	do
 	{
-		child = waitpid(-1, &status, WNOHANG | WUNTRACED);
+		child = waitpid(-1, &status, WNOHANG);
 
 		if (child == 0 || child == -1)
 			return;
 
-		filer_window = g_hash_table_lookup(child_to_filer,
-					(gpointer) child);
-		if (filer_window)
-			scan_dir(filer_window);
-
-		if (!WIFSTOPPED(status))
-			g_hash_table_remove(child_to_filer,
-					(gpointer) child);
+		/* fprintf(stderr, "Child %d exited\n", child); */
 
 	} while (1);
 }
@@ -105,9 +94,10 @@ int main(int argc, char **argv)
 
 	options_load();
 
+	/* Let child processes die */
 	act.sa_handler = child_died;
 	sigemptyset(&act.sa_mask);
-	act.sa_flags = 0;
+	act.sa_flags = SA_NOCLDSTOP;
 	sigaction(SIGCHLD, &act, NULL);
 
 	if (geteuid() == 0)

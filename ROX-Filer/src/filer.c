@@ -36,11 +36,6 @@
 
 FilerWindow 	*window_with_focus = NULL;
 
-/* When a child process that changes a directory dies we need to know
- * which filer window to update. Use this table.
- */
-GHashTable	*child_to_filer = NULL;
-
 /* Link paths to GLists of filer windows */
 GHashTable	*path_to_window_list = NULL;
 
@@ -84,7 +79,6 @@ void filer_init()
 {
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
-	child_to_filer = g_hash_table_new(NULL, NULL);
 	path_to_window_list = g_hash_table_new(g_str_hash, g_str_equal);
 }
 
@@ -120,14 +114,6 @@ static void remove_view(FilerWindow *filer_window)
 	if (newlist != list)
 		g_hash_table_insert(path_to_window_list, filer_window->path,
 				newlist);
-}
-
-/* When a filer window is destroyed we call this for each entry in the
- * child_to_filer hash table to remove old entries.
- */
-static gboolean child_eq(gpointer key, gpointer data, gpointer filer_window)
-{
-	return data == filer_window;
 }
 
 /* Go though all the FileItems in a collection, freeing all the temp
@@ -167,7 +153,6 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	}
 
 	remove_view(filer_window);
-	g_hash_table_foreach_remove(child_to_filer, child_eq, filer_window);
 
 	free_temp_icons(filer_window);
 	if (filer_window->dir)
@@ -292,8 +277,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	}
 
 	item->base_type = base_type;
-
-	item->mime_type = type_from_path(path->str);
+	item->mime_type = NULL;
 
 	if (base_type == TYPE_DIRECTORY)
 	{
@@ -330,6 +314,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 		}
 		else if (base_type == TYPE_FILE)
 		{
+			item->mime_type = type_from_path(path->str);
 			item->image = type_to_icon(filer_window->window, 
 						   item->mime_type);
 		}
@@ -724,7 +709,9 @@ void open_item(Collection *collection,
 				GString		*message;
 				MIME_type	*type = item->mime_type;
 
-				if (type && type_open(full_path, type))
+				g_return_if_fail(type != NULL);
+
+				if (type_open(full_path, type))
 				{
 					if (adjust && !filer_window->panel)
 						gtk_widget_destroy(widget);

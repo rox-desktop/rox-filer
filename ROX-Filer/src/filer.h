@@ -58,7 +58,7 @@ struct _FileItem
 	char		*leafname;
 	
 	int		base_type;	/* (regular file, dir, pipe, etc) */
-	MIME_type	*mime_type;	/* only valid for files */
+	MIME_type	*mime_type;	/* NULL, except for non-exec files */
 	ItemFlags	flags;
 	
 	int		text_width;
