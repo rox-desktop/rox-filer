@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * The collection widget provides an area for displaying a collection of
  * objects (such as files). It allows the user to choose a selection of
  * them and provides signals to allow popping up menus, detecting double-clicks

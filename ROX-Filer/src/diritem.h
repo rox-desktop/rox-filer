@@ -1,6 +1,5 @@
 /*
- * $Id$
- *
+ * ROX-Filer, filer for the ROX desktop project
  * Thomas Leonard, <tal197@users.sourceforge.net>
  */
 

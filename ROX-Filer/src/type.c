@@ -764,7 +764,7 @@ void type_set_handler_dialog(MIME_type *type)
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
 
-	radios = radios_new();
+	radios = radios_new(NULL, NULL);
 	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
 	radios_add(radios,

@@ -1,7 +1,8 @@
 /*
- * $Id$
+ * ROX-Filer, filer for the ROX desktop project
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  *
- * Diego Zamboni <zamboni@cerias.purdue.edu>
+ * This file by Diego Zamboni <zamboni@cerias.purdue.edu>
  */
 
 #ifndef _APPMENU_H

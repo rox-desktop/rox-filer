@@ -51,8 +51,7 @@
 #include "action.h"
 #include "display.h"
 #include "xml.h"
-
-#define DELETE_ICON 1
+#include "dropbox.h"
 
 #define SET_MEDIA 2
 #define SET_TYPE 1
@@ -64,24 +63,17 @@ static GHashTable *glob_icons = NULL; /* Pathname -> Icon pathname */
 /* Static prototypes */
 static const char *process_globicons_line(gchar *line);
 static gboolean free_globicon(gpointer key, gpointer value, gpointer data);
-static void get_path_set_icon(GtkWidget *dialog);
-static void show_icon_help(gpointer data);
 static void write_globicons(void);
-static void show_current_dirs_menu(GtkWidget *button, gpointer data);
+static void show_current_dirs_menu(GtkWidget *drop_box, gpointer data);
 static void add_globicon(const gchar *path, const gchar *icon);
-static void drag_icon_dropped(GtkWidget	 	*frame,
-		       	      GdkDragContext    *context,
-		       	      gint              x,
-		       	      gint              y,
-		       	      GtkSelectionData  *selection_data,
-		       	      guint             info,
-		       	      guint32           time,
-		       	      GtkWidget	 	*dialog);
+static void drag_icon_dropped(GtkWidget	*drop_box,
+				  const guchar	*path,
+				  GtkWidget	*dialog);
 static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
 static void delete_globicon(const gchar *path);
 static gboolean convert_to_png(const gchar *src, const gchar *dest);
-static gboolean set_icon_path(const guchar *filepath, const guchar *iconpath);
+static void radios_changed(gpointer data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -213,31 +205,27 @@ static gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 
 static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
 {
-	if (response == GTK_RESPONSE_OK)
-		get_path_set_icon(dialog);
-	else if (response == GTK_RESPONSE_CANCEL)
-		gtk_widget_destroy(dialog);
-	else if (response == DELETE_ICON)
+	gtk_widget_destroy(dialog);
+}
+
+static void clear_icon(DropBox *drop_box, GObject *dialog)
+{
+	const guchar *path;
+	const guchar *icon_path;
+
+	path = g_object_get_data(G_OBJECT(dialog), "pathname");
+	g_return_if_fail(path != NULL);
+
+	delete_globicon(path);
+
+	icon_path = make_path(path, ".DirIcon");
+	if (access(icon_path, F_OK) == 0)
 	{
-		const guchar *path;
-		const guchar *icon_path;
+		GList *list;
 
-		path = g_object_get_data(G_OBJECT(dialog), "pathname");
-		g_return_if_fail(path != NULL);
-
-		delete_globicon(path);
-
-		icon_path = make_path(path, ".DirIcon");
-		if (access(icon_path, F_OK) == 0)
-		{
-			GList *list;
-
-			list = g_list_prepend(NULL, (char *) icon_path);
-			action_delete(list);
-			g_list_free(list);
-		}
-
-		gtk_widget_destroy(dialog);
+		list = g_list_prepend(NULL, (char *) icon_path);
+		action_delete(list);
+		g_list_free(list);
 	}
 }
 
@@ -248,17 +236,10 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 {
 	struct stat	info;
 	GtkDialog	*dialog;
-	GtkWidget	*frame, *hbox, *vbox2;
-	GtkWidget	*entry, *label, *button, *align, *icon;
+	GtkWidget	*frame;
 	Radios		*radios;
-	GtkTargetEntry 	targets[] = {
-		{"text/uri-list", 0, TARGET_URI_LIST},
-	};
-	char	*gi;
 	
 	g_return_if_fail(item != NULL && path != NULL);
-
-	gi = g_hash_table_lookup(glob_icons, path);
 
 	dialog = GTK_DIALOG(gtk_dialog_new());
 	gtk_dialog_set_has_separator(dialog, FALSE);
@@ -268,7 +249,10 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
 
-	radios = radios_new();
+	radios = radios_new(radios_changed, dialog);
+
+	g_object_set_data(G_OBJECT(dialog), "radios", radios);
+	g_object_set_data(G_OBJECT(dialog), "mime-type", item->mime_type);
 
 	radios_add(radios,
 			_("Use a copy of the image as the default for all "
@@ -307,73 +291,24 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 			radios_set_value(radios, SET_COPY);
 	}
 
+
+	frame = drop_box_new(_("Drop an icon file here"),
+			_("Menu of directories previously used for icons")),
+	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
+
+	/* Make sure rox-dropbox is set before packing (calls changed) */
 	radios_pack(radios, GTK_BOX(dialog->vbox));
-
-	g_object_set_data(G_OBJECT(dialog), "radios", radios);
-	g_object_set_data(G_OBJECT(dialog), "mime_type", item->mime_type);
-
-	frame = gtk_frame_new(NULL);
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
 
-	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
-			targets, sizeof(targets) / sizeof(*targets),
-			GDK_ACTION_COPY);
-	g_signal_connect(frame, "drag_data_received",
+	g_signal_connect(frame, "path_dropped",
 			G_CALLBACK(drag_icon_dropped), dialog);
-
-	vbox2 = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(frame), vbox2);
-
-	label = gtk_label_new(_("Drop an icon file here"));
-	gtk_misc_set_padding(GTK_MISC(label), 10, 10);
-	gtk_box_pack_start(GTK_BOX(vbox2), label, TRUE, TRUE, 0);
-	align = gtk_alignment_new(1, 1, 0, 0);
-	gtk_box_pack_start(GTK_BOX(vbox2), align, FALSE, TRUE, 0);
-	button = gtk_button_new();
-	gtk_container_add(GTK_CONTAINER(align), button);
-	icon = gtk_image_new_from_pixbuf(im_dirs->pixbuf);
-	gtk_container_add(GTK_CONTAINER(button), icon);
-	gtk_tooltips_set_tip(tooltips, button,
-			_("Menu of directories previously used for icons"),
-			NULL);
-	g_signal_connect(button, "clicked",
+	g_signal_connect(frame, "open_dir",
 			G_CALLBACK(show_current_dirs_menu), NULL);
+	g_signal_connect(frame, "clear",
+			G_CALLBACK(clear_icon), dialog);
 
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
-						FALSE, TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
-
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
-
-	label = gtk_label_new(_("Enter the path of an icon file:")),
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 4);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			new_help_button(show_icon_help, NULL), FALSE, TRUE, 0);
-
-	entry = gtk_entry_new();
-	/* Set the current icon as the default text if there is one */
-	if (gi)
-		gtk_entry_set_text(GTK_ENTRY(entry), gi);
-
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
-	gtk_widget_grab_focus(entry);
-	g_object_set_data(G_OBJECT(dialog), "icon_path", entry);
-	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
-
-	button = button_new_mixed(GTK_STOCK_DELETE, _("_Remove"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_dialog_add_action_widget(dialog, button, DELETE_ICON);
 	gtk_dialog_add_buttons(dialog,
-			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_OK,
 			NULL);
 	g_signal_connect(dialog, "response", G_CALLBACK(dialog_response), NULL);
 	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
@@ -385,6 +320,73 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+/* The dropbox shows the path for the currently selected radio setting */
+static void radios_changed(gpointer data)
+{
+	GObject *dialog = G_OBJECT(data);
+	DropBox *drop_box;
+	Radios *radios;
+	const guchar *path;
+	MIME_type *mime_type;
+
+	radios = g_object_get_data(dialog, "radios");
+	path = g_object_get_data(dialog, "pathname");
+	drop_box = g_object_get_data(dialog, "rox-dropbox");
+	mime_type = g_object_get_data(dialog, "mime-type");
+
+	g_return_if_fail(radios != NULL);
+	g_return_if_fail(path != NULL);
+	g_return_if_fail(drop_box != NULL);
+	g_return_if_fail(mime_type != NULL);
+	
+	switch (radios_get_value(radios))
+	{
+		case SET_MEDIA:
+		{
+			char *path, *type;
+
+			type = g_strconcat(mime_type->media_type, ".png", NULL);
+			path = choices_find_path_load(type, "MIME-icons");
+			g_free(type);
+			drop_box_set_path(drop_box, path);
+			g_free(path);
+			break;
+		}
+		case SET_TYPE:
+		{
+			char *path, *type;
+
+			type = g_strconcat(mime_type->media_type, "_",
+					   mime_type->subtype, ".png", NULL);
+			path = choices_find_path_load(type, "MIME-icons");
+			g_free(type);
+			drop_box_set_path(drop_box, path);
+			g_free(path);
+			break;
+		}
+		case SET_PATH:
+		{
+			const char	*gi;
+			gi = g_hash_table_lookup(glob_icons, path);
+			drop_box_set_path(drop_box, gi);
+			break;
+		}
+		case SET_COPY:
+		{
+			const char *diricon;
+			diricon = make_path(path, ".DirIcon");
+			if (file_exists(diricon))
+				drop_box_set_path(drop_box, diricon);
+			else
+				drop_box_set_path(drop_box, NULL);
+			break;
+		}
+		default:
+			drop_box_set_path(drop_box, NULL);
+			break;
+	}
+}
 
 static gboolean free_globicon(gpointer key, gpointer value, gpointer data)
 {
@@ -525,7 +527,7 @@ static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 		gboolean just_media = (op == SET_MEDIA);
 		MIME_type *type;
 		
-		type = g_object_get_data(G_OBJECT(dialog), "mime_type");
+		type = g_object_get_data(G_OBJECT(dialog), "mime-type");
 
 		if (!set_icon_for_type(type, icon, just_media))
 			return;
@@ -537,60 +539,11 @@ static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 /* Called when a URI list is dropped onto the box in the Set Icon
  * dialog. Make that the default icon.
  */
-static void drag_icon_dropped(GtkWidget	 	*frame,
-		       	      GdkDragContext    *context,
-		       	      gint              x,
-		       	      gint              y,
-		       	      GtkSelectionData  *selection_data,
-		       	      guint             info,
-		       	      guint32           time,
-		       	      GtkWidget	 	*dialog)
+static void drag_icon_dropped(GtkWidget	*drop_box,
+			      const guchar *path,
+			      GtkWidget	*dialog)
 {
-	GList	*uris;
-	guchar	*icon = NULL;
-
-	if (!selection_data->data)
-		return;
-
-	uris = uri_list_to_glist(selection_data->data);
-
-	if (g_list_length(uris) == 1)
-		icon = g_strdup(get_local_path((guchar *) uris->data));
-
-	destroy_glist(&uris);
-
-	if (!icon)
-	{
-		delayed_error(_("You should drop a single local icon file "
-				    "onto the drop box - that icon will be "
-				    "used for this file from now on."));
-		return;
-	}
-
-	do_set_icon(dialog, icon);
-
-	g_free(icon);
-}
-
-/* Called if the user clicks on the OK button on the Set Icon dialog */
-static void get_path_set_icon(GtkWidget *dialog)
-{
-	GtkEntry *entry;
-	const gchar *icon;
-
-	entry = g_object_get_data(G_OBJECT(dialog), "icon_path");
-	g_return_if_fail(entry != NULL);
-
-	icon = gtk_entry_get_text(entry);
-
-	do_set_icon(dialog, icon);
-}
-
-static void show_icon_help(gpointer data)
-{
-	info_message(
-		_("Enter the full path of a file that contains a valid "
-		  "image to be used as the icon for this file or directory."));
+	do_set_icon(dialog, path);
 }
 
 /* Set the icon for the given MIME type.  We copy the file. */
@@ -664,7 +617,7 @@ static void add_dir_to_menu(gpointer key, gpointer value, gpointer data)
 	gtk_menu_shell_append(menu, item);
 }
 
-static void show_current_dirs_menu(GtkWidget *button, gpointer data)
+static void show_current_dirs_menu(GtkWidget *drop_box, gpointer data)
 {
 	GHashTable *names;
 	GtkWidget *menu;

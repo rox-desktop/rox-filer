@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
 

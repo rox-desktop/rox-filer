@@ -1,5 +1,6 @@
 /*
- * $Id$
+ * ROX-Filer, filer for the ROX desktop project
+ * By Thomas Leonard, <tal197@users.sourceforge.net>.
  *
  * Diego Zamboni, Feb 7, 2001
  */

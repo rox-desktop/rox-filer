@@ -55,8 +55,11 @@
 #include "tasklist.h"
 #include "panel.h"		/* For panel_mark_used() */
 #include "wrapped.h"
+#include "dropbox.h"
 
 static gboolean tmp_icon_selected = FALSE;		/* When dragging */
+
+static GtkWidget *set_backdrop_dialog = NULL;
 
 struct _Pinboard {
 	guchar		*name;		/* Leaf name */
@@ -206,19 +209,15 @@ static void set_backdrop(const gchar *path, BackdropStyle style);
 static void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static void abandon_backdrop_app(Pinboard *pinboard);
-static void drag_backdrop_dropped(GtkWidget	*frame,
-			      GdkDragContext    *context,
-			      gint              x,
-			      gint              y,
-			      GtkSelectionData  *selection_data,
-			      guint             drag_info,
-			      guint32           time,
-			      GtkWidget		*dialog);
+static void drag_backdrop_dropped(GtkWidget	*drop_box,
+				  const guchar	*path,
+				  GtkWidget	*dialog);
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
 static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect);
 static void update_pinboard_font(void);
 static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
+static void clear_backdrop(GtkWidget *drop_box, gpointer data);
 
 
 /****************************************************************
@@ -563,15 +562,19 @@ void pinboard_set_backdrop(void)
 	GtkWidget *dialog, *frame, *label, *hbox;
 	GtkBox *vbox;
 	Radios *radios;
-	GtkTargetEntry 	targets[] = {
-		{"text/uri-list", 0, TARGET_URI_LIST},
-	};
+
+	g_return_if_fail(current_pinboard != NULL);
+
+	if (set_backdrop_dialog)
+		gtk_widget_destroy(set_backdrop_dialog);
 
 	dialog = gtk_dialog_new_with_buttons(_("Set backdrop"), NULL,
 			GTK_DIALOG_NO_SEPARATOR,
-			GTK_STOCK_CLEAR, GTK_RESPONSE_NO,
-			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_OK,
 			NULL);
+	set_backdrop_dialog = dialog;
+	g_signal_connect(dialog, "destroy",
+			G_CALLBACK(gtk_widget_destroyed), &set_backdrop_dialog);
 	vbox = GTK_BOX(GTK_DIALOG(dialog)->vbox);
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
@@ -585,7 +588,7 @@ void pinboard_set_backdrop(void)
 	hbox = gtk_hbox_new(TRUE, 2);
 	gtk_box_pack_start(vbox, hbox, TRUE, TRUE, 4);
 
-	radios = radios_new();
+	radios = radios_new(NULL, NULL);
 	g_object_set_data(G_OBJECT(dialog), "rox-radios", radios);
 
 	radios_add(radios, _("Centre the image without scaling it"),
@@ -602,20 +605,15 @@ void pinboard_set_backdrop(void)
 	radios_pack(radios, GTK_BOX(hbox));
 	
 	/* The drop area... */
-	frame = gtk_frame_new(NULL);
+	frame = drop_box_new(_("Drop an image here"), NULL);
+	g_object_set_data(G_OBJECT(dialog), "rox-dropbox", frame);
 	gtk_box_pack_start(vbox, frame, TRUE, TRUE, 4);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
-	gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+	drop_box_set_path(DROP_BOX(frame), current_pinboard->backdrop);
 
-	gtk_drag_dest_set(frame, GTK_DEST_DEFAULT_ALL,
-			targets, sizeof(targets) / sizeof(*targets),
-			GDK_ACTION_COPY);
-	g_signal_connect(frame, "drag_data_received",
+	g_signal_connect(frame, "path_dropped",
 			G_CALLBACK(drag_backdrop_dropped), dialog);
-
-	label = gtk_label_new(_("Drop an image here"));
-	gtk_misc_set_padding(GTK_MISC(label), 10, 20);
-	gtk_container_add(GTK_CONTAINER(frame), label);
+	g_signal_connect(frame, "clear",
+			G_CALLBACK(clear_backdrop), dialog);
 
 	g_signal_connect(dialog, "response",
 			 G_CALLBACK(backdrop_response), NULL);
@@ -630,47 +628,23 @@ void pinboard_set_backdrop(void)
 
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data)
 {
-	if (response == GTK_RESPONSE_NO)
-		set_backdrop(NULL, BACKDROP_NONE);
-			
 	gtk_widget_destroy(dialog);
 }
 
-static void drag_backdrop_dropped(GtkWidget	*frame,
-			      GdkDragContext    *context,
-			      gint              x,
-			      gint              y,
-			      GtkSelectionData  *selection_data,
-			      guint             drag_info,
-			      guint32           time,
-			      GtkWidget		*dialog)
+static void clear_backdrop(GtkWidget *drop_box, gpointer data)
+{
+	set_backdrop(NULL, BACKDROP_NONE);
+}
+
+static void drag_backdrop_dropped(GtkWidget	*drop_box,
+				  const guchar	*path,
+				  GtkWidget	*dialog)
 {
 	struct stat info;
-	const gchar *path = NULL;
-	GList *uris;
 	Radios *radios;
-
-	if (!selection_data->data)
-		return; 		/* Timeout? */
 
 	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
 	g_return_if_fail(radios != NULL);
-
-	uris = uri_list_to_glist(selection_data->data);
-
-	if (g_list_length(uris) == 1)
-		path = get_local_path((guchar *) uris->data);
-	g_list_free(uris);
-
-	if (!path)
-	{
-		delayed_error(
-			_("You should drop a single (local) image file "
-			"onto the drop box - that image will be "
-			"used for the desktop background. You can also "
-			"drag certain applications onto this box."));
-		return;
-	}
 
 	if (mc_stat(path, &info))
 	{
@@ -2276,6 +2250,15 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 			current_pinboard->backdrop_style);
 	
 	pinboard_save();
+
+	if (set_backdrop_dialog)
+	{
+		DropBox *box = g_object_get_data(G_OBJECT(set_backdrop_dialog),
+							  "rox-dropbox");
+		g_return_if_fail(box != NULL);
+		drop_box_set_path(box, current_pinboard->backdrop);
+		/* TODO set style too? */
+	}
 }
 
 #define SEARCH_STEP 32

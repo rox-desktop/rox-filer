@@ -533,15 +533,14 @@ gboolean rox_spawn(const gchar *dir, const gchar **argv)
 	return TRUE;
 }
 
-GtkWidget *button_new_mixed(const char *stock, const char *message)
+GtkWidget *button_new_image_text(GtkWidget *image, const char *message)
 {
-	GtkWidget *button, *align, *image, *hbox, *label;
+	GtkWidget *button, *align, *hbox, *label;
 	
 	button = gtk_button_new();
 	label = gtk_label_new_with_mnemonic(message);
 	gtk_label_set_mnemonic_widget(GTK_LABEL(label), button);
 
-	image = gtk_image_new_from_stock(stock, GTK_ICON_SIZE_BUTTON);
 	hbox = gtk_hbox_new(FALSE, 2);
 
 	align = gtk_alignment_new(0.5, 0.5, 0.0, 0.0);
@@ -554,6 +553,13 @@ GtkWidget *button_new_mixed(const char *stock, const char *message)
 	gtk_widget_show_all(align);
 
 	return button;
+}
+
+GtkWidget *button_new_mixed(const char *stock, const char *message)
+{
+	return button_new_image_text(gtk_image_new_from_stock(stock,
+					       GTK_ICON_SIZE_BUTTON),
+					message);
 }
 
 /* Highlight entry in red if 'error' is TRUE */
@@ -786,19 +792,26 @@ gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
 
 struct _Radios {
 	GList *widgets;
+
+	void (*changed)(gpointer data);
+	gpointer changed_data;
 };
 
 /* Create a new set of radio buttons.
  * Use radios_add to add options, then radios_pack to put them into something.
  * The radios object will self-destruct with the first widget it contains.
+ * changed(data) is called (if not NULL) when pack is called, and on any
+ * change after that.
  */
-Radios *radios_new(void)
+Radios *radios_new(void (*changed)(gpointer data), gpointer data)
 {
 	Radios *radios;
 
 	radios = g_new(Radios, 1);
 
 	radios->widgets = NULL;
+	radios->changed = changed;
+	radios->changed_data = data;
 
 	return radios;
 }
@@ -840,12 +853,25 @@ void radios_add(Radios *radios, const gchar *tip, gint value,
 			  GINT_TO_POINTER(value));
 }
 
+static void radio_toggled(GtkToggleButton *button, Radios *radios)
+{
+	if (radios->changed)
+		radios->changed(radios->changed_data);
+}
+
 void radios_pack(Radios *radios, GtkBox *box)
 {
 	GList *next;
 
 	for (next = g_list_last(radios->widgets); next; next = next->prev)
-		gtk_box_pack_start(box, GTK_WIDGET(next->data), FALSE, TRUE, 0);
+	{
+		GtkWidget *button = GTK_WIDGET(next->data);
+
+		gtk_box_pack_start(box, button, FALSE, TRUE, 0);
+		g_signal_connect(button, "toggled",
+				G_CALLBACK(radio_toggled), radios);
+	}
+	radio_toggled(NULL, radios);
 }
 
 void radios_set_value(Radios *radios, gint value)

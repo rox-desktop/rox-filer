@@ -1,6 +1,4 @@
 /*
- * $Id$
- *
  * ROX-Filer, filer for the ROX desktop project
  * By Thomas Leonard, <tal197@users.sourceforge.net>.
  */
@@ -45,6 +43,7 @@ void wink_widget(GtkWidget *widget);
 void destroy_on_idle(GtkWidget *widget);
 gboolean rox_spawn(const gchar *dir, const gchar **argv);
 GtkWidget *button_new_mixed(const char *stock, const char *message);
+GtkWidget *button_new_image_text(GtkWidget *image, const char *message);
 void entry_set_error(GtkWidget *entry, gboolean error);
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower);
 void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y);
@@ -53,7 +52,7 @@ void tooltip_prime(GtkFunction callback, GObject *object);
 void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc);
 gboolean confirm(const gchar *message, const gchar *stock, const gchar *action);
 
-Radios *radios_new(void);
+Radios *radios_new(void (*changed)(gpointer data), gpointer data);
 void radios_add(Radios *radios, const gchar *tip, gint value,
 		const gchar *label, ...);
 void radios_pack(Radios *radios, GtkBox *box);
