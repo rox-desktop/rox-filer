@@ -30,6 +30,7 @@
 
 #define PIXMAP_PURGE_TIME 1200
 #define PIXMAP_THUMB_SIZE  128
+#define PIXMAP_THUMB_TOO_OLD_TIME  5
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -381,7 +382,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 			if (item->flags & ITEM_FLAG_APPDIR)
 				thumb_prog = g_strconcat(thumb_prog, "/AppRun",
 						       NULL);
-						  
+
 			execl(thumb_prog, thumb_prog, path,
 			      thumbnail_path(path),
 			      g_strdup_printf("%d", PIXMAP_THUMB_SIZE),
@@ -586,6 +587,7 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 	char *thumb_path, *md5, *uri, *path;
 	const char *ssize, *smtime;
 	struct stat info;
+	time_t ttime, now;
 
 	path = pathdup(pathname);
 	uri = g_filename_to_uri(path, NULL, NULL);
@@ -614,7 +616,12 @@ static GdkPixbuf *get_thumbnail_for(const char *pathname)
 	if (mc_stat(path, &info) != 0)
 		goto err;
 
-	if (info.st_mtime != atol(smtime) || info.st_size != atol(ssize))
+	ttime=(time_t) atol(smtime);
+	time(&now);
+	if (info.st_mtime != ttime && now>ttime+PIXMAP_THUMB_TOO_OLD_TIME)
+		goto err;
+
+	if (info.st_size < atol(ssize))
 		goto err;
 
 	goto out;
