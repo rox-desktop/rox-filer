@@ -81,20 +81,6 @@ void run_app(const char *path)
 	g_string_free(apprun, TRUE);
 }
 
-void run_app_with_arg(const char *path, const char *arg)
-{
-	GString	*apprun;
-	const char *argv[] = {NULL, NULL, NULL};
-
-	apprun = g_string_new(path);
-	argv[0] = g_string_append(apprun, "/AppRun")->str;
-	argv[1] = arg;
-
-	rox_spawn(home_dir, argv);
-	
-	g_string_free(apprun, TRUE);
-}
-
 /* Execute this program, passing all the URIs in the list as arguments.
  * URIs that are files on the local machine will be passed as simple
  * pathnames. The uri_list should be freed after this function returns.
@@ -205,74 +191,44 @@ void run_with_data(const char *path, gpointer data, gulong length)
 	close(fds[0]);
 }
 
-/* Load a file, open a directory or run an application. Or, if 'edit' is set:
- * edit a file, open an application, follow a symlink or mount a device.
- *
- * arg is a string to append to the command when running apps or executables,
- * or NULL.   Ignored for non-executables
- * filer_window is the window to use for displaying a directory.
- * NULL will always use a new directory when needed.
- * src_window is the window to copy options from, or NULL.
- *
- * Returns TRUE on success.
+/* Splits args into an argument vector, and runs the program. Must be
+ * executable.
  */
-gboolean run_diritem_with_arg(const guchar *full_path,
-		     DirItem *item,
-			      const gchar *arg,
-		     FilerWindow *filer_window,
-		     FilerWindow *src_window,
-		     gboolean edit)
+void run_with_args(const char *path, DirItem *item, const char *args)
 {
-	if (item->flags & ITEM_FLAG_SYMLINK && edit)
-		return follow_symlink(full_path, filer_window, src_window);
+	GError *error = NULL;
+	gchar **argv = NULL;
+	int n_args = 0;
 
-	switch (item->base_type)
+	if (item->base_type != TYPE_DIRECTORY && item->base_type != TYPE_FILE)
 	{
-		case TYPE_DIRECTORY:
-			if (item->flags & ITEM_FLAG_APPDIR && !edit)
-			{
-				if(arg)
-					run_app_with_arg(full_path, arg);
-				else
-					run_app(full_path);
-				return TRUE;
-			}
-
-			if (item->flags & ITEM_FLAG_MOUNT_POINT)
-			{
-				open_mountpoint(full_path, item,
-						filer_window, src_window, edit);
-			}
-			else if (filer_window)
-				filer_change_to(filer_window, full_path, NULL);
-			else
-				filer_opendir(full_path, src_window, NULL);
-			return TRUE;
-		case TYPE_FILE:
-			if (item->mime_type == application_executable && !edit)
-			{
-				const char *argv[] = {NULL, NULL, NULL};
-				guchar	*dir = filer_window
-						? filer_window->sym_path
-						: NULL;
-
-				argv[0] = full_path;
-				argv[1] = arg;
-
-				return rox_spawn(dir, argv) != 0;
-			}
-
-			return open_file(full_path, edit ? text_plain
-						  : item->mime_type);
-		case TYPE_ERROR:
-			delayed_error(_("File doesn't exist, or I can't "
-					  "access it: %s"), full_path);
-			return FALSE;
-		default:
-		        delayed_error(
-				_("I don't know how to open '%s'"), full_path);
-			return FALSE;
+		delayed_error("Arguments (%s) given for non-executable item %s",
+				args, path);
+		return;
 	}
+
+	if (!g_shell_parse_argv(args, &n_args, &argv, &error))
+	{
+		delayed_error("Failed to parse argument string '%s':\n%s",
+				args, error->message);
+		g_error_free(error);
+		return;
+	}
+
+	g_return_if_fail(argv != NULL);
+	g_return_if_fail(error == NULL);
+
+	argv = g_realloc(argv, (n_args + 2) * sizeof(gchar *));
+	memmove(argv + 1, argv, (n_args + 1) * sizeof(gchar *));
+
+	if (item->base_type == TYPE_DIRECTORY)
+		argv[0] = g_strconcat(path, "/AppRun", NULL);
+	else
+		argv[0] = g_strdup(path);
+
+	rox_spawn(home_dir, (const gchar **) argv);
+
+	g_strfreev(argv);
 }
 
 /* Load a file, open a directory or run an application. Or, if 'edit' is set:
@@ -290,8 +246,52 @@ gboolean run_diritem(const guchar *full_path,
 		     FilerWindow *src_window,
 		     gboolean edit)
 {
-	return run_diritem_with_arg(full_path, item, NULL, filer_window,
-				     src_window, edit);
+	if (item->flags & ITEM_FLAG_SYMLINK && edit)
+		return follow_symlink(full_path, filer_window, src_window);
+
+	switch (item->base_type)
+	{
+		case TYPE_DIRECTORY:
+			if (item->flags & ITEM_FLAG_APPDIR && !edit)
+			{
+				run_app(full_path);
+				return TRUE;
+			}
+
+			if (item->flags & ITEM_FLAG_MOUNT_POINT)
+			{
+				open_mountpoint(full_path, item,
+						filer_window, src_window, edit);
+			}
+			else if (filer_window)
+				filer_change_to(filer_window, full_path, NULL);
+			else
+				filer_opendir(full_path, src_window, NULL);
+			return TRUE;
+		case TYPE_FILE:
+			if (item->mime_type == application_executable && !edit)
+			{
+				const char *argv[] = {NULL, NULL};
+				guchar	*dir = filer_window
+						? filer_window->sym_path
+						: NULL;
+
+				argv[0] = full_path;
+
+				return rox_spawn(dir, argv) != 0;
+			}
+
+			return open_file(full_path, edit ? text_plain
+						  : item->mime_type);
+		case TYPE_ERROR:
+			delayed_error(_("File doesn't exist, or I can't "
+					  "access it: %s"), full_path);
+			return FALSE;
+		default:
+		        delayed_error(
+				_("I don't know how to open '%s'"), full_path);
+			return FALSE;
+	}
 }
 
 /* Attempt to open this item */

@@ -18,14 +18,9 @@ gboolean run_diritem(const guchar *full_path,
 		     FilerWindow *filer_window,
 		     FilerWindow *src_window,
 		     gboolean edit);
-gboolean run_diritem_with_arg(const guchar *full_path,
-			      DirItem *item,
-			      const gchar *arg,
-			      FilerWindow *filer_window,
-			      FilerWindow *src_window,
-			      gboolean edit);
 void open_to_show(const guchar *path);
 void examine(const guchar *path);
 void show_help_files(const char *dir);
+void run_with_args(const char *path, DirItem *item, const char *args);
 
 #endif /* _RUN_H */

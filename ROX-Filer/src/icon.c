@@ -440,19 +440,26 @@ void icon_set_shortcut(Icon *icon, const gchar *shortcut)
 	grab_key(icon);
 }
 
-void icon_set_argument(Icon *icon, const gchar *arg)
+void icon_set_arguments(Icon *icon, const gchar *args)
 {
 	g_return_if_fail(icon != NULL);
+	g_return_if_fail(args == NULL || icon->args != args);
 
-	if (arg && !*arg)
-		arg = NULL;
-	if (icon->arg == arg)
-		return;
-	if (icon->arg && arg && strcmp(icon->arg, arg) == 0)
+	if (args && !*args)
+		args = NULL;
+	if (icon->args && args && strcmp(icon->args, args) == 0)
 		return;
 
-	g_free(icon->arg);
-	icon->arg = g_strdup(arg);
+	g_free(icon->args);
+	icon->args = g_strdup(args);
+}
+
+void icon_run(Icon *icon)
+{
+	if (icon->args == NULL)
+		run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
+	else
+		run_with_args(icon->path, icon->item, icon->args);
 }
 
 /****************************************************************
@@ -500,8 +507,8 @@ static void icon_unhash_path(Icon *icon)
 static void rename_activate(GtkWidget *dialog)
 {
 	GtkWidget *entry, *src, *shortcut, *arg;
-	Icon	*icon;
-	const guchar	*new_name, *new_src, *new_shortcut, *new_arg;
+	Icon *icon;
+	const guchar *new_name, *new_src, *new_shortcut, *new_args;
 	
 	entry = g_object_get_data(G_OBJECT(dialog), "new_name");
 	icon = g_object_get_data(G_OBJECT(dialog), "callback_icon");
@@ -520,7 +527,7 @@ static void rename_activate(GtkWidget *dialog)
 	new_shortcut = gtk_label_get_text(GTK_LABEL(shortcut));
 	if (strcmp(new_shortcut, CLICK_TO_SET) == 0)
 		new_shortcut = NULL;
-	new_arg = gtk_entry_get_text(GTK_ENTRY(arg));
+	new_args = gtk_entry_get_text(GTK_ENTRY(arg));
 	
 	if (*new_src == '\0')
 		report_error(
@@ -529,7 +536,7 @@ static void rename_activate(GtkWidget *dialog)
 	{
 		icon_set_path(icon, new_src, new_name);
 		icon_set_shortcut(icon, new_shortcut);
-		icon_set_argument(icon, new_arg);
+		icon_set_arguments(icon, new_args);
 		g_signal_emit_by_name(icon, "update");
 		gtk_widget_destroy(dialog);
 	}
@@ -803,12 +810,12 @@ static void show_rename_box(Icon *icon)
 	g_signal_connect_swapped(entry, "activate",
 			G_CALLBACK(rename_activate), dialog);
 
-	label = gtk_label_new(_("Argument to pass (for executables):"));
+	label = gtk_label_new(_("Arguments to pass (for executables):"));
 	gtk_box_pack_start(vbox, label, TRUE, TRUE, 0);
 
 	entry = gtk_entry_new();
 	gtk_box_pack_start(vbox, entry, TRUE, FALSE, 2);
-	gtk_entry_set_text(GTK_ENTRY(entry), icon->arg? icon->arg: "");
+	gtk_entry_set_text(GTK_ENTRY(entry), icon->args ? icon->args : "");
 	g_object_set_data(G_OBJECT(dialog), "new_arg", entry);
 	g_signal_connect_swapped(entry, "activate",
 			G_CALLBACK(rename_activate), dialog);
@@ -879,7 +886,7 @@ static void icon_finialize(GObject *object)
 
 	icon_set_path(icon, NULL, NULL);
 	icon_set_shortcut(icon, NULL);
-	icon_set_argument(icon, NULL);
+	icon_set_arguments(icon, NULL);
 
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
@@ -937,7 +944,7 @@ static void icon_init(GTypeInstance *object, gpointer gclass)
 	icon->shortcut = NULL;
 	icon->shortcut_key.keycode = 0;
 	icon->shortcut_key.modifier = 0;
-	icon->arg = NULL;
+	icon->args = NULL;
 }
 
 /* As icon_set_selected(), but doesn't automatically unselect incompatible
@@ -1172,8 +1179,7 @@ static GdkFilterReturn filter_keys(GdkXEvent *xevent,
 		    icon->shortcut_key.modifier == state)
 		{
 			icon_wink(icon);
-			run_diritem_with_arg(icon->path, icon->item, icon->arg,
-				    NULL, NULL, FALSE);
+			icon_run(icon);
 		}
 	}
 	

@@ -445,8 +445,9 @@ void pinboard_moved_widget(GtkWidget *widget, const gchar *name,
  * 'x' and 'y' are the coordinates of the point in the middle of the text.
  * 'name' is the name to use. If NULL then the leafname of path is used.
  */
-void pinboard_pin_with_arg(const gchar *path, const gchar *name, int x, int y,
-			   const gchar *shortcut, const gchar *arg)
+static void pinboard_pin_with_args(const gchar *path, const gchar *name,
+				   int x, int y, const gchar *shortcut,
+				   const gchar *args)
 {
 	GtkWidget	*align, *vbox;
 	GdkWindow	*events;
@@ -532,7 +533,7 @@ void pinboard_pin_with_arg(const gchar *path, const gchar *name, int x, int y,
 	pin_icon_set_tip(pi);
 
 	icon_set_shortcut(icon, shortcut);
-	icon_set_argument(icon, arg);
+	icon_set_arguments(icon, args);
 
 	if (!loading_pinboard)
 		pinboard_save();
@@ -541,7 +542,7 @@ void pinboard_pin_with_arg(const gchar *path, const gchar *name, int x, int y,
 void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 		  const gchar *shortcut)
 {
-  pinboard_pin_with_arg(path, name, x, y, shortcut, NULL);
+	pinboard_pin_with_args(path, name, x, y, shortcut, NULL);
 }
 
 /* Put a border around the icon, briefly.
@@ -1160,8 +1161,7 @@ static void perform_action(PinIcon *pi, GdkEventButton *event)
 			pinboard_wink_item(pi, TRUE);
 			if (event->type == GDK_2BUTTON_PRESS)
 				icon_set_selected(icon, FALSE);
-			run_diritem_with_arg(icon->path, icon->item,
-					     icon->arg, NULL, NULL, FALSE);
+			icon_run(icon);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
@@ -1366,7 +1366,7 @@ static void backdrop_from_xml(xmlNode *node)
 static void pinboard_load_from_xml(xmlDocPtr doc)
 {
 	xmlNodePtr node, root;
-	char	   *tmp, *label, *path, *shortcut, *arg;
+	char	   *tmp, *label, *path, *shortcut, *args;
 	int	   x, y;
 
 	root = xmlDocGetRootElement(doc);
@@ -1402,14 +1402,14 @@ static void pinboard_load_from_xml(xmlDocPtr doc)
 		if (!path)
 			path = g_strdup("<missing path>");
 		shortcut = xmlGetProp(node, "shortcut");
-		arg = xmlGetProp(node, "arg");
+		args = xmlGetProp(node, "args");
 
-		pinboard_pin_with_arg(path, label, x, y, shortcut, arg);
+		pinboard_pin_with_args(path, label, x, y, shortcut, args);
 
 		g_free(path);
 		g_free(label);
 		g_free(shortcut);
-		g_free(arg);
+		g_free(args);
 	}
 }
 
@@ -1515,8 +1515,8 @@ static void pinboard_save(void)
 		xmlSetProp(tree, "label", icon->item->leafname);
 		if (icon->shortcut)
 			xmlSetProp(tree, "shortcut", icon->shortcut);
-		if (icon->arg)
-			xmlSetProp(tree, "arg", icon->arg);
+		if (icon->args)
+			xmlSetProp(tree, "args", icon->args);
 	}
 
 	save_new = g_strconcat(save, ".new", NULL);

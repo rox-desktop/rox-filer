@@ -133,7 +133,7 @@ static void panel_add_item(Panel *panel,
 			   const gchar *name,
 			   gboolean after,
 			   const gchar *shortcut,
-			   const gchar *arg);
+			   const gchar *args);
 static gboolean panel_drag_motion(GtkWidget	*widget,
 			    GdkDragContext	*context,
 			    gint		x,
@@ -516,7 +516,7 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 {
 	xmlNodePtr node;
-	char	   *label, *path, *shortcut, *arg;
+	char	   *label, *path, *shortcut, *args;
 
 	for (node = side->xmlChildrenNode; node; node = node->next)
 	{
@@ -532,14 +532,14 @@ static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
 		if (!path)
 			path = g_strdup("<missing path>");
 		shortcut = xmlGetProp(node, "shortcut");
-		arg = xmlGetProp(node, "arg");
+		args = xmlGetProp(node, "args");
 
-		panel_add_item(panel, path, label, after, shortcut, arg);
+		panel_add_item(panel, path, label, after, shortcut, args);
 
 		g_free(path);
 		g_free(label);
 		g_free(shortcut);
-		g_free(arg);
+		g_free(args);
 	}
 }
 
@@ -665,7 +665,7 @@ static void panel_add_item(Panel *panel,
 			   const gchar *name,
 			   gboolean after,
 			   const gchar *shortcut,
-			   const gchar *arg)
+			   const gchar *args)
 {
 	GtkWidget	*widget;
 	PanelIcon	*pi;
@@ -737,7 +737,7 @@ static void panel_add_item(Panel *panel,
 	}
 
 	icon_set_shortcut(icon, shortcut);
-	icon_set_argument(icon, arg);
+	icon_set_arguments(icon, args);
 
 	if (!loading_panel)
 		panel_save(panel);
@@ -951,8 +951,7 @@ static void perform_action(Panel *panel, PanelIcon *pi, GdkEventButton *event)
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
 			wink_widget(pi->widget);
-			run_diritem_with_arg(icon->path, icon->item, icon->arg,
-					     NULL, NULL, FALSE);
+			icon_run(icon);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
@@ -1391,8 +1390,8 @@ static void make_widgets(xmlNodePtr side, GList *widgets)
 		xmlSetProp(tree, "label", icon->item->leafname);
 		if (icon->shortcut)
 			xmlSetProp(tree, "shortcut", icon->shortcut);
-		if (icon->arg)
-			xmlSetProp(tree, "arg", icon->arg);
+		if (icon->args)
+			xmlSetProp(tree, "args", icon->args);
 	}
 	
 	if (widgets)
