@@ -13,7 +13,12 @@
 extern GtkAccelGroup	*filer_keys;
 
 void menu_init(void);
-void menu_save(void);
+
+GtkWidget *create_menu_options(void);
+void menu_update_options(void);
+void menu_set_options(void);
+void menu_save_options(void);
+
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item);
 #endif /* _MENU_H */

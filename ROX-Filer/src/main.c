@@ -69,6 +69,8 @@ int main(int argc, char **argv)
 	savebox_init();
 	type_init();
 
+	options_load();
+
 	signal(SIGCHLD, child_died);
 
 	if (argc < 2)

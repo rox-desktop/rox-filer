@@ -79,7 +79,6 @@ static void got_data_raw(GtkWidget 		*widget,
 			GdkDragContext 		*context,
 			GtkSelectionData 	*selection_data,
 			guint32             	time);
-static gboolean load_file(char *pathname, char **data_out, long *length_out);
 static GSList *uri_list_to_gslist(char *uri_list);
 static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
@@ -378,54 +377,6 @@ void drag_data_get(GtkWidget          		*widget,
 
 	if (delete_once_sent)
 		g_free(to_send);
-}
-
-/* Load the file into memory. Return TRUE on success. */
-static gboolean load_file(char *pathname, char **data_out, long *length_out)
-{
-	FILE		*file;
-	long		length;
-	char		*buffer;
-	gboolean 	retval = FALSE;
-
-	file = fopen(pathname, "r");
-
-	if (!file)
-	{
-		delayed_error("Opening file for DND", g_strerror(errno));
-		return FALSE;
-	}
-
-	fseek(file, 0, SEEK_END);
-	length = ftell(file);
-
-	buffer = malloc(length);
-	if (buffer)
-	{
-		fseek(file, 0, SEEK_SET);
-		fread(buffer, 1, length, file);
-
-		if (ferror(file))
-		{
-			delayed_error("Loading file for DND",
-						g_strerror(errno));
-			g_free(buffer);
-		}
-		else
-		{
-			*data_out = buffer;
-			*length_out = length;
-			retval = TRUE;
-		}
-	}
-	else
-		delayed_error("Loading file for DND",
-				"Can't allocate memory for buffer to "
-				"transfer this file");
-
-	fclose(file);
-
-	return retval;
 }
 
 /*			DRAGGING TO US				*/

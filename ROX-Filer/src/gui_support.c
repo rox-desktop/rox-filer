@@ -12,6 +12,7 @@
 #include <string.h>
 #include <sys/param.h>
 #include <stdarg.h>
+#include <errno.h>
 
 #include <glib.h>
 #include <X11/Xlib.h>
@@ -197,4 +198,55 @@ void delayed_error(char *title, char *error)
 	gtk_idle_add(error_idle_cb, delayed_error_data);
 
 	number_of_windows++;
+}
+
+/* Load the file into memory. Return TRUE on success.
+ * Block is zero terminated (but this is not included in the length).
+ */
+gboolean load_file(char *pathname, char **data_out, long *length_out)
+{
+	FILE		*file;
+	long		length;
+	char		*buffer;
+	gboolean 	retval = FALSE;
+
+	file = fopen(pathname, "r");
+
+	if (!file)
+	{
+		delayed_error("Opening file for DND", g_strerror(errno));
+		return FALSE;
+	}
+
+	fseek(file, 0, SEEK_END);
+	length = ftell(file);
+
+	buffer = malloc(length + 1);
+	if (buffer)
+	{
+		fseek(file, 0, SEEK_SET);
+		fread(buffer, 1, length, file);
+
+		if (ferror(file))
+		{
+			delayed_error("Loading file for DND",
+						g_strerror(errno));
+			g_free(buffer);
+		}
+		else
+		{
+			*data_out = buffer;
+			*length_out = length;
+			buffer[length] = '\0';
+			retval = TRUE;
+		}
+	}
+	else
+		delayed_error("Loading file for DND",
+				"Can't allocate memory for buffer to "
+				"transfer this file");
+
+	fclose(file);
+
+	return retval;
 }

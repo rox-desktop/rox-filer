@@ -34,10 +34,15 @@
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*panel_keys;
 
+/* Options */
+static GtkWidget *xterm_here_entry;
+static char *xterm_here_value;
+
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
+static char *load_xterm_here(char *data);
 
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -118,7 +123,6 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
 };
 
-
 void menu_init()
 {
 	GtkItemFactory  	*item_factory;
@@ -165,8 +169,71 @@ void menu_init()
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
 	gtk_accel_group_lock(panel_keys);
+
+	xterm_here_value = g_strdup("xterm");
+	option_register("xterm_here", load_xterm_here);
 }
  
+/* Build up some option widgets to go in the options dialog, but don't
+ * fill them in yet.
+ */
+GtkWidget *create_menu_options()
+{
+	GtkWidget	*table, *label;
+
+	table = gtk_table_new(2, 2, FALSE);
+	gtk_container_set_border_width(GTK_CONTAINER(table), 4);
+
+	label = gtk_label_new("To set the keyboard short-cuts you simply open "
+			"the menu over a filer window, move the pointer over "
+			"the item you want to use and press a key. The key "
+			"will appear next to the menu item and you can just "
+			"press that key without opening the menu in future. "
+			"To save the current menu short-cuts for next time, "
+			"click the Save button at the bottom of this window.");
+	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
+
+	label = gtk_label_new("'Xterm here' program:");
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
+	xterm_here_entry = gtk_entry_new();
+	gtk_table_attach_defaults(GTK_TABLE(table), xterm_here_entry,
+			1, 2, 1, 2);
+
+	return table;
+}
+
+static char *load_xterm_here(char *data)
+{
+	g_free(xterm_here_value);
+	xterm_here_value = g_strdup(data);
+	return NULL;
+}
+
+void menu_update_options()
+{
+	gtk_entry_set_text(GTK_ENTRY(xterm_here_entry), xterm_here_value);
+}
+
+void menu_set_options()
+{
+	g_free(xterm_here_value);
+	xterm_here_value = g_strdup(gtk_entry_get_text(
+				GTK_ENTRY(xterm_here_entry)));
+}
+
+void menu_save_options()
+{
+	char	*menurc;
+
+	menurc = choices_find_path_save("menus");
+	if (menurc)
+		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
+
+	option_write("xterm_here", xterm_here_value);
+}
+
+
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
 {
 	GList	*items, *item;
@@ -181,16 +248,6 @@ static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
 	}
 
 	g_list_free(items);
-}
-
-/* Save the keybindings... */
-void menu_save()
-{
-	char	*menurc;
-
-	menurc = choices_find_path_save("menus");
-	if (menurc)
-		gtk_item_factory_dump_rc(menurc, NULL, TRUE);
 }
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
@@ -562,7 +619,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*argv[] = {"gnome-terminal", NULL};	/* XXX: Bad default */
+	char	*argv[] = {xterm_here_value, NULL};
 
 	g_return_if_fail(window_with_focus != NULL);
 

@@ -7,6 +7,9 @@
 
 /* options.c - code for handling user choices */
 
+#include <stdio.h>
+#include <string.h>
+#include <errno.h>
 #include <glib.h>
 #include <gtk/gtk.h>
 
@@ -15,10 +18,14 @@
 #include "menu.h"
 #include "options.h"
 
+
 static GtkWidget *window;
+static FILE *save_file = NULL;
+static GHashTable *option_hash = NULL;
 
 /* Static prototypes */
 static void save_options(GtkWidget *widget, gpointer data);
+static char *process_option_line(char *line);
 
 void options_init()
 {
@@ -57,22 +64,10 @@ void options_init()
 	label = gtk_label_new("There are no copy options yet...");
 	gtk_container_add(GTK_CONTAINER(group), label);
 
-	group = gtk_frame_new("External programs");
-	gtk_box_pack_start(GTK_BOX(vbox), group, FALSE, TRUE, 0);
-	label = gtk_label_new("There are no external program options yet...");
-	gtk_container_add(GTK_CONTAINER(group), label);
 
-	group = gtk_frame_new("Short-cut keys");
+	group = gtk_frame_new("Menu options");
 	gtk_box_pack_start(GTK_BOX(vbox), group, FALSE, TRUE, 0);
-	label = gtk_label_new("To set the keyboard short-cuts you simply open "
-			"the menu over a filer window, move the pointer over "
-			"the item you want to use and press a key. The key "
-			"will appear next to the menu item and you can just "
-			"press that key without opening the menu in future. "
-			"To save the current menu short-cuts for next time, "
-			"click the Save button at the bottom of this window.");
-	gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
-	gtk_container_add(GTK_CONTAINER(group), label);
+	gtk_container_add(GTK_CONTAINER(group), create_menu_options());
 
 	save_path = choices_find_path_save("...");
 	if (save_path)
@@ -96,17 +91,143 @@ void options_init()
 	if (!save_path)
 		gtk_widget_set_sensitive(button, FALSE);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), NULL);
+			GTK_SIGNAL_FUNC(save_options), (gpointer) TRUE);
 
-	button = gtk_button_new_with_label("Dismiss");
+	button = gtk_button_new_with_label("OK");
+	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
+	gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(save_options), (gpointer) FALSE);
+
+	button = gtk_button_new_with_label("Cancel");
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
 }
 
+void options_load(void)
+{
+	char 		*path;
+	char		*data;
+	long		length;
+
+	path = choices_find_path_load("options");
+	if (!path)
+		return;		/* Nothing to load */
+
+	if (load_file(path, &data, &length))
+	{
+		char *eol, *error;
+		char *line = data;
+		int  line_number = 1;
+
+		while (line && *line)
+		{
+			eol = strchr(line, '\n');
+			if (eol)
+				*eol = '\0';
+
+			error = process_option_line(line);
+
+			if (error)
+			{
+				GString *message;
+
+				message = g_string_new(NULL);
+				g_string_sprintf(message,
+						"Error in options file at "
+						"line %d: %s", line_number,
+						error);
+				delayed_error("ROX-Filer", message->str);
+				g_string_free(message, TRUE);
+				break;
+			}
+
+			if (!eol)
+				break;
+			line = eol + 1;
+			line_number++;
+		}
+		g_free(data);
+	}
+	
+}
+
+/* Call this on init to register a handler for a key.
+ * The function returns a pointer to an error messages (which will
+ * NOT be free()d, or NULL on success.
+ */
+void option_register(char *key, OptionFunc *func)
+{
+	if (!option_hash)
+		option_hash = g_hash_table_new(g_str_hash, g_str_equal);
+	g_hash_table_insert(option_hash, key, func);
+}
+
+/* Process one line from the options file (\0 term'd).
+ * Returns NULL on success, or a pointer to an error message.
+ * The line is modified.
+ */
+static char *process_option_line(char *line)
+{
+	char 		*eq, *c;
+	OptionFunc 	*func;
+
+	g_return_val_if_fail(option_hash != NULL, "No registered functions!");
+
+	eq = strchr(line, '=');
+	if (!eq)
+		return "Missing '='";
+
+	c = eq - 1;
+	while (c > line && (*c == ' ' || *c == '\t'))
+		c--;
+	c[1] = '\0';
+	c = eq + 1;
+	while (*c == ' ' || *c == '\t')
+		c++;
+
+	func = (OptionFunc *) g_hash_table_lookup(option_hash, line);
+	if (!func)
+		return "Bad key (no such option name)";
+
+	return func(c);
+}
+
 static void save_options(GtkWidget *widget, gpointer data)
 {
-	menu_save();
+	gboolean	save = (gboolean) data;
+	
+	menu_set_options();
+	
+	if (save)
+	{
+		char *path;
+		
+		path = choices_find_path_save("options");
+		g_return_if_fail(path != NULL);
+
+		save_file = fopen(path, "wb");
+		if (!save_file)
+		{
+			char *str;
+			str = g_strconcat("Unable to open '", path,
+					  "' for writing: ",
+					  g_strerror(errno),
+					  NULL);
+			report_error("ROX-Filer", str);
+			g_free(str);
+			return;
+		}
+
+		menu_save_options();
+
+		if (save_file && fclose(save_file) == EOF)
+		{
+			report_error("ROX-Filer", g_strerror(errno));
+			return;
+		}
+	}
+
 	gtk_widget_hide(window);
 }
 
@@ -114,5 +235,25 @@ void options_show(FilerWindow *filer_window)
 {
 	if (GTK_WIDGET_MAPPED(window))
 		gtk_widget_hide(window);
+	menu_update_options();
 	gtk_widget_show_all(window);
+}
+
+void option_write(char *name, char *value)
+{
+	char    *string;
+	int	len;
+	
+	if (!save_file)
+		return;	/* Error already reported hopefully */
+
+	string = g_strconcat(name, " = ", value, "\n", NULL);
+	len = strlen(string);
+	if (fwrite(string, sizeof(char), len, save_file) < len)
+	{
+		delayed_error("Saving options", g_strerror(errno));
+		fclose(save_file);
+		save_file = NULL;
+	}
+	g_free(string);
 }

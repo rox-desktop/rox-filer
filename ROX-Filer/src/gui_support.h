@@ -24,5 +24,6 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
 void make_panel_window(GdkWindow *window);
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
 void delayed_error(char *title, char *error);
+gboolean load_file(char *pathname, char **data_out, long *length_out);
 
 #endif /* _GUI_SUPPORT_H */
