@@ -229,8 +229,6 @@ void pixmap_make_small(MaskedPixmap *mp)
 
 #ifdef GTK2
 /* Create a thumbnail file for this image.
- * Spec says to use different permissions, but as we only use the global
- * save dir anyway...
  * XXX: Thumbnails should be deleted somewhere!
  */
 static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
@@ -238,9 +236,8 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	struct stat info;
 	int original_width, original_height;
 	GString *to;
-	char *swidth, *sheight, *ssize, *smtime;
-	char *src;
-	char **bits, **bit;
+	char *md5, *swidth, *sheight, *ssize, *smtime;
+	mode_t old_mask;
 
 	original_width = gdk_pixbuf_get_width(full);
 	original_height = gdk_pixbuf_get_height(full);
@@ -253,30 +250,21 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	ssize = g_strdup_printf("%" SIZE_FMT, info.st_size);
 	smtime = g_strdup_printf("%ld", info.st_mtime);
 
+	path = pathdup(path);
+	md5 = md5_hash(path);
+	g_free(path);
+		
 	to = g_string_new(home_dir);
 	g_string_append(to, "/.thumbnails");
 	mkdir(to->str, 0700);
-	g_string_append(to, "/96x96");
+	g_string_append(to, "/96x96/");
 	mkdir(to->str, 0700);
-
-	src = pathdup(path);
-	g_return_if_fail(src[0] == '/');
-	bits = g_strsplit(src + 1, "/", 0);
-	g_free(src);
-
-	for (bit = bits; *bit && bit[1]; bit++)
-	{
-		g_string_append_c(to, '/');
-		g_string_append(to, *bit);
-		mkdir(to->str, 0700);
-	}
-
-	g_string_append_c(to, '/');
-	g_string_append(to, *bit);
+	g_string_append(to, md5);
 	g_string_append(to, ".png");
 
-	g_strfreev(bits);
+	g_free(md5);
 
+	old_mask = umask(0077);
 	gdk_pixbuf_save(image->huge_pixbuf,
 			to->str,
 			"png",
@@ -286,6 +274,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 			"tEXt::Thumb::OriginalSize", ssize,
 			"tEXt::Thumb::OriginalMTime", smtime,
 			NULL);
+	umask(old_mask);
 
 	g_string_free(to, TRUE);
 	g_free(swidth);
@@ -300,14 +289,16 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 static GdkPixbuf *get_thumbnail_for(char *path)
 {
 	GdkPixbuf *thumb;
-	char *thumb_path;
+	char *thumb_path, *md5;
 	char *ssize, *smtime;
 	struct stat info;
 
 	path = pathdup(path);
 	
+	md5 = md5_hash(path);
 	thumb_path = g_strdup_printf("%s/.thumbnails/96x96/%s.png",
-					home_dir, path);
+					home_dir, md5);
+	g_free(md5);
 
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
 	if (!thumb)

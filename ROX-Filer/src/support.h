@@ -43,4 +43,8 @@ int save_xml_file(xmlDocPtr doc, gchar *filename);
 char *readlink_dup(char *path);
 xmlDocPtr soap_new(xmlNodePtr *ret_body);
 
+#ifdef GTK2
+char *md5_hash(char *message);
+#endif
+
 #endif /* _SUPPORT_H */
