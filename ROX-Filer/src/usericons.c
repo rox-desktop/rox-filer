@@ -81,6 +81,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
 static void delete_globicon(const gchar *path);
+static gboolean convert_to_png(const gchar *src, const gchar *dest);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -170,35 +171,8 @@ void check_globicon(const guchar *path, DirItem *item)
 
 gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 {
-	MaskedPixmap *pic;
-	gchar	*icon_path;
-	GError	*error = NULL;
-
-	pic = g_fscache_lookup(pixmap_cache, iconpath);
-	if (!pic)
-	{
-		delayed_error(
-			_("Unable to load image file -- maybe it's not in a "
-			  "format I understand, or maybe the permissions are "
-			  "wrong?\n"
-			  "The icon has not been changed."));
+	if (!convert_to_png(iconpath, make_path(filepath, ".DirIcon")->str))
 		return FALSE;
-	}
-
-	icon_path = make_path(filepath, ".DirIcon")->str;
-	gdk_pixbuf_save(pic->src_pixbuf, icon_path,
-			"png", &error,
-			"tEXt::Software", PROJECT,
-			NULL);
-	g_object_unref(pic);
-
-	if (error)
-	{
-		delayed_error(_("Error creating image '%s':\n%s"),
-				icon_path, error->message);
-		g_error_free(error);
-		return FALSE;
-	}
 
 	dir_check_this(filepath);
 
@@ -642,34 +616,29 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 {
 	gchar *target;
 	gchar *leaf;
-	gchar *dir;
-	GList *paths;
-
-	/* XXX: Should convert to XPM format... */
 
 	if (just_media)
-		leaf = g_strconcat(type->media_type, ".xpm", NULL);
+		leaf = g_strconcat(type->media_type, ".png", NULL);
 	else
 		leaf = g_strconcat(type->media_type, "_", type->subtype,
-								".xpm", NULL);
+								".png", NULL);
 
 	target = choices_find_path_save(leaf, "MIME-icons", TRUE);
+	g_free(leaf);
+
 	if (!target)
 	{
 		delayed_error(_("Setting icon disabled by CHOICESPATH"));
-		g_free(leaf);
 		return FALSE;
 	}
 
-	dir = g_dirname(target);
-	paths = g_list_append(NULL, (gchar *) iconpath);
+	if (!convert_to_png(iconpath, target))
+	{
+		g_free(target);
+		return FALSE;
+	}
 
-	action_copy(paths, dir, leaf, -1);
-
-	g_free(leaf);
-	g_free(dir);
 	g_free(target);
-	g_list_free(paths);
 
 	return TRUE;
 }
@@ -733,4 +702,40 @@ static void show_current_dirs_menu(GtkWidget *button, gpointer data)
 	g_hash_table_destroy(names);
 
 	show_popup_menu(menu, gtk_get_current_event(), 0);
+}
+
+/* Load image 'src', and save it as an icon-sized image in png format.
+ * TRUE on success, error is already reported on failure.
+ */
+static gboolean convert_to_png(const gchar *src, const gchar *dest)
+{
+	MaskedPixmap *pic;
+	GError	*error = NULL;
+
+	pic = g_fscache_lookup(pixmap_cache, src);
+	if (!pic)
+	{
+		delayed_error(
+			_("Unable to load image file -- maybe it's not in a "
+			  "format I understand, or maybe the permissions are "
+			  "wrong?\n"
+			  "The icon has not been changed."));
+		return FALSE;
+	}
+
+	gdk_pixbuf_save(pic->src_pixbuf, dest,
+			"png", &error,
+			"tEXt::Software", PROJECT,
+			NULL);
+	g_object_unref(pic);
+
+	if (error)
+	{
+		delayed_error(_("Error creating image '%s':\n%s"),
+				dest, error->message);
+		g_error_free(error);
+		return FALSE;
+	}
+
+	return TRUE;
 }
