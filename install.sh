@@ -49,6 +49,7 @@ fi
 
 umask 022
 
+
 cat << EOF
 
 **************************************************************************
@@ -77,7 +78,13 @@ case $REPLY in
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
-	   CHOICESDIR=${HOME}/Choices
+	   if [ -n "$CHOICESPATH" ]; then
+		CHOICESDIR=`echo $CHOICESPATH | sed -e 's/^\([^:]*\).*$/\\1/'`
+	   fi
+	   echo -$CHOICESDIR-
+	   if [ ! -n "$CHOICESDIR" ]; then
+	   	CHOICESDIR=${HOME}/Choices
+	   fi
 	   MIMEDIR=${HOME}/.mime/mime-info
 	   if [ ! -d ${HOME}/man ]; then
 		MANDIR=""
