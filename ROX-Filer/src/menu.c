@@ -424,6 +424,45 @@ void position_menu(GtkMenu *menu, gint *x, gint *y,
 	*push_in = FALSE;
 }
 
+/* Returns an array listing all the names in the directory 'path'.
+ * The array is unsorted.
+ * '.' and '..' are skipped.
+ * On error, the error is reported with g_warning and NULL is returned.
+ */
+static GPtrArray *list_dir(const guchar *path)
+{
+	GDir *dir;
+	GError *error = NULL;
+	GPtrArray *names;
+	const char *leaf;
+	
+	dir = g_dir_open(path, 0, &error);
+	if (error)
+	{
+		g_warning("Can't list directory:\n%s", error->message);
+		g_error_free(error);
+		return NULL;
+	}
+
+	names = g_ptr_array_new();
+
+	while ((leaf = g_dir_read_name(dir)))
+		g_ptr_array_add(names, g_strdup(leaf));
+
+	g_dir_close(dir);
+
+	return names;
+}
+
+/* Used as the sort function for sorting GPtrArrays */
+static gint strcmp2(gconstpointer a, gconstpointer b)
+{
+	const char *aa = *(char **) a;
+	const char *bb = *(char **) b;
+
+	return g_strcasecmp(aa, bb);
+}
+
 static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 			    MenuIconStyle style, CallbackFn func,
 			    gboolean separator, gboolean strip_ext,
@@ -431,15 +470,15 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 {
 	GList *widgets = NULL;
 	DirItem *ditem;
-	DIR	*dir;
-	struct dirent *ent;
+	int i;
 	GtkWidget *item;
 	char *dname = NULL;
+	GPtrArray *names;
 
 	dname = pathdup(dir_name);
 
-	dir = opendir(dname);
-	if (!dir)
+	names = list_dir(dname);
+	if (!names)
 		goto out;
 
 	if (separator)
@@ -449,23 +488,24 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 	}
 
-	while ((ent = readdir(dir)))
-	{
-		char	*dot, *leaf;
-		gchar *fname;
+	g_ptr_array_sort(names, strcmp2);
 
-		/* Ignore hidden files */
-		if (ent->d_name[0] == '.')
-			continue;
+	for (i = 0; i < names->len; i++)
+	{
+		char	*leaf = names->pdata[i];
+		gchar	*fname;
+
+		fname = g_strconcat(dname, "/", leaf, NULL);
 
 		/* Strip off extension, if any */
-		dot = strchr(ent->d_name, '.');
-		if (strip_ext && dot)
-			leaf = g_strndup(ent->d_name, dot - ent->d_name);
-		else
-			leaf = g_strdup(ent->d_name);
+		if (strip_ext)
+		{
+			char	*dot;
+			dot = strchr(leaf, '.');
+			if (dot)
+				*dot = '\0';
+		}
 
-		fname = g_strconcat(dname, "/", ent->d_name, NULL);
 		ditem = diritem_new("");
 		diritem_restat(fname, ditem, NULL);
 
@@ -495,6 +535,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		else
 			item = gtk_menu_item_new_with_label(leaf);
 
+		g_free(leaf);
+
 		/* If it is a directory (but NOT an AppDir) and we are
 		 * recursing then set up a sub menu.
 		 */
@@ -515,7 +557,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 					G_CALLBACK(func), fname);
 
 		diritem_free(ditem);
-		g_free(leaf);
 
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 		g_signal_connect_swapped(item, "destroy",
@@ -524,7 +565,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		widgets = g_list_append(widgets, item);
 	}
 
-	closedir(dir);
+	g_ptr_array_free(names, TRUE);
 out:
 	g_free(dname);
 
