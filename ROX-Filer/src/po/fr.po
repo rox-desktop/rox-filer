@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.8\n"
-"POT-Creation-Date: 2003-04-27 00:00+0200\n"
+"POT-Creation-Date: 2003-05-22 14:04+0100\n"
 "PO-Revision-Date: 2003-04-27 00:25+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
@@ -29,7 +29,7 @@ msgstr "Silencieux"
 msgid "Don't confirm every operation"
 msgstr "Ne pas confirmer chaque opération"
 
-#: abox.c:409 tips:58
+#: abox.c:409 tips:59
 msgid "Name"
 msgstr "Nom"
 
@@ -493,11 +493,11 @@ msgstr ""
 "ROX-Filer ne supporte pas encore les points de montage sur votre système. "
 "Désolé."
 
-#: action.c:1714 menu.c:209 tips:188
+#: action.c:1714 menu.c:209 tips:189
 msgid "Delete"
 msgstr "Supprimer"
 
-#: action.c:1724 tips:194
+#: action.c:1724 tips:195
 msgid "Force"
 msgstr "Forcer"
 
@@ -505,7 +505,7 @@ msgstr "Forcer"
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Ne pas confirmer la suppression d'objets protégés contre l'écriture"
 
-#: action.c:1727 action.c:1782 tips:196
+#: action.c:1727 action.c:1782 tips:197
 msgid "Brief"
 msgstr "Bref"
 
@@ -538,7 +538,7 @@ msgstr "go-rwx (Privé - accès par le propriétaire uniquement)"
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Accès public, sauf écriture)"
 
-#: action.c:1771 menu.c:185 menu.c:220 tips:76
+#: action.c:1771 menu.c:185 menu.c:220 tips:77
 msgid "Permissions"
 msgstr "Permissions"
 
@@ -546,7 +546,7 @@ msgstr "Permissions"
 msgid "Don't list processed files"
 msgstr "Ne pas lister les fichiers traités"
 
-#: action.c:1785 tips:198
+#: action.c:1785 tips:199
 msgid "Recurse"
 msgstr "Récursif"
 
@@ -554,23 +554,23 @@ msgstr "Récursif"
 msgid "Also change contents of subdirectories"
 msgstr "Changer aussi le contenu des sous-répertoires"
 
-#: action.c:1822 dnd.c:123 menu.c:1832 tips:182
+#: action.c:1822 dnd.c:123 menu.c:1832 tips:183
 msgid "Copy"
 msgstr "Copier"
 
-#: action.c:1832 action.c:1865 tips:200
+#: action.c:1832 action.c:1865 tips:201
 msgid "Newer"
 msgstr "Plus récent"
 
-#: action.c:1833 action.c:1866 tips:201 tips:202 tips:203 tips:204
+#: action.c:1833 action.c:1866 tips:202 tips:203 tips:204 tips:205
 msgid "Only over-write if source is newer than destination."
 msgstr "Écraser seulement si la source est plus récente que la destination."
 
-#: action.c:1855 dnd.c:124 tips:184
+#: action.c:1855 dnd.c:124 tips:185
 msgid "Move"
 msgstr "Déplacer"
 
-#: action.c:1883 dnd.c:125 tips:186
+#: action.c:1883 dnd.c:125 tips:187
 msgid "Link"
 msgstr "Lier"
 
@@ -645,12 +645,12 @@ msgstr "Éditer les signets"
 msgid "Recently Visited"
 msgstr "Récemment visités"
 
-#: dir.c:903
+#: dir.c:924
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "Impossible de faire un stat du répertoire : %s"
 
-#: dir.c:912
+#: dir.c:933
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Impossible d'ouvrir le répertoire : %s"
@@ -1195,7 +1195,7 @@ msgstr "Options..."
 msgid "Home Directory"
 msgstr "Répertoire personnel"
 
-#: icon.c:141 icon.c:903 menu.c:205 type.c:215
+#: icon.c:141 icon.c:903 menu.c:205 type.c:211
 msgid "File"
 msgstr "Fichier"
 
@@ -1508,11 +1508,11 @@ msgstr "Non (gnome-vfs-config non trouvé)"
 msgid "Dnotify support"
 msgstr "Support dnotify"
 
-#: menu.c:181 tips:50
+#: menu.c:181 tips:51
 msgid "Display"
 msgstr "Affichage"
 
-#: menu.c:182 tips:55
+#: menu.c:182 tips:56
 msgid "Icons View"
 msgstr "Icônes"
 
@@ -1520,19 +1520,19 @@ msgstr "Icônes"
 msgid "Icons, With..."
 msgstr "Icônes, avec..."
 
-#: menu.c:184 tips:75
+#: menu.c:184 tips:76
 msgid "Sizes"
 msgstr "Tailles"
 
-#: menu.c:186 tips:243
+#: menu.c:186 tips:244
 msgid "Types"
 msgstr "Types"
 
-#: menu.c:187 tips:78
+#: menu.c:187 tips:79
 msgid "Times"
 msgstr "Dates & heures"
 
-#: menu.c:188 tips:56 tips:93
+#: menu.c:188 tips:57 tips:94
 msgid "List View"
 msgstr "Liste"
 
@@ -1544,7 +1544,7 @@ msgstr "Icônes plus grandes"
 msgid "Smaller Icons"
 msgstr "Icônes plus petites"
 
-#: menu.c:192 tips:72
+#: menu.c:192 tips:73
 msgid "Automatic"
 msgstr "Automatique"
 
@@ -2408,7 +2408,7 @@ msgstr "Lire"
 msgid "Rescan directory contents"
 msgstr "Relire le contenu du répertoire"
 
-#: toolbar.c:129 toolbar.c:133 tips:61
+#: toolbar.c:129 toolbar.c:133 tips:62
 msgid "Size"
 msgstr "Taille"
 
@@ -2445,7 +2445,7 @@ msgstr "Montrer l'aide de ROX-Filer"
 msgid " (%u hidden)"
 msgstr " (%u caché(s))"
 
-#: toolbar.c:212 tips:81
+#: toolbar.c:212 tips:82
 msgid "items"
 msgstr "objets"
 
@@ -2463,47 +2463,47 @@ msgstr "Pas d'objet%s"
 msgid "%u selected (%s)"
 msgstr "%u sélectionné(s) (%s)"
 
-#: type.c:206
+#: type.c:202
 msgid "Sym link"
 msgstr "Lien symb."
 
-#: type.c:208
+#: type.c:204
 msgid "Mount point"
 msgstr "Point de montage"
 
-#: type.c:210
+#: type.c:206
 msgid "App dir"
 msgstr "Rép. App."
 
-#: type.c:217
+#: type.c:213
 msgid "Dir"
 msgstr "Rép."
 
-#: type.c:219
+#: type.c:215
 msgid "Char dev"
 msgstr "Périph. car."
 
-#: type.c:221
+#: type.c:217
 msgid "Block dev"
 msgstr "Périph. bloc"
 
-#: type.c:223
+#: type.c:219
 msgid "Pipe"
 msgstr "Tube"
 
-#: type.c:225
+#: type.c:221
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:227
+#: type.c:223
 msgid "Door"
 msgstr "Porte"
 
-#: type.c:230
+#: type.c:226
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: type.c:373
+#: type.c:369
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2530,11 +2530,11 @@ msgstr ""
 "vous n'avez pas à vous inquiéter. Dans le cas contraire, vous devez "
 "vérifier, ou même juste supprimer, toutes les actions d'exécution existantes."
 
-#: type.c:386
+#: type.c:382
 msgid "go-w (Fix security problem)"
 msgstr "go-w (corriger un problème de sécurité)"
 
-#: type.c:488
+#: type.c:484
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -2545,71 +2545,71 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:666
+#: type.c:662
 msgid "This is not a program! Give me an application instead!"
 msgstr "Ce n'est pas un programme ! Donnez-moi une application à la place !"
 
-#: type.c:724
+#: type.c:720
 msgid "Execute file"
 msgstr "Exécuter le fichier"
 
-#: type.c:729
+#: type.c:725
 msgid "No run action defined"
 msgstr "Pas d'action d'exécution de définie"
 
-#: type.c:755
+#: type.c:751
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Erreur dans le handler %s : %s"
 
-#: type.c:770
+#: type.c:766
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Application %s invalide (mauvais AppRun)"
 
-#: type.c:781
+#: type.c:777
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non exécutable"
 
-#: type.c:814
+#: type.c:810
 msgid "Set run action"
 msgstr "Fixer l'action d'exécution"
 
-#: type.c:820
+#: type.c:816
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Si un gestionnaire n'est pas fixé pour le type spécifique, utiliser celui-ci "
 "par défaut."
 
-#: type.c:822
+#: type.c:818
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Fixer en tant que défaut pour tout `%s/<quelconque>'"
 
-#: type.c:826
+#: type.c:822
 msgid "Use this application for all files with this MIME type."
 msgstr "Utiliser cette application pour tous les fichiers ayant ce type MIME."
 
-#: type.c:828 usericons.c:285
+#: type.c:824 usericons.c:285
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Seulement pour le type `%s' (%s/%s)"
 
-#: type.c:834
+#: type.c:830
 msgid "Drop a suitable application here"
 msgstr "Faites glisser ici une application adéquate"
 
-#: type.c:849
+#: type.c:845
 msgid "OR"
 msgstr "OU"
 
-#: type.c:856
+#: type.c:852
 msgid "Enter a shell command:"
 msgstr "Entrez une commande shell :"
 
-#: type.c:914
+#: type.c:910
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2617,16 +2617,16 @@ msgstr ""
 "Une action d'exécution existe déjà et est un assez gros programme - êtes-"
 "vous sûr de vouloir la supprimer ?"
 
-#: type.c:925
+#: type.c:921
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossible de supprimer %s : %s"
 
-#: type.c:962
+#: type.c:958
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "La sauvegarde des choix est désactivée par la variable CHOICESPATH"
 
-#: type.c:1162
+#: type.c:1123
 #, c-format
 msgid ""
 "Error loading MIME database:\n"
@@ -2635,12 +2635,12 @@ msgstr ""
 "Erreur lors de la lecture de la base de données MIME :\n"
 "%s"
 
-#: type.c:1187
+#: type.c:1148
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr "Fichier '%s' altéré !"
 
-#: type.c:1273
+#: type.c:1234
 msgid ""
 "The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
 "should move it there (and make a symlink from ~/.mime to it for older "
@@ -2650,7 +2650,7 @@ msgstr ""
 "mime. Vous devez le déplacer là (et créer un lien symbolique de ~/.mime vers "
 "lui pour les anciennes applications)."
 
-#: type.c:1325
+#: type.c:1286
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -2671,7 +2671,7 @@ msgstr ""
 "permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /"
 "usr/share/mime/globs)."
 
-#: type.c:1399
+#: type.c:1360
 msgid "No description"
 msgstr "Pas de description"
 
@@ -2769,31 +2769,31 @@ msgstr ""
 "Erreur lors de la création de l'image '%s' :\n"
 "%s"
 
-#: view_details.c:998
+#: view_details.c:1000
 msgid "_Name"
 msgstr "_Nom"
 
-#: view_details.c:1001
+#: view_details.c:1003
 msgid "_Type"
 msgstr "_Type"
 
-#: view_details.c:1003
+#: view_details.c:1005
 msgid "_Permissions"
 msgstr "_Droits d'accès"
 
-#: view_details.c:1004
+#: view_details.c:1006
 msgid "_Owner"
 msgstr "_Propriétaire"
 
-#: view_details.c:1006
+#: view_details.c:1008
 msgid "_Group"
 msgstr "_Groupe"
 
-#: view_details.c:1008
+#: view_details.c:1010
 msgid "_Size"
 msgstr "_Taille"
 
-#: view_details.c:1010
+#: view_details.c:1012
 msgid "Last _Modified"
 msgstr "Dernière _Modification"
 
@@ -2842,42 +2842,46 @@ msgid "Hungarian"
 msgstr "Hongrois"
 
 #: tips:12
+msgid "Japanese"
+msgstr ""
+
+#: tips:13
 msgid "Norwegian"
 msgstr "Norvégien"
 
-#: tips:13
+#: tips:14
 msgid "Italian"
 msgstr "Italien"
 
-#: tips:14
+#: tips:15
 msgid "Polish"
 msgstr "Polonais"
 
-#: tips:15
+#: tips:16
 msgid "Russian"
 msgstr "Russe"
 
-#: tips:16
+#: tips:17
 msgid "Spanish"
 msgstr "Espagnol"
 
-#: tips:17
+#: tips:18
 msgid "Swedish"
 msgstr "Suédois"
 
-#: tips:18
+#: tips:19
 msgid "Filer windows"
 msgstr "Fenêtres du filer"
 
-#: tips:19
+#: tips:20
 msgid "Auto-resize filer windows"
 msgstr "Changement de taille automatique des fenêtres du filer"
 
-#: tips:20
+#: tips:21
 msgid "Never automatically resize"
 msgstr "Ne jamais changer de taille automatiquement"
 
-#: tips:21
+#: tips:22
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
@@ -2886,11 +2890,11 @@ msgstr ""
 "de fenêtres, l'entrée du menu « Changer taille de la fenêtre » ou en double-"
 "cliquant sur le fond de la fenêtre."
 
-#: tips:22
+#: tips:23
 msgid "Resize when changing the display style"
 msgstr "Changer de taille quand vous changez le style d'affichage"
 
-#: tips:23
+#: tips:24
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
@@ -2898,11 +2902,11 @@ msgstr ""
 "Le fait de changer la taille des icônes ou les détails à afficher provoquera "
 "un changement automatique de la taille de la fenêtre."
 
-#: tips:24
+#: tips:25
 msgid "Always resize"
 msgstr "Toujours changer la taille"
 
-#: tips:25 tips:26
+#: tips:26 tips:27
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
@@ -2910,15 +2914,15 @@ msgstr ""
 "Le filer changera la taille des fenêtres à chaque fois qu'il lui semblera "
 "utile (c'est-à-dire quand le répertoire ou le style d'affichage est changé)."
 
-#: tips:27
+#: tips:28
 msgid "Largest window size:"
 msgstr "Plus grande taille de fenêtre :"
 
-#: tips:28
+#: tips:29
 msgid "%"
 msgstr "%"
 
-#: tips:29 tips:30
+#: tips:30 tips:31
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
@@ -2926,15 +2930,15 @@ msgstr ""
 "La plus grande taille, en pourcentage de la taille de l'écran, que pourra "
 "prendre une fenêtre après changement de taille automatique."
 
-#: tips:31
+#: tips:32
 msgid "Window behaviour"
 msgstr "Comportement relatif aux fenêtres"
 
-#: tips:32
+#: tips:33
 msgid "Short titlebar flags"
 msgstr "Drapeaux de barre de titre courts"
 
-#: tips:33
+#: tips:34
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
@@ -2942,11 +2946,11 @@ msgstr ""
 "Utiliser des lettres simples au lieu de mots pour les indicateurs Lecture, "
 "Tous et Imagettes dans la barre de titre."
 
-#: tips:34
+#: tips:35
 msgid "Unique windows"
 msgstr "Fenêtres uniques"
 
-#: tips:35 tips:36
+#: tips:36 tips:37
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -2954,11 +2958,11 @@ msgstr ""
 "Lorsque vous ouvrez un répertoire et que ce répertoire est déjà affiché dans "
 "une autre fenêtre, cette option provoque la fermeture de cette autre fenêtre."
 
-#: tips:37
+#: tips:38
 msgid "New window on button 1"
 msgstr "Nouvelle fenêtre avec le bouton 1"
 
-#: tips:38
+#: tips:39
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -2968,11 +2972,11 @@ msgstr ""
 "répertoire dans une nouvelle fenêtre avec ceci activé. Cliquer avec le "
 "bouton 2 (milieu) réutilisera la fenêtre courante."
 
-#: tips:39
+#: tips:40
 msgid "Single-click navigation"
 msgstr "Navigation en simple clic"
 
-#: tips:40 tips:41 tips:42 tips:43 tips:138
+#: tips:41 tips:42 tips:43 tips:44 tips:139
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -2982,15 +2986,15 @@ msgstr ""
 "pour sélectionner l'objet à la place. Si option non choisie, cliquer une "
 "fois sélectionne l'objet; double-cliquez pour ouvrir des choses."
 
-#: tips:44
+#: tips:45
 msgid "Sorting"
 msgstr "Tri"
 
-#: tips:45
+#: tips:46
 msgid "Directories come first (for sort by name)"
 msgstr "Les répertoires sont listés en premier (pour le tri par nom)"
 
-#: tips:46
+#: tips:47
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
@@ -2998,11 +3002,11 @@ msgstr ""
 "Si cette option est choisie, alors les répertoires apparaîtront toujours "
 "avant les autres objets quand le tri se fait par nom."
 
-#: tips:47
+#: tips:48
 msgid "Capitalised names first (for sort by name)"
 msgstr "Noms avec majuscule en premier (pour le tri par nom)"
 
-#: tips:48 tips:49
+#: tips:49 tips:50
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
@@ -3010,15 +3014,15 @@ msgstr ""
 "Si activée, tous les noms de fichier commençant par une lettre majuscule "
 "viennent avant ceux commençant par une minuscule."
 
-#: tips:51
+#: tips:52
 msgid "Default settings for new windows"
 msgstr "Options par défaut pour les nouvelles fenêtres"
 
-#: tips:52
+#: tips:53
 msgid "Inherit options from source window"
 msgstr "Hériter les options de la fenêtre source"
 
-#: tips:53
+#: tips:54
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
@@ -3027,27 +3031,27 @@ msgstr ""
 "fenêtre sont héritées de la fenêtre source si possible, sinon elles sont "
 "fixées aux valeurs par défaut données ci-dessous."
 
-#: tips:54
+#: tips:55
 msgid "View type:"
 msgstr "Type de vue :"
 
-#: tips:57
+#: tips:58
 msgid "Sort by:"
 msgstr "Trier par :"
 
-#: tips:59 tips:77
+#: tips:60 tips:78
 msgid "Type"
 msgstr "Type"
 
-#: tips:60
+#: tips:61
 msgid "Date"
 msgstr "Date"
 
-#: tips:62
+#: tips:63
 msgid "Show hidden files"
 msgstr "Montrer les fichiers cachés"
 
-#: tips:63 tips:64 tips:65 tips:66
+#: tips:64 tips:65 tips:66 tips:67
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
@@ -3055,43 +3059,43 @@ msgstr ""
 "Lorsque cette option est activée, les fichiers dont le nom commence par un "
 "point sont aussi montrés, sinon ils sont cachés."
 
-#: tips:67
+#: tips:68
 msgid "Icon View"
 msgstr "Vue « icônes »"
 
-#: tips:68
+#: tips:69
 msgid "Default size:"
 msgstr "Taille par défaut :"
 
-#: tips:69
+#: tips:70
 msgid "Huge Icons"
 msgstr "Énormes icônes"
 
-#: tips:70 tips:233
+#: tips:71 tips:234
 msgid "Large Icons"
 msgstr "Grandes icônes"
 
-#: tips:71 tips:232
+#: tips:72 tips:233
 msgid "Small Icons"
 msgstr "Petites icônes"
 
-#: tips:73
+#: tips:74
 msgid "Default details:"
 msgstr "Détails par défaut :"
 
-#: tips:74
+#: tips:75
 msgid "No details"
 msgstr "Pas de détails"
 
-#: tips:79
+#: tips:80
 msgid "Automatic small icons:"
 msgstr "Petites icônes auto :"
 
-#: tips:80
+#: tips:81
 msgid "Change at:"
 msgstr "Changer à :"
 
-#: tips:82 tips:83 tips:84
+#: tips:83 tips:84 tips:85
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
@@ -3101,15 +3105,15 @@ msgstr ""
 "répertoire contient au moins autant d'objets, alors il sera affiché avec de "
 "petites icônes, sinon de grandes icônes seront utilisées."
 
-#: tips:85
+#: tips:86
 msgid "Max width (Large icons):"
 msgstr "Largeur maxi (grandes icônes) :"
 
-#: tips:86 tips:89
+#: tips:87 tips:90
 msgid "pixels"
 msgstr "pixels"
 
-#: tips:87
+#: tips:88
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -3118,57 +3122,57 @@ msgstr ""
 "« Grandes icônes ». En mode « Énormes icônes », le texte est passé à la "
 "ligne quand il est 50% plus large que ce qui est fixé ici."
 
-#: tips:88
+#: tips:89
 msgid "(Small Icons):"
 msgstr "(petites icônes) :"
 
-#: tips:90 tips:91 tips:92
+#: tips:91 tips:92 tips:93
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Largeur maximale du texte affiché à côté d'une petite icône."
 
-#: tips:94
+#: tips:95
 msgid "Show column headings"
 msgstr "Montrer les titres des colonnes"
 
-#: tips:95 tips:96 tips:97
+#: tips:96 tips:97 tips:98
 msgid "If this is on then column headings will be shown in the list view."
 msgstr ""
 "Si cette option est choisie, alors les titres des colonnes seront montrés "
 "lors de l'affichage sous forme de liste."
 
-#: tips:98
+#: tips:99
 msgid "Tools/Minibuffer"
 msgstr "Outils/minibuffer"
 
-#: tips:99
+#: tips:100
 msgid "Toolbar"
 msgstr "Barre d'outils"
 
-#: tips:100
+#: tips:101
 msgid "Toolbar type:"
 msgstr "Type de barre d'outils :"
 
-#: tips:101 tips:130
+#: tips:102 tips:131
 msgid "None"
 msgstr "Aucune"
 
-#: tips:102
+#: tips:103
 msgid "Icons only"
 msgstr "Icônes seulement"
 
-#: tips:103
+#: tips:104
 msgid "Text under icons"
 msgstr "Texte sous les icônes"
 
-#: tips:104
+#: tips:105
 msgid "Text beside icons"
 msgstr "Texte à côté des icônes"
 
-#: tips:105
+#: tips:106
 msgid "Show totals of items"
 msgstr "Afficher les nombres d'objets"
 
-#: tips:106 tips:107
+#: tips:107 tips:108
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -3178,19 +3182,19 @@ msgstr ""
 "nombre d'objets cachés (s'il y en a). Quand il y a une sélection, montrer le "
 "nombre d'objets sélectionnés et leur taille combinée."
 
-#: tips:108
+#: tips:109
 msgid "Select the buttons you want on the bar:"
 msgstr "Sélectionnez les boutons que vous voulez sur la barre :"
 
-#: tips:109
+#: tips:110
 msgid "Minibuffer"
 msgstr "Minibuffer"
 
-#: tips:110
+#: tips:111
 msgid "Beep if Tab-completion fails"
 msgstr "Bip si la complétion par <Tab> échoue"
 
-#: tips:111
+#: tips:112
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
@@ -3200,11 +3204,11 @@ msgstr ""
 "appuyez sur <Tab>, bip si rien ne se passe (e.g., parce qu'il y a plusieurs "
 "possibilités et que la lettre suivante varie)."
 
-#: tips:112
+#: tips:113
 msgid "Beep if there are several matches"
 msgstr "Bip s'il y a plusieurs complétions"
 
-#: tips:113 tips:114 tips:115
+#: tips:114 tips:115 tips:116
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
@@ -3213,11 +3217,11 @@ msgstr ""
 "appuyez sur <Tab>, un bip est émis s'il y a plusieurs fichiers qui "
 "conviennent, même si des lettres ont été ajoutées."
 
-#: tips:116 tips:117
+#: tips:117 tips:118
 msgid "Thumbnails"
 msgstr "Imagettes"
 
-#: tips:118
+#: tips:119
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
@@ -3225,11 +3229,11 @@ msgstr ""
 "Quand les imagettes sont activées, chaque fichier image dans un répertoire "
 "est chargé et une image réduite est affichée."
 
-#: tips:119
+#: tips:120
 msgid "Show image thumbnails"
 msgstr "Montrer les imagettes"
 
-#: tips:120 tips:121
+#: tips:121 tips:122
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
@@ -3238,11 +3242,11 @@ msgstr ""
 "Affichage pour activer ou désactiver les imagettes pour des fenêtres "
 "particulières."
 
-#: tips:122
+#: tips:123
 msgid "Thumbnails cache"
 msgstr "Cache des imagettes"
 
-#: tips:123
+#: tips:124
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
@@ -3252,11 +3256,11 @@ msgstr ""
 "répertoire caché « ~/.thumbnails ». Cliquez ici pour enlever toutes les "
 "imagettes du cache. Elles seront recréées lorsque cela sera nécessaire."
 
-#: tips:124
+#: tips:125
 msgid "Pinboard"
 msgstr "Punaiseur"
 
-#: tips:125
+#: tips:126
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
@@ -3264,51 +3268,51 @@ msgstr ""
 "Quand vous utilisez un punaiseur, vous pouvez faire glisser des fichiers et "
 "des applications sur le fond du bureau pour créer des raccourcis vers eux."
 
-#: tips:126 tips:229
+#: tips:127 tips:230
 msgid "Appearance"
 msgstr "Apparence"
 
-#: tips:127
+#: tips:128
 msgid "Foreground:"
 msgstr "Encre :"
 
-#: tips:128
+#: tips:129
 msgid "Text shadow:"
 msgstr "Ombre du texte :"
 
-#: tips:129
+#: tips:130
 msgid "Background:"
 msgstr "Fond :"
 
-#: tips:131
+#: tips:132
 msgid "Thin"
 msgstr "Fine"
 
-#: tips:132
+#: tips:133
 msgid "Thick"
 msgstr "Épaisse"
 
-#: tips:133
+#: tips:134
 msgid "Use custom font:"
 msgstr "Utiliser la fonte :"
 
-#: tips:134 tips:135
+#: tips:135 tips:136
 msgid "The font used for the text displayed under the icons"
 msgstr "La fonte utilisée pour le texte affiché au-dessous des icônes"
 
-#: tips:136
+#: tips:137
 msgid "Pinboard behaviour"
 msgstr "Comportement du punaiseur"
 
-#: tips:137
+#: tips:138
 msgid "Single-click to open"
 msgstr "Simple clic pour ouvrir"
 
-#: tips:139
+#: tips:140
 msgid "Keep icons within screen limits"
 msgstr "Garder les icônes à l'intérieur des limites de l'écran"
 
-#: tips:140
+#: tips:141
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -3316,45 +3320,45 @@ msgstr ""
 "Si cette option est active, les icônes du punaiseur sont toujours gardées "
 "complètement à l'intérieur des limites de l'écran, étiquette comprise."
 
-#: tips:141
+#: tips:142
 msgid "Icon grid step:"
 msgstr "Pas de la grille pour les icônes :"
 
-#: tips:142
+#: tips:143
 msgid "Fine"
 msgstr "Fin"
 
-#: tips:143
+#: tips:144
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr ""
 "Utiliser une grille avec pas de 2 pixels pour le positionnement des icônes "
 "sur le bureau."
 
-#: tips:144
+#: tips:145
 msgid "Medium"
 msgstr "Moyen"
 
-#: tips:145
+#: tips:146
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr ""
 "Utiliser une grille avec pas de 16 pixels pour le positionnement des icônes "
 "sur le bureau."
 
-#: tips:146
+#: tips:147
 msgid "Coarse"
 msgstr "Large"
 
-#: tips:147 tips:148 tips:149 tips:150
+#: tips:148 tips:149 tips:150 tips:151
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr ""
 "Utiliser une grille avec pas de 32 pixels pour le positionnement des icônes "
 "sur le bureau."
 
-#: tips:151 tips:153
+#: tips:152 tips:154
 msgid "Iconified windows"
 msgstr "Fenêtres iconifiées"
 
-#: tips:152
+#: tips:153
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -3364,11 +3368,11 @@ msgstr ""
 "iconifier (ou « minimiser ») les fenêtres, et divers programmes, dont ROX-"
 "Filer, peuvent servir à afficher les fenêtres iconifiées."
 
-#: tips:154
+#: tips:155
 msgid "Show iconified windows"
 msgstr "Montrer les fenêtres iconifiées"
 
-#: tips:155
+#: tips:156
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
@@ -3378,43 +3382,43 @@ msgstr ""
 "forme d'un petit bouton sur le punaiseur. Cela nécessite un gestionnaire de "
 "fenêtres compatible, et le punaiseur doit être actif."
 
-#: tips:156
+#: tips:157
 msgid "Iconify to the"
 msgstr "Iconifier en"
 
-#: tips:157
+#: tips:158
 msgid "top-left"
 msgstr "haut à gauche"
 
-#: tips:158
+#: tips:159
 msgid "top-right"
 msgstr "haut à droite"
 
-#: tips:159
+#: tips:160
 msgid "bottom-left"
 msgstr "bas à gauche"
 
-#: tips:160
+#: tips:161
 msgid "bottom-right"
 msgstr "bas à droite"
 
-#: tips:161
+#: tips:162
 msgid ", going"
 msgstr ", en allant"
 
-#: tips:162
+#: tips:163
 msgid "horizontally"
 msgstr "horizontalement"
 
-#: tips:163
+#: tips:164
 msgid "vertically"
 msgstr "verticalement"
 
-#: tips:164
+#: tips:165
 msgid "Panels"
 msgstr "Panneaux"
 
-#: tips:165
+#: tips:166
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
@@ -3422,54 +3426,54 @@ msgstr ""
 "Les panneaux sont des barres d'icônes situées sur les côtés de l'écran. Voir "
 "le manuel pour toute information sur l'utilisation des panneaux."
 
-#: tips:166
+#: tips:167
 msgid "Panel style"
 msgstr "Style du panneau"
 
-#: tips:167
+#: tips:168
 msgid "Image and text"
 msgstr "Image et texte"
 
-#: tips:168
+#: tips:169
 msgid "Every panel icon is shown with an image and some text."
 msgstr "Chaque icône du panneau comporte une image et du texte."
 
-#: tips:169
+#: tips:170
 msgid "Image only for applications"
 msgstr "Image seule pour les applications"
 
-#: tips:170
+#: tips:171
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr ""
 "Les applications comportent juste une image, le reste comporte une image et "
 "du texte."
 
-#: tips:171
+#: tips:172
 msgid "Image only"
 msgstr "Image seule"
 
-#: tips:172 tips:173
+#: tips:173 tips:174
 msgid "Only the image is shown."
 msgstr "Seule l'image est affichée."
 
-#: tips:174
+#: tips:175
 msgid "Panel width (thin)"
 msgstr "Largeur de panneau (fine)"
 
-#: tips:175
+#: tips:176
 msgid "(thick)"
 msgstr "(épaisse)"
 
-#: tips:176 tips:177 tips:178
+#: tips:177 tips:178 tips:179
 msgid "The size of the panels."
 msgstr "Taille des panneaux."
 
-#: tips:179
+#: tips:180
 msgid "Action windows"
 msgstr "Fenêtres d'action"
 
-#: tips:180
+#: tips:181
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -3478,64 +3482,64 @@ msgstr ""
 "une opération en arrière-plan, comme une copie ou\n"
 "suppression de fichiers."
 
-#: tips:181
+#: tips:182
 msgid "Auto-start (Quiet) these actions"
 msgstr "Commencer immédiatement (silencieusement) ces actions"
 
-#: tips:183
+#: tips:184
 msgid "Copy files without confirming first."
 msgstr "Copier des fichiers sans confirmation."
 
-#: tips:185
+#: tips:186
 msgid "Move files without confirming first."
 msgstr "Déplacer des fichiers sans confirmation."
 
-#: tips:187
+#: tips:188
 msgid "Create links to files without confirming first."
 msgstr "Créer des liens vers des fichiers sans confirmation."
 
-#: tips:189
+#: tips:190
 msgid "Delete files without confirming first."
 msgstr "Supprimer des fichiers sans confirmation."
 
-#: tips:190
+#: tips:191
 msgid "Mount"
 msgstr "Monter"
 
-#: tips:191 tips:192
+#: tips:192 tips:193
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "Monter et démonter des systèmes de fichiers sans confirmation."
 
-#: tips:193
+#: tips:194
 msgid "Default settings"
 msgstr "Options par défaut"
 
-#: tips:195
+#: tips:196
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "Ne pas confirmer la suppression d'objets protégés contre l'écriture."
 
-#: tips:197
+#: tips:198
 msgid "Don't display so much information in the message area."
 msgstr "Afficher le minimum d'informations dans la zone des messages."
 
-#: tips:199
+#: tips:200
 msgid "Also change contents of subdirectories."
 msgstr "Changer aussi le contenu des sous-répertoires."
 
-#: tips:205
+#: tips:206
 msgid "Drag and Drop"
 msgstr "Glisser-déposer"
 
-#: tips:206
+#: tips:207
 msgid "Dragging to icons"
 msgstr "Glisser vers icônes"
 
-#: tips:207
+#: tips:208
 msgid "Allow dragging to icons in filer windows"
 msgstr ""
 "Autoriser le glisser-déposer vers des icônes dans les fenêtres du filer"
 
-#: tips:208
+#: tips:209
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -3546,11 +3550,11 @@ msgstr ""
 "sera mise en valeur et lâcher le fichier dessus le mettra dans ce "
 "répertoire, ou le chargera dans ce programme."
 
-#: tips:209
+#: tips:210
 msgid "Directories spring open"
 msgstr "Les répertoires surgissent"
 
-#: tips:210
+#: tips:211
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -3560,15 +3564,15 @@ msgstr ""
 "au répertoire mis en valeur de « surgir » lorsque le fichier a été maintenu "
 "au-dessus pendant un instant."
 
-#: tips:211
+#: tips:212
 msgid "Spring delay:"
 msgstr "Délai de surgissement :"
 
-#: tips:212
+#: tips:213
 msgid "ms"
 msgstr "ms"
 
-#: tips:213 tips:214
+#: tips:214 tips:215
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -3578,19 +3582,19 @@ msgstr ""
 "fichier au-dessus d'un répertoire avant que ce dernier ne surgisse. L'option "
 "ci-dessus doit être active pour que ce réglage ait un effet."
 
-#: tips:215
+#: tips:216
 msgid "When dragging files with the left mouse button"
 msgstr "Quand vous glissez-déposez des fichiers avec le bouton gauche"
 
-#: tips:216 tips:222
+#: tips:217 tips:223
 msgid "Show a menu of possible actions"
 msgstr "Faire apparaître un menu des actions possibles"
 
-#: tips:217
+#: tips:218
 msgid "Copy the files"
 msgstr "Copier les fichiers"
 
-#: tips:218 tips:219 tips:220
+#: tips:219 tips:220 tips:221
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
@@ -3598,15 +3602,15 @@ msgstr ""
 "Notez que vous pouvez toujours faire apparaître le menu par glisser-déposer "
 "tout en maintenant <Alt> enfoncée."
 
-#: tips:221
+#: tips:222
 msgid "When dragging files with the middle mouse button"
 msgstr "Quand vous glissez-déposez des fichiers avec le bouton du milieu"
 
-#: tips:223
+#: tips:224
 msgid "Move the files"
 msgstr "Déplacer les fichiers"
 
-#: tips:224 tips:225 tips:226 tips:227
+#: tips:225 tips:226 tips:227 tips:228
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
@@ -3614,35 +3618,35 @@ msgstr ""
 "Notez que vous pouvez toujours faire apparaître le menu en glissant-déposant "
 "avec le bouton gauche tout en appuyant sur la touche <Alt>."
 
-#: tips:228
+#: tips:229
 msgid "Menus"
 msgstr "Menus"
 
-#: tips:230
+#: tips:231
 msgid "Size of icons in menus:"
 msgstr "Taille des icônes dans les menus :"
 
-#: tips:231
+#: tips:232
 msgid "No Icons"
 msgstr "Pas d'icônes"
 
-#: tips:234
+#: tips:235
 msgid "Same as current window"
 msgstr "Comme la fenêtre courante"
 
-#: tips:235
+#: tips:236
 msgid "Same as default"
 msgstr "Comme le choix par défaut"
 
-#: tips:236
+#: tips:237
 msgid "Behaviour"
 msgstr "Comportement"
 
-#: tips:237
+#: tips:238
 msgid "Menu on button 2 (RISC OS style)"
 msgstr "Menu avec le bouton 2 (style RISC OS)"
 
-#: tips:238
+#: tips:239
 msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
@@ -3651,28 +3655,28 @@ msgstr ""
 "fois avec une souris à deux boutons), pour faire afficher un menu. Si option "
 "non choisie, utilisez le bouton 3 (à droite) à la place."
 
-#: tips:239
+#: tips:240
 msgid "`Xterm Here' program"
 msgstr "Programme pour « Xterm ici »"
 
-#: tips:240 tips:241
+#: tips:241 tips:242
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr ""
 "Le programme à lancer quand vous choisissez « Xterm ici » dans le menu."
 
-#: tips:242
+#: tips:243
 msgid "Keyboard shortcuts"
 msgstr "Raccourcis clavier"
 
-#: tips:244
+#: tips:245
 msgid "Executable files"
 msgstr "Fichiers exécutables"
 
-#: tips:245
+#: tips:246
 msgid "Ignore eXecutable bit for known extensions"
 msgstr "Ignorer le bit « eXécutable » pour les extensions connues"
 
-#: tips:246 tips:247
+#: tips:247 tips:248
 msgid ""
 "If a file has a known extension (eg '.gif') then ignore the executable bit. "
 "This is useful if you have files on a Windows-type filesystem which are "
@@ -3683,26 +3687,24 @@ msgstr ""
 "fichiers sur un système de fichiers de type Windows qui sont montrés comme "
 "des programmes exécutables."
 
-#: tips:248
+#: tips:249
 msgid "MIME types"
 msgstr "Types MIME"
 
-#: tips:249
+#: tips:250
+#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
-"regular file, and then chooses a suitable icon for that type. After editing "
-"the files, you must run the 'update-mime-database' command. Use the Refresh "
-"toolbar button to reload the new types."
+"regular file, and then chooses a suitable icon for that type. Use the MIME-"
+"Editor application to change the file-to-type guessing rules:\n"
+"\n"
+"http://rox.sourceforge.net/mime_editor.html"
 msgstr ""
 "Le filer utilise un ensemble de règles pour deviner le type MIME correct de "
 "chaque fichier ordinaire et choisit ensuite une icône adéquate pour ce type. "
 "Après avoir édité les fichiers, vous devez exécuter la commande 'update-mime-"
 "database'. Utilisez le bouton de relecture de la barre d'outils pour "
 "recharger les nouveaux types."
-
-#: tips:250
-msgid "Show name-to-type rules"
-msgstr "Montrer les règles nom->type"
 
 #: tips:251 tips:252
 msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type."
@@ -3862,6 +3864,9 @@ msgstr ""
 "option. Utilisez-la si le « glisser » de fichiers vers une application "
 "provoque bien l'apparition d'un signe '+' sur le pointeur mais que le "
 "« déposer » ne fonctionne pas."
+
+#~ msgid "Show name-to-type rules"
+#~ msgstr "Montrer les règles nom->type"
 
 #~ msgid "DirItem"
 #~ msgstr "ObjRép"

@@ -87,9 +87,7 @@ static GdkColor	type_colours[NUM_TYPE_COLOURS];
 static void load_mime_types(void);
 static void alloc_type_colours(void);
 static char *get_action_save_path(GtkWidget *dialog);
-static void edit_mime_types(guchar *unused);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
-static GList *build_type_edit(Option *none, xmlNode *node, guchar *label);
 static gboolean remove_handler_with_confirm(const guchar *path);
 
 /* When working out the type for a file, this hash table is checked
@@ -150,8 +148,6 @@ void type_init(void)
 
 	load_mime_types();
 
-	option_register_widget("type-edit", build_type_edit);
-	
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
 	
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
@@ -1027,41 +1023,6 @@ gboolean can_set_run_action(DirItem *item)
 
 	return item->base_type == TYPE_FILE &&
 		!(item->mime_type == application_executable);
-}
-
-/* To edit the MIME types, open a filer window for <Choices>/MIME-info */
-static void edit_mime_types(guchar *unused)
-{
-	const guchar *path;
-
-	mkdir(make_path(home_dir, ".mime"), 0700);
-	path = make_path(home_dir, ".mime/packages");
-	mkdir(path, 0700);
-	filer_opendir(path, NULL, NULL);
-
-	path = "/usr/local/share/mime/packages";
-	if (file_exists(path))
-		filer_opendir(path, NULL, NULL);
-
-	path = "/usr/share/mime/packages";
-	if (file_exists(path))
-		filer_opendir(path, NULL, NULL);
-}
-
-static GList *build_type_edit(Option *none, xmlNode *node, guchar *label)
-{
-	GtkWidget *button, *align;
-
-	g_return_val_if_fail(none == NULL, NULL);
-
-	align = gtk_alignment_new(0.1, 0, 0.1, 0);
-	button = gtk_button_new_with_label(_(label));
-	gtk_container_add(GTK_CONTAINER(align), button);
-
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(edit_mime_types), NULL);
-
-	return g_list_append(NULL, align);
 }
 
 /* Parse file type colours and allocate/free them as necessary */
