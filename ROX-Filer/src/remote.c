@@ -94,7 +94,6 @@ static xmlNodePtr rpc_Mount(GList *args);
 static xmlNodePtr rpc_PanelAdd(GList *args);
 static xmlNodePtr rpc_PinboardAdd(GList *args);
 static xmlNodePtr rpc_SetBackdropApp(GList *args);
-static xmlNodePtr rpc_SetBackdrop(GList *args);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -134,7 +133,6 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
 
-	soap_register("SetBackdrop", rpc_SetBackdrop, "Path", "Style");
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
@@ -663,46 +661,13 @@ static xmlNodePtr rpc_SetBackdropApp(GList *args)
 
 	app = string_value(ARG(0));
 
-	pinboard_set_backdrop_from_program(app, BACKDROP_PROGRAM);
+	pinboard_set_backdrop_app(app);
 
 	g_free(app);
 
 	return NULL;
 }
 
-/* args = Path, [Style] */
-static xmlNodePtr rpc_SetBackdrop(GList *args)
-{
-	char *path, *style;
-	BackdropStyle s = BACKDROP_TILE;
-
-	path = string_value(ARG(0));
-
-	if (!path)
-	{
-		pinboard_set_backdrop_from_program(NULL, BACKDROP_NONE);
-		return NULL;
-	}
-
-	style = string_value(ARG(1));
-	if (style)
-	{
-		s = !g_strcasecmp(style, "Tiled")   ? BACKDROP_TILE :
-		    !g_strcasecmp(style, "Centred") ? BACKDROP_CENTRE :
-		    !g_strcasecmp(style, "Scaled")  ? BACKDROP_SCALE :
-						      BACKDROP_NONE;
-		if (s == BACKDROP_NONE)
-			g_warning("Unknown style '%s'\n", style);
-		g_free(style);
-	}
-
-	pinboard_set_backdrop_from_program(path, s);
-
-	g_free(path);
-
-	return NULL;
-}
-	
 /* args = Path, X, Y, [Label] */
 static xmlNodePtr rpc_PinboardAdd(GList *args)
 {

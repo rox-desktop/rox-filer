@@ -24,6 +24,6 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y);
 void pinboard_move_icons(void);
 const gchar *pinboard_get_name(void);
 void pinboard_set_backdrop(DirItem *item, const gchar *path);
-void pinboard_set_backdrop_from_program(const gchar *path, BackdropStyle style);
+void pinboard_set_backdrop_app(const gchar *app);
 
 #endif /* _PINBOARD_H */

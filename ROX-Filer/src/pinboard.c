@@ -62,7 +62,10 @@ struct _Pinboard {
 
 	gchar		*backdrop;	/* Pathname */
 	BackdropStyle	backdrop_style;
-	gint		backdrop_pid;	/* 0, or PID of running backdrop app */
+	gint		to_backdrop_app; /* pipe FD, or -1 */
+	gint		from_backdrop_app; /* pipe FD, or -1 */
+	gint		input_tag;
+	GString		*input_buffer;
 
 	GtkWidget	*window;	/* Screen-sized window */
 	GtkWidget	*fixed;
@@ -185,6 +188,7 @@ static void reload_backdrop(Pinboard *pinboard,
 static void set_backdrop(const gchar *path, BackdropStyle style);
 void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
+static void abandon_backdrop_app(Pinboard *pinboard);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -254,7 +258,10 @@ void pinboard_activate(const gchar *name)
 	current_pinboard->window = NULL;
 	current_pinboard->backdrop = NULL;
 	current_pinboard->backdrop_style = BACKDROP_NONE;
-	current_pinboard->backdrop_pid = 0;
+	current_pinboard->to_backdrop_app = -1;
+	current_pinboard->from_backdrop_app = -1;
+	current_pinboard->input_tag = -1;
+	current_pinboard->input_buffer = NULL;
 
 	create_pinboard_window(current_pinboard);
 
@@ -426,28 +433,18 @@ void pinboard_reshape_icon(Icon *icon)
 	gtk_widget_queue_draw(current_pinboard->fixed);
 }
 
-/* If style is BACKDROP_PROGRAM, 'path' saved as the new application to set
- * the backdrop. It will then be run, and should invoke the SetBackdrop
- * SOAP method.
- * Otherwise, 'path' is an image to display. It will not be saved (since
- * we want to store the program that asked for it, not the image itself).
+/* 'app' is saved as the new application to set the backdrop. It will then be
+ * run, and should communicate with the filer as described in the manual.
  */
-void pinboard_set_backdrop_from_program(const gchar *path, BackdropStyle style)
+void pinboard_set_backdrop_app(const gchar *app)
 {
 	XMLwrapper *ai;
 	DirItem *item;
 	gboolean can_set;
 
-	if (style != BACKDROP_PROGRAM)
-	{
-		g_return_if_fail(current_pinboard != NULL);
-		reload_backdrop(current_pinboard, path, style);
-		return;
-	}
-
 	item = diritem_new("");
-	diritem_restat(path, item, NULL);
-	ai = appinfo_get(path, item);
+	diritem_restat(app, item, NULL);
+	ai = appinfo_get(app, item);
 	diritem_free(item);
 
 	can_set = ai && xml_get_section(ai, ROX_NS, "CanSetBackdrop") != NULL;
@@ -455,7 +452,7 @@ void pinboard_set_backdrop_from_program(const gchar *path, BackdropStyle style)
 		g_object_unref(ai);
 
 	if (can_set)
-		set_backdrop(path, BACKDROP_PROGRAM);
+		set_backdrop(app, BACKDROP_PROGRAM);
 	else
 		delayed_error(_("This program does not know how to "
 				"manage ROX-Filer's backdrop image."));
@@ -485,7 +482,7 @@ void pinboard_set_backdrop(DirItem *item, const gchar *path)
 	if (item->flags & ITEM_FLAG_APPDIR)
 	{
 		/* Use this program to set the backdrop */
-		pinboard_set_backdrop_from_program(path, BACKDROP_PROGRAM);
+		pinboard_set_backdrop_app(path);
 	}
 	else if (item->base_type == TYPE_FILE)
 	{
@@ -1291,8 +1288,7 @@ static void pinboard_clear(void)
 
 	gtk_widget_destroy(current_pinboard->window);
 
-	if (current_pinboard->backdrop_pid)
-		kill(current_pinboard->backdrop_pid, SIGTERM);
+	abandon_backdrop_app(current_pinboard);
 	
 	g_free(current_pinboard->name);
 	g_free(current_pinboard);
@@ -1567,12 +1563,113 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 	return pixmap;
 }
 
-static void backdrop_app_died(gpointer data)
+static void abandon_backdrop_app(Pinboard *pinboard)
 {
-	gint pid = GPOINTER_TO_INT(data);
+	g_return_if_fail(pinboard != NULL);
 
-	if (current_pinboard && current_pinboard->backdrop_pid == pid)
-		current_pinboard->backdrop_pid = 0;
+	if (pinboard->to_backdrop_app != -1)
+	{
+		close(pinboard->to_backdrop_app);
+		close(pinboard->from_backdrop_app);
+		gtk_input_remove(pinboard->input_tag);
+		g_string_free(pinboard->input_buffer, TRUE);
+		pinboard->to_backdrop_app = -1;
+		pinboard->from_backdrop_app = -1;
+		pinboard->input_tag = -1;
+		pinboard->input_buffer = NULL;
+	}
+
+	g_return_if_fail(pinboard->to_backdrop_app == -1);
+	g_return_if_fail(pinboard->from_backdrop_app == -1);
+	g_return_if_fail(pinboard->input_tag == -1);
+	g_return_if_fail(pinboard->input_buffer == NULL);
+}
+
+/* A single line has been read from the child.
+ * Processes the command, and replies 'ok' (or abandons the child on error).
+ */
+static void command_from_backdrop_app(Pinboard *pinboard, const gchar *command)
+{
+	BackdropStyle style;
+	const char *ok = "ok\n";
+
+	if (strncmp(command, "tile ", 5) == 0)
+	{
+		style = BACKDROP_TILE;
+		command += 5;
+	}
+	else if (strncmp(command, "scale ", 6) == 0)
+	{
+		style = BACKDROP_SCALE;
+		command += 6;
+	}
+	else if (strncmp(command, "centre ", 7) == 0)
+	{
+		style = BACKDROP_CENTRE;
+		command += 7;
+	}
+	else
+	{
+		g_warning("Invalid command '%s' from backdrop app\n",
+				command);
+		abandon_backdrop_app(pinboard);
+		return;
+	}
+
+	reload_backdrop(pinboard, command, style);
+
+	while (*ok)
+	{
+		int sent;
+		
+		sent = write(pinboard->to_backdrop_app, ok, strlen(ok));
+		if (sent <= 0)
+		{
+			g_warning("command_from_backdrop_app: %s\n",
+					g_strerror(errno));
+			abandon_backdrop_app(pinboard);
+			return;
+		}
+		ok += sent;
+	}
+}
+
+static void backdrop_from_child(Pinboard *pinboard,
+				int src, GdkInputCondition cond)
+{
+	char buf[256];
+	int got;
+
+	got = read(src, buf, sizeof(buf));
+
+	if (got <= 0)
+	{
+		if (got < 0)
+			g_warning("backdrop_from_child: %s\n",
+					g_strerror(errno));
+		abandon_backdrop_app(pinboard);
+		return;
+	}
+
+	g_string_append_len(pinboard->input_buffer, buf, got);
+
+	while (pinboard->from_backdrop_app != -1)
+	{
+		int len;
+		char *nl, *command;
+
+		nl = strchr(pinboard->input_buffer->str, '\n');
+		if (!nl)
+			return;		/* Haven't got a whole line yet */
+
+		len = nl - pinboard->input_buffer->str;
+		command = g_strndup(pinboard->input_buffer->str, len);
+		g_string_erase(pinboard->input_buffer, 0, len + 1);
+
+		command_from_backdrop_app(pinboard, command);
+
+		g_free(command);
+	}
 }
 
 static void reload_backdrop(Pinboard *pinboard,
@@ -1586,8 +1683,10 @@ static void reload_backdrop(Pinboard *pinboard,
 		const char *argv[] = {NULL, "--backdrop", NULL};
 		GError	*error = NULL;
 
-		if (pinboard->backdrop_pid)
-			kill(pinboard->backdrop_pid, SIGTERM);
+		g_return_if_fail(pinboard->to_backdrop_app == -1);
+		g_return_if_fail(pinboard->from_backdrop_app == -1);
+		g_return_if_fail(pinboard->input_tag == -1);
+		g_return_if_fail(pinboard->input_buffer == NULL);
 
 		argv[0] = make_path(backdrop, "AppRun")->str;
 
@@ -1599,20 +1698,23 @@ static void reload_backdrop(Pinboard *pinboard,
 				G_SPAWN_DO_NOT_REAP_CHILD |
 				G_SPAWN_SEARCH_PATH,
 				NULL, NULL,		/* Child setup fn */
-				&pinboard->backdrop_pid,/* Child PID */
-				NULL, NULL, NULL,	/* Standard pipes */
+				NULL,			/* Child PID */
+				&pinboard->to_backdrop_app,
+				&pinboard->from_backdrop_app,
+				NULL,			/* Standard error */
 				&error))
 		{
-			on_child_death(pinboard->backdrop_pid,
-				backdrop_app_died,
-				GINT_TO_POINTER(pinboard->backdrop_pid));
+			pinboard->input_buffer = g_string_new(NULL);
+			pinboard->input_tag = gtk_input_add_full(
+					pinboard->from_backdrop_app,
+					GDK_INPUT_READ,
+					(GdkInputFunction) backdrop_from_child,
+					NULL, pinboard, NULL);
 		}
 		else
 		{
 			delayed_error("%s", error ? error->message : "(null)");
 			g_error_free(error);
-
-			pinboard->backdrop_pid = 0;
 		}
 		return;
 	}
@@ -1652,6 +1754,8 @@ static void set_backdrop(const gchar *path, BackdropStyle style)
 			"future."));
 		g_return_if_fail(current_pinboard != NULL);
 	}
+
+	abandon_backdrop_app(current_pinboard);
 
 	g_free(current_pinboard->backdrop);
 	current_pinboard->backdrop = g_strdup(path);

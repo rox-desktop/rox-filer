@@ -1385,6 +1385,108 @@ $ rox --bottom=</screen>
 
    </procedure>
   </sect1>
+
+  <sect1>
+   <title><anchor id="backdropapp" xreflabel="Backdrop applications"/>The pinboard backdrop image</title>
+   <para>
+    You can use any image as a background using...
+   </para>
+   <para>
+    If you want to create an application to set the backdrop (eg, to choose a
+    random image, or a slideshow) you need to first create an application directory
+    (see <xref linkend="AppDir"/>).
+   </para><para>
+    When run without arguments, the application should invoke the
+    <function>SetBackdropApp</function> SOAP method (see <xref
+    linkend="soap"/>). The filer will immediately run the application again,
+    this time with the <option>--backdrop</option> option.
+   </para><para>
+    When run with <option>--backdrop</option>, the program should write the style and name of
+    the image file to display to its standard output stream, eg:
+    <screen>tile /tmp/image.png</screen>
+    <userinput>centre</userinput> and <userinput>scale</userinput> are the other possible
+    styles.
+   </para><para>
+    In the case of a random backdrop chooser it may then quit immediately. If the application
+    created a temporary image then it should read the line "ok\n" from its standard input
+    before deleting the image.
+   </para><para>
+    If the application wishes to show a sequence of images it should still read "ok\n",
+    then wait until it's time to display the next image and then write that filename, and
+    so on.
+   </para><para>
+    The filer will indicate that the program should stop running by closing the two
+    streams. The program should clean up and exit at this point. Be sure to catch
+    SIGPIPE when writing to standard output if you need to delete any temporary files.
+   </para><para>
+    This example program will display an image of the Earth on the backdrop, updating it
+    once a minute. Note the three places we check for the filer closing its connection with
+    us: when sending the image, when waiting for acknowledgement, and while sleeping.
+    <programlisting><![CDATA[
+#!/usr/bin/env python
+
+import sys, os
+
+if len(sys.argv) == 1:
+	# Become the backdrop application
+	app = os.path.abspath(os.path.dirname(sys.argv[0]))
+	cin = os.popen('rox -R', 'w')
+	cin.write("""<?xml version="1.0"?>
+<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
+  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
+   <SetBackdropApp><App>""" + app + """</App></SetBackdropApp>
+  </env:Body>
+</env:Envelope>
+""")
+	sys.exit(0)
+elif len(sys.argv) != 2 or sys.argv[1] != '--backdrop':
+	sys.stderr.write("Usage: %s [--backdrop]\n" % sys.argv[0])
+	sys.exit(1)
+
+# If we get here, we've been run by the filer.
+# Generate a sequence of images, sending them to the filer one by one.
+
+import tempfile, time, signal
+from select import select
+
+time_between_updates = 60
+
+while 1:
+	# Write image to a temporary file
+	path = tempfile.mktemp('.ppm')
+	child = os.fork()
+	if child == 0:
+		fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0600)
+		os.dup2(fd, 1)
+		os.execvp("xearth", ["xearth", "-ppm"])
+		os._exit(1)
+	pid, status = os.waitpid(child, 0)
+	if status:
+		break		# xearth didn't work
+
+	# Send message to filer
+	quit = 0
+	try:
+		print "centre " + path
+		sys.stdout.flush()
+		if sys.stdin.readline() != 'ok\n':
+			quit = 1		# filer closed connection
+	except:
+		quit = 1			# filer closed connection
+	# Delete temporary file
+	os.unlink(path)
+	if quit:
+		break
+
+	# Wait until the next image is due, or the filer tells us to quit
+	ready = select([sys.stdin], [], [], time_between_updates)[0]
+	if ready:
+		# filer closed connection while we were waiting
+		break
+]]>
+    </programlisting>
+   </para>
+  </sect1>
  </chapter>
 
  <chapter id="virtual">
@@ -3250,60 +3352,9 @@ EOF</screen>
 &lt;/AppInfo&gt;</programlisting>
      The application will be run with the <option>--backdrop</option> option
      as it's only argument after invoking this method, and whenever the pinboard is
-     reloaded. It should respond by sending the SetBackdrop SOAP message
-     (described below) to choose the particular image.
-     </para><para>
-     An application can become the default handler either by being run normally,
-     and using this call, or using the filer's <guimenuitem>Use for
-     Backdrop</guimenuitem> menu item.
-     </para><para>
-     DO NOT use this method if invoked with <option>--backdrop</option> or
+     reloaded. DO NOT use this method if invoked with <option>--backdrop</option> or
      you will get stuck in an infinite loop!
-   </para></listitem>
-
-   <listitem><para><function>SetBackdrop</function>(<parameter>Path</parameter>,
-     [<parameter>Style</parameter>])
-     Set the new backdrop image. This must only be used by an application started
-     by the filer with the <option>--backdrop</option> option (see above).
-     <parameter>Path</parameter> is displayed on the backdrop in the given
-     <parameter>Style</parameter> (<userinput>Tiled</userinput>,
-     <userinput>Scaled</userinput> or <userinput>Centred</userinput>).
-     </para><para>
-     The image is displayed but not saved &mdash; the application will be run again
-     next time an image is required. An application may call this method several
-     times (eg, for a slideshow). The filer will send the TERM signal if the
-     program is still running when the user chooses a new backdrop.
-     </para><para>
-     The application is responsible for deleting the image afterwards, if
-     required.
-     </para><para>
-     Sample application:
-     <programlisting><![CDATA[
-#!/bin/sh
-if [ "$#" = 0 ]; then
-	app=`dirname "$0"`
-	app=`cd "$app"; pwd`
-	image=
-	message="<SetBackdropApp><App>$app</App></SetBackdropApp>"
-else
-	image=`mktemp` || exit 1
-	xearth -ppm > "$image"
-        message="<SetBackdrop><Path>$image</Path><Style>Centred</Style></SetBackdrop>"
-fi
-
-rox -R << EOF
-<?xml version="1.0"?>
-<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
-  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
-  $message
-  </env:Body>
-</env:Envelope>
-EOF
-
-if [ "x$image" != "x" ]; then
-	rm "$image"
-fi
-]]></programlisting>
+     See <xref linkend="backdropapp"/> for a guide to writing backdrop applications.
    </para></listitem>
 
    <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
