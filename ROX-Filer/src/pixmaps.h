@@ -42,7 +42,7 @@ struct _MaskedPixmap
 };
 
 
-extern MaskedPixmap default_pixmap[LAST_DEFAULT_PIXMAP];
+extern MaskedPixmap	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 
 void load_default_pixmaps(GdkWindow *window);

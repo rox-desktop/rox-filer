@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+PROG=ROX-Filer
+
 set -P
 APP_DIR=${0%/*}
 if [ "$APP_DIR" = "$0" ] ; then APP_DIR=. ; fi
@@ -22,7 +24,7 @@ case $1 in
 esac
 
 PLATFORM=`unset HOSTTYPE; unset OSTYPE; bash -c 'echo $OSTYPE-$HOSTTYPE'`
-BIN=$APP_DIR/$PLATFORM/ROX-Filer
+BIN=$APP_DIR/$PLATFORM/$PROG
 
 if [ -x $BIN ] ; then
   exec $DEBUGGER $BIN $*

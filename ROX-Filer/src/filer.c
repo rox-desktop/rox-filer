@@ -172,6 +172,7 @@ static void stop_scanning(FilerWindow *filer_window)
 	closedir(filer_window->dir);
 	gtk_idle_remove(filer_window->idle_scan_id);
 	filer_window->dir = NULL;
+	gdk_window_set_cursor(filer_window->window->window, NULL);
 }
 
 /* This is called while we are scanning the directory */
@@ -187,6 +188,8 @@ static gboolean idle_scan_dir(gpointer data)
 		{
 			closedir(filer_window->dir);
 			filer_window->dir = NULL;
+			gdk_window_set_cursor(filer_window->window->window,
+					NULL);
 
 			collection_set_item_size(filer_window->collection,
 					filer_window->scan_min_width,
@@ -524,6 +527,9 @@ void scan_dir(FilerWindow *filer_window)
 
 	update_dir(filer_window);
 	filer_window->flags &= ~FILER_UPDATING;
+
+	gdk_window_set_cursor(filer_window->window->window,
+			gdk_cursor_new(GDK_WATCH));
 }
 
 /* Like scan_dir(), but assume new display will be similar to the old

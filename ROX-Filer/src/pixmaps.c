@@ -36,7 +36,7 @@ static char * bad_xpm[] = {
 " ..XXXXXX.. ",
 "            "};
 
-MaskedPixmap default_pixmap[LAST_DEFAULT_PIXMAP];
+MaskedPixmap 	default_pixmap[LAST_DEFAULT_PIXMAP];
 
 /* Try to load the pixmap from the given path, allocate a MaskedPixmap
  * structure for it and return a pointer to the structure. NULL on failure.
