@@ -109,6 +109,9 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		if (ABOUT_NOW(item->mtime) || ABOUT_NOW(item->ctime))
 			item->flags |= ITEM_FLAG_RECENT;
 
+		if(xtype_have_attr(path))
+			item->flags |= ITEM_FLAG_HAS_XATTR;
+
 		if (S_ISLNK(info.st_mode))
 		{
 			if (mc_stat(path, &info))
