@@ -1946,7 +1946,7 @@ void action_find(GList *paths)
 	gui_side->entry_string_func = set_find_string_colour;
 
 	number_of_windows++;
-	gtk_widget_show_all(abox);
+	gtk_widget_show(abox);
 }
 
 /* Count disk space used by selected items */

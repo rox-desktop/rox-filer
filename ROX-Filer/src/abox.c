@@ -469,6 +469,8 @@ void abox_add_results(ABox *abox)
 
 	g_signal_connect(abox->results, "row-activated",
 			G_CALLBACK(select_row_callback), abox);
+
+	gtk_widget_show_all(frame);
 }
 
 void abox_add_filename(ABox *abox, const gchar *path)
