@@ -379,3 +379,9 @@ void close_on_exec(int fd, gboolean close)
 	if (fcntl(fd, F_SETFD, close))
 		g_warning("fcntl() failed: %s\n", g_strerror(errno));
 }
+
+void set_blocking(int fd, gboolean blocking)
+{
+	if (fcntl(fd, F_SETFL, blocking ? 0 : O_NONBLOCK))
+		g_warning("fcntl() failed: %s\n", g_strerror(errno));
+}

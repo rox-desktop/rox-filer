@@ -160,6 +160,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 			_exit(1);
 		default:
 			/* We are the parent */
+			set_blocking(fds[1], FALSE);
 			pd = g_new(PipedData, 1);
 			pd->data = g_malloc(length);
 			memcpy(pd->data, data, length);

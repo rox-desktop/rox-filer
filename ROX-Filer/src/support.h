@@ -28,5 +28,6 @@ char *pretty_permissions(mode_t m);
 gint applicable(uid_t uid, gid_t gid);
 char *get_local_path(char *uri);
 void close_on_exec(int fd, gboolean close);
+void set_blocking(int fd, gboolean blocking);
 
 #endif /* _SUPPORT_H */
