@@ -1430,6 +1430,7 @@ static void save_options()
 static char *filer_ro_bindings(char *data)
 {
 	o_ro_bindings = atoi(data) != 0;
+	collection_menu_button = o_ro_bindings ? 2 : 3;
 	return NULL;
 }
 
