@@ -461,7 +461,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	type_name = g_strconcat("mime-", type->media_type, ":",
 				type->subtype, NULL);
-	full = rox_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
+	full = rox_icon_theme_load_icon(icon_theme, type_name, HUGE_HEIGHT,
 						0, NULL);
 	g_free(type_name);
 	if (!full)
@@ -471,7 +471,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 				"-", type->subtype, NULL);
 		full = rox_icon_theme_load_icon(icon_theme,
 						type_name,
-						ICON_HEIGHT, 0, NULL);
+						HUGE_HEIGHT, 0, NULL);
 		g_free(type_name);
 	}
 	if (!full)
@@ -480,7 +480,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type_name = g_strconcat("mime-", type->media_type, NULL);
 		full = rox_icon_theme_load_icon(icon_theme,
 						type_name,
-						ICON_HEIGHT, 0, NULL);
+						HUGE_HEIGHT, 0, NULL);
 		g_free(type_name);
 	}
 	if (full)
