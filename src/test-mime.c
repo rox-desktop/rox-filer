@@ -41,6 +41,7 @@ main (int argc, char *argv[])
   int i;
 
   test_glob_type ();
+
   for (i = 1; i < argc; i++)
     {
       file_name = argv[i];

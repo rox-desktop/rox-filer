@@ -1,5 +1,5 @@
 
-CFLAGS=-Wall -g -DXDG_PREFIX=xdg_test
+CFLAGS=-Wall -Wmissing-prototypes  -Wno-sign-compare -g -DXDG_PREFIX=xdg_test
 
 all: test-mime
 
