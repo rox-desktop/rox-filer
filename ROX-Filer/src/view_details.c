@@ -1154,7 +1154,6 @@ static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
 	FilerWindow *filer_window = view_details->filer_window;
-	/*gboolean show_hidden = filer_window->show_hidden;*/
 	GPtrArray *items = view_details->items;
 	GtkTreeIter iter;
 	int i;
@@ -1261,7 +1260,7 @@ static void view_details_update_items(ViewIface *view, GPtrArray *items)
 		const gchar *leafname = item->leafname;
 		int j;
 
-		if (filer_match_filter(filer_window, leafname))
+		if (!filer_match_filter(filer_window, leafname))
 			continue;
 
 		j = details_find_item(view_details, item);
