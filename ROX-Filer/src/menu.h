@@ -16,8 +16,8 @@ extern GtkWidget 	*popup_menu;
 void menu_init(void);
 
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
-GtkItemFactory *menu_create(GtkItemFactoryEntry *def,
-			int n_entries, guchar *name);
+GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
+			    guchar *name, GtkAccelGroup *keys);
 void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
 void position_menu(GtkMenu *menu, gint *x, gint *y,
 #ifdef GTK2

@@ -175,7 +175,7 @@ void dnd_init()
 
 	item_factory = menu_create(menu_def,
 				sizeof(menu_def) / sizeof(*menu_def),
-				 "<dnd>");
+				 "<dnd>", NULL);
 	dnd_menu = gtk_item_factory_get_widget(item_factory, "<dnd>");
 }
 
@@ -243,7 +243,7 @@ GList *uri_list_to_glist(char *uri_list)
 
 		if (!linebreak || linebreak[1] != 10)
 		{
-			delayed_rox_error("uri_list_to_glist: %s",
+			delayed_error("uri_list_to_glist: %s",
 					_("Incorrect or missing line "
 					  "break in text/uri-list data"));
 			return list;
@@ -421,7 +421,7 @@ void drag_data_get(GtkWidget          		*widget,
 			delete_once_sent = FALSE;
 			break;
 		default:
-			delayed_rox_error("drag_data_get: %s",
+			delayed_error("drag_data_get: %s",
 					_("Internal error - bad info type"));
 			break;
 	}
@@ -750,7 +750,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
 		
-		delayed_rox_error("%s", error);
+		delayed_error("%s", error);
 	}
 	else
 		gtk_drag_get_data(widget, context, target, time);
@@ -834,7 +834,7 @@ static void drag_data_received(GtkWidget      	*widget,
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);
-			delayed_rox_error("drag_data_received: %s",
+			delayed_error("drag_data_received: %s",
 					_("Unknown target"));
 			break;
 	}
@@ -894,7 +894,7 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 	}
 
 	if (error)
-		delayed_rox_error("%s", error);
+		delayed_error("%s", error);
 }
 
 static void got_data_raw(GtkWidget 		*widget,
@@ -949,7 +949,7 @@ static void got_data_raw(GtkWidget 		*widget,
 		if (provides(context, XdndDirectSave0))
 			set_xds_prop(context, "");
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		delayed_rox_error(_("Error saving file: %s"), error);
+		delayed_error(_("Error saving file: %s"), error);
 	}
 	else
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
@@ -1057,7 +1057,7 @@ static void got_uri_list(GtkWidget 		*widget,
 	if (error)
 	{
 		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
-		delayed_rox_error(_("Error getting file list: %s"), error);
+		delayed_error(_("Error getting file list: %s"), error);
 	}
 	else if (send_reply)
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
@@ -1086,7 +1086,7 @@ static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
 			set_icon_path(prompt_dest_path,
 				(char*) prompt_local_paths->data);
 		else
-			delayed_rox_error(
+			delayed_error(
 			_("You can't use multiple files with Set Icon!"));
 	}
 } 

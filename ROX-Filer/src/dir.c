@@ -132,7 +132,7 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 		callback(dir, DIR_END_SCAN, NULL, data);
 
 	if (dir->error)
-		delayed_rox_error(_("Error scanning '%s':\n%s"),
+		delayed_error(_("Error scanning '%s':\n%s"),
 				dir->pathname, dir->error);
 }
 
@@ -712,7 +712,7 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 		dir_rescan(dir, pathname);
 
 	if (dir->error)
-		delayed_rox_error(_("Error scanning '%s':\n%s"),
+		delayed_error(_("Error scanning '%s':\n%s"),
 				dir->pathname, dir->error);
 }
 

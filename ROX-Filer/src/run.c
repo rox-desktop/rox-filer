@@ -73,7 +73,7 @@ void run_app(char *path)
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
 	if (!spawn_full(argv, home_dir))
-		report_rox_error(_("Failed to fork() child process"));
+		report_error(_("Failed to fork() child process"));
 	
 	g_string_free(apprun, TRUE);
 }
@@ -90,7 +90,7 @@ void run_with_files(char *path, GList *uri_list)
 
 	if (stat(path, &info))
 	{
-		delayed_rox_error(_("Program %s not found - deleted?"), path);
+		delayed_error(_("Program %s not found - deleted?"), path);
 		return;
 	}
 
@@ -117,7 +117,7 @@ void run_with_files(char *path, GList *uri_list)
 	argv[argc++] = NULL;
 
 	if (!spawn_full(argv, home_dir))
-		delayed_rox_error(_("Failed to fork() child process"));
+		delayed_error(_("Failed to fork() child process"));
 }
 
 /* Run the program as '<path> -', piping the data to it via stdin.
@@ -132,7 +132,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 
 	if (stat(path, &info))
 	{
-		delayed_rox_error(_("Program %s not found - deleted?"), path);
+		delayed_error(_("Program %s not found - deleted?"), path);
 		return;
 	}
 
@@ -143,7 +143,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 	
 	if (pipe(fds))
 	{
-		delayed_rox_error("pipe: %s", g_strerror(errno));
+		delayed_error("pipe: %s", g_strerror(errno));
 		return;
 	}
 	close_on_exec(fds[1], TRUE);
@@ -152,7 +152,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 	switch (fork())
 	{
 		case -1:
-			delayed_rox_error("fork: %s", g_strerror(errno));
+			delayed_error("fork: %s", g_strerror(errno));
 			close(fds[1]);
 			break;
 		case 0:
@@ -242,7 +242,7 @@ gboolean run_diritem(guchar *full_path,
 					return TRUE;
 				else
 				{
-					report_rox_error(
+					report_error(
 						_("Failed to fork() child"));
 					return FALSE;
 				}
@@ -251,11 +251,11 @@ gboolean run_diritem(guchar *full_path,
 			return open_file(full_path, edit ? text_plain
 						  : item->mime_type);
 		case TYPE_ERROR:
-			delayed_rox_error(_("File doesn't exist, or I can't "
+			delayed_error(_("File doesn't exist, or I can't "
 					  "access it: %s"), full_path);
 			return FALSE;
 		default:
-		        delayed_rox_error(
+		        delayed_error(
 				_("I don't know how to open '%s'"), full_path);
 			return FALSE;
 	}
@@ -281,17 +281,20 @@ void show_item_help(guchar *path, DirItem *item)
 	{
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE)
-				delayed_error(_("Executable file"),
-				      _("This is a file with an eXecute bit "
+				delayed_error(
+				      _("Executable file:\n"
+					"This is a file with an eXecute bit "
 					"set - it can be run as a program."));
 			else
-				delayed_error(_("File"), _(
+				delayed_error(
+				      _("File:\n"
 					"This is a data file. Try using the "
 					"Info menu item to find out more..."));
 			break;
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_MOUNT_POINT)
-				delayed_error(_("Mount point"), _(
+				delayed_error(
+				_("Mount point:\n"
 				"A mount point is a directory which another "
 				"filing system can be mounted on. Everything "
 				"on the mounted filesystem then appears to be "
@@ -301,23 +304,27 @@ void show_item_help(guchar *path, DirItem *item)
 			break;
 		case TYPE_CHAR_DEVICE:
 		case TYPE_BLOCK_DEVICE:
-			delayed_error(_("Device file"), _(
+			delayed_error(
+				_("Device file:\n"
 				"Device files allow you to read from or write "
 				"to a device driver as though it was an "
 				"ordinary file."));
 			break;
 		case TYPE_PIPE:
-			delayed_error(_("Named pipe"), _(
+			delayed_error(
+				_("Named pipe:\n"
 				"Pipes allow different programs to "
 				"communicate. One program writes data to the "
 				"pipe while another one reads it out again."));
 			break;
 		case TYPE_SOCKET:
-			delayed_error(_("Socket"), _(
+			delayed_error(
+				_("Socket:\n"
 				"Sockets allow processes to communicate."));
 			break;
 		default:
-			delayed_error(_("Unknown type"),  _(
+			delayed_error(
+				_("Unknown type:\n"
 				"I couldn't find out what kind of file this "
 				"is. Maybe it doesn't exist anymore or you "
 				"don't have search permission on the directory "
@@ -400,7 +407,7 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond)
 		{
 			if (errno == EAGAIN)
 				return;
-			delayed_rox_error(
+			delayed_error(
 					_("Could not send data to program: %s"),
 					g_strerror(errno));
 			goto finish;
@@ -431,7 +438,7 @@ static gboolean follow_symlink(char *full_path,
 	got = readlink(full_path, path, MAXPATHLEN);
 	if (got < 0)
 	{
-		delayed_rox_error(_("Could not read link: %s"),
+		delayed_error(_("Could not read link: %s"),
 				  g_strerror(errno));
 		return FALSE;
 	}
@@ -458,7 +465,7 @@ static gboolean follow_symlink(char *full_path,
 	if (!slash)
 	{
 		g_free(real);
-		delayed_rox_error(
+		delayed_error(
 			_("Broken symlink (or you don't have permission "
 			  "to follow it): %s"), full_path);
 		return FALSE;
@@ -494,7 +501,7 @@ static gboolean open_file(guchar *path, MIME_type *type)
 	if (type_open(path, type))
 		return TRUE;
 
-	report_rox_error(
+	report_error(
 		_("No run action specified for files of this type (%s/%s) - "
 		"you can set a run action by choosing `Set Run Action' "
 		"from the File menu, or you can just drag the file to an "
@@ -518,13 +525,14 @@ static void dir_show_help(DirItem *item, char *path)
 	if (mc_stat(help_dir, &info) == 0)
 		filer_opendir(help_dir, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
-		delayed_error(_("Application"),
-			_("This is an application directory - you can "
+		delayed_error(
+			_("Application:\n"
+			"This is an application directory - you can "
 			"run it as a program, or open it (hold down "
 			"Shift while you open it). Most applications provide "
 			"their own help here, but this one doesn't."));
 	else
-		delayed_error(_("Directory"), _(
+		delayed_error(_("Directory:\n"
 				"This is a directory. It contains an index to "
 				"other items - open it to see the list."));
 }

@@ -406,7 +406,7 @@ static void show_notice(GtkObject *button)
 	text = gtk_object_get_data(button, "notice_text");
 	g_return_if_fail(text != NULL);
 
-	report_error(_("Notice"), _(text));
+	report_error("%s", _(text));
 }
 
 static void build_widget(xmlNode *widget, GtkWidget *box)
@@ -787,7 +787,7 @@ static void build_options_window(void)
 	options_doc = xmlParseFile(make_path(app_dir, "Options.xml")->str);
 	if (!options_doc)
 	{
-		report_rox_error("Internal error: Options.xml unreadable");
+		report_error("Internal error: Options.xml unreadable");
 		return;
 	}
 
@@ -1108,7 +1108,7 @@ static void save_cb(gpointer key, gpointer value, gpointer data)
 	len = strlen(tmp);
 
 	if (fwrite(tmp, sizeof(char), len, stream) < len)
-		delayed_rox_error(_("Could not save options: %s"),
+		delayed_error(_("Could not save options: %s"),
 				  g_strerror(errno));
 
 	g_free(tmp);
@@ -1136,7 +1136,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 		path = choices_find_path_save("Options", PROJECT, TRUE);
 		if (!path)
 		{
-		        delayed_rox_error(_("Could not save options: %s"),
+		        delayed_error(_("Could not save options: %s"),
 				          _("Choices saving is disabled by "
 					  "CHOICESPATH variable"));
 			return;
@@ -1148,7 +1148,7 @@ static void save_options(GtkWidget *widget, gpointer data)
 		g_hash_table_foreach(option_hash, save_cb, file);
 
 		if (fclose(file) == EOF)
-			delayed_rox_error(_("Could not save options: %s"),
+			delayed_error(_("Could not save options: %s"),
 					  g_strerror(errno));
 
 		for (next = saver_callbacks; next; next = next->next)

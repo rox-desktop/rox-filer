@@ -61,7 +61,9 @@ static gboolean matches(Collection *collection, int item, char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
 static guchar *mini_contents(FilerWindow *filer_window);
 static void show_help(FilerWindow *filer_window);
-
+#ifdef GTK2
+static gboolean grab_focus(GtkWidget *minibuffer);
+#endif
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -96,6 +98,13 @@ void create_minibuffer(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(mini), "changed",
 			GTK_SIGNAL_FUNC(changed), filer_window);
+
+#ifdef GTK2
+	/* Grabbing focus musn't select the text... */
+	gtk_signal_connect_object(GTK_OBJECT(mini), "grab-focus",
+		GTK_SIGNAL_FUNC(grab_focus),
+		GTK_OBJECT(mini));
+#endif
 
 	filer_window->minibuffer = mini;
 	filer_window->minibuffer_label = label;
@@ -245,7 +254,7 @@ static void show_help(FilerWindow *filer_window)
 			break;
 	}
 
-	delayed_rox_error("%s", message);
+	delayed_error("%s", message);
 }
 
 
@@ -722,7 +731,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	switch (child)
 	{
 		case -1:
-			delayed_rox_error(_("Failed to create child process"));
+			delayed_error(_("Failed to create child process"));
 			break;
 		case 0:	/* Child */
 			/* Ensure output is noticed - send stdout to stderr */
@@ -793,7 +802,7 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 	cond = find_compile(entry);
 	if (!cond)
 	{
-		delayed_rox_error(_("Invalid Find condition"));
+		delayed_error(_("Invalid Find condition"));
 		return;
 	}
 
@@ -961,3 +970,17 @@ static guchar *mini_contents(FilerWindow *filer_window)
 	return NULL;
 }
 
+#ifdef GTK2
+static gboolean grab_focus(GtkWidget *minibuffer)
+{
+	GtkWidgetClass *class;
+	
+	class = GTK_WIDGET_CLASS(gtk_type_class(GTK_TYPE_WIDGET));
+
+	class->grab_focus(minibuffer);
+
+	gtk_signal_emit_stop_by_name(GTK_OBJECT(minibuffer), "grab_focus");
+
+	return 1;
+}
+#endif

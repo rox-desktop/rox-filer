@@ -212,7 +212,7 @@ void pinboard_activate(guchar *name)
 
 	if (!add_root_handlers())
 	{
-		delayed_rox_error(_("Another application is already "
+		delayed_error(_("Another application is already "
 					"managing the pinboard!"));
 		return;
 	}
@@ -1144,7 +1144,7 @@ void pinboard_save(void)
 
 	goto out;
 err:
-	delayed_rox_error(_("Could not save pinboard: %s"), g_strerror(errno));
+	delayed_error(_("Could not save pinboard: %s"), g_strerror(errno));
 out:
 	if (file)
 		fclose(file);

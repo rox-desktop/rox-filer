@@ -589,7 +589,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	if (!dir)
 	{
 		if (warning)
-			delayed_rox_error(_("Directory missing/deleted"));
+			delayed_error(_("Directory missing/deleted"));
 		gtk_widget_destroy(filer_window->window);
 		return FALSE;
 	}
@@ -889,7 +889,7 @@ static void group_restore(FilerWindow *filer_window, int i)
 
 	if (!groups[i].dir)
 	{
-		report_rox_error(_("Group %d is not set. Select some files "
+		report_error(_("Group %d is not set. Select some files "
 				"and press Ctrl+%d to set the group. Press %d "
 				"on its own to reselect the files later."),
 				i, i, i);
@@ -1036,7 +1036,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 
 	if (!new_dir)
 	{
-		delayed_rox_error(_("Directory '%s' is not accessible"),
+		delayed_error(_("Directory '%s' is not accessible"),
 				real_path);
 		g_free(real_path);
 		return;
@@ -1232,7 +1232,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 						   filer_window->path);
 	if (!filer_window->directory)
 	{
-		delayed_rox_error(_("Directory '%s' not found."), path);
+		delayed_error(_("Directory '%s' not found."), path);
 		g_free(filer_window->path);
 		g_free(filer_window);
 		return NULL;

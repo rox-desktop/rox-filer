@@ -815,7 +815,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 
 	if (pipe(filedes))
 	{
-		report_rox_error("pipe: %s", g_strerror(errno));
+		report_error("pipe: %s", g_strerror(errno));
 		return NULL;
 	}
 
@@ -823,7 +823,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	{
 		close(filedes[0]);
 		close(filedes[1]);
-		report_rox_error("pipe: %s", g_strerror(errno));
+		report_error("pipe: %s", g_strerror(errno));
 		return NULL;
 	}
 
@@ -835,7 +835,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	switch (child)
 	{
 		case -1:
-			report_rox_error("fork: %s", g_strerror(errno));
+			report_error("fork: %s", g_strerror(errno));
 			return NULL;
 		case 0:
 			/* We are the child */
@@ -1873,7 +1873,7 @@ void action_find(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_rox_error(_("You need to select some items "
+		report_error(_("You need to select some items "
 				"to search through"));
 		return;
 	}
@@ -1943,7 +1943,7 @@ void action_usage(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_rox_error(
+		report_error(
 			_("You need to select some items to count"));
 		return;
 	}
@@ -1979,7 +1979,7 @@ void action_mount(GList	*paths, gboolean open_dir)
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 #else
-	report_rox_error(
+	report_error(
 		_("ROX-Filer does not yet support mount points on your "
 			"system. Sorry."));
 #endif /* DO_MOUNT_POINTS */
@@ -2029,7 +2029,7 @@ void action_chmod(FilerWindow *filer_window)
 
 	if (collection->number_selected < 1)
 	{
-		report_rox_error(_("You need to select the items "
+		report_error(_("You need to select the items "
 				"whose permissions you want to change"));
 		return;
 	}

@@ -30,13 +30,11 @@ void gui_support_init();
 int get_choice(char *title,
 	       char *message,
 	       int number_of_buttons, ...);
-void report_error(char *title, char *message, ...);
-void report_rox_error(char *message, ...);
+void report_error(char *message, ...);
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
 void make_panel_window(GdkWindow *window);
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window);
-void delayed_error(char *title, char *error, ...);
-void delayed_rox_error(char *error, ...);
+void delayed_error(char *error, ...);
 gboolean load_file(char *pathname, char **data_out, long *length_out);
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data);
 void parse_file(char *path, ParseFunc *parse_line);

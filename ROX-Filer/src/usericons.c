@@ -164,7 +164,7 @@ gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 
 	/* Check if file exists */
 	if (!mc_stat(iconpath, &icon) == 0) {
-		delayed_rox_error(_("The pathname you gave does not exist. "
+		delayed_error(_("The pathname you gave does not exist. "
 			      	    "The icon has not been changed."));
 		return FALSE;
 	}
@@ -173,7 +173,7 @@ gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 	pic = g_fscache_lookup(pixmap_cache, iconpath);
 	if (!pic)
 	{
-		delayed_rox_error(
+		delayed_error(
 			_("Unable to load image file -- maybe it's not in a "
 			  "format I understand, or maybe the permissions are "
 			  "wrong?\n"
@@ -386,7 +386,7 @@ static void write_globicons(void)
 			     xmlDocGetRootElement(doc));
 
 	if (save_xml_file(doc, save_new) || rename(save_new, save))
-		delayed_rox_error(_("Error saving %s: %s"),
+		delayed_error(_("Error saving %s: %s"),
 				save, g_strerror(errno));
 
 	g_free(save_new);
@@ -517,7 +517,7 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 
 	if (!icon)
 	{
-		delayed_rox_error(_("You should drop a single local icon file "
+		delayed_error(_("You should drop a single local icon file "
 				    "onto the drop box - that icon will be "
 				    "used for this file from now on."));
 		return;
@@ -559,7 +559,7 @@ static void remove_icon(GtkWidget *dialog)
 
 static void show_icon_help(gpointer data)
 {
-	report_rox_error(
+	report_error(
 		_("Enter the full path of a file that contains a valid "
 		  "image to be used as the icon for this file or directory."));
 }
@@ -584,7 +584,7 @@ static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
 	target = choices_find_path_save(leaf, "MIME-icons", TRUE);
 	if (!target)
 	{
-		delayed_rox_error(_("Setting icon disabled by CHOICESPATH"));
+		delayed_error(_("Setting icon disabled by CHOICESPATH"));
 		g_free(leaf);
 		return FALSE;
 	}
@@ -652,7 +652,7 @@ static void show_current_dirs_menu(GtkWidget *button, gpointer data)
 	if (g_hash_table_size(glob_icons) == 0)
 	{
 		/* TODO: Include MIME-icons? */
-		delayed_rox_error(_("You have not yet set any special icons; "
+		delayed_error(_("You have not yet set any special icons; "
 			"therefore, I have no directories to show you"));
 		return;
 	}

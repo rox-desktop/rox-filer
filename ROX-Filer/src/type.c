@@ -483,7 +483,7 @@ gboolean type_open(char *path, MIME_type *type)
 
 	if (stat(open, &info))
 	{
-		report_rox_error("stat(%s): %s", open, g_strerror(errno));
+		report_error("stat(%s): %s", open, g_strerror(errno));
 		g_free(open);
 		return FALSE;
 	}
@@ -495,7 +495,7 @@ gboolean type_open(char *path, MIME_type *type)
 
 	if (!spawn_full(argv, home_dir))
 	{
-		report_rox_error(_("Failed to fork() child process"));
+		report_error(_("Failed to fork() child process"));
 		retval = FALSE;
 	}
 
@@ -587,7 +587,7 @@ GdkAtom type_to_atom(MIME_type *type)
 
 void show_shell_help(gpointer data)
 {
-	report_rox_error(_("Enter a shell command which will load \"$1\" into "
+	report_error(_("Enter a shell command which will load \"$1\" into "
 			"a suitable program. Eg:\n\n"
 			"gimp \"$1\""));
 }
@@ -629,7 +629,7 @@ static void set_shell_action(GtkWidget *dialog)
 		error = errno;
 
 	if (error)
-		report_rox_error(g_strerror(errno));
+		report_error(g_strerror(errno));
 
 	g_free(tmp);
 	g_free(path);
@@ -665,7 +665,7 @@ void drag_app_dropped(GtkWidget		*eb,
 
 	if (!app)
 	{
-		delayed_rox_error(
+		delayed_error(
 			_("You should drop a single (local) application "
 			"onto the drop box - that application will be "
 			"used to load files of this type in future"));
@@ -682,7 +682,7 @@ void drag_app_dropped(GtkWidget		*eb,
 		if (path)
 		{
 			if (symlink(app, path))
-				delayed_rox_error("symlink: %s",
+				delayed_error("symlink: %s",
 						g_strerror(errno));
 			else
 				destroy_on_idle(dialog);
@@ -691,7 +691,7 @@ void drag_app_dropped(GtkWidget		*eb,
 		g_free(path);
 	}
 	else
-		delayed_rox_error(
+		delayed_error(
 			_("This is not a program! Give me an application "
 			"instead!"));
 
@@ -982,7 +982,7 @@ char *get_action_save_path(GtkWidget *dialog)
 	path = choices_find_path_save("", PROJECT, FALSE);
 	if (!path)
 	{
-		report_rox_error(
+		report_error(
 		_("Choices saving is disabled by CHOICESPATH variable"));
 		goto out;
 	}
@@ -1008,7 +1008,7 @@ char *get_action_save_path(GtkWidget *dialog)
 		
 		if (unlink(path))
 		{
-			report_rox_error(_("Can't remove %s: %s"),
+			report_error(_("Can't remove %s: %s"),
 				path, g_strerror(errno));
 			g_free(path);
 			path = NULL;

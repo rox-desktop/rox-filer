@@ -204,27 +204,8 @@ int get_choice(char *title,
 	return retval;
 }
 
-/* Display a message in a window */
-void report_error(char *title, char *message, ...)
-{
-        va_list args;
-	gchar *s;
-
-	g_return_if_fail(message != NULL);
-
-	va_start(args, message);
-	s = g_strdup_vprintf(message, args);
-	va_end(args);
-
-	if (!title)
-		title = _("Error");
-
-	get_choice(title, s, 1, _("OK"));
-	g_free(s);
-}
-
 /* Display a message in a window with "ROX-Filer" as title */
-void report_rox_error(char *message, ...)
+void report_error(char *message, ...)
 {
         va_list args;
 	gchar *s;
@@ -235,7 +216,21 @@ void report_rox_error(char *message, ...)
 	s = g_strdup_vprintf(message, args);
 	va_end(args);
 
-        report_error(PROJECT, "%s", s);
+#ifdef GTK2
+	{
+		GtkWidget *dialog;
+		dialog = gtk_message_dialog_new(NULL,
+				GTK_DIALOG_MODAL,
+				GTK_MESSAGE_ERROR,
+				GTK_BUTTONS_OK,
+				"%s", s);
+		gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+		gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+	}
+#else
+	get_choice(PROJECT, s, 1, _("OK"));
+#endif
 	g_free(s);
 }
 
@@ -301,10 +296,9 @@ static gboolean error_idle_cb(gpointer data)
 {
 	char	**error = (char **) data;
 	
-	report_error(error[0], error[1]);
-	g_free(error[0]);
-	g_free(error[1]);
-	error[0] = error[1] = NULL;
+	report_error("%s", *error);
+	g_free(*error);
+	*error = NULL;
 
 	if (--number_of_windows == 0)
 		gtk_main_quit();
@@ -312,47 +306,29 @@ static gboolean error_idle_cb(gpointer data)
 	return FALSE;
 }
 
-/* Display an error next time we are idle */
-void delayed_error(char *title, char *error, ...)
+/* Display an error with "ROX-Filer" as title next time we are idle */
+void delayed_error(char *error, ...)
 {
-	static char *delayed_error_data[2] = {NULL, NULL};
+	static char *delayed_error_data = NULL;
 	gboolean already_open;
 	va_list args;
 
 	g_return_if_fail(error != NULL);
 
-	already_open = delayed_error_data[1] != NULL;
+	already_open = delayed_error_data != NULL;
 
-	g_free(delayed_error_data[0]);
-	g_free(delayed_error_data[1]);
+	g_free(delayed_error_data);
 
-	delayed_error_data[0] = g_strdup(title);
 	va_start(args, error);
-	delayed_error_data[1] = g_strdup_vprintf(error, args);
+	delayed_error_data = g_strdup_vprintf(error, args);
 	va_end(args);
 
 	if (already_open)
 		return;
 
-	gtk_idle_add(error_idle_cb, delayed_error_data);
+	gtk_idle_add(error_idle_cb, &delayed_error_data);
 
 	number_of_windows++;
-}
-
-/* Display an error with "ROX-Filer" as title next time we are idle */
-void delayed_rox_error(char *error, ...)
-{
-        va_list args;
-	gchar *s;
-
-	g_return_if_fail(error != NULL);
-
-	va_start(args, error);
-	s = g_strdup_vprintf(error, args);
-	va_end(args);
-
-        delayed_error(PROJECT, "%s", s);
-	g_free(s);
 }
 
 /* Load the file into memory. Return TRUE on success.
@@ -369,7 +345,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 	if (!file)
 	{
-		delayed_rox_error("open(%s): %s", pathname, g_strerror(errno));
+		delayed_error("open(%s): %s", pathname, g_strerror(errno));
 		return FALSE;
 	}
 
@@ -384,7 +360,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			delayed_rox_error(_("Error reading file %s: %s"),
+			delayed_error(_("Error reading file %s: %s"),
 					pathname, g_strerror(errno));
 			g_free(buffer);
 		}
@@ -397,7 +373,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 		}
 	}
 	else
-		delayed_rox_error(_("Can't allocate memory for buffer to "
+		delayed_error(_("Can't allocate memory for buffer to "
 				"load this file"));
 
 	fclose(file);
@@ -447,7 +423,7 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 			if (error && !seen_error)
 			{
-				delayed_rox_error(
+				delayed_error(
 		_("Error in '%s' file at line %d: "
 		"\n\"%s\"\n"
 		"This may be due to upgrading from a previous version of "

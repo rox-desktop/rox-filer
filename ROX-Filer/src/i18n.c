@@ -71,7 +71,7 @@ void i18n_init(void)
 }
 
 /* These two stolen from dia :-).
- * Slight modification though: '/%s/' means 'same as above' so that
+ * Slight modification though: '>' means 'same as above' so that
  * if a translation is missing it doesn't muck up the whole menu structure!
  */
 GtkItemFactoryEntry *translate_entries(GtkItemFactoryEntry *entries, gint n)
@@ -162,7 +162,7 @@ void free_translated_entries(GtkItemFactoryEntry *entries, gint n)
 static void trans_changed(guchar *lang)
 {
 	set_trans(lang);
-	delayed_rox_error(_("You must restart the filer for the new language "
+	delayed_error(_("You must restart the filer for the new language "
 		  "setting to take full effect"));
 }
 
@@ -237,7 +237,7 @@ static void save(void)
 	g_free(path);
 	if (!f)
 	{
-		delayed_rox_error(g_strerror(errno));
+		delayed_error(g_strerror(errno));
 		return;
 	}
 
@@ -248,5 +248,5 @@ static void save(void)
 		  (fclose(f) != 0);
 
 	if (err)
-		delayed_rox_error(g_strerror(errno));
+		delayed_error(g_strerror(errno));
 }

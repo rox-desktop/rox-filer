@@ -930,7 +930,7 @@ void panel_save(Panel *panel)
 
 	goto out;
 err:
-	delayed_rox_error(_("Could not save panel: %s"), g_strerror(errno));
+	delayed_error(_("Could not save panel: %s"), g_strerror(errno));
 out:
 	if (file)
 		fclose(file);
@@ -1205,7 +1205,7 @@ static void applet_died(GtkWidget *socket)
 
 	if (never_plugged)
 	{
-		report_rox_error(
+		report_error(
 			_("Applet quit without ever creating a widget!"));
 		gtk_widget_destroy(socket);
 	}

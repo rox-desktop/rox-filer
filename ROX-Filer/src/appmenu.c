@@ -236,7 +236,7 @@ static void apprun_menu(GtkWidget *item, gpointer data)
 	argv[2] = NULL;
 
 	if (!spawn(argv))
-		report_rox_error("fork: %s", g_strerror(errno));
+		report_error("fork: %s", g_strerror(errno));
 
 	g_free(argv[0]);
 }
