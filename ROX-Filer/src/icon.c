@@ -121,6 +121,7 @@ static GtkItemFactoryEntry menu_def[] = {
 
 void icon_init(void)
 {
+	guchar		*tmp;
 	GList		*items;
 	GtkItemFactory	*item_factory;
 	GtkTargetEntry 	target_table[] =
@@ -134,9 +135,11 @@ void icon_init(void)
 	item_factory = menu_create(menu_def,
 				sizeof(menu_def) / sizeof(*menu_def),
 				 "<icon>");
+
+	tmp = g_strconcat("<icon>/", _("File"), NULL);
 	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
-	icon_file_menu = gtk_item_factory_get_widget(item_factory,
-					"<icon>/File");
+	icon_file_menu = gtk_item_factory_get_widget(item_factory, tmp);
+	g_free(tmp);
 
 	/* File '' label... */
 	items = gtk_container_children(GTK_CONTAINER(icon_menu));
