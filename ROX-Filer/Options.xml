@@ -41,6 +41,24 @@ If on: animal, Ben, zoo.</toggle>
       <item label='Date' value='2'/>
       <item label='Size' value='3'/>
     </menu>
+    <spacer/>
+    <toggle name='colour_types' label='Colour files based on their types'>Filenames (and details) are coloured according to the file's type.</toggle>
+    <hbox>
+      <vbox>
+        <colour name='dir_colour'  lpos='1' label='Directory'/>
+        <colour name='file_colour' lpos='1' label='Regular file'/>
+        <colour name='pipe_colour' lpos='1' label='Pipe'/>
+        <colour name='sock_colour' lpos='1' label='Socket'/>
+        <colour name='cdev_colour' lpos='1' label='Character device'/>
+      </vbox>
+      <vbox>
+        <colour name='bdev_colour' lpos='1' label='Block device'/>
+        <colour name='exec_colour' lpos='1' label='Executable file'/>
+        <colour name='adir_colour' lpos='1' label='Application directory'/>
+        <colour name='unkn_colour' lpos='1' label='Unknown type'/>
+        <colour name='err_colour'  lpos='1' label='Error (eg. orphan symlink)'/>
+      </vbox>
+    </hbox>
   </section>
   <section name='pinboard' title='Pinboard'>
     <label>The pinboard is the desktop background.

@@ -69,6 +69,29 @@ static gboolean o_sort_nocase = TRUE;
 static gboolean o_dirs_first = FALSE;
 static gint	o_small_truncate = 250;
 static gint	o_large_truncate = 89;
+static gboolean	o_display_colour_types = TRUE;
+
+/* Colours for file types (same order as base types) */
+static gchar *opt_type_colours[][2] = {
+	{"display_err_colour",  "#ff0000"},
+	{"display_unkn_colour", "#000000"},
+	{"display_dir_colour",  "#000080"},
+	{"display_pipe_colour", "#444444"},
+	{"display_sock_colour", "#ff00ff"},
+	{"display_file_colour", "#000000"},
+	{"display_cdev_colour", "#000000"},
+	{"display_bdev_colour", "#000000"},
+	{"display_exec_colour", "#006000"},
+	{"display_adir_colour", "#006000"}
+};
+#define NUM_TYPE_COLOURS\
+		(sizeof(opt_type_colours) / sizeof(opt_type_colours[0]))
+
+/* Parsed colours for file types */
+static GdkColor	type_colours[NUM_TYPE_COLOURS];
+
+/* GC for drawing colour filenames */
+static GdkGC	*type_gc = NULL;
 
 typedef struct _Template Template;
 
@@ -93,6 +116,7 @@ struct _Template {
 		(template)->icon.x, (template)->icon.y)
 
 /* Static prototypes */
+static int alloc_type_colours(void);
 static void fill_template(GdkRectangle *area, DirItem *item,
 			FilerWindow *filer_window, Template *template);
 static void huge_template(GdkRectangle *area, DirItem *item,
@@ -136,6 +160,18 @@ enum {
 
 void display_init()
 {
+	int i;
+	
+	option_add_int("display_colour_types", o_display_colour_types, NULL);
+	
+	for (i = 0; i < NUM_TYPE_COLOURS; i++)
+		option_add_string(
+				opt_type_colours[i][0],
+				opt_type_colours[i][1],
+				NULL
+		);
+	alloc_type_colours();
+
 	option_add_int("display_sort_nocase", o_sort_nocase, NULL);
 	option_add_int("display_dirs_first", o_dirs_first, NULL);
 	option_add_int("display_size", LARGE_ICONS, NULL);
@@ -489,8 +525,8 @@ void draw_string(GtkWidget *widget,
 	GdkRectangle	clip;
 	GdkGC		*gc = selected
 			? widget->style->fg_gc[GTK_STATE_SELECTED]
-			: widget->style->fg_gc[GTK_STATE_NORMAL];
-
+			: type_gc;
+	
 	if (selected && box)
 		gtk_paint_flat_box(widget->style, widget->window, 
 				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
@@ -759,17 +795,67 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+/* Allocate colours for file types.
+ * Returns the number of colours changed (0 if first_time is TRUE).
+ */
+static int alloc_type_colours(void)
+{
+	gboolean	success[NUM_TYPE_COLOURS];
+	int		change_count = 0;
+	int		i;
+	static gboolean	first_time = TRUE;
+
+	/* Parse colours. */
+	for (i = 0; i < NUM_TYPE_COLOURS; i++) {
+		GdkColor *c = &type_colours[i];
+		gushort r = c->red;
+		gushort g = c->green;
+		gushort b = c->blue;
+
+		gdk_color_parse(
+			option_get_static_string(opt_type_colours[i][0]),
+			&type_colours[i]
+		);
+		if (!first_time
+		    && (c->red != r || c->green != g || c->blue != b))
+			change_count++;
+	}
+	
+	/* Free colours. */
+	if (!first_time && change_count)
+		gdk_colormap_free_colors(gtk_widget_get_default_colormap(),
+				type_colours, NUM_TYPE_COLOURS);
+
+	/* Allocate colours.
+	 * XXX: what should be done if allocation fails?
+	 */
+	if (first_time || change_count)
+		gdk_colormap_alloc_colors(gtk_widget_get_default_colormap(),
+				type_colours, NUM_TYPE_COLOURS,
+				FALSE, TRUE, success);
+
+	first_time = FALSE;
+
+	return change_count;
+}
+
 static void options_changed(void)
 {
 	gboolean	old_case = o_sort_nocase;
 	gboolean	old_dirs = o_dirs_first;
+	gboolean	old_colours = o_display_colour_types;
 	GList		*next = all_filer_windows;
+	int		ch_colours;
 
 	o_sort_nocase = option_get_int("display_sort_nocase");
 	o_dirs_first = option_get_int("display_dirs_first");
 	o_large_truncate = option_get_int("display_large_width");
 	o_small_truncate = option_get_int("display_small_width");
+	o_display_colour_types = option_get_int("display_colour_types");
 
+	/* TODO: Only alloc if needed? *?
+	ch_colours = alloc_type_colours();
+	
 	while (next)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
@@ -780,6 +866,9 @@ static void options_changed(void)
 					filer_window->sort_fn);
 		}
 		shrink_grid(filer_window);
+		if (old_colours != o_display_colour_types
+		    || (o_display_colour_types && ch_colours))
+			gtk_widget_queue_draw(filer_window->window);
 
 		next = next->next;
 	}
@@ -1102,9 +1191,9 @@ static void draw_details(FilerWindow *filer_window, DirItem *item, int x, int y,
 
 		/* Underline the effective permissions */
 		gdk_draw_rectangle(widget->window,
-				widget->style->fg_gc[selected
-							? GTK_STATE_SELECTED
-							: GTK_STATE_NORMAL],
+				selected
+				? widget->style->fg_gc[GTK_STATE_SELECTED]
+				: type_gc,
 				TRUE,
 				x - 1 + fixed_width * perm_offset,
 				y + fixed_font->descent - 1,
@@ -1210,6 +1299,22 @@ static void draw_item(GtkWidget *widget,
 			template.details.width, template.details.height);
 	return;
 #endif
+
+	/* Set up GC for coloured file types */
+	if (!type_gc)
+		type_gc = gdk_gc_new(widget->window);
+		
+	if (o_display_colour_types) {
+		if (item->flags & ITEM_FLAG_EXEC_FILE)
+			gdk_gc_set_foreground(type_gc, &type_colours[8]);
+		else if (item->flags & ITEM_FLAG_APPDIR)
+			gdk_gc_set_foreground(type_gc, &type_colours[9]);
+		else
+			gdk_gc_set_foreground(type_gc,
+					&type_colours[item->base_type]);
+	} else
+		gdk_gc_set_foreground(type_gc,
+				&widget->style->fg[GTK_STATE_NORMAL]);
 
 	if (template.icon.width <= SMALL_WIDTH &&
 			template.icon.height <= SMALL_HEIGHT)

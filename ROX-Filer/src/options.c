@@ -460,21 +460,25 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 		return;
 	}
 
-	if (strcmp(name, "hbox") == 0)
+	if (strcmp(name, "hbox") == 0 || strcmp(name, "vbox") == 0)
 	{
-		GtkWidget *hbox;
+		GtkWidget *nbox;
 		xmlNode	  *hw;
 
-		hbox = gtk_hbox_new(FALSE, 4);
+		if (name[0] == 'h')
+			nbox = gtk_hbox_new(FALSE, 4);
+		else
+			nbox = gtk_vbox_new(FALSE, 4);
+
 		if (label)
-			gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_box_pack_start(GTK_BOX(nbox),
 				gtk_label_new(_(label)), FALSE, TRUE, 4);
-		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(box), nbox, FALSE, TRUE, 0);
 
 		for (hw = widget->xmlChildrenNode; hw; hw = hw->next)
 		{
 			if (hw->type == XML_ELEMENT_NODE)
-				build_widget(hw, hbox);
+				build_widget(hw, nbox);
 		}
 
 		g_free(label);
@@ -594,9 +598,18 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 	else if (strcmp(name, "colour") == 0)
 	{
 		GtkWidget	*hbox, *da, *button;
+		int		lpos;
+		
+		/* lpos gives the position for the label 
+		 * 0: label comes before the button
+		 * non-zero: label comes after the button
+		 */
+		lpos = get_int(widget, "lpos");
 
 		hbox = gtk_hbox_new(FALSE, 4);
-		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
+		if (lpos == 0)
+			gtk_box_pack_start(GTK_BOX(hbox),
+				gtk_label_new(_(label)),
 				FALSE, TRUE, 0);
 
 		button = gtk_button_new();
@@ -609,6 +622,10 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 		may_add_tip(button, widget);
 		
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+		if (lpos)
+			gtk_box_pack_start(GTK_BOX(hbox),
+				gtk_label_new(_(label)),
+				FALSE, TRUE, 0);
 
 		gtk_box_pack_start(GTK_BOX(box), hbox, FALSE, TRUE, 0);
 
