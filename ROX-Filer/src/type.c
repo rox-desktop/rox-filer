@@ -1171,7 +1171,8 @@ GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 	if (!o_display_colour_types.int_value)
 		return normal;
 
-	if (item->flags & ITEM_FLAG_EXEC_FILE)
+	if (item->flags & ITEM_FLAG_EXEC_FILE &&
+	    item->mime_type == application_executable)
 		type = TYPE_EXEC;
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		type = TYPE_APPDIR;
