@@ -63,6 +63,7 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item);
 void display_free_colitem(Collection *collection, CollectionItem *colitem);
 void display_update_view(FilerWindow *filer_window,
 			 DirItem *item,
-			 ViewData *view);
+			 ViewData *view,
+			 gboolean update_name_layout);
 
 #endif /* _DISPLAY_H */

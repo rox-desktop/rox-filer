@@ -8,9 +8,11 @@ CC = @CC@
 
 PKG_CONFIG = @PKG_CONFIG@
 LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
+#PROF = -fprofile-arcs -pg
 
-CFLAGS = @CFLAGS@ @LFS_CFLAGS@ `${PKG_CONFIG} --cflags gtk+-2.0 libxml-2.0`
-LDFLAGS = @LDFLAGS@ ${LIBS} `${PKG_CONFIG} --libs gtk+-2.0 libxml-2.0`
+CFLAGS = ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
+	 `${PKG_CONFIG} --cflags gtk+-2.0 libxml-2.0`
+LDFLAGS = ${PROF} @LDFLAGS@ ${LIBS} `${PKG_CONFIG} --libs gtk+-2.0 libxml-2.0`
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs

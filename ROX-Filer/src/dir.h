@@ -47,6 +47,8 @@ struct _Directory
 	GList	*users;		/* Functions to call on update */
 	char	*error;		/* NULL => no error */
 
+	struct stat	stat_info;	/* Internal use */
+
 	gboolean	notify_active;	/* Notify timeout is running */
 	gint		idle_callback;	/* Idle callback ID */
 
@@ -75,7 +77,6 @@ void dir_init(void);
 void dir_attach(Directory *dir, DirCallback callback, gpointer data);
 void dir_detach(Directory *dir, DirCallback callback, gpointer data);
 void dir_update(Directory *dir, gchar *pathname);
-int dir_item_cmp(const void *a, const void *b);
 void refresh_dirs(const char *path);
 void dir_check_this(const guchar *path);
 DirItem *dir_update_item(Directory *dir, const gchar *leafname);

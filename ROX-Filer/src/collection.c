@@ -1296,7 +1296,7 @@ gint collection_insert(Collection *collection, gpointer data, gpointer view)
 {
 	int	item;
 	
-	g_return_val_if_fail(IS_COLLECTION(collection), -1);
+	/* g_return_val_if_fail(IS_COLLECTION(collection), -1); (slow) */
 
 	item = collection->number_of_items;
 
@@ -1456,7 +1456,7 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 	int		row, col;
 
 	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
+	/* g_return_if_fail(IS_COLLECTION(collection)); (slow) */
 	g_return_if_fail(item >= 0 &&
 			(item == 0 || item < collection->number_of_items));
 
@@ -1584,21 +1584,37 @@ void collection_qsort(Collection *collection,
 	gtk_widget_queue_draw(GTK_WIDGET(collection));
 }
 
-/* Find an item in an unsorted collection.
+/* Find an item in a sorted collection.
  * Returns the item number, or -1 if not found.
  */
 int collection_find_item(Collection *collection, gpointer data,
 		         int (*compar)(const void *, const void *))
 {
-	int	i;
+	int	lower, upper;
 
 	g_return_val_if_fail(collection != NULL, -1);
 	g_return_val_if_fail(IS_COLLECTION(collection), -1);
 	g_return_val_if_fail(compar != NULL, -1);
 
-	for (i = 0; i < collection->number_of_items; i++)
-		if (compar(&collection->items[i].data, &data) == 0)
+	/* If item is here, then: lower <= i < upper */
+	lower = 0;
+	upper = collection->number_of_items;
+
+	while (lower < upper)
+	{
+		int	i, cmp;
+
+		i = (lower + upper) >> 1;
+
+		cmp = compar(&collection->items[i].data, &data);
+		if (cmp == 0)
 			return i;
+
+		if (cmp > 0)
+			upper = i;
+		else
+			lower = i + 1;
+	}
 
 	return -1;
 }

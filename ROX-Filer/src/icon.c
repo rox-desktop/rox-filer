@@ -136,7 +136,7 @@ void icon_may_update(Icon *icon)
 	if (image)
 		g_object_ref(image);
 	mount_update(FALSE);
-	diritem_restat(icon->path, icon->item);
+	diritem_restat(icon->path, icon->item, NULL);
 
 	if (icon->item->image != image || icon->item->flags != flags)
 	{
@@ -375,7 +375,7 @@ void icon_set_path(Icon *icon, const char *pathname, const char *name)
 			name = g_basename(pathname);
 
 		icon->item = diritem_new(name);
-		diritem_restat(icon->path, icon->item);
+		diritem_restat(icon->path, icon->item, NULL);
 	}
 }
 

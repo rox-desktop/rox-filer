@@ -166,14 +166,6 @@ void dir_update(Directory *dir, gchar *pathname)
 	update(dir, pathname, NULL);
 }
 
-int dir_item_cmp(const void *a, const void *b)
-{
-	DirItem *aa = *((DirItem **) a);
-	DirItem *bb = *((DirItem **) b);
-
-	return strcmp(aa->leafname, bb->leafname);
-}
-
 /* Rescan this directory */
 void refresh_dirs(const char *path)
 {
@@ -345,6 +337,14 @@ void dir_rescan(Directory *dir, const guchar *pathname)
 	{
 		g_free(dir->error);
 		dir->error = NULL;
+	}
+
+	/* Saves statting the parent for each item... */
+	if (mc_stat(pathname, &dir->stat_info))
+	{
+		dir->error = g_strdup_printf(_("Can't stat directory: %s"),
+				g_strerror(errno));
+		return;		/* Report on attach */
 	}
 
 	d = mc_opendir(pathname);
@@ -594,7 +594,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 				g_object_ref(old.image);
 			do_compare = TRUE;
 		}
-		diritem_restat(tmp->str, item);
+		diritem_restat(tmp->str, item, &dir->stat_info);
 	}
 	else
 	{
@@ -603,7 +603,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 		 * we get here.
 		 */
 		item = diritem_new(leafname);
-		diritem_restat(tmp->str, item);
+		diritem_restat(tmp->str, item, &dir->stat_info);
 		if (item->base_type == TYPE_ERROR &&
 				item->lstat_errno == ENOENT)
 		{

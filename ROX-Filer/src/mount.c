@@ -104,27 +104,38 @@ void mount_update(gboolean force)
  * The function checks whether path's parent, path/.., is on a different device
  * than path, or whether path/.. and path point to the same i-node on the same
  * device -- this should detect mount points for all Unix and POSIX variants.
+ *
+ * 'info' and 'parent' are both optional, saving one stat() each.
  */
-gboolean mount_is_mounted(const guchar *path)
+gboolean mount_is_mounted(const guchar *path, struct stat *info,
+					      struct stat *parent)
 {
 	struct stat info_path, info_parent;
-	guchar *tmp;
 
-	if (stat(path, &info_path))
-		return FALSE; /*It doesn't exist -- so not a mount point :-) */
-
-	tmp = g_strconcat(path, "/..", NULL);
-	if (stat(tmp, &info_parent))
+	if (!info)
 	{
-		g_free(tmp);
-		return FALSE;
+		info = &info_path;
+		if (stat(path, &info_path))
+			return FALSE; /* Doesn't exist => not mount point :-) */
 	}
-	g_free(tmp);
 
-	if (info_path.st_dev != info_parent.st_dev)
+	if (!parent)
+	{
+		guchar *tmp;
+		parent = &info_parent;
+		tmp = g_strconcat(path, "/..", NULL);
+		if (stat(tmp, &info_parent))
+		{
+			g_free(tmp);
+			return FALSE;
+		}
+		g_free(tmp);
+	}
+
+	if (info->st_dev != parent->st_dev)
 		return TRUE;
 
-	if (info_path.st_ino == info_parent.st_ino)
+	if (info->st_ino == parent->st_ino)
 		return TRUE;	/* Same device and inode */
 		
 	return FALSE;

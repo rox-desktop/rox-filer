@@ -193,7 +193,8 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
 
-	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
+	i = collection_find_item(filer_window->collection, item,
+				 filer_window->sort_fn);
 
 	if (i < 0)
 	{
@@ -205,7 +206,8 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 
 	display_update_view(filer_window,
 			(DirItem *) colitem->data,
-			(ViewData *) colitem->view_data);
+			(ViewData *) colitem->view_data,
+			FALSE);
 	
 	calc_size(filer_window, colitem, &w, &h); 
 	if (w > old_w || h > old_h)
@@ -461,14 +463,14 @@ static void update_display(Directory *dir,
 				start_thumb_scanning(filer_window);
 			break;
 		case DIR_UPDATE:
+			collection_qsort(filer_window->collection,
+					filer_window->sort_fn);
 			for (i = 0; i < items->len; i++)
 			{
 				DirItem *item = (DirItem *) items->pdata[i];
 
 				update_item(filer_window, item);
 			}
-			collection_qsort(filer_window->collection,
-					filer_window->sort_fn);
 			break;
 	}
 }

@@ -31,6 +31,7 @@
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "global.h"
 
@@ -61,8 +62,10 @@ void diritem_init(void)
 	read_globicons();
 }
 
-/* Bring this item's structure uptodate */
-void diritem_restat(const guchar *path, DirItem *item)
+/* Bring this item's structure uptodate.
+ * 'parent' is optional; it saves one stat() for directories.
+ */
+void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 {
 	struct stat	info;
 
@@ -111,7 +114,7 @@ void diritem_restat(const guchar *path, DirItem *item)
 
 			if (item->base_type == TYPE_DIRECTORY)
 			{
-				if (mount_is_mounted(path))
+				if (mount_is_mounted(path, &info, parent))
 					item->flags |= ITEM_FLAG_MOUNT_POINT
 							| ITEM_FLAG_MOUNTED;
 				else if (g_hash_table_lookup(fstab_mounts,
@@ -183,7 +186,9 @@ void diritem_restat(const guchar *path, DirItem *item)
 
 DirItem *diritem_new(const guchar *leafname)
 {
-	DirItem *item;
+	DirItem		*item;
+	const gchar	*i;
+	gboolean	all_alpha = TRUE;
 
 	item = g_new(DirItem, 1);
 	item->leafname = g_strdup(leafname);
@@ -192,6 +197,56 @@ DirItem *diritem_new(const guchar *leafname)
 	item->base_type = TYPE_UNKNOWN;
 	item->flags = 0;
 	item->mime_type = NULL;
+
+	for (i = leafname; *i; i++)
+	{
+		if (!isalnum(*i))
+		{
+			all_alpha = FALSE;
+			break;
+		}
+	}
+
+	if (all_alpha)
+		item->leafname_collate = item->leafname;
+	else
+	{
+		gchar	*o;
+		gboolean need_digit_spacer = FALSE;
+		gboolean may_need_digit_spacer = FALSE;
+
+		item->leafname_collate = g_malloc(strlen(item->leafname) + 1);
+		o = item->leafname_collate;
+
+		for (i = leafname; *i; i++)
+		{
+			if (isdigit(*i))
+			{
+				if (need_digit_spacer)
+				{
+					need_digit_spacer = FALSE;
+					*(o++) = '-';
+				}
+				may_need_digit_spacer = TRUE;
+				*(o++) = *i;
+			}
+			else if (isalpha(*i))
+			{
+				need_digit_spacer = FALSE;
+				may_need_digit_spacer = FALSE;
+				*(o++) = *i;
+			}
+			else if (may_need_digit_spacer)
+			{
+				/* We had a digit more recently than
+				 * an alpha. If this thing following this
+				 * punctuation is another digit, add a spacer.
+				 */
+				need_digit_spacer = TRUE;
+			}
+		}
+		*o = '\0';
+	}
 
 	return item;
 }
@@ -203,6 +258,8 @@ void diritem_free(DirItem *item)
 	if (item->image)
 		g_object_unref(item->image);
 	item->image = NULL;
+	if (item->leafname_collate != item->leafname)
+		g_free(item->leafname_collate);
 	g_free(item->leafname);
 	item->leafname = NULL;
 	g_free(item);

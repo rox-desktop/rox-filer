@@ -480,8 +480,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			leaf = g_strdup(ent->d_name);
 
 		fname = g_strconcat(dname, "/", ent->d_name, NULL);
-		ditem = diritem_new(NULL);
-		diritem_restat(fname, ditem);
+		ditem = diritem_new("");
+		diritem_restat(fname, ditem, NULL);
 
 		if (ditem->image && style != MIS_NONE)
 		{

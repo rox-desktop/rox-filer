@@ -26,6 +26,7 @@ struct _MountPoint
 /* Prototypes */
 void mount_init();
 void mount_update(gboolean force);
-gboolean mount_is_mounted(const guchar *path);
+gboolean mount_is_mounted(const guchar *path, struct stat *info,
+					      struct stat *parent);
 
 #endif /* _MOUNT_H */

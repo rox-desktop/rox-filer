@@ -424,14 +424,14 @@ int sort_by_name(const void *item1, const void *item2)
 {
 	const DirItem *i1 = (DirItem *) ((CollectionItem *) item1)->data;
 	const DirItem *i2 = (DirItem *) ((CollectionItem *) item2)->data;
-	char *n1 = i1->leafname;
-	char *n2 = i2->leafname;
+	char *n1 = i1->leafname_collate;
+	char *n2 = i2->leafname_collate;
 
 	SORT_DIRS;
 		
 	if (!o_intelligent_sort.int_value)
 		return strcmp(i1->leafname, i2->leafname);
-	
+
 	/* The following code was copied from PicoGUI (was LGPL) */
 
 	/* Sort the files, in a way that should make sense to users.
@@ -441,18 +441,6 @@ int sort_by_name(const void *item1, const void *item2)
 	while (*n1 && *n2)
 	{
 		char c1 = *n1, c2 = *n2;
-
-		/* Skip punctuation */
-		if (!isalnum(c1))
-		{
-			n1++;
-			continue;
-		}
-		if (!isalnum(c2))
-		{
-			n2++;
-			continue;
-		}
 
 		/* If they are both numbers, sort them numerically */
 		if (isdigit(c1) && isdigit(c2))
@@ -470,7 +458,7 @@ int sort_by_name(const void *item1, const void *item2)
 			continue;
 		}
 
-		/* Otherwise, do a case-insensitive asciibetical sort */
+		/* Do a case-insensitive asciibetical sort */
 		c1 = tolower(c1);
 		c2 = tolower(c2);
 		if (c1 < c2)
@@ -729,7 +717,7 @@ ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item)
 	view->details = NULL;
 	view->image = NULL;
 
-	display_update_view(filer_window, item, view);
+	display_update_view(filer_window, item, view, TRUE);
 
 	return view;
 }
@@ -1230,7 +1218,7 @@ static void update_views(FilerWindow *filer_window)
 		CollectionItem *ci = &collection->items[i];
 
 		display_update_view(filer_window, (DirItem *) ci->data,
-					(ViewData *) ci->view_data);
+					(ViewData *) ci->view_data, TRUE);
 	}
 }
 
@@ -1263,7 +1251,8 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 
 void display_update_view(FilerWindow *filer_window,
 			 DirItem *item,
-			 ViewData *view)
+			 ViewData *view,
+			 gboolean update_name_layout)
 {
 	DisplayStyle	style = filer_window->display_style;
 	int	w, h;
@@ -1339,10 +1328,17 @@ void display_update_view(FilerWindow *filer_window,
 			g_object_ref(view->image);
 	}
 
-	if (view->layout)
+	if (view->layout && update_name_layout)
+	{
 		g_object_unref(G_OBJECT(view->layout));
+		view->layout = NULL;
+	}
 
-	if (g_utf8_validate(item->leafname, -1, NULL))
+	if (view->layout)
+	{
+		/* Do nothing */
+	}
+	else if (g_utf8_validate(item->leafname, -1, NULL))
 	{
 		view->layout = gtk_widget_create_pango_layout(
 				filer_window->window, item->leafname);

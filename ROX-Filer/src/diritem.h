@@ -23,6 +23,7 @@ typedef enum
 struct _DirItem
 {
 	char		*leafname;
+	char		*leafname_collate; /* Preprocessed for sorting */
 	gboolean	may_delete;	/* Not yet found, this scan */
 	int		base_type;
 	int		flags;
@@ -38,7 +39,7 @@ struct _DirItem
 
 void diritem_init(void);
 DirItem *diritem_new(const guchar *leafname);
-void diritem_restat(const guchar *path, DirItem *item);
+void diritem_restat(const guchar *path, DirItem *item, struct stat *parent);
 void diritem_free(DirItem *item);
 
 #endif /* _DIRITEM_H */

@@ -71,8 +71,6 @@ typedef struct pattern {
 } Pattern;
 #endif
 
-static Option o_use_gnomevfs;
-
 /* Colours for file types (same order as base types) */
 static gchar *opt_type_colours[][2] = {
 	{"display_err_colour",  "#ff0000"},
@@ -160,7 +158,6 @@ void type_init(void)
 	option_register_widget("type-reread", build_type_reread);
 	
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
-	option_add_int(&o_use_gnomevfs, "use_gnomevfs", TRUE);
 	
 	for (i = 0; i < NUM_TYPE_COLOURS; i++)
 		option_add_string(&o_type_colours[i],
@@ -719,8 +716,8 @@ void drag_app_dropped(GtkWidget		*eb,
 		return;
 	}
 
-	item = diritem_new(NULL);
-	diritem_restat(app, item);
+	item = diritem_new("");
+	diritem_restat(app, item, NULL);
 	if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
 	{
 		guchar	*path;
