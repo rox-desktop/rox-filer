@@ -293,13 +293,15 @@ void pinboard_activate(guchar *name)
 	current_pinboard->name = g_strdup(name);
 	current_pinboard->icons = NULL;
 
+	loading_pinboard++;
 	if (path)
 	{
-		loading_pinboard++;
 		parse_file(path, pin_from_file);
-		loading_pinboard--;
 		g_free(path);
 	}
+	else
+		pinboard_pin(home_dir, "Home", 4, 4, TRUE);
+	loading_pinboard--;
 }
 
 /* Add a new icon to the background.
