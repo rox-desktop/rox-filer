@@ -14,6 +14,7 @@
 #include <unistd.h>
 
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 #include <gdk/gdkkeysyms.h>
 #include <collection.h>
@@ -388,14 +389,15 @@ void open_item(Collection *collection,
 							item->leafname)->str);
 				break;
 			}
-			if (event->type != GDK_2BUTTON_PRESS ||
-					event->button == 1)
+			if (filer_window->panel == FALSE &&
+				(event->type != GDK_2BUTTON_PRESS ||
+					event->button == 1))
 			{
 				filer_window->path = pathdup(full_path);
 				scan_dir(filer_window);
 			}
 			else
-				filer_opendir(full_path);
+				filer_opendir(full_path, FALSE, BOTTOM);
 			break;
 		default:
 			report_error("open_item",
@@ -456,7 +458,7 @@ static gint key_press_event(GtkWidget	*widget,
 }
 
 
-void filer_opendir(char *path)
+void filer_opendir(char *path, gboolean panel, Side panel_side)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
@@ -464,6 +466,10 @@ void filer_opendir(char *path)
 	filer_window = g_malloc(sizeof(FilerWindow));
 	filer_window->path = pathdup(path);
 	filer_window->dir = NULL;	/* Not scanning */
+	filer_window->panel = panel;
+	filer_window->panel_side = panel_side;
+
+	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 
 	collection = collection_new(NULL);
 	gtk_object_set_data(GTK_OBJECT(collection),
@@ -471,18 +477,6 @@ void filer_opendir(char *path)
 	filer_window->collection = COLLECTION(collection);
 	collection_set_functions(filer_window->collection,
 			draw_item, test_point);
-
-	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
-				400, 200);
-
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
-	
-	gtk_box_pack_start(GTK_BOX(hbox), collection, TRUE, TRUE, 0);
-
-	scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
-	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_in_event",
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
@@ -503,6 +497,52 @@ void filer_opendir(char *path)
 	gtk_signal_connect(GTK_OBJECT(collection), "drag_data_get",
 			drag_data_get, filer_window);
 	drag_set_dest(collection);
+
+	if (panel)
+	{
+		int		swidth, sheight, iwidth, iheight;
+		GtkWidget	*frame, *win = filer_window->window;
+
+		gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
+		iwidth = filer_window->collection->item_width;
+		iheight = filer_window->collection->item_height;
+		
+		if (panel_side == TOP || panel_side == BOTTOM)
+		{
+			int	y = panel_side == TOP ? 0 : sheight - iheight;
+
+			gtk_widget_set_usize(collection, swidth, iheight);
+			gtk_widget_set_uposition(win, 0, y);
+		}
+		else
+		{
+			int	x = panel_side == LEFT ? 0 : swidth - iwidth;
+
+			gtk_widget_set_usize(collection, iwidth, sheight);
+			gtk_widget_set_uposition(win, x, 0);
+		}
+
+		frame = gtk_frame_new(NULL);
+		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
+		gtk_container_add(GTK_CONTAINER(frame), collection);
+		gtk_container_add(GTK_CONTAINER(win), frame);
+
+		gtk_widget_realize(win);
+		add_panel_properties(win);
+	}
+	else
+	{
+		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
+					400, 200);
+
+		hbox = gtk_hbox_new(FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
+		
+		gtk_box_pack_start(GTK_BOX(hbox), collection, TRUE, TRUE, 0);
+
+		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
+		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
+	}
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;

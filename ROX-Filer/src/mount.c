@@ -51,7 +51,6 @@ void mount_update()
 	time = read_time("/etc/fstab");
 	if (time != fstab_time)
 	{
-		printf("[ reread fstab ]\n");
 		fstab_time = time;
 		read_table(fstab_mounts, "/etc/fstab");
 	}
@@ -59,7 +58,6 @@ void mount_update()
 	time = read_time("/etc/mtab");
 	if (time != mtab_time)
 	{
-		printf("[ reread mtab ]\n");
 		mtab_time = time;
 		read_table(mtab_mounts, "/etc/mtab");
 	}

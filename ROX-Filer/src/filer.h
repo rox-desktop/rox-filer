@@ -16,6 +16,7 @@
 
 typedef struct _FilerWindow FilerWindow;
 typedef struct _FileItem FileItem;
+typedef enum {LEFT, RIGHT, TOP, BOTTOM} Side;
 
 enum
 {
@@ -30,6 +31,8 @@ struct _FilerWindow
 	GtkWidget	*window;
 	char		*path;		/* pathname */
 	Collection	*collection;
+	gboolean	panel;
+	Side		panel_side;
 
 	/* Scanning */
 	DIR		*dir;
@@ -53,7 +56,7 @@ extern GHashTable	*child_to_filer;
 
 /* Prototypes */
 void filer_init();
-void filer_opendir(char *path);
+void filer_opendir(char *path, gboolean panel, Side panel_side);
 void scan_dir(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

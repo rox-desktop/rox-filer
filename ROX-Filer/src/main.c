@@ -6,12 +6,14 @@
  */
 
 #include <stdlib.h>
+#include <stdio.h>
 #include <signal.h>
 #include <sys/wait.h>
 
 #include <gtk/gtk.h>
 #include <collection.h>
 
+#include "gui_support.h"
 #include "filer.h"
 #include "mount.h"
 #include "menu.h"
@@ -50,6 +52,7 @@ int main(int argc, char **argv)
 {
 	gtk_init(&argc, &argv);
 
+	gui_support_init();
 	menu_init();
 	dnd_init();
 	filer_init();
@@ -58,12 +61,38 @@ int main(int argc, char **argv)
 	signal(SIGCHLD, child_died);
 
 	if (argc < 2)
-		filer_opendir(getenv("HOME"));
+		filer_opendir(getenv("HOME"), FALSE, BOTTOM);
 	else
 	{
-		int	i;
-		for (i = 1; i < argc; i++)
-			filer_opendir(argv[i]);
+		int	 i = 1;
+		gboolean panel = FALSE;
+		Side	 side = BOTTOM;
+
+		while (i < argc)
+		{
+			if (argv[i][0] == '-')
+			{
+				switch (argv[i][1] + (argv[i][2] << 8))
+				{
+					case 't': side = TOP; break;
+					case 'b': side = BOTTOM; break;
+					case 'l': side = LEFT; break;
+					case 'r': side = RIGHT; break;
+					default:
+						fprintf(stderr,
+							"Bad option.\n");
+						return EXIT_FAILURE;
+				}
+				panel = TRUE;
+			}
+			else
+			{
+				filer_opendir(argv[i], panel, side);
+				panel = FALSE;
+				side = BOTTOM;
+			}
+			i++;
+		}
 	}
 
 	gtk_main();

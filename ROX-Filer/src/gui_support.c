@@ -14,7 +14,21 @@
 #include <stdarg.h>
 
 #include <glib.h>
-#include <gtk/gtk.h>
+
+#include "gui_support.h"
+
+static GdkAtom xa_win_state;
+static GdkAtom xa_win_layer;
+static GdkAtom xa_win_hints;
+static GdkAtom xa_cardinal;
+
+void gui_support_init()
+{
+	xa_win_state = gdk_atom_intern("_WIN_STATE", FALSE);
+	xa_win_layer = gdk_atom_intern("_WIN_LAYER", FALSE);
+	xa_win_hints = gdk_atom_intern("_WIN_HINTS", FALSE);
+	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
+}
 
 static void choice_clicked(GtkWidget *widget, gpointer number)
 {
@@ -116,4 +130,23 @@ void report_error(char *title, char *message)
 		title = "Error";
 
 	get_choice(title, message, 1, "OK");
+}
+
+void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
+{
+	gdk_property_change(window, prop, xa_cardinal, 32,
+				GDK_PROP_MODE_REPLACE, (gchar *) &value, 1);
+}
+
+/* Make this window behave as a panel (if possible).
+ * TODO: Detect GNOME-style window managers and use their features
+ * 	 if possible.
+ */
+void add_panel_properties(GtkWidget *window)
+{
+	GdkWindow *win = window->window;
+
+	set_cardinal_property(win, xa_win_layer, 2);
+
+	gdk_window_set_override_redirect(win, TRUE);
 }

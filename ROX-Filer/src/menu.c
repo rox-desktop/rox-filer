@@ -93,8 +93,7 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 {
-	g_return_if_fail(window_with_focus == filer_window);
-	
+	window_with_focus = filer_window;
 	gtk_menu_popup(GTK_MENU(filer_menu), NULL, NULL, position_menu,
 			NULL, event->button, event->time);
 }
@@ -197,5 +196,6 @@ static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_opendir(make_path(window_with_focus->path, "/..")->str);
+	filer_opendir(make_path(window_with_focus->path, "/..")->str,
+			FALSE, BOTTOM);
 }
