@@ -44,7 +44,7 @@ int mc_fstat (int fd, struct stat *buf);
 #  define mc_opendir(x) opendir(x)
 #  define mc_closedir(x) closedir(x)
 #  define mc_readdir(x) readdir(x)
-#  define mc_rewinddir(x) rewinddir(x)
+#  define mc_seekdir(x, o) seekdir(x, o)
 
 #endif
 

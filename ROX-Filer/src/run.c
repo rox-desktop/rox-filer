@@ -40,7 +40,7 @@ typedef struct _PipedData PipedData;
 
 struct _PipedData
 {
-	gpointer	data;
+	guchar		*data;
 	gint		tag;
 	gulong		sent;
 	gulong		length;

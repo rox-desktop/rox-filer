@@ -162,7 +162,9 @@ int main(int argc, char **argv)
 
 	home_dir = g_get_home_dir();
 
+#ifdef HAVE_LIBVFS
 	mc_vfs_init();
+#endif
 	gtk_init(&argc, &argv);
 
 	while (1)
