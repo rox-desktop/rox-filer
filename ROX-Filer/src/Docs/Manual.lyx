@@ -731,7 +731,7 @@ medskip
 \layout Standard
 \LyXTable
 multicol5
-20 2 0 0 -1 -1 -1 -1
+21 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 1 0
@@ -752,11 +752,12 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 1 0 0
-2 1 0 "3.5cm" ""
+0 1 0 0
+2 1 0 "3.8cm" ""
 2 1 1 "9.5cm" ""
 0 2 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
@@ -778,6 +779,8 @@ multicol5
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -852,6 +855,10 @@ in the box will be selected.
 \newline 
 If you use the middle button then the boxed items switch between being selected
  and unselected.
+\newline 
+Double-click background
+\newline 
+Resize the window to a sensible size.
 \newline 
 Backspace
 \newline 
@@ -1064,8 +1071,17 @@ You can open a menu by right clicking
 If the Use `RISC OS mouse bindings' option is on then use the middle button
  instead.
 \end_float 
- over a panel or filer window.
- Here is a full description of each choice and what it does:
+ over a pinboard, panel or filer window.
+ In filer windows, you may also press `
+\backslash 
+' to open the menu.
+ As a shortcut, you can open the File submenu directly by holding down the
+ 
+\family typewriter 
+Control
+\family default 
+ key when opening the menu.
+ Here is a full description of each menu item:
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
@@ -1127,9 +1143,11 @@ The display menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-19 2 0 0 -1 -1 -1 -1
+21 2 0 0 -1 -1 -1 -1
 1 1 0 0
+1 0 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 1 0
@@ -1152,7 +1170,11 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 2 1 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1192,6 +1214,10 @@ Entry
 \newline 
 Action
 \newline 
+Huge Icons
+\newline 
+Extra large icons (mainly useful with thumbnails, see below).
+\newline 
 Large Icons
 \newline 
 Each object in the directory is shown as a large icon with its name below.
@@ -1199,12 +1225,10 @@ Each object in the directory is shown as a large icon with its name below.
 Small Icons
 \newline 
 Items are drawn smaller than usual, allowing you to see more files at once.
-\latex latex 
-
-\backslash 
-dag
-\latex default 
-
+\newline 
+Huge, With...
+\newline 
+As for `Large, With...', but with extra large icons.
 \newline 
 Large, With...
 \newline 
@@ -1252,7 +1276,7 @@ Times
 \latex latex 
 
 \backslash 
-ddag
+dag
 \latex default 
 
 \newline 
@@ -1305,7 +1329,7 @@ if you have a directory full of photos and can't remember which is which!
 \backslash 
 noindent
 \backslash 
-ddag
+dag
 \backslash 
 thinspace{} 
 \latex default 
@@ -1540,6 +1564,13 @@ Change the name used for this object, or move it between directories.
 Link...
 \newline 
 Create a symbolic link to this name.
+ 
+\latex latex 
+
+\backslash 
+dag
+\latex default 
+
 \newline 
 Shift Open
 \newline 
@@ -1637,6 +1668,33 @@ Search for files by specifying various conditions --- see section
 \end_inset 
 
 .
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent
+\backslash 
+dag
+\backslash 
+thinspace{}
+\latex default 
+A symbolic link stores the 
+\emph on 
+location
+\emph default 
+ of another file.
+ Deleting the symlink doesn't affect the other file.
+ Deleting the other file means that the symlink won't work.
+ There are two types of symbolic link --- Relative and Absolute.
+ An absolute link stores the path from the root directory to the target
+ file (eg `/home/fred/MyFile').
+ A relative path stores the path from the symlink to the target (eg `../fred/MyFil
+e').
+ If the target file is never going to move then you want an absolute link,
+ but if the target may move (and the symlink will be moved with it) then
+ you want a relative link.
 \layout Subsection
 
 The window menu
@@ -2218,6 +2276,23 @@ $1
 $2
 \family default 
 , etc.
+\layout Standard
+
+Opening the minibuffer with a selection adds 
+\family typewriter 
+
+\begin_inset Quotes eld
+\end_inset 
+
+$@
+\begin_inset Quotes erd
+\end_inset 
+
+
+\family default 
+ to the end of the command --- this expands to all the selected files.
+ If there is no selection, but a file is under the cursor, the name of that
+ file is inserted.
 \layout Subsubsection*
 
 Examples
@@ -2253,9 +2328,9 @@ Open the shell command minibuffer.
 
 Type 
 \family typewriter 
-`lpr $*
+`lpr
 \family default 
-' and press Return.
+' at the beginning of the line and press Return.
 \layout Subsubsection*
 
 Notes
@@ -2267,21 +2342,6 @@ Be careful; you will not be asked to confirm! If in doubt, start the command
 echo
 \family default 
 ' so that it will be displayed rather than executed.
-\layout Itemize
-
-The above command won't work if some of the files contain spaces --- use
- `
-\family typewriter 
-lpr 
-\latex latex 
-"
-\latex default 
-$@
-\latex latex 
-"
-\family default 
-\latex default 
-' instead to be safe.
 \layout Itemize
 
 `sh' is always used as the name of the shell to run (mainly because bash
@@ -3026,6 +3086,10 @@ See section
 Filer window options
 \layout Itemize
 
+`Automatic resize' causes the window to resize when you change directory
+ if more space is useful.
+\layout Itemize
+
 `Unique windows' prevents you from having two windows showing the same directory.
  Opening a second view onto a directory closes the first.
 \layout Standard
@@ -3320,31 +3384,7 @@ Help is the directory to be opened when you choose `Help' from the File
  menu.
 \layout Description
 
-AppMenu lists additional menu items to display in the popup menu.
- The file should be an XML document with `
-\family typewriter 
-AppMenu
-\family default 
-' as the document element, containing any number of `
-\family typewriter 
-Item
-\family default 
-' elements (each of which appears as one entry on the menu).
- Item elements can have two attributes: `option' is passed as the argument
- to 
-\family typewriter 
-AppRun
-\family default 
- when the menu item is chosen; `
-\family typewriter 
-label
-\family default 
-' is the text used in the menu.
- See the `
-\family typewriter 
-ROX-Filer/AppMenu
-\family default 
-' file for an example.
+AppInfo.xml contains extra information about an application (see below).
 \layout Description
 
 AppIcon.xpm is used if 
@@ -3359,6 +3399,81 @@ Have a look at the ROX-Filer application directory for a full example.
 
 Note: For security reasons, an application directory must have the same
  owner as the AppRun file inside.
+\layout Subsection
+
+The AppInfo file
+\layout Standard
+
+`
+\family typewriter 
+AppInfo.xml
+\family default 
+' is an XML file with the following structure (any elements may be omitted,
+ and the file itself is optional):
+\layout LyX-Code
+
+<?xml version="1.0"?>
+\layout LyX-Code
+
+<AppInfo>
+\layout LyX-Code
+
+  <Summary>A graphical file manager</Summary>
+\layout LyX-Code
+
+  <About>
+\layout LyX-Code
+
+    <Purpose>File manager</Purpose>
+\layout LyX-Code
+
+    <Version>1.1.3 (07-May-2001)</Version>
+\layout LyX-Code
+
+    <Authors>Thomas Leonard and others</Authors>
+\layout LyX-Code
+
+    <License>GNU General Public License</License>
+\layout LyX-Code
+
+    <Homepage>http://rox.sourceforge.net</Homepage>
+\layout LyX-Code
+
+  </About>
+\layout LyX-Code
+
+  <AppMenu>
+\layout LyX-Code
+
+    <Item label="Enable pinboard" option="-p=Default"/>
+\layout LyX-Code
+
+    <Item label="Disable pinboard" option="-p="/>
+\layout LyX-Code
+
+  </AppMenu>
+\layout LyX-Code
+
+</AppInfo>
+\layout Description
+
+Summary is displayed in a tooltip when the mouse is held over the application.
+\layout Description
+
+About contains a list of fields which are shown in the `File Info' box for
+ the application (any element names may be used, but the above are suggested).
+\layout Description
+
+AppMenu is a list of extra menu items to display for the application.
+ When one is chosen, 
+\family typewriter 
+AppRun
+\family default 
+ is called with 
+\emph on 
+option
+\emph default 
+ as its only argument.
 \layout Section
 
 Internationalisation
