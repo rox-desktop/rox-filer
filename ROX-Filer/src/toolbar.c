@@ -162,8 +162,8 @@ void toolbar_init(void)
 		{
 			guchar	*path;
 
-			path = g_strconcat("pixmaps/",
-					tool->name, ".xpm", NULL);
+			path = g_strconcat("images/",
+					tool->name, ".png", NULL);
 			tool->icon = load_pixmap(path);
 			g_free(path);
 		}
