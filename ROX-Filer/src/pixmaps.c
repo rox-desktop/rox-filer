@@ -662,7 +662,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	to = g_string_new(home_dir);
 	g_string_append(to, "/.thumbnails");
 	mkdir(to->str, 0700);
-	g_string_append(to, "/96x96/");
+	g_string_append(to, "/normal/");
 	mkdir(to->str, 0700);
 	g_string_append(to, md5);
 	name_len = to->len + 4; /* Truncate to this length when renaming */
@@ -738,7 +738,7 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 	md5 = md5_hash(uri);
 	g_free(uri);
 	
-	thumb_path = g_strdup_printf("%s/.thumbnails/96x96/%s.png",
+	thumb_path = g_strdup_printf("%s/.thumbnails/normal/%s.png",
 					home_dir, md5);
 	g_free(md5);
 

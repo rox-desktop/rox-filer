@@ -232,7 +232,7 @@ void show_condition_help(gpointer data)
 		frame = gtk_frame_new(_("Quick Start"));
 		text = gtk_label_new(
 _("Just put the name of the file you're looking for in single quotes:\n"
-"'index.html'	(to find a file called 'index.html')"));
+"'index.html' (to find a file called 'index.html')"));
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
@@ -247,7 +247,7 @@ _("'*.htm', '*.html'      (finds HTML files)\n"
 "mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contains the word 'fred')"));
-		gtk_widget_set_name(text, "fixed-font");
+		gtk_widget_set_name(text, "fixed-style");
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);
@@ -1961,7 +1961,7 @@ void action_find(GList *paths)
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_find_string;
 	gui_side->entry = gtk_entry_new();
-	gtk_widget_set_name(gui_side->entry, "fixed-font");
+	gtk_widget_set_name(gui_side->entry, "fixed-style");
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
 	set_find_string_colour(gui_side->entry, last_find_string);
 	gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
