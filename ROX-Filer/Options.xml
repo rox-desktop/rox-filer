@@ -1,6 +1,6 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <options>
-  <section name='i18n' title='Translation options'>
+  <section name='i18n' title='Translation'>
     <menu name='translation' label='Translation'>
       <item label='None' value='None'/>
       <item label='From LANG' value='From LANG'/>
@@ -12,7 +12,7 @@
       <item label='Russian' value='ru'/>
     </menu>
   </section>
-  <section name='pinboard' title='Pinboard options'>
+  <section name='pinboard' title='Pinboard'>
     <radio-group name='text_bg'>
       <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
       <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
@@ -31,7 +31,7 @@
       </radio-group>
     </hbox>
   </section>
-  <section name='action' title='Action window options'>
+  <section name='action' title='Action windows'>
     <label>Auto-start (Quiet) these actions:</label>
     <hbox>
       <toggle name='copy' label='Copy'/>
@@ -41,7 +41,7 @@
       <toggle name='mount' label='Mount'/>
     </hbox>
   </section>
-  <section name='display' title='Display options'>
+  <section name='display' title='Display'>
     <toggle name='sort_nocase' label='Ignore case when sorting'>If off: Ben, animal, zoo.
 If on: animal, Ben, zoo.</toggle>
     <toggle name='dirs_first' label='Directories always come first'>If this is on then directories will always appear before anything else, regardless of the sort type.</toggle>
@@ -70,7 +70,7 @@ If on: animal, Ben, zoo.</toggle>
       <item label='Size' value='3'/>
     </menu>
   </section>
-  <section name='toolbar' title='Toolbar options'>
+  <section name='toolbar' title='Toolbar'>
     <label>Unshade the tools you want:</label>
     <tool-options name='disable'/>
     <menu name='type' label='Toolbar type'>
@@ -79,19 +79,19 @@ If on: animal, Ben, zoo.</toggle>
       <item label='Large' value='2'/>
     </menu>
   </section>
-  <section name='filer' title='Filer window options'>
+  <section name='filer' title='Filer windows'>
     <toggle name='auto_resize' label='Automatic resize'>Automatically resize the window when changing directory, if it's too small.</toggle>
     <toggle name='unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
     <toggle name='beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
     <toggle name='beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
   </section>
-  <section name='dnd' title='Drag and Drop options'>
+  <section name='dnd' title='Drag and Drop'>
     <toggle name='no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
     <toggle name='drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
     <toggle name='spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
     <slider name='spring_delay' label='Spring delay' min='100' max='2000' showvalue='1'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</slider>
   </section>
-  <section name='menu' title='Menu options'>
+  <section name='menu' title='Menus'>
     <label>To set the keyboard short-cuts, simply open the
 menu over a filer window, move the pointer over
 the item you want to use and press a key. The key

@@ -644,49 +644,45 @@ static void build_widget(Node *widget, GtkWidget *box)
 	g_free(label);
 }
 
-static void build_sections(Node *options, GtkWidget *sections_vbox)
+
+static void build_sections(Node *options, GtkWidget *sections_box)
 {
 	Node	*section = options->xmlChildrenNode;
-	gboolean need_spacer = FALSE;
 
 	g_return_if_fail(strcmp(options->name, "options") == 0);
 
 	for (; section; section = section->next)
 	{
 		guchar 		*title;
-		GtkWidget	*hbox;
+		GtkWidget   	*page, *scrolled_area;
 		Node		*widget;
 
 		if (section->type != XML_ELEMENT_NODE)
 			continue;
 
-		if (need_spacer)
-			gtk_box_pack_start(GTK_BOX(sections_vbox),
-					gtk_event_box_new(), TRUE, TRUE, 8);
-		else
-			need_spacer = TRUE;
-
 		title = xmlGetProp(section, "title");
 		section_name = xmlGetProp(section, "name");
+		page = gtk_vbox_new(FALSE, 0);
+		gtk_container_set_border_width(GTK_CONTAINER(page), 4);
 
-		hbox = gtk_hbox_new(FALSE, 4);
-		gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_hseparator_new(), TRUE, TRUE, 0);
-		
-		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(title)),
-					FALSE, TRUE, 0);
+		scrolled_area = gtk_scrolled_window_new(NULL, NULL);
+		gtk_scrolled_window_set_policy(
+					GTK_SCROLLED_WINDOW(scrolled_area),
+					GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
 
-		gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_hseparator_new(), TRUE, TRUE, 0);
+		gtk_scrolled_window_add_with_viewport(
+					GTK_SCROLLED_WINDOW(scrolled_area),
+					page);
 
-		gtk_box_pack_start(GTK_BOX(sections_vbox), hbox,
-					FALSE, TRUE, 2);
+		gtk_notebook_append_page(GTK_NOTEBOOK(sections_box),
+					scrolled_area,
+					gtk_label_new(_(title)));
 
 		widget = section->xmlChildrenNode;
 		for (; widget; widget = widget->next)
 		{
 			if (widget->type == XML_ELEMENT_NODE)
-				build_widget(widget, sections_vbox);
+				build_widget(widget, page);
 		}
 
 		g_free(title);
@@ -700,10 +696,10 @@ static void build_sections(Node *options, GtkWidget *sections_vbox)
  */
 static void build_options_window(void)
 {
-	GtkWidget *sections_vbox;
+	GtkWidget *sections_box;
 	xmlDocPtr options_doc;
 
-	sections_vbox = build_frame();
+	sections_box = build_frame();
 	
 	options_doc = xmlParseFile(make_path(app_dir, "Options.xml")->str);
 	if (!options_doc)
@@ -712,7 +708,7 @@ static void build_options_window(void)
 		return;
 	}
 
-	build_sections(xmlDocGetRootElement(options_doc), sections_vbox);
+	build_sections(xmlDocGetRootElement(options_doc), sections_box);
 
 	xmlFreeDoc(options_doc);
 	options_doc = NULL;
@@ -741,9 +737,9 @@ static void options_destroyed(GtkWidget *widget, gpointer data)
  */
 static GtkWidget *build_frame(void)
 {
-	GtkWidget	*sections_vbox;
-	GtkWidget	*tl_vbox, *scrolled_area;
-	GtkWidget	*border, *label;
+	GtkWidget	*sections_box;
+	GtkWidget	*tl_vbox;
+	GtkWidget	*label;
 	GtkWidget	*actions, *button;
 	char		*string, *save_path;
 
@@ -759,20 +755,10 @@ static GtkWidget *build_frame(void)
 	tl_vbox = gtk_vbox_new(FALSE, 4);
 	gtk_container_add(GTK_CONTAINER(window), tl_vbox);
 
-	scrolled_area = gtk_scrolled_window_new(NULL, NULL);
-	gtk_container_set_border_width(GTK_CONTAINER(scrolled_area), 4);
-	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scrolled_area),
-			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
-	gtk_box_pack_start(GTK_BOX(tl_vbox), scrolled_area, TRUE, TRUE, 0);
-
-	border = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(border), GTK_SHADOW_NONE);
-	gtk_container_set_border_width(GTK_CONTAINER(border), 4);
-	gtk_scrolled_window_add_with_viewport(
-			GTK_SCROLLED_WINDOW(scrolled_area), border);
-
-	sections_vbox = gtk_vbox_new(FALSE, 0);
-	gtk_container_add(GTK_CONTAINER(border), sections_vbox);
+	sections_box = gtk_notebook_new();
+	gtk_notebook_set_scrollable(GTK_NOTEBOOK(sections_box), TRUE);
+	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(sections_box), GTK_POS_LEFT);
+	gtk_box_pack_start(GTK_BOX(tl_vbox), sections_box, TRUE, TRUE, 0);
 	
 	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
@@ -820,7 +806,7 @@ static GtkWidget *build_frame(void)
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 		GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(window));
 
-	return sections_vbox;
+	return sections_box;
 }
 
 /* Process one line from the options file (\0 term'd).
