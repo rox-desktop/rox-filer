@@ -398,6 +398,20 @@ int main(int argc, char **argv)
 		 * it!).
 		 */
 	}
+
+	/* Close stdin. We don't need it, and it can cause problems if
+	 * a child process wants a password, etc...
+	 */
+	{
+		int fd;
+		fd = open("/dev/null", O_RDONLY);
+		if (fd > 0)
+		{
+			close(0);
+			dup2(fd, 0);
+			close(fd);
+		}
+	}
 	
 	pixmaps_init();
 

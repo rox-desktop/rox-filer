@@ -6,6 +6,9 @@
 ~~~~~~~~~~~
 Moved 'Select All', 'Clear Selection' and 'Select If...' to a new 'Select'
 submenu.
+The filer now closes stdin when it starts. This is to prevent child
+processes, such as auto-mounters, from trying to read a password from
+the console (Olivier Fourdan).
 
 27-Nov-2001
 ~~~~~~~~~~~
