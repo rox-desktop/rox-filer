@@ -299,11 +299,7 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 	g_dataset_set_data_full(context, "uri_list",
 				g_strdup(uri_list), g_free);
 
-	gtk_drag_set_icon_pixmap(context,
-			gtk_widget_get_colormap(widget),
-			im_multiple->pixmap,
-			im_multiple->mask,
-			0, 0);
+	gtk_drag_set_icon_pixbuf(context, im_multiple->pixbuf, 0, 0);
 }
 
 /* Copy/Load this item into another directory/application */
@@ -367,9 +363,7 @@ void drag_one_item(GtkWidget		*widget,
 
 	g_return_if_fail(image != NULL);
 
-	gtk_drag_set_icon_pixmap(context,
-			gtk_widget_get_colormap(widget),
-			image->pixmap, image->mask, 0, 0);
+	gtk_drag_set_icon_pixbuf(context, image->pixbuf, 0, 0);
 }
 
 static void drag_end(GtkWidget *widget,

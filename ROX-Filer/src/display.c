@@ -279,8 +279,7 @@ void draw_huge_icon(GtkWidget *widget,
 	int		width, height;
 	int		image_x;
 	int		image_y;
-	GdkGC	*gc = selected ? widget->style->white_gc
-						: widget->style->black_gc;
+
 	if (!image)
 		return;
 
@@ -301,12 +300,13 @@ void draw_huge_icon(GtkWidget *widget,
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
-		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, area->y + 2,	/* Dest x,y */
-				-1, -1);
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -314,16 +314,14 @@ void draw_huge_icon(GtkWidget *widget,
 					? im_mounted
 					: im_unmounted;
 
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
-		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_drawable(widget->window, gc, mp->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, area->y + 2, /* Dest x,y */
-				-1, -1);
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	
-	gdk_gc_set_clip_mask(gc, NULL);
-	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
 /* Draw this icon (including any symlink or mount symbol) inside the
@@ -370,12 +368,13 @@ void draw_large_icon(GtkWidget *widget,
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
-		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, area->y + 2,	/* Dest x,y */
-				-1, -1);
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -383,16 +382,14 @@ void draw_large_icon(GtkWidget *widget,
 					? im_mounted
 					: im_unmounted;
 
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 2);
-		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_drawable(widget->window, gc, mp->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, area->y + 2, /* Dest x,y */
-				-1, -1);
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	
-	gdk_gc_set_clip_mask(gc, NULL);
-	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
 /* The sort functions aren't called from outside, but they are
@@ -997,8 +994,6 @@ static void draw_small_icon(GtkWidget *widget,
 			    MaskedPixmap *image,
 			    gboolean selected)
 {
-	GdkGC	*gc = selected ? widget->style->white_gc
-			       : widget->style->black_gc;
 	int		width, height, image_x, image_y;
 	
 	if (!image)
@@ -1021,14 +1016,13 @@ static void draw_small_icon(GtkWidget *widget,
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_drawable(widget->window, gc, im_symlink->pixmap,
-				0, 0,			/* Source x,y */
-				image_x, area->y + 8,	/* Dest x,y */
-				-1, -1);
-		gdk_gc_set_clip_mask(gc, NULL);
-		gdk_gc_set_clip_origin(gc, 0, 0);
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, area->y + 8,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -1036,9 +1030,7 @@ static void draw_small_icon(GtkWidget *widget,
 					? im_mounted
 					: im_unmounted;
 
-		if (!mp->sm_pixbuf)
-			pixmap_make_small(mp);
-		gdk_pixbuf_render_to_drawable_alpha(mp->sm_pixbuf,
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
 				widget->window,
 				0, 0, 				/* src */
 				image_x + 2, area->y + 2,	/* dest */
