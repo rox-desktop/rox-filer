@@ -218,8 +218,15 @@ if [ -d "$APPDIR/ROX-Filer" ]; then
 	echo Deleting...
 	# Move it away first.  If $APPDIR is on an nfs mount then deleting
 	# the binary may fail.
-	mv "$APPDIR/ROX-Filer" "$APPDIR/.ROX-Filer"
-	rm -rf "$APPDIR/.ROX-Filer"
+	old="$APPDIR/.ROX-Filer.old"
+	if [ -d "$old" ]; then
+	    echo "Cleaning up old copy from previous install."
+	    rm -rf "$old"
+	fi
+	mv "$APPDIR/ROX-Filer" "$old"
+	rm -rf "$old" || echo "Could not delete old copy.
+This is usually because it is still executing.  When it exits you may like 
+to delete $old"
 fi
 cp -r ROX-Filer "$APPDIR"
 
