@@ -48,13 +48,12 @@ typedef struct _Tool Tool;
 typedef enum {DROP_NONE, DROP_TO_PARENT, DROP_TO_HOME} DropDest;
 
 struct _Tool {
-	guchar		*label;
-	guchar		*name;
-	guchar		*tip;		/* Tooltip */
+	const gchar	*label;
+	const gchar	*name;
+	const gchar	*tip;		/* Tooltip */
 	void		(*clicked)(GtkWidget *w, FilerWindow *filer_window);
 	DropDest	drop_action;
 	gboolean	enabled;
-	MaskedPixmap	*icon;
 	GtkWidget	**menu;		/* Right-click menu widget addr */
 };
 
@@ -105,37 +104,37 @@ static void option_notify(void);
 static GList *build_tool_options(Option *option, xmlNode *node, guchar *label);
 
 static Tool all_tools[] = {
-	{N_("Close"), "close", N_("Close filer window"),
+	{N_("Close"), GTK_STOCK_CLOSE, N_("Close filer window"),
 	 toolbar_close_clicked, DROP_NONE, FALSE,
-	 NULL, NULL},
+	 NULL},
 	 
-	{N_("Up"), "up", N_("Change to parent directory"),
+	{N_("Up"), GTK_STOCK_GO_UP, N_("Change to parent directory"),
 	 toolbar_up_clicked, DROP_TO_PARENT, TRUE,
-	 NULL, NULL},
+	 NULL},
 	 
-	{N_("Home"), "home", N_("Change to home directory"),
+	{N_("Home"), GTK_STOCK_HOME, N_("Change to home directory"),
 	 toolbar_home_clicked, DROP_TO_HOME, TRUE,
-	 NULL, NULL},
+	 NULL},
 	
-	{N_("Scan"), "refresh", N_("Rescan directory contents"),
+	{N_("Scan"), GTK_STOCK_REFRESH, N_("Rescan directory contents"),
 	 toolbar_refresh_clicked, DROP_NONE, TRUE,
-	 NULL, NULL},
+	 NULL},
 	
-	{N_("Size"), "zoom", N_("Change icon size"),
+	{N_("Size"), GTK_STOCK_ZOOM_IN, N_("Change icon size"),
 	 toolbar_size_clicked, DROP_NONE, TRUE,
-	 NULL, NULL},
+	 NULL},
 	
-	{N_("Details"), "details", N_("Show extra details"),
+	{N_("Details"), GTK_STOCK_JUSTIFY_LEFT, N_("Show extra details"),
 	 toolbar_details_clicked, DROP_NONE, TRUE,
-	 NULL, NULL},
+	 NULL},
 	
-	{N_("Hidden"), "hidden", N_("Show/hide hidden files"),
+	{N_("Hidden"), GTK_STOCK_STRIKETHROUGH, N_("Show/hide hidden files"),
 	 toolbar_hidden_clicked, DROP_NONE, TRUE,
-	 NULL, NULL},
+	 NULL},
 	
-	{N_("Help"), "help", N_("Show ROX-Filer help"),
+	{N_("Help"), GTK_STOCK_HELP, N_("Show ROX-Filer help"),
 	 toolbar_help_clicked, DROP_NONE, TRUE,
-	 NULL, NULL},
+	 NULL},
 };
 
 
@@ -149,17 +148,20 @@ void toolbar_init(void)
 	
 	option_add_int(&o_toolbar, "toolbar_type", TOOLBAR_NORMAL);
 	option_add_int(&o_toolbar_info, "toolbar_show_info", 1);
-	option_add_string(&o_toolbar_disable, "toolbar_disable", "close");
+	option_add_string(&o_toolbar_disable, "toolbar_disable",
+					GTK_STOCK_CLOSE);
 	option_add_notify(option_notify);
 	
 	tooltips = gtk_tooltips_new();
 
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
+#if 0
 		Tool	*tool = &all_tools[i];
 
 		if (!tool->icon)
 			tool->icon = load_pixmap(tool->name);
+#endif
 	}
 
 	option_register_widget("tool-options", build_tool_options);
@@ -183,7 +185,8 @@ GtkWidget *toolbar_tool_option(int i)
 	button = gtk_button_new();
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_image_new_from_pixbuf(tool->icon->pixbuf);
+	icon_widget = gtk_image_new_from_stock(tool->name,
+						GTK_ICON_SIZE_LARGE_TOOLBAR);
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
@@ -199,7 +202,8 @@ GtkWidget *toolbar_tool_option(int i)
 	g_signal_connect_swapped(button, "clicked",
 			G_CALLBACK(toggle_shaded), vbox);
 
-	g_object_set_data(G_OBJECT(button), "tool_name", tool->name);
+	g_object_set_data(G_OBJECT(button), "tool_name",
+				(gchar *) tool->name);
 
 	return button;
 }
@@ -354,6 +358,13 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	bar = gtk_toolbar_new();
 	gtk_widget_set_size_request(bar, 100, -1);
 
+	if (o_toolbar.int_value == TOOLBAR_LARGE)
+		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH);
+	else if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
+		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_BOTH_HORIZ);
+	else
+		gtk_toolbar_set_style(GTK_TOOLBAR(bar), GTK_TOOLBAR_ICONS);
+
 	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
 	{
 		Tool	*tool = &all_tools[i];
@@ -439,37 +450,9 @@ static gint menu_pressed(GtkWidget *button,
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window)
 {
-	GtkWidget 	*button, *icon_widget, *box = NULL;
+	GtkWidget 	*button, *icon_widget;
 
-	button = gtk_button_new();
-	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
-	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
-
-	if (tool->menu)
-	{
-		g_warning("Not implemented");
 #if 0
-		gtk_object_set_data(GTK_OBJECT(button), "popup_menu",
-				*tool->menu);
-		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
-			GTK_SIGNAL_FUNC(menu_pressed), filer_window);
-#endif
-	}
-	else
-	{
-		g_signal_connect(button, "button_press_event",
-			G_CALLBACK(toolbar_adjust_pressed), filer_window);
-		g_signal_connect(button, "button_release_event",
-			G_CALLBACK(toolbar_adjust_released), filer_window);
-	}
-
-	g_signal_connect(button, "clicked",
-			G_CALLBACK(tool->clicked), filer_window);
-
-	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
-
-	icon_widget = gtk_image_new_from_pixbuf(tool->icon->pixbuf);
-
 	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
 		box = gtk_hbox_new(FALSE, 0);
 	else if (o_toolbar.int_value == TOOLBAR_LARGE)
@@ -497,11 +480,45 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 		gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
 	else
 		gtk_misc_set_padding(GTK_MISC(icon_widget), 8, 1);
+#endif
 
-	gtk_toolbar_append_widget(GTK_TOOLBAR(bar), button, NULL, NULL);
+	icon_widget = gtk_image_new_from_stock(tool->name,
+						GTK_ICON_SIZE_LARGE_TOOLBAR);
+
+	button = gtk_toolbar_insert_element(GTK_TOOLBAR(bar),
+				   GTK_TOOLBAR_CHILD_BUTTON,
+				   NULL,
+				   _(tool->label),
+				   _(tool->tip), NULL,
+				   icon_widget,
+				   NULL, NULL,	/* CB, userdata */
+				   GTK_TOOLBAR(bar)->num_children);
 	
 	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
-		gtk_toolbar_append_space(GTK_TOOLBAR(bar));
+	{
+		GtkWidget *hbox, *label;
+		GList	  *kids;
+		//gtk_toolbar_append_space(GTK_TOOLBAR(bar));
+		hbox = GTK_BIN(button)->child;
+		kids = gtk_container_get_children(GTK_CONTAINER(hbox));
+		label = g_list_nth_data(kids, 1);
+		g_list_free(kids);
+		
+		if (label)
+		{
+			gtk_box_set_child_packing(GTK_BOX(hbox), label,
+						TRUE, TRUE, 0, GTK_PACK_END);
+			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
+		}
+	}
+
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(tool->clicked), filer_window);
+
+	g_signal_connect(button, "button_press_event",
+		G_CALLBACK(toolbar_adjust_pressed), filer_window);
+	g_signal_connect(button, "button_release_event",
+		G_CALLBACK(toolbar_adjust_released), filer_window);
 
 	return button;
 }
