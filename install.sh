@@ -19,7 +19,7 @@ endir() {
 
 confirm_or_die() {
 	while [ 1 -eq 1 ]; do
-		echo -e "[yes/no] >>> \c"
+		printf "[yes/no] >>> "
 		read CONFIRM
 		case $CONFIRM in
 			[yY]*) return;;
@@ -78,7 +78,7 @@ if you have root access; otherwise option (2) is best.
 
 Enter 1, 2, 3 or a path (starting with /):
 EOF
-echo -e ">>> \c"
+printf ">>> "
 
 read REPLY
 echo
@@ -139,7 +139,7 @@ Normally, you should choose (1) if you have root access, or (2) if not.
 
 Enter 1, 2, 3, 4 or a path (starting with /):
 EOF
-echo -e ">>> \c"
+printf ">>> "
 
 read REPLY
 echo
@@ -188,7 +188,7 @@ the filer?
 Enter 1, 2, 3, 4 or a path (starting with /):
 EOF
 
-echo -e ">>> \c"
+printf ">>> "
 read REPLY
 echo
 
