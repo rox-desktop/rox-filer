@@ -313,6 +313,13 @@ static void process_message(GUIside *gui_side, const gchar *buffer)
 		gui_side->errors++;
 		abox_log(abox, buffer + 1, "error");
 	}
+	else if (*buffer == '<') 
+		abox_set_file(abox, 0, buffer+1);
+	else if (*buffer == '>')
+	{
+		abox_set_file(abox, 1, buffer+1);
+		abox_show_compare(abox, TRUE);
+	}
 	else
 		abox_log(abox, buffer + 1, NULL);
 }
@@ -508,6 +515,7 @@ static void response(GtkDialog *dialog, gint response, GUIside *gui_side)
 
 	fputc(code, gui_side->to_child);
 	fflush(gui_side->to_child);
+	abox_show_compare(gui_side->abox, FALSE);
 }
 
 static void flag_toggled(ABox *abox, gint flag, GUIside *gui_side)
@@ -854,6 +862,8 @@ static void do_delete(const char *src_path, const char *unused)
 					   : access(src_path, W_OK) != 0;
 	if (write_prot || !quiet)
 	{
+		printf_send("<%s", src_path);
+		printf_send(">");
 		if (!printf_reply(from_parent, write_prot && !o_force,
 				  _("?Delete %s'%s'?"),
 				  write_prot ? _("WRITE-PROTECTED ") : "",
@@ -1001,6 +1011,8 @@ static void do_chmod(const char *path, const char *unused)
 
 	if (!quiet)
 	{
+		printf_send("<%s", path);
+		printf_send(">");
 		if (!printf_reply(from_parent, FALSE,
 				  _("?Change permissions of '%s'?"), path))
 			return;
@@ -1112,6 +1124,8 @@ static void do_copy2(const char *path, const char *dest)
 		}
 		else
 		{
+			printf_send("<%s", path);
+			printf_send(">%s", dest_path);
 			if (!printf_reply(from_parent, TRUE,
 					  _("?'%s' already exists - %s?"),
 					  dest_path,
@@ -1138,6 +1152,8 @@ static void do_copy2(const char *path, const char *dest)
 	}
 	else if (!quiet)
 	{
+		printf_send("<%s", path);
+		printf_send(">");
 		if (!printf_reply(from_parent, FALSE,
 				  _("?Copy %s as %s?"), path, dest_path))
 			return;
@@ -1269,10 +1285,14 @@ static void do_move2(const char *path, const char *dest)
 		{
 			/* Newer; keep going */
 		}
-		else if (!printf_reply(from_parent, TRUE,
+		else {
+			printf_send("<%s", path);
+			printf_send(">%s", dest_path);
+			if (!printf_reply(from_parent, TRUE,
 				       _("?'%s' already exists - overwrite?"),
 				       dest_path))
-			return;
+				return;
+		}
 
 		if (S_ISDIR(info.st_mode))
 			err = rmdir(dest_path);
@@ -1289,6 +1309,8 @@ static void do_move2(const char *path, const char *dest)
 	}
 	else if (!quiet)
 	{
+		printf_send("<%s", path);
+		printf_send(">");
 		if (!printf_reply(from_parent, FALSE,
 				  _("?Move %s as %s?"), path, dest_path))
 			return;
@@ -1356,9 +1378,13 @@ static void do_link(const char *path, const char *dest)
 
 	if (quiet)
 		printf_send(_("'Linking %s as %s\n"), path, dest_path);
-	else if (!printf_reply(from_parent, FALSE,
-			       _("?Link %s as %s?"), path, dest_path))
-		return;
+	else {
+		printf_send("<%s", path);
+		printf_send(">");
+		if (!printf_reply(from_parent, FALSE,
+				  _("?Link %s as %s?"), path, dest_path))
+			return;
+	}
 
 	if (symlink(path, dest_path))
 		send_error();

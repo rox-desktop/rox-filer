@@ -29,6 +29,12 @@ struct _ABox
 	GtkWidget	*entry;		/* Plain entry, or part of combo */
 	FilerWindow	*preview;
 
+	GtkWidget       *cmp_area;      /* Area where files are compared */
+	GtkWidget       *cmp_icon[2];
+	GtkWidget       *cmp_name[2];
+	GtkWidget       *cmp_size[2];
+	GtkWidget       *cmp_date[2];
+
 	gchar		*next_dir;	/* NULL => no timer active */
 	gint		next_timer;
 
@@ -69,5 +75,9 @@ void	abox_add_combo			(ABox *abox,
 void	abox_add_entry			(ABox *abox,
 					 const gchar *text,
 					 GtkWidget *help_button);
+
+void	abox_show_compare		(ABox *abox, gboolean show);
+void	abox_set_file			(ABox *abox, int file,
+					 const gchar *path);
 
 #endif /* __ABOX_H__ */

@@ -36,6 +36,8 @@
 #include "filer.h"
 #include "display.h"
 #include "support.h"
+#include "diritem.h"
+#include "pixmaps.h"
 
 #define RESPONSE_QUIET 1
 
@@ -118,6 +120,7 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 	GtkWidget *frame, *text, *scrollbar, *button;
 	ABox *abox = ABOX(object);
 	GtkDialog *dialog = GTK_DIALOG(object);
+	int i;
 
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
@@ -169,6 +172,36 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 			GTK_STOCK_YES, GTK_RESPONSE_YES,
 			NULL);
 
+	abox->cmp_area = gtk_table_new(2, 4, FALSE);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox),
+				abox->cmp_area, FALSE, FALSE, 2);
+	gtk_table_set_row_spacings(GTK_TABLE(abox->cmp_area), 2);
+	gtk_table_set_col_spacings(GTK_TABLE(abox->cmp_area), 2);
+
+	for (i = 0; i < 2; i++)
+	{
+		abox->cmp_icon[i] = gtk_image_new();
+		gtk_table_attach(GTK_TABLE(abox->cmp_area),
+				abox->cmp_icon[i],
+				0, 1, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 1, 1);
+		abox->cmp_name[i] = gtk_label_new("");
+		gtk_table_attach(GTK_TABLE(abox->cmp_area),
+				abox->cmp_name[i],
+				1, 2, i, i + 1,
+				GTK_EXPAND | GTK_FILL, GTK_SHRINK, 1, 1);
+		abox->cmp_size[i] = gtk_label_new("");
+		gtk_table_attach(GTK_TABLE(abox->cmp_area),
+				abox->cmp_size[i],
+				2, 3, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 1, 1);
+		abox->cmp_date[i] = gtk_label_new("");
+		gtk_table_attach(GTK_TABLE(abox->cmp_area),
+				abox->cmp_date[i],
+				3, 4, i, i + 1,
+				GTK_SHRINK, GTK_SHRINK, 1, 1);
+	}
+
 	abox->flag_box = gtk_hbox_new(FALSE, 16);
 	gtk_box_pack_end(GTK_BOX(dialog->vbox),
 				abox->flag_box, FALSE, TRUE, 2);
@@ -179,6 +212,7 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 	gtk_dialog_set_default_response(dialog, RESPONSE_QUIET);
 
 	gtk_widget_show_all(dialog->vbox);
+	gtk_widget_hide(abox->cmp_area);
 
 	abox->quiet = abox_add_flag(abox,
 			_("Quiet"), _("Don't confirm every operation"),
@@ -555,3 +589,65 @@ static gboolean abox_delete(GtkWidget *dialog, GdkEventAny *event)
 	g_signal_emit_by_name(dialog, "abort_operation");
 	return TRUE;
 }
+
+void abox_show_compare(ABox *abox, gboolean show)
+{
+	if (show)
+		gtk_widget_show(abox->cmp_area);
+	else
+		gtk_widget_hide(abox->cmp_area);
+}
+
+void abox_set_file(ABox *abox, int i, const gchar *path)
+{
+	DirItem *item;
+	gchar *base;
+	
+	g_return_if_fail(i >= 0 && i < 2);
+
+	if (!path || !path[0])
+	{
+		/*printf("path=%s\n", path? path: "NULL");*/
+		gtk_widget_hide(abox->cmp_icon[i]);
+		gtk_widget_hide(abox->cmp_name[i]);
+		gtk_widget_hide(abox->cmp_size[i]);
+		gtk_widget_hide(abox->cmp_date[i]);
+		return;
+	}
+
+	base = g_path_get_basename(path);
+	item = diritem_new(base);
+	g_free(base);
+	diritem_restat(path, item, NULL);
+
+	gtk_image_set_from_pixbuf(GTK_IMAGE(abox->cmp_icon[i]),
+				  item->image->pixbuf);
+	gtk_widget_show(abox->cmp_icon[i]);
+
+	gtk_label_set_text(GTK_LABEL(abox->cmp_name[i]), item->leafname);
+	gtk_widget_show(abox->cmp_name[i]);
+	
+	if (item->lstat_errno)
+	{
+		gtk_label_set_text(GTK_LABEL(abox->cmp_size[i]), "Error");
+		gtk_label_set_text(GTK_LABEL(abox->cmp_date[i]),
+				g_strerror(item->lstat_errno));
+	}
+	else
+	{
+		gchar *str;
+		
+		gtk_label_set_text(GTK_LABEL(abox->cmp_size[i]),
+				format_size_aligned(item->size));
+		
+		str = pretty_time(&item->mtime);
+		gtk_label_set_text(GTK_LABEL(abox->cmp_date[i]), str);
+		g_free(str);
+	}
+
+	gtk_widget_show(abox->cmp_size[i]);
+	gtk_widget_show(abox->cmp_date[i]);
+
+	diritem_free(item);
+}
+
