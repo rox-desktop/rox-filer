@@ -904,6 +904,37 @@ static void do_delete(const char *src_path, const char *unused)
 	g_free(safe_path);
 }
 
+static void do_eject(const char *path)
+{
+	const char *argv[3] = {NULL, NULL, NULL};
+	char *err;
+	
+	check_flags();
+
+	if (!quiet)
+	{
+		printf_send("<%s", path);
+		printf_send(">");
+		if (!printf_reply(from_parent, !o_force,
+				  _("?Eject '%s'?"),
+				  path))
+			return;
+	}
+	else if (!o_brief)
+		printf_send(_("'Eject '%s'\n"), path);
+
+	argv[0]="eject";
+	argv[1]=path;
+	argv[2]=NULL;
+	err=fork_exec_wait(argv);
+	if (err)
+	{
+		printf_send(_("!%s\neject failed\n"), err);
+		g_free(err);
+	}
+
+}
+
 /* path is the item to check. If is is a directory then we may recurse
  * (unless prune is used).
  */
@@ -1566,6 +1597,22 @@ static void delete_cb(gpointer data)
 	send_done();
 }
 
+static void eject_cb(gpointer data)
+{
+	GList	*paths = (GList *) data;
+
+	for (; paths; paths = paths->next)
+	{
+		guchar	*path = (guchar *) paths->data;
+		
+		send_dir(path);
+
+		do_eject(path);
+	}
+	
+	send_done();
+}
+
 static void find_cb(gpointer data)
 {
 	GList *all_paths = (GList *) data;
@@ -1915,6 +1962,25 @@ void action_link(GList *paths, const char *dest, const char *leaf)
 
 	abox = abox_new(_("Link"), o_action_link.int_value);
 	gui_side = start_action(abox, list_cb, paths,
+					 o_action_force.int_value,
+					 o_action_brief.int_value,
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
+	if (!gui_side)
+		return;
+
+	number_of_windows++;
+	gtk_widget_show(abox);
+}
+
+/* Eject these paths */
+void action_eject(GList *paths)
+{
+	GUIside		*gui_side;
+	GtkWidget	*abox;
+
+	abox = abox_new(_("Eject"), 0);
+	gui_side = start_action(abox, eject_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
 					 o_action_recurse.int_value,

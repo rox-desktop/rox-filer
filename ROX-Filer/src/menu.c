@@ -76,6 +76,9 @@ typedef enum {
 	FILE_CHMOD_ITEMS,
 	FILE_FIND,
 	FILE_OPEN_VFS_AVFS,
+	FILE_EJECT,
+	FILE_FORMAT,
+	FILE_FREE,
 } FileOp;
 
 typedef enum menu_icon_style {
@@ -173,6 +176,9 @@ static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
 static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
+static GtkWidget        *filer_file_eject;      /* File => Eject item */
+static GtkWidget        *filer_file_format;     /* File => Format item */
+static GtkWidget        *filer_file_free;       /* File => Free item */
 
 #undef N_
 #define N_(x) x
@@ -220,6 +226,10 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Find"),		NULL, file_op, FILE_FIND, "<StockItem>", GTK_STOCK_FIND},
+{">",				NULL, NULL, 0, "<Separator>"},
+{">" N_("Eject"),		NULL, file_op, FILE_EJECT, NULL},
+{">" N_("Format"),		NULL, file_op, FILE_FORMAT, NULL},
+{">" N_("Free"),		NULL, file_op, FILE_FREE, NULL},
 {N_("Select"),	    		NULL, NULL, 0, "<Branch>"},
 {">" N_("Select All"),	    	NULL, select_all, 0, NULL},
 {">" N_("Clear Selection"),	NULL, clear_selection, 0, NULL},
@@ -309,6 +319,10 @@ gboolean ensure_filer_menu(void)
 
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
 	filer_new_window = GTK_BIN(item)->child;
+
+	GET_SSMENU_ITEM(filer_file_eject, "filer", "File", "Eject");
+	GET_SSMENU_ITEM(filer_file_format, "filer", "File", "Format");
+	GET_SSMENU_ITEM(filer_file_free, "filer", "File", "Free");
 
 	g_signal_connect(filer_menu, "unmap_event",
 			G_CALLBACK(menu_closed), NULL);
@@ -689,6 +703,25 @@ static MenuIconStyle get_menu_icon_style(void)
 	return MIS_SMALL;
 }
 
+/* Set availability of the mount point specific menu items
+   (only eject implemented at present) */
+static void set_mount_point_items(gboolean ismp, gboolean ismounted)
+{
+	gtk_widget_set_sensitive(filer_file_eject, ismp && !ismounted);
+	gtk_widget_set_sensitive(filer_file_format, ismp && !ismounted);
+	gtk_widget_set_sensitive(filer_file_free, ismp && ismounted);
+
+	gtk_widget_set_sensitive(filer_file_format, FALSE);
+	gtk_widget_set_sensitive(filer_file_free, FALSE);
+}
+
+/* Set mount point items based on state of selected item */
+static void set_mount_point(DirItem *item)
+{
+	set_mount_point_items(item->flags & ITEM_FLAG_MOUNT_POINT,
+			      item->flags & ITEM_FLAG_MOUNTED);
+}
+
 /* iter->peek() is the clicked item, or NULL if none */
 void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 {
@@ -774,6 +807,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 			case 0:
 				g_string_assign(buffer, _("Next Click"));
 				shade_file_menu_items(FALSE);
+				set_mount_point_items(FALSE, FALSE);
 				break;
 			case 1:
 				item = filer_selected_item(filer_window);
@@ -791,11 +825,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 				if (!can_set_run_action(file_item))
 					menu_set_items_shaded(filer_file_menu,
 							TRUE, 6, 1);
+				set_mount_point(file_item);
 				break;
 			default:
 				shade_file_menu_items(TRUE);
 				g_string_printf(buffer, _("%d items"),
 						 n_selected);
+				set_mount_point_items(FALSE, FALSE);
 				break;
 		}
 		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
@@ -1905,6 +1941,15 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			break;
 		case FILE_OPEN_VFS_AVFS:
 			open_vfs_avfs(window_with_focus, item);
+			break;
+	        case FILE_EJECT:
+			{
+				GList *items;
+
+				items=filer_selected_items(window_with_focus);
+				action_eject(items);
+				destroy_glist(&items);
+			}
 			break;
 		default:
 			g_warning("Unknown action!");
