@@ -44,8 +44,8 @@
 #include "options.h"
 
 #include "toolbar.h"	/* for resizing */
-#include "display.h"
 #include "filer.h"
+#include "display.h"
 
 #define MIN_ITEM_WIDTH 64
 
@@ -1052,7 +1052,7 @@ static void view_collection_add_items(ViewIface *view, GPtrArray *items)
 		DirItem *item = (DirItem *) items->pdata[i];
 		char	*leafname = item->leafname;
 
-		if (leafname[0] == '.' && !filer_window->show_hidden)
+		if (!filer_match_filter(filer_window, leafname))
 			continue;
 
 		add_item(view_collection, item);
@@ -1083,7 +1083,7 @@ static void view_collection_update_items(ViewIface *view, GPtrArray *items)
 		const gchar *leafname = item->leafname;
 		int j;
 
-		if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
+		if (!filer_match_filter(filer_window, leafname))
 			continue;
 
 		j = collection_find_item(collection, item,

@@ -40,10 +40,10 @@
 #include "global.h"
 
 #include "main.h"
+#include "filer.h"
 #include "display.h"
 #include "support.h"
 #include "gui_support.h"
-#include "filer.h"
 #include "pixmaps.h"
 #include "menu.h"
 #include "dnd.h"
@@ -436,18 +436,35 @@ void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs)
 	filer_create_thumbs(filer_window);
 }
 
+void display_update_hidden(FilerWindow *filer_window)
+{
+	filer_detach_rescan(filer_window);	/* (updates titlebar) */
+
+	display_set_actual_size(filer_window, FALSE);
+}
+
 /* Set the 'Show Hidden' flag for this window */
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden)
 {
 	if (filer_window->show_hidden == hidden)
 		return;
 
+	/*
 	filer_window->show_hidden = hidden;
+	*/
+	filer_set_hidden(filer_window, hidden);
 
-	filer_detach_rescan(filer_window);	/* (updates titlebar) */
-
-	display_set_actual_size(filer_window, FALSE);
+	display_update_hidden(filer_window);
 }
+
+void display_set_filter(FilerWindow *filer_window, FilterType type,
+			const gchar *filter_string)
+{
+	filer_set_filter(filer_window, type, filter_string);
+
+	display_update_hidden(filer_window);
+}
+
 
 /* Highlight (wink or cursor) this item in the filer window. If the item
  * isn't already there but we're scanning then highlight it if it

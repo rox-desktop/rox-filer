@@ -128,6 +128,7 @@ static void set_sort(gpointer data, guint action, GtkWidget *widget);
 static void reverse_sort(gpointer data, guint action, GtkWidget *widget);
 
 static void hidden(gpointer data, guint action, GtkWidget *widget);
+static void test_filter(gpointer data, guint action, GtkWidget *widget);
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -193,6 +194,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Reversed"),		NULL, reverse_sort, 0, "<ToggleItem>"},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show Hidden"),   	NULL, hidden, 0, "<ToggleItem>"},
+{">" N_("Filter files"),   	NULL, mini_buffer, MINI_FILTER, NULL},
 {">" N_("Show Thumbnails"),	NULL, show_thumbs, 0, "<ToggleItem>"},
 {">" N_("Refresh"),		NULL, refresh, 0, "<StockItem>", GTK_STOCK_REFRESH},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
@@ -939,7 +941,19 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 
 	g_return_if_fail(window_with_focus != NULL);
 
-	display_set_hidden(window_with_focus, !window_with_focus->show_hidden);
+	display_set_hidden(window_with_focus,
+			   !window_with_focus->show_hidden);
+}
+
+static void test_filter(gpointer data, guint action, GtkWidget *widget)
+{
+	if (updating_menu)
+		return;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	display_set_filter(window_with_focus,
+			   FILER_SHOW_GLOB, "*.c");
 }
 
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget)

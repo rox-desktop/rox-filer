@@ -99,13 +99,14 @@ typedef struct _CollateKey CollateKey;
 typedef struct _WrappedLabel WrappedLabel;
 
 /* The minibuffer is a text field which appears at the bottom of
- * a filer window. It has four modes of operation:
+ * a filer window. It has various modes of operation:
  */
 typedef enum {
 	MINI_NONE,
 	MINI_PATH,
 	MINI_SHELL,
 	MINI_SELECT_IF,
+	MINI_FILTER,
 } MiniType;
 
 /* The next three correspond to the styles on the Display submenu: */

@@ -126,6 +126,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			mini_type == MINI_PATH ? _("Goto:") :
 			mini_type == MINI_SHELL ? _("Shell:") :
 			mini_type == MINI_SELECT_IF ? _("Select If:") :
+			mini_type == MINI_FILTER ? _("Pattern:") :
 			"?");
 
 	switch (mini_type)
@@ -139,13 +140,21 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 				make_path(filer_window->sym_path, ""));
 			if (filer_window->temp_show_hidden)
 			{
-				display_set_hidden(filer_window, FALSE);
 				filer_window->temp_show_hidden = FALSE;
+				display_update_hidden(filer_window);
 			}
 			break;
 		case MINI_SELECT_IF:
 			gtk_entry_set_text(mini, "");
 			filer_window->mini_cursor_base = -1;	/* History */
+			break;
+		case MINI_FILTER:
+			if(filer_window->filter!=FILER_SHOW_GLOB ||
+			   !filer_window->filter_string)
+				gtk_entry_set_text(mini, "");
+			else
+				gtk_entry_set_text(mini,
+						  filer_window->filter_string);
 			break;
 		case MINI_SHELL:
 		{
@@ -199,7 +208,7 @@ void minibuffer_hide(FilerWindow *filer_window)
 		item = iter.peek(&iter);
 
 		if (item == NULL || item->leafname[0] != '.')
-			display_set_hidden(filer_window, FALSE);
+		        display_update_hidden(filer_window);
 		filer_window->temp_show_hidden = FALSE;
 	}
 }
@@ -252,6 +261,12 @@ static void show_help(FilerWindow *filer_window)
 			break;
 		case MINI_SELECT_IF:
 			show_condition_help(NULL);
+			break;
+		case MINI_FILTER:
+			info_message(
+				_("Enter a pattern to match for files to "
+				"be shown.  An empty filter turns the "
+				  "filter off."));
 			break;
 		default:
 			g_warning("Unknown minibuffer type!");
@@ -432,16 +447,8 @@ static void path_changed(FilerWindow *filer_window)
 	{
 		if (*leaf == '.')
 		{
-			if (!filer_window->show_hidden)
-			{
-				filer_window->temp_show_hidden = TRUE;
-				display_set_hidden(filer_window, TRUE);
-			}
-		}
-		else if (filer_window->temp_show_hidden)
-		{
-			display_set_hidden(filer_window, FALSE);
-			filer_window->temp_show_hidden = FALSE;
+			filer_window->temp_show_hidden = TRUE;
+			display_update_hidden(filer_window);
 		}
 		
 		if (find_exact_match(filer_window, leaf) == FALSE &&
@@ -835,6 +842,22 @@ out:
 	minibuffer_hide(filer_window);
 }
 
+static void filter_return_pressed(FilerWindow *filer_window, guint etime)
+{
+	const gchar	*entry;
+	SelectData	data;
+
+	entry = mini_contents(filer_window);
+
+	if (entry && *entry) {
+		display_set_filter(filer_window, FILER_SHOW_GLOB,
+				   entry);
+	} else {
+		display_set_filter(filer_window, FILER_SHOW_ALL, NULL);
+	}
+	minibuffer_hide(filer_window);
+}
+
 
 /*			EVENT HANDLERS			*/
 
@@ -915,6 +938,19 @@ static gint key_press_event(GtkWidget	*widget,
 				case GDK_Return:
 				case GDK_KP_Enter:
 					select_return_pressed(filer_window,
+								event->time);
+					break;
+				default:
+					return FALSE;
+			}
+			break;
+
+	        case MINI_FILTER:
+			switch (event->keyval)
+			{
+				case GDK_Return:
+				case GDK_KP_Enter:
+					filter_return_pressed(filer_window,
 								event->time);
 					break;
 				default:

@@ -30,6 +30,7 @@
 #include <ctype.h>
 #include <netdb.h>
 #include <sys/param.h>
+#include <fnmatch.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -37,12 +38,12 @@
 
 #include "global.h"
 
+#include "filer.h"
 #include "display.h"
 #include "main.h"
 #include "fscache.h"
 #include "support.h"
 #include "gui_support.h"
-#include "filer.h"
 #include "choices.h"
 #include "pixmaps.h"
 #include "menu.h"
@@ -441,6 +442,11 @@ static void filer_window_destroyed(GtkWidget *widget, FilerWindow *filer_window)
 	tooltip_show(NULL);
 
 	filer_set_id(filer_window, NULL);
+
+	if(filer_window->filter_string)
+		g_free(filer_window->filter_string);
+	if(filer_window->regexp)
+		g_free(filer_window->regexp);
 
 	g_free(filer_window->auto_select);
 	g_free(filer_window->real_path);
@@ -1218,6 +1224,10 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	filer_window->max_thumbs = 0;
 	filer_window->sort_type = -1;
 
+	filer_window->filter = FILER_SHOW_ALL;
+	filer_window->filter_string = NULL;
+	filer_window->regexp = NULL;
+	
 	if (src_win && o_display_inherit_options.int_value)
 	{
 		s_type = src_win->sort_type;
@@ -1227,6 +1237,9 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 		filer_window->show_hidden = src_win->show_hidden;
 		filer_window->show_thumbs = src_win->show_thumbs;
 		filer_window->view_type = src_win->view_type;
+
+		filer_set_filter(filer_window, src_win->filter,
+				 src_win->filter_string);
 	}
 	else
 	{
@@ -1701,26 +1714,55 @@ void filer_set_title(FilerWindow *filer_window)
 {
 	gchar	*title = NULL;
 	guchar	*flags = "";
+	gchar  *hidden = "";
 
-	if (filer_window->scanning || filer_window->show_hidden ||
-				filer_window->show_thumbs)
+	if (filer_window->scanning ||
+	    filer_window->filter != FILER_SHOW_ALL ||
+	    filer_window->show_hidden || filer_window->show_thumbs)
 	{
 		if (o_short_flag_names.int_value)
 		{
+
+			switch(filer_window->filter) {
+			case FILER_SHOW_ALL:
+				hidden=filer_window->show_hidden? "A": "";
+				break;
+			case FILER_SHOW_GLOB:   hidden="G"; break;
+			case FILER_SHOW_REGEXP: hidden="R"; break;
+			default: break;
+			}
+
 			flags = g_strconcat(" +",
 				filer_window->scanning ? _("S") : "",
-				filer_window->show_hidden ? _("A") : "",
+				hidden,
 				filer_window->show_thumbs ? _("T") : "",
 				NULL);
 		}
 		else
 		{
+			switch(filer_window->filter) {
+			case FILER_SHOW_ALL:
+				hidden=g_strdup(filer_window->show_hidden? "All, ": "");
+				break;
+			case FILER_SHOW_GLOB:
+				hidden=g_strdup_printf("Glob (%s), ",
+						 filer_window->filter_string);
+				break;
+			case FILER_SHOW_REGEXP:
+				hidden=g_strdup_printf("Regexp (%s), ",
+						 filer_window->filter_string);
+				break;
+			default:
+				hidden=g_strdup("");
+				break;
+			}
 			flags = g_strconcat(" (",
 				filer_window->scanning ? _("Scanning, ") : "",
-				filer_window->show_hidden ? _("All, ") : "",
+				hidden,
 				filer_window->show_thumbs ? _("Thumbs, ") : "",
 				NULL);
 			flags[strlen(flags) - 2] = ')';
+			g_free(hidden);
 		}
 	}
 
@@ -2548,3 +2590,83 @@ void filer_refresh(FilerWindow *filer_window)
 	
 	full_refresh();
 }
+
+gboolean filer_match_filter(FilerWindow *filer_window,
+				   gchar *filename)
+{
+	if(filename[0]=='.' &&
+	   (!filer_window->temp_show_hidden && !filer_window->show_hidden))
+		return FALSE;
+
+	/*printf("%d %s\n", filer_window->filter, filename);*/
+	switch(filer_window->filter) {
+	case FILER_SHOW_GLOB:
+		return fnmatch(filer_window->filter_string,
+			       filename, 0)==0;
+		
+	case FILER_SHOW_REGEXP: /* Unimplemented */
+
+	case FILER_SHOW_ALL:
+	default:
+		break;
+	}
+	return TRUE;
+}
+
+/* Provided to hide the implementation */
+void filer_set_hidden(FilerWindow *filer_window, gboolean hidden)
+{
+	filer_window->show_hidden=hidden;
+}
+
+void filer_set_filter(FilerWindow *filer_window, FilterType type,
+			     const gchar *filter_string)
+{
+	/*printf("filer_set_filter(%p, %d, %s)\n", filer_window, type,
+	  filter_string? filter_string: "NULL");*/
+	/* Is this new filter the same as the old one? */
+	if(filer_window->filter==type) {
+		switch(filer_window->filter) {
+		case FILER_SHOW_ALL:
+			return;
+		case FILER_SHOW_GLOB:
+		case FILER_SHOW_REGEXP:
+			if(strcmp(filer_window->filter_string,
+				  filter_string)==0)
+				return;
+			break;
+		}
+	}
+
+	/* Clean up old filter */
+	if(filer_window->filter_string) {
+		g_free(filer_window->filter_string);
+		filer_window->filter_string=NULL;
+	}
+	/* Also clean up compiled regexp when implemented */
+
+	/*printf("set %d %s\n", type,
+	  filter_string? filter_string: "NULL");*/
+	filer_window->filter=type;
+	switch(type) {
+	case FILER_SHOW_ALL:
+		/* No extra work */
+		break;
+
+	case FILER_SHOW_GLOB:
+		filer_window->filter_string=g_strdup(filter_string);
+		break;
+
+	case FILER_SHOW_REGEXP:
+		filer_window->filter_string=g_strdup(filter_string);
+		/* Compile the pattern */
+		break;
+
+	default:
+		/* oops */
+		filer_window->filter=FILER_SHOW_ALL;
+		report_error("Impossible: filter type %d", type);
+		break;
+	}
+}
+

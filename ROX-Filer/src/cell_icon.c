@@ -33,10 +33,10 @@
 
 #include "view_details.h"
 #include "cell_icon.h"
+#include "filer.h"
 #include "display.h"
 #include "diritem.h"
 #include "pixmaps.h"
-#include "filer.h"
 #include "type.h"
 #include "support.h"
 #include "fscache.h"

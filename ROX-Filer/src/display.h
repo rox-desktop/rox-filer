@@ -40,6 +40,9 @@ void display_set_layout(FilerWindow  *filer_window,
 			DetailsType  details,
 			gboolean     force_resize);
 void display_set_hidden(FilerWindow *filer_window, gboolean hidden);
+void display_update_hidden(FilerWindow *filer_window);
+void display_set_filter(FilerWindow *filer_window, FilterType type,
+			const gchar *filter_string);
 void display_set_thumbs(FilerWindow *filer_window, gboolean thumbs);
 int sort_by_name(const void *item1, const void *item2);
 int sort_by_type(const void *item1, const void *item2);

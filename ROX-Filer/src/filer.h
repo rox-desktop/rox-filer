@@ -36,6 +36,14 @@ typedef enum
 	VIEW_TYPE_DETAILS = 1		/* TreeView details list */
 } ViewType;
 
+/* Filter types */
+typedef enum
+{
+	FILER_SHOW_ALL,           /* Show all files, modified by show_hidden */
+	FILER_SHOW_GLOB,          /* Show files that match a glob pattern */
+	FILER_SHOW_REGEXP,        /* Show files that match a regular expression */
+} FilterType;
+
 /* iter's next method has just returned the clicked item... */
 typedef void (*TargetFunc)(FilerWindow *filer_window,
 			   ViewIter *iter,
@@ -73,6 +81,9 @@ struct _FilerWindow
 	int		mini_cursor_base;	/* XXX */
 	MiniType	mini_type;
 
+	FilterType      filter;
+	gchar           *filter_string;  /* Glob or regexp pattern */
+	gchar           *regexp;         /* Compiled regexp pattern */
 	/* TRUE if hidden files are shown because the minibuffer leafname
 	 * starts with a dot.
 	 */
@@ -149,5 +160,11 @@ gint filer_key_press_event(GtkWidget *widget, GdkEventKey *event,
 			   FilerWindow *filer_window);
 void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
 void filer_refresh(FilerWindow *filer_window);
+
+extern gboolean filer_match_filter(FilerWindow *filer_window,
+				   gchar *filename);
+extern void filer_set_filter(FilerWindow *filer_window, FilterType type,
+			     const gchar *filter_string);
+extern void filer_set_hidden(FilerWindow *fwin, gboolean hidden);
 
 #endif /* _FILER_H */

@@ -3114,7 +3114,8 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>, <parameter>ID</parameter>])
+     <parameter>Class</parameter>, <parameter>ID</parameter>],
+     <parameter>Hidden</parameter>, <parameter>Filter</parameter>)
      Open a window showing directory <parameter>Filename</parameter>.
      <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      or <userinput>Automatic</userinput>.
@@ -3130,6 +3131,13 @@ opened window. If a window with this ID already exists, it is changed to the
 given directory. Otherwise, a new window is created and given this ID.
 If used from a program, ensure the IDs you generate are unique, for example
 by including your process name, PID and a timestamp in the ID.
+<parameter>Hidden</parameter> if <userinput>true</userinput> means
+that hidden files (those that start with a dot character) are shown,
+or not shown if <userinput>false</userinput>.  If ommitted then the 
+configured setting is used.
+<parameter>Filter</parameter> can be used to filter files shown by
+their name.  For example using a filter of <userinput>*.c</userinput>
+means that only files ending in .c are shown.
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,

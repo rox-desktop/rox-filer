@@ -123,7 +123,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
 	soap_register("OpenDir", rpc_OpenDir, "Filename",
-					      "Style,Details,Sort,Class,ID");
+			      "Style,Details,Sort,Class,ID,Hidden,Filter");
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
@@ -573,6 +573,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 {
 	char	   *path;
 	char       *style, *details, *sort, *class, *window;
+	int         hidden=FALSE;
+	char       *filter_string=NULL;
 	FilerWindow *fwin = NULL;
 
 	path = string_value(ARG(0));
@@ -600,6 +602,8 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 	style = string_value(ARG(1));
 	details = string_value(ARG(2));
 	sort = string_value(ARG(3));
+	hidden = boolean_value(ARG(6));
+	filter_string = string_value(ARG(7));
 
 	if (style)
 	{
@@ -667,6 +671,15 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 
 		g_free(sort);
 	}
+	if (hidden!=-1)
+	{
+		display_set_hidden(fwin, hidden);
+	}
+
+	if (filter_string)
+		display_set_filter(fwin, FILER_SHOW_GLOB, filter_string);
+	else
+		display_set_filter(fwin, FILER_SHOW_ALL, NULL);
 
 	return NULL;
 }

@@ -61,6 +61,7 @@ struct _Tool {
 Option o_toolbar, o_toolbar_info, o_toolbar_disable;
 
 static GtkTooltips *tooltips = NULL;
+static FilerWindow *filer_window_being_counted;
 
 /* TRUE if the button presses (or released) should open a new window,
  * rather than reusing the existing one.
@@ -206,11 +207,14 @@ void toolbar_update_info(FilerWindow *filer_window)
 			return;
 		}
 
-		if (!filer_window->show_hidden)
+		if (!(filer_window->show_hidden ||
+		      filer_window->temp_show_hidden) ||
+		    filer_window->filter!=FILER_SHOW_ALL)
 		{
 			GHashTable *hash = filer_window->directory->known_items;
 			int	   tally = 0;
 
+			filer_window_being_counted=filer_window;
 			g_hash_table_foreach(hash, tally_items, &tally);
 
 			if (tally)
@@ -706,7 +710,7 @@ static void tally_items(gpointer key, gpointer value, gpointer data)
 	guchar *leafname = (guchar *) key;
 	int    *tally = (int *) data;
 
-	if (leafname[0] == '.')
+	if (!filer_match_filter(filer_window_being_counted, leafname))
 		(*tally)++;
 }
 
