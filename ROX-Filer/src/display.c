@@ -98,6 +98,8 @@ static void large_template(GdkRectangle *area, DirItem *item,
 			   FilerWindow *filer_window, Template *template);
 static void small_template(GdkRectangle *area, DirItem *item,
 			   FilerWindow *filer_window, Template *template);
+static void huge_full_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template);
 static void large_full_template(GdkRectangle *area, DirItem *item,
 			   FilerWindow *filer_window, Template *template);
 static void small_full_template(GdkRectangle *area, DirItem *item,
@@ -164,6 +166,9 @@ static void fill_template(GdkRectangle *area, DirItem *item,
 		case LARGE_FULL_INFO:
 			large_full_template(area, item, filer_window, template);
 			break;
+		case HUGE_FULL_INFO:
+			huge_full_template(area, item, filer_window, template);
+			break;
 		default:
 			small_template(area, item, filer_window, template);
 			break;
@@ -191,6 +196,11 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 			h = text_height + 4 + 
 				PIXMAP_HEIGHT(item->image->huge_pixmap);
 			*height = MAX(h, ICON_HEIGHT * 1.5);
+			break;
+                case HUGE_FULL_INFO:
+			w = details_width(filer_window, item);
+                        *width = HUGE_WIDTH + 12 + MAX(w, item->name_width);
+			*height = HUGE_HEIGHT - 4;
 			break;
                 case LARGE_FULL_INFO:
 			w = details_width(filer_window, item);
@@ -228,12 +238,15 @@ void draw_huge_icon(GtkWidget *widget,
 		    gboolean selected)
 {
 	MaskedPixmap	*image = item->image;
-	int	width = PIXMAP_WIDTH(image->huge_pixmap);
-	int	height = PIXMAP_HEIGHT(image->huge_pixmap);
-	int	image_x = area->x + ((area->width - width) >> 1);
-	int	image_y;
+	int		width, height;
+	int		image_x;
+	int		image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
 						: widget->style->black_gc;
+
+	width = PIXMAP_WIDTH(image->huge_pixmap);
+	height = PIXMAP_HEIGHT(image->huge_pixmap);
+	image_x = area->x + ((area->width - width) >> 1);
 		
 	gdk_gc_set_clip_mask(gc, item->image->huge_mask);
 
@@ -527,10 +540,12 @@ void display_set_layout(FilerWindow  *filer_window,
 
 	if (details != DETAILS_NONE)
 	{
-		if (style != SMALL_ICONS)
+		if (style == SMALL_ICONS)
+			style = SMALL_FULL_INFO;
+		else if (style == LARGE_ICONS)
 			style = LARGE_FULL_INFO;
 		else
-			style = SMALL_FULL_INFO;
+			style = HUGE_FULL_INFO;
 	}
 
 	display_style_set(filer_window, style);
@@ -727,6 +742,37 @@ static void small_template(GdkRectangle *area, DirItem *item,
 	template->icon.y = area->y + 1;
 	template->icon.width = SMALL_WIDTH;
 	template->icon.height = SMALL_HEIGHT;
+}
+
+static void huge_full_template(GdkRectangle *area, DirItem *item,
+			   FilerWindow *filer_window, Template *template)
+{
+	MaskedPixmap	*image = item->image;
+	int	font_height = item_font->ascent + item_font->descent;
+	int	fixed_height = fixed_font->ascent + fixed_font->descent;
+	int	max_text_width = area->width - HUGE_WIDTH - 4;
+
+	if (!image->huge_pixmap)
+		pixmap_make_huge(image);
+
+	template->icon.width = PIXMAP_WIDTH(image->huge_pixmap);
+	template->icon.height = PIXMAP_HEIGHT(image->huge_pixmap);
+	template->icon.x = area->x + (HUGE_WIDTH - template->icon.width) / 2;
+	template->icon.y = area->y + (area->height - template->icon.height) / 2;
+
+	template->leafname.x = area->x + HUGE_WIDTH + 4;
+	template->leafname.y = area->y + area->height / 2 - font_height;
+	template->leafname.width = MIN(max_text_width, item->name_width);
+	template->leafname.height = font_height;
+
+	template->details_string = details(filer_window, item);
+	
+	template->details.x = template->leafname.x;
+	template->details.y = template->leafname.y +
+				item_font->descent + fixed_font->ascent;
+	template->details.width = fixed_width *
+					strlen(template->details_string);
+	template->details.height = fixed_height;
 }
 
 static void large_full_template(GdkRectangle *area, DirItem *item,

@@ -83,7 +83,7 @@ static void select_nth_item(GtkMenuShell *shell, int n);
 /* Note that for most of these callbacks none of the arguments are used. */
 
 /* (action used in these two - DetailsType) */
-static void huge_icons(gpointer data, guint action, GtkWidget *widget);
+static void huge_with(gpointer data, guint action, GtkWidget *widget);
 static void large_with(gpointer data, guint action, GtkWidget *widget);
 static void small_with(gpointer data, guint action, GtkWidget *widget);
 
@@ -153,9 +153,15 @@ static gboolean	(*current_savebox_callback)(guchar *current, guchar *new);
 
 static GtkItemFactoryEntry filer_menu_def[] = {
 {N_("Display"),			NULL, NULL, 0, "<Branch>"},
-{">" N_("Huge Icons"),   	NULL, huge_icons, 0, NULL},
+{">" N_("Huge Icons"),   	NULL, huge_with, DETAILS_NONE, NULL},
 {">" N_("Large Icons"),   	NULL, large_with, DETAILS_NONE, NULL},
 {">" N_("Small Icons"),   	NULL, small_with, DETAILS_NONE, NULL},
+{">" N_("Huge, With..."),	NULL, NULL, 0, "<Branch>"},
+{">>" N_("Summary"),		NULL, huge_with, DETAILS_SUMMARY, NULL},
+{">>" N_("Sizes"),		NULL, huge_with, DETAILS_SIZE, NULL},
+{">>" N_("Permissions"),	NULL, huge_with, DETAILS_PERMISSIONS, NULL},
+{">>" N_("Type"),		NULL, huge_with, DETAILS_TYPE, NULL},
+{">>" N_("Times"),		NULL, huge_with, DETAILS_TIMES, NULL},
 {">" N_("Large, With..."),	NULL, NULL, 0, "<Branch>"},
 {">>" N_("Summary"),		NULL, large_with, DETAILS_SUMMARY, NULL},
 {">>" N_("Sizes"),		NULL, large_with, DETAILS_SIZE, NULL},
@@ -589,9 +595,9 @@ void target_callback(FilerWindow *filer_window,
 
 /* Actions */
 
-static void huge_icons(gpointer data, guint action, GtkWidget *widget)
+static void huge_with(gpointer data, guint action, GtkWidget *widget)
 {
-	display_set_layout(window_with_focus, HUGE_ICONS, DETAILS_NONE);
+	display_set_layout(window_with_focus, HUGE_ICONS, action);
 }
 
 static void large_with(gpointer data, guint action, GtkWidget *widget)

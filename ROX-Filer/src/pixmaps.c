@@ -90,6 +90,7 @@ static MaskedPixmap *image_from_file(char *path);
 static MaskedPixmap *get_bad_image(void);
 static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf);
 static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
+static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 
 
 /****************************************************************
@@ -158,10 +159,20 @@ void pixmap_make_huge(MaskedPixmap *mp)
 
 	if (mp->huge_pixbuf)
 	{
-		gdk_pixbuf_render_pixmap_and_mask(mp->huge_pixbuf,
-				&mp->huge_pixmap,
-				&mp->huge_mask,
-				128);
+		GdkPixbuf	*hg;
+			
+		hg = scale_pixbuf_up(mp->huge_pixbuf,
+					HUGE_WIDTH * 0.7,
+					HUGE_HEIGHT * 0.7);
+
+		if (hg)
+		{
+			gdk_pixbuf_render_pixmap_and_mask(hg,
+					&mp->huge_pixmap,
+					&mp->huge_mask,
+					128);
+			gdk_pixbuf_unref(hg);
+		}
 
 		if (mp->huge_pixmap)
 			return;
@@ -251,6 +262,34 @@ static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h)
 		return gdk_pixbuf_scale_simple(src,
 						w / scale,
 						h / scale,
+						GDK_INTERP_BILINEAR);
+	}
+}
+
+/* Scale src up to fit in max_w, max_h and return the new pixbuf.
+ * If src is that size or bigger, then ref it and return that.
+ */
+static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h)
+{
+	int	w, h;
+
+	w = gdk_pixbuf_get_width(src);
+	h = gdk_pixbuf_get_height(src);
+
+	if (w == 0 || h == 0 || (w >= max_w && h >= max_h))
+	{
+		gdk_pixbuf_ref(src);
+		return src;
+	}
+	else
+	{
+		float scale_x = max_w / ((float) w);
+		float scale_y = max_h / ((float) h);
+		float scale = MIN(scale_x, scale_y);
+		
+		return gdk_pixbuf_scale_simple(src,
+						w * scale,
+						h * scale,
 						GDK_INTERP_BILINEAR);
 	}
 }
