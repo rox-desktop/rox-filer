@@ -145,7 +145,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			i = collection->cursor_item;
 			if (collection->number_selected)
 				gtk_entry_set_text(mini, " \"$@\"");
-			else if (i > -1)
+			else if (i > -1 && i < collection->number_of_items)
 			{
 				DirItem *item = (DirItem *) 
 						collection->items[i].data;
