@@ -71,10 +71,8 @@ void dir_update(Directory *dir, gchar *pathname);
 void dir_rescan_with_thumbs(Directory *dir, gchar *pathname);
 int dir_item_cmp(const void *a, const void *b);
 void refresh_dirs(char *path);
-void dir_stat(guchar *path, DirItem *item, gboolean make_thumb);
-void dir_restat(guchar *path, DirItem *item, gboolean make_thumb);
-void dir_item_clear(DirItem *item);
 void dir_check_this(guchar *path);
+DirItem *dir_update_item(Directory *dir, gchar *leafname);
 void dir_rescan(Directory *dir, guchar *pathname);
 void dir_merge_new(Directory *dir);
 

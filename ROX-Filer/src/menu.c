@@ -772,6 +772,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		GtkWidget	*file_label, *file_menu;
 		Collection 	*collection = filer_window->collection;
 		GString		*buffer;
+		DirItem		*item;
 
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
@@ -779,6 +780,15 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
 		buffer = g_string_new(NULL);
+
+		if (collection->number_selected == 1)
+		{
+			item = selected_item(filer_window->collection);
+			if (!item->image)
+				dir_update_item(filer_window->directory,
+						item->leafname);
+		}
+		
 		switch (collection->number_selected)
 		{
 			case 0:
@@ -1081,22 +1091,12 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 /* Open a savebox to act on the selected file.
  * Call 'callback' later to perform the operation.
  */
-static void src_dest_action_item(FilerWindow *filer_window, guchar *title,
+static void src_dest_action_item(guchar *path, MaskedPixmap *image,
+				 guchar *title,
 				 gboolean (*callback)(guchar *, guchar *))
 {
-	Collection *collection;
-	DirItem	*item;
-	guchar	*path;
-	
-	collection = filer_window->collection;
-
-	item = selected_item(collection);
-
-	g_return_if_fail(item->image != NULL);	/* XXX */
-
-	path = make_path(filer_window->path, item->leafname)->str;
-	pixmap_ref(item->image);
-	savebox_show(title, path, item->image, callback);
+	pixmap_ref(image);
+	savebox_show(title, path, image, callback);
 }
 
 static gboolean rename_cb(guchar *current, guchar *new)
@@ -1128,23 +1128,8 @@ static gboolean link_cb(guchar *initial, guchar *path)
 	return TRUE;
 }
 
-static void open_file(FilerWindow *filer_window)
+static void run_action(DirItem *item)
 {
-	filer_openitem(filer_window,
-			selected_item_number(filer_window->collection),
-			OPEN_SAME_WINDOW | OPEN_SHIFT);
-}
-
-static void run_action(FilerWindow *filer_window)
-{
-	Collection *collection;
-	DirItem	*item;
-	
-	collection = filer_window->collection;
-
-	item = selected_item(collection);
-	g_return_if_fail(item != NULL);
-
 	if (can_set_run_action(item))
 		type_set_handler_dialog(item->mime_type);
 	else
@@ -1153,57 +1138,15 @@ static void run_action(FilerWindow *filer_window)
 			"regular file"));
 }
 
-static void set_icon(FilerWindow *filer_window)
-{
-	Collection *collection;
-	DirItem *item;
-	guchar *path;
-
-	collection = filer_window->collection;
-
-	item = selected_item(collection);
-	g_return_if_fail(item != NULL);
-
-	path = make_path(filer_window->path, item->leafname)->str;
-
-	icon_set_handler_dialog(item, path);
-}
-
-static void show_file_info(FilerWindow *filer_window)
-{
-	DirItem		*file;
-	Collection 	*collection;
-
-	collection = filer_window->collection;
-
-	file = selected_item(collection);
-	infobox_new(make_path(filer_window->path, file->leafname)->str);
-}
-	
 void open_home(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(home_dir, NULL);
 }
 
-static void help(FilerWindow *filer_window)
-{
-	Collection 	*collection;
-	DirItem	*item;
-	
-	collection = filer_window->collection;
-	item = selected_item(collection);
-
-	show_item_help(make_path(filer_window->path, item->leafname)->str,
-			item);
-}
-
 #ifdef HAVE_LIBVFS
-static void real_vfs_open(FilerWindow *filer_window, char *fs)
+static void real_vfs_open(FilerWindow *filer_window, DirItem *item, char *fs)
 {
 	gchar		*path;
-	DirItem		*item;
-
-	item = selected_item(filer_window->collection);
 
 	path = g_strconcat(filer_window->path,
 			"/",
@@ -1214,15 +1157,9 @@ static void real_vfs_open(FilerWindow *filer_window, char *fs)
 	g_free(path);
 }
 #else
-static void open_vfs_avfs(FilerWindow *filer_window)
+static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
 {
 	gchar		*path;
-	DirItem		*item;
-	Collection 	*collection;
-
-	collection = filer_window->collection;
-
-	item = selected_item(collection);
 
 	path = g_strconcat(filer_window->path,
 			"/", item->leafname, "#", NULL);
@@ -1763,6 +1700,8 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 {
 	Collection *collection;
+	DirItem	*item;
+	gchar	*path;
 
 	g_return_if_fail(window_with_focus != NULL);
 
@@ -1862,51 +1801,67 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		return;
 	}
 
+	item = selected_item(collection);
+	g_return_if_fail(item != NULL);
+	if (!item->image)
+		item = dir_update_item(window_with_focus->directory,
+					item->leafname);
+
+	if (!item)
+	{
+		report_error(_("Item no longer exists!"));
+		return;
+	}
+
+	path = make_path(window_with_focus->path, item->leafname)->str;
+
 	switch (action)
 	{
 		case FILE_COPY_ITEM:
-			src_dest_action_item(window_with_focus, _("Copy"),
-					copy_cb);
+			src_dest_action_item(path, item->image,
+						_("Copy"), copy_cb);
 			break;
 		case FILE_RENAME_ITEM:
-			src_dest_action_item(window_with_focus, _("Rename"),
-					rename_cb);
+			src_dest_action_item(path, item->image,
+					_("Rename"), rename_cb);
 			break;
 		case FILE_LINK_ITEM:
-			src_dest_action_item(window_with_focus, _("Symlink"),
-					link_cb);
+			src_dest_action_item(path, item->image,
+					_("Symlink"), link_cb);
 			break;
 		case FILE_OPEN_FILE:
-			open_file(window_with_focus);
+			filer_openitem(window_with_focus,
+					selected_item_number(collection),
+					OPEN_SAME_WINDOW | OPEN_SHIFT);
 			break;
 		case FILE_HELP:
-			help(window_with_focus);
+			show_item_help(path, item);
 			break;
 		case FILE_SHOW_FILE_INFO:
-			show_file_info(window_with_focus);
+			infobox_new(path);
 			break;
 		case FILE_RUN_ACTION:
-			run_action(window_with_focus);
+			run_action(item);
 			break;
 		case FILE_SET_ICON:
-			set_icon(window_with_focus);
+			icon_set_handler_dialog(item, path);
 			break;
 #ifdef HAVE_LIBVFS
 		case FILE_OPEN_VFS_RPM:
-			real_vfs_open(window_with_focus, "rpm");
+			real_vfs_open(window_with_focus, item, "rpm");
 			break;
 		case FILE_OPEN_VFS_UTAR:
-			real_vfs_open(window_with_focus, "utar");
+			real_vfs_open(window_with_focus, item, "utar");
 			break;
 		case FILE_OPEN_VFS_UZIP:
-			real_vfs_open(window_with_focus, "uzip");
+			real_vfs_open(window_with_focus, item, "uzip");
 			break;
 		case FILE_OPEN_VFS_DEB:
-			real_vfs_open(window_with_focus, "deb");
+			real_vfs_open(window_with_focus, item, "deb");
 			break;
 #else
 		case FILE_OPEN_VFS_AVFS:
-			open_vfs_avfs(window_with_focus);
+			open_vfs_avfs(window_with_focus, item);
 			break;
 		default:
 			g_warning("Unknown action!");

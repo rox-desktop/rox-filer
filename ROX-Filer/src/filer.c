@@ -1881,7 +1881,16 @@ static gint coll_motion_notify(GtkWidget *widget,
 	{
 		DirItem	*item = (DirItem *) collection->items[i].data;
 
-		/* XXX: Ensure item->image */
+		if (!item->image)
+			item = dir_update_item(filer_window->directory,
+						item->leafname);
+
+		if (!item)
+		{
+			report_error(_("Item no longer exists!"));
+			return FALSE;
+		}
+
 		drag_one_item(widget, event,
 			make_path(filer_window->path, item->leafname)->str,
 			item);

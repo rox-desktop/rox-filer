@@ -78,7 +78,7 @@ static int getref(Directory *dir, gpointer data);
 static void update(Directory *dir, gchar *pathname, gpointer data);
 static void destroy(Directory *dir);
 static void set_idle_callback(Directory *dir);
-static void insert_item(Directory *dir, guchar *leafname);
+static DirItem *insert_item(Directory *dir, guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
 static void dir_recheck(Directory *dir, guchar *path, guchar *leafname);
 static GPtrArray *hash_to_array(GHashTable *hash);
@@ -212,6 +212,19 @@ void dir_check_this(guchar *path)
 	g_free(real_path);
 }
 
+/* Ensure that 'leafname' is up-to-date. Returns the new/updated
+ * DirItem, or NULL if the file no longer exists.
+ */
+DirItem *dir_update_item(Directory *dir, gchar *leafname)
+{
+	DirItem *item;
+	
+	item = insert_item(dir, leafname);
+	dir_merge_new(dir);
+
+	return item;
+}
+
 void dir_rescan_with_thumbs(Directory *dir, gchar *pathname)
 {
 	g_return_if_fail(dir != NULL);
@@ -276,7 +289,7 @@ static gboolean recheck_callback(gpointer data)
 	leaf = (guchar *) next->data;
 	g_list_free_1(next);
 
-	/* usleep(800); */
+	usleep(800);
 
 	insert_item(dir, leaf);
 
@@ -553,8 +566,11 @@ static void remove_item(Directory *dir, DirItem *item)
 	free_items_array(gone);
 }
 
-/* Stat this item and add, update or remove it */
-static void insert_item(Directory *dir, guchar *leafname)
+/* Stat this item and add, update or remove it.
+ * Returns the new/updated item, if any.
+ * (leafname may be from the current DirItem item)
+ */
+static DirItem *insert_item(Directory *dir, guchar *leafname)
 {
 	static GString  *tmp = NULL;
 
@@ -594,7 +610,7 @@ static void insert_item(Directory *dir, guchar *leafname)
 		remove_item(dir, item);
 		if (do_compare)
 			pixmap_unref(old.image);
-		return;
+		return NULL;
 	}
 
 	if (do_compare)
@@ -614,7 +630,7 @@ static void insert_item(Directory *dir, guchar *leafname)
 		 && item->name_width == old.name_width)
 		{
 			pixmap_unref(old.image);
-			return;
+			return item;
 		}
 		pixmap_unref(old.image);
 
@@ -622,6 +638,8 @@ static void insert_item(Directory *dir, guchar *leafname)
 
 	g_ptr_array_add(dir->up_items, item);
 	delayed_notify(dir);
+
+	return item;
 }
 
 static Directory *load(char *pathname, gpointer data)
