@@ -35,7 +35,8 @@
 extern "C" {
 #endif /* __cplusplus */
 
-#define XDG_MIME_TYPE_UNKNOWN "application/octet-stream"
+extern const char *xdg_mime_type_unknown;
+#define XDG_MIME_TYPE_UNKNOWN xdg_mime_type_unknown
 
 #ifdef XDG_PREFIX
 #define XDG_ENTRY(func) _XDG_ENTRY2(XDG_PREFIX,func)

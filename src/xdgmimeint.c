@@ -65,33 +65,33 @@ _xdg_utf8_to_ucs4(const char *source)
     {
       int bytelength = 0;
       xdg_unichar_t result;
-      if ( ! *source & 0x40 )
+      if ( ! (*source & 0x40) )
 	{
 	  ucs32 = *source;
 	}
       else
 	{
-	  if ( ! *source & 0x20 )
+	  if ( ! (*source & 0x20) )
 	    {
 	      result = *source++ & 0x1F;
 	      bytelength = 2;
 	    }
-	  else if ( ! *source & 0x10 )
+	  else if ( ! (*source & 0x10) )
 	    {
 	      result = *source++ & 0x0F;
 	      bytelength = 3;
 	    }
-	  else if ( ! *source & 0x08 )
+	  else if ( ! (*source & 0x08) )
 	    {
 	      result = *source++ & 0x07;
 	      bytelength = 4;
 	    }
-	  else if ( ! *source & 0x04 )
+	  else if ( ! (*source & 0x04) )
 	    {
 	      result = *source++ & 0x03;
 	      bytelength = 5;
 	    }
-	  else if ( ! *source & 0x02 )
+	  else if ( ! (*source & 0x02) )
 	    {
 	      result = *source++ & 0x01;
 	      bytelength = 6;

@@ -38,7 +38,7 @@
 static int initted = 0;
 static XdgGlobHash *global_hash = NULL;
 static XdgMimeMagic *global_magic = NULL;
-
+const char *xdg_mime_type_unknown = "application/octet-stream";
 
 static void
 _xdg_mime_init_from_directory (const char *directory)
