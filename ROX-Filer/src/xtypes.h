@@ -17,7 +17,8 @@
 #endif 
 
 /* Prototypes */
-extern MIME_type *xtype_get(const char *path);
-extern int xtype_set(const char *path, const MIME_type *type);
+MIME_type *xtype_get(const char *path);
+int xtype_set(const char *path, const MIME_type *type);
+void xtype_init(void);
 
 #endif

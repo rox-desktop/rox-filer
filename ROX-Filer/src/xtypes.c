@@ -36,16 +36,6 @@
 
 #include <glib.h>
 
-#ifdef HAVE_GETXATTR
-#if defined(HAVE_ATTR_XATTR_H)
-#include <attr/xattr.h>
-#elif defined(HAVE_SYS_XATTR_H)
-#include <sys/xattr.h>
-#else
-#error "Where is getxattr defined?"
-#endif
-#endif
-
 #include "global.h"
 #include "type.h"
 #include "xtypes.h"
@@ -55,19 +45,41 @@
 #if defined(HAVE_GETXATTR)
 /* Linux implementation */
 
+#include <dlfcn.h>
+
+static int (*dyn_setxattr)(const char *path, const char *name,
+		     const void *value, size_t size, int flags) = NULL;
+static ssize_t (*dyn_getxattr)(const char *path, const char *name,
+			 void *value, size_t size) = NULL;
+
+void xtype_init(void)
+{
+	void *libc;
+	
+	libc = dlopen("libc.so.6", RTLD_LAZY | RTLD_NOLOAD);
+	if (!libc)
+		return;	/* Give up on xattr support */
+
+	(void *) dyn_setxattr = dlsym(libc, "setxattr");
+	(void *) dyn_getxattr = dlsym(libc, "setxattr");
+}
+
 MIME_type *xtype_get(const char *path)
 {
 	ssize_t size;
 	gchar *buf;
 	MIME_type *type = NULL;
 
-	size = getxattr(path, XTYPE_ATTR, "", 0);
+	if (!dyn_getxattr)
+		return type_from_path(path);	/* Old libc */
+
+	size = dyn_getxattr(path, XTYPE_ATTR, "", 0);
 	if (size > 0)
 	{
 		int new_size;
 
 		buf = g_new(gchar, size + 1);
-		new_size = getxattr(path, XTYPE_ATTR, buf, size);
+		new_size = dyn_getxattr(path, XTYPE_ATTR, buf, size);
 
 		if (size == new_size)
 		{
@@ -90,14 +102,25 @@ int xtype_set(const char *path, const MIME_type *type)
 	int res;
 	gchar *ttext;
 
+	if (!dyn_setxattr)
+	{
+		errno = ENOSYS;
+		return 1; /* Set type failed */
+	}
+
 	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
-	res = setxattr(path, XTYPE_ATTR, ttext, strlen(ttext), 0);
+	res = dyn_setxattr(path, XTYPE_ATTR, ttext, strlen(ttext), 0);
 	g_free(ttext);
 
 	return res;
 }
 
 #elif defined(HAVE_ATTROPEN)
+
+void xtype_init(void)
+{
+}
+
 /* Solaris 9 implementation */
 
 MIME_type *xtype_get(const char *path)
@@ -153,6 +176,10 @@ int xtype_set(const char *path, const MIME_type *type)
 
 #else
 /* No extended attricutes available */
+
+void xtype_init(void)
+{
+}
 
 MIME_type *xtype_get(const char *path)
 {

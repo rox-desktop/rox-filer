@@ -71,6 +71,7 @@
 #include "panel.h"
 #include "session.h"
 #include "minibuffer.h"
+#include "xtypes.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 int to_wakeup_pipe = -1;	/* Write here to get noticed */
@@ -211,6 +212,7 @@ int main(int argc, char **argv)
 	/* Get internationalisation up and running. This requires the
 	 * choices system, to discover the user's preferred language.
 	 */
+	xtype_init();
 	choices_init();
 	options_init();
 	i18n_init();
