@@ -5,7 +5,7 @@
 BUILDDIR = ../build
 
 all:
-	cd ${BUILDDIR} && make
+	cd ${BUILDDIR} && ${MAKE}
 
 clean:
-	cd ${BUILDDIR} && make clean
+	cd ${BUILDDIR} && ${MAKE} clean
