@@ -33,7 +33,6 @@
 
 #include "config.h"
 #include <string.h>
-#include <parser.h>
 #include <tree.h>
 
 #include "global.h"
