@@ -51,6 +51,8 @@ static FindCondition *parse_is(guchar **expression);
 static Eval *parse_eval(guchar **expression);
 static Eval *parse_variable(guchar **expression);
 
+static gboolean match(guchar **expression, guchar *word);
+
 typedef enum {
 	IS_DIR,
 	IS_REG,
@@ -108,13 +110,10 @@ struct _Eval
 	gpointer	data2;
 };
 
-
 #define EAT ((*expression)++)
 #define NEXT (**expression)
 #define SKIP while (NEXT == ' ' || NEXT == '\t') EAT
-#define MATCH(word) (g_strncasecmp(*expression, word, sizeof(word) - 1) == 0 \
-		&& (isalpha((*expression)[sizeof(word) - 1]) == 0)	\
-		&& ((*expression) += sizeof(word) - 1))
+#define MATCH(word) (match(expression, word))
 
 #ifndef S_ISVTX
 # define S_ISVTX 0x0001000
@@ -902,4 +901,20 @@ static Eval *parse_variable(guchar **expression)
 	eval->data2 = NULL;
 
 	return eval;
+}
+
+static gboolean match(guchar **expression, guchar *word)
+{
+	int	len;
+
+	len = strlen(word);
+	if (g_strncasecmp(*expression, word, len))
+		return FALSE;
+
+	if (isalpha(*(*expression + len)))
+		return FALSE;
+
+	(*expression) += len;
+
+	return TRUE;
 }
