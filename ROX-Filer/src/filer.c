@@ -30,6 +30,7 @@
 #include <time.h>
 #include <ctype.h>
 #include <math.h>
+#include <netdb.h>
 #include <tree.h>
 
 #include <gtk/gtk.h>
@@ -112,8 +113,17 @@ static GdkCursor *crosshair = NULL;
 
 gboolean o_unique_filer_windows = FALSE;
 
+/* Indicates whether the filer's display is different to the machine it
+ * is actually running on.
+ */
+static gboolean not_local=FALSE;
+
 void filer_init(void)
 {
+	gchar *ohost;
+	gchar *dpyhost, *dpy;
+	gchar *tmp;
+  
 	option_add_int("filer_size_limit", 75, NULL);
 	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
@@ -121,6 +131,30 @@ void filer_init(void)
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
+
+	/* Is the display on the local machine, or are we being
+	 * run remotely? See filer_set_title().
+	 */
+	ohost = our_host_name();
+	dpy = gdk_get_display();
+	dpyhost = g_strdup(dpy);
+	tmp = strchr(dpyhost, ':');
+	if (tmp) 
+	        *tmp = '\0';
+
+	if (dpyhost[0] && strcmp(ohost, dpyhost) != 0)
+	{
+	        /* Try the cannonical name for dpyhost (see our_host_name()
+	         * in support.c).
+		 */
+	        struct hostent *ent;
+		
+		ent = gethostbyname(dpyhost);
+		if (!ent || strcmp(ohost, ent->h_name) != 0)
+		        not_local = TRUE;
+	}
+	
+	g_free(dpyhost);
 }
 
 static void set_unique(guchar *unique)
@@ -1470,7 +1504,13 @@ static void filer_set_title(FilerWindow *filer_window)
 	guchar	*title = NULL;
 	guchar	*scanning = filer_window->scanning ? _(" (Scanning)") : "";
 
-	if (home_dir_len > 1 &&
+	if (not_local)
+	{
+	        title = g_strconcat("//", our_host_name(),
+			    filer_window->path, scanning, NULL);
+	}
+	
+	if (!title && home_dir_len > 1 &&
 		strncmp(filer_window->path, home_dir, home_dir_len) == 0)
 	{
 		guchar 	sep = filer_window->path[home_dir_len];
