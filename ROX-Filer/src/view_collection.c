@@ -1863,6 +1863,8 @@ static void view_collection_autosize(ViewIface *view)
 	}
 
 	n = collection->number_of_items;
+	if (n == 0)
+		h = ICON_HEIGHT * 1.5;
 	n = MAX(n, 2);
 
 	max_x = (o_filer_size_limit.int_value * screen_width) / 100;
