@@ -403,8 +403,8 @@ void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
-	*x = pos[0] - (requisition.width >> 2);
-	*y = pos[1] - (requisition.height >> 2);
+	*x = pos[0] - (requisition.width * 7 / 8);
+	*y = pos[1] - (requisition.height * 3 / 18);
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
