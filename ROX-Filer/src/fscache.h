@@ -68,7 +68,8 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 void g_fscache_destroy(GFSCache *cache);
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname);
 gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
-				FSCacheLookup lookup_type);
+				FSCacheLookup lookup_type,
+				gboolean *found);
 void g_fscache_may_update(GFSCache *cache, char *pathname);
 void g_fscache_update(GFSCache *cache, char *pathname);
 void g_fscache_purge(GFSCache *cache, gint age);

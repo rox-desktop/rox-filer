@@ -109,5 +109,7 @@ void filer_target_mode(FilerWindow	*filer_window,
 void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink);
 GList *filer_selected_items(FilerWindow *filer_window);
 void filer_create_thumb(FilerWindow *filer_window, gchar *pathname);
+void filer_cancel_thumbnails(FilerWindow *filer_window);
+void filer_set_title(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

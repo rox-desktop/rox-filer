@@ -205,7 +205,7 @@ void dir_check_this(guchar *path)
 		*slash = '\0';
 
 		dir = g_fscache_lookup_full(dir_cache, real_path,
-						FSCACHE_LOOKUP_PEEK);
+						FSCACHE_LOOKUP_PEEK, NULL);
 		if (dir)
 			dir_recheck(dir, real_path, slash + 1);
 	}
@@ -225,7 +225,8 @@ void dir_force_update_path(gchar *path)
 
 	dir_path = g_dirname(path);
 
-	dir = g_fscache_lookup_full(dir_cache, dir_path, FSCACHE_LOOKUP_PEEK);
+	dir = g_fscache_lookup_full(dir_cache, dir_path, FSCACHE_LOOKUP_PEEK,
+			NULL);
 	if (dir)
 		dir_force_update_item(dir, g_basename(path));
 	

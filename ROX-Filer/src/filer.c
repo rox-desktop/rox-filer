@@ -98,7 +98,6 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
-static void filer_set_title(FilerWindow *filer_window);
 static gint coll_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        FilerWindow *filer_window);
@@ -119,8 +118,7 @@ static void group_free(int i);
 
 static void set_unique(guchar *unique);
 static void set_selection_state(FilerWindow *collection, gboolean normal);
-static void cancel_thumbnails(FilerWindow *filer_window);
-static void filer_next_thumb(FilerWindow *filer_window);
+static void filer_next_thumb(FilerWindow *filer_window, gchar *path);
 
 static void start_thumb_scanning(FilerWindow *filer_window);
 
@@ -1064,7 +1062,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 
 	g_return_if_fail(filer_window != NULL);
 
-	cancel_thumbnails(filer_window);
+	filer_cancel_thumbnails(filer_window);
 
 	filer_tooltip_prime(NULL, NULL);
 
@@ -1463,10 +1461,11 @@ static void filer_add_widgets(FilerWindow *filer_window)
 				filer_window->thumb_progress, TRUE, TRUE, 0);
 
 		cancel = gtk_button_new_with_label(_("Cancel"));
+		GTK_WIDGET_UNSET_FLAGS(cancel, GTK_CAN_FOCUS);
 		gtk_box_pack_start(GTK_BOX(filer_window->thumb_bar),
 				cancel, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(cancel), "clicked",
-				GTK_SIGNAL_FUNC(cancel_thumbnails),
+				GTK_SIGNAL_FUNC(filer_cancel_thumbnails),
 				(GtkObject *) filer_window);
 	}
 
@@ -1705,15 +1704,27 @@ gboolean filer_exists(FilerWindow *filer_window)
 	return FALSE;
 }
 
-static void filer_set_title(FilerWindow *filer_window)
+/* Make sure the window title is up-to-date */
+void filer_set_title(FilerWindow *filer_window)
 {
 	guchar	*title = NULL;
-	guchar	*scanning = filer_window->scanning ? _(" (Scanning)") : "";
+	guchar	*flags = "";
+
+	if (filer_window->scanning || filer_window->show_hidden ||
+				filer_window->show_thumbs)
+	{
+		flags = g_strconcat(" (",
+				filer_window->scanning ? _("Scanning, ") : "",
+				filer_window->show_hidden ? _("All, ") : "",
+				filer_window->show_thumbs ? _("Thumbs, ") : "",
+				NULL);
+		flags[strlen(flags) - 2] = ')';
+	}
 
 	if (not_local)
 	{
 	        title = g_strconcat("//", our_host_name(),
-			    filer_window->path, scanning, NULL);
+			    filer_window->path, flags, NULL);
 	}
 	
 	if (!title && home_dir_len > 1 &&
@@ -1724,15 +1735,18 @@ static void filer_set_title(FilerWindow *filer_window)
 		if (sep == '\0' || sep == '/')
 			title = g_strconcat("~",
 					filer_window->path + home_dir_len,
-					scanning,
+					flags,
 					NULL);
 	}
 	
 	if (!title)
-		title = g_strconcat(filer_window->path, scanning, NULL);
+		title = g_strconcat(filer_window->path, flags, NULL);
 
 	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
 	g_free(title);
+
+	if (flags[0] != '\0')
+		g_free(flags);
 }
 
 /* Reconnect to the same directory (used when the Show Hidden option is
@@ -2217,7 +2231,7 @@ static void set_selection_state(FilerWindow *filer_window, gboolean normal)
 		gtk_widget_queue_draw(GTK_WIDGET(filer_window->collection));
 }
 
-static void cancel_thumbnails(FilerWindow *filer_window)
+void filer_cancel_thumbnails(FilerWindow *filer_window)
 {
 	gtk_widget_hide(filer_window->thumb_bar);
 
@@ -2234,7 +2248,7 @@ static gboolean filer_next_thumb_real(FilerWindow *filer_window)
 
 	if (!filer_window->thumb_queue)
 	{
-		cancel_thumbnails(filer_window);
+		filer_cancel_thumbnails(filer_window);
 		return FALSE;
 	}
 
@@ -2257,8 +2271,11 @@ static gboolean filer_next_thumb_real(FilerWindow *filer_window)
 	return FALSE;
 }
 
-static void filer_next_thumb(FilerWindow *filer_window)
+/* path is the thumb just loaded, if any */
+static void filer_next_thumb(FilerWindow *filer_window, gchar *path)
 {
+	if (path)
+		dir_force_update_path(path);
 	gtk_idle_add((GtkFunction) filer_next_thumb_real, filer_window);
 }
 
@@ -2268,9 +2285,10 @@ static void start_thumb_scanning(FilerWindow *filer_window)
 		return;		/* Already scanning */
 
 	gtk_widget_show_all(filer_window->thumb_bar);
-	filer_next_thumb(filer_window);
+	filer_next_thumb(filer_window, NULL);
 }
 
+/* Set this image to be loaded some time in the future */
 void filer_create_thumb(FilerWindow *filer_window, gchar *path)
 {
 	filer_window->max_thumbs++;

@@ -52,7 +52,6 @@
 #include "dir.h"
 
 GFSCache *pixmap_cache = NULL;
-FilerWindow *pixmap_cache_load_via = NULL;
 
 static const char * bad_xpm[] = {
 "12 12 3 1",
@@ -98,6 +97,7 @@ static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static void got_thumb_data(GdkPixbufLoader *loader,
 				gint fd, GdkInputCondition cond);
+static GdkPixbuf *get_thumbnail_for(char *path);
 
 
 /****************************************************************
@@ -246,11 +246,43 @@ void pixmap_make_small(MaskedPixmap *mp)
 
 /* Load image 'path' in the background and insert into pixmap_cache.
  * Call callback(data, path) when done (PATH is NULL error).
+ * If the image is already uptodate, or being created already, calls the
+ * callback right away.
  */
 void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 {
 	GdkPixbufLoader *loader;
-	int	fd, tag;
+	int		fd, tag;
+	gboolean	found;
+	MaskedPixmap	*image;
+	GdkPixbuf	*pixbuf;
+
+	image = g_fscache_lookup_full(pixmap_cache, path,
+					FSCACHE_LOOKUP_ONLY_NEW, &found);
+
+	if (image || found)
+	{
+		/* Thumbnail is known, or being created */
+		callback(data, NULL);
+		return;
+	}
+
+	pixbuf = get_thumbnail_for(path);
+	if (pixbuf)
+	{
+		MaskedPixmap *image;
+
+		image = image_from_pixbuf(pixbuf);
+		gdk_pixbuf_unref(pixbuf);
+		g_fscache_insert(pixmap_cache, path, image);
+		callback(data, path);
+		return;
+	}
+
+	/* Add an entry, set to NULL, so no-one else tries to load this
+	 * image.
+	 */
+	g_fscache_insert(pixmap_cache, path, NULL);
 
 	fd = mc_open(path, O_RDONLY | O_NONBLOCK);
 	if (fd == -1)
@@ -404,14 +436,7 @@ static MaskedPixmap *image_from_file(char *path)
 	
 	pixbuf = get_thumbnail_for(path);
 	if (!pixbuf)
-	{
-		if (pixmap_cache_load_via)
-		{
-			filer_create_thumb(pixmap_cache_load_via, path);
-			return NULL;
-		}
 		pixbuf = gdk_pixbuf_new_from_file(path, &error);
-	}
 	if (!pixbuf)
 	{
 		g_print("%s\n", error ? error->message : _("Unknown error"));
@@ -664,7 +689,6 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 #endif
 			gdk_pixbuf_unref(pixbuf);
 			pixmap_unref(image);
-			dir_force_update_path(path);
 		}
 		else
 			got = -1;

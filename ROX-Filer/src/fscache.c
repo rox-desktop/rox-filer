@@ -140,7 +140,8 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
  */
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 {
-	return g_fscache_lookup_full(cache, pathname, FSCACHE_LOOKUP_CREATE);
+	return g_fscache_lookup_full(cache, pathname,
+			FSCACHE_LOOKUP_CREATE, NULL);
 }
 
 /* Force this already-loaded item into the cache. The cache will
@@ -150,7 +151,8 @@ void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
 {
 	GFSCacheData	*data;
 
-	data = g_fscache_lookup_full(cache, pathname, FSCACHE_LOOKUP_INIT);
+	data = g_fscache_lookup_full(cache, pathname,
+					FSCACHE_LOOKUP_INIT, NULL);
 
 	if (!data)
 		return;
@@ -164,9 +166,13 @@ void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
 
 /* As g_fscache_lookup, but 'lookup_type' controls what happens if the data
  * is out-of-date.
+ * If found is not NULL, use it to indicate whether the cache has an entry
+ * for this file (a NULL return could indicate that the data is cached, but
+ * the data is NULL).
  */
 gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
-				FSCacheLookup lookup_type)
+				FSCacheLookup lookup_type,
+				gboolean *found)
 {
 	struct stat 	info;
 	GFSCacheKey	key;
@@ -176,12 +182,19 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 	g_return_val_if_fail(pathname != NULL, NULL);
 
 	if (mc_stat(pathname, &info))
+	{
+		if (found)
+			*found = FALSE;
 		return NULL;
+	}
 
 	key.device = info.st_dev;
 	key.inode = info.st_ino;
 
 	data = g_hash_table_lookup(cache->inode_to_stats, &key);
+
+	if (found)
+		*found = (data != NULL);
 
 	if (data)
 	{
