@@ -120,7 +120,7 @@ void bulk_rename(const char *dir, GList *items)
 	button = gtk_button_new_with_label(_("Apply"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 	gtk_tooltips_set_tip(tooltips, button,
-			_("Do a search-and-replace in the New column."
+			_("Do a search-and-replace in the New column. "
 			"The files are not actually renamed until you click "
 			"on the Rename button below."), NULL);
 
