@@ -1,4 +1,7 @@
-all: Manual.valid Manual.html
+all: Manual.valid Manual.html Structs.png Prune.png
+
+%.png: %.dia
+	dia --nosplash -e $@ $<
 
 %.valid: %.xml
 	nsgmls -s -wxml /usr/lib/sgml/declaration/xml.decl $<

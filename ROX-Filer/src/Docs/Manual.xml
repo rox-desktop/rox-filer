@@ -2030,7 +2030,18 @@ The second looks for <filename>.c</filename> files, but does not bother
 checking inside directories called <filename>src</filename>.
 The expression is evaluated like this:
 
-{\centering \resizebox*{!}{2.5in}{\includegraphics{Prune.eps}} \par}
+<mediaobject>
+  <imageobject>
+    <imagedata align="center" format="PNG" fileref="Prune.png"/>
+  </imageobject>
+  <textobject>
+    <para>
+If file is named <filename>src</filename> then `Prune'.
+Either way, check if it ends in <filename>.c</filename> and include
+it in the results if so.
+    </para>
+  </textobject>
+</mediaobject>
 
   </para>
 </sect1>
@@ -2845,14 +2856,15 @@ files from the <filename>.c</filename> files and links to produce
 
 <sect1><title>Data-structures</title>
   <para>
-
 The diagram below shows some of the major structures found in the
 filer and the relationships between them.
   </para>
-
-  <para>
-{\centering \resizebox*{1\textwidth}{!}{\includegraphics{Structs.eps}} \par}
-  </para>
+<mediaobject>
+  <imageobject>
+    <imagedata align="center" format="PNG" fileref="Structs.png"/>
+  </imageobject>
+  <textobject><para>Can't display image.</para></textobject>
+</mediaobject>
 
   <para>
 To summarise, each window has its own <classname>FilerWindow</classname>
