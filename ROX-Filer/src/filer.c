@@ -797,7 +797,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 
 	while ((item = iter.next(&iter)))
-		xmlNewChild(group, NULL, "item", item->leafname);
+		xmlNewTextChild(group, NULL, "item", item->leafname);
 
 	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
 	if (save_path)
