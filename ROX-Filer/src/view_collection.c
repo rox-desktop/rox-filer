@@ -1588,9 +1588,10 @@ static DirItem *iter_init(ViewIter *iter)
 	int n = collection->number_of_items;
 	int flags = iter->flags;
 
-	g_return_val_if_fail(iter->n_remaining > 0, NULL);
-	
 	iter->peek = iter_peek;
+
+	if (iter->n_remaining == 0)
+		return NULL;
 
 	if (flags & VIEW_ITER_FROM_CURSOR)
 	{

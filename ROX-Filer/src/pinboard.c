@@ -117,9 +117,7 @@ static gint	wink_timeout;
 
 /* Used for the text colours (only) in the icons (and tasklist windows) */
 GdkColor pin_text_fg_col, pin_text_bg_col;
-
-/* Style that all the icons should use. NULL => regenerate from text_fg/bg */
-static GtkStyle *pinicon_style = NULL;
+PangoFontDescription *pinboard_font = NULL;	/* NULL => Gtk default */
 
 Pinboard	*current_pinboard = NULL;
 static gint	loading_pinboard = 0;		/* Non-zero => loading */
@@ -131,6 +129,7 @@ static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
 static Option o_iconify_start, o_iconify_dir;
+static Option o_label_font;
 
 /* Static prototypes */
 static GType pin_icon_get_type(void);
@@ -205,6 +204,7 @@ static void drag_backdrop_dropped(GtkWidget	*frame,
 			      GtkWidget		*dialog);
 static void backdrop_response(GtkWidget *dialog, gint response, gpointer data);
 static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect);
+static void update_pinboard_font(void);
 
 
 /****************************************************************
@@ -215,6 +215,7 @@ void pinboard_init(void)
 {
 	option_add_string(&o_pinboard_fg_colour, "pinboard_fg_colour", "#fff");
 	option_add_string(&o_pinboard_bg_colour, "pinboard_bg_colour", "#888");
+	option_add_string(&o_label_font, "label_font", "");
 
 	option_add_int(&o_pinboard_clamp_icons, "pinboard_clamp_icons", 1);
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
@@ -230,6 +231,7 @@ void pinboard_init(void)
 
 	gdk_color_parse(o_pinboard_fg_colour.value, &pin_text_fg_col);
 	gdk_color_parse(o_pinboard_bg_colour.value, &pin_text_bg_col);
+	update_pinboard_font();
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -693,16 +695,12 @@ static void pinboard_check_options(void)
 	tasklist_set_active(o_pinboard_tasklist.int_value && current_pinboard);
 
 	if (gdk_color_equal(&n_fg, &pin_text_fg_col) == 0 ||
-		gdk_color_equal(&n_bg, &pin_text_bg_col) == 0)
+		gdk_color_equal(&n_bg, &pin_text_bg_col) == 0 ||
+		o_label_font.has_changed)
 	{
 		pin_text_fg_col = n_fg;
 		pin_text_bg_col = n_bg;
-
-		if (pinicon_style)
-		{
-			g_object_unref(G_OBJECT(pinicon_style));
-			pinicon_style = NULL;
-		}
+		update_pinboard_font();
 
 		if (current_pinboard)
 		{
@@ -732,8 +730,8 @@ static gint end_wink(gpointer data)
 	return FALSE;
 }
 
-/* Updates the width, height, name_width and label fields, and resizes the
- * window. Also sets the style to pinicon_style, generating it if needed.
+/* Sets the appearance from the options and updates the size request of
+ * the image.
  */
 static void set_size_and_style(PinIcon *pi)
 {
@@ -746,6 +744,7 @@ static void set_size_and_style(PinIcon *pi)
 	gtk_widget_modify_bg(pi->label, GTK_STATE_PRELIGHT, &pin_text_bg_col);
 	gtk_widget_modify_fg(pi->label, GTK_STATE_NORMAL, &pin_text_fg_col);
 	gtk_widget_modify_bg(pi->label, GTK_STATE_NORMAL, &pin_text_bg_col);
+	widget_modify_font(pi->label, pinboard_font);
 
 	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
 
@@ -2108,5 +2107,15 @@ static void pinboard_reshape_icon(Icon *icon)
 		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
 				pi->win, x, y);
 	}
+}
+
+/* Sets the pinboard_font global from the option. Doesn't do anything else. */
+static void update_pinboard_font(void)
+{
+	if (pinboard_font)
+		pango_font_description_free(pinboard_font);
+	pinboard_font = o_label_font.value[0] != '\0'
+			? pango_font_description_from_string(o_label_font.value)
+			: NULL;
 }
 

@@ -466,6 +466,26 @@ out:
 
 }
 
+static void toggle_active_font(GtkToggleButton *toggle, Option *option)
+{
+	if (current_fontsel_box)
+		gtk_widget_destroy(GTK_WIDGET(current_fontsel_box));
+
+	if (gtk_toggle_button_get_active(toggle))
+	{
+		gtk_widget_set_sensitive(option->widget->parent, TRUE);
+		gtk_label_set_text(GTK_LABEL(option->widget), "Sans 12");
+	}
+	else
+	{
+		gtk_widget_set_sensitive(option->widget->parent, FALSE);
+		gtk_label_set_text(GTK_LABEL(option->widget),
+				   _("(use default)"));
+	}
+
+	option_check_widget(option);
+}
+
 static void open_fontsel(GtkWidget *button, Option *option)
 {
 	if (current_fontsel_box)
@@ -1193,7 +1213,20 @@ static void update_menu(Option *option)
 
 static void update_font(Option *option)
 {
-	gtk_label_set_text(GTK_LABEL(option->widget), option->value);
+	GtkToggleButton *active;
+	gboolean have_font = option->value[0] != '\0';
+
+	active = g_object_get_data(G_OBJECT(option->widget), "rox_override");
+
+	if (active)
+	{
+		gtk_toggle_button_set_active(active, have_font);
+		gtk_widget_set_sensitive(option->widget->parent, have_font);
+	}
+	
+	gtk_label_set_text(GTK_LABEL(option->widget),
+			   have_font ? option->value
+				     : (guchar *) _("(use default)"));
 }
 
 static void update_colour(Option *option)
@@ -1244,6 +1277,12 @@ static guchar *read_menu(Option *option)
 
 static guchar *read_font(Option *option)
 {
+	GtkToggleButton *active;
+
+	active = g_object_get_data(G_OBJECT(option->widget), "rox_override");
+	if (active && !gtk_toggle_button_get_active(active))
+		return g_strdup("");
+	
 	return g_strdup(gtk_label_get_text(GTK_LABEL(option->widget)));
 }
 
@@ -1639,13 +1678,28 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 static GList *build_font(Option *option, xmlNode *node, guchar *label)
 {
 	GtkWidget	*hbox, *button;
+	GtkWidget	*active = NULL;
+	int		override;
 
 	g_return_val_if_fail(option != NULL, NULL);
 
+	override = get_int(node, "override");
+
 	hbox = gtk_hbox_new(FALSE, 4);
 
-	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
-			FALSE, TRUE, 0);
+	if (override)
+	{
+		/* Add a check button to enable the font chooser. If off,
+		 * the option's value is "".
+		 */
+		active = gtk_check_button_new_with_label(_(label));
+		gtk_box_pack_start(GTK_BOX(hbox), active, FALSE, TRUE, 0);
+		g_signal_connect(active, "toggled",
+				 G_CALLBACK(toggle_active_font), option);
+	}
+	else
+		gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_(label)),
+				FALSE, TRUE, 0);
 
 	button = gtk_button_new_with_label("");
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
@@ -1654,6 +1708,8 @@ static GList *build_font(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_font;
 	option->widget = GTK_BIN(button)->child;
 	may_add_tip(button, node);
+
+	g_object_set_data(G_OBJECT(option->widget), "rox_override", active);
 
 	g_signal_connect(button, "clicked", G_CALLBACK(open_fontsel), option);
 

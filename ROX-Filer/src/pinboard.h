@@ -13,6 +13,7 @@ extern Pinboard	*current_pinboard;
 extern Icon *pinboard_drag_in_progress;
 
 extern GdkColor pin_text_fg_col, pin_text_bg_col;
+extern PangoFontDescription *pinboard_font;
 
 typedef enum {
 	BACKDROP_NONE,

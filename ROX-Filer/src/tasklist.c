@@ -809,6 +809,7 @@ static void update_style(gpointer key, gpointer data, gpointer user_data)
 					GTK_STATE_NORMAL, &pin_text_fg_col);
 		gtk_widget_modify_bg(win->label,
 					GTK_STATE_NORMAL, &pin_text_bg_col);
+		widget_modify_font(win->label, pinboard_font);
 	}
 }
 

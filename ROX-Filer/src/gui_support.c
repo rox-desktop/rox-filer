@@ -915,3 +915,23 @@ void tooltip_prime(GtkFunction callback, GObject *object)
 					   object,
 					   g_object_unref);
 }
+
+/* Like gtk_widget_modify_font, but copes with font_desc == NULL */
+void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc)
+{
+	GtkRcStyle *rc_style;
+
+	g_return_if_fail(GTK_IS_WIDGET(widget));
+
+	rc_style = gtk_widget_get_modifier_style(widget);  
+
+	if (rc_style->font_desc)
+		pango_font_description_free(rc_style->font_desc);
+
+	rc_style->font_desc = font_desc
+				? pango_font_description_copy(font_desc)
+				: NULL;
+
+	gtk_widget_modify_style(widget, rc_style);
+}
+
