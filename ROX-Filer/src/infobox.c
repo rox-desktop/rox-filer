@@ -60,7 +60,7 @@ struct _FileStatus
 static void refresh_info(GObject *window);
 static GtkWidget *make_vbox(guchar *path);
 static GtkWidget *make_details(guchar *path, DirItem *item);
-static GtkWidget *make_about(guchar *path, xmlNode *about);
+static GtkWidget *make_about(guchar *path, XMLwrapper *ai);
 static GtkWidget *make_file_says(guchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
@@ -230,7 +230,7 @@ static GtkWidget *make_vbox(guchar *path)
 	g_free(help_dir);
 
 	if (about)
-		add_frame(vbox, make_about(path, about));
+		add_frame(vbox, make_about(path, ai));
 	else
 		gtk_box_pack_start_defaults(vbox, make_file_says(path));
 
@@ -373,35 +373,77 @@ static GtkWidget *make_details(guchar *path, DirItem *item)
 	return view;
 }
 	
-/* Create the TreeView widget with the application's details, or
- * the file(1) summary (for non-apps).
- */
-static GtkWidget *make_about(guchar *path, xmlNode *about)
+/* Create the TreeView widget with the application's details */
+static GtkWidget *make_about(guchar *path, XMLwrapper *ai)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
 	xmlNode 	*prop;
 	gchar		*tmp;
+	xmlNode		*about, *about_trans;
+	GHashTable	*translate;
+
+	g_return_val_if_fail(ai != NULL, NULL);
+
+	about_trans = xml_get_section(ai, NULL, "About");
+
+	about = xmlDocGetRootElement(ai->doc)->xmlChildrenNode;
+	for (; about; about = about->next)
+	{
+		if (about->type != XML_ELEMENT_NODE)
+			continue;
+		if (about->ns == NULL && strcmp(about->name, "About") == 0)
+			break;
+	}
 
 	g_return_val_if_fail(about != NULL, NULL);
-
+	
 	make_list(&store, &view);
+
+	/* Add each field in about to the list, but overriding each element
+	 * with about_trans if a translation is supplied.
+	 */
+	translate = g_hash_table_new_full(g_str_hash, g_str_equal,
+					  NULL, g_free);
+	if (about_trans != about)
+	{
+		xmlNode *p;
+		for (p = about_trans->xmlChildrenNode; p; p = p->next)
+		{
+			if (p->type != XML_ELEMENT_NODE)
+				continue;
+			tmp = xmlNodeListGetString(p->doc,
+						   p->xmlChildrenNode, 1);
+			if (tmp)
+				g_hash_table_insert(translate,
+						(char *) p->name, tmp);
+		}
+
+	}
 
 	for (prop = about->xmlChildrenNode; prop; prop = prop->next)
 	{
 		if (prop->type == XML_ELEMENT_NODE)
 		{
 			char *l;
+			char *trans;
 
+			trans = g_hash_table_lookup(translate, prop->name);
+			
 			l = g_strconcat((char *) prop->name, ":", NULL);
-			tmp = xmlNodeListGetString(prop->doc,
-					prop->xmlChildrenNode, 1);
+			if (trans)
+				tmp = g_strdup(trans);
+			else
+				tmp = xmlNodeListGetString(prop->doc,
+						prop->xmlChildrenNode, 1);
 			if (!tmp)
 				tmp = g_strdup("-");
 			add_row_and_free(store, l, tmp);
 			g_free(l);
 		}
 	}
+
+	g_hash_table_destroy(translate);
 
 	return view;
 }
