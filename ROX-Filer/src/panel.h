@@ -40,4 +40,6 @@ void panel_save(Panel *panel);
 gboolean panel_want_show_text(Icon *icon);
 void panel_icon_renamed(Icon *icon);
 
+gboolean panel_add(PanelSide side, gchar *path, gchar *label, gboolean after);
+
 #endif /* _PANEL_H */

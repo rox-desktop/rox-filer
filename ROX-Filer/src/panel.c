@@ -322,6 +322,17 @@ void panel_icon_renamed(Icon *icon)
 	gtk_label_set_text(label, icon->item->leafname);
 }
 
+/* Externally visible function to add an item to a panel */
+gboolean panel_add(PanelSide side, gchar *path, gchar *label, gboolean after)
+{
+	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
+	
+	g_return_val_if_fail(current_panel[side] != NULL, FALSE);
+
+	panel_add_item(current_panel[side], path, label, after);
+
+	return TRUE;
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -448,6 +459,9 @@ static void panel_add_item(Panel *panel,
 {
 	GtkWidget	*widget;
 	Icon		*icon;
+
+	g_return_if_fail(panel != NULL);
+	g_return_if_fail(path != NULL);
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,

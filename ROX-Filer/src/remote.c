@@ -88,6 +88,9 @@ static xmlNodePtr rpc_Link(GList *args);
 static xmlNodePtr rpc_FileType(GList *args);
 static xmlNodePtr rpc_Mount(GList *args);
 
+static xmlNodePtr rpc_PanelAdd(GList *args);
+static xmlNodePtr rpc_PinboardAdd(GList *args);
+
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -125,6 +128,9 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Move", rpc_Move, "From,To", "Leafname,Quiet");
 	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
+
+	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
+	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
 
 	/* Look for a property on the root window giving the IPC window
 	 * of an already-running copy of this version of the filer, running
@@ -454,6 +460,26 @@ static char *string_value(xmlNode *arg)
 	return retval ? retval : g_strdup("");
 }
 
+/* Returns the text of this arg as an int, or the default value if not
+ * supplied or not an int.
+ */
+static int int_value(xmlNode *arg, int def)
+{
+	char *str, *end;
+	int i;
+
+	if (!arg)
+		return def;
+	
+	str = xmlNodeGetContent(arg);
+	if (!str || !str[0])
+		return def;
+
+	i = (int) strtol(str, &end, 0);
+
+	return (end > str) ? i : def;
+}
+
 /* Return a list of strings, one for each child node of arg.
  * g_list_free the list, and g_free each string.
  */
@@ -562,27 +588,83 @@ static xmlNodePtr rpc_Pinboard(GList *args)
 	return NULL;
 }
 
+/* args = Path, X, Y, [Label] */
+static xmlNodePtr rpc_PinboardAdd(GList *args)
+{
+	char *path = NULL;
+	gchar *name;
+	int x, y;
+
+	path = string_value(ARG(0));
+	x = int_value(ARG(1), 0);
+	y = int_value(ARG(2), 0);
+	name = string_value(ARG(3));
+	
+	pinboard_pin(path, name, x, y);
+
+	g_free(path);
+
+	return NULL;
+}
+
+/* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
+static PanelSide panel_name_to_side(gchar *side)
+{
+	if (strcmp(side, "Top") == 0)
+		return PANEL_TOP;
+	else if (strcmp(side, "Bottom") == 0)
+		return PANEL_BOTTOM;
+	else if (strcmp(side, "Left") == 0)
+		return PANEL_LEFT;
+	else if (strcmp(side, "Right") == 0)
+		return PANEL_RIGHT;
+	else
+		g_warning("Unknown panel side '%s'", side);
+	return PANEL_NUMBER_OF_SIDES;
+}
+
 /* args = Side, [Name] */
 static xmlNodePtr rpc_Panel(GList *args)
 {
-	char *name, *side;
+	PanelSide side;
+	char *name, *side_name;
 
-	side = string_value(ARG(0));
+	side_name = string_value(ARG(0));
+	side = panel_name_to_side(side_name);
+	g_free(side_name);
+	g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
+
 	name = string_value(ARG(1));
 
-	if (strcmp(side, "Top") == 0)
-		panel_new(name, PANEL_TOP);
-	else if (strcmp(side, "Bottom") == 0)
-		panel_new(name, PANEL_BOTTOM);
-	else if (strcmp(side, "Left") == 0)
-		panel_new(name, PANEL_LEFT);
-	else if (strcmp(side, "Right") == 0)
-		panel_new(name, PANEL_RIGHT);
-	else
-		g_warning("Unknown panel side '%s'", side);
+	panel_new(name, side);
 
-	g_free(side);
 	g_free(name);
+
+	return NULL;
+}
+
+/* args = Side, Path, [Label, After] */
+static xmlNodePtr rpc_PanelAdd(GList *args)
+{
+	PanelSide side;
+	char *path, *side_name, *label;
+	gboolean after = FALSE;
+	int tmp;
+
+	side_name = string_value(ARG(0));
+	side = panel_name_to_side(side_name);
+	g_free(side_name);
+	g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
+
+	path = string_value(ARG(1));
+	label = string_value(ARG(2));
+
+	tmp = bool_value(ARG(3));
+	after = (tmp == -1) ? FALSE : tmp;
+
+	panel_add(side, path, label, after);
+
+	g_free(path);
 
 	return NULL;
 }
