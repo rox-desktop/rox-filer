@@ -325,6 +325,18 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	
 	make_panel_window(icon->win);
 
+	/* TODO: Use gdk function when it supports this type */
+	{
+		gint32 desktop_type;
+
+		desktop_type = gdk_x11_atom_to_xatom(
+			gdk_atom_intern("_NET_WM_WINDOW_TYPE_DESKTOP", FALSE));
+		gdk_property_change(icon->win->window,
+			gdk_atom_intern("_NET_WM_WINDOW_TYPE", FALSE),
+			gdk_atom_intern("ATOM", FALSE), 32,
+			GDK_PROP_MODE_REPLACE, (guchar *) &desktop_type, 1);
+	}
+
 	gtk_widget_add_events(icon->widget,
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |

@@ -269,9 +269,11 @@ void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
 void make_panel_window(GtkWidget *widget)
 {
 	static gboolean need_init = TRUE;
-	static GdkAtom	xa_state, xa_atom, xa_net_state;
+	static GdkAtom	xa_state, xa_atom, xa_net_state, xa_hints;
 	static gint32	state_list[3];
 	GdkWindow *window = widget->window;
+	gint32  values[2];
+	
 
 	g_return_if_fail(window != NULL);
 
@@ -287,6 +289,7 @@ void make_panel_window(GtkWidget *widget)
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
 		xa_atom = gdk_atom_intern("ATOM", FALSE);
 		xa_net_state = gdk_atom_intern("_NET_WM_STATE", FALSE);
+		xa_hints = gdk_atom_intern("WM_HINTS", FALSE);
 
 		state_list[0] = gdk_x11_atom_to_xatom(gdk_atom_intern(
 					"_NET_WM_STATE_STICKY", FALSE));
@@ -314,6 +317,14 @@ void make_panel_window(GtkWidget *widget)
 
 	gdk_property_change(window, xa_net_state, xa_atom, 32,
 			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);
+
+	g_return_if_fail(window != NULL);
+
+	values[0] = 1;		/* InputHint */
+	values[1] = False;
+
+	gdk_property_change(window, xa_hints, xa_hints, 32,
+			GDK_PROP_MODE_REPLACE, (guchar *) values, 2);
 }
 
 gint hide_dialog_event(GtkWidget *widget, GdkEvent *event, gpointer window)

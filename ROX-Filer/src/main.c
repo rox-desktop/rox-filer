@@ -235,6 +235,10 @@ int main(int argc, char **argv)
 	 */
 	rpc = soap_new(&body);
 
+	/* Note: must do this before checking our options */
+	add_default_styles();
+	gtk_init(&argc, &argv);
+
 	while (1)
 	{
 		int	c;
@@ -342,8 +346,6 @@ int main(int argc, char **argv)
 		}
 	}
 
-	add_default_styles();
-	gtk_init(&argc, &argv);
 	tooltips = gtk_tooltips_new();
 
 	if (euid == 0 || show_user)
