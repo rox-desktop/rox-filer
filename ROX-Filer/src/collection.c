@@ -136,6 +136,10 @@ static void cancel_wink(Collection *collection);
 static gint collection_key_press(GtkWidget *widget, GdkEventKey *event);
 static void get_visible_limits(Collection *collection, int *first, int *last);
 static void scroll_to_show(Collection *collection, int item);
+static void collection_item_set_selected(Collection *collection,
+                                         gint item,
+                                         gboolean selected,
+					 gboolean signal);
 #ifndef GTK2
 static void draw_focus(GtkWidget *widget);
 static void collection_draw(GtkWidget *widget, GdkRectangle *area);
@@ -1244,8 +1248,11 @@ static void collection_process_area(Collection	 *collection,
 	guint32		stacked_time;
 	int		item;
 	gboolean	changed = FALSE;
+	guint		old_selected;
 
 	g_return_if_fail(fn == GDK_SET || fn == GDK_INVERT);
+
+	old_selected = collection->number_selected;
 
 	stacked_time = current_event_time;
 	current_event_time = time;
@@ -1262,9 +1269,12 @@ static void collection_process_area(Collection	 *collection,
 				goto out;
 
 			if (fn == GDK_INVERT)
-				collection_toggle_item(collection, item);
+				collection_item_set_selected(collection, item,
+					!collection->items[item].selected,
+					FALSE);
 			else
-				collection_select_item(collection, item);
+				collection_item_set_selected(collection, item,
+								TRUE, FALSE);
 
 			changed = TRUE;
 			item++;
@@ -1272,6 +1282,15 @@ static void collection_process_area(Collection	 *collection,
 	}
 
 out:
+	if (collection->number_selected && !old_selected)
+		gtk_signal_emit(GTK_OBJECT(collection),
+				collection_signals[GAIN_SELECTION],
+				current_event_time);
+	else if (!collection->number_selected && old_selected)
+		gtk_signal_emit(GTK_OBJECT(collection),
+				collection_signals[LOSE_SELECTION],
+				current_event_time);
+	
 	collection_unblock_selection_changed(collection,
 					current_event_time, changed);
 	current_event_time = stacked_time;
@@ -1534,10 +1553,15 @@ static gboolean as_timeout(Collection *collection)
 	return TRUE;
 }
 
-/* Change the selected state of an item */
+/* Change the selected state of an item.
+ * Send GAIN/LOSE signals if 'signal' is TRUE.
+ * Send SELECTION_CHANGED unless blocked.
+ * Updates number_selected and redraws the item.
+ */
 static void collection_item_set_selected(Collection *collection,
                                          gint item,
-                                         gboolean selected)
+                                         gboolean selected,
+					 gboolean signal)
 {
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1552,7 +1576,7 @@ static void collection_item_set_selected(Collection *collection,
 	if (selected)
 	{
 		collection->number_selected++;
-		if (collection->number_selected == 1)
+		if (signal && collection->number_selected == 1)
 			gtk_signal_emit(GTK_OBJECT(collection),
 					collection_signals[GAIN_SELECTION],
 					current_event_time);
@@ -1560,7 +1584,7 @@ static void collection_item_set_selected(Collection *collection,
 	else
 	{
 		collection->number_selected--;
-		if (collection->number_selected == 0)
+		if (signal && collection->number_selected == 0)
 			gtk_signal_emit(GTK_OBJECT(collection),
 					collection_signals[LOSE_SELECTION],
 					current_event_time);
@@ -1637,18 +1661,18 @@ gint collection_insert(Collection *collection, gpointer data)
 
 void collection_unselect_item(Collection *collection, gint item)
 {
-	collection_item_set_selected(collection, item, FALSE);
+	collection_item_set_selected(collection, item, FALSE, TRUE);
 }
 
 void collection_select_item(Collection *collection, gint item)
 {
-	collection_item_set_selected(collection, item, TRUE);
+	collection_item_set_selected(collection, item, TRUE, TRUE);
 }
 
 void collection_toggle_item(Collection *collection, gint item)
 {
 	collection_item_set_selected(collection, item,
-			!collection->items[item].selected);
+			!collection->items[item].selected, TRUE);
 }
 
 /* Select all items in the collection */
