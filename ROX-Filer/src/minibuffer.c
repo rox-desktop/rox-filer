@@ -126,17 +126,19 @@ void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 {
 	guchar		*esc;
 	GtkEditable 	*edit = GTK_EDITABLE(filer_window->minibuffer);
+	GtkEntry 	*entry = GTK_ENTRY(edit);
 	int		pos;
 
 	g_return_if_fail(filer_window->mini_type == MINI_SHELL);
 
-	if (strchr(leafname, ' '))
-		esc = g_strdup_printf(" \"%s\"", leafname);
-	else
-		esc = g_strdup_printf(" %s", leafname);
+	esc = shell_escape(leafname);
 
 	gtk_editable_delete_selection(edit);
 	pos = gtk_editable_get_position(edit);
+
+	if (pos > 0 && gtk_entry_get_text(entry)[pos - 1] != ' ')
+		gtk_editable_insert_text(edit, " ", 1, &pos);
+
 	gtk_editable_insert_text(edit, esc, strlen(esc), &pos);
 	gtk_editable_set_position(edit, pos);
 
@@ -395,14 +397,15 @@ static void shell_done(FilerWindow *filer_window)
 }
 
 /* Given a list of matches, return the longest stem. g_free() the result.
- * Spaces are escaped.
+ * Special chars are escaped. If there is only a single (non-dir) match
+ * then a trailing space is added.
  */
 static guchar *best_match(FilerWindow *filer_window, glob_t *matches)
 {
 	gchar	*first = matches->gl_pathv[0];
 	int	i;
 	int	longest, path_len;
-	guchar	*path;
+	guchar	*path, *tmp;
 
 	longest = strlen(first);
 
@@ -425,17 +428,17 @@ static guchar *best_match(FilerWindow *filer_window, glob_t *matches)
 	else
 		path = g_strndup(first, longest);
 
-	if (strchr(path, ' '))
+	tmp = shell_escape(path);
+	g_free(path);
+
+	if (matches->gl_pathc == 1 && tmp[strlen(tmp) - 1] != '/')
 	{
-		gchar	**bits;
-
-		bits = g_strsplit(path, " ", 0);
-		g_free(path);
-		path = g_strjoinv("\\ ", bits);
-		g_strfreev(bits);
+		path = g_strdup_printf("%s ", tmp);
+		g_free(tmp);
+		return path;
 	}
-
-	return path;
+	
+	return tmp;
 }
 
 static void shell_tab(FilerWindow *filer_window)

@@ -513,3 +513,27 @@ err:
 		return "Copy failed";
 	return NULL;
 }
+
+/* 'word' has all special characters escaped so that it may be inserted
+ * into a shell command.
+ * Eg: 'My Dir?' becomes 'My\ Dir\?'. g_free() the result.
+ */
+guchar *shell_escape(guchar *word)
+{
+	GString	*tmp;
+	guchar	*retval;
+
+	tmp = g_string_new(NULL);
+
+	while (*word)
+	{
+		if (strchr(" ?*['\"$~\\|();!`&", *word))
+			g_string_append_c(tmp, '\\');
+		g_string_append_c(tmp, *word);
+		word++;
+	}
+
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
+	return retval;
+}
