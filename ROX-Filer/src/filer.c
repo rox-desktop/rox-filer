@@ -111,8 +111,8 @@ static void filer_size_for(FilerWindow *filer_window,
 
 static void set_selection_state(FilerWindow *collection, gboolean normal);
 static void filer_next_thumb(GObject *window, const gchar *path);
-
 static void start_thumb_scanning(FilerWindow *filer_window);
+static void filer_options_changed(void);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -122,7 +122,7 @@ static GdkCursor *crosshair = NULL;
  */
 static gboolean not_local=FALSE;
 
-static Option o_filer_size_limit;
+static Option o_filer_size_limit, o_short_flag_names;
 Option o_filer_auto_resize, o_unique_filer_windows;
 
 void filer_init(void)
@@ -135,6 +135,10 @@ void filer_init(void)
 	option_add_int(&o_filer_auto_resize, "filer_auto_resize",
 							RESIZE_ALWAYS);
 	option_add_int(&o_unique_filer_windows, "filer_unique_windows", 0);
+
+	option_add_int(&o_short_flag_names, "filer_short_flag_names", FALSE);
+
+	option_add_notify(filer_options_changed);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 	crosshair = gdk_cursor_new(GDK_CROSSHAIR);
@@ -1762,12 +1766,23 @@ void filer_set_title(FilerWindow *filer_window)
 	if (filer_window->scanning || filer_window->show_hidden ||
 				filer_window->show_thumbs)
 	{
-		flags = g_strconcat(" (",
+		if (o_short_flag_names.int_value)
+		{
+			flags = g_strconcat(" +",
+				filer_window->scanning ? _("S") : "",
+				filer_window->show_hidden ? _("A") : "",
+				filer_window->show_thumbs ? _("T") : "",
+				NULL);
+		}
+		else
+		{
+			flags = g_strconcat(" (",
 				filer_window->scanning ? _("Scanning, ") : "",
 				filer_window->show_hidden ? _("All, ") : "",
 				filer_window->show_thumbs ? _("Thumbs, ") : "",
 				NULL);
-		flags[strlen(flags) - 2] = ')';
+			flags[strlen(flags) - 2] = ')';
+		}
 	}
 
 	if (not_local)
@@ -2414,5 +2429,20 @@ void filer_create_thumbs(FilerWindow *filer_window)
 		 */
 		if (!found)
 			filer_create_thumb(filer_window, path);
+	}
+}
+
+static void filer_options_changed(void)
+{
+	if (o_short_flag_names.has_changed)
+	{
+		GList *next;
+
+		for (next = all_filer_windows; next; next = next->next)
+		{
+			FilerWindow *filer_window = (FilerWindow *) next->data;
+
+			filer_set_title(filer_window);
+		}
 	}
 }
