@@ -415,8 +415,6 @@ static void panel_add_item(Panel *panel,
 								 : path);
 	}
 	
-	icon->item.name_width = gdk_string_width(font, icon->item.leafname);
-
 	gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
 			  GTK_SIGNAL_FUNC(icon_destroyed), (gpointer) icon);
 
