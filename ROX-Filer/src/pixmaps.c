@@ -99,6 +99,10 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *pixbuf);
 
 void pixmaps_init(void)
 {
+	gdk_rgb_init();
+	gtk_widget_push_visual(gdk_rgb_get_visual());
+	gtk_widget_push_colormap(gdk_rgb_get_cmap());
+
 	pixmap_cache = g_fscache_new((GFSLoadFunc) load,
 					(GFSRefFunc) ref,
 					(GFSRefFunc) unref,
