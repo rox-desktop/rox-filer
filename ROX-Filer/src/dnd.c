@@ -967,8 +967,8 @@ static void got_uri_list(GtkWidget 		*widget,
 
 	if (!uri_list)
 		error = _("No URIs in the text/uri-list (nothing to do!)");
-	else if (type == drop_dest_prog)
-		run_with_files(dest_path, uri_list); /* XXX: Action ask? */
+	else if (context->action != GDK_ACTION_ASK && type == drop_dest_prog)
+		run_with_files(dest_path, uri_list);
 	else if ((!uri_list->next) && (!get_local_path(uri_list->data)))
 	{
 		/* There is one URI in the list, and it's not on the local
