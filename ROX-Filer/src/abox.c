@@ -680,6 +680,10 @@ void    abox_set_percentage(ABox *abox, int per)
 				abox->progress, FALSE, FALSE, 2);
 		gtk_widget_show(abox->progress);
 	}
+	if(per<0 || per>100) {
+		gtk_widget_hide(abox->progress);
+		return;
+	}
 	gtk_progress_bar_set_fraction(GTK_PROGRESS_BAR(abox->progress),
 				      per/100.);
 }

@@ -1677,6 +1677,7 @@ static void usage_cb(gpointer data)
 			    format_double_size(size_tally));
 		total_size += size_tally;
 	}
+	printf_send("%%-1");
 
 	g_string_printf(message, _("'\nTotal: %s ("),
 			format_double_size(total_size));
