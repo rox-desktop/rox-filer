@@ -1,6 +1,6 @@
 #!/bin/sh
 
-for app in galeon mozilla netscape skipstone dillo konqueror amaya; do
+for app in firefox galeon mozilla netscape skipstone dillo konqueror amaya; do
   if [ -x "`which $app`" ]; then exec "$app" "$@"; fi
 done
 
