@@ -23,9 +23,6 @@ extern MaskedPixmap *im_multiple;
 extern MaskedPixmap *im_exec_file;
 extern MaskedPixmap *im_appdir;
 
-extern MaskedPixmap *im_up_icon;
-extern MaskedPixmap *im_home_icon;
-extern MaskedPixmap *im_refresh_icon;
 extern MaskedPixmap *im_help;
 
 #ifdef HAVE_IMLIB
@@ -58,5 +55,6 @@ void pixmaps_init(void);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
 void pixmap_make_small(MaskedPixmap *mp);
+MaskedPixmap *load_pixmap(char *name);
 
 #endif /* _PIXMAP_H */

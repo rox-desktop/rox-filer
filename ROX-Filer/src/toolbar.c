@@ -31,10 +31,26 @@
 #include "options.h"
 #include "support.h"
 #include "main.h"
+#include "menu.h"
 #include "dnd.h"
 #include "filer.h"
 #include "pixmaps.h"
 #include "bind.h"
+
+typedef struct _Tool Tool;
+
+typedef enum {DROP_NONE, DROP_TO_PARENT, DROP_TO_HOME} DropDest;
+
+struct _Tool {
+	guchar		*label;
+	guchar		*name;
+	guchar		*tip;		/* Tooltip */
+	void		(*clicked)(GtkWidget *w, FilerWindow *filer_window);
+	DropDest	drop_action;
+	gboolean	enabled;
+	MaskedPixmap	*icon;
+	GtkWidget	**menu;		/* Right-click menu widget addr */
+};
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -64,14 +80,16 @@ static GtkTooltips *tooltips = NULL;
   (o_new_window_on_1 ? ((GdkEventButton *) button_event)->button == 1	\
 		     : ((GdkEventButton *) button_event)->button != 1)
 
-typedef enum {DROP_TO_PARENT, DROP_TO_HOME} DropDest;
-
 /* Static prototypes */
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
-static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
-			GtkSignalFunc cb, FilerWindow *filer_window,
-			char *label, char *tip);
+static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_refresh_clicked(GtkWidget *widget,
+				    FilerWindow *filer_window);
+static void toolbar_large_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window);
+static GtkWidget *add_button(GtkWidget *box, Tool *tool,
+				FilerWindow *filer_window);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
@@ -87,6 +105,27 @@ static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest);
 
+static Tool all_tools[] = {
+	{N_("Up"), "up", N_("Change to parent directory"),
+	 toolbar_up_clicked, DROP_TO_PARENT, TRUE, NULL, NULL},
+	 
+	{N_("Home"), "home", N_("Change to home directory"),
+	 toolbar_home_clicked, DROP_TO_HOME, TRUE, NULL, NULL},
+	
+	{N_("Scan"), "refresh", N_("Rescan directory contents"),
+	 toolbar_refresh_clicked, DROP_NONE, TRUE, NULL, NULL},
+	
+	{N_("Large"), "large", N_("Display using large icons"),
+	 toolbar_large_clicked, DROP_NONE, TRUE, NULL, &display_large_menu},
+	
+	{N_("Small"), "small", N_("Display using small icons"),
+	 toolbar_small_clicked, DROP_NONE, TRUE, NULL, &display_small_menu},
+
+	{N_("Help"), "help", N_("Show ROX-Filer help"),
+	 toolbar_help_clicked, DROP_NONE, TRUE, NULL, NULL},
+};
+
+
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -94,10 +133,27 @@ static void handle_drops(FilerWindow *filer_window,
 
 void toolbar_init(void)
 {
+	int	i;
+	
 	options_sections = g_slist_prepend(options_sections, &options);
 	option_register("toolbar_type", toolbar_type);
 
 	tooltips = gtk_tooltips_new();
+
+	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
+	{
+		Tool	*tool = &all_tools[i];
+
+		if (!tool->icon)
+		{
+			guchar	*path;
+
+			path = g_strconcat("pixmaps/",
+					tool->name, ".xpm", NULL);
+			tool->icon = load_pixmap(path);
+			g_free(path);
+		}
+	}
 }
 
 /* Create a new toolbar widget, suitable for adding to a filer window,
@@ -166,43 +222,37 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 		change_to_parent(filer_window);
 }
 
+static void toolbar_large_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	display_set_layout(filer_window, "Large");
+}
+
+static void toolbar_small_clicked(GtkWidget *widget, FilerWindow *filer_window)
+{
+	display_set_layout(filer_window, "Small");
+}
+
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*frame, *box;
 	GtkWidget	*b;
+	int		i;
 
 	frame = gtk_frame_new(NULL);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
 
 	box = gtk_hbox_new(FALSE, 0);
-#if 0
-	gtk_button_box_set_child_size_default(16, 16);
-	gtk_hbutton_box_set_spacing_default(0);
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(box), GTK_BUTTONBOX_START);
-#endif
 
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
-	b = add_button(box, im_up_icon,
-			GTK_SIGNAL_FUNC(toolbar_up_clicked),
-			filer_window,
-			_("Up"), _("Change to parent directory"));
-	handle_drops(filer_window, b, DROP_TO_PARENT);
+	for (i = 0; i < sizeof(all_tools) / sizeof(*all_tools); i++)
+	{
+		Tool	*tool = &all_tools[i];
 
-	b = add_button(box, im_home_icon,
-			GTK_SIGNAL_FUNC(toolbar_home_clicked),
-			filer_window,
-			_("Home"), _("Change to home directory"));
-	handle_drops(filer_window, b, DROP_TO_HOME);
-
-	add_button(box, im_refresh_icon,
-			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
-			filer_window,
-			_("Scan"), _("Rescan directory contents"));
-	add_button(box, im_help,
-			GTK_SIGNAL_FUNC(toolbar_help_clicked),
-			filer_window,
-			_("Help"), _("Show ROX-Filer help"));
+		b = add_button(box, tool, filer_window);
+		if (tool->drop_action != DROP_NONE)
+			handle_drops(filer_window, b, tool->drop_action);
+	}
 
 	filer_window->toolbar_text = gtk_label_new("");
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
@@ -212,8 +262,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 }
 
 /* This is used to simulate a click when button 3 is used (GtkButton
- * normally ignores this). Currently, this button does not pop in -
- * this may be fixed in future versions of GTK+.
+ * normally ignores this).
  */
 static gint toolbar_other_button = 0;
 static gint toolbar_adjust_pressed(GtkButton *button,
@@ -246,26 +295,54 @@ static gint toolbar_adjust_released(GtkButton *button,
 	return TRUE;
 }
 
-static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
-			GtkSignalFunc cb, FilerWindow *filer_window,
-			char *label, char *tip)
+static gint menu_pressed(GtkWidget *button,
+			 GdkEventButton *event,
+			 FilerWindow *filer_window)
+{
+	GtkWidget	*menu;
+
+	if (event->button != 3 && event->button != 2)
+		return FALSE;
+
+	menu = gtk_object_get_data(GTK_OBJECT(button), "popup_menu");
+	g_return_val_if_fail(menu != NULL, TRUE);
+
+	show_style_menu(filer_window, event, menu);
+
+	return TRUE;
+}
+
+static GtkWidget *add_button(GtkWidget *box, Tool *tool,
+				FilerWindow *filer_window)
 {
 	GtkWidget 	*button, *icon_widget;
+	GtkSignalFunc	cb = GTK_SIGNAL_FUNC(tool->clicked);
 
 	button = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
 	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 
-	gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
+	if (tool->menu)
+	{
+		gtk_object_set_data(GTK_OBJECT(button), "popup_menu",
+				*tool->menu);
+		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
+			GTK_SIGNAL_FUNC(menu_pressed), filer_window);
+	}
+	else
+	{
+		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
 			GTK_SIGNAL_FUNC(toolbar_adjust_pressed), filer_window);
-	gtk_signal_connect(GTK_OBJECT(button), "button_release_event",
+		gtk_signal_connect(GTK_OBJECT(button), "button_release_event",
 			GTK_SIGNAL_FUNC(toolbar_adjust_released), filer_window);
+	}
+
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			cb, filer_window);
 
-	gtk_tooltips_set_tip(tooltips, button, tip, NULL);
+	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_pixmap_new(icon->pixmap, icon->mask);
+	icon_widget = gtk_pixmap_new(tool->icon->pixmap, tool->icon->mask);
 
 	if (o_toolbar == TOOLBAR_LARGE)
 	{
@@ -274,7 +351,7 @@ static GtkWidget *add_button(GtkWidget *box, MaskedPixmap *icon,
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
 
-		text = gtk_label_new(label);
+		text = gtk_label_new(_(tool->label));
 		gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, TRUE, 0);
 
 		gtk_container_add(GTK_CONTAINER(button), vbox);

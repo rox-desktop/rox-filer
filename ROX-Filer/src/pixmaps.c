@@ -84,14 +84,10 @@ MaskedPixmap *im_multiple;
 MaskedPixmap *im_exec_file;
 MaskedPixmap *im_appdir;
 
-MaskedPixmap *im_up_icon;
-MaskedPixmap *im_home_icon;
-MaskedPixmap *im_refresh_icon;
 MaskedPixmap *im_help;
 
 /* Static prototypes */
 
-static MaskedPixmap *load_pixmap(char *name);
 static void load_default_pixmaps(void);
 static MaskedPixmap *load(char *pathname, gpointer data);
 static void ref(MaskedPixmap *mp, gpointer data);
@@ -154,9 +150,6 @@ static void load_default_pixmaps(void)
 	im_exec_file = load_pixmap("pixmaps/exec.xpm");
 	im_appdir = load_pixmap("pixmaps/application.xpm");
 
-	im_up_icon = load_pixmap("pixmaps/up.xpm");
-	im_home_icon = load_pixmap("pixmaps/home.xpm");
-	im_refresh_icon = load_pixmap("pixmaps/refresh.xpm");
 	im_help = load_pixmap("pixmaps/help.xpm");
 }
 

@@ -155,6 +155,8 @@ static OptionsSection options =
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
 static GtkWidget	*filer_file_menu;	/* The File '' menu */
+GtkWidget	*display_large_menu;	/* Display->Large With... */
+GtkWidget	*display_small_menu;	/* Display->Small With... */
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
@@ -298,6 +300,11 @@ void menu_init()
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
 	GET_SSMENU_ITEM(filer_vfs_menu, "filer", "File", "Open VFS");
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
+
+	GET_SSMENU_ITEM(display_large_menu, "filer",
+			"Display", "Large, With...");
+	GET_SSMENU_ITEM(display_small_menu, "filer",
+			"Display", "Small, With...");
 
 	items = gtk_container_children(GTK_CONTAINER(filer_menu));
 	filer_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
@@ -491,6 +498,24 @@ void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
 		menu_set_items_shaded(pinboard_menu, TRUE, 4, 2);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
+			(gpointer) pos, event->button, event->time);
+}
+
+/* Used when you menu-click on the Large or Small toolbar tools */
+void show_style_menu(FilerWindow *filer_window,
+			GdkEventButton *event,
+			GtkWidget *menu)
+{
+	int		pos[2];
+
+	pos[0] = event->x_root;
+	pos[1] = event->y_root;
+
+	window_with_focus = filer_window;
+
+	popup_menu = menu;
+	
+	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
 

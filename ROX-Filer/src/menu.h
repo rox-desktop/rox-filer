@@ -14,6 +14,9 @@ extern GtkAccelGroup	*filer_keys;
 extern GtkWidget 	*popup_menu;
 extern char		*xterm_here_value;
 
+extern GtkWidget	*display_large_menu;	/* Display->Large With... */
+extern GtkWidget	*display_small_menu;	/* Display->Small With... */
+
 void menu_init(void);
 
 GtkWidget *create_menu_options(void);
@@ -26,6 +29,9 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item);
 GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name);
 void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
+void show_style_menu(FilerWindow *filer_window,
+			GdkEventButton *event,
+			GtkWidget *menu);
 
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);
