@@ -1687,17 +1687,22 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 		filer_opendir(make_path(app_dir, "Help")->str, NULL);
 	else if (action == HELP_MANUAL)
 	{
-		gchar *manual;
+		gchar *manual = NULL;
 
-		manual = g_strconcat(app_dir, "/Help/Manual-",
-				     current_lang, ".html", NULL);
-
-		if (access(manual, F_OK))
+		if (current_lang)
 		{
-			g_free(manual);
+			manual = g_strconcat(app_dir, "/Help/Manual-",
+					     current_lang, ".html", NULL);
+			if (access(manual, F_OK))
+			{
+				g_free(manual);
+				manual = NULL;
+			}
+		}
+
+		if (!manual)
 			manual = g_strconcat(app_dir,
 						"/Help/Manual.html", NULL);
-		}
 		
 		run_by_path(manual);
 
