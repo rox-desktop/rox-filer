@@ -61,7 +61,8 @@ static guchar *current_app_path = NULL;	/* The path of the application */
 static GList *current_items = NULL;	/* The GtkMenuItems we added directly
 					 * to it --- not submenu items.
 					 */
-static Option o_mount_free;
+static Option o_mount_free;      /* Command to run to show free space */
+static Option o_mount_format;    /* Command to run to format device */
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -70,6 +71,7 @@ static Option o_mount_free;
 void appmenu_init(void)
 {
 	option_add_string(&o_mount_free, "mount_free", "");
+	option_add_string(&o_mount_format, "mount_format", "");
 }
 
 /* Removes all appmenu menu items */
@@ -266,9 +268,6 @@ static void mnt_free(GtkWidget *item, gpointer data)
 	
 	g_return_if_fail(current_app_path != NULL);
 	
-	/*printf("do df for %s (%s)\n", current_app_path,
-	  o_mount_free.value);*/
-
 	if(o_mount_free.value[0]) {
 		fmt=o_mount_free.value;
 		if(fmt[0]!='/') {
@@ -312,7 +311,6 @@ static void mnt_free(GtkWidget *item, gpointer data)
 	}
 
 	argv[2]=g_strdup_printf(fmt, current_app_path);
-	/*printf("Command is %s\n", argv[2]);*/
 	rox_spawn(current_app_path, (const gchar **) argv);
 	g_free(argv[2]);
 
@@ -320,9 +318,27 @@ static void mnt_free(GtkWidget *item, gpointer data)
 		g_free(tmp);
 }
 
+static void mnt_format(GtkWidget *item, gpointer data)
+{
+	char *argv[4]={"sh", "-c", NULL, NULL};
+
+	g_return_if_fail(current_app_path != NULL);
+
+	if(!o_mount_format.value[0]) {
+		delayed_error(_("No program has been given to format a device"));
+		return;
+	}
+
+	argv[2]=g_strdup_printf(o_mount_format.value, current_app_path);
+	rox_spawn(current_app_path, (const gchar **) argv);
+	g_free(argv[2]);
+
+}
+
 static void build_mount_menu(const char *mnt_dir, DirItem *app_item)
 {
 	GtkWidget *item;
+	gboolean mounted=(app_item->flags & ITEM_FLAG_MOUNTED);
 
 	item = gtk_menu_item_new_with_label(_("Eject"));
 	gtk_widget_show(item);
@@ -332,11 +348,17 @@ static void build_mount_menu(const char *mnt_dir, DirItem *app_item)
 	item = gtk_menu_item_new_with_label(_("Format"));
 	gtk_widget_show(item);
 	current_items = g_list_prepend(current_items, item);
+	g_signal_connect(item, "activate", G_CALLBACK(mnt_format), NULL);
+	if(mounted)
+		gtk_widget_set_sensitive(item, FALSE);
 
 	item = gtk_menu_item_new_with_label(_("Free Space"));
 	gtk_widget_show(item);
 	current_items = g_list_prepend(current_items, item);
 	g_signal_connect(item, "activate", G_CALLBACK(mnt_free), NULL);
+	if(!mounted)
+		gtk_widget_set_sensitive(item, FALSE);
+	
 }
 
 /* Adds to current_items */
@@ -379,3 +401,11 @@ static void build_app_menu(const char *app_dir, DirItem *app_item)
 	if (ai)
 		g_object_unref(ai);
 }
+
+/*
+ * Persuade [X]Emacs to use the right indenting
+ * Local Variables:
+ * mode:c
+ * c-basic-offset:8
+ * End:
+ */
