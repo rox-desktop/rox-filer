@@ -729,9 +729,12 @@ static void pinboard_check_options(void)
 
 			gdk_colormap_alloc_color(cm, &n_bg, FALSE, TRUE);
 			gtk_widget_modify_bg(w, GTK_STATE_NORMAL, &n_bg);
-			gdk_window_set_background(w->window, &n_bg);
 
-			gtk_widget_queue_draw(w);
+			/* Only redraw the background if there is no image */
+			if (!current_pinboard->backdrop)
+				reload_backdrop(current_pinboard,
+						NULL, BACKDROP_NONE);
+			
 			reshape_all();
 		}
 
@@ -1940,6 +1943,9 @@ static void reload_backdrop(Pinboard *pinboard,
 	if (backdrop)
 		style->bg_pixmap[GTK_STATE_NORMAL] =
 			load_backdrop(backdrop, backdrop_style);
+
+	gdk_color_parse(o_pinboard_bg_colour.value,
+			&style->bg[GTK_STATE_NORMAL]);
 
 	gtk_widget_set_style(pinboard->window, style);
 
