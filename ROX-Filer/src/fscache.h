@@ -57,6 +57,7 @@ typedef enum {
 	FSCACHE_LOOKUP_ONLY_NEW,/* Return NULL if not present AND uptodate */
 	FSCACHE_LOOKUP_PEEK,	/* Lookup; don't load or update */
 	FSCACHE_LOOKUP_INIT,	/* Internal use */
+	FSCACHE_LOOKUP_INSERT,	/* Internal use */
 } FSCacheLookup;
 
 GFSCache *g_fscache_new(GFSLoadFunc load,
@@ -77,6 +78,7 @@ void g_fscache_purge(GFSCache *cache, gint age);
 void g_fscache_data_ref(GFSCache *cache, gpointer data);
 void g_fscache_data_unref(GFSCache *cache, gpointer data);
 
-void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj);
+void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj,
+		      gboolean update_details);
 
 #endif /* _FSCACHE_H */

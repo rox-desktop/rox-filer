@@ -282,7 +282,7 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 
 		image = image_from_pixbuf(pixbuf);
 		gdk_pixbuf_unref(pixbuf);
-		g_fscache_insert(pixmap_cache, path, image);
+		g_fscache_insert(pixmap_cache, path, image, TRUE);
 		callback(data, path);
 		return;
 	}
@@ -290,7 +290,7 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
 	/* Add an entry, set to NULL, so no-one else tries to load this
 	 * image.
 	 */
-	g_fscache_insert(pixmap_cache, path, NULL);
+	g_fscache_insert(pixmap_cache, path, NULL, TRUE);
 
 	fd = mc_open(path, O_RDONLY | O_NONBLOCK);
 	if (fd == -1)
@@ -1041,7 +1041,7 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 			gdk_pixbuf_ref(pixbuf);
 			image = image_from_pixbuf(pixbuf);
 
-			g_fscache_insert(pixmap_cache, path, image);
+			g_fscache_insert(pixmap_cache, path, image, FALSE);
 #if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 			save_thumbnail(path, pixbuf, image);
 #endif

@@ -8,6 +8,8 @@ _ROX_PANEL_MENU_POS property is now set on each GtkSocket window, rather than
 the panel, so that applets can find it more easiliy (requested by Stephen
 Watson).
 Only use Gtk+-2.0 if '--compile --with-gtk2' is used.
+Loading a thumbnail now stores the details when loading started, not
+when it finished.
 Bugfix: Under Gtk+-2.0, the savebox focussed the OK button rather than the
 	text entry.
 

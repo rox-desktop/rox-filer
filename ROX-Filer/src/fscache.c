@@ -148,12 +148,19 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 
 /* Force this already-loaded item into the cache. The cache will
  * ref the object if it wants to keep it.
+ * If update_details is FALSE then the timestamp and size aren't recorded.
+ * Generally, you call this function with update_details = TRUE when you
+ * start loading some data and then with update_details = FALSE when you
+ * put in the loaded object.
  */
-void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj)
+void g_fscache_insert(GFSCache *cache, char *pathname, gpointer obj,
+		      gboolean update_details)
 {
 	GFSCacheData	*data;
 
-	data = lookup_internal(cache, pathname, FSCACHE_LOOKUP_INIT);
+	data = lookup_internal(cache, pathname,
+			update_details ? FSCACHE_LOOKUP_INIT
+				       : FSCACHE_LOOKUP_INSERT);
 
 	if (!data)
 		return;
@@ -176,11 +183,10 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
 				gboolean *found)
 {
 	GFSCacheData *data;
+
+	g_return_val_if_fail(lookup_type != FSCACHE_LOOKUP_INIT, NULL);
 	
 	data = lookup_internal(cache, pathname, lookup_type);
-
-	if (lookup_type == FSCACHE_LOOKUP_INIT)
-		return data;
 
 	if (!data)
 	{
@@ -358,7 +364,8 @@ static GFSCacheData *lookup_internal(GFSCache *cache, char *pathname,
 	{
 		/* We've cached this file already */
 
-		if (lookup_type == FSCACHE_LOOKUP_PEEK)
+		if (lookup_type == FSCACHE_LOOKUP_PEEK ||
+		    lookup_type == FSCACHE_LOOKUP_INSERT)
 			goto out;	/* Never update on peeks */
 
 		if (lookup_type == FSCACHE_LOOKUP_INIT)
@@ -403,7 +410,9 @@ init:
 	data->length = info.st_size;
 	data->mode = info.st_mode;
 
-	if (data->data == NULL && lookup_type != FSCACHE_LOOKUP_INIT)
+	if (data->data == NULL &&
+		lookup_type != FSCACHE_LOOKUP_INIT &&
+		lookup_type != FSCACHE_LOOKUP_INSERT)
 	{
 		/* Create the object for the file (ie, not an update) */
 		if (cache->load)
