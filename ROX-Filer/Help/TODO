@@ -47,9 +47,7 @@ Scanning:
 	- Use dir_check_this in more places
 	- Clear window before resizing
 
-Add '... for all files of this type' to the Set Icon box.
-
-Apply session management patch.
+Add 'Just for this file / All files of type' to Set Icon dialog.
 
 Improve thumbnail handling.
 
@@ -90,8 +88,6 @@ Allow find expression with Permissions command...
 
 Use AA fonts and word wrapping in main window with Gtk+ 2.0.
 
-Add 'Just for this file / All files of type' to Set Icon dialog.
-
 
 OTHERS
 
@@ -127,15 +123,13 @@ permissions on the contents. chmod(1) has the same problem.
 Option to disable open-file-and-close-window behaviour (sometimes happens
 accidentally)?
 
-Options for 'Force' and 'Brief'?
-
 Items on the panel should be sensitive right up to the edge of the screen
 (GTK bug prevents this currently - should be fixed by 1.2.11).
 
-On Shift-Menu-click, send the filename to a script and parse the results
-as a menu of commands to execute?
-
 Remember last scroll position when returning to a directory?
+
+After entering a symlinked directory, Up should return to the symlink's
+directory, not the real parent?
 
 
 LONG TERM

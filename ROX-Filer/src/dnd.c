@@ -170,6 +170,7 @@ void dnd_init()
 	option_add_int("dnd_drag_to_icons", 1, NULL);
 	option_add_int("dnd_spring_open", 0, NULL);
 	option_add_int("dnd_spring_delay", 400, NULL);
+	option_add_int("dnd_middle_menu", TRUE, NULL);
 
 	item_factory = menu_create(menu_def,
 				sizeof(menu_def) / sizeof(*menu_def),
@@ -281,7 +282,12 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE
 			| GDK_ACTION_LINK | GDK_ACTION_ASK;
 	else
-		actions = GDK_ACTION_ASK;	/* TODO: Option for move */
+	{
+		if (option_get_int("dnd_middle_menu"))
+			actions = GDK_ACTION_ASK;
+		else
+			actions = GDK_ACTION_MOVE;
+	}
 	
 	target_list = gtk_target_list_new(target_table, 1);
 
@@ -337,7 +343,12 @@ void drag_one_item(GtkWidget		*widget,
 		actions = GDK_ACTION_COPY | GDK_ACTION_ASK
 			| GDK_ACTION_MOVE | GDK_ACTION_LINK;
 	else
-		actions = GDK_ACTION_ASK;	/* TODO: Option for move */
+	{
+		if (option_get_int("dnd_middle_menu"))
+			actions = GDK_ACTION_ASK;
+		else
+			actions = GDK_ACTION_MOVE;
+	}
 	
 	context = gtk_drag_begin(widget,
 			target_list,

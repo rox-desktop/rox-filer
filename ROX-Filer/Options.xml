@@ -146,6 +146,12 @@ operation, such as copying or deleting some files.</label>
     <toggle name='no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
     <toggle name='drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
     <spacer/>
+    <label>Dragging files with the middle mouse button...</label>
+    <radio-group name='middle_menu'>
+      <radio value='1' label='... shows a menu of possible actions'/>
+      <radio value='0' label='... moves the file'/>
+    </radio-group>
+    <spacer/>
     <toggle name='spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
     <slider name='spring_delay' label='Spring delay' min='100' max='2000' showvalue='1'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</slider>
   </section>
