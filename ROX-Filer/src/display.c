@@ -188,7 +188,7 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 			pix_width = MIN(HUGE_WIDTH,
 					PIXMAP_WIDTH(item->image->huge_pixmap));
                         *width = MAX(pix_width, w) + 4;
-			h = text_height + 2 + 
+			h = text_height + 4 + 
 				PIXMAP_HEIGHT(item->image->huge_pixmap);
 			*height = MAX(h, ICON_HEIGHT * 1.5);
 			break;
@@ -671,9 +671,9 @@ static void huge_template(GdkRectangle *area, DirItem *item,
 	image_y = MAX(area->y, image_y);
 	
 	template->icon.x = image_x;
-	template->icon.y = image_y;
+	template->icon.y = image_y + 1;
 	template->icon.width = iwidth;
-	template->icon.height = MIN(ICON_HEIGHT, iheight);
+	template->icon.height = MIN(HUGE_HEIGHT, iheight);
 }
 
 static void large_template(GdkRectangle *area, DirItem *item,

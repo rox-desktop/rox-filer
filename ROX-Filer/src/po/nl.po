@@ -11,7 +11,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.1\n"
-"POT-Creation-Date: 2001-03-30 11:26+0100\n"
+"POT-Creation-Date: 2001-04-02 17:46+0100\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@linuxfreak.com>\n"
 "Language-Team: ROX Mailing List <rox@ecs.soton.ac.uk>\n"
@@ -405,7 +405,7 @@ msgstr "?Opnieuw zoeken?"
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' is een symbolische koppeling\n"
 
-#: action.c:1819 tips:60
+#: action.c:1819 tips:62
 msgid "Name"
 msgstr "Naam"
 
@@ -421,7 +421,7 @@ msgstr "Je moet een paar items selecteren om te doorzoeken"
 msgid "Expression:"
 msgstr "Expressie:"
 
-#: action.c:1877 menu.c:192
+#: action.c:1877 menu.c:194
 msgid "Find"
 msgstr "Vind"
 
@@ -429,7 +429,7 @@ msgstr "Vind"
 msgid "You need to select some items to count"
 msgstr "Je moet een paar items selecteren om te tellen"
 
-#: action.c:1906 menu.c:190
+#: action.c:1906 menu.c:192
 msgid "Disk Usage"
 msgstr "Disk Gebruik"
 
@@ -442,7 +442,7 @@ msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr ""
 "ROX-Bestander ondersteund nog geen aansluitpunten op uw systeem. Sorry."
 
-#: action.c:1953 menu.c:189 tips:37
+#: action.c:1953 menu.c:191 tips:38
 msgid "Delete"
 msgstr "Wis"
 
@@ -491,19 +491,19 @@ msgstr "Doorlopen - verander ook de inhoud van sub-mappen"
 msgid "Command:"
 msgstr "Commando:"
 
-#: action.c:2036 menu.c:156 menu.c:162 menu.c:191 tips:56
+#: action.c:2036 menu.c:158 menu.c:164 menu.c:193 tips:58
 msgid "Permissions"
 msgstr "Toegangsrechten"
 
-#: action.c:2056 menu.c:760 tips:34
+#: action.c:2056 menu.c:767 tips:35
 msgid "Copy"
 msgstr "Kopiëer"
 
-#: action.c:2073 tips:35
+#: action.c:2073 tips:36
 msgid "Move"
 msgstr "Verplaats"
 
-#: action.c:2088 tips:36
+#: action.c:2088 tips:37
 msgid "Link"
 msgstr "Koppel"
 
@@ -531,17 +531,17 @@ msgstr ""
 " zal bepaalde items op het paneel of prikbord beïnvloeden - wil je ze echt "
 "wissen?"
 
-#: action.c:2181 gtksavebox.c:226 gtksavebox.c:498 icon.c:112 menu.c:1104
-#: menu.c:1428 options.c:805 type.c:605 usericons.c:476
+#: action.c:2181 gtksavebox.c:226 gtksavebox.c:498 icon.c:112 menu.c:1111
+#: menu.c:1435 options.c:805 type.c:605 usericons.c:476
 msgid "OK"
 msgstr "OK"
 
-#: action.c:2181 gtksavebox.c:233 icon.c:119 menu.c:1435 options.c:817
+#: action.c:2181 gtksavebox.c:233 icon.c:119 menu.c:1442 options.c:817
 #: panel.c:391 type.c:612 usericons.c:484
 msgid "Cancel"
 msgstr "Afbreken"
 
-#: appmenu.c:267 menu.c:1384
+#: appmenu.c:267 menu.c:1391
 msgid "fork() failed"
 msgstr "fork() mislukt"
 
@@ -550,7 +550,7 @@ msgstr "fork() mislukt"
 msgid "Can't open directory: %s"
 msgstr "Kan map niet openen: %s"
 
-#: display.c:564
+#: display.c:924
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) mislukt: %s"
@@ -641,21 +641,21 @@ msgstr "Onbekende actie aangevraagd"
 msgid "Error getting file list"
 msgstr "Fout tijdens het ophalen van bestand-lijst"
 
-#: filer.c:513
+#: filer.c:532
 msgid "Directory missing/deleted"
 msgstr "Map ontbreekt/gewist"
 
-#: filer.c:840
+#: filer.c:869
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Map '%s' is niet toegankelijk"
 
-#: filer.c:1022
+#: filer.c:1051
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Map '%s' niet gevonden."
 
-#: filer.c:1368
+#: filer.c:1400
 msgid " (Scanning)"
 msgstr " (Bezig met scannen)"
 
@@ -949,390 +949,395 @@ msgstr "VFS ondersteuning"
 msgid "No (couldn't find a valid libvfs)"
 msgstr "Nee (kon geen geldige libvfs vinden)"
 
-#: menu.c:150
+#: menu.c:151
 msgid "Display"
 msgstr "Weergave"
 
-#: menu.c:151 tips:50
+#: menu.c:152 tips:51
+#, fuzzy
+msgid "Huge Icons"
+msgstr "Grote Iconen"
+
+#: menu.c:153 tips:52
 msgid "Large Icons"
 msgstr "Grote Iconen"
 
-#: menu.c:152 tips:51
+#: menu.c:154 tips:53
 msgid "Small Icons"
 msgstr "Kleine Iconen"
 
-#: menu.c:153
+#: menu.c:155
 msgid "Large, With..."
 msgstr "Groot, Met..."
 
-#: menu.c:154 menu.c:160 tips:54
+#: menu.c:156 menu.c:162 tips:56
 msgid "Summary"
 msgstr "Samenvatting"
 
-#: menu.c:155 menu.c:161 tips:55
+#: menu.c:157 menu.c:163 tips:57
 msgid "Sizes"
 msgstr "Grote"
 
-#: menu.c:157 menu.c:163 tips:57 tips:61
+#: menu.c:159 menu.c:165 tips:59 tips:63
 msgid "Type"
 msgstr "Type"
 
-#: menu.c:158 menu.c:164 tips:58
+#: menu.c:160 menu.c:166 tips:60
 msgid "Times"
 msgstr "Tijden"
 
-#: menu.c:159
+#: menu.c:161
 msgid "Small, With..."
 msgstr "Klein, Met..."
 
-#: menu.c:166
+#: menu.c:168
 msgid "Sort by Name"
 msgstr "Sorteer op Naam"
 
-#: menu.c:167
+#: menu.c:169
 msgid "Sort by Type"
 msgstr "Sorteer volgens Type"
 
-#: menu.c:168
+#: menu.c:170
 msgid "Sort by Date"
 msgstr "Sorteer op Datum"
 
-#: menu.c:169
+#: menu.c:171
 msgid "Sort by Size"
 msgstr "Sorteer volgens Grote"
 
-#: menu.c:171
+#: menu.c:173
 msgid "Show Hidden"
 msgstr "Toon Verborgen"
 
-#: menu.c:172
+#: menu.c:174
 msgid "Refresh"
 msgstr "Opfrissen"
 
-#: menu.c:173
+#: menu.c:175
 msgid "Create Thumbs"
 msgstr "Maak Duimnagels"
 
-#: menu.c:174 run.c:287 type.c:198
+#: menu.c:176 run.c:287 type.c:198
 msgid "File"
 msgstr "Bestand"
 
-#: menu.c:175
+#: menu.c:177
 msgid "Copy..."
 msgstr "Kopiëer..."
 
-#: menu.c:176
+#: menu.c:178
 msgid "Rename..."
 msgstr "Hernoem..."
 
-#: menu.c:177
+#: menu.c:179
 msgid "Link..."
 msgstr "Koppel..."
 
-#: menu.c:178 menu.c:500
+#: menu.c:180 menu.c:502
 msgid "Shift Open"
 msgstr "Shift Open"
 
-#: menu.c:179 toolbar.c:120
+#: menu.c:181 toolbar.c:120
 msgid "Help"
 msgstr "Help"
 
-#: menu.c:180
+#: menu.c:182
 msgid "Info"
 msgstr "Info"
 
-#: menu.c:181
+#: menu.c:183
 msgid "Set Run Action..."
 msgstr "Zet Start Actie..."
 
-#: menu.c:182
+#: menu.c:184
 msgid "Set Icon..."
 msgstr "Zet Icoon..."
 
-#: menu.c:183
+#: menu.c:185
 msgid "Open VFS"
 msgstr "Open VFS"
 
-#: menu.c:184
+#: menu.c:186
 msgid "Unzip"
 msgstr "Ont-zip"
 
-#: menu.c:185
+#: menu.c:187
 msgid "Untar"
 msgstr "Ont-tar"
 
-#: menu.c:186
+#: menu.c:188
 msgid "Deb"
 msgstr "Deb"
 
-#: menu.c:187
+#: menu.c:189
 msgid "RPM"
 msgstr "RPM"
 
-#: menu.c:193
+#: menu.c:195
 msgid "Select All"
 msgstr "Selecteer Alles"
 
-#: menu.c:194
+#: menu.c:196
 msgid "Clear Selection"
 msgstr "Vergeet Selectie"
 
-#: menu.c:195
+#: menu.c:197
 msgid "Options..."
 msgstr "Opties..."
 
-#: menu.c:196
+#: menu.c:198
 msgid "New Directory..."
 msgstr "Nieuwe Map..."
 
-#: menu.c:197
+#: menu.c:199
 #, fuzzy
 msgid "New File..."
 msgstr "Nieuwe Map..."
 
-#: menu.c:198
+#: menu.c:200
 msgid "Xterm Here"
 msgstr "Xterm Hier"
 
-#: menu.c:199
+#: menu.c:201
 msgid "Window"
 msgstr "Venster"
 
-#: menu.c:200
+#: menu.c:202
 msgid "Parent, New Window"
 msgstr "Vader, Nieuw Venster"
 
-#: menu.c:201
+#: menu.c:203
 msgid "Parent, Same Window"
 msgstr "Vader, Zelfde Venster"
 
-#: menu.c:202
+#: menu.c:204
 msgid "New Window"
 msgstr "Nieuw Venster"
 
-#: menu.c:203
+#: menu.c:205
 #, fuzzy
 msgid "Home Directory"
 msgstr "Open Thuis Map"
 
-#: menu.c:204
+#: menu.c:206
 msgid "Resize Window"
 msgstr "Afmeting Venster aanpassen"
 
-#: menu.c:207
+#: menu.c:209
 msgid "Close Window"
 msgstr "Sluit Venster"
 
-#: menu.c:209
+#: menu.c:211
 msgid "Enter Path..."
 msgstr "Geef Pad..."
 
-#: menu.c:210
+#: menu.c:212
 msgid "Shell Command..."
 msgstr "Schil Commando..."
 
-#: menu.c:211
+#: menu.c:213
 msgid "Select If..."
 msgstr "Selecteer Als..."
 
-#: menu.c:213
+#: menu.c:215
 msgid "Show ROX-Filer Help"
 msgstr "Toon ROX-Bestander Help"
 
-#: menu.c:443
+#: menu.c:445
 msgid "Next Click"
 msgstr "Volgende Klik"
 
-#: menu.c:459
+#: menu.c:461
 #, c-format
 msgid "%d items"
 msgstr "%d items"
 
-#: menu.c:472
+#: menu.c:474
 msgid "Unmount"
 msgstr "Afsluiten"
 
-#: menu.c:474 tips:38
+#: menu.c:476 tips:39
 msgid "Mount"
 msgstr "Aansluiten"
 
-#: menu.c:478
+#: menu.c:480
 msgid "Show Target"
 msgstr "Toon Doel"
 
-#: menu.c:486
+#: menu.c:488
 msgid "Look Inside"
 msgstr "Kijk binnenin"
 
-#: menu.c:493
+#: menu.c:495
 msgid "Open As Text"
 msgstr "Open Als Tekst"
 
-#: menu.c:620
+#: menu.c:627
 msgid "DELETE ... ?"
 msgstr "WIS ... ?"
 
-#: menu.c:632
+#: menu.c:639
 msgid "Count the size of ... ?"
 msgstr "Geef de grote van ... ?"
 
-#: menu.c:644
+#: menu.c:651
 msgid "Set permissions on ... ?"
 msgstr "Zet toegangsrechten voor ... ?"
 
-#: menu.c:656
+#: menu.c:663
 msgid "Search inside ... ?"
 msgstr "Zoek binnenin ... ?"
 
-#: menu.c:706
+#: menu.c:713
 msgid "New pathname is not absolute"
 msgstr "Nieuw pad-naam is niet absoluut"
 
-#: menu.c:751 menu.c:777 menu.c:808 menu.c:829 menu.c:852 menu.c:885
-#: menu.c:1012 menu.c:1176
+#: menu.c:758 menu.c:784 menu.c:815 menu.c:836 menu.c:859 menu.c:892
+#: menu.c:1019 menu.c:1183
 msgid "You cannot do this to more than one item at a time"
 msgstr "Je kan dit niet doen met meer dan één item tegelijkertijd"
 
-#: menu.c:758
+#: menu.c:765
 msgid "Copy ... ?"
 msgstr "Kopiëer ... ?"
 
-#: menu.c:784
+#: menu.c:791
 msgid "Rename ... ?"
 msgstr "Hernoem ... ?"
 
-#: menu.c:786
+#: menu.c:793
 msgid "Rename"
 msgstr "Hernoem"
 
-#: menu.c:815
+#: menu.c:822
 msgid "Symlink ... ?"
 msgstr "Symkopp ... ?"
 
-#: menu.c:817
+#: menu.c:824
 msgid "Symlink"
 msgstr "Symkopp"
 
-#: menu.c:836
+#: menu.c:843
 msgid "Shift Open ... ?"
 msgstr "Shift Open ... ?"
 
-#: menu.c:859
+#: menu.c:866
 msgid "Set run action for ... ?"
 msgstr "Zet start actie voor ... ?"
 
-#: menu.c:871
+#: menu.c:878
 msgid "You can only set the run action for a regular file"
 msgstr "Je kan de start actie enkel zetten voor een gewoon bestand"
 
-#: menu.c:892
+#: menu.c:899
 msgid "Set icon for ... ?"
 msgstr "Zet icoon voor ... ?"
 
-#: menu.c:923
+#: menu.c:930
 msgid "ROX-Filer: file(1) says..."
 msgstr "ROX-Bestander: file(1) zegt..."
 
-#: menu.c:964
+#: menu.c:971
 msgid "Symbolic link to "
 msgstr "Symbolische koppeling naar "
 
-#: menu.c:967
+#: menu.c:974
 msgid "Symbolic link"
 msgstr "Symbolische koppeling"
 
-#: menu.c:971
+#: menu.c:978
 msgid "ROX application"
 msgstr "ROX applicatie"
 
-#: menu.c:974 run.c:293 type.c:191
+#: menu.c:981 run.c:293 type.c:191
 msgid "Mount point"
 msgstr "Aansluit punt"
 
-#: menu.c:1020
+#: menu.c:1027
 msgid "Examine ... ?"
 msgstr "Onderzoek ... ?"
 
-#: menu.c:1045
+#: menu.c:1052
 msgid "Name:"
 msgstr "Naam:"
 
-#: menu.c:1051
+#: menu.c:1058
 msgid "Owner, Group:"
 msgstr "Eigenaar, Groep:"
 
-#: menu.c:1058 support.c:235
+#: menu.c:1065 support.c:235
 msgid "bytes"
 msgstr "bytes"
 
-#: menu.c:1066
+#: menu.c:1073
 msgid "Size:"
 msgstr "Grote:"
 
-#: menu.c:1070
+#: menu.c:1077
 msgid "Change time:"
 msgstr "Verander tijd:"
 
-#: menu.c:1074
+#: menu.c:1081
 msgid "Modify time:"
 msgstr "Aanpas tijd:"
 
-#: menu.c:1078
+#: menu.c:1085
 msgid "Access time:"
 msgstr "Toegang tijd:"
 
-#: menu.c:1088
+#: menu.c:1095
 msgid "Permissions:"
 msgstr "Toegangsrechten:"
 
-#: menu.c:1094
+#: menu.c:1101
 msgid "Type:"
 msgstr "Type:"
 
-#: menu.c:1097
+#: menu.c:1104
 msgid "file(1) says..."
 msgstr "file(1) zegt..."
 
-#: menu.c:1099
+#: menu.c:1106
 msgid "<nothing yet>"
 msgstr "<nog niets>"
 
-#: menu.c:1183
+#: menu.c:1190
 msgid "Help about ... ?"
 msgstr "Help over ... ?"
 
-#: menu.c:1215
+#: menu.c:1222
 msgid "You must select a single file to open as a Virtual File System"
 msgstr "Je moet één bestand kiezen om als VFS te openen"
 
-#: menu.c:1273
+#: menu.c:1280
 msgid "New Directory"
 msgstr "Nieuwe Map"
 
-#: menu.c:1274
+#: menu.c:1281
 msgid "NewDir"
 msgstr "NieuweMap"
 
-#: menu.c:1287 menu.c:1292
+#: menu.c:1294 menu.c:1299
 #, fuzzy
 msgid "Error creating file"
 msgstr "Fout tijdens lezen bestand"
 
-#: menu.c:1303
+#: menu.c:1310
 #, fuzzy
 msgid "New File"
 msgstr "Bestand"
 
-#: menu.c:1304
+#: menu.c:1311
 #, fuzzy
 msgid "NewFile"
 msgstr "Bestand"
 
-#: menu.c:1318 run.c:120 type.c:321
+#: menu.c:1325 run.c:120 type.c:321
 msgid "Failed to fork() child process"
 msgstr "Mislukt om een kinder-proces te fork()'en"
 
-#: menu.c:1355
+#: menu.c:1362
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -1340,15 +1345,15 @@ msgstr ""
 "Je kan geen tweede zicht van deze map openen omdat de 'Unieke Vensters' "
 "optie aanstaat in Opties venster."
 
-#: menu.c:1399
+#: menu.c:1406
 msgid "New window, as user..."
 msgstr "Nieuw venster, als gebruiker..."
 
-#: menu.c:1407
+#: menu.c:1414
 msgid "Browse as which user?"
 msgstr "Als welke gebruiker rondneuzen?"
 
-#: menu.c:1414
+#: menu.c:1421
 msgid "User:"
 msgstr "Gebruiker:"
 
@@ -1455,11 +1460,11 @@ msgstr "Verwijder"
 msgid "Missing < or > in panel config file"
 msgstr "Ontbrekende < of > in paneel configuratie bestand"
 
-#: panel.c:969 pinboard.c:1748
+#: panel.c:971 pinboard.c:1751
 msgid "First, select a single item to edit"
 msgstr "Selecteer eerst één item om te bewerken"
 
-#: panel.c:984 pinboard.c:1725
+#: panel.c:986 pinboard.c:1728
 msgid ""
 "Select a single item, then use this to find out where it is in the "
 "filesystem."
@@ -1467,19 +1472,19 @@ msgstr ""
 "Selecteer één item, gebruik dit dan om uit te zoeken waar het zich bevind in "
 "het bestandssysteem."
 
-#: panel.c:1001
+#: panel.c:1003
 msgid "You must select a single item to get help on"
 msgstr "Je moet eerst één item om hulp over te krijgen selecteren"
 
-#: panel.c:1017
+#: panel.c:1019
 msgid "You must first select some icons to remove"
 msgstr "Je moet eerst een paar iconen die je wil verwijderen selecteren"
 
-#: panel.c:1269
+#: panel.c:1271
 msgid "Error saving panel"
 msgstr "Fout tijdens bewaren van paneel"
 
-#: panel.c:1619
+#: panel.c:1621
 msgid ""
 "Restart\n"
 "Applet"
@@ -1497,19 +1502,19 @@ msgstr ""
 "Je zou eerst een paar vastgeprikte iconen die je wil losmaken moeten "
 "selecteren. Hou de Ctrl toets ingedrukt en selecteer een paar iconen."
 
-#: pinboard.c:1139
+#: pinboard.c:1142
 msgid "Missing '>' in icon label"
 msgstr "Ontbrekende '>' in icoon label"
 
-#: pinboard.c:1148
+#: pinboard.c:1151
 msgid "Missing ',' after icon label"
 msgstr "Ontbrekende ',' na icoon label"
 
-#: pinboard.c:1313
+#: pinboard.c:1316
 msgid "Error saving pinboard"
 msgstr "Fout tijdens bewaren van prikbord"
 
-#: pinboard.c:1693
+#: pinboard.c:1696
 msgid "You must first select a single pinned icon to get help on."
 msgstr ""
 "Je moet eerst één vastgeprikt icoon selecteren om hulp over te krijgen."
@@ -1686,7 +1691,7 @@ msgstr "Scan"
 msgid "Rescan directory contents"
 msgstr "Herscan map inhoud"
 
-#: tips:69 toolbar.c:112
+#: tips:71 toolbar.c:112
 msgid "Large"
 msgstr "Groot"
 
@@ -1694,7 +1699,7 @@ msgstr "Groot"
 msgid "Display using large icons"
 msgstr "Toon gebruikmakend van grote iconen"
 
-#: tips:68 toolbar.c:116
+#: tips:70 toolbar.c:116
 msgid "Small"
 msgstr "Klein"
 
@@ -1850,7 +1855,7 @@ msgstr "Vertaal opties"
 msgid "Translation"
 msgstr "Vertaling"
 
-#: tips:3 tips:67
+#: tips:3 tips:69
 msgid "None"
 msgstr "Geen"
 
@@ -1867,58 +1872,62 @@ msgid "French"
 msgstr "Frans"
 
 #: tips:7
+msgid "Hungarian"
+msgstr ""
+
+#: tips:8
 msgid "Italian"
 msgstr "Italiaans"
 
-#: tips:8
+#: tips:9
 msgid "Polish"
 msgstr "Pools"
 
-#: tips:9
+#: tips:10
 msgid "Pinboard options"
 msgstr "Prikbord opties"
 
-#: tips:10
+#: tips:11
 msgid "No background"
 msgstr "Geen achtergrond"
 
-#: tips:11
+#: tips:12
 msgid "The text is drawn directly on the desktop background."
 msgstr "De tekst wordt direct op de desktop achtergrond getekend."
 
-#: tips:12
+#: tips:13
 msgid "Outlined text"
 msgstr "Uitgelijnde tekst"
 
-#: tips:13
+#: tips:14
 msgid "The text has a thin outline around each letter."
 msgstr "De tekst heeft een dune rand rond elke letter."
 
-#: tips:14
+#: tips:15
 msgid "Rectangular background slab"
 msgstr "Rechthoekige achtergrond tegel"
 
-#: tips:15 tips:16
+#: tips:16 tips:17
 msgid "The text is drawn on a solid rectangle."
 msgstr "De tekst wordt op een solide rechthoek getekend."
 
-#: tips:17
+#: tips:18
 msgid "Text colours:"
 msgstr "Tekst kleuren: "
 
-#: tips:18
+#: tips:19
 msgid "Foreground"
 msgstr "Voorgrond"
 
-#: tips:19
+#: tips:20
 msgid "Background"
 msgstr "Achtergrond"
 
-#: tips:20
+#: tips:21
 msgid "Keep icons within screen limits"
 msgstr "Hou iconen binnen de scherm limieten"
 
-#: tips:21
+#: tips:22
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -1926,51 +1935,51 @@ msgstr ""
 "Als dit gezet is, prikbord iconnen zullen altijd volledig gehouden worden "
 "binnenin de scherm limieten, inclusief het label."
 
-#: tips:22
+#: tips:23
 msgid "Icon grid step:"
 msgstr "Icoon rooster stap:"
 
-#: tips:23
+#: tips:24
 msgid "Fine"
 msgstr "Fijn"
 
-#: tips:24
+#: tips:25
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "Gebruik een 2-pixel rooster om iconen op de desktop te plaatsen."
 
-#: tips:25
+#: tips:26
 msgid "Medium"
 msgstr "Midden"
 
-#: tips:26
+#: tips:27
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "Gebruik een 16-pixel rooster om iconen op de desktop te plaatsen."
 
-#: tips:27
+#: tips:28
 msgid "Coarse"
 msgstr "Grof"
 
-#: tips:28 tips:29 tips:30 tips:31
+#: tips:29 tips:30 tips:31 tips:32
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "Gebruik een 32-pixel rooster om iconen op de desktop te plaatsen."
 
-#: tips:32
+#: tips:33
 msgid "Action window options"
 msgstr "Actie venster opties"
 
-#: tips:33
+#: tips:34
 msgid "Auto-start (Quiet) these actions:"
 msgstr "Auto-start (Stil) deze acties:"
 
-#: tips:39
+#: tips:40
 msgid "Display options"
 msgstr "Weergave opties"
 
-#: tips:40
+#: tips:41
 msgid "Ignore case when sorting"
 msgstr "Negeer hoofd-/kleine-letters bij het sorteren"
 
-#: tips:41
+#: tips:42
 msgid ""
 "If off: animal, zoo, Ben.\n"
 "If on: animal, Ben, zoo."
@@ -1978,82 +1987,82 @@ msgstr ""
 "Als uit: animal, zoo, Ben.\n"
 "Als aan: animal, Ben, zoo."
 
-#: tips:42
+#: tips:43
 #, fuzzy
 msgid "Directories always come first"
 msgstr "Mappen springen open"
 
-#: tips:43
+#: tips:44
 msgid ""
 "If this is on then directories will always appear before anything else, "
 "regardless of the sort type."
 msgstr ""
 
-#: tips:44
+#: tips:45
 msgid "Max Large Icons width"
 msgstr "Max Grote Iconen breedte"
 
-#: tips:45
+#: tips:46
 msgid "Maximum width for the text under a Large Icon."
 msgstr "Maximale breedte van de tekst onder een groot icoon."
 
-#: tips:46
+#: tips:47
 msgid "Max Small Icons width"
 msgstr "Max Kleine Iconen breedte"
 
-#: tips:47
+#: tips:48
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "Maximale breedte van de tekst onder een klein icoon."
 
-#: tips:48
+#: tips:49
 msgid "Default settings for new windows"
 msgstr "Standaard instellingen voor nieuwe vensters"
 
-#: tips:49
+#: tips:50
 msgid "Icon size"
 msgstr "Iconen grote"
 
-#: tips:52
+#: tips:54
 msgid "Details"
 msgstr "Details"
 
-#: tips:53
+#: tips:55
 msgid "No details"
 msgstr "Geen details"
 
-#: tips:59
+#: tips:61
 msgid "Sort by"
 msgstr "Sorteer op"
 
-#: tips:62
+#: tips:64
 msgid "Date"
 msgstr "Datum"
 
-#: tips:63
+#: tips:65
 msgid "Size"
 msgstr "Grote"
 
-#: tips:64
+#: tips:66
 msgid "Toolbar options"
 msgstr "Werktuig-balk opties"
 
-#: tips:65
+#: tips:67
 msgid "Unshade the tools you want:"
 msgstr "De-schaduw de werktuigen die je wenst:"
 
-#: tips:66
+#: tips:68
 msgid "Toolbar type"
 msgstr "Werktuig-balk type"
 
-#: tips:70
+#: tips:72
 msgid "Filer window options"
 msgstr "Bestandsvenster opties"
 
-#: tips:71
+#: tips:73
 msgid "Unique windows"
 msgstr "Unieke vensters"
 
-#: tips:72
+#: tips:74
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -2061,36 +2070,36 @@ msgstr ""
 "Als je een map opent en deze map wordt reeds getoond in een ander venster, "
 "dan zal deze optie ervoor zorgen dat dit andere venster gesloten wordt."
 
-#: tips:73
+#: tips:75
 msgid "Beep if Tab-completion fails"
 msgstr ""
 
-#: tips:74
+#: tips:76
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
 "letter varies)."
 msgstr ""
 
-#: tips:75
+#: tips:77
 msgid "Beep if there are several matches"
 msgstr ""
 
-#: tips:76 tips:77
+#: tips:78 tips:79
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
 msgstr ""
 
-#: tips:78
+#: tips:80
 msgid "Drag and Drop options"
 msgstr "Sleep en Drop opties"
 
-#: tips:79
+#: tips:81
 msgid "Don't use hostnames"
 msgstr "Gebruik geen 'host'-namen"
 
-#: tips:80
+#: tips:82
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -2101,11 +2110,11 @@ msgstr ""
 "van een applicatie een + teken toont op de aanwijzer maar het droppen niet "
 "werkt."
 
-#: tips:81
+#: tips:83
 msgid "Allow dragging to icons in filer windows"
 msgstr "Laat het slepen naar iconen in het bestandsvenster toe"
 
-#: tips:82
+#: tips:84
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -2116,11 +2125,11 @@ msgstr ""
 "en het droppen van het bestand zal het in die map plaatsen, of laden in het "
 "programma"
 
-#: tips:83
+#: tips:85
 msgid "Directories spring open"
 msgstr "Mappen springen open"
 
-#: tips:84
+#: tips:86
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -2130,11 +2139,11 @@ msgstr ""
 "de opgelichte map 'open springt' nadat het bestand er voor een korte periode "
 "over werd gehouden."
 
-#: tips:85
+#: tips:87
 msgid "Spring delay"
 msgstr "Spring vertraging"
 
-#: tips:86 tips:87
+#: tips:88 tips:89
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -2144,11 +2153,11 @@ msgstr ""
 "alvorens deze open springt. Bovenstaande optie moet aanstaan voordat dit "
 "hier enig effect kan hebben."
 
-#: tips:88
+#: tips:90
 msgid "Menu options"
 msgstr "Menu opties"
 
-#: tips:89
+#: tips:91
 msgid ""
 "To set the keyboard short-cuts, simply open the\n"
 "menu over a filer window, move the pointer over\n"
@@ -2162,23 +2171,23 @@ msgstr ""
 "Deze toets zal naast het menu item verschijnen en je\n"
 "kan het gewoon indrukken zonder dat je het menu nog moet openen."
 
-#: tips:90
+#: tips:92
 msgid "`Xterm Here' program:"
 msgstr "'Xterm Hier' programma:"
 
-#: tips:91 tips:92
+#: tips:93 tips:94
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "Het programma dat moet starten als je 'Xterm Hier' kiest van het menu"
 
-#: tips:93
+#: tips:95
 msgid "Mouse bindings"
 msgstr "Muis-bindingen"
 
-#: tips:94
+#: tips:96
 msgid "New window on button 1 (RISC OS style)"
 msgstr "Nieuw venster op knop 1 (RISC OS stijl)"
 
-#: tips:95
+#: tips:97
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -2188,11 +2197,11 @@ msgstr ""
 "map in een nieuw venster openen. Klikken met de 2de knop (midden) zal het "
 "huidige venster hergebruiken."
 
-#: tips:96
+#: tips:98
 msgid "Menu on button 2 (RISC OS style)"
 msgstr "Menu op knop 2 (RISC OS stijl)"
 
-#: tips:97
+#: tips:99
 msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
@@ -2201,11 +2210,11 @@ msgstr ""
 "twee-knops muizen), om het menu tevoorschijn te halen. Indien 'af', gebruik "
 "knop 3 (rechts) in de plaats."
 
-#: tips:98
+#: tips:100
 msgid "Single-click navigation"
 msgstr "Enkel-klik navigatie"
 
-#: tips:99 tips:100 tips:101
+#: tips:101 tips:102 tips:103
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "

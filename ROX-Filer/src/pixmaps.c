@@ -324,11 +324,7 @@ static MaskedPixmap *get_bad_image(void)
 
 static MaskedPixmap *load(char *pathname, gpointer user_data)
 {
-	MaskedPixmap	*retval;
-
-	retval = image_from_file(pathname);
-
-	return retval ? retval : get_bad_image();
+	return image_from_file(pathname);
 }
 
 static void ref(MaskedPixmap *mp, gpointer data)
