@@ -409,12 +409,6 @@ static void show_notice(GtkObject *button)
 	report_error(_("Notice"), _(text));
 }
 
-static void button_click(Option *option)
-{
-	if (option->changed_cb)
-		option->changed_cb(NULL);
-}
-
 static void build_widget(xmlNode *widget, GtkWidget *box)
 {
 	const char *name = widget->name;
@@ -527,8 +521,10 @@ static void build_widget(xmlNode *widget, GtkWidget *box)
 		option->widget_type = OPTION_BUTTON;
 		option->widget = button;
 
-		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-				GTK_SIGNAL_FUNC(button_click), option);
+		if (option->changed_cb)
+			gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+					GTK_SIGNAL_FUNC(option->changed_cb),
+					NULL);
 
 	}
 	else if (strcmp(name, "toggle") == 0)
@@ -1075,6 +1071,8 @@ static void may_change_cb(gpointer key, gpointer value, gpointer data)
 		case OPTION_TOOLS:
 			new = tools_to_list(widget);
 			break;
+              case OPTION_BUTTON:
+                      return;
 		default:
 			g_printerr("[ unknown widget for change '%s' ]\n",
 					(guchar *) key);

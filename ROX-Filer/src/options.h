@@ -10,7 +10,7 @@
 
 #include <gtk/gtk.h>
 
-typedef void OptionChanged(guchar *new_value);
+typedef void OptionChanged(guchar *new_value); /* (also connect_object cb) */
 typedef void OptionNotify(void);
 
 /* Prototypes */
