@@ -195,7 +195,7 @@ http://www.freedesktop.org/standards/shared-mime-info.html"
 echo "Installing application..."
 endir "$APPDIR"
 
-(cd ROX-Filer/src; make clean) > /dev/null
+(cd ROX-Filer/src && make clean) > /dev/null 2>&1
 if [ -d "$APPDIR/ROX-Filer" ]; then
 	echo "ROX-Filer is already installed - delete the existing"
 	echo "copy?"
