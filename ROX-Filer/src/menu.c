@@ -1711,7 +1711,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 			"is turned on in the Options window."));
 	}
 	else
-		filer_opendir(window_with_focus->path, NULL);
+		filer_opendir(window_with_focus->path, window_with_focus);
 }
 
 #if 0
