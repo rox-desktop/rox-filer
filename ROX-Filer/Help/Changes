@@ -2,6 +2,16 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+04-Dec-2000
+~~~~~~~~~~~
+When a panel is used for the first time, put the user's home directory and
+the directory containing ROX-Filer on it instead of leaving it blank.
+
+24-Nov-2000
+~~~~~~~~~~~
+Patch to make compiling easier under FreeBSD (Jimmy Olgeni).
+Added a #include for OSF1 (Vincent Lefevre).
+
 23-Nov-2000
 ~~~~~~~~~~~
 Bugfix: On many systems, the filer would fail to remove zombie processes
@@ -121,7 +131,7 @@ filer.
 The 'install.sh' script now uses 'printf' instead of 'echo -e' to suppress
 newlines (suggested by Bernard Jungen).
 
-Bugfix: Close tool was always disabled on started (reported by Martin Ward).
+Bugfix: Close tool was always disabled on startup (reported by Martin Ward).
 
 20-Sep-2000
 ~~~~~~~~~~~

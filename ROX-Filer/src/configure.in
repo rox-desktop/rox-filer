@@ -25,7 +25,7 @@ changequote(,)dnl
 if [ -n "$GLIB_LIBS" ]; then
   AC_MSG_RESULT(yes - use '$GLIB_LIBS')
 else
-  AC_MSG_ERROR(can't run 'glib-config --libs' - make sure it is in your PATH)
+  AC_MSG_ERROR(can't run '$GLIB_CONFIG --libs' - make sure it is in your PATH)
 fi
 changequote([,])dnl
 

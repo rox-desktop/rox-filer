@@ -263,12 +263,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 			GTK_SIGNAL_FUNC(panel_motion_event), panel);
 
 	if (strchr(name, '/'))
-	{
-		if (access(name, F_OK))
-			load_path = NULL;	/* File does not (yet) exist */
-		else
-			load_path = g_strdup(name);
-	}
+		load_path = g_strdup(name);
 	else
 	{
 		guchar	*leaf;
@@ -315,13 +310,27 @@ Panel *panel_new(guchar *name, PanelSide side)
 	gtk_widget_realize(panel->window);
 	make_panel_window(panel->window->window);
 	
-	if (load_path)
+	loading_panel = panel;
+	if (load_path && access(load_path, F_OK) == 0)
 	{
-		loading_panel = panel;
 		parse_file(load_path, pan_from_file);
 		g_free(load_path);
-		loading_panel = NULL;
 	}
+	else
+	{
+		/* Don't scare users with an empty panel... */
+		guchar	*apps;
+		
+		panel_add_item(panel, "~", "Home", FALSE);
+
+		apps = pathdup(make_path(app_dir, "..")->str);
+		if (apps)
+		{
+			panel_add_item(panel, apps, "Apps", FALSE);
+			g_free(apps);
+		}
+	}
+	loading_panel = NULL;
 
 	current_panel[side] = panel;
 
