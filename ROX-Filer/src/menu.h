@@ -30,5 +30,6 @@ void menu_set_items_shaded(GtkWidget *menu, gboolean shaded, int from, int n);
 /* Public menu handlers */
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget);
 void menu_show_options(gpointer data, guint action, GtkWidget *widget);
+void open_home(gpointer data, guint action, GtkWidget *widget);
 
 #endif /* _MENU_H */

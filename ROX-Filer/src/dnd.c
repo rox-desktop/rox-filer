@@ -1540,7 +1540,7 @@ gboolean dnd_motion_moved(GdkEventMotion *event)
 	dx = event->x_root - drag_start_x;
 	dy = event->y_root - drag_start_y;
 
-	if (ABS(dx) <= 3 && ABS(dy) <= 3)
+	if (ABS(dx) <= 5 && ABS(dy) <= 5)
 		return FALSE;		/* Not far enough */
 
 	dnd_motion_ungrab();

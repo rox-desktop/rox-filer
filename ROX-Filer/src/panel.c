@@ -48,8 +48,6 @@
 #include "mount.h"
 #include "filer.h"
 
-#define MAX_ICON_HEIGHT 42
-
 static Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
 /* Widget which holds the selection when we have it */
@@ -60,12 +58,15 @@ typedef struct _PanelIcon PanelIcon;
 
 struct _Panel {
 	GtkWidget	*window;
+	int		height;
 	GtkAdjustment	*adj;		/* Scroll position of the bar */
 	PanelSide	side;
 	guchar		*name;		/* Leaf name */
 
 	GtkWidget	*before;	/* Icons at the left/top end */
 	GtkWidget	*after;		/* Icons at the right/bottom end */
+
+	GtkWidget	*gap;		/* Event box between sides */
 };
 
 struct _PanelIcon {
@@ -101,7 +102,6 @@ static gint draw_icon(GtkWidget *widget,
 static void popup_panel_menu(GdkEventButton *event,
 				Panel *panel,
 				PanelIcon *icon);
-static void open_home(gpointer data, guint action, GtkWidget *widget);
 static gint panel_button_release(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
@@ -229,7 +229,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 {
 	guchar	*load_path;
 	Panel	*panel;
-	GtkWidget	*vp, *frame, *box;
+	GtkWidget	*vp, *box, *frame;
 
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, NULL);
 	g_return_val_if_fail(loading_panel == NULL, NULL);
@@ -252,6 +252,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 	panel = g_new(Panel, 1);
 	panel->name = g_strdup(name);
 	panel->side = side;
+	panel->height = 0;
 	panel->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_wmclass(GTK_WINDOW(panel->window), "ROX-Panel", PROJECT);
 	gtk_widget_set_events(panel->window,
@@ -311,6 +312,11 @@ Panel *panel_new(guchar *name, PanelSide side)
 
 	frame = make_insert_frame(panel);
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
+
+	/* This is used so that we can find the middle easily! */
+	panel->gap = gtk_event_box_new();
+	gtk_box_pack_start(GTK_BOX(box), panel->gap, FALSE, FALSE, 0);
+	
 	frame = make_insert_frame(panel);
 	gtk_object_set_data(GTK_OBJECT(frame), "after", "yes");
 	gtk_box_pack_start(GTK_BOX(box), frame, TRUE, TRUE, 4);
@@ -326,12 +332,12 @@ Panel *panel_new(guchar *name, PanelSide side)
 		loading_panel = NULL;
 	}
 
+	current_panel[side] = panel;
+
 	reposition_panel(panel);
 
 	number_of_windows++;
 	gtk_widget_show_all(panel->window);
-
-	current_panel[side] = panel;
 	
 	return panel;
 }
@@ -372,6 +378,14 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 {
 	if (current_panel[panel->side] == panel)
 		current_panel[panel->side] = NULL;
+
+	if (panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM)
+	{
+		if (current_panel[PANEL_RIGHT])
+			reposition_panel(current_panel[PANEL_RIGHT]);
+		if (current_panel[PANEL_LEFT])
+			reposition_panel(current_panel[PANEL_LEFT]);
+	}
 
 	g_free(panel->name);
 	g_free(panel);
@@ -480,11 +494,12 @@ static void panel_add_item(Panel *panel, guchar *path, gboolean after)
  */
 static void size_icon(PanelIcon *icon)
 {
+	int	im_height = MIN(icon->item.image->height, MAX_ICON_HEIGHT - 4);
 	GdkFont	*font = icon->widget->style->font;
 
 	gtk_widget_set_usize(icon->widget,
-			MAX(icon->item.image->width, icon->item.name_width) + 4,
-			font->ascent + font->descent + 4 + MAX_ICON_HEIGHT);
+		MAX(icon->item.image->width, icon->item.name_width) + 4,
+		font->ascent + font->descent + 2 + im_height);
 }
 
 static gint expose_icon(GtkWidget *widget,
@@ -506,12 +521,15 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *icon)
 	area.x = 0;
 	area.y = 0;
 	area.width = width;
-	area.height = height;
+	area.height = height - font->ascent - font->descent - 2;
 	
 	draw_large_icon(widget, &area, &icon->item, icon->selected);
 
 	text_x = (area.width - icon->item.name_width) >> 1;
-	text_y = area.height - font->ascent + 4;
+
+	text_y = height - font->descent;
+	if (icon->panel->side == PANEL_TOP || icon->panel->side == PANEL_BOTTOM)
+		text_y -= 4;
 
 	draw_string(widget,
 			font,
@@ -672,6 +690,9 @@ static void perform_action(Panel *panel, PanelIcon *icon, GdkEventButton *event)
 		case ACT_SELECT_EXCL:
 			icon_set_selected(icon, TRUE);
 			break;
+		case ACT_SLIDE_CLEAR_PANEL:
+			panel_clear_selection(NULL);
+			/* (no break) */
 		case ACT_SLIDE_PANEL:
 			dnd_motion_grab_pointer();
 			slide_from_value = panel->adj->value;
@@ -767,16 +788,39 @@ static void reposition_panel(Panel *panel)
 	else
 	{
 		w += MARGIN;
+		if (side == PANEL_RIGHT)
+			x = screen_width - w;
+
 		h = screen_height;
+
+		if (current_panel[PANEL_TOP])
+		{
+			int	ph;
+
+			ph = current_panel[PANEL_TOP]->height;
+			y += ph;
+			h -= ph;
+		}
+
+		if (current_panel[PANEL_BOTTOM])
+			h -= current_panel[PANEL_BOTTOM]->height;
 	}
 
 	if (side == PANEL_BOTTOM)
 		y = screen_height - h;
-	if (side == PANEL_RIGHT)
-		x = screen_width - w;
 	
 	gtk_widget_set_uposition(panel->window, x, y);
+	panel->height = h;
 	gtk_widget_set_usize(panel->window, w, h);
+	gdk_window_move_resize(panel->window->window, x, y, w, h);
+
+	if (side == PANEL_BOTTOM || side == PANEL_TOP)
+	{
+		if (current_panel[PANEL_RIGHT])
+			reposition_panel(current_panel[PANEL_RIGHT]);
+		if (current_panel[PANEL_LEFT])
+			reposition_panel(current_panel[PANEL_LEFT]);
+	}
 }
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
@@ -897,11 +941,6 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	}
 
 	panel_save(panel);
-}
-
-static void open_home(gpointer data, guint action, GtkWidget *widget)
-{
-	filer_opendir(home_dir);
 }
 
 /* See if the file the icon points to has changed. Update the icon
@@ -1300,7 +1339,10 @@ static gint icon_motion_event(GtkWidget *widget,
 	else if (motion_state != MOTION_REPOSITION)
 		return FALSE;
 
-	list = get_widget_list(panel);
+	list = gtk_container_children(GTK_CONTAINER(panel->before));
+	list = g_list_append(list, NULL);	/* The gap in the middle */
+	list = g_list_concat(list,
+			gtk_container_children(GTK_CONTAINER(panel->after)));
 	me = g_list_find(list, widget);
 
 	g_return_val_if_fail(me != NULL, TRUE);
@@ -1309,8 +1351,13 @@ static gint icon_motion_event(GtkWidget *widget,
 
 	if (me->prev)
 	{
-		GtkWidget *prev = GTK_WIDGET(me->prev->data);
+		GtkWidget *prev;
 		int	  x, y;
+
+		if (me->prev->data)
+			prev = GTK_WIDGET(me->prev->data);
+		else
+			prev = panel->gap;
 
 		gdk_window_get_deskrelative_origin(prev->window, &x, &y);
 
@@ -1320,17 +1367,28 @@ static gint icon_motion_event(GtkWidget *widget,
 
 	if (dir == 0 && me->next)
 	{
-		GtkWidget *next = GTK_WIDGET(me->next->data);
+		GtkWidget *next;
 		int	  x, y, w, h;
 
+		if (me->next->data)
+			next = GTK_WIDGET(me->next->data);
+		else
+			next = panel->gap;
+
 		gdk_window_get_deskrelative_origin(next->window, &x, &y);
+
 		gdk_window_get_size(next->window, &w, &h);
 
 		x += w;
 		y += h;
 
 		if (val >= (horz ? x : y))
-			dir = +1;
+		{
+			if (next == panel->gap)
+				dir = +2;
+			else
+				dir = +1;
+		}
 	}
 
 	if (dir)
@@ -1339,7 +1397,11 @@ static gint icon_motion_event(GtkWidget *widget,
 	return TRUE;
 }
 
-/* Move icon to this index in the complete widget list */
+/* Move icon to this index in the complete widget list.
+ * 0 makes the icon the left-most icon. The gap in the middle has
+ * an index number, which allows you to specify that the icon should
+ * go on the left or right side.
+ */
 static void reposition_icon(PanelIcon *icon, int index)
 {
 	Panel	  *panel = icon->panel;
@@ -1350,7 +1412,7 @@ static void reposition_icon(PanelIcon *icon, int index)
 	list = gtk_container_children(GTK_CONTAINER(panel->before));
 	before_len = g_list_length(list);
 
-	if (index < before_len)
+	if (index <= before_len)
 	{
 		/* Want to move icon to the 'before' list. Is it there
 		 * already?
@@ -1371,7 +1433,7 @@ static void reposition_icon(PanelIcon *icon, int index)
 	{
 		/* Else, we need it in the 'after' list. */
 
-		index -= before_len;
+		index -= before_len + 1;
 
 		g_list_free(list);
 

@@ -392,28 +392,37 @@ See section
  if you have trouble getting the icons to display correctly.
 \layout Subsubsection
 
+
+\begin_inset LatexCommand \label{run_pan}
+
+\end_inset 
+
 Panels
 \layout Standard
 
-If you want a directory to be opened as a panel, put 
+Panels work just like the pinboard.
+ You can create a panel on any side of the screen by using the options 
 \family typewriter 
--b
+--left
 \family default 
- or 
+, 
 \family typewriter 
--t
+--right,
 \family default 
- before the directory (for `bottom' or `top' panels).
- If you don't know what a panel is, try it and see!
+ 
+\family typewriter 
+--top
+\family default 
+ and 
+\family typewriter 
+--bottom
+\family default 
+, depending on which side of the screen the panel should appear on.
+ On some systems, the short (one letter) form of the options must be used.
+ For example, to create a panel along the bottom edge of the screen:
 \layout LyX-Code
 
-$ mkdir ~/Panel
-\layout LyX-Code
-
-$ ln -s $HOME ~/Panel/Home
-\layout LyX-Code
-
-$ rox -b ~/Panel
+$ rox -b=MyPanel
 \layout Standard
 
 The panel should be displayed in a window without a title bar.
@@ -423,6 +432,22 @@ The panel should be displayed in a window without a title bar.
 \end_inset 
 
  for some ideas.
+ You can drag files onto either side of the panel to add them.
+ Icons can be repositioned by dragging them with the middle mouse button.
+ Changes to the panel are automatically saved to '
+\emph on 
+<Choices>/ROX-Filer/pan_MyPanel
+\emph default 
+'.
+ As with the pinboard, you can switch between panel configurations simply
+ by running rox again with a different panel name.
+ Specify a blank name to remove the panel.
+\layout LyX-Code
+
+$ rox --bottom=MyOtherPanel
+\layout LyX-Code
+
+$ rox --bottom=
 \layout Subsubsection
 
 
@@ -1381,57 +1406,106 @@ Select just those files that match the given pattern --- see section
 Show ROX-Filer help
 \newline 
 Same as selecting ROX-Filer and choosing `Help' from the menu.
-\layout Subsubsection
-
-The panel menu
-\layout Standard
-
-This is just a cut-down version of the window menu.
- The only new entry is `Open Panel as Directory', which displays the panel
- in a new, non-panel, window.
- `Remove Item' is a cut-down version of `Delete'; it only works for symbolic
- links and never asks for confirmation.
- Since dragging applications and directories to the panel creates symlinks
- it is very easy to change the panel contents to suit your needs.
 \layout Subsection
 
-The pinboard
+The pinboard and panels
 \layout Standard
 
-Section 
+Sections 
 \begin_inset LatexCommand \ref{run_pin}
 
 \end_inset 
 
- explains how to turn the pinboard on.
- Once on, you may drop icons from filer windows onto the pinboard to pin
- them up.
+ and 
+\begin_inset LatexCommand \ref{run_pan}
+
+\end_inset 
+
+ explain how to turn the pinboard and panels on.
+ Once on, you may drop icons from filer windows onto the them to pin them
+ up.
  Clicking on a pinned file acts just like clicking on it in a filer window.
  You can drag pinned icons just like normal icons and you can right-click
- on one to see the pinboard's popup menu.
+ on one to see the popup menu.
 \layout Standard
 
 Drag pinned icons with the middle mouse button to move them around (they
- snap to a grid).
- Changes to the pinboard are automatically saved.
+ snap to a grid on the pinboard).
+ Changes to the pinboard and panel layouts are automatically saved.
+ Clicking on pinned icons with Control held down selects and unselects them.
+ Click on the background to unselect them all.
 \layout Standard
 
-Clicking on pinned icons with Control held down selects and unselects them.
- Click on the desktop background to unselect them all.
+If the panel has so many icons that they can't all be shown at once then
+ you can scroll it by dragging the blank area in the middle.
 \layout Standard
 
 
 \series bold 
 IMPORTANT: 
 \series default 
-Pinning a file to the pinboard does 
+Pinning a file does 
 \series bold 
 not
 \series default 
  copy it, it merely creates a shortcut to the original file.
- If you delete the file, then you've lost it! Removing a file from the pinboard
- only removes the link.
+ If you delete the file, then you've lost it! Removing a pinned file from
+ its pinboard or panel only removes the link.
  This is different to most other filers...
+\layout Subsubsection
+
+The panel and pinboard menus
+\layout Standard
+
+These menus are both the same, and very simple:
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
+multicol5
+6 2 0 0 -1 -1 -1 -1
+1 1 0 0
+1 0 0 0
+1 0 0 0
+1 0 0 0
+1 0 0 0
+1 1 0 0
+8 1 0 "" ""
+2 1 1 "8cm" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 2 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+0 8 1 0 0 0 0 "" ""
+
+Entry
+\newline 
+Action
+\newline 
+ROX-Filer Help
+\newline 
+Open the directory containing ROX-Filer's documentation.
+\newline 
+ROX-Filer Options...
+\newline 
+Show the configuration options for ROX-Filer.
+\newline 
+Open Home Directory
+\newline 
+Show your home directory.
+\newline 
+Show Help
+\newline 
+Show the documentation for the selected application.
+\newline 
+Remove Item(s)
+\newline 
+Remove the selected items from the panel.
 \layout Subsection
 
 
@@ -2239,12 +2313,12 @@ mtime The time that the file's contents were last modified.
 size The size of the file.
 \layout Description
 
-inode The file's inode (index) number
+inode The file's inode (index) number.
 \layout Description
 
-nlinks The number of links to this file (that is, the number of directory
- entries which refer to this file.
- Note that symlinks don't count as references).
+nlinks The number of links to this file.
+ That is, the number of directory entries which refer to this file.
+ Note that symlinks don't count as references.
 \layout Description
 
 uid The User ID of the file.
@@ -2503,6 +2577,10 @@ If you are using the pinboard features (see section
  However, users with more `noisy' backdrops may find such text hard to read;
  selecting `Rectangular background slab' will draw a solid rectangle behind
  the text to make it easier to read.
+\layout Standard
+
+You may also change the foreground and background colours used for the text
+ by clicking on the colour slabs in the Options window.
 \layout Subsubsection
 
 Action window options
@@ -2565,29 +2643,13 @@ Large
 Filer window options
 \layout Itemize
 
-`New window on button 1' swaps the actions of the two non-menu buttons when
- opening directories.
- This is provided for people who are used to the RISC OS mouse bindings.
-\layout Itemize
-
-`Menu on button 2' swaps the actions of buttons 2 and 3 so that the middle
- button brings up the menus.
- This is provided for people who are used to the RISC OS mouse bindings.
-\layout Itemize
-
-`Single-click navigation' treats a single click over an item as if it was
- a double click.
- This allows you to move around, run applications and open files without
- double clicking.
- To select a file 
-\emph on 
-without
-\emph toggle 
- opening it you must hold down CTRL while you click.
-\layout Itemize
-
 `Unique windows' prevents you from having two windows showing the same directory.
  Opening a second view onto a directory closes the first.
+\layout Itemize
+
+`Initial window height' determines how large newly opened filer windows
+ will be.
+ The height is given as the number of rows at Large Icons size.
 \layout Subsubsection
 
 Drag-And-Drop options
@@ -2621,6 +2683,11 @@ ROX-Filer uses the standard XDND protocol for drag-and-drop.
  for a similar effect.
  You need to have the previous option enabled for this to have any effect
  on files displayed in a directory.
+\layout Itemize
+
+`Spring delay' sets how long, in thousanths of a second, the filer will
+ wait before spring opening a directory as described above.
+ If the above option is turned off, then this has no effect.
 \layout Subsubsection
 
 Menu options
@@ -2628,10 +2695,34 @@ Menu options
 
 The `Xterm here' program is the one used when you choose `Xterm here' from
  the menu.
- You can replace it with another program such as `gnome-terminal' if you
- like.
+ You can replace it with another program such as `gnome-terminal' or `konsole'
+ if you like.
  In fact, any program will do, but note that you cannot pass any options
  to the program at present.
+\layout Subsubsection
+
+Mouse bindings
+\layout Itemize
+
+`New window on button 1' swaps the actions of the two non-menu buttons when
+ opening directories.
+ This is provided for people who are used to the RISC OS mouse bindings.
+\layout Itemize
+
+`Menu on button 2' swaps the actions of buttons 2 and 3 so that the middle
+ button brings up the menus.
+ This is provided for people who are used to the RISC OS mouse bindings.
+\layout Itemize
+
+`Single-click navigation' treats a single click over an item as if it was
+ a double click.
+ This allows you to move around, run applications and open files without
+ double clicking.
+ To select a file 
+\emph on 
+without
+\emph toggle 
+ opening it you must hold down CTRL while you click.
 \layout Section
 
 Filetypes
@@ -3030,11 +3121,18 @@ Data-structures
 \layout Standard
 
 The diagram below shows some of the major structures found in the filer
- along with their most important attributes and methods.
- Exactly which attributes have been included is a little hit-and-miss but
- it might help you get the overall picture.
- If you find it useful, please let me know and I'll try to keep it up-to-date
- (or even extend it!).
+ and the relationships between them.
+\layout Standard
+\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
+
+\begin_inset Figure size 595 314
+file Structs.eps
+width 3 100.00
+flags 9
+
+\end_inset 
+
+
 \layout Standard
 
 To summarise, each window (or panel) has its own 
@@ -3100,17 +3198,6 @@ attach()
 detach()
 \emph toggle 
  to add and remove functions to or from the list).
-\layout Standard
-\added_space_top 0.3cm \added_space_bottom 0.3cm \align center 
-
-\begin_inset Figure size 595 606
-file Structs.eps
-width 3 100.00
-flags 9
-
-\end_inset 
-
-
 \layout Bibliography
 \bibitem {ROX}
 

@@ -36,6 +36,7 @@ typedef enum {
 	ACT_LASSO_CLEAR,	/* Clear selection, and start lasso drag */
 	ACT_LASSO_MODIFY,	/* Start lasso drag without clearing */
 	ACT_SLIDE_PANEL,	/* Start scrolling the panel */
+	ACT_SLIDE_CLEAR_PANEL,	/* As above, but clear selection too */
 } BindAction;
 
 void bind_init(void);

@@ -380,7 +380,7 @@ void draw_large_icon(GtkWidget *widget,
 {
 	MaskedPixmap	*image = item->image;
 	int	width = MIN(image->width, MAX_ICON_WIDTH);
-	int	height = MIN(image->height, MAX_ICON_WIDTH);
+	int	height = MIN(image->height, MAX_ICON_HEIGHT);
 	int	image_x = area->x + ((area->width - width) >> 1);
 	int	image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
@@ -388,7 +388,7 @@ void draw_large_icon(GtkWidget *widget,
 		
 	gdk_gc_set_clip_mask(gc, item->image->mask);
 
-	image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
+	image_y = MAX(0, area->height - height - 6);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
 			item->image->pixmap,
@@ -712,8 +712,15 @@ static void draw_item_large(GtkWidget *widget,
 	int	text_x = area->x + ((area->width - text_width) >> 1);
 	int	text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
+	GdkRectangle	pic_area;
 
-	draw_large_icon(widget, area, item, selected);
+	pic_area.x = area->x;
+	pic_area.y = area->y;
+	pic_area.width = area->width;
+	pic_area.height = area->height -
+			(item_font->ascent + item_font->descent);
+
+	draw_large_icon(widget, &pic_area, item, selected);
 	
 	if (text_x < area->x)
 		text_x = area->x;
@@ -814,7 +821,7 @@ void shrink_width(FilerWindow *filer_window)
 	switch (style)
 	{
 		case LARGE_FULL_INFO:
-			height = MAX_ICON_HEIGHT + 4;
+			height = MAX_ICON_HEIGHT - 4;
 			break;
 		case SMALL_FULL_INFO:
 			fixed_height = fixed_font->ascent + fixed_font->descent;
@@ -825,7 +832,7 @@ void shrink_width(FilerWindow *filer_window)
 			break;
 		case LARGE_ICONS:
 		default:
-			height = text_height + MAX_ICON_HEIGHT + 8;
+			height = text_height + MAX_ICON_HEIGHT + 2;
 			break;
 	}
 

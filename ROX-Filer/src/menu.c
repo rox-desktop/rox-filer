@@ -225,6 +225,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 static GtkItemFactoryEntry pinboard_menu_def[] = {
 {N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
+{N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
 {N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
@@ -478,12 +479,12 @@ void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
 	if (icons)
 	{
 		menu_set_items_shaded(pinboard_menu,
-				icons->next ? TRUE : FALSE, 3, 1);
+				icons->next ? TRUE : FALSE, 4, 1);
 
-		menu_set_items_shaded(pinboard_menu, FALSE, 4, 1);
+		menu_set_items_shaded(pinboard_menu, FALSE, 5, 1);
 	}
 	else
-		menu_set_items_shaded(pinboard_menu, TRUE, 3, 2);
+		menu_set_items_shaded(pinboard_menu, TRUE, 4, 2);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
@@ -1195,6 +1196,11 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 			g_string_free(gstring, TRUE);
 			break;
 	}
+}
+
+void open_home(gpointer data, guint action, GtkWidget *widget)
+{
+	filer_opendir(home_dir);
 }
 
 static void help(gpointer data, guint action, GtkWidget *widget)

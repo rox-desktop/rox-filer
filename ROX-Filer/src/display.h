@@ -8,7 +8,7 @@
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 
-#define MAX_ICON_HEIGHT 42
+#define MAX_ICON_HEIGHT 48
 #define MAX_ICON_WIDTH 48
 #define ROW_HEIGHT_LARGE 64
 
