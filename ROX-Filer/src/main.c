@@ -252,8 +252,8 @@ int main(int argc, char **argv)
 		 * compiled OK. Do this test before gtk_init so that
 		 * we don't need an X server to install.
 		 */
-		fprintf(stderr, "ROX-Filer %s\n", VERSION);
-		fprintf(stderr, _(COPYING));
+		g_printerr("ROX-Filer %s\n", VERSION);
+		g_printerr(_(COPYING));
 		show_features();
 		return EXIT_SUCCESS;
 	}

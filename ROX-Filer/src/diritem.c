@@ -218,6 +218,8 @@ DirItem *diritem_new(const guchar *leafname)
 		item->leafname_collate = g_malloc(strlen(item->leafname) + 1);
 		o = item->leafname_collate;
 
+		/* TODO: Fix for UTF-8 */
+
 		for (i = leafname; *i; i++)
 		{
 			if (isdigit(*i))
