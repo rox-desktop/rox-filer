@@ -102,7 +102,7 @@ struct _GUIside
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-	GtkWidget 	*vbox, *log, *window, *dir;
+	GtkWidget 	*vbox, *log, *window, *dir, *log_hbox;
 	GtkWidget	*quiet, *yes, *no;
 	int		child;		/* Process ID */
 	int		errors;
@@ -113,6 +113,10 @@ struct _GUIside
 	
 	char		*next_dir;	/* NULL => no timer active */
 	gint		next_timer;
+
+	/* Used by Find */
+	FilerWindow	*preview;
+	GtkWidget	*results;
 };
 
 /* These don't need to be in a structure because we fork() before
@@ -270,6 +274,39 @@ static char *action_auto_quiet(char *data)
 }
 
 /*			SUPPORT				*/
+
+static void preview_closed(GtkWidget *window, GUIside *gui_side)
+{
+	gui_side->preview = NULL;
+}
+
+static void select_row_callback(GtkWidget *widget,
+                             gint row, gint column,
+                             GdkEventButton *event,
+                             GUIside *gui_side)
+{
+	gchar		*leaf, *dir;
+
+	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 0, &leaf);
+	gtk_clist_get_text(GTK_CLIST(gui_side->results), row, 1, &dir);
+
+	gtk_clist_unselect_row(GTK_CLIST(gui_side->results), row, column);
+
+	if (gui_side->preview)
+	{
+		if (strcmp(gui_side->preview->path, dir) == 0)
+			filer_set_autoselect(gui_side->preview, leaf);
+		else
+			filer_change_to(gui_side->preview, dir, leaf);
+		return;
+	}
+
+	gui_side->preview = filer_opendir(dir, PANEL_NO);
+	filer_set_autoselect(gui_side->preview, leaf);
+	gtk_signal_connect(GTK_OBJECT(gui_side->preview->window), "destroy",
+			GTK_SIGNAL_FUNC(preview_closed), gui_side);
+}
+
 
 /* This is called whenever the user edits the entry box (if any) - send the
  * new string.
@@ -481,6 +518,24 @@ static gboolean display_dir(gpointer data)
 	return FALSE;
 }
 
+static void add_to_results(GUIside *gui_side, gchar *path)
+{
+	gchar	*row[] = {"Leaf", "Dir"};
+	gchar	*slash;
+	int	len;
+
+	slash = strrchr(path, '/');
+	g_return_if_fail(slash != NULL);
+
+	len = slash - path;
+	row[1] = g_strndup(path, MAX(len, 1));
+	row[0] = slash + 1;
+
+	gtk_clist_append(GTK_CLIST(gui_side->results), row);
+
+	g_free(row[1]);
+}
+
 /* Called when the child sends us a message */
 static void message_from_child(gpointer 	 data,
 			       gint     	 source, 
@@ -506,6 +561,12 @@ static void message_from_child(gpointer 	 data,
 			else if (*buffer == '+')
 			{
 				refresh_dirs(buffer + 1);
+				g_free(buffer);
+				return;
+			}
+			else if (*buffer == '=')
+			{
+				add_to_results(gui_side, buffer + 1);
 				g_free(buffer);
 				return;
 			}
@@ -832,6 +893,16 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 		gtk_timeout_remove(gui_side->next_timer);
 		g_free(gui_side->next_dir);
 	}
+
+	if (gui_side->preview)
+	{
+		gtk_signal_disconnect_by_data(
+				GTK_OBJECT(gui_side->preview->window),
+				gui_side);
+		g_print("[ forget preview ]\n");
+		gui_side->preview = NULL;
+	}
+	
 	g_free(gui_side);
 	
 	if (--number_of_windows < 1)
@@ -848,7 +919,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
 	int		child;
-	GtkWidget	*vbox, *button, *hbox, *scrollbar, *actions;
+	GtkWidget	*vbox, *button, *scrollbar, *actions;
 	struct sigaction act;
 
 	if (pipe(filedes))
@@ -901,6 +972,8 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gui_side->child = child;
 	gui_side->errors = 0;
 	gui_side->show_info = FALSE;
+	gui_side->preview = NULL;
+	gui_side->results = NULL;
 	gui_side->entry = NULL;
 	gui_side->default_string = NULL;
 
@@ -918,14 +991,16 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gtk_misc_set_alignment(GTK_MISC(gui_side->dir), 0.5, 0.5);
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->dir, FALSE, TRUE, 0);
 
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 4);
+	gui_side->log_hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), gui_side->log_hbox, TRUE, TRUE, 4);
 
 	gui_side->log = gtk_text_new(NULL, NULL);
 	gtk_widget_set_usize(gui_side->log, 400, 100);
-	gtk_box_pack_start(GTK_BOX(hbox), gui_side->log, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
+				gui_side->log, TRUE, TRUE, 0);
 	scrollbar = gtk_vscrollbar_new(GTK_TEXT(gui_side->log)->vadj);
-	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
+				scrollbar, FALSE, TRUE, 0);
 
 	actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), actions, FALSE, TRUE, 0);
@@ -1107,7 +1182,7 @@ static gboolean do_find(char *path, char *dummy)
 
 	if (find_test_condition(find_condition, path))
 	{
-		g_string_sprintf(message, "'Found '%s'\n", path);
+		g_string_sprintf(message, "=%s", path);
 		send();
 	}
 
@@ -1767,7 +1842,8 @@ void action_find(FilerWindow *filer_window)
 {
 	GUIside		*gui_side;
 	Collection 	*collection;
-	GtkWidget	*hbox, *label, *button;
+	GtkWidget	*hbox, *label, *button, *scroller;
+	gchar		*titles[] = {"Name", "Directory"};
 
 	collection = filer_window->collection;
 
@@ -1787,6 +1863,22 @@ void action_find(FilerWindow *filer_window)
 		return;
 
 	gui_side->show_info = TRUE;
+
+	scroller = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(scroller),
+			GTK_POLICY_NEVER, GTK_POLICY_ALWAYS);
+	gtk_box_pack_start(GTK_BOX(gui_side->vbox), scroller, TRUE, TRUE, 4);
+	gui_side->results = gtk_clist_new_with_titles(
+			sizeof(titles) / sizeof(*titles), titles);
+	gtk_widget_set_usize(gui_side->results, 100, 100);
+	gtk_clist_set_column_width(GTK_CLIST(gui_side->results), 0, 100);
+	gtk_clist_set_selection_mode(GTK_CLIST(gui_side->results),
+					GTK_SELECTION_SINGLE);
+	gtk_container_add(GTK_CONTAINER(scroller), gui_side->results);
+	gtk_box_set_child_packing(GTK_BOX(gui_side->vbox),
+			  gui_side->log_hbox, FALSE, TRUE, 4, GTK_PACK_START);
+	gtk_signal_connect(GTK_OBJECT(gui_side->results), "select_row",
+			GTK_SIGNAL_FUNC(select_row_callback), gui_side);
 
 	hbox = gtk_hbox_new(FALSE, 0);
 	label = gtk_label_new("Expression:");

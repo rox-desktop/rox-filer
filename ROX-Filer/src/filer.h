@@ -84,5 +84,6 @@ void filer_openitem(FilerWindow *filer_window, int item_number,
 		OpenFlags flags);
 void filer_check_mounted(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
+void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 
 #endif /* _FILER_H */

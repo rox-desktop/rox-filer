@@ -184,7 +184,6 @@ static void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
-static void set_autoselect(FilerWindow *filer_window, guchar *leaf);
 static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
 static void filer_set_title(FilerWindow *filer_window);
 static gboolean exists(FilerWindow *filer_window);
@@ -1030,7 +1029,7 @@ static void follow_symlink(FilerWindow *filer_window, char *path,
 		FilerWindow *new;
 		
 		new = filer_opendir(new_dir, PANEL_NO);
-		set_autoselect(new, slash + 1);
+		filer_set_autoselect(new, slash + 1);
 	}
 	else
 		filer_change_to(filer_window, new_dir, slash + 1);
@@ -2027,7 +2026,7 @@ static gboolean exists(FilerWindow *filer_window)
  * isn't already there but we're scanning then highlight it if it
  * appears later.
  */
-static void set_autoselect(FilerWindow *filer_window, guchar *leaf)
+void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf)
 {
 	Collection	*col = filer_window->collection;
 	int		i;
