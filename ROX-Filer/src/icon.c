@@ -561,7 +561,7 @@ static void selection_get(GtkClipboard	*primary,
 
 static void set_backdrop(gpointer data, guint action, GtkWidget *widget)
 {
-	pinboard_set_backdrop();
+	pinboard_set_backdrop_box();
 }
 
 static void remove_items(gpointer data, guint action, GtkWidget *widget)

@@ -210,7 +210,6 @@ static void create_pinboard_window(Pinboard *pinboard);
 static void reload_backdrop(Pinboard *pinboard,
 			    const gchar *backdrop,
 			    BackdropStyle backdrop_style);
-static void set_backdrop(const gchar *path, BackdropStyle style);
 static void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static void abandon_backdrop_app(Pinboard *pinboard);
@@ -554,7 +553,7 @@ void pinboard_set_backdrop_app(const gchar *app)
 		g_object_unref(ai);
 
 	if (can_set)
-		set_backdrop(app, BACKDROP_PROGRAM);
+		pinboard_set_backdrop(app, BACKDROP_PROGRAM);
 	else
 		delayed_error(_("You can only set the backdrop to an image "
 				"or to a program which knows how to "
@@ -565,7 +564,7 @@ void pinboard_set_backdrop_app(const gchar *app)
 }
 
 /* Open a dialog box allowing the user to set the backdrop */
-void pinboard_set_backdrop(void)
+void pinboard_set_backdrop_box(void)
 {
 	GtkWidget *dialog, *frame, *label, *hbox;
 	GtkBox *vbox;
@@ -660,6 +659,52 @@ void draw_label_shadow(WrappedLabel *wl, GdkRegion *region)
 	gdk_gc_set_clip_region(current_pinboard->shadow_gc, NULL);
 }
 
+/* Set and save (path, style) as the new backdrop.
+ * If style is BACKDROP_PROGRAM, the program is run to get the backdrop.
+ * Otherwise, the image is displayed now.
+ */
+void pinboard_set_backdrop(const gchar *path, BackdropStyle style)
+{
+	g_return_if_fail((path == NULL && style == BACKDROP_NONE) ||
+			 (path != NULL && style != BACKDROP_NONE));
+
+	if (!current_pinboard)
+	{
+		if (!path)
+			return;
+		pinboard_activate("Default");
+		delayed_error(_("No pinboard was in use... "
+			"the 'Default' pinboard has been selected. "
+			"Use 'rox -p=Default' to turn it on in "
+			"future."));
+		g_return_if_fail(current_pinboard != NULL);
+	}
+
+	/* We might have just run the old backdrop program and now
+	 * we're going to set a new one! Seems a bit mean...
+	 */
+
+	abandon_backdrop_app(current_pinboard);
+
+	g_free(current_pinboard->backdrop);
+	current_pinboard->backdrop = g_strdup(path);
+	current_pinboard->backdrop_style = style;
+	reload_backdrop(current_pinboard,
+			current_pinboard->backdrop,
+			current_pinboard->backdrop_style);
+	
+	pinboard_save();
+
+	if (set_backdrop_dialog)
+	{
+		DropBox *box = g_object_get_data(G_OBJECT(set_backdrop_dialog),
+							  "rox-dropbox");
+		g_return_if_fail(box != NULL);
+		drop_box_set_path(box, current_pinboard->backdrop);
+		update_radios(set_backdrop_dialog);
+	}
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
@@ -671,7 +716,7 @@ static void backdrop_response(GtkWidget *dialog, gint response, gpointer data)
 
 static void clear_backdrop(GtkWidget *drop_box, gpointer data)
 {
-	set_backdrop(NULL, BACKDROP_NONE);
+	pinboard_set_backdrop(NULL, BACKDROP_NONE);
 }
 
 static void drag_backdrop_dropped(GtkWidget	*drop_box,
@@ -698,7 +743,7 @@ static void drag_backdrop_dropped(GtkWidget	*drop_box,
 		pinboard_set_backdrop_app(path);
 	}
 	else if (S_ISREG(info.st_mode))
-		set_backdrop(path, radios_get_value(radios));
+		pinboard_set_backdrop(path, radios_get_value(radios));
 	else
 		delayed_error(_("Only files (and certain applications) can be "
 				"used to set the background image."));
@@ -2019,7 +2064,7 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 				"Backdrop removed."),
 				error->message);
 		g_error_free(error);
-		set_backdrop(NULL, BACKDROP_NONE);
+		pinboard_set_backdrop(NULL, BACKDROP_NONE);
 		return NULL;
 	}
 
@@ -2279,52 +2324,6 @@ static void reload_backdrop(Pinboard *pinboard,
 	}
 }
 
-/* Set and save (path, style) as the new backdrop.
- * If style is BACKDROP_PROGRAM, the program is run to get the backdrop.
- * Otherwise, the image is displayed now.
- */
-static void set_backdrop(const gchar *path, BackdropStyle style)
-{
-	g_return_if_fail((path == NULL && style == BACKDROP_NONE) ||
-			 (path != NULL && style != BACKDROP_NONE));
-
-	if (!current_pinboard)
-	{
-		if (!path)
-			return;
-		pinboard_activate("Default");
-		delayed_error(_("No pinboard was in use... "
-			"the 'Default' pinboard has been selected. "
-			"Use 'rox -p=Default' to turn it on in "
-			"future."));
-		g_return_if_fail(current_pinboard != NULL);
-	}
-
-	/* We might have just run the old backdrop program and now
-	 * we're going to set a new one! Seems a bit mean...
-	 */
-
-	abandon_backdrop_app(current_pinboard);
-
-	g_free(current_pinboard->backdrop);
-	current_pinboard->backdrop = g_strdup(path);
-	current_pinboard->backdrop_style = style;
-	reload_backdrop(current_pinboard,
-			current_pinboard->backdrop,
-			current_pinboard->backdrop_style);
-	
-	pinboard_save();
-
-	if (set_backdrop_dialog)
-	{
-		DropBox *box = g_object_get_data(G_OBJECT(set_backdrop_dialog),
-							  "rox-dropbox");
-		g_return_if_fail(box != NULL);
-		drop_box_set_path(box, current_pinboard->backdrop);
-		update_radios(set_backdrop_dialog);
-	}
-}
-
 #define SEARCH_STEP 32
 
 static void search_free(GdkRectangle *rect, GdkRegion *used,
@@ -2465,7 +2464,7 @@ static void radios_changed(gpointer data)
 	{
 		path = drop_box_get_path(drop_box);
 		if (path)
-			set_backdrop(path, radios_get_value(radios));
+			pinboard_set_backdrop(path, radios_get_value(radios));
 	}
 }
 

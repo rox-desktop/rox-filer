@@ -96,6 +96,7 @@ static xmlNodePtr rpc_Mount(GList *args);
 
 static xmlNodePtr rpc_PanelAdd(GList *args);
 static xmlNodePtr rpc_PinboardAdd(GList *args);
+static xmlNodePtr rpc_SetBackdrop(GList *args);
 static xmlNodePtr rpc_SetBackdropApp(GList *args);
 
 /****************************************************************
@@ -137,6 +138,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
 
+	soap_register("SetBackdrop", rpc_SetBackdrop, "Filename,Style", NULL);
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After");
@@ -706,6 +708,33 @@ static xmlNodePtr rpc_Pinboard(GList *args)
 	name = string_value(ARG(0));
 	pinboard_activate(name);
 	g_free(name);
+
+	return NULL;
+}
+
+/* args = Filename, Style */
+static xmlNodePtr rpc_SetBackdrop(GList *args)
+{
+	char *file;
+	char *style;
+	BackdropStyle s;
+
+	file = string_value(ARG(0));
+	style = string_value(ARG(1));
+
+	s = !g_strcasecmp(style, "Tile") ? BACKDROP_TILE :
+	    !g_strcasecmp(style, "Scale") ? BACKDROP_SCALE :
+	    !g_strcasecmp(style, "Stretch") ? BACKDROP_STRETCH :
+	    !g_strcasecmp(style, "Centre") ? BACKDROP_CENTRE :
+					     BACKDROP_NONE;
+
+	if (s == BACKDROP_NONE)
+		g_warning("Invalid style '%s' for backdrop", style);
+	else
+		pinboard_set_backdrop(file, s);
+
+	g_free(file);
+	g_free(style);
 
 	return NULL;
 }
