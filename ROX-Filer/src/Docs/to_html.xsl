@@ -18,14 +18,6 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="guibutton">
-    <span class="guibutton">
-      <xsl:call-template name="inline.charseq"/>
-    </span>
-  </xsl:template>
-
-  <xsl:template match="guilabel">`<span class="guilabel"><xsl:call-template name="inline.charseq"/></span>'</xsl:template>
-
   <xsl:template match="function">
     <span class="function"><xsl:apply-templates/></span>
   </xsl:template>
