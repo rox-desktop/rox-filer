@@ -477,18 +477,14 @@ static gint end_wink(gpointer data)
 /* Make the wink border solid or transparent */
 static void mask_wink_border(Icon *icon, GdkColor *alpha)
 {
-	int	width, height;
-
 	if (!current_pinboard)
 		return;
 	
-	gdk_window_get_size(icon->widget->window, &width, &height);
-
 	gdk_gc_set_foreground(mask_gc, alpha);
 	gdk_draw_rectangle(icon->mask, mask_gc, FALSE,
-			0, 0, width - 1, height - 1);
+			0, 0, icon->width - 1, icon->height - 1);
 	gdk_draw_rectangle(icon->mask, mask_gc, FALSE,
-			1, 1, width - 3, height - 3);
+			1, 1, icon->width - 3, icon->height - 3);
 
 	gtk_widget_shape_combine_mask(icon->win, icon->mask, 0, 0);
 
@@ -545,6 +541,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	width = MAX(iwidth, item->name_width + 2) + 2 * WINK_FRAME;
 	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
 	gtk_widget_set_usize(icon->win, width, height);
+	icon->width = width;
+	icon->height = height;
 
 	if (icon->mask)
 		gdk_pixmap_unref(icon->mask);
@@ -642,7 +640,6 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 #ifndef GTK2
 	GdkFont		*font = icon->widget->style->font;
 #endif
-	int		width, height;
 	int		text_x, text_y;
 	DirItem		*item = &icon->item;
 	MaskedPixmap	*image = item->image;
@@ -653,8 +650,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 					       : GTK_STATE_NORMAL;
 
-	gdk_window_get_size(widget->window, &width, &height);
-	image_x = (width - iwidth) >> 1;
+	image_x = (icon->width - iwidth) >> 1;
 
 	/* TODO: If the shape extension is missing we might need to set
 	 * the clip mask here...
@@ -696,7 +692,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 		gdk_gc_set_clip_origin(gc, 0, 0);
 	}
 
-	text_x = (width - item->name_width) >> 1;
+	text_x = (icon->width - item->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
 	if (o_text_bg != TEXT_BG_NONE)
@@ -742,11 +738,11 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 		gdk_draw_rectangle(icon->widget->window,
 				icon->widget->style->white_gc,
 				FALSE,
-				0, 0, width - 1, height - 1);
+				0, 0, icon->width - 1, icon->height - 1);
 		gdk_draw_rectangle(icon->widget->window,
 				icon->widget->style->black_gc,
 				FALSE,
-				1, 1, width - 3, height - 3);
+				1, 1, icon->width - 3, icon->height - 3);
 	}
 
 	return FALSE;
