@@ -32,7 +32,6 @@
  */
 
 #include "config.h"
-
 #include <parser.h>
 #include <tree.h>
 

@@ -27,6 +27,8 @@
 
 #include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
+#include <parser.h>
+#include <tree.h>
 
 #include "global.h"
 
@@ -41,10 +43,15 @@
 #include "dnd.h"
 #include "run.h"
 #include "infobox.h"
+#include "pixmaps.h"
+#include "mount.h"
+#include "appinfo.h"
 
 typedef void (*RenameFn)(Icon *icon);
 
 static GtkWidget	*icon_menu;		/* The popup icon menu */
+
+static GtkTooltips	*tooltips = NULL;
 
 /* Widget which holds the selection when we have it */
 static GtkWidget *selection_invisible = NULL;
@@ -123,6 +130,8 @@ void icon_init(void)
 			GDK_SELECTION_PRIMARY,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table));
+
+	tooltips = gtk_tooltips_new();
 }
 
 /* Removes trailing / chars and converts a leading '~/' (if any) to
@@ -190,26 +199,45 @@ void icon_unhash_path(Icon *icon)
 				((Icon *) list->data)->path, list);
 }
 
+/* Called when the pointer moves over the icon */
+void icon_may_update(Icon *icon)
+{
+	MaskedPixmap	*image;
+	int		flags;
+
+	g_return_if_fail(icon != NULL);
+
+	image = icon->item.image;
+	flags = icon->item.flags;
+
+	pixmap_ref(image);
+	mount_update(FALSE);
+	dir_restat(icon->path, &icon->item, FALSE);
+
+	if (icon->item.image != image || icon->item.flags != flags)
+	{
+		/* Appearance changed; need to redraw */
+		if (icon->panel)
+		{
+			panel_size_icon(icon);
+			gtk_widget_queue_clear(icon->widget);
+		}
+		else
+			pinboard_reshape_icon(icon);
+	}
+
+	pixmap_unref(image);
+}
+
 /* If path is on an icon then it may have changed... check! */
 void icons_may_update(guchar *path)
 {
 	GList	*affected;
 
-	/* g_print("[ icons_may_update(%s) ]\n", path); */
-
 	affected = g_hash_table_lookup(icons_hash, path);
 
-	while (affected)
-	{
-		Icon *icon = (Icon *) affected->data;
-
-		if (icon->panel)
-			panel_icon_may_update(icon);
-		else
-			pinboard_icon_may_update(icon);
-
-		affected = affected->next;
-	}
+	for (; affected; affected = affected->next)
+		icon_may_update((Icon *) affected->data);
 }
 
 typedef struct _CheckData CheckData;
@@ -228,6 +256,38 @@ static void check_has(gpointer key, GList *icons, CheckData *check)
 
 	if (is_sub_dir(icon->path, check->path))
 		check->found = TRUE;
+}
+
+void icon_set_tip(Icon *icon)
+{
+	GtkWidget	*widget;
+	AppInfo		*ai;
+	struct _xmlNode *node;
+
+	g_return_if_fail(icon != NULL);
+
+	widget = icon->panel ? icon->widget : icon->win;
+
+	ai = appinfo_get(icon->path, &icon->item);
+
+	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
+	{
+		guchar *str;
+		str = xmlNodeListGetString(node->doc,
+				node->xmlChildrenNode, 1);
+		gtk_tooltips_set_tip(tooltips, widget, str, NULL);
+		g_free(str);
+	}
+	else if (icon->panel && !panel_want_show_text(icon))
+	{
+		gtk_tooltips_set_tip(tooltips, widget,
+				icon->item.leafname, NULL);
+	}
+	else
+		gtk_tooltips_set_tip(tooltips, widget, NULL, NULL);
+
+	if (ai)
+		appinfo_unref(ai);
 }
 
 /* Returns TRUE if any icon links to this item (or any item inside
@@ -413,6 +473,21 @@ void icon_destroyed(Icon *icon)
 	g_free(icon->path);
 	g_free(icon->src_path);
 	g_free(icon);
+}
+
+static void set_tip(gpointer key, GList *icons, gpointer data)
+{
+	for (; icons; icons = icons->next)
+	{
+		Icon	*icon = (Icon *) icons->data;
+		
+		icon_set_tip(icon);
+	}
+}
+
+void icons_update_tip(void)
+{
+	g_hash_table_foreach(icons_hash, (GHFunc) set_tip, NULL);
 }
 
 /****************************************************************

@@ -46,7 +46,6 @@
 #include "bind.h"
 #include "dnd.h"
 #include "support.h"
-#include "mount.h"
 #include "filer.h"
 #include "icon.h"
 #include "run.h"
@@ -127,7 +126,6 @@ static void perform_action(Panel *panel,
 			   GdkEventButton *event);
 static void run_applet(Icon *icon);
 static void panel_set_style(guchar *new);
-static gboolean want_show_text(Icon *icon);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -138,7 +136,7 @@ static gint slide_from_value = 0;
 #define SHOW_BOTH 0
 #define SHOW_APPS_SMALL 1
 #define SHOW_ICON 2
-static int panel_style = SHOW_BOTH;
+static int panel_style = SHOW_APPS_SMALL;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -146,7 +144,7 @@ static int panel_style = SHOW_BOTH;
 
 void panel_init(void)
 {
-	option_add_int("panel_style", SHOW_BOTH, panel_set_style);
+	option_add_int("panel_style", panel_style, panel_set_style);
 }
 
 /* 'name' may be NULL or "" to remove the panel */
@@ -278,27 +276,6 @@ Panel *panel_new(guchar *name, PanelSide side)
 	return panel;
 }
 
-/* See if the file the icon points to has changed. Update the icon
- * if so.
- */
-void panel_icon_may_update(Icon *icon)
-{
-	MaskedPixmap	*image = icon->item.image;
-	int		flags = icon->item.flags;
-
-	pixmap_ref(image);
-	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item, FALSE);
-
-	if (icon->item.image != image || icon->item.flags != flags)
-	{
-		panel_size_icon(icon);
-		gtk_widget_queue_clear(icon->widget);
-	}
-
-	pixmap_unref(image);
-}
-
 /* Set the size of the widget for this icon */
 void panel_size_icon(Icon *icon)
 {
@@ -317,7 +294,7 @@ void panel_size_icon(Icon *icon)
 
 	width = PIXMAP_WIDTH(icon->item.image->pixmap);
 
-	if (want_show_text(icon))
+	if (panel_want_show_text(icon))
 	{
 		height = font->ascent + font->descent + 6 + im_height;
 		width = MAX(width, icon->item.name_width);
@@ -326,6 +303,19 @@ void panel_size_icon(Icon *icon)
 		height = im_height;
 
 	gtk_widget_set_usize(icon->widget, width + 4, height);
+}
+
+gboolean panel_want_show_text(Icon *icon)
+{
+	if (panel_style == SHOW_BOTH)
+		return TRUE;
+	if (panel_style == SHOW_ICON)
+		return FALSE;
+
+	if (icon->item.flags & ITEM_FLAG_APPDIR)
+		return FALSE;
+
+	return TRUE;
 }
 
 
@@ -482,6 +472,7 @@ static void panel_add_item(Panel *panel,
 	if (!loading_panel)
 		panel_save(panel);
 		
+	icon_set_tip(icon);
 	gtk_widget_show(widget);
 }
 
@@ -506,7 +497,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 	area.width = width;
 	area.height = PIXMAP_HEIGHT(icon->item.image->pixmap);
 
-	if (want_show_text(icon))
+	if (panel_want_show_text(icon))
 	{
 		area.y = height - text_height - 6 - area.height;
 
@@ -988,7 +979,7 @@ static gboolean enter_icon(GtkWidget *widget,
 			   GdkEventCrossing *event,
 			   Icon *icon)
 {
-	panel_icon_may_update(icon);
+	icon_may_update(icon);
 
 	return FALSE;
 }
@@ -1321,19 +1312,8 @@ static void panel_set_style(guchar *new)
 		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 			if (current_panel[i])
 				reposition_panel(current_panel[i], TRUE);
+
+		icons_update_tip();
 	}
-}
-
-static gboolean want_show_text(Icon *icon)
-{
-	if (panel_style == SHOW_BOTH)
-		return TRUE;
-	if (panel_style == SHOW_ICON)
-		return FALSE;
-
-	if (icon->item.flags & ITEM_FLAG_APPDIR)
-		return FALSE;
-
-	return TRUE;
 }
 

@@ -43,7 +43,6 @@
 #include "gui_support.h"
 #include "options.h"
 #include "dir.h"
-#include "mount.h"
 #include "bind.h"
 #include "icon.h"
 #include "run.h"
@@ -345,6 +344,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 
 	current_pinboard->icons = g_list_prepend(current_pinboard->icons,
 						 icon);
+	icon_set_tip(icon);
 	gtk_widget_show_all(icon->win);
 	gdk_window_lower(icon->win->window);
 
@@ -465,24 +465,6 @@ static void pinboard_check_options(void)
 		if (current_pinboard)
 			reshape_all();
 	}
-}
-
-/* See if the file the icon points to has changed. Update the icon
- * if so.
- */
-void pinboard_icon_may_update(Icon *icon)
-{
-	MaskedPixmap	*image = icon->item.image;
-	int		flags = icon->item.flags;
-
-	pixmap_ref(image);
-	mount_update(FALSE);
-	dir_restat(icon->path, &icon->item, FALSE);
-
-	if (icon->item.image != image || icon->item.flags != flags)
-		pinboard_reshape_icon(icon);
-
-	pixmap_unref(image);
 }
 
 static gint end_wink(gpointer data)
@@ -779,7 +761,7 @@ static gboolean enter_notify(GtkWidget *widget,
 			     GdkEventCrossing *event,
 			     Icon *icon)
 {
-	pinboard_icon_may_update(icon);
+	icon_may_update(icon);
 
 	return FALSE;
 }

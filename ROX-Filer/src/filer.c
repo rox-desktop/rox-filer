@@ -101,6 +101,7 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
 static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
 static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
+static void show_tooltip(guchar *text);
 
 static void set_unique(guchar *unique);
 
@@ -1699,29 +1700,25 @@ static void tip_destroyed(gpointer data)
  */
 static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 {
-	GtkWidget *label;
 	Collection *collection;
-	gint 	x, y, py;
-	int	w, h;
+	gint 	x, y;
 	int	i;
 	GString	*tip = NULL;
 
 	g_return_val_if_fail(tip_item != NULL, 0);
 
-	if (tip_widget)
-	{
-		gtk_widget_destroy(tip_widget);
-		tip_widget = NULL;
-	}
+	tip_timeout = 0;
+
+	show_tooltip(NULL);
 
 	if (!filer_exists(filer_window))
-		goto out;
+		return FALSE;
 
 	collection = filer_window->collection;
 	gdk_window_get_pointer(GTK_WIDGET(collection)->window, &x, &y, NULL);
 	i = collection_get_item(filer_window->collection, x, y);
 	if (i == -1 || ((DirItem *) collection->items[i].data) != tip_item)
-		goto out;	/* Not still under the pointer */
+		return FALSE;	/* Not still under the pointer */
 
 	/* OK, the filer window still exists and the pointer is still
 	 * over the same item. Do we need to show a tip?
@@ -1753,11 +1750,35 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 		}
 	}
 
-	if (tip->len < 2)
-		goto out;	/* Nothing to display */
+	if (tip->len > 1)
+	{
+		g_string_truncate(tip, tip->len - 1);
+		show_tooltip(tip->str);
+	}
 
-	g_string_truncate(tip, tip->len - 1);
-	
+	g_string_free(tip, TRUE);
+
+	return FALSE;
+}
+
+/* Display a tooltip-like widget near the pointer with 'text'. If 'text' is
+ * NULL, close any current tooltip.
+ */
+static void show_tooltip(guchar *text)
+{
+	GtkWidget *label;
+	int	x, y, py;
+	int	w, h;
+
+	if (tip_widget)
+	{
+		gtk_widget_destroy(tip_widget);
+		tip_widget = NULL;
+	}
+
+	if (!text)
+		return;
+
 	/* Show the tip */
 	tip_widget = gtk_window_new(GTK_WINDOW_POPUP);
 	gtk_widget_set_app_paintable(tip_widget, TRUE);
@@ -1770,7 +1791,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 			GTK_SIGNAL_FUNC(filer_tooltip_draw),
 			(GtkObject *) tip_widget);
 
-	label = gtk_label_new(tip->str);
+	label = gtk_label_new(text);
 	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
 	gtk_container_add(GTK_CONTAINER(tip_widget), label);
 	gtk_widget_show(label);
@@ -1795,12 +1816,6 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	gtk_signal_connect_object(GTK_OBJECT(tip_widget), "destroy",
 			GTK_SIGNAL_FUNC(tip_destroyed), NULL);
 	time(&tip_time);
-
-out:
-	if (tip)
-		g_string_free(tip, TRUE);
-	tip_timeout = 0;
-	return FALSE;
 }
 
 /* Display a tooltip for 'item' after a while (if item is not NULL).
