@@ -989,6 +989,7 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 			if (!collection->target_cb)
 			{
 				collection_set_cursor_item(collection, -1);
+				collection_clear_selection(collection);
 				return FALSE;		/* Pass it on */
 			}
 			collection_target(collection, NULL, NULL);
@@ -1878,6 +1879,10 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(width > 4 && height > 4);
+
+	if (collection->item_width == width &&
+			collection->item_height == height)
+		return;
 
 	widget = GTK_WIDGET(collection);
 

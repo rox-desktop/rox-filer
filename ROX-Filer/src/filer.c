@@ -65,6 +65,9 @@
 #define PANEL_BORDER 2
 #define MIN_ITEM_WIDTH 64
 
+#define MIN_TRUNCATE 0
+#define MAX_TRUNCATE 250
+
 extern int collection_menu_button;
 extern gboolean collection_single_click;
 
@@ -94,6 +97,7 @@ static char *filer_new_window_on_1(char *data);
 static char *filer_toolbar(char *data);
 static char *filer_display_style(char *data);
 static char *filer_sort_by(char *data);
+static char *filer_truncate(char *data);
 
 static OptionsSection options =
 {
@@ -119,6 +123,10 @@ static gboolean o_sort_nocase = FALSE;
 static gboolean o_single_click = FALSE;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
+static gint	o_small_truncate = 144;
+static gint	o_large_truncate = 89;
+static GtkAdjustment *adj_small_truncate;
+static GtkAdjustment *adj_large_truncate;
 static GtkWidget *toggle_sort_nocase;
 static GtkWidget *toggle_single_click;
 static GtkWidget *toggle_new_window_on_1;
@@ -158,6 +166,7 @@ static void draw_string(GtkWidget *widget,
 		int 	x,
 		int 	y,
 		int 	width,
+		int	area_width,
 		gboolean selected);
 static void draw_item_large(GtkWidget *widget,
 			CollectionItem *item,
@@ -217,6 +226,7 @@ void filer_init()
 	option_register("filer_toolbar", filer_toolbar);
 	option_register("filer_display_style", filer_display_style);
 	option_register("filer_sort_by", filer_sort_by);
+	option_register("filer_truncate", filer_truncate);
 
 	busy_cursor = gdk_cursor_new(GDK_WATCH);
 
@@ -382,6 +392,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 static int calc_width(FilerWindow *filer_window, DirItem *item)
 {
 	int		pix_width = item->image->width;
+	int		w;
 
         switch (filer_window->display_style)
         {
@@ -391,7 +402,8 @@ static int calc_width(FilerWindow *filer_window, DirItem *item)
 		case SMALL_ICONS:
 			return SMALL_ICON_WIDTH + 12 + item->name_width;
                 default:
-                        return MAX(pix_width, item->name_width) + 4;
+			w = MIN(item->name_width, o_large_truncate);
+                        return MAX(pix_width, w) + 4;
         }
 }
 	
@@ -630,24 +642,49 @@ static void draw_string(GtkWidget *widget,
 		int 	x,
 		int 	y,
 		int 	width,
+		int	area_width,
 		gboolean selected)
 {
-	int	text_height = font->ascent + font->descent;
+	int		text_height = font->ascent + font->descent;
+	GdkRectangle	clip;
+	GdkGC		*gc = selected ? widget->style->white_gc
+				       : widget->style->black_gc;
 
 	if (selected)
 		gtk_paint_flat_box(widget->style, widget->window, 
 				GTK_STATE_SELECTED, GTK_SHADOW_NONE,
 				NULL, widget, "text",
 				x, y - font->ascent,
-				width,
+				MIN(width, area_width),
 				text_height);
+
+	if (width > area_width)
+	{
+		clip.x = x;
+		clip.y = y - font->ascent;
+		clip.width = area_width;
+		clip.height = text_height;
+		gdk_gc_set_clip_origin(gc, 0, 0);
+		gdk_gc_set_clip_rectangle(gc, &clip);
+	}
 
 	gdk_draw_text(widget->window,
 			font,
-			selected ? widget->style->white_gc
-				 : widget->style->black_gc,
+			gc,
 			x, y,
 			string, strlen(string));
+
+	if (width > area_width)
+	{
+		if (!red_gc)
+		{
+			red_gc = gdk_gc_new(widget->window);
+			gdk_gc_set_foreground(red_gc, &red);
+		}
+		gdk_draw_rectangle(widget->window, red_gc, TRUE,
+				x + area_width - 1, clip.y, 1, text_height);
+		gdk_gc_set_clip_rectangle(gc, NULL);
+	}
 }
 
 /* Return a string (valid until next call) giving details
@@ -691,6 +728,7 @@ static void draw_item_full_info(GtkWidget *widget,
 	int	low_text_y = area->y + area->height - fixed_font->descent - 2;
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
+	int		text_area_width = area->width - (text_x - area->x);
 
 	pic_area.x = area->x;
 	pic_area.y = area->y;
@@ -705,12 +743,14 @@ static void draw_item_full_info(GtkWidget *widget,
 			text_x,
 			low_text_y - item_font->descent - fixed_font->ascent,
 			item->name_width,
+			text_area_width,
 			selected);
 	draw_string(widget,
 			fixed_font,
 			details(item),
 			text_x, low_text_y,
 			item->details_width,
+			text_area_width,
 			selected);
 
 	if (item->lstat_errno)
@@ -750,6 +790,7 @@ static void draw_item_small(GtkWidget *widget,
 			text_x,
 			low_text_y,
 			item->name_width,
+			area->width - (text_x - area->x),
 			selected);
 }
 
@@ -758,16 +799,22 @@ static void draw_item_large(GtkWidget *widget,
 			GdkRectangle *area)
 {
 	DirItem		*item = (DirItem *) colitem->data;
-	int	text_x = area->x + ((area->width - item->name_width) >> 1);
+	int		text_width = item->name_width;
+	int	text_x = area->x + ((area->width - text_width) >> 1);
 	int	text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
 
 	draw_large_icon(widget, area, item, selected);
 	
+	if (text_x < area->x)
+		text_x = area->x;
+
 	draw_string(widget,
 			item_font,
 			item->leafname, 
-			text_x, text_y, item->name_width,
+			text_x, text_y,
+			item->name_width,
+			area->width,
 			selected);
 }
 
@@ -1243,7 +1290,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button == 3)
+		((GdkEventButton *) event)->button != 1)
 	{
 		filer_opendir(filer_window->path, PANEL_NO);
 	}
@@ -1260,7 +1307,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button == 3)
+		((GdkEventButton *) event)->button != 1)
 	{
 		filer_opendir(home_dir, PANEL_NO);
 	}
@@ -1274,7 +1321,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 
 	event = gtk_get_current_event();
 	if (event->type == GDK_BUTTON_RELEASE &&
-		((GdkEventButton *) event)->button == 3)
+		((GdkEventButton *) event)->button != 1)
 	{
 		filer_open_parent(filer_window);
 	}
@@ -1768,12 +1815,16 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
  * normally ignores this). Currently, this button does not pop in -
  * this may be fixed in future versions of GTK+.
  */
+static gint toolbar_other_button = 0;
 static gint toolbar_adjust_pressed(GtkButton *button,
 				GdkEventButton *event,
 				FilerWindow *filer_window)
 {
-	if (event->button == 3)
+	gint	b = event->button;
+
+	if ((b == 2 || b == 3) && toolbar_other_button == 0)
 	{
+		toolbar_other_button = event->button;
 		gtk_grab_add(GTK_WIDGET(button));
 		gtk_button_pressed(button);
 	}
@@ -1785,8 +1836,9 @@ static gint toolbar_adjust_released(GtkButton *button,
 				GdkEventButton *event,
 				FilerWindow *filer_window)
 {
-	if (event->button == 3)
+	if (event->button == toolbar_other_button)
 	{
+		toolbar_other_button = 0;
 		gtk_grab_remove(GTK_WIDGET(button));
 		gtk_button_released(button);
 	}
@@ -1837,7 +1889,7 @@ static void add_button(GtkWidget *box, int pixmap,
  */
 static GtkWidget *create_options()
 {
-	GtkWidget	*vbox, *menu, *hbox;
+	GtkWidget	*vbox, *menu, *hbox, *slide;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -1887,6 +1939,30 @@ static GtkWidget *create_options()
 	gtk_option_menu_set_menu(GTK_OPTION_MENU(menu_toolbar), menu);
 	gtk_box_pack_start(GTK_BOX(hbox), menu_toolbar, TRUE, TRUE, 0);
 
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_label_new(_("Max Large Icons width")),
+			TRUE, TRUE, 0);
+	adj_large_truncate = GTK_ADJUSTMENT(gtk_adjustment_new(0,
+				MIN_TRUNCATE, MAX_TRUNCATE, 1, 10, 0));
+	slide = gtk_hscale_new(adj_large_truncate);
+	gtk_widget_set_usize(slide, MAX_TRUNCATE, 24);
+	gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), slide, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_label_new(_("Max Small Icons width")),
+			TRUE, TRUE, 0);
+	adj_small_truncate = GTK_ADJUSTMENT(gtk_adjustment_new(0,
+				MIN_TRUNCATE, MAX_TRUNCATE, 1, 10, 0));
+	slide = gtk_hscale_new(adj_small_truncate);
+	gtk_widget_set_usize(slide, MAX_TRUNCATE, 24);
+	gtk_scale_set_draw_value(GTK_SCALE(slide), FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), slide, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
 	return vbox;
 }
 
@@ -1917,6 +1993,9 @@ static void update_options()
 			o_unique_filer_windows);
 	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
 
+	gtk_adjustment_set_value(adj_small_truncate, o_small_truncate);
+	gtk_adjustment_set_value(adj_large_truncate, o_large_truncate);
+
 	update_options_label();
 }
 
@@ -1926,6 +2005,7 @@ static void set_options()
 	GtkWidget 	*item, *menu;
 	GList		*list;
 	gboolean	old_case = o_sort_nocase;
+	GList		*next = all_filer_windows;
 	
 	o_sort_nocase = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_sort_nocase));
@@ -1950,19 +2030,21 @@ static void set_options()
 	o_toolbar = (ToolbarType) g_list_index(list, item);
 	g_list_free(list);
 
-	if (o_sort_nocase != old_case)
+	o_small_truncate = adj_small_truncate->value;
+	o_large_truncate = adj_large_truncate->value;
+
+	while (next)
 	{
-		GList		*next = all_filer_windows;
+		FilerWindow *filer_window = (FilerWindow *) next->data;
 
-		while (next)
+		if (o_sort_nocase != old_case)
 		{
-			FilerWindow *filer_window = (FilerWindow *) next->data;
-
 			collection_qsort(filer_window->collection,
-					 filer_window->sort_fn);
-
-			next = next->next;
+					filer_window->sort_fn);
 		}
+		shrink_width(filer_window);
+
+		next = next->next;
 	}
 }
 
@@ -1983,6 +2065,8 @@ static guchar *sort_fn_to_name(void)
 
 static void save_options()
 {
+	guchar	*tmp;
+
 	option_write("filer_sort_nocase", o_sort_nocase ? "1" : "0");
 	option_write("filer_new_window_on_1", o_new_window_on_1 ? "1" : "0");
 	option_write("filer_menu_on_2",
@@ -2003,6 +2087,10 @@ static void save_options()
 				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
 				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
 				      "Unknown");
+
+	tmp = g_strdup_printf("%d, %d", o_large_truncate, o_small_truncate);
+	option_write("filer_truncate", tmp);
+	g_free(tmp);
 }
 
 static char *filer_sort_nocase(char *data)
@@ -2062,6 +2150,20 @@ static char *filer_sort_by(char *data)
 		last_sort_fn = sort_by_size;
 	else
 		return _("Unknown sort type");
+
+	return NULL;
+}
+
+static char *filer_truncate(char *data)
+{
+	guchar	*comma;
+
+	comma = strchr(data, ',');
+	if (!comma)
+		return "Missing , in filer_truncate";
+
+	o_large_truncate = CLAMP(atoi(data), MIN_TRUNCATE, MAX_TRUNCATE);
+	o_small_truncate = CLAMP(atoi(comma + 1), MIN_TRUNCATE, MAX_TRUNCATE);
 
 	return NULL;
 }

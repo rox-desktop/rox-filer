@@ -8,7 +8,13 @@
 #ifndef _MINIBUFFER_H
 #define _MINIBUFFER_H
 
-typedef enum {MINI_NONE, MINI_PATH, MINI_SHELL, MINI_RUN_ACTION} MiniType;
+typedef enum {
+	MINI_NONE,
+	MINI_PATH,
+	MINI_SHELL,
+	MINI_RUN_ACTION,
+	MINI_SELECT_IF,
+} MiniType;
 
 #include <gtk/gtk.h>
 #include "filer.h"

@@ -33,11 +33,13 @@
 #include <gdk/gdkkeysyms.h>
 
 #include "collection.h"
+#include "find.h"
 #include "gui_support.h"
 #include "support.h"
 #include "minibuffer.h"
 #include "filer.h"
 #include "main.h"
+#include "action.h"
 
 static GList *shell_history = NULL;
 
@@ -50,6 +52,7 @@ static void find_next_match(FilerWindow *filer_window, char *pattern, int dir);
 static gboolean matches(Collection *collection, int item, char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
 static guchar *mini_contents(FilerWindow *filer_window);
+static void show_help(FilerWindow *filer_window);
 
 
 /****************************************************************
@@ -62,9 +65,21 @@ static guchar *mini_contents(FilerWindow *filer_window);
  */
 void create_minibuffer(FilerWindow *filer_window)
 {
-	GtkWidget *hbox, *label, *mini;
+	MaskedPixmap *mp;
+	GtkWidget *hbox, *label, *mini, *help, *icon;
 
 	hbox = gtk_hbox_new(FALSE, 0);
+	
+	mp = g_fscache_lookup(pixmap_cache,
+		make_path(getenv("APP_DIR"), "pixmaps/help.xpm")->str);
+	icon = gtk_pixmap_new(mp->pixmap, mp->mask);
+	g_fscache_data_unref(pixmap_cache, mp);
+	help = gtk_button_new();
+	gtk_container_add(GTK_CONTAINER(help), icon);
+	gtk_box_pack_start(GTK_BOX(hbox), help, FALSE, TRUE, 0);
+	gtk_signal_connect_object(GTK_OBJECT(help), "clicked",
+			GTK_SIGNAL_FUNC(show_help), (GtkObject *) filer_window);
+
 	label = gtk_label_new(NULL);
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 2);
 
@@ -96,6 +111,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			mini_type == MINI_PATH ? _("Goto:") :
 			mini_type == MINI_SHELL ? _("Shell:") :
 			mini_type == MINI_RUN_ACTION ? _("Run Action:") :
+			mini_type == MINI_SELECT_IF ? _("Select If:") :
 			"?");
 
 	collection = filer_window->collection;
@@ -110,6 +126,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			break;
 		case MINI_SHELL:
 		case MINI_RUN_ACTION:
+		case MINI_SELECT_IF:
 			filer_window->mini_cursor_base = -1;	/* History */
 			gtk_entry_set_text(mini, "");
 			break;
@@ -168,6 +185,42 @@ void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+static void show_help(FilerWindow *filer_window)
+{
+	guchar	*message;
+
+	gtk_widget_grab_focus(filer_window->minibuffer);
+
+	switch (filer_window->mini_type)
+	{
+		case MINI_PATH:
+			message = _("Enter the name of a file and I'll display "
+				"it for you. Press Tab to fill in the longest "
+				"match. Escape to close the minibuffer.");
+			break;
+		case MINI_SHELL:
+			message = _("Enter a shell command to execute. Click "
+				"on a file to add it to the buffer.");
+			break;
+		case MINI_RUN_ACTION:
+			message =
+	_("To set the run action for a file, either:\n"
+	  "- Drag a file to an application directory (eg drag an image to the "
+	  "Gimp), or\n" "- Enter a shell command which contains a \"$1\""
+	  "where the name of the file should go (eg ` gimp \"$1\" ')");
+			break;
+		case MINI_SELECT_IF:
+			show_condition_help();
+			return;
+		default:
+			message = "?!?";
+			break;
+	}
+
+	delayed_error(PROJECT, message);
+}
+
 
 /*			PATH ENTRY			*/
 
@@ -565,11 +618,7 @@ gboolean set_run_action(FilerWindow *filer_window, guchar *command)
 
 	if (!strchr(command, '$'))
 	{
-		delayed_error(PROJECT,
-	_("To set the run action for a file, either:\n"
-	  "- Drag a file to an application directory (eg drag an image to the "
-	  "Gimp), or\n" "- Enter a shell command which contains a \"$1\""
-	  "where the name of the file should go (eg ` gimp \"$1\" ')"));
+		show_help(filer_window);
 		return FALSE;
 	}
 
@@ -607,7 +656,7 @@ gboolean set_run_action(FilerWindow *filer_window, guchar *command)
 }
 
 /* Either execute the command or make it the default run action */
-static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
+static void shell_return_pressed(FilerWindow *filer_window)
 {
 	GPtrArray	*argv;
 	int		i;
@@ -703,6 +752,63 @@ static void shell_recall(FilerWindow *filer_window, int dir)
 	gtk_entry_set_text(GTK_ENTRY(filer_window->minibuffer), command);
 }
 
+/*			SELECT IF			*/
+
+static void select_return_pressed(FilerWindow *filer_window)
+{
+	FindCondition	*cond;
+	int		i, n;
+	guchar		*entry;
+	Collection	*collection = filer_window->collection;
+	FindInfo	info;
+
+	entry = mini_contents(filer_window);
+
+	if (!entry)
+		goto out;
+
+	add_to_history(entry);
+
+	cond = find_compile(entry);
+	if (!cond)
+	{
+		delayed_error(PROJECT, "Invalid Find condition");
+		return;
+	}
+
+	info.now = time(NULL);
+	info.prune = FALSE;	/* (don't care) */
+	n = collection->number_of_items;
+
+	/* If an item at the start is selected then we could lose the
+	 * primary selection after checking that item and then need to
+	 * gain it again at the end. Therefore, if anything is selected
+	 * then select the last item until the end of the search.
+	 */
+	if (collection->number_selected)
+		collection_select_item(collection, n - 1);
+	
+	for (i = 0; i < n; i++)
+	{
+		DirItem *item = (DirItem *) collection->items[i].data;
+
+		info.leaf = item->leafname;
+		info.fullpath = make_path(filer_window->path, info.leaf)->str;
+
+		if (lstat(info.fullpath, &info.stats) == 0 &&
+				find_test_condition(cond, &info))
+			collection_select_item(collection, i);
+		else
+			collection_unselect_item(collection, i);
+	}
+
+	find_condition_free(cond);
+
+out:
+	minibuffer_hide(filer_window);
+}
+
+
 /*			EVENT HANDLERS			*/
 
 static gint key_press_event(GtkWidget	*widget,
@@ -761,8 +867,26 @@ static gint key_press_event(GtkWidget	*widget,
 					shell_tab(filer_window);
 					break;
 				case GDK_Return:
-					shell_return_pressed(filer_window,
-								event);
+					shell_return_pressed(filer_window);
+					break;
+				default:
+					return FALSE;
+			}
+			break;
+		case MINI_SELECT_IF:
+			switch (event->keyval)
+			{
+				case GDK_Up:
+					shell_recall(filer_window, 1);
+					break;
+				case GDK_Down:
+					shell_recall(filer_window, -1);
+					break;
+				case GDK_Tab:
+					return TRUE;
+				case GDK_Return:
+					select_return_pressed(filer_window);
+					break;
 				default:
 					return FALSE;
 			}

@@ -135,7 +135,7 @@ void options_load(void)
 
 			group = gtk_frame_new(_(section->name));
 			gtk_box_pack_start(GTK_BOX(sections_vbox), group,
-					FALSE, TRUE, 0);
+					FALSE, TRUE, 4);
 			gtk_container_add(GTK_CONTAINER(group),
 					section->create());
 			next = next->next;

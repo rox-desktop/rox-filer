@@ -20,5 +20,6 @@ void action_find(FilerWindow *filer_window);
 void action_move(GSList *paths, char *dest);
 void action_copy(GSList *paths, char *dest, char *leaf);
 void action_link(GSList *paths, char *dest);
+void show_condition_help(void);
 
 #endif /* _ACTION_H */

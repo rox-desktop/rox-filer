@@ -1,4 +1,4 @@
-#This file was created by <tal197> Tue May 16 11:38:42 2000
+#This file was created by <tal197> Tue May 23 19:55:18 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1040,7 +1040,7 @@ The window menu
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-10 2 0 0 -1 -1 -1 -1
+11 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -1050,6 +1050,7 @@ multicol5
 0 1 0 0
 0 1 0 0
 0 1 1 0
+0 1 0 0
 0 1 0 0
 8 1 0 "" ""
 2 1 1 "8cm" ""
@@ -1069,6 +1070,8 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -1094,7 +1097,7 @@ Close Window
 \newline 
 Close this window.
 \newline 
-Enter Path
+Enter Path...
 \newline 
 Open the path-entry box (see section 
 \begin_inset LatexCommand \ref{sec: mini}
@@ -1103,7 +1106,7 @@ Open the path-entry box (see section
 
 ).
 \newline 
-Shell Command
+Shell Command...
 \newline 
 Open the shell command box (see section 
 \begin_inset LatexCommand \ref{sec: mini}
@@ -1112,7 +1115,7 @@ Open the shell command box (see section
 
 ).
 \newline 
-Set Run Action
+Set Run Action...
 \newline 
 Allows you to set the program to use when double-clicking on a file.
 \newline 
@@ -1124,6 +1127,15 @@ See section
 \end_inset 
 
  for details.
+\newline 
+Select If...
+\newline 
+Select just those files that match the given pattern --- see section 
+\begin_inset LatexCommand \ref{sec: SelectIf}
+
+\end_inset 
+
+.
 \newline 
 Show ROX-Filer help
 \newline 
@@ -1581,6 +1593,38 @@ Commands execute in the background, so you can say:
 
 sleep 240; xmessage Time to go!
 \end_deeper 
+\layout Subsubsection
+
+
+\begin_inset LatexCommand \label{sec: SelectIf}
+
+\end_inset 
+
+The conditional selection box
+\layout Standard
+
+Use this if you want to automatically select all files in the directory
+ which match a condition.
+ The syntax for the conditions is given in section 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+.
+ For example, to select all files larger than 5Mb:
+\layout Enumerate
+
+Open the Select If minibuffer.
+\layout Enumerate
+
+Type `
+\family typewriter 
+Size > 5Mb
+\family default 
+' and press Return.
+\layout Standard
+
+Just those files over 5 Mb in size will be selected.
 \layout Subsection
 
 Action windows
@@ -1767,7 +1811,7 @@ IsPipe matches pipes.
 IsSocket matches sockets.
 \layout Standard
 
-These look at the permissions set on the file - see section 
+These look at the permissions set on the file --- see section 
 \begin_inset LatexCommand \ref{sec: Permissions}
 
 \end_inset 
@@ -2300,7 +2344,7 @@ Application directories
 \layout Standard
 
 An application directory is a directory which can be run as an application.
- It contains all the resources of an application - source code, binaries,
+ It contains all the resources of an application --- source code, binaries,
  documentation and so on.
  Keeping everything in one place make installation and uninstallation much
  easier for users.
@@ -2569,7 +2613,7 @@ $ patch < patchfile
 $ ../AppRun --compile
 \layout Standard
 
-You can remove the patch by simply repeating the above sequence - patch
+You can remove the patch by simply repeating the above sequence --- patch
  will detect that the patch is already applied and offer to remove it.
  To create a patch you need to take a copy of the old 'src' directory before
  you modify it (before you compile, even):

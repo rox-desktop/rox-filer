@@ -42,6 +42,9 @@ GdkFont	   	*item_font = NULL;
 GdkFont	   	*fixed_font = NULL;
 GtkStyle   	*fixed_style = NULL;
 gint		fixed_width;
+GdkColor 	red = {0, 0xffff, 0, 0};
+GdkGC		*red_gc = NULL;	/* Not automatically initialised */
+
 
 static GdkAtom xa_cardinal;
 
@@ -56,6 +59,8 @@ void gui_support_init()
 	fixed_width = gdk_string_width(fixed_font, "m");
 
 	xa_cardinal  = gdk_atom_intern("CARDINAL", FALSE);
+
+	gdk_color_alloc(gtk_widget_get_default_colormap(), &red);
 }
 
 static void choice_clicked(GtkWidget *widget, gpointer number)

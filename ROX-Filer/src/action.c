@@ -75,8 +75,6 @@ static GtkWidget *w_auto_link = NULL;
 static GtkWidget *w_auto_delete = NULL;
 static GtkWidget *w_auto_mount = NULL;
 
-static GdkColor red = {0, 0xffff, 0, 0};
-
 /* Parent->Child messages are one character each:
  *
  * Q/Y/N 	Quiet/Yes/No button clicked
@@ -333,7 +331,7 @@ static void entry_changed(GtkEntry *entry, GUIside *gui_side)
 	fflush(gui_side->to_child);
 }
 
-static void show_condition_help(gpointer data)
+void show_condition_help(void)
 {
 	static GtkWidget *help = NULL;
 
@@ -1952,7 +1950,7 @@ void action_find(FilerWindow *filer_window)
 	button = gtk_button_new_with_label(_("Show expression reference"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			show_condition_help, NULL);
+			GTK_SIGNAL_FUNC(show_condition_help), NULL);
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);

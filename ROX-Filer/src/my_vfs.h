@@ -55,6 +55,7 @@ int mc_fstat (int fd, struct stat *buf);
 #  define mc_closedir(x) closedir(x)
 #  define mc_readdir(x) readdir(x)
 #  define mc_seekdir(x, o) seekdir(x, o)
+#  define mc_telldir(x) telldir(x)
 
 #endif
 

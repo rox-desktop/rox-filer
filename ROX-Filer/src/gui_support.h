@@ -19,6 +19,8 @@ extern GdkFont	   	*fixed_font;
 extern GdkFont	   	*item_font;
 extern GtkStyle   	*fixed_style;
 extern gint		fixed_width;
+extern GdkColor 	red;
+extern GdkGC 		*red_gc;
 
 void gui_support_init();
 int get_choice(char *title,

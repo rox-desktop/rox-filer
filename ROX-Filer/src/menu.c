@@ -117,6 +117,7 @@ static void close_window(gpointer data, guint action, GtkWidget *widget);
 static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void shell_command(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
+static void select_if(gpointer data, guint action, GtkWidget *widget);
 static void rox_help(gpointer data, guint action, GtkWidget *widget);
 
 static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
@@ -196,9 +197,11 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Parent, Same Window"), NULL,  open_parent_same, 0, NULL},
 {">" N_("New Window"),	NULL,   new_window, 0, NULL},
 {">" N_("Close Window"),	NULL,  	close_window, 0, NULL},
-{">" N_("Enter Path"),	NULL,  	enter_path, 0, NULL},
-{">" N_("Shell Command"),	NULL,  	shell_command, 0, NULL},
-{">" N_("Set Run Action"),	NULL,  	run_action, 0, NULL},
+{">",			NULL,  	NULL, 0, "<Separator>"},
+{">" N_("Enter Path..."),	NULL,  	enter_path, 0, NULL},
+{">" N_("Shell Command..."),	NULL,  	shell_command, 0, NULL},
+{">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
+{">" N_("Select If..."),	NULL,  	select_if, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
 {">" N_("Show ROX-Filer help"), NULL,  rox_help, 0, NULL},
 };
@@ -1393,6 +1396,13 @@ static void run_action(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	minibuffer_show(window_with_focus, MINI_RUN_ACTION);
+}
+
+static void select_if(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	minibuffer_show(window_with_focus, MINI_SELECT_IF);
 }
 
 static void rox_help(gpointer data, guint action, GtkWidget *widget)

@@ -168,7 +168,7 @@ static void free_items_array(GPtrArray *array)
 
 /* Scanning has finished. Remove all the old items that have gone.
  * Notify everyone who is watching us of the removed items and tell
- * them that the scan is over.
+ * them that the scan is over, unless 'needs_update'.
  */
 static void sweep_deleted(Directory *dir)
 {
@@ -206,7 +206,8 @@ static void sweep_deleted(Directory *dir)
 
 		if (old->len)
 			user->callback(dir, DIR_REMOVE, old, user->data);
-		user->callback(dir, DIR_END_SCAN, NULL, user->data);
+		if (!dir->needs_update)
+			user->callback(dir, DIR_END_SCAN, NULL, user->data);
 		
 		list = list->next;
 	}
@@ -287,7 +288,7 @@ static void start_scanning(Directory *dir, char *pathname)
 		return;		/* Report on attach */
 	}
 
-	dir->dir_start = telldir(dir->dir_handle);
+	dir->dir_start = mc_telldir(dir->dir_handle);
 
 	init_for_scan(dir);
 
