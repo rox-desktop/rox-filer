@@ -479,7 +479,7 @@ static void uniconify(IconWindow *win)
 	XSendEvent(gdk_display, DefaultRootWindow(gdk_display), False,
 			SubstructureNotifyMask | SubstructureRedirectMask,
 			(XEvent *) &sev);
-	XSync (gdk_display, False);
+	XSync(gdk_display, False);
 
 	gdk_error_trap_pop();
 }
