@@ -42,24 +42,31 @@ enum
 	LAST_DEFAULT_PIXMAP
 };
 
-
 typedef struct _MaskedPixmap MaskedPixmap;
+
+#ifdef HAVE_IMLIB
+#  ifdef PIXMAPS_C
+#    define IMLIB_T	GdkImlibImage
+#  else
+#    define IMLIB_T	gpointer
+#  endif
+#endif
 
 struct _MaskedPixmap
 {
-	GdkPixmap	*pixmap;
-	GdkBitmap	*mask;
 	int		ref;
+#ifdef HAVE_IMLIB
+	IMLIB_T		*image;
+#endif
+	GdkPixmap	*pixmap;	/* Full size image */
+	GdkBitmap	*mask;
 	int		width;
 	int		height;
 };
 
-
-extern MaskedPixmap	default_pixmap[LAST_DEFAULT_PIXMAP];
-
+extern MaskedPixmap *default_pixmap[LAST_DEFAULT_PIXMAP];
 
 void pixmaps_init(void);
-void load_pixmap(char *name, MaskedPixmap *image);
 void pixmap_ref(MaskedPixmap *mp);
 void pixmap_unref(MaskedPixmap *mp);
 

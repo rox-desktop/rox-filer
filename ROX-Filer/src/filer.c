@@ -520,9 +520,9 @@ static void draw_small_icon(GtkWidget *widget,
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc,
-				default_pixmap[TYPE_SYMLINK].mask);
+				default_pixmap[TYPE_SYMLINK]->mask);
 		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[TYPE_SYMLINK].pixmap,
+				default_pixmap[TYPE_SYMLINK]->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
@@ -534,9 +534,9 @@ static void draw_small_icon(GtkWidget *widget,
 				: TYPE_UNMOUNTED;
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc,
-				default_pixmap[type].mask);
+				default_pixmap[type]->mask);
 		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[type].pixmap,
+				default_pixmap[type]->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8, /* Dest x,y */
 				-1, -1);
@@ -583,9 +583,9 @@ static void draw_large_icon(GtkWidget *widget,
 	{
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc,
-				default_pixmap[TYPE_SYMLINK].mask);
+				default_pixmap[TYPE_SYMLINK]->mask);
 		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[TYPE_SYMLINK].pixmap,
+				default_pixmap[TYPE_SYMLINK]->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
@@ -597,9 +597,9 @@ static void draw_large_icon(GtkWidget *widget,
 				: TYPE_UNMOUNTED;
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 		gdk_gc_set_clip_mask(gc,
-				default_pixmap[type].mask);
+				default_pixmap[type]->mask);
 		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[type].pixmap,
+				default_pixmap[type]->pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8, /* Dest x,y */
 				-1, -1);
@@ -1040,6 +1040,7 @@ static void follow_symlink(FilerWindow *filer_window, char *path,
 	g_free(real);
 }
 
+/* Open the item (or add it to the shell command minibuffer) */
 void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 {
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
@@ -1055,6 +1056,12 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	gboolean	wink = TRUE, destroy = FALSE;
 
 	widget = filer_window->window;
+	if (filer_window->mini_type == MINI_SHELL)
+	{
+		minibuffer_add(filer_window, item->leafname);
+		return;
+	}
+	
 	full_path = make_path(filer_window->path,
 			item->leafname)->str;
 
@@ -1691,8 +1698,8 @@ static void add_button(GtkWidget *box, int pixmap,
 {
 	GtkWidget 	*button, *icon;
 
-	icon = gtk_pixmap_new(default_pixmap[pixmap].pixmap,
-				default_pixmap[pixmap].mask);
+	icon = gtk_pixmap_new(default_pixmap[pixmap]->pixmap,
+				default_pixmap[pixmap]->mask);
 
 	if (o_toolbar == TOOLBAR_GNOME)
 	{

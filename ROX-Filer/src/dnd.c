@@ -373,7 +373,7 @@ void drag_selection(Collection 		*collection,
 			(GdkEvent *) event);
 	g_dataset_set_data(context, "filer_window", filer_window);
 
-	image = item ? item->image : &default_pixmap[TYPE_MULTIPLE];
+	image = item ? item->image : default_pixmap[TYPE_MULTIPLE];
 	
 	gtk_drag_set_icon_pixmap(context,
 			gtk_widget_get_colormap(widget),

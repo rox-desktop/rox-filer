@@ -1289,7 +1289,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 
 	savebox_show("New Directory",
 			make_path(window_with_focus->path, "NewDir")->str,
-			default_pixmap + TYPE_DIRECTORY,
+			default_pixmap[TYPE_DIRECTORY],
 			new_directory_cb);
 }
 

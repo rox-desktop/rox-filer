@@ -434,17 +434,17 @@ static void insert_item(Directory *dir, struct dirent *ent)
 				new.flags |= ITEM_FLAG_TEMP_ICON;
 			}
 			else
-				new.image = default_pixmap + TYPE_APPDIR;
+				new.image = default_pixmap[TYPE_APPDIR];
 		}
 		else
-			new.image = default_pixmap + TYPE_DIRECTORY;
+			new.image = default_pixmap[TYPE_DIRECTORY];
 	}
 	else if (new.base_type == TYPE_FILE)
 	{
 		/* Note: for symlinks we use need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
-			new.image = default_pixmap + TYPE_EXEC_FILE;
+			new.image = default_pixmap[TYPE_EXEC_FILE];
 			new.flags |= ITEM_FLAG_EXEC_FILE;
 		}
 		else
@@ -455,7 +455,7 @@ static void insert_item(Directory *dir, struct dirent *ent)
 		}
 	}
 	else
-		new.image = default_pixmap + new.base_type;
+		new.image = default_pixmap[new.base_type];
 
 	for (i = 0; i < array->len; i++)
 	{
@@ -478,21 +478,26 @@ update:
 	new.leafname = item->leafname;
 	new.details_width = gdk_string_width(fixed_font, details(&new));
 
-	if (is_new == FALSE
-	 && item->lstat_errno == new.lstat_errno
-	 && item->base_type == new.base_type
-	 && item->flags == new.flags
-	 && item->size == new.size
-	 && item->mode == new.mode
-	 && item->mtime == new.mtime
-	 && item->uid == new.uid
-	 && item->gid == new.gid
-	 && item->image == new.image
-	 && item->mime_type == new.mime_type
-	 && item->name_width == new.name_width
-	 && item->details_width == new.details_width)
-		return;
+	if (is_new == FALSE)
+	{
+		if (item->flags & ITEM_FLAG_TEMP_ICON)
+			pixmap_unref(item->image);
+		if (item->lstat_errno == new.lstat_errno
+		 && item->base_type == new.base_type
+		 && item->flags == new.flags
+		 && item->size == new.size
+		 && item->mode == new.mode
+		 && item->mtime == new.mtime
+		 && item->uid == new.uid
+		 && item->gid == new.gid
+		 && item->image == new.image
+		 && item->mime_type == new.mime_type
+		 && item->name_width == new.name_width
+		 && item->details_width == new.details_width)
+			return;
+	}
 
+	item->image = new.image;
 	item->lstat_errno = new.lstat_errno;
 	item->base_type = new.base_type;
 	item->flags = new.flags;
@@ -501,7 +506,6 @@ update:
 	item->uid = new.uid;
 	item->gid = new.gid;
 	item->mtime = new.mtime;
-	item->image = new.image;
 	item->mime_type = new.mime_type;
 	item->name_width = new.name_width;
 	item->details_width = new.details_width;

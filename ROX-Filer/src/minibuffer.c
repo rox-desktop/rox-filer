@@ -25,6 +25,7 @@
 
 #include <string.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
@@ -58,6 +59,7 @@ GtkWidget *create_minibuffer(FilerWindow *filer_window)
 	GtkWidget *mini;
 
 	mini = gtk_entry_new();
+	gtk_widget_set_style(mini, fixed_style);
 	gtk_signal_connect(GTK_OBJECT(mini), "key_press_event",
 			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(mini), "changed",
@@ -113,6 +115,30 @@ void minibuffer_hide(FilerWindow *filer_window)
 	gtk_widget_hide(filer_window->minibuffer);
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			GTK_WIDGET(filer_window->collection));
+}
+
+/* Insert this leafname at the cursor (replacing the selection, if any).
+ * Must be in SHELL mode.
+ */
+void minibuffer_add(FilerWindow *filer_window, guchar *leafname)
+{
+	guchar		*esc;
+	GtkEditable 	*edit = GTK_EDITABLE(filer_window->minibuffer);
+	int		pos;
+
+	g_return_if_fail(filer_window->mini_type == MINI_SHELL);
+
+	if (strchr(leafname, ' '))
+		esc = g_strdup_printf(" \"%s\"", leafname);
+	else
+		esc = g_strdup_printf(" %s", leafname);
+
+	gtk_editable_delete_selection(edit);
+	pos = gtk_editable_get_position(edit);
+	gtk_editable_insert_text(edit, esc, strlen(esc), &pos);
+	gtk_editable_set_position(edit, pos);
+
+	g_free(esc);
 }
 
 
@@ -348,6 +374,26 @@ static void search_in_dir(FilerWindow *filer_window, int dir)
 
 /*			SHELL COMMANDS			*/
 
+static void add_to_history(FilerWindow *filer_window)
+{
+	guchar 	*line, *last, *c;
+	
+	line = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
+	
+	for (c = line; *c && isspace(*c); c++)
+		;
+
+	if (!*c)
+		return;
+	
+	last = shell_history ? (guchar *) shell_history->data : NULL;
+
+	if (last && strcmp(last, line) == 0)
+		return;			/* Duplicating last entry */
+	
+	shell_history = g_list_prepend(shell_history, g_strdup(line));
+}
+
 static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
 	GPtrArray	*argv;
@@ -355,8 +401,9 @@ static void shell_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	guchar		*entry;
 	Collection	*collection = filer_window->collection;
 
+	add_to_history(filer_window);
+
 	entry = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
-	shell_history = g_list_prepend(shell_history, g_strdup(entry));
 	
 	argv = g_ptr_array_new();
 	g_ptr_array_add(argv, "sh");
@@ -432,6 +479,8 @@ static gint key_press_event(GtkWidget	*widget,
 {
 	if (event->keyval == GDK_Escape)
 	{
+		if (filer_window->mini_type == MINI_SHELL)
+			add_to_history(filer_window);
 		minibuffer_hide(filer_window);
 		return TRUE;
 	}

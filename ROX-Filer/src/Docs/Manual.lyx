@@ -1,4 +1,4 @@
-#This file was created by <tal197> Sun Apr  9 18:10:38 2000
+#This file was created by <tal197> Fri Apr 14 10:40:15 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -1257,7 +1257,7 @@ Open the minibuffer by choosing 'Enter Path' from the Window menu.
  I usually bind this function to the slash (`/') key.
 \layout Enumerate
 
-Press CTRL-U to delete the existing contents - this moves you to the root
+Press CTRL-U to delete the existing contents --- this moves you to the root
  directory.
 \layout Enumerate
 
@@ -1294,18 +1294,48 @@ This provides a quick way of entering shell commands if you don't want to
 
 Just type in the command and press Return to execute it.
  Up and Down arrows move through previously entered commands.
+ Clicking on an item inserts its name into the minibuffer.
  If some items are selected then they are assigned to the positional parameters
- $1, $2, etc.
+ 
+\family typewriter 
+$1
+\family default 
+, 
+\family typewriter 
+$2
+\family default 
+, etc.
 \layout Subsubsection*
 
-Example
+Examples
+\layout Standard
+
+To untar a 
+\family typewriter 
+.tgz
+\family default 
+ archive:
+\layout Enumerate
+
+Open the minibuffer by choosing `Shell Command' from the Window menu.
+ I usually bind this to the bang (`!') key.
+\layout Enumerate
+
+Type `
+\family typewriter 
+tar xzf
+\family default 
+' and click on the file.
+ The leading space is automatically inserted.
+\layout Enumerate
+
+Press Return to execute it.
 \layout Standard
 
 To print all the selected files:
 \layout Enumerate
 
-Open the minibuffer by choosing `Shell Command' from the Window menu.
- I usually bind this to the bang (`!') key.
+Open the shell command minibuffer.
 \layout Enumerate
 
 Type 
