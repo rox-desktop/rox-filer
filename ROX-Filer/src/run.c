@@ -318,6 +318,12 @@ void show_item_help(const guchar *path, DirItem *item)
 				_("Socket:\n"
 				"Sockets allow processes to communicate."));
 			break;
+		case TYPE_DOOR:
+			info_message(
+				_("Door:\n"
+				"Doors are a little-used Solaris method for "
+				"processes to communicate."));
+			break;
 		default:
 			info_message(
 				_("Unknown type:\n"
