@@ -30,6 +30,7 @@
 #include <fcntl.h>
 #include <errno.h>
 #include <string.h>
+#include <sys/param.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -762,10 +763,20 @@ static void got_run_action(GtkWidget 		*widget,
 	char	*type = selection_data->data;
 	char	*media, *sub;
 	char	*dest_path, *link;
+	char	buffer[MAXPATHLEN + 1];
+	int	len;
 
 	g_return_if_fail(type != NULL);
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
+
+	/* dest_path might be a symlink - dereference it if so */
+	len = readlink(dest_path, buffer, sizeof(buffer) - 1);
+	if (len > 0)
+	{
+		buffer[len] = '\0';
+		dest_path = buffer;
+	}
 
 	gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 
