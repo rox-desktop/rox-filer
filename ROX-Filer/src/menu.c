@@ -723,7 +723,11 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 			close(file_data[0]);
 			dup2(file_data[1], STDOUT_FILENO);
 			dup2(file_data[1], STDERR_FILENO);
+#ifdef FILE_B_FLAG
 			argv[2] = path;
+#else
+			argv[1] = path;
+#endif
 			if (execvp(argv[0], argv))
 				fprintf(stderr, "execvp() error: %s\n",
 						g_strerror(errno));

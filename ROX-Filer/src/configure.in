@@ -15,6 +15,16 @@ if test "x$GCC" = "xyes"; then
 fi
 changequote([,])dnl
 
+dnl Does file(1) support '-b' ?
+AC_MSG_CHECKING(whether file -b works)
+if file -b / > /dev/null 2> /dev/null
+then
+  AC_DEFINE(FILE_B_FLAG)
+  AC_MSG_RESULT(yes)
+else
+  AC_MSG_RESULT(no)
+fi
+
 dnl Checks for header files.
 AC_PATH_X
 AC_HEADER_DIRENT
