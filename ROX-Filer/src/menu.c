@@ -128,7 +128,6 @@ static void set_sort(gpointer data, guint action, GtkWidget *widget);
 static void reverse_sort(gpointer data, guint action, GtkWidget *widget);
 
 static void hidden(gpointer data, guint action, GtkWidget *widget);
-static void test_filter(gpointer data, guint action, GtkWidget *widget);
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget);
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 
@@ -943,17 +942,6 @@ static void hidden(gpointer data, guint action, GtkWidget *widget)
 
 	display_set_hidden(window_with_focus,
 			   !window_with_focus->show_hidden);
-}
-
-static void test_filter(gpointer data, guint action, GtkWidget *widget)
-{
-	if (updating_menu)
-		return;
-
-	g_return_if_fail(window_with_focus != NULL);
-
-	display_set_filter(window_with_focus,
-			   FILER_SHOW_GLOB, "*.c");
 }
 
 static void show_thumbs(gpointer data, guint action, GtkWidget *widget)

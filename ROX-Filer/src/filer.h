@@ -162,7 +162,7 @@ void filer_set_autoscroll(FilerWindow *filer_window, gboolean auto_scroll);
 void filer_refresh(FilerWindow *filer_window);
 
 extern gboolean filer_match_filter(FilerWindow *filer_window,
-				   gchar *filename);
+				   const gchar *filename);
 extern void filer_set_filter(FilerWindow *filer_window, FilterType type,
 			     const gchar *filter_string);
 extern void filer_set_hidden(FilerWindow *fwin, gboolean hidden);

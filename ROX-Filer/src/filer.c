@@ -2591,8 +2591,7 @@ void filer_refresh(FilerWindow *filer_window)
 	full_refresh();
 }
 
-gboolean filer_match_filter(FilerWindow *filer_window,
-				   gchar *filename)
+gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename)
 {
 	if(filename[0]=='.' &&
 	   (!filer_window->temp_show_hidden && !filer_window->show_hidden))

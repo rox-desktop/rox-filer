@@ -46,7 +46,6 @@
 #include "choices.h"
 #include "options.h"
 
-/* XXX: RandR will break this! */
 gint	screen_width, screen_height;
 
 static GdkAtom xa_cardinal;
@@ -73,7 +72,7 @@ void gui_support_init()
 	 */
 	gdk_drawable_get_size(gdk_get_default_root_window(),
 			    &screen_width, &screen_height);
-
+	
 	/* Work around the scrollbar placement bug */
 	klass = g_type_class_ref(gtk_scrolled_window_get_type());
 	((GtkScrolledWindowClass *) klass)->scrollbar_spacing = 0;

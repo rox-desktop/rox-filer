@@ -42,5 +42,6 @@ void panel_save(Panel *panel);
 gboolean panel_add(PanelSide side,
 		   const gchar *path, const gchar *label, gboolean after);
 void panel_mark_used(GdkRegion *used);
+void panel_update_size(void);
 
 #endif /* _PANEL_H */

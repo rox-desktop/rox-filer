@@ -710,6 +710,25 @@ void pinboard_set_backdrop(const gchar *path, BackdropStyle style)
 	}
 }
 
+/* Called on xrandr screen resizes */
+void pinboard_update_size(void)
+{
+	int width, height;
+
+	gtk_window_get_size(GTK_WINDOW(current_pinboard->window),
+			&width, &height);
+	
+	/* Only update the pinboard's size if the screen gets bigger,
+	 * not smaller. Not sure what to do about icons that end up
+	 * offscreen if the screen shrinks, but perhaps a good policy
+	 * is to leave them there until the screen size is increased
+	 * again rather than mess them around. */
+	width = MAX(width, screen_width);
+	height = MAX(height, screen_height);
+	
+	gtk_widget_set_size_request(current_pinboard->window, width, height);
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/

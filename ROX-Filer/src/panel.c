@@ -193,6 +193,7 @@ static gboolean panel_want_show_text(PanelIcon *pi);
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel);
 static void panel_style_changed(void);
 static void motion_may_raise(Panel *panel, int x, int y);
+static void panel_update(Panel *panel);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -457,6 +458,19 @@ void panel_mark_used(GdkRegion *used)
 		gdk_region_union_with_rect(used, &rect);
 	}
 }
+
+/* On xrandr screen size changes, update all panels */
+void panel_update_size(void)
+{
+	int i;
+
+	for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
+	{
+		if (current_panel[i])
+			panel_update(current_panel[i]);
+	}
+}
+
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*

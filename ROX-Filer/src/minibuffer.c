@@ -845,7 +845,6 @@ out:
 static void filter_return_pressed(FilerWindow *filer_window, guint etime)
 {
 	const gchar	*entry;
-	SelectData	data;
 
 	entry = mini_contents(filer_window);
 
