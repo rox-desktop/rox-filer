@@ -317,7 +317,8 @@ void display_set_layout(FilerWindow  *filer_window,
 	display_style_set(filer_window, style);
 	display_details_set(filer_window, details);
 
-	view_style_changed(VIEW(filer_window->view), 0);
+	/* Recreate layouts because wrapping may have changed */
+	view_style_changed(VIEW(filer_window->view), VIEW_UPDATE_NAME);
 
 	if (o_filer_auto_resize.int_value != RESIZE_NEVER)
 		filer_window_autosize(filer_window, TRUE);
