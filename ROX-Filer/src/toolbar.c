@@ -439,7 +439,7 @@ static gint menu_pressed(GtkWidget *button,
 static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 				FilerWindow *filer_window)
 {
-	GtkWidget 	*button, *icon_widget;
+	GtkWidget 	*button, *icon_widget, *box = NULL;
 
 	button = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
@@ -470,26 +470,38 @@ static GtkWidget *add_button(GtkWidget *bar, Tool *tool,
 
 	icon_widget = gtk_image_new_from_pixbuf(tool->icon->pixbuf);
 
-	if (o_toolbar.int_value == TOOLBAR_LARGE)
-	{
-		GtkWidget	*vbox, *text;
+	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
+		box = gtk_hbox_new(FALSE, 0);
+	else if (o_toolbar.int_value == TOOLBAR_LARGE)
+		box = gtk_vbox_new(FALSE, 0);
 
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
+	if (box)
+	{
+		GtkWidget	*text;
+
+		gtk_box_pack_start(GTK_BOX(box), icon_widget, TRUE, TRUE, 0);
 
 		text = gtk_label_new(_(tool->label));
-		gtk_box_pack_start(GTK_BOX(vbox), text, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(box), text, FALSE, TRUE, 0);
 
-		gtk_container_add(GTK_CONTAINER(button), vbox);
+		gtk_container_add(GTK_CONTAINER(button), box);
 	}
 	else
 		gtk_container_add(GTK_CONTAINER(button), icon_widget);
 
 	gtk_container_set_border_width(GTK_CONTAINER(button), 1);
-	gtk_misc_set_padding(GTK_MISC(icon_widget),
-			o_toolbar.int_value == TOOLBAR_LARGE ? 16 : 8, 1);
+
+	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
+		gtk_misc_set_padding(GTK_MISC(icon_widget), 4, 1);
+	else if (o_toolbar.int_value == TOOLBAR_LARGE)
+		gtk_misc_set_padding(GTK_MISC(icon_widget), 16, 1);
+	else
+		gtk_misc_set_padding(GTK_MISC(icon_widget), 8, 1);
 
 	gtk_toolbar_append_widget(GTK_TOOLBAR(bar), button, NULL, NULL);
+	
+	if (o_toolbar.int_value == TOOLBAR_HORIZONTAL)
+		gtk_toolbar_append_space(GTK_TOOLBAR(bar));
 
 	return button;
 }

@@ -12,9 +12,10 @@
 
 /* The values correspond to the menu indexes in the option widget */
 typedef enum {
-	TOOLBAR_NONE 	= 0,
-	TOOLBAR_NORMAL 	= 1,
-	TOOLBAR_LARGE 	= 2,
+	TOOLBAR_NONE 		= 0,
+	TOOLBAR_NORMAL 		= 1,
+	TOOLBAR_LARGE 		= 2,
+	TOOLBAR_HORIZONTAL 	= 3,
 } ToolbarType;
 
 extern Option o_toolbar, o_toolbar_info;
