@@ -341,12 +341,14 @@ _xdg_glob_hash_new (void)
 static void
 _xdg_glob_hash_free_nodes (XdgGlobHashNode *node)
 {
-
-  if (node->child)
-    _xdg_glob_hash_free_nodes (node->child);
-  if (node->next)
-    _xdg_glob_hash_free_nodes (node->next);
-  free (node);
+  if (node)
+    {
+      if (node->child)
+       _xdg_glob_hash_free_nodes (node->child);
+      if (node->next)
+       _xdg_glob_hash_free_nodes (node->next);
+      free (node);
+    }
 }
 
 void
