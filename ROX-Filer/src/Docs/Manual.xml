@@ -821,7 +821,9 @@ which is which!
 
   </para>
 
-<sect2><title><anchor id="Permissions"/>Permissions</title>
+<sect2><title><anchor id="Permissions" xreflabel="Permissions"/>
+    Permissions
+  </title>
   <para>
 
 The permissions field, when shown, is made up of four groups of three
@@ -1471,9 +1473,11 @@ rather than executed.
 </para></listitem>
 
 <listitem><para>
-<refentrytitle>sh</refentrytitle> is always used as the name of the shell
-to run (mainly because <refentrytitle>bash</refentrytitle> and
-<refentrytitle>csh</refentrytitle> treat positional parameters differently).
+<citerefentry><refentrytitle>sh</refentrytitle></citerefentry>
+is always used as the name of the shell to run (mainly because
+<citerefentry><refentrytitle>bash</refentrytitle></citerefentry> and
+<citerefentry><refentrytitle>csh</refentrytitle></citerefentry> treat
+positional parameters differently).
 However, <envar>PATH</envar> is searched to find it so you can still use
 another shell if you want by naming it sh and putting it in your path.
 </para></listitem>
@@ -1601,18 +1605,15 @@ a particular expression.
 
 If you know the name of a file then just enter it in the `Expression:'
 box, enclosed in single quotes. For example, to find a file called
-`log' you would enter:
+<filename>log</filename> you would enter <userinput>'log'</userinput>.
 
-<command>'log'</command>
-
-Remember to use normal quotes, not double quotes (\texttt{{}``})
-or back-quotes (\texttt{`})!
-
+Remember to use normal quotes, not double quotes (") or back-quotes (`).
+  </para><para>
 As the filer finds matching files they are added to the results list.
 Clicking on an entry in the list opens a viewer showing the file you
 clicked on. The filer will use the same window to view other results
 (so, if you want the results shown in separate windows you must explicitly
-create a new window from the Window menu).
+create a new window from the <guimenu>Window</guimenu> menu).
   </para>
 
 <sect1>
@@ -1631,13 +1632,16 @@ for example:
 
   </simplelist>
 
-Look at the \texttt{glob(7)} manpage if you want to know more about
-shell wildcards.
-
+Look at the
+<citerefentry><refentrytitle>glob</refentrytitle>
+<manvolnum>7</manvolnum></citerefentry>
+manpage if you want to know more about shell wildcards.
+  </para><para>
 If the pattern you enter contains a slash (`/') character then the
 pattern is matched against the file's full path, otherwise only the
-leafname is used. That is, \texttt{'{*}tmp{*}'} will find `tmp' and
-`tmpfile' but not `/tmp/file' --- \texttt{'/{*}tmp{*}'} will find
+leafname is used. That is, <userinput>'*tmp*'</userinput> will find
+<filename>tmp</filename> and <filename>tmpfile</filename> but not
+<filename>/tmp/file</filename> --- <userinput>'/*tmp*'</userinput> will find
 all three.
   </para>
 </sect1>
@@ -1645,64 +1649,112 @@ all three.
 <sect1>
   <title>Simple tests</title>
   <para>
-
 As well as finding files by their names you can also find them by
-various other attributes. Note that `file' is used here to mean anything
-that can appear in the filesystem --- including directories, devices
-and so on.
-
-\smallskip\noindent These look at the type of the item being checked:
-
-\begin{description}
-\item [IsReg]matches any regular (ie, normal) file.
-\item [IsLink]matches symlinks.
-\item [IsDir]matches directories.
-\item [IsChar]matches character device files.
-\item [IsBlock]matches block device files.
-\item [IsDev]matches block or character device files.
-\item [IsPipe]matches pipes.
-\item [IsSocket]matches sockets.
-\end{description}
-These look at the permissions set on the file --- see section \ref{sec: Permissions}.
-
-\begin{description}
-\item [IsSUID]matches files which have the Set-UID bit set.
-\item [IsSGID]matches files which have the Set-GID bit set.
-\item [IsSticky]matches files with the sticky bit set.
-\item [IsReadable]matches files which you can read from.
-\item [IsWriteable]matches files which you can write to.
-\item [IsExecutable]matches files which you can execute.
-\end{description}
-And a couple of other useful ones:
-
-\begin{description}
-\item [IsEmpty]finds empty files (ie, those whose length is 0 bytes).
-\item [IsMine]finds files which you own.
-\end{description}
+various other attributes. Note that <emphasis>file</emphasis> is used here to
+mean anything that can appear in the filesystem --- including directories,
+devices and so on.
   </para>
+
+<itemizedlist><title>These look at the type of the item being checked:</title>
+
+<listitem><para>
+<userinput>IsReg</userinput> matches any regular (ie, normal) file.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsLink</userinput> matches symlinks.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsDir</userinput> matches directories.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsChar</userinput> matches character device files.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsBlock</userinput> matches block device files.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsDev</userinput> matches block or character device files.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsPipe</userinput> matches pipes.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsSocket</userinput> matches sockets.
+</para></listitem>
+
+</itemizedlist>
+
+<itemizedlist><title>These look at the permissions set on the file ---
+see the <xref linkend="Permissions"/> section.</title>
+
+<listitem><para>
+<userinput>IsSUID</userinput> matches files which have the Set-UID bit set.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsSGID</userinput> matches files which have the Set-GID bit set.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsSticky</userinput> matches files with the sticky bit set.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsReadable</userinput> matches files which you can read from.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsWriteable</userinput> matches files which you can write to.
+</para></listitem>
+
+<listitem><para>
+<userinput>IsExecutable</userinput> matches files which you can execute.
+</para></listitem>
+
+</itemizedlist>
+
+<itemizedlist><title>And a couple of other useful ones:</title>
+
+<listitem><para>
+<userinput>IsEmpty</userinput> finds empty files (ie, those whose length is 0 bytes).
+</para></listitem>
+
+<listitem><para>
+<userinput>IsMine</userinput> finds files which you own.
+</para></listitem>
+
+</itemizedlist>
+
 </sect1>
 
 <sect1>
   <title>Logic operators</title>
   <para>
-
 You can combine the above tests in various ways to perform more advanced
-searches. An expression is actually made up of a list of <emphasis>cases</emphasis>,
+searches.
+An expression is actually made up of a list of <emphasis>cases</emphasis>,
 separated by commas. The filer will try to match each case in turn
 until one matches or there are no more cases left. For example, to
 search for files with several possible endings:
 
-<command>'*.gif', '*.htm', '*.html'</command>
+<informalexample><command>'*.gif', '*.htm', '*.html'</command></informalexample>
 
 Further, each of the cases is actually a list of conditions. The case
 only matches if all of its conditions are met. So, to find a directory
-called \texttt{lib} or a regular file ending in \texttt{.so}:
+called <filename>lib</filename> or a regular file ending in
+<filename>.so</filename>:
 
-<command>IsDir 'lib', IsReg '*.so'</command>
+<informalexample><command>IsDir 'lib', IsReg '*.so'</command></informalexample>
 
-You can negate a condition by putting a \texttt{!} in front of it
-and you can use a sub-expression as a condition by bracketing it,
-like this:
+You can negate a condition by putting a <userinput>!</userinput> in front of it
+and you can use a sub-expression as a condition by bracketing it, like this:
 
 <screen>
 !(IsDir, IsReg)
@@ -1718,46 +1770,115 @@ All three do the same thing.
 <sect1>
   <title>Comparisons</title>
   <para>
+You can also compare various values using the operators
+<userinput>&lt;</userinput>,
+<userinput>&lt;=</userinput>,
+<userinput>=</userinput>,
+<userinput>!=</userinput>,
+<userinput>&gt;</userinput>, and
+<userinput>&gt;=</userinput>
+(for less-than, less-than-or-equal-to, equal-to,
+not-equal-to, greater-than and greater-than-or-equal-to).
 
-You can also compare various values using the operators \texttt{&lt;,
-&lt;=, =, !=, &gt;, &gt;=} (for less-than, less-than-or-equal-to, equal-to,
-not-equal-to, greater-than and greater-than-or-equal-to). When comparing
-times, you may find it helpful to use \texttt{after} and \texttt{before}
-instead of \texttt{&gt;} and \texttt{&lt;} to make things clearer.
+When comparing times, you may find it helpful to use
+<userinput>after</userinput> and <userinput>before</userinput> instead of
+<userinput>&gt;</userinput> and <userinput>&lt;</userinput> to make things
+clearer.
+  </para>
 
+<itemizedlist><title>
 The following are read from the file being checked and may be used
 for the values being compared:
+</title>
 
-\begin{description}
-\item [atime]The time that the file was last accessed.
-\item [ctime]The time that the file's status was last changed.
-\item [mtime]The time that the file's contents were last modified.
-\item [size]The size of the file.
-\item [inode]The file's inode (index) number.
-\item [nlinks]The number of links to this file. That is, the number of directory
+<listitem><para>
+<userinput>atime</userinput> The time that the file was last accessed.
+</para></listitem>
+
+<listitem><para>
+<userinput>ctime</userinput> The time that the file's status was last changed.
+</para></listitem>
+
+<listitem><para>
+<userinput>mtime</userinput> The time that the file's contents were last modified.
+</para></listitem>
+
+<listitem><para>
+<userinput>size</userinput> The size of the file.
+</para></listitem>
+
+<listitem><para>
+<userinput>inode</userinput> The file's inode (index) number.
+</para></listitem>
+
+<listitem><para>
+<userinput>nlinks</userinput> The number of links to this file. That is, the number of directory
 entries which refer to this file. Note that symlinks don't count as
 references.
-\item [uid]The User ID of the file.
-\item [gid]The Group ID of the file.
-\item [blocks]The number of disk blocks being used by the file.
-\end{description}
+</para></listitem>
+
+<listitem><para>
+<userinput>uid</userinput> The User ID of the file.
+</para></listitem>
+
+<listitem><para>
+<userinput>gid</userinput> The Group ID of the file.
+</para></listitem>
+
+<listitem><para>
+<userinput>blocks</userinput> The number of disk blocks being used by the file.
+</para></listitem>
+
+</itemizedlist>
+
+  <para>
 Times are measured as seconds since the Unix Epoch (00:00:00 UTC,
 January 1, 1970). Sizes are in bytes. When specifying constants to
 compare these values with you may use various keywords to scale the
 value:
 
-\begin{description}
-\item [Byte(s)]has no effect, but looks better.
-\item [Kb]multiplies by 1024, so 2Kb is the same as 2048.
-\item [Mb]multiplies by \( 1024^{2} \), ie 1024 Kb.
-\item [Sec(s)]has no effect, but looks nice.
-\item [Min(s)]multiplies by 60 to get minutes.
-\item [Hour(s), Day(s), Week(s), Year(s)]likewise convert to the relevant
+<itemizedlist>
+
+<listitem><para>
+<userinput>Byte(s)</userinput> has no effect, but looks better.
+</para></listitem>
+
+<listitem><para>
+<userinput>Kb</userinput> multiplies by 1024, so 2Kb is the same as 2048.
+</para></listitem>
+
+<listitem><para>
+<userinput>Mb</userinput> multiplies by 1024<superscript>2</superscript>,
+ie 1024 Kb.
+</para></listitem>
+
+<listitem><para>
+<userinput>Sec(s)</userinput> has no effect, but looks nice.
+</para></listitem>
+
+<listitem><para>
+<userinput>Min(s)</userinput> multiplies by 60 to get minutes.
+</para></listitem>
+
+<listitem><para>
+<userinput>Hour(s), Day(s), Week(s), Year(s)</userinput> likewise convert to the relevant
 unit.
-\item [Ago]makes the time in the past relative to when the check is done.
-\item [Hence]makes the time in the future.
-\item [Now]is short for `\texttt{0 Secs Hence}'.
-\end{description}
+</para></listitem>
+
+<listitem><para>
+<userinput>Ago</userinput> makes the time in the past relative to when the check is done.
+</para></listitem>
+
+<listitem><para>
+<userinput>Hence</userinput> makes the time in the future.
+</para></listitem>
+
+<listitem><para>
+<userinput>Now</userinput> is short for <userinput>0 Secs Hence</userinput>.
+</para></listitem>
+
+</itemizedlist>
+
 Some examples should make this all a bit clearer!
 
 <screen>
@@ -1768,17 +1889,22 @@ size &gt; 10 Mb
 IsReg and nlinks &gt; 1
 </screen>
 The first finds files modified within the last 24 hours. You could
-use \texttt{&gt;} instead of \texttt{after,}but it's not so clear what
-is meant. The second finds files larger than 10 Mb and the last finds
+use <userinput>&gt;</userinput> instead of <userinput>after</userinput>,
+but it's not so clear what is meant.
+</para><para>
+The second finds files larger than 10 Mb and the last finds
 regular files with more than one directory entry.
-
+</para><para>
 Be careful though --- the filer doesn't check the context of the modifiers,
-so \texttt{size &gt; 1 day ago} is allowed, although it doesn't make
-much sense! Also, forgetting to use \texttt{ago} or \texttt{hence}
-will cause odd effects (the time will be measured relative to the
-Epoch rather than the current time). Finally, don't use = with times
---- \texttt{atime = 1 day ago} looks for a file accessed <emphasis>exactly</emphasis>
-86400 seconds ago$\ldots$
+so <userinput>size &gt; 1 day ago</userinput> is allowed, although it
+doesn't make much sense!
+
+Also, forgetting to use <userinput>ago</userinput> or
+<userinput>hence</userinput> will cause odd effects (the time will be
+measured relative to the Epoch rather than the current time).
+Finally, don't use <userinput>=</userinput> with times ---
+<userinput>atime = 1 day ago</userinput> looks for a file accessed
+<emphasis>exactly</emphasis> 86400 seconds ago...
 
   </para>
 </sect1>
@@ -2089,7 +2215,9 @@ and what program to use when you open the file.
   </para>
 
 <sect1>
-  <title><anchor id="RunAction"/>The run action box</title>
+  <title><anchor id="RunAction" xreflabel="the run action box"/>
+    The run action box
+  </title>
   <para>
 
 This box appears when you choose `Set Run Action...' from the File
