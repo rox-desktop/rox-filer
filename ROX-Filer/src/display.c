@@ -1443,7 +1443,12 @@ void display_update_view(FilerWindow *filer_window,
 	static PangoFontDescription *monospace = NULL;
 
 	if (!monospace)
-		monospace = pango_font_description_from_string("Monospace");
+	{
+		/* XXX: Should just request 'monospace', but that doesn't
+		 * work for some reason (pango bug?).
+		 */
+		monospace = pango_font_description_from_string("Monotype.com");
+	}
 	
 	if (view->details)
 	{
@@ -1458,9 +1463,7 @@ void display_update_view(FilerWindow *filer_window,
 					filer_window->window, str);
 		g_free(str);
 
-#if 0
 		pango_layout_set_font_description(view->details, monospace);
-#endif
 		pango_layout_get_size(view->details, &w, &h);
 		view->details_width = w / PANGO_SCALE;
 		view->details_height = h / PANGO_SCALE;

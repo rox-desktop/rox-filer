@@ -218,26 +218,18 @@ void dir_check_this(guchar *path)
  */
 void dir_force_update_path(gchar *path)
 {
-	guchar	*slash;
-	guchar	*real_path;
+	gchar	*dir_path;
+	Directory *dir;
 
-	real_path = pathdup(path);
+	g_return_if_fail(path[0] == '/');
 
-	slash = strrchr(real_path, '/');
+	dir_path = g_dirname(path);
 
-	if (slash)
-	{
-		Directory *dir;
-
-		*slash = '\0';
-
-		dir = g_fscache_lookup_full(dir_cache, real_path,
-						FSCACHE_LOOKUP_PEEK);
-		if (dir)
-			dir_force_update_item(dir, slash + 1);
-	}
+	dir = g_fscache_lookup_full(dir_cache, dir_path, FSCACHE_LOOKUP_PEEK);
+	if (dir)
+		dir_force_update_item(dir, g_basename(path));
 	
-	g_free(real_path);
+	g_free(dir_path);
 }
 
 /* Ensure that 'leafname' is up-to-date. Returns the new/updated
