@@ -13,27 +13,6 @@
 
 extern GFSCache *pixmap_cache;
 
-enum
-{
-	/* Base types */
-	TYPE_ERROR,
-	TYPE_UNKNOWN,
-	TYPE_SYMLINK,
-	TYPE_FILE,
-	TYPE_DIRECTORY,
-	TYPE_CHAR_DEVICE,
-	TYPE_BLOCK_DEVICE,
-	TYPE_PIPE,
-	TYPE_SOCKET,
-
-	/* Extended types */
-	TYPE_UNMOUNTED,
-	TYPE_MOUNTED,
-	TYPE_EXEC_FILE,
-	TYPE_MULTIPLE,
-	TYPE_APPDIR,
-};
-
 typedef struct _MaskedPixmap MaskedPixmap;
 
 extern MaskedPixmap *im_error;

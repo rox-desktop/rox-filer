@@ -119,8 +119,8 @@ static GtkWidget *menu_toolbar;
 
 static GtkWidget *display_label;
 
-static gboolean o_sort_nocase = FALSE;
-static gboolean o_single_click = FALSE;
+static gboolean o_sort_nocase = TRUE;
+static gboolean o_single_click = TRUE;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
 gboolean o_unique_filer_windows = FALSE;
 static gint	o_small_truncate = 250;
@@ -1670,7 +1670,7 @@ FilerWindow *filer_opendir(char *path, PanelType panel_type)
 		{
 			int	height = iheight + PANEL_BORDER;
 			int	y = panel_type == PANEL_TOP 
-					? -PANEL_BORDER
+					? 0
 					: sheight - height - PANEL_BORDER;
 
 			gtk_widget_set_usize(collection, swidth, height);

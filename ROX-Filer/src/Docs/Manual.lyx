@@ -1,4 +1,4 @@
-#This file was created by <tal197> Tue May 23 19:55:18 2000
+#This file was created by <tal197> Wed Jun  7 10:53:24 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -205,6 +205,44 @@ ROX-Filer will perform various checks to find out what kind of system it
  If it doesn't work then please e-mail me and complain! Tell me what kind
  of system you have and what errors were reported.
  If you manage to fix the problem yourself then please e-mail me the fix.
+\begin_deeper 
+\layout Standard
+
+The executables files are stored inside the ROX-Filer directory in a different
+ subdirectory for each platform.
+ Therefore, you can compile the same application on several different types
+ of machine and then run it from any of them using the AppRun script.
+ This is particularly useful in a network environment.
+\end_deeper 
+\layout Enumerate
+
+The filer needs some shared files to work --- icons for the various file
+ types, rules for determining file types and default run actions.
+ These are installed, along with the filer itself, by the '
+\family typewriter 
+install.sh
+\family default 
+' script supplied with the filer.
+ Run it like this:
+\begin_deeper 
+\layout LyX-Code
+
+$ su
+\layout LyX-Code
+
+[ enter root password ]
+\layout LyX-Code
+
+$ ./install.sh
+\layout Standard
+
+If you don't have the root password then don't worry --- skip the '
+\family typewriter 
+su
+\family default 
+' step and follow the instructions for installing into your home directory.
+ 
+\end_deeper 
 \layout Standard
 
 You can now run the filer by running the AppRun script without any options,
@@ -215,13 +253,15 @@ $ ROX-Filer/AppRun
 \layout Standard
 
 A window should appear and display the contents of your home directory.
-\layout Standard
-
-The executables files are stored inside the ROX-Filer directory in a different
- subdirectory for each platform.
- Therefore, you can compile the same application on several different types
- of machine and then run it from any of them using the AppRun script.
- This is particularly useful in a network environment.
+ If you opted to install the `
+\family typewriter 
+rox
+\family default 
+' script then you can simply run that to open a viewer onto the current
+ directory.
+ You can also use it to open files in the same way that the filer would.
+ If you installed the script into your home directory then you may need
+ to set your PATH environment variable so that the shell can find it.
 \layout Subsection
 
 Invoking
@@ -290,11 +330,41 @@ Note that if the same version of the filer is already running on this machine
 Mouse button and key bindings
 \layout Standard
 
+Quick start:
+\layout Itemize
+
+Click the left
+\begin_float footnote 
+\layout Standard
+
+This documentation assumes that button--1 is the left button, button--2
+ is the middle button and button--3 is the right button.
+ This is not always the case --- for example, in a left-handed setup.
+\end_float 
+ mouse button to open files and directories.
+\layout Itemize
+
+Click the right button to get a menu.
+ Click over a file to perform an action on that file.
+\layout Itemize
+
+Drag files between windows to copy (left button) or move (middle button)
+ them.
+\layout Standard
+
+
+\latex latex 
+
+\backslash 
+noindent 
+\latex default 
 By default, the mouse button bindings are designed to fit in with X conventions.
- You can get the old RISC OS bindings by opening the Options window and
- clicking on a few toggle buttons.
- By default, the mouse buttons and key bindings for filer windows are as
- follows:
+ However, the behaviour is highly configurable --- have a play in the Options
+ window if you don't like the normal settings.
+ The normal settings behave as follows:
+\layout Standard
+
+
 \latex latex 
 
 \backslash 
@@ -302,9 +372,12 @@ medskip
 \layout Standard
 \LyXTable
 multicol5
-23 2 0 0 -1 -1 -1 -1
+19 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 1 0
+0 1 1 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 1 0
@@ -312,13 +385,6 @@ multicol5
 0 1 1 0
 0 1 0 0
 0 1 1 0
-0 1 0 0
-0 1 1 0
-0 1 1 0
-0 1 0 0
-0 1 1 0
-0 1 1 0
-0 1 0 0
 0 1 1 0
 0 1 0 0
 0 1 0 0
@@ -331,33 +397,25 @@ multicol5
 0 2 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 2 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 2 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 2 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -381,20 +439,26 @@ Action
 \newline 
 Left button click
 \newline 
-Select (only) the item clicked on, or clear the selection.
+Open the file or directory clicked on.
+\newline 
+
+\newline 
+Hold down Ctrl to select things instead of opening them.
+\newline 
+
+\newline 
+Hold down Shift to look inside applications, treat files as text, follow
+ symlinks or mount devices.
 \newline 
 Middle button click
 \newline 
-Toggle the item between being selected and unselected.
+Same as left click, but open a directory in a new window or close the viewer
+ when opening a file.
 \newline 
 Right button click
 \newline 
 Open the main menu.
- Hold down Ctrl while clicking to go directly to
-\newline 
-
-\newline 
-the Selection submenu.
+ Hold down Ctrl while clicking to go directly to the Selection submenu.
 \newline 
 Drag an item 
 \newline 
@@ -415,34 +479,17 @@ As above, but always moves rather than copying or symlinking.
 Drag (not over an item)
 \newline 
 Select a group of items by dragging a box around them.
+ With the left mouse button, only the files
 \newline 
 
 \newline 
-If you use the left button then the boxed items only are selected, otherwise
+in the box will be selected.
+ If you hold down Ctrl then the boxed items are added to the selection.
 \newline 
 
 \newline 
-the boxes items are toggled between selected and unselected.
-\newline 
-Double click left button
-\newline 
-Open the file or directory or run the application.
-\newline 
-
-\newline 
-Holding down Shift while clicking does the same thing as choosing
-\newline 
-
-\newline 
-`Shift Open' from the menu.
-\newline 
-Double click middle button
-\newline 
-Open the file and close the directory viewer,
-\newline 
-
-\newline 
-or open the directory in a new window.
+If the other mouse button is used then the boxed items are toggled between
+ selected and unselected.
 \newline 
 Backspace
 \newline 
@@ -478,9 +525,7 @@ medskip
 \backslash 
 noindent 
 \latex default 
-You can simulate a click of the middle mouse button by clicking with Ctrl
- held down.
- Other keys can easily be defined by opening the menu, moving the pointer
+Other keys can easily be defined by opening the menu, moving the pointer
  over the item you want to use and pressing a key.
  The key will appear in the menu and can be used from then on.
  To make the new key bindings permanent, open the Options box from the menu
@@ -504,7 +549,7 @@ Choose `Xterm here' from the menu in your home directory.
 Type `tar xzf ' (but don't press Return)
 \layout Enumerate
 
-Click on the .tgz file to select it.
+Ctrl-click on the .tgz file to select it.
 \layout Enumerate
 
 Click the middle button in the xterm window to paste the name of the file
@@ -523,14 +568,15 @@ The toolbar
 \layout Standard
 
 By default, each window has a toolbar along the top.
- You can disable this from the Options window.
- The three buttons on the toolbar are:
+ You can disable this (or make it larger) from the Options window.
+ The four buttons on the toolbar are:
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-4 3 0 0 -1 -1 -1 -1
+5 3 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
+0 1 0 0
 0 1 0 0
 0 1 0 0
 8 1 0 "" ""
@@ -545,6 +591,9 @@ multicol5
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -572,6 +621,12 @@ Looping arrows
 Reread the directory contents
 \newline 
 Open a new window
+\newline 
+Information
+\newline 
+Show ROX-Filer's help files
+\newline 
+Same
 \layout Standard
 
 
@@ -581,7 +636,7 @@ Open a new window
 noindent 
 \latex default 
 If the toolbar is in Normal mode (ie, not GNOME mode) then you may also
- use button 3 (usually the right-most button) to perform the `Other action'.
+ use either of the other buttons to perform the `Other action'.
 \layout Subsection
 
 The menus
@@ -712,12 +767,12 @@ Entries are displayed with their icon, name, type, permissions, owner and
 \newline 
 Sort by Name
 \newline 
-Items are arranged in ASCII order.
- Note that `Z' is considered to come before `a'.
+Items are arranged by name.
+ There is an option to make this case-sensitive.
 \newline 
 Sort by Type
 \newline 
-Items are grouped by their MIME-types and sorted by name within the groups.
+Items are grouped by their types and then sorted by name within the groups.
 \newline 
 Sort by Date
 \newline 
@@ -769,7 +824,7 @@ Permissions
 
 The permissions display, shown in Full Info mode, is made up of four groups
  of three flags.
- Each flag is displayed as a letter if it is on and a dash (-) if not.
+ Each flag is displayed as a letter if it is on and a dash (--) if not.
  The first three characters show the permissions for the owner of the file,
  the second for other members of the file's group and the third for everyone
  else.
@@ -864,12 +919,12 @@ real group ID
 The selection menu
 \layout Standard
 
-All of these work in the same way - if you open the menu with some items
+All of these work in the same way --- if you open the menu with some items
  selected then the operation applies to those items.
  If you open then menu over an item while there is no selection then that
  item is temporarily selected.
  If you choose one of these while there is no selection at all then the
- window goes into `target mode' - the operation happens to the next item
+ window goes into `target mode'; the operation happens to the next item
  you click on.
  Click on the window background, press Escape, or click with the right mouse
  button to cancel target mode.
@@ -878,7 +933,7 @@ All of these work in the same way - if you open the menu with some items
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-20 2 0 0 -1 -1 -1 -1
+19 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -888,7 +943,6 @@ multicol5
 0 1 1 0
 0 1 1 0
 0 1 0 0
-0 1 1 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
@@ -917,8 +971,6 @@ multicol5
 0 2 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
@@ -972,16 +1024,12 @@ containing the thing they point to.
 \newline 
 
 \newline 
-This is the same as double-clicking with Shift held down.
+This is the same effect as clicking with Shift held down.
 \newline 
 Help
 \newline 
 Explain what kind of thing is selected.
- For applications,
-\newline 
-
-\newline 
-display the help files.
+ For applications, display the help files.
 \newline 
 Info
 \newline 
@@ -1625,6 +1673,17 @@ Size > 5Mb
 \layout Standard
 
 Just those files over 5 Mb in size will be selected.
+ The expressions you can enter are in the same form as described in section
+ 
+\begin_inset LatexCommand \ref{sec: Searching}
+
+\end_inset 
+
+, except that `
+\family typewriter 
+prune
+\family default 
+' has no effect since the contents of directories are never checked anyway.
 \layout Subsection
 
 Action windows
@@ -2296,17 +2355,28 @@ MIME-info contains files which specify what the MIME type for a file should
  be, based on its extention.
  All the files in all the MIME-info directories are scanned when the filer
  loads.
- In addition, ROX-Filer is now supplied with a file called `MIME-info' (inside
- its application directory), which is also scanned --- this allows new users
- to get started more easily.
- Many applications now come with a file called `something.mime'; copy these
+ ROX-Filer comes with many such rules --- these are installed into the MIME-info
+ directory by the install script.
+\begin_deeper 
+\layout Standard
+
+Many applications now come with a file called `something.mime'; copy these
  files into your MIME-info directory to make ROX-Filer automatically recognise
  the new extensions.
+\end_deeper 
 \layout Description
 
 MIME-types contains symlinks, one for each MIME type, which point to programs
  that can handle files of that type.
- For example, to make opening an HTML file load it into Netscape:
+ To set what program is run when you click on the file you should normally
+ use the `Set Run Action' feature (see section 
+\begin_inset LatexCommand \ref{sec: RunAction}
+
+\end_inset 
+
+).
+ However, you can also set the actions manually --- for example, to make
+ opening an HTML file load it into Netscape:
 \begin_deeper 
 \layout Enumerate
 
@@ -2324,14 +2394,6 @@ You can also put actual programs in here as well as links if you want to.
 MIME-icons contains the images used to display each type of file.
  So the filer will try to display an HTML file using the icon `MIME-icons/text_h
 tml.xpm'.
-\layout Standard
-
-Many sample files are supplied as part of the ROX desktop
-\begin_inset LatexCommand \cite{ROX}
-
-\end_inset 
-
-.
 \layout Standard
 
 In both MIME-types and MIME-icons directories you can also provide default

@@ -20,6 +20,19 @@ extern MIME_type special_unknown;
 #include "pixmaps.h"
 #include "filer.h"
 
+enum
+{
+	/* Base types - this also determines the sort order */
+	TYPE_ERROR,
+	TYPE_UNKNOWN,
+	TYPE_DIRECTORY,
+	TYPE_PIPE,
+	TYPE_SOCKET,
+	TYPE_FILE,
+	TYPE_CHAR_DEVICE,
+	TYPE_BLOCK_DEVICE,
+};
+
 struct _MIME_type
 {
 	char		*media_type;

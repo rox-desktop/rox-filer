@@ -247,13 +247,13 @@ int main(int argc, char **argv)
 				override_redirect = TRUE;
 				break;
 			case 'v':
-				printf("ROX-Filer %s\n", VERSION);
-				printf(_(COPYING));
+				fprintf(stderr, "ROX-Filer %s\n", VERSION);
+				fprintf(stderr, _(COPYING));
 				show_features();
 				return EXIT_SUCCESS;
 			case 'h':
-				printf(_(HELP));
-				printf(_(SHORT_ONLY_WARNING));
+				fprintf(stderr, _(HELP));
+				fprintf(stderr, _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
 			case 't':
 			case 'b':
