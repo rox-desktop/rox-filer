@@ -77,13 +77,27 @@ _xdg_glob_list_new (void)
   return new_element;
 }
 
-#if 0
+/* Frees glob_list and all of it's children */
 static void
 _xdg_glob_list_free (XdgGlobList *glob_list)
 {
-  free (glob_list);
+  XdgGlobList *ptr, *next;
+
+  ptr = glob_list;
+
+  while (ptr != NULL)
+    {
+      next = ptr->next;
+
+      if (ptr->data)
+	free ((void *) ptr->data);
+      if (ptr->mime_type)
+	free ((void *) ptr->mime_type);
+      free (ptr);
+
+      ptr = next;
+    }
 }
-#endif
 
 static XdgGlobList *
 _xdg_glob_list_append (XdgGlobList *glob_list,
@@ -137,14 +151,6 @@ _xdg_glob_hash_node_new (void)
 
   return glob_hash_node;
 }
-
-#if 0
-static void
-_xdg_glob_hash_node_free (XdgGlobHashNode *glob_hash_node)
-{
-  free (glob_hash_node);
-}
-#endif
 
 void
 _xdg_glob_hash_node_dump (XdgGlobHashNode *glob_hash_node,
@@ -345,11 +351,11 @@ _xdg_glob_hash_free_nodes (XdgGlobHashNode *node)
 void
 _xdg_glob_hash_free (XdgGlobHash *glob_hash)
 {
+  _xdg_glob_list_free (glob_hash->literal_list);
+  _xdg_glob_list_free (glob_hash->full_list);
   _xdg_glob_hash_free_nodes (glob_hash->simple_node);
   free (glob_hash);
 }
-
-
 
 XdgGlobType
 _xdg_glob_determine_type (const char *glob)

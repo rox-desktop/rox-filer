@@ -3,12 +3,12 @@
 /* xdgmimemagic.: Private file.  Datastructure for storing magic.
  *
  * More info can be found at http://www.freedesktop.org/standards/
- * 
+ *
  * Copyright (C) 2003  Red Hat, Inc.
  * Copyright (C) 2003  Jonathan Blandford <jrb@alum.mit.edu>
  *
  * Licensed under the Academic Free License version 1.2
- * 
+ *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -18,7 +18,7 @@
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
- * 
+ *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
@@ -110,17 +110,6 @@ _xdg_mime_magic_matchlet_new (void)
   return matchlet;
 }
 
-void
-_xdg_mime_magic_match_free (XdgMimeMagicMatch *mime_magic_match)
-{
-  if (mime_magic_match)
-    {
-      if (mime_magic_match->mime_type)
-	free ((char *)mime_magic_match->mime_type);
-      free (mime_magic_match);
-    }
-}
-
 
 void
 _xdg_mime_magic_matchlet_free (XdgMimeMagicMatchlet *mime_magic_matchlet)
@@ -138,6 +127,27 @@ _xdg_mime_magic_matchlet_free (XdgMimeMagicMatchlet *mime_magic_matchlet)
 }
 
 
+/* Frees mime_magic_match and the remainder of its list
+ */
+void
+_xdg_mime_magic_match_free (XdgMimeMagicMatch *mime_magic_match)
+{
+  XdgMimeMagicMatch *ptr, *next;
+
+  ptr = mime_magic_match;
+  while (ptr)
+    {
+      next = ptr->next;
+
+      if (ptr->mime_type)
+	free ((void *) ptr->mime_type);
+      if (ptr->matchlet)
+	_xdg_mime_magic_matchlet_free (ptr->matchlet);
+      free (ptr);
+
+      ptr = next;
+    }
+}
 
 /* Reads in a hunk of data until a newline character or a '\000' is hit.  The
  * returned string is null terminated, and doesn't include the newline.
@@ -172,7 +182,7 @@ _xdg_mime_magic_read_to_newline (FILE *magic_file,
 	  retval = realloc (retval, len);
 	}
     }
-    
+
   retval[pos] = '\000';
   return retval;
 }
@@ -334,7 +344,7 @@ _xdg_mime_magic_parse_magic_line (FILE              *magic_file,
 
   if (c != '>')
     return XDG_MIME_MAGIC_ERROR;
-    
+
   matchlet = _xdg_mime_magic_matchlet_new ();
   matchlet->indent = indent;
   matchlet->offset = _xdg_mime_magic_read_a_number (magic_file, &end_of_file);
@@ -489,7 +499,7 @@ _xdg_mime_magic_parse_magic_line (FILE              *magic_file,
       matchlet->next = match->matchlet;
       match->matchlet = matchlet;
 
-      
+
       return XDG_MIME_MAGIC_MAGIC;
     }
 
@@ -506,7 +516,7 @@ _xdg_mime_magic_matchlet_compare_to_data (XdgMimeMagicMatchlet *matchlet,
 					  size_t                len)
 {
   int i, j;
-      
+
   for (i = matchlet->offset; i <= matchlet->offset + matchlet->range_length; i++)
     {
       int valid_matchlet = TRUE;
@@ -641,7 +651,7 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 			     size_t        len)
 {
   XdgMimeMagicMatch *match;
-  
+
   for (match = mime_magic->match_list; match; match = match->next)
     {
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
@@ -649,7 +659,7 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	  return match->mime_type;
 	}
     }
-      
+
   return NULL;
 }
 
@@ -658,7 +668,7 @@ _xdg_mime_update_mime_magic_extents (XdgMimeMagic *mime_magic)
 {
   XdgMimeMagicMatch *match;
   int max_extent = 0;
-  
+
   for (match = mime_magic->match_list; match; match = match->next)
     {
       XdgMimeMagicMatchlet *matchlet;

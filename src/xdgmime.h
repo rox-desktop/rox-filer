@@ -52,6 +52,7 @@ const char *xdg_mime_get_mime_type_for_data       (const void *data,
 const char *xdg_mime_get_mime_type_for_file       (const char *file_name);
 const char *xdg_mime_get_mime_type_from_file_name (const char *file_name);
 int         xdg_mime_is_valid_mime_type           (const char *mime_type);
+void        xdg_mime_shutdown                     (void);
 
 #ifdef __cplusplus
 }

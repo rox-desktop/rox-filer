@@ -1,3 +1,9 @@
+Tue Oct 28 14:47:37 2003  Jonathan Blandford  <jrb@redhat.com>
+
+	* src/xdgmime.c (xdg_mime_shutdown): implement shutdown.  This
+	frees all memory and resets to an uninitialized state as best as
+	possible.
+
 Mon Oct 27 11:45:58 2003  Jonathan Blandford  <jrb@redhat.com>
 
 	* src/xdgmimemagic.c (_xdg_mime_magic_read_a_number): strtol
