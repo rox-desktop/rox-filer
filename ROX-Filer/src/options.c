@@ -840,8 +840,11 @@ static void tree_cursor_changed(GtkTreeView *tv, gpointer data)
 	gtk_tree_model_get(model, &iter, 1, &page, -1);
 
 	if (page)
+	{
 		gtk_notebook_set_current_page(nbook,
 				gtk_notebook_page_num(nbook, page));
+		g_object_unref(page);
+	}
 }
 
 /* Creates the window and adds the various buttons to it.
