@@ -235,12 +235,14 @@ The filer supports various options; use <option>-h</option> for a list.
 All options have long and short forms (eg <option>-h</option> and
 <option>--help</option>) &mdash; although on some systems you can only use the
 short versions.
-
+</para><para>
 Note that if the same version of the filer is already running on this
 machine then, by default, it will be used to open the directories
 and the new copy will exit immediately. You can override this (perhaps
 because the old copy has stopped responding for some reason) using
 the <option>--new</option> option.
+</para><para>
+For a complete list of command-line options, see <xref linkend="manpage"/>
   </para>
 
 <sect1>
@@ -409,83 +411,6 @@ between systems (which is why this isn't built in to the filer!).
   </para>
 </sect1>
 
-<sect1>
-  <title>Full list of command-line options</title>
-
-  <variablelist><title>The full list of options is:</title>
-
-    <varlistentry><term><option>-b</option></term><term><option>--bottom=PANEL</option></term>
-<listitem><para>open PANEL as a bottom-edge panel.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-c</option></term><term><option>--client-id=ID</option></term>
-<listitem><para>used for session management.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-d</option></term><term><option>--dir=DIR</option></term>
-<listitem><para>open DIR as directory (not as an application, even if it looks
-like one).
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-D</option></term><term><option>--close=DIR</option></term>
-<listitem><para>close DIR and all its subdirectories.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-h</option></term><term><option>--help</option></term>
-<listitem><para>display help about the various options.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-l</option></term><term><option>--left=PANEL</option></term>
-<listitem><para>open PANEL as a left-edge panel.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-m</option></term><term><option>--mime-type=FILE</option></term>
-<listitem><para>print MIME type of FILE and exit.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-n</option></term><term><option>--new</option></term>
-<listitem><para>start a new filer, even if one already seems to be running.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-o</option></term><term><option>--override</option></term>
-<listitem><para>override window manager control of panels.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
-<listitem><para>use pinboard PIN as the pinboard.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-r</option></term><term><option>--right=PANEL</option></term>
-<listitem><para>open PANEL as a right-edge panel.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-R</option></term><term><option>--RPC</option></term>
-<listitem><para>read and invoke SOAP RPC from standard input (see <xref linkend="soap"/>).
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-s</option></term><term><option>--show=FILE</option></term>
-<listitem><para>open a directory showing FILE.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
-<listitem><para>open PANEL as a top-edge panel.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-u</option></term><term><option>--user</option></term>
-<listitem><para>show user name in each window.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-v</option></term><term><option>--version</option></term>
-<listitem><para>display the version information and exit.
-</para></listitem></varlistentry>
-
-<varlistentry><term><option>-x</option></term><term><option>--examine=FILE</option></term>
-<listitem><para>FILE has changed &mdash; re-examine it.
-</para></listitem></varlistentry>
-
-  </variablelist>
-
-</sect1>
 </chapter>
 
 <chapter>
@@ -2937,6 +2862,190 @@ the list).
   </para>
 </sect1>
 </chapter>
+
+<appendix id="manpage"><title>Manual page</title>
+
+<refentry id="rox">
+
+<refmeta>
+<refentrytitle>rox</refentrytitle>
+<manvolnum>1</manvolnum>
+</refmeta>
+
+<refnamediv>
+<refname>rox</refname>
+<refpurpose>a simple graphical file manager</refpurpose>
+</refnamediv>
+
+<refsynopsisdiv>
+<cmdsynopsis>
+<command>rox</command>
+<arg choice="opt" rep="repeat"><option>OPTION</option></arg>
+<arg choice="opt" rep="repeat">FILE</arg>
+</cmdsynopsis>
+</refsynopsisdiv>
+
+<refsect1><title>Description</title>
+<para>
+ROX-Filer is a simple and easy to use graphical file manager for X11, the
+windowing system used on Unix and Unix-like operating systems.
+</para><para>
+It is also the core component of the ROX Desktop:
+<ulink url="http://rox.sourceforge.net"/>
+</para><para>
+Invoking <command>rox</command> opens each directory or file listed,
+or the current working directory if no arguments are given.
+</para>
+</refsect1>
+
+<refsect1><title>Command-line options</title>
+  <para>
+  <variablelist>
+
+    <varlistentry><term><option>-b</option></term><term><option>--bottom=PANEL</option></term>
+<listitem><para>open PANEL as a bottom-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-c</option></term><term><option>--client-id=ID</option></term>
+<listitem><para>used for session management.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-d</option></term><term><option>--dir=DIR</option></term>
+<listitem><para>open DIR as directory (not as an application, even if it looks
+like one).
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-D</option></term><term><option>--close=DIR</option></term>
+<listitem><para>close DIR and all its subdirectories.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-h</option></term><term><option>--help</option></term>
+<listitem><para>display help about the various options.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-l</option></term><term><option>--left=PANEL</option></term>
+<listitem><para>open PANEL as a left-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-m</option></term><term><option>--mime-type=FILE</option></term>
+<listitem><para>print MIME type of FILE and exit.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-n</option></term><term><option>--new</option></term>
+<listitem><para>start a new filer, even if one already seems to be running.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-o</option></term><term><option>--override</option></term>
+<listitem><para>override window manager control of panels.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
+<listitem><para>use pinboard PIN as the pinboard.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-r</option></term><term><option>--right=PANEL</option></term>
+<listitem><para>open PANEL as a right-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-R</option></term><term><option>--RPC</option></term>
+<listitem><para>read and invoke SOAP RPC from standard input (see <xref linkend="soap"/>).
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-s</option></term><term><option>--show=FILE</option></term>
+<listitem><para>open a directory showing FILE.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
+<listitem><para>open PANEL as a top-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-u</option></term><term><option>--user</option></term>
+<listitem><para>show user name in each window.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-v</option></term><term><option>--version</option></term>
+<listitem><para>display the version information and exit.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-x</option></term><term><option>--examine=FILE</option></term>
+<listitem><para>FILE has changed &mdash; re-examine it.
+</para></listitem></varlistentry>
+
+  </variablelist>
+</para>
+</refsect1>
+
+<refsect1><title>Notes</title>
+	<para>
+The main documentation for ROX-Filer is available by choosing
+<guimenuitem>Show ROX-Filer Help</guimenuitem> from the
+popup menu, or by clicking on the <guibutton>i</guibutton>
+toolbar icon.
+	</para>
+</refsect1>
+
+<refsect1><title>License</title>
+	<para>Copyright (C) 2001 Thomas Leonard.
+	</para><para>
+You may redistribute copies of ROX-Filer under the terms of the GNU General
+Public License.
+	</para>
+</refsect1>
+
+<refsect1><title>Bugs</title>
+	<para>
+		Report bugs to <email>tal197@users.sourceforge.net</email>.
+	</para>
+</refsect1>
+
+<refsect1><title>Authors</title>
+<para>
+ROX-Filer was created by Thomas Leonard, with help from:
+</para><para>
+<simplelist columns='4'>
+	<member>Christopher Arndt</member>
+	<member>Jens Askengren</member>
+	<member>Liav Asseraf</member>
+	<member>Andrzej Borsuk</member>
+	<member>Richard Boulton</member>
+	<member>Simon Britnell</member>
+	<member>Arnaud Calvo</member>
+	<member>Andrew Clover</member>
+	<member>Fabien Coutant</member>
+	<member>Dmitry Elfimov</member>
+	<member>Mattias Engdegard</member>
+	<member>Andrew Flegg</member>
+	<member>Alex Holden</member>
+	<member>Jasper Huijsmans</member>
+	<member>Bernard Jungen</member>
+	<member>James Kermode</member>
+	<member>Vincent Ledda</member>
+	<member>Vincent Lefevre</member>
+	<member>Victor Liu See-le</member>
+	<member>Anders Lundmark</member>
+	<member>Jose Romildo Malaquias</member>
+	<member>Denis Manente</member>
+	<member>Andras Mohari</member>
+	<member>Christiansen Merel</member>
+	<member>Jimmy Olgeni</member>
+	<member>Andy Piper</member>
+	<member>Michel Alexandre Sali</member>
+	<member>Chris Sawer</member>
+	<member>Taras</member>
+	<member>Simon Truss</member>
+	<member>Jan Wagemakers</member>
+	<member>Stephen Watson</member>
+	<member>Andre Wyrwa</member>
+	<member>Diego Zamboni</member>
+</simplelist>
+</para><para>
+and many others &mdash; the <filename>Changes</filename> file contains more
+detailed information!
+</para>
+</refsect1>
+
+</refentry>
+</appendix>
 
 <appendix id="soap"><title>SOAP RPC</title>
 

@@ -5,6 +5,8 @@
 
   <xsl:import href="/usr/share/sgml/docbook/xsl-stylesheets-1.29/html/docbook.xsl"/>
 
+  <xsl:param name="generate.component.toc">0</xsl:param>
+
   <!-- Try to stop Netscape mucking things up using media.
   <xsl:param name="html.stylesheet">../style.css</xsl:param>
   -->
