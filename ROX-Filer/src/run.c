@@ -389,6 +389,34 @@ void run_list(guchar *to_open)
 
 }
 
+/* Open a directory viewer showing this file, and wink it */
+void open_to_show(guchar *path)
+{
+	FilerWindow	*new;
+	guchar		*dir, *slash;
+
+	g_return_if_fail(path != NULL);
+
+	dir = g_strdup(path);
+	slash = strrchr(dir, '/');
+	if (slash == dir || !slash)
+	{
+		/* Item in the root (or root itself!) */
+		new = filer_opendir("/");
+		if (dir[1])
+			display_set_autoselect(new, dir + 1);
+		
+	}
+	else
+	{
+		*slash = '\0';
+		new = filer_opendir(dir);
+		display_set_autoselect(new, slash + 1);
+	}
+
+	g_free(dir);
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/

@@ -19,6 +19,11 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/* Don't load icons larger than 400K (this is rather excessive, basically
+ * we just want to stop people crashing the filer with huge icons).
+ */
+#define MAX_ICON_SIZE (400 * 1024)
+
 #include "config.h"
 
 #include <gtk/gtk.h>
@@ -227,14 +232,18 @@ void dir_restat(guchar *path, DirItem *item)
 		sprintf(tmp, "%s/%s", path, "AppRun");
 		if (!mc_stat(tmp, &info) && info.st_uid == uid)
 		{
-			MaskedPixmap *app_icon;
+			struct stat	icon;
 
 			item->flags |= ITEM_FLAG_APPDIR;
 			
 			strcpy(tmp + path_len + 4, "Icon.xpm");
-			app_icon = g_fscache_lookup(pixmap_cache, tmp);
-			if (app_icon)
-				item->image = app_icon;
+
+			if (mc_stat(tmp, &icon) == 0 &&
+					icon.st_size <= MAX_ICON_SIZE)
+			{
+				item->image = g_fscache_lookup(pixmap_cache,
+								tmp);
+			}
 			else
 			{
 				item->image = im_appdir;

@@ -67,14 +67,9 @@ static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GtkWidget *xterm_here_entry;
 char *xterm_here_value;
 
-/* TRUE if we selected an icon automatically when the menu was opened */
-static gboolean pin_temp_item_selected;
-
 /* Static prototypes */
 
 static void save_menus(void);
-static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
-static void pin_menu_closed(GtkWidget *widget);
 static void menu_closed(GtkWidget *widget);
 static void items_sensitive(gboolean state);
 static char *load_xterm_here(char *data);
@@ -131,9 +126,6 @@ static void shell_command(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void select_if(gpointer data, guint action, GtkWidget *widget);
 
-static void pin_help(gpointer data, guint action, GtkWidget *widget);
-static void pin_remove(gpointer data, guint action, GtkWidget *widget);
-
 static GtkWidget *create_options();
 static void update_options();
 static void set_options();
@@ -158,7 +150,6 @@ GtkWidget	*display_small_menu;	/* Display->Small With... */
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
-static GtkWidget	*pinboard_menu;		/* The popup pinboard menu */
 
 /* Used for Copy, etc */
 static GtkWidget	*savebox = NULL;	
@@ -223,15 +214,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Select If..."),	NULL, select_if, 0, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Show ROX-Filer Help"), NULL, menu_rox_help, 0, NULL},
-};
-
-static GtkItemFactoryEntry pinboard_menu_def[] = {
-{N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
-{N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
-{N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
-{"",				NULL,	NULL, 0, "<Separator>"},
-{N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
-{N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
 };
 
 
@@ -323,13 +305,6 @@ void menu_init()
 		mark_menus_modified(FALSE);
 	}
 
-	pinboard_keys = gtk_accel_group_new();
-	MAKE_MENU(pinboard);
-	gtk_accel_group_lock(pinboard_keys);
-	GET_MENU_ITEM(pinboard_menu, "pinboard");
-
-	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(pin_menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
@@ -369,9 +344,6 @@ GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
 	menu = gtk_item_factory_get_widget(item_factory, name);
 
 	gtk_accel_group_lock(keys);
-
-	gtk_signal_connect(GTK_OBJECT(menu), "unmap_event",
-			GTK_SIGNAL_FUNC(pin_menu_closed), NULL);
 
 	return menu;
 }
@@ -452,7 +424,7 @@ static void items_sensitive(gboolean state)
 	g_list_free(items);
 }
 
-static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
+void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -464,44 +436,6 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
-}
-
-/* Display the pinboard menu. Set icon to NULL if no particular icon
- * was clicked.
- */
-void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
-{
-	int		pos[2];
-	GList		*icons;
-
-	if (icon)
-	{
-		if (pinboard_is_selected(icon))
-			pin_temp_item_selected = FALSE;
-		else
-		{
-			pinboard_select_only(icon);
-			pin_temp_item_selected = TRUE;
-		}
-	}
-
-	icons = pinboard_get_selected();
-
-	pos[0] = event->x_root;
-	pos[1] = event->y_root;
-
-	if (icons)
-	{
-		menu_set_items_shaded(pinboard_menu,
-				icons->next ? TRUE : FALSE, 4, 1);
-
-		menu_set_items_shaded(pinboard_menu, FALSE, 5, 1);
-	}
-	else
-		menu_set_items_shaded(pinboard_menu, TRUE, 4, 2);
-
-	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
-			(gpointer) pos, event->button, event->time);
 }
 
 /* Used when you menu-click on the Large or Small toolbar tools */
@@ -618,12 +552,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	
 	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
-}
-
-static void pin_menu_closed(GtkWidget *widget)
-{
-	if (pin_temp_item_selected)
-		pinboard_clear_selection();
 }
 
 static void menu_closed(GtkWidget *widget)
@@ -1543,25 +1471,6 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(make_path(app_dir, "Help")->str);
-}
-
-static void pin_help(gpointer data, guint action, GtkWidget *widget)
-{
-	PinIcon	*icon;
-
-	icon = pinboard_selected_icon();
-
-	if (icon)
-		pinboard_show_help(icon);
-	else
-		delayed_error(PROJECT,
-			_("You must first select a single pinned icon to get "
-			"help on."));
-}
-
-static void pin_remove(gpointer data, guint action, GtkWidget *widget)
-{
-	pinboard_unpin_selection();
 }
 
 /* Set n items from position 'from' in 'menu' to the 'shaded' state */

@@ -154,7 +154,8 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 				   ((GtkWidget *) collection)->style->black_gc,
 				   FALSE,
 				   area->x, area->y,
-				   area->width - 1, area->height - 1);
+				   collection->item_width - 1,
+				   area->height - 1);
 	}
 	
 	if (item == collection->cursor_item)
@@ -304,6 +305,9 @@ GtkWidget* collection_new(GtkAdjustment *vadj)
  * drawn to. For the column on the far right, this extends to the
  * edge of the window. Normally, use collection->item_width instead
  * of area->width to calculate the position.
+ *
+ * test_point does not use a larger value for the width, but the
+ * x point of the click may be larger than the width.
  */
 void collection_set_functions(Collection *collection,
 				CollectionDrawFunc draw_item,
@@ -674,7 +678,7 @@ static void default_draw_item(  GtkWidget *widget,
 				       : widget->style->black_gc,
 			TRUE,
 			area->x, area->y,
-		 	area->width, area->height,
+		 	COLLECTION(widget)->item_width, area->height,
 			0, 360 * 64);
 }
 
@@ -1779,7 +1783,10 @@ int collection_get_item(Collection *collection, int x, int y)
 	col = x / collection->item_width;
 	row = (y + scroll) / collection->item_height;
 
-	if (col < 0 || row < 0 || col >= collection->columns)
+	if (col >= collection->columns)
+		col = collection->columns - 1;
+
+	if (col < 0 || row < 0)
 		return -1;
 
 	item = col + row * collection->columns;

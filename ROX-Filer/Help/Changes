@@ -2,6 +2,21 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+12-Sep-2000
+~~~~~~~~~~~
+With items that spread over their normal width because they're on the
+edge of the window, clicking on the extra bit now works.
+
+Added a size limit of 400K on application icons. This is to prevent
+someone trying to crash the filer by linking /tmp/MyApp/AppIcon.xpm
+to some huge file!
+
+Dragging an item with the middle button when none are selected unselects
+the item after the drag.
+
+Added 'Show Location' feature for pinboard and panels - opens a directory
+showing where the file really is.
+
 11-Sep-2000
 ~~~~~~~~~~~
 Allowed items in the far right column to spread right to the edge of the

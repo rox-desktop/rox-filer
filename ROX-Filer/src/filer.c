@@ -1376,7 +1376,11 @@ static gint coll_motion_notify(GtkWidget *widget,
 			filer_window->temp_item_selected = TRUE;
 		}
 		else
+		{
+			if (collection->number_selected == 0)
+				filer_window->temp_item_selected = TRUE;
 			collection_select_item(collection, i);
+		}
 	}
 
 	g_return_val_if_fail(collection->number_selected > 0, TRUE);

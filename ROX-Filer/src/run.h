@@ -20,5 +20,6 @@ gboolean run_diritem(guchar *full_path,
 		     gboolean edit);
 void show_item_help(guchar *path, DirItem *item);
 void run_list(guchar *to_open);
+void open_to_show(guchar *path);
 
 #endif /* _RUN_H */

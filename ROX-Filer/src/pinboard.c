@@ -77,7 +77,8 @@ struct _Pinboard {
 
 static Pinboard	*current_pinboard = NULL;
 static gint	loading_pinboard = 0;		/* Non-zero => loading */
-static gboolean tmp_icon_selected = FALSE;	/* For drag-and-drop */
+static gboolean tmp_icon_selected = FALSE;
+
 
 static PinIcon	*current_wink_icon = NULL;
 static gint	wink_timeout;
@@ -187,6 +188,24 @@ static void drag_end(GtkWidget *widget,
 			PinIcon *icon);
 static void reshape_icon(PinIcon *icon);
 static void reshape_all(void);
+static void menu_closed(GtkWidget *widget);
+static void show_location(gpointer data, guint action, GtkWidget *widget);
+static void pin_help(gpointer data, guint action, GtkWidget *widget);
+static void pin_remove(gpointer data, guint action, GtkWidget *widget);
+static void show_pinboard_menu(GdkEventButton *event, PinIcon *icon);
+
+
+static GtkItemFactoryEntry menu_def[] = {
+{N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
+{N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
+{N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
+{"",				NULL,	NULL, 0, "<Separator>"},
+{N_("Show Location"),  		NULL,  	show_location, 0, NULL},
+{N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
+{N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
+};
+
+static GtkWidget	*pinboard_menu;		/* The popup pinboard menu */
 
 
 
@@ -206,6 +225,12 @@ void pinboard_init(void)
 
 	memcpy(&text_fg_col, &style->fg[GTK_STATE_NORMAL], sizeof(GdkColor));
 	memcpy(&text_bg_col, &style->bg[GTK_STATE_NORMAL], sizeof(GdkColor));
+
+	pinboard_menu = menu_create(menu_def,
+				 sizeof(menu_def) / sizeof(*menu_def),
+				 "<pinboard>");
+	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
 }
 
 /* Load 'pb_<pinboard>' config file from Choices (if it exists)
@@ -493,24 +518,9 @@ PinIcon *pinboard_selected_icon(void)
 	return found;
 }
 
-/* Display the help for this application/item */
-void pinboard_show_help(PinIcon *icon)
-{
-	g_return_if_fail(icon != NULL);
-
-	show_item_help(icon->path, &icon->item);
-}
-
 void pinboard_clear_selection(void)
 {
 	pinboard_select_only(NULL);
-}
-
-gboolean pinboard_is_selected(PinIcon *icon)
-{
-	g_return_val_if_fail(icon != NULL, FALSE);
-
-	return icon->selected;
 }
 
 /* Set whether an icon is selected or not */
@@ -1721,3 +1731,87 @@ static void reshape_all(void)
 		reshape_icon(icon);
 	}
 }
+
+/* Display the pinboard menu. Set icon to NULL if no particular icon
+ * was clicked.
+ */
+static void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
+{
+	int		pos[2];
+	GList		*icons;
+
+	if (icon)
+	{
+		if (icon->selected)
+			tmp_icon_selected = FALSE;
+		else
+		{
+			pinboard_select_only(icon);
+			tmp_icon_selected = TRUE;
+		}
+	}
+
+	icons = pinboard_get_selected();
+
+	pos[0] = event->x_root;
+	pos[1] = event->y_root;
+
+	if (icons)
+	{
+		menu_set_items_shaded(pinboard_menu,
+				icons->next ? TRUE : FALSE, 4, 2);
+
+		menu_set_items_shaded(pinboard_menu, FALSE, 6, 1);
+	}
+	else
+		menu_set_items_shaded(pinboard_menu, TRUE, 4, 3);
+
+	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
+			(gpointer) pos, event->button, event->time);
+}
+
+static void pin_help(gpointer data, guint action, GtkWidget *widget)
+{
+	PinIcon	*icon;
+
+	icon = pinboard_selected_icon();
+
+	if (icon)
+		show_item_help(icon->path, &icon->item);
+	else
+		delayed_error(PROJECT,
+			_("You must first select a single pinned icon to get "
+			"help on."));
+}
+
+static void pin_remove(gpointer data, guint action, GtkWidget *widget)
+{
+	pinboard_unpin_selection();
+}
+
+static void menu_closed(GtkWidget *widget)
+{
+	if (tmp_icon_selected)
+	{
+		pinboard_clear_selection();
+		tmp_icon_selected = FALSE;
+	}
+}
+
+/* Show where this item is stored */
+static void show_location(gpointer data, guint action, GtkWidget *widget)
+{
+	PinIcon	*icon;
+
+	icon = pinboard_selected_icon();
+
+	if (icon)
+		open_to_show(icon->path);
+	else
+	{
+		delayed_error(PROJECT,
+			_("Select a single item, then use this to find out "
+			  "where it is in the filesystem."));
+	}
+}
+

@@ -122,6 +122,7 @@ static void add_uri_list(GtkWidget          *widget,
 static void panel_add_item(Panel *panel, guchar *path, gboolean after);
 static void menu_closed(GtkWidget *widget);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
+static void show_location(gpointer data, guint action, GtkWidget *widget);
 static void show_help(gpointer data, guint action, GtkWidget *widget);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
@@ -167,6 +168,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
 {N_("Open Home Directory"),	NULL,	open_home, 0, NULL},
 {"",				NULL,	NULL, 0, "<Separator>"},
+{N_("Show Location"),  		NULL,  	show_location, 0, NULL},
 {N_("Show Help"),    		NULL,  	show_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	remove_items, 0, NULL},
 };
@@ -205,6 +207,7 @@ void panel_init(void)
 				 "<panel>");
 	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
+
 	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	selection_invisible = gtk_invisible_new();
@@ -856,7 +859,7 @@ static void reposition_panel(Panel *panel)
 	}
 }
 
-static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
+static void panel_position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 {
 	int		*pos = (int *) data;
 	GtkRequisition 	requisition;
@@ -921,18 +924,35 @@ static void popup_panel_menu(GdkEventButton *event,
 	else
 		pos[1] = event->y_root;
 
-	/* Shade the Help item unless exactly one item is selected */
+	/* Shade the Help/Target items unless exactly one item is selected */
 	menu_set_items_shaded(panel_menu,
 		panel_selection == NULL || panel_selection->next ? TRUE : FALSE,
-		4, 1);
+		4, 2);
 
 	/* Shade the Remove items unless there is a selection */
 	menu_set_items_shaded(panel_menu,
 		panel_selection ? FALSE : TRUE,
-		5, 1);
+		6, 1);
 
-	gtk_menu_popup(GTK_MENU(panel_menu), NULL, NULL, position_menu,
+	gtk_menu_popup(GTK_MENU(panel_menu), NULL, NULL, panel_position_menu,
 			(gpointer) pos, event->button, event->time);
+}
+
+static void show_location(gpointer data, guint action, GtkWidget *widget)
+{
+	PanelIcon	*icon;
+
+	if (panel_selection == NULL || panel_selection->next)
+	{
+		delayed_error(PROJECT,
+			_("Select a single item, then use this to find out "
+			  "where it is in the filesystem."));
+		return;
+	}
+
+	icon = (PanelIcon *) panel_selection->data;
+
+	open_to_show(icon->path);
 }
 
 static void show_help(gpointer data, guint action, GtkWidget *widget)
