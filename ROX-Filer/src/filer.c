@@ -656,6 +656,8 @@ void open_item(Collection *collection,
 	FileItem	*item = (FileItem *) item_data;
 	GdkEventButton 	*event;
 	char		*full_path;
+	GtkWidget	*widget;
+	gboolean	shift, adjust;
 
 	event = (GdkEventButton *) gtk_get_current_event();
 	full_path = make_path(filer_window->path, item->leafname)->str;
@@ -668,35 +670,51 @@ void open_item(Collection *collection,
 		panel_set_timeout(filer_window, 200);
 	}
 
+	if (event->type == GDK_2BUTTON_PRESS || event->type == GDK_BUTTON_PRESS)
+	{
+		shift = event->state & GDK_SHIFT_MASK;
+		adjust = event->button != 1 || event->state & GDK_CONTROL_MASK;
+	}
+	else
+	{
+		shift = FALSE;
+		adjust = FALSE;
+	}
+
+	widget = filer_window->window;
+
 	switch (item->base_type)
 	{
 		case TYPE_DIRECTORY:
-			if (item->flags & ITEM_FLAG_APPDIR &&
-					(event->type != GDK_2BUTTON_PRESS ||
-					(event->state & GDK_SHIFT_MASK) == 0))
+			if (item->flags & ITEM_FLAG_APPDIR && !shift)
 			{
 				run_app(make_path(filer_window->path,
 							item->leafname)->str);
+				if (adjust && !filer_window->panel)
+					gtk_widget_destroy(widget);
 				break;
 			}
-			if (filer_window->panel == FALSE &&
-				(event->type != GDK_2BUTTON_PRESS ||
-					event->button == 1))
+			if (adjust || filer_window->panel)
+				filer_opendir(full_path, FALSE, BOTTOM);
+			else
 			{
 				remove_view(filer_window);
 				filer_window->path = pathdup(full_path);
 				add_view(filer_window);
 				scan_dir(filer_window);
 			}
-			else
-				filer_opendir(full_path, FALSE, BOTTOM);
 			break;
 		case TYPE_FILE:
 			if (item->flags & ITEM_FLAG_EXEC_FILE)
 			{
 				char	*argv[] = {full_path, NULL};
 
-				if (!spawn_full(argv, getenv("HOME"), 0))
+				if (spawn_full(argv, getenv("HOME"), 0))
+				{
+					if (adjust && !filer_window->panel)
+						gtk_widget_destroy(widget);
+				}
+				else
 					report_error("ROX-Filer",
 						"Failed to fork() child");
 			}
@@ -705,7 +723,12 @@ void open_item(Collection *collection,
 				GString		*message;
 				MIME_type	*type = item->mime_type;
 
-				if ((!type) || !type_open(full_path, type))
+				if (type && type_open(full_path, type))
+				{
+					if (adjust && !filer_window->panel)
+						gtk_widget_destroy(widget);
+				}
+				else
 				{
 					message = g_string_new(NULL);
 					g_string_sprintf(message, "No open "
@@ -857,8 +880,6 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 			GTK_SIGNAL_FUNC(focus_in), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "focus_out_event",
 			GTK_SIGNAL_FUNC(focus_out), filer_window);
-	gtk_signal_connect(GTK_OBJECT(filer_window->window), "key_press_event",
-			GTK_SIGNAL_FUNC(key_press_event), filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			filer_window_destroyed, filer_window);
 
@@ -926,6 +947,9 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	}
 	else
 	{
+		gtk_signal_connect(GTK_OBJECT(filer_window->window),
+				"key_press_event",
+				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 					400, 200);
 
@@ -936,14 +960,14 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 
 		scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 		gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
+		gtk_accel_group_attach(filer_keys,
+				GTK_OBJECT(filer_window->window));
 	}
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
 
 	load_default_pixmaps(collection->window);
-
-	gtk_accel_group_attach(filer_keys, GTK_OBJECT(filer_window->window));
 
 	add_view(filer_window);
 	scan_dir(filer_window);

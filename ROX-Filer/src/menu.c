@@ -538,21 +538,21 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 {
 	GtkWidget	*window, *table, *label, *button, *frame;
-	FilerWindow	*filer_window = window_with_focus;
 	GtkWidget	*file_label;
-	GString		*reply;
+	GString		*gstring;
 	char		*string;
 	int		file_data[2];
 	char		*path;
-	char		buffer[2];
+	char		buffer[20];
 	char 		*argv[] = {"file", "-b", NULL, NULL};
 	int		got;
 	Collection 	*collection;
 	FileItem	*file;
+	struct stat	info;
 	
-	g_return_if_fail(filer_window != NULL);
+	g_return_if_fail(window_with_focus != NULL);
 
-	collection = filer_window->collection;
+	collection = window_with_focus->collection;
 	if (collection->number_selected != 1)
 	{
 		report_error("ROX-Filer", "You must select a single "
@@ -560,8 +560,15 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 		return;
 	}
 	file = selected_item(collection);
+	path = make_path(window_with_focus->path, file->leafname)->str;
+	if (lstat(path, &info))
+	{
+		delayed_error("ROX-Filer", g_strerror(errno));
+		return;
+	}
+	
+	gstring = g_string_new(NULL);
 
-	path = make_path(filer_window->path, file->leafname)->str;
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
@@ -576,22 +583,31 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 0, 1);
-	label = gtk_label_new("bob, bob");
+	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
+					    group_name(info.st_gid));
+	label = gtk_label_new(gstring->str);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 0, 1);
 	
 	label = gtk_label_new("Permissions:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 1, 2);
-	label = gtk_label_new("drwxrwxrwx");
+	g_string_sprintf(gstring, "%o", info.st_mode);
+	label = gtk_label_new(gstring->str);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 1, 2);
 	
 	label = gtk_label_new("MIME type:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 2, 3);
-	string = g_strconcat(file->mime_type->media_type, "/",
-			     file->mime_type->subtype, NULL);
-	label = gtk_label_new(string);
-	g_free(string);
+	if (file->base_type == TYPE_FILE &&
+			!(file->flags & ITEM_FLAG_EXEC_FILE))
+	{
+		string = g_strconcat(file->mime_type->media_type, "/",
+				file->mime_type->subtype, NULL);
+		label = gtk_label_new(string);
+		g_free(string);
+	}
+	else
+		label = gtk_label_new("-");
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
 
 	frame = gtk_frame_new("file(1) says...");
@@ -618,6 +634,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 			close(file_data[1]);
 			gtk_label_set_text(GTK_LABEL(file_label),
 					"fork() error");
+			g_string_free(gstring, TRUE);
 			return;
 		case 0:
 			close(file_data[0]);
@@ -631,17 +648,17 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	}
 	/* We are the parent... */
 	close(file_data[1]);
-	reply = g_string_new(NULL);
+	g_string_truncate(gstring, 0);
 	while (gtk_events_pending())
 		g_main_iteration(FALSE);
-	while ((got = read(file_data[0], buffer, sizeof(buffer))))
+	while ((got = read(file_data[0], buffer, sizeof(buffer) - 1)))
 	{
 		buffer[got] = '\0';
-		g_string_append(reply, buffer);
+		g_string_append(gstring, buffer);
 	}
 	close(file_data[0]);
-	gtk_label_set_text(GTK_LABEL(file_label), reply->str);
-	g_string_free(reply, TRUE);
+	gtk_label_set_text(GTK_LABEL(file_label), gstring->str);
+	g_string_free(gstring, TRUE);
 }
 
 static void help(gpointer data, guint action, GtkWidget *widget)

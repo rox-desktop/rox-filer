@@ -12,6 +12,8 @@
 #include <errno.h>
 #include <sys/param.h>
 #include <unistd.h>
+#include <pwd.h>
+#include <grp.h>
 
 #include <glib.h>
 
@@ -113,4 +115,28 @@ void debug_free_string(void *data)
 {
 	g_print("Freeing string '%s'\n", (char *) data);
 	g_free(data);
+}
+
+char *user_name(uid_t uid)
+{
+	static char	buffer[40];
+	struct passwd   *passwd;
+
+	passwd = getpwuid(uid);
+	if (passwd)
+		return passwd->pw_name;
+	snprintf(buffer, sizeof(buffer), "[%d]", uid);
+	return buffer;
+}
+
+char *group_name(gid_t gid)
+{
+	static char	buffer[40];
+	struct group 	*group;
+	
+	group = getgrgid(gid);
+	if (group)
+		return group->gr_name;
+	snprintf(buffer, sizeof(buffer), "[%d]", gid);
+	return buffer;
 }

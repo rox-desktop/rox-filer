@@ -217,13 +217,12 @@ static MaskedPixmap *try_icon_path(GtkWidget *window, char *handler, char *icon)
 }
 
 /* Return the image for this type, loading it if needed.
+ * Find handler application, <app>, then:
  * Places to check are: (eg type="text_plain", base="text")
- * 1. Choices/MIME-types/<type>/MIME-icons/<type>
- * 2. Choices/MIME-types/<type>/MIME-icons/<base>
- * 3. Choices/MIME-types/<base>/MIME-icons/<type>
- * 4. Choices/MIME-types/<base>/MIME-icons/<base>
- * 5. $APP_DIR/MIME-icons/<base>
- * 6. Unknown type icon.
+ * 1. <app>/MIME-icons/<type>
+ * 2. <app>/MIME-icons/<base>
+ * 3. $APP_DIR/MIME-icons/<base>
+ * 4. Unknown type icon.
  */
 MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 {
@@ -240,21 +239,17 @@ MaskedPixmap *type_to_icon(GtkWidget *window, MIME_type *type)
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
 
 	open = choices_find_path_load_shared(type_name, "MIME-types");
-	if (((i = try_icon_path(window, open, type_name)))
-	 || ((i = try_icon_path(window, open, type->media_type))))
-		goto out;
-
-	open = choices_find_path_load_shared(type->media_type, "MIME-types");
+	if (!open)
+		open = choices_find_path_load_shared(type->media_type,
+							"MIME-types");
 	if (((i = try_icon_path(window, open, type_name)))
 	 || ((i = try_icon_path(window, open, type->media_type)))
 	 || ((i = try_icon_path(window, getenv("APP_DIR"), type->media_type))))
-		goto out;
+		type->image = i;
+	else
+		type->image = default_pixmap + TYPE_UNKNOWN;
 	
-	i = default_pixmap + TYPE_UNKNOWN;
-
-out:
 	g_free(type_name);
 
-	type->image = i;
 	return i;
 }
