@@ -128,9 +128,8 @@ GtkTooltips *tooltips = NULL;
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
-       "\nThe latest version can be found at:\n"			\
-       "\thttp://rox.sourceforge.net\n"					\
-       "\nReport bugs to <tal197@users.sourceforge.net>.\n")
+       "\nReport bugs to <tal197@users.sourceforge.net>.\n"		\
+       "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
 #define SHORT_OPS "c:d:t:b:l:r:op:s:hvnux:m:D:R"
 
@@ -252,8 +251,8 @@ int main(int argc, char **argv)
 		 * compiled OK. Do this test before gtk_init so that
 		 * we don't need an X server to install.
 		 */
-		g_printerr("ROX-Filer %s\n", VERSION);
-		g_printerr(_(COPYING));
+		g_print("ROX-Filer %s\n", VERSION);
+		g_print(_(COPYING));
 		show_features();
 		return EXIT_SUCCESS;
 	}
@@ -316,13 +315,13 @@ int main(int argc, char **argv)
 					"instead."));
 				break;
 			case 'v':
-				g_printerr("ROX-Filer %s\n", VERSION);
-				g_printerr("%s", _(COPYING));
+				g_print("ROX-Filer %s\n", VERSION);
+				g_print("%s", _(COPYING));
 				show_features();
 				return EXIT_SUCCESS;
 			case 'h':
-				g_printerr("%s", _(HELP));
-				g_printerr("%s", _(SHORT_ONLY_WARNING));
+				g_print("%s", _(HELP));
+				g_print("%s", _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
 			case 'D':
 			case 'd':
@@ -571,8 +570,8 @@ void one_less_window(void)
 
 static void show_features(void)
 {
-	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
-	g_printerr("%s... %s\n", _("Large File Support"),
+	g_print("\n-- %s --\n\n", _("features set at compile time"));
+	g_print("%s... %s\n", _("Large File Support"),
 #ifdef LARGE_FILE_SUPPORT
 		_("Yes")
 #else
@@ -580,7 +579,7 @@ static void show_features(void)
 #endif
 		);
 #if 0
-	g_printerr("%s... %s\n", _("GNOME-VFS library"),
+	g_print("%s... %s\n", _("GNOME-VFS library"),
 # ifdef WITH_GNOMEVFS
 			_("Yes")
 # else
