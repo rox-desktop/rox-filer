@@ -89,7 +89,10 @@ case $REPLY in
 	   else
 	   	SHAREDIR=${HOME}/.local/share
 	   fi
-	   MANDIR=${SHAREDIR}/man
+	   MANDIR=${HOME}/man
+	   if [ ! -d "$MANDIR" ]; then
+	     MANDIR=
+	   fi
 	   ;;
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
