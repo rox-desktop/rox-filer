@@ -182,7 +182,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Icons, With..."),	NULL, NULL, 0, "<Branch>"},
 {">>" N_("Sizes"),		NULL, set_with, DETAILS_SIZE, NULL},
 {">>" N_("Permissions"),	NULL, set_with, DETAILS_PERMISSIONS, NULL},
-{">>" N_("Type"),		NULL, set_with, DETAILS_TYPE, NULL},
+{">>" N_("Types"),		NULL, set_with, DETAILS_TYPE, NULL},
 {">>" N_("Times"),		NULL, set_with, DETAILS_TIMES, NULL},
 {">" N_("List View"),   	NULL, view_type, VIEW_TYPE_DETAILS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
