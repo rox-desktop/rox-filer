@@ -208,6 +208,7 @@ static Option o_panel_style;
 static Option o_panel_width;
 static Option o_panel_xinerama;
 static Option o_panel_monitor;
+static Option o_panel_avoid;
 
 static gint panel_monitor = -1;
 GdkRectangle panel_geometry;
@@ -225,6 +226,8 @@ void panel_init(void)
 
 	option_add_int(&o_panel_xinerama, "panel_xinerama", 0);
 	option_add_int(&o_panel_monitor, "panel_monitor", 0);
+
+	option_add_int(&o_panel_avoid, "panel_avoid", TRUE);
 
 	option_add_notify(panel_style_changed);
 
@@ -401,28 +404,6 @@ Panel *panel_new(const gchar *name, PanelSide side)
 			G_CALLBACK(panel_post_resize), panel);
 	g_signal_connect(panel->window, "size-allocate",
 			G_CALLBACK(reposition_panel), panel);
-
-	/* Stop windows from maximising over us completely, so that the
-	 * auto-raise stuff works...
-	 */
-	{
-		guint32	wm_strut[] = {0, 0, 0, 0};
-
-		if (panel->side == PANEL_LEFT)
-			wm_strut[0] = 2;
-		else if (panel->side == PANEL_RIGHT)
-			wm_strut[1] = 2;
-		else if (panel->side == PANEL_TOP)
-			wm_strut[2] = 2;
-		else
-			wm_strut[3] = 2;
-
-		gdk_property_change(panel->window->window,
-				gdk_atom_intern("_NET_WM_STRUT", FALSE),
-				gdk_atom_intern("CARDINAL", FALSE),
-				32, GDK_PROP_MODE_REPLACE,
-				(gchar *) &wm_strut, 4);
-	}
 
 	number_of_windows++;
 	gdk_window_lower(panel->window->window);
@@ -996,6 +977,7 @@ static void reposition_panel(GtkWidget *window,
 {
 	int		x = panel_geometry.x;
 	int		y = panel_geometry.y;
+	int		thickness;
 	PanelSide	side = panel->side;
 
 	if (side == PANEL_LEFT || side == PANEL_RIGHT)
@@ -1025,6 +1007,35 @@ static void reposition_panel(GtkWidget *window,
 			gtk_widget_queue_resize(
 					current_panel[PANEL_LEFT]->window);
 	}
+
+	/* Stop windows from maximising over all/part of us */
+	{
+		guint32	wm_strut[] = {0, 0, 0, 0};
+
+		if (o_panel_avoid.int_value == FALSE)
+			thickness = 2;
+		else if (panel->side == PANEL_TOP ||
+			 panel->side == PANEL_BOTTOM)
+			thickness = alloc->height;
+		else
+			thickness = alloc->width;
+
+		if (panel->side == PANEL_LEFT)
+			wm_strut[0] = thickness;
+		else if (panel->side == PANEL_RIGHT)
+			wm_strut[1] = thickness;
+		else if (panel->side == PANEL_TOP)
+			wm_strut[2] = thickness;
+		else
+			wm_strut[3] = thickness;
+
+		gdk_property_change(panel->window->window,
+				gdk_atom_intern("_NET_WM_STRUT", FALSE),
+				gdk_atom_intern("CARDINAL", FALSE),
+				32, GDK_PROP_MODE_REPLACE,
+				(gchar *) &wm_strut, 4);
+	}
+
 }
 
 /* Same as drag_set_dest(), but for panel icons */
@@ -1789,9 +1800,10 @@ static void panel_style_changed(void)
 		}
 	}
 
-	if (o_panel_xinerama.has_changed || o_panel_monitor.has_changed)
+	if (o_panel_xinerama.has_changed || o_panel_monitor.has_changed ||
+	    o_panel_avoid.has_changed)
 	{
-		if (panel_check_xinerama())
+		if (panel_check_xinerama() || o_panel_avoid.has_changed)
 		{
 			for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 			{

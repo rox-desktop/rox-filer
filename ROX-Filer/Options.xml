@@ -206,6 +206,8 @@
       </radio-group>
       <spacer/>
       <slider name='panel_width' label='Panel width (thin)' min='16' max='96' end='(thick)'>The size of the panels.</slider>
+      <spacer/>
+      <toggle name='panel_avoid' label='Do not cover panel'>Ask the window manager not to cover panels at all when you maximise windows. Some window managers may not honour this. If unset, the filer asks for just a couple of pixel at the edge of the screen to remain uncovered, so that auto-raising works.</toggle>
     </frame>
     <frame label='Xinerama'>
       <hbox>
