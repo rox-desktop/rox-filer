@@ -257,6 +257,12 @@ static GtkWidget *create_options(void)
 			FALSE, TRUE, 0);
 
 	menu_translation = gtk_option_menu_new();
+	OPTION_TIP(menu_translation,
+			_("Choose a language for ROX-Filer's messages.\n"
+			  "With no translation, text will appear in English.\n"
+			  "`From LANG' uses the setting of the LANG "
+			  "environment variable as the name of the translation."
+			));
 	menu = gtk_menu_new();
 
 	gtk_option_menu_set_menu(GTK_OPTION_MENU(menu_translation), menu);

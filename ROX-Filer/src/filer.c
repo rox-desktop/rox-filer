@@ -178,24 +178,24 @@ static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		h += filer_window->toolbar_frame->allocation.height;
 
 	if (GTK_WIDGET_VISIBLE(filer_window->window))
-		gdk_window_resize(filer_window->window->window, w, h);
+	{
+		GtkRequisition	*req = &filer_window->window->requisition;
+
+		gdk_window_resize(filer_window->window->window,
+					MAX(req->width, w),
+					MAX(req->height, h));
+	}
 	else
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 						w, h);
 }
 
-static void filer_window_autosize(FilerWindow *filer_window)
+void filer_window_autosize(FilerWindow *filer_window)
 {
 	Collection	*collection = filer_window->collection;
 	int 		n = collection->number_of_items;
 	int 		nx, ny;
 	int 		maxw, maxh;
-
-	/* If there are too many files (or other problems), do
-	 * not resize. n is zero at this time?
-	 */
-	if (GTK_WIDGET_VISIBLE(filer_window->window) || filer_window->scanning)
-		return;
 
 	maxw = (2 * screen_width) / (collection->item_width * 3);
 	maxh = (2 * screen_height) / (collection->item_height * 3);
@@ -203,7 +203,7 @@ static void filer_window_autosize(FilerWindow *filer_window)
 	/* Taking the requested number of rows as a starting point,
 	 * how many columns would we need?
 	 */
-	ny = MAX(o_initial_window_height, 1);
+	ny = MAX(o_initial_window_height - 1, 1);
 	nx = (n + ny - 1) / ny;
 
 	if (nx > maxw)
@@ -217,7 +217,7 @@ static void filer_window_autosize(FilerWindow *filer_window)
 			ny = maxh;
 	}
 
-	filer_window_set_size(filer_window, nx, ny);
+	filer_window_set_size(filer_window, nx, ny + 1);
 }
 
 /* Called on a timeout while scanning or when scanning ends

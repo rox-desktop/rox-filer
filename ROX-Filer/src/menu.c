@@ -127,6 +127,7 @@ static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void shell_command(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void select_if(gpointer data, guint action, GtkWidget *widget);
+static void resize(gpointer data, guint action, GtkWidget *widget);
 
 static GtkWidget *create_options();
 static void update_options();
@@ -213,6 +214,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
+{">" N_("Resize Window"),	NULL, resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
 
 {">" N_("Close Window"),	NULL, close_window, 0, NULL},
@@ -1352,6 +1354,13 @@ static void open_parent_same(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	change_to_parent(window_with_focus);
+}
+
+static void resize(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_window_autosize(window_with_focus);
 }
 
 static void new_window(gpointer data, guint action, GtkWidget *widget)

@@ -96,5 +96,6 @@ void filer_target_mode(FilerWindow	*filer_window,
 			TargetFunc	fn,
 			gpointer	data,
 			char		*reason);
+void filer_window_autosize(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

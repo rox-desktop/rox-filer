@@ -139,6 +139,8 @@ void	collection_set_autoscroll	(Collection *collection,
 void	collection_lasso_box		(Collection *collection, int x, int y);
 void	collection_end_lasso		(Collection *collection,
 					 GdkFunction fn);
+void	collection_snap_size		(Collection *collection,
+					 int rows, int cols);
 
 #ifdef __cplusplus
 }
