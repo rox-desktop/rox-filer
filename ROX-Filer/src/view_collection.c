@@ -240,11 +240,20 @@ static void view_collection_finialize(GObject *object)
 	G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
+static void view_collection_grab_focus(GtkWidget *focus_widget)
+{
+	ViewCollection *view_collection = VIEW_COLLECTION(focus_widget);
+	gtk_widget_grab_focus(GTK_WIDGET(view_collection->collection));
+}
+
 static void view_collection_class_init(gpointer gclass, gpointer data)
 {
 	GObjectClass *object = (GObjectClass *) gclass;
+	GtkWidgetClass *widget = (GtkWidgetClass *) gclass;
 
 	parent_class = g_type_class_peek_parent(gclass);
+
+	widget->grab_focus = view_collection_grab_focus;
 
 	object->finalize = view_collection_finialize;
 	GTK_OBJECT_CLASS(object)->destroy = view_collection_destroy;
