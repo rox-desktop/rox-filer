@@ -139,6 +139,8 @@ static gint slide_from_value = 0;
 #define SHOW_ICON 2
 static int panel_style = SHOW_APPS_SMALL;
 
+static int closing_panel = 0;	/* Don't panel_save; destroying! */
+
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
@@ -165,7 +167,9 @@ Panel *panel_new(guchar *name, PanelSide side)
 	{
 		if (name)
 			number_of_windows++;
+		closing_panel++;
 		gtk_widget_destroy(current_panel[side]->window);
+		closing_panel--;
 		if (name)
 			number_of_windows--;
 	}
@@ -1194,47 +1198,53 @@ static guchar *create_uri_list(GList *list)
 
 static void applet_died(GtkWidget *socket)
 {
-	if (!GTK_OBJECT_DESTROYED(socket))
+	gboolean never_plugged;
+
+	never_plugged = (!gtk_object_get_data(GTK_OBJECT(socket), "lost_plug"))
+		      && !GTK_SOCKET(socket)->plug_window;
+
+	if (never_plugged)
+	{
+		report_rox_error(
+			_("Applet quit without ever creating a widget!"));
 		gtk_widget_destroy(socket);
+	}
 
 	gtk_widget_unref(socket);
 }
 
-static void restart_applet(GtkWidget *button, Icon *icon)
-{
-	gtk_widget_destroy(button);
-	run_applet(icon);
-}
-
 static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
 {
-	Icon	*icon;
-	gboolean lost_widget;
+	gtk_object_set_data(GTK_OBJECT(socket), "lost_plug", "yes");
 
-	lost_widget = GTK_OBJECT_DESTROYED(widget);
-	gtk_widget_unref(widget);
+	gtk_widget_unref(socket);
 
-	if (lost_widget)
-		return;		/* We're removing the icon... */
-		
-	icon = gtk_object_get_data(GTK_OBJECT(widget), "icon");
-	icon->socket = gtk_button_new_with_label(_("Restart\nApplet"));
-	
-	gtk_signal_connect(GTK_OBJECT(icon->socket), "button_release_event",
-			GTK_SIGNAL_FUNC(icon_button_release), icon);
-	gtk_signal_connect(GTK_OBJECT(icon->socket), "button_press_event",
-			GTK_SIGNAL_FUNC(icon_button_press), icon);
+	gtk_widget_destroy(widget);	/* Remove from panel */
 
-	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
-	gtk_container_set_border_width(GTK_CONTAINER(icon->socket), 4);
-	gtk_misc_set_padding(GTK_MISC(GTK_BIN(icon->socket)->child), 4, 4);
-	gtk_widget_show(icon->socket);
-
-	gtk_signal_connect(GTK_OBJECT(icon->socket), "clicked",
-			GTK_SIGNAL_FUNC(restart_applet), icon);
+	if (!closing_panel)
+		panel_save(gtk_object_get_data(GTK_OBJECT(socket), "panel"));
 }
 
-/* Try to run this applet. Fills in icon->socket on success. */
+/* Try to run this applet.
+ * Cases:
+ * 
+ * - No executable AppletRun:
+ * 	icon->socket == NULL (unchanged) on return.
+ *
+ * Otherwise, create socket (setting icon->socket) and ref it twice.
+ * 
+ * - AppletRun quits without connecting a plug:
+ * 	On child death lost_plug is unset and socket is empty.
+ * 	Unref socket.
+ * 	Report error and destroy widget (to 'socket destroyed').
+ *
+ * - AppletRun quits while plug is in socket:
+ * 	Unref socket once. Socket will be destroyed later.
+ *
+ * - Socket is destroyed.
+ * 	Set lost_plug = "yes" and remove widget from panel.
+ * 	Unref socket.
+ */
 static void run_applet(Icon *icon)
 {
 	char	*argv[3];
@@ -1246,12 +1256,17 @@ static void run_applet(Icon *icon)
 		return;
 
 	icon->socket = gtk_socket_new();
+	/* Two refs held: one for child death, one for socket destroyed */
+	gtk_widget_ref(icon->socket);
+	gtk_widget_ref(icon->socket);
+	
 	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
 	gtk_widget_show_all(icon->socket);
 	gtk_widget_realize(icon->socket);
 
-	gtk_widget_ref(icon->widget);
 	gtk_object_set_data(GTK_OBJECT(icon->widget), "icon", icon);
+	gtk_object_set_data(GTK_OBJECT(icon->socket), "panel", icon->panel);
+
 	gtk_signal_connect(GTK_OBJECT(icon->socket), "destroy",
 			GTK_SIGNAL_FUNC(socket_destroyed), icon->widget);
 	
@@ -1260,7 +1275,7 @@ static void run_applet(Icon *icon)
 	argv[2] = NULL;
 
 	pid = spawn(argv);
-	gtk_widget_ref(icon->socket);
+	
 	on_child_death(pid, (CallbackFn) applet_died, icon->socket);
 	
 	g_free(argv[1]);
