@@ -243,7 +243,7 @@ _("system(command) (true if 'command' returns with a zero exit status; a % \n"
 		text = gtk_label_new(
 			_("See the ROX-Filer manual for full details."));
 		gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);
-		button = gtk_button_new_with_label(_("Close"));
+		button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		g_signal_connect_swapped(button, "clicked",
 			G_CALLBACK(gtk_widget_hide), help);
@@ -311,7 +311,7 @@ static void show_chmod_help(gpointer data)
 
 		sep = gtk_hseparator_new();
 		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
-		button = gtk_button_new_with_label(_("Close"));
+		button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		g_signal_connect_swapped(button, "clicked",
 			G_CALLBACK(gtk_widget_hide), help);
