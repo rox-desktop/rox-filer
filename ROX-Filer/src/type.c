@@ -438,7 +438,7 @@ GdkAtom type_to_atom(MIME_type *type)
 	return retval;
 }
 
-void show_shell_help(gpointer data)
+static void show_shell_help(gpointer data)
 {
 	info_message(_("Enter a shell command which will load \"$1\" into "
 			"a suitable program. Eg:\n\n"

@@ -97,7 +97,7 @@ static SmProperty *new_property(SmClient *client,
 	return prop;
 }
 
-gint close_connection(gpointer data)
+static gint close_connection(gpointer data)
 {
 	SmClient *client = (SmClient *)data;
 	
@@ -109,7 +109,8 @@ gint close_connection(gpointer data)
 /* Called when there's data to be read on the ICE file descriptor.
    Unpacks the message and triggers the correct callback... I think */
 
-void poll_ice_messages(gpointer data, gint source, GdkInputCondition condition)
+static void poll_ice_messages(gpointer data, gint source,
+				GdkInputCondition condition)
 {
 	SmClient *client = (SmClient *)data;
 	Bool ret;
@@ -122,7 +123,7 @@ void poll_ice_messages(gpointer data, gint source, GdkInputCondition condition)
 
 /* Called whenever an ICE connection is opened or closed */
 
-void ice_watch_fn(IceConn conn, IcePointer client_data,
+static void ice_watch_fn(IceConn conn, IcePointer client_data,
                 			Bool opening, IcePointer *watch_data)
 {
 	SmClient *client = (SmClient *)client_data;
@@ -151,7 +152,7 @@ void ice_watch_fn(IceConn conn, IcePointer client_data,
 
 /* Callbacks for different SM messages */
 
-void sc_save_yourself(SmcConn conn, SmPointer client_data, int save_type,
+static void sc_save_yourself(SmcConn conn, SmPointer client_data, int save_type,
                       		Bool shutdown, int interact_style, Bool fast)
 {
 	SmClient *client = (SmClient *)client_data;
@@ -166,7 +167,7 @@ void sc_save_yourself(SmcConn conn, SmPointer client_data, int save_type,
 	SmcSaveYourselfDone(client->conn, success);
 }
 
-void sc_shutdown_cancelled(SmcConn conn, SmPointer client_data)
+static void sc_shutdown_cancelled(SmcConn conn, SmPointer client_data)
 {
 	SmClient *client = (SmClient *)client_data;
 #ifdef DEBUG	
@@ -176,7 +177,7 @@ void sc_shutdown_cancelled(SmcConn conn, SmPointer client_data)
 		client->shutdown_cancelled_fn(client);
 }
 
-void sc_save_complete(SmcConn conn, SmPointer client_data)
+static void sc_save_complete(SmcConn conn, SmPointer client_data)
 {
 	SmClient *client = (SmClient *)client_data;
 #ifdef DEBUG	
@@ -186,7 +187,7 @@ void sc_save_complete(SmcConn conn, SmPointer client_data)
 		client->save_complete_fn(client);
 }
 
-void sc_die(SmcConn conn, SmPointer client_data)
+static void sc_die(SmcConn conn, SmPointer client_data)
 {
 	SmClient *client = (SmClient *)client_data;
 #ifdef DEBUG	
@@ -203,7 +204,7 @@ gboolean sc_session_up()
 	return TRUE;
 }
 
-SmClient *sc_new(gchar *client_id)
+SmClient *sc_new(const gchar *client_id)
 {
 	SmClient *client;
 	

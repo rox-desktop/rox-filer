@@ -249,7 +249,7 @@ static void free_recheck_list(Directory *dir)
 }
 
 /* If scanning state has changed then notify all filer windows */
-void dir_set_scanning(Directory *dir, gboolean scanning)
+static void dir_set_scanning(Directory *dir, gboolean scanning)
 {
 	GList	*next;
 

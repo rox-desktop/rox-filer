@@ -306,39 +306,6 @@ GtkWidget* collection_new(void)
 	return GTK_WIDGET(gtk_widget_new(collection_get_type(), NULL));
 }
 
-/* Note: The draw_item call gives the maximum area that can be
- * drawn to. For the column on the far right, this extends to the
- * edge of the window. Normally, use collection->item_width instead
- * of area->width to calculate the position.
- *
- * test_point does not use a larger value for the width, but the
- * x point of the click may be larger than the width.
- */
-void collection_set_functions(Collection *collection,
-				CollectionDrawFunc draw_item,
-				CollectionTestFunc test_point,
-				gpointer user_data)
-{
-	GtkWidget	*widget;
-
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-
-	widget = GTK_WIDGET(collection);
-	
-	if (!draw_item)
-		draw_item = default_draw_item;
-	if (!test_point)
-		test_point = default_test_point;
-
-	collection->draw_item = draw_item;
-	collection->test_point = test_point;
-	collection->cb_user_data = user_data;
-
-	if (GTK_WIDGET_REALIZED(widget))
-		gtk_widget_queue_draw(widget);
-}
-
 /* After this we are unusable, but our data (if any) is still hanging around.
  * It will be freed later with finalize.
  */

@@ -169,7 +169,7 @@ void check_globicon(const guchar *path, DirItem *item)
 		item->image = g_fscache_lookup(pixmap_cache, gi);
 }
 
-gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
+static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 {
 	if (!convert_to_png(iconpath, make_path(filepath, ".DirIcon")->str))
 		return FALSE;

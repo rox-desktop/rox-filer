@@ -34,8 +34,9 @@
 #include "pinboard.h"
 #include "panel.h"
 #include "sc.h"
+#include "session.h"
 
-void save_state(SmClient *client)
+static void save_state(SmClient *client)
 {
 	FilerWindow *filer_window;
 	Panel *panel;
@@ -84,18 +85,18 @@ void save_state(SmClient *client)
 
 /* Callbacks for various SM messages */
 
-gboolean save_yourself(SmClient *client)
+static gboolean save_yourself(SmClient *client)
 {
 	save_state(client);
 	return TRUE;
 }
 
-void die(SmClient *client)
+static void die(SmClient *client)
 {
 	gtk_main_quit();
 }
 
-void session_init(gchar *client_id)
+void session_init(const gchar *client_id)
 {
 	SmClient *client;
 	struct passwd *pw;

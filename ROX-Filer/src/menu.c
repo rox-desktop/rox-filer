@@ -158,7 +158,6 @@ static void mini_buffer(gpointer data, guint action, GtkWidget *widget);
 static void resize(gpointer data, guint action, GtkWidget *widget);
 
 #define MENUS_NAME "menus2"
-static void keys_changed(gpointer data);
 
 static GtkWidget	*filer_menu;		/* The popup filer menu */
 static GtkWidget	*filer_file_item;	/* The File '' label */
@@ -310,8 +309,8 @@ void ensure_filer_menu(void)
 	g_signal_connect(filer_file_menu, "unmap_event",
 			G_CALLBACK(menu_closed), NULL);
 
-	g_signal_connect_object(G_OBJECT(filer_keys), "accel_changed",
-				  (GCallback) keys_changed, NULL, 0);
+	g_signal_connect(filer_keys, "accel_changed",
+			G_CALLBACK(save_menus), NULL);
 }
 
 void menu_init(void)
@@ -356,7 +355,7 @@ GtkItemFactory *menu_create(GtkItemFactoryEntry *def, int n_entries,
 }
 
 /* Prevent the user from setting a short-cut on this item */
-void menuitem_no_shortcuts(GtkWidget *item)
+static void menuitem_no_shortcuts(GtkWidget *item)
 {
 	/* XXX */
 #if 0
@@ -806,7 +805,7 @@ static void menu_closed(GtkWidget *widget)
 	}
 }
 
-void target_callback(FilerWindow *filer_window,
+static void target_callback(FilerWindow *filer_window,
 			gint item,
 			gpointer action)
 {
@@ -1707,11 +1706,6 @@ static void save_menus(void)
 		gtk_accel_map_save(menurc);
 		g_free(menurc);
 	}
-}
-
-static void keys_changed(gpointer data)
-{
-	save_menus();
 }
 
 static void select_nth_item(GtkMenuShell *shell, int n)

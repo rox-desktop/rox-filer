@@ -30,8 +30,8 @@ extern gint motion_buttons_pressed;
 
 extern gboolean o_no_hostnames;
 extern Option o_dnd_spring_open;
-extern char *drop_dest_prog;
-extern char *drop_dest_dir;
+extern const char *drop_dest_prog;
+extern const char *drop_dest_dir;
 extern GdkAtom XdndDirectSave0;
 extern GdkAtom text_uri_list;
 extern GdkAtom _rox_run_action;
@@ -53,14 +53,13 @@ void drag_data_get(GtkWidget      	*widget,
 void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults);
 void drag_set_dest(FilerWindow *filer_window);
 void drag_set_pinboard_dest(GtkWidget *widget);
-void dnd_init();
-GtkWidget *create_dnd_options();
+void dnd_init(void);
 gboolean provides(GdkDragContext *context, GdkAtom target);
 
 void dnd_spring_load(GdkDragContext *context, FilerWindow *src_win);
 void dnd_spring_abort(void);
 GList *uri_list_to_glist(const char *uri_list);
-guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
+const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
 
 gboolean dnd_motion_press(GtkWidget *widget, GdkEventButton *event);
 void dnd_motion_start(MotionType motion);

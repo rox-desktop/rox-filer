@@ -33,8 +33,8 @@ struct _SmClient {
 	gint input_tag;
 };
 
-gboolean sc_session_up();
-SmClient *sc_new(gchar *client_id);
+gboolean sc_session_up(void);
+SmClient *sc_new(const gchar *client_id);
 gboolean sc_connect(SmClient *client);
 void sc_get_prop_value(SmClient *client, const gchar *name,
 			SmPropValue **val_ret, gint *nvals_ret);

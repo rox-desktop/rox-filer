@@ -912,7 +912,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 			    PanelIcon		*pi)
 {
 	GdkDragAction	action = context->suggested_action;
-	char		*type = NULL;
+	const char	*type = NULL;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 
@@ -937,7 +937,7 @@ out:
 		type = NULL;
 	}
 
-	g_dataset_set_data(context, "drop_dest_type", type);
+	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
 	if (type)
 	{
 		gdk_drag_status(context, action, time);

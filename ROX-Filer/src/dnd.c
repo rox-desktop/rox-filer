@@ -71,7 +71,7 @@ static gchar *prompt_dest_path = NULL;
 gint motion_buttons_pressed = 0;
 
 /* Static prototypes */
-static void set_xds_prop(GdkDragContext *context, char *text);
+static void set_xds_prop(GdkDragContext *context, const char *text);
 static gboolean drag_motion(GtkWidget		*widget,
                             GdkDragContext	*context,
                             gint		x,
@@ -150,8 +150,8 @@ static GtkObject *scrolled_adj = NULL;	/* The object watched */
 /* Possible values for drop_dest_type (can also be NULL).
  * In either case, drop_dest_path is the app/file/dir to use.
  */
-char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
-char *drop_dest_dir  = "drop_dest_dir";		/* Save to path */
+const char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
+const char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
 
 GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
@@ -164,7 +164,7 @@ Option o_dnd_spring_open;
 static Option o_dnd_spring_delay;
 static Option o_dnd_middle_menu;
 
-void dnd_init()
+void dnd_init(void)
 {
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
@@ -182,7 +182,7 @@ void dnd_init()
 /*			SUPPORT FUNCTIONS			*/
 
 /* Set the XdndDirectSave0 property on the source window for this context */
-static void set_xds_prop(GdkDragContext *context, char *text)
+static void set_xds_prop(GdkDragContext *context, const char *text)
 {
 	gdk_property_change(context->source_window,
 			XdndDirectSave0,
@@ -504,7 +504,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	int		item_number;
 	GdkDragAction	action = context->suggested_action;
 	char	 	*new_path = NULL;
-	char		*type = NULL;
+	const char	*type = NULL;
 	gboolean	retval = FALSE;
 
 	if (o_dnd_drag_to_icons.int_value)
@@ -581,7 +581,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 			new_path = filer_window->sym_path;
 	}
 
-	g_dataset_set_data(context, "drop_dest_type", type);
+	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
 	if (type)
 	{
 		gdk_drag_status(context, action, time);
@@ -600,7 +600,7 @@ static gboolean drag_motion(GtkWidget		*widget,
  * Returns NULL to reject the drop, or drop_dest_prog/drop_dest_dir to
  * accept. Build the path based on item.
  */
-guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
+const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 {
 	DirItem	*item = *item_p;
 

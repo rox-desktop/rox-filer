@@ -457,16 +457,6 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 		pinboard_save();
 }
 
-/* Remove an icon from the pinboard */
-/* XXX: use destroy */
-void pinboard_unpin(PinIcon *pi)
-{
-	g_return_if_fail(pi != NULL);
-
-	gtk_widget_destroy(pi->win);
-	pinboard_save();
-}
-
 /* Put a border around the icon, briefly.
  * If icon is NULL then cancel any existing wink.
  * The icon will automatically unhighlight unless timeout is FALSE,
@@ -1265,7 +1255,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 			    PinIcon		*pi)
 {
 	GdkDragAction	action = context->suggested_action;
-	char		*type = NULL;
+	const char	*type = NULL;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 
@@ -1293,7 +1283,7 @@ out:
 		type = NULL;
 	}
 
-	g_dataset_set_data(context, "drop_dest_type", type);
+	g_dataset_set_data(context, "drop_dest_type", (gpointer) type);
 	if (type)
 	{
 		gdk_drag_status(context, action, time);

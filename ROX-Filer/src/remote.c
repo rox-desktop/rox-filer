@@ -68,7 +68,7 @@ struct _SOAP_call {
 static GHashTable *rpc_calls = NULL; /* MethodName -> Function */
 
 /* Static prototypes */
-static GdkWindow *get_existing_ipc_window();
+static GdkWindow *get_existing_ipc_window(void);
 static gboolean get_ipc_property(GdkWindow *window, Window *r_xid);
 static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest);
 static gboolean client_event(GtkWidget *window,
@@ -921,7 +921,7 @@ static void soap_done(GtkWidget *widget, GdkEventProperty *event, gpointer data)
 	gtk_main_quit();
 }
 
-gboolean too_slow(gpointer data)
+static gboolean too_slow(gpointer data)
 {
 	g_warning("Existing ROX-Filer process is not responding! Try with -n");
 	gtk_main_quit();

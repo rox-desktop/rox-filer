@@ -35,7 +35,7 @@ extern Option o_display_show_thumbs;
 extern Option o_small_width;
 
 /* Prototypes */
-void display_init();
+void display_init(void);
 void display_set_layout(FilerWindow  *filer_window,
 			DisplayStyle style,
 			DetailsType  details);

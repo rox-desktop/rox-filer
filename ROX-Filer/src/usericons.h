@@ -8,7 +8,7 @@
 #define _USERICONS_H_
 
 /* Public interface */
-void read_globicons();
+void read_globicons(void);
 void check_globicon(const guchar *path, DirItem *item);
 void icon_set_handler_dialog(DirItem *item, const guchar *path);
 

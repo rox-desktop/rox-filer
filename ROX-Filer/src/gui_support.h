@@ -25,7 +25,7 @@ extern gint		screen_width, screen_height;
 typedef void (*HelpFunc)(gpointer data);
 typedef const char *ParseFunc(gchar *line);
 
-void gui_support_init();
+void gui_support_init(void);
 int get_choice(const char *title,
 	       const char *message,
 	       int number_of_buttons, ...);

@@ -121,8 +121,8 @@ static guchar	*last_find_string = NULL;
 static guchar	*new_entry_string = NULL;
 
 /* Static prototypes */
-static gboolean send();
-static gboolean send_error();
+static gboolean send(void);
+static gboolean send_error(void);
 static gboolean send_dir(const char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
@@ -942,7 +942,7 @@ static void do_find(const char *path, const char *unused)
 }
 
 /* Like mode_compile(), but ignores spaces and bracketed bits */
-struct mode_change *nice_mode_compile(const char *mode_string,
+static struct mode_change *nice_mode_compile(const char *mode_string,
 				      unsigned int masked_ops)
 {
 	GString			*new;
