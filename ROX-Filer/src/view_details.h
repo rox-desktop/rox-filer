@@ -16,7 +16,6 @@ struct _ViewItem {
 	DirItem *item;
 	MaskedPixmap *image;
 	int	old_pos;	/* Used while sorting */
-	gboolean selected;
 	gchar   *utf8_name;	/* NULL => leafname is valid */
 };
 
@@ -24,6 +23,7 @@ typedef struct _ViewDetails ViewDetails;
 
 struct _ViewDetails {
 	GtkTreeView treeview;
+	GtkTreeSelection *selection;
 
 	FilerWindow *filer_window;	/* Used for styles, etc */
 
@@ -32,6 +32,8 @@ struct _ViewDetails {
 	int	    (*sort_fn)(const void *, const void *);
 
 	int	    cursor_base;	/* Cursor when minibuffer opened */
+
+	int	    can_change_selection;
 
 	GtkRequisition desired_size;
 };

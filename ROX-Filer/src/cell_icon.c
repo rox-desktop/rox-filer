@@ -312,35 +312,12 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 	ViewItem *view_item = icon->item;
 	DirItem *item;
 	DisplayStyle size;
+	gboolean selected = (flags & GTK_CELL_RENDERER_SELECTED) != 0;
 	
 	g_return_if_fail(view_item != NULL);
 
 	item = view_item->item;
 	size = get_style(cell);
-
-	/* Drag the background */
-
-	if (view_item->selected)
-	{
-		GdkColor color;
-		GdkGC *gc;
-
-		color.red = icon->background.red;
-		color.green = icon->background.green;
-		color.blue = icon->background.blue;
-
-		gc = gdk_gc_new(window);
-
-		gdk_gc_set_rgb_fg_color(gc, &color);
-
-		gdk_draw_rectangle(window, gc, TRUE,
-				background_area->x,
-				background_area->y,
-				background_area->width,
-				background_area->height);
-
-		g_object_unref(G_OBJECT(gc));
-	}
 
 	/* Draw the icon */
 
@@ -355,19 +332,19 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 			area.width = MIN(area.width, SMALL_WIDTH);
 			area.x = cell_area->x + cell_area->width - area.width;
 			draw_small_icon(window, &area, item,
-					view_item->image, view_item->selected);
+					view_item->image, selected);
 
 			break;
 		}
 		case LARGE_ICONS:
 			draw_large_icon(window, cell_area, item,
-					view_item->image, view_item->selected);
+					view_item->image, selected);
 			break;
 		case HUGE_ICONS:
 			if (!item->image->huge_pixbuf)
 				pixmap_make_huge(item->image);
 			draw_huge_icon(window, cell_area, item,
-					view_item->image, view_item->selected);
+					view_item->image, selected);
 			break;
 		default:
 			g_warning("Unknown size %d\n", size);

@@ -276,7 +276,6 @@ static void details_get_value(GtkTreeModel *tree_model,
 			      GValue       *value)
 {
 	ViewDetails *view_details = (ViewDetails *) tree_model;
-	GtkStyle *style = ((GtkWidget *) tree_model)->style;
 	gint i;
 	GPtrArray *items = view_details->items;
 	ViewItem *view_item;
@@ -351,6 +350,7 @@ static void details_get_value(GtkTreeModel *tree_model,
 			break;
 		case COL_BG_COLOUR:
 			g_value_init(value, GDK_TYPE_COLOR);
+#if 0
 			if (view_item->selected)
 			{
 				GtkStateType state = view_details->
@@ -358,6 +358,7 @@ static void details_get_value(GtkTreeModel *tree_model,
 				g_value_set_boxed(value, &style->base[state]);
 			}
 			else
+#endif
 				g_value_set_boxed(value, NULL);
 			break;
 		case COL_OWNER:
@@ -687,7 +688,7 @@ static gboolean view_details_expose(GtkWidget *widget, GdkEventExpose *event)
 	GtkTreePath *path = NULL;
 	GdkRectangle focus_rectangle;
 	gboolean     had_cursor;
-	
+
 	had_cursor = (GTK_WIDGET_FLAGS(widget) & GTK_HAS_FOCUS) != 0;
 	
 	if (had_cursor)
@@ -785,6 +786,19 @@ static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
 	return FALSE;
 }
 
+static gboolean test_can_change_selection(GtkTreeSelection *sel,
+                                          GtkTreeModel *model,
+                                          GtkTreePath *path,
+                                          gboolean path_currently_selected,
+                                          gpointer data)
+{
+	ViewDetails *view_details;
+
+	view_details = VIEW_DETAILS(gtk_tree_selection_get_tree_view(sel));
+	
+	return view_details->can_change_selection != 0;
+}
+
 #define ADD_TEXT_COLUMN(name, model_column) \
 	cell = gtk_cell_renderer_text_new();	\
 	column = gtk_tree_view_column_new_with_attributes(name, cell, \
@@ -803,16 +817,19 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	GtkTreeViewColumn *column;
 	GtkCellRenderer *cell;
 	GtkTreeSortable *sortable_list;
-	GtkTreeSelection *selection;
 	ViewDetails *view_details = (ViewDetails *) object;
 
 	view_details->items = g_ptr_array_new();
 	view_details->cursor_base = -1;
 	view_details->desired_size.width = -1;
 	view_details->desired_size.height = -1;
+	view_details->can_change_selection = 0;
 
-	selection = gtk_tree_view_get_selection(treeview);
-	gtk_tree_selection_set_mode(selection, GTK_SELECTION_NONE);
+	view_details->selection = gtk_tree_view_get_selection(treeview);
+	gtk_tree_selection_set_mode(view_details->selection,
+				GTK_SELECTION_MULTIPLE);
+	gtk_tree_selection_set_select_function(view_details->selection,
+			test_can_change_selection, view_details, NULL);
 
 	/* Sorting */
 	view_details->sort_fn = NULL;
@@ -1016,7 +1033,6 @@ static void view_details_add_items(ViewIface *view, GPtrArray *new_items)
 		vitem = g_new(ViewItem, 1);
 		vitem->item = item;
 		vitem->image = NULL;
-		vitem->selected = FALSE;
 		if (!g_utf8_validate(leafname, -1, NULL))
 			vitem->utf8_name = to_utf8(leafname);
 		else
@@ -1170,28 +1186,16 @@ static void view_details_clear(ViewIface *view)
 
 static void view_details_select_all(ViewIface *view)
 {
-	int i;
-	int n = ((ViewDetails *) view)->items->len;
+	ViewDetails *view_details = (ViewDetails *) view;
 
-	for (i = 0; i < n; i++)
-	{
-		ViewIter iter;
-		iter.i = i;
-		view_details_set_selected(view, &iter, TRUE);
-	}
+	gtk_tree_selection_select_all(view_details->selection);
 }
 
 static void view_details_clear_selection(ViewIface *view)
 {
-	int i;
-	int n = ((ViewDetails *) view)->items->len;
+	ViewDetails *view_details = (ViewDetails *) view;
 
-	for (i = 0; i < n; i++)
-	{
-		ViewIter iter;
-		iter.i = i;
-		view_details_set_selected(view, &iter, FALSE);
-	}
+	gtk_tree_selection_unselect_all(view_details->selection);
 }
 
 static int view_details_count_items(ViewIface *view)
@@ -1204,16 +1208,8 @@ static int view_details_count_items(ViewIface *view)
 static int view_details_count_selected(ViewIface *view)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
-	int n = view_details->items->len;
-	ViewItem **items = (ViewItem **) view_details->items->pdata;
-	int count = 0;
-	int i;
 
-	for (i = 0; i < n; i++)
-		if (items[i]->selected)
-			count++;
-
-	return count;
+	return gtk_tree_selection_count_selected_rows(view_details->selection);
 }
 
 static void view_details_show_cursor(ViewIface *view)
@@ -1271,25 +1267,16 @@ static void view_details_cursor_to_iter(ViewIface *view, ViewIter *iter)
 
 static void set_selected(ViewDetails *view_details, int i, gboolean selected)
 {
-	GtkTreeModel *model = (GtkTreeModel *) view_details;
-	GtkTreeIter t_iter;
-	GtkTreePath *path;
-	GPtrArray *items = view_details->items;
-	ViewItem *view_item;
+	GtkTreeIter iter;
 
-	g_return_if_fail(i >= 0 && i < items->len);
-	view_item = (ViewItem *) items->pdata[i];
-
-	if (view_item->selected == selected)
-		return;
-
-	view_item->selected = selected;
-
-	path = gtk_tree_path_new();
-	gtk_tree_path_append_index(path, i);
-	t_iter.user_data = GINT_TO_POINTER(i);
-	gtk_tree_model_row_changed(model, path, &t_iter);
-	gtk_tree_path_free(path);
+	iter.user_data = GINT_TO_POINTER(i);
+	view_details->can_change_selection++;
+	if (selected)
+		gtk_tree_selection_select_iter(view_details->selection, &iter);
+	else
+		gtk_tree_selection_unselect_iter(view_details->selection,
+						&iter);
+	view_details->can_change_selection--;
 }
 
 static void view_details_set_selected(ViewIface *view,
@@ -1301,11 +1288,12 @@ static void view_details_set_selected(ViewIface *view,
 
 static gboolean get_selected(ViewDetails *view_details, int i)
 {
-	GPtrArray *items = view_details->items;
+	GtkTreeIter iter;
 
-	g_return_val_if_fail(i >= 0 && i < items->len, FALSE);
+	iter.user_data = GINT_TO_POINTER(i);
 
-	return ((ViewItem *) items->pdata[i])->selected;
+	return gtk_tree_selection_iter_is_selected(view_details->selection,
+					&iter);
 }
 
 static gboolean view_details_get_selected(ViewIface *view, ViewIter *iter)
@@ -1316,18 +1304,12 @@ static gboolean view_details_get_selected(ViewIface *view, ViewIter *iter)
 static void view_details_select_only(ViewIface *view, ViewIter *iter)
 {
 	ViewDetails *view_details = (ViewDetails *) view;
-	int i = iter->i;
-	int n = view_details->items->len;
+	GtkTreePath *path;
 
-	set_selected(view_details, i, TRUE);
-
-	while (n > 0)
-	{
-		n--;
-
-		if (n != i)
-			set_selected(view_details, n, FALSE);
-	}
+	path = gtk_tree_path_new();
+	gtk_tree_path_append_index(path, iter->i);
+	gtk_tree_selection_select_range(view_details->selection, path, path);
+	gtk_tree_path_free(path);
 }
 
 static void view_details_set_frozen(ViewIface *view, gboolean frozen)
