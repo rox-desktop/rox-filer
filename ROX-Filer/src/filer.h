@@ -95,6 +95,8 @@ struct _FilerWindow
 	int		max_thumbs;		/* total for this batch */
 
 	gint		auto_scroll;		/* Timer */
+
+	char		*window_id;		/* For remote control */
 };
 
 extern FilerWindow 	*window_with_focus;

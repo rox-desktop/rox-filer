@@ -3043,7 +3043,7 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>, <parameter>Window</parameter>])
+     <parameter>Class</parameter>, <parameter>ID</parameter>])
      Open a window showing directory <parameter>Filename</parameter>.
      <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      or <userinput>Automatic</userinput>.
@@ -3054,9 +3054,11 @@ EOF</screen>
      <parameter>Class</parameter> can be used to set the WM_CLASS property on the new window. You can
      use this to get your window manager to treat the window
 specially.
-     <parameter>Window</parameter> is a string used to identify the 
-     opened window and when given will attempt to
-re-use an existing window of the same name, instead of opening a new one.
+     <parameter>ID</parameter> is a string used to identify the 
+opened window. If a window with this ID already exists, it is changed to the
+given directory. Otherwise, a new window is created and given this ID.
+If used from a program, ensure the IDs you generate are unique, for example
+by including your process name, PID and a timestamp in the ID.
    </para></listitem>
 
    <listitem><para><function>Panel</function>(<parameter>Side</parameter>,

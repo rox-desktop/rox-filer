@@ -313,7 +313,7 @@ static void mnt_free(GtkWidget *item, gpointer data)
 
 	argv[2]=g_strdup_printf(fmt, current_app_path);
 	/*printf("Command is %s\n", argv[2]);*/
-	rox_spawn(current_app_path, argv);
+	rox_spawn(current_app_path, (const gchar **) argv);
 	g_free(argv[2]);
 
 	if(tmp)
