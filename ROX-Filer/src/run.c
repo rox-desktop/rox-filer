@@ -249,9 +249,14 @@ gboolean run_diritem(guchar *full_path,
 
 			return open_file(full_path, edit ? &text_plain
 						  : item->mime_type);
+		case TYPE_ERROR:
+			delayed_error(full_path,
+					_("File doesn't exist, or I can't "
+					  "access it"));
+			return FALSE;
 		default:
 			delayed_error(full_path,
-					"I don't know how to open that");
+					_("I don't know how to open that"));
 			return FALSE;
 	}
 }
