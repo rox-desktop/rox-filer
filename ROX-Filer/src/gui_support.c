@@ -34,6 +34,7 @@
 #include <X11/Xatom.h>
 #include <gdk/gdkx.h>
 #include <gdk/gdk.h>
+#include <gdk/gdkkeysyms.h>
 
 #include "global.h"
 
@@ -99,6 +100,18 @@ static void choice_clicked(GtkWidget *widget, gpointer number)
 
 	if (choice_return)
 		*choice_return = GPOINTER_TO_INT(number);
+}
+
+static gboolean dialog_key_event(GtkWidget *dialog,
+				 GdkEventKey *kev,
+				 gpointer data)
+{
+	if (kev->keyval == GDK_Escape)
+	{
+		gtk_widget_destroy(dialog);
+		return TRUE;
+	}
+	return FALSE;
 }
 #endif
 
@@ -208,6 +221,8 @@ int get_choice(char *title,
 				&choice_return);
 	gtk_signal_connect(GTK_OBJECT(dialog), "destroy",
 			GTK_SIGNAL_FUNC(choice_clicked), GINT_TO_POINTER(-1));
+	gtk_signal_connect(GTK_OBJECT(dialog), "key-press-event",
+			GTK_SIGNAL_FUNC(dialog_key_event), NULL);
 
 	choice_return = -2;
 
