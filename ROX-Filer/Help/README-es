@@ -2,6 +2,23 @@
 			Un explorador estilo RISC OS para X
 			por Thomas Leonard
 
+ROX-Filer es un manejador de archivos gráfico simple y fácil de usar para X11,
+el sistema de ventanas utilizado en Unix y sistemas operativos clones de Unix.
+También es el componente principal del Escritorio ROX:
+
+        http://rox.sourceforge.net
+
+Para compilar:
+        $ ROX-Filer/AppRun --compile
+
+Para instalar:
+        $ ./install.sh
+
+Para ejecutar:
+        $ rox
+
+        
+
 
 
 Inicio rápido
@@ -18,72 +35,11 @@ usuario normal e instalar como root deberías hacer ésto:
 	[ ingresa clave de root ]
 	$ ./install.sh
 
+Por más instrucciones consulta el archivo Manual.html:
+        $ galeon ROX-Filer/Help/Manual.html
 
-notas sobre CVS
-~~~~~~~~~~~~~~~
-Si obtuviste ésto a partir de CVS entonces necesitarás que 'autoconf'
-esté instalado antes que puedas compilar (los snapshots en el sitio
-FTP no requieren ésto).
-
-También tendrás que ejecutar 'make' en el directorio 
-'ROX-Filer/src/Docs' para obtener el manual creado en 'ROX-Filer/Help'
-, y también ejecutar 'dist'en 'ROX-Filer/src/po' para obtener las 
-traducciones.
-
-Puedes encontrar instrucciones para obtener rox via CVS en:
-
-	http://sourceforge.net/cvs/?group_id=7023
-
-Una vez tengas una versión de rox de CVS puedes actualizarlo con
-
-	$ cvs -z3 update
-
-desde adentro del directorio 'rox'.
-
-Finalmente, recuerda que la versión CVS es el código más reciente de 
-desarrollo. No ha sido probado bien. Puede tener fallos. Incluso puede
-no compilar. ¡Has sido avisado! (pero por favor informa de cualquier 
-fallo que encuentres)
-
-
-ROX-Filer
-~~~~~~~~~
-Puedes encontrar ayuda del ROX-Filer en el directorio ROX-Filer/Help.
-
-
-Archivos
-~~~~~~~~
-
-Dos lugares se usan para los archivos de configuración del manejo 
-MIME:
-
-<Choices>/MIME-info/*
-	Contiene las reglas para adivinar el tipo de un archivo a 
-        partir de su nombre. Muchos programas vienen con archivos 
-        llamados '<prog>.mime' que contienen reglas adicionales.
-        Coloca esos archivos en el directorio MIME-infor también.
-
-<Choices>/MIME-types/*
-	Contiene programas o enlaces simbólicos que serán ejecutados.
-        Por ejemplo:
-
-	$ rox imagen.gif
-	es como hacer
-	$ <Choices>/MIME-types/image_gif imagen.gif
-	o, si no es hallado,
-	$ <Choices>/MIME-types/image imagen.gif
-
-En ambos casos, <Choices> son todos los directorios en tu variable de
-entorno CHOICESPATH, la cual por defecto tiene el valor:
-
-	~/Choices:/usr/local/share/Choices:/usr/share/Choices
-
-El directorio más a la izquierda es explorado primero, seguido de los 
-otros en orden. Si la cadena comienza con `:' entonces no estará 
-permitido guardar y ningún programa intentará guardar una 
-configuración en él. Por más detalls, consulta:
-
-	<http://rox.sourceforge.net/choices.php3>
+(o usa netscape, konqueror, mozilla, w3m o cualquier navegador en lugar de 
+galeon)
 
 
 Condiciones
@@ -103,3 +59,25 @@ junto con éste programa; sino, escribe a la Free Software Foundation,
 Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 Por favor informame cualquier fallo, <tal197@users.sourceforge.net>.
+
+
+Créditos
+~~~~~~~~
+ROX-Filer fué creado por Thomas Leonard, pero muchas personas han contribuído
+con él de una forma u otra...
+
+Si consideras que deberías estar incluído aquí entonces escribe y dímelo ;-)
+
+Primero, unas pocas personas/proyectos cuyo trabajo he utilizado:
+
+        Andrew Ciover           la mayoría de los íconos de archivo
+        David MacKenzie         el código para procesar los comandos de
+                                permisos
+        John Lindal             co-autor del protocolo XDS
+        Midnight Commander      la biblioteca Virtual File System y algunas
+                                cosas para el pinboard
+        GNOME Desktop           algunos íconos (incluyendo la barra de
+                                herramientas)                                
+
+Una enorme cantidad de personas han enviado código, sugerencias e incentivo -
+muchos de ellos están listados en el archivo `Changes'... ¡gracias!

@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.10\n"
+"Project-Id-Version: ROX-Filer 1.1.12\n"
 "POT-Creation-Date: 2002-02-03 16:30+0000\n"
 "PO-Revision-Date: 2001-11-05\n"
 "Last-Translator: Marcelo Ramos <mramos@montevideo.com.uy>\n"
@@ -150,7 +150,7 @@ msgid ""
 "\n"
 "See the chmod(1) man page for full details."
 msgstr ""
-"Generalmente, basta con seleccionar un comando desde el menú (pulsar \n"
+"Generalmente, basta con seleccionar un comando desde el menú (hacer click\n"
 "en la flecha al lado de la casilla de comandos). Algunas veces, necesitas "
 "más...\n"
 "\n"
@@ -669,6 +669,8 @@ msgstr ""
 #: dnd.c:933
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr ""
+"Lo siento, no puedo mostrar un menú de acciones para un archivo remoto / "
+"datos brutos."
 
 #: dnd.c:949
 msgid "UntitledData"
@@ -1003,6 +1005,8 @@ msgstr "No puedo asignar memoria al búfer para cargar éste archivo"
 #, c-format
 msgid "Attempt to read an XML file as a text file. File '%s' may be corrupted."
 msgstr ""
+"Se intentó leer un archivo XML como si fuera un archivo de texto.\n"
+"El archivo '%s' puede que esté corrupto."
 
 #: gui_support.c:508
 #, c-format
@@ -1016,7 +1020,7 @@ msgstr ""
 "Error en el archivo '%s' en la línea %d: \n"
 "\"%s\"\n"
 "Esto puede deberse a una actualización a partir de una versión previa de ROX-"
-"Filer. Abre la ventana Opciones y pulsa en Guardar.\n"
+"Filer. Abre la ventana Opciones y haz click en Guardar.\n"
 "Los errores posteriores serán ignorados."
 
 #: i18n.c:157
@@ -1099,7 +1103,7 @@ msgstr "Sólo puedes definir la acción para un archivo normal"
 
 #: icon.c:820
 msgid "Clicking the icon opens:"
-msgstr "Pulsando el ícono se abre:"
+msgstr "Al hacer click en el ícono se abre:"
 
 #: icon.c:832
 msgid "The text displayed under the icon is:"
@@ -1289,12 +1293,11 @@ msgstr "No (se necesita libpng o Gtk+-2.0)"
 
 #: main.c:589
 msgid "Character set translations"
-msgstr ""
+msgstr "Conversiones del conjunto de caracteres"
 
 #: main.c:596
-#, fuzzy
 msgid "No (needs libiconv or Gtk+-2.0)"
-msgstr "No (se necesita libpng o Gtk+-2.0)"
+msgstr "No (se necesita libiconv o Gtk+-2.0)"
 
 #: menu.c:188 tips:14
 msgid "Display"
@@ -1491,12 +1494,12 @@ msgstr ""
 #: menu.c:762
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr ""
-"Tienes que pulsar apretando Shift y elegir del menú sobre un archivo para "
-"enviarlo a alguna parte"
+"Tienes que hacer click apretando Shift y elegir del menú sobre un archivo "
+"para enviarlo a alguna parte"
 
 #: menu.c:801
 msgid "Next Click"
-msgstr "Siguiente Pulsación"
+msgstr "Siguiente Click"
 
 #: menu.c:817
 #, c-format
@@ -1570,7 +1573,8 @@ msgstr ""
 "\n"
 "%s\n"
 "%s\n"
-"El menú `Enviar A' puede ser abierto pulsando Shift+Menú sobre el archivo."
+"El menú `Enviar A' puede ser abierto haciendo click Shift+Menú sobre el "
+"archivo."
 
 #: menu.c:1371
 msgid ""
@@ -1706,8 +1710,8 @@ msgstr ""
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
-"Ingresa un comando de shell para ejecutar. Pulsa en un archivo para añadirlo "
-"al búfer."
+"Ingresa un comando de shell para ejecutar. Haz click en un archivo para "
+"añadirlo al búfer."
 
 #: minibuffer.c:742
 msgid "Failed to create child process"
@@ -1929,7 +1933,7 @@ msgid ""
 msgstr ""
 "No existe ninguna acción especificada para éste tipo (%s/%s) - puedes "
 "definir la acción eligiendo `Definir Acción' en el menú Archivo, o basta con "
-"arratrar el archivo sobre una aplicación"
+"arrastrar el archivo sobre una aplicación"
 
 #: run.c:528
 msgid ""
@@ -2460,7 +2464,7 @@ msgstr "Fondo"
 
 #: tips:60
 msgid "Single-click to open"
-msgstr "Una sóla pulsación para abrir"
+msgstr "Un sólo click para abrir"
 
 #: tips:61 tips:130
 msgid ""
@@ -2468,9 +2472,9 @@ msgid ""
 "item instead. If off, clicking once selects an item; double click to open "
 "things."
 msgstr ""
-"Al pulsar un elemento éste se abrirá si ésta opción está activada. Presiona "
-"Control para seleccionar el elemento. Si está desactivada, pulsar una vez "
-"selecciona el elemento; pulsar dos veces lo abre."
+"Al hacer click en un elemento éste se abrirá si ésta opción está activada. "
+"Presiona Control para seleccionar el elemento. Si está desactivada, hacer "
+"click una vez selecciona el elemento; hacer click dos veces lo abre."
 
 #: tips:62
 msgid "Keep icons within screen limits"
@@ -2665,8 +2669,8 @@ msgid ""
 "`Resize Window' menu entry or by double-clicking on the window background."
 msgstr ""
 "Tendrás que redimensionar las ventanas manualmente, usando el manejador de "
-"ventanas, la entrada del menú `Redimensionar Ventana' o pulsando dos veces "
-"en el fondo de la ventana."
+"ventanas, la entrada del menú `Redimensionar Ventana' o haciendo click dos "
+"veces en el fondo de la ventana."
 
 #: tips:118
 msgid "...when changing the display style"
@@ -2726,13 +2730,13 @@ msgid ""
 "a new window with this turned on. Clicking with the button-2 (middle) will "
 "reuse the current window."
 msgstr ""
-"Al pulsar con el botón 1 del ratón (usualmente el botón izquierdo) se abrirá "
-"un directorio en una nueva ventana si está opción está activada. Al pulsar "
-"con el botón 3 (del medio) reutilizará la ventana actual."
+"Al hacer click con el botón 1 del ratón (usualmente el botón izquierdo) se "
+"abrirá un directorio en una nueva ventana si está opción está activada. Al "
+"hacer click con el botón 3 (del medio) reutilizará la ventana actual."
 
 #: tips:129
 msgid "Single-click navigation in filer windows"
-msgstr "Navegación con una sóla pulsación en las ventanas del filer"
+msgstr "Navegación con un sólo click en las ventanas del filer"
 
 #: tips:131
 msgid "Beep if Tab-completion fails"
@@ -2903,9 +2907,9 @@ msgid ""
 "Use button 2, the middle button (click both buttons at once on two button "
 "mice), to pop up the menu. If off, use button 3 (right) instead."
 msgstr ""
-"Usar el botón 2, el botón del medio (pulsa ambos botones simultáneamente si "
-"tienes un ratón de dos botones), para lanzar el menú. Si está desactivada, "
-"usar el botón 3 (derecha) en su lugar."
+"Usar el botón 2, el botón del medio (haz click con ambos botones "
+"simultáneamente si tienes un ratón de dos botones), para lanzar el menú. Si "
+"está desactivada, usar el botón 3 (derecha) en su lugar."
 
 #: tips:165
 msgid "Types"
@@ -2982,8 +2986,8 @@ msgstr ""
 "El filer utiliza un conjunto de reglas para averigüar el tipo MIME\n"
 "correcto para cada archivo regular, luego elige un ícono adecuado para ese "
 "tipo.\n"
-"Después de editar los archivos, pulsa el botón de actualización abajo, o "
-"reinicia el filer."
+"Después de editar los archivos, haz click en el botón de actualización "
+"abajo, o reinicia el filer."
 
 #: tips:184
 msgid "Show name-to-type rules"
@@ -2998,6 +3002,5 @@ msgid "Use the 'Set Icon...' dialog box to set the icon for each type."
 msgstr ""
 "Usa el diálogo 'Definir Icono...' para definir el ícono para cada tipo."
 
-#, fuzzy
 #~ msgid "Yes (using libiconv)"
-#~ msgstr "Si (usando libpng)"
+#~ msgstr "Si (usando libiconv)"
