@@ -447,12 +447,10 @@ void drag_data_get(GtkWidget          		*widget,
 						&to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
-				if (item->mime_type)
-					type = type_to_atom(item->mime_type);
-				else
-					type = application_octet_stream;
+				type = selection_data->type;
 				break;
 			}
+			g_warning("drag_data_get: Can't find selected item\n");
 			return;
 		case	TARGET_URI_LIST:
 			string = g_string_new(NULL);
