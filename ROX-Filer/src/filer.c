@@ -29,6 +29,7 @@
 #include <errno.h>
 #include <time.h>
 #include <ctype.h>
+#include <math.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -79,9 +80,7 @@ static OptionsSection options =
 };
 
 gboolean o_unique_filer_windows = FALSE;
-static gint o_initial_window_height = 3;
 static GtkWidget *toggle_unique_filer_windows;
-static GtkAdjustment *adj_initial_window_height;
 
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
@@ -194,34 +193,67 @@ void filer_window_autosize(FilerWindow *filer_window)
 {
 	Collection	*collection = filer_window->collection;
 	int 		n = collection->number_of_items;
-	int 		nx, ny;
-	int 		maxw, maxh;
+	int 		x;
+	int		rows, cols;
+	int		w = collection->item_width;
+	int		h = collection->item_height;
+	int 		max_x, max_rows;
+	const float	r = 2.5;
+	int		t = 0;
+
+	if (o_toolbar != TOOLBAR_NONE)
+		t = filer_window->toolbar_frame->allocation.height;
 
 	/* Include items that are about to be added... */
 	if (filer_window->scanning)
 		n += filer_window->directory->new_items->len;
 
-	maxw = (2 * screen_width) / (collection->item_width * 3);
-	maxh = (2 * screen_height) / (collection->item_height * 3);
+	n = MAX(n, 2);
 
-	/* Taking the requested number of rows as a starting point,
-	 * how many columns would we need?
+	max_x = (3 * screen_width) / 4;
+	max_rows = (3 * screen_height) / (h * 4);
+
+	/* Aim for a size where
+	 * 	   x = r(y + t + h),		(1)
+	 * unless that's too wide.
+	 *
+	 * t = toolbar height
+	 * r = desired (width / height) ratio
+	 *
+	 * Want to display all items:
+	 * 	   (x/w)(y/h) = n
+	 * 	=> xy = nwh
+	 *	=> x(x/r - t - h) = nwh		(from 1)
+	 *	=> xx - x.rt - hr(1 - nw) = 0
+	 *	=> 2x = rt +/- sqrt(rt.rt + 4hr(nw - 1))
+	 * Now,
+	 * 	   4hr(nw - 1) > 0
+	 * so
+	 * 	   sqrt(rt.rt + ...) > rt
+	 *
+	 * So, the +/- must be +:
+	 * 	
+	 *	=> x = (rt + sqrt(rt.rt + 4hr(nw - 1))) / 2
+	 *
+	 * ( + w - 1 to round up)
 	 */
-	ny = MAX(o_initial_window_height - 1, 1);
-	nx = (n + ny - 1) / ny;
+	x = (r * t + sqrt(r*r*t*t + 4*h*r * (n*w - 1))) / 2 + w - 1;
 
-	if (nx > maxw)
-	{
-		/* Looks like we'll need more rows, then... */
+	/* Limit x */
+	if (x > max_x)
+		x = max_x;
 
-		nx = MAX(maxw, 1);
+	cols = x / w;
+	cols = MAX(cols, 1);
 
-		ny = (n + nx - 1) / nx;
-		if (ny > maxh)
-			ny = maxh;
-	}
+	/* Choose rows to display all items given our chosen x.
+	 * Don't make the window *too* big!
+	 */
+	rows = (n + cols - 1) / cols;
+	if (rows > max_rows)
+		rows = max_rows;
 
-	filer_window_set_size(filer_window, nx, ny + 1);
+	filer_window_set_size(filer_window, cols, rows + 1);
 }
 
 /* Called on a timeout while scanning or when scanning ends
@@ -1048,10 +1080,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	gtk_widget_realize(filer_window->window);
 
-	/* XXX: 6 or 8 ? */
-	filer_window_set_size(filer_window,
-			filer_window->display_style == LARGE_ICONS ? 6 : 8,
-			o_initial_window_height);
+	filer_window_set_size(filer_window, 4, 4);
 }
 
 static void filer_add_signals(FilerWindow *filer_window)
@@ -1130,7 +1159,7 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning)
  */
 static GtkWidget *create_options(void)
 {
-	GtkWidget	*vbox, *hbox, *label, *scale;
+	GtkWidget	*vbox;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -1144,21 +1173,6 @@ static GtkWidget *create_options(void)
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_unique_filer_windows,
 			FALSE, TRUE, 0);
 
-	adj_initial_window_height = GTK_ADJUSTMENT(gtk_adjustment_new(
-							o_initial_window_height,
-							2, 10, 1, 2, 0));
-	hbox = gtk_hbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-	label = gtk_label_new(_("Initial window height "));
-	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
-	scale = gtk_hscale_new(adj_initial_window_height);
-	gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_LEFT);
-	gtk_scale_set_digits(GTK_SCALE(scale), 0);
-	gtk_box_pack_start(GTK_BOX(hbox), scale, TRUE, TRUE, 0);
-	OPTION_TIP(scale, 
-		_("This option sets the initial height of filer windows, "
-		  "in rows of icons at Large Icons size."));
-	
 	return vbox;
 }
 
@@ -1168,8 +1182,6 @@ static void update_options()
 	gtk_toggle_button_set_active(
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows),
 			o_unique_filer_windows);
-	gtk_adjustment_set_value(adj_initial_window_height,
-				 o_initial_window_height);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
@@ -1177,20 +1189,12 @@ static void set_options()
 {
 	o_unique_filer_windows = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_unique_filer_windows));
-
-	o_initial_window_height = adj_initial_window_height->value;
 }
 
 static void save_options()
 {
-	guchar *str;
-	
 	option_write("filer_unique_windows",
 			o_unique_filer_windows ? "1" : "0");
-			
-	str = g_strdup_printf("%d", o_initial_window_height);
-	option_write("filer_initial_window_height", str);
-	g_free(str);
 }
 
 static char *filer_unique_windows(char *data)
@@ -1201,7 +1205,7 @@ static char *filer_unique_windows(char *data)
 
 static char *filer_initial_window_height(char *data)
 {
-	o_initial_window_height = atoi(data);
+	/* (ignore - old) */
 	return NULL;
 }
 
