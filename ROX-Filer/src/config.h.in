@@ -14,6 +14,7 @@
 #undef HAVE_LIBVFS
 #undef HAVE_VFS_H
 #undef HAVE_LOCALE_H
+#undef GTK2
 
 #include "my_vfs.h"
 #include "rox_gettext.h"
@@ -24,3 +25,7 @@
  * actually translating it at that point. Used by xgettext.
  */
 #define N_(String) (String)
+
+#ifdef GTK2
+# define GTK_WINDOW_DIALOG GTK_WINDOW_TOPLEVEL
+#endif

@@ -11,12 +11,18 @@
 #include <gtk/gtk.h>
 #include "fscache.h"
 
-#include <gdk/gdkprivate.h> /* XXX - find another way to do this */
-#define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
-#define PIXMAP_HEIGHT(p) (((GdkPixmapPrivate *) (p))->height)
-
-#ifndef PIXMAPS_C
+#ifdef GTK2
+# define PIXMAP_WIDTH(p) \
+	(GDK_PIXMAP_IMPL_X11(GDK_PIXMAP_OBJECT(p)->impl)->width)
+# define PIXMAP_HEIGHT(p) \
+	(GDK_PIXMAP_IMPL_X11(GDK_PIXMAP_OBJECT(p)->impl)->height)
+#else
+# include <gdk/gdkprivate.h> /* XXX - find another way to do this */
+# define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
+# define PIXMAP_HEIGHT(p) (((GdkPixmapPrivate *) (p))->height)
+# ifndef PIXMAPS_C
   typedef struct _GdkPixbuf GdkPixbuf;
+# endif
 #endif
 
 extern GFSCache *pixmap_cache;

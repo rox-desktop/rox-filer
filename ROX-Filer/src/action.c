@@ -23,6 +23,9 @@
  * These routines generally fork() and talk to us via pipes.
  */
 
+/* Allow use of GtkText widget */
+#define GTK_ENABLE_BROKEN
+
 #include "config.h"
 
 #include <stdio.h>
@@ -281,10 +284,10 @@ _("system(command) (true if 'command' returns with a zero exit status; a % \n"
 		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-				gtk_widget_hide, GTK_OBJECT(help));
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
 
 		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
-				gtk_widget_hide, GTK_OBJECT(help));
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
 	}
 
 	if (GTK_WIDGET_VISIBLE(help))
@@ -347,10 +350,10 @@ static void show_chmod_help(gpointer data)
 		button = gtk_button_new_with_label(_("Close"));
 		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
 		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-				gtk_widget_hide, GTK_OBJECT(help));
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
 
 		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
-				gtk_widget_hide, GTK_OBJECT(help));
+			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(help));
 	}
 
 	if (GTK_WIDGET_VISIBLE(help))
@@ -896,23 +899,24 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Q");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
+			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
+			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	gui_side->no = button = gtk_button_new_with_label(_("No"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "N");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			button_reply, gui_side);
+			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	SENSITIVE_YESNO(gui_side, FALSE);
 
 	button = gtk_button_new_with_label(_("Abort"));
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			gtk_widget_destroy, GTK_OBJECT(gui_side->window));
+			GTK_SIGNAL_FUNC(gtk_widget_destroy),
+			GTK_OBJECT(gui_side->window));
 
 	gui_side->input_tag = gdk_input_add(gui_side->from_child,
 						GDK_INPUT_READ,
@@ -1804,7 +1808,7 @@ static void add_toggle(GUIside *gui_side, guchar *label, guchar *code)
 	check = gtk_check_button_new_with_label(label);
 	gtk_object_set_data(GTK_OBJECT(check), "send-code", code);
 	gtk_signal_connect(GTK_OBJECT(check), "clicked",
-			button_reply, gui_side);
+			GTK_SIGNAL_FUNC(button_reply), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), check, FALSE, TRUE, 0);
 }
 
@@ -1870,7 +1874,7 @@ void action_find(FilerWindow *filer_window)
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
-			entry_changed, gui_side);
+			GTK_SIGNAL_FUNC(entry_changed), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox),
 				new_help_button(show_condition_help, NULL),
@@ -1879,7 +1883,8 @@ void action_find(FilerWindow *filer_window)
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Find"));
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
-			gtk_button_clicked, GTK_OBJECT(gui_side->quiet));
+			GTK_SIGNAL_FUNC(gtk_button_clicked),
+			GTK_OBJECT(gui_side->quiet));
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2028,7 +2033,7 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
-			entry_changed, gui_side);
+			GTK_SIGNAL_FUNC(entry_changed), gui_side);
 	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox),
 				new_help_button(show_chmod_help, NULL),
@@ -2037,7 +2042,8 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_window_set_focus(GTK_WINDOW(gui_side->window), gui_side->entry);
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Permissions"));
 	gtk_signal_connect_object(GTK_OBJECT(gui_side->entry), "activate",
-			gtk_button_clicked, GTK_OBJECT(gui_side->yes));
+			GTK_SIGNAL_FUNC(gtk_button_clicked),
+			GTK_OBJECT(gui_side->yes));
 
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);

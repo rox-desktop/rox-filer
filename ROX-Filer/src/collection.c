@@ -399,9 +399,7 @@ static void collection_finalize(GtkObject *object)
 	collection = COLLECTION(object);
 
 	if (collection->vadj)
-	{
 		gtk_object_unref(GTK_OBJECT(collection->vadj));
-	}
 
 	g_free(collection->items);
 }

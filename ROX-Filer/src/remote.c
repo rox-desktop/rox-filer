@@ -65,7 +65,6 @@ static gboolean ipc_prop_changed(GtkWidget *window,
 gboolean remote_init(GString *to_open, gboolean new_copy)
 {
 	guchar	*unique_id;
-	GdkWindowPrivate	*window;
 	GdkWindow		*existing_ipc_window;
 	GtkWidget		*ipc_window;
 
@@ -92,15 +91,13 @@ gboolean remote_init(GString *to_open, gboolean new_copy)
 	ipc_window = gtk_invisible_new();
 	gtk_widget_realize(ipc_window);
 			
-	window = (GdkWindowPrivate *) ipc_window->window;
-
 	/* Make the IPC window contain a property pointing to
 	 * itself - this can then be used to check that it really
 	 * is an IPC window.
 	 */
 	gdk_property_change(ipc_window->window, filer_atom,
 			XA_WINDOW, 32, GDK_PROP_MODE_REPLACE,
-			(guchar *) &window->xwindow, 1);
+			(void *) &GDK_WINDOW_XWINDOW(ipc_window->window), 1);
 
 	/* Get notified when the IPC property is changed */
 	gtk_widget_add_events(ipc_window, GDK_PROPERTY_CHANGE_MASK);
@@ -110,7 +107,7 @@ gboolean remote_init(GString *to_open, gboolean new_copy)
 	/* Make the root window contain a pointer to the IPC window */
 	gdk_property_change(GDK_ROOT_PARENT(), filer_atom,
 			XA_WINDOW, 32, GDK_PROP_MODE_REPLACE,
-			(guchar *) &window->xwindow, 1);
+			(void *) &GDK_WINDOW_XWINDOW(ipc_window->window), 1);
 
 	return FALSE;
 }

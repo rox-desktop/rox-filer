@@ -302,7 +302,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	gtk_container_add(GTK_CONTAINER(icon->win), icon->widget);
 	drag_set_pinicon_dest(icon);
 	gtk_signal_connect(GTK_OBJECT(icon->widget), "drag_data_get",
-				drag_data_get, NULL);
+				GTK_SIGNAL_FUNC(drag_data_get), NULL);
 
 	gtk_widget_realize(icon->win);
 	gtk_widget_realize(icon->widget);
