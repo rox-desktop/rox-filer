@@ -1303,7 +1303,8 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 		dtype = option_get_int("display_details");
 		filer_window->show_hidden =
 			option_get_int("display_show_hidden");
-		filer_window->show_thumbs = FALSE;
+		filer_window->show_thumbs =
+			option_get_int("display_show_thumbs");
 	}
 
 	/* Add all the user-interface elements & realise */
