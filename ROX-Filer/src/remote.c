@@ -563,7 +563,7 @@ static xmlNodePtr rpc_Version(GList *args)
 
 	reply = xmlNewNode(NULL, "rox:VersionResponse");
 	xmlNewNs(reply, SOAP_RPC_NS, "soap");
-	xmlNewChild(reply, NULL, "soap:result", VERSION);
+	xmlNewTextChild(reply, NULL, "soap:result", VERSION);
 
 	return reply;
 }
@@ -937,7 +937,7 @@ static xmlNodePtr rpc_FileType(GList *args)
 	tname = g_strconcat(type->media_type, "/", type->subtype, NULL);
 
 	xmlNewNs(reply, SOAP_RPC_NS, "soap");
-	xmlNewChild(reply, NULL, "soap:result", tname);
+	xmlNewTextChild(reply, NULL, "soap:result", tname);
 	g_free(tname);
 
 	return reply;
@@ -1045,9 +1045,9 @@ static xmlNodePtr soap_invoke(xmlNode *method)
 		reply = xmlNewNode(NULL, "env:Fault");
 		xmlNewNs(reply, SOAP_RPC_NS, "rpc");
 		xmlNewNs(reply, SOAP_ENV_NS, "env");
-		xmlNewChild(reply, NULL, "faultcode",
+		xmlNewTextChild(reply, NULL, "faultcode",
 						"rpc:ProcedureNotPresent");
-		xmlNewChild(reply, NULL, "faultstring", err);
+		xmlNewTextChild(reply, NULL, "faultstring", err);
 		g_free(err);
 		return reply;
 	}

@@ -792,7 +792,7 @@ static void group_save(FilerWindow *filer_window, char *name)
 			NULL, "group", NULL);
 	xmlSetProp(group, "name", name);
 
-	xmlNewChild(group, NULL, "directory", filer_window->sym_path);
+	xmlNewTextChild(group, NULL, "directory", filer_window->sym_path);
 
 	view_get_iter(filer_window->view, &iter, VIEW_ITER_SELECTED);
 

@@ -400,7 +400,7 @@ static void bookmarks_add_dir(const guchar *dir)
 	if (bookmark_find(dir))
 		return;
 
-	bookmark = xmlNewChild(xmlDocGetRootElement(bookmarks->doc),
+	bookmark = xmlNewTextChild(xmlDocGetRootElement(bookmarks->doc),
 				NULL, "bookmark", dir);
 
 	bookmarks_save();
@@ -597,7 +597,7 @@ static void commit_edits(GtkTreeModel *model)
 			xmlNode *bookmark;
 
 			gtk_tree_model_get_value(model, &iter, 0, &value);
-			bookmark = xmlNewChild(root, NULL, "bookmark",
+			bookmark = xmlNewTextChild(root, NULL, "bookmark",
 					g_value_get_string(&value));
 			g_value_unset(&value);
 		} while (gtk_tree_model_iter_next(model, &iter));

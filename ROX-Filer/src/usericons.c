@@ -422,7 +422,7 @@ static void write_globicon(gpointer key, gpointer value, gpointer data)
 
 	tree = xmlNewTextChild(doc, NULL, "rule", NULL);
 	xmlSetProp(tree, "match", key);
-	xmlNewChild(tree, NULL, "icon", value);
+	xmlNewTextChild(tree, NULL, "icon", value);
 }
 
 /* Write globicons file */
