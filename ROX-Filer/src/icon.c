@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2001, the ROX-Filer team.
+ * Copyright (C) 2002, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -601,9 +601,6 @@ static void rename_activate(GtkWidget *dialog)
 	else if (*new_src == '\0')
 		report_error(
 			_("The location must contain at least one character!"));
-	else if (strpbrk(new_name, "<>"))
-		report_error(
-			_("Sorry, but the name must not contain < or >"));
 	else
 	{
 #ifndef GTK2

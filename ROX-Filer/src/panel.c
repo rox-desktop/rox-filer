@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2001, the ROX-Filer team.
+ * Copyright (C) 2002, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <ctype.h>
 #include <unistd.h>
+#include <parser.h>
 
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
@@ -126,6 +127,7 @@ static void perform_action(Panel *panel,
 static void run_applet(Icon *icon);
 static void panel_set_style(guchar *new);
 static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon);
+static void panel_load_from_xml(Panel *panel, xmlDocPtr doc);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -251,7 +253,22 @@ Panel *panel_new(guchar *name, PanelSide side)
 	
 	loading_panel = panel;
 	if (load_path && access(load_path, F_OK) == 0)
-		parse_file(load_path, pan_from_file);
+	{
+		xmlDocPtr doc;
+		doc = xmlParseFile(load_path);
+		if (doc)
+		{
+			panel_load_from_xml(panel, doc);
+			xmlFreeDoc(doc);
+		}
+		else
+		{
+			parse_file(load_path, pan_from_file);
+			delayed_error(_("Your old panel file has been "
+					"converted to the new XML format."));
+			panel_save(panel);
+		}
+	}
 	else
 	{
 		/* Don't scare users with an empty panel... */
@@ -338,6 +355,42 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 
 	if (--number_of_windows < 1)
 		gtk_main_quit();
+}
+
+static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)
+{
+	xmlNodePtr node;
+	char	   *label, *path;
+
+	for (node = side->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+		if (strcmp(node->name, "icon") != 0)
+			continue;
+
+		label = xmlGetProp(node, "label");
+		if (!label)
+			label = g_strdup("<missing label>");
+		path = xmlNodeGetContent(node);
+		if (!path)
+			path = g_strdup("<missing path>");
+
+		panel_add_item(panel, path, label, after);
+
+		g_free(path);
+		g_free(label);
+	}
+}
+
+/* Create one panel icon for each icon in the doc */
+static void panel_load_from_xml(Panel *panel, xmlDocPtr doc)
+{
+	xmlNodePtr root;
+
+	root = xmlDocGetRootElement(doc);
+	panel_load_side(panel, get_subnode(root, NULL, "start"), FALSE);
+	panel_load_side(panel, get_subnode(root, NULL, "end"), TRUE);
 }
 
 /* Called for each line in the config file while loading a new panel */
@@ -808,20 +861,17 @@ static void drag_leave(GtkWidget	*widget,
 	dnd_spring_abort();
 }
 
-/* Writes lines to the file, one for each widget, prefixed by 'side'.
- * Returns TRUE on success, or FALSE on error (and sets errno).
+/* Create XML icon nodes for these widgets.
  * Always frees the widgets list.
  */
-static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
+static void make_widgets(xmlNodePtr side, GList *widgets)
 {
 	GList	*next;
-	GString	*tmp;
-
-	tmp = g_string_new(NULL);
 
 	for (next = widgets; next; next = next->next)
 	{
 		Icon	*icon;
+		xmlNodePtr tree;
 
 		icon = gtk_object_get_data(GTK_OBJECT(next->data), "icon");
 
@@ -831,28 +881,20 @@ static gboolean write_widgets(FILE *file, GList *widgets, guchar side)
 			continue;
 		}
 
-		g_string_sprintf(tmp, "%s%c%s\n",
-				icon->item->leafname,
-				side, icon->src_path);
-		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
-		{
-			g_list_free(widgets);
-			return FALSE;
-		}
-	}
+		tree = xmlNewTextChild(side, NULL, "icon", icon->src_path);
 
-	g_string_free(tmp, TRUE);
+		xmlSetProp(tree, "label", icon->item->leafname);
+	}
 	
 	if (widgets)
 		g_list_free(widgets);
-
-	return TRUE;
 }
 
 void panel_save(Panel *panel)
 {
+	xmlDocPtr doc;
+	xmlNodePtr root;
 	guchar	*save = NULL;
-	FILE	*file = NULL;
 	guchar	*save_new = NULL;
 
 	g_return_if_fail(panel != NULL);
@@ -871,41 +913,26 @@ void panel_save(Panel *panel)
 	if (!save)
 		return;
 
-	save_new = g_strconcat(save, ".new", NULL);
-	file = fopen(save_new, "wb");
-	if (!file)
-		goto err;
+	doc = xmlNewDoc("1.0");
+	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "pinboard", NULL));
 
-	if (!write_widgets(file,
-			gtk_container_children(GTK_CONTAINER(panel->before)),
-			'<'))
-		goto err;
+	root = xmlDocGetRootElement(doc);
+	make_widgets(xmlNewChild(root, NULL, "start", NULL),
+			gtk_container_children(GTK_CONTAINER(panel->before)));
 
-	if (!write_widgets(file,
+	make_widgets(xmlNewChild(root, NULL, "end", NULL),
 			g_list_reverse(gtk_container_children(
-					GTK_CONTAINER(panel->after))),
-			'>'))
-		goto err;
+					GTK_CONTAINER(panel->after))));
 
-	if (fclose(file))
-	{
-		file = NULL;
-		goto err;
-	}
-
-	file = NULL;
-
-	if (rename(save_new, save))
-		goto err;
-
-	goto out;
-err:
-	delayed_error(_("Could not save panel: %s"), g_strerror(errno));
-out:
-	if (file)
-		fclose(file);
-	g_free(save);
+	save_new = g_strconcat(save, ".new", NULL);
+	if (save_xml_file(doc, save_new) || rename(save_new, save))
+		delayed_error(_("Error saving panel %s: %s"),
+				save, g_strerror(errno));
 	g_free(save_new);
+
+	g_free(save);
+	if (doc)
+		xmlFreeDoc(doc);
 }
 
 /* Create a frame widget which can be used to add icons to the panel */
@@ -1288,4 +1315,5 @@ static void panel_set_style(guchar *new)
 		}
 	}
 }
+
 

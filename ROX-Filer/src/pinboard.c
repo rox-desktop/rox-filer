@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2001, the ROX-Filer team.
+ * Copyright (C) 2002, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -27,6 +27,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <errno.h>
+#include <parser.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
 #include <gtk/gtkinvisible.h>
@@ -166,6 +167,7 @@ static void drag_end(GtkWidget *widget,
 			Icon *icon);
 static void reshape_all(void);
 static void pinboard_check_options(void);
+static void pinboard_load_from_xml(xmlDocPtr doc);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -249,7 +251,20 @@ void pinboard_activate(guchar *name)
 	loading_pinboard++;
 	if (path)
 	{
-		parse_file(path, pin_from_file);
+		xmlDocPtr doc;
+		doc = xmlParseFile(path);
+		if (doc)
+		{
+			pinboard_load_from_xml(doc);
+			xmlFreeDoc(doc);
+		}
+		else
+		{
+			parse_file(path, pin_from_file);
+			delayed_error(_("Your old pinboard file has been "
+					"converted to the new XML format."));
+			pinboard_save();
+		}
 		g_free(path);
 	}
 	else
@@ -995,7 +1010,51 @@ static gint icon_motion_notify(GtkWidget *widget,
 	return TRUE;
 }
 
-/* Called for each line in the pinboard file while loading a new board */
+/* Create one pinboard icon for each icon in the doc */
+static void pinboard_load_from_xml(xmlDocPtr doc)
+{
+	xmlNodePtr node, root;
+	char	   *tmp, *label, *path;
+	int	   x, y;
+
+	root = xmlDocGetRootElement(doc);
+
+	for (node = root->xmlChildrenNode; node; node = node->next)
+	{
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+		if (strcmp(node->name, "icon") != 0)
+			continue;
+
+		tmp = xmlGetProp(node, "x");
+		if (!tmp)
+			continue;
+		x = atoi(tmp);
+		g_free(tmp);
+
+		tmp = xmlGetProp(node, "y");
+		if (!tmp)
+			continue;
+		y = atoi(tmp);
+		g_free(tmp);
+
+		label = xmlGetProp(node, "label");
+		if (!label)
+			label = g_strdup("<missing label>");
+		path = xmlNodeGetContent(node);
+		if (!path)
+			path = g_strdup("<missing path>");
+
+		pinboard_pin(path, label, x, y);
+
+		g_free(path);
+		g_free(label);
+	}
+}
+
+/* Called for each line in the pinboard file while loading a new board.
+ * Only used for old-format files when converting to XML.
+ */
 static char *pin_from_file(guchar *line)
 {
 	guchar	*leaf = NULL;
@@ -1112,10 +1171,10 @@ static void forward_root_clicks(void)
 void pinboard_save(void)
 {
 	guchar	*save = NULL;
-	GString	*tmp = NULL;
-	FILE	*file = NULL;
-	GList	*next;
 	guchar	*save_new = NULL;
+	GList	*next;
+	xmlDocPtr doc = NULL;
+	xmlNodePtr root;
 
 	g_return_if_fail(current_pinboard != NULL);
 
@@ -1135,44 +1194,39 @@ void pinboard_save(void)
 	if (!save)
 		return;
 
-	save_new = g_strconcat(save, ".new", NULL);
-	file = fopen(save_new, "wb");
-	if (!file)
-		goto err;
+	doc = xmlNewDoc("1.0");
+	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "pinboard", NULL));
 
-	tmp = g_string_new(NULL);
+	root = xmlDocGetRootElement(doc);
+
 	for (next = current_pinboard->icons; next; next = next->next)
 	{
+		xmlNodePtr tree;
 		Icon *icon = (Icon *) next->data;
+		char *tmp;
 
-		g_string_sprintf(tmp, "<%s>, %d, %d, %s\n",
-			icon->item->leafname, icon->x, icon->y, icon->src_path);
-		if (fwrite(tmp->str, 1, tmp->len, file) < tmp->len)
-			goto err;
+		tree = xmlNewTextChild(root, NULL, "icon", icon->src_path);
+
+		tmp = g_strdup_printf("%d", icon->x);
+		xmlSetProp(tree, "x", tmp);
+		g_free(tmp);
+		
+		tmp = g_strdup_printf("%d", icon->y);
+		xmlSetProp(tree, "y", tmp);
+		g_free(tmp);
+
+		xmlSetProp(tree, "label", icon->item->leafname);
 	}
 
-	if (fclose(file))
-	{
-		file = NULL;
-		goto err;
-	}
-
-	file = NULL;
-
-	if (rename(save_new, save))
-		goto err;
-
-	goto out;
-err:
-	delayed_error(_("Could not save pinboard: %s"), g_strerror(errno));
-out:
-	if (file)
-		fclose(file);
-	if (tmp)
-		g_string_free(tmp, TRUE);
-
+	save_new = g_strconcat(save, ".new", NULL);
+	if (save_xml_file(doc, save_new) || rename(save_new, save))
+		delayed_error(_("Error saving pinboard %s: %s"),
+				save, g_strerror(errno));
 	g_free(save_new);
+
 	g_free(save);
+	if (doc)
+		xmlFreeDoc(doc);
 }
 
 /*

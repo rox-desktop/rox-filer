@@ -2,7 +2,7 @@
  * $Id$
  *
  * Collection - a GTK+ widget
- * Copyright (C) 2001, the ROX-Filer team.
+ * Copyright (C) 2002, the ROX-Filer team.
  *
  * The collection widget provides an area for displaying a collection of
  * objects (such as files). It allows the user to choose a selection of
@@ -554,6 +554,7 @@ static void collection_size_request(GtkWidget *widget,
 #endif
 }
 
+#ifdef GTK2
 static gboolean scroll_after_alloc(Collection *collection)
 {
 	if (collection->wink_item != -1)
@@ -564,6 +565,7 @@ static gboolean scroll_after_alloc(Collection *collection)
 
 	return FALSE;
 }
+#endif
 
 static void collection_size_allocate(GtkWidget *widget,
 				GtkAllocation *allocation)

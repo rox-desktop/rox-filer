@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2001, the ROX-Filer team.
+ * Copyright (C) 2002, the ROX-Filer team.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -369,7 +369,7 @@ void delayed_error(char *error, ...)
 	if (old)
 	{
 		delayed_error_data = g_strconcat(old,
-				_("\n--- next error ---\n"),
+				_("\n---\n"),
 				new, NULL);
 		g_free(old);
 		g_free(new);

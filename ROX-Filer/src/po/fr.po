@@ -4,9 +4,9 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 1.1.9\n"
+"Project-Id-Version: ROX-Filer 1.1.10\n"
 "POT-Creation-Date: 2001-12-29 15:10+0000\n"
-"PO-Revision-Date: 2001-12-28 18:04+0100\n"
+"PO-Revision-Date: 2001-12-31 22:29+0100\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -223,7 +223,7 @@ msgstr "Abandonner"
 
 #: action.c:1019
 msgid "Don't confirm every operation"
-msgstr ""
+msgstr "Ne pas confirmer chaque opération"
 
 #: action.c:1063
 #, c-format
@@ -314,6 +314,8 @@ msgid ""
 "!%s\n"
 "Failed to copy '%s'"
 msgstr ""
+"!%s\n"
+"Impossible de copier '%s'"
 
 #: action.c:1530
 #, c-format
@@ -335,11 +337,13 @@ msgid "'Moving %s as %s\n"
 msgstr "'Déplacement de %s vers %s\n"
 
 #: action.c:1577
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Failed to move %s as %s\n"
-msgstr "!ERREUR : impossible de déplacer %s vers %s\n"
+msgstr ""
+"!%s\n"
+"Impossible de déplacer %s vers %s\n"
 
 #: action.c:1614
 msgid "!ERROR: Can't copy object into itself\n"
@@ -380,18 +384,22 @@ msgid "?Unmount %s?\n"
 msgstr "?Démonter %s ?\n"
 
 #: action.c:1700
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Mount failed\n"
-msgstr "!ERREUR : le montage a échoué\n"
+msgstr ""
+"!%s\n"
+"Le montage a échoué\n"
 
 #: action.c:1701
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "!%s\n"
 "Unmount failed\n"
-msgstr "!ERREUR : le démontage a échoué\n"
+msgstr ""
+"!%s\n"
+"Le démontage a échoué\n"
 
 #: action.c:1747
 #, c-format
@@ -490,18 +498,16 @@ msgid "Force"
 msgstr "Forcer"
 
 #: action.c:2076
-#, fuzzy
 msgid "Don't confirm deletion of non-writeable items"
-msgstr "Ne pas confirmer la suppression d'objets protégés contre l'écriture."
+msgstr "Ne pas confirmer la suppression d'objets protégés contre l'écriture"
 
 #: action.c:2079 action.c:2122 tips:100
 msgid "Brief"
 msgstr "Bref"
 
 #: action.c:2079
-#, fuzzy
 msgid "Only log directories being deleted"
-msgstr "Bref - ne lister que les répertoires à supprimer"
+msgstr "Ne lister que les répertoires supprimés"
 
 #: action.c:2095
 msgid "You need to select the items whose permissions you want to change"
@@ -529,18 +535,16 @@ msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Accès public, sauf écriture)"
 
 #: action.c:2122
-#, fuzzy
 msgid "Don't list processed files"
-msgstr "Bref - ne pas lister les fichiers traités"
+msgstr "Ne pas lister les fichiers traités"
 
 #: action.c:2125 tips:102
 msgid "Recurse"
 msgstr "Récursif"
 
 #: action.c:2125
-#, fuzzy
 msgid "Also change contents of subdirectories"
-msgstr "Changer aussi le contenu des sous-répertoires."
+msgstr "Changer aussi le contenu des sous-répertoires"
 
 #: action.c:2129
 msgid "Command:"
@@ -727,13 +731,13 @@ msgid "Directory missing/deleted"
 msgstr "Répertoire manquant/supprimé"
 
 #: filer.c:971
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
 "Press %s on its own to reselect the files later."
 msgstr ""
-"Le groupe %d n'est pas défini. Sélectionnez des fichiers et appuyez sur "
-"<Ctrl>+%d pour le définir. Appuyez seulement sur %d pour resélectionner ces "
+"Le groupe %s n'est pas défini. Sélectionnez des fichiers et appuyez sur "
+"<Ctrl>+%s pour le définir. Appuyez seulement sur %s pour resélectionner ces "
 "fichiers à l'avenir."
 
 #: filer.c:1143
@@ -747,17 +751,16 @@ msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
 #: filer.c:1793
-#, fuzzy
 msgid "Scanning, "
-msgstr " (Lecture)"
+msgstr "Lecture, "
 
 #: filer.c:1794
 msgid "All, "
-msgstr ""
+msgstr "Tous, "
 
 #: filer.c:1795
 msgid "Thumbs, "
-msgstr ""
+msgstr "Imagettes, "
 
 #: filer.c:2044 menu.c:1820
 msgid "Item no longer exists!"
@@ -988,6 +991,8 @@ msgid ""
 "\n"
 "--- next error ---\n"
 msgstr ""
+"\n"
+"--- erreur suivante ---\n"
 
 #: gui_support.c:430
 #, c-format
@@ -1282,13 +1287,12 @@ msgid "features set at compile time"
 msgstr "fonctionnalités fixées à la compilation"
 
 #: main.c:543
-#, fuzzy
 msgid "Old VFS support"
-msgstr "Support VFS"
+msgstr "Ancien support VFS"
 
 #: main.c:548
 msgid "No (incompatible with Large File Support)"
-msgstr ""
+msgstr "non (incompatible avec le support des fichiers longs)"
 
 #: main.c:550
 msgid "No (couldn't find a valid libvfs)"
@@ -1367,9 +1371,8 @@ msgid "Show Hidden"
 msgstr "Montrer les fichiers cachés"
 
 #: menu.c:217
-#, fuzzy
 msgid "Show Thumbnails"
-msgstr "Montrer les fichiers cachés"
+msgstr "Montrer les imagettes"
 
 #: menu.c:220
 msgid "Copy..."
@@ -1813,7 +1816,7 @@ msgstr "Erreur inconnue"
 #: remote.c:767
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr ""
+msgstr "Tentative d'invoquer la méthode SOAP inconnue '%s'"
 
 #: rox_gettext.c:93
 #, c-format
@@ -2264,9 +2267,8 @@ msgid "Translation"
 msgstr "Traduction"
 
 #: tips:2
-#, fuzzy
 msgid "Display messages in..."
-msgstr "Afficher en utilisant de grandes icônes"
+msgstr "Afficher les messages dans..."
 
 #: tips:4
 msgid "Dutch"
@@ -2274,7 +2276,7 @@ msgstr "Néerlandais"
 
 #: tips:5
 msgid "English (no translation)"
-msgstr ""
+msgstr "Anglais (pas de traduction)"
 
 #: tips:6
 msgid "French"
@@ -2306,7 +2308,7 @@ msgstr "Espagnol"
 
 #: tips:13
 msgid "Use the LANG environment variable"
-msgstr ""
+msgstr "Utiliser la variable d'environnement LANG"
 
 #: tips:15
 msgid "Ignore case when sorting"
@@ -2399,15 +2401,16 @@ msgstr ""
 "point sont aussi montrés, sinon ils sont cachés."
 
 #: tips:44
-#, fuzzy
 msgid "Show image thumbnails"
-msgstr "Montrer tous les détails"
+msgstr "Montrer les imagettes"
 
 #: tips:45 tips:46
 msgid ""
 "Load every image file and display it, scaled-down, in the filer window "
 "instead of the normal icon."
 msgstr ""
+"Charger chaque fichier de type image et afficher l'image à taille réduite "
+"dans la fenêtre du filer au lieu de l'icône normale."
 
 #: tips:47
 msgid "Pinboard"
@@ -2466,9 +2469,8 @@ msgid "Background"
 msgstr "Fond"
 
 #: tips:60
-#, fuzzy
 msgid "Single-click to open"
-msgstr "Navigation en simple clic"
+msgstr "Simple clic pour ouvrir"
 
 #: tips:61 tips:130
 msgid ""
@@ -2740,9 +2742,8 @@ msgstr ""
 "bouton 2 (milieu) réutilisera la fenêtre courante."
 
 #: tips:129
-#, fuzzy
 msgid "Single-click navigation in filer windows"
-msgstr "Navigation en simple clic"
+msgstr "Navigation en simple clic dans les fenêtres du filer"
 
 #: tips:131
 msgid "Beep if Tab-completion fails"
@@ -2987,15 +2988,17 @@ msgstr ""
 "que le filer n'a pas la permission d'examiner."
 
 #: tips:183
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type\n"
 "for each regular file, and then chooses a suitable icon for that type.\n"
 "After editing the files, click the re-read button below, or restart the "
 "filer."
 msgstr ""
-"Le filer utilise un ensemble de règles pour deviner le type MIME correct\n"
-"pour chaque fichier et choisit ensuite une icône adéquate pour ce type."
+"Le filer utilise un ensemble de règles pour deviner le type MIME correct de\n"
+"chaque fichier ordinaire et choisit ensuite une icône adéquate pour ce "
+"type.\n"
+"Après avoir édité les fichiers, cliquez sur le bouton relecture ci-dessous "
+"ou relancez le filer."
 
 #: tips:184
 msgid "Show name-to-type rules"
