@@ -287,6 +287,11 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	char *md5, *swidth, *sheight, *ssize, *smtime, *uri;
 	mode_t old_mask;
 
+	/* If the source image was very small, don't bother saving */
+	if (gdk_pixbuf_get_width(full) * gdk_pixbuf_get_height(full) <
+			   (HUGE_WIDTH * HUGE_HEIGHT * 3))
+		return;
+
 	original_width = gdk_pixbuf_get_width(full);
 	original_height = gdk_pixbuf_get_height(full);
 
@@ -399,7 +404,14 @@ static MaskedPixmap *image_from_file(char *path)
 	
 	pixbuf = get_thumbnail_for(path);
 	if (!pixbuf)
+	{
+		if (pixmap_cache_load_via)
+		{
+			filer_create_thumb(pixmap_cache_load_via, path);
+			return NULL;
+		}
 		pixbuf = gdk_pixbuf_new_from_file(path, &error);
+	}
 	if (!pixbuf)
 	{
 		g_print("%s\n", error ? error->message : _("Unknown error"));
@@ -407,6 +419,12 @@ static MaskedPixmap *image_from_file(char *path)
 		return NULL;
 	}
 #else
+	if (pixmap_cache_load_via)
+	{
+		filer_create_thumb(pixmap_cache_load_via, path);
+		return NULL;
+	}
+	
 	pixbuf = gdk_pixbuf_new_from_file(path);
 	if (!pixbuf)
 		return NULL;
@@ -414,13 +432,6 @@ static MaskedPixmap *image_from_file(char *path)
 
 	image = image_from_pixbuf(pixbuf);
 
-#ifdef GTK2
-	/* If the source image was very large, save a thumbnail */
-	if (gdk_pixbuf_get_width(pixbuf) * gdk_pixbuf_get_height(pixbuf) >
-	   (HUGE_WIDTH * HUGE_HEIGHT * 3))
-		save_thumbnail(path, pixbuf, image);
-#endif
-	
 	gdk_pixbuf_unref(pixbuf);
 
 	return image;
@@ -550,12 +561,6 @@ static MaskedPixmap *get_bad_image(void)
 
 static MaskedPixmap *load(char *pathname, gpointer user_data)
 {
-	if (pixmap_cache_load_via)
-	{
-		filer_create_thumb(pixmap_cache_load_via, pathname);
-		return NULL;
-	}
-	
 	return image_from_file(pathname);
 }
 
@@ -652,9 +657,12 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 		{
 			gdk_pixbuf_ref(pixbuf);
 			image = image_from_pixbuf(pixbuf);
-			gdk_pixbuf_unref(pixbuf);
 
 			g_fscache_insert(pixmap_cache, path, image);
+#ifdef GTK2
+			save_thumbnail(path, pixbuf, image);
+#endif
+			gdk_pixbuf_unref(pixbuf);
 			pixmap_unref(image);
 			dir_force_update_path(path);
 		}
