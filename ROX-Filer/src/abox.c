@@ -125,7 +125,7 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 				abox->log_hbox, TRUE, TRUE, 4);
 
 	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(abox->log_hbox), frame, TRUE, TRUE, 0);
+	gtk_box_pack_start_defaults(GTK_BOX(abox->log_hbox), frame);
 	
 	text = gtk_text_view_new();
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
@@ -221,7 +221,7 @@ static void response(GtkDialog *dialog, gint response_id)
 					response_id == GTK_RESPONSE_NO)
 	{
 		abox->question = FALSE;
-		shade(ABOX(abox));
+		shade(abox);
 	}
 }
 
@@ -253,14 +253,15 @@ void abox_log(ABox *abox, const gchar *message, const gchar *style)
 {
 	GtkTextIter end;
 	GtkTextBuffer *text_buffer;
+	GtkTextView *log = GTK_TEXT_VIEW(abox->log);
 
-	text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(abox->log));
+	text_buffer = gtk_text_view_get_buffer(log);
 
 	gtk_text_buffer_get_end_iter(text_buffer, &end);
 	gtk_text_buffer_insert_with_tags_by_name(text_buffer,
 			&end, message, -1, style, NULL);
 	gtk_text_view_scroll_to_mark(
-			GTK_TEXT_VIEW(abox->log),
+			log,
 			gtk_text_buffer_get_mark(text_buffer, "insert"),
 			0.0, FALSE, 0, 0);
 }

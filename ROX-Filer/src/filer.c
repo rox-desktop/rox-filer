@@ -538,8 +538,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	g_free(filer_window->sym_path);
 	g_free(filer_window);
 
-	if (--number_of_windows < 1)
-		gtk_main_quit();
+	one_less_window();
 }
 
 /* Add a single object to a directory display */
@@ -1230,28 +1229,12 @@ GList *filer_selected_items(FilerWindow *filer_window)
 	return g_list_reverse(retval);
 }
 
-int selected_item_number(Collection *collection)
+DirItem *filer_selected_item(FilerWindow *filer_window)
 {
-	int	i;
-	
-	g_return_val_if_fail(collection != NULL, -1);
-	g_return_val_if_fail(IS_COLLECTION(collection), -1);
-	g_return_val_if_fail(collection->number_selected == 1, -1);
-
-	for (i = 0; i < collection->number_of_items; i++)
-		if (collection->items[i].selected)
-			return i;
-
-	g_warning("selected_item: number_selected is wrong\n");
-
-	return -1;
-}
-
-DirItem *selected_item(Collection *collection)
-{
+	Collection *collection = filer_window->collection;
 	int	item;
 
-	item = selected_item_number(collection);
+	item = collection_selected_item_number(collection);
 
 	if (item > -1)
 		return (DirItem *) collection->items[item].data;
@@ -1454,7 +1437,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_container_add(GTK_CONTAINER(filer_window->window), hbox);
 
 	vbox = gtk_vbox_new(FALSE, 0);
-	gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
+	gtk_box_pack_start_defaults(GTK_BOX(hbox), vbox);
 	filer_window->toplevel_vbox = GTK_BOX(vbox);
 	
 	/* If we want a toolbar, create it now */
@@ -1484,7 +1467,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 				GTK_SHADOW_NONE);
 		gtk_container_add(GTK_CONTAINER(viewport), collection);
 		gtk_widget_show_all(viewport);
-		gtk_box_pack_start(GTK_BOX(vbox), viewport, TRUE, TRUE, 0);
+		gtk_box_pack_start_defaults(GTK_BOX(vbox), viewport);
 		filer_window->scrollbar = gtk_vscrollbar_new(adj);
 		gtk_widget_set_size_request(viewport, 4, 4);
 

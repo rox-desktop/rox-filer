@@ -457,8 +457,7 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel)
 	g_free(panel->name);
 	g_free(panel);
 
-	if (--number_of_windows < 1)
-		gtk_main_quit();
+	one_less_window();
 }
 
 static void panel_load_side(Panel *panel, xmlNodePtr side, gboolean after)

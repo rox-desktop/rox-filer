@@ -104,7 +104,7 @@ static Option o_menu_iconsize, o_menu_xterm;
 
 static void save_menus(void);
 static void menu_closed(GtkWidget *widget);
-static void items_sensitive(gboolean state);
+static void shade_file_menu_items(gboolean shaded);
 static void savebox_show(const gchar *action, const gchar *path,
 			 MaskedPixmap *image, SaveCb callback);
 static gint save_to_file(GObject *savebox,
@@ -118,7 +118,6 @@ static void new_file_type(gchar *templ);
 static void do_send_to(gchar *templ);
 static void show_send_to_menu(GList *paths, GdkEvent *event);
 static GList *set_keys_button(Option *option, xmlNode *node, guchar *label);
-static void options_closed(GtkWindow *options, gpointer unused);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -366,21 +365,11 @@ void menuitem_no_shortcuts(GtkWidget *item)
 	menuitem->accel_path = NULL;
 #endif
 }
- 
-static void items_sensitive(gboolean state)
+
+static void shade_file_menu_items(gboolean shaded)
 {
-	int	n = 9;
-	GList	*items, *item;
-
-	items = gtk_container_get_children(GTK_CONTAINER(filer_file_menu));
-	item = items;
-
-	while (item && n--)
-	{
-		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
-		item = item->next;
-	}
-	g_list_free(items);
+	menu_set_items_shaded(filer_file_menu, shaded, 0, 5);
+	menu_set_items_shaded(filer_file_menu, shaded, 6, 3);
 }
 
 /* 'data' is an array of three ints:
@@ -744,16 +733,15 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 		{
 			case 0:
 				g_string_assign(buffer, _("Next Click"));
-				items_sensitive(TRUE);
+				shade_file_menu_items(FALSE);
 				break;
 			case 1:
-				item = selected_item(filer_window->collection);
+				item = filer_selected_item(filer_window);
 				if (!item->image)
 					dir_update_item(filer_window->directory,
 							item->leafname);
-				items_sensitive(TRUE);
-				file_item = selected_item(
-						filer_window->collection);
+				shade_file_menu_items(FALSE);
+				file_item = filer_selected_item(filer_window);
 				g_string_sprintf(buffer, "%s '%s'",
 						basetype_name(file_item),
 						file_item->leafname);
@@ -762,7 +750,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 							TRUE, 6, 1);
 				break;
 			default:
-				items_sensitive(FALSE);
+				shade_file_menu_items(TRUE);
 				g_string_sprintf(buffer, _("%d items"),
 						collection->number_selected);
 				break;
@@ -1225,7 +1213,7 @@ void menu_show_options(gpointer data, guint action, GtkWidget *widget)
 	{
 		number_of_windows++;
 		g_signal_connect(win, "destroy",
-				G_CALLBACK(options_closed), NULL);
+				G_CALLBACK(one_less_window), NULL);
 	}
 }
 
@@ -1716,15 +1704,14 @@ static void keys_changed(gpointer data)
 
 static void select_nth_item(GtkMenuShell *shell, int n)
 {
-	GList	  *items, *nth;
-	GtkWidget *item = NULL;
+	GList	  *items;
+	GtkWidget *item;
 
 	items = gtk_container_get_children(GTK_CONTAINER(shell));
-	nth = g_list_nth(items, n);
+	item = g_list_nth_data(items, n);
 
-	g_return_if_fail(nth != NULL);
+	g_return_if_fail(item != NULL);
 
-	item = (GtkWidget *) (nth->data);
 	g_list_free(items);
 
 	gtk_menu_shell_select_item(shell, item);
@@ -1814,6 +1801,16 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		case FILE_FIND:
 			find(window_with_focus);
 			return;
+		case FILE_SHOW_FILE_INFO:
+		{
+			GList *items;
+
+			items = filer_selected_items(window_with_focus);
+			infobox_show_list(items);
+			g_list_foreach(items, (GFunc) g_free, NULL);
+			g_list_free(items);
+			return;
+		}
 		default:
 			break;
 	}
@@ -1827,7 +1824,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 		return;
 	}
 
-	item = selected_item(collection);
+	item = filer_selected_item(window_with_focus);
 	g_return_if_fail(item != NULL);
 	if (!item->image)
 		item = dir_update_item(window_with_focus->directory,
@@ -1857,14 +1854,11 @@ static void file_op(gpointer data, FileOp action, GtkWidget *widget)
 			break;
 		case FILE_OPEN_FILE:
 			filer_openitem(window_with_focus,
-					selected_item_number(collection),
-					OPEN_SAME_WINDOW | OPEN_SHIFT);
+				collection_selected_item_number(collection),
+				OPEN_SAME_WINDOW | OPEN_SHIFT);
 			break;
 		case FILE_HELP:
 			show_item_help(path, item);
-			break;
-		case FILE_SHOW_FILE_INFO:
-			infobox_new(path);
 			break;
 		case FILE_RUN_ACTION:
 			run_action(item);
@@ -1923,10 +1917,3 @@ static GList *set_keys_button(Option *option, xmlNode *node, guchar *label)
 
 	return g_list_append(NULL, align);
 }
-
-static void options_closed(GtkWindow *options, gpointer unused)
-{
-	if (--number_of_windows == 0)
-		gtk_main_quit();
-}
-

@@ -42,6 +42,7 @@
 #include "appinfo.h"
 #include "dnd.h"	/* For xa_string */
 #include "xml.h"
+#include "mount.h"
 
 typedef struct _FileStatus FileStatus;
 
@@ -62,13 +63,38 @@ static GtkWidget *make_file_says(guchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static guchar *pretty_type(DirItem *file, guchar *path);
-static GtkWidget *make_vbox(guchar *path);
 static void got_response(GObject *window, gint response, gpointer data);
 static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
+
+/* Open each item in a new infobox. Confirms if there are a large
+ * number of items to show.
+ */
+void infobox_show_list(GList *paths)
+{
+	int n;
+
+	n = g_list_length(paths);
+
+	if (n >= 10)
+	{
+		gchar *message;
+		int button;
+
+		message = g_strdup_printf(
+			_("Are you sure you want to open %d windows?"), n);
+		button = get_choice(_("File Information"),
+				message, 2, _("Cancel"), _("Show Info"));
+		g_free(message);
+		if (button != 1)
+			return;
+	}
+
+	g_list_foreach(paths, (GFunc) infobox_new, NULL);
+}
 
 /* Create and display a new info box showing details about this item */
 void infobox_new(const gchar *pathname)
@@ -112,8 +138,7 @@ static void got_response(GObject *window, gint response, gpointer data)
 	else
 	{
 		gtk_widget_destroy(GTK_WIDGET(window));
-		if (--number_of_windows < 1)
-			gtk_main_quit();
+		one_less_window();
 	}
 }
 
@@ -220,7 +245,7 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 	GString		*gstring;
 	struct stat	info;
 	xmlNode 	*prop;
-	gchar		*tmp;
+	gchar		*tmp, *tmp2;
 
 	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
 	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
@@ -246,7 +271,14 @@ static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 		add_row(store, _("Error:"), g_strerror(errno));
 		return view;
 	}
-	
+
+	tmp = g_dirname(path);
+	tmp2 = pathdup(tmp);
+	if (strcmp(tmp, tmp2) != 0)
+		add_row(store, _("Real directory:"), tmp2);
+	g_free(tmp);
+	g_free(tmp2);
+
 	gstring = g_string_new(NULL);
 
 	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
@@ -358,12 +390,8 @@ static GtkWidget *make_file_says(guchar *path)
 #ifdef FILE_B_FLAG
 			argv[2] = path;
 #else
-			tmp = strrchr(path, '/');
-			argv[1] = tmp + 1;
-			if (tmp > path)
-				chdir(g_strndup(path, tmp - path));
-			else
-				chdir("/");
+			argv[1] = (char *) g_basename(path);
+			chdir(g_dirname(path));
 #endif
 			if (execvp(argv[0], argv))
 				fprintf(stderr, "execvp() error: %s\n",
@@ -456,7 +484,19 @@ static guchar *pretty_type(DirItem *file, guchar *path)
 		return g_strdup(_("ROX application"));
 
 	if (file->flags & ITEM_FLAG_MOUNT_POINT)
-		return g_strdup(_("Mount point"));
+	{
+		MountPoint *mp;
+		const char *mounted;
+
+		mounted = mount_is_mounted(path, NULL, NULL)
+			  ? _("mounted") : _("unmounted");
+
+		mp = g_hash_table_lookup(fstab_mounts, path);
+		if (mp)
+			return g_strdup_printf(_("Mount point for %s (%s)"),
+						mp->name, mounted);
+		return g_strdup_printf(_("Mount point (%s)"), mounted);
+	}
 
 	if (file->mime_type)
 		return g_strconcat(file->mime_type->media_type, "/",

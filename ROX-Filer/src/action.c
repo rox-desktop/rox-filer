@@ -674,8 +674,7 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
 
 	g_free(gui_side);
 	
-	if (--number_of_windows < 1)
-		gtk_main_quit();
+	one_less_window();
 }
 
 /* Create two pipes, fork() a child and return a pointer to a GUIside struct

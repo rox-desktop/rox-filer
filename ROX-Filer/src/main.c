@@ -552,6 +552,12 @@ void on_child_death(gint child, CallbackFn callback, gpointer data)
 	g_hash_table_insert(death_callbacks, GINT_TO_POINTER(child), cb);
 }
 
+void one_less_window(void)
+{
+	if (--number_of_windows < 1)
+		gtk_main_quit();
+}
+
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/

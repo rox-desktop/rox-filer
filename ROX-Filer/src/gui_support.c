@@ -255,9 +255,7 @@ static gboolean error_idle_cb(gpointer data)
 	g_free(*error);
 	*error = NULL;
 
-	if (--number_of_windows == 0)
-		gtk_main_quit();
-
+	one_less_window();
 	return FALSE;
 }
 
@@ -307,7 +305,7 @@ gboolean load_file(const char *pathname, char **data_out, long *length_out)
 	
 	if (!g_file_get_contents(pathname, data_out, &len, &error))
 	{
-		delayed_error("%s", error ? error->message : pathname);
+		delayed_error("%s", error->message);
 		g_error_free(error);
 		return FALSE;
 	}

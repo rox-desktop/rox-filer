@@ -293,8 +293,6 @@ static void collection_init(GTypeInstance *instance, gpointer g_class)
 	object->free_item = NULL;
 
 	object->auto_scroll = -1;
-	
-	return;
 }
 
 GtkWidget* collection_new(void)
@@ -508,9 +506,14 @@ static void collection_size_allocate(GtkWidget *widget,
 	
 	if (GTK_WIDGET_REALIZED(widget))
 	{
+		GtkAdjustment 	*vadj = collection->vadj;
+
 		gdk_window_move_resize(widget->window,
 				allocation->x, allocation->y,
 				allocation->width, allocation->height);
+
+		if (vadj)
+			vadj->page_increment = vadj->page_size;
 
 		if (cursor_visible)
 			scroll_to_show(collection, collection->cursor_item);
@@ -672,11 +675,15 @@ static void collection_set_adjustment(Collection    *collection,
 				      GtkAdjustment *vadj)
 {
 	if (vadj)
-		g_return_if_fail (GTK_IS_ADJUSTMENT (vadj));
+		g_return_if_fail(GTK_IS_ADJUSTMENT(vadj));
 	else
 		vadj = GTK_ADJUSTMENT(gtk_adjustment_new(0.0,
-							 0.0, 0.0,
-							 0.0, 0.0, 0.0));
+  							 0.0, 0.0,
+  							 0.0, 0.0, 0.0));
+
+	vadj->step_increment = collection->item_height;
+	vadj->page_increment = vadj->page_size;
+
 	if (collection->vadj == vadj)
 		return;
 
@@ -1450,6 +1457,9 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	collection->item_width = width;
 	collection->item_height = height;
 
+	if (collection->vadj)
+		collection->vadj->step_increment = height;
+
 	if (GTK_WIDGET_REALIZED(widget))
 	{
 		gint		window_width;
@@ -1621,6 +1631,23 @@ int collection_get_item(Collection *collection, int x, int y)
 	}
 
 	return item;
+}
+
+int collection_selected_item_number(Collection *collection)
+{
+	int	i;
+	
+	g_return_val_if_fail(collection != NULL, -1);
+	g_return_val_if_fail(IS_COLLECTION(collection), -1);
+	g_return_val_if_fail(collection->number_selected == 1, -1);
+
+	for (i = 0; i < collection->number_of_items; i++)
+		if (collection->items[i].selected)
+			return i;
+
+	g_warning("collection_selected_item_number: number_selected is wrong");
+
+	return -1;
 }
 
 /* Set the cursor/highlight over the given item. Passing -1

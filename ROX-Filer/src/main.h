@@ -37,5 +37,6 @@ extern Option o_dnd_no_hostnames;
 /* Prototypes */
 int main(int argc, char **argv);
 void on_child_death(gint child, CallbackFn callback, gpointer data);
+void one_less_window(void);
 
 #endif /* _MAIN_H */
