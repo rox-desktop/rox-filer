@@ -759,8 +759,11 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 				shade_file_menu_items(FALSE);
 				file_item = filer_selected_item(filer_window);
 				g_string_sprintf(buffer, "%s '%s'",
-						basetype_name(file_item),
-						file_item->leafname);
+					basetype_name(file_item),
+					g_utf8_validate(file_item->leafname,
+							-1, NULL)
+						? file_item->leafname
+						: _("(bad utf-8)"));
 				if (!can_set_run_action(file_item))
 					menu_set_items_shaded(filer_file_menu,
 							TRUE, 6, 1);

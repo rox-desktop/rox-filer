@@ -1486,7 +1486,15 @@ void filer_set_title(FilerWindow *filer_window)
 	if (!title)
 		title = g_strconcat(filer_window->sym_path, flags, NULL);
 
+	if (!g_utf8_validate(title, -1, NULL))
+	{
+		char *tmp = title;
+		title = to_utf8(tmp);
+		g_free(tmp);
+	}
+
 	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
+
 	g_free(title);
 
 	if (flags[0] != '\0')

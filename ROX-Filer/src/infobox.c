@@ -108,7 +108,9 @@ void infobox_new(const gchar *pathname)
 
 	path = g_strdup(pathname); /* Gets attached to window & freed later */
 
-	window = gtk_dialog_new_with_buttons(path,
+	window = gtk_dialog_new_with_buttons(
+			g_utf8_validate(path, -1, NULL) ? path
+							: _("(bad utf-8)"),
 				NULL, GTK_DIALOG_NO_SEPARATOR,
 				GTK_STOCK_CANCEL, GTK_RESPONSE_DELETE_EVENT,
 				GTK_STOCK_REFRESH, GTK_RESPONSE_APPLY,
@@ -313,7 +315,15 @@ static GtkWidget *make_details(guchar *path, DirItem *item)
 
 	make_list(&store, &view);
 	
-	add_row(store, _("Name:"), item->leafname);
+	if (g_utf8_validate(path, -1, NULL))
+		add_row(store, _("Name:"), item->leafname);
+	else
+	{
+		gchar *u8;
+		u8 = to_utf8(path);
+		add_row(store, _("Name:"), u8);
+		g_free(u8);
+	}
 
 	if (lstat(path, &info))
 	{

@@ -255,16 +255,22 @@ void abox_log(ABox *abox, const gchar *message, const gchar *style)
 	GtkTextIter end;
 	GtkTextBuffer *text_buffer;
 	GtkTextView *log = GTK_TEXT_VIEW(abox->log);
+	gchar *u8 = NULL;
+
+	if (!g_utf8_validate(message, -1, NULL))
+		u8 = to_utf8(message);
 
 	text_buffer = gtk_text_view_get_buffer(log);
 
 	gtk_text_buffer_get_end_iter(text_buffer, &end);
 	gtk_text_buffer_insert_with_tags_by_name(text_buffer,
-			&end, message, -1, style, NULL);
+			&end, u8 ? u8 : message, -1, style, NULL);
 	gtk_text_view_scroll_to_mark(
 			log,
 			gtk_text_buffer_get_mark(text_buffer, "insert"),
 			0.0, FALSE, 0, 0);
+
+	g_free(u8);
 }
 
 static void abox_finalise(GObject *object)
