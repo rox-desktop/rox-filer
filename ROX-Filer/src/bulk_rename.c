@@ -114,7 +114,8 @@ void bulk_rename(const char *dir, GList *items)
 	gtk_entry_set_text(GTK_ENTRY(with_entry), ".html");
 	gtk_tooltips_set_tip(tooltips, with_entry,
 			_("The first match in each filename will be replaced "
-			"by this string. There a no special characters"), NULL);
+			"by this string. "
+			"There are no special characters."), NULL);
 
 	button = gtk_button_new_with_label(_("Apply"));
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
