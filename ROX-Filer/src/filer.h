@@ -11,6 +11,12 @@
 #include <gtk/gtk.h>
 #include "collection.h"
 
+enum {
+	RESIZE_STYLE = 0,
+	RESIZE_ALWAYS = 1,
+	RESIZE_NEVER = 2,
+};
+
 typedef enum
 {
 	OPEN_SHIFT		= 0x01,	/* Do ShiftOpen */

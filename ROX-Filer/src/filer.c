@@ -112,7 +112,7 @@ gboolean o_unique_filer_windows = FALSE;
 
 void filer_init(void)
 {
-	option_add_int("filer_auto_resize", 1, NULL);
+	option_add_int("filer_auto_resize", RESIZE_ALWAYS, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
 			set_unique);
 
@@ -910,7 +910,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
 				filer_window);
-	else if (option_get_int("filer_auto_resize"))
+	else if (option_get_int("filer_auto_resize") == RESIZE_ALWAYS)
 		filer_window_autosize_request(filer_window, 100);
 }
 
