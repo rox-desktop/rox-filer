@@ -1227,13 +1227,55 @@ static gint sort_by_strlen(gconstpointer a, gconstpointer b)
 	return 1;
 }
 
+static char **get_xdg_data_dirs(int *n_dirs)
+{
+	const char *env;
+	char **dirs;
+	int i, n;
+
+	env = getenv("XDG_DATA_DIRS");
+	if (!env)
+		env = "/usr/local/share/:/usr/share/";
+	dirs = g_strsplit(env, ":", 0);
+	g_return_val_if_fail(dirs != NULL, NULL);
+	for (n = 0; dirs[n]; n++)
+		;
+	for (i = n; i > 0; i--)
+		dirs[i] = dirs[i - 1];
+	env = getenv("XDG_DATA_HOME");
+	if (env)
+		dirs[0] = g_strdup(env);
+	else
+		dirs[0] = g_build_filename(g_get_home_dir(), ".local",
+						"share", NULL);
+	*n_dirs = n + 1;
+	return dirs;
+}
+
 /* Clear all currently stored information and re-read everything.
  * Note: calls filer_update_all.
  */
 static void load_mime_types(void)
 {
 	GHashTable *globs;
-	gchar *tmp;
+	char **dirs;
+	int n_dirs;
+	int i;
+
+	dirs = get_xdg_data_dirs(&n_dirs);
+	g_return_if_fail(dirs != NULL);
+
+	{
+		struct stat info;
+		if (lstat(make_path(home_dir, ".mime"), &info) == 0 &&
+		    S_ISDIR(info.st_mode))
+		{
+			delayed_error(_("The ~/.mime directory has moved. "
+				"It should now be ~/.local/share/mime. You "
+				"should move it there (and make a symlink "
+				"from ~/.mime to it for older applications)."));
+		}
+	}
 
 	if (!glob_patterns)
 		glob_patterns = g_ptr_array_new();
@@ -1260,12 +1302,15 @@ static void load_mime_types(void)
 						g_free, NULL);
 	globs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
 
-	import_file("/usr/share/mime/globs", globs);
-	import_file("/usr/local/share/mime/globs", globs);
-
-	tmp = g_strconcat(home_dir, "/.mime/globs", NULL);
-	import_file(tmp, globs);
-	g_free(tmp);
+	for (i = n_dirs - 1; i >= 0; i--)
+	{
+		char *path;
+		path = g_build_filename(dirs[i], "mime", "globs", NULL);
+		import_file(path, globs);
+		g_free(path);
+		g_free(dirs[i]);
+	}
+	g_free(dirs);
 
 	/* Turn the globs hash into a pointer array */
 	g_hash_table_foreach(globs, add_to_glob_patterns, NULL);
