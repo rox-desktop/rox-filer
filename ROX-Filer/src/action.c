@@ -59,6 +59,7 @@
  * F		Force deletion of non-writeable items
  * Q		Quiet toggled
  * E		Entry text changed
+ * W		neWer toggled
  */
 
 #define SENSITIVE_YESNO(gui_side, state)	\
@@ -119,10 +120,12 @@ static FindCondition *find_condition = NULL;	/* For Find */
 static gboolean o_force = FALSE;
 static gboolean o_brief = FALSE;
 static gboolean o_recurse = FALSE;
+static gboolean o_newer = FALSE;
 
 static Option o_action_copy, o_action_move, o_action_link;
 static Option o_action_delete, o_action_mount;
 static Option o_action_force, o_action_brief, o_action_recurse;
+static Option o_action_newer;
 
 /* Whenever the text in these boxes is changed we store a copy of the new
  * string to be used as the default next time.
@@ -739,6 +742,9 @@ static void process_flag(char flag)
 		case 'B':
 			o_brief = !o_brief;
 			break;
+	        case 'W':
+		        o_newer = !o_newer;
+			break;
 		case 'E':
 			read_new_entry_text();
 			break;
@@ -860,7 +866,8 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
  */
 static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 					  gboolean autoq,
-					  int force, int brief, int recurse)
+					  int force, int brief, int recurse,
+					  int newer)
 {
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
@@ -888,6 +895,7 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	o_force = force;
 	o_brief = brief;
 	o_recurse = recurse;
+	o_newer = newer;
 
 	child = fork();
 	switch (child)
@@ -1030,7 +1038,8 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	return start_action_with_options(data, func, autoq,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
-					 o_action_recurse.int_value);
+					 o_action_recurse.int_value,
+					 o_action_newer.int_value);
 }
 
 /* 			ACTIONS ON ONE ITEM 			*/
@@ -1364,12 +1373,19 @@ static void do_copy2(char *path, char *dest)
 
 		merge = S_ISDIR(info.st_mode) && S_ISDIR(dest_info.st_mode);
 
-		g_string_sprintf(message, _("?'%s' already exists - %s?"),
-				dest_path,
+		if (!merge && o_newer && info.st_mtime > dest_info.st_mtime)
+		{
+		  /* Newer; keep going */
+		}
+		else
+		{
+			g_string_sprintf(message,
+				_("?'%s' already exists - %s?"), dest_path,
 				merge ? _("merge contents") : _("overwrite"));
-		
-		if (!reply(from_parent, TRUE))
-			return;
+
+			if (!reply(from_parent, TRUE))
+				return;
+		}
 
 		if (!merge)
 		{
@@ -1524,16 +1540,23 @@ static void do_move2(char *path, char *dest)
 		struct stat	info;
 		int		err;
 
-		g_string_sprintf(message,
-				_("?'%s' already exists - overwrite?"),
-				dest_path);
-		if (!reply(from_parent, TRUE))
-			return;
-
 		if (mc_lstat(dest_path, &info))
 		{
 			send_error();
 			return;
+		}
+
+		if (!is_dir && o_newer && info2.st_mtime > info.st_mtime)
+		{
+			/* Newer; keep going */
+		}
+		else
+		{
+			g_string_sprintf(message,
+					_("?'%s' already exists - overwrite?"),
+					dest_path);
+			if (!reply(from_parent, TRUE))
+				return;
 		}
 
 		if (S_ISDIR(info.st_mode))
@@ -2153,6 +2176,10 @@ void action_copy(GList *paths, char *dest, char *leaf, int quiet)
 		return;
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Copy"));
+	add_toggle(gui_side,
+		   _("Newer"),
+		   _("Only over-write if source is newer than destination."),
+		   "W", o_action_newer.int_value);
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2175,6 +2202,10 @@ void action_move(GList *paths, char *dest, char *leaf, int quiet)
 		return;
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Move"));
+	add_toggle(gui_side,
+		   _("Newer"),
+		   _("Only over-write if source is newer than destination."),
+		   "W", o_action_newer.int_value);
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);
 }
@@ -2204,9 +2235,10 @@ void action_init(void)
 	option_add_int(&o_action_link, "action_link", 1);
 	option_add_int(&o_action_delete, "action_delete", 0);
 	option_add_int(&o_action_mount, "action_mount", 1);
-	option_add_int(&o_action_force, "action_force", o_force);
-	option_add_int(&o_action_brief, "action_brief", o_brief);
-	option_add_int(&o_action_recurse, "action_recurse", o_recurse);
+	option_add_int(&o_action_force, "action_force", FALSE);
+	option_add_int(&o_action_brief, "action_brief", FALSE);
+	option_add_int(&o_action_recurse, "action_recurse", FALSE);
+	option_add_int(&o_action_newer, "action_newer", FALSE);
 }
 
 #define MAX_ASK 4
