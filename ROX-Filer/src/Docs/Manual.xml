@@ -403,123 +403,181 @@ this isn't built in to the filer!).
 
 <section>
   <title>Full list of command-line options</title>
-  <para>
 
-The full list of options is:
+  <variablelist><title>The full list of options is:</title>
 
-\begin{description}
-\item [-b, --bottom=PANEL]open PANEL as a bottom-edge panel
-\item [-d, --dir=DIR]open DIR as directory (not as an application, even
-if it looks like one)
-\item [-h, --help]display help about the various options
-\item [-l, --left=PANEL]open PANEL as a left-edge panel
-\item [-m, --mime-type=FILE]print MIME type of FILE and exit
-\item [-n, --new]start a new filer, even if one already seems to be running
-\item [-o, --override]override window manager control of panels
-\item [-p, --pinboard=PIN]use pinboard PIN as the pinboard
-\item [-r, --right=PANEL]open PANEL as a right-edge panel
-\item [-s, --show=FILE]open a directory showing FILE
-\item [-t, --top=PANEL]open PANEL as a top-edge panel
-\item [-u, --user]show user name in each window
-\item [-x, --examine=FILE]FILE has changed --- re-examine it
-\item [-v, --version]display the version information and exit
-\end{description}
+    <varlistentry><term><option>-b</option></term><term><option>--bottom=PANEL</option></term>
+<listitem><para>open PANEL as a bottom-edge panel.
+</para></listitem></varlistentry>
 
-  </para>
+<varlistentry><term><option>-d</option></term><term><option>--dir=DIR</option></term>
+<listitem><para>open DIR as directory (not as an application, even if it looks
+like one).
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-h</option></term><term><option>--help</option></term>
+<listitem><para>display help about the various options.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-l</option></term><term><option>--left=PANEL</option></term>
+<listitem><para>open PANEL as a left-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-m</option></term><term><option>--mime-type=FILE</option></term>
+<listitem><para>print MIME type of FILE and exit.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-n</option></term><term><option>--new</option></term>
+<listitem><para>start a new filer, even if one already seems to be running.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-o</option></term><term><option>--override</option></term>
+<listitem><para>override window manager control of panels.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-p</option></term><term><option>--pinboard=PIN</option></term>
+<listitem><para>use pinboard PIN as the pinboard.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-r</option></term><term><option>--right=PANEL</option></term>
+<listitem><para>open PANEL as a right-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-s</option></term><term><option>--show=FILE</option></term>
+<listitem><para>open a directory showing FILE.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
+<listitem><para>open PANEL as a top-edge panel.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-u</option></term><term><option>--user</option></term>
+<listitem><para>show user name in each window.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-x</option></term><term><option>--examine=FILE</option></term>
+<listitem><para>FILE has changed --- re-examine it.
+</para></listitem></varlistentry>
+
+<varlistentry><term><option>-v</option></term><term><option>--version</option></term>
+<listitem><para>display the version information and exit.
+</para></listitem></varlistentry>
+
+  </variablelist>
+
 </section>
 </chapter>
 
 <chapter>
   <title>Mouse button and key bindings</title>
-  <para>
 
-Quick start:
+<itemizedlist><title>Quick start:</title>
 
-\begin{itemize}
-\item Click the left%
-\footnote{This documentation assumes that button--1 is the left button, button--2
+  <listitem><para>Click the left
+  <footnote><para>This documentation assumes that button--1 is the left button, button--2
 is the middle button and button--3 is the right button. This is not
-always the case --- for example, in a left-handed setup.
-} mouse button to open files and directories.
-\item Click the right button to get a menu. Click over a file to perform
-an action on that file.
-\item Drag files between windows to copy (left button) or move (middle button)
-them.
-\end{itemize}
-\noindent By default, the mouse button bindings are designed to fit
-in with X conventions. However, the behaviour is highly configurable
---- have a play in the Options window if you don't like the normal
-settings. The normal settings behave as follows:
+always the case --- for example, in a left-handed setup.</para></footnote>
+mouse button to open files and directories.</para></listitem>
 
-\medskip
+  <listitem><para>
+Click the right button to get a menu. Click over a file to perform an action on that file.
+  </para></listitem>
 
-\begin{tabular}{|p{3.8cm}|p{9.5cm}|}
-\hline 
-Key or mouse button&amp;
-Action\\
-\hline
-\hline 
-Left button click  &amp;
-Open the file or directory clicked on.Hold down Ctrl to select things
+  <listitem><para>
+Drag files between windows to copy (left button) or move (middle button) them.
+  </para></listitem>
+
+</itemizedlist>
+
+  <para>
+By default, the mouse button bindings are designed to fit in with X
+conventions. However, the behaviour is highly configurable --- have a play in
+the Options window if you don't like the normal settings. The normal settings
+behave as follows:
+  </para>
+
+<table><title>Mouse button and key bindings</title>
+<tgroup cols="2">
+<thead><row><entry>Key or mouse button</entry><entry>Action</entry></row></thead>
+
+<tbody>
+
+<row><entry>Left button click</entry><entry>
+Open the file or directory clicked on. Hold down Ctrl to select things
 instead of opening them.Hold down Shift to look inside applications,
-treat files as text, follow symlinks or mount devices.\\
-\hline
-Middle button click&amp;
-Same as left click, but open a directory in a new window or close
-the viewer when opening a file.\\
-\hline
-Right button click&amp;
-Open the main menu. Hold down Ctrl while clicking to go directly to
-the Selection submenu.\\
-\hline
-Drag an item  (left mouse button)&amp;
+treat files as text, follow symlinks or mount devices.
+</entry></row>
+
+<row><entry>Middle button click</entry><entry>
+Same as left click, but open a directory in a new window or close the viewer
+when opening a file.
+</entry></row>
+
+<row><entry>Right button click</entry><entry>
+Open the main menu. Hold down Ctrl while clicking to go directly to the
+Selection submenu.
+</entry></row>
+
+<row><entry>Drag an item  (left mouse button)</entry><entry>
 Copy the file(s) to the destination (an application or another filer
-window).Hold down Shift to move the file, or Ctrl+Shift to create
-a symbolic link.\\
-\hline
-Drag an item (middle mouse button)&amp;
-As above, but always moves rather than copying or symlinking.\\
-\hline
-Drag (not over an item)  &amp;
+window). Hold down Shift to move the file, or Ctrl+Shift to create
+a symbolic link.
+</entry></row>
+
+<row><entry>Drag an item (middle mouse button)</entry><entry>
+As above, but always moves rather than copying or symlinking.
+</entry></row>
+
+<row><entry>Drag (not over an item)</entry><entry>
 Select a group of items by dragging a box around them. With the left
 mouse button, only the filesin the box will be selected. If you hold
 down Ctrl then the boxed items are added to the selection.If you use
 the middle button then the boxed items switch between being selected
-and unselected.\\
-\hline
-Double-click background&amp;
-Resize the window to a sensible size.\\
-\hline
-Backspace&amp;
-Change to viewing the parent directory.\\
-\hline
-Cursor keys&amp;
-Move the cursor around.\\
-\hline
-Page Up, Page Down&amp;
-Move up and down in steps of ten rows at a time.\\
-\hline
-Home, End&amp;
-Move to the first/last entry in the directory.\\
-\hline
-Return&amp;
-Acts like clicking on the file. You may hold down Shift for other
-effects, as with clicking.\\
-\hline
-Spacebar&amp;
-Toggles the item under the cursor between being selected and unselected,
-and moves to the next item.\\
-\hline
-Tab, Shift+Tab&amp;
-Moves the cursor to the next/previous selected item.\\
-\hline
-\end{tabular}
+and unselected.
+</entry></row>
 
-\medskip\noindent Other keys can easily be defined by opening the
+<row><entry>Double-click background</entry><entry>
+Resize the window to a sensible size.
+</entry></row>
+
+<row><entry>Backspace</entry><entry>
+Change to viewing the parent directory.
+</entry></row>
+
+<row><entry>Cursor keys</entry><entry>
+Move the cursor around.
+</entry></row>
+
+<row><entry>
+Page Up, Page Down</entry><entry>
+Move up and down in steps of ten rows at a time.
+</entry></row>
+
+<row><entry>Home, End</entry><entry>
+Move to the first/last entry in the directory.
+</entry></row>
+
+<row><entry>Return</entry><entry>
+Acts like clicking on the file. You may hold down Shift for other
+effects, as with clicking.
+</entry></row>
+
+<row><entry>Spacebar</entry><entry>
+Toggles the item under the cursor between being selected and unselected,
+and moves to the next item.
+</entry></row>
+
+<row><entry>Tab, Shift+Tab</entry><entry>
+Moves the cursor to the next/previous selected item.
+</entry></row>
+
+</tbody></tgroup></table>
+
+  <para>
+Other keys can easily be defined by opening the
 menu, moving the pointer over the item you want to use and pressing
 a key. The key will appear in the menu and can be used from then on.
 Key bindings are automatically saved when the filer quits.
-
 
   </para>
 </chapter>
@@ -527,20 +585,26 @@ Key bindings are automatically saved when the filer quits.
 <chapter>
   <title>The selection</title>
   <para>
-
-While items are selected in a <application>ROX-Filer</application> window the filer has the global
-selection. You can then paste into another window to get the pathnames
-of the selected files. For example, if you want to load a file into
-an application that doesn't support drag-and-drop:
-
-\begin{enumerate}
-\item Open the application's `Open' dialog box.
-\item Ctrl-click on the file in <application>ROX-Filer</application> to select it.
-\item Click the middle button in the filename box in the application to
-paste the name in.
-\end{enumerate}
-
+While items are selected in a <application>ROX-Filer</application> window,
+the filer has the global selection. You can then paste into another window to
+get the pathnames of the selected files.
   </para>
+
+<procedure>
+  <title>Example: loading a file into an application that doesn't support drag-and-drop:</title>
+
+  <step><para>Open the application's <guilabel>Open</guilabel> dialog box.</para></step>
+
+  <step><para>
+Ctrl-click on the file in <application>ROX-Filer</application> to select it.
+  </para></step>
+
+  <step><para>
+Click the middle button in the filename box in the application to
+paste the name in.
+  </para></step>
+</procedure>
+
 </chapter>
 
 <chapter>
@@ -554,42 +618,48 @@ mouse button (1). However, many tools can perform a related function
 if clicked on with buttons 2 or 3 (middle or right).
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{4.5cm}|p{5.5cm}|}
-\hline 
-Icon&amp;
-Mouse button 1&amp;
-Other button\\
-\hline
-\hline 
-Cross&amp;
-Close the window&amp;
-Open a new window\\
-\hline 
-Up arrow&amp;
-Change to parent directory&amp;
-Show parent in a new window\dag\\
-\hline
-House&amp;
-Change to home directory&amp;
-Show home in a new window\dag\\
-\hline
-Looping arrows&amp;
-Reread the directory contents&amp;
-Open a new window\\
-\hline
-Magnifying glass&amp;
-Make icons bigger&amp;
-Make icons smaller\\
-\hline
-List&amp;
-Hide or show extra details&amp;
-Same\\
-\hline
-Information&amp;
-Show <application>ROX-Filer</application>'s help files&amp;
-Same\\
-\hline
-\end{tabular}\par}
+<table><title>The toolbar</title><tgroup cols="3">
+
+<thead>
+<row><entry> 
+Icon</entry><entry>
+Mouse button 1</entry><entry>
+Other button
+</entry></row>
+
+</thead>
+<tbody>
+
+<row><entry>
+Cross</entry><entry>
+Close the window</entry><entry>
+Open a new window
+</entry></row><row><entry> 
+Up arrow</entry><entry>
+Change to parent directory</entry><entry>
+Show parent in a new window\dag
+</entry></row><row><entry>
+House</entry><entry>
+Change to home directory</entry><entry>
+Show home in a new window\dag
+</entry></row><row><entry>
+Looping arrows</entry><entry>
+Reread the directory contents</entry><entry>
+Open a new window
+</entry></row><row><entry>
+Magnifying glass</entry><entry>
+Make icons bigger</entry><entry>
+Make icons smaller
+</entry></row><row><entry>
+List</entry><entry>
+Hide or show extra details</entry><entry>
+Same
+</entry></row><row><entry>
+Information</entry><entry>
+Show <application>ROX-Filer</application>'s help files</entry><entry>
+Same
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 \noindent\dag{}If the 'New window on button 1' option is turned on
@@ -621,28 +691,27 @@ key when opening the menu. Here is a full description of each menu
 item:
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{10cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-Select All&amp;
-Select every item in this window.\\
-\hline
-Clear Selection&amp;
-Unselect every item in this window.\\
-\hline
-Options...&amp;
-Configure <application>ROX-Filer</application>.\\
-\hline
-New&amp;
-Create a new file or subdirectory inside this directory.\\
-\hline
-Xterm Here&amp;
-Open an xterm with its current directory set to this directory.\\
-\hline
-\end{tabular}\par}
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+Select All</entry><entry>
+Select every item in this window.
+</entry></row><row><entry>
+Clear Selection</entry><entry>
+Unselect every item in this window.
+</entry></row><row><entry>
+Options...</entry><entry>
+Configure <application>ROX-Filer</application>.
+</entry></row><row><entry>
+New</entry><entry>
+Create a new file or subdirectory inside this directory.
+</entry></row><row><entry>
+Xterm Here</entry><entry>
+Open an xterm with its current directory set to this directory.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
   
   </para>
@@ -652,63 +721,62 @@ Open an xterm with its current directory set to this directory.\\
   <para>
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{10cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-Huge Icons&amp;
-Extra large icons (mainly useful with thumbnails, see below).\\
-\hline 
-Large Icons&amp;
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+Huge Icons</entry><entry>
+Extra large icons (mainly useful with thumbnails, see below).
+</entry></row><row><entry> 
+Large Icons</entry><entry>
 Each object in the directory is shown as a large icon with its name
-below.\\
-\hline
-Small Icons&amp;
+below.
+</entry></row><row><entry>
+Small Icons</entry><entry>
 Items are drawn smaller than usual, allowing you to see more files
-at once.\\
-\hline
-Huge, With...&amp;
-As for `Large, With...', but with extra large icons.\\
-\hline
-Large, With...     &amp;
+at once.
+</entry></row><row><entry>
+Huge, With...</entry><entry>
+As for `Large, With...', but with extra large icons.
+</entry></row><row><entry>
+Large, With...     </entry><entry>
 Entries are displayed along with some extra details:\textbf{Summary}
 shows the file permissions, owner, group, size and modification time.\textbf{Sizes}
 shows just the size of each file (not directories).\textbf{Permissions}
 shows just the permissions and owner.\textbf{Type} shows the MIME
 type of each file.\textbf{Times} shows the times the file was last
-accessed, modifed and changed.\dag\\
-\hline
-Small, With...&amp;
-As above, but with a smaller icon and all on one line.\\
-\hline
-Sort by Name&amp;
-Items are arranged by name. There is an option to make this case-sensitive.\\
-\hline
-Sort by Type&amp;
+accessed, modifed and changed.\dag
+</entry></row><row><entry>
+Small, With...</entry><entry>
+As above, but with a smaller icon and all on one line.
+</entry></row><row><entry>
+Sort by Name</entry><entry>
+Items are arranged by name. There is an option to make this case-sensitive.
+</entry></row><row><entry>
+Sort by Type</entry><entry>
 Items are grouped by their types and then sorted by name within the
-groups.\\
-\hline
-Sort by Date&amp;
-Most recently modified first.\\
-\hline
-Sort by Size&amp;
-Largest first.\\
-\hline
-Show Hidden&amp;
-If on, files beginning with a dot are shown, otherwise they are hidden.\\
-\hline
-Refresh &amp;
+groups.
+</entry></row><row><entry>
+Sort by Date</entry><entry>
+Most recently modified first.
+</entry></row><row><entry>
+Sort by Size</entry><entry>
+Largest first.
+</entry></row><row><entry>
+Show Hidden</entry><entry>
+If on, files beginning with a dot are shown, otherwise they are hidden.
+</entry></row><row><entry>
+Refresh </entry><entry>
 Rereads the contents of the directory and details of all the files
-in it.Use this if the display becomes out-of-date.\\
-\hline
-Create Thumbs &amp;
+in it.Use this if the display becomes out-of-date.
+</entry></row><row><entry>
+Create Thumbs </entry><entry>
 Tries to load every file as an image and use that image as the file's
 icon. Usefulif you have a directory full of photos and can't remember
-which is which!\\
-\hline
-\end{tabular}\par}
+which is which!
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 \noindent\dag\thinspace{} Reading a file's contents or listing a directory
@@ -786,66 +854,65 @@ top of this submenu when you click over them --- see section \ref{AppDir}
 for details.
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{10cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-Copy...&amp;
-Make a copy of this object.\\
-\hline
-Rename...&amp;
-Change the name used for this object, or move it between directories.\\
-\hline
-Link...&amp;
-Create a symbolic link to this name. \dag\\
-\hline
-Shift Open    &amp;
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+Copy...</entry><entry>
+Make a copy of this object.
+</entry></row><row><entry>
+Rename...</entry><entry>
+Change the name used for this object, or move it between directories.
+</entry></row><row><entry>
+Link...</entry><entry>
+Create a symbolic link to this name. \dag
+</entry></row><row><entry>
+Shift Open    </entry><entry>
 Opens applications as directories, files as text/plain, mount pointsby
 mounting or unmounting them and symlinks by opening the directorycontaining
 the thing they point to.This is the same effect as clicking with Shift
 held down. The text of the menuentry changes to show which action
-will be performed.\\
-\hline
-Help&amp;
+will be performed.
+</entry></row><row><entry>
+Help</entry><entry>
 Explain what kind of thing is selected. For applications, display
-the help files.\\
-\hline
-Info&amp;
-Display extra information about this object.\\
-\hline
-Set Run Action... &amp;
+the help files.
+</entry></row><row><entry>
+Info</entry><entry>
+Display extra information about this object.
+</entry></row><row><entry>
+Set Run Action... </entry><entry>
 Allows you to set the default program to use when opening files of
-this type.See section \ref{sec: RunAction} for details.\\
-Set Icon... &amp;
+this type.See section \ref{sec: RunAction} for details.
+Set Icon... </entry><entry>
 You can give each file or directory its own special icon using this
-feature --- simplydrag a suitable image onto the Set Icon dialog box.\\
-\hline
-Open (A)VFS&amp;
-Open the file as if it was a directory --- see section \ref{sec: vfs}.\\
-\hline
-Send To...&amp;
+feature --- simplydrag a suitable image onto the Set Icon dialog box.
+</entry></row><row><entry>
+Open (A)VFS</entry><entry>
+Open the file as if it was a directory --- see section \ref{sec: vfs}.
+</entry></row><row><entry>
+Send To...</entry><entry>
 Opens the `Send To' menu, allowing you to send the selected files
-to one of a list of applications. See section \ref{SendTo}.\\
-\hline
-Delete  &amp;
+to one of a list of applications. See section \ref{SendTo}.
+</entry></row><row><entry>
+Delete  </entry><entry>
 Remove all the selected entries from the directory.Subdirectories
 will have their contents deleted first.Deleting symlinks only removes
-the link, not the thing it points to.\\
-\hline
-Disk Usage &amp;
+the link, not the thing it points to.
+</entry></row><row><entry>
+Disk Usage </entry><entry>
 Count the sizes of all the selected items. Directories also have theircontents
-counted. Symlinks count themselves, not the things they point to.\\
-\hline
-Permissions&amp;
-Allows you to change the permissions for the selected files.\\
-\hline
-Find&amp;
+counted. Symlinks count themselves, not the things they point to.
+</entry></row><row><entry>
+Permissions</entry><entry>
+Allows you to change the permissions for the selected files.
+</entry></row><row><entry>
+Find</entry><entry>
 Search for files by specifying various conditions --- see section
-\ref{sec: Searching}.\\
-\hline
-\end{tabular}\par}
+\ref{sec: Searching}.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 \noindent\dag\thinspace{}A symbolic link stores the \emph{location}
@@ -870,22 +937,21 @@ or directory. There are two standard entries; the others are the contents
 of your <filename>&lt;Choices&gt;/Templates</filename> directory, if it exists.
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{9cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-Directory&amp;
-Create a new directory.\\
-\hline
-File&amp;
-Create a blank file.\\
-\hline
-&lt;user entries&gt;&amp;
-Copy a file from your Templates directory.\\
-\hline
-\end{tabular}\par}
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+Directory</entry><entry>
+Create a new directory.
+</entry></row><row><entry>
+File</entry><entry>
+Create a blank file.
+</entry></row><row><entry>
+&lt;user entries&gt;</entry><entry>
+Copy a file from your Templates directory.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 To add your own entries, create a new directory called
@@ -922,44 +988,43 @@ entries at present.
   <para>
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{9cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-Parent, New Window&amp;
-Open a new window displaying this window's parent.\\
-\hline
-Parent, Same Window&amp;
-As above, but reuse this window.\\
-\hline
-New Window&amp;
-Open another window onto this directory.\\
-\hline
-Home Directory&amp;
-Change to your home directory.\\
-\hline
-Resize Window&amp;
-Set the window to a sensible size for its contents.\\
-\hline
-Close Window&amp;
-Close this window.\\
-\hline
-Enter Path...&amp;
-Open the path-entry box (see section \ref{sec: mini}).\\
-\hline
-Shell Command...&amp;
-Open the shell command box (see section \ref{sec: mini}).\\
-\hline
-Select If...&amp;
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+Parent, New Window</entry><entry>
+Open a new window displaying this window's parent.
+</entry></row><row><entry>
+Parent, Same Window</entry><entry>
+As above, but reuse this window.
+</entry></row><row><entry>
+New Window</entry><entry>
+Open another window onto this directory.
+</entry></row><row><entry>
+Home Directory</entry><entry>
+Change to your home directory.
+</entry></row><row><entry>
+Resize Window</entry><entry>
+Set the window to a sensible size for its contents.
+</entry></row><row><entry>
+Close Window</entry><entry>
+Close this window.
+</entry></row><row><entry>
+Enter Path...</entry><entry>
+Open the path-entry box (see section \ref{sec: mini}).
+</entry></row><row><entry>
+Shell Command...</entry><entry>
+Open the shell command box (see section \ref{sec: mini}).
+</entry></row><row><entry>
+Select If...</entry><entry>
 Select just those files that match the given pattern --- see section
-\ref{sec: SelectIf}.\\
-\hline
-Show ROX-Filer Help&amp;
-Same as selecting ROX-Filer and choosing `Help' from the menu.\\
-\hline
-\end{tabular}\par}
+\ref{sec: SelectIf}.
+</entry></row><row><entry>
+Show ROX-Filer Help</entry><entry>
+Same as selecting ROX-Filer and choosing `Help' from the menu.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
   </para>
@@ -1019,29 +1084,28 @@ only removes the link. This is different to most other filers...
 These menus are both the same, and very simple:
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{10cm}|}
-\hline 
-Entry&amp;
-Action\\
-\hline
-\hline 
-ROX-Filer&amp;
-Show the filer's help, edit the options or open your home directory.\\
-\hline 
-File `file'&amp;
-Offers a smaller version of the filer's submenu of the same name.\\
-\hline 
-Edit Item&amp;
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Entry</entry><entry>
+Action
+</entry></row><row><entry> 
+ROX-Filer</entry><entry>
+Show the filer's help, edit the options or open your home directory.
+</entry></row><row><entry> 
+File `file'</entry><entry>
+Offers a smaller version of the filer's submenu of the same name.
+</entry></row><row><entry> 
+Edit Item</entry><entry>
 Change the name displayed under the icon, or the pathname the item
-points to.\\
-\hline 
-Show Location&amp;
-Open a directory viewer showing where the file is stored.\\
-\hline 
-Remove Item(s)&amp;
-Remove the selected items from the pinboard or panel.\\
-\hline
-\end{tabular}\par}
+points to.
+</entry></row><row><entry> 
+Show Location</entry><entry>
+Open a directory viewer showing where the file is stored.
+</entry></row><row><entry> 
+Remove Item(s)</entry><entry>
+Remove the selected items from the pinboard or panel.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 \noindent If you are setting up the defaults for multiple users and
@@ -1202,21 +1266,21 @@ between directories, or for selecting a full pathname from somewhere
 else and pasting it directly into the path-entry box.
 
 \vspace{0.3cm}
-{\centering \begin{tabular}{|c|p{8cm}|}
-\hline 
-Key&amp;
-Action\\
-\hline
-Return&amp;
-Open the currently selected item.\\
-\hline
-Tab&amp;
-Shell-style tab completion.\\
-\hline
-Up, Down&amp;
-Select the previous/next matching entry.\\
-\hline
-\end{tabular}\par}
+<table><title>Title</title><tgroup cols="2"><tbody>
+<row><entry> 
+Key</entry><entry>
+Action
+</entry></row><row><entry>
+Return</entry><entry>
+Open the currently selected item.
+</entry></row><row><entry>
+Tab</entry><entry>
+Shell-style tab completion.
+</entry></row><row><entry>
+Up, Down</entry><entry>
+Select the previous/next matching entry.
+</entry></row>
+</tbody></tgroup></table>
 \vspace{0.3cm}
 
 If you start entering a name beginning with a `.' then the `Show Hidden'
