@@ -106,10 +106,14 @@ static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
 static void find(gpointer data, guint action, GtkWidget *widget);
 
+#ifdef HAVE_LIBVFS
 static void open_vfs_rpm(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_utar(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_uzip(gpointer data, guint action, GtkWidget *widget);
 static void open_vfs_deb(gpointer data, guint action, GtkWidget *widget);
+#else
+static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget);
+#endif
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -137,7 +141,9 @@ static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*file_shift_item;	/* Shift Open label */
 GtkWidget	*display_large_menu;	/* Display->Large With... */
 GtkWidget	*display_small_menu;	/* Display->Small With... */
+#ifdef HAVE_LIBVFS
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
+#endif
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 
@@ -191,11 +197,15 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Info"),		NULL, show_file_info, 0, NULL},
 {">" N_("Set Run Action..."),	NULL, run_action, 0, NULL},
 {">" N_("Set Icon..."),		NULL, set_icon, 0, NULL},
+#ifdef HAVE_LIBVFS
 {">" N_("Open VFS"),		NULL, NULL, 0, "<Branch>"},
 {">>" N_("Unzip"),		NULL, open_vfs_uzip, 0, NULL},
 {">>" N_("Untar"),		NULL, open_vfs_utar, 0, NULL},
 {">>" N_("Deb"),              	NULL, open_vfs_deb, 0, NULL},
 {">>" N_("RPM"),		NULL, open_vfs_rpm, 0, NULL},
+#else
+{">" N_("Open AVFS"),		NULL, open_vfs_avfs, 0, NULL},
+#endif
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Delete"),	    	NULL, delete, 0,	NULL},
 {">" N_("Disk Usage"),		NULL, usage, 0, NULL},
@@ -275,7 +285,9 @@ void menu_init(void)
 
 	GET_MENU_ITEM(filer_menu, "filer");
 	GET_SMENU_ITEM(filer_file_menu, "filer", "File");
+#ifdef HAVE_LIBVFS
 	GET_SSMENU_ITEM(filer_vfs_menu, "filer", "File", "Open VFS");
+#endif
 	GET_SSMENU_ITEM(filer_hidden_menu, "filer", "Display", "Show Hidden");
 
 	GET_SSMENU_ITEM(display_large_menu, "filer",
@@ -373,6 +385,7 @@ static void items_sensitive(gboolean state)
 	}
 	g_list_free(items);
 
+#ifdef HAVE_LIBVFS
 	items = item = gtk_container_children(GTK_CONTAINER(filer_vfs_menu));
 	while (item)
 	{
@@ -380,6 +393,7 @@ static void items_sensitive(gboolean state)
 		item = item->next;
 	}
 	g_list_free(items);
+#endif
 }
 
 void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
@@ -1030,6 +1044,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 			item);
 }
 
+#ifdef HAVE_LIBVFS
 #define OPEN_VFS(fs)		\
 static void open_vfs_ ## fs (gpointer data, guint action, GtkWidget *widget) \
 {							\
@@ -1073,6 +1088,39 @@ OPEN_VFS(rpm)
 OPEN_VFS(utar)
 OPEN_VFS(uzip)
 OPEN_VFS(deb)
+#else
+static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget)
+{
+	gchar		*path;
+	DirItem		*item;
+	Collection 	*collection;
+
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected < 1)	
+	{
+		filer_target_mode(window_with_focus, target_callback,
+					open_vfs_avfs,
+					_("Look inside ... ?"));
+		return;
+	}
+	else if (collection->number_selected != 1)
+	{
+		report_error(PROJECT, _("You must select a single file "
+				"to open as a Virtual File System"));
+		return;
+	}
+
+	item = selected_item(collection);
+
+	path = g_strconcat(window_with_focus->path,
+			"/", item->leafname, "#", NULL);
+
+	filer_change_to(window_with_focus, path, NULL);
+	g_free(path);
+}
+#endif
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)
 {
