@@ -17,7 +17,7 @@ print "Version $a.$b.$c --- OK?\n";
 
 <STDIN> =~ /^[yY]/ or die "OK, fix the version number!\n";
 
-system "cvs tag Release-$a-$b-$c";
+system "cvs tag -f Release-$a-$b-$c";
 
 chdir;
 
