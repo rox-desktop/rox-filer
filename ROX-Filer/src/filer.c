@@ -392,6 +392,7 @@ static void update_display(Directory *dir,
 					collection_set_cursor_item(collection,
 							cursor);
 					filer_window->mini_cursor_base = cursor;
+					filer_window->had_cursor = FALSE;
 				}
 				else
 					collection_wink_item(collection,
