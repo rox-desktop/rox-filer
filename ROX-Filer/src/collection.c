@@ -937,6 +937,8 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 			return_pressed(collection);
 			break;
 		case GDK_Escape:
+			if (!collection->target_cb)
+				return FALSE;		/* Pass it on */
 			collection_target(collection, NULL, NULL);
 			break;
 		case ' ':

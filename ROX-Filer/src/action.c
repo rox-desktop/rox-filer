@@ -247,20 +247,35 @@ static char *action_auto_quiet(char *data)
 
 /*			SUPPORT				*/
 
-/* TRUE iff `sub' is (or would be) an object inside the directory `parent' */
+/* TRUE iff `sub' is (or would be) an object inside the directory `parent',
+ * (or the two are the same directory)
+ */
 static gboolean is_sub_dir(char *sub, char *parent)
 {
-	int parent_len;
+	int 		parent_len;
+	guchar		*real_sub, *real_parent;
+	gboolean	retval;
 
-	parent_len = strlen(parent);
-	if (strncmp(parent, sub, parent_len))
-		return FALSE;
+	real_sub = pathdup(sub);
+	real_parent = pathdup(parent);
 
-	/* sub is at least as long as parent and all characters upto
-	 * parent's length match.
-	 */
+	parent_len = strlen(real_parent);
+	if (strncmp(real_parent, real_sub, parent_len))
+		retval = FALSE;
+	else
+	{
+		/* real_sub is at least as long as real_parent and all
+		 * characters upto real_parent's length match.
+		 */
 
-	return sub[parent_len] == 0 || sub[parent_len] == '/';
+		retval = real_sub[parent_len] == 0
+			|| real_sub[parent_len] == '/';
+	}
+
+	g_free(real_sub);
+	g_free(real_parent);
+
+	return retval;
 }
 
 static gboolean display_dir(gpointer data)
@@ -964,7 +979,6 @@ static gboolean do_copy2(char *path, char *dest)
 
 /* Copy path to dest.
  * Check that path not copied into itself.
- * path and dest are real paths (coming from the filer)
  */
 static gboolean do_copy(char *path, char *dest)
 {
@@ -980,7 +994,6 @@ static gboolean do_copy(char *path, char *dest)
 
 /* Move path to dest.
  * Check that path not moved into itself.
- * path and dest are real paths (coming from the filer)
  */
 static gboolean do_move(char *path, char *dest)
 {
