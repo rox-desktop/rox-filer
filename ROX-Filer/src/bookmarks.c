@@ -332,11 +332,28 @@ static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
 	gtk_widget_destroy(window);
 }
 
+static void cell_edited(GtkCellRendererText *cell,
+	     const gchar *path_string,
+	     const gchar *new_text,
+	     gpointer data)
+{
+	GtkTreeModel *model = (GtkTreeModel *) data;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+
+	path = gtk_tree_path_new_from_string (path_string);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_path_free (path);
+
+	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, new_text, -1);
+}
+
 static void bookmarks_edit(GtkMenuShell *item, gpointer data)
 {
 	GtkListStore *model;
 	GtkWidget *list, *frame, *hbox, *button;
 	GtkTreeSelection *selection;
+	GtkCellRenderer *cell;
 	xmlNode *node;
 
 	if (bookmarks_window)
@@ -364,9 +381,12 @@ static void bookmarks_edit(GtkMenuShell *item, gpointer data)
 
 	list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
 	
-
+	cell = gtk_cell_renderer_text_new();
+	g_signal_connect(G_OBJECT(cell), "edited",
+		    G_CALLBACK(cell_edited), model);
+	g_object_set(G_OBJECT(cell), "editable", TRUE, NULL);
 	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(list), -1,
-		NULL, gtk_cell_renderer_text_new(), "text", 0, NULL);
+		NULL, cell, "text", 0, NULL);
 	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(list), TRUE);
 	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(list), FALSE);
 
