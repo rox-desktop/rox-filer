@@ -35,7 +35,7 @@
   </authorgroup>
 
   <copyright>
-   <year>2002</year>
+   <year>2003</year>
    <holder>Thomas Leonard</holder>
   </copyright>
 
@@ -1295,14 +1295,6 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ce
   <entry>Ouvre un xterm avec ce dossier comme dossier courant, et ferme la fenêtre du filer automatiquement.</entry>
  </row>
 
- <row>
-  <entry><guimenuitem>Voir l'aide de ROX-Filer</guimenuitem></entry>
-  <entry>
-   Comme si vous affichiez le dossier-application ROX-Filer, et que vous 
-   choisissiez <guimenuitem>Aide</guimenuitem> dans le menu sélection.
-  </entry>
- </row>
-
 </tbody></tgroup></informaltable>
   </para>
 </sect1>
@@ -1364,7 +1356,7 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ce
   <guimenuitem>Personnaliser</guimenuitem> qui se trouve en bas du menu ; elle créera si 
   nécessaire le dossier <filename>SendTo</filename> et l'ouvrira. 
   Vous pouvez placer dans ce dossier des liens symboliques en glissant/déposant des applications 
-  avec les touches <keycap>Control</keycap> et <keycap>Shift</keycap> maintenues enfoncées.
+  et en choisissant <guimenuitem>Lier</guimenuitem> dans le menu qui apparaît.
  </para>
  <para>
   L'affichage du menu 'Envoyer à...' via le menu principal est plutôt lent ; vous devriez l'ouvrir 
@@ -1551,7 +1543,7 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
 	  Lorsque le dossier de l'appliquette sera glissé sur un panneau, ROX-Filer lancera cet 
 	  exécutable avec pour argument un identifiant XID, correspondant à une fenêtre-socket 
 	  pour ce panneau. Vous pouvez utiliser l'identifiant pour créer une widget GtkPlug.
-	  Un exemple d'appliquette (en Python) est disponible ici : <ulink url="http://rox.sourceforge.net/applets.php3"/>
+	  Un exemple d'appliquette (en Python) est disponible ici : <ulink url="http://rox.sourceforge.net/applets.html"/>
      </para>
 	</step>
 
@@ -3202,7 +3194,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 
   <refsect1>
    <title>LICENCE</title>
-   <para>Copyright (C) 2002 Thomas Leonard.</para>
+   <para>Copyright (C) 2003 Thomas Leonard.</para>
    <para>
 	Vous pouvez redistribuer des copies de ROX-Filer si vous respectez les termes de la GNU General Public License.
    </para>
@@ -3212,7 +3204,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
    <title>BUGS</title>
    <para>
 	   Merci d'envoyer (en anglais) vos rapports de bugs à la liste de diffusion 
-	   consacrée au développement : <ulink url="http://rox.sourceforge.net/contact.php3"/>.
+	   consacrée au développement : <ulink url="http://rox.sourceforge.net/contact.html"/>.
    </para>
   </refsect1>
   <refsect1>
@@ -3269,6 +3261,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Christiansen Merel</member>
 	 <member>Jimmy Olgeni</member>
 	 <member>Richard Olsson</member>
+	 <member>Matthew O'Phinney</member>
 	 <member>Daniele Peri</member>
 	 <member>Andy Piper</member>
 	 <member>Marcelo Ramos</member>
@@ -3278,8 +3271,10 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Christian Storgaard</member>
 	 <member>Taras</member>
 	 <member>Simon Truss</member>
+	 <member>Hirosi Utumi</member>
 	 <member>Jan Wagemakers</member>
-     <member>Keith Warno</member>
+	 <member>Keith Warno</member>
+	 <member>Götz Waschk</member>
 	 <member>Stephen Watson</member>
 	 <member>Andre Wyrwa</member>
 	 <member>Geoff Youngs</member>
@@ -3543,7 +3538,7 @@ Les méthodes suivantes sont reconnues :</para>
 
 <bibliomixed>
   <abbrev>Choices</abbrev><citetitle>The ROX Choices system,
-  <ulink url="http://rox.sourceforge.net/choices.php3"/></citetitle>
+  <ulink url="http://rox.sourceforge.net/choices.html"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
@@ -3563,7 +3558,7 @@ Les méthodes suivantes sont reconnues :</para>
 
 <bibliomixed>
  <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
-  <ulink url="http://rox.sf.net/wallpaper.php3"/></citetitle>
+  <ulink url="http://rox.sf.net/wallpaper.html"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
