@@ -758,6 +758,7 @@ static void show_rename_box(Icon *icon)
 			G_CALLBACK(gtk_widget_destroyed), &icon->dialog);
 
 	dialog = GTK_DIALOG(icon->dialog);
+	gtk_dialog_set_has_separator(dialog, FALSE);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
