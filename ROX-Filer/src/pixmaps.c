@@ -103,6 +103,8 @@ static const char *stocks[] = {
 	ROX_STOCK_MOUNTED,
 };
 
+static GtkIconSize mount_icon_size = -1;
+
 /* Static prototypes */
 
 static void load_default_pixmaps(void);
@@ -158,6 +160,8 @@ void pixmaps_init(void)
 	}
 	gtk_icon_factory_add_default(factory);
 
+	mount_icon_size = gtk_icon_size_register("rox-mount-size", 14, 14);
+
 	load_default_pixmaps();
 }
 
@@ -182,7 +186,7 @@ MaskedPixmap *load_pixmap(const char *name)
 /* Create a MaskedPixmap from a GTK stock ID. Always returns
  * a valid image.
  */
-static MaskedPixmap *mp_from_stock(const char *stock_id)
+static MaskedPixmap *mp_from_stock(const char *stock_id, int size)
 {
 	GtkIconSet *icon_set;
 	GdkPixbuf  *pixbuf;
@@ -196,7 +200,7 @@ static MaskedPixmap *mp_from_stock(const char *stock_id)
                                      gtk_widget_get_default_style(), /* Gtk bug */
                                      GTK_TEXT_DIR_LTR,
                                      GTK_STATE_NORMAL,
-                                     GTK_ICON_SIZE_DIALOG,
+                                     size,
                                      NULL,
                                      NULL);
 	retval = masked_pixmap_new(pixbuf);
@@ -815,12 +819,12 @@ static void load_default_pixmaps(void)
 	GdkPixbuf *pixbuf;
 	GError *error = NULL;
 
-	im_error = mp_from_stock(GTK_STOCK_DIALOG_WARNING);
-	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION);
+	im_error = mp_from_stock(GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG);
+	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
 	im_symlink = load_pixmap("symlink");
 
-	im_unmounted = load_pixmap(ROX_STOCK_MOUNT);
-	im_mounted = load_pixmap(ROX_STOCK_MOUNTED);
+	im_unmounted = mp_from_stock(ROX_STOCK_MOUNT, mount_icon_size);
+	im_mounted = mp_from_stock(ROX_STOCK_MOUNTED, mount_icon_size);
 	im_appdir = load_pixmap("application");
 
 	im_dirs = load_pixmap("dirs");
