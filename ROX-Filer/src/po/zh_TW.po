@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
-"POT-Creation-Date: 2002-05-21 11:28+0100\n"
+"POT-Creation-Date: 2002-05-24 17:09+0100\n"
 "PO-Revision-Date: 2002-03-26 21:00+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai_cheung@hotmail.com>\n"
 "Language-Team: none\n"
@@ -122,10 +122,6 @@ msgstr ""
 msgid "See the ROX-Filer manual for full details."
 msgstr "詳情請查看ROX-Filer的man檔"
 
-#: action.c:246 action.c:314 toolbar.c:108
-msgid "Close"
-msgstr "關閉"
-
 #: action.c:273
 msgid "Permissions command reference"
 msgstr "權限方式"
@@ -178,11 +174,11 @@ msgstr "錯誤讀取"
 msgid "ERROR"
 msgstr "錯誤"
 
-#: action.c:649 main.c:568 main.c:576
+#: action.c:649 main.c:564 main.c:572
 msgid "Yes"
 msgstr "是"
 
-#: action.c:653 main.c:570
+#: action.c:653 main.c:566
 msgid "No"
 msgstr "否"
 
@@ -541,7 +537,7 @@ msgstr "將影嚮面板上某些項目 - 真的刪除?"
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr "將影嚮面板上某些項目 - 真的刪除?"
 
-#: action.c:2043 filer.c:1518 menu.c:1649 panel.c:439
+#: action.c:2043 filer.c:1519 menu.c:1649 panel.c:439
 msgid "Cancel"
 msgstr "取消"
 
@@ -557,7 +553,7 @@ msgstr ""
 msgid "The GtkAdjustment for the vertical position."
 msgstr ""
 
-#: dir.c:131 dir.c:668
+#: dir.c:131 dir.c:664
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -566,17 +562,17 @@ msgstr ""
 "錯誤檢視 '%s' :\n"
 "%s"
 
-#: dir.c:345
+#: dir.c:344
 #, fuzzy, c-format
 msgid "Can't stat directory: %s"
 msgstr "不能打開目錄: %s"
 
-#: dir.c:353
+#: dir.c:352
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "不能打開目錄: %s"
 
-#: display.c:1048
+#: display.c:1044
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr ""
@@ -670,11 +666,11 @@ msgstr "錯誤的檔案列表: %s"
 msgid "You can't use multiple files with Set Icon!"
 msgstr "不能同時對多種檔案設定圖示！"
 
-#: filer.c:582
+#: filer.c:585
 msgid "Directory missing/deleted"
 msgstr "目錄已刪除/或不存在"
 
-#: filer.c:964
+#: filer.c:965
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -683,49 +679,49 @@ msgstr ""
 "組別 %s 尚未設定。先選擇某些檔案再按鍵 Ctrl+%s 來設定組別 按鍵 %s 後完成可再"
 "重選其他檔案 "
 
-#: filer.c:1152
+#: filer.c:1153
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "'目錄 '%s' 不能被訪問"
 
-#: filer.c:1335
+#: filer.c:1336
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "'找不到目錄 '%s' "
 
-#: filer.c:1778
+#: filer.c:1768
 msgid "S"
 msgstr ""
 
-#: filer.c:1779
+#: filer.c:1769
 msgid "A"
 msgstr ""
 
-#: filer.c:1780
+#: filer.c:1770
 msgid "T"
 msgstr ""
 
-#: filer.c:1786
+#: filer.c:1776
 msgid "Scanning, "
 msgstr "從新檢視中, "
 
-#: filer.c:1787
+#: filer.c:1777
 msgid "All, "
 msgstr "全部, "
 
-#: filer.c:1788
+#: filer.c:1778
 msgid "Thumbs, "
 msgstr "縮圖啟動, "
 
-#: filer.c:2036 menu.c:1839
+#: filer.c:2025 menu.c:1839
 msgid "Item no longer exists!"
 msgstr "項目已不存在!"
 
-#: filer.c:2158
+#: filer.c:2146
 msgid "Symbolic link to "
 msgstr "符號連結予"
 
-#: filer.c:2189
+#: filer.c:2177
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
@@ -1195,24 +1191,24 @@ msgid ""
 "Report bugs to <tal197@users.sourceforge.net>.\n"
 msgstr ""
 
-#: main.c:399
+#: main.c:395
 #, c-format
 msgid "Running as user '%s'"
 msgstr "執行身份為 '%s'"
 
-#: main.c:565
+#: main.c:561
 msgid "features set at compile time"
 msgstr "在安裝時要設定之功能"
 
-#: main.c:566
+#: main.c:562
 msgid "Large File Support"
 msgstr "大型檔案支援"
 
-#: main.c:574
+#: main.c:570
 msgid "GNOME-VFS library"
 msgstr ""
 
-#: main.c:578
+#: main.c:574
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
@@ -1761,6 +1757,10 @@ msgstr ""
 msgid "Set backdrop"
 msgstr "設定圖示"
 
+#: pinboard.c:571
+msgid "Display backdrop image:"
+msgstr ""
+
 #: pinboard.c:580
 #, fuzzy
 msgid "Centred"
@@ -1823,13 +1823,13 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1971
+#: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 
-#: pixmaps.c:172 pixmaps.c:496
+#: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
 msgstr "不明錯誤"
 
@@ -1973,6 +1973,10 @@ msgid "byte"
 msgstr "byte"
 
 #: toolbar.c:108
+msgid "Close"
+msgstr "關閉"
+
+#: toolbar.c:108
 msgid "Close filer window"
 msgstr "關閉窗口"
 
@@ -2028,25 +2032,25 @@ msgstr "顯示/或隱藏隱藏檔"
 msgid "Show ROX-Filer help"
 msgstr "顯示ROX-Filer說明"
 
-#: toolbar.c:586
+#: toolbar.c:579
 #, c-format
 msgid " (%u hidden)"
 msgstr "(%u 隱藏)"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "items"
 msgstr "項目"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "item"
 msgstr "項目"
 
-#: toolbar.c:596
+#: toolbar.c:589
 #, c-format
 msgid "No items%s"
 msgstr "沒有項目%s"
 
-#: toolbar.c:613
+#: toolbar.c:606
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u 已選擇 (%s)"
@@ -2083,7 +2087,7 @@ msgstr "套節"
 msgid "Unknown"
 msgstr "不明的"
 
-#: type.c:450
+#: type.c:444
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2093,60 +2097,60 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:537
+#: type.c:531
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
 msgstr ""
 "請拖放一個(本機)執行程式入拖放欄內 - 而日後此程式將會用以開啟此類型的檔案"
 
-#: type.c:564
+#: type.c:558
 msgid "This is not a program! Give me an application instead!"
 msgstr "這不是一個程式!請給予一個可執行的程式!"
 
-#: type.c:622
+#: type.c:616
 msgid "Execute file"
 msgstr "執行檔案"
 
-#: type.c:627
+#: type.c:621
 msgid "No run action defined"
 msgstr "沒有執行動作被定義"
 
-#: type.c:653
+#: type.c:647
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "錯誤處理 %s: %s"
 
-#: type.c:668
+#: type.c:662
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "非法的執行程式 %s (錯誤執行)"
 
-#: type.c:679
+#: type.c:673
 #, c-format
 msgid "Non-executable %s"
 msgstr "非執行性的 %s"
 
-#: type.c:715
+#: type.c:709
 msgid "Set run action"
 msgstr "設定執行的動作"
 
-#: type.c:717
+#: type.c:711
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "設為預設值予全部的 `%s/<anything>'"
 
-#: type.c:723 usericons.c:310
+#: type.c:717 usericons.c:310
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "僅對應此類型 `%s/%s'"
 
-#: type.c:751
+#: type.c:745
 #, c-format
 msgid "Currently %s"
 msgstr "當前的 %s"
 
-#: type.c:765
+#: type.c:759
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2154,40 +2158,40 @@ msgstr ""
 "請拖放一個適的\n"
 "程式在此處"
 
-#: type.c:772 usericons.c:389
+#: type.c:766 usericons.c:389
 msgid "OR"
 msgstr "或"
 
-#: type.c:779
+#: type.c:773
 msgid "Enter a shell command:"
 msgstr "請輸入指令"
 
-#: type.c:849
+#: type.c:843
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "路徑參數錯誤,儲存取消"
 
-#: type.c:862
+#: type.c:856
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "一個相同而頗大的程序正在執行中 - 你決定要刪除它？"
 
-#: type.c:874
+#: type.c:868
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "不能移除 $s: %s"
 
-#: type.c:1130
+#: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1148
+#: type.c:1142
 #, c-format
 msgid "Invalid type '%s' in '%s'"
 msgstr ""
 
-#: type.c:1288
+#: type.c:1282
 msgid ""
 "The standard MIME type database was not found. The filer will probably not "
 "show the correct types for different files. You should download and install "

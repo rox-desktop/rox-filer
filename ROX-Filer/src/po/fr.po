@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.3.0\n"
-"POT-Creation-Date: 2002-05-21 11:28+0100\n"
+"POT-Creation-Date: 2002-05-24 17:09+0100\n"
 "PO-Revision-Date: 2002-04-15 04:04+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
@@ -145,10 +145,6 @@ msgstr ""
 msgid "See the ROX-Filer manual for full details."
 msgstr "Voir le manuel de ROX-Filer pour tous les détails."
 
-#: action.c:246 action.c:314 toolbar.c:108
-msgid "Close"
-msgstr "Fermer"
-
 #: action.c:273
 msgid "Permissions command reference"
 msgstr "Référence de la commande des permissions"
@@ -233,11 +229,11 @@ msgstr "ERREUR de lecture"
 msgid "ERROR"
 msgstr "ERREUR"
 
-#: action.c:649 main.c:568 main.c:576
+#: action.c:649 main.c:564 main.c:572
 msgid "Yes"
 msgstr "Oui"
 
-#: action.c:653 main.c:570
+#: action.c:653 main.c:566
 msgid "No"
 msgstr "Non"
 
@@ -602,7 +598,7 @@ msgstr ""
 " affectera des objets sur le punaiseur ou le panneau - voulez-vous vraiment "
 "les supprimer ?"
 
-#: action.c:2043 filer.c:1518 menu.c:1649 panel.c:439
+#: action.c:2043 filer.c:1519 menu.c:1649 panel.c:439
 msgid "Cancel"
 msgstr "Annuler"
 
@@ -618,7 +614,7 @@ msgstr "Ajustement vertical"
 msgid "The GtkAdjustment for the vertical position."
 msgstr "Le GtkAdjustment pour la position verticale."
 
-#: dir.c:131 dir.c:668
+#: dir.c:131 dir.c:664
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -627,17 +623,17 @@ msgstr ""
 "Erreur lors de la lecture de '%s' :\n"
 "%s"
 
-#: dir.c:345
+#: dir.c:344
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "Impossible de faire un stat du répertoire : %s"
 
-#: dir.c:353
+#: dir.c:352
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Impossible d'ouvrir le répertoire : %s"
 
-#: display.c:1048
+#: display.c:1044
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) a échoué : %s"
@@ -747,11 +743,11 @@ msgid "You can't use multiple files with Set Icon!"
 msgstr ""
 "Vous ne pouvez pas utiliser plusieurs fichiers avec « Fixer l'icône » !"
 
-#: filer.c:582
+#: filer.c:585
 msgid "Directory missing/deleted"
 msgstr "Répertoire manquant/supprimé"
 
-#: filer.c:964
+#: filer.c:965
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -761,49 +757,49 @@ msgstr ""
 "<Ctrl>+%s pour le définir. Appuyez seulement sur %s pour resélectionner ces "
 "fichiers à l'avenir."
 
-#: filer.c:1152
+#: filer.c:1153
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Le répertoire '%s' n'est pas accessible"
 
-#: filer.c:1335
+#: filer.c:1336
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Répertoire '%s' non trouvé."
 
-#: filer.c:1778
+#: filer.c:1768
 msgid "S"
 msgstr "L"
 
-#: filer.c:1779
+#: filer.c:1769
 msgid "A"
 msgstr "T"
 
-#: filer.c:1780
+#: filer.c:1770
 msgid "T"
 msgstr "I"
 
-#: filer.c:1786
+#: filer.c:1776
 msgid "Scanning, "
 msgstr "Lecture, "
 
-#: filer.c:1787
+#: filer.c:1777
 msgid "All, "
 msgstr "Tous, "
 
-#: filer.c:1788
+#: filer.c:1778
 msgid "Thumbs, "
 msgstr "Imagettes, "
 
-#: filer.c:2036 menu.c:1839
+#: filer.c:2025 menu.c:1839
 msgid "Item no longer exists!"
 msgstr "L'objet n'existe plus !"
 
-#: filer.c:2158
+#: filer.c:2146
 msgid "Symbolic link to "
 msgstr "Lien symbolique vers "
 
-#: filer.c:2189
+#: filer.c:2177
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 "Ce nom de fichier n'est pas en UTF-8 valide. Vous devriez le renommer.\n"
@@ -1319,24 +1315,24 @@ msgstr ""
 "\n"
 "Rendre compte des bugs à <tal197@users.sourceforge.net>.\n"
 
-#: main.c:399
+#: main.c:395
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Exécution en tant qu'utilisateur '%s'"
 
-#: main.c:565
+#: main.c:561
 msgid "features set at compile time"
 msgstr "fonctionnalités fixées à la compilation"
 
-#: main.c:566
+#: main.c:562
 msgid "Large File Support"
 msgstr "Support des fichiers longs"
 
-#: main.c:574
+#: main.c:570
 msgid "GNOME-VFS library"
 msgstr "Bibliothèque GNOME-VFS"
 
-#: main.c:578
+#: main.c:574
 msgid "No (gnome-vfs-config not found)"
 msgstr "Non (gnome-vfs-config non trouvé)"
 
@@ -1905,6 +1901,10 @@ msgstr ""
 msgid "Set backdrop"
 msgstr "Fixer l'icône"
 
+#: pinboard.c:571
+msgid "Display backdrop image:"
+msgstr ""
+
 #: pinboard.c:580
 #, fuzzy
 msgid "Centred"
@@ -1969,13 +1969,13 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1971
+#: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 
-#: pixmaps.c:172 pixmaps.c:496
+#: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
 msgstr "Erreur inconnue"
 
@@ -2134,6 +2134,10 @@ msgid "byte"
 msgstr "octet"
 
 #: toolbar.c:108
+msgid "Close"
+msgstr "Fermer"
+
+#: toolbar.c:108
 msgid "Close filer window"
 msgstr "Fermer la fenêtre du filer"
 
@@ -2189,25 +2193,25 @@ msgstr "Montrer/cacher les fichiers cachés"
 msgid "Show ROX-Filer help"
 msgstr "Montrer l'aide de ROX-Filer"
 
-#: toolbar.c:586
+#: toolbar.c:579
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u caché(s))"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "items"
 msgstr "objets"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "item"
 msgstr "objet"
 
-#: toolbar.c:596
+#: toolbar.c:589
 #, c-format
 msgid "No items%s"
 msgstr "Pas d'objet%s"
 
-#: toolbar.c:613
+#: toolbar.c:606
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u sélectionné(s) (%s)"
@@ -2244,7 +2248,7 @@ msgstr "Socket"
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: type.c:450
+#: type.c:444
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2255,7 +2259,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:537
+#: type.c:531
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2263,53 +2267,53 @@ msgstr ""
 "Vous devez faire glisser une seule application (locale) sur la boîte - cette "
 "application sera utilisée à l'avenir pour charger les fichiers de ce type"
 
-#: type.c:564
+#: type.c:558
 msgid "This is not a program! Give me an application instead!"
 msgstr "Ce n'est pas un programme ! Donnez-moi une application à la place !"
 
-#: type.c:622
+#: type.c:616
 msgid "Execute file"
 msgstr "Exécuter le fichier"
 
-#: type.c:627
+#: type.c:621
 msgid "No run action defined"
 msgstr "Pas d'action d'exécution de définie"
 
-#: type.c:653
+#: type.c:647
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Erreur dans le handler %s : %s"
 
-#: type.c:668
+#: type.c:662
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Application %s invalide (mauvais AppRun)"
 
-#: type.c:679
+#: type.c:673
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non exécutable"
 
-#: type.c:715
+#: type.c:709
 msgid "Set run action"
 msgstr "Fixer l'action d'exécution"
 
-#: type.c:717
+#: type.c:711
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Fixer en tant que défaut pour tout `%s/<quelconque>'"
 
-#: type.c:723 usericons.c:310
+#: type.c:717 usericons.c:310
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Seulement pour le type `%s/%s'"
 
-#: type.c:751
+#: type.c:745
 #, c-format
 msgid "Currently %s"
 msgstr "Actuellement %s"
 
-#: type.c:765
+#: type.c:759
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2317,19 +2321,19 @@ msgstr ""
 "Faites glisser ici une\n"
 "application adéquate"
 
-#: type.c:772 usericons.c:389
+#: type.c:766 usericons.c:389
 msgid "OR"
 msgstr "OU"
 
-#: type.c:779
+#: type.c:773
 msgid "Enter a shell command:"
 msgstr "Entrez une commande shell :"
 
-#: type.c:849
+#: type.c:843
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "La sauvegarde des choix est désactivée par la variable CHOICESPATH"
 
-#: type.c:862
+#: type.c:856
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2337,22 +2341,22 @@ msgstr ""
 "Une action d'exécution existe déjà et est un assez gros programme - êtes-"
 "vous sûr de vouloir la supprimer ?"
 
-#: type.c:874
+#: type.c:868
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossible de supprimer %s : %s"
 
-#: type.c:1130
+#: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1148
+#: type.c:1142
 #, fuzzy, c-format
 msgid "Invalid type '%s' in '%s'"
 msgstr "Impossible d'ouvrir '%s' en écriture : %s"
 
-#: type.c:1288
+#: type.c:1282
 msgid ""
 "The standard MIME type database was not found. The filer will probably not "
 "show the correct types for different files. You should download and install "

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-05-21 11:28+0100\n"
+"POT-Creation-Date: 2002-05-24 17:09+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: Christian Storgaard <cybolic@goth.net>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -147,10 +147,6 @@ msgstr ""
 msgid "See the ROX-Filer manual for full details."
 msgstr "Se ROX-Filer manualen for detaljer."
 
-#: action.c:246 action.c:314 toolbar.c:108
-msgid "Close"
-msgstr "Luk"
-
 #: action.c:273
 msgid "Permissions command reference"
 msgstr "Tilladdelser kommando referencer"
@@ -231,11 +227,11 @@ msgstr "FEJL under læsning"
 msgid "ERROR"
 msgstr "FEJL"
 
-#: action.c:649 main.c:568 main.c:576
+#: action.c:649 main.c:564 main.c:572
 msgid "Yes"
 msgstr "Ja"
 
-#: action.c:653 main.c:570
+#: action.c:653 main.c:566
 msgid "No"
 msgstr "Nej"
 
@@ -599,7 +595,7 @@ msgstr ""
 " vil påvirke nogle objekter på opslagstavlen eller panelet - virkelig slette "
 "dem?"
 
-#: action.c:2043 filer.c:1518 menu.c:1649 panel.c:439
+#: action.c:2043 filer.c:1519 menu.c:1649 panel.c:439
 msgid "Cancel"
 msgstr "Fortryd"
 
@@ -615,7 +611,7 @@ msgstr ""
 msgid "The GtkAdjustment for the vertical position."
 msgstr ""
 
-#: dir.c:131 dir.c:668
+#: dir.c:131 dir.c:664
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -624,17 +620,17 @@ msgstr ""
 "Fejl under scanning af '%s:\n"
 "%s"
 
-#: dir.c:345
+#: dir.c:344
 #, fuzzy, c-format
 msgid "Can't stat directory: %s"
 msgstr "Kan ikke åbne mappen: %s"
 
-#: dir.c:353
+#: dir.c:352
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Kan ikke åbne mappen: %s"
 
-#: display.c:1048
+#: display.c:1044
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) mislykkedes: %s"
@@ -739,11 +735,11 @@ msgstr "Fejl uder hentning af fil-liste: %s"
 msgid "You can't use multiple files with Set Icon!"
 msgstr "Du kan ikke bruge flere filer med Sæt Ikon!"
 
-#: filer.c:582
+#: filer.c:585
 msgid "Directory missing/deleted"
 msgstr "Mappe mangler/slettet"
 
-#: filer.c:964
+#: filer.c:965
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -752,49 +748,49 @@ msgstr ""
 "Gruppe %s er ikke sat. Vælg nogle filer og tryk Ctrl+%s for at huske "
 "gruppen. Tryk %s alene for at genvælge filerne senere."
 
-#: filer.c:1152
+#: filer.c:1153
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Mappen '%s' er ikke tilgænglig"
 
-#: filer.c:1335
+#: filer.c:1336
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Mappen '%s' kan ikke findes."
 
-#: filer.c:1778
+#: filer.c:1768
 msgid "S"
 msgstr ""
 
-#: filer.c:1779
+#: filer.c:1769
 msgid "A"
 msgstr ""
 
-#: filer.c:1780
+#: filer.c:1770
 msgid "T"
 msgstr ""
 
-#: filer.c:1786
+#: filer.c:1776
 msgid "Scanning, "
 msgstr "Scanner, "
 
-#: filer.c:1787
+#: filer.c:1777
 msgid "All, "
 msgstr "Alle, "
 
-#: filer.c:1788
+#: filer.c:1778
 msgid "Thumbs, "
 msgstr "Thumbs, "
 
-#: filer.c:2036 menu.c:1839
+#: filer.c:2025 menu.c:1839
 msgid "Item no longer exists!"
 msgstr "Objektet eksisterer ikke længere!"
 
-#: filer.c:2158
+#: filer.c:2146
 msgid "Symbolic link to "
 msgstr "Symbolsk genvej til "
 
-#: filer.c:2189
+#: filer.c:2177
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
@@ -1306,24 +1302,24 @@ msgstr ""
 "\n"
 "Rapporter fejl til <tal197@users.sourceforge.net>.\n"
 
-#: main.c:399
+#: main.c:395
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Kører som bruger '%s'"
 
-#: main.c:565
+#: main.c:561
 msgid "features set at compile time"
 msgstr "funktioner sat ved kompilerings tid"
 
-#: main.c:566
+#: main.c:562
 msgid "Large File Support"
 msgstr "Understøttelse af Store Filer"
 
-#: main.c:574
+#: main.c:570
 msgid "GNOME-VFS library"
 msgstr ""
 
-#: main.c:578
+#: main.c:574
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
@@ -1885,6 +1881,10 @@ msgstr ""
 msgid "Set backdrop"
 msgstr "Definer ikon"
 
+#: pinboard.c:571
+msgid "Display backdrop image:"
+msgstr ""
+
 #: pinboard.c:580
 #, fuzzy
 msgid "Centred"
@@ -1949,13 +1949,13 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1971
+#: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 
-#: pixmaps.c:172 pixmaps.c:496
+#: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
 msgstr "Ukendt fejl"
 
@@ -2108,6 +2108,10 @@ msgid "byte"
 msgstr "byte"
 
 #: toolbar.c:108
+msgid "Close"
+msgstr "Luk"
+
+#: toolbar.c:108
 msgid "Close filer window"
 msgstr "Luk 'filer' vinduet"
 
@@ -2163,25 +2167,25 @@ msgstr "Vis/Skjul skjulte filer"
 msgid "Show ROX-Filer help"
 msgstr "Vis ROX-Filers hjælp"
 
-#: toolbar.c:586
+#: toolbar.c:579
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u skjult)"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "items"
 msgstr "objekter"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "item"
 msgstr "objekt"
 
-#: toolbar.c:596
+#: toolbar.c:589
 #, c-format
 msgid "No items%s"
 msgstr "Ingen objekter%s"
 
-#: toolbar.c:613
+#: toolbar.c:606
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u valgt (%s)"
@@ -2218,7 +2222,7 @@ msgstr "Socket"
 msgid "Unknown"
 msgstr "Ukendt"
 
-#: type.c:450
+#: type.c:444
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2228,7 +2232,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:537
+#: type.c:531
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2236,53 +2240,53 @@ msgstr ""
 "Du kan trække et enkelt (lokal) pogram hen på boksen - det program vil så "
 "blive brugt til at åbne filer af denne type for fremtiden"
 
-#: type.c:564
+#: type.c:558
 msgid "This is not a program! Give me an application instead!"
 msgstr "Dette er ikke et prgram! Giv mig et program istedet!"
 
-#: type.c:622
+#: type.c:616
 msgid "Execute file"
 msgstr "Kørbar fil"
 
-#: type.c:627
+#: type.c:621
 msgid "No run action defined"
 msgstr "Ingen kør handling defineret"
 
-#: type.c:653
+#: type.c:647
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Fejl i behandler %s: %s"
 
-#: type.c:668
+#: type.c:662
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Ugyldingt program %s (dårlig AppRun)"
 
-#: type.c:679
+#: type.c:673
 #, c-format
 msgid "Non-executable %s"
 msgstr "Ikke-kørbar fil %s"
 
-#: type.c:715
+#: type.c:709
 msgid "Set run action"
 msgstr "Sæt kør handling"
 
-#: type.c:717
+#: type.c:711
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Sæt som normalt for alle `%s/<hvad som helst>'"
 
-#: type.c:723 usericons.c:310
+#: type.c:717 usericons.c:310
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Kun for typen `%s/%s'"
 
-#: type.c:751
+#: type.c:745
 #, c-format
 msgid "Currently %s"
 msgstr "Lige nu %s"
 
-#: type.c:765
+#: type.c:759
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2290,19 +2294,19 @@ msgstr ""
 "Træk et passende\n"
 "program her hen"
 
-#: type.c:772 usericons.c:389
+#: type.c:766 usericons.c:389
 msgid "OR"
 msgstr "ELLER"
 
-#: type.c:779
+#: type.c:773
 msgid "Enter a shell command:"
 msgstr "Skriv en shell kommando:"
 
-#: type.c:849
+#: type.c:843
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Gemning af Choices er slået fra af CHOICESPATH variablen"
 
-#: type.c:862
+#: type.c:856
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -2310,22 +2314,22 @@ msgstr ""
 "Der findes allerede en kør handling og den er et ret stort program - er du "
 "sikker på at du vil slette den?"
 
-#: type.c:874
+#: type.c:868
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Kan ikke fjerne %s: %s"
 
-#: type.c:1130
+#: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1148
+#: type.c:1142
 #, c-format
 msgid "Invalid type '%s' in '%s'"
 msgstr ""
 
-#: type.c:1288
+#: type.c:1282
 msgid ""
 "The standard MIME type database was not found. The filer will probably not "
 "show the correct types for different files. You should download and install "

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.1.0\n"
-"POT-Creation-Date: 2002-05-21 11:28+0100\n"
+"POT-Creation-Date: 2002-05-24 17:09+0100\n"
 "PO-Revision-Date: 2001-06-05 20:46+0300\n"
 "Last-Translator: Dmitry Elfimov <die@bk.ru>\n"
 "Language-Team: Russian <out of team>\n"
@@ -144,10 +144,6 @@ msgstr ""
 msgid "See the ROX-Filer manual for full details."
 msgstr "Смотрите документацию для более подробного описания."
 
-#: action.c:246 action.c:314 toolbar.c:108
-msgid "Close"
-msgstr "Закрыть"
-
 #: action.c:273
 msgid "Permissions command reference"
 msgstr "Обращение к правам доступа"
@@ -228,11 +224,11 @@ msgstr "Ошибка чтения"
 msgid "ERROR"
 msgstr "Ошибка"
 
-#: action.c:649 main.c:568 main.c:576
+#: action.c:649 main.c:564 main.c:572
 msgid "Yes"
 msgstr "Да"
 
-#: action.c:653 main.c:570
+#: action.c:653 main.c:566
 msgid "No"
 msgstr "Нет"
 
@@ -594,7 +590,7 @@ msgstr ""
 "Это затронет некоторые обьекты на рабочем столе или на панели - "
 "действительно удалить?"
 
-#: action.c:2043 filer.c:1518 menu.c:1649 panel.c:439
+#: action.c:2043 filer.c:1519 menu.c:1649 panel.c:439
 msgid "Cancel"
 msgstr "Отменить"
 
@@ -610,7 +606,7 @@ msgstr ""
 msgid "The GtkAdjustment for the vertical position."
 msgstr ""
 
-#: dir.c:131 dir.c:668
+#: dir.c:131 dir.c:664
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -619,17 +615,17 @@ msgstr ""
 "Ошибка просмотра '%s':\n"
 "%s"
 
-#: dir.c:345
+#: dir.c:344
 #, fuzzy, c-format
 msgid "Can't stat directory: %s"
 msgstr "Не могу открыть каталог %s"
 
-#: dir.c:353
+#: dir.c:352
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Не могу открыть каталог %s"
 
-#: display.c:1048
+#: display.c:1044
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) неудался: %s"
@@ -732,11 +728,11 @@ msgstr "Ошибка при получении списка файлов: %s"
 msgid "You can't use multiple files with Set Icon!"
 msgstr "Нельзя использовать несколько файлов для установки пиктограммы"
 
-#: filer.c:582
+#: filer.c:585
 msgid "Directory missing/deleted"
 msgstr "Каталог отсутствует или удален"
 
-#: filer.c:964
+#: filer.c:965
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -745,49 +741,49 @@ msgstr ""
 "Группа %s не установлена.  Выберите несколько файлов и нажмите Ctrl+%s для "
 "установки группы. Нажмите %s для перевыбора файлов позже."
 
-#: filer.c:1152
+#: filer.c:1153
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "Каталог '%s' недоступен"
 
-#: filer.c:1335
+#: filer.c:1336
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Каталог '%s' не найден"
 
-#: filer.c:1778
+#: filer.c:1768
 msgid "S"
 msgstr ""
 
-#: filer.c:1779
+#: filer.c:1769
 msgid "A"
 msgstr ""
 
-#: filer.c:1780
+#: filer.c:1770
 msgid "T"
 msgstr ""
 
-#: filer.c:1786
+#: filer.c:1776
 msgid "Scanning, "
 msgstr "Сканирование, "
 
-#: filer.c:1787
+#: filer.c:1777
 msgid "All, "
 msgstr "Все, "
 
-#: filer.c:1788
+#: filer.c:1778
 msgid "Thumbs, "
 msgstr ""
 
-#: filer.c:2036 menu.c:1839
+#: filer.c:2025 menu.c:1839
 msgid "Item no longer exists!"
 msgstr "Объект не существует!"
 
-#: filer.c:2158
+#: filer.c:2146
 msgid "Symbolic link to "
 msgstr "Символическая ссылка для "
 
-#: filer.c:2189
+#: filer.c:2177
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 
@@ -1261,24 +1257,24 @@ msgid ""
 "Report bugs to <tal197@users.sourceforge.net>.\n"
 msgstr ""
 
-#: main.c:399
+#: main.c:395
 #, c-format
 msgid "Running as user '%s'"
 msgstr "Запускается как пользователь '%s'"
 
-#: main.c:565
+#: main.c:561
 msgid "features set at compile time"
 msgstr "параметры установленные при компиляции"
 
-#: main.c:566
+#: main.c:562
 msgid "Large File Support"
 msgstr "Поддержка больших файлов"
 
-#: main.c:574
+#: main.c:570
 msgid "GNOME-VFS library"
 msgstr ""
 
-#: main.c:578
+#: main.c:574
 msgid "No (gnome-vfs-config not found)"
 msgstr ""
 
@@ -1839,6 +1835,10 @@ msgstr ""
 msgid "Set backdrop"
 msgstr "Установить пиктограмму."
 
+#: pinboard.c:571
+msgid "Display backdrop image:"
+msgstr ""
+
 #: pinboard.c:580
 #, fuzzy
 msgid "Centred"
@@ -1903,13 +1903,13 @@ msgid ""
 "Backdrop removed."
 msgstr ""
 
-#: pinboard.c:1971
+#: pinboard.c:1970
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
 
-#: pixmaps.c:172 pixmaps.c:496
+#: pixmaps.c:179 pixmaps.c:503
 msgid "Unknown error"
 msgstr "Неизвестная ошибка"
 
@@ -2052,6 +2052,10 @@ msgid "byte"
 msgstr "байт"
 
 #: toolbar.c:108
+msgid "Close"
+msgstr "Закрыть"
+
+#: toolbar.c:108
 msgid "Close filer window"
 msgstr "Закрыть окно"
 
@@ -2107,25 +2111,25 @@ msgstr "Отображать скрытые файлы"
 msgid "Show ROX-Filer help"
 msgstr "Показать помощь ROX-Filer'a"
 
-#: toolbar.c:586
+#: toolbar.c:579
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u скрыто)"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "items"
 msgstr "обьектов"
 
-#: toolbar.c:593
+#: toolbar.c:586
 msgid "item"
 msgstr "обьект"
 
-#: toolbar.c:596
+#: toolbar.c:589
 #, c-format
 msgid "No items%s"
 msgstr "Нет объектов %s"
 
-#: toolbar.c:613
+#: toolbar.c:606
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u выбрано (%s)"
@@ -2162,7 +2166,7 @@ msgstr "Сокет"
 msgid "Unknown"
 msgstr "Неизвестно"
 
-#: type.c:450
+#: type.c:444
 msgid ""
 "Enter a shell command which will load \"$1\" into a suitable program. Eg:\n"
 "\n"
@@ -2173,7 +2177,7 @@ msgstr ""
 "\n"
 "gimp \"$1\""
 
-#: type.c:537
+#: type.c:531
 msgid ""
 "You should drop a single (local) application onto the drop box - that "
 "application will be used to load files of this type in future"
@@ -2181,53 +2185,53 @@ msgstr ""
 "Вы должны бросить одиночную (локальную) программу в окно - эта программа "
 "будет использована для загрузки файлов такого же типа в дальнейшем."
 
-#: type.c:564
+#: type.c:558
 msgid "This is not a program! Give me an application instead!"
 msgstr "Это не программа!"
 
-#: type.c:622
+#: type.c:616
 msgid "Execute file"
 msgstr "Запускаемый файл"
 
-#: type.c:627
+#: type.c:621
 msgid "No run action defined"
 msgstr "Не установлена ассоциация"
 
-#: type.c:653
+#: type.c:647
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Ошибка в управлении %s: %s"
 
-#: type.c:668
+#: type.c:662
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Неправильное приложение %s (плохой AppRun)"
 
-#: type.c:679
+#: type.c:673
 #, c-format
 msgid "Non-executable %s"
 msgstr "Не запускаемый файл %s"
 
-#: type.c:715
+#: type.c:709
 msgid "Set run action"
 msgstr "Установить ассоциацию"
 
-#: type.c:717
+#: type.c:711
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Установить ассоциацю для всех `%s/<что угодно>'"
 
-#: type.c:723 usericons.c:310
+#: type.c:717 usericons.c:310
 #, c-format
 msgid "Only for the type `%s/%s'"
 msgstr "Только для типа `%s/%s'"
 
-#: type.c:751
+#: type.c:745
 #, c-format
 msgid "Currently %s"
 msgstr "В данный момент %s"
 
-#: type.c:765
+#: type.c:759
 msgid ""
 "Drop a suitable\n"
 "application here"
@@ -2235,40 +2239,40 @@ msgstr ""
 "Бросьте нужную\n"
 "программу сюда"
 
-#: type.c:772 usericons.c:389
+#: type.c:766 usericons.c:389
 msgid "OR"
 msgstr "или"
 
-#: type.c:779
+#: type.c:773
 msgid "Enter a shell command:"
 msgstr "Введите команду оболочки:"
 
-#: type.c:849
+#: type.c:843
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Запись `Choices` запрещена переменной окружения CHOICESPATH"
 
-#: type.c:862
+#: type.c:856
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "Ассоциация уже существует - вы уверены что хотите удалить?"
 
-#: type.c:874
+#: type.c:868
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Не могу удалить %s: %s"
 
-#: type.c:1130
+#: type.c:1124
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr ""
 
-#: type.c:1148
+#: type.c:1142
 #, c-format
 msgid "Invalid type '%s' in '%s'"
 msgstr ""
 
-#: type.c:1288
+#: type.c:1282
 msgid ""
 "The standard MIME type database was not found. The filer will probably not "
 "show the correct types for different files. You should download and install "
