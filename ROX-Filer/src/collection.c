@@ -992,7 +992,9 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 
 	collection = COLLECTION(widget);
 
+#ifndef GTK2
 	clear_area(collection, &event->area);
+#endif
 
 	collection_paint(collection, &event->area);
 
@@ -1003,10 +1005,12 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 static void scroll_by(Collection *collection, gint diff)
 {
 	GtkWidget	*widget;
+#ifndef GTK2
 	gint		width, height;
 	guint		from_y, to_y;
 	guint		amount;
 	GdkRectangle	new_area;
+#endif
 
 	if (diff == 0)
 		return;
@@ -1016,6 +1020,9 @@ static void scroll_by(Collection *collection, gint diff)
 	if (collection->lasso_box)
 		abort_lasso(collection);
 
+#ifdef GTK2
+	gdk_window_scroll(widget->window, 0, -diff);
+#else
 	gdk_window_get_size(widget->window, &width, &height);
 	new_area.x = 0;
 	new_area.width = width;
@@ -1069,6 +1076,7 @@ static void scroll_by(Collection *collection, gint diff)
 
 	clear_area(collection, &new_area);
 	collection_paint(collection, NULL);
+#endif
 }
 
 static void resize_arrays(Collection *collection, guint new_size)

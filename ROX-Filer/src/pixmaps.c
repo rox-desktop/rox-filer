@@ -99,8 +99,8 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 
 void pixmaps_init(void)
 {
-	gdk_rgb_init();
 #ifndef GTK2
+	gdk_rgb_init();
 	gtk_widget_push_visual(gdk_rgb_get_visual());
 #endif
 	gtk_widget_push_colormap(gdk_rgb_get_cmap());
