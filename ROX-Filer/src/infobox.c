@@ -77,8 +77,9 @@ struct _Permissions
 
 /* Static prototypes */
 static void refresh_info(GObject *window);
-static GtkWidget *make_vbox(const guchar *path);
-static GtkWidget *make_details(const guchar *path, DirItem *item);
+static GtkWidget *make_vbox(const guchar *path, GObject *window);
+static GtkWidget *make_details(const guchar *path, DirItem *item,
+				GObject *window);
 static GtkWidget *make_about(const guchar *path, XMLwrapper *ai);
 static GtkWidget *make_file_says(const guchar *path);
 static GtkWidget *make_permissions(const gchar *path, DirItem *item);
@@ -138,11 +139,11 @@ void infobox_new(const gchar *pathname)
 
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 
-	details = make_vbox(path);
+	owindow = G_OBJECT(window);
+	details = make_vbox(path, owindow);
 	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(window)->vbox),
 				    details);
 
-	owindow = G_OBJECT(window);
 	g_object_set_data(owindow, "details", details);
 	g_object_set_data_full(owindow, "path", path, g_free);
 
@@ -180,7 +181,7 @@ static void refresh_info(GObject *window)
 	vbox = details->parent;
 	gtk_widget_destroy(details);
 
-	details = make_vbox(path);
+	details = make_vbox(path, window);
 	g_object_set_data(window, "details", details);
 	gtk_box_pack_start_defaults(GTK_BOX(vbox), details);
 	gtk_widget_show_all(details);
@@ -199,7 +200,7 @@ static void add_frame(GtkBox *vbox, GtkWidget *list)
 /* Create the VBox widget that contains the details.
  * Note that 'path' must not be freed until the vbox is destroyed.
  */
-static GtkWidget *make_vbox(const guchar *path)
+static GtkWidget *make_vbox(const guchar *path, GObject *window)
 {
 	DirItem		*item;
 	GtkBox		*vbox;
@@ -261,7 +262,7 @@ static GtkWidget *make_vbox(const guchar *path)
 	}
 
 	/* List of file attributes */
-	add_frame(vbox, make_details(path, item));
+	add_frame(vbox, make_details(path, item, window));
 
 	help_dir = g_strconcat(path, "/Help", NULL);
 
@@ -372,13 +373,16 @@ static void add_row_and_free(GtkListStore *store,
 }
 
 /* Create an empty list view, ready to place some data in */
-static void make_list(GtkListStore **list_store, GtkWidget **list_view)
+static void make_list(GtkListStore **list_store, GtkWidget **list_view,
+			GCallback cell_edited)
 {
 	GtkListStore	*store;
 	GtkTreeView	*view;
 	GtkCellRenderer *cell_renderer;
 
-	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	/* Field name, value, editable */
+	store = gtk_list_store_new(3, G_TYPE_STRING, G_TYPE_STRING,
+					G_TYPE_BOOLEAN);
 	view = GTK_TREE_VIEW(
 			gtk_tree_view_new_with_model(GTK_TREE_MODEL(store)));
 	g_object_unref(G_OBJECT(store));
@@ -391,7 +395,10 @@ static void make_list(GtkListStore **list_store, GtkWidget **list_view)
 
 	cell_renderer = gtk_cell_renderer_text_new();
 	gtk_tree_view_insert_column_with_attributes(view,
-			1, NULL, cell_renderer, "text", 1, NULL);
+			1, NULL, cell_renderer, "text", 1, "editable", 2, NULL);
+
+	g_signal_connect(G_OBJECT(cell_renderer), "edited",
+		    G_CALLBACK(cell_edited), store);
 
 	g_signal_connect(view, "cursor_changed",
 			G_CALLBACK(set_selection), NULL);
@@ -467,17 +474,74 @@ static void kill_du_output(GtkWidget *widget, DU *du)
 	g_free(du->path);
 	g_free(du);
 }
-	
+
+static gboolean refresh_info_idle(gpointer data)
+{
+	GObject *window = G_OBJECT(data);
+
+	refresh_info(window);
+	g_object_unref(window);
+	return FALSE;
+}
+
+static void cell_edited(GtkCellRendererText *cell,
+	     const gchar *path_string,
+	     const gchar *new_text,
+	     gpointer data)
+{
+	GtkTreeModel *model = (GtkTreeModel *) data;
+	GtkTreePath *path;
+	GtkTreeIter iter;
+	GObject *window;
+	const char *fullpath;
+	char *oldlink;
+
+	window = g_object_get_data(G_OBJECT(model), "rox_window");
+	g_return_if_fail(window != NULL);
+
+	fullpath = g_object_get_data(window, "path");
+	g_return_if_fail(fullpath != NULL);
+
+	path = gtk_tree_path_new_from_string(path_string);
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_path_free(path);
+
+	oldlink = readlink_dup(fullpath);
+	if (!oldlink) {
+		report_error(_("'%s' is no longer a symlink"), fullpath);
+		return;
+	}
+	if (strcmp(oldlink, new_text) == 0)
+		return;	/* No change */
+	g_free(oldlink);
+	if (unlink(fullpath)) {
+		report_error(_("Failed to unlink '%s':\n%s"),
+				fullpath, g_strerror(errno));
+		return;
+	}
+	if (symlink(new_text, fullpath)) {
+		report_error(_("Failed to create symlink from '%s':\n%s\n"
+				"(note: old link has been deleted)"));
+		return;
+	}
+
+	g_object_ref(window);
+	gtk_idle_add(refresh_info_idle, window);
+}
+
 /* Create the TreeView widget with the file's details */
-static GtkWidget *make_details(const guchar *path, DirItem *item)
+static GtkWidget *make_details(const guchar *path, DirItem *item,
+				GObject *window)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
 	gchar		*tmp, *tmp2;
 
-	make_list(&store, &view);
+	make_list(&store, &view, G_CALLBACK(cell_edited));
+	g_object_set_data(G_OBJECT(store), "rox_window", window);
 
-	if (item->base_type == TYPE_ERROR)
+	/* For a symlink to an error, don't show the error */
+	if (item->base_type == TYPE_ERROR && item->lstat_errno)
 	{
 		add_row(store, _("Error:"), g_strerror(item->lstat_errno));
 		return view;
@@ -546,6 +610,24 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 	if (item->mime_type)
 		add_row(store, "", mime_type_comment(item->mime_type));
 
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		GtkTreeIter iter;
+		GtkTreeModel *model = GTK_TREE_MODEL(store);
+		char *target;
+
+		target = readlink_dup(path);
+		if (!target)
+			target = g_strdup(g_strerror(errno));
+		add_row_and_free(store, _("Link target:"), target);
+
+		/* Make cell editable */
+		gtk_tree_model_iter_nth_child(model, &iter,
+			NULL, gtk_tree_model_iter_n_children(model, NULL) - 1);
+
+		gtk_list_store_set(store, &iter, 2, TRUE, -1);
+	}
+
 	if (item->base_type != TYPE_DIRECTORY)
 		add_row_and_free(store, _("Run action:"),
 				 describe_current_command(item->mime_type));
@@ -577,7 +659,7 @@ static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 
 	g_return_val_if_fail(about != NULL, NULL);
 	
-	make_list(&store, &view);
+	make_list(&store, &view, NULL);
 
 	/* Add each field in about to the list, but overriding each element
 	 * with about_trans if a translation is supplied.
@@ -846,22 +928,7 @@ static const gchar *pretty_type(DirItem *file, const guchar *path)
 	null_g_free(&text);
 
 	if (file->flags & ITEM_FLAG_SYMLINK)
-	{
-		char	*target;
-
-		target = readlink_dup(path);
-		if (target)
-		{
-			ensure_utf8(&target);
-
-			text = g_strdup_printf(_("Symbolic link to %s"),
-					       target);
-			g_free(target);
-			return text;
-		}
-
 		return _("Symbolic link");
-	}
 
 	if (file->flags & ITEM_FLAG_APPDIR)
 		return _("ROX application");
