@@ -1288,56 +1288,66 @@ static void load_mime_types(void)
 	filer_update_all();
 }
 
-#define MIME_TRY doc = xml_cache_load(path); g_free(path); if (doc) return doc;
-
-/* Find the media/subtype.xml file for a MIME_type and load it, returning
- * an XML document (NULL if not found)
- *
- * g_object_unref() the result.
+/* Try to fill in 'type->comment' from this document.
+ * Frees 'path'.
  */
-static XMLwrapper *load_type_file(MIME_type *type)
+static void get_comment(MIME_type *type, guchar *path)
 {
-	guchar *path;
-	XMLwrapper *doc;
-
-	path = g_strdup_printf("%s/.mime/%s/%s.xml", home_dir,
-			type->media_type, type->subtype);
-	MIME_TRY;
-
-	path = g_strdup_printf("/usr/local/share/mime/%s/%s.xml",
-			type->media_type, type->subtype);
-	MIME_TRY;
-
-	path = g_strdup_printf("/usr/share/mime/%s/%s.xml",
-			type->media_type, type->subtype);
-	MIME_TRY;
-
-	return NULL;
-}
-
-static void find_comment(MIME_type *type)
-{
-	XMLwrapper *typedoc;
 	xmlNode *node;
+	XMLwrapper *doc;
+	
+	doc = xml_cache_load(path);
+	g_free(path);
+	if (!doc)
+		return;
 
-	typedoc = load_type_file(type);
-	if (!typedoc)
-		goto out;
-
-	node = xml_get_section(typedoc, TYPE_NS, "comment");
+	node = xml_get_section(doc, TYPE_NS, "comment");
 
 	if (node)
 	{
-		if (type->comment)
-			g_free(type->comment);
-		type->comment = xmlNodeListGetString(node->doc,
-						     node->xmlChildrenNode, 1);
+		char *val;
+		g_return_if_fail(type->comment == NULL);
+		val= xmlNodeListGetString(node->doc, node->xmlChildrenNode, 1);
+		type->comment = g_strdup(val);
+		xmlFree(val);
 	}
 
-	g_object_unref(typedoc);
-out:
-	if (!type->comment)
-		type->comment = g_strdup(_("No description"));
+	g_object_unref(doc);
+}
+
+/* Fill in the comment field for this MIME type.
+ *
+ * g_object_unref() the result.
+ */
+static void find_comment(MIME_type *type)
+{
+	guchar *path;
+
+	if (type->comment)
+	{
+		g_free(type->comment);
+		type->comment = NULL;
+	}
+
+	path = g_strdup_printf("%s/.mime/%s/%s.xml", home_dir,
+			type->media_type, type->subtype);
+	get_comment(type, path);
+	if (type->comment)
+		return;
+
+	path = g_strdup_printf("/usr/local/share/mime/%s/%s.xml",
+			type->media_type, type->subtype);
+	get_comment(type, path);
+	if (type->comment)
+		return;
+
+	path = g_strdup_printf("/usr/share/mime/%s/%s.xml",
+			type->media_type, type->subtype);
+	get_comment(type, path);
+	if (type->comment)
+		return;
+
+	type->comment = g_strdup(_("No description"));
 }
 
 const char *mime_type_comment(MIME_type *type)
