@@ -455,6 +455,8 @@ static gboolean read_du_output(GIOChannel *source, GIOCondition cond, DU *du)
 			insert_size(du, line->str);
 			break;
 		case G_IO_STATUS_EOF:
+		        set_cell(du->store, du->path,
+				 _("Failed to read size"));
 			break;
 		case G_IO_STATUS_AGAIN:
 			g_string_free(line, TRUE);
@@ -589,7 +591,8 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 					    NULL))
 		{
 			du->chan = g_io_channel_unix_new(out);
-			du->watch = g_io_add_watch(du->chan, G_IO_IN,
+			du->watch = g_io_add_watch(du->chan,
+						   G_IO_IN|G_IO_ERR|G_IO_HUP,
 						 (GIOFunc) read_du_output, du);
 			g_object_ref(G_OBJECT(du->store));
  			g_signal_connect(G_OBJECT(view), "destroy",
