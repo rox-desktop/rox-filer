@@ -45,7 +45,7 @@
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
 static gboolean follow_symlink(char *full_path, FilerWindow *filer_window);
 static gboolean open_file(guchar *path, MIME_type *type);
-static void app_show_help(char *path);
+static void dir_show_help(DirItem *item, char *path);
 
 typedef struct _PipedData PipedData;
 
@@ -289,18 +289,14 @@ void show_item_help(guchar *path, DirItem *item)
 					"Info menu item to find out more..."));
 			break;
 		case TYPE_DIRECTORY:
-			if (item->flags & ITEM_FLAG_APPDIR)
-				app_show_help(path);
-			else if (item->flags & ITEM_FLAG_MOUNT_POINT)
+			if (item->flags & ITEM_FLAG_MOUNT_POINT)
 				delayed_error(_("Mount point"), _(
 				"A mount point is a directory which another "
 				"filing system can be mounted on. Everything "
 				"on the mounted filesystem then appears to be "
 				"inside the directory."));
 			else
-				delayed_error(_("Directory"), _(
-				"This is a directory. It contains an index to "
-				"other items - open it to see the list."));
+				dir_show_help(item, path);
 			break;
 		case TYPE_CHAR_DEVICE:
 		case TYPE_BLOCK_DEVICE:
@@ -580,19 +576,26 @@ static gboolean open_file(guchar *path, MIME_type *type)
 	return FALSE;
 }
 
-static void app_show_help(char *path)
+/* Show the help for a directory - tries to open App/Help, but if
+ * that doesn't work then it displays a default message.
+ */
+static void dir_show_help(DirItem *item, char *path)
 {
 	char		*help_dir;
 	struct stat 	info;
 
 	help_dir = g_strconcat(path, "/Help", NULL);
-	
-	if (mc_stat(help_dir, &info))
+
+	if (mc_stat(help_dir, &info) == 0)
+		filer_opendir(help_dir);
+	else if (item->flags & ITEM_FLAG_APPDIR)
 		delayed_error(_("Application"),
 			_("This is an application directory - you can "
 			"run it as a program, or open it (hold down "
 			"Shift while you open it). Most applications provide "
 			"their own help here, but this one doesn't."));
 	else
-		filer_opendir(help_dir);
+		delayed_error(_("Directory"), _(
+				"This is a directory. It contains an index to "
+				"other items - open it to see the list."));
 }
