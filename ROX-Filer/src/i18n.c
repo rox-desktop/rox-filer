@@ -25,6 +25,9 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <string.h>
+#ifdef HAVE_LOCALE_H
+#  include <locale.h>
+#endif
 
 #include <gtk/gtk.h>
 
@@ -43,12 +46,25 @@
 /* Set things up for internationalisation */
 void i18n_init(void)
 {
-#ifdef HAVE_GETTEXT
+	guchar	*lang;
+
+	lang = getenv("LANG");
+
+#ifdef HAVE_LOCALE_H
 	setlocale(LC_ALL, "");
-	bindtextdomain(PROJECT,
-			make_path(getenv("APP_DIR"), "locale")->str);
-	textdomain(PROJECT);
 #endif
+	
+	if (lang)
+	{
+		struct stat info;
+		guchar	*path;
+
+		path = g_strdup_printf("%s/Messages/%s.gmo",
+				getenv("APP_DIR"), lang);
+		if (stat(path, &info) == 0)
+			rox_add_translations(path);
+		g_free(path);
+	}
 }
 
 

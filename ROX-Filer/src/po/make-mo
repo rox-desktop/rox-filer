@@ -1,14 +1,7 @@
 #!/bin/sh
 
 if [ $# = 1 ]; then
-	DIR=../../locale/$1
-	if [ ! -d $DIR ]; then
-		mkdir $DIR
-	fi
-	if [ ! -d $DIR/LC_MESSAGES ]; then
-		mkdir $DIR/LC_MESSAGES
-	fi
-	OUT=$DIR/LC_MESSAGES/ROX-Filer.mo
+	OUT=../../Messages/$1.gmo
 	msgfmt $1.po -o $OUT && echo Created file $OUT OK
 	exit 0
 fi

@@ -359,7 +359,7 @@ _("Just put the name of the file you're looking for in single quotes:\n"
 _("'*.htm', '*.html'      (finds HTML files)\n"
 "IsDir 'lib'            (finds directories called 'lib')\n"
 "IsReg 'core'           (finds a regular file called 'core')\n"
-"! (IsDir, IsReg)       (is neither a directory nor a regualr file)\n"
+"! (IsDir, IsReg)       (is neither a directory nor a regular file)\n"
 "mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contains the word 'fred')"));
@@ -377,8 +377,8 @@ _("IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
 "IsEmpty, IsMine\n"
 "\n"
 "A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
-"contains a slash then the match is agaist the full path; otherwise it is \n"
-"agaist the leafname only."));
+"contains a slash then the match is against the full path; otherwise it is \n"
+"against the leafname only."));
 		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_container_add(GTK_CONTAINER(frame), text);

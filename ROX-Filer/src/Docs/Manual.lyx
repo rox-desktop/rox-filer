@@ -1,4 +1,4 @@
-#This file was created by <tal197> Tue Apr 18 17:30:12 2000
+#This file was created by <tal197> Fri Apr 21 12:36:06 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -2205,11 +2205,12 @@ LANG=fr; export LANG
 ROX-Filer/AppRun
 \layout Standard
 
-Note that 
-\series bold 
-no translations currently exist
-\series default 
- --- if you want to help with a translation then please get in touch.
+To see which translations are currently provided, open the ROX-Filer application
+ directory (hold down Shift and double-click) and look inside the `
+\family typewriter 
+Messages
+\family default 
+' subdirectory.
 \layout Subsection
 
 Creating a new translation
@@ -2266,6 +2267,12 @@ Run the `
 make-mo
 \family default 
 ' script to create the binary file which ROX-Filer can use.
+ You will need the GNU gettext package for this.
+ If you don't have it then just send me the 
+\family typewriter 
+.po
+\family default 
+ file and I'll convert it for you.
 \begin_deeper 
 \layout LyX-Code
 
@@ -2275,7 +2282,7 @@ $ cd ROX-Filer/src/po
 $ ./make-mo ml
 \layout LyX-Code
 
-Created file ../../locale/ml/LC_MESSAGES/ROX-Filer.mo OK
+Created file ../../Messages/ml.gmo OK
 \end_deeper 
 \layout Enumerate
 
@@ -2632,5 +2639,5 @@ POrtable Dodgy Filesystems in Userland (hacK),
 \emph on 
 ImLib
 \emph toggle 
-, <http://www.labs.redhat.com/imlib/>
+, <http://www.gnome.org>
 \the_end

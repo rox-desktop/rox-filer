@@ -12,16 +12,12 @@
 #undef HAVE_LIBVFS
 #undef HAVE_VFS_H
 #undef HAVE_IMLIB
-#undef HAVE_GETTEXT
+#undef HAVE_LOCALE_H
 
 #include "my_vfs.h"
+#include "rox_gettext.h"
 
-#ifdef HAVE_GETTEXT
-#  include <libintl.h>
-#  define _(String) gettext(String)
-#else
-#  define _(String) (String)
-#endif
+#define _(String) rox_gettext(String)
 
 /* Short for gettext_noop() - marks a string as translatable without
  * actually translating it at that point. Used by xgettext.

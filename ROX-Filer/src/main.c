@@ -66,7 +66,7 @@ char *home_dir;
 static void show_features(void);
 
 
-#define VERSION "ROX-Filer 0.1.20\n"
+#define VERSION "ROX-Filer 0.1.21\n"
 #define COPYING								\
 	     N_("Copyright (C) 2000 Thomas Leonard.\n"			\
 		"ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"	\
@@ -358,13 +358,6 @@ static void show_features(void)
 		_("Yes")
 #else
 		_("No (the imlib-config command didn't work)")
-#endif
-		);
-	g_printerr("%s... %s\n", _("Internationalisation support"),
-#ifdef HAVE_GETTEXT
-		_("Yes")
-#else
-		_("No (could not find gettext() function)")
 #endif
 		);
 }

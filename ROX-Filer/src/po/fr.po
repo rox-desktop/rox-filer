@@ -2,11 +2,10 @@
 # Copyright (C) 2000 Vincent Lefevre <vincent@vinc17.org>
 # Vincent Lefevre <vincent@vinc17.org>, 2000.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 0.1.21\n"
-"POT-Creation-Date: 2000-04-18 23:54+0200\n"
+"POT-Creation-Date: 2000-04-21 12:32+0100\n"
 "PO-Revision-Date: 2000-04-19 02:55+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox@ecs.soton.ac.uk>\n"
@@ -46,7 +45,7 @@ msgstr "fonctionnalités fixées à la compilation"
 msgid "VFS support"
 msgstr "Support VFS"
 
-#: action.c:878 action.c:1041 main.c:351 main.c:358 main.c:365
+#: action.c:878 action.c:1041 main.c:351 main.c:358
 msgid "Yes"
 msgstr "Oui"
 
@@ -61,14 +60,6 @@ msgstr "Support ImLib"
 #: main.c:360
 msgid "No (the imlib-config command didn't work)"
 msgstr "Non (la commande imlib-config n'a pas marché)"
-
-#: main.c:363
-msgid "Internationalisation support"
-msgstr "Support internationalisation"
-
-#: main.c:367
-msgid "No (could not find gettext() function)"
-msgstr "Non (fonction gettext() non trouvée)"
 
 #: filer.c:100
 msgid "Filer window options"
@@ -94,8 +85,8 @@ msgstr "Impossible de faire un fork()"
 #: filer.c:1168
 #, c-format
 msgid "No open action specified for files of this type (%s/%s)"
-msgstr "Pas d'action d'ouverture spécifiée pour les fichiers de ce type "
-"(%s/%s)"
+msgstr ""
+"Pas d'action d'ouverture spécifiée pour les fichiers de ce type (%s/%s)"
 
 #: filer.c:1326
 #, c-format
@@ -585,13 +576,15 @@ msgstr "Fichier exécutable"
 
 #: menu.c:1191
 msgid "This is a file with an eXecute bit set - it can be run as a program."
-msgstr "C'est un fichier avec le bit eXecute positionné - il peut être "
-"exécuté comme un programme."
+msgstr ""
+"C'est un fichier avec le bit eXecute positionné - il peut être exécuté comme "
+"un programme."
 
 #: menu.c:1195
 msgid "This is a data file. Try using the Info menu item to find out more..."
-msgstr "C'est un fichier de données. Essayez l'entrée Info du menu pour en "
-"savoir plus..."
+msgstr ""
+"C'est un fichier de données. Essayez l'entrée Info du menu pour en savoir "
+"plus..."
 
 #: menu.c:1205
 msgid ""
@@ -661,8 +654,9 @@ msgstr ""
 
 #: menu.c:1263
 msgid "You must select a single file to open as a Virtual File System"
-msgstr "Vous devez sélectionner un seul fichier à ouvrir en tant que Système "
-"de Fichiers Virtuel (VFS)"
+msgstr ""
+"Vous devez sélectionner un seul fichier à ouvrir en tant que Système de "
+"Fichiers Virtuel (VFS)"
 
 #: menu.c:1320
 msgid "New Directory"
@@ -739,8 +733,9 @@ msgstr "Cible inconnue"
 
 #: dnd.c:766
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr "L'application distante ne peut pas ou ne veut pas m'envoyer les "
-"données - désolé"
+msgstr ""
+"L'application distante ne peut pas ou ne veut pas m'envoyer les données - "
+"désolé"
 
 #: dnd.c:785
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
@@ -959,7 +954,7 @@ msgid ""
 "'*.htm', '*.html'      (finds HTML files)\n"
 "IsDir 'lib'            (finds directories called 'lib')\n"
 "IsReg 'core'           (finds a regular file called 'core')\n"
-"! (IsDir, IsReg)       (is neither a directory nor a regualr file)\n"
+"! (IsDir, IsReg)       (is neither a directory nor a regular file)\n"
 "mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
 "'CVS' prune, isreg                     (a regular file not in CVS)\n"
 "IsReg system(grep -q fred \"%\")         (contains the word 'fred')"
@@ -985,8 +980,8 @@ msgid ""
 "\n"
 "A pattern in single quotes is a shell-style wildcard pattern to match. If "
 "it\n"
-"contains a slash then the match is agaist the full path; otherwise it is \n"
-"agaist the leafname only."
+"contains a slash then the match is against the full path; otherwise it is \n"
+"against the leafname only."
 msgstr ""
 "IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket (types)\n"
 "IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable "
@@ -1569,3 +1564,17 @@ msgstr "gid"
 #: find.c:892
 msgid "blocks"
 msgstr "blocks"
+
+#: rox_gettext.c:79
+msgid "Invalid .gmo translation file (too short)"
+msgstr ""
+
+#: rox_gettext.c:92
+msgid "Invalid .gmo translation file (GNU magic number not found)\n"
+msgstr ""
+
+#~ msgid "Internationalisation support"
+#~ msgstr "Support internationalisation"
+
+#~ msgid "No (could not find gettext() function)"
+#~ msgstr "Non (fonction gettext() non trouvée)"
