@@ -58,6 +58,7 @@
 #include "action.h"		/* (for action_chmod) */
 #include "xml.h"
 #include "dropbox.h"
+#include "gtkicontheme.h"
 
 #define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
 enum {SET_MEDIA, SET_TYPE};
@@ -129,9 +130,14 @@ MIME_type *inode_door;
 
 static Option o_display_colour_types;
 
+static GtkIconTheme *icon_theme = NULL;
+
 void type_init(void)
 {
 	int		i;
+
+	icon_theme = gtk_icon_theme_new();
+	gtk_icon_theme_set_custom_theme(icon_theme, "ROX");
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
@@ -411,7 +417,7 @@ gboolean type_open(const char *path, MIME_type *type)
  */
 MaskedPixmap *type_to_icon(MIME_type *type)
 {
-	char	*path;
+	GdkPixbuf *full;
 	char	*type_name;
 	time_t	now;
 
@@ -435,6 +441,18 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type->image = NULL;
 	}
 
+	type_name = g_strconcat(type->media_type, ":", type->subtype, NULL);
+	full = gtk_icon_theme_load_icon(icon_theme, type_name, HUGE_WIDTH, 0, NULL);
+	g_free(type_name);
+	if (!full)
+		full = gtk_icon_theme_load_icon(icon_theme, type->media_type, HUGE_WIDTH, 0, NULL);
+	if (full)
+	{
+		type->image = masked_pixmap_new(full);
+		g_object_unref(full);
+	}
+
+#if 0
 	type_name = g_strconcat(type->media_type, "_",
 				type->subtype, ".png", NULL);
 	path = choices_find_path_load(type_name, "MIME-icons");
@@ -451,6 +469,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		type->image = g_fscache_lookup(pixmap_cache, path);
 		g_free(path);
 	}
+#endif
 
 	if (!type->image)
 	{
