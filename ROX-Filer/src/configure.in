@@ -42,9 +42,9 @@ dnl Ensure that PROGRAM is in PATH.
 dnl Stops and displays ERROR if it's missing.
 AC_DEFUN(rox_CHECK_EXISTS, [
 AC_MSG_CHECKING(for $1)
-changequote(,)dnl
+[
 if [ -x "`which \"$1\" 2> /dev/null`" ]; then
-changequote([,])dnl
+]
   AC_MSG_RESULT(yes)
 else
   AC_MSG_RESULT(no)
@@ -61,14 +61,14 @@ dnl Checks for programs.
 AC_PROG_CC
 
 dnl Use -Wall if possible
-changequote(,)dnl
+[
 if test "x$GCC" = "xyes"; then
   case " $CFLAGS " in
   *[\ \	]-Wall[\ \	]*) ;;
   *) CFLAGS="$CFLAGS -Wall" ;;
   esac
 fi
-changequote([,])dnl
+]
 
 if test -z "$PKG_CONFIG"; then
   PKG_CONFIG=pkg-config
@@ -111,9 +111,9 @@ else
   fi
   GDK_PIXBUF_CFLAGS=`$GDK_PIXBUF_CONFIG --cflags`
   GDK_PIXBUF_LIBS=`$GDK_PIXBUF_CONFIG --libs`
-  changequote(,)dnl
+  [
   if [ -n "$GDK_PIXBUF_LIBS" ]; then
-  changequote([,])dnl
+  ]
     AC_MSG_RESULT(yes - use '$GDK_PIXBUF_LIBS')
   else
     AC_MSG_ERROR(can't run '$GDK_PIXBUF_CONFIG --libs' - make sure it is in your PATH)
@@ -182,9 +182,9 @@ AC_SUBST(VFS_LIBS)
 
 dnl Extract version info from AppInfo.xml
 AC_MSG_CHECKING(extracting version information)
-changequote(,)dnl
+[
 VERSION=`sed -n 's/^.*<Version>\([.0-9]*\).*<\/Version>.*$/\1/p' ../AppInfo.xml`
-changequote([,])dnl
+]
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
 
