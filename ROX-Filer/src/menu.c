@@ -93,6 +93,7 @@ static void help(gpointer data, guint action, GtkWidget *widget);
 static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
+static void remove_link(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
 static void chmod_items(gpointer data, guint action, GtkWidget *widget);
 
@@ -138,8 +139,6 @@ static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget	*panel_menu;		/* The popup panel menu */
-static GtkWidget	*panel_file_item;	/* The File '' label */
-static GtkWidget	*panel_file_menu;	/* The File '' menu */
 static GtkWidget	*panel_hidden_menu;	/* The Show Hidden item */
 
 static gint		screen_width, screen_height;
@@ -199,15 +198,14 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/Display/Show Hidden",   	NULL, 	hidden, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
-{"/File",			NULL,	NULL, 	0, "<Branch>"},
-{"/File/Help",		    	NULL,  	help, 0, NULL},
-{"/File/Info",			NULL,  	show_file_info, 0, NULL},
-{"/File/Delete",		NULL,	delete,	0, NULL},
-{"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
-{"/Options...",			NULL,   show_options, 0, NULL},
-{"/Close panel",		NULL, 	close_panel, 0, NULL},
+{"/Open Panel as Directory",	NULL, 	open_as_dir, 0, NULL},
+{"/Close Panel",		NULL, 	close_panel, 0, NULL},
 {"/Separator",			NULL,	NULL, 0, "<Separator>"},
-{"/Show ROX-Filer help",	NULL,   rox_help, 0, NULL},
+{"/ROX-Filer Help",		NULL,   rox_help, 0, NULL},
+{"/ROX-Filer Options...",	NULL,   show_options, 0, NULL},
+{"/Separator",			NULL,	NULL, 0, "<Separator>"},
+{"/Show Help",    		NULL,  	help, 0, NULL},
+{"/Remove Item",		NULL,	remove_link, 0, NULL},
 };
 
 typedef struct _FileStatus FileStatus;
@@ -262,13 +260,8 @@ void menu_init()
 			panel_menu_def,
 			NULL);
 	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
-	panel_file_menu = gtk_item_factory_get_widget(item_factory, 
-			"<panel>/File");
 	panel_hidden_menu = gtk_item_factory_get_widget(item_factory,
 			"<panel>/Display/Show Hidden");
-	items = gtk_container_children(GTK_CONTAINER(panel_menu));
-	panel_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
-	g_list_free(items);
 
 	menurc = choices_find_path_load("menus");
 	if (menurc)
@@ -398,9 +391,7 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item)
 {
-	GString		*buffer;
-	GtkWidget	*file_label, *file_menu;
-	DirItem	*file_item;
+	DirItem		*file_item;
 	int		pos[2];
 
 	updating_menu++;
@@ -435,47 +426,48 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	if (filer_window->panel_type)
 	{
-		file_label = panel_file_item;
-		file_menu = panel_file_menu;
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(panel_hidden_menu),
 				filer_window->show_hidden);
 	}
 	else
 	{
+		GtkWidget	*file_label, *file_menu;
+		Collection 	*collection = filer_window->collection;
+		GString		*buffer;
+
 		file_label = filer_file_item;
 		file_menu = filer_file_menu;
 		gtk_check_menu_item_set_active(
 				GTK_CHECK_MENU_ITEM(filer_hidden_menu),
 				filer_window->show_hidden);
+		buffer = g_string_new(NULL);
+		switch (collection->number_selected)
+		{
+			case 0:
+				g_string_assign(buffer, "Next Click");
+				items_sensitive(TRUE);
+				break;
+			case 1:
+				items_sensitive(TRUE);
+				file_item = selected_item(
+						filer_window->collection);
+				g_string_sprintf(buffer, "%s '%s'",
+						basetype_name(file_item),
+						file_item->leafname);
+				break;
+			default:
+				items_sensitive(FALSE);
+				g_string_sprintf(buffer, "%d items",
+						collection->number_selected);
+				break;
+		}
+		gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
+		g_string_free(buffer, TRUE);
 	}
 
-	buffer = g_string_new(NULL);
-	switch (filer_window->collection->number_selected)
-	{
-		case 0:
-			g_string_assign(buffer, "Next Click");
-			items_sensitive(TRUE);
-			break;
-		case 1:
-			items_sensitive(TRUE);
-			file_item = selected_item(filer_window->collection);
-			g_string_sprintf(buffer, "%s '%s'",
-					basetype_name(file_item),
-					file_item->leafname);
-			break;
-		default:
-			items_sensitive(FALSE);
-			g_string_sprintf(buffer, "%d items",
-				filer_window->collection->number_selected);
-			break;
-	}
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
-
-	gtk_label_set_text(GTK_LABEL(file_label), buffer->str);
-
-	g_string_free(buffer, TRUE);
 
 	if (filer_window->panel_type)
 		popup_menu = panel_menu;
@@ -611,6 +603,41 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 				target_callback, delete);
 	else
 		action_delete(window_with_focus);
+}
+
+static void remove_link(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (window_with_focus->collection->number_selected > 1)
+	{
+		report_error("ROX-Filer", "You can only remove one link "
+				"at a time");
+		return;
+	}
+	else if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, remove_link);
+	else
+	{
+		struct stat info;
+		DirItem *item;
+		guchar	*path;
+		
+		item = selected_item(window_with_focus->collection);
+
+		path = make_path(window_with_focus->path, item->leafname)->str;
+		if (lstat(path, &info))
+			report_error("ROX-Filer", g_strerror(errno));
+		else if (!S_ISLNK(info.st_mode))
+			report_error("ROX-Filer",
+				"You can only remove symbolic links this way - "
+				"try the 'Open Panel as Directory' item.");
+		else if (unlink(path))
+			report_error("ROX-Filer", g_strerror(errno));
+		else
+			update_dir(window_with_focus, TRUE);
+	}
 }
 
 static void usage(gpointer data, guint action, GtkWidget *widget)
@@ -879,7 +906,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
 	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	table = gtk_table_new(10, 2, FALSE);
+	table = gtk_table_new(9, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
@@ -947,25 +974,15 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 5, 6);
 	
-	label = gtk_label_new("MIME type:");
+	label = gtk_label_new("Type:");
 	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 6, 7);
 	if (file->mime_type)
 	{
 		string = g_strconcat(file->mime_type->media_type, "/",
 				file->mime_type->subtype, NULL);
-		label = gtk_label_new(string);
-		g_free(string);
 	}
-	else
-		label = gtk_label_new("-");
-	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 6, 7);
-
-	label = gtk_label_new("Special:");
-	gtk_misc_set_alignment(GTK_MISC(label), 1, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 1, 7, 8);
-	if (file->flags & ITEM_FLAG_APPDIR)
+	else if (file->flags & ITEM_FLAG_APPDIR)
 		string = g_strdup("ROX application");
 	else if (file->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -975,7 +992,8 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 		if (got > 0 && got <= MAXPATHLEN)
 		{
 			p[got] = '\0';
-			string = g_strconcat("Symbolic link to ", p, NULL);
+			string = g_strconcat("Symbolic link to ",
+						p, NULL);
 		}
 		else
 			string = g_strdup("Symbolic link");
@@ -986,21 +1004,19 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 		if ((file->flags & ITEM_FLAG_MOUNTED) &&
 			(mp = g_hash_table_lookup(mtab_mounts, path)))
 			string = g_strconcat("Mount point for ",
-						mp->name, NULL);
+					mp->name, NULL);
 		else
 			string = g_strdup("Mount point");
 	}
 	else
-	{
 		string = g_strdup("-");
-	}
 	label = gtk_label_new(string);
 	g_free(string);
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
-	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 7, 8);
+	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 6, 7);
 
 	frame = gtk_frame_new("file(1) says...");
-	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 8, 9);
+	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 7, 8);
 	file_label = gtk_label_new("<nothing yet>");
 	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
 	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);

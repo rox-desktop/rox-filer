@@ -639,12 +639,16 @@ static void draw_string(GtkWidget *widget,
 char *details(DirItem *item)
 {
 	mode_t		m = item->mode;
-	static GString 	*buf = NULL;
+	static guchar 	*buf = NULL;
 
-	if (!buf)
-		buf = g_string_new(NULL);
+	if (buf)
+		g_free(buf);
 
-	g_string_sprintf(buf, "%s %s %-8.8s %-8.8s %s %s",
+	if (item->lstat_errno)
+		buf = g_strdup_printf("lstat(2) failed: %s",
+				g_strerror(item->lstat_errno));
+	else
+		buf = g_strdup_printf("%s %s %-8.8s %-8.8s %s %s",
 				item->flags & ITEM_FLAG_APPDIR? "App " :
 			        S_ISDIR(m) ? "Dir " :
 				S_ISCHR(m) ? "Char" :
@@ -657,7 +661,7 @@ char *details(DirItem *item)
 			group_name(item->gid),
 			format_size_aligned(item->size),
 			pretty_time(&item->mtime));
-	return buf->str;
+	return buf;
 }
 
 static void draw_item_full_info(GtkWidget *widget,
@@ -691,6 +695,11 @@ static void draw_item_full_info(GtkWidget *widget,
 			text_x, low_text_y,
 			item->details_width,
 			selected);
+
+	if (item->lstat_errno)
+		return;
+
+	/* Underline the effective permissions */
 	gdk_draw_rectangle(widget->window,
 			selected ? widget->style->white_gc
 				 : widget->style->black_gc,

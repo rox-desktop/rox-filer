@@ -60,6 +60,7 @@ struct _DirItem
 	int		details_width;
 	uid_t		uid;
 	gid_t		gid;
+	int		lstat_errno;	/* 0 if details are valid */
 };
 
 struct _DirUser

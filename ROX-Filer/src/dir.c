@@ -24,7 +24,6 @@
 #include <gtk/gtk.h>
 #include <errno.h>
 
-#include "main.h"
 #include "support.h"
 #include "gui_support.h"
 #include "dir.h"
@@ -347,15 +346,17 @@ static void insert_item(Directory *dir, struct dirent *ent)
 	
 	if (mc_lstat(tmp->str, &info) == -1)
 	{
+		new.lstat_errno = errno;
 		new.base_type = TYPE_ERROR;
 		new.size = 0;
 		new.mode = 0;
 		new.mtime = 0;
-		new.uid = noaccess_uid;
-		new.gid = noaccess_gid;
+		new.uid = (uid_t) -1;
+		new.gid = (gid_t) -1;
 	}
 	else
 	{
+		new.lstat_errno = 0;
 		new.size = info.st_size;
 		new.mode = info.st_mode;
 		new.mtime = info.st_mtime;
@@ -478,6 +479,7 @@ update:
 	new.details_width = gdk_string_width(fixed_font, details(&new));
 
 	if (is_new == FALSE
+	 && item->lstat_errno == new.lstat_errno
 	 && item->base_type == new.base_type
 	 && item->flags == new.flags
 	 && item->size == new.size
@@ -491,6 +493,7 @@ update:
 	 && item->details_width == new.details_width)
 		return;
 
+	item->lstat_errno = new.lstat_errno;
 	item->base_type = new.base_type;
 	item->flags = new.flags;
 	item->size = new.size;

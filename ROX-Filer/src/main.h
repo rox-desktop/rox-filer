@@ -19,8 +19,6 @@ extern gid_t egid;
 extern int ngroups;			/* Number of supplemental groups */
 extern gid_t *supplemental_groups;
 extern char *home_dir;
-extern uid_t noaccess_uid;	/* Used when stat() fails */
-extern gid_t noaccess_gid;	/* Used when stat() fails */
 
 /* Prototypes */
 int main(int argc, char **argv);

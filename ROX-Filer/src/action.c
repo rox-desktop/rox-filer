@@ -298,7 +298,7 @@ static void show_chmod_help(gpointer data)
 	"CHANGE, CHANGE, ...\n"
 	"Each CHANGE is:\n"
 	"WHO HOW PERMISSIONS\n"
-	"WHO is some combination of u, g and o which determines whether to "
+	"WHO is some combination of u, g and o which determines whether to\n"
 	"change the permissions for the User (owner), Group or Others.\n"
 	"HOW is +, - or = to add, remove or set exactly the permissions.\n"
 	"PERMISSIONS is some combination of the letters 'rwxXstugo'\n\n"
@@ -309,10 +309,11 @@ static void show_chmod_help(gpointer data)
 	"o=u-w	(others get the same permissions as the owner, but without "
 	"write permission)\n"
 	"a+x	(everyone gets execute/access permission - same as 'ugo+x')\n"
-	"a+X	(directories become accessable by everyone; files which were "
+	"a+X	(directories become accessable by everyone; files which were\n"
 	"executable by anyone become executable by everyone)\n"
 	"u+rw, go+r	(two commands at once!)\n"
 	"u+s	(set the SetUID bit - often has no effect on script files)\n"
+	"755	(set the permissions directly)\n"
 	
 	"\nSee the chmod(1) man page for full details.");
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
