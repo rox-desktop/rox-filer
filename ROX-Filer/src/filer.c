@@ -1237,18 +1237,47 @@ static gint key_press_event(GtkWidget	*widget,
 static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
-	full_refresh();
-	filer_update_dir(filer_window, TRUE);
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+		((GdkEventButton *) event)->button == 3)
+	{
+		filer_opendir(filer_window->path, PANEL_NO);
+	}
+	else
+	{
+		full_refresh();
+		filer_update_dir(filer_window, TRUE);
+	}
 }
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	filer_change_to(filer_window, home_dir, NULL);
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+		((GdkEventButton *) event)->button == 3)
+	{
+		filer_opendir(home_dir, PANEL_NO);
+	}
+	else
+		filer_change_to(filer_window, home_dir, NULL);
 }
 
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 {
-	change_to_parent(filer_window);
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+		((GdkEventButton *) event)->button == 3)
+	{
+		filer_open_parent(filer_window);
+	}
+	else
+		change_to_parent(filer_window);
 }
 
 void change_to_parent(FilerWindow *filer_window)
@@ -1329,6 +1358,28 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 		g_free(error);
 		gtk_widget_destroy(filer_window->window);
 	}
+}
+
+void filer_open_parent(FilerWindow *filer_window)
+{
+	char	*copy;
+	char	*slash;
+
+	if (filer_window->path[0] == '/' && filer_window->path[1] == '\0')
+		return;		/* Already in the root */
+	
+	copy = g_strdup(filer_window->path);
+	slash = strrchr(copy, '/');
+
+	if (slash)
+	{
+		*slash = '\0';
+		filer_opendir(*copy ? copy : "/", PANEL_NO);
+	}
+	else
+		g_warning("No / in directory path!\n");
+
+	g_free(copy);
 }
 
 int selected_item_number(Collection *collection)
@@ -1709,6 +1760,36 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 	return frame;
 }
 
+/* This is used to simulate a click when button 3 is used (GtkButton
+ * normally ignores this). Currently, this button does not pop in -
+ * this may be fixed in future versions of GTK+.
+ */
+static gint toolbar_adjust_pressed(GtkButton *button,
+				GdkEventButton *event,
+				FilerWindow *filer_window)
+{
+	if (event->button == 3)
+	{
+		gtk_grab_add(GTK_WIDGET(button));
+		gtk_button_pressed(button);
+	}
+
+	return TRUE;
+}
+
+static gint toolbar_adjust_released(GtkButton *button,
+				GdkEventButton *event,
+				FilerWindow *filer_window)
+{
+	if (event->button == 3)
+	{
+		gtk_grab_remove(GTK_WIDGET(button));
+		gtk_button_released(button);
+	}
+
+	return TRUE;
+}
+
 static void add_button(GtkWidget *box, int pixmap,
 			GtkSignalFunc cb, FilerWindow *filer_window,
 			char *label, char *tip)
@@ -1734,6 +1815,10 @@ static void add_button(GtkWidget *box, int pixmap,
 		GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
 
 		gtk_container_add(GTK_CONTAINER(button), icon);
+		gtk_signal_connect(GTK_OBJECT(button), "button_press_event",
+			GTK_SIGNAL_FUNC(toolbar_adjust_pressed), filer_window);
+		gtk_signal_connect(GTK_OBJECT(button), "button_release_event",
+			GTK_SIGNAL_FUNC(toolbar_adjust_released), filer_window);
 		gtk_signal_connect(GTK_OBJECT(button), "clicked",
 				cb, filer_window);
 

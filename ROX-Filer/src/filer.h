@@ -87,5 +87,6 @@ void filer_check_mounted(char *path);
 void filer_change_to(FilerWindow *filer_window, char *path, char *from);
 void filer_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 gboolean filer_exists(FilerWindow *filer_window);
+void filer_open_parent(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

@@ -1338,27 +1338,9 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*copy;
-	char	*slash;
-
 	g_return_if_fail(window_with_focus != NULL);
 
-	if (window_with_focus->path[0] == '/'
-			&& window_with_focus->path[1] == '\0')
-		return;		/* Already in the root */
-	
-	copy = g_strdup(window_with_focus->path);
-	slash = strrchr(copy, '/');
-
-	if (slash)
-	{
-		*slash = '\0';
-		filer_opendir(*copy ? copy : "/", PANEL_NO);
-	}
-	else
-		g_warning("No / in directory path!\n");
-
-	g_free(copy);
+	filer_open_parent(window_with_focus);
 }
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget)
