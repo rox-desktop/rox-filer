@@ -1251,7 +1251,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 	SortType	s_type;
 	GtkSortType	s_order;
 	Settings	*dir_settings = NULL;
-  gboolean force_resize = TRUE;
+	gboolean 	force_resize = TRUE;
 
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
@@ -1387,10 +1387,13 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win,
 
 	if (dir_settings)
 	{
-		if(dir_settings->flags & SET_POSITION) 
+		if (dir_settings->flags & SET_POSITION)
+		{
 			gtk_window_move(GTK_WINDOW(filer_window->window),
 					    dir_settings->x, dir_settings->y);
-		if(dir_settings->flags & SET_SIZE) {
+		}
+		if (dir_settings->flags & SET_SIZE)
+		{
 			filer_window_set_size(filer_window,
 					      dir_settings->width,
 					      dir_settings->height);
