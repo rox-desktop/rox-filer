@@ -464,6 +464,10 @@ static void collection_size_allocate(GtkWidget *widget,
 	collection = COLLECTION(widget);
 
 	old_columns = collection->columns;
+	if (widget->allocation.x != allocation->x
+		|| widget->allocation.y != allocation->y)
+		collection->paint_level = PAINT_CLEAR;
+
 	widget->allocation = *allocation;
 
 	collection->columns = allocation->width / collection->item_width;

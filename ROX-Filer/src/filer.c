@@ -87,8 +87,16 @@ static OptionsSection options =
 	set_options,
 	save_options
 };
-static gboolean o_toolbar = TRUE;
-static GtkWidget *toggle_toolbar;
+
+/* The values correspond to the menu indexes in the option widget */
+typedef enum {
+	TOOLBAR_NONE 	= 0,
+	TOOLBAR_NORMAL 	= 1,
+	TOOLBAR_GNOME 	= 2,
+} ToolbarType;
+static ToolbarType o_toolbar = TOOLBAR_NORMAL;
+static GtkWidget *menu_toolbar;
+
 static gboolean o_single_click = FALSE;
 static GtkWidget *toggle_single_click;
 static gboolean o_new_window_on_1 = FALSE;	/* Button 1 => New window */
@@ -111,8 +119,9 @@ static gint focus_out(GtkWidget *widget,
 static void add_item(FilerWindow *filer_window, DirItem *item);
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window);
-static void add_button(GtkContainer *box, int pixmap,
-			GtkSignalFunc cb, gpointer data, char *tip);
+static void add_button(GtkWidget *box, int pixmap,
+			GtkSignalFunc cb, FilerWindow *filer_window,
+			char *label, char *tip);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
 static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
 				FilerWindow *window);
@@ -1510,7 +1519,7 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 				GTK_SIGNAL_FUNC(key_press_event), filer_window);
 		gtk_window_set_default_size(GTK_WINDOW(filer_window->window),
 			filer_window->display_style == LARGE_ICONS ? 400 : 512,
-			o_toolbar ? 220 : 200);
+			o_toolbar != TOOLBAR_NONE ? 220 : 200);
 
 		hbox = gtk_hbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(filer_window->window),
@@ -1519,7 +1528,7 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_box_pack_start(GTK_BOX(hbox), vbox, TRUE, TRUE, 0);
 		
-		if (o_toolbar)
+		if (o_toolbar != TOOLBAR_NONE)
 		{
 			GtkWidget *toolbar;
 			
@@ -1560,45 +1569,80 @@ FilerWindow *filer_opendir(char *path, gboolean panel, Side panel_side)
 static GtkWidget *create_toolbar(FilerWindow *filer_window)
 {
 	GtkWidget	*frame, *box;
-	
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
 
-	box = gtk_hbutton_box_new();
-	gtk_button_box_set_child_size_default(16, 16);
-	gtk_hbutton_box_set_spacing_default(2);
-	gtk_button_box_set_layout(GTK_BUTTON_BOX(box), GTK_BUTTONBOX_START);
+	if (o_toolbar == TOOLBAR_GNOME)
+	{
+		frame = gtk_handle_box_new();
+		box = gtk_toolbar_new(GTK_ORIENTATION_HORIZONTAL,
+				GTK_TOOLBAR_ICONS);
+		gtk_container_set_border_width(GTK_CONTAINER(box), 2);
+		gtk_toolbar_set_space_style(GTK_TOOLBAR(box),
+					GTK_TOOLBAR_SPACE_LINE);
+		gtk_toolbar_set_button_relief(GTK_TOOLBAR(box),
+					GTK_RELIEF_NONE);
+	}
+	else
+	{
+		frame = gtk_frame_new(NULL);
+		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
+
+		box = gtk_hbutton_box_new();
+		gtk_button_box_set_child_size_default(16, 16);
+		gtk_hbutton_box_set_spacing_default(2);
+		gtk_button_box_set_layout(GTK_BUTTON_BOX(box),
+				GTK_BUTTONBOX_START);
+	}
+
 	gtk_container_add(GTK_CONTAINER(frame), box);
 
-	add_button(GTK_CONTAINER(box), TOOLBAR_UP_ICON,
+	add_button(box, TOOLBAR_UP_ICON,
 			GTK_SIGNAL_FUNC(toolbar_up_clicked),
-			filer_window, "Change to parent directory");
-	add_button(GTK_CONTAINER(box), TOOLBAR_HOME_ICON,
+			filer_window,
+			"Up", "Change to parent directory");
+	add_button(box, TOOLBAR_HOME_ICON,
 			GTK_SIGNAL_FUNC(toolbar_home_clicked),
-			filer_window, "Change to home directory");
-	add_button(GTK_CONTAINER(box), TOOLBAR_REFRESH_ICON,
+			filer_window,
+			"Home", "Change to home directory");
+	add_button(box, TOOLBAR_REFRESH_ICON,
 			GTK_SIGNAL_FUNC(toolbar_refresh_clicked),
-			filer_window, "Rescan directory contents");
+			filer_window,
+			"Rescan", "Rescan directory contents");
 
 	return frame;
 }
 
-static void add_button(GtkContainer *box, int pixmap,
-			GtkSignalFunc cb, gpointer data,
-			char *tip)
+static void add_button(GtkWidget *box, int pixmap,
+			GtkSignalFunc cb, FilerWindow *filer_window,
+			char *label, char *tip)
 {
 	GtkWidget 	*button, *icon;
 
-	button = gtk_button_new();
-	GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
-	gtk_container_add(box, button);
-
 	icon = gtk_pixmap_new(default_pixmap[pixmap].pixmap,
 				default_pixmap[pixmap].mask);
-	gtk_container_add(GTK_CONTAINER(button), icon);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked", cb, data);
 
-	gtk_tooltips_set_tip(tooltips, button, tip, NULL);
+	if (o_toolbar == TOOLBAR_GNOME)
+	{
+		gtk_toolbar_append_element(GTK_TOOLBAR(box),
+				GTK_TOOLBAR_CHILD_BUTTON,
+				NULL,
+				label,
+				tip, NULL,
+				icon,
+				cb, filer_window);
+	}
+	else
+	{
+		button = gtk_button_new();
+		GTK_WIDGET_UNSET_FLAGS(button, GTK_CAN_FOCUS);
+
+		gtk_container_add(GTK_CONTAINER(button), icon);
+		gtk_signal_connect(GTK_OBJECT(button), "clicked",
+				cb, filer_window);
+
+		gtk_tooltips_set_tip(tooltips, button, tip, NULL);
+
+		gtk_container_add(GTK_CONTAINER(box), button);
+	}
 }
 
 /* Build up some option widgets to go in the options dialog, but don't
@@ -1606,7 +1650,7 @@ static void add_button(GtkContainer *box, int pixmap,
  */
 static GtkWidget *create_options()
 {
-	GtkWidget	*vbox;
+	GtkWidget	*vbox, *menu, *hbox;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -1626,9 +1670,19 @@ static GtkWidget *create_options()
 		gtk_check_button_new_with_label("Single-click nagivation");
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_single_click, FALSE, TRUE, 0);
 
-	toggle_toolbar =
-		gtk_check_button_new_with_label("Show toolbar on new windows");
-	gtk_box_pack_start(GTK_BOX(vbox), toggle_toolbar, FALSE, TRUE, 0);
+	hbox = gtk_hbox_new(FALSE, 4);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+	gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_label_new("Toolbar type for new windows"),
+			FALSE, TRUE, 0);
+	menu_toolbar = gtk_option_menu_new();
+	menu = gtk_menu_new();
+	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("None"));
+	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("Normal"));
+	gtk_menu_append(GTK_MENU(menu), gtk_menu_item_new_with_label("GNOME"));
+	gtk_option_menu_set_menu(GTK_OPTION_MENU(menu_toolbar), menu);
+	gtk_box_pack_start(GTK_BOX(hbox), menu_toolbar, TRUE, TRUE, 0);
 
 	return vbox;
 }
@@ -1642,13 +1696,15 @@ static void update_options()
 			collection_menu_button == 2 ? 1 : 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_single_click),
 			o_single_click);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_toolbar),
-			o_toolbar);
+	gtk_option_menu_set_history(GTK_OPTION_MENU(menu_toolbar), o_toolbar);
 }
 
 /* Set current values by reading the states of the widgets in the options box */
 static void set_options()
 {
+	GtkWidget 	*item, *menu;
+	GList		*list;
+	
 	o_new_window_on_1 = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_new_window_on_1));
 
@@ -1659,8 +1715,12 @@ static void set_options()
 			GTK_TOGGLE_BUTTON(toggle_single_click));
 	collection_single_click = o_single_click ? TRUE : FALSE;
 	
-	o_toolbar = gtk_toggle_button_get_active(
-			GTK_TOGGLE_BUTTON(toggle_toolbar));
+	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(menu_toolbar));
+	item = gtk_menu_get_active(GTK_MENU(menu));
+	list = gtk_container_children(GTK_CONTAINER(menu));
+	o_toolbar = (ToolbarType) g_list_index(list, item);
+	g_list_free(list);
+	
 }
 
 static void save_options()
@@ -1669,7 +1729,10 @@ static void save_options()
 	option_write("filer_menu_on_2",
 			collection_menu_button == 2 ? "1" : "0");
 	option_write("filer_single_click", o_single_click ? "1" : "0");
-	option_write("filer_toolbar", o_toolbar ? "1" : "0");
+	option_write("filer_toolbar", o_toolbar == TOOLBAR_NONE ? "None" :
+				      o_toolbar == TOOLBAR_NORMAL ? "Normal" :
+				      o_toolbar == TOOLBAR_GNOME ? "GNOME" :
+				      "Unknown");
 }
 
 static char *filer_new_window_on_1(char *data)
@@ -1693,7 +1756,15 @@ static char *filer_single_click(char *data)
 
 static char *filer_toolbar(char *data)
 {
-	o_toolbar = atoi(data) != 0;
+	if (g_strcasecmp(data, "None") == 0)
+		o_toolbar = TOOLBAR_NONE;
+	else if (g_strcasecmp(data, "Normal") == 0)
+		o_toolbar = TOOLBAR_NORMAL;
+	else if (g_strcasecmp(data, "GNOME") == 0)
+		o_toolbar = TOOLBAR_GNOME;
+	else
+		return "Unknown toolbar type";
+
 	return NULL;
 }
 

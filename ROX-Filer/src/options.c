@@ -174,9 +174,14 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 				message = g_string_new(NULL);
 				g_string_sprintf(message,
-						"Error in options file at "
-						"line %d: %s", line_number,
-						error);
+					"Error in options file at line %d: "
+					"\n\"%s\"\n"
+					"This may be due to upgrading from "
+					"a previous version of ROX-Filer. "
+					"Open the Options window and click "
+					"on Save.",
+					line_number,
+					error);
 				delayed_error("ROX-Filer", message->str);
 				g_string_free(message, TRUE);
 				break;
@@ -228,9 +233,7 @@ static char *process_option_line(guchar *line)
 
 	func = (OptionFunc *) g_hash_table_lookup(option_hash, line);
 	if (!func)
-		return "Unknown option - this may be due to using a newer "
-			"or older version of ROX-Filer than that which saved "
-			"the file. Open the Options window and click Save.";
+		return "Unknown option";
 
 	return func(c);
 }
