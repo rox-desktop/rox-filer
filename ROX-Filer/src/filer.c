@@ -89,7 +89,7 @@ static void update_display(Directory *dir,
 static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
-static FilerWindow *find_filer_window(char *real_path, FilerWindow *diff);
+static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff);
 static gint coll_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
 			        FilerWindow *filer_window);
@@ -1145,7 +1145,7 @@ void filer_change_to(FilerWindow *filer_window,
 	{
 		FilerWindow *fw;
 		
-		fw = find_filer_window(real_path, filer_window);
+		fw = find_filer_window(sym_path, filer_window);
 		if (fw)
 			gtk_widget_destroy(fw->window);
 	}
@@ -1282,7 +1282,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	{
 		FilerWindow	*same_dir_window;
 		
-		same_dir_window = find_filer_window(real_path, NULL);
+		same_dir_window = find_filer_window(path, NULL);
 
 		if (same_dir_window)
 		{
@@ -1628,9 +1628,8 @@ void full_refresh(void)
 
 /* See whether a filer window with a given path already exists
  * and is different from diff.
- * XXX: real_path or sym_path?
  */
-static FilerWindow *find_filer_window(char *real_path, FilerWindow *diff)
+static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff)
 {
 	GList	*next = all_filer_windows;
 
@@ -1639,7 +1638,7 @@ static FilerWindow *find_filer_window(char *real_path, FilerWindow *diff)
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
 		if (filer_window != diff &&
-		    	strcmp(real_path, filer_window->real_path) == 0)
+		    	strcmp(sym_path, filer_window->sym_path) == 0)
 		{
 			return filer_window;
 		}

@@ -117,6 +117,7 @@ static void new_file_type(gchar *templ);
 static void do_send_to(gchar *templ);
 static void show_send_to_menu(GList *paths, GdkEvent *event);
 static GList *set_keys_button(Option *option, xmlNode *node, guchar *label);
+static void options_closed(GtkWindow *options, gpointer unused);
 
 /* Note that for most of these callbacks none of the arguments are used. */
 
@@ -1188,7 +1189,16 @@ static void invert_selection(gpointer data, guint action, GtkWidget *widget)
 
 void menu_show_options(gpointer data, guint action, GtkWidget *widget)
 {
-	options_show();
+	GtkWidget *win;
+
+	win = options_show();
+
+	if (win)
+	{
+		number_of_windows++;
+		g_signal_connect(win, "destroy",
+				G_CALLBACK(options_closed), NULL);
+	}
 }
 
 static gboolean new_directory_cb(GObject *savebox,
@@ -1833,3 +1843,10 @@ static GList *set_keys_button(Option *option, xmlNode *node, guchar *label)
 
 	return g_list_append(NULL, align);
 }
+
+static void options_closed(GtkWindow *options, gpointer unused)
+{
+	if (--number_of_windows == 0)
+		gtk_main_quit();
+}
+
