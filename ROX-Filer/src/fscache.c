@@ -138,7 +138,7 @@ void g_fscache_data_unref(GFSCache *cache, gpointer data)
  */
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
 {
-	return g_fscache_lookup_full(cache, pathname, TRUE);
+	return g_fscache_lookup_full(cache, pathname, FSCACHE_LOOKUP_CREATE);
 }
 
 /* As g_fscache_lookup, but 'load' flags control what happens if the data
@@ -146,7 +146,8 @@ gpointer g_fscache_lookup(GFSCache *cache, char *pathname)
  * TRUE => Data is updated / reloaded
  * FALSE => Returns NULL
  */
-gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load)
+gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
+				FSCacheLookup lookup_type)
 {
 	struct stat 	info;
 	GFSCacheKey	key;
@@ -165,12 +166,17 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load)
 
 	if (data)
 	{
-		/* We've cached this file already - is it up-to-date? */
+		/* We've cached this file already */
+
+		if (lookup_type == FSCACHE_LOOKUP_PEEK)
+			goto out;	/* Never update on peeks */
+		
+		/* Is it up-to-date? */
 
 		if (UPTODATE(data, info))
 			goto out;
 		
-		if (!load)
+		if (lookup_type == FSCACHE_LOOKUP_ONLY_NEW)
 			return NULL;
 
 		/* Out-of-date */
@@ -187,7 +193,7 @@ gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load)
 	{
 		GFSCacheKey *new_key;
 
-		if (!load)
+		if (lookup_type != FSCACHE_LOOKUP_CREATE)
 			return NULL;
 		
 		new_key = g_memdup(&key, sizeof(key));

@@ -53,6 +53,12 @@ struct _GFSCacheData
 	mode_t		mode;
 };
 
+typedef enum {
+	FSCACHE_LOOKUP_CREATE,	/* Load if missing. Update as needed. */
+	FSCACHE_LOOKUP_ONLY_NEW,/* Return NULL if not present AND uptodate */
+	FSCACHE_LOOKUP_PEEK,	/* Lookup; don't load or update */
+} FSCacheLookup;
+
 GFSCache *g_fscache_new(GFSLoadFunc load,
 			GFSRefFunc ref,
 			GFSRefFunc unref,
@@ -61,7 +67,8 @@ GFSCache *g_fscache_new(GFSLoadFunc load,
 			gpointer user_data);
 void g_fscache_destroy(GFSCache *cache);
 gpointer g_fscache_lookup(GFSCache *cache, char *pathname);
-gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname, gboolean load);
+gpointer g_fscache_lookup_full(GFSCache *cache, char *pathname,
+				FSCacheLookup lookup_type);
 void g_fscache_may_update(GFSCache *cache, char *pathname);
 void g_fscache_update(GFSCache *cache, char *pathname);
 void g_fscache_purge(GFSCache *cache, gint age);

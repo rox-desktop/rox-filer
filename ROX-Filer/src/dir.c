@@ -79,6 +79,7 @@ static void destroy(Directory *dir);
 static void set_idle_callback(Directory *dir);
 static void insert_item(Directory *dir, guchar *leafname);
 static void remove_missing(Directory *dir, GPtrArray *keep);
+static void dir_recheck(Directory *dir, guchar *path, guchar *leafname);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -180,7 +181,6 @@ void refresh_dirs(char *path)
 
 /* When something has happened to a particular object, call this
  * and all appropriate changes will be made.
- * Currently, we just extract the dirname and rescan...
  */
 void dir_check_this(guchar *path)
 {
@@ -193,8 +193,14 @@ void dir_check_this(guchar *path)
 
 	if (slash)
 	{
+		Directory *dir;
+
 		*slash = '\0';
-		refresh_dirs(real_path);
+
+		dir = g_fscache_lookup_full(dir_cache, real_path,
+						FSCACHE_LOOKUP_PEEK);
+		if (dir)
+			dir_recheck(dir, real_path, slash + 1);
 	}
 	
 	g_free(real_path);
@@ -500,6 +506,8 @@ static void delayed_notify(Directory *dir)
 	dir->notify_active = TRUE;
 }
 
+/* Stat this item and add, update or remove it */
+/* XXX: Doesn't cope with deletions yet! */
 static void insert_item(Directory *dir, guchar *leafname)
 {
 	static GString  *tmp = NULL;
@@ -670,3 +678,13 @@ static void set_idle_callback(Directory *dir)
 	}
 }
 
+static void dir_recheck(Directory *dir, guchar *path, guchar *leafname)
+{
+	g_free(dir->pathname);
+	dir->pathname = g_strdup(path);
+
+	g_print("[ recheck %s - %s ]\n", path, leafname);
+
+	insert_item(dir, leafname);
+	dir_merge_new(dir);
+}
