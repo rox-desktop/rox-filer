@@ -763,7 +763,7 @@ static GtkWidget *make_permissions(const gchar *path, DirItem *item)
 	Permissions *perm;
 	GtkWidget *frame;
 	GtkWidget *table;
-	GtkWidget *but, *tick, *label;
+	GtkWidget *tick, *label;
 	int i, x, y;
 
 	perm=g_new(Permissions, 1);
