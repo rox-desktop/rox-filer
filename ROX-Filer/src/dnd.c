@@ -91,6 +91,7 @@ static void save_options();
 static char *load_no_hostnames(char *data);
 static char *drag_to_icons(char *data);
 static char *spring_open(char *data);
+static char *spring_delay(char *data);
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     FilerWindow *filer_window);
@@ -159,6 +160,7 @@ void dnd_init()
 	option_register("dnd_no_hostnames", load_no_hostnames);
 	option_register("dnd_drag_to_icons", drag_to_icons);
 	option_register("dnd_spring_open", spring_open);
+	option_register("dnd_spring_delay", spring_delay);
 }
 
 /*				OPTIONS				*/
@@ -166,17 +168,19 @@ void dnd_init()
 gboolean o_no_hostnames = FALSE;
 static gboolean o_drag_to_icons = TRUE;
 static gboolean o_spring_open = FALSE;
+static gint	o_spring_delay = 400;
 
 static GtkWidget *toggle_no_hostnames;
 static GtkWidget *toggle_drag_to_icons;
 static GtkWidget *toggle_spring_open;
+static GtkAdjustment *adj_spring_delay;
 
 /* Build up some option widgets to go in the options dialog, but don't
  * fill them in yet.
  */
 static GtkWidget *create_options()
 {
-	GtkWidget	*vbox;
+	GtkWidget	*vbox, *hbox, *label, *scale;
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_container_set_border_width(GTK_CONTAINER(vbox), 4);
@@ -208,9 +212,27 @@ static GtkWidget *create_options()
 		"after the file is held over it for a short while."));
 	gtk_box_pack_start(GTK_BOX(vbox), toggle_spring_open, FALSE, TRUE, 0);
 
+	adj_spring_delay = GTK_ADJUSTMENT(gtk_adjustment_new(o_spring_delay,
+							100, 2000,
+							10, 100, 0));
+	
+	hbox = gtk_hbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	label = gtk_label_new(_("Spring delay"));
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 0);
+	scale = gtk_hscale_new(adj_spring_delay);
+	gtk_scale_set_value_pos(GTK_SCALE(scale), GTK_POS_LEFT);
+	gtk_scale_set_digits(GTK_SCALE(scale), 0);
+	gtk_box_pack_start(GTK_BOX(hbox), scale, TRUE, TRUE, 0);
+	OPTION_TIP(scale,
+		_("This option sets how long, in ms, you must hold a file over "
+		"a directory before it will spring open. The above "
+		"option must be turned on for this to have any effect."));
+
 	return vbox;
 }
 
+/* Reflect current state by changing the widgets in the options box */
 static void update_options()
 {
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_no_hostnames),
@@ -219,8 +241,10 @@ static void update_options()
 			o_drag_to_icons);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(toggle_spring_open),
 			o_spring_open);
+	gtk_adjustment_set_value(adj_spring_delay, o_spring_delay);
 }
 
+/* Set current values by reading the states of the widgets in the options box */
 static void set_options()
 {
 	o_no_hostnames = gtk_toggle_button_get_active(
@@ -229,13 +253,20 @@ static void set_options()
 			GTK_TOGGLE_BUTTON(toggle_drag_to_icons));
 	o_spring_open = gtk_toggle_button_get_active(
 			GTK_TOGGLE_BUTTON(toggle_spring_open));
+	o_spring_delay = adj_spring_delay->value;
 }
 
 static void save_options()
 {
+	guchar	*str;
+
 	option_write("dnd_no_hostnames", o_no_hostnames ? "1" : "0");
 	option_write("dnd_drag_to_icons", o_drag_to_icons ? "1" : "0");
 	option_write("dnd_spring_open", o_spring_open ? "1" : "0");
+
+	str = g_strdup_printf("%d", o_spring_delay);
+	option_write("dnd_spring_delay", str);
+	g_free(str);
 }
 
 static char *load_no_hostnames(char *data)
@@ -247,6 +278,12 @@ static char *load_no_hostnames(char *data)
 static char *drag_to_icons(char *data)
 {
 	o_drag_to_icons = atoi(data) != 0;
+	return NULL;
+}
+
+static char *spring_delay(char *data)
+{
+	o_spring_delay = atoi(data);
 	return NULL;
 }
 
@@ -1240,7 +1277,7 @@ void dnd_spring_load(GdkDragContext *context)
 	
 	spring_context = context;
 	gdk_drag_context_ref(spring_context);
-	spring_timeout = gtk_timeout_add(500, spring_now, NULL);
+	spring_timeout = gtk_timeout_add(o_spring_delay, spring_now, NULL);
 }
 
 void dnd_spring_abort(void)

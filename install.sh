@@ -30,7 +30,7 @@ function confirm_or_die () {
 
 cd `dirname $0`
 
-./ROX-Filer/AppRun --version 2> /dev/null
+./ROX-Filer/AppRun -v 2> /dev/null
 
 if [ $? -ne 0 ]; then
 	echo "Filer didn't run... attempting to compile..."
@@ -40,7 +40,7 @@ else
 fi
 
 echo Testing...
-./ROX-Filer/AppRun --version
+./ROX-Filer/AppRun -v
 if [ $? -ne 0 ]; then
 	die "Filer doesn't work! Giving up..."
 fi

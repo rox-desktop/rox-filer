@@ -248,14 +248,19 @@ int main(int argc, char **argv)
 	choices_init();
 	i18n_init();
 
-	if (app_dir)
-		unsetenv("APP_DIR");
-	else
+	if (!app_dir)
 	{
 		g_warning("APP_DIR environment variable was unset!\n"
 			"Use the AppRun script to invoke ROX-Filer...\n");
 		app_dir = g_get_current_dir();
 	}
+#ifdef HAVE_UNSETENV 
+	else
+	{
+		/* Don't pass it on to our child processes... */
+		unsetenv("APP_DIR");
+	}
+#endif
 
 	death_callbacks = g_hash_table_new(NULL, NULL);
 
