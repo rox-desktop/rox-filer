@@ -132,6 +132,9 @@ static void collection_item_set_selected(Collection *collection,
                                          gint item,
                                          gboolean selected,
 					 gboolean signal);
+static void collection_drag_leave(GtkWidget *widget, GdkDragContext *context,
+				  guint time);
+static void collection_drag_end(GtkWidget *widget, GdkDragContext *context);
 static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
 
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
@@ -215,6 +218,8 @@ static void collection_class_init(GObjectClass *gclass, gpointer data)
 	widget_class->motion_notify_event = collection_motion_notify;
 	widget_class->map = collection_map;
 	widget_class->scroll_event = collection_scroll_event;
+	widget_class->drag_end = collection_drag_end;
+	widget_class->drag_leave = collection_drag_leave;
 
 	gclass->set_property = collection_set_property;
 	gclass->get_property = collection_get_property;
@@ -374,6 +379,36 @@ static void collection_finalize(GObject *object)
 
 	if (G_OBJECT_CLASS(parent_class)->finalize)
 		G_OBJECT_CLASS(parent_class)->finalize(object);
+}
+
+static void collection_drag_leave(GtkWidget *widget, GdkDragContext *context,
+				  guint time)
+{
+	Collection *collection = COLLECTION(widget);
+
+	/* Note that this isn't always called when the pointer leaves the
+	 * widget; only if we highlighted an item at some point. 
+	 */
+
+	/* collection_set_autoscroll(collection, FALSE); - not needed? */
+	collection_set_cursor_item(collection, -1);
+
+	if (GTK_WIDGET_CLASS(parent_class)->drag_leave)
+		(*GTK_WIDGET_CLASS(parent_class)->drag_leave)(widget, context,
+							      time);
+}
+
+/* Turn off auto scrolling.
+ * (do we need this AND drag_leave?)
+ */
+static void collection_drag_end(GtkWidget *widget, GdkDragContext *context)
+{
+	Collection *collection = COLLECTION(widget);
+
+	collection_set_autoscroll(collection, FALSE);
+
+	if (GTK_WIDGET_CLASS(parent_class)->drag_end)
+		(*GTK_WIDGET_CLASS(parent_class)->drag_end)(widget, context);
 }
 
 static void collection_map(GtkWidget *widget)
@@ -1852,8 +1887,8 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 /* When autoscroll is on, a timer keeps track of the pointer position.
  * While it's near the top or bottom of the window, the window scrolls.
  *
- * If the mouse buttons are released, or the pointer leaves the window,
- * auto_scroll is turned off.
+ * If the mouse buttons are released, the pointer leaves the window, or
+ * a drag-and-drop operation finishes, auto_scroll is turned off.
  */
 void collection_set_autoscroll(Collection *collection, gboolean auto_scroll)
 {

@@ -37,6 +37,7 @@
 
 #include "global.h"
 
+#include "view_iface.h"
 #include "collection.h"
 #include "dnd.h"
 #include "type.h"
@@ -370,10 +371,9 @@ static void drag_end(GtkWidget *widget,
 			GdkDragContext *context,
 			FilerWindow *filer_window)
 {
-	collection_set_autoscroll(filer_window->collection, FALSE);
 	if (filer_window->temp_item_selected)
 	{
-		collection_clear_selection(filer_window->collection);
+		view_clear_selection(VIEW(filer_window->view));
 		filer_window->temp_item_selected = FALSE;
 	}
 }
@@ -654,8 +654,6 @@ static void drag_leave(GtkWidget		*widget,
 			   guint32		time,
 			   FilerWindow		*filer_window)
 {
-	collection_set_autoscroll(filer_window->collection, FALSE);
-	collection_set_cursor_item(filer_window->collection, -1);
 	dnd_spring_abort();
 	if (scrolled_adj)
 	{

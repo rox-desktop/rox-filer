@@ -26,6 +26,7 @@ struct _ViewIfaceClass
 		    gboolean (*test)(gpointer item, gpointer data),
 		    gpointer data);
   void (*clear)(ViewIface *obj);
+  void (*clear_selection)(ViewIface *obj);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -55,5 +56,6 @@ void view_delete_if(ViewIface *obj,
 		    gboolean (*test)(gpointer item, gpointer data),
 		    gpointer data);
 void view_clear(ViewIface *obj);
+void view_clear_selection(ViewIface *obj);
 
 #endif /* __VIEW_IFACE_H__ */

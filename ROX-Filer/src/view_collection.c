@@ -158,6 +158,7 @@ static void view_collection_delete_if(ViewIface *view,
 			  gboolean (*test)(gpointer item, gpointer data),
 			  gpointer data);
 static void view_collection_clear(ViewIface *view);
+static void view_collection_clear_selection(ViewIface *view);
 
 
 /****************************************************************
@@ -747,6 +748,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->update_items = view_collection_update_items;
 	iface->delete_if = view_collection_delete_if;
 	iface->clear = view_collection_clear;
+	iface->clear_selection = view_collection_clear_selection;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -1423,4 +1425,12 @@ static void view_collection_clear(ViewIface *view)
 	Collection	*collection = view_collection->collection;
 	
 	collection_clear(collection);
+}
+
+static void view_collection_clear_selection(ViewIface *view)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+	Collection	*collection = view_collection->collection;
+	
+	collection_clear_selection(collection);
 }

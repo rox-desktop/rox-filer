@@ -134,3 +134,11 @@ void view_clear(ViewIface *obj)
 
 	VIEW_IFACE_GET_CLASS(obj)->clear(obj);
 }
+
+/* Unselect all items */
+void view_clear_selection(ViewIface *obj)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->clear_selection(obj);
+}
