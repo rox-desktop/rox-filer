@@ -568,7 +568,9 @@ $ rox --bottom=</screen>
 
      <row><entry><keycap>Return</keycap></entry><entry>
        Acts like clicking on the file. You may hold down Shift for other
-       effects, as with clicking.
+       effects, as with clicking. Holding down Alt works like clicking with
+       the middle button; directories open in a new window and opening files
+       closes the directory at the same time.
      </entry></row>
 
      <row><entry><keycap>Spacebar</keycap></entry><entry>
@@ -701,11 +703,11 @@ $ rox --bottom=</screen>
        Hide or show extra details</entry><entry>
        Same
        </entry></row><row><entry>
-       Dot files</entry><entry>
+       Crossed out text</entry><entry>
        Toggle the display of hidden file (those with names starting with a dot)</entry><entry>
        Same
        </entry></row><row><entry>
-       Information</entry><entry>
+       Life-belt</entry><entry>
        Show <application>ROX-Filer</application>'s help files</entry><entry>
        Show help files and close window
      </entry></row>
@@ -768,6 +770,10 @@ $ rox --bottom=</screen>
 
       <row><entry><guimenuitem>Window</guimenuitem></entry><entry>
         Operations on the window as a whole.
+      </entry></row>
+
+      <row><entry><guimenuitem>Help</guimenuitem></entry><entry>
+        Information about the filer.
       </entry></row>
 
    </tbody></tgroup></informaltable>
@@ -1000,12 +1006,10 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Shift Open</guimenuitem></entry><entry>
-         Opens applications as directories, files as text/plain, mount points by
-         mounting or unmounting them and symlinks by opening the directory containing
-         the thing they point to. This is the same effect as clicking with
-	 <keycap>Shift</keycap> held down. The text of the menu entry changes
-	 to show which action will be performed.
+         <guimenuitem>Delete</guimenuitem></entry><entry>
+         Remove all the selected entries from the directory. Subdirectories
+         will have their contents deleted first. Deleting symlinks only removes
+         the link, not the thing it points to.
        </entry></row>
 
        <row><entry>
@@ -1015,20 +1019,12 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Info</guimenuitem></entry><entry>
-         Display extra information about this object.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Set Run Action...</guimenuitem></entry><entry>
-         Allows you to set the default program to use when opening files of
-         this type. See <xref linkend="RunAction"/> section for details.
-       </entry></row>
-
-       <row><entry>
-         <guimenuitem>Set Icon...</guimenuitem></entry><entry>
-         You can give each file or directory its own special icon using this
-         feature &mdash; simply drag a suitable image onto <xref linkend="SetIcon"/>.
+         <guimenuitem>Shift Open</guimenuitem></entry><entry>
+         Opens applications as directories, files as text/plain, mount points by
+         mounting or unmounting them and symlinks by opening the directory containing
+         the thing they point to. This is the same effect as clicking with
+	 <keycap>Shift</keycap> held down. The text of the menu entry changes
+	 to show which action will be performed.
        </entry></row>
 
        <row><entry>
@@ -1045,14 +1041,24 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Delete</guimenuitem></entry><entry>
-         Remove all the selected entries from the directory. Subdirectories
-         will have their contents deleted first. Deleting symlinks only removes
-         the link, not the thing it points to.
+         <guimenuitem>Set Run Action...</guimenuitem></entry><entry>
+         Allows you to set the default program to use when opening files of
+         this type. See <xref linkend="RunAction"/> section for details.
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Disk Usage</guimenuitem></entry><entry>
+         <guimenuitem>Set Icon...</guimenuitem></entry><entry>
+         You can give each file or directory its own special icon using this
+         feature &mdash; simply drag a suitable image onto <xref linkend="SetIcon"/>.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Info</guimenuitem></entry><entry>
+         Display extra information about this object.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Count</guimenuitem></entry><entry>
          Count the sizes of all the selected items. Directories also have their
          contents counted. Symlinks count themselves, not the things they point
          to.
@@ -1254,6 +1260,37 @@ $ rox --bottom=</screen>
 
     </tbody></tgroup></informaltable>
 
+
+   </para>
+  </sect1>
+
+  <sect1>
+   <title>The help menu</title>
+   <para>
+
+    <informaltable><tgroup cols="2">
+      <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+      <tbody>
+       <row><entry>
+         <guimenuitem>About ROX-Filer...</guimenuitem></entry><entry>
+         Display information about the file. This is the same as locating ROX-Filer
+	 itself in a filer window and selecting <guimenuitem>Info</guimenuitem> from
+	 the file menu.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Show Help Files</guimenuitem></entry><entry>
+	 Same as selecting ROX-Filer and choosing
+	 <guimenuitem>Help</guimenuitem> from the file menu.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Manual</guimenuitem></entry><entry>
+	 Opens the HTML manual for your language, or the English version if there
+	 is no translation.
+       </entry></row>
+
+    </tbody></tgroup></informaltable>
 
    </para>
   </sect1>
@@ -2771,9 +2808,9 @@ while 1:
 
    </para>
    <para>
-    The filer works out the type for a file from its name. These are specified by
-    `.mimeinfo' files &mdash; see <citation>SharedMIME</citation> for details.
-   </para>
+    The filer works out the type for a file from its name. The rules come from
+    various <filename>globs</filename> files &mdash; see
+    <citation>SharedMIME</citation> for details.</para>
   </sect1>
  </chapter>
 
@@ -3554,7 +3591,7 @@ EOF</screen>
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.7)
+   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
     <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
   </bibliomixed>
 
