@@ -28,5 +28,6 @@ void mount_user_mount(const char *path);
 gboolean mount_is_user_mounted(const gchar *path);
 gboolean mount_is_mounted(const guchar *path, struct stat *info,
 					      struct stat *parent);
+gchar *mount_get_fs_size(const gchar *dir);
 
 #endif /* _MOUNT_H */

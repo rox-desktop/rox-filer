@@ -575,34 +575,47 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 	}
 	else
 	{
-		DU *du;
-		int out;
-		gchar *args[] = {"du", "-sk", "", NULL};
+		gchar *stt=NULL;
 
-		du = g_new(DU, 1);
-		du->store = store;
-		du->path = g_strdup(add_row(store, _("Size:"), _("Scanning")));
+		if(item->flags & ITEM_FLAG_MOUNTED)
+			stt=mount_get_fs_size(path);
 
-		args[2] = (gchar *) path;
-		if (g_spawn_async_with_pipes(NULL, args, NULL,
-					    G_SPAWN_SEARCH_PATH,
-					    NULL, NULL, &du->child,
-					    NULL, &out, NULL,
-					    NULL))
-		{
-			du->chan = g_io_channel_unix_new(out);
-			du->watch = g_io_add_watch(du->chan,
+		if(stt) {
+			add_row_and_free(store, _("Size:"), stt);
+		} else {
+			DU *du;
+			int out;
+			
+			gchar *args[] = {"du", "-sk", "", NULL};
+
+			du = g_new(DU, 1);
+			du->store = store;
+			du->path = g_strdup(add_row(store, _("Size:"),
+						    _("Scanning")));
+
+			args[2] = (gchar *) path;
+			if (g_spawn_async_with_pipes(NULL, args, NULL,
+						     G_SPAWN_SEARCH_PATH,
+						     NULL, NULL, &du->child,
+						     NULL, &out, NULL,
+						     NULL))
+			{
+				du->chan = g_io_channel_unix_new(out);
+				du->watch = g_io_add_watch(du->chan,
 						   G_IO_IN|G_IO_ERR|G_IO_HUP,
 						 (GIOFunc) read_du_output, du);
-			g_object_ref(G_OBJECT(du->store));
- 			g_signal_connect(G_OBJECT(view), "destroy",
- 				  G_CALLBACK(kill_du_output), du);
-		}
-		else
-		{
-			set_cell(store, du->path, _("Failed to scan"));
-			g_free(du->path);
-			g_free(du);
+				g_object_ref(G_OBJECT(du->store));
+				g_signal_connect(G_OBJECT(view),
+						 "destroy",
+						 G_CALLBACK(kill_du_output),
+						 du);
+			}
+			else
+			{
+				set_cell(store, du->path, _("Failed to scan"));
+				g_free(du->path);
+				g_free(du);
+			}
 		}
 	}
 

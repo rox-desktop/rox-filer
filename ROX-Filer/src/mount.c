@@ -44,6 +44,12 @@
 # include <sys/mnttab.h>
 #endif
 #include <sys/time.h>
+#ifdef HAVE_STATFS
+#include <sys/vfs.h>
+#endif
+#ifdef HAVE_STATVFS
+#include <sys/statvfs.h>
+#endif
 
 #include <gtk/gtk.h>
 
@@ -323,3 +329,51 @@ static void read_table(void)
 # endif /* HAVE_MNTENT_H */
 
 #endif /* DO_MOUNT_POINTS */
+
+gchar *mount_get_fs_size(const gchar *dir)
+{
+  int ok=FALSE;
+
+#if defined(HAVE_STATVFS)
+    struct statvfs buf;
+#elif defined(HAVE_STATFS)
+    struct statfs buf;
+#endif
+    unsigned long long total, used, avail;
+    gdouble fused;
+    gchar *str;
+    gchar *tmp1, *tmp2;
+    
+#if defined(HAVE_STATVFS)
+    ok=statvfs(dir, &buf)==0;
+#elif defined(HAVE_STATFS)
+    ok=statfs(dir, &buf)==0;
+#endif
+    if(!ok)
+	    return NULL;
+    
+#if defined(HAVE_STATVFS)
+    total=buf.f_frsize*(unsigned long long) buf.f_blocks;
+    used=buf.f_frsize*(unsigned long long) (buf.f_blocks-buf.f_bfree);
+    avail=buf.f_frsize*(unsigned long long) buf.f_bavail;
+#else
+    total=buf.f_bsize*(unsigned long long) buf.f_blocks;
+    used=buf.f_bsize*(unsigned long long) (buf.f_blocks-buf.f_bfree);
+    avail=buf.f_bsize*(unsigned long long) buf.f_bavail;
+#endif
+    if(total>0)
+	    fused=100.*(total-used)/((gdouble) total);
+    else
+	    fused=0.0;
+
+    tmp1=g_strdup(format_size(total));
+    tmp2=g_strdup(format_size(used));
+    str=g_strdup_printf(_("%s total, %s used, %s free (%.1f %%)"),
+			tmp1, tmp2, format_size(avail), fused);
+
+    g_free(tmp1);
+    g_free(tmp2);
+
+    return str;
+}
+

@@ -139,7 +139,7 @@ AC_TYPE_UID_T
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long)
+AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long statvfs statfs)
 
 dnl Check for extended attribute support
 AC_CHECK_FUNCS(attropen getxattr)
