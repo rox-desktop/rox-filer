@@ -1432,13 +1432,20 @@ static void do_mount(const guchar *path, gboolean mount)
 			_("!%s\nMount failed\n") :
 			_("!%s\nUnmount failed\n"), err);
 		g_free(err);
+
+		/* Mount may have worked even on error, eg if we try to mount
+		 * a read-only disk read/write, it gets mounted read-only
+		 * with an error.
+		 */
+		if (mount && mount_is_mounted(path, NULL, NULL))
+			printf_send(_("'(seems to be mounted now anyway)\n"));
+		else
+			return;
 	}
-	else
-	{
-		printf_send("M%s", path);
-		if (mount && mount_open_dir)
-			printf_send("o%s", path);
-	}
+
+	printf_send("M%s", path);
+	if (mount && mount_open_dir)
+		printf_send("o%s", path);
 }
 
 /*			CHILD MAIN LOOPS			*/

@@ -4,7 +4,10 @@
 
 14-Jul-2003
 ~~~~~~~~~~~
-Less frame-heavy look for info box.
+Less frame-heavy look for info box (Thomas Leonard).
+When mounting, force a refresh even if the mtime of the new disk is the same,
+since some formats don't change it. Also, if mounting gives an error, check to
+see if it worked anyway (Thomas Leonard).
 
 13-Jul-2003
 ~~~~~~~~~~~

@@ -1574,6 +1574,11 @@ void filer_check_mounted(const char *real_path)
 	int	len;
 	gboolean resize = o_filer_auto_resize.int_value == RESIZE_ALWAYS;
 
+	/* DOS disks, etc, often don't change the mtime of the root directory
+	 * on modification, so force a refresh now.
+	 */
+	g_fscache_update(dir_cache, real_path);
+
 	len = strlen(real_path);
 
 	while (next)
