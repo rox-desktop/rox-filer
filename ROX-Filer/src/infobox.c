@@ -227,6 +227,7 @@ static GtkWidget *make_vbox(const guchar *path)
 		name = gtk_label_new(u8);
 		g_free(u8);
 	}
+	gtk_label_set_selectable(GTK_LABEL(name), TRUE);
 	gtk_box_pack_start(GTK_BOX(hbox), name, FALSE, TRUE, 4);
 	
 	/* Make the name bolder and larger */
