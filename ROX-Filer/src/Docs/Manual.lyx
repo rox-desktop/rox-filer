@@ -1025,17 +1025,17 @@ Reread the directory contents
 \newline 
 Open a new window
 \newline 
-Big square
+Magnifying glass
 \newline 
-Use large icons in the display
+Make icons bigger
 \newline 
-Menu of extra details
+Make icons smaller
 \newline 
-Small squares
+List
 \newline 
-Use small icons in the display
+Hide or show extra details
 \newline 
-Menu of extra details
+Same
 \newline 
 Information
 \newline 
@@ -1062,6 +1062,11 @@ If the 'New window on button 1' option is turned on then the default is
 
 Dragging files to the Up or Home icons acts just like dragging them into
  the directory which the button leads to.
+\layout Standard
+
+The toolbar can also show the number of files in the directory, and information
+ about the selection.
+ This can be turned on or off in the Options box.
 \layout Section
 
 The menus
@@ -1858,10 +1863,8 @@ These menus are both the same, and very simple:
 \layout Standard
 \added_space_top 0.3cm \added_space_bottom 0.3cm \align center \LyXTable
 multicol5
-8 2 0 0 -1 -1 -1 -1
+6 2 0 0 -1 -1 -1 -1
 1 1 0 0
-1 0 0 0
-1 0 0 0
 1 0 0 0
 1 0 0 0
 1 0 0 0
@@ -1874,13 +1877,9 @@ multicol5
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
-0 2 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
-0 2 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 2 1 0 0 0 0 "" ""
-0 8 1 0 0 0 0 "" ""
-0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
 0 8 1 0 0 0 0 "" ""
@@ -1890,34 +1889,26 @@ Entry
 \newline 
 Action
 \newline 
-ROX-Filer Help
+ROX-Filer
 \newline 
-Open the directory containing ROX-Filer's documentation.
+Show the filer's help, edit the options or open your home directory.
 \newline 
-ROX-Filer Options...
+File `file'
 \newline 
-Show the configuration options for ROX-Filer.
+Offers a smaller version of the filer's submenu of the same name.
 \newline 
-Open Home Directory
+Edit Item
 \newline 
-Show your home directory.
-\newline 
-Edit Icon
-\newline 
-Change the name displayed under the icon, or the pathname the icon points
+Change the name displayed under the icon, or the pathname the item points
  to.
 \newline 
 Show Location
 \newline 
 Open a directory viewer showing where the file is stored.
 \newline 
-Show Help
-\newline 
-Show the documentation for the selected application.
-\newline 
 Remove Item(s)
 \newline 
-Remove the selected items from the panel.
+Remove the selected items from the pinboard or panel.
 \layout Standard
 
 
@@ -1933,7 +1924,7 @@ If you are setting up the defaults for multiple users and you wish to create
 \layout Standard
 
 Note that individual applications may add extra menu items to the top of
- this submenu when you click over them --- see section 
+ this menu when you click over them --- see section 
 \begin_inset LatexCommand \ref{AppDir}
 
 \end_inset 
@@ -2990,6 +2981,35 @@ LANG will use the value of the LANG environment variable as the name
  of the file to load from ROX-Filer/Messages.
 \layout Subsection
 
+Display options
+\layout Itemize
+
+`Ignore case when sorting' treats upper and lower case letters as equivalent
+ when sorting.
+ If this is off then `Zoo' comes before `animal', for example.
+\layout Itemize
+
+`Directories always come first' means that all directories are sorted and
+ displayed at the top, then all the other items are sorted and displayed
+ below.
+ With this option off, directories are mixed in with the other files.
+\layout Itemize
+
+`Large wrap width' sets the maximum width for a file's name in `Large Icons'
+ display mode before the text will wrap onto two lines.
+ In Huge Icons mode, the wrap width is 50% larger than this value.
+\layout Itemize
+
+`Max Small Icons width' --- as above, but applies when the display is in
+ `Small Icons' display mode.
+\layout Standard
+
+The remaining options provide the default settings for newly opened windows
+ --- they correspond to choosing styles from the Display menu.
+ Icon size is also used when switching off the details display from the
+ toolbar.
+\layout Subsection
+
 Pinboard options
 \layout Standard
 
@@ -3017,40 +3037,26 @@ You may also change the foreground and background colours used for the text
 `Icon grid step' controls how finely the icons may be positioned.
 \layout Subsection
 
+Panel options
+\layout Standard
+
+If you are using panels (see section 
+\begin_inset LatexCommand \ref{run_pan}
+
+\end_inset 
+
+) then this section lets you choose which icons will have textual labels
+ underneath them.
+ You can have labels on all icons, on no icons, or on all icons except applicati
+ons.
+\layout Subsection
+
 Action window options
 \layout Standard
 
 You can choose to start some operations automatically, without waiting for
  you to click on Quiet.
  Select each operation that you want to auto-start here.
-\layout Subsection
-
-Display options
-\layout Itemize
-
-`Ignore case when sorting' treats upper and lower case letters as equivalent
- when sorting.
- If this is off then `Zoo' comes before `animal', for example.
-\layout Itemize
-
-`Directories always come first' means that all directories are sorted and
- displayed at the top, then all the other items are sorted and displayed
- below.
- With this option off, directories are mixed in with the other files.
-\layout Itemize
-
-`Max Large Icons width' sets the maximum width for a file's name in `Large
- Icons' display mode.
- Text wider than this will be truncated (a small red vertical bar indicates
- when text has been truncated).
-\layout Itemize
-
-`Max Small Icons width' --- as above, but applies when the display is in
- `Small Icons' display mode.
-\layout Standard
-
-The remaining options provide the default settings for newly opened windows
- --- they correspond to choosing styles from the Display menu.
 \layout Subsection
 
 Toolbar options
@@ -3076,6 +3082,12 @@ Normal
 Large
 \series default 
  displays larger buttons, with textual labels.
+\layout Itemize
+
+`Show totals of items' shows the number of items displayed in a filer window,
+ as well as the number of hidden items (if any) on the toolbar.
+ When there's a selection, it shows the number of selected items and their
+ combined size (excluding directories).
 \layout Standard
 
 See section 
