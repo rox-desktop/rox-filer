@@ -190,6 +190,7 @@ void type_init(void)
  */
 void reread_mime_files(void)
 {
+	gtk_icon_theme_rescan_if_needed(icon_theme);
 	load_mime_types();
 }
 
