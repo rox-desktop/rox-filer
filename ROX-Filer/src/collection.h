@@ -146,7 +146,6 @@ void	collection_end_lasso		(Collection *collection,
 					 GdkFunction fn);
 void	collection_snap_size		(Collection *collection,
 					 int rows, int cols);
-/* XXX: Why? */
 void	collection_unblock_selection_changed(Collection *collection,
 					   guint time,
 					   gboolean emit);
