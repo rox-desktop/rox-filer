@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 1999, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -93,6 +93,7 @@ static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 static void usage(gpointer data, guint action, GtkWidget *widget);
+static void chmod_items(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
@@ -160,7 +161,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Mount",	    		"M",  	mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
 {"/File/Disk Usage",	    	"U", 	usage, 0, NULL},
-{"/File/Permissions",		NULL,   not_yet, 0, NULL},
+{"/File/Permissions",		NULL,   chmod_items, 0, NULL},
 {"/File/Touch",    		NULL,   not_yet, 0, NULL},
 {"/File/Find",			NULL,   not_yet, 0, NULL},
 {"/Select All",	    		C_"A",  select_all, 0, NULL},
@@ -598,6 +599,17 @@ static void usage(gpointer data, guint action, GtkWidget *widget)
 				target_callback, usage);
 	else
 		action_usage(window_with_focus);
+}
+
+static void chmod_items(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (window_with_focus->collection->number_selected == 0)
+		collection_target(window_with_focus->collection,
+				target_callback, chmod_items);
+	else
+		action_chmod(window_with_focus);
 }
 
 static gboolean copy_cb(char *initial, char *path)

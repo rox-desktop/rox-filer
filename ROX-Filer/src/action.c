@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 1999, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -44,6 +44,7 @@
 #include "filer.h"
 #include "main.h"
 #include "options.h"
+#include "modechange.h"
 
 /* Options bits */
 static GtkWidget *create_options();
@@ -85,6 +86,8 @@ static GdkColor red = {0, 0xffff, 0, 0};
 	do {				\
 		gtk_widget_set_sensitive((gui_side)->yes, state);	\
 		gtk_widget_set_sensitive((gui_side)->no, state);	\
+		if ((gui_side)->entry)					\
+			gtk_widget_set_sensitive((gui_side)->entry, state);\
 	} while (0)
 
 #define ON(flag) ((flag) ? "on" : "off")
@@ -100,6 +103,7 @@ struct _GUIside
 	int 		input_tag;	/* gdk_input_add() */
 	GtkWidget 	*vbox, *log, *window, *dir;
 	GtkWidget	*quiet, *yes, *no;
+	GtkWidget	*entry;		/* May be NULL */
 	int		child;		/* Process ID */
 	int		errors;
 	gboolean	show_info;	/* For Disk Usage */
@@ -119,9 +123,16 @@ static char     *action_dest = NULL;
 static gboolean (*action_do_func)(char *source, char *dest);
 static size_t	size_tally;	/* For Disk Usage */
 static DirItem 	*mount_item;
+static struct mode_change *mode_change = NULL;	/* For Permissions */
 
 static gboolean o_force = FALSE;
 static gboolean o_brief = FALSE;
+static gboolean o_recurse = FALSE;
+
+/* This is the last chmod command set, so that bringing up a new
+ * chmod box defaults to the last used command.
+ */
+static guchar	*chmod_command = NULL;
 
 /* Static prototypes */
 static gboolean send();
@@ -247,6 +258,83 @@ static char *action_auto_quiet(char *data)
 }
 
 /*			SUPPORT				*/
+
+/* This is called whenever the user edits the command - send the new command
+ * to the child process.
+ */
+static void chmod_command_changed(GtkEntry *entry, GUIside *gui_side)
+{
+	g_free(chmod_command);
+	chmod_command = g_strdup(gtk_entry_get_text(entry));
+
+	if (!gui_side->to_child)
+		return;
+
+	fputc('P', gui_side->to_child);
+	fputs(chmod_command, gui_side->to_child);
+	fputc('\n', gui_side->to_child);
+	fflush(gui_side->to_child);
+}
+
+static void show_chmod_help(gpointer data)
+{
+	static GtkWidget *help = NULL;
+
+	if (!help)
+	{
+		GtkWidget *text, *vbox, *button, *hbox, *sep;
+		
+		help = gtk_window_new(GTK_WINDOW_DIALOG);
+		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
+		gtk_window_set_title(GTK_WINDOW(help),
+				"Permissions command reference");
+
+		vbox = gtk_vbox_new(FALSE, 0);
+		gtk_container_add(GTK_CONTAINER(help), vbox);
+
+		text = gtk_label_new(
+	"The format of a command is:\n"
+	"CHANGE, CHANGE, ...\n"
+	"Each CHANGE is:\n"
+	"WHO HOW PERMISSIONS\n"
+	"WHO is some combination of u, g and o which determines whether to "
+	"change the permissions for the User (owner), Group or Others.\n"
+	"HOW is +, - or = to add, remove or set exactly the permissions.\n"
+	"PERMISSIONS is some combination of the letters 'rwxXstugo'\n\n"
+
+	"Examples:\n"
+	"u+rw 	(the file owner gains read and write permission)\n"
+	"g=u	(the group permissions are set to be the same as the user's)\n"
+	"o=u-w	(others get the same permissions as the owner, but without "
+	"write permission)\n"
+	"a+x	(everyone gets execute/access permission - same as 'ugo+x')\n"
+	"a+X	(directories become accessable by everyone; files which were "
+	"executable by anyone become executable by everyone)\n"
+	"u+rw, go+r	(two commands at once!)\n"
+	"u+s	(set the SetUID bit - often has no effect on script files)\n"
+	
+	"\nSee the chmod(1) man page for full details.");
+		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
+		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
+
+		hbox = gtk_hbox_new(FALSE, 20);
+		gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+
+		sep = gtk_hseparator_new();
+		gtk_box_pack_start(GTK_BOX(hbox), sep, TRUE, TRUE, 0);
+		button = gtk_button_new_with_label("Close");
+		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+		gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+				gtk_widget_hide, GTK_OBJECT(help));
+
+		gtk_signal_connect_object(GTK_OBJECT(help), "delete_event",
+				gtk_widget_hide, GTK_OBJECT(help));
+	}
+
+	if (GTK_WIDGET_VISIBLE(help))
+		gtk_widget_hide(help);
+	gtk_widget_show_all(help);
+}
 
 /* TRUE iff `sub' is (or would be) an object inside the directory `parent',
  * (or the two are the same directory)
@@ -491,6 +579,9 @@ static void process_flag(char flag)
 		case 'F':
 			o_force = !o_force;
 			break;
+		case 'R':
+			o_recurse = !o_recurse;
+			break;
 		case 'B':
 			o_brief = !o_brief;
 			break;
@@ -530,6 +621,35 @@ static void check_flags(void)
 
 		process_flag(retval);
 	}
+}
+
+static void read_new_chmod_command(void)
+{
+	int	len;
+	char	c;
+	GString	*new;
+
+	new = g_string_new(NULL);
+
+	for (;;)
+	{
+		len = read(from_parent, &c, 1);
+		if (len != 1)
+		{
+			fprintf(stderr, "read() error: %s\n",
+					g_strerror(errno));
+			_exit(1);	/* Parent died? */
+		}
+
+		if (c == '\n')
+			break;
+		g_string_append_c(new, c);
+	}
+
+	if (mode_change)
+		mode_free(mode_change);
+	mode_change = mode_compile(new->str, MODE_MASK_ALL);
+	g_string_free(new, TRUE);
 }
 
 /* Read until the user sends a reply. If ignore_quiet is TRUE then
@@ -576,6 +696,9 @@ static gboolean reply(int fd, gboolean ignore_quiet)
 				g_string_assign(message, "' No\n");
 				send();
 				return FALSE;
+			case 'P':
+				read_new_chmod_command();
+				break;
 			default:
 				process_flag(retval);
 				break;
@@ -676,6 +799,7 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 	gui_side->child = child;
 	gui_side->errors = 0;
 	gui_side->show_info = FALSE;
+	gui_side->entry = NULL;
 
 	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
@@ -778,7 +902,7 @@ static gboolean do_usage(char *src_path, char *dest_path)
 /* dest_path is the dir containing src_path */
 static gboolean do_delete(char *src_path, char *dest_path)
 {
-	struct 		stat info;
+	struct stat 	info;
 	gboolean	write_prot;
 
 	check_flags();
@@ -825,6 +949,63 @@ static gboolean do_delete(char *src_path, char *dest_path)
 	{
 		send_error();
 		return FALSE;
+	}
+
+	return TRUE;
+}
+
+/* path is the item to change. If is is a directory then we may recurse
+ * (depending on the recurse flag).
+ */
+static gboolean do_chmod(char *path, char *dummy)
+{
+	struct stat 	info;
+	mode_t		new_mode;
+
+	check_flags();
+
+	if (!quiet)
+	{
+		g_string_sprintf(message, "?Change permissions of '%s'?", path);
+		if (!reply(from_parent, FALSE))
+			return FALSE;
+	}
+	else if (!o_brief)
+	{
+		g_string_sprintf(message, "'Changing permissions of '%s'\n",
+				path);
+		send();
+	}
+
+	while (!mode_change)
+	{
+		g_string_assign(message,
+			"!Invalid mode command - change it and try again\n");
+		send();
+		g_string_sprintf(message, "?Change permissions of '%s'?", path);
+		if (!reply(from_parent, TRUE))
+			return FALSE;
+	}
+
+	if (lstat(path, &info))
+	{
+		send_error();
+		return FALSE;
+	}
+
+	new_mode = mode_adjust(info.st_mode, mode_change);
+	if (chmod(path, new_mode))
+	{
+		send_error();
+		return FALSE;
+	}
+
+	if (o_recurse && S_ISDIR(info.st_mode))
+	{
+		char *safe_path;
+		safe_path = g_strdup(path);
+		for_dir_contents(do_chmod, safe_path, safe_path);
+		g_free(safe_path);
 	}
 
 	return TRUE;
@@ -1270,6 +1451,37 @@ static void delete_cb(gpointer data)
 	send();
 }
 
+static void chmod_cb(gpointer data)
+{
+	FilerWindow *filer_window = (FilerWindow *) data;
+	Collection *collection = filer_window->collection;
+	DirItem   *item;
+	int	left = collection->number_selected;
+	int	i = -1;
+
+	send_dir(filer_window->path);
+
+	mode_change = mode_compile(chmod_command, MODE_MASK_ALL);
+
+	while (left > 0)
+	{
+		i++;
+		if (!collection->items[i].selected)
+			continue;
+		item = (DirItem *) collection->items[i].data;
+		if (do_chmod(make_path(filer_window->path,
+						item->leafname)->str, NULL))
+		{
+			g_string_sprintf(message, "+%s", filer_window->path);
+			send();
+		}
+		left--;
+	}
+	
+	g_string_sprintf(message, "'\nDone\n");
+	send();
+}
+
 static void list_cb(gpointer data)
 {
 	GSList	*paths = (GSList *) data;
@@ -1386,6 +1598,52 @@ void action_delete(FilerWindow *filer_window)
 		"Force - don't confirm deletion of non-writeable items", "F");
 	add_toggle(gui_side,
 		"Brief - only log directories being deleted", "B");
+
+	number_of_windows++;
+	gtk_widget_show_all(gui_side->window);
+}
+
+/* Change the permissions of the selected items */
+void action_chmod(FilerWindow *filer_window)
+{
+	GUIside		*gui_side;
+	Collection 	*collection;
+	GtkWidget	*hbox, *label, *button;
+
+	collection = filer_window->collection;
+
+	if (collection->number_selected < 1)
+	{
+		report_error("ROX-Filer", "You need to select the items "
+				"whose permissions you want to change");
+		return;
+	}
+
+	if (!chmod_command)
+		chmod_command = g_strdup("a+x");
+	gui_side = start_action(filer_window, chmod_cb, FALSE);
+	if (!gui_side)
+		return;
+
+	gtk_window_set_title(GTK_WINDOW(gui_side->window), "Permissions");
+	add_toggle(gui_side,
+		"Brief - don't list processed files", "B");
+	add_toggle(gui_side,
+		"Recurse - also change contents of subdirectories", "R");
+	hbox = gtk_hbox_new(FALSE, 0);
+	label = gtk_label_new("Command:");
+	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
+	gui_side->entry = gtk_entry_new();
+	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), chmod_command);
+	gtk_widget_set_sensitive(gui_side->entry, FALSE);
+	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
+	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
+			chmod_command_changed, gui_side);
+	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
+	button = gtk_button_new_with_label("Show command reference");
+	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
+	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
+			show_chmod_help, NULL);
 	
 	number_of_windows++;
 	gtk_widget_show_all(gui_side->window);

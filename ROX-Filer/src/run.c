@@ -2,7 +2,7 @@
  * $Id$
  *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 1999, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free

@@ -2,7 +2,7 @@
  * $Id$
  *
  * Collection - a GTK+ widget
- * Copyright (C) 1999, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
+ * Copyright (C) 2000, Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  *
  * The collection widget provides an area for displaying a collection of
  * objects (such as files). It allows the user to choose a selection of
