@@ -934,7 +934,11 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gui_side->default_string = NULL;
 	gui_side->entry_string_func = NULL;
 
-	gui_side->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gui_side->window = gtk_window_new(GTK_WINDOW_DIALOG);
+#ifdef GTK2
+	gtk_window_set_type_hint(GTK_WINDOW(gui_side->window),
+				    GDK_WINDOW_TYPE_HINT_DIALOG);
+#endif
 	gtk_container_set_border_width(GTK_CONTAINER(gui_side->window), 2);
 	gtk_window_set_default_size(GTK_WINDOW(gui_side->window), 450, 200);
 	gtk_signal_connect(GTK_OBJECT(gui_side->window), "destroy",
