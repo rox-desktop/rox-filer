@@ -251,6 +251,7 @@ static void init_for_scan(Directory *dir)
 	int	i;
 
 	dir->needs_update = FALSE;
+	dir->done_some_scanning = FALSE;
 	
 	for (i = 0; i < dir->items->len; i++)
 		((DirItem *) dir->items->pdata[i])->may_delete = TRUE;
@@ -260,7 +261,9 @@ static void start_scanning(Directory *dir, char *pathname)
 {
 	if (dir->dir_handle)
 	{
-		dir->needs_update = TRUE;
+		/* We are already scanning */
+		if (dir->done_some_scanning)
+			dir->needs_update = TRUE;
 		return;
 	}
 
@@ -486,6 +489,8 @@ update:
 static gint idle_callback(Directory *dir)
 {
 	struct dirent *ent;
+
+	dir->done_some_scanning = TRUE;
 	
 	do
 	{

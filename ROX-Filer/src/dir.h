@@ -74,6 +74,7 @@ struct _Directory
 
 	gboolean	needs_update;	/* When scan is finished, rescan */
 	gboolean	notify_active;	/* Notify timeout is running */
+	gboolean	done_some_scanning;	/* Read any items this scan? */
 	gint		idle;		/* Idle callback ID */
 	DIR		*dir_handle;	/* NULL => not scanning */
 

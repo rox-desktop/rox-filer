@@ -53,7 +53,7 @@ extern GHashTable	*child_to_filer;
 /* Prototypes */
 void filer_init();
 void filer_opendir(char *path, gboolean panel, Side panel_side);
-void update_dir(FilerWindow *filer_window);
+void update_dir(FilerWindow *filer_window, gboolean warning);
 void scan_dir(FilerWindow *filer_window);
 DirItem *selected_item(Collection *collection);
 void change_to_parent(FilerWindow *filer_window);

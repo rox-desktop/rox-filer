@@ -716,22 +716,6 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	return TRUE;
 }
 
-/* Callback to collection_delete_if() */
-#if 0
-static gboolean remove_deleted(gpointer item_data, gpointer data)
-{
-	DirItem *item = (DirItem *) item_data;
-
-	if (item->flags & ITEM_FLAG_MAY_DELETE)
-	{
-		free_item(item);
-		return TRUE;
-	}
-
-	return FALSE;
-}
-#endif
-
 /* Another app has grabbed the selection */
 static gint collection_lose_selection(GtkWidget *widget,
 				      GdkEventSelection *event)
@@ -1066,7 +1050,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
 	full_refresh();
-	update_dir(filer_window);
+	update_dir(filer_window, TRUE);
 }
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -1491,9 +1475,9 @@ static char *filer_toolbar(char *data)
 }
 
 /* Note that filer_window may not exist after this call. */
-void update_dir(FilerWindow *filer_window)
+void update_dir(FilerWindow *filer_window, gboolean warning)
 {
-	if (may_rescan(filer_window, TRUE))
+	if (may_rescan(filer_window, warning))
 		dir_update(filer_window->directory, filer_window->path);
 }
 
@@ -1537,7 +1521,7 @@ void filer_check_mounted(char *path)
 			char	s = filer_window->path[len];
 
 			if (s == '/' || s == '\0')
-				may_rescan(filer_window, FALSE);
+				update_dir(filer_window, FALSE);
 		}
 	}
 }

@@ -54,6 +54,8 @@
 GtkAccelGroup	*filer_keys;
 GtkAccelGroup	*panel_keys;
 
+static GtkWidget *popup_menu = NULL;	/* Currently open menu */
+
 /* Options */
 static GtkWidget *xterm_here_entry;
 static char *xterm_here_value;
@@ -242,12 +244,14 @@ void menu_init()
 	if (menurc)
 		gtk_item_factory_parse_rc(menurc);
 
-	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	gtk_accel_group_lock(panel_keys);
+
 	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
-
-	gtk_accel_group_lock(panel_keys);
+	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
 
 	options_sections = g_slist_prepend(options_sections, &options);
 	xterm_here_value = g_strdup("xterm");
@@ -440,15 +444,20 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	g_string_free(buffer, TRUE);
 
-	gtk_menu_popup(filer_window->panel ? GTK_MENU(panel_menu)
-				           : GTK_MENU(filer_menu),
-			NULL, NULL, position_menu,
+	if (filer_window->panel)
+		popup_menu = panel_menu;
+	else
+		popup_menu = (event->state & GDK_CONTROL_MASK)
+				? filer_file_menu
+				: filer_menu;
+
+	gtk_menu_popup(GTK_MENU(popup_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
 }
 
 static void menu_closed(GtkWidget *widget)
 {
-	if (window_with_focus == NULL)
+	if (window_with_focus == NULL || widget != popup_menu)
 		return;			/* Close panel item chosen? */
 
 	if (window_with_focus->temp_item_selected)
@@ -533,7 +542,7 @@ static void refresh(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	full_refresh();
-	update_dir(window_with_focus);
+	update_dir(window_with_focus, TRUE);
 }
 
 static void mount(gpointer data, guint action, GtkWidget *widget)

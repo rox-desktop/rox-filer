@@ -126,6 +126,6 @@ static void do_callback(GtkWidget *widget, gpointer data)
 	if (callback(initial, path))
 	{
 		gtk_widget_hide(window);
-		update_dir(filer_window);
+		update_dir(filer_window, TRUE);
 	}
 }
