@@ -475,7 +475,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 		{
 			GdkPixbuf *pixbuf;
 
-			switch (style) {
+			switch (style)
+			{
 				case MIS_LARGE:
 					pixbuf = ditem->image->pixbuf;
 					break;
@@ -500,7 +501,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 			label = gtk_label_new(leaf);
 			gtk_misc_set_alignment(GTK_MISC(label), 0, 0.5);
 			gtk_box_pack_start(GTK_BOX(hbox), label, TRUE, TRUE, 2);
-
 		}
 		else
 			item = gtk_menu_item_new_with_label(leaf);

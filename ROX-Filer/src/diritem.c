@@ -55,8 +55,7 @@ static Option o_ignore_exec;
 time_t diritem_recent_time;
 
 /* Static prototypes */
-static void examine_dir(const guchar *path, DirItem *item);
-
+static void examine_dir(const guchar *path, DirItem *item, uid_t uid);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -134,7 +133,15 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 	}
 
 	if (item->base_type == TYPE_DIRECTORY)
-		examine_dir(path, item);
+	{
+		/* KRJW: info.st_uid will be the uid of the dir, regardless
+		 * of whether `path' is a dir or a symlink to one.  Note that
+		 * if path is a symlink to a dir, item->uid will be the uid
+		 * of the *symlink*, but we really want the uid of the dir
+		 * to which the symlink points.
+		 */
+		examine_dir(path, item, info.st_uid);
+	}
 	else if (item->base_type == TYPE_FILE)
 	{
 		/* Type determined from path before checking for executables
@@ -229,10 +236,13 @@ void diritem_free(DirItem *item)
 /* Fill in more details of the DirItem for a directory item.
  * - Looks for an image (but maybe still NULL on error)
  * - Updates ITEM_FLAG_APPDIR
+ *
+ * KRJW (26 Jan 2003): Pass extra uid var, which will be the uid of
+ * the dir given by `path' (or the uid of the dir pointed to by `path'
+ * if `path' is a symlink).
  */
-static void examine_dir(const guchar *path, DirItem *item)
+static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 {
-	uid_t	uid = item->uid;
 	struct stat info;
 	static GString *tmp = NULL;
 
