@@ -32,6 +32,7 @@ struct _ViewData
 extern Option o_display_inherit_options, o_display_sort_by;
 extern Option o_display_size, o_display_details, o_display_show_hidden;
 extern Option o_display_show_thumbs;
+extern Option o_small_width;
 
 /* Prototypes */
 void display_init();
@@ -47,9 +48,6 @@ int sort_by_size(const void *item1, const void *item2);
 void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void display_set_autoselect(FilerWindow *filer_window, const gchar *leaf);
-void shrink_grid(FilerWindow *filer_window);
-void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
-		int *width, int *height);
 
 void draw_large_icon(GtkWidget *widget,
 		     GdkRectangle *area,
@@ -60,7 +58,6 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i);
 void display_change_size(FilerWindow *filer_window, gboolean bigger);
 
 ViewData *display_create_viewdata(FilerWindow *filer_window, DirItem *item);
-void display_free_colitem(Collection *collection, CollectionItem *colitem);
 void display_update_view(FilerWindow *filer_window,
 			 DirItem *item,
 			 ViewData *view,

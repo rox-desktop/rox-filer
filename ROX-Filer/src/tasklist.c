@@ -357,6 +357,8 @@ static void add_window(Window win)
 			PropertyChangeMask);
 		gdk_flush();
 
+		gdk_flush();
+
 		if (gdk_error_trap_pop() != Success)
 			return;
 

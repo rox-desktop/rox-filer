@@ -27,7 +27,6 @@
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
-#include <time.h>
 #include <ctype.h>
 #include <math.h>
 #include <netdb.h>
@@ -62,6 +61,8 @@
 #include "appinfo.h"
 #include "mount.h"
 #include "xml.h"
+#include "view_iface.h"
+#include "view_collection.h"
 
 static XMLwrapper *groups = NULL;
 
@@ -70,18 +71,11 @@ GList		*all_filer_windows = NULL;
 
 static FilerWindow *window_with_primary = NULL;
 
-/* Item we are about to display a tooltip for */
-static DirItem *tip_item = NULL;
-static GtkWidget *tip_widget = NULL;
-static gint tip_timeout = 0;
-static time_t tip_time = 0; 	/* Time tip widget last closed */
-
 /* Static prototypes */
 static void attach(FilerWindow *filer_window);
 static void detach(FilerWindow *filer_window);
 static void filer_window_destroyed(GtkWidget    *widget,
 				   FilerWindow	*filer_window);
-static void add_item(FilerWindow *filer_window, DirItem *item);
 static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
@@ -90,24 +84,12 @@ static void set_scanning_display(FilerWindow *filer_window, gboolean scanning);
 static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 static FilerWindow *find_filer_window(const char *sym_path, FilerWindow *diff);
-static gint coll_button_release(GtkWidget *widget,
-			        GdkEventButton *event,
-			        FilerWindow *filer_window);
-static gint coll_button_press(GtkWidget *widget,
-			      GdkEventButton *event,
-			      FilerWindow *filer_window);
-static gint coll_motion_notify(GtkWidget *widget,
-			       GdkEventMotion *event,
-			       FilerWindow *filer_window);
-static void perform_action(FilerWindow *filer_window, GdkEventButton *event);
 static void filer_add_widgets(FilerWindow *filer_window);
 static void filer_add_signals(FilerWindow *filer_window);
-static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
-static void show_tooltip(guchar *text);
 static void filer_size_for(FilerWindow *filer_window,
 			   int w, int h, int n, gboolean allow_shrink);
 
-static void set_selection_state(FilerWindow *collection, gboolean normal);
+static void set_selection_state(FilerWindow *filer_window, gboolean normal);
 static void filer_next_thumb(GObject *window, const gchar *path);
 static void start_thumb_scanning(FilerWindow *filer_window);
 static void filer_options_changed(void);
@@ -184,42 +166,6 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 	}
 
 	return FALSE;
-}
-
-static void update_item(FilerWindow *filer_window, DirItem *item)
-{
-	char	*leafname = item->leafname;
-	Collection *collection = filer_window->collection;
-	int	old_w = collection->item_width;
-	int	old_h = collection->item_height;
-	int	w, h, i;
-	CollectionItem *colitem;
-	
-	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
-		return;
-
-	i = collection_find_item(collection, item, filer_window->sort_fn);
-
-	if (i < 0)
-	{
-		g_warning("Failed to find '%s'\n", leafname);
-		return;
-	}
-	
-	colitem = &collection->items[i];
-
-	display_update_view(filer_window,
-			(DirItem *) colitem->data,
-			(ViewData *) colitem->view_data,
-			FALSE);
-	
-	calc_size(filer_window, colitem, &w, &h); 
-	if (w > old_w || h > old_h)
-		collection_set_item_size(collection,
-					 MAX(old_w, w),
-					 MAX(old_h, h));
-
-	collection_draw_item(collection, i, TRUE);
 }
 
 /* Resize the filer window to w x h pixels, plus border (not clamped) */
@@ -389,7 +335,7 @@ static void filer_size_for(FilerWindow *filer_window,
  */
 static gint open_filer_window(FilerWindow *filer_window)
 {
-	shrink_grid(filer_window);
+	view_style_changed(VIEW(filer_window->view), 0);
 
 	if (filer_window->open_timeout)
 	{
@@ -412,30 +358,18 @@ static void update_display(Directory *dir,
 			GPtrArray	*items,
 			FilerWindow *filer_window)
 {
-	int	old_num;
-	int	i;
 	Collection *collection = filer_window->collection;
+	ViewIface *view = (ViewIface *) filer_window->view;
 
 	switch (action)
 	{
 		case DIR_ADD:
-			old_num = collection->number_of_items;
-			for (i = 0; i < items->len; i++)
-			{
-				DirItem *item = (DirItem *) items->pdata[i];
-
-				add_item(filer_window, item);
-			}
-
-			if (old_num != collection->number_of_items)
-				collection_qsort(collection,
-						 filer_window->sort_fn);
-
+			view_add_items(view, items);
 			/* Open and resize if currently hidden */
 			open_filer_window(filer_window);
 			break;
 		case DIR_REMOVE:
-			collection_delete_if(collection, if_deleted, items);
+			view_delete_if(view, if_deleted, items);
 			break;
 		case DIR_START_SCAN:
 			set_scanning_display(filer_window, TRUE);
@@ -468,14 +402,7 @@ static void update_display(Directory *dir,
 				start_thumb_scanning(filer_window);
 			break;
 		case DIR_UPDATE:
-			collection_qsort(collection, filer_window->sort_fn);
-
-			for (i = 0; i < items->len; i++)
-			{
-				DirItem *item = (DirItem *) items->pdata[i];
-
-				update_item(filer_window, item);
-			}
+			view_update_items(view, items);
 			break;
 	}
 }
@@ -483,7 +410,7 @@ static void update_display(Directory *dir,
 static void attach(FilerWindow *filer_window)
 {
 	gdk_window_set_cursor(filer_window->window->window, busy_cursor);
-	collection_clear(filer_window->collection);
+	view_clear(VIEW(filer_window->view));
 	filer_window->scanning = TRUE;
 	dir_attach(filer_window->directory, (DirCallback) update_display,
 			filer_window);
@@ -531,7 +458,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		g_list_free(filer_window->thumb_queue);
 	}
 
-	filer_tooltip_prime(NULL, NULL);
+	tooltip_show(NULL);
 
 	g_free(filer_window->auto_select);
 	g_free(filer_window->real_path);
@@ -539,38 +466,6 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 	g_free(filer_window);
 
 	one_less_window();
-}
-
-/* Add a single object to a directory display */
-static void add_item(FilerWindow *filer_window, DirItem *item)
-{
-	char		*leafname = item->leafname;
-	Collection	*collection = filer_window->collection;
-	int		old_w = collection->item_width;
-	int		old_h = collection->item_height;
-	int		w, h, i;
-
-	if (leafname[0] == '.')
-	{
-		if (!filer_window->show_hidden)
-			return;
-
-		if (leafname[1] == '\0')
-			return;		/* Never show '.' */
-
-		if (leafname[1] == '.' && leafname[2] == '\0')
-			return;		/* Never show '..' */
-	}
-
-	i = collection_insert(collection, item,
-				display_create_viewdata(filer_window, item));
-
-	calc_size(filer_window, &collection->items[i], &w, &h); 
-
-	if (w > old_w || h > old_h)
-		collection_set_item_size(collection,
-					 MAX(old_w, w),
-					 MAX(old_h, h));
 }
 
 /* Returns TRUE iff the directory still exists. */
@@ -603,19 +498,26 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	return TRUE;
 }
 
-/* The collection widget has lost the primary selection */
-static gint collection_lose_selection(GtkWidget *widget,
-				      GdkEventSelection *event)
+/* No items are now selected. This might be because another app claimed
+ * the selection or because the user unselected all the items.
+ */
+void filer_lost_selection(FilerWindow *filer_window, gint time)
 {
-	if (window_with_primary &&
-			window_with_primary->collection == COLLECTION(widget))
+	if (window_with_primary == filer_window)
 	{
-		FilerWindow *filer_window = window_with_primary;
+		window_with_primary = NULL;
+		gtk_selection_owner_set(NULL, GDK_SELECTION_PRIMARY, time);
+	}
+}
+
+/* Another app has claimed the primary selection */
+void filer_lost_primary(FilerWindow *filer_window)
+{
+	if (window_with_primary && window_with_primary == filer_window)
+	{
 		window_with_primary = NULL;
 		set_selection_state(filer_window, FALSE);
 	}
-
-	return FALSE;
 }
 
 /* Someone wants us to send them the selection */
@@ -676,41 +578,19 @@ static void selection_get(GtkWidget *widget,
 	g_string_free(header, TRUE);
 }
 
-/* No items are now selected. This might be because another app claimed
- * the selection or because the user unselected all the items.
- */
-static void lose_selection(Collection 	*collection,
-			   guint	time,
-			   gpointer 	user_data)
+void filer_selection_changed(FilerWindow *filer_window, gint time)
 {
-	FilerWindow *filer_window = (FilerWindow *) user_data;
-
-	if (window_with_primary == filer_window)
-	{
-		window_with_primary = NULL;
-		gtk_selection_owner_set(NULL,
-				GDK_SELECTION_PRIMARY,
-				time);
-	}
-}
-
-static void selection_changed(Collection *collection,
-			      gint time,
-			      gpointer user_data)
-{
-	FilerWindow *filer_window = (FilerWindow *) user_data;
-
 	/* Selection has been changed -- try to grab the primary selection
 	 * if we don't have it.
 	 */
 	if (window_with_primary == filer_window)
 		return;		/* Already got it */
 
-	if (!collection->number_selected)
+	if (!filer_window->collection->number_selected)
 		return;		/* Nothing selected */
 
 	if (filer_window->temp_item_selected == FALSE &&
-		gtk_selection_owner_set(GTK_WIDGET(collection),
+		gtk_selection_owner_set(GTK_WIDGET(filer_window->collection),
 				GDK_SELECTION_PRIMARY,
 				time))
 	{
@@ -789,7 +669,7 @@ static gint pointer_out(GtkWidget *widget,
 			GdkEventCrossing *event,
 			FilerWindow *filer_window)
 {
-	filer_tooltip_prime(NULL, NULL);
+	tooltip_show(NULL);
 	return FALSE;
 }
 
@@ -1069,7 +949,7 @@ static gint key_press_event(GtkWidget	*widget,
 			change_to_parent(filer_window);
 			break;
 		case GDK_backslash:
-			filer_tooltip_prime(NULL, NULL);
+			tooltip_show(NULL);
 			show_filer_menu(filer_window, (GdkEvent *) event,
 					filer_window->collection->cursor_item);
 			break;
@@ -1147,7 +1027,7 @@ void filer_change_to(FilerWindow *filer_window,
 
 	filer_cancel_thumbnails(filer_window);
 
-	filer_tooltip_prime(NULL, NULL);
+	tooltip_show(NULL);
 
 	sym_path = g_strdup(path);
 	real_path = pathdup(path);
@@ -1239,37 +1119,6 @@ DirItem *filer_selected_item(FilerWindow *filer_window)
 	if (item > -1)
 		return (DirItem *) collection->items[item].data;
 	return NULL;
-}
-
-/* Append all the URIs in the selection to the string */
-static void create_uri_list(FilerWindow *filer_window, GString *string)
-{
-	Collection *collection = filer_window->collection;
-	GString	*leader;
-	int i, num_selected;
-
-	leader = g_string_new("file://");
-	g_string_append(leader, our_host_name_for_dnd());
-	g_string_append(leader, filer_window->sym_path);
-	if (leader->str[leader->len - 1] != '/')
-		g_string_append_c(leader, '/');
-
-	num_selected = collection->number_selected;
-
-	for (i = 0; num_selected > 0; i++)
-	{
-		if (collection->items[i].selected)
-		{
-			DirItem *item = (DirItem *) collection->items[i].data;
-			
-			g_string_append(string, leader->str);
-			g_string_append(string, item->leafname);
-			g_string_append(string, "\r\n");
-			num_selected--;
-		}
-	}
-
-	g_string_free(leader, TRUE);
 }
 
 /* Creates and shows a new filer window.
@@ -1417,9 +1266,6 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	filer_set_title(filer_window);
 
-	/* The collection is the area that actually displays the files */
-	collection = collection_new();
-
 	/* This property is cleared when the window is destroyed.
 	 * You can thus ref filer_window->window and use this to see
 	 * if the window no longer exists.
@@ -1427,10 +1273,11 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	g_object_set_data(G_OBJECT(filer_window->window),
 			"filer_window", filer_window);
 	
+	/* The view is the area that actually displays the files */
+	filer_window->view = view_collection_new(filer_window);
+	gtk_widget_show(filer_window->view);
+	collection = GTK_WIDGET(filer_window->collection);	/* XXX */
 	g_object_set_data(G_OBJECT(collection), "filer_window", filer_window);
-	filer_window->collection = COLLECTION(collection);
-
-	filer_window->collection->free_item = display_free_colitem;
 
 	/* Scrollbar on the right, everything else on the left */
 	hbox = gtk_hbox_new(FALSE, 0);
@@ -1457,23 +1304,9 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	/* Now add the area for displaying the files.
 	 * The collection is one huge window that goes in a Viewport.
 	 */
-	{
-		GtkWidget *viewport;
-		GtkAdjustment *adj;
-
-		adj = filer_window->collection->vadj;
-		viewport = gtk_viewport_new(NULL, adj);
-		gtk_viewport_set_shadow_type(GTK_VIEWPORT(viewport),
-				GTK_SHADOW_NONE);
-		gtk_container_add(GTK_CONTAINER(viewport), collection);
-		gtk_widget_show_all(viewport);
-		gtk_box_pack_start_defaults(GTK_BOX(vbox), viewport);
-		filer_window->scrollbar = gtk_vscrollbar_new(adj);
-		gtk_widget_set_size_request(viewport, 4, 4);
-
-		gtk_container_set_resize_mode(GTK_CONTAINER(viewport),
-						GTK_RESIZE_IMMEDIATE);
-	}
+	gtk_box_pack_start_defaults(GTK_BOX(vbox), filer_window->view);
+	filer_window->scrollbar =
+		gtk_vscrollbar_new(filer_window->collection->vadj);
 
 	/* And the minibuffer (hidden to start with) */
 	create_minibuffer(filer_window);
@@ -1546,14 +1379,6 @@ static void filer_add_signals(FilerWindow *filer_window)
 			GDK_BUTTON3_MOTION_MASK | GDK_POINTER_MOTION_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 
-	g_signal_connect_swapped(collection, "style_set",
-			G_CALLBACK(display_update_views), filer_window);
-	g_signal_connect(collection, "lose_selection",
-			G_CALLBACK(lose_selection), filer_window);
-	g_signal_connect(collection, "selection_changed",
-			G_CALLBACK(selection_changed), filer_window);
-	g_signal_connect(collection, "selection_clear_event",
-			G_CALLBACK(collection_lose_selection), NULL);
 	g_signal_connect(collection, "selection_get",
 			G_CALLBACK(selection_get), NULL);
 	gtk_selection_add_targets(GTK_WIDGET(collection), GDK_SELECTION_PRIMARY,
@@ -1562,12 +1387,6 @@ static void filer_add_signals(FilerWindow *filer_window)
 
 	g_signal_connect(collection, "key_press_event",
 			G_CALLBACK(key_press_event), filer_window);
-	g_signal_connect(collection, "button-release-event",
-			G_CALLBACK(coll_button_release), filer_window);
-	g_signal_connect(collection, "button-press-event",
-			G_CALLBACK(coll_button_press), filer_window);
-	g_signal_connect(collection, "motion-notify-event",
-			G_CALLBACK(coll_motion_notify), filer_window);
 
 	/* Drag and drop events */
 	g_signal_connect(collection, "drag_data_get",
@@ -1797,229 +1616,6 @@ void filer_detach_rescan(FilerWindow *filer_window)
 	attach(filer_window);
 }
 
-static gint coll_button_release(GtkWidget *widget,
-			        GdkEventButton *event,
-			        FilerWindow *filer_window)
-{
-	if (dnd_motion_release(event))
-	{
-		if (motion_buttons_pressed == 0 &&
-					filer_window->collection->lasso_box)
-		{
-			collection_end_lasso(filer_window->collection,
-				event->button == 1 ? GDK_SET : GDK_INVERT);
-		}
-		return FALSE;
-	}
-
-	perform_action(filer_window, event);
-
-	return FALSE;
-}
-
-static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
-{
-	Collection	*collection = filer_window->collection;
-	DirItem		*dir_item;
-	int		item;
-	BindAction	action;
-	gboolean	press = event->type == GDK_BUTTON_PRESS;
-	gboolean	selected = FALSE;
-	OpenFlags	flags = 0;
-
-	if (event->button > 3)
-		return;
-
-	item = collection_get_item(collection, event->x, event->y);
-
-	if (item != -1 && event->button == 1 &&
-		collection->items[item].selected &&
-		filer_window->selection_state == GTK_STATE_INSENSITIVE)
-	{
-		selection_changed(collection, event->time, filer_window);
-		return;
-	}
-
-	if (filer_window->target_cb)
-	{
-		dnd_motion_ungrab();
-		if (item != -1 && press && event->button == 1)
-			filer_window->target_cb(filer_window, item,
-					filer_window->target_data);
-		filer_target_mode(filer_window, NULL, NULL, NULL);
-
-		return;
-	}
-
-	action = bind_lookup_bev(
-			item == -1 ? BIND_DIRECTORY : BIND_DIRECTORY_ICON,
-			event);
-
-	if (item != -1)
-	{
-		dir_item = (DirItem *) collection->items[item].data;
-		selected = collection->items[item].selected;
-	}
-	else
-		dir_item = NULL;
-
-	switch (action)
-	{
-		case ACT_CLEAR_SELECTION:
-			collection_clear_selection(collection);
-			break;
-		case ACT_TOGGLE_SELECTED:
-			collection_toggle_item(collection, item);
-			break;
-		case ACT_SELECT_EXCL:
-			collection_clear_except(collection, item);
-			break;
-		case ACT_EDIT_ITEM:
-			flags |= OPEN_SHIFT;
-			/* (no break) */
-		case ACT_OPEN_ITEM:
-			if (event->button != 1)
-				flags |= OPEN_CLOSE_WINDOW;
-			else
-				flags |= OPEN_SAME_WINDOW;
-			if (o_new_button_1.int_value)
-				flags ^= OPEN_SAME_WINDOW;
-			if (event->type == GDK_2BUTTON_PRESS)
-				collection_unselect_item(collection, item);
-			dnd_motion_ungrab();
-			filer_openitem(filer_window, item, flags);
-			break;
-		case ACT_POPUP_MENU:
-			dnd_motion_ungrab();
-			filer_tooltip_prime(NULL, NULL);
-			show_filer_menu(filer_window, (GdkEvent *) event, item);
-			break;
-		case ACT_PRIME_AND_SELECT:
-			if (!selected)
-				collection_clear_except(collection, item);
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_AND_TOGGLE:
-			collection_toggle_item(collection, item);
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_PRIME_FOR_DND:
-			dnd_motion_start(MOTION_READY_FOR_DND);
-			break;
-		case ACT_IGNORE:
-			if (press && event->button < 4)
-			{
-				if (item)
-					collection_wink_item(collection, item);
-				dnd_motion_start(MOTION_NONE);
-			}
-			break;
-		case ACT_LASSO_CLEAR:
-			collection_clear_selection(collection);
-			/* (no break) */
-		case ACT_LASSO_MODIFY:
-			collection_lasso_box(collection, event->x, event->y);
-			break;
-		case ACT_RESIZE:
-			filer_window_autosize(filer_window, TRUE);
-			break;
-		default:
-			g_warning("Unsupported action : %d\n", action);
-			break;
-	}
-}
-
-static gint coll_button_press(GtkWidget *widget,
-			      GdkEventButton *event,
-			      FilerWindow *filer_window)
-{
-	collection_set_cursor_item(filer_window->collection, -1);
-
-	if (dnd_motion_press(widget, event))
-		perform_action(filer_window, event);
-
-	return FALSE;
-}
-
-static gint coll_motion_notify(GtkWidget *widget,
-			       GdkEventMotion *event,
-			       FilerWindow *filer_window)
-{
-	Collection	*collection = filer_window->collection;
-	int		i;
-
-	i = collection_get_item(collection, event->x, event->y);
-
-	if (i == -1)
-		filer_tooltip_prime(NULL, NULL);
-	else
-		filer_tooltip_prime(filer_window,
-				(DirItem *) collection->items[i].data);
-
-	if (motion_state != MOTION_READY_FOR_DND)
-		return FALSE;
-
-	if (!dnd_motion_moved(event))
-		return FALSE;
-
-	i = collection_get_item(collection,
-			event->x - (event->x_root - drag_start_x),
-			event->y - (event->y_root - drag_start_y));
-	if (i == -1)
-		return FALSE;
-
-	collection_wink_item(collection, -1);
-	
-	if (!collection->items[i].selected)
-	{
-		if (event->state & GDK_BUTTON1_MASK)
-		{
-			/* Select just this one */
-			filer_window->temp_item_selected = TRUE;
-			collection_clear_except(collection, i);
-		}
-		else
-		{
-			if (collection->number_selected == 0)
-				filer_window->temp_item_selected = TRUE;
-			collection_select_item(collection, i);
-		}
-	}
-
-	g_return_val_if_fail(collection->number_selected > 0, TRUE);
-
-	if (collection->number_selected == 1)
-	{
-		DirItem	 *item = (DirItem *) collection->items[i].data;
-		ViewData *view = (ViewData *) collection->items[i].view_data;
-
-		if (!item->image)
-			item = dir_update_item(filer_window->directory,
-						item->leafname);
-
-		if (!item)
-		{
-			report_error(_("Item no longer exists!"));
-			return FALSE;
-		}
-
-		drag_one_item(widget, event,
-			make_path(filer_window->sym_path, item->leafname)->str,
-			item, view ? view->image : NULL);
-	}
-	else
-	{
-		GString *uris;
-	
-		uris = g_string_new(NULL);
-		create_uri_list(filer_window, uris);
-		drag_selection(widget, event, uris->str);
-		g_string_free(uris, TRUE);
-	}
-
-	return FALSE;
-}
-
 /* Puts the filer window into target mode. When an item is chosen,
  * fn(filer_window, item, data) is called. 'reason' will be displayed
  * on the toolbar while target mode is active.
@@ -2054,204 +1650,6 @@ void filer_target_mode(FilerWindow *filer_window,
 	}
 	else
 		gtk_label_set_text(GTK_LABEL(filer_window->toolbar_text), "");
-}
-
-/* Draw the black border */
-static gint filer_tooltip_draw(GtkWidget *w)
-{
-	gdk_draw_rectangle(w->window, w->style->fg_gc[w->state], FALSE, 0, 0,
-			w->allocation.width - 1, w->allocation.height - 1);
-
-	return FALSE;
-}
-
-/* When the tips window closed, record the time. If we try to open another
- * tip soon, it will appear more quickly.
- */
-static void tip_destroyed(gpointer data)
-{
-	time(&tip_time);
-}
-
-/* It's time to make the tooltip appear. If we're not over the item any
- * more, or the item doesn't need a tooltip, do nothing.
- */
-static gboolean filer_tooltip_activate(FilerWindow *filer_window)
-{
-	Collection *collection;
-	gint 	x, y;
-	int	i;
-	GString	*tip = NULL;
-	guchar	*fullpath = NULL;
-
-	g_return_val_if_fail(tip_item != NULL, 0);
-
-	tip_timeout = 0;
-
-	show_tooltip(NULL);
-
-	if (!filer_exists(filer_window))
-		return FALSE;
-
-	collection = filer_window->collection;
-	gdk_window_get_pointer(GTK_WIDGET(collection)->window, &x, &y, NULL);
-	i = collection_get_item(collection, x, y);
-	if (i == -1 || ((DirItem *) collection->items[i].data) != tip_item)
-		return FALSE;	/* Not still under the pointer */
-
-	/* OK, the filer window still exists and the pointer is still
-	 * over the same item. Do we need to show a tip?
-	 */
-
-	tip = g_string_new(NULL);
-
-	if (display_is_truncated(filer_window, i))
-	{
-		g_string_append(tip, tip_item->leafname);
-		g_string_append_c(tip, '\n');
-	}
-	
-	fullpath = make_path(filer_window->real_path, tip_item->leafname)->str;
-
-	if (tip_item->flags & ITEM_FLAG_SYMLINK)
-	{
-		char *target;
-
-		target = readlink_dup(fullpath);
-		if (target)
-		{
-			g_string_append(tip, _("Symbolic link to "));
-			g_string_append(tip, target);
-			g_string_append_c(tip, '\n');
-			g_free(target);
-		}
-	}
-	
-	if (tip_item->flags & ITEM_FLAG_APPDIR)
-	{
-		XMLwrapper *info;
-		xmlNode *node;
-
-		info = appinfo_get(fullpath, tip_item);
-		if (info && ((node = xml_get_section(info, NULL, "Summary"))))
-		{
-			guchar *str;
-			str = xmlNodeListGetString(node->doc,
-					node->xmlChildrenNode, 1);
-			if (str)
-			{
-				g_string_append(tip, str);
-				g_string_append_c(tip, '\n');
-				g_free(str);
-			}
-		}
-		if (info)
-			g_object_unref(info);
-	}
-
-	if (!g_utf8_validate(tip_item->leafname, -1, NULL))
-		g_string_append(tip,
-			_("This filename is not valid UTF-8. "
-			  "You should rename it.\n"));
-
-	if (tip->len > 1)
-	{
-		g_string_truncate(tip, tip->len - 1);
-		show_tooltip(tip->str);
-	}
-
-	g_string_free(tip, TRUE);
-
-	return FALSE;
-}
-
-/* Display a tooltip-like widget near the pointer with 'text'. If 'text' is
- * NULL, close any current tooltip.
- */
-static void show_tooltip(guchar *text)
-{
-	GtkWidget *label;
-	int	x, y, py;
-	int	w, h;
-
-	if (tip_widget)
-	{
-		gtk_widget_destroy(tip_widget);
-		tip_widget = NULL;
-	}
-
-	if (!text)
-		return;
-
-	/* Show the tip */
-	tip_widget = gtk_window_new(GTK_WINDOW_POPUP);
-	gtk_widget_set_app_paintable(tip_widget, TRUE);
-	gtk_widget_set_name(tip_widget, "gtk-tooltips");
-
-	g_signal_connect_swapped(tip_widget, "expose_event",
-			G_CALLBACK(filer_tooltip_draw), tip_widget);
-
-	label = gtk_label_new(text);
-	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
-	gtk_container_add(GTK_CONTAINER(tip_widget), label);
-	gtk_widget_show(label);
-	gtk_widget_realize(tip_widget);
-
-	w = tip_widget->allocation.width;
-	h = tip_widget->allocation.height;
-	gdk_window_get_pointer(NULL, &x, &py, NULL);
-
-	x -= w / 2;
-	y = py + 12; /* I don't know the pointer height so I use a constant */
-
-	/* Now check for screen boundaries */
-	x = CLAMP(x, 0, screen_width - w);
-	y = CLAMP(y, 0, screen_height - h);
-
-	/* And again test if pointer is over the tooltip window */
-	if (py >= y && py <= y + h)
-		y = py - h- 2;
-	gtk_window_move(GTK_WINDOW(tip_widget), x, y);
-	gtk_widget_show(tip_widget);
-
-	g_signal_connect_swapped(tip_widget, "destroy",
-			G_CALLBACK(tip_destroyed), NULL);
-	time(&tip_time);
-}
-
-/* Display a tooltip for 'item' after a while (if item is not NULL).
- * Cancel any previous tooltip.
- */
-static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item)
-{
-	time_t  now;
-
-	time(&now);
-		
-	if (item == tip_item)
-		return;
-
-	if (tip_timeout)
-	{
-		gtk_timeout_remove(tip_timeout);
-		tip_timeout = 0;
-		tip_item = NULL;
-	}
-	if (tip_widget)
-	{
-		gtk_widget_destroy(tip_widget);
-		tip_widget = NULL;
-	}
-
-	tip_item = item;
-	if (filer_window && item)
-	{
-		int	delay = now - tip_time > 2 ? 1000 : 200;
-
-		tip_timeout = gtk_timeout_add(delay,
-					(GtkFunction) filer_tooltip_activate,
-					filer_window);
-	}
 }
 
 static void set_selection_state(FilerWindow *filer_window, gboolean normal)
@@ -2439,4 +1837,54 @@ static void set_style_by_number_of_items(FilerWindow *filer_window)
 	else
 		display_set_layout(filer_window, LARGE_ICONS,
 				   filer_window->details_type);
+}
+
+/* Append interesting information to this GString */
+void filer_add_tip_details(FilerWindow *filer_window,
+			   GString *tip, DirItem *item)
+{
+	guchar	*fullpath = NULL;
+
+	fullpath = make_path(filer_window->real_path, item->leafname)->str;
+
+	if (item->flags & ITEM_FLAG_SYMLINK)
+	{
+		char *target;
+
+		target = readlink_dup(fullpath);
+		if (target)
+		{
+			g_string_append(tip, _("Symbolic link to "));
+			g_string_append(tip, target);
+			g_string_append_c(tip, '\n');
+			g_free(target);
+		}
+	}
+	
+	if (item->flags & ITEM_FLAG_APPDIR)
+	{
+		XMLwrapper *info;
+		xmlNode *node;
+
+		info = appinfo_get(fullpath, item);
+		if (info && ((node = xml_get_section(info, NULL, "Summary"))))
+		{
+			guchar *str;
+			str = xmlNodeListGetString(node->doc,
+					node->xmlChildrenNode, 1);
+			if (str)
+			{
+				g_string_append(tip, str);
+				g_string_append_c(tip, '\n');
+				g_free(str);
+			}
+		}
+		if (info)
+			g_object_unref(info);
+	}
+
+	if (!g_utf8_validate(item->leafname, -1, NULL))
+		g_string_append(tip,
+			_("This filename is not valid UTF-8. "
+			  "You should rename it.\n"));
 }

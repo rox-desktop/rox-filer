@@ -45,6 +45,9 @@ typedef struct _Collection Collection;
  */
 typedef struct _CollectionItem   CollectionItem;
 
+/* A viewport containing a Collection which also handles redraw */
+typedef struct _ViewCollection ViewCollection;
+
 /* This contains the pixbufs for an image, in various sizes */
 typedef struct _MaskedPixmap MaskedPixmap;
 

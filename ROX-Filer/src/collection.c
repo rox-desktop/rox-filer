@@ -158,8 +158,7 @@ static void draw_one_item(Collection *collection, int item, GdkRectangle *area)
 	{
 		collection->draw_item((GtkWidget *) collection,
 				&collection->items[item],
-				area,
-				collection->cb_user_data);
+				area, collection->cb_user_data);
 	}
 	
 	if (item == collection->cursor_item)
@@ -280,7 +279,6 @@ static void collection_init(GTypeInstance *instance, gpointer g_class)
 	object->item_width = 64;
 	object->item_height = 64;
 	object->vadj = NULL;
-	object->bg_gc = NULL;
 
 	object->items = g_new(CollectionItem, MINIMUM_ITEMS);
 	object->cursor_item = -1;
@@ -351,12 +349,6 @@ static void collection_destroy(GtkObject *object)
 	{
 		gtk_timeout_remove(collection->auto_scroll);
 		collection->auto_scroll = -1;
-	}
-
-	if (collection->bg_gc)
-	{
-		g_object_unref(collection->bg_gc);
-		collection->bg_gc = NULL;
 	}
 
 	if (collection->vadj)
@@ -614,10 +606,10 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	return FALSE;
 }
 
-static void default_draw_item(  GtkWidget *widget,
-				CollectionItem *item,
-				GdkRectangle *area,
-				gpointer user_data)
+static void default_draw_item(GtkWidget *widget,
+			      CollectionItem *item,
+			      GdkRectangle *area,
+			      gpointer user_data)
 {
 	gdk_draw_arc(widget->window,
 			item->selected ? widget->style->white_gc
@@ -1464,6 +1456,13 @@ void collection_set_item_size(Collection *collection, int width, int height)
 	gtk_widget_queue_resize(GTK_WIDGET(collection));
 }
 
+static int (*cmp_callback)(const void *a, const void *b) = NULL;
+static int collection_cmp(const void *a, const void *b)
+{
+	return cmp_callback(((CollectionItem *) a)->data,
+			    ((CollectionItem *) b)->data);
+}
+
 /* Cursor is positioned on item with the same data as before the sort.
  * Same for the wink item.
  */
@@ -1480,6 +1479,7 @@ void collection_qsort(Collection *collection,
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(compar != NULL);
+	g_return_if_fail(cmp_callback == NULL);
 
 	/* Check to see if it needs sorting (saves redrawing) */
 	if (collection->number_of_items < 2)
@@ -1488,7 +1488,7 @@ void collection_qsort(Collection *collection,
 	array = collection->items;
 	for (i = 1; i < collection->number_of_items; i++)
 	{
-		if (compar(&array[i - 1], &array[i]) > 0)
+		if (compar(array[i - 1].data, array[i].data) > 0)
 			break;
 	}
 	if (i == collection->number_of_items)
@@ -1520,7 +1520,10 @@ void collection_qsort(Collection *collection,
 	else
 		cursor = -1;
 	
-	qsort(collection->items, items, sizeof(collection->items[0]), compar); 
+	cmp_callback = compar;
+	qsort(collection->items, items, sizeof(collection->items[0]),
+			collection_cmp); 
+	cmp_callback = NULL;
 
 	if (cursor > -1 || wink > -1 || wink_on_map > -1)
 	{
@@ -1566,7 +1569,7 @@ int collection_find_item(Collection *collection, gpointer data,
 
 		i = (lower + upper) >> 1;
 
-		cmp = compar(&collection->items[i].data, &data);
+		cmp = compar(collection->items[i].data, data);
 		if (cmp == 0)
 			return i;
 
@@ -1606,20 +1609,18 @@ int collection_get_item(Collection *collection, int x, int y)
 		width = collection->item_width;
 
 	item = col + row * collection->columns;
-	if (item >= collection->number_of_items
-			|| 
-		!collection->test_point(collection,
-			x - col * collection->item_width,
-			y - row * collection->item_height,
-			&collection->items[item],
-			width,
-			collection->item_height,
-			collection->cb_user_data))
-	{
+	if (item >= collection->number_of_items)
 		return -1;
-	}
 
-	return item;
+	x -= col * collection->item_width;
+	y -= row * collection->item_height;
+
+	if (collection->test_point(collection, x, y,
+	    &collection->items[item], width, collection->item_height,
+	    collection->cb_user_data))
+		return item;
+
+	return -1;
 }
 
 int collection_selected_item_number(Collection *collection)

@@ -536,7 +536,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 			!(item->flags & ITEM_FLAG_APPDIR))
 	{
 #if 0
-		/* XXX: Do we still need this under 2.0? */
+		/* XXX: This is needed so that directories don't
+		 * spring open while we scroll. Should go in
+		 * collection.c, I think.
+		 */
 		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
 
 		/* Subdir: prepare for spring-open */

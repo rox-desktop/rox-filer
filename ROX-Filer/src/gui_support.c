@@ -29,6 +29,7 @@
 #include <sys/param.h>
 #include <stdarg.h>
 #include <errno.h>
+#include <time.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -49,6 +50,10 @@ gint		screen_width, screen_height;
 static GdkAtom xa_cardinal;
 
 static GtkWidget *current_dialog = NULL;
+
+static GtkWidget *tip_widget = NULL;
+static time_t tip_time = 0; 	/* Time tip widget last closed */
+static gint tip_timeout = 0;	/* When primed */
 
 void gui_support_init()
 {
@@ -810,4 +815,95 @@ void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y)
 		child_allocation.height = child_requisition.height;
 		gtk_widget_size_allocate(child->widget, &child_allocation);
 	}
+}
+
+/* Draw the black border */
+static gint tooltip_draw(GtkWidget *w)
+{
+	gdk_draw_rectangle(w->window, w->style->fg_gc[w->state], FALSE, 0, 0,
+			w->allocation.width - 1, w->allocation.height - 1);
+
+	return FALSE;
+}
+
+/* When the tips window closed, record the time. If we try to open another
+ * tip soon, it will appear more quickly.
+ */
+static void tooltip_destroyed(gpointer data)
+{
+	time(&tip_time);
+}
+
+/* Display a tooltip-like widget near the pointer with 'text'. If 'text' is
+ * NULL, close any current tooltip.
+ */
+void tooltip_show(guchar *text)
+{
+	GtkWidget *label;
+	int	x, y, py;
+	int	w, h;
+
+	if (tip_timeout)
+	{
+		gtk_timeout_remove(tip_timeout);
+		tip_timeout = 0;
+	}
+
+	if (tip_widget)
+	{
+		gtk_widget_destroy(tip_widget);
+		tip_widget = NULL;
+	}
+
+	if (!text)
+		return;
+
+	/* Show the tip */
+	tip_widget = gtk_window_new(GTK_WINDOW_POPUP);
+	gtk_widget_set_app_paintable(tip_widget, TRUE);
+	gtk_widget_set_name(tip_widget, "gtk-tooltips");
+
+	g_signal_connect_swapped(tip_widget, "expose_event",
+			G_CALLBACK(tooltip_draw), tip_widget);
+
+	label = gtk_label_new(text);
+	gtk_misc_set_padding(GTK_MISC(label), 4, 2);
+	gtk_container_add(GTK_CONTAINER(tip_widget), label);
+	gtk_widget_show(label);
+	gtk_widget_realize(tip_widget);
+
+	w = tip_widget->allocation.width;
+	h = tip_widget->allocation.height;
+	gdk_window_get_pointer(NULL, &x, &py, NULL);
+
+	x -= w / 2;
+	y = py + 12; /* I don't know the pointer height so I use a constant */
+
+	/* Now check for screen boundaries */
+	x = CLAMP(x, 0, screen_width - w);
+	y = CLAMP(y, 0, screen_height - h);
+
+	/* And again test if pointer is over the tooltip window */
+	if (py >= y && py <= y + h)
+		y = py - h- 2;
+	gtk_window_move(GTK_WINDOW(tip_widget), x, y);
+	gtk_widget_show(tip_widget);
+
+	g_signal_connect_swapped(tip_widget, "destroy",
+			G_CALLBACK(tooltip_destroyed), NULL);
+	time(&tip_time);
+}
+
+/* Call callback(user_data) after a while, unless cancelled */
+void tooltip_prime(GtkFunction callback, gpointer user_data)
+{
+	time_t  now;
+	int	delay;
+
+	g_return_if_fail(tip_timeout == 0);
+	
+	time(&now);
+	delay = now - tip_time > 2 ? 1000 : 200;
+
+	tip_timeout = gtk_timeout_add(delay, (GtkFunction) callback, user_data);
 }

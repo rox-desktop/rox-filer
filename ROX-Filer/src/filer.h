@@ -41,6 +41,7 @@ struct _FilerWindow
 	gchar		*sym_path;		/* Path the user sees */
 	gchar		*real_path;		/* realpath(sym_path) */
 	Collection	*collection;
+	GtkWidget	*view;
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
@@ -116,5 +117,11 @@ void filer_create_thumb(FilerWindow *filer_window, const gchar *pathname);
 void filer_cancel_thumbnails(FilerWindow *filer_window);
 void filer_set_title(FilerWindow *filer_window);
 void filer_create_thumbs(FilerWindow *filer_window);
+void filer_add_tip_details(FilerWindow *filer_window,
+			   GString *tip, DirItem *item);
+void filer_lost_selection(FilerWindow *filer_window, gint time);
+void filer_lost_primary(FilerWindow *filer_window);
+void filer_selection_changed(FilerWindow *filer_window, gint time);
+void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item);
 
 #endif /* _FILER_H */

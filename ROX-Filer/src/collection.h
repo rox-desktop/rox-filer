@@ -21,7 +21,7 @@ extern "C" {
 #endif /* __cplusplus */
 
 #define COLLECTION(obj) GTK_CHECK_CAST((obj), collection_get_type(), Collection)
-#define COLLECTION_CLASS(klass) GTK_CHECK_CLASS_CAST((klass), \
+#define COLLECTION_CLASS(obj) G_TYPE_INSTANCE_GET_CLASS((obj), \
 					collection_get_type(), CollectionClass)
 #define IS_COLLECTION(obj) \
 	G_TYPE_CHECK_INSTANCE_TYPE((obj), collection_get_type())
@@ -61,18 +61,16 @@ struct _Collection
 {
 	GtkWidget 	parent_widget;
 
-	/* For gtk+-1.2, the adjustment is used for redrawing in the right
-	 * place. With 2.0, the collection is in a Viewport, and this is
-	 * used only to force scrolling, etc.
+	/* With 2.0, the collection is in a Viewport, and this is used only to
+	 * force scrolling, etc.
 	 */
 	GtkAdjustment	*vadj;
 
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;
 	CollectionFreeFunc free_item;
-	gpointer	cb_user_data;	/* Passed to above two functions */
-	GdkGC		*bg_gc;		/* NULL unless pixmap background */
-	
+	gpointer	cb_user_data;	/* Passed to above functions */
+
 	gboolean	lasso_box;	/* Is the box drawn? */
 	int		drag_box_x[2];	/* Index 0 is the fixed corner */
 	int		drag_box_y[2];
@@ -103,11 +101,23 @@ struct _CollectionClass
 	GtkWidgetClass 	parent_class;
 
 	void 		(*gain_selection)(Collection 	*collection,
-					gint		time);
+					  gint		time);
 	void 		(*lose_selection)(Collection 	*collection,
-					gint		time);
+					  gint		time);
 	void		(*selection_changed)(Collection	*collection,
-					gint		time);
+					     gint	time);
+
+	void		(*draw_item)(GtkWidget *widget, 
+				     CollectionItem *item,
+			  	     GdkRectangle *area);
+	
+	gboolean	(*test_point)(Collection *collection,
+				      int point_x, int point_y,
+				      CollectionItem *item,
+				      int width, int height);
+
+	void		(*free_item)(Collection *collection,
+				     CollectionItem *item);
 };
 
 GType	collection_get_type   		(void);
@@ -126,10 +136,6 @@ void 	collection_clear_selection	(Collection *collection);
 void	collection_invert_selection	(Collection *collection);
 void	collection_draw_item		(Collection *collection, gint item,
 					 gboolean blank);
-void 	collection_set_functions	(Collection *collection,
-					 CollectionDrawFunc draw_item,
-					 CollectionTestFunc test_point,
-					 gpointer user_data);
 void 	collection_set_item_size	(Collection *collection,
 					 int width, int height);
 void 	collection_qsort		(Collection *collection,

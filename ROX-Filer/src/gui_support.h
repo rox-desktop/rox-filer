@@ -49,5 +49,7 @@ GtkWidget *button_new_mixed(const char *stock, const char *message);
 void entry_set_error(GtkWidget *entry, gboolean error);
 void window_put_just_above(GdkWindow *higher, GdkWindow *lower);
 void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y);
+void tooltip_show(guchar *text);
+void tooltip_prime(GtkFunction callback, gpointer user_data);
 
 #endif /* _GUI_SUPPORT_H */
