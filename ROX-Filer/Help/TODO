@@ -12,6 +12,11 @@ Odd things to investigate:
 - newChild -> newChildText?
 - Remove Filter regexp code.
 
+ROX has an implementation of GtkIconTheme copied from GTK 2.3. GTK 2.4
+also has its own copy. Both copies scan the theme directories when
+initialised, which is a waste of time. ROX should use the GTK version
+when present.
+
 Arrow in Find box.
 
 The Set Type interface confuses people, because it usually doesn't work.
