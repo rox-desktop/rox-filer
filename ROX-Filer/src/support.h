@@ -13,8 +13,6 @@
 
 #define PRETTY_SIZE_LIMIT 4096
 
-typedef enum {NONE} SpawnFlags;
-
 char *pathdup(char *path);
 GString *make_path(char *dir, char *leaf);
 char *our_host_name();
@@ -28,5 +26,7 @@ char *format_size_aligned(unsigned long size);
 int fork_exec_wait(char **argv);
 char *pretty_permissions(mode_t m);
 gint applicable(uid_t uid, gid_t gid);
+char *get_local_path(char *uri);
+void close_on_exec(int fd, gboolean close);
 
 #endif /* _SUPPORT_H */

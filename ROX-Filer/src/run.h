@@ -5,4 +5,8 @@
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  */
 
+#include <gtk/gtk.h>
+
 void run_app(char *path);
+void run_with_files(char *path, GSList *uri_list);
+void run_with_data(char *path, gpointer data, gulong length);

@@ -37,6 +37,7 @@
 #include "collection.h"
 
 #include "main.h"
+#include "support.h"
 #include "gui_support.h"
 #include "filer.h"
 #include "mount.h"
@@ -221,6 +222,12 @@ int main(int argc, char **argv)
 	act.sa_flags = SA_NOCLDSTOP;
 	sigaction(SIGCHLD, &act, NULL);
 
+	/* Ignore SIGPIPE - check for EPIPE errors instead */
+	act.sa_handler = SIG_IGN;
+	sigemptyset(&act.sa_mask);
+	act.sa_flags = 0;
+	sigaction(SIGPIPE, &act, NULL);
+
 	euid = geteuid();
 	egid = getegid();
 	ngroups = getgroups(0, NULL);
@@ -268,6 +275,8 @@ int main(int argc, char **argv)
 	}
 
 	pipe(stderr_pipe);
+	close_on_exec(stderr_pipe[0], TRUE);
+	close_on_exec(stderr_pipe[1], TRUE);
 	gdk_input_add(stderr_pipe[0], GDK_INPUT_READ, stderr_cb, NULL);
 	to_error_log = stderr_pipe[1];
 

@@ -24,10 +24,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <unistd.h>
-#include <string.h>
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <errno.h>
+#include <string.h>
 
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
@@ -40,6 +40,7 @@
 #include "gui_support.h"
 #include "support.h"
 #include "options.h"
+#include "run.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
@@ -82,8 +83,6 @@ static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
 			 GtkSelectionData 	*selection_data,
 			 guint32             	time);
-static char *get_local_path(char *uri);
-static void run_with_files(char *path, GSList *uri_list);
 static GtkWidget *create_options();
 static void update_options();
 static void set_options();
@@ -234,53 +233,6 @@ static gboolean provides(GdkDragContext *context, GdkAtom target)
 		targets = targets->next;
 
 	return targets != NULL;
-}
-
-/* Convert a URI to a local pathname (or NULL if it isn't local).
- * The returned pointer points inside the input string.
- * Possible formats:
- *	/path
- *	///path
- *	//host/path
- *	file://host/path
- */
-static char *get_local_path(char *uri)
-{
-	char	*host;
-
-	host = our_host_name();
-
-	if (*uri == '/')
-	{
-		char    *path;
-
-		if (uri[1] != '/')
-			return uri;	/* Just a local path - no host part */
-
-		path = strchr(uri + 2, '/');
-		if (!path)
-			return NULL;	    /* //something */
-
-		if (path - uri == 2)
-			return path;	/* ///path */
-		if (strlen(host) == path - uri - 2 &&
-			strncmp(uri + 2, host, path - uri - 2) == 0)
-			return path;	/* //myhost/path */
-
-		return NULL;	    /* From a different host */
-	}
-	else
-	{
-		if (strncasecmp(uri, "file:", 5))
-			return NULL;	    /* Don't know this format */
-
-		uri += 5;
-
-		if (*uri == '/')
-			return get_local_path(uri);
-
-		return NULL;
-	}
 }
 
 /* Convert a list of URIs into a list of strings.
@@ -799,22 +751,25 @@ static void got_data_raw(GtkWidget 		*widget,
 	char		*error = NULL;
 	char		*dest_path;
 
+	g_return_if_fail(selection_data->data != NULL);
+
+	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
+	g_return_if_fail(filer_window != NULL);
+	dest_path = get_dest_path(filer_window, context);
+
 	if (g_dataset_get_data(context, "drop_dest_type") == drop_dest_prog)
 	{
 		/* The data needs to be sent to an application */
-		g_warning("[ not implemented ]\n");
+		run_with_data(dest_path,
+				selection_data->data, selection_data->length);
+		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
 		return;
 	}
-	
-	filer_window = gtk_object_get_data(GTK_OBJECT(widget), "filer_window");
-	g_return_if_fail(filer_window != NULL);
 
 	leafname = g_dataset_get_data(context, "leafname");
 	if (!leafname)
 		leafname = "UntitledData";
 	
-	dest_path = get_dest_path(filer_window, context);
-
 	fd = open(make_path(dest_path, leafname)->str,
 		O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY,
 			S_IRUSR | S_IRGRP | S_IROTH |
@@ -844,48 +799,6 @@ static void got_data_raw(GtkWidget 		*widget,
 	}
 	else
 		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
-}
-
-/* Execute this program, passing all the URIs in the list as arguments.
- * URIs that are files on the local machine will be passed as simple
- * pathnames. The uri_list should be freed after this function returns.
- */
-static void run_with_files(char *path, GSList *uri_list)
-{
-	char		**argv;
-	int		argc = 0;
-	struct stat 	info;
-
-	if (stat(path, &info))
-	{
-		delayed_error("ROX-Filer", "Program not found - deleted?");
-		return;
-	}
-
-	argv = g_malloc(sizeof(char *) * (g_slist_length(uri_list) + 2));
-
-	if (S_ISDIR(info.st_mode))
-		argv[argc++] = make_path(path, "AppRun")->str;
-	else
-		argv[argc++] = path;
-	
-	while (uri_list)
-	{
-		char *uri = (char *) uri_list->data;
-		char *local;
-
-		local = get_local_path(uri);
-		if (local)
-			argv[argc++] = local;
-		else
-			argv[argc++] = uri;
-		uri_list = uri_list->next;
-	}
-	
-	argv[argc++] = NULL;
-
-	if (!spawn_full(argv, getenv("HOME")))
-		delayed_error("ROX-Filer", "Failed to fork() child process");
 }
 
 /* We've got a list of URIs from somewhere (probably another filer window).

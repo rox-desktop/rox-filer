@@ -32,6 +32,7 @@
 #include <fcntl.h>
 #include <sys/wait.h>
 #include <sys/stat.h>
+#include <string.h>
 
 #include <glib.h>
 
@@ -120,7 +121,7 @@ pid_t spawn_full(char **argv, char *dir)
 				fprintf(stderr, "chdir() failed: %s\n",
 						g_strerror(errno));
 		dup2(to_error_log, STDERR_FILENO);
-		fcntl(STDERR_FILENO, F_SETFD, 0);
+		close_on_exec(STDERR_FILENO, FALSE);
 		execvp(argv[0], argv);
 		fprintf(stderr, "execvp(%s, ...) failed: %s\n",
 				argv[0],
@@ -323,3 +324,58 @@ char *pretty_permissions(mode_t m)
 	return buffer;
 }
 
+/* Convert a URI to a local pathname (or NULL if it isn't local).
+ * The returned pointer points inside the input string.
+ * Possible formats:
+ *	/path
+ *	///path
+ *	//host/path
+ *	file://host/path
+ */
+char *get_local_path(char *uri)
+{
+	char	*host;
+
+	host = our_host_name();
+
+	if (*uri == '/')
+	{
+		char    *path;
+
+		if (uri[1] != '/')
+			return uri;	/* Just a local path - no host part */
+
+		path = strchr(uri + 2, '/');
+		if (!path)
+			return NULL;	    /* //something */
+
+		if (path - uri == 2)
+			return path;	/* ///path */
+		if (strlen(host) == path - uri - 2 &&
+			strncmp(uri + 2, host, path - uri - 2) == 0)
+			return path;	/* //myhost/path */
+
+		return NULL;	    /* From a different host */
+	}
+	else
+	{
+		if (strncasecmp(uri, "file:", 5))
+			return NULL;	    /* Don't know this format */
+
+		uri += 5;
+
+		if (*uri == '/')
+			return get_local_path(uri);
+
+		return NULL;
+	}
+}
+
+/* Set the close-on-exec flag for this FD.
+ * TRUE means that an exec()'d process will not get the FD.
+ */
+void close_on_exec(int fd, gboolean close)
+{
+	if (fcntl(fd, F_SETFD, close))
+		g_warning("fcntl() failed: %s\n", g_strerror(errno));
+}
