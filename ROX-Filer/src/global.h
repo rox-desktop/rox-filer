@@ -53,3 +53,7 @@ typedef struct _Pinboard Pinboard;
  */
 typedef struct _PinIcon PinIcon;
 
+/* There is one of these for each panel window open. Panels work rather
+ * like little pinboards, but with a more rigid layout.
+ */
+typedef struct _Panel Panel;

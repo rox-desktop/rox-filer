@@ -407,7 +407,7 @@ static void handle_drops(FilerWindow *filer_window,
 			 GtkWidget *button,
 			 DropDest dest)
 {
-	make_drop_target(button);
+	make_drop_target(button, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "drag_motion",
 			GTK_SIGNAL_FUNC(drag_motion), filer_window);
 	gtk_signal_connect(GTK_OBJECT(button), "drag_leave",

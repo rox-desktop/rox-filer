@@ -189,6 +189,13 @@ void make_panel_window(GdkWindow *window)
 	static gboolean need_init = TRUE;
 	static GdkAtom	xa_state;
 
+	if (override_redirect)
+	{
+		gdk_window_lower(window);
+		gdk_window_set_override_redirect(window, TRUE);
+		return;
+	}
+
 	if (need_init)
 	{
 		xa_state = gdk_atom_intern("_WIN_STATE", FALSE);
@@ -695,4 +702,50 @@ void button_patch_set_colour(GtkWidget *button, GdkColor *colour)
 
 	if (GTK_WIDGET_REALIZED(patch))
 		gdk_window_clear(patch->window);
+}
+
+static GtkWidget *current_wink_widget = NULL;
+static gint	wink_timeout = -1;	/* Called when it's time to stop */
+static gint	wink_destroy;		/* Called if the widget dies first */
+
+static gboolean end_wink(gpointer data)
+{
+	gtk_drag_unhighlight(current_wink_widget);
+
+	gtk_signal_disconnect(GTK_OBJECT(current_wink_widget), wink_destroy);
+
+	current_wink_widget = NULL;
+
+	return FALSE;
+}
+
+static void cancel_wink(void)
+{
+	gtk_timeout_remove(wink_timeout);
+	end_wink(NULL);
+}
+
+static void wink_widget_died(gpointer data)
+{
+	current_wink_widget = NULL;
+	gtk_timeout_remove(wink_timeout);
+}
+
+/* Draw a black box around this widget, briefly.
+ * Note: uses the drag highlighting code for now.
+ */
+void wink_widget(GtkWidget *widget)
+{
+	g_return_if_fail(widget != NULL);
+	
+	if (current_wink_widget)
+		cancel_wink();
+
+	current_wink_widget = widget;
+	gtk_drag_highlight(current_wink_widget);
+	
+	wink_timeout = gtk_timeout_add(300, (GtkFunction) end_wink, NULL);
+
+	wink_destroy = gtk_signal_connect_object(GTK_OBJECT(widget), "destroy",
+				GTK_SIGNAL_FUNC(wink_widget_died), NULL);
 }

@@ -57,6 +57,7 @@
 #include "i18n.h"
 #include "remote.h"
 #include "pinboard.h"
+#include "panel.h"
 #include "run.h"
 #include "toolbar.h"
 
@@ -97,26 +98,30 @@ static void show_features(void);
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
-       "  -b, --bottom=DIR	open DIR as a bottom-edge panel\n"	\
-       "  -h, --help		display this help and exit\n"		      \
+       "  -b, --bottom=PANEL	open PAN as a bottom-edge panel\n"	\
+       "  -h, --help		display this help and exit\n"		\
+       "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
        "  -n, --new		start a new filer, even if already running\n"  \
        "  -o, --override	override window manager control of panels\n" \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
-       "  -t, --top=DIR		open DIR as a top-edge panel\n"		\
+       "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
+       "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -v, --version		display the version information and exit\n"   \
        "\nThe latest version can be found at:\n"			\
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "t:b:op:hvn"
+#define SHORT_OPS "t:b:l:r:op:hvn"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
 {
 	{"top", 1, NULL, 't'},
 	{"bottom", 1, NULL, 'b'},
+	{"left", 1, NULL, 'l'},
 	{"override", 0, NULL, 'o'},
 	{"pinboard", 1, NULL, 'p'},
+	{"right", 1, NULL, 'r'},
 	{"help", 0, NULL, 'h'},
 	{"version", 0, NULL, 'v'},
 	{"new", 0, NULL, 'n'},
@@ -300,6 +305,8 @@ int main(int argc, char **argv)
 				fprintf(stderr, _(HELP));
 				fprintf(stderr, _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
+			case 'l':
+			case 'r':
 			case 't':
 			case 'b':
 				g_string_append_c(to_open, '<');
@@ -353,6 +360,7 @@ int main(int argc, char **argv)
 	type_init();
 	action_init();
 	pinboard_init();
+	panel_init();
 
 	options_load();
 

@@ -8,8 +8,11 @@
 #ifndef _MENU_H
 #define _MENU_H
 
+#define MENU_MARGIN 32
+
 extern GtkAccelGroup	*filer_keys;
 extern GtkWidget 	*popup_menu;
+extern char		*xterm_here_value;
 
 void menu_init(void);
 
@@ -21,4 +24,10 @@ void menu_save_options(void);
 void show_pinboard_menu(GdkEventButton *event, PinIcon *icon);
 void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		     int item);
+GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name);
+
+/* Public menu handlers */
+void menu_rox_help(gpointer data, guint action, GtkWidget *widget);
+void menu_show_options(gpointer data, guint action, GtkWidget *widget);
+
 #endif /* _MENU_H */

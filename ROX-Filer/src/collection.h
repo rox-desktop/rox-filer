@@ -61,7 +61,6 @@ struct _CollectionItem
 struct _Collection
 {
 	GtkWidget 	parent_widget;
-	gboolean	panel;
 
 	GtkAdjustment	*vadj;
 	guint		last_scroll;	/* Current/previous scroll value */
@@ -143,8 +142,6 @@ int 	collection_find_item		(Collection *collection,
 					 gpointer data,
 					 int (*compar)(const void *,
 						       const void *));
-void 	collection_set_panel		(Collection *collection,
-					 gboolean panel);
 int 	collection_get_item		(Collection *collection, int x, int y);
 void 	collection_set_cursor_item	(Collection *collection, gint item);
 void 	collection_wink_item		(Collection *collection, gint item);

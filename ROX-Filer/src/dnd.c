@@ -79,7 +79,6 @@ static void got_data_raw(GtkWidget 		*widget,
 			GdkDragContext 		*context,
 			GtkSelectionData 	*selection_data,
 			guint32             	time);
-static GSList *uri_list_to_gslist(char *uri_list);
 static void got_uri_list(GtkWidget 		*widget,
 			 GdkDragContext 	*context,
 			 GtkSelectionData 	*selection_data,
@@ -133,14 +132,6 @@ static OptionsSection options =
 	save_options
 };
 
-enum
-{
-	TARGET_RAW,
-	TARGET_URI_LIST,
-	TARGET_RUN_ACTION,
-	TARGET_XDS,
-};
-
 GdkAtom XdndDirectSave0;
 GdkAtom _rox_run_action;
 GdkAtom xa_text_plain;
@@ -167,7 +158,7 @@ void dnd_init()
 
 gboolean o_no_hostnames = FALSE;
 static gboolean o_drag_to_icons = TRUE;
-static gboolean o_spring_open = FALSE;
+gboolean o_spring_open = FALSE;
 static gint	o_spring_delay = 400;
 
 static GtkWidget *toggle_no_hostnames;
@@ -343,7 +334,7 @@ gboolean provides(GdkDragContext *context, GdkAtom target)
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)
  */
-static GSList *uri_list_to_gslist(char *uri_list)
+GSList *uri_list_to_gslist(char *uri_list)
 {
 	GSList   *list = NULL;
 
@@ -572,7 +563,7 @@ void drag_data_get(GtkWidget          		*widget,
 /* Set up this widget as a drop-target.
  * Does not attach any motion handlers.
  */
-void make_drop_target(GtkWidget *widget)
+void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults)
 {
 	GtkTargetEntry 	target_table[] =
 	{
@@ -583,7 +574,7 @@ void make_drop_target(GtkWidget *widget)
 	};
 
 	gtk_drag_dest_set(widget,
-			0,
+			defaults,
 			target_table,
 			sizeof(target_table) / sizeof(*target_table),
 			GDK_ACTION_COPY | GDK_ACTION_MOVE
@@ -602,7 +593,7 @@ void drag_set_dest(FilerWindow *filer_window)
 {
 	GtkWidget	*widget = GTK_WIDGET(filer_window->collection);
 
-	make_drop_target(widget);
+	make_drop_target(widget, 0);
 
 	gtk_signal_connect(GTK_OBJECT(widget), "drag_motion",
 			GTK_SIGNAL_FUNC(drag_motion), filer_window);
@@ -658,7 +649,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (filer_window->collection->auto_scroll == -1)
 		collection_set_autoscroll(filer_window->collection, TRUE);
 
-	if (o_drag_to_icons || filer_window->panel_type != PANEL_NO)
+	if (o_drag_to_icons)
 		item_number = collection_get_item(filer_window->collection,
 							x, y);
 	else
@@ -668,95 +659,20 @@ static gboolean drag_motion(GtkWidget		*widget,
 		? (DirItem *) filer_window->collection->items[item_number].data
 		: NULL;
 
-	if (provides(context, _rox_run_action))
-	{
-		/* This is a special internal type. The user is dragging
-		 * to an executable item to set the run action.
-		 */
-		if (!item)
-			goto out;
-
-		if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
-		{
-			type = drop_dest_prog;
-			new_path = make_path(filer_window->path,
-						item->leafname)->str;
-		}
-		else
-			goto out;
-
-	}
-	else if (item)
-	{
-		/* If we didn't drop onto a directory, application or
-		 * executable file then act as though the drop is to the
-		 * window background.
-		 */
-		if (item->base_type != TYPE_DIRECTORY
-				&& !(item->flags & ITEM_FLAG_EXEC_FILE))
-			item = NULL;
-	}
-	
-	if (!item)
-	{
-		/* Drop onto the window background */
-		collection_set_cursor_item(filer_window->collection,
-				-1);
-
-	    	if (gtk_drag_get_source_widget(context) == widget)
-			goto out;
-
-		if (filer_window->panel_type != PANEL_NO)
-		{
-			if (context->actions & GDK_ACTION_LINK)
-			{
-				action = GDK_ACTION_LINK;
-				type = drop_dest_dir;
-			}
-		}
-		else
-			type = drop_dest_dir;
-
-		if (type)
-			new_path = filer_window->path;
-	}
+	if (item && filer_window->collection->items[item_number].selected)
+		type = NULL;
 	else
-	{
-		/* Drop onto a program/directory of some sort */
+		type = dnd_motion_item(context, &item);
 
-		if (gtk_drag_get_source_widget(context) == widget)
-		{
-			Collection *collection = filer_window->collection;
+	if (!type)
+		item = NULL;
 
-			if (collection->items[item_number].selected)
-				goto out;
-		}
-		
-		if (item->base_type == TYPE_DIRECTORY &&
-				!(item->flags & ITEM_FLAG_APPDIR))
-		{
-			if (provides(context, text_uri_list) ||
-			    provides(context, XdndDirectSave0))
-				type = drop_dest_dir;
-		}
-		else
-		{
-			if (provides(context, text_uri_list) ||
-			    provides(context, application_octet_stream))
-				type = drop_dest_prog;
-		}
-
-		if (type)
-			new_path = make_path(filer_window->path,
-					item->leafname)->str;
-	}
-
-out:
 	/* Don't allow drops to non-writeable directories. BUT, still
 	 * allow drops on non-writeable SUBdirectories so that we can
 	 * do the spring-open thing.
 	 */
-	if (type == drop_dest_dir && item)
+	if (item && type == drop_dest_dir &&
+			!(item->flags & ITEM_FLAG_APPDIR))
 	{
 		GtkObject *vadj = GTK_OBJECT(filer_window->collection->vadj);
 
@@ -778,10 +694,29 @@ out:
 	else
 		dnd_spring_abort();
 
-	if (type && item)
+	if (item)
+	{
 		collection_set_cursor_item(filer_window->collection,
 				item_number);
-	
+	}
+	else
+	{
+		collection_set_cursor_item(filer_window->collection, -1);
+
+		/* Disallow background drops within a single window */
+		if (type && gtk_drag_get_source_widget(context) == widget)
+			type = NULL;
+	}
+
+	if (type)
+	{
+		if (item)
+			new_path = make_path(filer_window->path,
+					item->leafname)->str;
+		else
+			new_path = filer_window->path;
+	}
+
 	g_dataset_set_data(context, "drop_dest_type", type);
 	if (type)
 	{
@@ -792,6 +727,83 @@ out:
 	}
 
 	return retval;
+}
+
+/* item is the item the file is held over, NULL for directory background.
+ * 'item' may be NULL on exit if the drop should be treated as onto the
+ * background. Disallow drags to a selected icon before calling this.
+ *
+ * Returns NULL to reject the drop, or drop_dest_prog/drop_dest_dir to
+ * accept. Build the path based on item.
+ */
+guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
+{
+	DirItem	*item = *item_p;
+
+	if (provides(context, _rox_run_action))
+	{
+		/* This is a special internal type. The user is dragging
+		 * to an executable item to set the run action.
+		 *
+		 * Only drags to an app/exec file are accepted.
+		 */
+
+		if (item &&
+			item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+		{
+			return drop_dest_prog;
+		}
+
+		/* Need to pretent to accept a drop on a directory so that
+		 * spring-opening works.
+		 */
+		if (o_spring_open && item && item->base_type == TYPE_DIRECTORY)
+			return drop_dest_dir;
+
+		return NULL;
+	}
+
+	/* Otherwise, it's a normal drag... */
+
+	if (item)
+	{
+		/* If we didn't drop onto a directory, application or
+		 * executable file then act as though the drop is to the
+		 * window background.
+		 */
+		if (item->base_type != TYPE_DIRECTORY
+				&& !(item->flags & ITEM_FLAG_EXEC_FILE))
+		{
+			item = NULL;
+			*item_p = NULL;
+		}
+	}
+
+	if (!item)
+	{
+		/* Drop onto the window background */
+
+		return drop_dest_dir;
+	}
+
+	/* Drop onto a program/directory of some sort */
+
+	if (item->base_type == TYPE_DIRECTORY &&
+			!(item->flags & ITEM_FLAG_APPDIR))
+	{
+		/* A normal directory */
+		if (provides(context, text_uri_list) ||
+				provides(context, XdndDirectSave0))
+			return drop_dest_dir;
+	}
+	else
+	{
+		if (provides(context, text_uri_list) ||
+				provides(context, application_octet_stream))
+			return drop_dest_prog;
+	}
+
+	return NULL;
 }
 
 /* Remove highlights */
@@ -872,9 +884,14 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 		target = text_uri_list;
 	else if (provides(context, application_octet_stream))
 		target = application_octet_stream;
-	else if (dest_type == drop_dest_prog &&
-				provides(context, _rox_run_action))
-		target = _rox_run_action;
+	else if (provides(context, _rox_run_action))
+	{
+		if (dest_type == drop_dest_prog)
+			target = _rox_run_action;
+		else
+			error = _("You must drag to an application to set "
+				"the run action");
+	}
 	else
 	{
 		if (dest_type == drop_dest_dir)

@@ -51,6 +51,7 @@
 #include "options.h"
 #include "minibuffer.h"
 #include "pinboard.h"
+#include "panel.h"
 #include "toolbar.h"
 
 #define PANEL_BORDER 2
@@ -104,8 +105,6 @@ static gint focus_out(GtkWidget *widget,
 			GdkEventFocus *event,
 			FilerWindow *filer_window);
 static void add_item(FilerWindow *filer_window, DirItem *item);
-static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
-				FilerWindow *window);
 static void update_display(Directory *dir,
 			DirAction	action,
 			GPtrArray	*items,
@@ -120,11 +119,6 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff);
 static void filer_set_title(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
-enum
-{
-	TARGET_STRING,
-	TARGET_URI_LIST,
-};
 
 static GdkCursor *busy_cursor = NULL;
 
@@ -509,8 +503,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 {
 	gboolean	shift = (flags & OPEN_SHIFT) != 0;
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
-	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0
-					&& !filer_window->panel_type;
+	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0;
 	GtkWidget	*widget;
 	DirItem		*item = (DirItem *)
 			filer_window->collection->items[item_number].data;
@@ -781,17 +774,6 @@ DirItem *selected_item(Collection *collection)
 	return NULL;
 }
 
-static int filer_confirm_close(GtkWidget *widget, GdkEvent *event,
-				FilerWindow *window)
-{
-	/* TODO: We can open lots of these - very irritating! */
-	return get_choice(_("Close panel?"),
-		      _("You have tried to close a panel via the window "
-			"manager - I usually find that this is accidental... "
-			"really close?"),
-			2, _("Remove"), _("Cancel")) != 0;
-}
-
 /* Append all the URIs in the selection to the string */
 static void create_uri_list(FilerWindow *filer_window, GString *string)
 {
@@ -856,14 +838,6 @@ static void start_drag_selection(Collection *collection,
 /* Creates and shows a new filer window */
 FilerWindow *filer_opendir(char *path)
 {
-	return filer_openpanel(path, PANEL_NO);
-}
-
-/* Creates and shows a new filer window.
- * panel_type may be PANEL_NO for a normal window.
- */
-FilerWindow *filer_openpanel(char *path, PanelType panel_type)
-{
 	GtkWidget	*hbox, *scrollbar, *collection;
 	FilerWindow	*filer_window;
 	GtkTargetEntry 	target_table[] =
@@ -879,7 +853,7 @@ FilerWindow *filer_openpanel(char *path, PanelType panel_type)
 	/* If the user doesn't want duplicate windows then check
 	 * for an existing one and close it if found.
 	 */
-	if (o_unique_filer_windows && panel_type == PANEL_NO)
+	if (o_unique_filer_windows)
 	{
 		FilerWindow *fw;
 		
@@ -927,7 +901,6 @@ FilerWindow *filer_openpanel(char *path, PanelType panel_type)
 	}
 
 	filer_window->show_hidden = last_show_hidden;
-	filer_window->panel_type = panel_type;
 	filer_window->temp_item_selected = FALSE;
 	filer_window->sort_fn = last_sort_fn;
 	filer_window->flags = (FilerFlags) 0;
@@ -978,46 +951,6 @@ FilerWindow *filer_openpanel(char *path, PanelType panel_type)
 	display_set_layout(filer_window, last_layout);
 	drag_set_dest(filer_window);
 
-	/* Add decorations appropriate to the window's type */
-	if (panel_type)
-	{
-		int		swidth, sheight, iwidth, iheight;
-		GtkWidget	*frame, *win = filer_window->window;
-
-		gtk_window_set_wmclass(GTK_WINDOW(win), "ROX-Panel",
-				PROJECT);
-		collection_set_panel(filer_window->collection, TRUE);
-		gtk_signal_connect(GTK_OBJECT(filer_window->window),
-				"delete_event",
-				GTK_SIGNAL_FUNC(filer_confirm_close),
-				filer_window);
-
-		gdk_window_get_size(GDK_ROOT_PARENT(), &swidth, &sheight);
-		iwidth = filer_window->collection->item_width;
-		iheight = filer_window->collection->item_height;
-		
-		{
-			int	height = iheight + PANEL_BORDER;
-			int	y = panel_type == PANEL_TOP 
-					? 0
-					: sheight - height - PANEL_BORDER;
-
-			gtk_widget_set_usize(collection, swidth, height);
-			gtk_widget_set_uposition(win, 0, y);
-		}
-
-		frame = gtk_frame_new(NULL);
-		gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_OUT);
-		gtk_container_add(GTK_CONTAINER(frame), collection);
-		gtk_container_add(GTK_CONTAINER(win), frame);
-
-		gtk_widget_show_all(frame);
-		gtk_widget_realize(win);
-		if (override_redirect)
-			gdk_window_set_override_redirect(win->window, TRUE);
-		make_panel_window(win->window);
-	}
-	else
 	{
 		GtkWidget	*vbox;
 		int		col_height = ROW_HEIGHT_LARGE * 3;
@@ -1254,8 +1187,7 @@ static FilerWindow *find_filer_window(char *path, FilerWindow *diff)
 	{
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 
-		if (filer_window->panel_type == PANEL_NO &&
-			filer_window != diff &&
+		if (filer_window != diff &&
 		    	strcmp(path, filer_window->path) == 0)
 		{
 			return filer_window;
@@ -1304,6 +1236,7 @@ void filer_check_mounted(char *path)
 	}
 
 	pinboard_may_update(path);
+	panel_may_update(path);
 }
 
 /* Like minibuffer_show(), except that:

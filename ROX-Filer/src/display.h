@@ -8,6 +8,8 @@
 #ifndef _DISPLAY_H
 #define _DISPLAY_H
 
+#define MAX_ICON_HEIGHT 42
+#define MAX_ICON_WIDTH 48
 #define ROW_HEIGHT_LARGE 64
 
 #include <gtk/gtk.h>
@@ -47,5 +49,19 @@ void display_set_sort_fn(FilerWindow *filer_window,
 void display_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 void shrink_width(FilerWindow *filer_window);
 int calc_width(FilerWindow *filer_window, DirItem *item);
+
+void draw_large_icon(GtkWidget *widget,
+		     GdkRectangle *area,
+		     DirItem  *item,
+		     gboolean selected);
+void draw_string(GtkWidget *widget,
+		GdkFont *font,
+		char	*string,
+		int 	x,
+		int 	y,
+		int 	width,
+		int	area_width,
+		gboolean selected,
+		gboolean box);
 
 #endif /* _DISPLAY_H */

@@ -54,12 +54,9 @@
 
 #define C_ "<control>"
 
-#define MENU_MARGIN 32
-
 typedef void (*ActionFn)(GSList *paths, char *dest_dir, char *leaf);
 
 GtkAccelGroup	*filer_keys;
-GtkAccelGroup	*panel_keys;
 GtkAccelGroup	*pinboard_keys;
 
 GtkWidget *popup_menu = NULL;		/* Currently open menu */
@@ -68,7 +65,7 @@ static gint updating_menu = 0;		/* Non-zero => ignore activations */
 
 /* Options */
 static GtkWidget *xterm_here_entry;
-static char *xterm_here_value;
+char *xterm_here_value;
 
 /* TRUE if we selected an icon automatically when the menu was opened */
 static gboolean pin_temp_item_selected;
@@ -124,7 +121,6 @@ static void open_vfs_uzip(gpointer data, guint action, GtkWidget *widget);
 
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
-static void show_options(gpointer data, guint action, GtkWidget *widget);
 static void new_directory(gpointer data, guint action, GtkWidget *widget);
 static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 
@@ -136,10 +132,6 @@ static void enter_path(gpointer data, guint action, GtkWidget *widget);
 static void shell_command(gpointer data, guint action, GtkWidget *widget);
 static void run_action(gpointer data, guint action, GtkWidget *widget);
 static void select_if(gpointer data, guint action, GtkWidget *widget);
-static void rox_help(gpointer data, guint action, GtkWidget *widget);
-
-static void open_as_dir(gpointer data, guint action, GtkWidget *widget);
-static void close_panel(gpointer data, guint action, GtkWidget *widget);
 
 static void pin_help(gpointer data, guint action, GtkWidget *widget);
 static void pin_remove(gpointer data, guint action, GtkWidget *widget);
@@ -167,8 +159,6 @@ static GtkWidget	*filer_file_menu;	/* The File '' menu */
 static GtkWidget	*filer_vfs_menu;	/* The Open VFS menu */
 static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
-static GtkWidget	*panel_menu;		/* The popup panel menu */
-static GtkWidget	*panel_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*pinboard_menu;		/* The popup pinboard menu */
 
 /* Used for Copy, etc */
@@ -218,7 +208,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Find"),		NULL,   find, 0, NULL},
 {N_("Select All"),	    	NULL,  	select_all, 0, NULL},
 {N_("Clear Selection"),		NULL,  	clear_selection, 0, NULL},
-{N_("Options..."),		NULL,   show_options, 0, NULL},
+{N_("Options..."),		NULL,   menu_show_options, 0, NULL},
 {N_("New Directory..."),	NULL,   new_directory, 0, NULL},
 {N_("Xterm Here"),		NULL,  	xterm_here, 0, NULL},
 {N_("Window"),			NULL,  	NULL, 0, "<Branch>"},
@@ -232,34 +222,15 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Set Run Action..."),	NULL,  	run_action, 0, NULL},
 {">" N_("Select If..."),	NULL,  	select_if, 0, NULL},
 {">",			NULL,  	NULL, 0, "<Separator>"},
-{">" N_("Show ROX-Filer Help"), NULL,  rox_help, 0, NULL},
-};
-
-static GtkItemFactoryEntry panel_menu_def[] = {
-{N_("Display"),			NULL,	NULL, 0, "<Branch>"},
-{">" N_("Sort by Name"),	NULL,   sort_name, 0, NULL},
-{">" N_("Sort by Type"),	NULL,   sort_type, 0, NULL},
-{">" N_("Sort by Date"),	NULL,   sort_date, 0, NULL},
-{">" N_("Sort by Size"),	NULL,   sort_size, 0, NULL},
-{">",			NULL,   NULL, 0, "<Separator>"},
-{">" N_("Show Hidden"),   	NULL, 	hidden, 0, "<ToggleItem>"},
-{">" N_("Refresh"),	NULL, 	refresh, 0,	NULL},
-{N_("Open Panel as Directory"), NULL, 	open_as_dir, 0, NULL},
-{N_("Close Panel"),		NULL, 	close_panel, 0, NULL},
-{"",				NULL,	NULL, 0, "<Separator>"},
-{N_("ROX-Filer Help"),		NULL,   rox_help, 0, NULL},
-{N_("ROX-Filer Options..."),	NULL,   show_options, 0, NULL},
-{"",				NULL,	NULL, 0, "<Separator>"},
-{N_("Show Help"),    		NULL,  	help, 0, NULL},
-{N_("Remove Item"),		NULL,	remove_link, 0, NULL},
+{">" N_("Show ROX-Filer Help"), NULL,  menu_rox_help, 0, NULL},
 };
 
 static GtkItemFactoryEntry pinboard_menu_def[] = {
+{N_("ROX-Filer Help"),		NULL,   menu_rox_help, 0, NULL},
+{N_("ROX-Filer Options..."),	NULL,   menu_show_options, 0, NULL},
+{"",				NULL,	NULL, 0, "<Separator>"},
 {N_("Show Help"),    		NULL,  	pin_help, 0, NULL},
 {N_("Remove Item(s)"),		NULL,	pin_remove, 0, NULL},
-{"",				NULL,	NULL, 0, "<Separator>"},
-{N_("ROX-Filer Help"),		NULL,   rox_help, 0, NULL},
-{N_("ROX-Filer Options..."),	NULL,   show_options, 0, NULL},
 };
 
 
@@ -305,7 +276,7 @@ do {									\
 									\
 	n_entries = sizeof(name ## _menu_def) / sizeof(*name ## _menu_def); \
 	translated = translate_entries(name ## _menu_def, n_entries);	\
-	gtk_item_factory_create_items (item_factory, n_entries,		\
+	gtk_item_factory_create_items(item_factory, n_entries,		\
 					translated, NULL);		\
 	free_translated_entries(translated, n_entries);			\
 } while (0)
@@ -316,7 +287,7 @@ void menu_init()
 	GList			*items;
 	guchar			*tmp;
 	GtkWidget		*item;
-	GtkItemFactory  	*item_factory;				\
+	GtkItemFactory  	*item_factory;
 
 	filer_keys = gtk_accel_group_new();
 	MAKE_MENU(filer);
@@ -333,12 +304,6 @@ void menu_init()
 	GET_SSMENU_ITEM(item, "filer", "Window", "New Window");
 	filer_new_window = GTK_BIN(item)->child;
 
-	panel_keys = gtk_accel_group_new();
-	MAKE_MENU(panel);
-
-	GET_MENU_ITEM(panel_menu, "panel");
-	GET_SSMENU_ITEM(panel_hidden_menu, "panel", "Display", "Show Hidden");
-
 	menurc = choices_find_path_load("menus", PROJECT);
 	if (menurc)
 	{
@@ -346,8 +311,6 @@ void menu_init()
 		mark_menus_modified(FALSE);
 	}
 
-	gtk_accel_group_lock(panel_keys);
-	
 	pinboard_keys = gtk_accel_group_new();
 	MAKE_MENU(pinboard);
 	gtk_accel_group_lock(pinboard_keys);
@@ -356,8 +319,6 @@ void menu_init()
 	gtk_signal_connect(GTK_OBJECT(pinboard_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(pin_menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
-			GTK_SIGNAL_FUNC(menu_closed), NULL);
-	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
 	gtk_signal_connect(GTK_OBJECT(filer_file_menu), "unmap_event",
 			GTK_SIGNAL_FUNC(menu_closed), NULL);
@@ -374,6 +335,33 @@ void menu_init()
 				GTK_OBJECT(savebox));
 
 	atexit(save_menus);
+}
+
+/* Name is in the form "<panel>" */
+GtkWidget *menu_create(GtkItemFactoryEntry *def, int n_entries, guchar *name)
+{
+	GtkItemFactory  	*item_factory;
+	GtkItemFactoryEntry	*translated;
+	GtkAccelGroup		*keys;
+	GtkWidget		*menu;
+
+	keys = gtk_accel_group_new();
+
+	item_factory = gtk_item_factory_new(GTK_TYPE_MENU, name, keys);
+
+	translated = translate_entries(def, n_entries);
+	gtk_item_factory_create_items(item_factory, n_entries,
+					translated, NULL);
+	free_translated_entries(translated, n_entries);
+
+	menu = gtk_item_factory_get_widget(item_factory, name);
+
+	gtk_accel_group_lock(keys);
+
+	gtk_signal_connect(GTK_OBJECT(menu), "unmap_event",
+			GTK_SIGNAL_FUNC(pin_menu_closed), NULL);
+
+	return menu;
 }
  
 /* Build up some option widgets to go in the options dialog, but don't
@@ -459,19 +447,8 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 
 	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
 
-	if (pos[0] == -1)
-		*x = screen_width - MENU_MARGIN - requisition.width;
-	else if (pos[0] == -2)
-		*x = MENU_MARGIN;
-	else
-		*x = pos[0] - (requisition.width >> 2);
-		
-	if (pos[1] == -1)
-		*y = screen_height - MENU_MARGIN - requisition.height;
-	else if (pos[1] == -2)
-		*y = MENU_MARGIN;
-	else
-		*y = pos[1] - (requisition.height >> 2);
+	*x = pos[0] - (requisition.width >> 2);
+	*y = pos[1] - (requisition.height >> 2);
 
 	*x = CLAMP(*x, 0, screen_width - requisition.width);
 	*y = CLAMP(*y, 0, screen_height - requisition.height);
@@ -504,12 +481,12 @@ void show_pinboard_menu(GdkEventButton *event, PinIcon *icon)
 	if (icons)
 	{
 		set_items_shaded(pinboard_menu,
-				icons->next ? TRUE : FALSE , 0, 1);
+				icons->next ? TRUE : FALSE, 3, 1);
 
-		set_items_shaded(pinboard_menu, FALSE, 1, 1);
+		set_items_shaded(pinboard_menu, FALSE, 4, 1);
 	}
 	else
-		set_items_shaded(pinboard_menu, TRUE, 0, 2);
+		set_items_shaded(pinboard_menu, TRUE, 3, 2);
 
 	gtk_menu_popup(GTK_MENU(pinboard_menu), NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
@@ -528,21 +505,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	window_with_focus = filer_window;
 
-	switch (filer_window->panel_type)
-	{
-		case PANEL_TOP:
-			pos[1] = -2;
-			break;
-		case PANEL_BOTTOM:
-			pos[1] = -1;
-			break;
-		default:
-			break;
-	}
-
-	if (filer_window->panel_type)
-		collection_clear_selection(filer_window->collection); /* ??? */
-
 	if (filer_window->collection->number_selected == 0 && item >= 0)
 	{
 		collection_select_item(filer_window->collection, item);
@@ -551,13 +513,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	else
 		filer_window->temp_item_selected = FALSE;
 
-	if (filer_window->panel_type)
-	{
-		gtk_check_menu_item_set_active(
-				GTK_CHECK_MENU_ITEM(panel_hidden_menu),
-				filer_window->show_hidden);
-	}
-	else
 	{
 		GtkWidget	*file_label, *file_menu;
 		Collection 	*collection = filer_window->collection;
@@ -596,10 +551,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 
 	gtk_widget_set_sensitive(filer_new_window, !o_unique_filer_windows);
 
-	if (filer_window->panel_type)
-		popup_menu = panel_menu;
-	else
-		popup_menu = (event->state & GDK_CONTROL_MASK)
+	popup_menu = (event->state & GDK_CONTROL_MASK)
 				? filer_file_menu
 				: filer_menu;
 
@@ -1347,7 +1299,7 @@ static void clear_selection(gpointer data, guint action, GtkWidget *widget)
 	window_with_focus->temp_item_selected = FALSE;
 }
 
-static void show_options(gpointer data, guint action, GtkWidget *widget)
+void menu_show_options(gpointer data, guint action, GtkWidget *widget)
 {
 	options_show();
 }
@@ -1383,8 +1335,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (!spawn_full(argv, window_with_focus->path))
-		report_error(PROJECT, "Failed to fork() child "
-					"process");
+		report_error(PROJECT, _("Failed to fork() child process"));
 }
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
@@ -1448,23 +1399,9 @@ static void select_if(gpointer data, guint action, GtkWidget *widget)
 	minibuffer_show(window_with_focus, MINI_SELECT_IF);
 }
 
-void rox_help(gpointer data, guint action, GtkWidget *widget)
+void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(make_path(app_dir, "Help")->str);
-}
-
-static void open_as_dir(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-	
-	filer_opendir(window_with_focus->path);
-}
-
-static void close_panel(gpointer data, guint action, GtkWidget *widget)
-{
-	g_return_if_fail(window_with_focus != NULL);
-	
-	gtk_widget_destroy(window_with_focus->window);
 }
 
 /* Return a list of full paths of all the selected items */

@@ -63,8 +63,6 @@
 #else
 #  define SMALL_ICON_WIDTH 48
 #endif
-#define MAX_ICON_HEIGHT 42
-#define MAX_ICON_WIDTH 48
 #define MIN_ITEM_WIDTH 64
 
 #define MIN_TRUNCATE 0
@@ -108,19 +106,6 @@ static GtkAdjustment *adj_large_truncate;
 static GtkWidget *toggle_sort_nocase;
 
 /* Static prototypes */
-static void draw_large_icon(GtkWidget *widget,
-			    GdkRectangle *area,
-			    DirItem  *item,
-			    gboolean selected);
-static void draw_string(GtkWidget *widget,
-		GdkFont *font,
-		char	*string,
-		int 	x,
-		int 	y,
-		int 	width,
-		int	area_width,
-		gboolean selected,
-		gboolean box);
 static void draw_item_large(GtkWidget *widget,
 			CollectionItem *item,
 			GdkRectangle *area,
@@ -388,10 +373,10 @@ static void draw_small_icon(GtkWidget *widget,
 	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
-static void draw_large_icon(GtkWidget *widget,
-			    GdkRectangle *area,
-			    DirItem  *item,
-			    gboolean selected)
+void draw_large_icon(GtkWidget *widget,
+		     GdkRectangle *area,
+		     DirItem  *item,
+		     gboolean selected)
 {
 	MaskedPixmap	*image = item->image;
 	int	width = MIN(image->width, MAX_ICON_WIDTH);
@@ -449,7 +434,7 @@ static void draw_large_icon(GtkWidget *widget,
 }
 
 /* 'box' renders a background box if the string is also selected */
-static void draw_string(GtkWidget *widget,
+void draw_string(GtkWidget *widget,
 		GdkFont	*font,
 		char	*string,
 		int 	x,
@@ -1136,9 +1121,6 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 {
 	if (filer_window->display_style == style)
 		return;
-
-	if (filer_window->panel_type)
-		style = LARGE_ICONS;
 
 	filer_window->display_style = style;
 

@@ -11,8 +11,6 @@
 #include <gtk/gtk.h>
 #include "collection.h"
 
-typedef enum {PANEL_NO, PANEL_TOP, PANEL_BOTTOM} PanelType;
-
 typedef enum
 {
 	OPEN_SHIFT		= 0x01,	/* Do ShiftOpen */
@@ -40,7 +38,6 @@ struct _FilerWindow
 	gboolean	temp_item_selected;
 	gboolean	show_hidden;
 	FilerFlags	flags;
-	PanelType	panel_type;
 	int 		(*sort_fn)(const void *a, const void *b);
 
 	DetailsType	details_type;
@@ -73,7 +70,6 @@ extern gboolean 	o_new_window_on_1;
 /* Prototypes */
 void filer_init(void);
 FilerWindow *filer_opendir(char *path);
-FilerWindow *filer_openpanel(char *path, PanelType panel_type);
 void filer_update_dir(FilerWindow *filer_window, gboolean warning);
 int selected_item_number(Collection *collection);
 DirItem *selected_item(Collection *collection);

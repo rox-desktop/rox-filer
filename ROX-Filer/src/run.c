@@ -33,12 +33,12 @@
 #include "support.h"
 #include "gui_support.h"
 #include "filer.h"
-#include "menu.h"
 #include "main.h"
 #include "type.h"
 #include "dir.h"
 #include "action.h"
 #include "pinboard.h"
+#include "panel.h"
 
 /* Static prototypes */
 static void write_data(gpointer data, gint fd, GdkInputCondition cond);
@@ -199,9 +199,6 @@ gboolean run_diritem(guchar *full_path,
 		     FilerWindow *filer_window,
 		     gboolean edit)
 {
-	if (filer_window && filer_window->panel_type)
-		filer_window = NULL;
-		
 	if (item->flags & ITEM_FLAG_SYMLINK && edit)
 		return follow_symlink(full_path, filer_window);
 
@@ -370,10 +367,16 @@ void run_list(guchar *to_open)
 				filer_opendir(value);
 				break;
 			case 't':
-				filer_openpanel(value, PANEL_TOP);
+				panel_new(value, PANEL_TOP);
 				break;
 			case 'b':
-				filer_openpanel(value, PANEL_BOTTOM);
+				panel_new(value, PANEL_BOTTOM);
+				break;
+			case 'l':
+				panel_new(value, PANEL_LEFT);
+				break;
+			case 'r':
+				panel_new(value, PANEL_RIGHT);
 				break;
 			default:
 				g_warning("Don't know how to handle '%s'",

@@ -325,7 +325,6 @@ static void collection_init(Collection *object)
 
 	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(object), GTK_CAN_FOCUS);
 
-	object->panel = FALSE;
 	object->number_of_items = 0;
 	object->number_selected = 0;
 	object->columns = 1;
@@ -1231,12 +1230,7 @@ static gint collection_button_press(GtkWidget      *widget,
 				event,
 				item);
 	}
-	else if (event->type == GDK_2BUTTON_PRESS && collection->panel)
-	{
-		/* Do nothing */
-	}
-	else if ((event->type == GDK_2BUTTON_PRESS && !collection_single_click)
-		|| collection->panel)
+	else if (event->type == GDK_2BUTTON_PRESS && !collection_single_click)
 	{
 		if (item >= 0)
 		{
@@ -2076,26 +2070,6 @@ int collection_find_item(Collection *collection, gpointer data,
 			return i;
 
 	return -1;
-}
-
-/* The collection may be in either normal mode or panel mode.
- * In panel mode:
- * - a single click calls open_item
- * - items are never selected
- * - lasso boxes are disabled
- */
-void collection_set_panel(Collection *collection, gboolean panel)
-{
-	g_return_if_fail(collection != NULL);
-	g_return_if_fail(IS_COLLECTION(collection));
-	
-	collection->panel = panel == TRUE;
-
-	if (collection->panel)
-	{
-		collection_clear_selection(collection);
-		abort_lasso(collection);
-	}
 }
 
 /* Return the number of the item under the point (x,y), or -1 for none.

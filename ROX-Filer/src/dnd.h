@@ -9,9 +9,18 @@
 #define _DND_H
 
 #include <gtk/gtk.h>
-#include "collection.h"
+
+enum
+{
+	TARGET_RAW,
+	TARGET_URI_LIST,
+	TARGET_RUN_ACTION,
+	TARGET_XDS,
+	TARGET_STRING,
+};
 
 extern gboolean o_no_hostnames;
+extern gboolean o_spring_open;
 extern char *drop_dest_prog;
 extern char *drop_dest_dir;
 extern GdkAtom XdndDirectSave0;
@@ -31,7 +40,7 @@ void drag_data_get(GtkWidget      	*widget,
 		   guint               	info,
 		   guint32             	time,
 		   gpointer	       	data);
-void make_drop_target(GtkWidget *widget);
+void make_drop_target(GtkWidget *widget, GtkDestDefaults defaults);
 void drag_set_dest(FilerWindow *filer_window);
 void drag_set_pinboard_dest(GtkWidget *widget);
 void dnd_init();
@@ -40,5 +49,7 @@ gboolean provides(GdkDragContext *context, GdkAtom target);
 
 void dnd_spring_load(GdkDragContext *context);
 void dnd_spring_abort(void);
+GSList *uri_list_to_gslist(char *uri_list);
+guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p);
 
 #endif /* _DND_H */

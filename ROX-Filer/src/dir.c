@@ -157,7 +157,7 @@ void dir_restat(guchar *path, DirItem *item)
 {
 	struct stat	info;
 
-	if (item->image && item->flags & ITEM_FLAG_TEMP_ICON)
+	if (item->image)
 	{
 		pixmap_unref(item->image);
 		item->image = NULL;
@@ -234,12 +234,12 @@ void dir_restat(guchar *path, DirItem *item)
 			strcpy(tmp + path_len + 4, "Icon.xpm");
 			app_icon = g_fscache_lookup(pixmap_cache, tmp);
 			if (app_icon)
-			{
 				item->image = app_icon;
-				item->flags |= ITEM_FLAG_TEMP_ICON;
-			}
 			else
+			{
 				item->image = im_appdir;
+				pixmap_ref(item->image);
+			}
 		}
 		g_free(tmp);
 	}
@@ -249,20 +249,26 @@ void dir_restat(guchar *path, DirItem *item)
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
 			item->image = im_exec_file;
+			pixmap_ref(im_exec_file);
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 		}
 		else
-		{
 			item->mime_type = type_from_path(path);
-			item->flags |= ITEM_FLAG_TEMP_ICON;
-		}
 	}
 
 	if (!item->mime_type)
 		item->mime_type = mime_type_from_base_type(item->base_type);
 
 	if (!item->image)
-		item->image = type_to_icon(item->mime_type);
+	{
+		if (item->base_type == TYPE_ERROR)
+		{
+			item->image = im_error;
+			pixmap_ref(im_error);
+		}
+		else
+			item->image = type_to_icon(item->mime_type);
+	}
 }
 
 /* Fill in the item structure with the appropriate details.
@@ -284,8 +290,7 @@ void dir_item_clear(DirItem *item)
 {
 	g_return_if_fail(item != NULL);
 
-	if (item->flags & ITEM_FLAG_TEMP_ICON)
-		pixmap_unref(item->image);
+	pixmap_unref(item->image);
 	g_free(item->leafname);
 }
 
@@ -528,8 +533,6 @@ update:
 
 	if (is_new == FALSE)
 	{
-		if (item->flags & ITEM_FLAG_TEMP_ICON)
-			pixmap_unref(item->image);
 		if (item->lstat_errno == new.lstat_errno
 		 && item->base_type == new.base_type
 		 && item->flags == new.flags
@@ -541,7 +544,10 @@ update:
 		 && item->image == new.image
 		 && item->mime_type == new.mime_type
 		 && item->name_width == new.name_width)
+		{
+			pixmap_unref(new.image);
 			return;
+		}
 	}
 
 	item->image = new.image;

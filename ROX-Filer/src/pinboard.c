@@ -60,12 +60,6 @@ GdkColor text_fg_col, text_bg_col;
 /* Style that all the icons should use. NULL => regenerate from text_fg/bg */
 GtkStyle *pinicon_style = NULL;
 
-enum
-{
-	TARGET_STRING,
-	TARGET_URI_LIST,
-};
-
 struct _PinIcon {
 	GtkWidget	*win, *paper;
 	GdkBitmap	*mask;
@@ -263,7 +257,12 @@ void pinboard_activate(guchar *name)
 	
 	slash = strchr(name, '/');
 	if (slash)
-		path = g_strdup(name);
+	{
+		if (access(name, F_OK))
+			path = NULL;	/* File does not (yet) exist */
+		else
+			path = g_strdup(name);
+	}
 	else
 	{
 		guchar	*leaf;
@@ -336,13 +335,7 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y)
 
 	gtk_widget_realize(icon->win);
 	gtk_widget_realize(icon->paper);
-	if (override_redirect)
-	{
-		gdk_window_lower(icon->win->window);
-		gdk_window_set_override_redirect(icon->win->window, TRUE);
-	}
-	else
-		make_panel_window(icon->win->window);
+	make_panel_window(icon->win->window);
 
 	set_size_and_shape(icon, &width, &height);
 	offset_from_centre(icon, width, height, &x, &y);
@@ -1172,7 +1165,6 @@ static void forward_root_clicks(void)
 static void pinboard_save(void)
 {
 	guchar	*save;
-	guchar	*leaf;
 	GString	*tmp;
 	FILE	*file = NULL;
 	GList	*next;
@@ -1180,9 +1172,16 @@ static void pinboard_save(void)
 
 	g_return_if_fail(current_pinboard != NULL);
 	
-	leaf = g_strconcat("pb_", current_pinboard->name, NULL);
-	save = choices_find_path_save(leaf, "ROX-Filer", TRUE);
-	g_free(leaf);
+	if (strchr(current_pinboard->name, '/'))
+		save = current_pinboard->name;
+	else
+	{
+		guchar	*leaf;
+
+		leaf = g_strconcat("pb_", current_pinboard->name, NULL);
+		save = choices_find_path_save(leaf, "ROX-Filer", TRUE);
+		g_free(leaf);
+	}
 
 	if (!save)
 		return;
@@ -1325,7 +1324,7 @@ static void drag_set_pinicon_dest(PinIcon *icon)
 {
 	GtkObject	*obj = GTK_OBJECT(icon->paper);
 
-	make_drop_target(icon->paper);
+	make_drop_target(icon->paper, 0);
 
 	gtk_signal_connect(obj, "drag_motion",
 			GTK_SIGNAL_FUNC(drag_motion), icon);
@@ -1360,54 +1359,23 @@ static gboolean drag_motion(GtkWidget		*widget,
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */
 
-	if (provides(context, _rox_run_action))
-	{
-		/* This is a special internal type. The user is dragging
-		 * to an executable item to set the run action.
-		 */
+	type = dnd_motion_item(context, &item);
 
-		if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
-			type = drop_dest_prog;
-		else
-			goto out;
-
-	}
-	else
-	{
-		/* If we didn't drop onto a directory, application or
-		 * executable file then give up.
-		 */
-		if (item->base_type != TYPE_DIRECTORY
-				&& !(item->flags & ITEM_FLAG_EXEC_FILE))
-			goto out;
-	}
-	
-	if (item->base_type == TYPE_DIRECTORY &&
-			!(item->flags & ITEM_FLAG_APPDIR))
-	{
-		if (provides(context, text_uri_list) ||
-				provides(context, XdndDirectSave0))
-			type = drop_dest_dir;
-	}
-	else
-	{
-		if (provides(context, text_uri_list) ||
-				provides(context, application_octet_stream))
-			type = drop_dest_prog;
-	}
-
+	if (!item)
+		type = NULL;
 out:
-
-#if 0
 	/* We actually must pretend to accept the drop, even if the
 	 * directory isn't writeable, so that the spring-opening
 	 * thing works.
 	 */
 
 	/* Don't allow drops to non-writeable directories */
-	if (type == drop_dest_dir && access(icon->path, W_OK) != 0)
+	if (o_spring_open == FALSE &&
+			type == drop_dest_dir &&
+			access(icon->path, W_OK) != 0)
+	{
 		type = NULL;
-#endif
+	}
 
 	g_dataset_set_data(context, "drop_dest_type", type);
 	if (type)

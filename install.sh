@@ -45,6 +45,8 @@ if [ $? -ne 0 ]; then
 	die "Filer doesn't work! Giving up..."
 fi
 
+umask 022
+
 cat << EOF
 
 
@@ -90,8 +92,8 @@ endir "$CHOICES"
 
 if [ -d "$CHOICES/MIME-icons" ]; then
 	cat << EOF
-WARNING: You already have a $CHOICES/MIME-icons directory --- any icons you
-have modified will be overwritten!
+WARNING: You already have a $CHOICES/MIME-icons
+directory --- any icons you have modified will be overwritten!
 
 Continue? [y/n]
 EOF
