@@ -154,6 +154,14 @@ fi
 AC_SUBST(VFS_CFLAGS)
 AC_SUBST(VFS_LIBS)
 
+dnl Extract version info from AppInfo.xml
+AC_MSG_CHECKING(extracting version information)
+changequote(,)dnl
+VERSION=`sed -n 's/^.*<Version>\([.0-9]*\).*<\/Version>.*$/\1/p' ../AppInfo.xml`
+changequote([,])dnl
+AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_MSG_RESULT(version $VERSION)
+
 dnl Check for the Midnight Commander VFS library
 AC_CHECK_LIB(vfs, mc_stat, , , `$GTK_CONFIG --libs`)
 
