@@ -355,6 +355,7 @@ void drag_data_get(GtkWidget          		*widget,
 					filer_window);
 			to_send = string->str;
 			to_send_length = string->len;
+			delete_once_sent = TRUE;
 			g_string_free(string, FALSE);
 			break;
 		default:

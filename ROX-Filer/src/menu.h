@@ -9,4 +9,5 @@ extern GtkAccelGroup	*filer_keys;
 
 void menu_init(void);
 void menu_finish(void);
-void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event);
+void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
+		     int item);

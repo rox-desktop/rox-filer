@@ -27,6 +27,8 @@ GtkAccelGroup	*panel_keys;
 
 /* Static prototypes */
 static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data);
+static void menu_closed(GtkWidget *widget);
+
 static void refresh(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
@@ -100,27 +102,34 @@ void menu_init()
 
 	filer_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
-					    "<popup>",
+					    "<filer>",
 					    filer_keys);
 	gtk_item_factory_create_items(item_factory,
 			sizeof(filer_menu_def) / sizeof(*filer_menu_def),
 			filer_menu_def,
 			NULL);
-	filer_menu = gtk_item_factory_get_widget(item_factory, "<popup>");
+	filer_menu = gtk_item_factory_get_widget(item_factory, "<filer>");
 
 	panel_keys = gtk_accel_group_new();
 	item_factory = gtk_item_factory_new(GTK_TYPE_MENU,
-					    "<popup2>",
+					    "<panel>",
 					    panel_keys);
 	gtk_item_factory_create_items(item_factory,
 			sizeof(panel_menu_def) / sizeof(*panel_menu_def),
 			panel_menu_def,
 			NULL);
-	panel_menu = gtk_item_factory_get_widget(item_factory, "<popup2>");
+	panel_menu = gtk_item_factory_get_widget(item_factory, "<panel>");
 
 	menurc = choices_find_path_load("menus");
 	if (menurc)
 		gtk_item_factory_parse_rc(menurc);
+
+	gtk_signal_connect(GTK_OBJECT(panel_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
+	gtk_signal_connect(GTK_OBJECT(filer_menu), "unmap_event",
+			GTK_SIGNAL_FUNC(menu_closed), NULL);
+
+	gtk_accel_group_lock(panel_keys);
 }
  
 /* Save the keybindings... */
@@ -161,7 +170,8 @@ static void position_menu(GtkMenu *menu, gint *x, gint *y, gpointer data)
 	*y = CLAMP(*y, 0, sheight - requisition.height);
 }
 
-void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
+void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
+		     int item)
 {
 	int	pos[] = {event->x_root, event->y_root};
 
@@ -178,10 +188,31 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event)
 		}
 	}
 
+	if (filer_window->panel)
+		collection_clear_selection(filer_window->collection);
+	if (filer_window->collection->number_selected == 0 && item >= 0)
+	{
+		collection_select_item(filer_window->collection, item);
+		filer_window->temp_item_selected = TRUE;
+	}
+	else
+		filer_window->temp_item_selected = FALSE;
+
 	gtk_menu_popup(filer_window->panel ? GTK_MENU(panel_menu)
 				           : GTK_MENU(filer_menu),
 			NULL, NULL, position_menu,
 			(gpointer) pos, event->button, event->time);
+}
+
+static void menu_closed(GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (window_with_focus->temp_item_selected)
+	{
+		collection_clear_selection(window_with_focus->collection);
+		window_with_focus->temp_item_selected = FALSE;
+	}
 }
 
 /* Actions */

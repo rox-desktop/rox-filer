@@ -28,6 +28,8 @@
 #include "apps.h"
 #include "mount.h"
 
+#define MAX_ICON_HEIGHT 42
+
 FilerWindow 	*window_with_focus = NULL;
 
 /* When a child process that changes a directory dies we need to know
@@ -258,6 +260,7 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	
 	/* XXX: Must be a better way... */
 	item->pix_width = ((GdkPixmapPrivate *) item->image->pixmap)->width;
+	item->pix_height = ((GdkPixmapPrivate *) item->image->pixmap)->height;
 
 	item_width = MAX(item->pix_width, item->text_width) + 4;
 
@@ -306,16 +309,21 @@ static void draw_item(GtkWidget *widget,
 
 	if (item->image)
 	{
+		int	image_y;
+		
 		gdk_gc_set_clip_mask(gc, item->image->mask);
-		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
+
+		image_y = MAX(0, MAX_ICON_HEIGHT - item->pix_height);
+		gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 		gdk_draw_pixmap(widget->window, gc,
 				item->image->pixmap,
 				0, 0,			/* Source x,y */
-				image_x, area->y + 8,	/* Dest x,y */
-				-1, -1);
+				image_x, area->y + image_y, /* Dest x,y */
+				-1, MIN(item->pix_height, MAX_ICON_HEIGHT));
 
 		if (item->flags & ITEM_FLAG_SYMLINK)
 		{
+			gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 			gdk_gc_set_clip_mask(gc,
 					default_pixmap[TYPE_SYMLINK].mask);
 			gdk_draw_pixmap(widget->window, gc,
@@ -329,6 +337,7 @@ static void draw_item(GtkWidget *widget,
 			int	type = item->flags & ITEM_FLAG_MOUNTED
 					? TYPE_MOUNTED
 					: TYPE_UNMOUNTED;
+			gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
 			gdk_gc_set_clip_mask(gc,
 					default_pixmap[type].mask);
 			gdk_draw_pixmap(widget->window, gc,
@@ -361,7 +370,7 @@ static void draw_item(GtkWidget *widget,
 void show_menu(Collection *collection, GdkEventButton *event,
 		int item, gpointer user_data)
 {
-	show_filer_menu((FilerWindow *) user_data, event);
+	show_filer_menu((FilerWindow *) user_data, event, item);
 }
 
 void scan_dir(FilerWindow *filer_window)
@@ -507,6 +516,7 @@ void filer_opendir(char *path, gboolean panel, Side panel_side)
 	filer_window->dir = NULL;	/* Not scanning */
 	filer_window->panel = panel;
 	filer_window->panel_side = panel_side;
+	filer_window->temp_item_selected = FALSE;
 
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 

@@ -33,6 +33,7 @@ struct _FilerWindow
 	char		*path;		/* pathname */
 	Collection	*collection;
 	gboolean	panel;
+	gboolean	temp_item_selected;
 	Side		panel_side;
 
 	/* Scanning */
@@ -49,6 +50,7 @@ struct _FileItem
 	
 	int		text_width;
 	int		pix_width;
+	int		pix_height;
 	MaskedPixmap	*image;
 };
 
