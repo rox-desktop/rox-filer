@@ -12,35 +12,19 @@
 
 #include <glib.h>
 
-/* ROX-Filer's unique namespace (for use in SOAP messages) */
-#define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
-
-/* The namespace for the SOAP envelope */
-#define SOAP_ENV_NS "http://www.w3.org/2001/06/soap-envelope"
-
-/* For debugging... */
-#define SHOW(var, fmt) (g_print("[ " #var " = '%" #fmt "' ]\n", var))
-
-/* We typedef various pointers here to avoid creating unnecessary
- * dependencies on the other header files.
+/* We put all the global typedefs here to avoid creating dependencies
+ * between header files.
  */
 
 /* Each filer window has one of these all to itself */
 typedef struct _FilerWindow FilerWindow;
 
 /* There is one Directory object per cached disk directory inode number.
- * Multiple FilerWindows may share a single directory. Directories
- * are cached, so a Directories may exist without any filer windows
+ * Multiple FilerWindows may share a single Directory. Directories
+ * are cached, so a Directory may exist without any filer windows
  * referencing it at all.
  */
 typedef struct _Directory Directory;
-
-/* A Collection is a GtkWidget used to arrange a grid of items.
- * Each filer window has its own one of these; the data field
- * of each item is the corresponding DirItem, shared with the
- * Directory and other Collections.
- */
-typedef struct _Collection Collection;
 
 /* Each item in a directory has a DirItem. The contains information from
  * stat()ing the file, plus a few other bits. There may be several of these
@@ -48,6 +32,13 @@ typedef struct _Collection Collection;
  * Each pinboard and panel icon also has one of these (not shared).
  */
 typedef struct _DirItem DirItem;
+
+/* A Collection is a GtkWidget used to arrange a grid of items.
+ * Each filer window has its own one of these; the data field
+ * of each item is the corresponding DirItem, shared with the
+ * FilerWindow's Directory and other windows' Collections.
+ */
+typedef struct _Collection Collection;
 
 /* This contains pixmaps and masks for an image, in various sizes */
 typedef struct _MaskedPixmap MaskedPixmap;
@@ -58,15 +49,15 @@ typedef struct _MaskedPixmap MaskedPixmap;
  */
 typedef struct _MIME_type MIME_type;
 
-/* There will be one of these if the pinboard is in use. It contains
- * the name of the pinboard and links to the pinned items inside.
- */
-typedef struct _Pinboard Pinboard;
-
 /* Each icon on the pinboard or a panel has an Icon structure. It contains
  * the name and path of the icon, as well as its DirItem.
  */
 typedef struct _Icon Icon;
+
+/* There will be one of these if the pinboard is in use. It contains
+ * the name of the pinboard and links to the pinned Icons inside.
+ */
+typedef struct _Pinboard Pinboard;
 
 /* There is one of these for each panel window open. Panels work rather
  * like little pinboards, but with a more rigid layout.
@@ -92,6 +83,8 @@ typedef enum {
 	MINI_SELECT_IF,
 } MiniType;
 
+/* The next two correspond to the styles on the Display submenu: */
+
 typedef enum {		/* Values used in options, must start at 0 */
 	LARGE_ICONS	= 0,
 	SMALL_ICONS	= 1,
@@ -107,6 +100,15 @@ typedef enum {		/* Values used in options, must start at 0 */
 	DETAILS_TYPE		= 4,
 	DETAILS_TIMES		= 5,
 } DetailsType;
+
+/* ROX-Filer's unique namespace (for use in SOAP messages) */
+#define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
+
+/* The namespace for the SOAP envelope */
+#define SOAP_ENV_NS "http://www.w3.org/2001/06/soap-envelope"
+
+/* For debugging... */
+#define SHOW(var, fmt) (g_print("[ " #var " = '%" #fmt "' ]\n", var))
 
 
 #include <tree.h>

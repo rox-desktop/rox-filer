@@ -19,6 +19,12 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+/* main.c - parses command-line options and parameters, plus some global
+ * 	    housekeeping.
+ *
+ * New to the code and feeling lost? Read global.h now.
+ */
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -70,6 +76,7 @@
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 static int to_wakeup_pipe = -1;	/* Write here to get noticed */
 
+/* Information about the ROX-Filer process */
 uid_t euid;
 gid_t egid;
 int ngroups;			/* Number of supplemental groups */
@@ -179,6 +186,11 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 /* The value that goes with an option */
 #define VALUE (*optarg == '=' ? optarg + 1 : optarg)
 
+/* Parses the command-line to work out what the user wants to do.
+ * Tries to send the request to an already-running copy of the filer.
+ * If that fails, it initialises all the other modules and executes the
+ * request itself.
+ */
 int main(int argc, char **argv)
 {
 	int		 wakeup_pipe[2];
@@ -194,6 +206,9 @@ int main(int argc, char **argv)
 	home_dir_len = strlen(home_dir);
 	app_dir = g_strdup(getenv("APP_DIR"));
 
+	/* Get internationalisation up and running. This requires the
+	 * choices system, to discover the user's preferred language.
+	 */
 	choices_init();
 	i18n_init();
 
@@ -211,12 +226,17 @@ int main(int argc, char **argv)
 	}
 #endif
 
+	/* Sometimes we want to take special action when a child
+	 * process exits. This hash table is used to convert the
+	 * child's PID to the callback function.
+	 */
 	death_callbacks = g_hash_table_new(NULL, NULL);
 
 #ifdef HAVE_LIBVFS
 	mc_vfs_init();
 #endif
 
+	/* Find out some information about ourself */
 	euid = geteuid();
 	egid = getegid();
 	ngroups = getgroups(0, NULL);
@@ -235,10 +255,13 @@ int main(int argc, char **argv)
 	 */
 	rpc = soap_new(&body);
 
-	/* Note: must do this before checking our options */
+	/* Note: must do this before checking our options,
+	 * otherwise we report an error for Gtk's options.
+	 */
 	add_default_styles();
 	gtk_init(&argc, &argv);
 
+	/* Process each option in turn */
 	while (1)
 	{
 		int	c;
@@ -352,6 +375,9 @@ int main(int argc, char **argv)
 		show_user_message = g_strdup_printf( _("Running as user '%s'"), 
 				user_name(euid));
 	
+	/* Add each remaining (non-option) argument to the list of files
+	 * to run.
+	 */
 	i = optind;
 	while (i < argc)
 	{
@@ -372,6 +398,9 @@ int main(int argc, char **argv)
 	}
 	else if (!body->xmlChildrenNode)
 	{
+		/* The user didn't request any action. Open the current
+		 * directory.
+		 */
 		guchar	*dir;
 
 		dir = g_get_current_dir();
@@ -381,9 +410,10 @@ int main(int argc, char **argv)
 
 	option_add_int("dnd_no_hostnames", 1, NULL);
 
+	/* Try to send the request to an already-running copy of the filer */
 	gui_support_init();
 	if (remote_init(rpc, new_copy))
-		return EXIT_SUCCESS;	/* Already running */
+		return EXIT_SUCCESS;	/* It worked - exit */
 
 	/* Put ourselves into the background (so 'rox' always works the
 	 * same, whether we're already running or not).
@@ -415,6 +445,8 @@ int main(int argc, char **argv)
 		}
 	}
 	
+	/* Initialize the rest of the filer... */
+	
 	pixmaps_init();
 
 	dnd_init();
@@ -436,8 +468,13 @@ int main(int argc, char **argv)
 	pinboard_init();
 	panel_init();
 
+	/* Load user settings */
 	options_load();
 
+	/* When we get a signal, we can't do much right then. Instead,
+	 * we send a char down this pipe, which causes the main loop to
+	 * deal with the event next time we're idle.
+	 */
 	pipe(wakeup_pipe);
 	close_on_exec(wakeup_pipe[0], TRUE);
 	close_on_exec(wakeup_pipe[1], TRUE);
@@ -463,14 +500,19 @@ int main(int argc, char **argv)
 	session_init(client_id);
 	g_free(client_id);
 		
+	/* Finally, execute the request */
 	reply = run_soap(rpc);
 	xmlFreeDoc(rpc);
 	if (reply)
 	{
+		/* Write the result, if any, to stdout */
 		save_xml_file(reply, "-");
 		xmlFreeDoc(reply);
 	}
 
+	/* Enter the main loop, processing events until all our windows
+	 * are closed.
+	 */
 	if (number_of_windows > 0)
 		gtk_main();
 
@@ -504,6 +546,13 @@ static void show_features(void)
 		_("Yes")
 #else
 		_("No (couldn't find a valid libvfs)")
+#endif
+		);
+	g_printerr("%s... %s\n", _("GTK+-2.0 support"),
+#ifdef GTK2
+		_("Yes")
+#else
+		_("No (using Gtk+-1.2 instead)")
 #endif
 		);
 }
