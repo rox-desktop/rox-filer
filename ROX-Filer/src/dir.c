@@ -189,6 +189,8 @@ void dir_check_this(guchar *path)
 
 	real_path = pathdup(path);
 
+	g_print("[ dir_check_this(%s) ]\n", real_path);
+
 	slash = strrchr(real_path, '/');
 
 	if (slash)
@@ -413,6 +415,22 @@ static void free_items_array(GPtrArray *array)
 	g_ptr_array_free(array, TRUE);
 }
 
+/* Tell everyone watching that these items have gone */
+static void notify_deleted(Directory *dir, GPtrArray *deleted)
+{
+	GList	*next;
+	
+	if (!deleted->len)
+		return;
+
+	for (next = dir->users; next; next = next->next)
+	{
+		DirUser *user = (DirUser *) next->data;
+
+		user->callback(dir, DIR_REMOVE, deleted, user->data);
+	}
+}
+
 /* Remove all the old items that have gone.
  * Notify everyone who is watching us of the removed items.
  */
@@ -420,7 +438,6 @@ static void remove_missing(Directory *dir, GPtrArray *keep)
 {
 	int		kept_items = 0;
 	GPtrArray	*deleted;
-	GList		*next;
 	int		old, new;
 
 	deleted = g_ptr_array_new();
@@ -471,16 +488,7 @@ static void remove_missing(Directory *dir, GPtrArray *keep)
 	
 	g_ptr_array_set_size(dir->items, kept_items);
 
-	/* Tell everyone about the removals */
-	if (deleted->len)
-	{
-		for (next = dir->users; next; next = next->next)
-		{
-			DirUser *user = (DirUser *) next->data;
-
-			user->callback(dir, DIR_REMOVE, deleted, user->data);
-		}
-	}
+	notify_deleted(dir, deleted);
 
 	free_items_array(deleted);
 }
@@ -509,8 +517,22 @@ static void delayed_notify(Directory *dir)
 	dir->notify_active = TRUE;
 }
 
+static void remove_item(Directory *dir, int i)
+{
+	GPtrArray *gone;
+
+	g_return_if_fail(i >= 0 && i < dir->items->len);
+
+	/* Move deleted item from 'items' to 'gone' */
+	gone = g_ptr_array_new();
+	g_ptr_array_add(gone, dir->items->pdata[i]);
+	g_ptr_array_remove_index(dir->items, i);
+
+	notify_deleted(dir, gone);
+	free_items_array(gone);
+}
+
 /* Stat this item and add, update or remove it */
-/* XXX: Doesn't cope with deletions yet! */
 static void insert_item(Directory *dir, guchar *leafname)
 {
 	static GString  *tmp = NULL;
@@ -521,17 +543,36 @@ static void insert_item(Directory *dir, guchar *leafname)
 	int		i;
 	DirItem		new;
 	gboolean	is_new = FALSE;
+	gboolean	deleted;
 
 	tmp = make_path(dir->pathname, leafname);
 	diritem_stat(tmp->str, &new, dir->do_thumbs);
+	deleted = new.base_type == TYPE_ERROR && new.lstat_errno == ENOENT;
 
 	/* Is an item with this name already listed? */
+	/* XXX: Binary search this! */
 	for (i = 0; i < array->len; i++)
 	{
 		item = (DirItem *) array->pdata[i];
 
 		if (strcmp(item->leafname, leafname) == 0)
+		{
+			if (deleted)
+			{
+				diritem_clear(&new);
+				remove_item(dir, i);
+				return;
+			}
+
 			goto update;
+		}
+	}
+
+	if (deleted)
+	{
+		/* Wasn't there before and isn't there now */
+		diritem_clear(&new);
+		return;
 	}
 
 	item = g_new(DirItem, 1);
