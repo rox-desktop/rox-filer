@@ -1477,6 +1477,10 @@ $ rox --bottom=</screen>
     <guilabel>Tiled</guilabel> to set the style, and then drag an image onto the marked area.
     To return to a solid colour backdrop (as set in the Options box), click on
     <guibutton>Clear</guibutton>.
+   </para><para>
+    The Wallpaper<citation>Wallpaper</citation> application can be used for more complicated
+    effects, such as choosing a new random image each hour, or rendering an image of the Earth
+    as it is currently lit by the sun.
    </para>
    <formalpara><title>For programmers...</title>
     <para>
@@ -1509,74 +1513,8 @@ $ rox --bottom=</screen>
     streams. The program should clean up and exit at this point. Be sure to catch
     SIGPIPE when writing to standard output if you need to delete any temporary files.
    </para><para>
-    This example program will display an image of the Earth on the backdrop, updating it
-    once a minute. Note the three places we check for the filer closing its connection with
-    us: when sending the image, when waiting for acknowledgement, and while sleeping.
-    This file should be saved as <filename>AppRun</filename> inside your new application
-    directory. To set the backdrop, run the application (eg, by clicking on it).
-    <programlisting><![CDATA[
-#!/usr/bin/env python
-
-import sys, os
-
-if len(sys.argv) == 1:
-	# Become the backdrop application
-	app = os.path.abspath(os.path.dirname(sys.argv[0]))
-	cin = os.popen('rox -R', 'w')
-	cin.write("""<?xml version="1.0"?>
-<env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope">
-  <env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer">
-   <SetBackdropApp><App>""" + app + """</App></SetBackdropApp>
-  </env:Body>
-</env:Envelope>
-""")
-	sys.exit(0)
-elif len(sys.argv) != 2 or sys.argv[1] != '--backdrop':
-	sys.stderr.write("Usage: %s [--backdrop]\n" % sys.argv[0])
-	sys.exit(1)
-
-# If we get here, we've been run by the filer.
-# Generate a sequence of images, sending them to the filer one by one.
-
-import tempfile, time, signal
-from select import select
-
-time_between_updates = 60
-
-while 1:
-	# Write image to a temporary file
-	path = tempfile.mktemp('.ppm')
-	child = os.fork()
-	if child == 0:
-		fd = os.open(path, os.O_CREAT | os.O_WRONLY | os.O_TRUNC, 0600)
-		os.dup2(fd, 1)
-		os.execvp("xearth", ["xearth", "-ppm"])
-		os._exit(1)
-	pid, status = os.waitpid(child, 0)
-	if status:
-		break		# xearth didn't work
-
-	# Send message to filer
-	quit = 0
-	try:
-		print "centre " + path
-		sys.stdout.flush()
-		if sys.stdin.readline() != 'ok\n':
-			quit = 1		# filer closed connection
-	except:
-		quit = 1			# filer closed connection
-	# Delete temporary file
-	os.unlink(path)
-	if quit:
-		break
-
-	# Wait until the next image is due, or the filer tells us to quit
-	ready = select([sys.stdin], [], [], time_between_updates)[0]
-	if ready:
-		# filer closed connection while we were waiting
-		break
-]]>
-    </programlisting>
+    See the Wallpaper<citation>Wallpaper</citation> application for a complete example application
+    (written in python).
    </para>
   </sect1>
  </chapter>
@@ -3627,6 +3565,11 @@ EOF</screen>
   <bibliomixed>
    <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
     <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
+    <ulink url="http://rox.sf.net/wallpaper.php3"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
