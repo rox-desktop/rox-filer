@@ -273,6 +273,7 @@ void view_select_if(ViewIface *obj,
 		    gpointer data)
 {
 	ViewIter iter;
+	gboolean should_select_first;
 
 	g_return_if_fail(VIEW_IS_IFACE(obj));
 
@@ -285,8 +286,10 @@ void view_select_if(ViewIface *obj,
 
 	/* If anything is currently selected then select the first item now
 	 * and set it to its correct value at the end (avoids losing the
-	 * primary and regaining it quickly).
+	 * primary and regaining it quickly). Do the test first in case it
+	 * relies on the selected state!
 	 */
+	should_select_first = test(&iter, data);
 	if (view_count_selected(obj))
 		view_set_selected(obj, &iter, TRUE);
 
@@ -295,7 +298,7 @@ void view_select_if(ViewIface *obj,
 
 	view_get_iter(obj, &iter, 0);
 	iter.next(&iter);
-	view_set_selected(obj, &iter, test(&iter, data));
+	view_set_selected(obj, &iter, should_select_first);
 
 	view_thaw(obj);
 }
