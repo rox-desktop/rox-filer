@@ -221,7 +221,7 @@ static void response(GtkDialog *dialog, gint response_id)
 	}
 }
 
-/* Display the question. Unshade the Yes and No boxes (XXX and any entry).
+/* Display the question. Unshade the Yes, No and entry box (if any).
  * Will send a response signal when the user makes a choice.
  */
 void abox_ask(ABox *abox, const gchar *question)
@@ -234,13 +234,6 @@ void abox_ask(ABox *abox, const gchar *question)
 
 	abox->question = TRUE;
 	shade(abox);
-
-#if 0
-		gtk_window_set_focus(
-				GTK_WINDOW(gui_side->window),
-				gui_side->entry ? gui_side->entry
-				: gui_side->yes);
-#endif
 }
 
 void abox_log(ABox *abox, const gchar *message, const gchar *style)
@@ -452,17 +445,15 @@ void abox_add_combo(ABox *abox, GList *presets,
 	abox->entry = GTK_COMBO(combo)->entry;
 
 	gtk_entry_set_text(GTK_ENTRY(abox->entry), text);
-	//gtk_editable_select_region(GTK_EDITABLE(gui_side->entry), 0, -1);
-	//gtk_widget_set_sensitive(abox->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), combo, TRUE, TRUE, 4);
 
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(abox)->vbox), hbox,
 				FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), help_button, FALSE, TRUE, 4);
 	
-	gtk_widget_grab_focus(abox->entry);
-
 	gtk_widget_show_all(hbox);
+
+	shade(abox);
 }
 
 void abox_add_entry(ABox *abox, const gchar *text, GtkWidget *help_button)
@@ -479,21 +470,17 @@ void abox_add_entry(ABox *abox, const gchar *text, GtkWidget *help_button)
 	abox->entry = gtk_entry_new();
 	gtk_widget_set_name(abox->entry, "fixed-style");
 	gtk_entry_set_text(GTK_ENTRY(abox->entry), text);
-	//gtk_editable_select_region(GTK_EDITABLE(abox->entry), 0, -1);
-	//gtk_widget_set_sensitive(abox->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), abox->entry, TRUE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(abox)->vbox),
 				hbox, FALSE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox), help_button,
 				FALSE, TRUE, 4);
 
-	gtk_window_set_focus(GTK_WINDOW(abox), abox->entry);
-#if 0
-	g_signal_connect(abox->entry, "activate",
-			G_CALLBACK(find_return_pressed), gui_side);
-#endif
+	gtk_entry_set_activates_default(GTK_ENTRY(abox->entry), TRUE);
 
 	gtk_widget_show_all(hbox);
+
+	shade(abox);
 }
 
 static void shade(ABox *abox)
@@ -506,9 +493,25 @@ static void shade(ABox *abox)
 	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_YES, on);
 	gtk_dialog_set_response_sensitive(dialog, GTK_RESPONSE_NO, on);
 	
-	gtk_dialog_set_response_sensitive(dialog, RESPONSE_QUIET,
-					  quiet ? FALSE : on);
+	/* Note: Gtk+-2.0.0 will segfault on Return if an insensitive
+	 * widget is the default.
+	 */
+	if (on && !quiet)
+	{
+		gtk_dialog_set_response_sensitive(dialog, RESPONSE_QUIET, TRUE);
+		gtk_dialog_set_default_response(dialog, RESPONSE_QUIET);
+	}
+	else
+	{
+		gtk_dialog_set_response_sensitive(dialog,
+						  RESPONSE_QUIET, FALSE);
+		gtk_dialog_set_default_response(dialog, GTK_RESPONSE_YES);
+	}
 
 	if (abox->entry)
+	{
 		gtk_widget_set_sensitive(abox->entry, on);
+		if (on)
+			gtk_widget_grab_focus(abox->entry);
+	}
 }

@@ -966,8 +966,7 @@ void type_set_handler_dialog(MIME_type *type)
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
 	g_object_set_data(G_OBJECT(dialog), "shell_command", entry);
-	g_signal_connect_swapped(GTK_OBJECT(entry), "activate",
-			G_CALLBACK(set_shell_action), GTK_OBJECT(dialog));
+	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 
 	/* If possible, fill in the entry box with the current command */
 	tmp = get_current_command(type);

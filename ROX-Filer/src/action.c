@@ -775,8 +775,6 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	g_signal_connect(abox, "flag_toggled",
 			 G_CALLBACK(flag_toggled), gui_side);
 
-	//SENSITIVE_YESNO(gui_side, FALSE);
-
 	gui_side->input_tag = gdk_input_add(gui_side->from_child,
 						GDK_INPUT_READ,
 						message_from_child,

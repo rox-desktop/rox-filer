@@ -321,8 +321,7 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
 	g_object_set_data(G_OBJECT(dialog), "icon_path", entry);
-	g_signal_connect_swapped(entry, "activate",
-			G_CALLBACK(get_path_set_icon), dialog);
+	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 
 	button = button_new_mixed(GTK_STOCK_DELETE, _("_Remove"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
@@ -333,24 +332,6 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 			NULL);
 	g_signal_connect(dialog, "response", G_CALLBACK(dialog_response), NULL);
 	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
-
-#if 0
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(get_path_set_icon), dialog);
-	
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(gtk_widget_destroy), dialog);
-#endif
 
 	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
