@@ -468,8 +468,6 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 		GtkWidget *img;
 		GtkWidget *label;
 		gchar *fname;
-		GdkPixmap *icon;
-		GdkBitmap *mask;
 
 		/* Ignore hidden files */
 		if (ent->d_name[0] == '.')
@@ -488,18 +486,16 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 
 		if (ditem->image && style != MIS_NONE)
 		{
+			GdkPixbuf *pixbuf;
+
 			switch (style) {
 				case MIS_LARGE:
-					icon = ditem->image->pixmap;
-					mask = ditem->image->mask;
+					pixbuf = ditem->image->pixbuf;
 					break;
-
-				case MIS_SMALL:
 				default:
-					if (!ditem->image->sm_pixmap)
+					if (!ditem->image->sm_pixbuf)
 						pixmap_make_small(ditem->image);
-					icon = ditem->image->sm_pixmap;
-					mask = ditem->image->sm_mask;
+					pixbuf = ditem->image->sm_pixbuf;
 					break;
 			}
 
@@ -510,7 +506,8 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dname,
 			hbox = gtk_hbox_new(FALSE, 2);
 			gtk_container_add(GTK_CONTAINER(item), hbox);
 
-			img = gtk_image_new_from_pixmap(icon, mask);
+			img = gtk_image_new_from_pixbuf(pixbuf);
+
 			gtk_box_pack_start(GTK_BOX(hbox), img, FALSE, FALSE, 2);
 
 			label = gtk_label_new(leaf);

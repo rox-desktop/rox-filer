@@ -176,36 +176,21 @@ void pixmap_make_huge(MaskedPixmap *mp)
 
 void pixmap_make_small(MaskedPixmap *mp)
 {
-	GdkPixbuf	*sm;
-
-	if (mp->sm_pixmap)
+	if (mp->sm_pixbuf)
 		return;
 
 	g_return_if_fail(mp->src_pixbuf != NULL);
-			
-	sm = scale_pixbuf(mp->src_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
 
-	if (sm)
+	mp->sm_pixbuf = scale_pixbuf(mp->src_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
+
+	if (!mp->sm_pixbuf)
 	{
-		gdk_pixbuf_render_pixmap_and_mask(sm,
-				&mp->sm_pixmap,
-				&mp->sm_mask,
-				128);
-		mp->sm_width = gdk_pixbuf_get_width(sm);
-		mp->sm_height = gdk_pixbuf_get_height(sm);
-		gdk_pixbuf_unref(sm);
+		mp->sm_pixbuf = mp->src_pixbuf;
+		g_object_ref(mp->sm_pixbuf);
 	}
 
-	if (mp->sm_pixmap)
-		return;
-
-	g_object_ref(mp->pixmap);
-	if (mp->mask)
-		g_object_ref(mp->mask);
-	mp->sm_pixmap = mp->pixmap;
-	mp->sm_mask = mp->mask;
-	mp->sm_width = mp->width;
-	mp->sm_height = mp->height;
+	mp->sm_width = gdk_pixbuf_get_width(mp->sm_pixbuf);
+	mp->sm_height = gdk_pixbuf_get_height(mp->sm_pixbuf);
 }
 
 /* Load image 'path' in the background and insert into pixmap_cache.
@@ -614,15 +599,10 @@ static void masked_pixmap_finialize(GObject *object)
 		mp->mask = NULL;
 	}
 
-	if (mp->sm_pixmap)
+	if (mp->sm_pixbuf)
 	{
-		g_object_unref(mp->sm_pixmap);
-		mp->sm_pixmap = NULL;
-	}
-	if (mp->sm_mask)
-	{
-		g_object_unref(mp->sm_mask);
-		mp->sm_mask = NULL;
+		g_object_unref(mp->sm_pixbuf);
+		mp->sm_pixbuf = NULL;
 	}
 
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -654,8 +634,7 @@ static void masked_pixmap_init(GTypeInstance *object, gpointer gclass)
 	mp->width = -1;
 	mp->height = -1;
 
-	mp->sm_pixmap = NULL;
-	mp->sm_mask = NULL;
+	mp->sm_pixbuf = NULL;
 	mp->sm_width = -1;
 	mp->sm_height = -1;
 }

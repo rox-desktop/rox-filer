@@ -1004,32 +1004,20 @@ static void draw_small_icon(GtkWidget *widget,
 	if (!image)
 		return;
 
-	if (!image->sm_pixmap)
+	if (!image->sm_pixbuf)
 		pixmap_make_small(image);
 
 	width = MIN(image->sm_width, SMALL_WIDTH);
 	height = MIN(image->sm_height, SMALL_HEIGHT);
 	image_x = area->x + ((area->width - width) >> 1);
-		
-	gdk_gc_set_clip_mask(gc, image->sm_mask);
-
 	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
-	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
-	gdk_draw_drawable(widget->window, gc,
-			image->sm_pixmap,
-			0, 0,			/* Source x,y */
-			image_x, area->y + image_y, /* Dest x,y */
-			width, height);
-
-	if (selected)
-	{
-		gdk_gc_set_function(gc, GDK_INVERT);
-		gdk_draw_rectangle(widget->window,
-				gc,
-				TRUE, image_x, area->y + image_y,
-				width, height);
-		gdk_gc_set_function(gc, GDK_COPY);
-	}
+		
+	gdk_pixbuf_render_to_drawable_alpha(image->sm_pixbuf, widget->window,
+			0, 0, 				/* src */
+			image_x, area->y + image_y,	/* dest */
+			width, height,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
@@ -1039,6 +1027,8 @@ static void draw_small_icon(GtkWidget *widget,
 				0, 0,			/* Source x,y */
 				image_x, area->y + 8,	/* Dest x,y */
 				-1, -1);
+		gdk_gc_set_clip_mask(gc, NULL);
+		gdk_gc_set_clip_origin(gc, 0, 0);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -1046,19 +1036,16 @@ static void draw_small_icon(GtkWidget *widget,
 					? im_mounted
 					: im_unmounted;
 
-		if (!mp->sm_pixmap)
+		if (!mp->sm_pixbuf)
 			pixmap_make_small(mp);
-		gdk_gc_set_clip_origin(gc, image_x + 2, area->y + 2);
-		gdk_gc_set_clip_mask(gc, mp->sm_mask);
-		gdk_draw_drawable(widget->window, gc,
-				mp->sm_pixmap,
-				0, 0,			/* Source x,y */
-				image_x + 2, area->y + 2, /* Dest x,y */
-				-1, -1);
+		gdk_pixbuf_render_to_drawable_alpha(mp->sm_pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x + 2, area->y + 2,	/* dest */
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
-	
-	gdk_gc_set_clip_mask(gc, NULL);
-	gdk_gc_set_clip_origin(gc, 0, 0);
 }
 
 /* Return a new string giving details of this item, or NULL if details

@@ -66,9 +66,8 @@ struct _MaskedPixmap
 	GdkBitmap	*mask;
 	int		width, height;
 
-	/* If sm_pixmap is NULL then call pixmap_make_small() */
-	GdkPixmap	*sm_pixmap;	/* Small image */
-	GdkBitmap	*sm_mask;
+	/* If sm_pixbuf is NULL then call pixmap_make_small() */
+	GdkPixbuf	*sm_pixbuf;
 	int		sm_width, sm_height;
 };
 
