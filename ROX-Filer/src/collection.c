@@ -1016,7 +1016,11 @@ static void draw_lasso_box(Collection *collection)
 	width = abs(collection->drag_box_x[1] - collection->drag_box_x[0]);
 	height = abs(collection->drag_box_y[1] - collection->drag_box_y[0]);
 
-	gdk_draw_rectangle(widget->window, collection->xor_gc, FALSE,
+	/* XXX: A redraw bug sometimes leaves a one-pixel dot on the screen.
+	 * As a quick hack, don't draw boxes that small for now...
+	 */
+	if (width || height)
+		gdk_draw_rectangle(widget->window, collection->xor_gc, FALSE,
 			x, y, width, height);
 }
 
