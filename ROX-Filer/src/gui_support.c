@@ -841,4 +841,3 @@ void fixed_move_fast(GtkFixed *fixed, GtkWidget *widget, int x, int y)
 		gtk_widget_size_allocate(child->widget, &child_allocation);
 	}
 }
-

@@ -36,6 +36,7 @@
 #include "global.h"
 
 #include "tasklist.h"
+#include "wrapped.h"
 #include "options.h"
 #include "gui_support.h"
 #include "main.h"
@@ -554,7 +555,7 @@ static void show_icon(IconWindow *win)
 
 	gtk_button_set_relief(GTK_BUTTON(win->widget), GTK_RELIEF_NONE);
 		
-	win->label = gtk_label_new(win->text);
+	win->label = wrapped_label_new(win->text, 180);
 
 	update_style(NULL, win, NULL);
 
@@ -569,6 +570,7 @@ static void show_icon(IconWindow *win)
 			G_CALLBACK(button_released), win);
 	
 	pinboard_add_widget(win->widget, iconify_next_x, iconify_next_y);
+
 	gtk_widget_show_all(win->widget);
 	gtk_widget_size_request(win->widget, &req);
 
