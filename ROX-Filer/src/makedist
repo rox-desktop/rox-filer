@@ -29,6 +29,7 @@ system "cvs -d:pserver:anonymous\@cvs.rox.sourceforge.net:/cvsroot/rox export -r
 
 system "cd rox/ROX-Filer/src; autoconf; cd Docs; make";
 system "cp ~/Projects/rox/ROX-Filer/Help/Manual-fr.ps rox/ROX-Filer/Help";
+system "cp ~/Projects/rox/rox.1 rox/rox.1";
 system "cp -r ~/Projects/rox/ROX-Filer/Messages/*.gmo rox/ROX-Filer/Messages";
 
 system "mv rox/* .";
