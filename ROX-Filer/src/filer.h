@@ -97,7 +97,7 @@ void filer_target_mode(FilerWindow	*filer_window,
 			TargetFunc	fn,
 			gpointer	data,
 			char		*reason);
-void filer_window_autosize(FilerWindow *filer_window);
+void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink);
 GList *filer_selected_items(FilerWindow *filer_window);
 
 #endif /* _FILER_H */

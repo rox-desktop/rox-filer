@@ -1343,7 +1343,7 @@ static void resize(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	filer_window_autosize(window_with_focus);
+	filer_window_autosize(window_with_focus, TRUE);
 }
 
 static void new_window(gpointer data, guint action, GtkWidget *widget)

@@ -150,7 +150,9 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 }
 
 /* Resize the filer window to w x h icons (not clamped) */
-static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
+static void filer_window_set_size(FilerWindow *filer_window,
+				  int w, int h,
+				  gboolean allow_shrink)
 {
 	g_return_if_fail(filer_window != NULL);
 
@@ -172,6 +174,18 @@ static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		h = MAX(req->height, h);
 		gdk_window_get_position(filer_window->window->window,
 					&x, &y);
+		if (!allow_shrink)
+		{
+			gint	old_w, old_h;
+
+			gdk_window_get_size(filer_window->window->window,
+					&old_w, &old_h);
+			w = MAX(w, old_w);
+			h = MAX(h, old_h);
+
+			if (w == old_w && h == old_h)
+				return;
+		}
 
 		if (x + w > screen_width || y + h > screen_height)
 		{
@@ -190,6 +204,11 @@ static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 						w, h);
 }
 
+static gboolean autosize_timeout_cb(FilerWindow *filer_window)
+{
+	filer_window_autosize(filer_window, FALSE);
+	return FALSE;
+}
 
 /* Add a gtk_timeout that calls the autosize routine after the period of time
  * passed with t, if t is equal to zero than remove the previously defined
@@ -204,11 +223,11 @@ static void filer_window_autosize_request(FilerWindow *filer_window, int t)
 	}
 	if (t > 0)
 		filer_window->autosize_timeout = gtk_timeout_add(t,
-				(GtkFunction) filer_window_autosize,
+				(GtkFunction) autosize_timeout_cb,
 				filer_window);
 }
 
-void filer_window_autosize(FilerWindow *filer_window)
+void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 {
 	Collection	*collection = filer_window->collection;
 	int 		n = collection->number_of_items;
@@ -274,7 +293,7 @@ void filer_window_autosize(FilerWindow *filer_window)
 	if (rows > max_rows)
 		rows = max_rows;
 
-	filer_window_set_size(filer_window, cols, rows + 1);
+	filer_window_set_size(filer_window, cols, rows + 1, allow_shrink);
 
 	if (filer_window->scanning && rows < max_rows)
 		filer_window_autosize_request(filer_window, 100);
@@ -293,11 +312,11 @@ static gint open_filer_window(FilerWindow *filer_window)
 
 	if (!GTK_WIDGET_VISIBLE(filer_window->window))
 	{
-		filer_window_autosize(filer_window);
+		filer_window_autosize(filer_window, TRUE);
 		gtk_widget_show(filer_window->window);
 	}
 	else if (filer_window->autosize_timeout)
-		filer_window_autosize(filer_window);
+		filer_window_autosize(filer_window, FALSE);
 
 	return FALSE;
 }
@@ -1143,7 +1162,7 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	gtk_widget_realize(filer_window->window);
 
-	filer_window_set_size(filer_window, 4, 4);
+	filer_window_set_size(filer_window, 4, 4, TRUE);
 }
 
 static void filer_add_signals(FilerWindow *filer_window)
