@@ -49,7 +49,8 @@
 #include "action.h"
 #include "type.h"
 
-static GdkAtom filer_atom;	/* _ROX_FILER_VERSION_HOST */
+static GdkAtom filer_atom;	/* _ROX_FILER_EUID_VERSION_HOST */
+static GdkAtom filer_atom_any;	/* _ROX_FILER_EUID_HOST */
 static GdkAtom xsoap;		/* _XSOAP */
 
 typedef struct _SOAP_call SOAP_call;
@@ -177,6 +178,24 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	/* Make the root window contain a pointer to the IPC window */
 	gdk_property_change(GDK_ROOT_PARENT(), filer_atom,
+			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
+			GDK_PROP_MODE_REPLACE,
+			(void *) &xwindow, 1);
+
+	/* Also have a property without the version number, for programs
+	 * that are happy to talk to any version of the filer.
+	 */
+	unique_id = g_strdup_printf("_ROX_FILER_%d_%s",
+				(int) euid, our_host_name());
+	filer_atom_any = gdk_atom_intern(unique_id, FALSE);
+	g_free(unique_id);
+	/* On the IPC window... */
+	gdk_property_change(ipc_window->window, filer_atom_any,
+			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
+			GDK_PROP_MODE_REPLACE,
+			(void *) &xwindow, 1);
+	/* ... and on the root */
+	gdk_property_change(GDK_ROOT_PARENT(), filer_atom_any,
 			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
 			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);

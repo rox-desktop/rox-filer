@@ -47,7 +47,7 @@ onto the desktop background.
   </abstract>
 </bookinfo>
 
-<chapter>
+<chapter id="intro">
   <title>Introduction</title>
   <para>
 <application>ROX-Filer</application> is a simple and easy to use graphical file manager for X11 &mdash; the
@@ -105,7 +105,7 @@ a directory full of photos!
 
 </chapter>
 
-<chapter>
+<chapter id="compiling">
   <title>Compiling</title>
   <para>
 
@@ -217,7 +217,7 @@ $ rehash</screen>
   </para>
 </chapter>
 
-<chapter>
+<chapter id="invoking">
   <title>Invoking</title>
   <para>
 
@@ -237,10 +237,9 @@ All options have long and short forms (eg <option>-h</option> and
 short versions.
 </para><para>
 Note that if the same version of the filer is already running on this
-machine then, by default, it will be used to open the directories
-and the new copy will exit immediately. You can override this (perhaps
-because the old copy has stopped responding for some reason) using
-the <option>--new</option> option.
+machine then, by default, it will be used to open the directories.
+You can override this (perhaps because the old copy has stopped responding for
+some reason) using the <option>--new</option> option.
 </para><para>
 For a complete list of command-line options, see <xref linkend="manpage"/>
   </para>
@@ -322,8 +321,8 @@ menu, all is well.
 
 <sect2><title>Sawfish / sawmill</title>
   <para>
-Sawfish trys to guess whether you are using GNOME at start-up and
-only provides support if so. You need to add the line
+Older versions of Sawfish tried to guess whether you were using GNOME at
+start-up and only provided support if so. You may need to add the line
 <programlisting>(require 'gnome)</programlisting>
 to your <filename>.sawfishrc</filename> file (see the sawfish manual
 for more details).
@@ -413,7 +412,7 @@ between systems (which is why this isn't built in to the filer!).
 
 </chapter>
 
-<chapter>
+<chapter id="keys">
   <title>Mouse button and key bindings</title>
 
 <itemizedlist><title>Quick start:</title>
@@ -448,9 +447,10 @@ behave as follows:
 <tbody>
 
 <row><entry>Left button click</entry><entry>
-Open the file or directory clicked on. Hold down Ctrl to select things
-instead of opening them.Hold down Shift to look inside applications,
-treat files as text, follow symlinks or mount devices.
+Open the file or directory clicked on. Hold down <keycap>Ctrl</keycap>
+to select things instead of opening them. Hold down <keycap>Shift</keycap>
+to look inside applications, treat files as text, follow symlinks or
+mount devices.
 </entry></row>
 
 <row><entry>Middle button click</entry><entry>
@@ -459,8 +459,9 @@ when opening a file.
 </entry></row>
 
 <row><entry>Right button click</entry><entry>
-Open the main menu. Hold down Ctrl while clicking to go directly to the
-Selection submenu.
+Open the main menu. Hold down <keycap>Ctrl</keycap> while clicking to go
+directly to the Selection submenu. Hold down <keycap>Shift</keycap> to get the
+<guimenu>Send To</guimenu> menu. See the <xref linkend="SendTo"/> section.
 </entry></row>
 
 <row><entry>Drag an item  (left mouse button)</entry><entry>
@@ -472,14 +473,14 @@ a symbolic link, or <keycap>Alt</keycap> to get a menu of possible actions.
 
 <row><entry>Drag an item (middle mouse button)</entry><entry>
 When you let go, display a menu of possible actions.
-There is an option to make this move rather than open the menu.
+There is an option to make this move the files rather than open the menu.
 </entry></row>
 
 <row><entry>Drag (not over an item)</entry><entry>
 Select a group of items by dragging a box around them. With the left
-mouse button, only the filesin the box will be selected. If you hold
-down Ctrl then the boxed items are added to the selection.If you use
-the middle button then the boxed items switch between being selected
+mouse button, only the files in the box will be selected. If you hold
+down <keycap>Ctrl</keycap> then the boxed items are added to the selection.
+If you use the middle button then the boxed items switch between being selected
 and unselected.
 </entry></row>
 
@@ -497,7 +498,7 @@ Move the cursor around.
 
 <row><entry>
 <keycap>Page Up</keycap>, <keycap>Page Down</keycap></entry><entry>
-Move up and down in steps of ten rows at a time.
+Move the cursor up and down a page at a time.
 </entry></row>
 
 <row><entry><keycap>Home</keycap>, <keycap>End</keycap></entry><entry>
@@ -529,12 +530,12 @@ Key bindings are automatically saved when the filer quits.
   </para>
 </chapter>
 
-<chapter>
+<chapter id="selection">
   <title>The selection</title>
   <para>
-While items are selected in a <application>ROX-Filer</application> window,
-the filer has the global selection. You can then paste into another window to
-get the pathnames of the selected files.
+When you select items in a <application>ROX-Filer</application> window,
+the filer takes the <emphasis>primary selection</emphasis>. You can then paste
+into another window to get the pathnames of the selected files.
   </para>
 
 <procedure>
@@ -543,7 +544,7 @@ get the pathnames of the selected files.
   <step><para>Open the application's Open dialog box.</para></step>
 
   <step><para>
-Ctrl-click on the file in <application>ROX-Filer</application> to select it.
+<keycap>Ctrl</keycap>-click on the file in <application>ROX-Filer</application> to select it.
   </para></step>
 
   <step><para>
@@ -552,9 +553,18 @@ paste the name in.
   </para></step>
 </procedure>
 
+  <para>
+Note that clicking the middle mouse button in the main area of most web-browsers
+will open the selected file.
+  </para><para>
+If you select something else (eg, some text in another program), the selected
+items in the filer window will be shown shaded (the filer no longer has the primary selection).
+Changing the selection (eg, by dragging a box around an item with the middle
+button) will cause the filer to regain the primary selection.
+  </para>
 </chapter>
 
-<chapter>
+<chapter id="toolbar">
   <title><anchor id="Toolbar" xreflabel="Toolbar"/>The toolbar</title>
   <para>
 
@@ -602,6 +612,10 @@ List</entry><entry>
 Hide or show extra details</entry><entry>
 Same
 </entry></row><row><entry>
+Dot files</entry><entry>
+Toggle the display of hidden file (those with names starting with a dot)</entry><entry>
+Same
+</entry></row><row><entry>
 Information</entry><entry>
 Show <application>ROX-Filer</application>'s help files</entry><entry>
 Same
@@ -627,7 +641,7 @@ Options box.
   </para>
 </chapter>
 
-<chapter>
+<chapter id="menus">
   <title>The menus</title>
   <para>
 By default, you can open a menu by right clicking over a pinboard, panel or filer window.
@@ -642,12 +656,16 @@ of each menu item:
 <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
 
 <tbody>
-<row><entry><guimenuitem>Select All</guimenuitem></entry><entry>
-Select every item in this window.
+<row><entry><guimenuitem>Display</guimenuitem></entry><entry>
+Change the display settings.
 </entry></row>
 
-<row><entry><guimenuitem>Clear Selection</guimenuitem></entry><entry>
-Unselect every item in this window.
+<row><entry><guimenuitem>File</guimenuitem></entry><entry>
+Operations on the selected items.
+</entry></row>
+
+<row><entry><guimenuitem>Select</guimenuitem></entry><entry>
+Control which items are selected.
 </entry></row>
 
 <row><entry><guimenuitem>Options...</guimenuitem></entry><entry>
@@ -660,6 +678,10 @@ Create a new file or subdirectory inside this directory.
 
 <row><entry><guimenuitem>Xterm Here</guimenuitem></entry><entry>
 Open an xterm with its current directory set to this directory.
+</entry></row>
+
+<row><entry><guimenuitem>Window</guimenuitem></entry><entry>
+Operations on the window as a whole.
 </entry></row>
 
 </tbody></tgroup></informaltable>
@@ -753,12 +775,12 @@ If on, files beginning with a dot are shown, otherwise they are hidden.
 
 <guimenuitem>Refresh</guimenuitem></entry><entry>
 Rereads the contents of the directory and details of all the files
-in it.Use this if the display becomes out-of-date.
+in it. Use this if the display becomes out-of-date.
 </entry></row><row><entry>
 
 <guimenuitem>Create Thumbs</guimenuitem></entry><entry>
 Tries to load every file as an image and use that image as the file's
-icon. Usefulif you have a directory full of photos and can't remember
+icon. Useful if you have a directory full of photos and can't remember
 which is which!
 </entry></row>
 </tbody></tgroup></informaltable>
@@ -908,7 +930,7 @@ this type. See <xref linkend="RunAction"/> section for details.
 <row><entry>
 <guimenuitem>Set Icon...</guimenuitem></entry><entry>
 You can give each file or directory its own special icon using this
-feature &mdash; simply drag a suitable image onto the Set Icon dialog box.
+feature &mdash; simply drag a suitable image onto <xref linkend="SetIcon"/>.
 </entry></row>
 
 <row><entry>
@@ -1024,6 +1046,32 @@ entries at present.
 </sect1>
 
 <sect1>
+  <title>The select menu</title>
+  <para>
+<informaltable><tgroup cols="2">
+<thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
+<tbody>
+<row><entry> 
+<guimenuitem>Select All</guimenuitem></entry><entry>
+Select every item in this window.
+</entry></row>
+
+<row><entry><guimenuitem>Clear Selection</guimenuitem></entry><entry>
+Unselect every item in this window.
+</entry></row>
+
+<row><entry>
+<guimenuitem>Select If...</guimenuitem></entry><entry>
+Select just those files that match the given pattern &mdash;
+see the <xref linkend="SelectIf"/> section).
+</entry></row>
+
+</tbody></tgroup></informaltable>
+
+  </para>
+</sect1>
+
+<sect1>
   <title>The window menu</title>
   <para>
 
@@ -1072,12 +1120,6 @@ Open the shell command box (see the <xref linkend="mini"/> section).
 </entry></row>
 
 <row><entry>
-<guimenuitem>Select If...</guimenuitem></entry><entry>
-Select just those files that match the given pattern &mdash;
-see the <xref linkend="SelectIf"/> section).
-</entry></row>
-
-<row><entry>
 <guimenuitem>Show ROX-Filer Help</guimenuitem></entry><entry>
 Same as selecting ROX-Filer and choosing `Help' from the menu.
 </entry></row>
@@ -1111,7 +1153,7 @@ holding the <keycap>Shift</keycap> key down.
 
 </chapter>
 
-<chapter>
+<chapter id="icons">
   <title>The pinboard and panels</title>
   <para>
 
@@ -1227,7 +1269,7 @@ example applet (written in python) is available at
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="virtual">
   <title>
     <anchor id="vfs" xreflabel="Virtual file systems"/>Virtual file systems
   </title>
@@ -1275,8 +1317,12 @@ Don't forget the final slash!
 </para>
 
 <procedure><title>Step by step example of adding VFS support</title>
-  <step><para>
+<note><para>
+	Some versions of libvfs don't work correctly this way. AVFS is recommended instead.
+</para></note>
 
+  <step><para>
+		  
 This assumes that you have the Midnight Commander source in a directory
 called <filename>mc</filename>.
 You might need to replace <filename>libvfs.so</filename> with
@@ -1331,7 +1377,7 @@ If you saw that line then it's worked! Well done!
 
 </chapter>
 
-<chapter>
+<chapter id="minibuffer">
   <title><anchor id="mini" xreflabel="Minibuffer"/>The mini-buffer</title>
   <para>
 
@@ -1480,7 +1526,7 @@ Type <userinput>lpr</userinput> at the beginning of the line and press
 
 <listitem><para>
 Be careful; you will not be asked to confirm! If in doubt, start the
-command with <userinput>echo</userinput> so that it will be displayed
+command with <userinput>xmessage</userinput> so that it will be displayed
 rather than executed.
 </para></listitem>
 
@@ -1526,13 +1572,14 @@ Just those files over 5 Mb in size will be selected. The expressions
 you can enter are in the same form as described in the
 <xref linkend="Searching"/> section, except that
 <userinput>prune</userinput> has no effect since the contents of
-directories are never checked anyway.
+directories are never checked anyway. You can press <keycap>Tab</keycap>
+to jump to each selected file in turn.
 
   </para>
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="actions">
   <title>Action windows</title>
   <para>
 
@@ -1609,7 +1656,7 @@ subdirectories, and so on.
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="searching">
   <title><anchor id="Searching" xreflabel="Searching"/>Searching</title>
   <para>
 
@@ -1987,7 +2034,7 @@ it in the results if so.
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="options">
   <title>Options</title>
   <para>
 
@@ -2360,7 +2407,7 @@ the middle one button-3 (this affects all programs, not just
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="types">
   <title>Filetypes</title>
   <para>
 
@@ -2374,7 +2421,7 @@ program to use when you open the file.
   </para>
 
 <sect1>
-  <title><anchor id="RunAction" xreflabel="the run action box"/>
+  <title><anchor id="RunAction" xreflabel="the Set Run Action box"/>
     The run action box
   </title>
   <para>
@@ -2427,6 +2474,26 @@ open them).
   </sect2>
 </sect1>
 
+<sect1>
+<title><anchor id="SetIcon" xreflabel="the Set Icon box"/>
+    The Set Icon box
+  </title>
+  <para>
+
+This box appears when you choose <guimenuitem>Set Icon...</guimenuitem>
+from the File menu, and is used to set which image to use to represent
+the file.
+  </para><para>
+It works much like the Set Run Action box described above, except that
+you may specifiy an icon for one file individually (by name) as well as
+for all files of a particular type.
+  </para><para>
+The directory icon inside the <guilabel>Drop an icon here</guilabel>
+area allows you to quickly get to a directory from which you are already
+using one or more icons.
+  </para>
+</sect1>
+  
 <sect1>
   <title>How filetypes are stored</title>
   <para>
@@ -2493,7 +2560,7 @@ will try simply using <filename>text</filename>.
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="appdirs">
   <title><anchor id="AppDir" xreflabel="Application directories"/>
     Application directories
   </title>
@@ -2610,7 +2677,7 @@ AppMenus inside other AppMenus.
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="i18n">
   <title>Internationalisation</title>
   <para>
 
@@ -2725,7 +2792,7 @@ a translation.
 </sect1>
 </chapter>
 
-<chapter>
+<chapter id="hacking">
   <title>Hacking</title>
   <para>
 This is a quick start guide for people who want to modify the source
@@ -2932,7 +2999,7 @@ like one).
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-n</option></term><term><option>--new</option></term>
-<listitem><para>start a new filer, even if one already seems to be running.
+<listitem><para>start a new filer, even if one already seems to be running. This also prevents the filer from forking (running in the background), which is useful for debugging.
 </para></listitem></varlistentry>
 
 <varlistentry><term><option>-o</option></term><term><option>--override</option></term>

@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+01-Dec-2001
+~~~~~~~~~~~
+Added a new root window property (_ROX_FILER_EUID_HOST) which points to
+the SOAP IPC window for a particular hostname and user ID. This makes it
+easier for other programs to talk to the filer.
+
 30-Nov-2001
 ~~~~~~~~~~~
 Added new SOAP methods Copy, Move, Link, Mount and FileType (Stephen Watson).
