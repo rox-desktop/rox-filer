@@ -1354,6 +1354,9 @@ static void icon_destroyed(GtkWidget *widget, Icon *icon)
 	if (icon->selected)
 		change_number_selected(-1);
 
+	if (current_wink_icon == icon)
+		current_wink_icon = NULL;
+
 	gdk_pixmap_unref(icon->mask);
 	dir_item_clear(&icon->item);
 	g_free(icon->src_path);

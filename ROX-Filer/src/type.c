@@ -94,12 +94,17 @@ static void import_for_dir(guchar *path)
 
 	while ((item = readdir(dir)))
 	{
+		guchar	*file;
+		struct stat info;
+		
 		if (item->d_name[0] == '.')
 			continue;
 
 		current_type = NULL;
-		parse_file(make_path(path, item->d_name)->str,
-				import_extensions);
+		file = make_path(path, item->d_name)->str;
+
+		if (stat(file, &info) == 0 && S_ISREG(info.st_mode))
+			parse_file(file, import_extensions);
 	}
 
 	closedir(dir);

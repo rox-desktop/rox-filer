@@ -2,6 +2,16 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+29-Sep-2000
+~~~~~~~~~~~
+Bugfix: Deleting a pinboard icon while it was highlighted caused a crash.
+	This means it is now possible to click on a pinboard icon to change
+	between pinboards...
+
+Bugfix: Textured window backgrounds didn't redraw correctly when scrolled
+	or resized. Now flickers when resizing if there's a textured
+	background - seems to be necessary :-(
+
 26-Sep-2000
 ~~~~~~~~~~~
 Running as root now simply turns on the -u flag, rather than displaying

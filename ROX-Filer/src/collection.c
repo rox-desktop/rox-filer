@@ -66,6 +66,7 @@ static guint32 current_event_time = GDK_CURRENT_TIME;
 static GtkWidgetClass *parent_class = NULL;
 
 /* Static prototypes */
+static void clear_area(Collection *collection, GdkRectangle *area);
 static void draw_one_item(Collection 	*collection,
 			  int 		item,
 			  GdkRectangle 	*area);
@@ -494,7 +495,10 @@ static void collection_size_allocate(GtkWidget *widget,
 				allocation->x, allocation->y,
 				allocation->width, allocation->height);
 
-		if (old_columns != collection->columns)
+		/* Force a redraw if the number of columns has changed
+		 * or we have a background pixmap (!).
+		 */
+		if (old_columns != collection->columns || collection->bg_gc)
 		{
 			collection->paint_level = PAINT_CLEAR;
 			gtk_widget_queue_clear(widget);
@@ -870,6 +874,8 @@ static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 
 	/* This doesn't always work - I think Gtk+ may be doing some
 	 * kind of expose-event compression...
+	 * 29/9/2000: Turned expose_events on in copy_area... maybe
+	 * we can use this again? Try after 1.0.0!
 	if (collection->paint_level > PAINT_NORMAL)
 	*/
 		collection_paint(collection, area);
@@ -932,8 +938,17 @@ static void scroll_by(Collection *collection, gint diff)
 	
 	if (amount < height)
 	{
+		static GdkGC *expo_gc = NULL;
+
+		if (!expo_gc)
+		{
+			expo_gc = gdk_gc_new(widget->window);
+			gdk_gc_copy(expo_gc, widget->style->white_gc);
+			gdk_gc_set_exposures(expo_gc, TRUE);
+		}
+
 		gdk_draw_pixmap(widget->window,
-				widget->style->white_gc,
+				expo_gc,
 				widget->window,
 				0,
 				from_y,
