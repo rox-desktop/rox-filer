@@ -354,6 +354,16 @@ char *pretty_permissions(mode_t m)
 	return buffer;
 }
 
+/* Gets the canonical name for address and compares to our_host_name() */
+static gboolean is_local_address(char *address)
+{
+	struct hostent *ent;
+
+	ent = gethostbyname(address);
+
+	return strcmp(our_host_name(), ent ? ent->h_name : address);
+}
+
 /* Convert a URI to a local pathname (or NULL if it isn't local).
  * The returned pointer points inside the input string.
  * Possible formats:
@@ -364,13 +374,9 @@ char *pretty_permissions(mode_t m)
  */
 char *get_local_path(char *uri)
 {
-	char	*host;
-
-	host = our_host_name();
-
 	if (*uri == '/')
 	{
-		char    *path;
+		char    *path, *uri_host;
 
 		if (uri[1] != '/')
 			return uri;	/* Just a local path - no host part */
@@ -381,9 +387,14 @@ char *get_local_path(char *uri)
 
 		if (path - uri == 2)
 			return path;	/* ///path */
-		if (strlen(host) == path - uri - 2 &&
-			strncmp(uri + 2, host, path - uri - 2) == 0)
+		
+		uri_host = g_strndup(uri + 2, path - uri - 2);
+		if (is_local_address(uri_host))
+		{
+			g_free(uri_host);
 			return path;	/* //myhost/path */
+		}
+		g_free(uri_host);
 
 		return NULL;	    /* From a different host */
 	}

@@ -8,6 +8,7 @@ LIBS = @LIBS@ @GDK_PIXBUF_LIBS@
 CC = @CC@
 
 GTK_CONFIG = @GTK_CONFIG@
+GDK_PIXBUF_CONFIG = @GDK_PIXBUF_CONFIG@
 CFLAGS = @CFLAGS@ `${GTK_CONFIG} --cflags` -I.
 LDFLAGS = @LDFLAGS@ `${GTK_CONFIG} --libs` ${LIBS}
 EXEC = ${PLATFORM_DIR}/${PROG}
@@ -57,3 +58,8 @@ configure: configure.in
 
 messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
+
+############ Special case
+
+pixmaps.o: pixmaps.c
+	${CC} ${CFLAGS} `${GDK_PIXBUF_CONFIG} --cflags` -c $< -o $@
