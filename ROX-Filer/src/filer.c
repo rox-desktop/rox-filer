@@ -33,6 +33,7 @@ static void draw_item(GtkWidget *widget,
 			gpointer data,
 			gboolean selected,
 			GdkRectangle *area);
+static int sort_by_name(const void *item1, const void *item2);
 
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
@@ -52,6 +53,10 @@ static void scan_callback(char *leafname, gpointer data)
 	struct stat	info;
 	int		base_type;
 	char		*path;
+
+	/* Ignore dot files (should be an option) */
+	if (leafname[0] == '.')
+		return;
 
 	item = g_malloc(sizeof(FileItem));
 	item->leafname = g_strdup(leafname);
@@ -177,6 +182,22 @@ static void draw_item(GtkWidget *widget,
 		 	item->leafname, strlen(item->leafname));
 }
 
+static int sort_by_name(const void *item1, const void *item2)
+{
+	return strcmp((*((FileItem **)item1))->leafname,
+		      (*((FileItem **)item2))->leafname);
+}
+
+void open_item(Collection *collection,
+		gpointer item_data, int item_number,
+		gpointer user_data)
+{
+	FilerWindow	*filer_window = (FilerWindow *) user_data;
+	FileItem	*item = (FileItem *) item_data;
+
+	filer_opendir(make_path(filer_window->dir->path, item->leafname)->str);
+}
+
 void filer_opendir(char *path)
 {
 	GtkWidget	*hbox, *scrollbar, *collection;
@@ -204,6 +225,8 @@ void filer_opendir(char *path)
 	scrollbar = gtk_vscrollbar_new(COLLECTION(collection)->vadj);
 	gtk_box_pack_start(GTK_BOX(hbox), scrollbar, FALSE, TRUE, 0);
 
+	gtk_signal_connect(GTK_OBJECT(filer_window->collection), "open_item",
+			open_item, filer_window);
 	gtk_signal_connect(GTK_OBJECT(filer_window->window), "destroy",
 			filer_window_destroyed, filer_window);
 
@@ -215,4 +238,6 @@ void filer_opendir(char *path)
 	/* Note - scan may call g_main_iteration */
 	if (!directory_scan(filer_window->dir, scan_callback, filer_window))
 		report_error("Error opening directory", g_strerror(errno));
+
+	collection_qsort(filer_window->collection, sort_by_name);
 }

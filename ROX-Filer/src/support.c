@@ -50,4 +50,3 @@ GString *make_path(char *dir, char *leaf)
 
 	return buffer;
 }
-
