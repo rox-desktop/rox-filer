@@ -24,7 +24,7 @@ get_dir() {
 # Create the directory if it doesn't exist. Exit if it can't be created.
 endir() {
 	if [ ! -d "$1" ]; then
-		mkdir "$1" || die "Can't create $1 directory!"
+		mkdir -p "$1" || die "Can't create $1 directory!"
 	fi
 }
 
