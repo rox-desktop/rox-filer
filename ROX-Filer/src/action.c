@@ -166,101 +166,59 @@ static void entry_changed(GtkEditable *entry, GUIside *gui_side)
 
 void show_condition_help(gpointer data)
 {
-	static GtkWidget *help = NULL;
+	GtkWidget *help;
+	GtkWidget *text;
 
-	if (!help)
-	{
-		GtkWidget *text, *vbox, *button, *hbox, *frame;
-		
-		help = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-		gtk_window_set_type_hint(GTK_WINDOW(help),
-				    GDK_WINDOW_TYPE_HINT_DIALOG);
-		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
-		gtk_window_set_title(GTK_WINDOW(help),
-				_("Find expression reference"));
+	help = gtk_dialog_new_with_buttons(
+			_("Find expression reference"),
+			NULL, 0,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_CANCEL,
+			NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(help), GTK_RESPONSE_CANCEL);
 
-		vbox = gtk_vbox_new(FALSE, 0);
-		gtk_container_add(GTK_CONTAINER(help), vbox);
-
-		frame = gtk_frame_new(_("Quick Start"));
-		text = gtk_label_new(
-_("Just put the name of the file you're looking for in single quotes:\n"
-"'index.html' (to find a file called 'index.html')"));
-		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_container_add(GTK_CONTAINER(frame), text);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
-
-		frame = gtk_frame_new(_("Examples"));
-		text = gtk_label_new(
-_("'*.htm', '*.html'      (finds HTML files)\n"
-"IsDir 'lib'            (finds directories called 'lib')\n"
-"IsReg 'core'           (finds a regular file called 'core')\n"
-"! (IsDir, IsReg)       (is neither a directory nor a regular file)\n"
-"mtime after 1 day ago and size > 1Mb   (big, and recently modified)\n"
-"'CVS' prune, isreg                     (a regular file not in CVS)\n"
-"IsReg system(grep -q fred \"%\")         (contains the word 'fred')"));
-		gtk_widget_set_name(text, "fixed-style");
-		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_container_add(GTK_CONTAINER(frame), text);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
-
-		frame = gtk_frame_new(_("Simple Tests"));
-		text = gtk_label_new(
-_("IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor "
+	text = gtk_label_new(NULL);
+	gtk_misc_set_padding(GTK_MISC(text), 2, 2);
+	gtk_box_pack_start_defaults(GTK_BOX(GTK_DIALOG(help)->vbox), text);
+	gtk_label_set_selectable(GTK_LABEL(text), TRUE);
+	gtk_label_set_markup(GTK_LABEL(text), _(
+"<u>Quick Start</u>\n"
+"Just put the name of the file you're looking for in single quotes:\n"
+"<b>'index.html'</b> (to find a file called 'index.html')\n"
+"\n"
+"<u>Examples</u>\n"
+"<b>'*.htm', '*.html'</b> (finds HTML files)\n"
+"<b>IsDir 'lib'</b> (finds directories called 'lib')\n"
+"<b>IsReg 'core'</b> (finds a regular file called 'core')\n"
+"<b>! (IsDir, IsReg)</b> (is neither a directory nor a regular file)\n"
+"<b>mtime after 1 day ago and size > 1Mb</b> (big, and recently modified)\n"
+"<b>'CVS' prune, isreg</b> (a regular file not in CVS)\n"
+"<b>IsReg system(grep -q fred \"%\")</b> (contains the word 'fred')\n"
+"\n"
+"<u>Simple Tests</u>\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</b> "
 "(types)\n"
-"IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable (permissions)"
-"\n"
-"IsEmpty, IsMine\n"
-"\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
+"(permissions)\n"
+"<b>IsEmpty, IsMine</b>\n"
 "A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
-"contains a slash then the match is against the full path; otherwise it is \n"
-"against the leafname only."));
-		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_container_add(GTK_CONTAINER(frame), text);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+"contains a slash then the match is against the full path; otherwise it is\n"
+"against the leafname only.\n"
+"\n"
+"<u>Comparisons</u>\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
+"<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
+"<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
+"(values)\n"
+"\n"
+"<u>Specials</u>\n"
+"<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
+"a \% in 'command' is replaced with the path of the current file)\n"
+"<b>prune</b> (false, and prevents searching the contents of a directory)."));
 
-		frame = gtk_frame_new(_("Comparisons"));
-		text = gtk_label_new(
-_("<, <=, =, !=, >, >=, After, Before (compare two values)\n"
-"5 bytes, 1Kb, 2Mb, 3Gb (file sizes)\n"
-"2 secs|mins|hours|days|weeks|years  ago|hence (times)\n"
-"atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks (values)"));
-		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_container_add(GTK_CONTAINER(frame), text);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
+	g_signal_connect(help, "response",
+			G_CALLBACK(gtk_widget_destroy), NULL);
 
-		frame = gtk_frame_new(_("Specials"));
-		text = gtk_label_new(
-_("system(command) (true if 'command' returns with a zero exit status; a % \n"
-"in 'command' is replaced with the path of the current file)\n"
-"prune (false, and prevents searching the contents of a directory).")
-);
-		gtk_misc_set_padding(GTK_MISC(text), 4, 4);
-		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
-		gtk_container_add(GTK_CONTAINER(frame), text);
-		gtk_box_pack_start(GTK_BOX(vbox), frame, FALSE, FALSE, 4);
-
-		hbox = gtk_hbox_new(FALSE, 20);
-		gtk_box_pack_start(GTK_BOX(vbox), hbox, TRUE, TRUE, 0);
-
-		text = gtk_label_new(
-			_("See the ROX-Filer manual for full details."));
-		gtk_box_pack_start(GTK_BOX(hbox), text, TRUE, TRUE, 0);
-		button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-		gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
-		g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(gtk_widget_hide), help);
-
-		g_signal_connect_swapped(help, "delete_event",
-			G_CALLBACK(gtk_widget_hide), help);
-	}
-
-	if (GTK_WIDGET_VISIBLE(help))
-		gtk_widget_hide(help);
 	gtk_widget_show_all(help);
 }
 
