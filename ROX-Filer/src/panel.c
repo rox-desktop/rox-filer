@@ -312,10 +312,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 	
 	loading_panel = panel;
 	if (load_path && access(load_path, F_OK) == 0)
-	{
 		parse_file(load_path, pan_from_file);
-		g_free(load_path);
-	}
 	else
 	{
 		/* Don't scare users with an empty panel... */
@@ -331,6 +328,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 		}
 	}
 	loading_panel = NULL;
+	g_free(load_path);
 
 	current_panel[side] = panel;
 
