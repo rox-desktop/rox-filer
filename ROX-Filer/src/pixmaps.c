@@ -182,6 +182,9 @@ void pixmap_make_small(MaskedPixmap *mp)
 			return;
 	}
 #endif
+	gdk_pixmap_ref(mp->pixmap);
+	if (mp->mask)
+		gdk_bitmap_ref(mp->mask);
 	mp->sm_pixmap = mp->pixmap;
 	mp->sm_mask = mp->mask;
 	mp->sm_width = mp->width;
@@ -240,14 +243,9 @@ static MaskedPixmap *image_from_file(char *path)
 	mp->height = height;
 #ifdef HAVE_IMLIB
 	mp->image = image;
+#endif
 	mp->sm_pixmap = NULL;
 	mp->sm_mask = NULL;
-#else
-	mp->sm_pixmap = mp->pixmap;
-	mp->sm_mask = mp->mask;
-	mp->sm_width = mp->width;
-	mp->sm_height = mp->height;
-#endif
 
 	return mp;
 }
@@ -305,8 +303,13 @@ static void unref(MaskedPixmap *mp, gpointer data)
 #endif
 		{
 			gdk_pixmap_unref(mp->pixmap);
-			gdk_bitmap_unref(mp->mask);
+			if (mp->mask)
+				gdk_bitmap_unref(mp->mask);
 		}
+		if (mp->sm_pixmap)
+			gdk_pixmap_unref(mp->sm_pixmap);
+		if (mp->sm_mask)
+			gdk_bitmap_unref(mp->sm_mask);
 		g_free(mp);
 	}	
 }

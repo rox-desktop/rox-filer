@@ -541,11 +541,14 @@ static void draw_small_icon(GtkWidget *widget,
 		int	type = item->flags & ITEM_FLAG_MOUNTED
 				? TYPE_MOUNTED
 				: TYPE_UNMOUNTED;
+		MaskedPixmap	*mp = default_pixmap[type];
+
+		if (!mp->sm_pixmap)
+			pixmap_make_small(mp);
 		gdk_gc_set_clip_origin(gc, image_x, area->y + 8);
-		gdk_gc_set_clip_mask(gc,
-				default_pixmap[type]->mask);
+		gdk_gc_set_clip_mask(gc, mp->sm_mask);
 		gdk_draw_pixmap(widget->window, gc,
-				default_pixmap[type]->pixmap,
+				mp->sm_pixmap,
 				0, 0,		/* Source x,y */
 				image_x, area->y + 8, /* Dest x,y */
 				-1, -1);
