@@ -434,7 +434,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	switch (filer_window->collection->number_selected)
 	{
 		case 0:
-			g_string_assign(buffer, "Next click");
+			g_string_assign(buffer, "Next Click");
 			items_sensitive(file_menu, 0, 6, TRUE);
 			break;
 		case 1:

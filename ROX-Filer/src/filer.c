@@ -168,6 +168,7 @@ static void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data);
 static gboolean minibuffer_show_cb(FilerWindow *filer_window);
+static void set_autoselect(FilerWindow *filer_window, guchar *leaf);
 
 static GdkAtom xa_string;
 enum
@@ -978,7 +979,8 @@ static void open_item(Collection *collection,
 /* Return the full path to the directory containing object 'path'.
  * Relative paths are resolved from the filerwindow's path.
  */
-static void follow_symlink(FilerWindow *filer_window, char *path)
+static void follow_symlink(FilerWindow *filer_window, char *path,
+				gboolean same_window)
 {
 	char	*real, *slash;
 	char	*new_dir;
@@ -993,7 +995,7 @@ static void follow_symlink(FilerWindow *filer_window, char *path)
 		g_free(real);
 		delayed_error("ROX-Filer",
 				"Broken symlink (or you don't have permission "
-				"to follow it.");
+				"to follow it).");
 		return;
 	}
 
@@ -1004,13 +1006,12 @@ static void follow_symlink(FilerWindow *filer_window, char *path)
 	else
 		new_dir = "/";
 
-	if (filer_window->panel)
+	if (filer_window->panel || !same_window)
 	{
 		FilerWindow *new;
 		
 		new = filer_opendir(new_dir, FALSE, BOTTOM);
-		g_free(new->auto_select);
-		new->auto_select = g_strdup(slash + 1);
+		set_autoselect(new, slash + 1);
 	}
 	else
 		filer_change_to(filer_window, new_dir, slash + 1);
@@ -1030,7 +1031,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 	char		*full_path;
 	DirItem		*item = (DirItem *)
 			filer_window->collection->items[item_number].data;
-	gboolean	wink = TRUE;
+	gboolean	wink = TRUE, destroy = FALSE;
 
 	widget = filer_window->window;
 	full_path = make_path(filer_window->path,
@@ -1051,7 +1052,8 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 			g_return_if_fail(got <= MAXPATHLEN);
 			path[got] = '\0';
 
-			follow_symlink(filer_window, path);
+			follow_symlink(filer_window, path,
+					flags & OPEN_SAME_WINDOW);
 		}
 		return;
 	}
@@ -1064,7 +1066,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				run_app(make_path(filer_window->path,
 						item->leafname)->str);
 				if (close_window)
-					gtk_widget_destroy(widget);
+					destroy = TRUE;
 				break;
 			}
 
@@ -1094,10 +1096,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				if (spawn_full(argv, getenv("HOME")))
 				{
 					if (close_window)
-					{
-						wink = FALSE;
-						gtk_widget_destroy(widget);
-					}
+						destroy = TRUE;
 				}
 				else
 					report_error("ROX-Filer",
@@ -1114,10 +1113,7 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 				if (type_open(full_path, type))
 				{
 					if (close_window)
-					{
-						wink = FALSE;
-						gtk_widget_destroy(widget);
-					}
+						destroy = TRUE;
 				}
 				else
 				{
@@ -1138,11 +1134,16 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 			break;
 	}
 
-	if (wink)
-		collection_wink_item(filer_window->collection, item_number);
-
-	if (close_mini)
-		minibuffer_hide(filer_window);
+	if (destroy)
+		gtk_widget_destroy(filer_window->window);
+	else
+	{
+		if (wink)
+			collection_wink_item(filer_window->collection,
+						item_number);
+		if (close_mini)
+			minibuffer_hide(filer_window);
+	}
 }
 
 static gint pointer_in(GtkWidget *widget,
@@ -1846,4 +1847,33 @@ static gboolean minibuffer_show_cb(FilerWindow *filer_window)
 	}
 
 	return FALSE;
+}
+
+/* Highlight (wink or cursor) this item in the filer window. If the item
+ * isn't already there but we're scanning then highlight it if it
+ * appears later.
+ */
+static void set_autoselect(FilerWindow *filer_window, guchar *leaf)
+{
+	Collection	*col = filer_window->collection;
+	int		i;
+	
+	g_free(filer_window->auto_select);
+	filer_window->auto_select = NULL;
+
+	for (i = 0; i < col->number_of_items; i++)
+	{
+		DirItem *item = (DirItem *) col->items[i].data;
+
+		if (strcmp(item->leafname, leaf) == 0)
+		{
+			if (col->cursor_item != -1)
+				collection_set_cursor_item(col, i);
+			else
+				collection_wink_item(col, i);
+			return;
+		}
+	}
+	
+	filer_window->auto_select = g_strdup(leaf);
 }

@@ -231,7 +231,7 @@ static void collection_class_init(CollectionClass *class)
 	class->lose_selection = NULL;
 
 	collection_signals[OPEN_ITEM] = gtk_signal_new("open_item",
-				     GTK_RUN_FIRST,
+				     GTK_RUN_LAST,
 				     object_class->type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     open_item),
@@ -240,7 +240,7 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_TYPE_POINTER,
 				     GTK_TYPE_UINT);
 	collection_signals[DRAG_SELECTION] = gtk_signal_new("drag_selection",
-				     GTK_RUN_FIRST,
+				     GTK_RUN_LAST,
 				     object_class->type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     drag_selection),
@@ -249,7 +249,7 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_TYPE_POINTER,
 				     GTK_TYPE_UINT);
 	collection_signals[SHOW_MENU] = gtk_signal_new("show_menu",
-				     GTK_RUN_FIRST,
+				     GTK_RUN_LAST,
 				     object_class->type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     show_menu),
@@ -258,7 +258,7 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_TYPE_POINTER,
 				     GTK_TYPE_INT);
 	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
-				     GTK_RUN_FIRST,
+				     GTK_RUN_LAST,
 				     object_class->type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     gain_selection),
@@ -266,7 +266,7 @@ static void collection_class_init(CollectionClass *class)
 				     GTK_TYPE_NONE, 1,
 				     GTK_TYPE_UINT);
 	collection_signals[LOSE_SELECTION] = gtk_signal_new("lose_selection",
-				     GTK_RUN_FIRST,
+				     GTK_RUN_LAST,
 				     object_class->type,
 				     GTK_SIGNAL_OFFSET(CollectionClass,
 						     lose_selection),

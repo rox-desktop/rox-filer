@@ -27,6 +27,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/param.h>
 #include <unistd.h>
 #include <errno.h>
 #include <sys/types.h>
@@ -526,6 +527,8 @@ static gboolean do_copy(char *path, char *dest)
 	char		*dest_path;
 	char		*leaf;
 	struct stat 	info;
+	struct stat 	dest_info;
+	gboolean	do_overwrite = FALSE;
 	gboolean	retval = TRUE;
 
 	leaf = strrchr(path, '/');
@@ -539,7 +542,7 @@ static gboolean do_copy(char *path, char *dest)
 	g_string_sprintf(message, "'Copying %s as %s\n", path, dest_path);
 	send();
 
-	if (access(dest_path, F_OK) == 0)
+	if (lstat(dest_path, &dest_info) == 0)
 	{
 		char	rep;
 		g_string_sprintf(message, "?'%s' already exists - overwrite?\n",
@@ -551,6 +554,7 @@ static gboolean do_copy(char *path, char *dest)
 			quiet = TRUE;
 		else if (rep != 'Y')
 			return FALSE;
+		do_overwrite = TRUE;
 	}
 
 	if (lstat(path, &info))
@@ -599,9 +603,35 @@ static gboolean do_copy(char *path, char *dest)
 		g_free(safe_path);
 		g_free(safe_dest);
 	}
+	else if (S_ISLNK(info.st_mode))
+	{
+		char	target[MAXPATHLEN + 1];
+		int	count;
+
+		/* Not all versions of cp(1) can make symlinks,
+		 * so we special-case it.
+		 */
+
+		count = readlink(path, target, sizeof(target) - 1);
+		if (count < 0)
+		{
+			send_error();
+			retval = FALSE;
+		}
+		else
+		{
+			target[count] = '\0';
+			if ((do_overwrite && unlink(dest_path))
+				|| (symlink(target, dest_path)))
+			{
+				send_error();
+				retval = FALSE;
+			}
+		}
+	}
 	else
 	{
-		char	*argv[] = {"cp", "-dpRf", NULL, NULL, NULL};
+		char	*argv[] = {"cp", "-pRf", NULL, NULL, NULL};
 
 		argv[2] = path;
 		argv[3] = dest_path;

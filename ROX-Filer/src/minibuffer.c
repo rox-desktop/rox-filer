@@ -119,12 +119,19 @@ static void return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	filer_openitem(filer_window, item, flags);
 }
 
-/* Use the cursor item to fill in the minibuffer */
+/* Use the cursor item to fill in the minibuffer.
+ * If there are multiple matches the fill in as much as possible and beep.
+ */
 static void complete(FilerWindow *filer_window)
 {
+	GtkEntry	*entry;
 	Collection 	*collection = filer_window->collection;
 	int		cursor = collection->cursor_item;
 	DirItem 	*item;
+	int		shortest_stem = -1;
+	int		current_stem;
+	int		other;
+	guchar		*text, *leaf;
 
 	if (cursor < 0 || cursor >= collection->number_of_items)
 	{
@@ -132,10 +139,75 @@ static void complete(FilerWindow *filer_window)
 		return;
 	}
 
-	item = (DirItem *) collection->items[cursor].data;
+	entry = GTK_ENTRY(filer_window->minibuffer);
 	
-	gtk_entry_set_text(GTK_ENTRY(filer_window->minibuffer),
-			make_path(filer_window->path, item->leafname)->str);
+	item = (DirItem *) collection->items[cursor].data;
+
+	text = gtk_entry_get_text(entry);
+	leaf = strrchr(text, '/');
+	if (!leaf)
+	{
+		gdk_beep();
+		return;
+	}
+
+	leaf++;
+	if (!matches(collection, cursor, leaf))
+	{
+		gdk_beep();
+		return;
+	}
+	
+	current_stem = strlen(leaf);
+
+	/* Find the longest other match of this name. It it's longer than
+	 * the currently entered text then complete only up to that length.
+	 */
+	for (other = 0; other < collection->number_of_items; other++)
+	{
+		DirItem *other_item = (DirItem *) collection->items[other].data;
+		int	stem = 0;
+
+		if (other == cursor)
+			continue;
+
+		while (other_item->leafname[stem] && item->leafname[stem])
+		{
+			if (other_item->leafname[stem] != item->leafname[stem])
+				break;
+			stem++;
+		}
+
+		/* stem is the index of the first difference */
+		if (stem >= current_stem &&
+				(shortest_stem == -1 || stem < shortest_stem))
+			shortest_stem = stem;
+	}
+
+	if (current_stem == shortest_stem)
+		gdk_beep();
+	else if (current_stem < shortest_stem)
+	{
+		guchar	*extra;
+
+		extra = g_strndup(item->leafname + current_stem,
+				shortest_stem - current_stem);
+		gtk_entry_append_text(entry, extra);
+		g_free(extra);
+		gdk_beep();
+	}
+	else
+	{
+		GString	*new;
+
+		new = make_path(filer_window->path, item->leafname);
+
+		if (item->base_type == TYPE_DIRECTORY &&
+				(item->flags & ITEM_FLAG_APPDIR) == 0)
+			g_string_append_c(new, '/');
+
+		gtk_entry_set_text(entry, new->str);
+	}
 }
 
 static gint key_press_event(GtkWidget	*widget,
