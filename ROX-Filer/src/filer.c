@@ -190,6 +190,24 @@ static void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 						w, h);
 }
 
+
+/* Add a gtk_timeout that calls the autosize routine after the period of time
+ * passed with t, if t is equal to zero than remove the previously defined
+ * timeout.
+ */
+static void filer_window_autosize_request(FilerWindow *filer_window, int t)
+{
+	if (filer_window->autosize_timeout)
+	{
+		gtk_timeout_remove(filer_window->autosize_timeout);
+		filer_window->autosize_timeout = 0;
+	}
+	if (t > 0)
+		filer_window->autosize_timeout = gtk_timeout_add(t,
+				(GtkFunction) filer_window_autosize,
+				filer_window);
+}
+
 void filer_window_autosize(FilerWindow *filer_window)
 {
 	Collection	*collection = filer_window->collection;
@@ -201,6 +219,8 @@ void filer_window_autosize(FilerWindow *filer_window)
 	int 		max_x, max_rows;
 	const float	r = 2.5;
 	int		t = 0;
+
+	filer_window_autosize_request(filer_window, 0);
 
 	if (o_toolbar != TOOLBAR_NONE)
 		t = filer_window->toolbar_frame->allocation.height;
@@ -255,6 +275,9 @@ void filer_window_autosize(FilerWindow *filer_window)
 		rows = max_rows;
 
 	filer_window_set_size(filer_window, cols, rows + 1);
+
+	if (filer_window->scanning && rows < max_rows)
+		filer_window_autosize_request(filer_window, 100);
 }
 
 /* Called on a timeout while scanning or when scanning ends
@@ -273,6 +296,8 @@ static gint open_filer_window(FilerWindow *filer_window)
 		filer_window_autosize(filer_window);
 		gtk_widget_show(filer_window->window);
 	}
+	else if (filer_window->autosize_timeout)
+		filer_window_autosize(filer_window);
 
 	return FALSE;
 }
@@ -401,6 +426,7 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 		gtk_timeout_remove(filer_window->open_timeout);
 		filer_window->open_timeout = 0;
 	}
+	filer_window_autosize_request(filer_window, 0);
 
 	g_free(filer_window->auto_select);
 	g_free(filer_window->path);
@@ -809,6 +835,8 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 	if (filer_window->mini_type == MINI_PATH)
 		gtk_idle_add((GtkFunction) minibuffer_show_cb,
 				filer_window);
+	else
+		filer_window_autosize_request(filer_window, 100);
 }
 
 void filer_open_parent(FilerWindow *filer_window)
@@ -940,6 +968,7 @@ FilerWindow *filer_opendir(char *path)
 	filer_window->toolbar_text = NULL;
 	filer_window->target_cb = NULL;
 	filer_window->mini_type = MINI_NONE;
+	filer_window->autosize_timeout = 0;
 
 	/* Finds the entry for this directory in the dir cache, creating
 	 * a new one if needed. This does not cause a scan to start,

@@ -69,6 +69,7 @@ struct _FilerWindow
 	GtkWidget	*scrollbar;
 
 	gint		open_timeout;	/* Will resize and show window... */
+	gint     	autosize_timeout;
 };
 
 extern FilerWindow 	*window_with_focus;
