@@ -30,6 +30,8 @@ struct _Panel {
 	GtkWidget	*gap;		/* Event box between sides */
 };
 
+extern Panel *current_panel[PANEL_NUMBER_OF_SIDES];
+
 void panel_init(void);
 Panel *panel_new(guchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);

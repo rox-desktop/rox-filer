@@ -50,7 +50,7 @@
 #include "icon.h"
 #include "run.h"
 
-static Panel *current_panel[PANEL_NUMBER_OF_SIDES];
+Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
 /* NULL => Not loading a panel */
 static Panel *loading_panel = NULL;

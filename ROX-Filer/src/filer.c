@@ -1224,6 +1224,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_widget_show(collection);
 
 	gtk_widget_realize(filer_window->window);
+	
+	gdk_window_set_role(filer_window->window->window, filer_window->path);
 
 	filer_window_set_size(filer_window, 4, 4, TRUE);
 }

@@ -64,6 +64,7 @@
 #include "icon.h"
 #include "appinfo.h"
 #include "panel.h"
+#include "session.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
 static int to_wakeup_pipe = -1;	/* Write here to get noticed */
@@ -123,7 +124,7 @@ static void show_features(void);
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:c:"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -142,6 +143,7 @@ static struct option long_opts[] =
 	{"show", 1, NULL, 's'},
 	{"examine", 1, NULL, 'x'},
 	{"mime-type", 1, NULL, 'm'},
+	{"client-id", 1, NULL, 'c'},
 	{NULL, 0, NULL, 0},
 };
 #endif
@@ -217,6 +219,7 @@ int main(int argc, char **argv)
 	int		 i;
 	struct sigaction act;
 	guchar		*tmp, *dir, *slash;
+	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
 
 	/* This is a list of \0 separated strings. Each string starts with a
@@ -355,6 +358,9 @@ int main(int argc, char **argv)
 							  type->subtype);
 				}
 				return EXIT_SUCCESS;
+			case 'c':
+				client_id = g_strdup(VALUE);
+				break;
 			default:
 				printf(_(USAGE));
 				return EXIT_FAILURE;
@@ -454,6 +460,10 @@ int main(int argc, char **argv)
 	act.sa_flags = 0;
 	sigaction(SIGPIPE, &act, NULL);
 
+	/* Set up session managament if available */
+	session_init(client_id);
+	g_free(client_id);
+		
 	run_list(to_open->str);
 	g_string_free(to_open, TRUE);
 	
