@@ -19,16 +19,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* appmenu.c - handles application-specific menus */
-
-/* The format of an AppMenu file is:
- *
- * <?xml version="1.0"?>
- * <AppMenu>
- *   <Item label="..." option="..."/>
- *   ...
- * </AppMenu>
- */
+/* appmenu.c - handles application-specific menus read from AppInfo.xml */
 
 #include "config.h"
 
@@ -51,17 +42,9 @@
 #include "appmenu.h"
 #include "dir.h"
 #include "type.h"
-
-typedef struct _AppMenu AppMenu;
-
-static GFSCache *appmenu_cache = NULL;
+#include "appinfo.h"
 
 /* Static prototypes */
-static AppMenu *load(char *pathname, gpointer data);
-static void ref(AppMenu *dir, gpointer data);
-static void unref(AppMenu *dir, gpointer data);
-static int getref(AppMenu *dir, gpointer data);
-
 static void apprun_menu(GtkWidget *item, gpointer data);
 static GtkWidget *create_menu_item(char *label, char *option);
 
@@ -70,24 +53,9 @@ static GtkWidget *current_menu = NULL;	/* The GtkMenu */
 static GList *current_items = NULL;	/* The GtkMenuItems we added to it */
 static guchar *current_app_path = NULL;	/* The path of the application */
 
-/* Stores the appmenu for one application */
-struct _AppMenu {
-	int	ref;
-	xmlDocPtr doc;		/* Parsed AppMenu file */
-};
-
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
-
-void appmenu_init(void)
-{
-	appmenu_cache = g_fscache_new((GFSLoadFunc) load,
-				      (GFSRefFunc) ref,
-				      (GFSRefFunc) unref,
-				      (GFSGetRefFunc) getref,
-				      NULL, NULL);
-}
 
 /* Removes all appmenu menu items */
 void appmenu_remove(void)
@@ -116,7 +84,7 @@ void appmenu_remove(void)
  */
 void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 {
-	AppMenu	*am;
+	AppInfo	*ai;
 	struct _xmlNode	*node;
 	guchar	*tmp;
 	GList	*next;
@@ -127,29 +95,18 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 	/* Should have called appmenu_remove() already... */
 	g_return_if_fail(current_menu == NULL);
 
-	/* Is it even an application directory? */
-	if (item->base_type != TYPE_DIRECTORY ||
-			!(item->flags & ITEM_FLAG_APPDIR))
-		return;	/* Not an application */
-
-	tmp = g_strconcat(app_dir, "/" APPMENU_FILENAME, NULL);
-	am = g_fscache_lookup(appmenu_cache, tmp);
-	g_free(tmp);
-	if (!am)
+	ai = appinfo_get(app_dir, item);
+	if (!ai)
 		return;	/* No appmenu (or invalid XML) */
 
-	/* OK, we've got a valid menu and parsed it.
-	 * Now build the GtkMenuItem widgets and add them to the menu...
+	/* OK, we've got a valid info file and parsed it.
+	 * Now build the GtkMenuItem widgets and add them to the menu
+	 * (if there are any).
 	 */
 
-	node = xmlDocGetRootElement(am->doc);
-	g_return_if_fail(node != NULL);
-
-	if (strcmp(node->name, "AppMenu") != 0)
-	{
-		g_warning("%s/AppMenu root node must be 'AppMenu'\n", app_dir);
+	node = appmenu_get_section(ai, "AppMenu");
+	if (!node)
 		return;
-	}
 
 	g_return_if_fail(current_items == NULL);
 
@@ -184,45 +141,6 @@ void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 /****************************************************************
  *                      INTERNAL FUNCTIONS                      *
  ****************************************************************/
-
-/* The pathname is the full path of the AppMenu file.
- * If we get here, assume that this really is an application.
- */
-static AppMenu *load(char *pathname, gpointer data)
-{
-	xmlDocPtr doc;
-	AppMenu *appmenu = NULL;
-
-	doc = xmlParseFile(pathname);
-	if (!doc)
-		return NULL;	/* Bad XML */
-
-	appmenu = g_new(AppMenu, 1);
-	appmenu->ref = 1;
-	appmenu->doc = doc;
-
-	return appmenu;
-}
-
-static void ref(AppMenu *am, gpointer data)
-{
-	if (am)
-		am->ref++;
-}
-
-static void unref(AppMenu *am, gpointer data)
-{
-	if (am && --am->ref == 0)
-	{
-		xmlFreeDoc(am->doc);
-		g_free(am);
-	}
-}
-	
-static int getref(AppMenu *am, gpointer data)
-{
-	return am ? am->ref : 0;
-}
 
 /* Create and return a menu item */
 static GtkWidget *create_menu_item(char *label, char *option)

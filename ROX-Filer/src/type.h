@@ -8,6 +8,8 @@
 #ifndef _TYPE_H
 #define _TYPE_H
 
+#include <gtk/gtk.h>
+
 extern MIME_type text_plain;		/* Often used as a default type */
 extern MIME_type special_directory;
 extern MIME_type special_pipe;
