@@ -291,6 +291,10 @@ static void update_display(Directory *dir,
 			if (filer_window->had_cursor &&
 					!view_cursor_visible(view))
 			{
+				ViewIter start;
+				view_get_iter(view, &start, 0);
+				if (start.next(&start))
+					view_cursor_to_iter(view, &start);
 				view_show_cursor(view);
 				filer_window->had_cursor = FALSE;
 			}

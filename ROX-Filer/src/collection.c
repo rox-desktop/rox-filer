@@ -1755,7 +1755,7 @@ void collection_delete_if(Collection *collection,
 				collection->free_item(collection,
 							&collection->items[in]);
 			
-			if (cursor >= in)
+			if (collection->cursor_item >= in)
 				cursor--;
 		}
 	}
