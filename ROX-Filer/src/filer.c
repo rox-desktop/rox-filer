@@ -612,8 +612,15 @@ static void selection_get(GtkWidget *widget,
 	/* This works, but I don't think I like it... */
 	/* g_string_append_c(reply, ' '); */
 	
-	gtk_selection_data_set(selection_data, xa_string,
-			8, reply->str + 1, reply->len - 1);
+	if (reply->len > 0)
+		gtk_selection_data_set(selection_data, xa_string,
+				8, reply->str + 1, reply->len - 1);
+	else
+	{
+		g_warning("Attempt to paste empty selection!");
+		gtk_selection_data_set(selection_data, xa_string, 8, "", 0);
+	}
+
 	g_string_free(reply, TRUE);
 	g_string_free(header, TRUE);
 }

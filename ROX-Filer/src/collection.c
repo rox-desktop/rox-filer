@@ -2030,6 +2030,14 @@ void collection_delete_if(Collection *collection,
 		}
 		
 		collection->number_of_items = out;
+		if (collection->number_selected && !selected)
+		{
+			/* We've lost all the selected items */
+			gtk_signal_emit(GTK_OBJECT(collection),
+					collection_signals[LOSE_SELECTION],
+					current_event_time);
+		}
+
 		collection->number_selected = selected;
 		resize_arrays(collection,
 			MAX(collection->number_of_items, MINIMUM_ITEMS));
