@@ -76,7 +76,7 @@ struct _GtkSaveboxClass
 GType	   gtk_savebox_get_type 	(void);
 GtkWidget* gtk_savebox_new		(const gchar *action);
 void	   gtk_savebox_set_icon		(GtkSavebox *savebox,
-					 GdkPixmap *pixmap, GdkPixmap *mask);
+					 GdkPixbuf *pixbuf);
 void	   gtk_savebox_set_pathname	(GtkSavebox *savebox,
 					 const gchar *pathname);
 void	   gtk_savebox_set_has_discard	(GtkSavebox *savebox, gboolean setting);

@@ -190,8 +190,7 @@ GtkWidget *toolbar_tool_option(int i)
 	button = gtk_button_new();
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_image_new_from_pixmap(tool->icon->pixmap,
-						tool->icon->mask);
+	icon_widget = gtk_image_new_from_pixbuf(tool->icon->pixbuf);
 
 	vbox = gtk_vbox_new(FALSE, 0);
 	gtk_box_pack_start(GTK_BOX(vbox), icon_widget, TRUE, TRUE, 0);
@@ -460,8 +459,7 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
-	icon_widget = gtk_image_new_from_pixmap(tool->icon->pixmap,
-						tool->icon->mask);
+	icon_widget = gtk_image_new_from_pixbuf(tool->icon->pixbuf);
 
 	if (o_toolbar.int_value == TOOLBAR_LARGE)
 	{

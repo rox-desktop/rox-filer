@@ -19,7 +19,7 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* pixmaps.c - code for handling pixmaps */
+/* pixmaps.c - code for handling pixbufs (despite the name!) */
 
 #include "config.h"
 #define PIXMAPS_C
@@ -588,16 +588,6 @@ static void masked_pixmap_finialize(GObject *object)
 		g_object_unref(mp->pixbuf);
 		mp->pixbuf = NULL;
 	}
-	if (mp->pixmap)
-	{
-		g_object_unref(mp->pixmap);
-		mp->pixmap = NULL;
-	}
-	if (mp->mask)
-	{
-		g_object_unref(mp->mask);
-		mp->mask = NULL;
-	}
 
 	if (mp->sm_pixbuf)
 	{
@@ -629,8 +619,6 @@ static void masked_pixmap_init(GTypeInstance *object, gpointer gclass)
 	mp->huge_height = -1;
 
 	mp->pixbuf = NULL;
-	mp->pixmap = NULL;
-	mp->mask = NULL;
 	mp->width = -1;
 	mp->height = -1;
 
@@ -669,8 +657,6 @@ MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size)
 {
 	MaskedPixmap *mp;
 	GdkPixbuf	*src_pixbuf, *normal_pixbuf;
-	GdkPixmap	*pixmap;
-	GdkBitmap	*mask;
 
 	g_return_val_if_fail(full_size != NULL, NULL);
 
@@ -680,22 +666,11 @@ MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size)
 	normal_pixbuf = scale_pixbuf(src_pixbuf, ICON_WIDTH, ICON_HEIGHT);
 	g_return_val_if_fail(normal_pixbuf != NULL, NULL);
 
-	gdk_pixbuf_render_pixmap_and_mask(normal_pixbuf, &pixmap, &mask, 128);
-
-	if (!pixmap)
-	{
-		gdk_pixbuf_unref(src_pixbuf);
-		gdk_pixbuf_unref(normal_pixbuf);
-		return NULL;
-	}
-
 	mp = g_object_new(masked_pixmap_get_type(), NULL);
 
 	mp->src_pixbuf = src_pixbuf;
 
 	mp->pixbuf = normal_pixbuf;
-	mp->pixmap = pixmap;
-	mp->mask = mask;
 	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
 	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
 

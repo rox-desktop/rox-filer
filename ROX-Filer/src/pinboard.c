@@ -203,6 +203,7 @@ static PinIcon *pin_icon_new(const char *pathname, const char *name);
 static void pin_icon_destroyed(PinIcon *pi);
 static void pin_icon_set_tip(PinIcon *pi);
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi);
+static void merge_alpha(GdkPixbuf *src, GdkBitmap *mask, int x, int y);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -559,44 +560,24 @@ static void set_size_and_shape(PinIcon *pi, int *rwidth, int *rheight)
 	gdk_draw_rectangle(pi->mask, mask_gc, TRUE, 0, 0, width, height);
 
 	gdk_gc_set_foreground(mask_gc, &mask_solid);
-	/* Make the icon area solid */
-	if (image->mask)
-	{
-		gdk_draw_drawable(pi->mask, mask_gc, image->mask,
-				0, 0,
-				(width - iwidth) >> 1,
-				WINK_FRAME,
-				image->width,
-				image->height);
-	}
-	else
-	{
-		gdk_draw_rectangle(pi->mask, mask_gc, TRUE,
-				(width - iwidth) >> 1,
-				WINK_FRAME,
-				iwidth,
-				iheight);
-	}
 
-	gdk_gc_set_function(mask_gc, GDK_OR);
+	/* Make the icon area solid.
+	 * Note that the highlighted version must have same alpha...
+	 */
+	merge_alpha(image->src_pixbuf, pi->mask,
+			(width - iwidth) >> 1, WINK_FRAME);
+
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_draw_drawable(pi->mask, mask_gc, im_symlink->mask,
-				0, 0,		/* Source x,y */
-				(width - iwidth) >> 1,		/* Dest x */
-				WINK_FRAME,			/* Dest y */
-				-1, -1);
+		merge_alpha(im_symlink->src_pixbuf, pi->mask,
+				(width - iwidth) >> 1, WINK_FRAME);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
 		/* Note: Both mount state pixmaps must have the same mask */
-		gdk_draw_drawable(pi->mask, mask_gc, im_mounted->mask,
-				0, 0,		/* Source x,y */
-				(width - iwidth) >> 1,		/* Dest x */
-				WINK_FRAME,			/* Dest y */
-				-1, -1);
+		merge_alpha(im_mounted->src_pixbuf, pi->mask,
+				(width - iwidth) >> 1, WINK_FRAME);
 	}
-	gdk_gc_set_function(mask_gc, GDK_COPY);
 
 	/* Mask off an area for the text */
 
@@ -623,35 +604,29 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	int		iwidth = image->width;
 	int		iheight = image->height;
 	int		image_x;
-	GdkGC		*gc = widget->style->black_gc;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 					       : GTK_STATE_NORMAL;
 	PangoRectangle	logical;
 
 	image_x = (pi->width - iwidth) >> 1;
 
-	/* TODO: If the shape extension is missing we might need to set
-	 * the clip mask here...
-	 */
-	gdk_draw_drawable(widget->window, gc,
-			image->pixmap,
-			0, 0,
-			image_x,
-			WINK_FRAME,
-			iwidth,
-			iheight);
+	gdk_pixbuf_render_to_drawable_alpha(image->pixbuf,
+			widget->window,
+			0, 0, 				/* src */
+			image_x, WINK_FRAME,	/* dest */
+			iwidth, iheight,
+			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+			GDK_RGB_DITHER_NORMAL, 0, 0);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
-		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
-		gdk_gc_set_clip_mask(gc, im_symlink->mask);
-		gdk_draw_drawable(widget->window, gc,
-				im_symlink->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, WINK_FRAME,	/* Dest x,y */
-				-1, -1);
-		gdk_gc_set_clip_mask(gc, NULL);
-		gdk_gc_set_clip_origin(gc, 0, 0);
+		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, WINK_FRAME,
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 	else if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -659,15 +634,13 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 					? im_mounted
 					: im_unmounted;
 					
-		gdk_gc_set_clip_origin(gc, image_x, WINK_FRAME);
-		gdk_gc_set_clip_mask(gc, mp->mask);
-		gdk_draw_drawable(widget->window, gc,
-				mp->pixmap,
-				0, 0,		/* Source x,y */
-				image_x, WINK_FRAME,	/* Dest x,y */
-				-1, -1);
-		gdk_gc_set_clip_mask(gc, NULL);
-		gdk_gc_set_clip_origin(gc, 0, 0);
+		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
+				widget->window,
+				0, 0, 				/* src */
+				image_x, WINK_FRAME,
+				-1, -1,
+				GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
+				GDK_RGB_DITHER_NORMAL, 0, 0);
 	}
 
 	text_x = (pi->width - pi->name_width) >> 1;
@@ -1627,4 +1600,32 @@ static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
 			position_menu,
 			(gpointer) pos, event->button, event->time);
+}
+
+/* Render the mask of 'src' onto 'mask' at (x, y) */
+static void merge_alpha(GdkPixbuf *src, GdkBitmap *mask, int x, int y)
+{
+	GdkGC *gc;
+	GdkColor color;
+	GdkPixmap *pixmap;
+	GdkBitmap *src_mask;
+	
+	gc = gdk_gc_new(mask);
+	color.pixel = 1;
+	gdk_gc_set_foreground(gc, &color);
+	
+	gdk_pixbuf_render_pixmap_and_mask(src, &pixmap, &src_mask, 10);
+	g_object_unref(pixmap);
+
+	if (src_mask)
+	{
+		gdk_gc_set_function(gc, GDK_OR);
+		gdk_draw_drawable(mask, gc, src_mask, 0, 0, x, y, -1, -1);
+		g_object_unref(src_mask);
+	}
+	else
+		gdk_draw_rectangle(mask, gc, TRUE, x, y,
+			gdk_pixbuf_get_width(src), gdk_pixbuf_get_height(src));
+	
+	g_object_unref(gc);
 }

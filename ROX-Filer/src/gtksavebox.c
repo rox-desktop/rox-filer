@@ -314,17 +314,17 @@ gtk_savebox_new (const gchar *action)
 }
 
 void
-gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixmap *pixmap, GdkPixmap *mask)
+gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixbuf *pixbuf)
 {
   g_return_if_fail (savebox != NULL);
   g_return_if_fail (GTK_IS_SAVEBOX (savebox));
-  g_return_if_fail (pixmap != NULL);
+  g_return_if_fail (pixbuf != NULL);
 
   if (savebox->icon)
-    gtk_image_set_from_pixmap (GTK_IMAGE (savebox->icon), pixmap, mask);
+    gtk_image_set_from_pixbuf (GTK_IMAGE (savebox->icon), pixbuf);
   else
     {
-      savebox->icon = gtk_image_new_from_pixmap (pixmap, mask);
+      savebox->icon = gtk_image_new_from_pixbuf (pixbuf);
       gtk_container_add (GTK_CONTAINER (savebox->drag_box), savebox->icon);
       gtk_widget_show(savebox->icon);
     }

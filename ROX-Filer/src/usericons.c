@@ -375,7 +375,7 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 	gtk_box_pack_start(GTK_BOX(vbox2), align, FALSE, TRUE, 0);
 	button = gtk_button_new();
 	gtk_container_add(GTK_CONTAINER(align), button);
-	icon = gtk_image_new_from_pixmap(im_dirs->pixmap, im_dirs->mask);
+	icon = gtk_image_new_from_pixbuf(im_dirs->pixbuf);
 	gtk_container_add(GTK_CONTAINER(button), icon);
 	gtk_tooltips_set_tip(tooltips, button,
 			_("Menu of directories previously used for icons"),

@@ -1016,7 +1016,7 @@ static void savebox_show(const gchar *action, const gchar *path,
 		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), u8);
 		g_free(u8);
 	}
-	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
+	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixbuf);
 	g_object_unref(image);
 				
 	gtk_widget_show(savebox);
