@@ -16,6 +16,7 @@
 #define WIN_STATE_ARRANGE_IGNORE  (1<<9) /* Ignore for auto arranging */
 
 extern GdkFont	   	*fixed_font;
+extern GdkFont	   	*item_font;
 extern GtkStyle   	*fixed_style;
 extern gint		fixed_width;
 

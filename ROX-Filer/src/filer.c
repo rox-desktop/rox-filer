@@ -398,8 +398,7 @@ static gboolean test_point_large(Collection *collection,
 				int width, int height)
 {
 	DirItem		*item = (DirItem *) colitem->data;
-	GdkFont		*font = GTK_WIDGET(collection)->style->font;
-	int		text_height = font->ascent + font->descent;
+	int		text_height = item_font->ascent + item_font->descent;
 	MaskedPixmap	*image = item->image;
 	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
 	int		image_width = (image->width >> 1) + 2;
@@ -425,7 +424,6 @@ static gboolean test_point_full_info(Collection *collection,
 				int width, int height)
 {
 	DirItem		*item = (DirItem *) colitem->data;
-	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	MaskedPixmap	*image = item->image;
 	int		image_y = MAX(0, MAX_ICON_HEIGHT - image->height);
 	int		low_top = height
@@ -438,7 +436,7 @@ static gboolean test_point_full_info(Collection *collection,
 
 	if (point_y >= low_top)
 		return point_x < item->details_width;
-	if (point_y >= low_top - font->ascent - font->descent)
+	if (point_y >= low_top - item_font->ascent - item_font->descent)
 		return point_x < item->name_width;
 	return FALSE;
 }
@@ -451,9 +449,8 @@ static gboolean test_point_small(Collection *collection,
 	DirItem		*item = (DirItem *) colitem->data;
 	MaskedPixmap	*image = item->image;
 	int		image_y = MAX(0, SMALL_ICON_HEIGHT - image->height);
-	GdkFont		*font = GTK_WIDGET(collection)->style->font;
 	int		low_top = height
-				- fixed_font->descent - 2 - font->ascent;
+				- fixed_font->descent - 2 - item_font->ascent;
 	int		iwidth = MIN(SMALL_ICON_WIDTH, image->width);
 
 	if (point_x < iwidth + 2)
@@ -655,7 +652,6 @@ static void draw_item_full_info(GtkWidget *widget,
 {
 	DirItem	*item = (DirItem *) colitem->data;
 	MaskedPixmap	*image = item->image;
-	GdkFont	*font = widget->style->font;
 	int	text_x = area->x + MAX_ICON_WIDTH + 8;
 	int	low_text_y = area->y + area->height - fixed_font->descent - 2;
 	gboolean	selected = colitem->selected;
@@ -669,10 +665,10 @@ static void draw_item_full_info(GtkWidget *widget,
 	draw_large_icon(widget, &pic_area, item, selected);
 	
 	draw_string(widget,
-			widget->style->font,
+			item_font,
 			item->leafname, 
 			text_x,
-			low_text_y - font->descent - fixed_font->ascent,
+			low_text_y - item_font->descent - fixed_font->ascent,
 			item->name_width,
 			selected);
 	draw_string(widget,
@@ -696,9 +692,8 @@ static void draw_item_small(GtkWidget *widget,
 			GdkRectangle *area)
 {
 	DirItem	*item = (DirItem *) colitem->data;
-	GdkFont	*font = widget->style->font;
 	int	text_x = area->x + SMALL_ICON_WIDTH + 4;
-	int	low_text_y = area->y + area->height - font->descent - 2;
+	int	low_text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
 	GdkRectangle	pic_area;
 
@@ -710,7 +705,7 @@ static void draw_item_small(GtkWidget *widget,
 	draw_small_icon(widget, &pic_area, item, selected);
 	
 	draw_string(widget,
-			widget->style->font,
+			item_font,
 			item->leafname, 
 			text_x,
 			low_text_y,
@@ -723,15 +718,14 @@ static void draw_item_large(GtkWidget *widget,
 			GdkRectangle *area)
 {
 	DirItem		*item = (DirItem *) colitem->data;
-	GdkFont	*font = widget->style->font;
 	int	text_x = area->x + ((area->width - item->name_width) >> 1);
-	int	text_y = area->y + area->height - font->descent - 2;
+	int	text_y = area->y + area->height - item_font->descent - 2;
 	gboolean	selected = colitem->selected;
 
 	draw_large_icon(widget, area, item, selected);
 	
 	draw_string(widget,
-			widget->style->font,
+			item_font,
 			item->leafname, 
 			text_x, text_y, item->name_width,
 			selected);
@@ -1326,11 +1320,9 @@ static void shrink_width(FilerWindow *filer_window)
 	int		width = MIN_ITEM_WIDTH;
 	int		this_width;
 	DisplayStyle	style = filer_window->display_style;
-	GdkFont		*font;
 	int		text_height;
 
-	font = gtk_widget_get_default_style()->font;
-	text_height = font->ascent + font->descent;
+	text_height = item_font->ascent + item_font->descent;
 	
 	for (i = 0; i < col->number_of_items; i++)
 	{

@@ -97,7 +97,9 @@ static gint collection_paint(Collection 	*collection,
 static void collection_size_request(GtkWidget 		*widget,
 				    GtkRequisition 	*requisition);
 static void collection_size_allocate(GtkWidget 		*widget,
-				     GtkAllocation 	*allocation);
+			     GtkAllocation 	*allocation);
+static void collection_set_style(GtkWidget *widget,
+                                 GtkStyle *previous_style);
 static void collection_set_adjustment(Collection 	*collection,
 				      GtkAdjustment 	*vadj);
 static void collection_set_arg(	GtkObject *object,
@@ -213,6 +215,7 @@ static void collection_class_init(CollectionClass *class)
 	widget_class->expose_event = collection_expose;
 	widget_class->size_request = collection_size_request;
 	widget_class->size_allocate = collection_size_allocate;
+	widget_class->style_set = collection_set_style;
 
 	widget_class->key_press_event = collection_key_press;
 	widget_class->button_press_event = collection_button_press;
@@ -491,6 +494,21 @@ static void collection_size_allocate(GtkWidget *widget,
 		if (collection->cursor_item != -1)
 			scroll_to_show(collection, collection->cursor_item);
 	}
+}
+
+static void collection_set_style(GtkWidget *widget,
+                                 GtkStyle *previous_style)
+{
+	Collection 	*collection;
+	
+	g_return_if_fail(IS_COLLECTION(widget));
+
+	collection = COLLECTION(widget);
+
+	collection->paint_level = PAINT_CLEAR;
+
+	if (parent_class->style_set)
+		(*parent_class->style_set)(widget, previous_style);
 }
 
 static gint collection_paint(Collection 	*collection,

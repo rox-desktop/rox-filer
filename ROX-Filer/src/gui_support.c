@@ -36,6 +36,7 @@
 #include "main.h"
 #include "gui_support.h"
 
+GdkFont	   	*item_font = NULL;
 GdkFont	   	*fixed_font = NULL;
 GtkStyle   	*fixed_style = NULL;
 gint		fixed_width;
@@ -45,6 +46,7 @@ static GdkAtom xa_cardinal;
 void gui_support_init()
 {
 	fixed_font = gdk_font_load("fixed");
+	item_font = gtk_widget_get_default_style()->font;
 
 	fixed_style = gtk_style_copy(gtk_widget_get_default_style());
 	fixed_style->font = fixed_font;
