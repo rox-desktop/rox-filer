@@ -5,7 +5,7 @@
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  */
 
-/* newdir.c - code for handling creation of new directories */
+/* savebox.c - code for handling those Newdir/Copy/Rename boxes */
 
 #include <sys/stat.h>
 #include <sys/types.h>
@@ -16,8 +16,9 @@
 #include <glib.h>
 #include <gtk/gtk.h>
 
+#include "support.h"
 #include "gui_support.h"
-#include "newdir.h"
+#include "savebox.h"
 #include "filer.h"
 
 static GtkWidget *window, *pathname_entry;
@@ -26,7 +27,7 @@ static FilerWindow *filer_window;
 /* Static prototypes */
 static void create_dir(GtkWidget *widget, gpointer data);
 
-void newdir_init()
+void savebox_init()
 {
 	GtkWidget	*table, *label, *sep;
 	GtkWidget	*button;
@@ -34,7 +35,6 @@ void newdir_init()
 	window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_window_set_default_size(GTK_WINDOW(window), 300, 0);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
-	gtk_window_set_title(GTK_WINDOW(window), "Create directory");
 	gtk_signal_connect(GTK_OBJECT(window), "delete_event",
 			GTK_SIGNAL_FUNC(hide_dialog_event), window);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 8);
@@ -42,7 +42,7 @@ void newdir_init()
 	table = gtk_table_new(4, 2, TRUE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 
-	label = gtk_label_new("Create new directory:");
+	label = gtk_label_new("Enter pathname:");
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 0, 2, 0, 1);
 
 	pathname_entry = gtk_entry_new();
@@ -54,7 +54,7 @@ void newdir_init()
 	sep = gtk_hseparator_new();
 	gtk_table_attach_defaults(GTK_TABLE(table), sep, 0, 2, 2, 3);
 
-	button = gtk_button_new_with_label("Create");
+	button = gtk_button_new_with_label("OK");
 	gtk_table_attach_defaults(GTK_TABLE(table), button, 0, 1, 3, 4);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			   GTK_SIGNAL_FUNC(create_dir), NULL);
@@ -65,21 +65,20 @@ void newdir_init()
 			GTK_SIGNAL_FUNC(gtk_widget_hide), GTK_OBJECT(window));
 }
 
-void newdir_show(FilerWindow *fw)
+void savebox_show(FilerWindow *fw, char *title, char *path, char *leaf)
 {
-	GString	*path = NULL;
-	
+	GString	*tmp;
 	filer_window = fw;
+
+	tmp = make_path(path, leaf);
 
 	if (GTK_WIDGET_MAPPED(window))
 		gtk_widget_hide(window);
+	gtk_window_set_title(GTK_WINDOW(window), title);
 
-	if (!path)
-		path = g_string_new(NULL);
-	
-	g_string_sprintf(path, "%s/", filer_window->path);
-
-	gtk_entry_set_text(GTK_ENTRY(pathname_entry), path->str);
+	gtk_entry_set_text(GTK_ENTRY(pathname_entry), tmp->str);
+	gtk_entry_select_region(GTK_ENTRY(pathname_entry),
+			tmp->len - strlen(leaf), -1);
 	
 	gtk_widget_grab_focus(pathname_entry);
 	gtk_widget_show_all(window);

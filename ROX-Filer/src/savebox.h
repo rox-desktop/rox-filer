@@ -5,14 +5,15 @@
  * By Thomas Leonard, <tal197@ecs.soton.ac.uk>.
  */
 
-#ifndef _NEWDIR_H
-#define _NEWDIR_H
+#ifndef _SAVEBOX_H
+#define _SAVEBOX_H
 
 #include "filer.h"
 
 /* Prototypes */
 
-void newdir_init(void);
-void newdir_show(FilerWindow *filer_window);
+void savebox_init(void);
+void savebox_show(FilerWindow *filer_window,
+		char *title, char *path, char *leaf);
 
-#endif /* _NEWDIR_H */
+#endif /* _SAVEBOX_H */

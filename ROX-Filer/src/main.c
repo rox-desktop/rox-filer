@@ -21,7 +21,7 @@
 #include "dnd.h"
 #include "options.h"
 #include "choices.h"
-#include "newdir.h"
+#include "savebox.h"
 #include "type.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 	filer_init();
 	mount_init();
 	options_init();
-	newdir_init();
+	savebox_init();
 	type_init();
 
 	signal(SIGCHLD, child_died);

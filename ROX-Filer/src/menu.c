@@ -18,7 +18,7 @@
 #include "gui_support.h"
 #include "options.h"
 #include "choices.h"
-#include "newdir.h"
+#include "savebox.h"
 
 #define C_ "<control>"
 
@@ -33,8 +33,11 @@ static void menu_closed(GtkWidget *widget);
 static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state);
 
 static void refresh(gpointer data, guint action, GtkWidget *widget);
+
+static void rename(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
+
 static void select_all(gpointer data, guint action, GtkWidget *widget);
 static void clear_selection(gpointer data, guint action, GtkWidget *widget);
 static void show_options(gpointer data, guint action, GtkWidget *widget);
@@ -66,8 +69,8 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/Display/Show Hidden",   	C_"H", 	NULL, 0, "<ToggleItem>"},
 {"/Display/Refresh",	   	C_"L", 	refresh, 0,	NULL},
 {"/File",			NULL,  	NULL, 0, "<Branch>"},
-{"/File/Copy",			NULL,  	NULL, 0, NULL},
-{"/File/Rename",		NULL,  	NULL, 0, NULL},
+{"/File/Copy...",		NULL,  	NULL, 0, NULL},
+{"/File/Rename...",		NULL,  	rename, 0, NULL},
 {"/File/Help",		    	"F1",  	NULL, 0, NULL},
 {"/File/Info",			NULL,  	NULL, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
@@ -99,7 +102,7 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Show Hidden",   	NULL, 	NULL, 0, "<ToggleItem>"},
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
-{"/File/Delete",		NULL,	NULL, 	0, NULL},
+{"/File/Delete",		NULL,	delete,	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
 };
@@ -162,7 +165,7 @@ static void items_sensitive(GtkWidget *menu, int from, int n, gboolean state)
 	item = g_list_nth(items, from);
 	while (item && n--)
 	{
-		gtk_widget_set_sensitive(GTK_WIDGET(item->data), state);
+		gtk_widget_set_sensitive(GTK_BIN(item->data)->child, state);
 		item = item->next;
 	}
 
@@ -258,11 +261,13 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 	{
 		case 0:
 			g_string_assign(buffer, "<nothing selected>");
-			items_sensitive(file_menu, 0, -1, FALSE);
+			items_sensitive(file_menu, 0, 4, FALSE);
+			items_sensitive(file_menu, 5, -1, FALSE);
 			gtk_widget_set_sensitive(file_label, FALSE);
 			break;
 		case 1:
-			items_sensitive(file_menu, 0, -1, TRUE);
+			items_sensitive(file_menu, 0, 4, TRUE);
+			items_sensitive(file_menu, 5, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			file_item = selected_item(filer_window->collection);
 			g_string_sprintf(buffer, "%s '%s'",
@@ -271,7 +276,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 			break;
 		default:
 			items_sensitive(file_menu, 0, 4, FALSE);
-			items_sensitive(file_menu, 4, -1, TRUE);
+			items_sensitive(file_menu, 5, -1, TRUE);
 			gtk_widget_set_sensitive(file_label, TRUE);
 			g_string_sprintf(buffer, "%d items",
 				filer_window->collection->number_selected);
@@ -326,7 +331,8 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 
 	if (collection->number_selected < 1)
 	{
-		report_error("ROX-Filer", "Nothing to delete!");
+		report_error("ROX-Filer", "You need to select some items "
+				"first");
 		return;
 	}
 
@@ -355,6 +361,25 @@ static void delete(gpointer data, guint action, GtkWidget *widget)
 	for (i = sizeof(start_args) / sizeof(char *); i < argc; i++)
 		g_free(argv[i]);
 	g_free(argv);
+}
+
+static void rename(gpointer data, guint action, GtkWidget *widget)
+{
+	Collection *collection;
+	
+	g_return_if_fail(window_with_focus != NULL);
+
+	collection = window_with_focus->collection;
+	if (collection->number_selected != 1)
+		report_error("ROX-Filer", "You must select a single "
+				"item to rename");
+	else
+	{
+		FileItem *item = selected_item(collection);
+
+		savebox_show(window_with_focus, "Rename",
+				window_with_focus->path, item->leafname);
+	}
 }
 
 static void mount(gpointer data, guint action, GtkWidget *widget)
@@ -419,7 +444,8 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	newdir_show(window_with_focus);
+	savebox_show(window_with_focus, "Create directory",
+			window_with_focus->path, "NewDir");
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
