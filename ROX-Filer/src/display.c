@@ -859,6 +859,7 @@ void display_set_layout(FilerWindow  *filer_window,
 
 	display_style_set(filer_window, style);
 	display_details_set(filer_window, details);
+	filer_window_autosize(filer_window);
 }
 
 /* Set the 'Show Hidden' flag for this window */
