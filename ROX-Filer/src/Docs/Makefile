@@ -3,7 +3,8 @@ RES=../..
 MAN=../../..
 
 all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1 \
-     Manual-fr.valid ${HELP}/Manual-fr.html
+     Manual-fr.valid ${HELP}/Manual-fr.html \
+     Manual-it.valid ${HELP}/Manual-it.html 
 
 %.valid: %.xml
 	xmllint --noout --postvalid $<
