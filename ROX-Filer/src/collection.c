@@ -217,10 +217,6 @@ static void collection_class_init(GObjectClass *gclass, gpointer data)
 	widget_class->map = collection_map;
 	widget_class->scroll_event = collection_scroll_event;
 
-#if 0
-	widget_class->style_set = collection_set_style; /* XXX: Test for 2.0 */
-#endif
-	
 	gclass->set_property = collection_set_property;
 	gclass->get_property = collection_get_property;
 
@@ -404,17 +400,6 @@ static void collection_map(GtkWidget *widget)
 	}
 }
 
-static GdkGC *create_bg_gc(GtkWidget *widget)
-{
-	GdkGCValues values;
-
-	values.tile = widget->style->bg_pixmap[GTK_STATE_NORMAL];
-	values.fill = GDK_TILED;
-
-	return gdk_gc_new_with_values(widget->window, &values,
-			GDK_GC_FILL | GDK_GC_TILE);
-}
-
 static void collection_realize(GtkWidget *widget)
 {
 	Collection 	*collection;
@@ -452,11 +437,6 @@ static void collection_realize(GtkWidget *widget)
 	widget->style = gtk_style_attach(widget->style, widget->window);
 
 	gdk_window_set_user_data(widget->window, widget);
-
-	gdk_window_set_background(widget->window,
-			&widget->style->bg[GTK_STATE_NORMAL]);
-	if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
-		collection->bg_gc = create_bg_gc(widget);
 
 	bg = &widget->style->bg[GTK_STATE_NORMAL];
 	fg = &widget->style->fg[GTK_STATE_NORMAL];
@@ -547,35 +527,6 @@ static void collection_size_allocate(GtkWidget *widget,
 	}
 }
 
-#if 0
-static void collection_set_style(GtkWidget *widget,
-                                 GtkStyle *previous_style)
-{
-	Collection 	*collection;
-	
-	g_return_if_fail(IS_COLLECTION(widget));
-
-	collection = COLLECTION(widget);
-
-	collection->paint_level = PAINT_CLEAR;
-
-	if (GTK_WIDGET_REALIZED(widget))
-	{
-		gdk_window_set_background(widget->window,
-				&widget->style->bg[GTK_STATE_NORMAL]);
-
-		if (collection->bg_gc)
-		{
-			gdk_gc_destroy(collection->bg_gc);
-			collection->bg_gc = NULL;
-		}
-
-		if (widget->style->bg_pixmap[GTK_STATE_NORMAL])
-			collection->bg_gc = create_bg_gc(widget);
-	}
-}
-#endif
-
 /* Return the area occupied by the item at (row, col) by filling
  * in 'area'.
  */
@@ -606,6 +557,10 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
 	g_return_val_if_fail(event != NULL, FALSE);
+
+	gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
+		      GTK_SHADOW_NONE, &event->area,
+		      widget, "base", 0, 0, -1, -1);
 
 	collection = COLLECTION(widget);
 

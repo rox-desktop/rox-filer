@@ -268,8 +268,8 @@ int main(int argc, char **argv)
 	/* Note: must do this before checking our options,
 	 * otherwise we report an error for Gtk's options.
 	 */
-	add_default_styles();
 	gtk_init(&argc, &argv);
+	add_default_styles();
 
 	/* Process each option in turn */
 	while (1)

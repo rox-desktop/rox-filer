@@ -698,18 +698,15 @@ gboolean rox_spawn(const gchar *dir, const gchar **argv)
  */
 void add_default_styles(void)
 {
-	gchar	*rc_file;
-	
-	rc_file = g_strconcat(app_dir, "/Styles", NULL);
-	gtk_rc_add_default_file(rc_file);
-	g_free(rc_file);
-
-	rc_file = choices_find_path_load("Styles", PROJECT);
-	if (rc_file)
-	{
-		gtk_rc_add_default_file(rc_file);
-		g_free(rc_file);
-	}
+	gtk_rc_parse_string("style \"rox-default-collection-style\" {\n"
+		"  bg[NORMAL] = \"#f3f3f3\"\n"
+		"  fg[NORMAL] = \"#000000\"\n"
+		"  bg[INSENSITIVE] = \"#bfbfbf\"\n"
+		"  fg[INSENSITIVE] = \"#000000\"\n"
+		"}\n"
+		"\n"
+		"class \"Collection\" style : "
+		"gtk \"rox-default-collection-style\"\n");
 }
 
 GtkWidget *button_new_mixed(const char *stock, const char *message)
