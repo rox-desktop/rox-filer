@@ -44,6 +44,7 @@
 #include "menu.h"
 #include "options.h"
 #include "dir.h"
+#include "mount.h"
 
 /* The number of pixels between the bottom of the image and the top
  * of the text.
@@ -579,12 +580,14 @@ void pinboard_select_only(PinIcon *icon)
  */
 static void icon_may_update(PinIcon *icon)
 {
-	MaskedPixmap *image = icon->item.image;
+	MaskedPixmap	*image = icon->item.image;
+	int		flags = icon->item.flags;
 
 	pixmap_ref(image);
+	mount_update(FALSE);
 	dir_restat(icon->path, &icon->item);
 
-	if (icon->item.image != image)
+	if (icon->item.image != image || icon->item.flags != flags)
 	{
 		int	x = icon->x, y = icon->y;
 		int	width, height;
