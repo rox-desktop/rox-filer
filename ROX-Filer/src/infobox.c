@@ -133,7 +133,7 @@ void infobox_new(const gchar *pathname)
 			g_utf8_validate(path, -1, NULL) ? path
 							: _("(bad utf-8)"),
 				NULL, GTK_DIALOG_NO_SEPARATOR,
-				GTK_STOCK_CANCEL, GTK_RESPONSE_DELETE_EVENT,
+				GTK_STOCK_CLOSE, GTK_RESPONSE_DELETE_EVENT,
 				GTK_STOCK_REFRESH, GTK_RESPONSE_APPLY,
 				NULL);
 
