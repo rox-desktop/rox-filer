@@ -318,13 +318,12 @@ static void open_coloursel(GtkWidget *ok, GtkWidget *button)
 }
 
 /* These are used during parsing... */
-typedef struct _xmlNode Node;
 static guchar *section_name = NULL;
 static xmlDocPtr options_doc = NULL;
 
 #define DATA(node) (xmlNodeListGetString(options_doc, node->xmlChildrenNode, 1))
 
-static void may_add_tip(GtkWidget *widget, Node *element)
+static void may_add_tip(GtkWidget *widget, xmlNode *element)
 {
 	guchar	*data, *tip;
 
@@ -339,7 +338,7 @@ static void may_add_tip(GtkWidget *widget, Node *element)
 	g_free(tip);
 }
 
-static int get_int(Node *node, guchar *attr)
+static int get_int(xmlNode *node, guchar *attr)
 {
 	guchar *txt;
 	int	retval;
@@ -354,7 +353,7 @@ static int get_int(Node *node, guchar *attr)
 	return retval;
 }
 
-static GtkWidget *build_radio(Node *radio, GtkWidget *box, GtkWidget *prev)
+static GtkWidget *build_radio(xmlNode *radio, GtkWidget *box, GtkWidget *prev)
 {
 	GtkWidget	*button;
 	GtkRadioButton	*prev_button = (GtkRadioButton *) prev;
@@ -377,7 +376,7 @@ static GtkWidget *build_radio(Node *radio, GtkWidget *box, GtkWidget *prev)
 	return button;
 }
 
-static void build_menu_item(Node *node, GtkWidget *option_menu)
+static void build_menu_item(xmlNode *node, GtkWidget *option_menu)
 {
 	GtkWidget	*item, *menu;
 	guchar		*label;
@@ -396,7 +395,7 @@ static void build_menu_item(Node *node, GtkWidget *option_menu)
 				"value", xmlGetProp(node, "value"));
 }
 
-static void build_widget(Node *widget, GtkWidget *box)
+static void build_widget(xmlNode *widget, GtkWidget *box)
 {
 	const char *name = widget->name;
 	guchar	*oname;
@@ -432,7 +431,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 	if (strcmp(name, "hbox") == 0)
 	{
 		GtkWidget *hbox;
-		Node	  *hw;
+		xmlNode	  *hw;
 
 		hbox = gtk_hbox_new(FALSE, 4);
 		if (label)
@@ -549,7 +548,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 	else if (strcmp(name, "radio-group") == 0)
 	{
 		GtkWidget	*button = NULL;
-		Node		*rn;
+		xmlNode		*rn;
 
 		for (rn = widget->xmlChildrenNode; rn; rn = rn->next)
 		{
@@ -587,7 +586,7 @@ static void build_widget(Node *widget, GtkWidget *box)
 	else if (strcmp(name, "menu") == 0)
 	{
 		GtkWidget	*hbox, *om, *option_menu;
-		Node		*item;
+		xmlNode		*item;
 		GtkWidget	*menu;
 		GList		*list, *kids;
 		int		min_w = 4, min_h = 4;
@@ -658,9 +657,9 @@ static void build_widget(Node *widget, GtkWidget *box)
 }
 
 
-static void build_sections(Node *options, GtkWidget *sections_box)
+static void build_sections(xmlNode *options, GtkWidget *sections_box)
 {
-	Node	*section = options->xmlChildrenNode;
+	xmlNode	*section = options->xmlChildrenNode;
 
 	g_return_if_fail(strcmp(options->name, "options") == 0);
 
@@ -668,7 +667,7 @@ static void build_sections(Node *options, GtkWidget *sections_box)
 	{
 		guchar 		*title;
 		GtkWidget   	*page, *scrolled_area;
-		Node		*widget;
+		xmlNode		*widget;
 
 		if (section->type != XML_ELEMENT_NODE)
 			continue;

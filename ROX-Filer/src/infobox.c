@@ -55,8 +55,7 @@ struct _FileStatus
 /* Static prototypes */
 static void refresh_info(GtkObject *window);
 static GtkWidget *make_vbox(guchar *path);
-static GtkWidget *make_clist(guchar *path,
-		DirItem *item, struct _xmlNode *about);
+static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
 static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 static void add_file_output(FileStatus *fs,
@@ -140,7 +139,7 @@ static GtkWidget *make_vbox(guchar *path)
 	DirItem		item;
 	GtkWidget	*vbox, *list, *file;
 	AppInfo		*ai;
-	struct _xmlNode *about = NULL;
+	xmlNode 	*about = NULL;
 
 	g_return_val_if_fail(path[0] == '/', NULL);
 	
@@ -207,14 +206,13 @@ static void get_selection(GtkCList *clist,
 }
 
 /* Create the CList with the file's details */
-static GtkWidget *make_clist(guchar *path,
-		DirItem *item, struct _xmlNode *about)
+static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 {
 	GtkCList	*table;
 	GString		*gstring;
 	struct stat	info;
 	char		*data[] = {NULL, NULL, NULL};
-	struct _xmlNode *prop;
+	xmlNode 	*prop;
 	GtkTargetEntry 	target_table[] = { {"STRING", 0, 0} };
 
 	table = GTK_CLIST(gtk_clist_new(2));

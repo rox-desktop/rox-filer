@@ -303,7 +303,7 @@ void icon_set_tip(Icon *icon)
 {
 	GtkWidget	*widget;
 	AppInfo		*ai;
-	struct _xmlNode *node;
+	xmlNode 	*node;
 
 	g_return_if_fail(icon != NULL);
 

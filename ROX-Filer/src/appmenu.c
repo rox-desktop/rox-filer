@@ -85,7 +85,7 @@ void appmenu_remove(void)
 void appmenu_add(guchar *app_dir, DirItem *item, GtkWidget *menu)
 {
 	AppInfo	*ai;
-	struct _xmlNode	*node;
+	xmlNode	*node;
 	GList	*next;
 	GtkWidget *sep;
 

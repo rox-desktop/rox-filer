@@ -115,9 +115,9 @@ void appinfo_unref(AppInfo *info)
  *
  * Returns an _xmlNode or NULL if there isn't one.
  */
-struct _xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
+xmlNode *appinfo_get_section(AppInfo *ai, guchar *name)
 {
-	struct _xmlNode *node;
+	xmlNode *node;
 
 	g_return_val_if_fail(ai != NULL, NULL);
 	g_return_val_if_fail(name != NULL, NULL);

@@ -1736,7 +1736,7 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 	if (tip_item->flags & ITEM_FLAG_APPDIR)
 	{
 		AppInfo *info;
-		struct _xmlNode *node;
+		xmlNode *node;
 
 		info = appinfo_get(make_path(filer_window->path,
 					tip_item->leafname)->str, tip_item);
