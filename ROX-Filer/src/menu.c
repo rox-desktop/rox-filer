@@ -1789,7 +1789,8 @@ static GList *set_keys_button(Option *option, xmlNode *node, guchar *label)
 	g_return_val_if_fail(option == NULL, NULL);
 	
 	align = gtk_alignment_new(0.5, 0.5, 0, 0);
-	button = gtk_button_new_with_label(_("Set keyboard shortcuts"));
+	button = button_new_mixed(GTK_STOCK_DIALOG_INFO,
+			_("Set keyboard shortcuts"));
 	gtk_container_add(GTK_CONTAINER(align), button);
 	g_signal_connect(button, "clicked", G_CALLBACK(show_key_help), NULL);
 

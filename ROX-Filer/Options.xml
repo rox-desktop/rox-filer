@@ -1,194 +1,229 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <options>
   <section title='Translation'>
-    <label>Display messages in...</label>
-    <radio-group name='i18n_translation' label='Translation'>
-      <radio label='Danish' value='da'/>
-      <radio label='Dutch' value='nl'/>
-      <radio label='English (no translation)' value='None'/>
-      <radio label='French' value='fr'/>
-      <radio label='German' value='de'/>
-      <radio label='Hungarian' value='hu'/>
-      <radio label='Italian' value='it'/>
-      <radio label='Polish' value='pl'/>
-      <radio label='Russian' value='ru'/>
-      <radio label='Spanish' value='sp'/>
-      <radio label='Use the LANG environment variable' value='From LANG'/>
-    </radio-group>
-    <label>Note that you must save your choices and restart the filer for the new language setting to take full effect.</label>
-  </section>
-  <section title='Display'>
-    <toggle name='display_intelligent_sort' label='Intelligent sorting'>If off, does ASCII sort: File10, File9, file8.
-If on, ignores case and punctuation and handles numbers properly: file8, File9, File10</toggle>
-    <toggle name='display_dirs_first' label='Directories always come first'>If this is on then directories will always appear before anything else, regardless of the sort type.</toggle>
-    <slider name='display_large_width' label='Large wrap width' min='0' max='250' fixed='1'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</slider>
-    <slider name='display_small_width' label='Max Small Icons width' min='0' max='250' fixed='1'>Maximum width for the text beside a Small Icon.</slider>
-    <spacer/>
-    <toggle name='display_inherit_options' label='Inherit options from source window'>If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below.</toggle>
-    <spacer/>
-    <label>Default settings for new windows:</label>
-    <menu name='display_size' label='Icon size'>
-      <item label='Huge Icons' value='2'/>
-      <item label='Large Icons' value='0'/>
-      <item label='Small Icons' value='1'/>
-    </menu>
-    <menu name='display_details' label='Details'>
-      <item label='No details' value='0'/>
-      <item label='Summary' value='1'/>
-      <item label='Sizes' value='2'/>
-      <item label='Permissions' value='3'/>
-      <item label='Type' value='4'/>
-      <item label='Times' value='5'/>
-    </menu>
-    <menu name='display_sort_by' label='Sort by'>
-      <item label='Name' value='0'/>
-      <item label='Type' value='1'/>
-      <item label='Date' value='2'/>
-      <item label='Size' value='3'/>
-    </menu>
-    <toggle name='display_show_hidden' label='Show hidden files'>If this is on then files whose names start with a dot are shown too, otherwise they are hidden.</toggle>
-    <toggle name='display_show_thumbs' label='Show image thumbnails'>Load every image file and display it, scaled-down, in the filer window instead of the normal icon.</toggle>
+    <frame label='Language'>
+      <radio-group name='i18n_translation'>
+        <radio label='Danish' value='da'/>
+        <radio label='Dutch' value='nl'/>
+        <radio label='English (no translation)' value='None'/>
+        <radio label='French' value='fr'/>
+        <radio label='German' value='de'/>
+        <radio label='Hungarian' value='hu'/>
+        <radio label='Italian' value='it'/>
+        <radio label='Polish' value='pl'/>
+        <radio label='Russian' value='ru'/>
+        <radio label='Spanish' value='sp'/>
+        <radio label='Use the LANG environment variable' value='From LANG'/>
+      </radio-group>
+    </frame>
+    <label help='1'>Note that you must save your choices and restart the filer for the new language setting to take full effect.</label>
   </section>
   <section title='Pinboard'>
-    <label>The pinboard is the desktop background.
+    <label help='1'>The pinboard is the desktop background.
 When the pinboard is turned on, you can drag files
 and applications onto it to create short-cuts to them.
 See the manual for information about using the pinboard.</label>
-    <spacer/>
-    <label>Text style:</label>
-    <radio-group name='pinboard_text_bg'>
-      <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
-      <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
-      <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
-    </radio-group>
-    <spacer/>
-    <hbox label='Text colours:'>
-      <colour name='pinboard_fg_colour' label='Foreground'/>
-      <colour name='pinboard_bg_colour' label='Background'/>
-    </hbox>
-    <spacer/>
-    <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-    <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
-    <hbox label='Icon grid step:'>
-      <radio-group name='pinboard_grid_step'>
-        <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
-        <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
-        <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
+    <frame label='Text style'>
+      <radio-group name='pinboard_text_bg'>
+        <radio label='No background' value='0'>The text is drawn directly on the desktop background.</radio>
+        <radio label='Outlined text' value='1'>The text has a thin outline around each letter.</radio>
+        <radio label='Rectangular background slab' value='2'>The text is drawn on a solid rectangle.</radio>
       </radio-group>
-    </hbox>
+    </frame>
+    <frame label='Text colours'>
+      <hbox>
+        <colour name='pinboard_fg_colour' label='Foreground:'/>
+	<spacer/>
+        <colour name='pinboard_bg_colour' label='Background:'/>
+      </hbox>
+    </frame>
+    <frame label='Pinboard behaviour'>
+      <toggle name='bind_single_pinboard' label='Single-click to open'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
+      <toggle name='pinboard_clamp_icons' label='Keep icons within screen limits'>If this is set, pinboard icons are always kept completely within screen limits, including the label.</toggle>
+      <hbox label='Icon grid step:'>
+        <radio-group name='pinboard_grid_step'>
+          <radio label='Fine' value='2'>Use a 2-pixel grid for positioning icons on the desktop.</radio>
+          <radio label='Medium' value='16'>Use a 16-pixel grid for positioning icons on the desktop.</radio>
+          <radio label='Coarse' value='32'>Use a 32-pixel grid for positioning icons on the desktop.</radio>
+        </radio-group>
+      </hbox>
+    </frame>
   </section>
 
   <section title='Panels'>
-    <label>Panels are bars of icons that run along the side of the screen.
+    <label help='1'>Panels are bars of icons that run along the side of the screen.
 See the manual for information about using panels.</label>
-    <spacer/>
-    <radio-group name='panel_style'>
-      <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
-      <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
-      <radio label='Image only' value='2'>Only the image is shown.</radio>
-    </radio-group>
+    <frame label='Panel style'>
+      <radio-group name='panel_style'>
+        <radio label='Image and text' value='0'>Every panel icon is shown with an image and some text.</radio>
+        <radio label='Image only for applications' value='1'>Applications have just an image, everything else has both an image and text.</radio>
+        <radio label='Image only' value='2'>Only the image is shown.</radio>
+      </radio-group>
+    </frame>
   </section>
   
   <section title='Action windows'>
-    <label>Action windows appear when you start a background
+    <label help='1'>Action windows appear when you start a background
 operation, such as copying or deleting some files.</label>
-    <spacer/>
-    <label>Auto-start (Quiet) these actions:</label>
-    <toggle name='action_copy' label='Copy'>Copy files without confirming first.</toggle>
-    <toggle name='action_move' label='Move'>Move files without confirming first.</toggle>
-    <toggle name='action_link' label='Link'>Create links to files without confirming first.</toggle>
-    <toggle name='action_delete' label='Delete'>Delete files without confirming first.</toggle>
-    <toggle name='action_mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
-    <spacer/>
-    <label>Default settings:</label>
-    <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
-    <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
-    <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
-    <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
-  </section>
-  <section title='Toolbar'>
-    <label>Unshade the tools you want:</label>
-    <tool-options name='toolbar_disable'/>
-    <spacer/>
-    <menu name='toolbar_type' label='Toolbar type'>
-      <item label='None' value='0'/>
-      <item label='Small' value='1'/>
-      <item label='Large' value='2'/>
-    </menu>
-    <toggle name='toolbar_show_info' label='Show totals of items'>Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size.</toggle>
+    <frame label='Auto-start (Quiet) these actions'>
+      <toggle name='action_copy' label='Copy'>Copy files without confirming first.</toggle>
+      <toggle name='action_move' label='Move'>Move files without confirming first.</toggle>
+      <toggle name='action_link' label='Link'>Create links to files without confirming first.</toggle>
+      <toggle name='action_delete' label='Delete'>Delete files without confirming first.</toggle>
+      <toggle name='action_mount' label='Mount'>Mount and unmount filesystems without confirming first.</toggle>
+    </frame>
+    <frame label='Default settings'>
+      <toggle name='action_force' label='Force'>Don't confirm deletion of non-writeable items.</toggle>
+      <toggle name='action_brief' label='Brief'>Don't display so much information in the message area.</toggle>
+      <toggle name='action_recurse' label='Recurse'>Also change contents of subdirectories.</toggle>
+      <toggle name='action_newer' label='Newer'>Only over-write if source is newer than destination.</toggle>
+    </frame>
   </section>
   <section title='Filer windows'>
-    <label>Automatically resize filer windows...</label>
-    <radio-group name='filer_auto_resize'>
-      <radio label='...never' value='2'>You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background.</radio>
-      <radio label='...when changing the display style' value='0'>Changing the size of the icons or which details are displayed will resize the window for you.</radio>
-      <radio label='...always' value='1'>The filer will resize windows whenever it seems useful (that is, when changing directory or display style).</radio>
-    </radio-group>
-    <slider name='filer_size_limit' label='Window size limit' min='1' max='100' showvalue='1'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</slider>
-    <spacer/>
-    <toggle name='filer_short_flag_names' label='Short titlebar flags'>Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar.</toggle>
-    <toggle name='filer_unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
-    <toggle name='bind_new_button_1' label='New window on button 1 (RISC OS style)'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
-    <toggle name='bind_single_click' label='Single-click navigation in filer windows'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
-    <spacer/>
-    <toggle name='filer_beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
-    <toggle name='filer_beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
-</section>
+    <frame label='Auto-resize filer windows'>
+      <radio-group name='filer_auto_resize'>
+        <radio label='Never automatically resize' value='2'>You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background.</radio>
+        <radio label='Resize when changing the display style' value='0'>Changing the size of the icons or which details are displayed will resize the window for you.</radio>
+        <radio label='Always resize' value='1'>The filer will resize windows whenever it seems useful (that is, when changing directory or display style).</radio>
+      </radio-group>
+      <numentry name='filer_size_limit' label='Largest window size:' min='1' max='100' width='3'>The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to.</numentry>
+    </frame>
+    <frame label='Window behaviour'>
+      <toggle name='filer_short_flag_names' label='Short titlebar flags'>Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar.</toggle>
+      <toggle name='filer_unique_windows' label='Unique windows'>If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed.</toggle>
+      <toggle name='bind_new_button_1' label='New window on button 1 (RISC OS style)'>Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window.</toggle>
+      <toggle name='bind_single_click' label='Single-click navigation in filer windows'>Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things.</toggle>
+    </frame>
+    <frame label='Beeping'>
+      <toggle name='filer_beep_fail' label='Beep if Tab-completion fails'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies).</toggle>
+      <toggle name='filer_beep_multi' label='Beep if there are several matches'>When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added.</toggle>
+    </frame>
+    <section title='Display'>
+      <frame label='General'>
+        <toggle name='display_intelligent_sort' label='Intelligent sorting'>If off, does ASCII sort: File10, File9, file8.
+If on, ignores case and punctuation and handles numbers properly: file8, File9, File10</toggle>
+        <toggle name='display_dirs_first' label='Directories always come first'>If this is on then directories will always appear before anything else, regardless of the sort type.</toggle>
+      </frame>
+      <frame label='Icon text width'>
+        <numentry name='display_large_width' label='Large wrap width:' min='0' max='250' width='3' sizegroup='disp-width'>Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this.</numentry>
+        <numentry name='display_small_width' label='Max Small Icons width:' min='0' max='250' width='3' sizegroup='disp-width'>Maximum width for the text beside a Small Icon.</numentry>
+      </frame>
+      <frame label='Default settings for new windows'>
+        <toggle name='display_inherit_options' label='Inherit options from source window'>If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below.</toggle>
+	<hbox>
+	  <vbox>
+            <menu name='display_size' label='Icon size:' sizegroup='disp-def'>
+              <item label='Huge Icons' value='2'/>
+              <item label='Large Icons' value='0'/>
+              <item label='Small Icons' value='1'/>
+            </menu>
+            <menu name='display_details' label='Details:' sizegroup='disp-def'>
+              <item label='No details' value='0'/>
+              <item label='Summary' value='1'/>
+              <item label='Sizes' value='2'/>
+              <item label='Permissions' value='3'/>
+              <item label='Type' value='4'/>
+              <item label='Times' value='5'/>
+            </menu>
+            <menu name='display_sort_by' label='Sort by:' sizegroup='disp-def'>
+              <item label='Name' value='0'/>
+              <item label='Type' value='1'/>
+              <item label='Date' value='2'/>
+              <item label='Size' value='3'/>
+            </menu>
+  	  </vbox><vbox>
+            <toggle name='display_show_hidden' label='Show hidden files'>If this is on then files whose names start with a dot are shown too, otherwise they are hidden.</toggle>
+            <toggle name='display_show_thumbs' label='Show image thumbnails'>Load every image file and display it, scaled-down, in the filer window instead of the normal icon.</toggle>
+	  </vbox>
+	</hbox>
+      </frame>
+    </section>
+    <section title='Toolbar'>
+      <frame label='Toolbar buttons'>
+        <label help='1'>Unshade the tools you want.</label>
+        <tool-options name='toolbar_disable'/>
+      </frame>
+      <frame label='Toolbar appearance'>
+        <hbox>
+	  <menu name='toolbar_type' label='Toolbar type:'>
+	  <item label='None' value='0'/>
+	  <item label='Small' value='1'/>
+	  <item label='Large' value='2'/>
+	  </menu>
+	  <spacer/>
+	  <toggle name='toolbar_show_info' label='Show totals of items'>Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size.</toggle>
+  	</hbox>
+      </frame>
+    </section>
+  </section>
   <section title='Drag and Drop'>
-    <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
-    <toggle name='dnd_drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
-    <spacer/>
-    <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
-    <slider name='dnd_spring_delay' label='Spring delay' min='100' max='2000' showvalue='1'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</slider>
-    <spacer/>
-    <label>Dragging files with the middle mouse button...</label>
-    <radio-group name='dnd_middle_menu'>
-      <radio value='1' label='... shows a menu of possible actions'/>
-      <radio value='0' label='... moves the files'>Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key</radio>
-    </radio-group>
+    <frame label='General'>
+      <toggle name='dnd_no_hostnames' label="Don't use hostnames">Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work.</toggle>
+      <toggle name='dnd_drag_to_icons' label='Allow dragging to icons in filer windows'>When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program.</toggle>
+      <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
+      <numentry name='dnd_spring_delay' label='Spring delay:' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
+    </frame>
+    <frame label='Dragging files with the middle mouse button'>
+      <radio-group name='dnd_middle_menu'>
+        <radio value='1' label='Shows a menu of possible actions'/>
+        <radio value='0' label='Moves the files'>Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key</radio>
+      </radio-group>
+    </frame>
   </section>
   <section title='Menus'>
-    <entry name='menu_xterm' label="`Xterm Here' program:">The program to launch when you choose `Xterm Here' from the menu.</entry>
+    <frame label='General'>
+      <toggle name='bind_menu_button_2' label='Menu on button 2 (RISC OS style)'>Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.</toggle>
+      <hbox>
+	<menu name='menu_iconsize' label='Size of icons in menus:'>
+	  <item label='No Icons' value='0'/>
+	  <item label='Small Icons' value='1'/>
+	  <item label='Large Icons' value='2'/>
+	  <!-- <item label='Huge Icons' value='3'/> -->
+	  <item label='Same as current window' value='4'/>
+	  <item label='Same as default' value='5'/>
+	</menu>
+      </hbox>
+    </frame>
+    <frame label="`Xterm Here' program">
+      <entry name='menu_xterm'>The program to launch when you choose `Xterm Here' from the menu.</entry>
+    </frame>
     <spacer/>
     <menu-set-keys/>
-    <spacer/>
-    <menu name='menu_iconsize' label='Size of icons in menus'>
-      <item label='No Icons' value='0'/>
-      <item label='Small Icons' value='1'/>
-      <item label='Large Icons' value='2'/>
-      <!-- <item label='Huge Icons' value='3'/> -->
-      <item label='Same as current window' value='4'/>
-      <item label='Same as default' value='5'/>
-    </menu>
-    <spacer/>
-    <toggle name='bind_menu_button_2' label='Menu on button 2 (RISC OS style)'>Use button 2, the middle button (click both buttons at once on two button mice), to pop up the menu. If off, use button 3 (right) instead.</toggle>
   </section>
   <section title='Types'>
-    <toggle name='display_ignore_exec' label='Ignore eXecutable bit for known extensions'>If a file has a known extension (eg '.gif') then ignore the executable bit. This is useful if you have files on a Windows-type filesystem which are being shown as executable programs.</toggle>
-    <toggle name='display_colour_types' label='Colour files based on their types'>Filenames (and details) are coloured according to the file's type.</toggle>
-    <hbox>
-      <vbox>
-        <colour name='display_dir_colour'  lpos='1' label='Directory'/>
-        <colour name='display_file_colour' lpos='1' label='Regular file'/>
-        <colour name='display_pipe_colour' lpos='1' label='Pipe'/>
-        <colour name='display_sock_colour' lpos='1' label='Socket'/>
-        <colour name='display_cdev_colour' lpos='1' label='Character device'/>
-      </vbox>
-      <vbox>
-        <colour name='display_bdev_colour' lpos='1' label='Block device'/>
-        <colour name='display_exec_colour' lpos='1' label='Executable file'/>
-        <colour name='display_adir_colour' lpos='1' label='Application directory'/>
-        <colour name='display_unkn_colour' lpos='1' label='Unknown type'/>
-	<colour name='display_err_colour'  lpos='1' label='Error'>Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine.</colour>
-      </vbox>
-    </hbox>
-    <spacer/>
-    <label>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. After editing the files, click the re-read button below, or restart the filer.</label>
-    <hbox>
-      <type-edit label='Show name-to-type rules'/>
-      <type-reread label='Re-read files'/>
-    </hbox>
-    <spacer/>
-    <label>Use the 'Set Icon...' dialog box to set the icon for each type.</label>
+    <frame label='General'>
+      <toggle name='display_ignore_exec' label='Ignore eXecutable bit for known extensions'>If a file has a known extension (eg '.gif') then ignore the executable bit. This is useful if you have files on a Windows-type filesystem which are being shown as executable programs.</toggle>
+    </frame>
+    <frame label='MIME types'>
+      <label help='1'>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. After editing the files, click the re-read button below, or restart the filer.</label>
+      <spacer/>
+      <hbox>
+        <type-edit label='Show name-to-type rules'/>
+        <type-reread label='Re-read files'/>
+      </hbox>
+      <spacer/>
+      <label help='1'>Use the 'Set Icon...' dialog box to set the icon for each type.</label>
+    </frame>
+    <section title='Colours'>
+      <frame label='File type colours'>
+        <toggle name='display_colour_types' label='Colour files based on their types'>Filenames (and details) are coloured according to the file's type.</toggle>
+        <hbox>
+          <vbox>
+            <colour name='display_dir_colour'  label='Directory:'/>
+            <colour name='display_file_colour' label='Regular file:'/>
+            <colour name='display_pipe_colour' label='Pipe:'/>
+            <colour name='display_sock_colour' label='Socket:'/>
+            <colour name='display_err_colour'   label='Error:'>Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine.</colour>
+          </vbox>
+          <vbox>
+            <colour name='display_cdev_colour' label='Character device:'/>
+            <colour name='display_bdev_colour' label='Block device:'/>
+            <colour name='display_exec_colour' label='Executable file:'/>
+            <colour name='display_adir_colour' label='Application directory:'/>
+            <colour name='display_unkn_colour' label='Unknown type:'/>
+          </vbox>
+        </hbox>
+      </frame>
+    </section>
   </section>
 </options>
