@@ -677,6 +677,13 @@ static void set_shell_action(GtkWidget *dialog)
 	gtk_widget_destroy(dialog);
 }
 
+static void set_action_response(GtkWidget *dialog, gint response, gpointer data)
+{
+	if (response == GTK_RESPONSE_OK)
+		set_shell_action(dialog);
+	gtk_widget_destroy(dialog);
+}
+
 /* Called when a URI list is dropped onto the box in the Set Run Action
  * dialog. Make sure it's an application, and make that the default
  * handler.
@@ -869,28 +876,21 @@ void type_set_handler_dialog(MIME_type *type)
 {
 	guchar		*tmp;
 	gchar           *handler;
-	GtkWidget	*dialog, *vbox, *frame, *hbox, *entry, *label, *button;
-	GtkWidget	*radio, *eb;
+	GtkDialog	*dialog;
+	GtkWidget	*frame, *entry, *label;
+	GtkWidget	*radio, *eb, *hbox;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
 
 	g_return_if_fail(type != NULL);
 
-	/* XXX: Use a real dialog! */
-	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-
-	gtk_window_set_type_hint(GTK_WINDOW(dialog),
-			GDK_WINDOW_TYPE_HINT_DIALOG);
-
+	dialog = GTK_DIALOG(gtk_dialog_new());
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+
 	gtk_object_set_data(GTK_OBJECT(dialog), "mime_type", type);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set run action"));
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
-
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
 
 	tmp = g_strdup_printf(_("Set default for all `%s/<anything>'"),
 				type->media_type);
@@ -900,16 +900,16 @@ void type_set_handler_dialog(MIME_type *type)
 
 	tmp = g_strdup_printf(_("Only for the type `%s/%s'"), type->media_type,
 			type->subtype);
-	gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
 	radio = gtk_radio_button_new_with_label(
 			gtk_radio_button_group(GTK_RADIO_BUTTON(radio)),
 			tmp);
 	g_free(tmp);
-	gtk_box_pack_start(GTK_BOX(vbox), radio, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio, FALSE, TRUE, 0);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio), TRUE);
 
 	frame = gtk_frame_new(NULL);
-	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), frame, TRUE, TRUE, 4);
 	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
 	eb = gtk_event_box_new();
 	gtk_container_add(GTK_CONTAINER(frame), eb);
@@ -945,14 +945,14 @@ void type_set_handler_dialog(MIME_type *type)
 	gtk_container_add(GTK_CONTAINER(eb), label);
 
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_label_new(_("OR")),
 						FALSE, TRUE, 0);
 	gtk_box_pack_start(GTK_BOX(hbox), gtk_hseparator_new(), TRUE, TRUE, 0);
 
 	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
 
 	label = gtk_label_new(_("Enter a shell command:")),
 	gtk_misc_set_alignment(GTK_MISC(label), 0, .5);
@@ -962,15 +962,12 @@ void type_set_handler_dialog(MIME_type *type)
 			new_help_button(show_shell_help, NULL), FALSE, TRUE, 0);
 
 	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(vbox), entry, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, FALSE, TRUE, 0);
 	gtk_widget_grab_focus(entry);
 	gtk_object_set_data(GTK_OBJECT(dialog), "shell_command", entry);
 	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
 			GTK_SIGNAL_FUNC(set_shell_action), GTK_OBJECT(dialog));
 
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-	
 	/* If possible, fill in the entry box with the current command */
 	tmp = get_current_command(type);
 	if (tmp)
@@ -985,21 +982,20 @@ void type_set_handler_dialog(MIME_type *type)
 		gtk_entry_set_position(GTK_ENTRY(entry), 0);
 	}
 
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(set_shell_action), GTK_OBJECT(dialog));
-	
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
+	gtk_dialog_add_buttons(dialog,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_DELETE_EVENT,
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			NULL);
 
-	gtk_widget_show_all(dialog);
+	hbox = gtk_hbox_new(TRUE, 4);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), hbox, FALSE, TRUE, 0);
+
+	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
+	
+	gtk_signal_connect(GTK_OBJECT(dialog), "response",
+			GTK_SIGNAL_FUNC(set_action_response), NULL);
+
+	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
 
 /* The user wants to set a new default action for files of this type.
