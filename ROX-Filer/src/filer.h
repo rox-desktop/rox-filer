@@ -63,7 +63,7 @@ struct _FilerWindow
 	GtkWidget	*minibuffer_area;	/* The hbox to show/hide */
 	GtkWidget	*minibuffer_label;	/* The operation name */
 	GtkWidget	*minibuffer;		/* The text entry */
-	int		mini_cursor_base;
+	int		mini_cursor_base;	/* XXX */
 	MiniType	mini_type;
 
 	/* TRUE if hidden files are shown because the minibuffer leafname

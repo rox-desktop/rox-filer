@@ -71,6 +71,8 @@ struct _ViewCollection {
 
 	Collection *collection;
 	FilerWindow *filer_window;	/* Used for styles, etc */
+
+	int	cursor_base;		/* Cursor when minibuffer opened */
 };
 
 typedef struct _Template Template;
@@ -170,8 +172,9 @@ static void drag_leave(GtkWidget	*widget,
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     ViewCollection *view_collection);
-static void make_item_iter(ViewCollection *vc, ViewIter *iter,
-			   int i, IterFlags flags);
+static void make_iter(ViewCollection *view_collection, ViewIter *iter,
+		      IterFlags flags);
+static void make_item_iter(ViewCollection *vc, ViewIter *iter, int i);
 
 static void view_collection_sort(ViewIface *view);
 static void view_collection_style_changed(ViewIface *view, int flags);
@@ -199,6 +202,11 @@ static void view_collection_set_frozen(ViewIface *view, gboolean frozen);
 static void view_collection_wink_item(ViewIface *view, ViewIter *iter);
 static void view_collection_autosize(ViewIface *view);
 static gboolean view_collection_cursor_visible(ViewIface *view);
+static void view_collection_set_base(ViewIface *view, ViewIter *iter);
+
+static DirItem *iter_next(ViewIter *iter);
+static DirItem *iter_prev(ViewIter *iter);
+static DirItem *iter_peek(ViewIter *iter);
 
 
 /****************************************************************
@@ -826,6 +834,7 @@ static void view_collection_iface_init(gpointer giface, gpointer iface_data)
 	iface->wink_item = view_collection_wink_item;
 	iface->autosize = view_collection_autosize;
 	iface->cursor_visible = view_collection_cursor_visible;
+	iface->set_base = view_collection_set_base;
 }
 
 /* It's time to make the tooltip appear. If we're not over the item any
@@ -1105,8 +1114,7 @@ static void perform_action(ViewCollection *view_collection,
 		if (item != -1 && press && event->button == 1)
 		{
 			ViewIter iter;
-			make_item_iter(view_collection, &iter, item,
-					VIEW_ITER_ONE_ONLY);
+			make_item_iter(view_collection, &iter, item);
 			
 			filer_window->target_cb(filer_window, &iter,
 					filer_window->target_data);
@@ -1146,8 +1154,7 @@ static void perform_action(ViewCollection *view_collection,
 		{
 			ViewIter iter;
 
-			make_item_iter(view_collection, &iter, item,
-					VIEW_ITER_ONE_ONLY);
+			make_item_iter(view_collection, &iter, item);
 			
 			if (event->button != 1 || event->state & GDK_MOD1_MASK)
 				flags |= OPEN_CLOSE_WINDOW;
@@ -1169,8 +1176,7 @@ static void perform_action(ViewCollection *view_collection,
 			dnd_motion_ungrab();
 			tooltip_show(NULL);
 
-			make_item_iter(view_collection, &iter, item,
-					VIEW_ITER_ONE_ONLY);
+			make_item_iter(view_collection, &iter, item);
 			show_filer_menu(filer_window,
 					(GdkEvent *) event, &iter);
 			break;
@@ -1570,21 +1576,61 @@ static void view_collection_show_cursor(ViewIface *view)
 	collection_move_cursor(collection, 0, 0);
 }
 
+/* The first time the next() method is used, this is called */
+static DirItem *iter_init(ViewIter *iter)
+{
+	ViewCollection *view_collection = iter->view_collection;
+	Collection *collection = view_collection->collection;
+	int i = -1;
+	int n = collection->number_of_items;
+	int flags = iter->flags;
+
+	g_return_val_if_fail(iter->n_remaining > 0, NULL);
+
+	if (flags & VIEW_ITER_FROM_CURSOR)
+		i = collection->cursor_item;
+	else if (flags & VIEW_ITER_FROM_BASE)
+		i = view_collection->cursor_base;
+	
+	if (i < 0 || i >= n)
+	{
+		/* Either a normal iteraction, or an iteration from an
+		 * invalid starting point.
+		 */
+		if (flags & VIEW_ITER_BACKWARDS)
+			i = n - 1;
+		else
+			i = 0;
+	}
+	
+	iter->peek = iter_peek;
+
+	if (i < 0 || i >= n)
+		return NULL;	/* No items at all! */
+
+	iter->next = flags & VIEW_ITER_BACKWARDS ? iter_prev : iter_next;
+	iter->n_remaining--;
+	iter->i = i;
+
+	if (flags & VIEW_ITER_SELECTED && !collection->items[i].selected)
+		return iter->next(iter);
+	return iter->peek(iter);
+}
 /* Advance iter to point to the next item and return the new item
  * (this saves you calling peek after next each time).
  */
 static DirItem *iter_next(ViewIter *iter)
 {
-	Collection *collection = iter->collection;
+	Collection *collection = iter->view_collection->collection;
 	int n = collection->number_of_items;
 	int i = iter->i;
 
 	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
 
-	/* i is the last item returned (or -1 on the first call) */
+	/* i is the last item returned (always valid) */
 
-	g_return_val_if_fail(i >= -1 && i < n, NULL);
-
+	g_return_val_if_fail(i >= 0 && i < n, NULL);
+	
 	while (iter->n_remaining)
 	{
 		i++;
@@ -1610,22 +1656,22 @@ static DirItem *iter_next(ViewIter *iter)
 /* Like iter_next, but in the other direction */
 static DirItem *iter_prev(ViewIter *iter)
 {
-	Collection *collection = iter->collection;
+	Collection *collection = iter->view_collection->collection;
 	int n = collection->number_of_items;
 	int i = iter->i;
 
 	g_return_val_if_fail(iter->n_remaining >= 0, NULL);
 
-	/* i is the last item returned (or -1 on the first call) */
+	/* i is the last item returned (always valid) */
 
-	g_return_val_if_fail(i >= -1 && i < n, NULL);
+	g_return_val_if_fail(i >= 0 && i < n, NULL);
 
 	while (iter->n_remaining)
 	{
 		i--;
 		iter->n_remaining--;
 
-		if (i < 0)
+		if (i == -1)
 			i = collection->number_of_items - 1;
 
 		g_return_val_if_fail(i >= 0 && i < n, NULL);
@@ -1644,44 +1690,60 @@ static DirItem *iter_prev(ViewIter *iter)
 
 static DirItem *iter_peek(ViewIter *iter)
 {
+	Collection *collection = iter->view_collection->collection;
 	int i = iter->i;
 
 	if (i == -1)
 		return NULL;
 	
-	g_return_val_if_fail(i >= 0 && i < iter->collection->number_of_items,
-				NULL);
+	g_return_val_if_fail(i >= 0 && i < collection->number_of_items, NULL);
 
-	return iter->collection->items[i].data;
+	return collection->items[i].data;
 }
 
-/* Create an iterator on item 'i'. Calling next will return NULL. */
-static void make_item_iter(ViewCollection *vc, ViewIter *iter,
-			   int i, IterFlags flags)
+static void make_iter(ViewCollection *view_collection, ViewIter *iter,
+		      IterFlags flags)
 {
-	iter->collection = vc->collection;
-	iter->next = flags & VIEW_ITER_BACKWARDS ? iter_prev : iter_next;
-	iter->peek = iter_peek;
-	iter->i = i;
+	Collection *collection = view_collection->collection;
+
+	iter->view_collection = view_collection;
+	iter->next = iter_init;
+	iter->peek = NULL;
+	iter->i = -1;
 
 	iter->flags = flags;
 
 	if (flags & VIEW_ITER_ONE_ONLY)
-		iter->n_remaining = 0;
+	{
+		iter->n_remaining = 1;
+		iter->next(iter);
+	}
 	else
-		iter->n_remaining = iter->collection->number_of_items;
+		iter->n_remaining = collection->number_of_items;
+}
+
+/* Set the iterator to return 'i' on the next peek() */
+static void make_item_iter(ViewCollection *view_collection,
+			   ViewIter *iter, int i)
+{
+	Collection *collection = view_collection->collection;
+
+	g_return_if_fail(i >= -1 && i < collection->number_of_items);
+
+	make_iter(view_collection, iter, 0);
+
+	iter->i = i;
+	iter->next = iter_next;
+	iter->peek = iter_peek;
+	iter->n_remaining = 0;
 }
 
 static void view_collection_get_iter(ViewIface *view,
 				     ViewIter *iter, IterFlags flags)
 {
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
-	Collection	*collection = view_collection->collection;
 
-	make_item_iter(view_collection, iter, -1, flags);
-
-	if (flags & VIEW_ITER_FROM_CURSOR && collection->number_of_items)
-		iter->i = collection->cursor_item;
+	make_iter(view_collection, iter, flags);
 }
 
 static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
@@ -1689,7 +1751,8 @@ static void view_collection_cursor_to_iter(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 	
-	g_return_if_fail(iter == NULL || iter->collection == collection);
+	g_return_if_fail(iter == NULL ||
+			 iter->view_collection == view_collection);
 
 	collection_set_cursor_item(collection, iter ? iter->i : -1);
 }
@@ -1701,7 +1764,8 @@ static void view_collection_set_selected(ViewIface *view,
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 	
-	g_return_if_fail(iter != NULL && iter->collection == collection);
+	g_return_if_fail(iter != NULL &&
+			 iter->view_collection == view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	if (selected)
@@ -1715,8 +1779,8 @@ static gboolean view_collection_get_selected(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 
-	g_return_val_if_fail(iter != NULL && iter->collection == collection,
-			FALSE);
+	g_return_val_if_fail(iter != NULL &&
+			iter->view_collection == view_collection, FALSE);
 	g_return_val_if_fail(iter->i >= 0 &&
 				iter->i < collection->number_of_items, FALSE);
 	
@@ -1728,7 +1792,8 @@ static void view_collection_select_only(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 
-	g_return_if_fail(iter != NULL && iter->collection == collection);
+	g_return_if_fail(iter != NULL &&
+			 iter->view_collection == view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	collection_clear_except(collection, iter->i);
@@ -1751,7 +1816,8 @@ static void view_collection_wink_item(ViewIface *view, ViewIter *iter)
 	ViewCollection	*view_collection = VIEW_COLLECTION(view);
 	Collection	*collection = view_collection->collection;
 
-	g_return_if_fail(iter != NULL && iter->collection == collection);
+	g_return_if_fail(iter != NULL &&
+			 iter->view_collection == view_collection);
 	g_return_if_fail(iter->i >= 0 && iter->i < collection->number_of_items);
 
 	collection_wink_item(collection, iter->i);
@@ -1852,6 +1918,13 @@ static gboolean view_collection_cursor_visible(ViewIface *view)
 	Collection	*collection = view_collection->collection;
 
 	return collection->cursor_item != -1;
+}
+
+static void view_collection_set_base(ViewIface *view, ViewIter *iter)
+{
+	ViewCollection	*view_collection = VIEW_COLLECTION(view);
+
+	view_collection->cursor_base = iter->i;
 }
 
 static void drag_end(GtkWidget *widget,

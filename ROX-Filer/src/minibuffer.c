@@ -35,7 +35,6 @@
 #include "global.h"
 
 #include "options.h"
-#include "collection.h"
 #include "find.h"
 #include "gui_support.h"
 #include "support.h"
@@ -60,7 +59,7 @@ static gboolean find_next_match(FilerWindow *filer_window,
 				int dir);
 static gboolean find_exact_match(FilerWindow *filer_window,
 				 const gchar *pattern);
-static gboolean matches(Collection *collection, int item, const char *pattern);
+static gboolean matches(ViewIter *iter, const char *pattern);
 static void search_in_dir(FilerWindow *filer_window, int dir);
 static const gchar *mini_contents(FilerWindow *filer_window);
 static void show_help(FilerWindow *filer_window);
@@ -112,9 +111,9 @@ void create_minibuffer(FilerWindow *filer_window)
 
 void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 {
-	Collection	*collection;
 	GtkEntry	*mini;
-	int		pos = -1, i;
+	int		pos = -1;
+	ViewIter	cursor;
 	
 	g_return_if_fail(filer_window != NULL);
 	g_return_if_fail(filer_window->minibuffer != NULL);
@@ -129,13 +128,13 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			mini_type == MINI_SELECT_IF ? _("Select If:") :
 			"?");
 
-	collection = filer_window->collection;
 	switch (mini_type)
 	{
 		case MINI_PATH:
 			view_show_cursor(filer_window->view);
-			filer_window->mini_cursor_base =
-					MAX(collection->cursor_item, 0);
+			view_get_cursor(filer_window->view, &cursor);
+			view_set_base(filer_window->view, &cursor);
+
 			gtk_entry_set_text(mini,
 				make_path(filer_window->sym_path, "")->str);
 			if (filer_window->temp_show_hidden)
@@ -149,14 +148,15 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			filer_window->mini_cursor_base = -1;	/* History */
 			break;
 		case MINI_SHELL:
+		{
+			DirItem *item;
+			view_get_cursor(filer_window->view, &cursor);
+			item = cursor.peek(&cursor);
 			pos = 0;
-			i = collection->cursor_item;
 			if (view_count_selected(filer_window->view) > 0)
 				gtk_entry_set_text(mini, " \"$@\"");
-			else if (i > -1 && i < collection->number_of_items)
+			else if (item)
 			{
-				DirItem *item = (DirItem *) 
-						collection->items[i].data;
 				guchar *tmp;
 
 				tmp = g_strconcat(" ", item->leafname, NULL);
@@ -167,6 +167,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 				gtk_entry_set_text(mini, "");
 			filer_window->mini_cursor_base = -1;	/* History */
 			break;
+		}
 		default:
 			g_warning("Bad minibuffer type\n");
 			return;
@@ -263,7 +264,6 @@ static void show_help(FilerWindow *filer_window)
 
 static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 {
-	Collection 	*collection = filer_window->collection;
 	const gchar	*path, *pattern;
 	int		flags = OPEN_FROM_MINI | OPEN_SAME_WINDOW;
 	ViewIter	iter;
@@ -275,7 +275,7 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 	view_get_cursor(filer_window->view, &iter);
 
 	item = iter.peek(&iter);
-	if (item == NULL || !matches(collection, iter.i, pattern)) /* XXX */
+	if (item == NULL || !matches(&iter, pattern))
 	{
 		gdk_beep();
 		return;
@@ -294,7 +294,6 @@ static void path_return_pressed(FilerWindow *filer_window, GdkEventKey *event)
 static void complete(FilerWindow *filer_window)
 {
 	GtkEntry	*entry;
-	Collection 	*collection = filer_window->collection;
 	DirItem 	*item, *other;
 	int		shortest_stem = -1;
 	int		current_stem;
@@ -321,7 +320,7 @@ static void complete(FilerWindow *filer_window)
 	}
 
 	leaf++;
-	if (!matches(collection, cursor.i, leaf)) /* XXX */
+	if (!matches(&cursor, leaf))
 	{
 		gdk_beep();
 		return;
@@ -476,11 +475,11 @@ static gboolean find_exact_match(FilerWindow *filer_window,
 	return FALSE;
 }
 
-/* Find the next item in the collection that matches 'pattern'. Start from
- * mini_cursor_base and loop at either end. dir is 1 for a forward search,
+/* Find the next item in the view that matches 'pattern'. Start from
+ * cursor_base and loop at either end. dir is 1 for a forward search,
  * -1 for backwards. 0 means forwards, but may stay the same.
  *
- * Does not automatically update mini_cursor_base.
+ * Does not automatically update cursor_base.
  *
  * Returns TRUE if a match is found.
  */
@@ -488,45 +487,43 @@ static gboolean find_next_match(FilerWindow *filer_window,
 				const char *pattern,
 				int dir)
 {
-	Collection *collection = filer_window->collection;
-	int 	   base = filer_window->mini_cursor_base;
-	int 	   item = base;
-	gboolean   retval = TRUE;
+	ViewIface  *view = filer_window->view;
+	ViewIter   iter;
 
-	if (collection->number_of_items < 1)
+	if (view_count_items(view) < 1)
 		return FALSE;
 
-	if (base < 0 || base>= collection->number_of_items)
-		filer_window->mini_cursor_base = base = 0;
+	view_get_iter(view, &iter,
+		VIEW_ITER_FROM_BASE |
+		(dir >= 0 ? 0 : VIEW_ITER_BACKWARDS));
 
-	do
+	if (dir != 0)
+		iter.next(&iter);	/* Don't look at the base itself */
+
+	while (iter.next(&iter))
 	{
-		/* Step to the next item */
-		item += dir;
-
-		if (item >= collection->number_of_items)
-			item = 0;
-		else if (item < 0)
-			item = collection->number_of_items - 1;
-
-		if (dir == 0)
-			dir = 1;
-		else if (item == base)
+		if (matches(&iter, pattern))
 		{
-			retval = FALSE;
-			break;		/* No (other) matches at all */
+			view_cursor_to_iter(view, &iter);
+			return TRUE;
 		}
-	} while (!matches(collection, item, pattern));
+	}
 
-	collection_set_cursor_item(collection, item);
+	/* No matches (except possibly base itself) */
+	view_get_iter(view, &iter,
+		VIEW_ITER_FROM_BASE | VIEW_ITER_ONE_ONLY |
+		(dir >= 0 ? 0 : VIEW_ITER_BACKWARDS));
 
-	return retval;
+	view_cursor_to_iter(view, &iter);
+
+	return FALSE;
 }
 
-static gboolean matches(Collection *collection,
-			int item_number, const char *pattern)
+static gboolean matches(ViewIter *iter, const char *pattern)
 {
-	DirItem *item = (DirItem *) collection->items[item_number].data;
+	DirItem *item;
+	
+	item = iter->peek(iter);
 	
 	return strncmp(item->leafname, pattern, strlen(pattern)) == 0;
 }
@@ -535,13 +532,16 @@ static gboolean matches(Collection *collection,
 static void search_in_dir(FilerWindow *filer_window, int dir)
 {
 	const char *path, *pattern;
+	ViewIter iter;
 
 	path = gtk_entry_get_text(GTK_ENTRY(filer_window->minibuffer));
 	pattern = g_basename(path);
 	
-	filer_window->mini_cursor_base = filer_window->collection->cursor_item;
+	view_get_cursor(filer_window->view, &iter);
+	view_set_base(filer_window->view, &iter);
 	find_next_match(filer_window, pattern, dir);
-	filer_window->mini_cursor_base = filer_window->collection->cursor_item;
+	view_get_cursor(filer_window->view, &iter);
+	view_set_base(filer_window->view, &iter);
 }
 
 /*			SHELL COMMANDS			*/

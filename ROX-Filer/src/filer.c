@@ -169,9 +169,12 @@ static gboolean if_deleted(gpointer item, gpointer removed)
 	return FALSE;
 }
 
-/* Resize the filer window to w x h pixels, plus border (not clamped) */
+/* Resize the filer window to w x h pixels, plus border (not clamped).
+ * If triggered by a key event, warp the pointer (for SloppyFocus users).
+ */
 void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 {
+	GdkEvent *event;
 	GtkWidget *window;
 
 	g_return_if_fail(filer_window != NULL);
@@ -209,6 +212,18 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 	}
 	else
 		gtk_window_set_default_size(GTK_WINDOW(window), w, h);
+
+	event = gtk_get_current_event();
+	if (event && event->type == GDK_KEY_PRESS)
+	{
+		GdkWindow *win = filer_window->window->window;
+		
+		XWarpPointer(gdk_x11_drawable_get_xdisplay(win),
+			     None,
+			     gdk_x11_drawable_get_xid(win),
+			     0, 0, 0, 0,
+			     w - 4, h - 4);
+	}
 }
 
 /* Resize the window to fit the items currently in the Directory.
@@ -890,6 +905,7 @@ static void tidy_sympath(gchar *path)
 /* Make filer_window display path. When finished, highlight item 'from', or
  * the first item if from is NULL. If there is currently no cursor then
  * simply wink 'from' (if not NULL).
+ * If the cause was a key event and we resize, warp the pointer.
  */
 void filer_change_to(FilerWindow *filer_window,
 			const char *path, const char *from)

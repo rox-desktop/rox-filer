@@ -26,6 +26,11 @@ typedef enum {
 
 	/* next() always returns NULL and has no effect */
 	VIEW_ITER_ONE_ONLY	= 1 << 3,
+
+	/* Like FROM_CURSOR, but using the base position. The base is set
+	 * from the cursor position when the path minibuffer is opened.
+	 */
+	VIEW_ITER_FROM_BASE	= 1 << 4,
 } IterFlags;
 
 typedef struct _ViewIfaceClass	ViewIfaceClass;
@@ -37,7 +42,7 @@ struct _ViewIter {
 	DirItem	   *(*next)(ViewIter *iter);
 
 	/* private fields */
-	Collection *collection;
+	ViewCollection *view_collection;
 	int	   i, n_remaining;
 	int	   flags;
 };
@@ -70,6 +75,7 @@ struct _ViewIfaceClass {
 	void (*wink_item)(ViewIface *obj, ViewIter *iter);
 	void (*autosize)(ViewIface *obj);
 	gboolean (*cursor_visible)(ViewIface *obj);
+	void (*set_base)(ViewIface *obj, ViewIter *iter);
 };
 
 #define VIEW_TYPE_IFACE           (view_iface_get_type())
@@ -121,5 +127,6 @@ void view_select_if(ViewIface *obj,
 void view_wink_item(ViewIface *obj, ViewIter *iter);
 void view_autosize(ViewIface *obj);
 gboolean view_cursor_visible(ViewIface *obj);
+void view_set_base(ViewIface *obj, ViewIter *iter);
 
 #endif /* __VIEW_IFACE_H__ */

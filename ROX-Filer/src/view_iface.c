@@ -311,3 +311,13 @@ gboolean view_cursor_visible(ViewIface *obj)
 
 	return VIEW_IFACE_GET_CLASS(obj)->cursor_visible(obj);
 }
+
+/* The 'base' position is used to record the position of the cursor
+ * when the minibuffer is opened, for interactive searching.
+ */
+void view_set_base(ViewIface *obj, ViewIter *iter)
+{
+	g_return_if_fail(VIEW_IS_IFACE(obj));
+
+	VIEW_IFACE_GET_CLASS(obj)->set_base(obj, iter);
+}
