@@ -18,6 +18,7 @@
 #include "directory.h"
 #include "gui_support.h"
 #include "filer.h"
+#include "pixmaps.h"
 
 static int number_of_windows = 0;
 
@@ -29,7 +30,6 @@ static void draw_item(GtkWidget *widget,
 			gpointer data,
 			gboolean selected,
 			GdkRectangle *area);
-
 
 static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
@@ -115,6 +115,8 @@ void filer_opendir(char *path)
 
 	gtk_widget_show_all(filer_window->window);
 	number_of_windows++;
+
+	load_default_pixmaps(collection->window);
 
 	if (!directory_scan(filer_window->dir, scan_callback, filer_window))
 		report_error("Error opening directory", g_strerror(errno));

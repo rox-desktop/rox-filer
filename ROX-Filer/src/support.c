@@ -28,3 +28,26 @@ char *pathdup(char *path)
 
 	return g_strdup(path);
 }
+
+/* Join the path to the leaf (adding a / between them) and
+ * return a pointer to a buffer with the result. Buffer is valid until
+ * the next call to make_path.
+ */
+GString *make_path(char *dir, char *leaf)
+{
+	static GString *buffer = NULL;
+
+	if (!buffer)
+		buffer = g_string_new(NULL);
+
+	g_return_val_if_fail(dir != NULL, buffer);
+	g_return_val_if_fail(leaf != NULL, buffer);
+
+	g_string_sprintf(buffer, "%s%s%s",
+			dir,
+			dir[0] == '/' && dir[1] == '\0' ? "" : "/",
+			leaf);
+
+	return buffer;
+}
+
