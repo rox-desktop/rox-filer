@@ -348,29 +348,40 @@ static gboolean error_idle_cb(gpointer data)
 	return FALSE;
 }
 
-/* Display an error with "ROX-Filer" as title next time we are idle */
+/* Display an error with "ROX-Filer" as title next time we are idle.
+ * If multiple errors are reported this way before the window is opened,
+ * all are displayed in a single window.
+ * If an error is reported while the error window is open, it is discarded.
+ */
 void delayed_error(char *error, ...)
 {
 	static char *delayed_error_data = NULL;
-	gboolean already_open;
+	char *old, *new;
 	va_list args;
 
 	g_return_if_fail(error != NULL);
 
-	already_open = delayed_error_data != NULL;
-
-	g_free(delayed_error_data);
+	old = delayed_error_data;
 
 	va_start(args, error);
-	delayed_error_data = g_strdup_vprintf(error, args);
+	new = g_strdup_vprintf(error, args);
 	va_end(args);
 
-	if (already_open)
-		return;
+	if (old)
+	{
+		delayed_error_data = g_strconcat(old,
+				_("\n--- next error ---\n"),
+				new, NULL);
+		g_free(old);
+		g_free(new);
+	}
+	else
+	{
+		delayed_error_data = new;
+		gtk_idle_add(error_idle_cb, &delayed_error_data);
 
-	gtk_idle_add(error_idle_cb, &delayed_error_data);
-
-	number_of_windows++;
+		number_of_windows++;
+	}
 }
 
 /* Load the file into memory. Return TRUE on success.
