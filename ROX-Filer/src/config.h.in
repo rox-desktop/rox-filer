@@ -19,6 +19,11 @@
 
 #undef HAVE_REGEX_H
 
+/* Enable extensions - used for dnotify support */
+#ifndef _GNU_SOURCE
+# define _GNU_SOURCE
+#endif
+
 #include "my_vfs.h"
 
 #include "rox_gettext.h"

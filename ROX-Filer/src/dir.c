@@ -67,6 +67,16 @@
 #include "pixmaps.h"
 #include "type.h"
 #include "usericons.h"
+#include "main.h"
+
+#ifdef USE_DNOTIFY
+/* Newer Linux kernels can tell use when the directories we are watching
+ * change using the dnotify system.
+ */
+static GHashTable *dnotify_fd_to_dir = NULL;
+gboolean dnotify_wakeup_flag = FALSE;
+static int dnotify_last_fd = -1;
+#endif
 
 GFSCache *dir_cache = NULL;
 
@@ -80,6 +90,10 @@ static void dir_recheck(Directory *dir,
 static GPtrArray *hash_to_array(GHashTable *hash);
 static void dir_force_update_item(Directory *dir, const gchar *leaf);
 static Directory *dir_new(const char *pathname);
+static void dir_rescan(Directory *dir);
+#ifdef USE_DNOTIFY
+static void dnotify_handler(int sig, siginfo_t *si, void *data);
+#endif
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -89,6 +103,20 @@ void dir_init(void)
 {
 	dir_cache = g_fscache_new((GFSLoadFunc) dir_new,
 				(GFSUpdateFunc) update, NULL);
+
+	/* Check for dnotify support in the kernel */
+#ifdef USE_DNOTIFY
+	{
+		struct sigaction act;
+
+		act.sa_sigaction = dnotify_handler;
+		sigemptyset(&act.sa_mask);
+		act.sa_flags = SA_SIGINFO;
+		sigaction(SIGRTMIN, &act, NULL);
+
+		dnotify_fd_to_dir = g_hash_table_new(NULL, NULL);
+	}
+#endif
 }
 
 /* Periodically calls callback to notify about changes to the contents
@@ -108,6 +136,29 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 	user = g_new(DirUser, 1);
 	user->callback = callback;
 	user->data = data;
+
+#ifdef USE_DNOTIFY
+	if (!dir->users)
+	{
+		int fd;
+		
+		if (dir->dnotify_fd != -1)
+			g_warning("dir_attach: dnotify error\n");
+		
+		fd = open(dir->pathname, O_RDONLY);
+		g_return_if_fail(g_hash_table_lookup(dnotify_fd_to_dir,
+				 GINT_TO_POINTER(fd)) == NULL);
+		if (fd != -1)
+		{
+			dir->dnotify_fd = fd;
+			g_hash_table_insert(dnotify_fd_to_dir,
+					GINT_TO_POINTER(fd), dir);
+			fcntl(fd, F_SETSIG, SIGRTMIN);
+			fcntl(fd, F_NOTIFY, DN_CREATE | DN_DELETE | DN_RENAME |
+					    DN_ATTRIB | DN_MULTISHOT);
+		}
+	}
+#endif
 	
 	dir->users = g_list_prepend(dir->users, user);
 
@@ -119,7 +170,7 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 	g_ptr_array_free(items, TRUE);
 
 	if (dir->needs_update && !dir->scanning)
-		dir_rescan(dir, dir->pathname);
+		dir_rescan(dir);
 
 	/* May start scanning if noone was watching before */
 	set_idle_callback(dir);
@@ -153,6 +204,15 @@ void dir_detach(Directory *dir, DirCallback callback, gpointer data)
 			/* May stop scanning if noone's watching */
 			set_idle_callback(dir);
 
+#ifdef USE_DNOTIFY
+			if (!dir->users && dir->dnotify_fd != -1)
+			{
+				close(dir->dnotify_fd);
+				g_hash_table_remove(dnotify_fd_to_dir,
+					GINT_TO_POINTER(dir->dnotify_fd));
+				dir->dnotify_fd = -1;
+			}
+#endif
 			return;
 		}
 	}
@@ -301,100 +361,9 @@ static gboolean recheck_callback(gpointer data)
 	dir->idle_callback = 0;
 
 	if (dir->needs_update)
-		dir_rescan(dir, dir->pathname);
+		dir_rescan(dir);
 
 	return FALSE;
-}
-
-/* Get the names of all files in the directory.
- * Remove any DirItems that are no longer listed.
- * Replace the recheck_list with the items found.
- */
-void dir_rescan(Directory *dir, const guchar *pathname)
-{
-	GPtrArray	*names;
-	DIR		*d;
-	struct dirent	*ent;
-	guint		i;
-
-	g_return_if_fail(dir != NULL);
-	g_return_if_fail(pathname != NULL);
-
-	dir->needs_update = FALSE;
-
-	names = g_ptr_array_new();
-
-	read_globicons();
-	mount_update(FALSE);
-	null_g_free(&dir->error);
-
-	/* Saves statting the parent for each item... */
-	if (mc_stat(pathname, &dir->stat_info))
-	{
-		dir->error = g_strdup_printf(_("Can't stat directory: %s"),
-				g_strerror(errno));
-		return;		/* Report on attach */
-	}
-
-	d = mc_opendir(pathname);
-	if (!d)
-	{
-		dir->error = g_strdup_printf(_("Can't open directory: %s"),
-				g_strerror(errno));
-		return;		/* Report on attach */
-	}
-
-	dir_set_scanning(dir, TRUE);
-	dir_merge_new(dir);
-	gdk_flush();
-
-	/* Make a list of all the names in the directory */
-	while ((ent = mc_readdir(d)))
-	{
-		if (ent->d_name[0] == '.')
-		{
-			if (ent->d_name[1] == '\0')
-				continue;		/* Ignore '.' */
-			if (ent->d_name[1] == '.' && ent->d_name[2] == '\0')
-				continue;		/* Ignore '..' */
-		}
-		
-		g_ptr_array_add(names, g_strdup(ent->d_name));
-	}
-
-	/* Sort, so the names are scanned in a sensible order */
-	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
-
-	/* Compare the list with the current DirItems, removing
-	 * any that are missing.
-	 */
-	remove_missing(dir, names);
-
-	free_recheck_list(dir);
-
-	/* For each name found, add it to the recheck_list.
-	 * If the item is new, put a blank place-holder item in the directory.
-	 */
-	for (i = 0; i < names->len; i++)
-	{
-		guchar *name = names->pdata[i];
-		dir->recheck_list = g_list_prepend(dir->recheck_list, name);
-		if (!g_hash_table_lookup(dir->known_items, name))
-		{
-			DirItem *new;
-
-			new = diritem_new(name);
-			g_ptr_array_add(dir->new_items, new);
-		}
-	}
-	dir_merge_new(dir);
-	
-	dir->recheck_list = g_list_reverse(dir->recheck_list);
-
-	g_ptr_array_free(names, TRUE);
-	mc_closedir(d);
-
-	set_idle_callback(dir);
 }
 
 /* Add all the new items to the items array.
@@ -438,6 +407,27 @@ void dir_merge_new(Directory *dir)
 	g_ptr_array_set_size(new, 0);
 	g_ptr_array_set_size(up, 0);
 }
+
+#ifdef USE_DNOTIFY
+/* Called from the mainloop shortly after dnotify_handler */
+void dnotify_wakeup(void)
+{
+	Directory *dir;
+
+	dnotify_wakeup_flag = FALSE;
+
+	dir = g_hash_table_lookup(dnotify_fd_to_dir,
+				  GINT_TO_POINTER(dnotify_last_fd));
+
+	if (!dir)
+		return;
+
+	if (dir->scanning)
+		dir->needs_update = TRUE;
+	else
+		dir_rescan(dir);
+}
+#endif
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -653,7 +643,7 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 	if (dir->scanning)
 		dir->needs_update = TRUE;
 	else
-		dir_rescan(dir, pathname);
+		dir_rescan(dir);
 
 	if (dir->error)
 		delayed_error(_("Error scanning '%s':\n%s"),
@@ -799,6 +789,9 @@ static void directory_init(GTypeInstance *object, gpointer gclass)
 	dir->notify_active = FALSE;
 	dir->pathname = NULL;
 	dir->error = NULL;
+#ifdef USE_DNOTIFY
+	dir->dnotify_fd = -1;
+#endif
 
 	dir->new_items = g_ptr_array_new();
 	dir->up_items = g_ptr_array_new();
@@ -841,3 +834,110 @@ static Directory *dir_new(const char *pathname)
 	
 	return dir;
 }
+
+/* Get the names of all files in the directory.
+ * Remove any DirItems that are no longer listed.
+ * Replace the recheck_list with the items found.
+ */
+static void dir_rescan(Directory *dir)
+{
+	GPtrArray	*names;
+	DIR		*d;
+	struct dirent	*ent;
+	guint		i;
+	const char	*pathname;
+
+	g_return_if_fail(dir != NULL);
+
+	pathname = dir->pathname;
+
+	dir->needs_update = FALSE;
+
+	names = g_ptr_array_new();
+
+	read_globicons();
+	mount_update(FALSE);
+	null_g_free(&dir->error);
+
+	/* Saves statting the parent for each item... */
+	if (mc_stat(pathname, &dir->stat_info))
+	{
+		dir->error = g_strdup_printf(_("Can't stat directory: %s"),
+				g_strerror(errno));
+		return;		/* Report on attach */
+	}
+
+	d = mc_opendir(pathname);
+	if (!d)
+	{
+		dir->error = g_strdup_printf(_("Can't open directory: %s"),
+				g_strerror(errno));
+		return;		/* Report on attach */
+	}
+
+	dir_set_scanning(dir, TRUE);
+	dir_merge_new(dir);
+	gdk_flush();
+
+	/* Make a list of all the names in the directory */
+	while ((ent = mc_readdir(d)))
+	{
+		if (ent->d_name[0] == '.')
+		{
+			if (ent->d_name[1] == '\0')
+				continue;		/* Ignore '.' */
+			if (ent->d_name[1] == '.' && ent->d_name[2] == '\0')
+				continue;		/* Ignore '..' */
+		}
+		
+		g_ptr_array_add(names, g_strdup(ent->d_name));
+	}
+
+	/* Sort, so the names are scanned in a sensible order */
+	qsort(names->pdata, names->len, sizeof(guchar *), sort_names);
+
+	/* Compare the list with the current DirItems, removing
+	 * any that are missing.
+	 */
+	remove_missing(dir, names);
+
+	free_recheck_list(dir);
+
+	/* For each name found, add it to the recheck_list.
+	 * If the item is new, put a blank place-holder item in the directory.
+	 */
+	for (i = 0; i < names->len; i++)
+	{
+		guchar *name = names->pdata[i];
+		dir->recheck_list = g_list_prepend(dir->recheck_list, name);
+		if (!g_hash_table_lookup(dir->known_items, name))
+		{
+			DirItem *new;
+
+			new = diritem_new(name);
+			g_ptr_array_add(dir->new_items, new);
+		}
+	}
+	dir_merge_new(dir);
+	
+	dir->recheck_list = g_list_reverse(dir->recheck_list);
+
+	g_ptr_array_free(names, TRUE);
+	mc_closedir(d);
+
+	set_idle_callback(dir);
+}
+
+#ifdef USE_DNOTIFY
+/* Signal handler - don't do anything dangerous here */
+static void dnotify_handler(int sig, siginfo_t *si, void *data)
+{
+	/* Note: there is currently only one place to store the fd,
+	 * so we'll miss updates to several directories if they happen
+	 * close together.
+	 */
+	dnotify_last_fd = si->si_fd;
+	dnotify_wakeup_flag = TRUE;
+	write(to_wakeup_pipe, "\0", 1);	/* Wake up! */
+}
+#endif

@@ -45,7 +45,6 @@
 #include "main.h"
 #include "options.h"
 #include "support.h"
-#include "my_vfs.h"
 #include "fscache.h"
 #include "main.h"
 #include "xml.h"

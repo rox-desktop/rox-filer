@@ -11,6 +11,15 @@
 #include <sys/types.h>
 #include <dirent.h>
 
+#include <signal.h>
+#include <fcntl.h>
+
+/* Check for dnotify support */
+#if defined(DN_MULTISHOT) && defined(SIGRTMIN)
+# define USE_DNOTIFY
+extern gboolean dnotify_wakeup_flag;
+#endif
+
 typedef enum {
 	DIR_START_SCAN,	/* Set 'scanning' indicator */
 	DIR_END_SCAN,	/* Clear 'scanning' indicator */
@@ -71,6 +80,10 @@ struct _Directory
 	 * and scanning is not in progress, a rescan is triggered.
 	 */
 	gboolean	needs_update;
+
+#ifdef USE_DNOTIFY
+	int		dnotify_fd;	/* -1 if not watching */
+#endif
 };
 
 void dir_init(void);
@@ -80,8 +93,8 @@ void dir_update(Directory *dir, gchar *pathname);
 void refresh_dirs(const char *path);
 void dir_check_this(const guchar *path);
 DirItem *dir_update_item(Directory *dir, const gchar *leafname);
-void dir_rescan(Directory *dir, const guchar *pathname);
 void dir_merge_new(Directory *dir);
 void dir_force_update_path(const gchar *path);
+void dnotify_wakeup(void);
 
 #endif /* _DIR_H */

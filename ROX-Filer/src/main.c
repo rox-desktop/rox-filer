@@ -73,7 +73,7 @@
 #include "minibuffer.h"
 
 int number_of_windows = 0;	/* Quit when this reaches 0 again... */
-static int to_wakeup_pipe = -1;	/* Write here to get noticed */
+int to_wakeup_pipe = -1;	/* Write here to get noticed */
 
 /* Information about the ROX-Filer process */
 uid_t euid;
@@ -467,7 +467,7 @@ int main(int argc, char **argv)
 			close(fd);
 		}
 	}
-	
+
 	/* Initialize the rest of the filer... */
 
 	pixmaps_init();
@@ -590,6 +590,13 @@ static void show_features(void)
 # endif
 		  );
 #endif
+	g_print("%s... %s\n", _("Dnotify support"),
+#ifdef USE_DNOTIFY
+		_("Yes")
+#else
+		_("No")
+#endif
+	       );
 }
 
 static void soap_add(xmlNodePtr body,
@@ -662,4 +669,8 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 	
 	if (child_died_flag)
 		child_died_callback();
+#ifdef USE_DNOTIFY
+	if (dnotify_wakeup)
+		dnotify_wakeup();
+#endif
 }
