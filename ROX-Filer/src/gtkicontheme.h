@@ -96,22 +96,9 @@ GQuark gtk_icon_theme_error_quark (void) G_GNUC_CONST;
 GType         gtk_icon_theme_get_type              (void) G_GNUC_CONST;
 
 GtkIconTheme *gtk_icon_theme_new                   (void);
-GtkIconTheme *gtk_icon_theme_get_default           (void);
-GtkIconTheme *gtk_icon_theme_get_for_screen        (GdkScreen                   *screen);
-void          gtk_icon_theme_set_screen            (GtkIconTheme                *icon_theme,
-						    GdkScreen                   *screen);
-
-void          gtk_icon_theme_set_search_path       (GtkIconTheme                *icon_theme,
-						    const gchar                 *path[],
-						    gint                         n_elements);
 void          gtk_icon_theme_get_search_path       (GtkIconTheme                *icon_theme,
 						    gchar                      **path[],
 						    gint                        *n_elements);
-void          gtk_icon_theme_append_search_path    (GtkIconTheme                *icon_theme,
-						    const gchar                 *path);
-void          gtk_icon_theme_prepend_search_path   (GtkIconTheme                *icon_theme,
-						    const gchar                 *path);
-
 void          gtk_icon_theme_set_custom_theme      (GtkIconTheme                *icon_theme,
 						    const gchar                 *theme_name);
 
@@ -127,15 +114,7 @@ GdkPixbuf *   gtk_icon_theme_load_icon             (GtkIconTheme                
 						    GtkIconLookupFlags           flags,
 						    GError                     **error);
 
-GList *       gtk_icon_theme_list_icons            (GtkIconTheme                *icon_theme,
-						    const gchar                 *context);
-char *        gtk_icon_theme_get_example_icon_name (GtkIconTheme                *icon_theme);
-
 gboolean      gtk_icon_theme_rescan_if_needed      (GtkIconTheme                *icon_theme);
-
-void       gtk_icon_theme_add_builtin_icon  (const gchar *icon_name,
-					     gint         size,
-					     GdkPixbuf   *pixbuf);
 
 GType         gtk_icon_info_get_type (void);
 GtkIconInfo  *gtk_icon_info_copy     (GtkIconInfo *icon_info);
