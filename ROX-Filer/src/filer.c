@@ -1174,9 +1174,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 
 	attach(filer_window);
 
-	/* Make the window visible. Update number_of_windows BEFORE destroying
-	 * the old window!
-	 */
+	/* Update number_of_windows BEFORE destroying the old window! */
 	number_of_windows++;
 
 	/* If the user doesn't want duplicate windows then check
@@ -1207,6 +1205,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 
 	/* Create the top-level window widget */
 	filer_window->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
+	gtk_window_set_position(GTK_WINDOW(filer_window->window),
+				GTK_WIN_POS_MOUSE);
 	filer_set_title(filer_window);
 
 	/* The collection is the area that actually displays the files */

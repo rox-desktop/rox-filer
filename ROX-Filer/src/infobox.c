@@ -355,7 +355,10 @@ static GtkWidget *make_file_says(guchar *path)
 #else
 			tmp = strrchr(path, '/');
 			argv[1] = tmp + 1;
-			chdir(g_strndup(path, tmp - path));
+			if (tmp > path)
+				chdir(g_strndup(path, tmp - path));
+			else
+				chdir("/");
 #endif
 			if (execvp(argv[0], argv))
 				fprintf(stderr, "execvp() error: %s\n",
