@@ -120,10 +120,12 @@ enum
 {
 	TARGET_RAW,
 	TARGET_URI_LIST,
+	TARGET_RUN_ACTION,
 	TARGET_XDS,
 };
 
 GdkAtom XdndDirectSave0;
+GdkAtom _rox_run_action;
 GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
@@ -131,6 +133,7 @@ GdkAtom application_octet_stream;
 void dnd_init()
 {
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
+	_rox_run_action = gdk_atom_intern("_ROX_RUN_ACTION", FALSE);
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
@@ -337,11 +340,14 @@ static void create_uri_list(GString *string,
  *
  * We always provide text/uri-list. If we are dragging a single, regular file
  * then we also offer application/octet-stream and the type of the file.
+ *
+ * If the RUN_ACTION minibuffer is open then only drags to other executables
+ * shown in our windows are allowed.
  */
 void drag_selection(Collection 		*collection,
 		    GdkEventMotion 	*event,
 		    gint		number_selected,
-		    gpointer 		user_data)
+		    FilerWindow		*filer_window)
 {
 	GtkWidget	*widget;
 	MaskedPixmap	*image;
@@ -363,7 +369,18 @@ void drag_selection(Collection 		*collection,
 	
 	widget = GTK_WIDGET(collection);
 	
-	if (item && item->mime_type)
+	if (filer_window->mini_type == MINI_RUN_ACTION)
+	{
+		GtkTargetEntry 	target_table[] = {
+			{"_ROX_RUN_ACTION", 0, TARGET_RUN_ACTION},
+		};
+
+		if (collection->number_selected != 1)
+			return;
+
+		target_list = gtk_target_list_new(target_table, 1);
+	}
+	else if (item && item->mime_type)
 	{
 		MIME_type *t = item->mime_type;
 		
@@ -401,6 +418,8 @@ static void drag_end(GtkWidget *widget,
 			FilerWindow *filer_window)
 {
 	collection_clear_selection(filer_window->collection);
+	if (filer_window->mini_type == MINI_RUN_ACTION)
+		minibuffer_hide(filer_window);
 }
 
 /* Called when a remote app wants us to send it some data.
@@ -445,6 +464,19 @@ void drag_data_get(GtkWidget          		*widget,
 			delete_once_sent = TRUE;
 			g_string_free(string, FALSE);
 			break;
+		case	TARGET_RUN_ACTION:
+			item = selected_item(filer_window->collection);
+			if (item && item->mime_type)
+			{
+				MIME_type	*type = item->mime_type;
+				to_send = g_strconcat(type->media_type, "/",
+						type->subtype, NULL);
+				to_send_length = strlen(to_send);
+				delete_once_sent = TRUE;
+				break;
+			}
+			g_warning("drag_data_get: Can't find MIME-type\n");
+			return;
 		default:
 			delayed_error("drag_data_get",
 					_("Internal error - bad info type"));
@@ -474,6 +506,7 @@ void drag_set_dest(FilerWindow *filer_window)
 		{"text/uri-list", 0, TARGET_URI_LIST},
 		{"XdndDirectSave0", 0, TARGET_XDS},
 		{"application/octet-stream", 0, TARGET_RAW},
+		{"_ROX_RUN_ACTION", 0, TARGET_RUN_ACTION},
 	};
 
 	gtk_drag_dest_set(widget,
@@ -522,7 +555,25 @@ static gboolean drag_motion(GtkWidget		*widget,
 		? (DirItem *) filer_window->collection->items[item_number].data
 		: NULL;
 
-	if (item)
+	if (provides(context, _rox_run_action))
+	{
+		/* This is a special internal type. The user is dragging
+		 * to an executable item to set the run action.
+		 */
+		if (!item)
+			goto out;
+
+		if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+		{
+			type = drop_dest_prog;
+			new_path = make_path(filer_window->path,
+						item->leafname)->str;
+		}
+		else
+			goto out;
+
+	}
+	else if (item)
 	{
 		/* If we didn't drop onto a directory, application or
 		 * executable file then act as though the drop is to the
@@ -678,6 +729,9 @@ static gboolean drag_drop(GtkWidget 	*widget,
 		target = text_uri_list;
 	else if (provides(context, application_octet_stream))
 		target = application_octet_stream;
+	else if (dest_type == drop_dest_prog &&
+				provides(context, _rox_run_action))
+		target = _rox_run_action;
 	else
 	{
 		if (dest_type == drop_dest_dir)
@@ -698,6 +752,36 @@ static gboolean drag_drop(GtkWidget 	*widget,
 		gtk_drag_get_data(widget, context, target, time);
 
 	return TRUE;
+}
+
+static void got_run_action(GtkWidget 		*widget,
+			 GdkDragContext 	*context,
+			 GtkSelectionData 	*selection_data,
+			 guint32             	time)
+{
+	char	*type = selection_data->data;
+	char	*media, *sub;
+	char	*dest_path, *link;
+
+	g_return_if_fail(type != NULL);
+
+	dest_path = g_dataset_get_data(context, "drop_dest_path");
+
+	gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
+
+	sub = strchr(type, '/');
+	g_return_if_fail(sub != NULL);
+
+	media = g_strndup(type, sub - type);
+	sub++;
+
+	link = type_ask_which_action(media, sub);
+	g_free(media);
+	if (!link)
+		return;
+
+	if (symlink(dest_path, link))
+		delayed_error(PROJECT, g_strerror(errno));
 }
 
 /* Called when some data arrives from the remote app (which we asked for
@@ -731,6 +815,9 @@ static void drag_data_received(GtkWidget      		*widget,
 			break;
 		case TARGET_URI_LIST:
 			got_uri_list(widget, context, selection_data, time);
+			break;
+		case TARGET_RUN_ACTION:
+			got_run_action(widget, context, selection_data, time);
 			break;
 		default:
 			gtk_drag_finish(context, FALSE, FALSE, time);

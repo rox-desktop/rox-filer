@@ -15,7 +15,7 @@
 void drag_selection(Collection 		*collection,
 		    GdkEventMotion 	*event,
 		    gint		number_selected,
-		    gpointer 		user_data);
+		    FilerWindow		*filer_window);
 void drag_data_get(GtkWidget          *widget,
 		   GdkDragContext     *context,
 		   GtkSelectionData   *selection_data,

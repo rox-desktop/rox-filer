@@ -1079,12 +1079,6 @@ void filer_openitem(FilerWindow *filer_window, int item_number, OpenFlags flags)
 		minibuffer_add(filer_window, item->leafname);
 		return;
 	}
-	else if (filer_window->mini_type == MINI_RUN_ACTION)
-	{
-		collection_set_cursor_item(filer_window->collection,
-						item_number);
-		return;
-	}
 	
 	full_path = make_path(filer_window->path,
 			item->leafname)->str;

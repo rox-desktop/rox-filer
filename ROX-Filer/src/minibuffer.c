@@ -575,18 +575,16 @@ gboolean set_run_action(FilerWindow *filer_window, guchar *command)
 	if (n < 0 || n >= collection->number_of_items)
 	{
 		delayed_error(PROJECT,
-	_("You must have the cursor on the item to use for '$1'. Clicking "
-	  "on an item will select it."));
+		_("You must have the cursor on the item to use for '$1'."));
 		return FALSE;
 	}
 
 	item = (DirItem *) collection->items[n].data;
-	path = type_ask_which_action(item->mime_type);
+	path = type_ask_which_action(item->mime_type->media_type,
+					item->mime_type->subtype);
 
 	if (!path)
 		return TRUE;
-
-	report_error("Setting action!", path);
 
 	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
 	len = strlen(tmp);
