@@ -50,6 +50,7 @@
 #include "main.h"
 #include "filer.h"
 #include "dir.h"
+#include "diritem.h"
 #include "choices.h"
 #include "options.h"
 #include "action.h"
@@ -369,12 +370,21 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 
 	if (child == 0)
 	{
-		/* We are the child process */
+		/* We are the child process.  (We are sloppy with freeing
+		 memory, but since we go away very quickly, that's ok.) */
 		if (thumb_prog)
 		{
+			DirItem *item=diritem_new(g_basename(thumb_prog));
+
+			diritem_restat(thumb_prog, item, NULL);
+			if(item->flags & ITEM_FLAG_APPDIR)
+				thumb_prog=g_strconcat(thumb_prog, "/AppRun",
+						       NULL);
+						  
 			execl(thumb_prog, thumb_prog, path,
-				thumbnail_path(path),
-				g_strdup_printf("%d", PIXMAP_THUMB_SIZE), NULL);
+			      thumbnail_path(path),
+			      g_strdup_printf("%d", PIXMAP_THUMB_SIZE),
+			      NULL);
 			_exit(1);
 		}
 
