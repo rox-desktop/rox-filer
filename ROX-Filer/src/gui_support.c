@@ -375,7 +375,7 @@ GtkWidget *new_help_button(HelpFunc show_help, gpointer data)
 	
 	b = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(b), GTK_RELIEF_NONE);
-	icon = gtk_image_new_from_stock(GTK_STOCK_DIALOG_INFO,
+	icon = gtk_image_new_from_stock(GTK_STOCK_HELP,
 					GTK_ICON_SIZE_SMALL_TOOLBAR);
 	gtk_container_add(GTK_CONTAINER(b), icon);
 	g_signal_connect_swapped(b, "clicked", G_CALLBACK(show_help), data);
