@@ -7,21 +7,12 @@
 
 #include <glib.h>
 #include <sys/stat.h>
+#include <time.h>
 
 typedef struct _FindCondition FindCondition;
 typedef struct _FindInfo FindInfo;
 typedef gboolean (*FindTest)(FindCondition *condition, FindInfo *info);
 typedef void (*FindFree)(FindCondition *condition);
-
-struct _FindCondition
-{
-	FindTest	test;
-	FindFree	free;
-	/* These next three depend on the first two... */
-	gpointer	data1;
-	gpointer	data2;
-	gint		value;
-};
 
 struct _FindInfo
 {

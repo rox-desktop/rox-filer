@@ -67,6 +67,7 @@ struct _Collection
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;
 	int		paint_level;	/* Complete redraw on next paint? */
+	GdkGC		*bg_gc;		/* NULL unless pixmap background */
 	
 	gboolean	lasso_box;	/* Is the box drawn? */
 	int		drag_box_x[2];	/* Index 0 is the fixed corner */

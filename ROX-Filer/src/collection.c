@@ -330,6 +330,7 @@ static void collection_init(Collection *object)
 	object->vadj = NULL;
 	object->paint_level = PAINT_OVERWRITE;
 	object->last_scroll = 0;
+	object->bg_gc = NULL;
 
 	object->items = g_malloc(sizeof(CollectionItem) * MINIMUM_ITEMS);
 	object->cursor_item = -1;
@@ -402,6 +403,12 @@ static void collection_destroy(GtkObject *object)
 	gtk_signal_disconnect_by_data(GTK_OBJECT(collection->vadj),
 			collection);
 
+	 if (collection->bg_gc)
+	 {
+		 gdk_gc_destroy(collection->bg_gc);
+		 collection->bg_gc = NULL;
+	 }
+
 	if (GTK_OBJECT_CLASS(parent_class)->destroy)
 		(*GTK_OBJECT_CLASS(parent_class)->destroy)(object);
 }
@@ -419,6 +426,17 @@ static void collection_finalize(GtkObject *object)
 	}
 
 	g_free(collection->items);
+}
+
+static GdkGC *create_bg_gc(GtkWidget *widget)
+{
+	GdkGCValues values;
+
+	values.tile = widget->style->bg_pixmap[GTK_STATE_INSENSITIVE];
+	values.fill = GDK_TILED;
+
+	return gdk_gc_new_with_values(widget->window, &values,
+			GDK_GC_FILL | GDK_GC_TILE);
 }
 
 static void collection_realize(GtkWidget *widget)
@@ -460,6 +478,8 @@ static void collection_realize(GtkWidget *widget)
 
 	gdk_window_set_background(widget->window,
 			&widget->style->base[GTK_STATE_INSENSITIVE]);
+	if (widget->style->bg_pixmap[GTK_STATE_INSENSITIVE])
+		collection->bg_gc = create_bg_gc(widget);
 
 	/* Try to stop everything flickering horribly */
 	gdk_window_set_static_gravities(widget->window, TRUE);
@@ -538,8 +558,40 @@ static void collection_set_style(GtkWidget *widget,
 
 	collection->paint_level = PAINT_CLEAR;
 
-	if (parent_class->style_set)
-		(*parent_class->style_set)(widget, previous_style);
+	if (GTK_WIDGET_REALIZED(widget))
+	{
+		gdk_window_set_background(widget->window,
+				&widget->style->base[GTK_STATE_INSENSITIVE]);
+
+		if (collection->bg_gc)
+		{
+			gdk_gc_destroy(collection->bg_gc);
+			collection->bg_gc = NULL;
+		}
+
+		if (widget->style->bg_pixmap[GTK_STATE_INSENSITIVE])
+			collection->bg_gc = create_bg_gc(widget);
+	}
+}
+
+static void clear_area(Collection *collection, GdkRectangle *area)
+{
+	GtkWidget	*widget = GTK_WIDGET(collection);
+	int		scroll = collection->vadj->value;
+
+	if (collection->bg_gc)
+	{
+		gdk_gc_set_ts_origin(collection->bg_gc, 0, -scroll);
+
+		gdk_draw_rectangle(widget->window,
+				collection->bg_gc,
+				TRUE,
+				area->x, area->y,
+				area->width, area->height);
+	}
+	else
+		gdk_window_clear_area(widget->window,
+				area->x, area->y, area->width, area->height);
 }
 
 static gint collection_paint(Collection 	*collection,
@@ -573,7 +625,7 @@ static gint collection_paint(Collection 	*collection,
 
 		if (collection->paint_level == PAINT_CLEAR
 				&& !collection->lasso_box)
-			gdk_window_clear(widget->window);
+			clear_area(collection, area);
 
 		collection->paint_level = PAINT_NORMAL;
 	}
@@ -602,8 +654,7 @@ static gint collection_paint(Collection 	*collection,
 		clip.height = (last_row - start_row + 1)
 			* collection->item_height;
 
-		gdk_window_clear_area(widget->window,
-				clip.x, clip.y, clip.width, clip.height);
+		clear_area(collection, &clip);
 	}
 
 	if (start_col < collection->columns)
@@ -839,11 +890,17 @@ static void collection_draw(GtkWidget *widget, GdkRectangle *area)
 
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 {
+	Collection	*collection;
+	
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
 	g_return_val_if_fail(event != NULL, FALSE);
 
-	collection_paint(COLLECTION(widget), &event->area);
+	collection = COLLECTION(widget);
+
+	clear_area(collection, &event->area);
+
+	collection_paint(collection, &event->area);
 
 	return FALSE;
 }
@@ -907,9 +964,7 @@ static void scroll_by(Collection *collection, gint diff)
 	else
 		collection->paint_level = PAINT_CLEAR;
 
-	gdk_window_clear_area(widget->window,
-			0, new_area.y,
-			width, new_area.height);
+	clear_area(collection, &new_area);
 	collection_paint(collection, NULL);
 }
 
@@ -1570,8 +1625,7 @@ static void collection_clear_except(Collection *collection, gint exception)
 				- scroll;
 
 		collection->items[item++].selected = FALSE;
-		gdk_window_clear_area(widget->window,
-				area.x, area.y, area.width, area.height);
+		clear_area(collection, &area);
 		collection_paint(collection, &area);
 		
 		collection->number_selected--;
@@ -1801,8 +1855,7 @@ void collection_select_all(Collection *collection)
 				- scroll;
 
 		collection->items[item++].selected = TRUE;
-		gdk_window_clear_area(widget->window,
-				area.x, area.y, area.width, area.height);
+		clear_area(collection, &area);
 		collection_paint(collection, &area);
 		
 		collection->number_selected++;
@@ -1862,8 +1915,7 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 	area.height = area_height;
 			
 	if (blank || collection->lasso_box)
-		gdk_window_clear_area(widget->window,
-				area.x, area.y, area.width, area.height);
+		clear_area(collection, &area);
 
 	draw_one_item(collection, item, &area);
 

@@ -343,8 +343,6 @@ static gint purge(gpointer data)
 
 #ifdef HAVE_IMLIB
 
-#define GREY_BG 0xd8
-
 /* Returns data to make an 1/4 size image of 'big'. g_free() the result. */
 static GdkImlibImage *make_half_size(GdkImlibImage *big)
 {
@@ -355,6 +353,8 @@ static GdkImlibImage *make_half_size(GdkImlibImage *big)
 	unsigned char	*small_data, *in, *out;
 	GdkImlibImage	*small;
 	int		x, y;
+	GtkStyle	*style = gtk_widget_get_default_style();
+	GdkColor	*bg = &style->bg[GTK_STATE_INSENSITIVE];
 
 	gdk_imlib_get_image_shape(big, &tr);
 	small_data = g_malloc(sw * sh * 3);
@@ -376,13 +376,33 @@ static GdkImlibImage *make_half_size(GdkImlibImage *big)
 			int	m = 0;		/* No. trans pixels */
 
 			if (r1 == tr.r && g1 == tr.g && b1 == tr.b)
-				r1 = g1 = b1 = GREY_BG, m++;
+			{
+				r1 = bg->red;
+				g1 = bg->green;
+				b1 = bg->blue;
+				m++;
+			}
 			if (r2 == tr.r && g2 == tr.g && b2 == tr.b)
-				r2 = g2 = b2 = GREY_BG, m++;
+			{
+				r2 = bg->red;
+				g2 = bg->green;
+				b2 = bg->blue;
+				m++;
+			}
 			if (r3 == tr.r && g3 == tr.g && b3 == tr.b)
-				r3 = g3 = b3 = GREY_BG, m++;
+			{
+				r3 = bg->red;
+				g3 = bg->green;
+				b3 = bg->blue;
+				m++;
+			}
 			if (r4 == tr.r && g4 == tr.g && b4 == tr.b)
-				r4 = g4 = b4 = GREY_BG, m++;
+			{
+				r4 = bg->red;
+				g4 = bg->green;
+				b4 = bg->blue;
+				m++;
+			}
 
 			if (m < 3)
 			{

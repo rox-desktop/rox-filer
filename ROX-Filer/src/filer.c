@@ -642,8 +642,9 @@ static void draw_string(GtkWidget *widget,
 {
 	int		text_height = font->ascent + font->descent;
 	GdkRectangle	clip;
-	GdkGC		*gc = selected ? widget->style->white_gc
-				       : widget->style->black_gc;
+	GdkGC		*gc = selected
+			? widget->style->fg_gc[GTK_STATE_SELECTED]
+			: widget->style->fg_gc[GTK_STATE_NORMAL];
 
 	if (selected)
 		gtk_paint_flat_box(widget->style, widget->window, 

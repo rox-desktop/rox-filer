@@ -102,6 +102,16 @@ enum
 typedef long (*EvalCalc)(Eval *eval, FindInfo *info);
 typedef void (*EvalFree)(Eval *eval);
 
+struct _FindCondition
+{
+	FindTest	test;
+	FindFree	free;
+	/* These next three depend on the first two... */
+	gpointer	data1;
+	gpointer	data2;
+	gint		value;
+};
+
 struct _Eval
 {
 	EvalCalc	calc;
