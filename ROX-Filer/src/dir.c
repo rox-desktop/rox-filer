@@ -203,7 +203,10 @@ void dir_check_this(const guchar *path)
 	dir = g_fscache_lookup_full(dir_cache, real_path,
 					FSCACHE_LOOKUP_PEEK, NULL);
 	if (dir)
+	{
 		dir_recheck(dir, real_path, g_basename(path));
+		g_fscache_data_unref(dir_cache, dir);
+	}
 	
 	g_free(real_path);
 }
@@ -223,7 +226,10 @@ void dir_force_update_path(const gchar *path)
 	dir = g_fscache_lookup_full(dir_cache, dir_path, FSCACHE_LOOKUP_PEEK,
 			NULL);
 	if (dir)
+	{
 		dir_force_update_item(dir, g_basename(path));
+		g_fscache_data_unref(dir_cache, dir);
+	}
 	
 	g_free(dir_path);
 }

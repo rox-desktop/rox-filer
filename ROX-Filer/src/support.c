@@ -48,6 +48,7 @@
 #include "fscache.h"
 #include "i18n.h"
 #include "main.h"
+#include "xml.h"
 
 static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
@@ -55,32 +56,28 @@ static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 /* Static prototypes */
 static void MD5Transform(guint32 buf[4], guint32 const in[16]);
 
-/* Static prototypes */
-static XMLwrapper *xml_load(char *pathname, gpointer data);
-static void xml_ref(XMLwrapper *dir, gpointer data);
-static void xml_unref(XMLwrapper *dir, gpointer data);
-static int xml_getref(XMLwrapper *dir, gpointer data);
-
 /****************************************************************
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
+/* XXX */
+static gint object_getref(GObject *object)
+{
+	return object->ref_count;
+}
+
+/* g_fscache_data_unref() the result! */
 XMLwrapper *xml_cache_load(const gchar *pathname)
 {
 	static GFSCache *xml_cache = NULL;
 
 	if (!xml_cache)
-		xml_cache = g_fscache_new((GFSLoadFunc) xml_load,
-					  (GFSRefFunc) xml_ref,
-					  (GFSRefFunc) xml_unref,
-					  (GFSGetRefFunc) xml_getref,
+		xml_cache = g_fscache_new((GFSLoadFunc) xml_new,
+					  (GFSRefFunc) g_object_ref,
+					  (GFSRefFunc) g_object_unref,
+					  (GFSGetRefFunc) object_getref,
 					  NULL, NULL);
 	return g_fscache_lookup(xml_cache, pathname);
-}
-
-void xml_cache_unref(XMLwrapper *wrapper)
-{
-	xml_unref(wrapper, NULL);
 }
 
 /* Taking this node and each directly following node with the same name,
@@ -1275,42 +1272,3 @@ gchar *from_utf8(const gchar *src)
 	return retval ? retval : g_strdup(src);
 }
 
-/****************************************************************
- *                      INTERNAL FUNCTIONS                      *
- ****************************************************************/
-
-static XMLwrapper *xml_load(char *pathname, gpointer data)
-{
-	xmlDocPtr doc;
-	XMLwrapper *xml_data = NULL;
-
-	doc = xmlParseFile(pathname);
-	if (!doc)
-		return NULL;	/* Bad XML */
-
-	xml_data = g_new(XMLwrapper, 1);
-	xml_data->ref = 1;
-	xml_data->doc = doc;
-
-	return xml_data;
-}
-
-static void xml_ref(XMLwrapper *doc, gpointer data)
-{
-	if (doc)
-		doc->ref++;
-}
-
-static void xml_unref(XMLwrapper *doc, gpointer data)
-{
-	if (doc && --doc->ref == 0)
-	{
-		xmlFreeDoc(doc->doc);
-		g_free(doc);
-	}
-}
-
-static int xml_getref(XMLwrapper *doc, gpointer data)
-{
-	return doc ? doc->ref : 0;
-}

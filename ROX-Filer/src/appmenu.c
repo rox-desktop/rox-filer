@@ -85,7 +85,7 @@ void appmenu_remove(void)
  */
 void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 {
-	XMLwrapper	*ai;
+	XMLwrapper	*ai = NULL;
 	xmlNode	*node;
 	GList	*next;
 	GtkWidget *sep;
@@ -106,7 +106,7 @@ void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 
 	node = appinfo_get_section(ai, "AppMenu");
 	if (!node)
-		return;
+		goto out;
 
 	g_return_if_fail(current_items == NULL);
 
@@ -131,6 +131,10 @@ void appmenu_add(const gchar *app_dir, DirItem *item, GtkWidget *menu)
 
 	current_menu = menu;
 	current_app_path = g_strdup(app_dir);
+
+out:
+	if (ai)
+		g_object_unref(ai);
 }
 
 /****************************************************************

@@ -177,6 +177,7 @@ void g_fscache_insert(GFSCache *cache, const char *pathname, gpointer obj,
  * If found is not NULL, use it to indicate whether something is being
  * returned (a NULL return could indicate that the data is cached, but
  * the data is NULL).
+ * If returned value is not NULL, value is refd.
  */
 gpointer g_fscache_lookup_full(GFSCache *cache, const char *pathname,
 				FSCacheLookup lookup_type,

@@ -8,16 +8,10 @@
 #ifndef _SUPPORT_H
 #define _SUPPORT_H
 
-struct _XMLwrapper {
-	int	ref;
-	xmlDocPtr doc;
-};
-
 #define PRETTY_SIZE_LIMIT 10000
 #define TIME_FORMAT "%T %d %b %Y"
 
 XMLwrapper *xml_cache_load(const gchar *pathname);
-void xml_cache_unref(XMLwrapper *wrapper);
 int save_xml_file(xmlDocPtr doc, const gchar *filename);
 xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
 xmlDocPtr soap_new(xmlNodePtr *ret_body);

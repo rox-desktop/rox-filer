@@ -61,6 +61,7 @@
 #include "bind.h"
 #include "appinfo.h"
 #include "mount.h"
+#include "xml.h"
 
 #define PANEL_BORDER 2
 
@@ -867,7 +868,7 @@ static xmlNode *group_find(char *name)
 		if (wrapper)
 		{
 			if (groups)
-				xml_cache_unref(groups);
+				g_object_unref(groups);
 			groups = wrapper;
 		}
 
@@ -876,9 +877,9 @@ static xmlNode *group_find(char *name)
 
 	if (!groups)
 	{
-		groups = g_new(XMLwrapper, 1);
+		groups = xml_new(NULL);
 		groups->doc = xmlNewDoc("1.0");
-		groups->ref = 1;
+
 		xmlDocSetRootElement(groups->doc,
 			xmlNewDocNode(groups->doc, NULL, "groups", NULL));
 		return NULL;
@@ -1285,7 +1286,7 @@ FilerWindow *filer_opendir(const char *path, FilerWindow *src_win)
 	DisplayStyle    dstyle;
 	DetailsType     dtype;
 	FilerWindow	*same_dir_window = NULL;
-	
+
 	/* Get the real pathname of the directory and copy it */
 	real_path = pathdup(path);
 
@@ -2160,6 +2161,8 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 				g_free(str);
 			}
 		}
+		if (info)
+			g_object_unref(info);
 	}
 
 	if (tip->len > 1)
@@ -2377,6 +2380,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 
 	for (i = 0; i < collection->number_of_items; i++)
 	{
+		MaskedPixmap *pixmap;
 		DirItem	 *item = (DirItem *) collection->items[i].data;
 		gchar    *path;
 		gboolean found;
@@ -2389,8 +2393,9 @@ void filer_create_thumbs(FilerWindow *filer_window)
 
 		path = make_path(filer_window->path, item->leafname)->str;
 
-		g_fscache_lookup_full(pixmap_cache, path,
+		pixmap = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, &found);
+		g_fscache_data_unref(pixmap_cache, pixmap);
 
 		/* If we didn't get an image, it could be because:
 		 *

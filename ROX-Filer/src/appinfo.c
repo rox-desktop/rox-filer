@@ -53,6 +53,7 @@
 #include "type.h"
 #include "diritem.h"
 #include "support.h"
+#include "xml.h"
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -63,7 +64,7 @@
  * Returns a pointer to the XMLwrapper structure, or NULL if this isn't
  * an application with a valid XMLwrapper file.
  *
- * appinfo_unref() the result.
+ * g_object_unref() the result.
  */
 XMLwrapper *appinfo_get(const gchar *app_dir, DirItem *item)
 {

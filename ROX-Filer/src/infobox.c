@@ -168,7 +168,7 @@ static GtkWidget *make_vbox(guchar *path)
 	}
 
 	if (ai)
-		xml_cache_unref(ai);
+		g_object_unref(ai);
 
 	item->leafname = NULL;
 	diritem_free(item);

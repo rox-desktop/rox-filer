@@ -92,7 +92,7 @@ static void draw_one_item(Collection 	*collection,
 static void collection_class_init(GObjectClass *gclass, gpointer data);
 static void collection_init(GTypeInstance *object, gpointer g_class);
 static void collection_destroy(GtkObject *object);
-static void collection_finalize(GtkObject *object);
+static void collection_finalize(GObject *object);
 static void collection_realize(GtkWidget *widget);
 static void collection_map(GtkWidget *widget);
 static gint collection_paint(Collection 	*collection,
@@ -379,7 +379,7 @@ static void collection_destroy(GtkObject *object)
 }
 
 /* This is the last thing that happens to us. Free all data. */
-static void collection_finalize(GtkObject *object)
+static void collection_finalize(GObject *object)
 {
 	Collection *collection;
 
@@ -388,6 +388,9 @@ static void collection_finalize(GtkObject *object)
 	g_return_if_fail(collection->number_of_items == 0);
 
 	g_free(collection->items);
+
+	if (G_OBJECT_CLASS(parent_class)->finalize)
+		G_OBJECT_CLASS(parent_class)->finalize(object);
 }
 
 static void collection_map(GtkWidget *widget)

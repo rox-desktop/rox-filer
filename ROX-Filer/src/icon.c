@@ -309,7 +309,7 @@ void icon_set_tip(Icon *icon)
 		gtk_tooltips_set_tip(tooltips, widget, NULL, NULL);
 
 	if (ai)
-		xml_cache_unref(ai);
+		g_object_unref(ai);
 }
 
 /* Returns TRUE if any icon links to this item (or any item inside
