@@ -12,7 +12,7 @@ LIBS = @LIBS@ @LFS_LDFLAGS@ -lICE -lSM
 
 CFLAGS = ${PROF} @CFLAGS@ @LFS_CFLAGS@ \
 	 `${PKG_CONFIG} --cflags gtk+-2.0 libxml-2.0`
-LDFLAGS = ${PROF} @LDFLAGS@ ${LIBS} `${PKG_CONFIG} --libs gtk+-2.0 libxml-2.0`
+LDFLAGS = ${PROF} @LDFLAGS@ ${LIBS} `${PKG_CONFIG} --libs gtk+-2.0 libxml-2.0 | sed 's/-lpangoxft-[^ ]*//'`
 EXEC = ${PLATFORM_DIR}/${PROG}
 
 ############ Things to change for different programs
