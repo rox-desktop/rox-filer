@@ -24,6 +24,7 @@ case $1 in
 		  DEBUGGER="gdb"
 		fi ;;
 	--valgrind) shift ; DEBUGGER="valgrind --num-callers=8";;
+	--leaks) shift ; DEBUGGER="valgrind --num-callers=8 --leak-check=yes";;
 	--compile)
 		shift
 		if [ ! -d "$APP_DIR/src" ] ; then
