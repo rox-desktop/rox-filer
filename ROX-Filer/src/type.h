@@ -61,5 +61,6 @@ void type_set_handler_dialog(MIME_type *type);
 gboolean can_set_run_action(DirItem *item);
 gchar *describe_current_command(MIME_type *type);
 GdkColor *type_get_colour(DirItem *item, GdkColor *normal);
+void reread_mime_files(void);
 
 #endif /* _TYPE_H */

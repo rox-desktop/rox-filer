@@ -2,6 +2,10 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+13-Aug-2002
+~~~~~~~~~~~
+Removed Re-read MIME types button. Use Refresh on the toolbar instead.
+
 11-Aug-2002
 ~~~~~~~~~~~
 Internal changes: moved menu and toolbar over to View interface.
@@ -12,6 +16,8 @@ Open the menu on the 'popup-menu' signal. Allows you to use the default Gtk
 keyboard shortcuts to open the menu.
 Translated AppInfo menu entries into Hungarian (Andras Mohari) and
 Spanish (Marcelo Ramos).
+After dragging to a remote application which didn't respond, the filer
+refused to gain the primary selection until the operation timed out.
 
 02-Aug-2002
 ~~~~~~~~~~~

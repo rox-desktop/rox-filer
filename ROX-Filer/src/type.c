@@ -83,9 +83,7 @@ static void load_mime_types(void);
 static void alloc_type_colours(void);
 char *get_action_save_path(GtkWidget *dialog);
 static void edit_mime_types(guchar *unused);
-static void reread_mime_files(guchar *unused);
 static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
-static GList *build_type_reread(Option *none, xmlNode *node, guchar *label);
 static GList *build_type_edit(Option *none, xmlNode *node, guchar *label);
 
 /* When working out the type for a file, this hash table is checked
@@ -147,7 +145,6 @@ void type_init(void)
 	load_mime_types();
 
 	option_register_widget("type-edit", build_type_edit);
-	option_register_widget("type-reread", build_type_reread);
 	
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
 	
@@ -158,6 +155,12 @@ void type_init(void)
 	alloc_type_colours();
 
 	option_add_notify(alloc_type_colours);
+}
+
+/* Read-load all the glob patterns */
+void reread_mime_files(void)
+{
+	load_mime_types();
 }
 
 /* Returns the MIME_type structure for the given type name. It is looked
@@ -1001,27 +1004,6 @@ static void edit_mime_types(guchar *unused)
 	path = "/usr/share/mime/packages";
 	if (mc_stat(path, &info) == 0)
 		filer_opendir(path, NULL);
-}
-
-static void reread_mime_files(guchar *unused)
-{
-	load_mime_types();
-}
-
-static GList *build_type_reread(Option *none, xmlNode *node, guchar *label)
-{
-	GtkWidget *button, *align;
-
-	g_return_val_if_fail(none == NULL, NULL);
-
-	align = gtk_alignment_new(0.1, 0, 0.1, 0);
-	button = gtk_button_new_with_label(_(label));
-	gtk_container_add(GTK_CONTAINER(align), button);
-
-	g_signal_connect_swapped(button, "clicked",
-			G_CALLBACK(reread_mime_files), NULL);
-
-	return g_list_append(NULL, align);
 }
 
 static GList *build_type_edit(Option *none, xmlNode *node, guchar *label)

@@ -1451,6 +1451,7 @@ void filer_update_all(void)
 void full_refresh(void)
 {
 	mount_update(TRUE);
+	reread_mime_files();
 }
 
 /* See whether a filer window with a given path already exists
