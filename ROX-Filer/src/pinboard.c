@@ -156,6 +156,9 @@ static gboolean button_release_event(GtkWidget *widget,
 static gboolean enter_notify(GtkWidget *widget,
 			     GdkEventCrossing *event,
 			     PinIcon *pi);
+static gint leave_notify(GtkWidget *widget,
+			      GdkEventCrossing *event,
+			      PinIcon *pi);
 static gboolean button_press_event(GtkWidget *widget,
 			    GdkEventButton *event,
                             PinIcon *pi);
@@ -218,7 +221,6 @@ static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
 static void clear_backdrop(GtkWidget *drop_box, gpointer data);
 static void radios_changed(gpointer data);
-
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -454,10 +456,12 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y,
 			GDK_EXPOSURE_MASK |
 			GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK |
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
-			GDK_BUTTON1_MOTION_MASK | GDK_ENTER_NOTIFY_MASK |
-			GDK_BUTTON2_MOTION_MASK | GDK_BUTTON3_MOTION_MASK);
+			GDK_BUTTON1_MOTION_MASK | GDK_BUTTON2_MOTION_MASK |
+			GDK_BUTTON3_MOTION_MASK);
 	g_signal_connect(pi->win, "enter-notify-event",
 			G_CALLBACK(enter_notify), pi);
+	g_signal_connect(pi->win, "leave-notify-event",
+			G_CALLBACK(leave_notify), pi);
 	g_signal_connect(pi->win, "button-press-event",
 			G_CALLBACK(button_press_event), pi);
 	g_signal_connect(pi->win, "button-release-event",
@@ -899,8 +903,14 @@ static gboolean enter_notify(GtkWidget *widget,
 			     PinIcon *pi)
 {
 	icon_may_update((Icon *) pi);
+	return TRUE;
+}
 
-	return FALSE;
+static gint leave_notify(GtkWidget *widget,
+			      GdkEventCrossing *event,
+			      PinIcon *pi)
+{
+	return TRUE;
 }
 
 static void select_lasso(void)
