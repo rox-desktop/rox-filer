@@ -41,6 +41,14 @@
 #include <gdk-pixbuf/gdk-pixbuf.h>
 #include <gdk-pixbuf/gdk-pixbuf-loader.h>
 
+#ifdef THUMBS_USE_LIBPNG
+# include <stdarg.h>
+# include <png.h>
+# ifndef png_jmpbuf
+#  define png_jmpbuf(png_ptr) ((png_ptr)->jmpbuf)
+# endif
+#endif
+
 #include "global.h"
 
 #include "fscache.h"
@@ -307,7 +315,317 @@ void pixmap_background_thumb(gchar *path, GFunc callback, gpointer data)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-#ifdef GTK2
+#ifdef THUMBS_USE_LIBPNG
+/* Do this in a separate function to avoid problems with longjmp and
+ * non-volatile variables.
+ */
+static gboolean png_save(png_structp png_ptr, png_infop info_ptr,
+			 FILE *file, GdkPixbuf *pixbuf, GPtrArray *textarr)
+{
+	gboolean	has_alpha;
+	int		width;
+	int		height;
+	int		bit_depth;
+	int		rowstride;
+	guchar		*pixels;
+
+	/* An error during saving will cause a jump back to here */
+	if (setjmp(png_jmpbuf(png_ptr)))
+		return FALSE;
+
+	png_init_io(png_ptr, file);
+
+	pixels = gdk_pixbuf_get_pixels(pixbuf);
+	width = gdk_pixbuf_get_width(pixbuf);
+	height = gdk_pixbuf_get_height(pixbuf);
+	has_alpha = gdk_pixbuf_get_has_alpha(pixbuf);
+	bit_depth = gdk_pixbuf_get_bits_per_sample(pixbuf);
+	rowstride = gdk_pixbuf_get_rowstride(pixbuf);
+	
+	png_set_IHDR(png_ptr, info_ptr, width, height, bit_depth,
+			PNG_COLOR_TYPE_RGB_ALPHA,
+			PNG_INTERLACE_NONE,
+			PNG_COMPRESSION_TYPE_DEFAULT,
+			PNG_FILTER_TYPE_DEFAULT);
+	
+	
+	/* Write image info */
+	png_write_info(png_ptr, info_ptr);
+
+	/* Write the image data */
+	if (has_alpha)
+	{
+		int	row;
+		
+		for (row = 0; row < height; row++, pixels += rowstride)
+			png_write_row(png_ptr, (png_bytep) pixels);
+	}
+	else	/* convert RGB to RGBA */
+	{
+		guchar	*rowbuf;
+		int	col;
+		int	row;
+
+		rowbuf = g_malloc(width * 4);
+		for (row = 0; row < height; row++, pixels += rowstride)
+		{
+			guchar	*src = pixels;
+			guchar	*dst = rowbuf;
+			for (col = 0; col < width; col++)
+			{
+				*dst++ = *src++;
+				*dst++ = *src++;
+				*dst++ = *src++;
+				*dst++ = 255;
+			}
+			png_write_row(png_ptr, (png_bytep) rowbuf);
+		}
+		g_free(rowbuf);
+	}
+	
+	png_write_end(png_ptr, info_ptr);
+
+	return TRUE;
+}
+
+/* Saves pixbuf to a PNG file (non-interlaced RGBA).
+ * The variable arguments are key-text pairs and must be NULL-terminated.
+ * NOTE: unlike with gdk_pixbuf_save, keys do NOT have to be prefixed
+ *       with "tEXt::".
+ * Returns TRUE if the image was saved, FALSE otherwise.
+ */
+static gboolean pixbuf_save_png(GdkPixbuf *pixbuf, char *filename, ...)
+{
+	FILE		*file = NULL;
+	png_structp	png_ptr = NULL;
+	png_infop	info_ptr = NULL;
+	GPtrArray	*textarr = NULL;
+	gboolean	retval = FALSE;
+	va_list		ap;
+	char		*string;
+
+	g_return_val_if_fail(pixbuf != NULL, FALSE);
+	g_return_val_if_fail(filename != NULL, FALSE);
+	g_return_val_if_fail(*filename != '\0', FALSE);
+
+	file = fopen(filename, "wb");
+	if (!file)
+		goto err;
+	
+	png_ptr = png_create_write_struct(PNG_LIBPNG_VER_STRING,
+					  NULL, NULL, NULL);
+	if (!png_ptr)
+		goto err;
+
+	info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr)
+		goto err;
+
+	/* Get optional key-text pairs. */
+	textarr = g_ptr_array_new();
+	va_start(ap, filename);
+	string = va_arg(ap, char *);
+	while (string != NULL)
+	{
+		png_text	*pngtext;
+
+		pngtext = g_new(png_text, 1);
+		pngtext->key = string;
+		pngtext->text = va_arg(ap, char *);
+		pngtext->compression = PNG_TEXT_COMPRESSION_NONE;
+		/* (lang and translated_keyword not needed for COMP_NONE) */
+		png_set_text(png_ptr, info_ptr, pngtext, 1);
+		/* png_set_text() does NOT copy data, so we can't free
+		 * it now -- store the pointers, they'll be freed later.
+		 */
+		g_ptr_array_add(textarr, pngtext);
+			
+		string = va_arg(ap, char *);
+	}
+	va_end(ap);
+
+	retval = png_save(png_ptr, info_ptr, file, pixbuf, textarr);
+err:
+	if (file)
+		fclose(file);
+	if (png_ptr)
+	{
+		if (info_ptr)
+			png_destroy_write_struct(&png_ptr, &info_ptr);
+		else
+			png_destroy_write_struct(&png_ptr, (png_infopp) NULL);
+	}
+	if (textarr)
+		g_ptr_array_free(textarr, TRUE);
+
+	if (!retval)
+		g_warning("Error saving thumbnail '%s'", filename);
+
+	return retval;
+}
+
+static void destroy_key_value_fn(gpointer key, gpointer value, gpointer data)
+{
+	g_free(key);
+	g_free(value);
+}
+
+/* Frees the pixel array of a pixbuf and the hash table associated with it. */
+static void pixbuf_destroy_fn(guchar *pixels, gpointer data)
+{
+	if (data != NULL)
+	{
+		g_hash_table_foreach((GHashTable *) data,
+				destroy_key_value_fn, NULL);
+		g_hash_table_destroy((GHashTable *) data);
+	}
+	
+	g_free(pixels);
+}
+
+static GdkPixbuf *png_load(png_structp png_ptr, png_infop info_ptr,
+			   FILE *file, GHashTable *text_hash)
+{
+	png_uint_32	width, height, rowbytes, row;
+	int		bit_depth, color_type, interlace_type;
+	guchar		*pixels;
+	guchar		*rowp;
+
+	/* An error during loading will cause a jump back to here */
+	if (setjmp(png_jmpbuf(png_ptr)))
+		return FALSE;
+
+	png_init_io(png_ptr, file);
+	
+	/* We've already read 8 bytes from the file */
+	png_set_sig_bytes(png_ptr, 8);
+
+	png_read_info(png_ptr, info_ptr);
+
+	png_get_IHDR(png_ptr, info_ptr, &width, &height, &bit_depth,
+			&color_type, &interlace_type, NULL, NULL);
+
+	if (interlace_type != PNG_INTERLACE_NONE || width > 256 || height > 256)
+		return FALSE;
+	
+	/* Change paletted images to RGB */
+	if (color_type == PNG_COLOR_TYPE_PALETTE)
+		png_set_palette_to_rgb(png_ptr);
+
+	/* Transform grayscale images of less than 8 to 8 bits */
+	if (color_type == PNG_COLOR_TYPE_GRAY && bit_depth < 8)
+		png_set_gray_1_2_4_to_8(png_ptr);
+
+	/* Add alpha channel if there's transparency info in the file */
+	if (png_get_valid(png_ptr, info_ptr, PNG_INFO_tRNS))
+		png_set_tRNS_to_alpha(png_ptr);
+
+	/* 16-bit RGB to 8-bit RGB */
+	if (bit_depth == 16)
+		png_set_strip_16(png_ptr);
+	
+	/* Convert RGB to RGBA with an opacity value of 255 */
+	if (bit_depth == 8 && color_type == PNG_COLOR_TYPE_RGB)
+		png_set_filler(png_ptr, 255, PNG_FILLER_AFTER);
+
+	/* Expand bit depths of 1, 2 and 4 to 8 */
+	if (bit_depth < 8)
+		png_set_packing(png_ptr);
+	
+	/* Grayscale to RGB */
+	if (color_type == PNG_COLOR_TYPE_GRAY ||
+	    color_type == PNG_COLOR_TYPE_GRAY_ALPHA)
+		png_set_gray_to_rgb(png_ptr);
+	
+	png_read_update_info(png_ptr, info_ptr);
+	rowbytes = png_get_rowbytes(png_ptr, info_ptr);
+
+	/* Read rows */
+	pixels = g_malloc(rowbytes * height);
+	for (row = 0, rowp = pixels; row < height; row++, rowp += rowbytes)
+		png_read_row(png_ptr, rowp, NULL);
+	
+	png_read_end(png_ptr, NULL);
+
+	/* Get key-text pairs and store them for later use */	
+	if (text_hash)
+	{
+		png_textp	text_ptr;
+		int		num_text;
+
+		png_get_text(png_ptr, info_ptr, &text_ptr, &num_text);
+		while (--num_text >= 0)
+		{
+			g_hash_table_insert(text_hash,
+					g_strdup(text_ptr[num_text].key),
+					g_strdup(text_ptr[num_text].text));
+		}
+	}
+
+	return gdk_pixbuf_new_from_data(pixels,
+			GDK_COLORSPACE_RGB, TRUE, 8,
+			(int) width, (int) height, (int) rowbytes,
+			pixbuf_destroy_fn, text_hash);
+}
+
+/* Creates a pixbuf from a PNG file and returns it.  If 'text_hash' is not
+ * NULL, it will be set to point to a hash table storing the image comments
+ * (key-text pairs).
+ * This is a support function for the thumbnail standard, so it will refuse
+ * to load interlaced images or images larger than 256x256 pixels.
+ * The hash table will be automatically destroyed when you destroy the pixbuf.
+ */
+static GdkPixbuf *pixbuf_new_from_png(char *filename, GHashTable **text_hash)
+{
+	FILE		*file = NULL;
+	png_structp	png_ptr = NULL;
+	png_infop	info_ptr = NULL;
+	GdkPixbuf	*retval = NULL;
+	char		header[8];
+
+	g_return_val_if_fail(filename != NULL, NULL);
+	g_return_val_if_fail(*filename != '\0', NULL);
+
+	file = fopen(filename, "rb");
+	if (!file)
+		return NULL;
+
+	/* Is it a PNG file? */
+	if (fread(header, 1, 8, file) != 8 || png_sig_cmp(header, 0, 8))
+		goto err;
+
+	png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING,
+					 NULL, NULL, NULL);
+	if (!png_ptr)
+		goto err;
+	
+	info_ptr = png_create_info_struct(png_ptr);
+	if (!info_ptr)
+		goto err;
+
+	*text_hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+	retval = png_load(png_ptr, info_ptr, file, *text_hash);
+err:
+	if (file)
+		fclose(file);
+
+	if (png_ptr)
+	{
+		if (info_ptr)
+			png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+		else
+			png_destroy_read_struct(&png_ptr, NULL, NULL);
+	}
+
+	if (!retval)
+		g_warning("Error loading thumbnail '%s'", filename);
+
+	return retval;
+}
+#endif /* THUMBS_USE_LIBPNG */
+
+#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 /* Create a thumbnail file for this image.
  * XXX: Thumbnails should be deleted somewhere!
  */
@@ -351,6 +669,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(md5);
 
 	old_mask = umask(0077);
+#ifdef GTK2
 	gdk_pixbuf_save(image->huge_pixbuf,
 			to->str,
 			"png",
@@ -362,6 +681,17 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 			"tEXt::Thumb::URI", uri,
 			"tEXt::Software", PROJECT,
 			NULL);
+#else
+	pixbuf_save_png(image->huge_pixbuf,
+			to->str,
+			"Thumb::Image::Width", swidth,
+			"Thumb::Image::Height", sheight,
+			"Thumb::Size", ssize,
+			"Thumb::MTime", smtime,
+			"Thumb::URI", uri,
+			"Software", PROJECT,
+			NULL);
+#endif	
 	umask(old_mask);
 
 	g_string_free(to, TRUE);
@@ -371,7 +701,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_free(smtime);
 	g_free(uri);
 }
-#endif
+#endif /* GTK2 or THUMBS_USE_LIBPNG */
 
 /* Check if we have an up-to-date thumbnail for this image.
  * If so, return it. Otherwise, returns NULL.
@@ -379,10 +709,13 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 static GdkPixbuf *get_thumbnail_for(char *path)
 {
 	GdkPixbuf *thumb = NULL;
-#ifdef GTK2
+#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 	char *thumb_path, *md5, *uri;
 	char *ssize, *smtime;
 	struct stat info;
+#ifndef GTK2
+	GHashTable *text_hash;
+#endif
 
 	path = pathdup(path);
 	uri = g_strconcat("file://", path, NULL);
@@ -393,16 +726,28 @@ static GdkPixbuf *get_thumbnail_for(char *path)
 					home_dir, md5);
 	g_free(md5);
 
+#ifdef GTK2
 	thumb = gdk_pixbuf_new_from_file(thumb_path, NULL);
+#else
+	thumb = pixbuf_new_from_png(thumb_path, &text_hash);
+#endif
 	if (!thumb)
 		goto err;
 
 	/* Note that these don't need freeing... */
+#ifdef GTK2
 	ssize = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::Size");
+#else
+	ssize = g_hash_table_lookup(text_hash, "Thumb::Size");
+#endif	
 	if (!ssize)
 		goto err;
 
+#ifdef GTK2
 	smtime = gdk_pixbuf_get_option(thumb, "tEXt::Thumb::MTime");
+#else
+	smtime = g_hash_table_lookup(text_hash, "Thumb::MTime");
+#endif
 	if (!smtime)
 		goto err;
 	
@@ -420,7 +765,7 @@ err:
 out:
 	g_free(path);
 	g_free(thumb_path);
-#endif
+#endif /* GTK2 or THUMBS_USE_LIBPNG */
 	return thumb;
 }
 
@@ -441,13 +786,16 @@ static MaskedPixmap *image_from_file(char *path)
 	{
 		g_print("%s\n", error ? error->message : _("Unknown error"));
 		g_error_free(error);
-		return NULL;
 	}
+#elif defined(THUMBS_USE_LIBPNG)
+	pixbuf = get_thumbnail_for(path);
+	if (!pixbuf)
+		pixbuf = gdk_pixbuf_new_from_file(path);
 #else
 	pixbuf = gdk_pixbuf_new_from_file(path);
+#endif
 	if (!pixbuf)
 		return NULL;
-#endif
 
 	image = image_from_pixbuf(pixbuf);
 
@@ -678,7 +1026,7 @@ static void got_thumb_data(GdkPixbufLoader *loader,
 			image = image_from_pixbuf(pixbuf);
 
 			g_fscache_insert(pixmap_cache, path, image);
-#ifdef GTK2
+#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 			save_thumbnail(path, pixbuf, image);
 #endif
 			gdk_pixbuf_unref(pixbuf);

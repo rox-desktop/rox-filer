@@ -540,6 +540,13 @@ void on_child_death(gint child, CallbackFn callback, gpointer data)
 static void show_features(void)
 {
 	g_printerr("\n-- %s --\n\n", _("features set at compile time"));
+	g_printerr("%s... %s\n", _("Large File Support"),
+#ifdef LARGE_FILE_SUPPORT
+		_("Yes")
+#else
+		_("No")
+#endif
+		);
 	g_printerr("%s... %s\n", _("Old VFS support"),
 #ifdef HAVE_LIBVFS
 		_("Yes")
@@ -556,6 +563,15 @@ static void show_features(void)
 		_("Yes")
 #else
 		_("No (using Gtk+-1.2 instead)")
+#endif
+		);
+	g_printerr("%s... %s\n", _("Save thumbnails"),
+#ifdef GTK2
+		_("Yes (using Gtk+-2.0)")
+#elif defined(HAVE_LIBPNG)
+		_("Yes (using libpng)")
+#else
+		_("No (needs libpng or gtk+-2.0)")
 #endif
 		);
 }

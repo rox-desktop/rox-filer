@@ -13,6 +13,7 @@
 #undef FILE_B_FLAG
 #undef HAVE_LIBVFS
 #undef HAVE_VFS_H
+#undef HAVE_LIBPNG
 
 #undef GTK2
 #undef LARGE_FILE_SUPPORT
@@ -42,6 +43,13 @@
 # define SIZE_FMT "lld"
 #else
 # define SIZE_FMT "ld"
+#endif
+
+/* Undefine THUMBS_USE_LIBPNG if you want thumbnail saving support
+ * under GTK+ 2.0 only.
+ */
+#if !defined(GTK2) && defined(HAVE_LIBPNG)
+# define THUMBS_USE_LIBPNG
 #endif
 
 /* #define GTK_DISABLE_DEPRECATED */

@@ -51,7 +51,7 @@ static GHashTable *uid_hash = NULL;	/* UID -> User name */
 static GHashTable *gid_hash = NULL;	/* GID -> Group name */
 
 /* Static prototypes */
-#ifdef GTK2
+#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 static void MD5Transform(guint32 buf[4], guint32 const in[16]);
 #endif
 
@@ -1024,7 +1024,7 @@ char *readlink_dup(char *source)
 	return g_strndup(path, got);
 }
 
-#ifdef GTK2
+#if defined(GTK2) || defined(THUMBS_USE_LIBPNG)
 /*
  * This code implements the MD5 message-digest algorithm.
  * The algorithm is due to Ron Rivest. The original code was
@@ -1270,7 +1270,7 @@ char *md5_hash(char *message)
 	MD5Update(&ctx, message, strlen(message));
 	return MD5Final(&ctx);
 }
-#endif /* GTK2 */
+#endif /* GTK2 or THUMBS_USE_LIBPNG */
 
 /****************************************************************
  *                      INTERNAL FUNCTIONS                      *

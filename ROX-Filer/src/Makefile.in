@@ -6,7 +6,7 @@ SHELL = @SHELL@
 srcdir = @srcdir@
 PLATFORM = @with_platform@
 PLATFORM_DIR = ../${PLATFORM}
-LIBS = @LIBS@ @GDK_PIXBUF_LIBS@ `${XML_CONFIG} --libs` -lICE -lSM
+LIBS = @LIBS@ @GDK_PIXBUF_LIBS@ `${XML_CONFIG} --libs` @LIBPNG@ -lICE -lSM
 .SUFFIXES:
 .SUFFIXES: .c .o
 

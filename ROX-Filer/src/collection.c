@@ -1980,10 +1980,25 @@ void collection_qsort(Collection *collection,
 	gpointer cursor_data = NULL;
 	gpointer wink_data = NULL;
 	gpointer wink_on_map_data = NULL;
+	CollectionItem *array;
+	int	i;
 	
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 	g_return_if_fail(compar != NULL);
+
+	/* Check to see if it needs sorting (saves redrawing) */
+	if (collection->number_of_items < 2)
+		return;
+
+	array = collection->items;
+	for (i = 1; i < collection->number_of_items; i++)
+	{
+		if (compar(&array[i - 1], &array[i]) > 0)
+			break;
+	}
+	if (i == collection->number_of_items)
+		return;		/* Already sorted */
 
 	items = collection->number_of_items;
 
