@@ -56,14 +56,14 @@ struct _FileStatus
 /* Static prototypes */
 static void refresh_info(GtkObject *window);
 static GtkWidget *make_vbox(guchar *path);
-static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about);
+static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about);
 static GtkWidget *make_file_says(guchar *path);
-static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static guchar *pretty_type(DirItem *file, guchar *path);
 static GtkWidget *make_vbox(guchar *path);
-static void info_destroyed(gpointer data);
+static void got_response(GtkObject *window, gint response, gpointer data);
+static void file_info_destroyed(GtkWidget *widget, FileStatus *fs);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -72,51 +72,30 @@ static void info_destroyed(gpointer data);
 /* Create and display a new info box showing details about this item */
 void infobox_new(const gchar *pathname)
 {
-	GtkWidget	*window, *hbox, *vbox, *details, *button;
+	GtkWidget	*window, *details;
 	gchar		*path;
 	
 	g_return_if_fail(pathname != NULL);
 
 	path = g_strdup(pathname); /* Gets attached to window & freed later */
 
-	window = gtk_window_new(GTK_WINDOW_DIALOG);
-#ifdef GTK2
-	gtk_window_set_type_hint(GTK_WINDOW(window),
-			GDK_WINDOW_TYPE_HINT_DIALOG);
-#endif
+	window = gtk_dialog_new_with_buttons(path,
+				NULL, GTK_DIALOG_NO_SEPARATOR,
+				GTK_STOCK_CANCEL, GTK_RESPONSE_DELETE_EVENT,
+				GTK_STOCK_REFRESH, GTK_RESPONSE_APPLY,
+				NULL);
+
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
-	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
-	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(window), vbox);
-	
 	details = make_vbox(path);
-	gtk_box_pack_start(GTK_BOX(vbox), details, TRUE, TRUE, 0);
-
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_end(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("Refresh"));
-	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(button), GTK_CAN_DEFAULT);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(refresh_info),
-			GTK_OBJECT(window));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(GTK_WIDGET(button), GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(window), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(window));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(window)->vbox),
+			   details, TRUE, TRUE, 0);
 
 	gtk_object_set_data(GTK_OBJECT(window), "details", details);
 	gtk_object_set_data_full(GTK_OBJECT(window), "path", path, g_free);
 
-	gtk_signal_connect_object(GTK_OBJECT(window), "destroy",
-			GTK_SIGNAL_FUNC(info_destroyed), NULL);
+	gtk_signal_connect(GTK_OBJECT(window), "response",
+			GTK_SIGNAL_FUNC(got_response), NULL);
 
 	number_of_windows++;
 	gtk_widget_show_all(window);
@@ -126,10 +105,16 @@ void infobox_new(const gchar *pathname)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-static void info_destroyed(gpointer data)
+static void got_response(GtkObject *window, gint response, gpointer data)
 {
-	if (--number_of_windows < 1)
-		gtk_main_quit();
+	if (response == GTK_RESPONSE_APPLY)
+		refresh_info(window);
+	else
+	{
+		gtk_widget_destroy(GTK_WIDGET(window));
+		if (--number_of_windows < 1)
+			gtk_main_quit();
+	}
 }
 
 static void refresh_info(GtkObject *window)
@@ -155,7 +140,7 @@ static void refresh_info(GtkObject *window)
 static GtkWidget *make_vbox(guchar *path)
 {
 	DirItem		*item;
-	GtkWidget	*vbox, *list, *file;
+	GtkWidget	*vbox, *list, *file, *frame;
 	XMLwrapper	*ai;
 	xmlNode 	*about = NULL;
 
@@ -171,8 +156,11 @@ static GtkWidget *make_vbox(guchar *path)
 	if (ai)
 		about = appinfo_get_section(ai, "About");
 
-	list = make_clist(path, item, about);
-	gtk_box_pack_start(GTK_BOX(vbox), list, TRUE, TRUE, 0);
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	list = make_details(path, item, about);
+	gtk_container_add(GTK_CONTAINER(frame), list);
+	gtk_box_pack_start(GTK_BOX(vbox), frame, TRUE, TRUE, 0);
 
 	if (!about)
 	{
@@ -189,90 +177,83 @@ static GtkWidget *make_vbox(guchar *path)
 	return vbox;
 }
 
-static guchar *selection_text = NULL;
-
 /* The selection has changed - grab or release the primary selection */
-static void set_selection(GtkCList *clist, int row, int col,
-			  GdkEventButton *event, gpointer data)
+static void set_selection(GtkTreeView *view, gpointer data)
 {
-	/* If we lose the selection when a row is unselected, there's a race
-	 * and it doesn't work - therefore, keep the selection...
-	 */
-	if (clist->selection)
-	{
-		gchar *text;
-		
-		g_return_if_fail(gtk_clist_get_text(clist, row, 1, &text) == 1);
+	static GtkClipboard *primary = NULL;
+	GtkTreeModel *model;
+	GtkTreePath *path = NULL;
+	GtkTreeIter iter;
+	gchar	*text;
 
-		gtk_selection_owner_set(GTK_WIDGET(clist),
-				GDK_SELECTION_PRIMARY,
-				event->time);
-		g_free(selection_text);
-		selection_text = g_strdup(text);
-	}
+	gtk_tree_view_get_cursor(view, &path, NULL);
+	if (!path)
+		return;
+
+	if (!primary)
+		primary = gtk_clipboard_get(gdk_atom_intern("PRIMARY", FALSE));
+	
+	model = gtk_tree_view_get_model(GTK_TREE_VIEW(view));
+
+	gtk_tree_model_get_iter(model, &iter, path);
+	gtk_tree_path_free(path);
+
+	gtk_tree_model_get(model, &iter, 1, &text, -1);
+
+	gtk_clipboard_set_text(primary, text, -1);
+
+	g_free(text);
 }
 
-static void get_selection(GtkCList *clist,
-		         GtkSelectionData *selection_data,
-		         guint      info,
-		         guint      time,
-		         gpointer   data)
+static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
 {
-	g_return_if_fail(selection_text != NULL);
+	GtkTreeIter	iter;
 
-	gtk_selection_data_set(selection_data, xa_string,
-				8, selection_text, strlen(selection_text));
+	gtk_list_store_append(store, &iter);
+	gtk_list_store_set(store, &iter, 0, label, 1, data, -1);
 }
 
-/* Create the CList with the file's details */
-static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
+/* Create the TreeView widget with the file's details */
+static GtkWidget *make_details(guchar *path, DirItem *item, xmlNode *about)
 {
-	GtkCList	*table;
+	GtkListStore	*store;
+	GtkWidget	*view;
+	GtkCellRenderer *cell_renderer;
 	GString		*gstring;
 	struct stat	info;
-	char		*data[] = {NULL, NULL, NULL};
 	xmlNode 	*prop;
-	GtkTargetEntry 	target_table[] = {
-		{"STRING", 0, 0},
-		{"COMPOUND_TEXT", 0, 0},	/* XXX: Treats as STRING */
-	};
+	gchar		*tmp;
 
-	table = GTK_CLIST(gtk_clist_new(2));
-	GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(table), GTK_CAN_FOCUS);
-	gtk_clist_set_column_auto_resize(table, 0, TRUE);
-	gtk_clist_set_column_auto_resize(table, 1, TRUE);
-	gtk_clist_set_column_justification(table, 0, GTK_JUSTIFY_RIGHT);
+	store = gtk_list_store_new(2, G_TYPE_STRING, G_TYPE_STRING);
+	view = gtk_tree_view_new_with_model(GTK_TREE_MODEL(store));
+	g_object_unref(G_OBJECT(store));
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(view), FALSE);
 
-	gtk_signal_connect(GTK_OBJECT(table), "select-row",
+	cell_renderer = gtk_cell_renderer_text_new();
+	g_object_set(G_OBJECT(cell_renderer), "xalign", 1.0, NULL);
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),
+			0, NULL, cell_renderer, "text", 0, NULL);
+
+	cell_renderer = gtk_cell_renderer_text_new();
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(view),
+			1, NULL, cell_renderer, "text", 1, NULL);
+
+	gtk_signal_connect(GTK_OBJECT(view), "cursor_changed",
 			GTK_SIGNAL_FUNC(set_selection), NULL);
-	gtk_signal_connect_object(GTK_OBJECT(table), "selection-clear-event",
-			GTK_SIGNAL_FUNC(gtk_clist_unselect_all),
-			GTK_OBJECT(table));
-	gtk_signal_connect(GTK_OBJECT(table), "selection_get",
-			GTK_SIGNAL_FUNC(get_selection), NULL);
-	gtk_selection_add_targets(GTK_WIDGET(table), GDK_SELECTION_PRIMARY,
-			target_table,
-			sizeof(target_table) / sizeof(*target_table));
 	
-	data[0] = _("Name:");
-	data[1] = item->leafname;
-	gtk_clist_append(table, data);
+	add_row(store, _("Name:"), item->leafname);
 
 	if (lstat(path, &info))
 	{
-		data[0] = _("Error:");
-		data[1] = (guchar *) g_strerror(errno);
-		gtk_clist_append(table, data);
-		return GTK_WIDGET(table);
+		add_row(store, _("Error:"), g_strerror(errno));
+		return view;
 	}
 	
 	gstring = g_string_new(NULL);
 
 	g_string_sprintf(gstring, "%s, %s", user_name(info.st_uid),
 					    group_name(info.st_gid));
-	data[0] = _("Owner, Group:");
-	data[1] = gstring->str;
-	gtk_clist_append(table, data);
+	add_row(store, _("Owner, Group:"), gstring->str);
 	
 	if (info.st_size >= PRETTY_SIZE_LIMIT)
 	{
@@ -285,64 +266,50 @@ static GtkWidget *make_clist(guchar *path, DirItem *item, xmlNode *about)
 		g_string_assign(gstring, 
 				format_size(info.st_size));
 	}
-	data[0] = _("Size:");
-	data[1] = gstring->str;
-	gtk_clist_append(table, data);
-	
-	data[0] = _("Change time:");
-	data[1] = pretty_time(&info.st_ctime);
-	gtk_clist_append(table, data);
-	
-	data[0] = _("Modify time:");
-	data[1] = pretty_time(&info.st_mtime);
-	gtk_clist_append(table, data);
-	
-	data[0] = _("Access time:");
-	data[1] = pretty_time(&info.st_atime);
-	gtk_clist_append(table, data);
+	add_row(store, _("Size:"), gstring->str);
+
+	add_row(store, _("Change time:"), pretty_time(&info.st_ctime));
+	add_row(store, _("Modify time:"), pretty_time(&info.st_mtime));
+	add_row(store, _("Access time:"), pretty_time(&info.st_atime));
 
 	g_string_free(gstring, TRUE);
 
-	data[0] = _("Permissions:");
-	data[1] = pretty_permissions(info.st_mode);
-	gtk_clist_append(table, data);
-	
-	data[0] = _("Type:");
-	data[1] = pretty_type(item, path);
-	gtk_clist_append(table, data);
-	g_free(data[1]);
+	add_row(store, _("Permissions:"), pretty_permissions(info.st_mode));
+
+	tmp = pretty_type(item, path);
+	add_row(store, _("Type:"), tmp);
+	g_free(tmp);
 
 	if (item->base_type != TYPE_DIRECTORY)
 	{
-	        data[0] = _("Run action:");
-		data[1] = describe_current_command(item->mime_type);
-		gtk_clist_append(table, data);
-		g_free(data[1]);
+		tmp = describe_current_command(item->mime_type);
+		add_row(store, _("Run action:"), tmp);
+		g_free(tmp);
 	}
 
 	if (about)
 	{
-		data[0] = data[1] = "";
-		gtk_clist_append(table, data);
-		gtk_clist_set_selectable(table, table->rows - 1, FALSE);
+		add_row(store, "", "");
+		//gtk_clist_set_selectable(table, table->rows - 1, FALSE);
 		for (prop = about->xmlChildrenNode; prop; prop = prop->next)
 		{
 			if (prop->type == XML_ELEMENT_NODE)
 			{
-				data[0] = g_strconcat((char *) prop->name,
-						":", NULL);
-				data[1] = xmlNodeListGetString(prop->doc,
+				char *l;
+
+				l = g_strconcat((char *) prop->name, ":", NULL);
+				tmp = xmlNodeListGetString(prop->doc,
 						prop->xmlChildrenNode, 1);
-				if (!data[1])
-					data[1] = g_strdup("-");
-				gtk_clist_append(table, data);
-				g_free(data[0]);
-				g_free(data[1]);
+				if (!tmp)
+					tmp = g_strdup("-");
+				add_row(store, l, tmp);
+				g_free(l);
+				g_free(tmp);
 			}
 		}
 	}
 
-	return GTK_WIDGET(table);
+	return view;
 }
 	
 static GtkWidget *make_file_says(guchar *path)
