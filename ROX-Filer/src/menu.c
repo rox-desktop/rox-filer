@@ -93,7 +93,7 @@ static GtkWidget *popup_menu = NULL;	/* Currently open menu */
 static gint updating_menu = 0;		/* Non-zero => ignore activations */
 static GList *send_to_paths = NULL;
 
-static Option o_menu_iconsize, o_menu_xterm;
+static Option o_menu_iconsize, o_menu_xterm, o_menu_quick;
 
 /* Static prototypes */
 
@@ -329,6 +329,7 @@ void menu_init(void)
 
 	option_add_string(&o_menu_xterm, "menu_xterm", "xterm");
 	option_add_int(&o_menu_iconsize, "menu_iconsize", MIS_SMALL);
+	option_add_int(&o_menu_quick, "menu_quick", FALSE);
 	option_add_saver(save_menus);
 
 	option_register_widget("menu-set-keys", set_keys_button);
@@ -780,14 +781,19 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	gtk_widget_set_sensitive(filer_follow_sym,
 		strcmp(filer_window->sym_path, filer_window->real_path) != 0);
 
-	popup_menu = (state & GDK_CONTROL_MASK)
-				? filer_file_menu
-				: filer_menu;
+	if (n_selected && o_menu_quick.int_value) 
+		popup_menu = (state & GDK_CONTROL_MASK)
+					? filer_menu
+					: filer_file_menu;
+	else 
+		popup_menu = (state & GDK_CONTROL_MASK)
+					? filer_file_menu
+					: filer_menu;
 
 	updating_menu--;
 	
 	show_popup_menu(popup_menu, event,
-			popup_menu == filer_file_menu ? (n_added + 7) : 1);
+			popup_menu == filer_file_menu ? n_added : 1);
 }
 
 static void menu_closed(GtkWidget *widget)
