@@ -27,9 +27,7 @@
     </span>
   </xsl:template>
 
-  <xsl:template match="guilabel">
-    `<span class="guilabel"><xsl:call-template name="inline.charseq"/></span>'
-  </xsl:template>
+  <xsl:template match="guilabel">`<span class="guilabel"><xsl:call-template name="inline.charseq"/></span>'</xsl:template>
 
   <xsl:template match="function">
     <span class="function"><xsl:apply-templates/></span>
@@ -39,9 +37,7 @@
     <span class="parameter"><xsl:apply-templates/></span>
   </xsl:template>
 
-  <xsl:template match="filename">
-    `<tt class="filename"><xsl:apply-templates/></tt>'
-  </xsl:template>
+  <xsl:template match="filename">`<tt class="filename"><xsl:apply-templates/></tt>'</xsl:template>
 
   <xsl:template match="keycap">
     <span class="keycap"><xsl:apply-templates/></span>

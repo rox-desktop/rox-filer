@@ -302,8 +302,7 @@ $ rehash</screen>
     blank name to remove the panel.
 
     <screen>$ rox --bottom=MyOtherPanel
-     $ rox --bottom=</screen>
-
+$ rox --bottom=</screen>
    </para>
   </sect1>
 
@@ -453,19 +452,14 @@ $ rehash</screen>
     careful when using the filer like this.
 
     Normally, you should log in as an ordinary user and only change to
-    root when you need to. You can create a simple script which runs the
-    filer as root &mdash; something like this:
+    root when you need to. If you have <command>sudo</command> installed
+    and set up then you can run the filer like this:
 
-    <programlisting>
-     #!/bin/sh
+    <screen>$ sudo rox</screen>
 
-     su -m -c "rox $*"</programlisting>
-
-    Then, you can get a root filer window by simply running the script
-    and entering the root password. Remember, any file operations you
-    perform and any programs you run from these windows will run as root
-    too! Be careful!
-
+    Remember, any file operations you perform and any programs you run from
+    these windows will run as root too! Be careful!
+    </para><para>
     You may find that the X server won't allow root (or other users) to
     connect. Reading the manual pages for <command>xauth</command> and
     <command>xhost</command> may give you some hints, but it varies
@@ -595,11 +589,12 @@ $ rehash</screen>
   </tbody></tgroup></informaltable>
 
   <para>
-   Other keys can easily be defined by opening the
-   menu, moving the pointer over the item you want to use and pressing
-   a key. The key will appear in the menu and can be used from then on.
-   Key bindings are automatically saved when the filer quits.
-
+   If you have user-defineable key-bindings enabled, then other keys can easily
+   be set by opening the menu, moving the pointer over the item you want to use
+   and pressing a key. The key will appear in the menu and can be used from
+   then on. Key bindings are automatically saved when the filer quits.
+   You can use an XSettings manager, such as ROX-Session, to turn this feature
+   on for all Gtk+-2.0 applications.
   </para>
  </chapter>
 
@@ -848,7 +843,9 @@ $ rehash</screen>
          </entry></row><row><entry>
 
          <guimenuitem>Sort by Name</guimenuitem></entry><entry>
-         Items are arranged by name. There is an option to make this case-sensitive.
+	 Items are arranged by name. The default sort mode is case-insensitive
+	 and deals with numbers sensibly. There is an option to use straight
+	 ASCII sorting.
          </entry></row><row><entry>
 
          <guimenuitem>Sort by Type</guimenuitem></entry><entry>
@@ -873,9 +870,8 @@ $ rehash</screen>
 	 When on, the filer tries to load every image file and use that
 	 image as the file's icon. Useful if you have a directory full of
 	 photos and can't remember which is which!
-         When using Gtk+-2.0 or libpng, the thumbnails are saved in
-         <filename>~/.thumbnails</filename> for quick loading next time.
-         Otherwise, they are lost when the filer quits.
+	 The thumbnails are saved in <filename>~/.thumbnails</filename> for
+	 quick loading next time.
 	 While loading thumbnails, a progress bar appears at the bottom of
 	 the window. Clicking on the <guibutton>Cancel</guibutton> button
 	 beside the bar stops the scan.
@@ -1040,7 +1036,7 @@ $ rehash</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Open (A)VFS</guimenuitem></entry><entry>
+         <guimenuitem>Open AVFS</guimenuitem></entry><entry>
          Open the file as if it was a directory &mdash; see the
          <xref linkend="vfs"/> section.
        </entry></row>
@@ -1256,9 +1252,9 @@ $ rehash</screen>
     </para><para>
     To change which applications appear here you should choose the
     <guimenuitem>Customise</guimenuitem> item from the bottom
-    of the menu to create and open your own SendTo directory. Applications can be
-    symlinked into this directory by dragging them in with <keycap>Control</keycap>
-    and <keycap>Shift</keycap> held down.
+    of the menu to create and open your own <filename>SendTo</filename>
+    directory. Applications can be symlinked into this directory by dragging
+    them in with <keycap>Control</keycap> and <keycap>Shift</keycap> held down.
     </para><para>
     Opening the Send To menu via the main menu is rather slow, so it is
     normally opened by clicking the Menu mouse button over a file while
@@ -1338,6 +1334,7 @@ $ rehash</screen>
 
     </tbody></tgroup></informaltable>
 
+    </para><para>
     If you are setting up the defaults for multiple users and
     you wish to create a `Home' icon that leads to each user's home directory
     then you should first create a new icon and then use
@@ -1368,13 +1365,14 @@ $ rehash</screen>
     </para></step>
 
     <step><para>
-      Put an icon called <filename>.DirIcon</filename> inside it (so the directory
-      appears with an icon).
+      Use the <guimenuitem>Set Icon...</guimenuitem> feature to create an icon
+      called <filename>.DirIcon</filename> inside it (so the directory appears
+      with an icon).
     </para></step>
 
     <step><para>
-      Make a <filename>Help</filename> directory inside it for when the user chooses
-      <guimenuitem>Help</guimenuitem> from the menu.
+      Make a <filename>Help</filename> directory inside it for when the user
+      chooses <guimenuitem>Help</guimenuitem> from the menu.
     </para></step>
 
     <step><para>
@@ -1394,51 +1392,14 @@ $ rehash</screen>
    <anchor id="vfs" xreflabel="Virtual file systems"/>Virtual file systems
   </title>
   <para>
-
    Some types of file can be represented as a directory. A typical example
    is a zip file, which contains an entire directory structure in compressed
    form. It is often useful to be able to open up such a file as if it
    was a real directory, and the VFS system allows you to do this.
-
-   <itemizedlist><title>To use this feature you must have one or both of the
-     following:</title>
-
-    <listitem><para>
-      A system such as AVFS<citation>AVFS</citation> which causes the kernel to
-      support various Virtual File Systems directly. This is the best option
-      since all programs will be able to access the contents of the VFS. You
-      may require root access to install such a system, however, and it is not
-      available on all platforms.
-    </para></listitem>
-
-    <listitem><para>
-      Support for the Midnight Commander VFS library compiled into
-      <application>ROX-Filer</application>. This happens automatically when you
-      compile <application>ROX-Filer</application> if it can find
-      the VFS library &mdash; this means having <filename>libvfs.so</filename>
-      (or <filename>libvfs.a</filename>) in a system library directory or in the
-      directory in the environment variable <envar>LD_LIBRARY_PATH</envar>. In
-      this case, you will be able to view the directory structure and copy
-      files out of it, but not change it.
-     </para>
-
-     <para>
-      When using libvfs, the menu structure is slightly different &mdash;
-      <guimenuitem>Open AVFS</guimenuitem> is replaced by the <guisubmenu>Open
-       VFS</guisubmenu> submenu.  This is simply a short-cut for using the
-      path-entry box (explained below), so if you want to use a VFS not listed
-      on the menu you can type in the path directly, eg:
-      <filename>/home/fred/archive.zip#uzip/</filename>.
-
-      Don't forget the final slash!
-      </para><para>
-      Use of libvfs is strongly discouraged; use AVFS instead. Recent versions
-      of the library don't compile properly, and it can't be used on many
-      systems because it conflicts with large file support.
-     </para>
-    </listitem>
-   </itemizedlist>
-
+  </para><para>
+   To use this feature you must have a system such as
+   AVFS<citation>AVFS</citation> installed, which causes the kernel to support
+   various Virtual File Systems directly.
   </para>
 
  </chapter>
@@ -1493,36 +1454,40 @@ $ rehash</screen>
 
    <para>
     Tab completion tries to fill in as many characters for you as it can.
-    For example, if there are two files in a directory called `save-mail-nov-1999'
-    and `save-mail-dec-1999' then typing 'save' and pressing
-    <keycap>Tab</keycap> will expand `save' to `save-mail-' and beep to
-    indicate that the match is not complete. If you use tab completion on a
+    For example, if there are two files in a directory called 
+    <filename>save-mail-nov-1999</filename> and
+    <filename>save-mail-dec-1999</filename> then typing
+    <userinput>save</userinput> and pressing <keycap>Tab</keycap> will expand
+    <userinput>save</userinput> to <userinput>save-mail-</userinput> and beep
+    to indicate that the match is not complete. If you use tab completion on a
     directory and it is unique then the filer will automatically change into
     the directory. This behavior should be familiar to shell users.
    </para>
 
    <informalexample><para>
      Let's say you want to locate the documentation for Wine in the directory
-     <filename>/usr/doc</filename> (which is usually very large).
+     <filename>/usr/share/doc</filename> (which is usually very large).
      Here's how you could do it:
 
      <orderedlist>
 
       <listitem><para>
-        Open the minibuffer by choosing <guimenuitem>Enter Path...</guimenuitem> from the
-        <guimenu>Window</guimenu> menu.
-        I usually bind this function to the slash (<keycap>/</keycap>) key.
+	Open the minibuffer by choosing <guimenuitem>Enter
+	Path...</guimenuitem> from the <guimenu>Window</guimenu> menu, or
+        by pressing the slash (<keycap>/</keycap>) key.
       </para></listitem>
 
       <listitem><para>
-        Press <keycap>CTRL</keycap>+<keycap>U</keycap> to delete the existing contents
-        &mdash; this moves you to the root directory.
+	Press <keycap>CTRL</keycap>+<keycap>A</keycap> to select the existing
+	contents.
       </para></listitem>
 
       <listitem><para>
-        Type <userinput>u&lt;Tab&gt;do&lt;Tab&gt;wi&lt;Tab&gt;</userinput>.
+	Type
+	<userinput>u&lt;Tab&gt;sh&lt;Tab&gt;do&lt;Tab&gt;wi&lt;Tab&gt;</userinput>.
         As you type, the cursor will move to the correct subdirectory.
-        If it beeps when you press Tab then you need to supply more letters.
+	If it beeps when you press <keycap>Tab</keycap> then you need to supply
+	more letters, or press <keycap>Return</keycap>.
       </para></listitem>
 
      </orderedlist>
@@ -1546,7 +1511,7 @@ $ rehash</screen>
     If some items are selected then they are assigned to the positional
     parameters <userinput>$1</userinput>, <userinput>$2</userinput>, etc.
     </para><para>
-    Opening the minibuffer with a selection adds <computeroutput>$@</computeroutput>
+    Opening the minibuffer with a selection adds <computeroutput>"$@"</computeroutput>
     to the end of the command &mdash; this expands to all the selected files.
    </para>
 
@@ -1675,7 +1640,7 @@ $ rehash</screen>
        answers no to the question displayed in the log area.
     </para></listitem></varlistentry>
 
-    <varlistentry><term><guibutton>Abort</guibutton></term><listitem><para>
+    <varlistentry><term><guibutton>Cancel</guibutton></term><listitem><para>
        kills the current operation (if any) and closes the action
        window.
     </para></listitem></varlistentry>
@@ -1722,8 +1687,15 @@ $ rehash</screen>
        subdirectories, and so on.
      </para></listitem>
 
-    </itemizedlist>
+     <listitem><para>
+       <guilabel>Newer</guilabel> will automatically copy a file over an existing one
+       if the file is newer than the one it replaces (later modification time).
+     </para></listitem>
 
+    </itemizedlist>
+   </para>
+   <para>
+     You can set the defaults for these options from the Options box.
    </para>
   </sect1>
  </chapter>
@@ -1743,10 +1715,10 @@ $ rehash</screen>
    Remember to use normal quotes, not double quotes (") or back-quotes (`).
    </para><para>
    As the filer finds matching files they are added to the results list.
-   Clicking on an entry in the list opens a viewer showing the file you
-   clicked on. The filer will use the same window to view other results
-   (so, if you want the results shown in separate windows you must explicitly
-   create a new window from the <guimenu>Window</guimenu> menu).
+   Double-clicking on an entry in the list opens a viewer showing that file.
+   The filer will use the same window to view other results (so, if you want
+   the results shown in separate windows you must explicitly create a new
+   window from the <guimenu>Window</guimenu> menu).
   </para>
 
   <sect1>
@@ -2107,36 +2079,32 @@ $ rehash</screen>
    You can configure various aspects of <application>ROX-Filer</application>
    from the Options box.
    Choose <guimenuitem>Options...</guimenuitem> from a filer window menu to
-   open it.
+   open it. The list on the left of the window lists the various sections &mdash;
+   click on one to see its options.
 
-   At the bottom of the window are four buttons:
+   At the bottom of the window are three buttons:
 
    <itemizedlist>
 
     <listitem><para>
       <guibutton>Save</guibutton>
-      puts all your choices into effect, and also saves them into
-      your Choices directory for next time <application>ROX-Filer</application> is
-      loaded. <application>ROX-Filer</application> will never save any preferences to
-      disk unless you click on the <guibutton>Save</guibutton> button in the options
-      window. Exactly where choices are loaded from and saved to is controlled by
-      the <envar>CHOICESPATH</envar> environment variable &mdash; see
-      <citation>Choices</citation> for details.
+      saves the current choices into your Choices directory for next time
+      <application>ROX-Filer</application> is loaded. Exactly where choices are
+      loaded from and saved to is controlled by the <envar>CHOICESPATH</envar>
+      environment variable &mdash; see <citation>Choices</citation> for
+      details.
     </para></listitem>
 
     <listitem><para>
       <guibutton>OK</guibutton>
-      puts your choices into effect without writing anything to disk.
+      closes the window. All choices take effect instantly, so this
+      button doesn't actually do anything else.
     </para></listitem>
 
     <listitem><para>
-      <guibutton>Apply</guibutton>
-      works like <guibutton>OK</guibutton>, but without closing the Options window.
-    </para></listitem>
-
-    <listitem><para>
-      <guibutton>Cancel</guibutton>
-      closes the options box and forgets any changes you made.
+      <guibutton>Revert</guibutton>
+      Restores all choices to how they were when the options box was opened.
+      The Options window is not closed.
     </para></listitem>
 
    </itemizedlist>
@@ -2158,68 +2126,167 @@ $ rehash</screen>
   </sect1>
 
   <sect1>
-   <title>Display options</title>
+   <title>Filer window options</title>
    <para>
 
     <itemizedlist>
-     <listitem><para><guilabel>Ignore case when sorting</guilabel>
-       treats upper and lower case letters as
-       equivalent when sorting. If this is off then <filename>Zoo</filename> comes
-       before <filename>animal</filename>, for example.
+     <listitem><para><guilabel>Automatically resize filer windows</guilabel> can be
+       used to control when windows are automatically resized:
+
+       <itemizedlist>
+        <listitem><para><guilabel>Never automatically resize</guilabel>
+          turns off auto-resizing. Windows must be resized manually.
+        </para></listitem>
+
+        <listitem><para><guilabel>Resize when changing the display style</guilabel>
+	  will resize the window automatically when you change the icon size or
+	  the type of details to be displayed.
+        </para></listitem>
+
+        <listitem><para><guilabel>Always resize</guilabel>
+	  causes the window to resize whenever it seems useful (that is, when
+	  changing to a different directory or when switching between display
+	  styles).
+        </para></listitem>
+       </itemizedlist>
+
      </para></listitem>
 
-     <listitem><para><guilabel>Directories always come first</guilabel> means that
-       all directories are sorted and displayed at the top, then all the other items
-       are sorted and displayed below. With this option off, directories are mixed in
-       with the other files.
+     <listitem><para> <guilabel>Largest window size</guilabel> sets the largest size
+       (as a percentage of the screen size) that the auto-resizer will resize windows
+       to.
      </para></listitem>
 
-     <listitem><para><guilabel>Large wrap width</guilabel> sets the maximum width
-       for a file's name in `Large Icons' display mode before the text will wrap onto
-       two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
+     <listitem><para> <guilabel>Short titlebar flags</guilabel> abbreviates
+     the All, Thumbs and Scanning titlebar indicators to single letters.
      </para></listitem>
 
-     <listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; in
-       `Small Icons' mode, any text longer than this is chopped off (a red bar
-       indicates that some text is not shown). You can hold the mouse over the
-       truncated name to see the full text.
+     <listitem><para> <guilabel>Unique windows</guilabel> prevents you from having
+       two windows showing the same directory. Opening a second view onto a directory
+       simply reshows the first one.
      </para></listitem>
 
-     <listitem><para><guilabel>Inherit options from source window</guilabel>
-       controls what happens when you open a new window from an existing window
-       (eg, by clicking the middle button over a directory). If on, the new window
-       has the same options (icon size, sort order, etc) as the old window. If
-       off, the new window has the default options.</para></listitem>
+     <listitem><para> <guilabel>New window on button 1</guilabel> swaps the
+       actions of the two non-menu buttons when opening directories. This is
+       provided for people who are used to the RISC OS mouse bindings.
+     </para></listitem>
 
-     <listitem><para><guilabel>Default settings for new windows</guilabel>.
-       The remaining options provide the default settings for newly opened
-       windows &mdash; they correspond to choosing styles from the
-       <guimenuitem>Display</guimenuitem> menu.
+     <listitem><para> <guilabel>Single-click navigation in filer windows</guilabel>
+       means that clicking on a file or directory will open it. If off, clicking on
+       files selects them instead &mdash; you must double click on a file to open it.
      </para></listitem>
 
     </itemizedlist>
    </para>
+
+   <sect2>
+    <title>Display options</title>
+    <para>
+
+     <itemizedlist>
+      <listitem><para><guilabel>Intelligent sorting</guilabel>
+	treats upper and lower case letters as equivalent when sorting, ignores
+	punctuation, and sorts numbers numerically. If this is off then
+	<filename>Zoo</filename> comes before <filename>animal</filename>, for
+	example.
+      </para></listitem>
+
+      <listitem><para><guilabel>Directories always come first</guilabel> means that
+	all directories are sorted and displayed at the top, then all the other items
+	are sorted and displayed below. With this option off, directories are mixed in
+	with the other files.
+      </para></listitem>
+
+      <listitem><para><guilabel>Large wrap width</guilabel> sets the maximum width
+	for a file's name in `Large Icons' display mode before the text will wrap onto
+	two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
+      </para></listitem>
+
+      <listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; in
+	`Small Icons' mode, any text longer than this is chopped off (a red bar
+	indicates that some text is not shown). You can hold the mouse over the
+	truncated name to see the full text.
+      </para></listitem>
+
+      <listitem><para><guilabel>Default settings for new windows</guilabel> &mdash;
+	these options provide the default settings for newly opened
+	windows. They correspond to choosing styles from the
+	<guimenuitem>Display</guimenuitem> menu.
+	If <guilabel>Inherit options from source window</guilabel>
+	is on then opening a new window from an existing window
+	(eg, by clicking the middle button over a directory) gives the new window
+	the same options (icon size, sort order, etc) as the old window. If
+	off, the new window has the default settings chosen here.
+      </para></listitem>
+
+     </itemizedlist>
+    </para>
+   </sect2>
+
+   <sect2><title>Toolbar options</title>
+    <para>
+     The toolbar is described in the <xref linkend="Toolbar"/> section.
+     <itemizedlist>
+      <listitem><para> <guilabel>Unshade the tools you want:</guilabel> allows
+	you to set which tools should appear on the toolbar. Click on the
+	buttons below to shade and unshade them &mdash; shaded tools will not be
+	shown on filer window toolbars.
+      </para></listitem>
+
+      <listitem><para> <guilabel>Toolbar type</guilabel> allows you to choose
+	what kind of toolbars you want.
+	<guimenuitem>None</guimenuitem> means that windows will not have a
+	toolbar,
+	<guimenuitem>Normal</guimenuitem> provides a small bar of icons, and
+	<guimenuitem>Large</guimenuitem> displays larger buttons, with textual labels.
+      </para></listitem>
+
+      <listitem><para> <guilabel>Show totals of items</guilabel> shows the
+	number of items displayed in a filer window, as well as the number of
+	hidden items (if any) on the toolbar.  When there's a selection, it
+	shows the number of selected items and their combined size (excluding
+	directories).
+      </para></listitem>
+
+     </itemizedlist>
+
+    </para>
+   </sect2>
+
+   <sect2><title>Minibuffers</title>
+    <para>
+     These two options control what happens when you press <keycap>Tab</keycap>
+     in the path entry minibuffer:
+
+     <itemizedlist>
+
+      <listitem><para> <guilabel>Beep if Tab-completion fails</guilabel> &mdash; beep
+       if there is no match, or there are several possible completions, each starting
+       differently.
+      </para></listitem>
+
+      <listitem><para> <guilabel>Beep if there are several matches</guilabel> &mdash;
+       beep if there are several matches, even though some letters were added.
+      </para></listitem>
+
+     </itemizedlist>
+    </para>
+   </sect2>
   </sect1>
 
   <sect1>
    <title>Pinboard options</title>
    <para>
-
-    If you are using the pinboard features (see the <xref linkend="run_pin"/>
-    section) then you can choose how the text under each icon is displayed. If
-    you have a fairly uniform background then you may like to choose <guilabel>No
-     background</guilabel>, which simply draws the text directly over the desktop
-    background. However, users with more `noisy' backdrops may find such
-    text hard to read; selecting <guilabel>Rectangular background slab</guilabel>
-    will draw a solid rectangle behind the text to make it easier to read.
-    When using Gtk+-2.0, this option has no effect.
-    </para><para>
-    You may also change the foreground and background colours used for
-    the text by clicking on the colour slabs in the Options window.
+    See the <xref linkend="run_pin"/> section for instructions on enabling the
+    pinboard.
 
     <itemizedlist>
 
-     <listitem><para> <guilabel>Single-click to open</guilabel>
+     <listitem><para><guilabel>Text style</guilabel>
+       sets the colours to use for the text under the icons.
+     </para></listitem>
+
+     <listitem><para><guilabel>Single-click to open</guilabel>
        allows you to open a file or directory just by clicking on it. Hold down
        <keycap>Control</keycap> to select things. If this is off, clicking selects
        and double-clicking opens.
@@ -2256,110 +2323,9 @@ $ rehash</screen>
 
     You can choose to start some operations automatically, without waiting
     for you to click on <guibutton>Quiet</guibutton>.
-    Select each operation that you want to
-    auto-start here. You can also set the default state for each of the
-    options that appear inside action windows.
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Toolbar options</title>
-   <para>
-    The toolbar is described in the <xref linkend="Toolbar"/> section.
-    <itemizedlist>
-     <listitem><para> <guilabel>Unshade the tools you want:</guilabel> allows
-       you to set which tools should appear on the toolbar. Click on the
-       buttons below to shade and unshade them &mdash; shaded tools will not be
-       shown on filer window toolbars.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Toolbar type</guilabel> allows you to choose
-       what kind of toolbars you want.
-       <guimenuitem>None</guimenuitem> means that windows will not have a
-       toolbar,
-       <guimenuitem>Normal</guimenuitem> provides a small bar of icons, and
-       <guimenuitem>Large</guimenuitem> displays larger buttons, with textual labels.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Show totals of items</guilabel> shows the
-       number of items displayed in a filer window, as well as the number of
-       hidden items (if any) on the toolbar.  When there's a selection, it
-       shows the number of selected items and their combined size (excluding
-       directories).
-     </para></listitem>
-
-    </itemizedlist>
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Filer window options</title>
-   <para>
-
-    <itemizedlist>
-     <listitem><para><guilabel>Automatically resize filer windows</guilabel> can be
-       used to control when windows are automatically resized:
-
-       <itemizedlist>
-        <listitem><para><guilabel>...never</guilabel>
-          turns off auto-resizing. Windows must be
-          resized manually.
-        </para></listitem>
-
-        <listitem><para><guilabel>...when changing the display style</guilabel>
-          will resize the
-          window automatically when you change the icon size or the type of
-          details to be displayed.
-        </para></listitem>
-
-        <listitem><para><guilabel>...always</guilabel>
-          causes the window to resize whenever it
-          seems useful (that is, when changing to a different directory or when
-          switching between display styles).
-        </para></listitem>
-       </itemizedlist>
-
-     </para></listitem>
-
-     <listitem><para> <guilabel>Window size limit</guilabel> sets the largest size
-       (as a percentage of the screen size) that the auto-resizer will resize windows
-       to.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Unique windows</guilabel> prevents you from having
-       two windows showing the same directory. Opening a second view onto a directory
-       closes the first.
-     </para></listitem>
-
-     <listitem><para> <guilabel>New window on button 1</guilabel> swaps the
-       actions of the two non-menu buttons when opening directories. This is
-       provided for people who are used to the RISC OS mouse bindings.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Single-click navigation in filer windows</guilabel>
-       means that clicking on a file or directory will open it. If off, clicking on
-       files selects them instead &mdash; you must double click on a file to open it.
-     </para></listitem>
-
-    </itemizedlist>
-
-    The next two options control what happens when you press <keycap>Tab</keycap>
-    in the path entry minibuffer:
-
-    <itemizedlist>
-
-     <listitem><para> <guilabel>Beep if Tab-completion fails</guilabel> &mdash; beep
-       if there is no match, or there are several possible completions, each starting
-       differently.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Beep if there are several matches</guilabel> &mdash;
-       beep if there are several matches, even though some letters were added.
-     </para></listitem>
-
-    </itemizedlist>
+    Select each operation that you want to auto-start here. You can also set
+    the default state for each of the options that appear inside action
+    windows.
 
    </para>
   </sect1>
@@ -2405,7 +2371,7 @@ $ rehash</screen>
        this has no effect.
      </para></listitem>
 
-     <listitem><para><guilabel>Dragging files with the middle mouse button...</guilabel>
+     <listitem><para><guilabel>Dragging files with the middle mouse button</guilabel>
        you can choose whether this displays a menu (like <keycap>Alt</keycap>
        dragging) or moves the files (like <keycap>Shift</keycap> dragging).
      </para></listitem>
@@ -2421,16 +2387,6 @@ $ rehash</screen>
 
     <itemizedlist>
 
-     <listitem><para><guilabel>Xterm here program</guilabel> is the command
-       used when you choose <guimenuitem>Xterm here</guimenuitem> from the
-       menu. You can replace it with another command such as
-       <command>gnome-terminal</command>, <command>konsole</command>, or
-       anything else.</para></listitem>
-
-     <listitem><para><guilabel>Size of icons in menus</guilabel> controls the
-       size of the icons in the <guimenuitem>Send To</guimenuitem> and
-       <guimenuitem>New</guimenuitem> menus.</para></listitem>
-
      <listitem><para><guilabel>Menu on button 2</guilabel> swaps the actions
        of buttons 2 and 3 so that the middle button brings up the menus. This
        is provided for people who are used to the RISC OS mouse bindings.
@@ -2442,6 +2398,16 @@ $ rehash</screen>
        <application>ROX-Filer</application>).
      </para></listitem>
 
+     <listitem><para><guilabel>Size of icons in menus</guilabel> controls the
+       size of the icons in the <guimenuitem>Send To</guimenuitem> and
+       <guimenuitem>New</guimenuitem> menus.</para></listitem>
+
+     <listitem><para><guilabel>Xterm here program</guilabel> is the command
+       used when you choose <guimenuitem>Xterm here</guimenuitem> from the
+       menu. You can replace it with another command such as
+       <command>gnome-terminal</command>, <command>konsole</command>, or
+       anything else.</para></listitem>
+
     </itemizedlist>
    </para>
   </sect1>
@@ -2449,36 +2415,34 @@ $ rehash</screen>
   <sect1>
    <title>Types</title>
    <para>
-    <itemizedlist>
-     <listitem><para><guilabel>Ignore eXecutable bit for known
-        extensions</guilabel> means that when a file has a known extension (eg
-       <filename>.gif</filename>) the executable bit is ignored. This is useful
-       if you have files on a Windows-type filesystem which are being shown as
-       executable programs. However, it prevents a file such as
-       <filename>script.sh</filename> from being treated as a program.
-     </para></listitem>
+     <guilabel>Ignore eXecutable bit for known extensions</guilabel> means that
+     when a file has a known extension (eg <filename>.gif</filename>) the
+     executable bit is ignored. This is useful if you have files on a
+     Windows-type filesystem which are being shown as executable programs.
+     However, it prevents a file such as <filename>script.sh</filename> from
+     being treated as a program.
+     </para><para>
+     The MIME type system used in the filer is described more fully in
+     <xref linkend="types"/>.
+     <itemizedlist>
+      <listitem><para><guibutton>Show name-to-type rules</guibutton>
+        opens the directories containing the files which tell the filer what
+        type to give each file.</para></listitem>
 
-     <listitem><para><guilabel>Colour files based on their types</guilabel>.
-       If on, each file's name is coloured depending on what kind of thing it is
-       (regular file, directory, executable, etc). You can choose the colours from
-       the list below.
-     </para></listitem>
-
-    </itemizedlist>
-
-    The MIME type system used in the filer is described more fully in
-    <xref linkend="types"/>.
-    <itemizedlist>
-     <listitem><para><guibutton>Show name-to-type rules</guibutton>
-       opens the directories containing the files which tell the filer what
-       type to give each file.</para></listitem>
-
-     <listitem><para><guibutton>Re-read files</guibutton> causes the filer to
-       reread these files after you've finished changing them.
-     </para></listitem>
-    </itemizedlist>
-
+      <listitem><para><guibutton>Re-read files</guibutton> causes the filer to
+        reread these files after you've finished changing them.
+      </para></listitem>
+     </itemizedlist>
    </para>
+
+   <sect2><title>Colours</title>
+     <para>
+       <guilabel>Colour files based on their types</guilabel>. If on, each
+       file's name is coloured depending on what kind of thing it is (regular
+       file, directory, executable, etc). You can choose the colours from the
+       list below.
+      </para>
+   </sect2>
   </sect1>
  </chapter>
 
@@ -2561,7 +2525,15 @@ $ rehash</screen>
     </para><para>
     It works much like the Set Run Action box described above, except that
     you may specifiy an icon for one file individually (by name) as well as
-    for all files of a particular type.
+    for all files of a particular type. When setting the icon for a single
+    file, the filer stores the name of the file and the name of the icon inside
+    your Choices directory. If either moves, the icon won't be displayed.
+    </para><para>
+    When setting the icon for a directory, you have the additional option of
+    storing the image inside the directory itself as a hidden file. This means
+    that other users will see the icon too, and you can safely delete the original
+    image after the copy (note that the image is scaled down if needed, and converted
+    to PNG format).
     </para><para>
     The directory icon inside the <guilabel>Drop an icon here</guilabel>
     area allows you to quickly get to a directory from which you are already
@@ -2687,7 +2659,7 @@ $ rehash</screen>
     <listitem><para>
       <filename>AppIcon.xpm</filename>
       is used if <filename>.DirIcon</filename> is missing (for backwards
-      compatibility).
+      compatibility; not to be used anymore).
     </para></listitem>
 
    </itemizedlist>
@@ -3131,7 +3103,7 @@ $ rehash</screen>
     <para>
      ROX-Filer was created by Thomas Leonard, with help from:
      </para><para>
-     <simplelist columns='4'>
+     <simplelist columns='3'>
       <member>Christopher Arndt</member>
       <member>Jens Askengren</member>
       <member>Liav Asseraf</member>
@@ -3145,6 +3117,7 @@ $ rehash</screen>
       <member>Fabien Coutant</member>
       <member>Couderc Damien</member>
       <member>Andreas Dehmel</member>
+      <member>Micah Dowty</member>
       <member>Dmitry Elfimov</member>
       <member>Mattias Engdegard</member>
       <member>Andrew Flegg</member>
@@ -3163,6 +3136,7 @@ $ rehash</screen>
       <member>Anders Lundmark</member>
       <member>Jose Romildo Malaquias</member>
       <member>Denis Manente</member>
+      <member>Brendan McCarthy</member>
       <member>Andras Mohari</member>
       <member>Christiansen Merel</member>
       <member>Jimmy Olgeni</member>
@@ -3170,11 +3144,13 @@ $ rehash</screen>
       <member>Marcelo Ramos</member>
       <member>Michel Alexandre Salim</member>
       <member>Chris Sawer</member>
+      <member>Christian Storgaard</member>
       <member>Taras</member>
       <member>Simon Truss</member>
       <member>Jan Wagemakers</member>
       <member>Stephen Watson</member>
       <member>Andre Wyrwa</member>
+      <member>Geoff Youngs</member>
       <member>Diego Zamboni</member>
      </simplelist>
      </para><para>
@@ -3239,11 +3215,27 @@ $ rehash</screen>
      If not given, the panel on that side is turned off.
    </para></listitem>
 
+   <listitem><para><function>PanelAdd</function>(<parameter>Side</parameter>,
+     <parameter>Path</parameter>, [<parameter>Label</parameter>,
+     <parameter>After</parameter>])
+     Add <parameter>Path</parameter> to the panel on side <parameter>Side</parameter>,
+     with label <parameter>Label</parameter>. If <parameter>After</parameter> is
+     <userinput>true</userinput> the icon goes on the right/bottom side of the panel,
+     otherwise on the left/top side.
+   </para></listitem>
+
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
      Display pinboard <parameter>Name</parameter> on the desktop background.
      <parameter>Name</parameter> can be a name in Choices (eg,
      <userinput>MyPinboard</userinput>) or a full pathname.
      If not given, the pinboard is turned off.
+   </para></listitem>
+
+   <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
+     <parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
+     Add <parameter>Path</parameter> to the pinboard at position
+     (<parameter>X</parameter>, <parameter>Y</parameter>), giving it the label
+     <parameter>Label</parameter>.
    </para></listitem>
 
    <listitem><para><function>Run</function>(<parameter>Filename</parameter>)
