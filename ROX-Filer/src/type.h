@@ -9,6 +9,7 @@
 #define _TYPE_H
 
 typedef struct _MIME_type MIME_type;
+extern MIME_type text_plain;		/* Often used as a default type */
 
 #include "pixmaps.h"
 #include "filer.h"

@@ -99,14 +99,14 @@ enum
 };
 
 GdkAtom XdndDirectSave0;
-GdkAtom text_plain;
+GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
 
 void dnd_init()
 {
 	XdndDirectSave0 = gdk_atom_intern("XdndDirectSave0", FALSE);
-	text_plain = gdk_atom_intern("text/plain", FALSE);
+	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
@@ -183,7 +183,7 @@ static void set_xds_prop(GdkDragContext *context, char *text)
 {
 	gdk_property_change(context->source_window,
 			XdndDirectSave0,
-			text_plain, 8,
+			xa_text_plain, 8,
 			GDK_PROP_MODE_REPLACE,
 			text,
 			strlen(text));
@@ -196,7 +196,7 @@ static char *get_xds_prop(GdkDragContext *context)
 
 	if (gdk_property_get(context->source_window,
 			XdndDirectSave0,
-			text_plain,
+			xa_text_plain,
 			0, MAXURILEN,
 			FALSE,
 			NULL, NULL,

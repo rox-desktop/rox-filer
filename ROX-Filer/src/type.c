@@ -32,7 +32,7 @@ static GHashTable *extension_hash = NULL;
 static char *current_type = NULL;	/* (used while reading file) */
 
 /* Most things on Unix are text files, so this is the default type */
-static MIME_type text_plain = {"text", "plain"};
+MIME_type text_plain = {"text", "plain"};
 
 void type_init()
 {

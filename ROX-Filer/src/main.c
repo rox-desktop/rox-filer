@@ -80,8 +80,6 @@ int main(int argc, char **argv)
 	int		 stderr_pipe[2];
 	struct sigaction act = {};
 
-	/* XXX: Set our process name to something sensible */
-
 	gtk_init(&argc, &argv);
 	choices_init("ROX-Filer");
 
@@ -105,9 +103,9 @@ int main(int argc, char **argv)
 	if (geteuid() == 0)
 	{
 		if (get_choice("!!!DANGER!!!",
-			"Running ROX-Filer as root is VERY dangerous. If it "
-			"had a warranty (it doesn't) then doing this would "
-			"void it.", 2,
+			"Running ROX-Filer as root is VERY dangerous. If I "
+			"had a warranty (I don't) then doing this would "
+			"void it", 2,
 			"Don't click here", "Quit") != 0)
 			exit(EXIT_SUCCESS);
 	}

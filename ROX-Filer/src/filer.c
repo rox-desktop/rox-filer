@@ -292,9 +292,14 @@ static void add_item(FilerWindow *filer_window, char *leafname)
 	if (base_type == TYPE_DIRECTORY &&
 			!(item->flags & ITEM_FLAG_MOUNT_POINT))
 	{
-		/* Might be an application directory - better check... */
+		uid_t	uid = info.st_uid;
+		
+		/* Might be an application directory - better check...
+		 * AppRun must have the same owner as the directory
+		 * (to stop people putting an AppRun in, eg, /tmp)
+		 */
 		g_string_append(path, "/AppRun");
-		if (!stat(path->str, &info))
+		if (!stat(path->str, &info) && info.st_uid == uid)
 		{
 			item->flags |= ITEM_FLAG_APPDIR;
 		}
@@ -757,7 +762,7 @@ void open_item(Collection *collection,
 			}
 			break;
 		case TYPE_FILE:
-			if (item->flags & ITEM_FLAG_EXEC_FILE)
+			if (item->flags & ITEM_FLAG_EXEC_FILE && !shift)
 			{
 				char	*argv[] = {full_path, NULL};
 
@@ -773,7 +778,8 @@ void open_item(Collection *collection,
 			else
 			{
 				GString		*message;
-				MIME_type	*type = item->mime_type;
+				MIME_type	*type = shift ? &text_plain
+							      : item->mime_type;
 
 				g_return_if_fail(type != NULL);
 
