@@ -338,7 +338,7 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 		gtk_tooltips_set_tip(tooltips, radio[SET_COPY],
 			_("Copy the image inside the directory, as "
 			"a hidden file called '.DirIcon'. "
-			"All users will than see the "
+			"All users will then see the "
 			"icon, and you can move the directory around safely. "
 			"This is usually the best option if you can write to "
 			"the directory."), NULL);
