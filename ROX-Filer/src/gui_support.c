@@ -242,8 +242,6 @@ void make_panel_window(GtkWidget *widget)
 	gdk_property_change(window, xa_net_state, xa_atom, 32,
 			GDK_PROP_MODE_APPEND, (guchar *) state_list, 3);
 
-	g_return_if_fail(window != NULL);
-
 	gdk_property_change(window, xa_hints, xa_hints, 32,
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_hints_values,
 			sizeof(wm_hints_values) / sizeof(gint32));
