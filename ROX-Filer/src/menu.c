@@ -54,6 +54,7 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget);
 static void rename_item(gpointer data, guint action, GtkWidget *widget);
 static void link_item(gpointer data, guint action, GtkWidget *widget);
 static void help(gpointer data, guint action, GtkWidget *widget);
+static void show_file_info(gpointer data, guint action, GtkWidget *widget);
 static void mount(gpointer data, guint action, GtkWidget *widget);
 static void delete(gpointer data, guint action, GtkWidget *widget);
 
@@ -93,7 +94,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Rename...",		NULL,  	rename_item, 0, NULL},
 {"/File/Link...",		NULL,  	link_item, 0, NULL},
 {"/File/Help",		    	"F1",  	help, 0, NULL},
-{"/File/Info",			NULL,  	NULL, 0, NULL},
+{"/File/Info",			"I",  	show_file_info, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
 {"/File/Mount",	    		C_"M",  mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
@@ -125,6 +126,7 @@ static GtkItemFactoryEntry panel_menu_def[] = {
 {"/Display/Refresh",	    	NULL, 	refresh, 0,	NULL},
 {"/File",			NULL,	NULL, 	0, "<Branch>"},
 {"/File/Help",		    	NULL,  	help, 0, NULL},
+{"/File/Info",			NULL,  	show_file_info, 0, NULL},
 {"/File/Delete",		NULL,	delete,	0, NULL},
 {"/Open as directory",		NULL, 	open_as_dir, 0, NULL},
 {"/Close panel",		NULL, 	close_panel, 0, NULL},
@@ -533,18 +535,39 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
-static void show_file_info(FilerWindow *filer_window, FileItem *file)
+static void show_file_info(gpointer data, guint action, GtkWidget *widget)
 {
-	GtkWidget	*window, *table, *label, *button;
+	GtkWidget	*window, *table, *label, *button, *frame;
+	FilerWindow	*filer_window = window_with_focus;
+	GtkWidget	*file_label;
+	GString		*reply;
 	char		*string;
+	int		file_data[2];
+	char		*path;
+	char		buffer[2];
+	char 		*argv[] = {"file", "-b", NULL, NULL};
+	int		got;
+	Collection 	*collection;
+	FileItem	*file;
+	
+	g_return_if_fail(filer_window != NULL);
 
+	collection = filer_window->collection;
+	if (collection->number_selected != 1)
+	{
+		report_error("ROX-Filer", "You must select a single "
+				"item before using Info");
+		return;
+	}
+	file = selected_item(collection);
+
+	path = make_path(filer_window->path, file->leafname)->str;
 	window = gtk_window_new(GTK_WINDOW_DIALOG);
 	gtk_window_set_position(GTK_WINDOW(window), GTK_WIN_POS_MOUSE);
 	gtk_container_set_border_width(GTK_CONTAINER(window), 4);
-	gtk_window_set_title(GTK_WINDOW(window),
-		     make_path(filer_window->path, file->leafname)->str);
+	gtk_window_set_title(GTK_WINDOW(window), path);
 
-	table = gtk_table_new(3, 2, FALSE);
+	table = gtk_table_new(4, 2, FALSE);
 	gtk_container_add(GTK_CONTAINER(window), table);
 	gtk_table_set_row_spacings(GTK_TABLE(table), 8);
 	gtk_table_set_col_spacings(GTK_TABLE(table), 4);
@@ -570,14 +593,55 @@ static void show_file_info(FilerWindow *filer_window, FileItem *file)
 	label = gtk_label_new(string);
 	g_free(string);
 	gtk_table_attach_defaults(GTK_TABLE(table), label, 1, 2, 2, 3);
+
+	frame = gtk_frame_new("file(1) says...");
+	gtk_table_attach_defaults(GTK_TABLE(table), frame, 0, 2, 3, 4);
+	file_label = gtk_label_new("<nothing yet>");
+	gtk_misc_set_padding(GTK_MISC(file_label), 4, 4);
+	gtk_label_set_line_wrap(GTK_LABEL(file_label), TRUE);
+	gtk_container_add(GTK_CONTAINER(frame), file_label);
 	
 	button = gtk_button_new_with_label("OK");
-	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 3, 4,
+	gtk_table_attach(GTK_TABLE(table), button, 0, 2, 4, 5,
 			GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 40, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			gtk_widget_destroy, GTK_OBJECT(window));
 
 	gtk_widget_show_all(window);
+	gdk_flush();
+
+	pipe(file_data);
+	switch (fork())
+	{
+		case -1:
+			close(file_data[0]);
+			close(file_data[1]);
+			gtk_label_set_text(GTK_LABEL(file_label),
+					"fork() error");
+			return;
+		case 0:
+			close(file_data[0]);
+			dup2(file_data[1], STDOUT_FILENO);
+			dup2(file_data[1], STDERR_FILENO);
+			argv[2] = path;
+			if (execvp(argv[0], argv))
+				fprintf(stderr, "execvp() error: %s\n",
+						g_strerror(errno));
+			_exit(0);
+	}
+	/* We are the parent... */
+	close(file_data[1]);
+	reply = g_string_new(NULL);
+	while (gtk_events_pending())
+		g_main_iteration(FALSE);
+	while ((got = read(file_data[0], buffer, sizeof(buffer))))
+	{
+		buffer[got] = '\0';
+		g_string_append(reply, buffer);
+	}
+	close(file_data[0]);
+	gtk_label_set_text(GTK_LABEL(file_label), reply->str);
+	g_string_free(reply, TRUE);
 }
 
 static void help(gpointer data, guint action, GtkWidget *widget)
@@ -603,7 +667,9 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 					"This is a file with an eXecute bit "
 					"set - it can be run as a program.");
 			else
-				show_file_info(window_with_focus, item);
+				report_error("File",
+					"This is a data file. Try using the "
+					"Info menu item to find out more...");
 			break;
 		case TYPE_DIRECTORY:
 			if (item->flags & ITEM_FLAG_APPDIR)
@@ -646,7 +712,6 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 				"it's in?");
 			break;
 	}
-
 }
 
 static void mount(gpointer data, guint action, GtkWidget *widget)

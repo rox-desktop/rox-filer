@@ -610,6 +610,8 @@ static void gain_selection(Collection 	*collection,
 	{
 		window_with_selection = filer_window;
 	}
+	else
+		collection_clear_selection(filer_window->collection);
 }
 
 static int sort_by_name(const void *item1, const void *item2)
