@@ -104,7 +104,6 @@ static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
 		       Icon	*icon);
-static GList *get_widget_list(Panel *panel);
 static GtkWidget *make_insert_frame(Panel *panel);
 static gboolean enter_icon(GtkWidget *widget,
 			   GdkEventCrossing *event,
@@ -643,50 +642,20 @@ static void reposition_panel(Panel *panel, gboolean force_resize)
 {
 	int	x = 0, y = 0;
 	int	w = 32, h = 32;
-	GList	*next, *children;
 	PanelSide	side = panel->side;
+	GtkRequisition req;
 
-	children = get_widget_list(panel);
+	gtk_widget_get_child_requisition(panel->window, &req);
+	w = req.width;
+	h = req.height;
 
-	for (next = children; next; next = next->next)
+	if (side == PANEL_LEFT || side == PANEL_RIGHT)
 	{
-		GtkWidget	*widget = (GtkWidget *) next->data;
-		GtkRequisition	req;
-
-		gtk_widget_get_child_requisition(widget, &req);
-
-		if (req.width > w)
-			w = req.width;
-		if (req.height > h)
-			h = req.height;
-	}
-
-	g_list_free(children);
-
-	if (side == PANEL_TOP || side == PANEL_BOTTOM)
-	{
-		w = screen_width;
-		h += MARGIN;
-	}
-	else
-	{
-		w += MARGIN;
 		if (side == PANEL_RIGHT)
 			x = screen_width - w;
 
-		h = screen_height;
-
 		if (current_panel[PANEL_TOP])
-		{
-			int	ph;
-
-			ph = current_panel[PANEL_TOP]->height;
-			y += ph;
-			h -= ph;
-		}
-
-		if (current_panel[PANEL_BOTTOM])
-			h -= current_panel[PANEL_BOTTOM]->height;
+			y += current_panel[PANEL_TOP]->height;
 	}
 
 	if (side == PANEL_BOTTOM)
@@ -936,17 +905,6 @@ out:
 		fclose(file);
 	g_free(save);
 	g_free(save_new);
-}
-
-static GList *get_widget_list(Panel *panel)
-{
-	GList	*list;
-
-	list = gtk_container_children(GTK_CONTAINER(panel->before));
-	list = g_list_concat(list,
-			gtk_container_children(GTK_CONTAINER(panel->after)));
-
-	return list;
 }
 
 /* Create a frame widget which can be used to add icons to the panel */
