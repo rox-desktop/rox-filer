@@ -1284,7 +1284,7 @@ gchar *escape_uri_path(const char *path)
 
 	ans = str->str;
 	g_string_free(str, FALSE);
-	
+
 	return ans;
 }
 

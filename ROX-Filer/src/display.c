@@ -92,7 +92,7 @@ void display_init()
 	option_add_int(&o_display_size, "display_icon_size", AUTO_SIZE_ICONS);
 	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
 	option_add_int(&o_display_sort_by, "display_sort_by", SORT_NAME);
-	option_add_int(&o_large_width, "display_large_width", 89);
+	option_add_int(&o_large_width, "display_large_width", 155);
 	option_add_int(&o_small_width, "display_small_width", 250);
 	option_add_int(&o_display_show_hidden, "display_show_hidden", FALSE);
 	option_add_int(&o_display_show_thumbs, "display_show_thumbs", FALSE);

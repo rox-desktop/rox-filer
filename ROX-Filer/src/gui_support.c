@@ -954,6 +954,7 @@ gint radios_get_value(Radios *radios)
 }
 
 /* Convert a list of URIs as a string into a GList of URIs.
+ * No unescaping is done.
  * Lines beginning with # are skipped.
  * The text block passed in is zero terminated (after the final CRLF)
  */
@@ -964,7 +965,6 @@ GList *uri_list_to_glist(const char *uri_list)
 	while (*uri_list)
 	{
 		char	*linebreak;
-		char	*uri;
 		int	length;
 
 		linebreak = strchr(uri_list, 13);
@@ -980,13 +980,7 @@ GList *uri_list_to_glist(const char *uri_list)
 		length = linebreak - uri_list;
 
 		if (length && uri_list[0] != '#')
-		{
-			char *tmp;
-			tmp = g_strndup(uri_list, length);
-			uri = unescape_uri(tmp);
-			g_free(tmp);
-			list = g_list_append(list, uri);
-		}
+			list = g_list_append(list, g_strndup(uri_list, length));
 
 		uri_list = linebreak + 2;
 	}

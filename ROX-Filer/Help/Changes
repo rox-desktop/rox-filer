@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+27-Apr-2004
+~~~~~~~~~~~
+Bugfix: URIs received through drag-and-drop were unescaped twice, causing
+	problems with names containing the '%' character (spotted by Jonatan
+	Liljedahl).
+
 21-Apr-2004
 ~~~~~~~~~~~
 Cope with spaces in ROX-Filer's path.
