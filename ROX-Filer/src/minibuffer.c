@@ -59,14 +59,13 @@ GtkWidget *create_minibuffer(FilerWindow *filer_window)
 	return mini;
 }
 
-/* Returns FALSE so that it can be used as an idle function */
-gboolean minibuffer_show(FilerWindow *filer_window)
+void minibuffer_show(FilerWindow *filer_window)
 {
 	Collection	*collection;
 	GtkEntry	*mini;
 	
-	g_return_val_if_fail(filer_window != NULL, FALSE);
-	g_return_val_if_fail(filer_window->minibuffer != NULL, FALSE);
+	g_return_if_fail(filer_window != NULL);
+	g_return_if_fail(filer_window->minibuffer != NULL);
 
 	collection = filer_window->collection;
 	filer_window->mini_cursor_base = MAX(collection->cursor_item, 0);
@@ -80,8 +79,6 @@ gboolean minibuffer_show(FilerWindow *filer_window)
 
 	gtk_window_set_focus(GTK_WINDOW(filer_window->window),
 			filer_window->minibuffer);
-
-	return FALSE;
 }
 
 

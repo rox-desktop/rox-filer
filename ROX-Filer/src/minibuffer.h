@@ -12,6 +12,6 @@
 #include "filer.h"
 
 GtkWidget *create_minibuffer(FilerWindow *filer_window);
-gboolean minibuffer_show(FilerWindow *filer_window);
+void minibuffer_show(FilerWindow *filer_window);
 
 #endif /* _MINIBUFFER_H */

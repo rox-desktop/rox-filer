@@ -158,6 +158,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning);
 static void open_item(Collection *collection,
 		gpointer item_data, int item_number,
 		gpointer user_data);
+static gboolean minibuffer_show_cb(FilerWindow *filer_window);
 
 static GdkAtom xa_string;
 enum
@@ -316,8 +317,6 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
-
-	gtk_idle_remove_by_data(filer_window);
 
 	if (window_with_selection == filer_window)
 		window_with_selection = NULL;
@@ -1232,7 +1231,7 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 		attach(filer_window);
 
 		if (GTK_WIDGET_VISIBLE(filer_window->minibuffer))
-			gtk_idle_add((GtkFunction) minibuffer_show,
+			gtk_idle_add((GtkFunction) minibuffer_show_cb,
 					filer_window);
 	}
 	else
@@ -1726,4 +1725,29 @@ void filer_check_mounted(char *path)
 				update_dir(filer_window, FALSE);
 		}
 	}
+}
+
+/* Like minibuffer_show(), except that:
+ * - It returns FALSE (to be used from an idle callback)
+ * - It checks that the filer window still exists.
+ */
+static gboolean minibuffer_show_cb(FilerWindow *filer_window)
+{
+	GList	*next = all_filer_windows;
+
+	while (next)
+	{
+		FilerWindow *fw = (FilerWindow *) next->data;
+
+
+		if (fw == filer_window)
+		{
+			minibuffer_show(filer_window);
+			break;
+		}
+		
+		next = next->next;
+	}
+
+	return FALSE;
 }
