@@ -115,7 +115,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {"/File/Help",		    	"F1",  	help, 0, NULL},
 {"/File/Info",			"I",  	show_file_info, 0, NULL},
 {"/File/Separator",		NULL,   NULL, 0, "<Separator>"},
-{"/File/Mount",	    		C_"M",  mount, 0,	NULL},
+{"/File/Mount",	    		"M",  	mount, 0,	NULL},
 {"/File/Delete",	    	C_"X", 	delete, 0,	NULL},
 {"/File/Disk Usage",	    	C_"U", 	not_yet, 0, NULL},
 {"/File/Permissions",		NULL,   not_yet, 0, NULL},
