@@ -122,8 +122,9 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 		xmlDocDumpMemory(rpc, &mem, &size);
 		g_return_val_if_fail(size > 0, FALSE);
 		
-		gdk_property_change(ipc_window->window, xsoap, XA_STRING, 8,
-			GDK_PROP_MODE_REPLACE, mem, size);
+		gdk_property_change(ipc_window->window, xsoap,
+				gdk_x11_xatom_to_atom(XA_STRING), 8,
+				GDK_PROP_MODE_REPLACE, mem, size);
 		g_free(mem);
 
 		soap_send(ipc_window, xsoap, existing_ipc_window);
@@ -138,7 +139,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	 * is an IPC window.
 	 */
 	gdk_property_change(ipc_window->window, filer_atom,
-			XA_WINDOW, 32, GDK_PROP_MODE_REPLACE,
+			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
+			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 
 	/* Get notified when we get a message */
@@ -147,7 +149,8 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 
 	/* Make the root window contain a pointer to the IPC window */
 	gdk_property_change(GDK_ROOT_PARENT(), filer_atom,
-			XA_WINDOW, 32, GDK_PROP_MODE_REPLACE,
+			gdk_x11_xatom_to_atom(XA_WINDOW), 32,
+			GDK_PROP_MODE_REPLACE,
 			(void *) &xwindow, 1);
 
 	return FALSE;
@@ -244,7 +247,8 @@ static gboolean get_ipc_property(GdkWindow *window, Window *r_xid)
 	gint		format, length;
 	gboolean	retval = FALSE;
 	
-	if (gdk_property_get(window, filer_atom, XA_WINDOW, 0, 4,
+	if (gdk_property_get(window, filer_atom,
+			gdk_x11_xatom_to_atom(XA_WINDOW), 0, 4,
 			FALSE, NULL, &format, &length, &data) && data)
 	{
 		if (format == 32 && length == 4)
@@ -273,14 +277,14 @@ static gboolean client_event(GtkWidget *window,
 
 	src_window = gdk_window_foreign_new(event->data.l[0]);
 	g_return_val_if_fail(src_window != NULL, FALSE);
-	prop = event->data.l[1];
+	prop = gdk_x11_xatom_to_atom(event->data.l[1]);
 
 	while (1)
 	{
 		xmlDocPtr doc;
 
 		if (!(gdk_property_get(src_window, prop,
-				XA_STRING, 0, grab_len,
+				gdk_x11_xatom_to_atom(XA_STRING), 0, grab_len,
 				TRUE, NULL, NULL,
 				&length, &data) && data))
 			return TRUE;	/* Error? */
@@ -464,7 +468,7 @@ static xmlNodePtr rpc_Panel(xmlNodePtr method)
 
 static void soap_done(GtkWidget *widget, GdkEventProperty *event, gpointer data)
 {
-	GdkAtom	prop = GPOINTER_TO_INT(data);
+	GdkAtom	prop = (GdkAtom) data;
 
 	if (prop != event->atom)
 		return;
@@ -488,7 +492,7 @@ static void soap_send(GtkWidget *from, GdkAtom prop, GdkWindow *dest)
 	GdkEventClient event;
 
 	event.data.l[0] = GDK_WINDOW_XWINDOW(from->window);
-	event.data.l[1] = prop;
+	event.data.l[1] = gdk_x11_atom_to_xatom(prop);
 	event.data_format = 32;
 	event.message_type = xsoap;
 	

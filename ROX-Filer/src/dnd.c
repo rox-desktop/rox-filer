@@ -33,6 +33,7 @@
 #include <X11/Xlib.h>
 #include <X11/Xatom.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include "collection.h"
 
 #include "global.h"
@@ -396,9 +397,11 @@ void drag_data_get(GtkWidget          		*widget,
 	char		*to_send = "E";	/* Default to sending an error */
 	long		to_send_length = 1;
 	gboolean	delete_once_sent = FALSE;
-	GdkAtom		type = XA_STRING;
+	GdkAtom		type;
 	guchar		*path;
-	
+
+	type = gdk_x11_xatom_to_atom(XA_STRING);
+
 	switch (info)
 	{
 		case	TARGET_RAW:

@@ -473,7 +473,7 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	/* Check if somebody else already owns drops on the root window */
 
 	XGetWindowProperty(GDK_DISPLAY(), xid,
-			   xdnd_proxy_atom, 0,
+			   gdk_x11_atom_to_xatom(xdnd_proxy_atom), 0,
 			   1, False, AnyPropertyType,
 			   &type, &format, &nitems, &after,
 			   (guchar **) &proxy_data);
@@ -496,8 +496,8 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 #endif
 
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
-				    xdnd_proxy_atom, 0,
-				    1, False, AnyPropertyType,
+				    gdk_x11_atom_to_xatom(xdnd_proxy_atom),
+				    0, 1, False, AnyPropertyType,
 				    &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
 
@@ -510,21 +510,23 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 		{
 			if (format == 32 && nitems == 1)
 				if (*proxy_data != proxy)
-					proxy = GDK_NONE;
+					proxy = None;
 
 			XFree(proxy_data);
 		}
 		else
-			proxy = GDK_NONE;
+			proxy = gdk_x11_atom_to_xatom(GDK_NONE);
 	}
 
 	if (!proxy)
 	{
 		/* OK, we can set the property to point to us */
+		/* TODO: Use gdk call? */
 
 		XChangeProperty(GDK_DISPLAY(), xid,
-				xdnd_proxy_atom,
-				gdk_atom_intern("WINDOW", FALSE),
+				gdk_x11_atom_to_xatom(xdnd_proxy_atom),
+				gdk_x11_atom_to_xatom(gdk_atom_intern("WINDOW",
+						      FALSE)),
 				32, PropModeReplace,
 				(guchar *) &proxy_xid, 1);
 	}
@@ -545,8 +547,9 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 		 * property pointing recursively;
 		 */
 		XChangeProperty(GDK_DISPLAY(), proxy_xid,
-				xdnd_proxy_atom,
-				gdk_atom_intern("WINDOW", FALSE),
+				gdk_x11_atom_to_xatom(xdnd_proxy_atom),
+				gdk_x11_atom_to_xatom(gdk_atom_intern("WINDOW",
+						      FALSE)),
 				32, PropModeReplace,
 				(guchar *) &proxy_xid, 1);
 	}
@@ -561,7 +564,8 @@ void release_xdnd_proxy(guint32 xid)
 
 	xdnd_proxy_atom = gdk_atom_intern("XdndProxy", FALSE);
 
-	XDeleteProperty(GDK_DISPLAY(), xid, xdnd_proxy_atom);
+	XDeleteProperty(GDK_DISPLAY(), xid,
+			gdk_x11_atom_to_xatom(xdnd_proxy_atom));
 }
 
 /* Looks for the proxy window to get root window clicks from the window
@@ -597,7 +601,7 @@ GdkWindow *find_click_proxy_window(void)
 	/* Check if the proxy window exists */
 
 	XGetWindowProperty(GDK_DISPLAY(), GDK_ROOT_WINDOW(),
-			   click_proxy_atom, 0,
+			   gdk_x11_atom_to_xatom(click_proxy_atom), 0,
 			   1, False, AnyPropertyType,
 			   &type, &format, &nitems, &after,
 			   (guchar **) &proxy_data);
@@ -620,7 +624,7 @@ GdkWindow *find_click_proxy_window(void)
 		gint	gdk_error_code;
 #endif
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
-				   click_proxy_atom, 0,
+				   gdk_x11_atom_to_xatom(click_proxy_atom), 0,
 				   1, False, AnyPropertyType,
 				   &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
@@ -634,12 +638,12 @@ GdkWindow *find_click_proxy_window(void)
 		{
 			if (format == 32 && nitems == 1)
 				if (*proxy_data != proxy)
-					proxy = GDK_NONE;
+					proxy = gdk_x11_atom_to_xatom(GDK_NONE);
 
 			XFree(proxy_data);
 		}
 		else
-			proxy = GDK_NONE;
+			proxy = gdk_x11_atom_to_xatom(GDK_NONE);
 	}
 
 #ifdef GTK2

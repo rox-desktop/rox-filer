@@ -33,4 +33,7 @@
 #ifdef GTK2
 # define GTK_WINDOW_DIALOG GTK_WINDOW_TOPLEVEL
 # define G_DISABLE_CONST_RETURNS
+#else
+# define gdk_x11_xatom_to_atom(x) (x)
+# define gdk_x11_atom_to_xatom(x) (x)
 #endif
