@@ -28,8 +28,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <unistd.h>
 #include <string.h>
 #include <errno.h>
@@ -152,6 +150,14 @@ static void gtk_savebox_get_property (GObject	      *object,
 				      GValue          *value,
 				      GParamSpec      *pspec);
 
+void
+marshal_INT__STRING (GClosure     *closure,
+                     GValue       *return_value,
+		     guint         n_param_values,
+		     const GValue *param_values,
+		     gpointer      invocation_hint,
+		     gpointer      marshal_data);
+
 GType
 gtk_savebox_get_type (void)
 {
@@ -190,39 +196,43 @@ gtk_savebox_class_init (GtkSaveboxClass *class)
 
   parent_class = g_type_class_peek_parent (class);
 
+  class->saved_to_uri = NULL;
   class->save_to_file = NULL;
   dialog->response = gtk_savebox_response;
 
-  /* XXX: G_TYPE_STRING */
-
-  savebox_signals[SAVE_TO_FILE] = gtk_signal_new ("save_to_file",
-					    GTK_RUN_LAST,
-					    GTK_CLASS_TYPE(class),
-					    GTK_SIGNAL_OFFSET (GtkSaveboxClass,
-							       save_to_file),
-					    gtk_marshal_INT__POINTER,
-					    GTK_TYPE_INT, 1,
-					    GTK_TYPE_POINTER);
-
-  savebox_signals[SAVED_TO_URI] = gtk_signal_new ("saved_to_uri",
-					    GTK_RUN_LAST,
-					    GTK_CLASS_TYPE(class),
-					    GTK_SIGNAL_OFFSET (GtkSaveboxClass,
-							       saved_to_uri),
-					    gtk_marshal_NONE__POINTER,
-					    GTK_TYPE_NONE, 1,
-					    GTK_TYPE_POINTER);
-
   object_class = G_OBJECT_CLASS(class);
+
+  savebox_signals[SAVE_TO_FILE] = g_signal_new(
+					"save_to_file",
+					G_TYPE_FROM_CLASS(object_class),
+					G_SIGNAL_RUN_LAST,
+					G_STRUCT_OFFSET(GtkSaveboxClass,
+							save_to_file),
+					NULL, NULL,
+					marshal_INT__STRING,
+					G_TYPE_INT, 1,
+					G_TYPE_STRING);
+
+  savebox_signals[SAVED_TO_URI] = g_signal_new(
+					"saved_to_uri",
+					G_TYPE_FROM_CLASS(object_class),
+					G_SIGNAL_RUN_LAST,
+					G_STRUCT_OFFSET(GtkSaveboxClass,
+							saved_to_uri),
+					NULL, NULL,
+					g_cclosure_marshal_VOID__STRING,
+					G_TYPE_NONE, 1,
+					G_TYPE_STRING);
+
   object_class->set_property = gtk_savebox_set_property;
   object_class->get_property = gtk_savebox_get_property;
 
-  g_object_class_install_property (object_class, PROP_HAS_DISCARD,
-                                   g_param_spec_boolean ("has_discard",
-							 _("Has Discard"),
+  g_object_class_install_property(object_class, PROP_HAS_DISCARD,
+                                  g_param_spec_boolean("has_discard",
+					 _("Has Discard"),
 					 _("The dialog has a Discard button"),
-                                                         TRUE,
-                                                         G_PARAM_READWRITE));
+					 TRUE,
+					 G_PARAM_READWRITE));
 }
 
 static void
@@ -248,17 +258,17 @@ gtk_savebox_init (GtkSavebox *savebox)
   savebox->drag_box = gtk_event_box_new ();
   gtk_container_set_border_width (GTK_CONTAINER (savebox->drag_box), 4);
   gtk_widget_add_events (savebox->drag_box, GDK_BUTTON_PRESS_MASK);
-  gtk_signal_connect (GTK_OBJECT (savebox->drag_box), "button_press_event",
-		      GTK_SIGNAL_FUNC (button_press_over_icon), savebox);
-  gtk_signal_connect (GTK_OBJECT (savebox), "drag_end",
-		      GTK_SIGNAL_FUNC (drag_end), savebox);
-  gtk_signal_connect (GTK_OBJECT (savebox), "drag_data_get",
-		      GTK_SIGNAL_FUNC (drag_data_get), savebox);
+  g_signal_connect (savebox->drag_box, "button_press_event",
+		      G_CALLBACK (button_press_over_icon), savebox);
+  g_signal_connect (savebox, "drag_end",
+		      G_CALLBACK (drag_end), savebox);
+  g_signal_connect (savebox, "drag_data_get",
+		      G_CALLBACK (drag_data_get), savebox);
   gtk_container_add (GTK_CONTAINER (alignment), savebox->drag_box);
 
   savebox->entry = gtk_entry_new ();
-  gtk_signal_connect_object (GTK_OBJECT (savebox->entry), "activate",
-			     GTK_SIGNAL_FUNC (do_save), GTK_OBJECT (savebox));
+  g_signal_connect_swapped (savebox->entry, "activate",
+			     G_CALLBACK (do_save), savebox);
   gtk_box_pack_start (GTK_BOX (dialog->vbox), savebox->entry, FALSE, TRUE, 4);
   
   gtk_widget_show_all (dialog->vbox);
@@ -268,8 +278,7 @@ gtk_savebox_init (GtkSavebox *savebox)
   
   button = button_new_mixed (GTK_STOCK_DELETE, "_Discard");
   gtk_box_pack_start (GTK_BOX (savebox->discard_area), button, FALSE, TRUE, 2);
-  gtk_signal_connect (GTK_OBJECT( button), "clicked",
-		  GTK_SIGNAL_FUNC (discard_clicked), savebox);
+  g_signal_connect (button, "clicked", G_CALLBACK (discard_clicked), savebox);
   GTK_WIDGET_UNSET_FLAGS (button, GTK_CAN_FOCUS);
   GTK_WIDGET_SET_FLAGS (button, GTK_CAN_DEFAULT);
 
@@ -285,7 +294,7 @@ gtk_savebox_new (const gchar *action)
   GtkDialog *dialog;
   GList	    *list, *next;
   
-  dialog = GTK_DIALOG (gtk_type_new (GTK_TYPE_SAVEBOX));
+  dialog = GTK_DIALOG (gtk_widget_new (gtk_savebox_get_type(), NULL));
 
   gtk_dialog_add_button (dialog, GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
 
@@ -304,7 +313,6 @@ gtk_savebox_new (const gchar *action)
   return GTK_WIDGET(dialog);
 }
 
-/* XXX: GtkImage */
 void
 gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixmap *pixmap, GdkPixmap *mask)
 {
@@ -313,10 +321,10 @@ gtk_savebox_set_icon (GtkSavebox *savebox, GdkPixmap *pixmap, GdkPixmap *mask)
   g_return_if_fail (pixmap != NULL);
 
   if (savebox->icon)
-    gtk_pixmap_set (GTK_PIXMAP (savebox->icon), pixmap, mask);
+    gtk_image_set_from_pixmap (GTK_IMAGE (savebox->icon), pixmap, mask);
   else
     {
-      savebox->icon = gtk_pixmap_new (pixmap, mask);
+      savebox->icon = gtk_image_new_from_pixmap (pixmap, mask);
       gtk_container_add (GTK_CONTAINER (savebox->drag_box), savebox->icon);
       gtk_widget_show(savebox->icon);
     }
@@ -392,7 +400,7 @@ button_press_over_icon (GtkWidget *drag_box, GdkEventButton *event,
   
   write_xds_property (context, leafname);
 
-  gtk_pixmap_get (GTK_PIXMAP (savebox->icon), &pixmap, &mask);
+  gtk_image_get_pixmap (GTK_IMAGE (savebox->icon), &pixmap, &mask);
   gtk_drag_set_icon_pixmap (context,
 			    gtk_widget_get_colormap (savebox->icon),
 			    pixmap,
@@ -441,9 +449,8 @@ drag_data_get (GtkWidget	*widget,
       to_send = 'F';    /* Not on the local machine */
     else
       {
-	gtk_signal_emit (GTK_OBJECT (widget), 
-	    savebox_signals[SAVE_TO_FILE],
-	    pathname, &result);
+	g_signal_emit (widget, savebox_signals[SAVE_TO_FILE], 0,
+		       pathname, &result);
 
 	if (result == GTK_XDS_SAVED)
 	  {
@@ -519,9 +526,8 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 
 	  path = get_local_path (uri);
 	  
-	  gtk_signal_emit (GTK_OBJECT (widget),
-			   savebox_signals[SAVED_TO_URI],
-			   path ? path : (const gchar *) uri);
+	  g_signal_emit (widget, savebox_signals[SAVED_TO_URI], 0,
+			 path ? path : (const gchar *) uri);
 	  g_free(uri);
 
 	  gtk_widget_destroy (widget);
@@ -534,15 +540,14 @@ static void drag_end (GtkWidget *widget, GdkDragContext *context)
 
   if (GTK_SAVEBOX (widget)->data_sent)
     {
-      gtk_signal_emit (GTK_OBJECT (widget),
-		       savebox_signals[SAVED_TO_URI], NULL);
+      g_signal_emit (widget, savebox_signals[SAVED_TO_URI], 0, NULL);
       gtk_widget_destroy (widget);
     }
 }
 
 static void discard_clicked (GtkWidget *button, GtkWidget *savebox)
 {
-  gtk_signal_emit (GTK_OBJECT (savebox), savebox_signals[SAVED_TO_URI], NULL);
+  g_signal_emit (savebox, savebox_signals[SAVED_TO_URI], 0, NULL);
   gtk_widget_destroy (savebox);
 }
 
@@ -576,13 +581,11 @@ static void do_save (GtkSavebox *savebox)
       return;
     }
 
-  gtk_signal_emit (GTK_OBJECT (savebox), savebox_signals[SAVE_TO_FILE],
-		   pathname, &result);
+  g_signal_emit (savebox, savebox_signals[SAVE_TO_FILE], 0, pathname, &result);
 
   if (result == GTK_XDS_SAVED)
     {
-      gtk_signal_emit (GTK_OBJECT (savebox), savebox_signals[SAVED_TO_URI],
-		       pathname);
+      g_signal_emit (savebox, savebox_signals[SAVED_TO_URI], 0, pathname);
 
       gtk_widget_destroy (GTK_WIDGET (savebox));
     }
@@ -645,4 +648,41 @@ gtk_savebox_get_property (GObject     *object,
       G_OBJECT_WARN_INVALID_PROPERTY_ID (object, prop_id, pspec);
       break;
     }
+}
+
+void
+marshal_INT__STRING (GClosure     *closure,
+                     GValue       *return_value,
+		     guint         n_param_values,
+		     const GValue *param_values,
+		     gpointer      invocation_hint,
+		     gpointer      marshal_data)
+{
+  typedef gint (*GMarshalFunc_INT__STRING) (gpointer     data1,
+                                            gpointer     arg_1,
+                                            gpointer     data2);
+  register GMarshalFunc_INT__STRING callback;
+  register GCClosure *cc = (GCClosure*) closure;
+  register gpointer data1, data2;
+  gint v_return;
+
+  g_return_if_fail (return_value != NULL);
+  g_return_if_fail (n_param_values == 2);
+
+  if (G_CCLOSURE_SWAP_DATA (closure))
+    {
+      data1 = closure->data;
+      data2 = g_value_peek_pointer (param_values + 0);
+    }
+  else
+    {
+      data1 = g_value_peek_pointer (param_values + 0);
+      data2 = closure->data;
+    }
+  callback = (GMarshalFunc_INT__STRING)
+	  	(marshal_data ? marshal_data : cc->callback);
+
+  v_return = callback (data1, param_values[1].data[0].v_pointer, data2);
+
+  g_value_set_int (return_value, v_return);
 }
