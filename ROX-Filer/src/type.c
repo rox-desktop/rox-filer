@@ -990,15 +990,15 @@ static void edit_mime_types(guchar *unused)
 	struct stat info;
 
 	mkdir(make_path(home_dir, ".mime")->str, 0700);
-	path = make_path(home_dir, ".mime/mime-info")->str;
+	path = make_path(home_dir, ".mime/packages")->str;
 	mkdir(path, 0700);
 	filer_opendir(path, NULL);
 
-	path = "/usr/local/share/mime/mime-info";
+	path = "/usr/local/share/mime/packages";
 	if (mc_stat(path, &info) == 0)
 		filer_opendir(path, NULL);
 
-	path = "/usr/share/mime/mime-info";
+	path = "/usr/share/mime/packages";
 	if (mc_stat(path, &info) == 0)
 		filer_opendir(path, NULL);
 }
