@@ -1214,9 +1214,9 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 {
-	char	*argv[] = {NULL, NULL};
+	char	*argv[] = {"sh", "-c", NULL, NULL};
 
-	argv[0] = option_get_static_string("menu_xterm");
+	argv[2] = option_get_static_string("menu_xterm");
 
 	g_return_if_fail(window_with_focus != NULL);
 
