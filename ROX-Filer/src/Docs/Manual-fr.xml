@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.0.1 - Manuel de l'utilisateur
+   ROX-Filer 2.1.0 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -61,7 +61,7 @@
    <para>
 	Note du traducteur :
 	Je ne suis pas programmeur, les paragraphes 'Appliquettes pour les panneaux' et 
-	'Structures de données' ont été traduits par Laurent Moussault <email>laurent.moussault at 9online.fr</email>.
+	'Structures de données' ont été traduits par Laurent Moussault <email>laurent.moussault@9online.fr</email>.
    </para>
    <para>
 	<application>ROX-Filer</application> est un gestionnaire de fichiers simple et pratique pour X11.
@@ -152,7 +152,19 @@
 	   </para>
 	 </listitem>
     </varlistentry>
-    
+
+<varlistentry><term>Thèmes (icônes)</term>
+      <listitem>
+	<para>
+	Des collections d'icônes, appelées 'thèmes', peuvent être installées
+	dans <filename>~/.icons</filename>).
+	Vous pouvez changer le thème utilisé dans la boîte Options.
+	Lorsque d'autres 'Gestionnaires de bureaux' utiliseront la même
+	technologie, les thèmes pourront alors être partagés avec ceux-ci.
+	</para>
+       </listitem>
+</varlistentry>
+
 	<varlistentry>
      <term>Support DNotify (Linux seulement)</term>
 	 <listitem>
@@ -739,9 +751,19 @@ Autre bouton
   <entry>Idem</entry>
  </row>
  <row>
-  <entry>¼il</entry>
+  <entry>A..Z</entry>
+  <entry>Passe au critère de tri suivant.</entry>
+  <entry>Passe au critère de tri précédent.</entry>
+ </row>
+ <row>
+  <entry>Œil</entry>
   <entry>Bascule entre l'affichage et le masquage des fichiers cachés (ceux dont le nom commence par un point)</entry>
   <entry>Same</entry>
+ </row>
+ <row>
+  <entry>Liste avec sélections</entry>
+  <entry>Sélectionne tout.</entry>
+  <entry>Inverse la sélection.</entry>
  </row>
  <row>
   <entry>Bouée</entry>
@@ -903,13 +925,7 @@ Opérations diverses agissant sur la fenêtre.
    Activée, le filer essaiera de lire chaque fichier-image et d'utiliser cette 
    image comme icône pour ce fichier. Très utile quand vous avez un dossier 
    rempli de photos et que vous en cherchez une dont le nom vous échappe !
-   Les imagettes sont enregistrées dans <filename>~/.thumbnails</filename> 
-   pour un affichage ultérieur plus rapide. 
-   Lors de l'affichage des imagettes, une barre de progression apparaîtra en bas 
-   de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton 
-   <guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression. 
-   La barre de titres affiche <guilabel>(Thumbs)</guilabel> quand cette option est 
-   activée.
+   Voir la section <xref linkend="thumbnails"/>.
   </entry>
  </row>
 
@@ -1015,7 +1031,11 @@ le groupe du fichier est le même qu'un des groupes auxquels l'utilisateur appar
  <para>
   Notez que pour les dossiers-applications, il peut y avoir quelques commandes qui sont
   ajoutées au début de ce sous-menu quand vous cliquez sur ceux-ci &mdash; voir la section
-  <xref linkend="AppDir"/> pour plus de détails.
+  <xref linkend="AppDir"/> pour plus de détails. Vous pouvez créer des commandes supplémentaires
+  qui apparaîtront en haut, en fonction du type de fichier sur lequel vous aurez cliqué.
+  Pour cela, choisissez la commande <guimenuitem>Personnaliser</guimenuitem>.
+  Par exemple, vous pourriez faire apparaître <application>The Gimp</application> pour toutes
+  les images, et <application>FreeFS</application> pour les points de montage.
 
 <informaltable><tgroup cols="2">
 		<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
@@ -1041,11 +1061,6 @@ Crée un lien symbolique vers cet objet.
 Supprime tous les objets sélectionnés du dossier courant. Le contenu des sous-dossiers
 sera supprimé en premier. Supprimer un lien symbolique ne supprime que le lien, pas la
 cible de ce lien.
-</entry></row>
-
-<row><entry>
-<guimenuitem>Aide</guimenuitem></entry><entry>
-Affiche le type de l'objet sélectionné. Pour les dossiers-applications, montre leurs fichiers d'aide.
 </entry></row>
 
 <row><entry>
@@ -1082,10 +1097,14 @@ Vous pouvez affecter une icône différente pour chaque fichier/dossier en
 utilisant cette commande &mdash; glissez-déposez simplement une icône sur <xref linkend="SetIcon"/>.
 </entry></row>
 
-<row><entry>
-<guimenuitem>Info</guimenuitem></entry><entry>
-Affiche plus de détails sur l'objet.
-</entry></row>
+<row>
+ <entry><guimenuitem>Info</guimenuitem></entry>
+ <entry>
+ Affiche plus de détails sur l'objet. Vous pouvez aussi modifier les permissions
+ d'accès à partir de cette boîte (la commande <guimenuitem>Permissions</guimenuitem>
+ vous permet quant à elle d'appliquer des modifications sur plusieurs fichiers simultanément).
+ </entry>
+</row>
 
 <row><entry>
 <guimenuitem>Compter</guimenuitem></entry><entry>
@@ -1093,10 +1112,14 @@ Fait le total de l'espace occupé par les objets sélectionnés. Le contenu des 
 sélectionnés est aussi compté. Les liens symboliques sont comptés, mais pas leur cible.
 </entry></row>
 
-<row><entry>
-<guimenuitem>Permissions</guimenuitem></entry><entry>
-Cette commande vous permet de changer les permissions des objets sélectionnés.
-</entry></row>
+<row>
+ <entry><guimenuitem>Permissions</guimenuitem></entry>
+ <entry>
+ Cette commande vous permet de changer les permissions des objets sélectionnés.
+ Si vous ne devez changer les permissions que pour un fichier, vous pouvez utiliser
+ la commande <guimenuitem>Info</guimenuitem>, qui est plus simple.
+ </entry>
+</row>
 
 <row><entry>
 <guimenuitem>Chercher</guimenuitem></entry><entry>
@@ -1673,6 +1696,59 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   </para>
  
 </chapter>
+
+<chapter>
+  <title><anchor id="thumbnails" xreflabel="Thumbnails"/>Imagettes</title>
+  <para>
+    Quand cette fonction est activée, le filer peut afficher les fichiers images avec une icône
+    représentant le contenu de ceux-ci, au lieu d'une icône générique. Très utile pour
+    organiser un dossier rempli de photos ! Vous pouvez activer cette fonction pour le dossier
+    en cours en choisissant la commande <guimenuitem>Montrer les imagettes</guimenuitem>
+    du menu <guimenu>Affichage</guimenu>. Vous pouvez aussi activer cette option par
+    défaut dans la boîte Options.
+    La barre de titres affiche <guilabel>(Imagettes)</guilabel> quand cette option est active.
+  </para>
+  <para>
+   Les imagettes sont enregistrées dans <filename>~/.thumbnails</filename> pour un
+   affichage ultérieur plus rapide.
+   Lors de l'affichage des imagettes, une barre de progression est présente en bas 
+   de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton 
+   <guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression. 
+   Vous pouvez demander au filer qu'il crée des imagettes pour d'autres types de fichiers,
+   comme les vidéos par exemple (i.e. en montrant la première image), grâce à un logiciel
+   adéquat.
+  </para>
+<sect1>
+ <title>Détails techniques</title>
+  <para>
+  En mode 'Imagettes', <application>ROX-Filer</application> vérifie le
+  dossier <filename>~/.thumbs/normal</filename> pour chaque fichier passé en revue.
+  Si une imagette existe, il la charge et passe au fichier suivant.
+  </para>
+  <para>
+  Pour générer l'imagette d'un fichier de type media/subtype, le filer recherche un exécutable
+  nommé <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>,
+  en se rabattant sur <filename>&lt;Choices&gt;/MIME-thumb/media</filename> s'il
+  ne le trouve pas. Si aucun des deux ne peut être trouvé et que le fichier est du
+  type image/*, les routines internes sont alors utilisées. Si le fichier n'est pas
+  du type image/*, l'imagette ne sera pas générée.
+  </para>
+  <para>
+  Si l'exécutable est trouvé, il est démarré avec les paramètres
+  <screen>thumbnailer /path/to/source/file /path/to/thumbnail pixel_size</screen>.
+  </para>
+  <para>
+  Quand celui-ci est terminé, le filer essaie de charger
+  <filename>/path/to/thumbnail</filename>. En cas d'échec, l'imagette n'est pas
+  montrée.
+  </para>
+  <para>
+  Notez les nombreuses étapes nécessaires ! ROX-Filer utilisera volontiers une imagette
+  existante, même s'il ne sait pas comment celle-ci a été générée.
+  </para>
+</sect1>
+
+ </chapter>
 
 <chapter id="virtual">
   <title>
@@ -3342,7 +3418,7 @@ Les méthodes suivantes sont reconnues :</para>
  <listitem>
   <para>
    <function>OpenDir</function>(<parameter>Filename</parameter>,
-   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>])
+   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>, <parameter>ID</parameter>])
    Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
    <parameter>Style</parameter> peut prendre la valeur <userinput>Large</userinput>, 
    <userinput>Small</userinput>, <userinput>Huge</userinput> ou <userinput>Automatic</userinput>. 
@@ -3355,6 +3431,11 @@ Les méthodes suivantes sont reconnues :</para>
    Si une de ces options n'est pas renseignée, l'affichage par défaut est utilisé. 
    <parameter>Class</parameter> peut être utilisé pour fixer la propriété WM_CLASS de la nouvelle fenêtre. 
    Vous pouvez utiliser ceci pour que votre gestionnaire de fenêtres gère celle-ci d'une façon particulière.
+   <parameter>ID</parameter> est une chaîne utilisée pour identifier la fenêtre ouverte.
+Si une fenêtre existe déjà avec cette ID, celle-ci est modifiée pour le nom du dossier ;
+sinon, une nouvelle fenêtre est créée et son ID lui est rattachée.
+Assurez-vous que les ID que vous générez sont uniques lorsque vous utilisez des scripts,
+en concaténant par exemple le nom du script, le PID et un horodatage pour former l'ID.
   </para>
  </listitem>
 
@@ -3417,6 +3498,16 @@ Les méthodes suivantes sont reconnues :</para>
 	 N'UTILISEZ PAS cette méthode si vous invoquez l'option <option>--backdrop</option>, vous seriez 
 	 bloqué dans une boucle sans fin !
 	 Voir <xref linkend="backdropapp"/> pour un guide sur l'écriture d'applications gèrant le fond d'écran.
+  </para>
+ </listitem>
+
+ <listitem>
+  <para>
+  <function>SetBackdrop</function>(<parameter>Filename</parameter>,
+   <parameter>Style</parameter>)
+   Définit l'image de fond d'écran. Si vous souhaitez régénérer l'image lors du prochain
+   login de l'utilisateur, ou si vous voulez la changer automatiquement de temps en
+   temps, utilisez plutôt <function>SetBackdropApp</function> ci-dessus.
   </para>
  </listitem>
 
@@ -3554,7 +3645,7 @@ Les méthodes suivantes sont reconnues :</para>
 
 <bibliomixed>
  <abbrev>Imagettes</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
-  <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
+  <ulink url="http://triq.net/~jens/thumbnail-spec/"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
@@ -3564,7 +3655,7 @@ Les méthodes suivantes sont reconnues :</para>
 
 <bibliomixed>
  <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
-  <ulink url="http://www.freedesktop.org/standards/shared-mime-info.html"/></citetitle>
+  <ulink url="http://www.freedesktop.org/standards/shared-mime-info-spec/"/></citetitle>
 </bibliomixed>
 
 </bibliography>
