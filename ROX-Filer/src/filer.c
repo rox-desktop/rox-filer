@@ -2296,13 +2296,6 @@ static void drag_leave(GtkWidget	*widget,
 		       FilerWindow	*filer_window)
 {
 	dnd_spring_abort();
-#if 0
-	if (scrolled_adj)
-	{
-		g_signal_handler_disconnect(scrolled_adj, scrolled_signal);
-		scrolled_adj = NULL;
-	}
-#endif
 }
 
 /* Called during the drag when the mouse is in a widget registered
@@ -2323,6 +2316,10 @@ static gboolean drag_motion(GtkWidget		*widget,
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
 	gboolean	same_window;
+
+	/* (GTK bug) */
+	if (!action && (context->actions & GDK_ACTION_ASK))
+		action = GDK_ACTION_ASK;
 
 	same_window = gtk_drag_get_source_widget(context) == widget;
 

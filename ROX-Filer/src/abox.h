@@ -43,6 +43,7 @@ struct _ABoxClass
 	GtkDialogClass 	parent_class;
 
 	void		(*flag_toggled)(ABox *abox, gint response);
+	void		(*abort_operation)(ABox *abox);
 };
 
 GType	abox_get_type   		(void);

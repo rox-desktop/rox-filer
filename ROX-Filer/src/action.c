@@ -79,6 +79,8 @@ struct _GUIside
 	guchar		**default_string; /* Changed when the entry changes */
 	void		(*entry_string_func)(GtkWidget *widget,
 					     const guchar *string);
+
+	int		abort_attempts;
 };
 
 /* These don't need to be in a structure because we fork() before
@@ -344,6 +346,9 @@ static void message_from_child(gpointer 	  data,
 		}
 		g_printerr("Child died in the middle of a message.\n");
 	}
+
+	if (gui_side->abort_attempts)
+		abox_log(abox, _("\nProcess terminated.\n"), "error");
 
 	/* The child is dead */
 	gui_side->child = 0;
@@ -649,13 +654,40 @@ static gboolean printf_reply(int fd, gboolean ignore_quiet,
 	}
 }
 
+static void abort_operation(GtkWidget *widget, gpointer data)
+{
+	GUIside	*gui_side = (GUIside *) data;
+
+	if (gui_side->child)
+	{
+		if (gui_side->abort_attempts == 0)
+		{
+			abox_log(ABOX(widget),
+				 _("\nAsking child process to terminate...\n"),
+				 "error");
+			kill(-gui_side->child, SIGTERM);
+		}
+		else
+		{
+			abox_log(ABOX(widget),
+				 _("\nTrying to KILL run-away process...\n"),
+				 "error");
+			kill(-gui_side->child, SIGKILL);
+			kill(-gui_side->child, SIGCONT);
+		}
+		gui_side->abort_attempts++;
+	}
+	else
+		gtk_widget_destroy(widget);
+}
+
 static void destroy_action_window(GtkWidget *widget, gpointer data)
 {
 	GUIside	*gui_side = (GUIside *) data;
 
 	if (gui_side->child)
 	{
-		kill(gui_side->child, SIGTERM);
+		kill(-gui_side->child, SIGTERM);
 		fclose(gui_side->to_child);
 		close(gui_side->from_child);
 		g_source_remove(gui_side->input_tag);
@@ -712,6 +744,9 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 		case 0:
 			/* We are the child */
 
+			/* Create a new process group */
+			setpgid(0, 0);
+
 			quiet = autoq;
 
 			dir_drop_all_dnotifies();
@@ -735,7 +770,7 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	/* We are the parent */
 	close(filedes[1]);
 	close(filedes[2]);
-	gui_side = g_malloc(sizeof(GUIside));
+	gui_side = g_new(GUIside, 1);
 	gui_side->from_child = filedes[0];
 	gui_side->to_child = fdopen(filedes[3], "wb");
 	gui_side->child = child;
@@ -743,6 +778,7 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	gui_side->show_info = FALSE;
 	gui_side->default_string = NULL;
 	gui_side->entry_string_func = NULL;
+	gui_side->abort_attempts = 0;
 
 	gui_side->abox = ABOX(abox);
 	g_signal_connect(abox, "destroy",
@@ -751,6 +787,8 @@ static GUIside *start_action(GtkWidget *abox, ActionChild *func, gpointer data,
 	g_signal_connect(abox, "response", G_CALLBACK(response), gui_side);
 	g_signal_connect(abox, "flag_toggled",
 			 G_CALLBACK(flag_toggled), gui_side);
+	g_signal_connect(abox, "abort_operation",
+			 G_CALLBACK(abort_operation), gui_side);
 
 	gui_side->input_tag = gtk_input_add_full(gui_side->from_child,
 						GDK_INPUT_READ,

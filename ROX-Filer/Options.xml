@@ -217,10 +217,16 @@ operation, such as copying or deleting some files.</label>
       <toggle name='dnd_spring_open' label='Directories spring open'>This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while.</toggle>
       <numentry name='dnd_spring_delay' label='Spring delay:' unit='ms' min='100' max='2000' width='4'>This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect.</numentry>
     </frame>
-    <frame label='Dragging files with the middle mouse button'>
+    <frame label='When dragging files with the left mouse button'>
+      <radio-group name='dnd_left_menu'>
+        <radio value='1' label='Show a menu of possible actions'/>
+        <radio value='0' label='Copy the files'>Note that you can still get the menu to appear, by dragging Alt help down.</radio>
+      </radio-group>
+    </frame>
+    <frame label='When dragging files with the middle mouse button'>
       <radio-group name='dnd_middle_menu'>
-        <radio value='1' label='Shows a menu of possible actions'/>
-        <radio value='0' label='Moves the files'>Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key</radio>
+        <radio value='1' label='Show a menu of possible actions'/>
+        <radio value='0' label='Move the files'>Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key.</radio>
       </radio-group>
     </frame>
   </section>

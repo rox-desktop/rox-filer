@@ -42,6 +42,7 @@
 /* Static prototypes */
 static void abox_class_init(GObjectClass *gclass, gpointer data);
 static void abox_init(GTypeInstance *object, gpointer gclass);
+static gboolean abox_delete(GtkWidget *dialog, GdkEventAny *event);
 static void response(GtkDialog *dialog, gint response_id);
 static void abox_finalise(GObject *object);
 static void shade(ABox *abox);
@@ -90,14 +91,24 @@ GtkWidget* abox_new(const gchar *title, gboolean quiet)
 
 static void abox_class_init(GObjectClass *gclass, gpointer data)
 {
+	GtkWidgetClass *widget = (GtkWidgetClass *) gclass;
 	GtkDialogClass *dialog = (GtkDialogClass *) gclass;
+	ABoxClass *abox = (ABoxClass *) gclass;
 
+	widget->delete_event = abox_delete;
 	dialog->response = response;
+	abox->flag_toggled = NULL;
+	abox->abort_operation = NULL;
 
 	g_signal_new("flag_toggled", G_TYPE_FROM_CLASS(gclass),
 		G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET(ABoxClass, flag_toggled),
 		NULL, NULL, g_cclosure_marshal_VOID__INT,
 		G_TYPE_NONE, 1, G_TYPE_INT);
+
+	g_signal_new("abort_operation", G_TYPE_FROM_CLASS(gclass),
+		G_SIGNAL_RUN_LAST, G_STRUCT_OFFSET(ABoxClass, abort_operation),
+		NULL, NULL, g_cclosure_marshal_VOID__VOID,
+		G_TYPE_NONE, 0);
 
 	gclass->finalize = abox_finalise;
 }
@@ -211,7 +222,7 @@ static void response(GtkDialog *dialog, gint response_id)
 	ABox *abox = ABOX(dialog);
 
 	if (response_id == GTK_RESPONSE_CANCEL)
-		gtk_widget_destroy(GTK_WIDGET(dialog));
+		g_signal_emit_by_name(abox, "abort_operation");
 	else if (response_id == RESPONSE_QUIET)
 	{
 		gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(abox->quiet),
@@ -537,4 +548,10 @@ static void shade(ABox *abox)
 		if (on)
 			gtk_widget_grab_focus(abox->entry);
 	}
+}
+
+static gboolean abox_delete(GtkWidget *dialog, GdkEventAny *event)
+{
+	g_signal_emit_by_name(dialog, "abort_operation");
+	return TRUE;
 }
