@@ -2057,6 +2057,36 @@ void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event)
 		return;
 	}
 
+	if (!o_single_click.int_value)
+	{
+		/* Make sure both parts of a double-click fall on
+		 * the same file.
+		 */
+		static guchar *first_click = NULL;
+		static guchar *second_click = NULL;
+
+		if (event->type == GDK_BUTTON_PRESS)
+		{
+			g_free(first_click);
+			first_click = second_click;
+
+			if (item)
+				second_click = g_strdup(item->leafname);
+			else
+				second_click = NULL;
+		}
+
+		if (event->type == GDK_2BUTTON_PRESS)
+		{
+			if (first_click && second_click &&
+			    strcmp(first_click, second_click) != 0)
+				return;
+			if ((first_click || second_click) &&
+			    !(first_click && second_click))
+				return;
+		}
+	}
+
 	action = bind_lookup_bev(
 			item ? BIND_DIRECTORY_ICON : BIND_DIRECTORY,
 			event);

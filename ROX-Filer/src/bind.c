@@ -30,9 +30,9 @@
 #include "options.h"
 #include "bind.h"
 
-Option o_new_button_1;
+Option o_new_button_1, o_single_click;
 static Option o_menu_button_2;
-static Option o_single_click, o_single_pinboard;
+static Option o_single_pinboard;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*

@@ -8,7 +8,7 @@
 
 #include <gtk/gtk.h>
 
-extern Option o_new_button_1;
+extern Option o_new_button_1, o_single_click;
 
 typedef enum {
 	BIND_DIRECTORY,
