@@ -57,6 +57,13 @@ struct _FileStatus
 	gchar	*text;	/* String so far */
 };
 
+typedef struct du {
+	gchar        *path;
+	GtkListStore *store;
+	guint         watch;
+	GIOChannel   *chan;
+} DU;
+
 /* Static prototypes */
 static void refresh_info(GObject *window);
 static GtkWidget *make_vbox(const guchar *path);
@@ -312,10 +319,13 @@ static void set_selection(GtkTreeView *view, gpointer data)
 	g_free(text);
 }
 
-static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
+static gchar *add_row(GtkListStore *store, const gchar *label,
+		      const gchar *data)
 {
 	GtkTreeIter	iter;
 	gchar		*u8 = NULL;
+	GtkTreePath     *tpath;
+	gchar           *last=NULL;
 
 	if (!g_utf8_validate(data, -1, NULL))
 		u8 = to_utf8(data);
@@ -324,6 +334,14 @@ static void add_row(GtkListStore *store, const gchar *label, const gchar *data)
 	gtk_list_store_set(store, &iter, 0, label, 1, u8 ? u8 : data, -1);
 
 	g_free(u8);
+
+	tpath=gtk_tree_model_get_path(GTK_TREE_MODEL(store), &iter);
+	if(last)
+		g_free(last);
+	last=gtk_tree_path_to_string(tpath);
+	gtk_tree_path_free(tpath);
+
+	return last;
 }
 
 static void add_row_and_free(GtkListStore *store,
@@ -361,6 +379,72 @@ static void make_list(GtkListStore **list_store, GtkWidget **list_view)
 	*list_store = store;
 	*list_view = (GtkWidget *) view;
 }
+
+static void set_cell(GtkListStore *store, const gchar *path,
+		     const gchar *ctext)
+{
+	GtkTreeIter iter;
+
+	gtk_tree_model_get_iter_from_string(GTK_TREE_MODEL(store),
+					    &iter, path);
+	gtk_list_store_set(store, &iter, 1, ctext, -1);
+}
+
+static void insert_size(DU *du, const char *line)
+{
+	off_t size;
+	gchar *cell;
+
+#ifdef	LARGE_FILE_SUPPORT
+	size=strtoll(line, NULL, 10);
+#else
+	size=strtol(line, NULL, 10);
+#endif
+	size<<=10; /* Because du reports in K */
+	cell=(size >= PRETTY_SIZE_LIMIT)?
+		g_strdup_printf("%s (%" SIZE_FMT " %s)",
+				format_size(size),
+				size, _("bytes"))
+		: g_strdup(format_size(size));
+
+	set_cell(du->store, du->path, cell);
+
+	g_free(cell);
+}
+
+static gboolean read_du_output(GIOChannel *source, GIOCondition cond,
+			       DU *du)
+{
+	GString *line;
+	GIOStatus stat;
+	GError *err=NULL;
+
+	line=g_string_new("");
+	stat=g_io_channel_read_line_string(source, line, NULL, &err);
+	switch(stat) {
+	case G_IO_STATUS_NORMAL:
+		insert_size(du, line->str);
+		break;
+	case G_IO_STATUS_EOF:
+		break;
+	case G_IO_STATUS_AGAIN:
+		g_string_free(line, TRUE);
+		return TRUE;
+	case G_IO_STATUS_ERROR:
+		set_cell(du->store, du->path, err->message);
+		break;
+	}
+	g_string_free(line, TRUE);
+	
+	return FALSE;
+}
+	
+static void kill_du_output(GtkWidget *widget, DU *du)
+{
+	g_io_channel_unref(du->chan);
+	g_free(du->path);
+	g_free(du);
+}
 	
 /* Create the TreeView widget with the file's details */
 static GtkWidget *make_details(const guchar *path, DirItem *item)
@@ -388,13 +472,38 @@ static GtkWidget *make_details(const guchar *path, DirItem *item)
 					 user_name(item->uid),
 					 group_name(item->gid)));
 
-	if (item->base_type != TYPE_DIRECTORY)
+	if (item->base_type != TYPE_DIRECTORY) {
 		add_row_and_free(store, _("Size:"),
 				 item->size >= PRETTY_SIZE_LIMIT
 				 ? g_strdup_printf("%s (%" SIZE_FMT " %s)",
 						   format_size(item->size),
 						   item->size, _("bytes"))
 				 : g_strdup(format_size(item->size)));
+	} else {
+		DU *du=g_new(DU, 1);
+		int out;
+		gchar *args[]={"du", "-sk", "", NULL};
+
+		du->store=store;
+		du->path=g_strdup(add_row(store, _("Size:"), _("Scanning")));
+
+		args[2]=(gchar *) path;
+		if(g_spawn_async_with_pipes(NULL, args, NULL,
+					    G_SPAWN_SEARCH_PATH,
+					    NULL, NULL, NULL,
+					    NULL, &out, NULL,
+					    NULL)) {
+			du->chan=g_io_channel_unix_new(out);
+			du->watch=g_io_add_watch(du->chan, G_IO_IN,
+						 (GIOFunc) read_du_output, du);
+			g_signal_connect(G_OBJECT(view), "destroy",
+				  G_CALLBACK(kill_du_output), du);
+		} else {
+			set_cell(store, du->path, _("Failed to scan"));
+			g_free(du->path);
+			g_free(du);
+		}
+	}
 
 	add_row_and_free(store, _("Change time:"), pretty_time(&item->ctime));
 	
