@@ -346,6 +346,7 @@ void drag_selection(Collection 		*collection,
 		{"", 0, TARGET_RAW},
 	};
 	DirItem	*item;
+	GdkDragAction	actions;
 
 	if (number_selected == 1)
 		item = selected_item(collection);
@@ -366,9 +367,14 @@ void drag_selection(Collection 		*collection,
 	else
 		target_list = gtk_target_list_new(target_table, 1);
 
+	if (event->state & GDK_BUTTON1_MASK)
+		actions = GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK;
+	else
+		actions = GDK_ACTION_MOVE;
+	
 	context = gtk_drag_begin(widget,
 			target_list,
-			GDK_ACTION_COPY | GDK_ACTION_MOVE | GDK_ACTION_LINK,
+			actions,
 			(event->state & GDK_BUTTON1_MASK) ? 1 : 2,
 			(GdkEvent *) event);
 	g_dataset_set_data(context, "filer_window", filer_window);

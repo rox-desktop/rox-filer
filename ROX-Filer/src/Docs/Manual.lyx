@@ -1,4 +1,4 @@
-#This file was created by <tal197> Tue Apr 18 12:24:48 2000
+#This file was created by <tal197> Tue Apr 18 17:30:12 2000
 #LyX 0.12 (C) 1995-1998 Matthias Ettrich and the LyX Team
 \lyxformat 2.15
 \textclass article
@@ -264,18 +264,19 @@ $ ROX-Filer/AppRun -o -b ~/Panel &
 Mouse button and key bindings
 \layout Standard
 
-By default, the mouse button bindings are different to fit in better with
- X conventions.
+By default, the mouse button bindings are designed to fit in with X conventions.
  You can get the old RISC OS bindings by opening the Options window and
  clicking on a few toggle buttons.
-\layout Standard
-
-By default, the mouse buttons and key bindings for filer windows are as
+ By default, the mouse buttons and key bindings for filer windows are as
  follows:
+\latex latex 
+
+\backslash 
+medskip
 \layout Standard
 \LyXTable
 multicol5
-21 2 0 0 -1 -1 -1 -1
+23 2 0 0 -1 -1 -1 -1
 1 1 0 0
 1 1 0 0
 0 1 0 0
@@ -285,33 +286,39 @@ multicol5
 0 1 1 0
 0 1 0 0
 0 1 1 0
-0 1 1 0
 0 1 0 0
 0 1 1 0
 0 1 1 0
 0 1 0 0
 0 1 1 0
+0 1 1 0
+0 1 0 0
+0 1 1 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
 0 1 0 0
-8 1 0 "" ""
-2 1 1 "10cm" ""
+2 1 0 "3.5cm" ""
+2 1 1 "9.5cm" ""
+0 2 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
-0 8 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
+0 8 0 1 1 0 0 "" ""
+0 8 0 1 0 0 0 "" ""
+0 2 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 0 0 0 "" ""
 0 8 0 1 1 0 0 "" ""
@@ -365,11 +372,19 @@ the Selection submenu.
 \newline 
 Drag an item 
 \newline 
-Copy the file(s) to the destination (an application or another filer window)
+Copy the file(s) to the destination (an application or another filer window).
 \newline 
-
+(left mouse button)
 \newline 
 Hold down Shift to move the file, or Ctrl+Shift to create a symbolic link.
+\newline 
+Drag an item
+\newline 
+As above, but always moves rather than copying or symlinking.
+\newline 
+(middle mouse button)
+\newline 
+
 \newline 
 Drag (not over an item)
 \newline 
@@ -429,6 +444,14 @@ Spacebar
 Toggles the item under the cursor between being selected and unselected.
 \layout Standard
 
+
+\latex latex 
+
+\backslash 
+medskip
+\backslash 
+noindent 
+\latex default 
 You can simulate a click of the middle mouse button by clicking with Ctrl
  held down.
  Other keys can easily be defined by opening the menu, moving the pointer
@@ -1953,6 +1976,17 @@ Save puts all your choices into effect, and also saves them into your Choices
  directory for next time ROX-Filer is loaded.
  ROX-Filer will never save any preferences to disk unless you click on the
  `Save' button in the options window.
+ Exactly where choices are loaded from and saved to is controlled by the
+ 
+\family typewriter 
+CHOICESPATH
+\family default 
+ environment variable --- see 
+\begin_inset LatexCommand \cite{Choices}
+
+\end_inset 
+
+ for details.
 \layout Description
 
 OK puts your choices into effect without writing anything to disk.
@@ -2326,10 +2360,32 @@ This is a quick start guide for people who want to modify the source code.
 Compiling
 \layout Standard
 
-The first time you compile the program you need to do `AppRun --compile',
- but in future you only need to run `make' in the `src' directory when you
- change the .c and .h files.
- You might want to run `make depend' too.
+The first time you compile the program you need to do `
+\family typewriter 
+AppRun --compile
+\family default 
+', but in future you only need to run `
+\family typewriter 
+make
+\family default 
+' in the `
+\family typewriter 
+src
+\family default 
+' directory when you change the 
+\family typewriter 
+.c
+\family default 
+ and 
+\family typewriter 
+.h
+\family default 
+ files.
+ You might want to run `
+\family typewriter 
+make depend
+\family default 
+' too.
 \layout Subsection
 
 Creating and applying patches

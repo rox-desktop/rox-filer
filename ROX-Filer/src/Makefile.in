@@ -43,9 +43,6 @@ depend:
 messages.pot: ${SRCS}
 	xgettext --keyword=_ --keyword=N_ --output=$@ ${SRCS}
 
-dist:
-	./po/update-po
-
 ############ Special case
 
 pixmaps.o: pixmaps.c
