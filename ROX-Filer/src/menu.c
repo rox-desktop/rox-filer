@@ -1876,7 +1876,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 		
 	item = iter.next(&iter);
 	g_return_if_fail(item != NULL);
-	g_return_if_fail(iter.next(&iter) == NULL);
+	/* iter may be passed to filer_openitem... */
 
 	if (!item->image)
 		item = dir_update_item(window_with_focus->directory,
