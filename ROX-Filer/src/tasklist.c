@@ -213,7 +213,7 @@ static GArray *get_window_list(Window xwindow, GdkAtom atom)
 	int format;
 	gulong nitems;
 	gulong bytes_after;
-	Window *data;
+	unsigned char *data;
 	int err, result;
 	int i;
 
@@ -226,7 +226,7 @@ static GArray *get_window_list(Window xwindow, GdkAtom atom)
 			gdk_x11_atom_to_xatom(atom),
 			0, G_MAXLONG,
 			False, XA_WINDOW, &type, &format, &nitems,
-			&bytes_after, (guchar **)&data);  
+			&bytes_after, &data);  
 	err = gdk_error_trap_pop();
 
 	if (err != Success || result != Success)
@@ -235,7 +235,7 @@ static GArray *get_window_list(Window xwindow, GdkAtom atom)
 	if (type == XA_WINDOW)
 	{
 		for (i = 0; i < nitems; i++)
-			g_array_append_val(array, data[i]);
+			g_array_append_val(array, ((Window *) data)[i]);
 
 		if (array->len)
 			g_array_sort(array, wincmp);
@@ -246,20 +246,20 @@ static GArray *get_window_list(Window xwindow, GdkAtom atom)
 	return array;  
 }
 
-static gchar *get_str(IconWindow *win, GdkAtom atom)
+static guchar *get_str(IconWindow *win, GdkAtom atom)
 {
 	Atom rtype;
 	int format;
 	gulong nitems;
 	gulong bytes_after;
-	char *data, *str = NULL;
+	unsigned char *data, *str = NULL;
 
 	if (XGetWindowProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(atom),
 			0, G_MAXLONG, False,
 			AnyPropertyType,
 			&rtype, &format, &nitems,
-			&bytes_after, (guchar **) &data) == Success && data)
+			&bytes_after, &data) == Success && data)
 	{
 		if (*data)
 			str = g_strdup(data);
@@ -308,7 +308,7 @@ static void window_check_status(IconWindow *win)
 	int format;
 	gulong nitems;
 	gulong bytes_after;
-	gint32 *data;
+	unsigned char *data;
 	gboolean iconic = FALSE;
 
 	if (wm_supports_hidden && XGetWindowProperty(gdk_display, win->xwindow,
@@ -316,14 +316,14 @@ static void window_check_status(IconWindow *win)
 			0, G_MAXLONG, False,
 			XA_ATOM,
 			&type, &format, &nitems,
-			&bytes_after, (guchar **) &data) == Success && data)
+			&bytes_after, &data) == Success && data)
 	{
 		GdkAtom state;
 		int i;
 			
 		for (i = 0; i < nitems; i++)
 		{
-			state = gdk_x11_xatom_to_atom((Atom) data[i]);
+			state = gdk_x11_xatom_to_atom(((Atom *) data)[i]);
 			if (state == xa__NET_WM_STATE_HIDDEN)
 			{
 				iconic = TRUE;
@@ -337,9 +337,9 @@ static void window_check_status(IconWindow *win)
 			0, 1, False,
 			gdk_x11_atom_to_xatom(xa_WM_STATE),
 			&type, &format, &nitems,
-			&bytes_after, (guchar **) &data) == Success && data)
+			&bytes_after, &data) == Success && data)
 	{
-		iconic = data[0] == 3;
+		iconic = ((guint32 *) data)[0] == 3;
 		XFree(data);
 	}
 	else
@@ -948,7 +948,7 @@ static void update_supported(void)
 	int format;
 	gulong nitems;
 	gulong bytes_after;
-	Atom *data;
+	unsigned char *data;
 	int err, result;
 	int i;
 	gboolean old_supports_hidden = wm_supports_hidden;
@@ -962,7 +962,7 @@ static void update_supported(void)
 			gdk_x11_atom_to_xatom(xa__NET_SUPPORTED),
 			0, G_MAXLONG,
 			False, XA_ATOM, &type, &format, &nitems,
-			&bytes_after, (guchar **)&data);  
+			&bytes_after, &data);  
 	err = gdk_error_trap_pop();
 
 	if (err != Success || result != Success)
@@ -970,7 +970,7 @@ static void update_supported(void)
 
 	for (i = 0; i < nitems; i++)
 	{
-		GdkAtom atom = gdk_x11_xatom_to_atom(data[i]);
+		GdkAtom atom = gdk_x11_xatom_to_atom(((Atom *) data)[i]);
 
 		if (atom == xa__NET_WM_STATE_HIDDEN)
 			wm_supports_hidden = TRUE;

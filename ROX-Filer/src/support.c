@@ -1168,17 +1168,17 @@ CollateKey *collate_key_new(const guchar *name)
 		 */
 		if (g_unichar_isdigit(g_utf8_get_char(i)))
 		{
-			guchar *endp;
+			char *endp;
 			
 			/* i -> first digit character */
 			tmp = g_utf8_strdown(name, i - name);
 			new.text = g_utf8_collate_key(tmp, -1);
 			g_free(tmp);
-			new.number = strtol(i, (char **) &endp, 10);
+			new.number = strtol(i, &endp, 10);
 
 			g_array_append_val(array, new);
 
-			g_return_val_if_fail(endp > i, NULL);
+			g_return_val_if_fail(endp > (char *) i, NULL);
 
 			name = endp;
 			i = name - 1;
