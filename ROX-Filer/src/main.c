@@ -586,6 +586,17 @@ static void show_features(void)
 		_("No (needs libpng or Gtk+-2.0)")
 #endif
 		);
+	g_printerr("%s... %s\n", _("Character set translations"),
+#ifdef GTK2
+			_("Yes (using Gtk+-2.0)")
+#else
+# ifdef HAVE_ICONV_H
+			_("Yes (using libiconv)")
+# else
+			_("No (needs libiconv or Gtk+-2.0)")
+# endif
+#endif
+		  );
 }
 
 static void soap_add(xmlNodePtr body,

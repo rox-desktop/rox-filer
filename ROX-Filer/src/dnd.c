@@ -927,6 +927,14 @@ static void got_data_raw(GtkWidget 		*widget,
 
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 
+	if (context->action == GDK_ACTION_ASK)
+	{
+		gtk_drag_finish(context, FALSE, FALSE, time);	/* Failure */
+		delayed_error(_("Sorry, can't display a menu of actions "
+				"for a remote file / raw data."));
+		return;
+	}
+
 	if (g_dataset_get_data(context, "drop_dest_type") == drop_dest_prog)
 	{
 		/* The data needs to be sent to an application */
@@ -1004,7 +1012,6 @@ static void got_uri_list(GtkWidget 		*widget,
 		/* There is one URI in the list, and it's not on the local
 		 * machine. Get it via the X server if possible.
 		 */
-		 /* XXX: Action ask? */
 
 		if (provides(context, application_octet_stream))
 		{

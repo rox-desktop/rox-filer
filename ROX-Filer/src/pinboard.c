@@ -1546,10 +1546,13 @@ static gboolean bg_drag_motion(GtkWidget	*widget,
 
 	if (!provides(context, text_uri_list))
 		return FALSE;
-	
+
 	pinboard_set_shadow(TRUE);
 	
-	gdk_drag_status(context, context->suggested_action, time);
+	gdk_drag_status(context,
+			context->suggested_action == GDK_ACTION_ASK
+				? GDK_ACTION_LINK : context->suggested_action,
+			time);
 	return TRUE;
 }
 

@@ -32,7 +32,11 @@
 #ifndef GTK2
 
 #include "gunicode.h"
-#include <iconv.h>
+
+#ifdef HAVE_ICONV_H
+# include <iconv.h>
+#endif
+
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
@@ -85,14 +89,7 @@ g_get_charset (const char **charset)
 
 /* unicode_strchr */
 
-
-#if defined(USE_LIBICONV) && !defined (_LIBICONV_H)
-#error libiconv in use but included iconv.h not from libiconv
-#endif
-#if !defined(USE_LIBICONV) && defined (_LIBICONV_H)
-#error libiconv not in use but included iconv.h is from libiconv
-#endif
-
+#ifdef HAVE_ICONV_H
 size_t 
 g_iconv (GIConv   converter,
 	 gchar  **inbuf,
@@ -134,6 +131,7 @@ open_converter (const gchar *to_codeset,
   return cd;
 
 }
+#endif
 
 gchar*
 g_convert (const gchar *str,
@@ -145,12 +143,13 @@ g_convert (const gchar *str,
 	   GError     **error)
 {
   gchar *res;
+#ifdef HAVE_ICONV_H
   GIConv cd;
   
   g_return_val_if_fail (str != NULL, NULL);
   g_return_val_if_fail (to_codeset != NULL, NULL);
   g_return_val_if_fail (from_codeset != NULL, NULL);
-     
+
   cd = open_converter (to_codeset, from_codeset, error);
 
   if (cd == (GIConv) -1)
@@ -169,10 +168,14 @@ g_convert (const gchar *str,
 			      error);
   
   g_iconv_close (cd);
+#else
+  res = g_strdup(str);
+#endif
 
   return res;
 }
 
+#ifdef HAVE_ICONV_H
 gchar*
 g_convert_with_iconv (const gchar *str,
 		      gssize       len,
@@ -264,6 +267,7 @@ g_convert_with_iconv (const gchar *str,
   else
     return dest;
 }
+#endif
 
 gchar *
 g_locale_to_utf8 (const gchar  *opsysstring,

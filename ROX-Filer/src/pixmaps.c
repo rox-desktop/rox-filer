@@ -636,6 +636,7 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	GString *to;
 	char *md5, *swidth, *sheight, *ssize, *smtime, *uri;
 	mode_t old_mask;
+	int name_len;
 
 	/* If the source image was very small, don't bother saving */
 	if (gdk_pixbuf_get_width(full) * gdk_pixbuf_get_height(full) <
@@ -664,7 +665,8 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 	g_string_append(to, "/96x96/");
 	mkdir(to->str, 0700);
 	g_string_append(to, md5);
-	g_string_append(to, ".png.new");
+	name_len = to->len + 4; /* Truncate to this length when renaming */
+	g_string_sprintfa(to, ".png.ROX-Filer-%ld", (long) getpid());
 
 	g_free(md5);
 
@@ -694,14 +696,14 @@ static void save_thumbnail(char *path, GdkPixbuf *full, MaskedPixmap *image)
 #endif	
 	umask(old_mask);
 
-	/* We create the file ###.png.new and rename it to avoid
+	/* We create the file ###.png.ROX-Filer-PID and rename it to avoid
 	 * a race condition if two program create the same thumb at
 	 * once.
 	 */
 	{
 		gchar *final;
 
-		final = g_strndup(to->str, to->len - 4);
+		final = g_strndup(to->str, name_len);
 		if (rename(to->str, final))
 			g_warning("Failed to rename '%s' to '%s': %s",
 				  to->str, final, g_strerror(errno));

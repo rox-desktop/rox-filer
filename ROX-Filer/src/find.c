@@ -102,7 +102,7 @@ enum
 	FLAG_HENCE 	= 1 << 1,
 };
 
-typedef long (*EvalCalc)(Eval *eval, FindInfo *info);
+typedef double (*EvalCalc)(Eval *eval, FindInfo *info);
 typedef void (*EvalFree)(Eval *eval);
 
 struct _FindCondition
@@ -112,7 +112,7 @@ struct _FindCondition
 	/* These next three depend on the first two... */
 	gpointer	data1;
 	gpointer	data2;
-	gint		value;
+	double		value;
 };
 
 struct _Eval
@@ -367,7 +367,7 @@ static gboolean test_comp(FindCondition *condition, FindInfo *info)
 {
 	Eval	*first = (Eval *) condition->data1;
 	Eval	*second = (Eval *) condition->data2;
-	long	a, b;
+	double	a, b;
 
 	a = first->calc(first, info);
 	b = second->calc(second, info);
@@ -831,9 +831,9 @@ out:
 
 /*	CALCULATIONS	*/
 
-static long get_constant(Eval *eval, FindInfo *info)
+static double get_constant(Eval *eval, FindInfo *info)
 {
-	long	value = *((long *) (eval->data1));
+	double	value = *((double *) (eval->data1));
 	gint	flags = GPOINTER_TO_INT(eval->data2);
 
 	if (flags & FLAG_AGO)
@@ -844,7 +844,7 @@ static long get_constant(Eval *eval, FindInfo *info)
 	return value;
 }
 
-static long get_var(Eval *eval, FindInfo *info)
+static double get_var(Eval *eval, FindInfo *info)
 {
 	switch ((VarType) eval->data1)
 	{
@@ -868,7 +868,7 @@ static long get_var(Eval *eval, FindInfo *info)
 			return info->stats.st_blocks;
 	}
 
-	return 0L;
+	return 0;
 }
 
 /*	FREEING		*/
@@ -888,7 +888,7 @@ static void free_constant(Eval *eval)
 static Eval *parse_eval(guchar **expression)
 {
 	char	*start, *end;
-	long	value;
+	double	value;
 	Eval	*eval;
 	gint	flags = 0;
 	
@@ -914,11 +914,11 @@ static Eval *parse_eval(guchar **expression)
 	if (MATCH(_("Byte")) || MATCH(_("Bytes")))
 		;
 	else if (MATCH("Kb"))
-		value <<= 10;
+		value *= 1<<10;
 	else if (MATCH("Mb"))
-		value <<= 20;
+		value *= 1<<20;
 	else if (MATCH("Gb"))
-		value <<= 30;
+		value *= 1<<30;
 	else if (MATCH(_("Sec")) || MATCH(_("Secs")))
 		;
 	else if (MATCH(_("Min")) || MATCH(_("Mins")))
