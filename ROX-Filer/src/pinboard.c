@@ -617,13 +617,13 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	}
 	gdk_gc_set_function(mask_gc, GDK_COPY);
 
-	/* Mask off an area for the text (from o_text_bg) */
+	/* Mask off an area for the text (from o_pinboard_text_bg) */
 
 	text_x = (width - icon->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
 #ifndef GTK2
-	if (o_text_bg == TEXT_BG_SOLID)
+	if (o_pinboard_text_bg.int_value == TEXT_BG_SOLID)
 	{
 #endif
 		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
@@ -638,7 +638,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 		TEXT_AT(0, 0);
 
-		if (o_text_bg == TEXT_BG_OUTLINE)
+		if (o_pinboard_text_bg.int_value == TEXT_BG_OUTLINE)
 		{
 			TEXT_AT(1, 0);
 			TEXT_AT(1, 1);

@@ -1103,7 +1103,8 @@ static GList *build_toggle(Option *option, xmlNode *node, guchar *label)
 	option->widget = toggle;
 
 	gtk_signal_connect_object(GTK_OBJECT(toggle), "toggled",
-			GTK_SIGNAL_FUNC(option_check_widget), option);
+			GTK_SIGNAL_FUNC(option_check_widget),
+			(GtkObject *) option);
 
 	return g_list_append(NULL, toggle);
 }
@@ -1155,7 +1156,8 @@ static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 	option->widget = slide;
 
 	gtk_signal_connect_object(GTK_OBJECT(adj), "value-changed",
-			GTK_SIGNAL_FUNC(option_check_widget), option);
+			GTK_SIGNAL_FUNC(option_check_widget),
+			(GtkObject *) option);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1181,7 +1183,8 @@ static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 	option->widget = entry;
 
 	gtk_signal_connect_object_after(GTK_OBJECT(entry), "changed",
-			GTK_SIGNAL_FUNC(option_check_widget), option);
+			GTK_SIGNAL_FUNC(option_check_widget),
+			(GtkObject *) option);
 
 	return g_list_append(NULL, hbox);
 }
@@ -1200,7 +1203,8 @@ static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 		{
 			button = build_radio(rn, button);
 			gtk_signal_connect_object(GTK_OBJECT(button), "toggled",
-				GTK_SIGNAL_FUNC(option_check_widget), option);
+				GTK_SIGNAL_FUNC(option_check_widget),
+				(GtkObject *) option);
 			list = g_list_append(list, button);
 		}
 	}
@@ -1308,7 +1312,8 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 	option->widget = option_menu;
 
 	gtk_signal_connect_object_after(GTK_OBJECT(option_menu), "changed",
-			GTK_SIGNAL_FUNC(option_check_widget), option);
+			GTK_SIGNAL_FUNC(option_check_widget),
+			(GtkObject *) option);
 
 	return g_list_append(NULL, hbox);
 }
