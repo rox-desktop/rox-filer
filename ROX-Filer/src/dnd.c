@@ -223,6 +223,7 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 	GtkTargetList   *target_list;
 	GtkTargetEntry 	target_table[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"UTF8_STRING", 0, TARGET_UTF8},
 	};
 		
 	if (event->state & GDK_BUTTON1_MASK)
@@ -236,7 +237,8 @@ void drag_selection(GtkWidget *widget, GdkEventMotion *event, guchar *uri_list)
 			actions = GDK_ACTION_MOVE;
 	}
 	
-	target_list = gtk_target_list_new(target_table, 1);
+	target_list = gtk_target_list_new(target_table,
+					G_N_ELEMENTS(target_table));
 
 	context = gtk_drag_begin(widget,
 			target_list,
@@ -267,6 +269,7 @@ void drag_one_item(GtkWidget		*widget,
 	GtkTargetList   *target_list;
 	GtkTargetEntry 	target_table[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
+		{"UTF8_STRING", 0, TARGET_UTF8},
 		{"application/octet-stream", 0, TARGET_RAW},
 		{"", 0, TARGET_RAW},
 	};
@@ -281,13 +284,14 @@ void drag_one_item(GtkWidget		*widget,
 	{
 		MIME_type *t = item->mime_type;
 		
-		target_table[2].target = g_strconcat(t->media_type, "/",
+		target_table[3].target = g_strconcat(t->media_type, "/",
 						     t->subtype, NULL);
-		target_list = gtk_target_list_new(target_table, 3);
-		g_free(target_table[2].target);
+		target_list = gtk_target_list_new(target_table,
+					G_N_ELEMENTS(target_table));
+		g_free(target_table[3].target);
 	}
 	else
-		target_list = gtk_target_list_new(target_table, 1);
+		target_list = gtk_target_list_new(target_table, 2);
 
 	if (event->state & GDK_BUTTON1_MASK)
 		actions = GDK_ACTION_COPY | GDK_ACTION_ASK
@@ -318,6 +322,46 @@ void drag_one_item(GtkWidget		*widget,
 	gtk_drag_set_icon_pixbuf(context, image->pixbuf, 0, 0);
 }
 
+/* Convert text/uri-list data to UTF8_STRING.
+ * g_free() the result.
+ */
+static gchar *uri_list_to_utf8(const char *uri_list)
+{
+	GString *new;
+	GList *uris, *next_uri;
+	char *string;
+
+	new = g_string_new(NULL);
+
+	uris = uri_list_to_glist(uri_list);
+
+	for (next_uri = uris; next_uri; next_uri = next_uri->next)
+	{
+		char *uri = (char *) next_uri->data;
+		const char *local;
+
+		local = get_local_path(uri);
+
+		if (new->len)
+			g_string_append_c(new, ' ');
+
+		if (local)
+			g_string_append(new, local);
+		else
+			g_warning("Not local!\n");
+
+		g_free(uri);
+	}
+
+	if (uris)	
+		g_list_free(uris);
+
+	string = new->str;
+	g_string_free(new, FALSE);
+
+	return string;
+}
+
 /* Called when a remote app wants us to send it some data.
  * TODO: Maybe we should handle errors better (ie, let the remote app know
  * the drag has failed)?
@@ -335,7 +379,7 @@ void drag_data_get(GtkWidget          		*widget,
 	GdkAtom		type;
 	guchar		*path;
 
-	type = gdk_x11_xatom_to_atom(XA_STRING);
+	type = selection_data->target;
 
 	switch (info)
 	{
@@ -344,11 +388,19 @@ void drag_data_get(GtkWidget          		*widget,
 			if (path && load_file(path, &to_send, &to_send_length))
 			{
 				delete_once_sent = TRUE;
-				type = selection_data->target;
 				break;
 			}
 			g_warning("drag_data_get: Can't find path!\n");
 			return;
+		case	TARGET_UTF8:
+		{
+			char *uri_list;
+			uri_list = g_dataset_get_data(context, "uri_list");
+			to_send = uri_list_to_utf8(uri_list);
+			to_send_length = strlen(to_send);
+			delete_once_sent = TRUE;
+			break;
+		}
 		case	TARGET_URI_LIST:
 			to_send = g_dataset_get_data(context, "uri_list");
 			to_send_length = strlen(to_send);
