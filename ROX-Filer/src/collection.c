@@ -1122,16 +1122,16 @@ static gint collection_button_press(GtkWidget      *widget,
 
 	collection = COLLECTION(widget);
 
-	if (event->button <= 3)
+	if (event->button <= 3 || event->type != GDK_BUTTON_PRESS)
 		return FALSE;		/* Only deal with wheel events here */
 		
 	/* Wheel mouse scrolling */
+	diff = 32;
+
 	if (event->button == 4)
-		diff = -((signed int) collection->item_height) / 4;
-	else if (event->button == 5)
-		diff = collection->item_height / 4;
-	else
-		diff = 0;
+		diff = -diff;
+	else if (event->button != 5)
+		return FALSE;
 
 	if (diff)
 	{
