@@ -18,6 +18,8 @@ struct _Option {
 	long		int_value;
 	gboolean	has_changed;
 
+	guchar		*backup;	/* Copy of value to Revert to */
+
 	GtkWidget	*widget;		/* NULL => No UI yet */
 	void		(*update_widget)(Option *option, guchar *value);
 	guchar *	(*read_widget)(Option *option);
@@ -26,7 +28,9 @@ struct _Option {
 /* Prototypes */
 
 void options_init(void);
+
 void option_register_widget(char *name, OptionBuildFn builder);
+void option_check_widget(Option *option);
 
 void option_add_int(Option *option, guchar *key, int value);
 void option_add_string(Option *option, guchar *key, guchar *value);

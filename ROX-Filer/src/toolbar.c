@@ -360,7 +360,7 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 
 	filer_window->toolbar_text = gtk_label_new("");
 	gtk_misc_set_alignment(GTK_MISC(filer_window->toolbar_text), 0, 0.5);
-	gtk_widget_set_usize(filer_window->toolbar_text, 8, 1);
+	gtk_widget_set_usize(filer_window->toolbar_text, 8, -1);
 	gtk_box_pack_start(GTK_BOX(box), filer_window->toolbar_text,
 			TRUE, TRUE, 4);
 
@@ -493,6 +493,7 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 static void toggle_shaded(GtkWidget *widget)
 {
 	gtk_widget_set_sensitive(widget, !GTK_WIDGET_SENSITIVE(widget));
+	option_check_widget(&o_toolbar_disable);
 }
 
 /* Called during the drag when the mouse is in a widget registered

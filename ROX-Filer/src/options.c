@@ -51,7 +51,7 @@
  * - For each widget in the box, the current value of the option is used to
  *   set the widget's state.
  *
- * When the user clicks Save/OK/Apply:
+ * When the user clicks Save/OK:
  *
  * - The state of each widget is copied to the options values.
  *
@@ -90,8 +90,6 @@ static GtkTooltips *option_tooltips = NULL;
 /* The Options window. NULL if not yet created. */
 static GtkWidget *window = NULL;
 
-enum {BUTTON_SAVE, BUTTON_OK, BUTTON_APPLY};
-
 /* "filer_unique" -> (Option *) */
 static GHashTable *option_hash = NULL;
 
@@ -112,14 +110,18 @@ static GList *notify_callbacks = NULL;
 /* List of functions to call after all options are saved */
 static GList *saver_callbacks = NULL;
 
+static int updating_widgets = 0;	/* Ignore change signals when set */
+
 /* Static prototypes */
 static void save_options(GtkWidget *widget, gpointer data);
+static void revert_options(GtkWidget *widget, gpointer data);
 static char *process_option_line(guchar *line);
 static void build_options_window(void);
 static GtkWidget *build_frame(void);
 static void update_option_widgets(void);
 static void button_patch_set_colour(GtkWidget *button, GdkColor *color);
 static void option_add(Option *option, guchar *key);
+static void set_not_changed(gpointer key, gpointer value, gpointer data);
 
 static GList *build_toggle(Option *option, xmlNode *node, guchar *label);
 static GList *build_slider(Option *option, xmlNode *node, guchar *label);
@@ -163,7 +165,8 @@ void options_init(void)
 /* When parsing the XML file, process an element named 'name' by
  * calling 'builder(ui, xml_node, label)'.
  * builder returns the new widgets to add to the options box.
- * 'name' should be a static string.
+ * 'name' should be a static string. Call 'option_check_widget' when
+ * the widget's value is modified.
  *
  * Functions to set or get the widget's state can be stored in 'ui'.
  * If the option doesn't have a name attribute in Options.xml then
@@ -172,6 +175,40 @@ void options_init(void)
 void option_register_widget(char *name, OptionBuildFn builder)
 {
 	g_hash_table_insert(widget_builder, name, builder);
+}
+
+/* This is called when the widget's value is modified by the user.
+ * Reads the new value of the widget into the option and calls
+ * the notify callbacks.
+ */
+void option_check_widget(Option *option)
+{
+	guchar		*new = NULL;
+
+	if (updating_widgets)
+		return;		/* Not caused by the user... */
+
+	g_return_if_fail(option->read_widget != NULL);
+
+	new = option->read_widget(option);
+
+	g_return_if_fail(new != NULL);
+
+	g_hash_table_foreach(option_hash, set_not_changed, NULL);
+
+	option->has_changed = strcmp(option->value, new) != 0;
+
+	if (!option->has_changed)
+	{
+		g_free(new);
+		return;
+	}
+
+	g_free(option->value);
+	option->value = new;
+	option->int_value = atoi(new);
+
+	options_notify();
 }
 
 /* Call all the notify callbacks. This should happen after any options
@@ -189,6 +226,15 @@ void options_notify(void)
 	}
 }
 
+/* Store values used by Revert */
+static void store_backup(gpointer key, gpointer value, gpointer data)
+{
+	Option *option = (Option *) value;
+
+	g_free(option->backup);
+	option->backup = g_strdup(option->value);
+}
+
 void options_show(void)
 {
 	if (!option_tooltips)
@@ -203,6 +249,8 @@ void options_show(void)
 	if (window)
 		gtk_widget_destroy(window);
 
+	g_hash_table_foreach(option_hash, store_backup, NULL);
+			
 	build_options_window();
 
 	update_option_widgets();
@@ -225,9 +273,9 @@ void option_add_string(Option *option, guchar *key, guchar *value)
 	option_add(option, key);
 }
 
-/* Add a callback which will be called after all the options have
- * been set following a Save/OK/Apply.
- * Useful if you need to update if any of several values have changed.
+/* Add a callback which will be called after any options have changed their
+ * values. If serveral options change at once, this is called after all
+ * changes.
  */
 void option_add_notify(OptionNotify *callback)
 {
@@ -236,7 +284,7 @@ void option_add_notify(OptionNotify *callback)
 	notify_callbacks = g_list_append(notify_callbacks, callback);
 }
 
-/* Call this after all the options have been saved */
+/* Call 'callback' after all the options have been saved */
 void option_add_saver(OptionNotify *callback)
 {
 	g_return_if_fail(callback != NULL);
@@ -270,6 +318,7 @@ static void option_add(Option *option, guchar *key)
 	option->widget = NULL;
 	option->update_widget = NULL;
 	option->read_widget = NULL;
+	option->backup = NULL;
 
 	g_hash_table_insert(option_hash, key, option);
 
@@ -288,7 +337,7 @@ static void option_add(Option *option, guchar *key)
 
 static GtkColorSelectionDialog *current_csel_box = NULL;
 
-static void get_new_colour(GtkWidget *ok, GtkWidget *button)
+static void get_new_colour(GtkWidget *ok, Option *option)
 {
 	GtkWidget	*csel;
 	gdouble		c[4];
@@ -303,12 +352,14 @@ static void get_new_colour(GtkWidget *ok, GtkWidget *button)
 	colour.green = c[1] * 0xffff;
 	colour.blue = c[2] * 0xffff;
 
-	button_patch_set_colour(button, &colour);
+	button_patch_set_colour(option->widget, &colour);
 	
 	gtk_widget_destroy(GTK_WIDGET(current_csel_box));
+
+	option_check_widget(option);
 }
 
-static void open_coloursel(GtkWidget *ok, GtkWidget *button)
+static void open_coloursel(GtkWidget *button, Option *option)
 {
 	GtkColorSelectionDialog	*csel;
 	GtkWidget		*dialog, *patch;
@@ -329,7 +380,7 @@ static void open_coloursel(GtkWidget *ok, GtkWidget *button)
 			GTK_SIGNAL_FUNC(gtk_widget_destroy),
 			GTK_OBJECT(dialog));
 	gtk_signal_connect(GTK_OBJECT(csel->ok_button), "clicked",
-			GTK_SIGNAL_FUNC(get_new_colour), button);
+			GTK_SIGNAL_FUNC(get_new_colour), option);
 
 	patch = GTK_BIN(button)->child;
 
@@ -642,7 +693,6 @@ static GtkWidget *build_frame(void)
 {
 	GtkWidget	*sections_box;
 	GtkWidget	*tl_vbox;
-	GtkWidget	*label;
 	GtkWidget	*actions, *button;
 	char		*string, *save_path;
 
@@ -663,50 +713,57 @@ static GtkWidget *build_frame(void)
 	gtk_notebook_set_tab_pos(GTK_NOTEBOOK(sections_box), GTK_POS_LEFT);
 	gtk_box_pack_start(GTK_BOX(tl_vbox), sections_box, TRUE, TRUE, 0);
 	
+	actions = gtk_hbutton_box_new();
+	gtk_button_box_set_layout(GTK_BUTTON_BOX(actions),
+				  GTK_BUTTONBOX_END);
+	gtk_button_box_set_spacing(GTK_BUTTON_BOX(actions), 10);
+
 	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
-	{
-		string = g_strdup_printf(_("Choices will be saved as %s"),
-					save_path);
-		g_free(save_path);
-		label = gtk_label_new(string);
-		g_free(string);
-	}
+		gtk_box_pack_start(GTK_BOX(tl_vbox), actions, FALSE, TRUE, 0);
 	else
-		label = gtk_label_new(_("Choices saving is disabled by "
-					"CHOICESPATH variable"));
-	gtk_box_pack_start(GTK_BOX(tl_vbox), label, FALSE, TRUE, 0);
+	{
+		GtkWidget *hbox;
 
-	actions = gtk_hbox_new(TRUE, 16);
-	gtk_box_pack_start(GTK_BOX(tl_vbox), actions, FALSE, TRUE, 0);
+		hbox = gtk_hbox_new(FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(tl_vbox), hbox, FALSE, TRUE, 0);
+		gtk_box_pack_start(GTK_BOX(hbox),
+			gtk_label_new(_("(saving disabled by CHOICESPATH)")),
+			FALSE, FALSE, 0);
+		gtk_box_pack_start(GTK_BOX(hbox), actions, TRUE, TRUE, 0);
+	}
 	
-	button = gtk_button_new_with_label(_("Save"));
+	button = gtk_button_new_with_label(_("Revert"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-	if (!save_path)
-		gtk_widget_set_sensitive(button, FALSE);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_SAVE);
-	gtk_widget_grab_default(button);
-	gtk_widget_grab_focus(button);
+			GTK_SIGNAL_FUNC(revert_options), NULL);
+	gtk_tooltips_set_tip(option_tooltips, button,
+			_("Restore all choices to how they were when the "
+			  "Options box was opened."), NULL);
 
 	button = gtk_button_new_with_label(_("OK"));
 	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
 	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_OK);
-
-	button = gtk_button_new_with_label(_("Apply"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(save_options), (gpointer) BUTTON_APPLY);
-
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 		GTK_SIGNAL_FUNC(gtk_widget_destroy), GTK_OBJECT(window));
+
+	if (save_path)
+	{
+		button = gtk_button_new_with_label(_("Save"));
+		gtk_box_pack_start(GTK_BOX(actions), button, FALSE, TRUE, 0);
+		gtk_signal_connect(GTK_OBJECT(button), "clicked",
+			GTK_SIGNAL_FUNC(save_options), NULL);
+
+		string = g_strdup_printf(_("Choices will be saved as:\n%s"),
+					save_path);
+		gtk_tooltips_set_tip(option_tooltips, button, string, NULL);
+		g_free(save_path);
+		g_free(string);
+		GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+		gtk_widget_grab_default(button);
+		gtk_widget_grab_focus(button);
+	}
 
 	return sections_box;
 }
@@ -839,37 +896,6 @@ static guchar *option_menu_get(GtkOptionMenu *om)
 	return gtk_object_get_data(GTK_OBJECT(item), "value");
 }
 
-/* Called for each Option when Save/OK/Apply is clicked.
- * Update value and call the callback if changed.
- */
-static void may_change_cb(gpointer key, gpointer value, gpointer data)
-{
-	Option *option = (Option *) value;
-	guchar		*new = NULL;
-
-	g_return_if_fail(option != NULL);
-	g_return_if_fail(option->widget != NULL);
-
-	if (option->read_widget)
-		new = option->read_widget(option);
-	else
-		return;
-
-	g_return_if_fail(new != NULL);
-
-	option->has_changed = strcmp(option->value, new) != 0;
-
-	if (!option->has_changed)
-	{
-		g_free(new);
-		return;
-	}
-
-	g_free(option->value);
-	option->value = new;
-	option->int_value = atoi(new);
-}
-
 static void save_cb(gpointer key, gpointer value, gpointer data)
 {
 	int	len;
@@ -888,48 +914,59 @@ static void save_cb(gpointer key, gpointer value, gpointer data)
 	g_free(tmp);
 }
 
+static void restore_backup(gpointer key, gpointer value, gpointer data)
+{
+	Option *option = (Option *) value;
+
+	g_return_if_fail(option->backup != NULL);
+
+	option->has_changed = strcmp(option->value, option->backup) != 0;
+	if (!option->has_changed)
+		return;
+
+	g_free(option->value);
+	option->value = g_strdup(option->backup);
+	option->int_value = atoi(option->value);
+}
+
+static void revert_options(GtkWidget *widget, gpointer data)
+{
+	g_hash_table_foreach(option_hash, restore_backup, NULL);
+	options_notify();
+	update_option_widgets();
+}
+
 static void save_options(GtkWidget *widget, gpointer data)
 {
-	GList		*next;
-	int		button = (int) data;
+	GList	*next;
+	guchar	*path;
+	FILE	*file;
 
-	/* Updates every value, and sets or clears has_changed */
-	g_hash_table_foreach(option_hash, may_change_cb, NULL);
-
-	options_notify();
-
-	if (button == BUTTON_SAVE)
+	path = choices_find_path_save("Options", PROJECT, TRUE);
+	if (!path)
 	{
-		guchar	*path;
-		FILE	*file;
+		delayed_error(_("Could not save options: %s"),
+				  _("Choices saving is disabled by "
+				  "CHOICESPATH variable"));
+		return;
+	}
+	
+	file = fopen(path, "wb");
+	g_free(path);
+	
+	g_hash_table_foreach(option_hash, save_cb, file);
 
-		path = choices_find_path_save("Options", PROJECT, TRUE);
-		if (!path)
-		{
-		        delayed_error(_("Could not save options: %s"),
-				          _("Choices saving is disabled by "
-					  "CHOICESPATH variable"));
-			return;
-		}
-		
-		file = fopen(path, "wb");
-		g_free(path);
-		
-		g_hash_table_foreach(option_hash, save_cb, file);
+	if (fclose(file) == EOF)
+		delayed_error(_("Could not save options: %s"),
+				  g_strerror(errno));
 
-		if (fclose(file) == EOF)
-			delayed_error(_("Could not save options: %s"),
-					  g_strerror(errno));
-
-		for (next = saver_callbacks; next; next = next->next)
-		{
-			OptionNotify *cb = (OptionNotify *) next->data;
-			cb();
-		}
+	for (next = saver_callbacks; next; next = next->next)
+	{
+		OptionNotify *cb = (OptionNotify *) next->data;
+		cb();
 	}
 
-	if (button != BUTTON_APPLY)
-		gtk_widget_destroy(window);
+	gtk_widget_destroy(window);
 }
 
 /* Make the widget reflect the current value of the option */
@@ -940,8 +977,12 @@ static void update_cb(gpointer key, gpointer value, gpointer data)
 	g_return_if_fail(option != NULL);
 	g_return_if_fail(option->widget != NULL);
 
+	updating_widgets++;
+	
 	if (option->update_widget)
 		option->update_widget(option, option->value);
+
+	updating_widgets--;
 }
 
 /* Reflect the values in the Option structures by changing the widgets
@@ -1034,6 +1075,13 @@ static guchar *read_colour(Option *option)
 			style->bg[GTK_STATE_NORMAL].blue);
 }
 
+static void set_not_changed(gpointer key, gpointer value, gpointer data)
+{
+	Option	*option = (Option *) value;
+
+	option->has_changed = FALSE;
+}
+
 /* These create new widgets in the options window and set the appropriate
  * callbacks.
  */
@@ -1052,8 +1100,8 @@ static GList *build_toggle(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_toggle;
 	option->widget = toggle;
 
-	//gtk_signal_connect_object(GTK_OBJECT(toggle), "toggled",
-			//GTK_SIGNAL_FUNC(check_widget), ui);
+	gtk_signal_connect_object(GTK_OBJECT(toggle), "toggled",
+			GTK_SIGNAL_FUNC(option_check_widget), option);
 
 	return g_list_append(NULL, toggle);
 }
@@ -1104,6 +1152,9 @@ static GList *build_slider(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_slider;
 	option->widget = slide;
 
+	gtk_signal_connect_object(GTK_OBJECT(adj), "value-changed",
+			GTK_SIGNAL_FUNC(option_check_widget), option);
+
 	return g_list_append(NULL, hbox);
 }
 
@@ -1127,6 +1178,9 @@ static GList *build_entry(Option *option, xmlNode *node, guchar *label)
 	option->read_widget = read_entry;
 	option->widget = entry;
 
+	gtk_signal_connect_object_after(GTK_OBJECT(entry), "changed",
+			GTK_SIGNAL_FUNC(option_check_widget), option);
+
 	return g_list_append(NULL, hbox);
 }
 
@@ -1143,6 +1197,8 @@ static GList *build_radio_group(Option *option, xmlNode *node, guchar *label)
 		if (rn->type == XML_ELEMENT_NODE)
 		{
 			button = build_radio(rn, button);
+			gtk_signal_connect_object(GTK_OBJECT(button), "toggled",
+				GTK_SIGNAL_FUNC(option_check_widget), option);
 			list = g_list_append(list, button);
 		}
 	}
@@ -1178,7 +1234,7 @@ static GList *build_colour(Option *option, xmlNode *node, guchar *label)
 	gtk_drawing_area_size(GTK_DRAWING_AREA(da), 64, 12);
 	gtk_container_add(GTK_CONTAINER(button), da);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(open_coloursel), button);
+			GTK_SIGNAL_FUNC(open_coloursel), option);
 
 	may_add_tip(button, node);
 	
@@ -1248,6 +1304,9 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 	option->update_widget = update_menu;
 	option->read_widget = read_menu;
 	option->widget = option_menu;
+
+	gtk_signal_connect_object_after(GTK_OBJECT(option_menu), "changed",
+			GTK_SIGNAL_FUNC(option_check_widget), option);
 
 	return g_list_append(NULL, hbox);
 }
