@@ -2,6 +2,14 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+09-Feb-2005
+~~~~~~~~~~~
+Defer re-generating a thumbnail until 5 seconds after the timestamp on 
+the old one (Stephen Watson).
+Bugfix: A file could be added many times to the thumbnail queue, causing
+        the progress bar to behave strangely (Stephen Watson).
+More changes for installing onto NFS mounted directory (Stephen Watson).
+
 31-Jan-2005
 ~~~~~~~~~~~
 Fixed a compiler warning by removing an unnecessary extra tooltips object
