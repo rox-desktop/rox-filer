@@ -1850,7 +1850,7 @@ static void show_pinboard_menu(GdkEventButton *event, Icon *icon)
 		}
 		/* Check for icon-specific menu */
 		if (icon->path)
-			menus = appmenu_query(icon->path);
+			menus = appmenu_query(icon->path, &icon->item);
 	}
 
 	/* Remove the previous appmenu used on this menu */

@@ -897,7 +897,7 @@ static void popup_panel_menu(GdkEventButton *event,
 		}
 		/* Check for icon-specific menu */
 		if (icon->path)
-			menus = appmenu_query(icon->path);
+			menus = appmenu_query(icon->path, &icon->item);
 	}
 
 	/* Remove the previous appmenu used on this menu */

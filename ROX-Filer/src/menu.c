@@ -539,12 +539,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 		shift_action = NULL;
 		if (collection->number_selected == 1)
 		{
-			guchar *path;
-
-			/* Check for app-specific menu */
-			path = make_path(filer_window->path,
-					 file_item->leafname)->str;
-
 			if (file_item->flags & ITEM_FLAG_MOUNT_POINT)
 			{
 				if (file_item->flags & ITEM_FLAG_MOUNTED)
@@ -559,7 +553,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEventButton *event,
 			else if (file_item->base_type == TYPE_FILE)
 				shift_action = N_("Open As Text");
 
-			menus = appmenu_query(path);
+			menus = appmenu_query(filer_window->path,
+						file_item);
 		}
 		gtk_widget_set_sensitive(file_shift_item,
 					 shift_action != NULL ||

@@ -15,10 +15,10 @@
 
 /* Store appmenus */
 typedef struct _AppMenus {
-	GList *items;   /* Raw menu items for the application menu */
-	int ref;
-	time_t last_read; /* Last time the menu was read */
-	GtkWidget *last_menu;  /* last menu on which this AppMenu was posted */
+	GList	*items;   	/* Raw menu items for the application menu */
+	int	ref;
+	GtkWidget *last_menu;  	/* Last menu on which this AppMenu was posted */
+	guchar	*app_dir;	/* Path of application (when menu appeared) */
 } AppMenus;
 
 extern GFSCache *appmenu_cache;
@@ -27,7 +27,6 @@ extern GFSCache *appmenu_cache;
 void appmenu_init(void);
 void appmenu_add(AppMenus *dir, GtkWidget *menu);
 void appmenu_remove(GtkWidget *menu);
-AppMenus *appmenu_query(char *path);
+AppMenus *appmenu_query(guchar *dir, DirItem *app);
 
 #endif   /* _APPMENU_H */
-

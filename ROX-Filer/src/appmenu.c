@@ -37,29 +37,25 @@
 #include "menu.h"
 #include "filer.h"
 #include "appmenu.h"
+#include "dir.h"
+#include "type.h"
 
 GFSCache *appmenu_cache = NULL;
 
-static GList *cur_list;
-
-/* Internal types */
-struct _AppMenu_check {
-	char *dirname;
-	struct stat info;
-};
-
-static struct _AppMenu_check cur_check;
+static AppMenus *cur_appmenu = NULL;
 
 /* Static prototypes */
 static AppMenus *load(char *pathname, gpointer data);
-static void update(AppMenus *dir, gchar *pathname, gpointer data);
-static char *process_appmenu_line(guchar *line);
 static void load_appmenu(AppMenus *appmenu, char *file);
-static gboolean check_appmenu_file(char *pathname);
-static void apprun_menu(gchar *string);
+static void ref(AppMenus *dir, gpointer data);
+static void unref(AppMenus *dir, gpointer data);
+static int getref(AppMenus *dir, gpointer data);
+
+static char *process_appmenu_line(guchar *line);
+static void apprun_menu(GtkWidget *item, AppMenus *menu);
 static void destroy_widget(gpointer data, gpointer user_data);
 static void destroy_contents(AppMenus *dir);
-static GtkWidget *appmenu_item_new(char *path, char *text, char *entryid);
+static GtkWidget *appmenu_item_new(AppMenus *menu, char *text, char *entryid);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -68,9 +64,10 @@ static GtkWidget *appmenu_item_new(char *path, char *text, char *entryid);
 void appmenu_init(void)
 {
 	appmenu_cache = g_fscache_new((GFSLoadFunc) load,
-				      NULL, NULL, NULL,
-				      (GFSUpdateFunc) update, NULL);
-	cur_check.dirname=NULL;
+				      (GFSRefFunc) ref,
+				      (GFSRefFunc) unref,
+				      (GFSGetRefFunc) getref,
+				      NULL, NULL);
 }
 
 /* Remove the appmenu stored in the given menu, if any */
@@ -78,23 +75,21 @@ void appmenu_init(void)
 void appmenu_remove(GtkWidget *menu)
 {
 	AppMenus *last_appmenu;
+	GList *next;
 
 	/* Get the last appmenu posted on this menu, if any */
 	last_appmenu = gtk_object_get_data(GTK_OBJECT(menu), "last_appmenu");
+	if (!last_appmenu)
+		return;
 
-	/* If the last appmenu was a different one, we remove its items before adding
-	 * ours. */
-	if (last_appmenu)
-	{
-		GList *next=last_appmenu->items;
-		while(next) {
-			gtk_container_remove(GTK_CONTAINER(menu),
-					     GTK_WIDGET(next->data));
-			next=next->next;
-		}
-	}
+	for (next = last_appmenu->items; next; next = next->next)
+		gtk_container_remove(GTK_CONTAINER(menu),
+				     GTK_WIDGET(next->data));
 
 	gtk_object_set_data(GTK_OBJECT(menu), "last_appmenu", NULL);
+
+	/* Lose the ref count returned from appmenu_query() */
+	g_fscache_data_unref(appmenu_cache, last_appmenu);
 }
 
 /* Add AppMenu entries to a standard menu, if necessary */
@@ -109,46 +104,67 @@ void appmenu_add(AppMenus *dir, GtkWidget *menu)
 	/* Remove the previous appmenu, if any */
 	appmenu_remove(menu);
 
-	/* If this AppMenu had been posted on a different menu, remove it from there */
+	/* If this AppMenu had been posted on a different menu, remove it from
+	 * there.
+	 */
 	if (dir->last_menu) 
 		appmenu_remove(dir->last_menu);
 
-	/* The dir we get must have been obtained from the cache, so
-	   that its items element is already properly populated. We check
-	   anyway.
-	*/
+	/* The dir we get must have been obtained from the cache, so that its
+	 * items element is already properly populated. We check anyway.
+	 */
 	if (dir->items == NULL)
 		return;
 
 	/* Add the menu entries */
-	next = dir->items;
-	while(next) {
+	for (next = dir->items; next; next = next->next)
 		gtk_menu_prepend(GTK_MENU(menu), GTK_WIDGET(next->data));
-		next=next->next;
-	}
+
 	/* Store a pointer to the current AppMenus entry in the menu itself */
 	gtk_object_set_data(GTK_OBJECT(menu), "last_appmenu", dir);
-	/* Store a pointer to the current menu in the AppMenus object too, in case
-	   we later try to post this same AppMenu to a different menu */
-	dir->last_menu=menu;
+
+	/* Store a pointer to the current menu in the AppMenus object too, in
+	 * case we later try to post this same AppMenu to a different menu.
+	 */
+	dir->last_menu = menu;
 }
 
-/* Return the AppMenus object corresponding to a certain path, if there
- * is one. The path must be a directory name, and the AppMenu file is
- * searched for in there.
- * This is the approved interface to appmenu_cache. g_fscache_lookup_full should
- * preferably never be called on appmenu_cache other than through this function.
+/* Return the AppMenus object corresponding to a certain item, if there
+ * is one.
+ * This is the approved interface to appmenu_cache. g_fscache_lookup should
+ * preferably never be called on appmenu_cache other than through this
+ * function.
+ * 'dir' is the directory containing DirItem.
+ * Returned value will unref automatically on appmenu_remove().
  */
-AppMenus *appmenu_query(char *path)
+AppMenus *appmenu_query(guchar *dir, DirItem *app)
 {
-	GString *tmp=g_string_new(path);
-	struct stat info;
+	AppMenus *retval;
+	guchar	*tmp, *app_dir;
 
-	g_string_sprintfa(tmp, "/%s", APPMENU_FILENAME);
-	if (mc_stat(tmp->str, &info)==0)
-		return g_fscache_lookup_full(appmenu_cache, tmp->str, TRUE);
-	else
+	/* Is it even an application directory? */
+	if (app->base_type != TYPE_DIRECTORY ||
+			!(app->flags & ITEM_FLAG_APPDIR))
 		return NULL;
+
+	app_dir = g_strconcat(dir, "/", app->leafname, NULL);
+	tmp = g_strconcat(app_dir, "/" APPMENU_FILENAME, NULL);
+	
+	retval = g_fscache_lookup(appmenu_cache, tmp);
+	/* We set the path on every query because the app dir can move
+	 * without the cache causing a reload.
+	 */
+	if (retval)
+	{
+		g_free(retval->app_dir);
+		retval->app_dir = app_dir;
+	}
+	else
+		g_free(app_dir);
+
+	g_free(tmp);
+
+	return retval;
 }
 
 /****************************************************************
@@ -156,92 +172,43 @@ AppMenus *appmenu_query(char *path)
  ****************************************************************/
 
 /* The pathname is the full path of the AppMenu file.
- * We check for an AppRun file, and all the appropriate permissions,
- * like in dir.c
+ * If we get here, assume that this really is an application.
  */
 static AppMenus *load(char *pathname, gpointer data)
 {
-	AppMenus *appmenu=NULL;
-
-	g_return_val_if_fail(pathname != NULL, NULL);
-
-	if (!check_appmenu_file(pathname))
-		return NULL;
+	AppMenus *appmenu = NULL;
 
 	appmenu = g_new(AppMenus, 1);
+	appmenu->ref = 1;
+	appmenu->app_dir = NULL;
+	appmenu->last_menu = NULL;
+	appmenu->items = NULL;
+
 	load_appmenu(appmenu, pathname);
 
 	return appmenu;
 }
 
-/* Check that:
-   - The given file exists
-   - An AppRun file exists in the same directory
-   - The given file, the AppRun file and the directory all belong to the same user
-
-   If everything is correct, it fills cur_check with the directory name and
-   the stat information of the file passed as argument.
-
-   Returns TRUE if everything is correct, FALSE otherwise.
-*/
-static gboolean check_appmenu_file(char *pathname)
+static void ref(AppMenus *dir, gpointer data)
 {
-	struct stat info;
-	guchar *dirname, *slash;
-	GString *tmp;
-	uid_t uid;
-	gboolean result=FALSE;
+	if (dir)
+		dir->ref++;
+}
 
-	dirname=g_strdup(pathname);
-	slash = strrchr(dirname, '/');
-	if (slash)
-		*slash='\0';
-	else
-		/* We need an absolute path. If there's no slash, something is wrong */
-		goto out;
-
-	/* Store the dirname */
-	if(cur_check.dirname)
-		g_free(cur_check.dirname);
-	cur_check.dirname=g_strdup(dirname);
-
-	/* Check that the AppRun file exists, and that it has the correct owner */
-
-	/* Get the directory's owner */
-	if (mc_stat(dirname, &info) == 0)
-		uid=info.st_uid;
-	else
-		goto out;
-
-	tmp=g_string_new(dirname);
-	g_string_sprintfa(tmp, "/%s", "AppRun");
-
-	if (mc_lstat(tmp->str, &info) == 0 && info.st_uid == uid)
-	{
-		/* See if there's a static menu file, and that it belongs to the
-		   same user that owns AppRun.
-		   We do the stat on the cur_check structure so that other
-		   functions can access the information without having to do
-		   another stat
-		*/
-		if (mc_stat(pathname, &cur_check.info) == 0 &&
-		    S_ISREG(cur_check.info.st_mode) &&
-		    cur_check.info.st_uid == uid)
-		{
-			result=TRUE;
-		}
-		/* If the menu file doesn't exist or does not belong
-		   to the same user as AppRun, do nothing */
-	}
-	g_string_free(tmp, TRUE);
- out:
-	g_free(dirname);
-	return result;
+static void unref(AppMenus *dir, gpointer data)
+{
+	if (dir && --dir->ref == 0)
+		destroy_contents(dir);
+}
+	
+static int getref(AppMenus *dir, gpointer data)
+{
+	return dir ? dir->ref : 0;
 }
 
 /* This function is the one that actually loads an appmenu from a file.
  * It doesn't do any permissions checking, that must have been done
- * before (see load() and update()).
+ * before...
  */
 static void load_appmenu(AppMenus *appmenu, char *file)
 {
@@ -249,131 +216,110 @@ static void load_appmenu(AppMenus *appmenu, char *file)
 
 	g_return_if_fail(appmenu != NULL);
 	
-	cur_list = NULL;
+	cur_appmenu = appmenu;
+	/* TODO: Make sure the file isn't too big... */
 	parse_file(file, process_appmenu_line);
-	sep=gtk_menu_item_new();
-	/* I don't know why, but if you don't manually increase the ref of a separator,
-	 * it goes out of existence when it is removed from the menu, and then it can't
-	 * be re-added later.
+	cur_appmenu = NULL;
+
+	sep = gtk_menu_item_new();
+	/* When separator is added to a container widget for the first time,
+	 * that widget takes our reference count from us. Therefore, we need an
+	 * extra one...
 	 */
 	gtk_widget_ref(sep);
+	gtk_object_sink(GTK_OBJECT(sep));
 	gtk_widget_show(sep);
-	cur_list=g_list_prepend(cur_list, sep);
-	appmenu->items = cur_list;
-	appmenu->ref = 1;
-	appmenu->last_read = time(NULL);
-	appmenu->last_menu=NULL;
+	appmenu->items = g_list_prepend(appmenu->items, sep);
 }
 
 /* Process lines from an AppMenu file. The format is:
-   entryid	Entry text
-   The corresponding entry is created, and when it is invoked, the
-   corresponding AppRun is invoked with option --entryid.
-*/
+ * entryid	Entry text
+ * The corresponding entry is created, and when it is invoked, the
+ * corresponding AppRun is invoked with option --entryid.
+ */
 static char *process_appmenu_line(guchar *line)
 {
 	guchar *entryid, *text;
 
-	entryid=strtok(line, " \t");
+	entryid = strtok(line, " \t");
 	/* Silently ignore empty lines and those that start with '#' */
-	if (entryid == NULL || entryid[0]=='#') {
+	if (entryid == NULL || entryid[0] == '#')
 		return NULL;
-	}
-	text=strtok(NULL, "");
+
+	text = strtok(NULL, "");
+
 	/* Noisily ignore lines with no text */
-	g_return_val_if_fail(text != NULL, "Invalid line in AppMenu specification: no entry text");
+	if (!text)
+		text = _("[ missing text ]");
+
 	/* Skip white space */
-	while(isspace(*text)) text++;
+	while (isspace(*text))
+		text++;
+
 	/* Create a new entry and store the appropriate information */
-	cur_list=g_list_prepend(cur_list, 
-				appmenu_item_new(cur_check.dirname,
-						 text, entryid));
+	cur_appmenu->items = g_list_prepend(cur_appmenu->items, 
+				  appmenu_item_new(cur_appmenu, text, entryid));
 
 	return NULL;
 }
 
 /* Create and return a menu item */
-static GtkWidget *appmenu_item_new(char *path, char *text, char *entryid)
+static GtkWidget *appmenu_item_new(AppMenus *menu, char *text, char *entryid)
 {
 	GtkWidget *item;
-	GString *fullpath;
 
-	g_return_val_if_fail(path!=NULL && text!=NULL && entryid!=NULL, NULL);
+	g_return_val_if_fail(text != NULL && entryid != NULL, NULL);
 
 	/* Create the new item and tie it to the appropriate callback */
-	item=gtk_menu_item_new_with_label(text);
-	fullpath=g_string_new(path);
-	g_string_sprintfa(fullpath, "/AppRun --%s", entryid);
-	gtk_signal_connect_object(GTK_OBJECT(item), "activate",
-				  GTK_SIGNAL_FUNC(apprun_menu),
-				  (gpointer) g_strdup(fullpath->str));
-	g_string_free(fullpath, TRUE);
+	item = gtk_menu_item_new_with_label(text);
+
+	gtk_object_set_data_full(GTK_OBJECT(item), "entryid",
+					g_strconcat("--", entryid, NULL),
+					debug_free_string);
+
+	gtk_signal_connect(GTK_OBJECT(item), "activate",
+			   GTK_SIGNAL_FUNC(apprun_menu),
+			   (gpointer) menu);
+
+	gtk_widget_ref(item);
+	gtk_object_sink(GTK_OBJECT(item));
 	gtk_widget_show(item);
+
 	return item;
 }
 
 /* Function called to execute an AppMenu item */
-static void apprun_menu(gchar *string)
+static void apprun_menu(GtkWidget *item, AppMenus *menu)
 {
+	guchar	*entryid;
 	char *argv[3];
-	char *sep;
+
+	entryid = gtk_object_get_data(GTK_OBJECT(item), "entryid");
+	g_return_if_fail(entryid != NULL);
 	
-	/* Temporarily split the string in two */
-	sep=strchr(string, ' ');
-	if (sep) {
-		*sep='\0';
-		argv[0]=string;
-		argv[1]=sep+1;
-		argv[2]=NULL;
-		if(!spawn(argv))
-			report_error(_("fork() failed"), g_strerror(errno));
-		*sep=' ';
-	}
-	else
-	{
- 		fprintf(stderr, "Internal error: string '%s' does not contain a space.\n", string);
-	}
+	argv[0] = g_strconcat(menu->app_dir, "/AppRun", NULL);
+	argv[1] = entryid;
+	argv[2] = NULL;
+
+	if (!spawn(argv))
+		report_error(_("fork() failed"), g_strerror(errno));
+
+	g_free(argv[0]);
 }
 
 /* Destroy the contents of an AppMenus structure */
 static void destroy_contents(AppMenus *dir)
 {
-	if (dir) {
-		if (dir->items) {
-			g_list_foreach(dir->items, destroy_widget, NULL);
-			g_list_free(dir->items);
-		}
+	g_return_if_fail(dir != NULL);
 
-		dir->items=NULL;
-		dir->last_read=(time_t)0;
-		dir->last_menu=NULL;
-		dir->ref=0;
+	if (dir->items)
+	{
+		g_list_foreach(dir->items, destroy_widget, NULL);
+		g_list_free(dir->items);
 	}
-}
 
-
-/* Check if the file has been modified and reload it if necessary */
-static void update(AppMenus *dir, gchar *pathname, gpointer data)
-{
-	if (dir) {
-		/* We check the file owners every time, just to be safe.
-		   check_appmenu_file() fills cur_check.info */
-		if (check_appmenu_file(pathname))
-		{
-			if (cur_check.info.st_mtime > dir->last_read)
-			{
-				/* Reload the file */
-				destroy_contents(dir);
-				load_appmenu(dir, pathname);
-			}
-		}
-		else {
-			/* Most likely file doesn't exist anymore. There
-			 doesn't seem to be a way to remove the entry
-			 from here, so we just empty it */
-			destroy_contents(dir);
-		}
-	}
+	dir->items = NULL;
+	dir->last_menu = NULL;
 }
 
 /* Free a GTK widget */
