@@ -115,7 +115,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Version", rpc_Version, NULL, NULL);
 
 	soap_register("Run", rpc_Run, "Filename", NULL);
-	soap_register("OpenDir", rpc_OpenDir, "Filename", "Style,Details");
+	soap_register("OpenDir", rpc_OpenDir, "Filename", "Style,Details,Sort");
 	soap_register("CloseDir", rpc_CloseDir, "Filename", NULL);
 	soap_register("Examine", rpc_Examine, "Filename", NULL);
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
@@ -518,16 +518,17 @@ static xmlNodePtr rpc_Version(GList *args)
 	return reply;
 }
 
-/* Args: Path, [Style, Details] */
+/* Args: Path, [Style, Details, Sort] */
 static xmlNodePtr rpc_OpenDir(GList *args)
 {
 	char	   *path;
-	char       *style, *details;
+	char       *style, *details, *sort;
 	FilerWindow *fwin;
 
 	path = string_value(ARG(0));
 	style = string_value(ARG(1));
 	details = string_value(ARG(2));
+	sort = string_value(ARG(3));
 
 	fwin = filer_opendir(path, NULL);
 	g_free(path);
@@ -567,6 +568,23 @@ static xmlNodePtr rpc_OpenDir(GList *args)
 			display_set_layout(fwin, fwin->display_style, dt);
 		
 		g_free(details);
+	}
+
+	if (sort)
+	{
+		int (*cmp)(const void *, const void *);
+
+		cmp = !g_strcasecmp(sort, "Name") ? sort_by_name :
+		      !g_strcasecmp(sort, "Type") ? sort_by_type :
+		      !g_strcasecmp(sort, "Date") ? sort_by_date :
+ 		      !g_strcasecmp(sort, "Size") ? sort_by_size :
+		     				     NULL;
+		if (!cmp)
+			g_warning("Unknown sorting criteria '%s'\n", sort);
+		else
+			display_set_sort_fn(fwin, cmp);
+
+		g_free(sort);
 	}
 
 	return NULL;
