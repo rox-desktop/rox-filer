@@ -106,13 +106,19 @@ void options_init()
 
 void options_load(void)
 {
-	char 		*path;
-	char		*data;
-	long		length;
+	char	*path;
 
 	path = choices_find_path_load("options");
 	if (!path)
 		return;		/* Nothing to load */
+
+	parse_file(path, process_option_line);
+}
+
+void parse_file(char *path, ParseFunc *parse_line)
+{
+	char		*data;
+	long		length;
 
 	if (load_file(path, &data, &length))
 	{
@@ -126,7 +132,7 @@ void options_load(void)
 			if (eol)
 				*eol = '\0';
 
-			error = process_option_line(line);
+			error = parse_line(line);
 
 			if (error)
 			{
@@ -149,7 +155,6 @@ void options_load(void)
 		}
 		g_free(data);
 	}
-	
 }
 
 /* Call this on init to register a handler for a key.

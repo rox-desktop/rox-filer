@@ -12,6 +12,7 @@
 #include <unistd.h>
 #include <stdlib.h>
 #include <errno.h>
+#include <ctype.h>
 
 #include "string.h"
 #include "filer.h"
@@ -21,21 +22,89 @@
 #include "choices.h"
 #include "type.h"
 #include "support.h"
+#include "options.h"
+
+/* Static prototypes */
+static char *import_extensions(char *line);
 
 /* Maps extensions to MIME_types (eg 'png'-> MIME_type *) */
 static GHashTable *extension_hash = NULL;
 
-/* XXX: Just for testing... */
+/* Most things on Unix are text files, so this is the default type */
 static MIME_type text_plain = {"text", "plain"};
-static MIME_type image_xpm = {"image", "x-xpixmap"};
-static MIME_type image_png = {"image", "png"};
 
 void type_init()
 {
+	char	*path;
+	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
-	g_hash_table_insert(extension_hash, "png", &image_png);
-	g_hash_table_insert(extension_hash, "xpm", &image_xpm);
+	path = choices_find_path_load_shared("mime.types", "MIME-types");
+	if (path)
+		parse_file(path, import_extensions);
+}
+
+/* Parse one line from the file and add entries to extension_hash.
+ * Lines go like:
+ * 	text/plain txt text
+ */
+static char *import_extensions(char *line)
+{
+	char	*media_type = line;
+	char	*subtype;
+
+	while (*line && isspace(*line))
+		line++;
+	if (*line == '\0' || *line == '#')
+		return NULL;		/* Blank, or comment */
+
+	line = strchr(line, '/');
+	if (!line)
+		return "Missing / in MIME-type";
+	*line++ = '\0';
+	subtype = line;
+
+	while (*line && !isspace(*line))
+	{
+		line++;
+	}
+
+	if (*line)
+		*line++ = '\0';
+
+	while (*line && isspace(*line))
+		line++;
+	if (*line == '\0')
+		return NULL;		/* No extensions */
+
+	media_type = g_strdup(media_type);
+	subtype = g_strdup(subtype);
+	
+	for (;;)
+	{
+		char		*ext;
+		MIME_type	*new;
+		
+		ext = line;
+
+		while (*line && !isspace(*line))
+			line++;
+		if (*line)
+			*line++ = '\0';
+
+		new = g_malloc(sizeof(MIME_type));
+		new->media_type = media_type;
+		new->subtype = subtype;
+		new->image = NULL;
+		g_hash_table_insert(extension_hash, g_strdup(ext), new);
+
+		while (*line && isspace(*line))
+			line++;
+		if (*line == '\0')
+			break;		/* All types added */
+	}
+
+	return NULL;
 }
 
 char *basetype_name(FileItem *item)
