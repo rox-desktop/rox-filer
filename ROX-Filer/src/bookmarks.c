@@ -85,7 +85,7 @@ void bookmarks_show_menu(FilerWindow *filer_window)
 void bookmarks_edit(void)
 {
 	GtkListStore *model;
-	GtkWidget *list, *frame, *hbox, *button;
+	GtkWidget *list, *hbox, *button, *swin;
 	GtkTreeSelection *selection;
 	GtkCellRenderer *cell;
 	xmlNode *node;
@@ -112,10 +112,13 @@ void bookmarks_edit(void)
 	g_signal_connect(bookmarks_window, "destroy",
 			 G_CALLBACK(one_less_window), NULL);
 
-	frame = gtk_frame_new(NULL);
-	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	swin = gtk_scrolled_window_new(NULL, NULL);
+	gtk_scrolled_window_set_shadow_type(GTK_SCROLLED_WINDOW(swin),
+			GTK_SHADOW_IN);
+	gtk_scrolled_window_set_policy(GTK_SCROLLED_WINDOW(swin),
+			GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
-			frame, TRUE, TRUE, 0);
+			swin, TRUE, TRUE, 0);
 
 	model = gtk_list_store_new(1, G_TYPE_STRING);
 
@@ -153,7 +156,7 @@ void bookmarks_edit(void)
 	}
 	
 	gtk_widget_set_size_request(list, 300, 100);
-	gtk_container_add(GTK_CONTAINER(frame), list);
+	gtk_container_add(GTK_CONTAINER(swin), list);
 
 	hbox = gtk_hbutton_box_new();
 	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),

@@ -63,6 +63,8 @@ static void run_error_info_dialog(GtkMessageType type, const char *message,
 
 void gui_support_init()
 {
+	gpointer klass;
+	
 	xa_cardinal = gdk_atom_intern("CARDINAL", FALSE);
 
 	/* This call starts returning strange values after a while, so get
@@ -70,6 +72,11 @@ void gui_support_init()
 	 */
 	gdk_drawable_get_size(gdk_get_default_root_window(),
 			    &screen_width, &screen_height);
+
+	/* Work around the scrollbar placement bug */
+	klass = g_type_class_ref(gtk_scrolled_window_get_type());
+	((GtkScrolledWindowClass *) klass)->scrollbar_spacing = 0;
+	/* (don't unref, ever) */
 }
 
 /* Open a modal dialog box showing a message.
