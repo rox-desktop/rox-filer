@@ -279,6 +279,8 @@ static void update_display(Directory *dir,
 
 				update_item(filer_window, item);
 			}
+			collection_qsort(filer_window->collection,
+					filer_window->sort_fn);
 			break;
 	}
 }

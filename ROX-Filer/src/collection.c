@@ -874,7 +874,10 @@ static void return_pressed(Collection *collection)
 		return;
 
 	if (cb)
-		return cb(collection, item, data);
+	{
+		cb(collection, item, data);
+		return;
+	}
 
 	gtk_signal_emit(GTK_OBJECT(collection), 
 			collection_signals[OPEN_ITEM],
