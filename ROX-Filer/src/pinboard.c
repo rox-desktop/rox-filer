@@ -32,6 +32,7 @@
 #include <gtk/gtkinvisible.h>
 #include <stdlib.h>
 #include <libxml/parser.h>
+#include <signal.h>
 
 #include "global.h"
 
@@ -59,8 +60,9 @@ struct _Pinboard {
 	GList		*icons;
 	GtkStyle	*style;
 
-	BackdropStyle	backdrop_style;
 	gchar		*backdrop;	/* Pathname */
+	BackdropStyle	backdrop_style;
+	gint		backdrop_pid;	/* 0, or PID of running backdrop app */
 
 	GtkWidget	*window;	/* Screen-sized window */
 	GtkWidget	*fixed;
@@ -255,6 +257,7 @@ void pinboard_activate(const gchar *name)
 	current_pinboard->window = NULL;
 	current_pinboard->backdrop = NULL;
 	current_pinboard->backdrop_style = BACKDROP_NONE;
+	current_pinboard->backdrop_pid = 0;
 
 	create_pinboard_window(current_pinboard);
 
@@ -1314,6 +1317,9 @@ static void pinboard_clear(void)
 	}
 
 	gtk_widget_destroy(current_pinboard->window);
+
+	if (current_pinboard->backdrop_pid)
+		kill(current_pinboard->backdrop_pid, SIGTERM);
 	
 	g_free(current_pinboard->name);
 	g_free(current_pinboard);
@@ -1605,6 +1611,14 @@ static GdkPixmap *load_backdrop(const gchar *path, BackdropStyle style)
 	return pixmap;
 }
 
+static void backdrop_app_died(gpointer data)
+{
+	gint pid = GPOINTER_TO_INT(data);
+
+	if (current_pinboard && current_pinboard->backdrop_pid == pid)
+		current_pinboard->backdrop_pid = 0;
+}
+
 static void reload_backdrop(Pinboard *pinboard,
 			    const gchar *backdrop,
 			    BackdropStyle backdrop_style)
@@ -1614,13 +1628,36 @@ static void reload_backdrop(Pinboard *pinboard,
 	if (backdrop && backdrop_style == BACKDROP_PROGRAM)
 	{
 		const char *argv[] = {NULL, "--backdrop", NULL};
+		GError	*error = NULL;
+
+		if (pinboard->backdrop_pid)
+			kill(pinboard->backdrop_pid, SIGTERM);
 
 		argv[0] = make_path(backdrop, "AppRun")->str;
 
 		/* Run the program. It'll send us a SOAP message and we'll 
 		 * get back here with a different style and image.
 		 */
-		rox_spawn(NULL, argv);
+
+		if (g_spawn_async_with_pipes(NULL, (gchar **) argv, NULL,
+				G_SPAWN_DO_NOT_REAP_CHILD |
+				G_SPAWN_SEARCH_PATH,
+				NULL, NULL,		/* Child setup fn */
+				&pinboard->backdrop_pid,/* Child PID */
+				NULL, NULL, NULL,	/* Standard pipes */
+				&error))
+		{
+			on_child_death(pinboard->backdrop_pid,
+				backdrop_app_died,
+				GINT_TO_POINTER(pinboard->backdrop_pid));
+		}
+		else
+		{
+			delayed_error("%s", error ? error->message : "(null)");
+			g_error_free(error);
+
+			pinboard->backdrop_pid = 0;
+		}
 		return;
 	}
 
