@@ -65,12 +65,20 @@ void gui_support_init()
 	 */
 	tmp = gtk_window_new(GTK_WINDOW_TOPLEVEL);
 	gtk_widget_realize(tmp);
+#ifdef GTK2
+	item_font = gtk_style_get_font(gtk_widget_get_style(tmp));
+#else
 	item_font = gtk_widget_get_style(tmp)->font;
+#endif
 	gdk_font_ref(item_font);
 	gtk_widget_destroy(tmp);
 
 	fixed_style = gtk_style_copy(gtk_widget_get_default_style());
+#ifdef GTK2
+	gtk_style_set_font(fixed_style, fixed_font);
+#else
 	fixed_style->font = fixed_font;
+#endif
 
 	fixed_width = gdk_string_width(fixed_font, "m");
 
@@ -443,7 +451,9 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	unsigned long nitems, after;
 	Window	*proxy_data;
 	Window	proxy;
+#ifndef GTK2
 	guint32	old_warnings;
+#endif
 
 	XGrabServer(GDK_DISPLAY());
 
@@ -452,10 +462,13 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	type = None;
 	proxy = None;
 
+#ifdef GTK2
+	gdk_error_trap_push();
+#else
 	old_warnings = gdk_error_warnings;
-
 	gdk_error_code = 0;
 	gdk_error_warnings = 0;
+#endif
 
 	/* Check if somebody else already owns drops on the root window */
 
@@ -478,12 +491,21 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 	 */
 	if (proxy)
 	{
+#ifdef GTK2
+		gint	gdk_error_code;
+#endif
+
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
 				    xdnd_proxy_atom, 0,
 				    1, False, AnyPropertyType,
 				    &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
 
+#ifdef GTK2
+		gdk_error_code = gdk_error_trap_pop();
+		gdk_error_trap_push();
+#endif
+		
 		if (!gdk_error_code && type != None)
 		{
 			if (format == 32 && nitems == 1)
@@ -507,8 +529,12 @@ gboolean setup_xdnd_proxy(guint32 xid, GdkWindow *proxy_window)
 				(guchar *) &proxy_xid, 1);
 	}
 
+#ifdef GTK2
+	gdk_error_trap_pop();
+#else
 	gdk_error_code = 0;
 	gdk_error_warnings = old_warnings;
+#endif
 
 	XUngrabServer(GDK_DISPLAY());
 	gdk_flush();
@@ -549,8 +575,10 @@ GdkWindow *find_click_proxy_window(void)
 	unsigned long nitems, after;
 	Window *proxy_data;
 	Window proxy;
-	guint32 old_warnings;
 	GdkWindow *proxy_gdk_window;
+#ifndef GTK2
+	guint32 old_warnings;
+#endif
 
 	XGrabServer(GDK_DISPLAY());
 
@@ -558,10 +586,13 @@ GdkWindow *find_click_proxy_window(void)
 	type = None;
 	proxy = None;
 
+#ifdef GTK2
+	gdk_error_trap_push();
+#else
 	old_warnings = gdk_error_warnings;
-
 	gdk_error_code = 0;
 	gdk_error_warnings = 0;
+#endif
 
 	/* Check if the proxy window exists */
 
@@ -585,12 +616,20 @@ GdkWindow *find_click_proxy_window(void)
 
 	if (proxy)
 	{
+#ifdef GTK2
+		gint	gdk_error_code;
+#endif
 		XGetWindowProperty(GDK_DISPLAY(), proxy,
 				   click_proxy_atom, 0,
 				   1, False, AnyPropertyType,
 				   &type, &format, &nitems, &after,
 				   (guchar **) &proxy_data);
 
+#ifdef GTK2
+		gdk_error_code = gdk_error_trap_pop();
+		gdk_error_trap_push();
+#endif
+		
 		if (!gdk_error_code && type != None)
 		{
 			if (format == 32 && nitems == 1)
@@ -603,8 +642,12 @@ GdkWindow *find_click_proxy_window(void)
 			proxy = GDK_NONE;
 	}
 
+#ifdef GTK2
+	gdk_error_trap_pop();
+#else
 	gdk_error_code = 0;
 	gdk_error_warnings = old_warnings;
+#endif
 
 	XUngrabServer(GDK_DISPLAY());
 	gdk_flush();

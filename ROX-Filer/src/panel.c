@@ -376,7 +376,6 @@ static void panel_add_item(Panel *panel,
 {
 	GtkWidget	*widget;
 	Icon		*icon;
-	GdkFont		*font;
 
 	widget = gtk_event_box_new();
 	gtk_widget_set_events(widget,
@@ -391,7 +390,6 @@ static void panel_add_item(Panel *panel,
 		gtk_box_reorder_child(GTK_BOX(panel->after), widget, 0);
 	
 	gtk_widget_realize(widget);
-	font = widget->style->font;
 
 	icon = g_new(Icon, 1);
 	icon->panel = panel;
@@ -475,8 +473,8 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 {
 	int	im_width, im_height;
 
-	im_width = PIXMAP_WIDTH(icon->item.image->pixmap);
-	im_height = MIN(PIXMAP_HEIGHT(icon->item.image->pixmap), ICON_HEIGHT);
+	im_width = icon->item.image->width;
+	im_height = MIN(icon->item.image->height, ICON_HEIGHT);
 
 	req->height += im_height;
 	req->width = MAX(req->width, im_width);
@@ -498,7 +496,7 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 
 	area.x = 0;
 	area.width = width;
-	area.height = PIXMAP_HEIGHT(icon->item.image->pixmap);
+	area.height = icon->item.image->height;
 
 	if (panel_want_show_text(icon))
 	{

@@ -326,7 +326,7 @@ void display_guess_size(FilerWindow *filer_window,
 void calc_size(FilerWindow *filer_window, DirItem *item,
 		int *width, int *height)
 {
-	int		pix_width = PIXMAP_WIDTH(item->image->pixmap);
+	int		pix_width = item->image->width;
 	int		w;
 	int		text_height = item_font->ascent + item_font->descent;
 	int		fixed_height;
@@ -340,7 +340,7 @@ void calc_size(FilerWindow *filer_window, DirItem *item,
 			if (!item->image->huge_pixmap)
 				pixmap_make_huge(item->image);
 			wrap_text(&temp, item, HUGE_WRAP);
-			pix_width = PIXMAP_WIDTH(item->image->huge_pixmap);
+			pix_width = item->image->huge_width;
 			*width = MAX(pix_width, temp.leafname.width) + 4;
 			*height = temp.leafname.height + HUGE_HEIGHT + 4;
 		}
@@ -397,8 +397,8 @@ void draw_huge_icon(GtkWidget *widget,
 	GdkGC	*gc = selected ? widget->style->white_gc
 						: widget->style->black_gc;
 
-	width = PIXMAP_WIDTH(image->huge_pixmap);
-	height = PIXMAP_HEIGHT(image->huge_pixmap);
+	width = image->huge_width;
+	height = image->huge_height;
 	image_x = area->x + ((area->width - width) >> 1);
 		
 	gdk_gc_set_clip_mask(gc, item->image->huge_mask);
@@ -457,8 +457,8 @@ void draw_large_icon(GtkWidget *widget,
 		     gboolean selected)
 {
 	MaskedPixmap	*image = item->image;
-	int	width = MIN(PIXMAP_WIDTH(image->pixmap), ICON_WIDTH);
-	int	height = MIN(PIXMAP_HEIGHT(image->pixmap), ICON_HEIGHT);
+	int	width = MIN(image->width, ICON_WIDTH);
+	int	height = MIN(image->height, ICON_HEIGHT);
 	int	image_x = area->x + ((area->width - width) >> 1);
 	int	image_y;
 	GdkGC	*gc = selected ? widget->style->white_gc
@@ -931,8 +931,8 @@ static void huge_template(GdkRectangle *area, DirItem *item,
 
 	if (!image->huge_pixmap)
 		pixmap_make_huge(image);
-	iwidth = PIXMAP_WIDTH(image->huge_pixmap);
-	iheight = PIXMAP_HEIGHT(image->huge_pixmap);
+	iwidth = image->huge_width;
+	iheight = image->huge_height;
 	image_x = area->x + ((col_width - iwidth) >> 1);
 	image_y = area->y + (HUGE_HEIGHT - iheight);
 
@@ -955,10 +955,8 @@ static void large_template(GdkRectangle *area, DirItem *item,
 	int	col_width = filer_window->collection->item_width;
 
 	MaskedPixmap	*image = item->image;
-	int		iwidth = MIN(PIXMAP_WIDTH(image->pixmap),
-					ICON_WIDTH);
-	int		iheight = MIN(PIXMAP_HEIGHT(image->pixmap) + 6,
-					ICON_HEIGHT);
+	int		iwidth = MIN(image->width, ICON_WIDTH);
+	int		iheight = MIN(image->height + 6, ICON_HEIGHT);
 	int		image_x = area->x + ((col_width - iwidth) >> 1);
 	int		image_y;
 	
@@ -1010,8 +1008,8 @@ static void huge_full_template(GdkRectangle *area, DirItem *item,
 	if (!image->huge_pixmap)
 		pixmap_make_huge(image);
 
-	template->icon.width = PIXMAP_WIDTH(image->huge_pixmap);
-	template->icon.height = PIXMAP_HEIGHT(image->huge_pixmap);
+	template->icon.width = image->huge_width;
+	template->icon.height = image->huge_height;
 	template->icon.x = area->x + (HUGE_WIDTH - template->icon.width) / 2;
 	template->icon.y = area->y + (area->height - template->icon.height) / 2;
 
@@ -1117,13 +1115,13 @@ static void draw_small_icon(GtkWidget *widget,
 	if (!image->sm_pixmap)
 		pixmap_make_small(image);
 
-	width = MIN(PIXMAP_WIDTH(image->sm_pixmap), SMALL_WIDTH);
-	height = MIN(PIXMAP_HEIGHT(image->sm_pixmap), SMALL_HEIGHT);
+	width = MIN(image->sm_width, SMALL_WIDTH);
+	height = MIN(image->sm_height, SMALL_HEIGHT);
 	image_x = area->x + ((area->width - width) >> 1);
 		
 	gdk_gc_set_clip_mask(gc, item->image->sm_mask);
 
-	image_y = MAX(0, SMALL_HEIGHT - PIXMAP_HEIGHT(image->sm_pixmap));
+	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
 	gdk_gc_set_clip_origin(gc, image_x, area->y + image_y);
 	gdk_draw_pixmap(widget->window, gc,
 			item->image->sm_pixmap,

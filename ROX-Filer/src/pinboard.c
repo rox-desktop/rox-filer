@@ -313,8 +313,8 @@ void pinboard_pin(guchar *path, guchar *name, int x, int y, gboolean corner)
 	{
 		/* Convert from icon-corner coordinates to center coordinates */
 		MaskedPixmap	*image = icon->item.image;
-		x += (PIXMAP_WIDTH(image->pixmap) >> 1);
-		y += height - (icon->widget->style->font->descent >> 1);
+
+		offset_to_centre(icon, image->width >> 1, height, &x, &y);
 	}
 	snap_to_grid(&x, &y);
 	offset_from_centre(icon, width, height, &x, &y);
@@ -505,8 +505,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	int		width, height;
 	int		font_height;
 	MaskedPixmap	*image = icon->item.image;
-	int		iwidth = PIXMAP_WIDTH(image->pixmap);
-	int		iheight = PIXMAP_HEIGHT(image->pixmap);
+	int		iwidth = image->width;
+	int		iheight = image->height;
 	DirItem		*item = &icon->item;
 	int		text_x, text_y;
 #ifndef GTK2
@@ -562,8 +562,8 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 				0, 0,
 				(width - iwidth) >> 1,
 				WINK_FRAME,
-				PIXMAP_WIDTH(image->pixmap),
-				PIXMAP_HEIGHT(image->pixmap));
+				image->width,
+				image->height);
 	}
 	else
 	{
@@ -643,8 +643,8 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 	int		text_x, text_y;
 	DirItem		*item = &icon->item;
 	MaskedPixmap	*image = item->image;
-	int		iwidth = PIXMAP_WIDTH(image->pixmap);
-	int		iheight = PIXMAP_HEIGHT(image->pixmap);
+	int		iwidth = image->width;
+	int		iheight = image->height;
 	int		image_x;
 	GdkGC		*gc = widget->style->black_gc;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
@@ -1228,7 +1228,10 @@ static void offset_from_centre(Icon *icon,
 			       int *x, int *y)
 {
 	*x -= width >> 1;
-	*y -= height - (icon->widget->style->font->descent >> 1);
+	*y -= height;
+#ifndef GTK2
+	*y += (icon->widget->style->font->descent >> 1);
+#endif
 	*x = CLAMP(*x, 0, screen_width - (o_clamp_icons ? width : 0));
 	*y = CLAMP(*y, 0, screen_height - (o_clamp_icons ? height : 0));
 }
@@ -1239,7 +1242,11 @@ static void offset_to_centre(Icon *icon,
 			     int *x, int *y)
 {
   *x += width >> 1;
-  *y += height - (icon->widget->style->font->descent >> 1);
+  *y += height;
+  
+#ifndef GTK2
+  *y -= (icon->widget->style->font->descent >> 1);
+#endif
 }
 
 /* Same as drag_set_dest(), but for pinboard icons */

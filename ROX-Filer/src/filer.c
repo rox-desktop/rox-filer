@@ -1646,6 +1646,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 	int		i;
 
 	i = collection_get_item(collection, event->x, event->y);
+
 	if (i == -1)
 		filer_tooltip_prime(NULL, NULL);
 	else

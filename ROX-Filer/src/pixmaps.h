@@ -12,10 +12,6 @@
 #include "fscache.h"
 
 #ifdef GTK2
-# define PIXMAP_WIDTH(p) \
-	(GDK_PIXMAP_IMPL_X11(GDK_PIXMAP_OBJECT(p)->impl)->width)
-# define PIXMAP_HEIGHT(p) \
-	(GDK_PIXMAP_IMPL_X11(GDK_PIXMAP_OBJECT(p)->impl)->height)
 #else
 # include <gdk/gdkprivate.h> /* XXX - find another way to do this */
 # define PIXMAP_WIDTH(p) (((GdkPixmapPrivate *) (p))->width)
@@ -60,6 +56,7 @@ struct _MaskedPixmap
 {
 	int		ref;
 	GdkPixbuf	*huge_pixbuf;	/* 'Huge' source image */
+	int		huge_width, huge_height;
 
 	/* If huge_pixmap is NULL then call pixmap_make_huge() */
 	GdkPixmap	*huge_pixmap;	/* Huge image */
@@ -67,10 +64,12 @@ struct _MaskedPixmap
 
 	GdkPixmap	*pixmap;	/* Normal size image (always valid) */
 	GdkBitmap	*mask;
+	int		width, height;
 
 	/* If sm_pixmap is NULL then call pixmap_make_small() */
 	GdkPixmap	*sm_pixmap;	/* Small image */
 	GdkBitmap	*sm_mask;
+	int		sm_width, sm_height;
 };
 
 void pixmaps_init(void);

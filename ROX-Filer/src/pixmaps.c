@@ -48,7 +48,7 @@
 
 GFSCache *pixmap_cache = NULL;
 
-static char * bad_xpm[] = {
+static const char * bad_xpm[] = {
 "12 12 3 1",
 " 	c #000000000000",
 ".	c #FFFF00000000",
@@ -156,66 +156,72 @@ void pixmap_unref(MaskedPixmap *mp)
 
 void pixmap_make_huge(MaskedPixmap *mp)
 {
+	GdkPixbuf	*hg;
+
 	if (mp->huge_pixmap)
 		return;
 
-	if (mp->huge_pixbuf)
+	g_return_if_fail(mp->huge_pixbuf != NULL);
+
+	hg = scale_pixbuf_up(mp->huge_pixbuf,
+				HUGE_WIDTH * 0.7,
+				HUGE_HEIGHT * 0.7);
+
+	if (hg)
 	{
-		GdkPixbuf	*hg;
-			
-		hg = scale_pixbuf_up(mp->huge_pixbuf,
-					HUGE_WIDTH * 0.7,
-					HUGE_HEIGHT * 0.7);
-
-		if (hg)
-		{
-			gdk_pixbuf_render_pixmap_and_mask(hg,
-					&mp->huge_pixmap,
-					&mp->huge_mask,
-					128);
-			gdk_pixbuf_unref(hg);
-		}
-
-		if (mp->huge_pixmap)
-			return;
+		gdk_pixbuf_render_pixmap_and_mask(hg,
+				&mp->huge_pixmap,
+				&mp->huge_mask,
+				128);
+		mp->huge_width = gdk_pixbuf_get_width(hg);
+		mp->huge_height = gdk_pixbuf_get_height(hg);
+		gdk_pixbuf_unref(hg);
 	}
 
-	gdk_pixmap_ref(mp->pixmap);
-	if (mp->mask)
-		gdk_bitmap_ref(mp->mask);
-	mp->huge_pixmap = mp->pixmap;
-	mp->huge_mask = mp->mask;
+	if (!mp->huge_pixmap)
+	{
+		gdk_pixmap_ref(mp->pixmap);
+		if (mp->mask)
+			gdk_bitmap_ref(mp->mask);
+		mp->huge_pixmap = mp->pixmap;
+		mp->huge_mask = mp->mask;
+		mp->huge_width = mp->width;
+		mp->huge_height = mp->height;
+	}
 }
 
 void pixmap_make_small(MaskedPixmap *mp)
 {
+	GdkPixbuf	*sm;
+
 	if (mp->sm_pixmap)
 		return;
 
-	if (mp->huge_pixbuf)
-	{
-		GdkPixbuf	*sm;
+	g_return_if_fail(mp->huge_pixbuf != NULL);
 			
-		sm = scale_pixbuf(mp->huge_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
+	sm = scale_pixbuf(mp->huge_pixbuf, SMALL_WIDTH, SMALL_HEIGHT);
 
-		if (sm)
-		{
-			gdk_pixbuf_render_pixmap_and_mask(sm,
-					&mp->sm_pixmap,
-					&mp->sm_mask,
-					128);
-			gdk_pixbuf_unref(sm);
-		}
-
-		if (mp->sm_pixmap)
-			return;
+	if (sm)
+	{
+		gdk_pixbuf_render_pixmap_and_mask(sm,
+				&mp->sm_pixmap,
+				&mp->sm_mask,
+				128);
+		mp->sm_width = gdk_pixbuf_get_width(sm);
+		mp->sm_height = gdk_pixbuf_get_height(sm);
+		gdk_pixbuf_unref(sm);
 	}
+
+	if (mp->sm_pixmap)
+		return;
 
 	gdk_pixmap_ref(mp->pixmap);
 	if (mp->mask)
 		gdk_bitmap_ref(mp->mask);
 	mp->sm_pixmap = mp->pixmap;
 	mp->sm_mask = mp->mask;
+	mp->sm_width = mp->width;
+	mp->sm_height = mp->height;
 }
 
 /****************************************************************
@@ -312,6 +318,7 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
 
 	huge_pixbuf = scale_pixbuf(full_size, HUGE_WIDTH, HUGE_HEIGHT);
 	g_return_val_if_fail(huge_pixbuf != NULL, NULL);
+
 	normal_pixbuf = scale_pixbuf(huge_pixbuf, ICON_WIDTH, ICON_HEIGHT);
 	g_return_val_if_fail(normal_pixbuf != NULL, NULL);
 
@@ -329,12 +336,18 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
 	mp->pixmap = pixmap;
 	mp->mask = mask;
 	mp->huge_pixbuf = huge_pixbuf;
+	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
+	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
 
 	mp->huge_pixmap = NULL;
 	mp->huge_mask = NULL;
+	mp->huge_width = -1;
+	mp->huge_height = -1;
 
 	mp->sm_pixmap = NULL;
 	mp->sm_mask = NULL;
+	mp->sm_width = -1;
+	mp->sm_height = -1;
 
 	return mp;
 }
@@ -344,27 +357,14 @@ static MaskedPixmap *image_from_pixbuf(GdkPixbuf *full_size)
  */
 static MaskedPixmap *get_bad_image(void)
 {
-	static	MaskedPixmap	*image = NULL;
+	GdkPixbuf *bad;
+	MaskedPixmap *mp;
+	
+	bad = gdk_pixbuf_new_from_xpm_data(bad_xpm);
+	mp = image_from_pixbuf(bad);
+	gdk_pixbuf_unref(bad);
 
-	if (!image)
-	{
-		image = g_new(MaskedPixmap, 1);
-		image->ref = 1;
-
-		image->pixmap= gdk_pixmap_colormap_create_from_xpm_d(NULL,
-				gtk_widget_get_default_colormap(),
-				&image->mask, NULL, bad_xpm);
-		image->huge_pixbuf = NULL;
-
-		image->huge_pixmap = NULL;
-		image->huge_mask = NULL;
-		image->sm_pixmap = NULL;
-		image->sm_mask = NULL;
-	}
-
-	image->ref++;
-
-	return image;
+	return mp;
 }
 
 static MaskedPixmap *load(char *pathname, gpointer user_data)

@@ -605,7 +605,9 @@ static void rename_activate(GtkWidget *dialog)
 			_("Sorry, but the name must not contain < or >"));
 	else
 	{
+#ifndef GTK2
 		GdkFont	*font = icon->widget->style->font;
+#endif
 		
 		g_free(icon->item.leafname);
 		g_free(icon->src_path);
@@ -618,7 +620,11 @@ static void rename_activate(GtkWidget *dialog)
 		icon_hash_path(icon);
 		
 		icon->item.leafname = g_strdup(new_name);
+#ifndef GTK2
 		icon->item.name_width = gdk_string_measure(font, new_name);
+#endif
+		/* XXX: Set name_width in size_and_shape? */
+
 		diritem_restat(icon->path, &icon->item, FALSE);
 
 		callback(icon);
