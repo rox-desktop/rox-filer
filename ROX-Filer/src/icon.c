@@ -1190,20 +1190,14 @@ static gboolean grabKey(MyKey *key)
 
 	GRAB(key, 0);
 
+	/* Here we grab all combinations of well known modifiers */
 	GRAB(key, ScrollLockMask);
 	GRAB(key, NumLockMask);
 	GRAB(key, CapsLockMask);
-
-	if (key->modifier != AnyModifier && key->modifier != 0)
-	{
-		/* Here we grab all combinations of well known
-		 * modifiers.
-		 */
-		GRAB(key, ScrollLockMask | NumLockMask);
-		GRAB(key, ScrollLockMask | CapsLockMask);
-		GRAB(key, CapsLockMask | NumLockMask);
-		GRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
-	}
+	GRAB(key, ScrollLockMask | NumLockMask);
+	GRAB(key, ScrollLockMask | CapsLockMask);
+	GRAB(key, CapsLockMask | NumLockMask);
+	GRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
 
 	gdk_flush();
 	return gdk_error_trap_pop() == Success;
@@ -1221,14 +1215,10 @@ static gboolean ungrabKey(MyKey *key)
 	UNGRAB(key, ScrollLockMask);
 	UNGRAB(key, NumLockMask);
 	UNGRAB(key, CapsLockMask);
-
-	if (key->modifier != AnyModifier && key->modifier != 0)
-	{
-		UNGRAB(key, ScrollLockMask | NumLockMask);
-		UNGRAB(key, ScrollLockMask | CapsLockMask);
-		UNGRAB(key, CapsLockMask | NumLockMask);
-		UNGRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
-	}
+	UNGRAB(key, ScrollLockMask | NumLockMask);
+	UNGRAB(key, ScrollLockMask | CapsLockMask);
+	UNGRAB(key, CapsLockMask | NumLockMask);
+	UNGRAB(key, ScrollLockMask | CapsLockMask | NumLockMask);
 
 	gdk_flush();
 	return gdk_error_trap_pop() == Success;
