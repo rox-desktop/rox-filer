@@ -446,7 +446,8 @@ void examine(guchar *path)
 		dir_check_this(path);
 
 		/* If this is itself directory then rescan its contents... */
-		refresh_dirs(path);
+		if (S_ISDIR(info.st_mode))
+			refresh_dirs(path);
 
 		/* If it's on the pinboard, update the icon... */
 		icons_may_update(path);
