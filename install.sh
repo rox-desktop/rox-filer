@@ -216,7 +216,10 @@ if [ -d "$APPDIR/ROX-Filer" ]; then
 	echo "copy?"
 	confirm_or_die
 	echo Deleting...
-	rm -rf "$APPDIR/ROX-Filer"
+	# Move it away first.  If $APPDIR is on an nfs mount then deleting
+	# the binary may fail.
+	mv "$APPDIR/ROX-Filer" "$APPDIR/.ROX-Filer"
+	rm -rf "$APPDIR/.ROX-Filer"
 fi
 cp -r ROX-Filer "$APPDIR"
 
