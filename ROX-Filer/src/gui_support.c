@@ -57,6 +57,10 @@ static GtkWidget *tip_widget = NULL;
 static time_t tip_time = 0; 	/* Time tip widget last closed */
 static gint tip_timeout = 0;	/* When primed */
 
+/* Static prototypes */
+static void run_error_info_dialog(GtkMessageType type, const char *message,
+				  va_list args);
+
 void gui_support_init()
 {
 	xa_cardinal = gdk_atom_intern("CARDINAL", FALSE);
@@ -140,53 +144,21 @@ int get_choice(const char *title,
 
 void info_message(const char *message, ...)
 {
-	GtkWidget *dialog;
         va_list args;
-	gchar *s;
-
-	g_return_if_fail(message != NULL);
 
 	va_start(args, message);
-	s = g_strdup_vprintf(message, args);
-	va_end(args);
 
-	dialog = gtk_message_dialog_new(NULL,
-					GTK_DIALOG_MODAL,
-					GTK_MESSAGE_INFO,
-					GTK_BUTTONS_OK,
-					"%s", s);
-	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-
-	g_free(s);
+	run_error_info_dialog(GTK_MESSAGE_INFO, message, args);
 }
 
 /* Display a message in a window with "ROX-Filer" as title */
 void report_error(const char *message, ...)
 {
-	GtkWidget *dialog;
-        va_list args;
-	gchar *s;
-
-	g_return_if_fail(message != NULL);
+	va_list args;
 
 	va_start(args, message);
-	s = g_strdup_vprintf(message, args);
-	va_end(args);
 
-	dialog = gtk_message_dialog_new(NULL,
-			GTK_DIALOG_MODAL,
-			GTK_MESSAGE_ERROR,
-			GTK_BUTTONS_OK,
-			"%s", s);
-	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
-	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
-	gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-
-	g_free(s);
+	run_error_info_dialog(GTK_MESSAGE_ERROR, message, args);
 }
 
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
@@ -444,6 +416,30 @@ void centre_window(GdkWindow *window, int x, int y)
 	gdk_window_move(window,
 		CLAMP(x, DECOR_BORDER, screen_width - w - DECOR_BORDER),
 		CLAMP(y, DECOR_BORDER, screen_height - h - DECOR_BORDER));
+}
+
+static void run_error_info_dialog(GtkMessageType type, const char *message,
+				  va_list args)
+{
+	GtkWidget *dialog;
+	gchar *s;
+
+	g_return_if_fail(message != NULL);
+
+	s = g_strdup_vprintf(message, args);
+	va_end(args);
+
+	dialog = gtk_message_dialog_new(NULL,
+					GTK_DIALOG_MODAL,
+					type,
+					GTK_BUTTONS_OK,
+					"%s", s);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_CENTER);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+	gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+
+	g_free(s);
 }
 
 static GtkWidget *current_wink_widget = NULL;

@@ -1001,7 +1001,7 @@ static gint coll_motion_notify(GtkWidget *widget,
 		}
 
 		drag_one_item(widget, event,
-			make_path(filer_window->sym_path, item->leafname)->str,
+			make_path(filer_window->sym_path, item->leafname),
 			item, view ? view->image : NULL);
 	}
 	else
@@ -1977,7 +1977,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 	DirItem		*item;
 	int		item_number;
 	GdkDragAction	action = context->suggested_action;
-	char	 	*new_path = NULL;
+	const guchar	*new_path = NULL;
 	const char	*type = NULL;
 	gboolean	retval = FALSE;
 	Collection	*collection = view_collection->collection;
@@ -2056,7 +2056,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 		if (item)
 			new_path = make_path(
 					view_collection->filer_window->sym_path,
-					item->leafname)->str;
+					item->leafname);
 		else
 			new_path = view_collection->filer_window->sym_path;
 	}

@@ -819,8 +819,10 @@ static void load_default_pixmaps(void)
 	GdkPixbuf *pixbuf;
 	GError *error = NULL;
 
-	im_error = mp_from_stock(GTK_STOCK_DIALOG_WARNING, GTK_ICON_SIZE_DIALOG);
-	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION, GTK_ICON_SIZE_DIALOG);
+	im_error = mp_from_stock(GTK_STOCK_DIALOG_WARNING,
+				 GTK_ICON_SIZE_DIALOG);
+	im_unknown = mp_from_stock(GTK_STOCK_DIALOG_QUESTION,
+				   GTK_ICON_SIZE_DIALOG);
 	im_symlink = load_pixmap("symlink");
 
 	im_unmounted = mp_from_stock(ROX_STOCK_MOUNT, mount_icon_size);
@@ -830,7 +832,7 @@ static void load_default_pixmaps(void)
 	im_dirs = load_pixmap("dirs");
 
 	pixbuf = gdk_pixbuf_new_from_file(
-			make_path(app_dir, ".DirIcon")->str, &error);
+			make_path(app_dir, ".DirIcon"), &error);
 	if (pixbuf)
 	{
 		GList *icon_list;

@@ -566,7 +566,7 @@ static DirItem *insert_item(Directory *dir, const guchar *leafname)
 	DirItem		old;
 	gboolean	do_compare = FALSE;	/* (old is filled in) */
 
-	full_path = make_path(dir->pathname, leafname)->str;
+	full_path = make_path(dir->pathname, leafname);
 	item = g_hash_table_lookup(dir->known_items, leafname);
 
 	if (item)

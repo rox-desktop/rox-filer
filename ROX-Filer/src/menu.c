@@ -784,7 +784,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 					n_selected == 0);
 		if (file_item)
 			appmenu_add(make_path(filer_window->sym_path,
-						file_item->leafname)->str,
+						file_item->leafname),
 					file_item, filer_file_menu);
 	}
 
@@ -1267,7 +1267,7 @@ static void new_directory(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	savebox_show(_("Create"),
-		make_path(window_with_focus->sym_path, _("NewDir"))->str,
+		make_path(window_with_focus->sym_path, _("NewDir")),
 		type_to_icon(inode_directory), new_directory_cb);
 }
 
@@ -1307,7 +1307,7 @@ static void new_file(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 	
 	savebox_show(_("Create"),
-		make_path(window_with_focus->sym_path, _("NewFile"))->str,
+		make_path(window_with_focus->sym_path, _("NewFile")),
 		type_to_icon(text_plain),
 		new_file_cb);
 }
@@ -1367,7 +1367,7 @@ static void new_file_type(gchar *templ)
 	type = type_get_type(templ);
 
 	savebox_show(_("Create"),
-		make_path(window_with_focus->sym_path, leaf)->str,
+		make_path(window_with_focus->sym_path, leaf),
 		type_to_icon(type),
 		new_file_type_cb);
 }
@@ -1591,89 +1591,6 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 		filer_opendir(window_with_focus->sym_path, window_with_focus, NULL);
 }
 
-#if 0
-static void su_to_user(GtkWidget *dialog)
-{
-	char		*argv[] = {
-		"xterm", "-e", "su_rox", "USER", "APP_RUN", "DIR", NULL};
-	GtkEntry	*user;
-	guchar  	*path;
-	
-	g_return_if_fail(dialog != NULL);
-
-	path = gtk_object_get_data(GTK_OBJECT(dialog), "dir_path");
-	user = gtk_object_get_data(GTK_OBJECT(dialog), "user_name");
-
-	g_return_if_fail(user != NULL && path != NULL);
-
-	argv[2] = g_strconcat(app_dir, "/su_rox", NULL);
-	argv[3] = gtk_entry_get_text(user);
-	argv[4] = g_strconcat(app_dir, "/AppRun", NULL);
-	argv[5] = path;
-
-	if (!spawn(argv))
-		report_error(_("fork: %s"), g_strerror(errno));
-
-	g_free(argv[2]);
-	g_free(argv[4]);
-
-	gtk_widget_destroy(dialog);
-}
-
-static void new_user(gpointer data, guint action, GtkWidget *widget)
-{
-	GtkWidget	*dialog, *vbox, *hbox, *entry, *button;
-	
-	g_return_if_fail(window_with_focus != NULL);
-
-	dialog = gtk_window_new(GTK_WINDOW_DIALOG);
-	gtk_window_set_title(GTK_WINDOW(dialog), _("New window, as user..."));
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 4);
-	gtk_object_set_data_full(GTK_OBJECT(dialog), "dir_path",
-			g_strdup(window_with_focus->path), g_free);
-	
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
-	gtk_box_pack_start(GTK_BOX(vbox),
-			gtk_label_new(_("Browse as which user?")),
-			TRUE, TRUE, 2);
-	
-	hbox = gtk_hbox_new(FALSE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 2);
-
-	gtk_box_pack_start(GTK_BOX(hbox),
-			gtk_label_new(_("User:")), FALSE, TRUE, 2);
-
-	entry = gtk_entry_new();
-	gtk_entry_set_text(GTK_ENTRY(entry), "root");
-	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
-	gtk_box_pack_start(GTK_BOX(hbox), entry, TRUE, TRUE, 2);
-	gtk_widget_grab_focus(entry);
-	gtk_object_set_data(GTK_OBJECT(dialog), "user_name", entry);
-	gtk_signal_connect_object(GTK_OBJECT(entry), "activate",
-			GTK_SIGNAL_FUNC(su_to_user), GTK_OBJECT(dialog));
-
-	hbox = gtk_hbox_new(TRUE, 0);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, FALSE, 2);
-
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-		GTK_SIGNAL_FUNC(su_to_user), GTK_OBJECT(dialog));
-	
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
-
-	gtk_widget_show_all(dialog);
-}
-#endif
-
 static void close_window(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
@@ -1699,7 +1616,7 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 	if (action == HELP_ABOUT)
 		infobox_new(app_dir);
 	else if (action == HELP_DIR)
-		filer_opendir(make_path(app_dir, "Help")->str, NULL, NULL);
+		filer_opendir(make_path(app_dir, "Help"), NULL, NULL);
 	else if (action == HELP_MANUAL)
 	{
 		gchar *manual = NULL;
@@ -1770,7 +1687,7 @@ static void select_nth_item(GtkMenuShell *shell, int n)
 static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 {
 	DirItem	*item;
-	gchar	*path;
+	const guchar *path;
 	int	n_selected;
 	ViewIter iter;
 
@@ -1890,7 +1807,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 		return;
 	}
 
-	path = make_path(window_with_focus->sym_path, item->leafname)->str;
+	path = make_path(window_with_focus->sym_path, item->leafname);
 
 	switch (action)
 	{

@@ -702,10 +702,10 @@ gchar *describe_current_command(MIME_type *type)
 
 	if (S_ISDIR(info.st_mode))
 	{
-		gchar *tmp;
+		const guchar *tmp;
 		uid_t dir_uid = info.st_uid;
 
-		tmp = make_path(handler, "AppRun")->str;
+		tmp = make_path(handler, "AppRun");
 
 		if (mc_lstat(tmp, &info) != 0 || info.st_uid != dir_uid
 			|| !(info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH)))
@@ -986,20 +986,19 @@ gboolean can_set_run_action(DirItem *item)
 /* To edit the MIME types, open a filer window for <Choices>/MIME-info */
 static void edit_mime_types(guchar *unused)
 {
-	const gchar *path;
-	struct stat info;
+	const guchar *path;
 
-	mkdir(make_path(home_dir, ".mime")->str, 0700);
-	path = make_path(home_dir, ".mime/packages")->str;
+	mkdir(make_path(home_dir, ".mime"), 0700);
+	path = make_path(home_dir, ".mime/packages");
 	mkdir(path, 0700);
 	filer_opendir(path, NULL, NULL);
 
 	path = "/usr/local/share/mime/packages";
-	if (mc_stat(path, &info) == 0)
+	if (file_exists(path))
 		filer_opendir(path, NULL, NULL);
 
 	path = "/usr/share/mime/packages";
-	if (mc_stat(path, &info) == 0)
+	if (file_exists(path))
 		filer_opendir(path, NULL, NULL);
 }
 

@@ -102,7 +102,7 @@ void read_globicons()
 	if (!path)
 		return;	/* Nothing to load */
 
-	if (mc_stat(path, &info) == -1)
+	if (mc_stat(path, &info))
 		goto out;
 
 	if (info.st_mtime <= last_read)
@@ -171,7 +171,7 @@ void check_globicon(const guchar *path, DirItem *item)
 
 static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 {
-	if (!convert_to_png(iconpath, make_path(filepath, ".DirIcon")->str))
+	if (!convert_to_png(iconpath, make_path(filepath, ".DirIcon")))
 		return FALSE;
 
 	dir_check_this(filepath);
@@ -182,11 +182,10 @@ static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 /* Add a globicon mapping for the given file to the given icon path */
 gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 {
-	struct stat icon;
 	MaskedPixmap *pic;
 
 	/* Check if file exists */
-	if (mc_stat(iconpath, &icon))
+	if (!file_exists(iconpath))
 	{
 		delayed_error(_("The pathname you gave does not exist. "
 			      	    "The icon has not been changed."));
@@ -220,20 +219,20 @@ static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
 		gtk_widget_destroy(dialog);
 	else if (response == DELETE_ICON)
 	{
-		const gchar *path;
-		gchar *icon_path;
+		const guchar *path;
+		const guchar *icon_path;
 
 		path = g_object_get_data(G_OBJECT(dialog), "pathname");
 		g_return_if_fail(path != NULL);
 
 		delete_globicon(path);
 
-		icon_path = make_path(path, ".DirIcon")->str;
+		icon_path = make_path(path, ".DirIcon");
 		if (access(icon_path, F_OK) == 0)
 		{
 			GList *list;
 
-			list = g_list_prepend(NULL, icon_path);
+			list = g_list_prepend(NULL, (char *) icon_path);
 			action_delete(list);
 			g_list_free(list);
 		}

@@ -136,7 +136,7 @@ void minibuffer_show(FilerWindow *filer_window, MiniType mini_type)
 			view_set_base(filer_window->view, &cursor);
 
 			gtk_entry_set_text(mini,
-				make_path(filer_window->sym_path, "")->str);
+				make_path(filer_window->sym_path, ""));
 			if (filer_window->temp_show_hidden)
 			{
 				display_set_hidden(filer_window, FALSE);
@@ -378,15 +378,15 @@ static void complete(FilerWindow *filer_window)
 	}
 	else
 	{
-		GString	*new;
+		const guchar *new;
 
 		new = make_path(filer_window->sym_path, item->leafname);
 
 		if (item->base_type == TYPE_DIRECTORY &&
 				(item->flags & ITEM_FLAG_APPDIR) == 0)
-			g_string_append_c(new, '/');
+			new = make_path(new, "");
 
-		gtk_entry_set_text(entry, new->str);
+		gtk_entry_set_text(entry, new);
 		gtk_editable_set_position(GTK_EDITABLE(entry), -1);
 	}
 }
@@ -796,9 +796,9 @@ static gboolean select_if_test(ViewIter *iter, gpointer user_data)
 
 	data->info.leaf = item->leafname;
 	data->info.fullpath = make_path(data->filer_window->sym_path,
-					data->info.leaf)->str;
+					data->info.leaf);
 
-	return lstat(data->info.fullpath, &data->info.stats) == 0 &&
+	return mc_lstat(data->info.fullpath, &data->info.stats) == 0 &&
 			find_test_condition(data->cond, &data->info);
 }
 

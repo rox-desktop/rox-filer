@@ -874,7 +874,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 				pi->label->allocation.height);
 	}
 	else if (o_pinboard_shadow_labels.int_value)
-		draw_label_shadow(GTK_LABEL(pi->label));
+		draw_label_shadow((GtkLabel *) pi->label);
 
 	/* Draw children */
 	(parent_class->expose_event)(widget, event);
@@ -891,9 +891,9 @@ static void draw_label_shadow(GtkLabel *label)
 	gfloat		xalign;
 	gint		x, y;
 
-	misc = GTK_MISC (label);
-	widget = GTK_WIDGET (label);
-	layout = gtk_label_get_layout (label);
+	misc = GTK_MISC(label);
+	widget = GTK_WIDGET(label);
+	layout = gtk_label_get_layout(label);
 
 	/* Taken from gtklabel.c ... */
 	if (gtk_widget_get_direction(widget) == GTK_TEXT_DIR_LTR)
@@ -2146,7 +2146,7 @@ static void reload_backdrop(Pinboard *pinboard,
 		g_return_if_fail(pinboard->input_tag == -1);
 		g_return_if_fail(pinboard->input_buffer == NULL);
 
-		argv[0] = make_path(backdrop, "AppRun")->str;
+		argv[0] = make_path(backdrop, "AppRun");
 
 		/* Run the program. It'll send us a SOAP message and we'll 
 		 * get back here with a different style and image.

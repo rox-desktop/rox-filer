@@ -483,12 +483,12 @@ static void selection_get(GtkWidget *widget,
 	{
 		case TARGET_STRING:
 			g_string_printf(header, " %s",
-				make_path(filer_window->sym_path, "")->str);
+				make_path(filer_window->sym_path, ""));
 			break;
 		case TARGET_URI_LIST:
 			g_string_printf(header, " file://%s%s",
 				our_host_name_for_dnd(),
-				make_path(filer_window->sym_path, "")->str);
+				make_path(filer_window->sym_path, ""));
 			break;
 	}
 
@@ -547,7 +547,7 @@ void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags)
 	gboolean	close_mini = flags & OPEN_FROM_MINI;
 	gboolean	close_window = (flags & OPEN_CLOSE_WINDOW) != 0;
 	DirItem		*item;
-	guchar		*full_path;
+	const guchar	*full_path;
 	gboolean	wink = TRUE;
 	Directory	*old_dir;
 
@@ -575,7 +575,7 @@ void filer_openitem(FilerWindow *filer_window, ViewIter *iter, OpenFlags flags)
 			close_window = FALSE;
 	}
 
-	full_path = make_path(filer_window->sym_path, item->leafname)->str;
+	full_path = make_path(filer_window->sym_path, item->leafname);
 	if (shift && (item->flags & ITEM_FLAG_SYMLINK))
 		wink = FALSE;
 
@@ -1034,7 +1034,7 @@ GList *filer_selected_items(FilerWindow *filer_window)
 	while ((item = iter.next(&iter)))
 	{
 		retval = g_list_prepend(retval,
-				g_strdup(make_path(dir, item->leafname)->str));
+				g_strdup(make_path(dir, item->leafname)));
 	}
 
 	return g_list_reverse(retval);
@@ -1697,7 +1697,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 	while ((item = iter.next(&iter)))
 	{
 		MaskedPixmap *pixmap;
-		gchar    *path;
+		const guchar *path;
 		gboolean found;
 
 		 if (item->base_type != TYPE_FILE)
@@ -1706,7 +1706,7 @@ void filer_create_thumbs(FilerWindow *filer_window)
 		 if (strcmp(item->mime_type->media_type, "image") != 0)
 			 continue;
 
-		path = make_path(filer_window->real_path, item->leafname)->str;
+		path = make_path(filer_window->real_path, item->leafname);
 
 		pixmap = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, &found);
@@ -1772,9 +1772,9 @@ static void set_style_by_number_of_items(FilerWindow *filer_window)
 void filer_add_tip_details(FilerWindow *filer_window,
 			   GString *tip, DirItem *item)
 {
-	guchar	*fullpath = NULL;
+	const guchar *fullpath = NULL;
 
-	fullpath = make_path(filer_window->real_path, item->leafname)->str;
+	fullpath = make_path(filer_window->real_path, item->leafname);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{

@@ -332,11 +332,11 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	else
 	{
 		/* Don't scare users with an empty panel... */
-		guchar	*apps;
+		guchar *apps;
 		
 		panel_add_item(panel, "~", "Home", FALSE, NULL);
 
-		apps = pathdup(make_path(app_dir, "..")->str);
+		apps = pathdup(make_path(app_dir, ".."));
 		if (apps)
 		{
 			panel_add_item(panel, apps, "Apps", FALSE, NULL);
@@ -1405,7 +1405,7 @@ static void run_applet(PanelIcon *pi)
 	gint	pid;
 	Icon	*icon = (Icon *) pi;
 
-	argv[0] = make_path(icon->path, "AppletRun")->str;
+	argv[0] = (char *) make_path(icon->path, "AppletRun");
 	
 	if (access(argv[0], X_OK) != 0)
 		return;

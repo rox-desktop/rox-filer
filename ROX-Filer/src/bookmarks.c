@@ -423,10 +423,11 @@ static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
 	{
 		GValue value = {0};
 		xmlNode *root = xmlDocGetRootElement(bookmarks->doc);
-		xmlNode *bookmark;
 
 		do
 		{
+			xmlNode *bookmark;
+
 			gtk_tree_model_get_value(model, &iter, 0, &value);
 			bookmark = xmlNewChild(root, NULL, "bookmark",
 					g_value_get_string(&value));
@@ -448,9 +449,9 @@ static void cell_edited(GtkCellRendererText *cell,
 	GtkTreePath *path;
 	GtkTreeIter iter;
 
-	path = gtk_tree_path_new_from_string (path_string);
+	path = gtk_tree_path_new_from_string(path_string);
 	gtk_tree_model_get_iter(model, &iter, path);
-	gtk_tree_path_free (path);
+	gtk_tree_path_free(path);
 
 	gtk_list_store_set(GTK_LIST_STORE(model), &iter, 0, new_text, -1);
 }

@@ -130,7 +130,7 @@ static gboolean send(void);
 static gboolean send_error(void);
 static gboolean send_dir(const char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
-static void do_mount(guchar *path, gboolean mount);
+static void do_mount(const guchar *path, gboolean mount);
 static gboolean printf_reply(int fd, gboolean ignore_quiet,
 			     const char *msg, ...);
 static gboolean remove_pinned_ok(GList *paths);
@@ -391,12 +391,9 @@ static void for_dir_contents(ForDirCB *cb,
 			|| (ent->d_name[1] == '.' && ent->d_name[2] == '\0')))
 			continue;
 		list = g_list_prepend(list, g_strdup(make_path(src_dir,
-						       ent->d_name)->str));
+							       ent->d_name)));
 	}
 	mc_closedir(d);
-
-	if (!list)
-		return;
 
 	for (next = list; next; next = next->next)
 	{
@@ -1020,7 +1017,7 @@ static void do_chmod(const char *path, const char *unused)
  * is set then that is the new leafname, otherwise the leafname stays
  * the same.
  */
-static char *make_dest_path(const char *object, const char *dir)
+static const char *make_dest_path(const char *object, const char *dir)
 {
 	const char *leaf;
 
@@ -1035,13 +1032,13 @@ static char *make_dest_path(const char *object, const char *dir)
 			leaf++;
 	}
 
-	return make_path(dir, leaf)->str;
+	return make_path(dir, leaf);
 }
 
 /* If action_leaf is not NULL it specifies the new leaf name */
 static void do_copy2(const char *path, const char *dest)
 {
-	char		*dest_path;
+	const char	*dest_path;
 	struct stat 	info;
 	struct stat 	dest_info;
 
@@ -1186,7 +1183,8 @@ static void do_copy2(const char *path, const char *dest)
 
 		if (error)
 		{
-			printf_send(_("!%s\nFailed to copy '%s'"), error, path);
+			printf_send(_("!%s\nFailed to copy '%s'\n"),
+							error, path);
 			g_free(error);
 		}
 		else
@@ -1197,7 +1195,7 @@ static void do_copy2(const char *path, const char *dest)
 /* If action_leaf is not NULL it specifies the new leaf name */
 static void do_move2(const char *path, const char *dest)
 {
-	char		*dest_path;
+	const char	*dest_path;
 	const char	*argv[] = {"mv", "-f", NULL, NULL, NULL};
 	struct stat	info2;
 	gboolean	is_dir;
@@ -1297,7 +1295,7 @@ static void do_move(const char *path, const char *dest)
 
 static void do_link(const char *path, const char *dest)
 {
-	char		*dest_path;
+	const char	*dest_path;
 
 	check_flags();
 
@@ -1316,7 +1314,7 @@ static void do_link(const char *path, const char *dest)
 }
 
 /* Mount/umount this item (depending on 'mount') */
-static void do_mount(guchar *path, gboolean mount)
+static void do_mount(const guchar *path, gboolean mount)
 {
 	const char *argv[3] = {NULL, NULL, NULL};
 	char *err;

@@ -539,7 +539,7 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 				g_string_printf(uri, "file://%s%s",
 						our_host_name_for_dnd(),
 						make_path(dest_path,
-							  leafname)->str);
+							  leafname));
 				set_xds_prop(context, uri->str);
 				g_string_free(uri, TRUE);
 
@@ -760,7 +760,7 @@ static void got_data_raw(GtkWidget 		*widget,
 	if (!leafname)
 		leafname = _("UntitledData");
 	
-	fd = open(make_path(dest_path, leafname)->str,
+	fd = open(make_path(dest_path, leafname),
 		O_WRONLY | O_CREAT | O_EXCL | O_NOCTTY,
 			S_IRUSR | S_IRGRP | S_IROTH |
 			S_IWUSR | S_IWGRP | S_IWOTH);

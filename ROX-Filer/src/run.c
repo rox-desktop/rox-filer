@@ -101,7 +101,7 @@ void run_with_files(const char *path, GList *uri_list)
 	argv = g_malloc(sizeof(char *) * (g_list_length(uri_list) + 2));
 
 	if (S_ISDIR(info.st_mode))
-		argv[argc++] = make_path(path, "AppRun")->str;
+		argv[argc++] = make_path(path, "AppRun");
 	else
 		argv[argc++] = path;
 	
@@ -140,7 +140,7 @@ void run_with_data(const char *path, gpointer data, gulong length)
 	}
 
 	if (S_ISDIR(info.st_mode))
-		argv[0] = make_path(path, "AppRun")->str;
+		argv[0] = make_path(path, "AppRun");
 	else
 		argv[0] = path;
 	
@@ -453,7 +453,7 @@ static gboolean follow_symlink(const char *full_path,
 		g_return_val_if_fail(slash != NULL, FALSE);
 
 		tmp = g_strndup(full_path, slash - full_path);
-		real = pathdup(make_path(tmp, path)->str);
+		real = pathdup(make_path(tmp, path));
 		/* NB: full_path may be invalid here... */
 		g_free(tmp);
 	}
@@ -518,11 +518,10 @@ static gboolean open_file(const guchar *path, MIME_type *type)
 static void dir_show_help(DirItem *item, const char *path)
 {
 	char		*help_dir;
-	struct stat 	info;
 
 	help_dir = g_strconcat(path, "/Help", NULL);
 
-	if (mc_stat(help_dir, &info) == 0)
+	if (file_exists(help_dir) == 0)
 		filer_opendir(help_dir, NULL, NULL);
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		info_message(

@@ -83,6 +83,7 @@
 #include "options.h"
 #include "main.h"
 #include "gui_support.h"
+#include "support.h"
 
 /* Add all option tooltips to this group */
 static GtkTooltips *option_tooltips = NULL;
@@ -1089,28 +1090,6 @@ static void write_option(gpointer key, gpointer value, gpointer data)
 
 	tree = xmlNewTextChild(doc, NULL, "Option", option->value);
 	xmlSetProp(tree, "name", (gchar *) key);
-}
-
-/* Save doc as XML as filename, 0 on success or -1 on failure */
-static int save_xml_file(xmlDocPtr doc, gchar *filename)
-{
-#if LIBXML_VERSION > 20400
-	if (xmlSaveFormatFileEnc(filename, doc, NULL, 1) < 0)
-		return 1;
-#else
-	FILE *out;
-	
-	out = fopen(filename, "w");
-	if (!out)
-		return 1;
-
-	xmlDocDump(out, doc);  /* Some versions return void */
-
-	if (fclose(out))
-		return 1;
-#endif
-
-	return 0;
 }
 
 static void save_options(void)

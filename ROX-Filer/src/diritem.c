@@ -208,7 +208,7 @@ void diritem_free(DirItem *item)
 		g_object_unref(item->image);
 	item->image = NULL;
 	collate_key_free(item->leafname_collate);
-	null_g_free(&item->leafname);
+	g_free(item->leafname);
 	g_free(item);
 }
 
@@ -247,7 +247,7 @@ static void examine_dir(const guchar *path, DirItem *item)
 	 * For symlinks, we want the symlink's owner.
 	 */
 
-	g_string_sprintf(tmp, "%s/.DirIcon", path);
+	g_string_printf(tmp, "%s/.DirIcon", path);
 
 	if (item->image)
 		goto no_diricon;	/* Already got an icon */

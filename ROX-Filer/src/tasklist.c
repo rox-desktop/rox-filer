@@ -827,13 +827,11 @@ static gboolean draw_label_shadow(GtkWidget *widget, GdkEventExpose *event,
 /* A window has been destroyed/expanded -- remove its icon */
 static void hide_icon(IconWindow *win)
 {
-	GtkWidget *widget = win->widget;
-
-	g_return_if_fail(widget != NULL);
+	g_return_if_fail(win->widget != NULL);
 
 	win->widget = NULL;
 	win->label = NULL;
-	gtk_widget_destroy(widget);
+	gtk_widget_destroy(win->widget);
 }
 
 static void state_changed(IconWindow *win)

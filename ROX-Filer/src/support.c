@@ -70,7 +70,7 @@ XMLwrapper *xml_cache_load(const gchar *pathname)
 	return g_fscache_lookup(xml_cache, pathname);
 }
 
-/* Save doc as XML as filename, 0 on success or -1 on failure */
+/* Save doc as XML as filename, 0 on success or 1 on failure */
 int save_xml_file(xmlDocPtr doc, const gchar *filename)
 {
 #if LIBXML_VERSION > 20400
@@ -128,25 +128,29 @@ char *pathdup(const char *path)
 }
 
 /* Join the path to the leaf (adding a / between them) and
- * return a pointer to a buffer with the result. Buffer is valid until
- * the next call to make_path.
+ * return a pointer to a static buffer with the result. Buffer is valid
+ * until the next call to make_path.
+ * The return value may be used as 'dir' for the next call.
  */
-GString *make_path(const char *dir, const char *leaf)
+const guchar *make_path(const char *dir, const char *leaf)
 {
 	static GString *buffer = NULL;
 
 	if (!buffer)
 		buffer = g_string_new(NULL);
 
-	g_return_val_if_fail(dir != NULL, buffer);
-	g_return_val_if_fail(leaf != NULL, buffer);
+	g_return_val_if_fail(dir != NULL, buffer->str);
+	g_return_val_if_fail(leaf != NULL, buffer->str);
 
-	g_string_printf(buffer, "%s%s%s",
-			dir,
-			dir[0] == '/' && dir[1] == '\0' ? "" : "/",
-			leaf);
+	if (buffer->str != dir)
+		g_string_assign(buffer, dir);
 
-	return buffer;
+	if (dir[0] != '/' || dir[1] != '\0')
+		g_string_append_c(buffer, '/');	/* For anything except "/" */
+
+	g_string_append(buffer, leaf);
+
+	return buffer->str;
 }
 
 /* Return our complete host name for DND */
@@ -240,7 +244,7 @@ const char *group_name(gid_t gid)
 /* Return a string in the form '23Mb' in a static buffer valid until
  * the next call.
  */
-char *format_size(off_t size)
+const char *format_size(off_t size)
 {
 	static	char *buffer = NULL;
 	const char	*units;
@@ -279,7 +283,7 @@ char *format_size(off_t size)
 /* Return a string in the form '23M' in a static buffer valid until
  * the next call. Aligned to the right (5 chars).
  */
-char *format_size_aligned(off_t size)
+const char *format_size_aligned(off_t size)
 {
 	static	char *buffer = NULL;
 	char	units;
@@ -318,7 +322,7 @@ char *format_size_aligned(off_t size)
  * unsigned long isn't wide enough on all platforms and we must be able to
  * sum sizes above 4 GB.
  */
-gchar *format_double_size(double size)
+const gchar *format_double_size(double size)
 {
 	static gchar	*buf = NULL;
 	const char	*units;
@@ -425,7 +429,7 @@ gint applicable(uid_t uid, gid_t gid)
 /* Converts a file's mode to a string. Result is a pointer
  * to a static buffer, valid until the next call.
  */
-char *pretty_permissions(mode_t m)
+const char *pretty_permissions(mode_t m)
 {
 	static char buffer[] = "rwx,rwx,rwx/UG"
 #ifdef S_ISVTX
@@ -1182,7 +1186,7 @@ CollateKey *collate_key_new(const guchar *name)
 	g_array_free(array, FALSE);
 
 	if (to_free)
-		g_free(to_free);
+		g_free(to_free);	/* Only taken for invalid UTF-8 */
 
 	return retval;
 }
@@ -1196,7 +1200,7 @@ void collate_key_free(CollateKey *key)
 	g_free(key);
 }
 
-int collate_key_cmp(CollateKey *n1, CollateKey *n2)
+int collate_key_cmp(const CollateKey *n1, const CollateKey *n2)
 {
 	int r;
 
@@ -1218,4 +1222,14 @@ int collate_key_cmp(CollateKey *n1, CollateKey *n2)
 		n1++;
 		n2++;
 	}
+}
+
+/* Returns TRUE if the object exists, FALSE if it doesn't.
+ * For symlinks, the file pointed to must exist.
+ */
+gboolean file_exists(const char *path)
+{
+	struct stat info;
+
+	return !mc_stat(path, &info);
 }

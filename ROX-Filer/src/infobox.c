@@ -58,10 +58,10 @@ struct _FileStatus
 
 /* Static prototypes */
 static void refresh_info(GObject *window);
-static GtkWidget *make_vbox(guchar *path);
-static GtkWidget *make_details(guchar *path, DirItem *item);
-static GtkWidget *make_about(guchar *path, XMLwrapper *ai);
-static GtkWidget *make_file_says(guchar *path);
+static GtkWidget *make_vbox(const guchar *path);
+static GtkWidget *make_details(const guchar *path, DirItem *item);
+static GtkWidget *make_about(const guchar *path, XMLwrapper *ai);
+static GtkWidget *make_file_says(const guchar *path);
 static void add_file_output(FileStatus *fs,
 			    gint source, GdkInputCondition condition);
 static const gchar *pretty_type(DirItem *file, const guchar *path);
@@ -189,7 +189,7 @@ static void add_frame(GtkBox *vbox, GtkWidget *list)
 /* Create the VBox widget that contains the details.
  * Note that 'path' must not be freed until the vbox is destroyed.
  */
-static GtkWidget *make_vbox(guchar *path)
+static GtkWidget *make_vbox(const guchar *path)
 {
 	DirItem		*item;
 	GtkBox		*vbox;
@@ -224,7 +224,7 @@ static GtkWidget *make_vbox(guchar *path)
 		gtk_container_add(GTK_CONTAINER(align), button);
 		g_signal_connect_swapped(button, "clicked", 
 				G_CALLBACK(show_help_clicked),
-				path);
+				(gpointer) path);
 	}
 	g_free(help_dir);
 
@@ -320,7 +320,7 @@ static void make_list(GtkListStore **list_store, GtkWidget **list_view)
 }
 	
 /* Create the TreeView widget with the file's details */
-static GtkWidget *make_details(guchar *path, DirItem *item)
+static GtkWidget *make_details(const guchar *path, DirItem *item)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
@@ -373,7 +373,7 @@ static GtkWidget *make_details(guchar *path, DirItem *item)
 }
 	
 /* Create the TreeView widget with the application's details */
-static GtkWidget *make_about(guchar *path, XMLwrapper *ai)
+static GtkWidget *make_about(const guchar *path, XMLwrapper *ai)
 {
 	GtkListStore	*store;
 	GtkWidget	*view;
@@ -447,7 +447,7 @@ static GtkWidget *make_about(guchar *path, XMLwrapper *ai)
 	return view;
 }
 
-static GtkWidget *make_file_says(guchar *path)
+static GtkWidget *make_file_says(const guchar *path)
 {
 	GtkWidget	*frame;
 	GtkWidget	*w_file_label;
@@ -487,7 +487,7 @@ static GtkWidget *make_file_says(guchar *path)
 			dup2(file_data[1], STDOUT_FILENO);
 			dup2(file_data[1], STDERR_FILENO);
 #ifdef FILE_B_FLAG
-			argv[2] = path;
+			argv[2] = (char *) path;
 #else
 			argv[1] = (char *) g_basename(path);
 			chdir(g_path_get_dirname(path));

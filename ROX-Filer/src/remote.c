@@ -676,7 +676,7 @@ static xmlNodePtr rpc_Show(GList *args)
 	leaf = string_value(ARG(1));
 
 	/* XXX: Seems silly to join them only to split again later... */
-	open_to_show(make_path(dir, leaf)->str);
+	open_to_show(make_path(dir, leaf));
 
 	g_free(dir);
 	g_free(leaf);

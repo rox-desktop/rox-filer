@@ -173,7 +173,6 @@ static void trans_changed(void)
  */
 static void set_trans(guchar *lang)
 {
-	struct stat info;
 	guchar	*path;
 	gchar	*lang2 = NULL;
 
@@ -201,7 +200,7 @@ static void set_trans(guchar *lang)
 	current_lang = lang2 ? lang2 : g_strdup(lang);
 
 	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, current_lang);
-	if (stat(path, &info) == 0)
+	if (file_exists(path))
 		rox_add_translations(path);
 	g_free(path);
 }

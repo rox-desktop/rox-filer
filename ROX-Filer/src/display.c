@@ -580,9 +580,9 @@ void display_update_view(FilerWindow *filer_window,
 	if (filer_window->show_thumbs && item->base_type == TYPE_FILE &&
 		strcmp(item->mime_type->media_type, "image") == 0)
 	{
-		gchar    *path;
+		const guchar    *path;
 
-		path = make_path(filer_window->real_path, item->leafname)->str;
+		path = make_path(filer_window->real_path, item->leafname);
 
 		view->image = g_fscache_lookup_full(pixmap_cache, path,
 				FSCACHE_LOOKUP_ONLY_NEW, NULL);
