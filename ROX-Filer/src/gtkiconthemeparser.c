@@ -90,7 +90,7 @@ static GtkIconThemeFileLine *   lookup_line    (GtkIconThemeFile            *df,
 
 
 GQuark
-_gtk_icon_theme_file_parse_error_quark (void)
+_rox_icon_theme_file_parse_error_quark (void)
 {
   static GQuark quark;
   if (!quark)
@@ -102,34 +102,34 @@ _gtk_icon_theme_file_parse_error_quark (void)
 static void
 parser_free (GtkIconThemeFileParser *parser)
 {
-  _gtk_icon_theme_file_free (parser->df);
+  _rox_icon_theme_file_free (parser->df);
 }
 
 static void
-gtk_icon_theme_file_line_free (GtkIconThemeFileLine *line)
+rox_icon_theme_file_line_free (GtkIconThemeFileLine *line)
 {
   g_free (line->locale);
   g_free (line->value);
 }
 
 static void
-gtk_icon_theme_file_section_free (GtkIconThemeFileSection *section)
+rox_icon_theme_file_section_free (GtkIconThemeFileSection *section)
 {
   int i;
 
   for (i = 0; i < section->n_lines; i++)
-    gtk_icon_theme_file_line_free (&section->lines[i]);
+    rox_icon_theme_file_line_free (&section->lines[i]);
   
   g_free (section->lines);
 }
 
 void
-_gtk_icon_theme_file_free (GtkIconThemeFile *df)
+_rox_icon_theme_file_free (GtkIconThemeFile *df)
 {
   int i;
 
   for (i = 0; i < df->n_sections; i++)
-    gtk_icon_theme_file_section_free (&df->sections[i]);
+    rox_icon_theme_file_section_free (&df->sections[i]);
   g_free (df->sections);
   g_free (df->current_locale[0]);
   g_free (df->current_locale[1]);
@@ -548,7 +548,7 @@ report_error (GtkIconThemeFileParser     *parser,
 
 
 GtkIconThemeFile *
-_gtk_icon_theme_file_new_from_string (char                       *data,
+_rox_icon_theme_file_new_from_string (char                       *data,
 				      GError                    **error)
 {
   GtkIconThemeFileParser parser;
@@ -584,7 +584,7 @@ _gtk_icon_theme_file_new_from_string (char                       *data,
 }
 
 char *
-_gtk_icon_theme_file_to_string (GtkIconThemeFile *df)
+_rox_icon_theme_file_to_string (GtkIconThemeFile *df)
 {
   GtkIconThemeFileSection *section;
   GtkIconThemeFileLine *line;
@@ -687,7 +687,7 @@ lookup_line (GtkIconThemeFile        *df,
 }
 
 gboolean
-_gtk_icon_theme_file_get_raw (GtkIconThemeFile  *df,
+_rox_icon_theme_file_get_raw (GtkIconThemeFile  *df,
 			      const char    *section_name,
 			      const char    *keyname,
 			      const char    *locale,
@@ -717,7 +717,7 @@ _gtk_icon_theme_file_get_raw (GtkIconThemeFile  *df,
 
 
 void
-_gtk_icon_theme_file_foreach_section (GtkIconThemeFile            *df,
+_rox_icon_theme_file_foreach_section (GtkIconThemeFile            *df,
 				      GtkIconThemeFileSectionFunc  func,
 				      gpointer                     user_data)
 {
@@ -734,7 +734,7 @@ _gtk_icon_theme_file_foreach_section (GtkIconThemeFile            *df,
 }
 
 void
-_gtk_icon_theme_file_foreach_key (GtkIconThemeFile            *df,
+_rox_icon_theme_file_foreach_key (GtkIconThemeFile            *df,
 				  const char                  *section_name,
 				  gboolean                     include_localized,
 				  GtkIconThemeFileLineFunc     func,
@@ -797,7 +797,7 @@ calculate_locale (GtkIconThemeFile   *df)
 }
 
 gboolean
-_gtk_icon_theme_file_get_locale_string  (GtkIconThemeFile  *df,
+_rox_icon_theme_file_get_locale_string  (GtkIconThemeFile  *df,
 					 const char      *section,
 					 const char      *keyname,
 					 char           **val)
@@ -809,7 +809,7 @@ _gtk_icon_theme_file_get_locale_string  (GtkIconThemeFile  *df,
 
   if  (df->current_locale[0] != NULL)
     {
-      res = _gtk_icon_theme_file_get_raw (df,section, keyname,
+      res = _rox_icon_theme_file_get_raw (df,section, keyname,
 					  df->current_locale[0], val);
       if (res)
 	return TRUE;
@@ -817,26 +817,26 @@ _gtk_icon_theme_file_get_locale_string  (GtkIconThemeFile  *df,
   
   if  (df->current_locale[1] != NULL)
     {
-      res = _gtk_icon_theme_file_get_raw (df,section, keyname,
+      res = _rox_icon_theme_file_get_raw (df,section, keyname,
 					  df->current_locale[1], val);
       if (res)
 	return TRUE;
     }
   
-  return _gtk_icon_theme_file_get_raw (df, section, keyname, NULL, val);
+  return _rox_icon_theme_file_get_raw (df, section, keyname, NULL, val);
 }
 
 gboolean
-_gtk_icon_theme_file_get_string (GtkIconThemeFile   *df,
+_rox_icon_theme_file_get_string (GtkIconThemeFile   *df,
 				 const char       *section,
 				 const char       *keyname,
 				 char            **val)
 {
-  return _gtk_icon_theme_file_get_raw (df, section, keyname, NULL, val);
+  return _rox_icon_theme_file_get_raw (df, section, keyname, NULL, val);
 }
 
 gboolean
-_gtk_icon_theme_file_get_integer (GtkIconThemeFile   *df,
+_rox_icon_theme_file_get_integer (GtkIconThemeFile   *df,
 				  const char       *section,
 				  const char       *keyname,
 				  int              *val)
@@ -846,7 +846,7 @@ _gtk_icon_theme_file_get_integer (GtkIconThemeFile   *df,
   
   *val = 0;
 
-  res = _gtk_icon_theme_file_get_raw (df, section, keyname, NULL, &str);
+  res = _rox_icon_theme_file_get_raw (df, section, keyname, NULL, &str);
   if (!res)
     return FALSE;
 

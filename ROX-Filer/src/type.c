@@ -141,7 +141,7 @@ void type_init(void)
 {
 	int	    i;
 
-	icon_theme = gtk_icon_theme_new();
+	icon_theme = rox_icon_theme_new();
 	
 	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
@@ -179,7 +179,7 @@ void type_init(void)
  */
 void reread_mime_files(void)
 {
-	gtk_icon_theme_rescan_if_needed(icon_theme);
+	rox_icon_theme_rescan_if_needed(icon_theme);
 	load_mime_types();
 }
 
@@ -461,7 +461,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	type_name = g_strconcat("mime-", type->media_type, ":",
 				type->subtype, NULL);
-	full = gtk_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
+	full = rox_icon_theme_load_icon(icon_theme, type_name, ICON_HEIGHT,
 						0, NULL);
 	g_free(type_name);
 	if (!full)
@@ -469,7 +469,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		/* Ugly hack... try for a GNOME icon */
 		type_name = g_strconcat("gnome-mime-", type->media_type,
 				"-", type->subtype, NULL);
-		full = gtk_icon_theme_load_icon(icon_theme,
+		full = rox_icon_theme_load_icon(icon_theme,
 						type_name,
 						ICON_HEIGHT, 0, NULL);
 		g_free(type_name);
@@ -478,7 +478,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	{
 		/* Try for a media type */
 		type_name = g_strconcat("mime-", type->media_type, NULL);
-		full = gtk_icon_theme_load_icon(icon_theme,
+		full = rox_icon_theme_load_icon(icon_theme,
 						type_name,
 						ICON_HEIGHT, 0, NULL);
 		g_free(type_name);
@@ -1432,13 +1432,13 @@ static void set_icon_theme(void)
 
 	while (1)
 	{
-		gtk_icon_theme_set_custom_theme(icon_theme, theme_name);
-		info = gtk_icon_theme_lookup_icon(icon_theme,
+		rox_icon_theme_set_custom_theme(icon_theme, theme_name);
+		info = rox_icon_theme_lookup_icon(icon_theme,
 				"mime-application:postscript",
 				ICON_HEIGHT, 0);
 		if (!info)
 		{
-			info = gtk_icon_theme_lookup_icon(icon_theme,
+			info = rox_icon_theme_lookup_icon(icon_theme,
 					"gnome-mime-application-postscript",
 					ICON_HEIGHT, 0);
 		}
@@ -1471,7 +1471,7 @@ static void set_icon_theme(void)
 				icon_home, g_strerror(errno));
 	g_free(icon_home);
 
-	gtk_icon_theme_rescan_if_needed(icon_theme);
+	rox_icon_theme_rescan_if_needed(icon_theme);
 }
 
 static guchar *read_theme(Option *option)
@@ -1571,7 +1571,7 @@ static GList *build_icon_theme(Option *option, xmlNode *node, guchar *label)
 	menu = gtk_menu_new();
 	gtk_option_menu_set_menu(GTK_OPTION_MENU(button), menu);
 
-	gtk_icon_theme_get_search_path(icon_theme, &theme_dirs, &n_dirs);
+	rox_icon_theme_get_search_path(icon_theme, &theme_dirs, &n_dirs);
 	names = g_ptr_array_new();
 	for (i = 0; i < n_dirs; i++)
 		add_themes_from_dir(names, theme_dirs[i]);

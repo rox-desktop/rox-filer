@@ -1,20 +1,13 @@
 /* GtkIconTheme - a loader for icon themes
  * gtk-icon-loader.h Copyright (C) 2002, 2003 Red Hat, Inc.
  *
- * This library is free software; you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public
- * License as published by the Free Software Foundation; either
- * version 2 of the License, or (at your option) any later version.
+ * This was LGPL; it's now GPL, as allowed by the LGPL. It's also very
+ * stripped down. GTK 2.4 will have this stuff built-in.
  *
- * This library is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
- * Lesser General Public License for more details.
- *
- * You should have received a copy of the GNU Lesser General Public
- * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * This program is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by the Free
+ * Software Foundation; either version 2 of the License, or (at your option)
+ * any later version.
  */
 
 #ifndef __GTK_ICON_THEME_H__
@@ -28,7 +21,7 @@ G_BEGIN_DECLS
 
 #define GTK_TYPE_ICON_INFO              (gtk_icon_info_get_type)
 
-#define GTK_TYPE_ICON_THEME             (gtk_icon_theme_get_type ())
+#define GTK_TYPE_ICON_THEME             (rox_icon_theme_get_type ())
 #define GTK_ICON_THEME(obj)             (G_TYPE_CHECK_INSTANCE_CAST ((obj), GTK_TYPE_ICON_THEME, GtkIconTheme))
 #define GTK_ICON_THEME_CLASS(klass)     (G_TYPE_CHECK_CLASS_CAST ((klass), GTK_TYPE_ICON_THEME, GtkIconThemeClass))
 #define GTK_IS_ICON_THEME(obj)          (G_TYPE_CHECK_INSTANCE_TYPE ((obj), GTK_TYPE_ICON_THEME))
@@ -64,11 +57,11 @@ struct _GtkIconThemeClass
  *   doesn't support them.
  *   Cannot be used together with %GTK_ICON_LOOKUP_NO_SVG.
  * @GTK_ICON_LOOKUP_USE_BUILTIN: When passed to
- *   gtk_icon_theme_lookup_icon() includes builtin icons
+ *   rox_icon_theme_lookup_icon() includes builtin icons
  *   as well as files. For a builtin icon, gdk_icon_info_get_filename()
  *   returns %NULL and you need to call gdk_icon_info_get_builtin_pixbuf().
  * 
- * Used to specify options for gtk_icon_theme_lookup_icon()
+ * Used to specify options for rox_icon_theme_lookup_icon()
  **/
 typedef enum
 {
@@ -77,7 +70,7 @@ typedef enum
   GTK_ICON_LOOKUP_USE_BUILTIN = 0 << 2
 } GtkIconLookupFlags;
 
-#define GTK_ICON_THEME_ERROR gtk_icon_theme_error_quark ()
+#define GTK_ICON_THEME_ERROR rox_icon_theme_error_quark ()
 
 /**
  * GtkIconThemeError:
@@ -91,50 +84,33 @@ typedef enum {
   GTK_ICON_THEME_FAILED
 } GtkIconThemeError;
 
-GQuark gtk_icon_theme_error_quark (void) G_GNUC_CONST;
+GQuark rox_icon_theme_error_quark (void) G_GNUC_CONST;
 
-GType         gtk_icon_theme_get_type              (void) G_GNUC_CONST;
+GType         rox_icon_theme_get_type              (void) G_GNUC_CONST;
 
-GtkIconTheme *gtk_icon_theme_new                   (void);
-void          gtk_icon_theme_get_search_path       (GtkIconTheme                *icon_theme,
+GtkIconTheme *rox_icon_theme_new                   (void);
+void          rox_icon_theme_get_search_path       (GtkIconTheme                *icon_theme,
 						    gchar                      **path[],
 						    gint                        *n_elements);
-void          gtk_icon_theme_set_custom_theme      (GtkIconTheme                *icon_theme,
+void          rox_icon_theme_set_custom_theme      (GtkIconTheme                *icon_theme,
 						    const gchar                 *theme_name);
 
-gboolean      gtk_icon_theme_has_icon              (GtkIconTheme                *icon_theme,
-						    const gchar                 *icon_name);
-GtkIconInfo * gtk_icon_theme_lookup_icon           (GtkIconTheme                *icon_theme,
+GtkIconInfo * rox_icon_theme_lookup_icon           (GtkIconTheme                *icon_theme,
 						    const gchar                 *icon_name,
 						    gint                         size,
 						    GtkIconLookupFlags           flags);
-GdkPixbuf *   gtk_icon_theme_load_icon             (GtkIconTheme                *icon_theme,
+GdkPixbuf *   rox_icon_theme_load_icon             (GtkIconTheme                *icon_theme,
 						    const gchar                 *icon_name,
 						    gint                         size,
 						    GtkIconLookupFlags           flags,
 						    GError                     **error);
 
-gboolean      gtk_icon_theme_rescan_if_needed      (GtkIconTheme                *icon_theme);
+gboolean      rox_icon_theme_rescan_if_needed      (GtkIconTheme                *icon_theme);
 
 GType         gtk_icon_info_get_type (void);
 GtkIconInfo  *gtk_icon_info_copy     (GtkIconInfo *icon_info);
 void          gtk_icon_info_free     (GtkIconInfo *icon_info);
 
-gint                  gtk_icon_info_get_base_size      (GtkIconInfo *icon_info);
-G_CONST_RETURN gchar *gtk_icon_info_get_filename       (GtkIconInfo *icon_info);
-GdkPixbuf    *        gtk_icon_info_get_builtin_pixbuf (GtkIconInfo *icon_info);
-GdkPixbuf    *        gtk_icon_info_load_icon          (GtkIconInfo *icon_info,
-							GError     **error);
-
-void                  gtk_icon_info_set_raw_coordinates (GtkIconInfo *icon_info,
-							 gboolean     raw_coordinates);
-
-gboolean              gtk_icon_info_get_embedded_rect (GtkIconInfo   *icon_info,
-						       GdkRectangle  *rectangle);
-gboolean              gtk_icon_info_get_attach_points (GtkIconInfo   *icon_info,
-						       GdkPoint     **points,
-						       gint          *n_points);
-G_CONST_RETURN gchar *gtk_icon_info_get_display_name  (GtkIconInfo   *icon_info);
 
 G_END_DECLS
 
