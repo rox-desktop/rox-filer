@@ -133,6 +133,7 @@ static GtkWidget *dnd_menu = NULL;
  */
 const char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
 const char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
+const char *drop_dest_pass_through  = "drop_dest_pass";	/* Pass to parent */
 
 GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
@@ -517,6 +518,9 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 	
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	dest_type = g_dataset_get_data(context, "drop_dest_type");
+
+	if (dest_type == drop_dest_pass_through)
+		return FALSE;	/* Let the parent widget handle it */
 
 	g_return_val_if_fail(dest_path != NULL, TRUE);
 

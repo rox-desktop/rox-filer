@@ -26,6 +26,7 @@ typedef enum {
 	DIR_ADD,	/* Add the listed items to the display */
 	DIR_REMOVE,	/* Remove listed items from display */
 	DIR_UPDATE,	/* Redraw these items */
+	DIR_ERROR_CHANGED,	/* Check dir->error */
 } DirAction;
 
 typedef struct _DirUser DirUser;

@@ -30,14 +30,6 @@
 
 #define PIXMAP_PURGE_TIME 1200
 
-/* Image files smaller than this are loaded in the main process.
- * Larger images are sent to a sub-process.
- * If this is too small, then looking inside ~/.thumbnails will
- * cause nasty effects ;-)
- */
-/* XXX: This is stupid! */
-#define SMALL_IMAGE_THRESHOLD 50000
-
 #include <stdlib.h>
 #include <stdio.h>
 #include <errno.h>
@@ -291,16 +283,26 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 	
 	if (!pixbuf)
 	{
-		struct stat finfo;
+		struct stat info1, info2;
+		char *dir;
 
-		/* If the image is small, load it now */
-		if (mc_stat(path, &finfo) != 0)
+		dir = g_path_get_dirname(path);
+
+		/* If the image itself is in ~/.thumbnails, load it now
+		 * (ie, don't create thumbnails for thumbnails!).
+		 */
+		if (mc_stat(dir, &info1) != 0)
 		{
 			callback(data, NULL);
+			g_free(dir);
 			return;
 		}
+		g_free(dir);
 
-		if (finfo.st_size < SMALL_IMAGE_THRESHOLD)
+		if (mc_stat(make_path(home_dir, ".thumbnails/normal"),
+			    &info2) == 0 &&
+			    info1.st_dev == info2.st_dev &&
+			    info1.st_ino == info2.st_ino)
 		{
 			pixbuf = gdk_pixbuf_new_from_file(path, NULL);
 			if (!pixbuf)
@@ -587,7 +589,7 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h)
 	w = gdk_pixbuf_get_width(src);
 	h = gdk_pixbuf_get_height(src);
 
-	if (w == 0 || h == 0 || (w >= max_w && h >= max_h))
+	if (w == 0 || h == 0 || w >= max_w || h >= max_h)
 	{
 		gdk_pixbuf_ref(src);
 		return src;

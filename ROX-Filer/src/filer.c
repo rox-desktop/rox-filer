@@ -324,6 +324,9 @@ static void update_display(Directory *dir,
 		case DIR_UPDATE:
 			view_update_items(view, items);
 			break;
+		case DIR_ERROR_CHANGED:
+			filer_set_title(filer_window);
+			break;
 	}
 }
 
@@ -336,6 +339,11 @@ static void attach(FilerWindow *filer_window)
 			filer_window);
 	filer_set_title(filer_window);
 	bookmarks_add_history(filer_window->sym_path);
+
+	if (filer_window->directory->error)
+		delayed_error(_("Error scanning '%s':\n%s"),
+				filer_window->sym_path,
+				filer_window->directory->error);
 }
 
 static void detach(FilerWindow *filer_window)
@@ -1690,6 +1698,14 @@ void filer_set_title(FilerWindow *filer_window)
 		title = g_strconcat(filer_window->sym_path, flags, NULL);
 
 	ensure_utf8(&title);
+
+	if (filer_window->directory->error)
+	{
+		gchar *old = title;
+		title = g_strconcat(old, ": ", filer_window->directory->error,
+				    NULL);
+		g_free(old);
+	}
 
 	gtk_window_set_title(GTK_WINDOW(filer_window->window), title);
 

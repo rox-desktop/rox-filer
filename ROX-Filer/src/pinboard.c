@@ -1446,7 +1446,11 @@ static gboolean drag_motion(GtkWidget		*widget,
 	DirItem		*item = icon->item;
 
 	if (gtk_drag_get_source_widget(context) == widget)
-		goto out;	/* Can't drag something to itself! */
+	{
+		g_dataset_set_data(context, "drop_dest_type",
+				   (gpointer) drop_dest_pass_through);
+		return FALSE;	/* Can't drag something to itself! */
+	}
 
 	if (icon->selected)
 		goto out;	/* Can't drag a selection to itself */

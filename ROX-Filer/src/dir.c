@@ -185,10 +185,6 @@ void dir_attach(Directory *dir, DirCallback callback, gpointer data)
 
 	if (!dir->scanning)
 		callback(dir, DIR_END_SCAN, NULL, data);
-
-	if (dir->error)
-		delayed_error(_("Error scanning '%s':\n%s"),
-				dir->pathname, dir->error);
 }
 
 /* Undo the effect of dir_attach */
@@ -344,6 +340,19 @@ static void dir_set_scanning(Directory *dir, gboolean scanning)
 		user->callback(dir,
 				scanning ? DIR_START_SCAN : DIR_END_SCAN,
 				NULL, user->data);
+	}
+}
+
+/* Notify everyone that the error status of the directory has changed */
+static void dir_error_changed(Directory *dir)
+{
+	GList	*next;
+
+	for (next = dir->users; next; next = next->next)
+	{
+		DirUser *user = (DirUser *) next->data;
+
+		user->callback(dir, DIR_ERROR_CHANGED, NULL, user->data);
 	}
 }
 
@@ -669,10 +678,6 @@ static void update(Directory *dir, gchar *pathname, gpointer data)
 		dir->needs_update = TRUE;
 	else
 		dir_rescan(dir);
-
-	if (dir->error)
-		delayed_error(_("Error scanning '%s':\n%s"),
-				dir->pathname, dir->error);
 }
 
 /* If there is work to do, set the idle callback.
@@ -886,13 +891,18 @@ static void dir_rescan(Directory *dir)
 
 	read_globicons();
 	mount_update(FALSE);
-	null_g_free(&dir->error);
+	if (dir->error)
+	{
+		null_g_free(&dir->error);
+		dir_error_changed(dir);
+	}
 
 	/* Saves statting the parent for each item... */
 	if (mc_stat(pathname, &dir->stat_info))
 	{
 		dir->error = g_strdup_printf(_("Can't stat directory: %s"),
 				g_strerror(errno));
+		dir_error_changed(dir);
 		return;		/* Report on attach */
 	}
 
@@ -901,6 +911,7 @@ static void dir_rescan(Directory *dir)
 	{
 		dir->error = g_strdup_printf(_("Can't open directory: %s"),
 				g_strerror(errno));
+		dir_error_changed(dir);
 		return;		/* Report on attach */
 	}
 

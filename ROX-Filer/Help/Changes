@@ -5,6 +5,13 @@
 08-Feb-2003
 ~~~~~~~~~~~
 Changing the icon for a MIME type updates all filer windows.
+When dragging a pinboard icon over itself, pretend the icon isn't there to
+allow fine repositioning.
+When an error prevents scanning a directory, show the error in the window
+title bar, and only report it once in an error box.
+Don't create thumbnails of thumbnails by checking if the image is in
+~/.thumbnails/normal. Before, the test was the size of the file, not its
+location.
 
 07-Feb-2003
 ~~~~~~~~~~~
