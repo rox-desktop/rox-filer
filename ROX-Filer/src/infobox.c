@@ -633,9 +633,10 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 
 	if (xtype_supported(NULL)) {
 		add_row(store, _("Extended attributes:"),
-			xtype_supported(path)?
-		  (item->flags & ITEM_FLAG_HAS_XATTR)? _("Present"): _("None")
-			: _("Not supported"));
+		  (item->flags & ITEM_FLAG_HAS_XATTR)
+		  	? _("Present")
+			: xtype_supported(path) ? _("None")
+						: _("Not supported"));
 	}
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
