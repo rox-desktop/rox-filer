@@ -691,13 +691,13 @@ _xdg_mime_magic_matchlet_mirror (XdgMimeMagicMatchlet *matchlets)
 {
   XdgMimeMagicMatchlet *new_list;
   XdgMimeMagicMatchlet *tmp;
-  
-  if ((matchlets == NULL) || (matchlets->next == NULL)) 
+
+  if ((matchlets == NULL) || (matchlets->next == NULL))
     return matchlets;
 
   new_list = NULL;
   tmp = matchlets;
-  while (tmp != NULL) 
+  while (tmp != NULL)
     {
       XdgMimeMagicMatchlet *matchlet;
 
@@ -708,7 +708,7 @@ _xdg_mime_magic_matchlet_mirror (XdgMimeMagicMatchlet *matchlets)
     }
 
   return new_list;
-  
+
 }
 
 static void
@@ -732,7 +732,8 @@ _xdg_mime_magic_read_magic_file (XdgMimeMagic *mime_magic,
 	  break;
 	case XDG_MIME_MAGIC_MAGIC:
 	  state = _xdg_mime_magic_parse_magic_line (magic_file, match);
-	  if (state == XDG_MIME_MAGIC_SECTION) 
+	  if (state == XDG_MIME_MAGIC_SECTION ||
+	      (state == XDG_MIME_MAGIC_EOF && match->mime_type))
 	    {
 	      match->matchlet = _xdg_mime_magic_matchlet_mirror (match->matchlet);
 	      _xdg_mime_magic_insert_match (mime_magic, match);
