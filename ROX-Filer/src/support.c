@@ -25,6 +25,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <netdb.h>
 #include <errno.h>
 #include <ctype.h>
 #include <sys/param.h>
@@ -92,11 +93,20 @@ char *our_host_name()
 	{
 		char buffer[4096];
 
-		g_return_val_if_fail(gethostname(buffer, 4096) == 0,
-					"localhost");
+		if (gethostname(buffer, 4096) == 0)
+		{
+			/* gethostname doesn't always return the full name... */
+			struct hostent *ent;
 
-		buffer[4095] = '\0';
-		name = g_strdup(buffer);
+			buffer[4095] = '\0';
+			ent = gethostbyname(buffer);
+			name = g_strdup(ent ? ent->h_name : buffer);
+		}
+		else
+		{
+			g_warning("gethostname() failed - using localhost\n");
+			name = g_strdup("localhost");
+		}
 	}
 
 	return name;
