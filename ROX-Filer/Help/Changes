@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+21-Mar-2002
+~~~~~~~~~~~
+Filenames which are not valid UTF-8 are shown in red. A tooltip explains the
+problem. CHARSET is used to try and render the name anyway, and the rename
+box can be used to fix it (reported by Christopher Arndt).
+
 20-Mar-2002
 ~~~~~~~~~~~
 Times weren't converted to UTF-8, causing errors in some locales (reported

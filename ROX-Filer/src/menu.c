@@ -990,7 +990,16 @@ static void savebox_show(const gchar *action, const gchar *path,
 	g_object_set_data(G_OBJECT(savebox), "check_relative", check_relative);
 
 	gtk_window_set_title(GTK_WINDOW(savebox), action);
-	gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
+
+	if (g_utf8_validate(path, -1, NULL))
+		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), path);
+	else
+	{
+		gchar *u8;
+		u8 = to_utf8(path);
+		gtk_savebox_set_pathname(GTK_SAVEBOX(savebox), u8);
+		g_free(u8);
+	}
 	gtk_savebox_set_icon(GTK_SAVEBOX(savebox), image->pixmap, image->mask);
 	g_object_unref(image);
 				

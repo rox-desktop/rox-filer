@@ -2165,6 +2165,11 @@ static gboolean filer_tooltip_activate(FilerWindow *filer_window)
 			g_object_unref(info);
 	}
 
+	if (!g_utf8_validate(tip_item->leafname, -1, NULL))
+		g_string_append(tip,
+			_("This filename is not valid UTF-8. "
+			  "You should rename it.\n"));
+
 	if (tip->len > 1)
 	{
 		g_string_truncate(tip, tip->len - 1);

@@ -1284,7 +1284,6 @@ void display_update_view(FilerWindow *filer_window,
 	if (str)
 	{
 		PangoAttrList	*list;
-		PangoAttribute	*attr;
 		int	perm_offset = -1;
 		
 		view->details = gtk_widget_create_pango_layout(
@@ -1296,14 +1295,16 @@ void display_update_view(FilerWindow *filer_window,
 		view->details_width = w / PANGO_SCALE;
 		view->details_height = h / PANGO_SCALE;
 
-		attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
-
 		if (filer_window->details_type == DETAILS_SUMMARY)
 			perm_offset = 5;
 		else if (filer_window->details_type == DETAILS_PERMISSIONS)
 			perm_offset = 0;
 		if (perm_offset > -1)
 		{
+			PangoAttribute	*attr;
+
+			attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
+
 			perm_offset += 4 * applicable(item->uid, item->gid);
 			attr->start_index = perm_offset;
 			attr->end_index = perm_offset + 3;
@@ -1340,8 +1341,30 @@ void display_update_view(FilerWindow *filer_window,
 
 	if (view->layout)
 		g_object_unref(G_OBJECT(view->layout));
-	view->layout = gtk_widget_create_pango_layout(
+
+	if (g_utf8_validate(item->leafname, -1, NULL))
+	{
+		view->layout = gtk_widget_create_pango_layout(
 				filer_window->window, item->leafname);
+	}
+	else
+	{
+		PangoAttrList	*list;
+		PangoAttribute	*attr;
+		gchar *utf8;
+
+		utf8 = to_utf8(item->leafname);
+		view->layout = gtk_widget_create_pango_layout(
+				filer_window->window, utf8);
+		g_free(utf8);
+
+		attr = pango_attr_foreground_new(0xffff, 0, 0);
+		attr->start_index = 0;
+		attr->end_index = 1000;
+		list = pango_attr_list_new();
+		pango_attr_list_insert(list, attr);
+		pango_layout_set_attributes(view->layout, list);
+	}
 
 	if (filer_window->details_type == DETAILS_NONE)
 	{
