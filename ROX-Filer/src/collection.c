@@ -985,6 +985,7 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 {
 	Collection *collection;
 	int	   item;
+	int	   key;
 
 	g_return_val_if_fail(widget != NULL, FALSE);
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
@@ -992,8 +993,17 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 
 	collection = (Collection *) widget;
 	item = collection->cursor_item;
+
+	key = event->keyval;
+	if (event->state & (GDK_CONTROL_MASK | GDK_SHIFT_MASK))
+	{
+		if (key == GDK_Left || key == GDK_Right || \
+				key == GDK_Up || key == GDK_Down)
+			return TRUE;
+		return FALSE;
+	}
 	
-	switch (event->keyval)
+	switch (key)
 	{
 		case GDK_Left:
 			collection_move_cursor(collection, 0, -1);

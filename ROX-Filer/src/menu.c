@@ -116,6 +116,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
+static void home_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 /* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
@@ -199,6 +200,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Parent, New Window"), 	NULL, open_parent, 0, NULL},
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
+{">" N_("Home Directory"),	NULL, home_directory, 0, NULL},
 {">" N_("Resize Window"),	NULL, resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
 
@@ -1314,6 +1316,13 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 
 	if (!spawn_full(argv, window_with_focus->path))
 		report_error(PROJECT, _("Failed to fork() child process"));
+}
+
+static void home_directory(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	filer_change_to(window_with_focus, home_dir, NULL);
 }
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
