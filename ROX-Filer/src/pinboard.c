@@ -599,7 +599,8 @@ static void pinboard_check_options(void)
 			pinicon_style = NULL;
 		}
 
-		reshape_all();
+		if (current_pinboard)
+			reshape_all();
 	}
 }
 
