@@ -41,8 +41,8 @@
 #include "usericons.h"
 
 #ifdef LIBXML_VERSION
-# if LIBXML_VERSION > 20000
-#  define XML2 1
+# if LIBXML_VERSION > 20400
+#  define XML24 1
 # endif
 #endif
 
@@ -197,7 +197,7 @@ static void write_globicons(void)
 		xmlNewChild(tree, NULL, "icon", gi->iconpath);
 	}
 
-#ifdef XML2
+#ifdef XML24
 	if (xmlSaveFormatFileEnc(save_new, doc, NULL, 1) < 0)
 #else
 	if (xmlSaveFile(save_new, doc) < 0)
