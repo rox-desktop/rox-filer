@@ -29,7 +29,6 @@
 #include <errno.h>
 #include <gtk/gtk.h>
 #include <gdk/gdkx.h>
-#include <gtk/gtkinvisible.h>
 #include <stdlib.h>
 #include <libxml/parser.h>
 #include <signal.h>
@@ -128,12 +127,6 @@ static gint	loading_pinboard = 0;		/* Non-zero => loading */
 /* The Icon that was used to start the current drag, if any */
 Icon *pinboard_drag_in_progress = NULL;
 
-typedef enum {
-	TEXT_BG_NONE = 0,
-	TEXT_BG_OUTLINE = 1,
-	TEXT_BG_SOLID = 2,
-} TextBgType;
-
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_button_3;
@@ -142,7 +135,6 @@ static Option o_iconify_start, o_iconify_dir;
 /* Static prototypes */
 static GType pin_icon_get_type(void);
 static void set_size_and_style(PinIcon *pi);
-static gint stop_expose(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static gint end_wink(gpointer data);
 static gboolean button_release_event(GtkWidget *widget,
@@ -200,7 +192,7 @@ static void reload_backdrop(Pinboard *pinboard,
 			    const gchar *backdrop,
 			    BackdropStyle backdrop_style);
 static void set_backdrop(const gchar *path, BackdropStyle style);
-void pinboard_reshape_icon(Icon *icon);
+static void pinboard_reshape_icon(Icon *icon);
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi);
 static void abandon_backdrop_app(Pinboard *pinboard);
 static void drag_backdrop_dropped(GtkWidget	*frame,
@@ -452,8 +444,6 @@ void pinboard_pin(const gchar *path, const gchar *name, int x, int y)
 	g_signal_connect(pi->win, "motion-notify-event",
 			G_CALLBACK(icon_motion_notify), pi);
 	g_signal_connect(pi->win, "expose-event",
-			G_CALLBACK(stop_expose), pi);
-	g_signal_connect(pi->widget, "expose-event",
 			G_CALLBACK(draw_icon), pi);
 	g_signal_connect_swapped(pi->win, "destroy",
 			G_CALLBACK(pin_icon_destroyed), pi);
@@ -508,22 +498,6 @@ static void pinboard_wink_item(PinIcon *pi, gboolean timeout)
 			wink_timeout = gtk_timeout_add(300, end_wink, NULL);
 		else
 			wink_timeout = -1;
-	}
-}
-
-/* Icon's size, shape or appearance has changed - update the display */
-void pinboard_reshape_icon(Icon *icon)
-{
-	PinIcon	*pi = (PinIcon *) icon;
-	int	x = pi->x, y = pi->y;
-
-	set_size_and_style(pi);
-	offset_from_centre(pi, &x, &y);
-
-	if (pi->win->allocation.x != x || pi->win->allocation.y != y)
-	{
-		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
-				pi->win, x, y);
 	}
 }
 
@@ -771,23 +745,9 @@ static void set_size_and_style(PinIcon *pi)
 	gtk_widget_set_size_request(pi->widget, iwidth, iheight);
 }
 
-/* Don't draw the normal button effect */
-static gint stop_expose(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
-{
-	static GtkWidgetClass *parent_class = NULL;
-	
-	if (!parent_class)
-	{
-		gpointer c = ((GTypeInstance *) widget)->g_class;
-		parent_class = (GtkWidgetClass *) g_type_class_peek_parent(c);
-	}
-
-	(parent_class->expose_event)(widget, event);
-	return TRUE;
-}
-
 static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 {
+	static GtkWidgetClass *parent_class = NULL;
 	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 	MaskedPixmap	*image = item->image;
@@ -796,14 +756,19 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	int		x, y;
 	GtkStateType	state = icon->selected ? GTK_STATE_SELECTED
 					       : GTK_STATE_NORMAL;
+	
+	if (!parent_class)
+	{
+		gpointer c = ((GTypeInstance *) widget)->g_class;
+		parent_class = (GtkWidgetClass *) g_type_class_peek_parent(c);
+	}
 
-
-	x = widget->allocation.x;
-	y = widget->allocation.y;
+	x = pi->widget->allocation.x;
+	y = pi->widget->allocation.y;
 
 	gdk_pixbuf_render_to_drawable_alpha(
 			icon->selected ? image->pixbuf_lit : image->pixbuf,
-			widget->window,
+			pi->widget->window,
 			0, 0, 				/* src */
 			x, y,				/* dest */
 			iwidth, iheight,
@@ -813,7 +778,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{
 		gdk_pixbuf_render_to_drawable_alpha(im_symlink->pixbuf,
-				widget->window,
+				pi->widget->window,
 				0, 0, 				/* src */
 				x, y,
 				-1, -1,
@@ -827,7 +792,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 					: im_unmounted;
 					
 		gdk_pixbuf_render_to_drawable_alpha(mp->pixbuf,
-				widget->window,
+				pi->widget->window,
 				0, 0, 				/* src */
 				x, y,
 				-1, -1,
@@ -847,7 +812,11 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 				pi->label->allocation.height);
 	}
 
-	return FALSE;
+	/* Draw children */
+	(parent_class->expose_event)(widget, event);
+
+	/* Stop the button effect */
+	return TRUE;
 }
 
 static gint draw_wink(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
@@ -1958,12 +1927,12 @@ static void reload_backdrop(Pinboard *pinboard,
 	/* Also update root window property (for transparent xterms, etc) */
 	if (style->bg_pixmap[GTK_STATE_NORMAL])
 	{
-		XID xid = GDK_WINDOW_XWINDOW(style->bg_pixmap[GTK_STATE_NORMAL]);
+		XID id = GDK_WINDOW_XWINDOW(style->bg_pixmap[GTK_STATE_NORMAL]);
 		gdk_property_change(gdk_get_default_root_window(),
 				gdk_atom_intern("_XROOTPMAP_ID", FALSE),
 				gdk_atom_intern("PIXMAP", FALSE),
 				32, GDK_PROP_MODE_REPLACE,
-				(guchar *) &xid, 1);
+				(guchar *) &id, 1);
 	}
 	else
 	{
@@ -2100,6 +2069,22 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect)
 	{
 		rect->x = 0;
 		rect->y = 0;
+	}
+}
+
+/* Icon's size, shape or appearance has changed - update the display */
+static void pinboard_reshape_icon(Icon *icon)
+{
+	PinIcon	*pi = (PinIcon *) icon;
+	int	x = pi->x, y = pi->y;
+
+	set_size_and_style(pi);
+	offset_from_centre(pi, &x, &y);
+
+	if (pi->win->allocation.x != x || pi->win->allocation.y != y)
+	{
+		fixed_move_fast(GTK_FIXED(current_pinboard->fixed),
+				pi->win, x, y);
 	}
 }
 
