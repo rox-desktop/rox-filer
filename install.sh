@@ -6,6 +6,21 @@ die() {
 	exit 1
 }
 
+get_dir() {
+	while [ 1 -eq 1 ]; do
+		printf "[$1] >>> "
+		read DIR
+
+		case "$DIR" in
+			/*) return;;
+			?*) echo "The path must start with a \`/'";;
+			*) DIR="$1"
+			   echo OK, using default value.
+			   return;;
+		esac
+	done
+}
+
 # Create the directory if it doesn't exist. Exit if it can't be created.
 endir() {
 	if [ ! -d "$1" ]; then
@@ -17,7 +32,7 @@ confirm_or_die() {
 	while [ 1 -eq 1 ]; do
 		printf "[yes/no] >>> "
 		read CONFIRM
-		case $CONFIRM in
+		case "$CONFIRM" in
 			[yY]*) return;;
 			[nN]*) die "OK.";;
 		esac
@@ -50,12 +65,12 @@ cat << EOF
 Where would you like to install the filer?
 Normally, you should choose (1) if you have root access, or (2) if not.
 
-1) /usr/local/apps
-2) ${HOME}/Apps
-3) /usr/apps
-4) Leave it where it is (it'll still work)
+1) Inside /usr/local
+2) Inside my home directory
+3) Inside /usr
+4) Specify paths manually
 
-Enter 1, 2, 3, 4 or a path (starting with /):
+Enter 1, 2, 3 or 4:
 EOF
 printf ">>> "
 
@@ -63,84 +78,84 @@ read REPLY
 echo
 
 case $REPLY in
-	1) APPDIR=/usr/local/apps;;
-	2) APPDIR=${HOME}/Apps;;
-	3) APPDIR=/usr/apps;;
-	4) APPDIR="";;
-	/*) APPDIR="$REPLY";;
+	1) APPDIR=/usr/local/apps
+	   BINDIR=/usr/local/bin
+	   MANDIR=/usr/local/man
+	   ;;
+	2) APPDIR=${HOME}/Apps
+	   BINDIR=${HOME}/bin
+	   MANDIR=""
+	   ;;
+	3) APPDIR=/usr/apps
+	   BINDIR=/usr/bin
+	   MANDIR=/usr/man
+	   ;;
+	4) echo "Where should the ROX-Filer application go?"
+	   get_dir "/usr/local/apps"
+	   APPDIR="$DIR"
+	   echo
+	   echo "Where should the launcher script go?"
+	   get_dir "/usr/local/bin"
+	   BINDIR="$DIR"
+	   echo
+	   echo "Where should the manual page go?"
+	   get_dir "/usr/local/man"
+	   MANDIR="$DIR"
+	   ;;
 	*) die "Invalid choice!";;
 esac
-
-if [ -n "$APPDIR" ]; then
-	endir "$APPDIR"
-
-	(cd ROX-Filer/src; make clean) > /dev/null
-	if [ -f "$APPDIR/ROX-Filer" ]; then
-		echo "ROX-Filer is already installed - delete the existing"
-		echo "copy?"
-		confirm_or_die
-		echo Deleting...
-		rm -rf "$APPDIR/ROX-Filer.old"
-	fi
-	cp -r ROX-Filer "$APPDIR"
-else
-	echo "OK, I'll leave it where it is."
-	APPDIR=`pwd`
-fi
 
 cat << EOF
 
+The application directory will be:
+	$APPDIR/ROX-Filer
 
-Where would you like to install the 'rox' script, which is used to run
-the filer?
+The launcher script will be:
+	$BINDIR/rox
 
-1) /usr/local/bin
-2) ${HOME}/bin
-3) /usr/bin
-4) I don't want to install it
+The manual page will be:
+	$MANDIR/man1/rox.1
 
-Enter 1, 2, 3, 4 or a path (starting with /):
+OK?
 EOF
-
-printf ">>> "
-read REPLY
+confirm_or_die
 echo
 
-case $REPLY in
-	1) BINDIR=/usr/local/bin;;
-	2) BINDIR=${HOME}/bin;;
-	3) BINDIR=/usr/bin;;
-	4) BINDIR="";;
-	/*) BINDIR="$REPLY";;
-	*) die "Invalid choice!";;
-esac
+echo "Installing manpage..."
+endir "$MANDIR"
+endir "$MANDIR/man1"
+cp rox.1 "$MANDIR/man1/rox.1" || die "Can't install manpage!"
 
-if [ -n "$BINDIR" ]; then
-	endir "$BINDIR"
+echo "Installing application..."
+endir "$APPDIR"
 
-	cat > "$BINDIR/rox" << EOF
+(cd ROX-Filer/src; make clean) > /dev/null
+if [ -f "$APPDIR/ROX-Filer" ]; then
+	echo "ROX-Filer is already installed - delete the existing"
+	echo "copy?"
+	confirm_or_die
+	echo Deleting...
+	rm -rf "$APPDIR/ROX-Filer"
+fi
+cp -r ROX-Filer "$APPDIR"
+
+echo "Installing launcher script..."
+endir "$BINDIR"
+
+cat > "$BINDIR/rox" << EOF
 #!/bin/sh
 exec $APPDIR/ROX-Filer/AppRun "\$@"
 EOF
-	[ $? -eq 0 ] || die "Failed to install 'rox' script"
-	chmod a+x "$BINDIR/rox"
+[ $? -eq 0 ] || die "Failed to install 'rox' script"
+chmod a+x "$BINDIR/rox"
 
-	cat << EOF
+cat << EOF
 Script installed. You can run the filer by simply typing 'rox'
 Make sure that $BINDIR is in your PATH though - if it isn't then
 you must use
 	\$ $BINDIR/rox
 to run it instead.
 EOF
-else
-	cat << EOF
-OK, skipping installation of the 'rox' script.
-
-Note: To run the filer in future, you must use:
-
-	\$ $APPDIR/ROX-Filer/AppRun
-EOF
-fi
 
 if [ ! -n "$CHOICESPATH" ]; then
 	CHOICESPATH=${HOME}/Choices:/usr/local/share/Choices:/usr/share/Choices
