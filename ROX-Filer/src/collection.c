@@ -26,8 +26,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <stdlib.h>
 
 #include <gtk/gtk.h>
@@ -46,13 +44,13 @@
 /* Macro to emit the "selection_changed" signal only if allowed */
 #define EMIT_SELECTION_CHANGED(collection, time) \
 	if (!collection->block_selection_changed) \
-		gtk_signal_emit(GTK_OBJECT(collection), \
-				collection_signals[SELECTION_CHANGED], time)
+		g_signal_emit(collection, \
+				collection_signals[SELECTION_CHANGED], 0, time)
 
 enum
 {
-	ARG_0,
-	ARG_VADJUSTMENT
+	PROP_0,
+	PROP_VADJUSTMENT
 };
 
 /* Signals:
@@ -91,7 +89,7 @@ static void clear_area(Collection *collection, GdkRectangle *area);
 static void draw_one_item(Collection 	*collection,
 			  int 		item,
 			  GdkRectangle 	*area);
-static void collection_class_init(gpointer gclass, gpointer data);
+static void collection_class_init(GObjectClass *gclass, gpointer data);
 static void collection_init(GTypeInstance *object, gpointer g_class);
 static void collection_destroy(GtkObject *object);
 static void collection_finalize(GtkObject *object);
@@ -105,12 +103,14 @@ static void collection_size_allocate(GtkWidget 		*widget,
 			     GtkAllocation 	*allocation);
 static void collection_set_adjustment(Collection 	*collection,
 				      GtkAdjustment 	*vadj);
-static void collection_set_arg(	GtkObject *object,
-				GtkArg    *arg,
-				guint     arg_id);
-static void collection_get_arg(	GtkObject *object,
-				GtkArg    *arg,
-				guint     arg_id);
+static void collection_get_property(GObject    *object,
+				    guint      prop_id,
+				    GValue     *value,
+				    GParamSpec *pspec);
+static void collection_set_property(GObject      *object,
+				    guint        prop_id,
+				    const GValue *value,
+				    GParamSpec   *pspec);
 static gint collection_expose(GtkWidget *widget, GdkEventExpose *event);
 static void default_draw_item(GtkWidget *widget,
 				CollectionItem *data,
@@ -180,7 +180,7 @@ GType collection_get_type(void)
 			sizeof(CollectionClass),
 			NULL,			/* base_init */
 			NULL,			/* base_finalise */
-			collection_class_init,
+			(GClassInitFunc) collection_class_init,
 			NULL,			/* class_finalise */
 			NULL,			/* class_data */
 			sizeof(Collection),
@@ -197,24 +197,17 @@ GType collection_get_type(void)
 
 typedef void (*FinalizeFn)(GObject *object);
 
-static void collection_class_init(gpointer gclass, gpointer data)
+static void collection_class_init(GObjectClass *gclass, gpointer data)
 {
 	CollectionClass *collection_class = (CollectionClass *) gclass;
 	GtkObjectClass *object_class = (GtkObjectClass *) gclass;
 	GtkWidgetClass *widget_class = (GtkWidgetClass *) gclass;
-	GtkType	       type;
 
 	parent_class = gtk_type_class(gtk_widget_get_type());
-
-	gtk_object_add_arg_type("Collection::vadjustment",
-			GTK_TYPE_ADJUSTMENT,
-			GTK_ARG_READWRITE | GTK_ARG_CONSTRUCT,
-			ARG_VADJUSTMENT);
 
 	object_class->destroy = collection_destroy;
 	G_OBJECT_CLASS(object_class)->finalize =
 		(FinalizeFn) collection_finalize;
-	type = GTK_CLASS_TYPE(object_class);
 
 	widget_class->realize = collection_realize;
 	widget_class->expose_event = collection_expose;
@@ -231,38 +224,51 @@ static void collection_class_init(gpointer gclass, gpointer data)
 	widget_class->style_set = collection_set_style; /* XXX: Test for 2.0 */
 #endif
 	
-	object_class->set_arg = collection_set_arg;
-	object_class->get_arg = collection_get_arg;
+	gclass->set_property = collection_set_property;
+	gclass->get_property = collection_get_property;
 
 	collection_class->gain_selection = NULL;
 	collection_class->lose_selection = NULL;
 	collection_class->selection_changed = NULL;
 
-	collection_signals[GAIN_SELECTION] = gtk_signal_new("gain_selection",
-				     GTK_RUN_LAST,
-				     type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     gain_selection),
-				     gtk_marshal_NONE__INT,
-				     GTK_TYPE_NONE, 1,
-				     GTK_TYPE_INT);
-	collection_signals[LOSE_SELECTION] = gtk_signal_new("lose_selection",
-				     GTK_RUN_LAST,
-				     type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     lose_selection),
-				     gtk_marshal_NONE__INT,
-				     GTK_TYPE_NONE, 1,
-				     GTK_TYPE_INT);
-	collection_signals[SELECTION_CHANGED] = gtk_signal_new(
-				     "selection_changed",
-				     GTK_RUN_LAST,
-				     type,
-				     GTK_SIGNAL_OFFSET(CollectionClass,
-						     selection_changed),
-				     gtk_marshal_NONE__INT,
-				     GTK_TYPE_NONE, 1,
-				     GTK_TYPE_INT);
+	collection_signals[GAIN_SELECTION] = g_signal_new("gain_selection",
+					G_TYPE_FROM_CLASS(gclass),
+					G_SIGNAL_RUN_LAST,
+					G_STRUCT_OFFSET(CollectionClass,
+							gain_selection),
+					NULL, NULL,
+					g_cclosure_marshal_VOID__INT,
+					G_TYPE_NONE, 1,
+					G_TYPE_INT);
+
+	collection_signals[LOSE_SELECTION] = g_signal_new("lose_selection",
+					G_TYPE_FROM_CLASS(gclass),
+					G_SIGNAL_RUN_LAST,
+					G_STRUCT_OFFSET(CollectionClass,
+							lose_selection),
+					NULL, NULL,
+					g_cclosure_marshal_VOID__INT,
+					G_TYPE_NONE, 1,
+					G_TYPE_INT);
+
+	collection_signals[SELECTION_CHANGED] = g_signal_new(
+					"selection_changed",
+					G_TYPE_FROM_CLASS(gclass),
+					G_SIGNAL_RUN_LAST,
+					G_STRUCT_OFFSET(CollectionClass,
+							selection_changed),
+					NULL, NULL,
+					g_cclosure_marshal_VOID__INT,
+					G_TYPE_NONE, 1,
+					G_TYPE_INT);
+
+	g_object_class_install_property(gclass,
+		PROP_VADJUSTMENT,
+		g_param_spec_object("vadjustment",
+			_("Vertical Adjustment"),
+			_("The GtkAdjustment for the vertical position."),
+			GTK_TYPE_ADJUSTMENT,
+			G_PARAM_READWRITE | G_PARAM_CONSTRUCT));
 }
 
 static void collection_init(GTypeInstance *instance, gpointer g_class)
@@ -333,7 +339,7 @@ void collection_set_functions(Collection *collection,
 	collection->cb_user_data = user_data;
 
 	if (GTK_WIDGET_REALIZED(widget))
-		gtk_widget_queue_clear(widget);
+		gtk_widget_queue_draw(widget);
 }
 
 /* After this we are unusable, but our data (if any) is still hanging around.
@@ -364,7 +370,7 @@ static void collection_destroy(GtkObject *object)
 
 	if (collection->vadj)
 	{
-		gtk_object_unref(GTK_OBJECT(collection->vadj));
+		g_object_unref(G_OBJECT(collection->vadj));
 		collection->vadj = NULL;
 	}
 
@@ -720,21 +726,24 @@ static gboolean	default_test_point(Collection *collection,
 	return (f_x * f_x) + (f_y * f_y) <= .25;
 }
 
-static void collection_set_arg(	GtkObject *object,
-				GtkArg    *arg,
-				guint     arg_id)
+static void collection_set_property(GObject      *object,
+				    guint        prop_id,
+				    const GValue *value,
+				    GParamSpec   *pspec)
 {
 	Collection *collection;
 
 	collection = COLLECTION(object);
 
-	switch (arg_id)
+	switch (prop_id)
 	{
-		case ARG_VADJUSTMENT:
+		case PROP_VADJUSTMENT:
 			collection_set_adjustment(collection,
-					GTK_VALUE_POINTER(*arg));
+						  g_value_get_object(value));
 			break;
 		default:
+			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,
+							  prop_id, pspec);
 			break;
 	}
 }
@@ -748,32 +757,34 @@ static void collection_set_adjustment(Collection    *collection,
 		vadj = GTK_ADJUSTMENT(gtk_adjustment_new(0.0,
 							 0.0, 0.0,
 							 0.0, 0.0, 0.0));
-	if (collection->vadj && (collection->vadj != vadj))
-		gtk_object_unref(GTK_OBJECT(collection->vadj));
+	if (collection->vadj == vadj)
+		return;
 
-	if (collection->vadj != vadj)
-	{
-		collection->vadj = vadj;
-		gtk_object_ref(GTK_OBJECT(collection->vadj));
-		gtk_object_sink(GTK_OBJECT(collection->vadj));
-	}
+	if (collection->vadj)
+		g_object_unref(G_OBJECT(collection->vadj));
+
+	collection->vadj = vadj;
+	g_object_ref(G_OBJECT(collection->vadj));
+	gtk_object_sink(GTK_OBJECT(collection->vadj));
 }
 
-static void collection_get_arg(	GtkObject *object,
-				GtkArg    *arg,
-				guint     arg_id)
+static void collection_get_property(GObject    *object,
+				    guint      prop_id,
+				    GValue     *value,
+				    GParamSpec *pspec)
 {
 	Collection *collection;
 
 	collection = COLLECTION(object);
 
-	switch (arg_id)
+	switch (prop_id)
 	{
-		case ARG_VADJUSTMENT:
-			GTK_VALUE_POINTER(*arg) = collection->vadj;
+		case PROP_VADJUSTMENT:
+			g_value_set_object(value, G_OBJECT(collection->vadj));
 			break;
 		default:
-			arg->type = GTK_TYPE_INVALID;
+			G_OBJECT_WARN_INVALID_PROPERTY_ID(object,
+							  prop_id, pspec);
 			break;
 	}
 }
@@ -1040,12 +1051,12 @@ static void collection_process_area(Collection	 *collection,
 
 out:
 	if (collection->number_selected && !old_selected)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[GAIN_SELECTION],
+		g_signal_emit(collection,
+				collection_signals[GAIN_SELECTION], 0,
 				current_event_time);
 	else if (!collection->number_selected && old_selected)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[LOSE_SELECTION],
+		g_signal_emit(collection,
+				collection_signals[LOSE_SELECTION], 0,
 				current_event_time);
 	
 	collection_unblock_selection_changed(collection,
@@ -1311,16 +1322,16 @@ static void collection_item_set_selected(Collection *collection,
 	{
 		collection->number_selected++;
 		if (signal && collection->number_selected == 1)
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[GAIN_SELECTION],
+			g_signal_emit(collection,
+					collection_signals[GAIN_SELECTION], 0,
 					current_event_time);
 	}
 	else
 	{
 		collection->number_selected--;
 		if (signal && collection->number_selected == 0)
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[LOSE_SELECTION],
+			g_signal_emit(collection,
+					collection_signals[LOSE_SELECTION], 0,
 					current_event_time);
 	}
 
@@ -1404,8 +1415,7 @@ void collection_select_all(Collection *collection)
 		collection->number_selected++;
 	}
 
-	gtk_signal_emit(GTK_OBJECT(collection),
-			collection_signals[GAIN_SELECTION],
+	g_signal_emit(collection, collection_signals[GAIN_SELECTION], 0,
 			current_event_time);
 	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
@@ -1437,7 +1447,7 @@ void collection_invert_selection(Collection *collection)
 				      collection->number_selected;
 	
 	/* Have to redraw everything... */
-	gtk_widget_queue_clear(GTK_WIDGET(collection));
+	gtk_widget_queue_draw(GTK_WIDGET(collection));
 	
 	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
@@ -1481,8 +1491,7 @@ void collection_clear_except(Collection *collection, gint item)
 	}
 
 	if (end == 0)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[LOSE_SELECTION],
+		g_signal_emit(collection, collection_signals[LOSE_SELECTION], 0,
 				current_event_time);
 	EMIT_SELECTION_CHANGED(collection, current_event_time);
 }
@@ -1826,8 +1835,8 @@ void collection_delete_if(Collection *collection,
 		if (collection->number_selected && !selected)
 		{
 			/* We've lost all the selected items */
-			gtk_signal_emit(GTK_OBJECT(collection),
-					collection_signals[LOSE_SELECTION],
+			g_signal_emit(collection,
+					collection_signals[LOSE_SELECTION], 0,
 					current_event_time);
 		}
 
@@ -1977,6 +1986,6 @@ void collection_unblock_selection_changed(Collection	*collection,
 	collection->block_selection_changed--;
 
 	if (emit && !collection->block_selection_changed)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[SELECTION_CHANGED], time);
+		g_signal_emit(collection,
+				collection_signals[SELECTION_CHANGED], 0, time);
 }
