@@ -253,13 +253,20 @@ static guchar *get_str(IconWindow *win, GdkAtom atom)
 	gulong nitems;
 	gulong bytes_after;
 	unsigned char *data, *str = NULL;
+	int err, result;
 
-	if (XGetWindowProperty(gdk_display, win->xwindow,
+	gdk_error_trap_push();
+
+	result = XGetWindowProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(atom),
 			0, G_MAXLONG, False,
 			AnyPropertyType,
 			&rtype, &format, &nitems,
-			&bytes_after, &data) == Success && data)
+			&bytes_after, &data);
+
+	err = gdk_error_trap_pop();
+	
+	if (err == Success && result == Success && data)
 	{
 		if (*data)
 			str = g_strdup(data);
