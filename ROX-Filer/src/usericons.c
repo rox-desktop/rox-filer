@@ -54,7 +54,6 @@
 
 #define DELETE_ICON 1
 
-/* Used to index the 'radios' array... */
 #define SET_MEDIA 2
 #define SET_TYPE 1
 #define SET_PATH 0		/* Store in globicons */
@@ -247,12 +246,10 @@ static void dialog_response(GtkWidget *dialog, gint response, gpointer data)
 void icon_set_handler_dialog(DirItem *item, const guchar *path)
 {
 	struct stat	info;
-	guchar		*tmp;
 	GtkDialog	*dialog;
 	GtkWidget	*frame, *hbox, *vbox2;
 	GtkWidget	*entry, *label, *button, *align, *icon;
-	GtkWidget	**radio;
-	GtkRadioButton	*group;
+	Radios		*radios;
 	GtkTargetEntry 	targets[] = {
 		{"text/uri-list", 0, TARGET_URI_LIST},
 	};
@@ -270,67 +267,47 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Set icon"));
 
-	radio = g_new(GtkWidget *, 4);
+	radios = radios_new();
 
-	tmp = g_strdup_printf(_("Set icon for all `%s/<anything>'"),
-			item->mime_type->media_type);
-	radio[SET_MEDIA] = gtk_radio_button_new_with_label(NULL, tmp);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox),
-			radio[SET_MEDIA], FALSE, TRUE, 0);
-	g_free(tmp);
-	group = GTK_RADIO_BUTTON(radio[SET_MEDIA]);
-	gtk_tooltips_set_tip(tooltips, radio[SET_MEDIA],
+	radios_add(radios,
 			_("Use a copy of the image as the default for all "
-			  "files of these MIME types."), NULL);
-
-	tmp = g_strdup_printf(_("Only for the type `%s/%s'"),
+			  "files of these MIME types."), SET_MEDIA,
+			_("Set icon for all `%s/<anything>'"),
+			item->mime_type->media_type);
+	
+	radios_add(radios,
+			_("Use a copy of the image for all files of this MIME "
+			  "type."), SET_TYPE,
+			_("Only for the type `%s/%s'"),
 			item->mime_type->media_type,
 			item->mime_type->subtype);
-	radio[SET_TYPE] = gtk_radio_button_new_with_label_from_widget(group,
-									tmp);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[SET_TYPE],
-			FALSE, TRUE, 0);
-	g_free(tmp);
-	gtk_tooltips_set_tip(tooltips, radio[SET_TYPE],
-			_("Use a copy of the image for all files of this MIME "
-			  "type."), NULL);
 
-	tmp = g_strdup_printf(_("Only for the file `%s'"), path);
-	radio[SET_PATH] = gtk_radio_button_new_with_label_from_widget(group,
-									tmp);
-	gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[SET_PATH],
-			FALSE, TRUE, 0);
-	gtk_tooltips_set_tip(tooltips, radio[SET_PATH],
+	radios_add(radios,
 			_("Add the file and image filenames to your "
 			"personal list. The setting will be lost if the image "
-			"or the file is moved."), NULL);
-	g_free(tmp);
-	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(radio[SET_PATH]), TRUE);
+			"or the file is moved."), SET_PATH,
+			_("Only for the file `%s'"), path);
+
+	radios_set_value(radios, SET_PATH);
 
 	/* If it's a directory, offer to create a .DirIcon */
 	if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
 	{
-		radio[3] = gtk_radio_button_new_with_label_from_widget(
-					group, _("Copy image into directory"));
-		gtk_box_pack_start(GTK_BOX(dialog->vbox), radio[SET_COPY],
-					FALSE, TRUE, 0);
-		gtk_tooltips_set_tip(tooltips, radio[SET_COPY],
+		radios_add(radios,
 			_("Copy the image inside the directory, as "
 			"a hidden file called '.DirIcon'. "
 			"All users will then see the "
 			"icon, and you can move the directory around safely. "
 			"This is usually the best option if you can write to "
-			"the directory."), NULL);
-
+			"the directory."), SET_COPY,
+			_("Copy image into directory"));
 		if (access(path, W_OK) == 0)
-			gtk_toggle_button_set_active(
-					GTK_TOGGLE_BUTTON(radio[SET_COPY]),
-					TRUE);
+			radios_set_value(radios, SET_COPY);
 	}
-	else
-		radio[SET_COPY] = NULL;
 
-	g_object_set_data_full(G_OBJECT(dialog), "radios", radio, g_free);
+	radios_pack(radios, GTK_BOX(dialog->vbox));
+
+	g_object_set_data(G_OBJECT(dialog), "radios", radios);
 	g_object_set_data(G_OBJECT(dialog), "mime_type", item->mime_type);
 
 	frame = gtk_frame_new(NULL);
@@ -520,32 +497,33 @@ static void delete_globicon(const gchar *path)
 static void do_set_icon(GtkWidget *dialog, const gchar *icon)
 {
 	guchar  *path = NULL;
-	GtkToggleButton **radio;
+	Radios *radios;
+	int op;
 
 	path = g_object_get_data(G_OBJECT(dialog), "pathname");
 	g_return_if_fail(path != NULL);
 
-	radio = g_object_get_data(G_OBJECT(dialog), "radios");
-	g_return_if_fail(radio != NULL);
+	radios = g_object_get_data(G_OBJECT(dialog), "radios");
+	g_return_if_fail(radios != NULL);
 
-	if (gtk_toggle_button_get_active(radio[0]))
+	op = radios_get_value(radios);
+
+	if (op == SET_PATH)
 	{
 		if (!set_icon_path(path, icon))
 			return;
 	}
-	else if (radio[SET_COPY] &&
-			gtk_toggle_button_get_active(radio[SET_COPY]))
+	else if (op == SET_COPY)
 	{
 		if (!create_diricon(path, icon))
 			return;
 	}
 	else
 	{
-		gboolean just_media;
+		gboolean just_media = (op == SET_MEDIA);
 		MIME_type *type;
 		
 		type = g_object_get_data(G_OBJECT(dialog), "mime_type");
-		just_media = gtk_toggle_button_get_active(radio[2]);
 
 		if (!set_icon_for_type(type, icon, just_media))
 			return;
@@ -642,6 +620,8 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 	}
 
 	g_free(target);
+
+	filer_update_all();
 
 	return TRUE;
 }

@@ -19,6 +19,8 @@
 #define WIN_HINTS_SKIP_WINLIST    (1<<1) /* Not in win list */
 #define WIN_HINTS_SKIP_TASKBAR    (1<<2) /* Not on taskbar */
 
+typedef struct _Radios Radios;
+
 extern GdkFont	   	*fixed_font;
 extern gint		screen_width, screen_height;
 
@@ -50,5 +52,12 @@ void tooltip_show(guchar *text);
 void tooltip_prime(GtkFunction callback, GObject *object);
 void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc);
 gboolean confirm(const gchar *message, const gchar *stock, const gchar *action);
+
+Radios *radios_new(void);
+void radios_add(Radios *radios, const gchar *tip, gint value,
+		const gchar *label, ...);
+void radios_pack(Radios *radios, GtkBox *box);
+void radios_set_value(Radios *radios, gint value);
+gint radios_get_value(Radios *radios);
 
 #endif /* _GUI_SUPPORT_H */

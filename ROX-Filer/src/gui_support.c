@@ -783,3 +783,107 @@ gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
 			  GTK_STOCK_CANCEL, NULL,
 			  stock, action) == 1;
 }
+
+struct _Radios {
+	GList *widgets;
+};
+
+/* Create a new set of radio buttons.
+ * Use radios_add to add options, then radios_pack to put them into something.
+ * The radios object will self-destruct with the first widget it contains.
+ */
+Radios *radios_new(void)
+{
+	Radios *radios;
+
+	radios = g_new(Radios, 1);
+
+	radios->widgets = NULL;
+
+	return radios;
+}
+
+static void radios_free(GtkWidget *radio, Radios *radios)
+{
+	g_list_free(radios->widgets);
+	g_free(radios);
+}
+
+void radios_add(Radios *radios, const gchar *tip, gint value,
+		const gchar *label, ...)
+{
+	GtkWidget *radio;
+	GSList *group = NULL;
+	gchar *s;
+	va_list args;
+
+	va_start(args, label);
+	s = g_strdup_vprintf(label, args);
+	va_end(args);
+
+	if (radios->widgets)
+	{
+		GtkRadioButton *first = GTK_RADIO_BUTTON(radios->widgets->data);
+		group = gtk_radio_button_get_group(first);
+	}
+
+	radio = gtk_radio_button_new_with_label(group, s);
+	gtk_widget_show(radio);
+	if (tip)
+		gtk_tooltips_set_tip(tooltips, radio, tip, NULL);
+	if (!group)
+		g_signal_connect(G_OBJECT(radio), "destroy",
+				G_CALLBACK(radios_free), radios);
+
+	radios->widgets = g_list_prepend(radios->widgets, radio);
+	g_object_set_data(G_OBJECT(radio), "rox-radios-value",
+			  GINT_TO_POINTER(value));
+}
+
+void radios_pack(Radios *radios, GtkBox *box)
+{
+	GList *next;
+
+	for (next = g_list_last(radios->widgets); next; next = next->prev)
+		gtk_box_pack_start(box, GTK_WIDGET(next->data), FALSE, TRUE, 0);
+}
+
+void radios_set_value(Radios *radios, gint value)
+{
+	GList *next;
+
+	for (next = radios->widgets; next; next = next->next)
+	{
+		GtkToggleButton *radio = GTK_TOGGLE_BUTTON(next->data);
+		int radio_value;
+
+		radio_value = GPOINTER_TO_INT(g_object_get_data(G_OBJECT(radio),
+						"rox-radios-value"));
+		
+		if (radio_value == value)
+		{
+			gtk_toggle_button_set_active(radio, TRUE);
+			return;
+		}
+	}
+
+	g_warning("Value %d not in radio group!", value);
+}
+
+gint radios_get_value(Radios *radios)
+{
+	GList *next;
+
+	for (next = radios->widgets; next; next = next->next)
+	{
+		GtkToggleButton *radio = GTK_TOGGLE_BUTTON(next->data);
+
+		if (gtk_toggle_button_get_active(radio))
+			return GPOINTER_TO_INT(g_object_get_data(
+					G_OBJECT(radio), "rox-radios-value"));
+	}
+
+	g_warning("Nothing in the radio group is selected!");
+
+	return -1;
+}
