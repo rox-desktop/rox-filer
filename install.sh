@@ -28,14 +28,14 @@ function confirm_or_die () {
 	done
 }
 
-# Installs an executable file in Choices if it isn't there already.
+# Installs a file in Choices if it isn't there already.
 function install_if_missing () {
 	dest="$CHOICES/$1"
 	if [ -e "$CHOICES/$1" ]; then
 		echo "'$dest' already exists - skipping..."
 	else
 		echo "Installing '$dest'"
-		install -m 755 "Choices/$1" $dest
+		cp "Choices/$1" $dest
 	fi
 }
 
@@ -116,7 +116,7 @@ endir "$CHOICES/MIME-info"
 endir "$CHOICES/MIME-types"
 
 echo "Installing icons..."
-install -m 644 Choices/MIME-icons/* "$CHOICES/MIME-icons"
+cp Choices/MIME-icons/* "$CHOICES/MIME-icons"
 
 echo
 echo "Installing handlers..."
@@ -124,7 +124,7 @@ install_if_missing MIME-types/application_postscript
 install_if_missing MIME-types/text
 
 echo "Installing rules for guessing MIME types."
-install -m 644 Choices/MIME-info/Standard "$CHOICES/MIME-info"
+cp Choices/MIME-info/Standard "$CHOICES/MIME-info"
 
 cat << EOF
 
