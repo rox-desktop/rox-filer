@@ -809,7 +809,7 @@ void add_default_styles(void)
 /* Return the (first) child of this node with the given name.
  * NULL if not found.
  */
-xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name)
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
 {
 	for (node = node->xmlChildrenNode; node; node = node->next)
 	{
@@ -831,6 +831,26 @@ xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name)
 	}
 
 	return NULL;
+}
+
+/*
+ * Interperet text as a boolean value.  Return defvalue if we don't
+ * recognise it
+ */
+int text_to_boolean(const char *text, int defvalue)
+{
+	if(g_strcasecmp(text, "true")==0)
+	        return TRUE;
+	else if(g_strcasecmp(text, "false")==0)
+	        return FALSE;
+	else if(g_strcasecmp(text, "yes")==0)
+	        return TRUE;
+	else if(g_strcasecmp(text, "no")==0)
+	        return FALSE;
+	else if(isdigit(text[0]))
+	        return !!atoi(text);
+
+	return defvalue;
 }
 
 void set_to_null(gpointer *data)
@@ -858,6 +878,28 @@ int save_xml_file(xmlDocPtr doc, gchar *filename)
 #endif
 
 	return 0;
+}
+
+/* Create a new SOAP message and return the document and the (empty)
+ * body node.
+ */
+xmlDocPtr soap_new(xmlNodePtr *ret_body)
+{
+	xmlDocPtr  doc;
+	xmlNodePtr root;
+	xmlNs	   *env_ns;
+
+	doc = xmlNewDoc("1.0");
+	root = xmlNewDocNode(doc, NULL, "Envelope", NULL);
+	xmlDocSetRootElement(doc, root);
+	
+	env_ns = xmlNewNs(root, SOAP_ENV_NS, "env");
+	xmlSetNs(root, env_ns);
+
+	*ret_body = xmlNewTextChild(root, env_ns, "Body", NULL);
+	xmlNewNs(*ret_body, ROX_NS, "rox");
+
+	return doc;
 }
 
 /* Return the pathname that this symlink points to.

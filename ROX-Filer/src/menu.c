@@ -64,7 +64,7 @@ typedef enum menu_icon_style {
   MIS_DEFAULT
 } MenuIconStyle;
 
-typedef void (*ActionFn)(GList *paths, char *dest_dir, char *leaf);
+typedef void (*ActionFn)(GList *paths, char *dest_dir, char *leaf, int quiet);
 typedef void MenuCallback(GtkWidget *widget, gpointer data);
 
 GtkAccelGroup	*filer_keys;
@@ -1070,7 +1070,7 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 	}
 
 	local_paths = g_list_append(NULL, current);
-	action(local_paths, new_dir, leaf);
+	action(local_paths, new_dir, leaf, -1);
 	g_list_free(local_paths);
 
 	g_free(new_dir);
@@ -1498,7 +1498,7 @@ static gboolean new_file_type_cb(guchar *initial, guchar *path)
 	leaf = g_basename(path);
 	paths = g_list_append(NULL, templ);
 
-	action_copy(paths, dest, leaf);
+	action_copy(paths, dest, leaf, -1);
 
 	g_list_free(paths);
 	g_free(dest);

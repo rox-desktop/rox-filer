@@ -805,7 +805,9 @@ static void destroy_action_window(GtkWidget *widget, gpointer data)
  *
  * If autoq then automatically selects 'Quiet'.
  */
-static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
+static GUIside *start_action_with_options(gpointer data, ActionChild *func,
+					  gboolean autoq,
+					  int force, int brief, int recurse)
 {
 	int		filedes[4];	/* 0 and 2 are for reading */
 	GUIside		*gui_side;
@@ -827,9 +829,9 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 		return NULL;
 	}
 
-	o_force = option_get_int("action_force");
-	o_brief = option_get_int("action_brief");
-	o_recurse = option_get_int("action_recurse");
+	o_force = force;
+	o_brief = brief;
+	o_recurse = recurse;
 
 	child = fork();
 	switch (child)
@@ -933,6 +935,14 @@ static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
 						gui_side);
 
 	return gui_side;
+}
+
+static GUIside *start_action(gpointer data, ActionChild *func, gboolean autoq)
+{
+	return start_action_with_options(data, func, autoq,
+					 option_get_int("action_force"),
+					 option_get_int("action_brief"),
+					 option_get_int("action_recurse"));
 }
 
 /* 			ACTIONS ON ONE ITEM 			*/
@@ -1536,17 +1546,10 @@ static gboolean do_move(char *path, char *dest)
 static gboolean do_link(char *path, char *dest)
 {
 	char		*dest_path;
-	char		*leaf;
 
 	check_flags();
 
-	leaf = strrchr(path, '/');
-	if (!leaf)
-		leaf = path;		/* Error? */
-	else
-		leaf++;
-
-	dest_path = make_path(dest, leaf)->str;
+	dest_path = make_dest_path(path, dest);
 
 	if (quiet)
 	{
@@ -1962,15 +1965,18 @@ void action_usage(FilerWindow *filer_window)
 /* Mount/unmount listed items (paths).
  * Free the list after this function returns.
  * If open_dir is TRUE and the dir is successfully mounted, open it.
+ * quiet can be -1 for default.
  */
-void action_mount(GList	*paths, gboolean open_dir)
+void action_mount(GList	*paths, gboolean open_dir, int quiet)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
 
+	if (quiet == -1)
+	 	quiet = option_get_int("action_mount");
+
 	mount_open_dir = open_dir;
-	gui_side = start_action(paths, mount_cb,
-					option_get_int("action_mount"));
+	gui_side = start_action(paths, mount_cb, quiet);
 	if (!gui_side)
 		return;
 
@@ -2094,15 +2100,20 @@ void action_chmod(FilerWindow *filer_window)
 	gtk_widget_show_all(gui_side->window);
 }
 
-/* If leaf is NULL then the copy has the same name as the original */
-void action_copy(GList *paths, char *dest, char *leaf)
+/* If leaf is NULL then the copy has the same name as the original.
+ * quiet can be -1 for default.
+ */
+void action_copy(GList *paths, char *dest, char *leaf, int quiet)
 {
 	GUIside		*gui_side;
+
+	if (quiet == -1)
+		quiet = option_get_int("action_copy");
 
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_copy;
-	gui_side = start_action(paths, list_cb, option_get_int("action_copy"));
+	gui_side = start_action(paths, list_cb, quiet);
 	if (!gui_side)
 		return;
 
@@ -2111,15 +2122,20 @@ void action_copy(GList *paths, char *dest, char *leaf)
 	gtk_widget_show_all(gui_side->window);
 }
 
-/* If leaf is NULL then the file is not renamed */
-void action_move(GList *paths, char *dest, char *leaf)
+/* If leaf is NULL then the file is not renamed.
+ * quiet can be -1 for default.
+ */
+void action_move(GList *paths, char *dest, char *leaf, int quiet)
 {
 	GUIside		*gui_side;
+
+	if (quiet == -1)
+		quiet = option_get_int("action_move");
 
 	action_dest = dest;
 	action_leaf = leaf;
 	action_do_func = do_move;
-	gui_side = start_action(paths, list_cb, option_get_int("action_move"));
+	gui_side = start_action(paths, list_cb, quiet);
 	if (!gui_side)
 		return;
 
@@ -2128,11 +2144,14 @@ void action_move(GList *paths, char *dest, char *leaf)
 	gtk_widget_show_all(gui_side->window);
 }
 
-void action_link(GList *paths, char *dest)
+/* If leaf is NULL then the link will have the same name */
+/* XXX: No quiet option here? */
+void action_link(GList *paths, char *dest, char *leaf)
 {
 	GUIside		*gui_side;
 
 	action_dest = dest;
+	action_leaf = leaf;
 	action_do_func = do_link;
 	gui_side = start_action(paths, list_cb, option_get_int("action_link"));
 	if (!gui_side)

@@ -1041,11 +1041,11 @@ static void got_uri_list(GtkWidget 		*widget,
 		else if (context->action == GDK_ACTION_ASK)
 			prompt_action(local_paths, dest_path);
 		else if (context->action == GDK_ACTION_MOVE)
-			action_move(local_paths, dest_path, NULL);
+			action_move(local_paths, dest_path, NULL, -1);
 		else if (context->action == GDK_ACTION_COPY)
-			action_copy(local_paths, dest_path, NULL);
+			action_copy(local_paths, dest_path, NULL, -1);
 		else if (context->action == GDK_ACTION_LINK)
-			action_link(local_paths, dest_path);
+			action_link(local_paths, dest_path, NULL);
 		else
 			error = _("Unknown action requested");
 
@@ -1075,11 +1075,11 @@ static void got_uri_list(GtkWidget 		*widget,
 static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
 {
 	if (action == MENU_MOVE)
-		action_move(prompt_local_paths, prompt_dest_path, NULL);
+		action_move(prompt_local_paths, prompt_dest_path, NULL, -1);
 	else if (action == MENU_COPY)
-		action_copy(prompt_local_paths, prompt_dest_path, NULL);
+		action_copy(prompt_local_paths, prompt_dest_path, NULL, -1);
 	else if (action == MENU_LINK)
-		action_link(prompt_local_paths, prompt_dest_path);
+		action_link(prompt_local_paths, prompt_dest_path, NULL);
 	else if (action == MENU_SET_ICON)
 	{
 		if (g_list_length(prompt_local_paths) == 1)

@@ -163,7 +163,6 @@ static gboolean child_died_flag = FALSE;
 
 /* Static prototypes */
 static void show_features(void);
-static xmlDocPtr soap_new(xmlNodePtr *ret_body);
 static void soap_add(xmlNodePtr body,
 			   xmlChar *function,
 			   xmlChar *arg1_name, xmlChar *arg1_value,
@@ -187,7 +186,7 @@ int main(int argc, char **argv)
 	guchar		*tmp, *dir, *slash;
 	gchar *client_id = NULL;
 	gboolean	show_user = FALSE;
-	xmlDocPtr	rpc, soap_rpc = NULL;
+	xmlDocPtr	rpc, soap_rpc = NULL, reply;
 	xmlNodePtr	body;
 
 	home_dir = g_get_home_dir();
@@ -461,8 +460,13 @@ int main(int argc, char **argv)
 	session_init(client_id);
 	g_free(client_id);
 		
-	run_soap(rpc);
+	reply = run_soap(rpc);
 	xmlFreeDoc(rpc);
+	if (reply)
+	{
+		save_xml_file(reply, "-");
+		xmlFreeDoc(reply);
+	}
 
 	if (number_of_windows > 0)
 		gtk_main();
@@ -499,28 +503,6 @@ static void show_features(void)
 		_("No (couldn't find a valid libvfs)")
 #endif
 		);
-}
-
-/* Create a new SOAP message and return the document and the (empty)
- * body node.
- */
-static xmlDocPtr soap_new(xmlNodePtr *ret_body)
-{
-	xmlDocPtr  doc;
-	xmlNodePtr root;
-	xmlNs	   *env_ns;
-
-	doc = xmlNewDoc("1.0");
-	root = xmlNewDocNode(doc, NULL, "Envelope", NULL);
-	xmlDocSetRootElement(doc, root);
-	
-	env_ns = xmlNewNs(root, SOAP_ENV_NS, "env");
-	xmlSetNs(root, env_ns);
-
-	*ret_body = xmlNewTextChild(root, env_ns, "Body", NULL);
-	xmlNewNs(*ret_body, ROX_NS, "rox");
-
-	return doc;
 }
 
 static void soap_add(xmlNodePtr body,

@@ -592,7 +592,7 @@ static gboolean set_icon_for_type(const MIME_type *type, gchar *iconpath,
 	dir = g_dirname(target);
 	paths = g_list_append(NULL, iconpath);
 
-	action_copy(paths, dir, leaf);
+	action_copy(paths, dir, leaf, -1);
 
 	g_free(leaf);
 	g_free(dir);

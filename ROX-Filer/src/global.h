@@ -17,6 +17,9 @@
 
 #define SOAP_ENV_NS "http://www.w3.org/2001/06/soap-envelope"
 
+/* For debugging... */
+#define SHOW(var) (g_print("[ " #var " = '%s' ]\n", var))
+
 /* We typedef various pointers here to avoid creating unnecessary
  * dependencies on the other header files.
  */

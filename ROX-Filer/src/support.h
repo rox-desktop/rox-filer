@@ -37,9 +37,11 @@ gboolean in_list(guchar *item, guchar *list);
 GPtrArray *split_path(guchar *path);
 guchar *get_relative_path(guchar *from, guchar *to);
 void add_default_styles(void);
-xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name);
+xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name);
+int text_to_boolean(const char *text, int defvalue);
 void set_to_null(gpointer *data);
 int save_xml_file(xmlDocPtr doc, gchar *filename);
 char *readlink_dup(char *path);
+xmlDocPtr soap_new(xmlNodePtr *ret_body);
 
 #endif /* _SUPPORT_H */

@@ -194,7 +194,7 @@ void pinboard_activate(guchar *name)
 	guchar		*path, *slash;
 
 	/* Treat an empty name the same as NULL */
-	if (!*name)
+	if (name && !*name)
 		name = NULL;
 
 	if (old_board)
