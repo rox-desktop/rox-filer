@@ -526,7 +526,7 @@ static GList *menu_from_dir(GtkWidget *menu, const gchar *dir_name,
 
 			sub = gtk_menu_new();
 			new_widgets = menu_from_dir(sub, fname, style, func,
-						separator, strip_ext, FALSE);
+						separator, strip_ext, TRUE);
 			g_list_free(new_widgets);
 			gtk_menu_item_set_submenu(GTK_MENU_ITEM(item), sub);
 		}
