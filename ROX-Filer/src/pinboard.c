@@ -516,6 +516,9 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	int		iheight = PIXMAP_HEIGHT(image->pixmap);
 	DirItem		*item = &icon->item;
 	int		text_x, text_y;
+#ifndef GTK2
+	GdkFont		*font;
+#endif
 
 	if (!pinicon_style)
 	{
@@ -527,7 +530,11 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	}
 	gtk_widget_set_style(icon->widget, pinicon_style);
 
-#ifdef GTK2
+#ifndef GTK2
+	font = pinicon_style->font;
+	font_height = font->ascent + font->descent;
+	item->name_width = gdk_string_width(font, item->leafname);
+#else
 	{
 		PangoRectangle logical;
 		pango_layout_set_text(icon->layout, icon->item.leafname, -1);
@@ -535,13 +542,6 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 		item->name_width = logical.width - logical.x;
 		font_height = logical.height - logical.y;
-	}
-#else
-	{
-		GdkFont		*font;
-		font = pinicon_style->font;
-		font_height = font->ascent + font->descent;
-		item->name_width = gdk_string_width(font, item->leafname);
 	}
 #endif
 
