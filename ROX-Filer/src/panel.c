@@ -54,6 +54,9 @@
 /* The width of the separator at the inner edge of the panel */
 #define EDGE_WIDTH 2
 
+/* The gap between panel icons */
+#define PANEL_ICON_SPACING 8
+
 Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
 /* NULL => Not loading a panel */
@@ -563,7 +566,12 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 	im_height = MIN(icon->item->image->height, ICON_HEIGHT);
 
 	req->height += im_height;
-	req->width = MAX(req->width, im_width) + 8;
+	req->width = MAX(req->width, im_width);
+
+	if (icon->panel->side == PANEL_LEFT || icon->panel->side == PANEL_RIGHT)
+		req->height += PANEL_ICON_SPACING;
+	else
+		req->width += PANEL_ICON_SPACING;
 }
 
 static gint expose_icon(GtkWidget *widget,
