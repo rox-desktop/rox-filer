@@ -121,7 +121,7 @@ static void create_menu(void);
 
 enum {
 	ACTION_SHIFT,
-	ACTION_INFO,
+	ACTION_PROPERTIES,
 	ACTION_RUN_ACTION,
 	ACTION_SET_ICON,
 	ACTION_EDIT,
@@ -140,7 +140,7 @@ static GtkItemFactoryEntry menu_def[] = {
 {">" N_("Home Directory"),	NULL, open_home, 0, "<StockItem>", GTK_STOCK_HOME},
 {N_("File"),			NULL, NULL, 0, "<Branch>"},
 {">" N_("Shift Open"),   	NULL, file_op, ACTION_SHIFT, NULL},
-{">" N_("Info"),    		NULL, file_op, ACTION_INFO, "<StockItem>", GTK_STOCK_DIALOG_INFO},
+{">" N_("Properties"),    	NULL, file_op, ACTION_PROPERTIES, "<StockItem>", GTK_STOCK_PROPERTIES},
 {">" N_("Set Run Action..."),	NULL, file_op, ACTION_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
 {">" N_("Set Icon..."),		NULL, file_op, ACTION_SET_ICON, NULL},
 {N_("Edit Item"),  		NULL, file_op, ACTION_EDIT, "<StockItem>", GTK_STOCK_PROPERTIES},
@@ -608,7 +608,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 		case ACTION_LOCATION:
 			open_to_show(menu_icon->path);
 			break;
-		case ACTION_INFO:
+		case ACTION_PROPERTIES:
 			infobox_new(menu_icon->path);
 			break;
 		case ACTION_RUN_ACTION:

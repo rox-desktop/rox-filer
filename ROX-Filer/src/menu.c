@@ -66,7 +66,7 @@ typedef enum {
 	FILE_RENAME_ITEM,
 	FILE_LINK_ITEM,
 	FILE_OPEN_FILE,
-	FILE_SHOW_FILE_INFO,
+	FILE_PROPERTIES,
 	FILE_RUN_ACTION,
 	FILE_SET_ICON,
 	FILE_SEND_TO,
@@ -206,7 +206,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Set Run Action..."),	NULL, file_op, FILE_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
 {">" N_("Set Icon..."),		NULL, file_op, FILE_SET_ICON, NULL},
-{">" N_("Info"),		NULL, file_op, FILE_SHOW_FILE_INFO, "<StockItem>", GTK_STOCK_DIALOG_INFO},
+{">" N_("Properties"),		NULL, file_op, FILE_PROPERTIES, "<StockItem>", GTK_STOCK_PROPERTIES},
 {">" N_("Count"),		NULL, file_op, FILE_USAGE, NULL},
 {">" N_("Permissions"),		NULL, file_op, FILE_CHMOD_ITEMS, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
@@ -1738,8 +1738,8 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			case FILE_OPEN_FILE:
 				prompt = _("Shift Open ... ?");
 				break;
-			case FILE_SHOW_FILE_INFO:
-				prompt = _("Examine ... ?");
+			case FILE_PROPERTIES:
+				prompt = _("Properties of ... ?");
 				break;
 			case FILE_RUN_ACTION:
 				prompt = _("Set run action for ... ?");
@@ -1791,7 +1791,7 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 		case FILE_FIND:
 			find(window_with_focus);
 			return;
-		case FILE_SHOW_FILE_INFO:
+		case FILE_PROPERTIES:
 		{
 			GList *items;
 
