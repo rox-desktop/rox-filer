@@ -2,11 +2,7 @@ HELP=../../Help
 RES=../..
 MAN=../../..
 
-all: Manual.valid ${HELP}/Manual.html ${RES}/Structs.png ${RES}/Prune.png \
-	${MAN}/rox.1
-
-${RES}/%.png: %.dia
-	dia --nosplash -e $@ $<
+all: Manual.valid ${HELP}/Manual.html ${MAN}/rox.1
 
 %.valid: %.xml
 	nsgmls -s -wxml /usr/lib/sgml/declaration/xml.decl $<

@@ -78,13 +78,8 @@ struct _GUIside
 	int 		from_child;	/* File descriptor */
 	FILE		*to_child;
 	int 		input_tag;	/* gdk_input_add() */
-#ifdef GTK2
-	GtkTextBuffer	*log;
-	GtkWidget	*log_view;
-#else
 	GtkWidget 	*log;
-#endif
-	GtkWidget 	*vbox, *window, *dir, *log_hbox;
+	GtkWidget 	*vbox, *window, *dir, *log_hbox, *flag_box;
 	GtkWidget	*quiet, *yes, *no, *quiet_flag;
 	int		child;		/* Process ID */
 	int		errors;
@@ -142,8 +137,10 @@ static gboolean send_error();
 static gboolean send_dir(char *dir);
 static gboolean read_exact(int source, char *buffer, ssize_t len);
 static void do_mount(guchar *path, gboolean mount);
-static GtkWidget *add_toggle(GUIside *gui_side, guchar *label, guchar *code,
-			gboolean active);
+static GtkWidget *add_toggle(GUIside *gui_side,
+			     guchar *label, guchar *tip,
+			     guchar *code,
+			     gboolean active);
 static gboolean reply(int fd, gboolean ignore_quiet);
 static gboolean remove_pinned_ok(GList *paths);
 
@@ -420,7 +417,10 @@ static void message_from_child(gpointer 	 data,
 	char buf[5];
 	GUIside	*gui_side = (GUIside *) data;
 #ifdef GTK2
+	GtkTextBuffer *text_buffer;
 	GtkTextIter end;
+
+	text_buffer = gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log));
 #endif
 
 	if (read_exact(source, buf, 4))
@@ -498,13 +498,13 @@ static void message_from_child(gpointer 	 data,
 				gui_side->errors++;
 
 #ifdef GTK2
-			gtk_text_buffer_get_end_iter(gui_side->log, &end);
-			gtk_text_buffer_insert_with_tags_by_name(gui_side->log,
+			gtk_text_buffer_get_end_iter(text_buffer, &end);
+			gtk_text_buffer_insert_with_tags_by_name(text_buffer,
 					&end, buffer + 1, message_len - 1,
 					*buffer == '!' ? "red" : NULL, NULL);
 			/* Causes a crash sometimes!
 			gtk_text_view_scroll_to_iter(
-				GTK_TEXT_VIEW(gui_side->log_view),
+				GTK_TEXT_VIEW(gui_side->log),
 				&end,
 				0.0, FALSE, 0, 0);
 				*/
@@ -541,7 +541,7 @@ static void message_from_child(gpointer 	 data,
 							gui_side->errors);
 
 #ifdef GTK2
-		gtk_text_buffer_insert_at_cursor(gui_side->log, report, -1);
+		gtk_text_buffer_insert_at_cursor(text_buffer, report, -1);
 #else
 		gtk_text_insert(GTK_TEXT(gui_side->log), NULL, &red, NULL,
 				report, -1);
@@ -869,6 +869,9 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	int		child;
 	GtkWidget	*vbox, *button, *scrollbar, *actions, *text;
 	struct sigaction act;
+#ifdef GTK2
+	GtkWidget	*frame;
+#endif
 
 	if (pipe(filedes))
 	{
@@ -950,33 +953,45 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 	gtk_box_pack_start(GTK_BOX(vbox), gui_side->log_hbox, TRUE, TRUE, 4);
 
 #ifdef GTK2
+	frame = gtk_frame_new(NULL);
+	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox), frame, TRUE, TRUE, 0);
+	
 	text = gtk_text_view_new();
-	gui_side->log_view = text;
-	gui_side->log = gtk_text_view_get_buffer(GTK_TEXT_VIEW(text));
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_container_add(GTK_CONTAINER(frame), text);
+
+	gtk_text_view_set_wrap_mode(GTK_TEXT_VIEW(text), GTK_WRAP_WORD);
+	gui_side->log = text;
 	scrollbar = gtk_vscrollbar_new(NULL);
 	gtk_widget_set_scroll_adjustments(text, NULL,
 			gtk_range_get_adjustment(GTK_RANGE(scrollbar)));
-	gtk_text_buffer_create_tag(gui_side->log, "red", "foreground", "red",
+	gtk_text_buffer_create_tag(
+			gtk_text_view_get_buffer(GTK_TEXT_VIEW(gui_side->log)),
+			"red", "foreground", "red",
 			NULL);
 	gtk_text_view_set_editable(GTK_TEXT_VIEW(text), FALSE);
 	gtk_text_view_set_cursor_visible(GTK_TEXT_VIEW(text), FALSE);
 #else
 	text = gui_side->log = gtk_text_new(NULL, NULL);
 	scrollbar = gtk_vscrollbar_new(GTK_TEXT(text)->vadj);
+	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox), text, TRUE, TRUE, 0);
 #endif
 	gtk_widget_set_usize(text, 400, 100);
-	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox), text, TRUE, TRUE, 0);
 
 	gtk_box_pack_start(GTK_BOX(gui_side->log_hbox),
 				scrollbar, FALSE, TRUE, 0);
 
 	actions = gtk_hbox_new(TRUE, 4);
 	gtk_box_pack_start(GTK_BOX(vbox), actions, FALSE, TRUE, 0);
+	gui_side->flag_box = gtk_hbox_new(FALSE, 16);
+	gtk_box_pack_start(GTK_BOX(vbox), gui_side->flag_box, FALSE, TRUE, 2);
 
 	gui_side->quiet = button = gtk_button_new_with_label(_("Quiet"));
-	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
+	gtk_misc_set_padding(GTK_MISC(GTK_BIN(button)->child), 12, 0);
+	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), button, FALSE, TRUE, 0);
 	gtk_signal_connect(GTK_OBJECT(button), "clicked",
 			GTK_SIGNAL_FUNC(quiet_clicked), gui_side);
+
 	gui_side->yes = button = gtk_button_new_with_label(_("Yes"));
 	gtk_object_set_data(GTK_OBJECT(button), "send-code", "Y");
 	gtk_box_pack_start(GTK_BOX(actions), button, TRUE, TRUE, 0);
@@ -999,8 +1014,9 @@ static GUIside *start_action_with_options(gpointer data, ActionChild *func,
 						GDK_INPUT_READ,
 						message_from_child,
 						gui_side);
+
 	gui_side->quiet_flag = add_toggle(gui_side,
-				_("Quiet - don't confirm every operation"),
+				_("Quiet"), _("Don't confirm every operation"),
 				"Q", autoq);
 	gtk_widget_set_sensitive(gui_side->quiet, !autoq);
 
@@ -1900,17 +1916,20 @@ static void list_cb(gpointer data)
 	send();
 }
 
-static GtkWidget *add_toggle(GUIside *gui_side, guchar *label, guchar *code,
+static GtkWidget *add_toggle(GUIside *gui_side,
+			     guchar *label, guchar *tip,
+			     guchar *code,
 			     gboolean active)
 {
 	GtkWidget	*check;
 
 	check = gtk_check_button_new_with_label(label);
+	gtk_tooltips_set_tip(tooltips, check, tip, NULL);
 	gtk_object_set_data(GTK_OBJECT(check), "send-code", code);
 	gtk_toggle_button_set_active(GTK_TOGGLE_BUTTON(check), active);
 	gtk_signal_connect(GTK_OBJECT(check), "clicked",
 			GTK_SIGNAL_FUNC(button_reply), gui_side);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), check, FALSE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(gui_side->flag_box), check, FALSE, TRUE, 0);
 
 	return check;
 }
@@ -2054,10 +2073,10 @@ void action_delete(GList *paths)
 
 	gtk_window_set_title(GTK_WINDOW(gui_side->window), _("Delete"));
 	add_toggle(gui_side,
-		_("Force - don't confirm deletion of non-writeable items"),
+		_("Force"), _("Don't confirm deletion of non-writeable items"),
 		"F", option_get_int("action_force"));
 	add_toggle(gui_side,
-		_("Brief - only log directories being deleted"),
+		_("Brief"), _("Only log directories being deleted"),
 		"B", option_get_int("action_brief"));
 
 	number_of_windows++;
@@ -2100,10 +2119,10 @@ void action_chmod(GList *paths)
 		return;
 
 	add_toggle(gui_side,
-		_("Brief - don't list processed files"),
+		_("Brief"), _("Don't list processed files"),
 		"B", option_get_int("action_brief"));
 	add_toggle(gui_side,
-		_("Recurse - also change contents of subdirectories"),
+		_("Recurse"), _("Also change contents of subdirectories"),
 		"R", option_get_int("action_recurse"));
 
 	hbox = gtk_hbox_new(FALSE, 0);

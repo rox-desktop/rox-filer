@@ -1342,6 +1342,10 @@ void display_update_view(FilerWindow *filer_window,
 	str = details(filer_window, item);
 	if (str)
 	{
+		PangoAttrList	*list;
+		PangoAttribute	*attr;
+		int	perm_offset = -1;
+		
 		view->details = gtk_widget_create_pango_layout(
 					filer_window->window, str);
 		g_free(str);
@@ -1350,6 +1354,23 @@ void display_update_view(FilerWindow *filer_window,
 		pango_layout_get_size(view->details, &w, &h);
 		view->details_width = w / PANGO_SCALE;
 		view->details_height = h / PANGO_SCALE;
+
+		attr = pango_attr_underline_new(PANGO_UNDERLINE_SINGLE);
+
+		if (filer_window->details_type == DETAILS_SUMMARY)
+			perm_offset = 5;
+		else if (filer_window->details_type == DETAILS_PERMISSIONS)
+			perm_offset = 0;
+		if (perm_offset > -1)
+		{
+			perm_offset += 4 * applicable(item->uid, item->gid);
+			attr->start_index = perm_offset;
+			attr->end_index = perm_offset + 3;
+
+			list = pango_attr_list_new();
+			pango_attr_list_insert(list, attr);
+			pango_layout_set_attributes(view->details, list);
+		}
 	}
 #else
 	int	font_height = item_font->ascent + item_font->descent;

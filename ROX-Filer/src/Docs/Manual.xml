@@ -1576,14 +1576,19 @@
  <chapter id="actions">
   <title>Action windows</title>
   <para>
-
    Action windows are those boxes that appear while you're doing a
    Copy/Move/Link/etc operation. The status line at the top of the window shows
    the current directory or object that the window is processing. The scrolling
-   area below is the log area &mdash; it shows what has been done and may display
-   questions here.
+   area below is the log area &mdash; it shows what has been done, and questions
+   may be displayed here.
+   <mediaobject>
+    <imageobject>
+     <imagedata align="center" format="PNG" fileref="../Action.png"/>
+    </imageobject>
+    <textobject><para>Can't display image.</para></textobject>
+   </mediaobject>
    </para><para>
-   At the bottom are four buttons and some options. All windows have the
+   Below this are four buttons and some options. All windows have the
    <guilabel>Quiet</guilabel> option. When this is on the filer will only
    confirm some operations (such as deleting a non-writeable file). Otherwise,
    all operations are confirmed.
@@ -1591,11 +1596,6 @@
    The buttons work as follows:
 
    <variablelist>
-
-    <varlistentry><term><guibutton>Quiet</guibutton></term><listitem><para>
-       is a quick way to turn <guilabel>Quiet</guilabel> on and click
-       <guibutton>Yes</guibutton>.
-    </para></listitem></varlistentry>
 
     <varlistentry><term><guibutton>Yes</guibutton></term><listitem><para>
        answers yes to the question displayed in the log area.
@@ -1609,6 +1609,12 @@
        kills the current operation (if any) and closes the action
        window.
     </para></listitem></varlistentry>
+
+    <varlistentry><term><guibutton>Quiet</guibutton></term><listitem><para>
+       is a quick way to turn <guilabel>Quiet</guilabel> on and click
+       <guibutton>Yes</guibutton>.
+    </para></listitem></varlistentry>
+
 
    </variablelist>
 
@@ -2021,20 +2027,10 @@
     The second looks for <filename>.c</filename> files, but does not bother
     checking inside directories called <filename>src</filename>.
     The expression is evaluated like this:
-
-    <mediaobject>
-     <imageobject>
-      <imagedata align="center" format="PNG" fileref="../Prune.png"/>
-     </imageobject>
-     <textobject>
-      <para>
-       If file is named <filename>src</filename> then `Prune'.
-       Either way, check if it ends in <filename>.c</filename> and include
-       it in the results if so.
-      </para>
-     </textobject>
-    </mediaobject>
-
+    </para><para>
+    If file is named <filename>src</filename> then `Prune'.
+    Either way, check if it ends in <filename>.c</filename> and include
+    it in the results if so.
    </para>
   </sect1>
  </chapter>
@@ -2090,22 +2086,8 @@
    <para>
 
     You can choose which language the filer will display messages in from
-    here. There are also two special choices:
-
-    <itemizedlist>
-
-     <listitem><para>
-       <guimenuitem>None</guimenuitem> causes the untranslated English messages to be
-       used;
-     </para></listitem>
-
-     <listitem><para>
-       <guimenuitem>From LANG</guimenuitem> will use the value of the
-       <envar>LANG</envar> environment variable as the name of the file to load
-       from <filename>ROX-Filer/Messages</filename>.
-     </para></listitem>
-
-    </itemizedlist>
+    here, or get it to read the LANG environment variable to get the desired
+    language.
 
    </para>
   </sect1>
@@ -2121,14 +2103,6 @@
        before <filename>animal</filename>, for example.
      </para></listitem>
 
-     <listitem><para><guilabel>Ignore eXecutable bit for known
-        extensions</guilabel> means that when a file has a known extension (eg
-       <filename>.gif</filename>) the executable bit is ignored. This is useful
-       if you have files on a Windows-type filesystem which are being shown as
-       executable programs. However, it prevents a file such as
-       <filename>script.sh</filename> from being treated as a program.
-     </para></listitem>
-
      <listitem><para><guilabel>Directories always come first</guilabel> means that
        all directories are sorted and displayed at the top, then all the other items
        are sorted and displayed below. With this option off, directories are mixed in
@@ -2140,33 +2114,25 @@
        two lines. In `Huge Icons' mode, the wrap width is 50% larger than this value.
      </para></listitem>
 
-     <listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; as above,
-       but applies when the display is in `Small Icons' display mode.
+     <listitem><para><guilabel>Max Small Icons width</guilabel> &mdash; in
+       `Small Icons' mode, any text longer than this is chopped off (a red bar
+       indicates that some text is not shown). You can hold the mouse over the
+       truncated name to see the full text.
      </para></listitem>
 
      <listitem><para><guilabel>Inherit options from source window</guilabel>
        controls what happens when you open a new window from an existing window
-       (eg, by clicking the middle button over a file). If on, the new window
+       (eg, by clicking the middle button over a directory). If on, the new window
        has the same options (icon size, sort order, etc) as the old window. If
        off, the new window has the default options.</para></listitem>
 
      <listitem><para><guilabel>Default settings for new windows</guilabel>.
-       These correspond to the display styles you can choose from the
+       The remaining options provide the default settings for newly opened
+       windows &mdash; they correspond to choosing styles from the
        <guimenuitem>Display</guimenuitem> menu.
      </para></listitem>
 
-     <listitem><para><guilabel>Colour files based on their types</guilabel>.
-       If on, each file's name is coloured depending on what kind of thing it is
-       (regular file, directory, executable, etc). You can choose the colours from
-       the list below.</para></listitem>
-
     </itemizedlist>
-
-    The remaining options provide the default settings for newly opened
-    windows &mdash; they correspond to choosing styles from the Display menu.
-    Icon size is also used when switching off the details display from
-    the toolbar.
-
    </para>
   </sect1>
 
@@ -2181,11 +2147,19 @@
     background. However, users with more `noisy' backdrops may find such
     text hard to read; selecting <guilabel>Rectangular background slab</guilabel>
     will draw a solid rectangle behind the text to make it easier to read.
-
+    When using Gtk+-2.0, this option has no effect.
+    </para><para>
     You may also change the foreground and background colours used for
     the text by clicking on the colour slabs in the Options window.
 
     <itemizedlist>
+
+     <listitem><para> <guilabel>Single-click to open</guilabel>
+       allows you to open a file or directory just by clicking on it. Hold down
+       <keycap>Control</keycap> to select things. If this is off, clicking selects
+       and double-clicking opens.
+     </para></listitem>
+
      <listitem><para><guilabel>Keep icons within screen limits</guilabel>
        prevents icons from going partly off the side of the screen.
      </para></listitem>
@@ -2294,6 +2268,16 @@
        closes the first.
      </para></listitem>
 
+     <listitem><para> <guilabel>New window on button 1</guilabel> swaps the
+       actions of the two non-menu buttons when opening directories. This is
+       provided for people who are used to the RISC OS mouse bindings.
+     </para></listitem>
+
+     <listitem><para> <guilabel>Single-click navigation in filer windows</guilabel>
+       means that clicking on a file or directory will open it. If off, clicking on
+       files selects them instead &mdash; you must double click on a file to open it.
+     </para></listitem>
+
     </itemizedlist>
 
     The next two options control what happens when you press <keycap>Tab</keycap>
@@ -2341,11 +2325,6 @@
        be saved into the directory being displayed.
      </para></listitem>
 
-     <listitem><para><guilabel>Dragging files with the middle mouse button...</guilabel>
-       you can choose whether this displays a menu (like <keycap>Alt</keycap>
-       dragging) or moves the files (like <keycap>Shift</keycap> dragging).
-     </para></listitem>
-
      <listitem><para><guilabel>Directories spring open</guilabel> controls what
        happens when you hold a file over a directory while dragging it. If on,
        the directory will `spring open' after a short pause, allowing you to
@@ -2359,6 +2338,11 @@
        thousanths of a second, the filer will wait before spring opening a
        directory as described above. If the above option is turned off, then
        this has no effect.
+     </para></listitem>
+
+     <listitem><para><guilabel>Dragging files with the middle mouse button...</guilabel>
+       you can choose whether this displays a menu (like <keycap>Alt</keycap>
+       dragging) or moves the files (like <keycap>Shift</keycap> dragging).
      </para></listitem>
 
     </itemizedlist>
@@ -2382,49 +2366,42 @@
        size of the icons in the <guimenuitem>Send To</guimenuitem> and
        <guimenuitem>New</guimenuitem> menus.</para></listitem>
 
-    </itemizedlist>
-
-   </para>
-  </sect1>
-
-  <sect1>
-   <title>Mouse bindings</title>
-   <para>
-
-    <itemizedlist>
-     <listitem><para> <guilabel>New window on button 1</guilabel> swaps the
-       actions of the two non-menu buttons when opening directories. This is
-       provided for people who are used to the RISC OS mouse bindings.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Menu on button 2</guilabel> swaps the actions
+     <listitem><para><guilabel>Menu on button 2</guilabel> swaps the actions
        of buttons 2 and 3 so that the middle button brings up the menus. This
        is provided for people who are used to the RISC OS mouse bindings.
+       </para><para>
+       As an alternative to using the options window to put menu on button-2,
+       some people prefer to use the command <command>xmodmap -e "pointer
+	= 1 3 2"</command>, which makes the right mouse button button-2 and
+       the middle one button-3 (this affects all programs, not just
+       <application>ROX-Filer</application>).
      </para></listitem>
 
-     <listitem><para> <guilabel>Single-click navigation in filer windows</guilabel>
-       means that clicking on a file or directory will open it. If off, clicking on
-       files selects them instead &mdash; you must double click on a file to open it.
-     </para></listitem>
-
-     <listitem><para> <guilabel>Single-click navigation on the pinboard</guilabel>
-       &mdash; as above, but for pinboard icons.
-     </para></listitem>
     </itemizedlist>
-
-    As an alternative to using the options window to put menu on button-2,
-    some people prefer to use the command <command>xmodmap -e "pointer
-     = 1 3 2"</command>, which makes the right mouse button button-2 and
-    the middle one button-3 (this affects all programs, not just
-    <application>ROX-Filer</application>).
-
    </para>
   </sect1>
 
   <sect1>
    <title>Types</title>
    <para>
-    The type system used in the filer is described more fully in
+    <itemizedlist>
+     <listitem><para><guilabel>Ignore eXecutable bit for known
+        extensions</guilabel> means that when a file has a known extension (eg
+       <filename>.gif</filename>) the executable bit is ignored. This is useful
+       if you have files on a Windows-type filesystem which are being shown as
+       executable programs. However, it prevents a file such as
+       <filename>script.sh</filename> from being treated as a program.
+     </para></listitem>
+
+     <listitem><para><guilabel>Colour files based on their types</guilabel>.
+       If on, each file's name is coloured depending on what kind of thing it is
+       (regular file, directory, executable, etc). You can choose the colours from
+       the list below.
+     </para></listitem>
+
+    </itemizedlist>
+
+    The MIME type system used in the filer is described more fully in
     <xref linkend="types"/>.
     <itemizedlist>
      <listitem><para><guibutton>Show name-to-type rules</guibutton> 
@@ -2668,18 +2645,18 @@
     <screen>
      &lt;?xml version="1.0"?&gt;
      &lt;AppInfo&gt;
-     &lt;Summary&gt;A graphical file manager&lt;/Summary&gt;
-     &lt;About&gt;
-     &lt;Purpose&gt;File manager&lt;/Purpose&gt;
-     &lt;Version&gt;1.1.3 (07-May-2001)&lt;/Version&gt;
-     &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
-     &lt;License&gt;GNU General Public License&lt;/License&gt;
-     &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
-     &lt;/About&gt;
-     &lt;AppMenu&gt;
-     &lt;Item label="Enable pinboard" option="-p=Default"/&gt;
-     &lt;Item label="Disable pinboard" option="-p="/&gt;
-     &lt;/AppMenu&gt;
+       &lt;Summary&gt;A graphical file manager&lt;/Summary&gt;
+       &lt;About&gt;
+	 &lt;Purpose&gt;File manager&lt;/Purpose&gt;
+	 &lt;Version&gt;1.1.3 (07-May-2001)&lt;/Version&gt;
+	 &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
+	 &lt;License&gt;GNU General Public License&lt;/License&gt;
+	 &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
+       &lt;/About&gt;
+       &lt;AppMenu&gt;
+	&lt;Item label="Enable pinboard" option="-p=Default"/&gt;
+	&lt;Item label="Disable pinboard" option="-p="/&gt;
+       &lt;/AppMenu&gt;
      &lt;/AppInfo&gt;
     </screen>
 
@@ -2925,20 +2902,14 @@
 
   <sect1><title>Data-structures</title>
    <para>
-    The diagram below shows some of the major structures found in the
-    filer and the relationships between them.
+    The <filename>global.h</filename> file lists each major data-structure used
+    in the filer and explains its purpose. This is a good place to start reading
+    if you want to know how the filer works.
    </para>
-   <mediaobject>
-    <imageobject>
-     <imagedata align="center" format="PNG" fileref="../Structs.png"/>
-    </imageobject>
-    <textobject><para>Can't display image.</para></textobject>
-   </mediaobject>
 
    <para>
-    To summarise, each window has its own <classname>FilerWindow</classname>
+    In summary, each window has its own <classname>FilerWindow</classname>
     structure.
-    </para><para>
     This structure has pointers to a <classname>Collection</classname>
     (which is the widget which actually displays the files) and to a
     <classname>Directory</classname>, which is used to cache the directory
@@ -3114,15 +3085,18 @@
       <member>Arnaud Calvo</member>
       <member>Andrew Clover</member>
       <member>Fabien Coutant</member>
+      <member>Couderc Damien</member>
       <member>Dmitry Elfimov</member>
       <member>Mattias Engdegard</member>
       <member>Andrew Flegg</member>
       <member>Olivier Fourdan</member>
+      <member>Eric Gillespie</member>
       <member>Thierry Godefroy</member>
       <member>Alex Holden</member>
       <member>Jasper Huijsmans</member>
       <member>Bernard Jungen</member>
       <member>James Kermode</member>
+      <member>Krzysztof Krzyzaniak</member>
       <member>Vincent Ledda</member>
       <member>Vincent Lefevre</member>
       <member>Victor Liu See-le</member>

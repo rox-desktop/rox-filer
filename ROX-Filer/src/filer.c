@@ -110,7 +110,7 @@ static void filer_size_for(FilerWindow *filer_window,
 
 static void set_unique(guchar *unique);
 static void set_selection_state(FilerWindow *collection, gboolean normal);
-static void filer_next_thumb(FilerWindow *filer_window, gchar *path);
+static void filer_next_thumb(GtkObject *window, gchar *path);
 
 static void start_thumb_scanning(FilerWindow *filer_window);
 
@@ -284,12 +284,6 @@ void filer_window_autosize(FilerWindow *filer_window, gboolean allow_shrink)
 	n = collection->number_of_items;
 	n = MAX(n, 2);
 
-#if 0
-	g_print("[ actual size  = %d x %d ]\n", 
-			collection->item_width,
-			collection->item_height);
-#endif
-	
 	filer_size_for(filer_window,
 			collection->item_width,
 			collection->item_height,
@@ -518,6 +512,8 @@ static void filer_window_destroyed(GtkWidget 	*widget,
 				   FilerWindow 	*filer_window)
 {
 	all_filer_windows = g_list_remove(all_filer_windows, filer_window);
+
+	gtk_object_set_data(GTK_OBJECT(widget), "filer_window", NULL);
 
 	if (window_with_primary == filer_window)
 		window_with_primary = NULL;
@@ -1444,6 +1440,13 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	/* The collection is the area that actually displays the files */
 	collection = collection_new();
 
+	/* This property is cleared when the window is destroyed.
+	 * You can thus ref filer_window->window and use this to see
+	 * if the window no longer exists.
+	 */
+	gtk_object_set_data(GTK_OBJECT(filer_window->window),
+			"filer_window", filer_window);
+	
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
@@ -1870,8 +1873,9 @@ static void perform_action(FilerWindow *filer_window, GdkEventButton *event)
 
 	item = collection_get_item(collection, event->x, event->y);
 
-	if (item != -1 && collection->items[item].selected
-		&& filer_window->selection_state == GTK_STATE_INSENSITIVE)
+	if (item != -1 && event->button == 1 &&
+		collection->items[item].selected &&
+		filer_window->selection_state == GTK_STATE_INSENSITIVE)
 	{
 		selection_changed(filer_window->collection,
 				event->time, filer_window);
@@ -2315,14 +2319,28 @@ void filer_cancel_thumbnails(FilerWindow *filer_window)
 	filer_window->max_thumbs = 0;
 }
 
-static gboolean filer_next_thumb_real(FilerWindow *filer_window)
+/* Generate the next thumb for this window. The collection object is
+ * unref'd when there is nothing more to do.
+ * If the collection no longer has a filer window, nothing is done.
+ */
+static gboolean filer_next_thumb_real(GtkObject *window)
 {
+	FilerWindow *filer_window;
 	gchar	*path;
 	int	done, total;
 
+	filer_window = gtk_object_get_data(window, "filer_window");
+
+	if (!filer_window)
+	{
+		gtk_object_unref(window);
+		return FALSE;
+	}
+		
 	if (!filer_window->thumb_queue)
 	{
 		filer_cancel_thumbnails(filer_window);
+		gtk_object_unref(window);
 		return FALSE;
 	}
 
@@ -2331,9 +2349,7 @@ static gboolean filer_next_thumb_real(FilerWindow *filer_window)
 
 	path = (gchar *) filer_window->thumb_queue->data;
 
-	pixmap_background_thumb(path,
-			(GFunc) filer_next_thumb,
-			filer_window);
+	pixmap_background_thumb(path, (GFunc) filer_next_thumb, window);
 
 	filer_window->thumb_queue = g_list_remove(filer_window->thumb_queue,
 						  path);
@@ -2345,12 +2361,15 @@ static gboolean filer_next_thumb_real(FilerWindow *filer_window)
 	return FALSE;
 }
 
-/* path is the thumb just loaded, if any */
-static void filer_next_thumb(FilerWindow *filer_window, gchar *path)
+/* path is the thumb just loaded, if any.
+ * collection is unref'd (eventually).
+ */
+static void filer_next_thumb(GtkObject *window, gchar *path)
 {
 	if (path)
 		dir_force_update_path(path);
-	gtk_idle_add((GtkFunction) filer_next_thumb_real, filer_window);
+
+	gtk_idle_add((GtkFunction) filer_next_thumb_real, window);
 }
 
 static void start_thumb_scanning(FilerWindow *filer_window)
@@ -2359,7 +2378,9 @@ static void start_thumb_scanning(FilerWindow *filer_window)
 		return;		/* Already scanning */
 
 	gtk_widget_show_all(filer_window->thumb_bar);
-	filer_next_thumb(filer_window, NULL);
+
+	gtk_object_ref(GTK_OBJECT(filer_window->window));
+	filer_next_thumb(GTK_OBJECT(filer_window->window), NULL);
 }
 
 /* Set this image to be loaded some time in the future */
