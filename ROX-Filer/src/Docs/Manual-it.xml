@@ -116,14 +116,14 @@
       <listitem><para>
 	Si possono installare (ad es. in <filename>~/.icons</filename>) varie raccolte
 	di icone, chiamate anche temi. Per cambiare tema, andare nella finestra 
-	«Opzioni». Non appena ci sarà il pieno supporto da parte degli altri desktop,
-	i temi saranno condivisi anche dagli altri.
+	«Opzioni». Si potranno condividere i temi con gli altri desktop, quando anche
+	questi ultimi ne attiveranno il supporto.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Supporto a DNotify (solo per Linux)</term>
       <listitem><para>
         Se si usa un kernel Linux recente (2.4.x), il filer si accorge
-	automaticamente dei cambiamenti del contenuto delle directory. Negli altri sistemi
+	automaticamente delle modifiche nel contenuto delle directory. Negli altri sistemi
         invece, le directory si aggiornano quando il puntatore si sposta sopra di esse.
      </para></listitem></varlistentry>
 
@@ -204,7 +204,7 @@
     Il pannello viene visualizzato in una finestra senza la barra del titolo. Se
     questo non succede, consultare le <xref linkend="winman"/>.
     Trascinare i file sul pannello per aggiungerli ad esso. Le icone possono essere
-    riposizionate trascinadole col tasto centrale del mouse.
+    riposizionate trascinandole col tasto centrale del mouse.
     Le modifiche al pannello sono automaticamente salvate in
     <filename>&lt;Choices&gt;/ROX-Filer/pan_MioPannello</filename>.
     Come per la bacheca, è possibile passare a diverse configurazioni eseguendo di nuovo
@@ -363,6 +363,12 @@ $ rox --bottom=</screen>
     cambiano da sistema a sistema (ecco perché questa caratteristica non è stata
     inserita nel filer).
 
+   </para>
+   <para>
+    Nota: <command>gnomesu</command> può essere usato per eseguire il filer come root,
+    ma è necessario usare <command>setsid</command> per eseguirlo in una nuova 
+    sessione, altrimenti gnomesu termina senza aprire alcuna finestra. Per esempio:
+    <screen>gnomesu -c 'setsid /usr/local/bin/rox /'</screen>
    </para>
   </sect1>
 
@@ -738,6 +744,11 @@ $ rox --bottom=</screen>
        piccolo, ecc...).
        </entry></row>
 
+       <row><entry><guimenuitem>Filtra i file...</guimenuitem></entry><entry>
+       Limita la visualizzazione a solo quei file i cui nomi corrispondono a un modello dato.
+       Quando è attivato, la barra del titolo mostra <guilabel>(Glob (modello))</guilabel>.
+       </entry></row>
+
        <row><entry><guimenuitem>Mostra nascosti</guimenuitem></entry><entry>
        Se attivato, vengono mostrati i file che iniziano con il punto, altrimenti vengono
        nascosti. Quando è attivato, la barra del titolo mostra  <guilabel>(Tutti)</guilabel>.
@@ -753,8 +764,11 @@ $ rox --bottom=</screen>
        Rilegge il contenuto della directory e i dettagli di tutti i file presenti in essa. 
        Da usare se il contenuto mostrato è obsoleto.
        </entry></row>
-    </tbody></tgroup></informaltable>
 
+       <row><entry><guimenuitem>Salva le impostazioni di visualizzazione...</guimenuitem></entry><entry>
+       Memorizza le impostazioni di visualizzazione solo per questa directory. Ogni volta che questa directory sarà aperta, verranno usate le impostazioni salvate.
+       </entry></row>
+    </tbody></tgroup></informaltable>
    </para>
 
    <sect2><title><anchor id="Permissions" xreflabel="Permessi"/>
@@ -997,6 +1011,16 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
+         <guimenuitem>Seleziona per nome...</guimenuitem></entry><entry>
+         Seleziona solo i file che corrispondono a un dato modello. Non è flessibile 
+         come <guimenuitem>Seleziona se...</guimenuitem> (vedere 
+	 sotto), ma è più veloce da usare. Con questa opzione i file vengono anche selezionati. 
+	 La scorciatoia da tastiera predefinita è <keycap>.</keycap>,
+	 quindi basta digitare per esempio <userinput>.png</userinput> per selezionare 
+	 tutti i file <filename>.png</filename>.
+       </entry></row>
+       
+       <row><entry>
          <guimenuitem>Seleziona se...</guimenuitem></entry><entry>
          Seleziona solo quei file che soddisfano un dato modello di ricerca. Vedere
          la sezione <xref linkend="SelectIf"/>.
@@ -1236,21 +1260,21 @@ $ rox --bottom=</screen>
    </para><para>
    Per spostare le icone del pannello, trascinarle con il tasto centrale del mouse.
    Nelle precedenti versioni del filer, si potevano spostare le icone della bacheca
-   anche col tasto centrale del mouse, ma ora non è più possibile perché 
+   anche col tasto centrale del mouse, ma ora non è più possibile perché tale tasto
    è riservato al window manager.
    </para><para>
    È possibile assegnare le scorciatoie da tastiera alle icone del pannello e della
    bacheca. Si possono usare per aprire velocemente directory, file o applicazioni,
    persino se un'altra finestra ha il focus.
    </para><para>
-   I cambiamenti del pannello e della bacheca sono salvati automaticamente. Cliccando
+   Le modifiche al pannello e alla bacheca vengono salvate automaticamente. Cliccando
    le icone affisse tenendo premuto il tasto <keycap>Control</keycap>, queste vengono
    selezionate e deselezionate. Cliccare sullo sfondo per deselezionarle tutte.
   </para>
 
   <important><para>
     Trascinare un file sulla bacheca o sul pannello <emphasis>non</emphasis> significa
-    copiarlo, è solamente una scorciatoia ad esso. Questo comportamento è 
+    copiarlo: è solamente una scorciatoia al file. Questo comportamento è 
     molto diverso da quello degli altri filer. Infatti se si elimina il file dalla
     bacheca, si elimina solo il collegamento al file originale; se si elimina il file
     originale, sulla bacheca rimane solo un collegamento interrotto. 
@@ -1402,7 +1426,7 @@ $ rox --bottom=</screen>
     "ok\n", quindi aspettare fino al momento di visualizzare l'immagine successiva e poi
     scrivere quel nome di file, e così via.
    </para><para>
-    Il filer indica che il programma si dovrebbe fermare chiudendo i due stream. A questo
+    Chiudendo i due stream, il filer indica che il programma si deve fermare. A questo
     punto il programma dovrebbe terminare.  Per eliminare qualunque file temporaneo, 
     assicurarsi di catturare SIGPIPE quando si scrive sullo standard output.
    </para><para>
@@ -1428,7 +1452,7 @@ $ rox --bottom=</screen>
    <filename>Lettera</filename> nel dischetto appare come <filename>/floppy/Lettera</filename>.
   </para>
   <para>
-   Prima di rimuovere un disco, il device deve essere smontato, così il sitema può scrivere
+   Prima di rimuovere un disco, il device deve essere smontato, così il sistema può scrivere
    i dati che ha in buffer. Rimuovere un disco senza smontarlo può rovinare il suo contenuto. 
    Fortunatamente i CD e gli Zip sono bloccati quando il device è montato, così non c'è 
    pericolo di rimuoverli accidentalmente.
@@ -1475,8 +1499,8 @@ $ rox --bottom=</screen>
     più velocemente la volta dopo. Durante il caricamento delle miniature, nella parte
     bassa della finestra compare una barra di avanzamento. Cliccando il pulsante  
     <guibutton>Annulla</guibutton> che è accanto alla barra, viene interrotta la scansione.
-    È anche possibile creare miniature di altri tipi di file, come dei video 
-    (per es. mostrando il primo frame). Basta usare un programma opportuno.
+    È anche possibile creare miniature di altri tipi di file, come ad esempio i video:
+    basta visualizzare un frame usando un programma opportuno.
   </para>
   <sect1><title>Dettagli tecnici</title>
   <para>
@@ -1672,7 +1696,7 @@ $ rox --bottom=</screen>
 
     <listitem><para>
       Attenzione: non viene mai chiesta la conferma.  In caso di dubbi, iniziare
-      il comando con <userinput>xmessage</userinput> così questo viene visualizzato invece 
+      il comando con <userinput>xmessage</userinput> così  viene visualizzato invece 
       che eseguito.
     </para></listitem>
 
@@ -1821,7 +1845,7 @@ $ rox --bottom=</screen>
    singoli. Per esempio, per trovare un file chiamato 
    <filename>log</filename>, digitare <userinput>'log'</userinput>.
 
-   Ricordarsi di usare l'accento acuto ('), non quello grave (`) o le virgolette (").
+   Ricordarsi di usare l'accento acuto ('), non quello grave (`) o le virgolette alte (").
    </para><para>
    Le corrispondenze trovate vengono mostrate nell'elenco dei risultati. Facendo doppio clic
    su una voce, si apre una finestra che mostra quel file. Il filer usa la stessa finestra per
@@ -2200,7 +2224,7 @@ $ rox --bottom=</screen>
     <listitem><para>
       <guibutton>Ripristina</guibutton>
       Rimette tutte le preferenze come erano prima dell'apertura della finestra «Opzioni».
-      Se il pulsante è ombreggiato, significa che non ci sono stati cambiamenti.
+      Se il pulsante è ombreggiato, significa che non ci sono state modifiche.
       La finestra «Opzioni» non viene chiusa quando si preme questo tasto.
     </para></listitem>
 
@@ -2652,7 +2676,7 @@ $ rox --bottom=</screen>
      <listitem><para>Sono più piccole e veloci da scaricare anche per chi ha connessioni lente.
      </para></listitem>
 
-     <listitem><para>Le modifiche si vedono prima di applicarle.
+     <listitem><para>Le modifiche si vedono prima che vengano applicate.
      </para></listitem>
 
      <listitem><para>Le patch si possono applicare a versioni leggermente modificate dei
@@ -2703,8 +2727,8 @@ $ rox --bottom=</screen>
   <title>Compilazione</title>
   <para>
 
-   Dopo aver scaricato i sorgenti, è necessario compilare <application>ROX-Filer</application> 
-   per poterlo usare. Se invece è stato scaricato e installato il pacchetto dei binari o se 
+   Dopo aver scaricato i sorgenti, per poter usare <application>ROX-Filer</application> 
+   è necessario compilarlo. Se invece è stato scaricato e installato il pacchetto dei binari o se 
    <application>ROX-Filer</application> era già incluso nel sistema, si può saltare questa
    sezione.  Se si è arrivati qui cliccando il simbolo del salvagente da una finestra del
    filer, o se tutto funziona digitando <command>rox</command> in un prompt di shell,
@@ -2770,11 +2794,11 @@ $ rox --bottom=</screen>
      che tipo di sistema si sta usando e poi inizierà la compilazione. Se qualcosa
      non funziona, contattare via email l'autore di ROX-Filer. Spiegare (in inglese)
      che tipo di sistema si ha e quali errori compaiono. Se si è capaci di risolvere
-     il problema, informare comunque via email l'autore.
+     il problema, informare comunque l'autore via email.
     </para><para>
      Il file eseguibile si trova dentro la directory «ROX-Filer» e in una sottodirectory
      diversa a seconda della piattaforma.  È quindi possibile compilare la stessa
-     applicazione su tipi diversi di macchine, per tutte però, si usa lo script
+     applicazione su diversi tipi di macchine, per tutte però, si usa lo script
      <filename>AppRun</filename> per avviare il filer. Questo è particolarmente utile in un
      ambiente di rete.
    </para></step>
@@ -2918,7 +2942,7 @@ $ rehash</screen>
       </para></listitem></varlistentry>
 
       <varlistentry><term><option>-x</option></term><term><option>--examine=FILE</option></term>
-       <listitem><para>FILE è cambiato: viene riesaminato.
+       <listitem><para>FILE è cambiato e deve essere riesaminato.
       </para></listitem></varlistentry>
 
      </variablelist>
@@ -2943,7 +2967,7 @@ $ rehash</screen>
 
    <refsect1><title>BUG</title>
     <para>
-     Segnalare bug alla mailing list degli sviluppatori: <ulink url="http://rox.sourceforge.net/contact.html"/>.
+     Segnalate i bug alla mailing list degli sviluppatori: <ulink url="http://rox.sourceforge.net/contact.html"/>.
     </para>
    </refsect1>
 
