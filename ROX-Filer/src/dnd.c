@@ -52,6 +52,7 @@
 #include "diritem.h"
 #include "usericons.h"
 #include "menu.h"
+#include "bookmarks.h"
 
 #define MAXURILEN 4096		/* Longest URI to allow */
 
@@ -114,7 +115,6 @@ typedef enum {
 	MENU_COPY,
 	MENU_MOVE,
 	MENU_LINK,
-	MENU_SET_ICON,
 } MenuActionType;
 
 #undef N_
@@ -123,8 +123,6 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("Copy"),		NULL, menuitem_response, MENU_COPY, 	NULL},
 {N_("Move"),		NULL, menuitem_response, MENU_MOVE, 	NULL},
 {N_("Link"),		NULL, menuitem_response, MENU_LINK, 	NULL},
-{"",	    		NULL, NULL, 		 0,		"<Separator>"},
-{N_("Set Icon"),	NULL, menuitem_response, MENU_SET_ICON, NULL},
 };
 static GtkWidget *dnd_menu = NULL;
 
@@ -134,6 +132,7 @@ static GtkWidget *dnd_menu = NULL;
 const char *drop_dest_prog = "drop_dest_prog";	/* Run a program */
 const char *drop_dest_dir  = "drop_dest_dir";	/* Save to path */
 const char *drop_dest_pass_through  = "drop_dest_pass";	/* Pass to parent */
+const char *drop_dest_bookmark = "drop_dest_bookmark";	/* Add to bookmarks */
 
 GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
@@ -488,6 +487,19 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 	if (dest_type == drop_dest_pass_through)
 		return FALSE;	/* Let the parent widget handle it */
 
+	if (dest_type == drop_dest_bookmark)
+	{
+		if (provides(context, text_uri_list))
+			gtk_drag_get_data(widget, context, text_uri_list, time);
+		else
+		{
+			gtk_drag_finish(context, FALSE, FALSE, time);
+			delayed_error(_("Drag a directory here to "
+					"bookmark it."));
+		}
+		return TRUE;
+	}
+
 	g_return_val_if_fail(dest_path != NULL, TRUE);
 
 	if (dest_type == drop_dest_dir && provides(context, XdndDirectSave0))
@@ -781,9 +793,19 @@ static void got_uri_list(GtkWidget 		*widget,
 	dest_path = g_dataset_get_data(context, "drop_dest_path");
 	type = g_dataset_get_data(context, "drop_dest_type");
 
-	g_return_if_fail(dest_path != NULL);
-
 	uri_list = uri_list_to_glist(selection_data->data);
+
+	if (type == drop_dest_bookmark)
+	{
+		GList *next;
+		for (next = uri_list; next; next = next->next)
+			bookmarks_add_uri((guchar *) next->data);
+		destroy_glist(&uri_list);
+		gtk_drag_finish(context, TRUE, FALSE, time);    /* Success! */
+		return;
+	}
+
+	g_return_if_fail(dest_path != NULL);
 
 	if (!uri_list)
 		error = _("No URIs in the text/uri-list (nothing to do!)");
@@ -876,15 +898,6 @@ static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
 		action_copy(prompt_local_paths, prompt_dest_path, NULL, -1);
 	else if (action == MENU_LINK)
 		action_link(prompt_local_paths, prompt_dest_path, NULL);
-	else if (action == MENU_SET_ICON)
-	{
-		if (g_list_length(prompt_local_paths) == 1)
-			set_icon_path(prompt_dest_path,
-				(char*) prompt_local_paths->data);
-		else
-			delayed_error(
-			_("You can't use multiple files with Set Icon!"));
-	}
 } 
 
 /* When some local files are dropped somewhere with ACTION_ASK, this
@@ -998,11 +1011,19 @@ static gboolean spring_check_idle(gpointer data)
 
 static gboolean spring_now(gpointer data)
 {
-	guchar		*dest_path;
+	const char	*type;
+	const guchar	*dest_path;
 	gint		x, y;
 	
 	g_return_val_if_fail(spring_context != NULL, FALSE);
 	g_return_val_if_fail(!spring_in_progress, FALSE);
+
+	type = g_dataset_get_data(spring_context, "drop_dest_type");
+	if (type == drop_dest_bookmark)
+	{
+		bookmarks_edit();
+		goto out;
+	}
 
 	dest_path = g_dataset_get_data(spring_context, "drop_dest_path");
 	g_return_val_if_fail(dest_path != NULL, FALSE);
@@ -1043,6 +1064,7 @@ static gboolean spring_now(gpointer data)
 	}
 	spring_in_progress--;
 
+out:
 	dnd_spring_abort();
 
 	return FALSE;

@@ -45,7 +45,7 @@
 
 typedef struct _Tool Tool;
 
-typedef enum {DROP_NONE, DROP_TO_PARENT, DROP_TO_HOME} DropDest;
+typedef enum {DROP_NONE, DROP_TO_PARENT, DROP_TO_HOME, DROP_BOOKMARK} DropDest;
 
 struct _Tool {
 	const gchar	*label;
@@ -118,7 +118,7 @@ static Tool all_tools[] = {
 	 FALSE},
 	
 	{N_("Bookmarks"), ROX_STOCK_BOOKMARKS, N_("Bookmarks menu"),
-	 toolbar_bookmarks_clicked, DROP_NONE, FALSE,
+	 toolbar_bookmarks_clicked, DROP_BOOKMARK, FALSE,
 	 TRUE},
 
 	{N_("Scan"), GTK_STOCK_REFRESH, N_("Rescan directory contents"),
@@ -597,18 +597,21 @@ static gboolean drag_motion(GtkWidget		*widget,
 {
 	GdkDragAction	action = context->suggested_action;
 	DropDest	dest;
+	gpointer	type = (gpointer) drop_dest_dir;
 
 	dest = (DropDest) g_object_get_data(G_OBJECT(widget), "toolbar_dest");
 
 	if (dest == DROP_TO_HOME)
 		g_dataset_set_data(context, "drop_dest_path",
 				   (gchar *) home_dir);
+	else if (dest == DROP_BOOKMARK)
+		type = (gpointer) drop_dest_bookmark;
 	else
 		g_dataset_set_data_full(context, "drop_dest_path",
 				g_path_get_dirname(filer_window->sym_path),
 				g_free);
 	
-	g_dataset_set_data(context, "drop_dest_type", (gpointer) drop_dest_dir);
+	g_dataset_set_data(context, "drop_dest_type", type);
 	gdk_drag_status(context, action, time);
 	
 	dnd_spring_load(context, filer_window);

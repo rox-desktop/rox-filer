@@ -35,6 +35,7 @@ extern Option o_dnd_left_menu;
 extern const char *drop_dest_prog;
 extern const char *drop_dest_dir;
 extern const char *drop_dest_pass_through;
+extern const char *drop_dest_bookmark;
 extern GdkAtom XdndDirectSave0;
 extern GdkAtom text_uri_list;
 extern GdkAtom _rox_run_action;

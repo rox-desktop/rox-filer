@@ -67,6 +67,8 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 			    int x, int y,
 			    GtkSelectionData *selection_data, guint info,
 			    guint time, GtkTreeView *view);
+static void bookmarks_add_dir(const guchar *dir);
+static void commit_edits(GtkTreeModel *model);
 
 
 /****************************************************************
@@ -112,9 +114,7 @@ void bookmarks_edit(void)
 	number_of_windows++;
 
 	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),
-			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
-	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),
-			GTK_STOCK_OK, GTK_RESPONSE_OK);
+			GTK_STOCK_CLOSE, GTK_RESPONSE_OK);
 
 	g_signal_connect(bookmarks_window, "destroy",
 			 G_CALLBACK(gtk_widget_destroyed), &bookmarks_window);
@@ -205,6 +205,15 @@ void bookmarks_edit(void)
 				G_CALLBACK(dir_dropped), list);
 	}
 
+	g_signal_connect_swapped(model, "row-changed",
+			 G_CALLBACK(commit_edits), model);
+	g_signal_connect_swapped(model, "row-inserted",
+			 G_CALLBACK(commit_edits), model);
+	g_signal_connect_swapped(model, "row-deleted",
+			 G_CALLBACK(commit_edits), model);
+	g_signal_connect_swapped(model, "rows-reordered",
+			 G_CALLBACK(commit_edits), model);
+
 	gtk_widget_show_all(bookmarks_window);
 }
 
@@ -252,6 +261,26 @@ void bookmarks_add_history(const gchar *path)
 		g_return_if_fail(history_tail != NULL);
 		history_remove((char *) history_tail->data);
 	}
+}
+
+void bookmarks_add_uri(const gchar *uri)
+{
+	const char *path;
+	struct stat info;
+
+	path = get_local_path(uri);
+
+	if (!path)
+	{
+		delayed_error(_("Can't bookmark non-local resource '%s'\n"),
+					uri);
+		return;
+	}
+
+	if (mc_stat(path, &info) == 0 && S_ISDIR(info.st_mode))
+		bookmarks_add_dir(path);
+	else
+		delayed_error(_("'%s' isn't a directory"), path);
 }
 
 /****************************************************************
@@ -350,9 +379,6 @@ static void bookmarks_save()
 		save_xml_file(bookmarks->doc, save_path);
 		g_free(save_path);
 	}
-
-	if (bookmarks_window)
-		gtk_widget_destroy(bookmarks_window);
 }
 
 /* Add a bookmark if it doesn't already exist, and save the
@@ -361,17 +387,24 @@ static void bookmarks_save()
 static void bookmarks_add(GtkMenuItem *menuitem, gpointer user_data)
 {
 	FilerWindow *filer_window = (FilerWindow *) user_data;
-	xmlNode	*bookmark;
-	guchar	*name;
 
-	name = filer_window->sym_path;
-	if (bookmark_find(name))
+	bookmarks_add_dir(filer_window->sym_path);
+}
+
+static void bookmarks_add_dir(const guchar *dir)
+{
+	xmlNode	*bookmark;
+
+	if (bookmark_find(dir))
 		return;
 
 	bookmark = xmlNewChild(xmlDocGetRootElement(bookmarks->doc),
-				NULL, "bookmark", name);
+				NULL, "bookmark", dir);
 
 	bookmarks_save();
+
+	if (bookmarks_window)
+		gtk_widget_destroy(bookmarks_window);
 }
 
 /* Called when a bookmark has been selected (right or left click) */
@@ -537,15 +570,9 @@ static gboolean dir_dropped(GtkWidget *window, GdkDragContext *context,
 	return TRUE;
 }
 
-static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
+static void commit_edits(GtkTreeModel *model)
 {
 	GtkTreeIter iter;
-
-	if (response != GTK_RESPONSE_OK)
-	{
-		gtk_widget_destroy(window);
-		return;
-	}
 
 	bookmarks_new();
 
@@ -566,6 +593,11 @@ static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
 	}
 
 	bookmarks_save();
+}
+
+static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
+{
+	commit_edits(model);
 
 	gtk_widget_destroy(window);
 }

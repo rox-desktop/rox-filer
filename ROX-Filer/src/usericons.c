@@ -81,6 +81,7 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
 static void delete_globicon(const gchar *path);
 static gboolean convert_to_png(const gchar *src, const gchar *dest);
+static gboolean set_icon_path(const guchar *filepath, const guchar *iconpath);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -179,7 +180,7 @@ static gboolean create_diricon(const guchar *filepath, const guchar *iconpath)
 }
 
 /* Add a globicon mapping for the given file to the given icon path */
-gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
+static gboolean set_icon_path(const guchar *filepath, const guchar *iconpath)
 {
 	MaskedPixmap *pic;
 

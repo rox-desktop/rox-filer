@@ -11,5 +11,6 @@
 void bookmarks_show_menu(FilerWindow *filer_window);
 void bookmarks_edit(void);
 void bookmarks_add_history(const gchar *path);
+void bookmarks_add_uri(const gchar *uri);
 
 #endif /* _BOOKMARKS_H */
