@@ -74,6 +74,7 @@ case $REPLY in
 	   BINDIR=/usr/local/bin
 	   SHAREDIR=/usr/local/share
 	   CHOICESDIR=${SHAREDIR}/Choices
+	   MANDIR=/usr/local/man	# (not under share!)
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
@@ -88,11 +89,13 @@ case $REPLY in
 	   else
 	   	SHAREDIR=${HOME}/.local/share
 	   fi
+	   MANDIR=${SHAREDIR}/man
 	   ;;
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
 	   SHAREDIR=/usr/share
 	   CHOICESDIR=${SHAREDIR}/Choices
+	   MANDIR=${SHAREDIR}/man
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
 	   get_dir "/usr/local/apps"
@@ -102,18 +105,21 @@ case $REPLY in
 	   get_dir "/usr/local/bin"
 	   BINDIR="$DIR"
 	   echo
-	   echo "Where should the shared resources (man page and MIME data) go?"
+	   echo "Where should the shared resources (eg, MIME data) go?"
 	   get_dir "/usr/local/share"
 	   SHAREDIR="$DIR"
 	   echo
 	   echo "Where should the default icons and run actions go?"
 	   get_dir "$SHAREDIR/Choices"
 	   CHOICESDIR="$DIR"
+	   echo
+	   echo "Where should the man pages go?"
+	   get_dir "/usr/local/man"
+	   MANDIR="$DIR"
 	   ;;
 	*) die "Invalid choice!";;
 esac
 
-MANDIR=${SHAREDIR}/man
 MIMEDIR=${SHAREDIR}/mime
 
 MIMEINFO="${MIMEDIR}/packages/rox.xml"
