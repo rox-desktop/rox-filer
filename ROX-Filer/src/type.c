@@ -473,8 +473,10 @@ static void show_shell_help(gpointer data)
 			"gimp \"$1\""));
 }
 
-/* Called if the user clicks on the OK button */
-static void set_shell_action(GtkWidget *dialog)
+/* Called if the user clicks on the OK button. Returns FALSE if an error
+ * was displayed instead of performing the action.
+ */
+static gboolean set_shell_action(GtkWidget *dialog)
 {
 	GtkEntry *entry;
 	GtkToggleButton *for_all;
@@ -485,19 +487,19 @@ static void set_shell_action(GtkWidget *dialog)
 
 	entry = g_object_get_data(G_OBJECT(dialog), "shell_command");
 	for_all = g_object_get_data(G_OBJECT(dialog), "set_for_all");
-	g_return_if_fail(entry != NULL);
+	g_return_val_if_fail(entry != NULL, FALSE);
 
 	command = gtk_entry_get_text(entry);
 	
 	if (!strchr(command, '$'))
 	{
 		show_shell_help(NULL);
-		return;
+		return FALSE;
 	}
 
 	path = get_action_save_path(dialog);
 	if (!path)
-		return;
+		return FALSE;
 		
 	tmp = g_strdup_printf("#! /bin/sh\nexec %s\n", command);
 	len = strlen(tmp);
@@ -528,12 +530,15 @@ static void set_shell_action(GtkWidget *dialog)
 	g_free(path);
 
 	gtk_widget_destroy(dialog);
+
+	return TRUE;
 }
 
 static void set_action_response(GtkWidget *dialog, gint response, gpointer data)
 {
 	if (response == GTK_RESPONSE_OK)
-		set_shell_action(dialog);
+		if (!set_shell_action(dialog))
+			return;
 	gtk_widget_destroy(dialog);
 }
 
