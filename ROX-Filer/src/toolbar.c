@@ -23,8 +23,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <string.h>
 
 #include "global.h"
@@ -230,7 +228,7 @@ void toolbar_update_info(FilerWindow *filer_window)
 {
 	if (o_toolbar.int_value != TOOLBAR_NONE && o_toolbar_info.int_value)
 		coll_selection_changed(filer_window->collection,
-				GDK_CURRENT_TIME, filer_window);
+				GDK_CURRENT_TIME, NULL);
 }
 
 
@@ -367,12 +365,9 @@ static GtkWidget *create_toolbar(FilerWindow *filer_window)
 			TRUE, TRUE, 4);
 
 	if (o_toolbar_info.int_value)
-		gtk_signal_connect_while_alive(
-				GTK_OBJECT(filer_window->collection),
+		g_signal_connect_object(filer_window->collection,
 				"selection_changed",
-				GTK_SIGNAL_FUNC(coll_selection_changed),
-				(gpointer) filer_window,
-				GTK_OBJECT(box));
+				G_CALLBACK(coll_selection_changed), box, 0);
 
 	return box;
 }
@@ -438,7 +433,6 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 				FilerWindow *filer_window)
 {
 	GtkWidget 	*button, *icon_widget;
-	GtkSignalFunc	cb = GTK_SIGNAL_FUNC(tool->clicked);
 
 	button = gtk_button_new();
 	gtk_button_set_relief(GTK_BUTTON(button), GTK_RELIEF_NONE);
@@ -462,8 +456,8 @@ static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 			G_CALLBACK(toolbar_adjust_released), filer_window);
 	}
 
-	gtk_signal_connect(GTK_OBJECT(button), "clicked",
-			cb, filer_window);
+	g_signal_connect(button, "clicked",
+			G_CALLBACK(tool->clicked), filer_window);
 
 	gtk_tooltips_set_tip(tooltips, button, _(tool->tip), NULL);
 
@@ -554,10 +548,10 @@ static void handle_drops(FilerWindow *filer_window,
 			 DropDest dest)
 {
 	make_drop_target(button, 0);
-	gtk_signal_connect(GTK_OBJECT(button), "drag_motion",
-			GTK_SIGNAL_FUNC(drag_motion), filer_window);
-	gtk_signal_connect(GTK_OBJECT(button), "drag_leave",
-			GTK_SIGNAL_FUNC(drag_leave), filer_window);
+	g_signal_connect(button, "drag_motion",
+			G_CALLBACK(drag_motion), filer_window);
+	g_signal_connect(button, "drag_leave",
+			G_CALLBACK(drag_leave), filer_window);
 	g_object_set_data(G_OBJECT(button), "toolbar_dest", (gpointer) dest);
 }
 
@@ -573,8 +567,12 @@ static void tally_items(gpointer key, gpointer value, gpointer data)
 static void coll_selection_changed(Collection *collection, guint time,
 					gpointer user_data)
 {
-	FilerWindow	*filer_window = (FilerWindow *) user_data;
+	FilerWindow	*filer_window;
 	gchar		*label;
+
+	filer_window = g_object_get_data(G_OBJECT(collection), "filer_window");
+
+	g_return_if_fail(filer_window != NULL);
 
 	if (filer_window->target_cb)
 		return;
@@ -696,7 +694,7 @@ static void update_tools(Option *option)
 {
 	GList	*next, *kids;
 
-	kids = gtk_container_children(GTK_CONTAINER(option->widget));
+	kids = gtk_container_get_children(GTK_CONTAINER(option->widget));
 
 	for (next = kids; next; next = next->next)
 	{
@@ -722,7 +720,7 @@ static guchar *read_tools(Option *option)
 
 	list = g_string_new(NULL);
 
-	kids = gtk_container_children(GTK_CONTAINER(option->widget));
+	kids = gtk_container_get_children(GTK_CONTAINER(option->widget));
 
 	for (next = kids; next; next = next->next)
 	{
