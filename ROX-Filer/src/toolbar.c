@@ -373,7 +373,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	{
 		filer_opendir(filer_window->sym_path, filer_window, NULL);
 	}
-	else
+	else if (!filer_window_delete(filer_window->window, NULL, filer_window))
 		gtk_widget_destroy(filer_window->window);
 }
 

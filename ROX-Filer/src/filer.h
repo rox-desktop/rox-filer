@@ -124,5 +124,8 @@ void filer_add_tip_details(FilerWindow *filer_window,
 void filer_selection_changed(FilerWindow *filer_window, gint time);
 void filer_lost_selection(FilerWindow *filer_window, guint time);
 void filer_window_set_size(FilerWindow *filer_window, int w, int h);
+gboolean filer_window_delete(GtkWidget *window,
+			     GdkEvent *unused,
+			     FilerWindow *filer_window);
 
 #endif /* _FILER_H */

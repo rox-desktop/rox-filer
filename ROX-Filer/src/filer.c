@@ -336,9 +336,12 @@ static void detach(FilerWindow *filer_window)
 	filer_window->directory = NULL;
 }
 
-static gboolean filer_window_delete(GtkWidget *window,
-				    GdkEvent *event,
-				    FilerWindow *filer_window)
+/* Returns TRUE to prevent closing the window. May offer to unmount a
+ * device.
+ */
+gboolean filer_window_delete(GtkWidget *window,
+			     GdkEvent *unused, /* (may be NULL) */
+			     FilerWindow *filer_window)
 {
 	if (mount_is_user_mounted(filer_window->real_path))
 	{
