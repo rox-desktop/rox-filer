@@ -28,7 +28,7 @@
     </othercredit>
    </authorgroup>
    
-  <copyright><year>2001</year><holder>Thomas Leonard</holder></copyright>
+  <copyright><year>2002</year><holder>Thomas Leonard</holder></copyright>
   <legalnotice>
     <title>Conditions</title>
     <para>
@@ -52,7 +52,7 @@
   <abstract>
    <para>
 		Note du traducteur :
-		Cette version a été traduite à partir du manuel <application>ROX-Filer</application> version 1.1.9.
+		Cette version a été traduite à partir du manuel <application>ROX-Filer</application> version 1.1.11.
 		Je ne suis pas programmeur, le point 4 du paragraphe 'Appliquettes pour les panneaux', ainsi que le
 		paragraphe 'Data-Structures' n'ont donc pas été traduits, mais si vous voulez me donner un petit
 		coup de main, c'est possible !
@@ -112,7 +112,8 @@ Applications entièrement contenues dans un dossier, pour lesquelles l'installati
 <listitem><para>
 		Le filer peut afficher les fichiers images avec une icône représentant le contenu
 		de ceux-ci, au lieu d'une icône générique.
-		Très utile pour organiser un dossier rempli de photos !
+		Très utile pour organiser un dossier rempli de photos ! Voir <citation>Imagettes</citation>
+		pour plus de détails (l'établissement de normes est en cours).
 </para></listitem></varlistentry>
 
 </variablelist>
@@ -439,7 +440,7 @@ implémenté dans le filer !).
 </sect1>
 </chapter>
 
-<chapter id="keys">
+<chapter id="keys" xreflabel="mouse and key bindings">
 	<title>Boutons de la souris et touches du clavier</title>
 
 <itemizedlist><title>Premier aperçu succinct :</title>
@@ -587,8 +588,8 @@ Vous pouvez alors les coller dans une autre fenêtre pour obtenir le chemin des o
 </procedure>
 
   <para>
-   Note that clicking the middle mouse button in the main area of most web-browsers
-   will open the selected file.
+   Notez que la plupart des navigateurs internet ("web-browsers") ouvrent les fichiers dont vous "collez"
+   les noms en cliquant avec le bouton du milieu n'importe où dans la page (sauf un lien, bien sûr...).
   </para>
   <para>
    Si vous sélectionnez autre chose (par exemple du texte dans un autre programme), les objets sélectionnés
@@ -624,7 +625,7 @@ Vous pouvez alors les coller dans une autre fenêtre pour obtenir le chemin des o
 	 </para>
 	</step>
    </procedure>
-   <para>Veuillez noter que les groupes ne sont pas réellement sauvegardés, vous les perdrez donc quand vous redémarrerez le filer.</para>
+   <para>Les groupes sont automatiquement enregistrés et seront donc accessibles pour une autre session du filer.</para>
 </sect1>
 
 </chapter>
@@ -836,19 +837,26 @@ Les plus gros fichiers au début.
 
 <guimenuitem>Montrer les fichiers cachés</guimenuitem></entry><entry>
 Si cette option est activée, les objets commençant par un point sont affichés,
-sinon, ils sont cachés.
+sinon, ils sont cachés. La barre de titres affiche <guilabel>(All)</guilabel>
+quand cette option est activée.
 </entry></row><row><entry>
+
+<guimenuitem>Montrer les imagettes</guimenuitem></entry><entry>
+Activée, le filer essaiera de lire chaque fichier-image et d'utiliser cette
+image comme icône pour ce fichier. Très utile quand vous avez un dossier
+rempli de photos et que vous en cherchez une dont le nom vous échappe !
+Si vous utilisez Gtk+-2.0 ou libpng, les imagettes sont enregistrées dans
+<filename>~/.thumbnails</filename> pour un affichage ultérieur plus rapide.
+Sinon, elles sont perdues quand vous quittez le filer.
+Lors de l'affichage des imagettes, une barre de progression apparaîtra en bas
+de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton
+<guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression.
+La barre de titres affiche <guilabel>(Thumbs)</guilabel> quand cette option est
+activée.</entry></row><row><entry>
 
 <guimenuitem>Rafraîchir</guimenuitem></entry><entry>
 Relit le contenu du dossier et les détails de tous les fichiers s'y trouvant.
 Utilisez cette commande si l'affichage n'est plus à jour.
-</entry></row><row><entry>
-
-<guimenuitem>Créer les imagettes</guimenuitem></entry><entry>
-Essaie de remplacer l'icône d'un fichier image par l'image du fichier lui-même.
-Très utile pour trier un dossier rempli de photos dont le nom vous échappe !
-Si vous utilisez Gtk+-2.0, les imagettes sont enregistrées dans <filename>~/.thumbnails</filename>
-pour un affichage ultérieur plus rapide. Sinon, elles sont perdues quand vous quittez le filer.
 </entry></row>
 </tbody></tgroup></informaltable>
 
@@ -924,7 +932,7 @@ le groupe du fichier est le même qu'un des groupes auxquels l'utilisateur appart
 </sect1>
 
 <sect1>
-	<title>Le menu sélection</title>
+ <title>Le menu Fichier</title>
   <para>
 
 Si vous ouvrez le menu alors que plusieurs objets sont sélectionnés, l'opération
@@ -1046,6 +1054,42 @@ l'être aussi...), alors optez pour un lien relatif.
 </sect1>
 
 <sect1>
+ <title>Le menu Sélectionner</title>
+ <para>
+  <informaltable><tgroup cols="2">
+	<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
+	<tbody>
+	 <row>
+	  <entry>
+	   <guimenuitem>Tout sélectionner</guimenuitem>
+	  </entry>
+	  <entry>
+	   Sélectionne tous les objets de cette fenêtre.
+	  </entry>
+	 </row>
+	 <row>
+	  <entry>
+	   <guimenuitem>Oublier la sélection</guimenuitem>
+	  </entry>
+	  <entry>
+	   Dé-sélectionne tous les objets de cette fenêtre.
+	  </entry>
+	 </row>
+	 <row>
+	  <entry>
+	   <guimenuitem>Sélectionner si...</guimenuitem>
+	  </entry>
+	  <entry>
+	   Ne sélectionner que les objets qui correspondent à certains critères
+	   &mdash; voir la section <xref linkend="SelectIf"/>.
+	  </entry>
+	 </row>
+
+ </tbody></tgroup></informaltable>
+</para>
+</sect1>
+
+<sect1>
   <title>Le menu Nouveau</title>
   <para>
 
@@ -1096,42 +1140,6 @@ feuille de calcul, une lettre ou un fax, etc...).
 Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour ces commandes personnalisées.
   </para>
 </sect1>
-
-<sect1>
- <title>Le menu Sélectionner</title>
- <para>
-  <informaltable><tgroup cols="2">
-	<thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
-	<tbody>
-	 <row>
-	  <entry>
-	   <guimenuitem>Tout sélectionner</guimenuitem>
-	  </entry>
-	  <entry>
-	   Sélectionne tous les objets de cette fenêtre.
-	  </entry>
-	 </row>
-	 <row>
-	  <entry>
-	   <guimenuitem>Oublier la sélection</guimenuitem>
-	  </entry>
-	  <entry>
-	   Dé-sélectionne tous les objets de cette fenêtre.
-	  </entry>
-	 </row>
-	 <row>
-	  <entry>
-	   <guimenuitem>Sélectionner si...</guimenuitem>
-	  </entry>
-	  <entry>
-	   Ne sélectionner que les objets qui correspondent à certains critères &mdash; voir la section <xref linkend="SelectIf"/>.
-	  </entry>
-	 </row>
-
-</tbody></tgroup></informaltable>
-
-	    </para>
-	   </sect1>
 
 <sect1>
   <title>Le menu fenêtre</title>
@@ -1310,7 +1318,7 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
     </para></step>
 
     <step><para>
-Créez-y une icône appelée <filename>.DirIcon.png</filename> (le dossier apparaîtra avec une icône).
+Créez-y une icône appelée <filename>.DirIcon</filename> (le dossier apparaîtra avec une icône).
     </para></step>
 
     <step><para>
@@ -1579,15 +1587,24 @@ d'accomplir une opération de Copie/Déplacement/Lien/etc... La ligne de statut
 en haut de la fenêtre affiche le nom du dossier courant ou de l'objet en train
 d'être traité. L'espace qui se trouve en-dessous est là pour afficher les messages
 &mdash; ce qui a été fait, et éventuellement des questions.
+
+<mediaobject>
+ <imageobject>
+  <imagedata align="center" format="PNG" fileref="../Action.png"/>
+ </imageobject>
+ <textobject><para>Impossible d'afficher l'image.</para></textobject>
+</mediaobject>
   </para><para>
-En bas, il y a quatre boutons, et, parfois, quelques options. Les boutons fonctionnent de cette manière :
+  
+En bas, il y a quatre boutons, et quelques options. Toutes les fenêtres ont une
+option <guilabel>Silencieux</guilabel>. Quand elle est active, le filer ne demandera
+que quelques confirmations (par exemple, la suppression d'un fichier protégé en
+écriture). Mais dans la majorité des cas, toutes les opérations seront automatiques.
+</para><para>
+
+Les boutons fonctionnent de cette manière :
 
 <variablelist>
-
-<varlistentry><term><guibutton>Silencieux</guibutton></term><listitem><para>
-réalisera des opérations simples sans vous demander de confirmer à chaque fois.
-Vous pouvez utilisez ce bouton pendant une opération pour faire une pause.
-</para></listitem></varlistentry>
 
 <varlistentry><term><guibutton>Oui</guibutton></term><listitem><para>
 répond oui à la question affichée.
@@ -1599,6 +1616,11 @@ répond non à la question affichée.
 
 <varlistentry><term><guibutton>Abandonner</guibutton></term><listitem><para>
 Stoppe l'opération en cours et ferme la fenêtre action.
+</para></listitem></varlistentry>
+
+<varlistentry><term><guibutton>Silencieux</guibutton></term><listitem><para>
+est un raccourci pour activer l'option <guilabel>Silencieux</guilabel> puis
+cliquer sur <guibutton>Oui</guibutton>.
 </para></listitem></varlistentry>
 
 </variablelist>
@@ -1993,13 +2015,10 @@ La première expression supprime chaque fichier ayant pour extension <filename>.o
 La seconde cherche les fichiers ayant pour extension <filename>.c</filename>, mais ne prend pas la peine
 de vérifier le contenu des dossiers nommés <filename>src</filename>.
 L'expression est évaluée comme suit :
-
-<mediaobject>
-  <imageobject>
-   <imagedata align="center" format="PNG" fileref="../Prune.png"/>
-  </imageobject>
-</mediaobject>
-
+</para><para>
+Si un fichier est nommé <filename>src</filename>, alors `Prune'.
+D'autre part, vérifie s'il se termine par <filename>.c</filename>
+et dans ce cas, l'inclut dans les résultats.
   </para>
 </sect1>
 </chapter>
@@ -2049,23 +2068,9 @@ souris au-dessus d'une option pour voir ce qu'elle fait.
 <sect1>
  <title>Options de traduction</title>
   <para>
-
-Vous pouvez choisir ici dans quelle langue le filer affiche les messages.
-Il y a aussi deux choix spéciaux :
-
-<itemizedlist>
-
-<listitem><para>
-<guimenuitem>Aucune</guimenuitem> utilise les messages non-traduits, en anglais.
-</para></listitem>
-
-<listitem><para>
-<guimenuitem>D'après LANG</guimenuitem> utilise la valeur de la variable d'environnement <envar>LANG</envar>
-en tant que nom de fichier à ouvrir depuis <filename>ROX-Filer/Messages</filename>.
-</para></listitem>
-
-</itemizedlist>
-
+Vous pouvez choisir ici dans quelle langue le filer affiche les messages,
+ou choisir d'utiliser la variable d'environnement <envar>LANG</envar> pour
+obtenir la langue désirée.
   </para>
 </sect1>
 
@@ -2080,13 +2085,6 @@ minuscule lors d'un tri. Si cette option est désactivée, alors <filename>Zoo</fi
 sera affiché avant <filename>animal</filename>, par exemple.
 </para></listitem>
 
-<listitem><para><guilabel>Ignorer le bit 'eXécutable' pour les extensions connues</guilabel> signifie que si
-un fichier a une extension connue (par exemple <filename>.gif</filename>), le 'bit exécutable' est ignoré.
-Un tel comportement est utile si vous avez des fichiers sur un système de fichiers de type Windows
-qui sont montrés comme des programmes exécutables. Par contre, cette option empêche un fichier du type
-<filename>script.sh</filename> d'être traité comme un programme.
-</para></listitem>
-
 <listitem><para><guilabel>Les répertoires viennent toujours en premier</guilabel> signifie que
 les répertoires sont triés et affichés au début, et ensuite seulement tous les autres objets
 sont triés et affichés. Si cette option est désactivée, les répertoires sont mélangés avec les
@@ -2099,30 +2097,24 @@ Au-delà de cette valeur, le nom sera affiché sur deux lignes.
 En mode 'Enormes Icônes', la coupure intervient à 50 % de cette valeur.
 </para></listitem>
 
-<listitem><para><guilabel>Largeur max des petites icônes</guilabel> &mdash; comme pour l'option précédente,
-mais lorsque l'affichage est en mode 'Petites Icônes'.
+<listitem><para><guilabel>Largeur max des petites icônes</guilabel> &mdash; en mode 'Petites Icônes',
+tout texte plus long que cette valeur sera tronqué à l'affichage (une petite barre rouge vous l'indique).
+Si vous maintenez la souris au-dessus d'un texte tronqué, une bulle apparaîtra et affichera le texte complet.
 </para></listitem>
 
 <listitem><para><guilabel>Hériter les options de la fenêtre source</guilabel> contrôle le comportement
 du filer quand vous ouvrez une nouvelle fenêtre depuis une fenêtre existante (par exemple en cliquant
-sur un objet avec le bouton du milieu). Si cette option est activée, la nouvelle fenêtre respectera les
+sur un dossier avec le bouton du milieu). Si cette option est activée, la nouvelle fenêtre respectera les
 mêmes options d'affichage que la fenêtre depuis laquelle vous l'avez ouverte (taille des icônes, critères
 de tri, etc). Sinon, la nouvelle fenêtre utilisera les options par défaut.</para></listitem>
 
-<listitem><para><guilabel>Options par défaut pour les nouvelles fenêtres</guilabel>. Celles-ci correspondent aux
-différents styles d'affichage que vous pouvez obtenir dans le menu <guimenuitem>Affichage</guimenuitem>.
+<listitem><para><guilabel>Options par défaut pour les nouvelles fenêtres</guilabel>.
+Les options restantes définissent l'affichage par défaut pour l'ouverture des nouvelles
+fenêtres &mdash; elles correspondent aux différents styles d'affichage que vous pouvez
+obtenir dans le menu <guimenuitem>Affichage</guimenuitem>.
 </para></listitem>
 
-<listitem><para><guilabel>Mettre les fichiers en couleur en fonction de leur type</guilabel>.
-Si cette option est activée, les noms (et les détails) des fichiers sont mis en couleur en fonction de leur type
-(fichier normal, dossier, exécutable, etc). Vous pouvez choisir les couleurs dans la liste affichée en dessous.</para></listitem>
-
 </itemizedlist>
-
-Les options restantes définissent l'affichage par défaut pour toute nouvelle
-fenêtre &mdash; elles correspondent au choix proposé dans le menu Affichage.
-La taille d'icône est aussi utilisée quand vous désactivez l'affichage des
-détails dans la barre d'outils.
 
   </para>
 </sect1>
@@ -2137,10 +2129,24 @@ plutôt simple, vous pourriez choisir <guilabel>Pas de fond</guilabel>, ce qui af
 texte directement sur le fond d'écran. Mais les utilisateurs avec des fonds d'écran
 chargés peuvent avoir des difficultés à lire le texte ; pour cette raison, ils pourront choisir l'option
 <guilabel>Plaque rectangulaire de fond</guilabel>, qui affichera le texte sur un fond de couleur.
-
+Si vous utilisez Gtk+-2.0, cette option est sans effet.
+</para>
+<para>
 Vous pouvez changer la couleur du texte et de ce fond en cliquant sur les pavés de couleur.
+</para>
 
 <itemizedlist>
+
+<listitem>
+ <para>
+  <guilabel>Navigation en simple clic</guilabel>
+  permet d'ouvrir un fichier ou un dossier avec un seul clic. Maintenez <keycap>Ctrl</keycap> enfoncé
+  pour sélectionner un(des) objet(s).
+  Si cette option est désactivée, vous devrez double-cliquer pour ouvrir, car un simple clic ne
+  fera que sélectionner l'objet.
+ </para>
+</listitem>
+
 <listitem><para> <guilabel>Garder les icônes à l'intérieur des limites de l'écran</guilabel> évite que les icônes
 soient affichées à moitié en-dehors de l'écran.
 </para></listitem>
@@ -2178,20 +2184,28 @@ Sélectionnez les opérations que vous voulez voir démarrer automatiquement.
   <title>Options de la barre d'outils</title>
   <para>
 
-<itemizedlist>
-	<listitem><para> <guilabel>Activez les outils que vous voulez</guilabel> vous permet d'activer/désactiver
-les outils que vous voulez voir apparaître/disparaître de la barre d'outils.
-Cliquez simplement dessus pour les activer/désactiver &mdash; les outils en
-grisé seront désactivés, et ne seront pas affichés sur la barre d'outils des
-fenêtres du filer.
-</para></listitem>
+   La barre d'outils est décrite à la section <xref linkend="Toolbar"/>.
+   <itemizedlist>
+	<listitem>
+	 <para>
+	  <guilabel>Activez les outils que vous voulez</guilabel>
+	  vous permet d'activer/désactiver les outils que vous voulez voir
+	  apparaître/disparaître de la barre d'outils.
+	  Cliquez simplement dessus pour les activer/désactiver &mdash; les outils
+	  en grisé seront désactivés, et ne seront pas affichés sur la barre
+	  d'outils des fenêtres du filer.
+	 </para>
+	</listitem>
 
-<listitem><para> <guilabel>Type de barre d'outils</guilabel> vous permet de choisir quel type
-de barre d'outils vous voulez.
-<guimenuitem>Aucune</guimenuitem> désactive l'affichage de la barre d'outils,
-<guimenuitem>Petit</guimenuitem> affiche une petite barre d'icônes, et
-<guimenuitem>Grand</guimenuitem> affiche de plus grands boutons, avec des labels textuels.
-</para></listitem>
+	<listitem>
+	 <para>
+	  <guilabel>Type de barre d'outils</guilabel>
+	  vous permet de choisir quel type de barre d'outils vous voulez.
+	  <guimenuitem>Aucune</guimenuitem> désactive l'affichage de la barre d'outils,
+	  <guimenuitem>Petit</guimenuitem> affiche une petite barre d'icônes, et
+	  <guimenuitem>Grand</guimenuitem> affiche de plus grands boutons, avec des labels textuels.
+	 </para>
+	</listitem>
 
 <listitem><para> <guilabel>Afficher le nombre d'objets</guilabel> montre dans la barre d'outils le nombre d'objets
 affichés dans la fenêtre, ainsi que le nombre d'objets cachés (s'il y en a).
@@ -2200,8 +2214,6 @@ de la sélection (les dossiers ne sont pas pris en compte).
 </para></listitem>
 
 </itemizedlist>
-
-Voir la section <xref linkend="Toolbar"/> pour plus de détails.
 
   </para>
 </sect1>
@@ -2237,6 +2249,22 @@ maximum des fenêtres lorsque celles-ci sont redimensionnées automatiquement.
 <listitem><para> <guilabel>Fenêtres uniques</guilabel> évite que deux fenêtres puissent afficher le même dossier.
 Si vous ouvrez une deuxième fenêtre du même dossier, la première se fermera automatiquement.
 </para></listitem>
+
+<listitem>
+ <para>
+  <guilabel>Nouvelle fenêtre avec le bouton 1</guilabel>
+  permute le rôle des deux boutons qui n'affichent pas de menu quand un dossier est ouvert.
+  Cette une option utile pour les personnes habituées à utiliser RISC OS.
+ </para>
+</listitem>
+
+<listitem>
+ <para>
+  <guilabel>Navigation en simple clic</guilabel>
+  permet d'ouvrir un fichier ou un dossier avec un seul clic. Si cette option est désactivée,
+  vous devrez double-cliquer pour ouvrir, car un simple clic ne fera que sélectionner l'objet.
+ </para>
+</listitem>
 
 </itemizedlist>
 
@@ -2283,11 +2311,6 @@ Si c'est désactivé, vous pouvez déposer n'importe où dans la fenêtre (au-dessus 
 &mdash; les données seront sauvées dans le dossier affiché.
 </para></listitem>
 
-<listitem><para><guilabel>Effectuer un drap-and-drop avec le bouton du milieu...</guilabel>
-vous permettra de choisir l'affichage d'un menu (le même qu'en appuyant sur <keycap>Alt</keycap> pendant un drag-and-drop) ou
-de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un drag-and-drop).
-</para></listitem>
-
 <listitem><para><guilabel>Les répertoires surgissent</guilabel> définit le comportement du filer
 quand vous glissez et maintenez un objet au-dessus d'un dossier.
 Active, l'option provoquera le surgissement du dossier après un délai fixé par l'option suivante,
@@ -2300,6 +2323,11 @@ active pour que cela ait un effet sur les objets affichés dans un dossier.
 <listitem><para><guilabel>Délai de surgissement</guilabel> définit le temps, en millièmes de seconde,
 que le filer attendra avant d'ouvrir le dossier (comme décrit ci-dessus).
 Si l'option précédente est désactivée, celle-ci n'aura aucun effet.
+</para></listitem>
+
+<listitem><para><guilabel>Effectuer un drap-and-drop avec le bouton du milieu...</guilabel>
+vous permettra de choisir l'affichage d'un menu (le même qu'en appuyant sur <keycap>Alt</keycap> pendant un drag-and-drop) ou
+de déplacer les objets (comme en appuyant sur <keycap>Shift</keycap> pendant un drag-and-drop).
 </para></listitem>
 
 </itemizedlist>
@@ -2327,181 +2355,221 @@ Si l'option précédente est désactivée, celle-ci n'aura aucun effet.
    <guimenuitem>Envoyer à...</guimenuitem> et <guimenuitem>Nouveau</guimenuitem>.
   </para>
  </listitem>
+
+ <listitem>
+  <para>
+   <guilabel>Menu avec le bouton 2</guilabel>
+   permute le rôle des boutons 2 et 3 pour que le bouton du milieu affiche les menus.
+   Cette une option utile pour les personnes habituées à utiliser RISC OS.
+  </para>
+  <para>
+   Il y a une autre façon d'affecter l'affichage du menu au bouton du milieu :
+   certaines personnes préfèrent utiliser la commande <command>xmodmap -e "pointer
+	= 1 3 2"</command>, ce qui interverse les boutons du milieu et celui de droite
+   (TOUS les programmes sont affectés par cette manipulation, pas seulement
+   <application>ROX-Filer</application>).
+  </para>
+ </listitem>
 </itemizedlist>
 
   </para>
 </sect1>
 
 <sect1>
-  <title>Affectation des boutons de la souris</title>
-  <para>
+ <title>Types</title>
+ <para>
+  <itemizedlist>
+   <listitem>
+	<para>
+	 <guilabel>Ignorer le bit 'eXécutable' pour les extensions connues</guilabel> signifie que si
+	 un fichier a une extension connue (par exemple <filename>.gif</filename>), le 'bit exécutable'
+	 est ignoré. Un tel comportement est utile si vous avez des fichiers sur un système de fichiers
+	 de type Windows qui sont montrés comme des programmes exécutables. Par contre, cette option
+	 empêche un fichier du type <filename>script.sh</filename> d'être traité comme un programme.
+	</para>
+   </listitem>
+   <listitem>
+	<para>
+	 <guilabel>Mettre les fichiers en couleur en fonction de leur type</guilabel>.
+	 Si cette option est activée, les noms (et les détails) des fichiers sont mis en couleur en
+	 fonction de leur type (fichier normal, dossier, exécutable, etc). Vous pouvez choisir les
+	 couleurs dans la liste affichée en dessous.
+	</para>
+   </listitem>
+  </itemizedlist>
 
-<itemizedlist>
-<listitem><para> <guilabel>Nouvelle fenêtre avec le bouton 1</guilabel> échange le rôle par défaut des deux boutons
-qui n'affichent pas le menu, quand vous voulez ouvrir un dossier (généralement le bouton de gauche et celui du milieu).
-Cette option est faite pour les personnes qui ont l'habitude d'utiliser RISC OS.
-</para></listitem>
+  Le système de types MIME utilisé par le filer est décrit plus en détails à la section <xref linkend="types"/>.
 
-<listitem><para> <guilabel>Menu avec le bouton 2</guilabel> échange le rôle par défaut des boutons 2 et 3 afin
-que le bouton du milieu affiche le menu. Cette option est faite pour les personnes qui ont l'habitude d'utiliser RISC OS.
-</para></listitem>
-
-<listitem><para> <guilabel>Navigation en simple clic</guilabel> permet d'ouvrir un fichier ou un dossier avec
-un seul clic. Si cette option est désactivée, vous devrez double-cliquer pour ouvrir, car un simple clic ne
-fera que sélectionner l'objet.
-</para></listitem>
-</itemizedlist>
-
-Il y a une autre façon d'affecter l'affichage du menu au bouton du milieu : certaines personnes préfèrent utiliser la commande
-<command>xmodmap -e "pointer = 1 3 2"</command>, ce qui interverse les boutons du milieu et celui de droite (TOUS les
-programmes sont affectés par cette manipulation, pas seulement <application>ROX-Filer</application>).
-  </para>
- </sect1>
-
- <sect1>
-  <title>Types</title>
-  <para>
-   Le système "Types" est décrit section <xref linkend="types"/>.
-   <itemizedlist>
-	<listitem><para><guibutton>Montrer les règles nom->type</guibutton>
-	  ouvre les dossiers contenant les fichiers précisant au filer quel type donner à quel fichier.
-	  </para></listitem>
-	  <listitem><para><guibutton>Relire les fichiers</guibutton> oblige le filer à relire ces fichiers
-		après que vous les ayez modifiés.
-	 </para></listitem>
-   </itemizedlist>
-  </para>
- </sect1>
+  <itemizedlist>
+   <listitem>
+	<para>
+	 <guibutton>Montrer les règles nom->type</guibutton>
+	 ouvre les dossiers contenant les fichiers précisant au filer quel type donner à quel fichier.
+	</para>
+   </listitem>
+   <listitem>
+	<para>
+	 <guibutton>Relire les fichiers</guibutton>
+	 oblige le filer à relire ces fichiers après que vous les ayez modifiés.
+	</para>
+   </listitem>
+  </itemizedlist>
+ </para>
+</sect1>
 
 </chapter>
 
 <chapter id="types">
-  <title>Types de fichier</title>
-  <para>
-
-Tous les fichiers ont un type MIME sous la forme <emphasis>text/plain</emphasis>. Ici,
-<emphasis>text</emphasis> est le <emphasis>type de media</emphasis> et <emphasis>plain</emphasis> est le <emphasis>sous-type</emphasis>.
-  </para><para>
-<application>ROX-Filer</application> utilise le nom d'un fichier pour décider si un fichier est d'un
-type MIME ou d'un autre, puis utilise le type MIME pour associer une icône et savoir quel programme
-exécuter quand vous ouvrez le fichier.
-  </para>
+ <title>Types de fichier</title>
+ <para>
+  Tous les fichiers ont un type MIME sous la forme <emphasis>text/plain</emphasis>. Ici,
+  <emphasis>text</emphasis> est le <emphasis>type de media</emphasis> et <emphasis>plain
+  </emphasis> est le <emphasis>sous-type</emphasis>.
+ </para>
+ <para>
+  <application>ROX-Filer</application> utilise le nom d'un fichier pour décider si un
+  fichier est d'un type MIME ou d'un autre, puis utilise le type MIME pour associer une
+  icône et savoir quel programme exécuter quand vous ouvrez le fichier.
+ </para>
 
 <sect1>
-  <title><anchor id="RunAction" xreflabel="the Set Run Action box"/>
-    Fixer l'action d'exécution...
-  </title>
+ <title><anchor id="RunAction" xreflabel="the Set Run Action box"/>
+  Fixer l'action d'exécution...
+ </title>
+ <para>
+  Cette commande du menu Fichier est utilisée pour définir l'application à exécuter
+  quand vous cliquez sur un fichier.
+ </para>
+ <para>
+  Par exemple, admettons que vous vouliez que les <filename>.gif</filename> s'ouvrent
+  automatiquement avec 'The Gimp'.
+  D'abord, faites un clic droit sur une image gif pour ouvrir le menu, et choisissez
+  la commande <guimenuitem>Fixer l'action d'exécution...</guimenuitem> dans le sous-menu
+  <guimenuitem>Fichier</guimenuitem> (celui qui prend le nom du fichier sur lequel
+  vous avez cliqué).
+  Ensuite, vous pouvez fixer l'action d'exécution de deux façons différentes :
+ </para>
+
+ <sect2>
+  <title>Par drag-and-drop</title>
   <para>
-
-Cette commande du menu Fichier est utilisée pour définir l'application à exécuter quand vous cliquez sur un fichier.
-  </para><para>
-Par exemple, admettons que vous vouliez que les <filename>.gif</filename> s'ouvrent automatiquement avec 'The Gimp'.
-D'abord, faites un clic droit sur une image gif pour ouvrir le menu, et choisissez la commande <guimenuitem>Fixer l'action d'exécution...</guimenuitem>
-dans le sous-menu <guimenuitem>Fichier</guimenuitem> (celui qui prend le nom du fichier sur lequel vous avez cliqué).
-Ensuite, vous pouvez fixer l'action d'exécution de deux façons différentes :
+   Déposez 'The Gimp' (depuis une fenêtre du filer, un panneau ou le punaiseur)
+   sur l'aire où est inscrit <guilabel>Faites glisser ici une application
+   appropriée</guilabel>.
+   Maintenant, si vous cliquez sur une image gif, 'The Gimp' sera lancé automatiquement
+   et ouvrira cette image.
   </para>
+ </sect2>
 
-  <sect2><title>Par drag-and-drop</title>
-    <para>
-Déposez 'The Gimp' (depuis une fenêtre du filer, un panneau ou le punaiseur) sur l'aire où est inscrit
-<guilabel>Faites glisser ici une application appropriée</guilabel>.
-Maintenant, si vous cliquez sur une image gif, 'The Gimp' sera lancé automatiquement et ouvrira cette image.
-    </para>
-  </sect2>
+ <sect2>
+  <title>En entrant une commande shell</title>
+  <para>
+   Tapez : <userinput>gimp "$1"</userinput> dans l'endroit <guilabel>Entrez une commande
+   shell</guilabel> et appuyez sur <keycap>Entrée</keycap>. <userinput>$1</userinput>
+   sera remplacé par le nom du fichier sur lequel vous cliquerez.
+   Comme ci-dessus, 'The Gimp' sera lancé automatiquement et ouvrira cette image.
+  </para>
+ </sect2>
 
-  <sect2><title>En entrant une commande shell</title>
-    <para>
-Tapez : <userinput>gimp "$1"</userinput>
-dans l'endroit <guilabel>Entrez une commande shell</guilabel> et appuyez sur <keycap>Entrée</keycap>.
-<userinput>$1</userinput> sera remplacé par le nom du fichier sur lequel vous cliquerez.
-Comme ci-dessus, 'The Gimp' sera lancé automatiquement et ouvrira cette image.
-    </para>
-  </sect2>
-
-  <sect2><title>Définir les types de média par défaut</title>
-    <para>
-Quelque soit la méthode que vous utilisez pour fixer l'action d'exécution,
-vous avez le choix de fixer celle-ci juste pour le type MIME du fichier,
-ou pour tous les fichiers ayant ce type et un sous-type différent et qui
-n'ont pas encore d'action par défaut.
-    </para><para>
-Puisque 'The Gimp' peut lire beaucoup de types d'images, il peut être intéressant
-de choisir l'option <guilabel>Mettre la valeur par défaut pour tout 'image/&lt;quelconque&gt;'</guilabel>
-et ainsi vous n'aurez pas à le faire pour les fichiers image/jpeg et les autres...
-Cette option n'a d'effet que sur les types qui n'ont pas déjà une action définie
-(ie, ceux qui vous affichent un message d'erreur quand vous essayez de les ouvrir).
-    </para>
-  </sect2>
+ <sect2>
+  <title>Définir les types de média par défaut</title>
+  <para>
+   Quelque soit la méthode que vous utilisez pour fixer l'action d'exécution,
+   vous avez le choix de fixer celle-ci juste pour le type MIME du fichier,
+   ou pour tous les fichiers ayant ce type et un sous-type différent et qui
+   n'ont pas encore d'action par défaut.
+  </para>
+  <para>
+   Puisque 'The Gimp' peut lire beaucoup de types d'images, il peut être intéressant
+   de choisir l'option <guilabel>Mettre la valeur par défaut pour tout
+   'image/&lt;quelconque&gt;'</guilabel> et ainsi vous n'aurez pas à le faire pour
+   les fichiers image/jpeg et les autres...
+   Cette option n'a d'effet que sur les types qui n'ont pas déjà une action définie
+   (ie, ceux qui vous affichent un message d'erreur quand vous essayez de les ouvrir).
+  </para>
+ </sect2>
 </sect1>
 
 <sect1>
- <title><anchor id="SetIcon" xreflabel="the Set Icon box"/>
-  La boîte 'Fixer l'icône'
-  </title>
-  <para>
-   Cette boîte apparaît quand vous choisissez la commande <guimenuitem>Fixer l'icône...</guimenuitem>
-   du menu Fichier. Elle permet de définir une image pour représenter l'objet.
-   </para>
-   <para>
-   Elle fonctionne un peu de la même façon que la boîte 'Fixer l'action d'exécution' décrite ci-dessus, sauf que
-   vous pouvez affecter une icône pour un fichier précis (par son nom), ou pour tous les fichiers d'un type particulier.
-   </para><para>
-   L'icône de dossier affichée dans la zone <guilabel>Faites glisser ici un fichier d'icône</guilabel>
-   vous permet d'afficher un dossier qui contient déjà une ou plusieurs icônes dont vous vous servez.
+ <title><anchor id="SetIcon" xreflabel="the Set Icon box"/>La boîte 'Fixer l'icône'</title>
+ <para>
+  Cette boîte apparaît quand vous choisissez la commande <guimenuitem>Fixer l'icône...
+  </guimenuitem> du menu Fichier. Elle permet de définir une image pour représenter l'objet.
+ </para>
+ <para>
+  Elle fonctionne un peu de la même façon que la boîte 'Fixer l'action d'exécution' décrite
+  ci-dessus, sauf que vous pouvez affecter une icône pour un fichier précis (par son nom),
+  ou pour tous les fichiers d'un type particulier.
+ </para>
+ <para>
+  L'icône de dossier affichée dans la zone <guilabel>Faites glisser ici un fichier d'icône
+  </guilabel> vous permet d'afficher un dossier qui contient déjà une ou plusieurs icônes
+  dont vous vous servez.
  </para>
 </sect1>
 
 <sect1>
-  <title>Comment les types de fichier sont enregistrés</title>
+ <title>Comment les types de fichier sont enregistrés</title>
+ <para>
+  <application>ROX-Filer</application> utilise trois sous-dossiers dans votre dossier Choices pour gérer
+  les types de fichier :
+  <variablelist>
+   <varlistentry><term><filename>MIME-info</filename></term><listitem>
+	 <para>
+	  contient des fichiers qui définissent le type MIME des fichiers
+	  en fonction de leur extension. Tous les fichiers se trouvant dans les dossiers
+	  <filename>MIME-info</filename> sont lus quand le filer démarre.
+	  <application>ROX-Filer</application> est installé avec beaucoup de ces règles déjà configurées
+	  &mdash; celles-ci sont installées par le paquetage rox-base.
+	 </para>
+	 <para>
+	  Beaucoup d'applications sont maintenant distribuées avec un fichier nommé <filename>something.mime</filename> ;
+	  copiez-les dans ce dossier <filename>MIME-info</filename> pour que <application>ROX-Filer</application> reconnaisse
+	  automatiquement les nouvelles extensions.
+	  <application>ROX-Filer</application> ne lit pas automatiquement ces fichiers. Vous pouvez soit redémarrer le filer,
+	  soit cliquer sur le bouton <guibutton>Relire les fichiers</guibutton> de l'onglet <guilabel>Types</guilabel> dans la boîte Options.
+	 </para>
+	</listitem>
+   </varlistentry>
+   <varlistentry><term><filename>MIME-types</filename></term><listitem>
+	 <para>
+	  contient des liens symboliques, un par type MIME, qui pointent vers des programmes
+	  qui connaissent ce type de fichiers. Pour définir quel programme est exécuté quand vous
+	  cliquez sur un fichier, vous utilisez normalement la commande <guimenuitem>Fixer l'action
+	  d'exécution...</guimenuitem> (voir la section <xref linkend="RunAction"/>).
+	  Cependant, vous pouvez définir ces actions manuellement &mdash; par exemple, pour ouvrir
+	  un fichier HTML avec Netscape :
+
+	  <orderedlist>
+	   <listitem>
+		<para>
+		 Trouvez l'application Netscape et choisissez la commande <guimenuitem>Lier...</guimenuitem> dans le menu.
+		</para>
+	   </listitem>
+
+	   <listitem>
+		<para>
+		 Entrez <userinput>text_html</userinput> comme nom pour le lien et glissez l'icône du haut de la
+		 boîte 'Lier' vers le dossier <filename>MIME-types</filename>.
+		</para>
+	   </listitem>
+
+	  </orderedlist>
+
+	  Vous pouvez aussi déposer dans ce dossier les programmes eux-mêmes, plutôt que des liens.
+   </para>
+ </listitem>
+</varlistentry>
+
+<varlistentry><term><filename>MIME-icons</filename></term>
+ <listitem>
   <para>
-
-<application>ROX-Filer</application> utilise trois sous-dossiers dans votre dossier Choices pour gérer
-les types de fichier :
-
-<variablelist>
-
-<varlistentry><term><filename>MIME-info</filename></term><listitem><para>
-contient des fichiers qui définissent le type MIME des fichiers
-en fonction de leur extension. Tous les fichiers se trouvant dans les dossiers
-<filename>MIME-info</filename> sont lus quand le filer démarre.
-<application>ROX-Filer</application> est installé avec beaucoup de ces règles déjà configurées
-&mdash; celles-ci sont installées par le paquetage rox-base.
-  </para><para>
-Beaucoup d'applications sont maintenant distribuées avec un fichier nommé <filename>something.mime</filename> ;
-copiez-les dans ce dossier <filename>MIME-info</filename> pour que <application>ROX-Filer</application> reconnaisse
-automatiquement les nouvelles extensions.
-<application>ROX-Filer</application> ne lit pas automatiquement ces fichiers. Vous pouvez soit redémarrer le filer,
-soit cliquer sur le bouton <guibutton>Relire les fichiers</guibutton> de l'onglet <guilabel>Types</guilabel> dans la boîte Options.
-</para></listitem></varlistentry>
-
-<varlistentry><term><filename>MIME-types</filename></term><listitem><para>
-contient des liens symboliques, un par type MIME, qui pointent vers des programmes
-qui connaissent ce type de fichiers. Pour définir quel programme est exécuté quand vous
-cliquez sur un fichier, vous utilisez normalement la commande <guimenuitem>Fixer l'action d'exécution...</guimenuitem>
-(voir la section <xref linkend="RunAction"/>).
-Cependant, vous pouvez définir ces actions manuellement &mdash; par exemple, pour ouvrir un fichier HTML
-avec Netscape :
-
-<orderedlist>
-<listitem><para>
-Trouvez l'application Netscape et choisissez la commande <guimenuitem>Lier...</guimenuitem> dans le menu.
-</para></listitem>
-
-<listitem><para>
-Entrez <userinput>text_html</userinput> comme nom pour le lien et glissez l'icône du haut de la
-boîte 'Lier' vers le dossier <filename>MIME-types</filename>.
-</para></listitem>
-
-</orderedlist>
-
-Vous pouvez aussi déposer dans ce dossier les programmes eux-mêmes, plutôt que des liens.
-</para></listitem></varlistentry>
-
-<varlistentry><term><filename>MIME-icons</filename></term><listitem><para>
-contient les images utilisées pour afficher chaque type de fichier.
-Donc le filer essaiera d'afficher un fichier HTML en utilisant l'icône nommée
-<filename>MIME-icons/text_html.xpm</filename>.
-</para></listitem></varlistentry>
+   contient les images utilisées pour afficher chaque type de fichier.
+   Donc le filer essaiera d'afficher un fichier HTML en utilisant l'icône nommée
+   <filename>MIME-icons/text_html.xpm</filename>.
+  </para>
+ </listitem>
+</varlistentry>
 
 </variablelist>
 
@@ -2511,7 +2579,7 @@ Par exemple, si <filename>text_html</filename> n'est pas trouvé, le filer
 essaiera simplement d'utiliser <filename>text</filename>.
 
   </para>
-</sect1>
+ </sect1>
 </chapter>
 
 <chapter id="appdirs">
@@ -2545,7 +2613,7 @@ exécutable (utilisez la boîte pour changer les permissions) !
 </para></listitem>
 
 <listitem><para>
-<filename>.DirIcon.png</filename>
+<filename>.DirIcon</filename>
 est l'image utilisée pour représenter le dossier (ceci fonctionne
 même s'il n'y a pas de fichier <filename>AppRun</filename>).
 </para></listitem>
@@ -2563,7 +2631,7 @@ contient des informations complémentaires sur l'application (voir ci-dessous).
 
 <listitem><para>
 <filename>AppIcon.xpm</filename>
-est utilisée si <filename>.DirIcon.png</filename> est manquant (dans un but de compatibilité
+est utilisée si <filename>.DirIcon</filename> est manquant (dans un but de compatibilité
 avec les anciennes versions).
 </para></listitem>
 
@@ -2836,43 +2904,38 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 </sect1>
 
 <sect1><title>Data-structures</title>
-  <para>
-The diagram below shows some of the major structures found in the
-filer and the relationships between them.
-  </para>
-<mediaobject>
-  <imageobject>
-   <imagedata align="center" format="PNG" fileref="../Structs.png"/>
-  </imageobject>
-  <textobject><para>Can't display image.</para></textobject>
-</mediaobject>
-
-  <para>
-To summarise, each window has its own <classname>FilerWindow</classname>
-structure.
-  </para><para>
-This structure has pointers to a <classname>Collection</classname>
-(which is the widget which actually displays the files) and to a
-<classname>Directory</classname>, which is used to cache the directory
-contents.
-  </para><para>
-Both <classname>Collection</classname> and
-<classname>Directory</classname> have pointers to (the same)
-<classname>DirItem</classname>s, each of which corresponds to one filesystem
-object.
-  </para><para>
-Several <classname>FilerWindow</classname>s may share the same
-<classname>Directory</classname>.
-  </para><para>
-While scanning is in progress the <classname>Directory</classname>
-keeps a list of the new items it has found
-(<emphasis>new_items</emphasis>) and the items which have changed in some way
-(<emphasis>up_items</emphasis>). It periodically notifies the filer window of
-the changes-so-far by calling all the functions in the
-<emphasis>users</emphasis> list (use <function>attach()</function>
-and <function>detach()</function> to add and remove functions to or from
-the list).
-  </para>
+ <para>
+  The <filename>global.h</filename> file lists each major data-structure used
+  in the filer and explains its purpose. This is a good place to start reading
+  if you want to know how the filer works.
+ </para>
+ <para>
+  In summary, each window has its own <classname>FilerWindow</classname>
+  structure.
+  This structure has pointers to a <classname>Collection</classname>
+  (which is the widget which actually displays the files) and to a
+  <classname>Directory</classname>, which is used to cache the directory
+  contents.
+ </para>
+ <para>
+  Both <classname>Collection</classname> and <classname>Directory</classname>
+  have pointers to (the same) <classname>DirItem</classname>s, each of which
+  corresponds to one filesystem object.
+ </para>
+ <para>
+  Several <classname>FilerWindow</classname>s may share the same
+  <classname>Directory</classname>.
+ </para>
+ <para>
+  While scanning is in progress the <classname>Directory</classname>
+  keeps a list of the new items it has found
+  (<emphasis>new_items</emphasis>) and the items which have changed in some way
+  (<emphasis>up_items</emphasis>). It periodically notifies the filer window of
+  the changes-so-far by calling all the functions in the
+  <emphasis>users</emphasis> list (use <function>attach()</function>
+  and <function>detach()</function> to add and remove functions to or from
+  the list).
+ </para>
 </sect1>
 </chapter>
 
@@ -3000,7 +3063,7 @@ the list).
 	 
   <refsect1>
    <title>LICENSE</title>
-   <para>Copyright (C) 2001 Thomas Leonard.</para>
+   <para>Copyright (C) 2002 Thomas Leonard.</para>
    <para>
 	Vous pouvez redistribuer des copies de ROX-Filer si vous respectez les termes de la GNU General Public License.
    </para>
@@ -3029,15 +3092,18 @@ the list).
 	 <member>Arnaud Calvo</member>
 	 <member>Andrew Clover</member>
 	 <member>Fabien Coutant</member>
+	 <member>Couderc Damien</member>
 	 <member>Dmitry Elfimov</member>
 	 <member>Mattias Engdegard</member>
 	 <member>Andrew Flegg</member>
 	 <member>Olivier Fourdan</member>
+	 <member>Eric Gillespie</member>
 	 <member>Thierry Godefroy</member>
 	 <member>Alex Holden</member>
 	 <member>Jasper Huijsmans</member>
 	 <member>Bernard Jungen</member>
 	 <member>James Kermode</member>
+	 <member>Krzysztof Krzyzaniak</member>
 	 <member>Vincent Ledda</member>
 	 <member>Vincent Lefevre</member>
 	 <member>Victor Liu See-le</member>
@@ -3079,7 +3145,7 @@ the list).
 <screen>
 $ rox --RPC &lt;&lt; EOF
 &lt;?xml version="1.0"?&gt;
-&lt;env:Envelope xmlns:env="http://www.w3.org/2001/06/soap-envelope"&gt;
+&lt;env:Envelope xmlns:env="http://www.w3.org/2001/12/soap-envelope"&gt;
 &lt;env:Body xmlns="http://rox.sourceforge.net/SOAP/ROX-Filer"&gt;
 &lt;Panel&gt;
 &lt;Name&gt;Default&lt;/Name&gt;
@@ -3093,6 +3159,14 @@ EOF
 Les méthodes suivantes sont reconnues :</para>
 
 <itemizedlist>
+
+ <listitem>
+  <para>
+   <function>Version()</function>
+   Returns the filer's version.
+  </para>
+ </listitem>
+
 <listitem><para><function>CloseDir(Filename)</function>
   Ferme le dossier <filename>Filename</filename> et tous ses sous-dossiers.
 </para></listitem>
@@ -3211,18 +3285,18 @@ Les méthodes suivantes sont reconnues :</para>
 </bibliomixed>
 
 <bibliomixed>
-  <abbrev>enlightenment</abbrev><citetitle>Enlightenment,
-  <ulink url="http://www.enlightenment.org"/></citetitle>
-</bibliomixed>
-
-<bibliomixed>
   <abbrev>AVFS</abbrev><citetitle>AVFS - A Virtual File System,
   <ulink url="http://sourceforge.net/projects/avf/"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
-  <abbrev>SOAP</abbrev><citetitle>Simple Object Access Protocol (SOAP) 1.1
+ <abbrev>SOAP</abbrev><citetitle>Simple Object Access Protocol (SOAP) 1.2
   <ulink url="http://www.w3.org/TR/SOAP/"/></citetitle>
+</bibliomixed>
+
+<bibliomixed>
+ <abbrev>Thumbs</abbrev><citetitle>Thumbnail Managing Standard
+  <ulink url="http://triq.net/~pearl/thumbnail-spec/"/></citetitle>
 </bibliomixed>
 
 </bibliography>
