@@ -438,7 +438,7 @@ static guchar *pretty_type(DirItem *file, guchar *path)
 		if (got > 0 && got <= MAXPATHLEN)
 		{
 			p[got] = '\0';
-			return g_strconcat(_("Symbolic link to "), p, NULL);
+			return g_strdup_printf(_("Symbolic link to %s"), p);
 		}
 
 		return g_strdup(_("Symbolic link"));

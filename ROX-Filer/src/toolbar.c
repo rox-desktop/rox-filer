@@ -309,10 +309,12 @@ static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window)
 {
 	if (filer_window->details_type == DETAILS_NONE)
-		display_set_layout(filer_window, SMALL_ICONS, DETAILS_SUMMARY);
+		display_set_layout(filer_window,
+				filer_window->display_style,
+				DETAILS_SUMMARY);
 	else
 		display_set_layout(filer_window,
-				option_get_int("display_size"),
+				filer_window->display_style,
 				DETAILS_NONE);
 }
 

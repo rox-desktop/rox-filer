@@ -846,9 +846,8 @@ static GtkWidget *build_frame(void)
 	save_path = choices_find_path_save("...", PROJECT, FALSE);
 	if (save_path)
 	{
-		string = g_strconcat(_("Choices will be saved as "),
-					save_path,
-					NULL);
+		string = g_strdup_printf(_("Choices will be saved as %s"),
+					save_path);
 		g_free(save_path);
 		label = gtk_label_new(string);
 		g_free(string);

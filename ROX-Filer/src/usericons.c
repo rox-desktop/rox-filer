@@ -220,20 +220,21 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 
 	radio = g_new(GtkWidget *, 3);
 
-	tmp = g_strconcat(_("Set icon for all `"), item->mime_type->media_type,
-			  "/<anything>'", NULL);
+	tmp = g_strdup_printf(_("Set icon for all `%s/<anything>'"),
+			item->mime_type->media_type);
 	radio[2] = gtk_radio_button_new_with_label(NULL, tmp);
 	gtk_box_pack_start(GTK_BOX(vbox), radio[2], FALSE, TRUE, 0);
 	g_free(tmp);
 
-	tmp = g_strconcat(_("Only for the type `"), item->mime_type->media_type,
-			  "/", item->mime_type->subtype, "'", NULL);
+	tmp = g_strdup_printf(_("Only for the type `%s/%s'"),
+			item->mime_type->media_type,
+			item->mime_type->subtype);
 	radio[1] = gtk_radio_button_new_with_label_from_widget(
 					GTK_RADIO_BUTTON(radio[2]), tmp);
 	gtk_box_pack_start(GTK_BOX(vbox), radio[1], FALSE, TRUE, 0);
 	g_free(tmp);
 
-	tmp = g_strconcat(_("Only for the file `"), path, "'", NULL);
+	tmp = g_strdup_printf(_("Only for the file `%s'"), path);
 	radio[0] = gtk_radio_button_new_with_label_from_widget(
 					GTK_RADIO_BUTTON(radio[2]), tmp);
 	gtk_box_pack_start(GTK_BOX(vbox), radio[0], FALSE, TRUE, 0);

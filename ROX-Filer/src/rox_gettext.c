@@ -52,7 +52,7 @@ char *rox_gettext(char *from)
 {
 	char	*retval;
 	
-	if (!translate)
+	if (!translate || !from || !*from)
 		return from;
 
 	retval = g_hash_table_lookup(translate, from);

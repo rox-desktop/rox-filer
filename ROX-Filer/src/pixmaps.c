@@ -272,10 +272,12 @@ static GdkPixbuf *scale_pixbuf(GdkPixbuf *src, int max_w, int max_h)
 		float scale_x = ((float) w) / max_w;
 		float scale_y = ((float) h) / max_h;
 		float scale = MAX(scale_x, scale_y);
+		int dest_w = w / scale;
+		int dest_h = h / scale;
 		
 		return gdk_pixbuf_scale_simple(src,
-						w / scale,
-						h / scale,
+						MAX(dest_w, 1),
+						MAX(dest_h, 1),
 						GDK_INTERP_BILINEAR);
 	}
 }
