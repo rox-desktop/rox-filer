@@ -299,7 +299,6 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
   ptr = strchr (file_name, '.');
   while (ptr != NULL)
     {
-      g_print (ptr);
       mime_type = (_xdg_glob_hash_node_lookup_file_name (glob_hash->simple_node, ptr, FALSE));
       if (mime_type != NULL)
         return mime_type;
@@ -308,7 +307,7 @@ _xdg_glob_hash_lookup_file_name (XdgGlobHash *glob_hash,
       if (mime_type != NULL)
         return mime_type;
       
-      ptr = strchr (ptr, '.');      
+      ptr = strchr (ptr+1, '.');
     }
 
   /* FIXME: Not UTF-8 safe */
