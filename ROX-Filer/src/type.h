@@ -41,6 +41,7 @@ struct _MIME_type
 /* Prototypes */
 void type_init();
 char *basetype_name(DirItem *item);
+MIME_type *type_get_type(guchar *path);
 
 MIME_type *type_from_path(char *path);
 gboolean type_open(char *path, MIME_type *type);

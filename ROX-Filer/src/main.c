@@ -109,6 +109,7 @@ static void show_features(void);
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -h, --help		display this help and exit\n"		\
        "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
+       "  -m, --mime-type=FILE	print MIME type of FILE and exit\n" \
        "  -n, --new		start a new filer, even if already running\n"  \
        "  -o, --override	override window manager control of panels\n" \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
@@ -116,13 +117,13 @@ static void show_features(void);
        "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
-       "  -x, --examine=FILE    FILE has changed - re-examine it\n"	\
+       "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
        "  -v, --version		display the version information and exit\n"   \
        "\nThe latest version can be found at:\n"			\
        "\thttp://rox.sourceforge.net\n"					\
        "\nReport bugs to <tal197@users.sourceforge.net>.\n")
 
-#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:"
+#define SHORT_OPS "d:t:b:l:r:op:s:hvnux:m:"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -140,6 +141,7 @@ static struct option long_opts[] =
 	{"new", 0, NULL, 'n'},
 	{"show", 1, NULL, 's'},
 	{"examine", 1, NULL, 'x'},
+	{"mime-type", 1, NULL, 'm'},
 	{NULL, 0, NULL, 0},
 };
 #endif
@@ -344,6 +346,15 @@ int main(int argc, char **argv)
 			case 'u':
 				show_user = TRUE;
 				break;
+		        case 'm':
+				{
+					MIME_type *type;
+					type_init();
+					type = type_get_type(VALUE);
+					printf("%s/%s\n", type->media_type,
+							  type->subtype);
+				}
+				return EXIT_SUCCESS;
 			default:
 				printf(_(USAGE));
 				return EXIT_FAILURE;

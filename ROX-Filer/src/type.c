@@ -213,6 +213,37 @@ char *basetype_name(DirItem *item)
 
 /*			MIME-type guessing 			*/
 
+/* Get the type of this file - stats the file and uses that if
+ * possible. For regular or missing files, uses the pathname.
+ */
+MIME_type *type_get_type(guchar *path)
+{
+	struct stat	info;
+	MIME_type	*type = NULL;
+	int		base = TYPE_FILE;
+	gboolean	exec = FALSE;
+
+	if (mc_stat(path, &info) == 0)
+	{
+		base = mode_to_base_type(info.st_mode);
+		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+			exec = TRUE;
+	}
+
+	if (base == TYPE_FILE)
+		type = type_from_path(path);
+
+	if (!type)
+	{
+		if (base == TYPE_FILE && exec)
+			type = &special_exec;
+		else
+			type = mime_type_from_base_type(base);
+	}
+
+	return type;
+}
+
 /* Returns a pointer to the MIME-type.
  * NULL if we can't think of anything.
  */
