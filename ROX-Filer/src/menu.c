@@ -1611,7 +1611,9 @@ static void close_window(gpointer data, guint action, GtkWidget *widget)
 {
 	g_return_if_fail(window_with_focus != NULL);
 
-	gtk_widget_destroy(window_with_focus->window);
+	if (!filer_window_delete(window_with_focus->window, NULL,
+				 window_with_focus))
+		gtk_widget_destroy(window_with_focus->window);
 }
 
 static void mini_buffer(gpointer data, guint action, GtkWidget *widget)
