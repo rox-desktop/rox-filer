@@ -151,6 +151,7 @@ static void home_directory(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 /* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
+static void follow_symlinks(gpointer data, guint action, GtkWidget *widget);
 
 /* (action used in this - MiniType) */
 static void mini_buffer(gpointer data, guint action, GtkWidget *widget);
@@ -167,6 +168,7 @@ static GtkWidget	*filer_hidden_menu;	/* The Show Hidden item */
 static GtkWidget	*filer_thumb_menu;	/* The Show Thumbs item */
 static GtkWidget	*filer_new_window;	/* The New Window item */
 static GtkWidget        *filer_new_menu;        /* The New submenu */
+static GtkWidget        *filer_follow_sym;      /* Follow symbolic links item */
 
 #undef N_
 #define N_(x) x
@@ -234,6 +236,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
 {">" N_("Home Directory"),	NULL, home_directory, 0, NULL},
+{">" N_("Follow Symbolic Links"),	NULL, follow_symlinks, 0, NULL},
 {">" N_("Resize Window"),	NULL, resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
 
@@ -285,6 +288,8 @@ void ensure_filer_menu(void)
 							"Show Thumbnails");
 
 	GET_SMENU_ITEM(filer_new_menu, "filer", "New");
+	GET_SSMENU_ITEM(item, "filer", "Window", "Follow Symbolic Links");
+	filer_follow_sym = GTK_BIN(item)->child;
 
 	/* File '' label... */
 	items = gtk_container_get_children(GTK_CONTAINER(filer_menu));
@@ -777,6 +782,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 	gtk_widget_set_sensitive(filer_new_window,
 			!o_unique_filer_windows.int_value);
+	gtk_widget_set_sensitive(filer_follow_sym,
+		strcmp(filer_window->sym_path, filer_window->real_path) != 0);
 
 	popup_menu = (state & GDK_CONTROL_MASK)
 				? filer_file_menu
@@ -1518,6 +1525,18 @@ static void home_directory(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_change_to(window_with_focus, home_dir, NULL);
+}
+
+static void follow_symlinks(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	if (strcmp(window_with_focus->real_path, window_with_focus->sym_path))
+		filer_change_to(window_with_focus,
+				window_with_focus->real_path, NULL);
+	else
+		delayed_error(_("This is already the canonical name "
+				"for this directory."));
 }
 
 static void open_parent(gpointer data, guint action, GtkWidget *widget)
