@@ -10,45 +10,43 @@
 
 #include <glib.h>
 
-#include <pango/pango.h>
-
 extern GList *icon_selection;
-extern gboolean tmp_icon_selected;
+extern GtkWidget *icon_menu;		/* The popup icon menu */
+
+typedef struct _IconClass IconClass;
+
+struct _IconClass {
+	GObjectClass parent;
+
+	gboolean (*same_group)(Icon *icon, Icon *other);
+	void (*destroy)(Icon *icon);
+	void (*redraw)(Icon *icon);
+	void (*update)(Icon *icon);
+
+	/* Acts on selected items */
+	void (*remove_items)(void);
+};
 
 struct _Icon {
-	Panel		*panel;		/* NULL => Pinboard icon */
-	GtkWidget	*widget;	/* The drawing area for the icon */
+	GObject		object;
+	
 	gboolean	selected;
 	guchar		*src_path;	/* Eg: ~/Apps */
 	guchar		*path;		/* Eg: /home/fred/Apps */
 	DirItem		*item;
 
-	/* Only used on the pinboard... */
-	GtkWidget	*win;
-	GdkBitmap	*mask;
-	int		x, y;
-	int		width, height;
-	int		name_width;
-	PangoLayout	*layout;	/* The label */
-
-	/* Only used on the panel... */
-	GtkWidget	*label;
-	GtkWidget	*socket;	/* For applets */
+	GtkWidget	*dialog;	/* Current rename box, if any */
 };
 
-void icon_init(void);
-void icon_hash_path(Icon *icon);
-void icon_unhash_path(Icon *icon);
+GType icon_get_type(void);
 gboolean icons_require(const gchar *path);
 void icon_may_update(Icon *icon);
 void icons_may_update(const gchar *path);
-void update_all_icons(void);
-void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel);
+void icon_prepare_menu(Icon *icon);
 void icon_set_selected(Icon *icon, gboolean selected);
 void icon_select_only(Icon *select);
-void icon_destroyed(Icon *icon);
-void icon_set_tip(Icon *icon);
-void icons_update_tip(void);
-gchar *icon_convert_path(const gchar *path);
+void icon_set_path(Icon *icon, const char *pathname, const char *name);
+gchar *icon_create_uri_list(void);
+void icon_destroy(Icon *icon);
 
 #endif /* _ICON_H */

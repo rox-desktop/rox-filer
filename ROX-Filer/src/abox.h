@@ -14,7 +14,7 @@
 #define ABOX(obj) GTK_CHECK_CAST((obj), abox_get_type(), ABox)
 #define ABOX_CLASS(klass) GTK_CHECK_CLASS_CAST((klass), \
 					abox_get_type(), ABoxClass)
-#define IS_ABOX(obj) GTK_CHECK_TYPE((obj), abox_get_type())
+#define IS_ABOX(obj) G_TYPE_CHECK_INSTANCE_TYPE((obj), abox_get_type())
 
 typedef struct _ABoxClass  ABoxClass;
 typedef struct _ABox ABox;

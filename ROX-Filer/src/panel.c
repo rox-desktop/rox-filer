@@ -50,12 +50,35 @@
 #include "filer.h"
 #include "icon.h"
 #include "run.h"
+#include "appinfo.h"
 
 /* The width of the separator at the inner edge of the panel */
 #define EDGE_WIDTH 2
 
 /* The gap between panel icons */
 #define PANEL_ICON_SPACING 8
+
+static gboolean tmp_icon_selected = FALSE;		/* When dragging */
+
+typedef struct _PanelIconClass PanelIconClass;
+typedef struct _PanelIcon PanelIcon;
+
+struct _PanelIconClass {
+	IconClass parent;
+};
+
+struct _PanelIcon {
+	Icon		icon;
+
+	Panel		*panel;
+	GtkWidget	*widget;	/* The drawing area for the icon */
+	GtkWidget	*label;
+	GtkWidget	*socket;	/* For applets */
+};
+
+#define PANEL_ICON(obj) GTK_CHECK_CAST((obj), panel_icon_get_type(), PanelIcon)
+#define IS_PANEL_ICON(obj) \
+	G_TYPE_CHECK_INSTANCE_TYPE((obj), panel_icon_get_type())
 
 Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 
@@ -68,18 +91,18 @@ static void panel_destroyed(GtkWidget *widget, Panel *panel);
 static const char *pan_from_file(gchar *line);
 static gint icon_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
-			        Icon *icon);
+			        PanelIcon *pi);
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
-			      Icon *icon);
+			      PanelIcon *pi);
 static void reposition_panel(GtkWidget *window,
 				GtkAllocation *alloc, Panel *panel);
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
-			Icon *icon);
+			PanelIcon *pi);
 static gint draw_icon(GtkWidget *widget,
 			GdkRectangle *badarea,
-			Icon *icon);
+			PanelIcon *pi);
 static gint panel_button_release(GtkWidget *widget,
 			      GdkEventButton *event,
 			      Panel *panel);
@@ -88,7 +111,7 @@ static gint panel_button_press(GtkWidget *widget,
 			      Panel *panel);
 static void panel_post_resize(GtkWidget *box,
 			GtkRequisition *req, Panel *panel);
-static void drag_set_panel_dest(Icon *icon);
+static void drag_set_panel_dest(PanelIcon *pi);
 static void add_uri_list(GtkWidget          *widget,
                          GdkDragContext     *context,
                          gint               x,
@@ -106,7 +129,7 @@ static gboolean drag_motion(GtkWidget		*widget,
                             gint		x,
                             gint		y,
                             guint		time,
-			    Icon		*icon);
+			    PanelIcon		*pi);
 static void drag_leave(GtkWidget	*widget,
                        GdkDragContext	*context,
 		       guint32		time,
@@ -117,25 +140,30 @@ static gboolean enter_icon(GtkWidget *widget,
 			   Icon *icon);
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
-			      Icon *icon);
+			      PanelIcon *pi);
 static gint panel_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
 			      Panel *panel);
-static void reposition_icon(Icon *icon, int index);
-static void start_drag(Icon *icon, GdkEventMotion *event);
-static guchar *create_uri_list(GList *list);
+static void reposition_icon(PanelIcon *pi, int index);
+static void start_drag(PanelIcon *pi, GdkEventMotion *event);
 static void drag_end(GtkWidget *widget,
 		     GdkDragContext *context,
 		     Icon *icon);
 static void perform_action(Panel *panel,
-			   Icon *icon,
+			   PanelIcon *pi,
 			   GdkEventButton *event);
-static void run_applet(Icon *icon);
-static void panel_set_style(void);
-static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon);
+static void run_applet(PanelIcon *pi);
+static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi);
 static void panel_load_from_xml(Panel *panel, xmlDocPtr doc);
 static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
 				Panel *panel);
+static PanelIcon *panel_icon_new(Panel *panel,
+				 const char *pathname,
+				 const char *name);
+static GType panel_icon_get_type(void);
+static gboolean panel_want_show_text(PanelIcon *pi);
+static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel);
+static void panel_style_changed(void);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -158,7 +186,7 @@ void panel_init(void)
 {
 	option_add_int(&o_panel_style, "panel_style", SHOW_APPS_SMALL);
 
-	option_add_notify(panel_set_style);
+	option_add_notify(panel_style_changed);
 }
 
 /* 'name' may be NULL or "" to remove the panel */
@@ -324,26 +352,6 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	return panel;
 }
 
-gboolean panel_want_show_text(Icon *icon)
-{
-	if (o_panel_style.int_value == SHOW_BOTH)
-		return TRUE;
-	if (o_panel_style.int_value == SHOW_ICON)
-		return FALSE;
-
-	if (icon->item->flags & ITEM_FLAG_APPDIR)
-		return FALSE;
-
-	return TRUE;
-}
-
-void panel_icon_renamed(Icon *icon)
-{
-	GtkLabel *label = GTK_LABEL(icon->label);
-
-	gtk_label_set_text(label, icon->item->leafname);
-}
-
 /* Externally visible function to add an item to a panel */
 gboolean panel_add(PanelSide side,
 		   const gchar *path, const gchar *label, gboolean after)
@@ -474,6 +482,60 @@ static gboolean icon_pointer_out(GtkWidget *widget,
 	return 0;
 }
 
+static void panel_icon_destroyed(PanelIcon *pi)
+{
+	g_return_if_fail(pi->widget != NULL);
+
+	pi->widget = NULL;
+
+	g_object_unref(pi);
+}
+
+/* Set the tooltip AND hide/show the label */
+static void panel_icon_set_tip(PanelIcon *pi)
+{
+	XMLwrapper	*ai;
+	xmlNode 	*node;
+	Icon		*icon = (Icon *) pi;
+
+	g_return_if_fail(pi != NULL);
+
+	if (pi->label)
+	{
+		if (panel_want_show_text(pi))
+			gtk_widget_show(pi->label);
+		else
+			gtk_widget_hide(pi->label);
+	}
+
+	if (pi->socket)
+		ai = NULL;
+	else
+		ai = appinfo_get(icon->path, icon->item);
+
+	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
+	{
+		guchar *str;
+		str = xmlNodeListGetString(node->doc,
+				node->xmlChildrenNode, 1);
+		if (str)
+		{
+			gtk_tooltips_set_tip(tooltips, pi->widget, str, NULL);
+			g_free(str);
+		}
+	}
+	else if ((!panel_want_show_text(pi)) && !pi->socket)
+	{
+		gtk_tooltips_set_tip(tooltips, pi->widget,
+				icon->item->leafname, NULL);
+	}
+	else
+		gtk_tooltips_set_tip(tooltips, pi->widget, NULL, NULL);
+
+	if (ai)
+		g_object_unref(ai);
+}
+
 /* Add an icon with this path to the panel. If after is TRUE then the
  * icon is added to the right/bottom end of the panel.
  *
@@ -485,6 +547,7 @@ static void panel_add_item(Panel *panel,
 			   gboolean after)
 {
 	GtkWidget	*widget;
+	PanelIcon	*pi;
 	Icon		*icon;
 
 	g_return_if_fail(panel != NULL);
@@ -504,84 +567,68 @@ static void panel_add_item(Panel *panel,
 	
 	gtk_widget_realize(widget);
 
-	icon = g_new(Icon, 1);
-	icon->panel = panel;
-	icon->src_path = g_strdup(path);
-	icon->path = icon_convert_path(path);
-	icon->socket = NULL;
-	icon->label = NULL;
-	icon->layout = NULL;
+	pi = panel_icon_new(panel, path, name);
+	icon = (Icon *) pi;
 
-	g_object_set_data(G_OBJECT(widget), "icon", icon);
+	/* Widget takes the initial ref of Icon */
+	g_object_set_data(G_OBJECT(widget), "icon", pi);
 	
-	icon_hash_path(icon);
-	
-	icon->widget = widget;
-	gtk_widget_set_name(icon->widget, "panel-icon");
-	icon->selected = FALSE;
+	pi->widget = widget;
+	g_object_ref(widget);
 
-	if (name)
-		icon->item = diritem_new(name);
-	else
-	{
-		guchar	*slash;
+	gtk_widget_set_name(pi->widget, "panel-icon");
 
-		slash = strrchr(icon->path, '/');
-		icon->item = diritem_new(slash && slash[1] ? slash + 1
-								 : path);
-	}
-	diritem_restat(icon->path, icon->item);
-	
 	g_signal_connect_swapped(widget, "destroy",
-			  G_CALLBACK(icon_destroyed), icon);
+			  G_CALLBACK(panel_icon_destroyed), pi);
 
 	if (icon->item->base_type == TYPE_DIRECTORY)
-		run_applet(icon);
+		run_applet(pi);
 
 	g_signal_connect(widget, "button_release_event",
-			G_CALLBACK(icon_button_release), icon);
+			G_CALLBACK(icon_button_release), pi);
 	g_signal_connect(widget, "button_press_event",
-			G_CALLBACK(icon_button_press), icon);
-	g_signal_connect(icon->widget, "motion-notify-event",
-			G_CALLBACK(icon_motion_event), icon);
-	g_signal_connect(icon->widget, "enter-notify-event",
-			G_CALLBACK(icon_pointer_in), icon);
-	g_signal_connect(icon->widget, "leave-notify-event",
-			G_CALLBACK(icon_pointer_out), icon);
+			G_CALLBACK(icon_button_press), pi);
+	g_signal_connect(widget, "motion-notify-event",
+			G_CALLBACK(icon_motion_event), pi);
+	g_signal_connect(widget, "enter-notify-event",
+			G_CALLBACK(icon_pointer_in), pi);
+	g_signal_connect(widget, "leave-notify-event",
+			G_CALLBACK(icon_pointer_out), pi);
 
-	if (!icon->socket)
+	if (!pi->socket)
 	{
 		g_signal_connect(widget, "enter-notify-event",
-				G_CALLBACK(enter_icon), icon);
+				G_CALLBACK(enter_icon), pi);
 		g_signal_connect_after(widget, "expose_event",
-				G_CALLBACK(expose_icon), icon);
+				G_CALLBACK(expose_icon), pi);
 		g_signal_connect(widget, "drag_data_get",
 				G_CALLBACK(drag_data_get), NULL);
 
 		g_signal_connect(widget, "size_request",
-				G_CALLBACK(size_request), icon);
+				G_CALLBACK(size_request), pi);
 
-		drag_set_panel_dest(icon);
+		drag_set_panel_dest(pi);
 
-		icon->label = gtk_label_new(icon->item->leafname);
-		gtk_container_add(GTK_CONTAINER(icon->widget), icon->label);
-		gtk_misc_set_alignment(GTK_MISC(icon->label), 0.5, 1);
-		gtk_misc_set_padding(GTK_MISC(icon->label), 1, 2);
+		pi->label = gtk_label_new(icon->item->leafname);
+		gtk_container_add(GTK_CONTAINER(pi->widget), pi->label);
+		gtk_misc_set_alignment(GTK_MISC(pi->label), 0.5, 1);
+		gtk_misc_set_padding(GTK_MISC(pi->label), 1, 2);
 	}
 
 	if (!loading_panel)
 		panel_save(panel);
 		
-	icon_set_tip(icon);
+	panel_icon_set_tip(pi);
 	gtk_widget_show(widget);
 }
 
 /* Called when Gtk+ wants to know how much space an icon needs.
  * 'req' is already big enough for the label, if shown.
  */
-static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
+static void size_request(GtkWidget *widget, GtkRequisition *req, PanelIcon *pi)
 {
 	int	im_width, im_height;
+	Icon	*icon = (Icon *) pi;
 
 	im_width = icon->item->image->width;
 	im_height = MIN(icon->item->image->height, ICON_HEIGHT);
@@ -589,7 +636,7 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 	req->height += im_height;
 	req->width = MAX(req->width, im_width);
 
-	if (icon->panel->side == PANEL_LEFT || icon->panel->side == PANEL_RIGHT)
+	if (pi->panel->side == PANEL_LEFT || pi->panel->side == PANEL_RIGHT)
 		req->height += PANEL_ICON_SPACING;
 	else
 		req->width += PANEL_ICON_SPACING;
@@ -597,15 +644,16 @@ static void size_request(GtkWidget *widget, GtkRequisition *req, Icon *icon)
 
 static gint expose_icon(GtkWidget *widget,
 			GdkEventExpose *event,
-			Icon *icon)
+			PanelIcon *pi)
 {
-	return draw_icon(widget, &event->area, icon);
+	return draw_icon(widget, &event->area, pi);
 }
 
-static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
+static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, PanelIcon *pi)
 {
 	GdkRectangle	area;
 	int		width, height;
+	Icon		*icon = (Icon *) pi;
 
 	gdk_drawable_get_size(widget->window, &width, &height);
 
@@ -613,9 +661,9 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 	area.width = width;
 	area.height = icon->item->image->height;
 
-	if (panel_want_show_text(icon))
+	if (panel_want_show_text(pi))
 	{
-		int	text_height = icon->label->requisition.height;
+		int text_height = pi->label->requisition.height;
 
 		area.y = height - text_height - area.height;
 		
@@ -633,13 +681,14 @@ static gint draw_icon(GtkWidget *widget, GdkRectangle *badarea, Icon *icon)
 }
 
 /* icon may be NULL if the event is on the background */
-static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
+static void perform_action(Panel *panel, PanelIcon *pi, GdkEventButton *event)
 {
 	BindAction	action;
+	Icon		*icon = (Icon *) pi;
 	
 	action = bind_lookup_bev(icon ? BIND_PANEL_ICON : BIND_PANEL, event);
 
-	if (icon && icon->socket)
+	if (pi && pi->socket)
 		if (action != ACT_POPUP_MENU && action != ACT_MOVE_ICON)
 			return;
 
@@ -647,17 +696,17 @@ static void perform_action(Panel *panel, Icon *icon, GdkEventButton *event)
 	{
 		case ACT_OPEN_ITEM:
 			dnd_motion_ungrab();
-			wink_widget(icon->widget);
+			wink_widget(pi->widget);
 			run_diritem(icon->path, icon->item, NULL, NULL, FALSE);
 			break;
 		case ACT_EDIT_ITEM:
 			dnd_motion_ungrab();
-			wink_widget(icon->widget);
+			wink_widget(pi->widget);
 			run_diritem(icon->path, icon->item, NULL, NULL, TRUE);
 			break;
 		case ACT_POPUP_MENU:
 			dnd_motion_ungrab();
-			icon_show_menu(event, icon, panel);
+			panel_show_menu(event, pi, panel);
 			break;
 		case ACT_MOVE_ICON:
 			dnd_motion_start(MOTION_REPOSITION);
@@ -723,28 +772,28 @@ static gint panel_button_press(GtkWidget *widget,
 
 static gint icon_button_release(GtkWidget *widget,
 			        GdkEventButton *event,
-			        Icon *icon)
+			        PanelIcon *pi)
 {
-	if (icon->socket && event->button == 1)
+	if (pi->socket && event->button == 1)
 		return FALSE;	/* Restart button */
 
 	if (dnd_motion_release(event))
 		return TRUE;
 
-	perform_action(icon->panel, icon, event);
+	perform_action(pi->panel, pi, event);
 	
 	return TRUE;
 }
 
 static gint icon_button_press(GtkWidget *widget,
 			      GdkEventButton *event,
-			      Icon *icon)
+			      PanelIcon *pi)
 {
-	if (icon->socket && event->button == 1)
+	if (pi->socket && event->button == 1)
 		return FALSE;	/* Restart button */
 
 	if (dnd_motion_press(widget, event))
-		perform_action(icon->panel, icon, event);
+		perform_action(pi->panel, pi, event);
 
 	return TRUE;
 }
@@ -785,15 +834,15 @@ static void reposition_panel(GtkWidget *window,
 }
 
 /* Same as drag_set_dest(), but for panel icons */
-static void drag_set_panel_dest(Icon *icon)
+static void drag_set_panel_dest(PanelIcon *pi)
 {
-	GtkWidget	*obj = icon->widget;
+	GtkWidget	*obj = pi->widget;
 
-	make_drop_target(icon->widget, 0);
+	make_drop_target(pi->widget, 0);
 
-	g_signal_connect(obj, "drag_motion", G_CALLBACK(drag_motion), icon);
-	g_signal_connect(obj, "drag_leave", G_CALLBACK(drag_leave), icon);
-	g_signal_connect(obj, "drag_end", G_CALLBACK(drag_end), icon);
+	g_signal_connect(obj, "drag_motion", G_CALLBACK(drag_motion), pi);
+	g_signal_connect(obj, "drag_leave", G_CALLBACK(drag_leave), pi);
+	g_signal_connect(obj, "drag_end", G_CALLBACK(drag_end), pi);
 }
 
 static gboolean drag_motion(GtkWidget		*widget,
@@ -801,10 +850,11 @@ static gboolean drag_motion(GtkWidget		*widget,
                             gint		x,
                             gint		y,
                             guint		time,
-			    Icon		*icon)
+			    PanelIcon		*pi)
 {
 	GdkDragAction	action = context->suggested_action;
 	char		*type = NULL;
+	Icon		*icon = (Icon *) pi;
 	DirItem		*item = icon->item;
 
 	if (icon->selected)
@@ -837,7 +887,7 @@ out:
 		if (type == drop_dest_dir)
 			dnd_spring_load(context, NULL);
 
-		if (dnd_highlight && dnd_highlight != icon->widget)
+		if (dnd_highlight && dnd_highlight != pi->widget)
 		{
 			gtk_drag_unhighlight(dnd_highlight);
 			dnd_highlight = NULL;
@@ -845,8 +895,8 @@ out:
 
 		if (dnd_highlight == NULL)
 		{
-			gtk_drag_highlight(icon->widget);
-			dnd_highlight = icon->widget;
+			gtk_drag_highlight(pi->widget);
+			dnd_highlight = pi->widget;
 		}
 	}
 
@@ -967,7 +1017,7 @@ void panel_save(Panel *panel)
 		return;
 
 	doc = xmlNewDoc("1.0");
-	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "pinboard", NULL));
+	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "panel", NULL));
 
 	root = xmlDocGetRootElement(doc);
 	make_widgets(xmlNewChild(root, NULL, "start", NULL),
@@ -1045,9 +1095,9 @@ static gint panel_motion_event(GtkWidget *widget,
 
 static gint icon_motion_event(GtkWidget *widget,
 			      GdkEventMotion *event,
-			      Icon *icon)
+			      PanelIcon *pi)
 {
-	Panel	*panel = icon->panel;
+	Panel	*panel = pi->panel;
 	GList	*list, *me;
 	gboolean horz = panel->side == PANEL_TOP || panel->side == PANEL_BOTTOM;
 	int	val;
@@ -1056,7 +1106,7 @@ static gint icon_motion_event(GtkWidget *widget,
 	if (motion_state == MOTION_READY_FOR_DND)
 	{
 		if (dnd_motion_moved(event))
-			start_drag(icon, event);
+			start_drag(pi, event);
 		return TRUE;
 	}
 	else if (motion_state != MOTION_REPOSITION)
@@ -1115,7 +1165,7 @@ static gint icon_motion_event(GtkWidget *widget,
 	}
 
 	if (dir)
-		reposition_icon(icon, g_list_index(list, widget) + dir);
+		reposition_icon(pi, g_list_index(list, widget) + dir);
 
 	return TRUE;
 }
@@ -1125,10 +1175,10 @@ static gint icon_motion_event(GtkWidget *widget,
  * an index number, which allows you to specify that the icon should
  * go on the left or right side.
  */
-static void reposition_icon(Icon *icon, int index)
+static void reposition_icon(PanelIcon *pi, int index)
 {
-	Panel	  *panel = icon->panel;
-	GtkWidget *widget = icon->widget;
+	Panel	  *panel = pi->panel;
+	GtkWidget *widget = pi->widget;
 	GList	  *list;
 	int	  before_len;
 
@@ -1179,9 +1229,10 @@ static void reposition_icon(Icon *icon, int index)
 	panel_save(panel);
 }
 
-static void start_drag(Icon *icon, GdkEventMotion *event)
+static void start_drag(PanelIcon *pi, GdkEventMotion *event)
 {
-	GtkWidget *widget = icon->widget;
+	GtkWidget *widget = pi->widget;
+	Icon	  *icon = (Icon *) pi;
 
 	if (!icon->selected)
 	{
@@ -1203,36 +1254,10 @@ static void start_drag(Icon *icon, GdkEventMotion *event)
 	{
 		guchar	*uri_list;
 
-		uri_list = create_uri_list(icon_selection);
+		uri_list = icon_create_uri_list();
 		drag_selection(widget, event, uri_list);
 		g_free(uri_list);
 	}
-}
-
-/* Return a text/uri-list of all the icons in the list */
-static guchar *create_uri_list(GList *list)
-{
-	GString	*tmp;
-	guchar	*retval;
-	guchar	*leader;
-
-	tmp = g_string_new(NULL);
-	leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
-
-	for (; list; list = list->next)
-	{
-		Icon *icon = (Icon *) list->data;
-
-		g_string_append(tmp, leader);
-		g_string_append(tmp, icon->path);
-		g_string_append(tmp, "\r\n");
-	}
-
-	g_free(leader);
-	retval = tmp->str;
-	g_string_free(tmp, FALSE);
-	
-	return retval;
 }
 
 static void applet_died(GtkWidget *socket)
@@ -1284,26 +1309,27 @@ static void socket_destroyed(GtkWidget *socket, GtkWidget *widget)
  * 	Set lost_plug = "yes" and remove widget from panel.
  * 	Unref socket.
  */
-static void run_applet(Icon *icon)
+static void run_applet(PanelIcon *pi)
 {
 	GError	*error = NULL;
 	char	*argv[3];
 	gint	pid;
+	Icon	*icon = (Icon *) pi;
 
 	argv[0] = make_path(icon->path, "AppletRun")->str;
 	
 	if (access(argv[0], X_OK) != 0)
 		return;
 
-	icon->socket = gtk_socket_new();
+	pi->socket = gtk_socket_new();
 	
-	gtk_container_add(GTK_CONTAINER(icon->widget), icon->socket);
-	gtk_widget_show_all(icon->socket);
-	gtk_widget_realize(icon->socket);
+	gtk_container_add(GTK_CONTAINER(pi->widget), pi->socket);
+	gtk_widget_show_all(pi->socket);
+	gtk_widget_realize(pi->socket);
 
 	{
 		gchar		*pos;
-		PanelSide	side = icon->panel->side;
+		PanelSide	side = pi->panel->side;
 
 		/* Set a hint to let applets position their menus correctly */
 		pos = g_strdup_printf("%s,%d",
@@ -1311,7 +1337,7 @@ static void run_applet(Icon *icon)
 				side == PANEL_BOTTOM ? "Bottom" :
 				side == PANEL_LEFT ? "Left" :
 				"Right", MENU_MARGIN);
-		gdk_property_change(icon->socket->window,
+		gdk_property_change(pi->socket->window,
 				gdk_atom_intern("_ROX_PANEL_MENU_POS", FALSE),
 				gdk_atom_intern("STRING", FALSE),
 				8, GDK_PROP_MODE_REPLACE,
@@ -1319,11 +1345,11 @@ static void run_applet(Icon *icon)
 		g_free(pos);
 	}
 
-	g_object_set_data(G_OBJECT(icon->widget), "icon", icon);
-	g_object_set_data(G_OBJECT(icon->socket), "panel", icon->panel);
+	g_object_set_data(G_OBJECT(pi->widget), "icon", pi);
+	g_object_set_data(G_OBJECT(pi->socket), "panel", pi->panel);
 
 	argv[1] = g_strdup_printf("%ld",
-			GDK_WINDOW_XWINDOW(icon->socket->window));
+			GDK_WINDOW_XWINDOW(pi->socket->window));
 	argv[2] = NULL;
 
 	if (!g_spawn_async(NULL, argv, NULL, G_SPAWN_DO_NOT_REAP_CHILD,
@@ -1331,17 +1357,17 @@ static void run_applet(Icon *icon)
 	{
 		delayed_error(_("Error running applet:\n%s"), error->message);
 		g_error_free(error);
-		gtk_widget_destroy(icon->socket);
-		icon->socket = NULL;
+		gtk_widget_destroy(pi->socket);
+		pi->socket = NULL;
 	}
 	else
 	{
-		gtk_widget_ref(icon->socket);
-		on_child_death(pid, (CallbackFn) applet_died, icon->socket);
+		gtk_widget_ref(pi->socket);
+		on_child_death(pid, (CallbackFn) applet_died, pi->socket);
 
-		gtk_widget_ref(icon->socket);
-		g_signal_connect(icon->socket, "destroy",
-				G_CALLBACK(socket_destroyed), icon->widget);
+		gtk_widget_ref(pi->socket);
+		g_signal_connect(pi->socket, "destroy",
+				G_CALLBACK(socket_destroyed), pi->widget);
 	}	
 	
 	g_free(argv[1]);
@@ -1375,23 +1401,42 @@ static void panel_post_resize(GtkWidget *win, GtkRequisition *req, Panel *panel)
 	}
 }
 
-/* The style setting has been changed -- update all panels */
-static void panel_set_style(void)
+/* Tips or style has changed -- update everything on this panel */
+static void panel_set_style(Panel *panel)
+{
+	GList	*kids, *next;
+
+	kids = gtk_container_get_children(GTK_CONTAINER(panel->before));
+	for (next = kids; next; next = next->next)
+	{
+		PanelIcon *pi;
+		pi = g_object_get_data(next->data, "icon");
+		panel_icon_set_tip(pi);
+	}
+	g_list_free(kids);
+
+	kids = gtk_container_get_children(GTK_CONTAINER(panel->after));
+	for (next = kids; next; next = next->next)
+	{
+		PanelIcon *pi;
+		pi = g_object_get_data(next->data, "icon");
+		panel_icon_set_tip(pi);
+	}
+	g_list_free(kids);
+
+	gtk_widget_queue_resize(panel->window);
+}
+
+static void panel_style_changed(void)
 {
 	if (o_panel_style.has_changed)
 	{
-		int	i;
-
-		icons_update_tip();
+		int i;
 
 		for (i = 0; i < PANEL_NUMBER_OF_SIDES; i++)
 		{
-			Panel	*panel = current_panel[i];
-			
-			if (!panel)
-				continue;
-
-			gtk_widget_queue_resize(panel->window);
+			if (current_panel[i])
+				panel_set_style(current_panel[i]);
 		}
 	}
 }
@@ -1429,4 +1474,192 @@ static gboolean draw_panel_edge(GtkWidget *widget, GdkEventExpose *event,
 			x, y, width, height);
 
 	return FALSE;
+}
+
+static gpointer parent_class;
+
+static void panel_icon_destroy(Icon *icon)
+{
+	PanelIcon *pi = (PanelIcon *) icon;
+
+	g_return_if_fail(pi->widget != NULL);
+
+	gtk_widget_destroy(pi->widget);
+}
+
+static void panel_remove_items(void)
+{
+	Panel *panel;
+
+	g_return_if_fail(icon_selection != NULL);
+
+	panel = ((PanelIcon *) icon_selection->data)->panel;
+
+	while (icon_selection)
+		icon_destroy((Icon *) icon_selection->data);
+
+	panel_save(panel);
+}
+
+static void panel_icon_redraw(Icon *icon)
+{
+	gtk_widget_queue_draw(PANEL_ICON(icon)->widget);
+}
+
+static void panel_icon_update(Icon *icon)
+{
+	PanelIcon	*pi = (PanelIcon *) icon;
+
+	gtk_widget_queue_draw(pi->widget);
+	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
+	panel_save(pi->panel);
+}
+
+/* The point of this is to clear the selection if the existing icons
+ * aren't from the same panel...
+ */
+static gboolean panel_icon_same_group(Icon *icon, Icon *other)
+{
+	if (IS_PANEL_ICON(other))
+	{
+		PanelIcon *a = (PanelIcon *) icon;
+		PanelIcon *b = (PanelIcon *) other;
+
+		return a->panel == b->panel;
+	}
+	else
+		return FALSE;
+}
+
+static void panel_icon_class_init(gpointer gclass, gpointer data)
+{
+	IconClass *icon = (IconClass *) gclass;
+
+	parent_class = g_type_class_peek_parent(gclass);
+
+	icon->destroy = panel_icon_destroy;
+	icon->redraw = panel_icon_redraw;
+	icon->update = panel_icon_update;
+	icon->remove_items = panel_remove_items;
+	icon->same_group = panel_icon_same_group;
+}
+
+static void panel_icon_init(GTypeInstance *object, gpointer gclass)
+{
+	PanelIcon *pi = (PanelIcon *) object;
+
+	pi->widget = NULL;
+	pi->label = NULL;
+	pi->socket = NULL;
+}
+
+static GType panel_icon_get_type(void)
+{
+	static GType type = 0;
+
+	if (!type)
+	{
+		static const GTypeInfo info =
+		{
+			sizeof (PanelIconClass),
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			panel_icon_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(PanelIcon),
+			0,			/* n_preallocs */
+			panel_icon_init
+		};
+
+		type = g_type_register_static(icon_get_type(),
+						"PanelIcon", &info, 0);
+	}
+
+	return type;
+}
+
+static PanelIcon *panel_icon_new(Panel *panel,
+				 const char *pathname,
+				 const char *name)
+{
+	PanelIcon *pi;
+	Icon	  *icon;
+
+	pi = g_object_new(panel_icon_get_type(), NULL);
+	icon = (Icon *) pi;
+
+	icon_set_path(icon, pathname, name);
+	pi->panel = panel;
+
+	return pi;
+}
+
+static gboolean panel_want_show_text(PanelIcon *pi)
+{
+	Icon *icon = (Icon *) pi;
+
+	if (o_panel_style.int_value == SHOW_BOTH)
+		return TRUE;
+	if (o_panel_style.int_value == SHOW_ICON)
+		return FALSE;
+
+	if (icon->item->flags & ITEM_FLAG_APPDIR)
+		return FALSE;
+
+	return TRUE;
+}
+
+static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
+				gboolean  *push_in, gpointer data)
+{
+	int		*pos = (int *) data;
+	GtkRequisition 	requisition;
+
+	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
+
+	if (pos[0] == -1)
+		*x = screen_width - MENU_MARGIN - requisition.width;
+	else if (pos[0] == -2)
+		*x = MENU_MARGIN;
+	else
+		*x = pos[0] - (requisition.width >> 2);
+		
+	if (pos[1] == -1)
+		*y = screen_height - MENU_MARGIN - requisition.height;
+	else if (pos[1] == -2)
+		*y = MENU_MARGIN;
+	else
+		*y = pos[1] - (requisition.height >> 2);
+
+	*x = CLAMP(*x, 0, screen_width - requisition.width);
+	*y = CLAMP(*y, 0, screen_height - requisition.height);
+
+	*push_in = FALSE;
+}
+
+static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
+{
+	PanelSide side = panel->side;
+	int pos[3];
+
+	pos[0] = event->x_root;
+	pos[1] = event->y_root;
+	pos[2] = 1;
+
+	icon_prepare_menu((Icon *) pi);
+
+	if (side == PANEL_LEFT)
+		pos[0] = -2;
+	else if (side == PANEL_RIGHT)
+		pos[0] = -1;
+
+	if (side == PANEL_TOP)
+		pos[1] = -2;
+	else if (side == PANEL_BOTTOM)
+		pos[1] = -1;
+
+	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
+			panel_position_menu,
+			(gpointer) pos, event->button, event->time);
 }

@@ -19,23 +19,28 @@
  * Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* icon.c - shared code for the pinboard and panels */
+/* icon.c - abstract base class for pinboard and panel icons.
+ *
+ * An Icon contains the full pathname of its file and the DirItem for that
+ * file. Icons emit the following signals:
+ *
+ * redraw - the image, details or selection state have changed.
+ * update - the name or path has changed.
+ * destroy - someone wishes to remove the icon.
+ *
+ * Note that an icon may be removed without emitting 'destroy'.
+ */
 
 #include "config.h"
 
 #include <string.h>
-
-#include <gtk/gtkinvisible.h>
 #include <gtk/gtk.h>
-#include <libxml/parser.h>
 
 #include "global.h"
 
 #include "main.h"
 #include "gui_support.h"
 #include "support.h"
-#include "pinboard.h"
-#include "panel.h"
 #include "icon.h"
 #include "diritem.h"
 #include "menu.h"
@@ -45,46 +50,45 @@
 #include "infobox.h"
 #include "pixmaps.h"
 #include "mount.h"
-#include "appinfo.h"
 #include "type.h"
 #include "usericons.h"
 
-typedef void (*RenameFn)(Icon *icon);
+static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 
-static GtkWidget	*icon_menu;		/* The popup icon menu */
+GtkWidget		*icon_menu;		/* The popup icon menu */
 static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
 
-/* Widget which holds the selection when we have it */
-static GtkWidget *selection_invisible = NULL;
-static guint losing_selection = 0;	/* > 0 => Don't send events */
-gboolean tmp_icon_selected = FALSE;		/* When dragging */
-
-/* A list of selected Icons */
+/* A list of selected Icons. Every icon in the list is from the same group
+ * (eg, you can't have icons from two different panels selected at the
+ * same time).
+ */
 GList *icon_selection = NULL;
 
 /* Each entry is a GList of Icons which have the given pathname.
  * This allows us to update all necessary icons when something changes.
  */
-static GHashTable *icons_hash = NULL;
+static GHashTable *icons_hash = NULL;	/* path -> [Icon] */
 
 static Icon *menu_icon = NULL;	/* Item clicked if there is no selection */
 
 /* Static prototypes */
 static void rename_activate(GtkWidget *dialog);
 static void menu_closed(GtkWidget *widget);
-static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
-		gboolean  *push_in, gpointer data);
-static gint lose_selection(GtkWidget *widget, GdkEventSelection *event);
-static void selection_get(GtkWidget *widget, 
+static void lose_selection(GtkClipboard *primary, gpointer data);
+static void selection_get(GtkClipboard *primary, 
 		       GtkSelectionData *selection_data,
 		       guint      info,
-		       guint      time,
 		       gpointer   data);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
 static void file_op(gpointer data, guint action, GtkWidget *widget);
-static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback);
+static void show_rename_box(Icon *icon);
+static void icon_set_selected_int(Icon *icon, gboolean selected);
+static void icon_class_init(gpointer gclass, gpointer data);
+static void icon_init(GTypeInstance *object, gpointer gclass);
+static void icon_hash_path(Icon *icon);
+static void icon_unhash_path(Icon *icon);
 
 enum {
 	ACTION_SHIFT,
@@ -118,97 +122,6 @@ static GtkItemFactoryEntry menu_def[] = {
  *			EXTERNAL INTERFACE			*
  ****************************************************************/
 
-void icon_init(void)
-{
-	guchar		*tmp;
-	GList		*items;
-	GtkItemFactory	*item_factory;
-	GtkTargetEntry 	target_table[] =
-	{
-		{"text/uri-list", 0, TARGET_URI_LIST},
-		{"UTF8", 0, TARGET_STRING},
-		{"COMPOUND_TEXT", 0, TARGET_STRING},/* XXX: Treats as STRING */
-		{"STRING", 0, TARGET_STRING},
-	};
-
-	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
-
-	item_factory = menu_create(menu_def,
-				sizeof(menu_def) / sizeof(*menu_def),
-				 "<icon>", NULL);
-
-	tmp = g_strconcat("<icon>/", _("File"), NULL);
-	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
-	icon_file_menu = gtk_item_factory_get_widget(item_factory, tmp);
-	g_free(tmp);
-
-	/* File '' label... */
-	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
-	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
-	g_list_free(items);
-
-	/* Shift Open... label */
-	items = gtk_container_get_children(GTK_CONTAINER(icon_file_menu));
-	file_shift_item = GTK_BIN(items->data)->child;
-	g_list_free(items);
-
-	g_signal_connect(icon_menu, "unmap_event",
-			G_CALLBACK(menu_closed), NULL);
-
-	selection_invisible = gtk_invisible_new();
-
-	g_signal_connect(selection_invisible, "selection_clear_event",
-			G_CALLBACK(lose_selection), NULL);
-
-	g_signal_connect(selection_invisible, "selection_get",
-			G_CALLBACK(selection_get), NULL);
-
-	gtk_selection_add_targets(selection_invisible,
-			GDK_SELECTION_PRIMARY,
-			target_table,
-			sizeof(target_table) / sizeof(*target_table));
-
-	tooltips = gtk_tooltips_new();
-}
-
-/* The icons_hash table allows us to convert from a path to a list
- * of icons that use that path.
- * Add this icon to the list for its path.
- */
-void icon_hash_path(Icon *icon)
-{
-	GList	*list;
-
-	g_return_if_fail(icon != NULL);
-
-	/* g_print("[ hashing '%s' ]\n", icon->path); */
-
-	list = g_hash_table_lookup(icons_hash, icon->path);
-	list = g_list_prepend(list, icon);
-	g_hash_table_insert(icons_hash, icon->path, list);
-}
-
-/* Remove this icon from the icons_hash table */
-void icon_unhash_path(Icon *icon)
-{
-	GList	*list;
-
-	g_return_if_fail(icon != NULL);
-
-	/* g_print("[ unhashing '%s' ]\n", icon->path); */
-	
-	list = g_hash_table_lookup(icons_hash, icon->path);
-	g_return_if_fail(list != NULL);
-
-	list = g_list_remove(list, icon);
-
-	/* Remove it first; the hash key may have changed address */
-	g_hash_table_remove(icons_hash, icon->path);
-	if (list)
-		g_hash_table_insert(icons_hash,
-				((Icon *) list->data)->path, list);
-}
-
 /* Called when the pointer moves over the icon */
 void icon_may_update(Icon *icon)
 {
@@ -228,10 +141,7 @@ void icon_may_update(Icon *icon)
 	if (icon->item->image != image || icon->item->flags != flags)
 	{
 		/* Appearance changed; need to redraw */
-		if (icon->panel)
-			gtk_widget_queue_draw(icon->widget);
-		else
-			pinboard_reshape_icon(icon);
+		g_signal_emit_by_name(icon, "redraw");
 	}
 
 	if (image)
@@ -267,61 +177,12 @@ static void check_has(gpointer key, GList *icons, CheckData *check)
 		check->found = TRUE;
 }
 
-/* Set the tooltip AND hide/show the label for panel icons */
-void icon_set_tip(Icon *icon)
-{
-	GtkWidget	*widget;
-	XMLwrapper	*ai;
-	xmlNode 	*node;
-
-	g_return_if_fail(icon != NULL);
-
-	widget = icon->panel ? icon->widget : icon->win;
-
-	if (icon->panel && icon->label)
-	{
-		if (panel_want_show_text(icon))
-			gtk_widget_show(icon->label);
-		else
-			gtk_widget_hide(icon->label);
-	}
-
-	if (icon->panel && icon->socket)
-		ai = NULL;
-	else
-		ai = appinfo_get(icon->path, icon->item);
-
-	if (ai && ((node = appinfo_get_section(ai, "Summary"))))
-	{
-		guchar *str;
-		str = xmlNodeListGetString(node->doc,
-				node->xmlChildrenNode, 1);
-		if (str)
-		{
-			gtk_tooltips_set_tip(tooltips, widget, str, NULL);
-			g_free(str);
-		}
-	}
-	else if (icon->panel && (!panel_want_show_text(icon)) && !icon->socket)
-	{
-		gtk_tooltips_set_tip(tooltips, widget,
-				icon->item->leafname, NULL);
-	}
-	else
-		gtk_tooltips_set_tip(tooltips, widget, NULL, NULL);
-
-	if (ai)
-		g_object_unref(ai);
-}
-
-/* Returns TRUE if any icon links to this item (or any item inside
- * this item).
+/* Returns TRUE if any icon links to this file (or any file inside
+ * this directory). Used to check that it's OK to delete 'path'.
  */
 gboolean icons_require(const gchar *path)
 {
 	CheckData	check;
-
-	/* g_print("[ icons_require(%s)? ]\n", path); */
 
 	check.path = path;
 	check.found = FALSE;
@@ -330,29 +191,12 @@ gboolean icons_require(const gchar *path)
 	return check.found;
 }
 
-/* Callback to update icons of a certain path */
-static void update_icons(gpointer key, GList *icons, gpointer data)
-{
-	icons_may_update((guchar *) key);
-}
-
-/* Check all icons to see if they have been updated */
-void update_all_icons(void)
-{
-	g_hash_table_foreach(icons_hash, (GHFunc) update_icons, NULL);
-}
-
-/* Show the menu for this panel (NULL for the pinboard).
- * icon is the icon that was clicked on, if any.
+/* Menu was clicked over this icon. Set things up correctly (shade items,
+ * add app menu stuff, etc).
+ * You should show icon_menu after calling this...
  */
-void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
+void icon_prepare_menu(Icon *icon)
 {
-	int		pos[3];
-
-	pos[0] = event->x_root;
-	pos[1] = event->y_root;
-	pos[2] = 1;
-
 	appmenu_remove();
 
 	menu_icon = icon;
@@ -390,76 +234,27 @@ void icon_show_menu(GdkEventButton *event, Icon *icon, Panel *panel)
 		menu_set_items_shaded(icon_file_menu, TRUE, 0, 5);
 		gtk_label_set_text(GTK_LABEL(icon_file_item), _("Nothing"));
 	}
-
-	if (panel)
-	{
-		PanelSide side = panel->side;
-
-		if (side == PANEL_LEFT)
-			pos[0] = -2;
-		else if (side == PANEL_RIGHT)
-			pos[0] = -1;
-
-		if (side == PANEL_TOP)
-			pos[1] = -2;
-		else if (side == PANEL_BOTTOM)
-			pos[1] = -1;
-	}
-
-	gtk_menu_popup(GTK_MENU(icon_menu), NULL, NULL,
-			panel ? panel_position_menu : position_menu,
-			(gpointer) pos, event->button, event->time);
 }
 
+/* Set whether this icon is selected. Will automatically clear the selection
+ * if it contains icons from a different group.
+ */
 void icon_set_selected(Icon *icon, gboolean selected)
 {
-	gboolean clear = FALSE;
-
-	g_return_if_fail(icon != NULL);
-
-	if (icon->selected == selected)
-		return;
-	
-	/* When selecting an icon on another panel, we need to unselect
-	 * everything else afterwards.
-	 */
 	if (selected && icon_selection)
 	{
-		Icon *current = (Icon *) icon_selection->data;
+		IconClass	*iclass;
+		Icon		*other = (Icon *) icon_selection->data;
 
-		if (icon->panel != current->panel)
-			clear = TRUE;
-	}
-
-	icon->selected = selected;
-
-	gtk_widget_queue_draw(icon->widget);
-
-	if (selected)
-	{
-		icon_selection = g_list_prepend(icon_selection, icon);
-		if (losing_selection == 0 && !icon_selection->next)
+		iclass = (IconClass *) G_OBJECT_GET_CLASS(icon);
+		if (!iclass->same_group(icon, other))
 		{
-			/* Grab selection */
-			gtk_selection_owner_set(selection_invisible,
-				GDK_SELECTION_PRIMARY,
-				gdk_event_get_time(gtk_get_current_event()));
-		}
-	}
-	else
-	{
-		icon_selection = g_list_remove(icon_selection, icon);
-		if (losing_selection == 0 && !icon_selection)
-		{
-			/* Release selection */
-			gtk_selection_owner_set(NULL,
-				GDK_SELECTION_PRIMARY,
-				gdk_event_get_time(gtk_get_current_event()));
+			icon_select_only(icon);
+			return;
 		}
 	}
 
-	if (clear)
-		icon_select_only(icon);
+	icon_set_selected_int(icon, TRUE);
 }
 
 /* Clear everything, except 'select', which is selected.
@@ -470,7 +265,7 @@ void icon_select_only(Icon *select)
 	GList	*to_clear, *next;
 	
 	if (select)
-		icon_set_selected(select, TRUE);
+		icon_set_selected_int(select, TRUE);
 
 	to_clear = g_list_copy(icon_selection);
 
@@ -478,113 +273,159 @@ void icon_select_only(Icon *select)
 		to_clear = g_list_remove(to_clear, select);
 		
 	for (next = to_clear; next; next = next->next)
-		icon_set_selected((Icon *) next->data, FALSE);
+		icon_set_selected_int((Icon *) next->data, FALSE);
 
 	g_list_free(to_clear);
 }
 
-/* XXX: Under Gtk+ 2.0, can this get called twice? */
-void icon_destroyed(Icon *icon)
+/* Destroys this icon's widget, causing it to be removed from the screen */
+void icon_destroy(Icon *icon)
 {
 	g_return_if_fail(icon != NULL);
 
-	if (icon == menu_icon)
-		menu_icon = NULL;
+	icon_set_selected_int(icon, FALSE);
 
-	if (icon->layout)
+	g_signal_emit_by_name(icon, "destroy");
+}
+
+/* Return a text/uri-list of all the icons in the selection */
+gchar *icon_create_uri_list(void)
+{
+	GString	*tmp;
+	guchar	*retval;
+	guchar	*leader;
+	GList	*next;
+
+	tmp = g_string_new(NULL);
+	leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
+
+	for (next = icon_selection; next; next = next->next)
 	{
-		g_object_unref(G_OBJECT(icon->layout));
-		icon->layout = NULL;
+		Icon *icon = (Icon *) next->data;
+
+		g_string_append(tmp, leader);
+		g_string_append(tmp, icon->path);
+		g_string_append(tmp, "\r\n");
 	}
 
-	icon_unhash_path(icon);
-
-	pinboard_wink_item(NULL, FALSE);
-
-	if (g_list_find(icon_selection, icon))
-	{
-		icon_selection = g_list_remove(icon_selection, icon);
-
-		if (!icon_selection)
-			gtk_selection_owner_set(NULL,
-				GDK_SELECTION_PRIMARY,
-				gdk_event_get_time(gtk_get_current_event()));
-	}
-
-	if (icon->panel == NULL)
-	{
-		g_object_unref(icon->mask);
-		if (current_pinboard)
-			current_pinboard->icons =
-				g_list_remove(current_pinboard->icons, icon);
-	}
+	g_free(leader);
+	retval = tmp->str;
+	g_string_free(tmp, FALSE);
 	
-	diritem_free(icon->item);
-	g_free(icon->path);
-	g_free(icon->src_path);
-	g_free(icon);
-}
-
-static void set_tip(gpointer key, GList *icons, gpointer data)
-{
-	for (; icons; icons = icons->next)
-	{
-		Icon	*icon = (Icon *) icons->data;
-		
-		icon_set_tip(icon);
-	}
-}
-
-void icons_update_tip(void)
-{
-	g_hash_table_foreach(icons_hash, (GHFunc) set_tip, NULL);
-}
-
-/* Removes trailing / chars and converts a leading '~/' (if any) to
- * the user's home dir. g_free() the result.
- */
-gchar *icon_convert_path(const gchar *path)
-{
-	guchar		*retval;
-	int		path_len;
-
-	g_return_val_if_fail(path != NULL, NULL);
-
-	path_len = strlen(path);
-	while (path_len > 1 && path[path_len - 1] == '/')
-		path_len--;
-	
-	retval = g_strndup(path, path_len);
-
-	if (path[0] == '~' && (path[1] == '\0' || path[1] == '/'))
-	{
-		guchar *tmp = retval;
-
-		retval = g_strconcat(home_dir, retval + 1, NULL);
-		g_free(tmp);
-	}
-
 	return retval;
+}
+
+GType icon_get_type(void)
+{
+	static GType type = 0;
+
+	if (!type)
+	{
+		static const GTypeInfo info =
+		{
+			sizeof (IconClass),
+			NULL,			/* base_init */
+			NULL,			/* base_finalise */
+			icon_class_init,
+			NULL,			/* class_finalise */
+			NULL,			/* class_data */
+			sizeof(Icon),
+			0,			/* n_preallocs */
+			icon_init
+		};
+
+		type = g_type_register_static(G_TYPE_OBJECT, "Icon",
+					      &info, 0);
+	}
+
+	return type;
+}
+
+/* Sets, unsets or changes the pathname and name for an icon.
+ * Updates icons_hash and (re)stats the item.
+ * If name is NULL then gets the leafname from pathname.
+ * If pathname is NULL, frees everything.
+ */
+void icon_set_path(Icon *icon, const char *pathname, const char *name)
+{
+	if (icon->path)
+	{
+		icon_unhash_path(icon);
+		icon->src_path = NULL;
+		icon->path = NULL;
+
+		diritem_free(icon->item);
+		icon->item = NULL;
+	}
+
+	if (pathname)
+	{
+		icon->src_path = g_strdup(pathname);
+		icon->path = expand_path(pathname);
+
+		icon_hash_path(icon);
+
+		if (!name)
+			name = g_basename(pathname);
+
+		icon->item = diritem_new(name);
+		diritem_restat(icon->path, icon->item);
+	}
 }
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
+/* The icons_hash table allows us to convert from a path to a list
+ * of icons that use that path.
+ * Add this icon to the list for its path.
+ */
+static void icon_hash_path(Icon *icon)
+{
+	GList	*list;
+
+	g_return_if_fail(icon != NULL);
+
+	/* g_print("[ hashing '%s' ]\n", icon->path); */
+
+	list = g_hash_table_lookup(icons_hash, icon->path);
+	list = g_list_prepend(list, icon);
+	g_hash_table_insert(icons_hash, icon->path, list);
+}
+
+/* Remove this icon from the icons_hash table */
+static void icon_unhash_path(Icon *icon)
+{
+	GList	*list;
+
+	g_return_if_fail(icon != NULL);
+
+	/* g_print("[ unhashing '%s' ]\n", icon->path); */
+	
+	list = g_hash_table_lookup(icons_hash, icon->path);
+	g_return_if_fail(list != NULL);
+
+	list = g_list_remove(list, icon);
+
+	/* Remove it first; the hash key may have changed address */
+	g_hash_table_remove(icons_hash, icon->path);
+	if (list)
+		g_hash_table_insert(icons_hash,
+				((Icon *) list->data)->path, list);
+}
+
 static void rename_activate(GtkWidget *dialog)
 {
 	GtkWidget *entry, *src;
-	RenameFn callback;
 	Icon	*icon;
 	const guchar	*new_name, *new_src;
 	
 	entry = g_object_get_data(G_OBJECT(dialog), "new_name");
 	icon = g_object_get_data(G_OBJECT(dialog), "callback_icon");
-	callback = g_object_get_data(G_OBJECT(dialog), "callback_fn");
 	src = g_object_get_data(G_OBJECT(dialog), "new_path");
 
-	g_return_if_fail(callback != NULL &&
-			 entry != NULL &&
+	g_return_if_fail(entry != NULL &&
 			 src != NULL &&
 			 icon != NULL);
 
@@ -599,22 +440,8 @@ static void rename_activate(GtkWidget *dialog)
 			_("The location must contain at least one character!"));
 	else
 	{
-		g_free(icon->item->leafname);
-		g_free(icon->src_path);
-
-		icon->src_path = g_strdup(new_src);
-
-		icon_unhash_path(icon);
-		g_free(icon->path);
-		icon->path = icon_convert_path(new_src);
-		icon_hash_path(icon);
-		
-		icon->item->leafname = g_strdup(new_name);
-		/* XXX: Set name_width in size_and_shape? */
-
-		diritem_restat(icon->path, icon->item);
-
-		callback(icon);
+		icon_set_path(icon, new_src, new_name);
+		g_signal_emit_by_name(icon, "update");
 		gtk_widget_destroy(dialog);
 	}
 }
@@ -625,143 +452,65 @@ static void menu_closed(GtkWidget *widget)
 	menu_icon = NULL;
 }
 
-static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
-				gboolean  *push_in, gpointer data)
-{
-	int		*pos = (int *) data;
-	GtkRequisition 	requisition;
-
-	gtk_widget_size_request(GTK_WIDGET(menu), &requisition);
-
-	if (pos[0] == -1)
-		*x = screen_width - MENU_MARGIN - requisition.width;
-	else if (pos[0] == -2)
-		*x = MENU_MARGIN;
-	else
-		*x = pos[0] - (requisition.width >> 2);
-		
-	if (pos[1] == -1)
-		*y = screen_height - MENU_MARGIN - requisition.height;
-	else if (pos[1] == -2)
-		*y = MENU_MARGIN;
-	else
-		*y = pos[1] - (requisition.height >> 2);
-
-	*x = CLAMP(*x, 0, screen_width - requisition.width);
-	*y = CLAMP(*y, 0, screen_height - requisition.height);
-
-	*push_in = FALSE;
-}
-
 /* Called when another application takes the selection away from us */
-static gint lose_selection(GtkWidget *widget, GdkEventSelection *event)
+static void lose_selection(GtkClipboard *primary, gpointer data)
 {
-	/* Don't send any events */
-
-	losing_selection++;
+	have_primary = FALSE;
 	icon_select_only(NULL);
-	losing_selection--;
-
-	return TRUE;
 }
 
 /* Called when another application wants the contents of our selection */
-static void selection_get(GtkWidget *widget, 
-		       GtkSelectionData *selection_data,
-		       guint      info,
-		       guint      time,
-		       gpointer   data)
+static void selection_get(GtkClipboard	*primary,
+		          GtkSelectionData *selection_data,
+		          guint		info,
+		          gpointer	data)
 {
-	GString	*str;
-	GList	*next;
-	guchar	*leader = NULL;
-
-	str = g_string_new(NULL);
+	gchar *text;
 
 	if (info == TARGET_URI_LIST)
-		leader = g_strdup_printf("file://%s", our_host_name_for_dnd());
-
-	for (next = icon_selection; next; next = next->next)
-	{
-		Icon	*icon = (Icon *) next->data;
-
-		if (leader)
-			g_string_append(str, leader);
-		g_string_append(str, icon->path);
-		g_string_append_c(str, ' ');
-	}
-
-	g_free(leader);
-	
-	gtk_selection_data_set(selection_data,
-				gdk_atom_intern("STRING", FALSE),
-				8,
-				str->str,
-				str->len ? str->len - 1 : 0);
-
-	g_string_free(str, TRUE);
-}
-
-static void rename_cb(Icon *icon)
-{
-	if (icon->panel)
-	{
-		gtk_widget_queue_draw(icon->widget);
-		panel_icon_renamed(icon);
-		panel_save(icon->panel);
-	}
+		text = icon_create_uri_list();
 	else
 	{
-		pinboard_reshape_icon(icon);
-		pinboard_save();
+		GList	*next;
+		GString	*str;
+
+		str = g_string_new(NULL);
+
+		for (next = icon_selection; next; next = next->next)
+		{
+			Icon	*icon = (Icon *) next->data;
+
+			g_string_append(str, icon->path);
+			g_string_append_c(str, ' ');
+		}
+
+		text = str->str;
+		g_string_free(str, FALSE);
 	}
+
+	gtk_selection_data_set(selection_data,
+				gdk_atom_intern("STRING", FALSE),
+				8, text, strlen(text));
 }
 
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
 {
-	Panel	*panel;
-	GList	*next;
+	IconClass	*iclass;
 
 	if (menu_icon)
 		icon_set_selected(menu_icon, TRUE);
 	
-	next = icon_selection;
-	
-	if (!next)
+	if (!icon_selection)
 	{
 		delayed_error(
 			_("You must first select some items to remove"));
 		return;
 	}
 
-	panel = ((Icon *) next->data)->panel;
+	iclass = (IconClass *)
+		  G_OBJECT_GET_CLASS(G_OBJECT(icon_selection->data));
 
-	if (panel)
-	{
-		while (next)
-		{
-			Icon *icon = (Icon *) next->data;
-
-			next = next->next;
-
-			gtk_widget_destroy(icon->widget);
-		}
-
-		panel_save(panel);
-	}
-	else
-	{
-		while (next)
-		{
-			Icon *icon = (Icon *) next->data;
-
-			next = next->next;
-
-			gtk_widget_destroy(icon->win);
-		}
-		
-		pinboard_save();
-	}
+	iclass->remove_items();
 }
 
 static void file_op(gpointer data, guint action, GtkWidget *widget)
@@ -779,8 +528,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 					NULL, NULL, TRUE);
 			break;
 		case ACTION_EDIT:
-			show_rename_box(menu_icon->widget,
-					menu_icon, rename_cb);
+			show_rename_box(menu_icon);
 			break;
 		case ACTION_LOCATION:
 			open_to_show(menu_icon->path);
@@ -816,17 +564,27 @@ static void edit_response(GtkWidget *dialog, gint response, gpointer data)
 }
 
 /* Opens a box allowing the user to change the name of a pinned icon.
- * If 'widget' is destroyed then the box will close.
+ * If the icon is destroyed then the box will close.
  * If the user chooses OK then the callback is called once the icon's
  * name, src_path and path fields have been updated and the item field
  * restatted.
  */
-static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
+static void show_rename_box(Icon *icon)
 {
 	GtkDialog	*dialog;
 	GtkWidget	*label, *entry;
 
-	dialog = GTK_DIALOG(gtk_dialog_new());
+	if (icon->dialog)
+	{
+		gtk_window_present(GTK_WINDOW(icon->dialog));
+		return;
+	}
+
+	icon->dialog = gtk_dialog_new();
+	g_signal_connect(icon->dialog, "destroy",
+			G_CALLBACK(gtk_widget_destroyed), &icon->dialog);
+
+	dialog = GTK_DIALOG(icon->dialog);
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
 	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
@@ -853,12 +611,7 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	g_object_set_data(G_OBJECT(dialog), "new_name", entry);
 	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 	
-	g_signal_connect_object(widget, "destroy",
-			G_CALLBACK(gtk_widget_destroy), dialog,
-			G_CONNECT_SWAPPED);
-
 	g_object_set_data(G_OBJECT(dialog), "callback_icon", icon);
-	g_object_set_data(G_OBJECT(dialog), "callback_fn", callback);
 
 	gtk_dialog_add_buttons(dialog,
 			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
@@ -869,4 +622,148 @@ static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 	g_signal_connect(dialog, "response", G_CALLBACK(edit_response), NULL);
 	
 	gtk_widget_show_all(GTK_WIDGET(dialog));
+}
+
+static gpointer parent_class = NULL;
+
+static void icon_finialize(GObject *object)
+{
+	Icon *icon = (Icon *) object;
+
+	g_return_if_fail(!icon->selected);
+
+	if (icon->dialog)
+		gtk_widget_destroy(icon->dialog);
+
+	if (icon == menu_icon)
+		menu_icon = NULL;
+
+	icon_set_path(icon, NULL, NULL);
+
+	G_OBJECT_CLASS(parent_class)->finalize(object);
+}
+
+static void icon_class_init(gpointer gclass, gpointer data)
+{
+	guchar		*tmp;
+	GList		*items;
+	GtkItemFactory	*item_factory;
+	GObjectClass *object = (GObjectClass *) gclass;
+	IconClass *icon = (IconClass *) gclass;
+
+	parent_class = g_type_class_peek_parent(gclass);
+
+	object->finalize = icon_finialize;
+	icon->destroy = NULL;
+	icon->redraw = NULL;
+	icon->update = NULL;
+	icon->same_group = NULL;
+
+	g_signal_new("update",
+			G_TYPE_FROM_CLASS(gclass),
+			G_SIGNAL_RUN_LAST,
+			G_STRUCT_OFFSET(IconClass, update),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE, 0);
+
+	g_signal_new("destroy",
+			G_TYPE_FROM_CLASS(gclass),
+			G_SIGNAL_RUN_LAST,
+			G_STRUCT_OFFSET(IconClass, destroy),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE, 0);
+
+	g_signal_new("redraw",
+			G_TYPE_FROM_CLASS(gclass),
+			G_SIGNAL_RUN_LAST,
+			G_STRUCT_OFFSET(IconClass, redraw),
+			NULL, NULL,
+			g_cclosure_marshal_VOID__VOID,
+			G_TYPE_NONE, 0);
+
+	icons_hash = g_hash_table_new(g_str_hash, g_str_equal);
+
+	item_factory = menu_create(menu_def,
+				sizeof(menu_def) / sizeof(*menu_def),
+				 "<icon>", NULL);
+
+	tmp = g_strconcat("<icon>/", _("File"), NULL);
+	icon_menu = gtk_item_factory_get_widget(item_factory, "<icon>");
+	icon_file_menu = gtk_item_factory_get_widget(item_factory, tmp);
+	g_free(tmp);
+
+	/* File '' label... */
+	items = gtk_container_get_children(GTK_CONTAINER(icon_menu));
+	icon_file_item = GTK_BIN(g_list_nth(items, 1)->data)->child;
+	g_list_free(items);
+
+	/* Shift Open... label */
+	items = gtk_container_get_children(GTK_CONTAINER(icon_file_menu));
+	file_shift_item = GTK_BIN(items->data)->child;
+	g_list_free(items);
+
+	g_signal_connect(icon_menu, "unmap_event",
+			G_CALLBACK(menu_closed), NULL);
+}
+
+static void icon_init(GTypeInstance *object, gpointer gclass)
+{
+	Icon *icon = (Icon *) object;
+
+	icon->selected = FALSE;
+	icon->src_path = NULL;
+	icon->path = NULL;
+	icon->item = NULL;
+	icon->dialog = NULL;
+}
+
+/* As icon_set_selected(), but doesn't automatically unselect incompatible
+ * icons.
+ */
+static void icon_set_selected_int(Icon *icon, gboolean selected)
+{
+	static GtkClipboard *primary;
+
+	g_return_if_fail(icon != NULL);
+
+	if (icon->selected == selected)
+		return;
+
+	if (!primary)
+		primary = gtk_clipboard_get(gdk_atom_intern("PRIMARY", FALSE));
+
+	if (selected)
+	{
+		icon_selection = g_list_prepend(icon_selection, icon);
+		if (!have_primary)
+		{
+			GtkTargetEntry target_table[] =
+			{
+				{"text/uri-list", 0, TARGET_URI_LIST},
+				{"UTF8", 0, TARGET_STRING},
+				{"COMPOUND_TEXT", 0, TARGET_STRING},
+				{"STRING", 0, TARGET_STRING},
+			};
+
+			/* Grab selection */
+			have_primary = gtk_clipboard_set_with_data(primary,
+				target_table,
+				sizeof(target_table) / sizeof(*target_table),
+				selection_get, lose_selection, NULL);
+		}
+	}
+	else
+	{
+		icon_selection = g_list_remove(icon_selection, icon);
+		if (have_primary && !icon_selection)
+		{
+			have_primary = FALSE;
+			gtk_clipboard_clear(primary);
+		}
+	}
+
+	icon->selected = selected;
+	g_signal_emit_by_name(icon, "redraw");
 }

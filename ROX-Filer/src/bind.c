@@ -107,7 +107,7 @@ BindAction bind_lookup_bev(BindContext context, GdkEventButton *event)
 	if (ctrl || (adjust && dclick_mode))
 		return ACT_PRIME_AND_TOGGLE;
 
-	if (icon && adjust)
+	if (context == BIND_PANEL_ICON && adjust)
 		return ACT_MOVE_ICON;
 
 	return dclick_mode ? ACT_PRIME_AND_SELECT : ACT_PRIME_FOR_DND;

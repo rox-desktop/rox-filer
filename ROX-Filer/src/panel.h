@@ -37,8 +37,6 @@ void panel_init(void);
 Panel *panel_new(const gchar *name, PanelSide side);
 void panel_icon_may_update(Icon *icon);
 void panel_save(Panel *panel);
-gboolean panel_want_show_text(Icon *icon);
-void panel_icon_renamed(Icon *icon);
 
 gboolean panel_add(PanelSide side,
 		   const gchar *path, const gchar *label, gboolean after);

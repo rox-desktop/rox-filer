@@ -50,7 +50,7 @@
 #include "filer.h"
 #include "action.h"
 #include "display.h"
-#include "icon.h"
+#include "support.h"
 
 #define DELETE_ICON 1
 
@@ -128,7 +128,7 @@ void read_globicons()
 				continue;
 
 			icon_path = xmlNodeGetContent(icon);
-			path = icon_convert_path(match);
+			path = expand_path(match);
 			g_hash_table_insert(glob_icons, path, icon_path);
 			g_free(match);
 		}

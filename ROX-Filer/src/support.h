@@ -45,5 +45,6 @@ char *readlink_dup(const char *path);
 gchar *to_utf8(const gchar *src);
 gchar *from_utf8(const gchar *src);
 char *md5_hash(const char *message);
+gchar *expand_path(const gchar *path);
 
 #endif /* _SUPPORT_H */

@@ -473,7 +473,6 @@ int main(int argc, char **argv)
 	type_init();
 	action_init();
 
-	icon_init();
 	pinboard_init();
 	panel_init();
 

@@ -23,6 +23,8 @@
 
 #include "config.h"
 
+#include <libxml/parser.h>
+
 #include "global.h"
 
 #include "xml.h"

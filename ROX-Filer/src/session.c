@@ -70,10 +70,10 @@ void save_state(SmClient *client)
 		g_ptr_array_add(restart_cmd, panel->name);
 	}
 	
-	if(pinboard)
+	if (pinboard)
 	{
 		g_ptr_array_add(restart_cmd, "-p");
-		g_ptr_array_add(restart_cmd, pinboard->name);
+		g_ptr_array_add(restart_cmd, (gchar *) pinboard_get_name());
 	}
 	
 	sc_set_list_of_array_prop(client, SmRestartCommand, 

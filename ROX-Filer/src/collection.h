@@ -23,7 +23,8 @@ extern "C" {
 #define COLLECTION(obj) GTK_CHECK_CAST((obj), collection_get_type(), Collection)
 #define COLLECTION_CLASS(klass) GTK_CHECK_CLASS_CAST((klass), \
 					collection_get_type(), CollectionClass)
-#define IS_COLLECTION(obj) GTK_CHECK_TYPE((obj), collection_get_type())
+#define IS_COLLECTION(obj) \
+	G_TYPE_CHECK_INSTANCE_TYPE((obj), collection_get_type())
 
 /* If the display gets mucked up then remember to fix it next time we get the
  * chance.
