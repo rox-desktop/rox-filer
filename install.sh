@@ -72,31 +72,27 @@ echo
 case $REPLY in
 	1) APPDIR=/usr/local/apps
 	   BINDIR=/usr/local/bin
-	   MANDIR=/usr/local/man
-	   CHOICESDIR=/usr/local/share/Choices
-	   MIMEDIR=/usr/local/share/mime
+	   SHAREDIR=/usr/local/share
+	   CHOICESDIR=${SHAREDIR}/Choices
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
 	   if [ -n "$CHOICESPATH" ]; then
 		CHOICESDIR=`echo $CHOICESPATH | sed -e 's/^\([^:]*\).*$/\\1/'`
 	   fi
-	   echo -$CHOICESDIR-
 	   if [ ! -n "$CHOICESDIR" ]; then
 	   	CHOICESDIR=${HOME}/Choices
 	   fi
-	   MIMEDIR=${HOME}/.mime
-	   if [ ! -d ${HOME}/man ]; then
-		MANDIR=""
+	   if [ -n "$XDG_DATA_HOME" ]; then
+	        SHAREDIR=${XDG_DATA_HOME}
 	   else
-		MANDIR=${HOME}/man
+	   	SHAREDIR=${HOME}/.local/share
 	   fi
 	   ;;
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
-	   MANDIR=/usr/man
-	   CHOICESDIR=/usr/share/Choices
-	   MIMEDIR=/usr/share/mime
+	   SHAREDIR=/usr/share
+	   CHOICESDIR=${SHAREDIR}/Choices
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
 	   get_dir "/usr/local/apps"
@@ -106,20 +102,19 @@ case $REPLY in
 	   get_dir "/usr/local/bin"
 	   BINDIR="$DIR"
 	   echo
-	   echo "Where should the manual page go?"
-	   get_dir "/usr/local/man"
-	   MANDIR="$DIR"
+	   echo "Where should the shared resources (man page and MIME data) go?"
+	   get_dir "/usr/local/share"
+	   SHAREDIR="$DIR"
 	   echo
 	   echo "Where should the default icons and run actions go?"
-	   get_dir "/usr/local/share/Choices"
+	   get_dir "$SHAREDIR/Choices"
 	   CHOICESDIR="$DIR"
-	   echo
-	   echo "Where should the MIME info file go?"
-	   get_dir "/usr/local/share/mime"
-	   MIMEDIR="$DIR"
 	   ;;
 	*) die "Invalid choice!";;
 esac
+
+MANDIR=${SHAREDIR}/man
+MIMEDIR=${SHAREDIR}/mime
 
 MIMEINFO="${MIMEDIR}/packages/rox.xml"
 
@@ -158,6 +153,8 @@ echo
 echo "OK?"
 confirm_or_die
 echo
+
+endir "$SHAREDIR"
 
 if [ -n "$MANDIR" ]; then
 	echo "Installing manpage..."
