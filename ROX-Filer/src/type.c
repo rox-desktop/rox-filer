@@ -1484,8 +1484,6 @@ static void set_icon_theme(void)
 		theme_name = "ROX";
 	}
 
-	delayed_error(_("ROX icon theme not found... installing..."));
-
 	icon_home = g_build_filename(home_dir, ".icons", NULL);
 	if (!file_exists(icon_home))
 		mkdir(icon_home, 0755);
