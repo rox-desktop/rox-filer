@@ -45,11 +45,14 @@
 #include "xml.h"
 #include "run.h"
 #include "diritem.h"
+#include "action.h"
 
 /* Static prototypes */
 static void apprun_menu(GtkWidget *item, gpointer data);
 static GtkWidget *create_menu_item(xmlNode *node);
 static void show_app_help(GtkWidget *item, gpointer data);
+static void build_mount_menu(const char *mnt_dir, DirItem *app_item);
+static void build_app_menu(const char *app_dir, DirItem *app_item);
 
 /* There can only be one menu open at a time... we store: */
 static GtkWidget *current_menu = NULL;	/* The GtkMenu */
@@ -88,52 +91,26 @@ void appmenu_remove(void)
  */
 void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 {
-	XMLwrapper	*ai = NULL;
-	xmlNode	*node;
 	GList	*next;
 	GtkWidget *sep;
-	GtkWidget *item;
 
 	g_return_if_fail(menu != NULL);
 
 	/* Should have called appmenu_remove() already... */
 	g_return_if_fail(current_menu == NULL);
-
-	ai = appinfo_get(app_dir, app_item);
-	if (ai)
-	{
-		node = xml_get_section(ai, NULL, "AppMenu");
-		if (node)
-			node = node->xmlChildrenNode;
-	}
-	else
-	{
-		if (app_item->flags & ITEM_FLAG_APPDIR)
-			node = NULL;
-		else
-			return;	/* Not an application AND no AppInfo */
-	}
-
 	g_return_if_fail(current_items == NULL);
 
-	/* Add the menu entries */
-	for (; node; node = node->next)
+	if (app_item->flags & ITEM_FLAG_MOUNT_POINT)
+		build_mount_menu(app_dir, app_item);
+	else
+		build_app_menu(app_dir, app_item);
+
+	if (current_items)
 	{
-		item = create_menu_item(node);
-
-		if (item)
-			current_items = g_list_prepend(current_items, item);
+		sep = gtk_menu_item_new();
+		current_items = g_list_prepend(current_items, sep);
+		gtk_widget_show(sep);
 	}
-		
-	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
-	gtk_widget_show(item);
-	current_items = g_list_prepend(current_items, item);
-	g_signal_connect(item, "activate", G_CALLBACK(show_app_help), NULL);
-	gtk_label_set_text(GTK_LABEL(GTK_BIN(item)->child), _("Help"));
-
-	sep = gtk_menu_item_new();
-	current_items = g_list_prepend(current_items, sep);
-	gtk_widget_show(sep);
 
 	for (next = current_items; next; next = next->next)
 		gtk_menu_shell_prepend(GTK_MENU_SHELL(menu),
@@ -141,9 +118,6 @@ void appmenu_add(const gchar *app_dir, DirItem *app_item, GtkWidget *menu)
 
 	current_menu = menu;
 	current_app_path = g_strdup(app_dir);
-
-	if (ai)
-		g_object_unref(ai);
 }
 
 
@@ -265,4 +239,73 @@ static void show_app_help(GtkWidget *item, gpointer data)
 	g_return_if_fail(current_app_path != NULL);
 
 	show_help_files(current_app_path);
+}
+
+static void mnt_eject(GtkWidget *item, gpointer data)
+{
+	GList *dirs;
+
+	g_return_if_fail(current_app_path != NULL);
+	dirs = g_list_prepend(NULL, current_app_path);
+	action_eject(dirs);
+	g_list_free(dirs);
+}
+
+static void build_mount_menu(const char *mnt_dir, DirItem *app_item)
+{
+	GtkWidget *item;
+
+	item = gtk_menu_item_new_with_label(_("Eject"));
+	gtk_widget_show(item);
+	current_items = g_list_prepend(current_items, item);
+	g_signal_connect(item, "activate", G_CALLBACK(mnt_eject), NULL);
+
+	item = gtk_menu_item_new_with_label(_("Format"));
+	gtk_widget_show(item);
+	current_items = g_list_prepend(current_items, item);
+
+	item = gtk_menu_item_new_with_label(_("Free Space"));
+	gtk_widget_show(item);
+	current_items = g_list_prepend(current_items, item);
+}
+
+/* Adds to current_items */
+static void build_app_menu(const char *app_dir, DirItem *app_item)
+{
+	XMLwrapper	*ai = NULL;
+	xmlNode	*node;
+	GtkWidget *item;
+
+	ai = appinfo_get(app_dir, app_item);
+	if (ai)
+	{
+		node = xml_get_section(ai, NULL, "AppMenu");
+		if (node)
+			node = node->xmlChildrenNode;
+	}
+	else
+	{
+		if (app_item->flags & ITEM_FLAG_APPDIR)
+			node = NULL;
+		else
+			return;	/* Not an application AND no AppInfo */
+	}
+
+	/* Add the menu entries */
+	for (; node; node = node->next)
+	{
+		item = create_menu_item(node);
+
+		if (item)
+			current_items = g_list_prepend(current_items, item);
+	}
+		
+	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
+	gtk_widget_show(item);
+	current_items = g_list_prepend(current_items, item);
+	g_signal_connect(item, "activate", G_CALLBACK(show_app_help), NULL);
+	gtk_label_set_text(GTK_LABEL(GTK_BIN(item)->child), _("Help"));
+
+	if (ai)
+		g_object_unref(ai);
 }
