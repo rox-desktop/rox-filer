@@ -756,11 +756,19 @@ static gboolean do_delete(char *src_path, char *dest_path)
 
 	write_prot = S_ISLNK(info.st_mode) ? FALSE
 					   : access(src_path, W_OK) != 0;
-	g_string_sprintf(message, "?Delete %s'%s'?",
-			write_prot ? "WRITE-PROTECTED " : " ",
-			src_path);
-	if (!reply(from_parent, write_prot && !o_force))
-		return FALSE;
+	if (write_prot || !quiet)
+	{
+		g_string_sprintf(message, "?Delete %s'%s'?",
+				write_prot ? "WRITE-PROTECTED " : " ",
+				src_path);
+		if (!reply(from_parent, write_prot && !o_force))
+			return FALSE;
+	}
+	else
+	{
+		g_string_sprintf(message, "'Removing '%s'\n", src_path);
+		send();
+	}
 
 	if (S_ISDIR(info.st_mode))
 	{
@@ -777,12 +785,7 @@ static gboolean do_delete(char *src_path, char *dest_path)
 		send();
 		g_free(safe_path);
 	}
-	else if (unlink(src_path) == 0)
-	{
-		g_string_sprintf(message, "'Deleted '%s'\n", src_path);
-		send();
-	}
-	else
+	else if (unlink(src_path))
 	{
 		send_error();
 		return FALSE;
