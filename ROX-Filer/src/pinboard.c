@@ -1490,6 +1490,7 @@ static gboolean bg_expose(GtkWidget *widget,
 		gdk_gc_set_clip_region(gc, event->region);
 		if (style->bg_pixmap[GTK_STATE_NORMAL])
 		{
+			gdk_gc_set_ts_origin(gc, 0, 0);
 			gdk_gc_set_fill(gc, GDK_TILED);
 			gdk_gc_set_tile(gc, style->bg_pixmap[GTK_STATE_NORMAL]);
 		}
