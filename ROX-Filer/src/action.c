@@ -305,15 +305,34 @@ static void show_condition_help(gpointer data)
 		help = gtk_window_new(GTK_WINDOW_DIALOG);
 		gtk_container_set_border_width(GTK_CONTAINER(help), 10);
 		gtk_window_set_title(GTK_WINDOW(help),
-				"Find condition reference");
+				"Find expression reference");
 
 		vbox = gtk_vbox_new(FALSE, 0);
 		gtk_container_add(GTK_CONTAINER(help), vbox);
 
 		text = gtk_label_new(
-	"The format of a condition is:\n"
-	"[ more help here ]\n"
-	"\nRead the ROX-Filer manual for full details.");
+	"An expression is a series of cases which are checked from left \n"
+	"to right. As soon as one matches, the expression is TRUE. If none \n"
+	"match then the expression is FALSE.\n"
+	"\n"
+	"Cases are separated by commas:\n"
+	"'*.htm', '*.html'	(finds HTML files)\n"
+	"\n"
+	"Each case is a list of conditions which must all be met for the \n"
+	"case to succeed:\n"
+	"IsReg 'core'	(finds a regular file called 'core')\n"
+	"Preceeding a condition by ! inverts the result of the condition:\n"
+	"IsDev ! '/dev/*' (finds device files not in /dev)\n"
+	"\n"
+	"Simple tests are: IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev,\n"
+	"IsPipe, IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsEmpty\n"
+	"IsExecutable, IsMine\n"
+	"\n"
+	"A pattern in single quotes is a shell-style wildcard pattern to \n"
+	"match. If it contains a slash then the match is agaist the full \n"
+	"path; otherwise it is agaist the leafname only.\n"
+	"\n"
+	"Read the ROX-Filer manual for full details.");
 		gtk_label_set_justify(GTK_LABEL(text), GTK_JUSTIFY_LEFT);
 		gtk_box_pack_start(GTK_BOX(vbox), text, TRUE, TRUE, 0);
 
@@ -710,8 +729,6 @@ static void read_new_entry_text(void)
 	g_free(new_entry_string);
 	new_entry_string = new->str;
 	g_string_free(new, FALSE);
-
-	g_print("[ new_entry_string = %s ]\n", new_entry_string);
 }
 
 /* Read until the user sends a reply. If ignore_quiet is TRUE then
@@ -1039,7 +1056,6 @@ static gboolean do_find(char *path, char *dummy)
 	{
 		if (new_entry_string)
 		{
-			g_print("[ find changed ]\n");
 			if (find_condition)
 				find_condition_free(find_condition);
 			find_condition = find_compile(new_entry_string);
@@ -1115,7 +1131,6 @@ static gboolean do_chmod(char *path, char *dummy)
 	{
 		if (new_entry_string)
 		{
-			g_print("[ chmod changed ]\n");
 			if (mode_change)
 				mode_free(mode_change);
 			mode_change = mode_compile(new_entry_string,
@@ -1741,7 +1756,7 @@ void action_find(FilerWindow *filer_window)
 	}
 
 	if (!last_find_string)
-		last_find_string = g_strdup("core");
+		last_find_string = g_strdup("'core'");
 
 	new_entry_string = last_find_string;
 	gui_side = start_action(filer_window, find_cb, FALSE);
@@ -1751,17 +1766,18 @@ void action_find(FilerWindow *filer_window)
 	gui_side->show_info = TRUE;
 
 	hbox = gtk_hbox_new(FALSE, 0);
-	label = gtk_label_new("Conditions:");
+	label = gtk_label_new("Expression:");
 	gtk_box_pack_start(GTK_BOX(hbox), label, FALSE, TRUE, 4);
 	gui_side->default_string = &last_find_string;
 	gui_side->entry = gtk_entry_new();
+	gtk_widget_set_style(gui_side->entry, fixed_style);
 	gtk_entry_set_text(GTK_ENTRY(gui_side->entry), last_find_string);
 	gtk_widget_set_sensitive(gui_side->entry, FALSE);
 	gtk_box_pack_start(GTK_BOX(hbox), gui_side->entry, TRUE, TRUE, 4);
 	gtk_signal_connect(GTK_OBJECT(gui_side->entry), "changed",
 			entry_changed, gui_side);
-	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 0);
-	button = gtk_button_new_with_label("Show condition reference");
+	gtk_box_pack_start(GTK_BOX(gui_side->vbox), hbox, FALSE, TRUE, 4);
+	button = gtk_button_new_with_label("Show expression reference");
 	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 4);
 	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
 			show_condition_help, NULL);

@@ -6,12 +6,26 @@
  */
 
 #include <glib.h>
+#include <sys/stat.h>
 
 typedef struct _FindCondition FindCondition;
+typedef struct _FindInfo FindInfo;
+typedef gboolean (*FindTest)(FindCondition *condition, FindInfo *info);
+typedef void (*FindFree)(FindCondition *condition);
 
 struct _FindCondition
 {
-	guchar	*name;
+	FindTest	test;
+	FindFree	free;
+	gpointer	data1;
+	gpointer	data2;
+};
+
+struct _FindInfo
+{
+	guchar		*fullpath;
+	guchar		*leaf;
+	struct stat	stats;
 };
 
 FindCondition *find_compile(guchar *string);
