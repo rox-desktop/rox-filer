@@ -104,8 +104,6 @@ static void filer_tooltip_prime(FilerWindow *filer_window, DirItem *item);
 
 static void set_unique(guchar *unique);
 
-static GdkAtom xa_string;
-
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
 
@@ -113,8 +111,6 @@ gboolean o_unique_filer_windows = FALSE;
 
 void filer_init(void)
 {
-	xa_string = gdk_atom_intern("STRING", FALSE);
-
 	option_add_int("filer_auto_resize", 1, NULL);
 	option_add_int("filer_unique_windows", o_unique_filer_windows,
 			set_unique);

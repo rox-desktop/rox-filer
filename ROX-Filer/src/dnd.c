@@ -130,6 +130,7 @@ GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
 GdkAtom application_octet_stream;
+GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
 void dnd_init()
 {
@@ -138,6 +139,7 @@ void dnd_init()
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
+	xa_string = gdk_atom_intern("STRING", FALSE);
 
 	option_add_int("dnd_drag_to_icons", 1, NULL);
 	option_add_int("dnd_spring_open", 0, NULL);

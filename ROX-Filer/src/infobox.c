@@ -39,6 +39,7 @@
 #include "type.h"
 #include "infobox.h"
 #include "appinfo.h"
+#include "dnd.h"	/* For xa_string */
 
 typedef struct _FileStatus FileStatus;
 
@@ -170,6 +171,41 @@ static GtkWidget *make_vbox(guchar *path)
 	return vbox;
 }
 
+static guchar *selection_text = NULL;
+
+/* The selection has changed - grab or release the primary selection */
+static void set_selection(GtkCList *clist, int row, int col,
+			  GdkEventButton *event, gpointer data)
+{
+	/* If we lose the selection when a row is unselected, there's a race
+	 * and it doesn't work - therefore, keep the selection...
+	 */
+	if (clist->selection)
+	{
+		gchar *text;
+		
+		g_return_if_fail(gtk_clist_get_text(clist, row, 1, &text) == 1);
+
+		gtk_selection_owner_set(GTK_WIDGET(clist),
+				GDK_SELECTION_PRIMARY,
+				event->time);
+		g_free(selection_text);
+		selection_text = g_strdup(text);
+	}
+}
+
+static void get_selection(GtkCList *clist,
+		         GtkSelectionData *selection_data,
+		         guint      info,
+		         guint      time,
+		         gpointer   data)
+{
+	g_return_if_fail(selection_text != NULL);
+
+	gtk_selection_data_set(selection_data, xa_string,
+				8, selection_text, strlen(selection_text));
+}
+
 /* Create the CList with the file's details */
 static GtkWidget *make_clist(guchar *path,
 		DirItem *item, struct _xmlNode *about)
@@ -179,12 +215,24 @@ static GtkWidget *make_clist(guchar *path,
 	struct stat	info;
 	char		*data[] = {NULL, NULL, NULL};
 	struct _xmlNode *prop;
+	GtkTargetEntry 	target_table[] = { {"STRING", 0, 0} };
 
 	table = GTK_CLIST(gtk_clist_new(2));
 	GTK_WIDGET_UNSET_FLAGS(GTK_WIDGET(table), GTK_CAN_FOCUS);
 	gtk_clist_set_column_auto_resize(table, 0, TRUE);
 	gtk_clist_set_column_auto_resize(table, 1, TRUE);
 	gtk_clist_set_column_justification(table, 0, GTK_JUSTIFY_RIGHT);
+
+	gtk_signal_connect(GTK_OBJECT(table), "select-row",
+			GTK_SIGNAL_FUNC(set_selection), NULL);
+	gtk_signal_connect_object(GTK_OBJECT(table), "selection-clear-event",
+			GTK_SIGNAL_FUNC(gtk_clist_unselect_all),
+			GTK_OBJECT(table));
+	gtk_signal_connect(GTK_OBJECT(table), "selection_get",
+			GTK_SIGNAL_FUNC(get_selection), NULL);
+	gtk_selection_add_targets(GTK_WIDGET(table), GDK_SELECTION_PRIMARY,
+			target_table,
+			sizeof(target_table) / sizeof(*target_table));
 	
 	data[0] = _("Name:");
 	data[1] = item->leafname;
