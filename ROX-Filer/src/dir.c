@@ -626,8 +626,7 @@ static DirItem *insert_item(Directory *dir, guchar *leafname)
 		 && item->uid == old.uid
 		 && item->gid == old.gid
 		 && item->image == old.image
-		 && item->mime_type == old.mime_type
-		 && item->name_width == old.name_width)
+		 && item->mime_type == old.mime_type)
 		{
 			pixmap_unref(old.image);
 			return item;

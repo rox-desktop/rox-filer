@@ -565,7 +565,9 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 					 MAX(old_w, w),
 					 MAX(old_h, h));
 
-	collection_insert(filer_window->collection, item);
+	/* The view_data field holds the leafname's width */
+	collection_insert(filer_window->collection, item,
+				GINT_TO_POINTER(-1));
 }
 
 /* Returns TRUE iff the directory still exists. */

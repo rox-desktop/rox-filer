@@ -51,6 +51,7 @@ typedef gboolean (*CollectionTestFunc)( Collection *collection,
 struct _CollectionItem
 {
 	gpointer	data;
+	gpointer	view_data;
 	gboolean	selected;
 };
 
@@ -114,7 +115,9 @@ guint   collection_get_type   		(void);
 GtkWidget *collection_new		(void);
 void    collection_clear           	(Collection *collection);
 void	collection_clear_except		(Collection *collection, gint item);
-gint    collection_insert          	(Collection *collection, gpointer data);
+gint	collection_insert		(Collection *collection,
+					 gpointer data,
+					 gpointer view);
 void    collection_remove          	(Collection *collection, gint item);
 void    collection_unselect_item	(Collection *collection, gint item);
 void    collection_select_item		(Collection *collection, gint item);

@@ -186,7 +186,6 @@ DirItem *diritem_new(guchar *leafname)
 	item->may_delete = FALSE;
 	item->image = NULL;
 	item->base_type = TYPE_UNKNOWN;
-	item->name_width = -1;
 	item->flags = 0;
 	item->mime_type = NULL;
 

@@ -30,6 +30,7 @@ struct _Icon {
 	GdkBitmap	*mask;
 	int		x, y;
 	int		width, height;
+	int		name_width;
 #ifdef GTK2
 	PangoLayout	*layout;	/* The label */
 #endif

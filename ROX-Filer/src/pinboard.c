@@ -545,12 +545,12 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 		pango_layout_set_text(icon->layout, icon->item->leafname, -1);
 		pango_layout_get_pixel_extents(icon->layout, NULL, &logical);
 
-		item->name_width = logical.width - logical.x;
+		icon->name_width = logical.width - logical.x;
 		font_height = logical.height - logical.y;
 	}
 #endif
 
-	width = MAX(iwidth, item->name_width + 2) + 2 * WINK_FRAME;
+	width = MAX(iwidth, icon->name_width + 2) + 2 * WINK_FRAME;
 	height = iheight + GAP + (font_height + 2) + 2 * WINK_FRAME;
 	gtk_widget_set_usize(icon->win, width, height);
 	icon->width = width;
@@ -608,7 +608,7 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 
 	/* Mask off an area for the text (from o_text_bg) */
 
-	text_x = (width - item->name_width) >> 1;
+	text_x = (width - icon->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
 #ifndef GTK2
@@ -616,9 +616,9 @@ static void set_size_and_shape(Icon *icon, int *rwidth, int *rheight)
 	{
 #endif
 		gdk_draw_rectangle(icon->mask, mask_gc, TRUE,
-				(width - (item->name_width + 2)) >> 1,
+				(width - (icon->name_width + 2)) >> 1,
 				WINK_FRAME + iheight + GAP,
-				item->name_width + 2, font_height + 2);
+				icon->name_width + 2, font_height + 2);
 #ifndef GTK2
 	}
 	else
@@ -704,7 +704,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 		gdk_gc_set_clip_origin(gc, 0, 0);
 	}
 
-	text_x = (icon->width - item->name_width) >> 1;
+	text_x = (icon->width - icon->name_width) >> 1;
 	text_y = WINK_FRAME + iheight + GAP + 1;
 
 	if (o_text_bg != TEXT_BG_NONE)
@@ -725,7 +725,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, Icon *icon)
 				NULL, widget, "text",
 				text_x - 1,
 				text_y - 1,
-				item->name_width + 2,
+				icon->name_width + 2,
 				font_height + 2);
 	}
 

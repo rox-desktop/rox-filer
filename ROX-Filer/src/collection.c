@@ -338,7 +338,7 @@ static void collection_init(Collection *object)
 #endif
 	object->bg_gc = NULL;
 
-	object->items = g_malloc(sizeof(CollectionItem) * MINIMUM_ITEMS);
+	object->items = g_new(CollectionItem, MINIMUM_ITEMS);
 	object->cursor_item = -1;
 	object->cursor_item_old = -1;
 	object->wink_item = -1;
@@ -1729,7 +1729,7 @@ void collection_clear(Collection *collection)
 /* Inserts a new item at the end. The new item is unselected, and its
  * number is returned.
  */
-gint collection_insert(Collection *collection, gpointer data)
+gint collection_insert(Collection *collection, gpointer data, gpointer view)
 {
 	int	item;
 	
@@ -1741,6 +1741,7 @@ gint collection_insert(Collection *collection, gpointer data)
 		resize_arrays(collection, item + (item >> 1));
 
 	collection->items[item].data = data;
+	collection->items[item].view_data = view;
 	collection->items[item].selected = FALSE;
 
 	collection->number_of_items++;
