@@ -178,7 +178,7 @@ void rox_add_translations(char *path)
 #endif
 	}
 
-out:
+out: ;			/* (some compilers complain otherwise) */
 #ifdef GTK2
 	g_free(data);
 	g_free(charset);

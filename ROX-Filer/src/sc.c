@@ -27,6 +27,8 @@
 #include <X11/Xlib.h>
 #include <X11/SM/SMlib.h>
 #include <pwd.h>
+#include <string.h>
+
 #include "sc.h"
 
 static SmPropValue *make_list_of_array_value(gchar *vals[], gint nvals)
