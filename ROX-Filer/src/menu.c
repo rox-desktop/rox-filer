@@ -59,6 +59,7 @@
 #include "infobox.h"
 #include "view_iface.h"
 #include "display.h"
+#include "bookmarks.h"
 
 typedef enum {
 	FILE_COPY_ITEM,
@@ -147,6 +148,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget);
 static void open_parent_same(gpointer data, guint action, GtkWidget *widget);
 static void open_parent(gpointer data, guint action, GtkWidget *widget);
 static void home_directory(gpointer data, guint action, GtkWidget *widget);
+static void show_bookmarks(gpointer data, guint action, GtkWidget *widget);
 static void new_window(gpointer data, guint action, GtkWidget *widget);
 /* static void new_user(gpointer data, guint action, GtkWidget *widget); */
 static void close_window(gpointer data, guint action, GtkWidget *widget);
@@ -235,6 +237,7 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Parent, Same Window"), NULL, open_parent_same, 0, NULL},
 {">" N_("New Window"),		NULL, new_window, 0, NULL},
 {">" N_("Home Directory"),	NULL, home_directory, 0, NULL},
+{">" N_("Show Bookmarks"),	"<Ctrl>B", show_bookmarks, 0, NULL},
 {">" N_("Follow Symbolic Links"),	NULL, follow_symlinks, 0, NULL},
 {">" N_("Resize Window"),	NULL, resize, 0, NULL},
 /* {">" N_("New, As User..."),	NULL, new_user, 0, NULL}, */
@@ -1532,6 +1535,13 @@ static void home_directory(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	filer_change_to(window_with_focus, home_dir, NULL);
+}
+
+static void show_bookmarks(gpointer data, guint action, GtkWidget *widget)
+{
+	g_return_if_fail(window_with_focus != NULL);
+
+	bookmarks_show_menu(window_with_focus);
 }
 
 static void follow_symlinks(gpointer data, guint action, GtkWidget *widget)

@@ -33,19 +33,17 @@
 #include "filer.h"
 #include "xml.h"
 #include "support.h"
+#include "gui_support.h"
 
 static XMLwrapper *bookmarks = NULL;
+static GtkWidget *bookmarks_window = NULL;
 
 /* Static prototypes */
 static void update_bookmarks(void);
 static xmlNode *bookmark_find(const gchar *mark);
 static void bookmarks_save(void);
 static void bookmarks_add(GtkMenuItem *menuitem, gpointer user_data);
-static void bookmarks_delete(GtkMenuItem *menuitem, const gchar *mark);
-static GtkWidget *bookmarks_build_submenu(const gchar *mark);
-static void bookmarks_show_submenu(const gchar *mark, GdkEventButton *event);
-static void bookmarks_activate(GtkMenuShell *menushell,
-			       FilerWindow *filer_window);
+static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window);
 static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window);
 static void position_menu(GtkMenu *menu, gint *x, gint *y,
 		   	  gboolean *push_in, gpointer data);
@@ -76,6 +74,17 @@ void bookmarks_show_menu(FilerWindow *filer_window)
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
+
+/* Initialise the bookmarks document to be empty. Does not save. */
+static void bookmarks_new(void)
+{
+	if (bookmarks)
+		g_object_unref(G_OBJECT(bookmarks));
+	bookmarks = xml_new(NULL);
+	bookmarks->doc = xmlNewDoc("1.0");
+	xmlDocSetRootElement(bookmarks->doc,
+		xmlNewDocNode(bookmarks->doc, NULL, "bookmarks", NULL));
+}
 
 static void position_menu(GtkMenu *menu, gint *x, gint *y,
 		   	  gboolean *push_in, gpointer data)
@@ -110,14 +119,7 @@ static void update_bookmarks()
 	}
 
 	if (!bookmarks)
-	{
-		bookmarks = xml_new(NULL);
-		bookmarks->doc = xmlNewDoc("1.0");
-
-		xmlDocSetRootElement(bookmarks->doc,
-			xmlNewDocNode(bookmarks->doc, NULL, "bookmarks", NULL));
-		return;
-	}
+		bookmarks_new();
 }
 
 /* Return the node for the 'mark' bookmark */
@@ -165,6 +167,9 @@ static void bookmarks_save()
 		save_xml_file(bookmarks->doc, save_path);
 		g_free(save_path);
 	}
+
+	if (bookmarks_window)
+		gtk_widget_destroy(bookmarks_window);
 }
 
 /* Add a bookmark if it doesn't already exist, and save the
@@ -186,75 +191,233 @@ static void bookmarks_add(GtkMenuItem *menuitem, gpointer user_data)
 	bookmarks_save();
 }
 
-/* Delete a bookmark and save the bookmarks */
-static void bookmarks_delete(GtkMenuItem *menuitem, const gchar *mark)
-{
-	xmlNode	*bookmark;
-
-	bookmark = bookmark_find(mark);
-
-	g_return_if_fail(bookmark != NULL);
-
-	xmlUnlinkNode(bookmark);
-	xmlFreeNode(bookmark);
-
-	bookmarks_save();
-}
-
-/* Builds the submenu that appears when right clicking a bookmark.
- * Currently only Delete available...
- */
-static GtkWidget *bookmarks_build_submenu(const gchar *mark)
-{
-	GtkWidget *menu;
-	GtkWidget *item;
-
-	menu = gtk_menu_new();
-	item = gtk_menu_item_new_with_label(_("Delete"));
-	g_signal_connect(item, "activate",
-			G_CALLBACK(bookmarks_delete),
-			(gpointer) mark);
-	gtk_widget_show(item);
-	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-
-	return menu;
-}
-
-/* Shows the submenu that appears when right clicking a bookmark. */
-static void bookmarks_show_submenu(const gchar *mark, GdkEventButton *event)
-{
-	GtkMenu *submenu;
-
-	submenu = GTK_MENU(bookmarks_build_submenu(mark));
-
-	gtk_menu_popup(submenu, NULL, NULL, NULL, NULL,
-			event->button, event->time);
-}
-
 /* Called when a bookmark has been selected (right or left click) */
-static void bookmarks_activate(GtkMenuShell *menushell,
-			       FilerWindow *filer_window)
+static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 {
-	GdkEvent *event;
 	const gchar *mark;
 	GtkLabel *label;
 
-	label = GTK_LABEL(GTK_BIN(menushell)->child);
+	label = GTK_LABEL(GTK_BIN(item)->child);
 	mark = gtk_label_get_text(label);
-	event = gtk_get_current_event();
 
-	if (event->type == GDK_BUTTON_RELEASE &&
-			((GdkEventButton *) event)->button == 3)
+	if (strcmp(mark, filer_window->sym_path) != 0)
+		filer_change_to(filer_window, mark, NULL);
+}
+
+static void edit_delete(GtkButton *button, GtkTreeView *view)
+{
+	GtkTreeModel *model;
+	GtkListStore *list;
+	GtkTreeSelection *selection;
+	GtkTreeIter iter;
+	gboolean more;
+
+	model = gtk_tree_view_get_model(view);
+	list = GTK_LIST_STORE(model);
+
+	selection = gtk_tree_view_get_selection(view);
+
+	if (!gtk_tree_model_get_iter_first(model, &iter))
 	{
-		/* Right click */
-		bookmarks_show_submenu(mark, (GdkEventButton *) event);
+		report_error(_("You should first select some rows to delete"));
+		return;
+	}
+
+	do
+	{
+		GtkTreeIter old = iter;
+
+		more = gtk_tree_model_iter_next(model, &iter);
+
+		if (gtk_tree_selection_iter_is_selected(selection, &old))
+			gtk_list_store_remove(list, &old);
+	} while (more);
+}
+
+static void reorder(GtkTreeView *view, int dir)
+{
+	GtkTreeModel *model;
+	GtkListStore *list;
+	GtkTreePath *cursor = NULL;
+	GtkTreeIter iter, old, new;
+	GValue value = {0};
+	gboolean    ok;
+
+	g_return_if_fail(view != NULL);
+	g_return_if_fail(dir == 1 || dir == -1);
+
+	model = gtk_tree_view_get_model(view);
+	list = GTK_LIST_STORE(model);
+
+	gtk_tree_view_get_cursor(view, &cursor, NULL);
+	if (!cursor)
+	{
+		report_error(_("Put the cursor on an entry in the "
+			       "list to move it"));
+		return;
+	}
+
+	gtk_tree_model_get_iter(model, &old, cursor);
+	if (dir > 0)
+	{
+		gtk_tree_path_next(cursor);
+		ok = gtk_tree_model_get_iter(model, &iter, cursor);
 	}
 	else
 	{
-		/* Left click, simply change the path  */
-		if (strcmp(mark, filer_window->sym_path) != 0)
-			filer_change_to(filer_window, mark, NULL);
+		ok = gtk_tree_path_prev(cursor);
+		if (ok)
+			gtk_tree_model_get_iter(model, &iter, cursor);
 	}
+	if (!ok)
+	{
+		gtk_tree_path_free(cursor);
+		report_error(_("This item is already at the end"));
+		return;
+	}
+
+	gtk_tree_model_get_value(model, &old, 0, &value);
+	if (dir > 0)
+		gtk_list_store_insert_after(list, &new, &iter);
+	else
+		gtk_list_store_insert_before(list, &new, &iter);
+	gtk_list_store_set(list, &new, 0, g_value_get_string(&value), -1);
+	gtk_list_store_remove(list, &old);
+
+	g_value_unset(&value);
+
+	gtk_tree_view_set_cursor(view, cursor, 0, FALSE);
+	gtk_tree_path_free(cursor);
+}
+
+static void reorder_up(GtkButton *button, GtkTreeView *view)
+{
+	reorder(view, -1);
+}
+
+static void reorder_down(GtkButton *button, GtkTreeView *view)
+{
+	reorder(view, 1);
+}
+
+static void edit_response(GtkWidget *window, gint response, GtkTreeModel *model)
+{
+	GtkTreeIter iter;
+
+	if (response != GTK_RESPONSE_OK)
+	{
+		gtk_widget_destroy(window);
+		return;
+	}
+
+	bookmarks_new();
+
+	if (gtk_tree_model_get_iter_first(model, &iter))
+	{
+		GValue value = {0};
+		xmlNode *root = xmlDocGetRootElement(bookmarks->doc);
+		xmlNode *bookmark;
+
+		do
+		{
+			gtk_tree_model_get_value(model, &iter, 0, &value);
+			bookmark = xmlNewChild(root, NULL, "bookmark",
+					g_value_get_string(&value));
+			g_value_unset(&value);
+		} while (gtk_tree_model_iter_next(model, &iter));
+	}
+
+	bookmarks_save();
+
+	gtk_widget_destroy(window);
+}
+
+static void bookmarks_edit(GtkMenuShell *item, gpointer data)
+{
+	GtkListStore *model;
+	GtkWidget *list, *frame, *hbox, *button;
+	GtkTreeSelection *selection;
+	xmlNode *node;
+
+	if (bookmarks_window)
+	{
+		gtk_window_present(GTK_WINDOW(bookmarks_window));
+		return;
+	}
+
+	bookmarks_window = gtk_dialog_new();
+
+	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL);
+	gtk_dialog_add_button(GTK_DIALOG(bookmarks_window),
+			GTK_STOCK_OK, GTK_RESPONSE_OK);
+
+	g_signal_connect(bookmarks_window, "destroy",
+			 G_CALLBACK(gtk_widget_destroyed), &bookmarks_window);
+
+	frame = gtk_frame_new(NULL);
+	gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_IN);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
+			frame, TRUE, TRUE, 0);
+
+	model = gtk_list_store_new(1, G_TYPE_STRING);
+
+	list = gtk_tree_view_new_with_model(GTK_TREE_MODEL(model));
+	
+
+	gtk_tree_view_insert_column_with_attributes(GTK_TREE_VIEW(list), -1,
+		NULL, gtk_cell_renderer_text_new(), "text", 0, NULL);
+	gtk_tree_view_set_reorderable(GTK_TREE_VIEW(list), TRUE);
+	gtk_tree_view_set_headers_visible(GTK_TREE_VIEW(list), FALSE);
+
+	node = xmlDocGetRootElement(bookmarks->doc);
+	for (node = node->xmlChildrenNode; node; node = node->next)
+	{
+		GtkTreeIter iter;
+		guchar *mark;
+
+		if (node->type != XML_ELEMENT_NODE)
+			continue;
+		if (strcmp(node->name, "bookmark") != 0)
+			continue;
+
+		mark = xmlNodeListGetString(bookmarks->doc,
+					    node->xmlChildrenNode, 1);
+		if (!mark)
+			continue;
+
+		gtk_list_store_append(model, &iter);
+		gtk_list_store_set(model, &iter, 0, mark, -1);
+
+		xmlFree(mark);
+	}
+	
+	gtk_widget_set_size_request(list, 300, 100);
+	gtk_container_add(GTK_CONTAINER(frame), list);
+
+	hbox = gtk_hbutton_box_new();
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(bookmarks_window)->vbox),
+			hbox, FALSE, TRUE, 0);
+	gtk_container_set_border_width(GTK_CONTAINER(hbox), 5);
+
+	button = gtk_button_new_from_stock(GTK_STOCK_DELETE);
+	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+	g_signal_connect(button, "clicked", G_CALLBACK(edit_delete), list);
+
+	button = gtk_button_new_from_stock(GTK_STOCK_GO_UP);
+	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+	g_signal_connect(button, "clicked", G_CALLBACK(reorder_up), list);
+	button = gtk_button_new_from_stock(GTK_STOCK_GO_DOWN);
+	gtk_box_pack_start(GTK_BOX(hbox), button, FALSE, TRUE, 0);
+	g_signal_connect(button, "clicked", G_CALLBACK(reorder_down), list);
+
+	selection = gtk_tree_view_get_selection(GTK_TREE_VIEW(list));
+	gtk_tree_selection_set_mode(selection, GTK_SELECTION_MULTIPLE);
+
+	g_signal_connect(bookmarks_window, "response",
+			 G_CALLBACK(edit_response), model);
+
+	gtk_widget_show_all(bookmarks_window);
 }
 
 /* Builds the bookmarks' menu. Done whenever the bookmarks icon has been
@@ -265,15 +428,19 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 	GtkWidget *menu;
 	GtkWidget *item;
 	xmlNode *node;
+	gboolean need_separator = TRUE;
 
 	menu = gtk_menu_new();
+
 	item = gtk_menu_item_new_with_label(_("Add new bookmark"));
 	g_signal_connect(item, "activate",
 			 G_CALLBACK(bookmarks_add), filer_window);
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
+	gtk_menu_shell_select_item(GTK_MENU_SHELL(menu), item);
 
-	item = gtk_separator_menu_item_new();
+	item = gtk_menu_item_new_with_label(_("Edit bookmarks"));
+	g_signal_connect(item, "activate", G_CALLBACK(bookmarks_edit), NULL);
 	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
@@ -304,6 +471,16 @@ static GtkWidget *bookmarks_build_menu(FilerWindow *filer_window)
 				filer_window);
 
 		gtk_widget_show(item);
+
+		if (need_separator)
+		{
+			GtkWidget *sep;
+			sep = gtk_separator_menu_item_new();
+			gtk_widget_show(sep);
+			gtk_menu_shell_append(GTK_MENU_SHELL(menu), sep);
+			need_separator = FALSE;
+		}
+
 		gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
 
 	}
