@@ -40,6 +40,11 @@ typedef struct _DirItem DirItem;
  */
 typedef struct _Collection Collection;
 
+/* Each item in a Collection has one of these, which stores its selected
+ * state, data, and view_data.
+ */
+typedef struct _CollectionItem   CollectionItem;
+
 /* This contains pixmaps and masks for an image, in various sizes */
 typedef struct _MaskedPixmap MaskedPixmap;
 

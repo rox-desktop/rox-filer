@@ -37,7 +37,6 @@ enum
 
 
 typedef struct _CollectionClass  CollectionClass;
-typedef struct _CollectionItem   CollectionItem;
 typedef void (*CollectionDrawFunc)(GtkWidget *widget,
 			     	  CollectionItem *item,
 			     	  GdkRectangle *area,
@@ -47,6 +46,8 @@ typedef gboolean (*CollectionTestFunc)( Collection *collection,
 			       		CollectionItem *item,
 			       		int width, int height,
 					gpointer user_data);
+typedef void (*CollectionFreeFunc)(Collection *collection,
+			     	   CollectionItem *item);
 
 struct _CollectionItem
 {
@@ -71,6 +72,7 @@ struct _Collection
 
 	CollectionDrawFunc draw_item;
 	CollectionTestFunc test_point;
+	CollectionFreeFunc free_item;
 	gpointer	cb_user_data;	/* Passed to above two functions */
 	GdkGC		*bg_gc;		/* NULL unless pixmap background */
 	

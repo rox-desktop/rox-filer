@@ -346,6 +346,7 @@ static void collection_init(Collection *object)
 	object->array_size = MINIMUM_ITEMS;
 	object->draw_item = default_draw_item;
 	object->test_point = default_test_point;
+	object->free_item = NULL;
 
 	object->auto_scroll = -1;
 	
@@ -407,11 +408,7 @@ static void collection_destroy(GtkObject *object)
 
 	collection = COLLECTION(object);
 
-	if (collection->wink_item != -1)
-	{
-		collection->wink_item = -1;
-		gtk_timeout_remove(collection->wink_timeout);
-	}
+	collection_clear(collection);
 
 	if (collection->auto_scroll != -1)
 	{
@@ -445,6 +442,8 @@ static void collection_finalize(GtkObject *object)
 	Collection *collection;
 
 	collection = COLLECTION(object);
+
+	g_return_if_fail(collection->number_of_items == 0);
 
 	g_free(collection->items);
 }
@@ -1691,39 +1690,7 @@ static void collection_item_set_selected(Collection *collection,
 /* Remove all objects from the collection */
 void collection_clear(Collection *collection)
 {
-	int	prev_selected;
-
-	g_return_if_fail(IS_COLLECTION(collection));
-
-	if (collection->number_of_items == 0)
-		return;
-
-	if (collection->wink_item != -1)
-	{
-		collection->wink_item = -1;
-		gtk_timeout_remove(collection->wink_timeout);
-	}
-
-	collection_set_cursor_item(collection,
-			collection->cursor_item == -1 ? -1: 0);
-	collection->cursor_item_old = -1;
-	prev_selected = collection->number_selected;
-	collection->number_of_items = collection->number_selected = 0;
-
-	resize_arrays(collection, MINIMUM_ITEMS);
-
-#ifdef GTK2
-	gtk_widget_queue_resize(GTK_WIDGET(collection));
-#else
-	collection->paint_level = PAINT_CLEAR;
-#endif
-
-	gtk_widget_queue_clear(GTK_WIDGET(collection));
-
-	if (prev_selected && collection->number_selected == 0)
-		gtk_signal_emit(GTK_OBJECT(collection),
-				collection_signals[LOSE_SELECTION],
-				current_event_time);
+	collection_delete_if(collection, NULL, NULL);
 }
 
 /* Inserts a new item at the end. The new item is unselected, and its
@@ -2195,6 +2162,8 @@ void collection_wink_item(Collection *collection, gint item)
  * Remove all items for which it returns TRUE. test() should
  * free the data before returning TRUE. The collection is in an
  * inconsistant state during this call (ie, when test() is called).
+ *
+ * If test is NULL, remove all items.
  */
 void collection_delete_if(Collection *collection,
 			  gboolean (*test)(gpointer item, gpointer data),
@@ -2206,14 +2175,14 @@ void collection_delete_if(Collection *collection,
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
-	g_return_if_fail(test != NULL);
 
 	cursor = collection->cursor_item;
 
 	for (in = 0; in < collection->number_of_items; in++)
 	{
-		if (!test(collection->items[in].data, data))
+		if (test && !test(collection->items[in].data, data))
 		{
+			/* Keep item */
 			if (collection->items[in].selected)
 			{
 				collection->items[out].selected = TRUE;
@@ -2222,11 +2191,22 @@ void collection_delete_if(Collection *collection,
 			else
 				collection->items[out].selected = FALSE;
 
-			collection->items[out++].data =
+			collection->items[out].data =
 				collection->items[in].data;
+			collection->items[out].view_data =
+				collection->items[in].view_data;
+			out++;
 		}
-		else if (cursor >= in)
-			cursor--;
+		else 
+		{
+			/* Remove item */
+			if (collection->free_item)
+				collection->free_item(collection,
+							&collection->items[in]);
+			
+			if (cursor >= in)
+				cursor--;
+		}
 	}
 
 	if (in != out)

@@ -156,6 +156,7 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	return mtype;
 }
 
+#ifdef USE_REGEX
 static void pattern_delete(gpointer patt, gpointer udata)
 {
 	Pattern *pattern = (Pattern *) patt;
@@ -164,6 +165,7 @@ static void pattern_delete(gpointer patt, gpointer udata)
 
 	g_free(pattern);
 }
+#endif
 
 static gboolean extension_delete(gpointer key, gpointer value, gpointer udata)
 {

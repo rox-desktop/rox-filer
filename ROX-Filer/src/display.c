@@ -40,6 +40,7 @@
 #include "global.h"
 
 #include "main.h"
+#include "display.h"
 #include "collection.h"
 #include "support.h"
 #include "gui_support.h"
@@ -99,13 +100,27 @@ typedef struct _Template Template;
 struct _Template {
 	GdkRectangle	icon;
 	GdkRectangle	leafname;
-	int		split;		/* 0 => No split */
 
 	/* Note that details_string is either NULL or points to a
 	 * static buffer - don't free it!
 	 */
 	guchar		*details_string;
 	GdkRectangle	details;
+};
+
+typedef struct _ViewData ViewData;
+
+struct _ViewData
+{
+#ifdef GTK2
+	PangoLayout *layout;
+#endif
+	int	name_width;
+	int	name_height;
+#ifndef GTK2
+	int	split_pos;		/* 0 => No split */
+	int	split_width, split_height;
+#endif
 };
 
 #define SHOW_RECT(ite, template)	\
@@ -146,7 +161,9 @@ static void display_details_set(FilerWindow *filer_window, DetailsType details);
 static void display_style_set(FilerWindow *filer_window, DisplayStyle style);
 static void options_changed(void);
 static char *details(FilerWindow *filer_window, DirItem *item);
+#ifndef GTK2
 static void wrap_text(Template *template, CollectionItem *colitem, int width);
+#endif
 
 enum {
 	SORT_BY_NAME = 0,
@@ -195,7 +212,9 @@ static void fill_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	DisplayStyle	style = filer_window->display_style;
 
+#ifndef GTK2
 	template->split = 0;
+#endif
 	template->details_string = NULL;
 
 	if (filer_window->details_type == DETAILS_NONE)
@@ -227,17 +246,47 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 {
 	int		pix_width;
 	int		w;
-	int		text_height = item_font->ascent + item_font->descent;
 	int		fixed_height;
-	Template	temp;
 	DisplayStyle	style = filer_window->display_style;
 	DirItem		*item = (DirItem *) colitem->data;
-	int		name_width = GPOINTER_TO_INT(colitem->view_data);
+	ViewData	*view = (ViewData *) colitem->view_data;
 
-	if (name_width == -1)
+	if (!view)
 	{
-		name_width = gdk_string_measure(item_font, item->leafname);
-		colitem->view_data = GINT_TO_POINTER(name_width);
+		int	w, h;
+
+		view = g_new(ViewData, 1);
+		colitem->view_data = view;
+
+#ifdef GTK2
+		view->layout = gtk_widget_create_pango_layout(
+					filer_window->window, item->leafname);
+
+		if (filer_window->details_type == DETAILS_NONE)
+		{
+			if (style == HUGE_ICONS)
+				pango_layout_set_width(view->layout,
+						HUGE_WRAP * PANGO_SCALE);
+			else if (style == LARGE_ICONS)
+				pango_layout_set_width(view->layout,
+						o_large_truncate * PANGO_SCALE);
+		}
+
+		pango_layout_get_size(view->layout, &w, &h);
+		view->name_width = w / PANGO_SCALE;
+		view->name_height = h / PANGO_SCALE;
+#else
+		view->name_width =
+				gdk_string_measure(item_font, item->leafname);
+		view->name_height = item_font->ascent + item_font->descent;
+		if (filer_window->details_type == DETAILS_NONE)
+		{
+			if (style == HUGE_ICONS)
+				wrap_text(colitem, HUGE_WRAP);
+			else if (style == LARGE_ICONS)
+				wrap_text(colitem, o_large_truncate);
+		}
+#endif
 	}
 
 	if (filer_window->details_type == DETAILS_NONE)
@@ -252,15 +301,19 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 			}
 			else
 				pix_width = HUGE_WIDTH * 3 / 2;
-			wrap_text(&temp, colitem, HUGE_WRAP);
-			*width = MAX(pix_width, temp.leafname.width) + 4;
-			*height = temp.leafname.height + HUGE_HEIGHT + 4;
+#ifdef GTK2
+			*width = MAX(pix_width, view->name_width) + 4;
+			*height = view->name_height + HUGE_HEIGHT + 4;
+#else
+			*width = MAX(pix_width, view->split_width) + 4;
+			*height = view->split_height + HUGE_HEIGHT + 4;
+#endif
 		}
 		else if (style == SMALL_ICONS)
 		{
-			w = MIN(name_width, o_small_truncate);
+			w = MIN(view->name_width, o_small_truncate);
 			*width = SMALL_WIDTH + 12 + w;
-			*height = MAX(text_height, SMALL_HEIGHT) + 4;
+			*height = MAX(view->name_height, SMALL_HEIGHT) + 4;
 		}
 		else
 		{
@@ -268,9 +321,13 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 				pix_width = item->image->width;
 			else
 				pix_width = HUGE_WIDTH * 3 / 2;
-			wrap_text(&temp, colitem, o_large_truncate);
-                        *width = MAX(pix_width, temp.leafname.width) + 4;
-			*height = temp.leafname.height + ICON_HEIGHT + 2;
+#ifdef GTK2
+			*width = MAX(pix_width, view->name_width) + 4;
+			*height = view->name_height + ICON_HEIGHT + 2;
+#else
+                        *width = MAX(pix_width, view->split_width) + 4;
+			*height = view->split_height + ICON_HEIGHT + 2;
+#endif
 		}
 	}
 	else
@@ -278,21 +335,23 @@ void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		if (style == HUGE_ICONS)
 		{
 			w = details_width(filer_window, item);
-			*width = HUGE_WIDTH + 12 + MAX(w, name_width);
+			*width = HUGE_WIDTH + 12 + MAX(w, view->name_width);
 			*height = HUGE_HEIGHT - 4;
 		}
 		else if (style == SMALL_ICONS)
 		{
+			int	text_height;
+
 			w = details_width(filer_window, item);
-			*width = SMALL_WIDTH + name_width + 12 + w;
+			*width = SMALL_WIDTH + view->name_width + 12 + w;
 			fixed_height = fixed_font->ascent + fixed_font->descent;
-			text_height = MAX(text_height, fixed_height);
+			text_height = MAX(view->name_height, fixed_height);
 			*height = MAX(text_height, SMALL_HEIGHT) + 4;
 		}
 		else
 		{
 			w = details_width(filer_window, item);
-                        *width = ICON_WIDTH + 12 + MAX(w, name_width);
+                        *width = ICON_WIDTH + 12 + MAX(w, view->name_width);
 			*height = ICON_HEIGHT;
 		}
         }
@@ -679,7 +738,7 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i)
 	int	row = i / collection->columns;
 	int	scroll = 0;
 	GdkRectangle area;
-	int	name_width = GPOINTER_TO_INT(colitem->view_data);
+	ViewData	*view = (ViewData *) colitem->view_data;
 
 #ifndef GTK2
 	scroll = collection->vadj->value;	/* (round to int) */
@@ -700,7 +759,7 @@ gboolean display_is_truncated(FilerWindow *filer_window, int i)
 
 	fill_template(&area, colitem, filer_window, &template);
 
-	return template.leafname.width < name_width;
+	return template.leafname.width < view->name_width;
 }
 
 /* Change the icon size (wraps) */
@@ -724,6 +783,21 @@ void display_change_size(FilerWindow *filer_window, gboolean bigger)
 	}
 
 	display_set_layout(filer_window, new, filer_window->details_type);
+}
+
+void display_free_colitem(Collection *collection, CollectionItem *colitem)
+{
+	ViewData	*view = (ViewData *) colitem->view_data;
+
+#ifdef GTK2
+	if (view->layout)
+	{
+		g_object_unref(G_OBJECT(view->layout));
+		view->layout = NULL;
+	}
+#endif
+	
+	g_free(view);
 }
 
 /****************************************************************
@@ -821,34 +895,36 @@ static int details_width(FilerWindow *filer_window, DirItem *item)
 	return fixed_width * strlen(details(filer_window, item));
 }
 
-/* Fill in the width, height and split of the leafname assuming a wrap
- * width of 'width' pixels.
+#ifndef GTK2
+/* Fill in the split_width, split_height and split_pos of this item's
+ * ViewData, assuming a wrap width of 'width' pixels.
  * Note: result may still be wider than 'width'.
  */
-static void wrap_text(Template *template, CollectionItem *colitem, int width)
+static void wrap_text(CollectionItem *colitem, int width)
 {
 	int	top_len, bot_len, sp;
 	int	font_height = item_font->ascent + item_font->descent;
 	DirItem	*item = (DirItem *) colitem->data;
-	int	name_width = GPOINTER_TO_INT(colitem->view_data);
+	ViewData *view = (ViewData *) colitem->view_data;
 
-	if (name_width < width)
+	if (view->name_width < width)
 	{
-		template->leafname.height = font_height;
-		template->leafname.width = name_width;
-		template->split = 0;
+		view->split_height = font_height;
+		view->split_width = view->name_width;
+		view->split_pos = 0;
 		return;
 	}
 		
 	sp = strlen(item->leafname) / 2;
-	template->split = sp;
+	view->split_pos = sp;
 
 	top_len = gdk_text_measure(item_font, item->leafname, sp);
 	bot_len = gdk_string_measure(item_font, item->leafname + sp);
 
-	template->leafname.width = MAX(top_len, bot_len);
-	template->leafname.height = font_height * 2;
+	view->split_width = MAX(top_len, bot_len);
+	view->split_height = font_height * 2;
 }
+#endif
 
 static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
@@ -858,6 +934,7 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 	MaskedPixmap	*image = item->image;
 	int		image_x, image_y;
 	int		text_x, text_y;
+	ViewData	*view = (ViewData *) colitem->view_data;
 
 	if (image)
 	{
@@ -875,7 +952,13 @@ static void huge_template(GdkRectangle *area, CollectionItem *colitem,
 	image_x = area->x + ((col_width - template->icon.width) >> 1);
 	image_y = area->y + (HUGE_HEIGHT - template->icon.height);
 
-	wrap_text(template, colitem, HUGE_WRAP);
+#ifdef GTK2
+	template->leafname.width = view->name_width;
+	template->leafname.height = view->name_height;
+#else
+	template->leafname.width = view->split_width;
+	template->leafname.height = view->split_height;
+#endif
 	text_x = area->x + ((col_width - template->leafname.width) >> 1);
 	text_y = image_y + template->icon.height + 2;
 
@@ -897,6 +980,7 @@ static void large_template(GdkRectangle *area, CollectionItem *colitem,
 	int		iwidth, iheight;
 	int		image_x;
 	int		image_y;
+	ViewData	*view = (ViewData *) colitem->view_data;
 	
 	int		text_x, text_y;
 	
@@ -912,7 +996,13 @@ static void large_template(GdkRectangle *area, CollectionItem *colitem,
 	}
 	image_x = area->x + ((col_width - iwidth) >> 1);
 
-	wrap_text(template, colitem, o_large_truncate);
+#ifdef GTK2
+	template->leafname.width = view->name_width;
+	template->leafname.height = view->name_height;
+#else
+	template->leafname.width = view->split_width;
+	template->leafname.height = view->split_height;
+#endif
 	text_x = area->x + ((col_width - template->leafname.width) >> 1);
 	text_y = area->y + ICON_HEIGHT + 2;
 
@@ -932,15 +1022,16 @@ static void small_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
 	int	text_x = area->x + SMALL_WIDTH + 4;
-	int	font_height = item_font->ascent + item_font->descent;
-	int	low_text_y = area->y + area->height / 2 - font_height / 2;
+	int	low_text_y;
 	int	max_text_width = area->width - SMALL_WIDTH - 4;
-	int	name_width = GPOINTER_TO_INT(colitem->view_data);
+	ViewData *view = (ViewData *) colitem->view_data;
+
+	low_text_y = area->y + area->height / 2 - view->name_height / 2;
 
 	template->leafname.x = text_x;
 	template->leafname.y = low_text_y;
-	template->leafname.width = MIN(max_text_width, name_width);
-	template->leafname.height = font_height;
+	template->leafname.width = MIN(max_text_width, view->name_width);
+	template->leafname.height = view->name_height;
 	
 	template->icon.x = area->x;
 	template->icon.y = area->y + 1;
@@ -953,10 +1044,9 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 {
 	DirItem		*item = (DirItem *) colitem->data;
 	MaskedPixmap	*image = item->image;
-	int	font_height = item_font->ascent + item_font->descent;
-	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	int	max_text_width = area->width - HUGE_WIDTH - 4;
-	int	name_width = GPOINTER_TO_INT(colitem->view_data);
+	int	fixed_height = fixed_font->ascent + fixed_font->descent;
+	ViewData *view = (ViewData *) colitem->view_data;
 
 	if (image)
 	{
@@ -976,14 +1066,14 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	template->leafname.x = area->x + HUGE_WIDTH + 4;
 	template->leafname.y = area->y + area->height / 2
-			     - (font_height + 2 + fixed_height) / 2;
-	template->leafname.width = MIN(max_text_width, name_width);
-	template->leafname.height = font_height;
+			     - (view->name_height + 2 + fixed_height) / 2;
+	template->leafname.width = MIN(max_text_width, view->name_width);
+	template->leafname.height = view->name_height;
 
 	template->details_string = details(filer_window, item);
 	
 	template->details.x = template->leafname.x;
-	template->details.y = template->leafname.y + font_height + 2;
+	template->details.y = template->leafname.y + view->name_height + 2;
 	template->details.width = fixed_width *
 					strlen(template->details_string);
 	template->details.height = fixed_height;
@@ -992,11 +1082,10 @@ static void huge_full_template(GdkRectangle *area, CollectionItem *colitem,
 static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 			   FilerWindow *filer_window, Template *template)
 {
-	int	font_height = item_font->ascent + item_font->descent;
 	int	fixed_height = fixed_font->ascent + fixed_font->descent;
 	int	max_text_width = area->width - ICON_WIDTH - 4;
-	int	name_width = GPOINTER_TO_INT(colitem->view_data);
 	DirItem	*item = (DirItem *) colitem->data;
+	ViewData *view = (ViewData *) colitem->view_data;
 
 	template->icon.x = area->x;
 	template->icon.y = area->y + (area->height - ICON_HEIGHT) / 2;
@@ -1005,14 +1094,14 @@ static void large_full_template(GdkRectangle *area, CollectionItem *colitem,
 
 	template->leafname.x = area->x + ICON_WIDTH + 4;
 	template->leafname.y = area->y + area->height / 2
-				- (font_height + 2 + fixed_height) / 2;
-	template->leafname.width = MIN(max_text_width, name_width);
-	template->leafname.height = font_height;
+				- (view->name_height + 2 + fixed_height) / 2;
+	template->leafname.width = MIN(max_text_width, view->name_width);
+	template->leafname.height = view->name_height;
 
 	template->details_string = details(filer_window, item);
 	
 	template->details.x = template->leafname.x;
-	template->details.y = template->leafname.y + font_height + 2;
+	template->details.y = template->leafname.y + view->name_height + 2;
 	template->details.width = fixed_width *
 					strlen(template->details_string);
 	template->details.height = fixed_height;
@@ -1253,25 +1342,9 @@ static void draw_item(GtkWidget *widget,
 	DirItem		*item = (DirItem *) colitem->data;
 	gboolean	selected = colitem->selected;
 	Template	template;
-	int		name_width = GPOINTER_TO_INT(colitem->view_data);
+	ViewData *view = (ViewData *) colitem->view_data;
 
 	fill_template(area, colitem, filer_window, &template);
-
-#if 0
-	/* Just draw outlines of the three regions */
-	gdk_draw_rectangle(widget->window, widget->style->black_gc,
-			selected, template.icon.x, template.icon.y,
-			template.icon.width, template.icon.height);
-	gdk_draw_rectangle(widget->window, widget->style->black_gc,
-			selected, template.leafname.x, template.leafname.y,
-			template.leafname.width, template.leafname.height);
-	if (!template.details_string)
-		return;
-	gdk_draw_rectangle(widget->window, widget->style->black_gc,
-			selected, template.details.x, template.details.y,
-			template.details.width, template.details.height);
-	return;
-#endif
 
 	/* Set up GC for coloured file types */
 	if (!type_gc)
@@ -1298,6 +1371,12 @@ static void draw_item(GtkWidget *widget,
 	else
 		draw_huge_icon(widget, &template.icon, item, selected);
 	
+#ifdef GTK2
+	gdk_draw_layout(widget->window, type_gc,
+			template.leafname.x,
+			template.leafname.y,
+			view->layout);
+#else
 	if (template.split)
 	{
 		guchar	*bot = item->leafname + template.split;
@@ -1335,6 +1414,7 @@ static void draw_item(GtkWidget *widget,
 				template.leafname.width,
 				filer_window->selection_state,
 				selected, TRUE);
+#endif
 	
 	if (template.details_string)
 		draw_details(filer_window, item,
@@ -1344,12 +1424,27 @@ static void draw_item(GtkWidget *widget,
 				selected, template.details_string);
 }
 
+static void free_views(Collection *collection)
+{
+	int	i;
+	
+	for (i = 0; i < collection->number_of_items; i++)
+	{
+		CollectionItem *ci = &collection->items[i];
+
+		display_free_colitem(collection, ci);
+
+		ci->view_data = NULL;
+	}
+}
+
 /* Note: Call shrink_grid after this */
 static void display_details_set(FilerWindow *filer_window, DetailsType details)
 {
 	if (filer_window->details_type == details)
 		return;
 	filer_window->details_type = details;
+	free_views(filer_window->collection);
 
 #ifndef GTK2
 	filer_window->collection->paint_level = PAINT_CLEAR;
@@ -1364,6 +1459,8 @@ static void display_style_set(FilerWindow *filer_window, DisplayStyle style)
 		return;
 
 	filer_window->display_style = style;
+
+	free_views(filer_window->collection);
 
 	collection_set_functions(filer_window->collection,
 			(CollectionDrawFunc) draw_item,

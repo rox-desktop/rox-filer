@@ -205,18 +205,21 @@ static void update_item(FilerWindow *filer_window, DirItem *item)
 	if (leafname[0] == '.' && filer_window->show_hidden == FALSE)
 		return;
 
-	calc_size(filer_window, item, &w, &h); 
+	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
+
+	if (i < 0)
+	{
+		g_warning("Failed to find '%s'\n", item->leafname);
+		return;
+	}
+
+	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
 	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,
 					 MAX(old_w, w),
 					 MAX(old_h, h));
 
-	i = collection_find_item(filer_window->collection, item, dir_item_cmp);
-
-	if (i >= 0)
-		collection_draw_item(filer_window->collection, i, TRUE);
-	else
-		g_warning("Failed to find '%s'\n", item->leafname);
+	collection_draw_item(filer_window->collection, i, TRUE);
 }
 
 /* Resize the filer window to w x h pixels, plus border (not clamped) */
@@ -551,6 +554,7 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 	int		old_w = filer_window->collection->item_width;
 	int		old_h = filer_window->collection->item_height;
 	int		w, h;
+	int		i;
 
 	if (leafname[0] == '.')
 	{
@@ -559,15 +563,14 @@ static void add_item(FilerWindow *filer_window, DirItem *item)
 		return;
 	}
 
-	calc_size(filer_window, item, &w, &h); 
+	/* The ViewData field is created in calc_size() */
+	i = collection_insert(filer_window->collection, item, NULL);
+
+	calc_size(filer_window, &filer_window->collection->items[i], &w, &h); 
 	if (w > old_w || h > old_h)
 		collection_set_item_size(filer_window->collection,
 					 MAX(old_w, w),
 					 MAX(old_h, h));
-
-	/* The view_data field holds the leafname's width */
-	collection_insert(filer_window->collection, item,
-				GINT_TO_POINTER(-1));
 }
 
 /* Returns TRUE iff the directory still exists. */
@@ -1344,6 +1347,8 @@ static void filer_add_widgets(FilerWindow *filer_window)
 	gtk_object_set_data(GTK_OBJECT(collection),
 			"filer_window", filer_window);
 	filer_window->collection = COLLECTION(collection);
+
+	filer_window->collection->free_item = display_free_colitem;
 
 	/* Scrollbar on the right, everything else on the left */
 	hbox = gtk_hbox_new(FALSE, 0);

@@ -28,7 +28,7 @@ void display_set_sort_fn(FilerWindow *filer_window,
 			int (*fn)(const void *a, const void *b));
 void display_set_autoselect(FilerWindow *filer_window, guchar *leaf);
 void shrink_grid(FilerWindow *filer_window);
-void calc_size(FilerWindow *filer_window, DirItem *item,
+void calc_size(FilerWindow *filer_window, CollectionItem *colitem,
 		int *width, int *height);
 
 void draw_large_icon(GtkWidget *widget,
@@ -48,5 +48,6 @@ void draw_string(GtkWidget *widget,
 		gboolean box);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);
 void display_change_size(FilerWindow *filer_window, gboolean bigger);
+void display_free_colitem(Collection *collection, CollectionItem *colitem);
 
 #endif /* _DISPLAY_H */
