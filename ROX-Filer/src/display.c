@@ -61,7 +61,6 @@
 #define HUGE_WRAP (1.5 * o_large_width.int_value)
 
 /* Options bits */
-static Option o_intelligent_sort;
 static Option o_display_dirs_first;
 Option o_display_size;
 Option o_display_details;
@@ -91,7 +90,6 @@ enum {
 
 void display_init()
 {
-	option_add_int(&o_intelligent_sort, "display_intelligent_sort", 1);
 	option_add_int(&o_display_dirs_first, "display_dirs_first", FALSE);
 	option_add_int(&o_display_size, "display_size", LARGE_ICONS);
 	option_add_int(&o_display_details, "display_details", DETAILS_NONE);
@@ -187,9 +185,6 @@ int sort_by_name(const void *item1, const void *item2)
 	int retval;
 
 	SORT_DIRS;
-
-	if (!o_intelligent_sort.int_value)
-		return strcmp(i1->leafname, i2->leafname);
 
 	retval = collate_key_cmp(n1, n2);
 
@@ -382,8 +377,7 @@ static void options_changed(void)
 		FilerWindow *filer_window = (FilerWindow *) next->data;
 		int flags = 0;
 
-		if (o_intelligent_sort.has_changed ||
-				o_display_dirs_first.has_changed)
+		if (o_display_dirs_first.has_changed)
 			view_sort(VIEW(filer_window->view));
 
 		if (o_large_width.has_changed || o_small_width.has_changed)
