@@ -23,8 +23,6 @@
 
 #include "config.h"
 
-#undef GTK_DISABLE_DEPRECATED
-
 #include <string.h>
 
 #include <gtk/gtkinvisible.h>
@@ -708,7 +706,7 @@ static void rename_cb(Icon *icon)
 {
 	if (icon->panel)
 	{
-		gtk_widget_queue_clear(icon->widget);
+		gtk_widget_queue_draw(icon->widget);
 		panel_icon_renamed(icon);
 		panel_save(icon->panel);
 	}
@@ -809,6 +807,14 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 	}
 }
 
+static void edit_response(GtkWidget *dialog, gint response, gpointer data)
+{
+	if (response == GTK_RESPONSE_OK)
+		rename_activate(dialog);
+	else if (response == GTK_RESPONSE_CANCEL)
+		gtk_widget_destroy(dialog);
+}
+
 /* Opens a box allowing the user to change the name of a pinned icon.
  * If 'widget' is destroyed then the box will close.
  * If the user chooses OK then the callback is called once the icon's
@@ -817,68 +823,50 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
  */
 static void show_rename_box(GtkWidget *widget, Icon *icon, RenameFn callback)
 {
-	GtkWidget	*dialog, *hbox, *vbox, *label, *entry, *button;
+	GtkDialog	*dialog;
+	GtkWidget	*label, *entry;
 
-	/* XXX: Use a real dialog box! */
-	dialog = gtk_window_new(GTK_WINDOW_TOPLEVEL);
-	gtk_window_set_type_hint(GTK_WINDOW(dialog),
-			GDK_WINDOW_TYPE_HINT_DIALOG);
+	dialog = GTK_DIALOG(gtk_dialog_new());
 
 	gtk_window_set_title(GTK_WINDOW(dialog), _("Edit Item"));
-	gtk_container_set_border_width(GTK_CONTAINER(dialog), 10);
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
 
-	vbox = gtk_vbox_new(FALSE, 4);
-	gtk_container_add(GTK_CONTAINER(dialog), vbox);
-	
 	label = gtk_label_new(_("Clicking the icon opens:"));
-	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
 
 	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, FALSE, 2);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->src_path);
 	g_object_set_data(G_OBJECT(dialog), "new_path", entry);
 	g_signal_connect_swapped(entry, "activate",
 			G_CALLBACK(rename_activate), dialog);
 
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), TRUE, TRUE, 2);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox),
+			gtk_hseparator_new(), TRUE, TRUE, 2);
 
 	label = gtk_label_new(_("The text displayed under the icon is:"));
-	gtk_box_pack_start(GTK_BOX(vbox), label, TRUE, TRUE, 0);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), label, TRUE, TRUE, 0);
 	entry = gtk_entry_new();
-	gtk_box_pack_start(GTK_BOX(vbox), entry, TRUE, FALSE, 2);
+	gtk_box_pack_start(GTK_BOX(dialog->vbox), entry, TRUE, FALSE, 2);
 	gtk_entry_set_text(GTK_ENTRY(entry), icon->item->leafname);
-	gtk_editable_select_region(GTK_EDITABLE(entry), 0, -1);
 	gtk_widget_grab_focus(entry);
 	g_object_set_data(G_OBJECT(dialog), "new_name", entry);
-	g_signal_connect_swapped(entry, "activate",
-			G_CALLBACK(rename_activate), dialog);
+	gtk_entry_set_activates_default(GTK_ENTRY(entry), TRUE);
 	
-	gtk_signal_connect_object_while_alive(GTK_OBJECT(widget),
-			"destroy",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
+	g_signal_connect_object(widget, "destroy",
+			G_CALLBACK(gtk_widget_destroy), dialog,
+			G_CONNECT_SWAPPED);
 
-	gtk_object_set_data(GTK_OBJECT(dialog), "callback_icon", icon);
-	gtk_object_set_data(GTK_OBJECT(dialog), "callback_fn", callback);
+	g_object_set_data(G_OBJECT(dialog), "callback_icon", icon);
+	g_object_set_data(G_OBJECT(dialog), "callback_fn", callback);
 
-	gtk_box_pack_start(GTK_BOX(vbox), gtk_hseparator_new(), TRUE, TRUE, 2);
+	gtk_dialog_add_buttons(dialog,
+			GTK_STOCK_CANCEL, GTK_RESPONSE_CANCEL,
+			GTK_STOCK_OK, GTK_RESPONSE_OK,
+			NULL);
+	gtk_dialog_set_default_response(dialog, GTK_RESPONSE_OK);
 
-	hbox = gtk_hbox_new(TRUE, 4);
-	gtk_box_pack_start(GTK_BOX(vbox), hbox, FALSE, TRUE, 0);
-
-	button = gtk_button_new_with_label(_("OK"));
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_window_set_default(GTK_WINDOW(dialog), button);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(rename_activate), GTK_OBJECT(dialog));
+	g_signal_connect(dialog, "response", G_CALLBACK(edit_response), NULL);
 	
-	button = gtk_button_new_with_label(_("Cancel"));
-	GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-	gtk_box_pack_start(GTK_BOX(hbox), button, TRUE, TRUE, 0);
-	gtk_signal_connect_object(GTK_OBJECT(button), "clicked",
-			GTK_SIGNAL_FUNC(gtk_widget_destroy),
-			GTK_OBJECT(dialog));
-
-	gtk_widget_show_all(dialog);
+	gtk_widget_show_all(GTK_WIDGET(dialog));
 }
