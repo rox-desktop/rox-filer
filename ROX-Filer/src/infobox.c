@@ -397,7 +397,7 @@ static void add_file_output(FileStatus *fs,
 		close(source);
 		fs->fd = -1;
 		if (got < 0)
-			delayed_error(_("ROX-Filer: file(1) says..."),
+			delayed_rox_error(_("file(1) says... %s"),
 					g_strerror(err));
 		return;
 	}

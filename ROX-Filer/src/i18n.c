@@ -57,7 +57,7 @@ void i18n_init(void)
 	setlocale(LC_ALL, "");
 #endif
 	
-	trans = choices_find_path_load("Translation", "ROX-Filer");
+	trans = choices_find_path_load("Translation", PROJECT);
 
 	if (trans)
 	{
@@ -162,8 +162,7 @@ void free_translated_entries(GtkItemFactoryEntry *entries, gint n)
 static void trans_changed(guchar *lang)
 {
 	set_trans(lang);
-	delayed_error(PROJECT,
-		_("You must restart the filer for the new language "
+	delayed_rox_error(_("You must restart the filer for the new language "
 		  "setting to take full effect"));
 }
 
@@ -228,7 +227,7 @@ static void save(void)
 	FILE	*f;
 	guchar	*lang;
 
-	path = choices_find_path_save("Translation", "ROX-Filer", TRUE);
+	path = choices_find_path_save("Translation", PROJECT, TRUE);
 	if (!path)
 		return;
 
@@ -238,7 +237,7 @@ static void save(void)
 	g_free(path);
 	if (!f)
 	{
-		delayed_error(PROJECT, g_strerror(errno));
+		delayed_rox_error(g_strerror(errno));
 		return;
 	}
 
@@ -249,5 +248,5 @@ static void save(void)
 		  (fclose(f) != 0);
 
 	if (err)
-		delayed_error(PROJECT, g_strerror(errno));
+		delayed_rox_error(g_strerror(errno));
 }

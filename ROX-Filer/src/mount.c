@@ -63,7 +63,7 @@ time_t fstab_time;
 
 /* Static prototypes */
 #ifdef DO_MOUNT_POINTS
-static GHashTable *read_table(GHashTable *mount_points, char *path);
+static void read_table(void);
 static void clear_table(GHashTable *table);
 static time_t read_time(char *path);
 static gboolean free_mp(gpointer key, gpointer value, gpointer data);
@@ -80,7 +80,7 @@ void mount_init(void)
 
 #ifdef DO_MOUNT_POINTS
 	fstab_time = read_time(THE_FSTAB);
-	read_table(fstab_mounts, THE_FSTAB);
+	read_table();
 #endif
 }
 
@@ -94,7 +94,7 @@ void mount_update(gboolean force)
 	if (force || time != fstab_time)
 	{
 		fstab_time = time;
-		read_table(fstab_mounts, THE_FSTAB);
+		read_table();
 	}
 #endif /* DO_MOUNT_POINTS */
 }
@@ -164,19 +164,17 @@ static time_t read_time(char *path)
 	return info.st_mtime;
 }
 
-#endif
-
-#ifdef HAVE_MNTENT_H
-static GHashTable *read_table(GHashTable *mount_points, char *path)
+# ifdef HAVE_MNTENT_H
+static void read_table(void)
 {
 	FILE		*tab;
 	struct mntent	*ent;
 	MountPoint	*mp;
 
-	clear_table(mount_points);
+	clear_table(fstab_mounts);
 
-	tab = setmntent(path, "r");
-	g_return_val_if_fail(tab != NULL, NULL);
+	tab = setmntent(THE_FSTAB, "r");
+	g_return_if_fail(tab != NULL);
 
 	while ((ent = getmntent(tab)))
 	{
@@ -187,35 +185,33 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 		mp->name = g_strdup(ent->mnt_fsname);
 		mp->dir  = g_strdup(ent->mnt_dir);
 
-		g_hash_table_insert(mount_points, mp->dir, mp);
+		g_hash_table_insert(fstab_mounts, mp->dir, mp);
 	}
 
 	endmntent(tab);
-
-	return mount_points;
 }
 
-#elif HAVE_SYS_MNTENT_H
-static GHashTable *read_table(GHashTable *mount_points, char *path)
+# elif HAVE_SYS_MNTENT_H
+static void read_table(void)
 {
 	FILE		*tab;
 	struct mnttab	ent;
 	MountPoint	*mp;
-#ifdef HAVE_FCNTL_H
+#  ifdef HAVE_FCNTL_H
 	struct flock	lb;
-#endif
+#  endif
 
-	tab = fopen(path, "r");
-	g_return_val_if_fail(tab != NULL, NULL);
-	clear_table(mount_points);
+	tab = fopen(THE_FSTAB, "r");
+	g_return_if_fail(tab != NULL);
+	clear_table(fstab_mounts);
 
-#ifdef HAVE_FCNTL_H
+#  ifdef HAVE_FCNTL_H
 	lb.l_type = F_RDLCK;
 	lb.l_whence = 0;
 	lb.l_start = 0;
 	lb.l_len = 0;
 	fcntl(fileno(tab), F_SETLKW, &lb);
-#endif
+#  endif
 
 	while (getmntent(tab, &ent)==0)
 	{
@@ -226,26 +222,24 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 		mp->dir = g_strdup(ent.mnt_mountp);
 		mp->name = g_strdup(ent.mnt_special);
 
-		g_hash_table_insert(mount_points, mp->dir, mp);
+		g_hash_table_insert(fstab_mounts, mp->dir, mp);
 	}
 
 	fclose(tab);
-
-	return mount_points;
 }
 
-#elif HAVE_SYS_UCRED_H	/* We don't have /etc/mtab (fstab?) */
+# elif HAVE_SYS_UCRED_H	/* We don't have getmntent(), etc */
 
-static GHashTable *read_table(GHashTable *mount_points, char *path)
+static void read_table(void)
 {
 	int		tab;
 	struct fstab	*ent;
 	MountPoint	*mp;
 
-	clear_table(mount_points);
+	clear_table(fstab_mounts);
 
 	tab = setfsent();
-	g_return_val_if_fail(tab != 0, NULL);
+	g_return_if_fail(tab != 0);
 
 	while ((ent = getfsent()))
 	{
@@ -258,12 +252,12 @@ static GHashTable *read_table(GHashTable *mount_points, char *path)
 		mp->name = g_strdup(ent->fs_spec);	/* block special device name */
 		mp->dir  = g_strdup(ent->fs_file);	/* file system path prefix */
 
-		g_hash_table_insert(mount_points, mp->dir, mp);
+		g_hash_table_insert(fstab_mounts, mp->dir, mp);
 	}
 
 	endfsent();
-
-	return mount_points;
 }
 
-#endif
+# endif /* HAVE_MNTENT_H */
+
+#endif /* DO_MOUNT_POINTS */

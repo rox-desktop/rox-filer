@@ -73,7 +73,7 @@ void run_app(char *path)
 	argv[0] = g_string_append(apprun, "/AppRun")->str;
 
 	if (!spawn_full(argv, home_dir))
-		report_error(PROJECT, "Failed to fork() child process");
+		report_rox_error(_("Failed to fork() child process"));
 	
 	g_string_free(apprun, TRUE);
 }
@@ -90,7 +90,7 @@ void run_with_files(char *path, GList *uri_list)
 
 	if (stat(path, &info))
 	{
-		delayed_error(PROJECT, _("Program not found - deleted?"));
+		delayed_rox_error(_("Program %s not found - deleted?"), path);
 		return;
 	}
 
@@ -117,7 +117,7 @@ void run_with_files(char *path, GList *uri_list)
 	argv[argc++] = NULL;
 
 	if (!spawn_full(argv, home_dir))
-		delayed_error(PROJECT, _("Failed to fork() child process"));
+		delayed_rox_error(_("Failed to fork() child process"));
 }
 
 /* Run the program as '<path> -', piping the data to it via stdin.
@@ -132,7 +132,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 
 	if (stat(path, &info))
 	{
-		delayed_error(PROJECT, _("Program not found - deleted?"));
+		delayed_rox_error(_("Program %s not found - deleted?"), path);
 		return;
 	}
 
@@ -143,7 +143,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 	
 	if (pipe(fds))
 	{
-		delayed_error("pipe() failed", g_strerror(errno));
+		delayed_rox_error("pipe: %s", g_strerror(errno));
 		return;
 	}
 	close_on_exec(fds[1], TRUE);
@@ -152,7 +152,7 @@ void run_with_data(char *path, gpointer data, gulong length)
 	switch (fork())
 	{
 		case -1:
-			delayed_error("fork() failed", g_strerror(errno));
+			delayed_rox_error("fork: %s", g_strerror(errno));
 			close(fds[1]);
 			break;
 		case 0:
@@ -242,7 +242,7 @@ gboolean run_diritem(guchar *full_path,
 					return TRUE;
 				else
 				{
-					report_error(PROJECT,
+					report_rox_error(
 						_("Failed to fork() child"));
 					return FALSE;
 				}
@@ -251,13 +251,12 @@ gboolean run_diritem(guchar *full_path,
 			return open_file(full_path, edit ? &text_plain
 						  : item->mime_type);
 		case TYPE_ERROR:
-			delayed_error(full_path,
-					_("File doesn't exist, or I can't "
-					  "access it"));
+			delayed_rox_error(_("File doesn't exist, or I can't "
+					  "access it: %s"), full_path);
 			return FALSE;
 		default:
-			delayed_error(full_path,
-					_("I don't know how to open that"));
+		        delayed_rox_error(
+				_("I don't know how to open '%s'"), full_path);
 			return FALSE;
 	}
 }
@@ -401,7 +400,8 @@ static void write_data(gpointer data, gint fd, GdkInputCondition cond)
 		{
 			if (errno == EAGAIN)
 				return;
-			delayed_error(_("ROX-Filer - Sending data to program"),
+			delayed_rox_error(
+					_("Could not send data to program: %s"),
 					g_strerror(errno));
 			goto finish;
 		}
@@ -431,7 +431,8 @@ static gboolean follow_symlink(char *full_path,
 	got = readlink(full_path, path, MAXPATHLEN);
 	if (got < 0)
 	{
-		delayed_error(PROJECT, g_strerror(errno));
+		delayed_rox_error(_("Could not read link: %s"),
+				  g_strerror(errno));
 		return FALSE;
 	}
 
@@ -457,9 +458,9 @@ static gboolean follow_symlink(char *full_path,
 	if (!slash)
 	{
 		g_free(real);
-		delayed_error(PROJECT,
+		delayed_rox_error(
 			_("Broken symlink (or you don't have permission "
-			  "to follow it)."));
+			  "to follow it): %s"), full_path);
 		return FALSE;
 	}
 
@@ -488,23 +489,18 @@ static gboolean follow_symlink(char *full_path,
 /* Load this file into an appropriate editor */
 static gboolean open_file(guchar *path, MIME_type *type)
 {
-	GString		*message;
-
 	g_return_val_if_fail(type != NULL, FALSE);
 
 	if (type_open(path, type))
 		return TRUE;
 
-	message = g_string_new(NULL);
-	g_string_sprintf(message,
+	report_rox_error(
 		_("No run action specified for files of this type (%s/%s) - "
 		"you can set a run action by choosing `Set Run Action' "
 		"from the File menu, or you can just drag the file to an "
 		"application"),
 		type->media_type,
 		type->subtype);
-	report_error(PROJECT, message->str);
-	g_string_free(message, TRUE);
 
 	return FALSE;
 }

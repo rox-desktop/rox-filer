@@ -576,7 +576,7 @@ static gboolean may_rescan(FilerWindow *filer_window, gboolean warning)
 	if (!dir)
 	{
 		if (warning)
-			delayed_error(PROJECT, _("Directory missing/deleted"));
+			delayed_rox_error(_("Directory missing/deleted"));
 		gtk_widget_destroy(filer_window->window);
 		return FALSE;
 	}
@@ -926,13 +926,9 @@ void filer_change_to(FilerWindow *filer_window, char *path, char *from)
 
 	if (!new_dir)
 	{
-		char	*error;
-
-		error = g_strdup_printf(_("Directory '%s' is not accessible"),
+		delayed_rox_error(_("Directory '%s' is not accessible"),
 				real_path);
 		g_free(real_path);
-		delayed_error(PROJECT, error);
-		g_free(error);
 		return;
 	}
 	
@@ -1113,11 +1109,7 @@ FilerWindow *filer_opendir(char *path, FilerWindow *src_win)
 						   filer_window->path);
 	if (!filer_window->directory)
 	{
-		char	*error;
-
-		error = g_strdup_printf(_("Directory '%s' not found."), path);
-		delayed_error(PROJECT, error);
-		g_free(error);
+		delayed_rox_error(_("Directory '%s' not found."), path);
 		g_free(filer_window->path);
 		g_free(filer_window);
 		return NULL;

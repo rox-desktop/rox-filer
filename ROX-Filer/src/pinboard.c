@@ -212,7 +212,7 @@ void pinboard_activate(guchar *name)
 
 	if (!add_root_handlers())
 	{
-		delayed_error(PROJECT, _("Another application is already "
+		delayed_rox_error(_("Another application is already "
 					"managing the pinboard!"));
 		return;
 	}
@@ -232,7 +232,7 @@ void pinboard_activate(guchar *name)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pb_", name, NULL);
-		path = choices_find_path_load(leaf, "ROX-Filer");
+		path = choices_find_path_load(leaf, PROJECT);
 		g_free(leaf);
 	}
 
@@ -1108,7 +1108,7 @@ void pinboard_save(void)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pb_", current_pinboard->name, NULL);
-		save = choices_find_path_save(leaf, "ROX-Filer", TRUE);
+		save = choices_find_path_save(leaf, PROJECT, TRUE);
 		g_free(leaf);
 	}
 
@@ -1144,7 +1144,7 @@ void pinboard_save(void)
 
 	goto out;
 err:
-	delayed_error(_("Error saving pinboard"), g_strerror(errno));
+	delayed_rox_error(_("Could not save pinboard: %s"), g_strerror(errno));
 out:
 	if (file)
 		fclose(file);

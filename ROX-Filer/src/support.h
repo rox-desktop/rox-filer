@@ -38,5 +38,6 @@ GPtrArray *split_path(guchar *path);
 guchar *get_relative_path(guchar *from, guchar *to);
 void add_default_styles(void);
 xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name);
+void set_to_null(gpointer *data);
 
 #endif /* _SUPPORT_H */

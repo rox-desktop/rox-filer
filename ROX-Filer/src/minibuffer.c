@@ -245,7 +245,7 @@ static void show_help(FilerWindow *filer_window)
 			break;
 	}
 
-	delayed_error(PROJECT, message);
+	delayed_rox_error("%s", message);
 }
 
 
@@ -722,8 +722,7 @@ static void shell_return_pressed(FilerWindow *filer_window)
 	switch (child)
 	{
 		case -1:
-			delayed_error(PROJECT, _("Failed to create "
-					"child process"));
+			delayed_rox_error(_("Failed to create child process"));
 			break;
 		case 0:	/* Child */
 			/* Ensure output is noticed - send stdout to stderr */
@@ -794,7 +793,7 @@ static void select_return_pressed(FilerWindow *filer_window, guint etime)
 	cond = find_compile(entry);
 	if (!cond)
 	{
-		delayed_error(PROJECT, "Invalid Find condition");
+		delayed_rox_error(_("Invalid Find condition"));
 		return;
 	}
 

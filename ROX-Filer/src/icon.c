@@ -594,13 +594,13 @@ static void rename_activate(GtkWidget *dialog)
 	new_src = gtk_entry_get_text(GTK_ENTRY(src));
 	
 	if (*new_name == '\0')
-		report_error(PROJECT,
+		report_rox_error(
 			_("The label must contain at least one character!"));
 	else if (*new_src == '\0')
-		report_error(PROJECT,
+		report_rox_error(
 			_("The location must contain at least one character!"));
 	else if (strpbrk(new_name, "<>"))
-		report_error(PROJECT,
+		report_rox_error(
 			_("Sorry, but the name must not contain < or >"));
 	else
 	{
@@ -746,7 +746,7 @@ static void remove_items(gpointer data, guint action, GtkWidget *widget)
 	
 	if (!next)
 	{
-		delayed_error(PROJECT,
+		delayed_rox_error(
 			_("You must first select some items to remove"));
 		return;
 	}
@@ -785,8 +785,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 {
 	if (!menu_icon)
 	{
-		delayed_error(PROJECT,
-			_("You must open the menu over an item"));
+		delayed_rox_error(_("You must open the menu over an item"));
 		return;
 	}
 
@@ -814,7 +813,7 @@ static void file_op(gpointer data, guint action, GtkWidget *widget)
 				type_set_handler_dialog(
 						menu_icon->item.mime_type);
 			else
-				report_error(PROJECT,
+				report_rox_error(
 				_("You can only set the run action for a "
 				"regular file"));
 			break;

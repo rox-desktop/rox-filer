@@ -76,6 +76,8 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window);
 static void toolbar_details_clicked(GtkWidget *widget,
 				    FilerWindow *filer_window);
+static void toolbar_hidden_clicked(GtkWidget *widget,
+				   FilerWindow *filer_window);
 static GtkWidget *add_button(GtkWidget *box, Tool *tool,
 				FilerWindow *filer_window);
 static GtkWidget *create_toolbar(FilerWindow *filer_window);
@@ -121,6 +123,10 @@ static Tool all_tools[] = {
 	
 	{N_("Details"), "details", N_("Show extra details"),
 	 toolbar_details_clicked, DROP_NONE, TRUE,
+	 NULL, NULL},
+	
+	{N_("Hidden"), "hidden", N_("Show/hide hidden files"),
+	 toolbar_hidden_clicked, DROP_NONE, TRUE,
 	 NULL, NULL},
 	
 	{N_("Help"), "help", N_("Show ROX-Filer help"),
@@ -308,6 +314,12 @@ static void toolbar_details_clicked(GtkWidget *widget,
 		display_set_layout(filer_window,
 				option_get_int("display_size"),
 				DETAILS_NONE);
+}
+
+static void toolbar_hidden_clicked(GtkWidget *widget,
+				   FilerWindow *filer_window)
+{
+	display_set_hidden(filer_window, !filer_window->show_hidden);
 }
 
 static GtkWidget *create_toolbar(FilerWindow *filer_window)

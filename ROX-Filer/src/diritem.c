@@ -155,10 +155,6 @@ void diritem_restat(guchar *path, DirItem *item, gboolean make_thumb)
 		if (make_thumb)
 			item->image = g_fscache_lookup(pixmap_cache, path);
 		else
-			item->image = g_fscache_lookup_full(pixmap_cache,
-						path,
-						FSCACHE_LOOKUP_ONLY_NEW);
-		if (!item->image)
 			check_globicon(path, item);
 	}
 	else

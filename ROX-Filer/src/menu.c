@@ -728,7 +728,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, int item)
 
 		if (filer_window->collection->number_selected == 0)
 		{
-			report_error(PROJECT,
+			report_rox_error(
 				_("You should Shift+Menu click over a file to "
 				"send it somewhere"));
 			return;
@@ -1036,7 +1036,7 @@ static gboolean action_with_leaf(ActionFn action, guchar *current, guchar *new)
 
 	if (new[0] != '/')
 	{
-		report_error(PROJECT, _("New pathname is not absolute"));
+		report_rox_error(_("New pathname is not absolute"));
 		return FALSE;
 	}
 
@@ -1082,7 +1082,7 @@ static void copy_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 						"one item at a time"));
 		return;
 	}
@@ -1108,7 +1108,7 @@ static void rename_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1138,7 +1138,7 @@ static gboolean link_cb(guchar *initial, guchar *path)
 			
 	if (err)
 	{
-		report_error("ROX-Filer: symlink()", g_strerror(errno));
+		report_rox_error("symlink: %s", g_strerror(errno));
 		return FALSE;
 	}
 	return TRUE;
@@ -1153,7 +1153,7 @@ static void link_item(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1174,7 +1174,7 @@ static void open_file(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1197,7 +1197,7 @@ static void run_action(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1215,7 +1215,7 @@ static void run_action(gpointer data, guint action, GtkWidget *widget)
 		if (can_set_run_action(item))
 			type_set_handler_dialog(item->mime_type);
 		else
-			report_error(PROJECT,
+			report_rox_error(
 				_("You can only set the run action for a "
 				"regular file"));
 	}
@@ -1230,7 +1230,7 @@ static void set_icon(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 					"one item at a time"));
 		return;
 	}
@@ -1262,7 +1262,7 @@ static void show_file_info(gpointer unused, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1293,7 +1293,7 @@ static void help(gpointer data, guint action, GtkWidget *widget)
 	collection = window_with_focus->collection;
 	if (collection->number_selected > 1)
 	{
-		report_error(PROJECT, _("You cannot do this to more than "
+		report_rox_error(_("You cannot do this to more than "
 				"one item at a time"));
 		return;
 	}
@@ -1333,7 +1333,7 @@ static void real_vfs_open(char *fs)
 
 	if (window_with_focus->collection->number_selected != 1)
 	{
-		report_error(PROJECT, _("You must select a single file "
+		report_rox_error(_("You must select a single file "
 				"to open as a Virtual File System"));
 		return;
 	}
@@ -1372,7 +1372,7 @@ static void open_vfs_avfs(gpointer data, guint action, GtkWidget *widget)
 	}
 	else if (collection->number_selected != 1)
 	{
-		report_error(PROJECT, _("You must select a single file "
+		report_rox_error(_("You must select a single file "
 				"to open as a Virtual File System"));
 		return;
 	}
@@ -1412,7 +1412,7 @@ static gboolean new_directory_cb(guchar *initial, guchar *path)
 {
 	if (mkdir(path, S_IRWXU | S_IRWXG | S_IRWXO))
 	{
-		report_error("mkdir", g_strerror(errno));
+		report_rox_error("mkdir: %s", g_strerror(errno));
 		return FALSE;
 	}
 
@@ -1447,12 +1447,14 @@ static gboolean new_file_cb(guchar *initial, guchar *path)
 
 	if (fd == -1)
 	{
-		report_error(_("Error creating file"), g_strerror(errno));
+		report_rox_error(_("Error creating '%s': %s"),
+				path, g_strerror(errno));
 		return FALSE;
 	}
 
 	if (close(fd))
-		report_error(_("Error creating file"), g_strerror(errno));
+		report_rox_error(_("Error creating '%s': %s"),
+				path, g_strerror(errno));
 
 	dir_check_this(path);
 
@@ -1487,13 +1489,9 @@ static gboolean new_file_type_cb(guchar *initial, guchar *path)
 	templ_dname = choices_find_path_load("Templates", "");
 	if (!templ_dname)
 	{
-		char *mess;
-
-		mess = g_strconcat(_("Could not find the template for "),
-					oleaf, NULL);
-		report_error(_("Error creating file"), mess);
-		g_free(mess);
-
+		report_rox_error(
+		_("Error creating file: could not find the template for %s"),
+				oleaf);
 		return FALSE;
 	}
 
@@ -1542,7 +1540,7 @@ static void new_file_type(gchar *templ)
 static void customise_send_to(gpointer data)
 {
 	GPtrArray	*path;
-	guchar		*msg, *save;
+	guchar		*save;
 	GString		*dirs;
 	int		i;
 
@@ -1562,7 +1560,7 @@ static void customise_send_to(gpointer data)
 	if (save)
 		mkdir(save, 0777);
 
-	msg = g_strdup_printf(
+	report_rox_error(
 		_("The `Send To' menu provides a quick way to send some files "
 		"to an application. The applications listed are those in "
 		"the following directories:\n\n%s\n%s\n"
@@ -1577,12 +1575,8 @@ static void customise_send_to(gpointer data)
 
 	g_string_free(dirs, TRUE);
 	
-	report_error(PROJECT, msg);
-
 	if (save)
 		filer_opendir(save, NULL);
-
-	g_free(msg);
 }
 
 /* Scan the SendTo dir and create and show the Send To menu.
@@ -1671,7 +1665,7 @@ static void xterm_here(gpointer data, guint action, GtkWidget *widget)
 	g_return_if_fail(window_with_focus != NULL);
 
 	if (!spawn_full(argv, window_with_focus->path))
-		report_error(PROJECT, _("Failed to fork() child process"));
+		report_rox_error(_("Failed to fork() child process"));
 }
 
 static void home_directory(gpointer data, guint action, GtkWidget *widget)
@@ -1708,7 +1702,7 @@ static void new_window(gpointer data, guint action, GtkWidget *widget)
 
 	if (o_unique_filer_windows)
 	{
-		report_error(PROJECT, _("You can't open a second view onto "
+		report_rox_error(_("You can't open a second view onto "
 			"this directory because the `Unique Windows' option "
 			"is turned on in the Options window."));
 	}
@@ -1737,7 +1731,7 @@ static void su_to_user(GtkWidget *dialog)
 	argv[5] = path;
 
 	if (!spawn(argv))
-		report_error(_("fork() failed"), g_strerror(errno));
+		report_rox_error(_("fork: %s"), g_strerror(errno));
 
 	g_free(argv[2]);
 	g_free(argv[4]);

@@ -85,8 +85,8 @@ void rox_add_translations(char *path)
 
 	if (size < 20)
 	{
-		delayed_error(PROJECT, _("Invalid .gmo translation file "
-					"(too short)"));
+		delayed_rox_error(_("Invalid .gmo translation file "
+					"(too short): %s"), path);
 		return;
 	}
 
@@ -98,8 +98,9 @@ void rox_add_translations(char *path)
 		swap = TRUE;
 	else
 	{
-		delayed_error(PROJECT, _("Invalid .gmo translation file "
-					"(GNU magic number not found)\n"));
+		delayed_rox_error(_("Invalid .gmo translation file "
+					"(GNU magic number not found): %s"),
+				  path);
 		return;
 	}
 

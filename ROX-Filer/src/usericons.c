@@ -169,7 +169,7 @@ static void write_globicons(void)
 	gchar *save_new = NULL;
 	xmlDocPtr doc = NULL;
 
-	save = choices_find_path_save("globicons", "ROX-Filer", TRUE);
+	save = choices_find_path_save("globicons", PROJECT, TRUE);
 
 	if (!save)
 		return;		/* Saving is disabled */
@@ -211,7 +211,7 @@ static void write_globicons(void)
 		goto err;
 	goto out;
  err:
-	delayed_error(_("Error saving globicons"), g_strerror(errno));
+	delayed_rox_error(_("Error saving globicons: %s"), g_strerror(errno));
  out:
 	if (doc)
 		xmlFreeDoc(doc);
@@ -361,10 +361,9 @@ static void drag_icon_dropped(GtkWidget	 	*frame,
 
 	if (!icon)
 	{
-		delayed_error(PROJECT,
-			_("You should drop a single local icon file "
-			"onto the drop box - that icon will be "
-			"used for this file from now on."));
+		delayed_rox_error(_("You should drop a single local icon file "
+				    "onto the drop box - that icon will be "
+				    "used for this file from now on."));
 		return;
 	}
 
@@ -417,9 +416,8 @@ gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 
 	/* Check if file exists */
 	if (!mc_stat(iconpath, &icon) == 0) {
-		delayed_error(PROJECT,
-		    _("The pathname you gave does not exist. "
-		      "The icon has not been changed."));
+		delayed_rox_error(_("The pathname you gave does not exist. "
+			      	    "The icon has not been changed."));
 		return FALSE;
 	}
 
@@ -427,7 +425,7 @@ gboolean set_icon_path(guchar *filepath, guchar *iconpath)
 	pic = g_fscache_lookup(pixmap_cache, iconpath);
 	if (!pic)
 	{
-		delayed_error(PROJECT,
+		delayed_rox_error(
 			_("Unable to load image file -- maybe it's not in a "
 			  "format I understand, or maybe the permissions are "
 			  "wrong?\n"
@@ -557,7 +555,7 @@ void icon_set_handler_dialog(DirItem *item, guchar *path)
 
 static void show_icon_help(gpointer data)
 {
-	report_error(PROJECT,
+	report_rox_error(
 		_("Enter the full path of a file that contains a valid "
 		  "image to be used as the icon for this file or directory."));
 }

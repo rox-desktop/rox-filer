@@ -40,6 +40,7 @@
 
 #include "main.h"
 #include "gui_support.h"
+#include "support.h"
 #include "pixmaps.h"
 
 GdkFont	   	*item_font = NULL;
@@ -204,14 +205,38 @@ int get_choice(char *title,
 }
 
 /* Display a message in a window */
-void report_error(char *title, char *message)
+void report_error(char *title, char *message, ...)
 {
+        va_list args;
+	gchar *s;
+
 	g_return_if_fail(message != NULL);
+
+	va_start(args, message);
+	s = g_strdup_vprintf(message, args);
+	va_end(args);
 
 	if (!title)
 		title = _("Error");
 
-	get_choice(title, message, 1, "OK");
+	get_choice(title, s, 1, _("OK"));
+	g_free(s);
+}
+
+/* Display a message in a window with "ROX-Filer" as title */
+void report_rox_error(char *message, ...)
+{
+        va_list args;
+	gchar *s;
+
+	g_return_if_fail(message != NULL);
+
+	va_start(args, message);
+	s = g_strdup_vprintf(message, args);
+	va_end(args);
+
+        report_error(PROJECT, "%s", s);
+	g_free(s);
 }
 
 void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
@@ -288,11 +313,12 @@ static gboolean error_idle_cb(gpointer data)
 }
 
 /* Display an error next time we are idle */
-void delayed_error(char *title, char *error)
+void delayed_error(char *title, char *error, ...)
 {
 	static char *delayed_error_data[2] = {NULL, NULL};
 	gboolean already_open;
-	
+	va_list args;
+
 	g_return_if_fail(error != NULL);
 
 	already_open = delayed_error_data[1] != NULL;
@@ -301,14 +327,32 @@ void delayed_error(char *title, char *error)
 	g_free(delayed_error_data[1]);
 
 	delayed_error_data[0] = g_strdup(title);
-	delayed_error_data[1] = g_strdup(error);
-	
+	va_start(args, error);
+	delayed_error_data[1] = g_strdup_vprintf(error, args);
+	va_end(args);
+
 	if (already_open)
 		return;
 
 	gtk_idle_add(error_idle_cb, delayed_error_data);
 
 	number_of_windows++;
+}
+
+/* Display an error with "ROX-Filer" as title next time we are idle */
+void delayed_rox_error(char *error, ...)
+{
+        va_list args;
+	gchar *s;
+
+	g_return_if_fail(error != NULL);
+
+	va_start(args, error);
+	s = g_strdup_vprintf(error, args);
+	va_end(args);
+
+        delayed_error(PROJECT, "%s", s);
+	g_free(s);
 }
 
 /* Load the file into memory. Return TRUE on success.
@@ -325,12 +369,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 	if (!file)
 	{
-		guchar	*message;
-
-		message = g_strdup_printf("open(%s): %s",
-				pathname, g_strerror(errno));
-		delayed_error(PROJECT, message);
-		g_free(message);
+		delayed_rox_error("open(%s): %s", pathname, g_strerror(errno));
 		return FALSE;
 	}
 
@@ -345,12 +384,8 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 
 		if (ferror(file))
 		{
-			guchar *tmp;
-
-			tmp = g_strdup_printf("%s: %s\n",
+			delayed_rox_error(_("Error reading file %s: %s"),
 					pathname, g_strerror(errno));
-			delayed_error(_("Error reading file"), tmp);
-			g_free(tmp);
 			g_free(buffer);
 		}
 		else
@@ -362,8 +397,7 @@ gboolean load_file(char *pathname, char **data_out, long *length_out)
 		}
 	}
 	else
-		delayed_error(PROJECT,
-			_("Can't allocate memory for buffer to "
+		delayed_rox_error(_("Can't allocate memory for buffer to "
 				"load this file"));
 
 	fclose(file);
@@ -413,10 +447,7 @@ void parse_file(char *path, ParseFunc *parse_line)
 
 			if (error && !seen_error)
 			{
-				GString *message;
-
-				message = g_string_new(NULL);
-				g_string_sprintf(message,
+				delayed_rox_error(
 		_("Error in '%s' file at line %d: "
 		"\n\"%s\"\n"
 		"This may be due to upgrading from a previous version of "
@@ -425,8 +456,6 @@ void parse_file(char *path, ParseFunc *parse_line)
 					path,
 					line_number,
 					error);
-				delayed_error(PROJECT, message->str);
-				g_string_free(message, TRUE);
 				seen_error = TRUE;
 			}
 
@@ -693,11 +722,6 @@ void centre_window(GdkWindow *window, int x, int y)
 	gdk_window_move(window,
 		CLAMP(x, DECOR_BORDER, screen_width - w - DECOR_BORDER),
 		CLAMP(y, DECOR_BORDER, screen_height - h - DECOR_BORDER));
-}
-
-static void set_to_null(gpointer *data)
-{
-	*data = NULL;
 }
 
 /* Non-NULL => selector window is open */

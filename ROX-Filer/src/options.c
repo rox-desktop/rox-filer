@@ -259,11 +259,6 @@ static Option *new_option(guchar *key, OptionChanged *changed)
 
 static GtkColorSelectionDialog *current_csel_box = NULL;
 
-static void set_to_null(gpointer *data)
-{
-	*data = NULL;
-}
-
 static void get_new_colour(GtkWidget *ok, GtkWidget *button)
 {
 	GtkWidget	*csel;
@@ -765,7 +760,7 @@ static void build_options_window(void)
 	options_doc = xmlParseFile(make_path(app_dir, "Options.xml")->str);
 	if (!options_doc)
 	{
-		report_error(PROJECT, "Internal error: Options.xml unreadable");
+		report_rox_error("Internal error: Options.xml unreadable");
 		return;
 	}
 
@@ -1085,7 +1080,8 @@ static void save_cb(gpointer key, gpointer value, gpointer data)
 	len = strlen(tmp);
 
 	if (fwrite(tmp, sizeof(char), len, stream) < len)
-		delayed_error(_("Saving options"), g_strerror(errno));
+		delayed_rox_error(_("Could not save options: %s"),
+				  g_strerror(errno));
 
 	g_free(tmp);
 }
@@ -1112,9 +1108,9 @@ static void save_options(GtkWidget *widget, gpointer data)
 		path = choices_find_path_save("Options", PROJECT, TRUE);
 		if (!path)
 		{
-			delayed_error(_("Saving options"),
-				      _("Choices saving is disabled by "
-					"CHOICESPATH variable"));
+		        delayed_rox_error(_("Could not save options: %s"),
+				          _("Choices saving is disabled by "
+					  "CHOICESPATH variable"));
 			return;
 		}
 		
@@ -1124,7 +1120,8 @@ static void save_options(GtkWidget *widget, gpointer data)
 		g_hash_table_foreach(option_hash, save_cb, file);
 
 		if (fclose(file) == EOF)
-			delayed_error(_("Saving options"), g_strerror(errno));
+			delayed_rox_error(_("Could not save options: %s"),
+					  g_strerror(errno));
 
 		for (next = saver_callbacks; next; next = next->next)
 		{

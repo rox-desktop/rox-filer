@@ -202,7 +202,7 @@ Panel *panel_new(guchar *name, PanelSide side)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pan_", name, NULL);
-		load_path = choices_find_path_load(leaf, "ROX-Filer");
+		load_path = choices_find_path_load(leaf, PROJECT);
 		g_free(leaf);
 	}
 
@@ -890,7 +890,7 @@ void panel_save(Panel *panel)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pan_", panel->name, NULL);
-		save = choices_find_path_save(leaf, "ROX-Filer", TRUE);
+		save = choices_find_path_save(leaf, PROJECT, TRUE);
 		g_free(leaf);
 	}
 
@@ -926,7 +926,7 @@ void panel_save(Panel *panel)
 
 	goto out;
 err:
-	delayed_error(_("Error saving panel"), g_strerror(errno));
+	delayed_rox_error(_("Could not save panel: %s"), g_strerror(errno));
 out:
 	if (file)
 		fclose(file);

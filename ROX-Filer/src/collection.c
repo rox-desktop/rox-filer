@@ -1085,11 +1085,19 @@ static gint collection_key_press(GtkWidget *widget, GdkEventKey *event)
 				MAX((gint) collection->number_of_items - 1, 0));
 			break;
 		case GDK_Page_Up:
-			collection_move_cursor(collection, -10, 0);
+		  {
+		        int first, last;
+		       	get_visible_limits(collection, &first, &last);
+			collection_move_cursor(collection, first - last - 1, 0);
 			break;
+		  }
 		case GDK_Page_Down:
-			collection_move_cursor(collection, 10, 0);
+		  {
+		        int first, last;
+		       	get_visible_limits(collection, &first, &last);
+			collection_move_cursor(collection, last - first + 1, 0);
 			break;
+		  }
 		case GDK_Escape:
 			collection_set_cursor_item(collection, -1);
 			collection_clear_selection(collection);

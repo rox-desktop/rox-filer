@@ -43,29 +43,18 @@
 
 #include "modechange.h"
 
-#ifndef NULL
-# define NULL 0
-#endif
-
-#if STAT_MACROS_BROKEN
-# undef S_ISDIR
-#endif
-
-#if !defined(S_ISDIR) && defined(S_IFDIR)
-# define S_ISDIR(m) (((m) & S_IFMT) == S_IFDIR)
-#endif
-
 #define isodigit(c) ((c) >= '0' && (c) <= '7')
 
 /* Return a positive integer containing the value of the ASCII
-   octal number S.  If S is not an octal number, return -1.  */
+   octal number S.  If S is not an octal number or is more than
+   4 digits, return -1.  */
 
 static int
 oatoi (const char *s)
 {
   register int i;
 
-  if (*s == 0)
+  if (*s == 0 || strlen (s) > 4)
     return -1;
   for (i = 0; isodigit (*s); ++s)
     i = i * 8 + *s - '0';

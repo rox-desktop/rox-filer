@@ -798,7 +798,7 @@ void add_default_styles(void)
 	gtk_rc_add_default_file(rc_file);
 	g_free(rc_file);
 
-	rc_file = choices_find_path_load("Styles", "ROX-Filer");
+	rc_file = choices_find_path_load("Styles", PROJECT);
 	if (rc_file)
 	{
 		gtk_rc_add_default_file(rc_file);
@@ -831,4 +831,9 @@ xmlNode *get_subnode(xmlNode *node, char *namespaceURI, char *name)
 	}
 
 	return NULL;
+}
+
+void set_to_null(gpointer *data)
+{
+	*data = NULL;
 }

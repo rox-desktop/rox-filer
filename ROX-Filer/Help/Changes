@@ -5,6 +5,15 @@
 06-Nov-2001
 ~~~~~~~~~~~
 Added Spanish translation (Marcelo Ramos).
+Applied Bernard Jungen's latest patch:
+- Disk usage forgot to count special files like pipes, etc.
+- Page up/down scrolls a window full at a time instead of 10 items.
+- Don't get icons from the cache if thumbnail mode is off anymore.
+- modechange.c: deleted useless stuff and fixed octal parsing to detect
+  *all* illegal values (eg 010000000000000).
+- Added 'Show/hide hidden files' toolbar button.
+- Lots of code tidying.
+
 
 05-Nov-2001
 ~~~~~~~~~~~
