@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 1.3.3 - Manuel de l'utilisateur
+   ROX-Filer 1.3.4 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -536,11 +536,7 @@ Redémarrez IceWM et le filer pour que les changements prennent effet.
 <sect2>
  <title>Autres</title>
   <para>
-
-	  Si rien ne fonctionne, essayez de lancer rox avec les options <option>-n</option> et <option>-o</option> ;
-	  cela devrait outrepasser le contrôle des icônes par le gestionnaire de fenêtres.
-	  (<option>-n</option> oblige le filer à démarrer une nouvelle copie).
-
+	  Si rien ne fonctionne, essayez la section "Compatibilité" de la boîte d'options.
   </para>
 </sect2>
 </sect1>
@@ -1557,28 +1553,36 @@ les icônes du punaiseur et des panneaux comme des objets normaux, et pour les mo
 faites un clic droit dessus.
   </para>
   <para>
-Vous pouvez arranger les icônes des panneaux en les faisant glisser avec le bouton du milieu.
-Dans les versions précédentes du filer, les icônes du punaiseur étaient aussi déplaçables avec
-le bouton du milieu. C'est peut-être encore faisable (cela dépend de votre gestionnaire de fenêtres),
-mais il est maintenant conseillé d'utiliser le bouton de gauche.
+   Vous pouvez arranger les icônes des panneaux en les faisant glisser avec le bouton du milieu. 
+   Dans les versions précédentes du filer, les icônes du punaiseur étaient aussi déplaçables avec 
+   le bouton du milieu ; ce n'est désormais plus possible, l'usage de celui-ci étant réservé au 
+   gestionnaire de fenêtres.
   </para>
   <para>
-Tout changement apporté au punaiseur et aux panneaux est immédiatement enregistré.
-Si vous cliquez sur ces icônes en maintenant <keycap>Ctrl</keycap> enfoncé,
-vous les sélectionnerez/dé-sélectionnerez. Cliquez ailleurs sur le bureau pour tout dé-sélectionner.
-  </para><para>
-S'il y a trop d'icônes dans un panneau au point que vous ne puissiez plus les voir toutes,
-vous pouvez voir celles qui sont cachées en cliquant avec le bouton gauche sur un espace "inter-icônes"
-et en le faisant glisser.
+   Vous pouvez affecter des raccourcis-clavier aux icônes des punaiseurs et des panneaux. Ils 
+   pourront être utilisés pour ouvrir rapidement des dossiers, des fichiers ou des applications, 
+   même si une autre fenêtre a le focus.
+  </para>
+  <para>
+   Tout changement apporté au punaiseur et aux panneaux est immédiatement enregistré. 
+   Si vous cliquez sur ces icônes en maintenant <keycap>Ctrl</keycap> enfoncé, 
+   vous les sélectionnerez/dé-sélectionnerez. Cliquez ailleurs sur le bureau pour tout dé-sélectionner.
+  </para>
+  <para>
+   S'il y a trop d'icônes dans un panneau au point que vous ne puissiez plus les voir toutes, 
+   vous pouvez voir celles qui sont cachées en cliquant avec le bouton gauche sur un espace "inter-icônes" 
+   et en le faisant glisser.
   </para>
 
-  <important><para>
-Déposer des objets sur le punaiseur ou les panneaux <emphasis>NE LES COPIE PAS</emphasis>, cela
-crée seulement un raccourci vers l'objet original. Si vous effacez l'objet
-original, vous le perdez ! Supprimer une icône du punaiseur ou d'un panneau
-ne supprime que celui-ci. Ce comportement diffère de celui des autres gestionnaires
-de fichiers, en général...
-  </para></important>
+  <important>
+   <para>
+	Déposer des objets sur le punaiseur ou les panneaux <emphasis>NE LES COPIE PAS</emphasis>, cela 
+	crée seulement un raccourci vers l'objet original. Si vous effacez l'objet 
+	original, vous le perdez ! Supprimer une icône du punaiseur ou d'un panneau 
+	ne supprime que celui-ci. Ce comportement diffère de celui des autres gestionnaires 
+	de fichiers, en général...
+   </para>
+  </important>
 
 <sect1>
   <title>Les menus du punaiseur et des panneaux</title>
@@ -1601,7 +1605,7 @@ Ouvre le même menu que le menu 'Fichier' du filer, mais en simplifié.
 <row><entry>
 <guimenuitem>Éditer l'objet</guimenuitem></entry><entry>
 Modifier le nom qui est affiché sous l'icône, ou le chemin de l'objet vers lequel
-pointe l'icône.
+pointe l'icône. Vous pouvez aussi assigner un raccourci-clavier à cet objet.
 </entry></row>
 
 <row><entry>
@@ -2060,7 +2064,6 @@ d'être traité. L'espace qui se trouve en-dessous est là pour afficher les messag
  <imageobject>
   <imagedata align="center" format="PNG" fileref="../Action.png"/>
  </imageobject>
- <textobject><para>Impossible d'afficher l'image.</para></textobject>
 </mediaobject>
   </para><para>
   
@@ -2153,7 +2156,14 @@ d'exécution de l'opération, si beaucoup de messages sont affichés.
 La fonction Chercher recherche à travers tous les fichiers et les dossiers
 sélectionnés ainsi que tous les sous-dossiers (récursivement), les objets
 qui correspondent à une expression particulière.
-</para><para>
+</para>
+<para>
+ Choisissez la commande <guimenuitem>Chercher</guimenuitem> du menu <guimenu>Fichier</guimenu> 
+ pour chercher un fichier dans les objets sélectionnés. Si vous voulez sélectionner tous les fichiers 
+ d'un dossier qui correspondent à une quelconque expression, utilisez 
+ <guimenuitem>Sélectionner</guimenuitem> -> <guimenuitem>Sélectionner si...</guimenuitem>.
+</para>
+<para>
 Si vous connaissez le nom d'un fichier, entrez-le simplement dans l'espace
 'Expression :', entouré par des apostrophes.
 Par exemple, pour chercher un fichier nommé <filename>log</filename>, vous entrerez <userinput>'log'</userinput>.
@@ -2813,6 +2823,14 @@ obtenir la langue désirée.
 
 	<listitem>
 	 <para>
+	  <guilabel>Utiliser la fonte</guilabel> permet de choisir la police utilisée pour 
+	  les icônes du punaiseur. Décochée, la police par défaut de votre gestionnaire de 
+	  session est utilisée (eg ROX-Session).
+	 </para>
+	</listitem>
+
+	<listitem>
+	 <para>
 	  <guilabel>Navigation en simple clic</guilabel>
 	  permet d'ouvrir un fichier ou un dossier avec un seul clic. 
 	  Maintenez <keycap>Ctrl</keycap> enfoncé pour sélectionner un(des) objet(s). 
@@ -2820,15 +2838,6 @@ obtenir la langue désirée.
 	  car un simple clic ne fera que sélectionner l'objet.
 	 </para>
     </listitem>
-
-	<listitem>
-	 <para>
-	  <guilabel>Passer les clics du bouton 3 au gestionnaire de fenêtres</guilabel>
-	  est peut-être nécessaire si votre gestionnaire de fenêtres utilise les clics du bouton 3 sur le bureau 
-	  pour une fonction importante. Normalement, un clic du bouton 3 sur le bureau affichera le menu du 
-	  punaiseur.
-	 </para>
-	</listitem>
 
 	<listitem>
 	 <para>
@@ -2886,23 +2895,6 @@ obtenir la langue désirée.
   <para>
 
    <itemizedlist>
-	<listitem>
-	 <para>
-	  <application>ROX-Filer</application> utilise le protocole standard XDND 
-	  pour le drag-and-drop. 
-	  Ce protocole recommande : &lt;&lt; les URI doivent être accompagnées 
-	  du nom de l'hôte de l'ordinateur où se trouve la ressource pour 
-	  que le programme qui reçoit les données puisse déterminer s'il peut 
-	  les recevoir directement ou s'il doit le faire via le serveur X &gt;&gt;. 
-	  Cependant, beaucoup d'anciens programmes (particulièrement des applications 
-	  GNOME) sont perturbés par le nom de l'hôte et ne réussissent pas à charger 
-	  les données correctement. Si <guilabel>Ne pas utiliser le nom de machine</guilabel> 
-	  est activée, celui-ci est donc omis et <application>ROX-Filer</application> 
-	  fonctionnera avec ces applications MAIS vous ne pourrez pas glisser-déposer 
-	  des données sur un programme tournant sur une autre machine.
-	 </para>
-	</listitem>
-
 	<listitem>
 	 <para>
 	  <guilabel>Permettre de faire glisser vers des icônes dans les fenêtres du 
@@ -3016,13 +3008,10 @@ obtenir la langue désirée.
 	 quel type donner à quel fichier.
     </para>
    </listitem>
-   <listitem>
-	<para>
-	 <guibutton>Relire les fichiers</guibutton>
-	 oblige le filer à relire ces fichiers après que vous les ayez modifiés.
-	</para>
-   </listitem>
   </itemizedlist>
+  Assurez-vous d'exécuter la commande `update-mime-database' après avoir édité les fichiers, 
+  et cliquez sur le bouton "Rafraîchir" de la barre d'outils pour que le filer intègre les 
+  nouvelles données.
  </para>
 
  <sect2>
@@ -3035,6 +3024,48 @@ obtenir la langue désirée.
   </para>
  </sect2>
 </sect1>
+
+<sect1><title>Compatibilité</title>
+ <para>
+  <itemizedlist>
+   <listitem>
+	<para>
+	 <guilabel>Outrepasser le contrôle du punaiseur et des panneaux par le WM</guilabel> 
+	 peut être utile pour éviter à certains anciens gestionnaires de fenêtres d'afficher 
+	 le punaiseur et les panneaux dans des fenêtres normales, ou de les passer au premier 
+	 plan quand vous cliquez dessus.
+	</para>
+   </listitem>
+   <listitem>
+	<para>
+	 <guilabel>Passer tous les clics sur l'image de fond au gestionnaire de fenêtres</guilabel> 
+	 peut être utile si votre gestionnaire de fenêtres utilise ces clics pour des fonctions 
+	 importantes. 
+	 Normalement, un clic avec le bouton droit sur le fond du bureau ouvre le menu du punaiseur, et 
+	 glisser avec le bouton de gauche vous permet de sélectionner plusieurs icônes.
+	</para>
+   </listitem>
+   <listitem>
+	 <para>
+	  <application>ROX-Filer</application> utilise le protocole standard XDND 
+	  pour le drag-and-drop. 
+	  Ce protocole recommande que les URI soient accompagnées du nom de l'hôte 
+	  de l'ordinateur où se trouve la ressource pour que le programme qui reçoit 
+	  les données puisse déterminer s'il peut les recevoir directement ou s'il 
+	  doit le faire via le serveur X. 
+	  Cependant, beaucoup d'anciens programmes (particulièrement des applications 
+	  GNOME) sont perturbés par le nom de l'hôte et ne réussissent pas à charger 
+	  les données correctement. Si <guilabel>Ne pas utiliser le nom de machine</guilabel> 
+	  est activée, celui-ci est donc omis et <application>ROX-Filer</application> 
+	  fonctionnera avec ces applications MAIS vous ne pourrez pas glisser-déposer 
+	  des données sur un programme tournant sur une autre machine.
+	 </para>
+	</listitem>
+
+   </itemizedlist>
+  </para>
+ </sect1>
+	   
 </chapter>
 
 <chapter id="types">
@@ -3082,8 +3113,8 @@ obtenir la langue désirée.
  <sect2>
   <title>En entrant une commande shell</title>
   <para>
-   Tapez : <userinput>gimp "$1"</userinput> dans l'endroit <guilabel>Entrez une commande
-   shell</guilabel> et appuyez sur <keycap>Entrée</keycap>. <userinput>$1</userinput>
+   Tapez : <userinput>gimp "$@"</userinput> dans l'endroit <guilabel>Entrez une commande
+   shell</guilabel> et appuyez sur <keycap>Entrée</keycap>. <userinput>$@</userinput>
    sera remplacé par le nom du fichier sur lequel vous cliquerez.
    Comme ci-dessus, 'The Gimp' sera lancé automatiquement et ouvrira cette image.
   </para>
@@ -3272,17 +3303,28 @@ ainsi que le fichier lui-même) :
 <screen>
 &lt;?xml version="1.0"?&gt;
 &lt;AppInfo&gt;
-  &lt;Summary&gt;A graphical file manager&lt;/Summary&gt;
-  &lt;About&gt;
+ &lt;Summary xml:lang="en"&gt;A graphical file manager&lt;/Summary&gt;
+ &lt;Summary xml:lang="de"&gt;Ein grafische Datei-Manager&lt;/Summary&gt;
+ &lt;Summary xml:lang="nl"&gt;Een grafisch bestandsbeheerprogramma&lt;/Summary&gt;
+ &lt;Summary xml:lang="sp"&gt;Un manejador de archivos gr&#xE1;afico&lt;/Summary&gt;	 
+ &lt;About xml:lang="en"&gt;
     &lt;Purpose&gt;File manager&lt;/Purpose&gt;
-    &lt;Version&gt;1.1.3 (07-May-2001)&lt;/Version&gt;
+    &lt;Version&gt;1.3.3 (25-Jul-2002)&lt;/Version&gt;
     &lt;Authors&gt;Thomas Leonard and others&lt;/Authors&gt;
     &lt;License&gt;GNU General Public License&lt;/License&gt;
     &lt;Homepage&gt;http://rox.sourceforge.net&lt;/Homepage&gt;
   &lt;/About&gt;
   &lt;AppMenu&gt;
-    &lt;Item label="Enable pinboard" option="-p=Default"/&gt;
-    &lt;Item label="Disable pinboard" option="-p="/&gt;
+	&lt;Item option="-p=Default"&gt;
+	  &lt;Label&gt;Enable pinboard&lt;/Label&gt;
+	  &lt;Label xml:lang="hu"&gt;Pinboard engedÃ©lyezÃ©se&lt;/Label&gt;
+	  &lt;Label xml:lang="sp"&gt;Habilitar el pinboard&lt;/Label&gt;
+    &lt;/Item&gt;
+	&lt;Item option="-p="&gt;
+	  &lt;Label&gt;Disable pinboard&lt;/Label&gt;
+	  &lt;Label xml:lang="hu"&gt;Pinboard tiltÃ¡sa&lt;/Label&gt;
+	  &lt;Label xml:lang="sp"&gt;Deshabilitar el pinboard&lt;/Label&gt;
+	&lt;/Item&gt;
   &lt;/AppMenu&gt;
 &lt;/AppInfo&gt;
 </screen>
@@ -3682,8 +3724,8 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
   <refsect1><title>NOTES</title>
        <para>
 		La documentation principale de ROX-Filer est accessible par la
-		commande <guimenuitem>Voir l'aide de ROX-Filer</guimenuitem> du menu
-		Fenêtre, ou par le bouton <guibutton>i</guibutton> de la barre d'outils.
+		commande <guimenuitem>Voir les fichiers d'aide</guimenuitem> du menu 
+		Aide, ou par le bouton le plus à droite sur la barre d'outils.
 	  </para>
   </refsect1>
 	 
@@ -3734,6 +3776,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Alex Holden</member>
 	 <member>Jasper Huijsmans</member>
 	 <member>Bernard Jungen</member>
+	 <member>Marcin Juszkiewicz</member>
 	 <member>James Kermode</member>
 	 <member>Jim Knoble</member>
 	 <member>Krzysztof Krzyzaniak</member>
@@ -3741,6 +3784,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Vincent Ledda</member>
 	 <member>Vincent Lefèvre</member>
 	 <member>Victor Liu See-le</member>
+	 <member>Krzysztof Luks</member>
 	 <member>Anders Lundmark</member>
 	 <member>Jose Romildo Malaquias</member>
 	 <member>Denis Manente</member>
@@ -3748,6 +3792,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filename
 	 <member>Andras Mohari</member>
 	 <member>Christiansen Merel</member>
 	 <member>Jimmy Olgeni</member>
+	 <member>Daniele Peri</member>
 	 <member>Andy Piper</member>
 	 <member>Marcelo Ramos</member>
 	 <member>Michel Alexandre Salim</member>
@@ -3822,7 +3867,7 @@ Les méthodes suivantes sont reconnues :</para>
  <listitem>
   <para>
    <function>OpenDir</function>(<parameter>Filename</parameter>,
-   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>]))
+   [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>, <parameter>Class</parameter>])
    Ouvre une fenêtre et y affiche le dossier <parameter>Filename</parameter>.
    <parameter>Style</parameter> peut prendre la valeur <userinput>Large</userinput>, 
    <userinput>Small</userinput> ou <userinput>Huge</userinput>. 
@@ -3831,7 +3876,9 @@ Les méthodes suivantes sont reconnues :</para>
    <userinput>Times</userinput> ou <userinput>Permissions</userinput>. 
    <parameter>Sort</parameter> peut prendre la valeur <userinput>Name</userinput>, 
    <userinput>Type</userinput>, <userinput>Date</userinput> ou <userinput>Size</userinput>. 
-   Si une de ces options n'est pas renseignée, l'affichage par défaut est utilisé.
+   Si une de ces options n'est pas renseignée, l'affichage par défaut est utilisé. 
+   <parameter>Class</parameter> peut être utilisé pour fixer la propriété WM_CLASS de la nouvelle fenêtre. 
+   Vous pouvez utiliser ceci pour que votre gestionnaire de fenêtres gère celle-ci d'une façon particulière.
   </para>
  </listitem>
 
