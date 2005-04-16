@@ -520,8 +520,7 @@ _xdg_mime_magic_matchlet_compare_to_data (XdgMimeMagicMatchlet *matchlet,
 					  size_t                len)
 {
   int i, j;
-
-  for (i = matchlet->offset; i <= matchlet->offset + matchlet->range_length; i++)
+  for (i = matchlet->offset; i < matchlet->offset + matchlet->range_length; i++)
     {
       int valid_matchlet = TRUE;
 
