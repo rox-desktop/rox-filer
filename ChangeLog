@@ -1,5 +1,10 @@
 2005-04-16  Christophe Fergeau  <teuf@gnome.org>
 
+	* src/xdgmime.c: (xdg_mime_init_from_directory): fix leak when
+	mime.cache doesn't exist
+
+2005-04-16  Christophe Fergeau  <teuf@gnome.org>
+
 	* src/test-mime.c: (main): disabled call to xdg_mime_dump for now
 	* src/xdgmimemagic.c: (_xdg_mime_magic_matchlet_compare_to_data):
 	fixed off by 1 error when handling offsets, fixes bug #2050 and 

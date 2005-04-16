@@ -147,6 +147,7 @@ xdg_mime_init_from_directory (const char *directory)
 	  return FALSE;
 	}
     }
+  free (file_name);
 
   file_name = malloc (strlen (directory) + strlen ("/mime/globs") + 1);
   strcpy (file_name, directory); strcat (file_name, "/mime/globs");
