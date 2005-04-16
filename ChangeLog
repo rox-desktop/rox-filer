@@ -1,3 +1,11 @@
+2005-04-17  Christophe Fergeau  <teuf@gnome.org>
+
+	* src/xdgmimemagic.c: (_xdg_mime_magic_matchlet_compare_to_data),
+	(_xdg_mime_magic_matchlet_compare_level),
+	(_xdg_mime_magic_lookup_data): when  magic patterns matches, check if
+	there aren't subtypes with matching patterns too, and if so, favour
+	the subtype over the parent type, should fix #2686
+
 2005-04-16  Christophe Fergeau  <teuf@gnome.org>
 
 	* src/xdgmime.c: (xdg_mime_init_from_directory): fix leak when
