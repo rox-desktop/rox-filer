@@ -337,6 +337,7 @@ void pixmap_background_thumb(const gchar *path, GFunc callback, gpointer data)
 		gdk_pixbuf_unref(pixbuf);
 		g_fscache_insert(pixmap_cache, path, image, TRUE);
 		callback(data, (gchar *) path);
+		g_object_unref(G_OBJECT(image));
 		return;
 	}
 
