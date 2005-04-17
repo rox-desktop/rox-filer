@@ -2954,22 +2954,15 @@ static void settings_free(Settings *set)
 	g_free(set);
 }
 
-static gboolean free_settings(gpointer key, gpointer value, gpointer data)
-{
-	if(!data || strcmp(data, key)==0)
-		settings_free(value);
-
-	return TRUE;
-}
-
 static void store_settings(Settings *set)
 {
 	Settings *old;
 
 	old=g_hash_table_lookup(settings_table, set->path);
-	if(old) {
-		g_hash_table_foreach_remove(settings_table, free_settings,
-					    set->path);
+	if(old)
+	{
+		g_hash_table_remove(settings_table, set->path);
+		settings_free(old);
 	}
 
 	g_hash_table_insert(settings_table, set->path, set);
