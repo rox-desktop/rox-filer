@@ -1762,9 +1762,9 @@ $ rox --bottom=</screen>
   </para>
 
   <para>
-   La finestra mostra una tabella con due colonne. La colonna <guilabel>Prima</guilabel>
-   mostra il nome attuale di ciascun file selezionato, la colonna <guilabel>Dopo</guilabel>
-   mostra il nuovo nome, che inizialmente è identico.
+   La finestra mostra una tabella con due colonne. La colonna <guilabel>Vecchio 
+   nome</guilabel> mostra il nome attuale di ciascun file selezionato, la colonna
+   <guilabel>Nuovo nome</guilabel> mostra il nome nuovo, che inizialmente è identico.
   </para>
 
   <para>
@@ -1965,6 +1965,10 @@ $ rox --bottom=</screen>
       <userinput>IsSocket (-S)</userinput> trova i socket.
     </para></listitem>
 
+     <listitem><para>
+       <userinput>IsDoor (-O)</userinput> trova le door (in Solaris).
+     </para></listitem>
+ 
    </itemizedlist>
 
    <itemizedlist><title>Questi riguardano i permessi sui file. Vedere la sezione
@@ -3162,11 +3166,13 @@ EOF</screen>
 
    <listitem><para><function>PanelAdd</function>(<parameter>Side</parameter>,
      <parameter>Path</parameter>, [<parameter>Label</parameter>,
-     <parameter>After</parameter>])
+     <parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
      Aggiunge <parameter>Path</parameter> al pannello sul lato <parameter>Side</parameter> dello schermo,
      con etichetta <parameter>Label</parameter>. Se <parameter>After</parameter> è 
      <userinput>true</userinput> l'icona va in basso a destra del pannello,
-     altrimenti in altro a sinistra.
+     altrimenti in altro a sinistra.  Se viene specificato <parameter>Shortcut</parameter>, allora questa è la
+     scorciatoia da tastiera che lo attiva. Se viene specificato <parameter>Args</parameter>,  questo è l'argomento
+     che aggiunge quando viene eseguito come programma.
    </para></listitem>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
@@ -3182,10 +3188,14 @@ EOF</screen>
    </para></listitem>
 
    <listitem><para><function>PinboardAdd</function>(<parameter>Path</parameter>,
-     <parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
+     <parameter>X</parameter>, <parameter>Y</parameter>, 
+     [<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
      Aggiunge <parameter>Path</parameter> nella bacheca alla posizione
      (<parameter>X</parameter>, <parameter>Y</parameter>), assegnandole l'etichetta
-     <parameter>Label</parameter>.
+     <parameter>Label</parameter>. Se viene specificato <parameter>Shortcut</parameter>,
+     allora questa è la scorciatoia da tastiera che lo attiva. Se viene specificato 
+     <parameter>Args</parameter>, questo è l'argomento che aggiunge quando viene eseguito 
+     come programma.
    </para></listitem>
 
    <listitem><para><function>PinboardRemove</function>(<parameter>Path</parameter>, [<parameter>Label</parameter>])
