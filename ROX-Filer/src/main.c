@@ -37,6 +37,7 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
+#include <time.h>
 #include <libxml/parser.h>
 
 #ifdef HAVE_GETOPT_LONG
@@ -192,27 +193,46 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
 
 static int rox_x_error(Display *display, XErrorEvent *error)
 {
-	  gchar buf[64];
-          
-	  XGetErrorText(display, error->error_code, buf, 63);
+	gchar buf[64];
 
-	  g_warning ("The program '%s' received an X Window System error.\n"
-                             "This probably reflects a bug in the program.\n"
-                             "The error was '%s'.\n"
-                             "  (Details: serial %ld error_code %d request_code %d minor_code %d)\n"
-                             "  (Note to programmers: normally, X errors are reported asynchronously;\n"
-                             "   that is, you will receive the error a while after causing it.\n"
-                             "   To debug your program, run it with the --sync command line\n"
-                             "   option to change this behavior. You can then get a meaningful\n"
-                             "   backtrace from your debugger.)",
-                             g_get_prgname (),
-                             buf,
-                             error->serial, 
-                             error->error_code, 
-                             error->request_code,
-                             error->minor_code);
-          
-	  abort();
+	XGetErrorText(display, error->error_code, buf, 63);
+
+	g_warning ("The program '%s' received an X Window System error.\n"
+			"This probably reflects a bug in the program.\n"
+			"The error was '%s'.\n"
+			"  (Details: serial %ld error_code %d request_code %d minor_code %d)\n"
+			"  (Note to programmers: normally, X errors are reported asynchronously;\n"
+			"   that is, you will receive the error a while after causing it.\n"
+			"   To debug your program, run it with the --sync command line\n"
+			"   option to change this behavior. You can then get a meaningful\n"
+			"   backtrace from your debugger.)",
+			g_get_prgname (),
+			buf,
+			error->serial, 
+			error->error_code, 
+			error->request_code,
+			error->minor_code);
+
+	/* Try to cope with BadWindow errors */
+	if (error->error_code == 3)
+	{
+		static time_t last_error = 0;
+		time_t now;
+		now = time(NULL);
+
+		if (last_error + 5 > now)
+			abort();		/* Errors coming too fast... */
+
+		last_error = now;
+
+		delayed_error(_("We got a BadWindow error from the X server. "
+				"This might be due to this GTK bug (during drag-and-drop?):\n"
+				"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+				"Trying to continue..."));
+		return 0;
+	}
+
+	abort();
 }
 
 /* Parses the command-line to work out what the user wants to do.
