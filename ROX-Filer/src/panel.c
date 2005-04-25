@@ -306,7 +306,7 @@ Panel *panel_new(const gchar *name, PanelSide side)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pan_", name, NULL);
-		load_path = choices_find_path_load(leaf, PROJECT);
+		load_path = choices_find_xdg_path_load(leaf, PROJECT, SITE);
 		g_free(leaf);
 	}
 
@@ -1426,7 +1426,7 @@ void panel_save(Panel *panel)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pan_", panel->name, NULL);
-		save = choices_find_path_save(leaf, PROJECT, TRUE);
+		save = choices_find_xdg_path_save(leaf, PROJECT, SITE, TRUE);
 		g_free(leaf);
 	}
 

@@ -919,7 +919,7 @@ static xmlNode *group_find(char *name)
 	gchar *path;
 
 	/* Update the groups, if possible */
-	path = choices_find_path_load("Groups.xml", PROJECT);
+	path = choices_find_xdg_path_load("Groups.xml", PROJECT, SITE);
 	if (path)
 	{
 		XMLwrapper *wrapper;
@@ -990,7 +990,8 @@ static void group_save(FilerWindow *filer_window, char *name)
 	while ((item = iter.next(&iter)))
 		xmlNewTextChild(group, NULL, "item", item->leafname);
 
-	save_path = choices_find_path_save("Groups.xml", PROJECT, TRUE);
+	save_path = choices_find_xdg_path_save("Groups.xml", PROJECT, SITE,
+					       TRUE);
 	if (save_path)
 	{
 		save_xml_file(groups->doc, save_path);
@@ -3025,7 +3026,7 @@ static void load_settings(void)
 	gchar *path;
 	XMLwrapper *settings_doc=NULL;
 
-	path=choices_find_path_load("Settings.xml", "ROX-Filer");
+	path=choices_find_xdg_path_load("Settings.xml", PROJECT, SITE);
 	if(path) {
 		settings_doc=xml_new(path);
 		g_free(path);
@@ -3139,7 +3140,7 @@ static void save_settings(void)
 {
 	gchar *path;
 
-	path=choices_find_path_save("Settings.xml", "ROX-Filer", TRUE);
+	path=choices_find_xdg_path_save("Settings.xml", PROJECT, SITE, TRUE);
 	if(path) {
 		xmlDocPtr doc = xmlNewDoc("1.0");
 		xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL,

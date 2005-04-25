@@ -34,10 +34,27 @@
 
 static gboolean saving_disabled = TRUE;
 static gchar **dir_list = NULL;
+static gchar **xdg_dir_list = NULL;
+static int     xdg_dir_count= 0 ;
+
+static struct migration {
+	const char *dir;
+	const char *site;
+	int symlink;
+} to_migrate[]={
+	{"ROX-Filer", SITE, TRUE},
+	{"SendTo", SITE, TRUE},
+	{"Templates", SITE, TRUE},
+	{"MIME-types", SITE, TRUE},
+	{"MIME-icons", SITE, TRUE},
+	{"MIME-thumb", SITE, TRUE},
+
+	{NULL, NULL, 0}
+};
 
 /* Static prototypes */
 static gboolean exists(char *path);
-
+static void migrate_choices(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -52,9 +69,13 @@ static gboolean exists(char *path);
 void choices_init(void)
 {
 	char	*choices;
+	const char *env;
+	char **dirs;
+	int i, n;
 
 	g_return_if_fail(dir_list == NULL);
 
+	/* Initialize old system */
 	choices = getenv("CHOICESPATH");
 	
 	if (choices)
@@ -76,17 +97,40 @@ void choices_init(void)
 	else
 	{
 		saving_disabled = FALSE;
-
+		
 		dir_list = g_new(gchar *, 4);
-		dir_list[0] = g_strconcat(getenv("HOME"), "/Choices", NULL);
+		dir_list[0] = g_build_filename(g_get_home_dir(), "Choices",
+					       NULL);
 		dir_list[1] = g_strdup("/usr/local/share/Choices");
 		dir_list[2] = g_strdup("/usr/share/Choices");
 		dir_list[3] = NULL;
 	}
 
+	/* Initialize new system */
+	env = getenv("XDG_CONFIG_DIRS");
+	if (!env)
+		env = "/etc/xdg";
+	dirs = g_strsplit(env, ":", 0);
+	g_return_if_fail(dirs != NULL);
+	for (n = 0; dirs[n]; n++)
+		;
+	for (i = n; i > 0; i--)
+		dirs[i] = dirs[i - 1];
+	env = getenv("XDG_CONFIG_HOME");
+	if (env)
+		dirs[0] = g_strdup(env);
+	else
+		dirs[0] = g_build_filename(g_get_home_dir(), ".config", NULL);
+
+	xdg_dir_list = dirs;
+	xdg_dir_count = n + 1;
+	
 #if 0
 	{
 		gchar	**cdir = dir_list;
+
+		for(i=0; i<xdg_dir_count; i++)
+			g_print("[ XDG dir '%s' ]\n", xdg_dir_list[i]);
 
 		while (*cdir)
 		{
@@ -98,6 +142,21 @@ void choices_init(void)
 							      : "enabled");
 	}
 #endif
+
+}
+
+/* If our XDG choices directory does not yet exist, offer to move the
+ * old config over
+ */
+void choices_migrate(void)
+{
+	gchar *newpath;
+	
+	/* Attempt migration */
+	newpath=choices_find_xdg_path_save(".", PROJECT, SITE, FALSE);
+	if(!exists(newpath) && !saving_disabled)
+		migrate_choices();
+	g_free(newpath);
 }
 
 /* Returns an array of the directories in CHOICESPATH which contain
@@ -120,7 +179,7 @@ GPtrArray *choices_list_dirs(char *dir)
 	{
 		guchar	*path;
 
-		path = g_strconcat(*cdir, "/", dir, NULL);
+		path = g_build_filename(*cdir, dir, NULL);
 		if (exists(path))
 			g_ptr_array_add(list, path);
 		else
@@ -150,7 +209,7 @@ void choices_free_list(GPtrArray *list)
  * The return values may be NULL - use built-in defaults.
  * g_free() the result.
  */
-guchar *choices_find_path_load(const char *leaf, const char *dir)
+gchar *choices_find_path_load(const char *leaf, const char *dir)
 {
 	gchar	**cdir = dir_list;
 
@@ -160,7 +219,7 @@ guchar *choices_find_path_load(const char *leaf, const char *dir)
 	{
 		gchar	*path;
 
-		path = g_strconcat(*cdir, "/", dir, "/", leaf, NULL);
+		path = g_build_filename(*cdir, dir, leaf, NULL);
 
 		if (exists(path))
 			return path;
@@ -171,6 +230,42 @@ guchar *choices_find_path_load(const char *leaf, const char *dir)
 	return NULL;
 }
 
+/* Get the pathname of a choices file to load, using the XDG paths. Eg:
+ *
+ * choices_find_xdg_path_load("menus", "ROX-Filer", "rox.sourceforge.net")
+ *		 		-> "/etc/xdg/rox.sourceforge.net/ROX-Filer/menus".
+ *
+ * Falls back on choices_find_path_load(leaf, dir) if it fails
+ * The return values may be NULL - use built-in defaults.
+ * g_free() the result.
+ */
+gchar *choices_find_xdg_path_load(const char *leaf, const char *dir,
+				  const char *site)
+{
+	int i;
+
+	g_return_val_if_fail(dir_list != NULL, NULL);
+
+	for (i=0; i<xdg_dir_count; i++)
+	{
+		gchar	*path;
+
+		if(site)
+			path = g_build_filename(xdg_dir_list[i], site,
+					   dir, leaf, NULL);
+		else
+			path = g_build_filename(xdg_dir_list[i], dir,
+					   leaf, NULL);
+
+		if (exists(path))
+			return path;
+
+		g_free(path);
+	}
+
+	return choices_find_path_load(leaf, dir);
+}
+
 /* Returns the pathname of a file to save to, or NULL if saving is
  * disabled. If 'create' is TRUE then intermediate directories will
  * be created (set this to FALSE if you just want to find out where
@@ -178,7 +273,7 @@ guchar *choices_find_path_load(const char *leaf, const char *dir)
  *
  * g_free() the result.
  */
-guchar *choices_find_path_save(const char *leaf, const char *dir,
+gchar *choices_find_path_save(const char *leaf, const char *dir,
 				gboolean create)
 {
 	gchar	*path, *retval;
@@ -195,19 +290,104 @@ guchar *choices_find_path_save(const char *leaf, const char *dir,
 					g_strerror(errno));
 	}
 
-	path = g_strconcat(dir_list[0], "/", dir, NULL);
+	path = g_build_filename(dir_list[0], dir, NULL);
 	if (create && !exists(path))
 	{
 		if (mkdir(path, 0777))
 			g_warning("mkdir(%s): %s\n", path, g_strerror(errno));
 	}
 
-	retval = g_strconcat(path, "/", leaf, NULL);
+	retval = g_build_filename(path, leaf, NULL);
 	g_free(path);
 
 	return retval;
 }
 
+/* Returns the pathname of a file to save to, or NULL if saving is
+ * disabled. If 'create' is TRUE then intermediate directories will
+ * be created (set this to FALSE if you just want to find out where
+ * a saved file would go without actually altering the filesystem).
+ *
+ * g_free() the result.
+ */
+gchar *choices_find_xdg_path_save(const char *leaf, const char *dir,
+				  const char *site, gboolean create)
+{
+	gchar	*path, *retval, *tmp;
+	
+	g_return_val_if_fail(xdg_dir_list != NULL, NULL);
+
+	if (create && !exists(xdg_dir_list[0]))
+	{
+		if (mkdir(xdg_dir_list[0], 0777))
+			g_warning("mkdir(%s): %s\n", xdg_dir_list[0],
+					g_strerror(errno));
+	}
+
+	if(site)
+        {
+		path = g_build_filename(xdg_dir_list[0], site, NULL);
+		if (create && !exists(path))
+		{
+			if (mkdir(path, 0777))
+				g_warning("mkdir(%s): %s\n", path,
+					  g_strerror(errno));
+		}
+		tmp=path;
+	} else {
+		tmp=g_strdup(xdg_dir_list[0]);
+	}
+	
+	path = g_build_filename(tmp, dir, NULL);
+	g_free(tmp);
+	if (create && !exists(path))
+	{
+		if (mkdir(path, 0777))
+			g_warning("mkdir(%s): %s\n", path, g_strerror(errno));
+	}
+	
+	retval = g_build_filename(path, leaf, NULL);
+	g_free(path);
+
+	return retval;
+}
+
+/*
+ * Returns an array of the directories in XDG_CONFIG_HOME and XDG_CONFIG_DIRS
+ * which contain a subdirectory called 'dir' (optionally in a subdirectory
+ * called site).
+ *
+ * Lower-indexed results should override higher-indexed ones.
+ *
+ * Free the list using choices_free_list().
+ */
+GPtrArray *choices_list_xdg_dirs(char *dir, char *site)
+{
+	GPtrArray	*list;
+	int              i;
+
+	g_return_val_if_fail(xdg_dir_list != NULL, NULL);
+
+	list = g_ptr_array_new();
+
+	for (i=0; i<xdg_dir_count; i++)
+	{
+		guchar	*path;
+
+		if(site)
+			path = g_build_filename(xdg_dir_list[i], site,
+					   dir, NULL);
+		else
+			path = g_build_filename(xdg_dir_list[i], dir, NULL);
+		
+		if (exists(path))
+			g_ptr_array_add(list, path);
+		else
+			g_free(path);
+	}
+
+	return list;
+}
 
 /****************************************************************
  *			INTERNAL FUNCTIONS			*
@@ -220,4 +400,108 @@ static gboolean exists(char *path)
 	struct stat info;
 
 	return stat(path, &info) == 0;
+}
+
+#include <unistd.h>
+#include <gtk/gtk.h>
+
+static void migrate_choices(void)
+{
+	GtkWidget *dialog, *vbox, *lbl;
+	gint resp;
+	gchar *opath, *npath;
+	gchar *text;
+
+	npath=choices_find_xdg_path_save("...", PROJECT, SITE, FALSE);
+	opath=choices_find_path_save("...", PROJECT,FALSE);
+	
+	dialog=gtk_dialog_new_with_buttons(_("Convert Choices to XDG specification?"),
+					   NULL, GTK_DIALOG_NO_SEPARATOR,
+					   GTK_STOCK_NO, GTK_RESPONSE_CANCEL,
+					   GTK_STOCK_YES, GTK_RESPONSE_OK,
+					   NULL);
+	vbox = GTK_DIALOG(dialog)->vbox;
+	text=g_strdup_printf(_("Do you wish to migrate your choices, "
+			       "currently stored in\n<b>%s</b>\nto the new "
+			       "standard where they will be stored in\n"
+			       "<b>%s</b>"),
+			       opath, npath);
+	lbl=gtk_label_new(text);
+	gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
+	g_free(text);
+	gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
+
+	gtk_widget_show_all(vbox);
+
+	resp=gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+
+	if(resp==GTK_RESPONSE_OK)
+	{
+		int failed=0;
+		int i;
+		gchar *src, *dest;
+
+		dest=choices_find_xdg_path_save(".", PROJECT, SITE, TRUE);
+		g_free(dest);
+
+		for(i=0; to_migrate[i].dir; i++) {
+			src=g_build_filename(dir_list[0], to_migrate[i].dir,
+					     NULL);
+			dest=choices_find_xdg_path_save(NULL, NULL,
+							to_migrate[i].site,
+							TRUE);
+			g_free(dest);
+			dest=choices_find_xdg_path_save(NULL,
+							to_migrate[i].dir,
+							to_migrate[i].site,
+							FALSE);
+			errno=0;
+			if(rename(src, dest)==0) {
+				if(to_migrate[i].symlink)
+					symlink(dest, src);
+			} else {
+				g_warning("rename(%s, %s): %s\n",
+					  src, dest,
+					  g_strerror(errno));
+				failed++;
+			}
+			g_free(src);
+			g_free(dest);
+		}
+
+		if(failed)
+			delayed_error(_("%d directories could not be migrated"),
+				      failed);
+		
+		
+	} else {
+		
+		dialog=gtk_dialog_new_with_buttons(_("OK"),
+						   NULL,
+						   GTK_DIALOG_NO_SEPARATOR,
+						   GTK_STOCK_OK,
+						   GTK_RESPONSE_OK,
+						   NULL);
+		vbox = GTK_DIALOG(dialog)->vbox;
+
+		text=g_strdup_printf(_("OK.  Existing choices will "
+				       "continue to be read from \n"
+				       "<b>%s</b>\n "
+				       "but changes will be saved to \n"
+				       "<b>%s</b>\n"),
+				     opath, npath);
+		lbl=gtk_label_new(text);
+		gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
+		g_free(text);
+		gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
+
+		gtk_widget_show_all(vbox);
+		(void) gtk_dialog_run(GTK_DIALOG(dialog));
+		gtk_widget_destroy(dialog);
+		
+	}
+
+	g_free(opath);
+	g_free(npath);
 }

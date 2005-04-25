@@ -315,7 +315,7 @@ void pinboard_activate(const gchar *name)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pb_", name, NULL);
-		path = choices_find_path_load(leaf, PROJECT);
+		path = choices_find_xdg_path_load(leaf, PROJECT, SITE);
 		g_free(leaf);
 	}
 
@@ -1506,7 +1506,7 @@ static void pinboard_save(void)
 		guchar	*leaf;
 
 		leaf = g_strconcat("pb_", current_pinboard->name, NULL);
-		save = choices_find_path_save(leaf, PROJECT, TRUE);
+		save = choices_find_xdg_path_save(leaf, PROJECT, SITE, TRUE);
 		g_free(leaf);
 	}
 

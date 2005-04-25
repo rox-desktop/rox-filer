@@ -342,7 +342,7 @@ static void update_bookmarks()
 	gchar *path;
 
 	/* Update the bookmarks, if possible */
-	path = choices_find_path_load("Bookmarks.xml", PROJECT);
+	path = choices_find_xdg_path_load("Bookmarks.xml", PROJECT, SITE);
 	if (path)
 	{
 		XMLwrapper *wrapper;
@@ -400,7 +400,8 @@ static void bookmarks_save()
 {
 	guchar	*save_path;
 
-	save_path = choices_find_path_save("Bookmarks.xml", PROJECT, TRUE);
+	save_path = choices_find_xdg_path_save("Bookmarks.xml", PROJECT, SITE,
+					       TRUE);
 	if (save_path)
 	{
 		save_xml_file(bookmarks->doc, save_path);

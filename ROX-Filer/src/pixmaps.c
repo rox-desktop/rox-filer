@@ -525,14 +525,15 @@ static gchar *thumbnail_program(MIME_type *type)
 		return NULL;
 
 	leaf = g_strconcat(type->media_type, "_", type->subtype, NULL);
-	path = choices_find_path_load(leaf, "MIME-thumb");
+	path = choices_find_xdg_path_load(leaf, "MIME-thumb", SITE);
 	g_free(leaf);
 	if (path)
 	{
 		return path;
 	}
 
-	path = choices_find_path_load(type->media_type, "MIME-thumb");
+	path = choices_find_xdg_path_load(type->media_type, "MIME-thumb",
+					  SITE);
 
 	return path;
 }

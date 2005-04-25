@@ -170,7 +170,7 @@ void options_init(void)
 	option_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	widget_builder = g_hash_table_new(g_str_hash, g_str_equal);
 
-	path = choices_find_path_load("Options", PROJECT);
+	path = choices_find_xdg_path_load("Options", PROJECT, SITE);
 	if (path)
 	{
 		/* Load in all the options set in the filer, storing them
@@ -977,7 +977,7 @@ static GtkWidget *build_window_frame(GtkTreeView **tree_view)
 	gtk_widget_grab_default(button);
 	gtk_widget_grab_focus(button);
 
-	save_path = choices_find_path_save("...", PROJECT, FALSE);
+	save_path = choices_find_xdg_path_save("...", PROJECT, SITE, FALSE);
 	if (save_path)
 	{
 		string = g_strdup_printf(_("Choices will be saved as:\n%s"),
@@ -1148,7 +1148,7 @@ static void save_options(void)
 	GList	*next;
 	guchar	*save, *save_new;
 
-	save = choices_find_path_save("Options", PROJECT, TRUE);
+	save = choices_find_xdg_path_save("Options", PROJECT, SITE, TRUE);
 	if (!save)
 		goto out;
 

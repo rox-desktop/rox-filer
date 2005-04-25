@@ -330,7 +330,7 @@ void menu_init(void)
 {
 	char			*menurc;
 
-	menurc = choices_find_path_load(MENUS_NAME, PROJECT);
+	menurc = choices_find_xdg_path_load(MENUS_NAME, PROJECT, SITE);
 	if (menurc)
 	{
 		gtk_accel_map_load(menurc);
@@ -571,7 +571,7 @@ static void update_new_files_menu(MenuIconStyle style)
 		widgets = NULL;
 	}
 
-	templ_dname = choices_find_path_load("Templates", "");
+	templ_dname = choices_find_xdg_path_load("Templates", "", SITE);
 	if (templ_dname)
 	{
 		widgets = menu_from_dir(filer_new_menu, templ_dname, style,
@@ -1405,7 +1405,7 @@ static gboolean new_file_type_cb(GObject *savebox,
 
 	/* We can work out the template path from the initial name */
 	oleaf = g_basename(initial);
-	templ_dname = choices_find_path_load("Templates", "");
+	templ_dname = choices_find_xdg_path_load("Templates", "", SITE);
 	if (!templ_dname)
 	{
 		report_error(
@@ -1475,7 +1475,7 @@ static void customise_send_to(gpointer data)
 	}
 	choices_free_list(path);
 
-	save = choices_find_path_save("", "SendTo", TRUE);
+	save = choices_find_xdg_path_save("", "SendTo", SITE, TRUE);
 	if (save)
 		mkdir(save, 0777);
 
@@ -1522,7 +1522,7 @@ static void customise_new(gpointer data)
 	}
 	choices_free_list(path);
 
-	save = choices_find_path_save("", "Templates", TRUE);
+	save = choices_find_xdg_path_save("", "Templates", SITE, TRUE);
 	if (save)
 		mkdir(save, 0777);
 
@@ -1825,7 +1825,7 @@ static void save_menus(void)
 {
 	char	*menurc;
 
-	menurc = choices_find_path_save(MENUS_NAME, PROJECT, TRUE);
+	menurc = choices_find_xdg_path_save(MENUS_NAME, PROJECT, SITE, TRUE);
 	if (menurc)
 	{
 		gtk_accel_map_save(menurc);

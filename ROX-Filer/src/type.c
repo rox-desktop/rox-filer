@@ -369,11 +369,12 @@ static char *handler_for(MIME_type *type)
 	char	*open;
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype, NULL);
-	open = choices_find_path_load(type_name, "MIME-types");
+	open = choices_find_xdg_path_load(type_name, "MIME-types", SITE);
 	g_free(type_name);
 
 	if (!open)
-		open = choices_find_path_load(type->media_type, "MIME-types");
+		open = choices_find_xdg_path_load(type->media_type,
+						  "MIME-types", SITE);
 
 	return open;
 }
@@ -482,7 +483,7 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 
 	type_name = g_strconcat(type->media_type, "_", type->subtype,
 				".png", NULL);
-	path = choices_find_path_load(type_name, "MIME-icons");
+	path = choices_find_xdg_path_load(type_name, "MIME-icons", SITE);
 	g_free(type_name);
 	if (path)
 	{
@@ -644,14 +645,16 @@ static guchar *handler_for_radios(GObject *dialog)
 	switch (radios_get_value(radios))
 	{
 		case SET_MEDIA:
-			return choices_find_path_load(type->media_type,
-							 "MIME-types");
+			return choices_find_xdg_path_load(type->media_type,
+							  "MIME-types", SITE);
 		case SET_TYPE:
 		{
 			gchar *tmp, *handler;
 			tmp = g_strconcat(type->media_type, "_",
 					  type->subtype, NULL);
-			handler = choices_find_path_load(tmp, "MIME-types");
+			handler = choices_find_xdg_path_load(tmp,
+							     "MIME-types",
+							     SITE);
 			g_free(tmp);
 			return handler;
 		}
@@ -1024,7 +1027,7 @@ static char *get_action_save_path(GtkWidget *dialog)
 		type_name = g_strconcat(type->media_type, "_",
 				type->subtype, NULL);
 
-	path = choices_find_path_save("", PROJECT, FALSE);
+	path = choices_find_xdg_path_save("", PROJECT, SITE, FALSE);
 	if (!path)
 	{
 		report_error(
@@ -1033,7 +1036,7 @@ static char *get_action_save_path(GtkWidget *dialog)
 	}
 	g_free(path);
 
-	path = choices_find_path_save(type_name, "MIME-types", TRUE);
+	path = choices_find_xdg_path_save(type_name, "MIME-types", SITE, TRUE);
 
 	if (!remove_handler_with_confirm(path))
 		null_g_free(&path);
@@ -1288,19 +1291,18 @@ static char **get_xdg_data_dirs(int *n_dirs)
 
 	env = getenv("XDG_DATA_DIRS");
 	if (!env)
-		env = "/usr/local/share/:/usr/share/";
+		env = "/etc/xdg/";
 	dirs = g_strsplit(env, ":", 0);
 	g_return_val_if_fail(dirs != NULL, NULL);
 	for (n = 0; dirs[n]; n++)
 		;
 	for (i = n; i > 0; i--)
 		dirs[i] = dirs[i - 1];
-	env = getenv("XDG_DATA_HOME");
+	env = getenv("XDG_CONFIG_HOME");
 	if (env)
 		dirs[0] = g_strdup(env);
 	else
-		dirs[0] = g_build_filename(g_get_home_dir(), ".local",
-						"share", NULL);
+		dirs[0] = g_build_filename(g_get_home_dir(), ".config", NULL);
 	*n_dirs = n + 1;
 	return dirs;
 }

@@ -285,7 +285,7 @@ static void customise_type(GtkWidget *item, MIME_type *type)
 	char *path;
 
 	leaf = g_strconcat(".", type->media_type, "_", type->subtype, NULL);
-	path = choices_find_path_save(leaf, "SendTo", TRUE);
+	path = choices_find_xdg_path_save(leaf, "SendTo", SITE, TRUE);
 	g_free(leaf);
 
 	mkdir(path, 0755);
@@ -307,7 +307,7 @@ static void build_menu_for_type(MIME_type *type)
 	DirItem *ditem;
 
 	leaf = g_strconcat(".", type->media_type, "_", type->subtype, NULL);
-	path = choices_find_path_load(leaf, "SendTo");
+	path = choices_find_xdg_path_load(leaf, "SendTo", SITE);
 
 	if (!path)
 		goto out;
