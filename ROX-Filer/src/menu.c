@@ -1465,13 +1465,13 @@ static void customise_send_to(gpointer data)
 
 	dirs = g_string_new(NULL);
 
-	path = choices_list_dirs("");
+	path = choices_list_xdg_dirs("", SITE);
 	for (i = 0; i < path->len; i++)
 	{
 		guchar *old = (guchar *) path->pdata[i];
 
 		g_string_append(dirs, old);
-		g_string_append(dirs, "SendTo\n");
+		g_string_append(dirs, "/SendTo\n");
 	}
 	choices_free_list(path);
 
@@ -1512,13 +1512,13 @@ static void customise_new(gpointer data)
 
 	dirs = g_string_new(NULL);
 
-	path = choices_list_dirs("");
+	path = choices_list_xdg_dirs("", SITE);
 	for (i = 0; i < path->len; i++)
 	{
 		guchar *old = (guchar *) path->pdata[i];
 
 		g_string_append(dirs, old);
-		g_string_append(dirs, "Templates\n");
+		g_string_append(dirs, "/Templates\n");
 	}
 	choices_free_list(path);
 
@@ -1559,7 +1559,7 @@ static void add_sendto(GtkWidget *menu, const gchar *type, const gchar *subtype)
 	else
 		searchdir = g_strdup("SendTo");
 
-	paths = choices_list_dirs(searchdir);
+	paths = choices_list_xdg_dirs(searchdir, SITE);
 	g_free(searchdir);	
 
 	for (i = 0; i < paths->len; i++)
