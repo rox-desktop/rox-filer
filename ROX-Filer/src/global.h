@@ -175,6 +175,9 @@ enum
 #define SOAP_RPC_NS "http://www.w3.org/2001/12/soap-rpc"
 #define ROX_NS "http://rox.sourceforge.net/SOAP/ROX-Filer"
 
+/* Namespace for configuration */
+#define SITE "rox.sourceforge.net"
+
 /* Stock icons */
 #define ROX_STOCK_SHOW_DETAILS "rox-show-details"
 #define ROX_STOCK_SHOW_HIDDEN  "rox-show-hidden"
