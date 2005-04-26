@@ -166,7 +166,7 @@ void choices_migrate(void)
  *
  * Free the list using choices_free_list().
  */
-GPtrArray *choices_list_dirs(char *dir)
+static GPtrArray *choices_list_dirs(char *dir)
 {
 	GPtrArray	*list;
 	gchar		**cdir = dir_list;
@@ -209,7 +209,7 @@ void choices_free_list(GPtrArray *list)
  * The return values may be NULL - use built-in defaults.
  * g_free() the result.
  */
-gchar *choices_find_path_load(const char *leaf, const char *dir)
+static gchar *choices_find_path_load(const char *leaf, const char *dir)
 {
 	gchar	**cdir = dir_list;
 
@@ -273,7 +273,7 @@ gchar *choices_find_xdg_path_load(const char *leaf, const char *dir,
  *
  * g_free() the result.
  */
-gchar *choices_find_path_save(const char *leaf, const char *dir,
+static gchar *choices_find_path_save(const char *leaf, const char *dir,
 				gboolean create)
 {
 	gchar	*path, *retval;
@@ -411,52 +411,28 @@ static void migrate_choices(void)
 	gint resp;
 	gchar *opath, *npath;
 	gchar *text;
+	int failed=0;
+	int i;
+	gchar *src, *dest;
+
 
 	npath=choices_find_xdg_path_save("...", PROJECT, SITE, FALSE);
 	opath=choices_find_path_save("...", PROJECT,FALSE);
 	
-	dialog=gtk_dialog_new_with_buttons(_("Convert Choices to XDG specification?"),
-					   NULL, GTK_DIALOG_NO_SEPARATOR,
-					   GTK_STOCK_NO, GTK_RESPONSE_CANCEL,
-					   GTK_STOCK_YES, GTK_RESPONSE_OK,
-					   NULL);
-	vbox = GTK_DIALOG(dialog)->vbox;
-	text=g_strdup_printf(_("Do you wish to migrate your choices, "
-			       "currently stored in\n<b>%s</b>\nto the new "
-			       "standard where they will be stored in\n"
-			       "<b>%s</b>"),
-			       opath, npath);
-	lbl=gtk_label_new(text);
-	gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
-	g_free(text);
-	gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
+	dest=choices_find_xdg_path_save(".", PROJECT, SITE, TRUE);
+	g_free(dest);
 
-	gtk_widget_show_all(vbox);
-
-	resp=gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
-
-	if(resp==GTK_RESPONSE_OK)
-	{
-		int failed=0;
-		int i;
-		gchar *src, *dest;
-
-		dest=choices_find_xdg_path_save(".", PROJECT, SITE, TRUE);
+	for(i=0; to_migrate[i].dir; i++) {
+		src=g_build_filename(dir_list[0], to_migrate[i].dir, NULL);
+		dest=choices_find_xdg_path_save(NULL, NULL,
+						to_migrate[i].site, TRUE);
 		g_free(dest);
-
-		for(i=0; to_migrate[i].dir; i++) {
-			src=g_build_filename(dir_list[0], to_migrate[i].dir,
-					     NULL);
-			dest=choices_find_xdg_path_save(NULL, NULL,
-							to_migrate[i].site,
-							TRUE);
-			g_free(dest);
-			dest=choices_find_xdg_path_save(NULL,
-							to_migrate[i].dir,
-							to_migrate[i].site,
-							FALSE);
-			errno=0;
+		dest=choices_find_xdg_path_save(NULL,
+						to_migrate[i].dir,
+						to_migrate[i].site,
+						FALSE);
+		errno=0;
+		if(exists(src)) {
 			if(rename(src, dest)==0) {
 				if(to_migrate[i].symlink)
 					symlink(dest, src);
@@ -466,42 +442,52 @@ static void migrate_choices(void)
 					  g_strerror(errno));
 				failed++;
 			}
-			g_free(src);
-			g_free(dest);
+		} else if(to_migrate[i].symlink) {
+			if(!exists(dir_list[0])) {
+				if (mkdir(dir_list[0], 0777))
+					g_warning("mkdir(%s): %s\n",
+						  dir_list[0],
+						  g_strerror(errno));
+				errno=0;
+			}
+			symlink(dest, src);
 		}
+		g_free(src);
+		g_free(dest);
+	}
 
-		if(failed)
-			delayed_error(_("%d directories could not be migrated"),
-				      failed);
-		
-		
-	} else {
-		
-		dialog=gtk_dialog_new_with_buttons(_("OK"),
-						   NULL,
-						   GTK_DIALOG_NO_SEPARATOR,
-						   GTK_STOCK_OK,
-						   GTK_RESPONSE_OK,
-						   NULL);
-		vbox = GTK_DIALOG(dialog)->vbox;
+	dialog=gtk_dialog_new_with_buttons(_("Choices migration"),
+					   NULL,
+					   GTK_DIALOG_NO_SEPARATOR,
+					   GTK_STOCK_OK,
+					   GTK_RESPONSE_OK,
+					   NULL);
+	vbox = GTK_DIALOG(dialog)->vbox;
 
-		text=g_strdup_printf(_("OK.  Existing choices will "
-				       "continue to be read from \n"
-				       "<b>%s</b>\n "
-				       "but changes will be saved to \n"
-				       "<b>%s</b>\n"),
-				     opath, npath);
+	text=g_strdup_printf(_("Choices have been moved from \n"
+			       "<b>%s</b>\n "
+			       "to the new location \n"
+			       "<b>%s</b>\n"),
+			     opath, npath);
+	lbl=gtk_label_new(text);
+	gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
+	g_free(text);
+	gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
+
+	if(failed) {
+		text=g_strdup_printf(_("%d directories could not be migrated"),
+				     failed);
 		lbl=gtk_label_new(text);
 		gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
 		g_free(text);
 		gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
 
-		gtk_widget_show_all(vbox);
-		(void) gtk_dialog_run(GTK_DIALOG(dialog));
-		gtk_widget_destroy(dialog);
-		
 	}
 
+	gtk_widget_show_all(vbox);
+	(void) gtk_dialog_run(GTK_DIALOG(dialog));
+	gtk_widget_destroy(dialog);
+		
 	g_free(opath);
 	g_free(npath);
 }

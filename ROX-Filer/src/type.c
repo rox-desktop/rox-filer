@@ -1291,18 +1291,19 @@ static char **get_xdg_data_dirs(int *n_dirs)
 
 	env = getenv("XDG_DATA_DIRS");
 	if (!env)
-		env = "/etc/xdg/";
+		env = "/usr/local/share/:/usr/share/";
 	dirs = g_strsplit(env, ":", 0);
 	g_return_val_if_fail(dirs != NULL, NULL);
 	for (n = 0; dirs[n]; n++)
 		;
 	for (i = n; i > 0; i--)
 		dirs[i] = dirs[i - 1];
-	env = getenv("XDG_CONFIG_HOME");
+	env = getenv("XDG_DATA_HOME");
 	if (env)
 		dirs[0] = g_strdup(env);
 	else
-		dirs[0] = g_build_filename(g_get_home_dir(), ".config", NULL);
+		dirs[0] = g_build_filename(g_get_home_dir(), ".local",
+					   "share", NULL);
 	*n_dirs = n + 1;
 	return dirs;
 }

@@ -4,6 +4,15 @@
 
 25-Apr-2005
 ~~~~~~~~~~~
+Bugfix: Broke get_xdg_data_dirs while writing choices_list_xdg_dirs (Stephen 
+        Watson, reported by Pär Forsling).
+Bugfix: Don't try to move directories that aren't there, but make symbolic
+        links for them anyway (Stephen Watson, reported by Thomas Leonard).
+Old choices_find_path_load/save now static, use new XDG functions exclusively
+(Stephen Watson).
+
+25-Apr-2005
+~~~~~~~~~~~
 Change over from CHOICESPATH to XDG_CONFIG_HOME and XDG_CONFIG_DIRS (Stephen
 Watson).
 
