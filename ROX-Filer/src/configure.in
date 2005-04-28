@@ -153,7 +153,13 @@ AC_TYPE_UID_T
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol getopt_long statvfs statfs)
+AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol statvfs statfs)
+
+dnl getopt_long may be in an addtional library
+AC_CHECK_FUNC(getopt_long)
+if test $ac_cv_func_getopt_long = no; then
+  AC_CHECK_LIB(gnugetopt, getopt_long)
+fi
 
 dnl Check for extended attribute support
 AC_CHECK_FUNCS(attropen getxattr)
