@@ -1,6 +1,13 @@
 			ROX-Filer
 			A RISC OS-like filer for X
 			by Thomas Leonard
+
+01-May-2005
+~~~~~~~~~~~
+When using the drag-and-drop menu, give the choice of creating relative or
+absolute symlinks. For Ctrl-Shift-Drag, always make relative links rather
+than absolute ones (Thomas Leonard; requested by Peter Prohaska).
+
 28-Apr-2005
 ~~~~~~~~~~~
 If we can't find getopt_long, try looking in libgnugetopt (Stephen Watson).
@@ -13,6 +20,9 @@ Bugfix: Don't try to move directories that aren't there, but make symbolic
         links for them anyway (Stephen Watson, reported by Thomas Leonard).
 Old choices_find_path_load/save now static, use new XDG functions exclusively
 (Stephen Watson).
+
+01-May-2005
+~~~~~~~~~~~
 
 25-Apr-2005
 ~~~~~~~~~~~

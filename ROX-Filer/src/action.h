@@ -17,7 +17,8 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action);
 void action_find(GList *paths);
 void action_move(GList *paths, const char *dest, const char *leaf, int quiet);
 void action_copy(GList *paths, const char *dest, const char *leaf, int quiet);
-void action_link(GList *paths, const char *dest, const char *leaf);
+void action_link(GList *paths, const char *dest, const char *leaf,
+		 gboolean relative);
 void action_eject(GList *paths);
 void show_condition_help(gpointer data);
 void set_find_string_colour(GtkWidget *widget, const guchar *string);

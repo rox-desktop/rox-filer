@@ -1563,14 +1563,9 @@ static void do_move(const char *path, const char *dest)
 	}
 }
 
-static void do_link(const char *path, const char *dest)
+/* Common code for do_link_relative() and do_link_absolute(). */
+static void do_link(const char *path, const char *dest_path)
 {
-	const char	*dest_path;
-
-	check_flags();
-
-	dest_path = make_dest_path(path, dest);
-
 	if (quiet)
 		printf_send(_("'Linking %s as %s\n"), path, dest_path);
 	else {
@@ -1585,6 +1580,26 @@ static void do_link(const char *path, const char *dest)
 		send_error();
 	else
 		send_check_path(dest_path);
+}
+
+static void do_link_relative(const char *path, const char *dest)
+{
+	char *rel_path;
+	const char *dest_path;
+
+	dest_path = make_dest_path(path, dest);
+
+	check_flags();
+
+	rel_path = get_relative_path(dest_path, path);
+	do_link(rel_path, dest_path);
+	g_free(rel_path);
+}
+
+static void do_link_absolute(const char *path, const char *dest)
+{
+	check_flags();
+	do_link(path, make_dest_path(path, dest));
 }
 
 /* Mount/umount this item (depending on 'mount') */
@@ -2255,15 +2270,18 @@ void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 }
 
 /* If leaf is NULL then the link will have the same name */
-/* XXX: No quiet option here? */
-void action_link(GList *paths, const char *dest, const char *leaf)
+void action_link(GList *paths, const char *dest, const char *leaf,
+		 gboolean relative)
 {
 	GtkWidget	*abox;
 	GUIside		*gui_side;
 
 	action_dest = dest;
 	action_leaf = leaf;
-	action_do_func = do_link;
+	if (relative)
+		action_do_func = do_link_relative;
+	else
+		action_do_func = do_link_absolute;
 
 	abox = abox_new(_("Link"), o_action_link.int_value);
 	gui_side = start_action(abox, list_cb, paths,

@@ -114,7 +114,8 @@ static void prompt_action(GList *paths, gchar *dest);
 typedef enum {
 	MENU_COPY,
 	MENU_MOVE,
-	MENU_LINK,
+	MENU_LINK_REL,
+	MENU_LINK_ABS,
 } MenuActionType;
 
 #undef N_
@@ -122,7 +123,8 @@ typedef enum {
 static GtkItemFactoryEntry menu_def[] = {
 {N_("Copy"),		NULL, menuitem_response, MENU_COPY, 	NULL},
 {N_("Move"),		NULL, menuitem_response, MENU_MOVE, 	NULL},
-{N_("Link"),		NULL, menuitem_response, MENU_LINK, 	NULL},
+{N_("Link (relative)"),	NULL, menuitem_response, MENU_LINK_REL, NULL},
+{N_("Link (absolute)"),	NULL, menuitem_response, MENU_LINK_ABS,	NULL},
 };
 static GtkWidget *dnd_menu = NULL;
 
@@ -1030,7 +1032,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		else if (context->action == GDK_ACTION_COPY)
 			action_copy(local_paths, dest_path, NULL, -1);
 		else if (context->action == GDK_ACTION_LINK)
-			action_link(local_paths, dest_path, NULL);
+			action_link(local_paths, dest_path, NULL, TRUE);
 		else
 			error = _("Unknown action requested");
 
@@ -1055,8 +1057,10 @@ static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
 		action_move(prompt_local_paths, prompt_dest_path, NULL, -1);
 	else if (action == MENU_COPY)
 		action_copy(prompt_local_paths, prompt_dest_path, NULL, -1);
-	else if (action == MENU_LINK)
-		action_link(prompt_local_paths, prompt_dest_path, NULL);
+	else if (action == MENU_LINK_REL)
+		action_link(prompt_local_paths, prompt_dest_path, NULL, TRUE);
+	else if (action == MENU_LINK_ABS)
+		action_link(prompt_local_paths, prompt_dest_path, NULL, FALSE);
 } 
 
 /* When some local files are dropped somewhere with ACTION_ASK, this
