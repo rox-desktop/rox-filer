@@ -975,7 +975,7 @@ static xmlNodePtr rpc_Link(GList *args)
 	leaf = string_value(ARG(2));
 
 	if (from)
-		action_link(from, to, leaf);
+		action_link(from, to, leaf, TRUE);
 	else
 		g_warning("No files in SOAP request list");
 
