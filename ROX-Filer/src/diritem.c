@@ -279,6 +279,9 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 		return;		/* Try to avoid automounter problems */
 	}
 
+	if (item->mode & S_IWOTH)
+		return;		/* Don't trust world-writable dirs */
+
 	/* Finding the icon:
 	 *
 	 * - If it contains a .DirIcon then that's the icon
