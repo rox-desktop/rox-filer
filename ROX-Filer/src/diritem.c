@@ -56,7 +56,8 @@ static Option o_ignore_exec;
 time_t diritem_recent_time;
 
 /* Static prototypes */
-static void examine_dir(const guchar *path, DirItem *item, uid_t uid);
+static void examine_dir(const guchar *path, DirItem *item,
+			struct stat *link_target);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -153,7 +154,7 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		 * of the *symlink*, but we really want the uid of the dir
 		 * to which the symlink points.
 		 */
-		examine_dir(path, item, info.st_uid);
+		examine_dir(path, item, &info);
 	}
 	else if (item->base_type == TYPE_FILE)
 	{
@@ -259,14 +260,15 @@ void _diritem_get_image(DirItem *item)
  * - Looks for an image (but maybe still NULL on error)
  * - Updates ITEM_FLAG_APPDIR
  *
- * KRJW (26 Jan 2003): Pass extra uid var, which will be the uid of
- * the dir given by `path' (or the uid of the dir pointed to by `path'
- * if `path' is a symlink).
+ * link_target contains stat info for the link target for symlinks (or for the
+ * item itself if not a link).
  */
-static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
+static void examine_dir(const guchar *path, DirItem *item,
+			struct stat *link_target)
 {
 	struct stat info;
 	static GString *tmp = NULL;
+	uid_t uid = link_target->st_uid;
 
 	if (!tmp)
 		tmp = g_string_new(NULL);
@@ -279,7 +281,7 @@ static void examine_dir(const guchar *path, DirItem *item, uid_t uid)
 		return;		/* Try to avoid automounter problems */
 	}
 
-	if (item->mode & S_IWOTH)
+	if (link_target->st_mode & S_IWOTH)
 		return;		/* Don't trust world-writable dirs */
 
 	/* Finding the icon:
