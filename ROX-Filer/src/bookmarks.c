@@ -38,6 +38,8 @@
 #include "main.h"
 #include "mount.h"
 #include "action.h"
+#include "options.h"
+#include "bind.h"
 
 static GList *history = NULL;		/* Most recent first */
 static GList *history_tail = NULL;	/* Oldest item */
@@ -441,6 +443,8 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 {
 	const gchar *mark;
 	GtkLabel *label;
+	GdkEvent *event;
+	gboolean new_win=FALSE;
 
 	mark=g_object_get_data(G_OBJECT(item), "bookmark-path");
 	if(!mark) {
@@ -448,8 +452,27 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 		mark = gtk_label_get_text(label);
 	}
 
+	event=gtk_get_current_event();
+	if(event)
+	{
+		if(event->type==GDK_BUTTON_PRESS ||
+		   event->type==GDK_BUTTON_RELEASE)
+		{
+			GdkEventButton *button=(GdkEventButton *) event;
+
+			new_win=o_new_button_1.int_value?
+				button->button==1: button->button!=1;
+		}
+		gdk_event_free(event);
+	}
+
 	if (strcmp(mark, filer_window->sym_path) != 0)
-		filer_change_to(filer_window, mark, NULL);
+	{
+		if(new_win)
+			filer_opendir(mark, filer_window, NULL);
+		else
+			filer_change_to(filer_window, mark, NULL);
+	}
 	if (g_hash_table_lookup(fstab_mounts, filer_window->real_path) &&
 		!mount_is_mounted(filer_window->real_path, NULL, NULL))
 	{
