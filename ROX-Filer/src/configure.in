@@ -156,10 +156,8 @@ dnl Checks for library functions.
 AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol statvfs statfs)
 
 dnl getopt_long may be in an addtional library
-AC_CHECK_FUNC(getopt_long)
-if test $ac_cv_func_getopt_long = no; then
-  AC_CHECK_LIB(gnugetopt, getopt_long)
-fi
+AC_CHECK_LIB(gnugetopt, getopt_long)
+AC_CHECK_FUNCS(getopt_long)
 
 dnl Check for extended attribute support
 AC_CHECK_FUNCS(attropen getxattr)
