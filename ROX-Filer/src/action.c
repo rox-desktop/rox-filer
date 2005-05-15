@@ -538,7 +538,7 @@ static gboolean send_msg(void)
 
 	g_return_val_if_fail(message->len < 0xffff, FALSE);
 
-	sprintf(len_buffer, "%04x", message->len);
+	sprintf(len_buffer, "%04" G_GSIZE_MODIFIER "x", message->len);
 	fwrite(len_buffer, 1, 4, to_parent);
 	len = fwrite(message->str, 1, message->len, to_parent);
 	fflush(to_parent);

@@ -1096,11 +1096,11 @@ static void reposition_panel(GtkWidget *window,
 	/* Stop windows from maximising over all/part of us */
 	{
 		struct {
-			guint32 left, right, top, bottom;
-			guint32 left_start_y, left_end_y;
-			guint32 right_start_y, right_end_y;
-			guint32 top_start_x, top_end_x;
-			guint32 bottom_start_x, bottom_end_x;
+			gulong left, right, top, bottom;
+			gulong left_start_y, left_end_y;
+			gulong right_start_y, right_end_y;
+			gulong top_start_x, top_end_x;
+			gulong bottom_start_x, bottom_end_x;
 		} strut = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
 		if (o_panel_avoid.int_value == FALSE)

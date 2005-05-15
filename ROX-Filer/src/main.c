@@ -740,7 +740,7 @@ static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition)
 	if (child_died_flag)
 		child_died_callback();
 #ifdef USE_DNOTIFY
-	if (dnotify_wakeup)
+	if (dnotify_wakeup_flag)
 		dnotify_wakeup();
 #endif
 }

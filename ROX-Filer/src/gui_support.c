@@ -214,7 +214,7 @@ void report_error(const char *message, ...)
 	run_error_info_dialog(GTK_MESSAGE_ERROR, message, args);
 }
 
-void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value)
+void set_cardinal_property(GdkWindow *window, GdkAtom prop, gulong value)
 {
 	gdk_property_change(window, prop, xa_cardinal, 32,
 				GDK_PROP_MODE_REPLACE, (gchar *) &value, 1);
@@ -229,7 +229,7 @@ void make_panel_window(GtkWidget *widget)
 	static GdkAtom xa_state, xa_atom, xa_hints, xa_win_hints;
 	static GdkAtom xa_NET_WM_DESKTOP;
 	GdkWindow *window = widget->window;
-	gint32  wm_hints_values[] = {1, False, 0, 0, 0, 0, 0, 0};
+	long wm_hints_values[] = {1, False, 0, 0, 0, 0, 0, 0};
 	GdkAtom	wm_protocols[2];
 
 	g_return_if_fail(window != NULL);
@@ -271,7 +271,7 @@ void make_panel_window(GtkWidget *widget)
 
 	gdk_property_change(window, xa_hints, xa_hints, 32,
 			GDK_PROP_MODE_REPLACE, (guchar *) wm_hints_values,
-			sizeof(wm_hints_values) / sizeof(gint32));
+			sizeof(wm_hints_values) / sizeof(long));
 
 	wm_protocols[0] = gdk_atom_intern("WM_DELETE_WINDOW", FALSE);
 	wm_protocols[1] = gdk_atom_intern("_NET_WM_PING", FALSE);

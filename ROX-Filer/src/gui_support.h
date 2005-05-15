@@ -43,7 +43,7 @@ int get_choice(const char *title,
 	       int number_of_buttons, ...);
 void report_error(const char *message, ...);
 void info_message(const char *message, ...);
-void set_cardinal_property(GdkWindow *window, GdkAtom prop, guint32 value);
+void set_cardinal_property(GdkWindow *window, GdkAtom prop, gulong value);
 void make_panel_window(GtkWidget *widget);
 void delayed_error(const char *error, ...);
 gboolean load_file(const char *pathname, char **data_out, long *length_out);
