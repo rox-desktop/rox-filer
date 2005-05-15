@@ -159,36 +159,6 @@ void choices_migrate(void)
 	g_free(newpath);
 }
 
-/* Returns an array of the directories in CHOICESPATH which contain
- * a subdirectory called 'dir'.
- *
- * Lower-indexed results should override higher-indexed ones.
- *
- * Free the list using choices_free_list().
- */
-static GPtrArray *choices_list_dirs(char *dir)
-{
-	GPtrArray	*list;
-	gchar		**cdir = dir_list;
-
-	g_return_val_if_fail(dir_list != NULL, NULL);
-
-	list = g_ptr_array_new();
-
-	for (; *cdir; cdir++)
-	{
-		guchar	*path;
-
-		path = g_build_filename(*cdir, dir, NULL);
-		if (exists(path))
-			g_ptr_array_add(list, path);
-		else
-			g_free(path);
-	}
-
-	return list;
-}
-
 void choices_free_list(GPtrArray *list)
 {
 	guint	i;
