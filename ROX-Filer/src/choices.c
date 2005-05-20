@@ -378,7 +378,6 @@ static gboolean exists(char *path)
 static void migrate_choices(void)
 {
 	GtkWidget *dialog, *vbox, *lbl;
-	gint resp;
 	gchar *opath, *npath;
 	gchar *text;
 	int failed=0;

@@ -102,7 +102,7 @@ void bulk_rename(const char *dir, GList *items)
 			"^ matches the start of a filename\n"
 			"$ matches the end\n"
 			"\\. matches a dot\n"
-			"\\.htm$ matches the '.htm' in 'index.html', etc"),
+			"\\.htm$ matches the '.htm' in 'index.htm', etc"),
 			NULL);
 
 	gtk_box_pack_start(GTK_BOX(hbox),
