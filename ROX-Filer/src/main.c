@@ -128,6 +128,7 @@ GtkTooltips *tooltips = NULL;
        "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
        "  -R, --RPC		invoke method call read from stdin\n"	\
        "  -s, --show=FILE	open a directory showing FILE\n"	\
+       "  -S, --rox-session	use default panel and pinboard options, and -n\n"\
        "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
@@ -135,7 +136,7 @@ GtkTooltips *tooltips = NULL;
        "\nReport bugs to " BUGS_TO ".\n"		\
        "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
-#define SHORT_OPS "c:d:t:b:l:r:op:s:hvnux:m:D:R"
+#define SHORT_OPS "c:d:t:b:l:r:op:s:hvnux:m:D:RS"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
@@ -153,6 +154,7 @@ static struct option long_opts[] =
 	{"new", 0, NULL, 'n'},
 	{"RPC", 0, NULL, 'R'},
 	{"show", 1, NULL, 's'},
+	{"rox-session", 0, NULL, 'S'},
 	{"examine", 1, NULL, 'x'},
 	{"close", 1, NULL, 'D'},
 	{"mime-type", 1, NULL, 'm'},
@@ -163,6 +165,17 @@ static struct option long_opts[] =
 
 /* Take control of panels away from WM? */
 Option o_override_redirect;
+
+/* Options used when we are called by ROX-Session */
+enum {
+	SESSION_PANEL_ONLY,
+	SESSION_PINBOARD_ONLY,
+	SESSION_BOTH,
+};
+Option o_session_panel_or_pin;
+Option o_session_panel_position;
+Option o_session_panel_name;
+Option o_session_pinboard_name;
 
 /* Always start a new filer, even if one seems to be already running */
 gboolean new_copy = FALSE;
@@ -183,6 +196,7 @@ static void child_died(int signum);
 static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
+static void add_default_panel_and_pinboard(xmlNodePtr body);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -314,6 +328,15 @@ int main(int argc, char **argv)
 
 	option_add_int(&o_override_redirect, "override_redirect", FALSE);
 
+	option_add_int(&o_session_panel_or_pin, "session_panel_or_pin",
+		       SESSION_BOTH);
+	option_add_int(&o_session_panel_position, "session_panel_position",
+		       PANEL_BOTTOM);
+	option_add_string(&o_session_panel_name, "session_panel_name",
+			  "Default");
+	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
+			  "Default");
+
 	/* The idea here is to convert the command-line arguments
 	 * into a SOAP RPC.
 	 * We attempt to invoke the call on an already-running copy of
@@ -419,7 +442,7 @@ int main(int argc, char **argv)
 						 c == 'r' ? "Right" :
 						 c == 't' ? "Top" :
 						 c == 'b' ? "Bottom" :
-						 "Unkown");
+						 "Unknown");
 				break;
 			case 'p':
 				soap_add(body, "Pinboard",
@@ -447,6 +470,12 @@ int main(int argc, char **argv)
 				if (!soap_rpc)
 					g_error("Invalid XML in RPC");
 				break;
+
+		        case 'S':
+				new_copy = TRUE;
+				add_default_panel_and_pinboard(body);
+				break;
+
 			default:
 				printf(_(USAGE));
 				return EXIT_FAILURE;
@@ -752,3 +781,39 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 	panel_update_size();
 	pinboard_update_size();
 }
+
+static void add_default_panel_and_pinboard(xmlNodePtr body)
+{
+	char *name, *side;
+
+
+	if(o_session_panel_or_pin.int_value != SESSION_PANEL_ONLY)
+	{
+		name=o_session_pinboard_name.value;
+		if(!name[0])
+			name="Default";
+		soap_add(body, "Pinboard","Name", name, NULL, NULL);
+	}
+					
+	if(o_session_panel_or_pin.int_value != SESSION_PINBOARD_ONLY)
+	{
+		name=o_session_panel_name.value;
+		if(!name[0])
+			name="Default";
+		
+		switch(o_session_panel_position.int_value) {
+		case PANEL_TOP: side="Top"; break;
+		case PANEL_BOTTOM: side="Bottom"; break;
+		case PANEL_LEFT: side="Left"; break;
+		case PANEL_RIGHT: side="Right"; break;
+
+		default:
+			side="Unknown";
+			break;
+		}
+		
+		soap_add(body, "Panel", "Name", name, "Side", side);
+	}
+
+}
+

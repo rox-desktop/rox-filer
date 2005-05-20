@@ -224,6 +224,32 @@
       </hbox>
     </frame>
   </section>
+
+  <section title='ROX-Session'>
+    <label help='1'>When run by the ROX-Session program the filer will open up a panel and/or the pinboard.  Here you configure which.</label>
+
+    <radio-group name='session_panel_or_pin'>
+      <radio label='Panel only' value='0'>Only a panel is shown</radio>
+      <radio label='Pinboard only' value='1'>Only the pinboard is shown</radio>
+      <radio label='Panel and pinboard' value='2'>Both a panel and a pinboard are shown</radio>
+    </radio-group>
+
+    <frame label='Panel'>
+      <radio-group name='session_panel_position'>
+        <radio label='Top panel' value='0'>The panel is shown at the top of the screen</radio>
+        <radio label='Bottom panel' value='1'>The panel is shown at the bottom of the screen</radio>
+        <radio label='Left panel' value='2'>The panel is shown at the left hand side of the screen</radio>
+        <radio label='Right panel' value='3'>The panel is shown at the right hand side of the screen</radio>
+      </radio-group>
+      <entry name='session_panel_name'>Enter the name of the panel to show here.</entry>
+    </frame>
+
+    <frame label='Pinboard'>
+      <entry name='session_pinboard_name'>Enter the name of the pinboard to show here.</entry>
+    </frame>
+
+    <label help='1'>Changes here take effect the next time the filer is run.</label>
+  </section>
   
   <section title='Action windows'>
     <label help='1'>Action windows appear when you start a background
