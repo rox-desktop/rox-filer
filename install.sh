@@ -74,22 +74,24 @@ case $REPLY in
 	1) APPDIR=/usr/local/apps
 	   BINDIR=/usr/local/bin
 	   SHAREDIR=/usr/local/share
-	   CHOICESDIR=${SHAREDIR}/Choices
+	   #CHOICESDIR=${SHAREDIR}/Choices
+	   XDGDATADIR=/usr/local/share
+	   CHOICESDIR=/etc/xdg
 	   MANDIR=/usr/local/man	# (not under share!)
 	   ;;
 	2) APPDIR=${HOME}/Apps
 	   BINDIR=${HOME}/bin
-	   if [ -n "$CHOICESPATH" ]; then
-		CHOICESDIR=`echo $CHOICESPATH | sed -e 's/^\([^:]*\).*$/\\1/'`
-	   fi
-	   if [ ! -n "$CHOICESDIR" ]; then
-	   	CHOICESDIR=${HOME}/Choices
-	   fi
 	   if [ -n "$XDG_DATA_HOME" ]; then
 	        SHAREDIR=${XDG_DATA_HOME}
 	   else
 	   	SHAREDIR=${HOME}/.local/share
 	   fi
+	   if [ -n "$XDG_CONFIG_HOME" ]; then
+	        CHOICESDIR=${XDG_CONFIG_HOME}
+	   else
+	   	CHOICESDIR=${HOME}/.config
+	   fi
+	   
 	   MANDIR=${HOME}/man
 	   if [ ! -d "$MANDIR" ]; then
 	     MANDIR=
@@ -98,7 +100,7 @@ case $REPLY in
 	3) APPDIR=/usr/apps
 	   BINDIR=/usr/bin
 	   SHAREDIR=/usr/share
-	   CHOICESDIR=${SHAREDIR}/Choices
+	   CHOICESDIR=/etc/xdg
 	   MANDIR=${SHAREDIR}/man
 	   ;;
 	4) echo "Where should the ROX-Filer application go?"
@@ -114,7 +116,7 @@ case $REPLY in
 	   SHAREDIR="$DIR"
 	   echo
 	   echo "Where should the default run actions go?"
-	   get_dir "$SHAREDIR/Choices"
+	   get_dir "/etc/xdg"
 	   CHOICESDIR="$DIR"
 	   echo
 	   echo "Where should the man pages go?"
@@ -126,7 +128,7 @@ case $REPLY in
            APPDIR="$DIR/apps"
 	   BINDIR="$DIR/bin"
 	   SHAREDIR="$DIR/share"
-	   CHOICESDIR=${SHAREDIR}/Choices
+	   CHOICESDIR=/etc/xdg
 	   MANDIR="$DIR/man"	# (not under share!)
 	   ;;
 
@@ -185,11 +187,11 @@ if [ -n "$MANDIR" ]; then
 fi
 
 echo "Installing run actions (existing actions will not be replaced)..."
-endir "$CHOICESDIR/MIME-types"
+endir "$CHOICESDIR/rox.sourceforge.net/MIME-types"
 cd Choices || die "Choices missing"
 for file in MIME-types/*; do
   if [ -f "$file" ]; then
-    dest="$CHOICESDIR/$file"
+    dest="$CHOICESDIR/rox.sourceforge.net/$file"
     if [ ! -f "$dest" ]; then
       if [ ! -d "$dest" ]; then
         echo Install $file as $dest
