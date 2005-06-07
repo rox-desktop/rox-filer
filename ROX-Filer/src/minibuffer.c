@@ -30,6 +30,9 @@
 #include <glob.h>
 #include <stdio.h>
 
+#include <sys/types.h>
+#include <pwd.h>
+ 
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 
@@ -426,13 +429,12 @@ static void complete(FilerWindow *filer_window)
 static void path_changed(FilerWindow *filer_window)
 {
 	GtkWidget *mini = filer_window->minibuffer;
-	const char	*new, *leaf;
-	char		*path;
+	const char	*rawnew, *leaf;
+	char		*path, *new;
 	gboolean	error = FALSE;
 
-	new = gtk_entry_get_text(GTK_ENTRY(mini));
-
-	if (!*new)
+	rawnew = gtk_entry_get_text(GTK_ENTRY(mini));
+	if (!*rawnew)
 	{
 		/* Entry may be blank because we're in the middle of changing
 		 * to something else...
@@ -441,11 +443,56 @@ static void path_changed(FilerWindow *filer_window)
 		return;
 	}
 
+	switch (rawnew[0])
+	{
+	case '/':
+		new=g_strdup(rawnew);
+		break;
+
+	case '~':
+		if (!rawnew[1] || rawnew[1]=='/')
+		{
+			new=g_strconcat(g_get_home_dir(), "/", 
+					     rawnew[1]? rawnew+2: "", "/", 
+					     NULL);
+		}
+		else
+		{
+			const char *sl;
+			gchar *username;
+			struct passwd *passwd;
+
+			
+			/* Need to lookup user name */
+			for(sl=rawnew+2; *sl && *sl!='/'; sl++)
+				;
+			username=g_strndup(rawnew+1, sl-rawnew-1);
+			passwd=getpwnam(username);
+			g_free(username);
+
+			if(passwd)
+			{
+				new=g_strconcat(passwd->pw_dir, "/", 
+					     sl+1, "/", 
+					     NULL);
+			}
+			else
+				new=g_strdup(rawnew);
+		}
+		break;
+
+	default:
+		new=g_strdup(rawnew);
+		break;
+	}
+		
+
 	leaf = g_basename(new);
 	if (leaf == new)
 		path = g_strdup("/");
 	else
 		path = g_path_get_dirname(new);
+	g_free(new);
 
 	if (strcmp(path, filer_window->sym_path) != 0)
 	{
