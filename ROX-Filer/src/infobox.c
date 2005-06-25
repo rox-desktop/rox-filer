@@ -242,25 +242,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 	gtk_label_set_selectable(GTK_LABEL(name), TRUE);
 	gtk_box_pack_start(GTK_BOX(hbox), name, FALSE, TRUE, 4);
 	
-	/* Make the name bolder and larger */
-	{
-		PangoAttribute *attr;
-		PangoAttrList *list;
-
-		list = pango_attr_list_new();
-
-		attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
-		attr->start_index = 0;
-		attr->end_index = -1;
-		pango_attr_list_insert(list, attr);
-
-		attr = pango_attr_scale_new(PANGO_SCALE_X_LARGE);
-		attr->start_index = 0;
-		attr->end_index = -1;
-		pango_attr_list_insert(list, attr);
-		
-		gtk_label_set_attributes(GTK_LABEL(name), list);
-	}
+	make_heading(name, PANGO_SCALE_X_LARGE);
 
 	/* List of file attributes */
 	add_frame(vbox, make_details(path, item, window));

@@ -1382,3 +1382,26 @@ rox_pixbuf_new_from_file_at_scale (const char *filename,
 
 	return pixbuf;
 }
+
+/* Make the name bolder and larger.
+ * scale_factor can be PANGO_SCALE_X_LARGE, etc.
+ */
+void make_heading(GtkWidget *label, double scale_factor)
+{
+	PangoAttribute *attr;
+	PangoAttrList *list;
+
+	list = pango_attr_list_new();
+
+	attr = pango_attr_weight_new(PANGO_WEIGHT_BOLD);
+	attr->start_index = 0;
+	attr->end_index = -1;
+	pango_attr_list_insert(list, attr);
+
+	attr = pango_attr_scale_new(scale_factor);
+	attr->start_index = 0;
+	attr->end_index = -1;
+	pango_attr_list_insert(list, attr);
+
+	gtk_label_set_attributes(GTK_LABEL(label), list);
+}
