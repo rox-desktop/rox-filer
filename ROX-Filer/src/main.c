@@ -116,7 +116,8 @@ GtkTooltips *tooltips = NULL;
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
-       "  -b, --border=PANEL	open PAN as a border panel\n"	\
+       "  -b, --border=PANEL	open PANEL as a border panel\n"	\
+       "  -B, --remove-panel=SIDE  remove panel (Top|Bottom|Left|Right)\n"  \
        "  -c, --client-id=ID	used for session management\n"		\
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -D, --close=DIR	close DIR and its subdirectories\n"     \
@@ -133,13 +134,14 @@ GtkTooltips *tooltips = NULL;
        "\nReport bugs to " BUGS_TO ".\n"		\
        "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
-#define SHORT_OPS "c:d:t:b:l:r:op:s:hvnux:m:D:RS"
+#define SHORT_OPS "c:d:t:b:l:r:B:op:s:hvnux:m:D:RS"
 
 #ifdef HAVE_GETOPT_LONG
 static struct option long_opts[] =
 {
 	{"dir", 1, NULL, 'd'},
 	{"top", 1, NULL, 't'},
+	{"remove-panel", 1, NULL, 'B'},
 	{"bottom", 1, NULL, 'b'},
 	{"border", 1, NULL, 'b'},
 	{"left", 1, NULL, 'l'},
@@ -441,6 +443,10 @@ int main(int argc, char **argv)
 
 				/* Argument is a leaf (or starts with /) */
 				soap_add(body, "Panel", "Name", VALUE,
+					 NULL, NULL);
+				break;
+			case 'B':
+				soap_add(body, "Panel", "Side", VALUE,
 					 NULL, NULL);
 				break;
 			case 'p':
