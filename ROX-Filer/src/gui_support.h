@@ -64,7 +64,7 @@ void tooltip_prime(GtkFunction callback, GObject *object);
 void widget_modify_font(GtkWidget *widget, PangoFontDescription *font_desc);
 gboolean confirm(const gchar *message, const gchar *stock, const gchar *action);
 
-Radios *radios_new(void (*changed)(gpointer data), gpointer data);
+Radios *radios_new(void (*changed)(Radios *, gpointer data), gpointer data);
 void radios_add(Radios *radios, const gchar *tip, gint value,
 		const gchar *label, ...);
 void radios_pack(Radios *radios, GtkBox *box);

@@ -12,7 +12,9 @@ typedef enum {
 	PANEL_LEFT,
 	PANEL_RIGHT,
 
-	PANEL_NUMBER_OF_SIDES	/* This goes last! */
+	PANEL_NUMBER_OF_SIDES,	/* (goes after valid sides) */
+
+	PANEL_DEFAULT_SIDE	/* Read from file, or use free side */
 } PanelSide;
 
 #define MENU_MARGIN(side) ((side) == PANEL_BOTTOM ? 32 : 8)
@@ -45,5 +47,6 @@ gboolean panel_remove_item(PanelSide side, const gchar *path,
 			   const gchar *label);
 void panel_mark_used(GdkRegion *used);
 void panel_update_size(void);
+PanelSide panel_name_to_side(gchar *side);
 
 #endif /* _PANEL_H */

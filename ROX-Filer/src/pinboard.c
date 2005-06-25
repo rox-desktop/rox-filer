@@ -229,8 +229,9 @@ static void update_pinboard_font(void);
 static void draw_lasso(void);
 static gint lasso_motion(GtkWidget *widget, GdkEventMotion *event, gpointer d);
 static void clear_backdrop(GtkWidget *drop_box, gpointer data);
-static void radios_changed(gpointer data);
+static void radios_changed(Radios *radios, gpointer data);
 static void update_radios(GtkWidget *dialog);
+static void pinboard_set_backdrop_box(void);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -657,7 +658,7 @@ void pinboard_set_backdrop_app(const gchar *app)
 }
 
 /* Open a dialog box allowing the user to set the backdrop */
-void pinboard_set_backdrop_box(void)
+static void pinboard_set_backdrop_box(void)
 {
 	GtkWidget *dialog, *frame, *label, *hbox;
 	GtkBox *vbox;
@@ -2096,13 +2097,17 @@ static void pin_icon_set_tip(PinIcon *pi)
 
 static void pinboard_show_menu(GdkEventButton *event, PinIcon *pi)
 {
+	GtkWidget	*option_item;
 	int		pos[3];
 	GList		*list;
 
 	pos[0] = event->x_root;
 	pos[1] = event->y_root;
 
-	icon_prepare_menu((Icon *) pi, TRUE);
+	option_item = gtk_image_menu_item_new_with_label(_("Backdrop..."));
+	g_signal_connect(option_item, "activate",
+			 G_CALLBACK(pinboard_set_backdrop_box), NULL);
+	icon_prepare_menu((Icon *) pi, option_item);
 
 	list = gtk_container_get_children(GTK_CONTAINER(icon_menu));
 	pos[2] = g_list_length(list) - 6;
@@ -2614,16 +2619,14 @@ static void update_pinboard_font(void)
 			: NULL;
 }
 
-static void radios_changed(gpointer data)
+static void radios_changed(Radios *radios, gpointer data)
 {
 	GObject *dialog = G_OBJECT(data);
 	DropBox *drop_box;
 	const guchar *path;
-	Radios *radios;
 
 	g_return_if_fail(dialog != NULL);
 
-	radios = g_object_get_data(G_OBJECT(dialog), "rox-radios");
 	drop_box = g_object_get_data(G_OBJECT(dialog), "rox-dropbox");
 
 	g_return_if_fail(radios != NULL);

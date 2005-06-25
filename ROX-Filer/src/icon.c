@@ -54,7 +54,7 @@
 #include "mount.h"
 #include "type.h"
 #include "usericons.h"
-#include "pinboard.h"	/* For pinboard_set_backdrop */
+#include "pinboard.h"	/* For pinboard_set_backdrop_box */
 
 static gboolean have_primary = FALSE;	/* We own the PRIMARY selection? */
 
@@ -62,6 +62,7 @@ GtkWidget		*icon_menu;		/* The popup icon menu */
 static GtkWidget	*icon_file_menu;	/* The file submenu */
 static GtkWidget	*icon_file_item;	/* 'File' label */
 static GtkWidget	*file_shift_item;	/* 'Shift Open' label */
+static GtkWidget	*current_options_item;	/* Pin/Pan Options */
 
 /* A list of selected Icons. Every icon in the list is from the same group
  * (eg, you can't have icons from two different panels selected at the
@@ -103,7 +104,6 @@ static void selection_get(GtkClipboard *primary,
 		       guint      info,
 		       gpointer   data);
 static void remove_items(gpointer data, guint action, GtkWidget *widget);
-static void set_backdrop(gpointer data, guint action, GtkWidget *widget);
 static void file_op(gpointer data, guint action, GtkWidget *widget);
 static void show_rename_box(Icon *icon);
 static void icon_set_selected_int(Icon *icon, gboolean selected);
@@ -111,7 +111,6 @@ static void icon_class_init(gpointer gclass, gpointer data);
 static void icon_init(GTypeInstance *object, gpointer gclass);
 static void icon_hash_path(Icon *icon);
 static void icon_unhash_path(Icon *icon);
-static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n);
 static void ungrab_key(Icon *icon);
 static void grab_key(Icon *icon);
 static void parseKeyString(MyKey *key, const char *str);
@@ -147,7 +146,6 @@ static GtkItemFactoryEntry menu_def[] = {
 {N_("Show Location"),  		NULL, file_op, ACTION_LOCATION, "<StockItem>", GTK_STOCK_JUMP_TO},
 {N_("Remove Item(s)"),		NULL, remove_items, 0, "<StockItem>", GTK_STOCK_REMOVE},
 {"",				NULL, NULL, 0, "<Separator>"},
-{N_("Backdrop..."),		NULL, set_backdrop, 0, NULL},
 };
 
 /****************************************************************
@@ -173,7 +171,7 @@ void icon_may_update(Icon *icon)
 	if (di_image(icon->item) != image || icon->item->flags != flags)
 	{
 		/* Appearance changed; need to redraw */
-		g_signal_emit_by_name(icon, "update");
+		g_signal_emit_by_name(icon, "redraw");
 	}
 
 	if (image)
@@ -232,17 +230,32 @@ gboolean icons_require(const gchar *path)
 /* Menu was clicked over this icon. Set things up correctly (shade items,
  * add app menu stuff, etc).
  * You should show icon_menu after calling this...
+ * panel_name is NULL for the pinboard.
  */
-void icon_prepare_menu(Icon *icon, gboolean pinboard)
+void icon_prepare_menu(Icon *icon, GtkWidget *options_item)
 {
+	GtkWidget *image;
+
 	appmenu_remove();
+
+	if (current_options_item)
+	{
+		gtk_widget_destroy(current_options_item);
+		current_options_item = NULL;
+	}
 
 	menu_icon = icon;
 
 	if (!icon_menu)
 		create_menu();
 
-	menu_set_hidden(icon_menu, !pinboard, 5, 2);
+	current_options_item = options_item;
+	image = gtk_image_new_from_stock(GTK_STOCK_PREFERENCES,
+						GTK_ICON_SIZE_MENU);
+	gtk_image_menu_item_set_image(GTK_IMAGE_MENU_ITEM(options_item), image);
+
+	gtk_menu_shell_append(GTK_MENU_SHELL(icon_menu), options_item);
+	gtk_widget_show_all(options_item);
 
 	/* Shade Remove Item(s) unless there is a selection */
 	menu_set_items_shaded(icon_menu,
@@ -585,11 +598,6 @@ static void selection_get(GtkClipboard	*primary,
 	}
 
 	gtk_selection_data_set_text(selection_data, text, strlen(text));
-}
-
-static void set_backdrop(gpointer data, guint action, GtkWidget *widget)
-{
-	pinboard_set_backdrop_box();
 }
 
 static void remove_items(gpointer data, guint action, GtkWidget *widget)
@@ -994,25 +1002,7 @@ static void icon_set_selected_int(Icon *icon, gboolean selected)
 	g_signal_emit_by_name(icon, "redraw");
 }
 
-static void menu_set_hidden(GtkWidget *menu, gboolean hidden, int from, int n)
-{
-	GList	*items, *item;
-
-	items = gtk_container_get_children(GTK_CONTAINER(menu));
-
-	item = g_list_nth(items, from);
-	while (item && n--)
-	{
-		if (hidden)
-			gtk_widget_hide(GTK_WIDGET(item->data));
-		else
-			gtk_widget_show(GTK_WIDGET(item->data));
-		item = item->next;
-	}
-	g_list_free(items);
-}
-
-/* Stolen from xfwm4 */
+/* From xfwm4 */
 static void initModifiers(void)
 {
 	static gboolean need_init = TRUE;

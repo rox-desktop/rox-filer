@@ -131,7 +131,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Show", rpc_Show, "Directory,Leafname", NULL);
 
 	soap_register("Pinboard", rpc_Pinboard, NULL, "Name");
-	soap_register("Panel", rpc_Panel, "Side", "Name");
+	soap_register("Panel", rpc_Panel, NULL, "Side,Name");
 
 	soap_register("FileType", rpc_FileType, "Filename", NULL);
 
@@ -830,22 +830,6 @@ static xmlNodePtr rpc_PinboardRemove(GList *args)
 	return NULL;
 }
 
-/* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
-static PanelSide panel_name_to_side(gchar *side)
-{
-	if (strcmp(side, "Top") == 0)
-		return PANEL_TOP;
-	else if (strcmp(side, "Bottom") == 0)
-		return PANEL_BOTTOM;
-	else if (strcmp(side, "Left") == 0)
-		return PANEL_LEFT;
-	else if (strcmp(side, "Right") == 0)
-		return PANEL_RIGHT;
-	else
-		g_warning("Unknown panel side '%s'", side);
-	return PANEL_NUMBER_OF_SIDES;
-}
-
 /* args = Side, [Name] */
 static xmlNodePtr rpc_Panel(GList *args)
 {
@@ -853,9 +837,14 @@ static xmlNodePtr rpc_Panel(GList *args)
 	char *name, *side_name;
 
 	side_name = string_value(ARG(0));
-	side = panel_name_to_side(side_name);
-	g_free(side_name);
-	g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
+	if (side_name)
+	{
+		side = panel_name_to_side(side_name);
+		g_free(side_name);
+		g_return_val_if_fail(side != PANEL_NUMBER_OF_SIDES, NULL);
+	}
+	else
+		side = PANEL_DEFAULT_SIDE;
 
 	name = string_value(ARG(1));
 

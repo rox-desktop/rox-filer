@@ -840,7 +840,7 @@ gboolean confirm(const gchar *message, const gchar *stock, const gchar *action)
 struct _Radios {
 	GList *widgets;
 
-	void (*changed)(gpointer data);
+	void (*changed)(Radios *, gpointer data);
 	gpointer changed_data;
 };
 
@@ -850,7 +850,7 @@ struct _Radios {
  * changed(data) is called (if not NULL) when pack is called, and on any
  * change after that.
  */
-Radios *radios_new(void (*changed)(gpointer data), gpointer data)
+Radios *radios_new(void (*changed)(Radios *, gpointer data), gpointer data)
 {
 	Radios *radios;
 
@@ -910,8 +910,11 @@ static void radio_toggled(GtkToggleButton *button, Radios *radios)
 {
 	g_return_if_fail(radios != NULL);
 
+	if (button && !gtk_toggle_button_get_active(button))
+		return;	/* Stop double-notifies */
+
 	if (radios->changed)
-		radios->changed(radios->changed_data);
+		radios->changed(radios, radios->changed_data);
 }
 
 void radios_pack(Radios *radios, GtkBox *box)

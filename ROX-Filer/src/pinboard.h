@@ -28,7 +28,6 @@ void pinboard_pin_with_args(const gchar *path, const gchar *name, int x, int y,
 gboolean pinboard_remove(const gchar *path, const gchar *name);
 void pinboard_move_icons(void);
 const gchar *pinboard_get_name(void);
-void pinboard_set_backdrop_box(void);
 void pinboard_set_backdrop_app(const gchar *app);
 GdkWindow *pinboard_get_window(void);
 void pinboard_add_widget(GtkWidget *widget, const gchar *name);

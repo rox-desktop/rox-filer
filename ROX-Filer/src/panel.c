@@ -93,6 +93,8 @@ Panel *current_panel[PANEL_NUMBER_OF_SIDES];
 /* NULL => Not loading a panel */
 static Panel *loading_panel = NULL;
 
+static GtkWidget *panel_options_dialog = NULL;
+
 /* Static prototypes */
 static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel);
 static void panel_destroyed(GtkWidget *widget, Panel *panel);
@@ -199,6 +201,7 @@ static gboolean panel_check_xinerama(void);
 static GList *build_monitor_number(Option *option,
 					xmlNode *node, guchar *label);
 static gboolean may_autoscroll(Panel *panel);
+static void panel_show_options(gpointer data);
 
 
 static GtkWidget *dnd_highlight = NULL; /* (stops flickering) */
@@ -240,18 +243,81 @@ void panel_init(void)
 	panel_check_xinerama();
 }
 
+/* Return a free edge for a new panel.
+ * If no edge is free, returns PANEL_BOTTOM.
+ */
+static PanelSide find_free_side()
+{
+	if (!current_panel[PANEL_BOTTOM])
+		return PANEL_BOTTOM;
+
+	if (!current_panel[PANEL_TOP])
+		return PANEL_TOP;
+
+	if (!current_panel[PANEL_LEFT])
+		return PANEL_LEFT;
+
+	if (!current_panel[PANEL_RIGHT])
+		return PANEL_RIGHT;
+
+	return PANEL_BOTTOM;
+}
+
 /* 'name' may be NULL or "" to remove the panel */
 Panel *panel_new(const gchar *name, PanelSide side)
 {
 	guchar	*load_path;
 	Panel	*panel;
-	GtkWidget	*vp, *box, *frame, *align;
+	GtkWidget *vp, *box, *frame, *align;
+	xmlDocPtr panel_doc = NULL;
+	gboolean need_resave = FALSE;
 
-	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, NULL);
+	g_return_val_if_fail(side == PANEL_DEFAULT_SIDE ||
+			(side >= 0 && side < PANEL_NUMBER_OF_SIDES), NULL);
 	g_return_val_if_fail(loading_panel == NULL, NULL);
 
 	if (name && *name == '\0')
 		name = NULL;
+
+	if (!name)
+		load_path = NULL;
+	else if (strchr(name, '/'))
+		load_path = g_strdup(name);
+	else
+	{
+		guchar	*leaf;
+
+		leaf = g_strconcat("pan_", name, NULL);
+		load_path = choices_find_xdg_path_load(leaf, PROJECT, SITE);
+		g_free(leaf);
+	}
+
+	if (load_path && access(load_path, F_OK) == 0)
+	{
+		char *saved_side;
+		xmlNodePtr root;
+
+		panel_doc = xmlParseFile(load_path);
+		root = xmlDocGetRootElement(panel_doc);
+
+		saved_side = xmlGetProp(root, "side");
+		if (saved_side)
+		{
+			PanelSide old_side;
+			old_side = panel_name_to_side(saved_side);
+			g_free(saved_side);
+
+			if (side == PANEL_DEFAULT_SIDE)
+				side = old_side;
+			else if (side != old_side)
+				need_resave = TRUE;
+		}
+		else
+			need_resave = TRUE;
+	}
+
+	if (side == PANEL_DEFAULT_SIDE)
+		side = find_free_side();
 
 	if (current_panel[side])
 	{
@@ -298,17 +364,6 @@ Panel *panel_new(const gchar *name, PanelSide side)
 			G_CALLBACK(panel_motion_event), panel);
 	g_signal_connect(panel->window, "leave-notify-event",
 			G_CALLBACK(panel_leave_event), panel);
-
-	if (strchr(name, '/'))
-		load_path = g_strdup(name);
-	else
-	{
-		guchar	*leaf;
-
-		leaf = g_strconcat("pan_", name, NULL);
-		load_path = choices_find_xdg_path_load(leaf, PROJECT, SITE);
-		g_free(leaf);
-	}
 
 	if (panel->side == PANEL_RIGHT)
 		align = gtk_alignment_new(1.0, 0.0, 0.0, 1.0);
@@ -370,22 +425,20 @@ Panel *panel_new(const gchar *name, PanelSide side)
 	gtk_widget_show_all(align);
 	
 	loading_panel = panel;
-	if (load_path && access(load_path, F_OK) == 0)
+	if (panel_doc)
 	{
-		xmlDocPtr doc;
-		doc = xmlParseFile(load_path);
-		if (doc)
-		{
-			panel_load_from_xml(panel, doc);
-			xmlFreeDoc(doc);
-		}
-		else
-		{
-			parse_file(load_path, pan_from_file);
-			info_message(_("Your old panel file has been "
-					"converted to the new XML format."));
+		panel_load_from_xml(panel, panel_doc);
+		xmlFreeDoc(panel_doc);
+
+		if (need_resave)
 			panel_save(panel);
-		}
+	}
+	else if (load_path)
+	{
+		parse_file(load_path, pan_from_file);
+		info_message(_("Your old panel file has been "
+					"converted to the new XML format."));
+		panel_save(panel);
 	}
 	else
 	{
@@ -498,6 +551,16 @@ static int panel_delete(GtkWidget *widget, GdkEvent *event, Panel *panel)
 
 static void panel_destroyed(GtkWidget *widget, Panel *panel)
 {
+	if (panel_options_dialog)
+	{
+		PanelSide side;
+		side = GPOINTER_TO_INT(g_object_get_data(
+					G_OBJECT(panel_options_dialog),
+					 "rox-panel-side"));
+		if (side == panel->side)
+			gtk_widget_destroy(panel_options_dialog);
+	}
+
 	if (current_panel[panel->side] == panel)
 		current_panel[panel->side] = NULL;
 
@@ -1418,7 +1481,7 @@ void panel_save(Panel *panel)
 	guchar	*save_new = NULL;
 
 	g_return_if_fail(panel != NULL);
-	
+
 	if (strchr(panel->name, '/'))
 		save = g_strdup(panel->name);
 	else
@@ -1437,6 +1500,13 @@ void panel_save(Panel *panel)
 	xmlDocSetRootElement(doc, xmlNewDocNode(doc, NULL, "panel", NULL));
 
 	root = xmlDocGetRootElement(doc);
+
+	xmlSetProp(root, "side",
+			panel->side == PANEL_TOP ? "Top" :
+			panel->side == PANEL_BOTTOM ? "Bottom" :
+			panel->side == PANEL_LEFT ? "Left" :
+			"Right");
+	
 	make_widgets(xmlNewChild(root, NULL, "start", NULL),
 		gtk_container_get_children(GTK_CONTAINER(panel->before)));
 
@@ -2100,6 +2170,7 @@ static void panel_icon_redraw(Icon *icon)
 			icon->selected ? GTK_STATE_SELECTED
 				       : GTK_STATE_NORMAL);
 	gtk_widget_queue_draw(PANEL_ICON(icon)->widget);
+	panel_icon_set_tip((PanelIcon *) icon);
 }
 
 static void panel_icon_update(Icon *icon)
@@ -2108,7 +2179,6 @@ static void panel_icon_update(Icon *icon)
 
 	gtk_widget_queue_draw(pi->widget);
 	gtk_label_set_text(GTK_LABEL(pi->label), icon->item->leafname);
-	panel_icon_set_tip(pi);
 	panel_save(pi->panel);
 }
 
@@ -2249,6 +2319,7 @@ static void panel_position_menu(GtkMenu *menu, gint *x, gint *y,
 
 static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 {
+	GtkWidget	*option_item;
 	PanelSide	side = panel->side;
 	int		pos[4];
 
@@ -2261,7 +2332,12 @@ static void panel_show_menu(GdkEventButton *event, PanelIcon *pi, Panel *panel)
 				gdk_screen_get_default(),
 				event->x_root, event->y_root);
 
-	icon_prepare_menu((Icon *) pi, FALSE);
+	option_item = gtk_image_menu_item_new_with_label(_("Panel Options..."));
+	g_signal_connect_swapped(option_item, "activate",
+			 G_CALLBACK(panel_show_options),
+			 GINT_TO_POINTER(panel->side));
+
+	icon_prepare_menu((Icon *) pi, option_item);
 
 	if (side == PANEL_LEFT)
 		pos[0] = -2;
@@ -2375,3 +2451,122 @@ static GList *build_monitor_number(Option *option, xmlNode *node, guchar *label)
 				0, n_monitors - 1, 1, 10, 1);
 	return build_numentry_base(option, node, label, GTK_ADJUSTMENT(adj));
 }
+
+static void side_changed(Radios *radios, gpointer data)
+{
+	Panel *panel;
+	PanelSide side, new_side;
+	GObject *dialog = G_OBJECT(data);
+	char *name, *other_side_name;
+
+	side = GPOINTER_TO_INT(g_object_get_data(dialog, "rox-panel-side"));
+	g_return_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES);
+	panel = current_panel[side];
+	g_return_if_fail(panel != NULL);
+
+	new_side = radios_get_value(radios);
+
+	if (new_side == side)
+		return;
+
+	name = g_strdup(panel->name);
+	other_side_name = current_panel[new_side]
+			? g_strdup(current_panel[new_side]->name)
+			: NULL;
+
+	panel_new(name, new_side);
+	g_object_set_data(G_OBJECT(dialog), "rox-panel-side",
+			GINT_TO_POINTER(new_side));
+	panel_new(other_side_name, side);
+
+	g_free(name);
+	g_free(other_side_name);
+}
+
+static void panel_show_options(gpointer data)
+{
+	GtkWidget *dialog;
+	GtkWidget *vbox, *label;
+	Radios *radios;
+	Panel *panel;
+	PanelSide side = GPOINTER_TO_INT(data);
+	char *tmp;
+
+	g_return_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES);
+	panel = current_panel[side];
+	g_return_if_fail(panel != NULL);
+
+	if (panel_options_dialog)
+		gtk_widget_destroy(panel_options_dialog);
+
+	dialog = gtk_dialog_new_with_buttons(_("Panel Options"), NULL,
+			GTK_DIALOG_NO_SEPARATOR,
+			GTK_STOCK_CLOSE, GTK_RESPONSE_OK,
+			NULL);
+	panel_options_dialog = dialog;
+
+	g_object_set_data(G_OBJECT(dialog), "rox-panel-side",
+			GINT_TO_POINTER(panel->side));
+
+	vbox = gtk_vbox_new(FALSE, 0);
+	gtk_box_pack_start(GTK_BOX(GTK_DIALOG(dialog)->vbox),
+			vbox, TRUE, TRUE, 0);
+
+	gtk_container_set_border_width(GTK_CONTAINER(vbox), 8);
+
+	tmp = g_strdup_printf(_("Panel: %s"), panel->name);
+	label = gtk_label_new(tmp);
+	make_heading(label, PANGO_SCALE_LARGE);
+	gtk_misc_set_alignment(GTK_MISC(label), 0, 0);
+	gtk_box_pack_start(GTK_BOX(vbox), label, FALSE, TRUE, 0);
+	g_free(tmp);
+
+	gtk_box_pack_start(GTK_BOX(vbox),
+			gtk_label_new(_("Select the panel's position:")),
+			FALSE, TRUE, 4);
+
+	/* Radio buttons to set the side */
+	radios = radios_new(side_changed, dialog);
+
+	radios_add(radios, _("Top-edge panel"),
+			PANEL_TOP, _("Top edge"));
+	radios_add(radios, _("Bottom edge panel"),
+			PANEL_BOTTOM, _("Bottom edge"));
+	radios_add(radios, _("Left edge panel"),
+			PANEL_LEFT, _("Left edge"));
+	radios_add(radios, _("Right-edge panel"),
+			PANEL_RIGHT, _("Right edge"));
+
+	radios_set_value(radios, panel->side);
+
+	radios_pack(radios, GTK_BOX(vbox));
+
+	g_signal_connect(dialog, "destroy",
+			G_CALLBACK(gtk_widget_destroyed),
+			&panel_options_dialog);
+
+	gtk_window_set_position(GTK_WINDOW(dialog), GTK_WIN_POS_MOUSE);
+
+	g_signal_connect(dialog, "response",
+			 G_CALLBACK(gtk_widget_destroy), NULL);
+	gtk_dialog_set_default_response(GTK_DIALOG(dialog), GTK_RESPONSE_OK);
+
+	gtk_widget_show_all(dialog);
+}
+
+/* Returns PANEL_NUMBER_OF_SIDES if name is invalid */
+PanelSide panel_name_to_side(gchar *side)
+{
+	if (strcmp(side, "Top") == 0)
+		return PANEL_TOP;
+	else if (strcmp(side, "Bottom") == 0)
+		return PANEL_BOTTOM;
+	else if (strcmp(side, "Left") == 0)
+		return PANEL_LEFT;
+	else if (strcmp(side, "Right") == 0)
+		return PANEL_RIGHT;
+	else
+		g_warning("Unknown panel side '%s'", side);
+	return PANEL_NUMBER_OF_SIDES;
+}
+

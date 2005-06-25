@@ -116,20 +116,17 @@ GtkTooltips *tooltips = NULL;
 #define HELP N_("Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"	\
        "Open each directory or file listed, or the current working\n"	\
        "directory if no arguments are given.\n\n"			\
-       "  -b, --bottom=PANEL	open PAN as a bottom-edge panel\n"	\
+       "  -b, --border=PANEL	open PAN as a border panel\n"	\
        "  -c, --client-id=ID	used for session management\n"		\
        "  -d, --dir=DIR		open DIR as directory (not application)\n"  \
        "  -D, --close=DIR	close DIR and its subdirectories\n"     \
        "  -h, --help		display this help and exit\n"		\
-       "  -l, --left=PANEL	open PAN as a left-edge panel\n"	\
        "  -m, --mime-type=FILE	print MIME type of FILE and exit\n" \
        "  -n, --new		start new copy; for debugging the filer\n"  \
        "  -p, --pinboard=PIN	use pinboard PIN as the pinboard\n"	\
-       "  -r, --right=PANEL	open PAN as a right-edge panel\n"	\
        "  -R, --RPC		invoke method call read from stdin\n"	\
        "  -s, --show=FILE	open a directory showing FILE\n"	\
        "  -S, --rox-session	use default panel and pinboard options, and -n\n"\
-       "  -t, --top=PANEL	open PANEL as a top-edge panel\n"	\
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
@@ -144,6 +141,7 @@ static struct option long_opts[] =
 	{"dir", 1, NULL, 'd'},
 	{"top", 1, NULL, 't'},
 	{"bottom", 1, NULL, 'b'},
+	{"border", 1, NULL, 'b'},
 	{"left", 1, NULL, 'l'},
 	{"override", 0, NULL, 'o'},
 	{"pinboard", 1, NULL, 'p'},
@@ -436,13 +434,14 @@ int main(int argc, char **argv)
 			case 'r':
 			case 't':
 			case 'b':
+				/* We used to have --top, --bottom,
+				 * --left and --right. Now, treat them all
+				 * as --border.
+				 */
+
 				/* Argument is a leaf (or starts with /) */
 				soap_add(body, "Panel", "Name", VALUE,
-					 "Side", c == 'l' ? "Left" :
-						 c == 'r' ? "Right" :
-						 c == 't' ? "Top" :
-						 c == 'b' ? "Bottom" :
-						 "Unknown");
+					 NULL, NULL);
 				break;
 			case 'p':
 				soap_add(body, "Pinboard",
