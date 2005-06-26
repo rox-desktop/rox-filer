@@ -226,8 +226,8 @@
     </frame>
   </section>
 
-  <section title='ROX-Session'>
-    <label help='1'>When run by the ROX-Session program the filer will open up a panel and/or the pinboard.  Here you configure which.</label>
+  <section title='Desktop'>
+    <label help='1'>When run by a session manager program (such as ROX-Session)the filer can open up a panel and/or the pinboard.  Here you configure which.</label>
 
     <radio-group name='session_panel_or_pin'>
       <radio label='Panel only' value='0'>Only a panel is shown</radio>
@@ -250,6 +250,7 @@
     </frame>
 
     <label help='1'>Changes here take effect the next time the filer is run.</label>
+    <label help='1'>The session manager activates these options by using the -S or --rox-session argument to rox.</label>
   </section>
   
   <section title='Action windows'>
