@@ -67,16 +67,6 @@ fi
 ROX_REQUIRE(gtk+-2.0, 2.4.0)
 ROX_REQUIRE(libxml-2.0, 2.0.0)
 
-AC_MSG_CHECKING(for GNOME VFS 2.8 or later)
-if "$PKG_CONFIG" --atleast-version=2.8.0 "gnome-vfs-2.0" ; then
-  LIBS="$LIBS `$PKG_CONFIG --libs gnome-vfs-2.0`"
-  CFLAGS="$CFLAGS `$PKG_CONFIG --cflags gnome-vfs-2.0`"
-  AC_DEFINE(HAVE_GNOME_VFS)
-  AC_MSG_RESULT(yes)
-else
-  AC_MSG_RESULT(no)
-fi
-
 GTK_VERSION=`"$PKG_CONFIG" --modversion gtk+-2.0`
 AC_DEFINE_UNQUOTED(GTK_VERSION, "$GTK_VERSION")
 
@@ -140,7 +130,7 @@ dnl Checks for header files.
 AC_HEADER_DIRENT
 AC_HEADER_STDC
 AC_HEADER_SYS_WAIT
-AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h apsymbols.h apbuild/apsymbols.h sys/statvfs.h sys/vfs.h)
+AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h mntent.h sys/ucred.h sys/mntent.h apsymbols.h apbuild/apsymbols.h sys/statvfs.h sys/vfs.h wctype.h)
 
 AC_CHECK_HEADER([X11/SM/SMlib.h], [],
   [AC_MSG_ERROR([Session management library (libsm) missing. It is part of the X server distribution. Try installing the libsm-dev package.])]
@@ -152,7 +142,7 @@ AC_TYPE_UID_T
 AC_TYPE_SIZE_T
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol statvfs statfs)
+AC_CHECK_FUNCS(gethostname unsetenv mkdir rmdir strdup strtol statvfs statfs mbrtowc)
 
 dnl getopt_long may be in an addtional library
 AC_CHECK_LIB(gnugetopt, getopt_long)

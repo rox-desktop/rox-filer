@@ -215,16 +215,13 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 MIME_type *mime_type_from_contents(const char *path)
 {
 	MIME_type *type = NULL;
-#ifdef HAVE_GNOME_VFS
-	char *type_name;
+	const char *type_name;
 
-	type_name = gnome_vfs_get_mime_type(path);
+	type_name = xdg_mime_get_mime_type_for_file(path);
 	if (type_name)
 	{
 		type = get_mime_type(type_name, TRUE);
-		free(type_name);
 	}
-#endif
 	return type;
 }
 
