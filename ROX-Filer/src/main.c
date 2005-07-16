@@ -175,7 +175,6 @@ enum {
 	SESSION_BOTH,
 };
 Option o_session_panel_or_pin;
-Option o_session_panel_position;
 Option o_session_panel_name;
 Option o_session_pinboard_name;
 
@@ -332,8 +331,6 @@ int main(int argc, char **argv)
 
 	option_add_int(&o_session_panel_or_pin, "session_panel_or_pin",
 		       SESSION_BOTH);
-	option_add_int(&o_session_panel_position, "session_panel_position",
-		       PANEL_BOTTOM);
 	option_add_string(&o_session_panel_name, "session_panel_name",
 			  "Default");
 	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
@@ -796,36 +793,22 @@ static void xrandr_size_change(GdkScreen *screen, gpointer user_data)
 
 static void add_default_panel_and_pinboard(xmlNodePtr body)
 {
-	char *name, *side;
+	char *name;
 
-
-	if(o_session_panel_or_pin.int_value != SESSION_PANEL_ONLY)
+	if (o_session_panel_or_pin.int_value != SESSION_PANEL_ONLY)
 	{
 		name=o_session_pinboard_name.value;
-		if(!name[0])
+		if (!name[0])
 			name="Default";
 		soap_add(body, "Pinboard","Name", name, NULL, NULL);
 	}
 					
-	if(o_session_panel_or_pin.int_value != SESSION_PINBOARD_ONLY)
+	if (o_session_panel_or_pin.int_value != SESSION_PINBOARD_ONLY)
 	{
-		name=o_session_panel_name.value;
-		if(!name[0])
+		name = o_session_panel_name.value;
+		if (!name[0])
 			name="Default";
 		
-		switch(o_session_panel_position.int_value) {
-		case PANEL_TOP: side="Top"; break;
-		case PANEL_BOTTOM: side="Bottom"; break;
-		case PANEL_LEFT: side="Left"; break;
-		case PANEL_RIGHT: side="Right"; break;
-
-		default:
-			side="Unknown";
-			break;
-		}
-		
-		soap_add(body, "Panel", "Name", name, "Side", side);
+		soap_add(body, "Panel", "Name", name, NULL, NULL);
 	}
-
 }
-
