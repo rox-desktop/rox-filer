@@ -497,8 +497,7 @@ const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 		 * executable file then act as though the drop is to the
 		 * window background.
 		 */
-		if (item->base_type != TYPE_DIRECTORY
-				&& !(item->mime_type == application_executable))
+		if (item->base_type != TYPE_DIRECTORY && !EXECUTABLE_FILE(item))
 		{
 			item = NULL;
 			*item_p = NULL;

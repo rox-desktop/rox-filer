@@ -46,8 +46,6 @@
 #include "pixmaps.h"
 #include "xtypes.h"
 
-static Option o_ignore_exec;
-
 #define RECENT_DELAY (5 * 60)	/* Time in seconds to consider a file recent */
 #define ABOUT_NOW(time) (diritem_recent_time - time < RECENT_DELAY)
 /* If you want to make use of the RECENT flag, make sure this is set to
@@ -65,8 +63,6 @@ static void examine_dir(const guchar *path, DirItem *item,
 
 void diritem_init(void)
 {
-	option_add_int(&o_ignore_exec, "display_ignore_exec", TRUE);
-
 	read_globicons();
 }
 
@@ -174,20 +170,6 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		else
 			item->mime_type = xtype_get(path);
 
-		/* Note: for symlinks we need the mode of the target */
-		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-		{
-			/* Note that the flag is set for ALL executable
-			 * files, but the mime_type is only
-			 * application_executable if the file doesn't have a
-			 * known extension when that option is in force.
-			 */
-			item->flags |= ITEM_FLAG_EXEC_FILE;
-
-			if (!o_ignore_exec.int_value)
-				item->mime_type = application_executable;
-		}
-
 		if (!item->mime_type)
 		{
 			if (item->size == 0)
@@ -196,10 +178,16 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 				item->mime_type = mime_type_from_contents(path);
 		}
 
+		/* If we still haven't got a MIME type yet, guess from the executable flag.
+		 * Note: for symlinks we need the mode of the target.
+		 */
 		if (!item->mime_type)
-			item->mime_type = item->flags & ITEM_FLAG_EXEC_FILE
-						? application_executable
-						: text_plain;
+		{
+			if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+				item->mime_type = application_executable;
+			else
+				item->mime_type = text_plain;
+		}
 
 		check_globicon(path, item);
 	}

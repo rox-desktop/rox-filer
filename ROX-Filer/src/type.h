@@ -28,6 +28,7 @@ struct _MIME_type
 
 	/* Private: use mime_type_comment() instead */
 	char		*comment;	/* Name in local language */
+	gboolean	executable;	/* Subclass of application/x-executable */
 };
 
 /* Prototypes */
@@ -50,5 +51,7 @@ void reread_mime_files(void);
 extern const char *mime_type_comment(MIME_type *type);
 extern MIME_type *mime_type_lookup(const char *type);
 extern GList *mime_type_name_list(void);
+
+#define EXECUTABLE_FILE(item) ((item)->mime_type && (item)->mime_type->executable)
 
 #endif /* _TYPE_H */

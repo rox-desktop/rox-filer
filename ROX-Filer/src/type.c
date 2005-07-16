@@ -58,6 +58,7 @@
 #include "action.h"		/* (for action_chmod) */
 #include "xml.h"
 #include "dropbox.h"
+#include "xdgmime.h"
 
 #define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
 enum {SET_MEDIA, SET_TYPE};
@@ -205,6 +206,8 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	mtype->subtype = g_strdup(slash + 1);
 	mtype->image = NULL;
 	mtype->comment = NULL;
+
+	mtype->executable = xdg_mime_mime_type_subclass(type_name, "application/x-executable");
 
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
@@ -661,7 +664,8 @@ static guchar *handler_for_radios(GObject *dialog)
 	}
 }
 
-static void run_action_update(gpointer data)
+/* (radios can be NULL if called from clear_run_action) */
+static void run_action_update(Radios *radios, gpointer data)
 {
 	guchar *handler;
 	DropBox *drop_box;
@@ -697,7 +701,7 @@ static void clear_run_action(GtkWidget *drop_box, GtkWidget *dialog)
 	if (handler)
 		remove_handler_with_confirm(handler);
 
-	run_action_update(dialog);
+	run_action_update(NULL, dialog);
 }
 
 /* Called when a URI list is dropped onto the box in the Set Run Action
@@ -712,7 +716,7 @@ static void drag_app_dropped(GtkWidget	*drop_box,
 
 	item = diritem_new("");
 	diritem_restat(app, item, NULL);
-	if (item->flags & (ITEM_FLAG_APPDIR | ITEM_FLAG_EXEC_FILE))
+	if (item->flags & ITEM_FLAG_APPDIR || EXECUTABLE_FILE(item))
 	{
 		guchar	*path;
 
@@ -788,7 +792,7 @@ gchar *describe_current_command(MIME_type *type)
 
 	g_return_val_if_fail(type != NULL, NULL);
 
-	if (type == application_executable)
+	if (type->executable)
 		return g_strdup(_("Execute file"));
 
 	handler = handler_for(type);
@@ -1094,8 +1098,7 @@ gboolean can_set_run_action(DirItem *item)
 {
 	g_return_val_if_fail(item != NULL, FALSE);
 
-	return item->base_type == TYPE_FILE &&
-		!(item->mime_type == application_executable);
+	return item->base_type == TYPE_FILE && !EXECUTABLE_FILE(item);
 }
 
 /* Parse file type colours and allocate/free them as necessary */
@@ -1171,8 +1174,7 @@ GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 	if (!o_display_colour_types.int_value)
 		return normal;
 
-	if (item->flags & ITEM_FLAG_EXEC_FILE &&
-	    item->mime_type == application_executable)
+	if (EXECUTABLE_FILE(item))
 		type = TYPE_EXEC;
 	else if (item->flags & ITEM_FLAG_APPDIR)
 		type = TYPE_APPDIR;

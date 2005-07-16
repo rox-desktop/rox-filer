@@ -72,7 +72,7 @@ static gboolean set_icon_for_type(MIME_type *type, const gchar *iconpath,
 				  gboolean just_media);
 static void delete_globicon(const gchar *path);
 static gboolean convert_to_png(const gchar *src, const gchar *dest);
-static void radios_changed(gpointer data);
+static void radios_changed(Radios *radios, gpointer data);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -246,7 +246,7 @@ static void clear_icon(DropBox *drop_box, GObject *dialog)
 	}
 
 	full_refresh();
-	radios_changed(dialog);
+	radios_changed(g_object_get_data(dialog, "radios"), dialog);
 }
 
 /* Display a dialog box allowing the user to set the icon for
@@ -340,16 +340,15 @@ void icon_set_handler_dialog(DirItem *item, const guchar *path)
  *			INTERNAL FUNCTIONS			*
  ****************************************************************/
 
-/* The dropbox shows the path for the currently selected radio setting */
-static void radios_changed(gpointer data)
+/* The dropbox shows the path for the currently selected radio setting.
+ */
+static void radios_changed(Radios *radios, gpointer data)
 {
 	GObject *dialog = G_OBJECT(data);
 	DropBox *drop_box;
-	Radios *radios;
 	const guchar *path;
 	MIME_type *mime_type;
 
-	radios = g_object_get_data(dialog, "radios");
 	path = g_object_get_data(dialog, "pathname");
 	drop_box = g_object_get_data(dialog, "rox-dropbox");
 	mime_type = g_object_get_data(dialog, "mime-type");
