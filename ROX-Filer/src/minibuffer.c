@@ -430,7 +430,8 @@ static void path_changed(FilerWindow *filer_window)
 {
 	GtkWidget *mini = filer_window->minibuffer;
 	const char	*rawnew, *leaf;
-	char		*path, *new;
+	char		*path;
+	char		*new = NULL;
 	gboolean	error = FALSE;
 
 	rawnew = gtk_entry_get_text(GTK_ENTRY(mini));
@@ -492,7 +493,6 @@ static void path_changed(FilerWindow *filer_window)
 		path = g_strdup("/");
 	else
 		path = g_path_get_dirname(new);
-	g_free(new);
 
 	if (strcmp(path, filer_window->sym_path) != 0)
 	{
@@ -520,6 +520,7 @@ static void path_changed(FilerWindow *filer_window)
 			error = TRUE;
 	}
 		
+	g_free(new);
 	g_free(path);
 
 	entry_set_error(mini, error);
