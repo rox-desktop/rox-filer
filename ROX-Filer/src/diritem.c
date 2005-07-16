@@ -170,6 +170,16 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		else
 			item->mime_type = xtype_get(path);
 
+		/* Note: for symlinks we need the mode of the target */
+		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
+		{
+			/* Note that the flag is set for ALL executable
+			 * files, but the mime_type must also be executable
+			 * for clicking on the file to run it.
+			 */
+			item->flags |= ITEM_FLAG_EXEC_FILE;
+		}		
+
 		if (!item->mime_type)
 		{
 			if (item->size == 0)

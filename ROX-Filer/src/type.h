@@ -52,6 +52,7 @@ extern const char *mime_type_comment(MIME_type *type);
 extern MIME_type *mime_type_lookup(const char *type);
 extern GList *mime_type_name_list(void);
 
-#define EXECUTABLE_FILE(item) ((item)->mime_type && (item)->mime_type->executable)
+#define EXECUTABLE_FILE(item) ((item)->mime_type && (item)->mime_type->executable && \
+				((item)->flags & ITEM_FLAG_EXEC_FILE))
 
 #endif /* _TYPE_H */

@@ -17,6 +17,7 @@ typedef enum
 	ITEM_FLAG_APPDIR  	= 0x02,	/* Contains an AppRun */
 	ITEM_FLAG_MOUNT_POINT  	= 0x04,	/* Is mounted or in fstab */
 	ITEM_FLAG_MOUNTED  	= 0x08,	/* Is mounted */
+	ITEM_FLAG_EXEC_FILE  	= 0x20,	/* File, and has an X bit set */
 	ITEM_FLAG_MAY_DELETE	= 0x40, /* Delete on finishing scan */
 	ITEM_FLAG_RECENT	= 0x80, /* [MC]-time is around now */
 
