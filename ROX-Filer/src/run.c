@@ -521,7 +521,7 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
 		GList	*paths;
 
 		paths = g_list_prepend(NULL, (gpointer) full_path);
-		action_mount(paths, filer_window == NULL, -1);
+		action_mount(paths, filer_window == NULL, !mounted, -1);
 		g_list_free(paths);
 		if (filer_window && !mounted)
 			filer_change_to(filer_window, full_path, NULL);

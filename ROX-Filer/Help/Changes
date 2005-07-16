@@ -9,8 +9,13 @@ Mark files as executable if their MIME type is a subclass of
 application/x-executable (Thomas Leonard).
 Removed the option for choosing panel side for -S, since we can use the new
 method of choosing the panel side indead (Thomas Leonard).
+Split Mount SOAP operation into separate Mount and Unmount operations
+(Thomas Leonard).
 Bugfix: The path entry buffer didn't work in /, due to recent changes
 	(Thomas Leonard).
+Bugfix: Clicking on a directory which was mounted but shown as unmounted,
+	due to the display being out-of-date, tried to unmount it.
+	(Thomas Leonard, reported by Mephistopheles Jones as bug #1007402).
 
 15-Jul-2005
 ~~~~~~~~~~~

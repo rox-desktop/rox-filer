@@ -97,6 +97,7 @@ struct _GUIside
  * using them again.
  */
 static gboolean mount_open_dir = FALSE;
+static gboolean mount_mount = FALSE;	/* (FALSE => unmount) */
 static int 	from_parent = 0;
 static FILE	*to_parent = NULL;
 static gboolean	quiet = FALSE;
@@ -1736,15 +1737,11 @@ static void mount_cb(gpointer data)
 			per=100*i/n;
 			printf_send("%%%d", per);
 		}
-		if (mount_is_mounted(target, NULL, NULL))
+		if (mount_is_mounted(target, NULL, NULL) ||
+		    g_hash_table_lookup(fstab_mounts, target))
 		{
 			mount_points = TRUE;
-			do_mount(target, FALSE);	/* Unmount */
-		}
-		else if (g_hash_table_lookup(fstab_mounts, target))
-		{
-			mount_points = TRUE;
-			do_mount(target, TRUE);	/* Mount */
+			do_mount(target, mount_mount);	/* Mount */
 		}
 
 		if (target != path)
@@ -2009,7 +2006,7 @@ void action_usage(GList *paths)
  * If open_dir is TRUE and the dir is successfully mounted, open it.
  * quiet can be -1 for default.
  */
-void action_mount(GList	*paths, gboolean open_dir, int quiet)
+void action_mount(GList	*paths, gboolean open_dir, gboolean mount, int quiet)
 {
 #ifdef DO_MOUNT_POINTS
 	GUIside		*gui_side;
@@ -2019,6 +2016,7 @@ void action_mount(GList	*paths, gboolean open_dir, int quiet)
 	 	quiet = o_action_mount.int_value;
 
 	mount_open_dir = open_dir;
+	mount_mount = mount;
 
 	abox = abox_new(_("Mount / Unmount"), quiet);
 	gui_side = start_action(abox, mount_cb, paths,

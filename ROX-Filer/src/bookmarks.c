@@ -479,7 +479,7 @@ static void bookmarks_activate(GtkMenuShell *item, FilerWindow *filer_window)
 		GList	*paths;
 
 		paths = g_list_prepend(NULL, filer_window->real_path);
-		action_mount(paths, FALSE, -1);
+		action_mount(paths, FALSE, TRUE, -1);
 		g_list_free(paths);
 	}
 }

@@ -93,6 +93,7 @@ static xmlNodePtr rpc_Move(GList *args);
 static xmlNodePtr rpc_Link(GList *args);
 static xmlNodePtr rpc_FileType(GList *args);
 static xmlNodePtr rpc_Mount(GList *args);
+static xmlNodePtr rpc_Unmount(GList *args);
 
 static xmlNodePtr rpc_PanelAdd(GList *args);
 static xmlNodePtr rpc_PanelRemove(GList *args);
@@ -139,6 +140,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("Move", rpc_Move, "From,To", "Leafname,Quiet");
 	soap_register("Link", rpc_Link, "From,To", "Leafname");
 	soap_register("Mount", rpc_Mount, "MountPoints", "OpenDir,Quiet");
+	soap_register("Unmount", rpc_Unmount, "MountPoints", "Quiet");
 
 	soap_register("SetBackdrop", rpc_SetBackdrop, "Filename,Style", NULL);
 	soap_register("SetBackdropApp", rpc_SetBackdropApp, "App", NULL);
@@ -1006,9 +1008,25 @@ static xmlNodePtr rpc_Mount(GList *args)
 
 	if (open_dir == -1)
 		open_dir = TRUE;
-	
+
 	if (paths)
-		action_mount(paths, open_dir, quiet);
+		action_mount(paths, open_dir, TRUE, quiet);
+
+	destroy_glist(&paths);
+
+	return NULL;
+}
+
+static xmlNodePtr rpc_Unmount(GList *args)
+{
+	GList *paths;
+	int	quiet;
+
+	paths = list_value(ARG(0));
+	quiet = bool_value(ARG(1));
+
+	if (paths)
+		action_mount(paths, FALSE, FALSE, quiet);
 
 	destroy_glist(&paths);
 

@@ -497,7 +497,7 @@ static void umount_dialog_response(GtkWidget *dialog, int response, char *mount)
 		GList *list; 
 
 		list = g_list_prepend(NULL, mount);
-		action_mount(list, FALSE, TRUE);
+		action_mount(list, FALSE, FALSE, TRUE);
 		g_list_free(list);
 	}
 
