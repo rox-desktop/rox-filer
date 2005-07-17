@@ -243,7 +243,6 @@ static gboolean if_deleted(gpointer item, gpointer removed)
  */
 void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 {
-	GdkEvent *event;
 	GtkWidget *window;
 
 	g_return_if_fail(filer_window != NULL);
@@ -263,6 +262,7 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		gint x, y, m;
 		GtkRequisition	*req = &window->requisition;
 		GdkWindow *gdk_window = window->window;
+		GdkEvent *event;
 
 		w = MAX(req->width, w);
 		h = MAX(req->height, h);
@@ -292,33 +292,37 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 		}
 		else
 			gdk_window_resize(gdk_window, w, h);
+
+		/* If the resize was triggered by a key press, keep
+		 * the pointer inside the window so that it doesn't
+		 * lose focus when using pointer-follows-mouse.
+		 */
+		event = gtk_get_current_event();
+		if (event && event->type == GDK_KEY_PRESS)
+		{
+			int x, y;
+			int nx, ny;
+
+			GdkWindow *win = filer_window->window->window;
+
+			gdk_window_get_pointer(filer_window->window->window,
+						&x, &y, NULL);
+
+			nx = CLAMP(x, 4, w - 4);
+			ny = CLAMP(y, 4, h - 4);
+			
+			if (nx != x || ny != y)
+			{
+				XWarpPointer(gdk_x11_drawable_get_xdisplay(win),
+						None,
+						gdk_x11_drawable_get_xid(win),
+						0, 0, 0, 0,
+						nx, ny);
+			}
+		}
 	}
 	else
 		gtk_window_set_default_size(GTK_WINDOW(window), w, h);
-
-	event = gtk_get_current_event();
-	if (event && event->type == GDK_KEY_PRESS)
-	{
-		int x, y;
-		int nx, ny;
-
-		GdkWindow *win = filer_window->window->window;
-
-		gdk_window_get_pointer(filer_window->window->window,
-					&x, &y, NULL);
-
-		nx = CLAMP(x, 4, w - 4);
-		ny = CLAMP(y, 4, h - 4);
-		
-		if (nx != x || ny != y)
-		{
-			XWarpPointer(gdk_x11_drawable_get_xdisplay(win),
-					None,
-					gdk_x11_drawable_get_xid(win),
-					0, 0, 0, 0,
-					nx, ny);
-		}
-	}
 }
 
 /* Called on a timeout while scanning or when scanning ends
