@@ -312,10 +312,11 @@ xterm -e wget $1</entry>
   </section>
   <section title='Types'>
     <frame label='MIME types'>
-      <label help='1'>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type. Use the MIME-Editor application to change the file-to-type guessing rules:
+      <label help='1'>The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type.</label>
 
-http://rox.sourceforge.net/mime_editor.html</label>
-      <spacer/>
+	<launch uri="http://rox.sourceforge.net/2005/interfaces/MIME-Editor" label="Edit MIME rules"/>
+     </frame>
+     <frame label='Themes'>
       <icon-theme-chooser label='Icon theme' name='icon_theme'/>
       <spacer/>
       <label help='1'>Themes should be placed inside the ~/.icons directory.</label>

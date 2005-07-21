@@ -1413,3 +1413,62 @@ int stat_with_timeout(const char *path, struct stat *info)
 
 	return retval;
 }
+
+/* From glib. */
+static gchar *my_strchrnul(const gchar *str, gchar c)
+{
+	gchar *p = (gchar*) str;
+	while (*p && (*p != c))
+		++p;
+
+	return p;
+}
+
+/* Based on code from glib. */
+gboolean available_in_path(const char *file)
+{
+	const gchar *path, *p;
+	gchar *name, *freeme;
+	size_t len;
+	size_t pathlen;
+	gboolean found = FALSE;
+
+	path = g_getenv("PATH");
+	if (path == NULL)
+		path = "/bin:/usr/bin:.";
+
+	len = strlen(file) + 1;
+	pathlen = strlen(path);
+	freeme = name = g_malloc(pathlen + len + 1);
+
+	/* Copy the file name at the top, including '\0'  */
+	memcpy(name + pathlen + 1, file, len);
+	name = name + pathlen;
+	/* And add the slash before the filename  */
+	*name = '/';
+
+	p = path;
+	do
+	{
+		char *startp;
+
+		path = p;
+		p = my_strchrnul(path, ':');
+
+		if (p == path)
+			/* Two adjacent colons, or a colon at the beginning or the end
+			 * of `PATH' means to search the current directory.
+			 */
+			startp = name + 1;
+		else
+			startp = memcpy (name - (p - path), path, p - path);
+
+		/* Try to execute this name.  If it works, execv will not return.  */
+		if (access(startp, X_OK) == 0)
+			found = TRUE;
+	} while (!found && *p++ != '\0');
+
+	g_free(freeme);
+
+	return found;
+}

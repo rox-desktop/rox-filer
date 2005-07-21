@@ -198,6 +198,7 @@ static void child_died_callback(void);
 static void wake_up_cb(gpointer data, gint source, GdkInputCondition condition);
 static void xrandr_size_change(GdkScreen *screen, gpointer user_data);
 static void add_default_panel_and_pinboard(xmlNodePtr body);
+static GList *build_launch(Option *option, xmlNode *node, guchar *label);
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -335,6 +336,7 @@ int main(int argc, char **argv)
 			  "Default");
 	option_add_string(&o_session_pinboard_name, "session_pinboard_name",
 			  "Default");
+	option_register_widget("launch", build_launch);
 
 	/* The idea here is to convert the command-line arguments
 	 * into a SOAP RPC.
@@ -811,4 +813,53 @@ static void add_default_panel_and_pinboard(xmlNodePtr body)
 		
 		soap_add(body, "Panel", "Name", name, NULL, NULL);
 	}
+}
+
+static void do_launch(GObject *button, gpointer data)
+{
+	char *uri;
+	const char *argv[] = {"0launch", NULL, NULL};
+	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
+				  "/bin/0launch";
+
+	uri = g_object_get_data(button, "rox-uri");
+	g_return_if_fail(uri != NULL);
+
+	if (!available_in_path(argv[0]))
+	{
+		if (access(uri_0launch, X_OK) == 0)
+			argv[0] = uri_0launch;
+		else
+		{
+			delayed_error("This program cannot be run, as the "
+				"0launch command is not available. "
+				"It can be downloaded from here:\n\n"
+				"http://0install.net/injector.html");
+			return;
+		}
+	}
+
+	argv[1] = uri;
+	rox_spawn(NULL, argv);
+}
+
+static GList *build_launch(Option *option, xmlNode *node, guchar *label)
+{
+	GtkWidget *button, *align;
+	char *uri;
+
+	g_return_val_if_fail(option == NULL, NULL);
+	g_return_val_if_fail(label != NULL, NULL);
+
+	uri = xmlGetProp(node, "uri");
+
+	g_return_val_if_fail(uri != NULL, NULL);
+	
+	align = gtk_alignment_new(0, 0.5, 0, 0);
+	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
+	g_object_set_data_full(G_OBJECT(button), "rox-uri", uri, g_free);
+	gtk_container_add(GTK_CONTAINER(align), button);
+	g_signal_connect(button, "clicked", G_CALLBACK(do_launch), NULL);
+
+	return g_list_append(NULL, align);
 }
