@@ -2970,6 +2970,10 @@ $ rehash</screen>
        <listitem><para>apre la directory mostrando FILE.
       </para></listitem></varlistentry>
 
+      <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
+       <listitem><para>eseguito da ROX-Session, apre il pannello e la bacheca predefinita (implica --new).
+      </para></listitem></varlistentry>
+
       <varlistentry><term><option>-t</option></term><term><option>--top=PAN</option></term>
        <listitem><para>apre PAN come pannello in alto.
       </para></listitem></varlistentry>
@@ -3284,6 +3288,11 @@ EOF</screen>
      Monta ciascuna directory dell'elenco <parameter>MountPoints</parameter>. Se è 
      <userinput>true</userinput>, <parameter>OpenDir</parameter> apre la directory
      dopo averla montata.
+   </para></listitem>
+
+   <listitem><para><function>Unmount</function>(<parameter>MountPoints</parameter>,
+     [<parameter>Quiet</parameter>])
+     Smonta ogni directory della lista <parameter>MountPoints</parameter>.
    </para></listitem>
 
   </itemizedlist>
