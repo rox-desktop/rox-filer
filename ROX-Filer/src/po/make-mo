@@ -16,4 +16,4 @@ charset=`grep "charset=" $1.po | head -1 | sed 's/^.*charset=\(.*\)\\\n.*/\1/'`
 echo Using charset \'$charset\'
 iconv -f $charset -t utf-8 $1.po | \
 	sed 's/; charset=\(.*\)\\n"/; charset=utf-8\\n"/' | \
-	msgfmt - -o $OUT && echo Created file $OUT OK
+	msgfmt --statistics - -o $OUT && echo Created file $OUT OK
