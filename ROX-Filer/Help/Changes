@@ -2,6 +2,15 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+22-Jul-2005
+~~~~~~~~~~~
+At install time, add a rule to the MIME database that shell scripts are
+executable, as the defaults are missing this (Thomas Leonard; reported by
+Stephen Watson).
+In the properties box, don't say that the run action is executable just
+because the MIME type is executable. The execute bit must be set too
+(Thomas Leonard).
+
 21-Jul-2005
 ~~~~~~~~~~~
 Replaced the text the Options box telling people to download and run

@@ -207,7 +207,8 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	mtype->image = NULL;
 	mtype->comment = NULL;
 
-	mtype->executable = xdg_mime_mime_type_subclass(type_name, "application/x-executable");
+	mtype->executable = xdg_mime_mime_type_subclass(type_name,
+						"application/x-executable");
 
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
@@ -781,6 +782,7 @@ out:
 
 /* Find the current command which is used to run files of this type,
  * and return a textual description of it.
+ * Only call for non-executable files.
  * g_free() the result.
  */
 gchar *describe_current_command(MIME_type *type)
@@ -791,9 +793,6 @@ gchar *describe_current_command(MIME_type *type)
 	char *target;
 
 	g_return_val_if_fail(type != NULL, NULL);
-
-	if (type->executable)
-		return g_strdup(_("Execute file"));
 
 	handler = handler_for(type);
 

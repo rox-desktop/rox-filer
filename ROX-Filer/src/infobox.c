@@ -645,8 +645,13 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 
 	if (item->base_type != TYPE_DIRECTORY)
 	{
-		add_row_and_free(store, _("Run action:"),
-			describe_current_command(item->mime_type));
+		if (EXECUTABLE_FILE(item))
+			add_row(store, _("Run action:"), _("Execute file"));
+		else
+		{
+			add_row_and_free(store, _("Run action:"),
+				describe_current_command(item->mime_type));
+		}
 	}
 
 	return view;
