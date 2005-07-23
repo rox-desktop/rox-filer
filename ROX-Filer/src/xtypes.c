@@ -120,10 +120,10 @@ MIME_type *xtype_get(const char *path)
 	gchar *buf;
 	MIME_type *type = NULL;
 
-	RETURN_IF_IGNORED(type_from_path(path));
+	RETURN_IF_IGNORED(NULL);
 	
 	if (!dyn_getxattr)
-		return type_from_path(path);	/* Old libc */
+		return NULL;
 
 	size = dyn_getxattr(path, XTYPE_ATTR, "", 0);
 	if (size > 0)
@@ -145,7 +145,7 @@ MIME_type *xtype_get(const char *path)
 		return type;
 
 	/* Fall back to non-extended */
-	return type_from_path(path);
+	return NULL;
 }
 
 /* 0 on success */
@@ -212,11 +212,11 @@ MIME_type *xtype_get(const char *path)
 	int nb;
 	MIME_type *type=NULL;
 
-	RETURN_IF_IGNORED(type_from_path(path));
+	RETURN_IF_IGNORED(NULL);
 
 #ifdef _PC_XATTR_EXISTS
 	if(!pathconf(path, _PC_XATTR_EXISTS))
-		return type_from_path(path);
+		return NULL;
 #endif
 
 	fd=attropen(path, XTYPE_ATTR, O_RDONLY);
@@ -237,7 +237,7 @@ MIME_type *xtype_get(const char *path)
 		return type;
   
 	/* Fall back to non-extended */
-	return type_from_path(path);
+	return NULL;
 }
 
 int xtype_set(const char *path, const MIME_type *type)
@@ -290,7 +290,7 @@ int xtype_have_attr(const char *path)
 MIME_type *xtype_get(const char *path)
 {
 	/* Fall back to non-extended */
-	return type_from_path(path);
+	return NULL;
 }
 
 int xtype_set(const char *path, const MIME_type *type)

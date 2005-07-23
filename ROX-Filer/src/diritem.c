@@ -154,21 +154,19 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 	}
 	else if (item->base_type == TYPE_FILE)
 	{
-		/* Type determined from path before checking for executables
-		 * because some mounts show everything as executable and we
-		 * still want to use the file name to set the mime type.
-		 */
-		if (item->flags & ITEM_FLAG_SYMLINK)
+		if (item->size == 0)
+			item->mime_type = text_plain;
+		else if (item->flags & ITEM_FLAG_SYMLINK)
 		{
 			guchar *link_path;
-			link_path = readlink_dup(path);
+			link_path = pathdup(path);
 			item->mime_type = type_from_path(link_path
-								? link_path
-								: path);
+					? link_path
+					: path);
 			g_free(link_path);
 		}
 		else
-			item->mime_type = xtype_get(path);
+			item->mime_type = type_from_path(path);
 
 		/* Note: for symlinks we need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
@@ -178,26 +176,13 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 			 * for clicking on the file to run it.
 			 */
 			item->flags |= ITEM_FLAG_EXEC_FILE;
+
+			if (item->mime_type == NULL || item->mime_type == application_octet_stream)
+				item->mime_type = application_executable;
 		}		
 
 		if (!item->mime_type)
-		{
-			if (item->size == 0)
-				item->mime_type = text_plain;
-			else
-				item->mime_type = mime_type_from_contents(path);
-		}
-
-		/* If we still haven't got a MIME type yet, guess from the executable flag.
-		 * Note: for symlinks we need the mode of the target.
-		 */
-		if (!item->mime_type)
-		{
-			if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
-				item->mime_type = application_executable;
-			else
-				item->mime_type = text_plain;
-		}
+			item->mime_type = text_plain;
 
 		check_globicon(path, item);
 	}

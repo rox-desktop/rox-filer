@@ -59,6 +59,7 @@
 #include "xml.h"
 #include "dropbox.h"
 #include "xdgmime.h"
+#include "xtypes.h"
 
 #define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
 enum {SET_MEDIA, SET_TYPE};
@@ -85,7 +86,6 @@ static Option o_type_colours[NUM_TYPE_COLOURS];
 static GdkColor	type_colours[NUM_TYPE_COLOURS];
 
 /* Static prototypes */
-static void load_mime_types(void);
 static void alloc_type_colours(void);
 static void options_changed(void);
 static char *get_action_save_path(GtkWidget *dialog);
@@ -93,26 +93,6 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create);
 static gboolean remove_handler_with_confirm(const guchar *path);
 static void set_icon_theme(void);
 static GList *build_icon_theme(Option *option, xmlNode *node, guchar *label);
-
-/* When working out the type for a file, this hash table is checked
- * first...
- */
-static GHashTable *literal_hash = NULL;	/* name -> MIME-type */
-
-/* Maps extensions to MIME_types (eg 'png'-> MIME_type *).
- * Extensions may contain dots; 'tar.gz' matches '*.tar.gz', etc.
- * The hash table is consulted from each dot in the string in turn
- * (First .ps.gz, then try .gz)
- */
-static GHashTable *extension_hash = NULL;
-
-/* The first pattern in the list which matches is used */
-typedef struct pattern {
-	gint len;		/* Used for sorting */
-	gchar *glob;
-	MIME_type *type;
-} Pattern;
-static GPtrArray *glob_patterns = NULL;	/* [Pattern] */
 
 /* Hash of all allocated MIME types, indexed by "media/subtype".
  * MIME_type structs are never freed; this table prevents memory leaks
@@ -129,6 +109,7 @@ MIME_type *inode_socket;
 MIME_type *inode_block_dev;
 MIME_type *inode_char_dev;
 MIME_type *application_executable;
+MIME_type *application_octet_stream;
 MIME_type *inode_unknown;
 MIME_type *inode_door;
 
@@ -143,7 +124,6 @@ void type_init(void)
 
 	icon_theme = gtk_icon_theme_new();
 	
-	extension_hash = g_hash_table_new(g_str_hash, g_str_equal);
 	type_hash = g_hash_table_new(g_str_hash, g_str_equal);
 
 	text_plain = get_mime_type("text/plain", TRUE);
@@ -154,10 +134,9 @@ void type_init(void)
 	inode_block_dev = get_mime_type("inode/blockdevice", TRUE);
 	inode_char_dev = get_mime_type("inode/chardevice", TRUE);
 	application_executable = get_mime_type("application/x-executable", TRUE);
+	application_octet_stream = get_mime_type("application/octet-stream", TRUE);
 	inode_unknown = get_mime_type("inode/unknown", TRUE);
 	inode_door = get_mime_type("inode/door", TRUE);
-
-	load_mime_types();
 
 	option_add_string(&o_icon_theme, "icon_theme", "ROX");
 	option_add_int(&o_display_colour_types, "display_colour_types", TRUE);
@@ -180,7 +159,8 @@ void type_init(void)
 void reread_mime_files(void)
 {
 	gtk_icon_theme_rescan_if_needed(icon_theme);
-	load_mime_types();
+
+	xdg_mime_shutdown();
 }
 
 /* Returns the MIME_type structure for the given type name. It is looked
@@ -213,20 +193,6 @@ static MIME_type *get_mime_type(const gchar *type_name, gboolean can_create)
 	g_hash_table_insert(type_hash, g_strdup(type_name), mtype);
 
 	return mtype;
-}
-
-/* NULL if we don't know / don't support contents checking */
-MIME_type *mime_type_from_contents(const char *path)
-{
-	MIME_type *type = NULL;
-	const char *type_name;
-
-	type_name = xdg_mime_get_mime_type_for_file(path);
-	if (type_name)
-	{
-		type = get_mime_type(type_name, TRUE);
-	}
-	return type;
 }
 
 const char *basetype_name(DirItem *item)
@@ -307,58 +273,30 @@ MIME_type *type_get_type(const guchar *path)
 }
 
 /* Returns a pointer to the MIME-type.
+ *
+ * Tries all enabled methods:
+ * - Look for extended attribute
+ * - If no attribute, check file name
+ * - If no name rule, check contents
+ *
  * NULL if we can't think of anything.
  */
 MIME_type *type_from_path(const char *path)
 {
-	const char *ext, *dot, *leafname;
-	char *lower;
-	MIME_type *type = NULL;
-	int	i;
+	MIME_type *mime_type = NULL;
+	const char *type_name;
 
-	leafname = g_basename(path);
+	/* Check for extended attribute first */
+	mime_type = xtype_get(path);
+	if (mime_type)
+		return mime_type;
 
-	type = g_hash_table_lookup(literal_hash, leafname);
-	if (type)
-		return type;
-	lower = g_utf8_strdown(leafname, -1);
-	type = g_hash_table_lookup(literal_hash, lower);
-	if (type)
-		goto out;
+	/* Try name and contents next */
+	type_name = xdg_mime_get_mime_type_for_file(path);
+	if (type_name)
+		return get_mime_type(type_name, TRUE);
 
-	ext = leafname;
-
-	while ((dot = strchr(ext, '.')))
-	{
-		ext = dot + 1;
-
-		type = g_hash_table_lookup(extension_hash, ext);
-
-		if (type)
-			goto out;
-
-		type = g_hash_table_lookup(extension_hash,
-					lower + (ext - leafname));
-		if (type)
-			goto out;
-	}
-
-	for (i = 0; i < glob_patterns->len; i++)
-	{
-		Pattern *p = glob_patterns->pdata[i];
-
-		if (fnmatch(p->glob, leafname, 0) == 0 ||
-		    fnmatch(p->glob, lower, 0) == 0)
-		{
-			type = p->type;
-			goto out;
-		}
-	}
-
-out:
-	g_free(lower);
-
-	return type;
+	return NULL;
 }
 
 /* Returns the file/dir in Choices for handling this type.
@@ -1183,104 +1121,6 @@ GdkColor *type_get_colour(DirItem *item, GdkColor *normal)
 	return &type_colours[type];
 }
 
-/* Process the 'Patterns' value */
-static void add_pattern(MIME_type *type, const char *pattern, GHashTable *globs)
-{
-	if (pattern[0] == '*' && pattern[1] == '.' &&
-	    strpbrk(pattern + 2, "*?[") == NULL)
-	{
-		g_hash_table_insert(extension_hash,
-				    g_strdup(pattern + 2),
-				    type);
-	}
-	else if (strpbrk(pattern, "*?[") == NULL)
-		g_hash_table_insert(literal_hash, g_strdup(pattern), type);
-	else
-		g_hash_table_insert(globs, g_strdup(pattern), type);
-}
-
-/* Load and parse this file. literal_hash and extension_hash are updated
- * directly. Other patterns are added to 'globs'.
- */
-static void import_file(const gchar *file, GHashTable *globs)
-{
-	MIME_type *type = NULL;
-	GError *error = NULL;
-	gchar  *data, *line;
-
-	if (access(file, F_OK) != 0)
-		return;		/* Doesn't exist. No problem. */
-
-	if (!g_file_get_contents(file, &data, NULL, &error))
-	{
-		delayed_error(_("Error loading MIME database:\n%s"),
-				error->message);
-		g_error_free(error);
-		return;
-	}
-	
-	line = data;
-
-	while (line && *line)
-	{
-		char *nl;
-
-		nl = strchr(line, '\n');
-		if (!nl)
-			break;
-		*nl = '\0';
-
-		if (*line != '#')
-		{
-			const gchar *colon;
-			gchar *name;
-
-			colon = strchr(line, ':');
-			if (!colon)
-			{
-				delayed_error(_("File '%s' corrupted!"), file);
-				break;
-			}
-
-			name = g_strndup(line, colon - line);
-			type = get_mime_type(name, TRUE);
-			g_free(name);
-			if (!type)
-				g_warning("Invalid type in '%s'", file);
-
-			add_pattern(type, colon + 1, globs);
-		}
-
-		line = nl + 1;
-	}
-
-	g_free(data);
-}
-
-static void add_to_glob_patterns(gpointer key, gpointer value, gpointer unused)
-{
-	Pattern *pattern;
-
-	pattern = g_new(Pattern, 1);
-	pattern->glob = g_strdup((gchar *) key);
-	pattern->type = (MIME_type *) value;
-	pattern->len = strlen(pattern->glob);
-
-	g_ptr_array_add(glob_patterns, pattern);
-}
-
-static gint sort_by_strlen(gconstpointer a, gconstpointer b)
-{
-	const Pattern *pa = *(const Pattern **) a;
-	const Pattern *pb = *(const Pattern **) b;
-
-	if (pa->len > pb->len)
-		return -1;
-	else if (pa->len == pb->len)
-		return 0;
-	return 1;
-}
-
 static char **get_xdg_data_dirs(int *n_dirs)
 {
 	const char *env;
@@ -1304,91 +1144,6 @@ static char **get_xdg_data_dirs(int *n_dirs)
 					   "share", NULL);
 	*n_dirs = n + 1;
 	return dirs;
-}
-
-/* Clear all currently stored information and re-read everything.
- * Note: calls filer_update_all.
- */
-static void load_mime_types(void)
-{
-	GHashTable *globs;
-	char **dirs;
-	int n_dirs;
-	int i;
-
-	dirs = get_xdg_data_dirs(&n_dirs);
-	g_return_if_fail(dirs != NULL);
-
-	{
-		struct stat info;
-		if (lstat(make_path(home_dir, ".mime"), &info) == 0 &&
-		    S_ISDIR(info.st_mode))
-		{
-			delayed_error(_("The ~/.mime directory has moved. "
-				"It should now be ~/.local/share/mime. You "
-				"should move it there (and make a symlink "
-				"from ~/.mime to it for older applications)."));
-		}
-	}
-
-	if (!glob_patterns)
-		glob_patterns = g_ptr_array_new();
-	else
-	{
-		int i;
-
-		for (i = glob_patterns->len - 1; i >= 0; i--)
-		{
-			Pattern *p = glob_patterns->pdata[i];
-			g_free(p->glob);
-			g_free(p);
-		}
-		g_ptr_array_set_size(glob_patterns, 0);
-	}
-
-	if (literal_hash)
-		g_hash_table_destroy(literal_hash);
-	if (extension_hash)
-		g_hash_table_destroy(extension_hash);
-	literal_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-						g_free, NULL);
-	extension_hash = g_hash_table_new_full(g_str_hash, g_str_equal,
-						g_free, NULL);
-	globs = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-
-	for (i = n_dirs - 1; i >= 0; i--)
-	{
-		char *path;
-		path = g_build_filename(dirs[i], "mime", "globs", NULL);
-		import_file(path, globs);
-		g_free(path);
-		g_free(dirs[i]);
-	}
-	g_free(dirs);
-
-	/* Turn the globs hash into a pointer array */
-	g_hash_table_foreach(globs, add_to_glob_patterns, NULL);
-	g_hash_table_destroy(globs);
-	globs = NULL;
-
-	if (glob_patterns->len)
-		g_ptr_array_sort(glob_patterns, sort_by_strlen);
-
-	if (g_hash_table_size(extension_hash) == 0)
-	{
-		delayed_error(_("The standard MIME type database "
-			"(version 0.9 or later) was not found. "
-			"The filer will probably not show the correct "
-			"types for different files. You should download and "
-			"install the 'shared-mime-info-0.9' package from "
-			"here:\n"
-		"http://www.freedesktop.org/software/shared-mime-info\n\n"
-		"If you have already installed this package, check that the "
-		"permissions allow the files to be read (check "
-		"/usr/local/share/mime/globs or /usr/share/mime/globs)."));
-	}
-
-	filer_update_all();
 }
 
 /* Try to fill in 'type->comment' from this document */

@@ -140,7 +140,7 @@ GdkAtom XdndDirectSave0;
 GdkAtom xa_text_plain;
 GdkAtom text_uri_list;
 GdkAtom text_x_moz_url;
-GdkAtom application_octet_stream;
+GdkAtom xa_application_octet_stream;
 GdkAtom xa_string; /* Not actually used for DnD, but the others are here! */
 
 int spring_in_progress = 0;	/* Non-zero changes filer_opendir slightly */
@@ -158,7 +158,7 @@ void dnd_init(void)
 	xa_text_plain = gdk_atom_intern("text/plain", FALSE);
 	text_uri_list = gdk_atom_intern("text/uri-list", FALSE);
 	text_x_moz_url = gdk_atom_intern("text/x-moz-url", FALSE);
-	application_octet_stream = gdk_atom_intern("application/octet-stream",
+	xa_application_octet_stream = gdk_atom_intern("application/octet-stream",
 			FALSE);
 	xa_string = gdk_atom_intern("STRING", FALSE);
 
@@ -526,7 +526,7 @@ const guchar *dnd_motion_item(GdkDragContext *context, DirItem **item_p)
 	{
 		if (provides(context, text_uri_list) ||
 				provides(context, text_x_moz_url) ||
-				provides(context, application_octet_stream))
+				provides(context, xa_application_octet_stream))
 			return drop_dest_prog;
 	}
 
@@ -610,8 +610,8 @@ static gboolean drag_drop(GtkWidget 	  *widget,
 		target = text_uri_list;
 	else if (provides(context, text_x_moz_url))
 		target = text_x_moz_url;
-	else if (provides(context, application_octet_stream))
-		target = application_octet_stream;
+	else if (provides(context, xa_application_octet_stream))
+		target = xa_application_octet_stream;
 	else
 	{
 		if (dest_type == drop_dest_dir)
@@ -788,12 +788,12 @@ static void got_data_xds_reply(GtkWidget 		*widget,
 		/* Sender couldn't save there - ask for another
 		 * type if possible.
 		 */
-		if (provides(context, application_octet_stream))
+		if (provides(context, xa_application_octet_stream))
 		{
 			mark_unsafe = FALSE;	/* Wait and see */
 
 			gtk_drag_get_data(widget, context,
-					application_octet_stream, time);
+					xa_application_octet_stream, time);
 		}
 		else
 			error = _("Remote app can't or won't send me "
@@ -967,7 +967,7 @@ static void got_uri_list(GtkWidget 		*widget,
 		 * machine. Get it via the X server if possible.
 		 */
 
-		if (provides(context, application_octet_stream))
+		if (provides(context, xa_application_octet_stream))
 		{
 			char	*leaf;
 			leaf = strrchr(uri_list->data, '/');
@@ -978,7 +978,7 @@ static void got_uri_list(GtkWidget 		*widget,
 			g_dataset_set_data_full(context, "leafname",
 				unescape_uri((EscapedPath *) leaf), g_free);
 			gtk_drag_get_data(widget, context,
-					application_octet_stream, time);
+					xa_application_octet_stream, time);
 			send_reply = FALSE;
 		}
 		else if ((strncasecmp(uri_list->data, "http:", 5) == 0) ||

@@ -4,6 +4,23 @@
 23-Jul-2005
 ~~~~~~~~~~~
 Added icon for messages (Thomas Leonard).
+Improvements for file type guessing (Thomas Leonard):
+- When getting the type for a symlink, we need the absolute path now that we
+  check file contents.
+- Also check for extended attributes for the symlink target.
+- Removed all of our code for guessing types from file names, since it
+  duplicates the new xdgmime code.
+- Files with control characters are now considered to be binary, even
+  though they may be valid UTF-8.
+- Executable files of unknown type are now marked as executable, not
+  octet-stream.
+- When complaining that there is no run action for an executable type,
+  give the user a hint about setting the execute permission.
+- Refreshing the MIME system also refreshes xdgmime.
+- Added MIME rules to say that Python, PERL and Ruby are executable, as
+  old versions of the MIME database don't have these rules (reported by
+  Stephen Watson).
+
 
 22-Jul-2005
 ~~~~~~~~~~~

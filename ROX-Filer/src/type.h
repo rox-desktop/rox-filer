@@ -18,6 +18,7 @@ extern MIME_type *inode_char_dev;
 extern MIME_type *application_executable;
 extern MIME_type *inode_unknown;
 extern MIME_type *inode_door;
+extern MIME_type *application_octet_stream;
 
 struct _MIME_type
 {
@@ -37,7 +38,6 @@ const char *basetype_name(DirItem *item);
 MIME_type *type_get_type(const guchar *path);
 
 MIME_type *type_from_path(const char *path);
-MIME_type *mime_type_from_contents(const char *path);
 gboolean type_open(const char *path, MIME_type *type);
 MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);

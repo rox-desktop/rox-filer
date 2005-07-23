@@ -654,9 +654,17 @@ _xdg_mime_magic_get_buffer_extents (XdgMimeMagic *mime_magic)
 static gboolean buffer_looks_like_text (const void  *data, const size_t len)
 {
 	gchar *end;
-		
+
 	if (g_utf8_validate (data, len, (const gchar**)&end))
 	{
+		/* g_utf8_validate allows control characters */
+		int i;
+		for (i = 0; i < len; i++)
+		{
+			unsigned char c = ((const guchar *) data)[i];
+			if (c < 32 && c != '\r' && c != '\n' && c != '\t')
+				return FALSE;
+		}
 		return TRUE;
 	} else {
 		/* Check whether the string was truncated in the middle of

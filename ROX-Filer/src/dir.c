@@ -365,6 +365,15 @@ static void dir_set_scanning(Directory *dir, gboolean scanning)
 				NULL, user->data);
 	}
 
+#if 0
+	/* Useful for profiling */
+	if (!scanning)
+	{
+		g_print("Done\n");
+		exit(0);
+	}
+#endif
+
 	in_callback--;
 }
 
