@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-22 11:31+0200\n"
+"POT-Creation-Date: 2005-07-23 15:00+0200\n"
 "PO-Revision-Date: 2005-07-21 13:00+0200\n"
 "Last-Translator: Yuri Bongiorno http://yuri.webhop.org <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
@@ -1558,7 +1558,7 @@ msgstr "Opzioni"
 msgid "Home Directory"
 msgstr "Directory home"
 
-#: icon.c:140 icon.c:1340 menu.c:206 type.c:243
+#: icon.c:140 icon.c:1340 menu.c:206 type.c:244
 msgid "File"
 msgstr "File"
 
@@ -1753,82 +1753,86 @@ msgstr "Non supportato"
 msgid "Link target:"
 msgstr "Il collegamento punta a:"
 
-#: infobox.c:648
+#: infobox.c:649 infobox.c:652
 msgid "Run action:"
 msgstr "Azione:"
 
-#: infobox.c:739
+#: infobox.c:649
+msgid "Execute file"
+msgstr "Esegui file"
+
+#: infobox.c:744
 msgid "<nothing yet>"
 msgstr "<ancora nulla>"
 
-#: infobox.c:809
+#: infobox.c:814
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) dice: %s"
 
-#: infobox.c:866
+#: infobox.c:871
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "Impossibile cambiare i permessi: %s"
 
-#: infobox.c:884
+#: infobox.c:889
 msgid "Owner"
 msgstr "Proprietario"
 
-#: infobox.c:886
+#: infobox.c:891
 msgid "Group"
 msgstr "Gruppo"
 
-#: infobox.c:888
+#: infobox.c:893
 msgid "World"
 msgstr "Altri"
 
-#: infobox.c:891
+#: infobox.c:896
 msgid "Read"
 msgstr "Lettura"
 
-#: infobox.c:893
+#: infobox.c:898
 msgid "Write"
 msgstr "Scrittura"
 
-#: infobox.c:895
+#: infobox.c:900
 msgid "Exec"
 msgstr "Esecuzione"
 
-#: infobox.c:912
+#: infobox.c:917
 msgid "SUID"
 msgstr "SUID"
 
-#: infobox.c:919
+#: infobox.c:924
 msgid "SGID"
 msgstr "SGID"
 
-#: infobox.c:926
+#: infobox.c:931
 msgid "Sticky"
 msgstr "Sticky"
 
-#: infobox.c:948
+#: infobox.c:953
 msgid "Symbolic link"
 msgstr "Collegamento simbolico"
 
-#: infobox.c:951
+#: infobox.c:956
 msgid "ROX application"
 msgstr "Applicazione ROX"
 
-#: infobox.c:959
+#: infobox.c:964
 msgid "mounted"
 msgstr "montato"
 
-#: infobox.c:959
+#: infobox.c:964
 msgid "unmounted"
 msgstr "smontato"
 
-#: infobox.c:963
+#: infobox.c:968
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "Punto di mount per %s (%s)"
 
-#: infobox.c:966
+#: infobox.c:971
 #, c-format
 msgid "Mount point (%s)"
 msgstr "Punto di mount (%s)"
@@ -3055,47 +3059,47 @@ msgstr "ascendente"
 msgid "descending"
 msgstr "discendente"
 
-#: type.c:234
+#: type.c:235
 msgid "Sym link"
 msgstr "Coll. simb."
 
-#: type.c:236
+#: type.c:237
 msgid "Mount point"
 msgstr "Punto di mount"
 
-#: type.c:238
+#: type.c:239
 msgid "App dir"
 msgstr "Dir app"
 
-#: type.c:245
+#: type.c:246
 msgid "Dir"
 msgstr "Dir"
 
-#: type.c:247
+#: type.c:248
 msgid "Char dev"
 msgstr "Char dev"
 
-#: type.c:249
+#: type.c:250
 msgid "Block dev"
 msgstr "Block dev"
 
-#: type.c:251
+#: type.c:252
 msgid "Pipe"
 msgstr "Pipe"
 
-#: type.c:253
+#: type.c:254
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:255
+#: type.c:256
 msgid "Door"
 msgstr "Door"
 
-#: type.c:258
+#: type.c:259
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: type.c:414
+#: type.c:415
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -3121,11 +3125,11 @@ msgstr ""
 "bisogna preoccuparsi. Altrimenti, si devono controllare o addirittura "
 "eliminare tutti questi eseguibili."
 
-#: type.c:427
+#: type.c:428
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Corregge il problema di sicurezza)"
 
-#: type.c:557
+#: type.c:558
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3135,92 +3139,88 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:738
+#: type.c:739
 msgid "This is not a program! Give me an application instead!"
 msgstr "Questa non è un'applicazione. Specificare un'applicazione."
 
-#: type.c:796
-msgid "Execute file"
-msgstr "Esegui file"
-
-#: type.c:801
+#: type.c:800
 msgid "No run action defined"
 msgstr "Nessuna azione definita"
 
-#: type.c:827
+#: type.c:826
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Errore nell'handler %s: %s"
 
-#: type.c:842
+#: type.c:841
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Applicazione %s non valida (AppRun errato)"
 
-#: type.c:853
+#: type.c:852
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non eseguibile"
 
-#: type.c:886
+#: type.c:885
 msgid "Set run action"
 msgstr "Imposta azione"
 
-#: type.c:892
+#: type.c:891
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Se il gestore di un tipo specifico non è impostato, usa questo come "
 "predefinito."
 
-#: type.c:894
+#: type.c:893
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr ""
 "Impostare come azione predefinita per tutti i file di tipo «%s/<anything>»"
 
-#: type.c:898
+#: type.c:897
 msgid "Use this application for all files with this MIME type."
 msgstr "Usa questa applicazione per tutti i file con questo tipo di MIME."
 
-#: type.c:900
+#: type.c:899
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Solo per il tipo «%s» (%s/%s)"
 
-#: type.c:906
+#: type.c:905
 msgid "Drop a suitable application here"
 msgstr "Trascinare qui un'applicazione adatta"
 
-#: type.c:921
+#: type.c:920
 msgid "OR"
 msgstr "O"
 
-#: type.c:928
+#: type.c:927
 msgid "Enter a shell command:"
 msgstr "Inserire un comando di shell:"
 
-#: type.c:957
+#: type.c:956
 msgid "_Use Command"
 msgstr "_Usa il comando"
 
-#: type.c:987
+#: type.c:986
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "Un'azione esiste già ed è un programma. Eliminarla veramente?"
 
-#: type.c:998
+#: type.c:997
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossibile eliminare %s: %s"
 
-#: type.c:1035
+#: type.c:1034
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr ""
 "Il salvataggio delle preferenze è disabilitato dalla variabile CHOICESPATH"
 
-#: type.c:1217
+#: type.c:1216
 #, c-format
 msgid ""
 "Error loading MIME database:\n"
@@ -3229,12 +3229,12 @@ msgstr ""
 "Errore durante il caricamento del database MIME:\n"
 "%s"
 
-#: type.c:1242
+#: type.c:1241
 #, c-format
 msgid "File '%s' corrupted!"
 msgstr "Il file «%s» è corrotto."
 
-#: type.c:1328
+#: type.c:1327
 msgid ""
 "The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
 "should move it there (and make a symlink from ~/.mime to it for older "
@@ -3244,7 +3244,7 @@ msgstr ""
 "necessario creare un collegamento simbolico a «~/.mime» per le vecchie "
 "applicazioni."
 
-#: type.c:1380
+#: type.c:1379
 msgid ""
 "The standard MIME type database (version 0.9 or later) was not found. The "
 "filer will probably not show the correct types for different files. You "
@@ -3263,7 +3263,7 @@ msgstr ""
 "Se il pacchetto è già stato installato, controllare che ci siano i permessi "
 "in lettura (controllare /usr/local/share/mime/globs o /usr/share/mime/globs)."
 
-#: type.c:1493
+#: type.c:1492
 #, c-format
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
@@ -3271,7 +3271,7 @@ msgstr ""
 "Il tema icone «%s» non contiene le icone di MIME. Si usi invece il tema "
 "predefinito ROX."
 
-#: type.c:1507
+#: type.c:1506
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"

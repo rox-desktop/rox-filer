@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: rox-ja\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-01-29 10:19+0000\n"
+"POT-Creation-Date: 2005-07-23 15:00+0200\n"
 "PO-Revision-Date: 2003-05-30 01:13+0900\n"
 "Last-Translator: OKATANA <mkato@par.odn.ne.jp,mosaicist@par.odn.ne.jp>\n"
 "Language-Team: OKATANA <mkato@par.odn.ne.jp,mosaicist@par.odn.ne.jp>\n"
@@ -29,11 +29,11 @@ msgstr "確認しない"
 msgid "Don't confirm every operation"
 msgstr "操作ごとに確認を求めません"
 
-#: abox.c:455 tips:65
+#: abox.c:455 tips:67
 msgid "Name"
 msgstr "名前"
 
-#: abox.c:461 menu.c:231
+#: abox.c:461 menu.c:232
 msgid "Directory"
 msgstr "ディレクトリ"
 
@@ -41,11 +41,23 @@ msgstr "ディレクトリ"
 msgid "Expression:"
 msgstr "検索式:"
 
-#: action.c:179
+#: action.c:58
+msgid "See the attr(5) man page for full details."
+msgstr ""
+
+#: action.c:60
+msgid "See the fsattr(5) man page for full details."
+msgstr ""
+
+#: action.c:62
+msgid "You do not appear to have OS support."
+msgstr ""
+
+#: action.c:188
 msgid "Find expression reference"
 msgstr "検索式 リファレンス"
 
-#: action.c:190
+#: action.c:199
 msgid ""
 "<u>Quick Start</u>\n"
 "Just put the name of the file you're looking for in single quotes:\n"
@@ -122,12 +134,12 @@ msgstr ""
 "す。)\n"
 "<b>prune</b> (偽を意味します。パターンを検索対象から除外します。)"
 
-#: action.c:237
+#: action.c:246
 #, fuzzy
 msgid "Change permissions reference"
 msgstr "検索式 リファレンス"
 
-#: action.c:248
+#: action.c:257
 msgid ""
 "Normally, you can just select a command from the menu (click \n"
 "on the arrow beside the command box). Sometimes, you need more...\n"
@@ -185,11 +197,12 @@ msgstr ""
 "\n"
 "※詳細は chmod(1) man page を見て下さい。"
 
-#: action.c:289
+#: action.c:298
 msgid "Set type reference"
 msgstr "MIME形式設定リファレンス"
 
-#: action.c:300
+#: action.c:309
+#, fuzzy
 msgid ""
 "Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
@@ -203,7 +216,6 @@ msgid ""
 "File types are only supported for regular files, not\n"
 "directories, devices, pipes or sockets, and then only\n"
 "on certain file systems and where the OS implements them.\n"
-"\n"
 msgstr ""
 "普通は、ROX-Filer は、通常ファイルのタイプを、ファイル名のパターンに\n"
 "よって決定します。\n"
@@ -219,7 +231,7 @@ msgstr ""
 "ファイルに対してのみサポートされます。\n"
 "\n"
 
-#: action.c:405
+#: action.c:416
 msgid ""
 "\n"
 "Process terminated.\n"
@@ -227,20 +239,20 @@ msgstr ""
 "\n"
 "プロセスが完了しました\n"
 
-#: action.c:421
+#: action.c:432
 msgid "There was one error.\n"
 msgstr "1 個のエラーが発生しました。\n"
 
-#: action.c:423
+#: action.c:434
 #, c-format
 msgid "There were %d errors.\n"
 msgstr "%d 個のエラーが発生しました。\n"
 
-#: action.c:447
+#: action.c:458
 msgid "ERROR reading"
 msgstr "読み込みエラー"
 
-#: action.c:490
+#: action.c:501
 msgid ""
 "'\n"
 "Done\n"
@@ -248,19 +260,19 @@ msgstr ""
 "'\n"
 "完了\n"
 
-#: action.c:546 support.c:395
+#: action.c:557 support.c:395
 msgid "ERROR"
 msgstr "エラー"
 
-#: action.c:700 main.c:621 main.c:628 main.c:635
+#: action.c:711 main.c:684 main.c:691 main.c:698
 msgid "Yes"
 msgstr "はい"
 
-#: action.c:703 main.c:623 main.c:637
+#: action.c:714 main.c:686 main.c:700
 msgid "No"
 msgstr "いいえ"
 
-#: action.c:721
+#: action.c:732
 msgid ""
 "\n"
 "Asking child process to terminate...\n"
@@ -268,7 +280,7 @@ msgstr ""
 "\n"
 "子プロセス終了処理中...\n"
 
-#: action.c:728
+#: action.c:739
 msgid ""
 "\n"
 "Trying to KILL run-away process...\n"
@@ -276,41 +288,41 @@ msgstr ""
 "\n"
 "暴走プロセス終了を試行中...\n"
 
-#: action.c:881
+#: action.c:892
 #, c-format
 msgid "?Count contents of %s?"
 msgstr "?%s の内容を数えますか?"
 
-#: action.c:917
+#: action.c:928
 #, c-format
 msgid "?Delete %s'%s'?"
 msgstr "?%s'%s' を削除しますか?"
 
-#: action.c:918
+#: action.c:929
 msgid "WRITE-PROTECTED "
 msgstr "書き込み禁止です"
 
-#: action.c:925
+#: action.c:936
 #, c-format
 msgid "'Deleting '%s'\n"
 msgstr "''%s' を削除中\n"
 
-#: action.c:938
+#: action.c:949
 #, c-format
 msgid "'Directory '%s' deleted\n"
 msgstr "'ディレクトリ '%s' を削除しました\n"
 
-#: action.c:971
+#: action.c:982
 #, c-format
 msgid "?Eject '%s'?"
 msgstr "?'%s' をイジェクトしますか?"
 
-#: action.c:978
+#: action.c:989
 #, c-format
 msgid "'Eject '%s'\n"
 msgstr "'%s' をイジェクト'\n"
 
-#: action.c:997
+#: action.c:1008
 #, c-format
 msgid ""
 "!%s\n"
@@ -319,80 +331,80 @@ msgstr ""
 "!%s\n"
 "イジェクトに失敗しました\n"
 
-#: action.c:1016 action.c:1035
+#: action.c:1027 action.c:1046
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?'%s' を調べますか?"
 
-#: action.c:1032
+#: action.c:1043
 msgid "!Invalid find condition - change it and try again\n"
 msgstr "! 無効な検索条件です。条件を変更し再試行してください\n"
 
-#: action.c:1042
+#: action.c:1053
 #, c-format
 msgid "'(while checking '%s')\n"
 msgstr "'('%s' を検索中)\n"
 
-#: action.c:1116 action.c:1141
+#: action.c:1127 action.c:1152
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?'%s' のパーミッションを変更しますか?"
 
-#: action.c:1122
+#: action.c:1133
 #, c-format
 msgid "'Changing permissions of '%s'\n"
 msgstr "''%s' のパーミッションを変更中\n"
 
-#: action.c:1139
+#: action.c:1150
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!無効なモードコマンドです - 設定を変更して再試行してください\n"
 
-#: action.c:1196 action.c:1216
+#: action.c:1207 action.c:1227
 #, c-format
 msgid "?Change type of '%s'?"
 msgstr "?'%s' のMIME形式を変更しますか?"
 
-#: action.c:1213
+#: action.c:1224
 msgid "!Invalid type - change it and try again\n"
 msgstr "!無効なMIME形式です - 設定を変更して再試行してください\n"
 
-#: action.c:1235
+#: action.c:1246
 #, c-format
 msgid "'Changing type of '%s' to '%s'\n"
 msgstr "'MIME形式 '%s' を '%s' に変更中'\n"
 
-#: action.c:1314
+#: action.c:1325
 #, c-format
 msgid "?'%s' already exists - %s?"
 msgstr "?'%s' は既に存在しています - %sしますか?"
 
-#: action.c:1316
+#: action.c:1327
 msgid "merge contents"
 msgstr "内容を結合"
 
-#: action.c:1317
+#: action.c:1328
 msgid "overwrite"
 msgstr "上書き"
 
-#: action.c:1333
+#: action.c:1344
 msgid "'Trying copy anyway...\n"
 msgstr "'とにかくコピーする...\n"
 
-#: action.c:1342
+#: action.c:1353
 #, c-format
 msgid "?Copy %s as %s?"
 msgstr "?%s を %s としてコピーしますか?"
 
-#: action.c:1346
+#: action.c:1357
 #, c-format
 msgid "'Copying %s as %s\n"
 msgstr "'?%s を %sとしてコピー中\n"
 
-#: action.c:1361
+#: action.c:1372
 msgid "!ERROR: Destination already exists, but is not a directory\n"
 msgstr "!エラー: 対象が既に存在しますが、ディレクトリではありません\n"
 
-#: action.c:1433
+#: action.c:1444
 #, c-format
 msgid ""
 "!%s\n"
@@ -401,26 +413,26 @@ msgstr ""
 "!%s\n"
 "'%s'の コピーに失敗\n"
 
-#: action.c:1477
+#: action.c:1488
 #, c-format
 msgid "?'%s' already exists - overwrite?"
 msgstr "?'%s'は既に存在します - 上書きしますか?"
 
-#: action.c:1492
+#: action.c:1503
 msgid "'Trying move anyway...\n"
 msgstr "'とにかく移動します...\n"
 
-#: action.c:1500
+#: action.c:1511
 #, c-format
 msgid "?Move %s as %s?"
 msgstr "? %s から %s に置き換え(移動/リネーム)しますか?"
 
-#: action.c:1504
+#: action.c:1515
 #, c-format
 msgid "'Moving %s as %s\n"
 msgstr "'%s を %s として移動中\n"
 
-#: action.c:1512
+#: action.c:1523
 #, c-format
 msgid ""
 "!%s\n"
@@ -429,45 +441,45 @@ msgstr ""
 "!%s\n"
 "%s を %s として移動するのに失敗\n"
 
-#: action.c:1533
+#: action.c:1544
 msgid "!ERROR: Can't copy object into itself\n"
 msgstr "!エラー: コピー元へのコピーは出来ません\n"
 
-#: action.c:1548
+#: action.c:1559
 msgid "!ERROR: Can't move/rename object into itself\n"
 msgstr "!エラー: 元ファイルへの移動/リネームはできません\n"
 
-#: action.c:1565
+#: action.c:1571
 #, c-format
 msgid "'Linking %s as %s\n"
 msgstr "'%s にリンク %s を作成中\n"
 
-#: action.c:1570
+#: action.c:1576
 #, c-format
 msgid "?Link %s as %s?"
 msgstr "? %s へのリンク %s を作成しますか?"
 
-#: action.c:1592
+#: action.c:1618
 #, c-format
 msgid "'Mounting %s\n"
 msgstr "'%s をマウント中\n"
 
-#: action.c:1593
+#: action.c:1619
 #, c-format
 msgid "'Unmounting %s\n"
 msgstr "'%s をアンマウント中\n"
 
-#: action.c:1596
+#: action.c:1622
 #, c-format
 msgid "?Mount %s?"
 msgstr "?%s をマウントしますか?"
 
-#: action.c:1597
+#: action.c:1623
 #, c-format
 msgid "?Unmount %s?"
 msgstr "?%s をアンマウントしますか?"
 
-#: action.c:1617
+#: action.c:1643
 #, c-format
 msgid ""
 "!%s\n"
@@ -476,7 +488,7 @@ msgstr ""
 "!%s\n"
 "マウント失敗\n"
 
-#: action.c:1618
+#: action.c:1644
 #, c-format
 msgid ""
 "!%s\n"
@@ -485,11 +497,11 @@ msgstr ""
 "!%s\n"
 "アンマウント失敗\n"
 
-#: action.c:1626
+#: action.c:1652
 msgid "'(seems to be mounted now anyway)\n"
 msgstr "'(マウントされているようです)\n"
 
-#: action.c:1671
+#: action.c:1698
 #, c-format
 msgid ""
 "'\n"
@@ -498,197 +510,197 @@ msgstr ""
 "'\n"
 "合計: %s ("
 
-#: action.c:1677
+#: action.c:1704
 msgid "file"
 msgstr "ファイル"
 
-#: action.c:1677
+#: action.c:1704
 msgid "files"
 msgstr "ファイル"
 
-#: action.c:1681
+#: action.c:1708
 msgid "no directories)\n"
 msgstr "ディレクトリが有りません)\n"
 
-#: action.c:1685
+#: action.c:1712
 msgid "directory"
 msgstr "ディレクトリ"
 
-#: action.c:1686
+#: action.c:1713
 msgid "directories"
 msgstr "ディレクトリ"
 
-#: action.c:1731
+#: action.c:1754
 msgid "!No mount points selected!\n"
 msgstr "!マウントポイントが選択されていません!\n"
 
-#: action.c:1816
+#: action.c:1839
 msgid "?Another search?"
 msgstr "?他を検索?"
 
-#: action.c:1846 action.c:1877
+#: action.c:1869 action.c:1900
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' はシンボリックリンクです\n"
 
-#: action.c:1917
+#: action.c:1940
 msgid "You need to select some items to search through"
 msgstr "検索するアイテムを選んでください"
 
-#: action.c:1927 menu.c:222
+#: action.c:1950 menu.c:223
 msgid "Find"
 msgstr "検索"
 
-#: action.c:1960
+#: action.c:1983
 msgid "You need to select some items to count"
 msgstr "計算対象(複数可)を指定してください"
 
-#: action.c:1964
+#: action.c:1987
 msgid "Disk Usage"
 msgstr "ディスク使用量"
 
-#: action.c:1997
+#: action.c:2021
 msgid "Mount / Unmount"
 msgstr "マウント/アンマウント"
 
-#: action.c:2010
+#: action.c:2034
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "ROX-Filer はこのマウントポイントをサポートできていません。ごめん!"
 
-#: action.c:2024 menu.c:209 tips:217
+#: action.c:2048 menu.c:210 tips:239
 msgid "Delete"
 msgstr "削除"
 
-#: action.c:2034 tips:223
+#: action.c:2058 tips:245
 msgid "Force"
 msgstr "強行"
 
-#: action.c:2034
+#: action.c:2058
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "書き込み禁止アイテムの削除を確認しません"
 
-#: action.c:2037 action.c:2092 action.c:2151 action.c:2204 action.c:2240
-#: tips:225
+#: action.c:2061 action.c:2116 action.c:2175 action.c:2228 action.c:2264
+#: tips:247
 msgid "Brief"
 msgstr "簡略"
 
-#: action.c:2037
+#: action.c:2061
 msgid "Only log directories being deleted"
 msgstr "ディレクトリを削除するときのみログを表示します"
 
-#: action.c:2054
+#: action.c:2078
 msgid "You need to select the items whose permissions you want to change"
 msgstr "パーミッション変更対象(複数可))を選択してください"
 
-#: action.c:2062
+#: action.c:2086
 msgid "a+x (Make executable/searchable)"
 msgstr "a+x (実行可能/検索可能属性を付加)"
 
-#: action.c:2064
+#: action.c:2088
 msgid "a-x (Make non-executable/non-searchable)"
 msgstr "a-x (実行可能/検索可能属性を削除)"
 
-#: action.c:2066
+#: action.c:2090
 msgid "u+rw (Give owner read+write)"
 msgstr "u+rw (所有者の読み書きを許可)"
 
-#: action.c:2068
+#: action.c:2092
 msgid "go-rwx (Private - owner access only)"
 msgstr "go-rwx (個人用 - 所有者のみアクセス可)"
 
-#: action.c:2070
+#: action.c:2094
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (所有者の属性から書込み権を除き、グループ、他人の属性に)"
 
-#: action.c:2081 menu.c:183 menu.c:220 tips:83
+#: action.c:2105 menu.c:184 menu.c:221 tips:85
 msgid "Permissions"
 msgstr "パーミッション"
 
-#: action.c:2092 action.c:2151
+#: action.c:2116 action.c:2175
 msgid "Don't list processed files"
 msgstr "作業中のファイルを表示しません"
 
-#: action.c:2095 action.c:2154 tips:227
+#: action.c:2119 action.c:2178 tips:249
 msgid "Recurse"
 msgstr "再帰"
 
-#: action.c:2095
+#: action.c:2119
 msgid "Also change contents of subdirectories"
 msgstr "サブディレクトリ以下の内容も変更します"
 
-#: action.c:2099
+#: action.c:2123
 msgid "Command:"
 msgstr "コマンド:"
 
-#: action.c:2127
+#: action.c:2151
 msgid "You need to select the items whose type you want to change"
 msgstr "パーミッション変更対象(複数可))を選択してください"
 
-#: action.c:2140
+#: action.c:2164
 msgid "Set type"
 msgstr "MIME形式設定"
 
-#: action.c:2154
+#: action.c:2178
 msgid "Change contents of subdirectories"
 msgstr "サブディレクトリ以下の内容も変更します"
 
-#: action.c:2161 infobox.c:633
+#: action.c:2185 infobox.c:615
 msgid "Type:"
 msgstr "種類:"
 
-#: action.c:2190 dnd.c:123 menu.c:1956 tips:211
+#: action.c:2214 dnd.c:124 menu.c:1999 tips:233
 msgid "Copy"
 msgstr "コピー"
 
-#: action.c:2200 action.c:2236 tips:229
+#: action.c:2224 action.c:2260 tips:251
 msgid "Newer"
 msgstr "新しいとき"
 
-#: action.c:2201 action.c:2237 tips:230 tips:231 tips:232 tips:233
+#: action.c:2225 action.c:2261 tips:252 tips:253 tips:254 tips:255
 msgid "Only over-write if source is newer than destination."
 msgstr "対象より新しいときだけ上書きします"
 
-#: action.c:2204
+#: action.c:2228
 msgid "Only log directories as they are copied"
 msgstr "ディレクトリをコピーするときのみログを表示します"
 
-#: action.c:2226 dnd.c:124 tips:213
+#: action.c:2250 dnd.c:125 tips:235
 msgid "Move"
 msgstr "移動"
 
-#: action.c:2240
+#: action.c:2264
 msgid "Don't log each file as it is moved"
 msgstr "各ファイルの移動時にログを表示しません"
 
-#: action.c:2257 dnd.c:125 tips:215
+#: action.c:2284 tips:237
 msgid "Link"
 msgstr "リンク"
 
-#: action.c:2276 appmenu.c:113
+#: action.c:2303 appmenu.c:113
 msgid "Eject"
 msgstr "イジェクト"
 
-#: action.c:2333
+#: action.c:2360
 msgid "Deleting items such as "
 msgstr "以下のアイテムを削除 "
 
-#: action.c:2337
+#: action.c:2364
 msgid "Deleting the item "
 msgstr "アイテムを削除中 "
 
-#: action.c:2339
+#: action.c:2366
 msgid "Deleting the items "
 msgstr "アイテムを削除中 "
 
-#: action.c:2358
+#: action.c:2385
 msgid " and "
 msgstr " and "
 
-#: action.c:2367
+#: action.c:2394
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr " ピンボードやパネルのアイテムに影響します - それでも削除しますか?"
 
-#: action.c:2374
+#: action.c:2401
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr " ピンボードやパネルのアイテムに影響します - それでも削除しますか?"
 
@@ -706,58 +718,58 @@ msgstr ""
 "らは同形式 (%s/%s) アイテムを指定して開かれたメニューの先頭に専用メニューとし"
 "て追加されます"
 
-#: appmenu.c:339
+#: appmenu.c:339 menu.c:234
 msgid "Customise Menu..."
 msgstr "指定アイテム専用メニューを追加"
 
-#: appmenu.c:386 menu.c:249 toolbar.c:160
+#: appmenu.c:386 menu.c:251 toolbar.c:159
 msgid "Help"
 msgstr "ヘルプ"
 
-#: bookmarks.c:144
+#: bookmarks.c:146
 msgid "Path"
 msgstr "パス"
 
-#: bookmarks.c:152
+#: bookmarks.c:154
 msgid "Title"
 msgstr "タイトル"
 
-#: bookmarks.c:301
+#: bookmarks.c:303
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "'%s' はローカルに存在しないのでブックマークできません。\n"
 
-#: bookmarks.c:309 bookmarks.c:605
+#: bookmarks.c:311 bookmarks.c:629
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s' はディレクトリではありません"
 
-#: bookmarks.c:493
+#: bookmarks.c:517
 msgid "You should first select some rows to delete"
 msgstr "まず削除する項目を選んでください"
 
-#: bookmarks.c:517
+#: bookmarks.c:541
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "移動するにはリストの項目にカーソルを置いてください"
 
-#: bookmarks.c:537
+#: bookmarks.c:561
 msgid "This item is already at the end"
 msgstr "これ以上移動できません"
 
-#: bookmarks.c:611
+#: bookmarks.c:635
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "'%s' はローカルディレクトリではないのでブックマークできません。"
 
-#: bookmarks.c:753
+#: bookmarks.c:777
 msgid "Add New Bookmark"
 msgstr "ブックマークに追加"
 
-#: bookmarks.c:760
+#: bookmarks.c:784
 msgid "Edit Bookmarks"
 msgstr "ブックマークの管理"
 
-#: bookmarks.c:765
+#: bookmarks.c:789
 msgid "Recently Visited"
 msgstr "最近開いたディレクトリ"
 
@@ -771,7 +783,7 @@ msgid "Reset"
 msgstr "戻す(_R)"
 
 #: bulk_rename.c:76
-msgid "Make the After column a copy of Before"
+msgid "Make the New column a copy of Old"
 msgstr ""
 
 #: bulk_rename.c:81
@@ -790,7 +802,7 @@ msgid ""
 "^ matches the start of a filename\n"
 "$ matches the end\n"
 "\\. matches a dot\n"
-"\\.htm$ matches the '.htm' in 'index.html', etc"
+"\\.htm$ matches the '.htm' in 'index.htm', etc"
 msgstr ""
 
 #: bulk_rename.c:109
@@ -810,20 +822,21 @@ msgstr ""
 
 #: bulk_rename.c:123
 msgid ""
-"Do a search-and-replace in the After column.The files are not actually "
+"Do a search-and-replace in the New column. The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr ""
 
-#: bulk_rename.c:142 find.c:652
-msgid "Before"
-msgstr "前"
+#: bulk_rename.c:142
+msgid "Old name"
+msgstr ""
 
-#: bulk_rename.c:151 find.c:650
-msgid "After"
-msgstr "後"
+#: bulk_rename.c:151
+#, fuzzy
+msgid "New name"
+msgstr "リネーム"
 
 #: bulk_rename.c:259
-msgid "No strings (in the After column) matched the given expression"
+msgid "No strings (in the New column) matched the given expression"
 msgstr ""
 
 #: bulk_rename.c:264
@@ -866,12 +879,31 @@ msgstr "?'%s' は既に存在しています - %sしますか?"
 #: bulk_rename.c:421
 #, c-format
 msgid ""
-"Some of the After names contain / characters (eg '%s'). This will cause the "
+"Some of the New names contain / characters (eg '%s'). This will cause the "
 "files to end up in different directories. Continue?"
 msgstr ""
 
 #: bulk_rename.c:436
 msgid "None of the names have changed. Nothing to do!"
+msgstr ""
+
+#: choices.c:428
+#, fuzzy
+msgid "Choices migration"
+msgstr "中国語 (繁体)"
+
+#: choices.c:436
+#, c-format
+msgid ""
+"Choices have been moved from \n"
+"<b>%s</b>\n"
+" to the new location \n"
+"<b>%s</b>\n"
+msgstr ""
+
+#: choices.c:447
+#, c-format
+msgid "%d directories could not be migrated"
 msgstr ""
 
 #: dir.c:973
@@ -884,25 +916,33 @@ msgstr "ディレクトリの情報が得られません: %s"
 msgid "Can't open directory: %s"
 msgstr "ディレクトリを開けません: %s"
 
-#: display.c:583
+#: display.c:585
 #, c-format
 msgid "lstat(2) failed: %s"
 msgstr "lstat(2) 失敗: %s"
 
-#: dnd.c:424
+#: dnd.c:126
+msgid "Link (relative)"
+msgstr ""
+
+#: dnd.c:127
+msgid "Link (absolute)"
+msgstr ""
+
+#: dnd.c:426
 msgid "Internal error - bad info type"
 msgstr "内部エラー - bad info type"
 
-#: dnd.c:564
+#: dnd.c:565
 msgid "Drag a directory here to bookmark it."
 msgstr "ブックマークするにはディレクトリをここにドラッグします"
 
-#: dnd.c:579
+#: dnd.c:580
 msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr ""
 "XDS protocol error: リーフネーム-ファイル名は '/' を含んでいないようです\n"
 
-#: dnd.c:604
+#: dnd.c:605
 msgid ""
 "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
 "plain) did not contain a leafname\n"
@@ -910,17 +950,17 @@ msgstr ""
 "XdndDirectSave0 は指示通りの操作を行いましたが、要素 XDS (type text/plain) "
 "は leafname-ファイル名を含んでいません\n"
 
-#: dnd.c:617
+#: dnd.c:618
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "text/uri-list 又は XdndDirectSave0形式のターゲットを指定して下さい."
 
-#: dnd.c:620
+#: dnd.c:621
 msgid ""
 "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 "text/uri-list 又は application/octet-stream 形式のターゲットを指定して下さい."
 
-#: dnd.c:690
+#: dnd.c:691
 #, c-format
 msgid ""
 "Failed to add some items to the pinboard, because they are on a remote "
@@ -932,50 +972,50 @@ msgstr ""
 "\n"
 "%s"
 
-#: dnd.c:765
+#: dnd.c:766
 msgid "Unknown target"
 msgstr "不明な対象"
 
-#: dnd.c:798
+#: dnd.c:799
 msgid "Remote app can't or won't send me the data - sorry"
 msgstr "リモートのアプリケーションはデータを送って来ません - 悪しからず"
 
-#: dnd.c:811
+#: dnd.c:812
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
 msgstr ""
 "XDS プロトコルエラー: リターンコードは 'S', 'F', 'E' でなければいけません\n"
 
-#: dnd.c:844
+#: dnd.c:845
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
 msgstr "リモートファイル / raw data の動作メニューは表示できません."
 
-#: dnd.c:860
+#: dnd.c:861
 msgid "UntitledData"
 msgstr "名無しのデータ"
 
-#: dnd.c:887
+#: dnd.c:888
 #, c-format
 msgid "Error saving file: %s"
 msgstr "エラー救済用ファイル: %s"
 
-#: dnd.c:960
+#: dnd.c:961
 msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "text/uri-list に URI がありません(何も出来ません!)"
 
-#: dnd.c:992
+#: dnd.c:993
 msgid ""
 "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 "リモートマシンからデータを取得できません(application/octet-stream が提供され"
 "ていません)"
 
-#: dnd.c:1015
+#: dnd.c:1016
 msgid ""
 "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 "幾つかのファイルは別のマシン上にあります(それらは無視されます)。ごめんね!"
 
-#: dnd.c:1022
+#: dnd.c:1023
 msgid ""
 "None of these files are on the local machine - I can't operate on multiple "
 "remote files - sorry."
@@ -983,11 +1023,11 @@ msgstr ""
 "これらのファイルはローカルマシン上にはありません(複数リモート上のファイルは取"
 "り扱えません、ごめん!)"
 
-#: dnd.c:1035
+#: dnd.c:1036
 msgid "Unknown action requested"
 msgstr "不明なアクションの要求です"
 
-#: dnd.c:1043
+#: dnd.c:1044
 #, c-format
 msgid "Error getting file list: %s"
 msgstr "エラーを起こしたファイルの一覧: %s"
@@ -1021,7 +1061,7 @@ msgstr "ごめん！ドロップエリアにドロップ出来るファイルは
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "ローカルファイルではないので '%s' を使えません。"
 
-#: dropbox.c:280 pinboard.c:850
+#: dropbox.c:280 pinboard.c:851
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1030,25 +1070,25 @@ msgstr ""
 "'%s' にアクセスできません:\n"
 "%s"
 
-#: filer.c:442
-#, c-format
-msgid ""
-"Error scanning '%s':\n"
-"%s\n"
-msgstr ""
-"スキャンエラー '%s':\n"
-"%s\n"
-
 #: filer.c:446
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
+"%s\n"
+msgstr ""
+"スキャンエラー '%s':\n"
+"%s\n"
+
+#: filer.c:450
+#, c-format
+msgid ""
+"Error scanning '%s':\n"
 "%s"
 msgstr ""
 "スキャンエラー '%s':\n"
 "%s"
 
-#: filer.c:551
+#: filer.c:555
 msgid ""
 "Do you want to unmount this device?\n"
 "\n"
@@ -1058,20 +1098,20 @@ msgstr ""
 "\n"
 "デバイスをアンマウントすると安全にディスクを取り出すことができます"
 
-#: filer.c:555
+#: filer.c:559
 #, fuzzy
 msgid "No change"
 msgstr "なし"
 
-#: filer.c:561 menu.c:860
+#: filer.c:565 menu.c:863
 msgid "Unmount"
 msgstr "アンマウント"
 
-#: filer.c:658
+#: filer.c:662
 msgid "Directory missing/deleted"
 msgstr "ディレクトリがありません/削除されています"
 
-#: filer.c:1019
+#: filer.c:1024
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -1082,81 +1122,81 @@ msgstr ""
 "定して下さい。 その後にファイルを再選択するには %s を押してください。\n"
 "10キーで設定するなら NumLock が on であることを確認してください。"
 
-#: filer.c:1251
+#: filer.c:1256
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "ディレクトリ'%s' にアクセスできません"
 
-#: filer.c:1403
+#: filer.c:1408
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "ディレクトリ'%s' はありません"
 
-#: filer.c:1697
+#: filer.c:1702
 msgid "Cancel"
 msgstr "キャンセル"
 
-#: filer.c:1986
+#: filer.c:1991
 msgid "S"
 msgstr "S"
 
-#: filer.c:1988
+#: filer.c:1993
 msgid "T"
 msgstr "T"
 
-#: filer.c:2010
+#: filer.c:2015
 msgid "Scanning, "
 msgstr "走査中, "
 
-#: filer.c:2012
+#: filer.c:2017
 msgid "Thumbs, "
 msgstr "サムネイル, "
 
-#: filer.c:2282
+#: filer.c:2293
 msgid "Symbolic link to "
 msgstr "シンボリックリンク -> "
 
-#: filer.c:2313
+#: filer.c:2324
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "不適切な UTF-8 のファイル名です。リネームしてください\n"
 
-#: filer.c:2621 menu.c:1946
+#: filer.c:2632 menu.c:1989
 msgid "Item no longer exists!"
 msgstr "アイテムは存在しません"
 
-#: filer.c:3312
+#: filer.c:3316
 msgid "Select display properties to save"
 msgstr "保存する表示プロパティを選択して下さい"
 
-#: filer.c:3319
+#: filer.c:3323
 msgid "Position"
 msgstr "位置"
 
-#: filer.c:3324 toolbar.c:136 toolbar.c:140 tips:68
+#: filer.c:3328 toolbar.c:135 toolbar.c:139 tips:70
 msgid "Size"
 msgstr "サイズ"
 
-#: filer.c:3329
+#: filer.c:3333
 msgid "Show hidden"
 msgstr "隠しファイルを表示"
 
-#: filer.c:3335
+#: filer.c:3339
 msgid "Display style"
 msgstr "表示スタイル"
 
-#: filer.c:3341
+#: filer.c:3345
 msgid "Sort type and order"
 msgstr "ソート方法と順序"
 
-#: filer.c:3346 toolbar.c:144
+#: filer.c:3350 toolbar.c:143
 msgid "Details"
 msgstr "詳細表示"
 
-#: filer.c:3351 tips:126 tips:127
+#: filer.c:3355 tips:130 tips:131
 msgid "Thumbnails"
 msgstr "サムネイル"
 
-#: filer.c:3357
+#: filer.c:3361
 msgid "Filter"
 msgstr "フィルタ"
 
@@ -1175,6 +1215,14 @@ msgstr "システム"
 #: find.c:562
 msgid "prune"
 msgstr "切り詰める"
+
+#: find.c:650
+msgid "After"
+msgstr "後"
+
+#: find.c:652
+msgid "Before"
+msgstr "前"
 
 #: find.c:746
 msgid "IsReg"
@@ -1372,11 +1420,6 @@ msgstr "gid"
 msgid "blocks"
 msgstr "ブロック"
 
-#: gtkicontheme.c:830
-#, c-format
-msgid "Icon '%s' not present in theme"
-msgstr "'%s' アイコンはテーマに存在しません"
-
 #: gtksavebox.c:251
 msgid "Save As:"
 msgstr "名前を付けて保存:"
@@ -1431,18 +1474,18 @@ msgstr ""
 "ン設定ウィンドウを開けて、'保存'をクリックしてください。\n"
 "エラーは無視されるでしょう。"
 
-#: gui_support.c:1003
+#: gui_support.c:1000
 msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "text/uri-listデータの,不正又は不明な改行です"
 
-#: gui_support.c:1335
+#: gui_support.c:1332
 #, fuzzy, c-format
 msgid "Failed to open file '%s': %s"
 msgstr ""
 "'%s'のシンボリックリンクを削除できません:\n"
 "%s"
 
-#: gui_support.c:1379
+#: gui_support.c:1376
 #, c-format
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
@@ -1456,116 +1499,112 @@ msgstr ""
 "注意: 新しい言語設定を完全に有効にするには、 選択を保存してファイラを再起動し"
 "てください。"
 
-#: icon.c:77
+#: icon.c:78
 msgid "(click to set)"
 msgstr "(クリックでセット)"
 
-#: icon.c:134
+#: icon.c:133
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:135 menu.c:250
+#: icon.c:134 menu.c:252
 msgid "About ROX-Filer..."
 msgstr "ROX-Filer について.."
 
-#: icon.c:136 menu.c:251
+#: icon.c:135 menu.c:253
 msgid "Show Help Files"
 msgstr "ヘルプファイルを表示"
 
-#: icon.c:137 menu.c:252
+#: icon.c:136 menu.c:254
 msgid "Manual"
 msgstr "マニュアル"
 
-#: icon.c:139 menu.c:229
+#: icon.c:138 menu.c:230
 msgid "Options..."
 msgstr "オプション設定"
 
-#: icon.c:140 menu.c:237
+#: icon.c:139 menu.c:239
 msgid "Home Directory"
 msgstr "ホームディレクトリ"
 
-#: icon.c:141 icon.c:1350 menu.c:205 type.c:244
+#: icon.c:140 icon.c:1340 menu.c:206 type.c:244
 msgid "File"
 msgstr "ファイル"
 
-#: icon.c:142 menu.c:211 menu.c:873
+#: icon.c:141 menu.c:212 menu.c:876
 msgid "Shift Open"
 msgstr "［Shift］+で開く"
 
-#: icon.c:143 menu.c:217
+#: icon.c:142 menu.c:218
 msgid "Properties"
 msgstr "プロパティ"
 
-#: icon.c:144 menu.c:215
+#: icon.c:143 menu.c:216
 msgid "Set Run Action..."
 msgstr "対応アプリの設定"
 
-#: icon.c:145 menu.c:216
+#: icon.c:144 menu.c:217
 msgid "Set Icon..."
 msgstr "アイコンを設定"
 
-#: icon.c:146 icon.c:798
+#: icon.c:145 icon.c:806
 msgid "Edit Item"
 msgstr "アイテムを編集"
 
-#: icon.c:147
+#: icon.c:146
 msgid "Show Location"
 msgstr "アイテムの場所を表示"
 
-#: icon.c:148
+#: icon.c:147
 msgid "Remove Item(s)"
 msgstr "アイテムを削除"
 
-#: icon.c:150
-msgid "Backdrop..."
-msgstr "背景を設定"
-
-#: icon.c:265 menu.c:762
+#: icon.c:278 menu.c:765
 #, c-format
 msgid "%s '%s'"
 msgstr "%s '%s'"
 
-#: icon.c:278
+#: icon.c:291
 msgid "Nothing"
 msgstr "なし"
 
-#: icon.c:534
+#: icon.c:547
 msgid "The location must contain at least one character!"
 msgstr "アイテムの在処は最低１文字以上でなければいけません！"
 
-#: icon.c:605
+#: icon.c:613
 msgid "You must first select some items to remove"
 msgstr "まず削除するアイテムを選んでください"
 
-#: icon.c:619
+#: icon.c:627
 msgid "You must open the menu over an item"
 msgstr "メニューはアイテムの上で開いてください"
 
-#: icon.c:644 menu.c:1258
+#: icon.c:652 menu.c:1261
 msgid "You can only set the run action for a regular file"
 msgstr "「対応アプリを設定」はファイルに対してのみ行えます"
 
-#: icon.c:730
+#: icon.c:738
 msgid "Press the desired shortcut (eg, Control+F1)"
 msgstr "ショートカットを入力してください(例: Control+F1)"
 
-#: icon.c:752
+#: icon.c:760
 msgid "Failed to get keyboard grab!"
 msgstr "キー入力の取得に失敗しました"
 
-#: icon.c:801
+#: icon.c:809
 msgid "Clicking the icon opens:"
 msgstr "アイコンクリックで開くファイル:"
 
-#: icon.c:811
+#: icon.c:819
 msgid "Arguments to pass (for executables):"
 msgstr "プログラムに渡す引数(実行可能アイテムの場合):"
 
-#: icon.c:825
+#: icon.c:833
 msgid "The text displayed under the icon is:"
 msgstr "アイコンの下に表示するテキスト:"
 
-#: icon.c:838
+#: icon.c:846
 msgid "The keyboard shortcut is:"
 msgstr "キーボードのショートカット:"
 
@@ -1578,36 +1617,36 @@ msgstr "本当に %d 個のウィンドウを開きますか？"
 msgid "Show Info"
 msgstr "情報を表示"
 
-#: infobox.c:135 menu.c:767
+#: infobox.c:135 menu.c:770
 msgid "(bad utf-8)"
 msgstr "(不正なutf-8)"
 
-#: infobox.c:277
+#: infobox.c:259
 msgid "Show _Help Files"
 msgstr "ヘルプファイルを表示"
 
-#: infobox.c:290
+#: infobox.c:272
 msgid "<b>Permissions</b>"
 msgstr "<b>パーミッション</b>"
 
-#: infobox.c:304
+#: infobox.c:286
 msgid "<b>Contents indicate...</b>"
 msgstr "<b>項目を表示</b>"
 
-#: infobox.c:441 infobox.c:578 support.c:349
+#: infobox.c:423 infobox.c:560 support.c:349
 msgid "bytes"
 msgstr "bytes"
 
-#: infobox.c:464
+#: infobox.c:446
 msgid "Failed to read size"
 msgstr "サイズ取得に失敗"
 
-#: infobox.c:522
+#: infobox.c:504
 #, c-format
 msgid "'%s' is no longer a symlink"
 msgstr "'%s' は既に symlink では無くなっています。"
 
-#: infobox.c:529
+#: infobox.c:511
 #, c-format
 msgid ""
 "Failed to unlink '%s':\n"
@@ -1616,7 +1655,7 @@ msgstr ""
 "'%s'のシンボリックリンクを削除できません:\n"
 "%s"
 
-#: infobox.c:534
+#: infobox.c:516
 #, c-format
 msgid ""
 "Failed to create symlink from '%s':\n"
@@ -1628,144 +1667,148 @@ msgstr ""
 "%s\n"
 "(注:古いリンクは削除されました。)"
 
-#: infobox.c:557 tips:294
+#: infobox.c:539 tips:314
 msgid "Error:"
 msgstr "エラー:"
 
-#: infobox.c:564
+#: infobox.c:546
 msgid "Real directory:"
 msgstr "通常のディレクトリ:"
 
-#: infobox.c:567
+#: infobox.c:549
 msgid "Owner, Group:"
 msgstr "所有者, グループ:"
 
-#: infobox.c:574 infobox.c:589 infobox.c:598
+#: infobox.c:556 infobox.c:571 infobox.c:580
 msgid "Size:"
 msgstr "サイズ:"
 
-#: infobox.c:599
+#: infobox.c:581
 msgid "Scanning"
 msgstr "スキャン中, "
 
-#: infobox.c:620
+#: infobox.c:602
 msgid "Failed to scan"
 msgstr "スキャンに失敗"
 
-#: infobox.c:627
+#: infobox.c:609
 msgid "Change time:"
 msgstr "変更した日時:"
 
-#: infobox.c:629
+#: infobox.c:611
 msgid "Modify time:"
 msgstr "修正した日時:"
 
-#: infobox.c:631
+#: infobox.c:613
 msgid "Access time:"
 msgstr "アクセスした日時:"
 
-#: infobox.c:639
+#: infobox.c:621
 msgid "Extended attributes:"
 msgstr ""
 
-#: infobox.c:641
+#: infobox.c:623
 msgid "Present"
 msgstr ""
 
-#: infobox.c:642
+#: infobox.c:624
 msgid "None"
 msgstr "なし"
 
-#: infobox.c:643
+#: infobox.c:625
 #, fuzzy
 msgid "Not supported"
 msgstr "Dnotify(ディレクトリ通知機能)サポート"
 
-#: infobox.c:655
+#: infobox.c:637
 msgid "Link target:"
 msgstr "リンク対象:"
 
-#: infobox.c:665
+#: infobox.c:649 infobox.c:652
 msgid "Run action:"
 msgstr "対応アプリ:"
 
-#: infobox.c:755
+#: infobox.c:649
+msgid "Execute file"
+msgstr "ファイルを実行"
+
+#: infobox.c:744
 msgid "<nothing yet>"
 msgstr "<未だ何も>"
 
-#: infobox.c:825
+#: infobox.c:814
 #, c-format
 msgid "file(1) says... %s"
 msgstr "file(1) says... %s"
 
-#: infobox.c:882
+#: infobox.c:871
 #, c-format
 msgid "Could not change permissions: %s"
 msgstr "%s'のパーミッションを変更できません: "
 
-#: infobox.c:900
+#: infobox.c:889
 msgid "Owner"
 msgstr "所有者"
 
-#: infobox.c:902
+#: infobox.c:891
 msgid "Group"
 msgstr "グループ"
 
-#: infobox.c:904
+#: infobox.c:893
 msgid "World"
 msgstr "ワード"
 
-#: infobox.c:907
+#: infobox.c:896
 msgid "Read"
 msgstr "読み込み"
 
-#: infobox.c:909
+#: infobox.c:898
 msgid "Write"
 msgstr "書き込み"
 
-#: infobox.c:911
+#: infobox.c:900
 msgid "Exec"
 msgstr "実行"
 
-#: infobox.c:928
+#: infobox.c:917
 msgid "SUID"
 msgstr "SUID ビット"
 
-#: infobox.c:935
+#: infobox.c:924
 msgid "SGID"
 msgstr "SGID ビット"
 
-#: infobox.c:942
+#: infobox.c:931
 msgid "Sticky"
 msgstr "Sticky ビット"
 
-#: infobox.c:964
+#: infobox.c:953
 msgid "Symbolic link"
 msgstr "シンボリックリンク"
 
-#: infobox.c:967
+#: infobox.c:956
 msgid "ROX application"
 msgstr "ROX アプリケーション"
 
-#: infobox.c:975
+#: infobox.c:964
 msgid "mounted"
 msgstr "マウント済み"
 
-#: infobox.c:975
+#: infobox.c:964
 msgid "unmounted"
 msgstr "アンマウント済み"
 
-#: infobox.c:979
+#: infobox.c:968
 #, c-format
 msgid "Mount point for %s (%s)"
 msgstr "%s (%s) のマウントポイント"
 
-#: infobox.c:982
+#: infobox.c:971
 #, c-format
 msgid "Mount point (%s)"
 msgstr "マウントポイント (%s)"
 
-#: main.c:95
+#: main.c:96
 #, fuzzy
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
@@ -1782,15 +1825,15 @@ msgstr ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 
-#: main.c:104
+#: main.c:105
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr "詳しくは `rox --help' で確認してください\n"
 
-#: main.c:107
+#: main.c:108
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr "詳しくは `rox -h' で確認してください\n"
 
-#: main.c:109
+#: main.c:110
 msgid ""
 "NOTE: Your system does not support long options - \n"
 "you must use the short versions instead.\n"
@@ -1800,14 +1843,15 @@ msgstr ""
 "ショートバージョンを使ってください\n"
 "\n"
 
-#: main.c:115
+#: main.c:116
 #, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
 "directory if no arguments are given.\n"
 "\n"
-"  -b, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
+"  -b, --border=PANEL\topen PANEL as a border panel\n"
+"  -B, --bottom=PANEL\topen PAN as a bottom-edge panel\n"
 "  -c, --client-id=ID\tused for session management\n"
 "  -d, --dir=DIR\t\topen DIR as directory (not application)\n"
 "  -D, --close=DIR\tclose DIR and its subdirectories\n"
@@ -1819,6 +1863,7 @@ msgid ""
 "  -r, --right=PANEL\topen PAN as a right-edge panel\n"
 "  -R, --RPC\t\tinvoke method call read from stdin\n"
 "  -s, --show=FILE\topen a directory showing FILE\n"
+"  -S, --rox-session\tuse default panel and pinboard options, and -n\n"
 "  -t, --top=PANEL\topen PANEL as a top-edge panel\n"
 "  -u, --user\t\tshow user name in each window \n"
 "  -v, --version\t\tdisplay the version information and exit\n"
@@ -1850,13 +1895,21 @@ msgstr ""
 "バグ報告は <rox-devel@lists.sourceforge.net> まで.\n"
 "Home page (最新バージョンを置いてあります): http://rox.sourceforge.net/\n"
 
-#: main.c:134
+#: main.c:137
 msgid ""
 ".\n"
 "Home page (including updated versions): http://rox.sourceforge.net/\n"
 msgstr ""
 
-#: main.c:348
+#: main.c:244
+msgid ""
+"We got a BadWindow error from the X server. This might be due to this GTK "
+"bug (during drag-and-drop?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Trying to continue..."
+msgstr ""
+
+#: main.c:392
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
@@ -1864,279 +1917,279 @@ msgstr ""
 " -o オプションは現在使われなくなりました(ウィンドウマネージャによるパネル制"
 "御)。  代わりにオプションボックスから設定可能です。"
 
-#: main.c:439
+#: main.c:499
 #, c-format
 msgid "Running as user '%s'"
 msgstr "ユーザ '%s' で実行"
 
-#: main.c:613
+#: main.c:676
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr "GTKバージョン %s でコンパイル\n"
 
-#: main.c:614
+#: main.c:677
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr "GTKバージョン %d.%d.%d で実行\n"
 
-#: main.c:618
+#: main.c:681
 msgid "features set at compile time"
 msgstr "機能はコンパイル時に設定します"
 
-#: main.c:619
+#: main.c:682
 msgid "Large File Support"
 msgstr "Large File サポート"
 
-#: main.c:626
+#: main.c:689
 msgid "GNOME-VFS library"
 msgstr "GNOME-VFS ライブラリ"
 
-#: main.c:630
+#: main.c:693
 msgid "No (need 2.8.0 or later)"
 msgstr "いいえ (2.8.0 以降が必要)"
 
-#: main.c:633
+#: main.c:696
 msgid "Dnotify support"
 msgstr "Dnotify(ディレクトリ通知機能)サポート"
 
-#: main.c:640
+#: main.c:703
 msgid "Binary compatibility"
 msgstr "バイナリ互換性"
 
-#: main.c:642
+#: main.c:705
 msgid "Yes (can run with older glibc versions)"
 msgstr "はい (より古いバージョンの glibc で実行可能)"
 
-#: main.c:644
+#: main.c:707
 msgid "No (apsymbols.h not found)"
 msgstr "いいえ (apsymbols.h がみつかりません)"
 
-#: menu.c:179 tips:57
+#: menu.c:180 tips:59
 msgid "Display"
 msgstr "表示"
 
-#: menu.c:180 tips:62
+#: menu.c:181 tips:64
 msgid "Icons View"
 msgstr "アイコン表示"
 
-#: menu.c:181
+#: menu.c:182
 msgid "Icons, With..."
 msgstr "アイコン &"
 
-#: menu.c:182 tips:82
+#: menu.c:183 tips:84
 msgid "Sizes"
 msgstr "サイズ"
 
-#: menu.c:184 tips:275
+#: menu.c:185 tips:297
 msgid "Types"
 msgstr "タイプ"
 
-#: menu.c:185 tips:85
+#: menu.c:186 tips:87
 msgid "Times"
 msgstr "日付"
 
-#: menu.c:186 tips:63 tips:100
+#: menu.c:187 tips:65 tips:102
 msgid "List View"
 msgstr "詳細表示"
 
-#: menu.c:188
+#: menu.c:189
 msgid "Bigger Icons"
 msgstr "アイコン拡大"
 
-#: menu.c:189
+#: menu.c:190
 msgid "Smaller Icons"
 msgstr "アイコン縮小"
 
-#: menu.c:190 tips:79
+#: menu.c:191 tips:81
 msgid "Automatic"
 msgstr "自動"
 
-#: menu.c:192
+#: menu.c:193
 msgid "Sort by Name"
 msgstr "名前でソート"
 
-#: menu.c:193
+#: menu.c:194
 msgid "Sort by Type"
 msgstr "種類でソート"
 
-#: menu.c:194
+#: menu.c:195
 msgid "Sort by Date"
 msgstr "日付でソート"
 
-#: menu.c:195
+#: menu.c:196
 msgid "Sort by Size"
 msgstr "サイズでソート"
 
-#: menu.c:196
+#: menu.c:197
 msgid "Sort by Owner"
 msgstr "所有者でソート"
 
-#: menu.c:197
+#: menu.c:198
 msgid "Sort by Group"
 msgstr "グループでソート"
 
-#: menu.c:198
+#: menu.c:199
 msgid "Reversed"
 msgstr "逆順にソート"
 
-#: menu.c:200
+#: menu.c:201
 msgid "Show Hidden"
 msgstr "隠しファイルを表示"
 
-#: menu.c:201
+#: menu.c:202
 msgid "Filter Files..."
 msgstr "ファイルのフィルタリング"
 
-#: menu.c:202
+#: menu.c:203
 msgid "Show Thumbnails"
 msgstr "サムネイルを表示"
 
-#: menu.c:203
+#: menu.c:204
 msgid "Refresh"
 msgstr "更新"
 
-#: menu.c:204
+#: menu.c:205
 msgid "Save Display Settings..."
 msgstr "表示設定を保存"
 
-#: menu.c:206
+#: menu.c:207
 msgid "Copy..."
 msgstr "コピー"
 
-#: menu.c:207
+#: menu.c:208
 msgid "Rename..."
 msgstr "リネーム"
 
-#: menu.c:208
+#: menu.c:209
 msgid "Link..."
 msgstr "リンク"
 
-#: menu.c:212
+#: menu.c:213
 msgid "Open AVFS"
 msgstr "AVFS で展開"
 
-#: menu.c:213
+#: menu.c:214
 msgid "Send To..."
 msgstr "アプリに送る"
 
-#: menu.c:218
+#: menu.c:219
 msgid "Count"
 msgstr "ディスク使用量"
 
-#: menu.c:219
+#: menu.c:220
 msgid "Set Type..."
 msgstr "MIME 形式設定"
 
-#: menu.c:223 toolbar.c:156
+#: menu.c:224 toolbar.c:155
 msgid "Select"
 msgstr "選択"
 
-#: menu.c:224
+#: menu.c:225
 msgid "Select All"
 msgstr "全て選択"
 
-#: menu.c:225
+#: menu.c:226
 msgid "Clear Selection"
 msgstr "選択をキャンセル"
 
-#: menu.c:226
+#: menu.c:227
 msgid "Invert Selection"
 msgstr "選択を反転"
 
-#: menu.c:227
+#: menu.c:228
 msgid "Select by Name..."
 msgstr "名前で選択"
 
-#: menu.c:228
+#: menu.c:229
 msgid "Select If..."
 msgstr "条件附き選択"
 
-#: menu.c:230
+#: menu.c:231
 msgid "New"
 msgstr "新規作成"
 
-#: menu.c:232
+#: menu.c:233
 msgid "Blank file"
 msgstr "空のファイル"
 
-#: menu.c:233 tasklist.c:293
+#: menu.c:235 tasklist.c:293
 msgid "Window"
 msgstr "ウィンドウ"
 
-#: menu.c:234
+#: menu.c:236
 msgid "Parent, New Window"
 msgstr "親ディレクトリを新規ウィンドウで"
 
-#: menu.c:235
+#: menu.c:237
 msgid "Parent, Same Window"
 msgstr "親ディレクトリを同じウィンドウで"
 
-#: menu.c:236
+#: menu.c:238
 msgid "New Window"
 msgstr "新規ウィンドウ"
 
-#: menu.c:238
+#: menu.c:240
 msgid "Show Bookmarks"
 msgstr "ブックマークを表示"
 
-#: menu.c:239
+#: menu.c:241
 msgid "Follow Symbolic Links"
 msgstr "シンボリックリンクを追跡"
 
-#: menu.c:240
+#: menu.c:242
 msgid "Resize Window"
 msgstr "ウィンドウをリサイズ"
 
-#: menu.c:243
+#: menu.c:245
 msgid "Close Window"
 msgstr "ウィンドウを閉じる"
 
-#: menu.c:245
+#: menu.c:247
 msgid "Enter Path..."
 msgstr "パス入力..."
 
-#: menu.c:246
+#: menu.c:248
 msgid "Shell Command..."
 msgstr "シェルコマンド..."
 
-#: menu.c:247
+#: menu.c:249
 msgid "Xterm Here"
 msgstr "ここでXtermを起動"
 
-#: menu.c:248
+#: menu.c:250
 msgid "Switch to xterm"
 msgstr "Xtermに切り替える"
 
-#: menu.c:716
+#: menu.c:719
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "アプリに送るには Shift を押しながらメニューボタンをクリックして下さい"
 
-#: menu.c:752
+#: menu.c:755
 msgid "Next Click"
 msgstr "次のクリック"
 
-#: menu.c:774
+#: menu.c:777
 #, c-format
 msgid "%d items"
 msgstr "%d 個のアイテム"
 
-#: menu.c:862
+#: menu.c:865
 msgid "Open unmounted"
 msgstr "マウントされてない状態で開く"
 
-#: menu.c:865
+#: menu.c:868
 msgid "Show Target"
 msgstr "リンク先を表示"
 
-#: menu.c:867
+#: menu.c:870
 msgid "Look Inside"
 msgstr "内容を見る"
 
-#: menu.c:869
+#: menu.c:872
 msgid "Open As Text"
 msgstr "テキストとして開く"
 
-#: menu.c:1029
+#: menu.c:1032
 msgid ""
 "Extended attributes, used to store types, are not supported for this file or "
 "files.\n"
@@ -2145,15 +2198,15 @@ msgid ""
 "mount option ('user_xattr' on Linux)."
 msgstr ""
 
-#: menu.c:1035
+#: menu.c:1038
 msgid "Setting type not supported for some of these files"
 msgstr ""
 
-#: menu.c:1070
+#: menu.c:1073
 msgid "_Relative link"
 msgstr "相対リンク(_R)"
 
-#: menu.c:1076
+#: menu.c:1079
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -2165,42 +2218,42 @@ msgstr ""
 "'OFF'の場合,'/'からの絶対パスが保持されます。シンボリックリンクのみを\n"
 "移動し、ターゲットは移動しないような場合は'OFF'にして下さい。"
 
-#: menu.c:1146
+#: menu.c:1149
 msgid "New pathname is not absolute"
 msgstr "新パス名は絶対パスでは有りません"
 
-#: menu.c:1212
+#: menu.c:1215
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr "'%s' のシンボリックリンクは既に存在します。置き換えますか?"
 
-#: menu.c:1218
+#: menu.c:1221
 msgid "_Replace"
 msgstr "置き換え(_R)"
 
-#: menu.c:1349 menu.c:1390 menu.c:1450
+#: menu.c:1352 menu.c:1393 menu.c:1453
 msgid "Create"
 msgstr "作成"
 
-#: menu.c:1350
+#: menu.c:1353
 msgid "NewDir"
 msgstr "新規ディレクトリ"
 
-#: menu.c:1364 menu.c:1370
+#: menu.c:1367 menu.c:1373
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "作成失敗 '%s': %s"
 
-#: menu.c:1391
+#: menu.c:1394
 msgid "NewFile"
 msgstr "新規ファイル"
 
-#: menu.c:1409
+#: menu.c:1412
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "ファイル作成失敗: %s 用のテンプレートが見つかりません。"
 
-#: menu.c:1480
+#: menu.c:1483
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -2230,7 +2283,7 @@ msgstr ""
 "と、その形式のファイルが選択されたときに表示されます。.group' は複数形式の"
 "ファイルが選択されたときに表示されます。"
 
-#: menu.c:1491
+#: menu.c:1494
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
@@ -2239,19 +2292,41 @@ msgstr ""
 "へ Ctrl+Shift+ ドラッグ & ドロップして下さい(シンボリックリンクを作成できま"
 "す)"
 
-#: menu.c:1494
+#: menu.c:1497 menu.c:1537
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "環境変数 CHOICESPATH の設定がカスタマイズを妨げています．残念！"
 
-#: menu.c:1609
+#: menu.c:1530
+#, c-format
+msgid ""
+"Any files placed in your Templates directories will appear on the `New' "
+"menu. Choosing one of them will make a copy of it as the new file.\n"
+"\n"
+"The following directories contain templates:\n"
+"\n"
+"%s\n"
+"%s\n"
+msgstr ""
+
+#: menu.c:1535
+#, fuzzy
+msgid ""
+"I'll show you your Templates directory now; you should place any template "
+"files you want inside it."
+msgstr ""
+"OK を押せば 'アプリに送る' 専用ディレクトリを開きます。登録したいアプリをそこ"
+"へ Ctrl+Shift+ ドラッグ & ドロップして下さい(シンボリックリンクを作成できま"
+"す)"
+
+#: menu.c:1652
 msgid "Customise"
 msgstr "カスタマイズ"
 
-#: menu.c:1674
+#: menu.c:1717
 msgid "This is already the canonical name for this directory."
 msgstr "これは、このディレクトリの規範的な名称です。"
 
-#: menu.c:1705
+#: menu.c:1748
 msgid ""
 "You can't open a second view onto this directory because the `Unique "
 "Windows' option is turned on in the Options window."
@@ -2259,75 +2334,75 @@ msgstr ""
 "このディレクトリのウィンドウをもうひとつ開くことはできません。オプション設定"
 "で `重複したウィンドウを開かない'オプションが有効になっています。"
 
-#: menu.c:1826
+#: menu.c:1869
 msgid "Copy ... ?"
 msgstr "どれをコピー?"
 
-#: menu.c:1829
+#: menu.c:1872
 msgid "Rename ... ?"
 msgstr "どれをリネーム?"
 
-#: menu.c:1832
+#: menu.c:1875
 msgid "Symlink ... ?"
 msgstr "どれをシンボリックリンク?"
 
-#: menu.c:1835
+#: menu.c:1878
 msgid "Shift Open ... ?"
 msgstr "どれを［Shift］+で開く?"
 
-#: menu.c:1838
+#: menu.c:1881
 msgid "Properties of ... ?"
 msgstr "どれのプロパティを...?"
 
-#: menu.c:1841
+#: menu.c:1884
 msgid "Set type of ... ?"
 msgstr "どれの MIME 形式を...?"
 
-#: menu.c:1844
+#: menu.c:1887
 msgid "Set run action for ... ?"
 msgstr "どれに対応アプリを設定...?"
 
-#: menu.c:1847
+#: menu.c:1890
 msgid "Set icon for ... ?"
 msgstr "どれにアイコンを設定?"
 
-#: menu.c:1850
+#: menu.c:1893
 msgid "Send ... to ... ?"
 msgstr "どれをアプリに送る?"
 
-#: menu.c:1853
+#: menu.c:1896
 msgid "DELETE ... ?"
 msgstr "どれを削除する?"
 
-#: menu.c:1856
+#: menu.c:1899
 msgid "Count the size of ... ?"
 msgstr "どれの容量を計算する?"
 
-#: menu.c:1859
+#: menu.c:1902
 msgid "Set permissions on ... ?"
 msgstr "どれのパーミッションを設定?"
 
-#: menu.c:1862
+#: menu.c:1905
 msgid "Search inside ... ?"
 msgstr "どれを検索?"
 
-#: menu.c:1865
+#: menu.c:1908
 msgid "Look inside ... ?"
 msgstr "どれを AVFS で展開?"
 
-#: menu.c:1929
+#: menu.c:1972
 msgid "You cannot do this to more than one item at a time"
 msgstr "複数アイテムに同時にこの処理を行うことはできません"
 
-#: menu.c:1961
+#: menu.c:2004
 msgid "Rename"
 msgstr "リネーム"
 
-#: menu.c:1966
+#: menu.c:2009
 msgid "Symlink"
 msgstr "シンボリックリンク"
 
-#: menu.c:1998
+#: menu.c:2041
 msgid ""
 "User-definable shortcuts are disabled by default in Gtk2, and you have not "
 "enabled them. You can turn this feature on by:\n"
@@ -2347,7 +2422,7 @@ msgstr ""
 "2) ~/.gtkrc-2.0 に以下の記述を加える(無ければ作成する):\n"
 " \tgtk-can-change-accels = 1"
 
-#: menu.c:2009
+#: menu.c:2052
 msgid ""
 "To set a keyboard short-cut for a menu item:\n"
 "\n"
@@ -2367,31 +2442,31 @@ msgstr ""
 "設定したショートカットはメニュー項目の横に表示され、以後はメニューを開かなく"
 "てもショートカットキーにより、その機能を呼び出せます。"
 
-#: menu.c:2024
+#: menu.c:2067
 msgid "Set keyboard shortcuts"
 msgstr "キーボードショートカットを設定"
 
-#: minibuffer.c:128
+#: minibuffer.c:131
 msgid "Goto:"
 msgstr "Goto:"
 
-#: minibuffer.c:129
+#: minibuffer.c:132
 msgid "Shell:"
 msgstr "シェル:"
 
-#: minibuffer.c:130
+#: minibuffer.c:133
 msgid "Select If:"
 msgstr "条件選択:"
 
-#: minibuffer.c:131
+#: minibuffer.c:134
 msgid "Select Named:"
 msgstr "名前選択:"
 
-#: minibuffer.c:132
+#: minibuffer.c:135
 msgid "Pattern:"
 msgstr "パターン"
 
-#: minibuffer.c:261
+#: minibuffer.c:264
 msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
@@ -2399,14 +2474,14 @@ msgstr ""
 "ファイル/パス名を入力すれば該当するものを表示します。tab キーによる補完が可能"
 "です。ミニバッファの閉じるには 'Escape' キーを押して下さい。"
 
-#: minibuffer.c:267
+#: minibuffer.c:270
 msgid ""
 "Enter a shell command to execute. Click on a file to add it to the buffer."
 msgstr ""
 "シェルコマンドを入力して下さい。ファイル/ディレクトリをあらかじめ選択しておく"
 "か、クリックするとパラメ-タとしてコマンドラインに追加されます。"
 
-#: minibuffer.c:272
+#: minibuffer.c:275
 msgid ""
 "Enter a file name pattern to select all matching files:\n"
 "\n"
@@ -2424,7 +2499,7 @@ msgstr ""
 "[a-z] 'a' から 'z' まで(小文字)のいずれか1文字に一致します\n"
 "*.png '.png'で終わる総てのアイテムに適合します"
 
-#: minibuffer.c:284
+#: minibuffer.c:287
 msgid ""
 "Enter a pattern to match for files to be shown.  An empty filter turns the "
 "filter off."
@@ -2432,7 +2507,7 @@ msgstr ""
 "表示を希望するファイルに適合するパターンを入力して下さい。パターンを指定しな"
 "い場合はフィルタリングを解除します"
 
-#: minibuffer.c:847
+#: minibuffer.c:895
 msgid "Invalid Find condition"
 msgstr "無効な検索条件です"
 
@@ -2479,7 +2554,7 @@ msgstr ""
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "(環境変数 CHOICESPATHにより保存できません)"
 
-#: options.c:1164 usericons.c:449
+#: options.c:1164 usericons.c:450
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "保存エラー %s: %s"
@@ -2488,11 +2563,11 @@ msgstr "保存エラー %s: %s"
 msgid "Missing '='"
 msgstr "'=' がありません"
 
-#: panel.c:385
+#: panel.c:439
 msgid "Your old panel file has been converted to the new XML format."
 msgstr "今までのパネル設定ファイルは新規 XML 形式に変換されました。"
 
-#: panel.c:493
+#: panel.c:546
 msgid ""
 "You have tried to close a panel via the window manager - I usually find that "
 "this is accidental... really close?"
@@ -2500,20 +2575,20 @@ msgstr ""
 "おそらく何かのアクシデントと思われますが、ウィンドウマネージャがパネルを閉じ"
 "ようとしています。 ...本当に閉じますか?"
 
-#: panel.c:576
+#: panel.c:639
 msgid "Missing < or > in panel config file"
 msgstr "パネル設定ファイル内で '<' 又は '>' が、欠けています"
 
-#: panel.c:1449
+#: panel.c:1519
 #, c-format
 msgid "Error saving panel %s: %s"
 msgstr "パネル %s を保存できません: %s"
 
-#: panel.c:1765
+#: panel.c:1835
 msgid "Applet quit without ever creating a widget!"
 msgstr "アプレットはウィジェットを作成せずに終了されました!"
 
-#: panel.c:1864
+#: panel.c:1934
 #, c-format
 msgid ""
 "Error running applet:\n"
@@ -2522,16 +2597,68 @@ msgstr ""
 "アプレットの実行エラー:\n"
 "%s"
 
-#: panel.c:2351
+#: panel.c:2335
+#, fuzzy
+msgid "Panel Options..."
+msgstr "オプション設定"
+
+#: panel.c:2427
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Xinerama モニタ %d は利用できません"
 
-#: pinboard.c:351
+#: panel.c:2502
+#, fuzzy
+msgid "Panel Options"
+msgstr "オプション"
+
+#: panel.c:2517
+#, fuzzy, c-format
+msgid "Panel: %s"
+msgstr "パネル"
+
+#: panel.c:2525
+msgid "Select the panel's position:"
+msgstr ""
+
+#: panel.c:2531
+msgid "Top-edge panel"
+msgstr ""
+
+#: panel.c:2532
+msgid "Top edge"
+msgstr ""
+
+#: panel.c:2533
+msgid "Bottom edge panel"
+msgstr ""
+
+#: panel.c:2534
+#, fuzzy
+msgid "Bottom edge"
+msgstr "下部余白"
+
+#: panel.c:2535
+msgid "Left edge panel"
+msgstr ""
+
+#: panel.c:2536
+msgid "Left edge"
+msgstr ""
+
+#: panel.c:2537
+msgid "Right-edge panel"
+msgstr ""
+
+#: panel.c:2538
+msgid "Right edge"
+msgstr ""
+
+#: pinboard.c:352
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "今までのピンボード設定ファイルは新規 XML 形式に変換されました。"
 
-#: pinboard.c:632
+#: pinboard.c:633
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
@@ -2548,7 +2675,7 @@ msgstr ""
 "※ 背景設定プログラム関しては以下をご覧下さい。\n"
 "http://rox.sourceforge.net/phpwiki/index.php/Wallpaper"
 
-#: pinboard.c:651
+#: pinboard.c:652
 msgid ""
 "You can only set the backdrop to an image or to a program which knows how to "
 "manage ROX-Filer's backdrop.\n"
@@ -2562,51 +2689,51 @@ msgstr ""
 "(開発者へ) アプリケーションの AppInfo.xml には ROX-Filers manualに記載されて"
 "いるようなCanSetBackdrop エレメントが必要です。"
 
-#: pinboard.c:671
+#: pinboard.c:672
 msgid "Set backdrop"
 msgstr "背景を設定"
 
-#: pinboard.c:682
+#: pinboard.c:683
 msgid "Choose a style and drag an image in:"
 msgstr "イメージをドラッグして表示方法を選択:"
 
-#: pinboard.c:695
+#: pinboard.c:696
 msgid "Centre the image without scaling it"
 msgstr "イメージを中央に原寸で表示"
 
-#: pinboard.c:696
+#: pinboard.c:697
 msgid "Centre"
 msgstr "中央に"
 
-#: pinboard.c:697
+#: pinboard.c:698
 msgid "Scale the image to fit the backdrop area, without distorting it"
 msgstr "イメージの縦横比率を維持したまま背景エリアに合わせて表示"
 
-#: pinboard.c:699
+#: pinboard.c:700
 msgid "Scale"
 msgstr "比率を維持"
 
-#: pinboard.c:700
+#: pinboard.c:701
 msgid "Stretch the image to fill the backdrop area"
 msgstr "イメージを背景エリアの縦横比率に合わせて伸縮して表示"
 
-#: pinboard.c:701
+#: pinboard.c:702
 msgid "Stretch"
 msgstr "背景サイズに合わせる"
 
-#: pinboard.c:702
+#: pinboard.c:703
 msgid "Tile the image over the backdrop area"
 msgstr "タイル状に並べる"
 
-#: pinboard.c:703
+#: pinboard.c:704
 msgid "Tile"
 msgstr "タイル"
 
-#: pinboard.c:708
+#: pinboard.c:709
 msgid "Drop an image here"
 msgstr "画像をここにドロップ"
 
-#: pinboard.c:769
+#: pinboard.c:770
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
@@ -2614,27 +2741,31 @@ msgstr ""
 "ピンボードが使用されていなかったので、デフォルトピンボードが設定されました。 "
 "以後、ピンボードを使用するなら rox-p=Default' で起動します。"
 
-#: pinboard.c:863
+#: pinboard.c:864
 msgid ""
 "Only files (and certain applications) can be used to set the background "
 "image."
 msgstr ""
 "画像ファイル(または特定のアプリケーション)だけが背景に設定できます。 image."
 
-#: pinboard.c:1468
+#: pinboard.c:1469
 msgid "Missing '>' in icon label"
 msgstr "アイコン名に '>' が見つかりません"
 
-#: pinboard.c:1477
+#: pinboard.c:1478
 msgid "Missing ',' after icon label"
 msgstr "アイコン名の後に ',' が見つかりません"
 
-#: pinboard.c:1562
+#: pinboard.c:1563
 #, c-format
 msgid "Error saving pinboard %s: %s"
 msgstr "ピンボード %s の保存に失敗: %s"
 
-#: pinboard.c:2195
+#: pinboard.c:2107
+msgid "Backdrop..."
+msgstr "背景を設定"
+
+#: pinboard.c:2200
 #, c-format
 msgid ""
 "Error loading backdrop image:\n"
@@ -2645,7 +2776,7 @@ msgstr ""
 "%s\n"
 "背景は削除されました。"
 
-#: pixmaps.c:982
+#: pixmaps.c:991
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2654,30 +2785,30 @@ msgstr ""
 "%s のサムネイルを削除できません:\n"
 "%s"
 
-#: pixmaps.c:1003
+#: pixmaps.c:1012
 msgid "There are no thumbnails to delete"
 msgstr "削除するサムネイルはありません"
 
-#: pixmaps.c:1016
+#: pixmaps.c:1025
 msgid "Purge thumbnails disk cache"
 msgstr "サムネイルのキャッシュを削除"
 
-#: remote.c:622
+#: remote.c:624
 #, c-format
 msgid "Unknown style '%s'"
 msgstr "不明なスタイル'%s'"
 
-#: remote.c:644
+#: remote.c:646
 #, c-format
 msgid "Unknown details type '%s'"
 msgstr "不明な詳細の種類'%s'"
 
-#: remote.c:672
+#: remote.c:674
 #, c-format
 msgid "Unknown sorting type '%s'"
 msgstr "不明な並べ変え方法'%s'"
 
-#: remote.c:1101
+#: remote.c:1113
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
 msgstr "不明な SOAP 方式 '%s' を試します。"
@@ -2755,134 +2886,134 @@ msgstr "B"
 msgid "byte"
 msgstr "byte"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Close"
 msgstr "閉じる"
 
-#: toolbar.c:116
+#: toolbar.c:115
 msgid "Close filer window"
 msgstr "ファイラーウィンドウを閉じる"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Up"
 msgstr "上へ"
 
-#: toolbar.c:120
+#: toolbar.c:119
 msgid "Change to parent directory"
 msgstr "親ディレクトリに移動"
 
-#: toolbar.c:124
+#: toolbar.c:123
 msgid "Home"
 msgstr "ホーム"
 
-#: toolbar.c:124
+#: toolbar.c:123
 msgid "Change to home directory"
 msgstr "ホームディレクトリに移動"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Bookmarks"
 msgstr "ブックマーク"
 
-#: toolbar.c:128
+#: toolbar.c:127
 msgid "Bookmarks menu"
 msgstr "ブックマークメニュー"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Scan"
 msgstr "スキャン"
 
-#: toolbar.c:132
+#: toolbar.c:131
 msgid "Rescan directory contents"
 msgstr "ディレクトリの内容を読み直す"
 
-#: toolbar.c:136
+#: toolbar.c:135
 msgid "Change icon size"
 msgstr "アイコンを拡大/縮小(左/右クリック)"
 
-#: toolbar.c:140
+#: toolbar.c:139
 msgid "Automatic size mode"
 msgstr "ウィンドウのサイズを最適化"
 
-#: toolbar.c:144
+#: toolbar.c:143
 msgid "Show extra details"
 msgstr "詳細を表示/非表示"
 
-#: toolbar.c:148
+#: toolbar.c:147
 msgid "Sort"
 msgstr "ソート"
 
-#: toolbar.c:148
+#: toolbar.c:147
 msgid "Change sort criteria"
 msgstr "ソート条件を変更"
 
-#: toolbar.c:152
+#: toolbar.c:151
 msgid "Hidden"
 msgstr "隠しファイル"
 
-#: toolbar.c:152
+#: toolbar.c:151
 msgid "Show/hide hidden files"
 msgstr "隠しファイルを表示/非表示"
 
-#: toolbar.c:156
+#: toolbar.c:155
 msgid "Select all/invert selection"
 msgstr "全てを選択/選択を反転(左/右クリック)"
 
-#: toolbar.c:160
+#: toolbar.c:159
 msgid "Show ROX-Filer help"
 msgstr "ROX-Filerのヘルプを表示"
 
-#: toolbar.c:223
+#: toolbar.c:220
 #, c-format
 msgid " (%u hidden)"
 msgstr " (%u 個の隠しファイル)"
 
-#: toolbar.c:231 tips:88
+#: toolbar.c:228 tips:90
 msgid "items"
 msgstr "アイテム"
 
-#: toolbar.c:231
+#: toolbar.c:228
 msgid "item"
 msgstr "アイテム"
 
-#: toolbar.c:234
+#: toolbar.c:231
 #, c-format
 msgid "No items%s"
 msgstr "アイテム無し%s"
 
-#: toolbar.c:253
+#: toolbar.c:250
 #, c-format
 msgid "%u selected (%s)"
 msgstr "%u 個を選択(%s)"
 
-#: toolbar.c:419
+#: toolbar.c:416
 msgid "Sort by name"
 msgstr "名前でソート"
 
-#: toolbar.c:419
+#: toolbar.c:416
 msgid "Sort by type"
 msgstr "種類でソート"
 
-#: toolbar.c:419
+#: toolbar.c:416
 msgid "Sort by date"
 msgstr "日付でソート"
 
-#: toolbar.c:420
+#: toolbar.c:417
 msgid "Sort by size"
 msgstr "サイズでソート"
 
-#: toolbar.c:420
+#: toolbar.c:417
 msgid "Sort by owner"
 msgstr "所有者でソート"
 
-#: toolbar.c:420
+#: toolbar.c:417
 msgid "Sort by group"
 msgstr "グループでソート"
 
-#: toolbar.c:453
+#: toolbar.c:450
 msgid "ascending"
 msgstr "昇順"
 
-#: toolbar.c:453
+#: toolbar.c:450
 msgid "descending"
 msgstr "降順"
 
@@ -2926,7 +3057,7 @@ msgstr "Door"
 msgid "Unknown"
 msgstr "不明"
 
-#: type.c:414
+#: type.c:415
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -2950,11 +3081,11 @@ msgstr ""
 "利用する全てのユ-ザが信頼できるなら心配はいりませんが、そうでない場合は完璧な"
 "チェックを行うか、わずかでも不安の残るプログラムは全て削除すべきです。"
 
-#: type.c:427
+#: type.c:428
 msgid "go-w (Fix security problem)"
 msgstr "go-w (セキュリティ的処置)"
 
-#: type.c:557
+#: type.c:558
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -2964,76 +3095,72 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:735
+#: type.c:739
 msgid "This is not a program! Give me an application instead!"
 msgstr "これはプログラムではありません。別のアプリを指定してください。"
 
-#: type.c:793
-msgid "Execute file"
-msgstr "ファイルを実行"
-
-#: type.c:798
+#: type.c:800
 msgid "No run action defined"
 msgstr "対応アプリが設定されていません"
 
-#: type.c:824
+#: type.c:826
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "%s にエラ-: %s"
 
-#: type.c:839
+#: type.c:841
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "無効なアプリケーション %s (AppRun 不良)"
 
-#: type.c:850
+#: type.c:852
 #, c-format
 msgid "Non-executable %s"
 msgstr "実行属性の無い %s"
 
-#: type.c:883
+#: type.c:885
 msgid "Set run action"
 msgstr "対応アプリを設定"
 
-#: type.c:889
+#: type.c:891
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "このファイル形式の取扱いが設定されていない場合、これをデフォルトの動作に使用"
 "します。"
 
-#: type.c:891
+#: type.c:893
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "`%s/<anything>' 全てに適用する"
 
-#: type.c:895
+#: type.c:897
 msgid "Use this application for all files with this MIME type."
 msgstr "この MIME 形式のファイル全てにこのアプリを対応させる。"
 
-#: type.c:897
+#: type.c:899
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "`%s'形式(%s/%s)のみに適用する"
 
-#: type.c:903
+#: type.c:905
 msgid "Drop a suitable application here"
 msgstr "関連づけるアプリケーションをここにドロップ"
 
-#: type.c:918
+#: type.c:920
 msgid "OR"
 msgstr "もしくは"
 
-#: type.c:925
+#: type.c:927
 msgid "Enter a shell command:"
 msgstr "シェルコマンドを入力してください:"
 
-#: type.c:954
+#: type.c:956
 #, fuzzy
 msgid "_Use Command"
 msgstr "コマンド:"
 
-#: type.c:984
+#: type.c:986
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -3041,12 +3168,12 @@ msgstr ""
 "既に対応アプリが定義されており、かなり大きなプログラムになっています。本当に"
 "削除しますか?"
 
-#: type.c:995
+#: type.c:997
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "%s を削除できません: %s"
 
-#: type.c:1032
+#: type.c:1034
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "環境変数 CHOICESPATH により、選択は保存されません。"
 
@@ -3120,7 +3247,7 @@ msgstr ""
 msgid "The pathname you gave does not exist. The icon has not been changed."
 msgstr "指定されたパスは存在しません。アイコンは変更されません。"
 
-#: usericons.c:191 usericons.c:615
+#: usericons.c:191 usericons.c:616
 msgid ""
 "Unable to load image file -- maybe it's not in a format I understand, or "
 "maybe the permissions are wrong?\n"
@@ -3198,11 +3325,11 @@ msgstr "画像をディレクトリにコピー"
 msgid "Drop an icon file here"
 msgstr "アイコンファイルをここにドロップ"
 
-#: usericons.c:586
+#: usericons.c:587
 msgid "Setting icon disabled by CHOICESPATH"
 msgstr " 環境変数 CHOICESPATH により、アイコンが設定できません"
 
-#: usericons.c:630
+#: usericons.c:631
 #, c-format
 msgid ""
 "Error creating image '%s':\n"
@@ -3211,31 +3338,31 @@ msgstr ""
 "画像 '%s' 作成エラー:\n"
 "%s"
 
-#: view_details.c:1003
+#: view_details.c:1009
 msgid "_Name"
 msgstr "名前(_N)"
 
-#: view_details.c:1006
+#: view_details.c:1012
 msgid "_Type"
 msgstr "タイプ(_T)"
 
-#: view_details.c:1008
+#: view_details.c:1015
 msgid "_Permissions"
 msgstr "パーミッション(_P)"
 
-#: view_details.c:1009
+#: view_details.c:1016
 msgid "_Owner"
 msgstr "所有者(_O)"
 
-#: view_details.c:1011
+#: view_details.c:1018
 msgid "_Group"
 msgstr "グループ(_G)"
 
-#: view_details.c:1013
+#: view_details.c:1020
 msgid "_Size"
 msgstr "サイズ(_S)"
 
-#: view_details.c:1015
+#: view_details.c:1022
 msgid "Last _Modified"
 msgstr "最終変更日(_M)"
 
@@ -3252,95 +3379,104 @@ msgid "Use the LANG environment variable"
 msgstr "LANG変数から読み取る"
 
 #: tips:4
+msgid "Basque"
+msgstr ""
+
+#: tips:5
 msgid "Chinese (traditional)"
 msgstr "中国語 (繁体)"
 
-#: tips:5
+#: tips:6
 msgid "Chinese (simplified)"
 msgstr "中国語 (簡体)"
 
-#: tips:6
+#: tips:7
 msgid "Czech"
 msgstr "チェコ語"
 
-#: tips:7
+#: tips:8
 msgid "Danish"
 msgstr "デンマーク語"
 
-#: tips:8
+#: tips:9
 msgid "Dutch"
 msgstr "オランダ語"
 
-#: tips:9
+#: tips:10
 msgid "English (no translation)"
 msgstr "英語(翻訳無し)"
 
-#: tips:10
+#: tips:11
+#, fuzzy
+msgid "Estonian"
+msgstr "ルーマニア語"
+
+#: tips:12
 #, fuzzy
 msgid "Finnish"
 msgstr "デンマーク語"
 
-#: tips:11
+#: tips:13
 msgid "French"
 msgstr "フランス語"
 
-#: tips:12
+#: tips:14
 msgid "German"
 msgstr "ドイツ語"
 
-#: tips:13
+#: tips:15
 msgid "Hungarian"
 msgstr "ハンガリー語"
 
-#: tips:14
+#: tips:16
 msgid "Japanese"
 msgstr "日本語"
 
-#: tips:15
+#: tips:17
 msgid "Norwegian"
 msgstr "ノルウェー語"
 
-#: tips:16
+#: tips:18
 msgid "Italian"
 msgstr "イタリア語"
 
-#: tips:17
+#: tips:19
 msgid "Polish"
 msgstr "ポーランド語"
 
-#: tips:18
+#: tips:20
 msgid "Portuguese (Brasil)"
 msgstr "ポルトガル語(ブラジル)"
 
-#: tips:19
+#: tips:21
 msgid "Romanian"
 msgstr "ルーマニア語"
 
-#: tips:20
+#: tips:22
 msgid "Russian"
 msgstr "ロシア語"
 
-#: tips:21
+#: tips:23
 msgid "Spanish"
 msgstr "スペイン語"
 
-#: tips:22
+#: tips:24
 msgid "Swedish"
 msgstr "スウェーデン語"
 
-#: tips:23
+#: tips:25
 msgid "Filer windows"
 msgstr "ファイラーウィンドウ"
 
-#: tips:24
+#: tips:26
 msgid "Auto-resize filer windows"
 msgstr "ウィンドウサイズの自動調整"
 
-#: tips:25
+#: tips:27
 msgid "Never automatically resize"
 msgstr "サイズを自動的には変更しない"
 
-#: tips:26
+#: tips:28
 msgid ""
 "You'll have to resize windows manually, using the window manager, the "
 "`Resize Window' menu entry or by double-clicking on the window background."
@@ -3349,11 +3485,11 @@ msgstr ""
 "ラーウィンドウ内のスペースをダブルクリックする事により、手動でリサイズしま"
 "す。"
 
-#: tips:27
+#: tips:29
 msgid "Resize when changing the display style"
 msgstr "表示方法を変更したらリサイズする"
 
-#: tips:28
+#: tips:30
 msgid ""
 "Changing the size of the icons or which details are displayed will resize "
 "the window for you."
@@ -3361,11 +3497,11 @@ msgstr ""
 "アイコンサイズ変更時、詳細表示モード切替え時に、自動的に適切なサイズに調節(リ"
 "サイズ)します。"
 
-#: tips:29
+#: tips:31
 msgid "Always resize"
 msgstr "常にリサイズする"
 
-#: tips:30 tips:31
+#: tips:32 tips:33
 msgid ""
 "The filer will resize windows whenever it seems useful (that is, when "
 "changing directory or display style)."
@@ -3373,15 +3509,15 @@ msgstr ""
 "リサイズが有効と思われる場合(ディレクトリ変更時、表示形式変更時など)、常に自"
 "動的にリサイズします。"
 
-#: tips:32
+#: tips:34
 msgid "Largest window size:"
 msgstr "ウィンドウの最大サイズ:"
 
-#: tips:33
+#: tips:35
 msgid "%"
 msgstr "%"
 
-#: tips:34 tips:35
+#: tips:36 tips:37
 msgid ""
 "The largest size, as a percentage of the screen size, that the auto-resizer "
 "will resize a window to."
@@ -3389,15 +3525,15 @@ msgstr ""
 "画面全体に対する最大のサイズ。自動的にサイズを変更する際に許可する最大のサイ"
 "ズ。"
 
-#: tips:36
+#: tips:38
 msgid "Window behaviour"
 msgstr "ウィンドウの動作"
 
-#: tips:37
+#: tips:39
 msgid "Short titlebar flags"
 msgstr "タイトルバーへの状態表示を略記する"
 
-#: tips:38
+#: tips:40
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
@@ -3405,11 +3541,11 @@ msgstr ""
 "タイトルバーに、スキャン中は'+S'、全て表示は'+A'、サムネイル表示は'+T' とファ"
 "イラーの状態の簡略表示を追加します。"
 
-#: tips:39
+#: tips:41
 msgid "Unique windows"
 msgstr "重複したウィンドウを開かない"
 
-#: tips:40 tips:41
+#: tips:42 tips:43
 msgid ""
 "If you open a directory and that directory is already displayed in another "
 "window, then this option causes the other window to be closed."
@@ -3417,11 +3553,11 @@ msgstr ""
 "開こうとしたディレクトリが、既に別ウィンドウとして開かれている場合、旧ウィン"
 "ドウを自動的に閉じます。"
 
-#: tips:42
+#: tips:44
 msgid "New window on button 1"
 msgstr "左ボタン(第 1 ボタン)で新しいウィンドウを開く"
 
-#: tips:43
+#: tips:45
 msgid ""
 "Clicking with mouse button 1 (usually the left button) opens a directory in "
 "a new window with this turned on. Clicking with the button-2 (middle) will "
@@ -3430,11 +3566,11 @@ msgstr ""
 "'ON' の場合、第 1 ボタン(通常は左ボタン)でディレクトリをクリックすると、新し"
 "いウィンドウで開き、中ボタンをクリックすると現在のウィンドウで開きます。"
 
-#: tips:44
+#: tips:46
 msgid "Single-click navigation"
 msgstr "シングルクリックで操作する"
 
-#: tips:45 tips:150
+#: tips:47 tips:154
 msgid ""
 "Clicking on an item opens it with this on. Hold down Control to select the "
 "item instead. If off, clicking once selects an item; double click to open "
@@ -3444,11 +3580,11 @@ msgstr ""
 "キーを押しながらクリック。'OFF' の場合は シングルクリックで選択、ダブルクリッ"
 "クでアイテムを開きます。"
 
-#: tips:46
+#: tips:48
 msgid "Double-click on background resizes"
 msgstr "背景のダブルクリックでウィンドウをリサイズする"
 
-#: tips:47 tips:48 tips:49 tips:50
+#: tips:49 tips:50 tips:51 tips:52
 msgid ""
 "If on then double clicking on the window background resizes the window, just "
 "like clicking on the Automatic size mode button in the toolbar."
@@ -3456,25 +3592,25 @@ msgstr ""
 "ファイラーウィンドウ背景のダブルクリックで、ツールバーのウィンドウサイズ最適"
 "化ボタンをクリックしたのと同様に、ウィンドウをリサイズします。"
 
-#: tips:51
+#: tips:53
 msgid "Sorting"
 msgstr "ソート"
 
-#: tips:52
+#: tips:54
 msgid "Directories come first (for sort by name)"
 msgstr "ディレクトリを先に表示(名前で並べ変える場合)"
 
-#: tips:53
+#: tips:55
 msgid ""
 "If this is on then directories will always appear before anything else when "
 "sorting by name."
 msgstr "'ON' で「名前でソ-ト」の場合、常にディレクトリを先に表示します。"
 
-#: tips:54
+#: tips:56
 msgid "Capitalised names first (for sort by name)"
 msgstr "大文字を先に表示(名前でソートの場合)"
 
-#: tips:55 tips:56
+#: tips:57 tips:58
 msgid ""
 "If on, all filenames starting with a capital letter come before filenames "
 "starting with lowercase ones."
@@ -3482,15 +3618,15 @@ msgstr ""
 "'ON' の場合、総ての大文字から始まるファイル名のものを、小文字から始まるファイ"
 "ルよりも先に表示します。"
 
-#: tips:58
+#: tips:60
 msgid "Default settings for new windows"
 msgstr "新規ウィンドウのデフォルト設定"
 
-#: tips:59
+#: tips:61
 msgid "Inherit options from source window"
 msgstr "元のウィンドウのオプションを引き継ぐ"
 
-#: tips:60
+#: tips:62
 msgid ""
 "If this is on then display options for a new window are inherited from the "
 "source window if possible, otherwise they are set to the defaults below."
@@ -3499,27 +3635,27 @@ msgstr ""
 "ぎ、'OFF' の場合、親ウィンドウの現在の表示法にかかわらず、デフォルトのオプ"
 "ション設定に従います。"
 
-#: tips:61
+#: tips:63
 msgid "View type:"
 msgstr "表示形式:"
 
-#: tips:64
+#: tips:66
 msgid "Sort by:"
 msgstr "ソート条件:"
 
-#: tips:66 tips:84
+#: tips:68 tips:86
 msgid "Type"
 msgstr "タイプ"
 
-#: tips:67
+#: tips:69
 msgid "Date"
 msgstr "日付"
 
-#: tips:69
+#: tips:71
 msgid "Show hidden files"
 msgstr "隠しファイルを表示"
 
-#: tips:70 tips:71 tips:72 tips:73
+#: tips:72 tips:73 tips:74 tips:75
 msgid ""
 "If this is on then files whose names start with a dot are shown too, "
 "otherwise they are hidden."
@@ -3527,43 +3663,43 @@ msgstr ""
 "'ON' の場合、ドットで始まる隠し属性ファイルも表示し、'OFF' の場合は表示しませ"
 "ん。"
 
-#: tips:74
+#: tips:76
 msgid "Icon View"
 msgstr "アイコン表示"
 
-#: tips:75
+#: tips:77
 msgid "Default size:"
 msgstr "デフォルトのサイズ:"
 
-#: tips:76
+#: tips:78
 msgid "Huge Icons"
 msgstr "特大アイコン"
 
-#: tips:77 tips:265
+#: tips:79 tips:287
 msgid "Large Icons"
 msgstr "大きいアイコン"
 
-#: tips:78 tips:264
+#: tips:80 tips:286
 msgid "Small Icons"
 msgstr "小さいアイコン"
 
-#: tips:80
+#: tips:82
 msgid "Default details:"
 msgstr "デフォルトの表示情報:"
 
-#: tips:81
+#: tips:83
 msgid "No details"
 msgstr "なし"
 
-#: tips:86
+#: tips:88
 msgid "Automatic small icons:"
 msgstr "小さいアイコンに自動的に変更:"
 
-#: tips:87
+#: tips:89
 msgid "Change at:"
 msgstr "この数で変更:"
 
-#: tips:89 tips:90 tips:91
+#: tips:91 tips:92 tips:93
 msgid ""
 "When automatic icon sizing is selected: If the directory contains this many "
 "items then it will be shown using Small Icons, otherwise Large Icons will be "
@@ -3572,15 +3708,15 @@ msgstr ""
 "デフォルトのサイズが「自動」の場合、アイテム数がこの数値を越えた時、小さいア"
 "イコンで表示します。「自動」以外の場合は指定サイズのままで表示します。"
 
-#: tips:92
+#: tips:94
 msgid "Max width (Large icons):"
 msgstr "ファイル名の最大幅(大きいアイコン):"
 
-#: tips:93 tips:96
+#: tips:95 tips:98
 msgid "pixels"
 msgstr "ピクセル"
 
-#: tips:94
+#: tips:96
 msgid ""
 "Text wider than this is broken onto two lines in Large Icons mode. In Huge "
 "Icons mode, text is wrapped when 50% wider than this."
@@ -3588,56 +3724,67 @@ msgstr ""
 "'大きいアイコンモード'の時、ファイル/ディレクトリ名表示がこの幅より広いと折り"
 "返します。'特大アイコンモード'の時の折り返し幅は 50%増しとなります。"
 
-#: tips:95
+#: tips:97
 msgid "(Small Icons):"
 msgstr "(小さいアイコン):"
 
-#: tips:97 tips:98 tips:99
+#: tips:99 tips:100 tips:101
 msgid "Maximum width for the text beside a Small Icon."
 msgstr "「小さいアイコン」の横に表示するファイル名の最大幅"
 
-#: tips:101
+#: tips:103
 msgid "Show column headings"
 msgstr "項目の標題を表示"
 
-#: tips:102 tips:103 tips:104
+#: tips:104
 msgid "If this is on then column headings will be shown in the list view."
 msgstr "詳細表示の際、ツールバー下部に情報項目の標題バーを表示します。"
 
 #: tips:105
+#, fuzzy
+msgid "Show full type"
+msgstr "種類でソート"
+
+#: tips:106 tips:107 tips:108
+msgid ""
+"If this is on then the full description of each object's type will be show "
+"rather than a short summary of its basic type."
+msgstr ""
+
+#: tips:109
 msgid "Tools/Minibuffer"
 msgstr "ツールバー/ミニバッファ"
 
-#: tips:106
+#: tips:110
 msgid "Toolbar"
 msgstr "ツールバー"
 
-#: tips:107
+#: tips:111
 msgid "Toolbar type:"
 msgstr "ツールバーの種類:"
 
-#: tips:108
+#: tips:112
 #, fuzzy
 msgid "No toolbar"
 msgstr "ツールバー"
 
-#: tips:109
+#: tips:113
 msgid "Icons only"
 msgstr "アイコンのみ"
 
-#: tips:110
+#: tips:114
 msgid "Text under icons"
 msgstr "アイコンの下に文字を表示"
 
-#: tips:111
+#: tips:115
 msgid "Text beside icons"
 msgstr "アイコンの横に文字を表示"
 
-#: tips:112
+#: tips:116
 msgid "Show totals of items"
 msgstr "アイテムの総数を表示"
 
-#: tips:113 tips:114
+#: tips:117 tips:118
 msgid ""
 "Show the number of items displayed in a filer window, as well as the number "
 "of hidden items (if any). When there's a selection, show the number of "
@@ -3647,15 +3794,15 @@ msgstr ""
 "がある場合、その数も表示されます。アイテムが選択されている場合は、その数と合"
 "計サイズを表示します。"
 
-#: tips:115
+#: tips:119
 msgid "Select the buttons you want on the bar:"
 msgstr "ツールバーに表示するボタンを選んでください:"
 
-#: tips:116
+#: tips:120
 msgid "Width of toolbar sets minimum width of window"
 msgstr "小さなウィンドウの時もツールバーをすべて表示"
 
-#: tips:117 tips:118
+#: tips:121 tips:122
 msgid ""
 "Each filer window is constrained to be wide enough to show the whole of the "
 "toolbar"
@@ -3664,15 +3811,15 @@ msgstr ""
 "ンドウサイズになるよう強制します(アイテム数が少ない場合でも総てのツールが表示"
 "されます)"
 
-#: tips:119
+#: tips:123
 msgid "Minibuffer"
 msgstr "ミニバッファ"
 
-#: tips:120
+#: tips:124
 msgid "Beep if Tab-completion fails"
 msgstr "タブ補完に失敗したときは警告音を鳴らす"
 
-#: tips:121
+#: tips:125
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
 "nothing happens (eg, because there are several possibilities and the next "
@@ -3681,11 +3828,11 @@ msgstr ""
 "'パス入力'ミニバッファ内で、タブキーを押しても変化が無い時(次の文字侯補が複数"
 "有る場合など)、警告音を鳴らします。"
 
-#: tips:122
+#: tips:126
 msgid "Beep if there are several matches"
 msgstr "補完候補が複数あるときは音を鳴らす"
 
-#: tips:123 tips:124 tips:125
+#: tips:127 tips:128 tips:129
 msgid ""
 "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
 "is more than one matching file, even though some more letters were added."
@@ -3693,7 +3840,7 @@ msgstr ""
 "'パス入力'ミニバッファ内で、タブキーを押した時、文字入力をさらに追加しても複"
 "数のファイルに適合するような場合、警告音を鳴らします。"
 
-#: tips:128
+#: tips:132
 msgid ""
 "When thumbnails are turned on, each image file in a directory is loaded and "
 "a small thumbnail of it is shown."
@@ -3701,11 +3848,11 @@ msgstr ""
 "サムネイルを有効にすると、ディレクトリ内の画像ファイルが小さなサムネイルで表"
 "示されます。"
 
-#: tips:129
+#: tips:133
 msgid "Show image thumbnails"
 msgstr "画像のサムネイルを表示"
 
-#: tips:130 tips:131
+#: tips:134 tips:135
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
@@ -3713,11 +3860,11 @@ msgstr ""
 "これが新規ウィンドウ起動時のデフォルト設定になりますが、 表示メニューにより、"
 "各ウィンドウのサムネイル表示を、個別に ON/OFF することも出来ます。"
 
-#: tips:132
+#: tips:136
 msgid "Thumbnails cache"
 msgstr "サムネイルのキャッシュ"
 
-#: tips:133
+#: tips:137
 msgid ""
 "To speed things up, the generated thumbnails are stored in the hidden ~/."
 "thumbnails directory. Click here to remove all the cached thumbnails. They "
@@ -3726,11 +3873,11 @@ msgstr ""
 "速度を上げるため、生成したサムネイルは隠しディレクトリ ~/.thumbnails に保存さ"
 "れます。ここをクリックすると保存したサムネイルを削除します。"
 
-#: tips:134
+#: tips:138 tips:224
 msgid "Pinboard"
 msgstr "ピンボード"
 
-#: tips:135
+#: tips:139
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
@@ -3740,66 +3887,66 @@ msgstr ""
 "ます。ピンボード使用時(rox -h 参照)は、ファイラー画面上のアイテムをデスクトッ"
 "プにドロップして、デスクトップアイコンを作ることが出来ます"
 
-#: tips:136 tips:261
+#: tips:140 tips:283
 msgid "Appearance"
 msgstr "外観"
 
-#: tips:137
+#: tips:141
 msgid "Foreground:"
 msgstr "文字の色:"
 
-#: tips:138
+#: tips:142
 msgid "Text shadow:"
 msgstr "文字の影:"
 
-#: tips:139
+#: tips:143
 msgid "Background:"
 msgstr "背景の色:"
 
-#: tips:140
+#: tips:144
 #, fuzzy
 msgid "No shadow"
 msgstr "文字の影:"
 
-#: tips:141
+#: tips:145
 msgid "Thin"
 msgstr "細い"
 
-#: tips:142
+#: tips:146
 msgid "Thick"
 msgstr "太い"
 
-#: tips:143
+#: tips:147
 msgid "Use custom font:"
 msgstr "カスタムフォントを使う:"
 
-#: tips:144
+#: tips:148
 msgid "The font used for the text displayed under the icons"
 msgstr "アイコンのテキスト(ラベル名)のフォントを指定します。"
 
-#: tips:145
+#: tips:149
 msgid "Fast scaling of images"
 msgstr ""
 
-#: tips:146 tips:147
+#: tips:150 tips:151
 msgid ""
 "Choose between the fast or slow method of scaling backdrop images.  The slow "
 "method can give better results."
 msgstr ""
 
-#: tips:148
+#: tips:152
 msgid "Pinboard behaviour"
 msgstr "ピンボードの動作"
 
-#: tips:149
+#: tips:153
 msgid "Single-click to open"
 msgstr "シングルクリックで開く"
 
-#: tips:151
+#: tips:155
 msgid "Keep icons within screen limits"
 msgstr "アイコンを画面内に収める"
 
-#: tips:152
+#: tips:156
 msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
@@ -3807,39 +3954,39 @@ msgstr ""
 "これを指定すると、デスクトップのアイコンが(テキスト)ラベルも含めて常に画面内"
 "に収まるようになります。"
 
-#: tips:153
+#: tips:157
 msgid "Icon grid step:"
 msgstr "アイコンのグリッド間隔:"
 
-#: tips:154
+#: tips:158
 msgid "Fine"
 msgstr "細かい"
 
-#: tips:155
+#: tips:159
 msgid "Use a 2-pixel grid for positioning icons on the desktop."
 msgstr "デスクトップ上でアイコンを 2 ピクセル単位で移動、配置。"
 
-#: tips:156
+#: tips:160
 msgid "Medium"
 msgstr "中間"
 
-#: tips:157
+#: tips:161
 msgid "Use a 16-pixel grid for positioning icons on the desktop."
 msgstr "デスクトップ上でアイコンを 16 ピクセル単位で移動、配置。"
 
-#: tips:158
+#: tips:162
 msgid "Coarse"
 msgstr "粗い"
 
-#: tips:159 tips:160 tips:161 tips:162
+#: tips:163 tips:164 tips:165 tips:166
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "デスクトップ上でアイコンを 32 ピクセル単位で移動、配置。"
 
-#: tips:163 tips:165
+#: tips:167 tips:169
 msgid "Iconified windows"
 msgstr "最小化ウィンドウのアイコン表示"
 
-#: tips:164
+#: tips:168
 msgid ""
 "Most window managers provide a way to iconify (or 'minimise') windows, and "
 "various programs, including ROX-Filer, can be used to display the iconified "
@@ -3848,11 +3995,11 @@ msgstr ""
 "ROXファイラーを含む様々な起動中のプログラムは、デスクトップにアイコン化するこ"
 "とが出来ます"
 
-#: tips:166
+#: tips:170
 msgid "Show iconified windows"
 msgstr "アイコン化したウィンドウを表示"
 
-#: tips:167
+#: tips:171
 msgid ""
 "If this option is on, the filer will show each iconified window as a small "
 "button on the pinboard. Requires a compatible window manager, and the "
@@ -3862,39 +4009,39 @@ msgstr ""
 "にアイコンとして表示されるようになります。機能をサポートするファイルマネー"
 "ジャ上でピンボードを使用している場合に限ります。 "
 
-#: tips:168
+#: tips:172
 msgid "Iconify to the"
 msgstr "アイコン化する場所"
 
-#: tips:169
+#: tips:173
 msgid "top-left"
 msgstr "左上"
 
-#: tips:170
+#: tips:174
 msgid "top-right"
 msgstr "右上"
 
-#: tips:171
+#: tips:175
 msgid "bottom-left"
 msgstr "左下"
 
-#: tips:172
+#: tips:176
 msgid "bottom-right"
 msgstr "右下"
 
-#: tips:173
+#: tips:177
 msgid ", going"
 msgstr ", 並びかた"
 
-#: tips:174
+#: tips:178
 msgid "horizontally"
 msgstr "水平に"
 
-#: tips:175
+#: tips:179
 msgid "vertically"
 msgstr "垂直に"
 
-#: tips:176
+#: tips:180
 msgid ""
 "Sometimes the filer doesn't know about your desktop furniture and puts "
 "iconified windows under (for example) the Gnome panel. You can define a top "
@@ -3905,27 +4052,27 @@ msgstr ""
 "ンドウ(のアイコン)を置くような場合も有ります。下の上部余白、下部余白の設定に"
 "よりこれを回避することが出来ます。ROX パネルに関しては常に正常に認識されます"
 
-#: tips:177
+#: tips:181
 msgid "Top margin"
 msgstr "上部余白"
 
-#: tips:178
+#: tips:182
 msgid "Height of no-go area at top of screen."
 msgstr "画面最上部の表示禁止区域の高さ"
 
-#: tips:179
+#: tips:183
 msgid "Bottom margin"
 msgstr "下部余白"
 
-#: tips:180 tips:181 tips:182 tips:183 tips:184
+#: tips:184 tips:185 tips:186 tips:187 tips:188
 msgid "Height of no-go area at bottom of screen."
 msgstr "画面最下部の表示禁止区域の高さ"
 
-#: tips:185
+#: tips:189
 msgid "Panels"
 msgstr "パネル"
 
-#: tips:186
+#: tips:190
 msgid ""
 "Panels are bars of icons that run along the side of the screen. See the "
 "manual for information about using panels."
@@ -3933,54 +4080,54 @@ msgstr ""
 "パネルは画面の端に沿って表示される、アイコンを置けるバーです。詳しくはマニュ"
 "アルをお読みください。"
 
-#: tips:187
+#: tips:191
 msgid "Panel style"
 msgstr "パネル上の表示"
 
-#: tips:188
+#: tips:192
 msgid "Image and text"
 msgstr "アイコンと文字"
 
-#: tips:189
+#: tips:193
 msgid "Every panel icon is shown with an image and some text."
 msgstr "全てのパネルアイコンと文字を表示します。"
 
-#: tips:190
+#: tips:194
 msgid "Image only for applications"
 msgstr "アプリケーションの場合はアイコンのみ"
 
-#: tips:191
+#: tips:195
 msgid ""
 "Applications have just an image, everything else has both an image and text."
 msgstr ""
 "アプリケーションの場合はアイコンのみ。その他の場合はアイコンと文字の両方を表"
 "示。"
 
-#: tips:192
+#: tips:196
 msgid "Image only"
 msgstr "アイコンのみ"
 
-#: tips:193 tips:194
+#: tips:197 tips:198
 msgid "Only the image is shown."
 msgstr "全てアイコンのみの表示"
 
-#: tips:195
+#: tips:199
 msgid "Panel width (thin)"
 msgstr "パネルの幅 ( 狭く ← )"
 
-#: tips:196
+#: tips:200
 msgid "(thick)"
 msgstr "( → 広く)"
 
-#: tips:197
+#: tips:201
 msgid "The size of the panels."
 msgstr "パネルのサイズ"
 
-#: tips:198
+#: tips:202
 msgid "Do not cover panel"
 msgstr "パネルを隠さない"
 
-#: tips:199 tips:200
+#: tips:203 tips:204
 msgid ""
 "Ask the window manager not to cover panels at all when you maximise windows. "
 "Some window managers may not honour this. If unset, the filer asks for just "
@@ -3992,15 +4139,15 @@ msgstr ""
 "ウィンドウを 2、3 ピクセルずらせばパネルをオートライズ(自動的に手前に表示)が"
 "可能です。"
 
-#: tips:201
+#: tips:205
 msgid "Xinerama"
 msgstr "Xinerama"
 
-#: tips:202
+#: tips:206
 msgid "Confine to Xinerama monitor"
 msgstr "Xinerama モニタを抑制"
 
-#: tips:203
+#: tips:207
 msgid ""
 "If you have an Xinerama multi-monitor setup, use this option to confine the "
 "panels to one monitor instead of spanning them."
@@ -4008,16 +4155,78 @@ msgstr ""
 "Xinerama multi-monitor setup がインストールされている場合、一つのモニタのみを"
 "使用するようパネルを抑制します"
 
-#: tips:204 tips:205 tips:206 tips:207
+#: tips:208 tips:209 tips:210 tips:211
 msgid ""
 "The monitor the panels are confined to in Xinerama mode (numbered from 0)."
 msgstr "パネルが Xinerama モードに制限されるモニタ(ナンバーは 0 から)"
 
-#: tips:208
+#: tips:212
+msgid "Desktop"
+msgstr ""
+
+#: tips:213
+msgid ""
+"When run by a session manager program (such as ROX-Session) the filer can "
+"open up a panel and/or the pinboard.  Here you configure which."
+msgstr ""
+
+#: tips:214
+#, fuzzy
+msgid "Panel only"
+msgstr "アイコンのみ"
+
+#: tips:215
+#, fuzzy
+msgid "Only a panel is shown."
+msgstr "全てアイコンのみの表示"
+
+#: tips:216
+#, fuzzy
+msgid "Pinboard only"
+msgstr "ピンボード"
+
+#: tips:217
+#, fuzzy
+msgid "Only the pinboard is shown."
+msgstr "全てアイコンのみの表示"
+
+#: tips:218
+#, fuzzy
+msgid "Panel and pinboard"
+msgstr "ピンボード"
+
+#: tips:219 tips:220
+msgid "Both a panel and a pinboard are shown."
+msgstr ""
+
+#: tips:221
+#, fuzzy
+msgid "Panel"
+msgstr "パネル"
+
+#: tips:222 tips:223
+msgid "Enter the name of the panel to show here."
+msgstr ""
+
+#: tips:225 tips:226
+msgid "Enter the name of the pinboard to show here."
+msgstr ""
+
+#: tips:227
+msgid "Changes here take effect the next time the filer is run."
+msgstr ""
+
+#: tips:228 tips:229
+msgid ""
+"The session manager activates these options by using the -S or --rox-session "
+"argument to rox."
+msgstr ""
+
+#: tips:230
 msgid "Action windows"
 msgstr "確認ダイアログ"
 
-#: tips:209
+#: tips:231
 msgid ""
 "Action windows appear when you start a background\n"
 "operation, such as copying or deleting some files."
@@ -4025,63 +4234,63 @@ msgstr ""
 "確認ダイアログは、バックグラウンド操作(ファイルのコピーや削除など)を始めよう"
 "とした時に表示されます。"
 
-#: tips:210
+#: tips:232
 msgid "Auto-start (Quiet) these actions"
 msgstr "以下を実行するときに確認を求めない:"
 
-#: tips:212
+#: tips:234
 msgid "Copy files without confirming first."
 msgstr "ファイルをコピーするときに確認を求ません"
 
-#: tips:214
+#: tips:236
 msgid "Move files without confirming first."
 msgstr "ファイルを移動/リネームするときに確認を求めません"
 
-#: tips:216
+#: tips:238
 msgid "Create links to files without confirming first."
 msgstr "リンクを張るときに確認を求めません"
 
-#: tips:218
+#: tips:240
 msgid "Delete files without confirming first."
 msgstr "ファイルを削除するときに確認を求めません"
 
-#: tips:219
+#: tips:241
 msgid "Mount"
 msgstr "マウント"
 
-#: tips:220 tips:221
+#: tips:242 tips:243
 msgid "Mount and unmount filesystems without confirming first."
 msgstr "マウント/アンマウントするときに確認を求めません"
 
-#: tips:222
+#: tips:244
 msgid "Default settings"
 msgstr "デフォルトの設定"
 
-#: tips:224
+#: tips:246
 msgid "Don't confirm deletion of non-writeable items."
 msgstr "書き込み禁止アイテムを削除するときも確認を求めません"
 
-#: tips:226
+#: tips:248
 msgid "Don't display so much information in the message area."
 msgstr "ログメッセージの表示を簡略化します"
 
-#: tips:228
+#: tips:250
 msgid "Also change contents of subdirectories."
 msgstr "サブディレクトリ以下の内容にも、作動を適用します"
 
-#: tips:234
+#: tips:256
 msgid "Drag and Drop"
 msgstr "ドラッグ＆ドロップ"
 
-#: tips:235
+#: tips:257
 msgid "Dragging to icons"
 msgstr "アイコンへのドラッグ"
 
-#: tips:236
+#: tips:258
 msgid "Allow dragging to icons in filer windows"
 msgstr "ファイラーウィンドウでアイコンへのドラッグ動作を可能にする"
 
-#: tips:237
+#: tips:259
 msgid ""
 "When this is on you can drag a file over a sub-directory or program in a "
 "filer window. The item will highlight when you do this and dropping the file "
@@ -4091,11 +4300,11 @@ msgstr ""
 "のドラッグが可能になります。操作中、アイテムは強調表示され、指定ディレクトリ"
 "に コピー(又は移動かリンク作成)されるか、指定プログラムで開かれます。"
 
-#: tips:238
+#: tips:260
 msgid "Directories spring open"
 msgstr "ディレクトリのスプリングオープン"
 
-#: tips:239
+#: tips:261
 msgid ""
 "This option, which requires the above option to be turned on too, causes the "
 "highlighted directory to 'spring open' after the file is held over it for a "
@@ -4105,15 +4314,15 @@ msgstr ""
 "ファイルをドラッグしてディレクトリの上に保持すると、そのディレクトリが '跳ね"
 "開け' られます。"
 
-#: tips:240
+#: tips:262
 msgid "Spring delay:"
 msgstr "開くまでの時間:"
 
-#: tips:241
+#: tips:263
 msgid "ms"
 msgstr "ms"
 
-#: tips:242 tips:243
+#: tips:264 tips:265
 msgid ""
 "This option sets how long, in ms, you must hold a file over a directory "
 "before it will spring open. The above option must be turned on for this to "
@@ -4122,19 +4331,19 @@ msgstr ""
 "ドラッグしたファイルでディレクトリをスプリングオープンする際の保持時間を(ミリ"
 "セコンド単位で)設定します。'スプリングオープン'が'ON'の場合に有効です。"
 
-#: tips:244
+#: tips:266
 msgid "When dragging files with the left mouse button"
 msgstr "マウスの左ボタンでファイルをドラッグしたときの動作"
 
-#: tips:245 tips:251
+#: tips:267 tips:273
 msgid "Show a menu of possible actions"
 msgstr "実行可能なメニューを表示"
 
-#: tips:246
+#: tips:268
 msgid "Copy the files"
 msgstr "ファイルをコピー"
 
-#: tips:247 tips:248 tips:249
+#: tips:269 tips:270 tips:271
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
@@ -4142,15 +4351,15 @@ msgstr ""
 "'ON'にした場合には、'Alt'キーを押しながら左ボタンでドラッグすれば、オプション"
 "メニューを表示できます。"
 
-#: tips:250
+#: tips:272
 msgid "When dragging files with the middle mouse button"
 msgstr "マウスの中ボタンでファイルをドラッグしたときの動作"
 
-#: tips:252
+#: tips:274
 msgid "Move the files"
 msgstr "ファイルを移動"
 
-#: tips:253 tips:254 tips:255
+#: tips:275 tips:276 tips:277
 msgid ""
 "Note that you can still get the menu to appear, by dragging with the left "
 "button and holding down the Alt key."
@@ -4158,11 +4367,11 @@ msgstr ""
 "'ON'にした場合には、'Alt'キーを押しながら左ボタンでドラッグすれば、オプション"
 "メニューを表示できます。"
 
-#: tips:256
+#: tips:278
 msgid "Download handler"
 msgstr "ダウンロード実行コマンド"
 
-#: tips:257 tips:258 tips:259
+#: tips:279 tips:280 tips:281
 msgid ""
 "When you drag a file from a web browser or other remote source, this program "
 "will be run to download it. $1 is the URI dragged to the filer, and the "
@@ -4175,35 +4384,35 @@ msgstr ""
 "ドされます。\n"
 "例：xterm -e wget $1"
 
-#: tips:260
+#: tips:282
 msgid "Menus"
 msgstr "メニュー"
 
-#: tips:262
+#: tips:284
 msgid "Size of icons in menus:"
 msgstr "メニューのアイコンの大きさ:"
 
-#: tips:263
+#: tips:285
 msgid "No Icons"
 msgstr "アイコンなし"
 
-#: tips:266
+#: tips:288
 msgid "Same as current window"
 msgstr "現在のウィンドウのアイコンと同じ"
 
-#: tips:267
+#: tips:289
 msgid "Same as default"
 msgstr "デフォルトのアイコンと同じ"
 
-#: tips:268
+#: tips:290
 msgid "Behaviour"
 msgstr "動作"
 
-#: tips:269
+#: tips:291
 msgid "File menu on right-click"
 msgstr "右クリックでアイテム用メニュー"
 
-#: tips:270
+#: tips:292
 msgid ""
 "Show the File menu instead of the main menu when right-clicking with files "
 "selected (the main menu can be accessed by holding down Control)."
@@ -4211,47 +4420,27 @@ msgstr ""
 "アイテム上で右クリックした時、メインメニューの代わりにアイテム用メニューを開"
 "きます。(Ctrl キーを押す事によりメインメニューも開けます)"
 
-#: tips:271
+#: tips:293
 msgid "`Xterm Here' program"
 msgstr "'ここでXtermを起動'で使用するプログラム"
 
-#: tips:272 tips:273
+#: tips:294 tips:295
 msgid "The program to launch when you choose `Xterm Here' from the menu."
 msgstr "メニューの`ここでxtermを起動'を選んだときに起動するプログラム"
 
-#: tips:274
+#: tips:296
 msgid "Keyboard shortcuts"
 msgstr "キーボードのショートカット"
 
-#: tips:276
-msgid "Executable files"
-msgstr "実行属性付きファイル"
-
-#: tips:277
-msgid "Ignore eXecutable bit for known extensions"
-msgstr "既知の拡張子については実行属性を無視する"
-
-#: tips:278 tips:279
-msgid ""
-"If a file has a known extension (eg '.gif') then ignore the executable bit. "
-"This is useful if you have files on a Windows-type filesystem which are "
-"being shown as executable programs."
-msgstr ""
-"既知の拡張子(例:'.gif')のファイルの場合、実行可能属性は無視する。 見掛けが実"
-"行可能属性を持つように見える 'Windows形式'のファイルシステム上の ファイル等に"
-"アクセスするような場合に有効。"
-
-#: tips:280
+#: tips:298
 msgid "MIME types"
 msgstr "MIME 形式"
 
-#: tips:281
+#: tips:299
+#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
-"regular file, and then chooses a suitable icon for that type. Use the MIME-"
-"Editor application to change the file-to-type guessing rules:\n"
-"\n"
-"http://rox.sourceforge.net/mime_editor.html"
+"regular file, and then chooses a suitable icon for that type."
 msgstr ""
 "ROX は標準的なルールに従ってファイルの MIME 形式を判別し、適切なアイコンを設"
 "定します。これを変更するには MIME-Editor を利用します。以下を参照してくださ"
@@ -4259,15 +4448,24 @@ msgstr ""
 "\n"
 "http://rox.sourceforge.net/mime_editor.html"
 
-#: tips:282
+#: tips:300
+msgid "Edit MIME rules"
+msgstr ""
+
+#: tips:301
+#, fuzzy
+msgid "Themes"
+msgstr "日付"
+
+#: tips:302
 msgid "Icon theme"
 msgstr "アイコンテーマ"
 
-#: tips:283
+#: tips:303
 msgid "Themes should be placed inside the ~/.icons directory."
 msgstr "テーマは ~/.icons ディレクトリに置いて下さい"
 
-#: tips:284 tips:285
+#: tips:304 tips:305
 msgid ""
 "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
 "that icons set this way override those from the selected theme."
@@ -4275,89 +4473,89 @@ msgstr ""
 "MIME 型式ごとにアイコンを設定するのは 'アイコンを設定...' ダイアログを使用し"
 "ます。標準に設定されるアイコンより優先されます。"
 
-#: tips:286
+#: tips:306
 msgid "Colours"
 msgstr "色"
 
-#: tips:287
+#: tips:307
 msgid "File type colours"
 msgstr "ファイルの色分け"
 
-#: tips:288
+#: tips:308
 msgid "Colour files based on their types"
 msgstr "タイプごとにファイルを色分けする"
 
-#: tips:289
+#: tips:309
 msgid "Filenames (and details) are coloured according to the file's type."
 msgstr "ファイル名(及び詳細情報)はアイテムの種別に従って色分け表示されます。"
 
-#: tips:290
+#: tips:310
 msgid "Directory:"
 msgstr "ディレクトリ:"
 
-#: tips:291
+#: tips:311
 msgid "Regular file:"
 msgstr "一般ファイル:"
 
-#: tips:292
+#: tips:312
 msgid "Pipe:"
 msgstr "パイプ:"
 
-#: tips:293
+#: tips:313
 msgid "Socket:"
 msgstr "ソケット:"
 
-#: tips:295 tips:296
+#: tips:315 tips:316
 msgid ""
 "Error, such as a symlink which points to a non-existant file, or a file "
 "which the filer does not have permission to examine."
 msgstr ""
 "エラー、存在しない、あるいは参照許可のないファイルへのシンボリックリンク。"
 
-#: tips:297
+#: tips:317
 msgid "Character device:"
 msgstr "キャラクタデバイス:"
 
-#: tips:298
+#: tips:318
 msgid "Block device:"
 msgstr "ブロックデバイス:"
 
-#: tips:299
+#: tips:319
 msgid "Door:"
 msgstr "Door:"
 
-#: tips:300
+#: tips:320
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
 msgstr ""
 "Doorファイルは 'ソケットやパイプ類似のもので、Solaris のみで使われます。"
 
-#: tips:301
+#: tips:321
 msgid "Executable file:"
 msgstr "実行可能ファイル:"
 
-#: tips:302
+#: tips:322
 msgid "Application directory:"
 msgstr "アプリケーションディレクトリ:"
 
-#: tips:303
+#: tips:323
 msgid "Unknown type:"
 msgstr "不明な種類:"
 
-#: tips:304
+#: tips:324
 msgid "Compatibility"
 msgstr "適合化"
 
-#: tips:305
+#: tips:325
 msgid "Window manager problems"
 msgstr "ウィンドウマネージャとの問題"
 
-#: tips:306
+#: tips:326
 msgid "Override window manager control of the pinboard and panels"
 msgstr "ウィンドウマネージャによるデスクトップとパネルの制御を無視する"
 
-#: tips:307
+#: tips:327
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
@@ -4371,11 +4569,11 @@ msgstr ""
 "やタスクバー上のウィンドウリストに現われたりする問題を解消することが出来ま"
 "す。"
 
-#: tips:308
+#: tips:328
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "デスクトップの背景でのマウスクリックはウィンドウマネージャに渡す"
 
-#: tips:309
+#: tips:329
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
@@ -4385,11 +4583,11 @@ msgstr ""
 "クリックで消えます。ここを ON にすれば、マウスイベントはウィンドウマネージャ"
 "に渡されます。この場合もアイコン上でのクリックは ROX に渡されます"
 
-#: tips:310
+#: tips:330
 msgid "Blackbox root menus hack"
 msgstr "Blackbox の root メニューの改善"
 
-#: tips:311
+#: tips:331
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
@@ -4400,11 +4598,11 @@ msgstr ""
 "く機能しませんが、ここを ON にすればいくらかは改善されます。これらのウィンド"
 "ウマネージャの新版ではこのオプションが不要になるよう修正されるでしょう。"
 
-#: tips:312
+#: tips:332
 msgid "Panel is a 'dock'"
 msgstr "パネルを'dock'として扱う"
 
-#: tips:313 tips:314
+#: tips:333 tips:334
 msgid ""
 "Disable this option if the panel stays above other windows against your "
 "wishes. Requires a restart to take effect."
@@ -4412,15 +4610,15 @@ msgstr ""
 "パネルに隠されウィンドウが操作できなくなるような事が有る場合は、このオプショ"
 "ンを'OFF'にして下さい。有効にするには再起動が必要です"
 
-#: tips:315
+#: tips:335
 msgid "Drag and drop"
 msgstr "ドラッグ＆ドロップ"
 
-#: tips:316
+#: tips:336
 msgid "Don't use hostnames"
 msgstr "ホスト名を使わない"
 
-#: tips:317 tips:318
+#: tips:337 tips:338
 msgid ""
 "Some older applications don't support XDND fully and may need to have this "
 "option turned on. Use this if dragging files to an application shows a + "
@@ -4431,22 +4629,40 @@ msgstr ""
 "ラッグした際、ポインタが + マークになってもドロップが機能しない場合に使用して"
 "ください"
 
-#: tips:319
+#: tips:339
 msgid "Extended attributes"
 msgstr ""
 
-#: tips:320
+#: tips:340
 #, fuzzy
 msgid "Don't use extended attributes"
 msgstr "ホスト名を使わない"
 
-#: tips:321 tips:322 tips:323 tips:324
+#: tips:341 tips:342 tips:343 tips:344
 msgid ""
 "This disables the use of extended attributes available in newer operating "
 "systems and file systems.  With this option set the 'Set Type' menu entry is "
 "disabled, the MIME type of the file is only derived from the file name and "
 "the properties window does not report extended attributes."
 msgstr ""
+
+#~ msgid "Icon '%s' not present in theme"
+#~ msgstr "'%s' アイコンはテーマに存在しません"
+
+#~ msgid "Executable files"
+#~ msgstr "実行属性付きファイル"
+
+#~ msgid "Ignore eXecutable bit for known extensions"
+#~ msgstr "既知の拡張子については実行属性を無視する"
+
+#~ msgid ""
+#~ "If a file has a known extension (eg '.gif') then ignore the executable "
+#~ "bit. This is useful if you have files on a Windows-type filesystem which "
+#~ "are being shown as executable programs."
+#~ msgstr ""
+#~ "既知の拡張子(例:'.gif')のファイルの場合、実行可能属性は無視する。 見掛けが"
+#~ "実行可能属性を持つように見える 'Windows形式'のファイルシステム上の ファイ"
+#~ "ル等にアクセスするような場合に有効。"
 
 #, fuzzy
 #~ msgid "Umount"
