@@ -178,11 +178,14 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 			item->flags |= ITEM_FLAG_EXEC_FILE;
 
 			if (item->mime_type == NULL ||
-			    item->mime_type == application_octet_stream ||
-			    (item->mime_type == text_plain &&
-			     !strchr(item->leafname, '.')))
+			    item->mime_type == application_octet_stream)
 			{
 				item->mime_type = application_executable;
+			}
+			else if (item->mime_type == text_plain &&
+			         !strchr(item->leafname, '.'))
+			{
+				item->mime_type = application_x_shellscript;
 			}
 		}		
 

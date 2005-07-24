@@ -19,6 +19,7 @@ extern MIME_type *application_executable;
 extern MIME_type *inode_unknown;
 extern MIME_type *inode_door;
 extern MIME_type *application_octet_stream;
+extern MIME_type *application_x_shellscript;
 
 struct _MIME_type
 {
