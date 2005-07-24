@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-23 15:00+0200\n"
-"PO-Revision-Date: 2005-07-23 15:00+0200\n"
+"POT-Creation-Date: 2005-07-24 20:57+0200\n"
+"PO-Revision-Date: 2005-07-24 20:56+0200\n"
 "Last-Translator: Vincent Lefevre <vincent@vinc17.org>\n"
 "Language-Team: ROX Mailing List <rox-devel@lists.sourceforge.net>\n"
 "MIME-Version: 1.0\n"
@@ -936,12 +936,12 @@ msgstr ""
 msgid "%d directories could not be migrated"
 msgstr "%d répertoires n'ont pas pu être migrés"
 
-#: dir.c:973
+#: dir.c:982
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "Impossible de faire un stat du répertoire : %s"
 
-#: dir.c:982
+#: dir.c:991
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Impossible d'ouvrir le répertoire : %s"
@@ -1568,7 +1568,7 @@ msgstr "Options..."
 msgid "Home Directory"
 msgstr "Répertoire personnel"
 
-#: icon.c:140 icon.c:1340 menu.c:206 type.c:244
+#: icon.c:140 icon.c:1340 menu.c:206 type.c:212
 msgid "File"
 msgstr "Fichier"
 
@@ -2933,12 +2933,24 @@ msgstr "Lien symbolique incorrect (ou pas de permission pour le suivre) : %s"
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
-"the file to an application"
+"the file to an application.%s"
 msgstr ""
 "Aucune action d'exécution spécifiée pour les fichiers de ce type (%s/%s) - "
 "vous pouvez fixer une action d'exécution en choisissant « Fixer l'action "
 "d'exécution » depuis le menu « Fichier », ou vous pouvez juste faire glisser "
-"le fichier sur une application"
+"le fichier sur une application.%s"
+
+#: run.c:508
+msgid ""
+"\n"
+"\n"
+"Note: If this is a computer program which you want to run, you need to set "
+"the execute bit by choosing Permissions from the File menu."
+msgstr ""
+"\n"
+"\n"
+"Note : si c'est un programme que vous voulez lancer, vous devez positionner "
+"le bit d'exécution en choisissant « Permissions » dans le menu « Fichier »."
 
 #: support.c:272
 msgid "B"
@@ -3079,47 +3091,47 @@ msgstr "croissant"
 msgid "descending"
 msgstr "décroissant"
 
-#: type.c:235
+#: type.c:203
 msgid "Sym link"
 msgstr "Lien symb."
 
-#: type.c:237
+#: type.c:205
 msgid "Mount point"
 msgstr "Point de montage"
 
-#: type.c:239
+#: type.c:207
 msgid "App dir"
 msgstr "Rép. App."
 
-#: type.c:246
+#: type.c:214
 msgid "Dir"
 msgstr "Rép."
 
-#: type.c:248
+#: type.c:216
 msgid "Char dev"
 msgstr "Périph. car."
 
-#: type.c:250
+#: type.c:218
 msgid "Block dev"
 msgstr "Périph. bloc"
 
-#: type.c:252
+#: type.c:220
 msgid "Pipe"
 msgstr "Tube"
 
-#: type.c:254
+#: type.c:222
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:256
+#: type.c:224
 msgid "Door"
 msgstr "Porte"
 
-#: type.c:259
+#: type.c:227
 msgid "Unknown"
 msgstr "Inconnu"
 
-#: type.c:415
+#: type.c:355
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -3146,11 +3158,11 @@ msgstr ""
 "vous n'avez pas à vous inquiéter. Dans le cas contraire, vous devez "
 "vérifier, ou même juste supprimer, toutes les actions d'exécution existantes."
 
-#: type.c:428
+#: type.c:368
 msgid "go-w (Fix security problem)"
 msgstr "go-w (corriger un problème de sécurité)"
 
-#: type.c:558
+#: type.c:498
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3161,71 +3173,71 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:739
+#: type.c:679
 msgid "This is not a program! Give me an application instead!"
 msgstr "Ce n'est pas un programme ! Donnez-moi une application à la place !"
 
-#: type.c:800
+#: type.c:740
 msgid "No run action defined"
 msgstr "Pas d'action d'exécution de définie"
 
-#: type.c:826
+#: type.c:766
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Erreur dans le gestionnaire %s : %s"
 
-#: type.c:841
+#: type.c:781
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Application %s invalide (mauvais AppRun)"
 
-#: type.c:852
+#: type.c:792
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non exécutable"
 
-#: type.c:885
+#: type.c:825
 msgid "Set run action"
 msgstr "Fixer l'action d'exécution"
 
-#: type.c:891
+#: type.c:831
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Si un gestionnaire n'est pas fixé pour le type spécifique, utiliser celui-ci "
 "par défaut."
 
-#: type.c:893
+#: type.c:833
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Fixer en tant que défaut pour tout `%s/<quelconque>'"
 
-#: type.c:897
+#: type.c:837
 msgid "Use this application for all files with this MIME type."
 msgstr "Utiliser cette application pour tous les fichiers ayant ce type MIME."
 
-#: type.c:899
+#: type.c:839
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Seulement pour le type `%s' (%s/%s)"
 
-#: type.c:905
+#: type.c:845
 msgid "Drop a suitable application here"
 msgstr "Faites glisser ici une application adéquate"
 
-#: type.c:920
+#: type.c:860
 msgid "OR"
 msgstr "OU"
 
-#: type.c:927
+#: type.c:867
 msgid "Enter a shell command:"
 msgstr "Entrez une commande shell :"
 
-#: type.c:956
+#: type.c:896
 msgid "_Use Command"
 msgstr "_Utiliser la commande"
 
-#: type.c:986
+#: type.c:926
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -3233,61 +3245,16 @@ msgstr ""
 "Une action d'exécution existe déjà et est un assez gros programme - êtes-"
 "vous sûr de vouloir la supprimer ?"
 
-#: type.c:997
+#: type.c:937
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossible de supprimer %s : %s"
 
-#: type.c:1034
+#: type.c:974
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "La sauvegarde des choix est désactivée par la variable CHOICESPATH"
 
-#: type.c:1216
-#, c-format
-msgid ""
-"Error loading MIME database:\n"
-"%s"
-msgstr ""
-"Erreur lors de la lecture de la base de données MIME :\n"
-"%s"
-
-#: type.c:1241
-#, c-format
-msgid "File '%s' corrupted!"
-msgstr "Fichier '%s' altéré !"
-
-#: type.c:1327
-msgid ""
-"The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
-"should move it there (and make a symlink from ~/.mime to it for older "
-"applications)."
-msgstr ""
-"Le répertoire ~/.mime a été déplacé. Ce doit maintenant être ~/.local/share/"
-"mime. Vous devez le déplacer là (et créer un lien symbolique de ~/.mime vers "
-"lui pour les anciennes applications)."
-
-#: type.c:1379
-msgid ""
-"The standard MIME type database (version 0.9 or later) was not found. The "
-"filer will probably not show the correct types for different files. You "
-"should download and install the 'shared-mime-info-0.9' package from here:\n"
-"http://www.freedesktop.org/software/shared-mime-info\n"
-"\n"
-"If you have already installed this package, check that the permissions allow "
-"the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/"
-"globs)."
-msgstr ""
-"La base de données des types MIME standard (version 0.9 ou ultérieure) n'a "
-"pas été trouvée. Le filer ne pourra probablement pas montrer les types "
-"corrects pour les différents fichiers. Vous devez télécharger et installer "
-"le paquet 'shared-mime-info-0.9' à partir de :\n"
-"http://www.freedesktop.org/software/shared-mime-info\n"
-"\n"
-"Si vous avez déjà installé ce paquet, vérifiez que les droits d'accès "
-"permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /"
-"usr/share/mime/globs)."
-
-#: type.c:1492
+#: type.c:1249
 #, c-format
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
@@ -3295,7 +3262,7 @@ msgstr ""
 "Le thème d'icônes '%s' ne contient pas d'icônes MIME. Utilisation du thème "
 "par défaut de ROX."
 
-#: type.c:1506
+#: type.c:1263
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
@@ -4751,6 +4718,46 @@ msgstr ""
 "est choisie, l'entrée « Fixer le type » du menu est désactivée, le type MIME "
 "du fichier est seulement dérivé du nom du fichier et la fenêtre des "
 "propriétés ne rapporte pas les attributs étendus."
+
+#~ msgid ""
+#~ "Error loading MIME database:\n"
+#~ "%s"
+#~ msgstr ""
+#~ "Erreur lors de la lecture de la base de données MIME :\n"
+#~ "%s"
+
+#~ msgid "File '%s' corrupted!"
+#~ msgstr "Fichier '%s' altéré !"
+
+#~ msgid ""
+#~ "The ~/.mime directory has moved. It should now be ~/.local/share/mime. "
+#~ "You should move it there (and make a symlink from ~/.mime to it for older "
+#~ "applications)."
+#~ msgstr ""
+#~ "Le répertoire ~/.mime a été déplacé. Ce doit maintenant être ~/.local/"
+#~ "share/mime. Vous devez le déplacer là (et créer un lien symbolique de ~/."
+#~ "mime vers lui pour les anciennes applications)."
+
+#~ msgid ""
+#~ "The standard MIME type database (version 0.9 or later) was not found. The "
+#~ "filer will probably not show the correct types for different files. You "
+#~ "should download and install the 'shared-mime-info-0.9' package from "
+#~ "here:\n"
+#~ "http://www.freedesktop.org/software/shared-mime-info\n"
+#~ "\n"
+#~ "If you have already installed this package, check that the permissions "
+#~ "allow the files to be read (check /usr/local/share/mime/globs or /usr/"
+#~ "share/mime/globs)."
+#~ msgstr ""
+#~ "La base de données des types MIME standard (version 0.9 ou ultérieure) "
+#~ "n'a pas été trouvée. Le filer ne pourra probablement pas montrer les "
+#~ "types corrects pour les différents fichiers. Vous devez télécharger et "
+#~ "installer le paquet 'shared-mime-info-0.9' à partir de :\n"
+#~ "http://www.freedesktop.org/software/shared-mime-info\n"
+#~ "\n"
+#~ "Si vous avez déjà installé ce paquet, vérifiez que les droits d'accès "
+#~ "permettent de lire les fichiers (vérifiez /usr/local/share/mime/globs ou /"
+#~ "usr/share/mime/globs)."
 
 #~ msgid "Executable files"
 #~ msgstr "Fichiers exécutables"
