@@ -1,6 +1,15 @@
 			ROX-Filer
 			A RISC OS-like filer for X
 			by Thomas Leonard
+
+24-Jul-2005
+~~~~~~~~~~~
+An executable text file of unknown type is marked as executable if its name
+doesn't contain a '.'. This is so that 'readme.txt' on a filesystem with
+all execute bits set is seen as text, but a shell script with no extension
+or interpreter header still shows up as an executable on Solaris (Thomas
+Leonard; requested by Stephen Watson).
+
 23-Jul-2005
 ~~~~~~~~~~~
 Added icon for messages (Thomas Leonard).
