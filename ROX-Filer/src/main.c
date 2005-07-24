@@ -815,37 +815,23 @@ static void add_default_panel_and_pinboard(xmlNodePtr body)
 	}
 }
 
-static void do_launch(GObject *button, gpointer data)
+static GtkWidget *launch_button_new(const char *label, const char *uri)
 {
-	char *uri;
-	const char *argv[] = {"0launch", NULL, NULL};
-	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
-				  "/bin/0launch";
+	GtkWidget *button;
+	GClosure *closure;
 
-	uri = g_object_get_data(button, "rox-uri");
-	g_return_if_fail(uri != NULL);
+	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
+	closure = g_cclosure_new_swap(G_CALLBACK(launch_uri),
+					g_strdup(uri),
+					(GClosureNotify) g_free);
+	g_signal_connect_closure(button, "clicked", closure, FALSE);
 
-	if (!available_in_path(argv[0]))
-	{
-		if (access(uri_0launch, X_OK) == 0)
-			argv[0] = uri_0launch;
-		else
-		{
-			delayed_error("This program cannot be run, as the "
-				"0launch command is not available. "
-				"It can be downloaded from here:\n\n"
-				"http://0install.net/injector.html");
-			return;
-		}
-	}
-
-	argv[1] = uri;
-	rox_spawn(NULL, argv);
+	return button;
 }
 
 static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 {
-	GtkWidget *button, *align;
+	GtkWidget *align;
 	char *uri;
 
 	g_return_val_if_fail(option == NULL, NULL);
@@ -854,12 +840,13 @@ static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 	uri = xmlGetProp(node, "uri");
 
 	g_return_val_if_fail(uri != NULL, NULL);
-	
+
 	align = gtk_alignment_new(0, 0.5, 0, 0);
-	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
-	g_object_set_data_full(G_OBJECT(button), "rox-uri", uri, g_free);
-	gtk_container_add(GTK_CONTAINER(align), button);
-	g_signal_connect(button, "clicked", G_CALLBACK(do_launch), NULL);
+
+	gtk_container_add(GTK_CONTAINER(align),
+			launch_button_new(label, uri));
+
+	g_free(uri);
 
 	return g_list_append(NULL, align);
 }

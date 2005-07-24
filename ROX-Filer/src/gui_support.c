@@ -1408,3 +1408,28 @@ void make_heading(GtkWidget *label, double scale_factor)
 
 	gtk_label_set_attributes(GTK_LABEL(label), list);
 }
+
+/* Launch a program using 0launch */
+void launch_uri(const char *uri)
+{
+	const char *argv[] = {"0launch", NULL, NULL};
+	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
+				  "/bin/0launch";
+
+	if (!available_in_path(argv[0]))
+	{
+		if (access(uri_0launch, X_OK) == 0)
+			argv[0] = uri_0launch;
+		else
+		{
+			delayed_error("This program cannot be run, as the "
+				"0launch command is not available. "
+				"It can be downloaded from here:\n\n"
+				"http://0install.net/injector.html");
+			return;
+		}
+	}
+
+	argv[1] = uri;
+	rox_spawn(NULL, argv);
+}

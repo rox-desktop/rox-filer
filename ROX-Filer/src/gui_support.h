@@ -83,6 +83,6 @@ GdkPixbuf * rox_pixbuf_new_from_file_at_scale (const char *filename,
 					       gboolean  preserve_aspect_ratio,
 					       GError    **error);
 void make_heading(GtkWidget *label, double scale_factor);
-
+void launch_uri(const char *uri);
 
 #endif /* _GUI_SUPPORT_H */
