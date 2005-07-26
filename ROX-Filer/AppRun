@@ -5,15 +5,6 @@ PROG=ROX-Filer
 APP_DIR=`dirname "$0"`
 APP_DIR=`cd "$APP_DIR";pwd`; export APP_DIR
 
-if [ "x$PLATFORM" = x ]; then
-	ARCH=`uname -m`
-	case "$ARCH" in
-		i?86) ARCH=ix86 ;;
-	esac
-
-	PLATFORM=`uname -s`-"$ARCH" export PLATFORM
-fi
-
 DEBUGGER=""
 
 case $1 in
@@ -43,9 +34,7 @@ case $1 in
 		[ ! -d "$BUILDDIR" ] && mkdir "$BUILDDIR"
 		rm -f "$BUILDDIR/config.cache"
 		rm -f "$APP_DIR/src/config.h"	# (for upgrading)
-		cd "$BUILDDIR" && "$APP_DIR/src/configure" --enable-rox    \
-					--with-platform="$PLATFORM" \
-					"$@" \
+		cd "$BUILDDIR" && "$APP_DIR/src/configure" "$@" \
 			&& make clean && make && echo Done >&2 && exit 0
 		echo Compile failed >&2
 		echo Press Return... >&2
@@ -60,13 +49,13 @@ if [ -z "$XDG_DATA_DIRS" -a -d /uri/0install/zero-install.sourceforge.net ]; the
   export XDG_DATA_DIRS
 fi
 
-BIN="$APP_DIR/$PLATFORM/$PROG"
+BIN="$APP_DIR/$PROG"
 
 if [ -x "$BIN" ]; then
   exec $DEBUGGER "$BIN" $DEBUG_OPTIONS "$@"
 else
   echo "ERROR from $0:" >&2
-  echo "I cannot find an executable file for your host type ($PLATFORM)." >&2
+  echo "I cannot find an executable binary." >&2
   echo "Trying to compile..." >&2
   if [ -n "$DISPLAY" ]; then
     xterm -e "$0" --compile

@@ -1,8 +1,7 @@
 SHELL = @SHELL@
 srcdir = @srcdir@
 VPATH = @srcdir@
-PLATFORM = @with_platform@
-PLATFORM_DIR = $(srcdir)/../${PLATFORM}
+PLATFORM_DIR = $(srcdir)/..
 CC = @CC@
 .SUFFIXES:
 .SUFFIXES: .c .o
@@ -46,7 +45,6 @@ OBJECTS = abox.o action.o appinfo.o appmenu.o bind.o bookmarks.o	\
 
 ${PROG}: ${OBJECTS}
 	${CC} -o "${PROG}" ${OBJECTS} ${LDFLAGS}
-	[ -d "${PLATFORM_DIR}" ] || mkdir "${PLATFORM_DIR}"
 	mv "${PROG}" "${PLATFORM_DIR}"
 	-(cd "${PLATFORM_DIR}" && \
 	 objcopy --only-keep-debug ROX-Filer ROX-Filer.dbg && \
@@ -66,7 +64,7 @@ config.h: config.h.in
 	./config.status
 
 config.status: configure
-	APP_DIR="$(srcdir)/.." $(srcdir)/configure --with-platform="${PLATFORM}" --enable-rox
+	APP_DIR="$(srcdir)/.." $(srcdir)/configure
 
 configure: configure.in
 	cd $(srcdir) && autoconf
