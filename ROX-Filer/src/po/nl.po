@@ -15,19 +15,21 @@
 # Bijgewerkt Jan 2002 en Mei 2002
 # Copyright (C) 2002 Wilbert Berendsen <wbsoft@xs4all.nl>
 # 
-# Bijgewerkt Dec 2002, Maa Mei Okt 2003, Jan Feb Mei Nov 2004, Jan 2005
-# Copyright (C) 2004 Jan Wagemakers <janw@easynet.be>
+# Bijgewerkt Dec 2002, Maa Mei Okt 2003, Jan Feb Mei Nov 2004, 
+#            Jan Jul 2005
+# Copyright (C) 2005 Jan Wagemakers <janw@easynet.be>
 #  - Dank aan Jan Verhoeven (wisclub) voor zijn tips!
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.1.2\n"
+"Project-Id-Version: ROX-Filer 2.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-23 15:00+0200\n"
+"POT-Creation-Date: 2005-07-28 08:35+0200\n"
 "PO-Revision-Date: \n"
 "Last-Translator: Jan Wagemakers <janw@easynet.be>\n"
 "Language-Team: ROX Mailing List <rox-devel@sourceforge.net>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=iso-8859-15\n"
+"Content-Type: text/plain; charset=utf8\n"
 "Content-Transfer-Encoding: \n"
 
 #: abox.c:127
@@ -60,15 +62,15 @@ msgstr "Uitdrukking:"
 
 #: action.c:58
 msgid "See the attr(5) man page for full details."
-msgstr ""
+msgstr "Raadpleeg de attr(5) man pagina voor de volledige details"
 
 #: action.c:60
 msgid "See the fsattr(5) man page for full details."
-msgstr ""
+msgstr "Raadpleeg de fsattr(5) man pagina voor de volledige details"
 
 #: action.c:62
 msgid "You do not appear to have OS support."
-msgstr ""
+msgstr "Blijkbaar is er geen OS ondersteuning"
 
 #: action.c:188
 msgid "Find expression reference"
@@ -207,7 +209,7 @@ msgstr ""
 "<b>a+X</b>: mappen worden bereikbaar voor iedereen; bestanden die "
 "uitvoerbaar\n"
 "waren door iemand worden uitvoerbaar door iedereen\n"
-"<b>u+rw, go+r</b>: twee opdrachten in één keer!\n"
+"<b>u+rw, go+r</b>: twee opdrachten in Ã©Ã©n keer!\n"
 "<b>u+s</b>: zet de SetUID bit - heeft meestal geen effect op script-"
 "bestanden\n"
 "<b>755</b>: zet de toegangsrechten direct\n"
@@ -219,7 +221,6 @@ msgid "Set type reference"
 msgstr "Zet type referentie"
 
 #: action.c:309
-#, fuzzy
 msgid ""
 "Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
@@ -234,8 +235,8 @@ msgid ""
 "directories, devices, pipes or sockets, and then only\n"
 "on certain file systems and where the OS implements them.\n"
 msgstr ""
-"Normaal kent ROX-Filer een bepaald type aan een normaal bestand\n"
-"toe als het met een bepaald patroon overeen komt. Hernoem het \n"
+"ROX-Filer bepaalt het type van een normaal bestand\n"
+"aan de hand van overeenkomst met een bepaald patroon. Hernoem het \n"
 "bestand om het type te veranderen.\n"
 "\n"
 "Nieuwere bestands-systemen kunnen zaken als 'Extended\n"
@@ -244,7 +245,7 @@ msgstr ""
 "'user.mime_type' attribute om het bestands type te bewaren.\n"
 "\n"
 "Bestands types worden enkel voor normale bestanden ondersteund, \n"
-"niet voor mappen, devices, pipes of sockets, and dit enkel \n"
+"niet voor mappen, devices, pipes of sockets, en dit enkel \n"
 "bij bepaalde bestands-systemen en daar waar het OS ze ondersteunt.\n"
 "\n"
 
@@ -405,17 +406,17 @@ msgstr "overschrijven"
 
 #: action.c:1344
 msgid "'Trying copy anyway...\n"
-msgstr "'Probeer toch te kopiëren...\n"
+msgstr "'Probeer toch te kopiÃ«ren...\n"
 
 #: action.c:1353
 #, c-format
 msgid "?Copy %s as %s?"
-msgstr "?Kopiëer %s als %s?"
+msgstr "?KopiÃ«er %s als %s?"
 
 #: action.c:1357
 #, c-format
 msgid "'Copying %s as %s\n"
-msgstr "Kopiëren %s als %s\n"
+msgstr "KopiÃ«ren %s als %s\n"
 
 #: action.c:1372
 msgid "!ERROR: Destination already exists, but is not a directory\n"
@@ -428,7 +429,7 @@ msgid ""
 "Failed to copy '%s'\n"
 msgstr ""
 "!%s\n"
-"Mislukt om '%s' te kopiëren\n"
+"Mislukt om '%s' te kopiÃ«ren\n"
 
 #: action.c:1488
 #, c-format
@@ -460,7 +461,7 @@ msgstr ""
 
 #: action.c:1544
 msgid "!ERROR: Can't copy object into itself\n"
-msgstr "!FOUT: Kan object niet naar zichzelf kopiëren\n"
+msgstr "!FOUT: Kan object niet naar zichzelf kopiÃ«ren\n"
 
 #: action.c:1559
 msgid "!ERROR: Can't move/rename object into itself\n"
@@ -623,7 +624,7 @@ msgstr "u+rw (Geef eigenaar lees+schrijf toegang)"
 
 #: action.c:2092
 msgid "go-rwx (Private - owner access only)"
-msgstr "go-rwx (Privé - enkel eigenaar toegang)"
+msgstr "go-rwx (PrivÃ© - enkel eigenaar toegang)"
 
 #: action.c:2094
 msgid "go=u-w (Public access, not write)"
@@ -667,7 +668,7 @@ msgstr "Type:"
 
 #: action.c:2214 dnd.c:124 menu.c:1999 tips:233
 msgid "Copy"
-msgstr "Kopiëren"
+msgstr "KopiÃ«ren"
 
 #: action.c:2224 action.c:2260 tips:251
 msgid "Newer"
@@ -716,12 +717,12 @@ msgstr " en "
 #: action.c:2394
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
-" zal bepaalde items op het paneel of prikbord beïnvloeden - echt verwijderen?"
+" zal bepaalde items op het paneel of prikbord beÃ¯nvloeden - echt verwijderen?"
 
 #: action.c:2401
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
-" zal bepaalde items op het paneel of prikbord beïnvloeden - echt verwijderen?"
+" zal bepaalde items op het paneel of prikbord beÃ¯nvloeden - echt verwijderen?"
 
 #: appmenu.c:198
 msgid "<missing label>"
@@ -738,7 +739,7 @@ msgstr ""
 
 #: appmenu.c:339 menu.c:234
 msgid "Customise Menu..."
-msgstr "Instellingen Menu..."
+msgstr "Menu aanpassen..."
 
 #: appmenu.c:386 menu.c:251 toolbar.c:159
 msgid "Help"
@@ -800,9 +801,8 @@ msgid "Reset"
 msgstr "Reset"
 
 #: bulk_rename.c:76
-#, fuzzy
 msgid "Make the New column a copy of Old"
-msgstr "Maak Na-kolom hetzelfde als de Voor-kolom"
+msgstr "Maak de Nieuwe-kolom hetzelfde als de Oude-kolom"
 
 #: bulk_rename.c:81
 msgid "_Rename"
@@ -813,7 +813,6 @@ msgid "Replace:"
 msgstr "Vervangen:"
 
 #: bulk_rename.c:101
-#, fuzzy
 msgid ""
 "This is a regular expression to search for.\n"
 "^ matches the start of a filename\n"
@@ -825,7 +824,7 @@ msgstr ""
 "^ komt overeen met het begin van een bestandsnaam\n"
 "$ komt overeen met het einde\n"
 "\\. komt overeen met een punt\n"
-"\\.htm$ komt overeen met '.htm' in 'index.html', etc"
+"\\.htm$ komt overeen met '.htm' in 'index.html', enz"
 
 #: bulk_rename.c:109
 msgid "With:"
@@ -844,32 +843,29 @@ msgid "Apply"
 msgstr "Toepassen"
 
 #: bulk_rename.c:123
-#, fuzzy
 msgid ""
 "Do a search-and-replace in the New column. The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr ""
-"Doe een zoek-en-vervang in de Na-kolom. De bestanden worden pas "
+"Doe een zoek-en-vervang in de Nieuw-kolom. De bestanden worden pas "
 "daadwerkelijk hernoemd als er beneden op de Hernoem knop geklikt wordt."
 
 #: bulk_rename.c:142
 msgid "Old name"
-msgstr ""
+msgstr "Oude naam"
 
 #: bulk_rename.c:151
-#, fuzzy
 msgid "New name"
-msgstr "Hernoemen"
+msgstr "Nieuwe naam"
 
 #: bulk_rename.c:259
-#, fuzzy
 msgid "No strings (in the New column) matched the given expression"
 msgstr ""
-"Geen enkele string (in de Na kolom) komt overeen met de gegeven expressie"
+"Geen enkele string (in de Nieuw-kolom) komt overeen met de gegeven expressie"
 
 #: bulk_rename.c:264
 msgid "One name matched, but the result was the same"
-msgstr "EÃn overeenkomst, maar het resultaat was hetzelfde"
+msgstr "EÃ©n overeenkomst, maar het resultaat was hetzelfde"
 
 #: bulk_rename.c:267
 #, c-format
@@ -912,12 +908,11 @@ msgid "A file called '%s' already exists"
 msgstr "Een bestand '%s' bestaat reeds "
 
 #: bulk_rename.c:421
-#, fuzzy, c-format
 msgid ""
 "Some of the New names contain / characters (eg '%s'). This will cause the "
 "files to end up in different directories. Continue?"
 msgstr ""
-"Sommige van de Na-namen bevatten / karakters (bv '%s'). Hierdoor zullen deze "
+"Sommige van de Nieuwe namen bevatten / karakters (bv '%s'). Hierdoor zullen deze "
 "bestanden in een andere map terecht komen. Doorgaan?"
 
 #: bulk_rename.c:436
@@ -925,9 +920,8 @@ msgid "None of the names have changed. Nothing to do!"
 msgstr "Geen enkele naam is veranderd. Niets te doen!"
 
 #: choices.c:428
-#, fuzzy
 msgid "Choices migration"
-msgstr "Chinees (traditioneel)"
+msgstr "'Choices' (keuze-instellingen) verhuizing"
 
 #: choices.c:436
 #, c-format
@@ -937,18 +931,22 @@ msgid ""
 " to the new location \n"
 "<b>%s</b>\n"
 msgstr ""
+"Keuze-instellingen (Choices) zijn verplaatst van \n"
+"<b>%s</b>\n"
+" naar een nieuwe locatie \n"
+"<b>%s</b>\n"
 
 #: choices.c:447
 #, c-format
 msgid "%d directories could not be migrated"
-msgstr ""
+msgstr "%d mappen konden niet verplaatst worden"
 
-#: dir.c:973
+#: dir.c:982
 #, c-format
 msgid "Can't stat directory: %s"
 msgstr "Kan map status niet verkrijgen: %s"
 
-#: dir.c:982
+#: dir.c:991
 #, c-format
 msgid "Can't open directory: %s"
 msgstr "Kan map niet openen: %s"
@@ -960,11 +958,11 @@ msgstr "lstat(2) mislukt: %s"
 
 #: dnd.c:126
 msgid "Link (relative)"
-msgstr ""
+msgstr "Link (relatief)"
 
 #: dnd.c:127
 msgid "Link (absolute)"
-msgstr ""
+msgstr "Link (absoluut)"
 
 #: dnd.c:426
 msgid "Internal error - bad info type"
@@ -1565,7 +1563,7 @@ msgstr "Opties..."
 msgid "Home Directory"
 msgstr "Thuis map"
 
-#: icon.c:140 icon.c:1340 menu.c:206 type.c:244
+#: icon.c:140 icon.c:1340 menu.c:206 type.c:212
 msgid "File"
 msgstr "Bestand"
 
@@ -1608,7 +1606,7 @@ msgstr "Niets"
 
 #: icon.c:547
 msgid "The location must contain at least one character!"
-msgstr "De locatie moet minstens één letterteken bevatten!"
+msgstr "De locatie moet minstens Ã©Ã©n letterteken bevatten!"
 
 #: icon.c:613
 msgid "You must first select some items to remove"
@@ -1742,11 +1740,11 @@ msgstr "Laatst geopend:"
 
 #: infobox.c:621
 msgid "Extended attributes:"
-msgstr ""
+msgstr "Uitgebreide attributen:"
 
 #: infobox.c:623
 msgid "Present"
-msgstr ""
+msgstr "Aanwezig"
 
 #: infobox.c:624
 msgid "None"
@@ -1856,7 +1854,7 @@ msgstr ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer komt ABSOLUUT ZONDER GARANTIE,\n"
 "voor zover wettelijk toegestaan.\n"
-"Kopiëen van ROX-Filer mogen verspreid worden onder de \n"
+"KopiÃ«en van ROX-Filer mogen verspreid worden onder de \n"
 "voorwaarden van de GNU General Public Licence.\n"
 "Voor meer informatie zie het bestand COPYING.\n"
 
@@ -1878,7 +1876,6 @@ msgstr ""
 "gebruik in plaats daarvan de korte versies.\n"
 
 #: main.c:116
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1909,7 +1906,8 @@ msgstr ""
 "Open de opgegeven mappen en bestanden of de huidige map als er geen \n"
 "argumenten zijn gegeven.\n"
 "\n"
-"  -b, --bottom=PANEL    open PANEL als paneel onderaan het scherm\n"
+"  -b, --bottom=PANEL    open PANEL als een paneel onderaan het scherm\n"
+"  -B, --bottom=PANEL    open PANEL als een paneel onderaan het scherm\n"
 "  -c, --client-id=ID    gebruik ID voor sessiebeheer\n"
 "  -d, --dir=DIR         open DIR als map (niet als applicatie)\n"
 "  -D, --close=DIR       sluit DIR en de subdirectories ervan\n"
@@ -1921,6 +1919,7 @@ msgstr ""
 "  -r, --right=PANEL     open PANEL als paneel rechts op het scherm\n"
 "  -R, --RPC             lees Remote Procedure Call van standaard invoer\n"
 "  -s, --show=FILE       open een map en toon FILE\n"
+"  -S, --rox-session     gebruik de standaard panel en pinboard opties, en -n\n"
 "  -t, --top=PANEL       open PANEL als paneel bovenaan het scherm\n"
 "  -u, --user            toon gebruikersnaam in ieder venster\n"
 "  -v, --version         toon informatie over versie en sluit af\n"
@@ -1943,6 +1942,10 @@ msgid ""
 "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 "Trying to continue..."
 msgstr ""
+"De X server gaf een BadWindow fout. Misschien het gevolg van deze GTK-"
+"fout (tijdens sleep-en-drop?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Poging om verder te gaan..."
 
 #: main.c:392
 msgid ""
@@ -2089,7 +2092,7 @@ msgstr "Bewaar Weergave Instellingen..."
 
 #: menu.c:207
 msgid "Copy..."
-msgstr "Kopiëren..."
+msgstr "KopiÃ«ren..."
 
 #: menu.c:208
 msgid "Rename..."
@@ -2349,15 +2352,20 @@ msgid ""
 "%s\n"
 "%s\n"
 msgstr ""
+"Ieder bestand dat in deze Template-map geplaatst wordt, zal verschijnen in "
+"het 'Nieuw' menu. Bij het selecteren hiervan zal deze gekopiÃ«erd naar een nieuw bestand.\n"
+"\n"
+"De volgende mappen bevatten templates:\n"
+"\n"
+"%s\n"
+"%s\n"
 
 #: menu.c:1535
-#, fuzzy
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
 msgstr ""
-"Ik zal nu de SendTo map laten zien; maak een symbolische link (Ctrl+Shift "
-"slepen) voor de gewenste applicaties."
+"Ik zal nu de Templates map laten zien; plaats 'template bestanden' in deze map."
 
 #: menu.c:1652
 msgid "Customise"
@@ -2377,7 +2385,7 @@ msgstr ""
 
 #: menu.c:1869
 msgid "Copy ... ?"
-msgstr "Kopiëren ... ?"
+msgstr "KopiÃ«ren ... ?"
 
 #: menu.c:1872
 msgid "Rename ... ?"
@@ -2433,7 +2441,7 @@ msgstr "Binnenin kijken ... ?"
 
 #: menu.c:1972
 msgid "You cannot do this to more than one item at a time"
-msgstr "Dit is niet mogelijk voor meer dan één item tegelijk"
+msgstr "Dit is niet mogelijk voor meer dan Ã©Ã©n item tegelijk"
 
 #: menu.c:2004
 msgid "Rename"
@@ -2642,9 +2650,8 @@ msgstr ""
 "%s"
 
 #: panel.c:2335
-#, fuzzy
 msgid "Panel Options..."
-msgstr "Opties..."
+msgstr "Paneel Opties..."
 
 #: panel.c:2427
 #, c-format
@@ -2652,51 +2659,48 @@ msgid "Xinerama monitor %d unavailable"
 msgstr "Xinerama monitor %d niet beschikbaar"
 
 #: panel.c:2502
-#, fuzzy
 msgid "Panel Options"
-msgstr "Opties"
+msgstr "Paneel Opties"
 
 #: panel.c:2517
-#, fuzzy, c-format
 msgid "Panel: %s"
-msgstr "Panelen"
+msgstr "Paneel:"
 
 #: panel.c:2525
 msgid "Select the panel's position:"
-msgstr ""
+msgstr "Kies de positie van het paneel:"
 
 #: panel.c:2531
 msgid "Top-edge panel"
-msgstr ""
+msgstr "Paneel bovenaan"
 
 #: panel.c:2532
 msgid "Top edge"
-msgstr ""
+msgstr "Boven"
 
 #: panel.c:2533
 msgid "Bottom edge panel"
-msgstr ""
+msgstr "Paneel onderaan"
 
 #: panel.c:2534
-#, fuzzy
 msgid "Bottom edge"
-msgstr "Ondergrens"
+msgstr "Onder"
 
 #: panel.c:2535
 msgid "Left edge panel"
-msgstr ""
+msgstr "Paneel links"
 
 #: panel.c:2536
 msgid "Left edge"
-msgstr ""
+msgstr "Links"
 
 #: panel.c:2537
 msgid "Right-edge panel"
-msgstr ""
+msgstr "Paneel rechts"
 
 #: panel.c:2538
 msgid "Right edge"
-msgstr ""
+msgstr "Rechts"
 
 #: pinboard.c:352
 msgid "Your old pinboard file has been converted to the new XML format."
@@ -2905,15 +2909,26 @@ msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "Verbroken symbolische link (of je hebt er geen toegang naar)."
 
 #: run.c:502
-#, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
-"the file to an application"
+"the file to an application.%s"
 msgstr ""
 "Er is geen start-actie ingesteld voor bestanden van dit type (%s/%s) - Kies "
 "een actie door 'Start-actie instellen' te kiezen in het Bestand menu, of "
 "sleep het bestand gewoon naar een geschikte applicatie."
+
+#: run.c:508
+msgid ""
+"\n"
+"\n"
+"Note: If this is a computer program which you want to run, you need to set "
+"the execute bit by choosing Permissions from the File menu."
+msgstr ""
+"\n"
+"\n"
+"Nota: Als dit een programma is dat moet gestart kunnen worden, dan moet het "
+"uitvoer-bit gezet worden. Dit kan gedaan worden door toegangsrechten in het Bestands-menu te kiezen."
 
 #: support.c:272
 msgid "B"
@@ -3054,47 +3069,47 @@ msgstr "stijgend"
 msgid "descending"
 msgstr "dalend"
 
-#: type.c:235
+#: type.c:203
 msgid "Sym link"
 msgstr "Symlink"
 
-#: type.c:237
+#: type.c:205
 msgid "Mount point"
 msgstr "Aankoppelpunt"
 
-#: type.c:239
+#: type.c:207
 msgid "App dir"
 msgstr "Applicatiemap"
 
-#: type.c:246
+#: type.c:214
 msgid "Dir"
 msgstr "Map"
 
-#: type.c:248
+#: type.c:216
 msgid "Char dev"
 msgstr "Char dev"
 
-#: type.c:250
+#: type.c:218
 msgid "Block dev"
 msgstr "Block dev"
 
-#: type.c:252
+#: type.c:220
 msgid "Pipe"
 msgstr "Pipe"
 
-#: type.c:254
+#: type.c:222
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:256
+#: type.c:224
 msgid "Door"
 msgstr "Door"
 
-#: type.c:259
+#: type.c:227
 msgid "Unknown"
 msgstr "Onbekend"
 
-#: type.c:415
+#: type.c:355
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -3119,11 +3134,11 @@ msgstr ""
 "Maak u geen zorgen indien iedereen die naar deze bestanden kan schrijven te "
 "vertrouwen is. Anders, controleer, of wis, alle bestaande start acties."
 
-#: type.c:428
+#: type.c:368
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Los veiligheids probleem op)"
 
-#: type.c:558
+#: type.c:498
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3134,71 +3149,71 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:739
+#: type.c:679
 msgid "This is not a program! Give me an application instead!"
 msgstr "Dit is geen programma! Geef me een applicatie in plaats daarvan!"
 
-#: type.c:800
+#: type.c:740
 msgid "No run action defined"
 msgstr "Geen startactie ingesteld"
 
-#: type.c:826
+#: type.c:766
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Fout in afhandeling %s: %s"
 
-#: type.c:841
+#: type.c:781
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Ongeldige applicatie %s (foute AppRun)"
 
-#: type.c:852
+#: type.c:792
 #, c-format
 msgid "Non-executable %s"
 msgstr "Niet-uitvoerbaar %s"
 
-#: type.c:885
+#: type.c:825
 msgid "Set run action"
 msgstr "Startactie instellen"
 
-#: type.c:891
+#: type.c:831
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Gebruik dit als de standaard, indien er voor het specifieke type geen "
 "startactie is ingesteld."
 
-#: type.c:893
+#: type.c:833
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr "Gebruiken voor alle `%s/<willekeurig>'"
 
-#: type.c:897
+#: type.c:837
 msgid "Use this application for all files with this MIME type."
 msgstr "Gebruik deze toepassing voor alle bestanden met dit MIME type."
 
-#: type.c:899
+#: type.c:839
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Alleen voor het type `%s' (%s/%s)"
 
-#: type.c:905
+#: type.c:845
 msgid "Drop a suitable application here"
 msgstr "Sleep een geschikte toepassing naar hier"
 
-#: type.c:920
+#: type.c:860
 msgid "OR"
 msgstr "OF"
 
-#: type.c:927
+#: type.c:867
 msgid "Enter a shell command:"
 msgstr "Geef een shell opdracht:"
 
-#: type.c:956
+#: type.c:896
 msgid "_Use Command"
 msgstr "_Gebruik Opdracht"
 
-#: type.c:986
+#: type.c:926
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
@@ -3206,60 +3221,16 @@ msgstr ""
 "Er bestaat reeds een start-actie in de vorm van een vrij groot programma - "
 "echt verwijderen?"
 
-#: type.c:997
+#: type.c:937
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Kan %s niet verwijderen: %s"
 
-#: type.c:1034
+#: type.c:974
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr "Bewaren van instellingen is uitgezet door de CHOICESPATH variabele"
 
-#: type.c:1216
-#, c-format
-msgid ""
-"Error loading MIME database:\n"
-"%s"
-msgstr ""
-"Fout tijdens laden MIME database:\n"
-"%s"
-
-#: type.c:1241
-#, c-format
-msgid "File '%s' corrupted!"
-msgstr "Bestand '%s' ongeldig!"
-
-#: type.c:1327
-msgid ""
-"The ~/.mime directory has moved. It should now be ~/.local/share/mime. You "
-"should move it there (and make a symlink from ~/.mime to it for older "
-"applications)."
-msgstr ""
-"De map ~/.mime is verplaatst. Deze zou nu ~/.local.share/mime moeten zijn. "
-"Verplaats het naar daar (en maak er een symbolische koppeling van ~/.mime "
-"naar toe voor oudere toepassingen)."
-
-#: type.c:1379
-msgid ""
-"The standard MIME type database (version 0.9 or later) was not found. The "
-"filer will probably not show the correct types for different files. You "
-"should download and install the 'shared-mime-info-0.9' package from here:\n"
-"http://www.freedesktop.org/software/shared-mime-info\n"
-"\n"
-"If you have already installed this package, check that the permissions allow "
-"the files to be read (check /usr/local/share/mime/globs or /usr/share/mime/"
-"globs)."
-msgstr ""
-"De standaard MIME type database (versie 0.9 of later) is niet gevonden. De "
-"filer zal waarschijnlijk niet de juiste types afbeelden voor verschillende "
-"bestanden. U kunt het 'Common types package' downloaden en het 'shared-mime-"
-"info-0.9' pakket installeren van:\n"
-"http://www.freedesktop.org/software/shared-mime-info\n"
-"\n"
-"Als dit pakket reeds geïnstalleerd is, controleer dan de lees-"
-"toegangsrechten (/usr/local/share/mime/globs of /usr/share/mime/globs)."
-
-#: type.c:1492
+#: type.c:1249
 #, c-format
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
@@ -3267,7 +3238,7 @@ msgstr ""
 "Iconen thema '%s' bevat geen MIME iconen. Zal gebruik maken van het "
 "standaard ROX theme."
 
-#: type.c:1506
+#: type.c:1263
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
@@ -3424,7 +3395,7 @@ msgstr "Gebruik de LANG ongevingsvariabele"
 
 #: tips:4
 msgid "Basque"
-msgstr ""
+msgstr "Baskisch"
 
 #: tips:5
 msgid "Chinese (traditional)"
@@ -3451,9 +3422,8 @@ msgid "English (no translation)"
 msgstr "Engels (geen vertaling)"
 
 #: tips:11
-#, fuzzy
 msgid "Estonian"
-msgstr "Roemeens"
+msgstr "Estlands"
 
 #: tips:12
 msgid "Finnish"
@@ -3489,7 +3459,7 @@ msgstr "Pools"
 
 #: tips:20
 msgid "Portuguese (Brasil)"
-msgstr "Portugees (Brazilië)"
+msgstr "Portugees (BraziliÃ«)"
 
 #: tips:21
 msgid "Romanian"
@@ -3789,15 +3759,16 @@ msgid "If this is on then column headings will be shown in the list view."
 msgstr "Indien aan, zullen kolom hoofddingen getoond worden in lijst weergave."
 
 #: tips:105
-#, fuzzy
 msgid "Show full type"
-msgstr "Sorteer op type"
+msgstr "Toon volledig type"
 
 #: tips:106 tips:107 tips:108
 msgid ""
 "If this is on then the full description of each object's type will be show "
 "rather than a short summary of its basic type."
 msgstr ""
+"Indien 'aan', toon de volledige beschrijving van het type van elk object, "
+"in de plaats van een korte samenvating met enkel het basis type."
 
 #: tips:109
 msgid "Tools/Minibuffer"
@@ -4199,7 +4170,7 @@ msgid ""
 "panels to one monitor instead of spanning them."
 msgstr ""
 "Gebruik deze optie om bij een Xinerama multi-monitor opstelling de panelen "
-"te beperken tot één monitor i.p.v. ze uit te breiden."
+"te beperken tot Ã©Ã©n monitor i.p.v. ze uit te breiden."
 
 #: tips:208 tips:209 tips:210 tips:211
 msgid ""
@@ -4217,58 +4188,55 @@ msgid ""
 "When run by a session manager program (such as ROX-Session) the filer can "
 "open up a panel and/or the pinboard.  Here you configure which."
 msgstr ""
+"Wanneer een sessie-beheer programma (zoals ROX-Session) gebruikt wordt, kan "
+"ROX-Filer een paneel en/of prikbord tonen. Dit kan je hier instellen."
 
 #: tips:214
-#, fuzzy
 msgid "Panel only"
-msgstr "Alleen plaatjes"
+msgstr "Enkel een paneel"
 
 #: tips:215
-#, fuzzy
 msgid "Only a panel is shown."
-msgstr "Alleen plaatjes worden getoond."
+msgstr "Alleen het paneel wordt getoond."
 
 #: tips:216
-#, fuzzy
 msgid "Pinboard only"
-msgstr "Prikbord"
+msgstr "Enkel een prikbord"
 
 #: tips:217
-#, fuzzy
 msgid "Only the pinboard is shown."
-msgstr "Alleen plaatjes worden getoond."
+msgstr "Alleen het prikbord wordt getoond."
 
 #: tips:218
-#, fuzzy
 msgid "Panel and pinboard"
-msgstr "Prikbord"
+msgstr "Paneel en Prikbord"
 
 #: tips:219 tips:220
 msgid "Both a panel and a pinboard are shown."
-msgstr ""
+msgstr "Zowel paneel als prikbord worden getoond."
 
 #: tips:221
-#, fuzzy
 msgid "Panel"
-msgstr "Panelen"
+msgstr "Paneel"
 
 #: tips:222 tips:223
 msgid "Enter the name of the panel to show here."
-msgstr ""
+msgstr "Geef de naam van het te tonen paneel."
 
 #: tips:225 tips:226
 msgid "Enter the name of the pinboard to show here."
-msgstr ""
+msgstr "Geef de naam van het te tonen prikbord."
 
 #: tips:227
 msgid "Changes here take effect the next time the filer is run."
-msgstr ""
+msgstr "Aanpassing zijn van toepassing vanaf ROX-filer opnieuw gestart wordt."
 
 #: tips:228 tips:229
 msgid ""
 "The session manager activates these options by using the -S or --rox-session "
 "argument to rox."
 msgstr ""
+"De sessie-manager activeert deze opties d.m.v. het -S of --rox-session argument van ROX."
 
 #: tips:230
 msgid "Action windows"
@@ -4280,7 +4248,7 @@ msgid ""
 "operation, such as copying or deleting some files."
 msgstr ""
 "Actie-vensters verschijnen bij achtergrond-bewerkingen\n"
-"zoals kopiëren en verwijderen."
+"zoals kopiÃ«ren en verwijderen."
 
 #: tips:232
 msgid "Auto-start (Quiet) these actions"
@@ -4288,7 +4256,7 @@ msgstr "Auto-start deze acties (Stil)"
 
 #: tips:234
 msgid "Copy files without confirming first."
-msgstr "Bestanden kopiëren zonder bevestiging."
+msgstr "Bestanden kopiÃ«ren zonder bevestiging."
 
 #: tips:236
 msgid "Move files without confirming first."
@@ -4487,25 +4455,20 @@ msgid "MIME types"
 msgstr "MIME types"
 
 #: tips:299
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type."
 msgstr ""
 "ROX gebruikt een set van regels om het juiste MIME-type te bepalen voor elk "
-"gewoon bestand, en kiest dan een passend icoon. Gebruik de MIME-Editor om "
-"deze bestand-naar-type regels aan te passen:\n"
-"\n"
-"http://rox.sourceforge.net/mime_editor.html"
+"gewoon bestand, en kiest dan een passend icoon."
 
 #: tips:300
 msgid "Edit MIME rules"
-msgstr ""
+msgstr "Pas MIME-regels aan"
 
 #: tips:301
-#, fuzzy
 msgid "Themes"
-msgstr "Tijden"
+msgstr "Thema's"
 
 #: tips:302
 msgid "Icon theme"
@@ -4688,7 +4651,7 @@ msgstr ""
 
 #: tips:339
 msgid "Extended attributes"
-msgstr ""
+msgstr "Uitgebreide attributen"
 
 #: tips:340
 msgid "Don't use extended attributes"
@@ -4707,21 +4670,3 @@ msgstr ""
 "van de bestandsnaam en zal het eigenschappen venster geen 'extended "
 "attributes' tonen."
 
-#~ msgid "Icon '%s' not present in theme"
-#~ msgstr "Icoon '%s' niet aanwezig in thema"
-
-#~ msgid "Executable files"
-#~ msgstr "Uitvoerbare bestanden:"
-
-#~ msgid "Ignore eXecutable bit for known extensions"
-#~ msgstr "Negeer eXecutable bit voor bekende extensies"
-
-#~ msgid ""
-#~ "If a file has a known extension (eg '.gif') then ignore the executable "
-#~ "bit. This is useful if you have files on a Windows-type filesystem which "
-#~ "are being shown as executable programs."
-#~ msgstr ""
-#~ "Als een bestand een bekende extensie heeft (bijv. '.gif') negeer dan het "
-#~ "executable bit. Dit is handig als je bestanden op een Windows-achtig "
-#~ "bestandssysteem hebt, zonder permissies, die worden aangegeven alsof ze "
-#~ "uitvoerbaar zijn."
