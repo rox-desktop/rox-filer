@@ -141,6 +141,7 @@ static int lasso_rect_y1, lasso_rect_y2;
 /* Tracking icon positions */
 static GHashTable *placed_icons=NULL;
 
+Option o_pinboard_tasklist_per_workspace;
 static Option o_pinboard_clamp_icons, o_pinboard_grid_step;
 static Option o_pinboard_fg_colour, o_pinboard_bg_colour;
 static Option o_pinboard_tasklist, o_forward_buttons_13;
@@ -250,6 +251,7 @@ void pinboard_init(void)
 	option_add_int(&o_pinboard_grid_step, "pinboard_grid_step",
 							GRID_STEP_COARSE);
 	option_add_int(&o_pinboard_tasklist, "pinboard_tasklist", TRUE);
+	option_add_int(&o_pinboard_tasklist_per_workspace, "pinboard_tasklist_per_workspace", FALSE);
 	option_add_int(&o_forward_buttons_13, "pinboard_forward_buttons_13",
 			FALSE);
 

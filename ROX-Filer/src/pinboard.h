@@ -10,6 +10,8 @@ extern Pinboard	*current_pinboard;
 
 extern Icon *pinboard_drag_in_progress;
 
+extern Option o_pinboard_tasklist_per_workspace;
+
 extern PangoFontDescription *pinboard_font;
 extern GdkColor pin_text_fg_col, pin_text_bg_col;
 

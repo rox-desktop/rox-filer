@@ -75,6 +75,8 @@ static GdkAtom xa__NET_CLIENT_LIST = GDK_NONE;
 static GdkAtom xa__NET_WM_ICON_GEOMETRY = GDK_NONE;
 static GdkAtom xa__NET_WM_STATE = GDK_NONE;
 static GdkAtom xa__NET_WM_STATE_HIDDEN = GDK_NONE;
+static GdkAtom xa__NET_WM_DESKTOP = GDK_NONE;
+static GdkAtom xa__NET_CURRENT_DESKTOP = GDK_NONE;
 
 /* We have selected destroy and property events on every window in
  * this table.
@@ -95,6 +97,10 @@ static void icon_win_free(IconWindow *win);
 static void update_style(gpointer key, gpointer data, gpointer user_data);
 static void update_supported(void);
 static gboolean update_title(gpointer data);
+static void update_current_desktop(void);
+
+/* remember what desktop number is currently displayed */
+static int cur_desktop = 0;
 
 /****************************************************************
  *			EXTERNAL INTERFACE			*
@@ -106,8 +112,15 @@ void tasklist_set_active(gboolean active)
 	static gboolean tasklist_active = FALSE;
 
 	if (active == tasklist_active)
+	{
+		if (o_pinboard_tasklist_per_workspace.has_changed && active)
+			tasklist_update(FALSE);
 		return;
+	}
 	tasklist_active = active;
+	
+	if (active)
+		update_current_desktop();
 
 	if (need_init)
 	{
@@ -132,6 +145,8 @@ void tasklist_set_active(gboolean active)
 		xa__NET_WM_STATE = gdk_atom_intern("_NET_WM_STATE", FALSE);
 		xa__NET_WM_STATE_HIDDEN =
 			gdk_atom_intern("_NET_WM_STATE_HIDDEN", FALSE);
+		xa__NET_WM_DESKTOP = gdk_atom_intern("_NET_WM_DESKTOP", FALSE);
+		xa__NET_CURRENT_DESKTOP = gdk_atom_intern("_NET_CURRENT_DESKTOP", FALSE);
 		
 		known = g_hash_table_new_full((GHashFunc) xid_hash,
 					      (GEqualFunc) xid_equal,
@@ -316,9 +331,12 @@ static void window_check_status(IconWindow *win)
 	gulong nitems;
 	gulong bytes_after;
 	unsigned char *data;
+	Window transient_for;
 	gboolean iconic = FALSE;
 
-	if (wm_supports_hidden && XGetWindowProperty(gdk_display, win->xwindow,
+	if (XGetTransientForHint(gdk_display, win->xwindow, &transient_for) && transient_for)
+		iconic = FALSE;
+	else if (wm_supports_hidden && XGetWindowProperty(gdk_display, win->xwindow,
 			gdk_x11_atom_to_xatom(xa__NET_WM_STATE),
 			0, G_MAXLONG, False,
 			XA_ATOM,
@@ -351,6 +369,20 @@ static void window_check_status(IconWindow *win)
 	}
 	else
 		iconic = FALSE;
+	
+	/* Iconified windows on another desktops are not shown */
+	if (o_pinboard_tasklist_per_workspace.int_value &&
+	    XGetWindowProperty(gdk_display, win->xwindow,
+			gdk_x11_atom_to_xatom(xa__NET_WM_DESKTOP),
+			0, G_MAXLONG, False, XA_CARDINAL, &type, &format, &nitems,
+			&bytes_after, &data) == Success && data)
+	{
+		guint32 desk_on = ((guint32 *) data)[0];
+		
+		if ((desk_on != 0xffffffff) && (desk_on != cur_desktop))
+			iconic = FALSE;
+		XFree(data);
+	}
 
 	if (win->iconified == iconic)
 		return;
@@ -360,6 +392,23 @@ static void window_check_status(IconWindow *win)
 	state_changed(win);
 
 	gdk_flush();
+}
+
+static void update_current_desktop(void)
+{
+	unsigned char *data;
+	Atom type;
+	int format;
+	gulong nitems;
+	gulong bytes_after;
+
+	if (XGetWindowProperty(gdk_display, gdk_x11_get_default_root_xwindow(),
+			gdk_x11_atom_to_xatom(xa__NET_CURRENT_DESKTOP),
+			0, G_MAXLONG, False, XA_CARDINAL, &type, &format, &nitems,
+			&bytes_after, (unsigned char **)(&data)) == Success && data) {
+		cur_desktop = ((gint32*)data)[0];
+		XFree(data);
+	}
 }
 
 /* Called for all events on all windows */
@@ -386,6 +435,11 @@ static GdkFilterReturn window_filter(GdkXEvent *xevent,
 				if (gdk_error_trap_pop() != Success)
 					g_hash_table_remove(known, &win);
 			}
+		}
+		else if (atom == xa__NET_CURRENT_DESKTOP)
+		{
+			update_current_desktop();
+			tasklist_update(FALSE);
 		}
 		else if (atom == xa__NET_WM_ICON_NAME ||
 			 atom == xa__NET_WM_VISIBLE_NAME ||
@@ -510,6 +564,7 @@ static void tasklist_update(gboolean to_empty)
 
 		if (new == old)
 		{
+			add_window(new);
 			new_i++;
 			old_i++;
 		}
