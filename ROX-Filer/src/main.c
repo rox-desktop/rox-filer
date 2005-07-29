@@ -844,7 +844,7 @@ static GList *build_launch(Option *option, xmlNode *node, guchar *label)
 	align = gtk_alignment_new(0, 0.5, 0, 0);
 
 	gtk_container_add(GTK_CONTAINER(align),
-			launch_button_new(label, uri));
+			launch_button_new(_(label), uri));
 
 	g_free(uri);
 
