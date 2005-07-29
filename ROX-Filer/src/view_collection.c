@@ -721,10 +721,11 @@ static void view_collection_extend_tip(ViewIface *view, ViewIter *iter,
 	Template template;
 	int i = iter->i;
 	CollectionItem	*colitem = &collection->items[i];
-	int col = i % collection->columns;
-	int row = i / collection->columns;
 	ViewData *view_data = (ViewData *) colitem->view_data;
 	GdkRectangle area;
+	int row,col;
+	
+	collection_item_to_rowcol(collection, i, &row, &col);
 
 	g_return_if_fail(iter->view == (ViewIface *) view_collection);
 	g_return_if_fail(i >= 0 && i < collection->number_of_items);
@@ -983,6 +984,17 @@ static void view_collection_style_changed(ViewIface *view, int flags)
 
 	if (n == 0 && filer_window->display_style != SMALL_ICONS)
 		height = ICON_HEIGHT;
+
+	view_collection->collection->vertical_order = FALSE;
+	if (filer_window->display_style == SMALL_ICONS && 
+	    o_vertical_order_small.int_value)
+	  view_collection->collection->vertical_order = TRUE;
+	if (filer_window->display_style != SMALL_ICONS && 
+	    o_vertical_order_large.int_value)
+	  view_collection->collection->vertical_order = TRUE;
+
+
+	
 
 	/* Recalculate all the ViewData structs for this window
 	 * (needed if the text or image has changed in any way) and

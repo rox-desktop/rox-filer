@@ -32,6 +32,7 @@ extern Option o_display_size, o_display_details, o_display_show_hidden;
 extern Option o_display_show_headers, o_display_show_full_type;
 extern Option o_display_show_thumbs;
 extern Option o_small_width;
+extern Option o_vertical_order_small, o_vertical_order_large;
 
 /* Prototypes */
 void display_init(void);

@@ -74,6 +74,7 @@ Option o_display_show_headers;
 Option o_display_show_full_type;
 Option o_display_inherit_options;
 static Option o_filer_change_size_num;
+Option o_vertical_order_small, o_vertical_order_large;
 
 /* Static prototypes */
 static void display_details_set(FilerWindow *filer_window, DetailsType details);
@@ -102,6 +103,8 @@ void display_init()
 	option_add_int(&o_display_inherit_options,
 		       "display_inherit_options", FALSE); 
 	option_add_int(&o_filer_change_size_num, "filer_change_size_num", 30); 
+	option_add_int(&o_vertical_order_small, "vertical_order_small", FALSE);
+	option_add_int(&o_vertical_order_large, "vertical_order_large", FALSE);
 
 	option_add_notify(options_changed);
 }

@@ -509,7 +509,7 @@ static void path_changed(FilerWindow *filer_window)
 	}
 	else
 	{
-		if (*leaf == '.')
+		if (*leaf == '.' && !filer_window->temp_show_hidden)
 		{
 			filer_window->temp_show_hidden = TRUE;
 			display_update_hidden(filer_window);

@@ -88,6 +88,7 @@ struct _Collection
 	gint		winks_left;		/* Flashes in this wink op */
 	gint		wink_timeout;
 	guint		columns;
+	gboolean        vertical_order;		/* order elements vertically? */
 	gint		number_of_items;	/* (often compared with -1) */
 	guint		item_width, item_height;
 
@@ -155,7 +156,10 @@ void	collection_snap_size		(Collection *collection,
 void	collection_unblock_selection_changed(Collection *collection,
 					   guint time,
 					   gboolean emit);
-
+void    collection_item_to_rowcol       (const Collection *collection,
+					 int item, int *row, int *col);
+int     collection_rowcol_to_item       (const Collection *collection,
+					 int row, int col);
 #ifdef __cplusplus
 }
 #endif /* __cplusplus */

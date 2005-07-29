@@ -132,6 +132,9 @@ static void collection_item_set_selected(Collection *collection,
                                          gboolean selected,
 					 gboolean signal);
 static gint collection_scroll_event(GtkWidget *widget, GdkEventScroll *event);
+static int collection_get_rows(const Collection *collection);
+static int collection_get_cols(const Collection *collection);
+
 
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
 {
@@ -280,6 +283,7 @@ static void collection_init(GTypeInstance *instance, gpointer g_class)
 	object->number_selected = 0;
 	object->block_selection_changed = 0;
 	object->columns = 1;
+	object->vertical_order = FALSE;
 	object->item_width = 64;
 	object->item_height = 64;
 	object->vadj = NULL;
@@ -413,7 +417,7 @@ static void collection_size_request(GtkWidget *widget,
 	 * will deal with scrolling.
 	 */
 	requisition->width = MIN_WIDTH;
-	rows = (collection->number_of_items + cols - 1) / cols;
+	rows = collection_get_rows(collection);
 	requisition->height = rows * collection->item_height;
 }
 
@@ -444,7 +448,10 @@ static void collection_size_allocate(GtkWidget *widget,
 	if (collection->cursor_item != -1)
 	{
 		int	first, last;
-		int	crow = collection->cursor_item / collection->columns;
+		int	crow, ccol;
+		
+		collection_item_to_rowcol(collection, collection->cursor_item,
+					  &crow, &ccol);
 
 		get_visible_limits(collection, &first, &last);
 
@@ -523,7 +530,9 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	start_row = event->area.y / collection->item_height;
 	last_row = (event->area.y + event->area.height - 1)
 		   / collection->item_height;
-	row = start_row;
+
+	if (last_row >= collection_get_rows(collection))
+		last_row = collection_get_rows(collection) - 1;
 
 	start_col = event->area.x / collection->item_width;
 	phys_last_col = (event->area.x + event->area.width - 1)
@@ -541,26 +550,16 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	else
 		last_col = phys_last_col;
 
-	col = start_col;
 
-	item = row * collection->columns + col;
-
-	while ((item == 0 || item < collection->number_of_items)
-			&& row <= last_row)
+	for(row = start_row; row <= last_row; row++) 
+		for(col = start_col; col <= last_col; col++) 
 	{
-		collection_get_item_area(collection, row, col, &item_area);
-				
+			item = collection_rowcol_to_item(collection, row, col);	      
+			if (item == 0 || item < collection->number_of_items) {
+				collection_get_item_area(collection,
+							 row, col, &item_area);
 		draw_one_item(collection, item, &item_area);
-		col++;
-
-		if (col > last_col)
-		{
-			col = start_col;
-			row++;
-			item = row * collection->columns + col;
 		}
-		else
-			item++;
 	}
 
 	if (collection->lasso_box)
@@ -845,6 +844,8 @@ static void collection_process_area(Collection	 *collection,
 				    guint32	 time)
 {
 	int		x, y;
+	int             rows = collection_get_rows(collection);
+	int             cols = collection->columns;
 	guint32		stacked_time;
 	int		item;
 	gboolean	changed = FALSE;
@@ -859,29 +860,24 @@ static void collection_process_area(Collection	 *collection,
 
 	collection->block_selection_changed++;
 
-	for (y = area->y; y < area->y + area->height; y++)
+	for (y = area->y; y < area->y + area->height && y < rows; y++)
+		for (x = area->x; x < area->x + area->width && x < cols; x++)
 	{
-		item = y * collection->columns + area->x;
-		
-		for (x = area->x; x < area->x + area->width; x++)
-		{
-			if (item >= collection->number_of_items)
-				goto out;
-
+			item = collection_rowcol_to_item(collection, y, x);
+			if (item < collection->number_of_items) {
 			if (fn == GDK_INVERT)
-				collection_item_set_selected(collection, item,
-					!collection->items[item].selected,
+					collection_item_set_selected(
+					    collection, item, 
+					    !collection-> items[item].selected,
 					FALSE);
 			else
-				collection_item_set_selected(collection, item,
-								TRUE, FALSE);
+					collection_item_set_selected(
+						collection, item, TRUE, FALSE);
 
 			changed = TRUE;
-			item++;
 		}
 	}
 
-out:
 	if (collection->number_selected && !old_selected)
 		g_signal_emit(collection,
 				collection_signals[GAIN_SELECTION], 0,
@@ -978,12 +974,12 @@ static void remove_lasso_box(Collection *collection)
 /* Make sure that 'item' is fully visible (vertically), scrolling if not. */
 static void scroll_to_show(Collection *collection, int item)
 {
-	int	first, last, row;
+        int     first, last, row, col;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
 
-	row = item / collection->columns;
+	collection_item_to_rowcol(collection, item, &row, &col);
 	get_visible_limits(collection, &first, &last);
 
 	if (row <= first)
@@ -1063,8 +1059,8 @@ static void invert_wink(Collection *collection)
 	if (!GTK_WIDGET_REALIZED(GTK_WIDGET(collection)))
 		return;
 
-	col = collection->wink_item % collection->columns;
-	row = collection->wink_item / collection->columns;
+	collection_item_to_rowcol(collection, collection->wink_item, 
+				  &row, &col);
 	collection_get_item_area(collection, row, col, &area);
 
 	gdk_draw_rectangle(((GtkWidget *) collection)->window,
@@ -1320,8 +1316,7 @@ void collection_draw_item(Collection *collection, gint item, gboolean blank)
 	if (!GTK_WIDGET_REALIZED(widget))
 		return;
 
-	col = item % collection->columns;
-	row = item / collection->columns;
+	collection_item_to_rowcol(collection, item, &row, &col);
 
 	collection_get_item_area(collection, row, col, &area);
 
@@ -1523,7 +1518,7 @@ int collection_get_item(Collection *collection, int x, int y)
 	else
 		width = collection->item_width;
 
-	item = col + row * collection->columns;
+	item = collection_rowcol_to_item(collection, row, col);
 	if (item >= collection->number_of_items)
 		return -1;
 
@@ -1693,7 +1688,7 @@ void collection_delete_if(Collection *collection,
 void collection_move_cursor(Collection *collection, int drow, int dcol)
 {
 	int	row, col, item;
-	int	first, last, total_rows;
+	int	first, last, total_rows, total_cols;
 
 	g_return_if_fail(collection != NULL);
 	g_return_if_fail(IS_COLLECTION(collection));
@@ -1706,6 +1701,8 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	}
 
 	get_visible_limits(collection, &first, &last);
+	total_rows = collection_get_rows(collection);
+	total_cols = collection_get_cols(collection);
 
 	item = collection->cursor_item;
 	if (item == -1)
@@ -1721,38 +1718,34 @@ void collection_move_cursor(Collection *collection, int drow, int dcol)
 	}
 	else
 	{
-		row = item / collection->columns;
-		col = item % collection->columns + dcol;
+		collection_item_to_rowcol(collection, item, &row, &col);
+		
+		col += dcol;
+		if (collection->vertical_order) 
+		{
+			col = MAX(0,col);
+			col = MIN(col, total_cols - 1);
+		}
 
 		if (row < first)
 			row = first;
 		else if (row > last)
 			row = last;
-		else
-			row = MAX(row + drow, 0);
-	}
-
-	total_rows = (collection->number_of_items + collection->columns - 1)
-				/ collection->columns;
-
-	if (row >= total_rows - 1 && drow > 0)
-	{
-		row = total_rows - 1;
-		item = col + row * collection->columns;
-		if (item >= collection->number_of_items - 1)
+		else {
+			row += drow;
+			if (!collection->vertical_order) 
 		{
-			collection_set_cursor_item(collection,
-					collection->number_of_items - 1,
-					TRUE);
-			return;
+				row = MAX(row, 0); 
+				row = MIN(row, total_rows - 1);
 		}
 	}
-	if (row < 0)
-		row = 0;
+	}
 
-	item = col + row * collection->columns;
+	item = collection_rowcol_to_item(collection, row, col);
 
-	if (item >= 0 && item < collection->number_of_items)
+	item = MAX(item, 0);
+	item = MIN(item, collection->number_of_items-1);
+
 		collection_set_cursor_item(collection, item, TRUE);
 }
 
@@ -1801,4 +1794,52 @@ void collection_unblock_selection_changed(Collection	*collection,
 	if (emit && !collection->block_selection_changed)
 		g_signal_emit(collection,
 				collection_signals[SELECTION_CHANGED], 0, time);
+}
+
+/* The number of rows, at least 1.  */
+static inline int collection_get_rows(const Collection *collection) {
+	return  MAX((collection->number_of_items + collection->columns - 1) 
+		    / collection->columns, 1);
+}
+
+/* The number of columns _actually_ displayed, at least 1.  This
+ * function is required in vertical_order layout-based manipulation
+ * such as moving the cursor to detect the last column.  */
+static inline int collection_get_cols(const Collection *collection) {
+	if (collection->vertical_order) 
+	{
+		int rows = collection_get_rows(collection);
+		return MAX(1,(collection->number_of_items + rows - 1) / rows);
+	}
+	else
+		return collection->columns;
+}
+
+/* Translate the item number to the (row, column) form */
+void    collection_item_to_rowcol       (const Collection *collection,
+					 int item, int *row, int *col)
+{
+	if (!collection->vertical_order) 
+	{
+		*row = item / collection->columns;
+		*col = item % collection->columns; 
+	}
+	else 
+	{
+		int rows = collection_get_rows(collection);
+		*row = item % rows;
+		*col = item / rows;
+	}
+}
+
+
+
+/* Translate the (row, column) form to the item number */
+int     collection_rowcol_to_item(const Collection *collection,
+				  int row, int col)
+{
+	if (!collection->vertical_order) 
+		return row * collection->columns + col;
+	else 
+		return row + col * collection_get_rows(collection);
 }
