@@ -2,6 +2,11 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 			
+30-Jul-2005
+~~~~~~~~~~~
+Don't abort on BadWindow errors. GTK bug #152151 is still not fixed after
+nearly a year, so give up trying to fix it and just ignore it (Thomas Leonard).
+
 29-Jul-2005
 ~~~~~~~~~~~
 Added option to only show iconified windows belonging to the current workspace

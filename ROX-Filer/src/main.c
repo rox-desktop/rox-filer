@@ -232,16 +232,7 @@ static int rox_x_error(Display *display, XErrorEvent *error)
 	/* Try to cope with BadWindow errors */
 	if (error->error_code == 3)
 	{
-		static time_t last_error = 0;
-		time_t now;
-		now = time(NULL);
-
-		if (last_error + 5 > now)
-			abort();		/* Errors coming too fast... */
-
-		last_error = now;
-
-		delayed_error(_("We got a BadWindow error from the X server. "
+		g_warning(_("We got a BadWindow error from the X server. "
 				"This might be due to this GTK bug (during drag-and-drop?):\n"
 				"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 				"Trying to continue..."));
