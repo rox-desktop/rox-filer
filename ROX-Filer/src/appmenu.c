@@ -344,12 +344,19 @@ out:
 	g_free(leaf);
 }
 
+static inline gboolean is_dir(const char *dir)
+{
+	struct stat info;
+	return stat(dir, &info) == 0 && S_ISDIR(info.st_mode);
+}
+
 /* Adds to current_items */
 static void build_app_menu(const char *app_dir, DirItem *app_item)
 {
 	XMLwrapper	*ai = NULL;
 	xmlNode	*node;
 	GtkWidget *item;
+	char *help_dir;
 
 	ai = appinfo_get(app_dir, app_item);
 	if (ai)
@@ -378,12 +385,17 @@ static void build_app_menu(const char *app_dir, DirItem *app_item)
 		if (item)
 			current_items = g_list_prepend(current_items, item);
 	}
-		
-	item = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
-	gtk_widget_show(item);
-	current_items = g_list_prepend(current_items, item);
-	g_signal_connect(item, "activate", G_CALLBACK(show_app_help), NULL);
-	gtk_label_set_text(GTK_LABEL(GTK_BIN(item)->child), _("Help"));
+
+	help_dir = g_build_filename(app_dir, "Help", NULL);
+	if (is_dir(help_dir))
+	{
+		item = gtk_image_menu_item_new_from_stock(GTK_STOCK_HELP, NULL);
+		gtk_widget_show(item);
+		current_items = g_list_prepend(current_items, item);
+		g_signal_connect(item, "activate", G_CALLBACK(show_app_help), NULL);
+		gtk_label_set_text(GTK_LABEL(GTK_BIN(item)->child), _("Help"));
+	}
+	g_free(help_dir);
 
 	if (ai)
 		g_object_unref(ai);
