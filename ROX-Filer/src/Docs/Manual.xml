@@ -12,9 +12,6 @@
   </title>
   <author>
    <firstname>Thomas</firstname><surname>Leonard</surname>
-   <affiliation>
-    <address><email>tal197 at users.sourceforge.net</email></address>
-   </affiliation>
   </author>
   <copyright><year>2005</year><holder>Thomas Leonard</holder></copyright>
   <legalnotice>
@@ -78,10 +75,12 @@
         <citation>XDS</citation>.
      </para></listitem></varlistentry>
 
-     <varlistentry><term>Choices</term>
+     <varlistentry><term>Basedir spec</term>
       <listitem><para>
-        A simple, but flexible, system for managing user choices.  See
-        <citation>Choices</citation> for details.
+        A simple, but flexible, system for managing user choices. By default, choices are
+	saved under <filename>~/.config</filename>. However, you can change this by setting
+	the <envar>XDG_CONFIG_HOME</envar> environment variable. See
+        <citation>BaseDir</citation> for details.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Application directories</term>
@@ -95,8 +94,7 @@
       <listitem><para>
         The filer can be made to display image files by using the image itself for the
         icon, instead of a generic `this-is-an-image' icon. Very useful for organising
-        a directory full of photos! See <citation>Thumbs</citation> for details
-        (spec is still in developement).
+        a directory full of photos! See <citation>Thumbs</citation> for details.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Shared MIME Info Database</term>
@@ -111,7 +109,7 @@
 	Collections of file icons, called themes, can be installed (eg, to
 	<filename>~/.icons</filename>). You can switch between themes in
 	the Options box. Once other desktops support this fully, themes
-	will be sharable between desktops.
+	will be sharable between desktops. See <citation>IconTheme</citation> for details.
      </para></listitem></varlistentry>
 
      <varlistentry><term>DNotify support (Linux only)</term>
@@ -168,7 +166,7 @@
     <screen>$ rox --pinboard=MyPinboard</screen>
 
     The pinboard configuration is saved in
-    <filename>&lt;Choices&gt;/ROX-Filer/pb_MyPinboard</filename>
+    <filename>~/.choices/rox.sourceforge.net/ROX-Filer/pb_MyPinboard</filename>
     as soon as you change it in some way (for example, by dropping a file
     onto the background). You can have as many pinboards as you like and
     switch between them by running rox again, eg:
@@ -181,20 +179,16 @@
 
     See the <xref linkend="winman"/> if you have trouble getting the icons to
     display correctly. The pinboard may also be turned on and off by locating
-    <filename>ROX-Filer</filename> in a filer window and choosing `Enable
-    pinboard' or `Disable pinboard' from the menu.  </para>
+    <filename>ROX-Filer</filename> in a filer window and choosing <guimenuitem>Enable
+    pinboard</guimenuitem> or <guimenuitem>Disable pinboard</guimenuitem> from the menu.</para>
   </sect1>
 
   <sect1>
    <title><anchor id="run_pan" xreflabel="Panel support"/>Panels</title>
    <para>
 
-    Panels work just like the pinboard. You can create a panel on any
-    side of the screen by using the options <option>--left</option>, <option>--right,</option>
-    <option>--top</option> and <option>--bottom</option>, depending on which side
-    of the screen the panel should appear on. On some systems, the short
-    (one letter) form of the options must be used. For example, to create
-    a panel along the bottom edge of the screen:
+    Panels work just like the pinboard, except that they run along the edge of the screen.
+    To create a panel:
 
     <screen>$ rox -b=MyPanel</screen>
 
@@ -203,13 +197,17 @@
     You can drag files onto either side of the panel to add them. Panel icons
     can be repositioned by dragging them with the middle mouse button.
     Changes to the panel are automatically saved to
-    <filename>&lt;Choices&gt;/ROX-Filer/pan_MyPanel</filename>.
+    <filename>~/.choices/rox.sourceforge.net/ROX-Filer/pan_MyPanel</filename>.
     As with the pinboard, you can switch between panel configurations
-    simply by running rox again with a different panel name. Specify a
-    blank name to remove the panel.
+    simply by running rox again with a different panel name.
 
-    <screen>$ rox --bottom=MyOtherPanel
-$ rox --bottom=</screen>
+    <screen>$ rox -b=MyOtherPanel</screen>
+
+    You can set which edge of the screen the panel appears on using the popup menu.
+    You can also set the edge when enabling the panel by using the side instead of -b.
+    Specify a blank name to remove the panel:
+
+    <screen>$ rox --bottom=</screen>
    </para>
   </sect1>
 
@@ -748,15 +746,15 @@ $ rox --bottom=</screen>
        Sort in reverse order (newest to oldest, largest to smallest, etc).
        </entry></row>
 
+       <row><entry><guimenuitem>Show Hidden</guimenuitem></entry><entry>
+       If on, files beginning with a dot are shown, otherwise they are hidden.
+       The titlebar shows <guilabel>(All)</guilabel> when this is on.
+       </entry></row>
+
        <row><entry><guimenuitem>Filter Files...</guimenuitem></entry><entry>
        Restrict the display to only show files with names matching the
        given pattern.
        The titlebar shows <guilabel>(Glob (pattern))</guilabel> when this is on.
-       </entry></row>
-
-       <row><entry><guimenuitem>Show Hidden</guimenuitem></entry><entry>
-       If on, files beginning with a dot are shown, otherwise they are hidden.
-       The titlebar shows <guilabel>(All)</guilabel> when this is on.
        </entry></row>
 
        <row><entry><guimenuitem>Show Thumbnails</guimenuitem></entry><entry>
@@ -1046,33 +1044,37 @@ $ rox --bottom=</screen>
    <para>
 
     Each entry in this submenu opens a savebox for creating a new file or
-    directory. There are two standard entries; the others are the contents of
-    your <filename>&lt;Choices&gt;/Templates</filename> directory, if it
+    directory. There are three standard entries; the others are the contents of
+    your <filename>~/.choices/rox.sourceforge.net/Templates</filename> directory, if it
     exists.
 
 
     <informaltable><tgroup cols="2">
       <thead><row><entry>Entry</entry><entry>Action</entry></row></thead>
       <tbody>
-       <row><entry>
-         Directory</entry><entry>
+       <row><entry>Directory</entry><entry>
          Create a new directory.
-         </entry></row><row><entry>
-         File</entry><entry>
+         </entry></row>
+	 
+	 <row><entry>File</entry><entry>
          Create a blank file.
-         </entry></row><row><entry>
-         &lt;user entries&gt;</entry><entry>
+         </entry></row>
+
+	 <row><entry>Customise Menu</entry><entry>
+         Open the <filename>Templates</filename> directory so that you can
+	 add extra items to the menu.
+         </entry></row>
+	 
+	 <row><entry>&lt;user entries&gt;</entry><entry>
          Copy a file from your Templates directory.
        </entry></row>
     </tbody></tgroup></informaltable>
 
 
-    To add your own entries, create a new directory called
-    <filename>~/Choices/Templates</filename>
-    (if you have the default <envar>CHOICESPATH</envar>) and put any files you
-    want in there. Each file in the directory will appear on the menu and the
-    box that appears will copy it. For example, you could create a blank
-    HTML file:
+    To add your own entries, choose <guimenuitem>Customise Menu</guimenuitem>
+    and put any files you want in there. Each file in the directory will appear
+    on the menu and the box that appears will copy it. For example, you could
+    create a blank HTML file:
 
     <programlisting>
 &lt;html&gt;
@@ -1210,8 +1212,9 @@ $ rox --bottom=</screen>
    <para>
 
     The `Send To' menu provides a quick way to send some files to an application.
-    The filer scans all the <filename>SendTo</filename> directories in your
-    <envar>CHOICESPATH</envar> and lists the contents on this menu.
+    The filer scans all the <filename>$XDG_CONFIG_DIRS/rox.sourceforge.net/SendTo</filename>
+    directories (see <citation>BaseDir</citation>) and lists
+    the contents on this menu.
     </para><para>
     To change which applications appear here you should choose the
     <guimenuitem>Customise</guimenuitem> item from the bottom
@@ -1334,6 +1337,12 @@ $ rox --bottom=</screen>
 	 the pinboard menu.
        </entry></row>
 
+       <row><entry>
+         <guimenuitem>Panel Options...</guimenuitem></entry><entry>
+	 Set the edge of the screen on which the panel is displayed. Only available from
+	 the panel menu.
+       </entry></row>
+
     </tbody></tgroup></informaltable>
 
     </para><para>
@@ -1380,9 +1389,9 @@ $ rox --bottom=</screen>
     <step><para>
       Create an executable file called <filename>AppletRun</filename>. This will be
       passed the XID of the panel socket window when the directory is dragged
-      onto the panel. You can use this to create a GtkPlug widget. An
-      example applet (written in python) is available at
-      <ulink url="http://rox.sourceforge.net/applets.html"/>
+      onto the panel. You can use this to create a GtkPlug widget. A
+      tutorial is available at
+      <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Tutorials/Applets"/>
     </para></step>
 
    </procedure>
@@ -1530,8 +1539,8 @@ thumbnail for each file it scans. If a thumbnail exists it loads it and
 continues on to the next file.
   </para><para>
 To generate a thumbnail for a given file of type media/subtype the filer looks
-for a program <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>,
-falling back to <filename>&lt;Choices&gt;/MIME-thumb/media</filename> if one
+for a program <filename>~/.choices/rox.sourceforge.net/MIME-thumb/media_subtype</filename>,
+falling back to <filename>~/.choices/rox.sourceforge.net/MIME-thumb/media</filename> if one
 cannot be found (this duplicates how run actions for files are looked up). If
 neither file can be found and the file is of type image/* then the internal
 routines are used. If the file is not of type image/* then no thumbnail is
@@ -1753,7 +1762,7 @@ generated.
     <orderedlist><title>For example, to select all files larger than 5Mb:</title>
 
      <listitem><para>
-       Open the Select If minibuffer.
+       Open the Select If minibuffer (bound to <keycap>?</keycap> by dafault).
      </para></listitem>
 
      <listitem><para>
@@ -2291,11 +2300,12 @@ generated.
 
     <listitem><para>
       <guibutton>OK</guibutton>
-      saves the current choices into your Choices directory for next time
+      saves the current choices into your
+      <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename> directory for next time
       <application>ROX-Filer</application> is loaded, if anything changed.
       Exactly where choices are loaded from and saved to is controlled by the
-      <envar>CHOICESPATH</envar> environment variable &mdash; see
-      <citation>Choices</citation> for details.
+      <envar>XDG_CONFIG_HOME</envar> environment variable &mdash; see
+      <citation>BaseDir</citation> for details.
       Changes made in the Options box take effect instantly, so you don't need to
       click on <guibutton>OK</guibutton> just to try them out.
     </para></listitem>
@@ -2396,7 +2406,8 @@ generated.
     you may specifiy an icon for one file individually (by name) as well as
     for all files of a particular type. When setting the icon for a single
     file, the filer stores the name of the file and the name of the icon inside
-    your Choices directory. If either moves, the icon won't be displayed.
+    your <filename>~/.choices/rox.sourceforge.net/MIME-icons</filename>
+    directory. If either moves, the icon won't be displayed.
     </para><para>
     When setting the icon for a directory, you have the additional option of
     storing the image inside the directory itself as a hidden file. This means
@@ -2414,8 +2425,8 @@ generated.
    <title>How filetypes are stored</title>
    <para>
 
-    <application>ROX-Filer</application> uses two sub-directories in your Choices
-    directory for filetypes:
+    <application>ROX-Filer</application> uses two sub-directories in your
+    <filename>~/.choices/rox.sourceforge.net</filename> directory for filetypes:
 
     <variablelist>
 
@@ -2447,21 +2458,33 @@ generated.
      <varlistentry><term><filename>MIME-icons</filename></term><listitem><para>
         contains the images used to display each type of file.
         So the filer will try to display an HTML file using the icon
-        <filename>MIME-icons/text_html.png</filename>.
+        <filename>MIME-icons/text_html.png</filename>. If no icon is set here,
+	the filer will use the currently selected icon theme (as set in the options
+	box); see <citation>IconTheme</citation> for details.
      </para></listitem></varlistentry>
 
     </variablelist>
 
-    In both <filename>MIME-types</filename> and <filename>MIME-icons</filename>
-    directories you can also provide default actions/images for each media type.
+    In <filename>MIME-types</filename> can also provide default actions for each media type.
     For example, if <filename>text_html</filename> isn't found then the filer
     will try simply using <filename>text</filename>.
+   </para>
 
+  </sect1>
+
+  <sect1>
+   <title>How the filer determines a file's type</title>
+   <para>
+    The filer usually works out the type for a file from its name. If this fails,
+    it tries to guess from the file's contents. It is possible to override this guessing
+    by setting an extended attribute on the file with the correct type, using the
+    <guimenuitem>Set Type...</guimenuitem> menu item.
    </para>
    <para>
-    The filer works out the type for a file from its name. The rules come from
-    various <filename>globs</filename> files &mdash; see
-    <citation>SharedMIME</citation> for details.</para>
+    To edit the rules used to guess types, open the options box and go to the Types section.
+    There is a button there that will launch the MIME-Editor application.
+    You can also edit the rules manually &mdash; see <citation>SharedMIME</citation> for details.
+   </para>
   </sect1>
  </chapter>
 
@@ -2833,7 +2856,7 @@ generated.
     </para></listitem>
 
     <listitem><para>
-      GTK+ 2.0.1 or later (libraries and headers) &mdash; get the latest version
+      GTK+ 2.4.0 or later (libraries and headers) &mdash; get the latest version
       from <citation>GTK+</citation>,
     </para></listitem>
 
@@ -2854,7 +2877,7 @@ generated.
    (<prompt>$</prompt> is the shell prompt):
 
    <screen>$ pkg-config --modversion gtk+-2.0
-2.0.5</screen>
+2.6.8</screen>
   </para>
 
   <procedure><title>To compile:</title>
@@ -2883,12 +2906,6 @@ generated.
      doesn't work then please e-mail me and complain! Tell me what kind of
      system you have and what errors were reported. If you manage to fix the
      problem yourself then please e-mail me the fix.
-    </para><para>
-     The executable file is stored inside the ROX-Filer directory in a
-     different subdirectory for each platform. Therefore, you can compile
-     the same application on several different types of machine and then
-     run it from any of them using the <filename>AppRun</filename> script.
-     This is particularly useful in a network environment.
    </para></step>
 
    <step><para>
@@ -2966,7 +2983,11 @@ $ rehash</screen>
     <para>
      <variablelist>
 
-      <varlistentry><term><option>-b</option></term><term><option>--bottom=PANEL</option></term>
+      <varlistentry><term><option>-b</option></term><term><option>--border=PANEL</option></term>
+       <listitem><para>open PANEL.
+      </para></listitem></varlistentry>
+
+      <varlistentry><term><option>-B</option></term><term><option>--bottom=PANEL</option></term>
        <listitem><para>open PANEL as a bottom-edge panel.
       </para></listitem></varlistentry>
 
@@ -3214,8 +3235,8 @@ means that only files ending in .c are shown.
      [<parameter>Name</parameter>])
      Open the panel named <parameter>Name</parameter> on screen side
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>).
-     <parameter>Name</parameter> can be a name in Choices (eg,
-     <userinput>MyPanel</userinput>) or a full pathname.
+     <parameter>Name</parameter> can be a name in <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename>
+     (eg, <userinput>MyPanel</userinput>) or a full pathname.
      If not given, the panel on that side is turned off.
    </para></listitem>
 
@@ -3240,8 +3261,8 @@ then this must match the label of the item.  If more than one item matches, only
 
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
      Display pinboard <parameter>Name</parameter> on the desktop background.
-     <parameter>Name</parameter> can be a name in Choices (eg,
-     <userinput>MyPinboard</userinput>) or a full pathname.
+     <parameter>Name</parameter> can be a name in  <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename>
+     (eg, <userinput>MyPinboard</userinput>) or a full pathname.
      If not given, the pinboard is turned off.
    </para></listitem>
 
@@ -3393,8 +3414,8 @@ then this must match the label of the item.  If more than one item matches, only
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>Choices</abbrev><citetitle>The ROX Choices system,
-    <ulink url="http://rox.sourceforge.net/choices.html"/></citetitle>
+   <abbrev>BaseDir</abbrev><citetitle>The freedesktop.org base directory system,
+    <ulink url="http://www.freedesktop.org/wiki/Standards_2fbasedir_2dspec"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
@@ -3414,12 +3435,17 @@ then this must match the label of the item.  If more than one item matches, only
 
   <bibliomixed>
    <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
-    <ulink url="http://rox.sf.net/wallpaper.html"/></citetitle>
+    <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Wallpaper"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
-    <ulink url="http://www.freedesktop.org/standards/shared-mime-info-spec/"/></citetitle>
+   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.16)
+    <ulink url="http://www.freedesktop.org/wiki/Standards_2fshared_2dmime_2dinfo_2dspec"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>IconTheme</abbrev><citetitle>The freedesktop.org Icon Theme specification
+    <ulink url="http://www.freedesktop.org/wiki/Standards_2ficon_2dtheme_2dspec"/></citetitle>
   </bibliomixed>
 
  </bibliography>
