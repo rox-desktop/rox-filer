@@ -1838,12 +1838,18 @@ void    collection_item_to_rowcol       (const Collection *collection,
 
 
 
-/* Translate the (row, column) form to the item number */
-int     collection_rowcol_to_item(const Collection *collection,
-				  int row, int col)
+/* Translate the (row, column) form to the item number.
+ * May return a number >= collection->number_of_items.
+ */
+int collection_rowcol_to_item(const Collection *collection, int row, int col)
 {
 	if (!collection->vertical_order) 
 		return row * collection->columns + col;
 	else 
-		return row + col * collection_get_rows(collection);
+	{
+		int rows = collection_get_rows(collection);
+		if (row >= rows)
+			return collection->number_of_items;
+		return row + col * rows;
+	}
 }

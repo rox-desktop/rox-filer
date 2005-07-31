@@ -330,9 +330,14 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
  */
 static gint open_filer_window(FilerWindow *filer_window)
 {
-	Settings	*dir_settings = (Settings *) g_hash_table_lookup(settings_table,
+	Settings *dir_settings;
+	gboolean force_resize;
+	
+	dir_settings = (Settings *) g_hash_table_lookup(settings_table,
 					      filer_window->sym_path);
-	gboolean force_resize = !(o_filer_auto_resize.int_value == RESIZE_NEVER && dir_settings && dir_settings->flags & SET_POSITION);
+
+	force_resize = !(o_filer_auto_resize.int_value == RESIZE_NEVER &&
+			 dir_settings && dir_settings->flags & SET_POSITION);
 
 	view_style_changed(filer_window->view, 0);
 

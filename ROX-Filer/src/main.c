@@ -37,7 +37,6 @@
 #include <fcntl.h>
 #include <pwd.h>
 #include <grp.h>
-#include <time.h>
 #include <libxml/parser.h>
 
 #ifdef HAVE_GETOPT_LONG
