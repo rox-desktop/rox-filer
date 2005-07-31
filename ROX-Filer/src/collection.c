@@ -136,6 +136,29 @@ static int collection_get_rows(const Collection *collection);
 static int collection_get_cols(const Collection *collection);
 
 
+/* The number of rows, at least 1.  */
+static inline int collection_get_rows(const Collection *collection)
+{
+	int rows = (collection->number_of_items + collection->columns - 1) /
+		collection->columns;
+	return MAX(rows, 1);
+}
+
+/* The number of columns _actually_ displayed, at least 1.  This
+ * function is required in vertical_order layout-based manipulation
+ * such as moving the cursor to detect the last column.  */
+static inline int collection_get_cols(const Collection *collection)
+{
+	if (collection->vertical_order) 
+	{
+		int rows = collection_get_rows(collection);
+		int cols = (collection->number_of_items + rows - 1) / rows;
+		return MAX(1, cols);
+	}
+	else
+		return collection->columns;
+}
+
 static void draw_focus_at(Collection *collection, GdkRectangle *area)
 {
 	GtkWidget    	*widget;
@@ -411,7 +434,7 @@ static void collection_size_request(GtkWidget *widget,
 				GtkRequisition *requisition)
 {
 	Collection *collection = COLLECTION(widget);
-	int	rows, cols = collection->columns;
+	int	rows;
 
 	/* We ask for the total size we need; our containing viewport
 	 * will deal with scrolling.
@@ -1794,25 +1817,6 @@ void collection_unblock_selection_changed(Collection	*collection,
 	if (emit && !collection->block_selection_changed)
 		g_signal_emit(collection,
 				collection_signals[SELECTION_CHANGED], 0, time);
-}
-
-/* The number of rows, at least 1.  */
-static inline int collection_get_rows(const Collection *collection) {
-	return  MAX((collection->number_of_items + collection->columns - 1) 
-		    / collection->columns, 1);
-}
-
-/* The number of columns _actually_ displayed, at least 1.  This
- * function is required in vertical_order layout-based manipulation
- * such as moving the cursor to detect the last column.  */
-static inline int collection_get_cols(const Collection *collection) {
-	if (collection->vertical_order) 
-	{
-		int rows = collection_get_rows(collection);
-		return MAX(1,(collection->number_of_items + rows - 1) / rows);
-	}
-	else
-		return collection->columns;
 }
 
 /* Translate the item number to the (row, column) form */
