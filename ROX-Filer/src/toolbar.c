@@ -297,6 +297,7 @@ static void toolbar_help_clicked(GtkWidget *widget, FilerWindow *filer_window)
 		menu_rox_help(NULL, HELP_MANUAL, NULL);
 	else
 		filer_opendir(make_path(app_dir, "Help"), NULL, NULL);
+	gdk_event_free(event);
 }
 
 static void toolbar_refresh_clicked(GtkWidget *widget,
@@ -312,6 +313,7 @@ static void toolbar_refresh_clicked(GtkWidget *widget,
 	}
 	else
 		filer_refresh(filer_window);
+	gdk_event_free(event);
 }
 
 static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -325,6 +327,7 @@ static void toolbar_home_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	}
 	else
 		filer_change_to(filer_window, home_dir, NULL);
+	gdk_event_free(event);
 }
 
 static void toolbar_bookmarks_clicked(GtkWidget *widget,
@@ -345,6 +348,7 @@ static void toolbar_bookmarks_clicked(GtkWidget *widget,
 	{
 		bookmarks_edit();
 	}
+	gdk_event_free(event);
 }
 
 static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -361,6 +365,7 @@ static void toolbar_close_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	}
 	else if (!filer_window_delete(filer_window->window, NULL, filer_window))
 		gtk_widget_destroy(filer_window->window);
+	gdk_event_free(event);
 }
 
 static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -374,6 +379,7 @@ static void toolbar_up_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	}
 	else
 		change_to_parent(filer_window);
+	gdk_event_free(event);
 }
 
 static void toolbar_autosize_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -381,11 +387,12 @@ static void toolbar_autosize_clicked(GtkWidget *widget, FilerWindow *filer_windo
 	GdkEventButton	*bev;
 
 	bev = (GdkEventButton *) gtk_get_current_event();
-	if (bev->type != GDK_BUTTON_RELEASE)
-		return;
-
-	display_set_layout(filer_window, AUTO_SIZE_ICONS, filer_window->details_type,
-			   TRUE);
+	if (bev->type == GDK_BUTTON_RELEASE)
+	{
+		display_set_layout(filer_window, AUTO_SIZE_ICONS, filer_window->details_type,
+				TRUE);
+	}
+	gdk_event_free((GdkEvent *) bev);
 }
 
 static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
@@ -393,10 +400,9 @@ static void toolbar_size_clicked(GtkWidget *widget, FilerWindow *filer_window)
 	GdkEventButton	*bev;
 
 	bev = (GdkEventButton *) gtk_get_current_event();
-	if (bev->type != GDK_BUTTON_RELEASE)
-		return;
-
-	display_change_size(filer_window, bev->button == 1);
+	if (bev->type == GDK_BUTTON_RELEASE)
+		display_change_size(filer_window, bev->button == 1);
+	gdk_event_free((GdkEvent *) bev);
 }
 
 static void toolbar_sort_clicked(GtkWidget *widget,
@@ -419,6 +425,7 @@ static void toolbar_sort_clicked(GtkWidget *widget,
 
 	bev = (GdkEventButton *) gtk_get_current_event();
 	adjust = (bev->button != 1) && bev->type == GDK_BUTTON_RELEASE;
+	gdk_event_free((GdkEvent *) bev);
 
 	current = -1;
 	dir = filer_window->sort_order;
@@ -487,6 +494,7 @@ static void toolbar_select_clicked(GtkWidget *widget, FilerWindow *filer_window)
 				       filer_window->view);
 	}
 	filer_window->temp_item_selected = FALSE;
+	gdk_event_free(event);
 }
 
 /* If filer_window is NULL, the toolbar is for the options window */

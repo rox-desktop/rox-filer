@@ -676,6 +676,8 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	int		n_selected;
 	int             n_added = 0;
 
+	g_return_if_fail(event != NULL);
+
 	n_selected = view_count_selected(filer_window->view);
 
 	ensure_filer_menu();
@@ -686,9 +688,6 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	appmenu_remove();
 
 	window_with_focus = filer_window;
-
-	if (!event)
-		event = gtk_get_current_event();
 
 	if (event->type == GDK_BUTTON_PRESS)
 		state = ((GdkEventButton *) event)->state;
@@ -1676,7 +1675,8 @@ static void send_to(FilerWindow *filer_window)
 	/* Eats paths */
 	show_send_to_menu(paths, event);
 
-	gdk_event_free(event);
+	if (event)
+		gdk_event_free(event);
 }
 
 static void xterm_here(gpointer data, guint action, GtkWidget *widget)

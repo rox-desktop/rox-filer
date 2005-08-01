@@ -1068,6 +1068,7 @@ static void menuitem_response(gpointer data, guint action, GtkWidget *widget)
 static void prompt_action(GList *paths, gchar *dest)
 {
 	GList		*next;
+	GdkEvent	*event;
 
 	if (prompt_local_paths)
 	{
@@ -1094,7 +1095,10 @@ static void prompt_action(GList *paths, gchar *dest)
 	/* Shade 'Set Icon' if there are multiple files */
 	menu_set_items_shaded(dnd_menu, g_list_length(paths) != 1, 4, 1);
 
-	show_popup_menu(dnd_menu, gtk_get_current_event(), 1);
+	event = gtk_get_current_event();
+	show_popup_menu(dnd_menu, event, 1);
+	if (event)
+		gdk_event_free(event);
 }
 
 

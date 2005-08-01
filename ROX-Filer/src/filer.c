@@ -303,6 +303,8 @@ void filer_window_set_size(FilerWindow *filer_window, int w, int h)
 			int x, y;
 			int nx, ny;
 
+			gdk_event_free(event);
+
 			GdkWindow *win = filer_window->window->window;
 
 			gdk_window_get_pointer(filer_window->window->window,
@@ -1069,10 +1071,14 @@ static void group_restore(FilerWindow *filer_window, char *name)
 static gboolean popup_menu(GtkWidget *widget, FilerWindow *filer_window)
 {
 	ViewIter iter;
+	GdkEvent *event;
 
 	view_get_cursor(filer_window->view, &iter);
 
+	event = gtk_get_current_event();
 	show_filer_menu(filer_window, NULL, &iter);
+	if (event)
+		gdk_event_free(event);
 
 	return TRUE;
 }

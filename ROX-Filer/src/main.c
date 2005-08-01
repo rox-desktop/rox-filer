@@ -816,6 +816,8 @@ static GtkWidget *launch_button_new(const char *label, const char *uri)
 					(GClosureNotify) g_free);
 	g_signal_connect_closure(button, "clicked", closure, FALSE);
 
+	allow_right_click(button);
+
 	return button;
 }
 

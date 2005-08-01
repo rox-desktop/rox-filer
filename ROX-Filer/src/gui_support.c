@@ -1409,10 +1409,12 @@ void make_heading(GtkWidget *label, double scale_factor)
 	gtk_label_set_attributes(GTK_LABEL(label), list);
 }
 
-/* Launch a program using 0launch */
+/* Launch a program using 0launch.
+ * If button-3 is used, open the GUI with -g.
+ */
 void launch_uri(const char *uri)
 {
-	const char *argv[] = {"0launch", NULL, NULL};
+	const char *argv[] = {"0launch", NULL, NULL, NULL};
 	const char *uri_0launch = "/uri/0install/zero-install.sourceforge.net"
 				  "/bin/0launch";
 
@@ -1430,6 +1432,71 @@ void launch_uri(const char *uri)
 		}
 	}
 
-	argv[1] = uri;
+	if (current_event_button() == 3)
+	{
+		argv[1] = "-g";
+		argv[2] = uri;
+	}
+	else
+		argv[1] = uri;
+
 	rox_spawn(NULL, argv);
+}
+
+static gint button3_button_pressed(GtkButton *button,
+				GdkEventButton *event,
+				gpointer date)
+{
+	if (event->button == 3)
+	{
+		gtk_grab_add(GTK_WIDGET(button));
+		gtk_button_pressed(button);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+static gint button3_button_released(GtkButton *button,
+				GdkEventButton *event,
+				FilerWindow *filer_window)
+{
+	if (event->button == 3)
+	{
+		gtk_grab_remove(GTK_WIDGET(button));
+		gtk_button_released(button);
+
+		return TRUE;
+	}
+
+	return FALSE;
+}
+
+void allow_right_click(GtkWidget *button)
+{
+	g_signal_connect(button, "button_press_event",
+		G_CALLBACK(button3_button_pressed), NULL);
+	g_signal_connect(button, "button_release_event",
+		G_CALLBACK(button3_button_released), NULL);
+}
+
+/* Return mouse button used in the current event, or -1 if none (no event,
+ * or not a click).
+ */
+gint current_event_button(void)
+{
+	GdkEventButton *bev;
+	gint button = -1;
+
+	bev = (GdkEventButton *) gtk_get_current_event();
+	if (!bev)
+		return -1;
+
+	if (bev->type == GDK_BUTTON_PRESS || bev->type == GDK_BUTTON_RELEASE)
+		button = bev->button;
+
+	gdk_event_free((GdkEvent *) bev);
+
+	return button;
 }
