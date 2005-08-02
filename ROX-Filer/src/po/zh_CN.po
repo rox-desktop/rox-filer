@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 1.2.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-30 15:23+0800\n"
-"PO-Revision-Date: 2005-07-30 18:00+0100\n"
+"POT-Creation-Date: 2005-08-02 12:32+0800\n"
+"PO-Revision-Date: 2005-08-02 12:32+0100\n"
 "Last-Translator: Babyfai Cheung<babyfai1@yahoo.com.hk>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -198,11 +198,11 @@ msgstr ""
 msgid "ERROR"
 msgstr "错误"
 
-#: action.c:711 main.c:684 main.c:691 main.c:698
+#: action.c:711 main.c:674 main.c:681 main.c:688
 msgid "Yes"
 msgstr "是"
 
-#: action.c:714 main.c:686 main.c:700
+#: action.c:714 main.c:676 main.c:690
 msgid "No"
 msgstr "否"
 
@@ -654,54 +654,54 @@ msgstr ""
 msgid "Customise Menu..."
 msgstr "自定菜单..."
 
-#: appmenu.c:386 menu.c:251 toolbar.c:159
+#: appmenu.c:396 menu.c:251 toolbar.c:159
 msgid "Help"
 msgstr "帮助"
 
-#: bookmarks.c:146
+#: bookmarks.c:147
 msgid "Path"
 msgstr "路径"
 
-#: bookmarks.c:154
+#: bookmarks.c:155
 msgid "Title"
 msgstr "标题"
 
-#: bookmarks.c:303
+#: bookmarks.c:304
 #, c-format
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "不能书签化非本地的资源 '%s'\n"
 
-#: bookmarks.c:311 bookmarks.c:629
+#: bookmarks.c:312 bookmarks.c:630
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s'并非一个目录"
 
-#: bookmarks.c:517
+#: bookmarks.c:518
 msgid "You should first select some rows to delete"
 msgstr "请先选择行数以删除"
 
-#: bookmarks.c:541
+#: bookmarks.c:542
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "将鼠标指向想要移动的项目上"
 
-#: bookmarks.c:561
+#: bookmarks.c:562
 msgid "This item is already at the end"
 msgstr "此项目已排在最后"
 
-#: bookmarks.c:635
+#: bookmarks.c:636
 #, c-format
 msgid "Can't bookmark non-local directories like '%s'"
 msgstr "不能书签化非本地目录如 '%s'"
 
-#: bookmarks.c:777
+#: bookmarks.c:778
 msgid "Add New Bookmark"
 msgstr "加入新书签"
 
-#: bookmarks.c:784
+#: bookmarks.c:785
 msgid "Edit Bookmarks"
 msgstr "编辑书签"
 
-#: bookmarks.c:789
+#: bookmarks.c:790
 msgid "Recently Visited"
 msgstr "最近存取的"
 
@@ -999,7 +999,7 @@ msgstr ""
 "不能存取 '%s':\n"
 "%s"
 
-#: filer.c:446
+#: filer.c:453
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1008,7 +1008,7 @@ msgstr ""
 "错误检视 '%s'：\n"
 "%s\n"
 
-#: filer.c:450
+#: filer.c:457
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1017,7 +1017,7 @@ msgstr ""
 "错误检视 '%s'：\n"
 "%s"
 
-#: filer.c:555
+#: filer.c:562
 msgid ""
 "Do you want to unmount this device?\n"
 "\n"
@@ -1027,19 +1027,19 @@ msgstr ""
 "\n"
 "解除挂载后才把媒体移出，会较为安全."
 
-#: filer.c:559
+#: filer.c:566
 msgid "No change"
 msgstr "没有改变"
 
-#: filer.c:565 menu.c:863
+#: filer.c:572 menu.c:862
 msgid "Unmount"
 msgstr "解除挂载"
 
-#: filer.c:662
+#: filer.c:669
 msgid "Directory missing/deleted"
 msgstr "目录已删除/或不存在"
 
-#: filer.c:1024
+#: filer.c:1031
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -1050,81 +1050,81 @@ msgstr ""
 "重选其他文件.\n"
 "注意，键盘上的 NumLock 必须开启"
 
-#: filer.c:1256
+#: filer.c:1267
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "目录 '%s' 不接受存取"
 
-#: filer.c:1408
+#: filer.c:1419
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "找不到目录 '%s' "
 
-#: filer.c:1702
+#: filer.c:1713
 msgid "Cancel"
 msgstr "取消"
 
-#: filer.c:1991
+#: filer.c:2002
 msgid "S"
 msgstr ""
 
-#: filer.c:1993
+#: filer.c:2004
 msgid "T"
 msgstr ""
 
-#: filer.c:2015
+#: filer.c:2026
 msgid "Scanning, "
 msgstr "从新检视中, "
 
-#: filer.c:2017
+#: filer.c:2028
 msgid "Thumbs, "
 msgstr "显示缩图, "
 
-#: filer.c:2293
+#: filer.c:2304
 msgid "Symbolic link to "
 msgstr "连接指向 "
 
-#: filer.c:2324
+#: filer.c:2335
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "不是正确的 UTF-8 名称，请重新命名.\n"
 
-#: filer.c:2632 menu.c:1989
+#: filer.c:2643 menu.c:1989
 msgid "Item no longer exists!"
 msgstr "项目已不存在！"
 
-#: filer.c:3316
+#: filer.c:3327
 msgid "Select display properties to save"
 msgstr "选择显示内容以储存"
 
-#: filer.c:3323
+#: filer.c:3334
 msgid "Position"
 msgstr "位置"
 
-#: filer.c:3328 toolbar.c:135 toolbar.c:139 tips:70
+#: filer.c:3339 toolbar.c:135 toolbar.c:139 tips:70
 msgid "Size"
 msgstr "大小"
 
-#: filer.c:3333
+#: filer.c:3344
 msgid "Show hidden"
 msgstr "显示隐藏档"
 
-#: filer.c:3339
+#: filer.c:3350
 msgid "Display style"
 msgstr "显示风格"
 
-#: filer.c:3345
+#: filer.c:3356
 msgid "Sort type and order"
 msgstr "以类型排序"
 
-#: filer.c:3350 toolbar.c:143
+#: filer.c:3361 toolbar.c:143
 msgid "Details"
 msgstr "详述"
 
-#: filer.c:3355 tips:134 tips:135
+#: filer.c:3366 tips:134 tips:135
 msgid "Thumbnails"
 msgstr "缩图"
 
-#: filer.c:3361
+#: filer.c:3372
 msgid "Filter"
 msgstr "过滤"
 
@@ -1410,7 +1410,7 @@ msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
 msgstr "未能载入影像 '%s'： 原因不明，可能是文件损毁"
 
-#: gui_support.c:1425
+#: gui_support.c:1427
 msgid ""
 "This program cannot be run, as the 0launch command is not available. It can "
 "be downloaded from here:\n"
@@ -1420,7 +1420,6 @@ msgstr ""
 "程序 0launch 找不到不能执行，请到这处下载：\n"
 "\n"
 "http://0install.net/injector.html"
-
 
 #: i18n.c:38
 msgid ""
@@ -1460,7 +1459,7 @@ msgstr "家目录"
 msgid "File"
 msgstr "文件"
 
-#: icon.c:141 menu.c:212 menu.c:876
+#: icon.c:141 menu.c:212 menu.c:875
 msgid "Shift Open"
 msgstr "以新窗口开启"
 
@@ -1488,7 +1487,7 @@ msgstr "显示位址"
 msgid "Remove Item(s)"
 msgstr "移除项目"
 
-#: icon.c:278 menu.c:765
+#: icon.c:278 menu.c:764
 #, c-format
 msgid "%s '%s'"
 msgstr ""
@@ -1509,7 +1508,7 @@ msgstr "请先选择项目以删除"
 msgid "You must open the menu over an item"
 msgstr "请在项目上开启菜单"
 
-#: icon.c:652 menu.c:1261
+#: icon.c:652 menu.c:1260
 msgid "You can only set the run action for a regular file"
 msgstr "只可对常规文件设定开启的程式"
 
@@ -1546,7 +1545,7 @@ msgstr "您想开启 %d 窗口"
 msgid "Show Info"
 msgstr "显示讯息"
 
-#: infobox.c:135 menu.c:770
+#: infobox.c:135 menu.c:769
 msgid "(bad utf-8)"
 msgstr "(不正确的 utf-8)"
 
@@ -1735,7 +1734,7 @@ msgstr "挂载点为 %s (%s)"
 msgid "Mount point (%s)"
 msgstr "挂载点 (%s)"
 
-#: main.c:96
+#: main.c:95
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1745,22 +1744,22 @@ msgid ""
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
 
-#: main.c:105
+#: main.c:104
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
 msgstr ""
 
-#: main.c:108
+#: main.c:107
 msgid "Try `ROX-Filer/AppRun -h' for more information.\n"
 msgstr ""
 
-#: main.c:110
+#: main.c:109
 msgid ""
 "NOTE: Your system does not support long options - \n"
 "you must use the short versions instead.\n"
 "\n"
 msgstr ""
 
-#: main.c:116
+#: main.c:115
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1788,13 +1787,13 @@ msgid ""
 "Report bugs to "
 msgstr ""
 
-#: main.c:137
+#: main.c:136
 msgid ""
 ".\n"
 "Home page (including updated versions): http://rox.sourceforge.net/\n"
 msgstr ""
 
-#: main.c:244
+#: main.c:234
 msgid ""
 "We got a BadWindow error from the X server. This might be due to this GTK "
 "bug (during drag-and-drop?):\n"
@@ -1802,56 +1801,56 @@ msgid ""
 "Trying to continue..."
 msgstr ""
 
-#: main.c:392
+#: main.c:382
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
 msgstr ""
 
-#: main.c:499
+#: main.c:489
 #, c-format
 msgid "Running as user '%s'"
 msgstr "执行用户为 '%s'"
 
-#: main.c:676
+#: main.c:666
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr ""
 
-#: main.c:677
+#: main.c:667
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr ""
 
-#: main.c:681
+#: main.c:671
 msgid "features set at compile time"
 msgstr ""
 
-#: main.c:682
+#: main.c:672
 msgid "Large File Support"
 msgstr ""
 
-#: main.c:689
+#: main.c:679
 msgid "GNOME-VFS library"
 msgstr ""
 
-#: main.c:693
+#: main.c:683
 msgid "No (need 2.8.0 or later)"
 msgstr ""
 
-#: main.c:696
+#: main.c:686
 msgid "Dnotify support"
 msgstr ""
 
-#: main.c:703
+#: main.c:693
 msgid "Binary compatibility"
 msgstr ""
 
-#: main.c:705
+#: main.c:695
 msgid "Yes (can run with older glibc versions)"
 msgstr ""
 
-#: main.c:707
+#: main.c:697
 msgid "No (apsymbols.h not found)"
 msgstr ""
 
@@ -2051,36 +2050,36 @@ msgstr "终端机"
 msgid "Switch to xterm"
 msgstr "切换成终端机"
 
-#: menu.c:719
+#: menu.c:718
 msgid "You should Shift+Menu click over a file to send it somewhere"
 msgstr "你可用鼠标在文件上点击菜单，并同时按下Shift键，开启`传送至'功能"
 
-#: menu.c:755
+#: menu.c:754
 msgid "Next Click"
 msgstr "进阶"
 
-#: menu.c:777
+#: menu.c:776
 #, c-format
 msgid "%d items"
 msgstr "%d 项目"
 
-#: menu.c:865
+#: menu.c:864
 msgid "Open unmounted"
 msgstr "列出已解除挂载项目"
 
-#: menu.c:868
+#: menu.c:867
 msgid "Show Target"
 msgstr "显示目标"
 
-#: menu.c:870
+#: menu.c:869
 msgid "Look Inside"
 msgstr "察看内部"
 
-#: menu.c:872
+#: menu.c:871
 msgid "Open As Text"
 msgstr "以文字模式开启"
 
-#: menu.c:1032
+#: menu.c:1031
 msgid ""
 "Extended attributes, used to store types, are not supported for this file or "
 "files.\n"
@@ -2092,15 +2091,15 @@ msgstr ""
 "可能是阁下的文件系统或 C 函式库不支援，又或在挂载文件系统时,没有套用正确的参"
 "数，挂载选项 ('user_xattr' on Linux)."
 
-#: menu.c:1038
+#: menu.c:1037
 msgid "Setting type not supported for some of these files"
 msgstr "某些文件不能以此类型设定"
 
-#: menu.c:1073
+#: menu.c:1072
 msgid "_Relative link"
 msgstr "相关连接(_R)"
 
-#: menu.c:1079
+#: menu.c:1078
 msgid ""
 "If on, the symlink will store the path from the symlink to the target file. "
 "Use this if the symlink and the target will be moved together.\n"
@@ -2112,42 +2111,42 @@ msgstr ""
 "关闭时,连接会储存从根目录到目标的路径，这选项适用於当连接移动，但目标不变的时"
 "侯."
 
-#: menu.c:1149
+#: menu.c:1148
 msgid "New pathname is not absolute"
 msgstr "新的路径名称属不绝对"
 
-#: menu.c:1215
+#: menu.c:1214
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
 msgstr " '%' 的连接档已存在，是否要替换？"
 
-#: menu.c:1221
+#: menu.c:1220
 msgid "_Replace"
 msgstr "替换(_R)"
 
-#: menu.c:1352 menu.c:1393 menu.c:1453
+#: menu.c:1351 menu.c:1392 menu.c:1452
 msgid "Create"
 msgstr "创建"
 
-#: menu.c:1353
+#: menu.c:1352
 msgid "NewDir"
 msgstr "新目录"
 
-#: menu.c:1367 menu.c:1373
+#: menu.c:1366 menu.c:1372
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "错误创建 '%s': %s"
 
-#: menu.c:1394
+#: menu.c:1393
 msgid "NewFile"
 msgstr "新文件"
 
-#: menu.c:1412
+#: menu.c:1411
 #, c-format
 msgid "Error creating file: could not find the template for %s"
 msgstr "错误创建文件: 找不到样板予 %s"
 
-#: menu.c:1483
+#: menu.c:1482
 #, c-format
 msgid ""
 "The `Send To' menu provides a quick way to send some files to an "
@@ -2173,17 +2172,17 @@ msgstr ""
 "您亦可建立子目录 `.text_html', `.text'等等，该子目录只会在开启该类型文件时出"
 "现。 `.group' 只会在选择多个文件时出现."
 
-#: menu.c:1494
+#: menu.c:1493
 msgid ""
 "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
 "drag) any applications you want into it."
 msgstr "请将适用的程式以符号连接 (Ctrl+Shift并拖放)到'传送至'的目录内."
 
-#: menu.c:1497 menu.c:1537
+#: menu.c:1496 menu.c:1536
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
 msgstr "不容许自定 CHOICE 路径"
 
-#: menu.c:1530
+#: menu.c:1529
 #, c-format
 msgid ""
 "Any files placed in your Templates directories will appear on the `New' "
@@ -2202,13 +2201,13 @@ msgstr ""
 "%s\n"
 "%s\n"
 
-#: menu.c:1535
+#: menu.c:1534
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
 msgstr "现在显示您的样板文件目录；您可放进任何需要的样板文件 ."
 
-#: menu.c:1652
+#: menu.c:1651
 msgid "Customise"
 msgstr "自定"
 
@@ -2712,7 +2711,7 @@ msgid ""
 "(hold down Shift while you open it). Most applications provide their own "
 "help here, but this one doesn't."
 msgstr ""
-"执行程式：\n"
+"应用程序：\n"
 "这是一个执行程式的目录 - 你可执行或开启它(开启时按下Shift键)，但此程式并没有"
 "帮助档."
 
@@ -2859,35 +2858,35 @@ msgstr "没有项目%s"
 msgid "%u selected (%s)"
 msgstr "%u 已选择 (%s)"
 
-#: toolbar.c:416
+#: toolbar.c:422
 msgid "Sort by name"
 msgstr "以名称排序"
 
-#: toolbar.c:416
+#: toolbar.c:422
 msgid "Sort by type"
 msgstr "以类型排序"
 
-#: toolbar.c:416
+#: toolbar.c:422
 msgid "Sort by date"
 msgstr "以日期排序"
 
-#: toolbar.c:417
+#: toolbar.c:423
 msgid "Sort by size"
 msgstr "以大小排序"
 
-#: toolbar.c:417
+#: toolbar.c:423
 msgid "Sort by owner"
 msgstr "以用户排序"
 
-#: toolbar.c:417
+#: toolbar.c:423
 msgid "Sort by group"
 msgstr "以组别排序"
 
-#: toolbar.c:450
+#: toolbar.c:457
 msgid "ascending"
 msgstr "提升"
 
-#: toolbar.c:450
+#: toolbar.c:457
 msgid "descending"
 msgstr "下降"
 
@@ -3654,11 +3653,15 @@ msgstr "当目录内有影像或图片时，会以缩图来预览."
 msgid "Show image thumbnails"
 msgstr "显示影像档的缩图"
 
-#: tips:138 tips:139
+#: tips:138
 msgid ""
 "This is the default setting for new windows. Use the Display menu to turn "
 "thumbnails on and off for individual windows."
 msgstr "这是新窗口的缺省值，可在菜单的显示内自行开启或关闭缩图."
+
+#: tips:139
+msgid "Video thumbnails"
+msgstr "影片缩图"
 
 #: tips:140
 msgid "Thumbnails cache"
@@ -3807,9 +3810,7 @@ msgstr "只显示当前工作区"
 msgid ""
 "If this option is on, the filer will only show iconified windows associated "
 "with the current workspace."
-msgstr ""
-"打开此选项，ROX-Filer 只会显示当前工作区内"
-"的已图标化(或最小化)窗口"
+msgstr "打开此选项，ROX-Filer 只会显示当前工作区内的已图标化(或最小化)窗口"
 
 #: tips:178
 msgid "Iconify to the"
