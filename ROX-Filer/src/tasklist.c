@@ -716,10 +716,14 @@ static GdkPixbuf* pixbuf_from_pixmap(Pixmap xpixmap)
 
 	drawable = gdk_xid_table_lookup(xpixmap);
 
-	if (drawable)
+	if (GDK_IS_DRAWABLE(drawable))
 		g_object_ref(G_OBJECT(drawable));
 	else
+	{
 		drawable = gdk_pixmap_foreign_new(xpixmap);
+		if (!GDK_IS_DRAWABLE(drawable))
+			return retval;
+	}
 
 	cmap = get_cmap(drawable);
 
