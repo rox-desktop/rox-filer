@@ -22,6 +22,7 @@ class Handler(ContentHandler):
 		data = string.strip(self.data)
 		if data:
 			self.trans(data)
+		self.data = ""
 	
 	def trans(self, data):
 		data = string.join(string.split(data, '\n'), '\\n')
