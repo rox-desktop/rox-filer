@@ -229,12 +229,12 @@ static int rox_x_error(Display *display, XErrorEvent *error)
 			error->minor_code);
 
 	/* Try to cope with BadWindow errors */
-	if (error->error_code == 3)
+	if (error->error_code == BadWindow || error->error_code == BadDrawable)
 	{
 		g_warning(_("We got a BadWindow error from the X server. "
-				"This might be due to this GTK bug (during drag-and-drop?):\n"
-				"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
-				"Trying to continue..."));
+			    "This might be due to this GTK bug (during drag-and-drop?):\n"
+			    "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+			    "Trying to continue..."));
 		return 0;
 	}
 
