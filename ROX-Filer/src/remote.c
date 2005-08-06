@@ -808,8 +808,9 @@ static xmlNodePtr rpc_PinboardAdd(GList *args)
 	pinboard_pin_with_args(path, name, x, y, shortcut, xargs);
 
 	g_free(path);
-	if(name)
-	        g_free(name);
+	g_free(name);
+	g_free(shortcut);
+	g_free(xargs);
 
 	return NULL;
 }
@@ -882,6 +883,9 @@ static xmlNodePtr rpc_PanelAdd(GList *args)
 	panel_add(side, path, label, after, shortcut, arg);
 
 	g_free(path);
+	g_free(label);
+	g_free(shortcut);
+	g_free(arg);
 
 	return NULL;
 }

@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.2.0 - Manuel de l'utilisateur
+   ROX-Filer 2.3 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -15,22 +15,12 @@
    <author>
 	<firstname>Thomas</firstname>
 	<surname>Leonard</surname>
-	<affiliation>
-	 <address>
-	  <email>tal197 at users.sourceforge.net</email>
-	 </address>
-    </affiliation>
    </author>
 
    <othercredit role="translator">
 	<firstname>Arnaud</firstname>
 	<surname>Calvo</surname>
 	<contrib>Traduction française</contrib>
-    <affiliation>
-	 <address>
-	  <email>arnaud at (oter_ceci)calvo-france.com</email>
-	 </address>
-    </affiliation>
    </othercredit>
   </authorgroup>
 
@@ -111,11 +101,14 @@
 	 </varlistentry>
 
 	 <varlistentry>
-	  <term>Choices</term>
+	  <term>Basedir spec</term>
 	  <listitem>
 	   <para>
 		Une façon simple, mais souple, de gérer les préférences des utilisateurs.
-		Voir <citation>Choices</citation> pour plus de détails.
+		Par défaut, celles-ci sont enregistrées dans <filename>~/.config</filename>, 
+		mais vous pouvez utiliser la variable d'environnement <envar>XDG_CONFIG_HOME</envar>
+		pour définir un autre emplacement.
+		Voir <citation>BaseDir</citation> pour plus de détails.
 	   </para>
 	  </listitem>
 	 </varlistentry>
@@ -138,7 +131,7 @@
 		Le <foreignphrase lang="en">filer</foreignphrase> peut afficher les fichiers images avec une icône représentant le contenu
 		de ceux-ci, au lieu d'une icône générique.
 		Très utile pour organiser un dossier rempli de photos ! Voir <citation>Imagettes</citation>
-		pour plus de détails (l'établissement de normes est en cours).
+		pour plus de détails.
 	   </para>
 	  </listitem>
 	 </varlistentry>
@@ -161,6 +154,7 @@
 	Vous pouvez changer le thème utilisé dans la boîte Options.
 	Lorsque d'autres 'Gestionnaires de bureaux' utiliseront la même
 	technologie, les thèmes pourront alors être partagés avec ceux-ci.
+	Voir <citation>IconTheme</citation> pour plus de détails.
 	</para>
        </listitem>
 </varlistentry>
@@ -222,7 +216,8 @@ Si vous voulez que le <foreignphrase lang="en">filer</foreignphrase> gère votre
 
 <screen>$ rox --pinboard=MonPunaiseur</screen>
 
-La configuration du punaiseur est sauvée dans <filename>&lt;Choices&gt;/ROX-Filer/pb_MonPunaiseur</filename>
+La configuration du punaiseur est sauvée dans 
+<filename>~/.config/rox.sourceforge.net/ROX-Filer/pb_MonPunaiseur</filename>
 dès que vous le modifiez (par exemple, en glissant/déposant un fichier
 sur votre bureau).
 Vous pouvez avoir autant de punaiseurs que vous le souhaitez et basculer
@@ -236,8 +231,9 @@ Pour arrêter la fonction punaiseur, donnez au nom une chaîne vide :
 
 Allez voir la section <xref linkend="winman"/> si vous avez des problèmes d'affichage avec les icônes.
 Le punaiseur peut aussi être activé/désactivé en se plaçant dans le répertoire d'installation de
-<filename>ROX-Filer</filename> dans une fenêtre du <foreignphrase lang="en">filer</foreignphrase> et en choisissant 'Enable pinboard' ou
-'Disable pinboard' dans le menu (clic droit).
+<filename>ROX-Filer</filename> dans une fenêtre du <foreignphrase lang="en">filer</foreignphrase> et 
+en choisissant <guimenuitem>Enable pinboard</guimenuitem> ou <guimenuitem>Disable pinboard</guimenuitem> 
+dans le menu (clic droit).
 
   </para>
 </sect1>
@@ -246,13 +242,9 @@ Le punaiseur peut aussi être activé/désactivé en se plaçant dans le répert
   <title><anchor id="run_pan" xreflabel="Panel support"/>Panneaux</title>
   <para>
 
-Les panneaux fonctionnent exactement de la même façon que les punaiseurs.
-Vous pouvez créer un panneau sur n'importe quel côté de l'écran en utilisant
-les options <option>--left</option>, <option>--right,</option>, <option>--top</option> et <option>--bottom</option>,
-(respectivement pour les non-anglophones 'gauche', 'droite', 'haut' et 'bas'),
-en fonction du côté sur lequel vous souhaitez voir apparaître votre panneau.
-Sur certains systèmes, vous devrez utiliser l'option courte (une lettre).
-Par exemple, pour créer un panneau en bas de votre écran :
+Les panneaux fonctionnent exactement de la même façon que les punaiseurs, mais ils correspondent à 
+une barre, le long d'un des bords de l'écran.
+Pour créer un panneau :
 
 <screen>$ rox -b=MonPanneau</screen>
 
@@ -261,15 +253,21 @@ Le panneau devrait être affiché dans une fenêtre sans barre de titre. Si
 Vous pouvez déposer des fichiers sur les 2 côtés du panneau, ils s'aligneront
 sur un côté ou sur l'autre.
 Les icônes des panneaux peuvent être repositionnées en les glissant avec le bouton du milieu.
-Les changements apportés au panneau sont automatiquement sauvegardés dans <filename>&lt;Choices&gt;/ROX-Filer/pan_MonPanneau</filename>.
+Les changements apportés au panneau sont automatiquement sauvegardés dans 
+<filename>~/.config/rox.sourceforge.net/ROX-Filer/pan_MonPanneau</filename>.
 Comme pour le punaiseur, vous pouvez basculer entre plusieurs configurations
 de panneaux en relançant rox avec un nom de panneau différent.
-Spécifiez une chaîne ville pour ôter le panneau.
 
-<screen>$ rox --bottom=MonAutrePanneau
-$ rox --bottom=</screen>
+<screen>$ rox -b=MonAutrePanneau</screen>
 
-  </para>
+Utilisez le menu contextuel pour choisir le côté sur lequel vous souhaitez positionner le panneau.
+Vous pouvez aussi utiliser le nom du côté ("bottom", "top", "left" ou "right"), au lieu de -b.
+
+Spécifiez une chaîne vide ("") pour ôter le panneau :
+
+<screen>$ rox --bottom=</screen>
+
+</para>
 </sect1>
 
 <sect1>
@@ -918,17 +916,6 @@ Opérations diverses agissant sur la fenêtre.
   </entry>
  </row>
 
-<row>
-  <entry>
-    <guimenuitem>Filtrer des fichiers...</guimenuitem>
-  </entry>
-  <entry>
-    Contraint ROX à n'afficher que les fichiers dont les noms correspondent 
-    à un certain motif.
-    La barre de titre affichera <guilabel>(Glob (motif))</guilabel> si un filtre est utilisé.
-  </entry>
-</row>
-
  <row>
   <entry><guimenuitem>Montrer les fichiers cachés</guimenuitem></entry>
   <entry>
@@ -939,7 +926,18 @@ Opérations diverses agissant sur la fenêtre.
  </row>
 
  <row>
-  <entry><guimenuitem>Montrer les imagettes</guimenuitem></entry>
+  <entry>
+    <guimenuitem>Filtrer des fichiers...</guimenuitem>
+  </entry>
+  <entry>
+    Contraint ROX à n'afficher que les fichiers dont les noms correspondent 
+    à un certain motif.
+    La barre de titre affichera <guilabel>(Glob (motif))</guilabel> si un filtre est utilisé.
+  </entry>
+ </row>
+
+ <row>
+  <entry><guimenuitem>Montrer les vignettes</guimenuitem></entry>
   <entry>
    Activée, le <foreignphrase lang="en">filer</foreignphrase> essaiera de lire chaque fichier-image et d'utiliser cette 
    image comme icône pour ce fichier. Très utile quand vous avez un dossier 
@@ -1304,30 +1302,37 @@ l'être aussi...), alors optez pour un lien relatif.
 
 Chaque commande de ce sous-menu ouvre une boîte pour créer un nouveau fichier
 ou un nouveau dossier.
-Il y a deux commandes de base ; les autres reflètent le contenu de votre
-dossier <filename>&lt;Choices&gt;/Templates</filename>, s'il existe.
+Il y a trois commandes de base ; les autres reflètent le contenu de votre
+dossier <filename>~/.config/rox.sourceforge.net/Templates</filename>, s'il existe.
 
 
 <informaltable><tgroup cols="2">
 <thead><row><entry>Commande</entry><entry>Action</entry></row></thead>
 <tbody>
-<row><entry>
-Répertoire</entry><entry>
-Crée un nouveau répertoire.
-</entry></row><row><entry>
-Fichier vide</entry><entry>
-Crée un fichier vide.
-</entry></row><row><entry>
-&lt;commandes supplémentaires&gt;</entry><entry>
-Copie un fichier depuis votre dossier Templates.
-</entry></row>
-</tbody></tgroup></informaltable>
+	<row>
+		<entry>Répertoire</entry>
+		<entry>Crée un nouveau répertoire.</entry>
+	</row>
+	<row>
+		<entry>Fichier vide</entry>
+		<entry>Crée un fichier vide.</entry>
+	</row>
+	<row>
+		<entry>Personnaliser le menu...</entry>
+		<entry>Affiche le dossier <filename>Templates</filename> pour que vous puissiez ajouter des éléments au menu.</entry>
+	</row>
+	<row>
+		<entry>&lt;commandes supplémentaires&gt;</entry>
+		<entry>Copie un fichier depuis votre dossier Templates.</entry>
+	</row>
+</tbody>
+</tgroup>
+</informaltable>
 
 
-Pour ajouter vos propres commandes, créez un nouveau dossier <filename>~/Choices/Templates</filename>
-(si la variable <envar>CHOICESPATH</envar> est celle par défaut) et enregistrez-y tous les fichiers
-que vous souhaitez. Chaque fichier de ce dossier apparaîtra dans le menu et la boîte qui s'ouvrira
-le copiera.
+Pour ajouter vos propres commandes, choisissez <guimenuitem>Personnaliser le menu...</guimenuitem> 
+et enregistrez-y tous les fichiers que vous souhaitez. Chaque fichier de ce dossier apparaîtra 
+dans le menu et la boîte qui s'ouvrira le copiera.
 Par exemple, vous pourriez créer une base pour un fichier HTML :
 
 <programlisting>
@@ -1480,7 +1485,8 @@ Notez que pour l'instant, vous ne pouvez pas créer de raccourcis-clavier pour c
  <title><anchor id="SendTo" xreflabel="Send To menu"/>Le menu 'Envoyer à...'</title>
  <para>
   Le menu 'Envoyer à...' permet d'envoyer très facilement un (des) objet(s) à une application. 
-  Le <foreignphrase lang="en">filer</foreignphrase> cherche le dossier <filename>SendTo</filename> dans votre <envar>CHOICESPATH</envar> 
+  Le <foreignphrase lang="en">filer</foreignphrase> cherche le dossier 
+  <filename>$XDG_CONFIG_DIRS/rox.sourceforge.net/SendTo</filename> (voir <citation>BaseDir</citation>) 
   et liste son contenu dans ce menu.
  </para>
  <para>
@@ -1620,6 +1626,14 @@ Supprime du punaiseur ou des panneaux les objets sélectionnés.
  </entry>
 </row>
 
+<row>
+ <entry><guimenuitem>Options du panneau...</guimenuitem></entry>
+  <entry>
+  	Définit le côté de l'écran utilisé par le panneau 
+	(commande disponible seulement dans le menu du panneau).
+  </entry>
+</row>
+
 </tbody></tgroup></informaltable>
 
 </para>
@@ -1676,7 +1690,7 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
 	  Lorsque le dossier de l'appliquette sera glissé sur un panneau, ROX-Filer lancera cet 
 	  exécutable avec pour argument un identifiant XID, correspondant à une fenêtre-socket 
 	  pour ce panneau. Vous pouvez utiliser l'identifiant pour créer une widget GtkPlug.
-	  Un exemple d'appliquette (en Python) est disponible ici : <ulink url="http://rox.sourceforge.net/applets.html"/>
+	  Un tutoriel est disponible ici : <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Tutorials/Applets"/>
      </para>
 	</step>
 
@@ -1813,18 +1827,18 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
     Quand cette fonction est activée, le <foreignphrase lang="en">filer</foreignphrase> peut afficher les fichiers images avec une icône
     représentant le contenu de ceux-ci, au lieu d'une icône générique. Très utile pour
     organiser un dossier rempli de photos ! Vous pouvez activer cette fonction pour le dossier
-    en cours en choisissant la commande <guimenuitem>Montrer les imagettes</guimenuitem>
+    en cours en choisissant la commande <guimenuitem>Montrer les vignettes</guimenuitem>
     du menu <guimenu>Affichage</guimenu>. Vous pouvez aussi activer cette option par
     défaut dans la boîte Options.
     La barre de titres affiche <guilabel>(Imagettes)</guilabel> quand cette option est active.
   </para>
   <para>
-   Les imagettes sont enregistrées dans <filename>~/.thumbnails</filename> pour un
+   Les vignettes sont enregistrées dans <filename>~/.thumbnails</filename> pour un
    affichage ultérieur plus rapide.
-   Lors de l'affichage des imagettes, une barre de progression est présente en bas 
+   Lors de l'affichage des vignettes, une barre de progression est présente en bas 
    de la fenêtre. Vous pouvez stopper ce processus en cliquant sur le bouton 
    <guibutton>Annuler</guibutton>, qui se trouve à côté de la barre de progression. 
-   Vous pouvez demander au <foreignphrase lang="en">filer</foreignphrase> qu'il crée des imagettes pour d'autres types de fichiers,
+   Vous pouvez demander au <foreignphrase lang="en">filer</foreignphrase> qu'il crée des vignettes pour d'autres types de fichiers,
    comme les vidéos par exemple (i.e. en montrant la première image), grâce à un logiciel
    adéquat.
   </para>
@@ -1833,15 +1847,16 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   <para>
   En mode 'Imagettes', <application>ROX-Filer</application> vérifie le
   dossier <filename>~/.thumbs/normal</filename> pour chaque fichier passé en revue.
-  Si une imagette existe, il la charge et passe au fichier suivant.
+  Si une vignette existe, il la charge et passe au fichier suivant.
   </para>
   <para>
-  Pour générer l'imagette d'un fichier de type media/subtype, le <foreignphrase lang="en">filer</foreignphrase> recherche un exécutable
-  nommé <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>,
-  en se rabattant sur <filename>&lt;Choices&gt;/MIME-thumb/media</filename> s'il
+  Pour générer la vignette d'un fichier de type media/subtype, le 
+  <foreignphrase lang="en">filer</foreignphrase> recherche un exécutable
+  nommé <filename>~/.config/rox.sourceforge.net/MIME-thumb/media_subtype</filename>,
+  en se rabattant sur <filename>~/.config/rox.sourceforge.net/MIME-thumb/media</filename> s'il
   ne le trouve pas. Si aucun des deux ne peut être trouvé et que le fichier est du
   type image/*, les routines internes sont alors utilisées. Si le fichier n'est pas
-  du type image/*, l'imagette ne sera pas générée.
+  du type image/*, la vignette ne sera pas générée.
   </para>
   <para>
   Si l'exécutable est trouvé, il est démarré avec les paramètres
@@ -1849,11 +1864,11 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   </para>
   <para>
   Quand celui-ci est terminé, le <foreignphrase lang="en">filer</foreignphrase> essaie de charger
-  <filename>/path/to/thumbnail</filename>. En cas d'échec, l'imagette n'est pas
+  <filename>/path/to/thumbnail</filename>. En cas d'échec, la vignette n'est pas
   montrée.
   </para>
   <para>
-  Notez les nombreuses étapes nécessaires ! ROX-Filer utilisera volontiers une imagette
+  Notez les nombreuses étapes nécessaires ! ROX-Filer utilisera volontiers une vignette
   existante, même s'il ne sait pas comment celle-ci a été générée.
   </para>
 </sect1>
@@ -2068,7 +2083,8 @@ Utilisez cette commande si vous voulez sélectionner des objets correspondant à
 <orderedlist><title>Par exemple, pour sélectionner tous les fichiers "pesant" plus de 5 Mb :</title>
 
 <listitem><para>
-		Choisissez la commande <guimenuitem>Sélectionner si...</guimenuitem>.
+		Choisissez la commande <guimenuitem>Sélectionner si...</guimenuitem> (raccourci-clavier par 
+		défaut : <keycap>?</keycap>).
 </para></listitem>
 
 <listitem><para>
@@ -2099,9 +2115,9 @@ pour passer d'un objet sélectionné à un autre, en boucle.
   </para>
 
   <para>
-   Cette fenêtre vous montre deux colonnes. La colonne <guilabel>Avant</guilabel> 
+   Cette fenêtre vous montre deux colonnes. La colonne <guilabel>Ancien nom</guilabel> 
    affiche le nom actuel de tous les fichiers sélectionnés, et la colonne 
-   <guilabel>Après</guilabel> affiche le nouveau nom, qui est le même au début de 
+   <guilabel>Nouveau nom</guilabel> affiche le nouveau nom, qui est le même au début de 
    la procédure de renommage en masse.
   </para>
 
@@ -2338,8 +2354,7 @@ Vous pouvez combiner plusieurs tests &mdash; <userinput>-rw</userinput> donnera 
 </para></listitem>
 
 <listitem><para>
-<userinput>EstPorte</userinput> : les portes sont un peu comme les sockets ou 
-les tubes, et n'ont été vues que sous Solaris.
+<userinput>EstPorte (-O)</userinput> correspond à un objet <foreignphrase lang="en">door</foreignphrase> (Solaris).
 </para></listitem>
 
 </itemizedlist>
@@ -2629,10 +2644,11 @@ Il y a deux boutons en bas de la boîte de configuration :
  <listitem>
   <para>
    <guibutton>OK</guibutton>
-   sauve vos choix dans votre dossier Choices, pour que <application>ROX-Filer</application> 
+   sauve vos choix dans votre dossier 
+   <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>, pour que <application>ROX-Filer</application> 
    les retrouve la prochaine fois qu'il sera exécuté. 
    L'endroit exact où les choix sont sauvegardés est défini par la variable d'environnement 
-   <envar>CHOICESPATH</envar> &mdash; voir <citation>Choices</citation> pour plus de détails. 
+   <envar>XDG_CONFIG_HOME</envar> &mdash; voir <citation>BaseDir</citation> pour plus de détails. 
    Puisque tous vos choix prennent effet immédiatement, vous n'avez pas besoin de cliquer sur 
    <guibutton>OK</guibutton> pour voir ce qui change.
   </para>
@@ -2736,8 +2752,10 @@ pour voir ce qu'elle fait.
   Elle fonctionne un peu de la même façon que la boîte 'Fixer l'action d'exécution' décrite
   ci-dessus, sauf que vous pouvez affecter une icône pour un fichier précis (par son nom),
   ou pour tous les fichiers d'un type particulier. Si vous affectez une icône à un fichier 
-  précis, le <foreignphrase lang="en">filer</foreignphrase> enregistre les noms de ce fichier et de cette icône dans le dossier 
-  <filename>Choices</filename>. Si l'un ou l'autre est déplacé, l'icône ne sera plus affichée.
+  précis, le <foreignphrase lang="en">filer</foreignphrase> enregistre les noms de ce fichier 
+  et de cette icône dans le dossier 
+  <filename>~/.config/rox.sourceforge.net/MIME-icons</filename>.
+  Si l'un ou l'autre est déplacé, l'icône ne sera plus affichée.
  </para>
  <para>
   Quand vous affectez une icône à un répertoire, vous avez la possibilité de copier cette icône 
@@ -2756,8 +2774,8 @@ pour voir ce qu'elle fait.
 <sect1>
  <title>Comment les types de fichier sont enregistrés</title>
  <para>
-  <application>ROX-Filer</application> utilise deux sous-dossiers dans votre dossier Choices pour gérer
-  les types de fichier :
+  <application>ROX-Filer</application> utilise deux sous-dossiers dans votre dossier 
+  <filename>~/.config/rox.sourceforge.net</filename> pour gérer les types de fichier :
   <variablelist>
    <varlistentry>
 	<term><filename>MIME-types</filename></term>
@@ -2795,21 +2813,39 @@ pour voir ce qu'elle fait.
  <listitem>
   <para>
    contient les images utilisées pour afficher chaque type de fichier.
-   Donc le <foreignphrase lang="en">filer</foreignphrase> essaiera d'afficher un fichier HTML en utilisant l'icône nommée
-   <filename>MIME-icons/text_html.png</filename>.
+   Donc le <foreignphrase lang="en">filer</foreignphrase> essaiera d'afficher un fichier HTML 
+   en utilisant l'icône nommée <filename>MIME-icons/text_html.png</filename>. S'il n'y a pas 
+   d'icône définie ici, le <foreignphrase lang="en">filer</foreignphrase> utilisera le thème 
+   d'icône choisi dans la boîte Options (voir <citation>IconTheme</citation> pour plus de détails).
   </para>
  </listitem>
 </varlistentry>
 
 </variablelist>
 
-Dans les dossiers <filename>MIME-types</filename> et <filename>MIME-icons</filename>,
-vous pouvez définir les actions/images par défaut pour chaque type de média.
+Dans le dossier <filename>MIME-types</filename>, vous pouvez définir les actions par défaut 
+pour chaque type de média.
 Par exemple, si <filename>text_html</filename> n'est pas trouvé, le <foreignphrase lang="en">filer</foreignphrase>
 essaiera simplement d'utiliser <filename>text</filename>.
+   </para>
+
+  </sect1>
+
+  <sect1>
+   <title>Comment le <foreignphrase lang="en">filer</foreignphrase> détermine-t-il un type de fichier ?</title> 
+   <para>
+    Le <foreignphrase lang="en">filer</foreignphrase> utilise la plupart du temps le nom du fichier 
+	pour déterminer son type. En cas d'échec, il essaiera de trouver d'après le contenu du fichier. 
+	Si vous ne souhaitez pas qu'il essaie de cette manière, fixez le type correct du fichier en 
+	utilisant les attributs étendus, grâce à la commande <guimenuitem>Fixer le type...</guimenuitem>.
 
   </para>
   <para>
+	Pour gérer les règles utilisées pour déterminer le type d'un fichier en fonction de son nom, 
+	ouvrez la boîte Options et sélectionnez la section Types.
+    Vous y trouverez un bouton qui démarrera l'application MIME-Editor.
+    Vous pouvez aussi éditer ces règles manuellement &mdash; voir <citation>SharedMIME</citation> pour plus de détails.
+
    Le <foreignphrase lang="en">filer</foreignphrase> cherche le type d'un fichier en fonction de son nom. Les règles sont définies dans
    plusieurs fichiers <filename>globs</filename> &mdash; voir <citation>SharedMIME</citation> pour
    plus de détails.
@@ -3193,7 +3229,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 
       <listitem>
        <para>
-        GTK+ 2.0.1 ou postérieure (bibliothèques et en-têtes) &mdash; dernière 
+        GTK+ 2.4.0 ou postérieure (bibliothèques et en-têtes) &mdash; dernière 
 		version téléchargeable depuis <citation>GTK+</citation>,
        </para>
       </listitem>
@@ -3218,7 +3254,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 	 <command>pkg-config</command>, comme ceci (<prompt>$</prompt> est le prompt) :
 
      <screen>$ pkg-config --modversion gtk+-2.0
-      2.0.5</screen>
+      2.6.8</screen>
 
     </para>
 
@@ -3255,17 +3291,10 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
       <para>
        <application>ROX-Filer</application> va effectuer quelques tests pour trouver 
 	   sur quel type de système vous travaillez, puis va commencer la compilation. 
-	   Si ça ne fonctionne pas, envoyez-moi un e-mail et plaignez-vous ! (ndt : plaignez-vous 
+	   Si ça ne fonctionne pas, envoyez-moi un courriel et plaignez-vous ! (ndt : plaignez-vous 
 	   -en anglais- à l'auteur de ce manuel, pas à moi ;-)
 	   Dites-moi quel type de système vous avez et quels sont les messages d'erreur affichés. 
-	   Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un e-mail avec le correctif.
-      </para>
-	  <para>
-       Le fichier exécutable se trouve à l'intérieur du dossier ROX-Filer, dans un 
-       sous-répertoire différent pour chaque plate-forme. Ainsi, vous pouvez compiler 
-	   la même application sur plusieurs types de machines différents et l'exécuter depuis 
-	   n'importe laquelle en utilisant le script <filename>AppRun</filename>. 
-	   C'est particulièrement utile dans un environnement réseau.
+	   Si vous réussissez à régler le problème vous-même, envoyez-moi SVP un courriel avec le correctif.
       </para>
      </step>
 
@@ -3350,8 +3379,12 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
      <para>
 	    <variablelist>
 
-		     <varlistentry><term><option>-b</option></term><term><option>--bottom=PANEL</option></term>
-			  <listitem><para>crée un panneau en bas de votre écran.
+			<varlistentry><term><option>-b</option></term><term><option>--border=PANEL</option></term>
+			  <listitem><para>affiche le panneau PANEL.
+			 </para></listitem></varlistentry>
+
+			<varlistentry><term><option>-B</option></term><term><option>--bottom=PANEL</option></term>
+			  <listitem><para>affiche le panneau PANEL en bas de votre écran.
 			 </para></listitem></varlistentry>
 
 			 <varlistentry><term><option>-c</option></term><term><option>--client-id=ID</option></term>
@@ -3402,6 +3435,11 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 
   <varlistentry><term><option>-s</option></term><term><option>--show=FILE</option></term>
    <listitem><para>Ouvre une fenêtre et affiche le dossier où se trouve FILE.
+  </para></listitem></varlistentry>
+
+  <varlistentry><term><option>-S</option></term><term><option>--rox-session</option></term>
+   <listitem><para>Démarrer sous une session 'ROX-Session', ouvre les panneau et punaiseur 
+   par défaut (implique l'utilisation de --new).
   </para></listitem></varlistentry>
 
   <varlistentry><term><option>-t</option></term><term><option>--top=PANEL</option></term>
@@ -3615,7 +3653,8 @@ pour n'afficher que les fichiers se terminant par .c.
    Ouvre le panneau nommé <parameter>Name</parameter> sur le côté de l'écran précisé en
    <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|
    <userinput>Left</userinput>|<userinput>Right</userinput> &mdash; NDT : Haut|Bas|Gauche|Droite).
-   <parameter>Name</parameter> peut être un nom stocké dans <filename>Choices</filename>
+   <parameter>Name</parameter> peut être un nom stocké dans 
+   <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
    (par exemple <userinput>MonPanneau</userinput>), ou un chemin complet.
   </para>
  </listitem>
@@ -3624,11 +3663,14 @@ pour n'afficher que les fichiers se terminant par .c.
   <para>
    <function>PanelAdd</function>(<parameter>Side</parameter>, 
 	<parameter>Path</parameter>, [<parameter>Label</parameter>, 
-	<parameter>After</parameter>])
+	<parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
 	Ajoute <parameter>Path</parameter> au panneau sur le côté <parameter>Side</parameter>, 
 	avec le libellé <parameter>Label</parameter>. 
 	Si <parameter>After</parameter> est fixé à <userinput>true</userinput>, l'icône sera alignée 
-	à droite (ou en bas) du panneau, sinon à gauche (ou en haut).
+	à droite (ou en bas) du panneau, sinon à gauche (ou en haut). Si <parameter>Shortcut</parameter>
+	est précisé, il s'agit du raccourci-clavier à utiliser pour ouvrir cet objet. Les arguements 
+	<parameter>Args</parameter>, s'ils sont fournis, seront passés à l'objet lors de son démarrage, s'il s'agit 
+	d'un programme.
   </para>
  </listitem>
 
@@ -3646,8 +3688,8 @@ pour n'afficher que les fichiers se terminant par .c.
   <para>
    <function>Pinboard</function>([<parameter>Name</parameter>])
    Affiche sur le bureau le punaiseur nommé <parameter>Name</parameter>.
-   <parameter>Name</parameter> peut être un nom stocké dans <filename>Choices</filename>
-   (par exemple <userinput>MonPunaiseur</userinput>), ou un chemin complet.. S'il est
+   <parameter>Name</parameter> peut être un nom stocké dans <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
+   (par exemple <userinput>MonPunaiseur</userinput>), ou un chemin complet. S'il est
    omis, la fonction punaiseur est désactivée.
   </para>
  </listitem>
@@ -3655,9 +3697,13 @@ pour n'afficher que les fichiers se terminant par .c.
  <listitem>
   <para>
    <function>PinboardAdd</function>(<parameter>Path</parameter>, 
-	<parameter>X</parameter>, <parameter>Y</parameter>, [<parameter>Label</parameter>])
+	<parameter>X</parameter>, <parameter>Y</parameter>, 
+	[<parameter>Label</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
 	Ajoute <parameter>Path</parameter> au punaiseur à la position 
-	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter>.
+	(<parameter>X</parameter>, <parameter>Y</parameter>), en le nommant <parameter>Label</parameter> (facultatif).
+	Si <parameter>Shortcut</parameter> est précisé, il s'agit du raccourci-clavier 
+	à utiliser pour ouvrir cet objet. Les arguements <parameter>Args</parameter>, 
+	s'ils sont fournis, seront passés à l'objet lors de son démarrage, s'il s'agit d'un programme.
   </para>
  </listitem>
 
@@ -3777,6 +3823,14 @@ pour n'afficher que les fichiers se terminant par .c.
    seront ouverts après leur montage.
   </para>
  </listitem>
+
+ <listitem>
+  <para>
+   <function>Unmount</function>(<parameter>MountPoints</parameter>, [<parameter>Quiet</parameter>])
+   Démonte tous les dossiers spécifiés par <parameter>MountPoints</parameter>.
+  </para>
+ </listitem>
+
 </itemizedlist>
 </appendix>
 
@@ -3819,8 +3873,8 @@ pour n'afficher que les fichiers se terminant par .c.
 </bibliomixed>
 
 <bibliomixed>
-  <abbrev>Choices</abbrev><citetitle>The ROX Choices system,
-  <ulink url="http://rox.sourceforge.net/choices.html"/></citetitle>
+  <abbrev>BaseDir</abbrev><citetitle>The freedesktop.org base directory system,
+  <ulink url="http://www.freedesktop.org/wiki/Standards_2fbasedir_2dspec"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
@@ -3834,19 +3888,24 @@ pour n'afficher que les fichiers se terminant par .c.
 </bibliomixed>
 
 <bibliomixed>
- <abbrev>Imagettes</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
+ <abbrev>Vignettes</abbrev><citetitle>Thumbnail Managing Standard (Version 0.5)
   <ulink url="http://triq.net/~jens/thumbnail-spec/"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
  <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
-  <ulink url="http://rox.sf.net/wallpaper.html"/></citetitle>
+  <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Wallpaper"/></citetitle>
 </bibliomixed>
 
 <bibliomixed>
- <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
-  <ulink url="http://www.freedesktop.org/standards/shared-mime-info-spec/"/></citetitle>
+ <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.16)
+  <ulink url="http://www.freedesktop.org/wiki/Standards_2fshared_2dmime_2dinfo_2dspec"/></citetitle>
 </bibliomixed>
+
+<bibliomixed>
+ <abbrev>IconTheme</abbrev><citetitle>The freedesktop.org Icon Theme specification
+  <ulink url="http://www.freedesktop.org/wiki/Standards_2ficon_2dtheme_2dspec"/></citetitle>
+ </bibliomixed>
 
 </bibliography>
 </book>

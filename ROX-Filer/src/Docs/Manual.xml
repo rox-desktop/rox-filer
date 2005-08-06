@@ -166,7 +166,7 @@
     <screen>$ rox --pinboard=MyPinboard</screen>
 
     The pinboard configuration is saved in
-    <filename>~/.choices/rox.sourceforge.net/ROX-Filer/pb_MyPinboard</filename>
+    <filename>~/.config/rox.sourceforge.net/ROX-Filer/pb_MyPinboard</filename>
     as soon as you change it in some way (for example, by dropping a file
     onto the background). You can have as many pinboards as you like and
     switch between them by running rox again, eg:
@@ -197,7 +197,7 @@
     You can drag files onto either side of the panel to add them. Panel icons
     can be repositioned by dragging them with the middle mouse button.
     Changes to the panel are automatically saved to
-    <filename>~/.choices/rox.sourceforge.net/ROX-Filer/pan_MyPanel</filename>.
+    <filename>~/.config/rox.sourceforge.net/ROX-Filer/pan_MyPanel</filename>.
     As with the pinboard, you can switch between panel configurations
     simply by running rox again with a different panel name.
 
@@ -1045,7 +1045,7 @@
 
     Each entry in this submenu opens a savebox for creating a new file or
     directory. There are three standard entries; the others are the contents of
-    your <filename>~/.choices/rox.sourceforge.net/Templates</filename> directory, if it
+    your <filename>~/.config/rox.sourceforge.net/Templates</filename> directory, if it
     exists.
 
 
@@ -1539,8 +1539,8 @@ thumbnail for each file it scans. If a thumbnail exists it loads it and
 continues on to the next file.
   </para><para>
 To generate a thumbnail for a given file of type media/subtype the filer looks
-for a program <filename>~/.choices/rox.sourceforge.net/MIME-thumb/media_subtype</filename>,
-falling back to <filename>~/.choices/rox.sourceforge.net/MIME-thumb/media</filename> if one
+for a program <filename>~/.config/rox.sourceforge.net/MIME-thumb/media_subtype</filename>,
+falling back to <filename>~/.config/rox.sourceforge.net/MIME-thumb/media</filename> if one
 cannot be found (this duplicates how run actions for files are looked up). If
 neither file can be found and the file is of type image/* then the internal
 routines are used. If the file is not of type image/* then no thumbnail is
@@ -2301,7 +2301,7 @@ generated.
     <listitem><para>
       <guibutton>OK</guibutton>
       saves the current choices into your
-      <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename> directory for next time
+      <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename> directory for next time
       <application>ROX-Filer</application> is loaded, if anything changed.
       Exactly where choices are loaded from and saved to is controlled by the
       <envar>XDG_CONFIG_HOME</envar> environment variable &mdash; see
@@ -2406,7 +2406,7 @@ generated.
     you may specifiy an icon for one file individually (by name) as well as
     for all files of a particular type. When setting the icon for a single
     file, the filer stores the name of the file and the name of the icon inside
-    your <filename>~/.choices/rox.sourceforge.net/MIME-icons</filename>
+    your <filename>~/.config/rox.sourceforge.net/MIME-icons</filename>
     directory. If either moves, the icon won't be displayed.
     </para><para>
     When setting the icon for a directory, you have the additional option of
@@ -2426,7 +2426,7 @@ generated.
    <para>
 
     <application>ROX-Filer</application> uses two sub-directories in your
-    <filename>~/.choices/rox.sourceforge.net</filename> directory for filetypes:
+    <filename>~/.config/rox.sourceforge.net</filename> directory for filetypes:
 
     <variablelist>
 
@@ -2465,7 +2465,7 @@ generated.
 
     </variablelist>
 
-    In <filename>MIME-types</filename> can also provide default actions for each media type.
+    In <filename>MIME-types</filename> you can also provide default actions for each media type.
     For example, if <filename>text_html</filename> isn't found then the filer
     will try simply using <filename>text</filename>.
    </para>
@@ -3235,14 +3235,14 @@ means that only files ending in .c are shown.
      [<parameter>Name</parameter>])
      Open the panel named <parameter>Name</parameter> on screen side
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>).
-     <parameter>Name</parameter> can be a name in <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename>
+     <parameter>Name</parameter> can be a name in <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
      (eg, <userinput>MyPanel</userinput>) or a full pathname.
      If not given, the panel on that side is turned off.
    </para></listitem>
 
    <listitem><para><function>PanelAdd</function>(<parameter>Side</parameter>,
      <parameter>Path</parameter>, [<parameter>Label</parameter>,
-     <parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>]])
+     <parameter>After</parameter>, <parameter>Shortcut</parameter>, <parameter>Args</parameter>])
      Add <parameter>Path</parameter> to the panel on side <parameter>Side</parameter>,
      with label <parameter>Label</parameter>. If <parameter>After</parameter> is
      <userinput>true</userinput> the icon goes on the right/bottom side of the panel,
@@ -3261,7 +3261,7 @@ then this must match the label of the item.  If more than one item matches, only
 
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
      Display pinboard <parameter>Name</parameter> on the desktop background.
-     <parameter>Name</parameter> can be a name in  <filename>~/.choices/rox.sourceforge.net/ROX-Filer</filename>
+     <parameter>Name</parameter> can be a name in  <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
      (eg, <userinput>MyPinboard</userinput>) or a full pathname.
      If not given, the pinboard is turned off.
    </para></listitem>
