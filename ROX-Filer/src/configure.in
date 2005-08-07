@@ -156,19 +156,4 @@ VERSION=`sed -n 's/^.*<Version>\([.0-9]*\).*<\/Version>.*$/\1/p' ../AppInfo.xml`
 AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
 AC_MSG_RESULT(version $VERSION)
 
-dnl Locate the docbook.xsl file
-AC_MSG_CHECKING(docbook.xsl)
-DOCBOOX_XSL_PATH=
-for d in /usr/share/xml/docbook/stylesheet/nwalsh/xhtml /usr/share/xml/docbook/stylesheet/nwalsh/current/xhtml ; do
-  if test -e "$d/docbook.xsl" ; then
-    DOCBOOX_XSL_PATH="$d/docbook.xsl"
-  fi
-done
-if test "x$DOCBOOX_XSL_PATH" = x ; then
-  DOCBOOX_XSL_PATH="/usr/share/xml/docbook/stylesheet/nwalsh/xhtml/docbook.xsl"
-fi
-AC_SUBST(DOCBOOK_XSL_PATH)
-AC_MSG_RESULT($DOCBOOX_XSL_PATH)
-
 AC_OUTPUT(Makefile)
-AC_OUTPUT(Docs/Makefile)
