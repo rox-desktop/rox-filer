@@ -10,24 +10,27 @@ while (<VER>) {
 }
 close(VER);
 
-/(\d+)\.(\d+)\.(\d+)$/;
+/(\d+(\.\d+)*)$/;
 
-($a, $b, $c) = ($1, $2, $3);
+$version = $1;
+$_=$1;
+s/\./_/g;
+$dash = $_;
 
 print "Check the manual is up-to-date!\n";
-print "Version $a.$b.$c --- OK?\n";
+print "Version $version ($dash) --- OK?\n";
 
 <STDIN> =~ /^[yY]/ or die "OK, fix the version number!\n";
 
-system "cvs tag -F Release-$a-$b-$c";
+system "cvs tag -F Release-$dash";
 system "cd ROX-Filer/src/po; ./update-po; ./dist";
 
 chdir;
 
-mkdir "rox-$a.$b.$c", 0775 or warn "mkdir() failed: $!\n";
-chdir "rox-$a.$b.$c";
+mkdir "rox-$version", 0775 or warn "mkdir() failed: $!\n";
+chdir "rox-$version";
 
-system "cvs -dtal197\@cvs.sourceforge.net:/cvsroot/rox export -r Release-$a-$b-$c rox";
+system "cvs -dtal197\@cvs.sourceforge.net:/cvsroot/rox export -r Release-$dash rox";
 #system "cvs -d:pserver:anonymous\@cvs.sourceforge.net:/cvsroot/rox export -r Release-$a-$b-$c rox";
 
 system "cd rox/ROX-Filer/src; autoconf; cd Docs; make";
@@ -39,7 +42,7 @@ rmdir "rox";
 system "find -name '.cvsignore' | xargs rm";
 
 chdir "..";
-system "tar czf rox-$a.$b.$c.tgz rox-$a.$b.$c";
-system "rm -r rox-$a.$b.$c";
+system "tar czf rox-$version.tgz rox-$version";
+system "rm -r rox-$version";
 
 print "OK, done\n";
