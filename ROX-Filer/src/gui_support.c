@@ -1490,10 +1490,9 @@ gint current_event_button(void)
 	gint button = -1;
 
 	bev = (GdkEventButton *) gtk_get_current_event();
-	if (!bev)
-		return -1;
 
-	if (bev->type == GDK_BUTTON_PRESS || bev->type == GDK_BUTTON_RELEASE)
+	if (bev &&
+	    (bev->type == GDK_BUTTON_PRESS || bev->type == GDK_BUTTON_RELEASE))
 		button = bev->button;
 
 	gdk_event_free((GdkEvent *) bev);
