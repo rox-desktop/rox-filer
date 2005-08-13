@@ -267,7 +267,7 @@ int main(int argc, char **argv)
 	choices_init();
 	options_init();
 	i18n_init();
-	xtype_init();
+	xattr_init();
 
 	if (!app_dir)
 	{
@@ -685,6 +685,9 @@ static void show_features(void)
 		_("No (apsymbols.h not found)")
 #endif
 	       );
+
+	g_print("%s... %s\n", _("Extended attribute support"),
+		xattr_supported(NULL)? _("Yes"): _("No"));
 }
 
 static void soap_add(xmlNodePtr body,

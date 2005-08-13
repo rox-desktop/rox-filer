@@ -2,20 +2,24 @@
  * ROX-Filer, filer for the ROX desktop project
  * By Thomas Leonard, <tal197@users.sourceforge.net>.
  *
- * Extended filesystem attribute support for MIME types
+ * Extended filesystem attribute support, particularly for MIME types
  */
 
 #ifndef _XTYPES_H
 #define _XTYPES_H
 
 /* Prototypes */
-MIME_type *xtype_get(const char *path);
-int xtype_set(const char *path, const MIME_type *type);
-void xtype_init(void);
-
-int xtype_have_attr(const char *path);
+void xattr_init(void);
 
 /* path may be NULL to test for support in libc */
-int xtype_supported(const char *path);
+int xattr_supported(const char *path);
+
+int xattr_have(const char *path);
+gchar *xattr_get(const char *path, const char *attr, int *len);
+int xattr_set(const char *path, const char *attr,
+	      const char *value, int value_len);
+
+MIME_type *xtype_get(const char *path);
+int xtype_set(const char *path, const MIME_type *type);
 
 #endif

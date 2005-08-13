@@ -617,11 +617,11 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 	if (item->mime_type)
 		add_row(store, "", mime_type_comment(item->mime_type));
 
-	if (xtype_supported(NULL)) {
+	if (xattr_supported(NULL)) {
 		add_row(store, _("Extended attributes:"),
 		  (item->flags & ITEM_FLAG_HAS_XATTR)
 		  	? _("Present")
-			: xtype_supported(path) ? _("None")
+			: xattr_supported(path) ? _("None")
 						: _("Not supported"));
 	}
 

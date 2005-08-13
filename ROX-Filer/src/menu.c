@@ -795,7 +795,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 	gtk_widget_set_sensitive(filer_follow_sym,
 		strcmp(filer_window->sym_path, filer_window->real_path) != 0);
 	gtk_widget_set_sensitive(filer_set_type,
-				 xtype_supported(filer_window->real_path));
+				 xattr_supported(filer_window->real_path));
 
 	if (n_selected && o_menu_quick.int_value) 
 		popup_menu = (state & GDK_CONTROL_MASK)
@@ -1022,7 +1022,7 @@ static void set_type_items(FilerWindow *filer_window)
 	
 	paths = filer_selected_items(filer_window);
 	for(p=paths; p; p=g_list_next(p)) {
-		if(xtype_supported((const char *) p->data))
+		if(xattr_supported((const char *) p->data))
 			npass++;
 		else
 			nfail++;

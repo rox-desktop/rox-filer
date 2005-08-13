@@ -59,7 +59,7 @@ static ssize_t (*dyn_getxattr)(const char *path, const char *name,
 static ssize_t (*dyn_listxattr)(const char *path, char *list,
 			 size_t size) = NULL;
 
-void xtype_init(void)
+void xattr_init(void)
 {
 	void *libc;
 	
@@ -74,7 +74,7 @@ void xtype_init(void)
 	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
-int xtype_supported(const char *path)
+int xattr_supported(const char *path)
 {
 	char buf[1];
 	ssize_t nent;
@@ -95,7 +95,7 @@ int xtype_supported(const char *path)
 	return TRUE;
 }
 
-int xtype_have_attr(const char *path)
+int xattr_have(const char *path)
 {
 	char buf[1];
 	ssize_t nent;
@@ -114,46 +114,47 @@ int xtype_have_attr(const char *path)
 	return (nent>0);
 }
 
-MIME_type *xtype_get(const char *path)
+gchar *xattr_get(const char *path, const char *attr, int *len)
 {
 	ssize_t size;
 	gchar *buf;
-	MIME_type *type = NULL;
 
 	RETURN_IF_IGNORED(NULL);
 	
 	if (!dyn_getxattr)
 		return NULL;
 
-	size = dyn_getxattr(path, XTYPE_ATTR, "", 0);
+	size = dyn_getxattr(path, attr, "", 0);
 	if (size > 0)
 	{
 		int new_size;
 
 		buf = g_new(gchar, size + 1);
-		new_size = dyn_getxattr(path, XTYPE_ATTR, buf, size);
+		new_size = dyn_getxattr(path, attr, buf, size);
 
-		if (size == new_size)
+		if(size == new_size)
 		{
 			buf[size] = '\0';
-			type = mime_type_lookup(buf);
+			
+			if(len)
+				*len=(int) size;
+
+			return buf;
 		}
+
 		g_free(buf);
-
 	}
-	if (type)
-		return type;
 
-	/* Fall back to non-extended */
 	return NULL;
+
 }
 
 /* 0 on success */
-int xtype_set(const char *path, const MIME_type *type)
+int xattr_set(const char *path, const char *attr,
+	      const char *value, int value_len)
 {
 	int res;
-	gchar *ttext;
-
+	
 	if(o_xattr_ignore.int_value)
 	{
 		errno = ENOSYS;
@@ -163,26 +164,26 @@ int xtype_set(const char *path, const MIME_type *type)
 	if (!dyn_setxattr)
 	{
 		errno = ENOSYS;
-		return 1; /* Set type failed */
+		return 1; /* Set attr failed */
 	}
 
-	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
-	res = dyn_setxattr(path, XTYPE_ATTR, ttext, strlen(ttext), 0);
-	g_free(ttext);
+	if(value && value_len<0)
+		value_len = strlen(value);
 
-	return res;
+	return dyn_setxattr(path, attr, value, value_len, 0);
 }
+
 
 #elif defined(HAVE_ATTROPEN)
 
 /* Solaris 9 implementation */
 
-void xtype_init(void)
+void xattr_init(void)
 {	
 	option_add_int(&o_xattr_ignore, "xattr_ignore", FALSE);
 }
 
-int xtype_supported(const char *path)
+int xattr_supported(const char *path)
 {
 	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_ENABLED
@@ -195,7 +196,7 @@ int xtype_supported(const char *path)
 #endif
 }
 
-int xtype_have_attr(const char *path)
+int xattr_have(const char *path)
 {
 	RETURN_IF_IGNORED(FALSE);
 #ifdef _PC_XATTR_EXISTS
@@ -205,10 +206,11 @@ int xtype_have_attr(const char *path)
 #endif
 }
 
-MIME_type *xtype_get(const char *path)
+#define MAX_ATTR_SIZE BUFSIZ
+gchar *xattr_get(const char *path, const char *attr, int *len);
 {
 	int fd;
-	char buf[1024], *nl;
+	char *buf=NULL;
 	int nb;
 	MIME_type *type=NULL;
 
@@ -219,31 +221,27 @@ MIME_type *xtype_get(const char *path)
 		return NULL;
 #endif
 
-	fd=attropen(path, XTYPE_ATTR, O_RDONLY);
+	fd=attropen(path, attr, O_RDONLY);
   
 	if(fd>=0) {
-		nb=read(fd, buf, sizeof(buf));
+		buf = g_new(gchar, MAX_ATTR_SIZE);
+		nb=read(fd, buf, MAX_ATTR_SIZE);
 		if(nb>0) {
 			buf[nb]=0;
-			nl=strchr(buf, '\n');
-			if(nl)
-			        *nl=0;
-			type=mime_type_lookup(buf);
 		}
 		close(fd);
+
+		if(len)
+			*len=nb;
 	}
 
-	if(type)
-		return type;
-  
-	/* Fall back to non-extended */
-	return NULL;
+	return buf;
 }
 
-int xtype_set(const char *path, const MIME_type *type)
+int xattr_set(const char *path, const char *attr,
+	      const char *value, int value_len)
 {
 	int fd;
-	gchar *ttext;
 	int nb;
 
 	if(o_xattr_ignore.int_value)
@@ -252,14 +250,15 @@ int xtype_set(const char *path, const MIME_type *type)
 		return 1;
 	}
 
-	fd=attropen(path, XTYPE_ATTR, O_WRONLY|O_CREAT, 0644);
+	if(value && value_len<0)
+		value_len = strlen(value);
+
+	fd=attropen(path, attr, O_WRONLY|O_CREAT, 0644);
 	if(fd>0) {
-		ttext=g_strdup_printf("%s/%s",
-				      type->media_type, type->subtype);
-		nb=write(fd, ttext, strlen(ttext));
-		if(nb==strlen(ttext))
+		
+		nb=write(fd, value, value_len);
+		if(nb==value_len)
 			ftruncate(fd, (off_t) nb);
-		g_free(ttext);
 
 		close(fd);
 
@@ -273,31 +272,69 @@ int xtype_set(const char *path, const MIME_type *type)
 #else
 /* No extended attributes available */
 
-void xtype_init(void)
+void xattr_init(void)
 {
 }
 
-int xtype_supported(const char *path)
-{
-	return FALSE;
-}
-
-int xtype_have_attr(const char *path)
+int xattr_supported(const char *path)
 {
 	return FALSE;
 }
 
-MIME_type *xtype_get(const char *path)
+int xattr_have(const char *path)
+{
+	return FALSE;
+}
+
+gchar *xattr_get(const char *path, const char *attr, int *len)
 {
 	/* Fall back to non-extended */
 	return NULL;
 }
 
-int xtype_set(const char *path, const MIME_type *type)
+int xattr_set(const char *path, const char *attr,
+	      const char *value, int value_len)
 {
 	errno = ENOSYS;
 	return 1; /* Set type failed */
 }
 
 #endif
+
+MIME_type *xtype_get(const char *path)
+{
+	MIME_type *type = NULL;
+	gchar *buf;
+	char *nl;
+
+	buf = xattr_get(path, XTYPE_ATTR, NULL);
+
+	if(buf)
+	{
+		nl = strchr(buf, '\n');
+		if(nl)
+			*nl = 0;
+		type = mime_type_lookup(buf);
+		g_free(buf);
+	}
+	return type;
+}
+
+int xtype_set(const char *path, const MIME_type *type)
+{
+	int res;
+	gchar *ttext;
+
+	if(o_xattr_ignore.int_value)
+	{
+		errno = ENOSYS;
+		return 1;
+	}
+
+	ttext = g_strdup_printf("%s/%s", type->media_type, type->subtype);
+	res = xattr_set(path, XTYPE_ATTR, ttext, -1);
+	g_free(ttext);
+
+	return res;
+}
 
