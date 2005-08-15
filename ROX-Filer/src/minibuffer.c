@@ -363,7 +363,7 @@ static void complete(FilerWindow *filer_window)
 	
 	current_stem = strlen(leaf);
 
-	/* Find the longest other match of this name. It it's longer than
+	/* Find the longest other match of this name. If it's longer than
 	 * the currently entered text then complete only up to that length.
 	 */
 	view_get_iter(filer_window->view, &iter, 0);
@@ -376,7 +376,13 @@ static void complete(FilerWindow *filer_window)
 
 		while (other->leafname[stem] && item->leafname[stem])
 		{
-			if (other->leafname[stem] != item->leafname[stem])
+			gchar	a, b;
+			/* Like the matches() function below, the comparison of
+			 * leafs must be case-insensitive.
+			 */
+		  	a = g_ascii_tolower(item->leafname[stem]);
+		  	b = g_ascii_tolower(other->leafname[stem]);
+			if (a != b)
 				break;
 			stem++;
 		}
@@ -395,17 +401,23 @@ static void complete(FilerWindow *filer_window)
 	}
 	else if (current_stem < shortest_stem)
 	{
-		guchar	*extra;
 		gint tmp_pos;
-
-		extra = g_strndup(item->leafname + current_stem,
-				shortest_stem - current_stem);
-
-		tmp_pos = entry->text_length;
-		gtk_editable_insert_text(GTK_EDITABLE(entry), extra, -1,
+		
+		/* Have to replace the leafname text in the minibuffer rather
+		 * than just append to it.  Here's an example:
+		 * Suppose we have two dirs, /tmp and /TMP.
+		 * The user enters /t in the minibuffer and hits Tab.
+		 * With the g_ascii_tolower() code above, this would result
+		 * in /tMP being bisplayed in the minibuffer which isn't
+		 * intuitive.  Therefore all text after the / must be replaced.
+		 */
+		tmp_pos = leaf - text; /* index of start of leaf */
+		gtk_editable_delete_text(GTK_EDITABLE(entry),
+					 tmp_pos, entry->text_length);
+		gtk_editable_insert_text(GTK_EDITABLE(entry),
+					 item->leafname, shortest_stem,
 					 &tmp_pos);
 		
-		g_free(extra);
 		gtk_editable_set_position(GTK_EDITABLE(entry), -1);
 
 		if (o_filer_beep_multi.int_value)

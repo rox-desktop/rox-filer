@@ -153,8 +153,6 @@ gchar *xattr_get(const char *path, const char *attr, int *len)
 int xattr_set(const char *path, const char *attr,
 	      const char *value, int value_len)
 {
-	int res;
-	
 	if(o_xattr_ignore.int_value)
 	{
 		errno = ENOSYS;
