@@ -205,12 +205,11 @@ int xattr_have(const char *path)
 }
 
 #define MAX_ATTR_SIZE BUFSIZ
-gchar *xattr_get(const char *path, const char *attr, int *len);
+gchar *xattr_get(const char *path, const char *attr, int *len)
 {
 	int fd;
 	char *buf=NULL;
 	int nb;
-	MIME_type *type=NULL;
 
 	RETURN_IF_IGNORED(NULL);
 
