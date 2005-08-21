@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: pt_PT\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-08-18 17:49+0100\n"
-"PO-Revision-Date: 2005-08-18 17:45+0100\n"
+"PO-Revision-Date: 2005-08-21 16:21+0100\n"
 "Last-Translator: Renato Caldas <seventhguardian@gmail.com>\n"
 "Language-Team: Português de Protugal <pt@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -154,6 +154,17 @@ msgid ""
 "directories, devices, pipes or sockets, and then only\n"
 "on certain file systems and where the OS implements them.\n"
 msgstr ""
+"Normalmente o ROX-Filer determina o tipo de um ficheiro regular\n"
+"procurando um padrão no seu nome. Para alterar o tipo do ficheiro\n"
+"tem de renomeá-lo.\n"
+"\n"
+"Novos sistemas de ficheiros podem suportar algo chamado 'Atributos\n Estendidos' que podem ser usados para guardar dados adicionais de\n"
+"cada ficheiro como parâmetros nomeados. O ROX-Filer usa o atributo\n"
+"'user.mime_type' para guardar tipos de ficheiro.\n"
+"\n"
+"Tipos de ficheiro são apenas suportados para ficheiros regulares, e\n"
+"não para directorias, dispositivos, pipes ou sockets, e então apenas\n"
+"em certo sistemas de ficheiros e onde o S.O. os implementa.\n"
 
 #: action.c:416
 msgid ""
@@ -490,8 +501,7 @@ msgstr "Montar / Desmontar"
 
 #: action.c:2034
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
-msgstr ""
-"O ROX-Filer ainda não suporta pontos de montagem no seu sistema. Desculpe."
+msgstr "O ROX-Filer ainda não suporta pontos de montagem no seu sistema. Desculpe."
 
 #: action.c:2048 menu.c:210 tips:209
 msgid "Delete"
@@ -780,8 +790,7 @@ msgid "%d names matched, but the results were all the same"
 msgstr "%d nomes foram correspondidos, mas os resultados foram os mesmos"
 
 #: bulk_rename.c:293
-msgid ""
-"Specify a regular expression to match, and a string to replace matches with."
+msgid "Specify a regular expression to match, and a string to replace matches with."
 msgstr ""
 "Especifique uma expressão regular a corresponder, e uma expressão para "
 "substituir as correspondências."
@@ -895,8 +904,7 @@ msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr ""
 
 #: dnd.c:621
-msgid ""
-"Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgid "Sorry - I require a target type of text/uri-list or application/octet-stream."
 msgstr ""
 
 #: dnd.c:691
@@ -918,8 +926,7 @@ msgstr "Destino desconhecido"
 
 #: dnd.c:799
 msgid "Remote app can't or won't send me the data - sorry"
-msgstr ""
-"Aplicação remota não consegue ou não quer enviar-me os dados - desculpe"
+msgstr "Aplicação remota não consegue ou não quer enviar-me os dados - desculpe"
 
 #: dnd.c:812
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
@@ -945,13 +952,11 @@ msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr ""
 
 #: dnd.c:993
-msgid ""
-"Can't get data from remote machine (application/octet-stream not provided)"
+msgid "Can't get data from remote machine (application/octet-stream not provided)"
 msgstr ""
 
 #: dnd.c:1016
-msgid ""
-"Some of these files are on a different machine - they will be ignored - sorry"
+msgid "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr ""
 
 #: dnd.c:1023
@@ -1002,6 +1007,8 @@ msgid ""
 "Can't access '%s':\n"
 "%s"
 msgstr ""
+"Não é possivel aceder '%s':\n"
+"%s"
 
 #: filer.c:453
 #, c-format
@@ -1023,10 +1030,13 @@ msgid ""
 "\n"
 "Unmounting a device makes it safe to remove the disk."
 msgstr ""
+"Deseja desmontar este dispositivo?\n"
+"\n"
+"Desmontar um dispositivo faz com que seja seguro remover o disco."
 
 #: filer.c:566
 msgid "No change"
-msgstr ""
+msgstr "Sem alteração"
 
 #: filer.c:572 menu.c:862
 msgid "Unmount"
@@ -1043,6 +1053,9 @@ msgid ""
 "Press %s on its own to reselect the files later.\n"
 "Make sure NumLock is on if you use the keypad."
 msgstr ""
+"O grupo %s não está definido. Seleccione alguns ficheiros e pressione Ctrl+%s para definir o grupo."
+"Pressione apenas %s para re-seleccionar os ficheiros mais tarde.\n"
+"Certifique-se que o NumLock está ligado ao usar o keypad."
 
 #: filer.c:1267
 #, c-format
@@ -1059,16 +1072,18 @@ msgid "Cancel"
 msgstr "Cancelar"
 
 #: filer.c:2002
+#, fuzzy
 msgid "S"
-msgstr ""
+msgstr "Em Busca"
 
 #: filer.c:2004
 msgid "T"
 msgstr "M"
 
 #: filer.c:2026
+#, fuzzy
 msgid "Scanning, "
-msgstr ""
+msgstr "B"
 
 #: filer.c:2028
 msgid "Thumbs, "
@@ -1357,10 +1372,13 @@ msgid ""
 msgstr ""
 
 #: gtksavebox.c:598
+#, fuzzy
 msgid ""
 "Drag the icon to a directory viewer\n"
 "(or enter a full pathname)"
 msgstr ""
+"Arraste o ícone para um visualizador de directorias\n"
+"(ou introduza o caminho completo)"
 
 #: gui_support.c:331
 msgid ""
@@ -1396,8 +1414,7 @@ msgstr "Não foi possivel abrir o ficheiro '%s': %s"
 
 #: gui_support.c:1376
 #, c-format
-msgid ""
-"Failed to load image '%s': reason not known, probably a corrupt image file"
+msgid "Failed to load image '%s': reason not known, probably a corrupt image file"
 msgstr ""
 "Não foi possivel carregar a image '%s': razão desconhecida, provavelmente um "
 "ficheiro de imagem corrompido"
@@ -1455,16 +1472,18 @@ msgid "File"
 msgstr "Ficheiro"
 
 #: icon.c:141 menu.c:212 menu.c:875
+#, fuzzy
 msgid "Shift Open"
-msgstr ""
+msgstr "Abrir Com Shift"
 
 #: icon.c:142 menu.c:218
 msgid "Properties"
 msgstr "Propriedades"
 
 #: icon.c:143 menu.c:216
+#, fuzzy
 msgid "Set Run Action..."
-msgstr ""
+msgstr "Definir Run Action..."
 
 #: icon.c:144 menu.c:217
 msgid "Set Icon..."
@@ -1489,23 +1508,24 @@ msgstr "%s '%s'"
 
 #: icon.c:291
 msgid "Nothing"
-msgstr ""
+msgstr "Nada"
 
 #: icon.c:547
 msgid "The location must contain at least one character!"
-msgstr ""
+msgstr "A localização deve conter pelo menos um caracter!"
 
 #: icon.c:613
 msgid "You must first select some items to remove"
-msgstr ""
+msgstr "É necessário que primeiro seleccione alguns itens a remover"
 
 #: icon.c:627
 msgid "You must open the menu over an item"
 msgstr "Tem que abrir o menu sobre um item"
 
 #: icon.c:652 menu.c:1260
+#, fuzzy
 msgid "You can only set the run action for a regular file"
-msgstr ""
+msgstr "Apenas pode definir a run action para um ficheiro regular"
 
 #: icon.c:738
 msgid "Press the desired shortcut (eg, Control+F1)"
@@ -1643,11 +1663,12 @@ msgstr "Não suportado"
 
 #: infobox.c:637
 msgid "Link target:"
-msgstr ""
+msgstr "Destino da ligação:"
 
 #: infobox.c:649 infobox.c:652
+#, fuzzy
 msgid "Run action:"
-msgstr ""
+msgstr "Run action:"
 
 #: infobox.c:649
 msgid "Execute file"
@@ -1655,17 +1676,17 @@ msgstr "Executar ficheiro"
 
 #: infobox.c:744
 msgid "<nothing yet>"
-msgstr ""
+msgstr "<nada ainda>"
 
 #: infobox.c:814
 #, c-format
 msgid "file(1) says... %s"
-msgstr ""
+msgstr "o ficheiro(1) diz... %s"
 
 #: infobox.c:871
 #, c-format
 msgid "Could not change permissions: %s"
-msgstr ""
+msgstr "Não foi possivel alterar permissões: %s"
 
 #: infobox.c:889
 msgid "Owner"
@@ -1700,16 +1721,18 @@ msgid "SGID"
 msgstr "SGID"
 
 #: infobox.c:931
+#, fuzzy
 msgid "Sticky"
-msgstr ""
+msgstr "Pegajoso"
 
 #: infobox.c:953
 msgid "Symbolic link"
-msgstr ""
+msgstr "Ligação simbólica"
 
 #: infobox.c:956
+#, fuzzy
 msgid "ROX application"
-msgstr ""
+msgstr "Aplicação ROX"
 
 #: infobox.c:964
 msgid "mounted"
@@ -1722,12 +1745,12 @@ msgstr "desmontado"
 #: infobox.c:968
 #, c-format
 msgid "Mount point for %s (%s)"
-msgstr ""
+msgstr "Ponto de montagem para %s (%s)"
 
 #: infobox.c:971
 #, c-format
 msgid "Mount point (%s)"
-msgstr ""
+msgstr "Ponto de montagem (%s)"
 
 #: main.c:95
 msgid ""
@@ -1738,6 +1761,12 @@ msgid ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
+"Copyright (C) 2005 Thomas Leonard.\n"
+"ROX-Filer vem com ABSOLUTAMENTE NENHUMA GARANTIA,\n"
+"em toda a extensão permitida por lei.\n"
+"Você pode redistribuir cópias do ROX-Filer\n"
+"sob os termos da GNU General Public License.\n"
+"Para mais informações sobre este assunto, veja o ficheiro chamado COPYING.\n"
 
 #: main.c:104
 msgid "Try `ROX-Filer/AppRun --help' for more information.\n"
@@ -2038,14 +2067,12 @@ msgid "Window"
 msgstr "Janela"
 
 #: menu.c:236
-#, fuzzy
 msgid "Parent, New Window"
-msgstr "Mãe, Nova Janela"
+msgstr "Directoria Acima, Nova Janela"
 
 #: menu.c:237
-#, fuzzy
 msgid "Parent, Same Window"
-msgstr "Mãe, Mesma Janela"
+msgstr "Directoria Acima, Mesma Janela"
 
 #: menu.c:238
 msgid "New Window"
@@ -2157,8 +2184,7 @@ msgstr "O novo caminho não é absoluto"
 #: menu.c:1214
 #, c-format
 msgid "Symlink from '%s' already exists. Replace it with a link to '%s'?"
-msgstr ""
-"A ligação a partir de '%s' já existe. Substituir por uma ligação a '%s'?"
+msgstr "A ligação a partir de '%s' já existe. Substituir por uma ligação a '%s'?"
 
 #: menu.c:1220
 msgid "_Replace"
@@ -2225,8 +2251,7 @@ msgstr ""
 
 #: menu.c:1496 menu.c:1536
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
-msgstr ""
-"A definição da sua variavel CHOICESPATH impede a personalização - desculpe."
+msgstr "A definição da sua variavel CHOICESPATH impede a personalização - desculpe."
 
 #: menu.c:1529
 #, c-format
@@ -2297,8 +2322,9 @@ msgid "Set type of ... ?"
 msgstr "Definir tipo de ... ?"
 
 #: menu.c:1887
+#, fuzzy
 msgid "Set run action for ... ?"
-msgstr ""
+msgstr "Definir run action para ... ?"
 
 #: menu.c:1890
 msgid "Set icon for ... ?"
@@ -2353,6 +2379,15 @@ msgid ""
 "\tgtk-can-change-accels = 1\n"
 "\t(this only works if NOT using XSETTINGS)"
 msgstr ""
+"Atalhos definíveis pelo utilizador são desactivados por defeito no Gtk2, "
+"e você não os activou. Pode activar esta característica ao:\n"
+"\n"
+"1) usar um gestor de XSettings, tal como o ROX-Session ou o gnome-settings-daemon, "
+"or\n"
+"\n"
+"2) adicionando esta linha ao ~/.gtkrc-2.0:\n"
+"\tgtk-can-change-accels = 1\n"
+"\t(isto funciona se NÃO estiver a usar XSETTINGS)"
 
 #: menu.c:2052
 msgid ""
@@ -2365,6 +2400,13 @@ msgid ""
 "The key will appear next to the menu item and you can just press that key "
 "without opening the menu in future."
 msgstr ""
+"Para definir uma atalho de teclado para um item do menu:\n"
+"\n"
+"- Abra o menu sobre uma janela do gestor de ficheiros,\n"
+"- Mova o ponteiro sobre o item que quer usar,\n"
+"- Pressione a tecla que quer associada ao menu.\n"
+"\n"
+"A tecla aparecerá ao lado do item do menu, e de futuro poderá simplesmente pressionar essa tecla sem ter que abrir o menu."
 
 #: menu.c:2067
 msgid "Set keyboard shortcuts"
@@ -2392,15 +2434,18 @@ msgid "Pattern:"
 msgstr "Padrão:"
 
 #: minibuffer.c:264
+#, fuzzy
 msgid ""
 "Enter the name of a file and I'll display it for you. Press Tab to fill in "
 "the longest match. Escape to close the minibuffer."
 msgstr ""
+"Introduza o nome de um ficheiro e eu mostra-lo-ei por si. Pressione Tab para "
+"preencher a correspondência mais longa. Escape fecha o minibuffer."
 
 #: minibuffer.c:270
-msgid ""
-"Enter a shell command to execute. Click on a file to add it to the buffer."
-msgstr ""
+#, fuzzy
+msgid "Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr "Introduza um comando 'shell' a executar. Clique num ficheiro para adicioná-lo ao buffer."
 
 #: minibuffer.c:275
 msgid ""
@@ -2453,8 +2498,7 @@ msgstr "_Reverter"
 
 #: options.c:968
 msgid "Restore all choices to how they were when the Options box was opened."
-msgstr ""
-"Restaurar todas as escolhas como estavam antes da caixa Opções ser aberta."
+msgstr "Restaurar todas as escolhas como estavam antes da caixa Opções ser aberta."
 
 #: options.c:983
 #, c-format
@@ -2467,7 +2511,7 @@ msgstr ""
 
 #: options.c:991
 msgid "(saving disabled by CHOICESPATH)"
-msgstr ""
+msgstr "(guardar desactivado pela CHOICESPATH)"
 
 #: options.c:1164 usericons.c:450
 #, c-format
@@ -2569,15 +2613,14 @@ msgstr "Borda direita"
 #: pinboard.c:354
 #, fuzzy
 msgid "Your old pinboard file has been converted to the new XML format."
-msgstr ""
-"O seu antigo ficheiro do pinboard foi convertido para o novo formato XML."
+msgstr "O seu antigo ficheiro do pinboard foi convertido para o novo formato XML."
 
 #: pinboard.c:635
 msgid ""
 "The backdrop handler must be an application directory. Drag an application "
 "directory into the Set Backdrop dialog box, or (for programmers) pass it to "
 "the SOAP SetBackdropApp method."
-msgstr ""
+msgstr "O gestor da imagem de fundo deve ser uma directoria de aplicação. Arraste uma directoria de aplicação para a caixa Definir Fundo, ou (para programadores) passe-a para o método SOAP SetBackdropApp."
 
 #: pinboard.c:654
 msgid ""
@@ -2587,6 +2630,11 @@ msgid ""
 "Programmers: the application's AppInfo.xml must contain the CanSetBackdrop "
 "element, as described in ROX-Filer's manual."
 msgstr ""
+"Pode apenas definir como fundo uma imagem ou um programa que saiba como"
+"gerir o fundo de ecrâ do ROX-Filer's.\n"
+"\n"
+"Programadores: o ficheiro AppInfo.xml da aplicação tem que conter o elemento "
+"CanSetBackdrop, como descrito no manual do ROX-Filer's."
 
 #: pinboard.c:674
 msgid "Set backdrop"
@@ -2633,10 +2681,13 @@ msgid "Drop an image here"
 msgstr "Largue uma imagem aqui"
 
 #: pinboard.c:772
+#, fuzzy
 msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
+"Nenhum pinboard estava em uso... o pinboard 'Default' foi seleccionado. Use 'rox "
+"-p=Default' para activalo de futuro."
 
 #: pinboard.c:866
 msgid ""
@@ -2656,8 +2707,9 @@ msgstr "A faltar '>' depois da etiqueta do ícone"
 
 #: pinboard.c:1565
 #, c-format
+#, fuzzy
 msgid "Error saving pinboard %s: %s"
-msgstr ""
+msgstr "Erro ao guardar o pinboard %s: %s"
 
 #: pinboard.c:2109
 msgid "Backdrop..."
@@ -2709,7 +2761,7 @@ msgstr "Tipo de organização desconhecido '%s'"
 #: remote.c:1117
 #, c-format
 msgid "Attempt to invoke unknown SOAP method '%s'"
-msgstr ""
+msgstr "Tentar invocar o método SOAP desconhecido '%s'"
 
 #: rox_gettext.c:95
 #, c-format
@@ -2719,8 +2771,7 @@ msgstr "Ficheiro de tradução .gmo inválido (demasiado pequeno): %s"
 #: rox_gettext.c:108
 #, c-format
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
-msgstr ""
-"Ficheiro de tradução .gmo inválido (número GNU magic não encontrado): %s"
+msgstr "Ficheiro de tradução .gmo inválido (número GNU magic não encontrado): %s"
 
 #: run.c:96 run.c:141
 #, c-format
@@ -2744,29 +2795,35 @@ msgid ""
 "(hold down Shift while you open it). Most applications provide their own "
 "help here, but this one doesn't."
 msgstr ""
+"Aplicação:\n"
+"Isto é uma directoria de aplicação - pode corrê-la como um programa, ou abri-la (mantenha pressionado o Shift enquanto a abre). A maioria das aplicações disponibiliza a sua própria ajuda aqui, mas esta não."
 
 #: run.c:407
 #, c-format
 msgid "Could not send data to program: %s"
-msgstr ""
+msgstr "Não foi possivel enviar dados para o programa: %s"
 
 #: run.c:437
 #, c-format
 msgid "Could not read link: %s"
-msgstr ""
+msgstr "Não foi possivel ler a ligação: %s"
 
 #: run.c:465
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
-msgstr ""
+msgstr "Ligação quebrada (ou não tem permissões para a seguir): %s"
 
 #: run.c:502
 #, c-format
+#, fuzzy
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
 "the file to an application.%s"
 msgstr ""
+"Nenhuma run action especificada para ficheiros deste tipo (%s/%s) - pode definir "
+"uma run action escolhendo `Set Run Action' a partir do menu Ficheiro, ou pode "
+"apenas arrastar o ficheiro para uma aplicação.%s"
 
 #: run.c:508
 msgid ""
@@ -2775,6 +2832,10 @@ msgid ""
 "Note: If this is a computer program which you want to run, you need to set "
 "the execute bit by choosing Permissions from the File menu."
 msgstr ""
+"\n"
+"\n"
+"Nota: Se este é o programa de computador que deseja correr, é necessário que "
+"defina o bit executavel escolhendo Permissões a partir do menu Ficheiro."
 
 #: support.c:272
 msgid "B"
@@ -2794,7 +2855,7 @@ msgstr "Fechar janela do gestor"
 
 #: toolbar.c:119
 msgid "Up"
-msgstr "Cima"
+msgstr "Acima"
 
 #: toolbar.c:119
 msgid "Change to parent directory"
@@ -2818,11 +2879,11 @@ msgstr "Menu Favoritos"
 
 #: toolbar.c:131
 msgid "Scan"
-msgstr ""
+msgstr "Actualizar"
 
 #: toolbar.c:131
 msgid "Rescan directory contents"
-msgstr ""
+msgstr "Actualizar o conteúdo da directoria"
 
 #: toolbar.c:135
 msgid "Change icon size"
@@ -2925,31 +2986,31 @@ msgstr "Ponto de montagem"
 
 #: type.c:207
 msgid "App dir"
-msgstr ""
+msgstr "Dir aplic"
 
 #: type.c:214
 msgid "Dir"
-msgstr ""
+msgstr "Dir"
 
 #: type.c:216
 msgid "Char dev"
-msgstr ""
+msgstr "Disp caract."
 
 #: type.c:218
 msgid "Block dev"
-msgstr ""
+msgstr "Disp blocos"
 
 #: type.c:220
 msgid "Pipe"
-msgstr ""
+msgstr "Pipe"
 
 #: type.c:222
 msgid "Socket"
-msgstr ""
+msgstr "Socket"
 
 #: type.c:224
 msgid "Door"
-msgstr ""
+msgstr "Porta"
 
 #: type.c:227
 msgid "Unknown"
@@ -2957,6 +3018,7 @@ msgstr "Desconhecido"
 
 #: type.c:355
 #, c-format
+#, fuzzy
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
 "permissions now (this problem may have been caused by a bug in earlier "
@@ -2969,10 +3031,20 @@ msgid ""
 "Otherwise, you should check, or even just delete, all the existing run "
 "actions."
 msgstr ""
+"O executavel '%s' pode ser escrito por todos! Recuso-me a corrê-lo. Por favor "
+"altere as permissões agora (este problema pode ter sido causado por um bug "
+"numa das versões anteriores do gestor de ficheiros).\n"
+"\n"
+"Tendo (non-symlink) run actions world-writeable significa que outras pessoas "
+"que usem o seu computador podem substituir as suas run actions por versões maliciosas.\n"
+"\n"
+"Se confia em todas as pessoas que podem escrever nestes ficheiros, então "
+"não se precisa de preocupar. Caso contrário, deve verificar, ou simplesmente "
+"até apagar todas as run actions existentes."
 
 #: type.c:368
 msgid "go-w (Fix security problem)"
-msgstr ""
+msgstr "go-w(Corrigir problema de segurança)"
 
 #: type.c:498
 msgid ""
@@ -2980,6 +3052,9 @@ msgid ""
 "\n"
 "gimp \"$@\""
 msgstr ""
+"Introduza um comando de 'shell' que irá abrir \"$@\" num programa adequado. Ex:\n"
+"\n"
+"gimp \"$@\""
 
 #: type.c:679
 msgid "This is not a program! Give me an application instead!"
@@ -2991,8 +3066,9 @@ msgstr "Nenhuma acção definida"
 
 #: type.c:766
 #, c-format
+#, fuzzy
 msgid "Error in handler %s: %s"
-msgstr ""
+msgstr "Erro no manipulador %s: %s"
 
 #: type.c:781
 #, c-format
@@ -3009,14 +3085,14 @@ msgid "Set run action"
 msgstr "Definir acção"
 
 #: type.c:831
-msgid ""
-"If a handler for the specific type isn't set up, use this as the default."
-msgstr ""
+#, fuzzy
+msgid "If a handler for the specific type isn't set up, use this as the default."
+msgstr "Se não estiver definido um handler para um tipo específico, usar este como predefinição."
 
 #: type.c:833
 #, c-format
 msgid "Set default for all `%s/<anything>'"
-msgstr ""
+msgstr "Definir predifinição para todos `%s/<anything>'"
 
 #: type.c:837
 msgid "Use this application for all files with this MIME type."
@@ -3025,11 +3101,11 @@ msgstr "Usar esta aplicação para todos os ficheiros com este tipo MIME."
 #: type.c:839
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
-msgstr ""
+msgstr "Apenas para o tipo `%s' (%s/%s)"
 
 #: type.c:845
 msgid "Drop a suitable application here"
-msgstr ""
+msgstr "Largue uma aplicação adequada aqui"
 
 #: type.c:860
 msgid "OR"
@@ -3060,8 +3136,7 @@ msgstr ""
 
 #: type.c:1249
 #, c-format
-msgid ""
-"Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
+msgid "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
 msgstr ""
 
 #: type.c:1264
@@ -3108,8 +3183,7 @@ msgid "Set icon"
 msgstr "Definir ícone"
 
 #: usericons.c:279
-msgid ""
-"Use a copy of the image as the default for all files of these MIME types."
+msgid "Use a copy of the image as the default for all files of these MIME types."
 msgstr ""
 "Usar uma cópia da imagem como predefinição para todos os ficheiros deste "
 "tipo MIME."
@@ -3365,10 +3439,11 @@ msgid "Short titlebar flags"
 msgstr "Flags curtas na barra de título"
 
 #: tips:39
+#, fuzzy
 msgid ""
 "Use single letters instead of words for Scanning, All and Thumbs indicators "
 "in the titlebar."
-msgstr ""
+msgstr "Usar letras únicas em vez de palavras para os indicadores Em Busca, Todos e Miniaturas na barra de título."
 
 #: tips:40
 msgid "Unique windows"
@@ -3571,8 +3646,7 @@ msgstr "Ordenar ícones pequenos verticalmente"
 
 #: tips:90
 #, fuzzy
-msgid ""
-"If this option is on, then small icons are arranged in columns, not rows."
+msgid "If this option is on, then small icons are arranged in columns, not rows."
 msgstr ""
 "Com esta opção activa, os ícones pequenos serão ordenados verticalmente, em "
 "vez de horizontalmente."
@@ -3583,8 +3657,7 @@ msgstr "Ordenar ícones grandes verticalmente"
 
 #: tips:92
 #, fuzzy
-msgid ""
-"If this option is on, then large icons are arranged in columns, not rows."
+msgid "If this option is on, then large icons are arranged in columns, not rows."
 msgstr ""
 "Com esta opção activa, os ícones grandes serão ordenados verticalmente, em "
 "vez de horizontalmente."
@@ -3734,14 +3807,16 @@ msgstr ""
 "guardadas em cache. Elas serão criadas de novo se necessário."
 
 #: tips:123 tips:196
+#, fuzzy
 msgid "Pinboard"
-msgstr ""
+msgstr "Pinboard"
 
 #: tips:124
+#, fuzzy
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
-msgstr ""
+msgstr "Ao usar um pinboard, pode arrastar ficheiros e aplicações para o fundo de ecrâ para criar atalhos para eles."
 
 #: tips:125 tips:242
 msgid "Appearance"
@@ -3970,10 +4045,8 @@ msgid "Image only for applications"
 msgstr "Apenas imagem para aplicações"
 
 #: tips:174
-msgid ""
-"Applications have just an image, everything else has both an image and text."
-msgstr ""
-"Aplicações têm apenas uma imagem, todo o resto tem tanto imagem como texto."
+msgid "Applications have just an image, everything else has both an image and text."
+msgstr "Aplicações têm apenas uma imagem, todo o resto tem tanto imagem como texto."
 
 #: tips:175
 msgid "Image only"
@@ -4028,8 +4101,7 @@ msgstr ""
 "paineis a apenas um monitor, em vez de os reproduzir em cada ecrâ."
 
 #: tips:185
-msgid ""
-"The monitor the panels are confined to in Xinerama mode (numbered from 0)."
+msgid "The monitor the panels are confined to in Xinerama mode (numbered from 0)."
 msgstr ""
 "O monitor ao qual os paineis estão confinados no modo Xinerama (numerado a "
 "partir de 0)."
@@ -4039,10 +4111,13 @@ msgid "Desktop"
 msgstr "Desktop"
 
 #: tips:187
+#, fuzzy
 msgid ""
 "When run by a session manager program (such as ROX-Session) the filer can "
 "open up a panel and/or the pinboard.  Here you configure which."
 msgstr ""
+"Ao ser corrido por um gestor de sessão (tal como o ROX-Session) o gestor de "
+"ficheiros pode abrir um painel e/ou o pinboard.  Aqui pode configurar qual."
 
 #: tips:188
 msgid "Panel only"
@@ -4219,8 +4294,7 @@ msgstr "Copiar os ficheiros"
 msgid ""
 "Note that you can still get the menu to appear, by dragging with Alt held "
 "down."
-msgstr ""
-"Note que pode sempre fazer o menu aparecer, arrastando com o Alt pressionado."
+msgstr "Note que pode sempre fazer o menu aparecer, arrastando com o Alt pressionado."
 
 #: tips:235
 msgid "When dragging files with the middle mouse button"
@@ -4387,22 +4461,21 @@ msgstr ""
 
 #: tips:273
 msgid "Character device:"
-msgstr ""
+msgstr "Dispositivo de caracter:"
 
 #: tips:274
 msgid "Block device:"
-msgstr ""
+msgstr "Dispositivo de blocos:"
 
 #: tips:275
 msgid "Door:"
-msgstr ""
+msgstr "Porta:"
 
 #: tips:276
 msgid ""
 "Door files are a bit like sockets or pipes, and have only been seen on "
 "Solaris."
-msgstr ""
-"Ficheiros Door são como sockets ou pipes, mas apenas foram vistos em Solaris."
+msgstr "Ficheiros Porta são como sockets ou pipes, mas apenas foram vistos em Solaris."
 
 #: tips:277
 msgid "Executable file:"
@@ -4426,44 +4499,48 @@ msgstr "Problemas com gestores de janelas"
 
 #: tips:282
 msgid "Override window manager control of the pinboard and panels"
-msgstr ""
+msgstr "Sobrepor-se ao gestor de janelas no controlo do pinboard e dos paineis."
 
 #: tips:283
+#, fuzzy
 msgid ""
 "Some window managers don't support the new Extended Window Manager Hints "
 "system, and so treat the pinboard and panels like normal windows. Turn this "
 "on to fix problems such as the pinboard coming to the front when you click "
 "on it, titlebars and other decorations appearing around windows, or having "
 "them appear in window-select lists."
-msgstr ""
+msgstr "Alguns gestores de janelas não suportam os novo sistema Extended Window Manager Hints, e assim tratam o pinboard e os paineis como janelas normais. Active esta opção para solucionar problemas tais como o pinboard vir para a frente quando clica nele, títulos e outras decorações aparecerem à volta das janelas, ou estas aparecerem em listas de escolha de janelas."
 
 #: tips:284
 msgid "Pass all backdrop mouse clicks to window manager"
-msgstr ""
-"Passar todos os cliques do rato no fundo do ecrâ para o gestor de janelas."
+msgstr "Passar todos os cliques do rato no fundo do ecrâ para o gestor de janelas."
 
 #: tips:285
+#, fuzzy
 msgid ""
 "Normally, right clicking on the desktop background will open the pinboard "
 "menu and left clicking will clear the selection. Turn this on to forward the "
 "events to your window manager instead. Clicks on icons will not be forwarded."
-msgstr ""
+msgstr "Normalmente, clicar com o botão direito no fundo de ecrâ abre o menu do pinboard, e clicar com o botão esquerdo limpa a selecção. Com esta opção activa os eventos serão em vez disso passados para o gestor de janelas. Cliques nos ícones não serão passados."
 
 #: tips:286
+#, fuzzy
 msgid "Blackbox root menus hack"
-msgstr ""
+msgstr "Hack dos menus de raíz do Blackbox"
 
 #: tips:287
+#, fuzzy
 msgid ""
 "Blackbox, Fluxbox and similar window managers do not yet work well with the "
 "ROX-Filer pinboard. This option enables some workarounds. These window "
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
-msgstr ""
+msgstr "Blackbox, Fluxbox e gestores de janelas similares ainda não funcionam bem com o pinboard do ROX-Filer. Esta opção activa alguns workarouns. Espera-se que estes gestores de janelas mudem o seu comportamento em novas versões, de forma a que isto não seja mais necessário."
 
 #: tips:288
+#, fuzzy
 msgid "Panel is a 'dock'"
-msgstr ""
+msgstr "O painel é uma 'doca'"
 
 #: tips:289
 msgid ""
@@ -4510,3 +4587,4 @@ msgstr ""
 "sistemas de ficheiros mais recentes.  Com esta opção o menu Definir Tipo é "
 "desactivado, o tipo MIME do ficheiro é apenas derivado do nome do ficheiro e "
 "a janela de propriedades não reporta atributos extendidos."
+
