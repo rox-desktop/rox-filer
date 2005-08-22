@@ -1980,7 +1980,6 @@ void filer_set_title(FilerWindow *filer_window)
 {
 	gchar	*title = NULL;
 	guchar	*flags = "";
-	gchar  *hidden = "";
 
 	if (filer_window->scanning ||
 	    filer_window->filter != FILER_SHOW_ALL ||
@@ -1988,13 +1987,14 @@ void filer_set_title(FilerWindow *filer_window)
 	{
 		if (o_short_flag_names.int_value)
 		{
+			const gchar  *hidden = "";
 
 			switch(filer_window->filter) {
 			case FILER_SHOW_ALL:
-				hidden=filer_window->show_hidden? "A": "";
+				hidden=filer_window->show_hidden? _("A") : "";
 				break;
-			case FILER_SHOW_GLOB:   hidden="G"; break;
-			case FILER_SHOW_REGEXP: hidden="R"; break;
+			case FILER_SHOW_GLOB:   hidden =  _("G"); break;
+			case FILER_SHOW_REGEXP: hidden = "R"; break;
 			default: break;
 			}
 
@@ -2006,6 +2006,8 @@ void filer_set_title(FilerWindow *filer_window)
 		}
 		else
 		{
+			gchar  *hidden = NULL;
+
 			switch(filer_window->filter) {
 			case FILER_SHOW_ALL:
 				hidden=g_strdup(filer_window->show_hidden? _("All, "): "");
