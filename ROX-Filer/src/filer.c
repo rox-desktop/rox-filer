@@ -1994,7 +1994,6 @@ void filer_set_title(FilerWindow *filer_window)
 				hidden=filer_window->show_hidden? _("A") : "";
 				break;
 			case FILER_SHOW_GLOB:   hidden =  _("G"); break;
-			case FILER_SHOW_REGEXP: hidden = "R"; break;
 			default: break;
 			}
 
@@ -2010,18 +2009,15 @@ void filer_set_title(FilerWindow *filer_window)
 
 			switch(filer_window->filter) {
 			case FILER_SHOW_ALL:
-				hidden=g_strdup(filer_window->show_hidden? _("All, "): "");
+				hidden = g_strdup(filer_window->show_hidden
+						? _("All, ") : "");
 				break;
 			case FILER_SHOW_GLOB:
-				hidden=g_strdup_printf(_("Glob (%s), "),
-						 filer_window->filter_string);
-				break;
-			case FILER_SHOW_REGEXP:
-				hidden=g_strdup_printf(_("Regexp (%s), "),
+				hidden = g_strdup_printf(_("Glob (%s), "),
 						 filer_window->filter_string);
 				break;
 			default:
-				hidden=g_strdup("");
+				hidden  =g_strdup("");
 				break;
 			}
 			flags = g_strconcat(" (",
@@ -2879,8 +2875,6 @@ gboolean filer_match_filter(FilerWindow *filer_window, const gchar *filename)
 		return fnmatch(filer_window->filter_string,
 			       filename, 0)==0;
 		
-	case FILER_SHOW_REGEXP: /* Unimplemented */
-
 	case FILER_SHOW_ALL:
 	default:
 		break;
@@ -2908,7 +2902,6 @@ gboolean filer_set_filter(FilerWindow *filer_window, FilterType type,
 		case FILER_SHOW_ALL:
 			return FALSE;
 		case FILER_SHOW_GLOB:
-		case FILER_SHOW_REGEXP:
 			if (strcmp(filer_window->filter_string,
 				   filter_string) == 0)
 				return FALSE;
@@ -2934,11 +2927,6 @@ gboolean filer_set_filter(FilerWindow *filer_window, FilterType type,
 
 	case FILER_SHOW_GLOB:
 		filer_window->filter_string = g_strdup(filter_string);
-		break;
-
-	case FILER_SHOW_REGEXP:
-		filer_window->filter_string = g_strdup(filter_string);
-		/* Compile the pattern */
 		break;
 
 	default:

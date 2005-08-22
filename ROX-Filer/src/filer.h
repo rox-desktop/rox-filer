@@ -41,7 +41,6 @@ typedef enum
 {
 	FILER_SHOW_ALL,           /* Show all files, modified by show_hidden */
 	FILER_SHOW_GLOB,          /* Show files that match a glob pattern */
-	FILER_SHOW_REGEXP,        /* Show files that match a regular expression */
 } FilterType;
 
 /* iter's next method has just returned the clicked item... */
