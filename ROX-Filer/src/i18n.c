@@ -39,7 +39,8 @@
 		  "and restart the filer for the new language "		\
 		  "setting to take full effect.")
 
-char *current_lang = NULL;	/* Two-char country code, or NULL */
+/* Two/five-char country_territory code, or NULL */
+char *current_lang = NULL;
 
 static Option o_translation;
 
@@ -175,7 +176,7 @@ static void trans_changed(void)
 static void set_trans(const guchar *lang)
 {
 	guchar	*path;
-	gchar	*lang2 = NULL;
+	gchar	*lang2;
 
 	g_return_if_fail(lang != NULL);
 
@@ -187,20 +188,35 @@ static void set_trans(const guchar *lang)
 		return;
 	else if (strcmp(lang, "From LANG") == 0)
 	{
+		const guchar *end;
+
 		lang = getenv("LANG");
 		if (!lang)
 			return;
 		/* Extract the language code from the locale name.
 		 * language[_territory][.codeset][@modifier]
 		 */
-		if (lang[0] != '\0' && lang[1] != '\0'
-		    && (lang[2] == '_' || lang[2] == '.' || lang[2] == '@'))
-			lang2 = g_strndup((gchar *) lang, 2);
-	}
 
-	current_lang = lang2 ? lang2 : g_strdup(lang);
+		end = strchr(lang, '.');
+		if (!end)
+			end = strchr(lang, '@');
+		if (end)
+			lang2 = g_strndup(lang, end - lang);
+		else
+			lang2 = g_strdup(lang);
+	}
+	else
+		lang2 = g_strdup(lang);
+
+	current_lang = lang2;
 
 	path = g_strdup_printf("%s/Messages/%s.gmo", app_dir, current_lang);
+	if (!file_exists(path) && strchr(current_lang, '_'))
+	{
+		/* Try again without the territory */
+		strcpy(strrchr(path, '_'), ".gmo");
+	}
+
 	if (file_exists(path))
 		rox_add_translations(path);
 	g_free(path);

@@ -1789,7 +1789,12 @@ void menu_rox_help(gpointer data, guint action, GtkWidget *widget)
 		{
 			manual = g_strconcat(app_dir, "/Help/Manual-",
 					     current_lang, ".html", NULL);
-			if (access(manual, F_OK))
+			if (!file_exists(manual) && strchr(current_lang, '_'))
+			{
+				/* Try again without the territory */
+				strcpy(strrchr(manual, '_'), ".html");
+			}
+			if (!file_exists(manual))
 				null_g_free(&manual);
 		}
 

@@ -113,9 +113,13 @@ xmlNode *get_subnode(xmlNode *node, const char *namespaceURI, const char *name)
 static xmlNode *best_lang(xmlNode *first)
 {
 	xmlNode *node = first;
+	xmlNode *fallback = NULL;
 	const char *target_lang = current_lang ? current_lang : "en";
+	char *territory;
 	
 	g_return_val_if_fail(first != NULL, NULL);
+
+	territory = strchr(target_lang, '_');
 
 	for (node = first->next; node; node = node->next)
 	{
@@ -126,15 +130,15 @@ static xmlNode *best_lang(xmlNode *first)
 
 		/* Check names match... */
 		if (strcmp(node->name, first->name))
-			return first;
+			break;
 
 		/* Check namespaces match... */
 		if ((node->ns == NULL) != (first->ns == NULL))
-			return first;
+			break;
 
 		if (node->ns && first->ns)
 			if (strcmp(node->ns->href, first->ns->href))
-				return first;
+				break;
 
 		lang = xmlNodeGetLang(node);
 		
@@ -145,10 +149,15 @@ static xmlNode *best_lang(xmlNode *first)
 			g_free(lang);
 			return node;
 		}
+		if (territory && strlen(lang) == (territory - target_lang) &&
+		    strncmp(lang, target_lang, territory - target_lang) == 0)
+		{
+			fallback = node;
+		}
 		g_free(lang);
 	}
 
-	return first;
+	return fallback ? fallback : first;
 }
 
 static void xml_wrapper_finialize(GObject *object)
