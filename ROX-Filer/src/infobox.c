@@ -501,19 +501,22 @@ static void cell_edited(GtkCellRendererText *cell,
 
 	oldlink = readlink_dup(fullpath);
 	if (!oldlink) {
-		report_error(_("'%s' is no longer a symlink"), fullpath);
+		/* Must use delayed_error(), as this can be called
+		 * from a focus-out event (causes a crash).
+		 */
+		delayed_error(_("'%s' is no longer a symlink"), fullpath);
 		return;
 	}
 	if (strcmp(oldlink, new_text) == 0)
 		return;	/* No change */
 	g_free(oldlink);
 	if (unlink(fullpath)) {
-		report_error(_("Failed to unlink '%s':\n%s"),
+		delayed_error(_("Failed to unlink '%s':\n%s"),
 				fullpath, g_strerror(errno));
 		return;
 	}
 	if (symlink(new_text, fullpath)) {
-		report_error(_("Failed to create symlink from '%s':\n%s\n"
+		delayed_error(_("Failed to create symlink from '%s':\n%s\n"
 				"(note: old link has been deleted)"));
 		return;
 	}

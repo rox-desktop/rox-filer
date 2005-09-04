@@ -2,6 +2,13 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+04-Sep-2005
+~~~~~~~~~~~
+Bugfix: If you editing the target of a symlink in the properties box, and then
+	unfocussed the entry when the symlink no longer existed, the filer
+	would crash trying to display the error message. Added work-around
+	(Thomas Leonard; reported as GTK bug #315229).
+
 27-Aug-2005
 ~~~~~~~~~~~
 When using 'From LANG', check for translations with and with the territory
