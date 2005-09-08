@@ -163,6 +163,8 @@ void reread_mime_files(void)
 	gtk_icon_theme_rescan_if_needed(icon_theme);
 
 	xdg_mime_shutdown();
+
+	filer_update_all();
 }
 
 /* Returns the MIME_type structure for the given type name. It is looked
@@ -1176,7 +1178,7 @@ static void get_comment(MIME_type *type, const guchar *path)
 static void find_comment(MIME_type *type)
 {
 	char **dirs;
-	int i, n_dirs;
+	int i, n_dirs = 0;
 
 	if (type->comment)
 	{
