@@ -1985,6 +1985,8 @@ void action_usage(GList *paths)
 	}
 
 	abox = abox_new(_("Disk Usage"), TRUE);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	
 	gui_side = start_action(abox, usage_cb, paths,
 					 o_action_force.int_value,
@@ -2019,6 +2021,8 @@ void action_mount(GList	*paths, gboolean open_dir, gboolean mount, int quiet)
 	mount_mount = mount;
 
 	abox = abox_new(_("Mount / Unmount"), quiet);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, mount_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
@@ -2046,6 +2050,8 @@ void action_delete(GList *paths)
 		return;
 
 	abox = abox_new(_("Delete"), o_action_delete.int_value);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, delete_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
@@ -2103,6 +2109,8 @@ void action_chmod(GList *paths, gboolean force_recurse, const char *action)
 		new_entry_string = g_strdup(last_chmod_string);
 
 	abox = abox_new(_("Permissions"), FALSE);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, chmod_cb, paths,
 				o_action_force.int_value,
 				o_action_brief.int_value,
@@ -2162,6 +2170,8 @@ void action_settype(GList *paths, gboolean force_recurse, const char *oldtype)
 		new_entry_string = g_strdup(last_settype_string);
 
 	abox = abox_new(_("Set type"), FALSE);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, settype_cb, paths,
 				o_action_force.int_value,
 				o_action_brief.int_value,
@@ -2212,6 +2222,8 @@ void action_copy(GList *paths, const char *dest, const char *leaf, int quiet)
 	action_do_func = do_copy;
 
 	abox = abox_new(_("Copy"), quiet);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, list_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
@@ -2248,6 +2260,8 @@ void action_move(GList *paths, const char *dest, const char *leaf, int quiet)
 	action_do_func = do_move;
 
 	abox = abox_new(_("Move"), quiet);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, list_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
@@ -2282,6 +2296,8 @@ void action_link(GList *paths, const char *dest, const char *leaf,
 		action_do_func = do_link_absolute;
 
 	abox = abox_new(_("Link"), o_action_link.int_value);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, list_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
@@ -2301,6 +2317,8 @@ void action_eject(GList *paths)
 	GtkWidget	*abox;
 
 	abox = abox_new(_("Eject"), TRUE);
+	if(paths && paths->next)
+		abox_set_percentage(ABOX(abox), 0);
 	gui_side = start_action(abox, eject_cb, paths,
 					 o_action_force.int_value,
 					 o_action_brief.int_value,
