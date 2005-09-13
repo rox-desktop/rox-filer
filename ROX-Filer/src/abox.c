@@ -187,6 +187,7 @@ static void abox_init(GTypeInstance *object, gpointer gclass)
 				1, 2, i, i + 1,
 				GTK_SHRINK, GTK_SHRINK, 4, 1);
 		abox->cmp_name[i] = gtk_label_new("");
+		gtk_label_set_line_wrap(GTK_LABEL(abox->cmp_name[i]), TRUE);
 		gtk_misc_set_alignment(GTK_MISC(abox->cmp_name[i]), 0., 0.5);
 		gtk_table_attach(GTK_TABLE(abox->cmp_area),
 				abox->cmp_name[i],
