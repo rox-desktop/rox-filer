@@ -240,6 +240,7 @@ static GtkWidget *make_vbox(const guchar *path, GObject *window)
 		g_free(u8);
 	}
 	gtk_label_set_selectable(GTK_LABEL(name), TRUE);
+	gtk_label_set_line_wrap(GTK_LABEL(name), TRUE);
 	gtk_box_pack_start(GTK_BOX(hbox), name, FALSE, TRUE, 4);
 	
 	make_heading(name, PANGO_SCALE_X_LARGE);
