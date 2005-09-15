@@ -44,6 +44,9 @@
 #include <unistd.h>
 #include <assert.h>
 
+#include "global.h"
+#include "main.h"
+
 typedef struct XdgDirTimeList XdgDirTimeList;
 typedef struct XdgCallbackList XdgCallbackList;
 
@@ -414,6 +417,8 @@ xdg_mime_init (void)
 
   if (need_reread)
     {
+      char *mime_parents;
+
       global_hash = _xdg_glob_hash_new ();
       global_magic = _xdg_mime_magic_new ();
       alias_list = _xdg_mime_alias_list_new ();
@@ -421,6 +426,13 @@ xdg_mime_init (void)
 
       xdg_run_command_on_dirs ((XdgDirectoryFunc) xdg_mime_init_from_directory,
 			       NULL);
+
+      /* We want to support shared-mime-database < 0.16, where we can't
+       * do this with the rox.xml file.
+       */
+      mime_parents = g_build_filename(app_dir, "subclasses", NULL);
+      _xdg_mime_parent_read_from_file(parent_list, mime_parents);
+      g_free(mime_parents);
 
       need_reread = FALSE;
     }
