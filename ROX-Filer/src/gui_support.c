@@ -417,7 +417,8 @@ void parse_file(const char *path, ParseFunc *parse_line)
 		_("Error in '%s' file at line %d: "
 		"\n\"%s\"\n"
 		"This may be due to upgrading from a previous version of "
-		"ROX-Filer. Open the Options window and click on Save.\n"
+		"ROX-Filer. Open the Options window and try changing something "
+		"and then changing it back (causing the file to be resaved).\n"
 		"Further errors will be ignored."),
 					path,
 					line_number,

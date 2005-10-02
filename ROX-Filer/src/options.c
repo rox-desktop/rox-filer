@@ -659,9 +659,9 @@ static GtkWidget *build_radio(xmlNode *radio, GtkWidget *prev)
 	return button;
 }
 
-static void build_menu_item(xmlNode *node, GtkWidget *option_menu)
+static void build_menu_item(xmlNode *node, GtkWidget *menu)
 {
-	GtkWidget	*item, *menu;
+	GtkWidget	*item;
 	guchar		*label;
 
 	g_return_if_fail(strcmp(node->name, "item") == 0);
@@ -670,9 +670,8 @@ static void build_menu_item(xmlNode *node, GtkWidget *option_menu)
 	item = gtk_menu_item_new_with_label(_(label));
 	g_free(label);
 
-	menu = gtk_option_menu_get_menu(GTK_OPTION_MENU(option_menu));
+	gtk_widget_show(item);
 	gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);
-	gtk_widget_show_all(menu);
 
 	g_object_set_data(G_OBJECT(item), "value", xmlGetProp(node, "value"));
 }
@@ -1667,15 +1666,16 @@ static GList *build_menu(Option *option, xmlNode *node, guchar *label)
 	gtk_box_pack_start(GTK_BOX(hbox), option_menu, FALSE, TRUE, 0);
 
 	om = gtk_menu_new();
-	gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), om);
-
-	add_to_size_group(node, option_menu);
 
 	for (item = node->xmlChildrenNode; item; item = item->next)
 	{
 		if (item->type == XML_ELEMENT_NODE)
-			build_menu_item(item, option_menu);
+			build_menu_item(item, om);
 	}
+
+	gtk_widget_show(om);
+	gtk_option_menu_set_menu(GTK_OPTION_MENU(option_menu), om);
+	add_to_size_group(node, option_menu);
 
 	option->update_widget = update_menu;
 	option->read_widget = read_menu;
