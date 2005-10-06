@@ -5,10 +5,10 @@
 # 
 msgid ""
 msgstr ""
-"Project-Id-Version: ROX-Filer 2.2.0\n"
+"Project-Id-Version: ROX-Filer 2.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-09 14:02+0100\n"
-"PO-Revision-Date: 2005-07-21 13:00+0200\n"
+"POT-Creation-Date: 2005-10-01 18:56+0200\n"
+"PO-Revision-Date: 2005-10-01 19:00+0200\n"
 "Last-Translator: Yuri Bongiorno http://yuri.webhop.org <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
@@ -1529,6 +1529,10 @@ msgid ""
 "\n"
 "http://0install.net/injector.html"
 msgstr ""
+"Questo programma non può essere eseguito: il comando «0launch» non è "
+"disponibile. Lo si può scaricare da qui:\n"
+"\n"
+"http://0install.net/injector.html"
 
 #: i18n.c:38
 msgid ""
@@ -2918,7 +2922,7 @@ msgstr ""
 "Collegamento simbolico interrotto (o non ci sono i permessi per seguirlo): %s"
 
 #: run.c:502
-#, fuzzy, c-format
+#, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
@@ -2926,7 +2930,7 @@ msgid ""
 msgstr ""
 "Non è stata specificata alcuna azione per i file di questo tipo (%s/%s): "
 "impostarne una usando «Imposta azione...» dal menù «File» o trascinare il "
-"file su un'applicazione"
+"file su un'applicazione.%s"
 
 #: run.c:508
 msgid ""
@@ -2935,6 +2939,10 @@ msgid ""
 "Note: If this is a computer program which you want to run, you need to set "
 "the execute bit by choosing Permissions from the File menu."
 msgstr ""
+"\n"
+"\n"
+"Nota: se è un programma che si desidera eseguire, è necessario renderlo "
+"eseguibile selezionando «Permessi» dal menù «File»."
 
 #: support.c:272
 msgid "B"
@@ -3757,23 +3765,25 @@ msgstr "Larghezza massima per il testo accanto alle icone piccole."
 
 #: tips:88
 msgid "Order small icons vertically"
-msgstr ""
+msgstr "Ordinare verticalmente le icone piccole"
 
 #: tips:89
 msgid ""
 "If this option is on, then small icons are ordered vertically, not "
 "horizontally."
 msgstr ""
+"Se attivata, le icone piccole vengono ordinate verticalmente, non orizzontalmente."
 
 #: tips:90
 msgid "Order large icons vertically"
-msgstr ""
+msgstr "Ordinare verticalmente le icone grandi"
 
 #: tips:91
 msgid ""
 "If this option is on, then large icons are sorted vertically, not "
 "horizontally."
 msgstr ""
+"Se attivata, le icone grandi vengono ordinate verticalmente, non orizzontalmente."
 
 #: tips:93
 msgid "Show column headings"
@@ -3907,9 +3917,8 @@ msgstr ""
 "individuali."
 
 #: tips:119
-#, fuzzy
 msgid "Video thumbnails"
-msgstr "Mostra miniature"
+msgstr "Miniature dei video"
 
 #: tips:120
 msgid "Thumbnails cache"
@@ -4063,17 +4072,15 @@ msgstr ""
 
 #: tips:152
 msgid "Show per workspace"
-msgstr ""
+msgstr "Area di lavoro attuale"
 
 #: tips:153
-#, fuzzy
 msgid ""
 "If this option is on, the filer will only show iconified windows associated "
 "with the current workspace."
 msgstr ""
-"Se attivata, il filer mostra sulla bacheca ogni finestra ridotta a icona "
-"come un pulsante. Richiede un window manager compatibile e la bacheca deve "
-"essere attiva."
+"Se attivata, il filer mostra sulla bacheca solo le finestre ridotte a icona "
+"dell'attuale area di lavoro."
 
 #: tips:154
 msgid "Iconify to the"
