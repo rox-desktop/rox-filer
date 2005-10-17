@@ -12,9 +12,6 @@
   </title>
   <author>
    <firstname>Thomas</firstname><surname>Leonard</surname>
-   <affiliation>
-    <address><email>tal197 at users.sourceforge.net</email></address>
-   </affiliation>
   </author>
   <othercredit role="translator">
     	 <firstname>Yuri</firstname>
@@ -47,7 +44,7 @@
     Window. La sua interfaccia utente è ispirata al filer di RISC OS e ha
     caratteristiche simili, come le directory applicative e il trascinamento
     per caricare e salvare i file. Il filer può anche agire da bacheca e permette
-    di appendere sullo sfondo del desktop i file più usati.
+    di appendere i file più usati sullo sfondo del desktop.
    </para>
   </abstract>
  </bookinfo>
@@ -83,10 +80,12 @@
         specifiche complete si trovano in <citation>XDS</citation>.
      </para></listitem></varlistentry>
 
-     <varlistentry><term>Choices</term>
+     <varlistentry><term>Specifiche Basedir</term>
       <listitem><para>
-        Un semplice e flessibile sistema per gestire le preferenze dell'utente.  Vedere
-        <citation>Choices</citation> per i dettagli.
+        Un semplice e flessibile sistema per gestire le preferenze dell'utente.  Normalmente
+        le preferenze vengono salvate in <filename>~/.config</filename>. Tuttavia questo si
+        può cambiare impostando la variabile d'ambiente <envar>XDG_CONFIG_HOME</envar>.
+        Vedere  <citation>BaseDir</citation> per i dettagli.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Directory applicative</term>
@@ -100,8 +99,7 @@
       <listitem><para>
         Il filer può visualizzare le immagini usando l'immagine stessa come icona,
         invece di usarne una generica. È molto utile in una directory
-        piena di foto. Vedere <citation>Thumbs</citation> per i dettagli
-        (specifiche ancora in sviluppo).
+        piena di foto. Vedere <citation>Thumbs</citation> per i dettagli.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Database condiviso delle informazioni MIME</term>
@@ -117,7 +115,7 @@
 	Si possono installare (ad es. in <filename>~/.icons</filename>) varie raccolte
 	di icone, chiamate anche temi. Per cambiare tema, andare nella finestra 
 	«Opzioni». Si potranno condividere i temi con gli altri desktop, quando anche
-	questi ultimi ne attiveranno il supporto.
+	questi ultimi ne attiveranno il supporto. Vedere <citation>IconTheme</citation> per i dettagli.
      </para></listitem></varlistentry>
 
      <varlistentry><term>Supporto a DNotify (solo per Linux)</term>
@@ -167,15 +165,15 @@
    <para>
 
     Se si desidera che il filer gestisca lo sfondo del desktop, si deve usare l'opzione
-    <option>--pinboard</option> e poi un nome per la bacheca, come ad esempio:
+    <option>--pinboard</option> seguito da un nome per la bacheca, come ad esempio:
 
     <screen>$ rox --pinboard=MiaBacheca</screen>
 
     Se si cambia qualcosa, per esempio se si rilascia un file sullo sfondo, la configurazione 
     della bacheca viene salvata in 
-    <filename>&lt;Choices&gt;/ROX-Filer/pb_MiaBacheca</filename>.
-	Si può avere ogni bacheca che si vuole e passare dall'una all'altra eseguendo di nuovo
-	«rox», per esempio:
+    <filename>~/.config/rox.sourceforge.net/ROX-Filer/pb_MiaBacheca</filename>.
+	Si possono avere tutte le bacheche che si desiderano e per passare dall'una all'altra basta
+	eseguire di nuovo 	«rox», come ad esempio:
 
     <screen>$ rox --pinboard=AltraBacheca</screen>
 
@@ -184,20 +182,18 @@
     <screen>$ rox --pinboard=</screen>
 
     Vedere le <xref linkend="winman"/> se ci sono problemi nel visualizzare correttamente
-    le icone. Si può anche attivare o disattivare la bacheca cercando 
-    <filename>ROX-Filer</filename> in una finestra del filer e scegliendo dal menù «Attiva
-    la bacheca» o «Disattiva la bacheca».  </para>
+    le icone. Si può anche attivare o disattivare la bacheca selezionando in una finestra del filer 
+    la directory applicativa <filename>ROX-Filer</filename> e scegliendo dal menù 
+    <guimenuitem>Attiva la bacheca</guimenuitem> o <guimenuitem>Disattiva la bacheca»
+    </guimenuitem>.  </para>
   </sect1>
 
   <sect1>
    <title><anchor id="run_pan" xreflabel="I pannelli"/>I pannelli</title>
    <para>
 
-    I pannelli funzionano come la bacheca: per crearne uno su qualsiasi lato dello schermo,
-    usare le opzioni <option>--left</option>, <option>--right,</option>
-    <option>--top</option>, <option>--bottom</option>, a seconda di dove lo si voglia
-    far apparire. In alcuni sistemi, si deve usare per forza l'opzione corta.
-    Per esempio, per creare un pannello in basso:
+    I pannelli funzionano come la bacheca, ma vengono visualizzati sui bordi dello schermo.
+    Per creare un pannello:
 
     <screen>$ rox -b=MioPannello</screen>
 
@@ -206,13 +202,17 @@
     Trascinare i file sul pannello per aggiungerli ad esso. Le icone possono essere
     riposizionate trascinandole col tasto centrale del mouse.
     Le modifiche al pannello sono automaticamente salvate in
-    <filename>&lt;Choices&gt;/ROX-Filer/pan_MioPannello</filename>.
+    <filename>~/.config/rox.sourceforge.net/ROX-Filer/pan_MioPannello</filename>.
     Come per la bacheca, è possibile passare a diverse configurazioni eseguendo di nuovo
-    «rox» con un altro nome di pannello. Lasciando vuoto il campo del nome, il pannello
-    viene rimosso.
+    «rox» con un altro nome di pannello. 
 
-    <screen>$ rox --bottom=AltroPannello
-$ rox --bottom=</screen>
+    <screen>$ rox -b=AltroPannello</screen>
+    
+    Con un menù a comparsa si può impostare su quale bordo dello schermo deve apparire
+    il pannello, oppure si può specificare il nome del bordo al posto di -b (ad es. --bottom).
+    Lasciare vuoto il campo del nome per rimuovere il pannello:
+    
+    <screen>$ rox --bottom=</screen>
    </para>
   </sect1>
 
@@ -220,7 +220,7 @@ $ rox --bottom=</screen>
    <title><anchor id="winman" xreflabel="note per i window manager"/>Note per i window manager</title>
    <para>
     Bisogna modificare le impostazioni del proprio window manager per visualizzare correttamente
-    la bacheca e i pannelli (es. per non avere i bordi e i titoli come le altre finestre).
+    la bacheca e i pannelli (ad es. per non avere i bordi e i titoli come nelle altre finestre).
     In particolare, si deve impostare il livello e la
     profondità di stacking al minimo (o a un valore negativo). Assicurarsi inoltre di disattivare
     qualsiasi opzione del tipo «Keep transients above other windows».
@@ -358,7 +358,7 @@ $ rox --bottom=</screen>
     finestra viene eseguito come utente «root».
     </para><para>
     Può accadere che il server X non permetta a «root» (o ad altri utenti) di 
-    connettersi. Leggere le pagine man dei comandi <command>xauth</command> e
+    connettersi. Leggere le pagine di manuale dei comandi <command>xauth</command> e
     <command>xhost</command> può aiutare a risolvere il problema, ma molte cose
     cambiano da sistema a sistema (ecco perché questa caratteristica non è stata
     inserita nel filer).
@@ -438,7 +438,7 @@ $ rox --bottom=</screen>
      </entry></row>
 
      <row><entry>Trascinare un oggetto (pulsante centrale del mouse)</entry><entry>
-       Quando si rilascia, mostra un menù di azioni possibili. C'è la possibilità di far
+       Quando si rilascia, mostra un menù di azioni possibili. C'è la possibilità di 
        spostare i file invece di attivare il menù.
      </entry></row>
 
@@ -508,7 +508,7 @@ $ rox --bottom=</screen>
  <chapter id="selection">
   <title>La selezione</title>
   <para>
-   Quando si selezionano oggetti in una finestra di <application>ROX-Filer</application>,
+   Quando si selezionano gli oggetti di una finestra di <application>ROX-Filer</application>,
    il filer memorizza la <emphasis>selezione primaria</emphasis>. È possibile quindi incollare
    in un'altra finestra il nome (e il percorso) del file selezionato.
   </para>
@@ -590,8 +590,8 @@ $ rox --bottom=</screen>
        Mostra la directory genitore in una nuova finestra <xref linkend="newwin_fn"/>
        </entry></row><row><entry>
        Casa</entry><entry>
-       Va nella directory home</entry><entry>
-       Mostra la directory home in una nuova finestra <xref linkend="newwin_fn"/>
+       Va nella home directory</entry><entry>
+       Mostra la home directory in una nuova finestra <xref linkend="newwin_fn"/>
        </entry></row><row><entry>
        Freccia sul punto giallo</entry><entry>
        Apre il <xref linkend="bookmarks"/>
@@ -744,14 +744,14 @@ $ rox --bottom=</screen>
        piccolo, ecc...).
        </entry></row>
 
-       <row><entry><guimenuitem>Filtra i file...</guimenuitem></entry><entry>
-       Limita la visualizzazione a solo quei file i cui nomi corrispondono a un modello dato.
-       Quando è attivato, la barra del titolo mostra <guilabel>(Glob (modello))</guilabel>.
-       </entry></row>
-
        <row><entry><guimenuitem>Mostra nascosti</guimenuitem></entry><entry>
        Se attivato, vengono mostrati i file che iniziano con il punto, altrimenti vengono
        nascosti. Quando è attivato, la barra del titolo mostra  <guilabel>(Tutti)</guilabel>.
+       </entry></row>
+
+       <row><entry><guimenuitem>Filtra i file...</guimenuitem></entry><entry>
+       Limita la visualizzazione a solo quei file i cui nomi corrispondono a un modello dato.
+       Quando è attivato, la barra del titolo mostra <guilabel>(Glob (modello))</guilabel>.
        </entry></row>
 
        <row><entry><guimenuitem>Mostra miniature</guimenuitem></entry><entry>
@@ -872,7 +872,7 @@ $ rox --bottom=</screen>
     numero qualsiasi di azioni definite dall'utente, che dipendono dal tipo di file
     su cui si fa clic. Per aggiungere dei programmi, selezionare la voce 
     <guimenuitem>Personalizza il menù...</guimenuitem>. Per esempio, è possibile far
-    apparire come menù <application>The Gimp</application> per le immagini e
+    apparire come menù <application>Gimp</application> per le immagini e
     <application>FreeFS</application> per i punti di mount.
 
     <informaltable><tgroup cols="2">
@@ -1039,30 +1039,33 @@ $ rox --bottom=</screen>
 
     Ciascuna voce di questo menù apre una finestra per creare un nuovo file o una 
     nuova directory. Ci sono due voci predefinite, le altre sono il contenuto della directory
-    <filename>&lt;Choices&gt;/Templates</filename>, se esiste.
+    <filename>~/.config/rox.sourceforge.net/Templates</filename>, se esiste.
 
 
     <informaltable><tgroup cols="2">
       <thead><row><entry>Voce</entry><entry>Azione</entry></row></thead>
       <tbody>
-       <row><entry>
-         Directory</entry><entry>
+       <row><entry>Directory</entry><entry>
          Crea una nuova directory.
-         </entry></row><row><entry>
-         File</entry><entry>
+         </entry></row>
+         
+         <row><entry>File</entry><entry>
          Crea un file vuoto.
-         </entry></row><row><entry>
-         &lt;definiti dall'utente&gt;</entry><entry>
+         </entry></row>
+
+         <row><entry>Personalizza</entry><entry>
+         Apre la directory <filename>Templates</filename> per aggiungere altre voci al menù.
+         </entry></row>
+         
+         <row><entry>&lt;definiti dall'utente&gt;</entry><entry>
          Copia un file dalla directory «Templates».
        </entry></row>
     </tbody></tgroup></informaltable>
 
 
-    Per aggiungere nuove voci, creare una directory di nome
-    <filename>~/Choices/Templates</filename>
-    (se si ha il <envar>CHOICESPATH</envar> predefinito) e mettere lì dentro i
-    file. I file nella directory compaiono quindi nel menù  e vengono usati per creare
-    i nuovi file. Per esempio, se si desidera creare un file HTML vuoto:
+    Per aggiungere nuove voci, scegliere <guimenuitem>Personalizza</guimenuitem>
+    e mettere i file lì dentro. I file di quella directory compaiono quindi nel menù  e vengono 
+    usati per creare i nuovi file. Per esempio, se si desidera creare un file HTML vuoto:
 
     <programlisting>
 &lt;html&gt;
@@ -1109,8 +1112,8 @@ $ rox --bottom=</screen>
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Directory home</guimenuitem></entry><entry>
-         Va alla directory home.
+         <guimenuitem>Home directory</guimenuitem></entry><entry>
+         Va nella home directory.
        </entry></row>
 
        <row><entry>
@@ -1200,7 +1203,8 @@ $ rox --bottom=</screen>
 
     Il menù «Invia a...» fornisce un modo veloce per inviare file a un'applicazione.
     Il filer analizza tutte le directory <filename>SendTo</filename> nel
-    <envar>CHOICESPATH</envar> ed elenca il contenuto in questo menù.
+    <envar>$XDG_CONFIG_DIRS/rox.sourceforge.net/SendTo</envar> 
+    (vedere <citation>BaseDir</citation>) ed elenca il contenuto in questo menù.
     </para><para>
     Per cambiare le applicazioni che appaiono, scegliere 
     <guimenuitem>Personalizza</guimenuitem> in fondo al menù. Si apre quindi
@@ -1292,11 +1296,11 @@ $ rox --bottom=</screen>
 
        <row><entry>
          <guimenuitem>ROX-Filer</guimenuitem></entry><entry>
-         Mostra i file di aiuto, modifica le opzioni e apre la directory home.
+         Mostra i file di aiuto, modifica le opzioni e apre la home directory.
        </entry></row>
 
        <row><entry>
-         <guimenuitem>File «file»</guimenuitem></entry><entry>
+         <guimenuitem>File «file</guimenuitem></entry><entry>
          È una versione ridotta del sottomenù «File» del filer.
        </entry></row>
 
@@ -1321,6 +1325,12 @@ $ rox --bottom=</screen>
          <guimenuitem>Sfondo...</guimenuitem></entry><entry>
 	 Imposta l'immagine di sfondo (vedere più sotto). È disponibile 
 	 solo nel menù della bacheca.
+       </entry></row>
+
+       <row><entry>
+         <guimenuitem>Opzioni pannello...</guimenuitem></entry><entry>
+	 Imposta il bordo dello schermo sul quale visualizzare il pannello. È disponibile
+	 solo dal menù del pannello.
        </entry></row>
 
     </tbody></tgroup></informaltable>
@@ -1367,9 +1377,9 @@ $ rox --bottom=</screen>
     <step><para>
       Creare un eseguibile di nome <filename>AppletRun</filename>. Questo
       passa lo XID del socket del pannello quando la directory viene trascinata 
-      dentro il pannello. Usare questo per creare un widget GtkPlug. Un esempio
-      di applet (scritta in python) si trova in
-      <ulink url="http://rox.sourceforge.net/applets.html"/>
+      dentro il pannello. Usare questo per creare un widget GtkPlug. Un tutorial
+      è disponibile su 
+      <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Tutorials/Applets"/>
     </para></step>
 
    </procedure>
@@ -1512,8 +1522,10 @@ $ rox --bottom=</screen>
    file che scansiona. Se la miniatura esiste, la carica e continua con il file successivo.
   </para><para>
    Per generare la miniatura di un file di un certo tipo di «media/subtype», il filer
-   cerca un programma prima in <filename>&lt;Choices&gt;/MIME-thumb/media_subtype</filename>
-   e poi in <filename>&lt;Choices&gt;/MIME-thumb/media</filename> (come quando si visualizzano
+   cerca un programma prima in 
+   <filename>~/.config/rox.sourceforge.net/MIME-thumb/media_subtype</filename>
+   e poi in <filename>~/.config/rox.sourceforge.net/MIME-thumb/media</filename> 
+   (come quando si visualizzano
    applicazioni differenti per tipi di file differenti). Se non viene trovato 
    niente e se il file è di tipo «image/*» allora vengono usate le routine interne. 
    Se il file non è di tipo «image/*», non viene creata alcuna miniatura.
@@ -1601,7 +1613,7 @@ $ rox --bottom=</screen>
     Il completamento automatico prova a ricostruire il nome con più caratteri
     possibili. Per esempio, se nella directory ci sono due file di nome 
     <filename>posta-salvata-nov-1999</filename> e 
-    <filename>posta-salvata-dec-1999</filename> allora digitando 
+    <filename>posta-salvata-dic-1999</filename> allora digitando 
     <userinput>posta</userinput> e premendo <keycap>Tab</keycap> si espande 
     <userinput>posta</userinput> fino a <userinput>posta-salvata-</userinput> 
     e viene emesso un beep per indicare che la corrispondenza non è completa. 
@@ -1731,7 +1743,7 @@ $ rox --bottom=</screen>
     <orderedlist><title>Per esempio, per selezionare tutti i file più grandi di 5Mb:</title>
 
      <listitem><para>
-       Attivare il minibuffer «Seleziona se...».
+       Attivare il minibuffer «Seleziona se...» (la scorciatoia predefinita è <keycap>?</keycap>).
      </para></listitem>
 
      <listitem><para>
@@ -1905,7 +1917,7 @@ $ rox --bottom=</screen>
 
     </simplelist>
 
-    Vedere la pagina man di 
+    Vedere la pagina di manuale di 
     <citerefentry><refentrytitle>glob</refentrytitle>
      <manvolnum>7</manvolnum></citerefentry>
     per ulteriori informazioni sui metacaratteri.
@@ -2135,7 +2147,7 @@ $ rox --bottom=</screen>
      </para></listitem>
 
      <listitem><para>
-       <userinput>Min(s)</userinput> multipli di 60.
+       <userinput>Min(s)</userinput> multipli di 60 secondi.
      </para></listitem>
 
      <listitem><para>
@@ -2253,18 +2265,19 @@ $ rox --bottom=</screen>
 
     <listitem><para>
       <guibutton>OK</guibutton>
-      salva le attuali preferenze nella directory «Choices» dell'utente, per caricarle
+      salva le attuali preferenze nella directory 
+      <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>, per caricarle
       la prossima volta che si avvia <application>ROX-Filer</application>.
       Il punto esatto in cui le preferenze vengono caricate e salvate è controllato dalla
-      variabile d'ambiente <envar>CHOICESPATH</envar>. Vedere
-      <citation>Choices</citation> per ulteriori dettagli.
+      variabile d'ambiente <envar>XDG_CONFIG_HOME</envar>. Vedere
+      <citation>BaseDir</citation> per ulteriori dettagli.
       Le modifiche fatte nella finestra «Opzioni» hanno effetto immediato, così non è
       necessario fare clic su <guibutton>OK</guibutton> per provarle.
     </para></listitem>
 
     <listitem><para>
       <guibutton>Ripristina</guibutton>
-      Rimette tutte le preferenze come erano prima dell'apertura della finestra «Opzioni».
+      rimette tutte le preferenze come erano prima dell'apertura della finestra «Opzioni».
       Se il pulsante è ombreggiato, significa che non ci sono state modifiche.
       La finestra «Opzioni» non viene chiusa quando si preme questo tasto.
     </para></listitem>
@@ -2330,8 +2343,8 @@ $ rox --bottom=</screen>
      dello stesso media-type che non hanno già una specifica azione.
      </para><para>
      Dal momento che Gimp può caricare molti tipi di immagine, ha senso selezionare l'opzione
-     <guilabel>Impostare come azione predefinita per tutti i file di tipo 
-     «image/&lt;anything&gt;»</guilabel>, così non bisogna ripetere lo stesso procedimento
+     "<guilabel>Impostare come azione predefinita per tutti i file di tipo 
+     «image/&lt;anything&gt;</guilabel>", così non bisogna ripetere lo stesso procedimento
      per i file «image/jpeg» e così via. Comunque, questo influenza solo i tipi che non hanno
      già una specifica azione (cioè quelli per cui appare un errore se si prova ad aprirli).
     </para>
@@ -2351,7 +2364,8 @@ $ rox --bottom=</screen>
     Funziona come «Imposta azione...» descritto sopra, eccetto che si può specificare
     un'icona anche per un file singolo (dal nome) o per tutti i file di quel tipo.
     Quando si imposta l'icona per un file singolo, il filer memorizza il nome del 
-    file e il nome dell'icona dentro la directory «Choices» dell'utente. Se uno dei
+    file e il nome dell'icona dentro la directory 
+    <filename>~/.config/rox.sourceforge.net/MIME-icons</filename>. Se uno dei
     due si sposta, l'icona non viene più visualizzata.
     </para><para>
     Quando si imposta l'icona per una directory, si può anche memorizzare l'immagine
@@ -2370,8 +2384,8 @@ $ rox --bottom=</screen>
    <title>Come i tipi di file sono memorizzati</title>
    <para>
 
-    <application>ROX-Filer</application> usa due sottodirectory della directory «Choices»
-    per i tipi di file:
+    <application>ROX-Filer</application> usa due sottodirectory della directory 
+    <filename>~/.config/rox.sourceforge.net</filename> per i tipi di file:
 
     <variablelist>
 
@@ -2403,21 +2417,32 @@ $ rox --bottom=</screen>
      <varlistentry><term><filename>MIME-icons</filename></term><listitem><para>
         contiene le immagini usate per visualizzare ciascun tipo di file.
         Per esempio, il filer prova a visualizzare un file HTML usando l'icona
-        <filename>MIME-icons/text_html.png</filename>.
+        <filename>MIME-icons/text_html.png</filename>. Se non viene impostata alcuna
+        icona, il filer usa quella predefinita del tema di icone (impostato in «Opzioni»);
+		vedere <citation>IconTheme</citation> per i dettagli.
      </para></listitem></varlistentry>
 
     </variablelist>
 
-    Sia in <filename>MIME-types</filename> che in <filename>MIME-icons</filename>
-    è anche possibile fornire le azioni/immagini predefinite per ciascun tipo di media.
-    Per esempio, se non si trova <filename>text_html</filename>, il filer
-    prova semplicemente a usare <filename>text</filename>.
+    In <filename>MIME-types</filename> è possibile fornire le azioni predefinite per 
+    ciascun tipo di media. Per esempio, se non si trova <filename>text_html</filename>, 
+    il filer prova semplicemente a usare <filename>text</filename>.
 
    </para>
    <para>
     Il filer trova il tipo di file dal suo nome. Le regole vengono dai vari file
     <filename>globs</filename>. Vedere
     <citation>SharedMIME</citation> per ulteriori dettagli.</para>
+  </sect1>
+ 
+  <sect1>
+    <title>Come il filer determina il tipo di file</title>
+    <para>
+     The filer normalmente determina il tipo di file dal suo nome. Se fallisce, prova a
+     supporlo dal contenuto del file. È possibile ignorare questa supposizione
+     impostando un attributo esteso sul file con il tipo corretto, usando il menù 
+     <guimenuitem>Tipo di file...</guimenuitem>.
+    </para>
   </sect1>
  </chapter>
 
@@ -2622,7 +2647,7 @@ $ rox --bottom=</screen>
      </para></listitem>
 
      <listitem><para>Spedire il file <filename>.po</filename> all'autore di <application>ROX-Filer</application>,
-     così sarà incluso nelle future versioni.
+     così sarà incluso nella prossima versione.
      </para></listitem>
 
     </orderedlist>
@@ -2786,7 +2811,7 @@ $ rox --bottom=</screen>
     </para></listitem>
 
     <listitem><para>
-      GTK+ 2.0.1 o successiva (librerie e header). L'ultima versione è disponibile
+      GTK+ 2.4.0 o successiva (librerie e header). L'ultima versione è disponibile
       su <citation>GTK+</citation>,
     </para></listitem>
 
@@ -2807,7 +2832,7 @@ $ rox --bottom=</screen>
    (<prompt>$</prompt> è il prompt di shell):
 
    <screen>$ pkg-config --modversion gtk+-2.0
-2.0.5</screen>
+2.6.8</screen>
   </para>
 
   <procedure><title>Per compilare:</title>
@@ -2836,12 +2861,6 @@ $ rox --bottom=</screen>
      non funziona, contattare via email l'autore di ROX-Filer. Spiegare (in inglese)
      che tipo di sistema si ha e quali errori compaiono. Se si è capaci di risolvere
      il problema, informare comunque l'autore via email.
-    </para><para>
-     Il file eseguibile si trova dentro la directory «ROX-Filer» e in una sottodirectory
-     diversa a seconda della piattaforma.  È quindi possibile compilare la stessa
-     applicazione su diversi tipi di macchine, per tutte però, si usa lo script
-     <filename>AppRun</filename> per avviare il filer. Questo è particolarmente utile in un
-     ambiente di rete.
    </para></step>
 
    <step><para>
@@ -2851,7 +2870,7 @@ $ rox --bottom=</screen>
      e rieseguire lo script.
 
      Se non si ha la password di root, ci si deve accontentare di un'installazione
-     locale e, seguendo le istruzioni, il filer viene installato nella directory home 
+     locale e, seguendo le istruzioni, il filer viene installato nella home directory 
      dell'utente.
    </para></step>
   </procedure>
@@ -2864,9 +2883,9 @@ $ rox --bottom=</screen>
 
    Dovrebbe quindi apparire una finestra e visualizzare il contenuto della directory attuale.
 
-   Se lo script è stato installato nella directory home dell'utente, probabilmente è necessario
+   Se lo script è stato installato nella home directory dell'utente, probabilmente è necessario
    modificare la variabile d'ambiente <envar>PATH</envar> in modo da trovarlo.
-   Per esempio, se è installato in una sottodirectory della home di nome 
+   Per esempio, se è installato nella home in una sottodirectory di nome 
    <filename>bin</filename>, digitare:
 
    <screen>$ PATH=$HOME/bin:$PATH; export PATH</screen>
@@ -2881,7 +2900,7 @@ $ rehash</screen>
 
  </appendix>
 
- <appendix id="manpage"><title>Pagina man</title>
+ <appendix id="manpage"><title>Pagina di manuale</title>
 
   <refentry id="rox">
 
@@ -2920,7 +2939,11 @@ $ rehash</screen>
     <para>
      <variablelist>
 
-      <varlistentry><term><option>-b</option></term><term><option>--bottom=PAN</option></term>
+      <varlistentry><term><option>-b</option></term><term><option>--border=PAN</option></term>
+       <listitem><para>apre PAN.
+      </para></listitem></varlistentry>
+
+      <varlistentry><term><option>-B</option></term><term><option>--bottom=PAN</option></term>
        <listitem><para>apre PAN come pannello in basso.
       </para></listitem></varlistentry>
 
@@ -3163,7 +3186,8 @@ EOF</screen>
      [<parameter>Name</parameter>])
      Apre il pannello di nome <parameter>Name</parameter> sul lato 
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>) dello schermo.
-     <parameter>Name</parameter> può essere un nome in «Choices» (es.
+     <parameter>Name</parameter> può essere un nome in 
+     <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename> (es.
      <userinput>MioPannello</userinput>) o avere il percorso completo.
      Se non c'è alcun nome, il pannello su quel lato viene disattivato.
    </para></listitem>
@@ -3186,7 +3210,8 @@ EOF</screen>
    
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])
      Attiva la bacheca <parameter>Name</parameter>.
-     <parameter>Name</parameter> può essere un nome in «Choices» (es.
+     <parameter>Name</parameter> può essere un nome in 
+     <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename> (es.
      <userinput>MiaBacheca</userinput>) o avere un percorso completo.
      Se non c'è alcun nome, la bacheca viene disattivata.
    </para></listitem>
@@ -3338,8 +3363,8 @@ EOF</screen>
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>Choices</abbrev><citetitle>The ROX Choices system,
-    <ulink url="http://rox.sourceforge.net/choices.html"/></citetitle>
+   <abbrev>BaseDir</abbrev><citetitle>The freedesktop.org base directory system,
+     <ulink url="http://www.freedesktop.org/wiki/Standards_2fbasedir_2dspec"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
@@ -3359,12 +3384,17 @@ EOF</screen>
 
   <bibliomixed>
    <abbrev>Wallpaper</abbrev><citetitle>Wallpaper backdrop control application
-    <ulink url="http://rox.sf.net/wallpaper.html"/></citetitle>
+    <ulink url="http://rox.sourceforge.net/phpwiki/index.php/Wallpaper"/></citetitle>
   </bibliomixed>
 
   <bibliomixed>
-   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.8)
-    <ulink url="http://www.freedesktop.org/standards/shared-mime-info-spec/"/></citetitle>
+   <abbrev>SharedMIME</abbrev><citetitle>Shared MIME-info Database (Version 0.16)
+    <ulink url="http://www.freedesktop.org/wiki/Standards_2fshared_2dmime_2dinfo_2dspec"/></citetitle>
+  </bibliomixed>
+
+  <bibliomixed>
+   <abbrev>IconTheme</abbrev><citetitle>The freedesktop.org Icon Theme specification
+    <ulink url="http://www.freedesktop.org/wiki/Standards_2ficon_2dtheme_2dspec"/></citetitle>
   </bibliomixed>
 
  </bibliography>
