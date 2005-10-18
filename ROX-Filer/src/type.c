@@ -1266,8 +1266,8 @@ static void set_icon_theme(void)
 		delayed_error(_("Failed to create symlink '%s':\n%s\n\n"
 		"(this may mean that the ROX theme already exists there, but "
 		"the 'mime-application:postscript' icon couldn't be loaded for "
-		"some reason, or %s is a link to an invalid directory)"),
-			      icon_home, g_strerror(errno), icon_home);
+		"some reason, or %s is a link to an invalid directory; try "
+		"deleting it)"), icon_home, g_strerror(errno), icon_home);
 		open_to_show(icon_home);
 	}
 	g_free(icon_home);

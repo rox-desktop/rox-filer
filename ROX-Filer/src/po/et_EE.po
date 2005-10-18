@@ -4,8 +4,8 @@ msgstr ""
 "Project-Id-Version: ROX-Filer 2.1.6\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-08-09 14:02+0100\n"
-"PO-Revision-Date: 2005-02-13 00:17+0200\n"
-"Last-Translator: Teet TÃ€rnoärno <teet@myrealbox.com>\n"
+"PO-Revision-Date: 2005-10-18 16:20+0200\n"
+"Last-Translator: Teet Tärno <devlin@hot.ee>\n"
 "Language-Team: Estonian <et@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -27,11 +27,13 @@ msgstr "Vaikne"
 msgid "Don't confirm every operation"
 msgstr "Ära küsi kinnitust iga kord"
 
-#: abox.c:455 tips:60
+#: abox.c:455
+#: tips:60
 msgid "Name"
 msgstr "Nimi"
 
-#: abox.c:461 menu.c:232
+#: abox.c:461
+#: menu.c:232
 msgid "Directory"
 msgstr "Kataloog"
 
@@ -41,15 +43,15 @@ msgstr "Avaldis:"
 
 #: action.c:58
 msgid "See the attr(5) man page for full details."
-msgstr ""
+msgstr "Lisainfo saamiseks vaadake attr(5) man-lehekülge."
 
 #: action.c:60
 msgid "See the fsattr(5) man page for full details."
-msgstr ""
+msgstr "Lisainfo saamiseks vaadake fsattr(5) man-lehekülge."
 
 #: action.c:62
 msgid "You do not appear to have OS support."
-msgstr ""
+msgstr "Teil ei tundu olevat opsüsteemi toetust."
 
 #: action.c:188
 msgid "Find expression reference"
@@ -71,13 +73,10 @@ msgid ""
 "<b>IsReg system(grep -q fred \"%\")</b> (contains the word 'fred')\n"
 "\n"
 "<u>Simple Tests</u>\n"
-"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
-"b> (types)\n"
-"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
-"(permissions)\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</b> (types)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (permissions)\n"
 "<b>IsEmpty, IsMine</b>\n"
-"A pattern in single quotes is a shell-style wildcard pattern to match. If "
-"it\n"
+"A pattern in single quotes is a shell-style wildcard pattern to match. If it\n"
 "contains a slash then the match is against the full path; otherwise it is\n"
 "against the leafname only.\n"
 "\n"
@@ -85,8 +84,7 @@ msgid ""
 "<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (compare two values)\n"
 "<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (file sizes)\n"
 "<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (times)\n"
-"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
-"(values)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (values)\n"
 "\n"
 "<u>Specials</u>\n"
 "<b>system(command)</b> (true if 'command' returns with a zero exit status;\n"
@@ -107,23 +105,18 @@ msgstr ""
 "<b>IsReg system(grep -q fred \"%\")</b> (sisaldab sõna 'fred')\n"
 "\n"
 "<u>Lihtsad testid</u>\n"
-"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</"
-"b> (tüübid)\n"
-"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> "
-"(failiõigused)\n"
+"<b>IsReg, IsLink, IsDir, IsChar, IsBlock, IsDev, IsPipe, IsSocket, IsDoor</b> (tüübid)\n"
+"<b>IsSUID, IsSGID, IsSticky, IsReadable, IsWriteable, IsExecutable</b> (failiõigused)\n"
 "<b>IsEmpty, IsMine</b>\n"
-"Ühekordsetes jutumärkides olevat mustrit võrreldakse käsurea stiilis. Kui "
-"see\n"
+"Ühekordsetes jutumärkides olevat mustrit võrreldakse käsurea stiilis. Kui see\n"
 "sisaldab kaldkriipsu, võrreldakse täieliku rajaga, muidu ainult \n"
 "failinimega.\n"
 "\n"
 "<u>Võrdlused</u>\n"
-"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (kahe väärtuse "
-"võrdlemine)\n"
+"<b>&lt;, &lt;=, =, !=, &gt;, &gt;=, After, Before</b> (kahe väärtuse võrdlemine)\n"
 "<b>5 bytes, 1Kb, 2Mb, 3Gb</b> (failisuurused)\n"
 "<b>2 secs|mins|hours|days|weeks|years  ago|hence</b> (ajad)\n"
-"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> "
-"(väärtused)\n"
+"<b>atime, ctime, mtime, now, size, inode, nlinks, uid, gid, blocks</b> (väärtused)\n"
 "\n"
 "<u>Erikäsud</u>\n"
 "<b>system(Befehl)</b> (tõene, kui 'käsu' väljundväärtus on null;\n"
@@ -141,11 +134,9 @@ msgid ""
 "\n"
 "The format of a command is: <b>CHANGE, CHANGE, ...</b>\n"
 "Each <b>CHANGE</b> is: <b>WHO HOW PERMISSIONS</b>\n"
-"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which "
-"determines whether to\n"
+"<b>WHO</b> is some combination of <b>u</b>, <b>g</b> and <b>o</b> which determines whether to\n"
 "change the permissions for the User (owner), Group or Others.\n"
-"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly "
-"the permissions.\n"
+"<b>HOW</b> is <b>+</b>, <b>-</b> or <b>=</b> to add, remove or set exactly the permissions.\n"
 "<b>PERMISSIONS</b> is some combination of the letters <b>rwxXstugo</b>\n"
 "\n"
 "Bracketed text and spaces are ignored.\n"
@@ -153,8 +144,7 @@ msgid ""
 "<u>Examples</u>\n"
 "<b>u+rw</b>: the file owner gains read and write permission\n"
 "<b>g=u</b>: the group permissions are set to be the same as the user's\n"
-"<b>o=u-w</b>: others get the same permissions as the owner, but without "
-"write permission\n"
+"<b>o=u-w</b>: others get the same permissions as the owner, but without write permission\n"
 "<b>a+x</b>: <b>a</b>ll get execute/access permission - same as <b>ugo+x</b>\n"
 "<b>a+X</b>: directories become accessable by everyone; files which were\n"
 "executable by anyone become executable by everyone\n"
@@ -169,11 +159,9 @@ msgstr ""
 "\n"
 "Käsuvorming on: <b>MUUDATUS, MUUDATUD, ...</b>\n"
 "Iga <b>MUUDATUS</b> on kujul: <b>KES MIDA ÕIGUSED</b>\n"
-"<b>KES</b> on kombinatsioon tähtedest <b>u</b>, <b>g</b> und <b>o</b>, mis "
-"määrab, kelle õigusi muudetakse:\n"
+"<b>KES</b> on kombinatsioon tähtedest <b>u</b>, <b>g</b> und <b>o</b>, mis määrab, kelle õigusi muudetakse:\n"
 "Omaniku (User),  grupi (Group) või kõigi muude (Others).\n"
-"<b>MIDA</b> on <b>+</b>, <b>-</b> või <b>=</b>, et lisade, eemaldada või "
-"täpselt seada õigusi.\n"
+"<b>MIDA</b> on <b>+</b>, <b>-</b> või <b>=</b>, et lisade, eemaldada või täpselt seada õigusi.\n"
 "<b>ÕIGUSED</b> on mingi kombinatsioon tähtedest <b>rwxXstugo</b>\n"
 "\n"
 "Nurksulgudes teksti ja tühikuid ignoreeritakse.\n"
@@ -182,15 +170,12 @@ msgstr ""
 "\n"
 "<b>u+rw</b>: faili omanik saab lugemis- ja kirjutamisõiguse\n"
 "<b>g=u</b>: grupi õigused seatakse samadeks kui omanikul\n"
-"<b>o=u-w</b>: kõik muud saavad samad õigused kui omanik, välja arvatud "
-"kirjutamisõigus\n"
+"<b>o=u-w</b>: kõik muud saavad samad õigused kui omanik, välja arvatud kirjutamisõigus\n"
 "<b>a+x</b>: kõik saavad õiguse käivitada - sama kui <b>ugo+x</b>\n"
-"<b>a+X</b>: kõik saavad õiguse kataloogidele ligi pääseda; failid, millele "
-"oli kellegil käivitusõigus, \n"
+"<b>a+X</b>: kõik saavad õiguse kataloogidele ligi pääseda; failid, millele oli kellegil käivitusõigus, \n"
 "muutuvad kõigi poolt käivitatavateks\n"
 "<b>u+rw, go+r</b>: kaks käsku korraga!\n"
-"<b>u+s</b>: sea SetUID-bitt - tihti ei oma mingit efekti skriptifailide "
-"puhul\n"
+"<b>u+s</b>: sea SetUID-bitt - tihti ei oma mingit efekti skriptifailide puhul\n"
 "<b>755</b>: sea ligipääsuõigused otse\n"
 "\n"
 "Täpsemat infot saate lugeda chmod(1) man-leheküljelt."
@@ -200,7 +185,6 @@ msgid "Set type reference"
 msgstr "Sea tüüpide viiteid"
 
 #: action.c:309
-#, fuzzy
 msgid ""
 "Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
@@ -258,15 +242,21 @@ msgstr ""
 "'\n"
 "Valmis\n"
 
-#: action.c:557 support.c:395
+#: action.c:557
+#: support.c:395
 msgid "ERROR"
 msgstr "VIGA"
 
-#: action.c:711 main.c:674 main.c:681 main.c:688
+#: action.c:711
+#: main.c:674
+#: main.c:681
+#: main.c:688
 msgid "Yes"
 msgstr "Jaa"
 
-#: action.c:714 main.c:676 main.c:690
+#: action.c:714
+#: main.c:676
+#: main.c:690
 msgid "No"
 msgstr "Ei"
 
@@ -329,7 +319,8 @@ msgstr ""
 "!%s\n"
 "väljastamine ebaõnnestus\n"
 
-#: action.c:1027 action.c:1046
+#: action.c:1027
+#: action.c:1046
 #, c-format
 msgid "?Check '%s'?"
 msgstr "?'Kontrollida %s'?"
@@ -343,7 +334,8 @@ msgstr "!Vigane otsingutingimus - muutke ja proovige uuesti\n"
 msgid "'(while checking '%s')\n"
 msgstr "'('%s' kontrollimise juures)\n"
 
-#: action.c:1127 action.c:1152
+#: action.c:1127
+#: action.c:1152
 #, c-format
 msgid "?Change permissions of '%s'?"
 msgstr "?Muuda '%s' loabitte?"
@@ -357,7 +349,8 @@ msgstr "'Muuda '%s loabitte'\n"
 msgid "!Invalid mode command - change it and try again\n"
 msgstr "!Vigane moodi käsk - muutke seda ja proovige veelkord\n"
 
-#: action.c:1207 action.c:1227
+#: action.c:1207
+#: action.c:1227
 #, c-format
 msgid "?Change type of '%s'?"
 msgstr "?Muuda '%s' tüüpi?"
@@ -536,7 +529,8 @@ msgstr "!Ühenduspunkti pole valitud!\n"
 msgid "?Another search?"
 msgstr "?Otsida veel?"
 
-#: action.c:1869 action.c:1900
+#: action.c:1869
+#: action.c:1900
 #, c-format
 msgid "!'%s' is a symbolic link\n"
 msgstr "!'%s' on sümbolviit\n"
@@ -545,7 +539,8 @@ msgstr "!'%s' on sümbolviit\n"
 msgid "You need to select some items to search through"
 msgstr "Palun valige mõni kataloog, millest otsida"
 
-#: action.c:1950 menu.c:223
+#: action.c:1950
+#: menu.c:223
 msgid "Find"
 msgstr "Otsi"
 
@@ -565,11 +560,14 @@ msgstr "Ühenda / Lahuta"
 msgid "ROX-Filer does not yet support mount points on your system. Sorry."
 msgstr "Vabandust, aga ROX-Filer ei toeta teie masinas veel ühenduspunkte"
 
-#: action.c:2048 menu.c:210 tips:208
+#: action.c:2048
+#: menu.c:210
+#: tips:208
 msgid "Delete"
 msgstr "Kustuta"
 
-#: action.c:2058 tips:213
+#: action.c:2058
+#: tips:213
 msgid "Force"
 msgstr "Sunni"
 
@@ -577,7 +575,11 @@ msgstr "Sunni"
 msgid "Don't confirm deletion of non-writeable items"
 msgstr "Kirjutuskeeluga objektide kustutamisel ära küsi kinnitust"
 
-#: action.c:2061 action.c:2116 action.c:2175 action.c:2228 action.c:2264
+#: action.c:2061
+#: action.c:2116
+#: action.c:2175
+#: action.c:2228
+#: action.c:2264
 #: tips:215
 msgid "Brief"
 msgstr "Lühidalt"
@@ -610,15 +612,21 @@ msgstr "go-rwx (Luba ligipääs vaid omanikule)"
 msgid "go=u-w (Public access, not write)"
 msgstr "go=u-w (Luba kõigil lugeda, keela kirjutamine)"
 
-#: action.c:2105 menu.c:184 menu.c:221 tips:75
+#: action.c:2105
+#: menu.c:184
+#: menu.c:221
+#: tips:75
 msgid "Permissions"
 msgstr "Õigused"
 
-#: action.c:2116 action.c:2175
+#: action.c:2116
+#: action.c:2175
 msgid "Don't list processed files"
 msgstr "Ära näita käsitletud faile"
 
-#: action.c:2119 action.c:2178 tips:217
+#: action.c:2119
+#: action.c:2178
+#: tips:217
 msgid "Recurse"
 msgstr "Rekursiivne"
 
@@ -642,19 +650,27 @@ msgstr "Muuda tüüpi"
 msgid "Change contents of subdirectories"
 msgstr "Muuda ka alamkataloogide sisu"
 
-#: action.c:2185 infobox.c:615
+#: action.c:2185
+#: infobox.c:615
 msgid "Type:"
 msgstr "Tüüp:"
 
-#: action.c:2214 dnd.c:124 menu.c:1999 tips:202
+#: action.c:2214
+#: dnd.c:124
+#: menu.c:1999
+#: tips:202
 msgid "Copy"
 msgstr "Kopeeri"
 
-#: action.c:2224 action.c:2260 tips:219
+#: action.c:2224
+#: action.c:2260
+#: tips:219
 msgid "Newer"
 msgstr "Uuem"
 
-#: action.c:2225 action.c:2261 tips:220
+#: action.c:2225
+#: action.c:2261
+#: tips:220
 msgid "Only over-write if source is newer than destination."
 msgstr "Kirjuta üle vaid siis, kui lähtefail on uuem."
 
@@ -662,7 +678,9 @@ msgstr "Kirjuta üle vaid siis, kui lähtefail on uuem."
 msgid "Only log directories as they are copied"
 msgstr "Näita vaid kopeeritavaid katalooge"
 
-#: action.c:2250 dnd.c:125 tips:204
+#: action.c:2250
+#: dnd.c:125
+#: tips:204
 msgid "Move"
 msgstr "Tõsta"
 
@@ -670,11 +688,13 @@ msgstr "Tõsta"
 msgid "Don't log each file as it is moved"
 msgstr "Ära näita iga faili, mida tõstetakse"
 
-#: action.c:2284 tips:206
+#: action.c:2284
+#: tips:206
 msgid "Link"
 msgstr "Loo viit"
 
-#: action.c:2303 appmenu.c:113
+#: action.c:2303
+#: appmenu.c:113
 msgid "Eject"
 msgstr "Väljasta"
 
@@ -708,18 +728,17 @@ msgstr "<Kirjeldus puudub>"
 
 #: appmenu.c:295
 #, c-format
-msgid ""
-"Symlink any programs you want into this directory. They will appear in the "
-"menu for all items of this type (%s/%s)."
-msgstr ""
-"Loo antud kataloogi sümbolviidad programmidele, mida soovid näha kõigi tüüpi "
-"(%s/%s) objektide puhul menüüs"
+msgid "Symlink any programs you want into this directory. They will appear in the menu for all items of this type (%s/%s)."
+msgstr "Loo antud kataloogi sümbolviidad programmidele, mida soovid näha kõigi tüüpi (%s/%s) objektide puhul menüüs"
 
-#: appmenu.c:339 menu.c:234
+#: appmenu.c:339
+#: menu.c:234
 msgid "Customise Menu..."
 msgstr "Kohanda menüüd..."
 
-#: appmenu.c:396 menu.c:251 toolbar.c:159
+#: appmenu.c:396
+#: menu.c:251
+#: toolbar.c:159
 msgid "Help"
 msgstr "Abi"
 
@@ -736,7 +755,8 @@ msgstr "Pealkiri"
 msgid "Can't bookmark non-local resource '%s'\n"
 msgstr "Võrguaadressi '%s' pole võimalik lisada järjehoidjatesse \n"
 
-#: bookmarks.c:312 bookmarks.c:630
+#: bookmarks.c:312
+#: bookmarks.c:630
 #, c-format
 msgid "'%s' isn't a directory"
 msgstr "'%s' ei ole kataloog"
@@ -779,7 +799,6 @@ msgid "Reset"
 msgstr "Taasta"
 
 #: bulk_rename.c:76
-#, fuzzy
 msgid "Make the New column a copy of Old"
 msgstr "Tee Pärast-tulpa koopia Enne-tulba sisust"
 
@@ -792,7 +811,6 @@ msgid "Replace:"
 msgstr "Asenda:"
 
 #: bulk_rename.c:101
-#, fuzzy
 msgid ""
 "This is a regular expression to search for.\n"
 "^ matches the start of a filename\n"
@@ -811,36 +829,26 @@ msgid "With:"
 msgstr "Stringiga:"
 
 #: bulk_rename.c:116
-msgid ""
-"The first match in each filename will be replaced by this string. There are "
-"no special characters."
-msgstr ""
-"Esimene vaste igas failinimes asendatakse selle stringiga. Erimärke pole."
+msgid "The first match in each filename will be replaced by this string. There are no special characters."
+msgstr "Esimene vaste igas failinimes asendatakse selle stringiga. Erimärke pole."
 
 #: bulk_rename.c:120
 msgid "Apply"
 msgstr "Rakenda"
 
 #: bulk_rename.c:123
-#, fuzzy
-msgid ""
-"Do a search-and-replace in the New column. The files are not actually "
-"renamed until you click on the Rename button below."
-msgstr ""
-"Soorita asendus Pärast tulbas.Faile endid ei nimetata ümber enne, kui "
-"klõpsate all asuvale 'Nimeta ümber' nupule."
+msgid "Do a search-and-replace in the New column. The files are not actually renamed until you click on the Rename button below."
+msgstr "Soorita asendus Pärast tulbas.Faile endid ei nimetata ümber enne, kui klõpsate all asuvale 'Nimeta ümber' nupule."
 
 #: bulk_rename.c:142
 msgid "Old name"
-msgstr ""
+msgstr "Vana nimi"
 
 #: bulk_rename.c:151
-#, fuzzy
 msgid "New name"
-msgstr "Nimeta ümber"
+msgstr "Uus nimi"
 
 #: bulk_rename.c:259
-#, fuzzy
 msgid "No strings (in the New column) matched the given expression"
 msgstr "Ükski string (Pärast tulbas) ei vastanud antud avaldisele"
 
@@ -854,10 +862,8 @@ msgid "%d names matched, but the results were all the same"
 msgstr "%d nime vastas avaldisele, kuid tulemused olid samad"
 
 #: bulk_rename.c:293
-msgid ""
-"Specify a regular expression to match, and a string to replace matches with."
-msgstr ""
-"Määra regulaaravaldis, mida otsitakse ja string, millega asendatakse tulemus."
+msgid "Specify a regular expression to match, and a string to replace matches with."
+msgstr "Määra regulaaravaldis, mida otsitakse ja string, millega asendatakse tulemus."
 
 #: bulk_rename.c:310
 #, c-format
@@ -886,22 +892,17 @@ msgid "A file called '%s' already exists"
 msgstr "Fail nimega '%s' on juba olemas"
 
 #: bulk_rename.c:421
-#, fuzzy, c-format
-msgid ""
-"Some of the New names contain / characters (eg '%s'). This will cause the "
-"files to end up in different directories. Continue?"
-msgstr ""
-"Mõned nimed Pärast tulbas sisaldavad / märke (näit. '%s'). Selle tagajärjel "
-"tõstetakse failid erinevatesse kataloogidesse. Kas jätkan?"
+#, c-format
+msgid "Some of the New names contain / characters (eg '%s'). This will cause the files to end up in different directories. Continue?"
+msgstr "Mõned nimed Pärast tulbas sisaldavad / märke (näit. '%s'). Selle tagajärjel tõstetakse failid erinevatesse kataloogidesse. Kas jätkan?"
 
 #: bulk_rename.c:436
 msgid "None of the names have changed. Nothing to do!"
 msgstr "Ükski nimi pole muutunud. Pole midagi teha!"
 
 #: choices.c:428
-#, fuzzy
 msgid "Choices migration"
-msgstr "Hiina (traditsiooniline)"
+msgstr "Valikute ümbertõstmine"
 
 #: choices.c:436
 #, c-format
@@ -911,11 +912,15 @@ msgid ""
 " to the new location \n"
 "<b>%s</b>\n"
 msgstr ""
+"Choices on tõstetud ümber asukohast \n"
+"<b>%s</b>\n"
+" uude asukohta \n"
+"<b>%s</b>\n"
 
 #: choices.c:447
 #, c-format
 msgid "%d directories could not be migrated"
-msgstr ""
+msgstr "%d kataloogi ei õnnestunud ümber tõsta"
 
 #: dir.c:982
 #, c-format
@@ -934,11 +939,11 @@ msgstr "lstat(2) ebaõnnestus: %s"
 
 #: dnd.c:126
 msgid "Link (relative)"
-msgstr ""
+msgstr "Sümbolviit"
 
 #: dnd.c:127
 msgid "Link (absolute)"
-msgstr ""
+msgstr "Absoluutne viit"
 
 #: dnd.c:426
 msgid "Internal error - bad info type"
@@ -953,33 +958,25 @@ msgid "XDS protocol error: leafname may not contain '/'\n"
 msgstr "XDS protokolli viga: failinimi ei tohi sisaldada '/' märki\n"
 
 #: dnd.c:605
-msgid ""
-"XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/"
-"plain) did not contain a leafname\n"
-msgstr ""
-"On XdndDirectSave0-sihtmärk, kuid XdndDirectSave0-aatomis (tüüp text/plain) "
-"polnud failinime\n"
+msgid "XdndDirectSave0 target provided, but the atom XdndDirectSave0 (type text/plain) did not contain a leafname\n"
+msgstr "On XdndDirectSave0-sihtmärk, kuid XdndDirectSave0-aatomis (tüüp text/plain) polnud failinime\n"
 
 #: dnd.c:618
 msgid "Sorry - I require a target type of text/uri-list or XdndDirectSave0."
 msgstr "Vabandust - vajan text/uri-list või XdndDirectSave0 tüüpi sihtmärki"
 
 #: dnd.c:621
-msgid ""
-"Sorry - I require a target type of text/uri-list or application/octet-stream."
-msgstr ""
-"Vabandust - vajan text/uri-list või application/octet-stream tüüpi sihtmärki."
+msgid "Sorry - I require a target type of text/uri-list or application/octet-stream."
+msgstr "Vabandust - vajan text/uri-list või application/octet-stream tüüpi sihtmärki."
 
 #: dnd.c:691
 #, c-format
 msgid ""
-"Failed to add some items to the pinboard, because they are on a remote "
-"machine. For example:\n"
+"Failed to add some items to the pinboard, because they are on a remote machine. For example:\n"
 "\n"
 "%s"
 msgstr ""
-"Mõnede objektide lisamine töölauale ebaõnnestus, kuna nad pole kohalikus "
-"masinas. Näiteks:\n"
+"Mõnede objektide lisamine töölauale ebaõnnestus, kuna nad pole kohalikus masinas. Näiteks:\n"
 "\n"
 "%s"
 
@@ -993,8 +990,7 @@ msgstr "Vabandust - Võrgurakendus ei taha/oska mulle infot saata"
 
 #: dnd.c:812
 msgid "XDS protocol error: return code should be 'S', 'F' or 'E'\n"
-msgstr ""
-"XDS protokolli viga: tagastatud väärtus peab olema kas 'S', 'F' või 'E'\n"
+msgstr "XDS protokolli viga: tagastatud väärtus peab olema kas 'S', 'F' või 'E'\n"
 
 #: dnd.c:845
 msgid "Sorry, can't display a menu of actions for a remote file / raw data."
@@ -1014,23 +1010,16 @@ msgid "No URIs in the text/uri-list (nothing to do!)"
 msgstr "text/uri-list nimekirjas pole ühtegi aadressi (pole tegevust!)"
 
 #: dnd.c:993
-msgid ""
-"Can't get data from remote machine (application/octet-stream not provided)"
-msgstr ""
-"Võrgust pole võimalik andmeid saada (application/octet-stream pole saadaval)"
+msgid "Can't get data from remote machine (application/octet-stream not provided)"
+msgstr "Võrgust pole võimalik andmeid saada (application/octet-stream pole saadaval)"
 
 #: dnd.c:1016
-msgid ""
-"Some of these files are on a different machine - they will be ignored - sorry"
+msgid "Some of these files are on a different machine - they will be ignored - sorry"
 msgstr "Vabandust - osad failid jätan vahele, kuna need asuvad teises masinas"
 
 #: dnd.c:1023
-msgid ""
-"None of these files are on the local machine - I can't operate on multiple "
-"remote files - sorry."
-msgstr ""
-"Vabandust - ükski failidest ei asu siin masinas. Ma ei saa mitme mitte-"
-"kohaliku failiga töötada."
+msgid "None of these files are on the local machine - I can't operate on multiple remote files - sorry."
+msgstr "Vabandust - ükski failidest ei asu siin masinas. Ma ei saa mitme mitte-kohaliku failiga töötada."
 
 #: dnd.c:1036
 msgid "Unknown action requested"
@@ -1054,12 +1043,8 @@ msgid "<nothing>"
 msgstr "<eimidagi>"
 
 #: dropbox.c:239
-msgid ""
-"I can't show you the currently set item, because nothing is currently set. "
-"Drag something onto me!"
-msgstr ""
-"Ma ei saa näidata praegust valikut, kuna midagi pole valitud ! Lohista siia "
-"midagi !"
+msgid "I can't show you the currently set item, because nothing is currently set. Drag something onto me!"
+msgstr "Ma ei saa näidata praegust valikut, kuna midagi pole valitud ! Lohista siia midagi !"
 
 #: dropbox.c:263
 msgid "Sorry, you need to drop exactly one file onto the drop area."
@@ -1070,7 +1055,8 @@ msgstr "Vabandust, te saate siia lohistada vaid ühe faili."
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Ei saa kasutada '%s' kuna see pole kohalik fail."
 
-#: dropbox.c:280 pinboard.c:853
+#: dropbox.c:280
+#: pinboard.c:853
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1111,7 +1097,8 @@ msgstr ""
 msgid "No change"
 msgstr "Pole muutust"
 
-#: filer.c:572 menu.c:862
+#: filer.c:572
+#: menu.c:862
 msgid "Unmount"
 msgstr "Lahuta"
 
@@ -1122,13 +1109,9 @@ msgstr "Kataloog on kadunud/kustutatud"
 #: filer.c:1031
 #, c-format
 msgid ""
-"Group %s is not set. Select some files and press Ctrl+%s to set the group. "
-"Press %s on its own to reselect the files later.\n"
+"Group %s is not set. Select some files and press Ctrl+%s to set the group. Press %s on its own to reselect the files later.\n"
 "Make sure NumLock is on if you use the keypad."
-msgstr ""
-"Grupp %s pole määratud. Grupi määramiseks valige mõned failid ja vajutage "
-"Ctrl+%s. Failide hiljem uuesti valimiseks vajutage vaid %s. "
-"Numbriklahvistiku kasutamisel peab Teil Numlock aktiivne olema"
+msgstr "Grupp %s pole määratud. Grupi määramiseks valige mõned failid ja vajutage Ctrl+%s. Failide hiljem uuesti valimiseks vajutage vaid %s. Numbriklahvistiku kasutamisel peab Teil Numlock aktiivne olema"
 
 #: filer.c:1267
 #, c-format
@@ -1168,7 +1151,8 @@ msgstr "Sümbolviit failile "
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr "Failinimi pole kodeeringus UTF-8. Te peaksite faili ümber nimetama.\n"
 
-#: filer.c:2643 menu.c:1989
+#: filer.c:2643
+#: menu.c:1989
 msgid "Item no longer exists!"
 msgstr "Objekti pole enam olemas!"
 
@@ -1180,7 +1164,10 @@ msgstr "Vali ekraani asetused, mida salvestada"
 msgid "Position"
 msgstr "Asukoht"
 
-#: filer.c:3339 toolbar.c:135 toolbar.c:139 tips:63
+#: filer.c:3339
+#: toolbar.c:135
+#: toolbar.c:139
+#: tips:63
 msgid "Size"
 msgstr "Suurus"
 
@@ -1196,11 +1183,14 @@ msgstr "Vaate stiil"
 msgid "Sort type and order"
 msgstr "Sorteerimistüüp ja järjekord"
 
-#: filer.c:3361 toolbar.c:143
+#: filer.c:3361
+#: toolbar.c:143
 msgid "Details"
 msgstr "Lisainfo"
 
-#: filer.c:3366 tips:114 tips:115
+#: filer.c:3366
+#: tips:114
+#: tips:115
 msgid "Thumbnails"
 msgstr "Pisipildid"
 
@@ -1437,12 +1427,8 @@ msgid "Unnamed"
 msgstr "Nimetu"
 
 #: gtksavebox.c:473
-msgid ""
-"Remote application wants to use Direct Save, but I can't read the "
-"XdndDirectSave0 (type text/plain) property.\n"
-msgstr ""
-"Võrgurakendus soovib Direct Save kasutada, kuid ma ei suuda XdndDirectSave0-"
-"atribuuti (tüüpi text/plain) lugeda.\n"
+msgid "Remote application wants to use Direct Save, but I can't read the XdndDirectSave0 (type text/plain) property.\n"
+msgstr "Võrgurakendus soovib Direct Save kasutada, kuid ma ei suuda XdndDirectSave0-atribuuti (tüüpi text/plain) lugeda.\n"
 
 #: gtksavebox.c:598
 msgid ""
@@ -1470,14 +1456,12 @@ msgstr "Proovin XML-faili teksti kujul lugeda. Fail '%s' võib olla vigane."
 msgid ""
 "Error in '%s' file at line %d: \n"
 "\"%s\"\n"
-"This may be due to upgrading from a previous version of ROX-Filer. Open the "
-"Options window and click on Save.\n"
+"This may be due to upgrading from a previous version of ROX-Filer. Open the Options window and click on Save.\n"
 "Further errors will be ignored."
 msgstr ""
 "Viga failis '%s' real %d: \n"
 "\"%s\"\n"
-"See võib johtuda vanema ROX-Filer'i versiooni uuendamisest.Avage Eelistuste "
-"aken ja klõpsake nupul Salvesta.\n"
+"See võib johtuda vanema ROX-Filer'i versiooni uuendamisest.Avage Eelistuste aken ja klõpsake nupul Salvesta.\n"
 "Edasisi vigu eiratakse."
 
 #: gui_support.c:1000
@@ -1491,27 +1475,22 @@ msgstr "Faili '%s' avamine ebaõnnestus: %s"
 
 #: gui_support.c:1376
 #, c-format
-msgid ""
-"Failed to load image '%s': reason not known, probably a corrupt image file"
-msgstr ""
-"Pildi '%s' laadimine ebaõnnestus: põhjus pole teada, tõenäoliselt vigane "
-"pildifail"
+msgid "Failed to load image '%s': reason not known, probably a corrupt image file"
+msgstr "Pildi '%s' laadimine ebaõnnestus: põhjus pole teada, tõenäoliselt vigane pildifail"
 
 #: gui_support.c:1427
 msgid ""
-"This program cannot be run, as the 0launch command is not available. It can "
-"be downloaded from here:\n"
+"This program cannot be run, as the 0launch command is not available. It can be downloaded from here:\n"
 "\n"
 "http://0install.net/injector.html"
 msgstr ""
+"Seda programmi pole võimalik jooksutada, kuna puudub 0launch käsk. Seda saate alla laadida aadressilt:\n"
+"\n"
+"http://0install.net/injector.html"
 
 #: i18n.c:38
-msgid ""
-"Note that you must save your choices and restart the filer for the new "
-"language setting to take full effect."
-msgstr ""
-"Te peate failihalduri uuesti käivitama, enne kui Teie valitud keel "
-"aktiveerub."
+msgid "Note that you must save your choices and restart the filer for the new language setting to take full effect."
+msgstr "Te peate failihalduri uuesti käivitama, enne kui Teie valitud keel aktiveerub."
 
 #: icon.c:78
 msgid "(click to set)"
@@ -1521,47 +1500,61 @@ msgstr "(Valimiseks klõpsa)"
 msgid "ROX-Filer"
 msgstr "ROX-Filer"
 
-#: icon.c:134 menu.c:252
+#: icon.c:134
+#: menu.c:252
 msgid "About ROX-Filer..."
 msgstr "ROX-Filer'i kohta..."
 
-#: icon.c:135 menu.c:253
+#: icon.c:135
+#: menu.c:253
 msgid "Show Help Files"
 msgstr "Näita abiinfot"
 
-#: icon.c:136 menu.c:254
+#: icon.c:136
+#: menu.c:254
 msgid "Manual"
 msgstr "Juhend"
 
-#: icon.c:138 menu.c:230
+#: icon.c:138
+#: menu.c:230
 msgid "Options..."
 msgstr "Eelistused..."
 
-#: icon.c:139 menu.c:239
+#: icon.c:139
+#: menu.c:239
 msgid "Home Directory"
 msgstr "Kodukataloog"
 
-#: icon.c:140 icon.c:1340 menu.c:206 type.c:212
+#: icon.c:140
+#: icon.c:1340
+#: menu.c:206
+#: type.c:212
 msgid "File"
 msgstr "Fail"
 
-#: icon.c:141 menu.c:212 menu.c:875
+#: icon.c:141
+#: menu.c:212
+#: menu.c:875
 msgid "Shift Open"
 msgstr "Ava tekstina"
 
-#: icon.c:142 menu.c:218
+#: icon.c:142
+#: menu.c:218
 msgid "Properties"
 msgstr "Omadused"
 
-#: icon.c:143 menu.c:216
+#: icon.c:143
+#: menu.c:216
 msgid "Set Run Action..."
 msgstr "Sea avaja..."
 
-#: icon.c:144 menu.c:217
+#: icon.c:144
+#: menu.c:217
 msgid "Set Icon..."
 msgstr "Sea ikoon..."
 
-#: icon.c:145 icon.c:806
+#: icon.c:145
+#: icon.c:806
 msgid "Edit Item"
 msgstr "Muuda elementi"
 
@@ -1573,7 +1566,8 @@ msgstr "Näita asukohta"
 msgid "Remove Item(s)"
 msgstr "Eemalda elemente"
 
-#: icon.c:278 menu.c:764
+#: icon.c:278
+#: menu.c:764
 #, c-format
 msgid "%s '%s'"
 msgstr "%s·'%s'"
@@ -1594,7 +1588,8 @@ msgstr "Elementide eemaldamiseks valige mõned neist"
 msgid "You must open the menu over an item"
 msgstr "Palun avage menüü mõne elemendi kohal"
 
-#: icon.c:652 menu.c:1260
+#: icon.c:652
+#: menu.c:1260
 msgid "You can only set the run action for a regular file"
 msgstr "Faili käivitajat saate muuta vaid tavafailide puhul"
 
@@ -1631,7 +1626,8 @@ msgstr "Kas tõesti soovite avada %d akent?"
 msgid "Show Info"
 msgstr "Näita infot"
 
-#: infobox.c:135 menu.c:769
+#: infobox.c:135
+#: menu.c:769
 msgid "(bad utf-8)"
 msgstr "(vigane utf-8)"
 
@@ -1647,7 +1643,9 @@ msgstr "<b>Õigused</b>"
 msgid "<b>Contents indicate...</b>"
 msgstr "<b>Sisu järgi otsustades...</b>"
 
-#: infobox.c:423 infobox.c:560 support.c:349
+#: infobox.c:423
+#: infobox.c:560
+#: support.c:349
 msgid "bytes"
 msgstr "baite"
 
@@ -1680,7 +1678,8 @@ msgstr ""
 "%s peale ebaõnnestus\n"
 "(märkus: vana viit kustutati)"
 
-#: infobox.c:539 tips:270
+#: infobox.c:539
+#: tips:270
 msgid "Error:"
 msgstr "Viga:"
 
@@ -1692,7 +1691,9 @@ msgstr "Tegelik kataloog:"
 msgid "Owner, Group:"
 msgstr "Omanik, grupp:"
 
-#: infobox.c:556 infobox.c:571 infobox.c:580
+#: infobox.c:556
+#: infobox.c:571
+#: infobox.c:580
 msgid "Size:"
 msgstr "Suurus:"
 
@@ -1736,7 +1737,8 @@ msgstr "Pole toetatud"
 msgid "Link target:"
 msgstr "Viida sihtmärk:"
 
-#: infobox.c:649 infobox.c:652
+#: infobox.c:649
+#: infobox.c:652
 msgid "Run action:"
 msgstr "Avatakse:"
 
@@ -1855,7 +1857,6 @@ msgstr ""
 "\n"
 
 #: main.c:115
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1883,16 +1884,17 @@ msgid ""
 "Report bugs to "
 msgstr ""
 "Kasutamine: ROX-Filer/AppRun [VÕTI]... [FAIL]...\n"
-"Ava iga käsureal ette antud kataloog/fail või argumentide puudumisel jooksev "
-"kataloog,\n"
+"Ava iga käsureal ette antud kataloog/fail või \n"
+"argumentide puudumisel jooksev kataloog,\n"
 "\n"
-"  -b, --bottom=PANEEL\tava PANEEL ekraani all servas\n"
+"  -b, --border=PANEEL\tava PANEEL ekraani servas\n"
+"  -B, --bottom=PANEEL\tava PANEEL ekraani all servas\n"
 "  -c, --client-id=ID\tkasutusel sessioonihalduses\n"
 "  -d, --dir=DIR\t\tava DIR kui kataloog (mitte kui rakendus)\n"
 "  -D, --close=DIR\tsulge DIR koos alamkataloogidega\n"
 "  -h, --help\t\tnäita abiinfot ja välju\n"
 "  -l, --left=PANEEL\tava PANEEL ekraani vasakus servas\n"
-"  -m, --mime-type=FAIL\tnäita FILE'i MIME-tüüp ja välju\n"
+"  -m, --mime-type=FAIL\tnäita FAIL'i MIME-tüüp ja välju\n"
 "  -n, --new\t\tkäivitab uue failihalduri; failihalduri silumiseks\n"
 "  -p, --pinboard=PIN\tkasuta töölauda nimega PIN\n"
 "  -r, --right=PANEEL\tava PANEEL ekraani paremas servas\n"
@@ -1915,19 +1917,17 @@ msgstr ""
 
 #: main.c:234
 msgid ""
-"We got a BadWindow error from the X server. This might be due to this GTK "
-"bug (during drag-and-drop?):\n"
+"We got a BadWindow error from the X server. This might be due to this GTK bug (during drag-and-drop?):\n"
 "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 "Trying to continue..."
 msgstr ""
+"Me saime BadWindow vea X serverilt. See võib olla tingitud järgnevast GTK puugist (lohistamise ajal?):\n"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"Üritan jätkata..."
 
 #: main.c:382
-msgid ""
-"The -o argument is no longer used. You can turn on override redirect from "
-"the Options box instead."
-msgstr ""
-"Käsurea võti -o pole enam kasutusel. See on tõstetud Eelistused->Ühilduvus "
-"alla."
+msgid "The -o argument is no longer used. You can turn on override redirect from the Options box instead."
+msgstr "Käsurea võti -o pole enam kasutusel. See on tõstetud Eelistused->Ühilduvus alla."
 
 #: main.c:489
 #, c-format
@@ -1976,11 +1976,13 @@ msgstr "Jah (suudab joosta ka vanemate glibc versioonidega)"
 msgid "No (apsymbols.h not found)"
 msgstr "Ei (apsymbols.h ei leitud)"
 
-#: menu.c:180 tips:52
+#: menu.c:180
+#: tips:52
 msgid "Display"
 msgstr "Vaade"
 
-#: menu.c:181 tips:57
+#: menu.c:181
+#: tips:57
 msgid "Icons View"
 msgstr "Ikoonivaade"
 
@@ -1988,19 +1990,24 @@ msgstr "Ikoonivaade"
 msgid "Icons, With..."
 msgstr "Ikoonid ja..."
 
-#: menu.c:183 tips:74
+#: menu.c:183
+#: tips:74
 msgid "Sizes"
 msgstr "Suurused"
 
-#: menu.c:185 tips:254
+#: menu.c:185
+#: tips:254
 msgid "Types"
 msgstr "Tüübid"
 
-#: menu.c:186 tips:77
+#: menu.c:186
+#: tips:77
 msgid "Times"
 msgstr "Ajad"
 
-#: menu.c:187 tips:58 tips:92
+#: menu.c:187
+#: tips:58
+#: tips:92
 msgid "List View"
 msgstr "Loend-vaade"
 
@@ -2012,7 +2019,8 @@ msgstr "Suuremad ikoonid"
 msgid "Smaller Icons"
 msgstr "Väiksemad ikoonid"
 
-#: menu.c:191 tips:71
+#: menu.c:191
+#: tips:71
 msgid "Automatic"
 msgstr "Automaatne"
 
@@ -2092,7 +2100,8 @@ msgstr "Loenda"
 msgid "Set Type..."
 msgstr "Sea tüüp..."
 
-#: menu.c:224 toolbar.c:155
+#: menu.c:224
+#: toolbar.c:155
 msgid "Select"
 msgstr "Vali"
 
@@ -2124,7 +2133,8 @@ msgstr "Uus"
 msgid "Blank file"
 msgstr "Tühi fail"
 
-#: menu.c:235 tasklist.c:308
+#: menu.c:235
+#: tasklist.c:308
 msgid "Window"
 msgstr "Aken"
 
@@ -2203,17 +2213,11 @@ msgstr "Ava tekstina"
 
 #: menu.c:1031
 msgid ""
-"Extended attributes, used to store types, are not supported for this file or "
-"files.\n"
-"This may be due to lack of support from the filesystem or the C library, or "
-"it may simply be that the filesystem needs to be mounted with the right "
-"mount option ('user_xattr' on Linux)."
+"Extended attributes, used to store types, are not supported for this file or files.\n"
+"This may be due to lack of support from the filesystem or the C library, or it may simply be that the filesystem needs to be mounted with the right mount option ('user_xattr' on Linux)."
 msgstr ""
-"Laiendatud atribuudid, mida kasutatakse tüübi salvestamiseks, pole selle "
-"faili või failide puhul toetatud.\n"
-"Selle põhjuseks võib olla atribuutide toetuse puudumine failisüsteemil või C-"
-"teegil, või ka lihtsalt peaksite failisüsteemi ühendamisel edastama õige "
-"suvandi ('user_xattr' Linuxi puhul)."
+"Laiendatud atribuudid, mida kasutatakse tüübi salvestamiseks, pole selle faili või failide puhul toetatud.\n"
+"Selle põhjuseks võib olla atribuutide toetuse puudumine failisüsteemil või C-teegil, või ka lihtsalt peaksite failisüsteemi ühendamisel edastama õige suvandi ('user_xattr' Linuxi puhul)."
 
 #: menu.c:1037
 msgid "Setting type not supported for some of these files"
@@ -2225,16 +2229,11 @@ msgstr "_Relative link"
 
 #: menu.c:1078
 msgid ""
-"If on, the symlink will store the path from the symlink to the target file. "
-"Use this if the symlink and the target will be moved together.\n"
-"If off, the path from the root directory is stored - use this if the symlink "
-"may move but the target will stay put."
+"If on, the symlink will store the path from the symlink to the target file. Use this if the symlink and the target will be moved together.\n"
+"If off, the path from the root directory is stored - use this if the symlink may move but the target will stay put."
 msgstr ""
-"Kui selle suvandi sisse lülite, salvestatakse viida juures teekond "
-"sihtfailini. Kasutage seda siis, kui soovite viita ja sihtfaili koos "
-"liigutada.\n"
-"Kui suvandi välja lülite, salvestatakse viida juures teekond sihtfailini "
-"juurkataloogist. Kasutage siis, kui liigutate viita, aga mitte sihtfaili."
+"Kui selle suvandi sisse lülite, salvestatakse viida juures teekond sihtfailini. Kasutage seda siis, kui soovite viita ja sihtfaili koos liigutada.\n"
+"Kui suvandi välja lülite, salvestatakse viida juures teekond sihtfailini juurkataloogist. Kasutage siis, kui liigutate viita, aga mitte sihtfaili."
 
 #: menu.c:1148
 msgid "New pathname is not absolute"
@@ -2249,7 +2248,9 @@ msgstr "Sümbolviit '%s' on juba olemas. Asendada see viidaga failile '%s'?"
 msgid "_Replace"
 msgstr "_Asenda"
 
-#: menu.c:1351 menu.c:1392 menu.c:1452
+#: menu.c:1351
+#: menu.c:1392
+#: menu.c:1452
 msgid "Create"
 msgstr "Tekita"
 
@@ -2257,7 +2258,8 @@ msgstr "Tekita"
 msgid "NewDir"
 msgstr "UusKataloog"
 
-#: menu.c:1366 menu.c:1372
+#: menu.c:1366
+#: menu.c:1372
 #, c-format
 msgid "Error creating '%s': %s"
 msgstr "Faili '%s' loomisel oli viga: %s"
@@ -2274,65 +2276,52 @@ msgstr "Viga faili loomisel: ei leidnud malli %s jaoks"
 #: menu.c:1482
 #, c-format
 msgid ""
-"The `Send To' menu provides a quick way to send some files to an "
-"application. The applications listed are those in the following "
-"directories:\n"
+"The `Send To' menu provides a quick way to send some files to an application. The applications listed are those in the following directories:\n"
 "\n"
 "%s\n"
 "%s\n"
 "The `Send To' menu may be opened by Shift+Menu clicking over a file.\n"
 "\n"
 "Advanced use:\n"
-"You can also create subdirectories called `.text_html', `.text', etc which "
-"will only be shown for files of that type. `.group' is shown only when "
-"multiple files are selected."
+"You can also create subdirectories called `.text_html', `.text', etc which will only be shown for files of that type. `.group' is shown only when multiple files are selected."
 msgstr ""
-"`Ava kasutades'-menüü võimaldab määrata failide avamiseks rakendusi (või "
-"nende viitasid), mis asuvad järgnevates kataloogides:\n"
+"`Ava kasutades'-menüü võimaldab määrata failide avamiseks rakendusi (või nende viitasid), mis asuvad järgnevates kataloogides:\n"
 "\n"
 "%s\n"
 "%s\n"
-"`Ava kasutades'-menüü avaneb, klõpsates Shift+Menüü (vaikimisi parem "
-"hiirenupp) faili peal.\n"
+"`Ava kasutades'-menüü avaneb, klõpsates Shift+Menüü (vaikimisi parem hiirenupp) faili peal.\n"
 "Edasijõudnud kasutus:\n"
-"Te võite ka luua alamkatalooge nimedega `.text_html', `.text', jne, mida "
-"näidatakse vaid vastavat tüüpi failide puhul. `.group' näidatakse juhul, kui "
-"mitu faili on valitud."
+"Te võite ka luua alamkatalooge nimedega `.text_html', `.text', jne, mida näidatakse vaid vastavat tüüpi failide puhul. `.group' näidatakse juhul, kui mitu faili on valitud."
 
 #: menu.c:1493
-msgid ""
-"I'll show you your SendTo directory now; you should symlink (Ctrl+Shift "
-"drag) any applications you want into it."
-msgstr ""
-"Näitan 'Ava kasutades' kataloogi; Te saate sinna luua viitasid (Ctrl+Shift-"
-"lohista) rakendustele."
+msgid "I'll show you your SendTo directory now; you should symlink (Ctrl+Shift drag) any applications you want into it."
+msgstr "Näitan 'Ava kasutades' kataloogi; Te saate sinna luua viitasid (Ctrl+Shift-lohista) rakendustele."
 
-#: menu.c:1496 menu.c:1536
+#: menu.c:1496
+#: menu.c:1536
 msgid "Your CHOICESPATH variable setting prevents customisations - sorry."
-msgstr ""
-"Vabandust: Teie CHOICESPATH muutuja lubab eelistusi muuta vaid kasutajal "
-"root."
+msgstr "Vabandust: Teie CHOICESPATH muutuja lubab eelistusi muuta vaid kasutajal root."
 
 #: menu.c:1529
 #, c-format
 msgid ""
-"Any files placed in your Templates directories will appear on the `New' "
-"menu. Choosing one of them will make a copy of it as the new file.\n"
+"Any files placed in your Templates directories will appear on the `New' menu. Choosing one of them will make a copy of it as the new file.\n"
 "\n"
 "The following directories contain templates:\n"
 "\n"
 "%s\n"
 "%s\n"
 msgstr ""
+"Teie Mallide kataloogi paigutatud failid on näha `Uus' menüüs. Nendest mõna valimine tekitab uue failina koopia mallist.\n"
+"\n"
+"Järgnevad kataloogid sisaldavad malle:\n"
+"\n"
+"%s\n"
+"%s\n"
 
 #: menu.c:1534
-#, fuzzy
-msgid ""
-"I'll show you your Templates directory now; you should place any template "
-"files you want inside it."
-msgstr ""
-"Näitan 'Ava kasutades' kataloogi; Te saate sinna luua viitasid (Ctrl+Shift-"
-"lohista) rakendustele."
+msgid "I'll show you your Templates directory now; you should place any template files you want inside it."
+msgstr "Näitan Mallide kataloogi; Te saate mallide failid panna sinna sisse."
 
 #: menu.c:1651
 msgid "Customise"
@@ -2343,12 +2332,8 @@ msgid "This is already the canonical name for this directory."
 msgstr "See ongi juba antud kataloogi kanooniline nimi."
 
 #: menu.c:1748
-msgid ""
-"You can't open a second view onto this directory because the `Unique "
-"Windows' option is turned on in the Options window."
-msgstr ""
-"Te ei saa avada teist akent selle kataloogiga, kuna eelistustes on "
-"aktiveeritud  'Näita ühes aknas'."
+msgid "You can't open a second view onto this directory because the `Unique Windows' option is turned on in the Options window."
+msgstr "Te ei saa avada teist akent selle kataloogiga, kuna eelistustes on aktiveeritud  'Näita ühes aknas'."
 
 #: menu.c:1869
 msgid "Copy ... ?"
@@ -2420,20 +2405,16 @@ msgstr "Loo viit"
 
 #: menu.c:2041
 msgid ""
-"User-definable shortcuts are disabled by default in Gtk2, and you have not "
-"enabled them. You can turn this feature on by:\n"
+"User-definable shortcuts are disabled by default in Gtk2, and you have not enabled them. You can turn this feature on by:\n"
 "\n"
-"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, "
-"or\n"
+"1) using an XSettings manager, such as ROX-Session or gnome-settings-daemon, or\n"
 "\n"
 "2) adding this line to ~/.gtkrc-2.0:\n"
 "\tgtk-can-change-accels = 1\n"
 "\t(this only works if NOT using XSETTINGS)"
 msgstr ""
-"Kiirklahvide kasutajate poolt muutmine on Gtk2 rakendustes vaikimisi "
-"keelatud. Te saate need lubada järgnevalt:\n"
-"1) Kasutades XSettings-haldurit, nagu näiteks ROX-Session või gnome-settings-"
-"daemon, või\n"
+"Kiirklahvide kasutajate poolt muutmine on Gtk2 rakendustes vaikimisi keelatud. Te saate need lubada järgnevalt:\n"
+"1) Kasutades XSettings-haldurit, nagu näiteks ROX-Session või gnome-settings-daemon, või\n"
 "\n"
 "2) Lisades faili ~/.gtkrc-2.0 rea:\n"
 "\tgtk-can-change-accels = 1\n"
@@ -2447,8 +2428,7 @@ msgid ""
 "- Move the pointer over the item you want to use,\n"
 "- Press the key you want attached to it.\n"
 "\n"
-"The key will appear next to the menu item and you can just press that key "
-"without opening the menu in future."
+"The key will appear next to the menu item and you can just press that key without opening the menu in future."
 msgstr ""
 "Kiirklahvide määramiseks:\n"
 "\n"
@@ -2456,8 +2436,7 @@ msgstr ""
 "- Liikuge hiirekursoriga soovitud tegevuse kohale,\n"
 "- Vajutage kiirklahvi, mida soovite tegevusele määrata.\n"
 "\n"
-" Määratud kiirklahv ilmub nähtavale menüüs tegevuse kõrval. Edaspidi piisab "
-"tegevuse väljakutsumiseks kiirklahvi vajutamisest ja menüüd pole vaja avada."
+" Määratud kiirklahv ilmub nähtavale menüüs tegevuse kõrval. Edaspidi piisab tegevuse väljakutsumiseks kiirklahvi vajutamisest ja menüüd pole vaja avada."
 
 #: menu.c:2067
 msgid "Set keyboard shortcuts"
@@ -2484,18 +2463,12 @@ msgid "Pattern:"
 msgstr "Mall:"
 
 #: minibuffer.c:264
-msgid ""
-"Enter the name of a file and I'll display it for you. Press Tab to fill in "
-"the longest match. Escape to close the minibuffer."
-msgstr ""
-"Sisestage failinimi, mida näidata. TAB klahv lõpetab nimesid. Esc klahv "
-"sulgeb minipuhvri."
+msgid "Enter the name of a file and I'll display it for you. Press Tab to fill in the longest match. Escape to close the minibuffer."
+msgstr "Sisestage failinimi, mida näidata. TAB klahv lõpetab nimesid. Esc klahv sulgeb minipuhvri."
 
 #: minibuffer.c:270
-msgid ""
-"Enter a shell command to execute. Click on a file to add it to the buffer."
-msgstr ""
-"Sisestage täidetav shelli käsk. Klõpsake failil, lisamaks seda puhvrisse."
+msgid "Enter a shell command to execute. Click on a file to add it to the buffer."
+msgstr "Sisestage täidetav shelli käsk. Klõpsake failil, lisamaks seda puhvrisse."
 
 #: minibuffer.c:275
 msgid ""
@@ -2516,12 +2489,8 @@ msgstr ""
 "*.png tähendab ükskõiik millist '.png' lõpuga nime"
 
 #: minibuffer.c:287
-msgid ""
-"Enter a pattern to match for files to be shown.  An empty filter turns the "
-"filter off."
-msgstr ""
-"Sisesta muster, millele vastavaid faile kuvatakse.  Tühja filtri puhul "
-"lülitakse filter välja."
+msgid "Enter a pattern to match for files to be shown.  An empty filter turns the filter off."
+msgstr "Sisesta muster, millele vastavaid faile kuvatakse.  Tühja filtri puhul lülitakse filter välja."
 
 #: minibuffer.c:895
 msgid "Invalid Find condition"
@@ -2536,7 +2505,8 @@ msgstr "%s·kokku,·%s·kasutusel,·%s·vaba·(%.1f·%%)"
 msgid "ROX-Filer has converted your Options file to the new XML format"
 msgstr "Teie vana eelistustefail teisendati uude XML-põhisesse vormingusse"
 
-#: options.c:535 options.c:1258
+#: options.c:535
+#: options.c:1258
 msgid "(use default)"
 msgstr "(kasuta vaikimisi asetusi)"
 
@@ -2570,7 +2540,8 @@ msgstr ""
 msgid "(saving disabled by CHOICESPATH)"
 msgstr "(CHOICESPATH keelab muudatuste salvestamise)"
 
-#: options.c:1164 usericons.c:450
+#: options.c:1164
+#: usericons.c:450
 #, c-format
 msgid "Error saving %s: %s"
 msgstr "Viga %s salvestamisel: %s"
@@ -2584,12 +2555,8 @@ msgid "Your old panel file has been converted to the new XML format."
 msgstr "Teie paneeli asetused on teisendati uude XML-põhisesse vormingusse."
 
 #: panel.c:546
-msgid ""
-"You have tried to close a panel via the window manager - I usually find that "
-"this is accidental... really close?"
-msgstr ""
-"Te üritasite paneeli sulgeda aknahalduri kaudu - enamasti pole see "
-"soovitud ... Tõesti sulgeda ?"
+msgid "You have tried to close a panel via the window manager - I usually find that this is accidental... really close?"
+msgstr "Te üritasite paneeli sulgeda aknahalduri kaudu - enamasti pole see soovitud ... Tõesti sulgeda ?"
 
 #: panel.c:639
 msgid "Missing < or > in panel config file"
@@ -2614,9 +2581,8 @@ msgstr ""
 "%s"
 
 #: panel.c:2335
-#, fuzzy
 msgid "Panel Options..."
-msgstr "Eelistused..."
+msgstr "Paneeli valikud..."
 
 #: panel.c:2427
 #, c-format
@@ -2624,79 +2590,67 @@ msgid "Xinerama monitor %d unavailable"
 msgstr "Xinerama ekraan %d pole saadaval"
 
 #: panel.c:2502
-#, fuzzy
 msgid "Panel Options"
-msgstr "Eelistused"
+msgstr "Paneeli valikud"
 
 #: panel.c:2517
-#, fuzzy, c-format
+#, c-format
 msgid "Panel: %s"
-msgstr "Panels"
+msgstr "Paneel: %s"
 
 #: panel.c:2525
 msgid "Select the panel's position:"
-msgstr ""
+msgstr "Vali paneeli asend:"
 
 #: panel.c:2531
 msgid "Top-edge panel"
-msgstr ""
+msgstr "Paneel üleval servas"
 
 #: panel.c:2532
 msgid "Top edge"
-msgstr ""
+msgstr "Üleval"
 
 #: panel.c:2533
 msgid "Bottom edge panel"
-msgstr ""
+msgstr "Paneel all servas"
 
 #: panel.c:2534
-#, fuzzy
 msgid "Bottom edge"
-msgstr "Alumine piir"
+msgstr "Alumine serv"
 
 #: panel.c:2535
 msgid "Left edge panel"
-msgstr ""
+msgstr "Paneel vasakul servas"
 
 #: panel.c:2536
 msgid "Left edge"
-msgstr ""
+msgstr "Vasakul"
 
 #: panel.c:2537
 msgid "Right-edge panel"
-msgstr ""
+msgstr "Paneel paremal servas"
 
 #: panel.c:2538
 msgid "Right edge"
-msgstr ""
+msgstr "Paremal"
 
 #: pinboard.c:354
 msgid "Your old pinboard file has been converted to the new XML format."
 msgstr "Teie töölaua asetuste fail teisaldati uude XML-põhisesse vormingusse."
 
 #: pinboard.c:635
-msgid ""
-"The backdrop handler must be an application directory. Drag an application "
-"directory into the Set Backdrop dialog box, or (for programmers) pass it to "
-"the SOAP SetBackdropApp method."
-msgstr ""
-"Taustahaldur peab olema kataloograkendus. Lohistage kataloograkendus 'Muuda "
-"tausta' dialoogikasti või (programmeerijate jaoks) edastage see SOAP "
-"SetBackdropApp meetodi argumendina."
+msgid "The backdrop handler must be an application directory. Drag an application directory into the Set Backdrop dialog box, or (for programmers) pass it to the SOAP SetBackdropApp method."
+msgstr "Taustahaldur peab olema kataloograkendus. Lohistage kataloograkendus 'Muuda tausta' dialoogikasti või (programmeerijate jaoks) edastage see SOAP SetBackdropApp meetodi argumendina."
 
 #: pinboard.c:654
 msgid ""
-"You can only set the backdrop to an image or to a program which knows how to "
-"manage ROX-Filer's backdrop.\n"
+"You can only set the backdrop to an image or to a program which knows how to manage ROX-Filer's backdrop.\n"
 "\n"
-"Programmers: the application's AppInfo.xml must contain the CanSetBackdrop "
-"element, as described in ROX-Filer's manual."
+"Programmers: the application's AppInfo.xml must contain the CanSetBackdrop element, as described in ROX-Filer's manual."
 msgstr ""
-"Taustaks saate määrata kas pildi või rakenduse, mis oskab hallata Rox-"
-"Filer'i tausta.\n"
+"Taustaks saate määrata kas pildi või rakenduse, mis oskab hallata Rox-Filer'i tausta.\n"
 "\n"
-"Programmeerijatele: rakenduse Appinfo.xml peab sisaldama CanSetBackdrop "
-"elementi, nagu kirjeldatud ROX-Filer'i käsiraamatus."
+"Programmeerijatele: rakenduse Appinfo.xml peab sisaldama CanSetBackdrop elementi, nagu kirjeldatud ROX-Filer'i käsiraamatus."
 
 #: pinboard.c:674
 msgid "Set backdrop"
@@ -2743,18 +2697,11 @@ msgid "Drop an image here"
 msgstr "Lohistage siia pilt"
 
 #: pinboard.c:772
-msgid ""
-"No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
-"-p=Default' to turn it on in future."
-msgstr ""
-"Töölaua asetusi ei leitud. Avan vaikimisi töölaua.Kasutage ROX-Filer'i "
-"käivitamisel parameetrit 'rox -p=Default', et sama töölauda tulevikus "
-"aktiveerida."
+msgid "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox -p=Default' to turn it on in future."
+msgstr "Töölaua asetusi ei leitud. Avan vaikimisi töölaua.Kasutage ROX-Filer'i käivitamisel parameetrit 'rox -p=Default', et sama töölauda tulevikus aktiveerida."
 
 #: pinboard.c:866
-msgid ""
-"Only files (and certain applications) can be used to set the background "
-"image."
+msgid "Only files (and certain applications) can be used to set the background image."
 msgstr "Tausta seadmiseks saate kasutada vaid pilte (ja teatud rakendusi)."
 
 #: pinboard.c:1471
@@ -2832,7 +2779,8 @@ msgstr "Vigane .gmo tõlkefail (liiga lühike): %s"
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr "Vigane .gmo tõlkefail (ei leitud GNU maagilist päist): %s"
 
-#: run.c:96 run.c:141
+#: run.c:96
+#: run.c:141
 #, c-format
 msgid "Program %s not found - deleted?"
 msgstr "Rakendust %s ei leitud - on see kustutatud?"
@@ -2850,14 +2798,10 @@ msgstr "Ma ei oska avada '%s'"
 #: run.c:323
 msgid ""
 "Application:\n"
-"This is an application directory - you can run it as a program, or open it "
-"(hold down Shift while you open it). Most applications provide their own "
-"help here, but this one doesn't."
+"This is an application directory - you can run it as a program, or open it (hold down Shift while you open it). Most applications provide their own help here, but this one doesn't."
 msgstr ""
 "Rakendus:\n"
-"See on kataloograkendus (application directory). Te võite seda käivitada kui "
-"programmi või avada kui kataloogi (Shift+klõps)Enamus rakendusi näitavad "
-"omaenda abiinfot, kuid mitte see."
+"See on kataloograkendus (application directory). Te võite seda käivitada kui programmi või avada kui kataloogi (Shift+klõps)Enamus rakendusi näitavad omaenda abiinfot, kuid mitte see."
 
 #: run.c:407
 #, c-format
@@ -2875,22 +2819,19 @@ msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr "Katkine viit (või puuduvad teil õigused sellele järgneda): %s"
 
 #: run.c:502
-#, fuzzy, c-format
-msgid ""
-"No run action specified for files of this type (%s/%s) - you can set a run "
-"action by choosing `Set Run Action' from the File menu, or you can just drag "
-"the file to an application.%s"
-msgstr ""
-"Failitüübi (%s/%s) jaoks pole seatud avajat - Te saate seda seada, valides "
-"Fail-menüüst 'Sea avaja...', või lohistades faili rakenduse peale"
+#, c-format
+msgid "No run action specified for files of this type (%s/%s) - you can set a run action by choosing `Set Run Action' from the File menu, or you can just drag the file to an application.%s"
+msgstr "Failitüübi (%s/%s) jaoks pole seatud avajat - Te saate seda seada, valides Fail-menüüst 'Sea avaja...', või lohistades faili rakenduse peale. %s"
 
 #: run.c:508
 msgid ""
 "\n"
 "\n"
-"Note: If this is a computer program which you want to run, you need to set "
-"the execute bit by choosing Permissions from the File menu."
+"Note: If this is a computer program which you want to run, you need to set the execute bit by choosing Permissions from the File menu."
 msgstr ""
+"\n"
+"\n"
+"Note: Kui te soovite jooksutada arvutiprogrammi, peate te seadma käivitusbiti, valides Fail menüüst Õigused."
 
 #: support.c:272
 msgid "B"
@@ -2981,7 +2922,8 @@ msgstr "Näita ROX-Filer'i abiinfot"
 msgid " (%u hidden)"
 msgstr " (%u peidetud)"
 
-#: toolbar.c:228 tips:80
+#: toolbar.c:228
+#: tips:80
 msgid "items"
 msgstr "faili"
 
@@ -3074,28 +3016,17 @@ msgstr "Tundmatu"
 #: type.c:355
 #, c-format
 msgid ""
-"Executable '%s' is world-writeable! Refusing to run. Please change the "
-"permissions now (this problem may have been caused by a bug in earlier "
-"versions of the filer).\n"
+"Executable '%s' is world-writeable! Refusing to run. Please change the permissions now (this problem may have been caused by a bug in earlier versions of the filer).\n"
 "\n"
-"Having (non-symlink) run actions world-writeable means that other people who "
-"use your computer can replace your run actions with malicious versions.\n"
+"Having (non-symlink) run actions world-writeable means that other people who use your computer can replace your run actions with malicious versions.\n"
 "\n"
-"If you trust everyone who could write to these files then you needn't worry. "
-"Otherwise, you should check, or even just delete, all the existing run "
-"actions."
+"If you trust everyone who could write to these files then you needn't worry. Otherwise, you should check, or even just delete, all the existing run actions."
 msgstr ""
-"Programm '%s' on kõigile kirjutatav! Keeldun käivitamast seda. Palun muutke "
-"faili ligipääsuõigusi (probleem võib olla pärit failihalduri vanemast, "
-"vigasest, versioonist).\n"
+"Programm '%s' on kõigile kirjutatav! Keeldun käivitamast seda. Palun muutke faili ligipääsuõigusi (probleem võib olla pärit failihalduri vanemast, vigasest, versioonist).\n"
 "\n"
-"Kõigile kirjutatav programmifail (välja arvatud sümboolsed viidad) tähendab "
-"seda, et kõik teie arvuti kasutajad saavad teie programmi muuta, asendades "
-"selle potentsiaalselt ohtliku programmiga.\n"
+"Kõigile kirjutatav programmifail (välja arvatud sümboolsed viidad) tähendab seda, et kõik teie arvuti kasutajad saavad teie programmi muuta, asendades selle potentsiaalselt ohtliku programmiga.\n"
 "\n"
-"Juhul, kui te usaldate absoluutselt kõiki kasutajaid, kellel on olnud "
-"ligipääs, ei pruugi te muretseda. Vastasel juhul peaksite üle kontrollima "
-"või isegi kustutama kõik käivitamis-seosed"
+"Juhul, kui te usaldate absoluutselt kõiki kasutajaid, kellel on olnud ligipääs, ei pruugi te muretseda. Vastasel juhul peaksite üle kontrollima või isegi kustutama kõik käivitamis-seosed"
 
 #: type.c:368
 msgid "go-w (Fix security problem)"
@@ -3139,8 +3070,7 @@ msgid "Set run action"
 msgstr "Sea avaja"
 
 #: type.c:831
-msgid ""
-"If a handler for the specific type isn't set up, use this as the default."
+msgid "If a handler for the specific type isn't set up, use this as the default."
 msgstr "Kui failitüübile pole avajat määratud, kasutada vaikimisi seda."
 
 #: type.c:833
@@ -3174,12 +3104,8 @@ msgid "_Use Command"
 msgstr "_Kasuta käsku"
 
 #: type.c:926
-msgid ""
-"A run action already exists and is quite a big program - are you sure you "
-"want to delete it?"
-msgstr ""
-"Käivitaja on juba määratud ja see on üsna suur programm - oled kindel, et "
-"soovid seda kustutada?"
+msgid "A run action already exists and is quite a big program - are you sure you want to delete it?"
+msgstr "Käivitaja on juba määratud ja see on üsna suur programm - oled kindel, et soovid seda kustutada?"
 
 #: type.c:937
 #, c-format
@@ -3192,8 +3118,7 @@ msgstr "Seadete salvestamise keelab CHOICESPATH-keskkonnamuutuja"
 
 #: type.c:1249
 #, c-format
-msgid ""
-"Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
+msgid "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
 msgstr "Ikooniteemas '%s' pole MIME ikoone. Kasutan Rox vaikimisi teemat.."
 
 #: type.c:1263
@@ -3202,27 +3127,24 @@ msgid ""
 "Failed to create symlink '%s':\n"
 "%s\n"
 "\n"
-"(this may mean that the ROX theme already exists there, but the 'mime-"
-"application:postscript' icon couldn't be loaded for some reason)"
+"(this may mean that the ROX theme already exists there, but the 'mime-application:postscript' icon couldn't be loaded for some reason)"
 msgstr ""
 "Sümbolviida '%s' loomine ebaõnnestus:\n"
 "%s\n"
 "\n"
-"(see võib tähendada, et ROX teema on juba seal olemas, kuid mingil põhjusel "
-"ei suudetud laadida 'mime-application:postscript' ikooni)"
+"(see võib tähendada, et ROX teema on juba seal olemas, kuid mingil põhjusel ei suudetud laadida 'mime-application:postscript' ikooni)"
 
 #: usericons.c:181
 msgid "The pathname you gave does not exist. The icon has not been changed."
 msgstr "Faili, milleni teekonna sisestasite, pole olemas. Ikooni ei muudetud."
 
-#: usericons.c:191 usericons.c:616
+#: usericons.c:191
+#: usericons.c:616
 msgid ""
-"Unable to load image file -- maybe it's not in a format I understand, or "
-"maybe the permissions are wrong?\n"
+"Unable to load image file -- maybe it's not in a format I understand, or maybe the permissions are wrong?\n"
 "The icon has not been changed."
 msgstr ""
-"Pildifaili ei õnnestu laadida - võib-olla on see mulle tundmatus vormingus "
-"või on ligipääsuõigused väärad?\n"
+"Pildifaili ei õnnestu laadida - võib-olla on see mulle tundmatus vormingus või on ligipääsuõigused väärad?\n"
 "Ikooni ei muudetud."
 
 #: usericons.c:238
@@ -3244,10 +3166,8 @@ msgid "Set icon"
 msgstr "Sea ikooni"
 
 #: usericons.c:279
-msgid ""
-"Use a copy of the image as the default for all files of these MIME types."
-msgstr ""
-"Kasuta koopiat pildist vaikimisi kõigi selle MIME-tüübiga failide jaoks."
+msgid "Use a copy of the image as the default for all files of these MIME types."
+msgstr "Kasuta koopiat pildist vaikimisi kõigi selle MIME-tüübiga failide jaoks."
 
 #: usericons.c:281
 #, c-format
@@ -3264,12 +3184,8 @@ msgid "For all files of type `%s' (%s/%s)"
 msgstr "Failidele, mis on tüüpi `%s' (%s/%s)"
 
 #: usericons.c:294
-msgid ""
-"Add the file and image filenames to your personal list. The setting will be "
-"lost if the image or the file is moved."
-msgstr ""
-"Lisage faili ja pildi failinimed oma isiklikku nimekirja. See asetus läheb "
-"kaotsi, kui pilt või fail mujale tõstetakse."
+msgid "Add the file and image filenames to your personal list. The setting will be lost if the image or the file is moved."
+msgstr "Lisage faili ja pildi failinimed oma isiklikku nimekirja. See asetus läheb kaotsi, kui pilt või fail mujale tõstetakse."
 
 #: usericons.c:297
 #, c-format
@@ -3277,14 +3193,8 @@ msgid "Only for the file `%s'"
 msgstr "Ainult faili `%s' jaoks"
 
 #: usericons.c:305
-msgid ""
-"Copy the image inside the directory, as a hidden file called '.DirIcon'. All "
-"users will then see the icon, and you can move the directory around safely. "
-"This is usually the best option if you can write to the directory."
-msgstr ""
-"Kopeeri pilt kataloogi sisse peidetud faili '.DirIcon'. nime alla.Kõik "
-"kasutajad näevad ikooni ja ketaloogi võib probleemitult mujale tõsta. See on "
-"enamasti parim valik, kui Teil on kirjutusõigus antud kataloogile."
+msgid "Copy the image inside the directory, as a hidden file called '.DirIcon'. All users will then see the icon, and you can move the directory around safely. This is usually the best option if you can write to the directory."
+msgstr "Kopeeri pilt kataloogi sisse peidetud faili '.DirIcon'. nime alla.Kõik kasutajad näevad ikooni ja ketaloogi võib probleemitult mujale tõsta. See on enamasti parim valik, kui Teil on kirjutusõigus antud kataloogile."
 
 #: usericons.c:311
 msgid "Copy image into directory"
@@ -3349,7 +3259,7 @@ msgstr "Kasutage LANG keskkonnamuutujat"
 
 #: tips:4
 msgid "Basque"
-msgstr ""
+msgstr "Baski"
 
 #: tips:5
 msgid "Chinese (traditional)"
@@ -3444,36 +3354,24 @@ msgid "Never automatically resize"
 msgstr "Ära kunagi sea suurust automaatselt"
 
 #: tips:28
-msgid ""
-"You'll have to resize windows manually, using the window manager, the "
-"`Resize Window' menu entry or by double-clicking on the window background."
-msgstr ""
-"Te peate akna suurust muutma käsitsi, kasutades; aknahalduri võimalusi, "
-"menüüvalikut `Kohalda akna suurust'-või topeltklõpsates akna tausta."
+msgid "You'll have to resize windows manually, using the window manager, the `Resize Window' menu entry or by double-clicking on the window background."
+msgstr "Te peate akna suurust muutma käsitsi, kasutades; aknahalduri võimalusi, menüüvalikut `Kohalda akna suurust'-või topeltklõpsates akna tausta."
 
 #: tips:29
 msgid "Resize when changing the display style"
 msgstr "Kohalda akna suurust vaate muutmisel"
 
 #: tips:30
-msgid ""
-"Changing the size of the icons or which details are displayed will resize "
-"the window for you."
-msgstr ""
-"Ikoonide suuruse või näidatavate omaduste hulga muutmisel muudetakse akna "
-"suurust automaatselt."
+msgid "Changing the size of the icons or which details are displayed will resize the window for you."
+msgstr "Ikoonide suuruse või näidatavate omaduste hulga muutmisel muudetakse akna suurust automaatselt."
 
 #: tips:31
 msgid "Always resize"
 msgstr "Alati muuda suurust"
 
 #: tips:32
-msgid ""
-"The filer will resize windows whenever it seems useful (that is, when "
-"changing directory or display style)."
-msgstr ""
-"Failihaldur muudab akna suurust iga kord, kui see tundub mõistlik (s.t. "
-"kataloogi vahetamisel või vaate muutmisel)."
+msgid "The filer will resize windows whenever it seems useful (that is, when changing directory or display style)."
+msgstr "Failihaldur muudab akna suurust iga kord, kui see tundub mõistlik (s.t. kataloogi vahetamisel või vaate muutmisel)."
 
 #: tips:33
 msgid "Largest window size:"
@@ -3484,12 +3382,8 @@ msgid "%"
 msgstr "%"
 
 #: tips:35
-msgid ""
-"The largest size, as a percentage of the screen size, that the auto-resizer "
-"will resize a window to."
-msgstr ""
-"Maksimaalne suurus, milleni aken automaatselt suurust muutes tohib kasvada, "
-"väljendatuna protsentides ekraanist."
+msgid "The largest size, as a percentage of the screen size, that the auto-resizer will resize a window to."
+msgstr "Maksimaalne suurus, milleni aken automaatselt suurust muutes tohib kasvada, väljendatuna protsentides ekraanist."
 
 #: tips:36
 msgid "Window behaviour"
@@ -3500,64 +3394,41 @@ msgid "Short titlebar flags"
 msgstr "Lühiindikaatorid aknapäisel"
 
 #: tips:38
-msgid ""
-"Use single letters instead of words for Scanning, All and Thumbs indicators "
-"in the titlebar."
-msgstr ""
-"Kasuta ühetähelisi lühendeid sõnade 'Skaneerin', 'Kõik', 'Pisipildid' asemel "
-"akna päises."
+msgid "Use single letters instead of words for Scanning, All and Thumbs indicators in the titlebar."
+msgstr "Kasuta ühetähelisi lühendeid sõnade 'Skaneerin', 'Kõik', 'Pisipildid' asemel akna päises."
 
 #: tips:39
 msgid "Unique windows"
 msgstr "Akende uuestikasutamine"
 
 #: tips:40
-msgid ""
-"If you open a directory and that directory is already displayed in another "
-"window, then this option causes the other window to be closed."
-msgstr ""
-"Kui antud suvand on sisse lülitud, siis kataloogi avamise puhul, mis on juba "
-"avatud mõnes teises failihalduri aknas, suletakse teine aken."
+msgid "If you open a directory and that directory is already displayed in another window, then this option causes the other window to be closed."
+msgstr "Kui antud suvand on sisse lülitud, siis kataloogi avamise puhul, mis on juba avatud mõnes teises failihalduri aknas, suletakse teine aken."
 
 #: tips:41
 msgid "New window on button 1"
 msgstr "Ava nupuga 1 kataloog uues aknas"
 
 #: tips:42
-msgid ""
-"Clicking with mouse button 1 (usually the left button) opens a directory in "
-"a new window with this turned on. Clicking with the button-2 (middle) will "
-"reuse the current window."
-msgstr ""
-"Klõpsates esimese hiirenupuga (tavaliselt vasak nupp) avatakse kataloog uues "
-"aknas. Klõpsates teise nupuga (keskmine hiirenupp) avatakse kataloog samas "
-"aknas."
+msgid "Clicking with mouse button 1 (usually the left button) opens a directory in a new window with this turned on. Clicking with the button-2 (middle) will reuse the current window."
+msgstr "Klõpsates esimese hiirenupuga (tavaliselt vasak nupp) avatakse kataloog uues aknas. Klõpsates teise nupuga (keskmine hiirenupp) avatakse kataloog samas aknas."
 
 #: tips:43
 msgid "Single-click navigation"
 msgstr "Ühe klõpsuga avamine"
 
-#: tips:44 tips:137
-msgid ""
-"Clicking on an item opens it with this on. Hold down Control to select the "
-"item instead. If off, clicking once selects an item; double click to open "
-"things."
-msgstr ""
-"Kui antud suvand on sisse lülitud, siis üks hiireklõps avab faili/kataloogi. "
-"Hoidke all Control-klahvi, et faili valida. Kui suvand on keelatud, siis üks "
-"klõps valib faili ja kaks klõpsu avab selle."
+#: tips:44
+#: tips:137
+msgid "Clicking on an item opens it with this on. Hold down Control to select the item instead. If off, clicking once selects an item; double click to open things."
+msgstr "Kui antud suvand on sisse lülitud, siis üks hiireklõps avab faili/kataloogi. Hoidke all Control-klahvi, et faili valida. Kui suvand on keelatud, siis üks klõps valib faili ja kaks klõpsu avab selle."
 
 #: tips:45
 msgid "Double-click on background resizes"
 msgstr "Topeltklõps taustale muudab suurust"
 
 #: tips:46
-msgid ""
-"If on then double clicking on the window background resizes the window, just "
-"like clicking on the Automatic size mode button in the toolbar."
-msgstr ""
-"Kui see suvand on sisse lülitud, muudab akna taustale topeltkõpsamine "
-"aknasuurust, käitudes nagu Automaatse suuruse nupp nupuribas."
+msgid "If on then double clicking on the window background resizes the window, just like clicking on the Automatic size mode button in the toolbar."
+msgstr "Kui see suvand on sisse lülitud, muudab akna taustale topeltkõpsamine aknasuurust, käitudes nagu Automaatse suuruse nupp nupuribas."
 
 #: tips:47
 msgid "Sorting"
@@ -3568,9 +3439,7 @@ msgid "Directories come first (for sort by name)"
 msgstr "Katalooge näidatakse enne (nimede järgi sortides)"
 
 #: tips:49
-msgid ""
-"If this is on then directories will always appear before anything else when "
-"sorting by name."
+msgid "If this is on then directories will always appear before anything else when sorting by name."
 msgstr "Nimede järgi sortides näidatakse katalooge alati enne muid faile."
 
 #: tips:50
@@ -3578,9 +3447,7 @@ msgid "Capitalised names first (for sort by name)"
 msgstr "Suurtähed enne väiketähti (nimede järgi sortides)"
 
 #: tips:51
-msgid ""
-"If on, all filenames starting with a capital letter come before filenames "
-"starting with lowercase ones."
+msgid "If on, all filenames starting with a capital letter come before filenames starting with lowercase ones."
 msgstr "Suurtähtedega algavaid faile näidatakse enne väiketähtedega algavaid."
 
 #: tips:53
@@ -3592,12 +3459,8 @@ msgid "Inherit options from source window"
 msgstr "Kasuta algse akna seadeid"
 
 #: tips:55
-msgid ""
-"If this is on then display options for a new window are inherited from the "
-"source window if possible, otherwise they are set to the defaults below."
-msgstr ""
-"Kui suvand on lubatud, kasutatakse uue akna puhul algse akna seadeid (kui "
-"võimalik), vastasel juhul kasutatakse vaikimisi asetusi."
+msgid "If this is on then display options for a new window are inherited from the source window if possible, otherwise they are set to the defaults below."
+msgstr "Kui suvand on lubatud, kasutatakse uue akna puhul algse akna seadeid (kui võimalik), vastasel juhul kasutatakse vaikimisi asetusi."
 
 #: tips:56
 msgid "View type:"
@@ -3607,7 +3470,8 @@ msgstr "Vaate tüüp:"
 msgid "Sort by:"
 msgstr "Sordi tunnuse järgi:"
 
-#: tips:61 tips:76
+#: tips:61
+#: tips:76
 msgid "Type"
 msgstr "Tüüp"
 
@@ -3620,12 +3484,8 @@ msgid "Show hidden files"
 msgstr "Näita peidetud faile"
 
 #: tips:65
-msgid ""
-"If this is on then files whose names start with a dot are shown too, "
-"otherwise they are hidden."
-msgstr ""
-"Kui suvand on sees, näidatakse faile, mis algavad punktiga, vastasel juhul "
-"peidetakse need."
+msgid "If this is on then files whose names start with a dot are shown too, otherwise they are hidden."
+msgstr "Kui suvand on sees, näidatakse faile, mis algavad punktiga, vastasel juhul peidetakse need."
 
 #: tips:66
 msgid "Icon View"
@@ -3639,11 +3499,13 @@ msgstr "Vaikimisi suurus:"
 msgid "Huge Icons"
 msgstr "Väga suured ikoonid"
 
-#: tips:69 tips:245
+#: tips:69
+#: tips:245
 msgid "Large Icons"
 msgstr "Suured ikoonid"
 
-#: tips:70 tips:244
+#: tips:70
+#: tips:244
 msgid "Small Icons"
 msgstr "Väikesed ikoonid"
 
@@ -3664,31 +3526,21 @@ msgid "Change at:"
 msgstr "Muuda alates:"
 
 #: tips:81
-msgid ""
-"When automatic icon sizing is selected: If the directory contains this many "
-"items then it will be shown using Small Icons, otherwise Large Icons will be "
-"used."
-msgstr ""
-"Juhul kui on lubatud automaatselt ikoonide suuruse muutmine ja kataloogis on "
-"vähemalt nii palju faile, näidatakse neid väikeste ikoonidega, vastasel "
-"juhul kasutatakse suuri ikoone."
+msgid "When automatic icon sizing is selected: If the directory contains this many items then it will be shown using Small Icons, otherwise Large Icons will be used."
+msgstr "Juhul kui on lubatud automaatselt ikoonide suuruse muutmine ja kataloogis on vähemalt nii palju faile, näidatakse neid väikeste ikoonidega, vastasel juhul kasutatakse suuri ikoone."
 
 #: tips:82
 msgid "Max width (Large icons):"
 msgstr "Maksimumlaius (suurte ikoonidega):"
 
-#: tips:83 tips:86
+#: tips:83
+#: tips:86
 msgid "pixels"
 msgstr "pikslit"
 
 #: tips:84
-msgid ""
-"Text wider than this is broken onto two lines in Large Icons mode. In Huge "
-"Icons mode, text is wrapped when 50% wider than this."
-msgstr ""
-"Sellest numbrist laiem tekst murtakse suurte ikoonide puhul järgmisele "
-"reale. Väga suurte ikoonide puhul murtakse tekst siis, kui tekst on 50% "
-"laiem sellest arvust."
+msgid "Text wider than this is broken onto two lines in Large Icons mode. In Huge Icons mode, text is wrapped when 50% wider than this."
+msgstr "Sellest numbrist laiem tekst murtakse suurte ikoonide puhul järgmisele reale. Väga suurte ikoonide puhul murtakse tekst siis, kui tekst on 50% laiem sellest arvust."
 
 #: tips:85
 msgid "(Small Icons):"
@@ -3700,23 +3552,19 @@ msgstr "Teksti maksimaalne laius väikese ikooni kõrval."
 
 #: tips:88
 msgid "Order small icons vertically"
-msgstr ""
+msgstr "Järjesta väikesed ikoonid vertikaalselt"
 
 #: tips:89
-msgid ""
-"If this option is on, then small icons are ordered vertically, not "
-"horizontally."
-msgstr ""
+msgid "If this option is on, then small icons are ordered vertically, not horizontally."
+msgstr "Kui see valik on lubatud, järjestatakse väikesed ikoonid vertikaalselt, mitte horisontaalselt."
 
 #: tips:90
 msgid "Order large icons vertically"
-msgstr ""
+msgstr "Järjesta suured ikoonid vertikaalselt."
 
 #: tips:91
-msgid ""
-"If this option is on, then large icons are sorted vertically, not "
-"horizontally."
-msgstr ""
+msgid "If this option is on, then large icons are sorted vertically, not horizontally."
+msgstr "Kui see valik on lubatud, järjestatakse suured ikoonid vertikaalselt, mitte horisontaalselt."
 
 #: tips:93
 msgid "Show column headings"
@@ -3727,15 +3575,12 @@ msgid "If this is on then column headings will be shown in the list view."
 msgstr "Näidatakse päiseid tulpade kohal nimekirjavaate puhul."
 
 #: tips:95
-#, fuzzy
 msgid "Show full type"
-msgstr "Sorteeri tüübi järgi"
+msgstr "Näita täielikku tüübiinfot"
 
 #: tips:96
-msgid ""
-"If this is on then the full description of each object's type will be show "
-"rather than a short summary of its basic type."
-msgstr ""
+msgid "If this is on then the full description of each object's type will be show rather than a short summary of its basic type."
+msgstr "Kui see valik on lubatud, siis näidatakse iga objektijuures tema tüübi täiskirjeldust, mitte selle tüübi lühikokkuvõtet."
 
 #: tips:97
 msgid "Tools/Minibuffer"
@@ -3770,14 +3615,8 @@ msgid "Show totals of items"
 msgstr "Näita objektide arvu nupuribal"
 
 #: tips:105
-msgid ""
-"Show the number of items displayed in a filer window, as well as the number "
-"of hidden items (if any). When there's a selection, show the number of "
-"selected items and their combined size."
-msgstr ""
-"Näita failihalduri aknas näha olevate failide/kataloogide arvu ja peidetud "
-"failide arvu(kui neid on). Kui mõningaid faile on valitud, näita nende hulka "
-"ja failisuuruste summat."
+msgid "Show the number of items displayed in a filer window, as well as the number of hidden items (if any). When there's a selection, show the number of selected items and their combined size."
+msgstr "Näita failihalduri aknas näha olevate failide/kataloogide arvu ja peidetud failide arvu(kui neid on). Kui mõningaid faile on valitud, näita nende hulka ja failisuuruste summat."
 
 #: tips:106
 msgid "Select the buttons you want on the bar:"
@@ -3788,9 +3627,7 @@ msgid "Width of toolbar sets minimum width of window"
 msgstr "Nupuriba laius määrab akna minimaalse laiuse"
 
 #: tips:108
-msgid ""
-"Each filer window is constrained to be wide enough to show the whole of the "
-"toolbar"
+msgid "Each filer window is constrained to be wide enough to show the whole of the toolbar"
 msgstr "Failihalduri akendel ei lubata olla kitsamad kui nupuriba laius"
 
 #: tips:109
@@ -3802,80 +3639,52 @@ msgid "Beep if Tab-completion fails"
 msgstr "Tabulaatoriga nime lõpetamise ebaõnnestumisel piiksata"
 
 #: tips:111
-msgid ""
-"When using the `Enter Path...' minibuffer and Tab is pressed, beep if "
-"nothing happens (eg, because there are several possibilities and the next "
-"letter varies)."
-msgstr ""
-"Kui te vajutate tabulaatorit 'Sisesta tee ...'-käsureal, kõlab piiksatus, "
-"kui midagi ei juhtu (näit. on mitu sobivat failinime ja järgmine täht nendes "
-"on erinev)."
+msgid "When using the `Enter Path...' minibuffer and Tab is pressed, beep if nothing happens (eg, because there are several possibilities and the next letter varies)."
+msgstr "Kui te vajutate tabulaatorit 'Sisesta tee ...'-käsureal, kõlab piiksatus, kui midagi ei juhtu (näit. on mitu sobivat failinime ja järgmine täht nendes on erinev)."
 
 #: tips:112
 msgid "Beep if there are several matches"
 msgstr "Piiksata kui on mitmeid võimalikke vasteid"
 
 #: tips:113
-msgid ""
-"When using the `Enter Path...' minibuffer and Tab is pressed, beep if there "
-"is more than one matching file, even though some more letters were added."
-msgstr ""
-"Kui vajutate tabulaatorit 'Sisesta tee...'-käsureal, kõlab piiksatus , kui "
-"on mitu võimalikku sobivat failinime, ka juhul, kui lisati tähti "
-"lõpetatavale nimele."
+msgid "When using the `Enter Path...' minibuffer and Tab is pressed, beep if there is more than one matching file, even though some more letters were added."
+msgstr "Kui vajutate tabulaatorit 'Sisesta tee...'-käsureal, kõlab piiksatus , kui on mitu võimalikku sobivat failinime, ka juhul, kui lisati tähti lõpetatavale nimele."
 
 #: tips:116
-msgid ""
-"When thumbnails are turned on, each image file in a directory is loaded and "
-"a small thumbnail of it is shown."
-msgstr ""
-"Kui pisipildid on lubatud, näidatakse kataloogis pildi vähendatud koopiat "
-"tema ikoonina."
+msgid "When thumbnails are turned on, each image file in a directory is loaded and a small thumbnail of it is shown."
+msgstr "Kui pisipildid on lubatud, näidatakse kataloogis pildi vähendatud koopiat tema ikoonina."
 
 #: tips:117
 msgid "Show image thumbnails"
 msgstr "Näita pisipilte"
 
 #: tips:118
-msgid ""
-"This is the default setting for new windows. Use the Display menu to turn "
-"thumbnails on and off for individual windows."
-msgstr ""
-"See on vaikimisi asetus uute akende jaoks. Kasuta 'Vaade' menüüd pisipiltide "
-"lubamiseks/keelamiseks antud aknas."
+msgid "This is the default setting for new windows. Use the Display menu to turn thumbnails on and off for individual windows."
+msgstr "See on vaikimisi asetus uute akende jaoks. Kasuta 'Vaade' menüüd pisipiltide lubamiseks/keelamiseks antud aknas."
 
 #: tips:119
-#, fuzzy
 msgid "Video thumbnails"
-msgstr "Näita pisipilte"
+msgstr "Videopisipildid"
 
 #: tips:120
 msgid "Thumbnails cache"
 msgstr "Pisipiltide vahemälu"
 
 #: tips:121
-msgid ""
-"To speed things up, the generated thumbnails are stored in the hidden ~/."
-"thumbnails directory. Click here to remove all the cached thumbnails. They "
-"will be created again as needed."
-msgstr ""
-"Pisipiltide kiiremaks laadimiseks puhverdatakse pisipildid peidetud "
-"kataloogi ~/.thumbnails. Kõigi salvestatud pisipiltide eemaldamiseks "
-"klõpsake siia, Pisipiltide puhver luuakse uuesti vastavalt vajadusele."
+msgid "To speed things up, the generated thumbnails are stored in the hidden ~/.thumbnails directory. Click here to remove all the cached thumbnails. They will be created again as needed."
+msgstr "Pisipiltide kiiremaks laadimiseks puhverdatakse pisipildid peidetud kataloogi ~/.thumbnails. Kõigi salvestatud pisipiltide eemaldamiseks klõpsake siia, Pisipiltide puhver luuakse uuesti vastavalt vajadusele."
 
-#: tips:122 tips:195
+#: tips:122
+#: tips:195
 msgid "Pinboard"
 msgstr "Töölaud"
 
 #: tips:123
-msgid ""
-"When using a pinboard, you can drag files and applications onto the desktop "
-"background to create shortcuts to them."
-msgstr ""
-"Kui kasutate töölauda, on teil võimalik lohistada faile ja programme oma "
-"töölaua taustale, et luua nendeni viitavaid ikoone."
+msgid "When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them."
+msgstr "Kui kasutate töölauda, on teil võimalik lohistada faile ja programme oma töölaua taustale, et luua nendeni viitavaid ikoone."
 
-#: tips:124 tips:241
+#: tips:124
+#: tips:241
 msgid "Appearance"
 msgstr "Välimus"
 
@@ -3916,12 +3725,8 @@ msgid "Fast scaling of images"
 msgstr "Piltide kiire skaleerimine"
 
 #: tips:134
-msgid ""
-"Choose between the fast or slow method of scaling backdrop images.  The slow "
-"method can give better results."
-msgstr ""
-"Valige kiire ja aeglase meetodi vahel taustapilte skaleerides.  Aeglane "
-"meetod võib anda paremaid tulemusi."
+msgid "Choose between the fast or slow method of scaling backdrop images.  The slow method can give better results."
+msgstr "Valige kiire ja aeglase meetodi vahel taustapilte skaleerides.  Aeglane meetod võib anda paremaid tulemusi."
 
 #: tips:135
 msgid "Pinboard behaviour"
@@ -3936,12 +3741,8 @@ msgid "Keep icons within screen limits"
 msgstr "Hoia ikoonid ekraani piirides"
 
 #: tips:139
-msgid ""
-"If this is set, pinboard icons are always kept completely within screen "
-"limits, including the label."
-msgstr ""
-"Ikoonid hoitakse alati ekraani piiride sees, kaasa arvatud ikooni all olev "
-"tekst."
+msgid "If this is set, pinboard icons are always kept completely within screen limits, including the label."
+msgstr "Ikoonid hoitakse alati ekraani piiride sees, kaasa arvatud ikooni all olev tekst."
 
 #: tips:140
 msgid "Icon grid step:"
@@ -3971,44 +3772,30 @@ msgstr "Ebatäpne"
 msgid "Use a 32-pixel grid for positioning icons on the desktop."
 msgstr "Kasutatakse 32-pikslist sammu ikoonide töölauale paigutamisel."
 
-#: tips:147 tips:149
+#: tips:147
+#: tips:149
 msgid "Iconified windows"
 msgstr "Minimeeritud aknad"
 
 #: tips:148
-msgid ""
-"Most window managers provide a way to iconify (or 'minimise') windows, and "
-"various programs, including ROX-Filer, can be used to display the iconified "
-"windows."
-msgstr ""
-"Enamus aknahaldureid pakuvad võimalust minimeerida (ikoniseerida) aknaid ja "
-"neid aknaid oskavad näidata mitmed programmid, sealhulgas failihaldur Rox."
+msgid "Most window managers provide a way to iconify (or 'minimise') windows, and various programs, including ROX-Filer, can be used to display the iconified windows."
+msgstr "Enamus aknahaldureid pakuvad võimalust minimeerida (ikoniseerida) aknaid ja neid aknaid oskavad näidata mitmed programmid, sealhulgas failihaldur Rox."
 
 #: tips:150
 msgid "Show iconified windows"
 msgstr "Näita minimeeritud aknaid"
 
 #: tips:151
-msgid ""
-"If this option is on, the filer will show each iconified window as a small "
-"button on the pinboard. Requires a compatible window manager, and the "
-"pinboard must be in use."
-msgstr ""
-"Iga minimeeritud akna kohta näidatakse töölaual ikooni. Eeldab ühilduvat "
-"aknahaldurit ja Rox töölaua kasutuses olemist."
+msgid "If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use."
+msgstr "Iga minimeeritud akna kohta näidatakse töölaual ikooni. Eeldab ühilduvat aknahaldurit ja Rox töölaua kasutuses olemist."
 
 #: tips:152
 msgid "Show per workspace"
-msgstr ""
+msgstr "Näita töölaua kohta"
 
 #: tips:153
-#, fuzzy
-msgid ""
-"If this option is on, the filer will only show iconified windows associated "
-"with the current workspace."
-msgstr ""
-"Iga minimeeritud akna kohta näidatakse töölaual ikooni. Eeldab ühilduvat "
-"aknahaldurit ja Rox töölaua kasutuses olemist."
+msgid "If this option is on, the filer will only show iconified windows associated with the current workspace."
+msgstr "Kui see valik on lubatud, näidatakse ainult praeguse töölaua minimeeritud aknaid."
 
 #: tips:154
 msgid "Iconify to the"
@@ -4043,16 +3830,8 @@ msgid "vertically"
 msgstr "vertikaalselt"
 
 #: tips:162
-msgid ""
-"Sometimes the filer doesn't know about your desktop furniture and puts "
-"iconified windows under (for example) the Gnome panel. You can define a top "
-"or bottom margin to avoid placing the icons there. The filer already knows "
-"about its own panel."
-msgstr ""
-"Mõnikord failihaldur ei ole teadlik muudest töölaual asuvatest graafilistest "
-"elementidest ja paigutab minimeeritud aknaid (näiteks) Gnome paneeli alla. "
-"Te võite määrata ülemise või alumise piiri, millega keelate failide ekraani "
-"servale lähemale paigutamise. Failihaldur on omaenda paneelidest teadlik."
+msgid "Sometimes the filer doesn't know about your desktop furniture and puts iconified windows under (for example) the Gnome panel. You can define a top or bottom margin to avoid placing the icons there. The filer already knows about its own panel."
+msgstr "Mõnikord failihaldur ei ole teadlik muudest töölaual asuvatest graafilistest elementidest ja paigutab minimeeritud aknaid (näiteks) Gnome paneeli alla. Te võite määrata ülemise või alumise piiri, millega keelate failide ekraani servale lähemale paigutamise. Failihaldur on omaenda paneelidest teadlik."
 
 #: tips:163
 msgid "Top margin"
@@ -4075,9 +3854,7 @@ msgid "Panels"
 msgstr "Panels"
 
 #: tips:168
-msgid ""
-"Panels are bars of icons that run along the side of the screen. See the "
-"manual for information about using panels."
+msgid "Panels are bars of icons that run along the side of the screen. See the manual for information about using panels."
 msgstr ""
 "Paneelid on ikoonidega ribad, mis jooksevad piki ekraani serva.\n"
 "Paneelidest rohkem teada saamiseks lugege käsiraamatut."
@@ -4099,8 +3876,7 @@ msgid "Image only for applications"
 msgstr "Pilt ainult rakendustel"
 
 #: tips:173
-msgid ""
-"Applications have just an image, everything else has both an image and text."
+msgid "Applications have just an image, everything else has both an image and text."
 msgstr "Rakendustel on ainult pilt, muudel failidel on nii pilt kui tekst."
 
 #: tips:174
@@ -4128,16 +3904,8 @@ msgid "Do not cover panel"
 msgstr "Ära kata paneeli"
 
 #: tips:180
-msgid ""
-"Ask the window manager not to cover panels at all when you maximise windows. "
-"Some window managers may not honour this. If unset, the filer asks for just "
-"a couple of pixels at the edge of the screen to remain uncovered, so that "
-"auto-raising works."
-msgstr ""
-"Palu aknahalduril mitte paigutada aknaid paneeli kohale, kui aken "
-"maksimeeritakse.Mõned aknahaldurid ei tunnusta seda asetust. Kui see suvand "
-"on välja lülitud, palub failihaldur paar pikslit ekraani servast vabaks "
-"jätta, et paneelide automaatne esiletõusmine toimiks."
+msgid "Ask the window manager not to cover panels at all when you maximise windows. Some window managers may not honour this. If unset, the filer asks for just a couple of pixels at the edge of the screen to remain uncovered, so that auto-raising works."
+msgstr "Palu aknahalduril mitte paigutada aknaid paneeli kohale, kui aken maksimeeritakse.Mõned aknahaldurid ei tunnusta seda asetust. Kui see suvand on välja lülitud, palub failihaldur paar pikslit ekraani servast vabaks jätta, et paneelide automaatne esiletõusmine toimiks."
 
 #: tips:181
 msgid "Xinerama"
@@ -4148,80 +3916,64 @@ msgid "Confine to Xinerama monitor"
 msgstr "Hoia Xinerama monitori piires"
 
 #: tips:183
-msgid ""
-"If you have an Xinerama multi-monitor setup, use this option to confine the "
-"panels to one monitor instead of spanning them."
-msgstr ""
-"Kui teil on Xinerama mitme monitori süsteem, siis see suvand hoiab paneeli "
-"ainult ühel monitoril, mitte kõigil."
+msgid "If you have an Xinerama multi-monitor setup, use this option to confine the panels to one monitor instead of spanning them."
+msgstr "Kui teil on Xinerama mitme monitori süsteem, siis see suvand hoiab paneeli ainult ühel monitoril, mitte kõigil."
 
 #: tips:184
-msgid ""
-"The monitor the panels are confined to in Xinerama mode (numbered from 0)."
-msgstr ""
-"Monitori number, millel on paneelid Xinerama moodis (numbrid algavad 0'st)"
+msgid "The monitor the panels are confined to in Xinerama mode (numbered from 0)."
+msgstr "Monitori number, millel on paneelid Xinerama moodis (numbrid algavad 0'st)"
 
 #: tips:185
 msgid "Desktop"
-msgstr ""
+msgstr "Töölaud"
 
 #: tips:186
-msgid ""
-"When run by a session manager program (such as ROX-Session) the filer can "
-"open up a panel and/or the pinboard.  Here you configure which."
-msgstr ""
+msgid "When run by a session manager program (such as ROX-Session) the filer can open up a panel and/or the pinboard.  Here you configure which."
+msgstr "Kui jooksutate failihaldurit sessioonihalduri kaudu (nagu näiteks ROX-Session), võib failihaldur avada paneeli ja/või töölaua. Siin saate sellega seotud asetusi muuta."
 
 #: tips:187
-#, fuzzy
 msgid "Panel only"
-msgstr "Ainult pilt"
+msgstr "Ainult paneel"
 
 #: tips:188
-#, fuzzy
 msgid "Only a panel is shown."
-msgstr "Näidatakse ainult pilti."
+msgstr "Näidatakse ainult paneeli."
 
 #: tips:189
-#, fuzzy
 msgid "Pinboard only"
-msgstr "Töölaud"
+msgstr "Ainult töölaud"
 
 #: tips:190
-#, fuzzy
 msgid "Only the pinboard is shown."
-msgstr "Näidatakse ainult pilti."
+msgstr "Näidatakse ainult töölauda."
 
 #: tips:191
-#, fuzzy
 msgid "Panel and pinboard"
-msgstr "Töölaud"
+msgstr "Paneel ja töölaud"
 
 #: tips:192
 msgid "Both a panel and a pinboard are shown."
-msgstr ""
+msgstr "Näidatakse nii paneeli kui töölauda."
 
 #: tips:193
-#, fuzzy
 msgid "Panel"
-msgstr "Panels"
+msgstr "Paneel"
 
 #: tips:194
 msgid "Enter the name of the panel to show here."
-msgstr ""
+msgstr "Sisestage siia näidatava paneeli nimi."
 
 #: tips:196
 msgid "Enter the name of the pinboard to show here."
-msgstr ""
+msgstr "Sisestage siia näidatava töölaua nimi."
 
 #: tips:197
 msgid "Changes here take effect the next time the filer is run."
-msgstr ""
+msgstr "Muutused hakkavad kehtima peale falihalduri uuestikäivitamist."
 
 #: tips:198
-msgid ""
-"The session manager activates these options by using the -S or --rox-session "
-"argument to rox."
-msgstr ""
+msgid "The session manager activates these options by using the -S or --rox-session argument to rox."
+msgstr "Sessioonihaldur aktiveerib need valikud kasutades -S või --rox-session võtit rox käiitamisel."
 
 #: tips:199
 msgid "Action windows"
@@ -4292,28 +4044,16 @@ msgid "Allow dragging to icons in filer windows"
 msgstr "Luba lohistada ikoonidele failihalduri aknas"
 
 #: tips:224
-msgid ""
-"When this is on you can drag a file over a sub-directory or program in a "
-"filer window. The item will highlight when you do this and dropping the file "
-"will put it into that directory, or load it into the program."
-msgstr ""
-"Kui see suvand on sisse lülitatud, saate te lohistada faili alamkataloogi "
-"või programmi peale failihalduri aknas. See objekt tõstetakse esile ja "
-"hiirenupu lahti laskmisel fail kas tõstetakse kataloogi või laetakse selle "
-"programmi sees."
+msgid "When this is on you can drag a file over a sub-directory or program in a filer window. The item will highlight when you do this and dropping the file will put it into that directory, or load it into the program."
+msgstr "Kui see suvand on sisse lülitatud, saate te lohistada faili alamkataloogi või programmi peale failihalduri aknas. See objekt tõstetakse esile ja hiirenupu lahti laskmisel fail kas tõstetakse kataloogi või laetakse selle programmi sees."
 
 #: tips:225
 msgid "Directories spring open"
 msgstr "Lahti hüppavad kataloogid"
 
 #: tips:226
-msgid ""
-"This option, which requires the above option to be turned on too, causes the "
-"highlighted directory to 'spring open' after the file is held over it for a "
-"short while."
-msgstr ""
-"See suvand eeldab ka eelmise lubamist. Kui lohistate faili kataloogi peale "
-"ja hoiate seda seal veidi aega, \"hüppab\" kataloog ise lahti."
+msgid "This option, which requires the above option to be turned on too, causes the highlighted directory to 'spring open' after the file is held over it for a short while."
+msgstr "See suvand eeldab ka eelmise lubamist. Kui lohistate faili kataloogi peale ja hoiate seda seal veidi aega, \"hüppab\" kataloog ise lahti."
 
 #: tips:227
 msgid "Spring delay:"
@@ -4324,20 +4064,15 @@ msgid "ms"
 msgstr "ms"
 
 #: tips:229
-msgid ""
-"This option sets how long, in ms, you must hold a file over a directory "
-"before it will spring open. The above option must be turned on for this to "
-"have any effect."
-msgstr ""
-"See suvand määrab, kui kaua (millisekundites ehk tuhandiksekundites) peate "
-"faili kataloogi kohal hoidma, et kataloog ise avaneks. Eeldab eelneva "
-"suvandi lubamist."
+msgid "This option sets how long, in ms, you must hold a file over a directory before it will spring open. The above option must be turned on for this to have any effect."
+msgstr "See suvand määrab, kui kaua (millisekundites ehk tuhandiksekundites) peate faili kataloogi kohal hoidma, et kataloog ise avaneks. Eeldab eelneva suvandi lubamist."
 
 #: tips:230
 msgid "When dragging files with the left mouse button"
 msgstr "Faile vasaku hiirenupuga lohistades"
 
-#: tips:231 tips:235
+#: tips:231
+#: tips:235
 msgid "Show a menu of possible actions"
 msgstr "Näita võimalike tegevuste menüüd"
 
@@ -4346,9 +4081,7 @@ msgid "Copy the files"
 msgstr "Kopeeri failid"
 
 #: tips:233
-msgid ""
-"Note that you can still get the menu to appear, by dragging with Alt held "
-"down."
+msgid "Note that you can still get the menu to appear, by dragging with Alt held down."
 msgstr "Vajadusel saate te menüü, kui lohistate, Alt-klahvi all hoides."
 
 #: tips:234
@@ -4360,12 +4093,8 @@ msgid "Move the files"
 msgstr "Tõsta failid"
 
 #: tips:237
-msgid ""
-"Note that you can still get the menu to appear, by dragging with the left "
-"button and holding down the Alt key."
-msgstr ""
-"Vajadusel saate te menüü, kui lohistate vasaku hiirenupuga, Alt-klahvi all "
-"hoides."
+msgid "Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key."
+msgstr "Vajadusel saate te menüü, kui lohistate vasaku hiirenupuga, Alt-klahvi all hoides."
 
 #: tips:238
 msgid "Download handler"
@@ -4373,15 +4102,10 @@ msgstr "Allalaadimiste haldur"
 
 #: tips:239
 msgid ""
-"When you drag a file from a web browser or other remote source, this program "
-"will be run to download it. $1 is the URI dragged to the filer, and the "
-"current directory is the destination. Eg:\n"
+"When you drag a file from a web browser or other remote source, this program will be run to download it. $1 is the URI dragged to the filer, and the current directory is the destination. Eg:\n"
 "xterm -e wget $1"
 msgstr ""
-"Kui te lohistate failihaldurisse faili brauserist või mõnest muust "
-"mittekohalikust allikast, jooksutatakse seda programmi allalaadimisel. $1 on "
-"lohistatud faili URI ja jooksev kataloog on sihtkoht, kuhu salvestatakse. "
-"Näiteks:\n"
+"Kui te lohistate failihaldurisse faili brauserist või mõnest muust mittekohalikust allikast, jooksutatakse seda programmi allalaadimisel. $1 on lohistatud faili URI ja jooksev kataloog on sihtkoht, kuhu salvestatakse. Näiteks:\n"
 "xterm -e wget $1"
 
 #: tips:240
@@ -4413,12 +4137,8 @@ msgid "File menu on right-click"
 msgstr "Fail-menüü paremklõpsu puhul"
 
 #: tips:250
-msgid ""
-"Show the File menu instead of the main menu when right-clicking with files "
-"selected (the main menu can be accessed by holding down Control)."
-msgstr ""
-"Näita Fail-menüüd põhimenüü asemel, kui teil on valitud faile ja "
-"paremklõpsate (põhimenüü saate, kui hoiate klõpsu ajal all Control-klahvi)"
+msgid "Show the File menu instead of the main menu when right-clicking with files selected (the main menu can be accessed by holding down Control)."
+msgstr "Näita Fail-menüüd põhimenüü asemel, kui teil on valitud faile ja paremklõpsate (põhimenüü saate, kui hoiate klõpsu ajal all Control-klahvi)"
 
 #: tips:251
 msgid "`Xterm Here' program"
@@ -4437,25 +4157,16 @@ msgid "MIME types"
 msgstr "MIME-Tüübid"
 
 #: tips:256
-#, fuzzy
-msgid ""
-"The filer uses a set of rules to work out the correct MIME type for each "
-"regular file, and then chooses a suitable icon for that type."
-msgstr ""
-"Failihaldur kasutab reeglite komplekti, et leida sobivat MIME-tüüpi iga "
-"tavalise faili jaoks ja valib seejärel failile ikooni. Kasutage MIME-"
-"Redaktorit, et muuta failitüübi tuvastamise reegleid:\n"
-"\n"
-"http://rox.sourceforge.net/mime_editor.html"
+msgid "The filer uses a set of rules to work out the correct MIME type for each regular file, and then chooses a suitable icon for that type."
+msgstr "Failihaldur kasutab reeglite komplekti, et leida sobivat MIME-tüüpi iga tavalise faili jaoks ja valib seejärel failile sobiva ikooni."
 
 #: tips:257
 msgid "Edit MIME rules"
-msgstr ""
+msgstr "Muuda MIME reegleid"
 
 #: tips:258
-#, fuzzy
 msgid "Themes"
-msgstr "Ajad"
+msgstr "Teemad"
 
 #: tips:259
 msgid "Icon theme"
@@ -4466,12 +4177,8 @@ msgid "Themes should be placed inside the ~/.icons directory."
 msgstr "Teemad peaksid olema ~/.icons kataloogi sees."
 
 #: tips:261
-msgid ""
-"Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note "
-"that icons set this way override those from the selected theme."
-msgstr ""
-"Kasutage \"Sea ikooni\" dialoogikasti, et iga MIME-tüübi jaoks ikooni seada."
-"Niimoodi seatud ikoone eelistatakse valitud teema ikoonidele."
+msgid "Use the 'Set Icon...' dialog box to set the icon for each MIME type. Note that icons set this way override those from the selected theme."
+msgstr "Kasutage \"Sea ikooni\" dialoogikasti, et iga MIME-tüübi jaoks ikooni seada.Niimoodi seatud ikoone eelistatakse valitud teema ikoonidele."
 
 #: tips:262
 msgid "Colours"
@@ -4506,12 +4213,8 @@ msgid "Socket:"
 msgstr "Sokkel:"
 
 #: tips:271
-msgid ""
-"Error, such as a symlink which points to a non-existant file, or a file "
-"which the filer does not have permission to examine."
-msgstr ""
-"Viga, näiteks kui sümbolviide viitab olematule failile või faili avamiseks "
-"pole failihalduril õigusi."
+msgid "Error, such as a symlink which points to a non-existant file, or a file which the filer does not have permission to examine."
+msgstr "Viga, näiteks kui sümbolviide viitab olematule failile või faili avamiseks pole failihalduril õigusi."
 
 #: tips:272
 msgid "Character device:"
@@ -4526,9 +4229,7 @@ msgid "Door:"
 msgstr "Uks:"
 
 #: tips:275
-msgid ""
-"Door files are a bit like sockets or pipes, and have only been seen on "
-"Solaris."
+msgid "Door files are a bit like sockets or pipes, and have only been seen on Solaris."
 msgstr "Uksed on soklite või torude moodi ja neid kasutatakse vaid Solarises."
 
 #: tips:276
@@ -4556,60 +4257,32 @@ msgid "Override window manager control of the pinboard and panels"
 msgstr "Võta aknahaldurilt kontroll töölaua ja paneelide üle"
 
 #: tips:282
-msgid ""
-"Some window managers don't support the new Extended Window Manager Hints "
-"system, and so treat the pinboard and panels like normal windows. Turn this "
-"on to fix problems such as the pinboard coming to the front when you click "
-"on it, titlebars and other decorations appearing around windows, or having "
-"them appear in window-select lists."
-msgstr ""
-"Paljud aknahaldurid ei toeta uut 'Extended Window Manager Hints' süsteemi ja "
-"kohtlevad töölauda ja paneele kui tavalisi aknaid. Lülitage sisse see suvand "
-"järgmiste probleemide esinedes: töölaud ning paneelid on akendenimistus, "
-"päised ning muud dekoratsioonid akendel või kui töölaud hiireklõpsu peale "
-"pealmiseks aknaks tõuseb."
+msgid "Some window managers don't support the new Extended Window Manager Hints system, and so treat the pinboard and panels like normal windows. Turn this on to fix problems such as the pinboard coming to the front when you click on it, titlebars and other decorations appearing around windows, or having them appear in window-select lists."
+msgstr "Paljud aknahaldurid ei toeta uut 'Extended Window Manager Hints' süsteemi ja kohtlevad töölauda ja paneele kui tavalisi aknaid. Lülitage sisse see suvand järgmiste probleemide esinedes: töölaud ning paneelid on akendenimistus, päised ning muud dekoratsioonid akendel või kui töölaud hiireklõpsu peale pealmiseks aknaks tõuseb."
 
 #: tips:283
 msgid "Pass all backdrop mouse clicks to window manager"
 msgstr "Anna kõik hiireklõpsud taustale aknahaldurile edasi"
 
 #: tips:284
-msgid ""
-"Normally, right clicking on the desktop background will open the pinboard "
-"menu and left clicking will clear the selection. Turn this on to forward the "
-"events to your window manager instead. Clicks on icons will not be forwarded."
-msgstr ""
-"Enamasti paremklõpsates töölaua taustale avaneb menüü ja vasakklõps tühistab "
-"valiku. Antud suvandi sisse lülitades antakse edasi aknahaldurile klõpsud "
-"taustale. Edasi ei anta klõpse ikoonidele."
+msgid "Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded."
+msgstr "Enamasti paremklõpsates töölaua taustale avaneb menüü ja vasakklõps tühistab valiku. Antud suvandi sisse lülitades antakse edasi aknahaldurile klõpsud taustale. Edasi ei anta klõpse ikoonidele."
 
 #: tips:285
 msgid "Blackbox root menus hack"
 msgstr "Blackboxi taustamenüü häkk"
 
 #: tips:286
-msgid ""
-"Blackbox, Fluxbox and similar window managers do not yet work well with the "
-"ROX-Filer pinboard. This option enables some workarounds. These window "
-"managers are expected to change their behaviour in new versions so that this "
-"isn't necessary."
-msgstr ""
-"Blackbox, Fluxbox ja neile sarnased aknahaldurid ei tööta veel kuigi hästi "
-"Roxi töölauaga. Sellele vastukaaluks aktiveerib antud suvand mõningad "
-"meetmed. Nende aknahaldurite järgmistes versioonides on küllap need "
-"probleemid juba parandatud."
+msgid "Blackbox, Fluxbox and similar window managers do not yet work well with the ROX-Filer pinboard. This option enables some workarounds. These window managers are expected to change their behaviour in new versions so that this isn't necessary."
+msgstr "Blackbox, Fluxbox ja neile sarnased aknahaldurid ei tööta veel kuigi hästi Roxi töölauaga. Sellele vastukaaluks aktiveerib antud suvand mõningad meetmed. Nende aknahaldurite järgmistes versioonides on küllap need probleemid juba parandatud."
 
 #: tips:287
 msgid "Panel is a 'dock'"
 msgstr "Paneel on 'dokk'"
 
 #: tips:288
-msgid ""
-"Disable this option if the panel stays above other windows against your "
-"wishes. Requires a restart to take effect."
-msgstr ""
-"Lülige välja see suvand, kui paneel tõuseb soovimatult teiste akende peale. "
-"Nõuab uuestikäivitust"
+msgid "Disable this option if the panel stays above other windows against your wishes. Requires a restart to take effect."
+msgstr "Lülige välja see suvand, kui paneel tõuseb soovimatult teiste akende peale. Nõuab uuestikäivitust"
 
 #: tips:289
 msgid "Drag and drop"
@@ -4620,14 +4293,8 @@ msgid "Don't use hostnames"
 msgstr "Ära kasuta arvutinimesid"
 
 #: tips:291
-msgid ""
-"Some older applications don't support XDND fully and may need to have this "
-"option turned on. Use this if dragging files to an application shows a + "
-"sign on the pointer but the drop doesn't work."
-msgstr ""
-"Mõned vanemad rakendused ei toets XDND protokolli täielikult ja see suvand "
-"võib vajalikuks osutuda. Lülitage see sisse, kui faili rakendusele lohitades "
-"kursorile lisandub + märk, kuid lohistamine ise ebaõnnestub."
+msgid "Some older applications don't support XDND fully and may need to have this option turned on. Use this if dragging files to an application shows a + sign on the pointer but the drop doesn't work."
+msgstr "Mõned vanemad rakendused ei toets XDND protokolli täielikult ja see suvand võib vajalikuks osutuda. Lülitage see sisse, kui faili rakendusele lohitades kursorile lisandub + märk, kuid lohistamine ise ebaõnnestub."
 
 #: tips:292
 msgid "Extended attributes"
@@ -4638,16 +4305,8 @@ msgid "Don't use extended attributes"
 msgstr "Ära kasuta laiendatud atribuute"
 
 #: tips:294
-msgid ""
-"This disables the use of extended attributes available in newer operating "
-"systems and file systems.  With this option set the 'Set Type' menu entry is "
-"disabled, the MIME type of the file is only derived from the file name and "
-"the properties window does not report extended attributes."
-msgstr ""
-"See keelab uuemates opsüsteemides ja failisüsteemides olevate laiendatud "
-"atribuutide kasutamise. Selle suvandi lubamisel 'Sea tüüp' menüüsissekanne "
-"keelatakse, faili MIME-tüüp tuletatakse ainult failinimest ja Omaduste aken "
-"ei näita infot laiendatud atribuutide kohta"
+msgid "This disables the use of extended attributes available in newer operating systems and file systems.  With this option set the 'Set Type' menu entry is disabled, the MIME type of the file is only derived from the file name and the properties window does not report extended attributes."
+msgstr "See keelab uuemates opsüsteemides ja failisüsteemides olevate laiendatud atribuutide kasutamise. Selle suvandi lubamisel 'Sea tüüp' menüüsissekanne keelatakse, faili MIME-tüüp tuletatakse ainult failinimest ja Omaduste aken ei näita infot laiendatud atribuutide kohta"
 
 #~ msgid ""
 #~ "Error loading MIME database:\n"
@@ -4655,10 +4314,8 @@ msgstr ""
 #~ msgstr ""
 #~ "Viga MIME-tüüpide andmebaasi laadimisel:\n"
 #~ "%s"
-
 #~ msgid "File '%s' corrupted!"
 #~ msgstr "Fail '%s' on vigane!"
-
 #~ msgid ""
 #~ "The ~/.mime directory has moved. It should now be ~/.local/share/mime. "
 #~ "You should move it there (and make a symlink from ~/.mime to it for older "
@@ -4666,7 +4323,6 @@ msgstr ""
 #~ msgstr ""
 #~ "Kataloog ~/.mime asub nüüd ~/.local/share/mime. Palun tõstke see sinna "
 #~ "(ja ühilduvuse huvides vanade programmidega looge viit vanasse asukohta)."
-
 #~ msgid ""
 #~ "The standard MIME type database (version 0.9 or later) was not found. The "
 #~ "filer will probably not show the correct types for different files. You "
@@ -4686,13 +4342,10 @@ msgstr ""
 #~ "Kui pakk on juba paigaldatud, kontrollige, kas Teil on lugemisõigused "
 #~ "sellele (kontrollige ligipääsuõigusi failile /usr/local/share/mime/globs "
 #~ "või /usr/share/mime/globs)."
-
 #~ msgid "Executable files"
 #~ msgstr "Käivitatavad failid"
-
 #~ msgid "Ignore eXecutable bit for known extensions"
 #~ msgstr "Ignoreeri tuntud laiendiga failide puhul käivitamisbitti"
-
 #~ msgid ""
 #~ "If a file has a known extension (eg '.gif') then ignore the executable "
 #~ "bit. This is useful if you have files on a Windows-type filesystem which "
@@ -4701,51 +4354,38 @@ msgstr ""
 #~ "Kui faili laiend (näiteks '.gif') on tuntud, ignoreeri käivitamisbitti. "
 #~ "See on mõistlik juhul, kui teil on faile Windowsi failisüsteemil ja neid "
 #~ "näidatakse käivitatavate programmidena."
-
 #~ msgid "Icon '%s' not present in theme"
 #~ msgstr "Ikooni '%s' pole teemas"
-
 #~ msgid "A"
 #~ msgstr "A"
-
 #~ msgid "All, "
 #~ msgstr "KÃµik, "
-
 #~ msgid ""
 #~ "Pinboard icons cannot be drawn because ROX-Filer was compiled against GTK"
 #~ "+-2.0 but is running with GTK+-2.2. Please recompile it."
 #~ msgstr ""
 #~ "TÃ¶Ã¶laua ikoone ei saa kuvada, kuna ROX-Filer kompileeriti GTK+-2.0 "
 #~ "kasutades, kuid praegu jookseb GTK+-2.2. Palun kompileerige uuesti."
-
 #~ msgid "Info"
 #~ msgstr "Info"
-
 #~ msgid "Permissions:"
 #~ msgstr "Loabitid:"
-
 #~ msgid "file(1) says..."
 #~ msgstr "file(1) ÃŒtleb..."
-
 #~ msgid "Symbolic link to %s"
 #~ msgstr "SÃŒmbolviit failile %s"
-
 #~ msgid "No (gnome-vfs-config not found)"
 #~ msgstr "Ei (ei leitud gnome-vfs-config)"
-
 #~ msgid "Help about ... ?"
 #~ msgstr "Abi  ... kohta ?"
-
 #~ msgid "Examine ... ?"
 #~ msgstr "Uuri ... ?"
-
 #~ msgid ""
 #~ "Executable file:\n"
 #~ "This is a file with an eXecute bit set - it can be run as a program."
 #~ msgstr ""
 #~ "KÃ€ivitatav fail:\n"
 #~ "Sellel failil on aktiveeritud kÃ€ivitusbitt (--x)"
-
 #~ msgid ""
 #~ "File:\n"
 #~ "This is a data file. Try using the Info menu item to find out more..."
@@ -4753,7 +4393,6 @@ msgstr ""
 #~ "Fail:\n"
 #~ "See on andmefail. Valige menÃŒÃŒst Info, et selle faili kohta rohkem "
 #~ "teada saada..."
-
 #~ msgid ""
 #~ "Mount point:\n"
 #~ "A mount point is a directory which another filing system can be mounted "
@@ -4764,7 +4403,6 @@ msgstr ""
 #~ "Ãhenduspunkt on kataloog, mille kÃŒlge saab teisi failisÃŒsteeme "
 #~ "ÃŒhendada. KÃµik failid ÃŒhendatud failisÃŒsteemil on kÃ€ttesaadavad "
 #~ "selle kataloogi seest."
-
 #~ msgid ""
 #~ "Device file:\n"
 #~ "Device files allow you to read from or write to a device driver as though "
@@ -4773,7 +4411,6 @@ msgstr ""
 #~ "Seadmefail:\n"
 #~ "Seadmefailid lubavad teil lugeda ja kirjutada andmeid oma seadme "
 #~ "tÃŒÃŒrelisse, nagu oleks tegemist tavalise failiga."
-
 #~ msgid ""
 #~ "Named pipe:\n"
 #~ "Pipes allow different programs to communicate. One program writes data to "
@@ -4782,14 +4419,12 @@ msgstr ""
 #~ "Nimega toru:\n"
 #~ "Torud lubavad erinevatel rakendustel omavahel suhelda. Ãks rakendus "
 #~ "kirjutab andmeid torusse ja teine loeb neid sealt."
-
 #~ msgid ""
 #~ "Socket:\n"
 #~ "Sockets allow processes to communicate."
 #~ msgstr ""
 #~ "Sokkel:\n"
 #~ "Soklid lubavad protsessidel omavahel suhelda."
-
 #~ msgid ""
 #~ "Door:\n"
 #~ "Doors are a little-used Solaris method for processes to communicate."
@@ -4797,7 +4432,6 @@ msgstr ""
 #~ "Uks:\n"
 #~ "Uksed on Solarise poolt kasutatav vÃ€helevinud meetod protsesside "
 #~ "omavaheliseks suhtluseks."
-
 #~ msgid ""
 #~ "Unknown type:\n"
 #~ "I couldn't find out what kind of file this is. Maybe it doesn't exist "
@@ -4806,7 +4440,6 @@ msgstr ""
 #~ "Tundmatut tÃŒÃŒpi:\n"
 #~ "Ei Ãµnnestunud tuvastada faili tÃŒÃŒpi. Ehk pole seda faili enam vÃµi "
 #~ "puuduvad teil Ãµigused otsida kataloogis, kus fail asub ?"
-
 #~ msgid ""
 #~ "Directory:\n"
 #~ "This is a directory. It contains an index to other items - open it to see "
@@ -4815,10 +4448,8 @@ msgstr ""
 #~ "Kataloog:\n"
 #~ "See on kataloog. See sisaldab nimekirja teiste elementide kohta  - avage "
 #~ "see, et nimekirja nÃ€ha."
-
 #~ msgid "Menu on button 2 (RISC OS style)"
 #~ msgstr "MenÃŒÃŒ teise hiirenupuga (RISC OS stiilis)"
-
 #~ msgid ""
 #~ "Use button 2, the middle button (click both buttons at once on two button "
 #~ "mice), to pop up the menu. If off, use button 3 (right) instead."
@@ -4826,3 +4457,4 @@ msgstr ""
 #~ "Kasutage teist hiirenuppu, s.o. keskmist hiirenuppu (klÃµpsake mÃµlemaid "
 #~ "nuppe korraga kahenupulise hiire puhul), et hÃŒpikmenÃŒÃŒd aktiveerida. "
 #~ "Kui suvand on keelatud, kasutage kolmandat (paremat) hiirenuppu."
+
