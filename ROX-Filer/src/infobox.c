@@ -518,7 +518,8 @@ static void cell_edited(GtkCellRendererText *cell,
 	}
 	if (symlink(new_text, fullpath)) {
 		delayed_error(_("Failed to create symlink from '%s':\n%s\n"
-				"(note: old link has been deleted)"));
+				"(note: old link has been deleted)"),
+				fullpath, g_strerror(errno));
 		return;
 	}
 
