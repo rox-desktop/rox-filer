@@ -1,5 +1,10 @@
 2005-10-18  Matthias Clasen  <mclasen@redhat.com>
 	
+	* src/xdgmime.c:
+	* src/xdgmimecache.h:
+	* src/xdgmimecache.c: Make the array of caches NULL-terminated
+	and rename it to _caches.  (#4011)
+
 	* src/xdgmime.h:
 	* src/xdgmime.c: Add a struct statbuf * argument to 
 	xdg_mime_get_mime_type_for_file().  (#3529)
