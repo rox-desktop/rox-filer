@@ -1,4 +1,10 @@
 2005-10-18  Matthias Clasen  <mclasen@redhat.com>
+	
+	* src/xdgmime.h:
+	* src/xdgmime.c: Add a struct statbuf * argument to 
+	xdg_mime_get_mime_type_for_file().  (#3529)
+
+	* src/test-mime.c: Adjust callers.
 
 	* src/xdgmimecache.c: Make magic comparisons work correctly.
 
