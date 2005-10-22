@@ -2389,6 +2389,9 @@ void filer_perform_action(FilerWindow *filer_window, GdkEventButton *event)
 	view_get_iter_at_point(view, &iter, event->window, event->x, event->y);
 	item = iter.peek(&iter);
 
+	if (item && view_cursor_visible(view))
+		view_cursor_to_iter(view, &iter);
+
 	if (item && event->button == 1 &&
 		view_get_selected(view, &iter) &&
 		filer_window->selection_state == GTK_STATE_INSENSITIVE)
