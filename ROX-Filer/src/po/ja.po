@@ -1,17 +1,19 @@
 # ROX-Filer-2.x Japanese Translation
-# OKATANA,  2004
+# Copyright (C) 2005 team OKATANA <mkato@par.odn.ne.jp, mosaicist@par.odn.ne.jp>
+# team OKATANA: KATO Masashi, TANAKA hiroaki
+# 
+# 
 msgid ""
 msgstr ""
-"Project-Id-Version: rox-ja\n"
+"Project-Id-Version: ROX-Filer 2.3\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-08-09 14:02+0100\n"
-"PO-Revision-Date: 2003-05-30 01:13+0900\n"
-"Last-Translator: OKATANA <mkato@par.odn.ne.jp,mosaicist@par.odn.ne.jp>\n"
-"Language-Team: OKATANA <mkato@par.odn.ne.jp,mosaicist@par.odn.ne.jp>\n"
+"POT-Creation-Date: 2005-09-03 16:08+0900\n"
+"PO-Revision-Date: 2005-09-05 07:11+0900\n"
+"Last-Translator: team OKATANA<mkato@par.odn.ne. jp,mosaicist@par.odn.ne.jp>\n"
+"Language-Team: Japanese team OKATANA <mkato@par.odn.ne.jp, mosaicist@par.odn.ne.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Translator: UTUMI Hirosi <utuhiro@mx12.freecom.ne.jp>, 2003\n"
 
 #: abox.c:127
 msgid "<dir>"
@@ -43,15 +45,15 @@ msgstr "検索式:"
 
 #: action.c:58
 msgid "See the attr(5) man page for full details."
-msgstr ""
+msgstr "詳細は attr の man page (5)をご覧下さい。"
 
 #: action.c:60
 msgid "See the fsattr(5) man page for full details."
-msgstr ""
+msgstr "詳細は fsattr の man page (5)をご覧下さい。"
 
 #: action.c:62
 msgid "You do not appear to have OS support."
-msgstr ""
+msgstr "OS にサポートされていないようです。"
 
 #: action.c:188
 msgid "Find expression reference"
@@ -96,7 +98,7 @@ msgid ""
 "<b>prune</b> (false, and prevents searching the contents of a directory)."
 msgstr ""
 "<u>概略</u>\n"
-"検索する文字を''でくくってください:\n"
+"検索する文字を''(シングルクォート)でくくってください:\n"
 "<b>'index.html'</b> (''無しでindex.htmlとだけ入力するとエラーになる)\n"
 "\n"
 "<u>例</u>\n"
@@ -135,9 +137,8 @@ msgstr ""
 "<b>prune</b> (偽を意味します。パターンを検索対象から除外します。)"
 
 #: action.c:246
-#, fuzzy
 msgid "Change permissions reference"
-msgstr "検索式 リファレンス"
+msgstr "パーミッション変更 リファレンス"
 
 #: action.c:257
 msgid ""
@@ -177,7 +178,7 @@ msgstr ""
 "<b>WHO</b> はユーザ(所有者)、グループ、他人、の許可属性を変更する\n"
 "べきかを決める <b>u</b>、<b>g</b>、<b>o</b> の、一つ以上を組み合せた文字で"
 "す。\n"
-"<b>HOW</b> は <b>+</b>, <b>-</b>, <b>=</b> の何れか。許可属性を追加、削除、同"
+"<b>HOW</b> は <b>+</b>, <b>-</b>, <b>=</b> のいずれか。許可属性を追加、削除、同"
 "等、にします。\n"
 "<b>PERMISSIONS</b> は '<b>rwxXstugo</b>'の内、一つ以上の文字の組合せです\n"
 "\n"
@@ -202,7 +203,6 @@ msgid "Set type reference"
 msgstr "MIME形式設定リファレンス"
 
 #: action.c:309
-#, fuzzy
 msgid ""
 "Normally ROX-Filer determines the type of a regular file\n"
 "by matching it's name against a pattern. To change the\n"
@@ -226,7 +226,7 @@ msgstr ""
 "ROX-File は、ファイルタイプを格納するために 'user.mime_type' を使用\n"
 "します。\n"
 "\n"
-"これらのファイルタイプは、ファイルシステム、OS がその機能をを実装し\n"
+"これらのファイルタイプは、ファイルシステム、OS がその機能を実装し\n"
 "ている場合に限り、ディレクトリー、デバイス、パイプ等ではなく、通常\n"
 "ファイルに対してのみサポートされます。\n"
 "\n"
@@ -720,7 +720,7 @@ msgstr ""
 
 #: appmenu.c:339 menu.c:234
 msgid "Customise Menu..."
-msgstr "指定アイテム専用メニューを追加"
+msgstr "メニューをカスタマイズ..."
 
 #: appmenu.c:396 menu.c:251 toolbar.c:159
 msgid "Help"
@@ -775,26 +775,23 @@ msgstr "最近開いたディレクトリ"
 
 #: bulk_rename.c:68
 msgid "Bulk rename files"
-msgstr ""
+msgstr "複数ファイルリネーム"
 
 #: bulk_rename.c:71
-#, fuzzy
 msgid "Reset"
-msgstr "戻す(_R)"
+msgstr "戻す"
 
 #: bulk_rename.c:76
 msgid "Make the New column a copy of Old"
-msgstr ""
+msgstr "'新しい名前'欄を以前のものに戻します"
 
 #: bulk_rename.c:81
-#, fuzzy
 msgid "_Rename"
-msgstr "リネーム"
+msgstr "リネーム(_R)"
 
 #: bulk_rename.c:94
-#, fuzzy
 msgid "Replace:"
-msgstr "置き換え(_R)"
+msgstr "リネーム対象:"
 
 #: bulk_rename.c:101
 msgid ""
@@ -804,64 +801,72 @@ msgid ""
 "\\. matches a dot\n"
 "\\.htm$ matches the '.htm' in 'index.htm', etc"
 msgstr ""
+"この項にはリネーム対象に該当する正規化表現を記入して下さい。\n"
+"^ ファイル名の先頭に一致\n"
+"$ 末尾に一致\n"
+"\\. ドットに一致\n"
+"\\.htm$ 'index.html'の'.htm' に一致, 等"
 
 #: bulk_rename.c:109
-#, fuzzy
 msgid "With:"
-msgstr "書き込み"
+msgstr "変更後"
 
 #: bulk_rename.c:116
 msgid ""
 "The first match in each filename will be replaced by this string. There are "
 "no special characters."
 msgstr ""
+"各ファイル名のリネーム対象(パターン)に一致するものが、この文字列に置き換えら"
+"れます。特殊文字は使われません"
 
 #: bulk_rename.c:120
 msgid "Apply"
-msgstr ""
+msgstr "適用"
 
 #: bulk_rename.c:123
 msgid ""
 "Do a search-and-replace in the New column. The files are not actually "
 "renamed until you click on the Rename button below."
 msgstr ""
+"検索と置き換えを'新しい名前'欄に適用します。リネームボタンを押すまでは実際のリ"
+"ネームは実行されません。"
 
 #: bulk_rename.c:142
 msgid "Old name"
-msgstr ""
+msgstr "古い名前"
 
 #: bulk_rename.c:151
-#, fuzzy
 msgid "New name"
-msgstr "リネーム"
+msgstr "新しい名前"
 
 #: bulk_rename.c:259
 msgid "No strings (in the New column) matched the given expression"
-msgstr ""
+msgstr "('新しい名前'欄には)与えられたパターン式に一致する名前は有りません"
 
 #: bulk_rename.c:264
 msgid "One name matched, but the result was the same"
-msgstr ""
+msgstr "1 個のアイテムがパターンに一致しますが、変更の前後が同じです"
 
 #: bulk_rename.c:267
 #, c-format
 msgid "%d names matched, but the results were all the same"
-msgstr ""
+msgstr "%d 個のアイテムがパターンに一致しますが、変更の前後が同じです"
 
 #: bulk_rename.c:293
 msgid ""
 "Specify a regular expression to match, and a string to replace matches with."
-msgstr ""
+msgstr "変換対象に一致する正規表現と、置き換える文字列を指定して下さい"
 
 #: bulk_rename.c:310
-#, fuzzy, c-format
+#, c-format
 msgid "%s (for '%s')"
-msgstr "%s '%s'"
+msgstr "%s ('%s' の為の)"
 
 #: bulk_rename.c:343
 #, c-format
 msgid "A file called '%s' already exists. Aborting bulk rename."
 msgstr ""
+"'%s' という名前のファイルが既に存在します。複数ファイルリネームは中断します。"
 
 #: bulk_rename.c:348
 #, c-format
@@ -870,11 +875,14 @@ msgid ""
 "%s\n"
 "Aborting bulk rename."
 msgstr ""
+"'%s'の'%s'としてのリネームに失敗:\n"
+"%s\n"
+"複数ファイルリネームを中断します。"
 
 #: bulk_rename.c:410
-#, fuzzy, c-format
+#, c-format
 msgid "A file called '%s' already exists"
-msgstr "?'%s' は既に存在しています - %sしますか?"
+msgstr "'%s' は既に存在しています。"
 
 #: bulk_rename.c:421
 #, c-format
@@ -882,15 +890,16 @@ msgid ""
 "Some of the New names contain / characters (eg '%s'). This will cause the "
 "files to end up in different directories. Continue?"
 msgstr ""
+"いくつかの'新しい名前'の中に / が含まれています (例えば  '%s')。これは、ファイルが別"
+"のディレクトリに置かれることを意味しますが、処理を続けますか?"
 
 #: bulk_rename.c:436
 msgid "None of the names have changed. Nothing to do!"
-msgstr ""
+msgstr "いずれの名前も変更されませんでした。なにも行いませんでした。"
 
 #: choices.c:428
-#, fuzzy
 msgid "Choices migration"
-msgstr "中国語 (繁体)"
+msgstr "Choices の移動"
 
 #: choices.c:436
 #, c-format
@@ -900,11 +909,16 @@ msgid ""
 " to the new location \n"
 "<b>%s</b>\n"
 msgstr ""
+"Choices(貴方の既存の設定)は \n"
+"<b>%s</b>\n"
+"から \n"
+"<b>%s</b>\n"
+"に移動されました\n"
 
 #: choices.c:447
 #, c-format
 msgid "%d directories could not be migrated"
-msgstr ""
+msgstr "%d 個のディレクトリは移動できませんでした"
 
 #: dir.c:982
 #, c-format
@@ -923,11 +937,11 @@ msgstr "lstat(2) 失敗: %s"
 
 #: dnd.c:126
 msgid "Link (relative)"
-msgstr ""
+msgstr "Link (相対パス)"
 
 #: dnd.c:127
 msgid "Link (absolute)"
-msgstr ""
+msgstr "Link (絶対パス)"
 
 #: dnd.c:426
 msgid "Internal error - bad info type"
@@ -939,8 +953,7 @@ msgstr "ブックマークするにはディレクトリをここにドラッグ
 
 #: dnd.c:580
 msgid "XDS protocol error: leafname may not contain '/'\n"
-msgstr ""
-"XDS protocol error: リーフネーム-ファイル名は '/' を含んでいないようです\n"
+msgstr "XDS protocol error: leafname-ファイル名は '/' を含んでいないようです\n"
 
 #: dnd.c:605
 msgid ""
@@ -1038,7 +1051,7 @@ msgstr "表示"
 
 #: dropbox.c:120
 msgid "Show the current choice in a filer window"
-msgstr "ファイラウィンドウに現在の選択を表示"
+msgstr "ファイラーウィンドウに現在の選択を表示"
 
 #: dropbox.c:174
 msgid "<nothing>"
@@ -1099,9 +1112,8 @@ msgstr ""
 "デバイスをアンマウントすると安全にディスクを取り出すことができます"
 
 #: filer.c:566
-#, fuzzy
 msgid "No change"
-msgstr "なし"
+msgstr "このまま"
 
 #: filer.c:572 menu.c:862
 msgid "Unmount"
@@ -1218,11 +1230,11 @@ msgstr "切り詰める"
 
 #: find.c:650
 msgid "After"
-msgstr "後"
+msgstr "変更後"
 
 #: find.c:652
 msgid "Before"
-msgstr "前"
+msgstr "変更前"
 
 #: find.c:746
 msgid "IsReg"
@@ -1306,27 +1318,27 @@ msgstr "Bytes"
 
 #: find.c:921
 msgid "Kb"
-msgstr ""
+msgstr "Kb"
 
 #: find.c:921
 msgid "K"
-msgstr ""
+msgstr "K"
 
 #: find.c:923
 msgid "Mb"
-msgstr ""
+msgstr "Mb"
 
 #: find.c:923
 msgid "M"
-msgstr ""
+msgstr "M"
 
 #: find.c:925
 msgid "Gb"
-msgstr ""
+msgstr "Gb"
 
 #: find.c:925
 msgid "G"
-msgstr ""
+msgstr "G"
 
 #: find.c:927
 msgid "Sec"
@@ -1479,17 +1491,17 @@ msgid "Incorrect or missing line break in text/uri-list data"
 msgstr "text/uri-listデータの,不正又は不明な改行です"
 
 #: gui_support.c:1332
-#, fuzzy, c-format
+#, c-format
 msgid "Failed to open file '%s': %s"
-msgstr ""
-"'%s'のシンボリックリンクを削除できません:\n"
-"%s"
+msgstr "'%s'のオープンに失敗しました : %s"
 
 #: gui_support.c:1376
 #, c-format
 msgid ""
 "Failed to load image '%s': reason not known, probably a corrupt image file"
 msgstr ""
+"イメージ '%s' を読み出せません:理由は不明ですが、恐らく壊れたファイルだと思わ"
+"れます。"
 
 #: gui_support.c:1427
 msgid ""
@@ -1498,6 +1510,10 @@ msgid ""
 "\n"
 "http://0install.net/injector.html"
 msgstr ""
+"対応コマンドが利用不能な為、このプログラムは実行することができません。それは以下から"
+"ダウンロードすることができます:\n"
+"\n"
+"http://0install.net/injector.html"
 
 #: i18n.c:38
 msgid ""
@@ -1673,7 +1689,7 @@ msgstr ""
 "%s\n"
 "'%s'のシンボリックリンクが作れません:\n"
 "%s\n"
-"(注:古いリンクは削除されました。)"
+"(注意:古いリンクは削除されました。)"
 
 #: infobox.c:539 tips:270
 msgid "Error:"
@@ -1713,20 +1729,19 @@ msgstr "アクセスした日時:"
 
 #: infobox.c:621
 msgid "Extended attributes:"
-msgstr ""
+msgstr "拡張属性:"
 
 #: infobox.c:623
 msgid "Present"
-msgstr ""
+msgstr "あります"
 
 #: infobox.c:624
 msgid "None"
-msgstr "なし"
+msgstr "ありません"
 
 #: infobox.c:625
-#, fuzzy
 msgid "Not supported"
-msgstr "Dnotify(ディレクトリ通知機能)サポート"
+msgstr "サポートされていません"
 
 #: infobox.c:637
 msgid "Link target:"
@@ -1817,7 +1832,6 @@ msgid "Mount point (%s)"
 msgstr "マウントポイント (%s)"
 
 #: main.c:95
-#, fuzzy
 msgid ""
 "Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
@@ -1826,7 +1840,7 @@ msgid ""
 "under the terms of the GNU General Public License.\n"
 "For more information about these matters, see the file named COPYING.\n"
 msgstr ""
-"Copyright (C) 2003 Thomas Leonard.\n"
+"Copyright (C) 2005 Thomas Leonard.\n"
 "ROX-Filer comes with ABSOLUTELY NO WARRANTY,\n"
 "to the extent permitted by law.\n"
 "You may redistribute copies of ROX-Filer\n"
@@ -1852,7 +1866,6 @@ msgstr ""
 "\n"
 
 #: main.c:115
-#, fuzzy
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1877,13 +1890,15 @@ msgid ""
 "  -v, --version\t\tdisplay the version information and exit\n"
 "  -x, --examine=FILE\tFILE has changed - re-examine it\n"
 "\n"
-"Report bugs to "
+"Report bugs to  <rox-devel@lists.sourceforge.net> .\n"
+"Home page (including updated versions): http://rox.sourceforge.net/\n"
 msgstr ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "指定されたファイル(ディレクトリ)を開きます。指定が無い場合は\n"
 "カレントディレクトリを開きます。\n"
 "\n"
-"  -b, --bottom=PANEL\t画面の下端に'PANEL'(という名の)パネルを表示\n"
+"  -b, --border=PANEL\t境界に'PANEL'(という名の)パネルを表示\n"
+"  -B, --bottom=PANEL\t画面の下端に'PANEL'(という名の)パネルを表示\n"
 "  -c, --client-id=ID\tセッションマネージメントを適用\n"
 "  -d, --dir=DIR\t\t'DIR' をディレクトリとして開く (not application)\n"
 "  -D, --close=DIR\t'DIR' と そのサブディレクトリを閉じる\n"
@@ -1895,6 +1910,7 @@ msgstr ""
 "  -r, --right=PANEL\t画面の右端に'PANEL'(という名の)パネル を表示\n"
 "  -R, --RPC\t\t標準入力から呼び出し方法を読み取る\n"
 "  -s, --show=FILE\t'FILE'表示の為にディレクトリを開く\n"
+"  -S, --rox-session\tデフォルトのパネルとピンボードで -n を実行\n"
 "  -t, --top=PANEL\t画面の上端に'PANEL'(という名の)パネルを表示\n"
 "  -u, --user\t\tウィンドウ毎にユーザー名を表示\n"
 "  -v, --version\t\tバージョン情報を表示して終了\n"
@@ -1903,12 +1919,6 @@ msgstr ""
 "バグ報告は <rox-devel@lists.sourceforge.net> まで.\n"
 "Home page (最新バージョンを置いてあります): http://rox.sourceforge.net/\n"
 
-#: main.c:136
-msgid ""
-".\n"
-"Home page (including updated versions): http://rox.sourceforge.net/\n"
-msgstr ""
-
 #: main.c:234
 msgid ""
 "We got a BadWindow error from the X server. This might be due to this GTK "
@@ -1916,6 +1926,10 @@ msgid ""
 "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 "Trying to continue..."
 msgstr ""
+"X サーバーから'BadWindow'エラーを受け取りました。これは GTK のバグ"
+"(ドラッグ・アンド・ドロップ中の?)によるかもしれません。"
+"http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
+"再試行してみて下さい..."
 
 #: main.c:382
 msgid ""
@@ -2205,10 +2219,15 @@ msgid ""
 "it may simply be that the filesystem needs to be mounted with the right "
 "mount option ('user_xattr' on Linux)."
 msgstr ""
+"タイプを格納するために使用される拡張属性は、指定アイテムをサポートしていませ"
+"ん。\n"
+"これは恐らくファイルシステム、C ライブラリ等の未サポートによるものか、ファイ"
+"ルシステムは拡張属性をサポートしているが、マウントオプションで拡張属性を指定"
+"していない事によるものと思われます(Linux の場合 'user_xattr')。"
 
 #: menu.c:1037
 msgid "Setting type not supported for some of these files"
-msgstr ""
+msgstr "設定されたタイプは選択されたファイル中の幾つかをサポートしていません。"
 
 #: menu.c:1072
 msgid "_Relative link"
@@ -2315,16 +2334,22 @@ msgid ""
 "%s\n"
 "%s\n"
 msgstr ""
+"テンプレート・ディレクトリーに置かれたファイルは、'新規作成'メニューに表示されます。\n"
+"メニューからそれらを選択すれば、新規ファイルとして、そのコピーが作られます\n"
+"\n。"
+"次のディレクトリーが、テンプレート専用として使用されます:\n"
+"\n"
+"%s\n"
+"%s\n"
+
 
 #: menu.c:1534
-#, fuzzy
 msgid ""
 "I'll show you your Templates directory now; you should place any template "
 "files you want inside it."
 msgstr ""
-"OK を押せば 'アプリに送る' 専用ディレクトリを開きます。登録したいアプリをそこ"
-"へ Ctrl+Shift+ ドラッグ & ドロップして下さい(シンボリックリンクを作成できま"
-"す)"
+"OK を押せばテンプレート・ディレクトリを開きます。登録したいテンプレートファイルを"
+"そこへコピーして下さい。"
 
 #: menu.c:1651
 msgid "Customise"
@@ -2422,13 +2447,19 @@ msgid ""
 "\tgtk-can-change-accels = 1\n"
 "\t(this only works if NOT using XSETTINGS)"
 msgstr ""
-"ユーザー定義のショートカットは Gtk2 デフォルトでは無効であり、現在も無効のま"
-"まになっています。以下のような方法により、この機能を有効にすることが可能で"
-"す:\n"
+"ユーザー定義のショートカットは Gtk2 デフォルトでは無効であり、現在の設定は無"
+"効のままになっています。以下のような方法により、この機能を有効にすることが可"
+"能です:\n"
+"\n"
 "1) ROX-Session、gnome-settings-daemon などの XSettings manager を使用する\n"
+"\n"
 "あるいは\n"
+"\n"
 "2) ~/.gtkrc-2.0 に以下の記述を加える(無ければ作成する):\n"
-" \tgtk-can-change-accels = 1"
+" \tgtk-can-change-accels = 1\n"
+"\n"
+"※ ショートカット設定を有効にするには、上記の設定終了後 rox のウィンドウ、パネ"
+"ル、ピンボードを一旦すべて終了する必要が有ります"
 
 #: menu.c:2052
 msgid ""
@@ -2445,7 +2476,7 @@ msgstr ""
 "\n"
 "- ファイラーウィンドウ上でメニューを開く\n"
 "- マウスポインタを、設定したい項目の所へ移動\n"
-"-  割り当てたいキーを押す\n"
+"- 割り当てたいキーを押す\n"
 "\n"
 "設定したショートカットはメニュー項目の横に表示され、以後はメニューを開かなく"
 "てもショートカットキーにより、その機能を呼び出せます。"
@@ -2606,9 +2637,8 @@ msgstr ""
 "%s"
 
 #: panel.c:2335
-#, fuzzy
 msgid "Panel Options..."
-msgstr "オプション設定"
+msgstr "パネル・オプション..."
 
 #: panel.c:2427
 #, c-format
@@ -2616,51 +2646,49 @@ msgid "Xinerama monitor %d unavailable"
 msgstr "Xinerama モニタ %d は利用できません"
 
 #: panel.c:2502
-#, fuzzy
 msgid "Panel Options"
-msgstr "オプション"
+msgstr "パネル・オプション"
 
 #: panel.c:2517
-#, fuzzy, c-format
+#, c-format
 msgid "Panel: %s"
-msgstr "パネル"
+msgstr "パネル: %s"
 
 #: panel.c:2525
 msgid "Select the panel's position:"
-msgstr ""
+msgstr "パネル位置を選んで下さい"
 
 #: panel.c:2531
 msgid "Top-edge panel"
-msgstr ""
+msgstr "上端パネル"
 
 #: panel.c:2532
 msgid "Top edge"
-msgstr ""
+msgstr "上端"
 
 #: panel.c:2533
 msgid "Bottom edge panel"
-msgstr ""
+msgstr "下端パネル"
 
 #: panel.c:2534
-#, fuzzy
 msgid "Bottom edge"
-msgstr "下部余白"
+msgstr "下端"
 
 #: panel.c:2535
 msgid "Left edge panel"
-msgstr ""
+msgstr "左端パネル"
 
 #: panel.c:2536
 msgid "Left edge"
-msgstr ""
+msgstr "左端"
 
 #: panel.c:2537
 msgid "Right-edge panel"
-msgstr ""
+msgstr "右端パネル"
 
 #: panel.c:2538
 msgid "Right edge"
-msgstr ""
+msgstr "右端"
 
 #: pinboard.c:354
 msgid "Your old pinboard file has been converted to the new XML format."
@@ -2876,7 +2904,6 @@ msgstr ""
 "ん): %s"
 
 #: run.c:502
-#, fuzzy, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
 "action by choosing `Set Run Action' from the File menu, or you can just drag "
@@ -2884,7 +2911,7 @@ msgid ""
 msgstr ""
 "この種類(%s/%s)のファイルに対応するアプリが設定されていません - アイコンを右"
 "クリックして「対応アプリの設定」を選んでください。もしくはアイコンを直接アプ"
-"リにドラッグしてください"
+"リにドラッグしてください。%s"
 
 #: run.c:508
 msgid ""
@@ -2893,6 +2920,10 @@ msgid ""
 "Note: If this is a computer program which you want to run, you need to set "
 "the execute bit by choosing Permissions from the File menu."
 msgstr ""
+"\n"
+"\n"
+"注意:もしこれが実行可能なプログラムなら、ファイルメニューの'パーミッション'の項で"
+"実行ビットをセットする必要が有ります。"
 
 #: support.c:272
 msgid "B"
@@ -3107,7 +3138,7 @@ msgid ""
 "\n"
 "gimp \"$@\""
 msgstr ""
-" \"$@\" を扱うのに適切なシェルコマンドを入力してください。例:\n"
+" \"$@\" を扱うのに適切なシェルコマンドを入力してください。\n例:\n"
 "\n"
 "gimp \"$@\""
 
@@ -3172,9 +3203,8 @@ msgid "Enter a shell command:"
 msgstr "シェルコマンドを入力してください:"
 
 #: type.c:896
-#, fuzzy
 msgid "_Use Command"
-msgstr "コマンド:"
+msgstr "使用コマンド(_U)"
 
 #: type.c:926
 msgid ""
@@ -3349,11 +3379,11 @@ msgstr "言語"
 
 #: tips:3
 msgid "Use the LANG environment variable"
-msgstr "LANG変数から読み取る"
+msgstr "環境変数 LANG から読み取る"
 
 #: tips:4
 msgid "Basque"
-msgstr ""
+msgstr "バスク語"
 
 #: tips:5
 msgid "Chinese (traditional)"
@@ -3380,14 +3410,12 @@ msgid "English (no translation)"
 msgstr "英語(翻訳無し)"
 
 #: tips:11
-#, fuzzy
 msgid "Estonian"
-msgstr "ルーマニア語"
+msgstr "エストニア語"
 
 #: tips:12
-#, fuzzy
 msgid "Finnish"
-msgstr "デンマーク語"
+msgstr "フィンランド語"
 
 #: tips:13
 msgid "French"
@@ -3707,23 +3735,25 @@ msgstr "「小さいアイコン」の横に表示するファイル名の最大
 
 #: tips:88
 msgid "Order small icons vertically"
-msgstr ""
+msgstr "小さいアイコンを縦方向順に配置"
 
 #: tips:89
 msgid ""
 "If this option is on, then small icons are ordered vertically, not "
 "horizontally."
 msgstr ""
+"'ON' の場合、横方向順ではなく、縦方向順に小さいアイコンをならべます"
 
 #: tips:90
 msgid "Order large icons vertically"
-msgstr ""
+msgstr "大きいアイコンを縦方向順に配置"
 
 #: tips:91
 msgid ""
 "If this option is on, then large icons are sorted vertically, not "
 "horizontally."
 msgstr ""
+"'ON' の場合、横方向順ではなく、縦方向順に大きいアイコンをならべます"
 
 #: tips:93
 msgid "Show column headings"
@@ -3731,18 +3761,18 @@ msgstr "項目の標題を表示"
 
 #: tips:94
 msgid "If this is on then column headings will be shown in the list view."
-msgstr "詳細表示の際、ツールバー下部に情報項目の標題バーを表示します。"
+msgstr "'ON' の場合、詳細表示の際、ツールバー下部に情報項目の標題バーを表示します。"
 
 #: tips:95
-#, fuzzy
 msgid "Show full type"
-msgstr "種類でソート"
+msgstr "タイプの詳細を表示"
 
 #: tips:96
 msgid ""
 "If this is on then the full description of each object's type will be show "
 "rather than a short summary of its basic type."
 msgstr ""
+"'ON' の場合、アイテムのタイプを基本形の要約ではなく、詳細に表示します。"
 
 #: tips:97
 msgid "Tools/Minibuffer"
@@ -3757,9 +3787,8 @@ msgid "Toolbar type:"
 msgstr "ツールバーの種類:"
 
 #: tips:100
-#, fuzzy
 msgid "No toolbar"
-msgstr "ツールバー"
+msgstr "ツールバーなし"
 
 #: tips:101
 msgid "Icons only"
@@ -3854,9 +3883,8 @@ msgstr ""
 "各ウィンドウのサムネイル表示を、個別に ON/OFF することも出来ます。"
 
 #: tips:119
-#, fuzzy
 msgid "Video thumbnails"
-msgstr "サムネイルを表示"
+msgstr "ビデオ・サムネイル"
 
 #: tips:120
 msgid "Thumbnails cache"
@@ -3902,9 +3930,8 @@ msgid "Background:"
 msgstr "背景の色:"
 
 #: tips:128
-#, fuzzy
 msgid "No shadow"
-msgstr "文字の影:"
+msgstr "文字の影なし"
 
 #: tips:129
 msgid "Thin"
@@ -3924,13 +3951,15 @@ msgstr "アイコンのテキスト(ラベル名)のフォントを指定しま�
 
 #: tips:133
 msgid "Fast scaling of images"
-msgstr ""
+msgstr "画像のサイズ調整を高速にする"
 
 #: tips:134
 msgid ""
 "Choose between the fast or slow method of scaling backdrop images.  The slow "
 "method can give better results."
 msgstr ""
+"'ON' の場合、背景画像のサイズ調整が高速になります。'OFF' の場合、速度は低下す"
+"るがより高画質です。"
 
 #: tips:135
 msgid "Pinboard behaviour"
@@ -3990,8 +4019,8 @@ msgid ""
 "various programs, including ROX-Filer, can be used to display the iconified "
 "windows."
 msgstr ""
-"ROXファイラーを含む様々な起動中のプログラムは、デスクトップにアイコン化するこ"
-"とが出来ます"
+"ピンボードを有効にした時、ROXファイラーを含む様々な起動中のプログラムは、デス"
+"クトップにアイコン化することが出来ます"
 
 #: tips:150
 msgid "Show iconified windows"
@@ -4004,22 +4033,20 @@ msgid ""
 "pinboard must be in use."
 msgstr ""
 "このオプションを利用すると、ファイラーウィンドウを最小化した際は、ピンボード"
-"にアイコンとして表示されるようになります。機能をサポートするファイルマネー"
-"ジャ上でピンボードを使用している場合に限ります。 "
+"にアイコンとして表示されるようになります。(機能をサポートするウィンドウマネー"
+"ジャ上でピンボードを使用している場合)。 "
 
 #: tips:152
 msgid "Show per workspace"
-msgstr ""
+msgstr "ワークスペース毎に表示"
 
 #: tips:153
-#, fuzzy
 msgid ""
 "If this option is on, the filer will only show iconified windows associated "
 "with the current workspace."
 msgstr ""
-"このオプションを利用すると、ファイラーウィンドウを最小化した際は、ピンボード"
-"にアイコンとして表示されるようになります。機能をサポートするファイルマネー"
-"ジャ上でピンボードを使用している場合に限ります。 "
+"このオプションを利用すると、最小化アイコンは、カレントワークスペースの"
+"もののみが表示されるようになります。"
 
 #: tips:154
 msgid "Iconify to the"
@@ -4174,65 +4201,63 @@ msgstr "パネルが Xinerama モードに制限されるモニタ(ナンバー�
 
 #: tips:185
 msgid "Desktop"
-msgstr ""
+msgstr "デスクトップ"
 
 #: tips:186
 msgid ""
 "When run by a session manager program (such as ROX-Session) the filer can "
 "open up a panel and/or the pinboard.  Here you configure which."
 msgstr ""
+"セッション・マネージャー・プログラム(ROX-Session のような)によって実行された時、"
+"ファイラーはパネル、ピンボードのいずれか、又は両方を開くことができます。下のいずれかを選んで下さい。"
 
 #: tips:187
-#, fuzzy
 msgid "Panel only"
-msgstr "アイコンのみ"
+msgstr "パネルのみ"
 
 #: tips:188
-#, fuzzy
 msgid "Only a panel is shown."
-msgstr "全てアイコンのみの表示"
+msgstr "パネルのみを表示します。"
 
 #: tips:189
-#, fuzzy
 msgid "Pinboard only"
-msgstr "ピンボード"
+msgstr "ピンボードのみ"
 
 #: tips:190
-#, fuzzy
 msgid "Only the pinboard is shown."
-msgstr "全てアイコンのみの表示"
+msgstr "ピンボードのみを表示します。"
 
 #: tips:191
-#, fuzzy
 msgid "Panel and pinboard"
-msgstr "ピンボード"
+msgstr "パネルとピンボード"
 
 #: tips:192
 msgid "Both a panel and a pinboard are shown."
-msgstr ""
+msgstr "パネルとピンボードを共に表示します。"
 
 #: tips:193
-#, fuzzy
 msgid "Panel"
 msgstr "パネル"
 
 #: tips:194
 msgid "Enter the name of the panel to show here."
-msgstr ""
+msgstr "表示するパネルの名前を入力して下さい。"
 
 #: tips:196
 msgid "Enter the name of the pinboard to show here."
-msgstr ""
+msgstr "表示するピンボードの名前を入力して下さい。"
 
 #: tips:197
 msgid "Changes here take effect the next time the filer is run."
-msgstr ""
+msgstr "変更は次回の rox 起動時に有効になります。"
 
 #: tips:198
 msgid ""
 "The session manager activates these options by using the -S or --rox-session "
 "argument to rox."
 msgstr ""
+"rox を -S 又は --rox-session オプションで起動した場合に、"
+"セッション・マネージャは これらのオプションを有効にします"
 
 #: tips:199
 msgid "Action windows"
@@ -4449,25 +4474,20 @@ msgid "MIME types"
 msgstr "MIME 形式"
 
 #: tips:256
-#, fuzzy
 msgid ""
 "The filer uses a set of rules to work out the correct MIME type for each "
 "regular file, and then chooses a suitable icon for that type."
 msgstr ""
 "ROX は標準的なルールに従ってファイルの MIME 形式を判別し、適切なアイコンを設"
-"定します。これを変更するには MIME-Editor を利用します。以下を参照してくださ"
-"い:\n"
-"\n"
-"http://rox.sourceforge.net/mime_editor.html"
+"定します。"
 
 #: tips:257
 msgid "Edit MIME rules"
-msgstr ""
+msgstr "MIME ルール編集"
 
 #: tips:258
-#, fuzzy
 msgid "Themes"
-msgstr "日付"
+msgstr "テーマ"
 
 #: tips:259
 msgid "Icon theme"
@@ -4557,15 +4577,15 @@ msgstr "不明な種類:"
 
 #: tips:279
 msgid "Compatibility"
-msgstr "適合化"
+msgstr "互換性"
 
 #: tips:280
 msgid "Window manager problems"
-msgstr "ウィンドウマネージャとの問題"
+msgstr "ウィンドウマネージャ関連の問題"
 
 #: tips:281
 msgid "Override window manager control of the pinboard and panels"
-msgstr "ウィンドウマネージャによるデスクトップとパネルの制御を無視する"
+msgstr "ピンボードとパネルの制御をウィンドウマネージャの支配下に置かない"
 
 #: tips:282
 msgid ""
@@ -4575,11 +4595,13 @@ msgid ""
 "on it, titlebars and other decorations appearing around windows, or having "
 "them appear in window-select lists."
 msgstr ""
-"ウィンドウマネージャの中には新しい拡張ヒントシステムをサポートしないものがあ"
-"り、その場合、ピンボードとパネルはウィンドウと同様に扱われます。ここにチェッ"
-"クを入れると、ピンボードアイコンやパネルがウィンドウの前面に来たり、メニュー"
-"やタスクバー上のウィンドウリストに現われたりする問題を解消することが出来ま"
-"す。"
+"ウィンドウマネージャの中には新しい'Extended Window Manager Hints'をサポートし"
+"ないものがあり、その場合、ピンボードとパネルはウィンドウと同様に扱われます。"
+"ここにチェックを入れると、ピンボードアイコンやパネルがウィンドウの前面に来た"
+"り、メニューやタスクバー上のウィンドウリストに現われたりする問題を解消するこ"
+"とが出来ます。\n"
+"※ 'Extended Window Manager Hints' の詳細については、以下を。\n"
+"http://standards.freedesktop.org/wm-spec/wm-spec-latest.html"
 
 #: tips:283
 msgid "Pass all backdrop mouse clicks to window manager"
@@ -4607,8 +4629,9 @@ msgid ""
 "isn't necessary."
 msgstr ""
 "Blackbox, Fluxbox などのウィンドウマネージャでは ROX-Filer のピンボードがうま"
-"く機能しませんが、ここを ON にすればいくらかは改善されます。これらのウィンド"
-"ウマネージャの新版ではこのオプションが不要になるよう修正されるでしょう。"
+"く機能しない場合がありますが、ここを ON にすればいくらかは改善されます。これ"
+"らのウィンドウマネージャの新版ではこのオプションが不要になるよう修正されるで"
+"しょう。"
 
 #: tips:287
 msgid "Panel is a 'dock'"
@@ -4643,12 +4666,11 @@ msgstr ""
 
 #: tips:292
 msgid "Extended attributes"
-msgstr ""
+msgstr "拡張属性"
 
 #: tips:293
-#, fuzzy
 msgid "Don't use extended attributes"
-msgstr "ホスト名を使わない"
+msgstr "拡張属性を使わない"
 
 #: tips:294
 msgid ""
@@ -4657,63 +4679,7 @@ msgid ""
 "disabled, the MIME type of the file is only derived from the file name and "
 "the properties window does not report extended attributes."
 msgstr ""
-
-#~ msgid ""
-#~ "Error loading MIME database:\n"
-#~ "%s"
-#~ msgstr ""
-#~ "MIME デ-タベ-ス読み込みエラ-:\n"
-#~ "%s"
-
-#~ msgid "File '%s' corrupted!"
-#~ msgstr "ファイル'%s'は壊れています"
-
-#~ msgid ""
-#~ "The ~/.mime directory has moved. It should now be ~/.local/share/mime. "
-#~ "You should move it there (and make a symlink from ~/.mime to it for older "
-#~ "applications)."
-#~ msgstr ""
-#~ "~/.mime ディレクトリは移動されました。~/.local/share/mime に置かれるべきで"
-#~ "す。移動してください。(旧来のアプリケーションのために ~/.mime からシンボ"
-#~ "リックリンクを張って下さい)."
-
-#~ msgid ""
-#~ "The standard MIME type database (version 0.9 or later) was not found. The "
-#~ "filer will probably not show the correct types for different files. You "
-#~ "should download and install the 'shared-mime-info-0.9' package from "
-#~ "here:\n"
-#~ "http://www.freedesktop.org/software/shared-mime-info\n"
-#~ "\n"
-#~ "If you have already installed this package, check that the permissions "
-#~ "allow the files to be read (check /usr/local/share/mime/globs or /usr/"
-#~ "share/mime/globs)."
-#~ msgstr ""
-#~ "標準の MIME 形式データベース (ver.0.9 以降) が見つかりません。ROX はファイ"
-#~ "ル形式を判別できません。 'shared-mime-info-0.9(以降)' を以下から入手してイ"
-#~ "ンストールして下さい:\n"
-#~ "http://www.freedesktop.org/standards/shared-mime-info.html\n"
-#~ "\n"
-#~ "もし既にインストール済みならば、ファイルの読み取りパーミッションを確認して"
-#~ "ください (/usr/local/share/mime/globs あるいは /usr/share/mime/globs)。"
-
-#~ msgid "Icon '%s' not present in theme"
-#~ msgstr "'%s' アイコンはテーマに存在しません"
-
-#~ msgid "Executable files"
-#~ msgstr "実行属性付きファイル"
-
-#~ msgid "Ignore eXecutable bit for known extensions"
-#~ msgstr "既知の拡張子については実行属性を無視する"
-
-#~ msgid ""
-#~ "If a file has a known extension (eg '.gif') then ignore the executable "
-#~ "bit. This is useful if you have files on a Windows-type filesystem which "
-#~ "are being shown as executable programs."
-#~ msgstr ""
-#~ "既知の拡張子(例:'.gif')のファイルの場合、実行可能属性は無視する。 見掛けが"
-#~ "実行可能属性を持つように見える 'Windows形式'のファイルシステム上の ファイ"
-#~ "ル等にアクセスするような場合に有効。"
-
-#, fuzzy
-#~ msgid "Umount"
-#~ msgstr "アンマウント"
+"より新しいオペレーティングシステムおよびファイルシステムにおいて利用可能な拡"
+"張属性の使用を不能にします。このオプションでメニューの MIME形式設定の項は無効"
+"になり、MIME型の決定はファイル名のみによりなされ、プロパティダイアログには拡"
+"張属性はレポートされません"
