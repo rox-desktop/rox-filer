@@ -256,6 +256,20 @@ int main(int argc, char **argv)
 	gboolean	show_user = FALSE;
 	xmlDocPtr	rpc, soap_rpc = NULL, reply;
 	xmlNodePtr	body;
+	int		fd;
+
+	/* Close stdin. We don't need it, and it can cause problems if
+	 * a child process wants a password, etc...
+	 * Do this BEFORE opening anything (e.g., the X connection), in
+	 * case fd 0 isn't open at this point.
+	 */
+	fd = open("/dev/null", O_RDONLY);
+	if (fd > 0)
+	{
+		close(0);
+		dup2(fd, 0);
+		close(fd);
+	}
 
 	home_dir = g_get_home_dir();
 	home_dir_len = strlen(home_dir);
@@ -530,7 +544,6 @@ int main(int argc, char **argv)
 	 */
 	if (!new_copy)
 	{
-		int fd;
 		pid_t child;
 
 		child = fork();
@@ -539,17 +552,6 @@ int main(int argc, char **argv)
 		/* Otherwise we're the child (or an error occurred - ignore
 		 * it!).
 		 */
-
-		/* Close stdin. We don't need it, and it can cause problems if
-		 * a child process wants a password, etc...
-		 */
-		fd = open("/dev/null", O_RDONLY);
-		if (fd > 0)
-		{
-			close(0);
-			dup2(fd, 0);
-			close(fd);
-		}
 	}
 
 	/* Initialize the rest of the filer... */
