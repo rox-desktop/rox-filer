@@ -156,6 +156,7 @@ static gboolean drag_motion(GtkWidget		*widget,
 static void load_settings(void);
 static void save_settings(void);
 static void check_settings(FilerWindow *filer_window);
+static char *tip_from_desktop_file(const char *full_path);
 
 static GdkCursor *busy_cursor = NULL;
 static GdkCursor *crosshair = NULL;
@@ -2327,6 +2328,17 @@ void filer_add_tip_details(FilerWindow *filer_window,
 		if (info)
 			g_object_unref(info);
 	}
+	else if (item->mime_type == application_x_desktop)
+	{
+		char *summary;
+		summary = tip_from_desktop_file(fullpath);
+		if (summary)
+		{
+			g_string_append(tip, summary);
+			g_string_append_c(tip, '\n');
+			g_free(summary);
+		}
+	}
 
 	if (!g_utf8_validate(item->leafname, -1, NULL))
 		g_string_append(tip,
@@ -3373,4 +3385,31 @@ void filer_save_settings(FilerWindow *fwin)
 			 G_CALLBACK(settings_response), set_win);
 
 	gtk_widget_show_all(set_win->window);
+}
+
+static char *tip_from_desktop_file(const char *full_path)
+{
+	GError *error = NULL;
+	GKeyFile *keyfile = NULL;
+	char *comment = NULL;
+
+	keyfile = g_key_file_new();
+	if (!g_key_file_load_from_file(keyfile, full_path, G_KEY_FILE_NONE, &error))
+	{
+		delayed_error("Failed to parse .desktop file '%s':\n%s",
+				full_path, error->message);
+		goto err;
+	}
+
+	comment = g_key_file_get_string(keyfile, "Desktop Entry", "Comment", &error);
+	if (!comment)
+		goto err;
+
+err:
+	if (error != NULL)
+		g_error_free(error);
+	if (keyfile != NULL)
+		g_key_file_free(keyfile);
+
+	return comment;
 }
