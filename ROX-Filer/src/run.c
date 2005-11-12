@@ -91,6 +91,7 @@ void run_with_files(const char *path, GList *uri_list)
 	const char	**argv;
 	int		argc = 0, i;
 	struct stat 	info;
+	MIME_type	*type;
 
 	if (stat(path, &info))
 	{
@@ -120,7 +121,15 @@ void run_with_files(const char *path, GList *uri_list)
 	
 	argv[argc++] = NULL;
 
-	rox_spawn(home_dir, argv);
+	type = type_from_path(argv[0]);
+	if (type && type == application_x_desktop)
+	{
+		run_desktop(argv[0], argv + 1, home_dir);
+	}
+	else
+	{
+		rox_spawn(home_dir, argv);
+	}
 
 	for (i = 1; i < argc; i++)
 		g_free((gchar *) argv[i]);
