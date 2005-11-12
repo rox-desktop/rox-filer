@@ -9,6 +9,7 @@
 #include <gtk/gtk.h>
 
 extern GFSCache *pixmap_cache;
+extern GFSCache *desktop_icon_cache;
 
 extern MaskedPixmap *im_error;
 extern MaskedPixmap *im_unknown;

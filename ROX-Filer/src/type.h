@@ -20,6 +20,9 @@ extern MIME_type *inode_unknown;
 extern MIME_type *inode_door;
 extern MIME_type *application_octet_stream;
 extern MIME_type *application_x_shellscript;
+extern MIME_type *application_x_desktop;
+
+extern GtkIconTheme *icon_theme;
 
 struct _MIME_type
 {

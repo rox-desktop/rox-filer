@@ -2280,6 +2280,9 @@ static gboolean panel_want_show_text(PanelIcon *pi)
 	if (icon->item->flags & ITEM_FLAG_APPDIR)
 		return FALSE;
 
+	if (EXECUTABLE_FILE(icon->item))
+		return FALSE;
+
 	return TRUE;
 }
 

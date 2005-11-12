@@ -99,13 +99,6 @@ struct PurgeInfo
  * It should load the file and return a pointer to an object for the file.
  * The object should have a ref count of 1.
  *
- * ref() and unref() should modify the reference counter of the object.
- * When the counter reaches zero, destroy the object.
- * 
- * getref() returns the current value. This can be used to stop objects
- * being purged from the cache while they are being used elsewhere, which
- * is rather wasteful. If NULL then this check isn't done.
- *
  * update() will be called to update an object which is cached, but
  * out of date. If NULL, the object will be unref'd and load() used
  * to make a new one.

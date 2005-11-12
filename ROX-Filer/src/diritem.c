@@ -167,7 +167,7 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 		}
 		else
 			item->mime_type = type_from_path(path);
-
+	
 		/* Note: for symlinks we need the mode of the target */
 		if (info.st_mode & (S_IXUSR | S_IXGRP | S_IXOTH))
 		{
@@ -188,11 +188,20 @@ void diritem_restat(const guchar *path, DirItem *item, struct stat *parent)
 				item->mime_type = application_x_shellscript;
 			}
 		}		
+		else if (item->mime_type == application_x_desktop)
+		{
+			item->flags |= ITEM_FLAG_EXEC_FILE;
+		}
 
 		if (!item->mime_type)
 			item->mime_type = text_plain;
 
 		check_globicon(path, item);
+
+		if (item->mime_type == application_x_desktop && item->_image == NULL)
+		{
+			item->_image = g_fscache_lookup(desktop_icon_cache, path);
+		}
 	}
 	else
 		check_globicon(path, item);

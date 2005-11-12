@@ -111,13 +111,14 @@ MIME_type *inode_char_dev;
 MIME_type *application_executable;
 MIME_type *application_octet_stream;
 MIME_type *application_x_shellscript;
+MIME_type *application_x_desktop;
 MIME_type *inode_unknown;
 MIME_type *inode_door;
 
 static Option o_display_colour_types;
 static Option o_icon_theme;
 
-static GtkIconTheme *icon_theme = NULL;
+GtkIconTheme *icon_theme = NULL;
 
 void type_init(void)
 {
@@ -137,6 +138,8 @@ void type_init(void)
 	application_executable = get_mime_type("application/x-executable", TRUE);
 	application_octet_stream = get_mime_type("application/octet-stream", TRUE);
 	application_x_shellscript = get_mime_type("application/x-shellscript", TRUE);
+	application_x_desktop = get_mime_type("application/x-desktop", TRUE);
+	application_x_desktop->executable = TRUE;
 	inode_unknown = get_mime_type("inode/unknown", TRUE);
 	inode_door = get_mime_type("inode/door", TRUE);
 

@@ -50,6 +50,7 @@ static gboolean open_file(const guchar *path, MIME_type *type);
 static void open_mountpoint(const guchar *full_path, DirItem *item,
 			    FilerWindow *filer_window, FilerWindow *src_window,
 			    gboolean edit);
+static void run_desktop(const char *full_path, const char **args, const char *dir);
 
 typedef struct _PipedData PipedData;
 
@@ -276,7 +277,10 @@ gboolean run_diritem(const guchar *full_path,
 						? filer_window->sym_path
 						: NULL;
 
-				argv[0] = full_path;
+				if (item->mime_type == application_x_desktop)
+					run_desktop(full_path, NULL, dir);
+				else
+					argv[0] = full_path;
 
 				return rox_spawn(dir, argv) != 0;
 			}
@@ -536,5 +540,87 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
 			filer_change_to(filer_window, full_path, NULL);
 		else
 			filer_opendir(full_path, src_window, NULL);
+	}
+}
+
+/* full_path is a .desktop file. Execute the application, using the Exec line from
+ * the file.
+ */
+static void run_desktop(const char *full_path, const char **args, const char *dir)
+{
+	GKeyFile *keyfile = NULL;
+	GError *error = NULL;
+	char *exec = NULL;
+	gint argc = 0;
+	gchar **argv = NULL;
+	GPtrArray *expanded = NULL;
+	int i;
+	
+	keyfile = g_key_file_new();
+	if (!g_key_file_load_from_file(keyfile, full_path, G_KEY_FILE_NONE, &error))
+	{
+		delayed_error("Failed to parse .desktop file '%s':\n%s",
+				full_path, error->message);
+		goto err;
+	}
+
+	exec = g_key_file_get_string(keyfile, "Desktop Entry", "Exec", &error);
+	if (!exec)
+	{
+		delayed_error("Can't find Exec command in .desktop file '%s':\n%s",
+				full_path, error->message);
+		goto err;
+	}
+
+	if (!g_shell_parse_argv(exec, &argc, &argv, &error))
+	{
+		delayed_error("Failed to parse '%s' from '%s':\n%s",
+				exec, full_path, error->message);
+		goto err;
+	}
+
+	expanded = g_ptr_array_new();
+	for (i = 0; i < argc; i++)
+	{
+		const char *src = argv[i];
+
+		if (src[0] == '%' && src[1] != '\0' && src[2] == '\0')
+		{
+			/* We should treat these four differently. */
+			if (src[1] == 'f' || src[1] == 'F' ||
+			    src[1] == 'u' || src[1] == 'U')
+			{
+				int j;
+				for (j = 0; args && args[j]; j++)
+					g_ptr_array_add(expanded, g_strdup(args[j]));
+			}
+			else
+			{
+				delayed_error("Unsupported escape character in '%s' in '%s'",
+						exec, full_path);
+				goto err;
+			}
+		}
+		else
+		{
+			g_ptr_array_add(expanded, g_strdup(src));
+		}
+	}
+	g_ptr_array_add(expanded, NULL);
+
+	rox_spawn(dir, (const gchar **) expanded->pdata);
+err:
+	if (error != NULL)
+		g_error_free(error);
+	if (keyfile != NULL)
+		g_key_file_free(keyfile);
+	if (exec != NULL)
+		g_free(exec);
+	if (argv != NULL)
+		g_strfreev(argv);
+	if (expanded != NULL)
+	{
+		g_ptr_array_foreach(expanded, (GFunc) g_free, NULL);
+		g_ptr_array_free(expanded, TRUE);
 	}
 }

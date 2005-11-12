@@ -58,6 +58,7 @@
 #include "type.h"
 
 GFSCache *pixmap_cache = NULL;
+GFSCache *desktop_icon_cache = NULL;
 
 static const char * bad_xpm[] = {
 "12 12 3 1",
@@ -112,6 +113,7 @@ static GtkIconSize mount_icon_size = -1;
 static void load_default_pixmaps(void);
 static gint purge(gpointer data);
 static MaskedPixmap *image_from_file(const char *path);
+static MaskedPixmap *image_from_desktop_file(const char *path);
 static MaskedPixmap *get_bad_image(void);
 static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
@@ -135,6 +137,7 @@ void pixmaps_init(void)
 	gtk_widget_push_colormap(gdk_rgb_get_colormap());
 
 	pixmap_cache = g_fscache_new((GFSLoadFunc) image_from_file, NULL, NULL);
+	desktop_icon_cache = g_fscache_new((GFSLoadFunc) image_from_desktop_file, NULL, NULL);
 
 	g_timeout_add(10000, purge, NULL);
 
@@ -659,6 +662,59 @@ static MaskedPixmap *image_from_file(const char *path)
 
 	gdk_pixbuf_unref(pixbuf);
 
+	return image;
+}
+
+/* Load this icon named by this .desktop file from the current theme.
+ * NULL on failure.
+ */
+static MaskedPixmap *image_from_desktop_file(const char *path)
+{
+	GKeyFile *keyfile = NULL;
+	GError *error = NULL;
+	MaskedPixmap *image = NULL;
+	char *icon = NULL;
+
+	keyfile = g_key_file_new();
+	if (!g_key_file_load_from_file(keyfile, path, G_KEY_FILE_NONE, &error))
+	{
+		g_warning("Failed to parse .desktop file '%s':\n%s",
+				path, error->message);
+		goto err;
+	}
+
+	icon = g_key_file_get_string(keyfile, "Desktop Entry", "Icon", NULL);
+	if (!icon)
+		goto err;		/* No Icon: not an error */
+	
+	if (icon[0] == '/')
+		image = image_from_file(icon);
+	else
+	{
+		GdkPixbuf *pixbuf;
+		int tmp_fd;
+
+		/* SVG reader is very noisy, so redirect stderr to stdout */
+		tmp_fd = dup(2);
+		dup2(1, 2);
+		pixbuf = gtk_icon_theme_load_icon(icon_theme, icon, HUGE_WIDTH,
+							0, NULL);
+		dup2(tmp_fd, 2);
+		close(tmp_fd);
+
+		if (pixbuf == NULL)
+			goto err;	/* Might just not be in the theme */
+
+		image = masked_pixmap_new(pixbuf);
+		g_object_unref(pixbuf);
+	}
+err:
+	if (error != NULL)
+		g_error_free(error);
+	if (keyfile != NULL)
+		g_key_file_free(keyfile);
+	if (icon != NULL)
+		g_free(icon);
 	return image;
 }
 
