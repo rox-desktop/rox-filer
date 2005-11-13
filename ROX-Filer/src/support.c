@@ -38,6 +38,7 @@
 #include <unistd.h>
 #include <libxml/parser.h>
 #include <math.h>
+#include <sys/mman.h>
 
 #include "global.h"
 
@@ -1476,6 +1477,70 @@ gboolean available_in_path(const char *file)
 	return found;
 }
 
+static char *get_value_from_desktop_data(const char *data, size_t length,
+					 const char *section, const char *key,
+					 GError **error)
+{
+	int section_length, key_length;
+	const char *last_possible_key_start;
+	const char *last_possible_section_start;
+	const char *next;
+
+	section_length = strlen(section);
+	last_possible_section_start = data + length - section_length - 3;
+
+	for (next = data; next <= last_possible_section_start; next++)
+	{
+		if (next[0] != '[' || (next > data && next[-1] != '\n'))
+			continue;
+		next += 1;
+		if (next[section_length] != ']' ||
+		    next[section_length + 1] != '\n')
+			continue;
+		if (strncmp(next, section, section_length) != 0)
+			continue;
+		next += section_length + 1;	/* Newline */
+		goto find_key;
+	}
+	return NULL;
+
+find_key:
+	key_length = strlen(key);
+	last_possible_key_start = data + length - key_length - 3;
+	for (;
+	     next && next < last_possible_key_start;
+	     next = memchr(next + 1, '\n', last_possible_key_start - next))
+	{
+		const char *nl;
+
+		next++;		/* Skip newline */
+
+		if (next[0] == '[')
+			break;	/* End of section */
+
+		if (strncmp(next, key, key_length) != 0)
+			continue;
+		next += key_length;
+		while (next[0] == ' ' || next[0] == '\t')
+			next++;
+
+		/* Note: if we had GLib 2.6, we could use
+		 * g_get_language_names() to get translations here.
+		 */
+		if (next[0] != '=')
+			continue;
+		next++;
+		while (next[0] == ' ' || next[0] == '\t')
+			next++;
+		nl = memchr(next, '\n', data + length - next);
+		if (!nl)
+			break;
+		return g_strndup(next, nl - next);
+	}
+
+	return NULL;
+}
+
 /* Load .desktop file 'path' and return the value of the named key.
  * Sets error if the desktop file cannot be parsed.
  * Returns NULL (but does not set error) if the key is not present.
@@ -1486,17 +1551,44 @@ char *get_value_from_desktop_file(const char *path,
 				  const char *key,
 				  GError **error)
 {
-	GKeyFile *keyfile = NULL;
 	char *value = NULL;
+	struct stat info;
+	int fd = -1;
+	void *start = NULL;
 
-	keyfile = g_key_file_new();
-	if (!g_key_file_load_from_file(keyfile, path, G_KEY_FILE_NONE, error))
+	fd = open(path, O_RDONLY);
+	if (fd == -1 || fstat(fd, &info) != 0)
+	{
+                g_set_error(error,
+                             G_FILE_ERROR,
+                             g_file_error_from_errno(errno),
+                             _("Failed to open and stat file '%s': %s"),
+                             path,
+                             g_strerror(errno));
 		goto err;
+	}
+	start = mmap(NULL, info.st_size, PROT_READ, MAP_SHARED, fd, 0);
+	if (start == MAP_FAILED)
+	{
+                g_set_error(error,
+                             G_FILE_ERROR,
+                             g_file_error_from_errno(errno),
+                             _("Failed to mmap file '%s': %s"),
+                             path,
+                             g_strerror(errno));
+		goto err;
+	}
 
-	value = g_key_file_get_string(keyfile, section, key, NULL);
-	
+	value = get_value_from_desktop_data((const char *) start,
+					    info.st_size,
+					    section, key,
+					    error);
 err:
-	g_key_file_free(keyfile);
+	if (fd != -1)
+		close(fd);
+
+	if (start != NULL && start != MAP_FAILED)
+		munmap(start, info.st_size);
 
 	return value;
 }
