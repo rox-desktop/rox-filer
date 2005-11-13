@@ -557,27 +557,26 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
  */
 static void run_desktop(const char *full_path, const char **args, const char *dir)
 {
-	GKeyFile *keyfile = NULL;
 	GError *error = NULL;
 	char *exec = NULL;
 	gint argc = 0;
 	gchar **argv = NULL;
 	GPtrArray *expanded = NULL;
 	int i;
-	
-	keyfile = g_key_file_new();
-	if (!g_key_file_load_from_file(keyfile, full_path, G_KEY_FILE_NONE, &error))
+
+	exec = get_value_from_desktop_file(full_path, "Desktop Entry", "Exec",
+					&error);
+	if (error)
 	{
 		delayed_error("Failed to parse .desktop file '%s':\n%s",
 				full_path, error->message);
 		goto err;
 	}
 
-	exec = g_key_file_get_string(keyfile, "Desktop Entry", "Exec", &error);
 	if (!exec)
 	{
-		delayed_error("Can't find Exec command in .desktop file '%s':\n%s",
-				full_path, error->message);
+		delayed_error("Can't find Exec command in .desktop file '%s'",
+				full_path);
 		goto err;
 	}
 
@@ -621,8 +620,6 @@ static void run_desktop(const char *full_path, const char **args, const char *di
 err:
 	if (error != NULL)
 		g_error_free(error);
-	if (keyfile != NULL)
-		g_key_file_free(keyfile);
 	if (exec != NULL)
 		g_free(exec);
 	if (argv != NULL)

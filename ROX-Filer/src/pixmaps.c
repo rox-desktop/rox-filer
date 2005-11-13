@@ -670,23 +670,21 @@ static MaskedPixmap *image_from_file(const char *path)
  */
 static MaskedPixmap *image_from_desktop_file(const char *path)
 {
-	GKeyFile *keyfile = NULL;
 	GError *error = NULL;
 	MaskedPixmap *image = NULL;
 	char *icon = NULL;
 
-	keyfile = g_key_file_new();
-	if (!g_key_file_load_from_file(keyfile, path, G_KEY_FILE_NONE, &error))
+	icon = get_value_from_desktop_file(path,
+					"Desktop Entry", "Icon", &error);
+	if (error)
 	{
 		g_warning("Failed to parse .desktop file '%s':\n%s",
 				path, error->message);
 		goto err;
 	}
-
-	icon = g_key_file_get_string(keyfile, "Desktop Entry", "Icon", NULL);
 	if (!icon)
-		goto err;		/* No Icon: not an error */
-	
+		goto err;
+
 	if (icon[0] == '/')
 		image = image_from_file(icon);
 	else
@@ -711,8 +709,6 @@ static MaskedPixmap *image_from_desktop_file(const char *path)
 err:
 	if (error != NULL)
 		g_error_free(error);
-	if (keyfile != NULL)
-		g_key_file_free(keyfile);
 	if (icon != NULL)
 		g_free(icon);
 	return image;

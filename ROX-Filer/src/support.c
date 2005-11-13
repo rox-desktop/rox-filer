@@ -1456,14 +1456,17 @@ gboolean available_in_path(const char *file)
 		p = my_strchrnul(path, ':');
 
 		if (p == path)
-			/* Two adjacent colons, or a colon at the beginning or the end
-			 * of `PATH' means to search the current directory.
+			/* Two adjacent colons, or a colon at the beginning or
+			 * the end of `PATH' means to search the current
+			 * directory.
 			 */
 			startp = name + 1;
 		else
 			startp = memcpy (name - (p - path), path, p - path);
 
-		/* Try to execute this name.  If it works, execv will not return.  */
+		/* Try to execute this name.  If it works, execv will not
+		 * return.
+		 */
 		if (access(startp, X_OK) == 0)
 			found = TRUE;
 	} while (!found && *p++ != '\0');
@@ -1471,4 +1474,29 @@ gboolean available_in_path(const char *file)
 	g_free(freeme);
 
 	return found;
+}
+
+/* Load .desktop file 'path' and return the value of the named key.
+ * Sets error if the desktop file cannot be parsed.
+ * Returns NULL (but does not set error) if the key is not present.
+ * Returned string must be g_free()d.
+ */
+char *get_value_from_desktop_file(const char *path,
+				  const char *section,
+				  const char *key,
+				  GError **error)
+{
+	GKeyFile *keyfile = NULL;
+	char *value = NULL;
+
+	keyfile = g_key_file_new();
+	if (!g_key_file_load_from_file(keyfile, path, G_KEY_FILE_NONE, error))
+		goto err;
+
+	value = g_key_file_get_string(keyfile, section, key, NULL);
+	
+err:
+	g_key_file_free(keyfile);
+
+	return value;
 }

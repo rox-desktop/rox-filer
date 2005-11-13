@@ -3390,26 +3390,20 @@ void filer_save_settings(FilerWindow *fwin)
 static char *tip_from_desktop_file(const char *full_path)
 {
 	GError *error = NULL;
-	GKeyFile *keyfile = NULL;
 	char *comment = NULL;
 
-	keyfile = g_key_file_new();
-	if (!g_key_file_load_from_file(keyfile, full_path, G_KEY_FILE_NONE, &error))
+	comment = get_value_from_desktop_file(full_path,
+			"Desktop Entry", "Comment", &error);
+	if (error)
 	{
 		delayed_error("Failed to parse .desktop file '%s':\n%s",
 				full_path, error->message);
 		goto err;
 	}
 
-	comment = g_key_file_get_string(keyfile, "Desktop Entry", "Comment", &error);
-	if (!comment)
-		goto err;
-
 err:
 	if (error != NULL)
 		g_error_free(error);
-	if (keyfile != NULL)
-		g_key_file_free(keyfile);
 
 	return comment;
 }
