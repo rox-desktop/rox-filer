@@ -50,7 +50,8 @@ static gboolean open_file(const guchar *path, MIME_type *type);
 static void open_mountpoint(const guchar *full_path, DirItem *item,
 			    FilerWindow *filer_window, FilerWindow *src_window,
 			    gboolean edit);
-static void run_desktop(const char *full_path, const char **args, const char *dir);
+static gboolean run_desktop(const char *full_path,
+			    const char **args, const char *dir);
 
 typedef struct _PipedData PipedData;
 
@@ -287,7 +288,8 @@ gboolean run_diritem(const guchar *full_path,
 						: NULL;
 
 				if (item->mime_type == application_x_desktop)
-					run_desktop(full_path, NULL, dir);
+					return run_desktop(full_path,
+							   NULL, dir);
 				else
 					argv[0] = full_path;
 
@@ -552,10 +554,13 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
 	}
 }
 
-/* full_path is a .desktop file. Execute the application, using the Exec line from
- * the file.
+/* full_path is a .desktop file. Execute the application, using the Exec line
+ * from the file.
+ * Returns TRUE on success.
  */
-static void run_desktop(const char *full_path, const char **args, const char *dir)
+static gboolean run_desktop(const char *full_path,
+			    const char **args,
+			    const char *dir)
 {
 	GError *error = NULL;
 	char *exec = NULL;
@@ -563,6 +568,7 @@ static void run_desktop(const char *full_path, const char **args, const char *di
 	gchar **argv = NULL;
 	GPtrArray *expanded = NULL;
 	int i;
+	gboolean success = FALSE;
 
 	exec = get_value_from_desktop_file(full_path, "Desktop Entry", "Exec",
 					&error);
@@ -616,7 +622,7 @@ static void run_desktop(const char *full_path, const char **args, const char *di
 	}
 	g_ptr_array_add(expanded, NULL);
 
-	rox_spawn(dir, (const gchar **) expanded->pdata);
+	success = rox_spawn(dir, (const gchar **) expanded->pdata);
 err:
 	if (error != NULL)
 		g_error_free(error);
@@ -629,4 +635,6 @@ err:
 		g_ptr_array_foreach(expanded, (GFunc) g_free, NULL);
 		g_ptr_array_free(expanded, TRUE);
 	}
+
+	return success;
 }
