@@ -256,9 +256,9 @@ int main(int argc, char **argv)
 	gboolean	show_user = FALSE;
 	xmlDocPtr	rpc, soap_rpc = NULL, reply;
 	xmlNodePtr	body;
-	int		fd;
+	int		fd, ofd0=-1;
 
-	/* Close stdin. We don't need it, and it can cause problems if
+	/* Relocate stdin. We do need it (-R), but it can cause problems if
 	 * a child process wants a password, etc...
 	 * Do this BEFORE opening anything (e.g., the X connection), in
 	 * case fd 0 isn't open at this point.
@@ -266,6 +266,7 @@ int main(int argc, char **argv)
 	fd = open("/dev/null", O_RDONLY);
 	if (fd > 0)
 	{
+		ofd0=dup(0);
 		close(0);
 		dup2(fd, 0);
 		close(fd);
@@ -476,9 +477,23 @@ int main(int argc, char **argv)
 				client_id = g_strdup(VALUE);
 				break;
 			case 'R':
+				/* Reconnect stdin */
+				if(ofd0>-1) {
+					close(0);
+					dup2(ofd0, 0);
+				}
 				soap_rpc = xmlParseFile("-");
 				if (!soap_rpc)
 					g_error("Invalid XML in RPC");
+				/* Disconnect stdin again */
+				fd = open("/dev/null", O_RDONLY);
+				if (fd > 0)
+				{
+					close(0);
+					dup2(fd, 0);
+					close(fd);
+				}
+				
 				break;
 
 		        case 'S':
