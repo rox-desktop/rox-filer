@@ -448,8 +448,11 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 	if (!full)
 	{
 		/* Ugly hack... try for a GNOME icon */
-		type_name = g_strconcat("gnome-mime-", type->media_type,
-				"-", type->subtype, NULL);
+                if (type == inode_directory)
+			type_name = g_strdup("gnome-fs-directory");
+		else
+			type_name = g_strconcat("gnome-mime-", type->media_type,
+					"-", type->subtype, NULL);
 		full = gtk_icon_theme_load_icon(icon_theme,
 						type_name,
 						HUGE_HEIGHT, 0, NULL);
@@ -462,6 +465,16 @@ MaskedPixmap *type_to_icon(MIME_type *type)
 		full = gtk_icon_theme_load_icon(icon_theme,
 						type_name,
 						HUGE_HEIGHT, 0, NULL);
+		g_free(type_name);
+	}
+	if (!full)
+	{
+		/* Ugly hack... try for a GNOME default media icon */
+		type_name = g_strconcat("gnome-mime-", type->media_type, NULL);
+
+		full = gtk_icon_theme_load_icon(icon_theme,
+				type_name,
+				HUGE_HEIGHT, 0, NULL);
 		g_free(type_name);
 	}
 	if (full)
