@@ -77,7 +77,6 @@ typedef enum {
 	FILE_USAGE,
 	FILE_CHMOD_ITEMS,
 	FILE_FIND,
-	FILE_OPEN_VFS_AVFS,
 	FILE_SET_TYPE,
 } FileOp;
 
@@ -210,7 +209,6 @@ static GtkItemFactoryEntry filer_menu_def[] = {
 {">" N_("Delete"),	    	"<Ctrl>X", file_op, FILE_DELETE, "<StockItem>", GTK_STOCK_DELETE},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Shift Open"),   	NULL, file_op, FILE_OPEN_FILE},
-{">" N_("Open AVFS"),		NULL, file_op, FILE_OPEN_VFS_AVFS, "<StockItem>", GTK_STOCK_OPEN},
 {">" N_("Send To..."),		NULL, file_op, FILE_SEND_TO, NULL},
 {">",				NULL, NULL, 0, "<Separator>"},
 {">" N_("Set Run Action..."),	"asterisk", file_op, FILE_RUN_ACTION, "<StockItem>", GTK_STOCK_EXECUTE},
@@ -387,8 +385,8 @@ static void shade_file_menu_items(gboolean shaded)
 {
 	menu_set_items_shaded(filer_file_menu, shaded, 0, 1);
 	menu_set_items_shaded(filer_file_menu, shaded, 2, 1);
-	menu_set_items_shaded(filer_file_menu, shaded, 5, 2);
-	menu_set_items_shaded(filer_file_menu, shaded, 9, 2);
+	menu_set_items_shaded(filer_file_menu, shaded, 5, 1);
+	menu_set_items_shaded(filer_file_menu, shaded, 8, 2);
 }
 
 /* 'data' is an array of three ints:
@@ -769,7 +767,7 @@ void show_filer_menu(FilerWindow *filer_window, GdkEvent *event, ViewIter *iter)
 						: _("(bad utf-8)"));
 				if (!can_set_run_action(file_item))
 					menu_set_items_shaded(filer_file_menu,
-							TRUE, 9, 1);
+							TRUE, 8, 1);
 				break;
 			default:
 				shade_file_menu_items(TRUE);
@@ -1264,17 +1262,6 @@ static void run_action(DirItem *item)
 void open_home(gpointer data, guint action, GtkWidget *widget)
 {
 	filer_opendir(home_dir, NULL, NULL);
-}
-
-static void open_vfs_avfs(FilerWindow *filer_window, DirItem *item)
-{
-	gchar		*path;
-
-	path = g_strconcat(filer_window->sym_path,
-			"/", item->leafname, "#", NULL);
-
-	filer_change_to(filer_window, path, NULL);
-	g_free(path);
 }
 
 static void select_all(gpointer data, guint action, GtkWidget *widget)
@@ -1909,9 +1896,6 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			case FILE_FIND:
 				prompt = _("Search inside ... ?");
 				break;
-			case FILE_OPEN_VFS_AVFS:
-				prompt = _("Look inside ... ?");
-				break;
 			default:
 				g_warning("Unknown action!");
 				return;
@@ -2023,9 +2007,6 @@ static void file_op(gpointer data, FileOp action, GtkWidget *unused)
 			break;
 		case FILE_SET_ICON:
 			icon_set_handler_dialog(item, path);
-			break;
-		case FILE_OPEN_VFS_AVFS:
-			open_vfs_avfs(window_with_focus, item);
 			break;
 		default:
 			g_warning("Unknown action!");
