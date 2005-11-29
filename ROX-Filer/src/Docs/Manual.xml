@@ -917,12 +917,6 @@
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Open AVFS</guimenuitem></entry><entry>
-         Open the file as if it was a directory &mdash; see the
-         <xref linkend="vfs"/> section.
-       </entry></row>
-
-       <row><entry>
          <guimenuitem>Send To...</guimenuitem></entry><entry>
          Opens the `Send To' menu, allowing you to send the selected files
          to one of a list of applications. See the
@@ -1574,6 +1568,48 @@ generated.
    To use this feature you must have a system such as
    AVFS<citation>AVFS</citation> installed, which causes the kernel to support
    various Virtual File Systems directly.
+  </para>
+
+  <para>
+    There are various ways to use AVFS. This example shows how to use it on
+    a Linux 2.6 system with FUSE. You will need a kernel with FUSE support and
+    the 'libfuse-dev' header files package installed.
+  </para>
+
+  <procedure><title>Installing AVFS on Linux 2.6</title>
+
+  <step><para>Get AVFS from CVS (the current July 2005 release is too old).</para></step>
+
+  <step><para>Compile AVFS (<userinput>sh autogen.sh; ./configure; make</userinput>).</para></step>
+
+  <step><para>Go into the <filename>avfs/fuse</filename> subdirectory and
+  run <userinput>./compile.sh</userinput>.</para></step>
+
+  <step><para>Create a mount point: <userinput>mkdir ~/.avfs-mount</userinput>.</para></step>
+
+  <step><para>Run AVFS: <userinput>./avfsd ~/.avfs-mount</userinput>.</para></step>
+
+  <step>
+    <para>
+      To configure ROX-Filer to open directories using AVFS, set the run action
+      (<guimenuitem>Set Run Action...</guimenuitem>) for zip files (and other
+      archive types) to: </para>
+    <screen>rox ~/.avfs-mount/"$1#"</screen>
+  </step>
+
+  </procedure>
+
+  <para>
+    Note that all of the above steps should be done as a user, not as root.
+    You may need to be in some special group to use FUSE (check the group
+    of <filename>/usr/bin/fusermount</filename>).
+  </para>
+
+  <para>
+    If you don't want to make AVFS the default action for these files, you
+    could instead create a script containing the above and add it to the
+    <guimenu>File</guimenu> menu, using <guimenuitem>Customise
+    Menu...</guimenuitem>.
   </para>
 
  </chapter>
