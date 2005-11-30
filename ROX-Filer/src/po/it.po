@@ -7,13 +7,13 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.3.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-10-31 21:21+0100\n"
-"PO-Revision-Date: 2005-11-01 21:45+0100\n"
+"POT-Creation-Date: 2005-11-24 21:46+0100\n"
+"PO-Revision-Date: 2005-11-24 21:45+0100\n"
 "Last-Translator: Yuri Bongiorno http://yuri.webhop.org <>\n"
 "Language-Team: Italian <tp@lists.linux.it>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: abox.c:127
 msgid "<dir>"
@@ -265,15 +265,15 @@ msgstr ""
 "'\n"
 "Fatto\n"
 
-#: action.c:557 support.c:395
+#: action.c:557 support.c:396
 msgid "ERROR"
 msgstr "ERRORE"
 
-#: action.c:711 main.c:669 main.c:676 main.c:690
+#: action.c:711 main.c:686 main.c:693 main.c:707
 msgid "Yes"
 msgstr "Si"
 
-#: action.c:714 main.c:671 main.c:678 main.c:690
+#: action.c:714 main.c:688 main.c:695 main.c:707
 msgid "No"
 msgstr "No"
 
@@ -1060,25 +1060,37 @@ msgstr "Azione sconosciuta richiesta"
 msgid "Error getting file list: %s"
 msgstr "Errore nell'ottenere la lista dei file: %s"
 
-#: dropbox.c:134
-msgid "Browse for a file or show the current choice in a filer window"
+#: dropbox.c:114
+msgid "Show"
+msgstr "Mostra"
+
+#: dropbox.c:120
+msgid "Show the current choice in a filer window"
 msgstr "Mostra la scelta attuale in una finestra del filer"
 
-#: dropbox.c:144
-msgid "Remove the current choice"
-msgstr "Rimuove la scelta attuale"
+#: dropbox.c:174
+msgid "<nothing>"
+msgstr "<nessuna>"
 
-#: dropbox.c:291
+#: dropbox.c:239
+msgid ""
+"I can't show you the currently set item, because nothing is currently set. "
+"Drag something onto me!"
+msgstr ""
+"Non è possibile mostrare attualmente l'oggetto impostato, perché attualmente "
+"non è impostato nulla. Trascinare qualcosa qui sopra."
+
+#: dropbox.c:263
 msgid "Sorry, you need to drop exactly one file onto the drop area."
 msgstr ""
 "È necessario trascinare esattamente un file dentro l'area di trascinamento."
 
-#: dropbox.c:301
+#: dropbox.c:273
 #, c-format
 msgid "Sorry, I can't use '%s' because it's not a local file."
 msgstr "Non è possibile usare «%s» perché non è un file locale."
 
-#: dropbox.c:308 pinboard.c:853
+#: dropbox.c:280 pinboard.c:853
 #, c-format
 msgid ""
 "Can't access '%s':\n"
@@ -1087,7 +1099,7 @@ msgstr ""
 "Impossibile accedere a «%s»:\n"
 "%s"
 
-#: filer.c:453
+#: filer.c:454
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1096,7 +1108,7 @@ msgstr ""
 "Errore durante la scansione di «%s»:\n"
 "%s\n"
 
-#: filer.c:457
+#: filer.c:458
 #, c-format
 msgid ""
 "Error scanning '%s':\n"
@@ -1105,7 +1117,7 @@ msgstr ""
 "Errore durante la scansione di «%s»:\n"
 "%s"
 
-#: filer.c:562
+#: filer.c:563
 msgid ""
 "Do you want to unmount this device?\n"
 "\n"
@@ -1115,19 +1127,19 @@ msgstr ""
 "\n"
 "Smontare un device rende sicura la rimozione del disco."
 
-#: filer.c:566
+#: filer.c:567
 msgid "No change"
 msgstr "Nessun cambiamento"
 
-#: filer.c:572 menu.c:862
+#: filer.c:573 menu.c:862
 msgid "Unmount"
 msgstr "Smonta"
 
-#: filer.c:669
+#: filer.c:670
 msgid "Directory missing/deleted"
 msgstr "Directory mancante o eliminata"
 
-#: filer.c:1031
+#: filer.c:1032
 #, c-format
 msgid ""
 "Group %s is not set. Select some files and press Ctrl+%s to set the group. "
@@ -1139,100 +1151,100 @@ msgstr ""
 "seguito.\n"
 "Se si usa il tastierino numerico, assucurarsi che NumLock sia acceso."
 
-#: filer.c:1267
+#: filer.c:1268
 #, c-format
 msgid "Directory '%s' is not accessible"
 msgstr "La directory «%s» non è accessibile"
 
-#: filer.c:1419
+#: filer.c:1420
 #, c-format
 msgid "Directory '%s' not found."
 msgstr "Directory «%s» non trovata."
 
-#: filer.c:1713
+#: filer.c:1714
 msgid "Cancel"
 msgstr "Annulla"
 
-#: filer.c:1994
+#: filer.c:1995
 msgid "A"
 msgstr "T"
 
-#: filer.c:1996 find.c:925
+#: filer.c:1997 find.c:925
 msgid "G"
 msgstr "F"
 
-#: filer.c:2001
+#: filer.c:2002
 msgid "S"
 msgstr "S"
 
-#: filer.c:2003
+#: filer.c:2004
 msgid "T"
 msgstr "M"
 
-#: filer.c:2013
+#: filer.c:2014
 msgid "All, "
 msgstr "Tutti, "
 
-#: filer.c:2016
+#: filer.c:2017
 #, c-format
 msgid "Glob (%s), "
 msgstr "Filtro (%s), "
 
-#: filer.c:2024
+#: filer.c:2025
 msgid "Scanning, "
 msgstr "Scansione, "
 
-#: filer.c:2026
+#: filer.c:2027
 msgid "Thumbs, "
 msgstr "Miniature, "
 
-#: filer.c:2302
+#: filer.c:2303
 msgid "Symbolic link to "
 msgstr "Collegamento simbolico a "
 
-#: filer.c:2333
+#: filer.c:2345
 msgid "This filename is not valid UTF-8. You should rename it.\n"
 msgstr ""
 "Il nome di questo file non è in formato UTF-8 valido. Bisognerebbe "
 "rinominarlo.\n"
 
-#: filer.c:2644 menu.c:1994
+#: filer.c:2656 menu.c:1994
 msgid "Item no longer exists!"
 msgstr "L'oggetto non esiste più."
 
-#: filer.c:3320
+#: filer.c:3332
 msgid "Select display properties to save"
 msgstr "Selezionare le proprietà di visualizzazione da salvare"
 
-#: filer.c:3327
+#: filer.c:3339
 msgid "Position"
 msgstr "Posizione"
 
-#: filer.c:3332 toolbar.c:135 toolbar.c:139 tips:64
+#: filer.c:3344 toolbar.c:135 toolbar.c:139 tips:64
 msgid "Size"
 msgstr "Dimensioni"
 
-#: filer.c:3337
+#: filer.c:3349
 msgid "Show hidden"
 msgstr "Mostra nascosti"
 
-#: filer.c:3343
+#: filer.c:3355
 msgid "Display style"
 msgstr "Stile di visualizzazione"
 
-#: filer.c:3349
+#: filer.c:3361
 msgid "Sort type and order"
 msgstr "Tipo di ordinamento"
 
-#: filer.c:3354 toolbar.c:143
+#: filer.c:3366 toolbar.c:143
 msgid "Details"
 msgstr "Dettagli"
 
-#: filer.c:3359 tips:115 tips:116
+#: filer.c:3371 tips:115 tips:116
 msgid "Thumbnails"
 msgstr "Miniature"
 
-#: filer.c:3365
+#: filer.c:3377
 msgid "Filter"
 msgstr "Filtro"
 
@@ -1504,7 +1516,8 @@ msgstr ""
 "Errore nel file «%s» alla riga %d: \n"
 "«%s»\n"
 "Può essere dovuto all'aggiornamento da una precedente versione di ROX-Filer. "
-"Aprire la finestra «Opzioni» e provare a cambiare qualcosa, poi rimettere tutto come prima (così il file viene risalvato).\n"
+"Aprire la finestra «Opzioni» e provare a cambiare qualcosa, poi rimettere "
+"tutto come prima (così il file viene risalvato).\n"
 "Ulteriori errori verranno ignorati."
 
 #: gui_support.c:1001
@@ -1570,9 +1583,9 @@ msgstr "Opzioni"
 
 #: icon.c:139 menu.c:239
 msgid "Home Directory"
-msgstr "Home directory"
+msgstr "Directory home"
 
-#: icon.c:140 icon.c:1340 menu.c:206 type.c:214
+#: icon.c:140 icon.c:1340 menu.c:206 type.c:217
 msgid "File"
 msgstr "File"
 
@@ -1678,7 +1691,7 @@ msgstr "<b>Permessi</b>"
 msgid "<b>Contents indicate...</b>"
 msgstr "<b>Il contenuto sembra essere:</b>"
 
-#: infobox.c:424 infobox.c:565 support.c:349
+#: infobox.c:424 infobox.c:565 support.c:350
 msgid "bytes"
 msgstr "byte"
 
@@ -1957,7 +1970,7 @@ msgstr ""
 "http://bugzilla.gnome.org/show_bug.cgi?id=152151\n"
 "Si sta provando a continuare..."
 
-#: main.c:377
+#: main.c:392
 msgid ""
 "The -o argument is no longer used. You can turn on override redirect from "
 "the Options box instead."
@@ -1965,46 +1978,46 @@ msgstr ""
 "L'argomento -o non è più supportato. Nella finestra «Opzioni» si può "
 "decidere di ignorare la redirezione."
 
-#: main.c:484
+#: main.c:513
 #, c-format
 msgid "Running as user '%s'"
 msgstr "In esecuzione come utente «%s»"
 
-#: main.c:661
+#: main.c:678
 #, c-format
 msgid "Compiled with GTK version %s\n"
 msgstr "Compilato con GTK versione %s\n"
 
-#: main.c:662
+#: main.c:679
 #, c-format
 msgid "Running with GTK version %d.%d.%d\n"
 msgstr "In esecuzione con GTK versione %d.%d.%d\n"
 
-#: main.c:666
+#: main.c:683
 msgid "features set at compile time"
 msgstr "caratteristiche impostate in fase di compilazione"
 
-#: main.c:667
+#: main.c:684
 msgid "Large File Support"
 msgstr "Supporto per file grandi"
 
-#: main.c:674
+#: main.c:691
 msgid "Dnotify support"
 msgstr "Supporto a Dnotify"
 
-#: main.c:681
+#: main.c:698
 msgid "Binary compatibility"
 msgstr "Compatibilità binaria"
 
-#: main.c:683
+#: main.c:700
 msgid "Yes (can run with older glibc versions)"
 msgstr "Si (si può eseguire con le precedenti versioni di glibc)"
 
-#: main.c:685
+#: main.c:702
 msgid "No (apsymbols.h not found)"
 msgstr "No («apsymbls.h» non trovato)"
 
-#: main.c:689
+#: main.c:706
 msgid "Extended attribute support"
 msgstr "Supporto attributi estesi"
 
@@ -2656,57 +2669,57 @@ msgstr ""
 "Errore durante l'esecuzione dell'applet:\n"
 "%s"
 
-#: panel.c:2335
+#: panel.c:2338
 msgid "Panel Options..."
 msgstr "Opzioni pannello..."
 
-#: panel.c:2427
+#: panel.c:2430
 #, c-format
 msgid "Xinerama monitor %d unavailable"
 msgstr "Monitor %d di Xinerama non disponibile"
 
-#: panel.c:2502
+#: panel.c:2505
 msgid "Panel Options"
 msgstr "Opzioni pannello"
 
-#: panel.c:2517
+#: panel.c:2520
 #, c-format
 msgid "Panel: %s"
 msgstr "Pannello: %s"
 
-#: panel.c:2525
+#: panel.c:2528
 msgid "Select the panel's position:"
 msgstr "Seleziona la posizione del pannello:"
 
-#: panel.c:2531
+#: panel.c:2534
 msgid "Top-edge panel"
 msgstr "Il pannello sul bordo in alto dello schermo"
 
-#: panel.c:2532
+#: panel.c:2535
 msgid "Top edge"
 msgstr "In alto"
 
-#: panel.c:2533
+#: panel.c:2536
 msgid "Bottom edge panel"
 msgstr "Il pannello sul bordo in basso dello schermo"
 
-#: panel.c:2534
+#: panel.c:2537
 msgid "Bottom edge"
 msgstr "In basso"
 
-#: panel.c:2535
+#: panel.c:2538
 msgid "Left edge panel"
 msgstr "Il pannello sul bordo sinistro dello schermo"
 
-#: panel.c:2536
+#: panel.c:2539
 msgid "Left edge"
 msgstr "A sinistra"
 
-#: panel.c:2537
+#: panel.c:2540
 msgid "Right-edge panel"
 msgstr "Il pannello sul bordo destro dello schermo"
 
-#: panel.c:2538
+#: panel.c:2541
 msgid "Right edge"
 msgstr "A destra"
 
@@ -2828,7 +2841,7 @@ msgstr ""
 "%s\n"
 "Sfondo rimosso."
 
-#: pixmaps.c:991
+#: pixmaps.c:1043
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2837,11 +2850,11 @@ msgstr ""
 "Impossibile eliminare le miniature in %s:\n"
 "%s"
 
-#: pixmaps.c:1012
+#: pixmaps.c:1064
 msgid "There are no thumbnails to delete"
 msgstr "Non ci sono miniature da eliminare"
 
-#: pixmaps.c:1025
+#: pixmaps.c:1077
 msgid "Purge thumbnails disk cache"
 msgstr "Elimina la cache delle miniature"
 
@@ -2875,22 +2888,22 @@ msgstr "File di traduzione .gmo non valido (troppo corto): %s"
 msgid "Invalid .gmo translation file (GNU magic number not found): %s"
 msgstr "File di traduzione .gmo non valido (numero magico GNU non trovato): %s"
 
-#: run.c:96 run.c:141
+#: run.c:99 run.c:152
 #, c-format
 msgid "Program %s not found - deleted?"
 msgstr "Programma %s non trovato. È stato eliminato?"
 
-#: run.c:287
+#: run.c:302
 #, c-format
 msgid "File doesn't exist, or I can't access it: %s"
 msgstr "Il file non esiste o non è accessibile: %s"
 
-#: run.c:292
+#: run.c:307
 #, c-format
 msgid "I don't know how to open '%s'"
 msgstr "Non so come aprire «%s»"
 
-#: run.c:323
+#: run.c:338
 msgid ""
 "Application:\n"
 "This is an application directory - you can run it as a program, or open it "
@@ -2903,23 +2916,23 @@ msgstr ""
 "mentre si tenta di aprirla). Molte applicazioni forniscono qui il loro "
 "aiuto, ma questa no."
 
-#: run.c:407
+#: run.c:422
 #, c-format
 msgid "Could not send data to program: %s"
 msgstr "Impossibile inviare dati al programma: %s"
 
-#: run.c:437
+#: run.c:452
 #, c-format
 msgid "Could not read link: %s"
 msgstr "Impossibile leggere il collegamento: %s"
 
-#: run.c:465
+#: run.c:480
 #, c-format
 msgid "Broken symlink (or you don't have permission to follow it): %s"
 msgstr ""
 "Collegamento simbolico interrotto (o non ci sono i permessi per seguirlo): %s"
 
-#: run.c:502
+#: run.c:517
 #, c-format
 msgid ""
 "No run action specified for files of this type (%s/%s) - you can set a run "
@@ -2930,7 +2943,7 @@ msgstr ""
 "impostarne una usando «Imposta azione...» dal menù «File» o trascinare il "
 "file su un'applicazione.%s"
 
-#: run.c:508
+#: run.c:523
 msgid ""
 "\n"
 "\n"
@@ -2942,13 +2955,23 @@ msgstr ""
 "Nota: se è un programma che si desidera eseguire, è necessario renderlo "
 "eseguibile selezionando «Permessi» dal menù «File»."
 
-#: support.c:272
+#: support.c:273
 msgid "B"
 msgstr "B"
 
-#: support.c:351
+#: support.c:352
 msgid "byte"
 msgstr "byte"
+
+#: support.c:1565
+#, c-format
+msgid "Failed to open and stat file '%s': %s"
+msgstr "Apertura e stat del file «%s» fallito: %s"
+
+#: support.c:1576
+#, c-format
+msgid "Failed to mmap file '%s': %s"
+msgstr "Mmap del file «%s» fallito: %s"
 
 #: toolbar.c:115
 msgid "Close"
@@ -2972,7 +2995,7 @@ msgstr "Home"
 
 #: toolbar.c:123
 msgid "Change to home directory"
-msgstr "Va nella home directory"
+msgstr "Va nella directory home"
 
 #: toolbar.c:127
 msgid "Bookmarks"
@@ -3081,47 +3104,47 @@ msgstr "ascendente"
 msgid "descending"
 msgstr "discendente"
 
-#: type.c:205
+#: type.c:208
 msgid "Sym link"
 msgstr "Coll. simb."
 
-#: type.c:207
+#: type.c:210
 msgid "Mount point"
 msgstr "Punto di mount"
 
-#: type.c:209
+#: type.c:212
 msgid "App dir"
 msgstr "Dir app"
 
-#: type.c:216
+#: type.c:219
 msgid "Dir"
 msgstr "Dir"
 
-#: type.c:218
+#: type.c:221
 msgid "Char dev"
 msgstr "Char dev"
 
-#: type.c:220
+#: type.c:223
 msgid "Block dev"
 msgstr "Block dev"
 
-#: type.c:222
+#: type.c:225
 msgid "Pipe"
 msgstr "Pipe"
 
-#: type.c:224
+#: type.c:227
 msgid "Socket"
 msgstr "Socket"
 
-#: type.c:226
+#: type.c:229
 msgid "Door"
 msgstr "Door"
 
-#: type.c:229
+#: type.c:232
 msgid "Unknown"
 msgstr "Sconosciuto"
 
-#: type.c:357
+#: type.c:360
 #, c-format
 msgid ""
 "Executable '%s' is world-writeable! Refusing to run. Please change the "
@@ -3147,11 +3170,11 @@ msgstr ""
 "bisogna preoccuparsi. Altrimenti, si devono controllare o addirittura "
 "eliminare tutti questi eseguibili."
 
-#: type.c:370
+#: type.c:373
 msgid "go-w (Fix security problem)"
 msgstr "go-w (Corregge il problema di sicurezza)"
 
-#: type.c:500
+#: type.c:503
 msgid ""
 "Enter a shell command which will load \"$@\" into a suitable program. Eg:\n"
 "\n"
@@ -3161,88 +3184,88 @@ msgstr ""
 "\n"
 "gimp \"$@\""
 
-#: type.c:681
+#: type.c:684
 msgid "This is not a program! Give me an application instead!"
 msgstr "Questa non è un'applicazione. Specificare un'applicazione."
 
-#: type.c:742
+#: type.c:745
 msgid "No run action defined"
 msgstr "Nessuna azione definita"
 
-#: type.c:768
+#: type.c:771
 #, c-format
 msgid "Error in handler %s: %s"
 msgstr "Errore nell'handler %s: %s"
 
-#: type.c:783
+#: type.c:786
 #, c-format
 msgid "Invalid application %s (bad AppRun)"
 msgstr "Applicazione %s non valida (AppRun errato)"
 
-#: type.c:794
+#: type.c:797
 #, c-format
 msgid "Non-executable %s"
 msgstr "%s non eseguibile"
 
-#: type.c:827
+#: type.c:830
 msgid "Set run action"
 msgstr "Imposta azione"
 
-#: type.c:833
+#: type.c:836
 msgid ""
 "If a handler for the specific type isn't set up, use this as the default."
 msgstr ""
 "Se il gestore di un tipo specifico non è impostato, usa questo come "
 "predefinito."
 
-#: type.c:835
+#: type.c:838
 #, c-format
 msgid "Set default for all `%s/<anything>'"
 msgstr ""
 "Impostare come azione predefinita per tutti i file di tipo «%s/<anything>»"
 
-#: type.c:839
+#: type.c:842
 msgid "Use this application for all files with this MIME type."
 msgstr "Usa questa applicazione per tutti i file con questo tipo di MIME."
 
-#: type.c:841
+#: type.c:844
 #, c-format
 msgid "Only for the type `%s' (%s/%s)"
 msgstr "Solo per il tipo «%s» (%s/%s)"
 
-#: type.c:847
+#: type.c:850
 msgid "Drop a suitable application here"
 msgstr "Trascinare qui un'applicazione adatta"
 
-#: type.c:862
+#: type.c:865
 msgid "OR"
 msgstr "O"
 
-#: type.c:869
+#: type.c:872
 msgid "Enter a shell command:"
 msgstr "Inserire un comando di shell:"
 
-#: type.c:898
+#: type.c:901
 msgid "_Use Command"
 msgstr "_Usa il comando"
 
-#: type.c:928
+#: type.c:931
 msgid ""
 "A run action already exists and is quite a big program - are you sure you "
 "want to delete it?"
 msgstr "Un'azione esiste già ed è un programma. Eliminarla veramente?"
 
-#: type.c:939
+#: type.c:942
 #, c-format
 msgid "Can't remove %s: %s"
 msgstr "Impossibile eliminare %s: %s"
 
-#: type.c:976
+#: type.c:979
 msgid "Choices saving is disabled by CHOICESPATH variable"
 msgstr ""
 "Il salvataggio delle preferenze è disabilitato dalla variabile CHOICESPATH"
 
-#: type.c:1251
+#: type.c:1254
 #, c-format
 msgid ""
 "Icon theme '%s' does not contain MIME icons. Using ROX default theme instead."
@@ -3250,7 +3273,7 @@ msgstr ""
 "Il tema icone «%s» non contiene le icone di MIME. Si usi invece il tema "
 "predefinito ROX."
 
-#: type.c:1266
+#: type.c:1269
 #, c-format
 msgid ""
 "Failed to create symlink '%s':\n"
@@ -3264,7 +3287,8 @@ msgstr ""
 "%s\n"
 "\n"
 "(significa che il tema ROX esiste già, ma l'icona «mime-application:"
-"postscript» non può essere caricata per qualche motivo, o «%s» è un collegamento a una directory non valida; provare a cancellarlo)"
+"postscript» non può essere caricata per qualche motivo, o «%s» è un "
+"collegamento a una directory non valida; provare a cancellarlo)"
 
 #: usericons.c:181
 msgid "The pathname you gave does not exist. The icon has not been changed."
@@ -4725,18 +4749,8 @@ msgstr ""
 "dedotto solo dal nome del file e la finestra «Proprietà» non riporta gli "
 "attributi estesi."
 
-#~ msgid "Show"
-#~ msgstr "Mostra"
-
-#~ msgid "<nothing>"
-#~ msgstr "<nessuna>"
-
-#~ msgid ""
-#~ "I can't show you the currently set item, because nothing is currently "
-#~ "set. Drag something onto me!"
-#~ msgstr ""
-#~ "Non è possibile mostrare attualmente l'oggetto impostato, perché "
-#~ "attualmente non è impostato nulla. Trascinare qualcosa qui sopra."
+#~ msgid "Remove the current choice"
+#~ msgstr "Rimuove la scelta attuale"
 
 #~ msgid "GNOME-VFS library"
 #~ msgstr "Libreria GNOME-VFS"
