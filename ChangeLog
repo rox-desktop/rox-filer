@@ -1,3 +1,27 @@
+2005-12-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* src/xdgmimecache.h:
+	* src/xdgmimecache.c (_xdg_mime_cache_get_mime_type_for_file): 
+	Allow passing in a struct stat * to avoid re-stat()ing. 
+	Forgotten commit from an earlier entry.
+
+	* src/xdgmimecache.c (cache_glob_lookup_literal):
+	(cache_glob_lookup_fnmatch):
+	(cache_glob_node_lookup_suffix): Change these functions to
+	allow returning more than one mime type if identical globs
+	match.
+
+	* src/xdgmimemagic.h: 
+	* src/xdgmimeglob.h: 
+	* src/xdgmimemagic.c (_xdg_mime_magic_lookup_data): 
+	* src/xdgmimeglob.c (_xdg_glob_hash_lookup_file_name): 
+	Change these functions to allow returning more than one
+	mime type if identical globs match.
+	
+	* src/xdgmimecache.c (_xdg_mime_cache_get_mime_type_for_file): 
+	* src/xdgmime.c (xdg_mime_get_mime_type_for_file): 
+	If multiple identical globs match, use magic to disambiguate.
+	
 2005-11-04  Matthias Clasen  <mclasen@redhat.com>
 
 	* xdgmime.c (xdg_mime_list_mime_parents): Prevent
