@@ -737,10 +737,10 @@ _xdg_mime_cache_get_mime_type_for_file (const char  *file_name,
 const char *
 _xdg_mime_cache_get_mime_type_from_file_name (const char *file_name)
 {
-  const char *mime_type;
+  const char *mime_types[2];
 
-  if (cache_glob_lookup_file_name (file_name, &mime_type, 1))
-    return mime_type;
+  if (cache_glob_lookup_file_name (file_name, mime_types, 2) == 1)
+    return mime_types[0];
   else
     return XDG_MIME_TYPE_UNKNOWN;
 }
