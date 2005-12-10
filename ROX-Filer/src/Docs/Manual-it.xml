@@ -914,11 +914,6 @@
        </entry></row>
 
        <row><entry>
-         <guimenuitem>Apri AVFS</guimenuitem></entry><entry>
-         Apre il file come se fosse una directory. Vedere la sezione <xref linkend="vfs"/>.
-       </entry></row>
-
-       <row><entry>
          <guimenuitem>Invia a...</guimenuitem></entry><entry>
          Attiva il menù «Invia a...» e permette di mandare i file selezionati a una o più
          applicazioni. Vedere la sezione <xref linkend="SendTo"/>.
@@ -1552,12 +1547,52 @@
   <para>
    Alcuni tipi di file possono essere rappresentati come directory. Un tipico esempio
    è il file zip, che contiene in forma compressa la struttura di una intera directory.
-   A volte è utile essere in grado di aprire tale genere di file come se fosse una vera 
+   A volte è utile essere in grado di aprire questo tipo di file come se fosse una vera 
    directory. Il VFS (Virtual File System) permette di farlo.
   </para><para>
-   Per usare questa funzionalità, deve essere installato sul sistema 
-   AVFS <citation>AVFS</citation>, il quale permette al kernel di supportare direttamente 
-   vari tipi di file system virtuali.
+   Per usare questa funzionalità,  AVFS <citation>AVFS</citation> deve essere installato sul sistema 
+   in modo da permettere al kernel di supportare direttamente i vari tipi di file system virtuali.
+  </para>
+
+  <para>
+    Ci sono vari modi di usare AVFS. Questo esempio mostra come usarlo su un sistema con
+    kernel Linux 2.6 e con FUSE. È necessario che il kernel abbia il supporto per FUSE e che
+    sia installato il pacchetto dei file header «libfuse-dev».
+  </para>
+
+  <procedure><title>Installare AVFS su Linux 2.6</title>
+
+  <step><para>Prendere AVFS dal CVS (la release di Luglio 2005 è troppo vecchia).</para></step>
+
+  <step><para>Compilare AVFS (<userinput>sh autogen.sh; ./configure; make</userinput>).</para></step>
+
+  <step><para>Andare nella sottodirectory <filename>avfs/fuse</filename> ed eseguire
+  <userinput>./compile.sh</userinput>.</para></step>
+
+  <step><para>Creare un punto di mount: <userinput>mkdir ~/.avfs-mount</userinput>.</para></step>
+
+  <step><para>Eseguire AVFS: <userinput>./avfsd ~/.avfs-mount</userinput>.</para></step>
+
+  <step>
+    <para>
+      Per configurare ROX-Filer in modo da aprire le directory usando AVFS, cliccare su 
+      (<guimenuitem>Imposta azione...</guimenuitem>) per i file zip (ed gli altri tipi di archivi)
+      ed inserire: </para>
+    <screen>rox ~/.avfs-mount/"$1#"</screen>
+  </step>
+
+  </procedure>
+
+  <para>
+    Notare che tutti i passi sopra descritti dovrebbero essere eseguiti come utente normale, non come root.
+    Potrebbe essere necessario appartenere ad un gruppo speciale per usare FUSE (controllare il gruppo
+    di <filename>/usr/bin/fusermount</filename>).
+  </para>
+
+  <para>
+    Se non si desidera che AVFS sia l'azione predefinita di questi file, è possibile creare uno script
+    contenente il comando sopra descritto e aggiungerlo al menù 
+    <guimenuitem>File</guimenuitem>, usando <guimenuitem>Personalizza il menù...</guimenuitem>.
   </para>
 
  </chapter>
