@@ -3289,10 +3289,11 @@ append to the item when run if it is a program.
    </para></listitem>
 
    <listitem><para><function>PanelRemove</function>(<parameter>Side</parameter>,
-     <parameter>Path</parameter>, [<parameter>Label</parameter>])
-     Remove <parameter>Path</parameter> from the panel on side
-<parameter>Side</parameter>. If <parameter>Label</parameter> is given
-then this must match the label of the item.  If more than one item matches, only one is removed.
+     [<parameter>Path</parameter>, <parameter>Label</parameter>])
+     Remove an item from the panel on side <parameter>Side</parameter>. If
+     <parameter>Path</parameter> or <parameter>Label</parameter> is not given
+     then any path or label will match. At least one must be specified.
+     If more than one item matches, only one is removed.
    </para></listitem>
 
    <listitem><para><function>Pinboard</function>([<parameter>Name</parameter>])

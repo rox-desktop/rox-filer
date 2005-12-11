@@ -832,7 +832,7 @@ static gboolean remove_item_from_side(GtkWidget *container, const gchar *path,
 		if (!icon)
 			continue;
 
-		if (strcmp(path, icon->src_path) == 0 &&
+		if ((!path || strcmp(path, icon->src_path) == 0) &&
 		    (!label || strcmp(label, icon->item->leafname)==0))
 		{
 			icon_destroy(icon);
@@ -856,7 +856,8 @@ gboolean panel_remove_item(PanelSide side, const gchar *path,
 	Panel *panel;
 
 	g_return_val_if_fail(side >= 0 && side < PANEL_NUMBER_OF_SIDES, FALSE);
-	g_return_val_if_fail(path != NULL, FALSE);
+
+	g_return_val_if_fail(path != NULL || label != NULL, FALSE);
 
 	panel = current_panel[side];
 	if (!panel)
@@ -873,8 +874,7 @@ gboolean panel_remove_item(PanelSide side, const gchar *path,
 		return TRUE;
 	}
 
-
-	g_warning("Panel item '%s' not found", path);
+	g_warning("Panel item path='%s', label='%s' not found", path, label);
 	return FALSE;
 }
 

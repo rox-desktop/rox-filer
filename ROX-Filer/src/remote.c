@@ -147,7 +147,7 @@ gboolean remote_init(xmlDocPtr rpc, gboolean new_copy)
 	soap_register("PinboardAdd", rpc_PinboardAdd, "Path,X,Y", "Label,Shortcut,Args");
 	soap_register("PinboardRemove", rpc_PinboardRemove, "Path", "Label");
 	soap_register("PanelAdd", rpc_PanelAdd, "Side,Path", "Label,After,Shortcut,Args");
-	soap_register("PanelRemove", rpc_PanelRemove, "Side,Path", "Label");
+	soap_register("PanelRemove", rpc_PanelRemove, "Side", "Path,Label");
 
 	/* Look for a property on the root window giving the IPC window
 	 * of an already-running copy of this version of the filer, running
@@ -907,7 +907,10 @@ static xmlNodePtr rpc_PanelRemove(GList *args)
 	path = string_value(ARG(1));
 	label = string_value(ARG(2));
 
-	panel_remove_item(side, path, label);
+	if (path || label)
+		panel_remove_item(side, path, label);
+	else
+		g_warning("Must specify either path or label");
 
 	g_free(path);
 	g_free(label);
