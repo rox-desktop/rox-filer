@@ -7,7 +7,7 @@
 <book lang="fr">
  <bookinfo>
   <title>
-   ROX-Filer 2.3 - Manuel de l'utilisateur
+   ROX-Filer 2.4 - Manuel de l'utilisateur
    <ulink url="http://rox.sourceforge.net"/>
   </title>
 
@@ -32,18 +32,20 @@
   <legalnotice>
    <title>Conditions</title>
    <para>
-	Ce programme est un logiciel libre, vous pouvez le redistribuer et/ou le modifier
-	suivant les termes de la licence publique générale GNU ('GNU General Public License'), publiée par 
-	la 'Free Software Foundation', soit la version 2, soit (à votre convenance) une 
+	Rox-Filer est un logiciel libre ; vous pouvez le redistribuer et/ou le modifier
+	selon les termes de la Licence Publique Générale GNU, telle que publiée par 
+	la Free Software Foundation ; version 2 de la licence, ou encore (à votre choix) toute 
 	version ultérieure.
-	Ce programme est distribué en espérant qu'il sera utile, mais SANS AUCUNE GARANTIE.
-	Consultez la 'GNU General Public License' pour plus de détails.
-	Vous devez avoir reçu une copie de la 'GNU General Public License' avec ce programme.
-	Si ce n'est pas le cas, écrivez à la Free Software Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+	Rox-Filer est distribué dans l'espoir qu'il sera utile, mais SANS AUCUNE GARANTIE ; sans 
+	même la garantie implicite de COMMERCIALISATION ou D'ADAPTATION À UN OBJET PARTICULIER. Pour 
+	plus de détails, voir la Licence Publique Générale GNU.
+	Un exemplaire de la Licence Publique Générale GNU doit être fourni avec Rox-Filer ; si 
+	ce n'est pas le cas, écrivez à la Free Software Foundation, Inc.,
+	59 Temple Place, Suite 330, Boston, MA 02111-1307 USA.
    </para>
    <para>
-	NDT : Vous pouvez consulter une traduction non officielle de la licence 'GNU General
-	Public License' à cette adresse : <ulink url="http://www.april.org/gnu/gpl_french.html"/>.
+	NDT : Vous pouvez consulter une traduction non officielle de la Licence Publique Générale 
+	GNU à cette adresse : <ulink url="http://fsffrance.org/gpl/gpl-fr.fr.html"/>.
    </para>
   </legalnotice>
 
@@ -1123,15 +1125,6 @@ le groupe du fichier est le même qu'un des groupes auxquels l'utilisateur appar
 
 <row>
  <entry>
-  <guimenuitem>Ouvrir AVFS</guimenuitem>
- </entry>
- <entry>
-  Ouvre le fichier comme s'il s'agissait d'un dossier &mdash; voir la section <xref linkend="vfs"/>.
- </entry>
-</row>
-
-<row>
- <entry>
   <guimenuitem>Envoyer à...</guimenuitem>
  </entry>
  <entry>
@@ -1889,8 +1882,51 @@ Créez un dossier pour l'appliquette (ex <filename>MonAppliquette</filename>).
   <para>
    Pour utiliser cette fonctionnalité, vous devez disposer d'un système comme 
    AVFS <citation>AVFS</citation>, qui permet au noyau d'intégrer directement 
-   le support de différents Systèmes de Fichiers Virtuels.
+   le support de différents systèmes de fichiers virtuels.
   </para>
+
+  <para>
+    Il y a différentes façons d'utiliser AVFS. L'exemple suivant montre comment 
+    l'utiliser avec un noyau Linux 2.6 et FUSE. Vous devez donc disposer d'un 
+    noyau qui gère FUSE, et le paquet 'libfuse-dev' doit être installé.
+  </para>
+
+  <procedure><title>Installer AVFS avec Linux 2.6</title>
+
+  <step><para>Téléchargez la version CVS d'AVFS (la version actuelle, datant de juillet 2005, 
+              est trop ancienne).</para></step>
+
+  <step><para>Compilez AVFS (<userinput>sh autogen.sh; ./configure; make</userinput>).</para></step>
+
+  <step><para>Déplacez-vous dans le sous-dossier <filename>avfs/fuse</filename> et exécutez 
+  <userinput>./compile.sh</userinput>.</para></step>
+
+  <step><para>Créez un point de montage : <userinput>mkdir ~/.avfs-mount</userinput>.</para></step>
+
+  <step><para>Démarrez AVFS : <userinput>./avfsd ~/.avfs-mount</userinput>.</para></step>
+
+  <step>
+    <para>
+      Vous devez ensuite configurer ROX-Filer pour qu'il ouvre 
+      les fichiers zip (et autres archives) comme des dossiers, en utilisant AVFS.
+      Fixez l'action d'exécution pour un fichier archive de cette manière (<guimenuitem>Fixer l'action d'exécution...</guimenuitem>) : </para>
+    <screen>rox ~/.avfs-mount/"$1#"</screen>
+  </step>
+  </procedure>
+
+  <para>
+    Notez bien que toutes les étapes ci-dessus doivent être suivies en tant 
+    que simple utilisateur, pas en tant que root.
+    Vous devrez peut-être faire partie d'un groupe particulier pour utiliser 
+    FUSE (vérifiez le groupe de <filename>/usr/bin/fusermount</filename>).
+  </para>
+
+  <para>
+    Si vous ne voulez pas AVFS comme action principale pour ces fichiers, vous 
+    pourriez créer un script se résumant à la commande ci-dessus et l'ajouter au 
+    menu <guimenu>Fichier</guimenu>, via la commande <guimenuitem>Personnaliser le menu...</guimenuitem>.
+  </para>
+
 </chapter>
 
 <chapter id="minibuffer">
@@ -3569,7 +3605,7 @@ Exécutez <command>make</command>, qui créera les fichiers <filename>.o</filena
 <appendix id="soap"><title>SOAP RPC</title>
 
 <para>
- Quand le vous démarrer le <foreignphrase lang="en">filer</foreignphrase>, vous pouvez lui spécifier des arguments, sur la ligne de commande, pour contrôler son comportement.
+ Quand vous démarrez le <foreignphrase lang="en">filer</foreignphrase>, vous pouvez lui spécifier des arguments, sur la ligne de commande, pour contrôler son comportement.
  Il existe une alternative à ceci ; le <foreignphrase lang="en">filer</foreignphrase> vous permet de passer vos arguments sous la forme d'un message au format RPC <citation>SOAP</citation>.
  En fait, si vous utilisez les options de la ligne de commande, le <foreignphrase lang="en">filer</foreignphrase> les convertit en RPC SOAP en interne.
 </para>
