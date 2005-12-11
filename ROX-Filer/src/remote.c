@@ -364,7 +364,10 @@ static gboolean get_ipc_property(GdkWindow *window, Window *r_xid)
 			gdk_x11_xatom_to_atom(XA_WINDOW), 0, 4,
 			FALSE, NULL, &format, &length, &data) && data)
 	{
-		if (format == 32 && length == 4)
+		/* Note: values with format=32 are stored as longs client-side,
+		 * which may be more than 32 bits on some systems.
+		 */
+		if (format == 32 && length >= 4)
 		{
 			retval = TRUE;
 			*r_xid = *((Window *) data);

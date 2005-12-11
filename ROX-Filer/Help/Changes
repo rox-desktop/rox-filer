@@ -1,6 +1,13 @@
 			ROX-Filer
 			A RISC OS-like filer for X
 			by Thomas Leonard
+
+11-Dec-2005
+~~~~~~~~~~~
+Bugfix: On 64-bit systems communication between ROX-Filer processes didn't
+	work, because GDK uses sizeof(long) bytes (not always 4 bytes) to store
+	a 32 bit property (Lucas Hazel).
+
 29-Nov-2005
 ~~~~~~~~~~~
 Removed 'Open AVFS' from menu. It doesn't do anything on most systems, and you
