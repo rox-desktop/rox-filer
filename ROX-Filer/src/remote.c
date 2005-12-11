@@ -367,10 +367,11 @@ static gboolean get_ipc_property(GdkWindow *window, Window *r_xid)
 		/* Note: values with format=32 are stored as longs client-side,
 		 * which may be more than 32 bits on some systems.
 		 */
-		if (format == 32 && length >= 4)
+		if (format == 32 && length == sizeof(long))
 		{
+			long windowID = *((long *) data);
 			retval = TRUE;
-			*r_xid = *((Window *) data);
+			*r_xid = (Window) windowID;
 		}
 		g_free(data);
 	}
