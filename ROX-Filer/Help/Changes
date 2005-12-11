@@ -4,6 +4,9 @@
 
 11-Dec-2005
 ~~~~~~~~~~~
+Bugfix: The install script failed to compile ROX-Filer on Debian systems, due
+	to a bug in recent versions of xterm (Vincent Lefèvre). Added
+	workaround.
 Bugfix: On 64-bit systems communication between ROX-Filer processes didn't
 	work, because GDK uses sizeof(long) bytes (not always 4 bytes) to store
 	a 32 bit property (Lucas Hazel).

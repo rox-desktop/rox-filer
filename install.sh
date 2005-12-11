@@ -42,7 +42,9 @@ confirm_or_die() {
 cd `dirname $0`
 
 echo Testing the filer...
-./ROX-Filer/AppRun -v
+# Note: must use full path due to bug in xterm
+# http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=342782
+"`pwd`/ROX-Filer/AppRun" -v
 if [ $? -ne 0 ]; then
 	die "Filer doesn't work! Giving up..."
 fi
