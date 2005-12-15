@@ -184,6 +184,8 @@ void toolbar_update_info(FilerWindow *filer_window)
 	ViewIface	*view;
 	int		n_selected;
 
+	g_return_if_fail(filer_window != NULL);
+
 	if (o_toolbar.int_value == TOOLBAR_NONE || !o_toolbar_info.int_value)
 		return;		/* Not showing info */
 

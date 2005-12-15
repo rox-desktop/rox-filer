@@ -765,6 +765,8 @@ static void selection_get(GtkWidget *widget,
  */
 void filer_selection_changed(FilerWindow *filer_window, gint time)
 {
+	g_return_if_fail(filer_window != NULL);
+
 	toolbar_update_info(filer_window);
 
 	if (window_with_primary == filer_window)

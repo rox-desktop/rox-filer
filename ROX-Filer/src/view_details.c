@@ -990,14 +990,17 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 				GTK_SELECTION_MULTIPLE);
 	gtk_tree_selection_set_select_function(view_details->selection,
 			test_can_change_selection, view_details, NULL);
-	g_signal_connect(view_details->selection, "changed",
-			G_CALLBACK(selection_changed), view_details);
 
 	/* Sorting */
 	view_details->sort_fn = NULL;
 	sortable_list = GTK_TREE_SORTABLE(object);
 
 	gtk_tree_view_set_model(treeview, GTK_TREE_MODEL(view_details));
+	/* Do this after set_model, because that can generate this
+	 * signal...
+	 */
+	g_signal_connect(view_details->selection, "changed",
+			G_CALLBACK(selection_changed), view_details);
 
 	/* Icon */
 	cell = cell_icon_new(view_details);

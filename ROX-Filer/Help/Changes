@@ -2,6 +2,12 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+15-Dec-2005
+~~~~~~~~~~~
+Bugfix: Changing the display style crashes the filer with GTK >= 2.8.9 because
+	it sends a selection changed event before the view has finished
+	initialising (Thomas Leonard; reported by Tobias Kieslich).
+
 13-Dec-2005 (Release 2.4)
 ~~~~~~~~~~~
 Updated Chinese translations (Babyfai Cheung).
