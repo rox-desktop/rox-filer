@@ -14,14 +14,7 @@ Hard-code sub-class-of.
 Size and position settings don't work on new windows.
 
 Odd things to investigate:
-- foreach_remove in filer settings.
 - newChild -> newChildText?
-- Remove Filter regexp code.
-
-ROX has an implementation of GtkIconTheme copied from GTK 2.3. GTK 2.4
-also has its own copy. Both copies scan the theme directories when
-initialised, which is a waste of time. ROX should use the GTK version
-when present.
 
 Saved settings for display size and position make the window flicker when
 changing directory.
@@ -40,8 +33,6 @@ If you set an icon view with some details turned on (like "sizes" or
 
 Shift+Menu on the Up button should show the Send To menu.
 
-Sorting by group/user should use name (Bernard Jungen).
-
 File2.html comes before File.html. Also, very large numbers aren't handled.
 
 Mounting/unmounting via a symlink doesn't update the display automatically.
@@ -49,11 +40,6 @@ Mounting/unmounting via a symlink doesn't update the display automatically.
 When the minibuffer is highlighted in red, scanning more items should recheck.
 
 Text beside icons style is too wide.
-
-Bookmarks:
-
-- Short name for bookmarks (you can assign names to items, so instead of
-  seeing "/usr/share/doc" in the menu, you see "Documentation").
 
 Bookmarks:
 - Show selection groups?
@@ -69,8 +55,6 @@ When all selected items have the same type, show handlers for that type on
 the SendTo menu (Arnaud Calvo)?
 
 Tab completion in save boxes.
-
-Order icons vertically or horizontally (option)?
 
 Rescanning sometimes causes the display to scroll (automounter problem).
 
