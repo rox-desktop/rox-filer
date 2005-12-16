@@ -59,7 +59,8 @@ void draw_large_icon(GdkWindow *window,
 		     GdkRectangle *area,
 		     DirItem  *item,
 		     MaskedPixmap *image,
-		     gboolean selected);
+		     gboolean selected,
+		     GdkColor *color);
 gboolean display_is_truncated(FilerWindow *filer_window, int i);
 void display_change_size(FilerWindow *filer_window, gboolean bigger);
 
@@ -70,9 +71,11 @@ void display_update_view(FilerWindow *filer_window,
 			 gboolean update_name_layout);
 void display_update_views(FilerWindow *filer_window);
 void draw_small_icon(GdkWindow *window, GdkRectangle *area,
-		     DirItem  *item, MaskedPixmap *image, gboolean selected);
+		     DirItem  *item, MaskedPixmap *image, gboolean selected,
+		     GdkColor *color);
 void draw_huge_icon(GdkWindow *window, GdkRectangle *area, DirItem *item,
-			   MaskedPixmap *image, gboolean selected);
+			   MaskedPixmap *image, gboolean selected,
+			   GdkColor *color);
 void display_set_actual_size(FilerWindow *filer_window, gboolean force_resize);
 
 #endif /* _DISPLAY_H */

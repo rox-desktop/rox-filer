@@ -86,5 +86,6 @@ void make_heading(GtkWidget *label, double scale_factor);
 void launch_uri(const char *uri);
 void allow_right_click(GtkWidget *button);
 gint current_event_button(void);
+GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, GdkColor *color);
 
 #endif /* _GUI_SUPPORT_H */

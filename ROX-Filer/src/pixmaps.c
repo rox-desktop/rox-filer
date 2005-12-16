@@ -119,8 +119,6 @@ static GdkPixbuf *scale_pixbuf_up(GdkPixbuf *src, int max_w, int max_h);
 static GdkPixbuf *get_thumbnail_for(const char *path);
 static void thumbnail_child_done(ChildThumbnail *info);
 static void child_create_thumbnail(const gchar *path);
-static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, guint32 color,
-					  guchar alpha);
 static GList *thumbs_purge_cache(Option *option, xmlNode *node, guchar *label);
 static gchar *thumbnail_path(const gchar *path);
 static gchar *thumbnail_program(MIME_type *type);
@@ -237,8 +235,6 @@ void pixmap_make_huge(MaskedPixmap *mp)
 		g_object_ref(mp->huge_pixbuf);
 	}
 
-	mp->huge_pixbuf_lit = create_spotlight_pixbuf(mp->huge_pixbuf,
-						      0x000099, 128);
 	mp->huge_width = gdk_pixbuf_get_width(mp->huge_pixbuf);
 	mp->huge_height = gdk_pixbuf_get_height(mp->huge_pixbuf);
 }
@@ -257,9 +253,6 @@ void pixmap_make_small(MaskedPixmap *mp)
 		mp->sm_pixbuf = mp->src_pixbuf;
 		g_object_ref(mp->sm_pixbuf);
 	}
-
-	mp->sm_pixbuf_lit = create_spotlight_pixbuf(mp->sm_pixbuf,
-						      0x000099, 128);
 
 	mp->sm_width = gdk_pixbuf_get_width(mp->sm_pixbuf);
 	mp->sm_height = gdk_pixbuf_get_height(mp->sm_pixbuf);
@@ -812,32 +805,16 @@ static void masked_pixmap_finialize(GObject *object)
 		g_object_unref(mp->huge_pixbuf);
 		mp->huge_pixbuf = NULL;
 	}
-	if (mp->huge_pixbuf_lit)
-	{
-		g_object_unref(mp->huge_pixbuf_lit);
-		mp->huge_pixbuf_lit = NULL;
-	}
-
 	if (mp->pixbuf)
 	{
 		g_object_unref(mp->pixbuf);
 		mp->pixbuf = NULL;
-	}
-	if (mp->pixbuf_lit)
-	{
-		g_object_unref(mp->pixbuf_lit);
-		mp->pixbuf_lit = NULL;
 	}
 
 	if (mp->sm_pixbuf)
 	{
 		g_object_unref(mp->sm_pixbuf);
 		mp->sm_pixbuf = NULL;
-	}
-	if (mp->sm_pixbuf_lit)
-	{
-		g_object_unref(mp->sm_pixbuf_lit);
-		mp->sm_pixbuf_lit = NULL;
 	}
 
 	G_OBJECT_CLASS(parent_class)->finalize(object);
@@ -859,17 +836,14 @@ static void masked_pixmap_init(GTypeInstance *object, gpointer gclass)
 	mp->src_pixbuf = NULL;
 
 	mp->huge_pixbuf = NULL;
-	mp->huge_pixbuf_lit = NULL;
 	mp->huge_width = -1;
 	mp->huge_height = -1;
 
 	mp->pixbuf = NULL;
-	mp->pixbuf_lit = NULL;
 	mp->width = -1;
 	mp->height = -1;
 
 	mp->sm_pixbuf = NULL;
-	mp->sm_pixbuf_lit = NULL;
 	mp->sm_width = -1;
 	mp->sm_height = -1;
 }
@@ -918,73 +892,10 @@ MaskedPixmap *masked_pixmap_new(GdkPixbuf *full_size)
 	mp->src_pixbuf = src_pixbuf;
 
 	mp->pixbuf = normal_pixbuf;
-	mp->pixbuf_lit = create_spotlight_pixbuf(normal_pixbuf, 0x000099, 128);
 	mp->width = gdk_pixbuf_get_width(normal_pixbuf);
 	mp->height = gdk_pixbuf_get_height(normal_pixbuf);
 
 	return mp;
-}
-
-/* Stolen from eel...and modified to colourize the pixbuf.
- * 'alpha' is the transparency of 'color' (0xRRGGBB):
- * 0 = fully opaque, 255 = fully transparent.
- */
-static GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src,
-					  guint32 color,
-					  guchar alpha)
-{
-	GdkPixbuf *dest;
-	int i, j;
-	int width, height, has_alpha, src_row_stride, dst_row_stride;
-	guchar *target_pixels, *original_pixels;
-	guchar *pixsrc, *pixdest;
-	guchar r, g, b;
-	gint n_channels;
-
-	n_channels = gdk_pixbuf_get_n_channels(src);
-	has_alpha = gdk_pixbuf_get_has_alpha(src);
-	width = gdk_pixbuf_get_width(src);
-	height = gdk_pixbuf_get_height(src);
-
-	g_return_val_if_fail(gdk_pixbuf_get_colorspace(src) ==
-			     GDK_COLORSPACE_RGB, NULL);
-	g_return_val_if_fail((!has_alpha && n_channels == 3) ||
-			     (has_alpha && n_channels == 4), NULL);
-	g_return_val_if_fail(gdk_pixbuf_get_bits_per_sample(src) == 8, NULL);
-
-	dest = gdk_pixbuf_new(gdk_pixbuf_get_colorspace(src), has_alpha,
-			       gdk_pixbuf_get_bits_per_sample(src),
-			       width, height);
-	
-	dst_row_stride = gdk_pixbuf_get_rowstride(dest);
-	src_row_stride = gdk_pixbuf_get_rowstride(src);
-	target_pixels = gdk_pixbuf_get_pixels(dest);
-	original_pixels = gdk_pixbuf_get_pixels(src);
-
-	r = (color & 0xff0000) >> 16;
-	g = (color & 0xff00) >> 8;
-	b = color & 0xff;
-
-	for (i = 0; i < height; i++)
-	{
-		gint tmp;
-
-		pixdest = target_pixels + i * dst_row_stride;
-		pixsrc = original_pixels + i * src_row_stride;
-		for (j = 0; j < width; j++)
-		{
-			tmp = (*pixsrc++ * alpha + r * (255 - alpha)) / 255;
-			*pixdest++ = (guchar) MIN(255, tmp);
-			tmp = (*pixsrc++ * alpha + g * (255 - alpha)) / 255;
-			*pixdest++ = (guchar) MIN(255, tmp);
-			tmp = (*pixsrc++ * alpha + b * (255 - alpha)) / 255;
-			*pixdest++ = (guchar) MIN(255, tmp);
-			if (has_alpha)
-				*pixdest++ = *pixsrc++;
-		}
-	}
-
-	return dest;
 }
 
 /* Load all the standard pixmaps. Also sets the default window icon. */

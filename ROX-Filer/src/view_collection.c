@@ -329,6 +329,7 @@ static void draw_item(GtkWidget *widget,
 	ViewCollection	*view_collection = (ViewCollection *) user_data;
 	FilerWindow	*filer_window = view_collection->filer_window;
 	GtkStateType	selection_state;
+	GdkColor	*color;
 
 	g_return_if_fail(view != NULL);
 
@@ -336,6 +337,8 @@ static void draw_item(GtkWidget *widget,
 		selection_state = filer_window->selection_state;
 	else
 		selection_state = GTK_STATE_NORMAL;
+
+	color = &widget->style->base[selection_state];
 	
 	fill_template(area, colitem, view_collection, &template);
 		
@@ -350,18 +353,18 @@ static void draw_item(GtkWidget *widget,
 			template.icon.height <= SMALL_HEIGHT)
 	{
 		draw_small_icon(widget->window, &template.icon,
-				item, view->image, selected);
+				item, view->image, selected, color);
 	}
 	else if (template.icon.width <= ICON_WIDTH &&
 			template.icon.height <= ICON_HEIGHT)
 	{
 		draw_large_icon(widget->window, &template.icon,
-				item, view->image, selected);
+				item, view->image, selected, color);
 	}
 	else
 	{
 		draw_huge_icon(widget->window, &template.icon,
-				item, view->image, selected);
+				item, view->image, selected, color);
 	}
 	
 	draw_string(widget, view->layout,

@@ -545,7 +545,7 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 
 	gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
 		      GTK_SHADOW_NONE, &event->area,
-		      widget, "base", 0, 0, -1, -1);
+		      widget, NULL, 0, 0, -1, -1);
 
 	collection = COLLECTION(widget);
 

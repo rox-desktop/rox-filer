@@ -312,11 +312,13 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 	DirItem *item;
 	DisplayStyle size;
 	gboolean selected = (flags & GTK_CELL_RENDERER_SELECTED) != 0;
+	GdkColor *color;
 	
 	g_return_if_fail(view_item != NULL);
 
 	item = view_item->item;
 	size = get_style(cell);
+	color = &widget->style->base[icon->view_details->filer_window->selection_state];
 
 	/* Draw the icon */
 
@@ -331,19 +333,19 @@ static void cell_icon_render(GtkCellRenderer    *cell,
 			area.width = MIN(area.width, SMALL_WIDTH);
 			area.x = cell_area->x + cell_area->width - area.width;
 			draw_small_icon(window, &area, item,
-					view_item->image, selected);
+					view_item->image, selected, color);
 
 			break;
 		}
 		case LARGE_ICONS:
 			draw_large_icon(window, cell_area, item,
-					view_item->image, selected);
+					view_item->image, selected, color);
 			break;
 		case HUGE_ICONS:
 			if (!di_image(item)->huge_pixbuf)
 				pixmap_make_huge(di_image(item));
 			draw_huge_icon(window, cell_area, item,
-					view_item->image, selected);
+					view_item->image, selected, color);
 			break;
 		default:
 			g_warning("Unknown size %d\n", size);

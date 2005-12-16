@@ -2,6 +2,14 @@
 			A RISC OS-like filer for X
 			by Thomas Leonard
 
+16-Dec-2005
+~~~~~~~~~~~
+Highlight icons using the theme's preferred colour instead of always using
+blue (Andras Mohari).
+Bugfix: Don't set style detail to "base" when highlighting items in a
+	Collection, as it confuses GTK's lighthouseblue theme engine
+	(Thomas Leonard).
+
 15-Dec-2005
 ~~~~~~~~~~~
 Bugfix: Changing the display style crashes the filer with GTK >= 2.8.9 because

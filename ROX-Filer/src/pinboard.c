@@ -968,6 +968,7 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 	int		iwidth = image->width;
 	int		iheight = image->height;
 	int		x, y;
+	GdkPixbuf	*pixbuf;
 	
 	if (!parent_class)
 	{
@@ -980,10 +981,18 @@ static gint draw_icon(GtkWidget *widget, GdkEventExpose *event, PinIcon *pi)
 
 	gdk_gc_set_clip_region(pi->widget->style->black_gc, event->region);
 
-	render_pixbuf(icon->selected ? image->pixbuf_lit : image->pixbuf,
+	pixbuf = icon->selected
+		? create_spotlight_pixbuf(image->pixbuf,
+			&pi->widget->style->base[GTK_STATE_SELECTED])
+		: image->pixbuf;
+
+	render_pixbuf(pixbuf,
 			pi->widget->window,
 			pi->widget->style->black_gc,
 			x, y, iwidth, iheight);
+
+	if (icon->selected)
+		g_object_unref(pixbuf);
 
 	if (item->flags & ITEM_FLAG_SYMLINK)
 	{

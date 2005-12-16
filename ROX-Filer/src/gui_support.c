@@ -1500,3 +1500,67 @@ gint current_event_button(void)
 
 	return button;
 }
+
+/* Create a new pixbuf by colourizing 'src' to 'color'. If the function fails,
+ * 'src' will be returned (with an increased reference count, so it is safe to
+ * g_object_unref() the return value whether the function fails or not).
+ */
+GdkPixbuf *create_spotlight_pixbuf(GdkPixbuf *src, GdkColor *color)
+{
+	guchar opacity = 192;
+	guchar alpha = 255 - opacity;
+	GdkPixbuf *dst;
+	GdkColorspace colorspace;
+	int width, height, src_rowstride, dst_rowstride, x, y;
+	int n_channels, bps;
+	int r, g, b;
+	guchar *spixels, *dpixels, *src_pixels, *dst_pixels;
+	gboolean has_alpha;
+
+	has_alpha = gdk_pixbuf_get_has_alpha(src);
+	colorspace = gdk_pixbuf_get_colorspace(src);
+	n_channels = gdk_pixbuf_get_n_channels(src);
+	bps = gdk_pixbuf_get_bits_per_sample(src);
+
+	if ((colorspace != GDK_COLORSPACE_RGB) ||
+	    (!has_alpha && n_channels != 3) ||
+	    (has_alpha && n_channels != 4) ||
+	    (bps != 8))
+		goto error;
+
+	width = gdk_pixbuf_get_width(src);
+	height = gdk_pixbuf_get_height(src);
+
+	dst = gdk_pixbuf_new(colorspace, has_alpha, bps, width, height);
+	if (dst == NULL)
+		goto error;
+
+	src_pixels = gdk_pixbuf_get_pixels(src);
+	dst_pixels = gdk_pixbuf_get_pixels(dst);
+	src_rowstride = gdk_pixbuf_get_rowstride(src);
+	dst_rowstride = gdk_pixbuf_get_rowstride(dst);
+
+	r = opacity * (color->red >> 8);
+	g = opacity * (color->green >> 8);
+	b = opacity * (color->blue >> 8);
+
+	for (y = 0; y < height; y++)
+	{
+		spixels = src_pixels + y * src_rowstride;
+		dpixels = dst_pixels + y * dst_rowstride;
+		for (x = 0; x < width; x++)
+		{
+			*dpixels++ = (*spixels++ * alpha + r) >> 8;
+			*dpixels++ = (*spixels++ * alpha + g) >> 8;
+			*dpixels++ = (*spixels++ * alpha + b) >> 8;
+			if (has_alpha)
+				*dpixels++ = *spixels++;
+		}
+
+	}
+	return dst;
+
+error:
+	g_object_ref(src);
+	return src;
+}

@@ -127,11 +127,13 @@ static void draw_emblem_on_icon(GdkWindow *window, MaskedPixmap *image,
  * given rectangle.
  */
 void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
-		   DirItem  *item, MaskedPixmap *image, gboolean selected)
+		   DirItem  *item, MaskedPixmap *image, gboolean selected,
+		   GdkColor *color)
 {
 	int		width, height;
 	int		image_x;
 	int		image_y;
+	GdkPixbuf	*pixbuf;
 
 	if (!image)
 		return;
@@ -141,15 +143,21 @@ void draw_huge_icon(GdkWindow *window, GdkRectangle *area,
 	image_x = area->x + ((area->width - width) >> 1);
 	image_y = MAX(0, area->height - height - 6);
 
+	pixbuf = selected
+		? create_spotlight_pixbuf(image->huge_pixbuf, color)
+		: image->huge_pixbuf;
+
 	gdk_pixbuf_render_to_drawable_alpha(
-			selected ? image->huge_pixbuf_lit
-				 : image->huge_pixbuf,
+			pixbuf,
 			window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
+
+	if (selected)
+		g_object_unref(pixbuf);
 
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -175,12 +183,14 @@ void draw_large_icon(GdkWindow *window,
 		     GdkRectangle *area,
 		     DirItem  *item,
 		     MaskedPixmap *image,
-		     gboolean selected)
+		     gboolean selected,
+		     GdkColor *color)
 {
 	int	width;
 	int	height;
 	int	image_x;
 	int	image_y;
+	GdkPixbuf *pixbuf;
 
 	if (!image)
 		return;
@@ -190,14 +200,21 @@ void draw_large_icon(GdkWindow *window,
 	image_x = area->x + ((area->width - width) >> 1);
 	image_y = MAX(0, area->height - height - 6);
 
+	pixbuf = selected
+		? create_spotlight_pixbuf(image->pixbuf, color)
+		: image->pixbuf;
+
 	gdk_pixbuf_render_to_drawable_alpha(
-			selected ? image->pixbuf_lit : image->pixbuf,
+			pixbuf,
 			window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
+
+	if (selected)
+		g_object_unref(pixbuf);
 
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
@@ -217,9 +234,11 @@ void draw_large_icon(GdkWindow *window,
 }
 
 void draw_small_icon(GdkWindow *window, GdkRectangle *area,
-		     DirItem  *item, MaskedPixmap *image, gboolean selected)
+		     DirItem  *item, MaskedPixmap *image, gboolean selected,
+		     GdkColor *color)
 {
 	int		width, height, image_x, image_y;
+	GdkPixbuf	*pixbuf;
 	
 	if (!image)
 		return;
@@ -232,14 +251,21 @@ void draw_small_icon(GdkWindow *window, GdkRectangle *area,
 	image_x = area->x + ((area->width - width) >> 1);
 	image_y = MAX(0, SMALL_HEIGHT - image->sm_height);
 		
+	pixbuf = selected
+		? create_spotlight_pixbuf(image->sm_pixbuf, color)
+		: image->sm_pixbuf;
+
 	gdk_pixbuf_render_to_drawable_alpha(
-			selected ? image->sm_pixbuf_lit : image->sm_pixbuf,
+			pixbuf,
 			window,
 			0, 0, 				/* src */
 			image_x, area->y + image_y,	/* dest */
 			width, height,
 			GDK_PIXBUF_ALPHA_FULL, 128,	/* (unused) */
 			GDK_RGB_DITHER_NORMAL, 0, 0);
+
+	if (selected)
+		g_object_unref(pixbuf);
 
 	if (item->flags & ITEM_FLAG_MOUNT_POINT)
 	{
