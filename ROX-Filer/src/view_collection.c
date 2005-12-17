@@ -338,7 +338,7 @@ static void draw_item(GtkWidget *widget,
 	else
 		selection_state = GTK_STATE_NORMAL;
 
-	color = &widget->style->base[selection_state];
+	color = &widget->style->bg[selection_state];
 	
 	fill_template(area, colitem, view_collection, &template);
 		

@@ -543,9 +543,13 @@ static gint collection_expose(GtkWidget *widget, GdkEventExpose *event)
 	g_return_val_if_fail(IS_COLLECTION(widget), FALSE);
 	g_return_val_if_fail(event != NULL, FALSE);
 
+	/* Note about 'detail' argument:
+	 * - If set to "base", lighthouse theme will crash
+	 * - If set to NULL, cleanice theme will crash
+	 */
 	gtk_paint_flat_box(widget->style, widget->window, GTK_STATE_NORMAL, 
 		      GTK_SHADOW_NONE, &event->area,
-		      widget, NULL, 0, 0, -1, -1);
+		      widget, "collection", 0, 0, -1, -1);
 
 	collection = COLLECTION(widget);
 
