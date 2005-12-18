@@ -60,6 +60,7 @@
 #include "dropbox.h"
 #include "xdgmime.h"
 #include "xtypes.h"
+#include "run.h"
 
 #define TYPE_NS "http://www.freedesktop.org/standards/shared-mime-info"
 enum {SET_MEDIA, SET_TYPE};
@@ -309,7 +310,7 @@ MIME_type *type_from_path(const char *path)
 /* Returns the file/dir in Choices for handling this type.
  * NULL if there isn't one. g_free() the result.
  */
-static char *handler_for(MIME_type *type)
+char *handler_for(MIME_type *type)
 {
 	char	*type_name;
 	char	*open;
@@ -331,66 +332,6 @@ MIME_type *mime_type_lookup(const char *type)
 }
 
 /*			Actions for types 			*/
-
-gboolean type_open(const char *path, MIME_type *type)
-{
-	gchar *argv[] = {NULL, NULL, NULL};
-	char		*open;
-	gboolean	retval;
-	struct stat	info;
-
-	argv[1] = (char *) path;
-
-	open = handler_for(type);
-	if (!open)
-		return FALSE;
-
-	if (stat(open, &info))
-	{
-		report_error("stat(%s): %s", open, g_strerror(errno));
-		g_free(open);
-		return FALSE;
-	}
-
-	if (info.st_mode & S_IWOTH)
-	{
-		gchar *choices_dir;
-		GList *paths;
-
-		report_error(_("Executable '%s' is world-writeable! Refusing "
-			"to run. Please change the permissions now (this "
-			"problem may have been caused by a bug in earlier "
-			"versions of the filer).\n\n"
-			"Having (non-symlink) run actions world-writeable "
-			"means that other people who use your computer can "
-			"replace your run actions with malicious versions.\n\n"
-			"If you trust everyone who could write to these files "
-			"then you needn't worry. Otherwise, you should check, "
-			"or even just delete, all the existing run actions."),
-			open);
-		choices_dir = g_path_get_dirname(open);
-		paths = g_list_append(NULL, choices_dir);
-		action_chmod(paths, TRUE, _("go-w (Fix security problem)"));
-		g_free(choices_dir);
-		g_list_free(paths);
-		g_free(open);
-		return TRUE;
-	}
-
-	if (S_ISDIR(info.st_mode))
-		argv[0] = g_strconcat(open, "/AppRun", NULL);
-	else
-		argv[0] = open;
-
-	retval = rox_spawn(home_dir, (const gchar **) argv) != 0;
-
-	if (argv[0] != open)
-		g_free(argv[0]);
-
-	g_free(open);
-	
-	return retval;
-}
 
 /* Return the image for this type, loading it if needed.
  * Places to check are: (eg type="text_plain", base="text")

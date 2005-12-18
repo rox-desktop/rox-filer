@@ -42,7 +42,6 @@ const char *basetype_name(DirItem *item);
 MIME_type *type_get_type(const guchar *path);
 
 MIME_type *type_from_path(const char *path);
-gboolean type_open(const char *path, MIME_type *type);
 MaskedPixmap *type_to_icon(MIME_type *type);
 GdkAtom type_to_atom(MIME_type *type);
 MIME_type *mime_type_from_base_type(int base_type);
@@ -55,6 +54,7 @@ void reread_mime_files(void);
 extern const char *mime_type_comment(MIME_type *type);
 extern MIME_type *mime_type_lookup(const char *type);
 extern GList *mime_type_name_list(void);
+char *handler_for(MIME_type *type);
 
 #define EXECUTABLE_FILE(item) ((item)->mime_type && (item)->mime_type->executable && \
 				((item)->flags & ITEM_FLAG_EXEC_FILE))

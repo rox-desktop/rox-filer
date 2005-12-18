@@ -52,6 +52,7 @@ static void open_mountpoint(const guchar *full_path, DirItem *item,
 			    gboolean edit);
 static gboolean run_desktop(const char *full_path,
 			    const char **args, const char *dir);
+static gboolean type_open(const char *path, MIME_type *type);
 
 typedef struct _PipedData PipedData;
 
@@ -638,3 +639,73 @@ err:
 
 	return success;
 }
+
+/* Returns FALSE is no run action is set for this type. */
+static gboolean type_open(const char *path, MIME_type *type)
+{
+	gchar *argv[] = {NULL, NULL, NULL};
+	char		*open;
+	struct stat	info;
+
+	argv[1] = (char *) path;
+
+	open = handler_for(type);
+	if (!open)
+		return FALSE;
+
+	if (stat(open, &info))
+	{
+		report_error("stat(%s): %s", open, g_strerror(errno));
+		g_free(open);
+		return TRUE;
+	}
+
+	if (info.st_mode & S_IWOTH)
+	{
+		gchar *choices_dir;
+		GList *paths;
+
+		report_error(_("Executable '%s' is world-writeable! Refusing "
+			"to run. Please change the permissions now (this "
+			"problem may have been caused by a bug in earlier "
+			"versions of the filer).\n\n"
+			"Having (non-symlink) run actions world-writeable "
+			"means that other people who use your computer can "
+			"replace your run actions with malicious versions.\n\n"
+			"If you trust everyone who could write to these files "
+			"then you needn't worry. Otherwise, you should check, "
+			"or even just delete, all the existing run actions."),
+			open);
+		choices_dir = g_path_get_dirname(open);
+		paths = g_list_append(NULL, choices_dir);
+		action_chmod(paths, TRUE, _("go-w (Fix security problem)"));
+		g_free(choices_dir);
+		g_list_free(paths);
+		g_free(open);
+		return TRUE;
+	}
+
+	if (S_ISDIR(info.st_mode))
+	{
+		argv[0] = g_strconcat(open, "/AppRun", NULL);
+		rox_spawn(home_dir, (const gchar **) argv) != 0;
+	}
+	else if (type_get_type(open) == application_x_desktop)
+	{
+		argv[0] = open;
+		run_desktop(open, (const char **) (argv + 1), home_dir);
+	}
+	else
+	{
+		argv[0] = open;
+		rox_spawn(home_dir, (const gchar **) argv) != 0;
+	}
+
+	if (argv[0] != open)
+		g_free(argv[0]);
+
+	g_free(open);
+	
+	return TRUE;
+}
+
