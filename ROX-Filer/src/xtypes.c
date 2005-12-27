@@ -65,6 +65,12 @@ void xattr_init(void)
 	
 	libc = dlopen("libc.so.6", RTLD_LAZY | RTLD_NOLOAD);
 	if (!libc)
+	{
+		/* Try a different name for uClib support */
+		libc = dlopen("libc.so", RTLD_LAZY | RTLD_NOLOAD);
+	}
+
+	if (!libc)
 		return;	/* Give up on xattr support */
 
 	dyn_setxattr = (void *) dlsym(libc, "setxattr");
