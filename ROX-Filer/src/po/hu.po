@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-22 22:12+0100\n"
-"PO-Revision-Date: 2005-12-22 22:37+0100\n"
+"POT-Creation-Date: 2005-12-28 09:00+0100\n"
+"PO-Revision-Date: 2005-12-28 09:34+0100\n"
 "Last-Translator: Andras Mohari <mayday@mailpont.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -775,7 +775,7 @@ msgstr "Elõbb jelöld ki a törlendõ sorokat"
 msgid "Put the cursor on an entry in the list to move it"
 msgstr "Jelöld ki a lista mozgatandó bejegyzését"
 
-# Ezt írja az elsõ elem elõbbre mozgatásakor is!
+# XXX: Ezt írja az elsõ elem elõbbre mozgatásakor is!
 #: bookmarks.c:562
 msgid "This item is already at the end"
 msgstr "Ez a bejegyzés már szélsõ pozícióban van"
@@ -3645,7 +3645,7 @@ msgstr "Teljes típus mutatása"
 
 #: tips:97
 msgid "If this is on then the full description of each object's type will be show rather than a short summary of its basic type."
-msgstr "Engedélyezésekor listanézetben a fájltípusok teljes leírása látható, és nem az alaptípus rövid neve."
+msgstr "Engedélyezésekor listanézetben a fájltípusok teljes leírása látható, nem pedig az alaptípus rövid neve."
 
 #: tips:98
 msgid "Tools/Minibuffer"
@@ -3746,7 +3746,7 @@ msgstr "Pinboard"
 
 #: tips:124
 msgid "When using a pinboard, you can drag files and applications onto the desktop background to create shortcuts to them."
-msgstr "A pinboard használatakor fájlokra és alkalmazásokra mutató ikonokat helyezhetsz a munkaasztal hátterére."
+msgstr "A pinboard használatakor fájlokra és alkalmazásokra mutató ikonokat helyezhetsz az asztalra."
 
 #: tips:125
 #: tips:242
@@ -3852,7 +3852,7 @@ msgstr "Ikonizált ablakok mutatása"
 
 #: tips:152
 msgid "If this option is on, the filer will show each iconified window as a small button on the pinboard. Requires a compatible window manager, and the pinboard must be in use."
-msgstr "Ha ez engedélyezve van, akkor a pinboardon kis gombokként megjelennek az ikonizált ablakok. Ehhez megfelelõ ablakkezelõ szükséges, és be kell kapcsolni a pinboardot."
+msgstr "Engedélyezésekor a pinboardon kis gombokként megjelennek az ikonizált ablakok. Ehhez megfelelõ ablakkezelõ szükséges, és be kell kapcsolni a pinboardot."
 
 #: tips:153
 msgid "Show per workspace"
@@ -3896,7 +3896,7 @@ msgstr "függõlegesen"
 
 #: tips:163
 msgid "Sometimes the filer doesn't know about your desktop furniture and puts iconified windows under (for example) the Gnome panel. You can define a top or bottom margin to avoid placing the icons there. The filer already knows about its own panel."
-msgstr "A fájlkezelõ néha nem ismeri a munkaasztalod elrendezését, és ezért az ikonizált ablakokat (például) a Gnome panel alá teszi. Itt megadhatod azt a felsõ és alsó margót, ahová nem tesz ikonokat. A saját paneljeinek helyét már ismeri."
+msgstr "A fájlkezelõ néha nem ismeri fel az asztalod elrendezését, ezért az ikonizált ablakokat (például) a Gnome panel alá teszi. Itt megadhatod azt a felsõ és alsó margót, ahová nem tesz ikonokat. A saját paneljeinek helyét már ismeri."
 
 #: tips:164
 msgid "Top margin"
@@ -3968,7 +3968,7 @@ msgstr "Ne takarja el a panelt"
 
 #: tips:181
 msgid "Ask the window manager not to cover panels at all when you maximise windows. Some window managers may not honour this. If unset, the filer asks for just a couple of pixels at the edge of the screen to remain uncovered, so that auto-raising works."
-msgstr "Ezzel lehát rávenni az ablakkezelõt, hogy a maximalizált ablakok egyáltalán ne takarják el a paneleket. Néhány ablakkezelõ ezt figyelmen kívül hagyhatja. Ha nincs beállítva, akkor a fájlkezelõ csak egy néhány képpontnyi margót kér a képernyõ szélén, hogy a panelek szükség esetén az elõtérbe ugorhassanak."
+msgstr "Ezzel lehát rávenni az ablakkezelõt, hogy a maximalizált ablakok egyáltalán ne takarják el a paneleket. Néhány ablakkezelõ ezt figyelmen kívül hagyhatja. Ha nincs beállítva, akkor a fájlkezelõ csak egy néhány képpontnyi margót kér a képernyõ szélén, hogy a paneleket az elõtérbe lehessen hozni."
 
 #: tips:182
 msgid "Xinerama"
@@ -3988,7 +3988,7 @@ msgstr "Xinerama használatakor ezen a monitoron legyenek a panelek. (A számozás 
 
 #: tips:186
 msgid "Desktop"
-msgstr "Munkaasztal"
+msgstr "Asztal"
 
 #: tips:187
 msgid "When run by a session manager program (such as ROX-Session) the filer can open up a panel and/or the pinboard.  Here you configure which."
@@ -3996,7 +3996,7 @@ msgstr "Amikor egy munkamenet-kezelõ program (például a ROX-Session) indítja el 
 
 #: tips:188
 msgid "Panel only"
-msgstr "Csak panel"
+msgstr "Csak a panel"
 
 #: tips:189
 msgid "Only a panel is shown."
@@ -4032,7 +4032,7 @@ msgstr "Add meg a megjelenítendõ pinboard nevét."
 
 #: tips:198
 msgid "Changes here take effect the next time the filer is run."
-msgstr "Az itteni változtatások a fájlkezelõ következõ indításakor lépnek életbe."
+msgstr "Ezek a változtatások a fájlkezelõ következõ indításakor lépnek életbe."
 
 #: tips:199
 msgid "The session manager activates these options by using the -S or --rox-session argument to rox."
@@ -4156,7 +4156,6 @@ msgstr "Fájlok középsõ egérgombbal húzása"
 msgid "Move the files"
 msgstr "Mozgatja a fájlokat"
 
-# XXX
 #: tips:238
 msgid "Note that you can still get the menu to appear, by dragging with the left button and holding down the Alt key."
 msgstr "A menüt még így is meg lehet jeleníteni, ha nyomva tartod az Alt billentyût miközben a bal gombbal húzod a fájlokat."
@@ -4331,7 +4330,7 @@ msgstr "Háttérre kattintások átadása az ablakkezelõnek"
 
 #: tips:285
 msgid "Normally, right clicking on the desktop background will open the pinboard menu and left clicking will clear the selection. Turn this on to forward the events to your window manager instead. Clicks on icons will not be forwarded."
-msgstr "Alapesetben a munkaasztal hátterére jobb gombbal kattintva megnyílik a pinboard menüje, a bal gomb pedig törli a kijelölést. Ha ez a beállítás engedélyezve van, akkor a kattintásokat az ablakkezelõ kapja meg. Az ikonokra kattintás kivétel ez alól."
+msgstr "Alapesetben az asztalon jobb gombra megnyílik a pinboard menüje, bal gombra pedig törlõdik a kijelölés. Ha ez a beállítás engedélyezve van, akkor a kattintásokat az ablakkezelõ kapja meg. Az ikonokra kattintás kivétel ez alól."
 
 #: tips:286
 msgid "Blackbox root menus hack"
