@@ -684,6 +684,16 @@ static MaskedPixmap *image_from_desktop_file(const char *path)
 	{
 		GdkPixbuf *pixbuf;
 		int tmp_fd;
+		char *extension;
+
+		/* For some unknown reason, some icon names have extensions.
+		 * Remove them.
+		 */
+		extension = strrchr(icon, '.');
+		if (extension && strcmp(extension, ".png") == 0)
+		{
+			*extension = '\0';
+		}
 
 		/* SVG reader is very noisy, so redirect stderr to stdout */
 		tmp_fd = dup(2);
