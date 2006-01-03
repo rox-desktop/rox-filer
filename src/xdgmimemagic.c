@@ -660,14 +660,17 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
   XdgMimeMagicMatch *match;
   const char *mime_type;
   int n;
+  int priority;
 
   mime_type = NULL;
+  priority = 0;
   for (match = mime_magic->match_list; match; match = match->next)
     {
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
 	{
-	  if ((mime_type == NULL) || (xdg_mime_mime_type_subclass (match->mime_type, mime_type))) {
+	  if ((mime_type == NULL) || (xdg_mime_mime_type_subclass (match->mime_type, mime_type)) || match->priority > priority) {
 	    mime_type = match->mime_type;
+	    priority = match->priority;
 	  }
 	}
       else 
