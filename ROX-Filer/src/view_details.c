@@ -1016,11 +1016,13 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_column_set_sort_column_id(column, COL_TYPE);
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	ADD_TEXT_COLUMN(_("_Permissions"), COL_PERM);
+	g_object_set(G_OBJECT(cell), "font", "monospace", NULL);
 	ADD_TEXT_COLUMN(_("_Owner"), COL_OWNER);
 	gtk_tree_view_column_set_sort_column_id(column, COL_OWNER);
 	ADD_TEXT_COLUMN(_("_Group"), COL_GROUP);
 	gtk_tree_view_column_set_sort_column_id(column, COL_GROUP);
 	ADD_TEXT_COLUMN(_("_Size"), COL_SIZE);
+	g_object_set(G_OBJECT(cell), "xalign", 1.0, "font", "monospace", NULL);
 	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
 	ADD_TEXT_COLUMN(_("Last _Modified"), COL_MTIME);
 	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
