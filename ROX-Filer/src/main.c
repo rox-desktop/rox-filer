@@ -133,7 +133,7 @@ GtkTooltips *tooltips = NULL;
        "  -u, --user		show user name in each window \n"	\
        "  -v, --version		display the version information and exit\n"   \
        "  -x, --examine=FILE	FILE has changed - re-examine it\n"	\
-       "\nReport bugs to " BUGS_TO ".\n"		\
+       "\nReport bugs to %s.\n"		\
        "Home page (including updated versions): http://rox.sourceforge.net/\n")
 
 #define SHORT_OPS "c:d:t:b:l:r:B:op:s:hvnux:m:D:RS"
@@ -400,7 +400,7 @@ int main(int argc, char **argv)
 				show_features();
 				return EXIT_SUCCESS;
 			case 'h':
-				g_print("%s", _(HELP));
+			        g_print(_(HELP), BUGS_TO);
 				g_print("%s", _(SHORT_ONLY_WARNING));
 				return EXIT_SUCCESS;
 			case 'D':
