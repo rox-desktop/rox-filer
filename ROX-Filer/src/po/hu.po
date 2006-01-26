@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: ROX-Filer 2.4\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-12-28 09:00+0100\n"
-"PO-Revision-Date: 2005-12-28 09:34+0100\n"
+"POT-Creation-Date: 2006-01-26 12:40+0100\n"
+"PO-Revision-Date: 2006-01-26 12:57+0100\n"
 "Last-Translator: Andras Mohari <mayday@mailpont.hu>\n"
 "Language-Team: Hungarian\n"
 "MIME-Version: 1.0\n"
@@ -1903,6 +1903,7 @@ msgstr ""
 "\n"
 
 #: main.c:115
+#, c-format
 msgid ""
 "Usage: ROX-Filer/AppRun [OPTION]... [FILE]...\n"
 "Open each directory or file listed, or the current working\n"
@@ -1927,40 +1928,35 @@ msgid ""
 "  -v, --version\t\tdisplay the version information and exit\n"
 "  -x, --examine=FILE\tFILE has changed - re-examine it\n"
 "\n"
-"Report bugs to "
-msgstr ""
-"Használat: ROX-Filer/AppRun [OPCIÓ]... [FÁJL]...\n"
-"Megnyitja a felsorolt könyvtárakat vagy fájlokat, argumentumok\n"
-"hiányában pedig az aktuális könyvtárat.\n"
-"\n"
-"  -b, --border=PANEL\toldalpanelként jelenítim meg a PANEL-t\n"
-"  -B, --bottom=PANEL\tmegjeleníti a PANEL-t a képernyõ alján\n"
-"  -c, --client-id=ID\tmunkamenet-kezelésnél használatos\n"
-"  -d, --dir=KÖNYVTÁR\tmegnyitja a KÖNYVTÁR-at\n"
-"  -D, --close=KÖNYVTÁR\tbezárja a KÖNYVTÁR-at és alkönyvtárait\n"
-"  -h, --help\t\tkiírja ezt a szöveget, majd kilép\n"
-"  -l, --left=PANEL\tmegjeleníti a PANEL-t a képernyõ bal oldalán\n"
-"  -m, --mime-type=FÁJL\tkiírja a FÁJL MIME-típusát, majd kilép\n"
-"  -n, --new\t\túj példányt indít (a fájlkezelõ nyomkövetésére)\n"
-"  -p, --pinboard=PIN\tengedélyezi a PIN nevû pinboard használatát\n"
-"  -r, --right=PANEL\tmegjeleníti a PANEL-t a képernyõ jobb oldalán\n"
-"  -R, --RPC\t\tvégrehajtja a stdin-rõl olvasott metódushívást\n"
-"  -s, --show=FÁJL\tmegmutatja a FÁJL-t a könyvtárában\n"
-"  -S, --rox-session\ta panel és pinboard alapbeállítások, illetve a -n használata\n"
-"  -t, --top=PANEL\tmegjeleníti a PANEL-t a képernyõ tetején\n"
-"  -u, --user\t\tminden ablakban kijelzi a felhasználónevet\n"
-"  -v, --version\t\tkiírja a program verzióját, majd kilép\n"
-"  -x, --examine=FÁJL\ta FÁJL megváltozott - frissíti a fájlinformációt\n"
-"\n"
-"A hibákat a következõ címen jelentsd: "
-
-#: main.c:136
-msgid ""
-".\n"
+"Report bugs to %s.\n"
 "Home page (including updated versions): http://rox.sourceforge.net/\n"
 msgstr ""
-".\n"
-"Honlap (frissített verziókkal): http://rox.sourceforge.net/\n"
+"Használat: ROX-Filer/AppRun [OPCIÓ]... [FÁJL]...\n"
+"Megnyitja a felsorolt könyvtárakat vagy fájlokat,\n"
+"argumentumok hiányában pedig az aktuális könyvtárat.\n"
+"\n"
+"  -b, --border=PANEL\toldalpanelként jeleníti meg a panelt\n"
+"  -B, --bottom=PANEL\tmegjeleníti a panelt a képernyõ alján\n"
+"  -c, --client-id=ID\tmunkamenet-kezelésnél használatos\n"
+"  -d, --dir=KÖNYVTÁR\tmegnyitja a könyvtárat\n"
+"  -D, --close=KÖNYVTÁR\tbezárja a könyvtárat és alkönyvtárait\n"
+"  -h, --help\t\tkiírja ezt a szöveget, majd kilép\n"
+"  -l, --left=PANEL\tmegjeleníti a panelt a képernyõ bal oldalán\n"
+"  -m, --mime-type=FÁJL\tkiírja a fájl MIME-típusát, majd kilép\n"
+"  -n, --new\t\túj példányt indít (a fájlkezelõ nyomkövetésére)\n"
+"  -p, --pinboard=PIN\ta PIN nevû pinboardot használja asztalként\n"
+"  -r, --right=PANEL\tmegjeleníti a panelt a képernyõ jobb oldalán\n"
+"  -R, --RPC\t\tvégrehajtja a stdin-rõl olvasott metódushívást\n"
+"  -s, --show=FÁJL\tmegmutatja a fájlt a könyvtárában\n"
+"  -S, --rox-session\ta panel és pinboard alapbeállításokat,\n"
+"                   \tilletve az -n opciót használja\n"
+"  -t, --top=PANEL\tmegjeleníti a panelt a képernyõ tetején\n"
+"  -u, --user\t\tminden ablakban kijelzi a felhasználónevet\n"
+"  -v, --version\t\tkiírja a program verzióját, majd kilép\n"
+"  -x, --examine=FÁJL\ta fájl megváltozott -- frissíti a fájlinformációt\n"
+"\n"
+"A hibákat ezen a címen jelentsd: %s.\n"
+"Honlap (újabb verziókkal): http://rox.sourceforge.net/\n"
 
 #: main.c:234
 msgid ""
@@ -2771,7 +2767,7 @@ msgstr ""
 "%s\n"
 "Háttér eltávolítva."
 
-#: pixmaps.c:954
+#: pixmaps.c:964
 #, c-format
 msgid ""
 "Can't delete thumbnails in %s:\n"
@@ -2780,11 +2776,11 @@ msgstr ""
 "Nem tudom törölni a bélyegképeket a könyvtárból (%s):\n"
 "%s"
 
-#: pixmaps.c:975
+#: pixmaps.c:985
 msgid "There are no thumbnails to delete"
 msgstr "Nincsenek törlendõ bélyegképek"
 
-#: pixmaps.c:988
+#: pixmaps.c:998
 msgid "Purge thumbnails disk cache"
 msgstr "Bélyegképek gyorstárának kiürítése"
 
@@ -3290,19 +3286,19 @@ msgstr "_Típus"
 msgid "_Permissions"
 msgstr "_Jogok"
 
-#: view_details.c:1019
+#: view_details.c:1020
 msgid "_Owner"
 msgstr "Tu_lajdonos"
 
-#: view_details.c:1021
+#: view_details.c:1022
 msgid "_Group"
 msgstr "_Csoport"
 
-#: view_details.c:1023
+#: view_details.c:1024
 msgid "_Size"
 msgstr "_Méret"
 
-#: view_details.c:1025
+#: view_details.c:1027
 msgid "Last _Modified"
 msgstr "_Utolsó módosítás"
 
@@ -4374,6 +4370,12 @@ msgstr "Ne használjon kiterjesztett attribútumokat"
 msgid "This disables the use of extended attributes available in newer operating systems and file systems.  With this option set the 'Set Type' menu entry is disabled, the MIME type of the file is only derived from the file name and the properties window does not report extended attributes."
 msgstr "Letiltja az újabb operációs rendszerek és fájlrendszerek által támogatott kiterjesztett attribútumok használatát. Engedélyezésekor nem érhetõ el a \"Típus beállítása\" menüpont, a fájlok MIME-típusát csak a nevük határozza meg, a tulajdonságok ablakban pedig nem láthatók a kiterjesztett attribútumok."
 
+#~ msgid ""
+#~ ".\n"
+#~ "Home page (including updated versions): http://rox.sourceforge.net/\n"
+#~ msgstr ""
+#~ ".\n"
+#~ "Honlap (frissített verziókkal): http://rox.sourceforge.net/\n"
 #~ msgid "Open AVFS"
 #~ msgstr "AVFS megnyitása"
 
