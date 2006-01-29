@@ -447,6 +447,14 @@ gboolean get_pointer_xy(int *x, int *y)
 	return mask != 0;
 }
 
+int get_monitor_under_pointer(void)
+{
+	int x, y;
+
+	get_pointer_xy(&x, &y);
+	return gdk_screen_get_monitor_at_point(gdk_screen_get_default(), x, y);
+}
+
 #define DECOR_BORDER 32
 
 /* Centre the window at these coords */

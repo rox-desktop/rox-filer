@@ -150,7 +150,7 @@ static Option o_label_font, o_pinboard_shadow_colour;
 static Option o_pinboard_shadow_labels;
 static Option o_blackbox_hack;
 
-static Option o_top_margin, o_bottom_margin;
+static Option o_top_margin, o_bottom_margin, o_left_margin, o_right_margin;
 static Option o_pinboard_image_scaling;
 
 /* Static prototypes */
@@ -262,6 +262,8 @@ void pinboard_init(void)
 
 	option_add_int(&o_top_margin, "pinboard_top_margin", 0);
 	option_add_int(&o_bottom_margin, "pinboard_bottom_margin", 0);
+	option_add_int(&o_left_margin, "pinboard_left_margin", 0);
+	option_add_int(&o_right_margin, "pinboard_right_margin", 0);
 
 	option_add_int(&o_pinboard_image_scaling, "pinboard_image_scaling", 0);
 
@@ -2476,15 +2478,24 @@ static void reload_backdrop(Pinboard *pinboard,
 
 #define SEARCH_STEP 32
 
+/* Search the area (omin, imin) to (omax, imax) for a free region the size of
+ * 'rect' that doesn't overlap 'used'.  Which of inner and outer is the
+ * vertical axis depends on the configuration.
+ *
+ * id and od give the direction of the search (step size).
+ *
+ * Returns the start of the found region in inner/outer, or -1 if there is no
+ * free space.
+ */
 static void search_free(GdkRectangle *rect, GdkRegion *used,
-			int *outer, int od, int omax,
-			int *inner, int id, int imax)
+			int *outer, int od, int omin, int omax,
+			int *inner, int id, int imin, int imax)
 {
-	*outer = od > 0 ? 0 : omax;
-	while (*outer >= 0 && *outer <= omax)
+	*outer = od > 0 ? omin : omax;
+	while (*outer >= omin && *outer <= omax)
 	{
-		*inner = id > 0 ? 0 : imax;
-		while (*inner >= 0 && *inner <= imax)
+		*inner = id > 0 ? imin : imax;
+		while (*inner >= imin && *inner <= imax)
 		{
 			if (gdk_region_rect_in(used, rect) ==
 					GDK_OVERLAP_RECTANGLE_OUT)
@@ -2497,6 +2508,37 @@ static void search_free(GdkRectangle *rect, GdkRegion *used,
 
 	rect->x = -1;
 	rect->y = -1;
+}
+
+/* Search the width x height area from (x0, y0) for a free region of size
+ * 'rect'. direction indicates whether to search rows or columns. dx, dy gives
+ * the direction of the search.
+ */
+static void search_free_area(GdkRectangle *rect, GdkRegion *used,
+		int direction, int dx, int dy, int x0, int y0, int width, int height)
+{
+	if (direction == DIR_VERT)
+	{
+		search_free(rect, used,
+			    &rect->x, dx, x0, width,
+			    &rect->y, dy, y0, height);
+	}
+	else
+	{
+		search_free(rect, used,
+			    &rect->y, dy, x0, height,
+			    &rect->x, dx, y0, width);
+	}
+}
+
+static gboolean search_free_xinerama(GdkRectangle *rect, GdkRegion *used,
+		int direction, int dx, int dy, int rwidth, int rheight)
+{
+	GdkRectangle *geom = &monitor_geom[get_monitor_under_pointer()];
+
+	search_free_area(rect, used, direction, dx, dy,
+			geom->x, geom->y, geom->width - rwidth, geom->height - rheight);
+	return rect->x != -1;
 }
 
 /* Finds a free area on the pinboard large enough for the width and height
@@ -2538,6 +2580,24 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
 		gdk_region_union_with_rect(used, &used_rect);
 	}
 
+	if (o_left_margin.int_value > 0)
+	{
+		used_rect.x = 0;
+		used_rect.y = 0;
+		used_rect.width = o_left_margin.int_value;
+		used_rect.height = gdk_screen_height();
+		gdk_region_union_with_rect(used, &used_rect);
+	}
+
+	if (o_right_margin.int_value > 0)
+	{
+		used_rect.x = gdk_screen_width() - o_right_margin.int_value; 
+		used_rect.y = 0;
+		used_rect.width = o_right_margin.int_value;
+		used_rect.height = gdk_screen_height();
+		gdk_region_union_with_rect(used, &used_rect);
+	}
+
 	/* Subtract the used areas... */
 
 	next = GTK_FIXED(pinboard->fixed)->children;
@@ -2568,7 +2628,6 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
 	 * it works). If you know a better (fast!) algorithm, let me know!
 	 */
 
-
 	if (o_iconify_start.int_value == CORNER_TOP_RIGHT ||
 	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
 		dx = -SEARCH_STEP;
@@ -2577,17 +2636,13 @@ static void find_free_rect(Pinboard *pinboard, GdkRectangle *rect,
 	    o_iconify_start.int_value == CORNER_BOTTOM_RIGHT)
 		dy = -SEARCH_STEP;
 
-	if (o_iconify_dir.int_value == DIR_VERT)
+	/* If pinboard covers more than one monitor, try to find free space on
+	 * monitor under pointer first, then whole screen if that fails */
+	if (n_monitors == 1 || !search_free_xinerama(rect, used,
+			o_iconify_dir.int_value, dx, dy, rect->width, rect->height))
 	{
-		search_free(rect, used,
-			    &rect->x, dx, screen_width - rect->width,
-			    &rect->y, dy, screen_height - rect->height);
-	}
-	else
-	{
-		search_free(rect, used,
-			    &rect->y, dy, screen_height - rect->height,
-			    &rect->x, dx, screen_width - rect->width);
+		search_free_area(rect, used, o_iconify_dir.int_value, dx, dy,
+			0, 0, screen_width - rect->width, screen_height - rect->height);
 	}
 	
 	gdk_region_destroy(used);

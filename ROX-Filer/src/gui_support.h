@@ -50,6 +50,7 @@ gboolean load_file(const char *pathname, char **data_out, long *length_out);
 GtkWidget *new_help_button(HelpFunc show_help, gpointer data);
 void parse_file(const char *path, ParseFunc *parse_line);
 gboolean get_pointer_xy(int *x, int *y);
+int get_monitor_under_pointer(void);
 void centre_window(GdkWindow *window, int x, int y);
 void wink_widget(GtkWidget *widget);
 void destroy_on_idle(GtkWidget *widget);
