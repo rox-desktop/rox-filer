@@ -927,6 +927,25 @@ static void view_details_class_init(gpointer gclass, gpointer data)
 	widget->expose_event = view_details_expose;
 	widget->size_request = view_details_size_request;
 	widget->drag_data_received = view_details_drag_data_received;
+
+	/*
+	 * Add the ViewDetails::mono-font style property.
+	 * To use this add something like
+	 *
+	 * style "details" {
+	 *   ViewDetails::mono-font = "Courier 8"
+	 * }
+	 * class "ViewDetails" style "details"
+	 *
+	 * to your ~/.gtkrc-2.0
+	 */
+	gtk_widget_class_install_style_property(widget,
+		       g_param_spec_string("mono-font",
+					   _("Mono font"),
+					   _("Font for displaying mono-spaced text"),
+					   "monospace",
+					   G_PARAM_READABLE));
+								    
 }
 
 static gboolean block_focus(GtkWidget *button, GtkDirectionType dir,
@@ -956,6 +975,21 @@ static void selection_changed(GtkTreeSelection *selection,
 
 	filer_selection_changed(view_details->filer_window,
 			gtk_get_current_event_time());
+}
+
+/*
+ * Set the font used for a treeview column to that given for the
+ * "mono-font" style property of a widget.  This has to be done _after_ the
+ * widget has been realized, because that is when the style information is
+ * set up.  This is done by connecting this function to run after the
+ * "realize" signal.
+ */
+static void set_column_mono_font(GtkWidget *widget, GObject *object)
+{
+	const gchar *font_name;
+
+	gtk_widget_style_get(widget, "mono-font", &font_name, NULL);
+	g_object_set(object, "font", font_name, NULL);
 }
 
 #define ADD_TEXT_COLUMN(name, model_column) \
@@ -1017,12 +1051,18 @@ static void view_details_init(GTypeInstance *object, gpointer gclass)
 	gtk_tree_view_column_set_resizable(column, TRUE);
 	ADD_TEXT_COLUMN(_("_Permissions"), COL_PERM);
 	g_object_set(G_OBJECT(cell), "font", "monospace", NULL);
+	g_signal_connect_after(object, "realize",
+			       G_CALLBACK(set_column_mono_font),
+			       G_OBJECT(cell));
 	ADD_TEXT_COLUMN(_("_Owner"), COL_OWNER);
 	gtk_tree_view_column_set_sort_column_id(column, COL_OWNER);
 	ADD_TEXT_COLUMN(_("_Group"), COL_GROUP);
 	gtk_tree_view_column_set_sort_column_id(column, COL_GROUP);
 	ADD_TEXT_COLUMN(_("_Size"), COL_SIZE);
 	g_object_set(G_OBJECT(cell), "xalign", 1.0, "font", "monospace", NULL);
+	g_signal_connect_after(object, "realize",
+			       G_CALLBACK(set_column_mono_font),
+			       G_OBJECT(cell));
 	gtk_tree_view_column_set_sort_column_id(column, COL_SIZE);
 	ADD_TEXT_COLUMN(_("Last _Modified"), COL_MTIME);
 	gtk_tree_view_column_set_sort_column_id(column, COL_MTIME);
