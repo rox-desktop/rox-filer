@@ -1,3 +1,10 @@
+2006-02-19  Christian Neumair  <chris@gnome-de.org>
+
+	* src/xdgmimemagic.c: (_xdg_mime_magic_lookup_data): When two
+	unrelated MIME types with equal priorities match, don't assume one of
+	them matches.
+	http://bugzilla.gnome.org/show_bug.cgi?id=331719
+
 2006-01-03  Christian Neumair  <chris@gnome-de.org>
 
 	* src/xdgmimemagic.c: (_xdg_mime_magic_lookup_data): Also consider

@@ -671,6 +671,10 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
 	  if ((mime_type == NULL) || (xdg_mime_mime_type_subclass (match->mime_type, mime_type)) || match->priority > priority) {
 	    mime_type = match->mime_type;
 	    priority = match->priority;
+	  } else if (match->priority == priority) {
+	    /* multiple unrelated patterns with the same priority matched,
+	     * so we can't tell what type this is. */
+	    mime_type = NULL;
 	  }
 	}
       else 
