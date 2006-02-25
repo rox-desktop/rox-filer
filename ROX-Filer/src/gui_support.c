@@ -1433,10 +1433,11 @@ void launch_uri(const char *uri)
 			argv[0] = uri_0launch;
 		else
 		{
-			delayed_error(_("This program cannot be run, as the "
-				"0launch command is not available. "
+			delayed_error(_("This program (%s) cannot be run, "
+				"as the 0launch command is not available. "
 				"It can be downloaded from here:\n\n"
-				"http://0install.net/injector.html"));
+				"http://0install.net/injector.html"),
+				uri);
 			return;
 		}
 	}

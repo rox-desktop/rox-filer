@@ -817,6 +817,8 @@ static GtkWidget *launch_button_new(const char *label, const char *uri)
 {
 	GtkWidget *button;
 	GClosure *closure;
+	const gchar *slash;
+	gchar *tip;
 
 	button = button_new_mixed(GTK_STOCK_PREFERENCES, label);
 	closure = g_cclosure_new_swap(G_CALLBACK(launch_uri),
@@ -825,6 +827,18 @@ static GtkWidget *launch_button_new(const char *label, const char *uri)
 	g_signal_connect_closure(button, "clicked", closure, FALSE);
 
 	allow_right_click(button);
+
+	slash = strrchr(uri, '/');
+	if (!slash)
+		slash = uri - 1;
+	tip = g_strdup_printf(
+			_("Left-click to run %s.\n"
+			  "Right-click for a list of versions."),
+			slash + 1);
+
+	gtk_tooltips_set_tip(tooltips, button, tip, NULL);
+
+	g_free(tip);
 
 	return button;
 }
