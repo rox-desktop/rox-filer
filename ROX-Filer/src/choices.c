@@ -30,6 +30,8 @@
 
 #include "global.h"
 
+#include "gui_support.h"
+
 #include "choices.h"
 
 static gboolean saving_disabled = TRUE;
@@ -377,19 +379,19 @@ static gboolean exists(char *path)
 
 static void migrate_choices(void)
 {
-	GtkWidget *dialog, *vbox, *lbl;
 	gchar *opath, *npath;
-	gchar *text;
 	int failed=0;
 	int i;
 	gchar *src, *dest;
-
+	gboolean migrated_something = FALSE;
 
 	npath=choices_find_xdg_path_save("...", PROJECT, SITE, FALSE);
 	opath=choices_find_path_save("...", PROJECT,FALSE);
 	
+	/*
 	dest=choices_find_xdg_path_save(".", PROJECT, SITE, TRUE);
 	g_free(dest);
+	*/
 
 	for(i=0; to_migrate[i].dir; i++) {
 		src=g_build_filename(dir_list[0], to_migrate[i].dir, NULL);
@@ -405,6 +407,7 @@ static void migrate_choices(void)
 			if(rename(src, dest)==0) {
 				if(to_migrate[i].symlink)
 					symlink(dest, src);
+				migrated_something = TRUE;
 			} else {
 				g_warning("rename(%s, %s): %s\n",
 					  src, dest,
@@ -412,50 +415,33 @@ static void migrate_choices(void)
 				failed++;
 			}
 		} else if(to_migrate[i].symlink) {
+			/*
 			if(!exists(dir_list[0])) {
 				if (mkdir(dir_list[0], 0777))
 					g_warning("mkdir(%s): %s\n",
 						  dir_list[0],
 						  g_strerror(errno));
-				errno=0;
 			}
 			symlink(dest, src);
+			*/
 		}
 		g_free(src);
 		g_free(dest);
 	}
 
-	dialog=gtk_dialog_new_with_buttons(_("Choices migration"),
-					   NULL,
-					   GTK_DIALOG_NO_SEPARATOR,
-					   GTK_STOCK_OK,
-					   GTK_RESPONSE_OK,
-					   NULL);
-	vbox = GTK_DIALOG(dialog)->vbox;
-
-	text=g_strdup_printf(_("Choices have been moved from \n"
-			       "<b>%s</b>\n "
+	if (migrated_something)
+	{
+		gchar *failed_msg = NULL;
+		if (failed)
+			failed_msg = g_strdup_printf(_("%d directories could not be migrated"),
+					     failed);
+		info_message(_("Choices have been moved from \n"
+			       "%s\n "
 			       "to the new location \n"
-			       "<b>%s</b>\n"),
-			     opath, npath);
-	lbl=gtk_label_new(text);
-	gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
-	g_free(text);
-	gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
-
-	if(failed) {
-		text=g_strdup_printf(_("%d directories could not be migrated"),
-				     failed);
-		lbl=gtk_label_new(text);
-		gtk_label_set_use_markup(GTK_LABEL(lbl), TRUE);
-		g_free(text);
-		gtk_box_pack_start(GTK_BOX(vbox), lbl, TRUE, TRUE, 4);
-
+			       "%s\n%s"),
+			     opath, npath, failed_msg ? failed_msg : "");
+		g_free(failed_msg);
 	}
-
-	gtk_widget_show_all(vbox);
-	(void) gtk_dialog_run(GTK_DIALOG(dialog));
-	gtk_widget_destroy(dialog);
 		
 	g_free(opath);
 	g_free(npath);
