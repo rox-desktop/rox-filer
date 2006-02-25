@@ -661,21 +661,27 @@ _xdg_mime_magic_lookup_data (XdgMimeMagic *mime_magic,
   const char *mime_type;
   int n;
   int priority;
+  int had_match;
 
   mime_type = NULL;
   priority = 0;
+  had_match = 0;
   for (match = mime_magic->match_list; match; match = match->next)
     {
       if (_xdg_mime_magic_match_compare_to_data (match, data, len))
 	{
-	  if ((mime_type == NULL) || (xdg_mime_mime_type_subclass (match->mime_type, mime_type)) || match->priority > priority) {
-	    mime_type = match->mime_type;
-	    priority = match->priority;
-	  } else if (match->priority == priority) {
+	  if (!had_match || match->priority > priority ||
+	      (mime_type != NULL && xdg_mime_mime_type_subclass (match->mime_type, mime_type)))
+	    {
+	      mime_type = match->mime_type;
+	      priority = match->priority;
+	    }
+	  else if (had_match && match->priority == priority)
 	    /* multiple unrelated patterns with the same priority matched,
 	     * so we can't tell what type this is. */
 	    mime_type = NULL;
-	  }
+
+	  had_match = 1;
 	}
       else 
 	{
