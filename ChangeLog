@@ -1,3 +1,11 @@
+2006-03-02  Christian Neumair  <chris@gnome-de.org>
+
+	* src/xdgmimeglob.c: (_xdg_glob_hash_insert_text),
+	(_xdg_glob_hash_append_glob): Don't strdup the MIME type when passing
+	it to _xdg_glob_hash_insert_text, but let the function itself figure
+	out whether string duplication is needed. Fixes #5993.
+	Thanks to Martin Wehner.
+
 2006-02-25  Christian Neumair  <chris@gnome-de.org>
 
 	* src/xdgmimemagic.c: (_xdg_mime_magic_lookup_data): Make
