@@ -593,6 +593,10 @@ static GtkWidget *make_details(const guchar *path, DirItem *item,
 						     NULL))
 			{
 				du->chan = g_io_channel_unix_new(out);
+				/* Select binary encoding so we don't get an
+				 * error with non-UTF-8 filenames.
+				 */
+				g_io_channel_set_encoding(du->chan, NULL, NULL);
 				du->watch = g_io_add_watch(du->chan,
 						   G_IO_IN|G_IO_ERR|G_IO_HUP,
 						 (GIOFunc) read_du_output, du);
