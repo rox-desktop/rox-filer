@@ -124,6 +124,9 @@ static Option o_action_delete, o_action_mount;
 static Option o_action_force, o_action_brief, o_action_recurse;
 static Option o_action_newer;
 
+static Option o_action_mount_command;
+static Option o_action_umount_command;
+
 /* Whenever the text in these boxes is changed we store a copy of the new
  * string to be used as the default next time.
  */
@@ -1611,7 +1614,8 @@ static void do_mount(const guchar *path, gboolean mount)
 
 	check_flags();
 
-	argv[0] = mount ? "mount" : "umount";
+	argv[0] = mount ? o_action_mount_command.value
+			: o_action_umount_command.value;
 	argv[1] = path;
 
 	if (quiet)
@@ -2342,6 +2346,11 @@ void action_init(void)
 	option_add_int(&o_action_brief, "action_brief", FALSE);
 	option_add_int(&o_action_recurse, "action_recurse", FALSE);
 	option_add_int(&o_action_newer, "action_newer", FALSE);
+
+	option_add_string(&o_action_mount_command,
+			  "action_mount_command", "mount");
+	option_add_string(&o_action_umount_command,
+			  "action_umount_command", "umount");
 }
 
 #define MAX_ASK 4
