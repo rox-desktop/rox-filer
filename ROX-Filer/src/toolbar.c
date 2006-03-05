@@ -148,7 +148,8 @@ static Tool all_tools[] = {
 	 toolbar_sort_clicked, DROP_NONE, FALSE,
 	 FALSE},
 	
-	{N_("Hidden"), ROX_STOCK_SHOW_HIDDEN, N_("Show/hide hidden files"),
+	{N_("Hidden"), ROX_STOCK_SHOW_HIDDEN, N_("Left: Show/hide hidden files\n"
+						 "Right: Show/hide thumbnails"),
 	 toolbar_hidden_clicked, DROP_NONE, TRUE,
 	 FALSE},
 	
@@ -474,7 +475,18 @@ static void toolbar_details_clicked(GtkWidget *widget,
 static void toolbar_hidden_clicked(GtkWidget *widget,
 				   FilerWindow *filer_window)
 {
-	display_set_hidden(filer_window, !filer_window->show_hidden);
+	GdkEvent	*event;
+
+	event = gtk_get_current_event();
+	if (event->type == GDK_BUTTON_RELEASE &&
+			((GdkEventButton *) event)->button == 1)
+	{
+		display_set_hidden(filer_window, !filer_window->show_hidden);
+	}
+	else
+	{
+		display_set_thumbs(filer_window, !filer_window->show_thumbs);
+	}
 }
 
 static gboolean invert_cb(ViewIter *iter, gpointer data)
