@@ -27,7 +27,7 @@ class Handler(ContentHandler):
 	def trans(self, data):
 		data = string.join(string.split(data, '\n'), '\\n')
 		if data:
-			out.write('_("%s")\n' % data)
+			out.write('_("%s")\n' % data.replace('"', '\\"'))
 
 try:
 	os.chdir("po")
