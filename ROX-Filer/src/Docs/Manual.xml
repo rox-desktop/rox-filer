@@ -3241,8 +3241,8 @@ EOF</screen>
 
    <listitem><para><function>OpenDir</function>(<parameter>Filename</parameter>,
      [<parameter>Style</parameter>, <parameter>Details</parameter>, <parameter>Sort</parameter>,
-     <parameter>Class</parameter>, <parameter>ID</parameter>],
-     <parameter>Hidden</parameter>, <parameter>Filter</parameter>)
+     <parameter>Class</parameter>, <parameter>ID</parameter>,
+     <parameter>Hidden</parameter>, <parameter>Filter</parameter>])
      Open a window showing directory <parameter>Filename</parameter>.
      <parameter>Style</parameter> is one of <userinput>Large</userinput>, <userinput>Small</userinput>, <userinput>Huge</userinput>
      or <userinput>Automatic</userinput>.
@@ -3267,8 +3267,8 @@ their name.  For example using a filter of <userinput>*.c</userinput>
 means that only files ending in .c are shown.
    </para></listitem>
 
-   <listitem><para><function>Panel</function>(<parameter>Side</parameter>,
-     [<parameter>Name</parameter>])
+   <listitem><para><function>Panel</function>([<parameter>Side</parameter>,
+     <parameter>Name</parameter>])
      Open the panel named <parameter>Name</parameter> on screen side
      <parameter>Side</parameter> (<userinput>Top</userinput>|<userinput>Bottom</userinput>|<userinput>Left</userinput>|<userinput>Right</userinput>).
      <parameter>Name</parameter> can be a name in <filename>~/.config/rox.sourceforge.net/ROX-Filer</filename>
