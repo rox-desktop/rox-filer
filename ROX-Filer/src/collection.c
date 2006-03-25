@@ -1,8 +1,6 @@
 /*
- * $Id$
- *
- * Collection - a GTK+ widget
- * Copyright (C) 2005, the ROX-Filer team.
+ * ROX-Filer, filer for the ROX desktop project
+ * Copyright (C) 2006, Thomas Leonard and others (see changelog for details).
  *
  * The collection widget provides an area for displaying a collection of
  * objects (such as files). It allows the user to choose a selection of

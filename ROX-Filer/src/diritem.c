@@ -1,7 +1,6 @@
 /*
- * $Id$
- *
- * Copyright (C) 2005, the ROX-Filer team.
+ * ROX-Filer, filer for the ROX desktop project
+ * Copyright (C) 2006, Thomas Leonard and others (see changelog for details).
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free

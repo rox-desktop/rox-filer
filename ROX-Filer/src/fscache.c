@@ -1,8 +1,6 @@
 /*
- * $Id$
- *
- * FSCache - a glib-style object for caching files
- * Copyright (C) 2005, the ROX-Filer team.
+ * ROX-Filer, filer for the ROX desktop project
+ * Copyright (C) 2006, Thomas Leonard and others (see changelog for details).
  *
  * A cache object holds stat details about files in a hash table, along
  * with user-specified data. When you want to read in a file try to

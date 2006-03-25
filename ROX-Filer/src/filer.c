@@ -1,8 +1,6 @@
 /*
- * $Id$
- *
  * ROX-Filer, filer for the ROX desktop project
- * Copyright (C) 2005, the ROX-Filer team.
+ * Copyright (C) 2006, Thomas Leonard and others (see changelog for details).
  *
  * This program is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the Free
@@ -335,7 +333,7 @@ static gint open_filer_window(FilerWindow *filer_window)
 {
 	Settings *dir_settings;
 	gboolean force_resize;
-	
+
 	dir_settings = (Settings *) g_hash_table_lookup(settings_table,
 					      filer_window->sym_path);
 
