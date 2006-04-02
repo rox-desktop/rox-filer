@@ -11,7 +11,7 @@ msgstr ""
 "Project-Id-Version: ru\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2005-08-09 14:02+0100\n"
-"PO-Revision-Date: 2006-03-26 18:08+0400\n"
+"PO-Revision-Date: 2006-03-30 21:14+0400\n"
 "Last-Translator: Nikita E. Shalaev <smacker@mail.ru>\n"
 "Language-Team: Russian <ru@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -304,7 +304,7 @@ msgstr "?Удалить %s\"%s\"?"
 
 #: action.c:929
 msgid "WRITE-PROTECTED "
-msgstr "ЗАЩИТА ОТ ЗАПИСИ"
+msgstr "защищённый от записи "
 
 #: action.c:936
 #, c-format
@@ -703,13 +703,13 @@ msgstr " и "
 #: action.c:2394
 msgid " will affect some items on the pinboard or panel - really delete it?"
 msgstr ""
-"Это затронет некоторые объекты на доске задач или на панели - "
+"Это затронет некоторые объекты на витрине или на панели - "
 "действительно удалить?"
 
 #: action.c:2401
 msgid " will affect some items on the pinboard or panel - really delete them?"
 msgstr ""
-"Это затронет некоторые объекты на доске задач или на панели - "
+"Это затронет некоторые объекты на витрине или на панели - "
 "действительно удалить их?"
 
 #: appmenu.c:198
@@ -983,7 +983,7 @@ msgid ""
 "\n"
 "%s"
 msgstr ""
-"Не удалось добавить некоторые элементы на доску задач, так как они "
+"Не удалось добавить некоторые элементы на витрину, так как они "
 "находятся на удалённой машине. Например:\n"
 "\n"
 "%s"
@@ -1906,11 +1906,11 @@ msgstr ""
 "  -l, --left=PANEL\tоткрыть PANEL как левую панель\n"
 "  -m, --mime-type=FILE\tвывести тип MIME файла FILE и выйти\n"
 "  -n, --new\t\tзапустить новую копию программы; используется для отладки\n"
-"  -p, --pinboard=PIN\tиспользовать доску задач PIN\n"
+"  -p, --pinboard=PIN\tиспользовать витрину PIN\n"
 "  -r, --right=PANEL\tоткрыть PANEL как правую панель\n"
 "  -R, --RPC\t\tзадействовать ввод из stdin\n"
 "  -s, --show=FILE\tоткрыть каталог, содержащий FILE\n"
-"  -S, --rox-session\tиспользовать настройки по умолчанию для панели и доски задач и -n\n"
+"  -S, --rox-session\tиспользовать настройки по умолчанию для панели и витрины + \"-n\"\n"
 "  -t, --top=PANEL\tоткрыть PANEL как верхнюю панель\n"
 "  -u, --user\t\tотображать имя пользователя в каждом окне \n"
 "  -v, --version\t\tвывести информацию о версии программы и выйти\n"
@@ -2696,7 +2696,7 @@ msgstr "Справа"
 
 #: pinboard.c:354
 msgid "Your old pinboard file has been converted to the new XML format."
-msgstr "Ваша старая доска задач была сконвертирована в новый XML формат."
+msgstr "Ваша старая витрина была сконвертирована в новый XML формат."
 
 #: pinboard.c:635
 msgid ""
@@ -2771,8 +2771,8 @@ msgid ""
 "No pinboard was in use... the 'Default' pinboard has been selected. Use 'rox "
 "-p=Default' to turn it on in future."
 msgstr ""
-"Доска задач не использовалась... Была выбрана доска задач по умолчанию. "
-"Используйте 'rox -p=Default' чтобы включить эту доску задач в будущем."
+"Витрина не использовалась... Была выбрана витрина по умолчанию. "
+"Используйте 'rox -p=Default' чтобы включить эту витрину в будущем."
 
 #: pinboard.c:866
 msgid ""
@@ -2793,7 +2793,7 @@ msgstr "Отсутствует \",\" после метки"
 #: pinboard.c:1565
 #, c-format
 msgid "Error saving pinboard %s: %s"
-msgstr "Ошибка сохранения доски задач %s: %s"
+msgstr "Ошибка сохранения витрины %s: %s"
 
 #: pinboard.c:2109
 msgid "Backdrop..."
@@ -3909,14 +3909,14 @@ msgstr ""
 
 #: tips:122 tips:195
 msgid "Pinboard"
-msgstr "Доска задач"
+msgstr "Витрина"
 
 #: tips:123
 msgid ""
 "When using a pinboard, you can drag files and applications onto the desktop "
 "background to create shortcuts to them."
 msgstr ""
-"Когда вы используете доску задач, то можете перетаскивать файлы "
+"Когда вы используете витрину, то можете перетаскивать файлы "
 "и приложения на рабочий стол для создания ярлыков к ним."
 
 #: tips:124 tips:241
@@ -3969,7 +3969,7 @@ msgstr ""
 
 #: tips:135
 msgid "Pinboard behaviour"
-msgstr "Поведение доски задач"
+msgstr "Поведение витрины"
 
 #: tips:136
 msgid "Single-click to open"
@@ -3984,7 +3984,7 @@ msgid ""
 "If this is set, pinboard icons are always kept completely within screen "
 "limits, including the label."
 msgstr ""
-"Если эта опция включена,значки доски задач всегда будут внутри "
+"Если эта опция включена, значки на витрине всегда будут внутри "
 "экрана, включая метку."
 
 #: tips:140
@@ -4040,8 +4040,8 @@ msgid ""
 "pinboard must be in use."
 msgstr ""
 "Если эта опция включена, ROX-Filer будет показывать каждое свернутое "
-"окно как небольшую кнопку на доске задач. Требуется совместимый оконный "
-"менеджер и должна использоваться доска задач."
+"окно как небольшую кнопку на витрине. Для этого требуется использовать "
+"совместимый оконный менеджер и задействовать витрину."
 
 #: tips:152
 msgid "Show per workspace"
@@ -4213,7 +4213,7 @@ msgid ""
 "open up a panel and/or the pinboard.  Here you configure which."
 msgstr ""
 "Если ROX запускается менеджером сессий (например, ROX-Session), "
-"он может создавать панель и/или доску задач. Здесь вы можете определить, "
+"он может создавать панель и/или витрину. Здесь вы можете определить, "
 "что именно будет создаваться."
 
 #: tips:187
@@ -4226,19 +4226,19 @@ msgstr "Показывается только панель."
 
 #: tips:189
 msgid "Pinboard only"
-msgstr "Только доска задач"
+msgstr "Только витрина"
 
 #: tips:190
 msgid "Only the pinboard is shown."
-msgstr "Показывается только доска задач."
+msgstr "Показывается только витрина."
 
 #: tips:191
 msgid "Panel and pinboard"
-msgstr "Панель и доска задач"
+msgstr "Панель и витрина"
 
 #: tips:192
 msgid "Both a panel and a pinboard are shown."
-msgstr "Показываются и панель, и доска задач."
+msgstr "Показываются и панель, и витрина."
 
 #: tips:193
 msgid "Panel"
@@ -4250,7 +4250,7 @@ msgstr "Укажите имя панели, которая будет отображаться."
 
 #: tips:196
 msgid "Enter the name of the pinboard to show here."
-msgstr "Укажите имя доски задач, которая будет отображаться."
+msgstr "Укажите имя витрины, которая будет отображаться."
 
 #: tips:197
 msgid "Changes here take effect the next time the filer is run."
@@ -4594,7 +4594,7 @@ msgstr "Проблемы с оконным менеджером"
 
 #: tips:281
 msgid "Override window manager control of the pinboard and panels"
-msgstr "Переназначать управление оконного менеджера для доски задач и панелей"
+msgstr "Переназначать управление оконного менеджера для витрины и панелей"
 
 #: tips:282
 msgid ""
@@ -4605,8 +4605,8 @@ msgid ""
 "them appear in window-select lists."
 msgstr ""
 "Некоторые оконные менеджеры не поддерживают \"Extended Window Manager Hint "
-"system\" и показывают доску задач и панели, как обычные окна. Включите эту "
-"опцию для решения проблем, таких как: выход доски задач на передний план, "
+"system\" и показывают витрину и панели как обычные окна. Включите эту "
+"опцию для решения проблем, таких как: выход витрины на передний план, "
 "когда вы по ней щелкаете, наличие у неё заголовка и других оконных элементов "
 "оформления окна или её появление в списке окон"
 
@@ -4620,9 +4620,9 @@ msgid ""
 "menu and left clicking will clear the selection. Turn this on to forward the "
 "events to your window manager instead. Clicks on icons will not be forwarded."
 msgstr ""
-"Обычно, правый щелчок по рабочему столу открывает меню, а левый щелчок "
-"снимает выделение. Включите опцию, и вместо этого данные события будут "
-"передаваться в ваш оконный менеджер. "
+"Обычно, правый щелчок по рабочему столу открывает меню витрины, а левый "
+"щелчок снимает выделение. Включите опцию, и вместо этого данные события "
+"будут передаваться в ваш оконный менеджер. "
 "Щелчки по значкам передаваться не будут."
 
 #: tips:285
@@ -4636,8 +4636,8 @@ msgid ""
 "managers are expected to change their behaviour in new versions so that this "
 "isn't necessary."
 msgstr ""
-"Blackbox, Fluxbox и им подобные оконные менеджеры плохо сочетаются с рабочим "
-"столом ROX. Эта опция включает некоторые обходные алгоритмы. Ожидается, что "
+"Blackbox, Fluxbox и им подобные оконные менеджеры плохо сочетаются с витриной "
+"ROX. Эта опция включает некоторые обходные алгоритмы. Ожидается, что "
 "новые версии этих оконных менеджеров будут вести себя иначе, и эта функция в "
 "будущем больше не понадобится."
 
