@@ -1064,7 +1064,6 @@ static void view_collection_add_items(ViewIface *view, GPtrArray *items)
 	{
 		DirItem *item = (DirItem *) items->pdata[i];
 
-		printf("test %s\n", item->leafname);
 		if (!filer_match_filter(filer_window, item))
 			continue;
 
@@ -1096,7 +1095,6 @@ static void view_collection_update_items(ViewIface *view, GPtrArray *items)
 		const gchar *leafname = item->leafname;
 		int j;
 
-		printf("update %s\n", leafname);
 		if (!filer_match_filter(filer_window, item))
 			continue;
 
